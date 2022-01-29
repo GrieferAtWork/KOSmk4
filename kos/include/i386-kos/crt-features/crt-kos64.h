@@ -2600,6 +2600,8 @@
 #define __CRT_HAVE_ilogbl
 #define __CRT_HAVE_imaxabs
 #define __CRT_HAVE_imaxdiv
+#define __CRT_HAVE_in6addr_any
+#define __CRT_HAVE_in6addr_loopback
 #define __CRT_HAVE_independent_calloc
 #define __CRT_HAVE_independent_comalloc
 #define __CRT_HAVE_index

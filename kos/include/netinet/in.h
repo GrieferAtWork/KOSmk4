@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe671e61 */
+/* HASH CRC-32:0xb1d38a04 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -148,17 +148,18 @@ struct in6_addr {
 
 #ifdef __CRT_HAVE_in6addr_any
 #undef in6addr_any
-__LIBC struct in6_addr const (in6addr_any); /* :: */
+__LIBC struct in6_addr const in6addr_any; /* :: */
 #endif /* __CRT_HAVE_in6addr_any */
 #ifdef __CRT_HAVE_in6addr_loopback
 #undef in6addr_loopback
-__LIBC struct in6_addr const (in6addr_loopback); /* ::1 */
+__LIBC struct in6_addr const in6addr_loopback; /* ::1 */
 #endif /* __CRT_HAVE_in6addr_loopback */
 
 #define IN6ADDR_ANY_INIT      { { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } } }
 #define IN6ADDR_LOOPBACK_INIT { { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 } } }
 #define INET_ADDRSTRLEN  16
 #define INET6_ADDRSTRLEN 46
+
 
 /* AF_INET: Socket address */
 struct sockaddr_in {

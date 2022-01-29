@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce49fa33 */
+/* HASH CRC-32:0x265c75 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,14 @@
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
+INTDEF struct in6_addr const libc_in6addr_any;
+INTDEF struct in6_addr const libc_in6addr_loopback;
+INTERN_CONST ATTR_SECTION(".rodata.crt.net.inet.6") struct in6_addr const libc_in6addr_any = IN6ADDR_ANY_INIT;
+INTERN_CONST ATTR_SECTION(".rodata.crt.net.inet.6") struct in6_addr const libc_in6addr_loopback = IN6ADDR_LOOPBACK_INIT;
+DEFINE_PUBLIC_ALIAS(in6addr_any, libc_in6addr_any);
+DEFINE_PUBLIC_ALIAS(in6addr_loopback, libc_in6addr_loopback);
+#endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 #include <hybrid/__byteswap.h>
 INTERN ATTR_SECTION(".text.crt.net.convert") ATTR_CONST uint16_t

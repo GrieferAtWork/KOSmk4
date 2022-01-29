@@ -156,17 +156,28 @@ struct in6_addr {
 
 #ifdef __CRT_HAVE_in6addr_any
 #undef in6addr_any
-__LIBC struct in6_addr const (in6addr_any); /* :: */
+__LIBC struct in6_addr const in6addr_any; /* :: */
 #endif /* __CRT_HAVE_in6addr_any */
 #ifdef __CRT_HAVE_in6addr_loopback
 #undef in6addr_loopback
-__LIBC struct in6_addr const (in6addr_loopback); /* ::1 */
+__LIBC struct in6_addr const in6addr_loopback; /* ::1 */
 #endif /* __CRT_HAVE_in6addr_loopback */
 
 #define IN6ADDR_ANY_INIT      { { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } } }
 #define IN6ADDR_LOOPBACK_INIT { { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 } } }
 #define INET_ADDRSTRLEN  16
 #define INET6_ADDRSTRLEN 46
+
+}%(auto_source){
+#ifndef __KERNEL__
+INTDEF struct in6_addr const libc_in6addr_any;
+INTDEF struct in6_addr const libc_in6addr_loopback;
+INTERN_CONST ATTR_SECTION(".rodata.crt.net.inet.6") struct in6_addr const libc_in6addr_any = IN6ADDR_ANY_INIT;
+INTERN_CONST ATTR_SECTION(".rodata.crt.net.inet.6") struct in6_addr const libc_in6addr_loopback = IN6ADDR_LOOPBACK_INIT;
+DEFINE_PUBLIC_ALIAS(in6addr_any, libc_in6addr_any);
+DEFINE_PUBLIC_ALIAS(in6addr_loopback, libc_in6addr_loopback);
+#endif /* !__KERNEL__ */
+}%{
 
 /* AF_INET: Socket address */
 struct sockaddr_in {
