@@ -31,5 +31,34 @@ CONFIGURE="$CONFIGURE --enable-newline-is-anycrlf"
 CONFIGURE="$CONFIGURE --enable-pcregrep-libz"
 CONFIGURE="$CONFIGURE --enable-pcregrep-libbz2"
 
+INSTALL_SKIP=""
+INSTALL_SKIP="$INSTALL_SKIP /bin/pcre-config"
+
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"
+
+cmd mkdir -p "$BINUTILS_CONFIG_BIN"
+cmd cat > "$BINUTILS_CONFIG_BIN/pcre-config" <<EOF
+#!/bin/sh
+if test \$# -eq 0; then exit 1; fi
+while test \$# -gt 0; do
+	case \$1 in
+	--prefix=*)      ;;
+	--prefix)        echo "$PACKAGE_PREFIX"; ;;
+	--exec-prefix=*) ;;
+	--exec-prefix)   echo "$PACKAGE_EPREFIX"; ;;
+	--version)       echo "$PACKAGE_VERSION"; ;;
+	--cflags)        echo ""; ;;
+	--cflags-posix)  echo ""; ;;
+	--libs-posix)    echo "-lpcreposix -lpcre"; ;;
+	--libs)          echo "-lpcre"; ;;
+	--libs16)        echo "-lpcre16"; ;;
+	--libs32)        echo "-lpcre32"; ;;
+	--libs-cpp)      echo "-lpcrecpp -lpcre"; ;;
+	*)               exit 1; ;;
+	esac
+	shift
+done
+EOF
+cmd chmod +x "$BINUTILS_CONFIG_BIN/pcre-config"
+

@@ -638,7 +638,7 @@ apply_patch() {
 #>> set_archpath
 # Set $PATH to include target toolchain utilities.
 set_archpath() {
-	export PATH="${BINUTILS_SYSROOT}/bin:${PATH}"
+	export PATH="$BINUTILS_SYSROOT/bin:$PATH"
 	export CC="${CROSS_PREFIX}gcc"
 	export AR="${CROSS_PREFIX}ar"
 }
@@ -650,6 +650,10 @@ export CROSS_PREFIX="$KOS_ROOT/binutils/$TARGET_NAME-kos/bin/$TARGET_CPUNAME-kos
 export CROSS_COMPILE="$CROSS_PREFIX"
 MAKE_PARALLEL_COUNT=$(grep -c ^processor /proc/cpuinfo)
 HOST_SYSROOT="$KOS_ROOT/binutils/misc"
+
+# Old-style config programs (like `pcre-config'), are put in this folder
+BINUTILS_CONFIG_BIN="$BINUTILS_SYSROOT/config-bin"
+export PATH="$BINUTILS_CONFIG_BIN:$PATH"
 
 
 # Handle the case where the utility name contains a "*"

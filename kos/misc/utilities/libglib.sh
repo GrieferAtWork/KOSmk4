@@ -1,4 +1,4 @@
-#TEST: require_utility libglib "$PKG_CONFIG_PATH/libglib.pc"
+#TEST: require_utility libglib "$PKG_CONFIG_PATH/glib-2.0.pc"
 # Copyright (c) 2019-2022 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
