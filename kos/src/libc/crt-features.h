@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x150d0224 */
+/* HASH CRC-32:0xaea22cd3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -727,6 +727,8 @@
 #define __CRT_HAVE_DOS$atoi
 #define __CRT_HAVE_DOS$atol
 #define __CRT_HAVE_DOS$atoll
+#define __CRT_HAVE_DOS$b64_ntop
+#define __CRT_HAVE_DOS$b64_pton
 #define __CRT_HAVE_DOS$backtrace
 #define __CRT_HAVE_DOS$backtrace_symbols
 #define __CRT_HAVE_DOS$backtrace_symbols_fd
@@ -934,6 +936,10 @@
 #define __CRT_HAVE_DOS$dirfd
 #define __CRT_HAVE_DOS$dirname
 #define __CRT_HAVE_DOS$div
+#define __CRT_HAVE_DOS$dn_comp
+#define __CRT_HAVE_DOS$dn_count_labels
+#define __CRT_HAVE_DOS$dn_expand
+#define __CRT_HAVE_DOS$dn_skipname
 #define __CRT_HAVE_DOS$dngettext
 #define __CRT_HAVE_DOS$dosfs_setenabled
 #define __CRT_HAVE_DOS$dprintf
@@ -1190,6 +1196,9 @@
 #define __CRT_HAVE_DOS$format_wwidth
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$fp_nquery
+#define __CRT_HAVE_DOS$fp_query
+#define __CRT_HAVE_DOS$fp_resstat
 #define __CRT_HAVE_DOS$fparseln
 #define __CRT_HAVE_DOS$fpathconf
 #define __CRT_HAVE_DOS$fprintf
@@ -1510,6 +1519,7 @@
 #define __CRT_HAVE_DOS$hdestroy_r
 #define __CRT_HAVE_DOS$heapsort
 #define __CRT_HAVE_DOS$herror
+#define __CRT_HAVE_DOS$hostalias
 #define __CRT_HAVE_DOS$hsearch
 #define __CRT_HAVE_DOS$hsearch_r
 #define __CRT_HAVE_DOS$hstrerror
@@ -1701,6 +1711,8 @@
 #define __CRT_HAVE_DOS$llroundf
 #define __CRT_HAVE_DOS$llroundl
 #define __CRT_HAVE_DOS$lltostr
+#define __CRT_HAVE_DOS$loc_aton
+#define __CRT_HAVE_DOS$loc_ntoa
 #define __CRT_HAVE_DOS$localtime
 #define __CRT_HAVE_DOS$localtime64
 #define __CRT_HAVE_DOS$localtime64_r
@@ -1971,6 +1983,40 @@
 #define __CRT_HAVE_DOS$nice
 #define __CRT_HAVE_DOS$nrand48
 #define __CRT_HAVE_DOS$nrand48_r
+#define __CRT_HAVE_DOS$ns_datetosecs
+#define __CRT_HAVE_DOS$ns_find_tsig
+#define __CRT_HAVE_DOS$ns_format_ttl
+#define __CRT_HAVE_DOS$ns_get16
+#define __CRT_HAVE_DOS$ns_get32
+#define __CRT_HAVE_DOS$ns_initparse
+#define __CRT_HAVE_DOS$ns_makecanon
+#define __CRT_HAVE_DOS$ns_name_compress
+#define __CRT_HAVE_DOS$ns_name_ntol
+#define __CRT_HAVE_DOS$ns_name_ntop
+#define __CRT_HAVE_DOS$ns_name_pack
+#define __CRT_HAVE_DOS$ns_name_pton
+#define __CRT_HAVE_DOS$ns_name_rollback
+#define __CRT_HAVE_DOS$ns_name_skip
+#define __CRT_HAVE_DOS$ns_name_uncompress
+#define __CRT_HAVE_DOS$ns_name_unpack
+#define __CRT_HAVE_DOS$ns_parse_ttl
+#define __CRT_HAVE_DOS$ns_parserr
+#define __CRT_HAVE_DOS$ns_put16
+#define __CRT_HAVE_DOS$ns_put32
+#define __CRT_HAVE_DOS$ns_samedomain
+#define __CRT_HAVE_DOS$ns_samename
+#define __CRT_HAVE_DOS$ns_sign
+#define __CRT_HAVE_DOS$ns_sign2
+#define __CRT_HAVE_DOS$ns_sign_tcp
+#define __CRT_HAVE_DOS$ns_sign_tcp2
+#define __CRT_HAVE_DOS$ns_sign_tcp_init
+#define __CRT_HAVE_DOS$ns_skiprr
+#define __CRT_HAVE_DOS$ns_sprintrr
+#define __CRT_HAVE_DOS$ns_sprintrrf
+#define __CRT_HAVE_DOS$ns_subdomain
+#define __CRT_HAVE_DOS$ns_verify
+#define __CRT_HAVE_DOS$ns_verify_tcp
+#define __CRT_HAVE_DOS$ns_verify_tcp_init
 #define __CRT_HAVE_DOS$ntohl
 #define __CRT_HAVE_DOS$ntohq
 #define __CRT_HAVE_DOS$ntohs
@@ -2010,6 +2056,18 @@
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$openlog
 #define __CRT_HAVE_DOS$openpty
+#define __CRT_HAVE_DOS$p_cdname
+#define __CRT_HAVE_DOS$p_cdnname
+#define __CRT_HAVE_DOS$p_class
+#define __CRT_HAVE_DOS$p_fqname
+#define __CRT_HAVE_DOS$p_fqnname
+#define __CRT_HAVE_DOS$p_option
+#define __CRT_HAVE_DOS$p_query
+#define __CRT_HAVE_DOS$p_rcode
+#define __CRT_HAVE_DOS$p_secstodate
+#define __CRT_HAVE_DOS$p_section
+#define __CRT_HAVE_DOS$p_time
+#define __CRT_HAVE_DOS$p_type
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$pathconf
@@ -2242,11 +2300,13 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$putgrent
+#define __CRT_HAVE_DOS$putlong
 #define __CRT_HAVE_DOS$putmsg
 #define __CRT_HAVE_DOS$putpmsg
 #define __CRT_HAVE_DOS$putpwent
 #define __CRT_HAVE_DOS$puts
 #define __CRT_HAVE_DOS$puts_unlocked
+#define __CRT_HAVE_DOS$putshort
 #define __CRT_HAVE_DOS$putspent
 #define __CRT_HAVE_DOS$pututline
 #define __CRT_HAVE_DOS$pututxline
@@ -2386,6 +2446,32 @@
 #define __CRT_HAVE_DOS$rename
 #define __CRT_HAVE_DOS$renameat
 #define __CRT_HAVE_DOS$renameat2
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$res_dnok
+#define __CRT_HAVE_DOS$res_hnok
+#define __CRT_HAVE_DOS$res_hostalias
+#define __CRT_HAVE_DOS$res_isourserver
+#define __CRT_HAVE_DOS$res_mailok
+#define __CRT_HAVE_DOS$res_mkquery
+#define __CRT_HAVE_DOS$res_nameinquery
+#define __CRT_HAVE_DOS$res_nclose
+#define __CRT_HAVE_DOS$res_ninit
+#define __CRT_HAVE_DOS$res_nisourserver
+#define __CRT_HAVE_DOS$res_nmkquery
+#define __CRT_HAVE_DOS$res_npquery
+#define __CRT_HAVE_DOS$res_nquery
+#define __CRT_HAVE_DOS$res_nquerydomain
+#define __CRT_HAVE_DOS$res_nsearch
+#define __CRT_HAVE_DOS$res_nsend
+#define __CRT_HAVE_DOS$res_ownok
+#define __CRT_HAVE_DOS$res_queriesmatch
+#define __CRT_HAVE_DOS$res_query
+#define __CRT_HAVE_DOS$res_querydomain
+#define __CRT_HAVE_DOS$res_search
+#define __CRT_HAVE_DOS$res_send
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$resolvepath
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -2789,6 +2875,13 @@
 #define __CRT_HAVE_DOS$swprintf_s
 #define __CRT_HAVE_DOS$swscanf
 #define __CRT_HAVE_DOS$swscanf_s
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$sym_ntop
+#define __CRT_HAVE_DOS$sym_ntos
+#define __CRT_HAVE_DOS$sym_ston
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$symlink
 #define __CRT_HAVE_DOS$symlinkat
 #endif /* !__KERNEL__ */
@@ -3638,6 +3731,7 @@
 #define __CRT_HAVE___pthread_unregister_cancel
 #define __CRT_HAVE___pthread_unregister_cancel_restore
 #define __CRT_HAVE___pthread_unwind_next
+#define __CRT_HAVE___res_state
 #define __CRT_HAVE___signbit
 #define __CRT_HAVE___signbitf
 #define __CRT_HAVE___signbitl
@@ -4176,6 +4270,8 @@
 #define __CRT_HAVE_atoi
 #define __CRT_HAVE_atol
 #define __CRT_HAVE_atoll
+#define __CRT_HAVE_b64_ntop
+#define __CRT_HAVE_b64_pton
 #define __CRT_HAVE_backtrace
 #define __CRT_HAVE_backtrace_symbols
 #define __CRT_HAVE_backtrace_symbols_fd
@@ -4372,6 +4468,10 @@
 #define __CRT_HAVE_dirfd
 #define __CRT_HAVE_dirname
 #define __CRT_HAVE_div
+#define __CRT_HAVE_dn_comp
+#define __CRT_HAVE_dn_count_labels
+#define __CRT_HAVE_dn_expand
+#define __CRT_HAVE_dn_skipname
 #define __CRT_HAVE_dngettext
 #define __CRT_HAVE_dosfs_getenabled
 #define __CRT_HAVE_dosfs_setenabled
@@ -4638,6 +4738,9 @@
 #define __CRT_HAVE_format_wto16
 #define __CRT_HAVE_format_wto32
 #define __CRT_HAVE_format_wto8
+#define __CRT_HAVE_fp_nquery
+#define __CRT_HAVE_fp_query
+#define __CRT_HAVE_fp_resstat
 #define __CRT_HAVE_fparseln
 #define __CRT_HAVE_fpathconf
 #define __CRT_HAVE_fpreset
@@ -5000,6 +5103,7 @@
 #define __CRT_HAVE_hdestroy_r
 #define __CRT_HAVE_heapsort
 #define __CRT_HAVE_herror
+#define __CRT_HAVE_hostalias
 #define __CRT_HAVE_hsearch
 #define __CRT_HAVE_hsearch_r
 #define __CRT_HAVE_hstrerror
@@ -5193,6 +5297,8 @@
 #define __CRT_HAVE_llroundf
 #define __CRT_HAVE_llroundl
 #define __CRT_HAVE_lltostr
+#define __CRT_HAVE_loc_aton
+#define __CRT_HAVE_loc_ntoa
 #define __CRT_HAVE_localeconv
 #define __CRT_HAVE_localtime
 #define __CRT_HAVE_localtime64
@@ -5488,6 +5594,40 @@
 #define __CRT_HAVE_nice
 #define __CRT_HAVE_nrand48
 #define __CRT_HAVE_nrand48_r
+#define __CRT_HAVE_ns_datetosecs
+#define __CRT_HAVE_ns_find_tsig
+#define __CRT_HAVE_ns_format_ttl
+#define __CRT_HAVE_ns_get16
+#define __CRT_HAVE_ns_get32
+#define __CRT_HAVE_ns_initparse
+#define __CRT_HAVE_ns_makecanon
+#define __CRT_HAVE_ns_name_compress
+#define __CRT_HAVE_ns_name_ntol
+#define __CRT_HAVE_ns_name_ntop
+#define __CRT_HAVE_ns_name_pack
+#define __CRT_HAVE_ns_name_pton
+#define __CRT_HAVE_ns_name_rollback
+#define __CRT_HAVE_ns_name_skip
+#define __CRT_HAVE_ns_name_uncompress
+#define __CRT_HAVE_ns_name_unpack
+#define __CRT_HAVE_ns_parse_ttl
+#define __CRT_HAVE_ns_parserr
+#define __CRT_HAVE_ns_put16
+#define __CRT_HAVE_ns_put32
+#define __CRT_HAVE_ns_samedomain
+#define __CRT_HAVE_ns_samename
+#define __CRT_HAVE_ns_sign
+#define __CRT_HAVE_ns_sign2
+#define __CRT_HAVE_ns_sign_tcp
+#define __CRT_HAVE_ns_sign_tcp2
+#define __CRT_HAVE_ns_sign_tcp_init
+#define __CRT_HAVE_ns_skiprr
+#define __CRT_HAVE_ns_sprintrr
+#define __CRT_HAVE_ns_sprintrrf
+#define __CRT_HAVE_ns_subdomain
+#define __CRT_HAVE_ns_verify
+#define __CRT_HAVE_ns_verify_tcp
+#define __CRT_HAVE_ns_verify_tcp_init
 #define __CRT_HAVE_ntohl
 #define __CRT_HAVE_ntohq
 #define __CRT_HAVE_ntohs
@@ -5518,6 +5658,18 @@
 #define __CRT_HAVE_opendirat
 #define __CRT_HAVE_openlog
 #define __CRT_HAVE_openpty
+#define __CRT_HAVE_p_cdname
+#define __CRT_HAVE_p_cdnname
+#define __CRT_HAVE_p_class
+#define __CRT_HAVE_p_fqname
+#define __CRT_HAVE_p_fqnname
+#define __CRT_HAVE_p_option
+#define __CRT_HAVE_p_query
+#define __CRT_HAVE_p_rcode
+#define __CRT_HAVE_p_secstodate
+#define __CRT_HAVE_p_section
+#define __CRT_HAVE_p_time
+#define __CRT_HAVE_p_type
 #define __CRT_HAVE_pathconf
 #define __CRT_HAVE_pause
 #define __CRT_HAVE_pclose
@@ -5745,11 +5897,13 @@
 #define __CRT_HAVE_putchar_unlocked
 #define __CRT_HAVE_putenv
 #define __CRT_HAVE_putgrent
+#define __CRT_HAVE_putlong
 #define __CRT_HAVE_putmsg
 #define __CRT_HAVE_putpmsg
 #define __CRT_HAVE_putpwent
 #define __CRT_HAVE_puts
 #define __CRT_HAVE_puts_unlocked
+#define __CRT_HAVE_putshort
 #define __CRT_HAVE_putspent
 #define __CRT_HAVE_pututline
 #define __CRT_HAVE_pututxline
@@ -5869,6 +6023,31 @@
 #define __CRT_HAVE_rename
 #define __CRT_HAVE_renameat
 #define __CRT_HAVE_renameat2
+#define __CRT_HAVE_res_close
+#define __CRT_HAVE_res_dnok
+#define __CRT_HAVE_res_hnok
+#define __CRT_HAVE_res_hostalias
+#define __CRT_HAVE_res_init
+#define __CRT_HAVE_res_isourserver
+#define __CRT_HAVE_res_mailok
+#define __CRT_HAVE_res_mkquery
+#define __CRT_HAVE_res_nameinquery
+#define __CRT_HAVE_res_nclose
+#define __CRT_HAVE_res_ninit
+#define __CRT_HAVE_res_nisourserver
+#define __CRT_HAVE_res_nmkquery
+#define __CRT_HAVE_res_npquery
+#define __CRT_HAVE_res_nquery
+#define __CRT_HAVE_res_nquerydomain
+#define __CRT_HAVE_res_nsearch
+#define __CRT_HAVE_res_nsend
+#define __CRT_HAVE_res_ownok
+#define __CRT_HAVE_res_queriesmatch
+#define __CRT_HAVE_res_query
+#define __CRT_HAVE_res_querydomain
+#define __CRT_HAVE_res_randomid
+#define __CRT_HAVE_res_search
+#define __CRT_HAVE_res_send
 #define __CRT_HAVE_resolvepath
 #define __CRT_HAVE_revoke
 #define __CRT_HAVE_rewind
@@ -6371,6 +6550,9 @@
 #define __CRT_HAVE_swprintf_s
 #define __CRT_HAVE_swscanf
 #define __CRT_HAVE_swscanf_s
+#define __CRT_HAVE_sym_ntop
+#define __CRT_HAVE_sym_ntos
+#define __CRT_HAVE_sym_ston
 #define __CRT_HAVE_symlink
 #define __CRT_HAVE_symlinkat
 #define __CRT_HAVE_sync

@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Windows Kits (/ucrt/corecrt_stdio_config.h) */
 #ifndef _CORECRT_STDIO_CONFIG_H
 #define _CORECRT_STDIO_CONFIG_H 1
 

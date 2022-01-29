@@ -63,15 +63,18 @@
 #define TCFL   FF /* ??? */
 
 
-#define MSABI64_CONVERTER_FOR_1(a)                         libd_msabi64_##a
-#define MSABI64_CONVERTER_FOR_2(a, b)                      libd_msabi64_##a##b
-#define MSABI64_CONVERTER_FOR_3(a, b, c)                   libd_msabi64_##a##b##c
-#define MSABI64_CONVERTER_FOR_4(a, b, c, d)                libd_msabi64_##a##b##c##d
-#define MSABI64_CONVERTER_FOR_5(a, b, c, d, e)             libd_msabi64_##a##b##c##d##e
-#define MSABI64_CONVERTER_FOR_6(a, b, c, d, e, f)          libd_msabi64_##a##b##c##d##e##f
-#define MSABI64_CONVERTER_FOR_7(a, b, c, d, e, f, g)       libd_msabi64_##a##b##c##d##e##f##g
-#define MSABI64_CONVERTER_FOR_8(a, b, c, d, e, f, g, h)    libd_msabi64_##a##b##c##d##e##f##g##h
-#define MSABI64_CONVERTER_FOR_9(a, b, c, d, e, f, g, h, i) libd_msabi64_##a##b##c##d##e##f##g##h##i
+#define MSABI64_CONVERTER_FOR_1(a)                                   libd_msabi64_##a
+#define MSABI64_CONVERTER_FOR_2(a, b)                                libd_msabi64_##a##b
+#define MSABI64_CONVERTER_FOR_3(a, b, c)                             libd_msabi64_##a##b##c
+#define MSABI64_CONVERTER_FOR_4(a, b, c, d)                          libd_msabi64_##a##b##c##d
+#define MSABI64_CONVERTER_FOR_5(a, b, c, d, e)                       libd_msabi64_##a##b##c##d##e
+#define MSABI64_CONVERTER_FOR_6(a, b, c, d, e, f)                    libd_msabi64_##a##b##c##d##e##f
+#define MSABI64_CONVERTER_FOR_7(a, b, c, d, e, f, g)                 libd_msabi64_##a##b##c##d##e##f##g
+#define MSABI64_CONVERTER_FOR_8(a, b, c, d, e, f, g, h)              libd_msabi64_##a##b##c##d##e##f##g##h
+#define MSABI64_CONVERTER_FOR_9(a, b, c, d, e, f, g, h, i)           libd_msabi64_##a##b##c##d##e##f##g##h##i
+#define MSABI64_CONVERTER_FOR_10(a, b, c, d, e, f, g, h, i, j)       libd_msabi64_##a##b##c##d##e##f##g##h##i##j
+#define MSABI64_CONVERTER_FOR_11(a, b, c, d, e, f, g, h, i, j, k)    libd_msabi64_##a##b##c##d##e##f##g##h##i##j##k
+#define MSABI64_CONVERTER_FOR_12(a, b, c, d, e, f, g, h, i, j, k, l) libd_msabi64_##a##b##c##d##e##f##g##h##i##j##k##l
 
 #define MSABI64_CONVERTER_FOR3(func, argv) func argv
 #define MSABI64_CONVERTER_FOR2(argc, argv) MSABI64_CONVERTER_FOR3(MSABI64_CONVERTER_FOR_##argc, argv)
@@ -184,6 +187,18 @@ END(libd_msabi64_RRRRR)
 .section ".text.crt.compat.dos.msabi64.msabi64_RRRRRRn"
 .cfi_startproc
 /* If necessary, add wrappers for more arguments here! */
+INTERN_FUNCTION(libd_msabi64_RRRRRRRRRRRR)
+	movzlq $(6), %r10
+	INTERN(libd_msabi64_RRRRRRn)
+	jmp    libd_msabi64_RRRRRRn
+END(libd_msabi64_RRRRRRRRRRRR)
+
+INTERN_FUNCTION(libd_msabi64_RRRRRRRRRR)
+	movzlq $(4), %r10
+	INTERN(libd_msabi64_RRRRRRn)
+	jmp    libd_msabi64_RRRRRRn
+END(libd_msabi64_RRRRRRRRRR)
+
 INTERN_FUNCTION(libd_msabi64_RRRRRRRRR)
 	movzlq $(3), %r10
 	INTERN(libd_msabi64_RRRRRRn)

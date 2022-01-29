@@ -1,3 +1,4 @@
+/* HASH CRC-32:0x7f9abd8a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,49 +18,61 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%(c_prefix){
-/* (#) Portability: MinGW        (/mingw-w64-headers/crt/new.h) */
-/* (#) Portability: Windows Kits (/ucrt/new.h) */
-}
+#ifndef _ARPA_FTP_H
+#define _ARPA_FTP_H 1
 
-%[define_replacement(locale_t = __locale_t)]
-%[default:section(".text.crt.dos.heap.malloc")]
+/* ??? */
+#define PRELIM    1 /* ??? */
+#define COMPLETE  2 /* ??? */
+#define CONTINUE  3 /* ??? */
+#define TRANSIENT 4 /* ??? */
+#define ERROR     5 /* ??? */
 
-%[insert:prefix(
-#include <features.h>
-)]%[insert:prefix(
-#include <crtdefs.h>
-)]%{
+/* ??? */
+#define TYPE_A 1 /* ASCII */
+#define TYPE_E 2 /* EBCDIC */
+#define TYPE_I 3 /* Image */
+#define TYPE_L 4 /* Local */
 
-#ifdef __CC__
-__SYSDECL_BEGIN
+#ifdef FTP_NAMES
+char *typenames[] = { "0", "ASCII", "EBCDIC", "Image", "Local" };
+#endif /* FTP_NAMES */
 
-}
+/* ??? */
+#define FORM_N 1 /* Nonprint */
+#define FORM_T 2 /* Telnet */
+#define FORM_C 3 /* Carriage-control */
+#ifdef FTP_NAMES
+char *formnames[] = { "0", "Nonprint", "Telnet", "Carriage-control" };
+#endif /* FTP_NAMES */
 
-%[define(DEFINE__PNH =
-@@pp_ifndef ___PNH_defined@@
-#define ___PNH_defined
-typedef int (__CRTDECL *_PNH)(size_t);
-@@pp_endif@@
-)]
+/* ??? */
+#define STRU_F 1 /* File */
+#define STRU_R 2 /* Record */
+#define STRU_P 3 /* Page */
+#ifdef FTP_NAMES
+char *strunames[] = { "0", "File", "Record", "Page" };
+#endif /* FTP_NAMES */
 
-%[define_replacement(_PNH = _PNH)]
-%[define_type_class(_PNH = "TP")]
+/* ??? */
+#define MODE_S 1 /* Stream */
+#define MODE_B 2 /* Block */
+#define MODE_C 3 /* Compressed */
+#ifdef FTP_NAMES
+char *modenames[] = { "0", "Stream", "Block", "Compressed" };
+#endif /* FTP_NAMES */
 
-%[insert:prefix(DEFINE__PNH)]
+/* ??? */
+#define REC_ESC '\377' /* ??? */
+#define REC_EOR '\001' /* ??? */
+#define REC_EOF '\002' /* ??? */
 
-[[crt_dos_only, decl_prefix(DEFINE__PNH)]]
-_PNH _query_new_handler(void);
+/* ??? */
+#define BLK_EOR     0x80 /* ??? */
+#define BLK_EOF     0x40 /* ??? */
+#define BLK_ERRORS  0x20 /* ??? */
+#define BLK_RESTART 0x10 /* ??? */
 
-[[crt_dos_only, decl_prefix(DEFINE__PNH)]]
-_PNH _set_new_handler(_PNH newhandler);
+#define BLK_BYTECOUNT 2 /* ??? */
 
-[[crt_dos_only]] int _query_new_mode(void);
-[[crt_dos_only]] int _set_new_mode(int newmode);
-
-%{
-
-__SYSDECL_END
-#endif /* __CC__ */
-
-}
+#endif /* !_ARPA_FTP_H */
