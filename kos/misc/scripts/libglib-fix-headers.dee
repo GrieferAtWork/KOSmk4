@@ -1,0 +1,114 @@
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import fs;
+import * from deemon;
+
+function normalizePath(path: string) {
+#ifdef __WINDOWS__
+	if (path.startswith("/cygdrive/"))
+		path = path[10].upper() + ":" + path[11:].replace("/", "\\");
+#endif
+	return path;
+}
+
+local args = [...][1:];
+global FIXPATH = normalizePath(args.popback());
+global INCPATHS = List(for (local a: args) normalizePath(a));
+
+
+function makeGlibIncludesRelativeInFile(filename: string) {
+	if (!filename.endswith(".h"))
+		return;
+#ifdef __WINDOWS__
+	filename = filename.replace("\\", "/");
+#endif /* __WINDOWS__ */
+	local olddata = File.open(filename, "r").read();
+	local newdata = File.Writer();
+	local glibPrefix = "";
+	local usedOldData = olddata.unifylines();
+	usedOldData = usedOldData.replace("defined (", "defined(");
+	usedOldData = usedOldData.replace(
+		'#if !defined(__GLIB_H_INSIDE__) && !defined(GLIB_COMPILATION)\n'
+		'#error "Only <glib.h> can be included directly."\n'
+		'#endif\n', '');
+	usedOldData = usedOldData.replace(
+		'#if !defined(__GLIB_H_INSIDE__) && !defined(__G_MAIN_H__) && !defined(GLIB_COMPILATION)\n'
+		'#error "Only <glib.h> can be included directly."\n'
+		'#endif\n', '');
+	usedOldData = usedOldData.replace(
+		'#if !defined(__GLIB_GOBJECT_H_INSIDE__) && !defined(GOBJECT_COMPILATION)\n'
+		'#error "Only <glib-object.h> can be included directly."\n'
+		'#endif\n', '');
+	usedOldData = usedOldData.replace(
+		'#if !defined(__GLIB_GOBJECT_H_INSIDE__) && !defined(GOBJECT_COMPILATION) && !defined(GLIB_COMPILATION)\n'
+		'#error "Only <glib-object.h> can be included directly."\n'
+		'#endif\n', '');
+	for (local l: usedOldData.splitlines(true)) {
+		local pound = l.find("#");
+		if (pound >= 0) {
+			++pound;
+			while (pound < #l && l.isspace(pound))
+				++pound;
+			if (l.startswith("include", pound)) {
+				pound += 7;
+				while (pound < #l && l.isspace(pound))
+					++pound;
+				if (l.startswith("<", pound)) {
+					local incend = l.index(">", pound) + 1;
+					local inctext = l[pound:incend];
+					local incname = inctext[1:-1];
+					for (local path: INCPATHS) {
+						local fullname = fs.joinpath(path, incname.decode("utf-8"));
+						if (fs.stat.exists(fullname)) {
+							fullname = fs.relpath(fullname, fs.headof(filename));
+#ifdef __WINDOWS__
+							fullname = fullname.replace("\\", "/");
+#endif /* __WINDOWS__ */
+							inctext = "\"{}\"".format({ fullname });
+							break;
+						}
+					}
+					l = l[:pound] + inctext + l[incend:];
+				}
+			}
+		}
+		newdata.write(l);
+	}
+	newdata = newdata.string.encode("utf-8");
+	if (newdata != olddata) {
+		print("Updating file: ", repr filename);
+		with (local fp = File.open(filename, "w"))
+			fp.write(newdata);
+	}
+}
+
+function makeGlibIncludesRelativeInPath(path: string) {
+	for (local ent: fs.dir(path)) {
+		ent = fs.joinpath(path, ent);
+		if (fs.stat.isdir(ent)) {
+			makeGlibIncludesRelativeInPath(ent);
+			continue;
+		}
+		makeGlibIncludesRelativeInFile(ent);
+	}
+}
+
+makeGlibIncludesRelativeInPath(FIXPATH);
