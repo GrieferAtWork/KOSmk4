@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9feef7fb */
+/* HASH CRC-32:0x4def89cf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -105,42 +105,445 @@ __ATTR_NONNULL((1)) void (FD_COPY)(fd_set const *__src, fd_set *__dst);
 #endif /* !__INTELLISENSE__ */
 
 #if defined(__CRT_HAVE_select) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> select(2), select64(2), pselect(2), pselect64(2)
+ * Wait for read/write/other events to become possible (without blocking)
+ * on the file descriptors within  any given non-NULL `fd_set'. Only  the
+ * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * representing  the  upper limit  on how  much  memory the  kernel might
+ * touch in the given sets.
+ *
+ * Upon return, all  bits from all  given fd sets  will be cleared,  except
+ * for those which are associated with files where the respective condition
+ * has become available.
+ *
+ * This system call is implemented in terms of `poll(2)', and individual
+ * sets translate to `struct pollfd::events':
+ *  - readfds:   POLLSELECT_READFDS    (POLLRDNORM | POLLRDBAND | POLLIN | POLLHUP | POLLERR)
+ *  - writefds:  POLLSELECT_WRITEFDS   (POLLWRBAND | POLLWRNORM | POLLOUT | POLLERR)
+ *  - exceptfds: POLLSELECT_EXCEPTFDS  (POLLPRI)
+ *
+ * @param: nfds:      The max fd index to probe in any of the given sets
+ * @param: readfds:   [0..1] Files to test for reading (s.a. `POLLSELECT_READFDS')
+ * @param: writefds:  [0..1] Files to test for writing (s.a. `POLLSELECT_WRITEFDS')
+ * @param: exceptfds: [0..1] Files to test for exceptional conditions (s.a. `POLLSELECT_EXCEPTFDS')
+ * @param: timeout:   [0..1] Timeout for how long to keep waiting
+ * @param: sigmask:   [0..1] When non-NULL, set of signals that should _NOT_ be allowed to interrupt the system call
+ *                           Semantically speaking, this mask is atomically  `SIG_SETMASK'd for the duration of  the
+ *                           call being made.
+ * @return: * : The # of distinct files for which a `1'-bit was written to at least one of the given sets
+ * @return: 0 : The given `timeout' expired
+ * @return: -1: [errno=EBADF]  One of the given sets contains an invalid file descriptor
+ * @return: -1: [errno=EINTR]  The system call was interrupted
+ * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
+ * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
 __CDECLARE(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,select,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timeval *__restrict __timeout),(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #elif defined(__CRT_HAVE___select) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> select(2), select64(2), pselect(2), pselect64(2)
+ * Wait for read/write/other events to become possible (without blocking)
+ * on the file descriptors within  any given non-NULL `fd_set'. Only  the
+ * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * representing  the  upper limit  on how  much  memory the  kernel might
+ * touch in the given sets.
+ *
+ * Upon return, all  bits from all  given fd sets  will be cleared,  except
+ * for those which are associated with files where the respective condition
+ * has become available.
+ *
+ * This system call is implemented in terms of `poll(2)', and individual
+ * sets translate to `struct pollfd::events':
+ *  - readfds:   POLLSELECT_READFDS    (POLLRDNORM | POLLRDBAND | POLLIN | POLLHUP | POLLERR)
+ *  - writefds:  POLLSELECT_WRITEFDS   (POLLWRBAND | POLLWRNORM | POLLOUT | POLLERR)
+ *  - exceptfds: POLLSELECT_EXCEPTFDS  (POLLPRI)
+ *
+ * @param: nfds:      The max fd index to probe in any of the given sets
+ * @param: readfds:   [0..1] Files to test for reading (s.a. `POLLSELECT_READFDS')
+ * @param: writefds:  [0..1] Files to test for writing (s.a. `POLLSELECT_WRITEFDS')
+ * @param: exceptfds: [0..1] Files to test for exceptional conditions (s.a. `POLLSELECT_EXCEPTFDS')
+ * @param: timeout:   [0..1] Timeout for how long to keep waiting
+ * @param: sigmask:   [0..1] When non-NULL, set of signals that should _NOT_ be allowed to interrupt the system call
+ *                           Semantically speaking, this mask is atomically  `SIG_SETMASK'd for the duration of  the
+ *                           call being made.
+ * @return: * : The # of distinct files for which a `1'-bit was written to at least one of the given sets
+ * @return: 0 : The given `timeout' expired
+ * @return: -1: [errno=EBADF]  One of the given sets contains an invalid file descriptor
+ * @return: -1: [errno=EINTR]  The system call was interrupted
+ * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
+ * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
 __CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,select,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timeval *__restrict __timeout),__select,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #elif defined(__CRT_HAVE_select64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> select(2), select64(2), pselect(2), pselect64(2)
+ * Wait for read/write/other events to become possible (without blocking)
+ * on the file descriptors within  any given non-NULL `fd_set'. Only  the
+ * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * representing  the  upper limit  on how  much  memory the  kernel might
+ * touch in the given sets.
+ *
+ * Upon return, all  bits from all  given fd sets  will be cleared,  except
+ * for those which are associated with files where the respective condition
+ * has become available.
+ *
+ * This system call is implemented in terms of `poll(2)', and individual
+ * sets translate to `struct pollfd::events':
+ *  - readfds:   POLLSELECT_READFDS    (POLLRDNORM | POLLRDBAND | POLLIN | POLLHUP | POLLERR)
+ *  - writefds:  POLLSELECT_WRITEFDS   (POLLWRBAND | POLLWRNORM | POLLOUT | POLLERR)
+ *  - exceptfds: POLLSELECT_EXCEPTFDS  (POLLPRI)
+ *
+ * @param: nfds:      The max fd index to probe in any of the given sets
+ * @param: readfds:   [0..1] Files to test for reading (s.a. `POLLSELECT_READFDS')
+ * @param: writefds:  [0..1] Files to test for writing (s.a. `POLLSELECT_WRITEFDS')
+ * @param: exceptfds: [0..1] Files to test for exceptional conditions (s.a. `POLLSELECT_EXCEPTFDS')
+ * @param: timeout:   [0..1] Timeout for how long to keep waiting
+ * @param: sigmask:   [0..1] When non-NULL, set of signals that should _NOT_ be allowed to interrupt the system call
+ *                           Semantically speaking, this mask is atomically  `SIG_SETMASK'd for the duration of  the
+ *                           call being made.
+ * @return: * : The # of distinct files for which a `1'-bit was written to at least one of the given sets
+ * @return: 0 : The given `timeout' expired
+ * @return: -1: [errno=EBADF]  One of the given sets contains an invalid file descriptor
+ * @return: -1: [errno=EINTR]  The system call was interrupted
+ * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
+ * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
 __CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,select,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timeval *__restrict __timeout),select64,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #elif defined(__CRT_HAVE_select64) || defined(__CRT_HAVE_select) || defined(__CRT_HAVE___select)
 #include <libc/local/sys.select/select.h>
+/* >> select(2), select64(2), pselect(2), pselect64(2)
+ * Wait for read/write/other events to become possible (without blocking)
+ * on the file descriptors within  any given non-NULL `fd_set'. Only  the
+ * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * representing  the  upper limit  on how  much  memory the  kernel might
+ * touch in the given sets.
+ *
+ * Upon return, all  bits from all  given fd sets  will be cleared,  except
+ * for those which are associated with files where the respective condition
+ * has become available.
+ *
+ * This system call is implemented in terms of `poll(2)', and individual
+ * sets translate to `struct pollfd::events':
+ *  - readfds:   POLLSELECT_READFDS    (POLLRDNORM | POLLRDBAND | POLLIN | POLLHUP | POLLERR)
+ *  - writefds:  POLLSELECT_WRITEFDS   (POLLWRBAND | POLLWRNORM | POLLOUT | POLLERR)
+ *  - exceptfds: POLLSELECT_EXCEPTFDS  (POLLPRI)
+ *
+ * @param: nfds:      The max fd index to probe in any of the given sets
+ * @param: readfds:   [0..1] Files to test for reading (s.a. `POLLSELECT_READFDS')
+ * @param: writefds:  [0..1] Files to test for writing (s.a. `POLLSELECT_WRITEFDS')
+ * @param: exceptfds: [0..1] Files to test for exceptional conditions (s.a. `POLLSELECT_EXCEPTFDS')
+ * @param: timeout:   [0..1] Timeout for how long to keep waiting
+ * @param: sigmask:   [0..1] When non-NULL, set of signals that should _NOT_ be allowed to interrupt the system call
+ *                           Semantically speaking, this mask is atomically  `SIG_SETMASK'd for the duration of  the
+ *                           call being made.
+ * @return: * : The # of distinct files for which a `1'-bit was written to at least one of the given sets
+ * @return: 0 : The given `timeout' expired
+ * @return: -1: [errno=EBADF]  One of the given sets contains an invalid file descriptor
+ * @return: -1: [errno=EINTR]  The system call was interrupted
+ * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
+ * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
 __NAMESPACE_LOCAL_USING_OR_IMPL(select, __FORCELOCAL __ATTR_ARTIFICIAL __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL select)(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timeval *__restrict __timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(select))(__nfds, __readfds, __writefds, __exceptfds, __timeout); })
 #endif /* ... */
 #ifdef __USE_XOPEN2K
 #if defined(__CRT_HAVE_pselect) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> select(2), select64(2), pselect(2), pselect64(2)
+ * Wait for read/write/other events to become possible (without blocking)
+ * on the file descriptors within  any given non-NULL `fd_set'. Only  the
+ * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * representing  the  upper limit  on how  much  memory the  kernel might
+ * touch in the given sets.
+ *
+ * Upon return, all  bits from all  given fd sets  will be cleared,  except
+ * for those which are associated with files where the respective condition
+ * has become available.
+ *
+ * This system call is implemented in terms of `poll(2)', and individual
+ * sets translate to `struct pollfd::events':
+ *  - readfds:   POLLSELECT_READFDS    (POLLRDNORM | POLLRDBAND | POLLIN | POLLHUP | POLLERR)
+ *  - writefds:  POLLSELECT_WRITEFDS   (POLLWRBAND | POLLWRNORM | POLLOUT | POLLERR)
+ *  - exceptfds: POLLSELECT_EXCEPTFDS  (POLLPRI)
+ *
+ * @param: nfds:      The max fd index to probe in any of the given sets
+ * @param: readfds:   [0..1] Files to test for reading (s.a. `POLLSELECT_READFDS')
+ * @param: writefds:  [0..1] Files to test for writing (s.a. `POLLSELECT_WRITEFDS')
+ * @param: exceptfds: [0..1] Files to test for exceptional conditions (s.a. `POLLSELECT_EXCEPTFDS')
+ * @param: timeout:   [0..1] Timeout for how long to keep waiting
+ * @param: sigmask:   [0..1] When non-NULL, set of signals that should _NOT_ be allowed to interrupt the system call
+ *                           Semantically speaking, this mask is atomically  `SIG_SETMASK'd for the duration of  the
+ *                           call being made.
+ * @return: * : The # of distinct files for which a `1'-bit was written to at least one of the given sets
+ * @return: 0 : The given `timeout' expired
+ * @return: -1: [errno=EBADF]  One of the given sets contains an invalid file descriptor
+ * @return: -1: [errno=EINTR]  The system call was interrupted
+ * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
+ * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
 __CDECLARE(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,pselect,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timespec const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
 #elif defined(__CRT_HAVE_pselect64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> select(2), select64(2), pselect(2), pselect64(2)
+ * Wait for read/write/other events to become possible (without blocking)
+ * on the file descriptors within  any given non-NULL `fd_set'. Only  the
+ * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * representing  the  upper limit  on how  much  memory the  kernel might
+ * touch in the given sets.
+ *
+ * Upon return, all  bits from all  given fd sets  will be cleared,  except
+ * for those which are associated with files where the respective condition
+ * has become available.
+ *
+ * This system call is implemented in terms of `poll(2)', and individual
+ * sets translate to `struct pollfd::events':
+ *  - readfds:   POLLSELECT_READFDS    (POLLRDNORM | POLLRDBAND | POLLIN | POLLHUP | POLLERR)
+ *  - writefds:  POLLSELECT_WRITEFDS   (POLLWRBAND | POLLWRNORM | POLLOUT | POLLERR)
+ *  - exceptfds: POLLSELECT_EXCEPTFDS  (POLLPRI)
+ *
+ * @param: nfds:      The max fd index to probe in any of the given sets
+ * @param: readfds:   [0..1] Files to test for reading (s.a. `POLLSELECT_READFDS')
+ * @param: writefds:  [0..1] Files to test for writing (s.a. `POLLSELECT_WRITEFDS')
+ * @param: exceptfds: [0..1] Files to test for exceptional conditions (s.a. `POLLSELECT_EXCEPTFDS')
+ * @param: timeout:   [0..1] Timeout for how long to keep waiting
+ * @param: sigmask:   [0..1] When non-NULL, set of signals that should _NOT_ be allowed to interrupt the system call
+ *                           Semantically speaking, this mask is atomically  `SIG_SETMASK'd for the duration of  the
+ *                           call being made.
+ * @return: * : The # of distinct files for which a `1'-bit was written to at least one of the given sets
+ * @return: 0 : The given `timeout' expired
+ * @return: -1: [errno=EBADF]  One of the given sets contains an invalid file descriptor
+ * @return: -1: [errno=EINTR]  The system call was interrupted
+ * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
+ * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
 __CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,pselect,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timespec const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect64,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
 #elif defined(__CRT_HAVE_pselect64) || defined(__CRT_HAVE_pselect)
 #include <libc/local/sys.select/pselect.h>
+/* >> select(2), select64(2), pselect(2), pselect64(2)
+ * Wait for read/write/other events to become possible (without blocking)
+ * on the file descriptors within  any given non-NULL `fd_set'. Only  the
+ * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * representing  the  upper limit  on how  much  memory the  kernel might
+ * touch in the given sets.
+ *
+ * Upon return, all  bits from all  given fd sets  will be cleared,  except
+ * for those which are associated with files where the respective condition
+ * has become available.
+ *
+ * This system call is implemented in terms of `poll(2)', and individual
+ * sets translate to `struct pollfd::events':
+ *  - readfds:   POLLSELECT_READFDS    (POLLRDNORM | POLLRDBAND | POLLIN | POLLHUP | POLLERR)
+ *  - writefds:  POLLSELECT_WRITEFDS   (POLLWRBAND | POLLWRNORM | POLLOUT | POLLERR)
+ *  - exceptfds: POLLSELECT_EXCEPTFDS  (POLLPRI)
+ *
+ * @param: nfds:      The max fd index to probe in any of the given sets
+ * @param: readfds:   [0..1] Files to test for reading (s.a. `POLLSELECT_READFDS')
+ * @param: writefds:  [0..1] Files to test for writing (s.a. `POLLSELECT_WRITEFDS')
+ * @param: exceptfds: [0..1] Files to test for exceptional conditions (s.a. `POLLSELECT_EXCEPTFDS')
+ * @param: timeout:   [0..1] Timeout for how long to keep waiting
+ * @param: sigmask:   [0..1] When non-NULL, set of signals that should _NOT_ be allowed to interrupt the system call
+ *                           Semantically speaking, this mask is atomically  `SIG_SETMASK'd for the duration of  the
+ *                           call being made.
+ * @return: * : The # of distinct files for which a `1'-bit was written to at least one of the given sets
+ * @return: 0 : The given `timeout' expired
+ * @return: -1: [errno=EBADF]  One of the given sets contains an invalid file descriptor
+ * @return: -1: [errno=EINTR]  The system call was interrupted
+ * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
+ * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pselect, __FORCELOCAL __ATTR_ARTIFICIAL __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL pselect)(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timespec const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pselect))(__nfds, __readfds, __writefds, __exceptfds, __timeout, __sigmask); })
 #endif /* ... */
 #endif /* __USE_XOPEN2K */
 
 #ifdef __USE_TIME64
 #if defined(__CRT_HAVE_select) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> select(2), select64(2), pselect(2), pselect64(2)
+ * Wait for read/write/other events to become possible (without blocking)
+ * on the file descriptors within  any given non-NULL `fd_set'. Only  the
+ * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * representing  the  upper limit  on how  much  memory the  kernel might
+ * touch in the given sets.
+ *
+ * Upon return, all  bits from all  given fd sets  will be cleared,  except
+ * for those which are associated with files where the respective condition
+ * has become available.
+ *
+ * This system call is implemented in terms of `poll(2)', and individual
+ * sets translate to `struct pollfd::events':
+ *  - readfds:   POLLSELECT_READFDS    (POLLRDNORM | POLLRDBAND | POLLIN | POLLHUP | POLLERR)
+ *  - writefds:  POLLSELECT_WRITEFDS   (POLLWRBAND | POLLWRNORM | POLLOUT | POLLERR)
+ *  - exceptfds: POLLSELECT_EXCEPTFDS  (POLLPRI)
+ *
+ * @param: nfds:      The max fd index to probe in any of the given sets
+ * @param: readfds:   [0..1] Files to test for reading (s.a. `POLLSELECT_READFDS')
+ * @param: writefds:  [0..1] Files to test for writing (s.a. `POLLSELECT_WRITEFDS')
+ * @param: exceptfds: [0..1] Files to test for exceptional conditions (s.a. `POLLSELECT_EXCEPTFDS')
+ * @param: timeout:   [0..1] Timeout for how long to keep waiting
+ * @param: sigmask:   [0..1] When non-NULL, set of signals that should _NOT_ be allowed to interrupt the system call
+ *                           Semantically speaking, this mask is atomically  `SIG_SETMASK'd for the duration of  the
+ *                           call being made.
+ * @return: * : The # of distinct files for which a `1'-bit was written to at least one of the given sets
+ * @return: 0 : The given `timeout' expired
+ * @return: -1: [errno=EBADF]  One of the given sets contains an invalid file descriptor
+ * @return: -1: [errno=EINTR]  The system call was interrupted
+ * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
+ * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
 __CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,select64,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timeval64 *__restrict __timeout),select,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #elif defined(__CRT_HAVE_select64)
+/* >> select(2), select64(2), pselect(2), pselect64(2)
+ * Wait for read/write/other events to become possible (without blocking)
+ * on the file descriptors within  any given non-NULL `fd_set'. Only  the
+ * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * representing  the  upper limit  on how  much  memory the  kernel might
+ * touch in the given sets.
+ *
+ * Upon return, all  bits from all  given fd sets  will be cleared,  except
+ * for those which are associated with files where the respective condition
+ * has become available.
+ *
+ * This system call is implemented in terms of `poll(2)', and individual
+ * sets translate to `struct pollfd::events':
+ *  - readfds:   POLLSELECT_READFDS    (POLLRDNORM | POLLRDBAND | POLLIN | POLLHUP | POLLERR)
+ *  - writefds:  POLLSELECT_WRITEFDS   (POLLWRBAND | POLLWRNORM | POLLOUT | POLLERR)
+ *  - exceptfds: POLLSELECT_EXCEPTFDS  (POLLPRI)
+ *
+ * @param: nfds:      The max fd index to probe in any of the given sets
+ * @param: readfds:   [0..1] Files to test for reading (s.a. `POLLSELECT_READFDS')
+ * @param: writefds:  [0..1] Files to test for writing (s.a. `POLLSELECT_WRITEFDS')
+ * @param: exceptfds: [0..1] Files to test for exceptional conditions (s.a. `POLLSELECT_EXCEPTFDS')
+ * @param: timeout:   [0..1] Timeout for how long to keep waiting
+ * @param: sigmask:   [0..1] When non-NULL, set of signals that should _NOT_ be allowed to interrupt the system call
+ *                           Semantically speaking, this mask is atomically  `SIG_SETMASK'd for the duration of  the
+ *                           call being made.
+ * @return: * : The # of distinct files for which a `1'-bit was written to at least one of the given sets
+ * @return: 0 : The given `timeout' expired
+ * @return: -1: [errno=EBADF]  One of the given sets contains an invalid file descriptor
+ * @return: -1: [errno=EINTR]  The system call was interrupted
+ * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
+ * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
 __CDECLARE(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,select64,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timeval64 *__restrict __timeout),(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #elif defined(__CRT_HAVE_select) || defined(__CRT_HAVE___select)
 #include <libc/local/sys.select/select64.h>
+/* >> select(2), select64(2), pselect(2), pselect64(2)
+ * Wait for read/write/other events to become possible (without blocking)
+ * on the file descriptors within  any given non-NULL `fd_set'. Only  the
+ * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * representing  the  upper limit  on how  much  memory the  kernel might
+ * touch in the given sets.
+ *
+ * Upon return, all  bits from all  given fd sets  will be cleared,  except
+ * for those which are associated with files where the respective condition
+ * has become available.
+ *
+ * This system call is implemented in terms of `poll(2)', and individual
+ * sets translate to `struct pollfd::events':
+ *  - readfds:   POLLSELECT_READFDS    (POLLRDNORM | POLLRDBAND | POLLIN | POLLHUP | POLLERR)
+ *  - writefds:  POLLSELECT_WRITEFDS   (POLLWRBAND | POLLWRNORM | POLLOUT | POLLERR)
+ *  - exceptfds: POLLSELECT_EXCEPTFDS  (POLLPRI)
+ *
+ * @param: nfds:      The max fd index to probe in any of the given sets
+ * @param: readfds:   [0..1] Files to test for reading (s.a. `POLLSELECT_READFDS')
+ * @param: writefds:  [0..1] Files to test for writing (s.a. `POLLSELECT_WRITEFDS')
+ * @param: exceptfds: [0..1] Files to test for exceptional conditions (s.a. `POLLSELECT_EXCEPTFDS')
+ * @param: timeout:   [0..1] Timeout for how long to keep waiting
+ * @param: sigmask:   [0..1] When non-NULL, set of signals that should _NOT_ be allowed to interrupt the system call
+ *                           Semantically speaking, this mask is atomically  `SIG_SETMASK'd for the duration of  the
+ *                           call being made.
+ * @return: * : The # of distinct files for which a `1'-bit was written to at least one of the given sets
+ * @return: 0 : The given `timeout' expired
+ * @return: -1: [errno=EBADF]  One of the given sets contains an invalid file descriptor
+ * @return: -1: [errno=EINTR]  The system call was interrupted
+ * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
+ * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
 __NAMESPACE_LOCAL_USING_OR_IMPL(select64, __FORCELOCAL __ATTR_ARTIFICIAL __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL select64)(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timeval64 *__restrict __timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(select64))(__nfds, __readfds, __writefds, __exceptfds, __timeout); })
 #endif /* ... */
 #ifdef __USE_XOPEN2K
 #if defined(__CRT_HAVE_pselect) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> select(2), select64(2), pselect(2), pselect64(2)
+ * Wait for read/write/other events to become possible (without blocking)
+ * on the file descriptors within  any given non-NULL `fd_set'. Only  the
+ * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * representing  the  upper limit  on how  much  memory the  kernel might
+ * touch in the given sets.
+ *
+ * Upon return, all  bits from all  given fd sets  will be cleared,  except
+ * for those which are associated with files where the respective condition
+ * has become available.
+ *
+ * This system call is implemented in terms of `poll(2)', and individual
+ * sets translate to `struct pollfd::events':
+ *  - readfds:   POLLSELECT_READFDS    (POLLRDNORM | POLLRDBAND | POLLIN | POLLHUP | POLLERR)
+ *  - writefds:  POLLSELECT_WRITEFDS   (POLLWRBAND | POLLWRNORM | POLLOUT | POLLERR)
+ *  - exceptfds: POLLSELECT_EXCEPTFDS  (POLLPRI)
+ *
+ * @param: nfds:      The max fd index to probe in any of the given sets
+ * @param: readfds:   [0..1] Files to test for reading (s.a. `POLLSELECT_READFDS')
+ * @param: writefds:  [0..1] Files to test for writing (s.a. `POLLSELECT_WRITEFDS')
+ * @param: exceptfds: [0..1] Files to test for exceptional conditions (s.a. `POLLSELECT_EXCEPTFDS')
+ * @param: timeout:   [0..1] Timeout for how long to keep waiting
+ * @param: sigmask:   [0..1] When non-NULL, set of signals that should _NOT_ be allowed to interrupt the system call
+ *                           Semantically speaking, this mask is atomically  `SIG_SETMASK'd for the duration of  the
+ *                           call being made.
+ * @return: * : The # of distinct files for which a `1'-bit was written to at least one of the given sets
+ * @return: 0 : The given `timeout' expired
+ * @return: -1: [errno=EBADF]  One of the given sets contains an invalid file descriptor
+ * @return: -1: [errno=EINTR]  The system call was interrupted
+ * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
+ * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
 __CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,pselect64,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timespec64 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
 #elif defined(__CRT_HAVE_pselect64)
+/* >> select(2), select64(2), pselect(2), pselect64(2)
+ * Wait for read/write/other events to become possible (without blocking)
+ * on the file descriptors within  any given non-NULL `fd_set'. Only  the
+ * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * representing  the  upper limit  on how  much  memory the  kernel might
+ * touch in the given sets.
+ *
+ * Upon return, all  bits from all  given fd sets  will be cleared,  except
+ * for those which are associated with files where the respective condition
+ * has become available.
+ *
+ * This system call is implemented in terms of `poll(2)', and individual
+ * sets translate to `struct pollfd::events':
+ *  - readfds:   POLLSELECT_READFDS    (POLLRDNORM | POLLRDBAND | POLLIN | POLLHUP | POLLERR)
+ *  - writefds:  POLLSELECT_WRITEFDS   (POLLWRBAND | POLLWRNORM | POLLOUT | POLLERR)
+ *  - exceptfds: POLLSELECT_EXCEPTFDS  (POLLPRI)
+ *
+ * @param: nfds:      The max fd index to probe in any of the given sets
+ * @param: readfds:   [0..1] Files to test for reading (s.a. `POLLSELECT_READFDS')
+ * @param: writefds:  [0..1] Files to test for writing (s.a. `POLLSELECT_WRITEFDS')
+ * @param: exceptfds: [0..1] Files to test for exceptional conditions (s.a. `POLLSELECT_EXCEPTFDS')
+ * @param: timeout:   [0..1] Timeout for how long to keep waiting
+ * @param: sigmask:   [0..1] When non-NULL, set of signals that should _NOT_ be allowed to interrupt the system call
+ *                           Semantically speaking, this mask is atomically  `SIG_SETMASK'd for the duration of  the
+ *                           call being made.
+ * @return: * : The # of distinct files for which a `1'-bit was written to at least one of the given sets
+ * @return: 0 : The given `timeout' expired
+ * @return: -1: [errno=EBADF]  One of the given sets contains an invalid file descriptor
+ * @return: -1: [errno=EINTR]  The system call was interrupted
+ * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
+ * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
 __CDECLARE(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,pselect64,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timespec64 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
 #elif defined(__CRT_HAVE_pselect)
 #include <libc/local/sys.select/pselect64.h>
+/* >> select(2), select64(2), pselect(2), pselect64(2)
+ * Wait for read/write/other events to become possible (without blocking)
+ * on the file descriptors within  any given non-NULL `fd_set'. Only  the
+ * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * representing  the  upper limit  on how  much  memory the  kernel might
+ * touch in the given sets.
+ *
+ * Upon return, all  bits from all  given fd sets  will be cleared,  except
+ * for those which are associated with files where the respective condition
+ * has become available.
+ *
+ * This system call is implemented in terms of `poll(2)', and individual
+ * sets translate to `struct pollfd::events':
+ *  - readfds:   POLLSELECT_READFDS    (POLLRDNORM | POLLRDBAND | POLLIN | POLLHUP | POLLERR)
+ *  - writefds:  POLLSELECT_WRITEFDS   (POLLWRBAND | POLLWRNORM | POLLOUT | POLLERR)
+ *  - exceptfds: POLLSELECT_EXCEPTFDS  (POLLPRI)
+ *
+ * @param: nfds:      The max fd index to probe in any of the given sets
+ * @param: readfds:   [0..1] Files to test for reading (s.a. `POLLSELECT_READFDS')
+ * @param: writefds:  [0..1] Files to test for writing (s.a. `POLLSELECT_WRITEFDS')
+ * @param: exceptfds: [0..1] Files to test for exceptional conditions (s.a. `POLLSELECT_EXCEPTFDS')
+ * @param: timeout:   [0..1] Timeout for how long to keep waiting
+ * @param: sigmask:   [0..1] When non-NULL, set of signals that should _NOT_ be allowed to interrupt the system call
+ *                           Semantically speaking, this mask is atomically  `SIG_SETMASK'd for the duration of  the
+ *                           call being made.
+ * @return: * : The # of distinct files for which a `1'-bit was written to at least one of the given sets
+ * @return: 0 : The given `timeout' expired
+ * @return: -1: [errno=EBADF]  One of the given sets contains an invalid file descriptor
+ * @return: -1: [errno=EINTR]  The system call was interrupted
+ * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
+ * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pselect64, __FORCELOCAL __ATTR_ARTIFICIAL __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL pselect64)(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timespec64 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pselect64))(__nfds, __readfds, __writefds, __exceptfds, __timeout, __sigmask); })
 #endif /* ... */
 #endif /* __USE_XOPEN2K */

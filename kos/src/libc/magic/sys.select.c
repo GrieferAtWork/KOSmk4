@@ -146,6 +146,38 @@ __STDC_INT_AS_SSIZE_T pselect32(__STDC_INT_AS_SIZE_T nfds,
                                 [[nullable]] $sigset_t const *__restrict sigmask);
 
 
+
+@@>> select(2), select64(2), pselect(2), pselect64(2)
+@@Wait for read/write/other events to become possible (without blocking)
+@@on the file descriptors within  any given non-NULL `fd_set'. Only  the
+@@first  `nfds' elementes  of the  respective sets  are considered, thus
+@@representing  the  upper limit  on how  much  memory the  kernel might
+@@touch in the given sets.
+@@
+@@Upon return, all  bits from all  given fd sets  will be cleared,  except
+@@for those which are associated with files where the respective condition
+@@has become available.
+@@
+@@This system call is implemented in terms of `poll(2)', and individual
+@@sets translate to `struct pollfd::events':
+@@ - readfds:   POLLSELECT_READFDS    (POLLRDNORM | POLLRDBAND | POLLIN | POLLHUP | POLLERR)
+@@ - writefds:  POLLSELECT_WRITEFDS   (POLLWRBAND | POLLWRNORM | POLLOUT | POLLERR)
+@@ - exceptfds: POLLSELECT_EXCEPTFDS  (POLLPRI)
+@@
+@@@param: nfds:      The max fd index to probe in any of the given sets
+@@@param: readfds:   [0..1] Files to test for reading (s.a. `POLLSELECT_READFDS')
+@@@param: writefds:  [0..1] Files to test for writing (s.a. `POLLSELECT_WRITEFDS')
+@@@param: exceptfds: [0..1] Files to test for exceptional conditions (s.a. `POLLSELECT_EXCEPTFDS')
+@@@param: timeout:   [0..1] Timeout for how long to keep waiting
+@@@param: sigmask:   [0..1] When non-NULL, set of signals that should _NOT_ be allowed to interrupt the system call
+@@                          Semantically speaking, this mask is atomically  `SIG_SETMASK'd for the duration of  the
+@@                          call being made.
+@@@return: * : The # of distinct files for which a `1'-bit was written to at least one of the given sets
+@@@return: 0 : The given `timeout' expired
+@@@return: -1: [errno=EBADF]  One of the given sets contains an invalid file descriptor
+@@@return: -1: [errno=EINTR]  The system call was interrupted
+@@@return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
+@@@return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections
 [[cp, decl_include("<features.h>", "<bits/os/timeval.h>", "<bits/os/fd_set.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("select", "__select")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("select64")]]
@@ -174,7 +206,8 @@ __STDC_INT_AS_SSIZE_T select(__STDC_INT_AS_SIZE_T nfds,
 }
 
 %#ifdef __USE_XOPEN2K
-[[cp, decl_include("<features.h>", "<bits/os/timespec.h>", "<bits/os/sigset.h>", "<bits/os/fd_set.h>"), no_crt_self_import]]
+[[cp, doc_alias("select"), no_crt_self_import]]
+[[decl_include("<features.h>", "<bits/os/timespec.h>", "<bits/os/sigset.h>", "<bits/os/fd_set.h>")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pselect")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pselect64")]]
 [[userimpl, requires($has_function(pselect32) || $has_function(pselect64))]]
@@ -204,8 +237,9 @@ __STDC_INT_AS_SSIZE_T pselect(__STDC_INT_AS_SIZE_T nfds,
 
 %
 %#ifdef __USE_TIME64
+[[cp, doc_alias("select")]]
 [[decl_include("<features.h>", "<bits/os/timeval.h>", "<bits/os/fd_set.h>")]]
-[[cp, preferred_time64_variant_of(select), doc_alias("select")]]
+[[preferred_time64_variant_of(select)]]
 [[userimpl, requires_function(select32)]]
 __STDC_INT_AS_SSIZE_T select64(__STDC_INT_AS_SIZE_T nfds,
                                [[nullable]] fd_set *__restrict readfds,
@@ -221,8 +255,9 @@ __STDC_INT_AS_SSIZE_T select64(__STDC_INT_AS_SIZE_T nfds,
 }
 
 %#ifdef __USE_XOPEN2K
+[[cp, doc_alias("select")]]
 [[decl_include("<features.h>", "<bits/os/timespec.h>", "<bits/os/sigset.h>", "<bits/os/fd_set.h>")]]
-[[cp, preferred_time64_variant_of(pselect), doc_alias("pselect")]]
+[[preferred_time64_variant_of(pselect)]]
 [[userimpl, requires_function(pselect32)]]
 __STDC_INT_AS_SSIZE_T pselect64(__STDC_INT_AS_SIZE_T nfds,
                                 [[nullable]] fd_set *__restrict readfds,
