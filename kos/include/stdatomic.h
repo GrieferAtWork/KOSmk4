@@ -242,44 +242,79 @@ typedef __COMPILER_ATOMIC(__UINTMAX_TYPE__) atomic_uintmax_t;
 #define atomic_compare_exchange_strong_explicit(ptr, poldval, newval, succ, fail)          \
 	__XBLOCK({                                                                             \
 		__auto_type __acese_poldval = (poldval);                                           \
-		__auto_type __acese_newval  = (newval);                                            \
+		__auto_type __acese_oldval  = *__acese_poldval;                                    \
 		__XRETURN (*__acese_poldval = __hybrid_atomic_cmpxch_val(__atomic_var_field(ptr),  \
-		                                                         *__acese_poldval,         \
-		                                                         __acese_newval, succ,     \
-		                                                         fail)) == __acese_newval; \
+		                                                         __acese_oldval,           \
+		                                                         newval, succ,             \
+		                                                         fail)) == __acese_oldval; \
 	})
-#define atomic_compare_exchange_weak_explicit(ptr, poldval, newval, succ, fail)                                                 \
-	__XBLOCK({                                                                                                                  \
-		__auto_type __acese_ptr     = (ptr);                                                                                    \
-		__auto_type __acese_poldval = (poldval);                                                                                \
-		__BOOL __acese_ok = __hybrid_atomic_cmpxch_weak(__atomic_var_field(__acese_ptr), *__acese_poldval, newval, succ, fail); \
-		if (!__acese_ok)                                                                                                        \
-			*__acese_poldval = __hybrid_atomic_load(__atomic_var_field(__acese_ptr), __ATOMIC_ACQUIRE);                         \
-		__XRETURN __acese_ok;                                                                                                   \
+#define atomic_compare_exchange_weak_explicit(ptr, poldval, newval, succ, fail)                         \
+	__XBLOCK({                                                                                          \
+		__auto_type __acese_ptr     = (ptr);                                                            \
+		__auto_type __acese_poldval = (poldval);                                                        \
+		__BOOL __acese_ok = __hybrid_atomic_cmpxch_weak(__atomic_var_field(__acese_ptr),                \
+		                                                *__acese_poldval, newval, succ, fail);          \
+		if (!__acese_ok)                                                                                \
+			*__acese_poldval = __hybrid_atomic_load(__atomic_var_field(__acese_ptr), __ATOMIC_ACQUIRE); \
+		__XRETURN __acese_ok;                                                                           \
 	})
 #else /* __COMPILER_HAVE_AUTOTYPE */
 #define atomic_compare_exchange_strong_explicit(ptr, poldval, newval, succ, fail)          \
 	__XBLOCK({                                                                             \
 		__typeof__(poldval) __acese_poldval = (poldval);                                   \
-		__typeof__(newval) __acese_newval  = (newval);                                     \
+		__typeof__(*__acese_poldval) __acese_oldval = *__acese_poldval;                    \
 		__XRETURN (*__acese_poldval = __hybrid_atomic_cmpxch_val(__atomic_var_field(ptr),  \
-		                                                         *__acese_poldval,         \
-		                                                         __acese_newval, succ,     \
-		                                                         fail)) == __acese_newval; \
+		                                                         __acese_oldval,           \
+		                                                         newval, succ,             \
+		                                                         fail)) == __acese_oldval; \
 	})
-#define atomic_compare_exchange_weak_explicit(ptr, poldval, newval, succ, fail)                                                 \
-	__XBLOCK({                                                                                                                  \
-		__typeof__(ptr) __acese_ptr = (ptr);                                                                                    \
-		__typeof__(poldval) __acese_poldval = (poldval);                                                                        \
-		__BOOL __acese_ok = __hybrid_atomic_cmpxch_weak(__atomic_var_field(__acese_ptr), *__acese_poldval, newval, succ, fail); \
-		if (!__acese_ok)                                                                                                        \
-			*__acese_poldval = __hybrid_atomic_load(__atomic_var_field(__acese_ptr), __ATOMIC_ACQUIRE);                         \
-		__XRETURN __acese_ok;                                                                                                   \
+#define atomic_compare_exchange_weak_explicit(ptr, poldval, newval, succ, fail)                         \
+	__XBLOCK({                                                                                          \
+		__typeof__(ptr) __acese_ptr         = (ptr);                                                    \
+		__typeof__(poldval) __acese_poldval = (poldval);                                                \
+		__BOOL __acese_ok = __hybrid_atomic_cmpxch_weak(__atomic_var_field(__acese_ptr),                \
+		                                                *__acese_poldval, newval, succ, fail);          \
+		if (!__acese_ok)                                                                                \
+			*__acese_poldval = __hybrid_atomic_load(__atomic_var_field(__acese_ptr), __ATOMIC_ACQUIRE); \
+		__XRETURN __acese_ok;                                                                           \
 	})
 #endif /* !__COMPILER_HAVE_AUTOTYPE */
 #else /* ... */
+/* Do `*p_value = value', and return `IN(*p_value) == value' */
+__FORCELOCAL __ATTR_ARTIFICIAL __BOOL (__PRIVATE_exchange_value_and_check_equal8)(__UINT8_TYPE__ *__p_value, __UINT8_TYPE__ __val) { __UINT8_TYPE__ __ov = *__p_value; *__p_value = __val; return __ov == __val; }
+__FORCELOCAL __ATTR_ARTIFICIAL __BOOL (__PRIVATE_exchange_value_and_check_equal16)(__UINT16_TYPE__ *__p_value, __UINT16_TYPE__ __val) { __UINT16_TYPE__ __ov = *__p_value; *__p_value = __val; return __ov == __val; }
+__FORCELOCAL __ATTR_ARTIFICIAL __BOOL (__PRIVATE_exchange_value_and_check_equal32)(__UINT32_TYPE__ *__p_value, __UINT32_TYPE__ __val) { __UINT32_TYPE__ __ov = *__p_value; *__p_value = __val; return __ov == __val; }
+#ifdef __UINT64_TYPE__
+__FORCELOCAL __ATTR_ARTIFICIAL __BOOL (__PRIVATE_exchange_value_and_check_equal64)(__UINT64_TYPE__ *__p_value, __UINT64_TYPE__ __val) { __UINT64_TYPE__ __ov = *__p_value; *__p_value = __val; return __ov == __val; }
+#ifdef __NO_builtin_choose_expr
+#define __PRIVATE_exchange_value_and_check_equal(p_value, value)                                                                                       \
+	__builtin_choose_expr(sizeof(*(p_value)) == 1, __PRIVATE_exchange_value_and_check_equal8((__UINT8_TYPE__ *)(p_value), (__UINT8_TYPE__)(value)),    \
+	__builtin_choose_expr(sizeof(*(p_value)) == 2, __PRIVATE_exchange_value_and_check_equal16((__UINT16_TYPE__ *)(p_value), (__UINT16_TYPE__)(value)), \
+	__builtin_choose_expr(sizeof(*(p_value)) == 4, __PRIVATE_exchange_value_and_check_equal32((__UINT32_TYPE__ *)(p_value), (__UINT32_TYPE__)(value)), \
+	                                               __PRIVATE_exchange_value_and_check_equal64((__UINT64_TYPE__ *)(p_value), (__UINT64_TYPE__)(value)))))
+#else /* __NO_builtin_choose_expr */
+#define __PRIVATE_exchange_value_and_check_equal(p_value, value)                                                                    \
+	(sizeof(*(p_value)) == 1 ? __PRIVATE_exchange_value_and_check_equal8((__UINT8_TYPE__ *)(p_value), (__UINT8_TYPE__)(value)) :    \
+	 sizeof(*(p_value)) == 2 ? __PRIVATE_exchange_value_and_check_equal16((__UINT16_TYPE__ *)(p_value), (__UINT16_TYPE__)(value)) : \
+	 sizeof(*(p_value)) == 4 ? __PRIVATE_exchange_value_and_check_equal32((__UINT32_TYPE__ *)(p_value), (__UINT32_TYPE__)(value)) : \
+	                           __PRIVATE_exchange_value_and_check_equal64((__UINT64_TYPE__ *)(p_value), (__UINT64_TYPE__)(value)))
+#endif /* !__NO_builtin_choose_expr */
+#else /* __UINT64_TYPE__ */
+#ifdef __NO_builtin_choose_expr
+#define __PRIVATE_exchange_value_and_check_equal(p_value, value)                                                                                       \
+	__builtin_choose_expr(sizeof(*(p_value)) == 1, __PRIVATE_exchange_value_and_check_equal8((__UINT8_TYPE__ *)(p_value), (__UINT8_TYPE__)(value)),    \
+	__builtin_choose_expr(sizeof(*(p_value)) == 2, __PRIVATE_exchange_value_and_check_equal16((__UINT16_TYPE__ *)(p_value), (__UINT16_TYPE__)(value)), \
+	                                               __PRIVATE_exchange_value_and_check_equal32((__UINT32_TYPE__ *)(p_value), (__UINT32_TYPE__)(value))))
+#else /* __NO_builtin_choose_expr */
+#define __PRIVATE_exchange_value_and_check_equal(p_value, value)                                                                    \
+	(sizeof(*(p_value)) == 1 ? __PRIVATE_exchange_value_and_check_equal8((__UINT8_TYPE__ *)(p_value), (__UINT8_TYPE__)(value)) :    \
+	 sizeof(*(p_value)) == 2 ? __PRIVATE_exchange_value_and_check_equal16((__UINT16_TYPE__ *)(p_value), (__UINT16_TYPE__)(value)) : \
+	                           __PRIVATE_exchange_value_and_check_equal32((__UINT32_TYPE__ *)(p_value), (__UINT32_TYPE__)(value)))
+#endif /* !__NO_builtin_choose_expr */
+#endif /* !__UINT64_TYPE__ */
+
 #define atomic_compare_exchange_strong_explicit(ptr, poldval, newval, succ, fail) \
-	((*(poldval) = __hybrid_atomic_cmpxch_val(__atomic_var_field(ptr), *(poldval), newval, succ, fail)) == (newval))
+	__PRIVATE_exchange_value_and_check_equal(poldval, __hybrid_atomic_cmpxch_val(__atomic_var_field(ptr), *(poldval), newval, succ, fail))
 #define atomic_compare_exchange_weak_explicit(ptr, poldval, newval, succ, fail)           \
 	(__hybrid_atomic_cmpxch_weak(__atomic_var_field(ptr), *(poldval), newval, succ, fail) \
 	 ? 1                                                                                  \
