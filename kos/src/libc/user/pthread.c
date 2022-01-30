@@ -3673,7 +3673,9 @@ again:
 	}
 	/* Check if we must increase the allocated size of the TLS-destructor-vector. */
 	avail = malloc_usable_size(tls_dtors) / sizeof(pthread_destr_function_t);
-	if (count >= avail) {
+	assert(i == count);
+	assert(count <= avail);
+	if (i >= avail) {
 		pthread_destr_function_t *old_destructors;
 		pthread_destr_function_t *new_destructors;
 		tls_endwrite();
@@ -3713,8 +3715,10 @@ again:
 		free(old_destructors);
 		goto again;
 	}
-	/* Simply append the new TLS slot at the end.
-	 * Note   that   i  ==   count   from  above! */
+	/* Simply append the new TLS slot at the
+	 * end. Note that i == count from above! */
+	assert(i == count);
+	tls_count = i + 1;
 use_ith_slot:
 	tls_dtors[i] = destr_function;
 	tls_endwrite();

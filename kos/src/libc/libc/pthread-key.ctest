@@ -1,0 +1,56 @@
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_LIBC_LIBC_PTHREAD_KEY_CTEST
+#define GUARD_LIBC_LIBC_PTHREAD_KEY_CTEST 1
+#define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
+#undef NDEBUG
+
+/**/
+#include <hybrid/compiler.h>
+
+#include <kos/types.h>
+#include <system-test/ctest.h>
+
+#include <assert.h>
+#include <errno.h>
+#include <pthread.h>
+/**/
+
+DECL_BEGIN
+
+DEFINE_TEST(pthread_key) {
+	pthread_key_t key;
+	char const *val = "Pointed-to memory";
+	EQd(pthread_key_create(&key, NULL), EOK);
+	EQp(pthread_getspecific(key), NULL);
+	EQd(pthread_setspecific(key, val), EOK);
+	EQp(pthread_getspecific(key), val);
+	EQd(pthread_setspecific(key, NULL), EOK);
+	EQp(pthread_getspecific(key), NULL);
+	EQd(pthread_key_delete(key), EOK);
+	EQd(pthread_key_delete(key), EINVAL);        /* Trying to delete twice must yield EINVAL */
+	EQd(pthread_setspecific(key, NULL), EINVAL); /* Trying to write after delete must yield EINVAL */
+	EQd(pthread_getspecific(key), NULL);         /* Trying to read after delete must yield NULL */
+}
+
+DECL_END
+
+#endif /* !GUARD_LIBC_LIBC_PTHREAD_KEY_CTEST */

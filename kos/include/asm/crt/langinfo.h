@@ -26,8 +26,8 @@
 #include <asm/crt/locale.h>
 
 #define _NL_ITEM(category, index) (((category) << 16) | (index))
-#define _NL_ITEM_CATEGORY(item)   ((int)(item) >> 16)
-#define _NL_ITEM_INDEX(item)      ((int)(item)&0xffff)
+#define _NL_ITEM_CATEGORY(item)   (__CCAST(int)(item) >> 16)
+#define _NL_ITEM_INDEX(item)      (__CCAST(int)(item) & 0xffff)
 
 #define _NL_TIME_ABDAY_1                       _NL_ITEM(__LC_TIME, 0x00) /* "Sun" */
 #define _NL_TIME_ABDAY_2                       _NL_ITEM(__LC_TIME, 0x01) /* "Mon" */
