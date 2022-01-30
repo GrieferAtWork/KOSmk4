@@ -1078,24 +1078,23 @@ file_seek(FILE *__restrict self, off64_t off, int whence) {
 	assert(self);
 	ex = self->if_exdata;
 	assert(ex);
-	self->if_flag &= ~IO_EOF;
 	if (whence == SEEK_SET || whence == SEEK_CUR) {
 		pos64_t old_abspos;
 		pos64_t new_abspos;
 		uint8_t *new_pos;
-
 		/* For these modes, we  can calculate the new  position,
 		 * allowing for in-buffer seek, as well as delayed seek. */
 		old_abspos = ex->io_fblk;
 		old_abspos += (self->if_ptr - self->if_base);
-		if (whence == SEEK_SET)
+		if (whence == SEEK_SET) {
 			new_abspos = (pos64_t)off;
-		else {
+		} else {
 			/* Special case: position-query */
 			if (off == 0)
 				return old_abspos;
 			new_abspos = old_abspos + off;
 		}
+		self->if_flag &= ~IO_EOF;
 		if unlikely(new_abspos >= INT64_MAX) {
 			libc_seterrno(EOVERFLOW);
 			goto err;
@@ -1145,6 +1144,7 @@ full_seek:
 	ex->io_chng = self->if_base;
 	ex->io_chsz = 0;
 	COMPILER_BARRIER();
+	self->if_flag &= ~IO_EOF;
 
 	/* Do a full seek using the underlying file. */
 	result = (pos64_t)file_system_seek(self, off, whence);
