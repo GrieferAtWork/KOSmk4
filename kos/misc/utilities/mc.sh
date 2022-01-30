@@ -45,7 +45,7 @@ CONFIGURE="$CONFIGURE --with-pcre"
 CONFIGURE="$CONFIGURE --with-mmap"
 CONFIGURE="$CONFIGURE --with-internal-edit"
 CONFIGURE="$CONFIGURE --with-diff-viewer"
-CONFIGURE="$CONFIGURE --with-subshell"
+CONFIGURE="$CONFIGURE --with-subshell=optional"
 
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"
