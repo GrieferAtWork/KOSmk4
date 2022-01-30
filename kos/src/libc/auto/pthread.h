@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6fd1bdc */
+/* HASH CRC-32:0xb6bbecb2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -444,17 +444,25 @@ INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_rwlock_init)(pthre
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_rwlock_destroy)(pthread_rwlock_t *rwlock);
 /* >> pthread_rwlock_rdlock(3)
  * Acquire read lock for `rwlock'
- * @return: EOK: Success */
+ * @return: EOK:     Success
+ * @return: EAGAIN:  The maximum # of read-locks has been acquired
+ * @return: EDEADLK: You're already holding a write-lock
+ * @return: EDEADLK: [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                   You're already holding a read-lock */
 INTDEF NONNULL((1)) errno_t NOTHROW_RPC(LIBDCALL libd_pthread_rwlock_rdlock)(pthread_rwlock_t *rwlock);
 /* >> pthread_rwlock_tryrdlock(3)
  * Try to acquire read lock for `rwlock'
- * @return: EOK:   Success
- * @return: EBUSY: A read-lock cannot be acquired at the moment,
- *                 because a write-lock  is already being  held. */
+ * @return: EOK:    Success
+ * @return: EBUSY:  A read-lock cannot be acquired at the moment,
+ *                  because a write-lock  is already being  held.
+ * @return: EAGAIN: The maximum # of read-locks has been acquired */
 INTDEF WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_rwlock_tryrdlock)(pthread_rwlock_t *rwlock);
 /* >> pthread_rwlock_wrlock(3)
  * Acquire write lock for `rwlock'
- * @return: EOK: Success */
+ * @return: EOK:     Success
+ * @return: EDEADLK: You're already holding a read-lock
+ * @return: EDEADLK: [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                   You're already holding a write-lock */
 INTDEF NONNULL((1)) errno_t NOTHROW_RPC(LIBDCALL libd_pthread_rwlock_wrlock)(pthread_rwlock_t *rwlock);
 /* >> pthread_rwlock_trywrlock(3)
  * Try to acquire write lock for `rwlock'
@@ -466,53 +474,82 @@ INTDEF WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_rwlock_try
  * Try to acquire read lock for `rwlock' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EAGAIN:    The maximum # of read-locks has been acquired
+ * @return: EDEADLK:   You're already holding a write-lock
+ * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a read-lock */
 INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBDCALL libd_pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restrict rwlock, struct timespec const *__restrict abstime);
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
  * Try to acquire write lock for `rwlock' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EDEADLK:   You're already holding a read-lock
+ * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a write-lock */
 INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBDCALL libd_pthread_rwlock_timedwrlock)(pthread_rwlock_t *__restrict rwlock, struct timespec const *__restrict abstime);
 /* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
  * Try to acquire read lock for `rwlock' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EAGAIN:    The maximum # of read-locks has been acquired
+ * @return: EDEADLK:   You're already holding a write-lock
+ * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a read-lock */
 INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBDCALL libd_pthread_rwlock_timedrdlock64)(pthread_rwlock_t *__restrict rwlock, struct timespec64 const *__restrict abstime);
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
  * Try to acquire write lock for `rwlock' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EDEADLK:   You're already holding a read-lock
+ * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a write-lock */
 INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBDCALL libd_pthread_rwlock_timedwrlock64)(pthread_rwlock_t *__restrict rwlock, struct timespec64 const *__restrict abstime);
 /* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
  * Try to acquire  read lock  for `rwlock' or  return after  the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
- * @return: ETIMEDOUT: The given `reltime' has expired */
+ * @return: ETIMEDOUT: The given `reltime' has expired
+ * @return: EAGAIN:    The maximum # of read-locks has been acquired
+ * @return: EDEADLK:   You're already holding a write-lock
+ * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a read-lock */
 INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBDCALL libd_pthread_rwlock_reltimedrdlock_np)(pthread_rwlock_t *__restrict rwlock, struct timespec const *__restrict reltime);
 /* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
  * Try to acquire  write lock for  `rwlock' or return  after the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
- * @return: ETIMEDOUT: The given `reltime' has expired */
+ * @return: ETIMEDOUT: The given `reltime' has expired
+ * @return: EDEADLK:   You're already holding a read-lock
+ * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a write-lock */
 INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBDCALL libd_pthread_rwlock_reltimedwrlock_np)(pthread_rwlock_t *__restrict rwlock, struct timespec const *__restrict reltime);
 /* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
  * Try to acquire  read lock  for `rwlock' or  return after  the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
- * @return: ETIMEDOUT: The given `reltime' has expired */
+ * @return: ETIMEDOUT: The given `reltime' has expired
+ * @return: EAGAIN:    The maximum # of read-locks has been acquired
+ * @return: EDEADLK:   You're already holding a write-lock
+ * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a read-lock */
 INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBDCALL libd_pthread_rwlock_reltimedrdlock64_np)(pthread_rwlock_t *__restrict rwlock, struct timespec64 const *__restrict reltime);
 /* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
  * Try to acquire  write lock for  `rwlock' or return  after the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
- * @return: ETIMEDOUT: The given `reltime' has expired */
+ * @return: ETIMEDOUT: The given `reltime' has expired
+ * @return: EDEADLK:   You're already holding a read-lock
+ * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a write-lock */
 INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBDCALL libd_pthread_rwlock_reltimedwrlock64_np)(pthread_rwlock_t *__restrict rwlock, struct timespec64 const *__restrict reltime);
 /* >> pthread_rwlock_unlock(3)
  * Unlock `rwlock'
- * @return: EOK: Success */
+ * @return: EOK:   Success
+ * @return: EPERM: You're not holding a read- or write-lock */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_rwlock_unlock)(pthread_rwlock_t *rwlock);
 /* >> pthread_rwlockattr_init(3)
  * Initialize attribute object `attr' with default values

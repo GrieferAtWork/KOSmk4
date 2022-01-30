@@ -1693,6 +1693,8 @@
 #define G_DEPRECATED
 #define G_DEPRECATED_FOR
 #define G_UNAVAILABLE(x,y)
+#define G_LIKELY
+#define G_UNLIKELY
 #define _GLIB_EXTERN
 #define GLIB_DEPRECATED
 #define GLIB_DEPRECATED_FOR(f)

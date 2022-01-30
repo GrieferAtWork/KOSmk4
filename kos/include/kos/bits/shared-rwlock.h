@@ -41,13 +41,13 @@
 __DECL_BEGIN
 
 struct shared_rwlock {
-	__uintptr_t sl_lock;   /* Lock state (Set of `SHARED_RWLOCK_*') */
+	__uintptr_t sl_lock;   /* # of read-locks, or (uintptr_t)-1 if a write-lock is active. */
 #ifdef __KERNEL__
 	struct sig  sl_rdwait; /* Signal broadcast to wake-up readers. */
 	struct sig  sl_wrwait; /* Signal broadcast to wake-up writers. */
 #else /* __KERNEL__ */
-	__uintptr_t sl_rdwait; /* Futex (`1' if there are threads waiting for this futex) */
-	__uintptr_t sl_wrwait; /* Futex (`1' if there are threads waiting for this futex) */
+	__uintptr_t sl_rdwait; /* Futex for read-lock waiters (non-zero if threads may be waiting) */
+	__uintptr_t sl_wrwait; /* Futex for write-lock waiters (non-zero if threads may be waiting) */
 #endif /* !__KERNEL__ */
 };
 

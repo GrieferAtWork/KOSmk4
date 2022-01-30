@@ -48,7 +48,7 @@ DEFINE_TEST(pthread_key) {
 	EQd(pthread_key_delete(key), EOK);
 	EQd(pthread_key_delete(key), EINVAL);        /* Trying to delete twice must yield EINVAL */
 	EQd(pthread_setspecific(key, NULL), EINVAL); /* Trying to write after delete must yield EINVAL */
-	EQd(pthread_getspecific(key), NULL);         /* Trying to read after delete must yield NULL */
+	EQp(pthread_getspecific(key), NULL);         /* Trying to read after delete must yield NULL */
 }
 
 DECL_END

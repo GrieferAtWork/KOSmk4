@@ -31,6 +31,7 @@
 #include <kos/anno.h>
 #include <kos/except.h>
 #include <kos/futex.h>
+#include <kos/futexexpr.h>
 #include <kos/rpc.h>
 #include <kos/syscalls.h>
 #include <kos/thread.h>
@@ -133,9 +134,9 @@ STATIC_ASSERT(offsetof(pthread_rwlockattr_t, rwa_shared) == __OFFSET_PTHREAD_RWL
 STATIC_ASSERT(sizeof(pthread_rwlock_t) <= __SIZEOF_PTHREAD_RWLOCK_T);
 STATIC_ASSERT(offsetof(pthread_rwlock_t, rw_lock) == __OFFSET_PTHREAD_RWLOCK_LOCK);
 STATIC_ASSERT(offsetof(pthread_rwlock_t, _rw_nr_readers) == __OFFSET_PTHREAD_RWLOCK_NR_READERS);
-STATIC_ASSERT(offsetof(pthread_rwlock_t, _rw_readers_wakeup) == __OFFSET_PTHREAD_RWLOCK_READERS_WAKEUP);
-STATIC_ASSERT(offsetof(pthread_rwlock_t, _rw_writer_wakeup) == __OFFSET_PTHREAD_RWLOCK_WRITER_WAKEUP);
-STATIC_ASSERT(offsetof(pthread_rwlock_t, _rw_nr_readers_queued) == __OFFSET_PTHREAD_RWLOCK_NR_READERS_QUEUED);
+STATIC_ASSERT(offsetof(pthread_rwlock_t, rw_readers_wakeup) == __OFFSET_PTHREAD_RWLOCK_READERS_WAKEUP);
+STATIC_ASSERT(offsetof(pthread_rwlock_t, rw_writer_wakeup) == __OFFSET_PTHREAD_RWLOCK_WRITER_WAKEUP);
+STATIC_ASSERT(offsetof(pthread_rwlock_t, rw_nr_writers) == __OFFSET_PTHREAD_RWLOCK_NR_WRITERS);
 STATIC_ASSERT(offsetof(pthread_rwlock_t, _rw_nr_writers_queued) == __OFFSET_PTHREAD_RWLOCK_NR_WRITERS_QUEUED);
 STATIC_ASSERT(offsetof(pthread_rwlock_t, rw_flags) == __OFFSET_PTHREAD_RWLOCK_FLAGS);
 STATIC_ASSERT(offsetof(pthread_rwlock_t, _rw_shared) == __OFFSET_PTHREAD_RWLOCK_SHARED);
@@ -2790,6 +2791,411 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_consistent)(pthread_mutex_t *mutex)
 /* pthread_rwlock_t                                                     */
 /************************************************************************/
 
+/*
+ * We implement posix r/w-locks as follows:
+ *
+ * - PTHREAD_RWLOCK_PREFER_READER_NP,  PTHREAD_RWLOCK_PREFER_WRITER_NP:
+ *   These act identical (as they also do in glibc), and allow the lock
+ *   to be used for recursive read-locks. (write-lock are never allowed
+ *   to be recursive)
+ * - PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP:
+ *   This simply makes  it illegal to  acquire recursive  read-locks.
+ *   This  option also requires  us to keep track  of which thread is
+ *   already holding a  specific read-lock (so  we can deny  requests
+ *   to  acquire recursive ones). This is done via a lazily allocated
+ *   TLS variable that points to a control structure used for keeping
+ *   track  of  which rwlocks  are  acquired by  the  calling thread.
+ *   Additionally, this option makes  it possible to use  write-locks
+ *   recursively.
+ *
+ * With recursion out of the way, the actual implementation works the same  as
+ * the KOS-specific  `struct shared_rwlock' from  <kos/sched/shared-rwlock.h>,
+ * with the addition that we also keep track of the TID of the writing thread.
+ *
+ *   [pthread_rwlock_t]  [struct shared_rwlock]  [desc]
+ *   rw_lock             sl_lock                 # of read-locks, or (uint32_t)-1 if a write-lock is active
+ *   rw_readers_wakeup   sl_rdwait               Futex for read-lock waiters (non-zero if threads may be waiting)
+ *   rw_writer_wakeup    sl_wrwait               Futex for write-lock waiters (non-zero if threads may be waiting)
+ *   rw_flags            N/A                     One of `PTHREAD_RWLOCK_PREFER_*'
+ *   rw_writer           N/A                     TID of thread holding write-lock (else: `0')
+ *   rw_nr_writers       N/A                     Write-lock recursion under `PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP'
+ *
+ */
+
+
+struct readlock_bucket {
+	pthread_rwlock_t *rb_lock; /* [0..1] Referenced lock, or one of `READLOCK_BUCKET_*' */
+#define READLOCK_BUCKET_SENTINEL ((pthread_rwlock_t *)0)  /* End-of-chain */
+#define READLOCK_BUCKET_DELETED  ((pthread_rwlock_t *)-1) /* Deleted entry (skip) */
+};
+#define pthread_rwlock_hashof(self) \
+	((uintptr_t)(self))
+#define pthread_rwlock_hashnx(i, perturb) \
+	((i) = (((i) << 2) + (i) + (perturb) + 1), (perturb) >>= 5)
+
+
+struct readlock_tls_data {
+	size_t                  rtd_rdlock_used; /* # of non-READLOCK_BUCKET_SENTINEL/READLOCK_BUCKET_DELETED entries */
+	size_t                  rtd_rdlock_size; /* # of non-READLOCK_BUCKET_SENTINEL entries */
+	size_t                  rtd_rdlock_mask; /* Hash-mask */
+	struct readlock_bucket *rtd_rdlock_list; /* [0..rtd_rdlock_mask+1][owned] Hash-map */
+};
+
+/* Rehash with the given list buffer */
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) void CC
+readlock_tls_data_rehash_with(struct readlock_tls_data *__restrict self,
+                              struct readlock_bucket *__restrict new_list,
+                              size_t new_mask) {
+	/* Rehash existing entries. */
+	uintptr_t i, j, perturb;
+	assert(new_mask >= self->rtd_rdlock_used);
+	for (i = 0; i <= self->rtd_rdlock_mask; ++i) {
+		struct readlock_bucket *dst;
+		pthread_rwlock_t *lck;
+		uintptr_t hash;
+		lck = self->rtd_rdlock_list[i].rb_lock;
+		if (lck == READLOCK_BUCKET_SENTINEL ||
+		    lck == READLOCK_BUCKET_DELETED)
+			continue; /* Empty, or deleted. */
+		hash = pthread_rwlock_hashof(lck);
+		j = perturb = hash & new_mask;
+		for (;; pthread_rwlock_hashnx(j, perturb)) {
+			dst = &new_list[j & new_mask];
+			if (dst->rb_lock == READLOCK_BUCKET_SENTINEL)
+				break;
+		}
+		dst->rb_lock = lck; /* Rehash */
+	}
+	free(self->rtd_rdlock_list);
+	self->rtd_rdlock_list = new_list;
+	self->rtd_rdlock_mask = new_mask;
+	self->rtd_rdlock_size = self->rtd_rdlock_used; /* All deleted entries were removed... */
+}
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1, 2)) errno_t
+readlock_tls_data_doadd_impl(struct readlock_tls_data *__restrict self,
+                             pthread_rwlock_t *__restrict lck) {
+	uintptr_t hash, i, perturb;
+	struct readlock_bucket *ent;
+	assert((self->rtd_rdlock_size + 1) <= self->rtd_rdlock_mask);
+	hash = pthread_rwlock_hashof(lck);
+	i = perturb = hash & self->rtd_rdlock_mask;
+	for (;; pthread_rwlock_hashnx(i, perturb)) {
+		pthread_rwlock_t *elck;
+		ent  = &self->rtd_rdlock_list[i & self->rtd_rdlock_mask];
+		elck = ent->rb_lock;
+		if (elck == READLOCK_BUCKET_SENTINEL) {
+			/* Found a free slot */
+			++self->rtd_rdlock_size;
+			break;
+		}
+		if (elck == READLOCK_BUCKET_DELETED) {
+			/* Re-use a previously deleted slot. */
+			break;
+		}
+		/* Check if this is an identical lock. */
+		if (elck == lck) {
+			/* Identical lock already exists (cannot add) */
+			return EDEADLK;
+		}
+	}
+	ent->rb_lock = lck; /* Inherit */
+	++self->rtd_rdlock_used;
+	return EOK;
+}
+
+#ifndef CONFIG_READLOCK_TLS_DATA_INITIAL_MASK
+#define CONFIG_READLOCK_TLS_DATA_INITIAL_MASK 7
+#endif /* !CONFIG_READLOCK_TLS_DATA_INITIAL_MASK */
+
+/* Add the given `lck' to `self' */
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) errno_t CC
+readlock_tls_data_doadd(struct readlock_tls_data *__restrict self,
+                        pthread_rwlock_t *__restrict lck)
+		THROWS(E_BADALLOC) {
+	if (((self->rtd_rdlock_size + 1) * 3) / 2 >= self->rtd_rdlock_mask) {
+		/* Must rehash! */
+		struct readlock_bucket *new_list;
+		size_t new_mask = CONFIG_READLOCK_TLS_DATA_INITIAL_MASK;
+		size_t thresh   = ((self->rtd_rdlock_used + 1) * 3) / 2;
+		while (thresh >= new_mask)
+			new_mask = (new_mask << 1) | 1;
+		new_list = (struct readlock_bucket *)calloc(new_mask + 1, sizeof(struct readlock_bucket));
+		if unlikely(!new_list) {
+			if ((self->rtd_rdlock_size + 1) <= self->rtd_rdlock_mask)
+				goto doadd;
+			new_mask = CONFIG_READLOCK_TLS_DATA_INITIAL_MASK;
+			while ((self->rtd_rdlock_used + 1) > self->rtd_rdlock_mask)
+				new_mask = (new_mask << 1) | 1;
+			new_list = (struct readlock_bucket *)calloc(new_mask + 1, sizeof(struct readlock_bucket));
+			if unlikely(!new_list)
+				return ENOMEM;
+		}
+		/* Rehash using the new list. */
+		readlock_tls_data_rehash_with(self, new_list, new_mask);
+		assert(self->rtd_rdlock_used == self->rtd_rdlock_size);
+	}
+doadd:
+	return readlock_tls_data_doadd_impl(self, lck);
+}
+
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) void CC
+readlock_tls_data_rehash_after_remove(struct readlock_tls_data *__restrict self) {
+	if ((self->rtd_rdlock_used < (self->rtd_rdlock_mask / 3)) &&
+	    self->rtd_rdlock_mask > CONFIG_READLOCK_TLS_DATA_INITIAL_MASK) {
+		/* Try to shrink the hash-vector's mask size. */
+		size_t new_mask = CONFIG_READLOCK_TLS_DATA_INITIAL_MASK;
+		size_t thresh   = ((self->rtd_rdlock_used + 1) * 3) / 2;
+		while (thresh >= new_mask)
+			new_mask = (new_mask << 1) | 1;
+		if (new_mask < self->rtd_rdlock_mask) {
+			/* Try to shrink */
+			struct readlock_bucket *new_list;
+			new_list = (struct readlock_bucket *)calloc(new_mask + 1, sizeof(struct readlock_bucket));
+			/* If the alloc worked, re-hash using `new_list' */
+			if (new_list)
+				readlock_tls_data_rehash_with(self, new_list, new_mask);
+		}
+	}
+}
+
+/* Remove `lck' from the set of locks of `self' */
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) errno_t CC
+readlock_tls_data_dodel(struct readlock_tls_data *__restrict self,
+                        pthread_rwlock_t *__restrict lck) {
+	uintptr_t hash, i, perturb;
+	struct readlock_bucket *ent;
+	pthread_rwlock_t *emon;
+	hash = pthread_rwlock_hashof(lck);
+	i = perturb = hash & self->rtd_rdlock_mask;
+	for (;; pthread_rwlock_hashnx(i, perturb)) {
+		ent  = &self->rtd_rdlock_list[i & self->rtd_rdlock_mask];
+		emon = ent->rb_lock;
+		if (emon == READLOCK_BUCKET_SENTINEL)
+			return EPERM; /* No such monitor. */
+		if (emon == lck)
+			break; /* Found it! */
+	}
+	assert(self->rtd_rdlock_used);
+	ent->rb_lock = READLOCK_BUCKET_DELETED;
+	--self->rtd_rdlock_used;
+	return EOK;
+}
+
+/* Remove `lck' from the set of locks of `self' */
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) bool CC
+readlock_tls_data_contains(struct readlock_tls_data const *__restrict self,
+                           pthread_rwlock_t const *__restrict lck) {
+	uintptr_t hash, i, perturb;
+	pthread_rwlock_t *emon;
+	hash = pthread_rwlock_hashof(lck);
+	i = perturb = hash & self->rtd_rdlock_mask;
+	for (;; pthread_rwlock_hashnx(i, perturb)) {
+		emon = self->rtd_rdlock_list[i & self->rtd_rdlock_mask].rb_lock;
+		if (emon == READLOCK_BUCKET_SENTINEL)
+			return false; /* No such monitor. */
+		if (emon == lck)
+			return true; /* Found it! */
+	}
+}
+
+
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") void
+NOTHROW_NCX(LIBCCALL readlock_tls_destroy)(void *data) {
+	struct readlock_tls_data *me;
+	if (!data)
+		return;
+	me = (struct readlock_tls_data *)data;
+	free(me->rtd_rdlock_list);
+	free(me);
+}
+
+PRIVATE ATTR_SECTION(".data.crt.sched.pthread")
+pthread_key_t readlock_tls_key = PTHREAD_ONCE_KEY_NP;
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") pthread_key_t
+NOTHROW_NCX(LIBCCALL readlock_tls_getkey)(void) {
+	if (pthread_key_create_once_np(&readlock_tls_key, &readlock_tls_destroy) != EOK)
+		return (pthread_key_t)-1;
+	return readlock_tls_key;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") struct readlock_tls_data *
+NOTHROW_NCX(LIBCCALL readlock_tls_getdata)(void) {
+	pthread_key_t key;
+	struct readlock_tls_data *data;
+	key  = readlock_tls_getkey();
+	data = (struct readlock_tls_data *)pthread_getspecific(key);
+	if (!data) {
+		if unlikely(key == (pthread_key_t)-1)
+			return NULL;
+		data = (struct readlock_tls_data *)calloc(sizeof(struct readlock_tls_data));
+		if unlikely(!data)
+			return NULL;
+		if unlikely(pthread_setspecific(key, data) != EOK) {
+			free(data);
+			return NULL;
+		}
+	}
+	return data;
+}
+
+
+
+/* @return: EOK:     Success
+ * @return: ENOMEM:  Out of memory
+ * @return: EDEADLK: Already reading */
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
+NOTHROW_NCX(LIBCCALL pthread_rwlock_addreading)(pthread_rwlock_t *__restrict rwlock) {
+	struct readlock_tls_data *data;
+	data = readlock_tls_getdata();
+	if unlikely(!data)
+		return ENOMEM;
+	return readlock_tls_data_doadd(data, rwlock);
+}
+
+/* @return: EOK:    Success
+ * @return: EPERM:  Not reading */
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
+NOTHROW_NCX(LIBCCALL pthread_rwlock_delreading)(pthread_rwlock_t *__restrict rwlock) {
+	errno_t result;
+	struct readlock_tls_data *data;
+	data = readlock_tls_getdata();
+	if unlikely(!data)
+		return ENOMEM;
+	result = readlock_tls_data_dodel(data, rwlock);
+	if (result == EOK)
+		readlock_tls_data_rehash_after_remove(data);
+	return result;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) bool
+NOTHROW_NCX(LIBCCALL pthread_rwlock_isreading)(pthread_rwlock_t *__restrict rwlock) {
+	struct readlock_tls_data *data;
+	if (readlock_tls_key == (pthread_key_t)-1)
+		return false;
+	data = readlock_tls_getdata();
+	if unlikely(!data)
+		return false;
+	return readlock_tls_data_contains(data, rwlock);
+}
+
+
+
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
+NOTHROW_RPC(LIBCCALL pthread_rwlock_acquireread)(pthread_rwlock_t *__restrict self,
+                                                 struct timespec64 const *timeout,
+                                                 syscall_ulong_t timeout_flags) {
+	uint32_t word;
+again:
+	if (self->rw_flags) {
+		/* Special handling to prevent recursive read-locks. */
+		errno_t error;
+		error = pthread_rwlock_addreading(self);
+		if (error == EOK) {
+			do {
+				word = ATOMIC_READ(self->rw_lock);
+				if (word >= (uint32_t)-2) {
+					if (word == (uint32_t)-2) {
+						error = EAGAIN; /* Too many read-locks */
+					} else if (self->rw_writer == gettid()) {
+						error = EDEADLK; /* You're already holding a write-lock */
+					} else {
+						/* Someone else is holding a write-lock */
+						pthread_rwlock_delreading(self);
+						goto handle_EBUSY;
+					}
+					pthread_rwlock_delreading(self);
+					break;
+				}
+			} while (!ATOMIC_CMPXCH_WEAK(self->rw_lock, word, word + 1));
+		}
+		return error;
+	}
+	do {
+		word = ATOMIC_READ(self->rw_lock);
+		if (word >= (uint32_t)-2) {
+			if (word == (uint32_t)-2)
+				return EAGAIN; /* Too many read-locks */
+			if (self->rw_writer == gettid())
+				return EDEADLK; /* You're already holding a write-lock */
+			goto handle_EBUSY;  /* Someone else is holding a write-lock */
+		}
+	} while (!ATOMIC_CMPXCH_WEAK(self->rw_lock, word, word + 1));
+	return EOK;
+handle_EBUSY:
+	/* Indicate that we are waiting for a read-lock */
+	ATOMIC_WRITE(self->rw_readers_wakeup, 1);
+
+	/* Using lfutex expressions to wait on `rw_readers_wakeup', while `rw_lock == (uint32_t)-1' */
+	{
+		int status;
+		static struct lfutexexpr const waitreadexpr[] = {
+			LFUTEXEXPR_INIT(__builtin_offsetof(pthread_rwlock_t, rw_lock), LFUTEX_WAIT_WHILE, UINT32_MAX, 0),
+			LFUTEXEXPR_INIT(0, LFUTEX_EXPREND, 0, 0)
+		};
+		status = LFutexExpr64((uintptr_t *)&self->rw_readers_wakeup, self,
+		                      waitreadexpr, timeout, timeout_flags);
+		if (status < 0) {
+			assert(timeout);
+			return ETIMEDOUT;
+		}
+	}
+
+	/* XXX: If we end up waiting again, and `LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE' was
+	 *      given, then we must subtract the  amount of time we've already  waited! */
+	goto again;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
+NOTHROW_RPC(LIBCCALL pthread_rwlock_acquirewrite)(pthread_rwlock_t *__restrict self,
+                                                  struct timespec64 const *timeout,
+                                                  syscall_ulong_t timeout_flags) {
+again:
+	if (ATOMIC_CMPXCH(self->rw_lock, 0, (uint32_t)-1)) {
+		/* Success */
+		self->rw_writer = gettid();
+		return EOK;
+	}
+
+	/* Check for recursive write-locks */
+	if (self->rw_flags && self->rw_writer == gettid()) {
+		if unlikely(self->rw_nr_writers == (uint32_t)-1)
+			return EAGAIN;     /* Not documented, but mirror what `pthread_rwlock_tryrdlock()' does */
+		++self->rw_nr_writers; /* Recursive write-lock! */
+		return EOK;
+	}
+
+	/* Someone is holding a read-lock. If it's us, that's a EDEADLK */
+	if unlikely(self->rw_flags && pthread_rwlock_isreading(self))
+		return EDEADLK;
+
+	/* Indicate that we are waiting for a write-lock */
+	ATOMIC_WRITE(self->rw_writer_wakeup, 1);
+
+	/* Using lfutex expressions to wait on `rw_writer_wakeup', until `rw_lock == 0' */
+	{
+		int status;
+		static struct lfutexexpr const waitwriteexpr[] = {
+			LFUTEXEXPR_INIT(__builtin_offsetof(pthread_rwlock_t, rw_lock), LFUTEX_WAIT_UNTIL, 0, 0),
+			LFUTEXEXPR_INIT(0, LFUTEX_EXPREND, 0, 0)
+		};
+		status = LFutexExpr64((uintptr_t *)&self->rw_writer_wakeup, self,
+		                      waitwriteexpr, timeout, timeout_flags);
+		if (status < 0) {
+			assert(timeout);
+			return ETIMEDOUT;
+		}
+	}
+
+	/* XXX: If we end up waiting again, and `LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE' was
+	 *      given, then we must subtract the  amount of time we've already  waited! */
+	goto again;
+}
+
+
 /*[[[head:libc_pthread_rwlock_init,hash:CRC-32=0x55dfbe61]]]*/
 /* >> pthread_rwlock_init(3)
  * Initialize read-write lock `rwlock' using attributes `attr',
@@ -2799,11 +3205,16 @@ INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_init)(pthread_rwlock_t *__restrict rwlock,
                                                pthread_rwlockattr_t const *__restrict attr)
 /*[[[body:libc_pthread_rwlock_init]]]*/
-/*AUTO*/{
-	(void)rwlock;
-	(void)attr;
-	CRT_UNIMPLEMENTEDF("pthread_rwlock_init(%p, %p)", rwlock, attr); /* TODO */
-	return ENOSYS;
+{
+	rwlock->rw_lock           = 0;
+	rwlock->rw_nr_writers     = 0;
+	rwlock->rw_readers_wakeup = 0;
+	rwlock->rw_writer_wakeup  = 0;
+	rwlock->rw_flags          = 0;
+	rwlock->rw_writer         = 0;
+	if (attr != NULL)
+		rwlock->rw_flags = attr->rwa_kind == PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP;
+	return EOK;
 }
 /*[[[end:libc_pthread_rwlock_init]]]*/
 
@@ -2814,62 +3225,80 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_init)(pthread_rwlock_t *__restrict rwlo
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_destroy)(pthread_rwlock_t *rwlock)
 /*[[[body:libc_pthread_rwlock_destroy]]]*/
-/*AUTO*/{
+{
 	(void)rwlock;
-	CRT_UNIMPLEMENTEDF("pthread_rwlock_destroy(%p)", rwlock); /* TODO */
-	return ENOSYS;
+	DBG_memset(rwlock, 0xcc, sizeof(*rwlock));
+	return EOK;
 }
 /*[[[end:libc_pthread_rwlock_destroy]]]*/
 
-/*[[[head:libc_pthread_rwlock_rdlock,hash:CRC-32=0xdfe4bc82]]]*/
+/*[[[head:libc_pthread_rwlock_rdlock,hash:CRC-32=0x123ca0c0]]]*/
 /* >> pthread_rwlock_rdlock(3)
  * Acquire read lock for `rwlock'
- * @return: EOK: Success */
+ * @return: EOK:     Success
+ * @return: EAGAIN:  The maximum # of read-locks has been acquired
+ * @return: EDEADLK: You're already holding a write-lock
+ * @return: EDEADLK: [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                   You're already holding a read-lock */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_rdlock)(pthread_rwlock_t *rwlock)
 /*[[[body:libc_pthread_rwlock_rdlock]]]*/
-/*AUTO*/{
-	(void)rwlock;
-	CRT_UNIMPLEMENTEDF("pthread_rwlock_rdlock(%p)", rwlock); /* TODO */
-	return ENOSYS;
+{
+	return pthread_rwlock_acquireread(rwlock, NULL, 0);
 }
 /*[[[end:libc_pthread_rwlock_rdlock]]]*/
 
-/*[[[head:libc_pthread_rwlock_tryrdlock,hash:CRC-32=0xd3ca7445]]]*/
+/*[[[head:libc_pthread_rwlock_tryrdlock,hash:CRC-32=0xfc3e4b6b]]]*/
 /* >> pthread_rwlock_tryrdlock(3)
  * Try to acquire read lock for `rwlock'
- * @return: EOK:   Success
- * @return: EBUSY: A read-lock cannot be acquired at the moment,
- *                 because a write-lock  is already being  held. */
+ * @return: EOK:    Success
+ * @return: EBUSY:  A read-lock cannot be acquired at the moment,
+ *                  because a write-lock  is already being  held.
+ * @return: EAGAIN: The maximum # of read-locks has been acquired */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_tryrdlock)(pthread_rwlock_t *rwlock)
 /*[[[body:libc_pthread_rwlock_tryrdlock]]]*/
-/*AUTO*/{
-	(void)rwlock;
-	CRT_UNIMPLEMENTEDF("pthread_rwlock_tryrdlock(%p)", rwlock); /* TODO */
-	return ENOSYS;
+{
+	uint32_t word;
+	do {
+		word = ATOMIC_READ(rwlock->rw_lock);
+		if (word >= (uint32_t)-2) {
+			if (word == (uint32_t)-1)
+				return EBUSY;
+			return EAGAIN;
+		}
+	} while (!ATOMIC_CMPXCH_WEAK(rwlock->rw_lock, word, word + 1));
+	return EOK;
 }
 /*[[[end:libc_pthread_rwlock_tryrdlock]]]*/
 
-/*[[[head:libc_pthread_rwlock_timedrdlock,hash:CRC-32=0xa392ed2a]]]*/
+/*[[[head:libc_pthread_rwlock_timedrdlock,hash:CRC-32=0x5a1fd7f3]]]*/
 /* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
  * Try to acquire read lock for `rwlock' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EAGAIN:    The maximum # of read-locks has been acquired
+ * @return: EDEADLK:   You're already holding a write-lock
+ * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a read-lock */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1, 2)) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restrict rwlock,
                                                       struct timespec const *__restrict abstime)
 /*[[[body:libc_pthread_rwlock_timedrdlock]]]*/
 {
-	(void)rwlock;
-	(void)abstime;
-	CRT_UNIMPLEMENTED("pthread_rwlock_timedrdlock"); /* TODO */
-	return ENOSYS;
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+	return pthread_rwlock_acquireread(rwlock, abstime, 0);
+#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+	struct timespec64 ts64;
+	ts64.tv_sec  = (time_t)abstime->tv_sec;
+	ts64.tv_nsec = (syscall_ulong_t)abstime->tv_nsec;
+	return pthread_rwlock_acquireread(rwlock, &ts64, 0);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 }
 /*[[[end:libc_pthread_rwlock_timedrdlock]]]*/
 
-/*[[[head:libc_pthread_rwlock_timedrdlock64,hash:CRC-32=0xbe1542c5]]]*/
+/*[[[head:libc_pthread_rwlock_timedrdlock64,hash:CRC-32=0x2331b79e]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_rwlock_timedrdlock64, libc_pthread_rwlock_timedrdlock);
 #else /* MAGIC:alias */
@@ -2877,31 +3306,33 @@ DEFINE_INTERN_ALIAS(libc_pthread_rwlock_timedrdlock64, libc_pthread_rwlock_timed
  * Try to acquire read lock for `rwlock' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EAGAIN:    The maximum # of read-locks has been acquired
+ * @return: EDEADLK:   You're already holding a write-lock
+ * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a read-lock */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1, 2)) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock64)(pthread_rwlock_t *__restrict rwlock,
                                                         struct timespec64 const *__restrict abstime)
 /*[[[body:libc_pthread_rwlock_timedrdlock64]]]*/
 {
-	(void)rwlock;
-	(void)abstime;
-	CRT_UNIMPLEMENTED("pthread_rwlock_timedrdlock64"); /* TODO */
-	return ENOSYS;
+	return pthread_rwlock_acquireread(rwlock, abstime, 0);
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_rwlock_timedrdlock64]]]*/
 
-/*[[[head:libc_pthread_rwlock_wrlock,hash:CRC-32=0x5a5a3aa0]]]*/
+/*[[[head:libc_pthread_rwlock_wrlock,hash:CRC-32=0x236bfa55]]]*/
 /* >> pthread_rwlock_wrlock(3)
  * Acquire write lock for `rwlock'
- * @return: EOK: Success */
+ * @return: EOK:     Success
+ * @return: EDEADLK: You're already holding a read-lock
+ * @return: EDEADLK: [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                   You're already holding a write-lock */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_wrlock)(pthread_rwlock_t *rwlock)
 /*[[[body:libc_pthread_rwlock_wrlock]]]*/
-/*AUTO*/{
-	(void)rwlock;
-	CRT_UNIMPLEMENTEDF("pthread_rwlock_wrlock(%p)", rwlock); /* TODO */
-	return ENOSYS;
+{
+	return pthread_rwlock_acquirewrite(rwlock, NULL, 0);
 }
 /*[[[end:libc_pthread_rwlock_wrlock]]]*/
 
@@ -2914,32 +3345,50 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_wrlock)(pthread_rwlock_t *rwlock)
 INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_trywrlock)(pthread_rwlock_t *rwlock)
 /*[[[body:libc_pthread_rwlock_trywrlock]]]*/
-/*AUTO*/{
-	(void)rwlock;
-	CRT_UNIMPLEMENTEDF("pthread_rwlock_trywrlock(%p)", rwlock); /* TODO */
-	return ENOSYS;
+{
+	if (!ATOMIC_CMPXCH(rwlock->rw_lock, 0, (uint32_t)-1)) {
+		/* Check for recursive write-locks */
+		if (rwlock->rw_flags && rwlock->rw_writer == gettid()) {
+			if unlikely(rwlock->rw_nr_writers == (uint32_t)-1)
+				return EAGAIN;       /* Not documented, but mirror what `pthread_rwlock_tryrdlock()' does */
+			++rwlock->rw_nr_writers; /* Recursive write-lock! */
+			return EOK;
+		}
+		return EBUSY; /* Locks are already being held */
+	}
+
+	/* Success */
+	rwlock->rw_writer = gettid();
+	return EOK;
 }
 /*[[[end:libc_pthread_rwlock_trywrlock]]]*/
 
-/*[[[head:libc_pthread_rwlock_timedwrlock,hash:CRC-32=0x1fcf25e7]]]*/
+/*[[[head:libc_pthread_rwlock_timedwrlock,hash:CRC-32=0x7fbb4606]]]*/
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
  * Try to acquire write lock for `rwlock' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EDEADLK:   You're already holding a read-lock
+ * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a write-lock */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1, 2)) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock)(pthread_rwlock_t *__restrict rwlock,
                                                       struct timespec const *__restrict abstime)
 /*[[[body:libc_pthread_rwlock_timedwrlock]]]*/
 {
-	(void)rwlock;
-	(void)abstime;
-	CRT_UNIMPLEMENTED("pthread_rwlock_timedwrlock"); /* TODO */
-	return ENOSYS;
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+	return pthread_rwlock_acquirewrite(rwlock, abstime, 0);
+#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+	struct timespec64 ts64;
+	ts64.tv_sec  = (time_t)abstime->tv_sec;
+	ts64.tv_nsec = (syscall_ulong_t)abstime->tv_nsec;
+	return pthread_rwlock_acquirewrite(rwlock, &ts64, 0);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 }
 /*[[[end:libc_pthread_rwlock_timedwrlock]]]*/
 
-/*[[[head:libc_pthread_rwlock_timedwrlock64,hash:CRC-32=0x97b9db86]]]*/
+/*[[[head:libc_pthread_rwlock_timedwrlock64,hash:CRC-32=0x7a866865]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_rwlock_timedwrlock64, libc_pthread_rwlock_timedwrlock);
 #else /* MAGIC:alias */
@@ -2947,57 +3396,72 @@ DEFINE_INTERN_ALIAS(libc_pthread_rwlock_timedwrlock64, libc_pthread_rwlock_timed
  * Try to acquire write lock for `rwlock' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
+ * @return: ETIMEDOUT: The given `abstime' has expired
+ * @return: EDEADLK:   You're already holding a read-lock
+ * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a write-lock */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1, 2)) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock64)(pthread_rwlock_t *__restrict rwlock,
                                                         struct timespec64 const *__restrict abstime)
 /*[[[body:libc_pthread_rwlock_timedwrlock64]]]*/
 {
-	(void)rwlock;
-	(void)abstime;
-	CRT_UNIMPLEMENTED("pthread_rwlock_timedwrlock64"); /* TODO */
-	return ENOSYS;
+	return pthread_rwlock_acquirewrite(rwlock, abstime, 0);
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_rwlock_timedwrlock64]]]*/
 
-/*[[[head:libc_pthread_rwlock_reltimedrdlock_np,hash:CRC-32=0xd179bc66]]]*/
+/*[[[head:libc_pthread_rwlock_reltimedrdlock_np,hash:CRC-32=0x259046d9]]]*/
 /* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
  * Try to acquire  read lock  for `rwlock' or  return after  the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
- * @return: ETIMEDOUT: The given `reltime' has expired */
+ * @return: ETIMEDOUT: The given `reltime' has expired
+ * @return: EAGAIN:    The maximum # of read-locks has been acquired
+ * @return: EDEADLK:   You're already holding a write-lock
+ * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a read-lock */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1, 2)) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_reltimedrdlock_np)(pthread_rwlock_t *__restrict rwlock,
                                                             struct timespec const *__restrict reltime)
 /*[[[body:libc_pthread_rwlock_reltimedrdlock_np]]]*/
 {
-	(void)rwlock;
-	(void)reltime;
-	CRT_UNIMPLEMENTED("pthread_rwlock_reltimedwrlock_np"); /* TODO */
-	return ENOSYS;
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+	return pthread_rwlock_acquireread(rwlock, reltime, LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE);
+#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+	struct timespec64 ts64;
+	ts64.tv_sec  = (time_t)reltime->tv_sec;
+	ts64.tv_nsec = (syscall_ulong_t)reltime->tv_nsec;
+	return pthread_rwlock_acquireread(rwlock, &ts64, LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 }
 /*[[[end:libc_pthread_rwlock_reltimedrdlock_np]]]*/
 
-/*[[[head:libc_pthread_rwlock_reltimedwrlock_np,hash:CRC-32=0xc3164ebe]]]*/
+/*[[[head:libc_pthread_rwlock_reltimedwrlock_np,hash:CRC-32=0xc25bfb6c]]]*/
 /* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
  * Try to acquire  write lock for  `rwlock' or return  after the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
- * @return: ETIMEDOUT: The given `reltime' has expired */
+ * @return: ETIMEDOUT: The given `reltime' has expired
+ * @return: EDEADLK:   You're already holding a read-lock
+ * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a write-lock */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1, 2)) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_reltimedwrlock_np)(pthread_rwlock_t *__restrict rwlock,
                                                             struct timespec const *__restrict reltime)
 /*[[[body:libc_pthread_rwlock_reltimedwrlock_np]]]*/
 {
-	(void)rwlock;
-	(void)reltime;
-	CRT_UNIMPLEMENTED("pthread_rwlock_reltimedwrlock_np"); /* TODO */
-	return ENOSYS;
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+	return pthread_rwlock_acquirewrite(rwlock, reltime, LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE);
+#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+	struct timespec64 ts64;
+	ts64.tv_sec  = (time_t)reltime->tv_sec;
+	ts64.tv_nsec = (syscall_ulong_t)reltime->tv_nsec;
+	return pthread_rwlock_acquirewrite(rwlock, &ts64, LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE);
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 }
 /*[[[end:libc_pthread_rwlock_reltimedwrlock_np]]]*/
 
-/*[[[head:libc_pthread_rwlock_reltimedrdlock64_np,hash:CRC-32=0x46046ee4]]]*/
+/*[[[head:libc_pthread_rwlock_reltimedrdlock64_np,hash:CRC-32=0x229d2e1b]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_rwlock_reltimedrdlock64_np, libc_pthread_rwlock_reltimedrdlock_np);
 #else /* MAGIC:alias */
@@ -3005,21 +3469,22 @@ DEFINE_INTERN_ALIAS(libc_pthread_rwlock_reltimedrdlock64_np, libc_pthread_rwlock
  * Try to acquire  read lock  for `rwlock' or  return after  the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
- * @return: ETIMEDOUT: The given `reltime' has expired */
+ * @return: ETIMEDOUT: The given `reltime' has expired
+ * @return: EAGAIN:    The maximum # of read-locks has been acquired
+ * @return: EDEADLK:   You're already holding a write-lock
+ * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a read-lock */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1, 2)) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_reltimedrdlock64_np)(pthread_rwlock_t *__restrict rwlock,
                                                               struct timespec64 const *__restrict reltime)
 /*[[[body:libc_pthread_rwlock_reltimedrdlock64_np]]]*/
 {
-	(void)rwlock;
-	(void)reltime;
-	CRT_UNIMPLEMENTED("pthread_rwlock_reltimedwrlock_np"); /* TODO */
-	return ENOSYS;
+	return pthread_rwlock_acquireread(rwlock, reltime, LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE);
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_rwlock_reltimedrdlock64_np]]]*/
 
-/*[[[head:libc_pthread_rwlock_reltimedwrlock64_np,hash:CRC-32=0xc70995ea]]]*/
+/*[[[head:libc_pthread_rwlock_reltimedwrlock64_np,hash:CRC-32=0x1b442254]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_rwlock_reltimedwrlock64_np, libc_pthread_rwlock_reltimedwrlock_np);
 #else /* MAGIC:alias */
@@ -3027,31 +3492,99 @@ DEFINE_INTERN_ALIAS(libc_pthread_rwlock_reltimedwrlock64_np, libc_pthread_rwlock
  * Try to acquire  write lock for  `rwlock' or return  after the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
- * @return: ETIMEDOUT: The given `reltime' has expired */
+ * @return: ETIMEDOUT: The given `reltime' has expired
+ * @return: EDEADLK:   You're already holding a read-lock
+ * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+ *                     You're already holding a write-lock */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1, 2)) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_reltimedwrlock64_np)(pthread_rwlock_t *__restrict rwlock,
                                                               struct timespec64 const *__restrict reltime)
 /*[[[body:libc_pthread_rwlock_reltimedwrlock64_np]]]*/
 {
-	(void)rwlock;
-	(void)reltime;
-	CRT_UNIMPLEMENTED("pthread_rwlock_reltimedwrlock_np"); /* TODO */
-	return ENOSYS;
+	return pthread_rwlock_acquirewrite(rwlock, reltime, LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE);
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_pthread_rwlock_reltimedwrlock64_np]]]*/
 
-/*[[[head:libc_pthread_rwlock_unlock,hash:CRC-32=0x864e5097]]]*/
+/*[[[head:libc_pthread_rwlock_unlock,hash:CRC-32=0x6c79c875]]]*/
 /* >> pthread_rwlock_unlock(3)
  * Unlock `rwlock'
- * @return: EOK: Success */
+ * @return: EOK:   Success
+ * @return: EPERM: You're not holding a read- or write-lock */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_unlock)(pthread_rwlock_t *rwlock)
 /*[[[body:libc_pthread_rwlock_unlock]]]*/
-/*AUTO*/{
-	(void)rwlock;
-	CRT_UNIMPLEMENTEDF("pthread_rwlock_unlock(%p)", rwlock); /* TODO */
-	return ENOSYS;
+{
+	errno_t error;
+	uint32_t word;
+	if (rwlock->rw_flags) {
+		word = ATOMIC_READ(rwlock->rw_lock);
+		if (word == (uint32_t)-1) {
+			/* Release write-lock */
+			if (rwlock->rw_writer != gettid())
+				return EPERM;
+			if (rwlock->rw_nr_writers != 0) {
+				--rwlock->rw_nr_writers;
+				return EOK; /* Recursive write-lock */
+			}
+			goto do_release_write_lock;
+		}
+
+		/* Release read-lock */
+		error = pthread_rwlock_delreading(rwlock);
+		if (error != EOK)
+			return error;
+		for (;;) {
+			assertf(word != 0, "But `pthread_rwlock_delreading()' "
+			                   "said we were holding a read-lock...");
+			if (ATOMIC_CMPXCH_WEAK(rwlock->rw_lock, word, word - 1))
+				break;
+			word = ATOMIC_READ(rwlock->rw_lock);
+		}
+	} else {
+		for (;;) {
+			word = ATOMIC_READ(rwlock->rw_lock);
+			if (word == (uint32_t)-1) {
+				/* Release write-lock */
+				if (rwlock->rw_writer != gettid())
+					return EPERM;
+do_release_write_lock:
+				rwlock->rw_writer = 0;
+				COMPILER_WRITE_BARRIER();
+				ATOMIC_WRITE(rwlock->rw_lock, 0);
+				if (rwlock->rw_readers_wakeup) {
+					/* Wake-up readers */
+					ATOMIC_WRITE(rwlock->rw_readers_wakeup, 0);
+					sys_Xfutex(&rwlock->rw_readers_wakeup,
+					           FUTEX_WAKE, (uint32_t)-1,
+					           NULL, NULL, 0);
+				}
+				return EOK;
+			}
+			if unlikely(word == 0)
+				return EPERM; /* There aren't locks of any kind */
+			if (ATOMIC_CMPXCH_WEAK(rwlock->rw_lock, word, word - 1))
+				break;
+		}
+	}
+	if (word == 1) {
+		/* Last read-lock went away (must wake-up writers) */
+		if (rwlock->rw_writer_wakeup) {
+			uint32_t count;
+			count = sys_Xfutex(&rwlock->rw_writer_wakeup,
+			                   FUTEX_WAKE, 1, NULL, NULL, 0);
+			if (count == 0) {
+				/* No more writers (clear the "there-may-be-writers" flag
+				 * and  broadcast anyone that  may have started listening
+				 * in the meantime, so-as to ensure consistency) */
+				ATOMIC_WRITE(rwlock->rw_writer_wakeup, 0);
+				sys_Xfutex(&rwlock->rw_writer_wakeup,
+				           FUTEX_WAKE, (uint32_t)-1,
+				           NULL, NULL, 0);
+			}
+		}
+	}
+	return EOK;
 }
 /*[[[end:libc_pthread_rwlock_unlock]]]*/
 

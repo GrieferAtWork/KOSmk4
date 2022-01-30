@@ -1846,21 +1846,29 @@ $errno_t pthread_rwlock_destroy([[nonnull]] pthread_rwlock_t *rwlock);
 
 @@>> pthread_rwlock_rdlock(3)
 @@Acquire read lock for `rwlock'
-@@@return: EOK: Success
+@@@return: EOK:     Success
+@@@return: EAGAIN:  The maximum # of read-locks has been acquired
+@@@return: EDEADLK: You're already holding a write-lock
+@@@return: EDEADLK: [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+@@                  You're already holding a read-lock
 [[cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_rwlock_rdlock([[nonnull]] pthread_rwlock_t *rwlock);
 
 @@>> pthread_rwlock_tryrdlock(3)
 @@Try to acquire read lock for `rwlock'
-@@@return: EOK:   Success
-@@@return: EBUSY: A read-lock cannot be acquired at the moment,
-@@                because a write-lock  is already being  held.
+@@@return: EOK:    Success
+@@@return: EBUSY:  A read-lock cannot be acquired at the moment,
+@@                 because a write-lock  is already being  held.
+@@@return: EAGAIN: The maximum # of read-locks has been acquired
 [[wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_rwlock_tryrdlock([[nonnull]] pthread_rwlock_t *rwlock);
 
 @@>> pthread_rwlock_wrlock(3)
 @@Acquire write lock for `rwlock'
-@@@return: EOK: Success
+@@@return: EOK:     Success
+@@@return: EDEADLK: You're already holding a read-lock
+@@@return: EDEADLK: [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+@@                  You're already holding a write-lock
 [[cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_rwlock_wrlock([[nonnull]] pthread_rwlock_t *rwlock);
 
@@ -1878,6 +1886,10 @@ $errno_t pthread_rwlock_trywrlock([[nonnull]] pthread_rwlock_t *rwlock);
 @@@return: EOK:       Success
 @@@return: EINVAL:    The given `abstime' is invalid
 @@@return: ETIMEDOUT: The given `abstime' has expired
+@@@return: EAGAIN:    The maximum # of read-locks has been acquired
+@@@return: EDEADLK:   You're already holding a write-lock
+@@@return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+@@                    You're already holding a read-lock
 [[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_rwlock_timedrdlock")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_rwlock_timedrdlock64")]]
@@ -1906,6 +1918,9 @@ $errno_t pthread_rwlock_timedrdlock([[nonnull]] pthread_rwlock_t *__restrict rwl
 @@@return: EOK:       Success
 @@@return: EINVAL:    The given `abstime' is invalid
 @@@return: ETIMEDOUT: The given `abstime' has expired
+@@@return: EDEADLK:   You're already holding a read-lock
+@@@return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+@@                    You're already holding a write-lock
 [[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_rwlock_timedwrlock")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_rwlock_timedwrlock64")]]
@@ -1973,6 +1988,10 @@ $errno_t pthread_rwlock_timedwrlock64([[nonnull]] pthread_rwlock_t *__restrict r
 @@@return: EOK:       Success
 @@@return: EINVAL:    The given `reltime' is invalid
 @@@return: ETIMEDOUT: The given `reltime' has expired
+@@@return: EAGAIN:    The maximum # of read-locks has been acquired
+@@@return: EDEADLK:   You're already holding a write-lock
+@@@return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+@@                    You're already holding a read-lock
 [[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_rwlock_reltimedrdlock_np")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_rwlock_reltimedrdlock64_np")]]
@@ -2001,6 +2020,9 @@ $errno_t pthread_rwlock_reltimedrdlock_np([[nonnull]] pthread_rwlock_t *__restri
 @@@return: EOK:       Success
 @@@return: EINVAL:    The given `reltime' is invalid
 @@@return: ETIMEDOUT: The given `reltime' has expired
+@@@return: EDEADLK:   You're already holding a read-lock
+@@@return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
+@@                    You're already holding a write-lock
 [[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_rwlock_reltimedwrlock_np")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_rwlock_reltimedwrlock64_np")]]
@@ -2064,7 +2086,8 @@ $errno_t pthread_rwlock_reltimedwrlock64_np([[nonnull]] pthread_rwlock_t *__rest
 
 @@>> pthread_rwlock_unlock(3)
 @@Unlock `rwlock'
-@@@return: EOK: Success
+@@@return: EOK:   Success
+@@@return: EPERM: You're not holding a read- or write-lock
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_rwlock_unlock([[nonnull]] pthread_rwlock_t *rwlock);
 

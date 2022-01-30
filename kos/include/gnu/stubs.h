@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17bd718d */
+/* HASH CRC-32:0xa8f0ddaf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -568,21 +568,6 @@
 #define __stub_pthread_mutex_consistent
 #define __stub_pthread_mutex_getprioceiling
 #define __stub_pthread_mutex_setprioceiling
-#define __stub_pthread_rwlock_destroy
-#define __stub_pthread_rwlock_init
-#define __stub_pthread_rwlock_rdlock
-#define __stub_pthread_rwlock_reltimedrdlock64_np
-#define __stub_pthread_rwlock_reltimedrdlock_np
-#define __stub_pthread_rwlock_reltimedwrlock64_np
-#define __stub_pthread_rwlock_reltimedwrlock_np
-#define __stub_pthread_rwlock_timedrdlock
-#define __stub_pthread_rwlock_timedrdlock64
-#define __stub_pthread_rwlock_timedwrlock
-#define __stub_pthread_rwlock_timedwrlock64
-#define __stub_pthread_rwlock_tryrdlock
-#define __stub_pthread_rwlock_trywrlock
-#define __stub_pthread_rwlock_unlock
-#define __stub_pthread_rwlock_wrlock
 #define __stub_pthread_setcancelstate
 #define __stub_pthread_setcanceltype
 #define __stub_ptsname_r

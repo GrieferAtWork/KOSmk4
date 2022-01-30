@@ -511,11 +511,17 @@ typedef union __pthread_rwlockattr {
 #endif /* __CC__ */
 #endif /* !__USE_PTHREAD_INTERNALS */
 
+#ifdef __USE_PTHREAD_INTERNALS
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define __OFFSET_PTHREAD_RWLOCK_LOCK              0
 #define __OFFSET_PTHREAD_RWLOCK_NR_READERS        4
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+#define __OFFSET_PTHREAD_RWLOCK_LOCK              4
+#define __OFFSET_PTHREAD_RWLOCK_NR_READERS        0
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 #define __OFFSET_PTHREAD_RWLOCK_READERS_WAKEUP    8
 #define __OFFSET_PTHREAD_RWLOCK_WRITER_WAKEUP     12
-#define __OFFSET_PTHREAD_RWLOCK_NR_READERS_QUEUED 16
+#define __OFFSET_PTHREAD_RWLOCK_NR_WRITERS        16
 #define __OFFSET_PTHREAD_RWLOCK_NR_WRITERS_QUEUED 20
 
 #ifndef __OFFSET_PTHREAD_RWLOCK_FLAGS
@@ -530,15 +536,21 @@ typedef union __pthread_rwlockattr {
 #ifndef __OFFSET_PTHREAD_RWLOCK_WRITER
 #define __OFFSET_PTHREAD_RWLOCK_WRITER 28
 #endif /* !__OFFSET_PTHREAD_RWLOCK_WRITER */
+#endif /* __USE_PTHREAD_INTERNALS */
 
 #ifdef __CC__
 struct __pthread_rwlock_s {
 #ifdef __USE_PTHREAD_INTERNALS
-	__INT32_TYPE__   rw_lock;              /* Futex/rwlock control word */
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	__INT32_TYPE__   rw_lock;              /* s.a. `struct shared_rwlock::sl_lock' */
 	__UINT32_TYPE__ _rw_nr_readers;        /* Unused (on KOS) */
-	__UINT32_TYPE__ _rw_readers_wakeup;    /* Unused (on KOS) */
-	__UINT32_TYPE__ _rw_writer_wakeup;     /* Unused (on KOS) */
-	__UINT32_TYPE__ _rw_nr_readers_queued; /* Unused (on KOS) */
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+	__UINT32_TYPE__ _rw_nr_readers;        /* Unused (on KOS) */
+	__INT32_TYPE__   rw_lock;              /* s.a. `struct shared_rwlock::sl_lock' */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+	__UINT32_TYPE__  rw_readers_wakeup;    /* s.a. `struct shared_rwlock::sl_rdwait' */
+	__UINT32_TYPE__  rw_writer_wakeup;     /* s.a. `struct shared_rwlock::sl_wrwait' */
+	__UINT32_TYPE__  rw_nr_writers;        /* Write-lock recursion under `PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP' */
 	__UINT32_TYPE__ _rw_nr_writers_queued; /* Unused (on KOS) */
 #else /* __USE_PTHREAD_INTERNALS */
 	__INT32_TYPE__   __lock;
@@ -552,7 +564,7 @@ struct __pthread_rwlock_s {
 #define __PTHREAD_RWLOCK_S_INITIALIZER_EX(flags) \
 	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, { 0 }, flags }
 #ifdef __USE_PTHREAD_INTERNALS
-	__INT32_TYPE__   rw_writer;    /* PID of the writing thread */
+	__INT32_TYPE__   rw_writer;    /* TID of the writing thread */
 	__INT32_TYPE__  _rw_shared;    /* Unused (on KOS) */
 	__INT8_TYPE__   _rw_rwelision; /* Unused (on KOS) */
 	__UINT8_TYPE__  _rw_pad1[__OFFSET_PTHREAD_RWLOCK_FLAGS - (__OFFSET_PTHREAD_RWLOCK_RWELISION + 1)];
@@ -568,11 +580,11 @@ struct __pthread_rwlock_s {
 #define __PTHREAD_RWLOCK_S_INITIALIZER_EX(flags) \
 	{ 0, 0, 0, 0, 0, 0, flags, 0, 0, 0, 0 }
 #ifdef __USE_PTHREAD_INTERNALS
-	__UINT8_TYPE__   rw_flags;     /* One of `PTHREAD_RWLOCK_PREFER_*' */
+	__UINT8_TYPE__   rw_flags;     /* [const] Non-zero if `PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP' */
 	__UINT8_TYPE__  _rw_shared;    /* Unused (on KOS) */
 	__INT8_TYPE__   _rw_rwelision; /* Unused (on KOS) */
 	__UINT8_TYPE__  _rw_pad1;      /* ... */
-	__INT32_TYPE__   rw_writer;    /* PID of the writing thread */
+	__INT32_TYPE__   rw_writer;    /* [valid_if(rw_lock == UINT32_MAX)] TID of the writing thread */
 #else /* __USE_PTHREAD_INTERNALS */
 	__UINT8_TYPE__  __flags;
 	__UINT8_TYPE__  __shared;
