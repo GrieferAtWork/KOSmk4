@@ -3065,6 +3065,8 @@
 #define __CRT_HAVE_nftw64
 #define __CRT_HAVE_ngettext
 #define __CRT_HAVE_nice
+#define __CRT_HAVE_nl_langinfo
+#define __CRT_HAVE_nl_langinfo_l
 #define __CRT_HAVE_nrand48
 #define __CRT_HAVE_nrand48_r
 #define __CRT_HAVE_ns_datetosecs
@@ -8006,6 +8008,8 @@
 #define __CRT_HAVE_KOS$nexttowardl
 #define __CRT_HAVE_KOS$ngettext
 #define __CRT_HAVE_KOS$nice
+#define __CRT_HAVE_KOS$nl_langinfo
+#define __CRT_HAVE_KOS$nl_langinfo_l
 #define __CRT_HAVE_KOS$nrand48
 #define __CRT_HAVE_KOS$nrand48_r
 #define __CRT_HAVE_KOS$ns_datetosecs
@@ -11986,6 +11990,8 @@
 #define __CRT_HAVE_DOS$nexttowardl
 #define __CRT_HAVE_DOS$ngettext
 #define __CRT_HAVE_DOS$nice
+#define __CRT_HAVE_DOS$nl_langinfo
+#define __CRT_HAVE_DOS$nl_langinfo_l
 #define __CRT_HAVE_DOS$nrand48
 #define __CRT_HAVE_DOS$nrand48_r
 #define __CRT_HAVE_DOS$ns_datetosecs

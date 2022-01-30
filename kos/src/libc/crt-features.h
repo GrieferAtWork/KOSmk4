@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaea22cd3 */
+/* HASH CRC-32:0x7dfeaefd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1981,6 +1981,8 @@
 #define __CRT_HAVE_DOS$nexttowardf
 #define __CRT_HAVE_DOS$ngettext
 #define __CRT_HAVE_DOS$nice
+#define __CRT_HAVE_DOS$nl_langinfo
+#define __CRT_HAVE_DOS$nl_langinfo_l
 #define __CRT_HAVE_DOS$nrand48
 #define __CRT_HAVE_DOS$nrand48_r
 #define __CRT_HAVE_DOS$ns_datetosecs
@@ -5592,6 +5594,8 @@
 #define __CRT_HAVE_nftw64
 #define __CRT_HAVE_ngettext
 #define __CRT_HAVE_nice
+#define __CRT_HAVE_nl_langinfo
+#define __CRT_HAVE_nl_langinfo_l
 #define __CRT_HAVE_nrand48
 #define __CRT_HAVE_nrand48_r
 #define __CRT_HAVE_ns_datetosecs

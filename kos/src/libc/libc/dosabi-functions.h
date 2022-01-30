@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46d05d62 */
+/* HASH CRC-32:0x35e18f8d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -504,6 +504,10 @@ DFUN(".text.crt.dos.sched.rpc", libd_rpc_interrupt, libc_rpc_interrupt, TD, 2, T
 DFUN(".text.crt.dos.sched.rpc", libd_RpcSchedule, libc_RpcSchedule, TV, 5, TIn(__SIZEOF_PID_T__), TD, TP, TP, TI)
 DFUN(".text.crt.dos.sched.rpc", libd_RpcExec, libc_RpcExec, TV, 4, TIn(__SIZEOF_PID_T__), TD, TP, TP)
 DFUN(".text.crt.dos.sched.rpc", libd_RpcInterrupt, libc_RpcInterrupt, TV, 2, TIn(__SIZEOF_PID_T__), TD)
+
+/* langinfo */
+DFUN(".text.crt.dos.i18n", libd_nl_langinfo, libc_nl_langinfo, TP, 1, TD)
+DFUN(".text.crt.dos.i18n", libd_nl_langinfo_l, libc_nl_langinfo_l, TP, 2, TD, TP)
 
 /* libgen */
 DFUN(".text.crt.dos.unsorted", libd_dirname, libc_dirname, TP, 1, TP)

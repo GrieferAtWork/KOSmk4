@@ -3248,6 +3248,8 @@
 #define __CRT_HAVE_nftw64
 #define __CRT_HAVE_ngettext
 #define __CRT_HAVE_nice
+#define __CRT_HAVE_nl_langinfo
+#define __CRT_HAVE_nl_langinfo_l
 #define __CRT_HAVE_nrand48
 #define __CRT_HAVE_nrand48_r
 #define __CRT_HAVE_ns_datetosecs
