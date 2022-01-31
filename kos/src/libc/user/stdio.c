@@ -2429,8 +2429,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.pos") NONNULL((1, 2)) int
                                  fpos_t *__restrict pos) THROWS(...)
 /*[[[body:libc_fgetpos_unlocked]]]*/
 {
-	off_t result;
-	result = ftello(stream);
+	off_t result = ftello_unlocked(stream);
 	if unlikely(result == -1 && libc_geterrno() != EOK)
 		return -1;
 	*pos = (fpos_t)result;
@@ -2444,7 +2443,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.pos") NONNULL((1, 2)) int
                                  fpos_t const *__restrict pos) THROWS(...)
 /*[[[body:libc_fsetpos_unlocked]]]*/
 {
-	return fseeko(stream, (off_t)(pos_t)*pos, SEEK_SET);
+	return fseeko_unlocked(stream, (off_t)(pos_t)*pos, SEEK_SET);
 }
 /*[[[end:libc_fsetpos_unlocked]]]*/
 
@@ -2457,8 +2456,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.pos") NONNULL((1, 2)) int
                                    fpos64_t *__restrict pos) THROWS(...)
 /*[[[body:libc_fgetpos64_unlocked]]]*/
 {
-	off64_t result;
-	result = ftello64(stream);
+	off64_t result = ftello64_unlocked(stream);
 	if unlikely(result == -1 && libc_geterrno() != EOK)
 		return -1;
 	*pos = (fpos64_t)result;
@@ -2476,7 +2474,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.pos") NONNULL((1, 2)) int
                                    fpos64_t const *__restrict pos) THROWS(...)
 /*[[[body:libc_fsetpos64_unlocked]]]*/
 {
-	return fseeko64(stream, (off64_t)(pos64_t)*pos, SEEK_SET);
+	return fseeko64_unlocked(stream, (off64_t)(pos64_t)*pos, SEEK_SET);
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_fsetpos64_unlocked]]]*/
