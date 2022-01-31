@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43aaddd8 */
+/* HASH CRC-32:0x484be51 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -868,6 +868,7 @@ DECL_END
 
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(nl_langinfo, libc_nl_langinfo);
+DEFINE_PUBLIC_ALIAS(__nl_langinfo_l, libc_nl_langinfo_l);
 DEFINE_PUBLIC_ALIAS(nl_langinfo_l, libc_nl_langinfo_l);
 #endif /* !__KERNEL__ */
 

@@ -871,6 +871,7 @@
 #define __CRT_HAVE___nexttowardf
 #define __CRT_HAVE___nexttowardl
 #define __CRT_HAVE___nice
+#define __CRT_HAVE___nl_langinfo_l
 #define __CRT_HAVE___nterrno_location
 #define __CRT_HAVE___ntohl
 #define __CRT_HAVE___ntohs

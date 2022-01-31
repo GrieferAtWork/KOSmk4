@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8783c324 */
+/* HASH CRC-32:0x568b176d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -245,7 +245,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(nl_langinfo, __FORCELOCAL __ATTR_ARTIFICIAL __AT
  * string when `item' is invalid.
  * @param: item: One of the macros from <langinfo.h>, or one of `_NL_*' */
 __CDECLARE(__ATTR_RETNONNULL,char __KOS_FIXED_CONST *,__NOTHROW_NCX,nl_langinfo_l,(__STDC_INT_AS_UINT_T __item, __locale_t __locale),(__item,__locale))
-#else /* __CRT_HAVE_nl_langinfo_l */
+#elif defined(__CRT_HAVE___nl_langinfo_l)
+/* >> nl_langinfo(3), nl_langinfo_l(3)
+ * Return the name of the given `item' (one of the macros above)
+ * to be returned for  the current locale (s.a.  `setlocale(3)')
+ * This function never returns `NULL',  but may return an  empty
+ * string when `item' is invalid.
+ * @param: item: One of the macros from <langinfo.h>, or one of `_NL_*' */
+__CREDIRECT(__ATTR_RETNONNULL,char __KOS_FIXED_CONST *,__NOTHROW_NCX,nl_langinfo_l,(__STDC_INT_AS_UINT_T __item, __locale_t __locale),__nl_langinfo_l,(__item,__locale))
+#else /* ... */
 #include <libc/local/langinfo/nl_langinfo_l.h>
 /* >> nl_langinfo(3), nl_langinfo_l(3)
  * Return the name of the given `item' (one of the macros above)
@@ -254,7 +262,7 @@ __CDECLARE(__ATTR_RETNONNULL,char __KOS_FIXED_CONST *,__NOTHROW_NCX,nl_langinfo_
  * string when `item' is invalid.
  * @param: item: One of the macros from <langinfo.h>, or one of `_NL_*' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(nl_langinfo_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL char __KOS_FIXED_CONST *__NOTHROW_NCX(__LIBCCALL nl_langinfo_l)(__STDC_INT_AS_UINT_T __item, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nl_langinfo_l))(__item, __locale); })
-#endif /* !__CRT_HAVE_nl_langinfo_l */
+#endif /* !... */
 #endif /* __USE_XOPEN2K */
 
 __SYSDECL_END

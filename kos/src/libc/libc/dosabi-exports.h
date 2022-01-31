@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3236fb */
+/* HASH CRC-32:0x4e898922 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -476,6 +476,7 @@ DEFINE_PUBLIC_ALIAS(DOS$RpcInterrupt, libd_RpcInterrupt);
 
 /* langinfo */
 DEFINE_PUBLIC_ALIAS(DOS$nl_langinfo, libd_nl_langinfo);
+DEFINE_PUBLIC_ALIAS(DOS$__nl_langinfo_l, libd_nl_langinfo_l);
 DEFINE_PUBLIC_ALIAS(DOS$nl_langinfo_l, libd_nl_langinfo_l);
 
 /* libgen */

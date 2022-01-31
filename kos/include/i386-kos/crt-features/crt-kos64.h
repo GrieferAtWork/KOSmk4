@@ -867,6 +867,7 @@
 #define __CRT_HAVE___nexttowardf
 #define __CRT_HAVE___nexttowardl
 #define __CRT_HAVE___nice
+#define __CRT_HAVE___nl_langinfo_l
 #define __CRT_HAVE___nterrno_location
 #define __CRT_HAVE___ntohl
 #define __CRT_HAVE___ntohs
@@ -5832,6 +5833,7 @@
 #define __CRT_HAVE_KOS$__nexttowardf
 #define __CRT_HAVE_KOS$__nexttowardl
 #define __CRT_HAVE_KOS$__nice
+#define __CRT_HAVE_KOS$__nl_langinfo_l
 #define __CRT_HAVE_KOS$__ntohl
 #define __CRT_HAVE_KOS$__ntohs
 #define __CRT_HAVE_KOS$__open
@@ -9814,6 +9816,7 @@
 #define __CRT_HAVE_DOS$__nexttowardf
 #define __CRT_HAVE_DOS$__nexttowardl
 #define __CRT_HAVE_DOS$__nice
+#define __CRT_HAVE_DOS$__nl_langinfo_l
 #define __CRT_HAVE_DOS$__ntohl
 #define __CRT_HAVE_DOS$__ntohs
 #define __CRT_HAVE_DOS$__open

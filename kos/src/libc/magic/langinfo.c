@@ -1042,8 +1042,8 @@ print("	}");
 
 %
 %#ifdef __USE_XOPEN2K
-[[doc_alias("nl_langinfo"), nonnull]]
-[[requires_function(nl_langinfo), decl_include("<features.h>")]]
+[[doc_alias("nl_langinfo"), export_alias("__nl_langinfo_l")]]
+[[nonnull, requires_function(nl_langinfo), decl_include("<features.h>")]]
 char __KOS_FIXED_CONST *nl_langinfo_l(__STDC_INT_AS_UINT_T item, $locale_t locale) {
 	(void)locale;
 	return nl_langinfo(item);
