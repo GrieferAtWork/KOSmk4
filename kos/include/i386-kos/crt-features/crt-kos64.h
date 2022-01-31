@@ -1372,6 +1372,9 @@
 #define __CRT_HAVE__mktemp_s
 #define __CRT_HAVE__msize
 #define __CRT_HAVE__msize_dbg
+#define __CRT_HAVE__nl_default_dirname
+#define __CRT_HAVE__nl_domain_bindings
+#define __CRT_HAVE__nl_msg_cat_cntr
 #define __CRT_HAVE__open_osfhandle
 #define __CRT_HAVE__pgmptr
 #define __CRT_HAVE__pipe

@@ -205,6 +205,12 @@ DECLARE_NOREL_GLOBAL_META(int, optopt);
 #define opterr GET_NOREL_GLOBAL(opterr)
 #define optopt GET_NOREL_GLOBAL(optopt)
 
+
+/* <libintl.h> */
+#undef _nl_msg_cat_cntr
+DECLARE_NOREL_GLOBAL_META(int, _nl_msg_cat_cntr);
+#define _nl_msg_cat_cntr GET_NOREL_GLOBAL(_nl_msg_cat_cntr)
+
 #endif /* !__KERNEL__ */
 
 DECL_END

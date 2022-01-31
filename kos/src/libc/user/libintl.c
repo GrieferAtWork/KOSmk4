@@ -66,6 +66,14 @@ DECL_BEGIN
 #endif /* !FCALL */
 
 
+
+/* Broadcast a notification that return value of `gettext()' may have changed. */
+#ifndef notify_gettext_maybe_changed
+#define notify_gettext_maybe_changed() \
+	(void)(++_nl_msg_cat_cntr)
+#endif /* !notify_gettext_maybe_changed */
+
+
 /*[[[deemon
 local offset = 0;
 
@@ -81,7 +89,7 @@ local CATEGORIES = {
 };
 
 local longest_catname_len = CATEGORIES.each.length > ...;
-print("PRIVATE char const category_names[] =");
+print("PRIVATE ATTR_SECTION(\".rodata.crt.i18n\") char const category_names[] =");
 for (local name: CATEGORIES) {
 	if (offset) {
 		print(repr("\0" + name));
@@ -103,7 +111,7 @@ for (local name: CATEGORIES) {
 }
 print("#pragma GCC diagnostic push");
 print("#pragma GCC diagnostic ignored \"-Woverride-init\"");
-print("PRIVATE u8 const category_names_offsets[LC_COUNT] = {");
+print("PRIVATE ATTR_SECTION(\".rodata.crt.i18n\") u8 const category_names_offsets[LC_COUNT] = {");
 print("	[0 ... LC_COUNT - 1] = category_names__END,");
 for (local name: CATEGORIES) {
 	print("	[", name, "]", (" " * (longest_catname_len - #name)), " = category_names__OFFSET_", name, ",");
@@ -111,7 +119,7 @@ for (local name: CATEGORIES) {
 print("};");
 print("#pragma GCC diagnostic pop");
 ]]]*/
-PRIVATE char const category_names[] =
+PRIVATE ATTR_SECTION(".rodata.crt.i18n") char const category_names[] =
 "LC_CTYPE"
 #define category_names__OFFSET_LC_CTYPE    0
 "\0LC_NUMERIC"
@@ -159,7 +167,7 @@ PRIVATE char const category_names[] =
 #endif /* LC_ALL >= LC_COUNT */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Woverride-init"
-PRIVATE u8 const category_names_offsets[LC_COUNT] = {
+PRIVATE ATTR_SECTION(".rodata.crt.i18n") u8 const category_names_offsets[LC_COUNT] = {
 	[0 ... LC_COUNT - 1] = category_names__END,
 	[LC_CTYPE]    = category_names__OFFSET_LC_CTYPE,
 	[LC_NUMERIC]  = category_names__OFFSET_LC_NUMERIC,
@@ -328,8 +336,10 @@ PRIVATE struct atomic_rwlock mofiletree_lock = ATOMIC_RWLOCK_INIT;
  * Cache of language names used for individual categories. These strings
  * are lazily initialized as strdup()  copies of strings retrieved  from
  * environment variables. */
-PRIVATE char *language_names[LC_COUNT] = { [0 ... LC_COUNT - 1] = NULL };
-PRIVATE char const unknown_language_name[] = "";
+PRIVATE ATTR_SECTION(".bss.crt.i18n")
+char *language_names[LC_COUNT] = { [0 ... LC_COUNT - 1] = NULL };
+PRIVATE ATTR_SECTION(".rodata.crt.i18n")
+char const unknown_language_name[] = "";
 
 /* Clear  cached language  names for  all categories.  This function is
  * called when one of the thread-unsafe libintl configuration functions
@@ -337,7 +347,8 @@ PRIVATE char const unknown_language_name[] = "";
  *   - textdomain(3)
  *   - bindtextdomain(3)
  *   - bind_textdomain_codeset(3) */
-PRIVATE void NOTHROW(FCALL clear_language_cache)(void) {
+PRIVATE ATTR_SECTION(".text.crt.i18n") void
+NOTHROW(FCALL clear_language_cache)(void) {
 	unsigned int i;
 	for (i = 0; i < LC_COUNT; ++i) {
 		char *lang = language_names[i];
@@ -347,13 +358,16 @@ PRIVATE void NOTHROW(FCALL clear_language_cache)(void) {
 				free(lang);
 		}
 	}
+
+	/* Indicate that gettext() strings may have changed. */
+	notify_gettext_maybe_changed();
 }
 
 /* Return the language name used for the given `category' of
  * messages. Returns an empty string if no language is  set.
  * NOTE: The caller must ensure that `category' is valid.
  * NOTE: Leading or trailing slashes will have been removed */
-PRIVATE ATTR_RETNONNULL WUNUSED char const *
+PRIVATE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.i18n") char const *
 NOTHROW(FCALL get_language_name)(int category) {
 	char const *result;
 	result = language_names[(unsigned int)category];
@@ -407,14 +421,19 @@ struct domain_directory {
 };
 
 /* Domain directory binding table. */
-PRIVATE size_t domain_directory_size = 0; /* # of domain directory bindings. */
+PRIVATE ATTR_SECTION(".bss.crt.i18n")
+size_t domain_directory_size = 0; /* # of domain directory bindings. */
+
 /* [0..domain_directory_size][sort(dd_dom)][owned] List of domain directory bindings (sorted by `dd_dom'). */
-PRIVATE struct domain_directory *domain_directory_list = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.i18n")
+struct domain_directory *domain_directory_list = NULL;
 
 /* Default domain directory. NOTE: Code assumes that this does _NOT_ end with a trailing slash! */
-PRIVATE char const default_domain_dir[] = _PATH_TEXTDOMAIN;
+INTERN ATTR_SECTION(".rodata.crt.i18n") /* `INTERN' because exported as `_nl_default_dirname' */
+char const default_domain_dir[] = _PATH_TEXTDOMAIN;
 
 /* Return the directory against which `domainname' is bound. */
+ATTR_SECTION(".text.crt.i18n")
 PRIVATE ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char const *FCALL
 get_domain_directory(char const *__restrict domainname) {
 	size_t lo = 0, hi = domain_directory_size;
@@ -458,7 +477,7 @@ struct plural_parser {
 
 
 /* Plural expression tokenization. */
-PRIVATE NONNULL((1)) void
+PRIVATE ATTR_SECTION(".text.crt.i18n") NONNULL((1)) void
 NOTHROW_NCX(FCALL plural_yield)(struct plural_parser *__restrict self) {
 	plural_tok_t result;
 	char const *ptr = self->pp_ptr;
@@ -643,7 +662,7 @@ eof:
 
 PRIVATE WUNUSED NONNULL((1)) longptr_t
 NOTHROW_NCX(FCALL plural_cond)(struct plural_parser *__restrict self);
-PRIVATE WUNUSED NONNULL((1)) longptr_t
+PRIVATE ATTR_SECTION(".text.crt.i18n") WUNUSED NONNULL((1)) longptr_t
 NOTHROW_NCX(FCALL plural_unary)(struct plural_parser *__restrict self) {
 	longptr_t result;
 	plural_tok_t tok;
@@ -681,7 +700,7 @@ NOTHROW_NCX(FCALL plural_unary)(struct plural_parser *__restrict self) {
 	return result;
 }
 
-PRIVATE WUNUSED NONNULL((1)) longptr_t
+PRIVATE ATTR_SECTION(".text.crt.i18n") WUNUSED NONNULL((1)) longptr_t
 NOTHROW_NCX(FCALL plural_prod)(struct plural_parser *__restrict self) {
 	longptr_t other, result = plural_unary(self);
 	while (self->pp_tok == '*' || self->pp_tok == '/' || self->pp_tok == '%') {
@@ -698,7 +717,7 @@ NOTHROW_NCX(FCALL plural_prod)(struct plural_parser *__restrict self) {
 	return result;
 }
 
-PRIVATE WUNUSED NONNULL((1)) longptr_t
+PRIVATE ATTR_SECTION(".text.crt.i18n") WUNUSED NONNULL((1)) longptr_t
 NOTHROW_NCX(FCALL plural_sum)(struct plural_parser *__restrict self) {
 	longptr_t other, result = plural_prod(self);
 	while (self->pp_tok == '+' || self->pp_tok == '-') {
@@ -711,7 +730,7 @@ NOTHROW_NCX(FCALL plural_sum)(struct plural_parser *__restrict self) {
 	return result;
 }
 
-PRIVATE WUNUSED NONNULL((1)) longptr_t
+PRIVATE ATTR_SECTION(".text.crt.i18n") WUNUSED NONNULL((1)) longptr_t
 NOTHROW_NCX(FCALL plural_cmp)(struct plural_parser *__restrict self) {
 	longptr_t other, result = plural_sum(self);
 	while (self->pp_tok == '<' || self->pp_tok == PLURAL_TOK_LE ||
@@ -732,7 +751,7 @@ NOTHROW_NCX(FCALL plural_cmp)(struct plural_parser *__restrict self) {
 	return result;
 }
 
-PRIVATE WUNUSED NONNULL((1)) longptr_t
+PRIVATE ATTR_SECTION(".text.crt.i18n") WUNUSED NONNULL((1)) longptr_t
 NOTHROW_NCX(FCALL plural_cmpeq)(struct plural_parser *__restrict self) {
 	longptr_t other, result = plural_cmp(self);
 	while (self->pp_tok == PLURAL_TOK_EQ || self->pp_tok == PLURAL_TOK_NE) {
@@ -745,7 +764,7 @@ NOTHROW_NCX(FCALL plural_cmpeq)(struct plural_parser *__restrict self) {
 	return result;
 }
 
-PRIVATE WUNUSED NONNULL((1)) longptr_t
+PRIVATE ATTR_SECTION(".text.crt.i18n") WUNUSED NONNULL((1)) longptr_t
 NOTHROW_NCX(FCALL plural_land)(struct plural_parser *__restrict self) {
 	longptr_t other, result = plural_cmpeq(self);
 	while (self->pp_tok == PLURAL_TOK_LAND) {
@@ -756,7 +775,7 @@ NOTHROW_NCX(FCALL plural_land)(struct plural_parser *__restrict self) {
 	return result;
 }
 
-PRIVATE WUNUSED NONNULL((1)) longptr_t
+PRIVATE ATTR_SECTION(".text.crt.i18n") WUNUSED NONNULL((1)) longptr_t
 NOTHROW_NCX(FCALL plural_lor)(struct plural_parser *__restrict self) {
 	longptr_t other, result = plural_land(self);
 	while (self->pp_tok == PLURAL_TOK_LOR) {
@@ -767,7 +786,7 @@ NOTHROW_NCX(FCALL plural_lor)(struct plural_parser *__restrict self) {
 	return result;
 }
 
-PRIVATE WUNUSED NONNULL((1)) longptr_t
+PRIVATE ATTR_SECTION(".text.crt.i18n") WUNUSED NONNULL((1)) longptr_t
 NOTHROW_NCX(FCALL plural_cond)(struct plural_parser *__restrict self) {
 	longptr_t result;
 	result = plural_lor(self);
@@ -784,7 +803,7 @@ NOTHROW_NCX(FCALL plural_cond)(struct plural_parser *__restrict self) {
 }
 
 /* Evaluate a plural expression and return the strend^N index to-be used. */
-PRIVATE ATTR_PURE WUNUSED NONNULL((1)) ulongptr_t
+PRIVATE ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED NONNULL((1)) ulongptr_t
 NOTHROW_NCX(FCALL eval_plural_expression)(char const *__restrict expr,
                                           longptr_t n) {
 	longptr_t result;
@@ -805,7 +824,7 @@ NOTHROW_NCX(FCALL eval_plural_expression)(char const *__restrict expr,
 
 
 /* Parse meta-data information. */
-PRIVATE ATTR_PURE WUNUSED NONNULL((1)) char const *
+PRIVATE ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED NONNULL((1)) char const *
 NOTHROW_NCX(FCALL mo_extract_plural_from_metadata)(char const *__restrict header,
                                                    size_t header_len) {
 	char const *header_end;
@@ -883,7 +902,7 @@ NOTHROW_NCX(FCALL mo_extract_plural_from_metadata)(char const *__restrict header
 }
 
 /* Try to open a .mo file for the given specs. */
-PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1)) struct mo_file *
+PRIVATE ATTR_SECTION(".text.crt.i18n") ATTR_NOINLINE WUNUSED NONNULL((1)) struct mo_file *
 NOTHROW_NCX(FCALL open_mo_file)(char const *__restrict domainname, int category) {
 	struct mo_file *result;
 	char const *lng; /* Used language name */
@@ -1057,10 +1076,10 @@ fail:
 }
 
 /* Cache for the last-accessed mo-file. */
-PRIVATE struct atomic_rwlock last_lock       = ATOMIC_RWLOCK_INIT;
-PRIVATE struct mo_file /**/ *last_file       = NULL;
-PRIVATE int /*            */ last_category   = 0;
-PRIVATE char const /*    */ *last_domainname = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.i18n") struct atomic_rwlock last_lock       = ATOMIC_RWLOCK_INIT;
+PRIVATE ATTR_SECTION(".bss.crt.i18n") struct mo_file /**/ *last_file       = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.i18n") int /*            */ last_category   = 0;
+PRIVATE ATTR_SECTION(".bss.crt.i18n") char const /*    */ *last_domainname = NULL;
 
 /* Helper macros for `last_lock' */
 #define last_mustreap()   0
@@ -1089,7 +1108,7 @@ PRIVATE char const /*    */ *last_domainname = NULL;
 
 
 /* Return the .mo file associated with the given arguments. */
-PRIVATE WUNUSED NONNULL((1)) struct mo_file *FCALL
+PRIVATE ATTR_SECTION(".text.crt.i18n") WUNUSED NONNULL((1)) struct mo_file *FCALL
 get_mo_file(char const *__restrict domainname, int category) {
 	struct mo_file *result;
 	last_read();
@@ -1137,13 +1156,13 @@ load_file_slowly:
 
 /* [0..1][owned] Current domain name (as set by `textdomain()')
  * Defaults to the part after the last slash in `dlmodulename(dlopen(NULL, 0))' */
-PRIVATE char *current_domainname = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.i18n") char *current_domainname = NULL;
 
 
 /* Translate the given message. */
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) char const *
+PRIVATE ATTR_SECTION(".text.crt.i18n") ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) char const *
 NOTHROW_NCX(FCALL mo_file_translate)(struct mo_file *__restrict self,
-                                       char const *__restrict msgid) {
+                                     char const *__restrict msgid) {
 	size_t lo, hi;
 	/* The specs promise that strings are sorted lexicographically.
 	 * As such, we're able to perform a binary search to find  what
@@ -1190,10 +1209,10 @@ corrupt:
 }
 
 /* Translate the given message. */
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) char const *
+PRIVATE ATTR_SECTION(".text.crt.i18n") ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) char const *
 NOTHROW_NCX(FCALL mo_file_translate_plural)(struct mo_file *__restrict self,
-                                              char const *__restrict msgid,
-                                              ulongptr_t index) {
+                                            char const *__restrict msgid,
+                                            ulongptr_t index) {
 	size_t lo, hi;
 	/* The specs promise that strings are sorted lexicographically.
 	 * As such, we're able to perform a binary search to find  what
@@ -1499,6 +1518,45 @@ NOTHROW_NCX(LIBCCALL libc_bind_textdomain_codeset)(char const *domainname,
 	return (char *)codeset;
 }
 /*[[[end:libc_bind_textdomain_codeset]]]*/
+
+
+/* This  is a special variable also visible to loaded programs, that
+ * gets incremented every time anything  happens that may result  in
+ * `gettext()' returning a different value from a given string, than
+ * what it may have returned during a preceding invocation.
+ *
+ * This may be used by programs to cache translated strings for  as
+ * long as they remain valid. And most importantly: this fixes some
+ * configure  scripts that test  for a variable  by this name being
+ * exported from libc (*cough* midnight-commander *cough*)... */
+INTERN ATTR_SECTION(".bss.crt.i18n") int libc__nl_msg_cat_cntr = 0;
+#undef _nl_msg_cat_cntr
+DEFINE_PUBLIC_ALIAS(_nl_msg_cat_cntr, libc__nl_msg_cat_cntr);
+
+/* Export the default domain directory by-name. (XXX: In the  original
+ * glibc, programs could override this symbol and have libintl pick up
+ * on that during initialization; this  could easily be added to  KOS,
+ * but I've yet to do so since  I don't think that programs should  do
+ * something  like that, because  `bindtextdomain(3)' already does the
+ * same) */
+#undef _nl_default_dirname
+DEFINE_PUBLIC_ALIAS(_nl_default_dirname, default_domain_dir);
+
+/* I don't really know what this symbol is supposed to be all about.
+ * It's exported by glibc as `struct binding *_nl_domain_bindings;',
+ * and looks like some kind of interface to internals.
+ *
+ * It  has to be exported because configure scripts exist that check
+ * for this symbol being present. However, OpenSolaris also includes
+ * compat for this scenario, and it  simply defines it as an  unused
+ * NULL-pointer  to an integer. - So we  simply do the same and hope
+ * for the best ;) */
+#undef _nl_domain_bindings
+INTERN ATTR_SECTION(".bss.crt.i18n") int *libc__nl_domain_bindings = NULL;
+DEFINE_PUBLIC_ALIAS(_nl_domain_bindings, libc__nl_domain_bindings);
+
+
+
 
 /*[[[start:exports,hash:CRC-32=0x2829af3a]]]*/
 DEFINE_PUBLIC_ALIAS(dcngettext, libc_dcngettext);

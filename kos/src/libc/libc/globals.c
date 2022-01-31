@@ -111,6 +111,11 @@ DEFINE_NOREL_GLOBAL_META(int, optopt, ".crt.application.options");
  *       to prevent  redundancy of  section information  meta-data. */
 
 
+/* <libintl.h> */
+#undef _nl_msg_cat_cntr
+DEFINE_NOREL_GLOBAL_META(int, _nl_msg_cat_cntr, ".crt.i18n");
+
+
 
 DECL_END
 
