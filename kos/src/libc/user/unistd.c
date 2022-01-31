@@ -113,9 +113,12 @@ NOTHROW(LIBCCALL libc_getpid)(void)
 }
 /*[[[end:libc_getpid]]]*/
 
-/*[[[head:libc_pipe,hash:CRC-32=0x68f6b91f]]]*/
+/*[[[head:libc_pipe,hash:CRC-32=0xc4e6a3cf]]]*/
 /* >> pipe(2)
- * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
+ * Create a new pair of connected pipes ([0] = reader, [1] = writer)
+ * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
+ * @return: 0:  Success
+ * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.io.access") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pipe)(fd_t pipedes[2])
 /*[[[body:libc_pipe]]]*/
@@ -1292,7 +1295,13 @@ NOTHROW_RPC(LIBCCALL libc_pwrite64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_pwrite64]]]*/
 
-/*[[[head:libc_pipe2,hash:CRC-32=0x9bb86b5]]]*/
+/*[[[head:libc_pipe2,hash:CRC-32=0xaaff9933]]]*/
+/* >> pipe2(2)
+ * Construct a [reader,writer]-pair of pipes
+ * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
+ * @param: flags:   Set of `O_CLOEXEC | O_CLOFORK | O_NONBLOCK | O_DIRECT'
+ * @return: 0:  Success
+ * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.io.access") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pipe2)(fd_t pipedes[2],
                                  oflag_t flags)

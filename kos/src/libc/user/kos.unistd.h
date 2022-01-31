@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd06657b1 */
+/* HASH CRC-32:0x55e432a6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,7 +61,10 @@ INTDEF ATTR_NORETURN ATTR_SENTINEL NONNULL((1)) void (VLIBCCALL libc_Execpl)(cha
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 INTDEF ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void (VLIBCCALL libc_Execlpe)(char const *__restrict file, char const *args, ...) THROWS(...);
 /* >> pipe(2)
- * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
+ * Create a new pair of connected pipes ([0] = reader, [1] = writer)
+ * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
+ * @return: 0:  Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF NONNULL((1)) void (LIBCCALL libc_Pipe)(fd_t pipedes[2]) THROWS(...);
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
@@ -209,6 +212,12 @@ INTDEF NONNULL((2)) size_t (LIBCCALL libc_PWrite64)(fd_t fd, void *buf, size_t b
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 INTDEF NONNULL((2)) size_t (LIBCCALL libc_PReadAll64)(fd_t fd, void *buf, size_t bufsize, pos64_t offset) THROWS(...);
+/* >> pipe2(2)
+ * Construct a [reader,writer]-pair of pipes
+ * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
+ * @param: flags:   Set of `O_CLOEXEC | O_CLOFORK | O_NONBLOCK | O_DIRECT'
+ * @return: 0:  Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF NONNULL((1)) void (LIBCCALL libc_Pipe2)(fd_t pipedes[2], oflag_t flags) THROWS(...);
 INTDEF fd_t (LIBCCALL libc_Dup3)(fd_t oldfd, fd_t newfd, oflag_t flags) THROWS(...);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED char *(LIBCCALL libc_GetCurrentDirName)(void) THROWS(...);

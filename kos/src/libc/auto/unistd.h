@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe2f1ccd */
+/* HASH CRC-32:0x9ccf73aa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -123,7 +123,10 @@ INTDEF ATTR_SENTINEL_O(1) NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_execlpe)(c
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> pipe(2)
- * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
+ * Create a new pair of connected pipes ([0] = reader, [1] = writer)
+ * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
+ * @return: 0:  Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_pipe)(fd_t pipedes[2]);
 /* >> sleep(3)
  * Sleep for up to `seconds' seconds */
@@ -295,6 +298,12 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_preadall64)(fd_t fd, void 
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_pwriteall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
+/* >> pipe2(2)
+ * Construct a [reader,writer]-pair of pipes
+ * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
+ * @param: flags:   Set of `O_CLOEXEC | O_CLOFORK | O_NONBLOCK | O_DIRECT'
+ * @return: 0:  Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_pipe2)(fd_t pipedes[2], oflag_t flags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__

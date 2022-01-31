@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd866499b */
+/* HASH CRC-32:0xb6f8cbb4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -130,7 +130,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Execlpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #endif /* !__cplusplus */
 #endif /* ... */
 /* >> pipe(2)
- * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
+ * Create a new pair of connected pipes ([0] = reader, [1] = writer)
+ * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
+ * @return: 0:  Success
+ * @return: -1: Error (s.a. `errno') */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,Pipe,(__fd_t __pipedes[2]),(__pipedes))
 #ifdef __CRT_HAVE_FSync
 /* >> fsync(2)
@@ -466,6 +469,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(PReadAll64, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 
 
 #ifdef __USE_GNU
+/* >> pipe2(2)
+ * Construct a [reader,writer]-pair of pipes
+ * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
+ * @param: flags:   Set of `O_CLOEXEC | O_CLOFORK | O_NONBLOCK | O_DIRECT'
+ * @return: 0:  Success
+ * @return: -1: Error (s.a. `errno') */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,Pipe2,(__fd_t __pipedes[2], __oflag_t __flags),(__pipedes,__flags))
 __CDECLARE_OPT(,__fd_t,__THROWING,Dup3,(__fd_t __oldfd, __fd_t __newfd, __oflag_t __flags),(__oldfd,__newfd,__flags))
 #ifdef __CRT_HAVE_GetCurrentDirName

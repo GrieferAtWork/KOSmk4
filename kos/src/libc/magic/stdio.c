@@ -2015,7 +2015,7 @@ int __overflow([[nonnull]] $FILE *stream, int ch) {
 
 %
 %#ifdef __USE_POSIX2
-%[default:section(".text.crt{|.dos}.FILE.locked.access")]
+%[default:section(".text.crt{|.dos}.FILE.utility.popen")]
 
 @@>> popen(3)
 @@Open and return a new process I/O stream for executing `command'

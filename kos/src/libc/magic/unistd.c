@@ -526,6 +526,9 @@ int dos_pipe([[nonnull]] $fd_t pipedes[2],
 
 @@>> pipe(2)
 @@Create a new pair of connected pipes ([0] = reader, [1] = writer)
+@@@param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
+@@@return: 0:  Success
+@@@return: -1: Error (s.a. `errno')
 [[section(".text.crt{|.dos}.io.access"), export_alias("__pipe", "__libc_pipe")]]
 [[userimpl, requires_function(dos_pipe)]]
 [[decl_include("<bits/types.h>")]]
@@ -1380,6 +1383,12 @@ $fd_t dup3($fd_t oldfd, $fd_t newfd, $oflag_t flags) {
 	return newfd != oldfd ? dup2(oldfd, newfd) : -1;
 }
 
+@@>> pipe2(2)
+@@Construct a [reader,writer]-pair of pipes
+@@@param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
+@@@param: flags:   Set of `O_CLOEXEC | O_CLOFORK | O_NONBLOCK | O_DIRECT'
+@@@return: 0:  Success
+@@@return: -1: Error (s.a. `errno')
 [[section(".text.crt{|.dos}.io.access")]]
 [[userimpl, requires_function(pipe)]]
 [[decl_include("<bits/types.h>")]]

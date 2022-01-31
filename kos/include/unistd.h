@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9fca62a */
+/* HASH CRC-32:0x5b2d1b9d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -638,20 +638,32 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,gettid,(void),__thread
 #endif /* __USE_KOS */
 #ifdef __CRT_HAVE_pipe
 /* >> pipe(2)
- * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
+ * Create a new pair of connected pipes ([0] = reader, [1] = writer)
+ * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
+ * @return: 0:  Success
+ * @return: -1: Error (s.a. `errno') */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pipe,(__fd_t __pipedes[2]),(__pipedes))
 #elif defined(__CRT_HAVE___pipe)
 /* >> pipe(2)
- * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
+ * Create a new pair of connected pipes ([0] = reader, [1] = writer)
+ * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
+ * @return: 0:  Success
+ * @return: -1: Error (s.a. `errno') */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pipe,(__fd_t __pipedes[2]),__pipe,(__pipedes))
 #elif defined(__CRT_HAVE___libc_pipe)
 /* >> pipe(2)
- * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
+ * Create a new pair of connected pipes ([0] = reader, [1] = writer)
+ * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
+ * @return: 0:  Success
+ * @return: -1: Error (s.a. `errno') */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pipe,(__fd_t __pipedes[2]),__libc_pipe,(__pipedes))
 #elif defined(__CRT_HAVE__pipe)
 #include <libc/local/unistd/pipe.h>
 /* >> pipe(2)
- * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
+ * Create a new pair of connected pipes ([0] = reader, [1] = writer)
+ * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
+ * @return: 0:  Success
+ * @return: -1: Error (s.a. `errno') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pipe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL pipe)(__fd_t __pipedes[2]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pipe))(__pipedes); })
 #endif /* ... */
 #ifndef __sleep_defined
@@ -1945,9 +1957,21 @@ __CDECLARE(,__fd_t,__NOTHROW_NCX,dup3,(__fd_t __oldfd, __fd_t __newfd, __oflag_t
 __NAMESPACE_LOCAL_USING_OR_IMPL(dup3, __FORCELOCAL __ATTR_ARTIFICIAL __fd_t __NOTHROW_NCX(__LIBCCALL dup3)(__fd_t __oldfd, __fd_t __newfd, __oflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dup3))(__oldfd, __newfd, __flags); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pipe2
+/* >> pipe2(2)
+ * Construct a [reader,writer]-pair of pipes
+ * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
+ * @param: flags:   Set of `O_CLOEXEC | O_CLOFORK | O_NONBLOCK | O_DIRECT'
+ * @return: 0:  Success
+ * @return: -1: Error (s.a. `errno') */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pipe2,(__fd_t __pipedes[2], __oflag_t __flags),(__pipedes,__flags))
 #elif defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE___libc_pipe) || defined(__CRT_HAVE__pipe)
 #include <libc/local/unistd/pipe2.h>
+/* >> pipe2(2)
+ * Construct a [reader,writer]-pair of pipes
+ * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
+ * @param: flags:   Set of `O_CLOEXEC | O_CLOFORK | O_NONBLOCK | O_DIRECT'
+ * @return: 0:  Success
+ * @return: -1: Error (s.a. `errno') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pipe2, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL pipe2)(__fd_t __pipedes[2], __oflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pipe2))(__pipedes, __flags); })
 #endif /* ... */
 #endif /* __USE_GNU || __USE_NETBSD */

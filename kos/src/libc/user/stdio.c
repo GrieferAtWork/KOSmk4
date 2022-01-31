@@ -34,6 +34,7 @@
 
 #include <bits/crt/io-file.h>
 #include <kos/syscalls.h>
+#include <sys/wait.h>
 
 #include <assert.h>
 #include <fcntl.h>
@@ -498,6 +499,7 @@ file_destroy(FILE *__restrict self) {
 	refcnt_t refcnt;
 	struct iofile_data *ex;
 	ex = self->if_exdata;
+
 	/* Last reference -> This file has to go away! */
 	assert(!atomic_owner_rwlock_reading(&ex->io_lock));
 	assert(!(self->if_flag & IO_READING));
@@ -506,6 +508,7 @@ file_destroy(FILE *__restrict self) {
 		 * -> Try to flush data data. */
 		atomic_owner_rwlock_init_read(&ex->io_lock);
 		ATOMIC_WRITE(ex->io_refcnt, 1);
+
 		/* NOTE: Errors during this sync are ignored! */
 		file_sync(self);
 		atomic_owner_rwlock_endread(&ex->io_lock);
@@ -516,6 +519,7 @@ file_destroy(FILE *__restrict self) {
 	}
 	assert(!atomic_owner_rwlock_reading(&ex->io_lock));
 	assert(!(self->if_flag & IO_READING));
+
 	/* Close the underlying file. */
 	if (self->if_flag & IO_HASVTAB) {
 		/* In this case, we have to be careful in case the file gets revived. */
@@ -534,17 +538,21 @@ file_destroy(FILE *__restrict self) {
 		if (refcnt != 1)
 			return; /* The file was revived. */
 	} else {
-		sys_close(self->if_fd);
+		if likely(self->if_fd >= 0)
+			sys_close(self->if_fd);
 	}
 	assert(!atomic_owner_rwlock_reading(&ex->io_lock));
 	assert(!(self->if_flag & IO_READING));
+
 	/* Make sure that the file is no longer accessible through the global file lists. */
 	if (LIST_ISBOUND(self, if_exdata->io_lnch))
 		changed_linebuffered_remove(self);
 	allfiles_remove(self);
+
 	/* Free a heap-allocated buffer. */
 	if (self->if_flag & IO_MALLBUF)
 		free(self->if_base);
+
 #if 1 /* This is always the case... */
 	assert(ex == (struct iofile_data *)(self + 1));
 #else
@@ -1527,7 +1535,7 @@ struct open_option const open_options[] = {
 
 
 /* @param: poflags: When non-NULL, filled with `O_*'
- * @return: * :     Set of `IO_*' */
+ * @return: * :     Set of `IO_LNIFTYY | IO_RW | IO_NODYNSCALE' */
 INTERN WUNUSED ATTR_SECTION(".text.crt.FILE.core.utility") uint32_t LIBCCALL
 file_evalmodes(char const *modes, oflag_t *poflags) {
 	/* IO_LNIFTYY: Check if the stream handle is a tty
@@ -3054,6 +3062,235 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.access") NONNULL((1)) int
 }
 /*[[[end:libc_fclose]]]*/
 
+
+
+/* Structure pointed-to by `if_exdata' of files opened with `popen(3)' */
+struct iofile_data_popen: iofile_data_novtab {
+	pid_t iop_pid; /* [const] PID of the child process. */
+};
+
+struct popen_execve_args {
+	char const  *pxa_path; /* [1..1] Path of program to exec */
+	char *const *pxa_argv; /* [1..1][0..n] Arguments to pass to program */
+	char *const *pxa_envp; /* [1..1][0..n] Environ to pass to program */
+};
+
+#define LIBC_POPEN_COMMAND 0 /* arg: `[0..1] char const *command;' */
+#define LIBC_POPEN_EXECVE  1 /* arg: `[1..1] struct popen_execve_args *args;' */
+PRIVATE ATTR_SECTION(".text.crt.FILE.utility.popen") WUNUSED NONNULL((1)) FILE *
+NOTHROW_RPC(LIBCCALL libc_popen_impl)(char const *modes, unsigned int how, void *arg) {
+	FILE *result;
+	struct iofile_data_popen *ex;
+	uint32_t flags;
+	oflag_t oflags;
+	fd_t pipefds[2];
+	fd_t child_override_fdno; /* One of `STD*_FILENO' to override in the child process */
+	fd_t child_override_fdvl; /* The FD with which to override `child_override_fdno' */
+	pid_t cpid;
+
+	/* Parse open flags. */
+	flags = file_evalmodes(modes, &oflags);
+	if unlikely(flags & IO_RW) {
+		/* Even though it could be done (by use of 4 pipe files), the
+		 * standard  doesn't  allow for  bi-directional communication
+		 * with processes opened via popen(3)...
+		 *
+		 * Maybe one day this will be implemented as a KOS extension... */
+		libc_seterrno(EINVAL);
+		return NULL;
+	}
+
+	/* Allocate the FILE object. */
+	result = file_calloc(sizeof(struct iofile_data_popen));
+	if unlikely(!result)
+		goto done;
+
+	/* Initialize generate FILE fields. */
+	ex = (struct iofile_data_popen *)(result + 1);
+	result->if_exdata = (struct iofile_data *)ex;
+	atomic_owner_rwlock_cinit(&ex->io_lock);
+	assert(ex->io_zero == 0);
+	ex->io_refcnt   = 1;
+	result->if_flag = flags;
+
+	/* Allocate the pipe pair that's going to be used. */
+	if unlikely(pipe2(pipefds, oflags & (O_CLOEXEC | O_CLOFORK | O_NONBLOCK | O_DIRECT)))
+		goto err_r;
+
+	/* Select pipe fds that shall be used for overwrite operations. */
+	if ((oflags & O_ACCMODE) != O_RDONLY) {
+		/* Write to child process */
+		child_override_fdno = STDIN_FILENO;
+		child_override_fdvl = pipefds[0];
+		result->if_fd       = pipefds[1];
+	} else {
+		/* Read from child process */
+		child_override_fdno = STDOUT_FILENO;
+		child_override_fdvl = pipefds[1];
+		result->if_fd       = pipefds[0];
+	}
+
+	/* Spawn child process */
+	COMPILER_BARRIER();
+	cpid = vfork();
+	COMPILER_BARRIER();
+	if (cpid == 0) {
+		/* In child process! */
+
+		/* Override file descriptors. */
+		if (child_override_fdvl != child_override_fdno)
+			sys_dup2(child_override_fdvl, child_override_fdno);
+
+		/* Don't keep the parent-process pipe end open.
+		 * Note that when `O_CLOEXEC' was set, the exec
+		 * below will automatically close the file! */
+		if (!(oflags & O_CLOEXEC)) {
+			sys_close(result->if_fd);
+			if (child_override_fdvl != child_override_fdno)
+				sys_close(child_override_fdvl);
+		}
+
+		/* Run another program. */
+		switch (how) {
+
+		case LIBC_POPEN_COMMAND:
+			shexec((char const *)arg);
+			break;
+
+		case LIBC_POPEN_EXECVE: {
+			struct popen_execve_args *args;
+			args = (struct popen_execve_args *)arg;
+			execve(args->pxa_path, args->pxa_argv, args->pxa_envp);
+		}	break;
+
+		default: __builtin_unreachable();
+		}
+		_exit(127);
+	}
+	COMPILER_BARRIER();
+
+	/* Check if vfork() may have failed. */
+	if unlikely(cpid == -1) {
+		sys_close(pipefds[0]);
+		sys_close(pipefds[1]);
+		goto err_r;
+	}
+
+	/* Remember the PID of the child process */
+	ex->iop_pid = cpid;
+
+	/* Insert the new file stream into the global list of them. */
+	allfiles_insert(result);
+done:
+	result = file_touser_opt(result);
+	return result;
+err_r:
+	file_free(result);
+	return NULL;
+}
+
+
+
+/*[[[head:libc_popen,hash:CRC-32=0x6820045d]]]*/
+/* >> popen(3)
+ * Open and return a new process I/O stream for executing `command'
+ * @param: command: The command to execute (s.a. `shexec(3)')
+ * @param: modes:   One of "r", "w", "re" or "we" ('e' sets  O_CLOEXEC
+ *                  for the internal file descriptor within the parent
+ *                  process) */
+INTERN ATTR_SECTION(".text.crt.FILE.utility.popen") WUNUSED NONNULL((1, 2)) FILE *
+NOTHROW_RPC(LIBCCALL libc_popen)(char const *command,
+                                 char const *modes)
+/*[[[body:libc_popen]]]*/
+{
+	return libc_popen_impl(modes, LIBC_POPEN_COMMAND, (void *)command);
+}
+/*[[[end:libc_popen]]]*/
+
+/*[[[head:libc_popenve,hash:CRC-32=0x5278a648]]]*/
+/* >> popenve(3)
+ * Similar to `popen(3)', but rather than running `shexec(command)', this
+ * function will `execve(path, argv, envp)'. The returned FILE must still
+ * be closed using `pclose(3)', rather than `fclose(3)' */
+INTERN ATTR_SECTION(".text.crt.FILE.utility.popen") WUNUSED NONNULL((1, 2, 3, 4)) FILE *
+NOTHROW_RPC(LIBCCALL libc_popenve)(char const *path,
+                                   __TARGV,
+                                   __TENVP,
+                                   char const *modes)
+/*[[[body:libc_popenve]]]*/
+{
+	struct popen_execve_args args;
+	args.pxa_path = path;
+	args.pxa_argv = ___argv;
+	args.pxa_envp = ___envp;
+	return libc_popen_impl(modes, LIBC_POPEN_EXECVE, &args);
+}
+/*[[[end:libc_popenve]]]*/
+
+/*[[[head:libc_pclose,hash:CRC-32=0x2c0734d6]]]*/
+/* >> pclose(3)
+ * Close a process I/O file `stream' (s.a. `popen(3)') */
+INTERN ATTR_SECTION(".text.crt.FILE.utility.popen") NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc_pclose)(FILE *stream)
+/*[[[body:libc_pclose]]]*/
+{
+	int result;
+	struct iofile_data_popen *ex;
+	if unlikely(!stream)
+		return libc_seterrno(EINVAL);
+	stream = file_fromuser(stream);
+	ex     = (struct iofile_data_popen *)stream->if_exdata;
+
+	/* Flush any unwritten data (in case `popen(..., "w")' was used) */
+	result = file_sync(stream);
+	if (result != 0)
+		return result;
+
+	/* Close  our end of the pipe. --  If the other process is currently
+	 * doing a blocking read/write with their end of the pipe, then this
+	 * will  cause that operation to be interrupted and indicate EOF (by
+	 * read(2) or write(2) returning `0'). */
+	if (stream->if_fd >= 0) {
+		sys_close(stream->if_fd);
+		stream->if_fd = -1; /* Don't try to close again in `file_destroy()' */
+	}
+
+	/* Wait for the child process to exit. */
+	result = 0;
+	for (;;) {
+		pid_t error;
+		error = waitpid(ex->iop_pid, &result, 0);
+		if (error == ex->iop_pid)
+			break;
+		if (error >= 0)
+			continue; /* Some other process??? */
+		if unlikely(libc_geterrno() != EINTR) {
+			/* This right here is a real problem with how this API is  designed:
+			 * If another thread is using `wait(2)' and reaped our child process
+			 * before  we were able to join it  (and read its exit status), then
+			 * us trying to waitpid() for it will fail with `ECHILD', and  we'll
+			 * never be able to ever retrieve the exit status again.
+			 *
+			 * The solution to  this problem is  for multi-threaded programs  to
+			 * never make use  of `wait(2)'  (for the obvious  reason that  they
+			 * might accidentally reap child processes spawned by other threads) */
+			return -1;
+		}
+	}
+
+	/* Destroy the file stream object. */
+	decref(stream);
+
+	/* Return the wait status. (yes: status; not exit-code. Though when
+	 * the program terminated via `exit(2)', wait-status == exit-code). */
+	return result;
+}
+/*[[[end:libc_pclose]]]*/
+
+
+
+
+
 /*[[[head:libc_fputc,hash:CRC-32=0x9f807d86]]]*/
 /* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
@@ -3144,52 +3381,6 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.getc") NONNULL((1)) int
 }
 /*[[[end:libc_fgetc_unlocked]]]*/
 
-
-
-/*[[[head:libc_popen,hash:CRC-32=0x85e8707a]]]*/
-/* >> popen(3)
- * Open and return a new process I/O stream for executing `command'
- * @param: command: The command to execute (s.a. `shexec(3)')
- * @param: modes:   One of "r", "w", "re" or "we" ('e' sets  O_CLOEXEC
- *                  for the internal file descriptor within the parent
- *                  process) */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
-NOTHROW_RPC(LIBCCALL libc_popen)(char const *command,
-                                 char const *modes)
-/*[[[body:libc_popen]]]*/
-/*AUTO*/{
-	(void)command;
-	(void)modes;
-	CRT_UNIMPLEMENTEDF("popen(%q, %q)", command, modes); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_popen]]]*/
-
-/*[[[head:libc_popenve,hash:CRC-32=0x5a75552d]]]*/
-/* >> popenve(3)
- * Similar to `popen(3)', but rather than running `shexec(command)', this
- * function will `execve(path, argv, envp)'. The returned FILE must still
- * be closed using `pclose(3)', rather than `fclose(3)' */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED NONNULL((1, 2, 3, 4)) FILE *
-NOTHROW_RPC(LIBCCALL libc_popenve)(char const *path,
-                                   __TARGV,
-                                   __TENVP,
-                                   char const *modes)
-/*[[[body:libc_popenve]]]*/
-/*AUTO*/{
-	(void)path;
-	(void)___argv;
-	(void)___envp;
-	(void)modes;
-	CRT_UNIMPLEMENTEDF("popenve(%q, %p, %p, %q)", path, ___argv, ___envp, modes); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_popenve]]]*/
-
-/*[[[impl:libc_pclose]]]*/
-DEFINE_INTERN_ALIAS(libc_pclose, libc_fclose);
 
 
 /*[[[head:libc_tmpnam_r,hash:CRC-32=0x6e2a6d14]]]*/

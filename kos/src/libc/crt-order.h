@@ -119,6 +119,7 @@
 	.FILE.utility.memopen
 	.FILE.utility.memstream
 	.FILE.utility.ext
+	.FILE.utility.popen
 
 	.io.* .io                       # All other I/O operations
 	.fs.basic_property .fs.property # Basic filesystem operations
@@ -277,6 +278,7 @@
 	CB(PREFIX.crt.FILE.utility.memopen) \
 	CB(PREFIX.crt.FILE.utility.memstream) \
 	CB(PREFIX.crt.FILE.utility.ext) \
+	CB(PREFIX.crt.FILE.utility.popen) \
 	CB(PREFIX.crt.io.large.lock PREFIX.crt.io.large.seek PREFIX.crt.io.large.utility PREFIX.crt.io.lock PREFIX.crt.io.poll PREFIX.crt.io.seek PREFIX.crt.io.sync PREFIX.crt.io.utility) \
 	CB(PREFIX.crt.fs.basic_property PREFIX.crt.fs.property) \
 	CB(PREFIX.crt.fs.environ) \
@@ -450,6 +452,7 @@
 	CB(PREFIX.crt.dos.FILE.unlocked.utility) \
 	CB(PREFIX.crt.dos.FILE.utility) \
 	CB(PREFIX.crt.dos.FILE.utility.ext) \
+	CB(PREFIX.crt.dos.FILE.utility.popen) \
 	CB(PREFIX.crt.dos.io.large.lock PREFIX.crt.dos.io.large.seek PREFIX.crt.dos.io.large.utility PREFIX.crt.dos.io.lock PREFIX.crt.dos.io.poll PREFIX.crt.dos.io.seek PREFIX.crt.dos.io.sync PREFIX.crt.dos.io.utility) \
 	CB(PREFIX.crt.dos.fs.basic_property PREFIX.crt.dos.fs.property) \
 	CB(PREFIX.crt.dos.fs.environ) \
