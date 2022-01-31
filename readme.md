@@ -45,6 +45,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 - Shell/coreutils
 	- [busybox-1.31.0](https://www.busybox.net)
 	- [file-5.39](https://github.com/file/file)
+	- [midnight-commander-4.8.27](http://midnight-commander.org/) (mc)
 - Programming
 	- [tcc-0.9.27](https://bellard.org/tcc/)
 	- [nano-4.4](https://www.nano-editor.org/)
@@ -68,6 +69,8 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- [libuuid-1.0.3](https://sourceforge.net/projects/libuuid/files/)
 	- [libjson-c-0.15-20200726](https://github.com/json-c/json-c)
 	- [liblzma-5.2.5](https://tukaani.org/xz/)
+	- [glib-2.70.3](https://gitlab.gnome.org/GNOME/glib/) (libglib)
+- Misc
 	- [X-Server (Experimental)](kos/misc/utilities/README.md#X-server)
 
 <a name="features"></a>
