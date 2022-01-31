@@ -1537,12 +1537,11 @@ file_evalmodes(char const *modes, oflag_t *poflags) {
 	if (modes) {
 		unsigned int flags = 0;
 		for (;;) {
-			bool open_binary;
+			int open_binary_mode;
 			unsigned int i;
 			size_t optlen;
-			char const *next = strchr(modes, ',');
-			if (!next)
-				next = modes + strlen(modes);
+			char const *next;
+			next   = strchrnul(modes, ',');
 			optlen = (size_t)(next - modes);
 			if (optlen < COMPILER_LENOF(open_options[0].name)) {
 				for (i = 0; i < COMPILER_LENOF(open_options); ++i) {
@@ -1550,8 +1549,8 @@ file_evalmodes(char const *modes, oflag_t *poflags) {
 						continue;
 					if (memcmp(open_options[i].name, modes, optlen * sizeof(char)) != 0)
 						continue;
-					if (oflags & open_options[i].mask)
-						goto err_invalid_oflags; /* Check illegal old flags. */
+					if ((oflags & open_options[i].mask) != 0)
+						goto err_invalid_oflags; /* XXX: Illegal file option */
 					/* Apply new flags. */
 					flags |= open_options[i].exflg;
 					oflags |= open_options[i].flag;
@@ -1564,7 +1563,10 @@ file_evalmodes(char const *modes, oflag_t *poflags) {
 				goto err_invalid_oflags;
 			if (oflags & BASEMODE_MASK)
 				goto err_invalid_oflags;
-			open_binary = false;
+			/* -1: Binary file
+			 *  0: Indeterminate
+			 * +1: Text file */
+			open_binary_mode = 0;
 			if (*modes == 'r') {
 				oflags |= O_RDONLY;
 			} else if (*modes == 'w') {
@@ -1574,29 +1576,31 @@ file_evalmodes(char const *modes, oflag_t *poflags) {
 			} else {
 				goto err_invalid_oflags;
 			}
-			if (*++modes == 'b') {
+			++modes;
+			while (modes < next) {
+				char ch = *modes;
+				if (ch == '+' && (oflags & O_ACCMODE) != O_RDWR) {
+					/* Open with read+write access */
+					oflags &= ~O_ACCMODE;
+					oflags |= O_RDWR;
+				} else if (ch == 'b' && open_binary_mode == 0) {
+					/* Open as a binary file */
+					open_binary_mode = -1;
+				} else if (*modes == 't' && open_binary_mode == 0) {
+					/* Open as a text file */
+					open_binary_mode = 1;
+				} else if (*modes == 'x' && (oflags & (O_TRUNC | O_CREAT)) == (O_TRUNC | O_CREAT)) {
+					/* Don't open an existing file */
+					oflags |= O_EXCL;
+				} else if (*modes == 'e' && !(oflags & O_CLOEXEC)) {
+					/* Set the close-on-exec flag */
+					oflags |= O_CLOEXEC;
+				} else {
+					/* XXX: Unrecognized mode character? */
+				}
 				++modes;
-				open_binary = true;
 			}
-			if (*modes == '+') {
-				++modes;
-				oflags &= ~O_ACCMODE;
-				oflags |= O_RDWR;
-			}
-			if (*modes == 'b' && !open_binary) {
-				++modes;
-				open_binary = true;
-			}
-			if (*modes == 'x' &&
-			    (oflags & (O_TRUNC | O_CREAT)) == (O_TRUNC | O_CREAT)) {
-				++modes;
-				oflags |= O_EXCL;
-			}
-			if (*modes == 't' && !open_binary)
-				++modes; /* Accept a trailing `t', as suggested by STD-C */
-			if (modes != next)
-				goto err_invalid_oflags;
-			if (!open_binary)
+			if (open_binary_mode > 0)
 				flags |= OPEN_EXFLAG_FTEXT;
 err_invalid_oflags:
 found_option:
