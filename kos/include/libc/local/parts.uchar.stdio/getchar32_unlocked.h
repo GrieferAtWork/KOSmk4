@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea7ab3be */
+/* HASH CRC-32:0x436b48f3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_getchar32_unlocked_defined
 #define __local_getchar32_unlocked_defined
 #include <__crt.h>
-#if ((defined(__CRT_HAVE_fgetwc_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$fgetwc_unlocked) || (defined(__CRT_HAVE__fgetwc_nolock) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$_fgetwc_nolock)) && !defined(__NO_STDSTREAMS)
+#include <libc/template/stdstreams.h>
+#if defined(__LOCAL_stdin) && ((defined(__CRT_HAVE_fgetwc_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$fgetwc_unlocked) || (defined(__CRT_HAVE__fgetwc_nolock) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$_fgetwc_nolock))
 #include <hybrid/typecore.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -39,9 +40,6 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),__WINT32_TYPE__,__THROWING,__localdep_fgetc3
 #undef __local___localdep_fgetc32_unlocked_defined
 #endif /* !... */
 #endif /* !__local___localdep_fgetc32_unlocked_defined */
-__NAMESPACE_LOCAL_END
-#include <libc/template/stdstreams.h>
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getchar32_unlocked) __WINT32_TYPE__
 (__LIBKCALL __LIBC_LOCAL_NAME(getchar32_unlocked))(void) __THROWS(...) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_fgetc32_unlocked)(__LOCAL_stdin);
@@ -51,7 +49,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_getchar32_unlocked_defined
 #define __localdep_getchar32_unlocked __LIBC_LOCAL_NAME(getchar32_unlocked)
 #endif /* !__local___localdep_getchar32_unlocked_defined */
-#else /* ((__CRT_HAVE_fgetwc_unlocked && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$fgetwc_unlocked || (__CRT_HAVE__fgetwc_nolock && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$_fgetwc_nolock) && !__NO_STDSTREAMS */
+#else /* __LOCAL_stdin && ((__CRT_HAVE_fgetwc_unlocked && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$fgetwc_unlocked || (__CRT_HAVE__fgetwc_nolock && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$_fgetwc_nolock) */
 #undef __local_getchar32_unlocked_defined
-#endif /* ((!__CRT_HAVE_fgetwc_unlocked || __SIZEOF_WCHAR_T__ != 4 || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$fgetwc_unlocked && (!__CRT_HAVE__fgetwc_nolock || __SIZEOF_WCHAR_T__ != 4 || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$_fgetwc_nolock) || __NO_STDSTREAMS */
+#endif /* !__LOCAL_stdin || ((!__CRT_HAVE_fgetwc_unlocked || __SIZEOF_WCHAR_T__ != 4 || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$fgetwc_unlocked && (!__CRT_HAVE__fgetwc_nolock || __SIZEOF_WCHAR_T__ != 4 || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$_fgetwc_nolock) */
 #endif /* !__local_getchar32_unlocked_defined */

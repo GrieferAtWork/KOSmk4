@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0967569 */
+/* HASH CRC-32:0x2bb76758 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2200,13 +2200,13 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_strcmpz)(
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strcmpz)(char const *lhs, char const *rhs, size_t rhs_len);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strstartcmp(3)
- * Compare the first `strnlen(str, strlen(startswith_str))' characters of
- * `str'  with  `startswith_str',  returning  the  usual  >0,  <0,   ==0. */
+ * Compare the first `strnlen(str, strlen(startswith_str))' characters
+ * of `str' with  `startswith_str', returning the  usual >0, <0,  ==0. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_strstartcmp)(char const *str, char const *startswith);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> strstartcmp(3)
- * Compare the first `strnlen(str, strlen(startswith_str))' characters of
- * `str'  with  `startswith_str',  returning  the  usual  >0,  <0,   ==0. */
+ * Compare the first `strnlen(str, strlen(startswith_str))' characters
+ * of `str' with  `startswith_str', returning the  usual >0, <0,  ==0. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strstartcmp)(char const *str, char const *startswith);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strstartcmpz(3)

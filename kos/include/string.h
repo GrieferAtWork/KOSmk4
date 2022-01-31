@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55f7e2cc */
+/* HASH CRC-32:0xe89eeca6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7196,14 +7196,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strcmpz, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
 #endif /* !__CRT_HAVE_strcmpz */
 #ifdef __CRT_HAVE_strstartcmp
 /* >> strstartcmp(3)
- * Compare the first `strnlen(str, strlen(startswith_str))' characters of
- * `str'  with  `startswith_str',  returning  the  usual  >0,  <0,   ==0. */
+ * Compare the first `strnlen(str, strlen(startswith_str))' characters
+ * of `str' with  `startswith_str', returning the  usual >0, <0,  ==0. */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strstartcmp,(char const *__str, char const *__startswith),(__str,__startswith))
 #else /* __CRT_HAVE_strstartcmp */
 #include <libc/local/string/strstartcmp.h>
 /* >> strstartcmp(3)
- * Compare the first `strnlen(str, strlen(startswith_str))' characters of
- * `str'  with  `startswith_str',  returning  the  usual  >0,  <0,   ==0. */
+ * Compare the first `strnlen(str, strlen(startswith_str))' characters
+ * of `str' with  `startswith_str', returning the  usual >0, <0,  ==0. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strstartcmp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL strstartcmp)(char const *__str, char const *__startswith) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strstartcmp))(__str, __startswith); })
 #endif /* !__CRT_HAVE_strstartcmp */
 #ifdef __CRT_HAVE_strstartcmpz

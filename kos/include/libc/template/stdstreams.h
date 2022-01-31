@@ -52,6 +52,9 @@ __LIBC __ATTR_WUNUSED __ATTR_RETNONNULL FILE *__NOTHROW(__LIBDCALL __iob_func)(v
 __LIBC __FILE *__LOCAL_stdin __ASMNAME("stdin");
 __LIBC __FILE *__LOCAL_stdout __ASMNAME("stdout");
 __LIBC __FILE *__LOCAL_stderr __ASMNAME("stderr");
+#define __LOCAL_stdin  __LOCAL_stdin
+#define __LOCAL_stdout __LOCAL_stdout
+#define __LOCAL_stderr __LOCAL_stderr
 #else /* ... */
 #ifndef __stdstreams_defined
 #define __stdstreams_defined

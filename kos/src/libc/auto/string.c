@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35346205 */
+/* HASH CRC-32:0x4ca0b851 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5201,8 +5201,8 @@ NOTHROW_NCX(LIBCCALL libc_strcmpz)(char const *lhs,
 	return 0;
 }
 /* >> strstartcmp(3)
- * Compare the first `strnlen(str, strlen(startswith_str))' characters of
- * `str'  with  `startswith_str',  returning  the  usual  >0,  <0,   ==0. */
+ * Compare the first `strnlen(str, strlen(startswith_str))' characters
+ * of `str' with  `startswith_str', returning the  usual >0, <0,  ==0. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_strstartcmp)(char const *str,
                                        char const *startswith) {

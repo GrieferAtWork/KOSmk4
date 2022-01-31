@@ -640,10 +640,11 @@ wcsxfrm(*) %{generate(str2wcs("strxfrm"))}
 %[default:section(".text.crt{|.dos}.wchar.FILE.locked.read.getc")]
 
 @@>> getwchar(3)
-[[cp_stdio, std, guard, wchar, requires_include("<__crt.h>")]]
-[[requires(!defined(__NO_STDSTREAMS) && $has_function(fgetwc))]]
-[[impl_include("<libc/template/stdstreams.h>"), dos_export_alias("_fgetwchar")]]
+[[cp_stdio, std, guard, wchar]]
 [[decl_include("<hybrid/typecore.h>")]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdin) && $has_function(fgetwc))]]
+[[impl_include("<libc/template/stdstreams.h>"), dos_export_alias("_fgetwchar")]]
 wint_t getwchar() {
 	return fgetwc(stdin);
 }
@@ -656,8 +657,9 @@ wint_t fgetwc([[nonnull]] FILE *__restrict stream);
 %[insert:guarded_std_function(getwc = fgetwc)]
 
 @@>> putwchar(3)
-[[cp_stdio, std, guard, wchar, requires_include("<__crt.h>")]]
-[[requires(!defined(__NO_STDSTREAMS) && $has_function(fputwc))]]
+[[cp_stdio, std, guard, wchar]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdout) && $has_function(fputwc))]]
 [[impl_include("<libc/template/stdstreams.h>"), dos_export_alias("_fputwchar")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.write.putc")]]
 [[decl_include("<hybrid/typecore.h>")]]
@@ -889,8 +891,9 @@ __STDC_INT_AS_SIZE_T wprintf([[nonnull]] wchar_t const *__restrict format, ...)
 @@>> vwprintf(3)
 [[cp_stdio, std, guard, wchar, ATTR_LIBC_WPRINTF(1, 0)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[requires_include("<__crt.h>"), impl_include("<libc/template/stdstreams.h>")]]
-[[requires($has_function(vfwprintf) && !defined(__NO_STDSTREAMS))]]
+[[impl_include("<libc/template/stdstreams.h>")]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdout) && $has_function(vfwprintf))]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.write.printf")]]
 __STDC_INT_AS_SIZE_T vwprintf([[nonnull]] wchar_t const *__restrict format, $va_list args) {
 	return vfwprintf(stdout, format, args);
@@ -1002,8 +1005,9 @@ __STDC_INT_AS_SIZE_T vfwscanf([[nonnull]] FILE *__restrict stream,
 @@>> vwscanf(3)
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[cp_stdio, std, guard, wchar, wunused, ATTR_LIBC_WSCANF(1, 0)]]
-[[requires_include("<__crt.h>"), impl_include("<libc/template/stdstreams.h>")]]
-[[requires($has_function(vfwscanf) && !defined(__NO_STDSTREAMS))]]
+[[impl_include("<libc/template/stdstreams.h>")]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdin) && $has_function(vfwscanf))]]
 __STDC_INT_AS_SIZE_T vwscanf([[nonnull]] wchar_t const *__restrict format, $va_list args) {
 	return vfwscanf(stdin, format, args);
 }
@@ -1278,8 +1282,9 @@ wcstold_l(*) %{generate(str2wcs("strtold_l"))}
 
 @@>> getwchar_unlocked(3)
 [[decl_include("<hybrid/typecore.h>")]]
-[[cp_stdio, wchar, requires_include("<__crt.h>"), impl_include("<libc/template/stdstreams.h>")]]
-[[requires($has_function(fgetwc_unlocked) && !defined(__NO_STDSTREAMS))]]
+[[cp_stdio, wchar, impl_include("<libc/template/stdstreams.h>")]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdin) && $has_function(fgetwc_unlocked))]]
 [[section(".text.crt{|.dos}.wchar.FILE.unlocked.read.getc")]]
 $wint_t getwchar_unlocked() {
 	return fgetwc_unlocked(stdin);
@@ -1287,11 +1292,12 @@ $wint_t getwchar_unlocked() {
 
 @@>> putwchar_unlocked(3)
 [[decl_include("<hybrid/typecore.h>")]]
-[[cp_stdio, wchar, requires_include("<__crt.h>"), impl_include("<libc/template/stdstreams.h>")]]
-[[requires($has_function(fputwc_unlocked) && !defined(__NO_STDSTREAMS))]]
+[[cp_stdio, wchar, impl_include("<libc/template/stdstreams.h>")]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdout) && $has_function(fputwc_unlocked))]]
 [[section(".text.crt{|.dos}.wchar.FILE.unlocked.write.putc")]]
 $wint_t putwchar_unlocked(wchar_t wc) {
-	return fputwc_unlocked(wc, stdin);
+	return fputwc_unlocked(wc, stdout);
 }
 
 %[insert:function(getwc_unlocked = fgetwc_unlocked)]
@@ -1487,8 +1493,9 @@ __STDC_INT_AS_SIZE_T wprintf_unlocked([[nonnull]] wchar_t const *__restrict form
 @@>> vwprintf_unlocked(3)
 [[cp_stdio, wchar, ATTR_LIBC_WPRINTF(1, 0)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[requires_include("<__crt.h>"), impl_include("<libc/template/stdstreams.h>")]]
-[[requires($has_function(vfwprintf_unlocked) && !defined(__NO_STDSTREAMS))]]
+[[impl_include("<libc/template/stdstreams.h>")]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdout) && $has_function(vfwprintf_unlocked))]]
 __STDC_INT_AS_SIZE_T vwprintf_unlocked([[nonnull]] wchar_t const *__restrict format, $va_list args) {
 	return vfwprintf_unlocked(stdout, format, args);
 }
@@ -1507,7 +1514,8 @@ __STDC_INT_AS_SIZE_T vfwscanf_unlocked([[nonnull]] $FILE *__restrict stream,
 [[impl_include("<libc/template/stdstreams.h>")]]
 [[cp_stdio, wchar, ATTR_LIBC_SCANF(1, 0), wunused]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[requires($has_function(vfwscanf_unlocked) && !defined(__NO_STDSTREAMS))]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdin) && $has_function(vfwscanf_unlocked))]]
 __STDC_INT_AS_SIZE_T vwscanf_unlocked([[nonnull]] wchar_t const *__restrict format, $va_list args) {
 	return vfwscanf_unlocked(stdin, format, args);
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69124e00 */
+/* HASH CRC-32:0x41d2dc9c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_putwchar_defined
 #define __local_putwchar_defined
 #include <__crt.h>
-#if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc))
+#include <libc/template/stdstreams.h>
+#if defined(__LOCAL_stdout) && (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc))
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -35,9 +36,6 @@ __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__WC
 #undef __local___localdep_fputwc_defined
 #endif /* !... */
 #endif /* !__local___localdep_fputwc_defined */
-__NAMESPACE_LOCAL_END
-#include <libc/template/stdstreams.h>
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(putwchar) __WINT_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(putwchar))(__WCHAR_TYPE__ __wc) __THROWS(...) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_fputwc)(__wc, __LOCAL_stdout);
@@ -47,7 +45,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_putwchar_defined
 #define __localdep_putwchar __LIBC_LOCAL_NAME(putwchar)
 #endif /* !__local___localdep_putwchar_defined */
-#else /* !__NO_STDSTREAMS && (__CRT_HAVE_fputwc || __CRT_HAVE_putwc) */
+#else /* __LOCAL_stdout && (__CRT_HAVE_fputwc || __CRT_HAVE_putwc) */
 #undef __local_putwchar_defined
-#endif /* __NO_STDSTREAMS || (!__CRT_HAVE_fputwc && !__CRT_HAVE_putwc) */
+#endif /* !__LOCAL_stdout || (!__CRT_HAVE_fputwc && !__CRT_HAVE_putwc) */
 #endif /* !__local_putwchar_defined */

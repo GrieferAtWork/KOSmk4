@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8238e2dc */
+/* HASH CRC-32:0xc8a3f08b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_putwchar_unlocked_defined
 #define __local_putwchar_unlocked_defined
 #include <__crt.h>
-#if (defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock)) && !defined(__NO_STDSTREAMS)
+#include <libc/template/stdstreams.h>
+#if defined(__LOCAL_stdout) && (defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock))
 #include <hybrid/typecore.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -35,19 +36,16 @@ __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc_unloc
 #undef __local___localdep_fputwc_unlocked_defined
 #endif /* !... */
 #endif /* !__local___localdep_fputwc_unlocked_defined */
-__NAMESPACE_LOCAL_END
-#include <libc/template/stdstreams.h>
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(putwchar_unlocked) __WINT_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(putwchar_unlocked))(__WCHAR_TYPE__ __wc) __THROWS(...) {
-	return (__NAMESPACE_LOCAL_SYM __localdep_fputwc_unlocked)(__wc, __LOCAL_stdin);
+	return (__NAMESPACE_LOCAL_SYM __localdep_fputwc_unlocked)(__wc, __LOCAL_stdout);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_putwchar_unlocked_defined
 #define __local___localdep_putwchar_unlocked_defined
 #define __localdep_putwchar_unlocked __LIBC_LOCAL_NAME(putwchar_unlocked)
 #endif /* !__local___localdep_putwchar_unlocked_defined */
-#else /* (__CRT_HAVE_fputwc_unlocked || __CRT_HAVE__fputwc_nolock) && !__NO_STDSTREAMS */
+#else /* __LOCAL_stdout && (__CRT_HAVE_fputwc_unlocked || __CRT_HAVE__fputwc_nolock) */
 #undef __local_putwchar_unlocked_defined
-#endif /* (!__CRT_HAVE_fputwc_unlocked && !__CRT_HAVE__fputwc_nolock) || __NO_STDSTREAMS */
+#endif /* !__LOCAL_stdout || (!__CRT_HAVE_fputwc_unlocked && !__CRT_HAVE__fputwc_nolock) */
 #endif /* !__local_putwchar_unlocked_defined */

@@ -810,10 +810,11 @@ int fgetc([[nonnull]] FILE *__restrict stream) {
 
 @@>> getchar(3)
 @@Alias for `fgetc(stdin)'
-[[std, cp_stdio, requires_include("<__crt.h>")]]
+[[std, cp_stdio]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("getchar_unlocked")]]
 [[dos_only_export_alias("_fgetchar"), impl_include("<libc/template/stdstreams.h>")]]
-[[requires(!defined(__NO_STDSTREAMS) && $has_function(fgetc))]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdin) && $has_function(fgetc))]]
 int getchar() {
 	return fgetc(stdin);
 }
@@ -847,8 +848,9 @@ int fputc(int ch, [[nonnull]] FILE *__restrict stream) {
 [[std, cp_stdio, crtbuiltin]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("putchar_unlocked")]]
 [[dos_only_export_alias("_fputchar"), alias("putchar_unlocked")]]
-[[requires_include("<__crt.h>"), impl_include("<libc/template/stdstreams.h>")]]
-[[requires(!defined(__NO_STDSTREAMS) && $has_function(fputc))]]
+[[impl_include("<libc/template/stdstreams.h>")]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdout) && $has_function(fputc))]]
 int putchar(int ch) {
 	return fputc(ch, stdout);
 }
@@ -929,8 +931,9 @@ __STDC_INT_AS_SSIZE_T fputs([[nonnull]] char const *__restrict string,
 [[std, cp_stdio, crtbuiltin, decl_include("<features.h>")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("puts_unlocked")]]
 [[export_alias("_IO_puts"), alias("puts_unlocked")]]
-[[requires_include("<__crt.h>"), impl_include("<libc/template/stdstreams.h>")]]
-[[requires(!defined(__NO_STDSTREAMS) && $has_function(fputs) && $has_function(fputc))]]
+[[impl_include("<libc/template/stdstreams.h>")]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdout) && $has_function(fputs) && $has_function(fputc))]]
 __STDC_INT_AS_SSIZE_T puts([[nonnull]] char const *__restrict string) {
 	__STDC_INT_AS_SSIZE_T result, temp;
 	result = fputs(string, stdout);
@@ -1120,10 +1123,10 @@ int ferror([[nonnull]] $FILE __KOS_FIXED_CONST *__restrict stream);
 @@>> }
 [[cp, std, guard, export_alias("_IO_perror")]]
 [[section(".text.crt{|.dos}.errno.utility")]]
-[[requires_include("<__crt.h>", "<libc/errno.h>")]]
 [[impl_include("<parts/printf-config.h>")]]
 [[impl_include("<libc/template/stdstreams.h>", "<libc/errno.h>")]]
-[[requires(!defined(__NO_STDSTREAMS) && defined(__libc_geterrno) &&
+[[requires_include("<libc/template/stdstreams.h>", "<libc/errno.h>")]]
+[[requires(defined(__LOCAL_stderr) && defined(__libc_geterrno) &&
            $has_function(fprintf) && $has_function(strerror))]]
 void perror([[nullable]] char const *message) {
 @@pp_ifdef __NO_PRINTF_STRERROR@@
@@ -1279,8 +1282,9 @@ __STDC_INT_AS_SSIZE_T fprintf([[nonnull]] FILE *__restrict stream,
 [[std, cp_stdio, crtbuiltin, ATTR_LIBC_PRINTF(1, 0)]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("vprintf_unlocked")]]
 [[alias("vprintf_s", "vprintf_unlocked")]]
-[[requires_include("<__crt.h>"), impl_include("<libc/template/stdstreams.h>")]]
-[[requires(!defined(__NO_STDSTREAMS) && $has_function(vfprintf))]]
+[[impl_include("<libc/template/stdstreams.h>")]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdout) && $has_function(vfprintf))]]
 [[section(".text.crt{|.dos}.FILE.locked.write.printf")]]
 __STDC_INT_AS_SSIZE_T vprintf([[nonnull]] char const *__restrict format, $va_list args) {
 	return vfprintf(stdout, format, args);
@@ -1340,9 +1344,10 @@ __STDC_INT_AS_SIZE_T vfscanf([[nonnull]] FILE *__restrict stream,
 
 [[decl_include("<features.h>"), doc_alias("scanf")]]
 [[std, cp_stdio, guard, crtbuiltin, ATTR_LIBC_SCANF(1, 0), wunused]]
-[[requires_include("<__crt.h>"), alias("_vscanf", "vscanf_unlocked")]]
+[[alias("_vscanf", "vscanf_unlocked")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("vscanf_unlocked")]]
-[[requires(!defined(__NO_STDSTREAMS) && $has_function(vfscanf))]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdin) && $has_function(vfscanf))]]
 [[impl_include("<libc/template/stdstreams.h>"), section(".text.crt{|.dos}.FILE.locked.read.scanf")]]
 __STDC_INT_AS_SIZE_T vscanf([[nonnull]] char const *__restrict format, $va_list args) {
 	return vfscanf(stdin, format, args);
@@ -1376,11 +1381,11 @@ __STDC_INT_AS_SIZE_T scanf([[nonnull]] char const *__restrict format, ...)
 
 %(std)
 %(std)#if !defined(__USE_ISOC11) || (defined(__cplusplus) && __cplusplus <= 201103L)
-[[std, cp_stdio, guard, wunused]]
+[[std, cp_stdio, guard, wunused, export_alias("_IO_gets")]]
 [[deprecated("No buffer size checks (use `fgets' instead)")]]
-[[export_alias("_IO_gets"), requires_include("<__crt.h>")]]
 [[impl_include("<libc/template/stdstreams.h>", "<hybrid/typecore.h>")]]
-[[requires(!defined(__NO_STDSTREAMS) && $has_function(fgets))]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdin) && $has_function(fgets))]]
 char *gets([[nonnull]] char *__restrict buf) {
 	return fgets(buf, INT_MAX, stdin);
 }
@@ -1944,8 +1949,9 @@ $ssize_t getline([[nonnull]] char **__restrict lineptr,
 
 @@>> getchar_unlocked(3)
 @@Same as `getchar()', but performs I/O without acquiring a lock to `stdin'
-[[cp_stdio, impl_include("<libc/template/stdstreams.h>"), requires_include("<__crt.h>")]]
-[[requires(!defined(__NO_STDSTREAMS) && $has_function(fgetc_unlocked))]]
+[[cp_stdio, impl_include("<libc/template/stdstreams.h>")]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdin) && $has_function(fgetc_unlocked))]]
 int getchar_unlocked() {
 	return fgetc_unlocked(stdin);
 }
@@ -1954,9 +1960,9 @@ int getchar_unlocked() {
 
 @@>> putchar_unlocked(3)
 @@Same as `putchar()', but performs I/O without acquiring a lock to `stdout'
-[[crtbuiltin, requires_include("<__crt.h>")]]
-[[cp_stdio, impl_include("<libc/template/stdstreams.h>")]]
-[[requires(!defined(__NO_STDSTREAMS) && $has_function(fputc_unlocked))]]
+[[cp_stdio, crtbuiltin, impl_include("<libc/template/stdstreams.h>")]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdout) && $has_function(fputc_unlocked))]]
 int putchar_unlocked(int ch) {
 	return fputc_unlocked(ch, stdout);
 }
@@ -3066,7 +3072,8 @@ int fftruncate_unlocked([[nonnull]] $FILE *__restrict stream, __PIO_OFFSET lengt
 
 [[cp_stdio, crtbuiltin, alias("puts"), decl_include("<features.h>")]]
 [[section(".text.crt{|.dos}.FILE.unlocked.write.write"), impl_include("<libc/template/stdstreams.h>")]]
-[[requires(!defined(__NO_STDSTREAMS) && $has_function(fputs_unlocked))]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdout) && $has_function(fputs_unlocked))]]
 __STDC_INT_AS_SSIZE_T puts_unlocked([[nonnull]] char const *__restrict string) {
 	__STDC_INT_AS_SSIZE_T result, temp;
 	result = fputs_unlocked(string, stdout);
@@ -3205,10 +3212,11 @@ __STDC_INT_AS_SSIZE_T fprintf_unlocked([[nonnull]] $FILE *__restrict stream,
                                        [[nonnull]] char const *__restrict format, ...)
 	%{printf("vfprintf_unlocked")}
 
-[[decl_include("<features.h>"), requires_include("<__crt.h>")]]
+[[decl_include("<features.h>")]]
 [[cp_stdio, ATTR_LIBC_PRINTF(1, 0), dos_only_export_alias("vprintf_s")]]
 [[impl_include("<libc/template/stdstreams.h>"), doc_alias("printf_unlocked")]]
-[[requires(!defined(__NO_STDSTREAMS) && $has_function(vprintf))]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdout) && $has_function(vprintf))]]
 __STDC_INT_AS_SSIZE_T vprintf_unlocked([[nonnull]] char const *__restrict format,
                                        $va_list args) {
 	return vfprintf_unlocked(stdout, format, args);
@@ -3258,9 +3266,10 @@ __STDC_INT_AS_SIZE_T vfscanf_unlocked([[nonnull]] $FILE *__restrict stream,
 
 
 
-[[decl_include("<features.h>"), requires_include("<__crt.h>")]]
-[[impl_include("<libc/template/stdstreams.h>"), doc_alias("scanf_unlocked")]]
-[[requires(!defined(__NO_STDSTREAMS) && $has_function(vfscanf_unlocked))]]
+[[doc_alias("scanf_unlocked"), decl_include("<features.h>")]]
+[[impl_include("<libc/template/stdstreams.h>")]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdin) && $has_function(vfscanf_unlocked))]]
 [[cp_stdio, ATTR_LIBC_SCANF(1, 0), wunused, alias("_vscanf")]]
 __STDC_INT_AS_SIZE_T vscanf_unlocked([[nonnull]] char const *__restrict format, $va_list args) {
 	return vfscanf_unlocked(stdin, format, args);
@@ -4434,10 +4443,10 @@ $size_t fread_s([[outp(min(return * elemsize, elemcount * elemsize, bufsize))]] 
 }
 
 %[default:section(".text.crt.dos.FILE.locked.read.read")];
-[[cp, wunused, requires_include("<__crt.h>")]]
+[[cp, wunused, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<libc/template/stdstreams.h>", "<libc/errno.h>")]]
-[[decl_include("<hybrid/typecore.h>")]]
-[[requires(!defined(__NO_STDSTREAMS) && $has_function(fgets))]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdin) && $has_function(fgets))]]
 char *gets_s([[outp(min(strlen(return), bufsize))]] char *__restrict buf, rsize_t bufsize) {
 	if unlikely(!buf) {
 @@pp_ifdef EINVAL@@
@@ -4770,16 +4779,22 @@ __STDC_INT_AS_SSIZE_T _vsnscanf_s(char const *buf, $size_t bufsize, [[nonnull]] 
 /* STD-stream wrapper functions                                         */
 /************************************************************************/
 %[default:section(".text.crt.dos.unicode.locale.format.printf")];
-[[decl_include("<features.h>"), requires($has_function(_vfprintf_s_l) && !defined(__NO_STDSTREAMS)), impl_include("<libc/template/stdstreams.h>")]]
+[[decl_include("<features.h>"), impl_include("<libc/template/stdstreams.h>")]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdout) && $has_function(_vfprintf_s_l))]]
 __STDC_INT_AS_SSIZE_T _vprintf_s_l([[nonnull]] char const *format, $locale_t locale, $va_list args) {
 	return _vfprintf_s_l(stdout, format, locale, args);
 }
-[[decl_include("<features.h>"), requires($has_function(_vfprintf_p_l) && !defined(__NO_STDSTREAMS)), impl_include("<libc/template/stdstreams.h>")]]
+[[decl_include("<features.h>"), impl_include("<libc/template/stdstreams.h>")]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdout) && $has_function(_vfprintf_p_l))]]
 __STDC_INT_AS_SSIZE_T _vprintf_p_l([[nonnull]] char const *format, $locale_t locale, $va_list args) {
 	return _vfprintf_p_l(stdout, format, locale, args);
 }
 %[default:section(".text.crt.dos.FILE.locked.read.scanf")];
-[[decl_include("<features.h>"), requires($has_function(_vfscanf_s_l) && !defined(__NO_STDSTREAMS)), impl_include("<libc/template/stdstreams.h>"), wunused]]
+[[wunused, decl_include("<features.h>"), impl_include("<libc/template/stdstreams.h>")]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdin) && $has_function(_vfscanf_s_l))]]
 __STDC_INT_AS_SSIZE_T _vscanf_s_l([[nonnull]] char const *format, $locale_t locale, $va_list args) {
 	return _vfscanf_s_l(stdin, format, locale, args);
 }

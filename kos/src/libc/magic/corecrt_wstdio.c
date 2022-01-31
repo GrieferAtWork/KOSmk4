@@ -126,9 +126,10 @@ __NAMESPACE_STD_USING(FILE)
 
 [[section(".text.crt.dos.wchar.errno.utility")]]
 [[cp_stdio, wchar, ATTR_COLD, guard("_CRT_WPERROR_DEFINED")]]
-[[requires_include("<__crt.h>", "<libc/errno.h>")]]
 [[impl_include("<libc/template/stdstreams.h>", "<libc/errno.h>")]]
-[[requires(!defined(__NO_STDSTREAMS) && defined(__libc_geterrno) && $has_function(fprintf) && $has_function(strerror))]]
+[[requires_include("<libc/template/stdstreams.h>", "<libc/errno.h>")]]
+[[requires(defined(__LOCAL_stderr) && defined(__libc_geterrno) &&
+           $has_function(fprintf) && $has_function(strerror))]]
 [[impl_include("<parts/printf-config.h>")]]
 [[decl_include("<hybrid/typecore.h>")]]
 void _wperror(wchar_t const *__restrict message) {
@@ -277,18 +278,20 @@ err_badalloc:
 
 
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[wchar, requires_include("<__crt.h>"), impl_include("<libc/template/stdstreams.h>")]]
-[[requires($has_function(fgetws) && !defined(__NO_STDSTREAMS))]]
+[[wchar, decl_include("<hybrid/typecore.h>")]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdin) && $has_function(fgetws))]]
 [[section(".text.crt.dos.wchar.FILE.locked.read.read")]]
+[[impl_include("<libc/template/stdstreams.h>")]]
 wchar_t *_getws_s(wchar_t *buf, size_t buflen) {
 	return fgetws(buf, buflen, stdin);
 }
 
-[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[wchar, requires_include("<__crt.h>"), impl_include("<libc/template/stdstreams.h>")]]
-[[requires($has_function(fputws) && !defined(__NO_STDSTREAMS))]]
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdout) && $has_function(fputws))]]
 [[section(".text.crt.dos.wchar.FILE.locked.write.write")]]
+[[impl_include("<libc/template/stdstreams.h>")]]
 __STDC_INT_AS_SIZE_T _putws([[nonnull]] wchar_t const *str) {
 	return fputws(str, stdout);
 }
@@ -563,16 +566,25 @@ __STDC_INT_AS_SSIZE_T _vsnwscanf_s(wchar_t const *buf, size_t bufsize, [[nonnull
 /* STD-stream wrapper functions                                         */
 /************************************************************************/
 %[default:section(".text.crt.dos.wchar.unicode.locale.format.printf")];
-[[wchar, decl_include("<features.h>"), requires($has_function(_vfwprintf_s_l) && !defined(__NO_STDSTREAMS)), impl_include("<libc/template/stdstreams.h>")]]
+[[wchar, decl_include("<features.h>")]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdout) && $has_function(_vfwprintf_s_l))]]
+[[impl_include("<libc/template/stdstreams.h>")]]
 __STDC_INT_AS_SSIZE_T _vwprintf_s_l([[nonnull]] wchar_t const *format, $locale_t locale, $va_list args) {
 	return _vfwprintf_s_l(stdout, format, locale, args);
 }
-[[wchar, decl_include("<features.h>"), requires($has_function(_vfwprintf_s_l) && !defined(__NO_STDSTREAMS)), impl_include("<libc/template/stdstreams.h>")]]
+[[wchar, decl_include("<features.h>")]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdout) && $has_function(_vfwprintf_p_l))]]
+[[impl_include("<libc/template/stdstreams.h>")]]
 __STDC_INT_AS_SSIZE_T _vwprintf_p_l([[nonnull]] wchar_t const *format, $locale_t locale, $va_list args) {
 	return _vfwprintf_p_l(stdout, format, locale, args);
 }
 %[default:section(".text.crt.dos.wchar.FILE.locked.read.scanf")];
-[[wchar, decl_include("<features.h>"), requires($has_function(_vfwprintf_s_l) && !defined(__NO_STDSTREAMS)), impl_include("<libc/template/stdstreams.h>")]]
+[[wchar, decl_include("<features.h>")]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdin) && $has_function(_vfwscanf_s_l))]]
+[[impl_include("<libc/template/stdstreams.h>")]]
 __STDC_INT_AS_SSIZE_T _vwscanf_s_l([[nonnull]] wchar_t const *format, $locale_t locale, $va_list args) {
 	return _vfwscanf_s_l(stdin, format, locale, args);
 }

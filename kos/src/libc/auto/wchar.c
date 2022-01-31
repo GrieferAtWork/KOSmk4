@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x510e9c4e */
+/* HASH CRC-32:0x3cfe0051 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2252,13 +2252,13 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.getc") wint32_t
 /* >> putwchar_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.putc") wint16_t
 (LIBDCALL libd_putwchar_unlocked)(char16_t wc) THROWS(...) {
-	return libd_fputwc_unlocked(wc, stdin);
+	return libd_fputwc_unlocked(wc, stdout);
 }
 #include <libc/template/stdstreams.h>
 /* >> putwchar_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.putc") wint32_t
 (LIBKCALL libc_putwchar_unlocked)(char32_t wc) THROWS(...) {
-	return libc_fputwc_unlocked(wc, stdin);
+	return libc_fputwc_unlocked(wc, stdout);
 }
 #include <asm/crt/stdio.h>
 #include <libc/errno.h>

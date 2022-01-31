@@ -1955,8 +1955,8 @@ int killpg($pid_t pgrp, $signo_t signo) {
 @@Same as `fprintf(stderr, "%s: %s\n", s, sigabbrev_np(signo) ? "SIG"+. : strdupf("Unknown signal %d", signo))'
 @@When `s' is `NULL' or an empty string, omit the leading "%s: " from the format.
 [[guard, decl_include("<bits/types.h>")]]
-[[requires_include("<__crt.h>")]]
-[[requires(!defined(__NO_STDSTREAMS) && $has_function(fprintf))]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stderr) && $has_function(fprintf))]]
 void psignal($signo_t signo, [[nullable]] char const *s) {
 	char const *signam = sigabbrev_np(signo);
 	if (s && *s)
@@ -1973,8 +1973,8 @@ void psignal($signo_t signo, [[nullable]] char const *s) {
 [[decl_include("<bits/os/siginfo.h>")]]
 [[impl_include("<bits/crt/inttypes.h>")]]
 [[impl_include("<bits/types.h>")]]
-[[requires_include("<__crt.h>")]]
-[[requires(!defined(__NO_STDSTREAMS) && $has_function(fprintf))]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stderr) && $has_function(fprintf))]]
 void psiginfo([[nonnull]] siginfo_t const *pinfo,
               [[nullable]] char const *s) {
 	char const *text;

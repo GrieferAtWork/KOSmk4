@@ -7164,8 +7164,8 @@ int strcmpz([[nonnull]] char const *lhs,
 }
 
 @@>> strstartcmp(3)
-@@Compare the first `strnlen(str, strlen(startswith_str))' characters of
-@@`str'  with  `startswith_str',  returning  the  usual  >0,  <0,   ==0.
+@@Compare the first `strnlen(str, strlen(startswith_str))' characters
+@@of `str' with  `startswith_str', returning the  usual >0, <0,  ==0.
 [[kernel, pure, wunused]]
 int strstartcmp([[nonnull]] char const *str,
                 [[nonnull]] char const *startswith) {

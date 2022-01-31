@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc1e9514 */
+/* HASH CRC-32:0x2563b949 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_getwchar_defined
 #define __local_getwchar_defined
 #include <__crt.h>
-#if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc))
+#include <libc/template/stdstreams.h>
+#if defined(__LOCAL_stdin) && (defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc))
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -35,9 +36,6 @@ __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FI
 #undef __local___localdep_fgetwc_defined
 #endif /* !... */
 #endif /* !__local___localdep_fgetwc_defined */
-__NAMESPACE_LOCAL_END
-#include <libc/template/stdstreams.h>
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getwchar) __WINT_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(getwchar))(void) __THROWS(...) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_fgetwc)(__LOCAL_stdin);
@@ -47,7 +45,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_getwchar_defined
 #define __localdep_getwchar __LIBC_LOCAL_NAME(getwchar)
 #endif /* !__local___localdep_getwchar_defined */
-#else /* !__NO_STDSTREAMS && (__CRT_HAVE_fgetwc || __CRT_HAVE_getwc) */
+#else /* __LOCAL_stdin && (__CRT_HAVE_fgetwc || __CRT_HAVE_getwc) */
 #undef __local_getwchar_defined
-#endif /* __NO_STDSTREAMS || (!__CRT_HAVE_fgetwc && !__CRT_HAVE_getwc) */
+#endif /* !__LOCAL_stdin || (!__CRT_HAVE_fgetwc && !__CRT_HAVE_getwc) */
 #endif /* !__local_getwchar_defined */

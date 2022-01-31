@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b435091 */
+/* HASH CRC-32:0x5219840e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_wscanf_defined
 #define __local_wscanf_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_vwscanf) || (defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS))
+#include <libc/template/stdstreams.h>
+#if defined(__CRT_HAVE_vwscanf) || (defined(__LOCAL_stdin) && defined(__CRT_HAVE_vfwscanf))
 #include <kos/anno.h>
 #include <features.h>
 #include <hybrid/typecore.h>
@@ -30,7 +31,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_vwscanf_defined
 #ifdef __CRT_HAVE_vwscanf
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vwscanf,(__WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vwscanf,(__format,__args))
-#elif defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS)
+#elif defined(__LOCAL_stdin) && defined(__CRT_HAVE_vfwscanf)
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/vwscanf.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -53,7 +54,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_wscanf_defined
 #define __localdep_wscanf __LIBC_LOCAL_NAME(wscanf)
 #endif /* !__local___localdep_wscanf_defined */
-#else /* __CRT_HAVE_vwscanf || (__CRT_HAVE_vfwscanf && !__NO_STDSTREAMS) */
+#else /* __CRT_HAVE_vwscanf || (__LOCAL_stdin && __CRT_HAVE_vfwscanf) */
 #undef __local_wscanf_defined
-#endif /* !__CRT_HAVE_vwscanf && (!__CRT_HAVE_vfwscanf || __NO_STDSTREAMS) */
+#endif /* !__CRT_HAVE_vwscanf && (!__LOCAL_stdin || !__CRT_HAVE_vfwscanf) */
 #endif /* !__local_wscanf_defined */

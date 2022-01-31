@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4600c0ec */
+/* HASH CRC-32:0x41dfdd29 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_vc16scanf_defined
 #define __local_vc16scanf_defined
 #include <__crt.h>
-#if ((defined(__CRT_HAVE_vfwscanf) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$vfwscanf)) && !defined(__NO_STDSTREAMS)
+#include <libc/template/stdstreams.h>
+#if defined(__LOCAL_stdin) && ((defined(__CRT_HAVE_vfwscanf) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$vfwscanf))
 #include <features.h>
 #include <hybrid/typecore.h>
 #include <kos/anno.h>
@@ -36,9 +37,6 @@ __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),_
 #undef __local___localdep_vfc16scanf_defined
 #endif /* !... */
 #endif /* !__local___localdep_vfc16scanf_defined */
-__NAMESPACE_LOCAL_END
-#include <libc/template/stdstreams.h>
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vc16scanf) __ATTR_WUNUSED __ATTR_LIBC_WSCANF(1, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T
 (__LIBDCALL __LIBC_LOCAL_NAME(vc16scanf))(__CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args) __THROWS(...) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_vfc16scanf)(__LOCAL_stdin, __format, __args);
@@ -48,7 +46,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_vc16scanf_defined
 #define __localdep_vc16scanf __LIBC_LOCAL_NAME(vc16scanf)
 #endif /* !__local___localdep_vc16scanf_defined */
-#else /* ((__CRT_HAVE_vfwscanf && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$vfwscanf) && !__NO_STDSTREAMS */
+#else /* __LOCAL_stdin && ((__CRT_HAVE_vfwscanf && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$vfwscanf) */
 #undef __local_vc16scanf_defined
-#endif /* ((!__CRT_HAVE_vfwscanf || __SIZEOF_WCHAR_T__ != 2 || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$vfwscanf) || __NO_STDSTREAMS */
+#endif /* !__LOCAL_stdin || ((!__CRT_HAVE_vfwscanf || __SIZEOF_WCHAR_T__ != 2 || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$vfwscanf) */
 #endif /* !__local_vc16scanf_defined */

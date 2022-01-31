@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1473cea */
+/* HASH CRC-32:0xb3b699bc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,14 +21,15 @@
 #ifndef __local__wscanf_l_defined
 #define __local__wscanf_l_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE__vwscanf_l) || defined(__CRT_HAVE_vwscanf) || (defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS))
+#include <libc/template/stdstreams.h>
+#if defined(__CRT_HAVE__vwscanf_l) || defined(__CRT_HAVE_vwscanf) || (defined(__LOCAL_stdin) && defined(__CRT_HAVE_vfwscanf))
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__vwscanf_l_defined
 #define __local___localdep__vwscanf_l_defined
 #ifdef __CRT_HAVE__vwscanf_l
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vwscanf_l,(__WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vwscanf_l,(__format,__locale,__args))
-#elif defined(__CRT_HAVE_vwscanf) || (defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS))
+#elif defined(__CRT_HAVE_vwscanf) || (defined(__LOCAL_stdin) && defined(__CRT_HAVE_vfwscanf))
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wstdio/_vwscanf_l.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -51,7 +52,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__wscanf_l_defined
 #define __localdep__wscanf_l __LIBC_LOCAL_NAME(_wscanf_l)
 #endif /* !__local___localdep__wscanf_l_defined */
-#else /* __CRT_HAVE__vwscanf_l || __CRT_HAVE_vwscanf || (__CRT_HAVE_vfwscanf && !__NO_STDSTREAMS) */
+#else /* __CRT_HAVE__vwscanf_l || __CRT_HAVE_vwscanf || (__LOCAL_stdin && __CRT_HAVE_vfwscanf) */
 #undef __local__wscanf_l_defined
-#endif /* !__CRT_HAVE__vwscanf_l && !__CRT_HAVE_vwscanf && (!__CRT_HAVE_vfwscanf || __NO_STDSTREAMS) */
+#endif /* !__CRT_HAVE__vwscanf_l && !__CRT_HAVE_vwscanf && (!__LOCAL_stdin || !__CRT_HAVE_vfwscanf) */
 #endif /* !__local__wscanf_l_defined */

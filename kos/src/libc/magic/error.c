@@ -115,8 +115,9 @@ __LIBC int error_one_per_line;
 [[impl_prefix(DEFINE_LOCAL_error_print_progname)]]
 [[impl_prefix(DEFINE_LOCAL_error_message_count)]]
 [[impl_include("<libc/template/program_invocation_name.h>")]]
-[[requires_include("<__crt.h>", "<libc/template/program_invocation_name.h>")]]
-[[requires(!defined(__NO_STDSTREAMS) && $has_function(exit) &&
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires_include("<libc/template/program_invocation_name.h>")]]
+[[requires(defined(__LOCAL_stdout) && defined(__LOCAL_stderr) && $has_function(exit) &&
            $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc) &&
            defined(__LOCAL_program_invocation_short_name) &&
            $has_function(strerror))]]
@@ -156,8 +157,9 @@ void error(int status, $errno_t errnum, const char *format, ...) {
 [[decl_include("<bits/types.h>")]]
 [[impl_include("<libc/template/stdstreams.h>")]]
 [[impl_include("<libc/template/program_invocation_name.h>")]]
-[[requires_include("<__crt.h>", "<libc/template/program_invocation_name.h>")]]
-[[requires(!defined(__NO_STDSTREAMS) && $has_function(exit) &&
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires_include("<libc/template/program_invocation_name.h>")]]
+[[requires(defined(__LOCAL_stderr) && defined(__LOCAL_stdout) && $has_function(exit) &&
            $has_function(fprintf) && $has_function(vfprintf) &&
            $has_function(fputc) && defined(__LOCAL_program_invocation_short_name) &&
            $has_function(strerror))]]
