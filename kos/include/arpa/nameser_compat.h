@@ -28,36 +28,36 @@
 #define __BIND 19950621 /* ??? */
 
 typedef struct {
-	unsigned id : 16; /* ??? */
+	unsigned int id : 16; /* ??? */
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 
-	unsigned qr : 1;     /* ??? */
-	unsigned opcode : 4; /* ??? */
-	unsigned aa : 1;     /* ??? */
-	unsigned tc : 1;     /* ??? */
-	unsigned rd : 1;     /* ??? */
-	unsigned ra : 1;     /* ??? */
-	unsigned unused : 1; /* ??? */
-	unsigned ad : 1;     /* ??? */
-	unsigned cd : 1;     /* ??? */
-	unsigned rcode : 4;  /* ??? */
+	unsigned int qr : 1;     /* ??? */
+	unsigned int opcode : 4; /* ??? */
+	unsigned int aa : 1;     /* ??? */
+	unsigned int tc : 1;     /* ??? */
+	unsigned int rd : 1;     /* ??? */
+	unsigned int ra : 1;     /* ??? */
+	unsigned int unused : 1; /* ??? */
+	unsigned int ad : 1;     /* ??? */
+	unsigned int cd : 1;     /* ??? */
+	unsigned int rcode : 4;  /* ??? */
 #else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
-	unsigned rd : 1;     /* ??? */
-	unsigned tc : 1;     /* ??? */
-	unsigned aa : 1;     /* ??? */
-	unsigned opcode : 4; /* ??? */
-	unsigned qr : 1;     /* ??? */
-	unsigned rcode : 4;  /* ??? */
-	unsigned cd : 1;     /* ??? */
-	unsigned ad : 1;     /* ??? */
-	unsigned unused : 1; /* ??? */
-	unsigned ra : 1;     /* ??? */
+	unsigned int rd : 1;     /* ??? */
+	unsigned int tc : 1;     /* ??? */
+	unsigned int aa : 1;     /* ??? */
+	unsigned int opcode : 4; /* ??? */
+	unsigned int qr : 1;     /* ??? */
+	unsigned int rcode : 4;  /* ??? */
+	unsigned int cd : 1;     /* ??? */
+	unsigned int ad : 1;     /* ??? */
+	unsigned int unused : 1; /* ??? */
+	unsigned int ra : 1;     /* ??? */
 #endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
 	/* remaining bytes */
-	unsigned qdcount : 16; /* ??? */
-	unsigned ancount : 16; /* ??? */
-	unsigned nscount : 16; /* ??? */
-	unsigned arcount : 16; /* ??? */
+	unsigned int qdcount : 16; /* ??? */
+	unsigned int ancount : 16; /* ??? */
+	unsigned int nscount : 16; /* ??? */
+	unsigned int arcount : 16; /* ??? */
 } HEADER;
 
 #define PACKETSZ        NS_PACKETSZ

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5638d60d */
+/* HASH CRC-32:0x3421556 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -139,32 +139,96 @@ typedef enum {
 } res_sendhookact;
 typedef res_sendhookact
 (__LIBKCALL *res_send_qhook)(struct sockaddr_in *const *__ns,
-                             u_char const **__query, int *__querylen,
-                             u_char *__ans, int __anssiz, int *__resplen);
+                             __u_char const **__query, int *__querylen,
+                             __u_char *__ans, int __anssiz, int *__resplen);
 typedef res_sendhookact
 (__LIBKCALL *res_send_rhook)(struct sockaddr_in const *__ns,
-                             u_char const *__query, int __querylen,
-                             u_char *__ans, int __anssiz, int *__resplen);
+                             __u_char const *__query, int __querylen,
+                             __u_char *__ans, int __anssiz, int *__resplen);
 
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("name")
+#pragma push_macro("type")
+#pragma push_macro("rr_class")
+#pragma push_macro("ttl")
+#pragma push_macro("rdlength")
+#pragma push_macro("rdata")
+#pragma push_macro("retrans")
+#pragma push_macro("retry")
+#pragma push_macro("options")
+#pragma push_macro("nscount")
+#pragma push_macro("nsaddr_list")
+#pragma push_macro("id")
+#pragma push_macro("dnsrch")
+#pragma push_macro("defdname")
+#pragma push_macro("pfcode")
+#pragma push_macro("ndots")
+#pragma push_macro("nsort")
+#pragma push_macro("ipv6_unavail")
+#pragma push_macro("unused")
+#pragma push_macro("addr")
+#pragma push_macro("mask")
+#pragma push_macro("sort_list")
+#pragma push_macro("qhook")
+#pragma push_macro("rhook")
+#pragma push_macro("res_h_errno")
+#pragma push_macro("pad")
+#pragma push_macro("nsmap")
+#pragma push_macro("nssocks")
+#pragma push_macro("nscount6")
+#pragma push_macro("nsinit")
+#pragma push_macro("nsaddrs")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef name
+#undef type
+#undef rr_class
+#undef ttl
+#undef rdlength
+#undef rdata
+#undef retrans
+#undef retry
+#undef options
+#undef nscount
+#undef nsaddr_list
+#undef id
+#undef dnsrch
+#undef defdname
+#undef pfcode
+#undef ndots
+#undef nsort
+#undef ipv6_unavail
+#undef unused
+#undef addr
+#undef mask
+#undef sort_list
+#undef qhook
+#undef rhook
+#undef res_h_errno
+#undef pad
+#undef nsmap
+#undef nssocks
+#undef nscount6
+#undef nsinit
+#undef nsaddrs
 typedef struct __res_state {
 	int                retrans;               /* ??? */
 	int                retry;                 /* ??? */
-	u_long             options;               /* ??? */
+	__u_long           options;               /* ??? */
 	int                nscount;               /* ??? */
 	struct sockaddr_in nsaddr_list[MAXNS];    /* ??? */
 #define nsaddr         nsaddr_list[0]         /* ??? */
-	u_short            id;                    /* ??? */
+	__u_short          id;                    /* ??? */
 	__byte_t         __rs_pad1[2];            /* ... */
 	char              *dnsrch[MAXDNSRCH + 1]; /* ??? */
 	char               defdname[256];         /* ??? */
-	u_long             pfcode;                /* ??? */
+	__u_long           pfcode;                /* ??? */
 	unsigned int       ndots : 4;             /* ??? */
 	unsigned int       nsort : 4;             /* ??? */
 	unsigned int       ipv6_unavail : 1;      /* ??? */
 	unsigned int       unused : 23;           /* ??? */
 	struct {
 		struct in_addr addr;                  /* ??? */
-		u_int32_t      mask;                  /* ??? */
+		__uint32_t     mask;                  /* ??? */
 	} sort_list[MAXRESOLVSORT];               /* ??? */
 #if __SIZEOF_POINTER__ >= 8
 	__byte_t         __rs_pad2[4];            /* ... */
@@ -173,30 +237,76 @@ typedef struct __res_state {
 	res_send_rhook     rhook;                 /* ??? */
 	int                res_h_errno;           /* ??? */
 	int               _vcsock;                /* ??? */
-	u_int             _flags;                 /* ??? */
+	__u_int           _flags;                 /* ??? */
 #if __SIZEOF_POINTER__ >= 8
 	__byte_t         __rs_pad3[4];            /* ... */
 #endif /* __SIZEOF_POINTER__ >= 8 */
 	union {
 		char           pad[52]; /* ... */
 		struct {
-			u_int16_t            nscount;        /* ??? */
-			u_int16_t            nsmap[MAXNS];   /* ??? */
+			__uint16_t           nscount;        /* ??? */
+			__uint16_t           nsmap[MAXNS];   /* ??? */
 			int                  nssocks[MAXNS]; /* ??? */
-			u_int16_t            nscount6;       /* ??? */
-			u_int16_t            nsinit;         /* ??? */
+			__uint16_t           nscount6;       /* ??? */
+			__uint16_t           nsinit;         /* ??? */
 			struct sockaddr_in6 *nsaddrs[MAXNS]; /* ??? */
 			__UINT32_TYPE__     _initstamp[2];   /* ??? */
 		} _ext;
 	} _u;
 } *res_state;
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("nsaddrs")
+#pragma pop_macro("nsinit")
+#pragma pop_macro("nscount6")
+#pragma pop_macro("nssocks")
+#pragma pop_macro("nsmap")
+#pragma pop_macro("pad")
+#pragma pop_macro("res_h_errno")
+#pragma pop_macro("rhook")
+#pragma pop_macro("qhook")
+#pragma pop_macro("sort_list")
+#pragma pop_macro("mask")
+#pragma pop_macro("addr")
+#pragma pop_macro("unused")
+#pragma pop_macro("ipv6_unavail")
+#pragma pop_macro("nsort")
+#pragma pop_macro("ndots")
+#pragma pop_macro("pfcode")
+#pragma pop_macro("defdname")
+#pragma pop_macro("dnsrch")
+#pragma pop_macro("id")
+#pragma pop_macro("nsaddr_list")
+#pragma pop_macro("nscount")
+#pragma pop_macro("options")
+#pragma pop_macro("retry")
+#pragma pop_macro("retrans")
+#pragma pop_macro("rdata")
+#pragma pop_macro("rdlength")
+#pragma pop_macro("ttl")
+#pragma pop_macro("rr_class")
+#pragma pop_macro("type")
+#pragma pop_macro("name")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #endif /* !__res_state_defined */
 
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("number")
+#pragma push_macro("name")
+#pragma push_macro("humanname")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef number
+#undef name
+#undef humanname
 struct res_sym {
 	int   number;    /* ??? */
 	char *name;      /* ??? */
 	char *humanname; /* ??? */
 };
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("humanname")
+#pragma pop_macro("name")
+#pragma pop_macro("number")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 __CDECLARE_OPT(__ATTR_CONST,struct __res_state *,__NOTHROW_NCX,__res_state,(void),())
 #ifdef __CRT_HAVE___res_state
@@ -205,14 +315,14 @@ __CDECLARE_OPT(__ATTR_CONST,struct __res_state *,__NOTHROW_NCX,__res_state,(void
 
 #ifndef __BIND_NOSTATIC
 #ifdef __CRT_HAVE_fp_nquery
-__CDECLARE_VOID(,__NOTHROW_NCX,fp_nquery,(u_char const *__a, int __b, FILE *__c),(__a,__b,__c))
+__CDECLARE_VOID(,__NOTHROW_NCX,fp_nquery,(unsigned char const *__a, int __b, __FILE *__c),(__a,__b,__c))
 #elif defined(__CRT_HAVE___fp_nquery)
-__CREDIRECT_VOID(,__NOTHROW_NCX,fp_nquery,(u_char const *__a, int __b, FILE *__c),__fp_nquery,(__a,__b,__c))
+__CREDIRECT_VOID(,__NOTHROW_NCX,fp_nquery,(unsigned char const *__a, int __b, __FILE *__c),__fp_nquery,(__a,__b,__c))
 #endif /* ... */
 #ifdef __CRT_HAVE_fp_query
-__CDECLARE_VOID(,__NOTHROW_NCX,fp_query,(u_char const *__a, FILE *__b),(__a,__b))
+__CDECLARE_VOID(,__NOTHROW_NCX,fp_query,(unsigned char const *__a, __FILE *__b),(__a,__b))
 #elif defined(__CRT_HAVE___fp_query)
-__CREDIRECT_VOID(,__NOTHROW_NCX,fp_query,(u_char const *__a, FILE *__b),__fp_query,(__a,__b))
+__CREDIRECT_VOID(,__NOTHROW_NCX,fp_query,(unsigned char const *__a, __FILE *__b),__fp_query,(__a,__b))
 #endif /* ... */
 #ifdef __CRT_HAVE_hostalias
 __CDECLARE(,char const *,__NOTHROW_NCX,hostalias,(char const *__a),(__a))
@@ -220,9 +330,9 @@ __CDECLARE(,char const *,__NOTHROW_NCX,hostalias,(char const *__a),(__a))
 __CREDIRECT(,char const *,__NOTHROW_NCX,hostalias,(char const *__a),__hostalias,(__a))
 #endif /* ... */
 #ifdef __CRT_HAVE_p_query
-__CDECLARE_VOID(,__NOTHROW_NCX,p_query,(u_char const *__a),(__a))
+__CDECLARE_VOID(,__NOTHROW_NCX,p_query,(unsigned char const *__a),(__a))
 #elif defined(__CRT_HAVE___p_query)
-__CREDIRECT_VOID(,__NOTHROW_NCX,p_query,(u_char const *__a),__p_query,(__a))
+__CREDIRECT_VOID(,__NOTHROW_NCX,p_query,(unsigned char const *__a),__p_query,(__a))
 #endif /* ... */
 #ifdef __CRT_HAVE_res_close
 __CDECLARE_VOID(,__NOTHROW_NCX,res_close,(void),())
@@ -240,29 +350,29 @@ __CDECLARE(,int,__NOTHROW_NCX,res_isourserver,(struct sockaddr_in const *__a),(_
 __CREDIRECT(,int,__NOTHROW_NCX,res_isourserver,(struct sockaddr_in const *__a),__res_isourserver,(__a))
 #endif /* ... */
 #ifdef __CRT_HAVE_res_mkquery
-__CDECLARE(,int,__NOTHROW_NCX,res_mkquery,(int __a, char const *__b, int __c, int __d, u_char const *__e, int __f, u_char const *__g, u_char *__h, int __i),(__a,__b,__c,__d,__e,__f,__g,__h,__i))
+__CDECLARE(,int,__NOTHROW_NCX,res_mkquery,(int __a, char const *__b, int __c, int __d, unsigned char const *__e, int __f, unsigned char const *__g, unsigned char *__h, int __i),(__a,__b,__c,__d,__e,__f,__g,__h,__i))
 #elif defined(__CRT_HAVE___res_mkquery)
-__CREDIRECT(,int,__NOTHROW_NCX,res_mkquery,(int __a, char const *__b, int __c, int __d, u_char const *__e, int __f, u_char const *__g, u_char *__h, int __i),__res_mkquery,(__a,__b,__c,__d,__e,__f,__g,__h,__i))
+__CREDIRECT(,int,__NOTHROW_NCX,res_mkquery,(int __a, char const *__b, int __c, int __d, unsigned char const *__e, int __f, unsigned char const *__g, unsigned char *__h, int __i),__res_mkquery,(__a,__b,__c,__d,__e,__f,__g,__h,__i))
 #endif /* ... */
 #ifdef __CRT_HAVE_res_query
-__CDECLARE(,int,__NOTHROW_NCX,res_query,(char const *__a, int __b, int __c, u_char *__d, int __e),(__a,__b,__c,__d,__e))
+__CDECLARE(,int,__NOTHROW_NCX,res_query,(char const *__a, int __b, int __c, unsigned char *__d, int __e),(__a,__b,__c,__d,__e))
 #elif defined(__CRT_HAVE___res_query)
-__CREDIRECT(,int,__NOTHROW_NCX,res_query,(char const *__a, int __b, int __c, u_char *__d, int __e),__res_query,(__a,__b,__c,__d,__e))
+__CREDIRECT(,int,__NOTHROW_NCX,res_query,(char const *__a, int __b, int __c, unsigned char *__d, int __e),__res_query,(__a,__b,__c,__d,__e))
 #endif /* ... */
 #ifdef __CRT_HAVE_res_querydomain
-__CDECLARE(,int,__NOTHROW_NCX,res_querydomain,(char const *__a, char const *__b, int __c, int __d, u_char *__e, int __f),(__a,__b,__c,__d,__e,__f))
+__CDECLARE(,int,__NOTHROW_NCX,res_querydomain,(char const *__a, char const *__b, int __c, int __d, unsigned char *__e, int __f),(__a,__b,__c,__d,__e,__f))
 #elif defined(__CRT_HAVE___res_querydomain)
-__CREDIRECT(,int,__NOTHROW_NCX,res_querydomain,(char const *__a, char const *__b, int __c, int __d, u_char *__e, int __f),__res_querydomain,(__a,__b,__c,__d,__e,__f))
+__CREDIRECT(,int,__NOTHROW_NCX,res_querydomain,(char const *__a, char const *__b, int __c, int __d, unsigned char *__e, int __f),__res_querydomain,(__a,__b,__c,__d,__e,__f))
 #endif /* ... */
 #ifdef __CRT_HAVE_res_search
-__CDECLARE(,int,__NOTHROW_NCX,res_search,(char const *__a, int __b, int __c, u_char *__d, int __e),(__a,__b,__c,__d,__e))
+__CDECLARE(,int,__NOTHROW_NCX,res_search,(char const *__a, int __b, int __c, unsigned char *__d, int __e),(__a,__b,__c,__d,__e))
 #elif defined(__CRT_HAVE___res_search)
-__CREDIRECT(,int,__NOTHROW_NCX,res_search,(char const *__a, int __b, int __c, u_char *__d, int __e),__res_search,(__a,__b,__c,__d,__e))
+__CREDIRECT(,int,__NOTHROW_NCX,res_search,(char const *__a, int __b, int __c, unsigned char *__d, int __e),__res_search,(__a,__b,__c,__d,__e))
 #endif /* ... */
 #ifdef __CRT_HAVE_res_send
-__CDECLARE(,int,__NOTHROW_NCX,res_send,(u_char const *__a, int __b, u_char *__c, int __d),(__a,__b,__c,__d))
+__CDECLARE(,int,__NOTHROW_NCX,res_send,(unsigned char const *__a, int __b, unsigned char *__c, int __d),(__a,__b,__c,__d))
 #elif defined(__CRT_HAVE___res_send)
-__CREDIRECT(,int,__NOTHROW_NCX,res_send,(u_char const *__a, int __b, u_char *__c, int __d),__res_send,(__a,__b,__c,__d))
+__CREDIRECT(,int,__NOTHROW_NCX,res_send,(unsigned char const *__a, int __b, unsigned char *__c, int __d),__res_send,(__a,__b,__c,__d))
 #endif /* ... */
 #endif /* !__BIND_NOSTATIC */
 #ifdef __CRT_HAVE_res_hnok
@@ -301,39 +411,39 @@ __CDECLARE(,char const *,__NOTHROW_NCX,sym_ntop,(struct res_sym const *__a, int 
 __CREDIRECT(,char const *,__NOTHROW_NCX,sym_ntop,(struct res_sym const *__a, int __b, int *__c),__sym_ntop,(__a,__b,__c))
 #endif /* ... */
 #ifdef __CRT_HAVE_b64_ntop
-__CDECLARE(,int,__NOTHROW_NCX,b64_ntop,(u_char const *__a, size_t __b, char *__c, size_t __d),(__a,__b,__c,__d))
+__CDECLARE(,int,__NOTHROW_NCX,b64_ntop,(unsigned char const *__a, size_t __b, char *__c, size_t __d),(__a,__b,__c,__d))
 #elif defined(__CRT_HAVE___b64_ntop)
-__CREDIRECT(,int,__NOTHROW_NCX,b64_ntop,(u_char const *__a, size_t __b, char *__c, size_t __d),__b64_ntop,(__a,__b,__c,__d))
+__CREDIRECT(,int,__NOTHROW_NCX,b64_ntop,(unsigned char const *__a, size_t __b, char *__c, size_t __d),__b64_ntop,(__a,__b,__c,__d))
 #endif /* ... */
 #ifdef __CRT_HAVE_b64_pton
-__CDECLARE(,int,__NOTHROW_NCX,b64_pton,(char const *__a, u_char *__b, size_t __c),(__a,__b,__c))
+__CDECLARE(,int,__NOTHROW_NCX,b64_pton,(char const *__a, unsigned char *__b, size_t __c),(__a,__b,__c))
 #elif defined(__CRT_HAVE___b64_pton)
-__CREDIRECT(,int,__NOTHROW_NCX,b64_pton,(char const *__a, u_char *__b, size_t __c),__b64_pton,(__a,__b,__c))
+__CREDIRECT(,int,__NOTHROW_NCX,b64_pton,(char const *__a, unsigned char *__b, size_t __c),__b64_pton,(__a,__b,__c))
 #endif /* ... */
 #ifdef __CRT_HAVE_loc_aton
-__CDECLARE(,int,__NOTHROW_NCX,loc_aton,(char const *__a, u_char *__b),(__a,__b))
+__CDECLARE(,int,__NOTHROW_NCX,loc_aton,(char const *__a, unsigned char *__b),(__a,__b))
 #elif defined(__CRT_HAVE___loc_aton)
-__CREDIRECT(,int,__NOTHROW_NCX,loc_aton,(char const *__a, u_char *__b),__loc_aton,(__a,__b))
+__CREDIRECT(,int,__NOTHROW_NCX,loc_aton,(char const *__a, unsigned char *__b),__loc_aton,(__a,__b))
 #endif /* ... */
 #ifdef __CRT_HAVE_loc_ntoa
-__CDECLARE(,char const *,__NOTHROW_NCX,loc_ntoa,(u_char const *__a, char *__b),(__a,__b))
+__CDECLARE(,char const *,__NOTHROW_NCX,loc_ntoa,(unsigned char const *__a, char *__b),(__a,__b))
 #elif defined(__CRT_HAVE___loc_ntoa)
-__CREDIRECT(,char const *,__NOTHROW_NCX,loc_ntoa,(u_char const *__a, char *__b),__loc_ntoa,(__a,__b))
+__CREDIRECT(,char const *,__NOTHROW_NCX,loc_ntoa,(unsigned char const *__a, char *__b),__loc_ntoa,(__a,__b))
 #endif /* ... */
 #ifdef __CRT_HAVE_dn_skipname
-__CDECLARE(,int,__NOTHROW_NCX,dn_skipname,(u_char const *__a, u_char const *__b),(__a,__b))
+__CDECLARE(,int,__NOTHROW_NCX,dn_skipname,(unsigned char const *__a, unsigned char const *__b),(__a,__b))
 #elif defined(__CRT_HAVE___dn_skipname)
-__CREDIRECT(,int,__NOTHROW_NCX,dn_skipname,(u_char const *__a, u_char const *__b),__dn_skipname,(__a,__b))
+__CREDIRECT(,int,__NOTHROW_NCX,dn_skipname,(unsigned char const *__a, unsigned char const *__b),__dn_skipname,(__a,__b))
 #endif /* ... */
 #ifdef __CRT_HAVE_putlong
-__CDECLARE_VOID(,__NOTHROW_NCX,putlong,(u_int32_t __a, u_char *__b),(__a,__b))
+__CDECLARE_VOID(,__NOTHROW_NCX,putlong,(__UINT32_TYPE__ __a, unsigned char *__b),(__a,__b))
 #elif defined(__CRT_HAVE___putlong)
-__CREDIRECT_VOID(,__NOTHROW_NCX,putlong,(u_int32_t __a, u_char *__b),__putlong,(__a,__b))
+__CREDIRECT_VOID(,__NOTHROW_NCX,putlong,(__UINT32_TYPE__ __a, unsigned char *__b),__putlong,(__a,__b))
 #endif /* ... */
 #ifdef __CRT_HAVE_putshort
-__CDECLARE_VOID(,__NOTHROW_NCX,putshort,(u_int16_t __a, u_char *__b),(__a,__b))
+__CDECLARE_VOID(,__NOTHROW_NCX,putshort,(__UINT16_TYPE__ __a, unsigned char *__b),(__a,__b))
 #elif defined(__CRT_HAVE___putshort)
-__CREDIRECT_VOID(,__NOTHROW_NCX,putshort,(u_int16_t __a, u_char *__b),__putshort,(__a,__b))
+__CREDIRECT_VOID(,__NOTHROW_NCX,putshort,(__UINT16_TYPE__ __a, unsigned char *__b),__putshort,(__a,__b))
 #endif /* ... */
 #ifdef __CRT_HAVE_p_class
 __CDECLARE(,char const *,__NOTHROW_NCX,p_class,(int __a),(__a))
@@ -341,9 +451,9 @@ __CDECLARE(,char const *,__NOTHROW_NCX,p_class,(int __a),(__a))
 __CREDIRECT(,char const *,__NOTHROW_NCX,p_class,(int __a),__p_class,(__a))
 #endif /* ... */
 #ifdef __CRT_HAVE_p_time
-__CDECLARE(,char const *,__NOTHROW_NCX,p_time,(u_int32_t __a),(__a))
+__CDECLARE(,char const *,__NOTHROW_NCX,p_time,(__UINT32_TYPE__ __a),(__a))
 #elif defined(__CRT_HAVE___p_time)
-__CREDIRECT(,char const *,__NOTHROW_NCX,p_time,(u_int32_t __a),__p_time,(__a))
+__CREDIRECT(,char const *,__NOTHROW_NCX,p_time,(__UINT32_TYPE__ __a),__p_time,(__a))
 #endif /* ... */
 #ifdef __CRT_HAVE_p_type
 __CDECLARE(,char const *,__NOTHROW_NCX,p_type,(int __a),(__a))
@@ -356,34 +466,34 @@ __CDECLARE(,char const *,__NOTHROW_NCX,p_rcode,(int __a),(__a))
 __CREDIRECT(,char const *,__NOTHROW_NCX,p_rcode,(int __a),__p_rcode,(__a))
 #endif /* ... */
 #ifdef __CRT_HAVE_p_cdnname
-__CDECLARE(,u_char const *,__NOTHROW_NCX,p_cdnname,(u_char const *__a, u_char const *__b, int __c, FILE *__d),(__a,__b,__c,__d))
+__CDECLARE(,unsigned char const *,__NOTHROW_NCX,p_cdnname,(unsigned char const *__a, unsigned char const *__b, int __c, __FILE *__d),(__a,__b,__c,__d))
 #elif defined(__CRT_HAVE___p_cdnname)
-__CREDIRECT(,u_char const *,__NOTHROW_NCX,p_cdnname,(u_char const *__a, u_char const *__b, int __c, FILE *__d),__p_cdnname,(__a,__b,__c,__d))
+__CREDIRECT(,unsigned char const *,__NOTHROW_NCX,p_cdnname,(unsigned char const *__a, unsigned char const *__b, int __c, __FILE *__d),__p_cdnname,(__a,__b,__c,__d))
 #endif /* ... */
 #ifdef __CRT_HAVE_p_cdname
-__CDECLARE(,u_char const *,__NOTHROW_NCX,p_cdname,(u_char const *__a, u_char const *__b, FILE *__c),(__a,__b,__c))
+__CDECLARE(,unsigned char const *,__NOTHROW_NCX,p_cdname,(unsigned char const *__a, unsigned char const *__b, __FILE *__c),(__a,__b,__c))
 #elif defined(__CRT_HAVE___p_cdname)
-__CREDIRECT(,u_char const *,__NOTHROW_NCX,p_cdname,(u_char const *__a, u_char const *__b, FILE *__c),__p_cdname,(__a,__b,__c))
+__CREDIRECT(,unsigned char const *,__NOTHROW_NCX,p_cdname,(unsigned char const *__a, unsigned char const *__b, __FILE *__c),__p_cdname,(__a,__b,__c))
 #endif /* ... */
 #ifdef __CRT_HAVE_p_fqnname
-__CDECLARE(,u_char const *,__NOTHROW_NCX,p_fqnname,(u_char const *__a, u_char const *__b, int __c, char *__d, int __e),(__a,__b,__c,__d,__e))
+__CDECLARE(,unsigned char const *,__NOTHROW_NCX,p_fqnname,(unsigned char const *__a, unsigned char const *__b, int __c, char *__d, int __e),(__a,__b,__c,__d,__e))
 #elif defined(__CRT_HAVE___p_fqnname)
-__CREDIRECT(,u_char const *,__NOTHROW_NCX,p_fqnname,(u_char const *__a, u_char const *__b, int __c, char *__d, int __e),__p_fqnname,(__a,__b,__c,__d,__e))
+__CREDIRECT(,unsigned char const *,__NOTHROW_NCX,p_fqnname,(unsigned char const *__a, unsigned char const *__b, int __c, char *__d, int __e),__p_fqnname,(__a,__b,__c,__d,__e))
 #endif /* ... */
 #ifdef __CRT_HAVE_p_fqname
-__CDECLARE(,u_char const *,__NOTHROW_NCX,p_fqname,(u_char const *__a, u_char const *__b, FILE *__c),(__a,__b,__c))
+__CDECLARE(,unsigned char const *,__NOTHROW_NCX,p_fqname,(unsigned char const *__a, unsigned char const *__b, __FILE *__c),(__a,__b,__c))
 #elif defined(__CRT_HAVE___p_fqname)
-__CREDIRECT(,u_char const *,__NOTHROW_NCX,p_fqname,(u_char const *__a, u_char const *__b, FILE *__c),__p_fqname,(__a,__b,__c))
+__CREDIRECT(,unsigned char const *,__NOTHROW_NCX,p_fqname,(unsigned char const *__a, unsigned char const *__b, __FILE *__c),__p_fqname,(__a,__b,__c))
 #endif /* ... */
 #ifdef __CRT_HAVE_p_option
-__CDECLARE(,char const *,__NOTHROW_NCX,p_option,(u_long __a),(__a))
+__CDECLARE(,char const *,__NOTHROW_NCX,p_option,(unsigned long __a),(__a))
 #elif defined(__CRT_HAVE___p_option)
-__CREDIRECT(,char const *,__NOTHROW_NCX,p_option,(u_long __a),__p_option,(__a))
+__CREDIRECT(,char const *,__NOTHROW_NCX,p_option,(unsigned long __a),__p_option,(__a))
 #endif /* ... */
 #ifdef __CRT_HAVE_p_secstodate
-__CDECLARE(,char *,__NOTHROW_NCX,p_secstodate,(u_long __a),(__a))
+__CDECLARE(,char *,__NOTHROW_NCX,p_secstodate,(unsigned long __a),(__a))
 #elif defined(__CRT_HAVE___p_secstodate)
-__CREDIRECT(,char *,__NOTHROW_NCX,p_secstodate,(u_long __a),__p_secstodate,(__a))
+__CREDIRECT(,char *,__NOTHROW_NCX,p_secstodate,(unsigned long __a),__p_secstodate,(__a))
 #endif /* ... */
 #ifdef __CRT_HAVE_dn_count_labels
 __CDECLARE(,int,__NOTHROW_NCX,dn_count_labels,(char const *__a),(__a))
@@ -391,29 +501,29 @@ __CDECLARE(,int,__NOTHROW_NCX,dn_count_labels,(char const *__a),(__a))
 __CREDIRECT(,int,__NOTHROW_NCX,dn_count_labels,(char const *__a),__dn_count_labels,(__a))
 #endif /* ... */
 #ifdef __CRT_HAVE_dn_comp
-__CDECLARE(,int,__NOTHROW_NCX,dn_comp,(char const *__a, u_char *__b, int __c, u_char **__d, u_char **__e),(__a,__b,__c,__d,__e))
+__CDECLARE(,int,__NOTHROW_NCX,dn_comp,(char const *__a, unsigned char *__b, int __c, unsigned char **__d, unsigned char **__e),(__a,__b,__c,__d,__e))
 #elif defined(__CRT_HAVE___dn_comp)
-__CREDIRECT(,int,__NOTHROW_NCX,dn_comp,(char const *__a, u_char *__b, int __c, u_char **__d, u_char **__e),__dn_comp,(__a,__b,__c,__d,__e))
+__CREDIRECT(,int,__NOTHROW_NCX,dn_comp,(char const *__a, unsigned char *__b, int __c, unsigned char **__d, unsigned char **__e),__dn_comp,(__a,__b,__c,__d,__e))
 #endif /* ... */
 #ifdef __CRT_HAVE_dn_expand
-__CDECLARE(,int,__NOTHROW_NCX,dn_expand,(u_char const *__a, u_char const *__b, u_char const *__c, char *__d, int __e),(__a,__b,__c,__d,__e))
+__CDECLARE(,int,__NOTHROW_NCX,dn_expand,(unsigned char const *__a, unsigned char const *__b, unsigned char const *__c, char *__d, int __e),(__a,__b,__c,__d,__e))
 #elif defined(__CRT_HAVE___dn_expand)
-__CREDIRECT(,int,__NOTHROW_NCX,dn_expand,(u_char const *__a, u_char const *__b, u_char const *__c, char *__d, int __e),__dn_expand,(__a,__b,__c,__d,__e))
+__CREDIRECT(,int,__NOTHROW_NCX,dn_expand,(unsigned char const *__a, unsigned char const *__b, unsigned char const *__c, char *__d, int __e),__dn_expand,(__a,__b,__c,__d,__e))
 #endif /* ... */
 #ifdef __CRT_HAVE_res_randomid
-__CDECLARE(,u_int,__NOTHROW_NCX,res_randomid,(void),())
+__CDECLARE(,unsigned int,__NOTHROW_NCX,res_randomid,(void),())
 #elif defined(__CRT_HAVE___res_randomid)
-__CREDIRECT(,u_int,__NOTHROW_NCX,res_randomid,(void),__res_randomid,())
+__CREDIRECT(,unsigned int,__NOTHROW_NCX,res_randomid,(void),__res_randomid,())
 #endif /* ... */
 #ifdef __CRT_HAVE_res_nameinquery
-__CDECLARE(,int,__NOTHROW_NCX,res_nameinquery,(char const *__a, int __b, int __c, u_char const *__d, u_char const *__e),(__a,__b,__c,__d,__e))
+__CDECLARE(,int,__NOTHROW_NCX,res_nameinquery,(char const *__a, int __b, int __c, unsigned char const *__d, unsigned char const *__e),(__a,__b,__c,__d,__e))
 #elif defined(__CRT_HAVE___res_nameinquery)
-__CREDIRECT(,int,__NOTHROW_NCX,res_nameinquery,(char const *__a, int __b, int __c, u_char const *__d, u_char const *__e),__res_nameinquery,(__a,__b,__c,__d,__e))
+__CREDIRECT(,int,__NOTHROW_NCX,res_nameinquery,(char const *__a, int __b, int __c, unsigned char const *__d, unsigned char const *__e),__res_nameinquery,(__a,__b,__c,__d,__e))
 #endif /* ... */
 #ifdef __CRT_HAVE_res_queriesmatch
-__CDECLARE(,int,__NOTHROW_NCX,res_queriesmatch,(u_char const *__a, u_char const *__b, u_char const *__c, u_char const *__d),(__a,__b,__c,__d))
+__CDECLARE(,int,__NOTHROW_NCX,res_queriesmatch,(unsigned char const *__a, unsigned char const *__b, unsigned char const *__c, unsigned char const *__d),(__a,__b,__c,__d))
 #elif defined(__CRT_HAVE___res_queriesmatch)
-__CREDIRECT(,int,__NOTHROW_NCX,res_queriesmatch,(u_char const *__a, u_char const *__b, u_char const *__c, u_char const *__d),__res_queriesmatch,(__a,__b,__c,__d))
+__CREDIRECT(,int,__NOTHROW_NCX,res_queriesmatch,(unsigned char const *__a, unsigned char const *__b, unsigned char const *__c, unsigned char const *__d),__res_queriesmatch,(__a,__b,__c,__d))
 #endif /* ... */
 #ifdef __CRT_HAVE_p_section
 __CDECLARE(,char const *,__NOTHROW_NCX,p_section,(int __a, int __b),(__a,__b))
@@ -431,14 +541,14 @@ __CDECLARE(,int,__NOTHROW_NCX,res_nisourserver,(res_state __a, struct sockaddr_i
 __CREDIRECT(,int,__NOTHROW_NCX,res_nisourserver,(res_state __a, struct sockaddr_in const *__b),__res_nisourserver,(__a,__b))
 #endif /* ... */
 #ifdef __CRT_HAVE_fp_resstat
-__CDECLARE_VOID(,__NOTHROW_NCX,fp_resstat,(res_state __a, FILE *__b),(__a,__b))
+__CDECLARE_VOID(,__NOTHROW_NCX,fp_resstat,(res_state __a, __FILE *__b),(__a,__b))
 #elif defined(__CRT_HAVE___fp_resstat)
-__CREDIRECT_VOID(,__NOTHROW_NCX,fp_resstat,(res_state __a, FILE *__b),__fp_resstat,(__a,__b))
+__CREDIRECT_VOID(,__NOTHROW_NCX,fp_resstat,(res_state __a, __FILE *__b),__fp_resstat,(__a,__b))
 #endif /* ... */
 #ifdef __CRT_HAVE_res_npquery
-__CDECLARE_VOID(,__NOTHROW_NCX,res_npquery,(res_state __a, u_char const *__b, int __c, FILE *__d),(__a,__b,__c,__d))
+__CDECLARE_VOID(,__NOTHROW_NCX,res_npquery,(res_state __a, unsigned char const *__b, int __c, __FILE *__d),(__a,__b,__c,__d))
 #elif defined(__CRT_HAVE___res_npquery)
-__CREDIRECT_VOID(,__NOTHROW_NCX,res_npquery,(res_state __a, u_char const *__b, int __c, FILE *__d),__res_npquery,(__a,__b,__c,__d))
+__CREDIRECT_VOID(,__NOTHROW_NCX,res_npquery,(res_state __a, unsigned char const *__b, int __c, __FILE *__d),__res_npquery,(__a,__b,__c,__d))
 #endif /* ... */
 #ifdef __CRT_HAVE_res_hostalias
 __CDECLARE(,char const *,__NOTHROW_NCX,res_hostalias,(res_state __a, char const *__b, char *__c, size_t __d),(__a,__b,__c,__d))
@@ -446,29 +556,29 @@ __CDECLARE(,char const *,__NOTHROW_NCX,res_hostalias,(res_state __a, char const 
 __CREDIRECT(,char const *,__NOTHROW_NCX,res_hostalias,(res_state __a, char const *__b, char *__c, size_t __d),__res_hostalias,(__a,__b,__c,__d))
 #endif /* ... */
 #ifdef __CRT_HAVE_res_nquery
-__CDECLARE(,int,__NOTHROW_NCX,res_nquery,(res_state __a, char const *__b, int __c, int __d, u_char *__e, int __f),(__a,__b,__c,__d,__e,__f))
+__CDECLARE(,int,__NOTHROW_NCX,res_nquery,(res_state __a, char const *__b, int __c, int __d, unsigned char *__e, int __f),(__a,__b,__c,__d,__e,__f))
 #elif defined(__CRT_HAVE___res_nquery)
-__CREDIRECT(,int,__NOTHROW_NCX,res_nquery,(res_state __a, char const *__b, int __c, int __d, u_char *__e, int __f),__res_nquery,(__a,__b,__c,__d,__e,__f))
+__CREDIRECT(,int,__NOTHROW_NCX,res_nquery,(res_state __a, char const *__b, int __c, int __d, unsigned char *__e, int __f),__res_nquery,(__a,__b,__c,__d,__e,__f))
 #endif /* ... */
 #ifdef __CRT_HAVE_res_nsearch
-__CDECLARE(,int,__NOTHROW_NCX,res_nsearch,(res_state __a, char const *__b, int __c, int __d, u_char *__e, int __f),(__a,__b,__c,__d,__e,__f))
+__CDECLARE(,int,__NOTHROW_NCX,res_nsearch,(res_state __a, char const *__b, int __c, int __d, unsigned char *__e, int __f),(__a,__b,__c,__d,__e,__f))
 #elif defined(__CRT_HAVE___res_nsearch)
-__CREDIRECT(,int,__NOTHROW_NCX,res_nsearch,(res_state __a, char const *__b, int __c, int __d, u_char *__e, int __f),__res_nsearch,(__a,__b,__c,__d,__e,__f))
+__CREDIRECT(,int,__NOTHROW_NCX,res_nsearch,(res_state __a, char const *__b, int __c, int __d, unsigned char *__e, int __f),__res_nsearch,(__a,__b,__c,__d,__e,__f))
 #endif /* ... */
 #ifdef __CRT_HAVE_res_nquerydomain
-__CDECLARE(,int,__NOTHROW_NCX,res_nquerydomain,(res_state __a, char const *__b, char const *__c, int __d, int __e, u_char *__f, int __g),(__a,__b,__c,__d,__e,__f,__g))
+__CDECLARE(,int,__NOTHROW_NCX,res_nquerydomain,(res_state __a, char const *__b, char const *__c, int __d, int __e, unsigned char *__f, int __g),(__a,__b,__c,__d,__e,__f,__g))
 #elif defined(__CRT_HAVE___res_nquerydomain)
-__CREDIRECT(,int,__NOTHROW_NCX,res_nquerydomain,(res_state __a, char const *__b, char const *__c, int __d, int __e, u_char *__f, int __g),__res_nquerydomain,(__a,__b,__c,__d,__e,__f,__g))
+__CREDIRECT(,int,__NOTHROW_NCX,res_nquerydomain,(res_state __a, char const *__b, char const *__c, int __d, int __e, unsigned char *__f, int __g),__res_nquerydomain,(__a,__b,__c,__d,__e,__f,__g))
 #endif /* ... */
 #ifdef __CRT_HAVE_res_nmkquery
-__CDECLARE(,int,__NOTHROW_NCX,res_nmkquery,(res_state __a, int __b, char const *__c, int __d, int __e, u_char const *__f, int __g, u_char const *__h, u_char *__i, int __j),(__a,__b,__c,__d,__e,__f,__g,__h,__i,__j))
+__CDECLARE(,int,__NOTHROW_NCX,res_nmkquery,(res_state __a, int __b, char const *__c, int __d, int __e, unsigned char const *__f, int __g, unsigned char const *__h, unsigned char *__i, int __j),(__a,__b,__c,__d,__e,__f,__g,__h,__i,__j))
 #elif defined(__CRT_HAVE___res_nmkquery)
-__CREDIRECT(,int,__NOTHROW_NCX,res_nmkquery,(res_state __a, int __b, char const *__c, int __d, int __e, u_char const *__f, int __g, u_char const *__h, u_char *__i, int __j),__res_nmkquery,(__a,__b,__c,__d,__e,__f,__g,__h,__i,__j))
+__CREDIRECT(,int,__NOTHROW_NCX,res_nmkquery,(res_state __a, int __b, char const *__c, int __d, int __e, unsigned char const *__f, int __g, unsigned char const *__h, unsigned char *__i, int __j),__res_nmkquery,(__a,__b,__c,__d,__e,__f,__g,__h,__i,__j))
 #endif /* ... */
 #ifdef __CRT_HAVE_res_nsend
-__CDECLARE(,int,__NOTHROW_NCX,res_nsend,(res_state __a, u_char const *__b, int __c, u_char *__d, int __e),(__a,__b,__c,__d,__e))
+__CDECLARE(,int,__NOTHROW_NCX,res_nsend,(res_state __a, unsigned char const *__b, int __c, unsigned char *__d, int __e),(__a,__b,__c,__d,__e))
 #elif defined(__CRT_HAVE___res_nsend)
-__CREDIRECT(,int,__NOTHROW_NCX,res_nsend,(res_state __a, u_char const *__b, int __c, u_char *__d, int __e),__res_nsend,(__a,__b,__c,__d,__e))
+__CREDIRECT(,int,__NOTHROW_NCX,res_nsend,(res_state __a, unsigned char const *__b, int __c, unsigned char *__d, int __e),__res_nsend,(__a,__b,__c,__d,__e))
 #endif /* ... */
 #ifdef __CRT_HAVE_res_nclose
 __CDECLARE_VOID(,__NOTHROW_NCX,res_nclose,(res_state __a),(__a))

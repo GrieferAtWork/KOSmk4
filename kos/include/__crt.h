@@ -87,7 +87,6 @@
 #ifdef __CRT_KOS_PRIMARY
 #ifndef __BUILDING_LIBC
 #ifdef __CRT_KOS_KERNEL
-#define __NO_STDSTREAMS
 #include <crt-features/crt-kos-kernel.h>
 #if defined(CONFIG_NO_ASSERT_RESTARTABLE) || defined(CONFIG_NO_DEBUGGER)
 #undef __CRT_HAVE___acheck
@@ -105,8 +104,6 @@
 #include <crt-features/crt-dos.h>
 #elif defined(__CRT_GENERIC)
 #include <crt-features/generic.h>
-#elif defined(__CRT_FREESTANDING)
-#define __NO_STDSTREAMS
 #endif /* ... */
 
 

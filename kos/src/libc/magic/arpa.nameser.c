@@ -107,25 +107,29 @@ typedef enum __ns_sect {
 /* ??? */
 #ifdef __CC__
 typedef struct __ns_msg {
-	u_char const *_msg;
-	u_char const *_eom;
-	u_int16_t     _id;
-	u_int16_t     _flags;
-	u_int16_t     _counts[ns_s_max];
-	u_char const *_sections[ns_s_max];
-	ns_sect       _sect;
-	int           _rrnum;
-	u_char const *_msg_ptr;
+	__u_char const *_msg;
+	__u_char const *_eom;
+	__uint16_t      _id;
+	__uint16_t      _flags;
+	__uint16_t      _counts[ns_s_max];
+	__u_char const *_sections[ns_s_max];
+	ns_sect         _sect;
+	int             _rrnum;
+	__u_char const *_msg_ptr;
 } ns_msg;
 #endif /* __CC__ */
 
 /* ??? */
 #ifdef __CC__
+}%[push_macro @undef { mask, shift }]%{
 struct _ns_flagdata {
 	int mask;
 	int shift;
 };
-extern struct _ns_flagdata const _ns_flagdata[];
+}%[pop_macro]%{
+#ifdef __CRT_HAVE__ns_flagdata
+__LIBC struct _ns_flagdata const _ns_flagdata[];
+#endif /* !__CRT_HAVE__ns_flagdata */
 #endif /* __CC__ */
 
 /* ??? */
@@ -137,14 +141,16 @@ extern struct _ns_flagdata const _ns_flagdata[];
 
 /* ??? */
 #ifdef __CC__
+}%[push_macro @undef { name, type, rr_class, ttl, rdlength, rdata }]%{
 typedef struct __ns_rr {
-	char          name[NS_MAXDNAME];
-	u_int16_t     type;
-	u_int16_t     rr_class;
-	u_int32_t     ttl;
-	u_int16_t     rdlength;
-	u_char const *rdata;
+	char            name[NS_MAXDNAME];
+	__uint16_t      type;
+	__uint16_t      rr_class;
+	__uint32_t      ttl;
+	__uint16_t      rdlength;
+	__u_char const *rdata;
 } ns_rr;
+}%[pop_macro]%{
 #endif /* __CC__ */
 
 /* ??? */
@@ -313,20 +319,25 @@ typedef enum __ns_update_operation {
 
 #ifdef __CC__
 /* ??? */
+}%[push_macro @undef { name, alg, data, len }]%{
 typedef struct ns_tsig_key {
-	char name[NS_MAXDNAME], alg[NS_MAXDNAME];
+	char           name[NS_MAXDNAME];
+	char           alg[NS_MAXDNAME];
 	unsigned char *data;
-	int len;
+	int            len;
 } ns_tsig_key;
+}%[pop_macro]%{
 
 /* ??? */
+}%[push_macro @undef { counter, key, ctx, sig, siglen }]%{
 typedef struct ns_tcp_tsig_state {
-	int counter;
+	int             counter;
 	struct dst_key *key;
-	void *ctx;
-	unsigned char sig[NS_PACKETSZ];
-	int siglen;
+	void           *ctx;
+	unsigned char   sig[NS_PACKETSZ];
+	int             siglen;
 } ns_tcp_tsig_state;
+}%[pop_macro]%{
 #endif /* __CC__ */
 
 #define NS_TSIG_FUDGE        300
@@ -717,36 +728,36 @@ typedef enum __ns_cert_types {
 /* TODO: Figure out what these functions do and (try to) implement them */
 
 //int ns_msg_getflag(ns_msg a, int b);
-u_int ns_get16(u_char const *a);
-u_long ns_get32(u_char const *a);
-void ns_put16(u_int a, u_char *b);
-void ns_put32(u_long a, u_char *b);
-int ns_initparse(u_char const *a, int b, ns_msg *c);
-int ns_skiprr(u_char const *a, u_char const *b, ns_sect c, int d);
+$u_int ns_get16($u_char const *a);
+$u_long ns_get32($u_char const *a);
+void ns_put16($u_int a, $u_char *b);
+void ns_put32($u_long a, $u_char *b);
+int ns_initparse($u_char const *a, int b, ns_msg *c);
+int ns_skiprr($u_char const *a, $u_char const *b, ns_sect c, int d);
 int ns_parserr(ns_msg *a, ns_sect b, int c, ns_rr *d);
 int ns_sprintrr(ns_msg const *a, ns_rr const *b, char const *c, char const *d, char *e, size_t f);
-int ns_sprintrrf(u_char const *a, size_t, char const *b, ns_class c, ns_type d, u_long e, u_char const *f, size_t g, char const *h, char const *i, char *j, size_t k);
-int ns_format_ttl(u_long a, char *b, size_t c);
-int ns_parse_ttl(char const *a, u_long *b);
+int ns_sprintrrf($u_char const *a, size_t, char const *b, ns_class c, ns_type d, $u_long e, $u_char const *f, size_t g, char const *h, char const *i, char *j, size_t k);
+int ns_format_ttl($u_long a, char *b, size_t c);
+int ns_parse_ttl(char const *a, $u_long *b);
 u_int32_t ns_datetosecs(char const *a, int *b);
-int ns_name_ntol(u_char const *a, u_char *b, size_t c);
-int ns_name_ntop(u_char const *a, char *b, size_t c);
-int ns_name_pton(char const *a, u_char *b, size_t c);
-int ns_name_unpack(u_char const *a, u_char const *b, u_char const *c, u_char *d, size_t e);
-int ns_name_pack(u_char const *a, u_char *b, int c, u_char const **d, u_char const **e);
-int ns_name_uncompress(u_char const *a, u_char const *b, u_char const *c, char *d, size_t e);
-int ns_name_compress(char const *a, u_char *b, size_t c, u_char const **d, u_char const **e);
-int ns_name_skip(u_char const **a, u_char const *b);
-void ns_name_rollback(u_char const *a, u_char const **b, u_char const **c);
-int ns_sign(u_char *a, int *b, int c, int d, void *e, u_char const *f, int g, u_char *h, int *i, time_t j);
-int ns_sign2(u_char *a, int *b, int c, int d, void *e, u_char const *f, int g, u_char *h, int *i, time_t j, u_char **k, u_char **l);
-int ns_sign_tcp(u_char *a, int *b, int c, int d, ns_tcp_tsig_state *e, int f);
-int ns_sign_tcp2(u_char *a, int *b, int c, int d, ns_tcp_tsig_state *e, int f, u_char **g, u_char **h);
-int ns_sign_tcp_init(void *a, u_char const *b, int c, ns_tcp_tsig_state *d);
-u_char *ns_find_tsig(u_char *a, u_char *b);
-int ns_verify(u_char *a, int *b, void *c, u_char const *d, int e, u_char *f, int *g, time_t *h, int i);
-int ns_verify_tcp(u_char *a, int *b, ns_tcp_tsig_state *c, int d);
-int ns_verify_tcp_init(void *a, u_char const *b, int c, ns_tcp_tsig_state *d);
+int ns_name_ntol($u_char const *a, $u_char *b, size_t c);
+int ns_name_ntop($u_char const *a, char *b, size_t c);
+int ns_name_pton(char const *a, $u_char *b, size_t c);
+int ns_name_unpack($u_char const *a, $u_char const *b, $u_char const *c, $u_char *d, size_t e);
+int ns_name_pack($u_char const *a, $u_char *b, int c, $u_char const **d, $u_char const **e);
+int ns_name_uncompress($u_char const *a, $u_char const *b, $u_char const *c, char *d, size_t e);
+int ns_name_compress(char const *a, $u_char *b, size_t c, $u_char const **d, $u_char const **e);
+int ns_name_skip($u_char const **a, $u_char const *b);
+void ns_name_rollback($u_char const *a, $u_char const **b, $u_char const **c);
+int ns_sign($u_char *a, int *b, int c, int d, void *e, $u_char const *f, int g, $u_char *h, int *i, time_t j);
+int ns_sign2($u_char *a, int *b, int c, int d, void *e, $u_char const *f, int g, $u_char *h, int *i, time_t j, $u_char **k, $u_char **l);
+int ns_sign_tcp($u_char *a, int *b, int c, int d, ns_tcp_tsig_state *e, int f);
+int ns_sign_tcp2($u_char *a, int *b, int c, int d, ns_tcp_tsig_state *e, int f, $u_char **g, $u_char **h);
+int ns_sign_tcp_init(void *a, $u_char const *b, int c, ns_tcp_tsig_state *d);
+$u_char *ns_find_tsig($u_char *a, $u_char *b);
+int ns_verify($u_char *a, int *b, void *c, $u_char const *d, int e, $u_char *f, int *g, time_t *h, int i);
+int ns_verify_tcp($u_char *a, int *b, ns_tcp_tsig_state *c, int d);
+int ns_verify_tcp_init(void *a, $u_char const *b, int c, ns_tcp_tsig_state *d);
 int ns_samedomain(char const *a, char const *b);
 int ns_subdomain(char const *a, char const *b);
 int ns_makecanon(char const *a, char *b, size_t c);

@@ -127,7 +127,12 @@ incdir("");
 #include <ansidecl.h>
 #include <ar.h>
 #include <argz.h>
+#include <arpa/ftp.h>
 #include <arpa/inet.h>
+#include <arpa/nameser.h>
+#include <arpa/nameser_compat.h>
+#include <arpa/telnet.h>
+#include <arpa/tftp.h>
 #include <asm/__stdinc.h>
 #include <asm/asmword.h>
 #include <asm/cacheline.h>
@@ -138,6 +143,7 @@ incdir("");
 #include <asm/crt/getpassfd.h>
 #include <asm/crt/glob.h>
 #include <asm/crt/humanize_number.h>
+#include <asm/crt/langinfo.h>
 #include <asm/crt/limits.h>
 #include <asm/crt/locale.h>
 #include <asm/crt/malloc.h>
@@ -696,6 +702,7 @@ incdir("");
 #include <kos/types.h>
 #include <kos/ukern.h>
 #include <kos/unistd.h>
+#include <langinfo.h>
 #include <lastlog.h>
 #include <libansitty/ansitty.h>
 #include <libansitty/api.h>
@@ -1065,6 +1072,7 @@ incdir("");
 #include <re_comp.h>
 #include <readpassphrase.h>
 #include <regex.h>
+#include <resolv.h>
 #include <rpc/netdb.h>
 #include <sal.h>
 #include <sched.h>

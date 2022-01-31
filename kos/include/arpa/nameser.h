@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfef29dfd */
+/* HASH CRC-32:0xde2a1e0e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -108,25 +108,37 @@ typedef enum __ns_sect {
 /* ??? */
 #ifdef __CC__
 typedef struct __ns_msg {
-	u_char const *_msg;
-	u_char const *_eom;
-	u_int16_t     _id;
-	u_int16_t     _flags;
-	u_int16_t     _counts[ns_s_max];
-	u_char const *_sections[ns_s_max];
-	ns_sect       _sect;
-	int           _rrnum;
-	u_char const *_msg_ptr;
+	__u_char const *_msg;
+	__u_char const *_eom;
+	__uint16_t      _id;
+	__uint16_t      _flags;
+	__uint16_t      _counts[ns_s_max];
+	__u_char const *_sections[ns_s_max];
+	ns_sect         _sect;
+	int             _rrnum;
+	__u_char const *_msg_ptr;
 } ns_msg;
 #endif /* __CC__ */
 
 /* ??? */
 #ifdef __CC__
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("mask")
+#pragma push_macro("shift")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef mask
+#undef shift
 struct _ns_flagdata {
 	int mask;
 	int shift;
 };
-extern struct _ns_flagdata const _ns_flagdata[];
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("shift")
+#pragma pop_macro("mask")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#ifdef __CRT_HAVE__ns_flagdata
+__LIBC struct _ns_flagdata const _ns_flagdata[];
+#endif /* !__CRT_HAVE__ns_flagdata */
 #endif /* __CC__ */
 
 /* ??? */
@@ -138,14 +150,36 @@ extern struct _ns_flagdata const _ns_flagdata[];
 
 /* ??? */
 #ifdef __CC__
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("name")
+#pragma push_macro("type")
+#pragma push_macro("rr_class")
+#pragma push_macro("ttl")
+#pragma push_macro("rdlength")
+#pragma push_macro("rdata")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef name
+#undef type
+#undef rr_class
+#undef ttl
+#undef rdlength
+#undef rdata
 typedef struct __ns_rr {
-	char          name[NS_MAXDNAME];
-	u_int16_t     type;
-	u_int16_t     rr_class;
-	u_int32_t     ttl;
-	u_int16_t     rdlength;
-	u_char const *rdata;
+	char            name[NS_MAXDNAME];
+	__uint16_t      type;
+	__uint16_t      rr_class;
+	__uint32_t      ttl;
+	__uint16_t      rdlength;
+	__u_char const *rdata;
 } ns_rr;
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("rdata")
+#pragma pop_macro("rdlength")
+#pragma pop_macro("ttl")
+#pragma pop_macro("rr_class")
+#pragma pop_macro("type")
+#pragma pop_macro("name")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #endif /* __CC__ */
 
 /* ??? */
@@ -314,20 +348,56 @@ typedef enum __ns_update_operation {
 
 #ifdef __CC__
 /* ??? */
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("name")
+#pragma push_macro("alg")
+#pragma push_macro("data")
+#pragma push_macro("len")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef name
+#undef alg
+#undef data
+#undef len
 typedef struct ns_tsig_key {
-	char name[NS_MAXDNAME], alg[NS_MAXDNAME];
+	char           name[NS_MAXDNAME];
+	char           alg[NS_MAXDNAME];
 	unsigned char *data;
-	int len;
+	int            len;
 } ns_tsig_key;
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("len")
+#pragma pop_macro("data")
+#pragma pop_macro("alg")
+#pragma pop_macro("name")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 /* ??? */
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("counter")
+#pragma push_macro("key")
+#pragma push_macro("ctx")
+#pragma push_macro("sig")
+#pragma push_macro("siglen")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef counter
+#undef key
+#undef ctx
+#undef sig
+#undef siglen
 typedef struct ns_tcp_tsig_state {
-	int counter;
+	int             counter;
 	struct dst_key *key;
-	void *ctx;
-	unsigned char sig[NS_PACKETSZ];
-	int siglen;
+	void           *ctx;
+	unsigned char   sig[NS_PACKETSZ];
+	int             siglen;
 } ns_tcp_tsig_state;
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("siglen")
+#pragma pop_macro("sig")
+#pragma pop_macro("ctx")
+#pragma pop_macro("key")
+#pragma pop_macro("counter")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #endif /* __CC__ */
 
 #define NS_TSIG_FUDGE        300
@@ -682,36 +752,36 @@ typedef enum __ns_cert_types {
 
 #ifdef __CC__
 
-__CDECLARE_OPT(,u_int,__NOTHROW_NCX,ns_get16,(u_char const *__a),(__a))
-__CDECLARE_OPT(,u_long,__NOTHROW_NCX,ns_get32,(u_char const *__a),(__a))
-__CDECLARE_VOID_OPT(,__NOTHROW_NCX,ns_put16,(u_int __a, u_char *__b),(__a,__b))
-__CDECLARE_VOID_OPT(,__NOTHROW_NCX,ns_put32,(u_long __a, u_char *__b),(__a,__b))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_initparse,(u_char const *__a, int __b, ns_msg *__c),(__a,__b,__c))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_skiprr,(u_char const *__a, u_char const *__b, ns_sect __c, int __d),(__a,__b,__c,__d))
+__CDECLARE_OPT(,unsigned int,__NOTHROW_NCX,ns_get16,(unsigned char const *__a),(__a))
+__CDECLARE_OPT(,unsigned long,__NOTHROW_NCX,ns_get32,(unsigned char const *__a),(__a))
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,ns_put16,(unsigned int __a, unsigned char *__b),(__a,__b))
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,ns_put32,(unsigned long __a, unsigned char *__b),(__a,__b))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_initparse,(unsigned char const *__a, int __b, ns_msg *__c),(__a,__b,__c))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_skiprr,(unsigned char const *__a, unsigned char const *__b, ns_sect __c, int __d),(__a,__b,__c,__d))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,ns_parserr,(ns_msg *__a, ns_sect __b, int __c, ns_rr *__d),(__a,__b,__c,__d))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,ns_sprintrr,(ns_msg const *__a, ns_rr const *__b, char const *__c, char const *__d, char *__e, size_t __f),(__a,__b,__c,__d,__e,__f))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_sprintrrf,(u_char const *__a, size_t, char const *__b, ns_class __c, ns_type __d, u_long __e, u_char const *__f, size_t __g, char const *__h, char const *__i, char *__j, size_t __k),(__a,,__b,__c,__d,__e,__f,__g,__h,__i,__j,__k))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_format_ttl,(u_long __a, char *__b, size_t __c),(__a,__b,__c))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_parse_ttl,(char const *__a, u_long *__b),(__a,__b))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_sprintrrf,(unsigned char const *__a, size_t, char const *__b, ns_class __c, ns_type __d, unsigned long __e, unsigned char const *__f, size_t __g, char const *__h, char const *__i, char *__j, size_t __k),(__a,,__b,__c,__d,__e,__f,__g,__h,__i,__j,__k))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_format_ttl,(unsigned long __a, char *__b, size_t __c),(__a,__b,__c))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_parse_ttl,(char const *__a, unsigned long *__b),(__a,__b))
 __CDECLARE_OPT(,u_int32_t,__NOTHROW_NCX,ns_datetosecs,(char const *__a, int *__b),(__a,__b))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_name_ntol,(u_char const *__a, u_char *__b, size_t __c),(__a,__b,__c))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_name_ntop,(u_char const *__a, char *__b, size_t __c),(__a,__b,__c))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_name_pton,(char const *__a, u_char *__b, size_t __c),(__a,__b,__c))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_name_unpack,(u_char const *__a, u_char const *__b, u_char const *__c, u_char *__d, size_t __e),(__a,__b,__c,__d,__e))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_name_pack,(u_char const *__a, u_char *__b, int __c, u_char const **__d, u_char const **__e),(__a,__b,__c,__d,__e))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_name_uncompress,(u_char const *__a, u_char const *__b, u_char const *__c, char *__d, size_t __e),(__a,__b,__c,__d,__e))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_name_compress,(char const *__a, u_char *__b, size_t __c, u_char const **__d, u_char const **__e),(__a,__b,__c,__d,__e))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_name_skip,(u_char const **__a, u_char const *__b),(__a,__b))
-__CDECLARE_VOID_OPT(,__NOTHROW_NCX,ns_name_rollback,(u_char const *__a, u_char const **__b, u_char const **__c),(__a,__b,__c))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_sign,(u_char *__a, int *__b, int __c, int __d, void *__e, u_char const *__f, int __g, u_char *__h, int *__i, time_t __j),(__a,__b,__c,__d,__e,__f,__g,__h,__i,__j))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_sign2,(u_char *__a, int *__b, int __c, int __d, void *__e, u_char const *__f, int __g, u_char *__h, int *__i, time_t __j, u_char **__k, u_char **__l),(__a,__b,__c,__d,__e,__f,__g,__h,__i,__j,__k,__l))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_sign_tcp,(u_char *__a, int *__b, int __c, int __d, ns_tcp_tsig_state *__e, int __f),(__a,__b,__c,__d,__e,__f))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_sign_tcp2,(u_char *__a, int *__b, int __c, int __d, ns_tcp_tsig_state *__e, int __f, u_char **__g, u_char **__h),(__a,__b,__c,__d,__e,__f,__g,__h))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_sign_tcp_init,(void *__a, u_char const *__b, int __c, ns_tcp_tsig_state *__d),(__a,__b,__c,__d))
-__CDECLARE_OPT(,u_char *,__NOTHROW_NCX,ns_find_tsig,(u_char *__a, u_char *__b),(__a,__b))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_verify,(u_char *__a, int *__b, void *__c, u_char const *__d, int __e, u_char *__f, int *__g, time_t *__h, int __i),(__a,__b,__c,__d,__e,__f,__g,__h,__i))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_verify_tcp,(u_char *__a, int *__b, ns_tcp_tsig_state *__c, int __d),(__a,__b,__c,__d))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_verify_tcp_init,(void *__a, u_char const *__b, int __c, ns_tcp_tsig_state *__d),(__a,__b,__c,__d))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_name_ntol,(unsigned char const *__a, unsigned char *__b, size_t __c),(__a,__b,__c))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_name_ntop,(unsigned char const *__a, char *__b, size_t __c),(__a,__b,__c))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_name_pton,(char const *__a, unsigned char *__b, size_t __c),(__a,__b,__c))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_name_unpack,(unsigned char const *__a, unsigned char const *__b, unsigned char const *__c, unsigned char *__d, size_t __e),(__a,__b,__c,__d,__e))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_name_pack,(unsigned char const *__a, unsigned char *__b, int __c, unsigned char const **__d, unsigned char const **__e),(__a,__b,__c,__d,__e))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_name_uncompress,(unsigned char const *__a, unsigned char const *__b, unsigned char const *__c, char *__d, size_t __e),(__a,__b,__c,__d,__e))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_name_compress,(char const *__a, unsigned char *__b, size_t __c, unsigned char const **__d, unsigned char const **__e),(__a,__b,__c,__d,__e))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_name_skip,(unsigned char const **__a, unsigned char const *__b),(__a,__b))
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,ns_name_rollback,(unsigned char const *__a, unsigned char const **__b, unsigned char const **__c),(__a,__b,__c))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_sign,(unsigned char *__a, int *__b, int __c, int __d, void *__e, unsigned char const *__f, int __g, unsigned char *__h, int *__i, time_t __j),(__a,__b,__c,__d,__e,__f,__g,__h,__i,__j))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_sign2,(unsigned char *__a, int *__b, int __c, int __d, void *__e, unsigned char const *__f, int __g, unsigned char *__h, int *__i, time_t __j, unsigned char **__k, unsigned char **__l),(__a,__b,__c,__d,__e,__f,__g,__h,__i,__j,__k,__l))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_sign_tcp,(unsigned char *__a, int *__b, int __c, int __d, ns_tcp_tsig_state *__e, int __f),(__a,__b,__c,__d,__e,__f))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_sign_tcp2,(unsigned char *__a, int *__b, int __c, int __d, ns_tcp_tsig_state *__e, int __f, unsigned char **__g, unsigned char **__h),(__a,__b,__c,__d,__e,__f,__g,__h))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_sign_tcp_init,(void *__a, unsigned char const *__b, int __c, ns_tcp_tsig_state *__d),(__a,__b,__c,__d))
+__CDECLARE_OPT(,unsigned char *,__NOTHROW_NCX,ns_find_tsig,(unsigned char *__a, unsigned char *__b),(__a,__b))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_verify,(unsigned char *__a, int *__b, void *__c, unsigned char const *__d, int __e, unsigned char *__f, int *__g, time_t *__h, int __i),(__a,__b,__c,__d,__e,__f,__g,__h,__i))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_verify_tcp,(unsigned char *__a, int *__b, ns_tcp_tsig_state *__c, int __d),(__a,__b,__c,__d))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_verify_tcp_init,(void *__a, unsigned char const *__b, int __c, ns_tcp_tsig_state *__d),(__a,__b,__c,__d))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,ns_samedomain,(char const *__a, char const *__b),(__a,__b))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,ns_subdomain,(char const *__a, char const *__b),(__a,__b))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,ns_makecanon,(char const *__a, char *__b, size_t __c),(__a,__b,__c))

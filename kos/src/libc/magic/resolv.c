@@ -136,32 +136,40 @@ typedef enum {
 } res_sendhookact;
 typedef res_sendhookact
 (__LIBKCALL *res_send_qhook)(struct sockaddr_in *const *__ns,
-                             u_char const **__query, int *__querylen,
-                             u_char *__ans, int __anssiz, int *__resplen);
+                             __u_char const **__query, int *__querylen,
+                             __u_char *__ans, int __anssiz, int *__resplen);
 typedef res_sendhookact
 (__LIBKCALL *res_send_rhook)(struct sockaddr_in const *__ns,
-                             u_char const *__query, int __querylen,
-                             u_char *__ans, int __anssiz, int *__resplen);
+                             __u_char const *__query, int __querylen,
+                             __u_char *__ans, int __anssiz, int *__resplen);
 
+}%[push_macro @undef {
+	name, type, rr_class, ttl, rdlength, rdata,
+	retrans, retry, options, nscount, nsaddr_list,
+	id, dnsrch, defdname, pfcode, ndots, nsort,
+	ipv6_unavail, unused, addr, mask, sort_list,
+	qhook, rhook, res_h_errno, pad, nsmap, nssocks,
+	nscount6, nsinit, nsaddrs
+}]%{
 typedef struct __res_state {
 	int                retrans;               /* ??? */
 	int                retry;                 /* ??? */
-	u_long             options;               /* ??? */
+	__u_long           options;               /* ??? */
 	int                nscount;               /* ??? */
 	struct sockaddr_in nsaddr_list[MAXNS];    /* ??? */
 #define nsaddr         nsaddr_list[0]         /* ??? */
-	u_short            id;                    /* ??? */
+	__u_short          id;                    /* ??? */
 	__byte_t         __rs_pad1[2];            /* ... */
 	char              *dnsrch[MAXDNSRCH + 1]; /* ??? */
 	char               defdname[256];         /* ??? */
-	u_long             pfcode;                /* ??? */
+	__u_long           pfcode;                /* ??? */
 	unsigned int       ndots : 4;             /* ??? */
 	unsigned int       nsort : 4;             /* ??? */
 	unsigned int       ipv6_unavail : 1;      /* ??? */
 	unsigned int       unused : 23;           /* ??? */
 	struct {
 		struct in_addr addr;                  /* ??? */
-		u_int32_t      mask;                  /* ??? */
+		__uint32_t     mask;                  /* ??? */
 	} sort_list[MAXRESOLVSORT];               /* ??? */
 #if __SIZEOF_POINTER__ >= 8
 	__byte_t         __rs_pad2[4];            /* ... */
@@ -170,30 +178,33 @@ typedef struct __res_state {
 	res_send_rhook     rhook;                 /* ??? */
 	int                res_h_errno;           /* ??? */
 	int               _vcsock;                /* ??? */
-	u_int             _flags;                 /* ??? */
+	__u_int           _flags;                 /* ??? */
 #if __SIZEOF_POINTER__ >= 8
 	__byte_t         __rs_pad3[4];            /* ... */
 #endif /* __SIZEOF_POINTER__ >= 8 */
 	union {
 		char           pad[52]; /* ... */
 		struct {
-			u_int16_t            nscount;        /* ??? */
-			u_int16_t            nsmap[MAXNS];   /* ??? */
+			__uint16_t           nscount;        /* ??? */
+			__uint16_t           nsmap[MAXNS];   /* ??? */
 			int                  nssocks[MAXNS]; /* ??? */
-			u_int16_t            nscount6;       /* ??? */
-			u_int16_t            nsinit;         /* ??? */
+			__uint16_t           nscount6;       /* ??? */
+			__uint16_t           nsinit;         /* ??? */
 			struct sockaddr_in6 *nsaddrs[MAXNS]; /* ??? */
 			__UINT32_TYPE__     _initstamp[2];   /* ??? */
 		} _ext;
 	} _u;
 } *res_state;
+}%[pop_macro]%{
 #endif /* !__res_state_defined */
 
+}%[push_macro @undef { number, name, humanname }]%{
 struct res_sym {
 	int   number;    /* ??? */
 	char *name;      /* ??? */
 	char *humanname; /* ??? */
 };
+}%[pop_macro]%{
 
 }
 
@@ -213,18 +224,18 @@ struct res_sym {
 
 %
 %#ifndef __BIND_NOSTATIC
-[[export_alias("__fp_nquery")]] void fp_nquery(u_char const *a, int b, FILE *c);
-[[export_alias("__fp_query")]] void fp_query(u_char const *a, FILE *b);
+[[export_alias("__fp_nquery")]] void fp_nquery($u_char const *a, int b, $FILE *c);
+[[export_alias("__fp_query")]] void fp_query($u_char const *a, $FILE *b);
 [[export_alias("__hostalias")]] char const *hostalias(char const *a);
-[[export_alias("__p_query")]] void p_query(u_char const *a);
+[[export_alias("__p_query")]] void p_query($u_char const *a);
 [[export_alias("__res_close")]] void res_close(void);
 [[export_alias("__res_init")]] int res_init(void);
 [[export_alias("__res_isourserver")]] int res_isourserver(struct sockaddr_in const *a);
-[[export_alias("__res_mkquery")]] int res_mkquery(int a, char const *b, int c, int d, u_char const *e, int f, u_char const *g, u_char *h, int i);
-[[export_alias("__res_query")]] int res_query(char const *a, int b, int c, u_char *d, int e);
-[[export_alias("__res_querydomain")]] int res_querydomain(char const *a, char const *b, int c, int d, u_char *e, int f);
-[[export_alias("__res_search")]] int res_search(char const *a, int b, int c, u_char *d, int e);
-[[export_alias("__res_send")]] int res_send(u_char const *a, int b, u_char *c, int d);
+[[export_alias("__res_mkquery")]] int res_mkquery(int a, char const *b, int c, int d, $u_char const *e, int f, $u_char const *g, $u_char *h, int i);
+[[export_alias("__res_query")]] int res_query(char const *a, int b, int c, $u_char *d, int e);
+[[export_alias("__res_querydomain")]] int res_querydomain(char const *a, char const *b, int c, int d, $u_char *e, int f);
+[[export_alias("__res_search")]] int res_search(char const *a, int b, int c, $u_char *d, int e);
+[[export_alias("__res_send")]] int res_send($u_char const *a, int b, $u_char *c, int d);
 %#endif /* !__BIND_NOSTATIC */
 
 [[export_alias("__res_hnok")]] int res_hnok(char const *a);
@@ -234,40 +245,40 @@ struct res_sym {
 [[export_alias("__sym_ston")]] int sym_ston(struct res_sym const *a, char const *b, int *c);
 [[export_alias("__sym_ntos")]] char const *sym_ntos(struct res_sym const *a, int b, int *c);
 [[export_alias("__sym_ntop")]] char const *sym_ntop(struct res_sym const *a, int b, int *c);
-[[export_alias("__b64_ntop")]] int b64_ntop(u_char const *a, size_t b, char *c, size_t d);
-[[export_alias("__b64_pton")]] int b64_pton(char const *a, u_char *b, size_t c);
-[[export_alias("__loc_aton")]] int loc_aton(char const *a, u_char *b);
-[[export_alias("__loc_ntoa")]] char const *loc_ntoa(u_char const *a, char *b);
-[[export_alias("__dn_skipname")]] int dn_skipname(u_char const *a, u_char const *b);
-[[export_alias("__putlong")]] void putlong(u_int32_t a, u_char *b);
-[[export_alias("__putshort")]] void putshort(u_int16_t a, u_char *b);
+[[export_alias("__b64_ntop")]] int b64_ntop($u_char const *a, size_t b, char *c, size_t d);
+[[export_alias("__b64_pton")]] int b64_pton(char const *a, $u_char *b, size_t c);
+[[export_alias("__loc_aton")]] int loc_aton(char const *a, $u_char *b);
+[[export_alias("__loc_ntoa")]] char const *loc_ntoa($u_char const *a, char *b);
+[[export_alias("__dn_skipname")]] int dn_skipname($u_char const *a, $u_char const *b);
+[[export_alias("__putlong")]] void putlong($u_int32_t a, $u_char *b);
+[[export_alias("__putshort")]] void putshort($u_int16_t a, $u_char *b);
 [[export_alias("__p_class")]] char const *p_class(int a);
-[[export_alias("__p_time")]] char const *p_time(u_int32_t a);
+[[export_alias("__p_time")]] char const *p_time($u_int32_t a);
 [[export_alias("__p_type")]] char const *p_type(int a);
 [[export_alias("__p_rcode")]] char const *p_rcode(int a);
-[[export_alias("__p_cdnname")]] u_char const *p_cdnname(u_char const *a, u_char const *b, int c, FILE *d);
-[[export_alias("__p_cdname")]] u_char const *p_cdname(u_char const *a, u_char const *b, FILE *c);
-[[export_alias("__p_fqnname")]] u_char const *p_fqnname(u_char const *a, u_char const *b, int c, char *d, int e);
-[[export_alias("__p_fqname")]] u_char const *p_fqname(u_char const *a, u_char const *b, FILE *c);
-[[export_alias("__p_option")]] char const *p_option(u_long a);
-[[export_alias("__p_secstodate")]] char *p_secstodate(u_long a);
+[[export_alias("__p_cdnname")]] $u_char const *p_cdnname($u_char const *a, $u_char const *b, int c, $FILE *d);
+[[export_alias("__p_cdname")]] $u_char const *p_cdname($u_char const *a, $u_char const *b, $FILE *c);
+[[export_alias("__p_fqnname")]] $u_char const *p_fqnname($u_char const *a, $u_char const *b, int c, char *d, int e);
+[[export_alias("__p_fqname")]] $u_char const *p_fqname($u_char const *a, $u_char const *b, $FILE *c);
+[[export_alias("__p_option")]] char const *p_option($u_long a);
+[[export_alias("__p_secstodate")]] char *p_secstodate($u_long a);
 [[export_alias("__dn_count_labels")]] int dn_count_labels(char const *a);
-[[export_alias("__dn_comp")]] int dn_comp(char const *a, u_char *b, int c, u_char **d, u_char **e);
-[[export_alias("__dn_expand")]] int dn_expand(u_char const *a, u_char const *b, u_char const *c, char *d, int e);
-[[export_alias("__res_randomid")]] u_int res_randomid(void);
-[[export_alias("__res_nameinquery")]] int res_nameinquery(char const *a, int b, int c, u_char const *d, u_char const *e);
-[[export_alias("__res_queriesmatch")]] int res_queriesmatch(u_char const *a, u_char const *b, u_char const *c, u_char const *d);
+[[export_alias("__dn_comp")]] int dn_comp(char const *a, $u_char *b, int c, $u_char **d, $u_char **e);
+[[export_alias("__dn_expand")]] int dn_expand($u_char const *a, $u_char const *b, $u_char const *c, char *d, int e);
+[[export_alias("__res_randomid")]] $u_int res_randomid(void);
+[[export_alias("__res_nameinquery")]] int res_nameinquery(char const *a, int b, int c, $u_char const *d, $u_char const *e);
+[[export_alias("__res_queriesmatch")]] int res_queriesmatch($u_char const *a, $u_char const *b, $u_char const *c, $u_char const *d);
 [[export_alias("__p_section")]] char const *p_section(int a, int b);
 [[export_alias("__res_ninit")]] int res_ninit(res_state a);
 [[export_alias("__res_nisourserver")]] int res_nisourserver(res_state a, struct sockaddr_in const *b);
-[[export_alias("__fp_resstat")]] void fp_resstat(res_state a, FILE *b);
-[[export_alias("__res_npquery")]] void res_npquery(res_state a, u_char const *b, int c, FILE *d);
+[[export_alias("__fp_resstat")]] void fp_resstat(res_state a, $FILE *b);
+[[export_alias("__res_npquery")]] void res_npquery(res_state a, $u_char const *b, int c, $FILE *d);
 [[export_alias("__res_hostalias")]] char const *res_hostalias(res_state a, char const *b, char *c, size_t d);
-[[export_alias("__res_nquery")]] int res_nquery(res_state a, char const *b, int c, int d, u_char *e, int f);
-[[export_alias("__res_nsearch")]] int res_nsearch(res_state a, char const *b, int c, int d, u_char *e, int f);
-[[export_alias("__res_nquerydomain")]] int res_nquerydomain(res_state a, char const *b, char const *c, int d, int e, u_char *f, int g);
-[[export_alias("__res_nmkquery")]] int res_nmkquery(res_state a, int b, char const *c, int d, int e, u_char const *f, int g, u_char const *h, u_char *i, int j);
-[[export_alias("__res_nsend")]] int res_nsend(res_state a, u_char const *b, int c, u_char *d, int e);
+[[export_alias("__res_nquery")]] int res_nquery(res_state a, char const *b, int c, int d, $u_char *e, int f);
+[[export_alias("__res_nsearch")]] int res_nsearch(res_state a, char const *b, int c, int d, $u_char *e, int f);
+[[export_alias("__res_nquerydomain")]] int res_nquerydomain(res_state a, char const *b, char const *c, int d, int e, $u_char *f, int g);
+[[export_alias("__res_nmkquery")]] int res_nmkquery(res_state a, int b, char const *c, int d, int e, $u_char const *f, int g, $u_char const *h, $u_char *i, int j);
+[[export_alias("__res_nsend")]] int res_nsend(res_state a, $u_char const *b, int c, $u_char *d, int e);
 [[export_alias("__res_nclose")]] void res_nclose(res_state a);
 
 

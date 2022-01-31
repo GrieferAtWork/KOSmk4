@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3e76801 */
+/* HASH CRC-32:0x45564220 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -233,10 +233,6 @@ __NAMESPACE_STD_USING(snprintf)
 #include <sys/reent.h>
 #endif /* __CRT_CYG_PRIMARY */
 
-#ifdef __CRT_DOS_PRIMARY
-#include <bits/crt/io-file.h>
-#endif /* __CRT_DOS_PRIMARY */
-
 __SYSDECL_BEGIN
 
 /* The possibilities for the third argument to `setvbuf()'. */
@@ -430,45 +426,116 @@ __NAMESPACE_STD_USING(FILE)
 #endif /* !__FILE_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
-#ifndef __NO_STDSTREAMS
-/* Standard streams. */
-#ifndef __stdstreams_defined
-#define __stdstreams_defined
-#undef stdin
-#undef stdout
-#undef stderr
-#ifdef __CRT_CYG_PRIMARY
-#   define stdin  (__CYG_REENT->__cyg_stdin)
-#   define stdout (__CYG_REENT->__cyg_stdout)
-#   define stderr (__CYG_REENT->__cyg_stderr)
-#elif defined(__CRT_DOS_PRIMARY)
-#ifdef __USE_DOS_LINKOBJECTS
-#ifndef ___iob_defined
+
+/************************************************************************/
+/* STDIO standard streams (stdin, stdout, stderr)                       */
+/************************************************************************/
+
+/* Define symbols needed for stdio FILE access */
+#if defined(__CYG_REENT)
+/* nothing */
+#elif !defined(___iob_defined) && defined(__CRT_HAVE__iob)
+#include <bits/crt/io-file.h>
 #define ___iob_defined
-__LIBC FILE _iob[];
-#endif /* !___iob_defined */
-#   define stdin    (_iob + 0)
-#   define stdout   (_iob + 1)
-#   define stderr   (_iob + 2)
-#else /* __USE_DOS_LINKOBJECTS */
+__LIBC __FILE _iob[];
 #ifndef ____iob_func_defined
 #define ____iob_func_defined
-__LIBC __ATTR_WUNUSED __ATTR_RETNONNULL FILE *__NOTHROW(__LIBDCALL __iob_func)(void);
+#define __iob_func() (_iob)
 #endif /* !____iob_func_defined */
-#   define stdin    (__iob_func() + 0)
-#   define stdout   (__iob_func() + 1)
-#   define stderr   (__iob_func() + 2)
-#endif /* !__USE_DOS_LINKOBJECTS */
-#else /* __CRT_... */
+#elif !defined(____p__iob_defined) && defined(__CRT_HAVE___p__iob)
+#include <bits/crt/io-file.h>
+#define ____p__iob_defined
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__FILE *,__NOTHROW,__p__iob,(void),())
+#ifndef ____iob_func_defined
+#define ____iob_func_defined
+#define __iob_func __p__iob
+#endif /* !____iob_func_defined */
+#elif !defined(____iob_func_defined) && defined(__CRT_HAVE___iob_func)
+#include <bits/crt/io-file.h>
+#define ____iob_func_defined
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__FILE *,__NOTHROW,__iob_func,(void),())
+#endif /* ... */
+
+
+/* ===== stdin ============================== */
+#ifndef stdin
+#ifdef __LOCAL_stdin
+#define stdin __LOCAL_stdin
+#elif defined(__CRT_HAVE_stdin)
 __LIBC __FILE *stdin;
-#define stdin  stdin
+#define stdin stdin
+#elif defined(__CYG_REENT)
+#define stdin (__CYG_REENT->__cyg_stdin)
+#elif defined(____iob_func_defined)
+#define stdin (__iob_func() + 0)
+#elif defined(__CRT_HAVE__IO_stdin_)
+#ifndef _IO_stdin_
+#define _IO_stdin_ _IO_stdin_
+__LIBC __FILE _IO_stdin_;
+#endif /* !_IO_stdin_ */
+#define stdin (&_IO_stdin_)
+#elif defined(__CRT_HAVE__IO_2_1_stdin_)
+#ifndef _IO_2_1_stdin_
+#define _IO_2_1_stdin_ _IO_2_1_stdin_
+__LIBC __FILE _IO_2_1_stdin_;
+#endif /* !_IO_2_1_stdin_ */
+#define stdin (&_IO_2_1_stdin_)
+#endif /* ... */
+#endif /* !stdin */
+
+
+/* ===== stdout ============================= */
+#ifndef stdout
+#ifdef __LOCAL_stdout
+#define stdout __LOCAL_stdout
+#elif defined(__CRT_HAVE_stdout)
 __LIBC __FILE *stdout;
 #define stdout stdout
+#elif defined(__CYG_REENT)
+#define stdout (__CYG_REENT->__cyg_stdout)
+#elif defined(____iob_func_defined)
+#define stdout (__iob_func() + 1)
+#elif defined(__CRT_HAVE__IO_stdout_)
+#ifndef _IO_stdout_
+#define _IO_stdout_ _IO_stdout_
+__LIBC __FILE _IO_stdout_;
+#endif /* !_IO_stdout_ */
+#define stdout (&_IO_stdout_)
+#elif defined(__CRT_HAVE__IO_2_1_stdout_)
+#ifndef _IO_2_1_stdout_
+#define _IO_2_1_stdout_ _IO_2_1_stdout_
+__LIBC __FILE _IO_2_1_stdout_;
+#endif /* !_IO_2_1_stdout_ */
+#define stdout (&_IO_2_1_stdout_)
+#endif /* ... */
+#endif /* !stdout */
+
+
+/* ===== stderr ============================= */
+#ifndef stderr
+#ifdef __LOCAL_stderr
+#define stderr __LOCAL_stderr
+#elif defined(__CRT_HAVE_stderr)
 __LIBC __FILE *stderr;
 #define stderr stderr
-#endif /* !__CRT_... */
-#endif /* !__stdstreams_defined */
-#endif /* !__NO_STDSTREAMS */
+#elif defined(__CYG_REENT)
+#define stderr (__CYG_REENT->__cyg_stderr)
+#elif defined(____iob_func_defined)
+#define stderr (__iob_func() + 2)
+#elif defined(__CRT_HAVE__IO_stderr_)
+#ifndef _IO_stderr_
+#define _IO_stderr_ _IO_stderr_
+__LIBC __FILE _IO_stderr_;
+#endif /* !_IO_stderr_ */
+#define stderr (&_IO_stderr_)
+#elif defined(__CRT_HAVE__IO_2_1_stderr_)
+#ifndef _IO_2_1_stderr_
+#define _IO_2_1_stderr_ _IO_2_1_stderr_
+__LIBC __FILE _IO_2_1_stderr_;
+#endif /* !_IO_2_1_stderr_ */
+#define stderr (&_IO_2_1_stderr_)
+#endif /* ... */
+#endif /* !stderr */
 
 
 __NAMESPACE_STD_BEGIN
