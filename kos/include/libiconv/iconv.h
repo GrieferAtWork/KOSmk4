@@ -474,7 +474,7 @@ __NOTHROW_NCX(iconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict self
 }
 #endif /* LIBICONV_WANT_PROTOTYPES */
 
-/* Check  if the given encoder is in its default (zero) shift state. If it isn't,
+/* Check  if the given decoder is in its default (zero) shift state. If it isn't,
  * then that must mean that it's still waiting for more input data to arrive, and
  * that  you should either feed it said data,  or deal with the fact that there's
  * something missing in your input.
@@ -562,6 +562,24 @@ typedef __ATTR_NONNULL((1)) __ssize_t
 #ifdef LIBICONV_WANT_PROTOTYPES
 LIBICONV_DECL __ATTR_NONNULL((1)) __ssize_t
 __NOTHROW_NCX(LIBICONV_CC iconv_encode_flush)(struct iconv_encode *__restrict self);
+#endif /* LIBICONV_WANT_PROTOTYPES */
+
+/* Check if UTF-8 input taken by the given encoder is in its default (zero) shift
+ * state. If it isn't, then that must mean that it's still waiting for more UTF-8
+ * data to arrive, and that you should either feed it said data, or deal with the
+ * fact that there's something missing in your input.
+ * WARNING: This function DOESN'T work when  the given encoder is targeting  UTF-8.
+ *          This is because special optimizations are performed when encoding UTF-8
+ *          (since  encoder also always  takes UTF-8 as input).  In this case, this
+ *          function will always return `true';
+ * - s.a. `union iconv_encode_data::ied_utf8'
+ * @return: true:  UTF-8 input is in a zero-shift state.
+ * @return: false: The encoder is still expecting more UTF-8 input. */
+typedef __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+/*__NOTHROW_NCX*/ (LIBICONV_CC *PICONV_ENCODE_ISINPUTSHIFTZERO)(struct iconv_encode const *__restrict self);
+#ifdef LIBICONV_WANT_PROTOTYPES
+LIBICONV_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+__NOTHROW_NCX(LIBICONV_CC iconv_encode_isinputshiftzero)(struct iconv_encode const *__restrict self);
 #endif /* LIBICONV_WANT_PROTOTYPES */
 /************************************************************************/
 

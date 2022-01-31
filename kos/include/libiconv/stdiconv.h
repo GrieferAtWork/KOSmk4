@@ -77,10 +77,8 @@ __NOTHROW_NCX(__LIBCCALL iconv_close)(iconv_t __self);
  *                       filled with data to-be converted.
  * @param: outbytesleft: [1..1][valid_if(inbuf)] # of bytes available in `outbuf'.
  *                       Updated over the course of the call.
- * @return: * : The # of decoded+encoded unicode characters. (technically only the
- *              # of decoded characters, but that  should normally equal the #  of
- *              encoded ones, and should they not match, the specs don't say  what
- *              should be returned then, so...)
+ * @return: 0 : The conversion went without any problems.
+ * @return: * : The # of replacement characters inserted into `*outbuf'
  * @return: (size_t)-1: [errno=EILSEQ] Invalid sequence  in input  (*inbuf now  points
  *                                     to the start of said sequence, but *inbytesleft
  *                                     is left unchanged)
