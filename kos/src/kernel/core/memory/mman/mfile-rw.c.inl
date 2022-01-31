@@ -1525,22 +1525,22 @@ extend_failed:
 		/*
 		 * ```
 		 *            parthead_disk
-		 *            |    parthead_size
-		 *            |    |           parttail_disk
-		 *            |    |           |    parttail_size
-		 *            v    |           v    |
+		 *            │    parthead_size
+		 *            │    │           parttail_disk
+		 *            │    │           │    parttail_size
+		 *            v    │           v    │
 		 *            [--] v           [--] v
 		 *            [----]           [----]
 		 *  PART: [???DDDD00***********DDDD00???]
 		 *            ^     ^          ^
-		 *            |     |          |
-		 *            |     |          parttail_base
-		 *            |     content_base
+		 *            │     │          │
+		 *            │     │          parttail_base
+		 *            │     content_base
 		 *            parthead_base
 		 * ```
 		 *
-		 * Also: The both the parthead and parttail regions may overlap
-		 *       with the content area! */
+		 * Also: Both the parthead and parttail regions
+		 *       may overlap  with  the  content  area! */
 
 		mpart_reladdr_t content_base;
 		mpart_reladdr_t parthead_base, parttail_base;

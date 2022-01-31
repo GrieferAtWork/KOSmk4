@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1116ec5d */
+/* HASH CRC-32:0xa5f56f5b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -330,7 +330,7 @@ INTDEF NONNULL((1, 2, 3)) char *NOTHROW_NCX(LIBCCALL libc_strptime_l)(char const
  * Since  `getdate' is not  reentrant because of  the use of `getdate_err'
  * and the static buffer to return the result in, we provide a thread-safe
  * variant.  The  functionality is  the same.  The  result is  returned in
- * the buffer pointed to by `resbufp' and  in case of an error the  return
+ * the  buffer pointed to by `resbufp' and in case of an error, the return
  * value is != 0  with the same values  as given above for  `getdate_err'. */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_getdate_r)(char const *__restrict string, struct tm *__restrict resbufp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -339,7 +339,7 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_getdate_r)(char const *__re
  * Since  `getdate' is not  reentrant because of  the use of `getdate_err'
  * and the static buffer to return the result in, we provide a thread-safe
  * variant.  The  functionality is  the same.  The  result is  returned in
- * the buffer pointed to by `resbufp' and  in case of an error the  return
+ * the  buffer pointed to by `resbufp' and in case of an error, the return
  * value is != 0  with the same values  as given above for  `getdate_err'. */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_getdate_r)(char const *__restrict string, struct tm *__restrict resbufp);
 #endif /* !__KERNEL__ */

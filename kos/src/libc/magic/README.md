@@ -5,12 +5,12 @@ Documentation for magic definition files found in this folder
 
 | Name             | Description                                               |
 | ---------------- | --------------------------------------------------------- |
-| `c_prefix`       | Guard-prefix in `<HEADER.h>`                            |
-| `c`              | C-part in `<HEADER.h>`                                  |
-| `std`            | `namespace std`-part in `<HEADER.h>`                    |
-| `ccompat`        | c-compat-part in `<HEADER.h>`                           |
-| `libc_fast`      | `<libc/HEADER.h>`                                       |
-| `libc_core`      | `<libc/core/HEADER.h>`                                  |
+| `c_prefix`       | Guard-prefix in `<HEADER.h>`                              |
+| `c`              | C-part in `<HEADER.h>`                                    |
+| `std`            | `namespace std`-part in `<HEADER.h>`                      |
+| `ccompat`        | c-compat-part in `<HEADER.h>`                             |
+| `libc_fast`      | `<libc/HEADER.h>`                                         |
+| `libc_core`      | `<libc/core/HEADER.h>`                                    |
 | `auto_header`    | `/kos/src/libc/auto/HEADER.h`                             |
 | `auto_source`    | `/kos/src/libc/auto/HEADER.c`                             |
 | `user`           | `/kos/src/libc/user/HEADER.h`                             |

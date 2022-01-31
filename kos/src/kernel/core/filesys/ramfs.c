@@ -1263,14 +1263,14 @@ NOTHROW(KCALL ramfs_super_v_delete)(REF struct fsuper *__restrict self) {
 	 *
 	 * ```
 	 *   ramfs_super::rs_dat::rdd_tree
-	 *       ^                  |
-	 *       |                  |
-	 *       +----+             v
-	 *            |         ramfs_dirent::rde_node
-	 *   fnode::fn_super                    |
-	 *     ^                                |
-	 *     |                                |
-	 *     +--------------------------------+
+	 *       ^                  │
+	 *       │                  │
+	 *       └────┐             v
+	 *            │         ramfs_dirent::rde_node
+	 *   fnode::fn_super                    │
+	 *     ^                                │
+	 *     │                                │
+	 *     └────────────────────────────────┘
 	 * ```
 	 *
 	 * Without this, following would leak memory:

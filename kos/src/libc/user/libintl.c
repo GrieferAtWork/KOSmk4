@@ -226,13 +226,13 @@ struct mo_file {
 	 *
 	 * ```
 	 *   /usr/share/locale/de/LC_MESSAGES/xz.mo
-	 *   [===============] [] [=========] [][=]
-	 *   |                 |  |           | |
-	 *   |                 |  |           | \--- File extension
-	 *   |                 |  |           \----- current_domainname
-	 *   |                 |  \----------------- Category (as given to `dcngettext(3)')
-	 *   |                 \-------------------- Language (see below)
-	 *   \-------------------------------------- Domain directory (usually `_PATH_TEXTDOMAIN')
+	 *   └┴┴┴┴┴┴┴┼┴┴┴┴┴┴┴┘ ├┘ └┴┴┴┴┼┴┴┴┴┘ ├┘└┼┘
+	 *           │         │       │      │  │
+	 *           │         │       │      │  └── File extension
+	 *           │         │       │      └───── current_domainname
+	 *           │         │       └──────────── Category (as given to `dcngettext(3)')
+	 *           │         └──────────────────── Language (see below)
+	 *           └────────────────────────────── Domain directory (usually `_PATH_TEXTDOMAIN')
 	 * ```
 	 *
 	 * Language  is determined from `environ'. On KOS the results of this are cached and are only

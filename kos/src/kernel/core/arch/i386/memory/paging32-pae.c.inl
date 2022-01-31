@@ -90,10 +90,10 @@ STATIC_ASSERT(offsetof(struct pae_pdir_e3_identity_t_struct, x[1])       == 8);
  * can't have, as the paging system can't possibly make use of the FPU, as this would create
  * a dependency on the heap sub-system (which could cause E_BADALLOC), as well as a loop:
  *
- *    PAGING -> FPU -> MALLOC -> HEAP -> MMAP
- *       ^                                |
- *       |                                |
- *       +--------------------------------+
+ *    PAGING ─> FPU ─> MALLOC ─> HEAP ─> MMAP
+ *       ^                                │
+ *       │                                │
+ *       └────────────────────────────────┘
  *
  * So  because of all of this, we are  left having to implement an atomic read by
  * reading 64-bit words in 2 steps (hi/lo part), which may yield corrupted values

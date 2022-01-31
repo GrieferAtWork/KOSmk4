@@ -1673,7 +1673,7 @@ char *strptime_l([[nonnull]] char const *__restrict s,
 @@Since  `getdate' is not  reentrant because of  the use of `getdate_err'
 @@and the static buffer to return the result in, we provide a thread-safe
 @@variant.  The  functionality is  the same.  The  result is  returned in
-@@the buffer pointed to by `resbufp' and  in case of an error the  return
+@@the  buffer pointed to by `resbufp' and in case of an error, the return
 @@value is != 0  with the same values  as given above for  `getdate_err'.
 [[guard, decl_include("<bits/crt/tm.h>")]]
 int getdate_r([[nonnull]] char const *__restrict string,

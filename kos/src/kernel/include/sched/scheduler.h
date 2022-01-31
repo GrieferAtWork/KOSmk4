@@ -143,11 +143,11 @@ LIST_HEAD(task_runlist, REF task);
 struct scheduler {
 	/* Thread chains:
 	 *
-	 *   s_running  --[NEXT...]--> s_running_last    (Sorted ascendingly by `this_stoptime')
-	 *                               |
-	 *       +---------NEXT----------+
+	 *   s_running  ──[NEXT...]─> s_running_last    (Sorted ascendingly by `this_stoptime')
+	 *                               │
+	 *       ┌─────────NEXT──────────┘
 	 *       v
-	 *   s_waiting  --[NEXT...]--> s_waiting_last    (Sorted ascendingly by `this_sched_timeout')
+	 *   s_waiting  ──[NEXT...]─> s_waiting_last    (Sorted ascendingly by `this_sched_timeout')
 	 *
 	 * NOTE: Backwards links (via `this_sched_pself')
 	 *       exist  everywhere  within  this   chain.

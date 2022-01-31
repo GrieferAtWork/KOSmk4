@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88732dbe */
+/* HASH CRC-32:0x9ab97a0c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1502,7 +1502,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX
  * Since  `getdate' is not  reentrant because of  the use of `getdate_err'
  * and the static buffer to return the result in, we provide a thread-safe
  * variant.  The  functionality is  the same.  The  result is  returned in
- * the buffer pointed to by `resbufp' and  in case of an error the  return
+ * the  buffer pointed to by `resbufp' and in case of an error, the return
  * value is != 0  with the same values  as given above for  `getdate_err'. */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,getdate_r,(char const *__restrict __string, struct __NAMESPACE_STD_SYM tm *__restrict __resbufp),(__string,__resbufp))
 #else /* __CRT_HAVE_getdate_r */
@@ -1511,7 +1511,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,getdate_r,(char const *__res
  * Since  `getdate' is not  reentrant because of  the use of `getdate_err'
  * and the static buffer to return the result in, we provide a thread-safe
  * variant.  The  functionality is  the same.  The  result is  returned in
- * the buffer pointed to by `resbufp' and  in case of an error the  return
+ * the  buffer pointed to by `resbufp' and in case of an error, the return
  * value is != 0  with the same values  as given above for  `getdate_err'. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getdate_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL getdate_r)(char const *__restrict __string, struct __NAMESPACE_STD_SYM tm *__restrict __resbufp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getdate_r))(__string, __resbufp); })
 #endif /* !__CRT_HAVE_getdate_r */
@@ -1578,7 +1578,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strptime_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
  * Since  `getdate' is not  reentrant because of  the use of `getdate_err'
  * and the static buffer to return the result in, we provide a thread-safe
  * variant.  The  functionality is  the same.  The  result is  returned in
- * the buffer pointed to by `resbufp' and  in case of an error the  return
+ * the  buffer pointed to by `resbufp' and in case of an error, the return
  * value is != 0  with the same values  as given above for  `getdate_err'. */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,getdate_r,(char const *__restrict __string, struct __NAMESPACE_STD_SYM tm *__restrict __resbufp),(__string,__resbufp))
 #else /* __CRT_HAVE_getdate_r */
@@ -1587,7 +1587,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,getdate_r,(char const *__res
  * Since  `getdate' is not  reentrant because of  the use of `getdate_err'
  * and the static buffer to return the result in, we provide a thread-safe
  * variant.  The  functionality is  the same.  The  result is  returned in
- * the buffer pointed to by `resbufp' and  in case of an error the  return
+ * the  buffer pointed to by `resbufp' and in case of an error, the return
  * value is != 0  with the same values  as given above for  `getdate_err'. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getdate_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL getdate_r)(char const *__restrict __string, struct __NAMESPACE_STD_SYM tm *__restrict __resbufp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getdate_r))(__string, __resbufp); })
 #endif /* !__CRT_HAVE_getdate_r */

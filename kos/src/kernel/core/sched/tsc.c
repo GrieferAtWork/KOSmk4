@@ -161,34 +161,34 @@ NOTHROW(FCALL tsc_resync_interrupt)(ktime_t curr_ktime) {
 	 *
 	 * TSC
 	 *  ^
-	 *  |                      [------]  (now)
-	 *  |                      |     /
-	 *  |                      |    /
-	 *  |                     |    /
-	 *  |                     |   /
-	 *  |         hz_min --> |   / <-- hz_max
-	 *  |                    |  /
-	 *  |                   |  /
-	 *  |                   | /
-	 *  |                  | /
-	 *  |                  |/
-	 *  |                 |/
-	 *  |                 /
-	 *  |                /
-	 *  |               /|
-	 *  |              /|
-	 *  |             / |
-	 *  |            / |
-	 *  |           /  |
-	 *  |          /  |
-	 *  |         /   |
-	 *  |        /   |
-	 *  |       /    |
-	 *  |      /    |
-	 *  |     /     |
-	 *  |    [------]  (thiscpu_startup)
-	 *  |
-	 *  +--------------------------------------> KT
+	 *  │                      [------]  (now)
+	 *  │                      |     /
+	 *  │                      |    /
+	 *  │                     |    /
+	 *  │                     |   /
+	 *  │         hz_min --> |   / <-- hz_max
+	 *  │                    |  /
+	 *  │                   |  /
+	 *  │                   | /
+	 *  │                  | /
+	 *  │                  |/
+	 *  │                 |/
+	 *  │                 /
+	 *  │                /
+	 *  │               /|
+	 *  │              /|
+	 *  │             / |
+	 *  │            / |
+	 *  │           /  |
+	 *  │          /  |
+	 *  │         /   |
+	 *  │        /   |
+	 *  │       /    |
+	 *  │      /    |
+	 *  │     /     |
+	 *  │    [------]  (thiscpu_startup)
+	 *  │
+	 * ─┼──────────────────────────────────────> KT
 	 */
 	tsc_passed       = now.ts_tsc - FORCPU(me, thiscpu_startup.ts_tsc);
 	ktime_passed_min = FORCPU(me, thiscpu_startup.ts_kt) + tsc_realtime_err;
@@ -251,23 +251,23 @@ NOTHROW(FCALL tsc_resync_interrupt)(ktime_t curr_ktime) {
 	 *
 	 * TSC
 	 *  ^
-	 *  |          (cpu_now) [-]  [------] (now)
-	 *  |                     |      /
-	 *  |                     |     /
-	 *  |                    |     /
-	 *  |                    |    /
-	 *  |                   |    /
-	 *  |                   |   /
-	 *  |                  |   /
-	 *  |                  |  /
-	 *  |                 |  /
-	 *  |                 | /
-	 *  |                | /
-	 *  |                |/
-	 *  |                /
-	 *  |               [------]  (thiscpu_startup)
-	 *  |
-	 *  +--------------------------------------> KT
+	 *  │          (cpu_now) [-]  [------] (now)
+	 *  │                     |      /
+	 *  │                     |     /
+	 *  │                    |     /
+	 *  │                    |    /
+	 *  │                   |    /
+	 *  │                   |   /
+	 *  │                  |   /
+	 *  │                  |  /
+	 *  │                 |  /
+	 *  │                 | /
+	 *  │                | /
+	 *  │                |/
+	 *  │                /
+	 *  │               [------]  (thiscpu_startup)
+	 *  │
+	 * ─┼──────────────────────────────────────> KT
 	 */
 	cpu_now = tsc_now_to_ktime(me, now.ts_tsc);
 	/* Clamp `cpu_now' to the closest valid TSC timestamp. */

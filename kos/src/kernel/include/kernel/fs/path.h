@@ -88,15 +88,15 @@ DECL_BEGIN
  *
  *    SUPER
  *      ^
- *      |
- *    MOUNT=PATH --parent-> PATH --parent-> PATH
- *      ^   | ^              ^               ^ |
- *      |   | |              |               | |
- *      |   | +-recent_cache-+---------------+ |
- *      |   |       |                          |
- *      |   +-[*]-+ |                          |
- *      |         v |                          |
- *     MOUNTS---- VFS --> ROOT <-----parent----+
+ *      │
+ *    MOUNT=PATH ──parent─> PATH ──parent─> PATH
+ *      ^   │ ^              ^               ^ │
+ *      │   │ │              │               │ │
+ *      │   │ └─recent_cache─┴───────────────┘ │
+ *      │   │       │                          │
+ *      │   └─[*]─┐ │                          │
+ *      │         v │                          │
+ *     MOUNTS ─── VFS ──> ROOT <─────parent────┘
  *
  * [*] Weak reference (PATH->VFS)
  *

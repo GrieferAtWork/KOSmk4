@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca052419 */
+/* HASH CRC-32:0x6b3d3bc3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -403,7 +403,7 @@ NOTHROW_NCX(LIBCCALL libc_strptime_l)(char const *__restrict s,
  * Since  `getdate' is not  reentrant because of  the use of `getdate_err'
  * and the static buffer to return the result in, we provide a thread-safe
  * variant.  The  functionality is  the same.  The  result is  returned in
- * the buffer pointed to by `resbufp' and  in case of an error the  return
+ * the  buffer pointed to by `resbufp' and in case of an error, the return
  * value is != 0  with the same values  as given above for  `getdate_err'. */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_getdate_r)(char const *__restrict string,
