@@ -359,9 +359,10 @@ NOTHROW_NCX(LIBCCALL libc_regerror)(int errcode,
 INTERN ATTR_SECTION(".text.crt.utility.regex") void
 NOTHROW_NCX(LIBCCALL libc_regfree)(regex_t *preg)
 /*[[[body:libc_regfree]]]*/
-{
-	if (preg)
-		free(preg->buffer);
+/*AUTO*/{
+	(void)preg;
+	CRT_UNIMPLEMENTEDF("regfree(%p)", preg); /* TODO */
+	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_regfree]]]*/
 
