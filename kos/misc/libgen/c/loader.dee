@@ -558,6 +558,7 @@ do_add_nonnull_annotation:
 									break;
 								}
 							}
+							break;
 						}
 						if (method is none) {
 							self.err("Unable to deduce [[format]] method from function name {!r}"

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x190c69ed */
+/* HASH CRC-32:0x76e4b014 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -341,7 +341,7 @@ NOTHROW_NCX(LIBKCALL libc___stdio_common_vfwprintf)(uint64_t options,
 }
 DEFINE_INTERN_ALIAS(libd___stdio_common_vfwprintf_s, libd___stdio_common_vfwprintf);
 DEFINE_INTERN_ALIAS(libc___stdio_common_vfwprintf_s, libc___stdio_common_vfwprintf);
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C16PRINTF(3, 0) NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C16PRINTF_P(3, 0) NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd___stdio_common_vfwprintf_p)(uint64_t options,
                                                       FILE *stream,
                                                       char16_t const *format,
@@ -352,7 +352,7 @@ NOTHROW_NCX(LIBDCALL libd___stdio_common_vfwprintf_p)(uint64_t options,
 	(void)options;
 	return libd_vfwprintf(stream, format, args);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C32PRINTF(3, 0) NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C32PRINTF_P(3, 0) NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc___stdio_common_vfwprintf_p)(uint64_t options,
                                                       FILE *stream,
                                                       char32_t const *format,
@@ -417,7 +417,7 @@ NOTHROW_NCX(LIBKCALL libc___stdio_common_vsnwprintf_s)(uint64_t options,
 	__hybrid_assert(bufsize <= maxsize);
 	return libc___stdio_common_vswprintf(options, buf, bufsize, format, locale, args);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C16PRINTF(4, 0) NONNULL((4)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C16PRINTF_P(4, 0) NONNULL((4)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd___stdio_common_vswprintf_p)(uint64_t options,
                                                       char16_t *buf,
                                                       size_t bufsize,
@@ -432,7 +432,7 @@ NOTHROW_NCX(LIBDCALL libd___stdio_common_vswprintf_p)(uint64_t options,
 		result = bufsize;
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C32PRINTF(4, 0) NONNULL((4)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C32PRINTF_P(4, 0) NONNULL((4)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc___stdio_common_vswprintf_p)(uint64_t options,
                                                       char32_t *buf,
                                                       size_t bufsize,
@@ -542,7 +542,7 @@ NOTHROW_NCX(LIBKCALL libc__vswprintf_s_l)(char32_t *buf,
 	return result < 0 ? -1 : result;
 }
 #include <corecrt_stdio_config.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C16PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C16PRINTF_P(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd__vswprintf_p_l)(char16_t *buf,
                                           size_t bufsize,
                                           char16_t const *format,
@@ -552,7 +552,7 @@ NOTHROW_NCX(LIBDCALL libd__vswprintf_p_l)(char16_t *buf,
 	return result < 0 ? -1 : result;
 }
 #include <corecrt_stdio_config.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C32PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C32PRINTF_P(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc__vswprintf_p_l)(char32_t *buf,
                                           size_t bufsize,
                                           char32_t const *format,
@@ -578,7 +578,7 @@ NOTHROW_NCX(LIBKCALL libc__vscwprintf_l)(char32_t const *format,
 	return result < 0 ? -1 : result;
 }
 #include <corecrt_stdio_config.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C16PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C16PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd__vscwprintf_p_l)(char16_t const *format,
                                            locale_t locale,
                                            va_list args) {
@@ -586,7 +586,7 @@ NOTHROW_NCX(LIBDCALL libd__vscwprintf_p_l)(char16_t const *format,
 	return result < 0 ? -1 : result;
 }
 #include <corecrt_stdio_config.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C32PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C32PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc__vscwprintf_p_l)(char32_t const *format,
                                            locale_t locale,
                                            va_list args) {
@@ -652,7 +652,7 @@ NOTHROW_NCX(LIBKCALL libc__vfwprintf_s_l)(FILE *stream,
 	return libc___stdio_common_vfwprintf_s(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, stream, format, locale, args);
 }
 #include <corecrt_stdio_config.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C16PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C16PRINTF_P(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd__vfwprintf_p_l)(FILE *stream,
                                           char16_t const *format,
                                           locale_t locale,
@@ -660,7 +660,7 @@ NOTHROW_NCX(LIBDCALL libd__vfwprintf_p_l)(FILE *stream,
 	return libd___stdio_common_vfwprintf_p(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, stream, format, locale, args);
 }
 #include <corecrt_stdio_config.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C32PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C32PRINTF_P(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc__vfwprintf_p_l)(FILE *stream,
                                           char32_t const *format,
                                           locale_t locale,
@@ -795,13 +795,13 @@ NOTHROW_NCX(LIBKCALL libc__vwscanf_l)(char32_t const *format,
 	(void)locale;
 	return libc_vwscanf(format, args);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C16PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C16PRINTF_P(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd__vfwprintf_p)(FILE *stream,
                                         char16_t const *format,
                                         va_list args) {
 	return libd__vfwprintf_p_l(stream, format, NULL, args);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C32PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C32PRINTF_P(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc__vfwprintf_p)(FILE *stream,
                                         char32_t const *format,
                                         va_list args) {
@@ -863,24 +863,24 @@ NOTHROW_NCX(LIBKCALL libc__vswprintf)(char32_t *buf,
                                       va_list args) {
 	return libc__vswprintf_c_l(buf, (size_t)-1, format, NULL, args); /* _vswprintf_l */
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C16PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C16PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd__vwprintf_p)(char16_t const *format,
                                        va_list args) {
 	return libd__vwprintf_p_l(format, NULL, args);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C32PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C32PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc__vwprintf_p)(char32_t const *format,
                                        va_list args) {
 	return libc__vwprintf_p_l(format, NULL, args);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C16PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C16PRINTF_P(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd__vswprintf_p)(char16_t *buf,
                                         size_t bufsize,
                                         char16_t const *format,
                                         va_list args) {
 	return libd__vswprintf_p_l(buf, bufsize, format, NULL, args);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C32PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C32PRINTF_P(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc__vswprintf_p)(char32_t *buf,
                                         size_t bufsize,
                                         char32_t const *format,
@@ -897,12 +897,12 @@ NOTHROW_NCX(LIBKCALL libc__vscwprintf)(char32_t const *format,
                                        va_list args) {
 	return libc__vscwprintf_l(format, NULL, args);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C16PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C16PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd__vscwprintf_p)(char16_t const *format,
                                          va_list args) {
 	return libd__vscwprintf_p_l(format, NULL, args);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C32PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C32PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc__vscwprintf_p)(char32_t const *format,
                                          va_list args) {
 	return libc__vscwprintf_p_l(format, NULL, args);
@@ -978,14 +978,14 @@ NOTHROW_NCX(LIBKCALL libc__vwprintf_s_l)(char32_t const *format,
 	return libc__vfwprintf_s_l(stdout, format, locale, args);
 }
 #include <libc/template/stdstreams.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C16PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C16PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd__vwprintf_p_l)(char16_t const *format,
                                          locale_t locale,
                                          va_list args) {
 	return libd__vfwprintf_p_l(stdout, format, locale, args);
 }
 #include <libc/template/stdstreams.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C32PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C32PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc__vwprintf_p_l)(char32_t const *format,
                                          locale_t locale,
                                          va_list args) {
@@ -1053,7 +1053,7 @@ NOTHROW_NCX(VLIBKCALL libc__fwprintf_s_l)(FILE *stream,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C16PRINTF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C16PRINTF_P(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__fwprintf_p_l)(FILE *stream,
                                           char16_t const *format,
                                           locale_t locale,
@@ -1065,7 +1065,7 @@ NOTHROW_NCX(VLIBDCALL libd__fwprintf_p_l)(FILE *stream,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C32PRINTF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C32PRINTF_P(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBKCALL libc__fwprintf_p_l)(FILE *stream,
                                           char32_t const *format,
                                           locale_t locale,
@@ -1121,7 +1121,7 @@ NOTHROW_NCX(VLIBKCALL libc__wprintf_s_l)(char32_t const *format,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C16PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C16PRINTF_P(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__wprintf_p_l)(char16_t const *format,
                                          locale_t locale,
                                          ...) {
@@ -1132,7 +1132,7 @@ NOTHROW_NCX(VLIBDCALL libd__wprintf_p_l)(char16_t const *format,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C32PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C32PRINTF_P(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBKCALL libc__wprintf_p_l)(char32_t const *format,
                                          locale_t locale,
                                          ...) {
@@ -1167,7 +1167,7 @@ NOTHROW_NCX(VLIBKCALL libc___swprintf_l)(char32_t *buf,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C16PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C16PRINTF_P(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__fwprintf_p)(FILE *stream,
                                         char16_t const *format,
                                         ...) {
@@ -1178,7 +1178,7 @@ NOTHROW_NCX(VLIBDCALL libd__fwprintf_p)(FILE *stream,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C32PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C32PRINTF_P(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBKCALL libc__fwprintf_p)(FILE *stream,
                                         char32_t const *format,
                                         ...) {
@@ -1189,7 +1189,7 @@ NOTHROW_NCX(VLIBKCALL libc__fwprintf_p)(FILE *stream,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C16PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C16PRINTF_P(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__wprintf_p)(char16_t const *format,
                                        ...) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -1199,7 +1199,7 @@ NOTHROW_NCX(VLIBDCALL libd__wprintf_p)(char16_t const *format,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C32PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C32PRINTF_P(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBKCALL libc__wprintf_p)(char32_t const *format,
                                        ...) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -1257,7 +1257,7 @@ NOTHROW_NCX(VLIBKCALL libc__swprintf_s_l)(char32_t *buf,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C16PRINTF(3, 5) NONNULL((3)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C16PRINTF_P(3, 5) NONNULL((3)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__swprintf_p_l)(char16_t *buf,
                                           size_t bufsize,
                                           char16_t const *format,
@@ -1270,7 +1270,7 @@ NOTHROW_NCX(VLIBDCALL libd__swprintf_p_l)(char16_t *buf,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C32PRINTF(3, 5) NONNULL((3)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C32PRINTF_P(3, 5) NONNULL((3)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBKCALL libc__swprintf_p_l)(char32_t *buf,
                                           size_t bufsize,
                                           char32_t const *format,
@@ -1363,7 +1363,7 @@ NOTHROW_NCX(VLIBKCALL libc__snwprintf_s_l)(char32_t *buf,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C16PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C16PRINTF_P(3, 4) NONNULL((3)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__swprintf_p)(char16_t *buf,
                                         size_t bufsize,
                                         char16_t const *format,
@@ -1375,7 +1375,7 @@ NOTHROW_NCX(VLIBDCALL libd__swprintf_p)(char16_t *buf,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C32PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C32PRINTF_P(3, 4) NONNULL((3)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBKCALL libc__swprintf_p)(char32_t *buf,
                                         size_t bufsize,
                                         char32_t const *format,
@@ -1483,7 +1483,7 @@ NOTHROW_NCX(VLIBKCALL libc__scwprintf_l)(char32_t const *format,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C16PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C16PRINTF_P(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__scwprintf_p_l)(char16_t const *format,
                                            locale_t locale,
                                            ...) {
@@ -1494,7 +1494,7 @@ NOTHROW_NCX(VLIBDCALL libd__scwprintf_p_l)(char16_t const *format,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C32PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_LIBC_C32PRINTF_P(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBKCALL libc__scwprintf_p_l)(char32_t const *format,
                                            locale_t locale,
                                            ...) {
@@ -1525,7 +1525,7 @@ NOTHROW_NCX(VLIBKCALL libc__scwprintf)(char32_t const *format,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C16PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C16PRINTF_P(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__scwprintf_p)(char16_t const *format,
                                          ...) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -1535,7 +1535,7 @@ NOTHROW_NCX(VLIBDCALL libd__scwprintf_p)(char16_t const *format,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C32PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C32PRINTF_P(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBKCALL libc__scwprintf_p)(char32_t const *format,
                                          ...) {
 	__STDC_INT_AS_SSIZE_T result;

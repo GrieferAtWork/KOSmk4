@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e9f0c5a */
+/* HASH CRC-32:0xe2c79abd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_vfc32printf_defined
 #endif /* !... */
 #endif /* !__local___localdep_vfc32printf_defined */
-__LOCAL_LIBC(__stdio_common_vfc32printf_p) __ATTR_LIBC_C32PRINTF(3, 0) __ATTR_NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(__stdio_common_vfc32printf_p) __ATTR_LIBC_C32PRINTF_P(3, 0) __ATTR_NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(__stdio_common_vfc32printf_p))(__UINT64_TYPE__ __options, __FILE *__stream, __CHAR32_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args) {
 	/* TODO: Support for positional arguments */
 	(void)__locale;
