@@ -2173,4 +2173,4 @@
 #define __sighandler_t        sighandler_t
 #define __sa_family_t         sa_family_t
 #define __port_t              port_t
-#define __port_t            port_t
+#define __builtin_va_list     va_list

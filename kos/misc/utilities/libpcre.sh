@@ -61,4 +61,3 @@ while test \$# -gt 0; do
 done
 EOF
 cmd chmod +x "$BINUTILS_CONFIG_BIN/pcre-config"
-

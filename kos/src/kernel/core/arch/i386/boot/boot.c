@@ -894,8 +894,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * similar to the (now abandoned  and now longer available) KOS-specific  O_SYMLINK. */
 
 	/* TODO: Use magic annotations to do __attribute__((__format__(...)))
-	 *       tagging via relevant arguments. (this way, we can automate
-	 *       parameter indices by simply adding the tag to the format
+	 *       tagging via relevant arguments.  (this way, we can  automate
+	 *       parameter  indices by  simply adding  the tag  to the format
 	 *       argument, and automatically adding the varargs index) */
 
 	return state;

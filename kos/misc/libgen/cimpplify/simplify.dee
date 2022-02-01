@@ -51,9 +51,9 @@ class SimpFunctionMacro {
 class SimpConfig {
 	this = default;
 
-	@@Set to @true to not remove comments, and unnecessarly whitespace.
-	@@However, do keep line-feeds, so-long as they appear right next to
-	@@each other.
+	@@Set to @true to  remove comments, and unnecessary  whitespace.
+	@@However, do keep line-feeds, so-long as they appear right next
+	@@to each other.
 	public member truncateOutput: bool = true;
 
 	@@Macros that are always/never defined or defined as something specific:

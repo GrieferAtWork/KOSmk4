@@ -71,7 +71,7 @@ int wsystem([[nullable]] wchar_t const *cmd) {
 [[impl_include("<asm/os/fcntl.h>", "<asm/os/limits.h>", "<libc/errno.h>")]]
 wchar_t *wrealpath([[nonnull]] wchar_t const *filename, wchar_t *resolved) {
 @@pp_if defined(__AT_FDCWD) && $has_function(wfrealpathat)@@
-@@pp_if defined(__PATH_MAX) && __PATH_MAX != -1@@
+@@pp_if   defined(__PATH_MAX)   &&   __PATH_MAX   !=    -1@@
 	return wfrealpathat(__AT_FDCWD, filename, resolved, resolved ? __PATH_MAX : 0, 0);
 @@pp_else@@
 	return wfrealpathat(__AT_FDCWD, filename, resolved, resolved ? _POSIX_PATH_MAX : 0, 0);

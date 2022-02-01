@@ -205,7 +205,7 @@
  * >> 	return inner::my_function();
  * >> }
  * >> }
- * >> 
+ * >>
  * >> extern "C" {
  * >> extern void foo(void *);
  * >> void foobar(void) {

@@ -98,4 +98,3 @@ make_glib_include_warpper "glib.h"
 make_glib_include_warpper "glib-object.h"
 make_glib_include_warpper "glib-unix.h"
 make_glib_include_warpper "gmodule.h"
-
