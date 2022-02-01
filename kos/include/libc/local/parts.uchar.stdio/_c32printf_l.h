@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b57121e */
+/* HASH CRC-32:0xfd12a5aa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__vc32printf_l_defined
 #define __local___localdep__vc32printf_l_defined
 #if defined(__CRT_HAVE__vwprintf_l) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vc32printf_l,(__CHAR32_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vwprintf_l,(__format,__locale,__args))
+__CREDIRECT(__ATTR_LIBC_C32PRINTF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vc32printf_l,(__CHAR32_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vwprintf_l,(__format,__locale,__args))
 #elif defined(__CRT_HAVE_KOS$_vwprintf_l)
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vc32printf_l,(__CHAR32_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vwprintf_l,(__format,__locale,__args))
+__CREDIRECT_KOS(__ATTR_LIBC_C32PRINTF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vc32printf_l,(__CHAR32_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vwprintf_l,(__format,__locale,__args))
 #elif (defined(__CRT_HAVE_vwprintf) || (defined(__LOCAL_stdout) && (defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)))) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wstdio/_vwprintf_l.h>
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__vc32printf_l_defined
 #endif /* !... */
 #endif /* !__local___localdep__vc32printf_l_defined */
-__LOCAL_LIBC(_c32printf_l) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(_c32printf_l) __ATTR_LIBC_C32PRINTF(1, 3) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__VLIBKCALL __LIBC_LOCAL_NAME(_c32printf_l))(__CHAR32_TYPE__ const *__format, __locale_t __locale, ...) {
 	__STDC_INT_AS_SSIZE_T __result;
 	__builtin_va_list __args;

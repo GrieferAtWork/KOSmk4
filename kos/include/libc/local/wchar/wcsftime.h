@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6535ae9 */
+/* HASH CRC-32:0xe3936fda */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <hybrid/typecore.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wcsftime) __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__
+__LOCAL_LIBC(wcsftime) __ATTR_LIBC_WCSFTIME(3, 0) __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsftime))(__WCHAR_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp) {
 	if (__buflen)
 		*__buf = 0;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea1ab2b8 */
+/* HASH CRC-32:0x1e3569f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -191,7 +191,7 @@ INTDEF NONNULL((1)) ssize_t (LIBKCALL libc_format_whexdump)(pc32formatprinter pr
  *  - ...               There are a _lot_ more...
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF ATTR_LIBC_WPRINTF(3, 0) NONNULL((1, 3)) ssize_t (LIBDCALL libd_format_vwprintf)(pc16formatprinter printer, void *arg, char16_t const *__restrict format, va_list args) THROWS(...);
+INTDEF ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1, 3)) ssize_t (LIBDCALL libd_format_vwprintf)(pc16formatprinter printer, void *arg, char16_t const *__restrict format, va_list args) THROWS(...);
 /* >> format_printf(3), format_vprintf(3)
  * Generic     printf      implementation
  * Taking a  regular printf-style  format  string and  arguments,  these
@@ -282,7 +282,7 @@ INTDEF ATTR_LIBC_WPRINTF(3, 0) NONNULL((1, 3)) ssize_t (LIBDCALL libd_format_vwp
  *  - ...               There are a _lot_ more...
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF ATTR_LIBC_WPRINTF(3, 0) NONNULL((1, 3)) ssize_t (LIBKCALL libc_format_vwprintf)(pc32formatprinter printer, void *arg, char32_t const *__restrict format, va_list args) THROWS(...);
+INTDEF ATTR_LIBC_C32PRINTF(3, 0) NONNULL((1, 3)) ssize_t (LIBKCALL libc_format_vwprintf)(pc32formatprinter printer, void *arg, char32_t const *__restrict format, va_list args) THROWS(...);
 /* >> format_printf(3), format_vprintf(3)
  * Generic     printf      implementation
  * Taking a  regular printf-style  format  string and  arguments,  these
@@ -373,7 +373,7 @@ INTDEF ATTR_LIBC_WPRINTF(3, 0) NONNULL((1, 3)) ssize_t (LIBKCALL libc_format_vwp
  *  - ...               There are a _lot_ more...
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF ATTR_LIBC_WPRINTF(3, 0) NONNULL((1, 3)) ssize_t (LIBDCALL libd_format_wprintf)(pc16formatprinter printer, void *arg, char16_t const *__restrict format, ...) THROWS(...);
+INTDEF ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1, 3)) ssize_t (LIBDCALL libd_format_wprintf)(pc16formatprinter printer, void *arg, char16_t const *__restrict format, ...) THROWS(...);
 /* >> format_printf(3), format_vprintf(3)
  * Generic     printf      implementation
  * Taking a  regular printf-style  format  string and  arguments,  these
@@ -464,7 +464,7 @@ INTDEF ATTR_LIBC_WPRINTF(3, 0) NONNULL((1, 3)) ssize_t (LIBDCALL libd_format_wpr
  *  - ...               There are a _lot_ more...
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF ATTR_LIBC_WPRINTF(3, 0) NONNULL((1, 3)) ssize_t (LIBKCALL libc_format_wprintf)(pc32formatprinter printer, void *arg, char32_t const *__restrict format, ...) THROWS(...);
+INTDEF ATTR_LIBC_C32PRINTF(3, 0) NONNULL((1, 3)) ssize_t (LIBKCALL libc_format_wprintf)(pc32formatprinter printer, void *arg, char32_t const *__restrict format, ...) THROWS(...);
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
 INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wsprintf_printer)(void *arg, char16_t const *__restrict data, size_t datalen);

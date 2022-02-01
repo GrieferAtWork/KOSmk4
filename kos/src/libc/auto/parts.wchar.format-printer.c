@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3ba029e */
+/* HASH CRC-32:0x7e72e42e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1196,7 +1196,7 @@ err:
  *  - ...               There are a _lot_ more...
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0) NONNULL((1, 3)) ssize_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1, 3)) ssize_t
 (LIBDCALL libd_format_vwprintf)(pc16formatprinter printer,
                                 void *arg,
                                 char16_t const *__restrict format,
@@ -1340,7 +1340,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0)
  *  - ...               There are a _lot_ more...
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0) NONNULL((1, 3)) ssize_t
+INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_LIBC_C32PRINTF(3, 0) NONNULL((1, 3)) ssize_t
 (LIBKCALL libc_format_vwprintf)(pc32formatprinter printer,
                                 void *arg,
                                 char32_t const *__restrict format,
@@ -1464,7 +1464,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0) NON
  *  - ...               There are a _lot_ more...
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0) NONNULL((1, 3)) ssize_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1, 3)) ssize_t
 (LIBDCALL libd_format_wprintf)(pc16formatprinter printer,
                                void *arg,
                                char16_t const *__restrict format,
@@ -1566,7 +1566,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0)
  *  - ...               There are a _lot_ more...
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0) NONNULL((1, 3)) ssize_t
+INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_LIBC_C32PRINTF(3, 0) NONNULL((1, 3)) ssize_t
 (LIBKCALL libc_format_wprintf)(pc32formatprinter printer,
                                void *arg,
                                char32_t const *__restrict format,

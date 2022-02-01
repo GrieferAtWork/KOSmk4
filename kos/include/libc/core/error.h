@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9600877b */
+/* HASH CRC-32:0x69fdf76 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,6 +34,7 @@ __SYSDECL_BEGIN
 #ifdef __CRT_HAVE_error
 #include <kos/anno.h>
 #include <bits/types.h>
+#include <__crt.h>
 /* >> error(3)
  * Helper  function  for printing  an error  message to  `stderr' and  possibly exiting  the program
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
@@ -62,6 +63,7 @@ __LIBC __ATTR_LIBC_PRINTF(3, 4) void (__VLIBCCALL __libc_core_error)(int __statu
 #ifdef __CRT_HAVE_error_at_line
 #include <kos/anno.h>
 #include <bits/types.h>
+#include <__crt.h>
 /* >> error_at_line(3)
  * Same as `error()', but also include the given filename in the error message.
  * The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'

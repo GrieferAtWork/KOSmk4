@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x737347f */
+/* HASH CRC-32:0x7e2f621a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,18 +31,18 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfc16scanf,(__FILE *__restrict __stream, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_C16SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfc16scanf,(__FILE *__restrict __stream, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_DOS$vfwscanf)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfc16scanf,(__FILE *__restrict __stream, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_LIBC_C16SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfc16scanf,(__FILE *__restrict __stream, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
 #else /* ... */
 #undef __local___localdep_vfc16scanf_defined
 #endif /* !... */
 #endif /* !__local___localdep_vfc16scanf_defined */
-__LOCAL_LIBC(__stdio_common_vfc16scanf) __ATTR_NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(__stdio_common_vfc16scanf) __ATTR_LIBC_C16SCANF(3, 0) __ATTR_NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(__stdio_common_vfc16scanf))(__UINT64_TYPE__ __options, __FILE *__stream, __CHAR16_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args) {
 	(void)__options;
 	(void)__locale;

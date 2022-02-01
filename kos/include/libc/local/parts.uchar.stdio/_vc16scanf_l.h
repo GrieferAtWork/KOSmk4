@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96bb9b8e */
+/* HASH CRC-32:0x5bbc1d53 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,13 +32,13 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vc16scanf,(__CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),vwscanf,(__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_C16SCANF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vc16scanf,(__CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),vwscanf,(__format,__args))
 #elif defined(__CRT_HAVE_DOS$vwscanf)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vc16scanf,(__CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),vwscanf,(__format,__args))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_LIBC_C16SCANF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vc16scanf,(__CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),vwscanf,(__format,__args))
 #elif defined(__LOCAL_stdin) && defined(__CRT_HAVE_vfwscanf) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/vwscanf.h>
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_vc16scanf_defined
 #endif /* !... */
 #endif /* !__local___localdep_vc16scanf_defined */
-__LOCAL_LIBC(_vc16scanf_l) __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(_vc16scanf_l) __ATTR_WUNUSED __ATTR_LIBC_C16SCANF(1, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_vc16scanf_l))(__CHAR16_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args) {
 	(void)__locale;
 	return (__NAMESPACE_LOCAL_SYM __localdep_vc16scanf)(__format, __args);

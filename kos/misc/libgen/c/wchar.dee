@@ -30,14 +30,22 @@ global WcharFunction;
 
 @@Replacements for wchar-related keywords
 global wcharReplacementEscapes: {string: (string, string)} = Dict({
-	"wchar_t"            : ("char16_t", "char32_t"),
-	"__wchar_t"          : ("__char16_t", "__char32_t"),
-	"__WCHAR_TYPE__"     : ("__CHAR16_TYPE__", "__CHAR32_TYPE__"),
-	"__SIZEOF_WCHAR_T__" : ("2", "4"),
-	"LIBCCALL"           : ("LIBDCALL", "LIBKCALL"),
-	"VLIBCCALL"          : ("VLIBDCALL", "VLIBKCALL"),
-	"__LIBCCALL"         : ("__LIBDCALL", "__LIBKCALL"),
-	"__VLIBCCALL"        : ("__VLIBDCALL", "__VLIBKCALL"),
+	"wchar_t"               : ("char16_t", "char32_t"),
+	"__wchar_t"             : ("__char16_t", "__char32_t"),
+	"__WCHAR_TYPE__"        : ("__CHAR16_TYPE__", "__CHAR32_TYPE__"),
+	"__SIZEOF_WCHAR_T__"    : ("2", "4"),
+	"LIBCCALL"              : ("LIBDCALL", "LIBKCALL"),
+	"__LIBCCALL"            : ("__LIBDCALL", "__LIBKCALL"),
+	"VLIBCCALL"             : ("VLIBDCALL", "VLIBKCALL"),
+	"__VLIBCCALL"           : ("__VLIBDCALL", "__VLIBKCALL"),
+	"ATTR_LIBC_WPRINTF"     : ("ATTR_LIBC_C16PRINTF", "ATTR_LIBC_C32PRINTF"),
+	"__ATTR_LIBC_WPRINTF"   : ("__ATTR_LIBC_C16PRINTF", "__ATTR_LIBC_C32PRINTF"),
+	"ATTR_LIBC_WPRINTF_P"   : ("ATTR_LIBC_C16PRINTF_P", "ATTR_LIBC_C32PRINTF_P"),
+	"__ATTR_LIBC_WPRINTF_P" : ("__ATTR_LIBC_C16PRINTF_P", "__ATTR_LIBC_C32PRINTF_P"),
+	"ATTR_LIBC_WSCANF"      : ("ATTR_LIBC_C16SCANF", "ATTR_LIBC_C32SCANF"),
+	"__ATTR_LIBC_WSCANF"    : ("__ATTR_LIBC_C16SCANF", "__ATTR_LIBC_C32SCANF"),
+	"ATTR_LIBC_WCSFTIME"    : ("ATTR_LIBC_C16FTIME", "ATTR_LIBC_C32FTIME"),
+	"__ATTR_LIBC_WCSFTIME"  : ("__ATTR_LIBC_C16FTIME", "__ATTR_LIBC_C32FTIME"),
 });
 
 @@Additional keywords-replacements used by in-library implementations of DOS variants

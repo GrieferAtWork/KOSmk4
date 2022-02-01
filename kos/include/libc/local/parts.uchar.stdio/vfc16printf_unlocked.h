@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f6a2170 */
+/* HASH CRC-32:0x2de9d33b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,12 +56,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/crt/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,__localdep_format_vc16printf,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),format_vwprintf,(__printer,__arg,__format,__args))
+__CREDIRECT(__ATTR_LIBC_C16PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,__localdep_format_vc16printf,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),format_vwprintf,(__printer,__arg,__format,__args))
 #elif defined(__CRT_HAVE_DOS$format_vwprintf)
 __NAMESPACE_LOCAL_END
 #include <bits/crt/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_DOS(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,__localdep_format_vc16printf,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),format_vwprintf,(__printer,__arg,__format,__args))
+__CREDIRECT_DOS(__ATTR_LIBC_C16PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,__localdep_format_vc16printf,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),format_vwprintf,(__printer,__arg,__format,__args))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <bits/crt/uformat-printer.h>
@@ -75,7 +75,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_format_vc16printf __LIBC_LOCAL_NAME(format_vc16printf)
 #endif /* !... */
 #endif /* !__local___localdep_format_vc16printf_defined */
-__LOCAL_LIBC(vfc16printf_unlocked) __ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(vfc16printf_unlocked) __ATTR_LIBC_C16PRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (__LIBDCALL __LIBC_LOCAL_NAME(vfc16printf_unlocked))(__FILE *__restrict __stream, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args) __THROWS(...) {
 	return (__STDC_INT_AS_SSIZE_T)(__NAMESPACE_LOCAL_SYM __localdep_format_vc16printf)(&(__NAMESPACE_LOCAL_SYM __localdep_file_c16printer_unlocked),
 	                                              __stream, __format, __args);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1365233c */
+/* HASH CRC-32:0x24f3a771 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -107,7 +107,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_vfprintf_defined
 #endif /* !... */
 #endif /* !__local___localdep_vfprintf_defined */
-__LOCAL_LIBC(vwarnc) __ATTR_LIBC_PRINTF(1, 0) void
+__LOCAL_LIBC(vwarnc) __ATTR_LIBC_PRINTF(2, 0) void
 (__LIBCCALL __LIBC_LOCAL_NAME(vwarnc))(__errno_t __used_errno, char const *__format, __builtin_va_list __args) __THROWS(...) {
 #if (defined(__CRT_HAVE_flockfile) || defined(__CRT_HAVE__lock_file) || defined(__CRT_HAVE__IO_flockfile)) && (defined(__CRT_HAVE_funlockfile) || defined(__CRT_HAVE__unlock_file) || defined(__CRT_HAVE__IO_funlockfile))
 	(__NAMESPACE_LOCAL_SYM __localdep_flockfile)(__LOCAL_stderr);

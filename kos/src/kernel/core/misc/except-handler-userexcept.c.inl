@@ -419,7 +419,7 @@ check_next_proc_rpc:
 
 	/* Kernel RPCs are handled after user-space RPCs. This is needed so that
 	 * user-space  RPCs have higher priority when it executing code before a
-	 * system  call can be performed in a  situation where the system all is
+	 * system call can be performed in a situation where the system call  is
 	 * implemented by a thread sending an RPC to itself (as is the suggested
 	 * method of gaining access of one's own register state) */
 	while (!SLIST_EMPTY(&kernel_rpcs)) {

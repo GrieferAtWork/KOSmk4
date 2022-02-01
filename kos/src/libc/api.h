@@ -169,13 +169,23 @@
 #define ASMCALL /* nothing */
 #endif /* !ASMCALL */
 
-#define ATTR_LIBC_PRINTF(a, b)    __ATTR_LIBC_PRINTF(a, b)
-#define ATTR_LIBC_PRINTF_P(a, b)  __ATTR_LIBC_PRINTF_P(a, b)
-#define ATTR_LIBC_SCANF(a, b)     __ATTR_LIBC_SCANF(a, b)
-#define ATTR_LIBC_STRFMON(a, b)   __ATTR_LIBC_STRFMON(a, b)
-#define ATTR_LIBC_WPRINTF(a, b)   __ATTR_LIBC_WPRINTF(a, b)
-#define ATTR_LIBC_WPRINTF_P(a, b) __ATTR_LIBC_WPRINTF_P(a, b)
-#define ATTR_LIBC_WSCANF(a, b)    __ATTR_LIBC_WSCANF(a, b)
+#define ATTR_LIBC_PRINTF(a, b)      __ATTR_LIBC_PRINTF(a, b)
+#define ATTR_LIBC_PRINTF_P(a, b)    __ATTR_LIBC_PRINTF_P(a, b)
+#define ATTR_LIBC_SCANF(a, b)       __ATTR_LIBC_SCANF(a, b)
+#define ATTR_LIBC_STRFMON(a, b)     __ATTR_LIBC_STRFMON(a, b)
+#define ATTR_LIBC_STRFTIME(a, b)    __ATTR_LIBC_STRFTIME(a, b)
+#define ATTR_LIBC_WPRINTF(a, b)     __ATTR_LIBC_WPRINTF(a, b)
+#define ATTR_LIBC_WPRINTF_P(a, b)   __ATTR_LIBC_WPRINTF_P(a, b)
+#define ATTR_LIBC_WSCANF(a, b)      __ATTR_LIBC_WSCANF(a, b)
+#define ATTR_LIBC_WCSFTIME(a, b)    __ATTR_LIBC_WCSFTIME(a, b)
+#define ATTR_LIBC_C16PRINTF(a, b)   __ATTR_LIBC_C16PRINTF(a, b)
+#define ATTR_LIBC_C16PRINTF_P(a, b) __ATTR_LIBC_C16PRINTF_P(a, b)
+#define ATTR_LIBC_C16SCANF(a, b)    __ATTR_LIBC_C16SCANF(a, b)
+#define ATTR_LIBC_C16FTIME(a, b)    __ATTR_LIBC_C16FTIME(a, b)
+#define ATTR_LIBC_C32PRINTF(a, b)   __ATTR_LIBC_C32PRINTF(a, b)
+#define ATTR_LIBC_C32PRINTF_P(a, b) __ATTR_LIBC_C32PRINTF_P(a, b)
+#define ATTR_LIBC_C32SCANF(a, b)    __ATTR_LIBC_C32SCANF(a, b)
+#define ATTR_LIBC_C32FTIME(a, b)    __ATTR_LIBC_C32FTIME(a, b)
 
 #include <errno.h>
 #include <libc/errno.h>

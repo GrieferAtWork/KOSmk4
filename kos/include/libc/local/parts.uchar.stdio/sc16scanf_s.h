@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x337dcb76 */
+/* HASH CRC-32:0x6be487df */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,12 +29,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vsc16scanf_s,(__CHAR16_TYPE__ const *__buf, __CHAR16_TYPE__ const *__format, __builtin_va_list __args),vswscanf_s,(__buf,__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_C16SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vsc16scanf_s,(__CHAR16_TYPE__ const *__buf, __CHAR16_TYPE__ const *__format, __builtin_va_list __args),vswscanf_s,(__buf,__format,__args))
 #elif defined(__CRT_HAVE_DOS$vswscanf_s)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vsc16scanf_s,(__CHAR16_TYPE__ const *__buf, __CHAR16_TYPE__ const *__format, __builtin_va_list __args),vswscanf_s,(__buf,__format,__args))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_LIBC_C16SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vsc16scanf_s,(__CHAR16_TYPE__ const *__buf, __CHAR16_TYPE__ const *__format, __builtin_va_list __args),vswscanf_s,(__buf,__format,__args))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wstdio/vswscanf_s.h>
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_vsc16scanf_s __LIBC_LOCAL_NAME(vsc16scanf_s)
 #endif /* !... */
 #endif /* !__local___localdep_vsc16scanf_s_defined */
-__LOCAL_LIBC(sc16scanf_s) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(sc16scanf_s) __ATTR_WUNUSED __ATTR_LIBC_C16SCANF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__VLIBDCALL __LIBC_LOCAL_NAME(sc16scanf_s))(__CHAR16_TYPE__ const *__buf, __CHAR16_TYPE__ const *__format, ...) {
 	__STDC_INT_AS_SSIZE_T __result;
 	__builtin_va_list __args;

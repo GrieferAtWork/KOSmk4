@@ -750,7 +750,7 @@ wint_t ungetwc(wint_t wc, [[nonnull]] FILE *stream);
 [[decl_include("<hybrid/typecore.h>", "<bits/crt/tm.h>")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.format.strftime")]]
 size_t wcsftime([[outp(min(return, buflen))]] wchar_t *__restrict buf, size_t buflen,
-                [[nonnull]] wchar_t const *__restrict format,
+                [[nonnull, format("wcsftime")]] wchar_t const *__restrict format,
                 [[nonnull]] struct tm const *__restrict tp) {
 	if (buflen)
 		*buf = 0;
@@ -863,69 +863,71 @@ int fwide([[nonnull]] FILE *fp, int mode) {
 %(std)#if defined(__USE_ISOC95) || defined(__USE_UNIX98) || defined(__USE_DOS)
 
 @@>> fwprintf(3)
-[[cp_stdio, std, guard, wchar, ATTR_LIBC_WPRINTF(2, 3)]]
+[[cp_stdio, std, guard, wchar]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.write.printf")]]
 __STDC_INT_AS_SIZE_T fwprintf([[nonnull]] FILE *__restrict stream,
-                              [[nonnull]] wchar_t const *__restrict format, ...)
+                              [[nonnull, format]] wchar_t const *__restrict format, ...)
 	%{printf("vfwprintf")}
 
 @@>> vfwprintf(3)
 [[requires_dependent_function(file_wprinter)]]
-[[cp_stdio, std, guard, wchar, ATTR_LIBC_WPRINTF(2, 0)]]
+[[cp_stdio, std, guard, wchar]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.write.printf")]]
 __STDC_INT_AS_SIZE_T vfwprintf([[nonnull]] FILE *__restrict stream,
-                               [[nonnull]] wchar_t const *__restrict format,
+                               [[nonnull, format]] wchar_t const *__restrict format,
                                $va_list args) {
 	return (__STDC_INT_AS_SSIZE_T)format_vwprintf(&file_wprinter, stream, format, args);
 }
 
 @@>> wprintf(3)
-[[cp_stdio, std, guard, wchar, ATTR_LIBC_WPRINTF(1, 2)]]
+[[cp_stdio, std, guard, wchar]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.write.printf")]]
-__STDC_INT_AS_SIZE_T wprintf([[nonnull]] wchar_t const *__restrict format, ...)
+__STDC_INT_AS_SIZE_T wprintf([[nonnull, format]] wchar_t const *__restrict format, ...)
 	%{printf("vwprintf")}
 
 @@>> vwprintf(3)
-[[cp_stdio, std, guard, wchar, ATTR_LIBC_WPRINTF(1, 0)]]
+[[cp_stdio, std, guard, wchar]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<libc/template/stdstreams.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stdout) && $has_function(vfwprintf))]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.write.printf")]]
-__STDC_INT_AS_SIZE_T vwprintf([[nonnull]] wchar_t const *__restrict format, $va_list args) {
+__STDC_INT_AS_SIZE_T vwprintf([[nonnull, format]] wchar_t const *__restrict format, $va_list args) {
 	return vfwprintf(stdout, format, args);
 }
 
 @@>> fwscanf(3)
-[[cp_stdio, std, guard, wchar, ATTR_LIBC_WSCANF(2, 3)]]
+[[cp_stdio, std, guard, wchar]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.read.scanf")]]
-__STDC_INT_AS_SIZE_T fwscanf([[nonnull]] FILE *__restrict stream, [[nonnull]] wchar_t const *__restrict format, ...)
+__STDC_INT_AS_SIZE_T fwscanf([[nonnull]] FILE *__restrict stream,
+                             [[nonnull, format]] wchar_t const *__restrict format, ...)
 	%{printf("vfwscanf")}
 
 @@>> wscanf(3)
-[[cp_stdio, std, guard, wchar, ATTR_LIBC_WSCANF(1, 2)]]
+[[cp_stdio, std, guard, wchar]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.read.scanf")]]
-__STDC_INT_AS_SIZE_T wscanf([[nonnull]] wchar_t const *__restrict format, ...)
+__STDC_INT_AS_SIZE_T wscanf([[nonnull, format]] wchar_t const *__restrict format, ...)
 	%{printf("vwscanf")}
 
 @@>> swscanf(3)
-[[std, guard, wchar, ATTR_LIBC_WSCANF(2, 3)]]
+[[std, guard, wchar]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.format.scanf")]]
-__STDC_INT_AS_SIZE_T swscanf([[nonnull]] wchar_t const *__restrict src, [[nonnull]] wchar_t const *__restrict format, ...)
+__STDC_INT_AS_SIZE_T swscanf([[nonnull]] wchar_t const *__restrict src,
+                             [[nonnull, format]] wchar_t const *__restrict format, ...)
 	%{printf("vswscanf")}
 
 @@>> vswprintf(3)
-[[std, guard, wchar, ATTR_LIBC_WPRINTF(3, 0)]]
+[[std, guard, wchar]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.format.printf")]]
 __STDC_INT_AS_SIZE_T vswprintf([[outp_opt(min(return + 1, buflen))]] wchar_t *__restrict buf, size_t buflen,
-                               [[nonnull]] wchar_t const *__restrict format, $va_list args) {
+                               [[nonnull, format]] wchar_t const *__restrict format, $va_list args) {
 	COMPILER_IMPURE();
 	if (buflen)
 		*buf = 0;
@@ -937,10 +939,10 @@ __STDC_INT_AS_SIZE_T vswprintf([[outp_opt(min(return + 1, buflen))]] wchar_t *__
 
 @@>> swprintf(3)
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[std, guard, wchar, ATTR_LIBC_WPRINTF(3, 4)]]
+[[std, guard, wchar]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.format.printf")]]
 __STDC_INT_AS_SIZE_T swprintf([[outp_opt(min(return + 1, buflen))]] wchar_t *__restrict buf, size_t buflen,
-                              [[nonnull]] wchar_t const *__restrict format, ...)
+                              [[nonnull, format]] wchar_t const *__restrict format, ...)
 	%{printf("vswprintf")}
 
 %(std)#endif /* __USE_ISOC95 || __USE_UNIX98 || __USE_DOS */
@@ -997,18 +999,18 @@ wcstoull(*) %{generate(str2wcs("strtoull"))}
 
 @@>> vfwscanf(3)
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[cp_stdio, std, guard, wchar, wunused, ATTR_LIBC_WSCANF(2, 0)]]
+[[cp_stdio, std, guard, wchar, wunused]]
 __STDC_INT_AS_SIZE_T vfwscanf([[nonnull]] FILE *__restrict stream,
-                              [[nonnull]] wchar_t const *__restrict format, $va_list args);
+                              [[nonnull, format]] wchar_t const *__restrict format, $va_list args);
 /* TODO: format_scanf() implementation for `vfwscanf'! */
 
 @@>> vwscanf(3)
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[cp_stdio, std, guard, wchar, wunused, ATTR_LIBC_WSCANF(1, 0)]]
+[[cp_stdio, std, guard, wchar, wunused]]
 [[impl_include("<libc/template/stdstreams.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stdin) && $has_function(vfwscanf))]]
-__STDC_INT_AS_SIZE_T vwscanf([[nonnull]] wchar_t const *__restrict format, $va_list args) {
+__STDC_INT_AS_SIZE_T vwscanf([[nonnull, format]] wchar_t const *__restrict format, $va_list args) {
 	return vfwscanf(stdin, format, args);
 }
 
@@ -1016,9 +1018,9 @@ __STDC_INT_AS_SIZE_T vwscanf([[nonnull]] wchar_t const *__restrict format, $va_l
 
 @@>> vswscanf(3)
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[std, guard, wchar, wunused, ATTR_LIBC_WSCANF(2, 0)]]
+[[std, guard, wchar, wunused]]
 __STDC_INT_AS_SIZE_T vswscanf([[nonnull]] wchar_t const *__restrict src,
-                              [[nonnull]] wchar_t const *__restrict format, $va_list args) {
+                              [[nonnull, format]] wchar_t const *__restrict format, $va_list args) {
 	/* TODO: format_wscanf() */
 	(void)src;
 	(void)format;
@@ -1378,7 +1380,7 @@ __STDC_INT_AS_SIZE_T fputws_unlocked([[nonnull]] wchar_t const *__restrict str,
 [[dos_export_alias("_wcsftime_l"), export_alias("__wcsftime_l")]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.format.strftime")]]
 $size_t wcsftime_l([[outp(maxsize)]] wchar_t *__restrict buf, $size_t maxsize,
-                   [[nonnull]] wchar_t const *__restrict format,
+                   [[nonnull, format("wcsftime")]] wchar_t const *__restrict format,
                    [[nonnull]] struct $tm const *__restrict tp,
                    $locale_t locale) {
 	(void)locale;
@@ -1468,35 +1470,35 @@ $wint_t ungetwc_unlocked($wint_t ch, [[nonnull]] $FILE *__restrict stream);
 
 @@>> vfwprintf_unlocked(3)
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[cp_stdio, wchar, ATTR_LIBC_WPRINTF(2, 0)]]
+[[cp_stdio, wchar]]
 [[requires_dependent_function(file_wprinter_unlocked)]]
 __STDC_INT_AS_SIZE_T vfwprintf_unlocked([[nonnull]] $FILE *__restrict stream,
-                                        [[nonnull]] wchar_t const *__restrict format,
+                                        [[nonnull, format]] wchar_t const *__restrict format,
                                         $va_list args) {
 	return (__STDC_INT_AS_SSIZE_T)format_vwprintf(&file_wprinter_unlocked,
 	                                              stream, format, args);
 }
 
 @@>> fwprintf_unlocked(3)
-[[cp_stdio, wchar, ATTR_LIBC_WPRINTF(2, 3)]]
+[[cp_stdio, wchar]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 __STDC_INT_AS_SIZE_T fwprintf_unlocked([[nonnull]] $FILE *__restrict stream,
-                                       [[nonnull]] wchar_t const *__restrict format, ...)
+                                       [[nonnull, format]] wchar_t const *__restrict format, ...)
 	%{printf("vfwprintf_unlocked")}
 
 @@>> wprintf_unlocked(3)
-[[cp_stdio, wchar, ATTR_LIBC_WPRINTF(1, 2)]]
+[[cp_stdio, wchar]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-__STDC_INT_AS_SIZE_T wprintf_unlocked([[nonnull]] wchar_t const *__restrict format, ...)
+__STDC_INT_AS_SIZE_T wprintf_unlocked([[nonnull, format]] wchar_t const *__restrict format, ...)
 	%{printf("vwprintf_unlocked")}
 
 @@>> vwprintf_unlocked(3)
-[[cp_stdio, wchar, ATTR_LIBC_WPRINTF(1, 0)]]
+[[cp_stdio, wchar]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<libc/template/stdstreams.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stdout) && $has_function(vfwprintf_unlocked))]]
-__STDC_INT_AS_SIZE_T vwprintf_unlocked([[nonnull]] wchar_t const *__restrict format, $va_list args) {
+__STDC_INT_AS_SIZE_T vwprintf_unlocked([[nonnull, format]] wchar_t const *__restrict format, $va_list args) {
 	return vfwprintf_unlocked(stdout, format, args);
 }
 
@@ -1504,33 +1506,33 @@ __STDC_INT_AS_SIZE_T vwprintf_unlocked([[nonnull]] wchar_t const *__restrict for
 
 @@>> vfwscanf_unlocked(3)
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[cp_stdio, wunused, ATTR_LIBC_WSCANF(2, 0), wchar, alias("vfwscanf")]]
+[[cp_stdio, wunused, wchar, alias("vfwscanf")]]
 __STDC_INT_AS_SIZE_T vfwscanf_unlocked([[nonnull]] $FILE *__restrict stream,
-                                       [[nonnull]] wchar_t const *__restrict format,
+                                       [[nonnull, format]] wchar_t const *__restrict format,
                                        $va_list args);
 /* TODO: Inline implementation for `vfwscanf_unlocked()' */
 
 @@>> vwscanf_unlocked(3)
 [[impl_include("<libc/template/stdstreams.h>")]]
-[[cp_stdio, wchar, ATTR_LIBC_SCANF(1, 0), wunused]]
+[[cp_stdio, wchar, wunused]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stdin) && $has_function(vfwscanf_unlocked))]]
-__STDC_INT_AS_SIZE_T vwscanf_unlocked([[nonnull]] wchar_t const *__restrict format, $va_list args) {
+__STDC_INT_AS_SIZE_T vwscanf_unlocked([[nonnull, format]] wchar_t const *__restrict format, $va_list args) {
 	return vfwscanf_unlocked(stdin, format, args);
 }
 
 @@>> fwscanf_unlocked(3)
-[[cp_stdio, wchar, ATTR_LIBC_SCANF(2, 3), wunused]]
+[[cp_stdio, wchar, wunused]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 __STDC_INT_AS_SIZE_T fwscanf_unlocked([[nonnull]] $FILE *__restrict stream,
-                                      [[nonnull]] wchar_t const *__restrict format, ...)
+                                      [[nonnull, format]] wchar_t const *__restrict format, ...)
 	%{printf("vfwscanf_unlocked")}
 
 @@>> wscanf_unlocked(3)
-[[cp_stdio, wchar, ATTR_LIBC_SCANF(1, 2), wunused]]
+[[cp_stdio, wchar, wunused]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-__STDC_INT_AS_SIZE_T wscanf_unlocked([[nonnull]] wchar_t const *__restrict format, ...)
+__STDC_INT_AS_SIZE_T wscanf_unlocked([[nonnull, format]] wchar_t const *__restrict format, ...)
 	%{printf("vwscanf_unlocked")}
 
 

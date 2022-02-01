@@ -210,8 +210,16 @@ class Generator {
 
 @@Replacements for str2wcs-related keywords
 global str2wcsReplacementEscapes: {string: string} = Dict({
-	"char"            : "wchar_t",
-	"__SIZEOF_CHAR__" : "__SIZEOF_WCHAR_T__",
+	"char"                 : "wchar_t",
+	"__SIZEOF_CHAR__"      : "__SIZEOF_WCHAR_T__",
+	"ATTR_LIBC_PRINTF"     : "ATTR_LIBC_WPRINTF",
+	"__ATTR_LIBC_PRINTF"   : "__ATTR_LIBC_WPRINTF",
+	"ATTR_LIBC_PRINTF_P"   : "ATTR_LIBC_WPRINTF_P",
+	"__ATTR_LIBC_PRINTF_P" : "__ATTR_LIBC_WPRINTF_P",
+	"ATTR_LIBC_SCANF"      : "ATTR_LIBC_WSCANF",
+	"__ATTR_LIBC_SCANF"    : "__ATTR_LIBC_WSCANF",
+	"ATTR_LIBC_STRFTIME"   : "ATTR_LIBC_WCSFTIME",
+	"__ATTR_LIBC_STRFTIME" : "__ATTR_LIBC_WCSFTIME",
 });
 
 @@Replacement-headers in str2wcs functions

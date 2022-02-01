@@ -56,6 +56,7 @@ global final DEFAULT_LIBFUN_COND     = "!defined(__KERNEL__)";
 global final DEFAULT_KOS_SECTION     = ".text.crt.unsorted";
 global final DEFAULT_DOS_SECTION     = ".text.crt.dos.unsorted";
 global final INCLUDE_KOS_ANNO        = "#include <kos/anno.h>";
+global final INCLUDE_CRT             = "#include <__crt.h>";
 global final IF_FAST_DEFINED_PATTERN = "$extended_prefix("
                                        "#ifdef __LIBC_BIND_OPTIMIZATIONS\n"
                                        "#include <optimized/{}.h>\n"
@@ -447,7 +448,8 @@ function parsePrototypeAnnotation(
 function parseArgumentList(
 		self: CParser, result: FunctionPrototype,
 		defaultAttributes: {(string | UserString)...} = (),
-		functionArgumentNamesOverride: {(string | UserString)...} = none) {
+		functionArgumentNamesOverride: {(string | UserString)...} = none,
+		currentFunction: Function = none) {
 	local tok = self.tok;
 	if (tok == "[") {
 		local numRBracket = 1;
@@ -492,6 +494,8 @@ again_skip_annotation_rbracket:
 	}
 	tok = self.skip("(");
 	local nonNullArguments: {int...} = none;
+	@@Pair of (format-method, format-string-argument-index)
+	local formatArgument: (string, int)  = none;
 	result.argv = [];
 	while (tok != ")") {
 		while (tok == "[") {
@@ -525,6 +529,54 @@ do_add_nonnull_annotation:
 						nonNullArguments = HashSet();
 					nonNullArguments.insert(#result.argv + 1);
 					break;
+
+				case "format": {
+					local method;
+					if (formatArgument !is none) {
+						self.err("[[format]] was already specified as {!r}"
+							.format({ formatArgument }));
+					}
+					tok = self.next();
+					if (tok == "(" || currentFunction is none) {
+						self.skip("(");
+						method = self.parseCStringOrAllUntilRParenAsString();
+						self.skip(")");
+					} else {
+						local functionName = currentFunction.name;
+						final local METHOD_MARKERS: {string...} = {
+							"printf_p", "printf", "scanf" };
+						method = none;
+						for (local marker: METHOD_MARKERS) {
+							local p = functionName.find(marker);
+							if (p < 0)
+								continue;
+							method = marker;
+							local textBefore = functionName[:p];
+							for (local x: { "w", "c16", "c32" }) {
+								if (textBefore.endswith(x)) {
+									method = x + method;
+									break;
+								}
+							}
+						}
+						if (method is none) {
+							self.err("Unable to deduce [[format]] method from function name {!r}"
+								.format({ functionName }));
+						}
+					}
+					method = method.strip("_").upper();
+					if (method !in {
+						"PRINTF", "WPRINTF", "C16PRINTF", "C32PRINTF",
+						"PRINTF_P", "WPRINTF_P", "C16PRINTF_P", "C32PRINTF_P",
+						"SCANF", "WSCANF", "C16SCANF", "C32SCANF",
+						"STRFTIME", "WCSFTIME", "C16FTIME", "C32FTIME",
+						"STRFMON",
+					}) {
+						self.err("Unsupported format method: {!r}"
+							.format({ method }));
+					}
+					formatArgument = (method, #result.argv + 1);
+				}	break;
 
 					/* (Mostly) ignored annotations */
 				case "inp":
@@ -592,6 +644,20 @@ again_skip_arg_annotation_rbracket:
 			result.attributes = List(defaultAttributes);
 		result.attributes.append(attrib);
 	}
+	if (formatArgument !is none) {
+		local attrib = "ATTR_LIBC_{}({}, {})".format({
+			formatArgument.first,
+			formatArgument.last,
+			result.hasEllipsis ? #result.argv : 0,
+		});
+		if (result.attributes === defaultAttributes)
+			result.attributes = List(defaultAttributes);
+		result.attributes.append(attrib);
+		if (result.declPrefix !is List)
+			result.declPrefix = List(result.declPrefix);
+		if (INCLUDE_CRT !in result.declPrefix)
+			result.declPrefix.append(INCLUDE_CRT);
+	}
 }
 
 @@Same as @parseArgumentList, but also parse an optional trailing @"-> TYPE"
@@ -601,8 +667,10 @@ again_skip_arg_annotation_rbracket:
 function parseArgumentListAndOptionalTrailingReturnType(
 		self: CParser, result: FunctionPrototype,
 		defaultAttributes: {(string | UserString)...} = (),
-		functionArgumentNamesOverride: {(string | UserString)...} = none) {
-	parseArgumentList(self, result, defaultAttributes, functionArgumentNamesOverride);
+		functionArgumentNamesOverride: {(string | UserString)...} = none,
+		currentFunction: Function = none) {
+	parseArgumentList(self, result, defaultAttributes,
+		functionArgumentNamesOverride, currentFunction);
 	if (self.tok in ["->", ":"]) {
 		local tok = self.next();
 		if (result.returnType is bound)
@@ -817,14 +885,16 @@ again_skip_annotation_rbracket:
 function parseWholeFunctionPrototype(
 		self: CParser, result: FunctionPrototype,
 		defaultAttributes: {(string | UserString)...} = (),
-		functionArgumentNamesOverride: {(string | UserString)...} = none) {
+		functionArgumentNamesOverride: {(string | UserString)...} = none,
+		currentFunction: Function = none) {
 	if (self.tok != "(") {
 		/* Try to parse a leading return type designator */
 		result.returnType = parseCTypeAndName(self)[0];
 	}
 	parseArgumentListAndOptionalTrailingReturnType(
 		self, result, defaultAttributes,
-		functionArgumentNamesOverride);
+		functionArgumentNamesOverride,
+		currentFunction);
 	if (result.returnType !is bound)
 		result.returnType = CType("void");
 }
@@ -3446,7 +3516,7 @@ function loadSystemHeaderDefinitions(
 			continue;
 		}
 		local currentFeatures = copy context.defaultFeatures;
-		local current = Function(originalSystemHeaderName: headerName);
+		local current: Function = Function(originalSystemHeaderName: headerName);
 		local currentPrototype = FunctionPrototype(nothrow: DEFAULT_NOTHROW);
 		local currentPrototypes = [("1", { currentPrototype })];
 		local currentKosLibraryFunction: LibraryFunction = none;
@@ -4548,7 +4618,7 @@ again_skip_annotation_rbracket:
 		 * before the argument list. So parse that argument  list */
 		parseArgumentListAndOptionalTrailingReturnType(
 			self, currentPrototype, defaultAttributes,
-			functionArgumentNamesOverride);
+			functionArgumentNamesOverride, current);
 		tok = self.tok;
 		/* Default to having a void returnType */
 		if (currentPrototype.returnType !is bound)
@@ -4577,7 +4647,7 @@ again_skip_annotation_rbracket:
 					nothrow: currentPrototype.nothrow);
 				parseWholeFunctionPrototype(
 					self, cxxProto, defaultAttributes,
-					functionArgumentNamesOverride);
+					functionArgumentNamesOverride, current);
 				cxxPrototypes.append(cxxProto);
 				while (numBrackets--)
 					tok = self.skip("]");

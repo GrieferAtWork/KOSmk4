@@ -45,10 +45,9 @@
 %[define_str2wcs_replacement(FORMATPRINTER_CC        = WFORMATPRINTER_CC)]
 %[define_str2wcs_replacement(__FORMATPRINTER_CC      = __WFORMATPRINTER_CC)]
 
-%[define_str2wcs_replacement(ATTR_LIBC_PRINTF   = ATTR_LIBC_WPRINTF)]
-%[define_str2wcs_replacement(ATTR_LIBC_PRINTF_P = ATTR_LIBC_WPRINTF_P)]
-%[define_str2wcs_replacement(ATTR_LIBC_SCANF    = ATTR_LIBC_WSCANF)]
-
+%[define_str2wcs_replacement(ATTR_LIBC_PRINTF     = ATTR_LIBC_WPRINTF)]
+%[define_str2wcs_replacement(ATTR_LIBC_PRINTF_P   = ATTR_LIBC_WPRINTF_P)]
+%[define_str2wcs_replacement(ATTR_LIBC_SCANF      = ATTR_LIBC_WSCANF)]
 %[define_str2wcs_replacement(__ATTR_LIBC_PRINTF   = __ATTR_LIBC_WPRINTF)]
 %[define_str2wcs_replacement(__ATTR_LIBC_PRINTF_P = __ATTR_LIBC_WPRINTF_P)]
 %[define_str2wcs_replacement(__ATTR_LIBC_SCANF    = __ATTR_LIBC_WSCANF)]
@@ -798,7 +797,7 @@ err:
 @@ - ...               There are a _lot_ more...
 @@@return: >= 0: The sum of all values returned by `printer'
 @@@return: < 0:  The first negative value ever returned by `printer' (if any)
-[[kernel, throws, ATTR_LIBC_PRINTF(3, 0)]]
+[[kernel, throws]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<parts/printf-config.h>")]]
 [[impl_include("<libc/template/itoa_digits.h>")]]
@@ -823,7 +822,7 @@ err:
 #endif /* !__NO_PRINTF_VINFO */
 )]]
 $ssize_t format_vprintf([[nonnull]] pformatprinter printer, void *arg,
-                        [[nonnull]] char const *__restrict format,
+                        [[nonnull, format]] char const *__restrict format,
                         $va_list args) {
 #ifndef __INTELLISENSE__
 #define __FORMAT_PRINTER           printer
@@ -848,10 +847,10 @@ $ssize_t format_vprintf([[nonnull]] pformatprinter printer, void *arg,
 #endif /* !__INTELLISENSE__ */
 }
 
-[[kernel, ATTR_LIBC_PRINTF(3, 4), throws]]
+[[kernel, throws]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>"), doc_alias("format_vprintf")]]
 $ssize_t format_printf([[nonnull]] pformatprinter printer, void *arg,
-                       [[nonnull]] char const *__restrict format, ...) {
+                       [[nonnull, format]] char const *__restrict format, ...) {
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -888,14 +887,14 @@ $ssize_t format_printf([[nonnull]] pformatprinter printer, void *arg,
 @@@return: 0 :  No data could be scanned.
 @@@return: * :  The total number of successfully scanned arguments.
 @@@return: EOF: `PGETC' returned EOF the first time an attempt at reading was made
-[[throws, kernel, ATTR_LIBC_SCANF(4, 0)]]
+[[throws, kernel]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<libc/string.h>", "<libc/unicode.h>")]]
 [[impl_include("<parts/printf-config.h>")]]
 [[impl_include("<bits/math-constants.h>")]]
 $ssize_t format_vscanf([[nonnull]] pformatgetc pgetc,
                        [[nonnull]] pformatungetc pungetc, void *arg,
-                       [[nonnull]] char const *__restrict format, $va_list args) {
+                       [[nonnull, format]] char const *__restrict format, $va_list args) {
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE      char
 #define __CHAR_SIZE      __SIZEOF_CHAR__
@@ -908,12 +907,12 @@ $ssize_t format_vscanf([[nonnull]] pformatgetc pgetc,
 #endif /* !__INTELLISENSE__ */
 }
 
-[[throws, ATTR_LIBC_SCANF(4, 5)]]
+[[throws]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 [[doc_alias("format_vscanf"), kernel]]
 $ssize_t format_scanf([[nonnull]] pformatgetc pgetc,
                       [[nonnull]] pformatungetc pungetc, void *arg,
-                      [[nonnull]] char const *__restrict format, ...) {
+                      [[nonnull, format]] char const *__restrict format, ...) {
 	ssize_t result;
 	va_list args;
 	va_start(args, format);

@@ -3087,10 +3087,10 @@ NOTHROW_NCX(LIBCCALL libc_dehumanize_number)(char const *str,
 }
 /*[[[end:libc_dehumanize_number]]]*/
 
-/*[[[head:libd_setproctitle,hash:CRC-32=0x1916f1eb]]]*/
+/*[[[head:libd_setproctitle,hash:CRC-32=0x92733881]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 /* >> setproctitle(3) */
-INTERN ATTR_SECTION(".text.crt.dos.bsd") ATTR_LIBC_PRINTF(1, 2) void
+INTERN ATTR_SECTION(".text.crt.dos.bsd") ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) void
 NOTHROW_NCX(VLIBDCALL libd_setproctitle)(char const *format,
                                          ...)
 /*[[[body:libd_setproctitle]]]*/
@@ -3102,9 +3102,9 @@ NOTHROW_NCX(VLIBDCALL libd_setproctitle)(char const *format,
 #endif /* MAGIC:impl_if */
 /*[[[end:libd_setproctitle]]]*/
 
-/*[[[head:libc_setproctitle,hash:CRC-32=0x935ea57]]]*/
+/*[[[head:libc_setproctitle,hash:CRC-32=0x1a4c9c15]]]*/
 /* >> setproctitle(3) */
-INTERN ATTR_SECTION(".text.crt.bsd") ATTR_LIBC_PRINTF(1, 2) void
+INTERN ATTR_SECTION(".text.crt.bsd") ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) void
 NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format,
                                          ...)
 /*[[[body:libc_setproctitle]]]*/

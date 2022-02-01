@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ca0b851 */
+/* HASH CRC-32:0x38972fd1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4466,8 +4466,9 @@ NOTHROW_NCX(LIBCCALL libc_strcasestr_l)(char const *haystack,
 	}
 	return NULL;
 }
-/* Print the given `format' into a newly allocated, heap-allocated string */
-INTERN ATTR_SECTION(".text.crt.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_LIBC_PRINTF(1, 0) char *
+/* >> strdupf(3), vstrdupf(3)
+ * Print the given `format' into a newly allocated, heap-allocated string */
+INTERN ATTR_SECTION(".text.crt.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_vstrdupf)(char const *__restrict format,
                                     va_list args) {
 	char *result;
@@ -4475,8 +4476,9 @@ NOTHROW_NCX(LIBCCALL libc_vstrdupf)(char const *__restrict format,
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Print the given `format' into a newly allocated, heap-allocated string */
-INTERN ATTR_SECTION(".text.crt.dos.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_LIBC_PRINTF(1, 0) char *
+/* >> strdupf(3), vstrdupf(3)
+ * Print the given `format' into a newly allocated, heap-allocated string */
+INTERN ATTR_SECTION(".text.crt.dos.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) char *
 NOTHROW_NCX(VLIBDCALL libd_strdupf)(char const *__restrict format,
                                     ...) {
 	char * result;
@@ -4488,8 +4490,9 @@ NOTHROW_NCX(VLIBDCALL libd_strdupf)(char const *__restrict format,
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Print the given `format' into a newly allocated, heap-allocated string */
-INTERN ATTR_SECTION(".text.crt.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_LIBC_PRINTF(1, 0) char *
+/* >> strdupf(3), vstrdupf(3)
+ * Print the given `format' into a newly allocated, heap-allocated string */
+INTERN ATTR_SECTION(".text.crt.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) char *
 NOTHROW_NCX(VLIBCCALL libc_strdupf)(char const *__restrict format,
                                     ...) {
 	char * result;

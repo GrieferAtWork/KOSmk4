@@ -109,11 +109,11 @@ __LIBC int error_one_per_line;
 @@The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
 @@Also note that `stdout' is flushed before the message is printed.
 @@If `STATUS' is non-zero, follow up with a call to `exit(status)'
-[[ATTR_LIBC_PRINTF(3, 4), fast, libc, throws]]
+[[fast, libc, throws]]
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<libc/template/stdstreams.h>")]]
 [[impl_prefix(DEFINE_LOCAL_error_print_progname)]]
 [[impl_prefix(DEFINE_LOCAL_error_message_count)]]
+[[impl_include("<libc/template/stdstreams.h>")]]
 [[impl_include("<libc/template/program_invocation_name.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires_include("<libc/template/program_invocation_name.h>")]]
@@ -121,7 +121,7 @@ __LIBC int error_one_per_line;
            $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc) &&
            defined(__LOCAL_program_invocation_short_name) &&
            $has_function(strerror))]]
-void error(int status, $errno_t errnum, const char *format, ...) {
+void error(int status, $errno_t errnum, [[nullable, format("printf")]] const char *format, ...) {
 @@pp_ifdef __LOCAL_error_print_progname@@
 	if (__LOCAL_error_print_progname) {
 		(*__LOCAL_error_print_progname)();
@@ -153,7 +153,7 @@ void error(int status, $errno_t errnum, const char *format, ...) {
 @@The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
 @@Additionally,    when   `error_one_per_line'   is    non-zero,   consecutive   calls    to   this   function   that
 @@pass the same values for `filename' and `line' will not produce the error message.
-[[fast, libc, throws, ATTR_LIBC_PRINTF(5, 6)]]
+[[fast, libc, throws]]
 [[decl_include("<bits/types.h>")]]
 [[impl_include("<libc/template/stdstreams.h>")]]
 [[impl_include("<libc/template/program_invocation_name.h>")]]
@@ -167,7 +167,7 @@ void error(int status, $errno_t errnum, const char *format, ...) {
 [[impl_prefix(DEFINE_LOCAL_error_one_per_line)]]
 [[impl_prefix(DEFINE_LOCAL_error_message_count)]]
 void error_at_line(int status, $errno_t errnum, char const *filename,
-                   unsigned int line, char const *format, ...) {
+                   unsigned int line, [[nullable, format("printf")]] char const *format, ...) {
 @@pp_ifdef __LOCAL_error_one_per_line@@
 	static char const *last_filename = NULL;
 	static unsigned int last_line = 0;

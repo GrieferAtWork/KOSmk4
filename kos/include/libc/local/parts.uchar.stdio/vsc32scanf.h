@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b93f85d */
+/* HASH CRC-32:0xfb7dd887 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vsc32scanf) __ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(vsc32scanf) __ATTR_WUNUSED __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(vsc32scanf))(__CHAR32_TYPE__ const *__restrict __src, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args) {
 	/* TODO: format_wscanf() */
 	(void)__src;

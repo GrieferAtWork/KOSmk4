@@ -444,9 +444,9 @@ NOTHROW_NCX(LIBDCALL libd_open_wmemstream)(char16_t **bufloc,
 
 
 
-/*[[[head:libc_vfwscanf_unlocked,hash:CRC-32=0x3782c23a]]]*/
+/*[[[head:libc_vfwscanf_unlocked,hash:CRC-32=0x56fae7ed]]]*/
 /* >> vfwscanf_unlocked(3) */
-INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_C32SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (LIBKCALL libc_vfwscanf_unlocked)(FILE *__restrict stream,
                                   char32_t const *__restrict format,
                                   va_list args) THROWS(...)
@@ -491,9 +491,9 @@ NOTHROW_NCX(LIBKCALL libc_fgetwln)(FILE *__restrict fp,
 }
 /*[[[end:libc_fgetwln]]]*/
 
-/*[[[head:libd_vfwscanf_unlocked,hash:CRC-32=0xd9ad7ce7]]]*/
+/*[[[head:libd_vfwscanf_unlocked,hash:CRC-32=0xd14852eb]]]*/
 /* >> vfwscanf_unlocked(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_C16SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (LIBDCALL libd_vfwscanf_unlocked)(FILE *__restrict stream,
                                   char16_t const *__restrict format,
                                   va_list args) THROWS(...)
@@ -508,9 +508,9 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR
 }
 /*[[[end:libd_vfwscanf_unlocked]]]*/
 
-/*[[[head:libc_vfwscanf,hash:CRC-32=0xdd6b097e]]]*/
+/*[[[head:libc_vfwscanf,hash:CRC-32=0xb71140c5]]]*/
 /* >> vfwscanf(3) */
-INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_C32SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (LIBKCALL libc_vfwscanf)(FILE *__restrict stream,
                          char32_t const *__restrict format,
                          va_list args) THROWS(...)
@@ -525,9 +525,9 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_
 }
 /*[[[end:libc_vfwscanf]]]*/
 
-/*[[[head:libd_vfwscanf,hash:CRC-32=0x1cd69c77]]]*/
+/*[[[head:libd_vfwscanf,hash:CRC-32=0x4efbec88]]]*/
 /* >> vfwscanf(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_C16SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (LIBDCALL libd_vfwscanf)(FILE *__restrict stream,
                          char16_t const *__restrict format,
                          va_list args) THROWS(...)

@@ -6294,19 +6294,19 @@ char *strcasestr_l([[nonnull]] char const *haystack, [[nonnull]] char const *nee
 %
 
 
-[[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_LIBC_PRINTF(1, 0)]]
+[[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
 [[doc_alias("strdupf"), section(".text.crt{|.dos}.heap.strdup")]]
 [[requires_function(vasprintf)]]
-char *vstrdupf(char const *__restrict format, $va_list args) {
+char *vstrdupf([[nonnull, format("printf")]] char const *__restrict format, $va_list args) {
 	char *result;
 	return vasprintf(&result, format, args) >= 0 ? result : 0;
 }
 
+@@>> strdupf(3), vstrdupf(3)
 @@Print the given `format' into a newly allocated, heap-allocated string
-[[wunused, ATTR_MALL_DEFAULT_ALIGNED]]
-[[ATTR_MALLOC, ATTR_LIBC_PRINTF(1, 0)]]
+[[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
 [[section(".text.crt{|.dos}.heap.strdup")]]
-char *strdupf(char const *__restrict format, ...)
+char *strdupf([[nonnull, format("printf")]] char const *__restrict format, ...)
 	%{printf(vstrdupf)}
 
 %{

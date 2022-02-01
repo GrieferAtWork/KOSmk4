@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc574068 */
+/* HASH CRC-32:0x43b9088d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_vfwprintf_defined
 #endif /* !... */
 #endif /* !__local___localdep_vfwprintf_defined */
-__LOCAL_LIBC(__stdio_common_vfwprintf) __ATTR_NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(__stdio_common_vfwprintf) __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__stdio_common_vfwprintf))(__UINT64_TYPE__ __options, __FILE *__stream, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args) {
 	(void)__locale;
 	(void)__options;

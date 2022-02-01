@@ -130,8 +130,7 @@ $ssize_t format_wrepeat([[nonnull]] pwformatprinter printer, void *arg,
 %
 %
 
-[[throws, ATTR_LIBC_WPRINTF(3, 0)]]
-[[wchar, doc_alias("format_vprintf")]]
+[[throws, wchar, doc_alias("format_vprintf")]]
 [[decl_include("<bits/crt/wformat-printer.h>")]]
 [[impl_include("<parts/printf-config.h>")]]
 [[impl_include("<libc/template/itoa_digits.h>")]]
@@ -156,7 +155,7 @@ $ssize_t format_wrepeat([[nonnull]] pwformatprinter printer, void *arg,
 #endif /* !__NO_PRINTF_VINFO */
 )]]
 $ssize_t format_vwprintf([[nonnull]] pwformatprinter printer, void *arg,
-                         [[nonnull]] wchar_t const *__restrict format,
+                         [[nonnull, format]] wchar_t const *__restrict format,
                          $va_list args) {
 #ifndef __INTELLISENSE__
 #define __FORMAT_PRINTER            printer

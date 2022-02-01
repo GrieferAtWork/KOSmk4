@@ -182,7 +182,8 @@ task_rpc_exec(struct task *__restrict thread, syscall_ulong_t flags,
 	 * the same thing, but  also works then the  thread hosted by another  CPU. */
 	if (thread->t_flags & TASK_FKERNTHREAD) {
 		assertf(!(flags & RPC_SYNCMODE_F_USER), "Can't send user-return RPC to kernel-only thread");
-		task_wake(thread);
+		STATIC_ASSERT(RPC_PRIORITY_F_HIGH == TASK_WAKE_FHIGHPRIO);
+		return task_wake(thread, flags);
 	} else {
 		userexcept_sysret_inject_safe(thread, flags);
 	}
@@ -325,11 +326,11 @@ again_test_signo:
 
 
 /* Check if there are any unmasked process RPCs that are currently pending. */
+PRIVATE WUNUSED bool FCALL
+are_any_unmasked_process_rpcs_pending(void)
 #ifdef CONFIG_HAVE_USERPROCMASK
-PRIVATE WUNUSED bool FCALL are_any_unmasked_process_rpcs_pending(void)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT)
 #else /* CONFIG_HAVE_USERPROCMASK */
-PRIVATE WUNUSED bool FCALL are_any_unmasked_process_rpcs_pending(void)
 		THROWS(E_WOULDBLOCK)
 #endif /* !CONFIG_HAVE_USERPROCMASK */
 {
@@ -386,7 +387,8 @@ are_any_unmasked_process_rpcs_pending_with_sigmask(sigset_t const *__restrict si
 
 /* Same as `are_any_unmasked_process_rpcs_pending()', but use *_nopf memory
  * access, and if that fails, assume that pending RPCs are always unmasked. */
-PRIVATE WUNUSED bool NOTHROW(FCALL are_any_unmasked_process_rpcs_maybe_pending_nx)(void) {
+PRIVATE WUNUSED bool
+NOTHROW(FCALL are_any_unmasked_process_rpcs_maybe_pending_nx)(void) {
 	struct pending_rpc *rpc;
 	struct process_pending_rpcs *proc_rpcs = &THIS_PROCESS_RPCS;
 	if (ATOMIC_READ(proc_rpcs->ppr_list.slh_first) == NULL)

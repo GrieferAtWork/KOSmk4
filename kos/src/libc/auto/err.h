@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6604e5cb */
+/* HASH CRC-32:0x2abcd4f0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,22 +52,22 @@ INTDEF ATTR_LIBC_PRINTF(1, 0) void (LIBCCALL libc_vwarn)(char const *format, va_
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> warnc(3), vwarnc(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
-INTDEF ATTR_LIBC_PRINTF(1, 2) void (VLIBDCALL libd_warnc)(errno_t used_errno, char const *format, ...) THROWS(...);
+INTDEF ATTR_LIBC_PRINTF(2, 3) void (VLIBDCALL libd_warnc)(errno_t used_errno, char const *format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> warnc(3), vwarnc(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
-INTDEF ATTR_LIBC_PRINTF(1, 2) void (VLIBCCALL libc_warnc)(errno_t used_errno, char const *format, ...) THROWS(...);
+INTDEF ATTR_LIBC_PRINTF(2, 3) void (VLIBCCALL libc_warnc)(errno_t used_errno, char const *format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> warnc(3), vwarnc(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
-INTDEF ATTR_LIBC_PRINTF(1, 0) void (LIBDCALL libd_vwarnc)(errno_t used_errno, char const *format, va_list args) THROWS(...);
+INTDEF ATTR_LIBC_PRINTF(2, 0) void (LIBDCALL libd_vwarnc)(errno_t used_errno, char const *format, va_list args) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> warnc(3), vwarnc(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
-INTDEF ATTR_LIBC_PRINTF(1, 0) void (LIBCCALL libc_vwarnc)(errno_t used_errno, char const *format, va_list args) THROWS(...);
+INTDEF ATTR_LIBC_PRINTF(2, 0) void (LIBCCALL libc_vwarnc)(errno_t used_errno, char const *format, va_list args) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> warnx(3), vwarnx(3)
@@ -112,22 +112,22 @@ INTDEF ATTR_NORETURN ATTR_LIBC_PRINTF(2, 0) void (LIBCCALL libc_verr)(int status
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> errc(3), verrc(3)
  * Same as `warnc()', but follow up by calling `exit(status)' */
-INTDEF ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void (VLIBDCALL libd_errc)(int status, errno_t used_errno, char const *format, ...) THROWS(...);
+INTDEF ATTR_NORETURN ATTR_LIBC_PRINTF(3, 4) void (VLIBDCALL libd_errc)(int status, errno_t used_errno, char const *format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> errc(3), verrc(3)
  * Same as `warnc()', but follow up by calling `exit(status)' */
-INTDEF ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void (VLIBCCALL libc_errc)(int status, errno_t used_errno, char const *format, ...) THROWS(...);
+INTDEF ATTR_NORETURN ATTR_LIBC_PRINTF(3, 4) void (VLIBCCALL libc_errc)(int status, errno_t used_errno, char const *format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> errc(3), verrc(3)
  * Same as `warnc()', but follow up by calling `exit(status)' */
-INTDEF ATTR_NORETURN ATTR_LIBC_PRINTF(2, 0) void (LIBDCALL libd_verrc)(int status, errno_t used_errno, char const *format, va_list args) THROWS(...);
+INTDEF ATTR_NORETURN ATTR_LIBC_PRINTF(3, 0) void (LIBDCALL libd_verrc)(int status, errno_t used_errno, char const *format, va_list args) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> errc(3), verrc(3)
  * Same as `warnc()', but follow up by calling `exit(status)' */
-INTDEF ATTR_NORETURN ATTR_LIBC_PRINTF(2, 0) void (LIBCCALL libc_verrc)(int status, errno_t used_errno, char const *format, va_list args) THROWS(...);
+INTDEF ATTR_NORETURN ATTR_LIBC_PRINTF(3, 0) void (LIBCCALL libc_verrc)(int status, errno_t used_errno, char const *format, va_list args) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> errx(3), verrx(3)

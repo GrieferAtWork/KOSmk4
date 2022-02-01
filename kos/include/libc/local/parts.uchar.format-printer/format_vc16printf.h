@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a9a24b */
+/* HASH CRC-32:0xb66c6bd4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -339,7 +339,7 @@ __NAMESPACE_LOCAL_END
 #endif /* __KERNEL__ && __KOS__ */
 #endif /* !__NO_PRINTF_VINFO */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(format_vc16printf) __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__
+__LOCAL_LIBC(format_vc16printf) __ATTR_LIBC_C16PRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__
 (__LIBDCALL __LIBC_LOCAL_NAME(format_vc16printf))(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args) __THROWS(...) {
 #ifndef __INTELLISENSE__
 #define __FORMAT_PRINTER            __printer

@@ -3755,8 +3755,8 @@ int dehumanize_number(char const *str, $int64_t *size); /* TODO: Implement here 
 
 
 @@>> setproctitle(3)
-[[guard, ATTR_LIBC_PRINTF(1, 2)]]
-void setproctitle(char const *format, ...);
+[[guard]]
+void setproctitle([[nonnull, format("printf")]] char const *format, ...);
 
 
 %[insert:function(reallocarr = reallocarray)]

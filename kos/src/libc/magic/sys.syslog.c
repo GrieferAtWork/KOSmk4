@@ -158,18 +158,17 @@ void openlog(char const *ident,
 [[decl_include("<features.h>")]]
 int setlogmask(__STDC_INT_AS_UINT_T mask);
 
-[[decl_include("<features.h>")]]
-[[cp, ATTR_LIBC_PRINTF(2, 3)]]
+[[cp, decl_include("<features.h>")]]
 void syslog(__STDC_INT_AS_UINT_T level,
-            [[nonnull]] char const *format, ...)
+            [[nonnull, format("printf")]] char const *format, ...)
 	%{printf("vsyslog")}
 
 %
 %#ifdef __USE_MISC
-[[cp, ATTR_LIBC_PRINTF(2, 0), decl_include("<features.h>")]]
+[[cp, decl_include("<features.h>")]]
 [[requires_dependent_function(syslog_printer)]]
 void vsyslog(__STDC_INT_AS_UINT_T level,
-             [[nonnull]] char const *format,
+             [[nonnull, format("printf")]] char const *format,
              $va_list args) {
 	format_vprintf(&syslog_printer,
 	               (void *)(uintptr_t)(unsigned int)level,

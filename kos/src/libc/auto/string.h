@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2bb76758 */
+/* HASH CRC-32:0x91c8c61f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1975,20 +1975,24 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_strcase
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_strcasestr_l)(char const *haystack, char const *needle, locale_t locale);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Print the given `format' into a newly allocated, heap-allocated string */
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_LIBC_PRINTF(1, 0) char *NOTHROW_NCX(LIBDCALL libd_vstrdupf)(char const *__restrict format, va_list args);
+/* >> strdupf(3), vstrdupf(3)
+ * Print the given `format' into a newly allocated, heap-allocated string */
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_vstrdupf)(char const *__restrict format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Print the given `format' into a newly allocated, heap-allocated string */
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_LIBC_PRINTF(1, 0) char *NOTHROW_NCX(LIBCCALL libc_vstrdupf)(char const *__restrict format, va_list args);
+/* >> strdupf(3), vstrdupf(3)
+ * Print the given `format' into a newly allocated, heap-allocated string */
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_vstrdupf)(char const *__restrict format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Print the given `format' into a newly allocated, heap-allocated string */
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_LIBC_PRINTF(1, 0) char *NOTHROW_NCX(VLIBDCALL libd_strdupf)(char const *__restrict format, ...);
+/* >> strdupf(3), vstrdupf(3)
+ * Print the given `format' into a newly allocated, heap-allocated string */
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) char *NOTHROW_NCX(VLIBDCALL libd_strdupf)(char const *__restrict format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Print the given `format' into a newly allocated, heap-allocated string */
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_LIBC_PRINTF(1, 0) char *NOTHROW_NCX(VLIBCCALL libc_strdupf)(char const *__restrict format, ...);
+/* >> strdupf(3), vstrdupf(3)
+ * Print the given `format' into a newly allocated, heap-allocated string */
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) char *NOTHROW_NCX(VLIBCCALL libc_strdupf)(char const *__restrict format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_wildstrcmp)(char const *pattern, char const *string);

@@ -107,13 +107,23 @@
 #endif /* ... */
 
 
-#define __ATTR_LIBC_PRINTF(a, b)    /* nothing */
-#define __ATTR_LIBC_PRINTF_P(a, b)  /* nothing */
-#define __ATTR_LIBC_SCANF(a, b)     /* nothing */
-#define __ATTR_LIBC_STRFMON(a, b)   /* nothing */
-#define __ATTR_LIBC_WPRINTF(a, b)   /* nothing */
-#define __ATTR_LIBC_WPRINTF_P(a, b) /* nothing */
-#define __ATTR_LIBC_WSCANF(a, b)    /* nothing */
+#define __ATTR_LIBC_PRINTF(a, b)      /* nothing */
+#define __ATTR_LIBC_PRINTF_P(a, b)    /* nothing */
+#define __ATTR_LIBC_SCANF(a, b)       /* nothing */
+#define __ATTR_LIBC_STRFMON(a, b)     /* nothing */
+#define __ATTR_LIBC_STRFTIME(a, b)    /* nothing */
+#define __ATTR_LIBC_WPRINTF(a, b)     /* nothing */
+#define __ATTR_LIBC_WPRINTF_P(a, b)   /* nothing */
+#define __ATTR_LIBC_WSCANF(a, b)      /* nothing */
+#define __ATTR_LIBC_WCSFTIME(a, b)    /* nothing */
+#define __ATTR_LIBC_C16PRINTF(a, b)   /* nothing */
+#define __ATTR_LIBC_C16PRINTF_P(a, b) /* nothing */
+#define __ATTR_LIBC_C16SCANF(a, b)    /* nothing */
+#define __ATTR_LIBC_C16FTIME(a, b)    /* nothing */
+#define __ATTR_LIBC_C32PRINTF(a, b)   /* nothing */
+#define __ATTR_LIBC_C32PRINTF_P(a, b) /* nothing */
+#define __ATTR_LIBC_C32SCANF(a, b)    /* nothing */
+#define __ATTR_LIBC_C32FTIME(a, b)    /* nothing */
 
 #ifndef __LIBC_MALLOC_ALIGNMENT
 #ifdef __INTELLISENSE__ /* Don't include <hybrid/typecore.h> */
