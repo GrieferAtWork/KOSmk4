@@ -300,6 +300,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Set-up the realtime clock resync interrupt */
 	x86_initialize_tsc_resync();
 
+	/* Do some more initialization of the scheduling system that can only
+	 * be done after everything SMP-related has already been  intialized. */
+	kernel_initialize_scheduler_after_smp();
+
 	/* XXX: ioapic support (ioapic is the modern equivalent of the pic) */
 
 #ifdef CONFIG_FPU

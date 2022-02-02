@@ -181,9 +181,8 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
                                      * its first quantum before `task_start()' returns. */
 #ifdef __CC__
 /* Start executing  the  given task  on  the  CPU it  has  been  assigned.
- * HINT: By default, `task_alloc()' will assign new tasks to the boot CPU.
- * @return: * : Always re-returns `thread' */
-FUNDEF NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct task *
+ * HINT: By default, `task_alloc()' will assign new tasks to the boot CPU. */
+FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags);
 
 /* Default flags used for `task_start()'
@@ -193,9 +192,9 @@ DATDEF unsigned int task_start_default_flags;
 
 #ifdef __cplusplus
 extern "C++" {
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_RETNONNULL NONNULL((1)) struct task *
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void
 NOTHROW(FCALL task_start)(struct task *__restrict thread) {
-	return task_start(thread, task_start_default_flags);
+	task_start(thread, task_start_default_flags);
 }
 } /* extern "C++" */
 #endif /* __cplusplus */
@@ -410,49 +409,6 @@ FUNDEF void (KCALL task_yield)(void) THROWS(E_WOULDBLOCK_PREEMPTED);
 FUNDEF WUNUSED __BOOL NOTHROW(KCALL task_yield_nx)(void);
 #endif /* !__task_yield_defined */
 #endif /* __CC__ */
-
-
-
-
-
-#if 0
-#define TASK_CLONE_CSIGNAL        0x000000ff /* Signal mask to be sent at exit. */
-#define TASK_CLONE_VM             0x00000100 /* Set if VM shared between processes. */
-#define TASK_CLONE_FS             0x00000200 /* Set if fs info shared between processes. */
-#define TASK_CLONE_FILES          0x00000400 /* Set if open files shared between processes. */
-#define TASK_CLONE_SIGHAND        0x00000800 /* Set if signal handlers shared. */
-/*      TASK_CLONE_               0x00001000  * ... */
-#define TASK_CLONE_PTRACE         0x00002000 /* Set if tracing continues on the child. */
-#define TASK_CLONE_VFORK          0x00004000 /* Set if the parent wants the child to wake it up on mm_release. */
-#define TASK_CLONE_PARENT         0x00008000 /* Set if we want to have the same parent as the cloner. */
-#define TASK_CLONE_THREAD         0x00010000 /* Set to add to same thread group. */
-#define TASK_CLONE_NEWNS          0x00020000 /* Set to create new namespace. */
-#define TASK_CLONE_SYSVSEM        0x00040000 /* Set to shared SVID SEM_UNDO semantics. */
-#define TASK_CLONE_SETTLS         0x00080000 /* Set TLS info. */
-#define TASK_CLONE_PARENT_SETTID  0x00100000 /* Store TID in userlevel buffer before MM copy. */
-#define TASK_CLONE_CHILD_CLEARTID 0x00200000 /* Register exit futex and memory location to clear. */
-#define TASK_CLONE_DETACHED       0x00400000 /* Create clone detached. */
-#define TASK_CLONE_UNTRACED       0x00800000 /* Set if the tracing process can't force CLONE_PTRACE on this clone. */
-#define TASK_CLONE_CHILD_SETTID   0x01000000 /* Store TID in userlevel buffer in the child. */
-/*      TASK_CLONE_               0x02000000  * ... */
-#define TASK_CLONE_NEWUTS         0x04000000 /* New utsname group. */
-#define TASK_CLONE_NEWIPC         0x08000000 /* New ipcs. */
-#define TASK_CLONE_NEWUSER        0x10000000 /* New user namespace. */
-#define TASK_CLONE_NEWPID         0x20000000 /* New pid namespace. */
-#define TASK_CLONE_NEWNET         0x40000000 /* New network namespace. */
-#define TASK_CLONE_IO             0x80000000 /* Clone I/O context. */
-
-/* High-level kernel interface for the clone(2) system call.
- * @param: clone_flags: Set of `TASK_CLONE_*' */
-FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct task *
-(KCALL task_create)(struct ucpustate const *__restrict init_state,
-                    uintptr_t clone_flags, void *tls_val,
-                    USER CHECKED pid_t *parent_tidptr,
-                    USER CHECKED pid_t *child_tidptr)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
-#endif
-
-
 
 DECL_END
 

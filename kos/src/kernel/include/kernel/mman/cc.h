@@ -70,6 +70,12 @@ DATDEF unsigned int system_cc_maxattempts;
 FUNDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) __BOOL
 NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info);
 
+/* Helper  wrapper  for  `system_cc()'  that   throws
+ * `E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY' on error. */
+FUNDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void FCALL
+system_cc_virtual_memory(struct ccinfo *__restrict info)
+		THROWS(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY);
+
 
 /************************************************************************/
 /* Helper functions to clear the caches of known objects.               */

@@ -220,9 +220,8 @@ trigger_clone_trap(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 PUBLIC unsigned int task_start_default_flags = TASK_START_FNORMAL;
 
 /* Start executing  the  given task  on  the  CPU it  has  been  assigned.
- * HINT: By default, `task_alloc()' will assign new tasks to the boot CPU.
- * @return: * : Always re-returns `thread' */
-PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct task *
+ * HINT: By default, `task_alloc()' will assign new tasks to the boot CPU. */
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 	pflag_t was;
 	struct cpu *me;
@@ -264,7 +263,7 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 		if (old_flags & (TASK_FSTARTED | TASK_FRUNNING)) {
 			assertf(!(old_flags & TASK_FRUNNING) || (old_flags & TASK_FSTARTED),
 			        "old_flags = %#" PRIxPTR, old_flags);
-			goto done;
+			return;
 		}
 		FORTASK(thread, this_starttime) = ktime();
 		FORTASK(thread, this_stoptime)  = FORTASK(thread, this_starttime);
@@ -303,8 +302,6 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 		}
 	}
 	PREEMPTION_POP(was);
-done:
-	return thread;
 }
 
 DECL_END

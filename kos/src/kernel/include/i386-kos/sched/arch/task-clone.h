@@ -17,9 +17,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_SCHED_ARCH_CPU_H
-#define GUARD_KERNEL_INCLUDE_SCHED_ARCH_CPU_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_TASK_CLONE_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_TASK_CLONE_H 1
 
 #include <kernel/compiler.h>
 
-#endif /* !GUARD_KERNEL_INCLUDE_SCHED_ARCH_CPU_H */
+#include <kernel/types.h>
+
+#define ARCH_CLONE__PARAMS              \
+	,                                   \
+	USER UNCHECKED void *x86_child_psp, \
+	uintptr_t x86_child_gsbase,         \
+	uintptr_t x86_child_fsbase
+#define ARCH_CLONE__ARGS \
+	, x86_child_psp, x86_child_gsbase, x86_child_fsbase
+
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_TASK_CLONE_H */

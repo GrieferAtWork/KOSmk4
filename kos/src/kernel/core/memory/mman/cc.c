@@ -1392,6 +1392,17 @@ NOTHROW(FCALL system_cc)(struct ccinfo *__restrict info) {
 	return false;
 }
 
+/* Helper  wrapper  for  `system_cc()'  that   throws
+ * `E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY' on error. */
+PUBLIC NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void FCALL
+system_cc_virtual_memory(struct ccinfo *__restrict info)
+		THROWS(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY) {
+	if unlikely(!system_cc(info)) {
+		THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
+		      info->ci_bytes);
+	}
+}
+
 
 
 DECL_END

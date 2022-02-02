@@ -89,6 +89,7 @@ struct task task_header = {
 	{ .t_state = NULL }
 };
 
+DATDEF ATTR_PERTASK struct mnode this_trampoline_node_ ASMNAME("this_trampoline_node");
 DATDEF ATTR_PERTASK struct mpart this_kernel_stackpart_ ASMNAME("this_kernel_stackpart");
 DATDEF ATTR_PERTASK struct mnode this_kernel_stacknode_ ASMNAME("this_kernel_stacknode");
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
@@ -122,7 +123,7 @@ PUBLIC ATTR_PERTASK struct mpart this_kernel_stackpart_ = {
 
 PUBLIC ATTR_PERTASK struct mnode this_kernel_stacknode_ = {
 	MNODE_INIT_mn_mement({ {} }),
-	MNODE_INIT_mn_minaddr(0),
+	MNODE_INIT_mn_minaddr(MAP_FAILED),
 	MNODE_INIT_mn_maxaddr(KERNEL_STACKSIZE - 1),
 	MNODE_INIT_mn_flags(MNODE_F_PWRITE | MNODE_F_PREAD |
 	                    MNODE_F_SHARED | MNODE_F_NOSPLIT |
@@ -141,7 +142,7 @@ PUBLIC ATTR_PERTASK struct mnode this_kernel_stacknode_ = {
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
 PUBLIC ATTR_PERTASK struct mnode this_kernel_stackguard_ = {
 	MNODE_INIT_mn_mement({}),
-	MNODE_INIT_mn_minaddr(0),
+	MNODE_INIT_mn_minaddr(MAP_FAILED),
 	MNODE_INIT_mn_maxaddr(PAGESIZE - 1),
 	MNODE_INIT_mn_flags(MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
 	                    MNODE_F_KERNPART | MNODE_F_MLOCK |
@@ -170,11 +171,11 @@ INTDEF FREE void NOTHROW(KCALL kernel_initialize_scheduler_arch)(void);
 LOCAL ATTR_FREETEXT void
 NOTHROW(KCALL initialize_predefined_trampoline)(struct task *__restrict self,
                                                    PAGEDIR_PAGEALIGNED void *addr) {
-	FORTASK(self, this_trampoline_node).mn_minaddr = (byte_t *)addr;
-	FORTASK(self, this_trampoline_node).mn_maxaddr = (byte_t *)addr + PAGESIZE - 1;
+	FORTASK(self, this_trampoline_node_).mn_minaddr = (byte_t *)addr;
+	FORTASK(self, this_trampoline_node_).mn_maxaddr = (byte_t *)addr + PAGESIZE - 1;
 	/* Load the trampoline node into the kernel VM. */
-	assert(FORTASK(self, this_trampoline_node).mn_mman == &mman_kernel);
-	mman_mappings_insert(&mman_kernel, &FORTASK(self, this_trampoline_node));
+	assert(FORTASK(self, this_trampoline_node_).mn_mman == &mman_kernel);
+	mman_mappings_insert(&mman_kernel, &FORTASK(self, this_trampoline_node_));
 }
 
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
@@ -200,6 +201,20 @@ INTDEF byte_t __kernel_asyncwork_stack_guard[];
 INTDEF byte_t __kernel_bootidle_stack_guard[];
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 
+
+INTERN ATTR_FREETEXT void
+NOTHROW(KCALL kernel_initialize_scheduler_after_smp)(void) {
+	/* This right here is needed for `clone(2)', but until this point, we had the
+	 * task  template's mman field  point at the  kernel mman, thus automatically
+	 * initializing it correctly for all of the statically allocated thread, such
+	 * as CPU IDLE threads, as well as boottask/bootidle and asyncwork. */
+	struct task *task_template;
+	task_template = (struct task *)__kernel_pertask_start;
+	assert(task_template->t_mman == &mman_kernel);
+	assert(FORTASK(task_template, this_kernel_stackpart_).mp_state = MPART_ST_MEM);
+	task_template->t_mman                                   = NULL;
+	FORTASK(task_template, this_kernel_stackpart_).mp_state = MPART_ST_VOID;
+}
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_scheduler)(void) {
@@ -366,21 +381,10 @@ PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL task_destroy_raw_impl_post)(Tobpostlockop(mman) *__restrict _lop,
                                           struct mman *__restrict UNUSED(mm)) {
 	struct task *self;
-	REF struct mman *mm;
 	self = (struct task *)_lop;
 
 	/* Deallocate physical memory once used by the kernel stack. */
 	mpart_ll_freemem(&FORTASK(self, this_kernel_stackpart_));
-
-	/* Remove from the mman's task list. */
-	mm = self->t_mman;
-	if likely(LIST_ISBOUND(self, t_mman_tasks)) {
-		mman_threadslock_acquire(mm);
-		if likely(LIST_ISBOUND(self, t_mman_tasks))
-			LIST_REMOVE(self, t_mman_tasks);
-		mman_threadslock_release(mm);
-	}
-	decref(mm);
 
 	/* Free the backing memory of the task structure itself. */
 	heap_free(&kernel_locked_heap, self, self->t_heapsz, GFP_LOCKED);
@@ -396,12 +400,12 @@ NOTHROW(FCALL task_destroy_raw_impl)(Toblockop(mman) *__restrict _lop,
 	self = (struct task *)_lop;
 
 	/* Unlink + unmap the trampoline node. */
-	mman_mappings_removenode(&mman_kernel, &FORTASK(self, this_trampoline_node));
+	mman_mappings_removenode(&mman_kernel, &FORTASK(self, this_trampoline_node_));
 
 	/* The  `mn_writable' field is only valid when  a part is set, which must
 	 * not be the case for the trampoline node (which is a reserved mapping!) */
-	assert(FORTASK(self, this_trampoline_node).mn_part == NULL);
-	addr = mnode_getaddr(&FORTASK(self, this_trampoline_node));
+	assert(FORTASK(self, this_trampoline_node_).mn_part == NULL);
+	addr = mnode_getaddr(&FORTASK(self, this_trampoline_node_));
 	pagedir_unmapone(addr);
 	mman_supersyncone(addr);
 	pagedir_kernelunprepareone(addr);
@@ -434,25 +438,8 @@ typedef void (KCALL *pertask_fini_t)(struct task *__restrict self);
 INTDEF pertask_fini_t __kernel_pertask_fini_start[];
 INTDEF pertask_fini_t __kernel_pertask_fini_end[];
 
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL task_destroy)(struct task *__restrict self) {
-	pertask_fini_t *iter;
-	assertf(self != &boottask && self != &bootidle && self != &asyncwork,
-	        "Cannot destroy the BOOT or IDLE task of CPU0\n"
-	        "self       = %p\n"
-	        "&boottask  = %p\n"
-	        "&bootidle  = %p\n"
-	        "&asyncwork = %p\n",
-	        self, &boottask, &bootidle, &asyncwork);
-	assert(self->t_refcnt == 0);
-	assert(self->t_self == self);
-	assert((self->t_flags & TASK_FTERMINATED) || !(self->t_flags & TASK_FSTARTED));
-
-	/* Run task finalizers. */
-	iter = __kernel_pertask_fini_start;
-	for (; iter < __kernel_pertask_fini_end; ++iter)
-		(**iter)(self);
-
+INTERN NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL task_unmap_stack_and_free)(struct task *__restrict self) {
 	/* Destroy  the  task  structure,  and  unload  memory segments
 	 * occupied by the thread, including its stack, and trampoline. */
 	if (mman_lock_tryacquire(&mman_kernel)) {
@@ -472,6 +459,41 @@ NOTHROW(KCALL task_destroy)(struct task *__restrict self) {
 	}
 }
 
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL task_destroy)(struct task *__restrict self) {
+	REF struct mman *mm;
+	pertask_fini_t *iter;
+	assertf(self != &boottask && self != &bootidle && self != &asyncwork,
+	        "Cannot destroy the BOOT or IDLE task of CPU0\n"
+	        "self       = %p\n"
+	        "&boottask  = %p\n"
+	        "&bootidle  = %p\n"
+	        "&asyncwork = %p\n",
+	        self, &boottask, &bootidle, &asyncwork);
+	assert(self->t_refcnt == 0);
+	assert(self->t_self == self);
+	assert((self->t_flags & TASK_FTERMINATED) || !(self->t_flags & TASK_FSTARTED));
+
+	/* Run task finalizers. */
+	iter = __kernel_pertask_fini_start;
+	for (; iter < __kernel_pertask_fini_end; ++iter)
+		(**iter)(self);
+
+	/* Remove from the mman's task list. */
+	mm = self->t_mman;
+	if likely(LIST_ISBOUND(self, t_mman_tasks)) {
+		mman_threadslock_acquire(mm);
+		if likely(LIST_ISBOUND(self, t_mman_tasks))
+			LIST_REMOVE(self, t_mman_tasks);
+		mman_threadslock_release(mm);
+	}
+	decref(mm);
+
+	/* Destroy  the  task  structure,  and  unload  memory segments
+	 * occupied by the thread, including its stack, and trampoline. */
+	task_unmap_stack_and_free(self);
+}
+
 PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct task *
 (KCALL task_alloc)(struct mman *__restrict task_mman) THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	REF struct task *result;
@@ -487,7 +509,6 @@ PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct task *
 	memcpy(result, __kernel_pertask_start, (size_t)__kernel_pertask_size);
 	result->t_heapsz = heapptr_getsiz(resptr);
 	result->t_self   = result;
-	incref(&mfile_ndef); /* FORTASK(result, this_kernel_stackpart_).mp_file */
 #define STN(thread) FORTASK(&thread, this_kernel_stacknode_)
 #define STP(thread) FORTASK(&thread, this_kernel_stackpart_)
 	STN(*result).mn_part           = &STP(*result);
@@ -556,14 +577,14 @@ again_lock_kernel_mman:
 					goto again_lock_kernel_mman;
 				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, PAGESIZE);
 			}
-			FORTASK(result, this_trampoline_node).mn_minaddr = (byte_t *)trampoline_addr;
-			FORTASK(result, this_trampoline_node).mn_maxaddr = (byte_t *)trampoline_addr + PAGESIZE - 1;
+			FORTASK(result, this_trampoline_node_).mn_minaddr = (byte_t *)trampoline_addr;
+			FORTASK(result, this_trampoline_node_).mn_maxaddr = (byte_t *)trampoline_addr + PAGESIZE - 1;
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			if unlikely(!pagedir_prepareone(trampoline_addr))
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			/* Load nodes into the kernel VM. */
-			mman_mappings_insert(&mman_kernel, &FORTASK(result, this_trampoline_node));
+			mman_mappings_insert(&mman_kernel, &FORTASK(result, this_trampoline_node_));
 			mman_mappings_insert(&mman_kernel, &FORTASK(result, this_kernel_stacknode_));
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
 			mman_mappings_insert(&mman_kernel, &FORTASK(result, this_kernel_stackguard_));
@@ -578,7 +599,6 @@ again_lock_kernel_mman:
 			RETHROW();
 		}
 	} EXCEPT {
-		decref_nokill(&mfile_ndef); /* FORTASK(result, this_kernel_stackpart_).mp_file */
 		heap_free(&kernel_locked_heap,
 		          heapptr_getptr(resptr),
 		          heapptr_getsiz(resptr),

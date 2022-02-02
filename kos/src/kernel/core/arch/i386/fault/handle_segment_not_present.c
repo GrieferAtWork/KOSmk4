@@ -34,6 +34,9 @@
 #include <kernel/x86/fault.h>
 #include <kernel/x86/gdt.h>
 #include <kernel/x86/idt.h> /* IDT_CONFIG_ISTRAP() */
+#include <sched/pid.h>
+#include <sched/task-clone.h>
+#include <sched/task.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/byteorder.h>
@@ -61,18 +64,11 @@
 DECL_BEGIN
 
 #ifndef __OPTIMIZE_SIZE__
-INTDEF NONNULL((1)) pid_t KCALL
-x86_clone_impl(struct icpustate const *__restrict init_state,
-               uintptr_t clone_flags,
-               USER UNCHECKED void *child_stack,
-               USER UNCHECKED pid_t *parent_tidptr,
-               USER UNCHECKED pid_t *child_tidptr,
-               uintptr_t gsbase, uintptr_t fsbase);
-
 PRIVATE ABNORMAL_RETURN WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(KERNEL_INTERRUPT_CALLBACK_CC lcall7_clone32)(struct icpustate *__restrict state) {
 	pid_t cpid;
 	struct rpc_syscall_info sc_info;
+	REF struct task *ctsk;
 #ifndef CONFIG_NO_SYSCALL_TRACING
 	sc_info.rsi_sysno = __NR32_clone; /* Only needed for `syscall_trace()' */
 #endif /* !CONFIG_NO_SYSCALL_TRACING */
@@ -96,11 +92,11 @@ again:
 #endif /* !CONFIG_NO_SYSCALL_TRACING */
 
 		/* Invoke the actual clone system call implementation. */
-		cpid = x86_clone_impl(state,
+		ctsk = sys_clone_impl(state,
 		                      sc_info.rsi_regs[0],                         /* clone_flags */
-		                      (USER UNCHECKED void *)sc_info.rsi_regs[1],  /* child_stack */
 		                      (USER UNCHECKED pid_t *)sc_info.rsi_regs[2], /* parent_tidptr */
 		                      (USER UNCHECKED pid_t *)sc_info.rsi_regs[4], /* child_tidptr */
+		                      (USER UNCHECKED void *)sc_info.rsi_regs[1],  /* child_stack */
 		                      sc_info.rsi_regs[0] & CLONE_SETTLS ? sc_info.rsi_regs[3]
 		                                                         : x86_get_user_gsbase(),
 		                      x86_get_user_fsbase());
@@ -114,6 +110,8 @@ again:
 		PERTASK_SET(this_exception_code, 1); /* Prevent internal fault */
 		goto again;
 	}
+	cpid = task_gettid_of(ctsk);
+	decref(ctsk);
 	icpustate_setreturn(state, cpid);
 	return state;
 }

@@ -31,6 +31,7 @@
 #include <kernel/mman/nopf.h>
 #include <kernel/mman/phys-access.h>
 #include <kernel/mman/phys.h>
+#include <kernel/mman/unmapped.h> /* MAP_FAILED */
 #include <kernel/paging.h>
 #include <kernel/types.h>
 #include <sched/task.h>
@@ -1222,9 +1223,10 @@ NOTHROW(KCALL copypagestophys_nopf)(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst,
 
 /************************************************************************/
 /* A mem-node used to describe a single, reserved page. */
-PUBLIC ATTR_PERTASK struct mnode this_trampoline_node = {
+DATDEF ATTR_PERTASK struct mnode this_trampoline_node_ ASMNAME("this_trampoline_node");
+PUBLIC ATTR_PERTASK struct mnode this_trampoline_node_ = {
 	MNODE_INIT_mn_mement({}),
-	MNODE_INIT_mn_minaddr(0),
+	MNODE_INIT_mn_minaddr((byte_t *)MAP_FAILED),
 	MNODE_INIT_mn_maxaddr(PAGESIZE - 1),
 	MNODE_INIT_mn_flags(MNODE_F_PWRITE | MNODE_F_PREAD |
 	                    MNODE_F_SHARED | MNODE_F_NOSPLIT |

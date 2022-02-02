@@ -223,7 +223,7 @@ DATDEF ATTR_PERTASK PAGEDIR_PAGEALIGNED byte_t *this_trampoline;
 #define THIS_TRAMPOLINE PERTASK_GET(this_trampoline)
 
 /* A mem-node used to describe a single, reserved page. */
-DATDEF ATTR_PERTASK struct mnode this_trampoline_node;
+DATDEF ATTR_PERTASK struct mnode const this_trampoline_node;
 /************************************************************************/
 
 

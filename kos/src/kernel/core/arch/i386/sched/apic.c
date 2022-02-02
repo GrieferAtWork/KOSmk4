@@ -459,9 +459,9 @@ NOTHROW(KCALL cpu_destroy)(struct cpu *__restrict self) {
 	mnode_pagedir_unmap(&FORTASK(myidle, this_kernel_stacknode_));
 	mnode_pagedir_sync(&FORTASK(myidle, this_kernel_stacknode_));
 	mnode_pagedir_kernelunprepare(&FORTASK(myidle, this_kernel_stacknode_));
-	pagedir_unmapone(mnode_getaddr(&FORTASK(myidle, this_trampoline_node)));
-	pagedir_syncone(mnode_getaddr(&FORTASK(myidle, this_trampoline_node)));
-	pagedir_kernelunprepareone(mnode_getaddr(&FORTASK(myidle, this_trampoline_node)));
+	pagedir_unmapone(mnode_getaddr(&FORTASK(myidle, this_trampoline_node_)));
+	pagedir_syncone(mnode_getaddr(&FORTASK(myidle, this_trampoline_node_)));
+	pagedir_kernelunprepareone(mnode_getaddr(&FORTASK(myidle, this_trampoline_node_)));
 
 	/* Remove the #DF and IDLE stack nodes from the kernel VM */
 	while (!mman_lock_tryacquire(&mman_kernel))
@@ -616,13 +616,13 @@ i386_allocate_secondary_cores(void) {
 			                                   MHINT_GETMODE(KERNEL_MHINT_TRAMPOLINE));
 			if unlikely(addr == (byte_t *)MAP_FAILED)
 				kernel_panic(FREESTR("Failed to find suitable location for CPU #%u's IDLE trampoline"), (unsigned int)i);
-			FORTASK(altidle, this_trampoline_node).mn_minaddr = addr;
-			FORTASK(altidle, this_trampoline_node).mn_maxaddr = addr + PAGESIZE - 1;
+			FORTASK(altidle, this_trampoline_node_).mn_minaddr = addr;
+			FORTASK(altidle, this_trampoline_node_).mn_maxaddr = addr + PAGESIZE - 1;
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			if unlikely(!pagedir_prepareone(addr))
 				kernel_panic(FREESTR("Failed to prepare CPU #%u's IDLE trampoline"), (unsigned int)i);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-			mman_mappings_insert(&mman_kernel, &FORTASK(altidle, this_trampoline_node));
+			mman_mappings_insert(&mman_kernel, &FORTASK(altidle, this_trampoline_node_));
 		}
 
 		FORTASK(altidle, this_fs)             = incref(&fs_kernel);

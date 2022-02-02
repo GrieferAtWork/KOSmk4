@@ -23,7 +23,6 @@
 #include <kernel/compiler.h>
 
 #include <kernel/paging.h> /* pagedir_phys_t */
-#include <sched/arch/cpu.h>
 #include <sched/pertask.h>
 
 #include <hybrid/__bit.h>
