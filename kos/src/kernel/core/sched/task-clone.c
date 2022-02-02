@@ -57,6 +57,7 @@
 #include <kernel/x86/gdt.h>
 #include <sched/x86/iopl.h>
 
+#include <asm/cpu-flags.h>
 #include <kos/kernel/cpu-state-compat.h>
 #endif /* __i386__ || __x86_64__ */
 
@@ -322,36 +323,37 @@ again_release_kernel_and_cc:
 			kernel_stack = FORTASK(result, this_kernel_stacknode_).mn_minaddr;
 #endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
 
+			/* Construct the initial scheduler CPU state from the caller-given `init_state' */
 #ifdef __x86_64__
 			child_state = icpustate_to_scpustate_p_ex(init_state,
-			                                           kernel_stack,
-			                                           x86_child_gsbase,
-			                                           x86_child_fsbase,
-			                                           __rdgs(),
-			                                           __rdfs(),
-			                                           __rdes(),
-			                                           __rdds());
+			                                          kernel_stack,
+			                                          x86_child_gsbase,
+			                                          x86_child_fsbase,
+			                                          __rdgs(),
+			                                          __rdfs(),
+			                                          __rdes(),
+			                                          __rdds());
 #else /* __x86_64__ */
-			state = icpustate_to_scpustate_p(init_state, kernel_stack);
+			child_state = icpustate_to_scpustate_p(init_state, kernel_stack);
 #endif /* !__x86_64__ */
-
 
 			/* Do additional, arch-specific initialization */
 #if defined(__i386__) || defined(__x86_64__)
 			/* Assign the given stack pointer for the new thread. */
 			scpustate_setuserpsp(child_state, (uintptr_t)x86_child_psp);
+
 			/* Reset iopl() for the child thread/process */
 			if ((clone_flags & CLONE_THREAD) ? !x86_iopl_keep_after_clone
 			                                 : !x86_iopl_keep_after_fork)
 				child_state->scs_irregs.ir_Pflags &= ~EFLAGS_IOPLMASK;
-			/* Have `clone()' or `fork()' return `0' in the child thread/process */
-			gpregs_setpax(&child_state->scs_gpregs, 0);
 #endif /* __i386__ || __x86_64__ */
 #if defined(__i386__) && !defined(__x86_64__)
 			FORTASK(result, this_x86_user_gsbase) = x86_child_gsbase;
 			FORTASK(result, this_x86_user_fsbase) = x86_child_fsbase;
 #endif /* __i386__ && !__x86_64__ */
 
+			/* Have `fork(2)' and `clone(2)' return `0' in the child thread/process */
+			scpustate_setreturn(child_state, 0);
 
 			/* Inject  an  RPC  for  saving  the  child's  TID  within  the  given  pointer
 			 * This always needs to be done in the context of the child, so that exceptions

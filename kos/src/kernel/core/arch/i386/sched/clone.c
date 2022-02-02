@@ -38,6 +38,7 @@
 #include <kernel/rand.h>
 #include <sched/userkern.h>
 
+#include <kos/kernel/paging.h>
 #include <kos/ukern.h>
 #endif /* !CONFIG_NO_USERKERN_SEGMENT */
 
