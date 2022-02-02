@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e3569f */
+/* HASH CRC-32:0xb0e12634 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,10 +56,10 @@ INTDEF NONNULL((1)) ssize_t (LIBKCALL libc_format_wrepeat)(pc32formatprinter pri
  * >> hat a great day.
  * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
  * Output #2:  >> Hello  \"World\"  W\nhat a  great  day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
- * This   function  escapes  all   control  and  non-ascii  characters,
- * preferring octal encoding  for control  characters and  hex-encoding
- * for other  non-ascii characters,  a behavior  that may  be  modified
+ * NOTE: Output  #2 is generated if `FORMAT_ESCAPE_FPRINTRAW' is set
+ * This  function  escapes  all  control  and  non-ascii characters,
+ * preferring octal encoding for control characters and hex-encoding
+ * for other non-ascii characters, a  behavior that may be  modified
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
@@ -71,10 +71,10 @@ INTDEF NONNULL((1)) ssize_t (LIBDCALL libd_format_wescape)(pc16formatprinter pri
  * >> hat a great day.
  * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
  * Output #2:  >> Hello  \"World\"  W\nhat a  great  day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
- * This   function  escapes  all   control  and  non-ascii  characters,
- * preferring octal encoding  for control  characters and  hex-encoding
- * for other  non-ascii characters,  a behavior  that may  be  modified
+ * NOTE: Output  #2 is generated if `FORMAT_ESCAPE_FPRINTRAW' is set
+ * This  function  escapes  all  control  and  non-ascii characters,
+ * preferring octal encoding for control characters and hex-encoding
+ * for other non-ascii characters, a  behavior that may be  modified
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */

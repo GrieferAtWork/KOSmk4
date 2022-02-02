@@ -210,10 +210,10 @@ err:
 @@>> hat a great day.
 @@Output #1: >> \"Hello \"World\" W\nhat a great day.\"
 @@Output #2:  >> Hello  \"World\"  W\nhat a  great  day
-@@NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
-@@This   function  escapes  all   control  and  non-ascii  characters,
-@@preferring octal encoding  for control  characters and  hex-encoding
-@@for other  non-ascii characters,  a behavior  that may  be  modified
+@@NOTE: Output  #2 is generated if `FORMAT_ESCAPE_FPRINTRAW' is set
+@@This  function  escapes  all  control  and  non-ascii characters,
+@@preferring octal encoding for control characters and hex-encoding
+@@for other non-ascii characters, a  behavior that may be  modified
 @@with the `FORMAT_ESCAPE_FFORCE*' flags
 @@@param: printer: A function called for all quoted portions of the text
 @@@param: textlen: The total number of bytes to escape, starting at `text'
