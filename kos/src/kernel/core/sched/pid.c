@@ -211,21 +211,20 @@ this_taskgroup_clone(struct task *__restrict new_thread, uintptr_t flags) {
 }
 
 
-DEFINE_PERTASK_ONEXIT(this_taskgroup_cleanup);
-PRIVATE ATTR_USED NOBLOCK void
-NOTHROW(KCALL this_taskgroup_cleanup)(void) {
+INTERN NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL maybe_propagate_exit_to_procss_children)(struct task *__restrict caller) {
 	struct task *proc;
-	struct taskpid *mypid = THIS_TASKPID;
+	struct taskpid *mypid = FORTASK(caller, this_taskpid);
 #ifdef __INTELLISENSE__
 	struct taskgroup &mygroup = FORTASK(proc, this_taskgroup);
 #else /* __INTELLISENSE__ */
 #define mygroup FORTASK(proc, this_taskgroup)
 #endif /* !__INTELLISENSE__ */
-	proc = task_getprocess();
+	proc = task_getprocess_of(caller);
 	if (!proc) {
 		/* Kernel-space thread */
 		assert(!mypid);
-	} else if (proc == THIS_TASK) {
+	} else if (proc == caller) {
 		REF struct taskpid *threads;
 		assert(mypid);
 		threads = ATOMIC_XCH(mygroup.tg_proc_threads.lh_first,
@@ -248,7 +247,7 @@ NOTHROW(KCALL this_taskgroup_cleanup)(void) {
 					/* Child process (detach) */
 					while (!sync_trywrite(&FORTASK(child_thread, this_taskgroup).tg_proc_parent_lock))
 						task_tryyield_or_pause();
-					assert(FORTASK(child_thread, this_taskgroup).tg_proc_parent == THIS_TASK);
+					assert(FORTASK(child_thread, this_taskgroup).tg_proc_parent == caller);
 					FORTASK(child_thread, this_taskgroup).tg_proc_parent = NULL;
 					sync_endwrite(&FORTASK(child_thread, this_taskgroup).tg_proc_parent_lock);
 				} else {
@@ -300,7 +299,7 @@ NOTHROW(KCALL this_taskgroup_cleanup)(void) {
 		sig_altbroadcast(&mygroup.tg_proc_threads_change, (struct sig *)mypid);
 		do {
 			COMPILER_READ_BARRIER();
-			thread_detach_state = PERTASK_GET(this_taskgroup.tg_thread_detached);
+			thread_detach_state = FORTASK(caller, this_taskgroup.tg_thread_detached);
 			COMPILER_READ_BARRIER();
 		} while (!ATOMIC_CMPXCH_WEAK(THIS_TASKGROUP.tg_thread_detached,
 		                             thread_detach_state,

@@ -142,11 +142,6 @@ DECL_END
 #define DEFINE_PERTASK_CLONE(func) \
 	DEFINE_CALLBACK(".rodata.callback.pertask.clone", func)
 
-/* >> void NOTHROW(KCALL func)(void);
- * Invoked    during     task_exit(). */
-#define DEFINE_PERTASK_ONEXIT(func) \
-	DEFINE_CALLBACK(".rodata.callback.pertask.onexit", func)
-
 
 
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_PERTASK_H */

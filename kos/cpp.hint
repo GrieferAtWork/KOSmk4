@@ -1380,7 +1380,6 @@
 #define DEFINE_CALLBACK(...)
 #define DEFINE_PERTASK_FINI(func)
 #define DEFINE_PERTASK_CLONE(func)
-#define DEFINE_PERTASK_ONEXIT(func)
 
 #define PAGEDIR_P_BEGINUSE(...)
 #define PAGEDIR_P_ENDUSE(...)

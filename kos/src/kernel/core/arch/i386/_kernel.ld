@@ -166,10 +166,8 @@ SECTIONS {
 
 		DEFINE_VECTOR(idle_job, .rodata.callback.idle_job)
 		DEFINE_VECTOR(pertask_relocations, .rodata.pertask.relocations)
-		DEFINE_VECTOR(pertask_init, .rodata.callback.pertask.init)
 		DEFINE_VECTOR(pertask_fini, .rodata.callback.pertask.fini)
 		DEFINE_VECTOR(pertask_clone, .rodata.callback.pertask.clone)
-		DEFINE_VECTOR(pertask_onexit, .rodata.callback.pertask.onexit)
 		DEFINE_VECTOR(permman_init, .rodata.callback.permman.init)
 		DEFINE_VECTOR(permman_fini, .rodata.callback.permman.fini)
 		DEFINE_VECTOR(permman_clone, .rodata.callback.permman.clone)

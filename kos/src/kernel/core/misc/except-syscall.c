@@ -84,47 +84,6 @@ PUBLIC ATTR_PERTASK struct user_except_handler this_user_except_handler = {
  * `CLONE_CHILD_SETTID' flag will cause the same address to be filled with the thread's
  * TID. */
 PUBLIC ATTR_PERTASK USER CHECKED pid_t *this_tid_address = NULL;
-DEFINE_PERTASK_ONEXIT(onexit_this_tid_address);
-INTERN ATTR_USED void NOTHROW(KCALL onexit_this_tid_address)(void) {
-	USER CHECKED pid_t *addr;
-	addr = PERTASK_GET(this_tid_address);
-	if (addr) {
-		TRY {
-			/* Special case for vfork when the kernel supports userprocmask. */
-#ifdef CONFIG_HAVE_USERPROCMASK
-			uintptr_t my_flags = PERTASK_GET(this_task.t_flags);
-			if (my_flags & TASK_FVFORK) {
-				if unlikely(my_flags & TASK_FUSERPROCMASK_AFTER_VFORK) {
-					USER CHECKED struct userprocmask *um;
-					um = (USER CHECKED struct userprocmask *)addr;
-					/* Handle the special case of a vfork()'d thread having
-					 * initialized their parent thread's userprocmask  data
-					 * structure.
-					 * This  is  needed  because  userprocmask  is  part  of   a
-					 * thread's  user-space  TLS  state,  which  itself  is part
-					 * of that process's VM, which  is the very thing that  gets
-					 * shared  during a  call to  vfork(), meaning  that we must
-					 * uninitialize it if it wasn't the parent who did the init! */
-					ATOMIC_WRITE(um->pm_sigmask, NULL);
-				}
-				return;
-			}
-#endif /* CONFIG_HAVE_USERPROCMASK */
-			ATOMIC_WRITE(*addr, 0);
-			mman_broadcastfutex(addr);
-		} EXCEPT {
-			/* Explicitly handle E_SEGFAULT:addr as a no-op */
-			if (!was_thrown(E_SEGFAULT) ||
-			    PERTASK_NE(this_exception_args.e_segfault.s_addr, (uintptr_t)addr)) {
-				/* We  can't RETHROW() the  exception since our function
-				 * has to be NOTHROW() (especially so since we're called
-				 * as part of thread cleanup)
-				 * Because of this, dump all other errors that happen here. */
-				except_printf("Broadcasting tid_address=%p", addr);
-			}
-		}
-	}
-}
 
 
 DEFINE_PERTASK_CLONE(clone_user_except_handler);

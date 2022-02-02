@@ -1463,9 +1463,6 @@ NOTHROW(FCALL task_disconnectall)(void) {
 	self->tcs_dlvr = NULL;
 }
 
-/* Disconnect all remaining connections during task_exit(). */
-DEFINE_PERTASK_ONEXIT(task_disconnectall);
-
 /* Same as `task_disconnectall()', but don't forward signals with a
  * `TASK_CONNECTION_STAT_SENT'-state, but rather return the  sender
  * of the signal that was received.

@@ -67,27 +67,6 @@ PUBLIC ATTR_PERTASK struct pending_rpc_slist this_rpcs = SLIST_HEAD_INITIALIZER(
  * a sporadic interrupt once they do arrive. */
 PUBLIC ATTR_PERTASK struct sig this_rpcs_sig = SIG_INIT;
 
-/* Finalizer for thread RPCs (called during `task_exit()') */
-DEFINE_PERTASK_ONEXIT(shutdown_this_rpcs);
-PRIVATE ATTR_USED void
-NOTHROW(KCALL shutdown_this_rpcs)(void) {
-	struct task *me = THIS_TASK;
-	struct pending_rpc *remain;
-
-	/* Mark the RPC list as terminated and load remaining RPCs. */
-	remain = ATOMIC_XCH(FORTASK(me, this_rpcs.slh_first),
-	                    THIS_RPCS_TERMINATED);
-	assertf(remain != THIS_RPCS_TERMINATED,
-	        "We're the only ones that ever set this, "
-	        "so what; did we get called twice?");
-	sig_broadcast_for_fini(&FORTASK(me, this_rpcs_sig));
-
-	/* Destroy all remaining RPCs for the purpose of shutdown. */
-	task_asyncrpc_destroy_list_for_shutdown(remain);
-}
-
-
-
 /* High-level RPC scheduling function.
  * This is the kernel-equivalent of the userspace `rpc_exec()' from <kos/rpc.h>
  *

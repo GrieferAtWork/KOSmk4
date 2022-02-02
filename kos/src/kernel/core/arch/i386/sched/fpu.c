@@ -69,14 +69,6 @@ PUBLIC ATTR_PERCPU struct task *thiscpu_fputhread = NULL;
 /* [0..1][owned] The per-task FPU state (lazily allocated) */
 PUBLIC ATTR_PERTASK struct fpustate *this_fpustate = NULL;
 
-DEFINE_PERTASK_ONEXIT(pertask_cleanup_fpustate);
-INTERN NOBLOCK void
-NOTHROW(KCALL pertask_cleanup_fpustate)(void) {
-	/* Unset the  calling thread  potentially holding  the FPU  state.
-	 * Since the task will go away, we don't actually have to save it. */
-	ATOMIC_CMPXCH(PERCPU(thiscpu_fputhread), THIS_TASK, NULL);
-}
-
 DEFINE_PERTASK_FINI(pertask_finalize_fpustate);
 INTERN NOBLOCK void
 NOTHROW(KCALL pertask_finalize_fpustate)(struct task *__restrict self) {

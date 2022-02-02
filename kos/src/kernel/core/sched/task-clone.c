@@ -38,6 +38,7 @@
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc-internal.h>
+#include <sched/signal.h>
 #include <sched/task-clone.h>
 #include <sched/task.h>
 

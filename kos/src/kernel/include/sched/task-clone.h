@@ -123,7 +123,10 @@ task_clone(struct icpustate const *__restrict init_state,
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 
 
+
+
 #ifdef CONFIG_BUILDING_KERNEL_CORE
+
 /* Define a per-task relocation that must be initialized as:
  * >> struct task *thread = THREAD_TO_INITIALIZE;
  * >> *(uintptr_t *)((byte_t *)thread + addr) += thread; */
