@@ -75,21 +75,6 @@ NOTHROW(KCALL pertask_finalize_fpustate)(struct task *__restrict self) {
 	fpustate_free(FORTASK(self, this_fpustate));
 }
 
-#if 0 /* No need... */
-DEFINE_PERTASK_CLONE(clone_fpustate);
-PRIVATE ATTR_USED void KCALL
-clone_fpustate(struct task *__restrict new_thread, uintptr_t UNUSED(flags)) {
-	struct fpustate *fst;
-	fst = PERTASK_GET(this_fpustate);
-	if (fst) {
-		struct fpustate *copy;
-		fpustate_save();
-		copy = fpustate_alloc_noinit();
-		memcpy(copy, fst, sizeof(struct fpustate));
-	}
-}
-#endif
-
 
 PRIVATE ATTR_MALLOC ATTR_RETNONNULL WUNUSED struct fpustate *KCALL
 fpustate_alloc_noinit(void) {

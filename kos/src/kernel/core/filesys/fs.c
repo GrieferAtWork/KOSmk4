@@ -85,20 +85,6 @@ NOTHROW(KCALL fini_this_fs)(struct task *__restrict self) {
 	xdecref(FORTASK(self, this_fs));
 }
 
-DEFINE_PERTASK_CLONE(clone_this_fs);
-INTERN NONNULL((1)) void KCALL
-clone_this_fs(struct task *__restrict new_thread, uintptr_t flags) {
-	struct fs *myfs = THIS_FS;
-	if (flags & CLONE_FS) {
-		incref(myfs); /* Re-use the same fs. */
-	} else {
-		/* Clone the old fs. */
-		myfs = fs_clone(myfs, (flags & CLONE_NEWNS) != 0);
-	}
-	assert(!FORTASK(new_thread, this_fs));
-	FORTASK(new_thread, this_fs) = myfs; /* Inherit reference */
-}
-
 
 
 /* Lock for accessing any remote thread's this_fs field */

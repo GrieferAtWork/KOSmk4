@@ -57,29 +57,6 @@ PUBLIC ATTR_PERTASK REF struct ioperm_bitmap *this_x86_ioperm_bitmap = NULL;
  * up being caused by  the CPU trying to  access the I/O permissions  bitmap. */
 PUBLIC ATTR_PERCPU struct ioperm_bitmap *thiscpu_x86_ioperm_bitmap = NULL;
 
-/* Check  if `self' is currently mapped with  write permissions within the calling CPU.
- * If  this is the case, get rid of those write permissions, but keep the ioperm bitmap
- * itself mapped as read-only (used to implement copy-on-write during clone() in  order
- * to prevent a race condition when user-space calls `clone()' followed by  `ioperm()',
- * where we need  to prevent  the `ioperm()' call  from potentially  modifying the  I/O
- * permissions bitmap of the child thread, which it otherwise would if the child thread
- * got scheduled on a different CPU, or hasn't yet received its first quantum) */
-LOCAL NOBLOCK void
-NOTHROW(KCALL ioperm_bitmap_unset_write_access)(struct ioperm_bitmap *__restrict self) {
-	struct cpu *me;
-	pflag_t was;
-	was = PREEMPTION_PUSHOFF();
-	me  = THIS_CPU;
-	if (FORCPU(me, thiscpu_x86_ioperm_bitmap) == self) {
-		/* Re-map, and only include read permissions. */
-		pagedir_map(FORCPU(me, thiscpu_x86_iob),
-		            2 * PAGESIZE,
-		            self->ib_pages,
-		            PAGEDIR_PROT_READ);
-	}
-	PREEMPTION_POP(was);
-}
-
 DEFINE_PERTASK_FINI(fini_this_ioperm_bitmap);
 PRIVATE NOBLOCK ATTR_USED NONNULL((1)) void
 NOTHROW(KCALL fini_this_ioperm_bitmap)(struct task *__restrict self) {
@@ -89,30 +66,6 @@ NOTHROW(KCALL fini_this_ioperm_bitmap)(struct task *__restrict self) {
 		assert(iob->ib_share >= 1);
 		ATOMIC_DEC(iob->ib_share);
 		decref_likely(iob);
-	}
-}
-
-DEFINE_PERTASK_CLONE(clone_this_ioperm_bitmap);
-PRIVATE NOBLOCK ATTR_USED NONNULL((1)) void
-NOTHROW(KCALL clone_this_ioperm_bitmap)(struct task *__restrict new_thread,
-                                        uintptr_t UNUSED(flags)) {
-	struct ioperm_bitmap *iob;
-
-	/* The ioperm()  permissions bitmap  is always  inherited by  child
-	 * threads! Only the iopl() level is not inherited in certain cases
-	 * (as configurable via `/proc/sys/x86/keepiopl/(clone|exec|fork)') */
-	iob = THIS_X86_IOPERM_BITMAP;
-
-	/* unlikely, since this isn't really something that modern applications
-	 * commonly make use of! */
-	if unlikely(iob) {
-		assert(iob->ib_share >= 1);
-		incref(iob);
-
-		/* Unset write-access if this is the first time the IOB is getting shared. */
-		if (ATOMIC_FETCHINC(iob->ib_share) == 1)
-			ioperm_bitmap_unset_write_access(iob);
-		FORTASK(new_thread, this_x86_ioperm_bitmap) = iob;
 	}
 }
 

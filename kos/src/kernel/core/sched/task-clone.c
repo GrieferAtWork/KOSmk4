@@ -22,6 +22,8 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/fs/fs.h>
+#include <kernel/handle.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
@@ -35,6 +37,7 @@
 #include <kernel/rt/except-syscall.h>
 #include <kernel/user.h>
 #include <sched/cpu.h>
+#include <sched/cred.h>
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc-internal.h>
@@ -56,7 +59,9 @@
 
 #if defined(__i386__) || defined(__x86_64__)
 #include <kernel/x86/gdt.h>
+#include <sched/x86/iobm.h>
 #include <sched/x86/iopl.h>
+#include <sched/x86/tss.h>
 
 #include <asm/cpu-flags.h>
 #include <kos/kernel/cpu-state-compat.h>
@@ -64,7 +69,7 @@
 
 DECL_BEGIN
 
-typedef void (KCALL *pertask_clone_t)(struct task *__restrict new_thread, uintptr_t flags);
+typedef void (KCALL *pertask_clone_t)(struct task *__restrict result, uintptr_t flags);
 INTDEF pertask_clone_t __kernel_pertask_clone_start[];
 INTDEF pertask_clone_t __kernel_pertask_clone_end[];
 
@@ -133,6 +138,186 @@ waitfor_vfork_completion(struct task *__restrict thread)
 		task_waitfor();
 	}
 }
+
+
+/* Clone the calling thread's signal mask into `result'. */
+PRIVATE NONNULL((1, 2)) void KCALL
+task_clone_sigmask(struct task *__restrict result,
+                   struct task *__restrict caller,
+                   uintptr_t clone_flags) {
+	/* Clone the current signal mask. */
+	(void)clone_flags;
+	assert(arref_ptr(&FORTASK(result, this_kernel_sigmask)) == &kernel_sigmask_empty);
+#ifdef CONFIG_HAVE_USERPROCMASK
+	if (caller->t_flags & TASK_FUSERPROCMASK) {
+		struct userprocmask *um;
+		um = FORTASK(caller, this_userprocmask_address);
+		if (!(clone_flags & CLONE_VM)) {
+			/* Special case:
+			 * ```
+			 *  During a call to fork() or clone() (w/o CLONE_VM), the parent
+			 *  thread's TASK_FUSERPROCMASK attribute is inherited unconditionally.
+			 * ```
+			 */
+inherit_parent_userprocmask:
+			FORTASK(result, this_userprocmask_address) = um;
+			result->t_flags |= TASK_FUSERPROCMASK;
+			/* The static initialization for the kernel-space `this_kernel_sigmask' is sufficient in this case! */
+			/*FORTASK(result, this_kernel_sigmask) = ARREF_INIT(&kernel_sigmask_empty);*/
+		} else if (clone_flags & CLONE_VFORK) {
+			/* Special case:
+			 * ```
+			 *  During a vfork(2), where the parent thread has the TASK_FUSERPROCMASK
+			 *  attribute set [...]
+			 *  The  child  thread is  started  with the  `TASK_FUSERPROCMASK'  attribute set,
+			 *  which will be cleared the normal way once the child performs a successful call
+			 *  to either exec(2) or  _Exit(2), at which pointer  the process will once  again
+			 *  wake up.
+			 * ```
+			 */
+			goto inherit_parent_userprocmask;
+		} else {
+			/* Special case:
+			 * ```
+			 *  During a call to clone(CLONE_VM), where the parent is a userprocmask  thread,
+			 *  prior to clone() returning in either the parent or child, the parent thread's
+			 *  user-space `pm_sigmask' is copied into  the kernel-space buffer of the  child
+			 *  thread, while the child thread will start with TASK_FUSERPROCMASK=0.
+			 * ```
+			 *
+			 * In other words: We must copy `um->pm_sigmask' into `FORTASK(result, this_kernel_sigmask)'
+			 */
+			struct kernel_sigmask *new_thread_mask;
+			new_thread_mask = (struct kernel_sigmask *)kmalloc(sizeof(struct kernel_sigmask),
+			                                                   GFP_NORMAL);
+			TRY {
+				USER UNCHECKED sigset_t *parent_umask;
+				parent_umask = ATOMIC_READ(um->pm_sigmask);
+				validate_readable(parent_umask, sizeof(sigset_t));
+				memcpy(&new_thread_mask->sm_mask, parent_umask, sizeof(sigset_t));
+			} EXCEPT {
+				kfree(new_thread_mask);
+				RETHROW();
+			}
+			new_thread_mask->sm_refcnt = 1;
+			new_thread_mask->sm_share  = 1;
+			/* Initialize the new  thread's signal mask  with
+			 * the copy of the parent's current userprocmask. */
+			arref_init(&FORTASK(result, this_kernel_sigmask), new_thread_mask);
+		}
+	} else
+#endif /* CONFIG_HAVE_USERPROCMASK */
+	{
+		if (sigmask_kernel_getrd() == &kernel_sigmask_empty) {
+			/* Nothing to do here! */
+		} else {
+			REF struct kernel_sigmask *mask;
+			struct kernel_sigmask_arref *maskref;
+			maskref = &PERTASK(this_kernel_sigmask);
+			mask    = arref_get(maskref);
+			assert(mask != &kernel_sigmask_empty);
+			ATOMIC_INC(mask->sm_share);
+			COMPILER_WRITE_BARRIER();
+			arref_init(&FORTASK(result, this_kernel_sigmask), mask); /* Inherit reference. */
+			COMPILER_WRITE_BARRIER();
+		}
+	}
+}
+
+
+/* Clone the calling thread's signal handlers into `result'. */
+PRIVATE NONNULL((1, 2)) void KCALL
+task_clone_sighand(struct task *__restrict result,
+                   struct task *__restrict caller,
+                   uintptr_t clone_flags) {
+	if (clone_flags & CLONE_SIGHAND) {
+		/* Must share signal handlers. */
+		REF struct sighand_ptr *myptr;
+		myptr = FORTASK(caller, this_sighand_ptr);
+		if (!myptr) {
+			/* Must allocate the signal handler table pointer so we can share it! */
+			myptr = (REF struct sighand_ptr *)kmalloc(sizeof(struct sighand_ptr),
+			                                          GFP_NORMAL);
+			myptr->sp_refcnt = 2;
+			atomic_rwlock_init(&myptr->sp_lock);
+			myptr->sp_hand = NULL;
+			assert(!FORTASK(caller, this_sighand_ptr));
+			PERTASK_SET(this_sighand_ptr, myptr);
+		} else {
+			incref(myptr);
+		}
+		FORTASK(result, this_sighand_ptr) = myptr;
+	} else {
+		/* Set signal handlers of the thread as a copy of the caller. */
+		struct sighand_ptr *myptr;
+		myptr = FORTASK(caller, this_sighand_ptr);
+		if (!myptr) {
+			/* No handlers -> Nothing to copy (the new thread will also use default handlers!) */
+		} else {
+			REF struct sighand_ptr *newptr;
+			struct sighand *myhand;
+			newptr = (REF struct sighand_ptr *)kmalloc(sizeof(struct sighand_ptr),
+			                                           GFP_NORMAL);
+again_lock_myptr:
+			TRY {
+				sync_read(myptr);
+				COMPILER_READ_BARRIER();
+				myhand = myptr->sp_hand;
+				COMPILER_READ_BARRIER();
+				if (!myhand) {
+					/* No handlers -> Nothing to copy (the new thread will also use default handlers!) */
+					sync_endread(myptr);
+					kfree(newptr);
+					newptr = NULL;
+				} else {
+					if (!sync_trywrite(myhand)) {
+						sync_endread(myptr);
+						task_yield();
+						goto again_lock_myptr;
+					}
+					sync_endread(myptr);
+					sighand_incshare(myhand);
+					sync_endwrite(myhand);
+
+					/* Still share the handler table as copy-on-write. */
+					atomic_rwlock_init(&newptr->sp_lock);
+					newptr->sp_refcnt = 1;
+					newptr->sp_hand = myhand;
+				}
+			} EXCEPT {
+				kfree(newptr);
+				RETHROW();
+			}
+			FORTASK(result, this_sighand_ptr) = newptr;
+		}
+	}
+}
+
+
+
+#if defined(__i386__) || defined(__x86_64__)
+/* Check  if `self' is currently mapped with  write permissions within the calling CPU.
+ * If  this is the case, get rid of those write permissions, but keep the ioperm bitmap
+ * itself mapped as read-only (used to implement copy-on-write during clone() in  order
+ * to prevent a race condition when user-space calls `clone()' followed by  `ioperm()',
+ * where we need  to prevent  the `ioperm()' call  from potentially  modifying the  I/O
+ * permissions bitmap of the child thread, which it otherwise would if the child thread
+ * got scheduled on a different CPU, or hasn't yet received its first quantum) */
+LOCAL NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL x86_ioperm_bitmap_unset_write_access)(struct task *__restrict caller,
+                                                    struct ioperm_bitmap *__restrict self) {
+	pflag_t was       = PREEMPTION_PUSHOFF();
+	struct cpu *mycpu = caller->t_cpu;
+	if (FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) == self) {
+		/* Re-map, and only include read permissions. */
+		pagedir_map(FORCPU(mycpu, thiscpu_x86_iob),
+		            2 * PAGESIZE,
+		            self->ib_pages,
+		            PAGEDIR_PROT_READ);
+	}
+	PREEMPTION_POP(was);
+}
+#endif /* __i386__ || __x86_64__ */
 
 
 
@@ -360,21 +545,118 @@ again_release_kernel_and_cc:
 		if (clone_flags & CLONE_CHILD_CLEARTID)
 			FORTASK(result, this_tid_address) = child_tidptr; /* `set_tid_address(child_tidptr)' */
 
-		/* Clone the calling thread's execution context.
-		 * Also: all sub-systems that  have the ability  to make the  new
-		 *       thread visible to other parts of the kernel must operate
-		 *       interlocked, such that all of their respective locks are
-		 *       held at the same time.
-		 *       Furthermore (and while already holding all of those locks),
-		 *       we  must serve  RPCs in  the calling  thread _before_ we're
-		 *       allowed to make the new  thread visible. -- This is  needed
-		 *       in order to  prevent something like  SIGINT from not  being
-		 *       received  by all of  its targets when  one of those targets
-		 *       cloned itself, with the clone then being started after  the
-		 *       parent should have already been killed. */
+		/************************************************************************/
+		/* CLONE THREAD CONTEXT                                                 */
+		/************************************************************************/
+
+		/* Clone user-space exception handler. */
+		memcpy(&FORTASK(result, this_user_except_handler),
+		       &FORTASK(caller, this_user_except_handler),
+		       sizeof(struct user_except_handler));
+
+		/* Clone the calling thread's FS context */
+		{
+			struct fs *result_fs = FORTASK(caller, this_fs);
+			if (clone_flags & CLONE_FS) {
+				result_fs = incref(result_fs);
+			} else {
+				result_fs = fs_clone(result_fs, (clone_flags & CLONE_NEWNS) != 0);
+			}
+			FORTASK(result, this_fs) = result_fs;
+		}
+
+		/* Clone credentials */
+		{
+			struct cred *result_cred = FORTASK(caller, this_cred);
+			if (clone_flags & CLONE_CRED) {
+				result_cred = incref(result_cred);
+			} else {
+				result_cred = cred_clone(result_cred);
+			}
+			FORTASK(result, this_cred) = result_cred; /* Inherit reference */
+		}
+
+		/* Clone the calling thread's signal mask */
+		task_clone_sigmask(result, caller, clone_flags);
+
+		/* Clone the calling thread's signal handlers */
+		task_clone_sighand(result, caller, clone_flags);
+
+		/* Clone the calling thread's open file descriptors */
+		{
+			struct handle_manager *result_hman;
+			result_hman = FORTASK(caller, this_handle_manager);
+			if (clone_flags & CLONE_FILES) {
+				result_hman = incref(result_hman);
+			} else {
+				result_hman = handle_manager_clone(result_hman);
+			}
+			FORTASK(result, this_handle_manager) = result_hman; /* Inherit reference */
+		}
+
+		/* On x86, the ioperm() permissions bitmap is always inherited by child
+		 * threads! Only the  iopl() level  is not inherited  in certain  cases
+		 * (as configurable via `/proc/sys/x86/keepiopl/(clone|exec|fork)') */
+#if defined(__i386__) || defined(__x86_64__)
+		{
+			struct ioperm_bitmap *iob;
+			iob = FORTASK(caller, this_x86_ioperm_bitmap);
+			/* `unlikely', since this isn't really  something
+			 * that modern applications commonly make use of! */
+			if unlikely(iob) {
+				assert(iob->ib_share >= 1);
+				incref(iob);
+				/* Unset write-access if this is the first time the IOB is getting shared. */
+				if (ATOMIC_FETCHINC(iob->ib_share) == 1)
+					x86_ioperm_bitmap_unset_write_access(caller, iob);
+				FORTASK(result, this_x86_ioperm_bitmap) = iob;
+			}
+		}
+#endif /* __i386__ || __x86_64__ */
+
+		/************************************************************************/
+		/* MAKE NEW THREAD GLOBALLY VISIBLE                                     */
+		/************************************************************************/
+
+		/* NOTE: The  act of making a new thread visible must be done in such a
+		 *       way that we are holding all  relevant longs at the same  time,
+		 *       and while still holding all of them, we check for pending RPCs
+		 *       in the calling thread. If there are any, we release all  locks
+		 *       and serve them before starting over from scratch.
+		 * -> This way of doing things is required to ensure that we'll never
+		 *    spawn additional threads while there might be a signal  pending
+		 *    with the capacity of killing us.
+		 *    The reason why we have to interlock that possibility with holding
+		 *    locks  to all  thread lists into  which the new  thread should be
+		 *    added, is so someone sending SIGKILL to a process group, can live
+		 *    with the knowledge that none of  the processes are able to  spawn
+		 *    more  processes that might continue to live even after the signal
+		 *    was handled by all existing onces being killed.
+		 *    This works because anyone sending such a signal would  necessarily
+		 *    have to acquire the same locks we acquire to register a new thread
+		 *    globally, meaning that only when  holding all of those locks,  and
+		 *    also making sure that there's no chance of us actually being meant
+		 *    to die right  now, can we  say for certain  that we're allowed  to
+		 *    create  a  new  thread, rather  than  do something  else,  such as
+		 *    handling a signal. */
+
 		/* TODO */
+
 	} EXCEPT {
 		/* Cleanup on error. */
+#if defined(__i386__) || defined(__x86_64__)
+		if unlikely(FORTASK(result, this_x86_ioperm_bitmap)) {
+			assert(FORTASK(result, this_x86_ioperm_bitmap)->ib_share >= 1);
+			ATOMIC_DEC(FORTASK(result, this_x86_ioperm_bitmap)->ib_share);
+			decref_likely(FORTASK(result, this_x86_ioperm_bitmap));
+		}
+#endif /* __i386__ || __x86_64__ */
+		xdecref(FORTASK(result, this_handle_manager));
+		xdecref(FORTASK(result, this_sighand_ptr));
+		if (arref_ptr(&FORTASK(result, this_kernel_sigmask)) != &kernel_sigmask_empty)
+			decref(arref_ptr(&FORTASK(result, this_kernel_sigmask)));
+		xdecref(FORTASK(result, this_cred));
+		xdecref(FORTASK(result, this_fs));
 		if (result->t_mman) {
 			if likely(LIST_ISBOUND(result, t_mman_tasks)) {
 				mman_threadslock_acquire(result->t_mman);
@@ -396,39 +678,49 @@ again_release_kernel_and_cc:
 
 
 	/* At this point the new thread is fully initialized and visible.
-	 * The only thing that's still left to do is to start it (and in
+	 * The  only thing that's still left to do is to start it (and in
 	 * the case of vfork(): wait for it to exit(2) or exec(2)). */
 	TRY {
 #if 1 /* TODO: Remove me */
-		/* Invoke task clone callbacks (TODO: Remove+inline these!)
-		 * Also: all sub-systems that  have the ability  to make the  new
-		 *       thread visible to other parts of the kernel must operate
-		 *       interlocked, such that all of their respective locks are
-		 *       held at the same time.
-		 *       Furthermore (and while already holding all of those locks),
-		 *       we  must serve  RPCs in  the calling  thread _before_ we're
-		 *       allowed to make the new  thread visible. -- This is  needed
-		 *       in order to  prevent something like  SIGINT from not  being
-		 *       received  by all of  its targets when  one of those targets
-		 *       cloned itself, with the clone then being started after  the
-		 *       parent should have already been killed. */
-		{
-			pertask_clone_t *iter;
-			for (iter = __kernel_pertask_clone_start;
-			     iter < __kernel_pertask_clone_end; ++iter)
-				(**iter)(result, clone_flags);
+		/* Allocate the PID descriptor for the new thread. */
+		if (clone_flags & CLONE_NEWPID) {
+			REF struct pidns *ns;
+			ns = pidns_alloc(FORTASK(caller, this_taskpid)->tp_pidns);
+			FINALLY_DECREF_UNLIKELY(ns);
+			task_setpid(result, ns, 0);
+		} else {
+			task_setpid(result, THIS_PIDNS, 0);
 		}
+
+		/* TODO: Remember `flags & CSIGNAL' as signal to-be send on exit! */
+		if (clone_flags & CLONE_THREAD) {
+			/* Add to the same process as the caller */
+			task_setthread(result, caller);
+		} else if (clone_flags & CLONE_PARENT) {
+			REF struct task *my_parent;
+			my_parent = task_getprocessparent_of(caller);
+			FINALLY_XDECREF_UNLIKELY(my_parent);
+			/* Inherit parent, group & session of the caller */
+			task_setprocess(result, my_parent, caller, caller);
+		} else {
+			/* Inherit group & session of the caller; set caller as parent */
+			task_setprocess(result, caller, caller, caller);
+		}
+
+		/* Already pre-detach the thread if instructed to */
+		if (clone_flags & CLONE_DETACHED)
+			task_detach(result);
 
 		/* Insert the new task into its mman's thread-list */
 		mman_threadslock_acquire(result->t_mman);
 		LIST_INSERT_HEAD(&result->t_mman->mm_threads, result, t_mman_tasks);
 		mman_threadslock_release(result->t_mman);
 
-		/* Write-back the new thread's TID to the caller-given memory
+		/* Write-back the new thread's TID to the caller-given  memory
 		 * location within the calling process. TODO: This also has to
 		 * happen whilst interlocked with other systems which are able
-		 * to make the thread visible. In the case where the pointed-
-		 * to memory is VIO, the operation must happen like:
+		 * to  make the thread visible. In the case where the pointed-
+		 * to  memory  is  VIO,   the  operation  must  happen   like:
 		 * >>    lock_pid_system();
 		 * >>again:
 		 * >>    ...

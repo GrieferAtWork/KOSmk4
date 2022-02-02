@@ -205,21 +205,6 @@ NOTHROW(KCALL fini_this_cred)(struct task *__restrict self) {
 	xdecref(FORTASK(self, this_cred));
 }
 
-DEFINE_PERTASK_CLONE(clone_this_cred);
-INTERN NONNULL((1)) void KCALL
-clone_this_cred(struct task *__restrict new_thread, uintptr_t flags) {
-	struct cred *self;
-	self = THIS_CRED;
-	if (flags & CLONE_CRED) {
-		incref(self); /* Re-use the same credentials. */
-	} else {
-		/* Clone the old credentials, as they appear in their current state. */
-		self = cred_clone(self);
-	}
-	assert(!FORTASK(new_thread, this_cred));
-	FORTASK(new_thread, this_cred) = self; /* Inherit reference */
-}
-
 
 /* Check if the calling thread has a given capability
  * `capno' (one of  `CAP_*' from  <kos/capability.h>) */

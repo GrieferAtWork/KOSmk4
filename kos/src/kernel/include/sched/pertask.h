@@ -136,12 +136,4 @@ DECL_END
 #define DEFINE_PERTASK_FINI(func) \
 	DEFINE_CALLBACK(".rodata.callback.pertask.fini", func)
 
-/* >> void KCALL func(struct task *__restrict new_thread, uintptr_t flags);
- * Invoked  to initialize a given clone `new_thread' of the calling thread.
- * @param: flags: Set of `CLONE_*' from `<bits/sched.h>' */
-#define DEFINE_PERTASK_CLONE(func) \
-	DEFINE_CALLBACK(".rodata.callback.pertask.clone", func)
-
-
-
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_PERTASK_H */

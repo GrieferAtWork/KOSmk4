@@ -188,12 +188,10 @@ print("#endif /" "* ... *" "/");
 
 
 
-/* [0..1][lock(READ(ATOMIC), WRITE(THIS_TASK))]
+/* [1..1][lock(READ(ATOMIC), WRITE(THIS_TASK))]
  * Reference to the signal mask (set of signals being blocked) in the  current
  * thread. The pointed-to object is meaningless (but must still be valid) when
- * the associated thread make use of userprocmask.
- *
- * NOTE: Only ever NULL for kernel-space threads! */
+ * the associated thread make use of userprocmask. */
 PUBLIC ATTR_PERTASK struct kernel_sigmask_arref
 this_kernel_sigmask = ARREF_INIT(&kernel_sigmask_empty);
 
@@ -676,150 +674,6 @@ NOTHROW(FCALL task_setsighand_ptr)(struct sighand_ptr *newsighand_ptr) {
 	return result;
 }
 
-
-
-DEFINE_PERTASK_CLONE(clone_posix_signals);
-PRIVATE ATTR_USED void KCALL
-clone_posix_signals(struct task *__restrict new_thread, uintptr_t flags) {
-	/* Clone the current signal mask. */
-#ifdef CONFIG_HAVE_USERPROCMASK
-	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
-		struct userprocmask *um;
-		um = PERTASK_GET(this_userprocmask_address);
-		if (!(flags & CLONE_VM)) {
-			/* Special case:
-			 * ```
-			 *  During a call to fork() or clone() (w/o CLONE_VM), the parent thread's
-			 *  TASK_FUSERPROCMASK    attribute    is    inherited    unconditionally.
-			 * ```
-			 */
-inherit_parent_userprocmask:
-			FORTASK(new_thread, this_userprocmask_address) = um;
-			new_thread->t_flags |= TASK_FUSERPROCMASK;
-			/* The static initialization for the kernel-space `this_kernel_sigmask' is sufficient in this case! */
-			/*FORTASK(new_thread, this_kernel_sigmask) = ARREF_INIT(&kernel_sigmask_empty);*/
-		} else if (flags & CLONE_VFORK) {
-			/* Special case:
-			 * ```
-			 *  During a vfork(2), where the parent thread has the TASK_FUSERPROCMASK
-			 *  attribute set [...]
-			 *  The  child  thread is  started  with the  `TASK_FUSERPROCMASK'  attribute set,
-			 *  which will be cleared the normal way once the child performs a successful call
-			 *  to either exec(2) or  _Exit(2), at which pointer  the process will once  again
-			 *  wake up.
-			 * ```
-			 */
-			goto inherit_parent_userprocmask;
-		} else {
-			/* Special case:
-			 * ```
-			 *  During a call to clone(CLONE_VM), where the parent is a userprocmask  thread,
-			 *  prior to clone() returning in either the parent or child, the parent thread's
-			 *  user-space `pm_sigmask' is copied into  the kernel-space buffer of the  child
-			 *  thread, while the child thread will start with TASK_FUSERPROCMASK=0.
-			 * ```
-			 *
-			 * In other words: We must copy `um->pm_sigmask' into `FORTASK(new_thread, this_kernel_sigmask)'
-			 */
-			struct kernel_sigmask *new_thread_mask;
-			new_thread_mask = (struct kernel_sigmask *)kmalloc(sizeof(struct kernel_sigmask),
-			                                                   GFP_NORMAL);
-			TRY {
-				USER UNCHECKED sigset_t *parent_umask;
-				parent_umask = ATOMIC_READ(um->pm_sigmask);
-				validate_readable(parent_umask, sizeof(sigset_t));
-				memcpy(&new_thread_mask->sm_mask,
-				       parent_umask,
-				       sizeof(sigset_t));
-			} EXCEPT {
-				kfree(new_thread_mask);
-				RETHROW();
-			}
-			new_thread_mask->sm_refcnt = 1;
-			new_thread_mask->sm_share  = 1;
-			/* Initialize the new  thread's signal mask  with
-			 * the copy of the parent's current userprocmask. */
-			arref_init(&FORTASK(new_thread, this_kernel_sigmask), new_thread_mask);
-		}
-	} else
-#endif /* CONFIG_HAVE_USERPROCMASK */
-	{
-		if (sigmask_kernel_getrd() == &kernel_sigmask_empty) {
-			/* Nothing to do here! */
-		} else {
-			REF struct kernel_sigmask *mask;
-			struct kernel_sigmask_arref *maskref;
-			maskref = &PERTASK(this_kernel_sigmask);
-			mask    = arref_get(maskref);
-			assert(mask != &kernel_sigmask_empty);
-			ATOMIC_INC(mask->sm_share);
-			COMPILER_WRITE_BARRIER();
-			arref_init(&FORTASK(new_thread, this_kernel_sigmask), mask); /* Inherit reference. */
-			COMPILER_WRITE_BARRIER();
-		}
-	}
-	if (flags & CLONE_SIGHAND) {
-		/* Must share signal handlers. */
-		REF struct sighand_ptr *myptr;
-		myptr = PERTASK_GET(this_sighand_ptr);
-		if (!myptr) {
-			/* Must allocate the signal handler table pointer so we can share it! */
-			myptr = (REF struct sighand_ptr *)kmalloc(sizeof(struct sighand_ptr),
-			                                          GFP_NORMAL);
-			myptr->sp_refcnt = 2;
-			atomic_rwlock_init(&myptr->sp_lock);
-			myptr->sp_hand = NULL;
-			assert(!PERTASK_TEST(this_sighand_ptr));
-			PERTASK_SET(this_sighand_ptr, myptr);
-		} else {
-			incref(myptr);
-		}
-		FORTASK(new_thread, this_sighand_ptr) = myptr;
-	} else {
-		/* Set signal handlers of the thread as a copy of the caller. */
-		struct sighand_ptr *myptr;
-		myptr = PERTASK_GET(this_sighand_ptr);
-		if (!myptr) {
-			/* No handlers -> Nothing to copy (the new thread will also use default handlers!) */
-		} else {
-			REF struct sighand_ptr *newptr;
-			struct sighand *myhand;
-			newptr = (REF struct sighand_ptr *)kmalloc(sizeof(struct sighand_ptr),
-			                                           GFP_NORMAL);
-again_lock_myptr:
-			TRY {
-				sync_read(myptr);
-				COMPILER_READ_BARRIER();
-				myhand = myptr->sp_hand;
-				COMPILER_READ_BARRIER();
-				if (!myhand) {
-					/* No handlers -> Nothing to copy (the new thread will also use default handlers!) */
-					sync_endread(myptr);
-					kfree(newptr);
-					newptr = NULL;
-				} else {
-					if (!sync_trywrite(myhand)) {
-						sync_endread(myptr);
-						task_yield();
-						goto again_lock_myptr;
-					}
-					sync_endread(myptr);
-					sighand_incshare(myhand);
-					sync_endwrite(myhand);
-
-					/* Still share the handler table as copy-on-write. */
-					atomic_rwlock_init(&newptr->sp_lock);
-					newptr->sp_refcnt = 1;
-					newptr->sp_hand = myhand;
-				}
-			} EXCEPT {
-				kfree(newptr);
-				RETHROW();
-			}
-			FORTASK(new_thread, this_sighand_ptr) = newptr;
-		}
-	}
-}
 
 
 DEFINE_PERTASK_FINI(fini_posix_signals);

@@ -90,11 +90,10 @@ DATDEF struct kernel_sigmask kernel_sigmask_full;
 ARREF(kernel_sigmask_arref, kernel_sigmask);
 #endif /* !__kernel_sigmask_arref_defined */
 
-/* [0..1][lock(READ(ATOMIC), WRITE(THIS_TASK))]
+/* [1..1][lock(READ(ATOMIC), WRITE(THIS_TASK))]
  * Reference to the signal mask (set of signals being blocked) in the  current
  * thread. The pointed-to object is meaningless (but must still be valid) when
- * the associated thread make use of userprocmask.
- * NOTE: Only ever NULL for kernel-space threads! */
+ * the associated thread make use of userprocmask. */
 DATDEF ATTR_PERTASK struct kernel_sigmask_arref this_kernel_sigmask;
 
 /* Return a pointer to the kernel signal mask of the calling thread. */

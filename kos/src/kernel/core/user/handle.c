@@ -447,22 +447,6 @@ NOTHROW(KCALL fini_this_handle_manager)(struct task *__restrict self) {
 	xdecref(FORTASK(self, this_handle_manager));
 }
 
-DEFINE_PERTASK_CLONE(clone_this_handle_manager);
-INTERN void KCALL
-clone_this_handle_manager(struct task *__restrict new_thread, uintptr_t flags) {
-	struct handle_manager *hman;
-	hman = THIS_HANDLE_MANAGER;
-	assert(hman);
-	if (flags & CLONE_FILES) {
-		incref(hman); /* Re-use the same handle manager. */
-	} else {
-		/* Clone the old handle manager. */
-		hman = handle_manager_clone(hman);
-	}
-	assert(!FORTASK(new_thread, this_handle_manager));
-	FORTASK(new_thread, this_handle_manager) = hman; /* Inherit reference */
-}
-
 
 #ifndef CONFIG_NO_SMP
 /* Lock for accessing any remote thread's this_handle_manager field */

@@ -85,17 +85,6 @@ PUBLIC ATTR_PERTASK struct user_except_handler this_user_except_handler = {
  * TID. */
 PUBLIC ATTR_PERTASK USER CHECKED pid_t *this_tid_address = NULL;
 
-
-DEFINE_PERTASK_CLONE(clone_user_except_handler);
-PRIVATE ATTR_USED NOBLOCK void
-NOTHROW(KCALL clone_user_except_handler)(struct task *__restrict new_thread,
-                                         uintptr_t flags) {
-	(void)flags;
-	memcpy(&FORTASK(new_thread, this_user_except_handler),
-	       &PERTASK(this_user_except_handler),
-	       sizeof(struct user_except_handler));
-}
-
 DEFINE_PERMMAN_ONEXEC(reset_user_except_handler);
 PRIVATE ATTR_USED NOBLOCK void
 NOTHROW(KCALL reset_user_except_handler)(void) {

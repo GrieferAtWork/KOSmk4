@@ -167,50 +167,6 @@ NOTHROW(KCALL task_send_sigcld_to_parent_process)(struct task *__restrict parent
 	(void)origin_pid;
 }
 
-
-/* >> void KCALL func(struct task *__restrict new_thread, uintptr_t flags);
- * Invoked  to initialize a given clone `new_thread' of the calling thread.
- * @param: flags: Set of `CLONE_*' from `<bits/sched.h>' */
-DEFINE_PERTASK_CLONE(this_taskgroup_clone);
-PRIVATE ATTR_USED void KCALL
-this_taskgroup_clone(struct task *__restrict new_thread, uintptr_t flags) {
-	/* Allocate the PID descriptor for the new thread. */
-	if (flags & CLONE_NEWPID) {
-		REF struct pidns *ns;
-		ns = pidns_alloc(THIS_PIDNS);
-		FINALLY_DECREF_UNLIKELY(ns);
-		task_setpid(new_thread, ns, 0);
-	} else {
-		task_setpid(new_thread, THIS_PIDNS, 0);
-	}
-	/* TODO: Remember `flags & CSIGNAL' as signal to-be send on exit! */
-	if (flags & CLONE_THREAD) {
-		/* Add to the same process as the caller */
-		task_setthread(new_thread,
-		               THIS_TASK);
-	} else if (flags & CLONE_PARENT) {
-		REF struct task *my_parent;
-		my_parent = task_getprocessparent();
-		FINALLY_XDECREF_UNLIKELY(my_parent);
-		/* Inherit parent, group & session of the caller */
-		task_setprocess(new_thread,
-		                my_parent,
-		                THIS_TASK,
-		                THIS_TASK);
-	} else {
-		/* Inherit group & session of the caller; set caller as parent */
-		task_setprocess(new_thread,
-		                THIS_TASK,
-		                THIS_TASK,
-		                THIS_TASK);
-	}
-
-	/* Already pre-detach the thread if instructed to */
-	if (flags & CLONE_DETACHED)
-		task_detach(new_thread);
-}
-
-
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL maybe_propagate_exit_to_procss_children)(struct task *__restrict caller) {
 	struct task *proc;
