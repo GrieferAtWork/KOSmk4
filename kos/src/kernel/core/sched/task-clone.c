@@ -135,7 +135,24 @@ waitfor_vfork_completion(struct task *__restrict thread)
 			task_disconnectall();
 			break;
 		}
-		task_waitfor();
+
+		/* Because we're doing a wait with a custom signal mask, we  have
+		 * to  inject the current  system call's return  path with a call
+		 * to `userexcept_sysret()' that will check for posix signal that
+		 * may have become pending while we  were waiting with a mask  in
+		 * which those signals were being suppressed.
+		 *
+		 * This always has to happen in the parent process of a vfork(2). */
+		userexcept_sysret_inject_self();
+
+		/* The specs say that we should ignore (mask) all POSIX
+		 * signals until the  child indicate VFORK  completion.
+		 *
+		 * We do  this by  simply doing  the wait  using  a
+		 * custom mask that has all signal bits set to `1'.
+		 *
+		 * s.a. `__ARCH_HAVE_SIGBLOCK_VFORK' */
+		task_waitfor_with_sigmask(&kernel_sigmask_full.sm_mask);
 	}
 }
 
@@ -739,14 +756,11 @@ again_release_kernel_and_cc:
 
 		/* Deal with vfork() */
 		if (clone_flags & CLONE_VFORK) {
-			REF struct kernel_sigmask *old_sigmask;
-			struct kernel_sigmask_arref *maskref;
-			maskref = &PERTASK(this_kernel_sigmask);
-
 #ifdef CONFIG_HAVE_USERPROCMASK
 			/* Special case for when the parent thread was using USERPROCMASK.
-			 * In this case we must essentially disable the USERPROCMASK until
-			 * our child process indicates that they're done using our mman.
+			 * In this case we have to save+restore both the contents of--, as
+			 * well  as the pointer to the signal  mask as it was active prior
+			 * to the vfork() call being made.
 			 *
 			 * This way, the child process can freely (and unknowingly) modify
 			 * the parent process's  signal mask,  without actually  affecting
@@ -761,10 +775,6 @@ again_release_kernel_and_cc:
 				validate_readwrite(user_sigmask, sizeof(sigset_t));
 				memcpy(&saved_user_sigset, user_sigmask, sizeof(sigset_t));
 
-				/* Switch over to a completely filled, kernel-space
-				 * signal mask to-be  used by  the calling  thread. */
-				old_sigmask = arref_xch(maskref, &kernel_sigmask_full);
-				ATOMIC_AND(caller->t_flags, ~TASK_FUSERPROCMASK);
 				TRY {
 					/* Actually start execution of the newly created thread. */
 					task_start(result);
@@ -772,22 +782,13 @@ again_release_kernel_and_cc:
 					/* Wait for the thread to clear its VFORK flag. */
 					waitfor_vfork_completion(result);
 				} EXCEPT {
-					arref_set_inherit(maskref, old_sigmask);
-					ATOMIC_OR(caller->t_flags, TASK_FUSERPROCMASK);
 					{
 						NESTED_EXCEPTION;
 						memcpy(user_sigmask, &saved_user_sigset, sizeof(sigset_t));
 						ATOMIC_WRITE(um->pm_sigmask, user_sigmask);
 					}
-					userexcept_sysret_inject_self();
 					RETHROW();
 				}
-
-				/* Restore our old kernel-space signal mask. */
-				arref_set_inherit(maskref, old_sigmask);
-
-				/* Re-enable userprocmask-mode. */
-				ATOMIC_OR(caller->t_flags, TASK_FUSERPROCMASK);
 
 				/* Restore the old (saved) state of the user-space  signal
 				 * mask, as it was prior to the vfork-child being started.
@@ -800,35 +801,12 @@ again_release_kernel_and_cc:
 			} else
 #endif /* CONFIG_HAVE_USERPROCMASK */
 			{
-				/* The specs say that we should ignore (mask) all POSIX
-				 * signals until the  child indicate VFORK  completion. */
-				old_sigmask = arref_xch(maskref, &kernel_sigmask_full);
-				TRY {
-					/* Actually start execution of the newly created thread. */
-					task_start(result);
+				/* Actually start execution of the newly created thread. */
+				task_start(result);
 
-					/* Wait for the thread to clear its VFORK flag. */
-					waitfor_vfork_completion(result);
-				} EXCEPT {
-					arref_set_inherit(maskref, old_sigmask);
-					userexcept_sysret_inject_self();
-					RETHROW();
-				}
-				arref_set_inherit(maskref, old_sigmask);
+				/* Wait for the thread to clear its VFORK flag. */
+				waitfor_vfork_completion(result);
 			}
-
-			/* With the original signal mask restored, we must check if
-			 * we (the parent) have received any signals while we  were
-			 * waiting on the child.
-			 *
-			 * But note that if that did happen, we mustn't cause our
-			 * system call to return with -EINTR, since at this point
-			 * we've already succeeded in spawning a new process.
-			 *
-			 * Instead, we have to handle RPCs/signals before returning
-			 * to user-space, but in a  sysret context (rather than  an
-			 * interrupt context). */
-			userexcept_sysret_inject_self();
 		} else {
 			/* Simply start execution of the newly created thread. */
 			task_start(result);
