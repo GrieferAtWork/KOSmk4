@@ -35,7 +35,6 @@ DECL_BEGIN
 struct icpustate;
 
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_scheduler)(void);
-INTDEF FREE void NOTHROW(KCALL kernel_initialize_scheduler_callbacks)(void);
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_scheduler_after_smp)(void);
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_commandline_options_very_early)(void);
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_commandline_options_early)(void);

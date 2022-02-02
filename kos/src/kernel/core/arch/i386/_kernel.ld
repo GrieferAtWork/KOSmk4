@@ -158,22 +158,24 @@ SECTIONS {
 		PROVIDE_HIDDEN(__kernel_sect_dbg_hooks_size = ABSOLUTE(. - __kernel_sect_dbg_hooks_start));
 #endif /* !CONFIG_NO_DEBUGGER */
 
-#define DEFINE_CALLBACK_VECTOR(name,section)                   \
+#define DEFINE_VECTOR(name,section)                            \
 		IP_ALIGN(__SIZEOF_POINTER__);                          \
 		PROVIDE_HIDDEN(__kernel_##name##_start = ABSOLUTE(.)); \
 		KEEP(*(section))                                       \
 		PROVIDE_HIDDEN(__kernel_##name##_end = ABSOLUTE(.));
 
-		DEFINE_CALLBACK_VECTOR(idle_job, .rodata.callback.idle_job)
-		DEFINE_CALLBACK_VECTOR(pertask_init, .rodata.callback.pertask.init)
-		DEFINE_CALLBACK_VECTOR(pertask_fini, .rodata.callback.pertask.fini)
-		DEFINE_CALLBACK_VECTOR(pertask_clone, .rodata.callback.pertask.clone)
-		DEFINE_CALLBACK_VECTOR(pertask_onexit, .rodata.callback.pertask.onexit)
-		DEFINE_CALLBACK_VECTOR(permman_init, .rodata.callback.permman.init)
-		DEFINE_CALLBACK_VECTOR(permman_fini, .rodata.callback.permman.fini)
-		DEFINE_CALLBACK_VECTOR(permman_clone, .rodata.callback.permman.clone)
-		DEFINE_CALLBACK_VECTOR(permman_onexec, .rodata.callback.permman.onexec)
-		DEFINE_CALLBACK_VECTOR(validatable_heaps, .rodata.heaps.validatable)
+		DEFINE_VECTOR(idle_job, .rodata.callback.idle_job)
+		DEFINE_VECTOR(pertask_relocations, .rodata.pertask.relocations)
+		DEFINE_VECTOR(pertask_init, .rodata.callback.pertask.init)
+		DEFINE_VECTOR(pertask_fini, .rodata.callback.pertask.fini)
+		DEFINE_VECTOR(pertask_clone, .rodata.callback.pertask.clone)
+		DEFINE_VECTOR(pertask_onexit, .rodata.callback.pertask.onexit)
+		DEFINE_VECTOR(permman_init, .rodata.callback.permman.init)
+		DEFINE_VECTOR(permman_fini, .rodata.callback.permman.fini)
+		DEFINE_VECTOR(permman_clone, .rodata.callback.permman.clone)
+		DEFINE_VECTOR(permman_onexec, .rodata.callback.permman.onexec)
+		DEFINE_VECTOR(validatable_heaps, .rodata.heaps.validatable)
+#undef DEFINE_VECTOR
 
 		*(.rodata.local.* .rodata.cold .rodata.unlikely .rodata.cold.*)
 	}

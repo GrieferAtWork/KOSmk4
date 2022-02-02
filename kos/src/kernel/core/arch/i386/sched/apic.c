@@ -46,6 +46,7 @@
 #include <kernel/x86/pit.h>
 #include <sched/cpu.h>
 #include <sched/scheduler.h>
+#include <sched/task-clone.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 #include <sched/x86/cpureg.h>
@@ -153,10 +154,6 @@ INTDEF byte_t __kernel_percpu_full_bytes[];
 INTDEF byte_t __kernel_pertask_start[];
 INTDEF byte_t __kernel_pertask_size[];
 INTDEF FREE struct tss __kernel_percpu_tss;
-
-typedef void (KCALL *pertask_init_t)(struct task *__restrict self);
-INTDEF pertask_init_t __kernel_pertask_init_start[];
-INTDEF pertask_init_t __kernel_pertask_init_end[];
 
 typedef void (KCALL *pertask_fini_t)(struct task *__restrict self);
 INTDEF pertask_fini_t __kernel_pertask_fini_start[];
@@ -505,7 +502,6 @@ i386_allocate_secondary_cores(void) {
 		altcore->c_id                          = i;
 		FORCPU(altcore, thiscpu_sched_current) = altidle;
 		altidle->t_cpu                         = altcore;
-		altidle->t_self                        = altidle;
 		altidle->t_flags                       = TASK_FSTARTED | TASK_FRUNNING | TASK_FKEEPCORE | TASK_FCRITICAL;
 		FORCPU(altcore, thiscpu_scheduler).s_runcount         = 1;
 		FORCPU(altcore, thiscpu_scheduler).s_running.lh_first = altidle;
@@ -569,11 +565,7 @@ i386_allocate_secondary_cores(void) {
 		                                                     MNODE_F_SHARED | MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
 		                                                     _MNODE_F_MPREPARED_KERNEL);
 
-#define REL(x) ((x) = (__typeof__(x))(uintptr_t)((byte_t *)(x) + (uintptr_t)altidle))
-		REL(FORTASK(altidle, this_kernel_stacknode_).mn_part);
-		REL(FORTASK(altidle, this_kernel_stacknode_).mn_link.le_prev);
-		REL(FORTASK(altidle, this_kernel_stackpart_).mp_share.lh_first);
-#undef REL
+		_task_init_relocations(altidle);
 		mpart_ll_allocmem(&FORTASK(altidle, this_kernel_stackpart_),
 		                  CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE));
 		{
@@ -662,14 +654,8 @@ i386_allocate_secondary_cores(void) {
 			init_state->scs_sgregs.sg_fs    = SEGMENT_KERNEL_FSBASE;
 			init_state->scs_sgregs.sg_gs    = SEGMENT_USER_GSBASE_RPL;
 #endif /* !__x86_64__ */
+			_task_init_arch_sstate(altidle, &boottask, &init_state);
 			FORTASK(altidle, this_sstate) = init_state;
-		}
-
-		/* Run per-task initializers on the new cpu's IDLE thread. */
-		{
-			pertask_init_t *iter = __kernel_pertask_init_start;
-			for (; iter < __kernel_pertask_init_end; ++iter)
-				(**iter)(altidle);
 		}
 
 		/* Setup additional properties of the CPU */

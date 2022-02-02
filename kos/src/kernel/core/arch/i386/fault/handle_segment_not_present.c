@@ -92,14 +92,14 @@ again:
 #endif /* !CONFIG_NO_SYSCALL_TRACING */
 
 		/* Invoke the actual clone system call implementation. */
-		ctsk = sys_clone_impl(state,
-		                      sc_info.rsi_regs[0],                         /* clone_flags */
-		                      (USER UNCHECKED pid_t *)sc_info.rsi_regs[2], /* parent_tidptr */
-		                      (USER UNCHECKED pid_t *)sc_info.rsi_regs[4], /* child_tidptr */
-		                      (USER UNCHECKED void *)sc_info.rsi_regs[1],  /* child_stack */
-		                      sc_info.rsi_regs[0] & CLONE_SETTLS ? sc_info.rsi_regs[3]
-		                                                         : x86_get_user_gsbase(),
-		                      x86_get_user_fsbase());
+		ctsk = task_clone(state,
+		                  sc_info.rsi_regs[0],                         /* clone_flags */
+		                  (USER UNCHECKED pid_t *)sc_info.rsi_regs[2], /* parent_tidptr */
+		                  (USER UNCHECKED pid_t *)sc_info.rsi_regs[4], /* child_tidptr */
+		                  (USER UNCHECKED void *)sc_info.rsi_regs[1],  /* child_stack */
+		                  sc_info.rsi_regs[0] & CLONE_SETTLS ? sc_info.rsi_regs[3]
+		                                                     : x86_get_user_gsbase(),
+		                  x86_get_user_fsbase());
 	} EXCEPT {
 #ifdef CONFIG_NO_SYSCALL_TRACING
 		sc_info.rsi_sysno = __NR32_clone;

@@ -522,14 +522,10 @@ NOTHROW(FCALL p64_pagedir_prepare_impl_widen)(unsigned int vec4,
                                               unsigned int vec2,
                                               unsigned int vec1_prepare_start,
                                               unsigned int vec1_prepare_size) {
-	/* NOTE: This  function  is  able  to  access  `THIS_TRAMPOLINE_PAGE',  since
-	 *       that  memory location  is always  already prepared  from the get-go.
-	 *       The trampoline  page of  any given  thread gets  initially  prepared
-	 *       by the thread that called `task_alloc()' (where the act of preparing
-	 *       the trampoline page of some new thread will require the use of one's
-	 *       own trampoline page)
-	 * The dependency loop formed by this is resolved thanks to
-	 *      `kernel_initialize_boot_trampolines()' */
+	/* NOTE: This function is  able to  access `THIS_TRAMPOLINE_PAGE',  since
+	 *       that memory location is always already prepared from the get-go.
+	 * -> The  dependency loop formed  by this is resolved
+	 *    thanks to `kernel_initialize_boot_trampolines()' */
 #define VEC4_IS_USERSPACE (vec4 < 256)
 	union p64_pdir_e4 e4;
 	union p64_pdir_e3 e3;

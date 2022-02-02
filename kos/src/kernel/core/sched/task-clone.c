@@ -63,14 +63,6 @@
 
 DECL_BEGIN
 
-typedef void (KCALL *pertask_init_t)(struct task *__restrict self);
-INTDEF pertask_init_t __kernel_pertask_init_start[];
-INTDEF pertask_init_t __kernel_pertask_init_end[];
-
-typedef void (KCALL *pertask_fini_t)(struct task *__restrict self);
-INTDEF pertask_fini_t __kernel_pertask_fini_start[];
-INTDEF pertask_fini_t __kernel_pertask_fini_end[];
-
 typedef void (KCALL *pertask_clone_t)(struct task *__restrict new_thread, uintptr_t flags);
 INTDEF pertask_clone_t __kernel_pertask_clone_start[];
 INTDEF pertask_clone_t __kernel_pertask_clone_end[];
@@ -151,12 +143,12 @@ waitfor_vfork_completion(struct task *__restrict thread)
  * @param: child_tidptr:  [valid_if(CLONE_CHILD_CLEARTID | CLONE_CHILD_SETTID)]
  *                        Store child TID here in child process
  * @param: ARCH_CLONE__PARAMS: Additional, arch-specific parameters */
-INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *KCALL
-sys_clone_impl(struct icpustate const *__restrict init_state,
-               uintptr_t clone_flags,
-               USER UNCHECKED pid_t *parent_tidptr,
-               USER UNCHECKED pid_t *child_tidptr
-               ARCH_CLONE__PARAMS)
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *KCALL
+task_clone(struct icpustate const *__restrict init_state,
+           uintptr_t clone_flags,
+           USER UNCHECKED pid_t *parent_tidptr,
+           USER UNCHECKED pid_t *child_tidptr
+           ARCH_CLONE__PARAMS)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	struct task *result;
 	struct task *caller = THIS_TASK;
@@ -189,12 +181,7 @@ sys_clone_impl(struct icpustate const *__restrict init_state,
 		}
 #endif
 		/* Initialize the new task. */
-		result->t_self = result;
-#define REL(x) ((x) = (__typeof__(x))(uintptr_t)((byte_t *)(x) + (uintptr_t)result))
-		REL(FORTASK(result, this_kernel_stacknode_).mn_part);
-		REL(FORTASK(result, this_kernel_stacknode_).mn_link.le_prev);
-		REL(FORTASK(result, this_kernel_stackpart_).mp_share.lh_first);
-#undef REL
+		_task_init_relocations(result);
 
 		/* Assign the thread's mman */
 		assert(result->t_mman == NULL);
@@ -362,21 +349,15 @@ again_release_kernel_and_cc:
 			if (clone_flags & CLONE_CHILD_SETTID)
 				child_state = task_asyncrpc_push(child_state, &clone_set_child_tid, child_tidptr);
 
+			/* Apply some finalizing transformations to `child_state' */
+			_task_init_arch_sstate(result, caller, &child_state);
+
 			/* Save the CPU context with which the child will launch */
 			FORTASK(result, this_sstate) = child_state;
 		}
 
 		if (clone_flags & CLONE_CHILD_CLEARTID)
 			FORTASK(result, this_tid_address) = child_tidptr; /* `set_tid_address(child_tidptr)' */
-
-#if 1 /* TODO: Remove me */
-		{
-			pertask_init_t *iter;
-			iter = __kernel_pertask_init_start;
-			for (; iter < __kernel_pertask_init_end; ++iter)
-				(**iter)(result);
-		}
-#endif
 
 		/* Clone the calling thread's execution context.
 		 * Also: all sub-systems that  have the ability  to make the  new
@@ -393,14 +374,6 @@ again_release_kernel_and_cc:
 		/* TODO */
 	} EXCEPT {
 		/* Cleanup on error. */
-#if 1 /* TODO: Remove me */
-		{
-			pertask_fini_t *iter;
-			iter = __kernel_pertask_fini_start;
-			for (; iter < __kernel_pertask_fini_end; ++iter)
-				(**iter)(result);
-		}
-#endif
 		if (result->t_mman) {
 			if likely(LIST_ISBOUND(result, t_mman_tasks)) {
 				mman_threadslock_acquire(result->t_mman);
@@ -572,6 +545,32 @@ again_release_kernel_and_cc:
 		RETHROW();
 	}
 	return result;
+}
+
+
+/* Per-task relocations */
+INTDEF uintptr_t __kernel_pertask_relocations_start[];
+INTDEF uintptr_t __kernel_pertask_relocations_end[];
+
+/* Initialize task relocations, as defined by `DEFINE_PERTASK_RELOCATION()' */
+INTERN NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL _task_init_relocations)(struct task *__restrict self) {
+	uintptr_t *p_offset;
+	/* Apply relocations */
+	for (p_offset = __kernel_pertask_relocations_start;
+	     p_offset < __kernel_pertask_relocations_end; ++p_offset) {
+		uintptr_t *reladdr;
+		reladdr = (uintptr_t *)((byte_t *)self + *p_offset);
+		*reladdr += (uintptr_t)self;
+	}
+
+	/* Assert that relocations were applied correctly. */
+	assert(self->t_self == self);
+	assert(FORTASK(self, this_kernel_stacknode_).mn_part == &FORTASK(self, this_kernel_stackpart_));
+	assert(FORTASK(self, this_kernel_stacknode_).mn_link.le_prev == &FORTASK(self, this_kernel_stackpart_).mp_share.lh_first);
+	assert(FORTASK(self, this_kernel_stackpart_).mp_share.lh_first == &FORTASK(self, this_kernel_stacknode_));
+	assert(FORTASK(self, this_connections) == &FORTASK(self, this_root_connections));
+	assert(FORTASK(self, this_root_connections).tcs_thread == self);
 }
 
 

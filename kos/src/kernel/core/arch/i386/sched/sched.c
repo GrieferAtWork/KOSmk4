@@ -26,6 +26,7 @@
 #include <kernel/except.h>
 #include <kernel/fs/fs.h>
 #include <kernel/handle.h>
+#include <kernel/mman/mnode.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
@@ -40,6 +41,7 @@
 #include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/rpc.h>
+#include <sched/task-clone.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -67,6 +69,7 @@ kernel_initialize_threadstack(struct task *__restrict thread,
                               size_t sp_size,
                               void *__restrict entry) {
 	struct scpustate *init_state;
+	FORTASK(thread, _this_x86_kernel_psp0) = (uintptr_t)(sp_base + sp_size);
 	/* Initialize the CPU state of the boot CPU's idle thread. */
 #ifdef __x86_64__
 	init_state = (struct scpustate *)((sp_base + sp_size) - SIZEOF_SCPUSTATE);
@@ -93,12 +96,14 @@ kernel_initialize_threadstack(struct task *__restrict thread,
 	FORTASK(thread, this_sstate) = init_state;
 }
 
+INTDEF byte_t __kernel_boottask_stack[KERNEL_STACKSIZE];
 INTDEF byte_t __kernel_bootidle_stack[KERNEL_IDLE_STACKSIZE];
 INTDEF byte_t __kernel_asyncwork_stack[KERNEL_STACKSIZE];
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_scheduler_arch)(void) {
 	/* Initialize the CPU state of the boot CPU's idle thread, as well as the ASYNC worker thread. */
+	FORTASK(&boottask, _this_x86_kernel_psp0) = (uintptr_t)COMPILER_ENDOF(__kernel_boottask_stack);
 	kernel_initialize_threadstack(&bootidle, __kernel_bootidle_stack, KERNEL_IDLE_STACKSIZE, (void *)&cpu_idlemain);
 	kernel_initialize_threadstack(&asyncwork, __kernel_asyncwork_stack, KERNEL_STACKSIZE, (void *)&_asyncmain);
 }
@@ -170,6 +175,7 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
 #endif /* !__x86_64__ */
 	/* TODO: Must also execute thread startup callbacks! */
 	thread->t_flags |= TASK_FKERNTHREAD;
+	_task_init_arch_sstate(thread, THIS_TASK, &state);
 	FORTASK(thread, this_sstate) = state;
 	if (!FORTASK(thread, this_fs))
 		FORTASK(thread, this_fs) = incref(&fs_kernel);

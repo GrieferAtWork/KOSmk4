@@ -708,7 +708,7 @@ task_waitfor_with_sigmask(sigset_t const *__restrict sigmask,
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 INTDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL pertask_init_task_connections)(struct task *__restrict self);
+NOTHROW(KCALL pertask_fix_task_connections)(struct task *__restrict self);
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 #endif /* __CC__ */

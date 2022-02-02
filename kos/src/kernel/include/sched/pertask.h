@@ -131,11 +131,6 @@ DECL_END
 
 #endif /* __CC__ */
 
-/* >> void KCALL func(struct task *__restrict self);
- * Invoked during task_alloc(). */
-#define DEFINE_PERTASK_INIT(func) \
-	DEFINE_CALLBACK(".rodata.callback.pertask.init", func)
-
 /* >> NOBLOCK void NOTHROW(KCALL func)(struct task *__restrict self);
  * Invoked during task_destroy(). */
 #define DEFINE_PERTASK_FINI(func) \

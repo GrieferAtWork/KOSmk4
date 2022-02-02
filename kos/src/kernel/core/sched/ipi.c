@@ -219,8 +219,8 @@ trigger_clone_trap(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 /* Default task start flags. */
 PUBLIC unsigned int task_start_default_flags = TASK_START_FNORMAL;
 
-/* Start executing  the  given task  on  the  CPU it  has  been  assigned.
- * HINT: By default, `task_alloc()' will assign new tasks to the boot CPU. */
+/* Start executing the given task on the CPU it has been assigned.
+ * @param: flags: Set of `TASK_START_F*' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 	pflag_t was;

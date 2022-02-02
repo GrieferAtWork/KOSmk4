@@ -180,8 +180,8 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
                                      * same CPU as the calling  thread, then `thread' will  receive
                                      * its first quantum before `task_start()' returns. */
 #ifdef __CC__
-/* Start executing  the  given task  on  the  CPU it  has  been  assigned.
- * HINT: By default, `task_alloc()' will assign new tasks to the boot CPU. */
+/* Start executing the given task on the CPU it has been assigned.
+ * @param: flags: Set of `TASK_START_F*' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags);
 

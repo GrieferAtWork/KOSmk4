@@ -25,6 +25,7 @@
 #include <kernel/types.h>
 #include <sched/arch/task-clone.h>
 
+#include <asm/asmword.h>
 #include <asm/os/sched.h>
 
 /* Cloning flags. */
@@ -113,14 +114,42 @@ DECL_BEGIN
  * @param: child_tidptr:  [valid_if(CLONE_CHILD_CLEARTID | CLONE_CHILD_SETTID)]
  *                        Store child TID here in child process
  * @param: ARCH_CLONE__PARAMS: Additional, arch-specific parameters */
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *KCALL
-sys_clone_impl(struct icpustate const *__restrict init_state,
-               uintptr_t clone_flags,
-               USER UNCHECKED pid_t *parent_tidptr,
-               USER UNCHECKED pid_t *child_tidptr
-               ARCH_CLONE__PARAMS)
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *KCALL
+task_clone(struct icpustate const *__restrict init_state,
+           uintptr_t clone_flags,
+           USER UNCHECKED pid_t *parent_tidptr,
+           USER UNCHECKED pid_t *child_tidptr
+           ARCH_CLONE__PARAMS)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 
+
+#ifdef CONFIG_BUILDING_KERNEL_CORE
+/* Define a per-task relocation that must be initialized as:
+ * >> struct task *thread = THREAD_TO_INITIALIZE;
+ * >> *(uintptr_t *)((byte_t *)thread + addr) += thread; */
+#define DEFINE_PERTASK_RELOCATION(addr)                    \
+	__asm__(".pushsection .rodata.pertask.relocations\n\t" \
+	        "\t.wordptr %p0\n\t"                           \
+	        ".popsection"                                  \
+	        : : "X" (addr))
+
+/* Initialize task relocations, as defined by `DEFINE_PERTASK_RELOCATION()' */
+INTDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL _task_init_relocations)(struct task *__restrict self);
+
+/* Do some additional arch-specific initialization that should be
+ * done just before `FORTASK(self, this_sstate)' will be assigned.
+ *
+ * @param: child:    The new thread that is being initialized
+ * @param: caller:   The calling thread (THIS_TASK)
+ * @param: p_sstate: `struct scpustate **' Pointer to the state
+ *                   that will be assigned to `this_sstate' once
+ *                   this function returns. */
+#ifndef _task_init_arch_sstate
+#define _task_init_arch_sstate(child, caller, p_sstate) (void)0
+#endif /* !_task_init_arch_sstate */
+
+#endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 DECL_END
 #endif /* __CC__ */

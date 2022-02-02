@@ -24,6 +24,10 @@
 
 #include <kernel/types.h>
 
+#ifdef __CC__
+DECL_BEGIN
+
+/* Arch-specific parameters for `task_clone()' */
 #define ARCH_CLONE__PARAMS              \
 	,                                   \
 	USER UNCHECKED void *x86_child_psp, \
@@ -31,5 +35,14 @@
 	uintptr_t x86_child_fsbase
 #define ARCH_CLONE__ARGS \
 	, x86_child_psp, x86_child_gsbase, x86_child_fsbase
+
+/* The per-task value written to `t_psp0' during scheduler preemption. */
+DATDEF ATTR_PERTASK uintptr_t _this_x86_kernel_psp0 ASMNAME("this_x86_kernel_psp0");
+#define _task_init_arch_sstate(child, caller, p_sstate) \
+	(void)(FORTASK(child, _this_x86_kernel_psp0) = (uintptr_t)mnode_getendaddr(&FORTASK(child, this_kernel_stacknode)))
+
+DECL_END
+#endif /* __CC__ */
+
 
 #endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_TASK_CLONE_H */

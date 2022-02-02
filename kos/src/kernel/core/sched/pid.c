@@ -1438,8 +1438,7 @@ NOTHROW(FCALL pidns_nextpid)(struct pidns *__restrict self,
 /* Allocate a `struct taskpid' for `self' (which must not have  been
  * started yet, or have its taskpid already allocated), and register
  * that task within the given pidns `ns'
- * This function should be called after `task_alloc()', but before `task_start()'
- * WARNING: This   function   may  only   be   called  _ONCE_   for   each  task!
+ * WARNING: This function may only be called _ONCE_ for each task!
  * @param: ns_pid: The  PID  to  try to  assign  to `self'  within  the namespace.
  *                 When ZERO(0),  or already  in  use, sequentially  generate  IDs
  *                 Also note  that  this PID  is  only  set for  `self'  in  `ns'.

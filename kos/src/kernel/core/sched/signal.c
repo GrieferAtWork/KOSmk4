@@ -28,10 +28,12 @@
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/selftest.h> /* DEFINE_TEST */
+#include <sched/pertask.h>
 #include <sched/rpc.h>
 #include <sched/signal-completion.h>
 #include <sched/signal-select.h>
 #include <sched/signal.h>
+#include <sched/task-clone.h> /* DEFINE_PERTASK_RELOCATION */
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -40,6 +42,7 @@
 #include <alloca.h>
 #include <assert.h>
 #include <inttypes.h>
+#include <stdalign.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -65,7 +68,7 @@ DECL_BEGIN
 /* Root connections set. */
 PUBLIC ATTR_PERTASK struct task_connections this_root_connections = {
 	.tsc_prev   = NULL,
-	.tcs_thread = NULL, /* Fill in by `pertask_init_task_connections()' */
+	.tcs_thread = NULL,
 	.tcs_con    = NULL,
 	.tcs_dlvr   = NULL,
 	.tcs_static = { }
@@ -73,18 +76,29 @@ PUBLIC ATTR_PERTASK struct task_connections this_root_connections = {
 
 /* [1..1][lock(PRIVATE(THIS_TASK))]  Current   set   of   in-use   connections.
  * Most of the time, this will simply point to `PERTASK(this_root_connections)' */
-PUBLIC ATTR_PERTASK struct task_connections *
-this_connections = NULL; /* Fill in by `pertask_init_task_connections()' */
+PUBLIC ATTR_PERTASK struct task_connections *this_connections = &this_root_connections;
 
-DEFINE_PERTASK_INIT(pertask_init_task_connections);
-DEFINE_PERTASK_ONEXIT(task_disconnectall); /* Disconnect all remaining connections during task cleanup. */
 
 INTERN NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL pertask_init_task_connections)(struct task *__restrict self) {
-	struct task_connections *rootcons;
-	rootcons = &FORTASK(self, this_root_connections);
-	rootcons->tcs_thread = self;
-	FORTASK(self, this_connections) = rootcons;
+NOTHROW(KCALL pertask_fix_task_connections)(struct task *__restrict self) {
+	struct task *active_thread;
+	struct task_connections *self_connections;
+	DEFINE_PERTASK_RELOCATION(&this_root_connections.tcs_thread);
+	DEFINE_PERTASK_RELOCATION(&this_connections);
+	self_connections = FORTASK(self, this_connections);
+	if (!ADDR_ISKERN(self_connections))
+		goto fixit;
+	if (!IS_ALIGNED((uintptr_t)self_connections, alignof(struct task_connections)))
+		goto fixit;
+	if (memcpy_nopf(&active_thread, &self_connections->tcs_thread, sizeof(struct task *)) != 0)
+		goto fixit;
+	if (active_thread != self)
+		goto fixit;
+	return;
+fixit:
+	FORTASK(self, this_connections) = &FORTASK(self, this_root_connections);
+	bzero(&FORTASK(self, this_root_connections), sizeof(struct task_connections));
+	FORTASK(self, this_root_connections).tcs_thread = self;
 }
 
 #if defined(__x86_64__) || defined(__i386__)
@@ -1448,6 +1462,9 @@ NOTHROW(FCALL task_disconnectall)(void) {
 	COMPILER_BARRIER();
 	self->tcs_dlvr = NULL;
 }
+
+/* Disconnect all remaining connections during task_exit(). */
+DEFINE_PERTASK_ONEXIT(task_disconnectall);
 
 /* Same as `task_disconnectall()', but don't forward signals with a
  * `TASK_CONNECTION_STAT_SENT'-state, but rather return the  sender

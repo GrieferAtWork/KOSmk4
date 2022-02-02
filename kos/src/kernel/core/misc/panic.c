@@ -104,9 +104,7 @@ LOCAL NOBLOCK ATTR_COLDTEXT NONNULL((1)) void
 NOTHROW(KCALL fixup_uninitialized_thread)(struct task *__restrict thread) {
 	if (thread->t_self != thread)
 		thread->t_self = thread; /* Shouldn't happen... */
-	if (!FORTASK(thread, this_connections) ||
-	    (FORTASK(thread, this_connections)->tcs_thread != thread))
-		pertask_init_task_connections(thread);
+	pertask_fix_task_connections(thread);
 }
 
 #if defined(__x86_64__) || defined(__i386__)

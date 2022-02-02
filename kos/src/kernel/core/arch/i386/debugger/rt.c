@@ -47,6 +47,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <sched/async.h>
 #include <sched/cpu.h>
 #include <sched/scheduler.h>
+#include <sched/task-clone.h>
 #include <sched/task.h>
 #include <sched/x86/tss.h>
 
@@ -116,8 +117,6 @@ PRIVATE ATTR_DBGTEXT void FCALL dbg_runhooks(dbg_hook_type_t type) {
 DATDEF ATTR_PERTASK uintptr_t this_x86_kernel_psp0_ ASMNAME("this_x86_kernel_psp0");
 DATDEF ATTR_PERTASK struct mnode this_kernel_stacknode_ ASMNAME("this_kernel_stacknode");
 DATDEF ATTR_PERTASK struct mpart this_kernel_stackpart_ ASMNAME("this_kernel_stackpart");
-
-INTDEF NOBLOCK void NOTHROW(KCALL init_this_x86_kernel_psp0)(struct task *__restrict self);
 
 #ifdef CONFIG_NO_SMP
 #define x86_failsafe_getcpu() &bootcpu
@@ -624,7 +623,7 @@ x86_init_psp0_thread(struct task *__restrict thread, size_t stack_size) {
 		part->mp_mem.mc_size = stack_size / PAGESIZE;
 	node->mn_maxaddr = node->mn_minaddr + stack_size - 1;
 	part->mp_maxaddr = part->mp_minaddr + stack_size - 1;
-	init_this_x86_kernel_psp0(thread);
+	FORTASK(thread, _this_x86_kernel_psp0) = (uintptr_t)mnode_getendaddr(node);
 }
 
 PRIVATE ATTR_DBGTEXT void FCALL
@@ -693,9 +692,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 	FORCPU(me, thiscpu_sched_override) = mythread;
 
 	/* Make sure that the signal connections sub-system is initialized. */
-	if (!FORTASK(mythread, this_connections) ||
-	    (FORTASK(mythread, this_connections)->tcs_thread != mythread))
-		pertask_init_task_connections(mythread);
+	pertask_fix_task_connections(mythread);
 
 	/* Push active connections. */
 	if (!(initok & INITOK_CONNECTIONS)) {
@@ -711,8 +708,9 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 			/* Connections are all f'ed up. - Fully reset them, so
 			 * we can at least get ~some~ kind of working state... */
 fully_reset_task_connections:
+			FORTASK(mythread, this_connections) = NULL;
 			bzero(&FORTASK(mythread, this_root_connections), sizeof(this_root_connections));
-			pertask_init_task_connections(mythread);
+			pertask_fix_task_connections(mythread);
 			task_pushconnections(&x86_dbg_hostbackup.dhs_signals);
 		} else if likely(FORTASK(mythread, this_connections) != &x86_dbg_hostbackup.dhs_signals) {
 			task_pushconnections(&x86_dbg_hostbackup.dhs_signals);
@@ -890,9 +888,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset_dbg_stack(void) {
 	x86_dbg_initialize_segments(me, mythread);
 
 	/* Make sure that the signal connections sub-system is (still) initialized. */
-	if (!FORTASK(mythread, this_connections) ||
-	    (FORTASK(mythread, this_connections)->tcs_thread != mythread))
-		pertask_init_task_connections(mythread);
+	pertask_fix_task_connections(mythread);
 
 	/* When the debugger is reset after a prior call to `task_pushconnections()',
 	 * then we  must take  special care  to pop  the pushed  set of  connections.
@@ -927,8 +923,9 @@ dont_pop_connections:
 		}
 	} else if unlikely(!verify_task_connections(FORTASK(mythread, this_connections))){
 reset_all_connections:
+		FORTASK(mythread, this_connections) = NULL;
 		bzero(&FORTASK(mythread, this_root_connections), sizeof(this_root_connections));
-		pertask_init_task_connections(mythread);
+		pertask_fix_task_connections(mythread);
 		if (initok & INITOK_CONNECTIONS)
 			task_pushconnections(&x86_dbg_hostbackup.dhs_signals);
 	}
@@ -955,9 +952,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
 	x86_init_psp0(me, mythread);
 
 	/* Make sure that the signal connections sub-system is (still) initialized. */
-	if (!FORTASK(mythread, this_connections) ||
-	    (FORTASK(mythread, this_connections)->tcs_thread != mythread))
-		pertask_init_task_connections(mythread);
+	pertask_fix_task_connections(mythread);
 	if (FORTASK(mythread, this_connections) != &x86_dbg_hostbackup.dhs_signals) {
 		if (initok & INITOK_CONNECTIONS)
 			FORTASK(mythread, this_connections) = x86_dbg_hostbackup.dhs_signals.tsc_prev;

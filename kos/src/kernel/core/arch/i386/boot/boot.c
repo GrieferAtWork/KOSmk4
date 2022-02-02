@@ -155,16 +155,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Load default memory banks. */
 	x86_initialize_default_memory_banks();
 
-	/* Run task initialization callbacks on the boot task,  initializing
-	 * important structures such as the r/w-lock descriptor and the task
-	 * signal connection manager.
-	 * NOTE: We do  this now  since r/w-locks  and signal  connections  are
-	 *       required  by  the  Unwind-FDE cache  sub-system,  meaning that
-	 *       they are also required for us to be able to handle exceptions.
-	 * In other words: Only once this function has been called can we
-	 *                 start   making   use  of   exceptions  safely. */
-	kernel_initialize_scheduler_callbacks();
-
 	/* Load multiboot information.
 	 * NOTE: All  information provided by the bootloader is assumed
 	 *       to be located within the first 1Gb of physical memory! */

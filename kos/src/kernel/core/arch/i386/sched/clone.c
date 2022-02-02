@@ -82,14 +82,14 @@ sys_clone64_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	REF struct task *child_tsk;
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
-	child_tsk = sys_clone_impl(ctx->rc_state,
-	                           ctx->rc_scinfo.rsi_regs[0],                         /* clone_flags */
-	                           (USER UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[2], /* parent_tidptr */
-	                           (USER UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[3], /* child_tidptr */
-	                           (USER UNCHECKED void *)ctx->rc_scinfo.rsi_regs[1],  /* child_stack */
-	                           x86_get_user_gsbase(),
-	                           ctx->rc_scinfo.rsi_regs[0] & CLONE_SETTLS ? ctx->rc_scinfo.rsi_regs[4]
-	                                                                     : x86_get_user_fsbase());
+	child_tsk = task_clone(ctx->rc_state,
+	                       ctx->rc_scinfo.rsi_regs[0],                         /* clone_flags */
+	                       (USER UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[2], /* parent_tidptr */
+	                       (USER UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[3], /* child_tidptr */
+	                       (USER UNCHECKED void *)ctx->rc_scinfo.rsi_regs[1],  /* child_stack */
+	                       x86_get_user_gsbase(),
+	                       ctx->rc_scinfo.rsi_regs[0] & CLONE_SETTLS ? ctx->rc_scinfo.rsi_regs[4]
+	                                                                 : x86_get_user_fsbase());
 	child_tid = task_gettid_of(child_tsk);
 	decref(child_tsk);
 	icpustate_setreturn(ctx->rc_state, child_tid);
@@ -124,14 +124,14 @@ sys_clone32_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	REF struct task *child_tsk;
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
-	child_tsk = sys_clone_impl(ctx->rc_state,
-	                           ctx->rc_scinfo.rsi_regs[0],                         /* clone_flags */
-	                           (USER UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[2], /* parent_tidptr */
-	                           (USER UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[4], /* child_tidptr */
-	                           (USER UNCHECKED void *)ctx->rc_scinfo.rsi_regs[1],  /* child_stack */
-	                           ctx->rc_scinfo.rsi_regs[0] & CLONE_SETTLS ? ctx->rc_scinfo.rsi_regs[3]
-	                                                                     : x86_get_user_gsbase(),
-	                           x86_get_user_fsbase());
+	child_tsk = task_clone(ctx->rc_state,
+	                       ctx->rc_scinfo.rsi_regs[0],                         /* clone_flags */
+	                       (USER UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[2], /* parent_tidptr */
+	                       (USER UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[4], /* child_tidptr */
+	                       (USER UNCHECKED void *)ctx->rc_scinfo.rsi_regs[1],  /* child_stack */
+	                       ctx->rc_scinfo.rsi_regs[0] & CLONE_SETTLS ? ctx->rc_scinfo.rsi_regs[3]
+	                                                                 : x86_get_user_gsbase(),
+	                       x86_get_user_fsbase());
 	child_tid = task_gettid_of(child_tsk);
 	decref(child_tsk);
 	icpustate_setreturn(ctx->rc_state, child_tid);
@@ -170,10 +170,10 @@ INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 sys_fork_impl(struct icpustate *__restrict state) {
 	pid_t child_tid;
 	REF struct task *child_tsk;
-	child_tsk = sys_clone_impl(state, SIGCHLD, NULL, NULL,
-	                           (USER UNCHECKED void *)icpustate_getusersp(state),
-	                           x86_get_user_gsbase(),
-	                           x86_get_user_fsbase());
+	child_tsk = task_clone(state, SIGCHLD, NULL, NULL,
+	                       (USER UNCHECKED void *)icpustate_getusersp(state),
+	                       x86_get_user_gsbase(),
+	                       x86_get_user_fsbase());
 	child_tid = task_gettid_of(child_tsk);
 	decref(child_tsk);
 	gpregs_setpax(&state->ics_gpregs, child_tid);
@@ -209,10 +209,10 @@ INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 sys_vfork_impl(struct icpustate *__restrict state) {
 	pid_t child_tid;
 	REF struct task *child_tsk;
-	child_tsk = sys_clone_impl(state, CLONE_VM | CLONE_VFORK | SIGCHLD, NULL, NULL,
-	                           (USER UNCHECKED void *)icpustate_getusersp(state),
-	                           x86_get_user_gsbase(),
-	                           x86_get_user_fsbase());
+	child_tsk = task_clone(state, CLONE_VM | CLONE_VFORK | SIGCHLD, NULL, NULL,
+	                       (USER UNCHECKED void *)icpustate_getusersp(state),
+	                       x86_get_user_gsbase(),
+	                       x86_get_user_fsbase());
 	child_tid = task_gettid_of(child_tsk);
 	decref(child_tsk);
 	gpregs_setpax(&state->ics_gpregs, child_tid);

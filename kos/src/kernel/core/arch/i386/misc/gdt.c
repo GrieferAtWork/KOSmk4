@@ -124,16 +124,9 @@ PUBLIC ATTR_PERCPU struct segment thiscpu_x86_ldt[LDT_SEGMENT_COUNT] = {
 };
 
 
-/* The per-task value written to `t_psp0' during scheduler preemption. */
+/* The per-task value written to `t_psp0' during scheduler preemption.
+ * HINT: Initialized by `_task_init_arch_sstate()' */
 PUBLIC ATTR_PERTASK uintptr_t _this_x86_kernel_psp0 ASMNAME("this_x86_kernel_psp0") = 0;
-
-DEFINE_PERTASK_INIT(init_this_x86_kernel_psp0);
-INTERN NOBLOCK void
-NOTHROW(KCALL init_this_x86_kernel_psp0)(struct task *__restrict self) {
-	/* Initialize the kernel-sp0 valued to-be written during preemption. */
-	FORTASK(self, _this_x86_kernel_psp0) = (uintptr_t)mnode_getendaddr(&FORTASK(self, this_kernel_stacknode));
-}
-
 
 #ifndef __x86_64__
 /* The  per-task values with which the `SEGMENT_USER_FSBASE' and
