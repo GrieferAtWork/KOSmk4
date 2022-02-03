@@ -508,7 +508,7 @@ i386_allocate_secondary_cores(void) {
 		altcore->c_id                          = i;
 		FORCPU(altcore, thiscpu_sched_current) = altidle;
 		altidle->t_cpu                         = altcore;
-		altidle->t_flags                       = TASK_FSTARTED | TASK_FRUNNING | TASK_FKEEPCORE | TASK_FCRITICAL;
+		altidle->t_flags                       = TASK_FSTARTED | TASK_FRUNNING | TASK_FKEEPCORE | TASK_FCRITICAL | TASK_FKERNTHREAD;
 		FORCPU(altcore, thiscpu_scheduler).s_runcount         = 1;
 		FORCPU(altcore, thiscpu_scheduler).s_running.lh_first = altidle;
 		FORCPU(altcore, thiscpu_scheduler).s_running_last     = altidle;
