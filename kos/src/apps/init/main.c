@@ -281,6 +281,9 @@ done_tmpfs:
 		}
 
 		/* Wait for the user-shell to die. */
+		/* TODO: Once `CONFIG_USE_NEW_GROUP' is  implemented, this right  here
+		 *       must be changed such that we use `wait(2)' to reap any orphan
+		 *       processes that got reparented to us. */
 		while (waitpid(cpid, NULL, 0) < 0)
 			sched_yield();
 

@@ -155,9 +155,9 @@ NOTHROW(KCALL maybe_propagate_exit_to_procss_children)(struct task *__restrict c
 		while (threads) {
 			REF struct task *child_thread;
 			REF struct taskpid *next;
-			next = LIST_NEXT(threads, tp_sib);
-			ATOMIC_WRITE(threads->tp_sib.le_prev, NULL);
-			__HYBRID_Q_BADPTR(threads->tp_sib.le_next);
+			next = LIST_NEXT(threads, tp_parsib);
+			ATOMIC_WRITE(threads->tp_parsib.le_prev, NULL);
+			__HYBRID_Q_BADPTR(threads->tp_parsib.le_next);
 			child_thread = awref_get(&threads->tp_thread);
 			if (child_thread) {
 				/* Must differentiate:
@@ -195,7 +195,7 @@ NOTHROW(KCALL maybe_propagate_exit_to_procss_children)(struct task *__restrict c
 			if (parent) {
 				/* Send an IPC signal to `parent', informing them that we've just terminated! (SIGCLD) */
 				COMPILER_READ_BARRIER();
-				if (LIST_ISBOUND(mypid, tp_sib)) /* Check if we've been detached. */
+				if (LIST_ISBOUND(mypid, tp_parsib)) /* Check if we've been detached. */
 					task_send_sigcld_to_parent_process(parent, proc, mypid);
 				decref(parent);
 			}
@@ -226,16 +226,16 @@ NOTHROW(KCALL maybe_propagate_exit_to_procss_children)(struct task *__restrict c
 		                             TASKGROUP_TG_THREAD_DETACHED_TERMINATED));
 		if (thread_detach_state != TASKGROUP_TG_THREAD_DETACHED_NO) {
 			/* Remove our thread link from the chain of threads of our process's leader. */
-			if (LIST_ISBOUND(mypid, tp_sib)) {
+			if (LIST_ISBOUND(mypid, tp_parsib)) {
 				while (!sync_trywrite(&mygroup.tg_proc_threads_lock)) {
 					COMPILER_READ_BARRIER();
 					if (LIST_FIRST(&mygroup.tg_proc_threads) == TASKGROUP_TG_PROC_THREADS_TERMINATED)
 						goto done_unlink_pid_sibling; /* The leader has already terminated. */
 					task_tryyield_or_pause();
 				}
-				LIST_UNBIND(mypid, tp_sib);
+				LIST_UNBIND(mypid, tp_parsib);
 				sync_endwrite(&mygroup.tg_proc_threads_lock);
-				decref_nokill(mypid); /* The reference previously contained within the `tp_sib' chain */
+				decref_nokill(mypid); /* The reference previously contained within the `tp_parsib' chain */
 			}
 		}
 done_unlink_pid_sibling:
@@ -271,7 +271,7 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 		 * the process  itself  didn't  bother  wait(2)-ing  for. */
 		if (iter != TASKGROUP_TG_PROC_THREADS_TERMINATED) {
 			while (iter) {
-				next = LIST_NEXT(iter, tp_sib);
+				next = LIST_NEXT(iter, tp_parsib);
 				decref(iter);
 				iter = next;
 			}
@@ -391,14 +391,14 @@ task_setthread(struct task *__restrict self,
 	FORTASK(self, this_taskgroup).tg_thread_exit = exit_rpc;
 	assertf(FORTASK(self, this_taskgroup).tg_thread_detached == TASKGROUP_TG_THREAD_DETACHED_NO,
 	        "tg_thread_detached = %" PRIuPTR, FORTASK(self, this_taskgroup).tg_thread_detached);
-	assert(!LIST_ISBOUND(pid, tp_sib));
-	pid->tp_sib.le_prev = &FORTASK(leader, this_taskgroup).tg_proc_threads.lh_first;
+	assert(!LIST_ISBOUND(pid, tp_parsib));
+	pid->tp_parsib.le_prev = &FORTASK(leader, this_taskgroup).tg_proc_threads.lh_first;
 	incref(pid); /* The reference for the child chain */
 	COMPILER_WRITE_BARRIER();
 	do {
 		next = LIST_FIRST(&FORTASK(leader, this_taskgroup).tg_proc_threads);
 		if unlikely(next == TASKGROUP_TG_PROC_THREADS_TERMINATED) {
-			pid->tp_sib.le_prev                 = NULL;
+			pid->tp_parsib.le_prev                 = NULL;
 			FORTASK(self, this_taskgroup).tg_process = NULL;
 			COMPILER_WRITE_BARRIER();
 			sync_endwrite(&FORTASK(leader, this_taskgroup).tg_proc_threads_lock);
@@ -408,10 +408,10 @@ task_setthread(struct task *__restrict self,
 			pending_rpc_free(exit_rpc);
 			return false;
 		}
-		ATOMIC_WRITE(pid->tp_sib.le_next, next);
+		ATOMIC_WRITE(pid->tp_parsib.le_next, next);
 	} while (!ATOMIC_CMPXCH_WEAK(FORTASK(leader, this_taskgroup).tg_proc_threads.lh_first, next, pid));
 	if unlikely(next != NULL)
-		next->tp_sib.le_prev = &pid->tp_sib.le_next;
+		next->tp_parsib.le_prev = &pid->tp_parsib.le_next;
 	sync_endwrite(&FORTASK(leader, this_taskgroup).tg_proc_threads_lock);
 	return true;
 }
@@ -487,8 +487,8 @@ task_setprocess(struct task *__restrict self,
 	/* Now to bind the process's parent */
 	if (!parent || parent == self) {
 		/* Create a detached process. */
-		pid->tp_sib.le_prev = NULL;
-		__HYBRID_Q_BADPTR(pid->tp_sib.le_next);
+		pid->tp_parsib.le_prev = NULL;
+		__HYBRID_Q_BADPTR(pid->tp_parsib.le_next);
 	} else {
 		/* Set the proper parent process. */
 		parent = task_getprocess_of(parent);
@@ -503,7 +503,7 @@ again_lock_proc_threads_lock:
 			}
 		}
 		/* Add the given thread to the chain of siblings of the parent process. */
-		LIST_INSERT_HEAD(&FORTASK(parent, this_taskgroup).tg_proc_threads, pid, tp_sib);
+		LIST_INSERT_HEAD(&FORTASK(parent, this_taskgroup).tg_proc_threads, pid, tp_parsib);
 		incref(pid); /* The reference stored in the `tg_proc_threads' chain of the parent. */
 		FORTASK(self, this_taskgroup).tg_proc_parent = parent; /* Weakly referenced */
 		sync_endwrite(&FORTASK(self, this_taskgroup).tg_proc_parent_lock);
@@ -938,7 +938,7 @@ task_setpid(struct task *__restrict self,
 	pid->tp_refcnt = 1;
 	awref_init(&pid->tp_thread, self);
 	sig_init(&pid->tp_changed);
-	LIST_ENTRY_UNBOUND_INIT(&pid->tp_sib);
+	LIST_ENTRY_UNBOUND_INIT(&pid->tp_parsib);
 	pid->tp_ns = incref(ns);
 	COMPILER_WRITE_BARRIER();
 
@@ -1097,7 +1097,7 @@ task_detach(struct task *__restrict thread)
 	struct task *process;
 	pid = FORTASK(thread, this_taskpid);
 	COMPILER_READ_BARRIER();
-	if (!LIST_ISBOUND(pid, tp_sib))
+	if (!LIST_ISBOUND(pid, tp_parsib))
 		return false; /* Already detached. */
 	process = FORTASK(thread, this_taskgroup).tg_process;
 	if (thread == process) {
@@ -1125,14 +1125,14 @@ parent_is_dead:
 			/* Start over by acquiring the parent-lock of the given thread. */
 			goto again_acquire_parent_lock;
 		}
-		if (LIST_ISBOUND(pid, tp_sib)) {
-			LIST_UNBIND(pid, tp_sib);
+		if (LIST_ISBOUND(pid, tp_parsib)) {
+			LIST_UNBIND(pid, tp_parsib);
 
 			/* Delete the parent link within our own process. */
 			FORTASK(thread, this_taskgroup).tg_proc_parent = NULL;
 			sync_endwrite(&FORTASK(parent, this_taskgroup).tg_proc_threads_lock);
 			sync_endwrite(&FORTASK(thread, this_taskgroup).tg_proc_parent_lock);
-			decref_nokill(pid); /* Inherited from the `tp_sib' chain */
+			decref_nokill(pid); /* Inherited from the `tp_parsib' chain */
 			return true;
 		}
 		/* Already detached. */
@@ -1148,10 +1148,10 @@ parent_is_dead:
 			if (thread_detach_state == TASKGROUP_TG_THREAD_DETACHED_TERMINATED) {
 				/* Child thread has already terminated (check for manual detach) */
 				sync_write(&FORTASK(process, this_taskgroup).tg_proc_threads_lock);
-				if (LIST_ISBOUND(pid, tp_sib)) {
-					LIST_UNBIND(pid, tp_sib);
+				if (LIST_ISBOUND(pid, tp_parsib)) {
+					LIST_UNBIND(pid, tp_parsib);
 					sync_endwrite(&FORTASK(process, this_taskgroup).tg_proc_threads_lock);
-					decref_nokill(pid); /* Inherited from the `tp_sib' chain */
+					decref_nokill(pid); /* Inherited from the `tp_parsib' chain */
 					return true;
 				}
 				sync_endwrite(&FORTASK(process, this_taskgroup).tg_proc_threads_lock);
@@ -1188,7 +1188,7 @@ again:
 	sync_write(&procgroup.tg_proc_threads_lock);
 	iter = LIST_FIRST(&procgroup.tg_proc_threads);
 continue_with_iter:
-	for (; iter; iter = LIST_NEXT(iter, tp_sib)) {
+	for (; iter; iter = LIST_NEXT(iter, tp_parsib)) {
 		if (!wasdestroyed(iter))
 			break;
 	}
@@ -1236,9 +1236,9 @@ continue_with_iter:
 		}
 		/* Detach the child thread */
 detach_manually:
-		LIST_UNBIND(iter, tp_sib);
+		LIST_UNBIND(iter, tp_parsib);
 		sync_endwrite(&procgroup.tg_proc_threads_lock);
-		/* Drop the reference previously held by our `tp_sib' chain. */
+		/* Drop the reference previously held by our `tp_parsib' chain. */
 		decref(iter);
 		++result;
 		goto again;
@@ -1297,7 +1297,7 @@ do_detach_self:
 		/* Go through the list of children of this process. */
 again:
 		sync_write(&procgroup->tg_proc_threads_lock);
-		LIST_FOREACH (iter, &procgroup->tg_proc_threads, tp_sib) {
+		LIST_FOREACH (iter, &procgroup->tg_proc_threads, tp_parsib) {
 			REF struct task *tpid_thread;
 			if (iter != tpid)
 				continue;
@@ -1339,7 +1339,7 @@ again:
 			}
 detach_manually:
 			/* Unbind the thread's PID from our chain of children. */
-			LIST_UNBIND(iter, tp_sib);
+			LIST_UNBIND(iter, tp_parsib);
 			sync_endwrite(&procgroup->tg_proc_threads_lock);
 			decref(iter); /* The reference previously contained within the `tg_proc_threads' chain */
 			result = -EOK;
@@ -1425,13 +1425,13 @@ reapall_check_already_locked:
 							return -ECHILD;
 						}
 						if (!(options & WNOREAP)) {
-							for (; child; child = LIST_NEXT(child, tp_sib)) {
+							for (; child; child = LIST_NEXT(child, tp_parsib)) {
 								if (is_taskpid_terminating(child)) {
 									/* Detach (reap) this child. */
 									if (!sync_writing(&mygroup.tg_proc_threads_lock) &&
 									    !sync_upgrade(&mygroup.tg_proc_threads_lock))
 										goto reapall_check_already_locked;
-									LIST_UNBIND(child, tp_sib); /* Inherit reference. */
+									LIST_UNBIND(child, tp_parsib); /* Inherit reference. */
 									sync_endwrite(&mygroup.tg_proc_threads_lock);
 									decref(child);
 									goto reapall_check;
@@ -1472,7 +1472,7 @@ again_enum_children:
 			sync_read(&mygroup.tg_proc_threads_lock);
 again_enum_children_locked:
 			num_candidates = 0;
-			LIST_FOREACH (child, &mygroup.tg_proc_threads, tp_sib) {
+			LIST_FOREACH (child, &mygroup.tg_proc_threads, tp_parsib) {
 				REF struct task *child_thread;
 				if (which == P_PID) {
 					if (_taskpid_slot_getpidno(child->tp_pids[my_indirection]) != upid)
@@ -1540,7 +1540,7 @@ again_read_status:
 							/* Unbind the child thread/process, thereby inheriting the
 							 * reference  previously stored within  the chain of child
 							 * threads. */
-							LIST_UNBIND(child, tp_sib);
+							LIST_UNBIND(child, tp_parsib);
 
 							/* Inherit reference to `child' */
 							sync_endwrite(&mygroup.tg_proc_threads_lock);

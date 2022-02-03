@@ -47,6 +47,11 @@
 #pragma GCC diagnostic ignored "-Winvalid-offsetof"
 #endif
 
+#undef CONFIG_USE_NEW_GROUP
+#if 0
+#define CONFIG_USE_NEW_GROUP
+#endif
+
 /*
  * The meaning of NOBLOCK vs. <neither> vs. BLOCKING
  *

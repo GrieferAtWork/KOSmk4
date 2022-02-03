@@ -3093,7 +3093,7 @@ find_first_thread_greater_or_equal(struct task *__restrict master,
 	result_pid = (upid_t)-1;
 	group      = &FORTASK(master, this_taskgroup);
 	atomic_rwlock_read(&group->tg_proc_threads_lock);
-	LIST_FOREACH (iter, &group->tg_proc_threads, tp_sib) {
+	LIST_FOREACH (iter, &group->tg_proc_threads, tp_parsib) {
 		upid_t iter_pid;
 		if unlikely(iter->tp_ns->pn_ind < myind)
 			continue; /* Cannot be represented */
@@ -3123,7 +3123,7 @@ get_greatest_child_pid_plus_one(struct task *__restrict master) {
 	result = 0;
 	group  = &FORTASK(master, this_taskgroup);
 	atomic_rwlock_read(&group->tg_proc_threads_lock);
-	LIST_FOREACH (iter, &group->tg_proc_threads, tp_sib) {
+	LIST_FOREACH (iter, &group->tg_proc_threads, tp_parsib) {
 		upid_t iter_pid;
 		if unlikely(iter->tp_ns->pn_ind < myind)
 			continue; /* Cannot be represented */

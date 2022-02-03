@@ -130,13 +130,19 @@ struct taskpid {
 	uint8_t                 tp_SIGCLD;  /* [const] Signal number send to parent process when `tp_status' changes. */
 	uint8_t                _tp_pad[sizeof(void *) - 3]; /* ... */
 #endif /* !__WANT_TASKPID__tp_lop */
-	LIST_ENTRY(REF taskpid) tp_sib;     /* [0..1] Chain of sibling tasks:
-	                                     * - If `tp_thread' is a process-leader:
+#ifdef CONFIG_USE_NEW_GROUP
+	REF struct taskpid     *tp_proc;    /* [1..1][ref_if(!= this)][const] PID descriptor for associated process. */
+	struct procctl         *tp_pctl;    /* [1..1][owned_if(tp_proc == this)][== tp_proc->tp_pctl][const] Process controller. */
+	LIST_ENTRY(REF taskpid) tp_parsib;  /* [1..1] Chain of sibling tasks:
+	                                     * - If `tp_proc == this': Link in chain of other processes spawned by the parent process of `tp_thread'
+	                                     * - If `tp_proc != this': Link in chain of sibling threads spawned within the same process */
+#else /* CONFIG_USE_NEW_GROUP */
+	LIST_ENTRY(REF taskpid) tp_parsib;  /* [0..1] Chain of sibling tasks:
+	                                     * - If `tp_proc == this':
 	                                     *   Link in chain of other processes spawned by the parent process of `tp_thread'
-	                                     * - If `tp_thread' isn't a process-leader (but instead a secondary
-	                                     *   thread): Chain of sibling threads spawned within the same process
-	                                     * - In either case, the link may be unbound if `detach()' was called.
-	                                     * - This field only becomes relevant in `<sched/group.h>' */
+	                                     * - If `tp_proc != this':
+	                                     *   Link in chain of sibling threads spawned within the same process */
+#endif /* !CONFIG_USE_NEW_GROUP */
 	REF struct pidns       *tp_ns;      /* [1..1][const] Top-level PID namespace containing this descriptor. */
 	COMPILER_FLEXIBLE_ARRAY(struct taskpid_slot,
 	                        tp_pids);   /* [const][tp_ns->pn_ind+1] Task PID value from different namespaces. */
@@ -198,7 +204,7 @@ taskpid_gettask_srch(struct taskpid *__restrict self)
 
 #define taskpid_getpidno(self)   taskpid_getnspidno(self, THIS_PIDNS)
 #define taskpid_getpidno_s(self) taskpid_getnspidno_s(self, THIS_PIDNS)
-	
+
 
 /* Return `self's PID number within its own namespace */
 #define taskpid_getselfpidno(self)                                                  \
@@ -217,20 +223,24 @@ taskpid_gettask_srch(struct taskpid *__restrict self)
 /* TASK PID NAMESPACE                                                   */
 /************************************************************************/
 struct pidns {
-	WEAK refcnt_t               pn_refcnt; /* Reference counter. */
-	size_t                      pn_ind;    /* [const][(== 0) == (. == &pidns_root)]
-	                                        * Indirection of this PID namespace. (== number of PIDs that are
-	                                        * associated  with every `struct taskpid' within this namespace)
-	                                        * NOTE: `pidns_root' is the only namespace with `pn_ind == 0'! */
-	REF struct pidns           *pn_par;    /* [1..1][const][->pn_ind == pn_ind-1]
-	                                        * [valid_if(pn_ind != 0 <=> . != &pidns_root)]
-	                                        * The parenting PID namespace with one less indirection.
-	                                        * NOTE: For `pidns_root', this field is set to `NULL'. */
-	struct atomic_rwlock        pn_lock;   /* Lock for accessing the LLRB-tree below. */
-	Toblockop_slist(pidns)      pn_lops;   /* [0..n][lock(ATOMIC)] Lock operations for `pn_lock'. */
-	LLRBTREE_ROOT(WEAK taskpid) pn_tree;   /* [LINK(->tp_pids[pn_ind].tps_link)][0..n][lock(pn_lock)]
-	                                        * Tree of PIDs (pids remove themselves upon destruction). */
-	pid_t                       pn_npid;   /* [lock(pn_lock)] Next PID to hand out. (in [PIDNS_FIRST_NONRESERVED_PID,PID_MAX]) */
+	WEAK refcnt_t               pn_refcnt;  /* Reference counter. */
+	size_t                      pn_ind;     /* [const][(== 0) == (. == &pidns_root)]
+	                                         * Indirection of this PID namespace. (== number of PIDs that are
+	                                         * associated  with every `struct taskpid' within this namespace)
+	                                         * NOTE: `pidns_root' is the only namespace with `pn_ind == 0'! */
+	REF struct pidns           *pn_par;     /* [1..1][const][->pn_ind == pn_ind-1]
+	                                         * [valid_if(pn_ind != 0 <=> . != &pidns_root)]
+	                                         * The parenting PID namespace with one less indirection.
+	                                         * NOTE: For `pidns_root', this field is set to `NULL'. */
+	struct atomic_rwlock        pn_lock;    /* Lock for accessing the LLRB-tree below. */
+	Toblockop_slist(pidns)      pn_lops;    /* [0..n][lock(ATOMIC)] Lock operations for `pn_lock'. */
+	LLRBTREE_ROOT(WEAK taskpid) pn_tree;    /* [LINK(->tp_pids[pn_ind].tps_link)][0..n][lock(pn_lock)]
+	                                         * Tree of PIDs (pids remove themselves upon destruction). */
+#ifdef CONFIG_USE_NEW_GROUP
+	LLRBTREE_ROOT(WEAK procgrp) pn_tree_pg; /* [LINK(->pgc_pids[pn_ind].pgs_link)][0..n][lock(pn_lock)]
+	                                         * Tree of process groups (groups remove themselves upon destruction). */
+#endif /* CONFIG_USE_NEW_GROUP */
+	pid_t                       pn_npid;    /* [lock(pn_lock)] Next PID to hand out. (in [PIDNS_FIRST_NONRESERVED_PID,PID_MAX]) */
 };
 
 /* Helper macros for working with `struct pidns::pn_lock' */
@@ -327,7 +337,7 @@ NOTHROW(FCALL pidns_insertpid)(struct pidns *__restrict self,
 FUNDEF NOBLOCK NONNULL((1)) struct taskpid *
 NOTHROW(FCALL pidns_removepid)(struct pidns *__restrict self, pid_t pid);
 
-/* Find the first (lowest) unused pid that is in [minpid,maxpid]
+/* Find the first (lowest) unused  pid that is in  [minpid,maxpid]
  * If no such pid exists (or when `minpid > maxpid'), return `-1'. */
 FUNDEF WUNUSED NOBLOCK NONNULL((1)) pid_t
 NOTHROW(FCALL pidns_findpid)(struct pidns const *__restrict self,

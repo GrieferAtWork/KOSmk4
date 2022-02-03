@@ -26,6 +26,7 @@
 
 #include <kernel/malloc.h>
 #include <sched/async.h>
+#include <sched/group.h>
 #include <sched/pid.h>
 #include <sched/task.h>
 
@@ -215,9 +216,13 @@ for (local x: nodes) {
 	print("		.tp_SIGCLD  = SIGCLD,");
 	print("		._tp_pad    = {}");
 	print("	}},");
-	print("	.tp_sib  = LIST_ENTRY_UNBOUND_INITIALIZER,");
-	print("	.tp_ns   = &pidns_root,");
-	print("	.tp_pids = {");
+	print("	.tp_parsib = LIST_ENTRY_UNBOUND_INITIALIZER,");
+	print("#ifdef CONFIG_USE_NEW_GROUP");
+	print("	.tp_proc   = &", x.val == "boottask" ? "boottask_pid" : "bootidle_pid", ",");
+	print("	.tp_pctl   = &", x.val == "boottask" ? "procctl_boottask" : "procctl_kernel", ",");
+	print("#endif /" "* CONFIG_USE_NEW_GROUP *" "/");
+	print("	.tp_ns     = &pidns_root,");
+	print("	.tp_pids   = {");
 	print("		[0] = {");
 	print("			.tps_link = { ", pidof(x.lhs), ", ", pidof(x.rhs), " },");
 	print("			.tps_pid  = ", x.minkey),;
@@ -239,9 +244,13 @@ INTERN struct taskpid boottask_pid = {
 		.tp_SIGCLD  = SIGCLD,
 		._tp_pad    = {}
 	}},
-	.tp_sib  = LIST_ENTRY_UNBOUND_INITIALIZER,
-	.tp_ns   = &pidns_root,
-	.tp_pids = {
+	.tp_parsib = LIST_ENTRY_UNBOUND_INITIALIZER,
+#ifdef CONFIG_USE_NEW_GROUP
+	.tp_proc   = &boottask_pid,
+	.tp_pctl   = &procctl_boottask,
+#endif /* CONFIG_USE_NEW_GROUP */
+	.tp_ns     = &pidns_root,
+	.tp_pids   = {
 		[0] = {
 			.tps_link = { NULL, NULL },
 			.tps_pid  = 1,
@@ -257,9 +266,13 @@ INTERN ATTR_PERCPU struct taskpid thiscpu_idle_pid = {
 		.tp_SIGCLD  = SIGCLD,
 		._tp_pad    = {}
 	}},
-	.tp_sib  = LIST_ENTRY_UNBOUND_INITIALIZER,
-	.tp_ns   = &pidns_root,
-	.tp_pids = {
+	.tp_parsib = LIST_ENTRY_UNBOUND_INITIALIZER,
+#ifdef CONFIG_USE_NEW_GROUP
+	.tp_proc   = &bootidle_pid,
+	.tp_pctl   = &procctl_kernel,
+#endif /* CONFIG_USE_NEW_GROUP */
+	.tp_ns     = &pidns_root,
+	.tp_pids   = {
 		[0] = {
 			.tps_link = { &boottask_pid, &asyncwork_pid },
 			.tps_pid  = 2,
@@ -275,9 +288,13 @@ INTERN struct taskpid asyncwork_pid = {
 		.tp_SIGCLD  = SIGCLD,
 		._tp_pad    = {}
 	}},
-	.tp_sib  = LIST_ENTRY_UNBOUND_INITIALIZER,
-	.tp_ns   = &pidns_root,
-	.tp_pids = {
+	.tp_parsib = LIST_ENTRY_UNBOUND_INITIALIZER,
+#ifdef CONFIG_USE_NEW_GROUP
+	.tp_proc   = &bootidle_pid,
+	.tp_pctl   = &procctl_kernel,
+#endif /* CONFIG_USE_NEW_GROUP */
+	.tp_ns     = &pidns_root,
+	.tp_pids   = {
 		[0] = {
 			.tps_link = { NULL, NULL },
 			.tps_pid  = 3,
@@ -293,13 +310,16 @@ PUBLIC pid_t pid_recycle_threshold = PID_RECYCLE_THRESHOLD_DEFAULT;
 
 /* The root PID namespace. */
 PUBLIC struct pidns pidns_root = {
-	.pn_refcnt = 4,    /* +1: pidns_root, +1: boottask_pid, +1: bootidle_pid, +1: asyncwork_pid */
-	.pn_ind    = 0,    /* Root namespace indirection */
-	.pn_par    = NULL, /* Root namespace doesn't have a parent */
-	.pn_lock   = ATOMIC_RWLOCK_INIT,
-	.pn_lops   = SLIST_HEAD_INITIALIZER(pidns_root.pn_lops),
-	.pn_tree   = STATIC_TASKPID_TREE_ROOT,
-	.pn_npid   = 4, /* 1-3 are already in use */
+	.pn_refcnt  = 4,    /* +1: pidns_root, +1: boottask_pid, +1: bootidle_pid, +1: asyncwork_pid */
+	.pn_ind     = 0,    /* Root namespace indirection */
+	.pn_par     = NULL, /* Root namespace doesn't have a parent */
+	.pn_lock    = ATOMIC_RWLOCK_INIT,
+	.pn_lops    = SLIST_HEAD_INITIALIZER(pidns_root.pn_lops),
+	.pn_tree    = STATIC_TASKPID_TREE_ROOT,
+#ifdef CONFIG_USE_NEW_GROUP
+	.pn_tree_pg = NULL,
+#endif /* CONFIG_USE_NEW_GROUP */
+	.pn_npid    = 4, /* 1-3 are already in use */
 };
 
 
@@ -309,8 +329,12 @@ NOTHROW(FCALL pidns_destroy)(struct pidns *__restrict self) {
 	assert(self != &pidns_root);
 	assert(self->pn_ind != 0);
 	assert(self->pn_par != NULL);
-	assertf(self->pn_tree == NULL, "Any taskpid should have kept us alive");
+	pidns_reap(self);
 	assert(SLIST_EMPTY(&self->pn_lops));
+	assertf(self->pn_tree == NULL, "Any taskpid should have kept us alive");
+#ifdef CONFIG_USE_NEW_GROUP
+	assertf(self->pn_tree_pg == NULL, "Any procgrp should have kept us alive");
+#endif /* CONFIG_USE_NEW_GROUP */
 	decref_unlikely(self->pn_par);
 	kfree(self);
 }
