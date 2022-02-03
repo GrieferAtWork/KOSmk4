@@ -37,6 +37,13 @@ DECL_BEGIN
 struct taskpid;
 struct stat;
 
+#ifdef CONFIG_USE_NEW_GROUP
+#ifndef __procgrp_awref_defined
+#define __procgrp_awref_defined
+struct procgrp;
+AWREF(procgrp_awref, procgrp);
+#endif /* !__procgrp_awref_defined */
+#else /* CONFIG_USE_NEW_GROUP */
 #ifndef __taskpid_axref_defined
 #define __taskpid_axref_defined
 AXREF(taskpid_axref, taskpid);
@@ -46,6 +53,7 @@ AXREF(taskpid_axref, taskpid);
 #define __taskpid_awref_defined
 AWREF(taskpid_awref, taskpid);
 #endif /* !__taskpid_awref_defined */
+#endif /* !CONFIG_USE_NEW_GROUP */
 
 
 struct ttydev_ops {
@@ -66,12 +74,17 @@ struct ttydev
 #define _ttydev_chr_     /* nothing */
 #endif /* !__WANT_FS_INLINE_STRUCTURES */
 	struct terminal      t_term;  /* The associated terminal driver controller. */
+#ifdef CONFIG_USE_NEW_GROUP
+	struct procgrp_awref t_cproc; /* [0..1] Session controlled by this tty. */
+	struct procgrp_awref t_fproc; /* [0..1] Foreground process group. */
+#else /* CONFIG_USE_NEW_GROUP */
 	struct taskpid_awref t_cproc; /* [0..1] Controlling terminal support.
 	                               * When  non-NULL,  points  to  a  session  leader  thread,  such that
 	                               * `FORTASK(taskpid_gettask(t_cproc), this_taskgroup).tg_ctty == self'
 	                               * is the case. */
 	struct taskpid_axref t_fproc; /* [0..1] PID of the foreground process group leader.
 	                               * This process is usually apart of the same session as `t_cproc' */
+#endif /* !CONFIG_USE_NEW_GROUP */
 };
 
 

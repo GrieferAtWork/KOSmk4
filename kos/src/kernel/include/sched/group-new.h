@@ -74,6 +74,24 @@ SLIST_HEAD(pending_rpc_slist, pending_rpc);
  * [1..1] Process group:     >> REF struct procgrp *grp     = arref_get(&THIS_TASKPID->tp_pctl->pc_grp);
  * [1..1] Process session:   >> REF struct procsession *ses = arref_get(&grp->pgc_session);
  *
+ * is_process_leader:
+ *    >> return THIS_TASKPID->tp_proc == THIS_TASKPID;
+ * is_group_leader:
+ *    >> pid = THIS_TASKPID;
+ *    >> grp = arref_get(&pid->tp_pctl->pc_grp);
+ *    >> return grp->pgc_ns == pid->tp_ns &&
+ *    >>        _taskpid_slot_getpidno(grp->pgc_pids[pid->tp_ns->pn_ind].pgs_pid) ==
+ *    >>        _taskpid_slot_getpidno(pid->tp_pids[pid->tp_ns->pn_ind].pgs_pid);
+ * is_session_leader:
+ *    >> return is_group_leader && grp == grp->pgc_sleader;
+ *
+ * get_thread_id:              >> THIS_TASKPID->tp_pids[*].tps_pid;
+ * get_process_id:             >> THIS_TASKPID->tp_proc->tp_pids[*].tps_pid;
+ * get_group_id:               >> arref_get(&THIS_TASKPID->tp_pctl->pc_grp)->pgc_pids[*].pgs_pid
+ * get_session_id:             >> arref_get(&THIS_TASKPID->tp_pctl->pc_grp)->pgc_sleader->pgc_pids[*].pgs_pid
+ * get_session_id_of_terminal: >> awref_get(&tty->t_cproc)?:->pgc_pids[*].pgs_pid
+ * get_fggroup_id_of_terminal: >> awref_get(&tty->t_fproc)?:->pgc_pids[*].pgs_pid
+ *
  * Enumerate threads/children of process (WARNING: E_WOULDBLOCK):
  * >> struct taskpid *tpid;
  * >> struct procctl *ctl = _task_getproctl();
@@ -110,15 +128,9 @@ AXREF(ttydev_device_axref, ttydev);
 #endif /* !__ttydev_device_axref_defined */
 
 struct procsession {
-	WEAK refcnt_t              ps_refcnt; /* Reference counter. */
-	struct ttydev_device_axref ps_ctty;   /* [0..1] The controlling terminal; aka. "/dev/tty" (if any) */
+	struct ttydev_device_axref ps_ctty; /* [0..1] The controlling terminal; aka. "/dev/tty" (if any) */
+	/* Other session data would go here... */
 };
-
-/* Destroy the given process session. */
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL procsession_destroy)(struct procsession *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct procsession, ps_refcnt, procsession_destroy)
-
 
 struct procgrp;
 struct procgrp_slot {
@@ -133,7 +145,8 @@ struct procgrp_slot {
 
 struct procgrp {
 	WEAK refcnt_t                                pgc_refcnt;  /* Reference counter. */
-	REF struct procsession                      *pgc_session; /* [1..1][const] Session associated with this process group. */
+	REF struct procgrp                          *pgc_sleader; /* [1..1][ref_if(!= this)][const] Session leader process group. */
+	struct procsession                          *pgc_session; /* [1..1][owned_if(pgc_sleader == this)][const] Session data. */
 	Toblockop_slist(procgrp)                     pgc_lops;    /* Lock-ops for `pgc_lock' */
 	struct atomic_rwlock                         pgc_lock;    /* Lock for `pgc_list' */
 	struct WEAK taskpid_list                     pgc_list;    /* [0..n][LINK(tp_pctl->pc_grpmember)][lock(pgc_lock)]
@@ -161,10 +174,10 @@ ARREF(procgrp_arref, procgrp);
 struct procctl {
 	struct atomic_rwlock     pc_chlds_lock;   /* Lock for `pc_chlds' */
 	struct REF taskpid_list  pc_chlds;        /* [0..n][lock(pc_chlds_lock)][link(tp_parsib)]
-	                                           * Child tasks of  this process. This  includes
-	                                           * both threads  (other than  the main  thread)
-	                                           * within  the  process, as  well  as processes
-	                                           * that were fork'd from this one. */
+	                                           * Child tasks of this process. This includes both
+	                                           * threads (other than the main thread) within the
+	                                           * process,  as well as processes that were fork'd
+	                                           * from this one (or re-parented to this one). */
 	struct sig               pc_chld_changed; /* Broadcast when one of `pc_chlds' changes status.
 	                                           * (s.a. `struct taskpid::tp_changed') */
 	struct task_arref        pc_parent;       /* [1..1][lock(READ(ATOMIC), WRITE(OLD->pc_chlds_lock &&
@@ -188,6 +201,8 @@ struct procctl {
 	                                           * Process group controller. */
 	LIST_ENTRY(taskpid)      pc_grpmember;    /* [0..1][lock(pc_grp->pgc_lock)] Process group member link. */
 };
+
+#define procctl_getparent(self) arref_get(&(self)->procctl) /* REF struct task * [1..1] */
 
 #define taskpid_isaprocess(self) ((self)->tp_proc == (self))
 #define task_getprocesspid()     THIS_TASKPID->tp_proc                    /* struct taskpid * [1..1] */
