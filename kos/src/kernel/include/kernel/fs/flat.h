@@ -139,8 +139,8 @@ struct flatdirnode_xops {
 	 * >> if (IS_PART_OF_RESERVED_RANGE(ent->fde_pos, ent->fde_size)) {
 	 * >>     // Some directories have reserved address range (usually at the start)
 	 * >>     // which cannot be used for "normal" entries (e.g. "fat"). To handle
-	 * >>     // this case, `fdnx_writedir' may modify `fde_pos' such that it doesn't
-	 * >>     // points at the end of a reserved area.
+	 * >>     // this case, `fdnx_writedir' may modify `fde_pos' such that it points
+	 * >>     // at the end of a reserved area.
 	 * >>     pos_t end = END_OF_RESREVED_RANGE(ent->fde_pos);
 	 * >>     size_t delta = end - ent->fde_pos;
 	 * >>     if (OVERFLOW_USUB(ent->fde_size, delta, &ent->fde_size))
@@ -191,8 +191,8 @@ struct flatdirnode_xops {
 	 *   in this case `fn_nlink' drops to `0', `fdnx_deletefile' will be called.
 	 * - The caller of this function must check for `MFILE_F_READONLY' and
 	 *   not invoke it  if that flag  was set  at the time  of the  check.
-	 * - This  operator will not be called if  `MFILE_F_DELETED' was found to be set
-	 *   at some point after the write-lock to self->fdn_data.fdd_lock was acquired.
+	 * - This operator will not be called if `MFILE_F_DELETED' was found to be set at
+	 *   some point after the  write-lock to `self->fdn_data.fdd_lock' was  acquired.
 	 * @param: at_end_of_dir: When `true', the delete is happening such that `ent'
 	 *                        scrapes against the far end of the directory stream. */
 	BLOCKING NONNULL((1, 2, 3)) void
@@ -332,7 +332,7 @@ struct flatdirnode_xops {
 	/* [0..1][lock(WRITE(oldparent->fdn_data.fdd_lock) &&
 	 *             WRITE(newparent->fdn_data.fdd_lock))]
 	 * Optional callback invoked when the directory entry of a file changes,
-	 * alongside  which a change in directory may also occurr. This operator
+	 * alongside which a change in  directory may also occur. This  operator
 	 * is invoked from `oldparent' and may  be used to update on-disk  meta-
 	 * data for special directory entries present on some filesystems.
 	 *
@@ -480,7 +480,7 @@ struct flatdirdata {
 	                                              * Used during file creation to pick between searching for a suitable gap to put new
 	                                              * files, or appending them at the end of the directory. */
 	struct flatdirent          *fdd_biggest_suc; /* [lock(fdd_lock)][1..1][valid_if(fdd_biggest_gap != 0)] Successor after `fdd_biggest_gap' */
-	uintptr_t                   fdd_flags;       /* [lock(fdd_lock)] */
+	uintptr_t                   fdd_flags;       /* [lock(fdd_lock)] Set of `FFLATDIR_F_*' */
 	size_t                      fdd_filessize;   /* [lock(fdd_lock)] Amount of used (non-NULL and non-deleted) directory entries */
 	size_t                      fdd_filesused;   /* [lock(fdd_lock)] Amount of (non-NULL) directory entries */
 	size_t                      fdd_filesmask;   /* [lock(fdd_lock)] Hash-mask for `p_cldlist' */

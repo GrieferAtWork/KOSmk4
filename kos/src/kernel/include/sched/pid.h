@@ -239,6 +239,9 @@ struct pidns {
 #ifdef CONFIG_USE_NEW_GROUP
 	LLRBTREE_ROOT(WEAK procgrp) pn_tree_pg; /* [LINK(->pgc_pids[pn_ind].pgs_link)][0..n][lock(pn_lock)]
 	                                         * Tree of process groups (groups remove themselves upon destruction). */
+	/* TODO: When implementing CONFIG_USE_NEW_GROUP, remember that PIDs cannot be
+	 *       re-used if there is EITHER a process with that ID, or a process group
+	 *       with that ID (s.a. posix -- "4.13 Process ID Reuse") */
 #endif /* CONFIG_USE_NEW_GROUP */
 	pid_t                       pn_npid;    /* [lock(pn_lock)] Next PID to hand out. (in [PIDNS_FIRST_NONRESERVED_PID,PID_MAX]) */
 };

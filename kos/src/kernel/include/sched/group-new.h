@@ -92,6 +92,15 @@ SLIST_HEAD(pending_rpc_slist, pending_rpc);
  * get_session_id_of_terminal: >> awref_get(&tty->t_cproc)?:->pgc_pids[*].pgs_pid
  * get_fggroup_id_of_terminal: >> awref_get(&tty->t_fproc)?:->pgc_pids[*].pgs_pid
  *
+ * NOTE: get_session_id -- Sessions IDs are _required_ to be process group IDs:
+ *       Posix says about `getsid(2)':
+ *       """
+ *       The getsid(2) function  shall obtain  the process group  ID of  the
+ *       process that is the session leader of the process specified by pid.
+ *       """
+ *       In other words: the concept of "session IDs" doesn't actually
+ *       exist. Instead, it's all just process and process group  IDs!
+ *
  * Enumerate threads/children of process (WARNING: E_WOULDBLOCK):
  * >> struct taskpid *tpid;
  * >> struct procctl *ctl = _task_getproctl();
@@ -118,6 +127,13 @@ SLIST_HEAD(pending_rpc_slist, pending_rpc);
  * >>     // Member process: `tpid'
  * >> }
  * >> procgrp_endread(grp);
+ *
+ * There  doesn't need to be a way of enumerating process groups
+ * apart  of a session.  -- Nothing in  posix would require that
+ * sort of functionality (though you could do a system-wide enum
+ * of all processes  (e.g. via `pidns_root'),  and filter  those
+ * that are apart of your sought-after session)
+ *
  */
 
 
@@ -129,7 +145,13 @@ AXREF(ttydev_device_axref, ttydev);
 
 struct procsession {
 	struct ttydev_device_axref ps_ctty; /* [0..1] The controlling terminal; aka. "/dev/tty" (if any) */
-	/* Other session data would go here... */
+	/* Other session data would go here...
+	 *
+	 * After skimming the posix specs, it seems that the controlling terminal is
+	 * the  only thing that needs to be in here. The only other mention of stuff
+	 * relating  to session lifetime appears to be return values of `sysconf()',
+	 * so maybe stuff like `struct fs::fs_lnkmax' should also go in here?
+	 */
 };
 
 struct procgrp;
