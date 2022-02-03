@@ -510,14 +510,14 @@ do_TCSETA: {
 		break;
 
 	case TIOCSPGRP:
-	case _IOW(_IOC_TYPE(TIOCSPGRP), _IOC_NR(TIOCSPGRP), upid_t): {
-		upid_t pid;
+	case _IOW(_IOC_TYPE(TIOCSPGRP), _IOC_NR(TIOCSPGRP), pid_t): {
+		pid_t pid;
 		REF struct taskpid *oldpid;
 		REF struct taskpid *newpid;
 		REF struct task *newthread;
-		validate_readable(arg, sizeof(upid_t));
+		validate_readable(arg, sizeof(pid_t));
 		COMPILER_READ_BARRIER();
-		pid = *(USER CHECKED upid_t *)arg;
+		pid = *(USER CHECKED pid_t *)arg;
 		COMPILER_READ_BARRIER();
 		newthread = pid == 0
 		            ? incref(THIS_TASK)
@@ -536,33 +536,33 @@ do_TCSETA: {
 	}	break;
 
 	case TIOCGPGRP:
-	case _IOR(_IOC_TYPE(TIOCGPGRP), _IOC_NR(TIOCGPGRP), upid_t): {
-		upid_t respid;
+	case _IOR(_IOC_TYPE(TIOCGPGRP), _IOC_NR(TIOCGPGRP), pid_t): {
+		pid_t respid;
 		REF struct taskpid *tpid;
-		validate_writable(arg, sizeof(upid_t));
-		respid = (upid_t)-ESRCH;
+		validate_writable(arg, sizeof(pid_t));
+		respid = -ESRCH;
 		tpid   = axref_get(&me->t_fproc);
 		if (tpid) {
 			respid = taskpid_getpidno(tpid);
 			decref_unlikely(tpid);
 		}
 		COMPILER_WRITE_BARRIER();
-		*(USER CHECKED upid_t *)arg = respid;
+		*(USER CHECKED pid_t *)arg = respid;
 	}	break;
 
 	case TIOCGSID:
-	case _IOR(_IOC_TYPE(TIOCGSID), _IOC_NR(TIOCGSID), upid_t): {
-		upid_t respid;
+	case _IOR(_IOC_TYPE(TIOCGSID), _IOC_NR(TIOCGSID), pid_t): {
+		pid_t respid;
 		REF struct taskpid *tpid;
-		validate_writable(arg, sizeof(upid_t));
-		respid = (upid_t)-ENOTTY;
-		tpid = awref_get(&me->t_cproc);
+		validate_writable(arg, sizeof(pid_t));
+		respid = -ENOTTY;
+		tpid   = awref_get(&me->t_cproc);
 		if (tpid) {
 			respid = taskpid_getpidno(tpid);
 			decref_unlikely(tpid);
 		}
 		COMPILER_WRITE_BARRIER();
-		*(USER CHECKED upid_t *)arg = respid;
+		*(USER CHECKED pid_t *)arg = respid;
 	}	break;
 
 	case TIOCSETD:

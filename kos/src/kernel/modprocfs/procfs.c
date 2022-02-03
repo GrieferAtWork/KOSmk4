@@ -346,14 +346,14 @@ procfs_root_v_lookup(struct fdirnode *__restrict UNUSED(self),
 	ch = ATOMIC_READ(info->flu_name[0]);
 	if (ch >= '1' && ch <= '9') {
 		REF struct taskpid *pid;
-		upid_t pidno = (upid_t)(ch - '0');
+		pid_t pidno = ch - '0';
 		size_t i;
 		for (i = 1; i < info->flu_namelen; ++i) {
 			ch = ATOMIC_READ(info->flu_name[i]);
 			if unlikely(!(ch >= '0' && ch <= '9'))
 				goto notapid;
 			pidno *= 10;
-			pidno += (upid_t)(ch - '0');
+			pidno += ch - '0';
 		}
 		pid = pidns_lookup(THIS_PIDNS, pidno);
 		if likely(pid) {
@@ -365,7 +365,7 @@ procfs_root_v_lookup(struct fdirnode *__restrict UNUSED(self),
 
 			/* Fill in the directory entry. */
 			result->pprd_pid            = pid; /* Inherit reference */
-			result->pprd_ent.fd_namelen = (u16)sprintf(result->pprd_ent.fd_name, "%" PRIuN(__SIZEOF_PID_T__), pidno);
+			result->pprd_ent.fd_namelen = (u16)sprintf(result->pprd_ent.fd_name, "%" PRIuN(__SIZEOF_PID_T__), (upid_t)pidno);
 			assert(result->pprd_ent.fd_namelen == info->flu_namelen);
 			if (info->flu_hash == FLOOKUP_INFO_HASH_UNSET || ADDR_ISUSER(info->flu_name))
 				info->flu_hash = fdirent_hash(result->pprd_ent.fd_name, result->pprd_ent.fd_namelen);
@@ -415,8 +415,10 @@ NOTHROW(KCALL procfs_root_direnum_v_fini)(struct fdirenum *__restrict UNUSED(sel
 
 PRIVATE WUNUSED NONNULL((1)) REF struct taskpid *KCALL
 find_first_taskpid_greater_or_equal(struct pidns *__restrict ns,
-                                    upid_t pid) {
+                                    pid_t pid) {
 	REF struct taskpid *result;
+	if unlikely(pid < 0)
+		return NULL;
 	pidns_read(ns);
 	result = pidns_lookupnext_locked(ns, (pid_t)pid);
 	xincref(result);
@@ -454,11 +456,11 @@ again:
 		char namebuf[COMPILER_LENOF(PRIMAXuN(__SIZEOF_PID_T__))];
 
 		/* Lookup next taskpid entry. */
-		pid = find_first_taskpid_greater_or_equal(ns, (upid_t)(index - PROCFS_ROOT_COUNT));
+		pid = find_first_taskpid_greater_or_equal(ns, (pid_t)(index - PROCFS_ROOT_COUNT));
 		if (!pid)
 			return 0; /* End-of-directory */
 		FINALLY_DECREF_UNLIKELY(pid);
-		pid_id  = (upid_t)_taskpid_slot_getpidno(pid->tp_pids[ns->pn_indirection]);
+		pid_id  = (upid_t)_taskpid_slot_getpidno(pid->tp_pids[ns->pn_ind]);
 		namelen = (u16)sprintf(namebuf, "%" PRIuN(__SIZEOF_PID_T__), pid_id);
 
 		/* Feed directory entry. */

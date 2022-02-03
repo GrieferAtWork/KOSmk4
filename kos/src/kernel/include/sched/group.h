@@ -45,13 +45,6 @@ DECL_BEGIN
 
 #ifdef __CC__
 
-/* Deprecated aliases */
-#define tp_siblings    tp_sib /* TODO: REMOVE ME */
-#define tp_pidns       tp_ns  /* TODO: REMOVE ME */
-#define pn_parent      pn_par /* TODO: REMOVE ME */
-#define pn_indirection pn_ind /* TODO: REMOVE ME */
-
-
 /* For `posix-signal' */
 struct pending_rpc; /* Define in `rpc-internal.h' */
 #ifndef __pending_rpc_slist_defined
@@ -135,11 +128,11 @@ struct taskgroup {
 	                                                      * @assume(tg_process == FORTASK(tg_process,this_taskgroup).tg_process)
 	                                                      * NOTE:
 	                                                      *   - When  set to `THIS_TASK',  the calling thread  is a process leader,
-	                                                      *     also meaning that the `tp_siblings' chain within its PID  structure
+	                                                      *     also meaning that the `tp_sib' chain within its PID  structure
 	                                                      *     is set up to form a chain of all other sibling processes within the
 	                                                      *     same process group.
 	                                                      *   - When  set  to something  different, the  calling  thread is  a worker
-	                                                      *     thread, meaning that the `tp_siblings' chain within its PID structure
+	                                                      *     thread, meaning that the `tp_sib' chain within its PID structure
 	                                                      *     is apart of a chain of other worker threads.
 	                                                      *   - Any kernel thread is always its own process. */
 	/* All of the following fields are only valid when `tg_process == THIS_TASK' (Otherwise, they are all `[0..1][const]') */
@@ -160,7 +153,7 @@ struct taskgroup {
 	if (((taskpid_elem) = LIST_FIRST(&(group)->tg_proc_threads)) == TASKGROUP_TG_PROC_THREADS_TERMINATED) \
 		;                                                                                                 \
 	else                                                                                                  \
-		for (; (taskpid_elem); (taskpid_elem) = LIST_NEXT(taskpid_elem, tp_siblings))
+		for (; (taskpid_elem); (taskpid_elem) = LIST_NEXT(taskpid_elem, tp_sib))
 #define TASKGROUP_TG_THREAD_DETACHED_NO         0 /* The thread is not detached */
 #define TASKGROUP_TG_THREAD_DETACHED_YES        1 /* The thread is detached */
 #define TASKGROUP_TG_THREAD_DETACHED_TERMINATED 2 /* The thread has terminated */
@@ -174,10 +167,10 @@ struct taskgroup {
 	struct atomic_rwlock         tg_proc_parent_lock;    /* Lock for `tg_proc_parent' */
 	WEAK struct task            *tg_proc_parent;         /* [0..1][const] The parent of this process.
 	                                                      * @assume(tg_proc_parent == FORTASK(tg_proc_parent,this_taskgroup).tg_process)
-	                                                      * In  the event  that this  process has  a parent, `THIS_TASKPID->tp_siblings'
+	                                                      * In  the event  that this  process has  a parent, `THIS_TASKPID->tp_sib'
 	                                                      * is    a     link    within     `tg_proc_parent->tp_thread->tg_proc_threads'.
 	                                                      * In the event that the parent process terminates before its child, this field
-	                                                      * gets set to `NULL', at  which point `THIS_TASKPID->tp_siblings' is  unbound. */
+	                                                      * gets set to `NULL', at  which point `THIS_TASKPID->tp_sib' is  unbound. */
 	struct atomic_rwlock         tg_proc_group_lock;     /* Lock for `tg_proc_group' */
 	REF struct taskpid          *tg_proc_group;          /* [1..1][lock(tg_proc_group_lock)]
 	                                                      * @assume(tg_proc_procgroup == FORTASK(taskpid_gettask(tg_proc_procgroup), this_taskgroup).tg_proc_procgroup)
@@ -433,18 +426,18 @@ task_setprocess(struct task *__restrict self,
 LOCAL ATTR_PURE WUNUSED bool
 NOTHROW(KCALL task_isorphan)(void) {
 	struct taskpid *proc = task_getprocesspid();
-	return __hybrid_atomic_load(proc->tp_siblings.le_prev, __ATOMIC_ACQUIRE) == __NULLPTR;
+	return __hybrid_atomic_load(proc->tp_sib.le_prev, __ATOMIC_ACQUIRE) == __NULLPTR;
 }
 
 LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL task_isorphan_p)(struct task *__restrict thread) {
 	struct taskpid *proc = task_getprocesspid_of(thread);
-	return __hybrid_atomic_load(proc->tp_siblings.le_prev, __ATOMIC_ACQUIRE) == __NULLPTR;
+	return __hybrid_atomic_load(proc->tp_sib.le_prev, __ATOMIC_ACQUIRE) == __NULLPTR;
 }
 
 LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL taskpid_isorphan_p)(struct taskpid *__restrict self) {
-	return __hybrid_atomic_load(self->tp_siblings.le_prev, __ATOMIC_ACQUIRE) == __NULLPTR;
+	return __hybrid_atomic_load(self->tp_sib.le_prev, __ATOMIC_ACQUIRE) == __NULLPTR;
 }
 
 LOCAL WUNUSED REF struct task *KCALL

@@ -155,9 +155,9 @@ NOTHROW(KCALL maybe_propagate_exit_to_procss_children)(struct task *__restrict c
 		while (threads) {
 			REF struct task *child_thread;
 			REF struct taskpid *next;
-			next = LIST_NEXT(threads, tp_siblings);
-			ATOMIC_WRITE(threads->tp_siblings.le_prev, NULL);
-			__HYBRID_Q_BADPTR(threads->tp_siblings.le_next);
+			next = LIST_NEXT(threads, tp_sib);
+			ATOMIC_WRITE(threads->tp_sib.le_prev, NULL);
+			__HYBRID_Q_BADPTR(threads->tp_sib.le_next);
 			child_thread = awref_get(&threads->tp_thread);
 			if (child_thread) {
 				/* Must differentiate:
@@ -195,7 +195,7 @@ NOTHROW(KCALL maybe_propagate_exit_to_procss_children)(struct task *__restrict c
 			if (parent) {
 				/* Send an IPC signal to `parent', informing them that we've just terminated! (SIGCLD) */
 				COMPILER_READ_BARRIER();
-				if (LIST_ISBOUND(mypid, tp_siblings)) /* Check if we've been detached. */
+				if (LIST_ISBOUND(mypid, tp_sib)) /* Check if we've been detached. */
 					task_send_sigcld_to_parent_process(parent, proc, mypid);
 				decref(parent);
 			}
@@ -226,16 +226,16 @@ NOTHROW(KCALL maybe_propagate_exit_to_procss_children)(struct task *__restrict c
 		                             TASKGROUP_TG_THREAD_DETACHED_TERMINATED));
 		if (thread_detach_state != TASKGROUP_TG_THREAD_DETACHED_NO) {
 			/* Remove our thread link from the chain of threads of our process's leader. */
-			if (LIST_ISBOUND(mypid, tp_siblings)) {
+			if (LIST_ISBOUND(mypid, tp_sib)) {
 				while (!sync_trywrite(&mygroup.tg_proc_threads_lock)) {
 					COMPILER_READ_BARRIER();
 					if (LIST_FIRST(&mygroup.tg_proc_threads) == TASKGROUP_TG_PROC_THREADS_TERMINATED)
 						goto done_unlink_pid_sibling; /* The leader has already terminated. */
 					task_tryyield_or_pause();
 				}
-				LIST_UNBIND(mypid, tp_siblings);
+				LIST_UNBIND(mypid, tp_sib);
 				sync_endwrite(&mygroup.tg_proc_threads_lock);
-				decref_nokill(mypid); /* The reference previously contained within the `tp_siblings' chain */
+				decref_nokill(mypid); /* The reference previously contained within the `tp_sib' chain */
 			}
 		}
 done_unlink_pid_sibling:
@@ -271,7 +271,7 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 		 * the process  itself  didn't  bother  wait(2)-ing  for. */
 		if (iter != TASKGROUP_TG_PROC_THREADS_TERMINATED) {
 			while (iter) {
-				next = LIST_NEXT(iter, tp_siblings);
+				next = LIST_NEXT(iter, tp_sib);
 				decref(iter);
 				iter = next;
 			}
@@ -388,14 +388,14 @@ task_setthread(struct task *__restrict self,
 	FORTASK(self, this_taskgroup).tg_thread_exit = exit_rpc;
 	assertf(FORTASK(self, this_taskgroup).tg_thread_detached == TASKGROUP_TG_THREAD_DETACHED_NO,
 	        "tg_thread_detached = %" PRIuPTR, FORTASK(self, this_taskgroup).tg_thread_detached);
-	assert(!LIST_ISBOUND(pid, tp_siblings));
-	pid->tp_siblings.le_prev = &FORTASK(leader, this_taskgroup).tg_proc_threads.lh_first;
+	assert(!LIST_ISBOUND(pid, tp_sib));
+	pid->tp_sib.le_prev = &FORTASK(leader, this_taskgroup).tg_proc_threads.lh_first;
 	incref(pid); /* The reference for the child chain */
 	COMPILER_WRITE_BARRIER();
 	do {
 		next = LIST_FIRST(&FORTASK(leader, this_taskgroup).tg_proc_threads);
 		if unlikely(next == TASKGROUP_TG_PROC_THREADS_TERMINATED) {
-			pid->tp_siblings.le_prev                 = NULL;
+			pid->tp_sib.le_prev                 = NULL;
 			FORTASK(self, this_taskgroup).tg_process = NULL;
 			COMPILER_WRITE_BARRIER();
 			sync_endwrite(&FORTASK(leader, this_taskgroup).tg_proc_threads_lock);
@@ -405,10 +405,10 @@ task_setthread(struct task *__restrict self,
 			pending_rpc_free(exit_rpc);
 			return false;
 		}
-		ATOMIC_WRITE(pid->tp_siblings.le_next, next);
+		ATOMIC_WRITE(pid->tp_sib.le_next, next);
 	} while (!ATOMIC_CMPXCH_WEAK(FORTASK(leader, this_taskgroup).tg_proc_threads.lh_first, next, pid));
 	if unlikely(next != NULL)
-		next->tp_siblings.le_prev = &pid->tp_siblings.le_next;
+		next->tp_sib.le_prev = &pid->tp_sib.le_next;
 	sync_endwrite(&FORTASK(leader, this_taskgroup).tg_proc_threads_lock);
 	return true;
 }
@@ -484,8 +484,8 @@ task_setprocess(struct task *__restrict self,
 	/* Now to bind the process's parent */
 	if (!parent || parent == self) {
 		/* Create a detached process. */
-		pid->tp_siblings.le_prev = NULL;
-		__HYBRID_Q_BADPTR(pid->tp_siblings.le_next);
+		pid->tp_sib.le_prev = NULL;
+		__HYBRID_Q_BADPTR(pid->tp_sib.le_next);
 	} else {
 		/* Set the proper parent process. */
 		parent = task_getprocess_of(parent);
@@ -500,7 +500,7 @@ again_lock_proc_threads_lock:
 			}
 		}
 		/* Add the given thread to the chain of siblings of the parent process. */
-		LIST_INSERT_HEAD(&FORTASK(parent, this_taskgroup).tg_proc_threads, pid, tp_siblings);
+		LIST_INSERT_HEAD(&FORTASK(parent, this_taskgroup).tg_proc_threads, pid, tp_sib);
 		incref(pid); /* The reference stored in the `tg_proc_threads' chain of the parent. */
 		FORTASK(self, this_taskgroup).tg_proc_parent = parent; /* Weakly referenced */
 		sync_endwrite(&FORTASK(self, this_taskgroup).tg_proc_parent_lock);
@@ -887,7 +887,7 @@ task_setpid(struct task *__restrict self,
             struct pidns *__restrict ns,
             pid_t ns_pid)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	upid_t recycle = ATOMIC_READ(pid_recycle_threshold);
+	pid_t recycle = ATOMIC_READ(pid_recycle_threshold);
 	REF struct taskpid *pid;
 	struct pidns *ns_iter;
 	assert(!FORTASK(self, this_taskpid));
@@ -908,9 +908,9 @@ task_setpid(struct task *__restrict self,
 	/* register the new taskpid structure within the namespaces. */
 	ns_iter = ns;
 	do {
-		assert(ns_iter->pn_parent
-		       ? ns_iter->pn_parent->pn_indirection == ns_iter->pn_indirection - 1
-		       : ns_iter->pn_indirection == 0 && ns_iter == &pidns_root);
+		assert(ns_iter->pn_par
+		       ? ns_iter->pn_par->pn_ind == ns_iter->pn_ind - 1
+		       : ns_iter->pn_ind == 0 && ns_iter == &pidns_root);
 		if (ns_pid == 0)
 			ns_pid = ns_iter->pn_npid;
 		ns_pid = pidns_findpid(ns_iter, ns_pid, recycle);
@@ -929,14 +929,14 @@ task_setpid(struct task *__restrict self,
 		pid->tp_pids[ns_iter->pn_ind].tps_pid = ns_pid;
 		pidns_insertpid(ns_iter, pid);
 		ns_pid = 0; /* Use a sequential PID during the next pass. */
-	} while ((ns_iter = ns_iter->pn_parent) != NULL);
+	} while ((ns_iter = ns_iter->pn_par) != NULL);
 
 	/* Install the `struct taskpid' to be apart of the given thread. */
 	pid->tp_refcnt = 1;
 	awref_init(&pid->tp_thread, self);
 	sig_init(&pid->tp_changed);
-	LIST_ENTRY_UNBOUND_INIT(&pid->tp_siblings);
-	pid->tp_pidns = incref(ns);
+	LIST_ENTRY_UNBOUND_INIT(&pid->tp_sib);
+	pid->tp_ns = incref(ns);
 	COMPILER_WRITE_BARRIER();
 
 	assert(!FORTASK(self, this_taskpid));
@@ -970,21 +970,21 @@ DEFINE_SYSCALL0(pid_t, getpid) {
 
 #ifdef __ARCH_WANT_SYSCALL_GETPPID
 DEFINE_SYSCALL0(pid_t, getppid) {
-	upid_t result;
+	pid_t result;
 	REF struct task *parent;
 	parent = task_getprocessparent();
 	if unlikely(!parent)
 		return 0;
 	result = task_gettid_of(parent);
 	decref_unlikely(parent);
-	return (pid_t)result;
+	return result;
 }
 #endif /* __ARCH_WANT_SYSCALL_GETPPID */
 
 #ifdef __ARCH_WANT_SYSCALL_GETPGRP
 DEFINE_SYSCALL0(pid_t, getpgrp) {
 	/* Same as `getpgid(0)' */
-	upid_t result;
+	pid_t result;
 	REF struct task *group;
 	group  = task_getprocessgroupleader_srch();
 	result = task_gettid_of(group);
@@ -995,13 +995,13 @@ DEFINE_SYSCALL0(pid_t, getpgrp) {
 
 #ifdef __ARCH_WANT_SYSCALL_GETPGID
 DEFINE_SYSCALL1(pid_t, getpgid, pid_t, pid) {
-	upid_t result;
+	pid_t result;
 	REF struct task *group;
 	if (pid == 0) {
 		group = task_getprocessgroupleader_srch();
 	} else {
 		REF struct task *temp;
-		temp = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)pid);
+		temp = pidns_lookuptask_srch(THIS_PIDNS, pid);
 		{
 			FINALLY_DECREF_UNLIKELY(temp);
 			group = task_getprocessgroupleader_srch_of(temp);
@@ -1009,7 +1009,7 @@ DEFINE_SYSCALL1(pid_t, getpgid, pid_t, pid) {
 	}
 	result = task_gettid_of(group);
 	decref_unlikely(group);
-	return (pid_t)result;
+	return result;
 }
 #endif /* __ARCH_WANT_SYSCALL_GETPGID */
 
@@ -1017,32 +1017,32 @@ DEFINE_SYSCALL1(pid_t, getpgid, pid_t, pid) {
 DEFINE_SYSCALL2(errno_t, setpgid, pid_t, pid, pid_t, pgid) {
 	REF struct task *thread, *group;
 	unsigned int error;
-	if ((upid_t)pid == 0) {
+	if (pid == 0) {
 		thread = THIS_TASK;
-		if ((upid_t)pgid == 0) {
+		if (pgid == 0) {
 			task_setprocessgroupleader(thread, thread);
 		} else {
-			group = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)pgid);
+			group = pidns_lookuptask_srch(THIS_PIDNS, pgid);
 			{
 				FINALLY_DECREF_UNLIKELY(group);
 				error = task_setprocessgroupleader(thread, group);
 			}
 handle_error:
 			if (error == TASK_SETPROCESSGROUPLEADER_EXITED)
-				THROW(E_PROCESS_EXITED, (upid_t)pgid);
+				THROW(E_PROCESS_EXITED, pgid);
 			if (error == TASK_SETPROCESSGROUPLEADER_LEADER) {
 				THROW(E_ILLEGAL_PROCESS_OPERATION,
 				      E_ILLEGAL_OPERATION_CONTEXT_SETPGID_LEADER,
-				      (upid_t)pid, (upid_t)pgid);
+				      pid, pgid);
 			}
 		}
 	} else {
-		thread = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)pid);
+		thread = pidns_lookuptask_srch(THIS_PIDNS, pid);
 		FINALLY_DECREF_UNLIKELY(thread);
-		if ((upid_t)pgid == 0 || (upid_t)pgid == (upid_t)pid) {
+		if (pgid == 0 || pgid == pid) {
 			task_setprocessgroupleader(thread, thread);
 		} else {
-			group = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)pgid);
+			group = pidns_lookuptask_srch(THIS_PIDNS, pgid);
 			{
 				FINALLY_DECREF_UNLIKELY(group);
 				error = task_setprocessgroupleader(thread, group);
@@ -1056,19 +1056,19 @@ handle_error:
 
 #ifdef __ARCH_WANT_SYSCALL_GETSID
 DEFINE_SYSCALL1(pid_t, getsid, pid_t, pid) {
-	upid_t result;
+	pid_t result;
 	REF struct task *session;
-	if ((upid_t)pid == 0) {
+	if (pid == 0) {
 		session = task_getsessionleader_srch();
 	} else {
 		REF struct task *temp;
-		temp = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)pid);
+		temp = pidns_lookuptask_srch(THIS_PIDNS, pid);
 		FINALLY_DECREF_UNLIKELY(temp);
 		session = task_getsessionleader_srch_of(temp);
 	}
 	result = task_gettid_of(session);
 	decref_unlikely(session);
-	return (pid_t)result;
+	return result;
 }
 #endif /* __ARCH_WANT_SYSCALL_GETSID */
 
@@ -1077,7 +1077,7 @@ DEFINE_SYSCALL0(pid_t, setsid) {
 	struct task *me = THIS_TASK;
 	/* Set the calling process to become its own session. */
 	task_setsessionleader(me, me);
-	return (pid_t)task_getpid();
+	return task_getpid();
 }
 #endif /* __ARCH_WANT_SYSCALL_SETSID */
 
@@ -1094,7 +1094,7 @@ task_detach(struct task *__restrict thread)
 	struct task *process;
 	pid = FORTASK(thread, this_taskpid);
 	COMPILER_READ_BARRIER();
-	if (!LIST_ISBOUND(pid, tp_siblings))
+	if (!LIST_ISBOUND(pid, tp_sib))
 		return false; /* Already detached. */
 	process = FORTASK(thread, this_taskgroup).tg_process;
 	if (thread == process) {
@@ -1122,14 +1122,14 @@ parent_is_dead:
 			/* Start over by acquiring the parent-lock of the given thread. */
 			goto again_acquire_parent_lock;
 		}
-		if (LIST_ISBOUND(pid, tp_siblings)) {
-			LIST_UNBIND(pid, tp_siblings);
+		if (LIST_ISBOUND(pid, tp_sib)) {
+			LIST_UNBIND(pid, tp_sib);
 
 			/* Delete the parent link within our own process. */
 			FORTASK(thread, this_taskgroup).tg_proc_parent = NULL;
 			sync_endwrite(&FORTASK(parent, this_taskgroup).tg_proc_threads_lock);
 			sync_endwrite(&FORTASK(thread, this_taskgroup).tg_proc_parent_lock);
-			decref_nokill(pid); /* Inherited from the `tp_siblings' chain */
+			decref_nokill(pid); /* Inherited from the `tp_sib' chain */
 			return true;
 		}
 		/* Already detached. */
@@ -1145,10 +1145,10 @@ parent_is_dead:
 			if (thread_detach_state == TASKGROUP_TG_THREAD_DETACHED_TERMINATED) {
 				/* Child thread has already terminated (check for manual detach) */
 				sync_write(&FORTASK(process, this_taskgroup).tg_proc_threads_lock);
-				if (LIST_ISBOUND(pid, tp_siblings)) {
-					LIST_UNBIND(pid, tp_siblings);
+				if (LIST_ISBOUND(pid, tp_sib)) {
+					LIST_UNBIND(pid, tp_sib);
 					sync_endwrite(&FORTASK(process, this_taskgroup).tg_proc_threads_lock);
-					decref_nokill(pid); /* Inherited from the `tp_siblings' chain */
+					decref_nokill(pid); /* Inherited from the `tp_sib' chain */
 					return true;
 				}
 				sync_endwrite(&FORTASK(process, this_taskgroup).tg_proc_threads_lock);
@@ -1185,7 +1185,7 @@ again:
 	sync_write(&procgroup.tg_proc_threads_lock);
 	iter = LIST_FIRST(&procgroup.tg_proc_threads);
 continue_with_iter:
-	for (; iter; iter = LIST_NEXT(iter, tp_siblings)) {
+	for (; iter; iter = LIST_NEXT(iter, tp_sib)) {
 		if (!wasdestroyed(iter))
 			break;
 	}
@@ -1233,9 +1233,9 @@ continue_with_iter:
 		}
 		/* Detach the child thread */
 detach_manually:
-		LIST_UNBIND(iter, tp_siblings);
+		LIST_UNBIND(iter, tp_sib);
 		sync_endwrite(&procgroup.tg_proc_threads_lock);
-		/* Drop the reference previously held by our `tp_siblings' chain. */
+		/* Drop the reference previously held by our `tp_sib' chain. */
 		decref(iter);
 		++result;
 		goto again;
@@ -1274,7 +1274,7 @@ do_detach_self:
 			result = -EOK;
 		goto done;
 	}
-	tpid = pidns_lookup_srch(mypid->tp_pidns, (upid_t)pid);
+	tpid = pidns_lookup_srch(mypid->tp_ns, pid);
 	/* Check for special case: `detach(gettid())' (daemonize the calling thread) */
 	if (tpid == THIS_TASKPID) {
 		/* Detach the calling thread. */
@@ -1294,7 +1294,7 @@ do_detach_self:
 		/* Go through the list of children of this process. */
 again:
 		sync_write(&procgroup->tg_proc_threads_lock);
-		LIST_FOREACH (iter, &procgroup->tg_proc_threads, tp_siblings) {
+		LIST_FOREACH (iter, &procgroup->tg_proc_threads, tp_sib) {
 			REF struct task *tpid_thread;
 			if (iter != tpid)
 				continue;
@@ -1336,7 +1336,7 @@ again:
 			}
 detach_manually:
 			/* Unbind the thread's PID from our chain of children. */
-			LIST_UNBIND(iter, tp_siblings);
+			LIST_UNBIND(iter, tp_sib);
 			sync_endwrite(&procgroup->tg_proc_threads_lock);
 			decref(iter); /* The reference previously contained within the `tg_proc_threads' chain */
 			result = -EOK;
@@ -1422,13 +1422,13 @@ reapall_check_already_locked:
 							return -ECHILD;
 						}
 						if (!(options & WNOREAP)) {
-							for (; child; child = LIST_NEXT(child, tp_siblings)) {
+							for (; child; child = LIST_NEXT(child, tp_sib)) {
 								if (is_taskpid_terminating(child)) {
 									/* Detach (reap) this child. */
 									if (!sync_writing(&mygroup.tg_proc_threads_lock) &&
 									    !sync_upgrade(&mygroup.tg_proc_threads_lock))
 										goto reapall_check_already_locked;
-									LIST_UNBIND(child, tp_siblings); /* Inherit reference. */
+									LIST_UNBIND(child, tp_sib); /* Inherit reference. */
 									sync_endwrite(&mygroup.tg_proc_threads_lock);
 									decref(child);
 									goto reapall_check;
@@ -1462,14 +1462,14 @@ again_connect_enum_children:
 		task_connect_for_poll(&mygroup.tg_proc_threads_change);
 		TRY {
 			size_t my_indirection;
-			my_indirection = THIS_TASKPID->tp_pidns->pn_indirection;
+			my_indirection = THIS_TASKPID->tp_ns->pn_ind;
 
 			/* Enumerate child processes. */
 again_enum_children:
 			sync_read(&mygroup.tg_proc_threads_lock);
 again_enum_children_locked:
 			num_candidates = 0;
-			LIST_FOREACH (child, &mygroup.tg_proc_threads, tp_siblings) {
+			LIST_FOREACH (child, &mygroup.tg_proc_threads, tp_sib) {
 				REF struct task *child_thread;
 				if (which == P_PID) {
 					if (_taskpid_slot_getpidno(child->tp_pids[my_indirection]) != upid)
@@ -1537,7 +1537,7 @@ again_read_status:
 							/* Unbind the child thread/process, thereby inheriting the
 							 * reference  previously stored within  the chain of child
 							 * threads. */
-							LIST_UNBIND(child, tp_siblings);
+							LIST_UNBIND(child, tp_sib);
 
 							/* Inherit reference to `child' */
 							sync_endwrite(&mygroup.tg_proc_threads_lock);
@@ -1829,30 +1829,15 @@ DEFINE_SYSCALL4(pid_t, wait4, pid_t, upid,
 		which = (idtype_t)P_PID;
 	}
 #if __SIZEOF_TIME32_T__ == __TM_SIZEOF(TIME)
-	result = posix_waitfor(which,
-	                       (upid_t)upid,
-	                       wstatus,
-	                       NULL,
-	                       options,
-	                       ru);
+	result = posix_waitfor(which, upid, wstatus, NULL, options, ru);
 #else /* __SIZEOF_TIME32_T__ == __TM_SIZEOF(TIME) */
 	if (ru) {
 		struct rusage kru;
-		result = posix_waitfor(which,
-		                       (upid_t)upid,
-		                       wstatus,
-		                       NULL,
-		                       options,
-		                       &kru);
+		result = posix_waitfor(which, upid, wstatus, NULL, options, &kru);
 		if (E_ISOK(result))
 			rusage_to_rusage32(&kru, ru);
 	} else {
-		result = posix_waitfor(which,
-		                       (upid_t)upid,
-		                       wstatus,
-		                       NULL,
-		                       options,
-		                       NULL);
+		result = posix_waitfor(which, upid, wstatus, NULL, options, NULL);
 	}
 #endif /* __SIZEOF_TIME32_T__ != __TM_SIZEOF(TIME) */
 	return result;
@@ -1892,30 +1877,15 @@ DEFINE_SYSCALL4(pid_t, wait4_64, pid_t, upid,
 		which = (idtype_t)P_PID;
 	}
 #if __SIZEOF_TIME64_T__ == __TM_SIZEOF(TIME)
-	result = posix_waitfor(which,
-	                       (upid_t)upid,
-	                       wstatus,
-	                       NULL,
-	                       options,
-	                       ru);
+	result = posix_waitfor(which, upid, wstatus, NULL, options, ru);
 #else /* __SIZEOF_TIME64_T__ == __TM_SIZEOF(TIME) */
 	if (ru) {
 		struct rusage kru;
-		result = posix_waitfor(which,
-		                       (upid_t)upid,
-		                       wstatus,
-		                       NULL,
-		                       options,
-		                       &kru);
+		result = posix_waitfor(which, upid, wstatus, NULL, options, &kru);
 		if (E_ISOK(result))
 			rusage_to_rusage64(&kru, ru);
 	} else {
-		result = posix_waitfor(which,
-		                       (upid_t)upid,
-		                       wstatus,
-		                       NULL,
-		                       options,
-		                       NULL);
+		result = posix_waitfor(which, upid, wstatus, NULL, options, NULL);
 	}
 #endif /* __SIZEOF_TIME64_T__ != __TM_SIZEOF(TIME) */
 	return result;
@@ -1956,21 +1926,11 @@ DEFINE_COMPAT_SYSCALL4(pid_t, wait4, pid_t, upid,
 	}
 	if (ru) {
 		struct rusage kru;
-		result = posix_waitfor(which,
-		                       (upid_t)upid,
-		                       wstatus,
-		                       NULL,
-		                       options,
-		                       &kru);
+		result = posix_waitfor(which, upid, wstatus, NULL, options, &kru);
 		if (E_ISOK(result))
 			rusage_to_compat_rusage32(&kru, ru);
 	} else {
-		result = posix_waitfor(which,
-		                       (upid_t)upid,
-		                       wstatus,
-		                       NULL,
-		                       options,
-		                       NULL);
+		result = posix_waitfor(which, upid, wstatus, NULL, options, NULL);
 	}
 	return result;
 }
@@ -2010,21 +1970,11 @@ DEFINE_COMPAT_SYSCALL4(pid_t, wait4_64, pid_t, upid,
 	}
 	if (ru) {
 		struct rusage kru;
-		result = posix_waitfor(which,
-		                       (upid_t)upid,
-		                       wstatus,
-		                       NULL,
-		                       options,
-		                       &kru);
+		result = posix_waitfor(which, upid, wstatus, NULL, options, &kru);
 		if (E_ISOK(result))
 			rusage_to_compat_rusage64(&kru, ru);
 	} else {
-		result = posix_waitfor(which,
-		                       (upid_t)upid,
-		                       wstatus,
-		                       NULL,
-		                       options,
-		                       NULL);
+		result = posix_waitfor(which, upid, wstatus, NULL, options, NULL);
 	}
 	return result;
 }

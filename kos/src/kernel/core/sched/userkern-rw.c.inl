@@ -160,11 +160,11 @@ userkern_segment_writeq(struct vioargs *__restrict args,
 				error = task_setprocessgroupleader(caller, group);
 			}
 			if (error == TASK_SETPROCESSGROUPLEADER_EXITED)
-				THROW(E_PROCESS_EXITED, (upid_t)value);
+				THROW(E_PROCESS_EXITED, value);
 			if (error == TASK_SETPROCESSGROUPLEADER_LEADER) {
 				THROW(E_ILLEGAL_PROCESS_OPERATION,
 				      E_ILLEGAL_OPERATION_CONTEXT_SETPGID_LEADER,
-				      (upid_t)0, (upid_t)value);
+				      0, value);
 			}
 		}
 #endif /* !DEFINE_IO_READ */

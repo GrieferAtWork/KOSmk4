@@ -454,11 +454,11 @@ NOTHROW(FCALL GDBThread_DoLookupPID)(intptr_t pid) {
 	if (pid == GDB_KERNEL_PID)
 		return incref(&bootidle);
 	if (GDBThread_IsAllStopModeActive)
-		return pidns_lookuptask_locked(&pidns_root, (upid_t)pid);
+		return pidns_lookuptask_locked(&pidns_root, pid);
 	/* FIXME: What if one of the suspended threads is holding the PIDNS  lock?
 	 *        We should have some kind of timeout here, and switch to all-stop
 	 *        mode if the timeout expires. */
-	return pidns_lookuptask(&pidns_root, (upid_t)pid);
+	return pidns_lookuptask(&pidns_root, pid);
 }
 
 PRIVATE WUNUSED REF struct task *
@@ -466,11 +466,11 @@ NOTHROW(FCALL GDBThread_DoLookupTID)(intptr_t tid) {
 	if (tid == 0) /* Any thread */
 		return incref(GDB_CurrentThread_general.ts_thread);
 	if (GDBThread_IsAllStopModeActive)
-		return pidns_lookuptask_locked(&pidns_root, (upid_t)tid);
+		return pidns_lookuptask_locked(&pidns_root, tid);
 	/* FIXME: What if one of the suspended threads is holding the PIDNS  lock?
 	 *        We should have some kind of timeout here, and switch to all-stop
 	 *        mode if the timeout expires. */
-	return pidns_lookuptask(&pidns_root, (upid_t)tid);
+	return pidns_lookuptask(&pidns_root, tid);
 }
 
 /* Decode a thread ID, filling in `*result'.

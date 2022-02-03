@@ -662,7 +662,7 @@ again_release_kernel_and_cc:
 		{
 			/* Figure out which PID namespace(s) the new thread should appear in. */
 			REF struct pidns *result_pidns;
-			result_pidns = FORTASK(caller, this_taskpid)->tp_pidns;
+			result_pidns = FORTASK(caller, this_taskpid)->tp_ns;
 			if (clone_flags & CLONE_NEWPID) {
 				result_pidns = pidns_alloc(result_pidns);
 			} else {
@@ -716,7 +716,7 @@ again_release_kernel_and_cc:
 		/* Allocate the PID descriptor for the new thread. */
 		if (clone_flags & CLONE_NEWPID) {
 			REF struct pidns *ns;
-			ns = pidns_alloc(FORTASK(caller, this_taskpid)->tp_pidns);
+			ns = pidns_alloc(FORTASK(caller, this_taskpid)->tp_ns);
 			FINALLY_DECREF_UNLIKELY(ns);
 			task_setpid(result, ns, 0);
 		} else {

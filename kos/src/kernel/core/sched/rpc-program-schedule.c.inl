@@ -306,7 +306,7 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 	COMPILER_WRITE_BARRIER();
 
 	/* Lookup the target thread. */
-	target = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)target_tid);
+	target = pidns_lookuptask_srch(THIS_PIDNS, target_tid);
 	{
 		FINALLY_DECREF_UNLIKELY(target);
 
@@ -317,7 +317,7 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 		                                       : task_rpc_schedule(target, rpc))) {
 			rpc->pr_user.pur_refcnt = 1;
 			COMPILER_WRITE_BARRIER();
-			THROW(E_PROCESS_EXITED, (upid_t)target_tid);
+			THROW(E_PROCESS_EXITED, target_tid);
 		}
 	}
 
@@ -409,7 +409,7 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 			 * the  target thread/process exited and will no longer be able to
 			 * service _any_ rpcs at all! */
 			if (status == PENDING_USER_RPC_STATUS_CANCELED)
-				THROW(E_PROCESS_EXITED, (upid_t)target_tid);
+				THROW(E_PROCESS_EXITED, target_tid);
 
 			/* Rethrow the exception that brought down the RPC VM */
 			tls = except_data();

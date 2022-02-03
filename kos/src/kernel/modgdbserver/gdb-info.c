@@ -390,7 +390,8 @@ err:
 PRIVATE ssize_t
 NOTHROW(FCALL GDBInfo_PrintProcessList_Callback)(void *closure,
                                                  struct task *__restrict thread) {
-	ssize_t temp, result = 0; upid_t pid;
+	pid_t pid;
+	ssize_t temp, result = 0;
 	pformatprinter printer; void *arg;
 	if (!task_isprocessleader_p(thread))
 		goto done;
@@ -398,11 +399,11 @@ NOTHROW(FCALL GDBInfo_PrintProcessList_Callback)(void *closure,
 		goto done;
 	printer = ((struct GDBInfo_PrintThreadList_Data *)closure)->ptld_printer;
 	arg     = ((struct GDBInfo_PrintThreadList_Data *)closure)->ptld_arg;
-	pid = task_getrootpid_of(thread);
+	pid     = task_getrootpid_of(thread);
 	PRINTF("<item>"
 	       "<column name=\"pid\">%" PRIx32 "</column>"
 	       "<column name=\"user\">root</column>"
-	       "<column name=\"program\">", pid);
+	       "<column name=\"program\">", (upid_t)pid);
 	DO(GDBInfo_PrintThreadExecFile(printer, arg, thread, false));
 	PRINT("</column>"
 	      "<column name=\"command\">");
@@ -531,11 +532,11 @@ err:
 PRIVATE ssize_t
 NOTHROW(FCALL GDBInfo_PrintFdListEntry)(pformatprinter printer, void *arg,
                                         struct task *__restrict thread,
-                                        upid_t pid, unsigned int fdno,
+                                        pid_t pid, unsigned int fdno,
                                         struct handle *__restrict hnd) {
 	ssize_t temp, result = 0;
 	PRINTF("<item>"
-	       "<column name=\"pid\">%" PRIx32 "</column>", pid);
+	       "<column name=\"pid\">%" PRIx32 "</column>", (upid_t)pid);
 	PRINT("<column name=\"command\">");
 	DO(GDBInfo_PrintThreadCommandline(printer, arg, thread));
 	PRINTF("</column>"
@@ -552,7 +553,8 @@ err:
 PRIVATE ssize_t
 NOTHROW(FCALL GDBInfo_PrintFdList_Callback)(void *closure,
                                             struct task *__restrict thread) {
-	ssize_t temp, result = 0; upid_t pid;
+	pid_t pid;
+	ssize_t temp, result = 0;
 	pformatprinter printer; void *arg;
 	REF struct handle_manager *hman;
 	unsigned int i;

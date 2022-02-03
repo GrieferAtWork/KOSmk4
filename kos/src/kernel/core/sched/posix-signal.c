@@ -1947,7 +1947,7 @@ DEFINE_SYSCALL2(errno_t, kill, pid_t, pid, signo_t, signo) {
 	mypid         = THIS_TASKPID;
 	if (pid > 0) {
 		/* Kill the thread matching `pid'. */
-		target = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)pid);
+		target = pidns_lookuptask_srch(THIS_PIDNS, pid);
 		FINALLY_DECREF_UNLIKELY(target);
 		info.si_pid = taskpid_getpid_ind(mypid, get_pid_indirection(target));
 		if (!task_raisesignalprocess(target, &info))
@@ -1961,7 +1961,7 @@ DEFINE_SYSCALL2(errno_t, kill, pid_t, pid, signo_t, signo) {
 		THROW(E_NOT_IMPLEMENTED_TODO);
 	} else {
 		/* Kill the entirety of a process group. */
-		target = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)-pid);
+		target = pidns_lookuptask_srch(THIS_PIDNS, -pid);
 do_inherit_target_and_raise_processgroup:
 		FINALLY_DECREF_UNLIKELY(target);
 		info.si_pid = taskpid_getpid_ind(mypid, get_pid_indirection(target));
@@ -1989,7 +1989,7 @@ DEFINE_SYSCALL3(errno_t, tgkill,
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TID,
 		      tid);
-	target = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)tid);
+	target = pidns_lookuptask_srch(THIS_PIDNS, tid);
 	FINALLY_DECREF_UNLIKELY(target);
 
 	/* Check if the given TGID matches the group of this thread. */
@@ -2023,7 +2023,7 @@ DEFINE_SYSCALL2(errno_t, tkill, pid_t, tid, signo_t, signo) {
 	if unlikely(tid <= 0)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TID, tid);
-	target = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)tid);
+	target = pidns_lookuptask_srch(THIS_PIDNS, tid);
 	FINALLY_DECREF_UNLIKELY(target);
 
 	/* Don't deliver signal `0'. - It's used to test access. */
@@ -2119,7 +2119,7 @@ DEFINE_SYSCALL3(errno_t, rt_sigqueueinfo,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, pid);
 	}
 	siginfo_from_user(&info, signo, uinfo);
-	target = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)pid);
+	target = pidns_lookuptask_srch(THIS_PIDNS, pid);
 	FINALLY_DECREF_UNLIKELY(target);
 	/* Don't allow sending arbitrary signals to other processes. */
 	if ((info.si_code >= 0 || info.si_code == SI_TKILL) &&
@@ -2149,7 +2149,7 @@ DEFINE_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TID, tid);
 	siginfo_from_user(&info, signo, uinfo);
-	target = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)tid);
+	target = pidns_lookuptask_srch(THIS_PIDNS, tid);
 	FINALLY_DECREF_UNLIKELY(target);
 	/* Don't allow sending arbitrary signals to other processes. */
 	leader = task_getprocess_of(target);
@@ -2178,7 +2178,7 @@ DEFINE_COMPAT_SYSCALL3(errno_t, rt_sigqueueinfo,
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, pid);
 	siginfo_from_compat_user(&info, signo, uinfo);
-	target = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)pid);
+	target = pidns_lookuptask_srch(THIS_PIDNS, pid);
 	FINALLY_DECREF_UNLIKELY(target);
 	/* Don't allow sending arbitrary signals to other processes. */
 	if ((info.si_code >= 0 || info.si_code == SI_TKILL) &&
@@ -2208,7 +2208,7 @@ DEFINE_COMPAT_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TID, tid);
 	siginfo_from_compat_user(&info, signo, uinfo);
-	target = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)tid);
+	target = pidns_lookuptask_srch(THIS_PIDNS, tid);
 	FINALLY_DECREF_UNLIKELY(target);
 	/* Don't allow sending arbitrary signals to other processes. */
 	leader = task_getprocess_of(target);

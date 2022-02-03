@@ -2370,14 +2370,14 @@ epoll_nextmon_locked:
 		pid_t tpid;
 		hand = (struct taskpid *)me->pfir_hand.h_data;
 		tpid = -1;
-		if likely(myns->pn_indirection <= hand->tp_pidns->pn_indirection)
-			tpid = (pid_t)_taskpid_slot_getpidno(hand->tp_pids[myns->pn_indirection]);
+		if likely(myns->pn_ind <= hand->tp_ns->pn_ind)
+			tpid = (pid_t)_taskpid_slot_getpidno(hand->tp_pids[myns->pn_ind]);
 		if (printf("Pid:\t%" PRIdN(__SIZEOF_PID_T__) "\n", tpid) < 0)
 			return;
-		if likely(myns->pn_indirection >= hand->tp_pidns->pn_indirection) {
+		if likely(myns->pn_ind >= hand->tp_ns->pn_ind) {
 			size_t i;
 			PRINT("NSpid:");
-			for (i = myns->pn_indirection; i <= hand->tp_pidns->pn_indirection; ++i) {
+			for (i = myns->pn_ind; i <= hand->tp_ns->pn_ind; ++i) {
 				if (printf("\t%" PRIdN(__SIZEOF_PID_T__), hand->tp_pids[i]) < 0)
 					return;
 			}
@@ -3022,14 +3022,14 @@ procfs_perproc_task_v_lookup(struct fdirnode *__restrict self,
 	ch = ATOMIC_READ(info->flu_name[0]);
 	if (ch >= '1' && ch <= '9') {
 		REF struct taskpid *pid;
-		upid_t pidno = (upid_t)(ch - '0');
+		pid_t pidno = ch - '0';
 		size_t i;
 		for (i = 1; i < info->flu_namelen; ++i) {
 			ch = ATOMIC_READ(info->flu_name[i]);
 			if unlikely(!(ch >= '0' && ch <= '9'))
 				goto notapid;
 			pidno *= 10;
-			pidno += (upid_t)(ch - '0');
+			pidno += ch - '0';
 		}
 		pid = pidns_lookup(THIS_PIDNS, pidno);
 		if likely(pid) {
@@ -3093,9 +3093,9 @@ find_first_thread_greater_or_equal(struct task *__restrict master,
 	result_pid = (upid_t)-1;
 	group      = &FORTASK(master, this_taskgroup);
 	atomic_rwlock_read(&group->tg_proc_threads_lock);
-	LIST_FOREACH (iter, &group->tg_proc_threads, tp_siblings) {
+	LIST_FOREACH (iter, &group->tg_proc_threads, tp_sib) {
 		upid_t iter_pid;
-		if unlikely(iter->tp_pidns->pn_indirection < myind)
+		if unlikely(iter->tp_ns->pn_ind < myind)
 			continue; /* Cannot be represented */
 		iter_pid = _taskpid_slot_getpidno(iter->tp_pids[myind]);
 		if (!(pid >= iter_pid))
@@ -3119,15 +3119,15 @@ get_greatest_child_pid_plus_one(struct task *__restrict master) {
 	size_t myind;
 	struct taskgroup *group;
 	assert(task_isprocessleader_p(master));
-	myind  = THIS_PIDNS->pn_indirection;
+	myind  = THIS_PIDNS->pn_ind;
 	result = 0;
 	group  = &FORTASK(master, this_taskgroup);
 	atomic_rwlock_read(&group->tg_proc_threads_lock);
-	LIST_FOREACH (iter, &group->tg_proc_threads, tp_siblings) {
+	LIST_FOREACH (iter, &group->tg_proc_threads, tp_sib) {
 		upid_t iter_pid;
-		if unlikely(iter->tp_pidns->pn_indirection < myind)
+		if unlikely(iter->tp_ns->pn_ind < myind)
 			continue; /* Cannot be represented */
-		iter_pid = _taskpid_slot_getpidno(iter->tp_pids[myind]);
+		iter_pid = _taskpid_slot_getpidno(iter->tp_pids[myind]) + 1;
 		if (result < iter_pid)
 			result = iter_pid;
 	}
@@ -3144,7 +3144,7 @@ procfs_task_direnum_v_readdir(struct fdirenum *__restrict self, USER CHECKED str
 	REF struct taskpid *pid;
 	upid_t pid_id;
 	u16 namelen;
-	size_t myind = THIS_PIDNS->pn_indirection;
+	size_t myind = THIS_PIDNS->pn_ind;
 	upid_t index, newindex;
 	ssize_t result;
 	struct procfs_task_direnum *me;
@@ -3162,7 +3162,7 @@ again:
 	if (index == 0) {
 		/* Special behavior for PID=0: The original process itself (but as a thread) */
 		pid = me->ptd_pid;
-		if likely(pid->tp_pidns->pn_indirection >= myind) {
+		if likely(pid->tp_ns->pn_ind >= myind) {
 			incref(pid);
 			pid_id   = _taskpid_slot_getpidno(pid->tp_pids[myind]);
 			newindex = 1; /* Start enumeration threads the next time around */

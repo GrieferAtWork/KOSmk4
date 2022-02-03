@@ -1551,16 +1551,7 @@ INTERN void KCALL
 ProcFS_Sys_Kernel_PidMax_Write(USER CHECKED void const *buf,
                                size_t bufsize) {
 	upid_t newvalue;
-	/* Don't allow the value to become larger than the max possible
-	 * positive, signed PID. While the kernel could deal with going
-	 * up to the max unsigned PID internally, various system  calls
-	 * that accept pid values have special behavior when the  given
-	 * pid becomes negative, such as for example `kill(2)'
-	 *
-	 * As such, don't raise the limit such that we'd end up with
-	 * the kernel generating negative PIDs! */
-	newvalue = ProcFS_ParseUPid(buf, bufsize, PIDNS_FIRST_NONRESERVED_PID + 1,
-	                            (upid_t)__PRIVATE_MAX_S(__SIZEOF_PID_T__) + 1);
+	newvalue = ProcFS_ParseUPid(buf, bufsize, PID_MIN, PID_MAX);
 	ATOMIC_WRITE(pid_recycle_threshold, newvalue);
 }
 

@@ -768,11 +768,11 @@ PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) bool
 NOTHROW(FCALL taskpid_inns)(struct taskpid const *__restrict self,
                             struct pidns const *__restrict ns) {
 	struct pidns const *iter;
-	iter = self->tp_pidns;
+	iter = self->tp_ns;
 	do {
 		if (iter == ns)
 			return true;
-	} while ((iter = iter->pn_parent) != NULL);
+	} while ((iter = iter->pn_par) != NULL);
 	return false;
 }
 

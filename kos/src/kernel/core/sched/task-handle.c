@@ -272,7 +272,7 @@ DEFINE_SYSCALL2(fd_t, pidfd_open,
 		THROW(E_INVALID_ARGUMENT_RESERVED_ARGUMENT,
 		      E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_FLAGS);
 	}
-	thread_pid = pidns_lookup_srch(THIS_PIDNS, (upid_t)pid);
+	thread_pid = pidns_lookup_srch(THIS_PIDNS, pid);
 	FINALLY_DECREF_UNLIKELY(thread_pid);
 	thread = taskpid_gettask_srch(thread_pid);
 	{

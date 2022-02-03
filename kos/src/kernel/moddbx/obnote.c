@@ -217,13 +217,13 @@ NOTHROW(KCALL note_taskpid)(pformatprinter printer, void *arg,
 		referenced_thread = thread->tp_thread.awr_obj;
 		if (referenced_thread && !ADDR_ISKERN(referenced_thread))
 			goto badobj;
-		ns = thread->tp_pidns;
+		ns = thread->tp_ns;
 		if (!ns || !ADDR_ISKERN(ns))
 			goto badobj;
-		ind = ns->pn_indirection;
+		ind = ns->pn_ind;
 		expected_indirection = 0;
 		for (;;) {
-			ns = ns->pn_parent;
+			ns = ns->pn_par;
 			if (!ns)
 				break;
 			if (!ADDR_ISKERN(ns))
