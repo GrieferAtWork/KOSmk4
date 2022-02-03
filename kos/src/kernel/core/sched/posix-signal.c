@@ -39,7 +39,7 @@
 #include <kernel/user.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
@@ -387,7 +387,7 @@ set_maybe_and_return:
 					goto set_maybe_and_return;
 				printk(KERN_DEBUG "[userprocmask:%p] Mark signal %d as pending "
 				                  "[tid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
-				       um, signo, task_getroottid_s());
+				       um, signo, task_getroottid());
 #else /* atomic_or_nopf */
 				/* If the architecture doesn't support `atomic_cmpxch_nopf()',
 				 * and  the signal hasn't been marked as pending, yet, then we
@@ -1910,13 +1910,13 @@ DEFINE_COMPAT_SYSCALL1(syscall_ulong_t, ssetmask, syscall_ulong_t, new_sigmask) 
 LOCAL ATTR_PURE WUNUSED NONNULL((1)) size_t KCALL
 get_pid_indirection(struct task const *__restrict thread) {
 	struct taskpid *pid = FORTASK(thread, this_taskpid);
-	return likely(pid) ? pid->tp_pidns->pn_indirection : 0;
+	return likely(pid) ? pid->tp_ns->pn_ind : 0;
 }
 
-LOCAL ATTR_PURE WUNUSED NONNULL((1)) upid_t KCALL
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) pid_t KCALL
 taskpid_getpid_ind(struct taskpid *__restrict self, size_t ind) {
-	if likely(ind <= self->tp_pidns->pn_indirection)
-		return self->tp_pids[ind];
+	if likely(ind <= self->tp_ns->pn_ind)
+		return _taskpid_slot_getpidno(self->tp_pids[ind]);
 	return 0;
 }
 
@@ -1947,7 +1947,7 @@ DEFINE_SYSCALL2(errno_t, kill, pid_t, pid, signo_t, signo) {
 	mypid         = THIS_TASKPID;
 	if (pid > 0) {
 		/* Kill the thread matching `pid'. */
-		target = pidns_lookup_task(THIS_PIDNS, (upid_t)pid);
+		target = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)pid);
 		FINALLY_DECREF_UNLIKELY(target);
 		info.si_pid = taskpid_getpid_ind(mypid, get_pid_indirection(target));
 		if (!task_raisesignalprocess(target, &info))
@@ -1961,7 +1961,7 @@ DEFINE_SYSCALL2(errno_t, kill, pid_t, pid, signo_t, signo) {
 		THROW(E_NOT_IMPLEMENTED_TODO);
 	} else {
 		/* Kill the entirety of a process group. */
-		target = pidns_lookup_task(THIS_PIDNS, (upid_t)-pid);
+		target = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)-pid);
 do_inherit_target_and_raise_processgroup:
 		FINALLY_DECREF_UNLIKELY(target);
 		info.si_pid = taskpid_getpid_ind(mypid, get_pid_indirection(target));
@@ -1989,11 +1989,11 @@ DEFINE_SYSCALL3(errno_t, tgkill,
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TID,
 		      tid);
-	target = pidns_lookup_task(THIS_PIDNS, (upid_t)tid);
+	target = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)tid);
 	FINALLY_DECREF_UNLIKELY(target);
 
 	/* Check if the given TGID matches the group of this thread. */
-	if (taskpid_getpid_s(task_getprocesspid_of(target)) != (upid_t)pid) {
+	if (task_getpid_of_s(target) != pid) {
 		/* Maybe not necessarily exited, but no need to create a new exception type for this... */
 		THROW(E_PROCESS_EXITED, pid);
 	}
@@ -2023,7 +2023,7 @@ DEFINE_SYSCALL2(errno_t, tkill, pid_t, tid, signo_t, signo) {
 	if unlikely(tid <= 0)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TID, tid);
-	target = pidns_lookup_task(THIS_PIDNS, (upid_t)tid);
+	target = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)tid);
 	FINALLY_DECREF_UNLIKELY(target);
 
 	/* Don't deliver signal `0'. - It's used to test access. */
@@ -2119,7 +2119,7 @@ DEFINE_SYSCALL3(errno_t, rt_sigqueueinfo,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, pid);
 	}
 	siginfo_from_user(&info, signo, uinfo);
-	target = pidns_lookup_task(THIS_PIDNS, (upid_t)pid);
+	target = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)pid);
 	FINALLY_DECREF_UNLIKELY(target);
 	/* Don't allow sending arbitrary signals to other processes. */
 	if ((info.si_code >= 0 || info.si_code == SI_TKILL) &&
@@ -2149,7 +2149,7 @@ DEFINE_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TID, tid);
 	siginfo_from_user(&info, signo, uinfo);
-	target = pidns_lookup_task(THIS_PIDNS, (upid_t)tid);
+	target = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)tid);
 	FINALLY_DECREF_UNLIKELY(target);
 	/* Don't allow sending arbitrary signals to other processes. */
 	leader = task_getprocess_of(target);
@@ -2158,7 +2158,7 @@ DEFINE_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE,
 		      info.si_code);
 	/* Check if the thread-group ID matches that of the leader of the requested thread-group. */
-	if (task_gettid_of_s(leader) != (upid_t)pid)
+	if (task_gettid_of_s(leader) != pid)
 		THROW(E_PROCESS_EXITED, pid);
 	if (signo != 0) {
 		if (!task_raisesignalthread(target, &info))
@@ -2178,7 +2178,7 @@ DEFINE_COMPAT_SYSCALL3(errno_t, rt_sigqueueinfo,
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, pid);
 	siginfo_from_compat_user(&info, signo, uinfo);
-	target = pidns_lookup_task(THIS_PIDNS, (upid_t)pid);
+	target = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)pid);
 	FINALLY_DECREF_UNLIKELY(target);
 	/* Don't allow sending arbitrary signals to other processes. */
 	if ((info.si_code >= 0 || info.si_code == SI_TKILL) &&
@@ -2208,7 +2208,7 @@ DEFINE_COMPAT_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TID, tid);
 	siginfo_from_compat_user(&info, signo, uinfo);
-	target = pidns_lookup_task(THIS_PIDNS, (upid_t)tid);
+	target = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)tid);
 	FINALLY_DECREF_UNLIKELY(target);
 	/* Don't allow sending arbitrary signals to other processes. */
 	leader = task_getprocess_of(target);
@@ -2217,7 +2217,7 @@ DEFINE_COMPAT_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE,
 		      info.si_code);
 	/* Check if the thread-group ID matches that of the leader of the requested thread-group. */
-	if (task_gettid_of_s(leader) != (upid_t)pid)
+	if (task_gettid_of_s(leader) != pid)
 		THROW(E_PROCESS_EXITED, pid);
 	if (signo != 0) {
 		if (!task_raisesignalthread(target, &info))

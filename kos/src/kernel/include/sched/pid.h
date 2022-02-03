@@ -26,481 +26,28 @@
 #include <sched/pertask.h>
 #include <sched/signal.h>
 
+#include <hybrid/limitcore.h>
+#include <hybrid/__assert.h>
 #include <hybrid/sequence/list.h>
+#include <hybrid/sequence/rbtree.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <kos/aref.h>
-#include <sys/wait.h>
-
-#ifndef __INTELLISENSE__
-#include <sched/task.h>
-
-#include <hybrid/__assert.h>
-#include <hybrid/__atomic.h>
-#endif /* !__INTELLISENSE__ */
-
-DECL_BEGIN
-
-#ifdef __CC__
-struct task;
-struct pidns;
-
-#ifndef __task_awref_defined
-#define __task_awref_defined
-AWREF(task_awref, task);
-#endif /* !__task_awref_defined */
-
-struct taskpid {
-	/* The `struct taskpid' acts as a sort-of weak
-	 * reference  to  a  task,  using  a  binding:
-	 *
-	 *  <struct TASK>                   <struct taskpid>
-	 *   THIS_TASKPID[1..1]  <------>   tp_thread[0..1]
-	 *   - Reference                    - Weak reference
-	 *                                  - Cleared when the task gets destroyed.
-	 *                                    WARNING: May point to a `wasdestroyed()' task! */
-	WEAK refcnt_t                   tp_refcnt;   /* Reference counter. */
-	struct task_awref               tp_thread;   /* [0..1] The pointed-to task */
-	union wait                      tp_status;   /* [const_if(!tp_thread || wasdestroyed(tp_thread) || tp_thread->t_flags & TASK_FTERMINATING)]
-	                                              * Current thread status / thread exit status. */
-	struct sig                      tp_changed;  /* Signal broadcast when the thread changes state (WSTOPPED, WCONTINUED, WEXITED) */
-	LIST_ENTRY(REF taskpid)         tp_siblings; /* [0..1][valid_if(tp_thread && !wasdestroyed(tp_thread))]
-	                                              * Chain of sibling tasks:
-	                                              *  - If `tp_thread' is a process-leader:
-	                                              *    - Chain of sibling processes spawned by the parent process of `tp_thread'
-	                                              *  - If `tp_thread' isn't a process-leader (but instead a secondary thread):
-	                                              *    - Chain of sibling threads spawned within the same process
-	                                              *  - In either case, the link may be unbound if `detach()' was called. */
-	REF struct pidns               *tp_pidns;    /* [1..1][const] The associated PID namespace. */
-	COMPILER_FLEXIBLE_ARRAY(upid_t, tp_pids);    /* [const][tp_pidns->pn_indirection + 1] This task's  PIDs within  all
-	                                              * of the different PID namespaces that  were used to bring it  forth.
-	                                              * Usually, this is only 1 (the root PID namespace), which is also the
-	                                              * one who's PID appears in system logs. */
-};
-
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL taskpid_destroy)(struct taskpid *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct taskpid, tp_refcnt, taskpid_destroy)
-
-/* Return a reference to the task associated with the given PID.
- * If that task has already terminated and has already been destroyed, return `NULL' instead. */
-#ifdef __INTELLISENSE__
-NOBLOCK WUNUSED REF struct task *NOTHROW(taskpid_gettask)(struct taskpid *__restrict self);
-NOBLOCK WUNUSED struct task *NOTHROW(taskpid_gettaskptr)(struct taskpid *__restrict self);
-#else /* __INTELLISENSE__ */
-#define taskpid_gettask(self)    awref_get(&(self)->tp_thread)
-#define taskpid_gettaskptr(self) awref_ptr(&(self)->tp_thread)
-#endif /* !__INTELLISENSE__ */
-
-/* Same as `taskpid_gettask()', but throw an exception if the thread has exited. */
-FUNDEF ATTR_RETNONNULL WUNUSED REF struct task *KCALL
-taskpid_gettask_srch(struct taskpid *__restrict self)
-		THROWS(E_PROCESS_EXITED);
+#include <kos/lockop.h>
 
 
-/* Return the PID of `self' within the given PID namespace. */
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1, 2)) upid_t
-NOTHROW(KCALL taskpid_getpid)(struct taskpid const *__restrict self,
-                              struct pidns const *__restrict ns);
-FORCELOCAL ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1, 2)) upid_t
-NOTHROW(KCALL taskpid_getpid_s)(struct taskpid const *__restrict self,
-                                struct pidns const *__restrict ns);
+/* Valid range of PID numbers. Note that even though PIDs are signed,
+ * structures like those found below may _only_ hold positive values.
+ *
+ * Negative PIDs in kernel control structures represent hard undefined
+ * behavior and may lead to kernel panic, or similar. */
+#define PID_MIN 1
+#define PID_MAX __PRIVATE_MAX_S(__SIZEOF_PID_T__)
 
-/* Return the PID of `self' within its own PID namespace. */
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) upid_t
-NOTHROW(KCALL taskpid_getselfpid)(struct taskpid const *__restrict self);
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) upid_t
-NOTHROW(KCALL taskpid_getselfpid_s)(struct taskpid const *__restrict self);
+/* First PID that isn't reserved. (`0' is never assigned, and `1'
+ * is only ever assigned to a PID namespace's root/init process). */
+#define PIDNS_FIRST_NONRESERVED_PID 2
 
-/* Return the PID of `self' within the root PID namespace. */
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) upid_t
-NOTHROW(KCALL taskpid_getrootpid)(struct taskpid const *__restrict self);
-
-/* [1..1][valid_if(!TASK_FKERNTHREAD)][const] The PID associated with the calling thread.
- * NOTE: `NULL' (though  assume UNDEFINED  if the choice  comes up)  for kernel  threads. */
-DATDEF ATTR_PERTASK struct taskpid *this_taskpid;
-#define THIS_TASKPID PERTASK_GET(this_taskpid)
-#define THIS_PIDNS   (PERTASK_GET(this_taskpid)->tp_pidns)
-
-
-/* For `posix-signal' */
-struct pending_rpc; /* Define in `rpc-internal.h' */
-#ifndef __pending_rpc_slist_defined
-#define __pending_rpc_slist_defined
-SLIST_HEAD(pending_rpc_slist, pending_rpc);
-#endif /* !__pending_rpc_slist_defined */
-
-struct process_pending_rpcs {
-	struct atomic_rwlock     ppr_lock; /* Lock for `ppr_list'. */
-	struct pending_rpc_slist ppr_list; /* [0..n][lock(APPEND(ATOMIC), REMOVE(ppr_lock))]
-	                                    * List of pending RPCs directed at the process as a whole. When
-	                                    * set  to `THIS_RPCS_TERMINATED', the  process is considered as
-	                                    * terminated and no additional RPCs can be enqueued.
-	                                    * NOTE: User-RPCs must not have the `RPC_SYNCMODE_F_REQUIRE_SC'
-	                                    *       or `RPC_SYNCMODE_F_REQUIRE_CP'  flag set.  If they  do,
-	                                    *       an internal assertion check will trigger. */
-	struct sig               ppr_more; /* A signal that is broadcast  whenever something is added to  `ppr_list'
-	                                    * This signal is _only_ used  to implement `signalfd(2)', as you're  not
-	                                    * normally supposed to "wait" for signals to arrive; you just always get
-	                                    * a sporadic interrupt once they do arrive. */
-};
-
-/* Helper macros for `struct driver::ppr_lock' */
-#define process_pending_rpcs_mustreap(self)     0
-#define process_pending_rpcs_reap(self)         (void)0
-#define _process_pending_rpcs_reap(self)        (void)0
-#define process_pending_rpcs_write(self)        atomic_rwlock_write(&(self)->ppr_lock)
-#define process_pending_rpcs_write_nx(self)     atomic_rwlock_write_nx(&(self)->ppr_lock)
-#define process_pending_rpcs_trywrite(self)     atomic_rwlock_trywrite(&(self)->ppr_lock)
-#define process_pending_rpcs_endwrite(self)     (atomic_rwlock_endwrite(&(self)->ppr_lock), process_pending_rpcs_reap(self))
-#define _process_pending_rpcs_endwrite(self)    atomic_rwlock_endwrite(&(self)->ppr_lock)
-#define process_pending_rpcs_read(self)         atomic_rwlock_read(&(self)->ppr_lock)
-#define process_pending_rpcs_read_nx(self)      atomic_rwlock_read_nx(&(self)->ppr_lock)
-#define process_pending_rpcs_tryread(self)      atomic_rwlock_tryread(&(self)->ppr_lock)
-#define _process_pending_rpcs_endread(self)     atomic_rwlock_endread(&(self)->ppr_lock)
-#define process_pending_rpcs_endread(self)      (void)(atomic_rwlock_endread(&(self)->ppr_lock) && (process_pending_rpcs_reap(self), 0))
-#define _process_pending_rpcs_end(self)         atomic_rwlock_end(&(self)->ppr_lock)
-#define process_pending_rpcs_end(self)          (void)(atomic_rwlock_end(&(self)->ppr_lock) && (process_pending_rpcs_reap(self), 0))
-#define process_pending_rpcs_upgrade(self)      atomic_rwlock_upgrade(&(self)->ppr_lock)
-#define process_pending_rpcs_upgrade_nx(self)   atomic_rwlock_upgrade_nx(&(self)->ppr_lock)
-#define process_pending_rpcs_tryupgrade(self)   atomic_rwlock_tryupgrade(&(self)->ppr_lock)
-#define process_pending_rpcs_downgrade(self)    atomic_rwlock_downgrade(&(self)->ppr_lock)
-#define process_pending_rpcs_reading(self)      atomic_rwlock_reading(&(self)->ppr_lock)
-#define process_pending_rpcs_writing(self)      atomic_rwlock_writing(&(self)->ppr_lock)
-#define process_pending_rpcs_canread(self)      atomic_rwlock_canread(&(self)->ppr_lock)
-#define process_pending_rpcs_canwrite(self)     atomic_rwlock_canwrite(&(self)->ppr_lock)
-#define process_pending_rpcs_waitread(self)     atomic_rwlock_waitread(&(self)->ppr_lock)
-#define process_pending_rpcs_waitwrite(self)    atomic_rwlock_waitwrite(&(self)->ppr_lock)
-#define process_pending_rpcs_waitread_nx(self)  atomic_rwlock_waitread_nx(&(self)->ppr_lock)
-#define process_pending_rpcs_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->ppr_lock)
-
-
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL process_pending_rpcs_fini)(struct process_pending_rpcs *__restrict self);
-
-/* Pending RPCs for the calling process. */
-#define THIS_PROCESS_RPCS \
-	FORTASK(task_getprocess(), this_taskgroup.tg_proc_rpcs)
-
-struct ttydev;
-struct pending_rpc;
-
-LIST_HEAD(taskpid_list, REF taskpid);
-#ifndef __task_list_defined
-#define __task_list_defined
-LIST_HEAD(task_list, WEAK task);
-#endif /* !__task_list_defined */
-
-#ifndef __ttydev_device_axref_defined
-#define __ttydev_device_axref_defined
-AXREF(ttydev_device_axref, ttydev);
-#endif /* !__ttydev_device_axref_defined */
-
-
-struct taskgroup {
-	/* Controller structure for tracing task association within/between
-	 * processes, process groups, as well as sessions. */
-	REF struct task             *tg_process;             /* [1..1][ref_if(!= THIS_TASK)][const]
-	                                                      * Process leader (the main-thread of the associated process).
-	                                                      * When this thread terminates, all other threads within the process also die.
-	                                                      * @assume(tg_process == FORTASK(tg_process,this_taskgroup).tg_process)
-	                                                      * NOTE:
-	                                                      *   - When  set to `THIS_TASK',  the calling thread  is a process leader,
-	                                                      *     also meaning that the `tp_siblings' chain within its PID  structure
-	                                                      *     is set up to form a chain of all other sibling processes within the
-	                                                      *     same process group.
-	                                                      *   - When  set  to something  different, the  calling  thread is  a worker
-	                                                      *     thread, meaning that the `tp_siblings' chain within its PID structure
-	                                                      *     is apart of a chain of other worker threads.
-	                                                      *   - Any kernel thread is always its own process. */
-	/* All of the following fields are only valid when `tg_process == THIS_TASK' (Otherwise, they are all `[0..1][const]') */
-	union {
-		struct pending_rpc      *tg_thread_exit;         /* [valid_if(tg_process != THIS_TASK)][lock(PRIVATE(tg_process), CLEAR_ONCE)][0..1][owned]
-		                                                  * A pre-allocated RPC used by the process leader to propagate its exit status to this thread. */
-		struct atomic_rwlock     tg_proc_threads_lock;   /* [valid_if(tg_process == THIS_TASK)] Lock for `tg_proc_threads' */
-	};
-	union {
-#define TASKGROUP_TG_PROC_THREADS_TERMINATED ((REF struct taskpid *)-1)
-		struct taskpid_list      tg_proc_threads;        /* [0..1][lock(tg_proc_threads_lock)][valid_if(tg_process == THIS_TASK)]
-		                                                  * Chain  of  threads &  child processes  of this  process  (excluding the  calling (aka.  leader) thread)
-		                                                  * Child processes are removed from this chain, either by being `detach(2)'ed, or by being `wait(2)'ed on.
-		                                                  * NOTE: This chain is set to `TASKGROUP_TG_PROC_THREADS_TERMINATED' once the associated
-		                                                  *       process  terminates,  in order  to prevent  any new  threads from  being added.
-		                                                  * NOTE: When a thread is detached, the `tg_thread_detached' field is updated */
-#define FOREACH_taskgroup__proc_threads(taskpid_elem, group)                                              \
-	if (((taskpid_elem) = LIST_FIRST(&(group)->tg_proc_threads)) == TASKGROUP_TG_PROC_THREADS_TERMINATED) \
-		;                                                                                                 \
-	else                                                                                                  \
-		for (; (taskpid_elem); (taskpid_elem) = LIST_NEXT(taskpid_elem, tp_siblings))
-#define TASKGROUP_TG_THREAD_DETACHED_NO         0 /* The thread is not detached */
-#define TASKGROUP_TG_THREAD_DETACHED_YES        1 /* The thread is detached */
-#define TASKGROUP_TG_THREAD_DETACHED_TERMINATED 2 /* The thread has terminated */
-		uintptr_t                tg_thread_detached;     /* [valid_if(tg_process != THIS_TASK)] Thread detach state (one of `TASKGROUP_TG_THREAD_DETACHED_*') */
-	};
-	struct sig                   tg_proc_threads_change; /* Broadcast when one of the  threads (or child processes)  of this process changes  state.
-	                                                      * For this purpose, the changed child has previously set its `tp_status' field to describe
-	                                                      * its new state.
-	                                                      * Also: Broadcasts are performed through `sig_altbroadcast()', with the sender set to the
-	                                                      *      `struct taskpid *' of the child which has changed state. */
-	struct atomic_rwlock         tg_proc_parent_lock;    /* Lock for `tg_proc_parent' */
-	WEAK struct task            *tg_proc_parent;         /* [0..1][const] The parent of this process.
-	                                                      * @assume(tg_proc_parent == FORTASK(tg_proc_parent,this_taskgroup).tg_process)
-	                                                      * In  the event  that this  process has  a parent, `THIS_TASKPID->tp_siblings'
-	                                                      * is    a     link    within     `tg_proc_parent->tp_thread->tg_proc_threads'.
-	                                                      * In the event that the parent process terminates before its child, this field
-	                                                      * gets set to `NULL', at  which point `THIS_TASKPID->tp_siblings' is  unbound. */
-	struct atomic_rwlock         tg_proc_group_lock;     /* Lock for `tg_proc_group' */
-	REF struct taskpid          *tg_proc_group;          /* [1..1][lock(tg_proc_group_lock)]
-	                                                      * @assume(tg_proc_procgroup == FORTASK(taskpid_gettask(tg_proc_procgroup), this_taskgroup).tg_proc_procgroup)
-	                                                      * The leader of the associated process group.
-	                                                      * When set to `THIS_TASKPID', then the calling thread is a process group leader. */
-	LIST_ENTRY(WEAK task)        tg_proc_group_siblings; /* [0..1][lock(tg_proc_group->tg_pgrp_processes_lock)]
-	                                                      * [valid_if(THIS_TASKPID != tg_proc_group &&
-	                                                      *           taskpid_gettask(tg_proc_group) != NULL)]
-	                                                      * Chain of sibling processes within the same process group.
-	                                                      * The base of this chain is `taskpid_gettask(tg_proc_group)->tg_pgrp_processes' */
-	struct process_pending_rpcs  tg_proc_rpcs;           /* Pending RPCs of this process as a whole. */
-	/* All of the following fields are only valid when `tg_proc_group == THIS_TASKPID' (Otherwise, they are all `[0..1][const]') */
-	struct atomic_rwlock         tg_pgrp_processes_lock; /* Lock for `tg_pgrp_processes' */
-	struct task_list             tg_pgrp_processes;      /* [0..1] Chain of processes within this  process group (excluding the calling  process)
-	                                                      * NOTE: This list of processes is chained using the `tg_proc_group_siblings' list node. */
-#define KEY__this_taskgroup__tg_proc_group_siblings(thread) \
-	FORTASK(thread, this_taskgroup).tg_proc_group_siblings
-#define FOREACH_taskgroup__pgrp_processes(proc, group) \
-	LIST_FOREACH_P(proc, &(group)->tg_pgrp_processes, KEY__this_taskgroup__tg_proc_group_siblings)
-	struct atomic_rwlock         tg_pgrp_session_lock;   /* Lock for `tg_pgrp_session' */
-	REF struct taskpid          *tg_pgrp_session;        /* [1..1][const_if(== THIS_TASKPID)][lock(tg_pgrp_session_lock)]
-	                                                      * @assume(tg_pgrp_session == FORTASK(taskpid_gettask(tg_pgrp_session), this_taskgroup).tg_pgrp_session)
-	                                                      * The session leader of the this process group.
-	                                                      * When set to `THIS_TASKPID', then the calling thread is that leader. */
-	/* All of the following fields are only valid when `tg_pgrp_session == THIS_TASKPID' (Otherwise, they are all `[0..1][const]') */
-	struct ttydev_device_axref   tg_ctty;                /* [0..1] The controlling terminal  (/dev/tty) associated  with this  session
-	                                                      * When non-NULL, `tg_ctty->t_cproc == THIS_TASKPID' (for the session leader) */
-};
-
-
-DATDEF ATTR_PERTASK struct taskgroup this_taskgroup;
-#define THIS_TASKGROUP       PERTASK(this_taskgroup)
-
-#ifdef __INTELLISENSE__
-/* Returns a pointer to the process associated with the calling/given thread.
- * NOTE:   These   functions   return   `NULL'   for   kernel-space   thread! */
-NOBLOCK WUNUSED /*ATTR_RETNONNULL*/ ATTR_CONST struct task *KCALL task_getprocess(void);
-NOBLOCK WUNUSED /*ATTR_RETNONNULL*/ ATTR_CONST struct taskpid *KCALL task_getprocesspid(void);
-NOBLOCK WUNUSED /*ATTR_RETNONNULL*/ ATTR_CONST NONNULL((1)) struct task *KCALL task_getprocess_of(struct task const *__restrict thread);
-NOBLOCK WUNUSED /*ATTR_RETNONNULL*/ ATTR_CONST NONNULL((1)) struct taskpid *KCALL task_getprocesspid_of(struct task const *__restrict thread);
-#else /* __INTELLISENSE__ */
-#define task_getprocess()              ((struct task *)PERTASK_GET(this_taskgroup.tg_process))
-#define task_getprocesspid()           FORTASK(task_getprocess(), this_taskpid)
-#define task_getprocess_of(thread)     ((struct task *)FORTASK(thread, this_taskgroup).tg_process)
-#define task_getprocesspid_of(thread)  FORTASK(task_getprocess_of(thread), this_taskpid)
-#endif /* !__INTELLISENSE__ */
-
-/* Returns  a  reference  to  the  parent  of  the  calling/given process.
- * If that parent has already terminated and has already been detach(2)ed,
- * or wait(2)ed, return `NULL' instead. */
-LOCAL WUNUSED REF struct task *KCALL task_getprocessparent(void) THROWS(E_WOULDBLOCK);
-LOCAL WUNUSED REF struct taskpid *KCALL task_getprocessparentpid(void) THROWS(E_WOULDBLOCK);
-LOCAL WUNUSED NONNULL((1)) REF struct task *KCALL task_getprocessparent_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
-LOCAL WUNUSED NONNULL((1)) REF struct taskpid *KCALL task_getprocessparentpid_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
-LOCAL WUNUSED REF struct task *NOTHROW(KCALL task_getprocessparent_nx)(void);
-LOCAL WUNUSED REF struct taskpid *NOTHROW(KCALL task_getprocessparentpid_nx)(void);
-LOCAL WUNUSED NONNULL((1)) REF struct task *NOTHROW(KCALL task_getprocessparent_of_nx)(struct task *__restrict thread);
-LOCAL WUNUSED NONNULL((1)) REF struct taskpid *NOTHROW(KCALL task_getprocessparentpid_of_nx)(struct task *__restrict thread);
-LOCAL WUNUSED NONNULL((1)) struct task *NOTHROW(KCALL task_getprocessparentptr_of)(struct task *__restrict thread);
-
-/* Check if the given task was orphaned (no longer has a parent process) */
-LOCAL ATTR_PURE WUNUSED bool NOTHROW(KCALL task_isorphan)(void);
-LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool NOTHROW(KCALL task_isorphan_p)(struct task *__restrict thread);
-LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool NOTHROW(KCALL taskpid_isorphan_p)(struct taskpid *__restrict self);
-
-/* Detach the given `thread' from its parent
- * @return: true:  Successfully detached the given `thread'.
- * @return: false: The given `thread' had already been detached. */
-FUNDEF bool KCALL task_detach(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
-
-/* Detach all child threads/processes of the given `process'
- * @assume(process == task_getprocess_of(process));
- * @return: * : The number of detached children. */
-FUNDEF size_t KCALL task_detach_children(struct task *__restrict process) THROWS(E_WOULDBLOCK);
-
-
-/* Return a reference to the leader of the process group of the calling/given thread. */
-LOCAL WUNUSED REF struct task *KCALL task_getprocessgroupleader(void) THROWS(E_WOULDBLOCK);
-LOCAL ATTR_RETNONNULL WUNUSED REF struct task *KCALL task_getprocessgroupleader_srch(void) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED);
-LOCAL ATTR_RETNONNULL WUNUSED REF struct taskpid *KCALL task_getprocessgroupleaderpid(void) THROWS(E_WOULDBLOCK);
-LOCAL WUNUSED NONNULL((1)) REF struct task *KCALL task_getprocessgroupleader_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
-LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *KCALL task_getprocessgroupleader_srch_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED);
-LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct taskpid *KCALL task_getprocessgroupleaderpid_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
-LOCAL WUNUSED REF struct task *NOTHROW(KCALL task_getprocessgroupleader_nx)(void);
-LOCAL WUNUSED REF struct taskpid *NOTHROW(KCALL task_getprocessgroupleaderpid_nx)(void);
-LOCAL WUNUSED NONNULL((1)) REF struct task *NOTHROW(KCALL task_getprocessgroupleader_of_nx)(struct task *__restrict thread);
-LOCAL WUNUSED NONNULL((1)) REF struct taskpid *NOTHROW(KCALL task_getprocessgroupleaderpid_of_nx)(struct task *__restrict thread);
-
-/* Return a reference to the session leader of the process group of the calling/given thread.
- * NOTE: After the process group leader has died, it's PID implicitly becomes the session leader PID.
- *       This way, code can be simplified since `task_getsessionleaderpid()' always returns non-NULL,
- *       and always returns a dead  taskpid once either the current  session, or the current  process
- *       group have exited. */
-LOCAL WUNUSED REF struct task *KCALL task_getsessionleader(void) THROWS(E_WOULDBLOCK);
-LOCAL ATTR_RETNONNULL WUNUSED REF struct task *KCALL task_getsessionleader_srch(void) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED);
-LOCAL ATTR_RETNONNULL WUNUSED REF struct taskpid *KCALL task_getsessionleaderpid(void) THROWS(E_WOULDBLOCK);
-LOCAL WUNUSED NONNULL((1)) REF struct task *KCALL task_getsessionleader_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
-LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *KCALL task_getsessionleader_srch_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED);
-LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct taskpid *KCALL task_getsessionleaderpid_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
-LOCAL WUNUSED REF struct task *NOTHROW(KCALL task_getsessionleader_nx)(void);
-LOCAL WUNUSED REF struct taskpid *NOTHROW(KCALL task_getsessionleaderpid_nx)(void);
-LOCAL WUNUSED NONNULL((1)) REF struct task *NOTHROW(KCALL task_getsessionleader_of_nx)(struct task *__restrict thread);
-LOCAL WUNUSED NONNULL((1)) REF struct taskpid *NOTHROW(KCALL task_getsessionleaderpid_of_nx)(struct task *__restrict thread);
-
-/* Returns true if the calling/given thread is a process leader (aka. process main thread) */
-LOCAL ATTR_CONST WUNUSED bool NOTHROW(KCALL task_isprocessleader)(void);
-LOCAL ATTR_CONST WUNUSED NONNULL((1)) bool NOTHROW(KCALL task_isprocessleader_p)(struct task const *__restrict thread);
-
-/* Returns true if the calling/given thread is a process group leader */
-LOCAL ATTR_PURE WUNUSED bool NOTHROW(KCALL task_isprocessgroupleader)(void);
-LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool NOTHROW(KCALL task_isprocessgroupleader_p)(struct task const *__restrict thread);
-
-/* Returns true if the calling/given thread is a session group leader */
-LOCAL ATTR_PURE WUNUSED bool NOTHROW(KCALL task_issessionleader)(void);
-LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool NOTHROW(KCALL task_issessionleader_p)(struct task const *__restrict thread);
-
-
-/* Return  the  TID  (thread  id)  /  PID  (process  id /
- * thread id of the process leader) of the calling thread
- * The returned IDS are either relative to the task's own
- * PID namespace, or to the ROOT pid namespace.
- * NOTE: The `*_S' variants can also be used by kernel threads, where they evaluate to `0' */
-LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t NOTHROW(KCALL task_gettid)(void);
-LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t NOTHROW(KCALL task_gettid_s)(void);
-LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t NOTHROW(KCALL task_getroottid)(void);
-LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t NOTHROW(KCALL task_getroottid_s)(void);
-LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t NOTHROW(KCALL task_getpid)(void);
-LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t NOTHROW(KCALL task_getpid_s)(void);
-LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t NOTHROW(KCALL task_getrootpid)(void);
-LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t NOTHROW(KCALL task_getrootpid_s)(void);
-
-/* Same as the functions above, but return the values for a given thread, rather than the calling.
- * NOTE: The non-root variants of these functions will still return the thread's proper IDs in
- *       the context of the calling thread's PID namespace
- * With that in mind, the non-*_s variants will cause kernel panic/undefined behavior for any
- * for the following situations:
- * task_gettid_of:
- *   - FORTASK(thread, this_taskpid) == NULL                                  (`thread' is a kernel thread)
- *   - THIS_TASKPID == NULL                                                   (The caller is a kernel thread)
- * task_getroottid_of:
- *   - FORTASK(thread, this_taskpid) == NULL                                  (`thread' is a kernel thread)
- * task_getpid_of:
- *   - FORTASK(thread, _this_group.tg_process) == NULL                        (`thread' is a kernel thread)
- *   - FORTASK(FORTASK(thread, _this_group.tg_process), this_taskpid) == NULL (The process leader of `thread' is a kernel thread)
- *   - THIS_TASKPID == NULL                                                   (The caller is a kernel thread)
- * task_getrootpid_of:
- *   - FORTASK(thread, _this_group.tg_process) == NULL                        (`thread' is a kernel thread)
- *   - FORTASK(FORTASK(thread, _this_group.tg_process), this_taskpid) == NULL (The process leader of `thread' is a kernel thread)
- */
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_gettid_of)(struct task const *__restrict thread);
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_gettid_of_s)(struct task const *__restrict thread);
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_getselftid_of)(struct task const *__restrict thread);
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_getselftid_of_s)(struct task const *__restrict thread);
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_getroottid_of)(struct task const *__restrict thread);
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_getroottid_of_s)(struct task const *__restrict thread);
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_getpid_of)(struct task const *__restrict thread);
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_getpid_of_s)(struct task const *__restrict thread);
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_getselfpid_of)(struct task const *__restrict thread);
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_getselfpid_of_s)(struct task const *__restrict thread);
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_getrootpid_of)(struct task const *__restrict thread);
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_getrootpid_of_s)(struct task const *__restrict thread);
-
-
-
-
-/* Set the group leader for the process of the given thread.
- * NOTE: If `leader' isn't a process leader, `task_getprocess_of(leader)' will be used instead.
- * @param: pold_group_leader: When non-NULL store a reference to the old process group leader of `task_getprocess_of(thread)'. (Only set on TASK_SETPROCESSGROUPLEADER_SUCCESS)
- * @param: pnew_group_leader: When non-NULL store a reference to the new process group leader of `task_getprocess_of(thread)'. (Only set on TASK_SETPROCESSGROUPLEADER_SUCCESS)
- * @return: * : One of `TASK_SETPROCESSGROUPLEADER_*' */
-FUNDEF NONNULL((1, 2)) unsigned int KCALL
-task_setprocessgroupleader(struct task *thread, struct task *leader,
-                           /*OUT,OPT*/ REF struct taskpid **pold_group_leader DFL(__NULLPTR),
-                           /*OUT,OPT*/ REF struct taskpid **pnew_group_leader DFL(__NULLPTR))
-		THROWS(E_WOULDBLOCK);
-#define TASK_SETPROCESSGROUPLEADER_SUCCESS 0 /* Successfully  added   `task_getprocess_of(thread)'  to   the  process   group
-                                              * that `leader' is apart of (which is `task_getprocessgroupleader_of(leader)'),
-                                              * or make `thread' become its own process group when
-                                              * `task_getprocess_of(thread) == task_getprocess_of(leader)' */
-#define TASK_SETPROCESSGROUPLEADER_LEADER  1 /*  The given `thread' is already the leader of its own process group.
-                                              * -> Once promoted to a group leader, a process cannot back out and no longer be one! */
-#define TASK_SETPROCESSGROUPLEADER_EXITED  2 /* The given `leader' has already terminated. */
-
-/* Set the session leader for the process group of the given thread.
- * NOTE: If `task_getprocess_of(thread)' isn't already the leader of its own process group
- *      (`task_isprocessgroupleader_p(task_getprocess_of(thread))' is false), a call to
- *       this  function  also implies  `task_setprocessgroupleader(thread,thread)', meaning
- *       that `task_getprocess_of(thread)' is turned into its own process group before that
- *       group is added to the session of `leader', or made to become a new session
- * @param: pold_group_leader:   When non-NULL store a reference to the old process group leader of `task_getprocess_of(thread)'.
- *                              NOTE:  The  new  process  group  leader  of  `thread'  is  always  `task_getprocess_of(thread)',
- *                                    since only the leader of a process group can dictate the associated session.
- * @param: pold_session_leader: When non-NULL store a reference to the old session leader of `task_getprocess_of(thread)'.
- * @param: pnew_session_leader: When non-NULL store a reference to the new session leader of `task_getprocess_of(thread)'.
- * @return: * : One of `TASK_SETSESSIONLEADER_*' */
-FUNDEF NONNULL((1, 2)) unsigned int KCALL
-task_setsessionleader(struct task *thread, struct task *leader,
-                      /*OUT,OPT*/ REF struct taskpid **pold_group_leader DFL(__NULLPTR),
-                      /*OUT,OPT*/ REF struct taskpid **pold_session_leader DFL(__NULLPTR),
-                      /*OUT,OPT*/ REF struct taskpid **pnew_session_leader DFL(__NULLPTR))
-		THROWS(E_WOULDBLOCK);
-#define TASK_SETSESSIONLEADER_SUCCESS 0 /* Successfully   added    `task_getprocess_of(thread)'    (which    at    that
-                                         * point is guarantied to be identical to `task_getprocessgroupleader(thread)')
-                                         * to the session that `leader' is apart of (which is
-                                         * `task_getsessionleader_of(leader)'), or make `thread' become a new session when
-                                         * `task_getprocessgroupleader(thread) == task_getprocessgroupleader(leader)' */
-#define TASK_SETSESSIONLEADER_LEADER  1 /* The given `thread' is already the leader of a different session than `leader'.
-                                         * -> Once promoted to a session leader, a process group cannot back out and no longer be one! */
-
-
-
-
-
-
-
-
-
-
-
-struct pidns_entry {
-	WEAK struct taskpid *pe_pid; /* [0..1] PID entry (Set to `PIDNS_ENTRY_DELETED' for deleted entries). */
-#define PIDNS_ENTRY_DELETED ((WEAK struct taskpid *)-1)
-};
-
-struct pidns {
-	WEAK refcnt_t        pn_refcnt;      /* Reference counter. */
-	size_t               pn_indirection; /* [const] Namespace indirection  of  this  PID  NS.
-	                                      * This also  describes the  number of  PIDs that  a
-	                                      * thread  that  is  added  to  this  namespace will
-	                                      * gain (+1), from this namespace and all namespaces
-	                                      * that are reachable from `pn_parent'. */
-	REF struct pidns    *pn_parent;      /* [0..1][const]
-	                                      * [->pn_indirection == pn_indirection-1]
-	                                      * [(!= NULL) == (pn_indirection != 0)]
-	                                      * [(== NULL) == (self == &pidns_root)]
-	                                      * The parenting PID namespace with one less indirection. */
-	struct atomic_rwlock pn_lock;        /* Lock for accessing the hash-vector below. */
-	size_t               pn_used;        /* [lock(pn_lock)] Amount of used (non-NULL and non-DUMMY) PIDs */
-	size_t               pn_size;        /* [lock(pn_lock)] Amount of (non-NULL) PIDs entries. */
-	size_t               pn_mask;        /* [lock(pn_lock)] Hash-mask for `pn_list' */
-	struct pidns_entry  *pn_list;        /* [1..pn_mask+1][owned_if(!= INTERNAL(empty_pidns_list))]
-	                                      * Hash-vector of PIDs. */
-	WEAK struct taskpid *pn_dead;        /* [0..1] Chain of dead task PIDs that are pending removal.
-	                                      * NOTE: Chained via `tp_siblings.le_next' */
-#define KEY__pidns_dead_next(elem) (elem)->tp_siblings.le_next
-	upid_t               pn_nextpid;     /* [lock(pn_lock)] Next PID to hand out. */
-};
-
-#define PIDNS_FIRST_NONRESERVED_PID 2 /* First PID that isn't reserved. */
-
-/* `/proc/sys/kernel/pid_max': When `pn_nextpid' >= this value, start recycling PIDs. */
-DATDEF upid_t pid_recycle_threshold;
 
 /* Default value for `pid_recycle_threshold' */
 #ifndef PID_RECYCLE_THRESHOLD_DEFAULT
@@ -508,794 +55,286 @@ DATDEF upid_t pid_recycle_threshold;
 #endif /* !PID_RECYCLE_THRESHOLD_DEFAULT */
 
 
-#define PIDNS_HASHNXT(i, perturb) \
-	((i) = (((i) << 2) + (i) + (perturb) + 1), (perturb) >>= 5)
+#ifdef __CC__
+DECL_BEGIN
 
+/*
+ * PID (or rather TID) data layout
+ *
+ * ```
+ *           +------1..1---------+
+ *           |                   v
+ *       [taskpid] <--0..N--- [pidns] --+
+ *        |    ^                 ^      |
+ * weakref|    |                 |      | 0..1 (nested namespaces)
+ *        |    | 0..1            +------+
+ *        v    |
+ *        [task]
+ * ```
+ *
+ * NOTE: Process/Process-group/Session handling
+ *       is  implemented  in `<sched/group.h>'!
+ */
+
+
+struct pidns;
+struct taskpid;
+struct task;
+#ifndef __task_awref_defined
+#define __task_awref_defined
+AWREF(task_awref, task);
+#endif /* !__task_awref_defined */
+
+struct taskpid_slot {
+	LLRBTREE_NODE(taskpid) tps_link; /* [0..1][lock(:tp_ns->[pn_par...]->pn_lock)]
+	                                  * Link entry within the associated PID namespace */
+	upid_t                 tps_pid;  /* [const] PID relevant to this slot. */
+};
+#if __SIZEOF_PID_T__ == 4
+#define __TASKPID_SLOT_PIDMASK __UINT32_C(0x7fffffff)
+#define __TASKPID_SLOT_REDMASK __UINT32_C(0x80000000)
+#elif __SIZEOF_PID_T__ == 8
+#define __TASKPID_SLOT_PIDMASK __UINT64_C(0x7fffffffffffffff)
+#define __TASKPID_SLOT_REDMASK __UINT64_C(0x8000000000000000)
+#else /* __SIZEOF_PID_T__ == ... */
+#error "Unsupported sizeof(pid_t)"
+#endif /* __SIZEOF_PID_T__ != ... */
+#define _taskpid_slot_getpidno(self) ((pid_t)((self).tps_pid & __TASKPID_SLOT_PIDMASK))
+
+
+
+/************************************************************************/
+/* TASK PID OBJECT                                                      */
+/************************************************************************/
+struct taskpid {
+	WEAK refcnt_t           tp_refcnt;  /* Reference counter. */
+#ifdef __WANT_TASKPID__tp_lop
+	union {
+		struct {
+			struct task_awref tp_thread;  /* ... */
+			struct sig        tp_changed; /* ... */
+			uint16_t          tp_status;  /* ... */
+			uint8_t           tp_SIGCLD;  /* ... */
+			uint8_t          _tp_pad[sizeof(void *) - 3]; /* ... */
+		};
+		Toblockop(pidns)     _tp_lop;   /* Used internally during destruction */
+		Tobpostlockop(pidns) _tp_plop;  /* Used internally during destruction */
+	};
+#else /* __WANT_TASKPID__tp_lop */
+	struct task_awref       tp_thread;  /* [0..1] The pointed-to task (or `NULL' if destroyed) */
+	struct sig              tp_changed; /* Signal broadcast after changing `tp_status'. */
+	uint16_t                tp_status;  /* [const_if(!tp_thread || wasdestroyed(tp_thread) ||
+	                                     *           tp_thread->t_flags & TASK_FTERMINATING)]
+	                                     * [lock(PRIVATE(tp_thread == THIS_TASK))]
+	                                     * Current thread status (~ala `union wait'). */
+	uint8_t                 tp_SIGCLD;  /* [const] Signal number send to parent process when `tp_status' changes. */
+	uint8_t                _tp_pad[sizeof(void *) - 3]; /* ... */
+#endif /* !__WANT_TASKPID__tp_lop */
+	LIST_ENTRY(REF taskpid) tp_sib;     /* [0..1] Chain of sibling tasks:
+	                                     * - If `tp_thread' is a process-leader:
+	                                     *   Link in chain of other processes spawned by the parent process of `tp_thread'
+	                                     * - If `tp_thread' isn't a process-leader (but instead a secondary
+	                                     *   thread): Chain of sibling threads spawned within the same process
+	                                     * - In either case, the link may be unbound if `detach()' was called.
+	                                     * - This field only becomes relevant in `<sched/group.h>' */
+	REF struct pidns       *tp_ns;      /* [1..1][const] Top-level PID namespace containing this descriptor. */
+	COMPILER_FLEXIBLE_ARRAY(struct taskpid_slot,
+	                        tp_pids);   /* [const][tp_ns->pn_ind+1] Task PID value from different namespaces. */
+};
+
+/* Allocate a taskpid descriptor for use with a given `ns' */
+#define taskpid_alloc(ns)                                                        \
+	((struct taskpid *)kmalloc(__builtin_offsetof(struct taskpid, tp_pids) +     \
+	                           ((ns)->pn_ind + 1) * sizeof(struct taskpid_slot), \
+	                           GFP_NORMAL))
+#define taskpid_free(self) kfree(self)
+
+/* Destroy the given taskpid. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL taskpid_destroy)(struct taskpid *__restrict self);
+DEFINE_REFCOUNT_FUNCTIONS(struct taskpid, tp_refcnt, taskpid_destroy)
+
+/* [1..1][const] The PID associated with the calling thread. */
+DATDEF ATTR_PERTASK struct taskpid *this_taskpid;
+#define THIS_TASKPID PERTASK_GET(this_taskpid)
+#define THIS_PIDNS   PERTASK_GET(this_taskpid)->tp_ns
+
+/* Return a reference/pointer to the thread associated with `self'
+ * Returns `NULL'  when said  thread has  already been  destroyed. */
+#define taskpid_gettask(self)    awref_get(&(self)->tp_thread)
+#define taskpid_gettaskptr(self) awref_ptr(&(self)->tp_thread)
+
+/* Same as `taskpid_gettask()', but throw an exception if the thread has exited. */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL
+taskpid_gettask_srch(struct taskpid *__restrict self)
+		THROWS(E_PROCESS_EXITED);
+
+/* Return the # of PIDs defined by `self' */
+#define taskpid_getpidnocount(self) ((self)->tp_ns->pn_ind + 1)
+
+/* Return `self's PID number associated with `ns' */
+#ifdef NDEBUG
+#define taskpid_getnspidno(self, ns) \
+	_taskpid_slot_getpidno((self)->tp_pids[(ns)->pn_ind])
+#else /* NDEBUG */
+#define taskpid_getnspidno(self, ns)                                      \
+	({                                                                    \
+		struct taskpid const *__tpgp_self = (self);                       \
+		struct pidns const *__tpgp_ns     = (ns);                         \
+		__hybrid_assert(__tpgp_self->tp_ns->pn_ind >= __tpgp_ns->pn_ind); \
+		_taskpid_slot_getpidno(__tpgp_self->tp_pids[__tpgp_ns->pn_ind]);  \
+	})
+#endif /* !NDEBUG */
+
+/* Same as `taskpid_getnspidno()', but return `0' if `self' doesn't appear in `ns' */
+#define taskpid_getnspidno_s(self, ns)                                       \
+	({                                                                       \
+		struct taskpid const *__tpgps_self = (self);                         \
+		struct pidns const *__tpgps_ns     = (ns);                           \
+		(likely(__tpgps_self->tp_ns->pn_ind >= __tpgps_ns->pn_ind)           \
+		 ? _taskpid_slot_getpidno(__tpgps_self->tp_pids[__tpgps_ns->pn_ind]) \
+		 : 0);                                                               \
+	})
+
+#define taskpid_getpidno(self)   taskpid_getnspidno(self, THIS_PIDNS)
+#define taskpid_getpidno_s(self) taskpid_getnspidno_s(self, THIS_PIDNS)
+	
+
+/* Return `self's PID number within its own namespace */
+#define taskpid_getselfpidno(self)                                                  \
+	({                                                                              \
+		struct taskpid const *__tpgsp_self = (self);                                \
+		_taskpid_slot_getpidno(__tpgsp_self->tp_pids[__tpgsp_self->tp_ns->pn_ind]); \
+	})
+
+/* Return `self's PID number within the root namespace */
+#define taskpid_getrootpidno(self) _taskpid_slot_getpidno((self)->tp_pids[0])
+
+
+
+
+/************************************************************************/
+/* TASK PID NAMESPACE                                                   */
+/************************************************************************/
+struct pidns {
+	WEAK refcnt_t               pn_refcnt; /* Reference counter. */
+	size_t                      pn_ind;    /* [const][(== 0) == (. == &pidns_root)]
+	                                        * Indirection of this PID namespace. (== number of PIDs that are
+	                                        * associated  with every `struct taskpid' within this namespace)
+	                                        * NOTE: `pidns_root' is the only namespace with `pn_ind == 0'! */
+	REF struct pidns           *pn_par;    /* [1..1][const][->pn_ind == pn_ind-1]
+	                                        * [valid_if(pn_ind != 0 <=> . != &pidns_root)]
+	                                        * The parenting PID namespace with one less indirection.
+	                                        * NOTE: For `pidns_root', this field is set to `NULL'. */
+	struct atomic_rwlock        pn_lock;   /* Lock for accessing the LLRB-tree below. */
+	Toblockop_slist(pidns)      pn_lops;   /* [0..n][lock(ATOMIC)] Lock operations for `pn_lock'. */
+	LLRBTREE_ROOT(WEAK taskpid) pn_tree;   /* [LINK(->tp_pids[pn_ind].tps_link)][0..n][lock(pn_lock)]
+	                                        * Tree of PIDs (pids remove themselves upon destruction). */
+	pid_t                       pn_npid;   /* [lock(pn_lock)] Next PID to hand out. (in [PIDNS_FIRST_NONRESERVED_PID,PID_MAX]) */
+};
+
+/* Helper macros for working with `struct pidns::pn_lock' */
+#define _pidns_reap(self)        _oblockop_reap_atomic_rwlock(&(self)->pn_lops, &(self)->pn_lock, self)
+#define pidns_reap(self)         oblockop_reap_atomic_rwlock(&(self)->pn_lops, &(self)->pn_lock, self)
+#define pidns_write(self)        atomic_rwlock_write(&(self)->pn_lock)
+#define pidns_write_nx(self)     atomic_rwlock_write_nx(&(self)->pn_lock)
+#define pidns_trywrite(self)     atomic_rwlock_trywrite(&(self)->pn_lock)
+#define pidns_endwrite(self)     (atomic_rwlock_endwrite(&(self)->pn_lock), pidns_reap(self))
+#define _pidns_endwrite(self)    atomic_rwlock_endwrite(&(self)->pn_lock)
+#define pidns_read(self)         atomic_rwlock_read(&(self)->pn_lock)
+#define pidns_read_nx(self)      atomic_rwlock_read_nx(&(self)->pn_lock)
+#define pidns_tryread(self)      atomic_rwlock_tryread(&(self)->pn_lock)
+#define _pidns_endread(self)     atomic_rwlock_endread(&(self)->pn_lock)
+#define pidns_endread(self)      (void)(atomic_rwlock_endread(&(self)->pn_lock) && (pidns_reap(self), 0))
+#define _pidns_end(self)         atomic_rwlock_end(&(self)->pn_lock)
+#define pidns_end(self)          (void)(atomic_rwlock_end(&(self)->pn_lock) && (pidns_reap(self), 0))
+#define pidns_upgrade(self)      atomic_rwlock_upgrade(&(self)->pn_lock)
+#define pidns_upgrade_nx(self)   atomic_rwlock_upgrade_nx(&(self)->pn_lock)
+#define pidns_tryupgrade(self)   atomic_rwlock_tryupgrade(&(self)->pn_lock)
+#define pidns_downgrade(self)    atomic_rwlock_downgrade(&(self)->pn_lock)
+#define pidns_reading(self)      atomic_rwlock_reading(&(self)->pn_lock)
+#define pidns_writing(self)      atomic_rwlock_writing(&(self)->pn_lock)
+#define pidns_canread(self)      atomic_rwlock_canread(&(self)->pn_lock)
+#define pidns_canwrite(self)     atomic_rwlock_canwrite(&(self)->pn_lock)
+#define pidns_waitread(self)     atomic_rwlock_waitread(&(self)->pn_lock)
+#define pidns_waitwrite(self)    atomic_rwlock_waitwrite(&(self)->pn_lock)
+#define pidns_waitread_nx(self)  atomic_rwlock_waitread_nx(&(self)->pn_lock)
+#define pidns_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->pn_lock)
+
+/* `/proc/sys/kernel/pid_max': When `pn_nextpid' >= this
+ * value, start recycling  PIDs. (in  [PID_MIN,PID_MAX]) */
+DATDEF pid_t pid_recycle_threshold;
 
 /* The root PID namespace. */
 DATDEF struct pidns pidns_root;
 
-/* Functions for acquiring the `pn_lock' for reading/writing. */
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL pidns_tryread)(struct pidns *__restrict self);
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL pidns_trywrite)(struct pidns *__restrict self);
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL pidns_tryupgrade)(struct pidns *__restrict self);
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL pidns_end)(struct pidns *__restrict self);
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL pidns_endread)(struct pidns *__restrict self);
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL pidns_endwrite)(struct pidns *__restrict self);
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL pidns_downgrade)(struct pidns *__restrict self);
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL pidns_tryservice)(struct pidns *__restrict self);
-FUNDEF NONNULL((1)) void (KCALL pidns_read)(struct pidns *__restrict self) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1)) void (KCALL pidns_write)(struct pidns *__restrict self) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1)) bool (KCALL pidns_upgrade)(struct pidns *__restrict self) THROWS(E_WOULDBLOCK);
-FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(KCALL pidns_read_nx)(struct pidns *__restrict self);
-FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(KCALL pidns_write_nx)(struct pidns *__restrict self);
-FUNDEF WUNUSED NONNULL((1)) unsigned int NOTHROW(KCALL pidns_upgrade_nx)(struct pidns *__restrict self);
-#define pidns_reading(self)  sync_reading(&(self)->pn_lock)
-#define pidns_writing(self)  sync_writing(&(self)->pn_lock)
-#define pidns_canread(self)  sync_canread(&(self)->pn_lock)
-#define pidns_canwrite(self) sync_canwrite(&(self)->pn_lock)
-__DEFINE_SYNC_RWLOCK(struct pidns,
-                     pidns_tryread,
-                     pidns_read,
-                     pidns_read_nx,
-                     pidns_endread,
-                     pidns_reading,
-                     pidns_canread,
-                     pidns_trywrite,
-                     pidns_write,
-                     pidns_write_nx,
-                     pidns_endwrite,
-                     pidns_writing,
-                     pidns_canwrite,
-                     pidns_end,
-                     pidns_tryupgrade,
-                     pidns_upgrade,
-                     pidns_upgrade_nx,
-                     pidns_downgrade)
-
-
-
-/* Destroy a previously allocated pidns. */
+/* Destroy a given PID namespace. */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL pidns_destroy)(struct pidns *__restrict self);
+NOTHROW(FCALL pidns_destroy)(struct pidns *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct pidns, pn_refcnt, pidns_destroy)
 
 /* Allocate a new child PID namespace for `parent' */
-FUNDEF ATTR_RETNONNULL NONNULL((1)) REF struct pidns *
-(KCALL pidns_alloc)(struct pidns *__restrict parent) THROWS(E_BADALLOC);
+FUNDEF ATTR_RETNONNULL NONNULL((1)) REF struct pidns *FCALL
+pidns_alloc(struct pidns *__restrict parent) THROWS(E_BADALLOC);
+
+/* Lookup a thread in a given PID namespace. */
+FUNDEF WUNUSED NONNULL((1)) REF struct taskpid *FCALL pidns_lookup(struct pidns *__restrict self, pid_t pid) THROWS(E_WOULDBLOCK);
+FUNDEF WUNUSED NONNULL((1)) REF struct task *FCALL pidns_lookuptask(struct pidns *__restrict self, pid_t pid) THROWS(E_WOULDBLOCK);
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct taskpid *FCALL pidns_lookup_srch(struct pidns *__restrict self, pid_t pid) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED);
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL pidns_lookuptask_srch(struct pidns *__restrict self, pid_t pid) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED);
+
+/* Return the taskpid object associated with `pid' within `self' */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct taskpid *
+NOTHROW(FCALL pidns_lookup_locked)(struct pidns const *__restrict self, pid_t pid);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) REF struct task *
+NOTHROW(FCALL pidns_lookuptask_locked)(struct pidns const *__restrict self, pid_t pid);
+
+/* Return the taskpid object with the lowest PID (in `self'), that is still `>= min_pid'
+ * This  function is  used for task  enumeration for things  such as `opendir("/proc")'. */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct taskpid *
+NOTHROW(FCALL pidns_lookupnext_locked)(struct pidns const *__restrict self, pid_t min_pid);
+
+
+/* Try to acquire write-locks to all PID namespaces reachable from `self'
+ * Upon success, return `NULL'; else: return the blocking PID  namespace.
+ * @return: NULL: Success
+ * @return: * :   The blocking PID namespace. */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct pidns *
+NOTHROW(FCALL pidns_trywriteall)(struct pidns *__restrict self);
+/* Release write-locks from all PID namespaces reachable from `self' */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL pidns_endwriteall)(struct pidns *__restrict self);
+
+/* Insert a given `tpid' into the tree of `self'.
+ * The caller is responsible to:
+ *  - Assign `tpid->tp_pids[self->pn_ind].tps_pid'
+ *  - Ensure that `pidns_lookup_locked(self, tpid->tp_pids[self->pn_ind].tps_pid) == NULL'
+ *  - Be holding a lock to `self->pn_lock'
+ * This function is only responsible for doing the actual
+ * inserting of `tpid' into the LLRB-tree of `self',  and
+ * it's  the caller's responsibility to ensure that doing
+ * so actually makes sense! */
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL pidns_insertpid)(struct pidns *__restrict self,
+                               struct taskpid *__restrict tpid);
+
+/* Do the reverse of `pidns_insertpid()' and remove the PID
+ * descriptor associated with a given `pid' (which is  then
+ * returned).  In this sense, this function behaves similar
+ * to `pidns_lookup_locked', except that the taskpid object
+ * is also removed from the tree.
+ * When no taskpid is associated with `pid', return `NULL'. */
+FUNDEF NOBLOCK NONNULL((1)) struct taskpid *
+NOTHROW(FCALL pidns_removepid)(struct pidns *__restrict self, pid_t pid);
+
+/* Find the first (lowest) unused pid that is in [minpid,maxpid]
+ * If no such pid exists (or when `minpid > maxpid'), return `-1'. */
+FUNDEF WUNUSED NOBLOCK NONNULL((1)) pid_t
+NOTHROW(FCALL pidns_findpid)(struct pidns const *__restrict self,
+                             pid_t minpid, pid_t maxpid);
 
-/* Lookup a given `pid' within the specified PID namespace. */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct taskpid *
-(KCALL pidns_lookup)(struct pidns *__restrict self, upid_t pid)
-		THROWS(E_WOULDBLOCK, E_PROCESS_EXITED);
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *
-(KCALL pidns_lookup_task)(struct pidns *__restrict self, upid_t pid)
-		THROWS(E_WOULDBLOCK, E_PROCESS_EXITED);
-FUNDEF WUNUSED NONNULL((1)) REF struct taskpid *
-(KCALL pidns_trylookup)(struct pidns *__restrict self, upid_t pid)
-		THROWS(E_WOULDBLOCK);
-FUNDEF WUNUSED NONNULL((1)) REF struct task *
-(KCALL pidns_trylookup_task)(struct pidns *__restrict self, upid_t pid)
-		THROWS(E_WOULDBLOCK);
-FUNDEF WUNUSED NONNULL((1)) REF struct taskpid *
-NOTHROW(KCALL pidns_trylookup_locked)(struct pidns *__restrict self, upid_t pid);
-FUNDEF WUNUSED NONNULL((1)) REF struct task *
-NOTHROW(KCALL pidns_trylookup_task_locked)(struct pidns *__restrict self, upid_t pid);
-
-
-/* Allocate a `struct taskpid' for `self' (which must not have  been
- * started yet, or have its taskpid already allocated), and register
- * that task within the given pidns `ns'
- * WARNING: This function may only be called _ONCE_ for each task!
- * @param: ns_pid: The  PID  to  try to  assign  to `self'  within  the namespace.
- *                 When ZERO(0),  or already  in  use, sequentially  generate  IDs
- *                 Also note  that  this PID  is  only  set for  `self'  in  `ns'.
- *                 All underlying namespaces _always_ have their PIDs sequentially
- *                 generated.
- * @return: * : Always re-returns `self' */
-FUNDEF ATTR_RETNONNULL NONNULL((1, 2)) struct task *
-(KCALL task_setpid)(struct task *__restrict self,
-                    struct pidns *__restrict ns,
-                    upid_t ns_pid DFL(0))
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
-
-
-
-/* Initialize the `self' to be a member of the same process which `leader' is apart of.
- * NOTE: This function or `task_setprocess()' may only be called once for any given thread.
- *       Also  note  that  these  functions  must  _NOT_  be  called  for  kernel  threads!
- * NOTE: This function must be called _AFTER_ `task_setpid(self)' has already been invoked!
- * @return: true:  Successfully initialized `self' as a thread within the same process as `leader'
- * @return: false: The process that `leader' is apart of has already terminated. */
-FUNDEF NONNULL((1, 2)) bool
-(KCALL task_setthread)(struct task *__restrict self,
-                       struct task *__restrict leader)
-		THROWS(E_WOULDBLOCK);
-
-/* Initialize the `self' to be the leader of a new process, using `parent' as leader.
- * When   `parent'   is   `NULL',   initialize   `self'   as   a   detached  process.
- * @param: parent:  The parent of the process
- * @param: group:   A thread  apart  of  some process  group  that  `self' should  be  apart  of.
- *                  When `NULL' or equal to `self', initialize `self' as a its own process group.
- *                  In  this case, the process group will be  set to be apart of the session that
- *                  the given `session' is  apart of, or  `self' in case  `session' is `NULL'  or
- *                  equal to `self'.
- * @param: session: Some thread apart of the a session that a new process group should be made
- *                  apart of.
- * NOTE: This function or `task_setthread()' may only be called once for any given thread.
- *       Also note  that  these  functions  must  _NOT_  be  called  for  kernel  threads!
- * NOTE: This function must be called _AFTER_ `task_setpid(self)' has already been invoked! */
-FUNDEF ATTR_RETNONNULL NONNULL((1)) struct task *
-(KCALL task_setprocess)(struct task *__restrict self,
-                        struct task *parent DFL(__NULLPTR),
-                        struct task *group DFL(__NULLPTR),
-                        struct task *session DFL(__NULLPTR))
-		THROWS(E_WOULDBLOCK);
-
-
-
-
-#ifdef __cplusplus
-extern "C++" {
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) upid_t
-NOTHROW(KCALL taskpid_getpid)(struct taskpid const *__restrict self) {
-	return taskpid_getpid(self, THIS_PIDNS);
-}
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) upid_t
-NOTHROW(KCALL taskpid_getpid_s)(struct taskpid const *__restrict self) {
-	return taskpid_getpid_s(self, THIS_PIDNS);
-}
-} /* extern "C++" */
-#endif /* __cplusplus */
-
-#ifndef __INTELLISENSE__
-
-/* Return the PID of `self' within the given PID namespace. */
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1, 2)) upid_t
-NOTHROW(KCALL taskpid_getpid)(struct taskpid const *__restrict self,
-                              struct pidns const *__restrict ns) {
-	__hybrid_assert(self->tp_pidns->pn_indirection >= ns->pn_indirection);
-	return self->tp_pids[ns->pn_indirection];
-}
-
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1, 2)) upid_t
-NOTHROW(KCALL taskpid_getpid_s)(struct taskpid const *__restrict self,
-                                struct pidns const *__restrict ns) {
-	if likely(self->tp_pidns->pn_indirection >= ns->pn_indirection)
-		return self->tp_pids[ns->pn_indirection];
-	return 0;
-}
-
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) upid_t
-NOTHROW(KCALL taskpid_getselfpid)(struct taskpid const *__restrict self) {
-	return taskpid_getpid(self, self->tp_pidns);
-}
-
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) upid_t
-NOTHROW(KCALL taskpid_getselfpid_s)(struct taskpid const *__restrict self) {
-	return taskpid_getpid_s(self, self->tp_pidns);
-}
-
-
-/* Return the PID of `self' within the root PID namespace. */
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) upid_t
-NOTHROW(KCALL taskpid_getrootpid)(struct taskpid const *__restrict self) {
-	return self->tp_pids[0];
-}
-
-/* Check if the given task was orphaned (no longer has a parent process) */
-LOCAL ATTR_PURE WUNUSED bool
-NOTHROW(KCALL task_isorphan)(void) {
-	struct taskpid *proc = task_getprocesspid();
-	return __hybrid_atomic_load(proc->tp_siblings.le_prev, __ATOMIC_ACQUIRE) == __NULLPTR;
-}
-
-LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool
-NOTHROW(KCALL task_isorphan_p)(struct task *__restrict thread) {
-	struct taskpid *proc = task_getprocesspid_of(thread);
-	return __hybrid_atomic_load(proc->tp_siblings.le_prev, __ATOMIC_ACQUIRE) == __NULLPTR;
-}
-
-LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool
-NOTHROW(KCALL taskpid_isorphan_p)(struct taskpid *__restrict self) {
-	return __hybrid_atomic_load(self->tp_siblings.le_prev, __ATOMIC_ACQUIRE) == __NULLPTR;
-}
-
-LOCAL WUNUSED REF struct task *KCALL
-task_getprocessparent(void) THROWS(E_WOULDBLOCK) {
-	REF struct task *result;
-	struct task *proc = task_getprocess();
-	sync_read(&FORTASK(proc, this_taskgroup).tg_proc_parent_lock);
-	result = FORTASK(proc, this_taskgroup).tg_proc_parent;
-	if (result && !tryincref(result))
-		result = __NULLPTR;
-	sync_endread(&FORTASK(proc, this_taskgroup).tg_proc_parent_lock);
-	return result;
-}
-
-LOCAL WUNUSED NONNULL((1)) REF struct task *KCALL
-task_getprocessparent_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
-	REF struct task *result;
-	struct task *proc = task_getprocess_of(thread);
-	sync_read(&FORTASK(proc, this_taskgroup).tg_proc_parent_lock);
-	result = FORTASK(proc, this_taskgroup).tg_proc_parent;
-	if (result && !tryincref(result))
-		result = __NULLPTR;
-	sync_endread(&FORTASK(proc, this_taskgroup).tg_proc_parent_lock);
-	return result;
-}
-
-LOCAL WUNUSED REF struct task *
-NOTHROW(KCALL task_getprocessparent_nx)(void) {
-	REF struct task *result;
-	struct task *proc = task_getprocess();
-	if unlikely(!sync_read_nx(&FORTASK(proc, this_taskgroup).tg_proc_parent_lock))
-		return __NULLPTR;
-	result = FORTASK(proc, this_taskgroup).tg_proc_parent;
-	if (result && !tryincref(result))
-		result = __NULLPTR;
-	sync_endread(&FORTASK(proc, this_taskgroup).tg_proc_parent_lock);
-	return result;
-}
-
-LOCAL WUNUSED NONNULL((1)) REF struct task *
-NOTHROW(KCALL task_getprocessparent_of_nx)(struct task *__restrict thread) {
-	REF struct task *result;
-	struct task *proc = task_getprocess_of(thread);
-	if unlikely(!sync_read_nx(&FORTASK(proc, this_taskgroup).tg_proc_parent_lock))
-		return __NULLPTR;
-	result = FORTASK(proc, this_taskgroup).tg_proc_parent;
-	if (result && !tryincref(result))
-		result = __NULLPTR;
-	sync_endread(&FORTASK(proc, this_taskgroup).tg_proc_parent_lock);
-	return result;
-}
-
-LOCAL WUNUSED NONNULL((1)) struct task *
-NOTHROW(KCALL task_getprocessparentptr_of)(struct task *__restrict thread) {
-	struct task *proc = task_getprocess_of(thread);
-	return __hybrid_atomic_load(FORTASK(proc, this_taskgroup).tg_proc_parent, __ATOMIC_ACQUIRE);
-}
-
-LOCAL WUNUSED REF struct taskpid *KCALL
-task_getprocessparentpid(void) THROWS(E_WOULDBLOCK) {
-	REF struct taskpid *result;
-	REF struct task *result_thread;
-	result_thread = task_getprocessparent();
-	if unlikely(!result_thread)
-		return __NULLPTR;
-	result = incref(FORTASK(result_thread, this_taskpid));
-	decref_unlikely(result_thread);
-	return result;
-}
-
-LOCAL WUNUSED NONNULL((1)) REF struct taskpid *KCALL
-task_getprocessparentpid_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
-	REF struct taskpid *result;
-	REF struct task *result_thread;
-	result_thread = task_getprocessparent_of(thread);
-	if unlikely(!result_thread)
-		return __NULLPTR;
-	result = incref(FORTASK(result_thread, this_taskpid));
-	decref_unlikely(result_thread);
-	return result;
-}
-
-LOCAL WUNUSED REF struct taskpid *
-NOTHROW(KCALL task_getprocessparentpid_nx)(void) {
-	REF struct taskpid *result;
-	REF struct task *result_thread;
-	result_thread = task_getprocessparent_nx();
-	if unlikely(!result_thread)
-		return __NULLPTR;
-	result = incref(FORTASK(result_thread, this_taskpid));
-	decref_unlikely(result_thread);
-	return result;
-}
-
-LOCAL WUNUSED NONNULL((1)) REF struct taskpid *
-NOTHROW(KCALL task_getprocessparentpid_of_nx)(struct task *__restrict thread) {
-	REF struct taskpid *result;
-	REF struct task *result_thread;
-	result_thread = task_getprocessparent_of_nx(thread);
-	if unlikely(!result_thread)
-		return __NULLPTR;
-	result = incref(FORTASK(result_thread, this_taskpid));
-	decref_unlikely(result_thread);
-	return result;
-}
-
-
-
-
-LOCAL ATTR_RETNONNULL WUNUSED REF struct taskpid *KCALL
-task_getprocessgroupleaderpid(void) THROWS(E_WOULDBLOCK) {
-	REF struct taskpid *result;
-	struct task *proc = task_getprocess();
-	sync_read(&FORTASK(proc, this_taskgroup).tg_proc_group_lock);
-	result = incref(FORTASK(proc, this_taskgroup).tg_proc_group);
-	sync_endread(&FORTASK(proc, this_taskgroup).tg_proc_group_lock);
-	return result;
-}
-
-LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct taskpid *KCALL
-task_getprocessgroupleaderpid_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
-	REF struct taskpid *result;
-	struct task *proc = task_getprocess_of(thread);
-	sync_read(&FORTASK(proc, this_taskgroup).tg_proc_group_lock);
-	result = incref(FORTASK(proc, this_taskgroup).tg_proc_group);
-	sync_endread(&FORTASK(proc, this_taskgroup).tg_proc_group_lock);
-	return result;
-}
-
-LOCAL WUNUSED REF struct taskpid *
-NOTHROW(KCALL task_getprocessgroupleaderpid_nx)(void) {
-	REF struct taskpid *result;
-	struct task *proc = task_getprocess();
-	if unlikely(!sync_read_nx(&FORTASK(proc, this_taskgroup).tg_proc_group_lock))
-		return __NULLPTR;
-	result = incref(FORTASK(proc, this_taskgroup).tg_proc_group);
-	sync_endread(&FORTASK(proc, this_taskgroup).tg_proc_group_lock);
-	return result;
-}
-
-LOCAL WUNUSED NONNULL((1)) REF struct taskpid *
-NOTHROW(KCALL task_getprocessgroupleaderpid_of_nx)(struct task *__restrict thread) {
-	REF struct taskpid *result;
-	struct task *proc = task_getprocess_of(thread);
-	if unlikely(!sync_read_nx(&FORTASK(proc, this_taskgroup).tg_proc_group_lock))
-		return __NULLPTR;
-	result = incref(FORTASK(proc, this_taskgroup).tg_proc_group);
-	sync_endread(&FORTASK(proc, this_taskgroup).tg_proc_group_lock);
-	return result;
-}
-
-LOCAL WUNUSED REF struct task *KCALL
-task_getprocessgroupleader(void) THROWS(E_WOULDBLOCK) {
-	REF struct task *result;
-	REF struct taskpid *tpid;
-	tpid   = task_getprocessgroupleaderpid();
-	result = taskpid_gettask(tpid);
-	decref_unlikely(tpid);
-	return result;
-}
-
-LOCAL ATTR_RETNONNULL WUNUSED REF struct task *KCALL
-task_getprocessgroupleader_srch(void) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED) {
-	REF struct task *result;
-	REF struct taskpid *tpid;
-	tpid = task_getprocessgroupleaderpid();
-	FINALLY_DECREF_UNLIKELY(tpid);
-	result = taskpid_gettask_srch(tpid);
-	return result;
-}
-
-LOCAL WUNUSED NONNULL((1)) REF struct task *KCALL
-task_getprocessgroupleader_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
-	REF struct task *result;
-	REF struct taskpid *tpid;
-	tpid   = task_getprocessgroupleaderpid_of(thread);
-	result = taskpid_gettask(tpid);
-	decref_unlikely(tpid);
-	return result;
-}
-
-LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *KCALL
-task_getprocessgroupleader_srch_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED) {
-	REF struct task *result;
-	REF struct taskpid *tpid;
-	tpid = task_getprocessgroupleaderpid_of(thread);
-	FINALLY_DECREF_UNLIKELY(tpid);
-	result = taskpid_gettask_srch(tpid);
-	return result;
-}
-
-LOCAL WUNUSED REF struct task *
-NOTHROW(KCALL task_getprocessgroupleader_nx)(void) {
-	REF struct task *result;
-	REF struct taskpid *tpid;
-	tpid = task_getprocessgroupleaderpid_nx();
-	if unlikely(!tpid)
-		return __NULLPTR;
-	result = taskpid_gettask(tpid);
-	decref_unlikely(tpid);
-	return result;
-}
-
-LOCAL WUNUSED NONNULL((1)) REF struct task *
-NOTHROW(KCALL task_getprocessgroupleader_of_nx)(struct task *__restrict thread) {
-	REF struct task *result;
-	REF struct taskpid *tpid;
-	tpid = task_getprocessgroupleaderpid_of_nx(thread);
-	if unlikely(!tpid)
-		return __NULLPTR;
-	result = taskpid_gettask(tpid);
-	decref_unlikely(tpid);
-	return result;
-}
-
-
-
-
-LOCAL ATTR_RETNONNULL WUNUSED REF struct taskpid *KCALL
-task_getsessionleaderpid(void) THROWS(E_WOULDBLOCK) {
-	REF struct taskpid *result;
-	REF struct task *grp;
-	result = task_getprocessgroupleaderpid();
-	grp    = taskpid_gettask(result);
-	if likely(grp) {
-		FINALLY_DECREF_UNLIKELY(grp);
-		decref_unlikely(result);
-		sync_read(&FORTASK(grp, this_taskgroup).tg_pgrp_session_lock);
-		result = incref(FORTASK(grp, this_taskgroup).tg_pgrp_session);
-		sync_endread(&FORTASK(grp, this_taskgroup).tg_pgrp_session_lock);
-	}
-	return result;
-}
-
-LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct taskpid *KCALL
-task_getsessionleaderpid_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
-	REF struct taskpid *result;
-	REF struct task *grp;
-	result = task_getprocessgroupleaderpid_of(thread);
-	grp    = taskpid_gettask(result);
-	if likely(grp) {
-		FINALLY_DECREF_UNLIKELY(grp);
-		decref_unlikely(result);
-		sync_read(&FORTASK(grp, this_taskgroup).tg_pgrp_session_lock);
-		result = incref(FORTASK(grp, this_taskgroup).tg_pgrp_session);
-		sync_endread(&FORTASK(grp, this_taskgroup).tg_pgrp_session_lock);
-	}
-	return result;
-}
-
-LOCAL WUNUSED REF struct taskpid *
-NOTHROW(KCALL task_getsessionleaderpid_nx)(void) {
-	REF struct taskpid *result;
-	result = task_getprocessgroupleaderpid_nx();
-	if likely(result) {
-		REF struct task *grp;
-		grp = taskpid_gettask(result);
-		if likely(grp) {
-			decref_unlikely(result);
-			if unlikely(!sync_read_nx(&FORTASK(grp, this_taskgroup).tg_pgrp_session_lock)) {
-				decref_unlikely(grp);
-				return __NULLPTR;
-			}
-			result = incref(FORTASK(grp, this_taskgroup).tg_pgrp_session);
-			sync_endread(&FORTASK(grp, this_taskgroup).tg_pgrp_session_lock);
-			decref_unlikely(grp);
-		}
-	}
-	return result;
-}
-
-LOCAL WUNUSED NONNULL((1)) REF struct taskpid *
-NOTHROW(KCALL task_getsessionleaderpid_of_nx)(struct task *__restrict thread) {
-	REF struct taskpid *result;
-	result = task_getprocessgroupleaderpid_of_nx(thread);
-	if likely(result) {
-		REF struct task *grp;
-		grp = taskpid_gettask(result);
-		if likely(grp) {
-			decref_unlikely(result);
-			if unlikely(!sync_read_nx(&FORTASK(grp, this_taskgroup).tg_pgrp_session_lock)) {
-				decref_unlikely(grp);
-				return __NULLPTR;
-			}
-			result = incref(FORTASK(grp, this_taskgroup).tg_pgrp_session);
-			sync_endread(&FORTASK(grp, this_taskgroup).tg_pgrp_session_lock);
-			decref_unlikely(grp);
-		}
-	}
-	return result;
-}
-
-LOCAL WUNUSED REF struct task *KCALL
-task_getsessionleader(void) THROWS(E_WOULDBLOCK) {
-	REF struct task *result;
-	REF struct taskpid *tpid;
-	tpid = task_getsessionleaderpid();
-	result = taskpid_gettask(tpid);
-	decref_unlikely(tpid);
-	return result;
-}
-
-LOCAL WUNUSED REF struct task *KCALL
-task_getsessionleader_srch(void) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED) {
-	REF struct task *result;
-	REF struct taskpid *tpid;
-	tpid = task_getsessionleaderpid();
-	FINALLY_DECREF_UNLIKELY(tpid);
-	result = taskpid_gettask_srch(tpid);
-	return result;
-}
-
-LOCAL WUNUSED NONNULL((1)) REF struct task *KCALL
-task_getsessionleader_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
-	REF struct task *result;
-	REF struct taskpid *tpid;
-	tpid = task_getsessionleaderpid_of(thread);
-	result = taskpid_gettask(tpid);
-	decref_unlikely(tpid);
-	return result;
-}
-
-LOCAL WUNUSED NONNULL((1)) REF struct task *KCALL
-task_getsessionleader_srch_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED) {
-	REF struct task *result;
-	REF struct taskpid *tpid;
-	tpid = task_getsessionleaderpid_of(thread);
-	FINALLY_DECREF_UNLIKELY(tpid);
-	result = taskpid_gettask_srch(tpid);
-	return result;
-}
-
-LOCAL WUNUSED REF struct task *
-NOTHROW(KCALL task_getsessionleader_nx)(void) {
-	REF struct task *result;
-	REF struct taskpid *tpid;
-	tpid = task_getsessionleaderpid_nx();
-	if unlikely(!tpid)
-		return __NULLPTR;
-	result = taskpid_gettask(tpid);
-	decref_unlikely(tpid);
-	return result;
-}
-
-LOCAL WUNUSED NONNULL((1)) REF struct task *
-NOTHROW(KCALL task_getsessionleader_of_nx)(struct task *__restrict thread) {
-	REF struct task *result;
-	REF struct taskpid *tpid;
-	tpid = task_getsessionleaderpid_of_nx(thread);
-	if unlikely(!tpid)
-		return __NULLPTR;
-	result = taskpid_gettask(tpid);
-	decref_unlikely(tpid);
-	return result;
-}
-
-
-
-
-
-LOCAL ATTR_CONST WUNUSED bool
-NOTHROW(KCALL task_isprocessleader)(void) {
-	struct task *me = THIS_TASK;
-	return FORTASK(me, this_taskgroup.tg_process) == me;
-}
-
-LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool
-NOTHROW(KCALL task_isprocessleader_p)(struct task const *__restrict thread) {
-	return FORTASK(thread, this_taskgroup.tg_process) == thread;
-}
-
-
-LOCAL ATTR_PURE WUNUSED bool
-NOTHROW(KCALL task_isprocessgroupleader)(void) {
-	struct task *me = THIS_TASK;
-	return FORTASK(me, this_taskgroup.tg_proc_group) == FORTASK(me, this_taskpid);
-}
-
-LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool
-NOTHROW(KCALL task_isprocessgroupleader_p)(struct task const *__restrict thread) {
-	return __hybrid_atomic_load(FORTASK(thread, this_taskgroup.tg_proc_group), __ATOMIC_ACQUIRE) ==
-	       FORTASK(thread, this_taskpid);
-}
-
-LOCAL ATTR_PURE WUNUSED bool
-NOTHROW(KCALL task_issessionleader)(void) {
-	struct task *me = THIS_TASK;
-	struct taskpid *mypid = FORTASK(me, this_taskpid);
-	return FORTASK(me, this_taskgroup.tg_proc_group) == mypid &&
-	       FORTASK(me, this_taskgroup.tg_pgrp_session) == mypid;
-}
-
-LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool
-NOTHROW(KCALL task_issessionleader_p)(struct task const *__restrict thread) {
-	return task_isprocessgroupleader_p(thread) &&
-	       __hybrid_atomic_load(FORTASK(thread, this_taskgroup.tg_pgrp_session), __ATOMIC_ACQUIRE) ==
-	       FORTASK(thread, this_taskpid);
-}
-
-LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t
-NOTHROW(KCALL task_gettid)(void) {
-	struct taskpid *pid = THIS_TASKPID;
-	__hybrid_assertf(pid, "task_gettid() called by a kernel thread");
-	return pid->tp_pids[pid->tp_pidns->pn_indirection];
-}
-
-LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t
-NOTHROW(KCALL task_gettid_s)(void) {
-	struct taskpid *pid = THIS_TASKPID;
-	return likely(pid) ? pid->tp_pids[pid->tp_pidns->pn_indirection] : 0;
-}
-
-LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t
-NOTHROW(KCALL task_getroottid)(void) {
-	struct taskpid *pid = THIS_TASKPID;
-	__hybrid_assertf(pid, "task_getroottid() called by a kernel thread");
-	return pid->tp_pids[0];
-}
-
-LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t
-NOTHROW(KCALL task_getroottid_s)(void) {
-	struct taskpid *pid = THIS_TASKPID;
-	return likely(pid) ? pid->tp_pids[0] : 0;
-}
-
-LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t
-NOTHROW(KCALL task_getpid)(void) {
-	struct taskpid *pid;
-	struct task *leader = task_getprocess();
-	__hybrid_assertf(leader, "task_getpid() called by a kernel thread");
-	pid = FORTASK(leader, this_taskpid);
-	__hybrid_assertf(pid, "task_getpid() called by a thread within a kernel process");
-	return pid->tp_pids[pid->tp_pidns->pn_indirection];
-}
-
-LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t
-NOTHROW(KCALL task_getpid_s)(void) {
-	struct taskpid *pid;
-	struct task *leader = task_getprocess();
-	if unlikely(!leader)
-		return 0;
-	pid = FORTASK(leader, this_taskpid);
-	return likely(pid) ? pid->tp_pids[pid->tp_pidns->pn_indirection] : 0;
-}
-
-LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t
-NOTHROW(KCALL task_getrootpid)(void) {
-	struct taskpid *pid;
-	struct task *leader = task_getprocess();
-	__hybrid_assertf(leader, "task_getrootpid() called by a kernel thread");
-	pid = FORTASK(leader, this_taskpid);
-	__hybrid_assertf(pid, "task_getrootpid() called by a thread within a kernel process");
-	return pid->tp_pids[0];
-}
-
-LOCAL NOBLOCK ATTR_PURE WUNUSED upid_t
-NOTHROW(KCALL task_getrootpid_s)(void) {
-	struct taskpid *pid;
-	struct task *leader = task_getprocess();
-	if unlikely(!leader)
-		return 0;
-	pid = FORTASK(leader, this_taskpid);
-	return likely(pid) ? pid->tp_pids[0] : 0;
-}
-
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
-NOTHROW(KCALL task_gettid_of)(struct task const *__restrict thread) {
-	struct taskpid *pid   = FORTASK(thread, this_taskpid);
-	struct taskpid *mypid = THIS_TASKPID;
-	__hybrid_assertf(pid, "task_gettid_of(%p) is a kernel thread", thread);
-	__hybrid_assertf(mypid, "task_gettid_of(%p) called from a kernel thread", thread);
-	__hybrid_assertf(mypid->tp_pidns->pn_indirection <= pid->tp_pidns->pn_indirection,
-	                 "task_gettid_of(%p) PID cannot be represented in the caller's namespace", thread);
-	return pid->tp_pids[mypid->tp_pidns->pn_indirection];
-}
-
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
-NOTHROW(KCALL task_getselftid_of)(struct task const *__restrict thread) {
-	struct taskpid *pid = FORTASK(thread, this_taskpid);
-	__hybrid_assertf(pid, "task_getselftid_of(%p) is a kernel thread", thread);
-	__hybrid_assertf(pid->tp_pidns->pn_indirection <= pid->tp_pidns->pn_indirection,
-	                 "task_getselftid_of(%p) PID cannot be represented in the caller's namespace", thread);
-	return pid->tp_pids[pid->tp_pidns->pn_indirection];
-}
-
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
-NOTHROW(KCALL task_gettid_of_s)(struct task const *__restrict thread) {
-	struct taskpid *pid   = FORTASK(thread, this_taskpid);
-	struct taskpid *mypid = THIS_TASKPID;
-	return likely(pid && mypid && mypid->tp_pidns->pn_indirection <= pid->tp_pidns->pn_indirection)
-	       ? pid->tp_pids[mypid->tp_pidns->pn_indirection]
-	       : 0;
-}
-
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
-NOTHROW(KCALL task_getselftid_of_s)(struct task const *__restrict thread) {
-	struct taskpid *pid = FORTASK(thread, this_taskpid);
-	return likely(pid && pid->tp_pidns->pn_indirection <= pid->tp_pidns->pn_indirection)
-	       ? pid->tp_pids[pid->tp_pidns->pn_indirection]
-	       : 0;
-}
-
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
-NOTHROW(KCALL task_getroottid_of)(struct task const *__restrict thread) {
-	struct taskpid *pid = FORTASK(thread, this_taskpid);
-	__hybrid_assertf(pid, "task_getroottid_of(%p) is a kernel thread", thread);
-	return pid->tp_pids[0];
-}
-
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
-NOTHROW(KCALL task_getroottid_of_s)(struct task const *__restrict thread) {
-	struct taskpid *pid = FORTASK(thread, this_taskpid);
-	return likely(pid) ? pid->tp_pids[0] : 0;
-}
-
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
-NOTHROW(KCALL task_getpid_of)(struct task const *__restrict thread) {
-	struct taskpid *pid;
-	struct taskpid *mypid = THIS_TASKPID;
-	struct task *leader   = task_getprocess_of(thread);
-	__hybrid_assertf(leader, "task_getpid_of(%p) is a kernel thread", thread);
-	__hybrid_assertf(mypid, "task_getpid_of(%p) called from a kernel thread", thread);
-	pid = FORTASK(leader, this_taskpid);
-	__hybrid_assertf(pid, "task_getpid_of(%p) is a thread within a kernel process", thread);
-	__hybrid_assertf(mypid->tp_pidns->pn_indirection <= pid->tp_pidns->pn_indirection,
-	                 "task_getpid_of(%p) PID cannot be represented in the caller's namespace", thread);
-	return pid->tp_pids[mypid->tp_pidns->pn_indirection];
-}
-
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
-NOTHROW(KCALL task_getselfpid_of)(struct task const *__restrict thread) {
-	struct taskpid *pid;
-	struct task *leader = task_getprocess_of(thread);
-	__hybrid_assertf(leader, "task_getselfpid_of(%p) is a kernel thread", thread);
-	pid = FORTASK(leader, this_taskpid);
-	__hybrid_assertf(pid, "task_getselfpid_of(%p) is a thread within a kernel process", thread);
-	__hybrid_assertf(pid->tp_pidns->pn_indirection <= pid->tp_pidns->pn_indirection,
-	                 "task_getselfpid_of(%p) PID cannot be represented in the caller's namespace", thread);
-	return pid->tp_pids[pid->tp_pidns->pn_indirection];
-}
-
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
-NOTHROW(KCALL task_getpid_of_s)(struct task const *__restrict thread) {
-	struct taskpid *pid;
-	struct task *leader   = task_getprocess_of(thread);
-	struct taskpid *mypid = THIS_TASKPID;
-	if unlikely(!leader || !mypid)
-		return 0;
-	pid = FORTASK(leader, this_taskpid);
-	return likely(pid && mypid->tp_pidns->pn_indirection <= pid->tp_pidns->pn_indirection)
-	       ? pid->tp_pids[mypid->tp_pidns->pn_indirection]
-	       : 0;
-}
-
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
-NOTHROW(KCALL task_getselfpid_of_s)(struct task const *__restrict thread) {
-	struct taskpid *pid;
-	struct task *leader = task_getprocess_of(thread);
-	if unlikely(!leader)
-		return 0;
-	pid = FORTASK(leader, this_taskpid);
-	return likely(pid && pid->tp_pidns->pn_indirection <= pid->tp_pidns->pn_indirection)
-	       ? pid->tp_pids[pid->tp_pidns->pn_indirection]
-	       : 0;
-}
-
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
-NOTHROW(KCALL task_getrootpid_of)(struct task const *__restrict thread) {
-	struct taskpid *pid;
-	struct task *leader = task_getprocess_of(thread);
-	__hybrid_assertf(leader, "task_getrootpid_of(%p) is a kernel thread", thread);
-	pid = FORTASK(leader, this_taskpid);
-	__hybrid_assertf(pid, "task_getrootpid_of(%p) is a thread within a kernel process", thread);
-	return pid->tp_pids[0];
-}
-
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
-NOTHROW(KCALL task_getrootpid_of_s)(struct task const *__restrict thread) {
-	struct taskpid *pid;
-	struct task *leader = task_getprocess_of(thread);
-	if unlikely(!leader)
-		return 0;
-	pid = FORTASK(leader, this_taskpid);
-	return likely(pid) ? pid->tp_pids[0] : 0;
-}
-
-#endif /* !__INTELLISENSE__ */
-
-#endif /* __CC__ */
 
 DECL_END
-
-#ifdef GUARD_KERNEL_INCLUDE_DEV_TTY_H
-#ifndef GUARD_KERNEL_INCLUDE_SCHED_PID_CTTY_H
-#include <sched/pid-ctty.h>
-#endif /* !GUARD_KERNEL_INCLUDE_SCHED_PID_CTTY_H */
-#endif /* GUARD_KERNEL_INCLUDE_DEV_TTY_H */
-
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_PID_H */

@@ -38,7 +38,7 @@
 #include <kernel/user.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc-internal.h>
 #include <sched/signal.h>
@@ -656,9 +656,23 @@ again_release_kernel_and_cc:
 		 *    to die right  now, can we  say for certain  that we're allowed  to
 		 *    create  a  new  thread, rather  than  do something  else,  such as
 		 *    handling a signal. */
+#undef HAVE_FIXED_CLONE
+#if 0
+#define HAVE_FIXED_CLONE
+		{
+			/* Figure out which PID namespace(s) the new thread should appear in. */
+			REF struct pidns *result_pidns;
+			result_pidns = FORTASK(caller, this_taskpid)->tp_pidns;
+			if (clone_flags & CLONE_NEWPID) {
+				result_pidns = pidns_alloc(result_pidns);
+			} else {
+				result_pidns = incref(result_pidns);
+			}
+			FINALLY_DECREF_UNLIKELY(result_pidns);
+			/* TODO */
 
-		/* TODO */
-
+		}
+#endif
 	} EXCEPT {
 		/* Cleanup on error. */
 #if defined(__i386__) || defined(__x86_64__)
@@ -698,7 +712,7 @@ again_release_kernel_and_cc:
 	 * The  only thing that's still left to do is to start it (and in
 	 * the case of vfork(): wait for it to exit(2) or exec(2)). */
 	TRY {
-#if 1 /* TODO: Remove me */
+#ifndef HAVE_FIXED_CLONE
 		/* Allocate the PID descriptor for the new thread. */
 		if (clone_flags & CLONE_NEWPID) {
 			REF struct pidns *ns;
@@ -752,7 +766,7 @@ again_release_kernel_and_cc:
 		 */
 		if (clone_flags & CLONE_PARENT_SETTID)
 			ATOMIC_WRITE(*parent_tidptr, task_gettid_of(result));
-#endif
+#endif /* !HAVE_FIXED_CLONE */
 
 		/* Deal with vfork() */
 		if (clone_flags & CLONE_VFORK) {

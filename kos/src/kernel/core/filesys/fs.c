@@ -76,8 +76,8 @@ PUBLIC struct fs fs_kernel = {
  * it  is OK for this pointer to change  outside the context of any FS operation,
  * such as a top-level system call.
  *
- * NOTE: Initialized to NULL. - Must be initialized before the task is started. */
-PUBLIC ATTR_PERTASK REF struct fs *this_fs = NULL;
+ * NOTE: Initialize changed to `NULL' in `kernel_initialize_scheduler_after_smp()' */
+PUBLIC ATTR_PERTASK REF struct fs *this_fs = &fs_kernel;
 
 DEFINE_PERTASK_FINI(fini_this_fs);
 INTERN NOBLOCK NONNULL((1)) void

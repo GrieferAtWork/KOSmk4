@@ -47,7 +47,7 @@
 #include <kernel/x86/idt.h> /* IDT_CONFIG_ISTRAP() */
 #include <kernel/x86/phys2virt64.h>
 #include <sched/cpu.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/task.h>
 #include <sched/userkern.h>
 #include <sched/x86/iobm.h>

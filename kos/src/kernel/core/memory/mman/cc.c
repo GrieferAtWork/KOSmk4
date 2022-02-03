@@ -335,7 +335,7 @@ NOTHROW(FCALL system_cc_vfs_recent_paths_unload)(struct vfs *__restrict self,
                                                  struct ccinfo *__restrict info) {
 	struct path_slist deadpaths;
 	struct path *iter;
-	if (vfs_recentlock_tryacquire(self)) {
+	if (!vfs_recentlock_tryacquire(self)) {
 		if (ccinfo_noblock(info))
 			return;
 		if (!vfs_recentlock_acquire_nx(self))

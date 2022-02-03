@@ -24,7 +24,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/fpu.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/task.h>
 
 #include <hybrid/unaligned.h>
@@ -77,7 +77,7 @@ NOTHROW(FCALL GDB_SetSingleStep)(struct task *__restrict thread,
 	          "%" PRIuN(__SIZEOF_PID_T__) "), "
 	          "%s) (was: %s)\n",
 	          thread,
-	          task_getrootpid_of_s(thread),
+	          task_getrootpid_of(thread),
 	          task_getroottid_of_s(thread),
 	          (new_flags & EFLAGS_TF) ? "true" : "false",
 	          (flags & EFLAGS_TF) ? "true" : "false");

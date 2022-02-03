@@ -59,8 +59,6 @@ INTDEF FREE void NOTHROW(KCALL kernel_initialize_ide_driver)(void);
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_fat_driver)(void);
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_rootfs)(void);
 
-INTDEF FREE void NOTHROW(KCALL kernel_initialize_bootpid)(void);
-
 #ifdef CONFIG_SELFTEST
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_selftest)(void);
 #endif /* CONFIG_SELFTEST */

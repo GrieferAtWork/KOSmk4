@@ -613,6 +613,7 @@ SECTIONS {
 #ifndef __x86_64__
 	PROVIDE_HIDDEN(bootcpu_thiscpu_x86_tss = ABSOLUTE(bootcpu + thiscpu_x86_tss));
 #endif /* !__x86_64__ */
+	PROVIDE_HIDDEN(bootidle_pid = ABSOLUTE(bootcpu + thiscpu_idle_pid));
 
 #ifndef __x86_64__
 #ifndef CONFIG_NO_PAGING_P32

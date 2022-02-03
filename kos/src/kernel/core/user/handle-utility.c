@@ -47,7 +47,7 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/atomic64.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>

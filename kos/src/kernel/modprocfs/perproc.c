@@ -39,7 +39,7 @@ DECL_END
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/user.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 
 #include <kos/ioctl/task.h>
 #include <kos/kernel/handle.h>

@@ -17,14 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_SCHED_PID_CTTY_H
-#define GUARD_KERNEL_INCLUDE_SCHED_PID_CTTY_H 1
+#ifndef GUARD_KERNEL_INCLUDE_SCHED_GROUP_CTTY_H
+#define GUARD_KERNEL_INCLUDE_SCHED_GROUP_CTTY_H 1
 
 #include <kernel/compiler.h>
 
-#ifndef GUARD_KERNEL_INCLUDE_SCHED_PID_H
-#include <sched/pid.h>
-#endif /* !GUARD_KERNEL_INCLUDE_SCHED_PID_H */
+#ifndef GUARD_KERNEL_INCLUDE_SCHED_GROUP_H
+#include <sched/group.h>
+#endif /* !GUARD_KERNEL_INCLUDE_SCHED_GROUP_H */
 #ifndef GUARD_KERNEL_INCLUDE_DEV_TTY_H
 #include <dev/tty.h>
 #endif /* !GUARD_KERNEL_INCLUDE_DEV_TTY_H */
@@ -101,4 +101,4 @@ NOTHROW(KCALL task_getctty_of_nx)(struct task *__restrict thread) {
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_SCHED_PID_CTTY_H */
+#endif /* !GUARD_KERNEL_INCLUDE_SCHED_GROUP_CTTY_H */

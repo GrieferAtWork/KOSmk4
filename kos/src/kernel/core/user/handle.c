@@ -42,7 +42,7 @@
 #include <kernel/user.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -439,10 +439,11 @@ DEFINE_DBG_BZERO_IF(THIS_HANDLE_MANAGER != NULL,
                     sizeof(handle_manager_kernel.hm_lock));
 
 
-/* [1..1][lock(PRIVATE(THIS_TASK))] Handle manager of the calling thread. */
-PUBLIC ATTR_PERTASK struct handle_manager *this_handle_manager = NULL;
+/* [1..1][lock(PRIVATE(THIS_TASK))] Handle manager of the calling thread.
+ * NOTE: Initialize changed to `NULL' in `kernel_initialize_scheduler_after_smp()' */
+PUBLIC ATTR_PERTASK struct handle_manager *this_handle_manager = &handle_manager_kernel;
 DEFINE_PERTASK_FINI(fini_this_handle_manager);
-INTERN NOBLOCK void
+INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL fini_this_handle_manager)(struct task *__restrict self) {
 	xdecref(FORTASK(self, this_handle_manager));
 }

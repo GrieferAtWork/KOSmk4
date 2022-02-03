@@ -41,7 +41,7 @@
 #include <kernel/x86/idt.h>
 #include <kernel/x86/syscall-tables.h>
 #include <sched/cpu.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc.h>
 #include <sched/task.h>

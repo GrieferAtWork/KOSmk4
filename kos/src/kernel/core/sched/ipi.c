@@ -27,7 +27,7 @@
 #include <kernel/mman.h>
 #include <kernel/printk.h>
 #include <sched/cpu.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
 #include <sched/scheduler.h>

@@ -35,7 +35,7 @@
 #include <kernel/printk.h>
 #include <kernel/syslog.h>
 #include <sched/cpu.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -362,7 +362,7 @@ NOTHROW(FCALL GDBEncode_IntptrAsHex)(char *buf, intptr_t v) {
 LOCAL ATTR_PURE intptr_t
 NOTHROW(FCALL GDBThread_GetPID)(struct task const *__restrict thread) {
 	intptr_t pid, tid;
-	pid = (intptr_t)task_getrootpid_of_s(thread);
+	pid = (intptr_t)task_getrootpid_of(thread);
 	tid = (intptr_t)task_getroottid_of_s(thread);
 	if unlikely(!pid || !tid)
 		pid = GDB_KERNEL_PID; /* Kernel thread. */
@@ -372,7 +372,7 @@ NOTHROW(FCALL GDBThread_GetPID)(struct task const *__restrict thread) {
 LOCAL ATTR_PURE intptr_t
 NOTHROW(FCALL GDBThread_GetTID)(struct task const *__restrict thread) {
 	intptr_t pid, tid;
-	pid = (intptr_t)task_getrootpid_of_s(thread);
+	pid = (intptr_t)task_getrootpid_of(thread);
 	tid = (intptr_t)task_getroottid_of_s(thread);
 	if unlikely(!pid || !tid)
 		tid = GDB_KERNEL_TID(thread); /* Kernel thread. */
@@ -382,7 +382,7 @@ NOTHROW(FCALL GDBThread_GetTID)(struct task const *__restrict thread) {
 INTERN char *
 NOTHROW(FCALL GDBThread_EncodeThreadID)(char *buf, struct task const *__restrict thread) {
 	intptr_t pid, tid;
-	pid = (intptr_t)task_getrootpid_of_s(thread);
+	pid = (intptr_t)task_getrootpid_of(thread);
 	tid = (intptr_t)task_getroottid_of_s(thread);
 	if unlikely(!pid || !tid) {
 		/* Kernel thread. */
@@ -454,11 +454,11 @@ NOTHROW(FCALL GDBThread_DoLookupPID)(intptr_t pid) {
 	if (pid == GDB_KERNEL_PID)
 		return incref(&bootidle);
 	if (GDBThread_IsAllStopModeActive)
-		return pidns_trylookup_task_locked(&pidns_root, (upid_t)pid);
+		return pidns_lookuptask_locked(&pidns_root, (upid_t)pid);
 	/* FIXME: What if one of the suspended threads is holding the PIDNS  lock?
 	 *        We should have some kind of timeout here, and switch to all-stop
 	 *        mode if the timeout expires. */
-	return pidns_trylookup_task(&pidns_root, (upid_t)pid);
+	return pidns_lookuptask(&pidns_root, (upid_t)pid);
 }
 
 PRIVATE WUNUSED REF struct task *
@@ -466,11 +466,11 @@ NOTHROW(FCALL GDBThread_DoLookupTID)(intptr_t tid) {
 	if (tid == 0) /* Any thread */
 		return incref(GDB_CurrentThread_general.ts_thread);
 	if (GDBThread_IsAllStopModeActive)
-		return pidns_trylookup_task_locked(&pidns_root, (upid_t)tid);
+		return pidns_lookuptask_locked(&pidns_root, (upid_t)tid);
 	/* FIXME: What if one of the suspended threads is holding the PIDNS  lock?
 	 *        We should have some kind of timeout here, and switch to all-stop
 	 *        mode if the timeout expires. */
-	return pidns_trylookup_task(&pidns_root, (upid_t)tid);
+	return pidns_lookuptask(&pidns_root, (upid_t)tid);
 }
 
 /* Decode a thread ID, filling in `*result'.

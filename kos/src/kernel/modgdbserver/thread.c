@@ -29,7 +29,7 @@
 #include <kernel/fpu.h> /* CONFIG_FPU */
 #include <kernel/printk.h>
 #include <sched/cpu.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/rpc.h>
 #include <sched/scheduler.h>
 #include <sched/signal.h>
@@ -143,7 +143,7 @@ NOTHROW(FCALL GDBThread_StopRPCImpl)(uintptr_t flags,
 	          "[flags=%#" PRIxPTR "]\n",
 	          (flags & GDBTHREAD_STOPRPCIMPL_F_STOPCPU) ? "cpu" : "thread",
 	          stop_event.e.tse_thread,
-	          task_getrootpid_of_s(stop_event.e.tse_thread),
+	          task_getrootpid_of(stop_event.e.tse_thread),
 	          task_getroottid_of_s(stop_event.e.tse_thread),
 	          flags);
 	sig_init(&stop_event.e.tse_sigresume);
@@ -381,7 +381,7 @@ NOTHROW(FCALL GDBThread_ResumeSingleStopEvent)(GDBThreadStopEvent *__restrict se
 	          "%" PRIuN(__SIZEOF_PID_T__) ")\n",
 	          self->tse_isacpu ? "cpu" : "thread",
 	          self->tse_thread,
-	          task_getrootpid_of_s(self->tse_thread),
+	          task_getrootpid_of(self->tse_thread),
 	          task_getroottid_of_s(self->tse_thread));
 	assert(self->tse_mayresume == GDB_THREAD_MAYRESUME_NASYNC);
 	COMPILER_BARRIER();
@@ -531,7 +531,7 @@ NOTHROW(FCALL GDBThread_StopWithAsyncNotificationIPI)(struct icpustate *__restri
 	          "%" PRIuN(__SIZEOF_PID_T__) ") "
 	          "[async-altcpu]\n",
 	          thread,
-	          task_getrootpid_of_s(thread),
+	          task_getrootpid_of(thread),
 	          task_getroottid_of_s(thread));
 	/* Very important: Set  the  HIGH_PRIORITY flag,  thus ensuring
 	 *                 that we immediately switch over to `thread',
@@ -643,7 +643,7 @@ NOTHROW(FCALL GDBThread_CreateMissingAsyncStopNotification)(struct task *__restr
 			          "%" PRIuN(__SIZEOF_PID_T__) ") "
 			          "[async]\n",
 			          thread,
-			          task_getrootpid_of_s(thread),
+			          task_getrootpid_of(thread),
 			          task_getroottid_of_s(thread));
 			/* Very important: Set  the  HIGH_PRIORITY flag,  thus ensuring
 			 *                 that we immediately switch over to `thread',
@@ -715,7 +715,7 @@ NOTHROW(FCALL GDBThread_Stop)(struct task *__restrict thread,
 	          "%" PRIuN(__SIZEOF_PID_T__) "."
 	          "%" PRIuN(__SIZEOF_PID_T__) ")\n",
 	          thread,
-	          task_getrootpid_of_s(thread),
+	          task_getrootpid_of(thread),
 	          task_getroottid_of_s(thread));
 	if (!task_rpc_exec(thread,
 	                   RPC_CONTEXT_KERN |
@@ -829,7 +829,7 @@ INTERN NONNULL((1)) void
 NOTHROW(FCALL GDBThread_ResumeProcess)(struct task *__restrict thread) {
 	GDBThreadStopEvent **piter, *iter;
 	GDB_DEBUG("[gdb] GDBThread_ResumeProcess(%p(%u))\n",
-	          thread, task_getrootpid_of_s(thread));
+	          thread, task_getrootpid_of(thread));
 	piter = &GDBThread_Stopped;
 	if (GDBThread_IsKernelThread(thread)) {
 again_piter_kern:
@@ -986,7 +986,7 @@ INTERN NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL GDBThread_IsKernelThread)(struct task const *__restrict thread) {
 	if (task_getroottid_of_s(thread) == 0)
 		return true;
-	if (task_getrootpid_of_s(thread) == 0)
+	if (task_getrootpid_of(thread) == 0)
 		return true;
 	return false;
 }

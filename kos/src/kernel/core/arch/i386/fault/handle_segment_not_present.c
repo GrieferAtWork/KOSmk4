@@ -34,7 +34,7 @@
 #include <kernel/x86/fault.h>
 #include <kernel/x86/gdt.h>
 #include <kernel/x86/idt.h> /* IDT_CONFIG_ISTRAP() */
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/task-clone.h>
 #include <sched/task.h>
 

@@ -45,6 +45,7 @@
 #include <sched/async.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
+#include <sched/group.h>
 #include <sched/scheduler.h>
 #include <sched/task-clone.h>
 #include <sched/task.h>
@@ -84,7 +85,7 @@ struct task task_header = {
 	.t_refcnt     = 1,
 	.t_flags      = TASK_FNORMAL,
 	.t_cpu        = &bootcpu,
-	.t_mman       = &mman_kernel,
+	.t_mman       = &mman_kernel, /* NOTE: Initialize changed to `NULL' in `kernel_initialize_scheduler_after_smp()' */
 	.t_mman_tasks = LIST_ENTRY_UNBOUND_INITIALIZER,
 	.t_heapsz     = (size_t)__kernel_pertask_size,
 	{ .t_state = NULL }
@@ -107,7 +108,7 @@ PUBLIC ATTR_PERTASK struct mpart this_kernel_stackpart_ = {
 	MPART_INIT_mp_refcnt(1),
 	MPART_INIT_mp_flags(MPART_F_NOSPLIT | MPART_F_NOMERGE |
 	                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK),
-	MPART_INIT_mp_state(MPART_ST_MEM),
+	MPART_INIT_mp_state(MPART_ST_MEM), /* NOTE: Initialize changed to `MPART_ST_VOID' in `kernel_initialize_scheduler_after_smp()' */
 	MPART_INIT_mp_file(&mfile_zero),
 	MPART_INIT_mp_copy(LIST_HEAD_INITIALIZER(this_kernel_stackpart_.mp_copy)),
 	MPART_INIT_mp_share({ &this_kernel_stacknode_ }),
@@ -210,9 +211,23 @@ NOTHROW(KCALL kernel_initialize_scheduler_after_smp)(void) {
 	task_template = (struct task *)__kernel_pertask_start;
 	assert(task_template->t_mman == &mman_kernel);
 	assert(FORTASK(task_template, this_kernel_stackpart_).mp_state = MPART_ST_MEM);
+	assert(FORTASK(task_template, this_fs) == &fs_kernel);
+	assert(FORTASK(task_template, this_handle_manager) == &handle_manager_kernel);
+	assert(FORTASK(task_template, this_taskgroup).tg_process == &bootidle);
 	task_template->t_mman                                   = NULL;
 	FORTASK(task_template, this_kernel_stackpart_).mp_state = MPART_ST_VOID;
+	FORTASK(task_template, this_fs)                         = NULL;
+	FORTASK(task_template, this_handle_manager)             = NULL;
+	FORTASK(task_template, this_taskgroup).tg_process       = NULL;
+#ifndef CONFIG_EVERYONE_IS_ROOT
+	assert(FORTASK(task_template, this_cred) == &cred_kernel);
+	FORTASK(task_template, this_cred) = NULL;
+#endif /* !CONFIG_EVERYONE_IS_ROOT */
 }
+
+INTDEF struct taskpid boottask_pid;
+INTDEF struct taskpid bootidle_pid;
+INTDEF struct taskpid asyncwork_pid;
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_scheduler)(void) {
@@ -247,12 +262,20 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	DEFINE_PUBLIC_SYMBOL(thiscpu_state, offsetof(struct cpu, c_state), sizeof(u16));
 	DEFINE_PUBLIC_SYMBOL(thismman_pagedir_p, offsetof(struct mman, mm_pagedir_p), sizeof(physaddr_t));
 
-	assert(boottask.t_refcnt == 1);
-	assert(bootidle.t_refcnt == 1);
-	assert(asyncwork.t_refcnt == 1);
+	/* Apply relocations to static threads. */
 	_task_init_relocations(&boottask);
 	_task_init_relocations(&bootidle);
 	_task_init_relocations(&asyncwork);
+
+	/* Fill in task PID pointers. */
+	FORTASK(&boottask, this_taskpid)  = &boottask_pid;
+	FORTASK(&bootidle, this_taskpid)  = &bootidle_pid;
+	FORTASK(&asyncwork, this_taskpid) = &asyncwork_pid;
+
+	/* Special handling for boottask (which will become /bin/init) */
+	FORTASK(&boottask, this_taskgroup).tg_process      = &boottask;     /* The boottask is its own process. */
+	FORTASK(&boottask, this_taskgroup).tg_proc_group   = &boottask_pid; /* the boot task is a process group */
+	FORTASK(&boottask, this_taskgroup).tg_pgrp_session = &boottask_pid; /* the boot task is a session */
 
 	/* Figure out where to put the initial trampolines for boottask and bootidle */
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
@@ -304,19 +327,10 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 #undef STP
 #undef STN
 
-	FORTASK(&boottask, this_fs) = &fs_kernel;
-	FORTASK(&bootidle, this_fs) = &fs_kernel;
-#ifndef CONFIG_EVERYONE_IS_ROOT
-	FORTASK(&boottask, this_cred) = &cred_kernel;
-	FORTASK(&bootidle, this_cred) = &cred_kernel;
-#endif /* !CONFIG_EVERYONE_IS_ROOT */
-	FORTASK(&boottask, this_handle_manager) = &handle_manager_kernel;
-	FORTASK(&bootidle, this_handle_manager) = &handle_manager_kernel;
-
 	/* The stack of IDLE threads is executable in order to allow for hacking around .free restrictions. */
 	FORTASK(&bootidle, this_kernel_stacknode_).mn_flags = (MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD |
-	                                                        MNODE_F_SHARED | MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
-	                                                        _MNODE_F_MPREPARED_KERNEL);
+	                                                       MNODE_F_SHARED | MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
+	                                                       _MNODE_F_MPREPARED_KERNEL);
 
 	mman_kernel.mm_threads.lh_first = &boottask;
 	boottask.t_mman_tasks.le_prev   = &mman_kernel.mm_threads.lh_first;

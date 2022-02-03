@@ -31,7 +31,7 @@
 #include <kernel/rt/except-handler.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
@@ -306,7 +306,7 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 	COMPILER_WRITE_BARRIER();
 
 	/* Lookup the target thread. */
-	target = pidns_lookup_task(THIS_PIDNS, (upid_t)target_tid);
+	target = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)target_tid);
 	{
 		FINALLY_DECREF_UNLIKELY(target);
 

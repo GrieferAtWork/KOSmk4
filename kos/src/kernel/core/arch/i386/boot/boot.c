@@ -304,9 +304,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Make the kernel's .text and .rodata sections read-only. */
 	x86_initialize_mman_kernel_rdonly();
 
-	/* Initialize the PID sub-system for the boot task. */
-	kernel_initialize_bootpid();
-
 	/* Copy the kernel commandline into high memory. */
 	x86_initialize_commandline_himem();
 

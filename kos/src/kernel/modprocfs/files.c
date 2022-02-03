@@ -50,7 +50,7 @@
 #include <kernel/user.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/scheduler.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
@@ -156,7 +156,7 @@ INTERN WUNUSED NONNULL((1)) size_t KCALL
 procfs_self_printer(struct flnknode *__restrict UNUSED(self),
                     USER CHECKED /*utf-8*/ char *buf, size_t bufsize)
 		THROWS(E_SEGFAULT, ...) {
-	return snprintf(buf, bufsize, "%" PRIuN(__SIZEOF_PID_T__), task_getpid_s());
+	return snprintf(buf, bufsize, "%" PRIuN(__SIZEOF_PID_T__), task_getpid());
 }
 
 
@@ -169,7 +169,7 @@ procfs_threadself_printer(struct flnknode *__restrict UNUSED(self),
 		THROWS(E_SEGFAULT, ...) {
 	return snprintf(buf, bufsize, "%" PRIuN(__SIZEOF_PID_T__) "/task/"
 	                              "%" PRIuN(__SIZEOF_PID_T__),
-	                task_getpid_s(), task_gettid_s());
+	                task_getpid(), task_gettid());
 }
 
 
@@ -226,7 +226,7 @@ INTERN WUNUSED NONNULL((1)) size_t KCALL
 procfs_mounts_printer(struct flnknode *__restrict UNUSED(self),
                       USER CHECKED /*utf-8*/ char *buf, size_t bufsize)
 		THROWS(E_SEGFAULT, ...) {
-	return snprintf(buf, bufsize, "%" PRIuN(__SIZEOF_PID_T__) "/mounts", task_getpid_s());
+	return snprintf(buf, bufsize, "%" PRIuN(__SIZEOF_PID_T__) "/mounts", task_getpid());
 }
 
 

@@ -3281,8 +3281,7 @@ NOTHROW_NCX(LIBCCALL libc_pclose)(FILE *stream)
 	/* Destroy the file stream object. */
 	decref(stream);
 
-	/* Return the wait status. (yes: status; not exit-code. Though when
-	 * the program terminated via `exit(2)', wait-status == exit-code). */
+	/* Return the wait status (yes: status; not exit-code). */
 	return result;
 }
 /*[[[end:libc_pclose]]]*/

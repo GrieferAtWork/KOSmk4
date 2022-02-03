@@ -34,7 +34,7 @@
 #include <kernel/syscall.h>
 #include <sched/cred.h>
 #include <sched/pertask.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 
 #include <compat/config.h>
 #include <kos/bits/ukern-struct.h>

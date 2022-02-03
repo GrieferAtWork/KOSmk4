@@ -38,7 +38,7 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc.h>
 #include <sched/tsc.h>
@@ -2475,7 +2475,7 @@ PRIVATE ATTR_RETNONNULL WUNUSED REF struct task *KCALL
 kcmp_get_thread_from_pid(pid_t pid) {
 	REF struct task *result;
 	/* Lookup the thread in question */
-	result = pidns_lookup_task(THIS_PIDNS, (upid_t)pid);
+	result = pidns_lookuptask_srch(THIS_PIDNS, (upid_t)pid);
 	TRY {
 		/* Make sure that the caller is allowed to inspect `thread' */
 		kcmp_require_inspect_process(result);

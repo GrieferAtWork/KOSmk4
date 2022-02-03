@@ -42,7 +42,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <sched/async.h>
 #include <sched/cpu.h>
 #include <sched/enum.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/scheduler.h>
 #include <sched/task.h>
 
@@ -96,7 +96,7 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 			++len;
 		}
 	}
-	pid = task_getrootpid_of_s(thread);
+	pid = task_getrootpid_of(thread);
 	len = dbg_printf(DBGSTR(" %u"), pid);
 	dbg_loadcolor();
 	while (len < 4) {
@@ -205,27 +205,6 @@ DBG_COMMAND(lsthread,
 
 
 
-PUBLIC ATTR_DBGTEXT struct taskpid *
-NOTHROW(KCALL lookup_taskpid)(upid_t pid) {
-	REF struct taskpid *result;
-	uintptr_t i, perturb;
-	i = perturb = pid & pidns_root.pn_mask;
-	for (;; PIDNS_HASHNXT(i, perturb)) {
-		result = pidns_root.pn_list[i & pidns_root.pn_mask].pe_pid;
-		if (result == PIDNS_ENTRY_DELETED)
-			continue;
-		if unlikely(!result)
-			break;
-		if (result->tp_pids[pidns_root.pn_indirection] != pid)
-			continue;
-		/* Found it! (check if it's dead...) */
-		if (wasdestroyed(result))
-			continue;
-		break;
-	}
-	return result;
-}
-
 
 PRIVATE ATTR_DBGTEXT bool FCALL
 evalthreadexpr(char *expr, struct task **presult) {
@@ -239,7 +218,7 @@ evalthreadexpr(char *expr, struct task **presult) {
 		pidno = strtoul(p, &p, 0);
 		if (*p != 0)
 			break;
-		pid = lookup_taskpid(pidno);
+		pid = pidns_lookup_locked(&pidns_root, (pid_t)pidno);
 		if (!pid || !awref_ptr(&pid->tp_thread)) {
 			dbg_printf(DBGSTR("Error: Invalid PID %lu\n"), pidno);
 			break;
@@ -266,6 +245,26 @@ evalthreadexpr(char *expr, struct task **presult) {
 }
 
 
+PRIVATE NONNULL((1, 2, 3, 4)) void FCALL
+enumerate_thread_tids(char buf[], char const *__restrict format,
+                      struct taskpid *__restrict tpid,
+                      dbg_autocomplete_cb_t cb, void *arg) {
+	size_t len;
+again:
+	len = sprintf(buf, format, taskpid_getrootpidno(tpid));
+	(*cb)(arg, buf, len);
+	if (tpid->tp_pids[0].tps_link.rb_lhs) {
+		if (tpid->tp_pids[0].tps_link.rb_rhs)
+			enumerate_thread_tids(buf, format, tpid->tp_pids[0].tps_link.rb_rhs, cb, arg);
+		tpid = tpid->tp_pids[0].tps_link.rb_lhs;
+		goto again;
+	}
+	if (tpid->tp_pids[0].tps_link.rb_rhs) {
+		tpid = tpid->tp_pids[0].tps_link.rb_rhs;
+		goto again;
+	}
+}
+
 DBG_AUTOCOMPLETE(thread,
                  /*size_t*/ argc, /*char **/ argv /*[]*/,
                  /*dbg_autocomplete_cb_t*/ cb, /*void **/arg,
@@ -281,9 +280,7 @@ DBG_AUTOCOMPLETE(thread,
 			                   COMPILER_LENOF("p0x" PRIMAXxN(__SIZEOF_PID_T__)),
 			                   COMPILER_LENOF("p0X" PRIMAXXN(__SIZEOF_PID_T__)),
 			                   COMPILER_LENOF("p0b" PRIMAXbN(__SIZEOF_PID_T__)))];
-			size_t pidtextlen;
 			char const *format = DBGSTR("p%lu");
-			uintptr_t i;
 			if (starts_with_len >= 2 && starts_with[1] == '0') {
 				format = DBGSTR("p0%" PRIoN(__SIZEOF_PID_T__));
 				if (starts_with_len >= 3) {
@@ -303,15 +300,8 @@ DBG_AUTOCOMPLETE(thread,
 					}
 				}
 			}
-			for (i = 0; i <= pidns_root.pn_mask; ++i) {
-				struct taskpid *ent;
-				ent = pidns_root.pn_list[i].pe_pid;
-				if (!ent || ent == PIDNS_ENTRY_DELETED || wasdestroyed(ent))
-					continue;
-				pidtextlen = sprintf(pidtext, format,
-				                     ent->tp_pids[pidns_root.pn_indirection]);
-				(*cb)(arg, pidtext, pidtextlen);
-			}
+			if likely(pidns_root.pn_tree != NULL)
+				enumerate_thread_tids(pidtext, format, pidns_root.pn_tree, cb, arg);
 			return;
 		}
 	}

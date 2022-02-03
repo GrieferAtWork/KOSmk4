@@ -31,7 +31,7 @@
 #include <kernel/printk.h>
 #include <kernel/types.h>
 #include <kernel/x86/cpuid.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>

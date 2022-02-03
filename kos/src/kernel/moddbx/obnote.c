@@ -59,7 +59,7 @@
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/mman/ramfile.h>
 #include <sched/cpu.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/scheduler.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
@@ -171,7 +171,7 @@ NOTHROW(KCALL note_task)(pformatprinter printer, void *arg,
 				exec_namelen = 16;
 			readmem(exec_name, exec_namelen * sizeof(char));
 		}
-		pid = task_getrootpid_of_s(thread);
+		pid = task_getrootpid_of(thread);
 		tid = task_getroottid_of_s(thread);
 	} EXCEPT {
 		goto badobj;
@@ -234,7 +234,7 @@ NOTHROW(KCALL note_taskpid)(pformatprinter printer, void *arg,
 		}
 		if (expected_indirection != ind)
 			goto badobj;
-		tid = thread->tp_pids[ind];
+		tid = _taskpid_slot_getpidno(thread->tp_pids[ind]);
 	} EXCEPT {
 		goto badobj;
 	}

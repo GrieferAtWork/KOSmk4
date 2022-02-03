@@ -67,18 +67,21 @@ struct dtls_extension {
 
 DECL_END
 
-#define RBTREE_LEFT_LEANING   /* Use left-leaning trees */
-#define RBTREE_NOTHROW        NOTHROW
-#define RBTREE(name)          dtls_extension_tree_##name
-#define RBTREE_T              struct dtls_extension
-#define RBTREE_Tkey           DlModule *
-#define RBTREE_NODEPATH       te_tree
-#define RBTREE_GETKEY         dtls_extension_getmodule
-#define RBTREE_ISRED(self)    ((self)->te_redblack & 1)
-#define RBTREE_SETRED(self)   ((self)->te_redblack |= 1)
-#define RBTREE_SETBLACK(self) ((self)->te_redblack &= ~1)
-#define RBTREE_KEY_LO(a, b)   ((uintptr_t)(a) < (uintptr_t)(b))
-#define RBTREE_KEY_EQ(a, b)   ((uintptr_t)(a) == (uintptr_t)(b))
+#define RBTREE_LEFT_LEANING    /* Use left-leaning trees */
+#define RBTREE_NOTHROW         NOTHROW
+#define RBTREE(name)           dtls_extension_tree_##name
+#define RBTREE_T               struct dtls_extension
+#define RBTREE_Tkey            DlModule *
+#define RBTREE_NODEPATH        te_tree
+#define RBTREE_GETKEY          dtls_extension_getmodule
+#define RBTREE_ISRED(self)     ((self)->te_redblack & 1)
+#define RBTREE_SETRED(self)    ((self)->te_redblack |= 1)
+#define RBTREE_SETBLACK(self)  ((self)->te_redblack &= ~1)
+#define RBTREE_FLIPCOLOR(self) ((self)->te_redblack ^= 1)
+#define RBTREE_COPYCOLOR(dst, src) \
+	((dst)->te_redblack = ((dst)->te_redblack & ~1) | ((src)->te_redblack & 1))
+#define RBTREE_KEY_LO(a, b) ((uintptr_t)(a) < (uintptr_t)(b))
+#define RBTREE_KEY_EQ(a, b) ((uintptr_t)(a) == (uintptr_t)(b))
 #include <hybrid/sequence/rbtree-abi.h>
 
 DECL_BEGIN

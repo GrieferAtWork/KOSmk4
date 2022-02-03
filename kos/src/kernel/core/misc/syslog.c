@@ -42,7 +42,7 @@
 #include <kernel/syslog.h>
 #include <kernel/types.h>
 #include <sched/cpu.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -607,7 +607,7 @@ set_timestamp_and_write_data:
 			if likely(ADDR_ISKERN(mypid) && mypid != NULL)
 #endif /* !KERNELSPACE_HIGHMEM */
 			{
-				self->sp_tid = (s32)(u32)mypid->tp_pids[0];
+				self->sp_tid = taskpid_getrootpidno(mypid);
 			} else {
 				self->sp_tid = 0;
 			}

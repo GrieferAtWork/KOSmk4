@@ -328,7 +328,7 @@ again_free_node_ptr:
 		newnode->tn_visit = oldnode->tn_visit;
 		newnode->tn_kind  = TRACE_NODE_KIND_BITSET;
 		newnode->tn_flags = oldnode->tn_flags;
-		newnode->tn_tid   = task_getroottid_s();
+		newnode->tn_tid   = task_getroottid();
 
 		/* Split the bitset of oldnode between it, and newnode */
 		{
@@ -488,7 +488,7 @@ NOTHROW(KCALL kmalloc_trace_nx)(void *base, size_t num_bytes,
 	node->tn_visit       = 0;
 	node->tn_kind        = TRACE_NODE_KIND_USER;
 	node->tn_flags       = TRACE_NODE_FLAG_FROM_GFP(gfp);
-	node->tn_tid         = task_getroottid_s();
+	node->tn_tid         = task_getroottid();
 	{
 		struct lcpustate cs;
 		lcpustate_current(&cs);

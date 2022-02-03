@@ -40,7 +40,7 @@ gcc_opt.removeif([](x) -> x.startswith("-O")); // TODO: Why are optimizations di
 #include <kernel/malloc.h>
 #include <sched/async.h>
 #include <sched/cred.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/tsc.h>
 
 #include <hybrid/align.h>

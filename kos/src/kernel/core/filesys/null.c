@@ -35,7 +35,7 @@
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
 #include <kernel/syslog.h>
-#include <sched/pid-ctty.h>
+#include <sched/group-ctty.h>
 #include <sched/tsc.h>
 
 #include <hybrid/atomic.h>

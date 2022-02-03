@@ -23,6 +23,7 @@
 //#define DEFINE_IO_WRITE 1
 #endif /* __INTELLISENSE__ */
 
+#include <sched/task.h>
 #include <kos/except/reason/illop.h>
 
 #if (defined(DEFINE_IO_READ) + defined(DEFINE_IO_WRITE)) != 1
@@ -153,7 +154,7 @@ userkern_segment_writeq(struct vioargs *__restrict args,
 		else {
 			unsigned int error;
 			REF struct task *group;
-			group = pidns_lookup_task(THIS_PIDNS, value);
+			group = pidns_lookuptask_srch(THIS_PIDNS, value);
 			{
 				FINALLY_DECREF_UNLIKELY(group);
 				error = task_setprocessgroupleader(caller, group);
@@ -178,9 +179,9 @@ userkern_segment_writeq(struct vioargs *__restrict args,
 #else /* DEFINE_IO_READ */
 		struct task *caller;
 		caller = THIS_TASK;
-		if (value != 0 &&
-		    value != task_gettid_of(THIS_TASK) &&
-		    value != task_getpid_of(THIS_TASK))
+		if (value != (VALUE_TYPE)0 &&
+		    value != (VALUE_TYPE)task_gettid_of(caller) &&
+		    value != (VALUE_TYPE)task_getpid_of(caller))
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_USERKERN_SID,
 			      value);
@@ -193,34 +194,34 @@ userkern_segment_writeq(struct vioargs *__restrict args,
 	}	break;
 
 	case offsetof(USERKERN_STRUCT, uk_uid):
-		IFELSE_RW(result = cred_getruid(),
-		          cred_setruid(value));
+		IFELSE_RW(result = (VALUE_TYPE)cred_getruid(),
+		          cred_setruid((uid_t)value));
 		break;
 
 	case offsetof(USERKERN_STRUCT, uk_gid):
-		IFELSE_RW(result = cred_getrgid(),
-		          cred_setrgid(value));
+		IFELSE_RW(result = (VALUE_TYPE)cred_getrgid(),
+		          cred_setrgid((gid_t)value));
 		break;
 
 	case offsetof(USERKERN_STRUCT, uk_euid):
-		IFELSE_RW(result = cred_geteuid(),
-		          cred_seteuid(value));
+		IFELSE_RW(result = (VALUE_TYPE)cred_geteuid(),
+		          cred_seteuid((uid_t)value));
 		break;
 
 
 	case offsetof(USERKERN_STRUCT, uk_egid):
-		IFELSE_RW(result = cred_getegid(),
-		          cred_setegid(value));
+		IFELSE_RW(result = (VALUE_TYPE)cred_getegid(),
+		          cred_setegid((gid_t)value));
 		break;
 
 	case offsetof(USERKERN_STRUCT, uk_suid):
-		IFELSE_RW(result = cred_getsuid(),
-		          cred_setsuid(value));
+		IFELSE_RW(result = (VALUE_TYPE)cred_getsuid(),
+		          cred_setsuid((uid_t)value));
 		break;
 
 	case offsetof(USERKERN_STRUCT, uk_sgid):
-		IFELSE_RW(result = cred_getsgid(),
-		          cred_setsgid(value));
+		IFELSE_RW(result = (VALUE_TYPE)cred_getsgid(),
+		          cred_setsgid((gid_t)value));
 		break;
 
 	default:

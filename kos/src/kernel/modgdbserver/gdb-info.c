@@ -32,7 +32,7 @@
 #include <kernel/mman/driver.h>
 #include <kernel/mman/execinfo.h>
 #include <kernel/uname.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/scheduler.h>
 #include <sched/task.h>
 
@@ -72,7 +72,7 @@ NOTHROW(FCALL GDBInfo_PrintThreadName)(pformatprinter printer, void *arg,
 	result = GDBInfo_PrintThreadExecFile(printer, arg, thread, true);
 	if unlikely(result < 0)
 		goto done;
-	pid = task_getrootpid_of_s(thread);
+	pid = task_getrootpid_of(thread);
 	tid = task_getroottid_of_s(thread);
 	PRINT(" (");
 	if (pid && tid && pid != tid)
@@ -122,7 +122,7 @@ NOTHROW(FCALL GDBInfo_PrintThreadExecFile)(pformatprinter printer, void *arg,
 	REF struct mman *v;
 	REF struct fdirent *dent;
 	REF struct path            *path;
-	if (task_getrootpid_of_s(thread) == 0 ||
+	if (task_getrootpid_of(thread) == 0 ||
 	    task_getroottid_of_s(thread) == 0)
 		return GDBInfo_PrintKernelFilename(printer, arg, filename_only);
 	v = task_getmman(thread);
@@ -398,7 +398,7 @@ NOTHROW(FCALL GDBInfo_PrintProcessList_Callback)(void *closure,
 		goto done;
 	printer = ((struct GDBInfo_PrintThreadList_Data *)closure)->ptld_printer;
 	arg     = ((struct GDBInfo_PrintThreadList_Data *)closure)->ptld_arg;
-	pid = task_getrootpid_of_s(thread);
+	pid = task_getrootpid_of(thread);
 	PRINTF("<item>"
 	       "<column name=\"pid\">%" PRIx32 "</column>"
 	       "<column name=\"user\">root</column>"
@@ -562,7 +562,7 @@ NOTHROW(FCALL GDBInfo_PrintFdList_Callback)(void *closure,
 		goto done;
 	printer = ((struct GDBInfo_PrintThreadList_Data *)closure)->ptld_printer;
 	arg     = ((struct GDBInfo_PrintThreadList_Data *)closure)->ptld_arg;
-	pid     = task_getrootpid_of_s(thread);
+	pid     = task_getrootpid_of(thread);
 	hman    = task_gethandlemanager(thread);
 	if (!GDBThread_IsAllStopModeActive) {
 		/* FIXME: What  if one  of the suspended  threads is holding  the VM lock?
@@ -652,7 +652,7 @@ NOTHROW(FCALL GDBInfo_PrintOSThreadList_Callback)(void *closure,
 	ssize_t temp, result = 0;
 	pformatprinter printer; void *arg;
 	intptr_t pid, tid;
-	pid = (intptr_t)task_getrootpid_of_s(thread);
+	pid = (intptr_t)task_getrootpid_of(thread);
 	tid = (intptr_t)task_getroottid_of_s(thread);
 	if unlikely(!pid || !tid) {
 		pid = GDB_KERNEL_PID; /* Kernel thread. */

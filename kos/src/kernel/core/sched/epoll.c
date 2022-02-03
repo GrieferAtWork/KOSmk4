@@ -60,7 +60,7 @@
 #ifdef CONFIG_HAVE_EPOLL_RPC
 #include <kernel/compat.h> /* __ARCH_HAVE_COMPAT, syscall_iscompat() */
 #include <kernel/mman.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #endif /* CONFIG_HAVE_EPOLL_RPC */
 
 DECL_BEGIN
@@ -1888,7 +1888,7 @@ epoll_create_rpc_monitor(struct epoll_controller *__restrict self,
 		}
 
 		/* Lookup the target thread. */
-		rpc->emr_target = pidns_lookup(THIS_PIDNS, (upid_t)target_tid);
+		rpc->emr_target = pidns_lookup_srch(THIS_PIDNS, (upid_t)target_tid);
 	} EXCEPT {
 		pending_rpc_free(&rpc->emr_rpc);
 		RETHROW();

@@ -38,7 +38,7 @@
 #include <sched/arch/task.h>
 #include <sched/cpu.h>
 #include <sched/enum.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>

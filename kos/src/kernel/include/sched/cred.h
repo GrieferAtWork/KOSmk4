@@ -383,8 +383,7 @@ FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct cred *FCALL
 cred_clone(struct cred *__restrict self) THROWS(E_BADALLOC);
 
 /* [1..1][lock(read(THIS_TASK || INTERN(lock)), write(THIS_TASK && INTERN(lock)))]
- * Per-thread credentials controller.
- * NOTE: Initialized to NULL. - Must be initialized before the task is started. */
+ * Per-thread credentials controller. */
 DATDEF ATTR_PERTASK REF struct cred *this_cred;
 #define THIS_CRED PERTASK_GET(this_cred)
 

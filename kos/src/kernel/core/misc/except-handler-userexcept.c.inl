@@ -24,7 +24,7 @@
 //#define DEFINE_userexcept_sysret
 #endif /* __INTELLISENSE__ */
 
-#include <sched/pid.h>
+#include <sched/group.h>
 
 #include <stdalign.h>
 

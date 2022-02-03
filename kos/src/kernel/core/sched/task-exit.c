@@ -31,7 +31,7 @@
 #include <kernel/printk.h>
 #include <kernel/rt/except-syscall.h>
 #include <sched/cpu.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
 #include <sched/scheduler.h>
@@ -154,8 +154,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	}
 
 	/* Fill in the exit status */
-	if (pid)
-		ATOMIC_WRITE(pid->tp_status.w_status, w_status);
+	ATOMIC_WRITE(pid->tp_status, w_status);
 
 	/* Set the bit to indicate that we've started termination. */
 	if (!(ATOMIC_FETCHOR(caller->t_flags, TASK_FTERMINATING) & TASK_FTERMINATING)) {
@@ -167,7 +166,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 		 * no longer able to find the thread apart of thread listings.
 		 *
 		 * s.a. /kos/misc/gdbridge/gdbride.dee */
-		if (kernel_debugtrap_enabled() && pid) {
+		if (kernel_debugtrap_enabled()) {
 			struct debugtrap_reason reason;
 			reason.dtr_reason = task_isprocessleader_p(caller)
 			                    ? DEBUGTRAP_REASON_PEXITED
@@ -274,13 +273,12 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	 * has been set,  the thread's  pid's `tp_status' field  contains its  final exit  status.
 	 * Thus, the  terminate-flag  acts  as  an  interlocked check  for  the  exit  status  and
 	 * waiting for the status to change during thread exit. */
-	if (pid) {
-		/* Important! Must broadcast the change while impersonating `next'!
-		 *
-		 * Our current thread context is already too broken to allow us to
-		 * re-schedule  others threads that may be waiting for us to exit. */
-		sig_broadcast_as_nopr(&pid->tp_changed, next);
-	}
+
+	/* Important! Must broadcast the change while impersonating `next'!
+	 *
+	 * Our current thread context is already too broken to allow us to
+	 * re-schedule  others threads that may be waiting for us to exit. */
+	sig_broadcast_as_nopr(&pid->tp_changed, next);
 
 	/* Good bye... */
 	cpu_run_current_nopr();

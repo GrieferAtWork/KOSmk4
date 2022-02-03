@@ -24,7 +24,7 @@
 
 #include <kernel/fs/chrdev.h>
 #include <kernel/types.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 
 #include <kos/dev.h>
 
@@ -215,7 +215,7 @@ DECL_END
 
 #ifdef GUARD_KERNEL_INCLUDE_SCHED_PID_H
 #ifndef GUARD_KERNEL_INCLUDE_SCHED_PID_CTTY_H
-#include <sched/pid-ctty.h>
+#include <sched/group-ctty.h>
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_PID_CTTY_H */
 #endif /* GUARD_KERNEL_INCLUDE_SCHED_PID_H */
 

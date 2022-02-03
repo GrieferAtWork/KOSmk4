@@ -45,6 +45,7 @@
 #include <kernel/x86/pic.h>
 #include <kernel/x86/pit.h>
 #include <sched/cpu.h>
+#include <sched/pid.h>
 #include <sched/scheduler.h>
 #include <sched/task-clone.h>
 #include <sched/task.h>
@@ -169,6 +170,7 @@ DATDEF ATTR_PERTASK struct mnode this_kernel_stackguard_ ASMNAME("this_kernel_st
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 DATDEF ATTR_PERTASK struct mpart this_kernel_stackpart_ ASMNAME("this_kernel_stackpart");
 DATDEF ATTR_PERCPU u8 thiscpu_x86_iob_[] ASMNAME("thiscpu_x86_iob");
+INTDEF ATTR_PERCPU struct taskpid thiscpu_idle_pid;
 
 PRIVATE ATTR_FREETEXT REF struct mpart *KCALL
 mpart_create_lockram(size_t num_pages) {
@@ -447,6 +449,10 @@ NOTHROW(KCALL cpu_destroy)(struct cpu *__restrict self) {
 			(**iter)(&FORCPU(self, thiscpu_idle));
 	}
 
+	/* Remove the IDLE thread PID */
+	pidns_removepid(&pidns_root, FORCPU(self, thiscpu_idle_pid).tp_pids[0].tps_pid);
+	--pidns_root.pn_refcnt;
+
 	/* Unmap, sync, & unprepare the mappings for the CPU's IDLE and #DF stacks.
 	 * NOTE: Because these mappings are private the the CPU itself, we don't
 	 *       need to  be holding  a lock  to the  kernel VM  for this  part! */
@@ -509,6 +515,13 @@ i386_allocate_secondary_cores(void) {
 		/*FORCPU(altcore, thiscpu_scheduler).s_waiting_last = NULL;*/
 		FORTASK(altidle, this_sched_link).le_prev = &FORCPU(altcore, thiscpu_scheduler).s_running.lh_first;
 		/*FORTASK(altidle, this_sched_link).le_next = NULL;*/
+
+		/* Allocate a PID for the IDLE thread. */
+		FORTASK(altidle, this_taskpid) = &FORCPU(altcore, thiscpu_idle_pid);
+		FORCPU(altcore, thiscpu_idle_pid).tp_thread.awr_obj  = altidle;
+		FORCPU(altcore, thiscpu_idle_pid).tp_pids[0].tps_pid = pidns_root.pn_npid++;
+		pidns_insertpid(&pidns_root, &FORCPU(altcore, thiscpu_idle_pid));
+		++pidns_root.pn_refcnt;
 
 		/* Insert the new task into the kernel VM's task user list. */
 		LIST_INSERT_HEAD(&mman_kernel.mm_threads, altidle, t_mman_tasks);

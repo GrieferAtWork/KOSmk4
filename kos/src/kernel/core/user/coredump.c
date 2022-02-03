@@ -50,7 +50,7 @@
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/path.h>
 #include <kernel/mman/execinfo.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/task.h>
 
 #include <libinstrlen/instrlen.h>
@@ -98,7 +98,7 @@ dbg_coredump(void const *const *traceback_vector,
 		pid_t tid, pid;
 		tid = task_getroottid_of_s(dbg_current);
 		dbg_printf(DBGSTR("tid:%" PRIuN(__SIZEOF_PID_T__)), tid);
-		pid = task_getrootpid_of_s(dbg_current);
+		pid = task_getrootpid_of(dbg_current);
 		if (pid != tid)
 			dbg_printf(DBGSTR(" pid:%" PRIuN(__SIZEOF_PID_T__)), pid);
 	}

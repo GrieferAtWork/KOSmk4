@@ -23,7 +23,7 @@
 
 #include <kernel/compiler.h>
 
-#include <sched/pid.h>
+#include <sched/group.h>
 
 #include <format-printer.h>
 #include <string.h>
@@ -100,11 +100,11 @@ NOTHROW(FCALL GDB_PrintOsRegisterValue)(struct task *__restrict thread, uintptr_
 		break;
 
 	case OS_REGISTER_PID:
-		result = format_printf(printer, arg, "%u", task_getselfpid_of_s(thread));
+		result = format_printf(printer, arg, "%u", task_getselfpid_of(thread));
 		break;
 
 	case OS_REGISTER_ROOTPID:
-		result = format_printf(printer, arg, "%u", task_getrootpid_of_s(thread));
+		result = format_printf(printer, arg, "%u", task_getrootpid_of(thread));
 		break;
 
 	case OS_REGISTER_PGID:
@@ -115,8 +115,8 @@ NOTHROW(FCALL GDB_PrintOsRegisterValue)(struct task *__restrict thread, uintptr_
 			result = (*printer)(arg, "?", 1);
 		} else {
 			result = format_printf(printer, arg, "%u",
-			                       os_regno == OS_REGISTER_PGID ? taskpid_getselfpid_s(tpid)
-			                                                    : taskpid_getrootpid(tpid));
+			                       os_regno == OS_REGISTER_PGID ? taskpid_getselfpidno(tpid)
+			                                                    : taskpid_getrootpidno(tpid));
 			decref_unlikely(tpid);
 		}
 	}	break;
@@ -129,8 +129,8 @@ NOTHROW(FCALL GDB_PrintOsRegisterValue)(struct task *__restrict thread, uintptr_
 			result = (*printer)(arg, "?", 1);
 		} else {
 			result = format_printf(printer, arg, "%u",
-			                       os_regno == OS_REGISTER_SID ? taskpid_getselfpid_s(tpid)
-			                                                   : taskpid_getrootpid(tpid));
+			                       os_regno == OS_REGISTER_SID ? taskpid_getselfpidno(tpid)
+			                                                   : taskpid_getrootpidno(tpid));
 			decref_unlikely(tpid);
 		}
 	}	break;

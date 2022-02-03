@@ -185,7 +185,7 @@ LOCAL_NOTHROW(KCALL LOCAL_METHOD_malloc)(
 		node->tn_visit = 0;
 		node->tn_kind  = TRACE_NODE_KIND_MALL;
 		node->tn_flags = TRACE_NODE_FLAG_FROM_GFP(flags);
-		node->tn_tid   = task_getroottid_s();
+		node->tn_tid   = task_getroottid();
 
 		/* Generate a traceback. */
 		lcpustate_current(&cs);
@@ -294,7 +294,7 @@ do_normal_malloc:
 			node->tn_visit = 0;
 			node->tn_kind  = TRACE_NODE_KIND_MALL;
 			node->tn_flags = TRACE_NODE_FLAG_FROM_GFP(flags);
-			node->tn_tid   = task_getroottid_s();
+			node->tn_tid   = task_getroottid();
 
 			/* Generate a traceback. */
 			lcpustate_current(&cs);
@@ -361,7 +361,7 @@ again_nonnull_ptr:
 			node->tn_visit = 0;
 			node->tn_kind  = TRACE_NODE_KIND_MALL;
 			node->tn_flags = TRACE_NODE_FLAG_FROM_GFP(flags);
-			node->tn_tid   = task_getroottid_s();
+			node->tn_tid   = task_getroottid();
 
 			/* Generate a traceback. */
 			lcpustate_current(&cs);

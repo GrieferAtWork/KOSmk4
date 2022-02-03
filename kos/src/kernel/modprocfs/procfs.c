@@ -29,7 +29,7 @@
 #include <kernel/fs/filesys.h>
 #include <kernel/fs/super.h>
 #include <kernel/user.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 
@@ -355,7 +355,7 @@ procfs_root_v_lookup(struct fdirnode *__restrict UNUSED(self),
 			pidno *= 10;
 			pidno += (upid_t)(ch - '0');
 		}
-		pid = pidns_trylookup(THIS_PIDNS, pidno);
+		pid = pidns_lookup(THIS_PIDNS, pidno);
 		if likely(pid) {
 			REF struct procfs_perproc_root_dirent *result;
 			result = (REF struct procfs_perproc_root_dirent *)kmalloc(offsetof(struct procfs_perproc_root_dirent,
@@ -416,38 +416,10 @@ NOTHROW(KCALL procfs_root_direnum_v_fini)(struct fdirenum *__restrict UNUSED(sel
 PRIVATE WUNUSED NONNULL((1)) REF struct taskpid *KCALL
 find_first_taskpid_greater_or_equal(struct pidns *__restrict ns,
                                     upid_t pid) {
-	REF struct taskpid *result = NULL;
-	upid_t result_pid          = (upid_t)-1;
-	size_t i, ind;
+	REF struct taskpid *result;
 	pidns_read(ns);
-	ind = ns->pn_indirection;
-	/* TODO: This could be done sooo much better... (instead of needing to be an O(N) operation) */
-	for (i = 0; i <= ns->pn_mask; ++i) {
-		upid_t temp;
-		struct taskpid *tpid = ns->pn_list[i].pe_pid;
-		if (tpid == NULL || tpid == PIDNS_ENTRY_DELETED)
-			continue;
-		if (wasdestroyed(tpid))
-			continue;
-		temp = tpid->tp_pids[ind];
-		if (temp < pid)
-			continue; /* Too low... */
-		if (result_pid >= temp && tryincref(tpid)) {
-			REF struct task *pid;
-			pid = taskpid_gettask(tpid);
-			if (!pid) {
-				decref_unlikely(tpid);
-			} else if (!task_isprocessleader_p(pid)) {
-				decref_unlikely(pid);
-				decref_unlikely(tpid);
-			} else {
-				decref_unlikely(pid);
-				xdecref_unlikely(result);
-				result_pid = temp;
-				result     = tpid;
-			}
-		}
-	}
+	result = pidns_lookupnext_locked(ns, (pid_t)pid);
+	xincref(result);
 	pidns_endread(ns);
 	return result;
 }
@@ -486,7 +458,7 @@ again:
 		if (!pid)
 			return 0; /* End-of-directory */
 		FINALLY_DECREF_UNLIKELY(pid);
-		pid_id  = pid->tp_pids[ns->pn_indirection];
+		pid_id  = (upid_t)_taskpid_slot_getpidno(pid->tp_pids[ns->pn_indirection]);
 		namelen = (u16)sprintf(namebuf, "%" PRIuN(__SIZEOF_PID_T__), pid_id);
 
 		/* Feed directory entry. */
@@ -507,30 +479,19 @@ again:
 }
 
 
-PRIVATE WUNUSED upid_t KCALL find_greatest_inuse_pid(void) {
-	upid_t result = 0;
-	size_t i, ind;
-	struct pidns *ns = THIS_PIDNS;
+PRIVATE WUNUSED pid_t FCALL find_greatest_inuse_pid(void) {
+	pid_t result = 0;
+	struct taskpid *tpid;
+	struct pidns *ns;
+	size_t ind;
+	ns  = THIS_PIDNS;
+	ind = ns->pn_ind;
 	pidns_read(ns);
-	ind = ns->pn_indirection;
-	/* TODO: This could be done sooo much better... (instead of needing to be an O(N) operation) */
-	for (i = 0; i <= ns->pn_mask; ++i) {
-		upid_t temp;
-		REF struct task *pid;
-		struct taskpid *tpid = ns->pn_list[i].pe_pid;
-		if (tpid == NULL || tpid == PIDNS_ENTRY_DELETED)
-			continue;
-		if (wasdestroyed(tpid))
-			continue;
-		pid = taskpid_gettask(tpid);
-		if (!pid)
-			continue;
-		if (task_isprocessleader_p(pid)) {
-			temp = tpid->tp_pids[ind];
-			if (result < temp)
-				result = temp;
-		}
-		decref_unlikely(pid);
+	tpid = ns->pn_tree;
+	if likely(tpid) {
+		while (tpid->tp_pids[ind].tps_link.rb_rhs)
+			tpid = tpid->tp_pids[ind].tps_link.rb_rhs;
+		result = _taskpid_slot_getpidno(tpid->tp_pids[ind]);
 	}
 	pidns_endread(ns);
 	return result;

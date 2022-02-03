@@ -23,7 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/types.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/rpc.h>
 
 #include <hybrid/__assert.h>

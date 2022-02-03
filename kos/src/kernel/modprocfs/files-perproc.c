@@ -60,7 +60,7 @@ DECL_END
 #include <sched/cred.h>
 #include <sched/epoll.h>
 #include <sched/eventfd.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/posix-signalfd.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
@@ -1237,7 +1237,7 @@ procfs_pp_stat_printer(struct printnode *__restrict self,
 		mm = task_getmman(thread);
 	FINALLY_XDECREF_UNLIKELY(mm);
 	if (printf("%" PRIuN(__SIZEOF_PID_T__) " (",
-	           taskpid_getpid_s(tpid)) < 0)
+	           taskpid_getpidno_s(tpid)) < 0)
 		return;
 	if (mm) {
 		REF struct fdirent *exec_name;
@@ -1331,7 +1331,7 @@ nogroup:
 			goto nofproc;
 		FINALLY_DECREF_UNLIKELY(fproc);
 		if (printf("%" PRIuN(__SIZEOF_PID_T__) " ",
-		                  taskpid_getpid_s(fproc)) < 0)
+		           taskpid_getpidno_s(fproc)) < 0)
 			return;
 	} else {
 nosession:
@@ -1451,7 +1451,7 @@ nofproc:
 	       "0 "            /* TODO: arg_end */
 	       "0 "            /* TODO: env_start */
 	       "0 "            /* TODO: env_end */
-	       "%u",           /* exit_code */
+	       "%" PRIu16,     /* exit_code */
 #ifdef KERNELSPACE_HIGHMEM
 	       0,                /* TODO: start_data */
 	       KERNELSPACE_BASE, /* TODO: end_data */
@@ -1459,7 +1459,7 @@ nofproc:
 	       KERNEL_CEILING, /* TODO: start_data */
 	       (void *)-1,     /* TODO: end_data */
 #endif /* !KERNELSPACE_HIGHMEM */
-	       tpid->tp_status.w_status);
+	       tpid->tp_status);
 }
 
 
@@ -1558,7 +1558,7 @@ no_exec:
 	           state,
 	           thread ? task_getpid_of_s(thread) : 0,         /* Tgid */
 	           thread ? task_getpid_of_s(thread) : 0,         /* Pid */
-	           parent_pid ? taskpid_getpid_s(parent_pid) : 0, /* PPid */
+	           parent_pid ? taskpid_getpidno_s(parent_pid) : 0, /* PPid */
 	           thread_cred ? ATOMIC_READ(thread_cred->c_ruid) : 0,
 	           thread_cred ? ATOMIC_READ(thread_cred->c_euid) : 0,
 	           thread_cred ? ATOMIC_READ(thread_cred->c_suid) : 0,
@@ -2371,7 +2371,7 @@ epoll_nextmon_locked:
 		hand = (struct taskpid *)me->pfir_hand.h_data;
 		tpid = -1;
 		if likely(myns->pn_indirection <= hand->tp_pidns->pn_indirection)
-			tpid = (pid_t)hand->tp_pids[myns->pn_indirection];
+			tpid = (pid_t)_taskpid_slot_getpidno(hand->tp_pids[myns->pn_indirection]);
 		if (printf("Pid:\t%" PRIdN(__SIZEOF_PID_T__) "\n", tpid) < 0)
 			return;
 		if likely(myns->pn_indirection >= hand->tp_pidns->pn_indirection) {
@@ -3031,7 +3031,7 @@ procfs_perproc_task_v_lookup(struct fdirnode *__restrict self,
 			pidno *= 10;
 			pidno += (upid_t)(ch - '0');
 		}
-		pid = pidns_trylookup(THIS_PIDNS, pidno);
+		pid = pidns_lookup(THIS_PIDNS, pidno);
 		if likely(pid) {
 			REF struct procfs_perproc_root_dirent *result;
 			if (pid != master_pid) {
@@ -3097,7 +3097,7 @@ find_first_thread_greater_or_equal(struct task *__restrict master,
 		upid_t iter_pid;
 		if unlikely(iter->tp_pidns->pn_indirection < myind)
 			continue; /* Cannot be represented */
-		iter_pid = iter->tp_pids[myind];
+		iter_pid = _taskpid_slot_getpidno(iter->tp_pids[myind]);
 		if (!(pid >= iter_pid))
 			continue;
 		if (result_pid < iter_pid)
@@ -3127,7 +3127,7 @@ get_greatest_child_pid_plus_one(struct task *__restrict master) {
 		upid_t iter_pid;
 		if unlikely(iter->tp_pidns->pn_indirection < myind)
 			continue; /* Cannot be represented */
-		iter_pid = iter->tp_pids[myind];
+		iter_pid = _taskpid_slot_getpidno(iter->tp_pids[myind]);
 		if (result < iter_pid)
 			result = iter_pid;
 	}
@@ -3164,7 +3164,7 @@ again:
 		pid = me->ptd_pid;
 		if likely(pid->tp_pidns->pn_indirection >= myind) {
 			incref(pid);
-			pid_id   = pid->tp_pids[myind];
+			pid_id   = _taskpid_slot_getpidno(pid->tp_pids[myind]);
 			newindex = 1; /* Start enumeration threads the next time around */
 			goto gotpid;
 		}
@@ -3172,7 +3172,7 @@ again:
 	pid = find_first_thread_greater_or_equal(master, index, myind);
 	if (!pid)
 		return 0; /* End-of-directory */
-	pid_id   = pid->tp_pids[myind];
+	pid_id   = _taskpid_slot_getpidno(pid->tp_pids[myind]);
 	newindex = pid_id + 1; /* Next time around, yield a process with a greater PID */
 	{
 		char namebuf[COMPILER_LENOF(PRIMAXuN(__SIZEOF_PID_T__))];

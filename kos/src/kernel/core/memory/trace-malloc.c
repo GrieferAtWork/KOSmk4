@@ -58,7 +58,7 @@
 #include <kernel/syslog.h>
 #include <sched/cpu.h>
 #include <sched/enum.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/scheduler.h>
 #include <sched/task.h>
 

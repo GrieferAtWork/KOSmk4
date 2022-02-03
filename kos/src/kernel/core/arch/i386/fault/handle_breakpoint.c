@@ -39,7 +39,7 @@ opt.append("-Os");
 #include <kernel/rt/except-handler.h>
 #include <kernel/x86/fault.h> /* x86_handle_stackfault(), x86_handle_gpf(), x86_handle_illegal_instruction() */
 #include <kernel/x86/idt.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/posix-signal.h>
 
 #include <kos/kernel/cpu-state-helpers.h>
@@ -80,7 +80,7 @@ dbg_handle_breakpoint(void *faultpc, void *resumepc) {
 		pid_t tid, pid;
 		tid = task_getroottid_of_s(dbg_current);
 		dbg_printf(DBGSTR("tid:%" PRIuN(__SIZEOF_PID_T__)), tid);
-		pid = task_getrootpid_of_s(dbg_current);
+		pid = task_getrootpid_of(dbg_current);
 		if (pid != tid)
 			dbg_printf(DBGSTR(" pid:%" PRIuN(__SIZEOF_PID_T__)), pid);
 	}

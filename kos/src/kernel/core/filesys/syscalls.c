@@ -54,7 +54,7 @@
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc.h>
 #include <sched/tsc.h>
@@ -2355,7 +2355,7 @@ kernel_exec_rpc(struct rpc_context *__restrict ctx, void *cookie) {
 		assert(THIS_TASKPID);
 		bzero(&data->er_except.e_args, sizeof(data->er_except.e_args));
 		data->er_except.e_code                            = EXCEPT_CODEOF(E_EXIT_THREAD);
-		data->er_except.e_args.e_exit_thread.et_exit_code = (uintptr_t)(unsigned int)THIS_TASKPID->tp_status.w_status;
+		data->er_except.e_args.e_exit_thread.et_exit_code = (uintptr_t)THIS_TASKPID->tp_status;
 		goto error_completion;
 	}
 	TRY {
@@ -2492,11 +2492,10 @@ send_rpc_to_main_thread:
 		if unlikely(!task_rpc_exec(proc, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER | RPC_PRIORITY_F_HIGH,
 		                           &kernel_exec_rpc, data)) {
 			/* The main thread was already terminated. */
-			union wait status;
-			status = FORTASK(caller, this_taskpid)->tp_status;
+			uint16_t status = FORTASK(caller, this_taskpid)->tp_status;
 			task_disconnectall();
 			kernel_exec_rpc_data_destroy(data);
-			THROW(E_EXIT_THREAD, status.w_status);
+			THROW(E_EXIT_THREAD, status);
 		}
 		FINALLY_DECREF_UNLIKELY(data);
 

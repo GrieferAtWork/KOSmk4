@@ -32,7 +32,7 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/posix-signal.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
@@ -109,7 +109,7 @@ handle_task_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
 
 	case TASK_IOC_GETTID: {
 		validate_writable(arg, sizeof(pid_t));
-		*(USER CHECKED pid_t *)arg = taskpid_getpid(self, THIS_PIDNS);
+		*(USER CHECKED pid_t *)arg = taskpid_getpidno(self);
 		return 0;
 	}	break;
 
@@ -134,7 +134,7 @@ handle_task_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
 		if unlikely(!parent_pid)
 			THROW(E_NO_SUCH_PROCESS);
 		FINALLY_DECREF_UNLIKELY(parent_pid);
-		*(USER CHECKED pid_t *)arg = taskpid_getpid(parent_pid, THIS_PIDNS);
+		*(USER CHECKED pid_t *)arg = taskpid_getpidno(parent_pid);
 		return 0;
 	}	break;
 
@@ -150,7 +150,7 @@ handle_task_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
 		if unlikely(!group_pid)
 			THROW(E_NO_SUCH_PROCESS);
 		FINALLY_DECREF_UNLIKELY(group_pid);
-		*(USER CHECKED pid_t *)arg = taskpid_getpid(group_pid, THIS_PIDNS);
+		*(USER CHECKED pid_t *)arg = taskpid_getpidno(group_pid);
 		return 0;
 	}	break;
 
@@ -166,7 +166,7 @@ handle_task_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
 		if unlikely(!session_pid)
 			THROW(E_NO_SUCH_PROCESS);
 		FINALLY_DECREF_UNLIKELY(session_pid);
-		*(USER CHECKED pid_t *)arg = taskpid_getpid(session_pid, THIS_PIDNS);
+		*(USER CHECKED pid_t *)arg = taskpid_getpidno(session_pid);
 		return 0;
 	}	break;
 
@@ -241,7 +241,7 @@ handle_task_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
 				decref_unlikely(thread);
 				THROW(E_INVALID_ARGUMENT_BAD_STATE,
 				      E_INVALID_ARGUMENT_CONTEXT_TASK_NOT_EXITED,
-				      taskpid_getpid_s(self, THIS_PIDNS));
+				      taskpid_getpidno_s(self));
 			}
 			decref_unlikely(thread);
 		}
@@ -272,7 +272,7 @@ DEFINE_SYSCALL2(fd_t, pidfd_open,
 		THROW(E_INVALID_ARGUMENT_RESERVED_ARGUMENT,
 		      E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_FLAGS);
 	}
-	thread_pid = pidns_lookup(THIS_PIDNS, (upid_t)pid);
+	thread_pid = pidns_lookup_srch(THIS_PIDNS, (upid_t)pid);
 	FINALLY_DECREF_UNLIKELY(thread_pid);
 	thread = taskpid_gettask_srch(thread_pid);
 	{

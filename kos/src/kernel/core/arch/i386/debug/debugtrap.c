@@ -30,7 +30,7 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
 

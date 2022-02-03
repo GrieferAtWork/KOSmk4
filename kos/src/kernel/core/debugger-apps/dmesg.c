@@ -34,7 +34,7 @@
 #include <kernel/fs/path.h>
 #include <kernel/mman/execinfo.h>
 #include <kernel/panic.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -189,7 +189,7 @@ dbg_dmesg_render_enum(void *arg, struct syslog_packet *__restrict packet,
 				 */
 				REF struct task *sender;
 				TRY {
-					sender = pidns_trylookup_task(&pidns_root,
+					sender = pidns_lookuptask(&pidns_root,
 					                              packet->sp_tid);
 				} EXCEPT {
 				}

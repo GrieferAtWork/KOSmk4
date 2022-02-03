@@ -30,7 +30,7 @@
 #include <kernel/malloc.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/posix-signal.h>
 #include <sched/posix-signalfd.h>
 #include <sched/rpc-internal.h>

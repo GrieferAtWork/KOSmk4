@@ -32,7 +32,7 @@
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/rand.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/bit.h>

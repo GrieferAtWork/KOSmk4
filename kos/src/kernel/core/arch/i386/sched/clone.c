@@ -23,7 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/syscall.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/rpc.h>
 #include <sched/task-clone.h>
 #include <sched/task.h>

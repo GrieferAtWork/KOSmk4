@@ -22,8 +22,6 @@
 
 #include <kernel/compiler.h>
 
-#include <sched/cred.h>
-
 #include <asm/cpu-flags.h>
 #include <kos/capability.h>
 

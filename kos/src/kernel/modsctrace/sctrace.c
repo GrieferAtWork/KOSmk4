@@ -30,7 +30,7 @@
 #include <kernel/printk.h>
 #include <kernel/syscall-trace.h>
 #include <kernel/syslog.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 
 #include <compat/config.h>
 #include <kos/asm/rpc-method.h>
@@ -73,7 +73,7 @@
 
 
 #if 0
-#include <sched/pid-ctty.h>
+#include <sched/group-ctty.h>
 DECL_BEGIN
 #define TRACE_HOOK() trace_hook()
 PRIVATE void trace_hook() {

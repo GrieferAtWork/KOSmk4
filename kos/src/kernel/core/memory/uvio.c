@@ -35,7 +35,7 @@
 #include <kernel/rand.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 

@@ -31,7 +31,7 @@
 #include <kernel/types.h>
 #include <sched/cpu.h>
 #include <sched/enum.h>
-#include <sched/pid.h>
+#include <sched/group.h>
 #include <sched/scheduler.h>
 #include <sched/task.h>
 
@@ -794,41 +794,61 @@ NOTHROW(KCALL task_enum_filter_ns_processes_cb_nb)(void *arg,
 	return (*data->efn_cb)(data->efn_arg, thread, pid);
 }
 
+PRIVATE NONNULL((1, 3)) ssize_t
+NOTHROW(KCALL pidns_enumerate_processes_nb)(struct taskpid *__restrict tpid,
+                                            task_enum_cb_t cb, void *arg,
+                                            size_t ind) {
+	ssize_t temp, result;
+	struct taskpid_slot *slot;
+	result = 0;
+again:
+	if (tryincref(tpid)) {
+		REF struct task *thread;
+		temp   = 0;
+		thread = taskpid_gettask(tpid);
+		if (thread) {
+			if (task_isprocessleader_p(thread))
+				temp = (*cb)(arg, thread, tpid);
+			decref_unlikely(thread);
+		}
+		decref_unlikely(tpid);
+		if unlikely(temp < 0)
+			goto err;
+		result += temp;
+	}
+	slot = &tpid->tp_pids[ind];
+	if (slot->tps_link.rb_lhs) {
+		if (slot->tps_link.rb_rhs) {
+			temp = pidns_enumerate_processes_nb(slot->tps_link.rb_rhs,
+			                                    cb, arg, ind);
+			if unlikely(temp < 0)
+				goto err;
+			result += temp;
+		}
+		tpid = slot->tps_link.rb_lhs;
+		goto again;
+	}
+	if (slot->tps_link.rb_rhs) {
+		tpid = slot->tps_link.rb_rhs;
+		goto again;
+	}
+	return result;
+err:
+	return temp;
+}
+
 /* Similar  to `task_enum_user()': Enumerate the leaders of running
  * user-space processes, as visible by `ns'. These are identical to
  * what will show up under `/proc' */
 PUBLIC NONNULL((1, 3)) ssize_t
 NOTHROW(KCALL task_enum_processes_nb)(task_enum_cb_t cb, void *arg,
                                       struct pidns *__restrict ns) {
-	ssize_t temp, result;
-	if (sync_tryread(ns)) {
-		size_t i, mask;
-		struct pidns_entry *list;
+	ssize_t result;
+	if (pidns_tryread(ns)) {
 		result = 0;
-		mask = ns->pn_mask;
-		list = ns->pn_list;
-		for (i = 0; i <= mask; ++i) {
-			struct taskpid *pid;
-			REF struct task *thread;
-			pid = list[i].pe_pid;
-			if (!pid)
-				continue; /* Unused entry */
-			if (pid == PIDNS_ENTRY_DELETED)
-				continue; /* Deleted entry */
-			thread = taskpid_gettask(pid);
-			if (!thread)
-				continue;
-			temp = task_isprocessleader_p(thread)
-			       ? (*cb)(arg, thread, pid)
-			       : 0;
-			decref_unlikely(thread);
-			if unlikely(temp < 0) {
-				sync_endread(ns);
-				goto err;
-			}
-			result += temp;
-		}
-		sync_endread(ns);
+		if likely(ns->pn_tree != NULL)
+			result = pidns_enumerate_processes_nb(ns->pn_tree, cb, arg, ns->pn_ind);
+		pidns_endread(ns);
 	} else {
 		struct task_enum_filter_ns_data data;
 		data.efn_cb  = cb;
@@ -837,8 +857,6 @@ NOTHROW(KCALL task_enum_processes_nb)(task_enum_cb_t cb, void *arg,
 		result = task_enum_all_nb(&task_enum_filter_ns_processes_cb_nb, &data);
 	}
 	return result;
-err:
-	return temp;
 }
 
 
@@ -853,36 +871,56 @@ NOTHROW(KCALL task_enum_filter_ns_threads_cb_nb)(void *arg,
 	return (*data->efn_cb)(data->efn_arg, thread, pid);
 }
 
+PRIVATE NONNULL((1, 3)) ssize_t
+NOTHROW(KCALL pidns_enumerate_all_nb)(struct taskpid *__restrict tpid,
+                                      task_enum_cb_t cb, void *arg,
+                                      size_t ind) {
+	ssize_t temp, result;
+	struct taskpid_slot *slot;
+	result = 0;
+again:
+	if (tryincref(tpid)) {
+		REF struct task *thread;
+		thread = taskpid_gettask(tpid);
+		temp = (*cb)(arg, thread, tpid);
+		xdecref_unlikely(thread);
+		decref_unlikely(tpid);
+		if unlikely(temp < 0)
+			goto err;
+		result += temp;
+	}
+	slot = &tpid->tp_pids[ind];
+	if (slot->tps_link.rb_lhs) {
+		if (slot->tps_link.rb_rhs) {
+			temp = pidns_enumerate_processes_nb(slot->tps_link.rb_rhs,
+			                                    cb, arg, ind);
+			if unlikely(temp < 0)
+				goto err;
+			result += temp;
+		}
+		tpid = slot->tps_link.rb_lhs;
+		goto again;
+	}
+	if (slot->tps_link.rb_rhs) {
+		tpid = slot->tps_link.rb_rhs;
+		goto again;
+	}
+	return result;
+err:
+	return temp;
+}
+
 /* Similar to `task_enum_processes()', but don't just enumerate
  * threads that are process leaders, but all threads from  `ns' */
 PUBLIC NOBLOCK NONNULL((1, 3)) ssize_t
 NOTHROW(KCALL task_enum_namespace_nb)(task_enum_cb_t cb, void *arg,
                                       struct pidns *__restrict ns) {
-	ssize_t temp, result;
-	if (sync_tryread(ns)) {
-		size_t i, mask;
-		struct pidns_entry *list;
+	ssize_t result;
+	if (pidns_tryread(ns)) {
 		result = 0;
-		mask = ns->pn_mask;
-		list = ns->pn_list;
-		for (i = 0; i <= mask; ++i) {
-			struct taskpid *pid;
-			REF struct task *thread;
-			pid = list[i].pe_pid;
-			if (!pid)
-				continue; /* Unused entry */
-			if (pid == PIDNS_ENTRY_DELETED)
-				continue; /* Deleted entry */
-			thread = taskpid_gettask(pid);
-			temp   = (*cb)(arg, thread, pid);
-			xdecref_unlikely(thread);
-			if unlikely(temp < 0) {
-				sync_endread(ns);
-				goto err;
-			}
-			result += temp;
-		}
-		sync_endread(ns);
+		if likely(ns->pn_tree != NULL)
+			result = pidns_enumerate_all_nb(ns->pn_tree, cb, arg, ns->pn_ind);
+		pidns_endread(ns);
 	} else {
 		struct task_enum_filter_ns_data data;
 		data.efn_cb  = cb;
@@ -891,8 +929,6 @@ NOTHROW(KCALL task_enum_namespace_nb)(task_enum_cb_t cb, void *arg,
 		result = task_enum_all_nb(&task_enum_filter_ns_threads_cb_nb, &data);
 	}
 	return result;
-err:
-	return temp;
 }
 
 
