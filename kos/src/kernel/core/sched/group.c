@@ -331,15 +331,17 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 #undef mygroup
 }
 
+INTDEF struct taskpid bootidle_pid;
 PUBLIC ATTR_PERTASK struct taskgroup this_taskgroup = {
-	.tg_process = &bootidle, /* Initialize set to `NULL' in `kernel_initialize_scheduler_after_smp()' */
+	.tg_process             = &bootidle, /* Initialize set to `NULL' in `kernel_initialize_scheduler_after_smp()' */
 	{ .tg_proc_threads_lock = ATOMIC_RWLOCK_INIT },
 	{ .tg_proc_threads = LIST_HEAD_INITIALIZER(this_taskgroup.tg_proc_threads) },
 	.tg_proc_threads_change = SIG_INIT,
 	.tg_proc_parent_lock    = ATOMIC_RWLOCK_INIT,
-	.tg_proc_parent         = NULL,                /* Initialized by `task_setprocess()' */
+	.tg_proc_parent         = NULL,          /* Initialized by `task_setprocess()' */
 	.tg_proc_group_lock     = ATOMIC_RWLOCK_INIT,
-	.tg_proc_group          = NULL,                /* Initialized by `task_setprocess()' */
+	.tg_proc_group          = &bootidle_pid, /* Initialize set to `NULL' in `kernel_initialize_scheduler_after_smp()' */
+	                                         /* Initialized by `task_setprocess()' */
 	.tg_proc_group_siblings = LIST_ENTRY_UNBOUND_INITIALIZER,
 	.tg_proc_rpcs = {
 		.ppr_lock = ATOMIC_RWLOCK_INIT,
@@ -348,7 +350,8 @@ PUBLIC ATTR_PERTASK struct taskgroup this_taskgroup = {
 	.tg_pgrp_processes_lock = ATOMIC_RWLOCK_INIT,
 	.tg_pgrp_processes      = LIST_HEAD_INITIALIZER(this_taskgroup.tg_pgrp_processes),
 	.tg_pgrp_session_lock   = ATOMIC_RWLOCK_INIT,
-	.tg_pgrp_session        = NULL,                /* Initialized by `task_setprocess()' */
+	.tg_pgrp_session        = &bootidle_pid, /* Initialize set to `NULL' in `kernel_initialize_scheduler_after_smp()' */
+	                                         /* Initialized by `task_setprocess()' */
 	.tg_ctty                = AXREF_INIT(NULL)
 };
 

@@ -200,6 +200,11 @@ INTDEF byte_t __kernel_asyncwork_stack_guard[];
 INTDEF byte_t __kernel_bootidle_stack_guard[];
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 
+INTDEF struct taskpid boottask_pid;
+INTDEF struct taskpid bootidle_pid;
+INTDEF struct taskpid asyncwork_pid;
+
+
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_scheduler_after_smp)(void) {
@@ -214,20 +219,20 @@ NOTHROW(KCALL kernel_initialize_scheduler_after_smp)(void) {
 	assert(FORTASK(task_template, this_fs) == &fs_kernel);
 	assert(FORTASK(task_template, this_handle_manager) == &handle_manager_kernel);
 	assert(FORTASK(task_template, this_taskgroup).tg_process == &bootidle);
+	assert(FORTASK(task_template, this_taskgroup).tg_proc_group == &bootidle_pid);
+	assert(FORTASK(task_template, this_taskgroup).tg_pgrp_session == &bootidle_pid);
 	task_template->t_mman                                   = NULL;
 	FORTASK(task_template, this_kernel_stackpart_).mp_state = MPART_ST_VOID;
 	FORTASK(task_template, this_fs)                         = NULL;
 	FORTASK(task_template, this_handle_manager)             = NULL;
 	FORTASK(task_template, this_taskgroup).tg_process       = NULL;
+	FORTASK(task_template, this_taskgroup).tg_proc_group    = NULL;
+	FORTASK(task_template, this_taskgroup).tg_pgrp_session  = NULL;
 #ifndef CONFIG_EVERYONE_IS_ROOT
 	assert(FORTASK(task_template, this_cred) == &cred_kernel);
 	FORTASK(task_template, this_cred) = NULL;
 #endif /* !CONFIG_EVERYONE_IS_ROOT */
 }
-
-INTDEF struct taskpid boottask_pid;
-INTDEF struct taskpid bootidle_pid;
-INTDEF struct taskpid asyncwork_pid;
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_scheduler)(void) {
