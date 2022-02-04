@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33d9e025 */
+/* HASH CRC-32:0xbcf0e80b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __SYSDECL_BEGIN
  * @return: 0:  Success
  * @return: -1: [errno=EINVAL] The given `signo' is invalid */
 __CREDIRECT(,int,__NOTHROW_NCX,__libc_core_raise,(__signo_t __signo),raise,(__signo))
-#elif (defined(__CRT_HAVE_pthread_kill) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current))) || ((defined(__CRT_HAVE_kill) || defined(__CRT_HAVE___kill) || defined(__CRT_HAVE___libc_kill)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
+#elif ((defined(__CRT_HAVE_pthread_kill) || defined(__CRT_HAVE_thr_kill)) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self))) || ((defined(__CRT_HAVE_kill) || defined(__CRT_HAVE___kill) || defined(__CRT_HAVE___libc_kill)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
 #include <libc/local/signal/raise.h>
 /* >> raise(3)
  * Raise a signal within the current thread.
@@ -136,6 +136,22 @@ struct __sigset_struct;
  * @return: 0:  Success
  * @return: -1: [errno=EINVAL] Invalid `how' */
 __CREDIRECT(,int,__NOTHROW_NCX,__libc_core_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),pthread_sigmask,(__how,__set,__oset))
+#elif defined(__CRT_HAVE_thr_sigsetmask)
+struct __sigset_struct;
+#include <features.h>
+/* Change  the signal mask for the calling thread. Note that portable
+ * programs that also make use of multithreading must instead use the
+ * pthread-specific  `pthread_sigmask()'  function instead,  as POSIX
+ * states that  this function  behaves undefined  in such  scenarios.
+ * However, on KOS, `pthread_sigmask()' is  simply an alias for  this
+ * function,  and  `sigprocmask()'   always  operates   thread-local.
+ * Note also  that on  KOS 2  additional functions  `getsigmaskptr()'
+ * and `setsigmaskptr()'  exist, which  can be  used to  get/set  the
+ * address of the signal mask used by the kernel.
+ * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
+ * @return: 0:  Success
+ * @return: -1: [errno=EINVAL] Invalid `how' */
+__CREDIRECT(,int,__NOTHROW_NCX,__libc_core_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),thr_sigsetmask,(__how,__set,__oset))
 #else /* ... */
 #undef ____libc_core_sigprocmask_defined
 #endif /* !... */

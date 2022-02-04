@@ -719,7 +719,7 @@ void tss_delete(tss_t tss_id) = pthread_key_delete;
 }
 %#ifdef __USE_SOLARIS
 @@>> thr_min_stack(3)
-[[const, decl_include("<hybrid/typecore.h>")]]
+[[guard, wunused, const, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<asm/crt/confname.h>", "<asm/crt/limits.h>")]]
 $size_t thr_min_stack() {
 @@pp_if !defined(__BUILDING_LIBC) && ($has_function(sysconf) && defined(_SC_THREAD_STACK_MIN))@@
@@ -744,6 +744,7 @@ $size_t thr_min_stack() {
 @@created  by one  of the  pthread- or  threads-related init functions.
 @@Internally,  this is  the return value  if the caller  doesn't have a
 @@proper pthread-controller attached.
+[[guard]]
 thr_main(*) = pthread_main_np;
 %#endif /* __USE_SOLARIS */
 

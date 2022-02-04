@@ -303,12 +303,12 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 	print();
 	print("/" "* ", doc, " *" "/");
 	print("#ifndef ", name);
-	print("#if ", escapedNameOf(name), " != -1");
+	print("#if defined(", escapedNameOf(name), ") && ", escapedNameOf(name), " != -1");
 	print("#define ", name, " ", escapedNameOf(name));
 	if (alwaysUseMinimum) {
-		print("#else /" "* ", escapedNameOf(name), " != -1 *" "/");
+		print("#else /" "* ", escapedNameOf(name), " && ", escapedNameOf(name), " != -1 *" "/");
 		print("#define ", name, " ", posixName ? posixName : posixMinimum);
-		print("#endif /" "* ", escapedNameOf(name), " == -1 *" "/");
+		print("#endif /" "* !", escapedNameOf(name), " || ", escapedNameOf(name), " == -1 *" "/");
 	} else {
 		print("#elif defined(__USE_ALL_LIMITS)");
 		print("#define ", name, " ", posixName ? posixName : posixMinimum);
@@ -507,7 +507,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* Maximum simultaneous processes per real user ID. */
 #ifndef CHILD_MAX
-#if __CHILD_MAX != -1
+#if defined(__CHILD_MAX) && __CHILD_MAX != -1
 #define CHILD_MAX __CHILD_MAX
 #elif defined(__USE_ALL_LIMITS)
 #define CHILD_MAX _POSIX_CHILD_MAX
@@ -516,25 +516,25 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* Number of simultaneous supplementary group IDs per process. */
 #ifndef NGROUPS_MAX
-#if __NGROUPS_MAX != -1
+#if defined(__NGROUPS_MAX) && __NGROUPS_MAX != -1
 #define NGROUPS_MAX __NGROUPS_MAX
-#else /* __NGROUPS_MAX != -1 */
+#else /* __NGROUPS_MAX && __NGROUPS_MAX != -1 */
 #define NGROUPS_MAX _POSIX_NGROUPS_MAX
-#endif /* __NGROUPS_MAX == -1 */
+#endif /* !__NGROUPS_MAX || __NGROUPS_MAX == -1 */
 #endif /* !NGROUPS_MAX */
 
 /* Number of files one process can have open at once. */
 #ifndef OPEN_MAX
-#if __OPEN_MAX != -1
+#if defined(__OPEN_MAX) && __OPEN_MAX != -1
 #define OPEN_MAX __OPEN_MAX
-#else /* __OPEN_MAX != -1 */
+#else /* __OPEN_MAX && __OPEN_MAX != -1 */
 #define OPEN_MAX _POSIX_OPEN_MAX
-#endif /* __OPEN_MAX == -1 */
+#endif /* !__OPEN_MAX || __OPEN_MAX == -1 */
 #endif /* !OPEN_MAX */
 
 /* Maximum length of a timezone name (element of `tzname'). */
 #ifndef TZNAME_MAX
-#if __TZNAME_MAX != -1
+#if defined(__TZNAME_MAX) && __TZNAME_MAX != -1
 #define TZNAME_MAX __TZNAME_MAX
 #elif defined(__USE_ALL_LIMITS)
 #define TZNAME_MAX _POSIX_TZNAME_MAX
@@ -543,7 +543,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* Minimum # of operations in one list I/O call. */
 #ifndef AIO_LISTIO_MAX
-#if __AIO_LISTIO_MAX != -1
+#if defined(__AIO_LISTIO_MAX) && __AIO_LISTIO_MAX != -1
 #define AIO_LISTIO_MAX __AIO_LISTIO_MAX
 #elif defined(__USE_ALL_LIMITS)
 #define AIO_LISTIO_MAX _POSIX_AIO_LISTIO_MAX
@@ -552,7 +552,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* Minimal # of outstanding asynchronous I/O operations. */
 #ifndef AIO_MAX
-#if __AIO_MAX != -1
+#if defined(__AIO_MAX) && __AIO_MAX != -1
 #define AIO_MAX __AIO_MAX
 #elif defined(__USE_ALL_LIMITS)
 #define AIO_MAX _POSIX_AIO_MAX
@@ -561,16 +561,16 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* Maximum length of arguments to `execve', including environment. */
 #ifndef ARG_MAX
-#if __ARG_MAX != -1
+#if defined(__ARG_MAX) && __ARG_MAX != -1
 #define ARG_MAX __ARG_MAX
-#else /* __ARG_MAX != -1 */
+#else /* __ARG_MAX && __ARG_MAX != -1 */
 #define ARG_MAX _POSIX_ARG_MAX
-#endif /* __ARG_MAX == -1 */
+#endif /* !__ARG_MAX || __ARG_MAX == -1 */
 #endif /* !ARG_MAX */
 
 /* Minimal # of timer expiration overruns. */
 #ifndef DELAYTIMER_MAX
-#if __DELAYTIMER_MAX != -1
+#if defined(__DELAYTIMER_MAX) && __DELAYTIMER_MAX != -1
 #define DELAYTIMER_MAX __DELAYTIMER_MAX
 #elif defined(__USE_ALL_LIMITS)
 #define DELAYTIMER_MAX _POSIX_DELAYTIMER_MAX
@@ -579,7 +579,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* Maximum length of a host name (not including the terminating null) as returned by `gethostname(2)'. */
 #ifndef HOST_NAME_MAX
-#if __HOST_NAME_MAX != -1
+#if defined(__HOST_NAME_MAX) && __HOST_NAME_MAX != -1
 #define HOST_NAME_MAX __HOST_NAME_MAX
 #elif defined(__USE_ALL_LIMITS)
 #define HOST_NAME_MAX _POSIX_HOST_NAME_MAX
@@ -588,16 +588,16 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* Maximum link count of a file. */
 #ifndef LINK_MAX
-#if __LINK_MAX != -1
+#if defined(__LINK_MAX) && __LINK_MAX != -1
 #define LINK_MAX __LINK_MAX
-#else /* __LINK_MAX != -1 */
+#else /* __LINK_MAX && __LINK_MAX != -1 */
 #define LINK_MAX _POSIX_LINK_MAX
-#endif /* __LINK_MAX == -1 */
+#endif /* !__LINK_MAX || __LINK_MAX == -1 */
 #endif /* !LINK_MAX */
 
 /* Maximum length of login name. */
 #ifndef LOGIN_NAME_MAX
-#if __LOGIN_NAME_MAX != -1
+#if defined(__LOGIN_NAME_MAX) && __LOGIN_NAME_MAX != -1
 #define LOGIN_NAME_MAX __LOGIN_NAME_MAX
 #elif defined(__USE_ALL_LIMITS)
 #define LOGIN_NAME_MAX _POSIX_LOGIN_NAME_MAX
@@ -606,25 +606,25 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* Number of bytes in a terminal canonical input queue. */
 #ifndef MAX_CANON
-#if __MAX_CANON != -1
+#if defined(__MAX_CANON) && __MAX_CANON != -1
 #define MAX_CANON __MAX_CANON
-#else /* __MAX_CANON != -1 */
+#else /* __MAX_CANON && __MAX_CANON != -1 */
 #define MAX_CANON _POSIX_MAX_CANON
-#endif /* __MAX_CANON == -1 */
+#endif /* !__MAX_CANON || __MAX_CANON == -1 */
 #endif /* !MAX_CANON */
 
 /* Number of bytes for which space will be available in a terminal input queue. */
 #ifndef MAX_INPUT
-#if __MAX_INPUT != -1
+#if defined(__MAX_INPUT) && __MAX_INPUT != -1
 #define MAX_INPUT __MAX_INPUT
-#else /* __MAX_INPUT != -1 */
+#else /* __MAX_INPUT && __MAX_INPUT != -1 */
 #define MAX_INPUT _POSIX_MAX_INPUT
-#endif /* __MAX_INPUT == -1 */
+#endif /* !__MAX_INPUT || __MAX_INPUT == -1 */
 #endif /* !MAX_INPUT */
 
 /* Maximum # of message queues open for a process. */
 #ifndef MQ_OPEN_MAX
-#if __MQ_OPEN_MAX != -1
+#if defined(__MQ_OPEN_MAX) && __MQ_OPEN_MAX != -1
 #define MQ_OPEN_MAX __MQ_OPEN_MAX
 #elif defined(__USE_ALL_LIMITS)
 #define MQ_OPEN_MAX _POSIX_MQ_OPEN_MAX
@@ -633,7 +633,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* Maximum # of supported message priorities. */
 #ifndef MQ_PRIO_MAX
-#if __MQ_PRIO_MAX != -1
+#if defined(__MQ_PRIO_MAX) && __MQ_PRIO_MAX != -1
 #define MQ_PRIO_MAX __MQ_PRIO_MAX
 #elif defined(__USE_ALL_LIMITS)
 #define MQ_PRIO_MAX _POSIX_MQ_PRIO_MAX
@@ -642,25 +642,25 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* Number of bytes in a filename. */
 #ifndef NAME_MAX
-#if __NAME_MAX != -1
+#if defined(__NAME_MAX) && __NAME_MAX != -1
 #define NAME_MAX __NAME_MAX
-#else /* __NAME_MAX != -1 */
+#else /* __NAME_MAX && __NAME_MAX != -1 */
 #define NAME_MAX _POSIX_NAME_MAX
-#endif /* __NAME_MAX == -1 */
+#endif /* !__NAME_MAX || __NAME_MAX == -1 */
 #endif /* !NAME_MAX */
 
 /* Number of bytes in a pathname. */
 #ifndef PATH_MAX
-#if __PATH_MAX != -1
+#if defined(__PATH_MAX) && __PATH_MAX != -1
 #define PATH_MAX __PATH_MAX
-#else /* __PATH_MAX != -1 */
+#else /* __PATH_MAX && __PATH_MAX != -1 */
 #define PATH_MAX _POSIX_PATH_MAX
-#endif /* __PATH_MAX == -1 */
+#endif /* !__PATH_MAX || __PATH_MAX == -1 */
 #endif /* !PATH_MAX */
 
 /* Number of bytes than can be written atomically to a pipe. */
 #ifndef PIPE_BUF
-#if __PIPE_BUF != -1
+#if defined(__PIPE_BUF) && __PIPE_BUF != -1
 #define PIPE_BUF __PIPE_BUF
 #elif defined(__USE_ALL_LIMITS)
 #define PIPE_BUF _POSIX_PIPE_BUF
@@ -669,25 +669,25 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* The # of repeated occurrences of a BRE permitted by the REGEXEC and REGCOMP functions when using the interval notation. */
 #ifndef RE_DUP_MAX
-#if __RE_DUP_MAX != -1
+#if defined(__RE_DUP_MAX) && __RE_DUP_MAX != -1
 #define RE_DUP_MAX __RE_DUP_MAX
-#else /* __RE_DUP_MAX != -1 */
+#else /* __RE_DUP_MAX && __RE_DUP_MAX != -1 */
 #define RE_DUP_MAX _POSIX_RE_DUP_MAX
-#endif /* __RE_DUP_MAX == -1 */
+#endif /* !__RE_DUP_MAX || __RE_DUP_MAX == -1 */
 #endif /* !RE_DUP_MAX */
 
 /* Minimal # of realtime signals reserved for the application. */
 #ifndef RTSIG_MAX
-#if __RTSIG_MAX != -1
+#if defined(__RTSIG_MAX) && __RTSIG_MAX != -1
 #define RTSIG_MAX __RTSIG_MAX
-#else /* __RTSIG_MAX != -1 */
+#else /* __RTSIG_MAX && __RTSIG_MAX != -1 */
 #define RTSIG_MAX _POSIX_RTSIG_MAX
-#endif /* __RTSIG_MAX == -1 */
+#endif /* !__RTSIG_MAX || __RTSIG_MAX == -1 */
 #endif /* !RTSIG_MAX */
 
 /* Number of semaphores a process can have. */
 #ifndef SEM_NSEMS_MAX
-#if __SEM_NSEMS_MAX != -1
+#if defined(__SEM_NSEMS_MAX) && __SEM_NSEMS_MAX != -1
 #define SEM_NSEMS_MAX __SEM_NSEMS_MAX
 #elif defined(__USE_ALL_LIMITS)
 #define SEM_NSEMS_MAX _POSIX_SEM_NSEMS_MAX
@@ -696,7 +696,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* Maximal value of a semaphore. */
 #ifndef SEM_VALUE_MAX
-#if __SEM_VALUE_MAX != -1
+#if defined(__SEM_VALUE_MAX) && __SEM_VALUE_MAX != -1
 #define SEM_VALUE_MAX __SEM_VALUE_MAX
 #elif defined(__USE_ALL_LIMITS)
 #define SEM_VALUE_MAX _POSIX_SEM_VALUE_MAX
@@ -705,7 +705,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* Number of pending realtime signals. */
 #ifndef SIGQUEUE_MAX
-#if __SIGQUEUE_MAX != -1
+#if defined(__SIGQUEUE_MAX) && __SIGQUEUE_MAX != -1
 #define SIGQUEUE_MAX __SIGQUEUE_MAX
 #elif defined(__USE_ALL_LIMITS)
 #define SIGQUEUE_MAX _POSIX_SIGQUEUE_MAX
@@ -714,7 +714,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* Number of streams a process can have open at once. */
 #ifndef STREAM_MAX
-#if __STREAM_MAX != -1
+#if defined(__STREAM_MAX) && __STREAM_MAX != -1
 #define STREAM_MAX __STREAM_MAX
 #elif defined(__USE_ALL_LIMITS)
 #define STREAM_MAX _POSIX_STREAM_MAX
@@ -723,7 +723,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* The # of bytes in a symbolic link. */
 #ifndef SYMLINK_MAX
-#if __SYMLINK_MAX != -1
+#if defined(__SYMLINK_MAX) && __SYMLINK_MAX != -1
 #define SYMLINK_MAX __SYMLINK_MAX
 #elif defined(__USE_ALL_LIMITS)
 #define SYMLINK_MAX _POSIX_SYMLINK_MAX
@@ -732,16 +732,16 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* The # of symbolic links that can be traversed in the resolution of a pathname in the absence of a loop. */
 #ifndef SYMLOOP_MAX
-#if __SYMLOOP_MAX != -1
+#if defined(__SYMLOOP_MAX) && __SYMLOOP_MAX != -1
 #define SYMLOOP_MAX __SYMLOOP_MAX
-#else /* __SYMLOOP_MAX != -1 */
+#else /* __SYMLOOP_MAX && __SYMLOOP_MAX != -1 */
 #define SYMLOOP_MAX _POSIX_SYMLOOP_MAX
-#endif /* __SYMLOOP_MAX == -1 */
+#endif /* !__SYMLOOP_MAX || __SYMLOOP_MAX == -1 */
 #endif /* !SYMLOOP_MAX */
 
 /* Number of timer for a process. */
 #ifndef TIMER_MAX
-#if __TIMER_MAX != -1
+#if defined(__TIMER_MAX) && __TIMER_MAX != -1
 #define TIMER_MAX __TIMER_MAX
 #elif defined(__USE_ALL_LIMITS)
 #define TIMER_MAX _POSIX_TIMER_MAX
@@ -750,7 +750,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* Maximum # of characters in a tty name. */
 #ifndef TTY_NAME_MAX
-#if __TTY_NAME_MAX != -1
+#if defined(__TTY_NAME_MAX) && __TTY_NAME_MAX != -1
 #define TTY_NAME_MAX __TTY_NAME_MAX
 #elif defined(__USE_ALL_LIMITS)
 #define TTY_NAME_MAX _POSIX_TTY_NAME_MAX
@@ -759,7 +759,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* Maximum clock resolution in nanoseconds. */
 #ifndef CLOCKRES_MIN
-#if __CLOCKRES_MIN != -1
+#if defined(__CLOCKRES_MIN) && __CLOCKRES_MIN != -1
 #define CLOCKRES_MIN __CLOCKRES_MIN
 #elif defined(__USE_ALL_LIMITS)
 #define CLOCKRES_MIN _POSIX_CLOCKRES_MIN
@@ -768,7 +768,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* The # of data keys per process. */
 #ifndef THREAD_KEYS_MAX
-#if __PTHREAD_KEYS_MAX != -1
+#if defined(__PTHREAD_KEYS_MAX) && __PTHREAD_KEYS_MAX != -1
 #define THREAD_KEYS_MAX __PTHREAD_KEYS_MAX
 #elif defined(__USE_ALL_LIMITS)
 #define THREAD_KEYS_MAX _POSIX_THREAD_KEYS_MAX
@@ -777,7 +777,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* Controlling the iterations of destructors for thread-specific data. */
 #ifndef THREAD_DESTRUCTOR_ITERATIONS
-#if __PTHREAD_DESTRUCTOR_ITERATIONS != -1
+#if defined(__PTHREAD_DESTRUCTOR_ITERATIONS) && __PTHREAD_DESTRUCTOR_ITERATIONS != -1
 #define THREAD_DESTRUCTOR_ITERATIONS __PTHREAD_DESTRUCTOR_ITERATIONS
 #elif defined(__USE_ALL_LIMITS)
 #define THREAD_DESTRUCTOR_ITERATIONS _POSIX_THREAD_DESTRUCTOR_ITERATIONS
@@ -786,7 +786,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* The # of threads per process. */
 #ifndef THREAD_THREADS_MAX
-#if __PTHREAD_THREADS_MAX != -1
+#if defined(__PTHREAD_THREADS_MAX) && __PTHREAD_THREADS_MAX != -1
 #define THREAD_THREADS_MAX __PTHREAD_THREADS_MAX
 #elif defined(__USE_ALL_LIMITS)
 #define THREAD_THREADS_MAX _POSIX_THREAD_THREADS_MAX
@@ -808,7 +808,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #if __PTHREAD_STACK_MIN != -1
 #define PTHREAD_STACK_MIN __PTHREAD_STACK_MIN
 #elif defined(__USE_ALL_LIMITS)
-#define PTHREAD_STACK_MIN _POSIX_THREAD_STACK_MIN
+#define PTHREAD_STACK_MIN 16384
 #endif /* ... */
 #endif /* !PTHREAD_STACK_MIN */
 

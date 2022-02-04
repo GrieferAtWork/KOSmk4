@@ -66,13 +66,13 @@
 #include <bits/types.h>
 )]%[insert:prefix(
 #include <kos/anno.h>
-)]%[insert:prefix(
-#include <endian.h>
-)]%[insert:prefix(
-#include <sched.h>
-)]%[insert:prefix(
-#include <time.h>
 )]%{
+
+#if 1 /* ??? */
+#include <endian.h>
+#include <sched.h>
+#include <time.h>
+#endif
 
 __SYSDECL_BEGIN
 
@@ -660,7 +660,7 @@ $errno_t pthread_create([[nonnull]] pthread_t *__restrict newthread, pthread_att
 @@>> pthread_exit(3)
 @@Terminate calling thread.
 @@The registered cleanup handlers are called via exception handling
-[[throws, noreturn]]
+[[throws, noreturn, export_alias("thr_exit")]]
 void pthread_exit(void *retval);
 
 @@>> pthread_join(3)
@@ -746,7 +746,7 @@ $errno_t pthread_detach(pthread_t pthread);
 @@>> pthread_self(3)
 @@Obtain the identifier of the current thread
 @@@return: * : Handle for the calling thread
-[[const, nothrow, export_alias("thrd_current")]]
+[[const, nothrow, export_alias("thrd_current", "thr_self")]]
 pthread_t pthread_self();
 
 @@>> pthread_equal(3)
@@ -849,6 +849,7 @@ $errno_t pthread_attr_setinheritsched([[nonnull]] pthread_attr_t *attr, int inhe
 
 @@>> pthread_attr_getscope(3)
 @@Return in `*scope' the scheduling contention scope of `*attr'
+@@@param:  scope: Filled with one of `PTHREAD_SCOPE_*'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_attr_getscope([[nonnull]] pthread_attr_t const *__restrict attr,
@@ -856,6 +857,7 @@ $errno_t pthread_attr_getscope([[nonnull]] pthread_attr_t const *__restrict attr
 
 @@>> pthread_attr_setscope(3)
 @@Set scheduling contention scope in `*attr' according to `scope'
+@@@param:  scope:  One of `PTHREAD_SCOPE_*'
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `scope'
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
@@ -1048,7 +1050,7 @@ $errno_t pthread_getattr_np(pthread_t pthread, [[nonnull]] pthread_attr_t *attr)
 @@@return: EPERM:  The caller isn't allowed to specify `policy' and `param'
 @@@return: ESRCH:  `pthread' has already exited
 @@@return: EINVAL: Invalid/unsupported `policy', or `param' is malformed for `policy'
-[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/sched.h>")]]
 $errno_t pthread_setschedparam(pthread_t target_thread, int policy,
                                [[nonnull]] struct sched_param const *param);
 
@@ -1056,7 +1058,7 @@ $errno_t pthread_setschedparam(pthread_t target_thread, int policy,
 @@Return in `*policy' and `*param' the scheduling parameters for `target_thread'
 @@@return: EOK:   Success
 @@@return: ESRCH: `pthread' has already exited
-[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/sched.h>")]]
 $errno_t pthread_getschedparam(pthread_t target_thread,
                                [[nonnull]] int *__restrict policy,
                                [[nonnull]] struct sched_param *__restrict param);
@@ -1126,6 +1128,7 @@ $errno_t pthread_rpc_exec(pthread_t target_thread,
 @@>> pthread_getconcurrency(3)
 @@Determine level of concurrency
 @@@return: * : The current concurrency level
+[[export_alias("thr_getconcurrency")]]
 [[pure]] int pthread_getconcurrency();
 
 @@>> pthread_setconcurrency(3)
@@ -1133,6 +1136,7 @@ $errno_t pthread_rpc_exec(pthread_t target_thread,
 @@@return: EOK:    Success
 @@@return: EINVAL: The given `level' is negative
 [[decl_include("<bits/types.h>")]]
+[[export_alias("thr_setconcurrency")]]
 $errno_t pthread_setconcurrency(int level);
 %#endif /* __USE_UNIX98 */
 
@@ -2503,6 +2507,7 @@ $errno_t pthread_barrierattr_setpshared([[nonnull]] pthread_barrierattr_t *attr,
 @@@return: EOK:    Success
 @@@return: ENOMEM: Insufficient memory to create the key
 [[nodos, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("thr_keycreate")]]
 $errno_t pthread_key_create([[nonnull]] pthread_key_t *key,
                             [[nullable]] void (LIBKCALL *destr_function)(void *value));
 /* TODO: dos support for `pthread_key_create' (it's in cygwin, so it can exist on DOS!) */
@@ -2529,7 +2534,7 @@ $errno_t pthread_key_create([[nonnull]] pthread_key_t *key,
 @@@return: EOK:    Success
 @@@return: ENOMEM: Insufficient memory to create the key
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-[[impl_include("<hybrid/__atomic.h>")]]
+[[impl_include("<hybrid/__atomic.h>"), export_alias("thr_keycreate_once")]]
 [[nodos, requires_function(pthread_key_create)]] /* TODO: dos support for `pthread_key_create_once_np' */
 $errno_t pthread_key_create_once_np([[nonnull]] pthread_key_t *key,
                                     [[nullable]] void (LIBKCALL *destr_function)(void *)) {
@@ -2597,6 +2602,7 @@ void *pthread_getspecific(pthread_key_t key);
 @@@return: ENOMEM: `pointer'  is non-`NULL', `key' had yet to be allowed for the
 @@                 calling thread, and an attempt to allocate it just now failed
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("thr_setspecific")]]
 $errno_t pthread_setspecific(pthread_key_t key, void const *pointer);
 
 %#ifdef __USE_XOPEN2K

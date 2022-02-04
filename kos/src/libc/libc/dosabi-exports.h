@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e898922 */
+/* HASH CRC-32:0x758b122e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1155,6 +1155,7 @@ DEFINE_PUBLIC_ALIAS(DOS$_spawnve, libd_fspawnve);
 DEFINE_PUBLIC_ALIAS(DOS$fspawnve, libd_fspawnve);
 
 /* pthread */
+DEFINE_PUBLIC_ALIAS(DOS$thr_exit, libd_pthread_exit);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_exit, libd_pthread_exit);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_join, libd_pthread_join);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_tryjoin_np, libd_pthread_tryjoin_np);
@@ -1196,6 +1197,7 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_getname_np, libd_pthread_getname_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_set_name_np, libd_pthread_setname_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_setname_np, libd_pthread_setname_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_gettid_np, libd_pthread_gettid_np);
+DEFINE_PUBLIC_ALIAS(DOS$thr_setconcurrency, libd_pthread_setconcurrency);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_setconcurrency, libd_pthread_setconcurrency);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_setaffinity_np, libd_pthread_setaffinity_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_getaffinity_np, libd_pthread_getaffinity_np);
@@ -1293,6 +1295,7 @@ DEFINE_PUBLIC_ALIAS(DOS$tss_delete, libd_pthread_key_delete);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_key_delete, libd_pthread_key_delete);
 DEFINE_PUBLIC_ALIAS(DOS$tss_get, libd_pthread_getspecific);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_getspecific, libd_pthread_getspecific);
+DEFINE_PUBLIC_ALIAS(DOS$thr_setspecific, libd_pthread_setspecific);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_setspecific, libd_pthread_setspecific);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_getcpuclockid, libd_pthread_getcpuclockid);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_atfork, libd_pthread_atfork);
@@ -1534,6 +1537,7 @@ DEFINE_PUBLIC_ALIAS(DOS$sigismember, libd_sigismember);
 DEFINE_PUBLIC_ALIAS(DOS$__sigprocmask, libd_sigprocmask);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_sigprocmask, libd_sigprocmask);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_sigmask, libd_sigprocmask);
+DEFINE_PUBLIC_ALIAS(DOS$thr_sigsetmask, libd_sigprocmask);
 DEFINE_PUBLIC_ALIAS(DOS$sigprocmask, libd_sigprocmask);
 DEFINE_PUBLIC_ALIAS(DOS$setsigmaskptr, libd_setsigmaskptr);
 DEFINE_PUBLIC_ALIAS(DOS$__sigsuspend, libd_sigsuspend);
@@ -1565,6 +1569,7 @@ DEFINE_PUBLIC_ALIAS(DOS$sighold, libd_sighold);
 DEFINE_PUBLIC_ALIAS(DOS$sigrelse, libd_sigrelse);
 DEFINE_PUBLIC_ALIAS(DOS$sigignore, libd_sigignore);
 DEFINE_PUBLIC_ALIAS(DOS$sigset, libd_sigset);
+DEFINE_PUBLIC_ALIAS(DOS$thr_kill, libd_pthread_kill);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_kill, libd_pthread_kill);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_sigqueue, libd_pthread_sigqueue);
 DEFINE_PUBLIC_ALIAS(DOS$signalnumber, libd_signalnumber);
@@ -2868,6 +2873,14 @@ DEFINE_PUBLIC_ALIAS(DOS$tcsetsid, libd_tcsetsid);
 DEFINE_PUBLIC_ALIAS(DOS$cfsetspeed, libd_cfsetspeed);
 DEFINE_PUBLIC_ALIAS(DOS$cfmakeraw, libd_cfmakeraw);
 DEFINE_PUBLIC_ALIAS(DOS$cfmakesane, libd_cfmakesane);
+
+/* thread */
+DEFINE_PUBLIC_ALIAS(DOS$thr_create, libd_thr_create);
+DEFINE_PUBLIC_ALIAS(DOS$thr_join, libd_thr_join);
+DEFINE_PUBLIC_ALIAS(DOS$thr_setprio, libd_thr_setprio);
+DEFINE_PUBLIC_ALIAS(DOS$thr_getprio, libd_thr_getprio);
+DEFINE_PUBLIC_ALIAS(DOS$thr_getspecific, libd_thr_getspecific);
+DEFINE_PUBLIC_ALIAS(DOS$thr_stksegment, libd_thr_stksegment);
 
 /* threads */
 DEFINE_PUBLIC_ALIAS(DOS$thrd_sleep, libd_thrd_sleep);

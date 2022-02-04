@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5edc5580 */
+/* HASH CRC-32:0x25f9b8d6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -493,6 +493,11 @@ __NAMESPACE_LOCAL_END
 struct __sigset_struct;
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),pthread_sigmask,(__how,__set,__oset))
+#elif defined(__CRT_HAVE_thr_sigsetmask)
+__NAMESPACE_LOCAL_END
+struct __sigset_struct;
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),thr_sigsetmask,(__how,__set,__oset))
 #else /* ... */
 #undef __local___localdep_sigprocmask_defined
 #endif /* !... */
@@ -835,10 +840,10 @@ __do_exec:
 #endif /* (!__CRT_HAVE_sigaction && !__CRT_HAVE___sigaction) || !__SIG_DFL */
 		}
 		if (__attrp->__flags & __POSIX_SPAWN_SETSIGMASK) {
-#if (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask)) && defined(__SIG_SETMASK)
+#if (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask) || defined(__CRT_HAVE_thr_sigsetmask)) && defined(__SIG_SETMASK)
 			if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_sigprocmask)(__SIG_SETMASK, &__attrp->__ss, __NULLPTR))
 				goto __child_error;
-#else /* (__CRT_HAVE_sigprocmask || __CRT_HAVE___sigprocmask || __CRT_HAVE___libc_sigprocmask || __CRT_HAVE_pthread_sigmask) && __SIG_SETMASK */
+#else /* (__CRT_HAVE_sigprocmask || __CRT_HAVE___sigprocmask || __CRT_HAVE___libc_sigprocmask || __CRT_HAVE_pthread_sigmask || __CRT_HAVE_thr_sigsetmask) && __SIG_SETMASK */
 #ifdef __ENOSYS
 			(void)__libc_seterrno(__ENOSYS);
 #elif defined(__EPERM)
@@ -847,7 +852,7 @@ __do_exec:
 			(void)__libc_seterrno(1);
 #endif /* !... */
 			goto __child_error;
-#endif /* (!__CRT_HAVE_sigprocmask && !__CRT_HAVE___sigprocmask && !__CRT_HAVE___libc_sigprocmask && !__CRT_HAVE_pthread_sigmask) || !__SIG_SETMASK */
+#endif /* (!__CRT_HAVE_sigprocmask && !__CRT_HAVE___sigprocmask && !__CRT_HAVE___libc_sigprocmask && !__CRT_HAVE_pthread_sigmask && !__CRT_HAVE_thr_sigsetmask) || !__SIG_SETMASK */
 		}
 		if (__attrp->__flags & (__POSIX_SPAWN_SETSCHEDPARAM | __POSIX_SPAWN_SETSCHEDULER)) {
 #if (defined(__CRT_HAVE_sched_setscheduler) || defined(__CRT_HAVE___sched_setscheduler) || defined(__CRT_HAVE___libc_sched_setscheduler)) && (defined(__CRT_HAVE_sched_setparam) || defined(__CRT_HAVE___sched_setparam) || defined(__CRT_HAVE___libc_sched_setparam)) && (defined(__CRT_HAVE_sched_getparam) || defined(__CRT_HAVE___sched_getparam) || defined(__CRT_HAVE___libc_sched_getparam))

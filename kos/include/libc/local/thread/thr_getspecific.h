@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6bf4f2d */
+/* HASH CRC-32:0x302d7fbb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,27 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_tss_set_defined
-#define __local_tss_set_defined
+#ifndef __local_thr_getspecific_defined
+#define __local_thr_getspecific_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_pthread_setspecific) || defined(__CRT_HAVE_thr_setspecific)
-#include <bits/crt/threads.h>
+#if (defined(__CRT_HAVE_pthread_getspecific) || defined(__CRT_HAVE_tss_get)) && (defined(__CRT_HAVE_pthread_setspecific) || defined(__CRT_HAVE_thr_setspecific))
 __NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_pthread_getspecific_defined
+#define __local___localdep_pthread_getspecific_defined
+#ifdef __CRT_HAVE_pthread_getspecific
+__NAMESPACE_LOCAL_END
+#include <bits/crt/pthreadtypes.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,__localdep_pthread_getspecific,(__pthread_key_t __key),pthread_getspecific,(__key))
+#elif defined(__CRT_HAVE_tss_get)
+__NAMESPACE_LOCAL_END
+#include <bits/crt/pthreadtypes.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,__localdep_pthread_getspecific,(__pthread_key_t __key),tss_get,(__key))
+#else /* ... */
+#undef __local___localdep_pthread_getspecific_defined
+#endif /* !... */
+#endif /* !__local___localdep_pthread_getspecific_defined */
 #ifndef __local___localdep_pthread_setspecific_defined
 #define __local___localdep_pthread_setspecific_defined
 #ifdef __CRT_HAVE_pthread_setspecific
@@ -42,24 +57,20 @@ __CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep_pthread_setspecific,(__pthread_k
 #undef __local___localdep_pthread_setspecific_defined
 #endif /* !... */
 #endif /* !__local___localdep_pthread_setspecific_defined */
-__NAMESPACE_LOCAL_END
-#include <asm/crt/threads.h>
-#include <bits/crt/pthreadtypes.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(tss_set) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tss_set))(__tss_t __tss_id, void *__val) {
-	__errno_t __error;
-	__error = (__NAMESPACE_LOCAL_SYM __localdep_pthread_setspecific)((__pthread_key_t)__tss_id, __val);
-	if __likely(!__error)
-		return __thrd_success;
-	return __thrd_error;
+__LOCAL_LIBC(thr_getspecific) __errno_t
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thr_getspecific))(__pthread_key_t __key, void **__p_val) {
+	void *__val;
+	*__p_val = __val = (__NAMESPACE_LOCAL_SYM __localdep_pthread_getspecific)(__key);
+	if (__val != __NULLPTR)
+		return 0;
+	return (__NAMESPACE_LOCAL_SYM __localdep_pthread_setspecific)(__key, __NULLPTR);
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_tss_set_defined
-#define __local___localdep_tss_set_defined
-#define __localdep_tss_set __LIBC_LOCAL_NAME(tss_set)
-#endif /* !__local___localdep_tss_set_defined */
-#else /* __CRT_HAVE_pthread_setspecific || __CRT_HAVE_thr_setspecific */
-#undef __local_tss_set_defined
-#endif /* !__CRT_HAVE_pthread_setspecific && !__CRT_HAVE_thr_setspecific */
-#endif /* !__local_tss_set_defined */
+#ifndef __local___localdep_thr_getspecific_defined
+#define __local___localdep_thr_getspecific_defined
+#define __localdep_thr_getspecific __LIBC_LOCAL_NAME(thr_getspecific)
+#endif /* !__local___localdep_thr_getspecific_defined */
+#else /* (__CRT_HAVE_pthread_getspecific || __CRT_HAVE_tss_get) && (__CRT_HAVE_pthread_setspecific || __CRT_HAVE_thr_setspecific) */
+#undef __local_thr_getspecific_defined
+#endif /* (!__CRT_HAVE_pthread_getspecific && !__CRT_HAVE_tss_get) || (!__CRT_HAVE_pthread_setspecific && !__CRT_HAVE_thr_setspecific) */
+#endif /* !__local_thr_getspecific_defined */

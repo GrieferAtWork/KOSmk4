@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6bbecb2 */
+/* HASH CRC-32:0xcd9865aa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -140,10 +140,12 @@ INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attr_getinherit
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attr_setinheritsched)(pthread_attr_t *attr, int inherit);
 /* >> pthread_attr_getscope(3)
  * Return in `*scope' the scheduling contention scope of `*attr'
+ * @param:  scope: Filled with one of `PTHREAD_SCOPE_*'
  * @return: EOK: Success */
 INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attr_getscope)(pthread_attr_t const *__restrict attr, int *__restrict scope);
 /* >> pthread_attr_setscope(3)
  * Set scheduling contention scope in `*attr' according to `scope'
+ * @param:  scope:  One of `PTHREAD_SCOPE_*'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `scope' */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attr_setscope)(pthread_attr_t *attr, int scope);

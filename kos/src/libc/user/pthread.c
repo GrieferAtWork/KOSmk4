@@ -917,9 +917,10 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setinheritsched)(pthread_attr_t *attr,
 }
 /*[[[end:libc_pthread_attr_setinheritsched]]]*/
 
-/*[[[head:libc_pthread_attr_getscope,hash:CRC-32=0x167f9d8]]]*/
+/*[[[head:libc_pthread_attr_getscope,hash:CRC-32=0x9f6ee748]]]*/
 /* >> pthread_attr_getscope(3)
  * Return in `*scope' the scheduling contention scope of `*attr'
+ * @param:  scope: Filled with one of `PTHREAD_SCOPE_*'
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getscope)(pthread_attr_t const *__restrict attr,
@@ -933,9 +934,10 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getscope)(pthread_attr_t const *__restric
 }
 /*[[[end:libc_pthread_attr_getscope]]]*/
 
-/*[[[head:libc_pthread_attr_setscope,hash:CRC-32=0x963a5198]]]*/
+/*[[[head:libc_pthread_attr_setscope,hash:CRC-32=0x345f1b7d]]]*/
 /* >> pthread_attr_setscope(3)
  * Set scheduling contention scope in `*attr' according to `scope'
+ * @param:  scope:  One of `PTHREAD_SCOPE_*'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `scope' */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
@@ -4368,11 +4370,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setspecific)(pthread_key_t key,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x7f9488d0]]]*/
+/*[[[start:exports,hash:CRC-32=0xce92074d]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(DOS$pthread_create, libd_pthread_create);
 #endif /* !__LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(pthread_create, libc_pthread_create);
+DEFINE_PUBLIC_ALIAS(thr_exit, libc_pthread_exit);
 DEFINE_PUBLIC_ALIAS(pthread_exit, libc_pthread_exit);
 DEFINE_PUBLIC_ALIAS(pthread_join, libc_pthread_join);
 DEFINE_PUBLIC_ALIAS(pthread_tryjoin_np, libc_pthread_tryjoin_np);
@@ -4380,6 +4383,7 @@ DEFINE_PUBLIC_ALIAS(pthread_timedjoin_np, libc_pthread_timedjoin_np);
 DEFINE_PUBLIC_ALIAS(pthread_timedjoin64_np, libc_pthread_timedjoin64_np);
 DEFINE_PUBLIC_ALIAS(pthread_detach, libc_pthread_detach);
 DEFINE_PUBLIC_ALIAS(thrd_current, libc_pthread_self);
+DEFINE_PUBLIC_ALIAS(thr_self, libc_pthread_self);
 DEFINE_PUBLIC_ALIAS(pthread_self, libc_pthread_self);
 DEFINE_PUBLIC_ALIAS(pthread_attr_init, libc_pthread_attr_init);
 DEFINE_PUBLIC_ALIAS(pthread_attr_destroy, libc_pthread_attr_destroy);
@@ -4415,7 +4419,9 @@ DEFINE_PUBLIC_ALIAS(pthread_set_name_np, libc_pthread_setname_np);
 DEFINE_PUBLIC_ALIAS(pthread_setname_np, libc_pthread_setname_np);
 DEFINE_PUBLIC_ALIAS(pthread_gettid_np, libc_pthread_gettid_np);
 DEFINE_PUBLIC_ALIAS(pthread_rpc_exec, libc_pthread_rpc_exec);
+DEFINE_PUBLIC_ALIAS(thr_getconcurrency, libc_pthread_getconcurrency);
 DEFINE_PUBLIC_ALIAS(pthread_getconcurrency, libc_pthread_getconcurrency);
+DEFINE_PUBLIC_ALIAS(thr_setconcurrency, libc_pthread_setconcurrency);
 DEFINE_PUBLIC_ALIAS(pthread_setconcurrency, libc_pthread_setconcurrency);
 DEFINE_PUBLIC_ALIAS(pthread_setaffinity_np, libc_pthread_setaffinity_np);
 DEFINE_PUBLIC_ALIAS(pthread_getaffinity_np, libc_pthread_getaffinity_np);
@@ -4502,11 +4508,13 @@ DEFINE_PUBLIC_ALIAS(pthread_barrierattr_init, libc_pthread_barrierattr_init);
 DEFINE_PUBLIC_ALIAS(pthread_barrierattr_destroy, libc_pthread_barrierattr_destroy);
 DEFINE_PUBLIC_ALIAS(pthread_barrierattr_getpshared, libc_pthread_barrierattr_getpshared);
 DEFINE_PUBLIC_ALIAS(pthread_barrierattr_setpshared, libc_pthread_barrierattr_setpshared);
+DEFINE_PUBLIC_ALIAS(thr_keycreate, libc_pthread_key_create);
 DEFINE_PUBLIC_ALIAS(pthread_key_create, libc_pthread_key_create);
 DEFINE_PUBLIC_ALIAS(tss_delete, libc_pthread_key_delete);
 DEFINE_PUBLIC_ALIAS(pthread_key_delete, libc_pthread_key_delete);
 DEFINE_PUBLIC_ALIAS(tss_get, libc_pthread_getspecific);
 DEFINE_PUBLIC_ALIAS(pthread_getspecific, libc_pthread_getspecific);
+DEFINE_PUBLIC_ALIAS(thr_setspecific, libc_pthread_setspecific);
 DEFINE_PUBLIC_ALIAS(pthread_setspecific, libc_pthread_setspecific);
 DEFINE_PUBLIC_ALIAS(pthread_getcpuclockid, libc_pthread_getcpuclockid);
 DEFINE_PUBLIC_ALIAS(pthread_atfork, libc_pthread_atfork);

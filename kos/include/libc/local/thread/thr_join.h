@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5edf6187 */
+/* HASH CRC-32:0xa07db152 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,30 +18,33 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_sighold_defined
-#define __local_sighold_defined
+#ifndef __local_thr_join_defined
+#define __local_thr_join_defined
 #include <__crt.h>
-#include <asm/os/signal.h>
-#if defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask) || defined(__CRT_HAVE_thr_sigsetmask))
+#ifdef __CRT_HAVE_pthread_join
+#include <bits/crt/pthreadtypes.h>
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_pthread_join_defined
+#define __local___localdep_pthread_join_defined
+__NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_set_single_signal_masked_defined
-#define __local___localdep_set_single_signal_masked_defined
-__NAMESPACE_LOCAL_END
-#include <libc/local/signal/set_single_signal_masked.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_set_single_signal_masked __LIBC_LOCAL_NAME(set_single_signal_masked)
-#endif /* !__local___localdep_set_single_signal_masked_defined */
-__LOCAL_LIBC(sighold) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sighold))(__signo_t __signo) {
-	return (__NAMESPACE_LOCAL_SYM __localdep_set_single_signal_masked)(__signo, __SIG_BLOCK);
+__CREDIRECT(,__errno_t,__NOTHROW_RPC,__localdep_pthread_join,(__pthread_t __pthread, void **__thread_return),pthread_join,(__pthread,__thread_return))
+#endif /* !__local___localdep_pthread_join_defined */
+__LOCAL_LIBC(thr_join) __errno_t
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thr_join))(__pthread_t __thr, __pthread_t *__p_departed, void **__thread_return) {
+	__errno_t __result;
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_pthread_join)(__thr, __thread_return);
+	if (__result == 0)
+		*__p_departed = __thr;
+	return __result;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_sighold_defined
-#define __local___localdep_sighold_defined
-#define __localdep_sighold __LIBC_LOCAL_NAME(sighold)
-#endif /* !__local___localdep_sighold_defined */
-#else /* __SIG_BLOCK && (__CRT_HAVE_sigprocmask || __CRT_HAVE___sigprocmask || __CRT_HAVE___libc_sigprocmask || __CRT_HAVE_pthread_sigmask || __CRT_HAVE_thr_sigsetmask) */
-#undef __local_sighold_defined
-#endif /* !__SIG_BLOCK || (!__CRT_HAVE_sigprocmask && !__CRT_HAVE___sigprocmask && !__CRT_HAVE___libc_sigprocmask && !__CRT_HAVE_pthread_sigmask && !__CRT_HAVE_thr_sigsetmask) */
-#endif /* !__local_sighold_defined */
+#ifndef __local___localdep_thr_join_defined
+#define __local___localdep_thr_join_defined
+#define __localdep_thr_join __LIBC_LOCAL_NAME(thr_join)
+#endif /* !__local___localdep_thr_join_defined */
+#else /* __CRT_HAVE_pthread_join */
+#undef __local_thr_join_defined
+#endif /* !__CRT_HAVE_pthread_join */
+#endif /* !__local_thr_join_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdfa746ca */
+/* HASH CRC-32:0x8a1b17e2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,9 +46,12 @@
 #include <bits/crt/setjmp.h>
 #include <bits/types.h>
 #include <kos/anno.h>
+
+#if 1 /* ??? */
 #include <endian.h>
 #include <sched.h>
 #include <time.h>
+#endif
 
 __SYSDECL_BEGIN
 
@@ -627,10 +630,17 @@ typedef __pthread_barrierattr_t pthread_barrierattr_t;
  *                  (read: `ENOMEM', but posix didn't want to use that
  *                  errno for whatever reason...) */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,pthread_create,(pthread_t *__restrict __newthread, pthread_attr_t const *__restrict __attr, void *(__LIBCCALL *__start_routine)(void *__arg), void *__arg),(__newthread,__attr,__start_routine,__arg))
+#ifdef __CRT_HAVE_pthread_exit
 /* >> pthread_exit(3)
  * Terminate calling thread.
  * The registered cleanup handlers are called via exception handling */
-__CDECLARE_VOID_OPT(__ATTR_NORETURN,__THROWING,pthread_exit,(void *__retval),(__retval))
+__CDECLARE_VOID(__ATTR_NORETURN,__THROWING,pthread_exit,(void *__retval),(__retval))
+#elif defined(__CRT_HAVE_thr_exit)
+/* >> pthread_exit(3)
+ * Terminate calling thread.
+ * The registered cleanup handlers are called via exception handling */
+__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,pthread_exit,(void *__retval),thr_exit,(__retval))
+#endif /* ... */
 /* >> pthread_join(3)
  * Make calling thread wait for termination of the thread `pthread'.
  * The exit status of the  thread is stored in `*thread_return',  if
@@ -723,6 +733,11 @@ __CDECLARE(__ATTR_CONST,pthread_t,__NOTHROW,pthread_self,(void),())
  * Obtain the identifier of the current thread
  * @return: * : Handle for the calling thread */
 __CREDIRECT(__ATTR_CONST,pthread_t,__NOTHROW,pthread_self,(void),thrd_current,())
+#elif defined(__CRT_HAVE_thr_self)
+/* >> pthread_self(3)
+ * Obtain the identifier of the current thread
+ * @return: * : Handle for the calling thread */
+__CREDIRECT(__ATTR_CONST,pthread_t,__NOTHROW,pthread_self,(void),thr_self,())
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_equal
 /* >> pthread_equal(3)
@@ -803,10 +818,12 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_attr_getin
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_setinheritsched,(pthread_attr_t *__attr, int __inherit),(__attr,__inherit))
 /* >> pthread_attr_getscope(3)
  * Return in `*scope' the scheduling contention scope of `*attr'
+ * @param:  scope: Filled with one of `PTHREAD_SCOPE_*'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_attr_getscope,(pthread_attr_t const *__restrict __attr, int *__restrict __scope),(__attr,__scope))
 /* >> pthread_attr_setscope(3)
  * Set scheduling contention scope in `*attr' according to `scope'
+ * @param:  scope:  One of `PTHREAD_SCOPE_*'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `scope' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_setscope,(pthread_attr_t *__attr, int __scope),(__attr,__scope))
@@ -1009,15 +1026,30 @@ struct rpc_context;
 __CDECLARE_OPT(__ATTR_WUNUSED,__errno_t,__NOTHROW_RPC,pthread_rpc_exec,(pthread_t __target_thread, void (__LIBKCALL *__func)(struct rpc_context *__restrict __ctx, void *__cookie), void *__cookie),(__target_thread,__func,__cookie))
 #endif /* __USE_KOS */
 #ifdef __USE_UNIX98
+#ifdef __CRT_HAVE_pthread_getconcurrency
 /* >> pthread_getconcurrency(3)
  * Determine level of concurrency
  * @return: * : The current concurrency level */
-__CDECLARE_OPT(__ATTR_PURE,int,__NOTHROW_NCX,pthread_getconcurrency,(void),())
+__CDECLARE(__ATTR_PURE,int,__NOTHROW_NCX,pthread_getconcurrency,(void),())
+#elif defined(__CRT_HAVE_thr_getconcurrency)
+/* >> pthread_getconcurrency(3)
+ * Determine level of concurrency
+ * @return: * : The current concurrency level */
+__CREDIRECT(__ATTR_PURE,int,__NOTHROW_NCX,pthread_getconcurrency,(void),thr_getconcurrency,())
+#endif /* ... */
+#ifdef __CRT_HAVE_pthread_setconcurrency
 /* >> pthread_setconcurrency(3)
  * Set new concurrency level to `level'
  * @return: EOK:    Success
  * @return: EINVAL: The given `level' is negative */
-__CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_setconcurrency,(int __level),(__level))
+__CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_setconcurrency,(int __level),(__level))
+#elif defined(__CRT_HAVE_thr_setconcurrency)
+/* >> pthread_setconcurrency(3)
+ * Set new concurrency level to `level'
+ * @return: EOK:    Success
+ * @return: EINVAL: The given `level' is negative */
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_setconcurrency,(int __level),thr_setconcurrency,(__level))
+#endif /* ... */
 #endif /* __USE_UNIX98 */
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_sched_yield
@@ -1068,6 +1100,14 @@ __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),__libc_sched_yield,())
  * implementation
  * @return: EOK: Success */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),yield,())
+#elif defined(__CRT_HAVE_thr_yield)
+/* >> pthread_yield(3), thrd_yield(3), sched_yield(2)
+ * Yield  the processor to another thread or process.
+ * This function is similar to the POSIX `sched_yield' function but
+ * might  be differently implemented in the case of a m-on-n thread
+ * implementation
+ * @return: EOK: Success */
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),thr_yield,())
 #endif /* ... */
 /* >> pthread_setaffinity_np(3)
  * Limit specified thread `pthread' to run only on the processors represented in `cpuset'
@@ -2324,6 +2364,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_barrierattr_s
 /* pthread_key_t                                                        */
 /************************************************************************/
 
+#ifdef __CRT_HAVE_pthread_key_create
 /* >> pthread_key_create(3)
  * Create a key value identifying a location in the thread-specific
  * data area. Each thread maintains a distinct thread-specific data
@@ -2333,7 +2374,19 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_barrierattr_s
  * when the key is destroyed
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_key_create,(pthread_key_t *__key, void (__LIBKCALL *__destr_function)(void *__value)),(__key,__destr_function))
+__CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_key_create,(pthread_key_t *__key, void (__LIBKCALL *__destr_function)(void *__value)),(__key,__destr_function))
+#elif defined(__CRT_HAVE_thr_keycreate)
+/* >> pthread_key_create(3)
+ * Create a key value identifying a location in the thread-specific
+ * data area. Each thread maintains a distinct thread-specific data
+ * area. `destr_function', if non-`NULL', is called with the  value
+ * associated to that key when the key is destroyed.
+ * `destr_function' is not called if the value associated is `NULL'
+ * when the key is destroyed
+ * @return: EOK:    Success
+ * @return: ENOMEM: Insufficient memory to create the key */
+__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_key_create,(pthread_key_t *__key, void (__LIBKCALL *__destr_function)(void *__value)),thr_keycreate,(__key,__destr_function))
+#endif /* ... */
 #ifdef __USE_SOLARIS
 #ifndef PTHREAD_ONCE_KEY_NP
 #ifdef __PTHREAD_ONCE_KEY_NP
@@ -2353,7 +2406,18 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_key_create,(p
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_key_create_once_np,(pthread_key_t *__key, void (__LIBKCALL *__destr_function)(void *)),(__key,__destr_function))
-#elif defined(__CRT_HAVE_pthread_key_create)
+#elif defined(__CRT_HAVE_thr_keycreate_once)
+/* >> pthread_key_create_once_np(3)
+ * Same as `pthread_key_create()', but the  given `key' must be  pre-initialized
+ * using the static initializer `PTHREAD_ONCE_KEY_NP', whilst this function will
+ * make  sure that  even in the  event of multiple  simultaneous threads calling
+ * this function, only one will create the  key, and all others will wait  until
+ * the key has been  created. Once the  key was created,  further calls to  this
+ * function will no longer block, but simply return immediately.
+ * @return: EOK:    Success
+ * @return: ENOMEM: Insufficient memory to create the key */
+__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_key_create_once_np,(pthread_key_t *__key, void (__LIBKCALL *__destr_function)(void *)),thr_keycreate_once,(__key,__destr_function))
+#elif defined(__CRT_HAVE_pthread_key_create) || defined(__CRT_HAVE_thr_keycreate)
 #include <libc/local/pthread/pthread_key_create_once_np.h>
 /* >> pthread_key_create_once_np(3)
  * Same as `pthread_key_create()', but the  given `key' must be  pre-initialized
@@ -2397,13 +2461,23 @@ __CDECLARE(__ATTR_WUNUSED,void *,__NOTHROW_NCX,pthread_getspecific,(pthread_key_
  * @return: NULL: Invalid `key' */
 __CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,pthread_getspecific,(pthread_key_t __key),tss_get,(__key))
 #endif /* ... */
+#ifdef __CRT_HAVE_pthread_setspecific
 /* >> pthread_setspecific(3)
  * Store POINTER in the thread-specific data slot identified by `key'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `key'
  * @return: ENOMEM: `pointer'  is non-`NULL', `key' had yet to be allowed for the
  *                  calling thread, and an attempt to allocate it just now failed */
-__CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_setspecific,(pthread_key_t __key, void const *__pointer),(__key,__pointer))
+__CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_setspecific,(pthread_key_t __key, void const *__pointer),(__key,__pointer))
+#elif defined(__CRT_HAVE_thr_setspecific)
+/* >> pthread_setspecific(3)
+ * Store POINTER in the thread-specific data slot identified by `key'
+ * @return: EOK:    Success
+ * @return: EINVAL: Invalid `key'
+ * @return: ENOMEM: `pointer'  is non-`NULL', `key' had yet to be allowed for the
+ *                  calling thread, and an attempt to allocate it just now failed */
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_setspecific,(pthread_key_t __key, void const *__pointer),thr_setspecific,(__key,__pointer))
+#endif /* ... */
 #ifdef __USE_XOPEN2K
 /* >> pthread_getcpuclockid(3)
  * Get the ID of CPU-time clock for thread `pthread'

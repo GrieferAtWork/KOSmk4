@@ -18,6 +18,17 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
+/* (#) Portability: Cygwin        (/newlib/libc/include/langinfo.h) */
+/* (#) Portability: FreeBSD       (/include/langinfo.h) */
+/* (#) Portability: GNU C Library (/locale/langinfo.h) */
+/* (#) Portability: NetBSD        (/include/langinfo.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/langinfo.h) */
+/* (#) Portability: OpenBSD       (/include/langinfo.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/langinfo.h) */
+/* (#) Portability: diet libc     (/include/langinfo.h) */
+/* (#) Portability: libc6         (/include/langinfo.h) */
+/* (#) Portability: musl libc     (/include/langinfo.h) */
+/* (#) Portability: uClibc        (/include/langinfo.h) */
 }
 
 %[default:section(".text.crt{|.dos}.i18n")]

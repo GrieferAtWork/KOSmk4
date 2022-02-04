@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c9e292c */
+/* HASH CRC-32:0xb1798352 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -335,7 +335,7 @@ done_infd:
 				continue;
 #if (defined(__CRT_HAVE_kill) || defined(__CRT_HAVE___kill) || defined(__CRT_HAVE___libc_kill)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid))
 			libc_kill(libc_getpid(), __NAMESPACE_LOCAL_SYM rpp_signals[i]);
-#elif defined(__CRT_HAVE_raise) || (defined(__CRT_HAVE_pthread_kill) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current)))
+#elif defined(__CRT_HAVE_raise) || ((defined(__CRT_HAVE_pthread_kill) || defined(__CRT_HAVE_thr_kill)) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self)))
 			libc_raise(__NAMESPACE_LOCAL_SYM rpp_signals[i]);
 #endif /* ... */
 

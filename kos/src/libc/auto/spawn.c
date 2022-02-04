@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x581a0ab9 */
+/* HASH CRC-32:0x1e5e0804 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -343,10 +343,10 @@ do_exec:
 #endif /* (!__CRT_HAVE_sigaction && !__CRT_HAVE___sigaction) || !__SIG_DFL */
 		}
 		if (attrp->__flags & __POSIX_SPAWN_SETSIGMASK) {
-#if (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask)) && defined(__SIG_SETMASK)
+#if (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask) || defined(__CRT_HAVE_thr_sigsetmask)) && defined(__SIG_SETMASK)
 			if unlikely(libc_sigprocmask(__SIG_SETMASK, &attrp->__ss, NULL))
 				goto child_error;
-#else /* (__CRT_HAVE_sigprocmask || __CRT_HAVE___sigprocmask || __CRT_HAVE___libc_sigprocmask || __CRT_HAVE_pthread_sigmask) && __SIG_SETMASK */
+#else /* (__CRT_HAVE_sigprocmask || __CRT_HAVE___sigprocmask || __CRT_HAVE___libc_sigprocmask || __CRT_HAVE_pthread_sigmask || __CRT_HAVE_thr_sigsetmask) && __SIG_SETMASK */
 #ifdef ENOSYS
 			(void)libc_seterrno(ENOSYS);
 #elif defined(EPERM)
@@ -355,7 +355,7 @@ do_exec:
 			(void)libc_seterrno(1);
 #endif /* !... */
 			goto child_error;
-#endif /* (!__CRT_HAVE_sigprocmask && !__CRT_HAVE___sigprocmask && !__CRT_HAVE___libc_sigprocmask && !__CRT_HAVE_pthread_sigmask) || !__SIG_SETMASK */
+#endif /* (!__CRT_HAVE_sigprocmask && !__CRT_HAVE___sigprocmask && !__CRT_HAVE___libc_sigprocmask && !__CRT_HAVE_pthread_sigmask && !__CRT_HAVE_thr_sigsetmask) || !__SIG_SETMASK */
 		}
 		if (attrp->__flags & (__POSIX_SPAWN_SETSCHEDPARAM | __POSIX_SPAWN_SETSCHEDULER)) {
 #if (defined(__CRT_HAVE_sched_setscheduler) || defined(__CRT_HAVE___sched_setscheduler) || defined(__CRT_HAVE___libc_sched_setscheduler)) && (defined(__CRT_HAVE_sched_setparam) || defined(__CRT_HAVE___sched_setparam) || defined(__CRT_HAVE___libc_sched_setparam)) && (defined(__CRT_HAVE_sched_getparam) || defined(__CRT_HAVE___sched_getparam) || defined(__CRT_HAVE___libc_sched_getparam))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55633a51 */
+/* HASH CRC-32:0x8685434d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -448,35 +448,47 @@ __CREDIRECT(,int,__NOTHROW_NCX,sched_getscheduler,(__pid_t __pid),__libc_sched_g
 #endif /* ... */
 
 #ifdef __CRT_HAVE_sched_yield
-/* @return: 1: Another thread was  executed prior to  the function  returning
+/* >> sched_yield(2)
+ * @return: 1: Another thread was  executed prior to  the function  returning
  *             The thread may not necessarily be apart of the calling process
  * @return: 0: The function returned immediately when no other thread was executed */
 __CDECLARE(,int,__NOTHROW,sched_yield,(void),())
 #elif defined(__CRT_HAVE_thrd_yield)
-/* @return: 1: Another thread was  executed prior to  the function  returning
+/* >> sched_yield(2)
+ * @return: 1: Another thread was  executed prior to  the function  returning
  *             The thread may not necessarily be apart of the calling process
  * @return: 0: The function returned immediately when no other thread was executed */
 __CREDIRECT(,int,__NOTHROW,sched_yield,(void),thrd_yield,())
 #elif defined(__CRT_HAVE_pthread_yield)
-/* @return: 1: Another thread was  executed prior to  the function  returning
+/* >> sched_yield(2)
+ * @return: 1: Another thread was  executed prior to  the function  returning
  *             The thread may not necessarily be apart of the calling process
  * @return: 0: The function returned immediately when no other thread was executed */
 __CREDIRECT(,int,__NOTHROW,sched_yield,(void),pthread_yield,())
 #elif defined(__CRT_HAVE___sched_yield)
-/* @return: 1: Another thread was  executed prior to  the function  returning
+/* >> sched_yield(2)
+ * @return: 1: Another thread was  executed prior to  the function  returning
  *             The thread may not necessarily be apart of the calling process
  * @return: 0: The function returned immediately when no other thread was executed */
 __CREDIRECT(,int,__NOTHROW,sched_yield,(void),__sched_yield,())
 #elif defined(__CRT_HAVE___libc_sched_yield)
-/* @return: 1: Another thread was  executed prior to  the function  returning
+/* >> sched_yield(2)
+ * @return: 1: Another thread was  executed prior to  the function  returning
  *             The thread may not necessarily be apart of the calling process
  * @return: 0: The function returned immediately when no other thread was executed */
 __CREDIRECT(,int,__NOTHROW,sched_yield,(void),__libc_sched_yield,())
 #elif defined(__CRT_HAVE_yield)
-/* @return: 1: Another thread was  executed prior to  the function  returning
+/* >> sched_yield(2)
+ * @return: 1: Another thread was  executed prior to  the function  returning
  *             The thread may not necessarily be apart of the calling process
  * @return: 0: The function returned immediately when no other thread was executed */
 __CREDIRECT(,int,__NOTHROW,sched_yield,(void),yield,())
+#elif defined(__CRT_HAVE_thr_yield)
+/* >> sched_yield(2)
+ * @return: 1: Another thread was  executed prior to  the function  returning
+ *             The thread may not necessarily be apart of the calling process
+ * @return: 0: The function returned immediately when no other thread was executed */
+__CREDIRECT(,int,__NOTHROW,sched_yield,(void),thr_yield,())
 #endif /* ... */
 #ifdef __CRT_HAVE_sched_get_priority_max
 __CDECLARE(,int,__NOTHROW_NCX,sched_get_priority_max,(__STDC_INT_AS_UINT_T __algorithm),(__algorithm))

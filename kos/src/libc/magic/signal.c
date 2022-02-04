@@ -1630,7 +1630,7 @@ int sigismember([[nonnull]] $sigset_t const *set, $signo_t signo) {
 @@@return: 0:  Success
 @@@return: -1: [errno=EINVAL] Invalid `how'
 [[libc, decl_prefix(struct __sigset_struct;), decl_include("<features.h>")]]
-[[export_alias("__sigprocmask", "__libc_sigprocmask", "pthread_sigmask")]]
+[[export_alias("__sigprocmask", "__libc_sigprocmask", "pthread_sigmask", "thr_sigsetmask")]]
 int sigprocmask(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset);
 
 %#ifdef __USE_KOS
@@ -2680,7 +2680,7 @@ $signo_t __libc_current_sigrtmax() {
  *       doing it this ways, especially  since the only possible error  can
  *       only happen as the result of improper API use of an argument  that
  *       will almost always simply have a fixed, constant value. */
-[[nocrt, alias("pthread_sigmask", "sigprocmask")]]
+[[nocrt, alias("pthread_sigmask", "thr_sigsetmask", "sigprocmask")]]
 $errno_t pthread_sigmask(__STDC_INT_AS_UINT_T how,
                          [[nullable]] $sigset_t const *newmask,
                          [[nullable]] $sigset_t *oldmask);
@@ -2691,6 +2691,7 @@ $errno_t pthread_sigmask(__STDC_INT_AS_UINT_T how,
 @@@return: EOK:    Success
 @@@return: EINVAL: The given `signo' is invalid
 [[guard, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("thr_kill")]]
 $errno_t pthread_kill($pthread_t pthread, $signo_t signo);
 
 %#ifdef __USE_GNU

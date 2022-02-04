@@ -1110,7 +1110,7 @@ DEFINE_INTERN_ALIAS(libd_gsignal, libd_raise);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x31425136]]]*/
+/*[[[start:exports,hash:CRC-32=0x22591e1b]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$raise, libd_raise);
 DEFINE_PUBLIC_ALIAS(raise, libc_raise);
 DEFINE_PUBLIC_ALIAS(DOS$__sysv_signal, libd_sysv_signal);
@@ -1136,6 +1136,7 @@ DEFINE_PUBLIC_ALIAS(kill, libc_kill);
 DEFINE_PUBLIC_ALIAS(__sigprocmask, libc_sigprocmask);
 DEFINE_PUBLIC_ALIAS(__libc_sigprocmask, libc_sigprocmask);
 DEFINE_PUBLIC_ALIAS(pthread_sigmask, libc_sigprocmask);
+DEFINE_PUBLIC_ALIAS(thr_sigsetmask, libc_sigprocmask);
 DEFINE_PUBLIC_ALIAS(sigprocmask, libc_sigprocmask);
 DEFINE_PUBLIC_ALIAS(getsigmaskptr, libc_getsigmaskptr);
 DEFINE_PUBLIC_ALIAS(setsigmaskptr, libc_setsigmaskptr);
@@ -1160,6 +1161,7 @@ DEFINE_PUBLIC_ALIAS(sigqueueinfo, libc_sigqueueinfo);
 DEFINE_PUBLIC_ALIAS(tgsigqueueinfo, libc_tgsigqueueinfo);
 DEFINE_PUBLIC_ALIAS(siginterrupt, libc_siginterrupt);
 DEFINE_PUBLIC_ALIAS(sigaltstack, libc_sigaltstack);
+DEFINE_PUBLIC_ALIAS(thr_kill, libc_pthread_kill);
 DEFINE_PUBLIC_ALIAS(pthread_kill, libc_pthread_kill);
 DEFINE_PUBLIC_ALIAS(pthread_sigqueue, libc_pthread_sigqueue);
 /*[[[end:exports]]]*/

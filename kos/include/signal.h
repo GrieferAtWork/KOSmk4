@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6956734 */
+/* HASH CRC-32:0xcb8f1bb4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,9 +54,9 @@ __NAMESPACE_STD_USING(sig_atomic_t)
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
-#if defined(__CRT_HAVE_raise) || (defined(__CRT_HAVE_pthread_kill) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current))) || ((defined(__CRT_HAVE_kill) || defined(__CRT_HAVE___kill) || defined(__CRT_HAVE___libc_kill)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
+#if defined(__CRT_HAVE_raise) || ((defined(__CRT_HAVE_pthread_kill) || defined(__CRT_HAVE_thr_kill)) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self))) || ((defined(__CRT_HAVE_kill) || defined(__CRT_HAVE___kill) || defined(__CRT_HAVE___libc_kill)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
 __NAMESPACE_STD_USING(raise)
-#endif /* __CRT_HAVE_raise || (__CRT_HAVE_pthread_kill && (__CRT_HAVE_pthread_self || __CRT_HAVE_thrd_current)) || ((__CRT_HAVE_kill || __CRT_HAVE___kill || __CRT_HAVE___libc_kill) && (__CRT_HAVE_getpid || __CRT_HAVE__getpid || __CRT_HAVE___getpid || __CRT_HAVE___libc_getpid)) */
+#endif /* __CRT_HAVE_raise || ((__CRT_HAVE_pthread_kill || __CRT_HAVE_thr_kill) && (__CRT_HAVE_pthread_self || __CRT_HAVE_thrd_current || __CRT_HAVE_thr_self)) || ((__CRT_HAVE_kill || __CRT_HAVE___kill || __CRT_HAVE___libc_kill) && (__CRT_HAVE_getpid || __CRT_HAVE__getpid || __CRT_HAVE___getpid || __CRT_HAVE___libc_getpid)) */
 #include <features.h>
 #if (defined(__CRT_HAVE_signal) && defined(__USE_MISC)) || (defined(__CRT_HAVE__signal) && defined(__USE_MISC)) || defined(__CRT_HAVE_sysv_signal)
 __NAMESPACE_STD_USING(signal)
@@ -1257,7 +1257,7 @@ __NAMESPACE_STD_BEGIN
  * @return: 0:  Success
  * @return: -1: [errno=EINVAL] The given `signo' is invalid */
 __CDECLARE(,int,__NOTHROW_NCX,raise,(__signo_t __signo),(__signo))
-#elif (defined(__CRT_HAVE_pthread_kill) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current))) || ((defined(__CRT_HAVE_kill) || defined(__CRT_HAVE___kill) || defined(__CRT_HAVE___libc_kill)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
+#elif ((defined(__CRT_HAVE_pthread_kill) || defined(__CRT_HAVE_thr_kill)) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self))) || ((defined(__CRT_HAVE_kill) || defined(__CRT_HAVE___kill) || defined(__CRT_HAVE___libc_kill)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
 __NAMESPACE_STD_END
 #include <libc/local/signal/raise.h>
 __NAMESPACE_STD_BEGIN
@@ -1297,9 +1297,9 @@ __CREDIRECT(,__sighandler_t,__NOTHROW_NCX,signal,(__signo_t __signo, __sighandle
 #endif /* ... */
 __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
-#if defined(__CRT_HAVE_raise) || (defined(__CRT_HAVE_pthread_kill) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current))) || ((defined(__CRT_HAVE_kill) || defined(__CRT_HAVE___kill) || defined(__CRT_HAVE___libc_kill)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
+#if defined(__CRT_HAVE_raise) || ((defined(__CRT_HAVE_pthread_kill) || defined(__CRT_HAVE_thr_kill)) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self))) || ((defined(__CRT_HAVE_kill) || defined(__CRT_HAVE___kill) || defined(__CRT_HAVE___libc_kill)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
 __NAMESPACE_STD_USING(raise)
-#endif /* __CRT_HAVE_raise || (__CRT_HAVE_pthread_kill && (__CRT_HAVE_pthread_self || __CRT_HAVE_thrd_current)) || ((__CRT_HAVE_kill || __CRT_HAVE___kill || __CRT_HAVE___libc_kill) && (__CRT_HAVE_getpid || __CRT_HAVE__getpid || __CRT_HAVE___getpid || __CRT_HAVE___libc_getpid)) */
+#endif /* __CRT_HAVE_raise || ((__CRT_HAVE_pthread_kill || __CRT_HAVE_thr_kill) && (__CRT_HAVE_pthread_self || __CRT_HAVE_thrd_current || __CRT_HAVE_thr_self)) || ((__CRT_HAVE_kill || __CRT_HAVE___kill || __CRT_HAVE___libc_kill) && (__CRT_HAVE_getpid || __CRT_HAVE__getpid || __CRT_HAVE___getpid || __CRT_HAVE___libc_getpid)) */
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __CRT_HAVE_sysv_signal
 /* >> sysv_signal(3)
@@ -1422,7 +1422,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ssignal, __FORCELOCAL __ATTR_ARTIFICIAL __sighan
  * @return: 0:  Success
  * @return: -1: [errno=EINVAL] The given `signo' is invalid */
 __CDECLARE(,int,__NOTHROW_NCX,gsignal,(__signo_t __signo),(__signo))
-#elif defined(__CRT_HAVE_raise) || (defined(__CRT_HAVE_pthread_kill) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current))) || ((defined(__CRT_HAVE_kill) || defined(__CRT_HAVE___kill) || defined(__CRT_HAVE___libc_kill)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
+#elif defined(__CRT_HAVE_raise) || ((defined(__CRT_HAVE_pthread_kill) || defined(__CRT_HAVE_thr_kill)) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self))) || ((defined(__CRT_HAVE_kill) || defined(__CRT_HAVE___kill) || defined(__CRT_HAVE___libc_kill)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
 #include <libc/local/signal/gsignal.h>
 /* >> gsignal(3)
  * Raise a software-signal  by invoking  a previously  established
@@ -1446,7 +1446,7 @@ __CDECLARE(__ATTR_DEPRECATED("Using `sigprocmask(SIG_BLOCK)\' instead"),int,__NO
  * Modern   code   should   use   `sigprocmask()'    instead.
  * @return: 0: Success */
 __CREDIRECT(__ATTR_DEPRECATED("Using `sigprocmask(SIG_BLOCK)\' instead"),int,__NOTHROW_NCX,sigblock,(int __mask),__sigblock,(__mask))
-#elif defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask))
+#elif defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask) || defined(__CRT_HAVE_thr_sigsetmask))
 #include <libc/local/signal/sigblock.h>
 /* >> sigblock(3)
  * Deprecated method of SIG_BLOCK-ing a given set of signals.
@@ -1466,7 +1466,7 @@ __CDECLARE(__ATTR_DEPRECATED("Using `sigprocmask()\' instead"),int,__NOTHROW_NCX
  * Modern code should  use `sigprocmask(SIG_SETMASK)'  instead.
  * @return: 0: Success */
 __CREDIRECT(__ATTR_DEPRECATED("Using `sigprocmask()\' instead"),int,__NOTHROW_NCX,sigsetmask,(int __mask),__sigsetmask,(__mask))
-#elif defined(__SIG_SETMASK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask))
+#elif defined(__SIG_SETMASK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask) || defined(__CRT_HAVE_thr_sigsetmask))
 #include <libc/local/signal/sigsetmask.h>
 /* >> sigsetmask(3)
  * Deprecated method of SIG_SETMASK-ing a given set of signals.
@@ -1490,7 +1490,7 @@ __CDECLARE(__ATTR_DEPRECATED("Using `sigprocmask()\' instead"),int,__NOTHROW_NCX
  *                      of  the  lowest-numbered  couple  of  signal.
  * @return: -1:         Error */
 __CREDIRECT(__ATTR_DEPRECATED("Using `sigprocmask()\' instead"),int,__NOTHROW_NCX,siggetmask,(void),__siggetmask,())
-#elif defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask)
+#elif defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask) || defined(__CRT_HAVE_thr_sigsetmask)
 #include <libc/local/signal/siggetmask.h>
 /* >> sigsetmask(3)
  * Deprecated method of  retrieving the masking-state  of
@@ -1796,6 +1796,20 @@ __CREDIRECT(,int,__NOTHROW_NCX,sigprocmask,(__STDC_INT_AS_UINT_T __how, sigset_t
  * @return: 0:  Success
  * @return: -1: [errno=EINVAL] Invalid `how' */
 __CREDIRECT(,int,__NOTHROW_NCX,sigprocmask,(__STDC_INT_AS_UINT_T __how, sigset_t const *__set, sigset_t *__oset),pthread_sigmask,(__how,__set,__oset))
+#elif defined(__CRT_HAVE_thr_sigsetmask)
+/* Change  the signal mask for the calling thread. Note that portable
+ * programs that also make use of multithreading must instead use the
+ * pthread-specific  `pthread_sigmask()'  function instead,  as POSIX
+ * states that  this function  behaves undefined  in such  scenarios.
+ * However, on KOS, `pthread_sigmask()' is  simply an alias for  this
+ * function,  and  `sigprocmask()'   always  operates   thread-local.
+ * Note also  that on  KOS 2  additional functions  `getsigmaskptr()'
+ * and `setsigmaskptr()'  exist, which  can be  used to  get/set  the
+ * address of the signal mask used by the kernel.
+ * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
+ * @return: 0:  Success
+ * @return: -1: [errno=EINVAL] Invalid `how' */
+__CREDIRECT(,int,__NOTHROW_NCX,sigprocmask,(__STDC_INT_AS_UINT_T __how, sigset_t const *__set, sigset_t *__oset),thr_sigsetmask,(__how,__set,__oset))
 #endif /* ... */
 #ifdef __USE_KOS
 /* >> getsigmaskptr(3)
@@ -2231,7 +2245,7 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,sigaltstack,(struct sigaltstack const *__ss, s
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
 __CDECLARE(,int,__NOTHROW_NCX,sighold,(__signo_t __signo),(__signo))
-#elif defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask))
+#elif defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask) || defined(__CRT_HAVE_thr_sigsetmask))
 #include <libc/local/signal/sighold.h>
 /* >> sighold(3)
  * Mask a single signal  `signo', which is the  same
@@ -2247,7 +2261,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sighold, __FORCELOCAL __ATTR_ARTIFICIAL int __NO
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
 __CDECLARE(,int,__NOTHROW_NCX,sigrelse,(__signo_t __signo),(__signo))
-#elif defined(__SIG_UNBLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask))
+#elif defined(__SIG_UNBLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask) || defined(__CRT_HAVE_thr_sigsetmask))
 #include <libc/local/signal/sigrelse.h>
 /* >> sighold(3)
  * Unmask a single signal  `signo', which is the  same
@@ -2277,7 +2291,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sigignore, __FORCELOCAL __ATTR_ARTIFICIAL int __
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
 __CDECLARE(,__sighandler_t,__NOTHROW_NCX,sigset,(__signo_t __signo, __sighandler_t __disp),(__signo,__disp))
-#elif defined(__SIG_ERR) && defined(__SIG_HOLD) && defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask)) && (defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction))
+#elif defined(__SIG_ERR) && defined(__SIG_HOLD) && defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask) || defined(__CRT_HAVE_thr_sigsetmask)) && (defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction))
 #include <libc/local/signal/sigset.h>
 /* >> sigset(3)
  * Set the handler of `signo'  to `disp', or add `signo'  to
@@ -2313,6 +2327,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmax, __FORCELOCAL __ATTR_ART
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `how' */
 __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_sigmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__newmask, struct __sigset_struct *__oldmask),(__how,__newmask,__oldmask))
+#elif defined(__CRT_HAVE_thr_sigsetmask)
+/* >> pthread_sigmask(3)
+ * Thread-safe version of `sigprocmask(2)'. Note though, that on
+ * many systems (including KOS), this function behaves identical
+ * to `sigprocmask()', though portable programs should still use
+ * this function if they intend to use multiple threads.
+ * @return: EOK:    Success
+ * @return: EINVAL: Invalid `how' */
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_sigmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__newmask, struct __sigset_struct *__oldmask),thr_sigsetmask,(__how,__newmask,__oldmask))
 #elif defined(__CRT_HAVE_sigprocmask)
 /* >> pthread_sigmask(3)
  * Thread-safe version of `sigprocmask(2)'. Note though, that on
@@ -2326,14 +2349,24 @@ __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_sigmask,(__STDC_INT_AS_UINT_T __how
 #undef __pthread_sigmask_defined
 #endif /* !... */
 #endif /* !__pthread_sigmask_defined */
-#if !defined(__pthread_kill_defined) && defined(__CRT_HAVE_pthread_kill)
+#ifndef __pthread_kill_defined
 #define __pthread_kill_defined
+#ifdef __CRT_HAVE_pthread_kill
 /* >> pthread_kill(3)
  * Portable function for sending a signal to a specific `pthread' within one's own process.
  * @return: EOK:    Success
  * @return: EINVAL: The given `signo' is invalid */
 __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_kill,(__pthread_t __pthread, __signo_t __signo),(__pthread,__signo))
-#endif /* !__pthread_kill_defined && __CRT_HAVE_pthread_kill */
+#elif defined(__CRT_HAVE_thr_kill)
+/* >> pthread_kill(3)
+ * Portable function for sending a signal to a specific `pthread' within one's own process.
+ * @return: EOK:    Success
+ * @return: EINVAL: The given `signo' is invalid */
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_kill,(__pthread_t __pthread, __signo_t __signo),thr_kill,(__pthread,__signo))
+#else /* ... */
+#undef __pthread_kill_defined
+#endif /* !... */
+#endif /* !__pthread_kill_defined */
 #ifdef __USE_GNU
 #if !defined(__pthread_sigqueue_defined) && defined(__CRT_HAVE_pthread_sigqueue)
 #define __pthread_sigqueue_defined

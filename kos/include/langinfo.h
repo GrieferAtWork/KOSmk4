@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x568b176d */
+/* HASH CRC-32:0xbe8220db */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/newlib/libc/include/langinfo.h) */
+/* (#) Portability: FreeBSD       (/include/langinfo.h) */
+/* (#) Portability: GNU C Library (/locale/langinfo.h) */
+/* (#) Portability: NetBSD        (/include/langinfo.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/langinfo.h) */
+/* (#) Portability: OpenBSD       (/include/langinfo.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/langinfo.h) */
+/* (#) Portability: diet libc     (/include/langinfo.h) */
+/* (#) Portability: libc6         (/include/langinfo.h) */
+/* (#) Portability: musl libc     (/include/langinfo.h) */
+/* (#) Portability: uClibc        (/include/langinfo.h) */
 #ifndef _LANGINFO_H
 #define _LANGINFO_H 1
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f7e5284 */
+/* HASH CRC-32:0xb1f49257 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -297,6 +297,7 @@ DEFINE_PUBLIC_ALIAS(pthread_spin_destroy, libc_pthread_spin_destroy);
 DEFINE_PUBLIC_ALIAS(pthread_spin_lock, libc_pthread_spin_lock);
 DEFINE_PUBLIC_ALIAS(pthread_spin_trylock, libc_pthread_spin_trylock);
 DEFINE_PUBLIC_ALIAS(pthread_spin_unlock, libc_pthread_spin_unlock);
+DEFINE_PUBLIC_ALIAS(thr_keycreate_once, libc_pthread_key_create_once_np);
 DEFINE_PUBLIC_ALIAS(pthread_key_create_once_np, libc_pthread_key_create_once_np);
 DEFINE_PUBLIC_ALIAS(pthread_num_processors_np, libc_pthread_num_processors_np);
 DEFINE_PUBLIC_ALIAS(pthread_set_num_processors_np, libc_pthread_set_num_processors_np);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9fe2ddc7 */
+/* HASH CRC-32:0xbb041787 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_sigset_defined
 #include <__crt.h>
 #include <asm/os/signal.h>
-#if defined(__SIG_ERR) && defined(__SIG_HOLD) && defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask)) && (defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction))
+#if defined(__SIG_ERR) && defined(__SIG_HOLD) && defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask) || defined(__CRT_HAVE_thr_sigsetmask)) && (defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sigaction_defined
@@ -302,6 +302,12 @@ struct __sigset_struct;
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),pthread_sigmask,(__how,__set,__oset))
+#elif defined(__CRT_HAVE_thr_sigsetmask)
+__NAMESPACE_LOCAL_END
+struct __sigset_struct;
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),thr_sigsetmask,(__how,__set,__oset))
 #else /* ... */
 #undef __local___localdep_sigprocmask_defined
 #endif /* !... */
@@ -351,7 +357,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_sigset_defined
 #define __localdep_sigset __LIBC_LOCAL_NAME(sigset)
 #endif /* !__local___localdep_sigset_defined */
-#else /* __SIG_ERR && __SIG_HOLD && __SIG_BLOCK && (__CRT_HAVE_sigprocmask || __CRT_HAVE___sigprocmask || __CRT_HAVE___libc_sigprocmask || __CRT_HAVE_pthread_sigmask) && (__CRT_HAVE_sigaction || __CRT_HAVE___sigaction) */
+#else /* __SIG_ERR && __SIG_HOLD && __SIG_BLOCK && (__CRT_HAVE_sigprocmask || __CRT_HAVE___sigprocmask || __CRT_HAVE___libc_sigprocmask || __CRT_HAVE_pthread_sigmask || __CRT_HAVE_thr_sigsetmask) && (__CRT_HAVE_sigaction || __CRT_HAVE___sigaction) */
 #undef __local_sigset_defined
-#endif /* !__SIG_ERR || !__SIG_HOLD || !__SIG_BLOCK || (!__CRT_HAVE_sigprocmask && !__CRT_HAVE___sigprocmask && !__CRT_HAVE___libc_sigprocmask && !__CRT_HAVE_pthread_sigmask) || (!__CRT_HAVE_sigaction && !__CRT_HAVE___sigaction) */
+#endif /* !__SIG_ERR || !__SIG_HOLD || !__SIG_BLOCK || (!__CRT_HAVE_sigprocmask && !__CRT_HAVE___sigprocmask && !__CRT_HAVE___libc_sigprocmask && !__CRT_HAVE_pthread_sigmask && !__CRT_HAVE_thr_sigsetmask) || (!__CRT_HAVE_sigaction && !__CRT_HAVE___sigaction) */
 #endif /* !__local_sigset_defined */

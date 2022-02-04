@@ -1249,6 +1249,7 @@ incdir("");
 #include <termio.h>
 #include <termios.h>
 #include <tgmath.h>
+#include <thread.h>
 #include <threads.h>
 #include <time.h>
 #include <ttyent.h>

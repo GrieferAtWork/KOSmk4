@@ -304,7 +304,7 @@
 /* Enable  additional  extensions  present  on
  * Solaris (or more specifically: OpenSolaris) */
 #ifdef __EXTENSIONS__
-#define __USE_SOLARIS  1
+#define __USE_SOLARIS 1
 #undef _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE 1
 #undef _XOPEN_SOURCE

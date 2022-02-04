@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x664fe07 */
+/* HASH CRC-32:0x87ff8ec3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_siggetmask_defined
 #define __local_siggetmask_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask)
+#if defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask) || defined(__CRT_HAVE_thr_sigsetmask)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sigprocmask_defined
 #define __local___localdep_sigprocmask_defined
@@ -49,6 +49,12 @@ struct __sigset_struct;
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),pthread_sigmask,(__how,__set,__oset))
+#elif defined(__CRT_HAVE_thr_sigsetmask)
+__NAMESPACE_LOCAL_END
+struct __sigset_struct;
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),thr_sigsetmask,(__how,__set,__oset))
 #else /* ... */
 #undef __local___localdep_sigprocmask_defined
 #endif /* !... */
@@ -75,7 +81,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_siggetmask_defined
 #define __localdep_siggetmask __LIBC_LOCAL_NAME(siggetmask)
 #endif /* !__local___localdep_siggetmask_defined */
-#else /* __CRT_HAVE_sigprocmask || __CRT_HAVE___sigprocmask || __CRT_HAVE___libc_sigprocmask || __CRT_HAVE_pthread_sigmask */
+#else /* __CRT_HAVE_sigprocmask || __CRT_HAVE___sigprocmask || __CRT_HAVE___libc_sigprocmask || __CRT_HAVE_pthread_sigmask || __CRT_HAVE_thr_sigsetmask */
 #undef __local_siggetmask_defined
-#endif /* !__CRT_HAVE_sigprocmask && !__CRT_HAVE___sigprocmask && !__CRT_HAVE___libc_sigprocmask && !__CRT_HAVE_pthread_sigmask */
+#endif /* !__CRT_HAVE_sigprocmask && !__CRT_HAVE___sigprocmask && !__CRT_HAVE___libc_sigprocmask && !__CRT_HAVE_pthread_sigmask && !__CRT_HAVE_thr_sigsetmask */
 #endif /* !__local_siggetmask_defined */

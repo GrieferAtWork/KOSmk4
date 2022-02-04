@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7dfeaefd */
+/* HASH CRC-32:0xf8d630ed */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2933,6 +2933,12 @@
 #define __CRT_HAVE_DOS$tgammaf
 #define __CRT_HAVE_DOS$tgammal
 #define __CRT_HAVE_DOS$tgsigqueueinfo
+#define __CRT_HAVE_DOS$thr_create
+#define __CRT_HAVE_DOS$thr_getprio
+#define __CRT_HAVE_DOS$thr_getspecific
+#define __CRT_HAVE_DOS$thr_join
+#define __CRT_HAVE_DOS$thr_setprio
+#define __CRT_HAVE_DOS$thr_stksegment
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
 #define __CRT_HAVE_DOS$thrd_create
@@ -6604,7 +6610,13 @@
 #define __CRT_HAVE_tgammaf
 #define __CRT_HAVE_tgammal
 #define __CRT_HAVE_tgsigqueueinfo
+#define __CRT_HAVE_thr_create
+#define __CRT_HAVE_thr_getprio
+#define __CRT_HAVE_thr_getspecific
+#define __CRT_HAVE_thr_join
 #define __CRT_HAVE_thr_min_stack
+#define __CRT_HAVE_thr_setprio
+#define __CRT_HAVE_thr_stksegment
 #define __CRT_HAVE_thrd_create
 #define __CRT_HAVE_thrd_detach
 #define __CRT_HAVE_thrd_exit

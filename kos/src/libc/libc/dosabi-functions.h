@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89395c9d */
+/* HASH CRC-32:0x34491a78 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2248,6 +2248,14 @@ DFUN(".text.crt.dos.io.tty", libd_tcsetsid, libc_tcsetsid, TD, 2, TIn(__SIZEOF_F
 DFUN(".text.crt.dos.io.tty", libd_cfsetspeed, libc_cfsetspeed, TD, 2, TP, TI32)
 DFUN(".text.crt.dos.io.tty", libd_cfmakeraw, libc_cfmakeraw, TV, 1, TP)
 DFUN(".text.crt.dos.io.tty", libd_cfmakesane, libc_cfmakesane, TV, 1, TP)
+
+/* thread */
+DFUN(".text.crt.dos.sched.threads", libd_thr_create, libc_thr_create, TIn(__SIZEOF_ERRNO_T__), 6, TP, TI, TP, TP, TL, TP)
+DFUN(".text.crt.dos.sched.threads", libd_thr_join, libc_thr_join, TIn(__SIZEOF_ERRNO_T__), 3, TIn(__SIZEOF_PTHREAD_T), TP, TP)
+DFUN(".text.crt.dos.sched.threads", libd_thr_setprio, libc_thr_setprio, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_PTHREAD_T), TD)
+DFUN(".text.crt.dos.sched.threads", libd_thr_getprio, libc_thr_getprio, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_PTHREAD_T), TP)
+DFUN(".text.crt.dos.sched.threads", libd_thr_getspecific, libc_thr_getspecific, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_PTHREAD_KEY_T), TP)
+DFUN(".text.crt.dos.sched.threads", libd_thr_stksegment, libc_thr_stksegment, TIn(__SIZEOF_ERRNO_T__), 1, TP)
 
 /* threads */
 DFUN(".text.crt.dos.sched.threads", libd_thrd_sleep, libc_thrd_sleep, TD, 2, TP, TP)

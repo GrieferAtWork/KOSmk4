@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9ddcdfd */
+/* HASH CRC-32:0x6ad42ee2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -213,6 +213,10 @@ __CREDIRECT(__ATTR_WUNUSED,thrd_t,__NOTHROW_NCX,thrd_current,(void),pthread_self
 /* >> thrd_current(3)
  * Return the descriptor for the calling thread (s.a. `pthread_self(3)') */
 __CDECLARE(__ATTR_WUNUSED,thrd_t,__NOTHROW_NCX,thrd_current,(void),())
+#elif defined(__CRT_HAVE_thr_self)
+/* >> thrd_current(3)
+ * Return the descriptor for the calling thread (s.a. `pthread_self(3)') */
+__CREDIRECT(__ATTR_WUNUSED,thrd_t,__NOTHROW_NCX,thrd_current,(void),thr_self,())
 #endif /* ... */
 #include <bits/types.h>
 #if defined(__CRT_HAVE_thrd_sleep) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
@@ -267,7 +271,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(thrd_sleep64, __FORCELOCAL __ATTR_ARTIFICIAL __A
 /* >> thrd_exit(3)
  * Terminate the calling thread (s.a. `pthread_exit(3)') */
 __CDECLARE_VOID(__ATTR_NORETURN,__THROWING,thrd_exit,(int __res),(__res))
-#elif defined(__CRT_HAVE_pthread_exit)
+#elif defined(__CRT_HAVE_pthread_exit) || defined(__CRT_HAVE_thr_exit)
 #include <libc/local/threads/thrd_exit.h>
 /* >> thrd_exit(3)
  * Terminate the calling thread (s.a. `pthread_exit(3)') */
@@ -325,6 +329,10 @@ __CREDIRECT_VOID(,__NOTHROW,thrd_yield,(void),__libc_sched_yield,())
 /* >> thrd_yield(3)
  * Yield execution to another thread (s.a. `pthread_yield(3)') */
 __CREDIRECT_VOID(,__NOTHROW,thrd_yield,(void),yield,())
+#elif defined(__CRT_HAVE_thr_yield)
+/* >> thrd_yield(3)
+ * Yield execution to another thread (s.a. `pthread_yield(3)') */
+__CREDIRECT_VOID(,__NOTHROW,thrd_yield,(void),thr_yield,())
 #endif /* ... */
 
 
@@ -590,7 +598,7 @@ __CDECLARE_VOID(,__NOTHROW_NCX,cnd_destroy,(cnd_t *__cond),(__cond))
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
 __CDECLARE(,int,__NOTHROW_NCX,tss_create,(tss_t *__tss_id, void (__LIBKCALL *__destructor)(void *__arg)),(__tss_id,__destructor))
-#elif defined(__CRT_HAVE_pthread_key_create)
+#elif defined(__CRT_HAVE_pthread_key_create) || defined(__CRT_HAVE_thr_keycreate)
 #include <libc/local/threads/tss_create.h>
 /* >> tss_create(3)
  * Create a new TLS key (s.a. `pthread_key_create(3)')
@@ -615,7 +623,7 @@ __CDECLARE(,void *,__NOTHROW_NCX,tss_get,(tss_t __tss_id),(__tss_id))
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
 __CDECLARE(,int,__NOTHROW_NCX,tss_set,(tss_t __tss_id, void *__val),(__tss_id,__val))
-#elif defined(__CRT_HAVE_pthread_setspecific)
+#elif defined(__CRT_HAVE_pthread_setspecific) || defined(__CRT_HAVE_thr_setspecific)
 #include <libc/local/threads/tss_set.h>
 /* >> tss_set(3)
  * Set the calling thread's value for the given TLS key (s.a. `pthread_setspecific(3)')
@@ -639,14 +647,19 @@ __CDECLARE_VOID(,__NOTHROW_NCX,tss_delete,(tss_t __tss_id),(__tss_id))
  *       to see this function anywhere other than Solaris, restrict it to its feature
  *       namespace. */
 #ifdef __USE_SOLARIS
+#ifndef __thr_min_stack_defined
+#define __thr_min_stack_defined
 #ifdef __CRT_HAVE_thr_min_stack
 /* >> thr_min_stack(3) */
-__CDECLARE(__ATTR_CONST,__SIZE_TYPE__,__NOTHROW_NCX,thr_min_stack,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,thr_min_stack,(void),())
 #else /* __CRT_HAVE_thr_min_stack */
 #include <libc/local/threads/thr_min_stack.h>
 /* >> thr_min_stack(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(thr_min_stack, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL thr_min_stack)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thr_min_stack))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(thr_min_stack, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL thr_min_stack)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thr_min_stack))(); })
 #endif /* !__CRT_HAVE_thr_min_stack */
+#endif /* !__thr_min_stack_defined */
+#ifndef __thr_main_defined
+#define __thr_main_defined
 #ifdef __CRT_HAVE_pthread_main_np
 /* >> thr_main(3)
  * Another  one of these non-restricted, but solaris-specific functions:
@@ -681,7 +694,10 @@ __CDECLARE(__ATTR_CONST,int,__NOTHROW,thr_main,(void),())
  * Internally,  this is  the return value  if the caller  doesn't have a
  * proper pthread-controller attached. */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST int __NOTHROW(__LIBCCALL thr_main)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_main_np))(); }
-#endif /* ... */
+#else /* ... */
+#undef __thr_main_defined
+#endif /* !... */
+#endif /* !__thr_main_defined */
 #endif /* __USE_SOLARIS */
 
 #endif /* __CC__ */

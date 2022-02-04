@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6ccefd3 */
+/* HASH CRC-32:0x436a63ea */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,7 +85,8 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_setparam)(pid_t pid, struct sched_par
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_getparam)(pid_t pid, struct sched_param *param);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_setscheduler)(pid_t pid, int policy, struct sched_param const *param);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_getscheduler)(pid_t pid);
-/* @return: 1: Another thread was  executed prior to  the function  returning
+/* >> sched_yield(2)
+ * @return: 1: Another thread was  executed prior to  the function  returning
  *             The thread may not necessarily be apart of the calling process
  * @return: 0: The function returned immediately when no other thread was executed */
 INTDEF int NOTHROW(LIBCCALL libc_sched_yield)(void);

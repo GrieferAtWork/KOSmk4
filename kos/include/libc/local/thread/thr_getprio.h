@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5edf6187 */
+/* HASH CRC-32:0xc025c542 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,30 +18,39 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_sighold_defined
-#define __local_sighold_defined
+#ifndef __local_thr_getprio_defined
+#define __local_thr_getprio_defined
 #include <__crt.h>
-#include <asm/os/signal.h>
-#if defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask) || defined(__CRT_HAVE_thr_sigsetmask))
+#ifdef __CRT_HAVE_pthread_getschedparam
 #include <bits/types.h>
+#include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_set_single_signal_masked_defined
-#define __local___localdep_set_single_signal_masked_defined
+#ifndef __local___localdep_pthread_getschedparam_defined
+#define __local___localdep_pthread_getschedparam_defined
 __NAMESPACE_LOCAL_END
-#include <libc/local/signal/set_single_signal_masked.h>
+#include <bits/os/sched.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_set_single_signal_masked __LIBC_LOCAL_NAME(set_single_signal_masked)
-#endif /* !__local___localdep_set_single_signal_masked_defined */
-__LOCAL_LIBC(sighold) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sighold))(__signo_t __signo) {
-	return (__NAMESPACE_LOCAL_SYM __localdep_set_single_signal_masked)(__signo, __SIG_BLOCK);
+__CREDIRECT(__ATTR_NONNULL((2, 3)),__errno_t,__NOTHROW_NCX,__localdep_pthread_getschedparam,(__pthread_t __target_thread, int *__restrict __policy, struct sched_param *__restrict __param),pthread_getschedparam,(__target_thread,__policy,__param))
+#endif /* !__local___localdep_pthread_getschedparam_defined */
+__NAMESPACE_LOCAL_END
+#include <bits/os/sched.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(thr_getprio) __ATTR_NONNULL((2)) __errno_t
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thr_getprio))(__pthread_t __thr, int *__p_priority) {
+	__errno_t __result;
+	struct sched_param __param;
+	int __policy;
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_pthread_getschedparam)(__thr, &__policy, &__param);
+	if (__result == 0)
+		*__p_priority = __param.sched_priority;
+	return __result;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_sighold_defined
-#define __local___localdep_sighold_defined
-#define __localdep_sighold __LIBC_LOCAL_NAME(sighold)
-#endif /* !__local___localdep_sighold_defined */
-#else /* __SIG_BLOCK && (__CRT_HAVE_sigprocmask || __CRT_HAVE___sigprocmask || __CRT_HAVE___libc_sigprocmask || __CRT_HAVE_pthread_sigmask || __CRT_HAVE_thr_sigsetmask) */
-#undef __local_sighold_defined
-#endif /* !__SIG_BLOCK || (!__CRT_HAVE_sigprocmask && !__CRT_HAVE___sigprocmask && !__CRT_HAVE___libc_sigprocmask && !__CRT_HAVE_pthread_sigmask && !__CRT_HAVE_thr_sigsetmask) */
-#endif /* !__local_sighold_defined */
+#ifndef __local___localdep_thr_getprio_defined
+#define __local___localdep_thr_getprio_defined
+#define __localdep_thr_getprio __LIBC_LOCAL_NAME(thr_getprio)
+#endif /* !__local___localdep_thr_getprio_defined */
+#else /* __CRT_HAVE_pthread_getschedparam */
+#undef __local_thr_getprio_defined
+#endif /* !__CRT_HAVE_pthread_getschedparam */
+#endif /* !__local_thr_getprio_defined */

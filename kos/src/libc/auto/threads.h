@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfdcac86a */
+/* HASH CRC-32:0x5955e368 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -303,7 +303,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_tss_set)(tss_t tss_id, void *val);
  * @return: thrd_error:   Error */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_tss_set)(tss_t tss_id, void *val);
 /* >> thr_min_stack(3) */
-INTDEF ATTR_CONST size_t NOTHROW_NCX(LIBCCALL libc_thr_min_stack)(void);
+INTDEF ATTR_CONST WUNUSED size_t NOTHROW_NCX(LIBCCALL libc_thr_min_stack)(void);
 #endif /* !__KERNEL__ */
 
 DECL_END
