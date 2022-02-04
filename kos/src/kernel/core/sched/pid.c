@@ -26,9 +26,12 @@
 
 #include <kernel/malloc.h>
 #include <sched/async.h>
+#include <sched/group-new.h>
 #include <sched/group.h>
 #include <sched/pid.h>
 #include <sched/task.h>
+
+#include <hybrid/atomic.h>
 
 #include <kos/except.h>
 
@@ -37,27 +40,71 @@
 #include <stddef.h>
 
 
+DECL_BEGIN
+
+struct _pidtree_slot {
+	LLRBTREE_NODE_P(void) pts_link; /* [0..1][lock(:tp_ns->[pn_par...]->pn_lock)]
+	                                 * Link entry within the associated PID namespace */
+	upid_t                pts_pid;  /* [const] PID relevant to this slot. */
+};
+#define _pidtree_slotat(self, offsetof_slot) \
+	((struct _pidtree_slot *)((byte_t *)(self) + (offsetof_slot)))
+
+DECL_END
+
 /* Define the ABI for accessing `struct pidns::pn_tree' */
 #define RBTREE_LEFT_LEANING /* Use left-leaning trees */
 #define RBTREE_WANT_MINMAXLOCATE
+#define RBTREE_OMIT_REMOVENODE
 #define RBTREE_NOTHROW      NOTHROW
 #define RBTREE(name)        _pidns_tree_##name
-#define RBTREE_SLOT__PARAMS , size_t _ns_ind
-#define RBTREE_SLOT__ARGS   , _ns_ind
-#define RBTREE_T            struct taskpid
+#define RBTREE_SLOT__PARAMS , ptrdiff_t _offsetof_slot
+#define RBTREE_SLOT__ARGS   , _offsetof_slot
+#define RBTREE_T            void
 #define RBTREE_Tkey         pid_t
-#define RBTREE_NODEPATH     tp_pids[_ns_ind].tps_link
-#define RBTREE_GETKEY(x)    _taskpid_slot_getpidno((x)->tp_pids[_ns_ind])
-#define RBTREE_ISRED(x)     ((x)->tp_pids[_ns_ind].tps_pid & __TASKPID_SLOT_REDMASK)
-#define RBTREE_SETRED(x)    ((x)->tp_pids[_ns_ind].tps_pid |= __TASKPID_SLOT_REDMASK)
-#define RBTREE_SETBLACK(x)  ((x)->tp_pids[_ns_ind].tps_pid &= ~__TASKPID_SLOT_REDMASK)
-#define RBTREE_FLIPCOLOR(x) ((x)->tp_pids[_ns_ind].tps_pid ^= __TASKPID_SLOT_REDMASK)
-#define RBTREE_COPYCOLOR(dst, src)                                                                   \
-	((dst)->tp_pids[_ns_ind].tps_pid = ((dst)->tp_pids[_ns_ind].tps_pid & ~__TASKPID_SLOT_REDMASK) | \
-	                                   ((src)->tp_pids[_ns_ind].tps_pid & __TASKPID_SLOT_REDMASK))
+#define RBTREE_GETNODE(x)   _pidtree_slotat(x, _offsetof_slot)->pts_link
+#define RBTREE_GETKEY(x)    (pid_t)(_pidtree_slotat(x, _offsetof_slot)->pts_pid & __TASKPID_SLOT_PIDMASK)
+#define RBTREE_ISRED(x)     (_pidtree_slotat(x, _offsetof_slot)->pts_pid & __TASKPID_SLOT_REDMASK)
+#define RBTREE_SETRED(x)    (_pidtree_slotat(x, _offsetof_slot)->pts_pid |= __TASKPID_SLOT_REDMASK)
+#define RBTREE_SETBLACK(x)  (_pidtree_slotat(x, _offsetof_slot)->pts_pid &= ~__TASKPID_SLOT_REDMASK)
+#define RBTREE_FLIPCOLOR(x) (_pidtree_slotat(x, _offsetof_slot)->pts_pid ^= __TASKPID_SLOT_REDMASK)
+#define RBTREE_COPYCOLOR(dst, src)                                               \
+	(_pidtree_slotat(dst, _offsetof_slot)->pts_pid =                             \
+	 (_pidtree_slotat(dst, _offsetof_slot)->pts_pid & ~__TASKPID_SLOT_REDMASK) | \
+	 (_pidtree_slotat(src, _offsetof_slot)->pts_pid & __TASKPID_SLOT_REDMASK))
 #include <hybrid/sequence/rbtree-abi.h>
 
+#define _taskpid_offsetof_slot(ind) \
+	(offsetof(struct taskpid, tp_pids) + (ind) * sizeof(struct taskpid_slot))
+#define _procgrp_offsetof_slot(ind) \
+	(offsetof(struct procgrp, pgr_pids) + (ind) * sizeof(struct procgrp_slot))
+
+#define _taskpid_tree_minmaxlocate(root, minkey, maxkey, result, ind) _pidns_tree_minmaxlocate(root, minkey, maxkey, result, _taskpid_offsetof_slot(ind))
+#define _procgrp_tree_minmaxlocate(root, minkey, maxkey, result, ind) _pidns_tree_minmaxlocate(root, minkey, maxkey, result, _procgrp_offsetof_slot(ind))
+#define _taskpid_tree_locate(root, key, ind)                          ((struct taskpid *)_pidns_tree_locate(root, key, _taskpid_offsetof_slot(ind)))
+#define _procgrp_tree_locate(root, key, ind)                          ((struct procgrp *)_pidns_tree_locate(root, key, _procgrp_offsetof_slot(ind)))
+#define _taskpid_tree_remove(proot, key, ind)                         ((struct taskpid *)_pidns_tree_remove((void **)(proot), key, _taskpid_offsetof_slot(ind)))
+#define _procgrp_tree_remove(proot, key, ind)                         ((struct procgrp *)_pidns_tree_remove((void **)(proot), key, _procgrp_offsetof_slot(ind)))
+#define _taskpid_tree_insert(proot, node, ind)                        _pidns_tree_insert((void **)(proot), node, _taskpid_offsetof_slot(ind))
+#define _procgrp_tree_insert(proot, node, ind)                        _pidns_tree_insert((void **)(proot), node, _procgrp_offsetof_slot(ind))
+
 DECL_BEGIN
+
+/* Assert binary compatibility between `struct _pidtree_slot' and `struct taskpid_slot' */
+STATIC_ASSERT((offsetof(struct taskpid, tp_pids[1]) - offsetof(struct taskpid, tp_pids[0])) == sizeof(struct taskpid_slot));
+STATIC_ASSERT(offsetof(struct _pidtree_slot, pts_link) == offsetof(struct taskpid_slot, tps_link));
+STATIC_ASSERT(sizeof(((struct _pidtree_slot *)0)->pts_link) == sizeof(((struct taskpid_slot *)0)->tps_link));
+STATIC_ASSERT(offsetof(struct _pidtree_slot, pts_pid) == offsetof(struct taskpid_slot, tps_pid));
+STATIC_ASSERT(sizeof(((struct _pidtree_slot *)0)->pts_pid) == sizeof(((struct taskpid_slot *)0)->tps_pid));
+
+#ifdef CONFIG_USE_NEW_GROUP
+/* Assert binary compatibility between `struct _pidtree_slot' and `struct procgrp_slot' */
+STATIC_ASSERT((offsetof(struct procgrp, pgr_pids[1]) - offsetof(struct procgrp, pgr_pids[0])) == sizeof(struct procgrp_slot));
+STATIC_ASSERT(offsetof(struct _pidtree_slot, pts_link) == offsetof(struct procgrp_slot, pgs_link));
+STATIC_ASSERT(sizeof(((struct _pidtree_slot *)0)->pts_link) == sizeof(((struct procgrp_slot *)0)->pgs_link));
+STATIC_ASSERT(offsetof(struct _pidtree_slot, pts_pid) == offsetof(struct procgrp_slot, pgs_pid));
+STATIC_ASSERT(sizeof(((struct _pidtree_slot *)0)->pts_pid) == sizeof(((struct procgrp_slot *)0)->pgs_pid));
+#endif /* CONFIG_USE_NEW_GROUP */
 
 
 /************************************************************************/
@@ -79,8 +126,8 @@ NOTHROW(FCALL taskpid_remove_from_ns)(struct taskpid *__restrict self,
 	(void)removed;
 }
 
-/* Remove `self' from all associated namespaces (and decref the top-most
- * namespace), before using `taskpid_free()' to free the taskpid object. */
+/* Remove `self' from all associated namespaces (and decref the  top-most
+ * namespace), before using `_taskpid_free()' to free the taskpid object. */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL taskpid_remove_from_namespaces_and_free)(struct taskpid *__restrict self);
 
@@ -99,7 +146,7 @@ NOTHROW(LOCKOP_CC pidns_removepid_postlop)(Tobpostlockop(pidns) *__restrict self
 		taskpid_remove_from_namespaces_and_free(me);
 	} else {
 		/* Free the taskpid descriptor. */
-		taskpid_free(self);
+		_taskpid_free(self);
 	}
 }
 
@@ -119,8 +166,8 @@ NOTHROW(LOCKOP_CC pidns_removepid_lop)(Toblockop(pidns) *__restrict self,
 }
 
 
-/* Remove `self' from all associated namespaces (and decref the top-most
- * namespace), before using `taskpid_free()' to free the taskpid object. */
+/* Remove `self' from all associated namespaces (and decref the  top-most
+ * namespace), before using `_taskpid_free()' to free the taskpid object. */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL taskpid_remove_from_namespaces_and_free)(struct taskpid *__restrict self) {
 	struct pidns *par, *ns;
@@ -151,7 +198,7 @@ again_lock_ns:
 	}
 
 	/* Free the taskpid descriptor. */
-	taskpid_free(self);
+	_taskpid_free(self);
 }
 
 /* Destroy the given taskpid. */
@@ -216,11 +263,17 @@ for (local x: nodes) {
 	print("		.tp_SIGCLD  = SIGCLD,");
 	print("		._tp_pad    = {}");
 	print("	}},");
-	print("	.tp_parsib = LIST_ENTRY_UNBOUND_INITIALIZER,");
 	print("#ifdef CONFIG_USE_NEW_GROUP");
-	print("	.tp_proc   = &", x.val == "boottask" ? "boottask_pid" : "bootidle_pid", ",");
-	print("	.tp_pctl   = &", x.val == "boottask" ? "procctl_boottask" : "procctl_kernel", ",");
-	print("#endif /" "* CONFIG_USE_NEW_GROUP *" "/");
+	local prev, next = {
+		"asyncwork"    : ("&boottask_procctl.pc_chlds_list.lh_first", "&bootidle_pid"),
+		"thiscpu_idle" : ("&asyncwork_pid.tp_parsib.le_next", "NULL"),
+	}.get(x.val, ("NULL", "NULL"))...;
+	print("	.tp_parsib = { .le_next = ", next, ", .le_prev = ", prev, " },");
+	print("	.tp_proc   = &boottask_pid,");
+	print("	.tp_pctl   = &boottask_procctl,");
+	print("#else /" "* CONFIG_USE_NEW_GROUP *" "/");
+	print("	.tp_parsib = LIST_ENTRY_UNBOUND_INITIALIZER,");
+	print("#endif /" "* !CONFIG_USE_NEW_GROUP *" "/");
 	print("	.tp_ns     = &pidns_root,");
 	print("	.tp_pids   = {");
 	print("		[0] = {");
@@ -244,11 +297,13 @@ INTERN struct taskpid boottask_pid = {
 		.tp_SIGCLD  = SIGCLD,
 		._tp_pad    = {}
 	}},
-	.tp_parsib = LIST_ENTRY_UNBOUND_INITIALIZER,
 #ifdef CONFIG_USE_NEW_GROUP
+	.tp_parsib = { .le_next = NULL, .le_prev = NULL },
 	.tp_proc   = &boottask_pid,
-	.tp_pctl   = &procctl_boottask,
-#endif /* CONFIG_USE_NEW_GROUP */
+	.tp_pctl   = &boottask_procctl,
+#else /* CONFIG_USE_NEW_GROUP */
+	.tp_parsib = LIST_ENTRY_UNBOUND_INITIALIZER,
+#endif /* !CONFIG_USE_NEW_GROUP */
 	.tp_ns     = &pidns_root,
 	.tp_pids   = {
 		[0] = {
@@ -266,11 +321,13 @@ INTERN ATTR_PERCPU struct taskpid thiscpu_idle_pid = {
 		.tp_SIGCLD  = SIGCLD,
 		._tp_pad    = {}
 	}},
-	.tp_parsib = LIST_ENTRY_UNBOUND_INITIALIZER,
 #ifdef CONFIG_USE_NEW_GROUP
-	.tp_proc   = &bootidle_pid,
-	.tp_pctl   = &procctl_kernel,
-#endif /* CONFIG_USE_NEW_GROUP */
+	.tp_parsib = { .le_next = NULL, .le_prev = &asyncwork_pid.tp_parsib.le_next },
+	.tp_proc   = &boottask_pid,
+	.tp_pctl   = &boottask_procctl,
+#else /* CONFIG_USE_NEW_GROUP */
+	.tp_parsib = LIST_ENTRY_UNBOUND_INITIALIZER,
+#endif /* !CONFIG_USE_NEW_GROUP */
 	.tp_ns     = &pidns_root,
 	.tp_pids   = {
 		[0] = {
@@ -288,11 +345,13 @@ INTERN struct taskpid asyncwork_pid = {
 		.tp_SIGCLD  = SIGCLD,
 		._tp_pad    = {}
 	}},
-	.tp_parsib = LIST_ENTRY_UNBOUND_INITIALIZER,
 #ifdef CONFIG_USE_NEW_GROUP
-	.tp_proc   = &bootidle_pid,
-	.tp_pctl   = &procctl_kernel,
-#endif /* CONFIG_USE_NEW_GROUP */
+	.tp_parsib = { .le_next = &bootidle_pid, .le_prev = &boottask_procctl.pc_chlds_list.lh_first },
+	.tp_proc   = &boottask_pid,
+	.tp_pctl   = &boottask_procctl,
+#else /* CONFIG_USE_NEW_GROUP */
+	.tp_parsib = LIST_ENTRY_UNBOUND_INITIALIZER,
+#endif /* !CONFIG_USE_NEW_GROUP */
 	.tp_ns     = &pidns_root,
 	.tp_pids   = {
 		[0] = {
@@ -310,14 +369,18 @@ PUBLIC pid_t pid_recycle_threshold = PID_RECYCLE_THRESHOLD_DEFAULT;
 
 /* The root PID namespace. */
 PUBLIC struct pidns pidns_root = {
+#ifdef CONFIG_USE_NEW_GROUP
+	.pn_refcnt  = 5,    /* +1: pidns_root, +1: boottask_pid, +1: bootidle_pid, +1: asyncwork_pid, +1: boottask_procgrp.pgr_ns */
+#else /* CONFIG_USE_NEW_GROUP */
 	.pn_refcnt  = 4,    /* +1: pidns_root, +1: boottask_pid, +1: bootidle_pid, +1: asyncwork_pid */
+#endif /* !CONFIG_USE_NEW_GROUP */
 	.pn_ind     = 0,    /* Root namespace indirection */
 	.pn_par     = NULL, /* Root namespace doesn't have a parent */
 	.pn_lock    = ATOMIC_RWLOCK_INIT,
 	.pn_lops    = SLIST_HEAD_INITIALIZER(pidns_root.pn_lops),
 	.pn_tree    = STATIC_TASKPID_TREE_ROOT,
 #ifdef CONFIG_USE_NEW_GROUP
-	.pn_tree_pg = NULL,
+	.pn_tree_pg = &boottask_procgrp, /* First and initial process group */
 #endif /* CONFIG_USE_NEW_GROUP */
 	.pn_npid    = 4, /* 1-3 are already in use */
 };
@@ -419,14 +482,14 @@ throw_exited:
 /* Return the taskpid object associated with `pid' within `self' */
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) struct taskpid *
 NOTHROW(FCALL pidns_lookup_locked)(struct pidns const *__restrict self, pid_t pid) {
-	return _pidns_tree_locate(self->pn_tree, pid, self->pn_ind);
+	return _taskpid_tree_locate(self->pn_tree, pid, self->pn_ind);
 }
 
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) REF struct task *
 NOTHROW(FCALL pidns_lookuptask_locked)(struct pidns const *__restrict self, pid_t pid) {
 	REF struct task *result;
 	REF struct taskpid *tpid;
-	tpid = _pidns_tree_locate(self->pn_tree, pid, self->pn_ind);
+	tpid = _taskpid_tree_locate(self->pn_tree, pid, self->pn_ind);
 	if (!tpid || !tryincref(tpid))
 		return NULL;
 	result = taskpid_gettask(tpid);
@@ -440,9 +503,10 @@ NOTHROW(FCALL pidns_lookuptask_locked)(struct pidns const *__restrict self, pid_
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) struct taskpid *
 NOTHROW(FCALL pidns_lookupnext_locked)(struct pidns const *__restrict self, pid_t min_pid) {
 	_pidns_tree_minmax_t mima;
-	_pidns_tree_minmaxlocate(self->pn_tree, min_pid, PID_MAX, &mima, self->pn_ind);
-	return mima.mm_min;
+	_taskpid_tree_minmaxlocate(self->pn_tree, min_pid, PID_MAX, &mima, self->pn_ind);
+	return (struct taskpid *)mima.mm_min;
 }
+
 
 
 /* Try to acquire write-locks to all PID namespaces reachable from `self'
@@ -492,7 +556,7 @@ NOTHROW(FCALL pidns_endwriteall)(struct pidns *__restrict self) {
 PUBLIC NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL pidns_insertpid)(struct pidns *__restrict self,
                                struct taskpid *__restrict tpid) {
-	_pidns_tree_insert(&self->pn_tree, tpid, self->pn_ind);
+	_taskpid_tree_insert(&self->pn_tree, tpid, self->pn_ind);
 }
 
 /* Do the reverse of `pidns_insertpid()' and remove the PID
@@ -503,7 +567,7 @@ NOTHROW(FCALL pidns_insertpid)(struct pidns *__restrict self,
  * When no taskpid is associated with `pid', return `NULL'. */
 PUBLIC NOBLOCK NONNULL((1)) struct taskpid *
 NOTHROW(FCALL pidns_removepid)(struct pidns *__restrict self, pid_t pid) {
-	return _pidns_tree_remove(&self->pn_tree, pid, self->pn_ind);
+	return _taskpid_tree_remove(&self->pn_tree, pid, self->pn_ind);
 }
 
 
@@ -514,8 +578,17 @@ NOTHROW(FCALL pidns_findpid)(struct pidns const *__restrict self,
                              pid_t minpid, pid_t maxpid) {
 	if (minpid <= maxpid) {
 		for (;;) {
-			if (_pidns_tree_locate(self->pn_tree, minpid, self->pn_ind) == NULL)
+#ifdef CONFIG_USE_NEW_GROUP
+			/* PIDs cannot be re-used if there is EITHER a process
+			 * with that  ID, or  a process  group with  that  ID!
+			 * -> s.a. posix -- "4.13 Process ID Reuse" */
+			if (_taskpid_tree_locate(self->pn_tree, minpid, self->pn_ind) == NULL &&
+			    _procgrp_tree_locate(self->pn_tree_pg, minpid, self->pn_ind) == NULL)
 				return minpid;
+#else /* CONFIG_USE_NEW_GROUP */
+			if (_taskpid_tree_locate(self->pn_tree, minpid, self->pn_ind) == NULL)
+				return minpid;
+#endif /* !CONFIG_USE_NEW_GROUP */
 			if (minpid >= maxpid)
 				break;
 			++minpid;
@@ -523,6 +596,88 @@ NOTHROW(FCALL pidns_findpid)(struct pidns const *__restrict self,
 	}
 	return -1;
 }
+
+/* Return the next free PID  to-be assigned to a new  thread/process
+ * In the (highly unlikely) even that all PIDs are in use, and  none
+ * can be reclaimed (iow: `self' contains 2^31 threads), return `-1'
+ * instead.
+ *
+ * Allocation  of a PID  is done by use  of `pidns_insertpid', but in
+ * addition to this, the  caller must also increment  `self->pn_npid'
+ * to `return + 1' once  they inserted the  PID into this  namespace!
+ * This only happens when `#ifdef PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE' */
+PUBLIC WUNUSED NOBLOCK NONNULL((1)) pid_t
+NOTHROW(FCALL pidns_nextpid)(struct pidns const *__restrict self) {
+	pid_t recycle = ATOMIC_READ(pid_recycle_threshold);
+	pid_t result;
+
+	/* Find  the next free PID between the next to-be used, and
+	 * the threshold going from which we're supposed to recycle
+	 * old PIDs. */
+	result = pidns_findpid(self, self->pn_npid, recycle);
+	if likely(result != -1)
+		goto done;
+
+	/* Try to recycle PIDs by searching for a free slot in the
+	 * range  preceding   that   which   we   just   searched. */
+	result = pidns_findpid(self, PIDNS_FIRST_NONRESERVED_PID, self->pn_npid - 1);
+	if likely(result != -1)
+		goto done;
+
+	/* If we get here, that means there are at least `recycle'
+	 * threads living within our PID namespace. In this  case,
+	 * we're allowed to hand out PIDs beyond the threshold  at
+	 * which PIDs are recycled. */
+	result = pidns_findpid(self, recycle + 1, PID_MAX);
+
+	/* If `result' still `== -1' at this point (extremely unlikely),
+	 * then there are 2^31 threads living without our namespace.  In
+	 * this case, our caller will */
+#ifndef PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE
+	assertf(result == -1, "Given pointer size restrictions, it should "
+	                      "be physically impossible to allocate 2^31 of "
+	                      "something as large as `struct taskpid'. So "
+	                      "how can it be that _all_ PIDs are allocated?");
+#endif /* !PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE */
+
+done:
+	return result;
+}
+
+
+
+#ifdef CONFIG_USE_NEW_GROUP
+/* Return the process group associated with `gpid' within `self' */
+PUBLIC WUNUSED NONNULL((1)) REF struct procgrp *FCALL
+pidns_grplookup(struct pidns *__restrict self, pid_t gpid)
+		THROWS(E_WOULDBLOCK) {
+	REF struct procgrp *result;
+	pidns_read(self);
+	result = _procgrp_tree_locate(self->pn_tree, gpid, self->pn_ind);
+	if (result && !tryincref(result))
+		result = NULL;
+	pidns_endread(self);
+	return result;
+}
+
+PUBLIC WUNUSED NONNULL((1)) struct procgrp *
+NOTHROW(FCALL pidns_grplookup_locked)(struct pidns *__restrict self, pid_t gpid) {
+	return _procgrp_tree_locate(self->pn_tree, gpid, self->pn_ind);
+}
+
+/* Insert/Remove a process group to/from the given namespace. */
+PUBLIC NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL pidns_grpinsert)(struct pidns *__restrict self,
+                               struct procgrp *__restrict grp) {
+	_procgrp_tree_insert(&self->pn_tree_pg, grp, self->pn_ind);
+}
+
+PUBLIC NOBLOCK NONNULL((1)) struct procgrp *
+NOTHROW(FCALL pidns_grpremove)(struct pidns *__restrict self, pid_t gpid) {
+	return _procgrp_tree_remove(&self->pn_tree_pg, gpid, self->pn_ind);
+}
+#endif /* CONFIG_USE_NEW_GROUP */
+
 
 DECL_END
 

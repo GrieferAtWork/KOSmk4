@@ -896,7 +896,7 @@ task_setpid(struct task *__restrict self,
 	assert(!FORTASK(self, this_taskpid));
 
 	/* Step #1: Allocate the PID descriptor */
-	pid =  taskpid_alloc(ns);
+	pid =  _taskpid_alloc(ns);
 	TRY {
 		struct pidns *blocking;
 		/* Step #2: Acquire write-locks to all of the PID namespaces in which we want to allocate,

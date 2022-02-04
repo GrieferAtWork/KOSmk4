@@ -363,7 +363,7 @@ LOCAL ATTR_PURE intptr_t
 NOTHROW(FCALL GDBThread_GetPID)(struct task const *__restrict thread) {
 	intptr_t pid, tid;
 	pid = (intptr_t)task_getrootpid_of(thread);
-	tid = (intptr_t)task_getroottid_of_s(thread);
+	tid = (intptr_t)task_getroottid_of(thread);
 	if unlikely(!pid || !tid)
 		pid = GDB_KERNEL_PID; /* Kernel thread. */
 	return pid;
@@ -373,7 +373,7 @@ LOCAL ATTR_PURE intptr_t
 NOTHROW(FCALL GDBThread_GetTID)(struct task const *__restrict thread) {
 	intptr_t pid, tid;
 	pid = (intptr_t)task_getrootpid_of(thread);
-	tid = (intptr_t)task_getroottid_of_s(thread);
+	tid = (intptr_t)task_getroottid_of(thread);
 	if unlikely(!pid || !tid)
 		tid = GDB_KERNEL_TID(thread); /* Kernel thread. */
 	return tid;
@@ -383,7 +383,7 @@ INTERN char *
 NOTHROW(FCALL GDBThread_EncodeThreadID)(char *buf, struct task const *__restrict thread) {
 	intptr_t pid, tid;
 	pid = (intptr_t)task_getrootpid_of(thread);
-	tid = (intptr_t)task_getroottid_of_s(thread);
+	tid = (intptr_t)task_getroottid_of(thread);
 	if unlikely(!pid || !tid) {
 		/* Kernel thread. */
 		pid = GDB_KERNEL_PID;

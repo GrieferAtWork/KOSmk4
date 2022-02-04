@@ -144,7 +144,7 @@ NOTHROW(FCALL GDBThread_StopRPCImpl)(uintptr_t flags,
 	          (flags & GDBTHREAD_STOPRPCIMPL_F_STOPCPU) ? "cpu" : "thread",
 	          stop_event.e.tse_thread,
 	          task_getrootpid_of(stop_event.e.tse_thread),
-	          task_getroottid_of_s(stop_event.e.tse_thread),
+	          task_getroottid_of(stop_event.e.tse_thread),
 	          flags);
 	sig_init(&stop_event.e.tse_sigresume);
 	COMPILER_BARRIER();
@@ -382,7 +382,7 @@ NOTHROW(FCALL GDBThread_ResumeSingleStopEvent)(GDBThreadStopEvent *__restrict se
 	          self->tse_isacpu ? "cpu" : "thread",
 	          self->tse_thread,
 	          task_getrootpid_of(self->tse_thread),
-	          task_getroottid_of_s(self->tse_thread));
+	          task_getroottid_of(self->tse_thread));
 	assert(self->tse_mayresume == GDB_THREAD_MAYRESUME_NASYNC);
 	COMPILER_BARRIER();
 	ATOMIC_AND(self->tse_thread->t_flags, ~TASK_FGDB_STOPPED);
@@ -532,7 +532,7 @@ NOTHROW(FCALL GDBThread_StopWithAsyncNotificationIPI)(struct icpustate *__restri
 	          "[async-altcpu]\n",
 	          thread,
 	          task_getrootpid_of(thread),
-	          task_getroottid_of_s(thread));
+	          task_getroottid_of(thread));
 	/* Very important: Set  the  HIGH_PRIORITY flag,  thus ensuring
 	 *                 that we immediately switch over to `thread',
 	 *                 allowing it to run as the new override. */
@@ -644,7 +644,7 @@ NOTHROW(FCALL GDBThread_CreateMissingAsyncStopNotification)(struct task *__restr
 			          "[async]\n",
 			          thread,
 			          task_getrootpid_of(thread),
-			          task_getroottid_of_s(thread));
+			          task_getroottid_of(thread));
 			/* Very important: Set  the  HIGH_PRIORITY flag,  thus ensuring
 			 *                 that we immediately switch over to `thread',
 			 *                 allowing it to run as the new override. */
@@ -716,7 +716,7 @@ NOTHROW(FCALL GDBThread_Stop)(struct task *__restrict thread,
 	          "%" PRIuN(__SIZEOF_PID_T__) ")\n",
 	          thread,
 	          task_getrootpid_of(thread),
-	          task_getroottid_of_s(thread));
+	          task_getroottid_of(thread));
 	if (!task_rpc_exec(thread,
 	                   RPC_CONTEXT_KERN |
 	                   RPC_SYNCMODE_F_ALLOW_ASYNC |
@@ -984,7 +984,7 @@ NOTHROW(FCALL GDBThread_StopAllAndGenerateAsyncStopEvents)(void) {
 /* Check if the given `thread' is considered to be a kernel thread */
 INTERN NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL GDBThread_IsKernelThread)(struct task const *__restrict thread) {
-	if (task_getroottid_of_s(thread) == 0)
+	if (task_getroottid_of(thread) == 0)
 		return true;
 	if (task_getrootpid_of(thread) == 0)
 		return true;

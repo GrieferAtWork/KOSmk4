@@ -72,25 +72,25 @@ SLIST_HEAD(pending_rpc_slist, pending_rpc);
  * [1..1] Process of thread: >> struct taskpid *proc        = THIS_TASKPID->tp_proc;
  * [1..1] Process parent:    >> REF struct task *parent     = arref_get(&THIS_TASKPID->tp_pctl->pc_parent);
  * [1..1] Process group:     >> REF struct procgrp *grp     = arref_get(&THIS_TASKPID->tp_pctl->pc_grp);
- * [1..1] Process session:   >> REF struct procsession *ses = arref_get(&grp->pgc_session);
+ * [1..1] Process session:   >> REF struct procsession *ses = arref_get(&grp->pgr_session);
  *
  * is_process_leader:
  *    >> return THIS_TASKPID->tp_proc == THIS_TASKPID;
  * is_group_leader:
  *    >> pid = THIS_TASKPID;
  *    >> grp = arref_get(&pid->tp_pctl->pc_grp);
- *    >> return grp->pgc_ns == pid->tp_ns &&
- *    >>        _taskpid_slot_getpidno(grp->pgc_pids[pid->tp_ns->pn_ind].pgs_pid) ==
+ *    >> return grp->pgr_ns == pid->tp_ns &&
+ *    >>        _taskpid_slot_getpidno(grp->pgr_pids[pid->tp_ns->pn_ind].pgs_pid) ==
  *    >>        _taskpid_slot_getpidno(pid->tp_pids[pid->tp_ns->pn_ind].pgs_pid);
  * is_session_leader:
- *    >> return is_group_leader && grp == grp->pgc_sleader;
+ *    >> return is_group_leader && grp == grp->pgr_sleader;
  *
  * get_thread_id:              >> THIS_TASKPID->tp_pids[*].tps_pid;
  * get_process_id:             >> THIS_TASKPID->tp_proc->tp_pids[*].tps_pid;
- * get_group_id:               >> arref_get(&THIS_TASKPID->tp_pctl->pc_grp)->pgc_pids[*].pgs_pid
- * get_session_id:             >> arref_get(&THIS_TASKPID->tp_pctl->pc_grp)->pgc_sleader->pgc_pids[*].pgs_pid
- * get_session_id_of_terminal: >> awref_get(&tty->t_cproc)?:->pgc_pids[*].pgs_pid
- * get_fggroup_id_of_terminal: >> awref_get(&tty->t_fproc)?:->pgc_pids[*].pgs_pid
+ * get_group_id:               >> arref_get(&THIS_TASKPID->tp_pctl->pc_grp)->pgr_pids[*].pgs_pid
+ * get_session_id:             >> arref_get(&THIS_TASKPID->tp_pctl->pc_grp)->pgr_sleader->pgr_pids[*].pgs_pid
+ * get_session_id_of_terminal: >> awref_get(&tty->t_cproc)?:->pgr_pids[*].pgs_pid
+ * get_fggroup_id_of_terminal: >> awref_get(&tty->t_fproc)?:->pgr_pids[*].pgs_pid
  *
  * NOTE: get_session_id -- Sessions IDs are _required_ to be process group IDs:
  *       Posix says about `getsid(2)':
@@ -106,7 +106,7 @@ SLIST_HEAD(pending_rpc_slist, pending_rpc);
  * >> struct procctl *ctl = _task_getproctl();
  * >> procctl_chlds_read(ctl);
  * >> // NOTE: This enumeration does not include task_getprocess()!
- * >> LIST_FOREACH (tpid, &ctl->pc_chlds, tp_parsib) {
+ * >> LIST_FOREACH (tpid, &ctl->pc_chlds_list, tp_parsib) {
  * >>     if (taskpid_isaprocess(tpid)) {
  * >>         assert(tpid->tp_pctl != ctl);
  * >>         assert(arref_ptr(&tpid->tp_pctl->pc_parent) == THIS_TASK);
@@ -120,13 +120,13 @@ SLIST_HEAD(pending_rpc_slist, pending_rpc);
  * Enumerate process in a process group (WARNING: E_WOULDBLOCK):
  * >> struct procgrp *grp = ...;
  * >> struct taskpid *tpid;
- * >> procgrp_read(grp);
- * >> LIST_FOREACH (tpid, &grp->pc_chlds, tp_pctl->pc_grpmember) {
+ * >> procgrp_memb_read(grp);
+ * >> LIST_FOREACH (tpid, &grp->pgr_memb_list, tp_pctl->pc_grpmember) {
  * >>     assert(taskpid_isaprocess(tpid));
  * >>     assert(arref_ptr(&tpid->tp_pctl->pc_grp) == grp);
  * >>     // Member process: `tpid'
  * >> }
- * >> procgrp_endread(grp);
+ * >> procgrp_memb_endread(grp);
  *
  * There  doesn't need to be a way of enumerating process groups
  * apart  of a session.  -- Nothing in  posix would require that
@@ -138,13 +138,13 @@ SLIST_HEAD(pending_rpc_slist, pending_rpc);
 
 
 struct ttydev;
-#ifndef __ttydev_device_axref_defined
-#define __ttydev_device_axref_defined
-AXREF(ttydev_device_axref, ttydev);
-#endif /* !__ttydev_device_axref_defined */
+#ifndef __ttydev_axref_defined
+#define __ttydev_axref_defined
+AXREF(ttydev_axref, ttydev);
+#endif /* !__ttydev_axref_defined */
 
 struct procsession {
-	struct ttydev_device_axref ps_ctty; /* [0..1] The controlling terminal; aka. "/dev/tty" (if any) */
+	struct ttydev_axref ps_ctty; /* [0..1] The controlling terminal; aka. "/dev/tty" (if any) */
 	/* Other session data would go here...
 	 *
 	 * After skimming the posix specs, it seems that the controlling terminal is
@@ -154,35 +154,146 @@ struct procsession {
 	 */
 };
 
+/* Allocate/Free a `struct procsession' */
+#define _procsession_new()      ((struct procsession *)kmalloc(sizeof(struct procsession), GFP_CALLOC))
+#define _procsession_free(self) kfree(self)
+#define _procsession_fini(self) axref_fini(&(self)->ps_ctty)
+#define _procsession_destroy(self) \
+	(_procsession_fini(self), _procsession_free(self))
+
 struct procgrp;
 struct procgrp_slot {
-	LLRBTREE_NODE(procgrp) pgs_link; /* [0..1][lock(:pgc_ns->[pn_par...]->pn_lock)]
+	LLRBTREE_NODE(procgrp) pgs_link; /* [0..1][lock(:pgr_ns->[pn_par...]->pn_lock)]
 	                                  * Link entry within the associated PID namespace */
 	upid_t                 pgs_pid;  /* [const] PID relevant to this slot. (s.a. `__TASKPID_SLOT_*') */
-	/* TODO: When implementing LLRB operators for these slots, alter `_pidns_tree_*'
-	 *       functions  to  take  `offsetof_slot',  at  which  point  we  can   pass
-	 *       `offsetof(struct taskpid, tp_pids[ind])', or
-	 *       `offsetof(struct procgrp, pgc_pids[ind])'. */
 };
 
+#define _procgrp_slot_getpidno(self) ((pid_t)((self).pgs_pid & __TASKPID_SLOT_PIDMASK))
+
 struct procgrp {
-	WEAK refcnt_t                                pgc_refcnt;  /* Reference counter. */
-	REF struct procgrp                          *pgc_sleader; /* [1..1][ref_if(!= this)][const] Session leader process group. */
-	struct procsession                          *pgc_session; /* [1..1][owned_if(pgc_sleader == this)][const] Session data. */
-	Toblockop_slist(procgrp)                     pgc_lops;    /* Lock-ops for `pgc_lock' */
-	struct atomic_rwlock                         pgc_lock;    /* Lock for `pgc_list' */
-	struct WEAK taskpid_list                     pgc_list;    /* [0..n][LINK(tp_pctl->pc_grpmember)][lock(pgc_lock)]
-	                                                           * List of processes apart of this group (including the group leader).
-	                                                           * Members of  this list  automatically remove  themselves upon  being
-	                                                           * destroyed (aka. inside of `taskpid_destroy()'). */
-	REF struct pidns                            *pgc_ns;      /* [1..1][const] Top-level PID namespace containing this descriptor. */
-	COMPILER_FLEXIBLE_ARRAY(struct procgrp_slot, pgc_pids);   /* [const][tp_ns->pn_ind+1] Task PID value from different namespaces. */
+	WEAK refcnt_t                                pgr_refcnt;    /* Reference counter. */
+#ifdef __WANT_PROCGRP__pgr_lop
+	union {
+		struct {
+			REF struct procgrp                  *pgr_sleader;   /* [1..1][ref_if(!= this)][const] Session leader process group. */
+			struct procsession                  *pgr_session;   /* [1..1][owned_if(pgr_sleader == this)][const] Session data. */
+		};
+		Toblockop(pidns)                        _pgr_lop;       /* Used internally during destruction */
+		Tobpostlockop(pidns)                    _pgr_plop;      /* Used internally during destruction */
+	};
+#else /* __WANT_PROCGRP__pgr_lop */
+	REF struct procgrp                          *pgr_sleader;   /* [1..1][ref_if(!= this)][const] Session leader process group. */
+	struct procsession                          *pgr_session;   /* [1..1][owned_if(pgr_sleader == this)][const] Session data. */
+#endif /* !__WANT_PROCGRP__pgr_lop */
+	Toblockop_slist(procgrp)                     pgr_memb_lops; /* Lock-ops for `pgr_memb_lock' */
+	struct atomic_rwlock                         pgr_memb_lock; /* Lock for `pgr_memb_list' */
+	struct WEAK taskpid_list                     pgr_memb_list; /* [0..n][LINK(tp_pctl->pc_grpmember)][lock(pgr_memb_lock)]
+	                                                             * List of processes apart of this group (including the group leader).
+	                                                             * Members of  this list  automatically remove  themselves upon  being
+	                                                             * destroyed (aka. inside of `taskpid_destroy()'). */
+	REF struct pidns                            *pgr_ns;        /* [1..1][const] Top-level PID namespace containing this descriptor. */
+	COMPILER_FLEXIBLE_ARRAY(struct procgrp_slot, pgr_pids);     /* [const][tp_ns->pn_ind+1] Task PID value from different namespaces. */
 };
+
+/* Destroy the given procgrp. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL procgrp_destroy)(struct procgrp *__restrict self);
+DEFINE_REFCOUNT_FUNCTIONS(struct procgrp, pgr_refcnt, procgrp_destroy)
+
+
+/* Allocate/Free a `struct procgrp' */
+#define _procgrp_sizeof(ns) \
+	(__builtin_offsetof(struct procgrp, pgr_pids) + ((ns)->pn_ind + 1) * sizeof(struct procgrp_slot))
+#define _procgrp_alloc(ns) ((struct procgrp *)kmalloc(_procgrp_sizeof(ns), GFP_NORMAL))
+#define _procgrp_free(self) kfree(self)
+
+/* Helper macros for working with `struct procgrp::pgr_memb_lock' */
+#define procgrp_memb_mustreap(self)     oblockop_mustreap(&(self)->pgr_memb_lops)
+#define _procgrp_memb_reap(self)        _oblockop_reap_atomic_rwlock(&(self)->pgr_memb_lops, &(self)->pgr_memb_lock, self)
+#define procgrp_memb_reap(self)         oblockop_reap_atomic_rwlock(&(self)->pgr_memb_lops, &(self)->pgr_memb_lock, self)
+#define procgrp_memb_write(self)        atomic_rwlock_write(&(self)->pgr_memb_lock)
+#define procgrp_memb_write_nx(self)     atomic_rwlock_write_nx(&(self)->pgr_memb_lock)
+#define procgrp_memb_trywrite(self)     atomic_rwlock_trywrite(&(self)->pgr_memb_lock)
+#define procgrp_memb_endwrite(self)     (atomic_rwlock_endwrite(&(self)->pgr_memb_lock), procgrp_memb_reap(self))
+#define _procgrp_memb_endwrite(self)    atomic_rwlock_endwrite(&(self)->pgr_memb_lock)
+#define procgrp_memb_read(self)         atomic_rwlock_read(&(self)->pgr_memb_lock)
+#define procgrp_memb_read_nx(self)      atomic_rwlock_read_nx(&(self)->pgr_memb_lock)
+#define procgrp_memb_tryread(self)      atomic_rwlock_tryread(&(self)->pgr_memb_lock)
+#define _procgrp_memb_endread(self)     atomic_rwlock_endread(&(self)->pgr_memb_lock)
+#define procgrp_memb_endread(self)      (void)(atomic_rwlock_endread(&(self)->pgr_memb_lock) && (procgrp_memb_reap(self), 0))
+#define _procgrp_memb_end(self)         atomic_rwlock_end(&(self)->pgr_memb_lock)
+#define procgrp_memb_end(self)          (void)(atomic_rwlock_end(&(self)->pgr_memb_lock) && (procgrp_memb_reap(self), 0))
+#define procgrp_memb_upgrade(self)      atomic_rwlock_upgrade(&(self)->pgr_memb_lock)
+#define procgrp_memb_upgrade_nx(self)   atomic_rwlock_upgrade_nx(&(self)->pgr_memb_lock)
+#define procgrp_memb_tryupgrade(self)   atomic_rwlock_tryupgrade(&(self)->pgr_memb_lock)
+#define procgrp_memb_downgrade(self)    atomic_rwlock_downgrade(&(self)->pgr_memb_lock)
+#define procgrp_memb_reading(self)      atomic_rwlock_reading(&(self)->pgr_memb_lock)
+#define procgrp_memb_writing(self)      atomic_rwlock_writing(&(self)->pgr_memb_lock)
+#define procgrp_memb_canread(self)      atomic_rwlock_canread(&(self)->pgr_memb_lock)
+#define procgrp_memb_canwrite(self)     atomic_rwlock_canwrite(&(self)->pgr_memb_lock)
+#define procgrp_memb_waitread(self)     atomic_rwlock_waitread(&(self)->pgr_memb_lock)
+#define procgrp_memb_waitwrite(self)    atomic_rwlock_waitwrite(&(self)->pgr_memb_lock)
+#define procgrp_memb_waitread_nx(self)  atomic_rwlock_waitread_nx(&(self)->pgr_memb_lock)
+#define procgrp_memb_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->pgr_memb_lock)
+
+/* Helper macros for adding/removing elements from `struct procgrp::pgr_memb_list'
+ * NOTE: For all of these, the caller must be holding a write-lock to `self->pgr_memb_lock' */
+#define __procgrp_memb_assert(self, member_struct_taskpid)                    \
+	(__hybrid_assertf(taskpid_isaprocess(struct_taskpid_to_add),              \
+	                  "Not a process leader"),                                \
+	 __hybrid_assertf(taskpid_getprocgrpptr(struct_taskpid_to_add) == (self), \
+	                  "Not set-up as a member of this process group"))
+#define procgrp_memb_insert(self, struct_taskpid_to_add) \
+	(__procgrp_memb_assert(self, struct_taskpid_to_add), \
+	 LIST_INSERT_HEAD(&(self)->pgr_memb_list, struct_taskpid_to_add, tp_pctl->pc_grpmember))
+#define procgrp_memb_remove(self, struct_taskpid_to_del) \
+	(__procgrp_memb_assert(self, struct_taskpid_to_del), \
+	 LIST_REMOVE(struct_taskpid_to_del, tp_pctl->pc_grpmember))
+
+
 
 /* Destroy the given process group. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL procgrp_destroy)(struct procgrp *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct procgrp, pgc_refcnt, procgrp_destroy)
+DEFINE_REFCOUNT_FUNCTIONS(struct procgrp, pgr_refcnt, procgrp_destroy)
+
+/* Return information regarding the session associated with a given process group. */
+#define procgrp_getsessionleader(self) (self)->pgr_sleader
+#define procgrp_issessionleader(self)  ((self) == procgrp_getsessionleader(self))
+#define procgrp_getsession(self)       procgrp_getsessionleader(self)->pgr_session
+
+/* Return the # of PIDs defined by `self' */
+#define procgrp_getpidnocount(self) ((self)->pgr_ns->pn_ind + 1)
+
+/* Return `self's PID number associated with `ns' */
+#ifdef NDEBUG
+#define procgrp_getnspidno(self, ns) \
+	_procgrp_slot_getpidno((self)->pgr_pids[(ns)->pn_ind])
+#else /* NDEBUG */
+#define procgrp_getnspidno(self, ns)                                       \
+	({                                                                     \
+		struct procgrp const *__pggp_self = (self);                        \
+		struct pidns const *__tpgp_ns     = (ns);                          \
+		__hybrid_assert(__pggp_self->pgr_ns->pn_ind >= __tpgp_ns->pn_ind); \
+		_procgrp_slot_getpidno(__pggp_self->pgr_pids[__tpgp_ns->pn_ind]);  \
+	})
+#endif /* !NDEBUG */
+
+/* Same as `procgrp_getnspidno()', but return `0' if `self' doesn't appear in `ns' */
+#define procgrp_getnspidno_s(self, ns)                                        \
+	({                                                                        \
+		struct procgrp const *__pggps_self = (self);                          \
+		struct pidns const *__tpgps_ns     = (ns);                            \
+		(likely(__pggps_self->pgr_ns->pn_ind >= __tpgps_ns->pn_ind)           \
+		 ? _procgrp_slot_getpidno(__pggps_self->pgr_pids[__tpgps_ns->pn_ind]) \
+		 : 0);                                                                \
+	})
+#define procgrp_getpidno(self)   procgrp_getnspidno(self, THIS_PIDNS)
+#define procgrp_getpidno_s(self) procgrp_getnspidno_s(self, THIS_PIDNS)
+
+/* Return `self's PID number within the root namespace */
+#define procgrp_getrootpidno(self) _procgrp_slot_getpidno((self)->pgr_pids[0])
+
 
 
 
@@ -194,18 +305,19 @@ ARREF(procgrp_arref, procgrp);
 #endif /* !__procgrp_arref_defined */
 
 struct procctl {
-	struct atomic_rwlock     pc_chlds_lock;   /* Lock for `pc_chlds' */
-	struct REF taskpid_list  pc_chlds;        /* [0..n][lock(pc_chlds_lock)][link(tp_parsib)]
+	struct atomic_rwlock     pc_chlds_lock;   /* Lock for `pc_chlds_list' */
+	struct REF taskpid_list  pc_chlds_list;   /* [0..n][lock(pc_chlds_lock)][link(tp_parsib)]
 	                                           * Child tasks of this process. This includes both
 	                                           * threads (other than the main thread) within the
 	                                           * process,  as well as processes that were fork'd
 	                                           * from this one (or re-parented to this one). */
-	struct sig               pc_chld_changed; /* Broadcast when one of `pc_chlds' changes status.
+	struct sig               pc_chld_changed; /* Broadcast when one of `pc_chlds_list' changes status.
 	                                           * (s.a. `struct taskpid::tp_changed') */
 	struct task_arref        pc_parent;       /* [1..1][lock(READ(ATOMIC), WRITE(OLD->pc_chlds_lock &&
 	                                           *                                 NEW->pc_chlds_lock))]
 	                                           * Parent process. When the parent thread exits, it will
-	                                           * re-parent  all of its remaining children to boottask. */
+	                                           * re-parent  all of its remaining children to boottask.
+	                                           * NOTE: You may assume that `task_isaprocess(pc_parent)' */
 	struct atomic_rwlock     pc_sig_lock;     /* Lock for `pc_sig_list'. */
 	struct pending_rpc_slist pc_sig_list;     /* [0..n][lock(APPEND(ATOMIC), REMOVE(pc_sig_lock))]
 	                                           * List of pending RPCs directed at the process as a whole. When
@@ -218,33 +330,174 @@ struct procctl {
 	                                           * This  signal is _only_  used to implement  `signalfd(2)', as you're not
 	                                           * normally supposed to "wait" for signals to arrive; you just always  get
 	                                           * a sporadic interrupt once they do arrive. */
-	struct procgrp_arref     pc_grp;          /* [1..1][lock(READ(ATOMIC), WRITE(OLD->pgc_lock &&
-	                                           *                                 NEW->pgc_lock))]
+	struct procgrp_arref     pc_grp;          /* [1..1][lock(READ(ATOMIC), WRITE(OLD->pgr_memb_lock &&
+	                                           *                                 NEW->pgr_memb_lock))]
 	                                           * Process group controller. */
-	LIST_ENTRY(taskpid)      pc_grpmember;    /* [0..1][lock(pc_grp->pgc_lock)] Process group member link. */
+	LIST_ENTRY(taskpid)      pc_grpmember;    /* [0..1][lock(pc_grp->pgr_memb_lock)] Process group member link. */
 };
 
-#define procctl_getparent(self) arref_get(&(self)->procctl) /* REF struct task * [1..1] */
+/* Allocate/Free a `struct procctl' */
+#define _procctl_alloc()    ((struct procctl *)kmalloc(sizeof(struct procctl), GFP_NORMAL))
+#define _procctl_free(self) kfree(self)
 
-#define taskpid_isaprocess(self) ((self)->tp_proc == (self))
-#define task_getprocesspid()     THIS_TASKPID->tp_proc                    /* struct taskpid * [1..1] */
-#define _task_getproctl()        THIS_TASKPID->tp_pctl                    /* struct procctl * [1..1] */
-#define task_getparentprocess()  awref_get(&_task_getproctl()->pc_parent) /* REF struct task * [0..1] */
+/* Helper macros for working with `struct procgrp::pc_chlds_lock' */
+#define procctl_chlds_mustreap(self)     0
+#define _procctl_chlds_reap(self)        (void)0
+#define procctl_chlds_reap(self)         (void)0
+#define procctl_chlds_write(self)        atomic_rwlock_write(&(self)->pc_chlds_lock)
+#define procctl_chlds_write_nx(self)     atomic_rwlock_write_nx(&(self)->pc_chlds_lock)
+#define procctl_chlds_trywrite(self)     atomic_rwlock_trywrite(&(self)->pc_chlds_lock)
+#define procctl_chlds_endwrite(self)     (atomic_rwlock_endwrite(&(self)->pc_chlds_lock), procctl_chlds_reap(self))
+#define _procctl_chlds_endwrite(self)    atomic_rwlock_endwrite(&(self)->pc_chlds_lock)
+#define procctl_chlds_read(self)         atomic_rwlock_read(&(self)->pc_chlds_lock)
+#define procctl_chlds_read_nx(self)      atomic_rwlock_read_nx(&(self)->pc_chlds_lock)
+#define procctl_chlds_tryread(self)      atomic_rwlock_tryread(&(self)->pc_chlds_lock)
+#define _procctl_chlds_endread(self)     atomic_rwlock_endread(&(self)->pc_chlds_lock)
+#define procctl_chlds_endread(self)      (void)(atomic_rwlock_endread(&(self)->pc_chlds_lock) && (procctl_chlds_reap(self), 0))
+#define _procctl_chlds_end(self)         atomic_rwlock_end(&(self)->pc_chlds_lock)
+#define procctl_chlds_end(self)          (void)(atomic_rwlock_end(&(self)->pc_chlds_lock) && (procctl_chlds_reap(self), 0))
+#define procctl_chlds_upgrade(self)      atomic_rwlock_upgrade(&(self)->pc_chlds_lock)
+#define procctl_chlds_upgrade_nx(self)   atomic_rwlock_upgrade_nx(&(self)->pc_chlds_lock)
+#define procctl_chlds_tryupgrade(self)   atomic_rwlock_tryupgrade(&(self)->pc_chlds_lock)
+#define procctl_chlds_downgrade(self)    atomic_rwlock_downgrade(&(self)->pc_chlds_lock)
+#define procctl_chlds_reading(self)      atomic_rwlock_reading(&(self)->pc_chlds_lock)
+#define procctl_chlds_writing(self)      atomic_rwlock_writing(&(self)->pc_chlds_lock)
+#define procctl_chlds_canread(self)      atomic_rwlock_canread(&(self)->pc_chlds_lock)
+#define procctl_chlds_canwrite(self)     atomic_rwlock_canwrite(&(self)->pc_chlds_lock)
+#define procctl_chlds_waitread(self)     atomic_rwlock_waitread(&(self)->pc_chlds_lock)
+#define procctl_chlds_waitwrite(self)    atomic_rwlock_waitwrite(&(self)->pc_chlds_lock)
+#define procctl_chlds_waitread_nx(self)  atomic_rwlock_waitread_nx(&(self)->pc_chlds_lock)
+#define procctl_chlds_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->pc_chlds_lock)
+
+/* Helper macros for adding/removing elements from `struct procctl::pc_chlds_list'
+ * NOTE: For all of these, the caller must be holding a write-lock to `self->pc_chlds_lock' */
+#define __procctl_chlds_assert(self, member_struct_taskpid)                                         \
+	__hybrid_assertf((self) == taskpid_getprocctl(member_struct_taskpid) ||                         \
+	                 (self) == task_getprocctl(taskpid_getparentprocessptr(member_struct_taskpid)), \
+	                 "Can only add process-threads, or child processes")
+#define procctl_chlds_insert(self, struct_taskpid_to_add) \
+	(__procctl_chlds_assert(self, struct_taskpid_to_add), \
+	 LIST_INSERT_HEAD(&(self)->pc_chlds_list, struct_taskpid_to_add, tp_parsib))
+#define procctl_chlds_remove(self, struct_taskpid_to_del) \
+	(__procctl_chlds_assert(self, struct_taskpid_to_del), \
+	 LIST_REMOVE(struct_taskpid_to_del, tp_parsib))
+
+/* Helper macros for working with `struct procgrp::pc_sig_lock' */
+#define procctl_sig_mustreap(self)     0
+#define _procctl_sig_reap(self)        (void)0
+#define procctl_sig_reap(self)         (void)0
+#define procctl_sig_write(self)        atomic_rwlock_write(&(self)->pc_sig_lock)
+#define procctl_sig_write_nx(self)     atomic_rwlock_write_nx(&(self)->pc_sig_lock)
+#define procctl_sig_trywrite(self)     atomic_rwlock_trywrite(&(self)->pc_sig_lock)
+#define procctl_sig_endwrite(self)     (atomic_rwlock_endwrite(&(self)->pc_sig_lock), procctl_sig_reap(self))
+#define _procctl_sig_endwrite(self)    atomic_rwlock_endwrite(&(self)->pc_sig_lock)
+#define procctl_sig_read(self)         atomic_rwlock_read(&(self)->pc_sig_lock)
+#define procctl_sig_read_nx(self)      atomic_rwlock_read_nx(&(self)->pc_sig_lock)
+#define procctl_sig_tryread(self)      atomic_rwlock_tryread(&(self)->pc_sig_lock)
+#define _procctl_sig_endread(self)     atomic_rwlock_endread(&(self)->pc_sig_lock)
+#define procctl_sig_endread(self)      (void)(atomic_rwlock_endread(&(self)->pc_sig_lock) && (procctl_sig_reap(self), 0))
+#define _procctl_sig_end(self)         atomic_rwlock_end(&(self)->pc_sig_lock)
+#define procctl_sig_end(self)          (void)(atomic_rwlock_end(&(self)->pc_sig_lock) && (procctl_sig_reap(self), 0))
+#define procctl_sig_upgrade(self)      atomic_rwlock_upgrade(&(self)->pc_sig_lock)
+#define procctl_sig_upgrade_nx(self)   atomic_rwlock_upgrade_nx(&(self)->pc_sig_lock)
+#define procctl_sig_tryupgrade(self)   atomic_rwlock_tryupgrade(&(self)->pc_sig_lock)
+#define procctl_sig_downgrade(self)    atomic_rwlock_downgrade(&(self)->pc_sig_lock)
+#define procctl_sig_reading(self)      atomic_rwlock_reading(&(self)->pc_sig_lock)
+#define procctl_sig_writing(self)      atomic_rwlock_writing(&(self)->pc_sig_lock)
+#define procctl_sig_canread(self)      atomic_rwlock_canread(&(self)->pc_sig_lock)
+#define procctl_sig_canwrite(self)     atomic_rwlock_canwrite(&(self)->pc_sig_lock)
+#define procctl_sig_waitread(self)     atomic_rwlock_waitread(&(self)->pc_sig_lock)
+#define procctl_sig_waitwrite(self)    atomic_rwlock_waitwrite(&(self)->pc_sig_lock)
+#define procctl_sig_waitread_nx(self)  atomic_rwlock_waitread_nx(&(self)->pc_sig_lock)
+#define procctl_sig_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->pc_sig_lock)
+
+/* Helper macros for working with `struct procgrp::pc_sig_list' */
+#define procctl_sig_insert(self, struct_pending_rpc_to_add)                                   \
+	(__hybrid_assertf(!((struct_pending_rpc_to_add)->pr_flags & (RPC_SYNCMODE_F_REQUIRE_SC |  \
+	                                                             RPC_SYNCMODE_F_REQUIRE_CP)), \
+	                  "These flags cannot be used for process-directed signals/RPCs"),        \
+	 SLIST_ATOMIC_INSERT(&(self)->pc_sig_list, struct_pending_rpc_to_add, pr_link))
+#define procctl_sig_insert_r(self, lo_elem, hi_elem) \
+	SLIST_ATOMIC_INSERT_R(&(self)->pc_sig_list, lo_elem, hi_elem, pr_link)
+/* NOTE: For `procctl_sig_clear()', the caller must be holding a write-lock to `pc_sig_list'! */
+#define procctl_sig_clear(self) SLIST_ATOMIC_CLEAR(&(self)->pc_sig_list)
+
+/* Return a reference to the parent-process of the given element. */
+#define procctl_getparentprocess(self)   arref_get(&(self)->procctl)                          /* REF struct task * [1..1] */
+#define taskpid_getparentprocess(self)   procctl_getparentprocess(taskpid_getprocctl(self))   /* REF struct task * [0..1] */
+#define task_getparentprocess()          procctl_getparentprocess(task_getprocctl())          /* REF struct task * [0..1] */
+#define task_getparentprocess_of(thread) procctl_getparentprocess(task_getprocctl_of(thread)) /* REF struct task * [0..1] */
+
+#define procctl_getparentprocessptr(self)   arref_ptr(&(self)->procctl)
+#define taskpid_getparentprocessptr(self)   procctl_getparentprocessptr(taskpid_getprocctl(self))
+#define task_getparentprocessptr()          procctl_getparentprocessptr(task_getprocctl())
+#define task_getparentprocessptr_of(thread) procctl_getparentprocessptr(task_getprocctl_of(thread))
 
 
-/* Session used by `procgrp_kernel' (and consequently also by `/bin/init') */
-DATDEF struct procsession procsession_kernel;
+/* Session used by `procctl_boottask' (and consequently also by `/bin/init') */
+DATDEF struct procsession boottask_procsession;
 
 /* Special process group with `pgid == 0'  used for kernel threads (and  /bin/init)
  * Because we use  `pgid == 0', `setpgid(2)'  cannot be  used to  join this  group,
  * since passing it `0' as the target process group ID is an alias for `getpid(2)'. */
-DATDEF struct procgrp procgrp_kernel;
-
-/* Process controller for kernel threads. */
-DATDEF struct procctl procctl_kernel;
+DATDEF struct procgrp boottask_procgrp;
 
 /* Process controller for `boottask' (aka. `/bin/init') */
-DATDEF struct procctl procctl_boottask;
+DATDEF struct procctl boottask_procctl;
+
+
+/* Return a reference to the process group to which element belongs. */
+#define procctl_getprocgrp(self) /* >> REF struct procgrp * [1..1] */ \
+	({ struct procctl *__pcgpg_self = (self); arref_get(&__pcgpg_self->pc_grp); })
+#define taskpid_getprocgrp(self)      procctl_getprocgrp(taskpid_getprocctl(self))   /* >> REF struct procgrp * [1..1] */
+#define task_getprocgrp()             procctl_getprocgrp(task_getprocctl())          /* >> REF struct procgrp * [1..1] */
+#define task_getprocgrp_of(thread)    procctl_getprocgrp(task_getprocctl_of(thread)) /* >> REF struct procgrp * [1..1] */
+#define procctl_getprocgrpptr(self)   arref_ptr(&(self)->pc_grp)
+#define taskpid_getprocgrpptr(self)   procctl_getprocgrpptr(taskpid_getprocctl(self))
+#define task_getprocgrpptr()          procctl_getprocgrpptr(task_getprocctl())
+#define task_getprocgrpptr_of(thread) procctl_getprocgrpptr(task_getprocctl_of(thread))
+
+
+#define __task_getpgid(inherted_grp_ref, how)                 \
+	({                                                        \
+		REF struct procgrp *__tgpgi_grp = (inherted_grp_ref); \
+		pid_t __tgpgi_res               = how;                \
+		decref_unlikely(__tgpgi_grp);                         \
+		__tgpgi_res;                                          \
+	})
+#define __task_getmypgid(how)                                                \
+	({                                                                       \
+		struct taskpid *__tgmpgi_pid     = task_gettaskpid();                \
+		REF struct procgrp *__tgmpgi_grp = taskpid_getprocgrp(__tgmpgi_pid); \
+		pid_t __tgmpgi_res               = how;                              \
+		decref_unlikely(__tgmpgi_grp);                                       \
+		__tgmpgi_res;                                                        \
+	})
+
+/* Return process group ID of a given `struct procctl' or `struct taskpid'. */
+#define procctl_getpgid(self)         __task_getpgid(procctl_getprocgrp(self), procgrp_getpidno(__tgpgi_grp))         /* Return PGID of given `struct procctl' (in caller's namespace; panic/undefined if not mapped) */
+#define procctl_getpgid_s(self)       __task_getpgid(procctl_getprocgrp(self), procgrp_getpidno_s(__tgpgi_grp))       /* Return PGID of given `struct procctl' (in caller's namespace; `0' if not mapped) */
+#define procctl_getrootpgid(self)     __task_getpgid(procctl_getprocgrp(self), procgrp_getrootpidno(__tgpgi_grp))     /* Return PGID of given `struct procctl' (in root namespace) */
+#define procctl_getnspgid(self, ns)   __task_getpgid(procctl_getprocgrp(self), procgrp_getnspidno(__tgpgi_grp, ns))   /* Return PGID of given `struct procctl' (in caller's namespace; panic/undefined if not mapped) */
+#define procctl_getnspgid_s(self, ns) __task_getpgid(procctl_getprocgrp(self), procgrp_getnspidno_s(__tgpgi_grp, ns)) /* Return PGID of given `struct procctl' (in caller's namespace; `0' if not mapped) */
+#define taskpid_getpgid(self)         procctl_getpgid(taskpid_getprocctl(self))                                       /* Return PGID of given `struct taskpid' (in caller's namespace; panic/undefined if not mapped) */
+#define taskpid_getpgid_s(self)       procctl_getpgid_s(taskpid_getprocctl(self))                                     /* Return PGID of given `struct taskpid' (in caller's namespace; `0' if not mapped) */
+#define taskpid_getrootpgid(self)     procctl_getrootpgid(taskpid_getprocctl(self))                                   /* Return PGID of given `struct taskpid' (in root namespace) */
+#define taskpid_getnspgid(self, ns)   procctl_getnspgid(taskpid_getprocctl(self), ns)                                 /* Return PGID of given `struct taskpid' (in given namespace; panic/undefined if not mapped) */
+#define taskpid_getnspgid_s(self, ns) procctl_getnspgid_s(taskpid_getprocctl(self), ns)                               /* Return PGID of given `struct taskpid' (in given namespace; `0' if not mapped) */
+
+/* Return process group ID of the calling/given thread. */
+#define task_getpgid()                  __task_getmypgid(procgrp_getnspidno(__tgmpgi_grp, __tgmpgi_pid->tp_ns))   /* Return PGID of calling thread (in caller's namespace; panic/undefined if not mapped) */
+#define task_getpgid_s()                __task_getmypgid(procgrp_getnspidno_s(__tgmpgi_grp, __tgmpgi_pid->tp_ns)) /* Return PGID of calling thread (in caller's namespace; `0' if not mapped) */
+#define task_getpgid_of(thread)         taskpid_getpgid(task_gettaskpid_of(thread))                               /* Return PGID of given thread (in caller's namespace; panic/undefined if not mapped) */
+#define task_getpgid_of_s(thread)       taskpid_getpgid_s(task_gettaskpid_of(thread))                             /* Return PGID of given thread (in caller's namespace; `0' if not mapped) */
+#define task_getrootpgid()              taskpid_getrootpgid(task_gettaskpid())                                    /* Return PGID of calling thread (in root namespace) */
+#define task_getrootpgid_of(thread)     taskpid_getrootpgid(task_gettaskpid_of(thread))                           /* Return PGID of given thread (in root namespace) */
+#define task_getnspgid(ns)              taskpid_getnspgid(task_gettaskpid(), ns)                                  /* Return PGID of calling thread (in given namespace; panic/undefined if not mapped) */
+#define task_getnspgid_s(ns)            taskpid_getnspgid_s(task_gettaskpid(), ns)                                /* Return PGID of calling thread (in given namespace; `0' if not mapped) */
+#define task_getnspgid_of(thread, ns)   taskpid_getnspgid(task_gettaskpid_of(thread), ns)                         /* Return PGID of given thread (in given namespace; panic/undefined if not mapped) */
+#define task_getnspgid_of_s(thread, ns) taskpid_getnspgid_s(task_gettaskpid_of(thread), ns)                       /* Return PGID of given thread (in given namespace; `0' if not mapped) */
+
 
 
 DECL_END

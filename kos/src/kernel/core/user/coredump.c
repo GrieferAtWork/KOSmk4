@@ -96,7 +96,7 @@ dbg_coredump(void const *const *traceback_vector,
 	}
 	{
 		pid_t tid, pid;
-		tid = task_getroottid_of_s(dbg_current);
+		tid = task_getroottid_of(dbg_current);
 		dbg_printf(DBGSTR("tid:%" PRIuN(__SIZEOF_PID_T__)), tid);
 		pid = task_getrootpid_of(dbg_current);
 		if (pid != tid)

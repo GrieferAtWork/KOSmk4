@@ -27,7 +27,9 @@
 #else /* CONFIG_USE_NEW_GROUP */
 #include <kernel/types.h>
 #include <sched/pertask.h>
+#ifndef GUARD_KERNEL_INCLUDE_SCHED_PID_H
 #include <sched/pid.h>
+#endif /* !GUARD_KERNEL_INCLUDE_SCHED_PID_H */
 #include <sched/signal.h>
 
 #include <hybrid/sequence/list.h>
@@ -119,10 +121,10 @@ LIST_HEAD(taskpid_list, REF taskpid);
 LIST_HEAD(task_list, WEAK task);
 #endif /* !__task_list_defined */
 
-#ifndef __ttydev_device_axref_defined
-#define __ttydev_device_axref_defined
-AXREF(ttydev_device_axref, ttydev);
-#endif /* !__ttydev_device_axref_defined */
+#ifndef __ttydev_axref_defined
+#define __ttydev_axref_defined
+AXREF(ttydev_axref, ttydev);
+#endif /* !__ttydev_axref_defined */
 
 
 struct taskgroup {
@@ -202,7 +204,7 @@ struct taskgroup {
 	                                                      * The session leader of the this process group.
 	                                                      * When set to `THIS_TASKPID', then the calling thread is that leader. */
 	/* All of the following fields are only valid when `tg_pgrp_session == THIS_TASKPID' (Otherwise, they are all `[0..1][const]') */
-	struct ttydev_device_axref   tg_ctty;                /* [0..1] The controlling terminal  (/dev/tty) associated  with this  session
+	struct ttydev_axref   tg_ctty;                /* [0..1] The controlling terminal  (/dev/tty) associated  with this  session
 	                                                      * When non-NULL, `tg_ctty->t_cproc == THIS_TASKPID' (for the session leader) */
 };
 
@@ -313,9 +315,7 @@ LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool NOTHROW(KCALL task_issessionleader_p)(
 #define task_getnstid_of(thread, ns)   taskpid_getnspidno(FORTASK(thread, this_taskpid), ns)
 #define task_getnstid_of_s(thread, ns) taskpid_getnspidno_s(FORTASK(thread, this_taskpid), ns)
 #define task_getselftid_of(thread)     taskpid_getselfpidno(FORTASK(thread, this_taskpid))
-#define task_getselftid_of_s(thread)   taskpid_getselfpidno(FORTASK(thread, this_taskpid))
 #define task_getroottid_of(thread)     taskpid_getrootpidno(FORTASK(thread, this_taskpid))
-#define task_getroottid_of_s(thread)   taskpid_getrootpidno(FORTASK(thread, this_taskpid))
 #define task_getpid_of(thread)         taskpid_getpidno(task_getprocesspid_of(thread))
 #define task_getpid_of_s(thread)       taskpid_getpidno_s(task_getprocesspid_of(thread))
 #define task_getnspid_of(thread, ns)   taskpid_getnspidno(task_getprocesspid_of(thread), ns)

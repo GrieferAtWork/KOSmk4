@@ -92,11 +92,11 @@ NOTHROW(FCALL GDB_PrintOsRegisterValue)(struct task *__restrict thread, uintptr_
 	switch (os_regno) {
 
 	case OS_REGISTER_TID:
-		result = format_printf(printer, arg, "%u", task_getselftid_of_s(thread));
+		result = format_printf(printer, arg, "%u", task_getselftid_of(thread));
 		break;
 
 	case OS_REGISTER_ROOTTID:
-		result = format_printf(printer, arg, "%u", task_getroottid_of_s(thread));
+		result = format_printf(printer, arg, "%u", task_getroottid_of(thread));
 		break;
 
 	case OS_REGISTER_PID:

@@ -172,7 +172,7 @@ NOTHROW(KCALL note_task)(pformatprinter printer, void *arg,
 			readmem(exec_name, exec_namelen * sizeof(char));
 		}
 		pid = task_getrootpid_of(thread);
-		tid = task_getroottid_of_s(thread);
+		tid = task_getroottid_of(thread);
 	} EXCEPT {
 		goto badobj;
 	}

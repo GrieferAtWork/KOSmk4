@@ -276,7 +276,7 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 	me  = THIS_CPU;
 	printk(KERN_TRACE "[sched:cpu#%u] Starting thread %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
 	       (unsigned int)thread->t_cpu->c_id, thread,
-	       (unsigned int)task_getroottid_of_s(thread));
+	       (unsigned int)task_getroottid_of(thread));
 #ifndef CONFIG_NO_SMP
 	/* NOTE: Before being started, the thread's CPU shouldn't be subject to change yet,
 	 *       so we're safe in assuming that the thread's CPU won't change before  we're

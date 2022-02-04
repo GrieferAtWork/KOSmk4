@@ -133,9 +133,10 @@ struct taskpid {
 #ifdef CONFIG_USE_NEW_GROUP
 	REF struct taskpid     *tp_proc;    /* [1..1][ref_if(!= this)][const] PID descriptor for associated process. */
 	struct procctl         *tp_pctl;    /* [1..1][owned_if(tp_proc == this)][== tp_proc->tp_pctl][const] Process controller. */
-	LIST_ENTRY(REF taskpid) tp_parsib;  /* [1..1] Chain of sibling tasks:
+	LIST_ENTRY(REF taskpid) tp_parsib;  /* [0..1] Chain of sibling tasks:
 	                                     * - If `tp_proc == this': Link in chain of other processes spawned by the parent process of `tp_thread'
-	                                     * - If `tp_proc != this': Link in chain of sibling threads spawned within the same process */
+	                                     * - If `tp_proc != this': Link in chain of sibling threads spawned within the same process
+	                                     * Marked as unbound if this taskpid has been wait(2)-ed for. */
 #else /* CONFIG_USE_NEW_GROUP */
 	LIST_ENTRY(REF taskpid) tp_parsib;  /* [0..1] Chain of sibling tasks:
 	                                     * - If `tp_proc == this':
@@ -143,17 +144,21 @@ struct taskpid {
 	                                     * - If `tp_proc != this':
 	                                     *   Link in chain of sibling threads spawned within the same process */
 #endif /* !CONFIG_USE_NEW_GROUP */
-	REF struct pidns       *tp_ns;      /* [1..1][const] Top-level PID namespace containing this descriptor. */
+	REF struct pidns       *tp_ns;      /* [1..1][const][== tp_proc->tp_ns]
+	                                     * Top-level PID namespace containing this descriptor. Note
+	                                     * that threads are  _required_ to reside  in the same  PID
+	                                     * namespace as a  process's main thread.  This is  assumed
+	                                     * by stuff like `task_getpid()'. */
 	COMPILER_FLEXIBLE_ARRAY(struct taskpid_slot,
 	                        tp_pids);   /* [const][tp_ns->pn_ind+1] Task PID value from different namespaces. */
 };
 
 /* Allocate a taskpid descriptor for use with a given `ns' */
-#define taskpid_alloc(ns)                                                        \
-	((struct taskpid *)kmalloc(__builtin_offsetof(struct taskpid, tp_pids) +     \
-	                           ((ns)->pn_ind + 1) * sizeof(struct taskpid_slot), \
-	                           GFP_NORMAL))
-#define taskpid_free(self) kfree(self)
+#define _taskpid_sizeof(ns)                         \
+	((__builtin_offsetof(struct taskpid, tp_pids) + \
+	  ((ns)->pn_ind + 1) * sizeof(struct taskpid_slot)))
+#define _taskpid_alloc(ns)  ((struct taskpid *)kmalloc(_taskpid_sizeof(ns), GFP_NORMAL))
+#define _taskpid_free(self) kfree(self)
 
 /* Destroy the given taskpid. */
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -167,7 +172,7 @@ DATDEF ATTR_PERTASK struct taskpid *this_taskpid;
 
 /* Return a reference/pointer to the thread associated with `self'
  * Returns `NULL'  when said  thread has  already been  destroyed. */
-#define taskpid_gettask(self)    awref_get(&(self)->tp_thread)
+#define taskpid_gettask(self)    ({ struct taskpid *__tpgt_self = (self); awref_get(&__tpgt_self->tp_thread); })
 #define taskpid_gettaskptr(self) awref_ptr(&(self)->tp_thread)
 
 /* Same as `taskpid_gettask()', but throw an exception if the thread has exited. */
@@ -222,6 +227,9 @@ taskpid_gettask_srch(struct taskpid *__restrict self)
 /************************************************************************/
 /* TASK PID NAMESPACE                                                   */
 /************************************************************************/
+#ifdef CONFIG_USE_NEW_GROUP
+struct procgrp; /* Defined in <sched/group-new.h> */
+#endif /* CONFIG_USE_NEW_GROUP */
 struct pidns {
 	WEAK refcnt_t               pn_refcnt;  /* Reference counter. */
 	size_t                      pn_ind;     /* [const][(== 0) == (. == &pidns_root)]
@@ -239,14 +247,12 @@ struct pidns {
 #ifdef CONFIG_USE_NEW_GROUP
 	LLRBTREE_ROOT(WEAK procgrp) pn_tree_pg; /* [LINK(->pgc_pids[pn_ind].pgs_link)][0..n][lock(pn_lock)]
 	                                         * Tree of process groups (groups remove themselves upon destruction). */
-	/* TODO: When implementing CONFIG_USE_NEW_GROUP, remember that PIDs cannot be
-	 *       re-used if there is EITHER a process with that ID, or a process group
-	 *       with that ID (s.a. posix -- "4.13 Process ID Reuse") */
 #endif /* CONFIG_USE_NEW_GROUP */
 	pid_t                       pn_npid;    /* [lock(pn_lock)] Next PID to hand out. (in [PIDNS_FIRST_NONRESERVED_PID,PID_MAX]) */
 };
 
 /* Helper macros for working with `struct pidns::pn_lock' */
+#define pidns_mustreap(self)     oblockop_mustreap(&(self)->pn_lops)
 #define _pidns_reap(self)        _oblockop_reap_atomic_rwlock(&(self)->pn_lops, &(self)->pn_lock, self)
 #define pidns_reap(self)         oblockop_reap_atomic_rwlock(&(self)->pn_lops, &(self)->pn_lock, self)
 #define pidns_write(self)        atomic_rwlock_write(&(self)->pn_lock)
@@ -307,7 +313,6 @@ NOTHROW(FCALL pidns_lookuptask_locked)(struct pidns const *__restrict self, pid_
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct taskpid *
 NOTHROW(FCALL pidns_lookupnext_locked)(struct pidns const *__restrict self, pid_t min_pid);
 
-
 /* Try to acquire write-locks to all PID namespaces reachable from `self'
  * Upon success, return `NULL'; else: return the blocking PID  namespace.
  * @return: NULL: Success
@@ -346,8 +351,100 @@ FUNDEF WUNUSED NOBLOCK NONNULL((1)) pid_t
 NOTHROW(FCALL pidns_findpid)(struct pidns const *__restrict self,
                              pid_t minpid, pid_t maxpid);
 
+/* Return the next free PID  to-be assigned to a new  thread/process
+ * In the (highly unlikely) even that all PIDs are in use, and  none
+ * can be reclaimed (iow: `self' contains 2^31 threads), return `-1'
+ * instead.
+ *
+ * Allocation  of a PID  is done by use  of `pidns_insertpid', but in
+ * addition to this, the  caller must also increment  `self->pn_npid'
+ * to `return + 1' once  they inserted the  PID into this  namespace!
+ * This only happens when `#ifdef PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE' */
+FUNDEF WUNUSED NOBLOCK NONNULL((1)) pid_t
+NOTHROW(FCALL pidns_nextpid)(struct pidns const *__restrict self);
+#if __SIZEOF_POINTER__ > 4
+#define PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE
+#endif /* __SIZEOF_POINTER__ > 4 */
+
+
+#ifdef CONFIG_USE_NEW_GROUP
+/* Return the process group associated with `gpid' within `self' */
+FUNDEF WUNUSED NONNULL((1)) REF struct procgrp *FCALL
+pidns_grplookup(struct pidns *__restrict self, pid_t gpid) THROWS(E_WOULDBLOCK);
+FUNDEF WUNUSED NONNULL((1)) struct procgrp *
+NOTHROW(FCALL pidns_grplookup_locked)(struct pidns *__restrict self, pid_t gpid);
+
+/* Insert/Remove a process group to/from the given namespace. */
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL pidns_grpinsert)(struct pidns *__restrict self,
+                               struct procgrp *__restrict grp);
+FUNDEF NOBLOCK NONNULL((1)) struct procgrp *
+NOTHROW(FCALL pidns_grpremove)(struct pidns *__restrict self, pid_t gpid);
+#endif /* CONFIG_USE_NEW_GROUP */
+
+
+#ifdef CONFIG_USE_NEW_GROUP
+
+#define taskpid_getprocpid(self)   ((self)->tp_proc)
+#define taskpid_getprocctl(self)   ((self)->tp_pctl)
+#define taskpid_isaprocess(self)   ((self) == taskpid_getprocpid(self))
+#define _taskpid_isaprocess(self)  ({ struct taskpid const *__tpiap_self = (self); taskpid_isaprocess(__tpiap_self); })
+#define task_gettaskpid()          THIS_TASKPID                                   /* Return task-pid of calling thread */
+#define task_getprocpid()          task_gettaskpid()->tp_proc                     /* Return proc-pid of calling thread */
+#define task_gettaskpid_of(thread) FORTASK(thread, this_taskpid)                  /* Return task-pid of given thread */
+#define task_getprocpid_of(thread) taskpid_getprocpid(task_gettaskpid_of(thread)) /* Return proc-pid of given thread */
+#define task_getprocctl()          task_gettaskpid()->tp_pctl                     /* Return process controller of calling thread */
+#define task_getprocctl_of(thread) taskpid_getprocpid(task_gettaskpid_of(thread)) /* Return process controller of given thread */
+
+/* Return the process-task associated with a given thread. */
+#define task_getproc()             taskpid_gettask(task_getprocpid())             /* >> REF struct task * [0..1] */
+#define task_getproc_of(thread)    taskpid_gettask(task_getprocpid_of(thread))    /* >> REF struct task * [0..1] */
+#define task_getprocptr()          taskpid_gettaskptr(task_getprocpid())          /* >> struct task * [0..1] */
+#define task_getprocptr_of(thread) taskpid_gettaskptr(task_getprocpid_of(thread)) /* >> struct task * [0..1] */
+
+/* Check if the calling/given thread is a process leader. */
+#define task_isprocess()        _taskpid_isaprocess(task_gettaskpid())
+#define task_isaprocess(thread) _taskpid_isaprocess(task_gettaskpid_of(thread))
+
+#define task_getprocesspid    task_getprocpid    /* Deprecated */
+#define task_getprocesspid_of task_getprocpid_of /* Deprecated */
+
+/* Return the TID (thread id) /  PID (process id / thread  id
+ * of the process leader) of the calling thread. The returned
+ * IDS are either relative to  the task's own PID  namespace,
+ * to the ROOT pid namespace, or the given namespace. */
+#define task_gettid()                  taskpid_getselfpidno(task_gettaskpid())              /* Return TID of calling thread (in its own namespace) */
+#define task_gettid_of(thread)         taskpid_getpidno(task_gettaskpid_of(thread))         /* Return TID of given thread (in caller's namespace; panic/undefined if not mapped) */
+#define task_gettid_of_s(thread)       taskpid_getpidno_s(task_gettaskpid_of(thread))       /* Return TID of given thread (in caller's namespace; `0' if not mapped) */
+#define task_getselftid_of(thread)     taskpid_getselfpidno(task_gettaskpid_of(thread))     /* Return TID of given thread (in its own namespace) */
+#define task_getroottid()              taskpid_getrootpidno(task_gettaskpid())              /* Return TID of calling thread (in root namespace) */
+#define task_getroottid_of(thread)     taskpid_getrootpidno(task_gettaskpid_of(thread))     /* Return TID of given thread (in root namespace) */
+#define task_getnstid(ns)              taskpid_getnspidno(task_gettaskpid(), ns)            /* Return TID of calling thread (in given namespace; panic/undefined if not mapped) */
+#define task_getnstid_s(ns)            taskpid_getnspidno_s(task_gettaskpid(), ns)          /* Return TID of calling thread (in given namespace; `0' if not mapped) */
+#define task_getnstid_of(thread, ns)   taskpid_getnspidno(task_gettaskpid_of(thread), ns)   /* Return TID of given thread (in given namespace; panic/undefined if not mapped) */
+#define task_getnstid_of_s(thread, ns) taskpid_getnspidno_s(task_gettaskpid_of(thread), ns) /* Return TID of given thread (in given namespace; `0' if not mapped) */
+#define task_getpid()                  taskpid_getselfpidno(task_getprocpid())              /* Return PID of calling thread (in its own namespace) */
+#define task_getpid_of(thread)         taskpid_getpidno(task_getprocpid_of(thread))         /* Return PID of given thread (in caller's namespace; panic/undefined if not mapped) */
+#define task_getpid_of_s(thread)       taskpid_getpidno_s(task_getprocpid_of(thread))       /* Return PID of given thread (in caller's namespace; `0' if not mapped) */
+#define task_getselfpid_of(thread)     taskpid_getselfpidno(task_getprocpid_of(thread))     /* Return PID of given thread (in its own namespace) */
+#define task_getrootpid()              taskpid_getrootpidno(task_getprocpid())              /* Return PID of calling thread (in root namespace) */
+#define task_getrootpid_of(thread)     taskpid_getrootpidno(task_getprocpid_of(thread))     /* Return PID of given thread (in root namespace) */
+#define task_getnspid(ns)              taskpid_getnspidno(task_getprocpid(), ns)            /* Return PID of calling thread (in given namespace; panic/undefined if not mapped) */
+#define task_getnspid_s(ns)            taskpid_getnspidno_s(task_getprocpid(), ns)          /* Return PID of calling thread (in given namespace; `0' if not mapped) */
+#define task_getnspid_of(thread, ns)   taskpid_getnspidno(task_getprocpid_of(thread), ns)   /* Return PID of given thread (in given namespace; panic/undefined if not mapped) */
+#define task_getnspid_of_s(thread, ns) taskpid_getnspidno_s(task_getprocpid_of(thread), ns) /* Return PID of given thread (in given namespace; `0' if not mapped) */
+
+#endif /* CONFIG_USE_NEW_GROUP */
+
+
 
 DECL_END
 #endif /* __CC__ */
+
+#ifndef CONFIG_USE_NEW_GROUP
+#ifndef GUARD_KERNEL_INCLUDE_SCHED_GROUP_H
+#include <sched/group.h> /* Forward-compatibility for stuff like `task_gettid()' */
+#endif /* !GUARD_KERNEL_INCLUDE_SCHED_GROUP_H */
+#endif /* !CONFIG_USE_NEW_GROUP */
 
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_PID_H */

@@ -45,6 +45,7 @@
 #include <kernel/x86/pic.h>
 #include <kernel/x86/pit.h>
 #include <sched/cpu.h>
+#include <sched/group.h>
 #include <sched/pid.h>
 #include <sched/scheduler.h>
 #include <sched/task-clone.h>
@@ -488,6 +489,7 @@ NOTHROW(KCALL cpu_destroy)(struct cpu *__restrict self) {
 	cpu_free(self);
 }
 
+INTDEF struct taskpid boottask_pid;
 
 PRIVATE ATTR_FREETEXT void KCALL
 i386_allocate_secondary_cores(void) {
@@ -522,6 +524,13 @@ i386_allocate_secondary_cores(void) {
 		FORCPU(altcore, thiscpu_idle_pid).tp_pids[0].tps_pid = pidns_root.pn_npid++;
 		pidns_insertpid(&pidns_root, &FORCPU(altcore, thiscpu_idle_pid));
 		++pidns_root.pn_refcnt;
+
+#ifdef CONFIG_USE_NEW_GROUP
+		/* Join the process group of /bin/init (like all other kernel threads) */
+		FORCPU(altcore, thiscpu_idle_pid).tp_proc = &boottask_pid;
+		FORCPU(altcore, thiscpu_idle_pid).tp_pctl = &boottask_procctl;
+		LIST_INSERT_HEAD(&boottask_procctl.pc_chlds_list, &FORCPU(altcore, thiscpu_idle_pid), tp_parsib);
+#endif /* CONFIG_USE_NEW_GROUP */
 
 		/* Insert the new task into the kernel VM's task user list. */
 		LIST_INSERT_HEAD(&mman_kernel.mm_threads, altidle, t_mman_tasks);

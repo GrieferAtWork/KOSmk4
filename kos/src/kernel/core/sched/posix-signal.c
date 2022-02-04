@@ -316,7 +316,7 @@ set_maybe_and_return:
 					goto set_maybe_and_return;
 				printk(KERN_DEBUG "[userprocmask:%p] Mark signal %d as pending "
 				                  "[tid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
-				       um, signo, task_getroottid_of_s(self));
+				       um, signo, task_getroottid_of(self));
 #else /* atomic_or_nopf */
 				/* If the architecture doesn't support `atomic_cmpxch_nopf()',
 				 * and  the signal hasn't been marked as pending, yet, then we

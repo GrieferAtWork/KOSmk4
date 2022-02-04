@@ -78,7 +78,7 @@ NOTHROW(FCALL GDB_SetSingleStep)(struct task *__restrict thread,
 	          "%s) (was: %s)\n",
 	          thread,
 	          task_getrootpid_of(thread),
-	          task_getroottid_of_s(thread),
+	          task_getroottid_of(thread),
 	          (new_flags & EFLAGS_TF) ? "true" : "false",
 	          (flags & EFLAGS_TF) ? "true" : "false");
 	if (new_flags != flags) {

@@ -306,8 +306,8 @@ x86_handle_device_not_available(struct icpustate *__restrict state) {
 		                  "%p[pid=%" PRIuN(__SIZEOF_PID_T__) "] to "
 		                  "%p[pid=%" PRIuN(__SIZEOF_PID_T__) "] "
 		                  "[pc=%p]\n",
-		       old_task, old_task ? task_getroottid_of_s(old_task) : 0,
-		       new_task, task_getroottid_of_s(new_task),
+		       old_task, old_task ? task_getroottid_of(old_task) : 0,
+		       new_task, task_getroottid_of(new_task),
 		       state->ics_irregs.ir_Pip);
 		mystate = PERTASK_GET(this_fpustate);
 		if (!mystate) {

@@ -884,7 +884,18 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * The combination of O_PATH|O_NOFOLLOW can be used to directly open flnknode nodes,
 	 * similar to the (now abandoned  and now longer available) KOS-specific  O_SYMLINK. */
 
-	/* TODO: Unify thread creation and the clone(2) system call. */
+	/* TODO: Update the toolchain gcc to the latest version.
+	 *       Afterwards, add `__attribute__((access(...)))' support to magic:
+	 * >> void foo([[in]] char const *buf);                       --> __attribute__((access(read_only, 1), nonnull(1))) void foo(char const *buf);
+	 * >> void foo([[out]] char *buf);                            --> __attribute__((access(write_only, 1), nonnull(1))) void foo(char *buf);
+	 * >> void foo([[inout]] char *buf);                          --> __attribute__((access(read_write, 1), nonnull(1))) void foo(char *buf);
+	 * >> void foo([[in_opt]] char const *buf);                   --> __attribute__((access(read_only, 1))) void foo(char const *buf);
+	 * >> void foo([[out_opt]] char *buf);                        --> __attribute__((access(write_only, 1))) void foo(char *buf);
+	 * >> void foo([[inout_opt]] char *buf);                      --> __attribute__((access(read_write, 1))) void foo(char *buf);
+	 * >> void foo([[in(count)]] void const *buf, size_t count);  --> __attribute__((access(read_only, 1, 2))) void foo(void const *buf, size_t count);
+	 * >> void foo([[out(count)]] void *buf, size_t count);       --> __attribute__((access(write_only, 1, 2))) void foo(void *buf, size_t count);
+	 * >> void foo([[inout(count)]] void *buf, size_t count);     --> __attribute__((access(read_write, 1, 2))) void foo(void *buf, size_t count);
+	 */
 
 	return state;
 }

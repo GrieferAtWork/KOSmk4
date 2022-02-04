@@ -103,7 +103,7 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 		dbg_putc(' ');
 		++len;
 	}
-	tid = task_getroottid_of_s(thread);
+	tid = task_getroottid_of(thread);
 	len = pid == tid ? 0 : dbg_printf(DBGSTR(" %u"), tid);
 	while (len < 5) {
 		dbg_putc(' ');

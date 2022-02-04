@@ -73,7 +73,7 @@ NOTHROW(FCALL GDBInfo_PrintThreadName)(pformatprinter printer, void *arg,
 	if unlikely(result < 0)
 		goto done;
 	pid = task_getrootpid_of(thread);
-	tid = task_getroottid_of_s(thread);
+	tid = task_getroottid_of(thread);
 	PRINT(" (");
 	if (pid && tid && pid != tid)
 		PRINTF("%u.%u:", pid, tid);
@@ -123,7 +123,7 @@ NOTHROW(FCALL GDBInfo_PrintThreadExecFile)(pformatprinter printer, void *arg,
 	REF struct fdirent *dent;
 	REF struct path            *path;
 	if (task_getrootpid_of(thread) == 0 ||
-	    task_getroottid_of_s(thread) == 0)
+	    task_getroottid_of(thread) == 0)
 		return GDBInfo_PrintKernelFilename(printer, arg, filename_only);
 	v = task_getmman(thread);
 	if (v == &mman_kernel)
@@ -655,7 +655,7 @@ NOTHROW(FCALL GDBInfo_PrintOSThreadList_Callback)(void *closure,
 	pformatprinter printer; void *arg;
 	intptr_t pid, tid;
 	pid = (intptr_t)task_getrootpid_of(thread);
-	tid = (intptr_t)task_getroottid_of_s(thread);
+	tid = (intptr_t)task_getroottid_of(thread);
 	if unlikely(!pid || !tid) {
 		pid = GDB_KERNEL_PID; /* Kernel thread. */
 		tid = GDB_KERNEL_TID(thread);
