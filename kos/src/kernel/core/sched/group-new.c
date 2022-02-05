@@ -722,9 +722,9 @@ DEFINE_SYSCALL1(errno_t, detach, pid_t, pid) {
 	 *     to detach, `-ECHILD' is returned (yes: "return"; we don't use an
 	 *     exception in this case).
 	 *
-	 * NOTE: Threads created with  `clone(CLONE_DETACHED)' already have  the
-	 *       `TASK_FTERMINATING' flag set from the get-go. However, the flag
-	 *       doesn't affect child processes. */
+	 * NOTE: Threads  created  with `clone(CLONE_DETACHED)'  already  have the
+	 *       `TASK_FTERMINATING' flag set from the get-go. In child processes,
+	 *       it causes /bin/init to be used as parent. */
 	struct taskpid *caller_task = task_gettaskpid();
 	struct taskpid *caller_proc = taskpid_getprocpid(caller_task);
 	struct procctl *ctl         = taskpid_getprocctl(caller_proc);
@@ -809,6 +809,7 @@ again_write_ctl:
 
 				/* Update list membership. */
 				procctl_chlds_remove(ctl, detach);
+				assert(!(boottask.t_flags & TASK_FTERMINATING));
 				procctl_chlds_insert(&boottask_procctl, detach);
 
 				/* Release locks. */

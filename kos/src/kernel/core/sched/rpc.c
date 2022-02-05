@@ -197,18 +197,20 @@ NOTHROW(FCALL task_asyncrpc_destroy_for_shutdown)(struct pending_rpc *__restrict
 		alignas(alignof(struct rpc_context))
 		byte_t _ctxbuf[offsetof(struct rpc_context, rc_scinfo)];
 		struct rpc_context *ctx = (struct rpc_context *)_ctxbuf;
+		uintptr_t rpc_flags = self->pr_flags;
 		TRY {
+			void *cookie = self;
+			if (!(rpc_flags &_RPC_CONTEXT_DONTFREE))
+				cookie = self->pr_kern.k_cookie;
 			ctx->rc_context = RPC_REASONCTX_SHUTDOWN;
-			task_asyncrpc_execnow(ctx,
-			                      self->pr_kern.k_func,
-			                      self->pr_kern.k_cookie);
+			task_asyncrpc_execnow(ctx, self->pr_kern.k_func, cookie);
 		} EXCEPT {
 			/* Dump the exception if it is non-signaling */
 			except_printf("Unhandled exception in RPC function during thread termination");
 		}
-		goto free_rpc;
-	} else if (self->pr_flags & RPC_CONTEXT_SIGNAL){
-free_rpc:
+		if (!(rpc_flags & _RPC_CONTEXT_DONTFREE))
+			pending_rpc_free(self);
+	} else if (self->pr_flags & RPC_CONTEXT_SIGNAL) {
 		pending_rpc_free(self);
 	} else {
 		/* Mark a user RPC program as canceled. */

@@ -215,7 +215,7 @@ NOTHROW(FCALL taskpid_destroy)(struct taskpid *__restrict self) {
 
 
 /* [1..1][const] The PID associated with the calling thread. */
-PUBLIC ATTR_PERTASK struct taskpid *this_taskpid = NULL;
+PUBLIC ATTR_PERTASK REF struct taskpid *this_taskpid = NULL;
 
 /* Same as `taskpid_gettask()', but throw an exception if the thread has exited. */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL

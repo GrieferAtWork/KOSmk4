@@ -364,6 +364,16 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
 FUNDEF ABNORMAL_RETURN ATTR_NORETURN void
 NOTHROW(FCALL task_exit)(int w_status DFL(__W_EXITCODE(0, 0)));
 
+#ifdef CONFIG_USE_NEW_GROUP
+/* Same as `task_exit()', but propagate the same status
+ * to  all  other threads  within the  current process.
+ *
+ * This is the same as calling `task_exit()' from the
+ * main thread of the calling process. */
+FUNDEF ABNORMAL_RETURN ATTR_NORETURN void
+NOTHROW(FCALL process_exit)(int w_status DFL(__W_EXITCODE(0, 0)));
+#endif /* CONFIG_USE_NEW_GROUP */
+
 #ifdef __cplusplus
 extern "C++" {
 FORCELOCAL ABNORMAL_RETURN ATTR_ARTIFICIAL ATTR_NORETURN void

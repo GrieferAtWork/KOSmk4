@@ -166,7 +166,7 @@ NOTHROW(FCALL taskpid_destroy)(struct taskpid *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct taskpid, tp_refcnt, taskpid_destroy)
 
 /* [1..1][const] The PID associated with the calling thread. */
-DATDEF ATTR_PERTASK struct taskpid *this_taskpid;
+DATDEF ATTR_PERTASK REF struct taskpid *this_taskpid;
 #define THIS_TASKPID PERTASK_GET(this_taskpid)
 #define THIS_PIDNS   PERTASK_GET(this_taskpid)->tp_ns
 
@@ -410,7 +410,7 @@ NOTHROW(FCALL pidns_grpremove)(struct pidns *__restrict self, pid_t gpid);
 #define task_gettaskpid_of(thread) FORTASK(thread, this_taskpid)                  /* Return task-pid of given thread */
 #define task_getprocpid_of(thread) taskpid_getprocpid(task_gettaskpid_of(thread)) /* Return proc-pid of given thread */
 #define task_getprocctl()          task_gettaskpid()->tp_pctl                     /* Return process controller of calling thread */
-#define task_getprocctl_of(thread) taskpid_getprocpid(task_gettaskpid_of(thread)) /* Return process controller of given thread */
+#define task_getprocctl_of(thread) taskpid_getprocctl(task_gettaskpid_of(thread)) /* Return process controller of given thread */
 
 /* Return the process-task associated with a given thread. */
 #define task_getproc()             taskpid_gettask(task_getprocpid())             /* >> REF struct task * [0..1] */

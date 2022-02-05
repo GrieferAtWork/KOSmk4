@@ -57,8 +57,10 @@ PRIVATE struct async_thread_controller _async_workers_deafult = {
 /* Destroy the given async-thread-data. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL async_thread_data_destroy)(struct async_thread_data *__restrict self) {
-	if (self->atd_killrpc)
+	if (self->atd_killrpc) {
+		assert(!(self->atd_killrpc->pr_flags & _RPC_CONTEXT_DONTFREE));
 		pending_rpc_free(self->atd_killrpc);
+	}
 	decref(self->atd_thread);
 	kfree(self);
 }
@@ -115,6 +117,7 @@ NOTHROW(FCALL async_threads_kill)(struct task *__restrict thread) {
 		if unlikely(!task_rpc_schedule(thread, rpc)) {
 			/* Deal with the possibility that the async-worker thread
 			 * died through other means? */
+			assert(!(rpc->pr_flags & _RPC_CONTEXT_DONTFREE));
 			pending_rpc_free(rpc);
 		}
 		return true;

@@ -96,7 +96,7 @@ again:
 
 
 
-
+#ifndef CONFIG_USE_NEW_GROUP
 PRIVATE ABNORMAL_RETURN ATTR_NORETURN void
 NOTHROW(FCALL process_exit)(int reason) {
 	if (!task_isprocessleader()) {
@@ -117,12 +117,13 @@ NOTHROW(FCALL process_exit)(int reason) {
 			/* Failed to deliver the RPC because the process
 			 * leader has/is already terminated/terminating,
 			 * and is no longer able to service any RPCs. */
-			pending_rpc_free(rpc);
+			_pending_rpc_maybe_free(rpc);
 		}
 	}
 done:
 	task_exit(reason);
 }
+#endif /* !CONFIG_USE_NEW_GROUP */
 
 PRIVATE ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL process_exit_for_exception_after_coredump)(struct exception_data const *__restrict error) {
@@ -618,6 +619,7 @@ again_switch_action_handler:
 			break;
 		}
 		xdecref_unlikely(action.sa_mask);
+		assert(!(rpc->pr_flags & _RPC_CONTEXT_DONTFREE));
 		pending_rpc_free(rpc);
 	} else {
 		struct icpustate *new_state;

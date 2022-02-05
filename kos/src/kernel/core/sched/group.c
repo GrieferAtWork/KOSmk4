@@ -115,7 +115,7 @@ NOTHROW(KCALL task_propagate_exit_status_to_worker_thread)(struct task *__restri
 	 * terminated/terminating, and is no longer able to service any RPCs. */
 
 	/* Cleanup the RPC, since it isn't inherited by `task_rpc_schedule()' upon failure. */
-	pending_rpc_free(rpc);
+	_pending_rpc_maybe_free(rpc);
 }
 
 PRIVATE NOBLOCK void
@@ -263,7 +263,7 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 		/* Free up the thread-exit RPC (this happens if
 		 * a  thread exits prior to the process leader) */
 		if (mygroup.tg_thread_exit)
-			pending_rpc_free(mygroup.tg_thread_exit);
+			_pending_rpc_maybe_free(mygroup.tg_thread_exit);
 	} else {
 		/* Process leader. */
 		REF struct taskpid *iter, *next;

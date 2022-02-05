@@ -113,6 +113,7 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL _pending_rpc_destroy_user)(struct pending_rpc *__restrict self) {
 	sig_broadcast_for_fini(&self->pr_user.pur_stchng);
 	decref(self->pr_user.pur_mman);
+	assert(!(self->pr_flags & _RPC_CONTEXT_DONTFREE));
 	pending_rpc_free(self);
 }
 

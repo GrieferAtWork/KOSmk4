@@ -613,7 +613,6 @@ NOTHROW(FCALL sigmask_ismasked_nopf)(signo_t signo) {
 	uintptr_t thread_flags;
 	thread_flags = PERTASK_GET(this_task.t_flags);
 	if (thread_flags & (TASK_FVFORK | TASK_FUSERPROCMASK)) {
-		/* Always behave as though this was `kernel_sigmask_full'. */
 		if (signo == SIGKILL || signo == SIGSTOP)
 			return SIGMASK_ISMASKED_NOPF_NO; /* Cannot be masked. */
 

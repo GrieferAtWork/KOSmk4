@@ -129,7 +129,7 @@ task_clone(struct icpustate const *__restrict init_state,
 
 /* Define a per-task relocation that must be initialized as:
  * >> struct task *thread = THREAD_TO_INITIALIZE;
- * >> *(uintptr_t *)((byte_t *)thread + addr) += thread; */
+ * >> *(uintptr_t *)((byte_t *)thread + addr) += (uintptr_t)thread; */
 #define DEFINE_PERTASK_RELOCATION(addr)                    \
 	__asm__(".pushsection .rodata.pertask.relocations\n\t" \
 	        "\t.wordptr %p0\n\t"                           \

@@ -321,7 +321,10 @@ struct procctl {
 	                                           * during `task_exit()'. Child  processes don't  do
 	                                           * this  and must instead  be removed with wait(2),
 	                                           * as can  also be  done for  threads (that  aren't
-	                                           * detached) */
+	                                           * detached)
+	                                           * NOTE: Elements may only be added to this list for
+	                                           *       as long as this process's main thread isn't
+	                                           *       marked as `TASK_FTERMINATING'! */
 	struct sig               pc_chld_changed; /* Broadcast when one of `pc_chlds_list' changes
 	                                           * status.  (s.a.  `struct taskpid::tp_changed') */
 	struct task_arref        pc_parent;       /* [1..1][lock(READ(ATOMIC), WRITE(OLD->pc_chlds_lock &&

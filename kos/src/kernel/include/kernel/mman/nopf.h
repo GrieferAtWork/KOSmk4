@@ -116,7 +116,7 @@ LOCAL NOBLOCK WUNUSED bool NOTHROW(KCALL writeq_nopf)(USER CHECKED void *addr, u
 #define write_nopf(addr, value)                        \
 	(sizeof(*(addr)) == 1                              \
 	 ? writeb_nopf(addr, (__UINT8_TYPE__)(value))      \
-	 : sizeof(va * (addr)lue) == 2                     \
+	 : sizeof(*(addr)) == 2                            \
 	   ? writew_nopf(addr, (__UINT16_TYPE__)(value))   \
 	   : sizeof(*(addr)) == 4                          \
 	     ? writel_nopf(addr, (__UINT32_TYPE__)(value)) \

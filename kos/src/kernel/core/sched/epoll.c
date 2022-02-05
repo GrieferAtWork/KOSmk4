@@ -1890,6 +1890,7 @@ epoll_create_rpc_monitor(struct epoll_controller *__restrict self,
 		/* Lookup the target thread. */
 		rpc->emr_target = pidns_lookup_srch(THIS_PIDNS, target_tid);
 	} EXCEPT {
+		assert(!(rpc->emr_rpc.pr_flags & _RPC_CONTEXT_DONTFREE));
 		pending_rpc_free(&rpc->emr_rpc);
 		RETHROW();
 	}

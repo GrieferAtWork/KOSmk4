@@ -43,6 +43,7 @@
 #include <sys/wait.h>
 
 #include <assert.h>
+#include <stdalign.h>
 #include <stddef.h>
 
 DECL_BEGIN
@@ -52,6 +53,14 @@ NOTHROW(PRPC_EXEC_CALLBACK_CC task_decref_for_exit_rpc)(struct rpc_context *__re
                                                         void *cookie) {
 	decref((struct task *)cookie);
 }
+
+#ifdef CONFIG_USE_NEW_GROUP
+PRIVATE NONNULL((1, 2)) void
+NOTHROW(PRPC_EXEC_CALLBACK_CC taskpid_destroy_rpc)(struct rpc_context *__restrict UNUSED(ctx),
+                                                   void *cookie) {
+	taskpid_destroy((struct taskpid *)cookie);
+}
+#endif /* CONFIG_USE_NEW_GROUP */
 
 PRIVATE ATTR_KERNEL_PANIC_NORETURN ATTR_COLD ATTR_NOINLINE NONNULL((1)) void
 NOTHROW(FCALL panic_critical_thread_exited)(struct task *__restrict caller) {
@@ -119,8 +128,150 @@ NOTHROW(FCALL terminate_pending_rpcs)(struct task *__restrict caller) {
 }
 
 
-INTDEF NOBLOCK NONNULL((1)) void /* From "sched/pid.c" */
+#ifndef CONFIG_USE_NEW_GROUP
+INTDEF NOBLOCK NONNULL((1)) void /* From "sched/group.c" */
 NOTHROW(KCALL maybe_propagate_exit_to_procss_children)(struct task *__restrict caller);
+#endif /* !CONFIG_USE_NEW_GROUP */
+
+
+#ifdef CONFIG_USE_NEW_GROUP
+struct _task_exitrpc {
+	SLIST_ENTRY(pending_rpc) pr_link;  /* ... */
+	uintptr_t                pr_flags; /* ... */
+	prpc_exec_callback_t     k_func;   /* ... */
+#if 0 /* Technically, this would need to go here. But because `_RPC_CONTEXT_DONTFREE'
+       * causes  `k_cookie' to  remain unused, the  RPC system will  instead pass the
+       * address of the `struct pending_rpc' to `k_func'! */
+	void                    *k_cookie;
+#endif
+};
+
+/* Ensure binary compatiblity. */
+STATIC_ASSERT(offsetof(struct pending_rpc, pr_link) == offsetof(struct _task_exitrpc, pr_link));
+STATIC_ASSERT(offsetafter(struct pending_rpc, pr_link) == offsetafter(struct _task_exitrpc, pr_link));
+STATIC_ASSERT(offsetof(struct pending_rpc, pr_flags) == offsetof(struct _task_exitrpc, pr_flags));
+STATIC_ASSERT(offsetafter(struct pending_rpc, pr_flags) == offsetafter(struct _task_exitrpc, pr_flags));
+STATIC_ASSERT(offsetof(struct pending_rpc, pr_kern.k_func) == offsetof(struct _task_exitrpc, k_func));
+STATIC_ASSERT(offsetafter(struct pending_rpc, pr_kern.k_func) == offsetafter(struct _task_exitrpc, k_func));
+
+/* [valid_if(!taskpid_isaprocess(THIS_TASKPID))]
+ * Buffer used for holding a mini-RPC that can be used to propagate
+ * exit  commands from non-main threads to the main thread, as well
+ * as the main thread to all non-main threads. */
+INTDEF struct pending_rpc this_exitrpc ASMNAME("this_exitrpc");
+INTDEF struct _task_exitrpc __this_exitrpc ASMNAME("this_exitrpc");
+INTERN ATTR_SECTION(".data.pertask.middle") struct _task_exitrpc __this_exitrpc = {
+	.pr_link  = { NULL },
+	.pr_flags = RPC_CONTEXT_KERN | _RPC_CONTEXT_DONTFREE,
+	.k_func   = NULL, /* Allocated if non-NULL (set to either `propagate_process_exit_status' or `propagate_thread_exit_status') */
+};
+
+/* Called in context of worker threads: propagate exit status of process leader */
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+propagate_process_exit_status(struct rpc_context *__restrict ctx,
+                              void *UNUSED(cookie)) {
+	struct taskpid *procpid;
+	uint16_t status;
+	if (ctx->rc_context == RPC_REASONCTX_SHUTDOWN)
+		return; /* Already being shut down for some other reason --> don't do anything */
+
+	/* At this point we know that we are a thread in a larger process, and
+	 * that our process leader (iow: the main thread) has exited. Now it's
+	 * our job to propagate its exit status into our own `taskpid'. */
+	procpid = task_getprocpid();
+	status  = ATOMIC_READ(procpid->tp_status);
+	THROW(E_EXIT_THREAD, status);
+}
+
+
+/* Called in context of main threads: propagate exit status of worker thread */
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+propagate_thread_exit_status(struct rpc_context *__restrict ctx,
+                             void *cookie) {
+	REF struct task *origin;
+	struct taskpid *origin_pid;
+	uint16_t status;
+
+	/* Figure out the origin of the exit request. Note that for this purpose,
+	 * the  originating thread used  its own `this_exitrpc'  in order to send
+	 * an  RPC to the process's main thread (that  RPC is us, and we are said
+	 * main  thread). As such, because `_RPC_CONTEXT_DONTFREE' means `cookie'
+	 * is  a  pointer to  the sending  thread's `this_exitrpc',  we can  do a
+	 * container_of-style operation to determine the origin! */
+	origin = (REF struct task *)((byte_t *)cookie - (uintptr_t)&this_exitrpc);
+
+	/* Using the sending thread, we can determine their `struct taskpid' */
+	origin_pid = task_gettaskpid_of(origin);
+
+	/* And with that, we can extract the intended status */
+	status = ATOMIC_READ(origin_pid->tp_status);
+
+	/* In order to  prevent `this_exitrpc' from  being free'd, child  threads
+	 * let this RPC inherit a reference to the sending thread. Now that we're
+	 * done  accessing the originating thread's TLS memory, we must drop that
+	 * reference! */
+	decref_unlikely(origin);
+
+	if (ctx->rc_context == RPC_REASONCTX_SHUTDOWN)
+		return; /* Already being shut down for some other reason --> don't do anything */
+
+	/* Actually propagate the exit status. */
+	THROW(E_EXIT_THREAD, status);
+}
+
+
+/* Same as `task_exit()', but propagate the same status
+ * to  all  other threads  within the  current process.
+ *
+ * This is the same as calling `task_exit()' from the
+ * main thread of the calling process. */
+PUBLIC ABNORMAL_RETURN ATTR_NORETURN void
+NOTHROW(FCALL process_exit)(int w_status) {
+	struct task *caller = THIS_TASK;
+	struct taskpid *pid = task_gettaskpid_of(caller);
+
+	if (!taskpid_isaprocess(pid)) {
+		REF struct task *main_thread;
+		main_thread = taskpid_gettask(taskpid_getprocpid(pid));
+		if likely(main_thread) {
+			/* Main thread hasn't been destroyed. */
+			if (!(ATOMIC_READ(main_thread->t_flags) & (TASK_FTERMINATING | TASK_FTERMINATED))) {
+				/* Main thread hasn't terminated, yet. */
+
+				/* Send an RPC to the main thread in order to terminate it. */
+				if (ATOMIC_CMPXCH(FORTASK(caller, this_exitrpc.pr_kern.k_func),
+				                  NULL, &propagate_thread_exit_status)) {
+
+					/* This write is repeated  in `task_exit()', but that's  OK
+					 * It also has to happen here, so that the RPC will be able
+					 * to talk to  our thread  in order to  determine the  exit
+					 * status that should be propagated. */
+					ATOMIC_WRITE(pid->tp_status, w_status);
+
+					/* Inherited by `propagate_thread_exit_status()' */
+					incref(caller);
+
+					/* Actually send the RPC (or at least try to, because if this
+					 * fails,  it means  that the  main thread  is also currently
+					 * terminating for some unrelated reason) */
+					if unlikely(!task_rpc_schedule(main_thread, &FORTASK(caller, this_exitrpc))) {
+						/* Race condition: main thread has already terminated,
+						 * and we were unable to schedule the RPC to propagate
+						 * our thread's process-exit request.
+						 *
+						 * But that's OK since the main thread is also currently
+						 * exiting (only for a reason other than what our caller
+						 * wanted it to be) */
+						decref_nokill(caller);
+					}
+				}
+			}
+			decref_unlikely(main_thread);
+		}
+	}
+	task_exit(w_status);
+}
+#endif /* CONFIG_USE_NEW_GROUP */
 
 
 /* Terminate the calling thread immediately.
@@ -141,7 +292,14 @@ PUBLIC ABNORMAL_RETURN ATTR_NORETURN void
 NOTHROW(FCALL task_exit)(int w_status) {
 	struct task *caller = THIS_TASK, *next;
 	struct cpu *me;
+	uintptr_t flags;
+#ifdef CONFIG_USE_NEW_GROUP
+	struct taskpid *pid = task_gettaskpid_of(caller);
+	REF struct taskpid *parpid;
+#else /* CONFIG_USE_NEW_GROUP */
 	struct taskpid *pid = THIS_TASKPID;
+#endif /* !CONFIG_USE_NEW_GROUP */
+
 	assert(!WIFSTOPPED(w_status));
 	assert(!WIFCONTINUED(w_status));
 	assertf(PREEMPTION_ENABLED(), "Without preemption, how do you want to switch tasks?");
@@ -153,38 +311,134 @@ NOTHROW(FCALL task_exit)(int w_status) {
 		ATOMIC_AND(caller->t_flags, ~TASK_FCRITICAL);
 	}
 
-	/* Fill in the exit status */
+	/* Fill in the exit status.
+	 * Note that this has to happen first, even before we set `TASK_FTERMINATING'! */
 	ATOMIC_WRITE(pid->tp_status, w_status);
 
 	/* Set the bit to indicate that we've started termination. */
-	if (!(ATOMIC_FETCHOR(caller->t_flags, TASK_FTERMINATING) & TASK_FTERMINATING)) {
-		printk(KERN_TRACE "[sched] Exiting thread %p\n", caller);
+	flags = ATOMIC_FETCHOR(caller->t_flags, TASK_FTERMINATING);
+	assertf(!(flags & TASK_FTERMINATING), "This shouldn't happen!");
+	(void)flags;
 
-		/* Trigger the appropriate debug trap associated with thread/process  exits.
-		 * This is required because otherwise GDB  will sooner or later hang  itself
-		 * when waiting for the exited-notification of a terminated thread once it's
-		 * no longer able to find the thread apart of thread listings.
-		 *
-		 * s.a. /kos/misc/gdbridge/gdbride.dee */
-		if (kernel_debugtrap_enabled()) {
-			struct debugtrap_reason reason;
-			reason.dtr_reason = task_isprocessleader_p(caller)
-			                    ? DEBUGTRAP_REASON_PEXITED
-			                    : DEBUGTRAP_REASON_TEXITED;
-			reason.dtr_signo  = w_status;
-			reason.dtr_ptrarg = caller;
-			kernel_debugtrap(&reason);
-		}
+	printk(KERN_TRACE "[sched] Exiting thread %p\n", caller);
 
-		/* Clear the TID address of a user-space thread. */
-		maybe_clear_tid_address(caller);
-
-		/* Reap all remaining RPCs and invoke them in a SHUTDOWN context. */
-		terminate_pending_rpcs(caller);
-
-		/* Propagate the  */
-		maybe_propagate_exit_to_procss_children(caller);
+#ifdef CONFIG_USE_NEW_GROUP
+	/* Determine the PID of the thread of which we are a child. */
+	if (taskpid_isaprocess(pid)) {
+		struct procctl *myproc;
+		REF struct task *parent;
+		parent = taskpid_getparentprocess(pid);
+		parpid = incref(task_gettaskpid_of(parent));
+		decref_unlikely(parent);
+	} else {
+		parpid = incref(taskpid_getprocpid(pid));
 	}
+#endif /* CONFIG_USE_NEW_GROUP */
+
+	/* Trigger the appropriate debug trap associated with thread/process  exits.
+	 * This is required because otherwise GDB  will sooner or later hang  itself
+	 * when waiting for the exited-notification of a terminated thread once it's
+	 * no longer able to find the thread apart of thread listings.
+	 *
+	 * s.a. /kos/misc/gdbridge/gdbride.dee */
+	if (kernel_debugtrap_enabled()) {
+		struct debugtrap_reason reason;
+#ifdef CONFIG_USE_NEW_GROUP
+		reason.dtr_reason = taskpid_isaprocess(pid)
+		                    ? DEBUGTRAP_REASON_PEXITED
+		                    : DEBUGTRAP_REASON_TEXITED;
+#else /* CONFIG_USE_NEW_GROUP */
+		reason.dtr_reason = task_isprocessleader_p(caller)
+		                    ? DEBUGTRAP_REASON_PEXITED
+		                    : DEBUGTRAP_REASON_TEXITED;
+#endif /* !CONFIG_USE_NEW_GROUP */
+		reason.dtr_signo  = w_status;
+		reason.dtr_ptrarg = caller;
+		kernel_debugtrap(&reason);
+	}
+
+	/* Clear the TID address of a user-space thread. */
+	maybe_clear_tid_address(caller);
+
+	/* Reap all remaining RPCs and invoke them in a SHUTDOWN context. */
+	terminate_pending_rpcs(caller);
+
+#ifdef CONFIG_USE_NEW_GROUP
+	if (taskpid_isaprocess(pid)) {
+		/* Propagate exit status to child threads, and
+		 * reparent all child process onto  /bin/init. */
+		struct procctl *ctl = pid->tp_pctl;
+
+		/* NOTE: As per the requirements, we're allowed to assume  that
+		 *       no-one is allowed to still be adding additional  items
+		 *       to `ctl->pc_chlds_list' (because we, as the associated
+		 *       process have the TASK_FTERMINATING flag set). */
+again_process_children:
+		assert(PREEMPTION_ENABLED());
+		procctl_chlds_write(ctl); /* Never throws because preemption is enabled */
+		while (!LIST_EMPTY(&ctl->pc_chlds_list)) {
+			struct taskpid *child;
+			child = LIST_FIRST(&ctl->pc_chlds_list);
+			if (taskpid_isaprocess(child)) {
+				/* Re-parent onto /bin/init */
+				if (!procctl_chlds_trywrite(&boottask_procctl)) {
+					procctl_chlds_endwrite(ctl);
+					procctl_chlds_waitwrite(&boottask_procctl); /* Never throws because preemption is enabled */
+					goto again_process_children;
+				}
+
+				/* NOTE: Because  we're holding a lock to `ctl->pc_chlds_lock',
+				 *       we know that the parent reference of any child process
+				 *       can't be changed,  since doing so  requires one to  be
+				 *       holding said lock. */
+				assertf(arref_ptr(&child->tp_pctl->pc_parent) == caller,
+				        "Child process indicates wrong parent:\n"
+				        "arref_ptr(&child->tp_pctl->pc_parent) = %p\n"
+				        "caller                                = %p",
+				        arref_ptr(&child->tp_pctl->pc_parent), caller);
+
+				/* Change the parent pointer to &boottask */
+				arref_set(&child->tp_pctl->pc_parent, &boottask);
+				procctl_chlds_remove(ctl, child);               /* Inherit reference */
+				procctl_chlds_insert(&boottask_procctl, child); /* Inherit reference */
+				procctl_chlds_endwrite(&boottask_procctl);
+				sig_broadcast(&boottask_procctl.pc_chld_changed);
+			} else {
+				REF struct task *child_thread;
+				procctl_chlds_unbind(ctl, child); /* Inherit reference */
+				child_thread = taskpid_gettask(child);
+				decref_unlikely(child); /* Inherited from `procctl_chlds_unbind()' */
+				if (child_thread) {
+					/* Use the child thread's exit RPC to terminate
+					 * it, as well  as propagate  our exit  status. */
+					if (ATOMIC_CMPXCH(FORTASK(child_thread, this_exitrpc.pr_kern.k_func),
+					                  NULL, &propagate_process_exit_status))
+						task_rpc_schedule(child_thread, &FORTASK(child_thread, this_exitrpc));
+					decref_unlikely(child_thread);
+				}
+			}
+		}
+		procctl_chlds_endwrite(ctl);
+	}
+
+	/* Automatically unbind our PID from our parent's list of children. */
+	if (flags & TASK_FDETACHED) {
+		struct procctl *parctl = parpid->tp_pctl;
+		assert(PREEMPTION_ENABLED());
+		procctl_chlds_write(parctl); /* Never throws because preemption is enabled */
+		if likely(LIST_ISBOUND(pid, tp_parsib)) {
+			procctl_chlds_unbind(parctl, pid); /* Inherit reference */
+			decref_nokill(pid);                /* nokill because of reference in `THIS_TASKPID' */
+		}
+		procctl_chlds_endwrite(parctl);
+	}
+
+	/* XXX: send `pid->tp_SIGCLD' to our parent process */
+	/* XXX: Posix also say a bunch of stuff about SIGHUP relating to process
+	 *      groups becoming orphaned as the  result of a process  exiting... */
+#else /* CONFIG_USE_NEW_GROUP */
+	maybe_propagate_exit_to_procss_children(caller);
+#endif /* !CONFIG_USE_NEW_GROUP */
 
 	PREEMPTION_DISABLE();
 	me = caller->t_cpu;
@@ -260,25 +514,28 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	/* Update the current-thread field to indicate who's about to start running. */
 	FORCPU(me, thiscpu_sched_current) = next;
 
-	/* Broadcast  the  status-changed   signal  _after_  setting   `TASK_FTERMINATED'
-	 * That way,  other  thread  can use  `tp_changed'  alongside  `TASK_FTERMINATED'
-	 * in order to wait for  the thread to fully terminate.  If we were to  broadcast
-	 * `tp_changed'  before setting the  flag, then even  though we've got interrupts
-	 * disabled, another CPU may receive the  `tp_changed' signal and read the  flags
-	 * field not containing `TASK_FTERMINATED' yet before we've set the flag, causing
-	 * it to end up  soft-locked (as in:  CTRL+C would still  work), waiting for  the
-	 * thread to terminate when in fact it already has terminated.
-	 * However,  we  must  fill  in  the  exit  status  _before_  setting  `TASK_FTERMINATED',
-	 * such that another thread waiting for us to terminate knows that once `TASK_FTERMINATED'
-	 * has been set,  the thread's  pid's `tp_status' field  contains its  final exit  status.
-	 * Thus, the  terminate-flag  acts  as  an  interlocked check  for  the  exit  status  and
-	 * waiting for the status to change during thread exit. */
-
-	/* Important! Must broadcast the change while impersonating `next'!
+	/* For the sake of easier  interlocking, we only broadcast our  thread's
+	 * status change _after_ setting the TASK_FTERMINATED flag. -- That way,
+	 * it  becomes possible to  wait for a thread  to _fully_ terminate, and
+	 * there is no chance of a terminated thread still being scheduled after
+	 * it broadcasted its terminated status.
+	 *
+	 * Important! Must broadcast the change while impersonating `next'!
 	 *
 	 * Our current thread context is already too broken to allow us to
 	 * re-schedule  others threads that may be waiting for us to exit. */
 	sig_broadcast_as_nopr(&pid->tp_changed, next);
+
+#ifdef CONFIG_USE_NEW_GROUP
+	/* Also notify our parent process that one of its children has changed state. */
+	sig_broadcast_as_nopr(&parpid->tp_pctl->pc_chld_changed, next);
+	if unlikely(ATOMIC_DECFETCH(parpid->tp_refcnt) == 0) {
+		struct scpustate *state;
+		state = FORTASK(next, this_sstate);
+		state = task_asyncrpc_push(state, &taskpid_destroy_rpc, parpid);
+		FORTASK(next, this_sstate) = state;
+	}
+#endif /* CONFIG_USE_NEW_GROUP */
 
 	/* Good bye... */
 	cpu_run_current_nopr();

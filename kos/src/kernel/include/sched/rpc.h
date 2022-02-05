@@ -95,6 +95,11 @@ task_rpc_userunwind(prpc_exec_callback_t func, void *cookie DFL(__NULLPTR))
  *                 remains disabled if it was disabled before. */
 FUNDEF BLOCKING __BOOL (FCALL task_serve)(void) THROWS(E_INTERRUPT_USER_RPC, ...);
 
+/* Literally the same as `task_serve()',  but doesn't include the  inline
+ * optimization that tests for `TASK_FRPC' before calling `task_serve()'.
+ * Call this one if you're fairly certain that RPCs are really pending. */
+FUNDEF BLOCKING __BOOL (FCALL _task_serve)(void) THROWS(E_INTERRUPT_USER_RPC, ...) ASMNAME("task_serve");
+
 /* Arch-specific function:
  * Same as `task_serve()', but only sevice RPCs that were scheduled as no-throw.
  * @return: * : Set of `TASK_SERVE_*' */

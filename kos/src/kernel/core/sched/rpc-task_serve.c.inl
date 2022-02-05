@@ -212,18 +212,25 @@ handle_pending:
 	/* Execute kernel RPCs. */
 	while (!SLIST_EMPTY(&runnow)) {
 		struct pending_rpc *rpc = SLIST_FIRST(&runnow);
+		void *cookie;
+		uintptr_t rpc_flags;
 		SLIST_REMOVE_HEAD(&runnow, pr_link);
 		assert(rpc->pr_flags & RPC_CONTEXT_KERN);
 		assert(!(rpc->pr_flags & RPC_SYNCMODE_F_USER));
+		rpc_flags = rpc->pr_flags;
+		cookie    = rpc;
+		if (!(rpc_flags &_RPC_CONTEXT_DONTFREE))
+			cookie = rpc->pr_kern.k_cookie;
 #ifdef LOCAL_NOEXCEPT
-		(*rpc->pr_kern.k_func)(&ctx, rpc->pr_kern.k_cookie);
+		(*rpc->pr_kern.k_func)(&ctx, cookie);
 #else /* LOCAL_NOEXCEPT */
 		TRY {
-			(*rpc->pr_kern.k_func)(&ctx, rpc->pr_kern.k_cookie);
+			(*rpc->pr_kern.k_func)(&ctx, cookie);
 		} EXCEPT {
 			struct exception_info *tls = except_info();
 			if (tls->ei_code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {
-				pending_rpc_free(rpc);
+				if (!(rpc_flags & _RPC_CONTEXT_DONTFREE))
+					pending_rpc_free(rpc);
 				/* Load additional RPCs, but discard this new exception */
 				ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
 				pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
@@ -234,7 +241,8 @@ handle_pending:
 				memcpy(&error, tls, sizeof(error));
 		}
 #endif /* !LOCAL_NOEXCEPT */
-		pending_rpc_free(rpc);
+		if (!(rpc_flags & _RPC_CONTEXT_DONTFREE))
+			pending_rpc_free(rpc);
 		assert(ctx.rc_context == RPC_REASONCTX_SYNC);
 	}
 

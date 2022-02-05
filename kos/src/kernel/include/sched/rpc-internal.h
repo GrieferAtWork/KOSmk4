@@ -120,6 +120,7 @@ FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
 #define pending_rpc_alloc_psig(gfp)     pending_rpc_alloc(COMPILER_OFFSETAFTER(struct pending_rpc, pr_psig), gfp)
 #define pending_rpc_alloc_psig_nx(gfp)  pending_rpc_alloc_nx(COMPILER_OFFSETAFTER(struct pending_rpc, pr_psig), gfp)
 #define pending_rpc_free(self)          __os_free(self)
+#define _pending_rpc_maybe_free(self)   (((self)->pr_flags & _RPC_CONTEXT_DONTFREE) ? (void)0 : pending_rpc_free(self))
 
 
 #ifndef __pending_rpc_slist_defined

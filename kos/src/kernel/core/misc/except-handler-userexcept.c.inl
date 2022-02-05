@@ -221,6 +221,7 @@ handle_pending:
 					struct exception_info *tls = except_info();
 					if (except_priority(error.ei_code) < except_priority(tls->ei_code))
 						memcpy(&error, tls, sizeof(error));
+					assert(!(rpc->pr_flags & _RPC_CONTEXT_DONTFREE));
 					if (rpc->pr_flags & RPC_CONTEXT_SIGNAL) {
 						pending_rpc_free(rpc);
 					} else {
@@ -449,8 +450,11 @@ check_next_proc_rpc:
 				prpc_exec_callback_t func;
 				void *cookie;
 				func   = rpc->pr_kern.k_func;
-				cookie = rpc->pr_kern.k_cookie;
-				pending_rpc_free(rpc);
+				cookie = rpc;
+				if (!(rpc->pr_flags & _RPC_CONTEXT_DONTFREE)) {
+					cookie = rpc->pr_kern.k_cookie;
+					pending_rpc_free(rpc);
+				}
 				*restore_plast = SLIST_FIRST(&kernel_rpcs);
 				while (!SLIST_EMPTY(&repeat)) {
 					struct pending_rpc *repeat_rpc;
@@ -484,12 +488,17 @@ check_next_proc_rpc:
 				pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
 				goto handle_pending;
 			} else {
+				uintptr_t rpc_flags = rpc->pr_flags;
 				TRY {
-					(*rpc->pr_kern.k_func)(&ctx, rpc->pr_kern.k_cookie);
+					void *cookie = rpc;
+					if (!(rpc_flags & _RPC_CONTEXT_DONTFREE))
+						cookie = rpc->pr_kern.k_cookie;
+					(*rpc->pr_kern.k_func)(&ctx, cookie);
 				} EXCEPT {
 					struct exception_info *tls = except_info();
 					if (tls->ei_code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {
-						pending_rpc_free(rpc);
+						if (!(rpc_flags & _RPC_CONTEXT_DONTFREE))
+							pending_rpc_free(rpc);
 						/* Load additional RPCs, but discard this new exception */
 						ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
 						pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
@@ -499,19 +508,24 @@ check_next_proc_rpc:
 					if (except_priority(error.ei_code) < except_priority(tls->ei_code))
 						memcpy(&error, tls, sizeof(error));
 				}
-				pending_rpc_free(rpc);
+				if (!(rpc_flags & _RPC_CONTEXT_DONTFREE))
+					pending_rpc_free(rpc);
 			}
 			assert(ctx.rc_context == RPC_REASONCTX_SYSRET ||
 			       ctx.rc_context == (sc_info ? RPC_REASONCTX_SYSCALL
 			                                  : RPC_REASONCTX_INTERRUPT));
-		}
 #else /* !LOCAL_IS_SYSRET */
+			uintptr_t rpc_flags = rpc->pr_flags;
 			TRY {
-				(*rpc->pr_kern.k_func)(&ctx, rpc->pr_kern.k_cookie);
+				void *cookie = rpc;
+				if (!(rpc_flags &_RPC_CONTEXT_DONTFREE))
+					cookie = rpc->pr_kern.k_cookie;
+				(*rpc->pr_kern.k_func)(&ctx, cookie);
 			} EXCEPT {
 				struct exception_info *tls = except_info();
 				if (tls->ei_code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {
-					pending_rpc_free(rpc);
+					if (!(rpc_flags & _RPC_CONTEXT_DONTFREE))
+						pending_rpc_free(rpc);
 					/* Load additional RPCs, but discard this new exception */
 					ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
 					pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
@@ -522,9 +536,10 @@ check_next_proc_rpc:
 					memcpy(&error, tls, sizeof(error));
 			}
 			assert(ctx.rc_context == RPC_REASONCTX_SYSRET);
-			pending_rpc_free(rpc);
-		}
+			if (!(rpc_flags & _RPC_CONTEXT_DONTFREE))
+				pending_rpc_free(rpc);
 #endif /* !LOCAL_IS_SYSRET */
+		}
 	}
 
 	/* Check if there are RPCs that need to be repeated. */
@@ -592,15 +607,21 @@ check_next_proc_rpc:
 			}
 			while (!SLIST_EMPTY(&kernel_rpcs)) {
 				struct pending_rpc *rpc;
+				uintptr_t rpc_flags;
 				rpc = SLIST_FIRST(&kernel_rpcs);
 				SLIST_REMOVE_HEAD(&kernel_rpcs, pr_link);
 				assert(rpc->pr_flags & RPC_SYNCMODE_F_SYSRET);
+				rpc_flags = rpc->pr_flags;
 				TRY {
-					(*rpc->pr_kern.k_func)(&ctx, rpc->pr_kern.k_cookie);
+					void *cookie = rpc;
+					if (!(rpc_flags &_RPC_CONTEXT_DONTFREE))
+						cookie = rpc->pr_kern.k_cookie;
+					(*rpc->pr_kern.k_func)(&ctx, cookie);
 				} EXCEPT {
 					struct exception_info *tls = except_info();
 					if (tls->ei_code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {
-						pending_rpc_free(rpc);
+						if (!(rpc_flags & _RPC_CONTEXT_DONTFREE))
+							pending_rpc_free(rpc);
 						/* Load additional RPCs, but discard this new exception */
 						ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
 						pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
@@ -611,7 +632,8 @@ check_next_proc_rpc:
 						memcpy(&error, tls, sizeof(error));
 				}
 				assert(ctx.rc_context == RPC_REASONCTX_SYSRET);
-				pending_rpc_free(rpc);
+				if (!(rpc_flags & _RPC_CONTEXT_DONTFREE))
+					pending_rpc_free(rpc);
 			}
 		}
 		if (!SLIST_EMPTY(&restore))

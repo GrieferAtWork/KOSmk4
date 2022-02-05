@@ -364,6 +364,22 @@
 
 /* Internally used: RPC is currently inactive. */
 #define _RPC_CONTEXT_INACTIVE 0x00020000
+
+/* Flag for use with `RPC_CONTEXT_KERN':
+ *  - Don't do `pending_rpc_free()' to free this RPC
+ *  - May  only  be  used  with  `RPC_CONTEXT_KERN'!
+ *  - Pass the `struct pending_rpc' instead of `k_cookie'
+ *  - When set,  the internal  RPC system  will never  make any  further
+ *    accesses to the `struct pending_rpc' after the associated `k_func'
+ *    is invoked.
+ *  - Using  this flag, it  falls upon `k_func'  to free the associated
+ *    `struct pending_rpc', but this also makes it possible to allocate
+ *    a larger structure to pass more  than one cookie argument to  the
+ *    RPC function.
+ *  - When this flag  is set, no  fields of `struct pending_rpc'  beyond
+ *    `pr_kern.k_func' are ever accessed, meaning that the struct's size
+ *    becomes `offsetafter(struct pending_rpc, pr_kern.k_func)'. */
+#define _RPC_CONTEXT_DONTFREE 0x00010000
 /************************************************************************/
 #endif /* __KERNEL__ */
 

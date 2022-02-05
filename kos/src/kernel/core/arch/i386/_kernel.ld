@@ -199,6 +199,7 @@ SECTIONS {
 	PEROBJECT_SECTION(.pertask, __kernel_pertask, {
 		KEEP(*(.data.pertask.head))
 		KEEP(*(.data.pertask.early))
+		KEEP(*(.data.pertask.middle))
 		KEEP(*(.data.pertask))
 	})
 

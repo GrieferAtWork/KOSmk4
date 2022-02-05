@@ -269,6 +269,7 @@ NOTHROW(FCALL mbuilder_fini)(struct mbuilder *__restrict self) {
 		struct pending_rpc *rpc;
 		rpc = SLIST_FIRST(&self->mb_killrpc);
 		SLIST_REMOVE_HEAD(&self->mb_killrpc, pr_link);
+		assert(!(rpc->pr_flags & _RPC_CONTEXT_DONTFREE));
 		pending_rpc_free(rpc);
 	}
 	mbuilder_norpc_fini(self);
