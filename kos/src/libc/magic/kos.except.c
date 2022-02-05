@@ -635,11 +635,16 @@ for (local name: classes.keys.sorted()) {
 @@pp_endif@@
 
 	case @E_INVALID_ARGUMENT@:
-@@pp_if defined(EPERM) && defined(EINVAL)@@
-		result = self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID@ ||
-		        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID@ ? EPERM : EINVAL;
+@@pp_if defined(EINVAL)@@
+		result = EINVAL;
 @@pp_endif@@
 		switch(self->@e_subclass@) {
+@@pp_if defined(EPERM) && defined(EINVAL)@@
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_INVALID_ARGUMENT_BAD_VALUE@)):
+			result = self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID@ ||
+			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID@ ? EPERM : EINVAL;
+			break;
+@@pp_endif@@
 @@pp_if defined(EAFNOSUPPORT) && defined(ESOCKTNOSUPPORT) && defined(EPROTONOSUPPORT) && defined(EINVAL)@@
 		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_INVALID_ARGUMENT_UNKNOWN_COMMAND@)):
 			result = self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_FAMILY@ ? EAFNOSUPPORT :
@@ -648,7 +653,7 @@ for (local name: classes.keys.sorted()) {
 			        EINVAL;
 			break;
 @@pp_endif@@
-@@pp_if defined(ENOTCONN) && defined(EDESTADDRREQ) && defined(EISCONN) && defined(ENXIO) && defined(EPIPE) && defined(ENOMEM) && defined(EINVAL)@@
+@@pp_if defined(ENOTCONN) && defined(EDESTADDRREQ) && defined(EISCONN) && defined(ENXIO) && defined(EPIPE) && defined(ENOMEM) && defined(EPERM) && defined(EINVAL)@@
 		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_INVALID_ARGUMENT_BAD_STATE@)):
 			result = self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED@ ||
 			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED@ ||
@@ -659,6 +664,10 @@ for (local name: classes.keys.sorted()) {
 			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS@ ? EPIPE :
 			        (self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_MEMORY@ ||
 			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_FUTEX@) ? ENOMEM :
+			        (self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SETPGID_DIFFERENT_SESSION@ ||
+			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SETPGID_NO_SUCH_GROUP@ ||
+			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SETPGID_IS_SESSION_LEADER@ ||
+			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SETSID_ALREADY_GROUP_LEADER@) ? EPERM :
 			        EINVAL;
 			break;
 @@pp_endif@@

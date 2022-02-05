@@ -21,18 +21,46 @@
 #define GUARD_KERNEL_SRC_SCHED_GROUP_NEW_C 1
 #define __WANT_PROCGRP__pgr_lop
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
+#define _TIME64_SOURCE 1
 
 #include <kernel/compiler.h>
 
 #ifdef CONFIG_USE_NEW_GROUP
 #include <dev/tty.h>
+#include <kernel/except.h>
 #include <kernel/malloc.h>
+#include <kernel/syscall.h>
+#include <kernel/user.h>
 #include <sched/group-new.h>
 #include <sched/pid.h>
+#include <sched/posix-signal.h>
 #include <sched/task.h>
 
+#include <hybrid/atomic.h>
+
+#include <bits/os/rusage-convert.h>
+#include <bits/os/rusage.h>
+#include <compat/config.h>
+#include <kos/except.h>
+#include <kos/except/reason/inval.h>
+#include <sys/wait.h>
+
 #include <assert.h>
+#include <errno.h>
+#include <signal.h>
 #include <stddef.h>
+#include <string.h>
+
+#ifdef __ARCH_HAVE_COMPAT
+#include <compat/bits/os/rusage-convert.h>
+#include <compat/bits/os/rusage.h>
+#include <compat/bits/os/siginfo-convert.h>
+#include <compat/bits/os/siginfo.h>
+#include <compat/bits/types.h>
+#include <compat/kos/types.h>
+#include <compat/signal.h>
+#endif /* __ARCH_HAVE_COMPAT */
 
 DECL_BEGIN
 
@@ -218,11 +246,11 @@ PUBLIC struct procctl boottask_procctl = {
 	 *      set-up to behave  like the  first element of  this very  list! */
 	.pc_chlds_list   = { &asyncwork_pid },
 	.pc_chld_changed = SIG_INIT,
-	/* Even though it doesn't ~really~ make sense, /bin/init is set-up to
+	/* Even though it  doesn't ~really~  make sense, /bin/init  is set-up  to
 	 * behave as its own parent process. Because the parent field must always
 	 * be non-NULL, we have to fill in ~something~, and since /bin/init can't
-	 * ever die (TASK_FCRITICAL), its parent never ~really~ becomes relevant
-	 * either. -- But note however that if /bin/init were to call getppid(),
+	 * ever die (TASK_FCRITICAL), its parent never ~really~ becomes  relevant
+	 * either. -- But note however that if /bin/init were to call  getppid(),
 	 * it would get back its own PID! */
 	.pc_parent    = ARREF_INIT(&boottask),
 	.pc_sig_lock  = ATOMIC_RWLOCK_INIT,
@@ -234,6 +262,1223 @@ PUBLIC struct procctl boottask_procctl = {
 };
 
 
+
+
+
+
+/************************************************************************/
+/* gettid(), getpid(), getppid(), getpgrp(), getpgid()                  */
+/* setpgid(), getsid(), setsid()                                        */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_GETTID
+DEFINE_SYSCALL0(pid_t, gettid) {
+	COMPILER_IMPURE();
+	return task_gettid();
+}
+#endif /* __ARCH_WANT_SYSCALL_GETTID */
+
+#ifdef __ARCH_WANT_SYSCALL_GETPID
+DEFINE_SYSCALL0(pid_t, getpid) {
+	COMPILER_IMPURE();
+	return task_getpid();
+}
+#endif /* __ARCH_WANT_SYSCALL_GETPID */
+
+#ifdef __ARCH_WANT_SYSCALL_GETPPID
+DEFINE_SYSCALL0(pid_t, getppid) {
+	COMPILER_IMPURE();
+	return task_getppid_s();
+}
+#endif /* __ARCH_WANT_SYSCALL_GETPPID */
+
+#ifdef __ARCH_WANT_SYSCALL_GETPGRP
+DEFINE_SYSCALL0(pid_t, getpgrp) {
+	/* Same as `getpgid(0)' */
+	COMPILER_IMPURE();
+	return task_getpgid_s();
+}
+#endif /* __ARCH_WANT_SYSCALL_GETPGRP */
+
+#ifdef __ARCH_WANT_SYSCALL_GETPGID
+DEFINE_SYSCALL1(pid_t, getpgid, pid_t, pid) {
+	REF struct procgrp *grp;
+	struct taskpid *mypid = task_gettaskpid();
+	pid_t result;
+	if (pid == 0) {
+		grp = taskpid_getprocgrp(mypid);
+	} else {
+		REF struct taskpid *req_pid;
+		req_pid = pidns_lookup_srch(mypid->tp_ns, pid);
+		grp     = taskpid_getprocgrp(req_pid);
+		decref_unlikely(req_pid);
+	}
+	result = procgrp_getnspgid_s(grp, mypid->tp_ns);
+	decref_unlikely(grp);
+	return result;
+}
+#endif /* __ARCH_WANT_SYSCALL_GETPGID */
+
+#ifdef __ARCH_WANT_SYSCALL_SETPGID
+DEFINE_SYSCALL2(errno_t, setpgid, pid_t, pid, pid_t, pgid) {
+	struct taskpid *caller_pid = task_getprocpid();
+	REF struct taskpid *self_pid; /* For `pid' */
+	struct procctl *self_pctl;
+	REF struct procgrp *oldgrp;
+	REF struct procgrp *caller_grp;
+	caller_grp = taskpid_getprocgrp(caller_pid);
+	FINALLY_DECREF_UNLIKELY(caller_grp);
+	if (pid == 0) {
+		self_pid = incref(caller_pid);
+		pid      = taskpid_gettid_s(caller_pid);
+	} else {
+		self_pid = pidns_lookup_srch(caller_pid->tp_ns, pid);
+	}
+	FINALLY_DECREF_UNLIKELY(self_pid);
+	if (!taskpid_isaprocess(self_pid) || /* Must be a process */
+	    !(self_pid == caller_pid ||      /* Must be the calling thread, or one of its children */
+	      taskpid_getparentprocessptr(self_pid) == taskpid_gettaskptr(caller_pid)))
+		THROW(E_PROCESS_EXITED, pid);
+	self_pctl = taskpid_getprocctl(self_pid);
+
+	if (pgid != 0 && pgid == taskpid_gettid_s(self_pid))
+		pgid = 0; /* Also create a new group in this case. */
+
+	/* Query the old process group of `self_pid' */
+again_get_oldgrp:
+	oldgrp = procctl_getprocgrp(self_pctl);
+	FINALLY_DECREF_UNLIKELY(oldgrp);
+
+	/* Posix only allows changing the group of a process apart of the caller's session.
+	 * """
+	 * EPERM  The value of the pid argument matches the process ID of  a
+	 *        child process of the calling process and the child process
+	 *        is not in the same session as the calling process.
+	 * """
+	 */
+	if (procgrp_getsession(oldgrp) != procgrp_getsession(caller_grp)) {
+		THROW(E_INVALID_ARGUMENT_BAD_STATE,
+		      E_INVALID_ARGUMENT_CONTEXT_SETPGID_DIFFERENT_SESSION, pid);
+	}
+
+	/* """
+	 * EPERM The process indicated by the pid argument is a session leader.
+	 * """ */
+	if (procgrp_issessionleader(oldgrp)) {
+		THROW(E_INVALID_ARGUMENT_BAD_STATE,
+		      E_INVALID_ARGUMENT_CONTEXT_SETPGID_IS_SESSION_LEADER, pid);
+	}
+
+	/* Figure out which group we want to join. */
+	if (pgid == 0) {
+		struct pidns *ns_iter;
+		REF struct procgrp *newgrp;
+
+		/* Check for special case: `self_pid' already is the leader of `oldgrp'
+		 * In this case we mustn't do anything. This is also important in order
+		 * to  ensure that  no process  group matching  `self_pid's IDs already
+		 * exists within any of the associated PID namespaces! */
+		if (self_pid->tp_ns == oldgrp->pgr_ns) {
+			size_t ind = self_pid->tp_ns->pn_ind;
+			if (self_pid->tp_pids[ind].tps_pid == oldgrp->pgr_pids[ind].pgs_pid)
+				return -EOK;
+		}
+
+		/* Create a new process group. */
+		newgrp = _procgrp_alloc(self_pid->tp_ns);
+
+		/* Initialize the new group. */
+		newgrp->pgr_refcnt  = 1; /* +1: self_pctl->pc_grp (arref_cmpxch_inherit_new) */
+		newgrp->pgr_sleader = incref(oldgrp->pgr_sleader);
+		newgrp->pgr_session = oldgrp->pgr_session;
+		SLIST_INIT(&newgrp->pgr_memb_lops);
+		atomic_rwlock_init_write(&newgrp->pgr_memb_lock); /* IMPORTANT: Init w/ a write-lock */
+		LIST_INIT(&newgrp->pgr_memb_list);
+		newgrp->pgr_ns = incref(self_pid->tp_ns);
+
+		/* Fill in PIDs for the new process group. This has to happen
+		 * first since the moment we set `self_pctl->pc_grp', the new
+		 * process group will already  be globally visible. As  such,
+		 * all of its non-locked (i.e. [const]) fields must be  fully
+		 * initialized at that point! */
+		ns_iter = newgrp->pgr_ns;
+		do {
+			size_t ind = ns_iter->pn_ind;
+			newgrp->pgr_pids[ind].pgs_pid = self_pid->tp_pids[ind].tps_pid;
+		} while ((ns_iter = ns_iter->pn_par) != NULL);
+
+		/* Acquire required locks.
+		 *
+		 * Because  we're creating a new process group,  we need locks to all of
+		 * the PID namespaces it should appear in, as well as the member list of
+		 * the group's first process's old process group. */
+		TRY {
+			struct pidns *blocking;
+again_lock_oldgrp_for_new_group:
+			procgrp_memb_write(oldgrp);
+			blocking = pidns_trywriteall(newgrp->pgr_ns);
+			if (blocking) {
+				procgrp_memb_endwrite(oldgrp);
+				pidns_waitwrite(blocking);
+				goto again_lock_oldgrp_for_new_group;
+			}
+		} EXCEPT {
+			decref_nokill(newgrp->pgr_ns);      /* *_nokill because of ref in `self_pid->tp_ns' */
+			decref_nokill(newgrp->pgr_sleader); /* *_nokill because of ref in `oldgrp->pgr_sleader' */
+			_procgrp_free(newgrp);
+			RETHROW();
+		}
+
+		/* === Point of no return: make the new group globally visible */
+		if (!arref_cmpxch_inherit_new(&self_pctl->pc_grp, oldgrp, newgrp)) {
+			_procgrp_memb_endwrite(oldgrp);
+			pidns_endwriteall(newgrp->pgr_ns);
+			procgrp_memb_reap(oldgrp);
+			decref_nokill(newgrp->pgr_ns);      /* *_nokill because of ref in `self_pid->tp_ns' */
+			decref_nokill(newgrp->pgr_sleader); /* *_nokill because of ref in `oldgrp->pgr_sleader' */
+			_procgrp_free(newgrp);
+			goto again_get_oldgrp;
+		}
+
+		/* Update remaining links. */
+		procgrp_memb_remove(oldgrp, self_pid);
+		procgrp_memb_insert(newgrp, self_pid);
+		_procgrp_memb_endwrite(newgrp); /* We initialized the lock in write-mode! */
+		_procgrp_memb_endwrite(oldgrp);
+
+		/* Insert the new process group into all of the namespaces.
+		 *
+		 * Note that the "if (self_pid->tp_pids[ind].tps_pid == oldgrp->pgr_pids[ind].pgs_pid)"
+		 * check above already asserted  (when combined with POSIX's  rules on PID reuse)  that
+		 * there cannot be pre-existing process groups already using our new group's IDs within
+		 * any of those namespaces! */
+		ns_iter = newgrp->pgr_ns;
+		do {
+			pidns_grpinsert(ns_iter, newgrp);
+		} while ((ns_iter = ns_iter->pn_par) != NULL);
+
+		/* Release locks. */
+		pidns_endwriteall(newgrp->pgr_ns);
+		procgrp_memb_reap(oldgrp);
+		procgrp_memb_reap(newgrp);
+	} else {
+		REF struct procgrp *newgrp;
+		/* Join an existing process group. */
+		newgrp = pidns_grplookup(caller_pid->tp_ns, pgid);
+		if unlikely(!newgrp) {
+			if unlikely(pgid < 0) {
+				/* """
+				 * EINVAL The value of the pgid argument is less than 0, or is not a
+				 *        value supported by the implementation.
+				 * """ */
+				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+				      E_INVALID_ARGUMENT_CONTEXT_SETPGID_INVALID_PGID,
+				      pgid);
+			}
+
+			/* """
+			 * EPERM  The value of the pgid argument is valid but does not  match
+			 *        the  process  ID  of  the  process  indicated  by  the  pid
+			 *        argument and there is no process group with a process group
+			 *        ID that matches the value of the pgid argument in the  same
+			 *        session as the calling process.
+			 * """
+			 * [*] "valid" here only means that the value is positive */
+throw_no_such_group:
+			THROW(E_INVALID_ARGUMENT_BAD_STATE,
+			      E_INVALID_ARGUMENT_CONTEXT_SETPGID_NO_SUCH_GROUP,
+			      pgid);
+		}
+
+		/* Special case: we're a no-op if the group didn't change. */
+		if (newgrp == oldgrp) {
+			decref_nokill(newgrp); /* *_nokill because of 2nd reference held to `oldgrp' */
+			return -EOK;
+		}
+
+		/* Existing group must be part of caller's session. */
+		if (procgrp_getsession(newgrp) != procgrp_getsession(caller_grp)) {
+			decref_unlikely(newgrp);
+			goto throw_no_such_group;
+		}
+
+		/* All right: let's join this group! */
+again_lock_oldgrp:
+		procgrp_memb_write(oldgrp);
+		if (!procgrp_memb_trywrite(newgrp)) {
+			procgrp_memb_endwrite(oldgrp);
+			procgrp_memb_write(newgrp);
+			if (!procgrp_memb_trywrite(oldgrp)) {
+				procgrp_memb_endwrite(newgrp);
+				goto again_lock_oldgrp;
+			}
+		}
+
+		/* Change group association */
+		if (!arref_cmpxch_inherit_new(&self_pctl->pc_grp, oldgrp, newgrp)) {
+			_procgrp_memb_endwrite(newgrp);
+			_procgrp_memb_endwrite(oldgrp);
+			procgrp_memb_reap(newgrp);
+			procgrp_memb_reap(oldgrp);
+			decref_unlikely(newgrp);
+			goto again_get_oldgrp;
+		}
+
+		/* Update group membership list pointers. */
+		procgrp_memb_remove(oldgrp, self_pid);
+		procgrp_memb_insert(newgrp, self_pid);
+
+		/* Release locks. */
+		_procgrp_memb_endwrite(newgrp);
+		_procgrp_memb_endwrite(oldgrp);
+		procgrp_memb_reap(newgrp);
+		procgrp_memb_reap(oldgrp);
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SETPGID */
+
+#ifdef __ARCH_WANT_SYSCALL_GETSID
+DEFINE_SYSCALL1(pid_t, getsid, pid_t, pid) {
+	REF struct procgrp *grp;
+	struct taskpid *mypid = task_gettaskpid();
+	pid_t result;
+	if (pid == 0) {
+		grp = taskpid_getprocgrp(mypid);
+	} else {
+		REF struct taskpid *req_pid;
+		req_pid = pidns_lookup_srch(mypid->tp_ns, pid);
+		grp     = taskpid_getprocgrp(req_pid);
+		decref_unlikely(req_pid);
+	}
+	result = procgrp_getnssid_s(grp, mypid->tp_ns);
+	decref_unlikely(grp);
+	return result;
+}
+#endif /* __ARCH_WANT_SYSCALL_GETSID */
+
+#ifdef __ARCH_WANT_SYSCALL_SETSID
+DEFINE_SYSCALL0(pid_t, setsid) {
+	pid_t result;
+	struct pidns *ns_iter;
+	struct taskpid *pid = task_getprocpid();
+	struct procctl *ctl = taskpid_getprocctl(pid);
+	struct pidns *ns    = pid->tp_ns;
+	REF struct procgrp *oldgrp, *newgrp;
+again_get_oldgrp:
+	oldgrp = procctl_getprocgrp(ctl);
+	FINALLY_DECREF_UNLIKELY(oldgrp);
+
+	/* """
+	 * EPERM  The calling process is already a process group leader, or
+	 *        the  process group ID of a process other than the calling
+	 *        process matches the process ID of the calling process.
+	 * """
+	 * I  really don't know  how that second part  could happen, where a
+	 * process group matching the  caller's PID already exists.  Because
+	 * process groups can only be created using the PID of the  creating
+	 * process, and processes only get assigned PIDs that aren't already
+	 * in use by process groups (as per posix specs).
+	 *
+	 * Anyways: If the caller is already a process group leader, then
+	 *          we're not  allowed to  make  them a  session  leader! */
+	if (oldgrp->pgr_ns == ns &&
+	    oldgrp->pgr_pids[ns->pn_ind].pgs_pid == pid->tp_pids[ns->pn_ind].tps_pid) {
+		THROW(E_INVALID_ARGUMENT_BAD_STATE,
+		      E_INVALID_ARGUMENT_CONTEXT_SETSID_ALREADY_GROUP_LEADER);
+	}
+
+	/* All right: let's construct a new process group! */
+	newgrp = _procgrp_alloc(ns);
+	TRY {
+		/* Allocate+initialize a new session. */
+		newgrp->pgr_session = _procsession_new();
+	} EXCEPT {
+		_procgrp_free(newgrp);
+		RETHROW();
+	}
+
+	/* Initialize the new group. */
+	newgrp->pgr_refcnt  = 1;      /* +1: ctl->pc_grp (arref_cmpxch_inherit_new) */
+	newgrp->pgr_sleader = newgrp; /* This one's a session leader! */
+	SLIST_INIT(&newgrp->pgr_memb_lops);
+	atomic_rwlock_init_write(&newgrp->pgr_memb_lock); /* IMPORTANT: Init w/ a write-lock */
+	LIST_INIT(&newgrp->pgr_memb_list);
+	newgrp->pgr_ns = incref(ns);
+
+	/* Fill in PIDs for the new  process group. This has to  happen
+	 * first since the moment we set `ctl->pc_grp', the new process
+	 * group  will already be globally visible. As such, all of its
+	 * non-locked  (i.e. [const]) fields  must be fully initialized
+	 * at that point! */
+	ns_iter = newgrp->pgr_ns;
+	do {
+		size_t ind = ns_iter->pn_ind;
+		newgrp->pgr_pids[ind].pgs_pid = pid->tp_pids[ind].tps_pid;
+	} while ((ns_iter = ns_iter->pn_par) != NULL);
+
+	/* Return the new session's process group ID */
+	result = newgrp->pgr_pids[ns->pn_ind].pgs_pid;
+
+	/* Acquire required locks.
+	 *
+	 * Because  we're creating a new process group,  we need locks to all of
+	 * the PID namespaces it should appear in, as well as the member list of
+	 * the group's first process's old process group. */
+	TRY {
+		struct pidns *blocking;
+again_lock_oldgrp_for_new_group:
+		procgrp_memb_write(oldgrp);
+		blocking = pidns_trywriteall(newgrp->pgr_ns);
+		if (blocking) {
+			procgrp_memb_endwrite(oldgrp);
+			pidns_waitwrite(blocking);
+			goto again_lock_oldgrp_for_new_group;
+		}
+	} EXCEPT {
+		decref_nokill(newgrp->pgr_ns); /* *_nokill because of ref in `pid->tp_ns' */
+		_procsession_destroy(newgrp->pgr_session);
+		_procgrp_free(newgrp);
+		RETHROW();
+	}
+
+	/* === Point of no return: make the new group globally visible */
+	if (!arref_cmpxch_inherit_new(&ctl->pc_grp, oldgrp, newgrp)) {
+		_procgrp_memb_endwrite(oldgrp);
+		pidns_endwriteall(newgrp->pgr_ns);
+		procgrp_memb_reap(oldgrp);
+		decref_nokill(newgrp->pgr_ns); /* *_nokill because of ref in `pid->tp_ns' */
+		_procsession_destroy(newgrp->pgr_session);
+		_procgrp_free(newgrp);
+		goto again_get_oldgrp;
+	}
+
+	/* Update remaining links. */
+	procgrp_memb_remove(oldgrp, pid);
+	procgrp_memb_insert(newgrp, pid);
+	_procgrp_memb_endwrite(newgrp); /* We initialized the lock in write-mode! */
+	_procgrp_memb_endwrite(oldgrp);
+
+	/* Insert the new process group into all of the namespaces.
+	 *
+	 * Note that the "if (pid->tp_pids[ind].tps_pid == oldgrp->pgr_pids[ind].pgs_pid)"
+	 * check  above already asserted  (when combined with POSIX's  rules on PID reuse)
+	 * that there cannot be pre-existing process groups already using our new  group's
+	 * IDs within any of those namespaces! */
+	ns_iter = newgrp->pgr_ns;
+	do {
+		pidns_grpinsert(ns_iter, newgrp);
+	} while ((ns_iter = ns_iter->pn_par) != NULL);
+
+	/* Release locks. */
+	pidns_endwriteall(newgrp->pgr_ns);
+	procgrp_memb_reap(oldgrp);
+	procgrp_memb_reap(newgrp);
+
+	return result;
+}
+#endif /* __ARCH_WANT_SYSCALL_SETSID */
+
+
+
+
+/************************************************************************/
+/* detach()                                                             */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_DETACH
+DEFINE_SYSCALL1(errno_t, detach, pid_t, pid) {
+	/* >> sys_detach(2)
+	 * This is a KOS-specific system call that can be used to detach a
+	 * child thread (by setting `TASK_FDETACHED'), or a child  process
+	 * (by  changing it's parent to be `/bin/init'). The same may also
+	 * be done to the calling thread/process!
+	 *
+	 * The following modes of operation are defined:
+	 *
+	 * >> detach(0)
+	 *   - Same as `detach(gettid())', but note special handling when
+	 *     the caller is the main thread.
+	 *
+	 * >> detach(TID_OF_THREAD_IN_CURRENT_PROCESS_OTHER_THAN_MAIN_THREAD)
+	 *   - Set the `TASK_FDETACHED' flag for the thread. If the thread has
+	 *     already  been destroyed, or already has the `TASK_FTERMINATING'
+	 *     flag set, also unlink it from the process's list of children.
+	 *   - When the `TASK_FDETACHED' flag is already set, throw `E_PROCESS_EXITED'
+	 *
+	 * >> detach(PID_OF_CURRENT_PROCESS_OR_CHILD_PROCESS)
+	 *   - Change the parent of the indicated process to become /bin/init,
+	 *     thus  also removing it from it's old parent's list of children,
+	 *     and inserting it into that of /bin/init. Note that when this is
+	 *     done by /bin/init itself, this becomes a no-op.
+	 *
+	 * >> detach(-1)
+	 *   - Same as (atomic):
+	 *     >> for (pid_t pid: opendir("/proc/self/task")) {
+	 *     >>     if (pid == getpid())
+	 *     >>         continue;
+	 *     >>     detach(pid);
+	 *     >> }
+	 *     In other words: detach all children (both threads and processes)
+	 *     of  the calling process. Note that if there weren't any children
+	 *     to detach, `-ECHILD' is returned (yes: "return"; we don't use an
+	 *     exception in this case).
+	 *
+	 * NOTE: Threads created with  `clone(CLONE_DETACHED)' already have  the
+	 *       `TASK_FTERMINATING' flag set from the get-go. However, the flag
+	 *       doesn't affect child processes. */
+	struct taskpid *caller_task = task_gettaskpid();
+	struct taskpid *caller_proc = taskpid_getprocpid(caller_task);
+	struct procctl *ctl         = taskpid_getprocctl(caller_proc);
+	struct pidns *ns            = caller_task->tp_ns;
+	if (pid == -1) {
+		/* TODO: Detach all children */
+	} else {
+		REF struct taskpid *detach;
+		if (pid == 0) /* Use the caller's TID instead. */
+			pid = caller_task->tp_pids[ns->pn_ind].tps_pid;
+
+		/* Lookup the task to detach. */
+		detach = pidns_lookup_srch(ns, pid);
+		FINALLY_DECREF_UNLIKELY(detach);
+
+		/* Special case for child threads. */
+		if (!taskpid_isaprocess(detach)) {
+			REF struct task *thread;
+			/* Ensure that this is one of our threads. */
+			if (taskpid_getprocpid(detach) != caller_proc)
+				THROW(E_PROCESS_EXITED, pid);
+
+			thread = taskpid_gettask(detach);
+			if (thread) {
+				/* Thread is still running. -- Let's see if we can set the DETACHED
+				 * flag before the thread itself  sets its TERMINATING flag. If  we
+				 * manage to do that, then the  thread will remove itself from  our
+				 * process's child list as soon as it terminates. */
+				uintptr_t old_flags;
+				old_flags = ATOMIC_FETCHOR(thread->t_flags, TASK_FDETACHED);
+				decref_unlikely(thread);
+				if unlikely(old_flags & TASK_FDETACHED)
+					THROW(E_PROCESS_EXITED, pid); /* Thread had already been detached before */
+				if (!(old_flags & TASK_FTERMINATING))
+					return -EOK; /* Success: the thread will remove itself! */
+				/* The thread is already terminating. -- In this case, we must (try) to
+				 * remove the thread from our  process's child list (unless the  thread
+				 * itself already managed to do so as well) */
+			}
+
+			/* (try to) unbind from our process's child list. */
+			procctl_chlds_write(ctl);
+			if (LIST_ISBOUND(detach, tp_parsib)) {
+				procctl_chlds_unbind(ctl, detach); /* Inherit reference */
+			} else {
+				incref(detach);
+			}
+			procctl_chlds_endwrite(ctl);
+			decref(detach);
+		} else {
+			REF struct task *oldparent;
+again_get_oldparent:
+			oldparent = taskpid_getparentprocess(detach);
+			FINALLY_DECREF_UNLIKELY(oldparent);
+
+			/* Ensure that this is actually one of our process's children (or the process itself). */
+			if (detach != caller_proc && oldparent != taskpid_gettaskptr(caller_proc))
+				THROW(E_PROCESS_EXITED, pid);
+
+			/* Detach a child process (by changing its parent to become /bin/init)
+			 * Note  that this is  a no-op if the  calling process _is_ /bin/init! */
+			if likely(ctl != &boottask_procctl) {
+again_write_ctl:
+				procctl_chlds_write(ctl);
+				if (!procctl_chlds_trywrite(&boottask_procctl)) {
+					procctl_chlds_endwrite(ctl);
+					procctl_chlds_write(&boottask_procctl);
+					if (!procctl_chlds_trywrite(ctl)) {
+						procctl_chlds_endwrite(&boottask_procctl);
+						goto again_write_ctl;
+					}
+				}
+
+				/* Atomically change the parent process to /bin/init */
+				if (!arref_cmpxch(&detach->tp_pctl->pc_parent, oldparent, &boottask)) {
+					_procctl_chlds_endwrite(&boottask_procctl);
+					_procctl_chlds_endwrite(ctl);
+					procctl_chlds_reap(&boottask_procctl);
+					procctl_chlds_reap(ctl);
+					goto again_get_oldparent;
+				}
+
+				/* Update list membership. */
+				procctl_chlds_remove(ctl, detach);
+				procctl_chlds_insert(&boottask_procctl, detach);
+
+				/* Release locks. */
+				_procctl_chlds_endwrite(&boottask_procctl);
+				_procctl_chlds_endwrite(ctl);
+				procctl_chlds_reap(&boottask_procctl);
+				procctl_chlds_reap(ctl);
+
+				/* Broadcast the process's change of parent */
+				sig_broadcast(&boottask_procctl.pc_chld_changed);
+				sig_broadcast(&ctl->pc_chld_changed);
+				sig_broadcast(&detach->tp_changed);
+			}
+		}
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_DETACH */
+
+
+
+
+/************************************************************************/
+/* waitid(), waitpid(), wait4()                                         */
+/************************************************************************/
+#if (defined(__ARCH_WANT_SYSCALL_WAITID) ||         \
+     defined(__ARCH_WANT_SYSCALL_WAITPID) ||        \
+     defined(__ARCH_WANT_SYSCALL_WAIT4) ||          \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_WAITID) ||  \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_WAITPID) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_WAIT4))
+#define WANT_WAIT 1
+#endif
+
+#ifdef WANT_WAIT
+
+/* Check if `SIGCLD' is being ignored by the calling thread */
+PRIVATE WUNUSED bool FCALL
+is_ignoring_SIGCLD(void) THROWS(E_WOULDBLOCK) {
+	struct sighand_ptr *handptr;
+	struct sighand *hand;
+	handptr = THIS_SIGHAND_PTR;
+	if (!handptr)
+		return false;
+	hand = sighand_ptr_lockread(handptr);
+	if unlikely(!hand)
+		return false;
+	if (hand->sh_actions[SIGCLD - 1].sa_flags & SA_NOCLDWAIT)
+		return true; /* This also triggers `SIG_IGN' behavior! */
+	if (hand->sh_actions[SIGCLD - 1].sa_handler == SIG_IGN)
+		return true; /* SIGCLD is explicitly set to SIG_IGN */
+	return false;
+}
+
+/* Check if the thread of a given `taskpid' has terminated (or is terminating). */
+LOCAL NOBLOCK NONNULL((1)) bool
+NOTHROW(KCALL taskpid_hasterminated)(struct taskpid *__restrict self) {
+	uintptr_t flags;
+	REF struct task *thread;
+	thread = taskpid_gettask(self);
+	if (!thread) {
+		/* Destroyed thread --> thread must have terminated. */
+		return true;
+	}
+	flags = ATOMIC_READ(thread->t_flags);
+	decref_unlikely(thread);
+
+	/* Return indicative of the TERMINATING or TERMINATED flags being set. */
+	return (flags & (TASK_FTERMINATING | TASK_FTERMINATED)) != 0;
+}
+
+
+/* @return: true:  There are no non-terminated child processes, and all
+ *                 those  that have terminated  were reaped (unless the
+ *                 WNOREAP flag was given)
+ * @return: false: There are still some child processes that have yet to terminate. */
+PRIVATE WUNUSED NONNULL((1)) bool FCALL
+try_reap_all_children(struct procctl *__restrict ctl,
+                      syscall_ulong_t options)
+		THROWS(E_WOULDBLOCK) {
+	bool result = true;
+	struct taskpid *child;
+again:
+	/* Enumerate child threads (and processes) */
+	procctl_chlds_read(ctl);
+	LIST_FOREACH (child, &ctl->pc_chlds_list, tp_parsib) {
+		REF struct task *thread;
+		uint16_t status;
+		if (!taskpid_isaprocess(child))
+			continue; /* Ignore child threads. (we only care about processes) */
+		if (!taskpid_hasterminated(child)) {
+			/* Found a child process that has yet to terminate! */
+			result = false;
+			continue;
+		}
+		/* If instructed to, reap terminated child processes. */
+		if (!(options & WNOREAP)) {
+			if (!procctl_chlds_tryupgrade(ctl)) {
+				procctl_chlds_endread(ctl);
+				procctl_chlds_waitwrite(ctl);
+				goto again;
+			}
+			/* Unlink `child' from the list. */
+			procctl_chlds_unbind(ctl, child); /* Inherit reference */
+			procctl_chlds_endwrite(ctl);
+			decref_likely(child);
+			goto again;
+		}
+	}
+	procctl_chlds_endread(ctl);
+	return result;
+}
+
+/* Block until all  child processes have  exited,
+ * and reap all zombies created in the mean time.
+ *
+ * @param: options: WNOREAP: Don't actually reap children; just wait until all child processes have exited.
+ *                  WNOHANG: Don't actually wait; just reap children as they are present right now.
+ * NOTE: When `WNOHANG | WNOREAP' is passed, this function becomes a de-facto no-op. */
+PRIVATE BLOCKING_IF(!(options & WNOHANG)) NONNULL((1)) void FCALL
+waitfor_and_reap_all_children(struct procctl *__restrict ctl,
+                              syscall_ulong_t options) {
+again:
+	if (try_reap_all_children(ctl, options))
+		return;
+	if (options & WNOHANG)
+		return; /* Not supposed to block. */
+	task_connect_for_poll(&ctl->pc_chld_changed);
+	TRY {
+		if (try_reap_all_children(ctl, options)) {
+			task_disconnectall();
+			return;
+		}
+	} EXCEPT {
+		task_disconnectall();
+		RETHROW();
+	}
+
+	/* Wait for one of our children to change status. */
+	task_waitfor();
+	goto again;
+}
+
+
+/* Fill in wait status information for user-space.
+ * @return: * : The used child PID for `child' */
+PRIVATE NONNULL((1, 2)) pid_t KCALL
+fill_wait_info(struct taskpid *__restrict proc,
+               struct taskpid *__restrict child,
+               uint16_t status,
+               USER CHECKED int32_t *wstatus,
+               USER CHECKED siginfo_t *infop,
+               USER CHECKED struct rusage *ru) {
+	pid_t result;
+	result = taskpid_getnstid_s(child, proc->tp_ns);
+
+	/* Fill in information in user-pointers! */
+	COMPILER_WRITE_BARRIER();
+	if (wstatus != NULL)
+		*wstatus = status;
+	if (infop) {
+		infop->si_signo  = SIGCLD;
+		infop->si_errno  = 0;
+		if (WIFCONTINUED(status)) {
+			infop->si_code = CLD_CONTINUED;
+		} else if (WIFSTOPPED(status)) {
+			infop->si_code = CLD_STOPPED;
+		} else if (WCOREDUMP(status)) {
+			infop->si_code = CLD_DUMPED;
+		} else if (WIFEXITED(status)) {
+			infop->si_code = CLD_EXITED;
+		} else if (WIFSIGNALED(status)) {
+			infop->si_code = CLD_KILLED;
+		} else {
+			infop->si_code = CLD_TRAPPED;
+		}
+		infop->si_pid    = result;
+		infop->si_uid    = 0; /* ??? */
+		infop->si_status = status;
+		infop->si_utime  = 0; /* ??? */
+		infop->si_stime  = 0; /* ??? */
+	}
+	if (ru) {
+		bzero(ru, sizeof(*ru));
+		/* XXX: Fill in usage information? */
+	}
+	COMPILER_WRITE_BARRIER();
+}
+
+
+PRIVATE pid_t KCALL
+waitfor_children(idtype_t which, id_t which_pid,
+                 syscall_ulong_t options,
+                 USER CHECKED int32_t *wstatus,
+                 USER CHECKED siginfo_t *infop,
+                 USER CHECKED struct rusage *ru) {
+	struct taskpid *proc = task_getprocpid();
+	struct procctl *ctl  = taskpid_getprocctl(proc);
+
+	/* Check for special behavior when SIGCLD is being ignored. */
+	if (is_ignoring_SIGCLD()) {
+		waitfor_and_reap_all_children(ctl, options);
+		return -ECHILD;
+	}
+
+	/* Do the actual job of waiting for threads/processes. */
+	if (which == P_PID) {
+		uint16_t status;
+		REF struct taskpid *child;
+
+		/* Wait for a specific child thread/process */
+		child = pidns_lookup(proc->tp_ns, which_pid);
+		if unlikely(!child)
+			return -ECHILD; /* No such process */
+		FINALLY_DECREF_UNLIKELY(child);
+again_read_status:
+		if (taskpid_isaprocess(child)) {
+			if (taskpid_getparentprocessptr(child) != taskpid_gettaskptr(proc))
+				return -ECHILD; /* Not a child process */
+		} else {
+			if (taskpid_getprocpid(child) != proc)
+				return -ECHILD; /* Not a child thread */
+		}
+		status = ATOMIC_READ(child->tp_status);
+		if (((options & WSTOPPED) && WIFSTOPPED(status)) ||
+		    ((options & WCONTINUED) && WIFCONTINUED(status))) {
+again_consume_status_stop_cont:
+			if (!ATOMIC_CMPXCH_WEAK(child->tp_status, status, 0))
+				goto again_read_status;
+			/* we're dealing with an stop/continue status */
+		} else if ((options & WEXITED) && taskpid_hasterminated(child)) {
+			/* we're dealing with an exit-code status */
+again_child_has_exited:
+			if (!(options & WNOREAP)) {
+				/* Reap child */
+				procctl_chlds_write(ctl);
+				if (taskpid_getparentprocessptr(child) != taskpid_gettaskptr(proc)) {
+					procctl_chlds_endwrite(ctl);
+					return -ECHILD; /* Not a child */
+				}
+				procctl_chlds_unbind(ctl, child); /* Inherit reference */
+				procctl_chlds_endwrite(ctl);
+				decref_nokill(child); /* Still got our reference from `pidns_lookup()'! */
+			}
+		} else if (options & WNOHANG) {
+			/* Don't block */
+			return -EAGAIN;
+		} else {
+			/* Wait for child to change status. */
+			task_connect_for_poll(&child->tp_changed);
+			status = ATOMIC_READ(child->tp_status);
+			if (((options & WSTOPPED) && WIFSTOPPED(status)) ||
+			    ((options & WCONTINUED) && WIFCONTINUED(status))) {
+				task_disconnectall();
+				goto again_consume_status_stop_cont;
+			}
+			if ((options & WEXITED) && taskpid_hasterminated(child)) {
+				task_disconnectall();
+				goto again_child_has_exited;
+			}
+			task_waitfor();
+			goto again_read_status;
+		}
+
+		/* Write-back wait information for this child. */
+		return fill_wait_info(proc, child, status, wstatus, infop, ru);
+	} else {
+		/* Wait for multiple children (as opposed to a specific child) */
+		struct taskpid *child;
+		bool has_candidates;
+again_scan_children:
+		has_candidates = false;
+		if (!(options & WNOHANG))
+			task_connect_for_poll(&ctl->pc_chld_changed);
+		TRY {
+			procctl_chlds_read(ctl);
+		} EXCEPT {
+			task_disconnectall();
+			RETHROW();
+		}
+
+		/* Enumerate child processes. (in this case, we ignore threads) */
+		LIST_FOREACH (child, &ctl->pc_chlds_list, tp_parsib) {
+			uint16_t status;
+			if (!taskpid_isaprocess(child))
+				continue;
+			if (which == P_PGID) {
+				/* Ignore if `child' isn't apart of a specific process group. */
+				if (taskpid_getpgid_s(child) != which_pid)
+					continue;
+			}
+again_read_status_in_nonspecific:
+			status = ATOMIC_READ(child->tp_status);
+			if (((options & WSTOPPED) && WIFSTOPPED(status)) ||
+			    ((options & WCONTINUED) && WIFCONTINUED(status))) {
+				if (!ATOMIC_CMPXCH_WEAK(child->tp_status, status, 0))
+					goto again_read_status_in_nonspecific;
+				/* we're dealing with an stop/continue status */
+				incref(child);
+				procctl_chlds_endread(ctl);
+			} else if ((options & WEXITED) && taskpid_hasterminated(child)) {
+				/* we're dealing with an exit-code status */
+				if (options & WNOREAP) {
+					incref(child);
+				} else {
+					/* Reap child */
+					if (!procctl_chlds_tryupgrade(ctl)) {
+						procctl_chlds_endread(ctl);
+						task_disconnectall();
+						procctl_chlds_waitwrite(ctl);
+						goto again_scan_children;
+					}
+					procctl_chlds_unbind(ctl, child); /* Inherit reference */
+					procctl_chlds_endwrite(ctl);
+				}
+			} else {
+				/* We've got a candidate, but it doesn't
+				 * have a status that we're looking for. */
+				has_candidates = true;
+				continue;
+			}
+			FINALLY_DECREF_UNLIKELY(child);
+			return fill_wait_info(proc, child, status, wstatus, infop, ru);
+		}
+		procctl_chlds_endread(ctl);
+		if (!has_candidates) {
+			task_disconnectall();
+			return -ECHILD; /* No candidates */
+		}
+		if (options & WNOHANG)
+			return -EAGAIN; /* Operation would have blocked */
+		task_waitfor();
+		goto again_scan_children;
+	}
+}
+#endif /* WANT_WAIT */
+
+#ifdef __ARCH_WANT_SYSCALL_WAITID
+DEFINE_SYSCALL5(pid_t, waitid,
+                syscall_ulong_t, which, id_t, upid,
+                USER UNCHECKED siginfo_t *, infop,
+                syscall_ulong_t, options,
+                USER UNCHECKED struct rusage32 *, ru) {
+	pid_t result;
+	VALIDATE_FLAGSET(options,
+	                 WNOHANG | WNOREAP | WEXITED | WSTOPPED | WCONTINUED,
+	                 E_INVALID_ARGUMENT_CONTEXT_WAITID_OPTIONS);
+	if (!(options & (WEXITED | WSTOPPED | WCONTINUED)))
+		THROW(E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION,
+		      E_INVALID_ARGUMENT_CONTEXT_WAITID_OPTIONS,
+		      options,
+		      WEXITED | WSTOPPED | WCONTINUED,
+		      0);
+	if (which > P_PGID)
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_WAITID_WHICH,
+		      which);
+	validate_writable_opt(infop, sizeof(*infop));
+	validate_writable_opt(ru, sizeof(*ru));
+#if __SIZEOF_TIME32_T__ == __TM_SIZEOF(TIME)
+	result = waitfor_children((idtype_t)which, upid, options, NULL, infop, ru);
+#else /* __SIZEOF_TIME32_T__ == __TM_SIZEOF(TIME) */
+	if (ru) {
+		struct rusage kru;
+		result = waitfor_children((idtype_t)which, upid, options, NULL, infop, &kru);
+		if (E_ISOK(result))
+			rusage_to_rusage32(&kru, ru);
+	} else {
+		result = waitfor_children((idtype_t)which, upid, options, NULL, infop, NULL);
+	}
+#endif /* __SIZEOF_TIME32_T__ != __TM_SIZEOF(TIME) */
+	return result;
+}
+#endif /* __ARCH_WANT_SYSCALL_WAITID */
+
+#ifdef __ARCH_WANT_SYSCALL_WAITID64
+DEFINE_SYSCALL5(pid_t, waitid64,
+                syscall_ulong_t, which, id_t, upid,
+                USER UNCHECKED siginfo_t *, infop,
+                syscall_ulong_t, options,
+                USER UNCHECKED struct rusage64 *, ru) {
+	pid_t result;
+	VALIDATE_FLAGSET(options,
+	                 WNOHANG | WNOREAP | WEXITED | WSTOPPED | WCONTINUED,
+	                 E_INVALID_ARGUMENT_CONTEXT_WAITID_OPTIONS);
+	if (!(options & (WEXITED | WSTOPPED | WCONTINUED)))
+		THROW(E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION,
+		      E_INVALID_ARGUMENT_CONTEXT_WAITID_OPTIONS,
+		      options,
+		      WEXITED | WSTOPPED | WCONTINUED,
+		      0);
+	if (which > P_PGID)
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_WAITID_WHICH,
+		      which);
+	validate_writable_opt(infop, sizeof(*infop));
+	validate_writable_opt(ru, sizeof(*ru));
+#if __SIZEOF_TIME64_T__ == __TM_SIZEOF(TIME)
+	result = waitfor_children((idtype_t)which, options, upid, NULL, infop, ru);
+#else /* __SIZEOF_TIME64_T__ == __TM_SIZEOF(TIME) */
+	if (ru) {
+		struct rusage kru;
+		result = waitfor_children((idtype_t)which, upid, options, NULL, infop, &kru);
+		if (E_ISOK(result))
+			rusage_to_rusage64(&kru, ru);
+	} else {
+		result = waitfor_children((idtype_t)which, upid, options, NULL, infop, NULL);
+	}
+#endif /* __SIZEOF_TIME64_T__ != __TM_SIZEOF(TIME) */
+	return result;
+}
+#endif /* __ARCH_WANT_SYSCALL_WAITID64 */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_WAITID
+DEFINE_COMPAT_SYSCALL5(pid_t, waitid,
+                       syscall_ulong_t, which, id_t, upid,
+                       USER UNCHECKED compat_siginfo_t *, infop,
+                       syscall_ulong_t, options,
+                       USER UNCHECKED struct compat_rusage32 *, ru) {
+	pid_t result;
+	siginfo_t info;
+	VALIDATE_FLAGSET(options,
+	                 WNOHANG | WNOREAP | WEXITED | WSTOPPED | WCONTINUED,
+	                 E_INVALID_ARGUMENT_CONTEXT_WAITID_OPTIONS);
+	if (!(options & (WEXITED | WSTOPPED | WCONTINUED)))
+		THROW(E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION,
+		      E_INVALID_ARGUMENT_CONTEXT_WAITID_OPTIONS,
+		      options,
+		      WEXITED | WSTOPPED | WCONTINUED,
+		      0);
+	if (which > P_PGID)
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_WAITID_WHICH,
+		      which);
+	validate_writable_opt(infop, sizeof(*infop));
+	validate_writable_opt(ru, sizeof(*ru));
+	if (ru) {
+		struct rusage kru;
+		result = waitfor_children((idtype_t)which, upid, options,
+		                          NULL, infop ? &info : NULL, &kru);
+		if (E_ISOK(result))
+			rusage_to_compat_rusage32(&kru, ru);
+	} else {
+		result = waitfor_children((idtype_t)which, upid, options,
+		                          NULL, infop ? &info : NULL, NULL);
+	}
+	if (E_ISOK(result) && infop)
+		siginfo_to_compat_siginfo(&info, infop);
+	return result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_WAITID */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_WAITID64
+DEFINE_COMPAT_SYSCALL5(pid_t, waitid64,
+                       syscall_ulong_t, which, id_t, upid,
+                       USER UNCHECKED compat_siginfo_t *, infop,
+                       syscall_ulong_t, options,
+                       USER UNCHECKED struct compat_rusage64 *, ru) {
+	pid_t result;
+	siginfo_t info;
+	VALIDATE_FLAGSET(options,
+	                 WNOHANG | WNOREAP | WEXITED | WSTOPPED | WCONTINUED,
+	                 E_INVALID_ARGUMENT_CONTEXT_WAITID_OPTIONS);
+	if (!(options & (WEXITED | WSTOPPED | WCONTINUED)))
+		THROW(E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION,
+		      E_INVALID_ARGUMENT_CONTEXT_WAITID_OPTIONS,
+		      options,
+		      WEXITED | WSTOPPED | WCONTINUED,
+		      0);
+	if (which > P_PGID)
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_WAITID_WHICH,
+		      which);
+	validate_writable_opt(infop, sizeof(*infop));
+	validate_writable_opt(ru, sizeof(*ru));
+	if (ru) {
+		struct rusage kru;
+		result = waitfor_children((idtype_t)which, upid, options,
+		                          NULL, infop ? &info : NULL, &kru);
+		if (E_ISOK(result))
+			rusage_to_compat_rusage64(&kru, ru);
+	} else {
+		result = waitfor_children((idtype_t)which, upid, options,
+		                          NULL, infop ? &info : NULL, NULL);
+	}
+	if (E_ISOK(result) && infop)
+		siginfo_to_compat_siginfo(&info, infop);
+	return result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_WAITID64 */
+
+#ifdef __ARCH_WANT_SYSCALL_WAITPID
+DEFINE_SYSCALL3(pid_t, waitpid,
+                pid_t, pid, int32_t *, stat_loc,
+                syscall_ulong_t, options) {
+	return sys_wait4(pid, stat_loc, options, NULL);
+}
+#endif /* __ARCH_WANT_SYSCALL_WAITPID */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_WAITPID
+DEFINE_COMPAT_SYSCALL3(pid_t, waitpid,
+                       pid_t, pid, int32_t *, stat_loc,
+                       syscall_ulong_t, options) {
+	return sys_wait4(pid, stat_loc, options, NULL);
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_WAITPID */
+
+#ifdef __ARCH_WANT_SYSCALL_WAIT4
+DEFINE_SYSCALL4(pid_t, wait4, pid_t, upid,
+                USER UNCHECKED int32_t *, wstatus,
+                syscall_ulong_t, options,
+                USER UNCHECKED struct rusage32 *, ru) {
+	idtype_t which;
+	pid_t result;
+	VALIDATE_FLAGSET(options,
+	                 WNOHANG | WSTOPPED | WCONTINUED | WNOREAP,
+	                 E_INVALID_ARGUMENT_CONTEXT_WAIT4_OPTIONS);
+	options |= WEXITED;
+	validate_writable_opt(wstatus, sizeof(*wstatus));
+	validate_writable_opt(ru, sizeof(*ru));
+	if (upid < -1) {
+		upid  = -upid;
+		which = (idtype_t)P_PGID;
+	} else if (upid == -1) {
+		upid  = 0;
+		which = (idtype_t)P_ALL;
+	} else if (upid == 0) {
+		/* wait for any child process whose process group ID is equal to that of the calling process. */
+		upid  = task_getpgid_s();
+		which = (idtype_t)P_PGID;
+	} else {
+		/* wait for the child whose process ID is equal to the value of pid. */
+		which = (idtype_t)P_PID;
+	}
+#if __SIZEOF_TIME32_T__ == __TM_SIZEOF(TIME)
+	result = waitfor_children(which, upid, options, wstatus, NULL, ru);
+#else /* __SIZEOF_TIME32_T__ == __TM_SIZEOF(TIME) */
+	if (ru) {
+		struct rusage kru;
+		result = waitfor_children(which, upid, options, wstatus, NULL, &kru);
+		if (E_ISOK(result))
+			rusage_to_rusage32(&kru, ru);
+	} else {
+		result = waitfor_children(which, upid, options, wstatus, NULL, NULL);
+	}
+#endif /* __SIZEOF_TIME32_T__ != __TM_SIZEOF(TIME) */
+	return result;
+}
+#endif /* __ARCH_WANT_SYSCALL_WAIT4 */
+
+#ifdef __ARCH_WANT_SYSCALL_WAIT4_64
+DEFINE_SYSCALL4(pid_t, wait4_64, pid_t, upid,
+                USER UNCHECKED int32_t *, wstatus,
+                syscall_ulong_t, options,
+                USER UNCHECKED struct rusage64 *, ru) {
+	idtype_t which;
+	pid_t result;
+	VALIDATE_FLAGSET(options,
+	                 WNOHANG | WSTOPPED | WCONTINUED | WNOREAP,
+	                 E_INVALID_ARGUMENT_CONTEXT_WAIT4_OPTIONS);
+	options |= WEXITED;
+	validate_writable_opt(wstatus, sizeof(*wstatus));
+	validate_writable_opt(ru, sizeof(*ru));
+	if (upid < -1) {
+		upid  = -upid;
+		which = (idtype_t)P_PGID;
+	} else if (upid == -1) {
+		upid  = 0;
+		which = (idtype_t)P_ALL;
+	} else if (upid == 0) {
+		/* wait for any child process whose process group ID is equal to that of the calling process. */
+		upid  = task_getpgid_s();
+		which = (idtype_t)P_PGID;
+	} else {
+		/* wait for the child whose process ID is equal to the value of pid. */
+		which = (idtype_t)P_PID;
+	}
+#if __SIZEOF_TIME64_T__ == __TM_SIZEOF(TIME)
+	result = waitfor_children(which, upid, options, wstatus, NULL, ru);
+#else /* __SIZEOF_TIME64_T__ == __TM_SIZEOF(TIME) */
+	if (ru) {
+		struct rusage kru;
+		result = waitfor_children(which, upid, options, wstatus, NULL, &kru);
+		if (E_ISOK(result))
+			rusage_to_rusage64(&kru, ru);
+	} else {
+		result = waitfor_children(which, upid, options, wstatus, NULL, NULL);
+	}
+#endif /* __SIZEOF_TIME64_T__ != __TM_SIZEOF(TIME) */
+	return result;
+}
+#endif /* __ARCH_WANT_SYSCALL_WAIT4_64 */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_WAIT4
+DEFINE_COMPAT_SYSCALL4(pid_t, wait4, pid_t, upid,
+                       USER UNCHECKED int32_t *, wstatus,
+                       syscall_ulong_t, options,
+                       USER UNCHECKED struct compat_rusage32 *, ru) {
+	idtype_t which;
+	pid_t result;
+	VALIDATE_FLAGSET(options,
+	                 WNOHANG | WSTOPPED | WCONTINUED | WNOREAP,
+	                 E_INVALID_ARGUMENT_CONTEXT_WAIT4_OPTIONS);
+	options |= WEXITED;
+	validate_writable_opt(wstatus, sizeof(*wstatus));
+	validate_writable_opt(ru, sizeof(*ru));
+	if (upid < -1) {
+		upid  = -upid;
+		which = (idtype_t)P_PGID;
+	} else if (upid == -1) {
+		upid  = 0;
+		which = (idtype_t)P_ALL;
+	} else if (upid == 0) {
+		/* wait for any child process whose process group ID is equal to that of the calling process. */
+		upid  = task_getpgid_s();
+		which = (idtype_t)P_PGID;
+	} else {
+		/* wait for the child whose process ID is equal to the value of pid. */
+		which = (idtype_t)P_PID;
+	}
+	if (ru) {
+		struct rusage kru;
+		result = waitfor_children(which, upid, options, wstatus, NULL, &kru);
+		if (E_ISOK(result))
+			rusage_to_compat_rusage32(&kru, ru);
+	} else {
+		result = waitfor_children(which, upid, options, wstatus, NULL, NULL);
+	}
+	return result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_WAIT4 */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_WAIT4_64
+DEFINE_COMPAT_SYSCALL4(pid_t, wait4_64, pid_t, upid,
+                       USER UNCHECKED int32_t *, wstatus,
+                       syscall_ulong_t, options,
+                       USER UNCHECKED struct compat_rusage64 *, ru) {
+	idtype_t which;
+	pid_t result;
+	VALIDATE_FLAGSET(options,
+	                 WNOHANG | WSTOPPED | WCONTINUED | WNOREAP,
+	                 E_INVALID_ARGUMENT_CONTEXT_WAIT4_OPTIONS);
+	options |= WEXITED;
+	validate_writable_opt(wstatus, sizeof(*wstatus));
+	validate_writable_opt(ru, sizeof(*ru));
+	if (upid < -1) {
+		upid  = -upid;
+		which = (idtype_t)P_PGID;
+	} else if (upid == -1) {
+		upid  = 0;
+		which = (idtype_t)P_ALL;
+	} else if (upid == 0) {
+		/* wait for any child process whose process group ID is equal to that of the calling process. */
+		upid  = task_getpgid_s();
+		which = (idtype_t)P_PGID;
+	} else {
+		/* wait for the child whose process ID is equal to the value of pid. */
+		which = (idtype_t)P_PID;
+	}
+	if (ru) {
+		struct rusage kru;
+		result = waitfor_children(which, upid, options, wstatus, NULL, &kru);
+		if (E_ISOK(result))
+			rusage_to_compat_rusage64(&kru, ru);
+	} else {
+		result = waitfor_children(which, upid, options, wstatus, NULL, NULL);
+	}
+	return result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_WAIT4_64 */
 
 DECL_END
 #endif /* CONFIG_USE_NEW_GROUP */

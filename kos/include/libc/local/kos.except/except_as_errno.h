@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6fa3fe3 */
+/* HASH CRC-32:0x14a9ae88 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -386,11 +386,16 @@ for (local name: classes.keys.sorted()) {
 #endif /* __EINTR */
 
 	case E_INVALID_ARGUMENT:
-#if defined(__EPERM) && defined(__EINVAL)
-		__result = __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID ||
-		        __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID ? __EPERM : __EINVAL;
-#endif /* __EPERM && __EINVAL */
+#ifdef __EINVAL
+		__result = __EINVAL;
+#endif /* __EINVAL */
 		switch(__self->e_subclass) {
+#if defined(__EPERM) && defined(__EINVAL)
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_ARGUMENT_BAD_VALUE)):
+			__result = __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID ||
+			        __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID ? __EPERM : __EINVAL;
+			break;
+#endif /* __EPERM && __EINVAL */
 #if defined(__EAFNOSUPPORT) && defined(__ESOCKTNOSUPPORT) && defined(__EPROTONOSUPPORT) && defined(__EINVAL)
 		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_ARGUMENT_UNKNOWN_COMMAND)):
 			__result = __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_FAMILY ? __EAFNOSUPPORT :
@@ -399,7 +404,7 @@ for (local name: classes.keys.sorted()) {
 			        __EINVAL;
 			break;
 #endif /* __EAFNOSUPPORT && __ESOCKTNOSUPPORT && __EPROTONOSUPPORT && __EINVAL */
-#if defined(__ENOTCONN) && defined(__EDESTADDRREQ) && defined(__EISCONN) && defined(__ENXIO) && defined(__EPIPE) && defined(__ENOMEM) && defined(__EINVAL)
+#if defined(__ENOTCONN) && defined(__EDESTADDRREQ) && defined(__EISCONN) && defined(__ENXIO) && defined(__EPIPE) && defined(__ENOMEM) && defined(__EPERM) && defined(__EINVAL)
 		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_ARGUMENT_BAD_STATE)):
 			__result = __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED ||
 			        __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED ||
@@ -410,9 +415,13 @@ for (local name: classes.keys.sorted()) {
 			        __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS ? __EPIPE :
 			        (__self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_MEMORY ||
 			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_FUTEX) ? __ENOMEM :
+			        (__self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SETPGID_DIFFERENT_SESSION ||
+			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SETPGID_NO_SUCH_GROUP ||
+			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SETPGID_IS_SESSION_LEADER ||
+			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SETSID_ALREADY_GROUP_LEADER) ? __EPERM :
 			        __EINVAL;
 			break;
-#endif /* __ENOTCONN && __EDESTADDRREQ && __EISCONN && __ENXIO && __EPIPE && __ENOMEM && __EINVAL */
+#endif /* __ENOTCONN && __EDESTADDRREQ && __EISCONN && __ENXIO && __EPIPE && __ENOMEM && __EPERM && __EINVAL */
 #ifdef __ENOPROTOOPT
 		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_ARGUMENT_SOCKET_OPT)):
 			__result = __ENOPROTOOPT;

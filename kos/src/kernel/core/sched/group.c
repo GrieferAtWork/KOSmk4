@@ -25,6 +25,7 @@
 
 #include <kernel/compiler.h>
 
+#ifndef CONFIG_USE_NEW_GROUP
 #include <dev/tty.h>
 #include <kernel/except.h>
 #include <kernel/handle-proto.h>
@@ -1824,7 +1825,7 @@ DEFINE_SYSCALL4(pid_t, wait4, pid_t, upid,
 		struct taskpid *pid;
 		group = task_getprocessgroupleader_srch();
 		pid   = FORTASK(group, this_taskpid);
-		upid  = taskpid_getpidno_s(pid);
+		upid  = taskpid_gettid_s(pid);
 		which = (idtype_t)P_PGID;
 		decref_unlikely(group);
 	} else {
@@ -1872,7 +1873,7 @@ DEFINE_SYSCALL4(pid_t, wait4_64, pid_t, upid,
 		struct taskpid *pid;
 		group = task_getprocessgroupleader_srch();
 		pid   = FORTASK(group, this_taskpid);
-		upid  = taskpid_getpidno_s(pid);
+		upid  = taskpid_gettid_s(pid);
 		which = (idtype_t)P_PGID;
 		decref_unlikely(group);
 	} else {
@@ -1920,7 +1921,7 @@ DEFINE_COMPAT_SYSCALL4(pid_t, wait4, pid_t, upid,
 		struct taskpid *pid;
 		group = task_getprocessgroupleader_srch();
 		pid   = FORTASK(group, this_taskpid);
-		upid  = taskpid_getpidno_s(pid);
+		upid  = taskpid_gettid_s(pid);
 		which = (idtype_t)P_PGID;
 		decref_unlikely(group);
 	} else {
@@ -1964,7 +1965,7 @@ DEFINE_COMPAT_SYSCALL4(pid_t, wait4_64, pid_t, upid,
 		struct taskpid *pid;
 		group = task_getprocessgroupleader_srch();
 		pid   = FORTASK(group, this_taskpid);
-		upid  = taskpid_getpidno_s(pid);
+		upid  = taskpid_gettid_s(pid);
 		which = (idtype_t)P_PGID;
 		decref_unlikely(group);
 	} else {
@@ -1985,5 +1986,6 @@ DEFINE_COMPAT_SYSCALL4(pid_t, wait4_64, pid_t, upid,
 
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_GROUP */
 
 #endif /* !GUARD_KERNEL_SRC_SCHED_GROUP_C */

@@ -251,7 +251,7 @@ enumerate_thread_tids(char buf[], char const *__restrict format,
                       dbg_autocomplete_cb_t cb, void *arg) {
 	size_t len;
 again:
-	len = sprintf(buf, format, taskpid_getrootpidno(tpid));
+	len = sprintf(buf, format, taskpid_getroottid(tpid));
 	(*cb)(arg, buf, len);
 	if (tpid->tp_pids[0].tps_link.rb_lhs) {
 		if (tpid->tp_pids[0].tps_link.rb_rhs)

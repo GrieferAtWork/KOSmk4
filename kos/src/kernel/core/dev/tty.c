@@ -66,7 +66,7 @@ NOTHROW(KCALL ttydev_log_setsession)(struct ttydev *__restrict self,
                                      struct taskpid *__restrict session_pid) {
 	device_getname_lock_acquire(self);
 	printk(KERN_NOTICE "[ctty][+] Assign tty %q as controller for session %u\n",
-	       device_getname(self), taskpid_getrootpidno(session_pid));
+	       device_getname(self), taskpid_getroottid(session_pid));
 	device_getname_lock_release(self);
 }
 
@@ -76,7 +76,7 @@ NOTHROW(KCALL ttydev_log_delsession)(struct ttydev *__restrict self,
                                      struct taskpid *__restrict session_pid) {
 	device_getname_lock_acquire(self);
 	printk(KERN_NOTICE "[ctty][-] Remove tty %q as controller for session %u\n",
-	       device_getname(self), taskpid_getrootpidno(session_pid));
+	       device_getname(self), taskpid_getroottid(session_pid));
 	device_getname_lock_release(self);
 }
 
@@ -127,7 +127,7 @@ do_try_override_fproc:
 			printk(KERN_INFO "[tty:%q] Background process group %p "
 			                 "[pgid=%" PRIuN(__SIZEOF_PID_T__) "] tried to write\n",
 			       device_getname(term), awref_ptr(&my_leader_pid->tp_thread),
-			       taskpid_getrootpidno(my_leader_pid));
+			       taskpid_getroottid(my_leader_pid));
 			device_getname_lock_release(term);
 
 			/* When `SIGTTOU' is ignored, allow the write */
@@ -187,7 +187,7 @@ do_throw_ttou:
 			printk(KERN_INFO "[tty:%q] Background process group %p "
 			                 "[pgid=%" PRIuN(__SIZEOF_PID_T__) "] tried to read\n",
 			       device_getname(term), my_leader_pid,
-			       taskpid_getrootpidno(my_leader_pid));
+			       taskpid_getroottid(my_leader_pid));
 			device_getname_lock_release(term);
 
 			/* ... if the reading process is ignoring or blocking the SIGTTIN signal, or if
@@ -529,7 +529,7 @@ do_TCSETA: {
 		}
 		device_getname_lock_acquire(me);
 		printk(KERN_TRACE "[tty:%q] Set foreground process group to [pgid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
-		       device_getname(me), taskpid_getrootpidno(newpid));
+		       device_getname(me), taskpid_getroottid(newpid));
 		device_getname_lock_release(me);
 		oldpid = axref_xch_inherit(&me->t_fproc, newpid);
 		xdecref(oldpid);
@@ -543,7 +543,7 @@ do_TCSETA: {
 		respid = -ESRCH;
 		tpid   = axref_get(&me->t_fproc);
 		if (tpid) {
-			respid = taskpid_getpidno(tpid);
+			respid = taskpid_gettid(tpid);
 			decref_unlikely(tpid);
 		}
 		COMPILER_WRITE_BARRIER();
@@ -558,7 +558,7 @@ do_TCSETA: {
 		respid = -ENOTTY;
 		tpid   = awref_get(&me->t_cproc);
 		if (tpid) {
-			respid = taskpid_getpidno(tpid);
+			respid = taskpid_gettid(tpid);
 			decref_unlikely(tpid);
 		}
 		COMPILER_WRITE_BARRIER();

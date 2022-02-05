@@ -206,8 +206,7 @@
 /* E_INVALID_ARGUMENT                                                   */
 /************************************************************************/
 #ifndef E_INVALID_ARGUMENT
-#define E_INVALID_ARGUMENT                        (0x0002)                     /* [errno($context == E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID ||
-                                                                                *        $context == E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID ? EPERM : EINVAL), msg("Invalid argument")]
+#define E_INVALID_ARGUMENT                        (0x0002)                     /* [errno(EINVAL), msg("Invalid argument")]
                                                                                 * [fld(context: syscall_ulong_t, "Argument context (One of `E_INVALID_ARGUMENT_CONTEXT_*')")] */
 #endif /* !E_INVALID_ARGUMENT */
 #ifndef E_INVALID_ARGUMENT_UNKNOWN_FLAG
@@ -246,7 +245,9 @@
                                                                                 * the  expression  `(mask & value) != required_masked_value' was  the case. */
 #endif /* !E_INVALID_ARGUMENT_BAD_ALIGNMENT */
 #ifndef E_INVALID_ARGUMENT_BAD_VALUE
-#define E_INVALID_ARGUMENT_BAD_VALUE              (E_INVALID_ARGUMENT, 0x0006) /* [msg("A given value is invalid for the associated argument")]
+#define E_INVALID_ARGUMENT_BAD_VALUE              (E_INVALID_ARGUMENT, 0x0006) /* [errno($context == E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID ||
+                                                                                *        $context == E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID ? EPERM : EINVAL)]
+                                                                                * [msg("A given value is invalid for the associated argument")]
                                                                                 * [fld(value:   uintptr_t, "The value that was given")] */
 #endif /* !E_INVALID_ARGUMENT_BAD_VALUE */
 #ifndef E_INVALID_ARGUMENT_RESERVED_ARGUMENT
@@ -270,6 +271,10 @@
                                                                                 *        $context == E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS ? EPIPE :
                                                                                 *        ($context == E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_MEMORY ||
                                                                                 *         $context == E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_FUTEX) ? ENOMEM :
+                                                                                *        ($context == E_INVALID_ARGUMENT_CONTEXT_SETPGID_DIFFERENT_SESSION ||
+                                                                                *         $context == E_INVALID_ARGUMENT_CONTEXT_SETPGID_NO_SUCH_GROUP ||
+                                                                                *         $context == E_INVALID_ARGUMENT_CONTEXT_SETPGID_IS_SESSION_LEADER ||
+                                                                                *         $context == E_INVALID_ARGUMENT_CONTEXT_SETSID_ALREADY_GROUP_LEADER) ? EPERM :
                                                                                 *        EINVAL)]
                                                                                 * [msg("The current object state does not allow this operation")] */
 #endif /* !E_INVALID_ARGUMENT_BAD_STATE */

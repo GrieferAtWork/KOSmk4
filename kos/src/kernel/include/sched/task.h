@@ -62,7 +62,11 @@ DECL_BEGIN
                                                    *                  - The thread must no longer appear in the scheduler of any CPU. */
 #define TASK_FKEEPCORE     __UINT32_C(0x00000100) /* [lock(PRIVATE(THIS_TASK))] Don't allow this task's core to change randomly. */
 #define TASK_FSUSPENDED    __UINT32_C(0x00000200) /* [lock(PRIVATE(THIS_TASK))] Used internally to implement of SIGSTOP/SIGCONT */
-/*      TASK_F             __UINT32_C(0x00000400)  * ... */
+#ifdef CONFIG_USE_NEW_GROUP
+#define TASK_FDETACHED     __UINT32_C(0x00000400) /* [lock(WRITE_ONCE)] The thread/process will automatically remove  itself
+                                                   * from `task_getprocctl_of(task_getparentprocess())' as part of task_exit
+                                                   * Additionally, this task cannot be wait(2)-ed for. */
+#endif /* CONFIG_USE_NEW_GROUP */
 /*      TASK_F             __UINT32_C(0x00000800)  * ... */
 /*      TASK_F             __UINT32_C(0x00001000)  * ... */
 /*      TASK_F             __UINT32_C(0x00002000)  * ... */

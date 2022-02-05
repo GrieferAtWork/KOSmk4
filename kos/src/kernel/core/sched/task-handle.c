@@ -109,7 +109,7 @@ handle_task_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
 
 	case TASK_IOC_GETTID: {
 		validate_writable(arg, sizeof(pid_t));
-		*(USER CHECKED pid_t *)arg = taskpid_getpidno(self);
+		*(USER CHECKED pid_t *)arg = taskpid_gettid(self);
 		return 0;
 	}	break;
 
@@ -134,7 +134,7 @@ handle_task_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
 		if unlikely(!parent_pid)
 			THROW(E_NO_SUCH_PROCESS);
 		FINALLY_DECREF_UNLIKELY(parent_pid);
-		*(USER CHECKED pid_t *)arg = taskpid_getpidno(parent_pid);
+		*(USER CHECKED pid_t *)arg = taskpid_gettid(parent_pid);
 		return 0;
 	}	break;
 
@@ -150,7 +150,7 @@ handle_task_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
 		if unlikely(!group_pid)
 			THROW(E_NO_SUCH_PROCESS);
 		FINALLY_DECREF_UNLIKELY(group_pid);
-		*(USER CHECKED pid_t *)arg = taskpid_getpidno(group_pid);
+		*(USER CHECKED pid_t *)arg = taskpid_gettid(group_pid);
 		return 0;
 	}	break;
 
@@ -166,7 +166,7 @@ handle_task_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
 		if unlikely(!session_pid)
 			THROW(E_NO_SUCH_PROCESS);
 		FINALLY_DECREF_UNLIKELY(session_pid);
-		*(USER CHECKED pid_t *)arg = taskpid_getpidno(session_pid);
+		*(USER CHECKED pid_t *)arg = taskpid_gettid(session_pid);
 		return 0;
 	}	break;
 
@@ -241,7 +241,7 @@ handle_task_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
 				decref_unlikely(thread);
 				THROW(E_INVALID_ARGUMENT_BAD_STATE,
 				      E_INVALID_ARGUMENT_CONTEXT_TASK_NOT_EXITED,
-				      taskpid_getpidno_s(self));
+				      taskpid_gettid_s(self));
 			}
 			decref_unlikely(thread);
 		}

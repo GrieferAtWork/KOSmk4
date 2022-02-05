@@ -225,7 +225,7 @@ taskpid_gettask_srch(struct taskpid *__restrict self)
 	result = taskpid_gettask(self);
 	/* Throw an exception if the thread already exited */
 	if unlikely(!result)
-		THROW(E_PROCESS_EXITED, taskpid_getpidno(self));
+		THROW(E_PROCESS_EXITED, taskpid_gettid(self));
 	return result;
 }
 

@@ -1237,7 +1237,7 @@ procfs_pp_stat_printer(struct printnode *__restrict self,
 		mm = task_getmman(thread);
 	FINALLY_XDECREF_UNLIKELY(mm);
 	if (printf("%" PRIuN(__SIZEOF_PID_T__) " (",
-	           taskpid_getpidno_s(tpid)) < 0)
+	           taskpid_gettid_s(tpid)) < 0)
 		return;
 	if (mm) {
 		REF struct fdirent *exec_name;
@@ -1331,7 +1331,7 @@ nogroup:
 			goto nofproc;
 		FINALLY_DECREF_UNLIKELY(fproc);
 		if (printf("%" PRIuN(__SIZEOF_PID_T__) " ",
-		           taskpid_getpidno_s(fproc)) < 0)
+		           taskpid_gettid_s(fproc)) < 0)
 			return;
 	} else {
 nosession:
@@ -1558,7 +1558,7 @@ no_exec:
 	           state,
 	           thread ? task_getpid_of_s(thread) : 0,         /* Tgid */
 	           thread ? task_getpid_of_s(thread) : 0,         /* Pid */
-	           parent_pid ? taskpid_getpidno_s(parent_pid) : 0, /* PPid */
+	           parent_pid ? taskpid_gettid_s(parent_pid) : 0, /* PPid */
 	           thread_cred ? ATOMIC_READ(thread_cred->c_ruid) : 0,
 	           thread_cred ? ATOMIC_READ(thread_cred->c_euid) : 0,
 	           thread_cred ? ATOMIC_READ(thread_cred->c_suid) : 0,

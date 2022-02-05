@@ -300,28 +300,28 @@ LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool NOTHROW(KCALL task_issessionleader_p)(
  * of the process leader) of the calling thread. The returned
  * IDS are either relative to  the task's own PID  namespace,
  * to the ROOT pid namespace, or the given namespace. */
-#define task_gettid()       taskpid_getselfpidno(THIS_TASKPID)
-#define task_getroottid()   taskpid_getrootpidno(THIS_TASKPID)
-#define task_getnstid(ns)   taskpid_getnspidno(THIS_TASKPID, ns)
-#define task_getnstid_s(ns) taskpid_getnspidno_s(THIS_TASKPID, ns)
-#define task_getpid()       taskpid_getpidno(task_getprocesspid())
-#define task_getrootpid()   taskpid_getrootpidno(task_getprocesspid())
-#define task_getnspid(ns)   taskpid_getnspidno(task_getprocesspid(), ns)
-#define task_getnspid_s(ns) taskpid_getnspidno_s(task_getprocesspid(), ns)
+#define task_gettid()       taskpid_getselftid(THIS_TASKPID)
+#define task_getroottid()   taskpid_getroottid(THIS_TASKPID)
+#define task_getnstid(ns)   taskpid_getnstid(THIS_TASKPID, ns)
+#define task_getnstid_s(ns) taskpid_getnstid_s(THIS_TASKPID, ns)
+#define task_getpid()       taskpid_gettid(task_getprocesspid())
+#define task_getrootpid()   taskpid_getroottid(task_getprocesspid())
+#define task_getnspid(ns)   taskpid_getnstid(task_getprocesspid(), ns)
+#define task_getnspid_s(ns) taskpid_getnstid_s(task_getprocesspid(), ns)
 
 /* Return TIDs/PIDs of the given thread. */
-#define task_gettid_of(thread)         taskpid_getpidno(FORTASK(thread, this_taskpid))
-#define task_gettid_of_s(thread)       taskpid_getpidno_s(FORTASK(thread, this_taskpid))
-#define task_getnstid_of(thread, ns)   taskpid_getnspidno(FORTASK(thread, this_taskpid), ns)
-#define task_getnstid_of_s(thread, ns) taskpid_getnspidno_s(FORTASK(thread, this_taskpid), ns)
-#define task_getselftid_of(thread)     taskpid_getselfpidno(FORTASK(thread, this_taskpid))
-#define task_getroottid_of(thread)     taskpid_getrootpidno(FORTASK(thread, this_taskpid))
-#define task_getpid_of(thread)         taskpid_getpidno(task_getprocesspid_of(thread))
-#define task_getpid_of_s(thread)       taskpid_getpidno_s(task_getprocesspid_of(thread))
-#define task_getnspid_of(thread, ns)   taskpid_getnspidno(task_getprocesspid_of(thread), ns)
-#define task_getnspid_of_s(thread, ns) taskpid_getnspidno_s(task_getprocesspid_of(thread), ns)
-#define task_getselfpid_of(thread)     taskpid_getselfpidno(task_getprocesspid_of(thread))
-#define task_getrootpid_of(thread)     taskpid_getrootpidno(task_getprocesspid_of(thread))
+#define task_gettid_of(thread)         taskpid_gettid(FORTASK(thread, this_taskpid))
+#define task_gettid_of_s(thread)       taskpid_gettid_s(FORTASK(thread, this_taskpid))
+#define task_getnstid_of(thread, ns)   taskpid_getnstid(FORTASK(thread, this_taskpid), ns)
+#define task_getnstid_of_s(thread, ns) taskpid_getnstid_s(FORTASK(thread, this_taskpid), ns)
+#define task_getselftid_of(thread)     taskpid_getselftid(FORTASK(thread, this_taskpid))
+#define task_getroottid_of(thread)     taskpid_getroottid(FORTASK(thread, this_taskpid))
+#define task_getpid_of(thread)         taskpid_gettid(task_getprocesspid_of(thread))
+#define task_getpid_of_s(thread)       taskpid_gettid_s(task_getprocesspid_of(thread))
+#define task_getnspid_of(thread, ns)   taskpid_getnstid(task_getprocesspid_of(thread), ns)
+#define task_getnspid_of_s(thread, ns) taskpid_getnstid_s(task_getprocesspid_of(thread), ns)
+#define task_getselfpid_of(thread)     taskpid_getselftid(task_getprocesspid_of(thread))
+#define task_getrootpid_of(thread)     taskpid_getroottid(task_getprocesspid_of(thread))
 
 
 

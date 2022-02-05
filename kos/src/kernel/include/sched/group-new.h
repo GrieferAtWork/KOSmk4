@@ -239,16 +239,16 @@ DEFINE_REFCOUNT_FUNCTIONS(struct procgrp, pgr_refcnt, procgrp_destroy)
 /* Helper macros for adding/removing elements from `struct procgrp::pgr_memb_list'
  * NOTE: For all of these, the caller must be holding a write-lock to `self->pgr_memb_lock' */
 #define __procgrp_memb_assert(self, member_struct_taskpid)                    \
-	(__hybrid_assertf(taskpid_isaprocess(struct_taskpid_to_add),              \
-	                  "Not a process leader"),                                \
-	 __hybrid_assertf(taskpid_getprocgrpptr(struct_taskpid_to_add) == (self), \
-	                  "Not set-up as a member of this process group"))
-#define procgrp_memb_insert(self, struct_taskpid_to_add) \
-	(__procgrp_memb_assert(self, struct_taskpid_to_add), \
-	 LIST_INSERT_HEAD(&(self)->pgr_memb_list, struct_taskpid_to_add, tp_pctl->pc_grpmember))
-#define procgrp_memb_remove(self, struct_taskpid_to_del) \
-	(__procgrp_memb_assert(self, struct_taskpid_to_del), \
-	 LIST_REMOVE(struct_taskpid_to_del, tp_pctl->pc_grpmember))
+	(__hybrid_assertf(taskpid_isaprocess(member_struct_taskpid),              \
+	                  "Not a process leader")/*, vvv: cannot assert -- race   \
+	 __hybrid_assertf(taskpid_getprocgrpptr(member_struct_taskpid) == (self), \
+	                  "Not set-up as a member of this process group")*/)
+#define procgrp_memb_insert(self, struct_taskpid_to_insert) \
+	(__procgrp_memb_assert(self, struct_taskpid_to_insert), \
+	 LIST_INSERT_HEAD(&(self)->pgr_memb_list, struct_taskpid_to_insert, tp_pctl->pc_grpmember))
+#define procgrp_memb_remove(self, struct_taskpid_to_remove) \
+	(__procgrp_memb_assert(self, struct_taskpid_to_remove), \
+	 LIST_REMOVE(struct_taskpid_to_remove, tp_pctl->pc_grpmember))
 
 
 
@@ -263,24 +263,24 @@ DEFINE_REFCOUNT_FUNCTIONS(struct procgrp, pgr_refcnt, procgrp_destroy)
 #define procgrp_getsession(self)       procgrp_getsessionleader(self)->pgr_session
 
 /* Return the # of PIDs defined by `self' */
-#define procgrp_getpidnocount(self) ((self)->pgr_ns->pn_ind + 1)
+#define procgrp_getpgidcount(self) ((self)->pgr_ns->pn_ind + 1)
 
 /* Return `self's PID number associated with `ns' */
 #ifdef NDEBUG
-#define procgrp_getnspidno(self, ns) \
+#define procgrp_getnspgid(self, ns) \
 	_procgrp_slot_getpidno((self)->pgr_pids[(ns)->pn_ind])
 #else /* NDEBUG */
-#define procgrp_getnspidno(self, ns)                                       \
+#define procgrp_getnspgid(self, ns)                                        \
 	({                                                                     \
 		struct procgrp const *__pggp_self = (self);                        \
-		struct pidns const *__tpgp_ns     = (ns);                          \
-		__hybrid_assert(__pggp_self->pgr_ns->pn_ind >= __tpgp_ns->pn_ind); \
-		_procgrp_slot_getpidno(__pggp_self->pgr_pids[__tpgp_ns->pn_ind]);  \
+		struct pidns const *__pggp_ns     = (ns);                          \
+		__hybrid_assert(__pggp_self->pgr_ns->pn_ind >= __pggp_ns->pn_ind); \
+		_procgrp_slot_getpidno(__pggp_self->pgr_pids[__pggp_ns->pn_ind]);  \
 	})
 #endif /* !NDEBUG */
 
-/* Same as `procgrp_getnspidno()', but return `0' if `self' doesn't appear in `ns' */
-#define procgrp_getnspidno_s(self, ns)                                        \
+/* Same as `procgrp_getnspgid()', but return `0' if `self' doesn't appear in `ns' */
+#define procgrp_getnspgid_s(self, ns)                                         \
 	({                                                                        \
 		struct procgrp const *__pggps_self = (self);                          \
 		struct pidns const *__tpgps_ns     = (ns);                            \
@@ -288,13 +288,18 @@ DEFINE_REFCOUNT_FUNCTIONS(struct procgrp, pgr_refcnt, procgrp_destroy)
 		 ? _procgrp_slot_getpidno(__pggps_self->pgr_pids[__tpgps_ns->pn_ind]) \
 		 : 0);                                                                \
 	})
-#define procgrp_getpidno(self)   procgrp_getnspidno(self, THIS_PIDNS)
-#define procgrp_getpidno_s(self) procgrp_getnspidno_s(self, THIS_PIDNS)
+#define procgrp_getpgid(self)   procgrp_getnspgid(self, THIS_PIDNS)
+#define procgrp_getpgid_s(self) procgrp_getnspgid_s(self, THIS_PIDNS)
 
 /* Return `self's PID number within the root namespace */
-#define procgrp_getrootpidno(self) _procgrp_slot_getpidno((self)->pgr_pids[0])
+#define procgrp_getrootpgid(self) _procgrp_slot_getpidno((self)->pgr_pids[0])
 
-
+/* Query the session ID of a given process group */
+#define procgrp_getnssid(self, ns)   procgrp_getnspgid(procgrp_getsessionleader(self), ns)
+#define procgrp_getnssid_s(self, ns) procgrp_getnspgid_s(procgrp_getsessionleader(self), ns)
+#define procgrp_getsid(self)         procgrp_getpgid(procgrp_getsessionleader(self))
+#define procgrp_getsid_s(self)       procgrp_getpgid_s(procgrp_getsessionleader(self))
+#define procgrp_getrootsid(self)     procgrp_getrootpgid(procgrp_getsessionleader(self))
 
 
 
@@ -307,12 +312,18 @@ ARREF(procgrp_arref, procgrp);
 struct procctl {
 	struct atomic_rwlock     pc_chlds_lock;   /* Lock for `pc_chlds_list' */
 	struct REF taskpid_list  pc_chlds_list;   /* [0..n][lock(pc_chlds_lock)][link(tp_parsib)]
-	                                           * Child tasks of this process. This includes both
-	                                           * threads (other than the main thread) within the
-	                                           * process,  as well as processes that were fork'd
-	                                           * from this one (or re-parented to this one). */
-	struct sig               pc_chld_changed; /* Broadcast when one of `pc_chlds_list' changes status.
-	                                           * (s.a. `struct taskpid::tp_changed') */
+	                                           * Child  tasks of this process. This includes both
+	                                           * threads  (other than the main thread) within the
+	                                           * process,  as well as  processes that were fork'd
+	                                           * from this one (or re-parented to this one). Note
+	                                           * that threads with the `TASK_FDETACHED' flag will
+	                                           * automatically remove themselves  from this  list
+	                                           * during `task_exit()'. Child  processes don't  do
+	                                           * this  and must instead  be removed with wait(2),
+	                                           * as can  also be  done for  threads (that  aren't
+	                                           * detached) */
+	struct sig               pc_chld_changed; /* Broadcast when one of `pc_chlds_list' changes
+	                                           * status.  (s.a.  `struct taskpid::tp_changed') */
 	struct task_arref        pc_parent;       /* [1..1][lock(READ(ATOMIC), WRITE(OLD->pc_chlds_lock &&
 	                                           *                                 NEW->pc_chlds_lock))]
 	                                           * Parent process. When the parent thread exits, it will
@@ -371,16 +382,12 @@ struct procctl {
 
 /* Helper macros for adding/removing elements from `struct procctl::pc_chlds_list'
  * NOTE: For all of these, the caller must be holding a write-lock to `self->pc_chlds_lock' */
-#define __procctl_chlds_assert(self, member_struct_taskpid)                                         \
-	__hybrid_assertf((self) == taskpid_getprocctl(member_struct_taskpid) ||                         \
-	                 (self) == task_getprocctl(taskpid_getparentprocessptr(member_struct_taskpid)), \
-	                 "Can only add process-threads, or child processes")
-#define procctl_chlds_insert(self, struct_taskpid_to_add) \
-	(__procctl_chlds_assert(self, struct_taskpid_to_add), \
-	 LIST_INSERT_HEAD(&(self)->pc_chlds_list, struct_taskpid_to_add, tp_parsib))
-#define procctl_chlds_remove(self, struct_taskpid_to_del) \
-	(__procctl_chlds_assert(self, struct_taskpid_to_del), \
-	 LIST_REMOVE(struct_taskpid_to_del, tp_parsib))
+#define procctl_chlds_insert(self, /*IN_REF*/ struct_taskpid_to_insert) \
+	LIST_INSERT_HEAD(&(self)->pc_chlds_list, struct_taskpid_to_insert, tp_parsib)
+#define procctl_chlds_remove(self, /*OUT_REF*/ struct_taskpid_to_remove) \
+	LIST_REMOVE(struct_taskpid_to_remove, tp_parsib)
+#define procctl_chlds_unbind(self, /*OUT_REF*/ struct_taskpid_to_unbind) \
+	LIST_UNBIND(struct_taskpid_to_unbind, tp_parsib)
 
 /* Helper macros for working with `struct procgrp::pc_sig_lock' */
 #define procctl_sig_mustreap(self)     0
@@ -423,12 +430,12 @@ struct procctl {
 #define procctl_sig_clear(self) SLIST_ATOMIC_CLEAR(&(self)->pc_sig_list)
 
 /* Return a reference to the parent-process of the given element. */
-#define procctl_getparentprocess(self)   arref_get(&(self)->procctl)                          /* REF struct task * [1..1] */
+#define procctl_getparentprocess(self)   arref_get(&(self)->pc_parent)                        /* REF struct task * [1..1] */
 #define taskpid_getparentprocess(self)   procctl_getparentprocess(taskpid_getprocctl(self))   /* REF struct task * [0..1] */
 #define task_getparentprocess()          procctl_getparentprocess(task_getprocctl())          /* REF struct task * [0..1] */
 #define task_getparentprocess_of(thread) procctl_getparentprocess(task_getprocctl_of(thread)) /* REF struct task * [0..1] */
 
-#define procctl_getparentprocessptr(self)   arref_ptr(&(self)->procctl)
+#define procctl_getparentprocessptr(self)   arref_ptr(&(self)->pc_parent)
 #define taskpid_getparentprocessptr(self)   procctl_getparentprocessptr(taskpid_getprocctl(self))
 #define task_getparentprocessptr()          procctl_getparentprocessptr(task_getprocctl())
 #define task_getparentprocessptr_of(thread) procctl_getparentprocessptr(task_getprocctl_of(thread))
@@ -475,11 +482,11 @@ DATDEF struct procctl boottask_procctl;
 	})
 
 /* Return process group ID of a given `struct procctl' or `struct taskpid'. */
-#define procctl_getpgid(self)         __task_getpgid(procctl_getprocgrp(self), procgrp_getpidno(__tgpgi_grp))         /* Return PGID of given `struct procctl' (in caller's namespace; panic/undefined if not mapped) */
-#define procctl_getpgid_s(self)       __task_getpgid(procctl_getprocgrp(self), procgrp_getpidno_s(__tgpgi_grp))       /* Return PGID of given `struct procctl' (in caller's namespace; `0' if not mapped) */
-#define procctl_getrootpgid(self)     __task_getpgid(procctl_getprocgrp(self), procgrp_getrootpidno(__tgpgi_grp))     /* Return PGID of given `struct procctl' (in root namespace) */
-#define procctl_getnspgid(self, ns)   __task_getpgid(procctl_getprocgrp(self), procgrp_getnspidno(__tgpgi_grp, ns))   /* Return PGID of given `struct procctl' (in caller's namespace; panic/undefined if not mapped) */
-#define procctl_getnspgid_s(self, ns) __task_getpgid(procctl_getprocgrp(self), procgrp_getnspidno_s(__tgpgi_grp, ns)) /* Return PGID of given `struct procctl' (in caller's namespace; `0' if not mapped) */
+#define procctl_getpgid(self)         __task_getpgid(procctl_getprocgrp(self), procgrp_getpgid(__tgpgi_grp))         /* Return PGID of given `struct procctl' (in caller's namespace; panic/undefined if not mapped) */
+#define procctl_getpgid_s(self)       __task_getpgid(procctl_getprocgrp(self), procgrp_getpgid_s(__tgpgi_grp))       /* Return PGID of given `struct procctl' (in caller's namespace; `0' if not mapped) */
+#define procctl_getrootpgid(self)     __task_getpgid(procctl_getprocgrp(self), procgrp_getrootpgid(__tgpgi_grp))     /* Return PGID of given `struct procctl' (in root namespace) */
+#define procctl_getnspgid(self, ns)   __task_getpgid(procctl_getprocgrp(self), procgrp_getnspgid(__tgpgi_grp, ns))   /* Return PGID of given `struct procctl' (in caller's namespace; panic/undefined if not mapped) */
+#define procctl_getnspgid_s(self, ns) __task_getpgid(procctl_getprocgrp(self), procgrp_getnspgid_s(__tgpgi_grp, ns)) /* Return PGID of given `struct procctl' (in caller's namespace; `0' if not mapped) */
 #define taskpid_getpgid(self)         procctl_getpgid(taskpid_getprocctl(self))                                       /* Return PGID of given `struct taskpid' (in caller's namespace; panic/undefined if not mapped) */
 #define taskpid_getpgid_s(self)       procctl_getpgid_s(taskpid_getprocctl(self))                                     /* Return PGID of given `struct taskpid' (in caller's namespace; `0' if not mapped) */
 #define taskpid_getrootpgid(self)     procctl_getrootpgid(taskpid_getprocctl(self))                                   /* Return PGID of given `struct taskpid' (in root namespace) */
@@ -487,8 +494,8 @@ DATDEF struct procctl boottask_procctl;
 #define taskpid_getnspgid_s(self, ns) procctl_getnspgid_s(taskpid_getprocctl(self), ns)                               /* Return PGID of given `struct taskpid' (in given namespace; `0' if not mapped) */
 
 /* Return process group ID of the calling/given thread. */
-#define task_getpgid()                  __task_getmypgid(procgrp_getnspidno(__tgmpgi_grp, __tgmpgi_pid->tp_ns))   /* Return PGID of calling thread (in caller's namespace; panic/undefined if not mapped) */
-#define task_getpgid_s()                __task_getmypgid(procgrp_getnspidno_s(__tgmpgi_grp, __tgmpgi_pid->tp_ns)) /* Return PGID of calling thread (in caller's namespace; `0' if not mapped) */
+#define task_getpgid()                  __task_getmypgid(procgrp_getnspgid(__tgmpgi_grp, __tgmpgi_pid->tp_ns))   /* Return PGID of calling thread (in caller's namespace; panic/undefined if not mapped) */
+#define task_getpgid_s()                __task_getmypgid(procgrp_getnspgid_s(__tgmpgi_grp, __tgmpgi_pid->tp_ns)) /* Return PGID of calling thread (in caller's namespace; `0' if not mapped) */
 #define task_getpgid_of(thread)         taskpid_getpgid(task_gettaskpid_of(thread))                               /* Return PGID of given thread (in caller's namespace; panic/undefined if not mapped) */
 #define task_getpgid_of_s(thread)       taskpid_getpgid_s(task_gettaskpid_of(thread))                             /* Return PGID of given thread (in caller's namespace; `0' if not mapped) */
 #define task_getrootpgid()              taskpid_getrootpgid(task_gettaskpid())                                    /* Return PGID of calling thread (in root namespace) */
@@ -498,6 +505,72 @@ DATDEF struct procctl boottask_procctl;
 #define task_getnspgid_of(thread, ns)   taskpid_getnspgid(task_gettaskpid_of(thread), ns)                         /* Return PGID of given thread (in given namespace; panic/undefined if not mapped) */
 #define task_getnspgid_of_s(thread, ns) taskpid_getnspgid_s(task_gettaskpid_of(thread), ns)                       /* Return PGID of given thread (in given namespace; `0' if not mapped) */
 
+/* Return session ID of a given `struct procctl' or `struct taskpid'. */
+#define procctl_getsid(self)         __task_getpgid(procctl_getprocgrp(self), procgrp_getsid(__tgpgi_grp))         /* Return SID of given `struct procctl' (in caller's namespace; panic/undefined if not mapped) */
+#define procctl_getsid_s(self)       __task_getpgid(procctl_getprocgrp(self), procgrp_getsid_s(__tgpgi_grp))       /* Return SID of given `struct procctl' (in caller's namespace; `0' if not mapped) */
+#define procctl_getrootsid(self)     __task_getpgid(procctl_getprocgrp(self), procgrp_getrootsid(__tgpgi_grp))     /* Return SID of given `struct procctl' (in root namespace) */
+#define procctl_getnssid(self, ns)   __task_getpgid(procctl_getprocgrp(self), procgrp_getnssid(__tgpgi_grp, ns))   /* Return SID of given `struct procctl' (in caller's namespace; panic/undefined if not mapped) */
+#define procctl_getnssid_s(self, ns) __task_getpgid(procctl_getprocgrp(self), procgrp_getnssid_s(__tgpgi_grp, ns)) /* Return SID of given `struct procctl' (in caller's namespace; `0' if not mapped) */
+#define taskpid_getsid(self)         procctl_getsid(taskpid_getprocctl(self))                                        /* Return SID of given `struct taskpid' (in caller's namespace; panic/undefined if not mapped) */
+#define taskpid_getsid_s(self)       procctl_getsid_s(taskpid_getprocctl(self))                                      /* Return SID of given `struct taskpid' (in caller's namespace; `0' if not mapped) */
+#define taskpid_getrootsid(self)     procctl_getrootsid(taskpid_getprocctl(self))                                    /* Return SID of given `struct taskpid' (in root namespace) */
+#define taskpid_getnssid(self, ns)   procctl_getnssid(taskpid_getprocctl(self), ns)                                  /* Return SID of given `struct taskpid' (in given namespace; panic/undefined if not mapped) */
+#define taskpid_getnssid_s(self, ns) procctl_getnssid_s(taskpid_getprocctl(self), ns)                                /* Return SID of given `struct taskpid' (in given namespace; `0' if not mapped) */
+
+/* Return session ID of the calling/given thread. */
+#define task_getsid()                  __task_getmypgid(procgrp_getnssid(__tgmpgi_grp, __tgmpgi_pid->tp_ns))   /* Return SID of calling thread (in caller's namespace; panic/undefined if not mapped) */
+#define task_getsid_s()                __task_getmypgid(procgrp_getnssid_s(__tgmpgi_grp, __tgmpgi_pid->tp_ns)) /* Return SID of calling thread (in caller's namespace; `0' if not mapped) */
+#define task_getsid_of(thread)         taskpid_getsid(task_gettaskpid_of(thread))                                /* Return SID of given thread (in caller's namespace; panic/undefined if not mapped) */
+#define task_getsid_of_s(thread)       taskpid_getsid_s(task_gettaskpid_of(thread))                              /* Return SID of given thread (in caller's namespace; `0' if not mapped) */
+#define task_getrootsid()              taskpid_getrootsid(task_gettaskpid())                                     /* Return SID of calling thread (in root namespace) */
+#define task_getrootsid_of(thread)     taskpid_getrootsid(task_gettaskpid_of(thread))                            /* Return SID of given thread (in root namespace) */
+#define task_getnssid(ns)              taskpid_getnssid(task_gettaskpid(), ns)                                   /* Return SID of calling thread (in given namespace; panic/undefined if not mapped) */
+#define task_getnssid_s(ns)            taskpid_getnssid_s(task_gettaskpid(), ns)                                 /* Return SID of calling thread (in given namespace; `0' if not mapped) */
+#define task_getnssid_of(thread, ns)   taskpid_getnssid(task_gettaskpid_of(thread), ns)                          /* Return SID of given thread (in given namespace; panic/undefined if not mapped) */
+#define task_getnssid_of_s(thread, ns) taskpid_getnssid_s(task_gettaskpid_of(thread), ns)                        /* Return SID of given thread (in given namespace; `0' if not mapped) */
+
+
+
+
+#define __task_getppid(inherted_task, how)              \
+	({                                                  \
+		REF struct task *__tgpp_task = (inherted_task); \
+		pid_t __tgpp_res             = how;             \
+		decref_unlikely(__tgpp_task);                   \
+		__tgpp_res;                                     \
+	})
+#define __task_getmyppid(how)                                                  \
+	({                                                                         \
+		struct taskpid *__tgmpp_pid   = task_gettaskpid();                     \
+		REF struct task *__tgmpp_task = taskpid_getparentprocess(__tgmpp_pid); \
+		pid_t __tgpp_res              = how;                                   \
+		decref_unlikely(__tgmpp_task);                                         \
+		__tgpp_res;                                                            \
+	})
+
+/* Return parent process ID of a given `struct procctl' or `struct taskpid'. */
+#define procctl_getppid(self)         __task_getppid(procctl_getparentprocess(self), task_gettid_of(__tgpp_task))         /* Return parent PID of given `struct procctl' (in caller's namespace; panic/undefined if not mapped) */
+#define procctl_getppid_s(self)       __task_getppid(procctl_getparentprocess(self), task_gettid_of_s(__tgpp_task))       /* Return parent PID of given `struct procctl' (in caller's namespace; `0' if not mapped) */
+#define procctl_getrootppid(self)     __task_getppid(procctl_getparentprocess(self), task_getroottid_of(__tgpp_task))     /* Return parent PID of given `struct procctl' (in root namespace) */
+#define procctl_getnsppid(self, ns)   __task_getppid(procctl_getparentprocess(self), task_getnstid_of(__tgpp_task, ns))   /* Return parent PID of given `struct procctl' (in given namespace; panic/undefined if not mapped) */
+#define procctl_getnsppid_s(self, ns) __task_getppid(procctl_getparentprocess(self), task_getnstid_of_s(__tgpp_task, ns)) /* Return parent PID of given `struct procctl' (in given namespace; `0' if not mapped) */
+#define taskpid_getppid(self)         procctl_getppid(taskpid_getprocctl(self))                                           /* Return parent PID of given `struct taskpid' (in caller's namespace; panic/undefined if not mapped) */
+#define taskpid_getppid_s(self)       procctl_getppid_s(taskpid_getprocctl(self))                                         /* Return parent PID of given `struct taskpid' (in caller's namespace; `0' if not mapped) */
+#define taskpid_getrootppid(self)     procctl_getrootppid(taskpid_getprocctl(self))                                       /* Return parent PID of given `struct taskpid' (in root namespace) */
+#define taskpid_getnsppid(self, ns)   procctl_getnsppid(taskpid_getprocctl(self), ns)                                     /* Return parent PID of given `struct taskpid' (in given namespace; panic/undefined if not mapped) */
+#define taskpid_getnsppid_s(self, ns) procctl_getnsppid_s(taskpid_getprocctl(self), ns)                                   /* Return parent PID of given `struct taskpid' (in given namespace; `0' if not mapped) */
+
+/* Return parent process ID of the calling/given thread. */
+#define task_getppid()                __task_getmyppid(task_getnstid_of(__tgmpp_task, __tgmpp_pid->tp_ns))   /* Return parent PID of calling thread (in caller's namespace; panic/undefined if not mapped) */
+#define task_getppid_s()              __task_getmyppid(task_getnstid_of_s(__tgmpp_task, __tgmpp_pid->tp_ns)) /* Return parent PID of calling thread (in caller's namespace; `0' if not mapped) */
+#define task_getppid_of(self)         taskpid_getppid(task_gettaskpid_of(self))                              /* Return parent PID of given thread (in caller's namespace; panic/undefined if not mapped) */
+#define task_getppid_of_s(self)       taskpid_getppid_s(task_gettaskpid_of(self))                            /* Return parent PID of given thread (in caller's namespace; `0' if not mapped) */
+#define task_getrootppid()            taskpid_getrootppid(task_gettaskpid())                                 /* Return parent PID of calling thread (in root namespace) */
+#define task_getrootppid_of(self)     taskpid_getrootppid(task_gettaskpid_of(self))                          /* Return parent PID of given thread (in root namespace) */
+#define task_getnsppid(ns)            taskpid_getnsppid(task_gettaskpid(), ns)                               /* Return parent PID of calling thread (in given namespace; panic/undefined if not mapped) */
+#define task_getnsppid_s(ns)          taskpid_getnsppid_s(task_gettaskpid(), ns)                             /* Return parent PID of calling thread (in given namespace; `0' if not mapped) */
+#define task_getnsppid_of(self, ns)   taskpid_getnsppid(task_gettaskpid_of(self), ns)                        /* Return parent PID of given thread (in given namespace; panic/undefined if not mapped) */
+#define task_getnsppid_of_s(self, ns) taskpid_getnsppid_s(task_gettaskpid_of(self), ns)                      /* Return parent PID of given thread (in given namespace; `0' if not mapped) */
 
 
 DECL_END

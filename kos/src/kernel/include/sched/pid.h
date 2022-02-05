@@ -180,15 +180,15 @@ FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL
 taskpid_gettask_srch(struct taskpid *__restrict self)
 		THROWS(E_PROCESS_EXITED);
 
-/* Return the # of PIDs defined by `self' */
-#define taskpid_getpidnocount(self) ((self)->tp_ns->pn_ind + 1)
+/* Return the # of TIDs defined by `self' */
+#define taskpid_gettidcount(self) ((self)->tp_ns->pn_ind + 1)
 
-/* Return `self's PID number associated with `ns' */
+/* Return `self's TID number associated with `ns' */
 #ifdef NDEBUG
-#define taskpid_getnspidno(self, ns) \
+#define taskpid_getnstid(self, ns) \
 	_taskpid_slot_getpidno((self)->tp_pids[(ns)->pn_ind])
 #else /* NDEBUG */
-#define taskpid_getnspidno(self, ns)                                      \
+#define taskpid_getnstid(self, ns)                                        \
 	({                                                                    \
 		struct taskpid const *__tpgp_self = (self);                       \
 		struct pidns const *__tpgp_ns     = (ns);                         \
@@ -197,8 +197,8 @@ taskpid_gettask_srch(struct taskpid *__restrict self)
 	})
 #endif /* !NDEBUG */
 
-/* Same as `taskpid_getnspidno()', but return `0' if `self' doesn't appear in `ns' */
-#define taskpid_getnspidno_s(self, ns)                                       \
+/* Same as `taskpid_getnstid()', but return `0' if `self' doesn't appear in `ns' */
+#define taskpid_getnstid_s(self, ns)                                         \
 	({                                                                       \
 		struct taskpid const *__tpgps_self = (self);                         \
 		struct pidns const *__tpgps_ns     = (ns);                           \
@@ -207,19 +207,39 @@ taskpid_gettask_srch(struct taskpid *__restrict self)
 		 : 0);                                                               \
 	})
 
-#define taskpid_getpidno(self)   taskpid_getnspidno(self, THIS_PIDNS)
-#define taskpid_getpidno_s(self) taskpid_getnspidno_s(self, THIS_PIDNS)
+#define taskpid_gettid(self)   taskpid_getnstid(self, THIS_PIDNS)
+#define taskpid_gettid_s(self) taskpid_getnstid_s(self, THIS_PIDNS)
 
 
-/* Return `self's PID number within its own namespace */
-#define taskpid_getselfpidno(self)                                                  \
+/* Return `self's TID number within its own namespace */
+#define taskpid_getselftid(self)                                                    \
 	({                                                                              \
 		struct taskpid const *__tpgsp_self = (self);                                \
 		_taskpid_slot_getpidno(__tpgsp_self->tp_pids[__tpgsp_self->tp_ns->pn_ind]); \
 	})
 
-/* Return `self's PID number within the root namespace */
-#define taskpid_getrootpidno(self) _taskpid_slot_getpidno((self)->tp_pids[0])
+/* Return `self's TID number within the root namespace */
+#define taskpid_getroottid(self) _taskpid_slot_getpidno((self)->tp_pids[0])
+
+/* Query the process ID of a given taskpid */
+#define taskpid_gettidcount(self) ((self)->tp_ns->pn_ind + 1)
+
+#ifdef CONFIG_USE_NEW_GROUP
+/* Query sub-elements of `struct taskpid' */
+#define taskpid_getprocpid(self)   (self)->tp_proc
+#define taskpid_getprocctl(self)   (self)->tp_pctl
+#define taskpid_isaprocess(self)   ((self) == taskpid_getprocpid(self))
+#define _taskpid_isaprocess(self)  ({ struct taskpid const *__tpiap_self = (self); taskpid_isaprocess(__tpiap_self); })
+
+/* Return `self's PID number associated with `ns' */
+#define taskpid_getnspid(self, ns)   taskpid_getnstid(taskpid_getprocpid(self), ns)
+#define taskpid_getnspid_s(self, ns) taskpid_getnstid_s(taskpid_getprocpid(self), ns)
+#define taskpid_getpid(self)         taskpid_gettid(taskpid_getprocpid(self))
+#define taskpid_getpid_s(self)       taskpid_gettid_s(taskpid_getprocpid(self))
+#define taskpid_getselfpid(self)     taskpid_getselftid(taskpid_getprocpid(self))
+#define taskpid_getrootpid(self)     taskpid_getroottid(taskpid_getprocpid(self))
+#endif /* CONFIG_USE_NEW_GROUP */
+
 
 
 
@@ -385,10 +405,6 @@ NOTHROW(FCALL pidns_grpremove)(struct pidns *__restrict self, pid_t gpid);
 
 #ifdef CONFIG_USE_NEW_GROUP
 
-#define taskpid_getprocpid(self)   ((self)->tp_proc)
-#define taskpid_getprocctl(self)   ((self)->tp_pctl)
-#define taskpid_isaprocess(self)   ((self) == taskpid_getprocpid(self))
-#define _taskpid_isaprocess(self)  ({ struct taskpid const *__tpiap_self = (self); taskpid_isaprocess(__tpiap_self); })
 #define task_gettaskpid()          THIS_TASKPID                                   /* Return task-pid of calling thread */
 #define task_getprocpid()          task_gettaskpid()->tp_proc                     /* Return proc-pid of calling thread */
 #define task_gettaskpid_of(thread) FORTASK(thread, this_taskpid)                  /* Return task-pid of given thread */
@@ -413,26 +429,26 @@ NOTHROW(FCALL pidns_grpremove)(struct pidns *__restrict self, pid_t gpid);
  * of the process leader) of the calling thread. The returned
  * IDS are either relative to  the task's own PID  namespace,
  * to the ROOT pid namespace, or the given namespace. */
-#define task_gettid()                  taskpid_getselfpidno(task_gettaskpid())              /* Return TID of calling thread (in its own namespace) */
-#define task_gettid_of(thread)         taskpid_getpidno(task_gettaskpid_of(thread))         /* Return TID of given thread (in caller's namespace; panic/undefined if not mapped) */
-#define task_gettid_of_s(thread)       taskpid_getpidno_s(task_gettaskpid_of(thread))       /* Return TID of given thread (in caller's namespace; `0' if not mapped) */
-#define task_getselftid_of(thread)     taskpid_getselfpidno(task_gettaskpid_of(thread))     /* Return TID of given thread (in its own namespace) */
-#define task_getroottid()              taskpid_getrootpidno(task_gettaskpid())              /* Return TID of calling thread (in root namespace) */
-#define task_getroottid_of(thread)     taskpid_getrootpidno(task_gettaskpid_of(thread))     /* Return TID of given thread (in root namespace) */
-#define task_getnstid(ns)              taskpid_getnspidno(task_gettaskpid(), ns)            /* Return TID of calling thread (in given namespace; panic/undefined if not mapped) */
-#define task_getnstid_s(ns)            taskpid_getnspidno_s(task_gettaskpid(), ns)          /* Return TID of calling thread (in given namespace; `0' if not mapped) */
-#define task_getnstid_of(thread, ns)   taskpid_getnspidno(task_gettaskpid_of(thread), ns)   /* Return TID of given thread (in given namespace; panic/undefined if not mapped) */
-#define task_getnstid_of_s(thread, ns) taskpid_getnspidno_s(task_gettaskpid_of(thread), ns) /* Return TID of given thread (in given namespace; `0' if not mapped) */
-#define task_getpid()                  taskpid_getselfpidno(task_getprocpid())              /* Return PID of calling thread (in its own namespace) */
-#define task_getpid_of(thread)         taskpid_getpidno(task_getprocpid_of(thread))         /* Return PID of given thread (in caller's namespace; panic/undefined if not mapped) */
-#define task_getpid_of_s(thread)       taskpid_getpidno_s(task_getprocpid_of(thread))       /* Return PID of given thread (in caller's namespace; `0' if not mapped) */
-#define task_getselfpid_of(thread)     taskpid_getselfpidno(task_getprocpid_of(thread))     /* Return PID of given thread (in its own namespace) */
-#define task_getrootpid()              taskpid_getrootpidno(task_getprocpid())              /* Return PID of calling thread (in root namespace) */
-#define task_getrootpid_of(thread)     taskpid_getrootpidno(task_getprocpid_of(thread))     /* Return PID of given thread (in root namespace) */
-#define task_getnspid(ns)              taskpid_getnspidno(task_getprocpid(), ns)            /* Return PID of calling thread (in given namespace; panic/undefined if not mapped) */
-#define task_getnspid_s(ns)            taskpid_getnspidno_s(task_getprocpid(), ns)          /* Return PID of calling thread (in given namespace; `0' if not mapped) */
-#define task_getnspid_of(thread, ns)   taskpid_getnspidno(task_getprocpid_of(thread), ns)   /* Return PID of given thread (in given namespace; panic/undefined if not mapped) */
-#define task_getnspid_of_s(thread, ns) taskpid_getnspidno_s(task_getprocpid_of(thread), ns) /* Return PID of given thread (in given namespace; `0' if not mapped) */
+#define task_gettid()                  taskpid_getselftid(task_gettaskpid())              /* Return TID of calling thread (in its own namespace) */
+#define task_gettid_of(thread)         taskpid_gettid(task_gettaskpid_of(thread))         /* Return TID of given thread (in caller's namespace; panic/undefined if not mapped) */
+#define task_gettid_of_s(thread)       taskpid_gettid_s(task_gettaskpid_of(thread))       /* Return TID of given thread (in caller's namespace; `0' if not mapped) */
+#define task_getselftid_of(thread)     taskpid_getselftid(task_gettaskpid_of(thread))     /* Return TID of given thread (in its own namespace) */
+#define task_getroottid()              taskpid_getroottid(task_gettaskpid())              /* Return TID of calling thread (in root namespace) */
+#define task_getroottid_of(thread)     taskpid_getroottid(task_gettaskpid_of(thread))     /* Return TID of given thread (in root namespace) */
+#define task_getnstid(ns)              taskpid_getnstid(task_gettaskpid(), ns)            /* Return TID of calling thread (in given namespace; panic/undefined if not mapped) */
+#define task_getnstid_s(ns)            taskpid_getnstid_s(task_gettaskpid(), ns)          /* Return TID of calling thread (in given namespace; `0' if not mapped) */
+#define task_getnstid_of(thread, ns)   taskpid_getnstid(task_gettaskpid_of(thread), ns)   /* Return TID of given thread (in given namespace; panic/undefined if not mapped) */
+#define task_getnstid_of_s(thread, ns) taskpid_getnstid_s(task_gettaskpid_of(thread), ns) /* Return TID of given thread (in given namespace; `0' if not mapped) */
+#define task_getpid()                  taskpid_getselftid(task_getprocpid())              /* Return PID of calling thread (in its own namespace) */
+#define task_getpid_of(thread)         taskpid_gettid(task_getprocpid_of(thread))         /* Return PID of given thread (in caller's namespace; panic/undefined if not mapped) */
+#define task_getpid_of_s(thread)       taskpid_gettid_s(task_getprocpid_of(thread))       /* Return PID of given thread (in caller's namespace; `0' if not mapped) */
+#define task_getselfpid_of(thread)     taskpid_getselftid(task_getprocpid_of(thread))     /* Return PID of given thread (in its own namespace) */
+#define task_getrootpid()              taskpid_getroottid(task_getprocpid())              /* Return PID of calling thread (in root namespace) */
+#define task_getrootpid_of(thread)     taskpid_getroottid(task_getprocpid_of(thread))     /* Return PID of given thread (in root namespace) */
+#define task_getnspid(ns)              taskpid_getnstid(task_getprocpid(), ns)            /* Return PID of calling thread (in given namespace; panic/undefined if not mapped) */
+#define task_getnspid_s(ns)            taskpid_getnstid_s(task_getprocpid(), ns)          /* Return PID of calling thread (in given namespace; `0' if not mapped) */
+#define task_getnspid_of(thread, ns)   taskpid_getnstid(task_getprocpid_of(thread), ns)   /* Return PID of given thread (in given namespace; panic/undefined if not mapped) */
+#define task_getnspid_of_s(thread, ns) taskpid_getnstid_s(task_getprocpid_of(thread), ns) /* Return PID of given thread (in given namespace; `0' if not mapped) */
 
 #endif /* CONFIG_USE_NEW_GROUP */
 

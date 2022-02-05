@@ -607,7 +607,7 @@ set_timestamp_and_write_data:
 			if likely(ADDR_ISKERN(mypid) && mypid != NULL)
 #endif /* !KERNELSPACE_HIGHMEM */
 			{
-				self->sp_tid = taskpid_getrootpidno(mypid);
+				self->sp_tid = taskpid_getroottid(mypid);
 			} else {
 				self->sp_tid = 0;
 			}

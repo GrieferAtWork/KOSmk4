@@ -242,6 +242,11 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BADBUF,                    /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: O_DIRECT-io attempted with unaligned buffer addr. */
 	E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_APPEND,                    /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Tried to write(2) with both `O_DIRECT' and `O_APPEND' */
 	E_INVALID_ARGUMENT_CONTEXT_TASK_NOT_EXITED,                    /* E_INVALID_ARGUMENT_BAD_STATE: Tried to use `TASK_IOC_EXITCODE', but the thread hasn't exited, yet. */
+	E_INVALID_ARGUMENT_CONTEXT_SETPGID_DIFFERENT_SESSION,          /* E_INVALID_ARGUMENT_BAD_STATE: Tried to set the progress group of a process apart of a different session */
+	E_INVALID_ARGUMENT_CONTEXT_SETPGID_NO_SUCH_GROUP,              /* E_INVALID_ARGUMENT_BAD_STATE: `pgid' doesn't indicate creation of a new process group, and no group with the given ID exists in the calling session. */
+	E_INVALID_ARGUMENT_CONTEXT_SETPGID_IS_SESSION_LEADER,          /* E_INVALID_ARGUMENT_BAD_STATE: `pid' refers to a process that is a session leader */
+	E_INVALID_ARGUMENT_CONTEXT_SETPGID_INVALID_PGID,               /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid `pgid' passed to `setpgid(2)' */
+	E_INVALID_ARGUMENT_CONTEXT_SETSID_ALREADY_GROUP_LEADER,        /* E_INVALID_ARGUMENT_BAD_STATE: The process calling `setsid(2)' is already a process group leader */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -459,6 +464,11 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BADBUF                    E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BADBUF                    /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: O_DIRECT-io attempted with unaligned buffer addr. */
 #define E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_APPEND                    E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_APPEND                    /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Tried to write(2) with both `O_DIRECT' and `O_APPEND' */
 #define E_INVALID_ARGUMENT_CONTEXT_TASK_NOT_EXITED                    E_INVALID_ARGUMENT_CONTEXT_TASK_NOT_EXITED                    /* E_INVALID_ARGUMENT_BAD_STATE: Tried to use `TASK_IOC_EXITCODE', but the thread hasn't exited, yet. */
+#define E_INVALID_ARGUMENT_CONTEXT_SETPGID_DIFFERENT_SESSION          E_INVALID_ARGUMENT_CONTEXT_SETPGID_DIFFERENT_SESSION          /* E_INVALID_ARGUMENT_BAD_STATE: Tried to set the progress group of a process apart of a different session */
+#define E_INVALID_ARGUMENT_CONTEXT_SETPGID_NO_SUCH_GROUP              E_INVALID_ARGUMENT_CONTEXT_SETPGID_NO_SUCH_GROUP              /* E_INVALID_ARGUMENT_BAD_STATE: `pgid' doesn't indicate creation of a new process group, and no group with the given ID exists in the calling session. */
+#define E_INVALID_ARGUMENT_CONTEXT_SETPGID_IS_SESSION_LEADER          E_INVALID_ARGUMENT_CONTEXT_SETPGID_IS_SESSION_LEADER          /* E_INVALID_ARGUMENT_BAD_STATE: `pid' refers to a process that is a session leader */
+#define E_INVALID_ARGUMENT_CONTEXT_SETPGID_INVALID_PGID               E_INVALID_ARGUMENT_CONTEXT_SETPGID_INVALID_PGID               /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid `pgid' passed to `setpgid(2)' */
+#define E_INVALID_ARGUMENT_CONTEXT_SETSID_ALREADY_GROUP_LEADER        E_INVALID_ARGUMENT_CONTEXT_SETSID_ALREADY_GROUP_LEADER        /* E_INVALID_ARGUMENT_BAD_STATE: The process calling `setsid(2)' is already a process group leader */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -673,6 +683,11 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BADBUF                    190 /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: O_DIRECT-io attempted with unaligned buffer addr. */
 #define E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_APPEND                    191 /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Tried to write(2) with both `O_DIRECT' and `O_APPEND' */
 #define E_INVALID_ARGUMENT_CONTEXT_TASK_NOT_EXITED                    192 /* E_INVALID_ARGUMENT_BAD_STATE: Tried to use `TASK_IOC_EXITCODE', but the thread hasn't exited, yet. */
+#define E_INVALID_ARGUMENT_CONTEXT_SETPGID_DIFFERENT_SESSION          193 /* E_INVALID_ARGUMENT_BAD_STATE: Tried to set the progress group of a process apart of a different session */
+#define E_INVALID_ARGUMENT_CONTEXT_SETPGID_NO_SUCH_GROUP              194 /* E_INVALID_ARGUMENT_BAD_STATE: `pgid' doesn't indicate creation of a new process group, and no group with the given ID exists in the calling session. */
+#define E_INVALID_ARGUMENT_CONTEXT_SETPGID_IS_SESSION_LEADER          195 /* E_INVALID_ARGUMENT_BAD_STATE: `pid' refers to a process that is a session leader */
+#define E_INVALID_ARGUMENT_CONTEXT_SETPGID_INVALID_PGID               196 /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid `pgid' passed to `setpgid(2)' */
+#define E_INVALID_ARGUMENT_CONTEXT_SETSID_ALREADY_GROUP_LEADER        197 /* E_INVALID_ARGUMENT_BAD_STATE: The process calling `setsid(2)' is already a process group leader */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 
