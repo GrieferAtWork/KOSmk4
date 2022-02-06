@@ -94,7 +94,7 @@
 #ifdef LIBVIO_CONFIG_ENABLED
 #include <kernel/mman/mfile.h>
 #include <kernel/types.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 
 #include <hybrid/byteorder.h>
 #include <hybrid/sync/atomic-rwlock.h>

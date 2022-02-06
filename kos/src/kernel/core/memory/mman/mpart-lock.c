@@ -35,7 +35,7 @@
 #include <kernel/mman/sync.h>
 #include <kernel/paging.h>
 #include <kernel/swap.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>

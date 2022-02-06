@@ -31,7 +31,7 @@
 #include <hybrid/typecore.h>
 
 #ifdef __KERNEL__
-#include <sched/signal.h>
+#include <sched/sig.h>
 #else /* __KERNEL__ */
 #include <kos/futex.h>
 #endif /* !__KERNEL__ */

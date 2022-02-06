@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ee3895b */
+/* HASH CRC-32:0x416eb8b7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <kos/anno.h>
 #include <kos/bits/shared-lock.h>
 #include <hybrid/__assert.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(shared_lock_waitfor_with_timeout_nx) __ATTR_WUNUSED __BLOCKING __ATTR_NONNULL((1)) __BOOL
 (__FCALL __LIBC_LOCAL_NAME(shared_lock_waitfor_with_timeout_nx))(struct shared_lock *__restrict __self, __shared_lock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {

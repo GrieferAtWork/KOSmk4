@@ -30,7 +30,7 @@
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <sched/eventfd.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 
 #include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>

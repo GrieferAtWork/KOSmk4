@@ -30,7 +30,7 @@
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>

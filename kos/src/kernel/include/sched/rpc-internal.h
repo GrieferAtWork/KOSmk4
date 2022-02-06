@@ -24,7 +24,7 @@
 
 #include <kernel/types.h>
 #include <sched/pertask.h>
-#include <sched/signal.h> /* `struct sig' */
+#include <sched/sig.h> /* `struct sig' */
 
 #include <hybrid/sequence/list.h>
 

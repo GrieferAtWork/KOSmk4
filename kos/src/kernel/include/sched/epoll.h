@@ -26,8 +26,8 @@
 #include <kernel/malloc.h>
 #include <kernel/types.h>
 #include <sched/mutex.h>
-#include <sched/signal-completion.h>
-#include <sched/signal.h>
+#include <sched/sig-completion.h>
+#include <sched/sig.h>
 
 #include <sys/epoll.h>
 

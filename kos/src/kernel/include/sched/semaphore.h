@@ -24,7 +24,7 @@
 
 #include <kernel/types.h>
 #include <sched/pertask.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>

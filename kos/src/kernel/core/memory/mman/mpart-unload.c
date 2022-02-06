@@ -28,7 +28,7 @@
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <sched/async.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>

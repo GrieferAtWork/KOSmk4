@@ -26,7 +26,7 @@
 #include <kernel/types.h>
 #include <misc/unlockinfo.h>
 #include <sched/atomic64.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
@@ -43,7 +43,7 @@
 #endif /* __WANT_FS_INIT */
 
 #ifdef __WANT_MFILE__mf_compl
-#include <sched/signal-completion.h>
+#include <sched/sig-completion.h>
 #endif /* __WANT_MFILE__mf_compl */
 
 #if (__SIZEOF_POINTER__ < 8 && defined(__WANT_MFILE_INIT_mf_filesize_symbol) && defined(__WANT_FS_INIT))

@@ -27,7 +27,7 @@
 #include <kernel/fpu.h>
 #include <sched/cpu.h>
 #include <sched/scheduler.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>

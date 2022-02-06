@@ -26,7 +26,7 @@
 #include <kernel/types.h>
 #include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_USERPROCMASK */
 #include <sched/pertask.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 
 #include <hybrid/host.h>
 #include <hybrid/sync/atomic-rwlock.h>

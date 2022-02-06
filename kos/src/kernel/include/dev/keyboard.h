@@ -25,7 +25,7 @@
 #include <debugger/config.h> /* CONFIG_HAVE_DEBUGGER */
 #include <dev/mktty.h>
 #include <kernel/types.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 
 #include <kos/aref.h>
 #include <kos/keyboard.h>

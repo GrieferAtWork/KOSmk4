@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa76a8350 */
+/* HASH CRC-32:0xa54a3876 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -130,7 +130,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING NONNULL((1)) boo
 }
 #ifdef __KERNEL__
 #include <hybrid/__assert.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 #else /* __KERNEL__ */
 #include <kos/syscalls.h>
 #include <kos/asm/futex.h>
@@ -176,7 +176,7 @@ success:
 }
 #ifdef __KERNEL__
 #include <hybrid/__assert.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 #else /* __KERNEL__ */
 #include <kos/syscalls.h>
 #include <kos/asm/futex.h>
@@ -567,7 +567,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING NONNULL((1)) boo
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #endif /* !__KERNEL__ */
 #ifdef __KERNEL__
-#include <sched/signal.h>
+#include <sched/sig.h>
 /* >> shared_rwlock_read_nx(3)
  * Acquire a read-lock to the given shared_rwlock.
  * @return: true:  Successfully acquired a read-lock.
@@ -593,7 +593,7 @@ success:
 	COMPILER_READ_BARRIER();
 	return true;
 }
-#include <sched/signal.h>
+#include <sched/sig.h>
 /* >> shared_rwlock_write_nx(3)
  * Acquire a write-lock to the given shared_rwlock.
  * Acquire  a  lock   to  the  given   shared_lock.
@@ -620,7 +620,7 @@ success:
 	COMPILER_BARRIER();
 	return true;
 }
-#include <sched/signal.h>
+#include <sched/sig.h>
 /* >> shared_rwlock_read_with_timeout_nx(3)
  * Acquire a read-lock to the given shared_rwlock.
  * @return: true:  Successfully acquired a read-lock.
@@ -648,7 +648,7 @@ success:
 	COMPILER_READ_BARRIER();
 	return true;
 }
-#include <sched/signal.h>
+#include <sched/sig.h>
 /* >> shared_rwlock_write_with_timeout_nx(3)
  * Acquire a write-lock to the given shared_rwlock.
  * @return: true:  Successfully acquired a write-lock.
@@ -676,7 +676,7 @@ success:
 	COMPILER_BARRIER();
 	return true;
 }
-#include <sched/signal.h>
+#include <sched/sig.h>
 /* >> shared_rwlock_waitread_nx(3)
  * Wait until acquiring a read-lock to `self' no longer blocks
  * @return: true:  A read-lock became available.
@@ -702,7 +702,7 @@ success:
 	COMPILER_READ_BARRIER();
 	return true;
 }
-#include <sched/signal.h>
+#include <sched/sig.h>
 /* >> shared_rwlock_waitwrite_nx(3)
  * Wait until acquiring a write-lock to `self' no longer blocks
  * Acquire a lock to the given shared_lock.
@@ -729,7 +729,7 @@ success:
 	COMPILER_BARRIER();
 	return true;
 }
-#include <sched/signal.h>
+#include <sched/sig.h>
 /* >> shared_rwlock_waitread_with_timeout_nx(3)
  * Wait until acquiring a read-lock to `self' no longer blocks
  * @return: true:  A read-lock became available.
@@ -757,7 +757,7 @@ success:
 	COMPILER_READ_BARRIER();
 	return true;
 }
-#include <sched/signal.h>
+#include <sched/sig.h>
 /* >> shared_rwlock_waitwrite_with_timeout_nx(3)
  * Wait until acquiring a write-lock to `self' no longer blocks
  * @return: true:  A write-lock became available.

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x450d49f4 */
+/* HASH CRC-32:0xec926b28 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #ifdef __KERNEL__
 #include <hybrid/__assert.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 #else /* __KERNEL__ */
 #include <kos/syscalls.h>
 #include <kos/asm/futex.h>

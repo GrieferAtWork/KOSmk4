@@ -17,13 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_SCHED_SIGNAL_COMPLETION_H
-#define GUARD_KERNEL_INCLUDE_SCHED_SIGNAL_COMPLETION_H 1
+#ifndef GUARD_KERNEL_INCLUDE_SCHED_SIG_COMPLETION_H
+#define GUARD_KERNEL_INCLUDE_SCHED_SIG_COMPLETION_H 1
 
 #include <kernel/compiler.h>
 
 #include <kernel/types.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 
 #if TASK_CONNECTION_STAT_BROADCAST == 0 && !defined(NDEBUG)
 #include <hybrid/__assert.h>
@@ -435,4 +435,4 @@ DECL_END
 #endif /* __CC__ */
 
 
-#endif /* !GUARD_KERNEL_INCLUDE_SCHED_SIGNAL_COMPLETION_H */
+#endif /* !GUARD_KERNEL_INCLUDE_SCHED_SIG_COMPLETION_H */

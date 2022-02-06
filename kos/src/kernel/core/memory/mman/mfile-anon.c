@@ -33,7 +33,7 @@
 
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
-#include <sched/signal-completion.h>
+#include <sched/sig-completion.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>

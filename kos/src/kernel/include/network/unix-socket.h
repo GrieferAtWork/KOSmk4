@@ -23,7 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/types.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 
 #include <hybrid/__atomic.h>
 

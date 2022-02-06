@@ -38,7 +38,7 @@
 #include <sched/group.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 

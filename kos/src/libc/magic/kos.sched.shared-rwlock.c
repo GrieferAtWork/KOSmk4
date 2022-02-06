@@ -40,7 +40,7 @@
 
 #ifdef __KERNEL__
 #include <kernel/types.h> /* ktime_t */
-#include <sched/signal.h>
+#include <sched/sig.h>
 #else /* __KERNEL__ */
 }%[insert:prefix(
 #include <bits/os/timespec.h>
@@ -280,7 +280,7 @@ static struct @lfutexexpr@ const @__shared_rwlock_waitwriteexpr@[] = {
 %[define(DEFINE_SHARED_RWLOCK_READ_PREFIX =
 @@pp_ifdef __KERNEL__@@
 #include <hybrid/__assert.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 @@pp_else@@
 DEFINE_SHARED_RWLOCK_READ_USER_PREFIX
 @@pp_endif@@
@@ -289,7 +289,7 @@ DEFINE_SHARED_RWLOCK_READ_USER_PREFIX
 %[define(DEFINE_SHARED_RWLOCK_WRITE_PREFIX =
 @@pp_ifdef __KERNEL__@@
 #include <hybrid/__assert.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 @@pp_else@@
 DEFINE_SHARED_RWLOCK_WRITE_USER_PREFIX
 @@pp_endif@@
@@ -705,7 +705,7 @@ $bool shared_rwlock_waitwrite_with_timeout64([[nonnull]] struct shared_rwlock *_
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
+[[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_rwlock_read_nx([[nonnull]] struct shared_rwlock *__restrict self) {
 	__hybrid_assert(!@task_wasconnected@());
 	while (!shared_rwlock_tryread(self)) {
@@ -736,7 +736,7 @@ success:
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
+[[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_rwlock_write_nx([[nonnull]] struct shared_rwlock *__restrict self) {
 	__hybrid_assert(!@task_wasconnected@());
 	while (!shared_rwlock_trywrite(self)) {
@@ -767,7 +767,7 @@ success:
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
+[[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_rwlock_read_with_timeout_nx([[nonnull]] struct shared_rwlock *__restrict self,
                                          __shared_rwlock_timespec abs_timeout) {
 	__hybrid_assert(!@task_wasconnected@());
@@ -799,7 +799,7 @@ success:
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
+[[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_rwlock_write_with_timeout_nx([[nonnull]] struct shared_rwlock *__restrict self,
                                           __shared_rwlock_timespec abs_timeout) {
 	__hybrid_assert(!@task_wasconnected@());
@@ -829,7 +829,7 @@ success:
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
+[[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_rwlock_waitread_nx([[nonnull]] struct shared_rwlock *__restrict self) {
 	__hybrid_assert(!@task_wasconnected@());
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == ($uintptr_t)-1) {
@@ -860,7 +860,7 @@ success:
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
+[[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_rwlock_waitwrite_nx([[nonnull]] struct shared_rwlock *__restrict self) {
 	__hybrid_assert(!@task_wasconnected@());
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
@@ -891,7 +891,7 @@ success:
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
+[[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_rwlock_waitread_with_timeout_nx([[nonnull]] struct shared_rwlock *__restrict self,
                                              __shared_rwlock_timespec abs_timeout) {
 	__hybrid_assert(!@task_wasconnected@());
@@ -923,7 +923,7 @@ success:
 [[crt_impl_if(defined(__KERNEL__)), requires(defined(__KERNEL__))]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[impl_include("<hybrid/__assert.h>", "<sched/signal.h>")]]
+[[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
 $bool shared_rwlock_waitwrite_with_timeout_nx([[nonnull]] struct shared_rwlock *__restrict self,
                                               __shared_rwlock_timespec abs_timeout) {
 	__hybrid_assert(!@task_wasconnected@());

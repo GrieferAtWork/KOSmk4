@@ -47,7 +47,7 @@
 #include "termio.h"
 
 #ifdef __KERNEL__
-#include <sched/signal.h>
+#include <sched/sig.h>
 #else /* __KERNEL__ */
 #include <kos/futexexpr.h>
 #endif /* !__KERNEL__ */

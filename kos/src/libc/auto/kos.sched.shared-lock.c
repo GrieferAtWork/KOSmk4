@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4c814d0 */
+/* HASH CRC-32:0xbf85526 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ DECL_BEGIN
 
 #ifdef __KERNEL__
 #include <hybrid/__assert.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 #else /* __KERNEL__ */
 #include <kos/syscalls.h>
 #include <kos/asm/futex.h>
@@ -245,7 +245,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING NONNULL((1)) boo
 #endif /* !__KERNEL__ */
 #ifdef __KERNEL__
 #include <hybrid/__assert.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 /* >> shared_lock_acquire_nx(3)
  * Acquire a lock to the given shared_lock.
  * @return: true:  Successfully acquired a lock.
@@ -272,7 +272,7 @@ success:
 	return true;
 }
 #include <hybrid/__assert.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 /* >> shared_lock_acquire_with_timeout_nx(3)
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
@@ -301,7 +301,7 @@ success:
 	return true;
 }
 #include <hybrid/__assert.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 /* >> shared_lock_waitfor_nx(3)
  * Wait that `self' becomes available.
  * @return: true:  The lock became available.
@@ -328,7 +328,7 @@ success:
 	return true;
 }
 #include <hybrid/__assert.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 /* >> shared_lock_waitfor_with_timeout_nx(3)
  * Wait that `self' becomes available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.

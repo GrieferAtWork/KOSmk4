@@ -30,7 +30,7 @@
 #include <kernel/mman/mpartmeta.h>
 #include <misc/unlockinfo.h>
 #include <sched/atomic64.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>

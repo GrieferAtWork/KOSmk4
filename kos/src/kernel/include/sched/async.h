@@ -24,7 +24,7 @@
 
 #include <kernel/types.h>
 
-#include <sched/signal-completion.h>
+#include <sched/sig-completion.h>
 
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-lock.h>

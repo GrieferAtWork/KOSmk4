@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_SCHED_SIGNAL_H
-#define GUARD_KERNEL_INCLUDE_SCHED_SIGNAL_H 1
+#ifndef GUARD_KERNEL_INCLUDE_SCHED_SIG_H
+#define GUARD_KERNEL_INCLUDE_SCHED_SIG_H 1
 
 #include <kernel/compiler.h>
 
@@ -878,4 +878,4 @@ unsigned int NOTHROW(KCALL task_tryyield)(void);
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_SCHED_SIGNAL_H */
+#endif /* !GUARD_KERNEL_INCLUDE_SCHED_SIG_H */

@@ -65,7 +65,7 @@
 #ifndef GUARD_KERNEL_INCLUDE_SCHED_PID_H
 #include <sched/pid.h>
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_PID_H */
-#include <sched/signal.h>
+#include <sched/sig.h>
 
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-rwlock.h>

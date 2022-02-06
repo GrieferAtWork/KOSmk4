@@ -64,7 +64,7 @@
 #include <kernel/printk.h>
 #include <kernel/syslog.h>
 #include <kernel/vboxgdb.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xafe33617 */
+/* HASH CRC-32:0x957c9614 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,7 +88,7 @@ __LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __
 __NAMESPACE_LOCAL_END
 #ifdef __KERNEL__
 #include <hybrid/__assert.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 #else /* __KERNEL__ */
 #include <kos/syscalls.h>
 #include <kos/asm/futex.h>

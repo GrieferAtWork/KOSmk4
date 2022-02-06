@@ -24,7 +24,7 @@
 
 #include <kernel/fs/chrdev.h>
 #include <kernel/types.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 
 #include <hybrid/sync/atomic-rwlock.h>
 

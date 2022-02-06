@@ -28,7 +28,7 @@
 #include <kernel/user.h>
 #include <sched/cred.h>
 #include <sched/rpc.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 
 #include <hybrid/host.h>
 #include <hybrid/pointer.h>

@@ -29,7 +29,7 @@
 
 #ifdef __KERNEL__
 #include <kernel/types.h> /* ktime_t */
-#include <sched/signal.h>
+#include <sched/sig.h>
 #define __shared_rwlock_timespec ktime_t
 #else /* __KERNEL__ */
 #include <bits/os/timespec.h>

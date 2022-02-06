@@ -63,7 +63,7 @@
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
 #include <misc/unlockinfo.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 

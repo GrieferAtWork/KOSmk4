@@ -31,7 +31,7 @@
 #include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
 #include <kernel/printk.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>

@@ -30,7 +30,7 @@
 #include <kernel/mman/mpart.h>
 #include <kernel/types.h>
 #include <sched/cpu.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 
 #include <hybrid/host.h>
 #include <hybrid/sequence/list.h>

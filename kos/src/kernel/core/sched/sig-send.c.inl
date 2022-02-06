@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
-#include "signal.c"
+#include "sig.c"
 //#define         DEFINE_sig_send
 //#define      DEFINE_sig_altsend
 //#define    DEFINE_sig_send_nopr

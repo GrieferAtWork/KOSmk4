@@ -25,7 +25,7 @@
 #ifdef CONFIG_USE_NEW_GROUP
 #include <kernel/types.h>
 #include <sched/pid.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-lock.h>

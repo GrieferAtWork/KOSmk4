@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_SCHED_SIGNAL_C
-#define GUARD_KERNEL_INCLUDE_SCHED_SIGNAL_C 1
+#ifndef GUARD_KERNEL_INCLUDE_SCHED_SIG_C
+#define GUARD_KERNEL_INCLUDE_SCHED_SIG_C 1
 #define __SIG_INTERNAL_EXPOSE_CONTROL_WORD 1
 #define _KOS_SOURCE 1
 
@@ -30,9 +30,9 @@
 #include <kernel/selftest.h> /* DEFINE_TEST */
 #include <sched/pertask.h>
 #include <sched/rpc.h>
-#include <sched/signal-completion.h>
-#include <sched/signal-select.h>
-#include <sched/signal.h>
+#include <sched/sig-completion.h>
+#include <sched/sig-select.h>
+#include <sched/sig.h>
 #include <sched/task-clone.h> /* DEFINE_PERTASK_RELOCATION */
 #include <sched/task.h>
 
@@ -2334,85 +2334,85 @@ DECL_END
 
 #ifndef __INTELLISENSE__
 #define DEFINE_sig_send
-#include "signal-send.c.inl"
+#include "sig-send.c.inl"
 
 #define DEFINE_sig_send_nopr
-#include "signal-send.c.inl"
+#include "sig-send.c.inl"
 
 #define DEFINE_sig_altsend
-#include "signal-send.c.inl"
+#include "sig-send.c.inl"
 
 #define DEFINE_sig_altsend_nopr
-#include "signal-send.c.inl"
+#include "sig-send.c.inl"
 
 #define DEFINE_sig_sendto
-#include "signal-send.c.inl"
+#include "sig-send.c.inl"
 
 #define DEFINE_sig_sendto_nopr
-#include "signal-send.c.inl"
+#include "sig-send.c.inl"
 
 #define DEFINE_sig_altsendto
-#include "signal-send.c.inl"
+#include "sig-send.c.inl"
 
 #define DEFINE_sig_altsendto_nopr
-#include "signal-send.c.inl"
+#include "sig-send.c.inl"
 
 #define DEFINE_sig_broadcast
-#include "signal-send.c.inl"
+#include "sig-send.c.inl"
 
 #define DEFINE_sig_broadcast_nopr
-#include "signal-send.c.inl"
+#include "sig-send.c.inl"
 
 #define DEFINE_sig_altbroadcast
-#include "signal-send.c.inl"
+#include "sig-send.c.inl"
 
 #define DEFINE_sig_altbroadcast_nopr
-#include "signal-send.c.inl"
+#include "sig-send.c.inl"
 
 #define DEFINE_sig_broadcast_as_nopr
-#include "signal-send.c.inl"
+#include "sig-send.c.inl"
 
 #define DEFINE_sig_broadcast_cleanup_nopr
-#include "signal-send.c.inl"
+#include "sig-send.c.inl"
 
 #define DEFINE_sig_broadcast_as_cleanup_nopr
-#include "signal-send.c.inl"
+#include "sig-send.c.inl"
 
 #define DEFINE_sig_broadcast_for_fini
-#include "signal-send.c.inl"
+#include "sig-send.c.inl"
 
 #define DEFINE_sig_broadcast_for_fini_nopr
-#include "signal-send.c.inl"
+#include "sig-send.c.inl"
 
 #define DEFINE_sig_altbroadcast_for_fini
-#include "signal-send.c.inl"
+#include "sig-send.c.inl"
 
 #define DEFINE_sig_altbroadcast_for_fini_nopr
-#include "signal-send.c.inl"
+#include "sig-send.c.inl"
 
 #define DEFINE_sig_broadcast_as_for_fini_nopr
-#include "signal-send.c.inl"
+#include "sig-send.c.inl"
 
 #define DEFINE_sig_broadcast_for_fini_cleanup_nopr
-#include "signal-send.c.inl"
+#include "sig-send.c.inl"
 
 #define DEFINE_sig_broadcast_as_for_fini_cleanup_nopr
-#include "signal-send.c.inl"
+#include "sig-send.c.inl"
 
 #define DEFINE_task_waitfor
-#include "signal-waitfor.c.inl"
+#include "sig-waitfor.c.inl"
 
 #define DEFINE_task_waitfor_with_sigmask
-#include "signal-waitfor.c.inl"
+#include "sig-waitfor.c.inl"
 
 #define DEFINE_task_waitfor_norpc
-#include "signal-waitfor.c.inl"
+#include "sig-waitfor.c.inl"
 
 #define DEFINE_task_waitfor_nx
-#include "signal-waitfor.c.inl"
+#include "sig-waitfor.c.inl"
 
 #define DEFINE_task_waitfor_norpc_nx
-#include "signal-waitfor.c.inl"
+#include "sig-waitfor.c.inl"
 #endif /* !__INTELLISENSE__ */
 
-#endif /* !GUARD_KERNEL_INCLUDE_SCHED_SIGNAL_C */
+#endif /* !GUARD_KERNEL_INCLUDE_SCHED_SIG_C */

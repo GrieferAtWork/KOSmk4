@@ -31,7 +31,7 @@ macros["__DATE_YEAR__"] = str(import("time").Time.now().year)[#"Years ":];
 #include <kernel/driver.h>
 #include <kernel/x86/pit.h> /* X86_PIT_EARLY_HZ */
 #include <sched/cpu.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 #include <sched/tsc.h>
 #include <sched/x86/cmos.h>
 

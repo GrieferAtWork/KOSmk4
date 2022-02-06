@@ -42,7 +42,7 @@
 #ifdef __KERNEL__
 #include <kernel/except.h>
 #include <kernel/mman/nopf.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 #define HEAP_FREE(base, size) \
 	((size) ? heap_free(&kernel_default_heap, base, size, GFP_NORMAL) : (void)0)
 #else /* __KERNEL__ */

@@ -33,7 +33,7 @@
 #include <kernel/fpu.h>
 #include <kernel/panic.h>
 #include <sched/cpu.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>

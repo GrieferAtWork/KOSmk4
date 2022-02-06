@@ -30,7 +30,7 @@
 #include <kernel/mman/cc.h>
 #include <kernel/refcountable.h>
 #include <kernel/types.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 
 #include <hybrid/atomic.h>
 

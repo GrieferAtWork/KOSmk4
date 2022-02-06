@@ -24,7 +24,7 @@
 
 #include <kernel/except.h>
 #include <kernel/types.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 #include <sched/task.h>
 
 #include <hybrid/__assert.h>

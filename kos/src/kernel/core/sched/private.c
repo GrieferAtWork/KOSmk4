@@ -29,7 +29,7 @@
 #include <kernel/types.h>
 #include <sched/cpu.h>
 #include <sched/private.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>

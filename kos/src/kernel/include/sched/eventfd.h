@@ -25,7 +25,7 @@
 #include <kernel/malloc.h>
 #include <kernel/types.h>
 #include <sched/atomic64.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 
 DECL_BEGIN
 

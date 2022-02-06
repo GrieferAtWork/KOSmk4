@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
-#include "signal.c"
+#include "sig.c"
 //#define DEFINE_task_waitfor
 #define DEFINE_task_waitfor_with_sigmask
 //#define    DEFINE_task_waitfor_norpc

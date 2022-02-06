@@ -26,7 +26,7 @@
 #include <kernel/driver-param.h>
 #include <kernel/except.h>
 #include <kernel/printk.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 #include <sched/tsc.h>
 
 #include <hybrid/atomic.h>

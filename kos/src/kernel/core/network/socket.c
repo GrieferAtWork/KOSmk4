@@ -36,7 +36,7 @@
 #include <sched/cred.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc.h> /* task_serve() */
-#include <sched/signal.h>
+#include <sched/sig.h>
 #include <sched/tsc.h>
 
 #include <hybrid/atomic.h>

@@ -28,7 +28,7 @@
 #include <kernel/malloc.h>
 #include <sched/async-intern.h>
 #include <sched/async.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 

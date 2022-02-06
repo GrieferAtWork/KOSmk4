@@ -28,7 +28,7 @@
 #include <kernel/except.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/types.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 
 #include <kos/exec/module.h>
 

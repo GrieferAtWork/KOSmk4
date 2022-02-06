@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4086e936 */
+/* HASH CRC-32:0x2dc7d159 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,7 +63,7 @@ __LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __
 #endif /* !__local___localdep_shared_rwlock_tryread_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/__assert.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(shared_rwlock_read_nx) __ATTR_WUNUSED __BLOCKING __ATTR_NONNULL((1)) __BOOL
 (__FCALL __LIBC_LOCAL_NAME(shared_rwlock_read_nx))(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {

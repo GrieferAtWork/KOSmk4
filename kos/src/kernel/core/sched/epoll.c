@@ -34,8 +34,8 @@
 #include <kernel/user.h>
 #include <sched/epoll.h>
 #include <sched/rpc.h>
-#include <sched/signal-completion.h>
-#include <sched/signal.h>
+#include <sched/sig-completion.h>
+#include <sched/sig.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 

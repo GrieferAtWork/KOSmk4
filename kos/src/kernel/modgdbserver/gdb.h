@@ -24,7 +24,7 @@
 
 #include <kernel/debugtrap.h>
 #include <kernel/types.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 #include <sched/task.h>
 
 #include <bits/crt/format-printer.h>

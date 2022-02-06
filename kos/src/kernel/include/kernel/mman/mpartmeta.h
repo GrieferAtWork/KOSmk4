@@ -25,7 +25,7 @@
 #include <kernel/arch/mman/rtm.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/types.h>
-#include <sched/signal.h>
+#include <sched/sig.h>
 
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
