@@ -24,7 +24,9 @@
 #define DEFINE_task_serve_with_icpustate_and_sigmask
 #endif /* __INTELLISENSE__ */
 
-#include <sched/posix-signal.h>
+#include <sched/sigaction.h>
+
+#include <signal.h>
 
 #if (defined(DEFINE_task_serve_with_icpustate) +    \
      defined(DEFINE_task_serve_with_icpustate_nx) + \

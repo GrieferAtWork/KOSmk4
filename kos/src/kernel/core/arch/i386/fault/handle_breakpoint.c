@@ -40,11 +40,12 @@ opt.append("-Os");
 #include <kernel/x86/fault.h> /* x86_handle_stackfault(), x86_handle_gpf(), x86_handle_illegal_instruction() */
 #include <kernel/x86/idt.h>
 #include <sched/group.h>
-#include <sched/posix-signal.h>
+#include <sched/task.h>
 
 #include <kos/kernel/cpu-state-helpers.h>
 
 #include <inttypes.h>
+#include <signal.h>
 #include <stddef.h>
 
 #include <libinstrlen/instrlen.h>

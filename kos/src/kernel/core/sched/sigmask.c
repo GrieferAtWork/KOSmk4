@@ -29,11 +29,13 @@
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/rt/except-handler.h>
+#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_USERPROCMASK */
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/cpu.h>
 #include <sched/pid.h>
+#include <sched/rpc-internal.h>
 #include <sched/sigmask.h>
 #include <sched/task.h>
 
@@ -918,6 +920,52 @@ DEFINE_COMPAT_SYSCALL1(syscall_ulong_t, ssetmask, syscall_ulong_t, new_sigmask) 
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SSETMASK */
 
 
+
+
+
+
+
+/************************************************************************/
+/* rt_sigpending(), sigpending()                                        */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_RT_SIGPENDING
+DEFINE_SYSCALL2(errno_t, rt_sigpending,
+                UNCHECKED USER sigset_t *, uset,
+                size_t, sigsetsize) {
+	sigset_t pending;
+	/* Validate the user-space signal set pointer. */
+	if unlikely(sigsetsize != sizeof(sigset_t)) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
+		      sigsetsize);
+	}
+	validate_writable(uset, sizeof(sigset_t));
+	sigemptyset(&pending);
+
+	/* Collect pending signals */
+	task_rpc_pending_sigset(&pending);
+	proc_rpc_pending_sigset(&pending);
+
+	/* Write back results */
+	COMPILER_WRITE_BARRIER();
+	memcpy(uset, &pending, sizeof(pending));
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_RT_SIGPENDING */
+
+#ifdef __ARCH_WANT_SYSCALL_SIGPENDING
+DEFINE_SYSCALL1(errno_t, sigpending,
+                UNCHECKED USER sigset_t *, uset) {
+	return sys_rt_sigpending(uset, sizeof(sigset_t));
+}
+#endif /* __ARCH_WANT_SYSCALL_SIGPENDING */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_SIGPENDING
+DEFINE_COMPAT_SYSCALL1(errno_t, sigpending,
+                       UNCHECKED USER compat_sigset_t *, uset) {
+	return sys_rt_sigpending(uset, sizeof(compat_sigset_t));
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_SIGPENDING */
 
 
 

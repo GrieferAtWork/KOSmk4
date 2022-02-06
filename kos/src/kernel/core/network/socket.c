@@ -54,6 +54,7 @@
 #include <alloca.h>
 #include <assert.h>
 #include <errno.h>
+#include <signal.h>
 #include <stdalign.h>
 #include <stdint.h>
 #include <string.h>

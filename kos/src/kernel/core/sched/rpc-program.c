@@ -32,7 +32,7 @@
 #include <kernel/mman/nopf.h>
 #include <kernel/mman/rw.h>
 #include <kernel/rt/except-handler.h>
-#include <kernel/rt/except-syscall.h>
+#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_USERPROCMASK */
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/cred.h>

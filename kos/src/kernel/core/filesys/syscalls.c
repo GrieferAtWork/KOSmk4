@@ -50,7 +50,7 @@
 #include <kernel/mman/execinfo.h>
 #include <kernel/personality.h>
 #include <kernel/printk.h>
-#include <kernel/rt/except-syscall.h>
+#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_USERPROCMASK */
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/cred.h>

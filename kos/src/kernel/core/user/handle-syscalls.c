@@ -39,8 +39,8 @@
 #include <kernel/user.h>
 #include <sched/cred.h>
 #include <sched/group.h>
-#include <sched/posix-signal.h>
 #include <sched/rpc.h>
+#include <sched/sigaction.h>
 #include <sched/tsc.h>
 
 #include <hybrid/align.h>

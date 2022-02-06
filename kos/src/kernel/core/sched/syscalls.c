@@ -36,9 +36,9 @@
 #include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/group.h>
-#include <sched/posix-signal.h>
 #include <sched/rpc.h>
 #include <sched/sig.h>
+#include <sched/sigaction.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 

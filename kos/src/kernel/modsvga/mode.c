@@ -44,6 +44,7 @@
 #include <kos/ioctl/svga.h>
 
 #include <assert.h>
+#include <signal.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>

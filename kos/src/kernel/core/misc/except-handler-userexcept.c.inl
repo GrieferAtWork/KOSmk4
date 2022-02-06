@@ -24,6 +24,7 @@
 //#define DEFINE_userexcept_sysret
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_USERPROCMASK */
 #include <sched/group.h>
 #include <sched/sigmask.h>
 

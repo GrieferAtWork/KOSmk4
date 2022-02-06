@@ -29,8 +29,8 @@
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/iovec.h>
+#include <kernel/malloc.h>
 #include <sched/cred.h>
-#include <sched/posix-signal.h>
 #include <sched/rpc.h>
 
 #include <hybrid/atomic.h>

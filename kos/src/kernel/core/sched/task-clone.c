@@ -35,16 +35,16 @@
 #include <kernel/mman/phys.h> /* this_trampoline_node */
 #include <kernel/mman/unmapped.h>
 #include <kernel/rt/except-handler.h>
-#include <kernel/rt/except-syscall.h>
+#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_USERPROCMASK */
 #include <kernel/user.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/group.h>
-#include <sched/posix-signal.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
-#include <sched/sigmask.h>
 #include <sched/sig.h>
+#include <sched/sigaction.h>
+#include <sched/sigmask.h>
 #include <sched/task-clone.h>
 #include <sched/task.h>
 

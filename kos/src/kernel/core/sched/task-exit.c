@@ -29,7 +29,7 @@
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
-#include <kernel/rt/except-syscall.h>
+#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_USERPROCMASK */
 #include <sched/cpu.h>
 #include <sched/group.h>
 #include <sched/rpc-internal.h>

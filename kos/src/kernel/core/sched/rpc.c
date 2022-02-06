@@ -25,6 +25,7 @@
 
 #include <kernel/except.h>
 #include <kernel/rt/except-handler.h>
+#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_USERPROCMASK */
 #include <kernel/types.h>
 #include <sched/group.h>
 #include <sched/rpc-internal.h>

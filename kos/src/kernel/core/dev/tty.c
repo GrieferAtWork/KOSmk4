@@ -34,6 +34,7 @@
 #include <sched/group.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc.h> /* task_serve() */
+#include <sched/sigaction.h>
 #include <sched/sigmask.h>
 #include <sched/task.h>
 
