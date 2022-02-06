@@ -32,6 +32,7 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
+#include <sched/group.h>
 #include <sched/posix-signal.h> /* task_raisesignalprocessgroup() */
 #include <sched/task.h>
 
@@ -484,12 +485,26 @@ PRIVATE BLOCKING NONNULL((1, 2)) void FCALL
 svgatty_settty_with_winch(struct svgatty *__restrict self,
                           struct svga_ttyaccess *__restrict ntty) {
 	REF struct mkttydev *utty;
+#ifdef CONFIG_USE_NEW_GROUP
+	REF struct procgrp *fggrp;
+#else /* CONFIG_USE_NEW_GROUP */
 	REF struct taskpid *fgpid;
 	REF struct task *fgproc;
+#endif /* !CONFIG_USE_NEW_GROUP */
 	svgatty_settty(self, ntty);
 	utty = awref_get(&self->at_tty);
 	if (!utty)
 		return; /* No tty attached. */
+#ifdef CONFIG_USE_NEW_GROUP
+	fggrp = awref_get(&utty->t_fproc);
+	decref_unlikely(utty);
+	if (!fggrp)
+		return; /* No foreground process. */
+	{
+		FINALLY_DECREF_UNLIKELY(fggrp);
+		task_raisesignalprocessgroup(fggrp, SIGWINCH);
+	}
+#else /* CONFIG_USE_NEW_GROUP */
 	fgpid = axref_get(&utty->t_fproc);
 	decref_unlikely(utty);
 	if (!fgpid)
@@ -502,6 +517,7 @@ svgatty_settty_with_winch(struct svgatty *__restrict self,
 		FINALLY_DECREF_UNLIKELY(fgproc);
 		task_raisesignalprocessgroup(fgproc, SIGWINCH);
 	}
+#endif /* !CONFIG_USE_NEW_GROUP */
 
 	/* In case the calling process is part of the same group,
 	 * enqueue the calling thread  to try serving the  signal

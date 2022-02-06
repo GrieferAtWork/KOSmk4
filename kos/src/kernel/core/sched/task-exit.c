@@ -325,11 +325,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 #ifdef CONFIG_USE_NEW_GROUP
 	/* Determine the PID of the thread of which we are a child. */
 	if (taskpid_isaprocess(pid)) {
-		struct procctl *myproc;
-		REF struct task *parent;
-		parent = taskpid_getparentprocess(pid);
-		parpid = incref(task_gettaskpid_of(parent));
-		decref_unlikely(parent);
+		parpid = taskpid_getparentprocesspid(pid);
 	} else {
 		/* In this case, `parpid' is the PID of the associated process */
 		parpid = incref(taskpid_getprocpid(pid));

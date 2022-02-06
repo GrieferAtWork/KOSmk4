@@ -1193,8 +1193,6 @@ print_fd_t(pformatprinter printer, void *arg, fd_t fd) {
 	case AT_THIS_TASK:      name = "AT_THIS_TASK"; break;
 	case AT_THIS_PROCESS:   name = "AT_THIS_PROCESS"; break;
 	case AT_PARENT_PROCESS: name = "AT_PARENT_PROCESS"; break;
-	case AT_GROUP_LEADER:   name = "AT_GROUP_LEADER"; break;
-	case AT_SESSION_LEADER: name = "AT_SESSION_LEADER"; break;
 
 #if 1 /* <unistd.h> names for certain file handles. */
 	case STDIN_FILENO:  name = "STDIN_FILENO"; break;

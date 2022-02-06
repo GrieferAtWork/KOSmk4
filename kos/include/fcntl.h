@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x346114aa */
+/* HASH CRC-32:0x5aa8e51 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1036,16 +1036,6 @@ enum __pid_type {
 #if !defined(AT_PARENT_PROCESS) && defined(__AT_PARENT_PROCESS)
 #define AT_PARENT_PROCESS __AT_PARENT_PROCESS
 #endif /* !AT_PARENT_PROCESS && __AT_PARENT_PROCESS */
-
-/* HANDLE_TYPE_TASK (writable, Equivalent of `getpgid(0)') */
-#if !defined(AT_GROUP_LEADER) && defined(__AT_GROUP_LEADER)
-#define AT_GROUP_LEADER __AT_GROUP_LEADER
-#endif /* !AT_GROUP_LEADER && __AT_GROUP_LEADER */
-
-/* HANDLE_TYPE_TASK (writable, Equivalent of `getsid(0)') */
-#if !defined(AT_SESSION_LEADER) && defined(__AT_SESSION_LEADER)
-#define AT_SESSION_LEADER __AT_SESSION_LEADER
-#endif /* !AT_SESSION_LEADER && __AT_SESSION_LEADER */
 
 
 /* DOS Drive root / current-working paths.

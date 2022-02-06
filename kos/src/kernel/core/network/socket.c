@@ -34,8 +34,8 @@
 #include <kernel/printk.h>
 #include <sched/async.h>
 #include <sched/cred.h>
-#include <sched/posix-signal.h>
-#include <sched/rpc.h> /* task_serve() */
+#include <sched/posix-signal.h> /* task_raisesignalthread */
+#include <sched/rpc.h>          /* task_serve() */
 #include <sched/sig.h>
 #include <sched/tsc.h>
 
@@ -478,7 +478,11 @@ PRIVATE void KCALL raise_sigpipe(void) {
 	/* Make sure to allow for exception nesting when sending the signal. */
 	NESTED_EXCEPTION;
 	/* Actually send the signal. */
+#if 1
+	task_raisesignalthread(THIS_TASK, SIGPIPE);
+#else
 	task_raisesignalprocess(THIS_TASK, SIGPIPE);
+#endif
 	task_serve();
 }
 

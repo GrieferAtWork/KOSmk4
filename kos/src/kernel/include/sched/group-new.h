@@ -162,6 +162,27 @@ struct procsession {
 #define _procsession_destroy(self) \
 	(_procsession_fini(self), _procsession_free(self))
 
+#define __procgrp_inherit_and_getctty(self)               \
+	({                                                    \
+		REF struct procgrp *__pgiagct_self = (self);      \
+		REF struct ttydev *__pgiagct_ctty;                \
+		__pgiagct_ctty = procgrp_getctty(__pgiagct_self); \
+		decref_unlikely(__pgiagct_self);                  \
+		__pgiagct_ctty;                                   \
+	})
+
+/* Return a [0..1]-reference to the calling/given components controlling terminal. */
+#define procsession_getctty(self) axref_get(&(self)->ps_ctty)
+#define procgrp_getctty(self)     procsession_getctty(procgrp_getsession(self))
+#define task_getctty()            __procgrp_inherit_and_getctty(task_getprocgrp())
+#define task_getctty_of(thread)   __procgrp_inherit_and_getctty(task_getprocgrp_of(thread))
+#define taskpid_getctty(self)     __procgrp_inherit_and_getctty(taskpid_getprocgrp(self))
+#define procctl_getctty(self)     __procgrp_inherit_and_getctty(procctl_getprocgrp(self))
+
+#define task_getctty_nx() task_getctty() /* Deprecated alias */
+
+
+
 struct procgrp;
 struct procgrp_slot {
 	LLRBTREE_NODE(procgrp) pgs_link; /* [0..1][lock(:pgr_ns->[pn_par...]->pn_lock)]
@@ -251,12 +272,20 @@ DEFINE_REFCOUNT_FUNCTIONS(struct procgrp, pgr_refcnt, procgrp_destroy)
 	(__procgrp_memb_assert(self, struct_taskpid_to_remove), \
 	 LIST_REMOVE(struct_taskpid_to_remove, tp_pctl->pc_grpmember))
 
+/* Return the # of processes apart of `self'. -- Caller must be holding a lock */
+#define procgrp_memb_count(self) \
+	LIST_COUNT(&(self)->pgr_memb_list, tp_pctl->pc_grpmember)
+
+/* Return the # of processes apart of `self'. -- Caller must be holding a lock */
+#define FOREACH_procgrp_memb(iter, self) \
+	LIST_FOREACH(iter, &(self)->pgr_memb_list, tp_pctl->pc_grpmember)
+
 
 
 /* Return information regarding the session associated with a given process group. */
 #define procgrp_getsessionleader(self) (self)->pgr_sleader
 #define procgrp_issessionleader(self)  ((self) == procgrp_getsessionleader(self))
-#define procgrp_getsession(self)       procgrp_getsessionleader(self)->pgr_session
+#define procgrp_getsession(self)       (self)->pgr_session
 
 /* Return the # of PIDs defined by `self' */
 #define procgrp_getpgidcount(self) ((self)->pgr_ns->pn_ind + 1)
@@ -489,14 +518,30 @@ struct procctl {
 
 /* Return a reference to the parent-process of the given element. */
 #define procctl_getparentprocess(self)   arref_get(&(self)->pc_parent)                        /* REF struct task * [1..1] */
-#define taskpid_getparentprocess(self)   procctl_getparentprocess(taskpid_getprocctl(self))   /* REF struct task * [0..1] */
-#define task_getparentprocess()          procctl_getparentprocess(task_getprocctl())          /* REF struct task * [0..1] */
-#define task_getparentprocess_of(thread) procctl_getparentprocess(task_getprocctl_of(thread)) /* REF struct task * [0..1] */
+#define taskpid_getparentprocess(self)   procctl_getparentprocess(taskpid_getprocctl(self))   /* REF struct task * [1..1] */
+#define task_getparentprocess()          procctl_getparentprocess(task_getprocctl())          /* REF struct task * [1..1] */
+#define task_getparentprocess_of(thread) procctl_getparentprocess(task_getprocctl_of(thread)) /* REF struct task * [1..1] */
 
 #define procctl_getparentprocessptr(self)   arref_ptr(&(self)->pc_parent)
 #define taskpid_getparentprocessptr(self)   procctl_getparentprocessptr(taskpid_getprocctl(self))
 #define task_getparentprocessptr()          procctl_getparentprocessptr(task_getprocctl())
 #define task_getparentprocessptr_of(thread) procctl_getparentprocessptr(task_getprocctl_of(thread))
+
+
+#define __task_inherit_and_gettaskpid_of(self)                        \
+	({                                                                \
+		REF struct task *__tiagtpio_self = (self);                    \
+		REF struct taskpid *__tiagtpio_res;                           \
+		__tiagtpio_res = incref(task_gettaskpid_of(__tiagtpio_self)); \
+		decref_unlikely(__tiagtpio_self);                             \
+		__tiagtpio_res;                                               \
+	})
+
+/* Return a reference to the parent-process's PID of the given element. */
+#define procctl_getparentprocesspid(self)   __task_inherit_and_gettaskpid_of(procctl_getparentprocess(self))   /* REF struct taskpid * [1..1] */
+#define taskpid_getparentprocesspid(self)   __task_inherit_and_gettaskpid_of(taskpid_getparentprocess(self))   /* REF struct taskpid * [1..1] */
+#define task_getparentprocesspid()          __task_inherit_and_gettaskpid_of(task_getparentprocess())          /* REF struct taskpid * [1..1] */
+#define task_getparentprocesspid_of(thread) __task_inherit_and_gettaskpid_of(task_getparentprocess_of(thread)) /* REF struct taskpid * [1..1] */
 
 
 /* Session used by `procctl_boottask' (and consequently also by `/bin/init') */

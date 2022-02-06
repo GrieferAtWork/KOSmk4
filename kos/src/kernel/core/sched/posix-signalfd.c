@@ -31,7 +31,6 @@
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/group.h>
-#include <sched/posix-signal.h>
 #include <sched/posix-signalfd.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>

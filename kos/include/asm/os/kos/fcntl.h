@@ -167,8 +167,6 @@
 #if __KOS_VERSION__ >= 400
 #define __AT_THIS_PROCESS     (-181) /* HANDLE_TYPE_TASK (writable, Equivalent of `getpid()') */
 #define __AT_PARENT_PROCESS   (-182) /* HANDLE_TYPE_TASK (writable, Equivalent of `getppid()') */
-#define __AT_GROUP_LEADER     (-183) /* HANDLE_TYPE_TASK (writable, Equivalent of `getpgid(0)') */
-#define __AT_SESSION_LEADER   (-184) /* HANDLE_TYPE_TASK (writable, Equivalent of `getsid(0)') */
 #endif /* __KOS_VERSION__ >= 400 */
 #if __KOS_VERSION__ >= 300
 /* DOS Drive root / current-working paths.

@@ -33,10 +33,10 @@
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/group.h>
-#include <sched/posix-signal.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
 #include <sched/sig.h>
+#include <sched/sigmask.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -229,8 +229,8 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
                 size_t, max_param_count)
 #endif /* !DEFINE_compat_sys_rpc_schedule */
 {
-	REF struct task *target;
 	REF struct pending_rpc *rpc;
+	bool is_caller_potential_target;
 	VALIDATE_FLAGSET(mode,
 	                 RPC_SIGNO_MASK | RPC_SYNCMODE_F_ALLOW_ASYNC |
 	                 RPC_SYNCMODE_F_REQUIRE_SC | RPC_SYNCMODE_F_REQUIRE_CP |
@@ -306,10 +306,50 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 	FINALLY_DECREF(&rpc->pr_user);
 	COMPILER_WRITE_BARRIER();
 
-	/* Lookup the target thread. */
-	target = pidns_lookuptask_srch(THIS_PIDNS, target_tid);
 	{
+#ifdef CONFIG_USE_NEW_GROUP
+		/* Lookup the target thread. */
+		struct taskpid *mypid;
+		REF struct taskpid *target;
+		mypid  = task_gettaskpid();
+		target = pidns_lookup_srch(mypid->tp_ns, target_tid);
 		FINALLY_DECREF_UNLIKELY(target);
+
+		is_caller_potential_target = false;
+		if (target == mypid) {
+			is_caller_potential_target = true;
+		} else if (mode & RPC_DOMAIN_F_PROC) {
+			is_caller_potential_target = taskpid_getprocpid(target) ==
+			                             taskpid_getprocpid(mypid);
+		}
+
+		/* Schedule the RPC */
+		rpc->pr_user.pur_refcnt = 2; /* +1 for the target component's list. */
+		COMPILER_WRITE_BARRIER();
+		if (mode & RPC_DOMAIN_F_PROC) {
+			if unlikely(!proc_rpc_schedule(target, rpc))
+				goto err_target_exited;
+		} else {
+			REF struct task *target_thread;
+			target_thread = taskpid_gettask(target);
+			if unlikely(!target_thread) {
+err_target_exited:
+				rpc->pr_user.pur_refcnt = 1;
+				COMPILER_WRITE_BARRIER();
+				THROW(E_PROCESS_EXITED, target_tid);
+			}
+			FINALLY_DECREF_UNLIKELY(target_thread);
+			if unlikely(!task_rpc_schedule(target_thread, rpc))
+				goto err_target_exited;
+		}
+#else /* CONFIG_USE_NEW_GROUP */
+		/* Lookup the target thread. */
+		REF struct task *target;
+		target = pidns_lookuptask_srch(THIS_PIDNS, target_tid);
+		FINALLY_DECREF_UNLIKELY(target);
+		is_caller_potential_target = target == THIS_TASK ||
+		                             ((mode & RPC_DOMAIN_F_PROC) &&
+		                              task_getprocess_of(target) == task_getprocess());
 
 		/* Schedule the RPC */
 		rpc->pr_user.pur_refcnt = 2; /* +1 for the target component's list. */
@@ -320,6 +360,7 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 			COMPILER_WRITE_BARRIER();
 			THROW(E_PROCESS_EXITED, target_tid);
 		}
+#endif /* !CONFIG_USE_NEW_GROUP */
 	}
 
 	/* (possibly) wait for completion */
@@ -353,8 +394,7 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 						 * process; in the later case, we already know that no other thread
 						 * within the process  will/is executing the  RPC, because we  were
 						 * able to set its status to CANCELED) */
-						if ((target == THIS_TASK || ((mode & RPC_DOMAIN_F_PROC) &&
-						                             task_getprocess_of(target) == task_getprocess())) &&
+						if (is_caller_potential_target &&
 						    !sigmask_ismasked_with_nesting(_RPC_GETSIGNO(mode))) {
 							/* On most definitely! While the actual cause may have also been
 							 * some other RPC, the one we just tried to schedule is just  as

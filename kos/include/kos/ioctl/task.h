@@ -42,8 +42,8 @@
 /*      TASK_IOC_            _IO_KOS('p', 0x08, ...)            * ... */
 #define TASK_IOC_OPENPID    _IOR_KOS('p', 0x09, struct openfd) /* pidfd_open(getpid()) */
 #define TASK_IOC_OPENPPID   _IOR_KOS('p', 0x0a, struct openfd) /* pidfd_open(getppid()) */
-#define TASK_IOC_OPENPGID   _IOR_KOS('p', 0x0b, struct openfd) /* pidfd_open(getpgid()) */
-#define TASK_IOC_OPENSID    _IOR_KOS('p', 0x0c, struct openfd) /* pidfd_open(getsid()) */
+/*      TASK_IOC_            _IO_KOS('p', 0x0b, ...)            * ... */
+/*      TASK_IOC_            _IO_KOS('p', 0x0c, ...)            * ... */
 /*      TASK_IOC_            _IO_KOS('p', 0x0d, ...)            * ... */
 /*      TASK_IOC_            _IO_KOS('p', 0x0e, ...)            * ... */
 /*      TASK_IOC_            _IO_KOS('p', 0x0f, ...)            * ... */

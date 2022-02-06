@@ -59,6 +59,21 @@
 #define process_pending_rpcs_waitread_nx  procctl_chlds_waitread_nx
 #define process_pending_rpcs_waitwrite_nx procctl_chlds_waitwrite_nx
 
+/* Returns  a  reference  to  the  parent  of  the  calling/given process.
+ * If that parent has already terminated and has already been detach(2)ed,
+ * or wait(2)ed, return `NULL' instead. */
+#define task_getprocessparent()              task_getparentprocess()
+#define task_getprocessparentpid()           task_getparentprocesspid()
+#define task_getprocessparent_of(self)       task_getparentprocess_of(self)
+#define task_getprocessparentpid_of(self)    task_getparentprocesspid_of(self)
+#define task_getprocessparent_nx()           task_getprocessparent()
+#define task_getprocessparent_of_nx(self)    task_getprocessparent_of(self)
+#define task_getprocessparentpid_of_nx(self) task_getprocessparentpid_of(self)
+#define task_getprocessparentptr_of(self)    task_getparentprocessptr_of(self)
+
+#define task_isprocessleader()         task_isprocess()
+#define task_isprocessleader_p(thread) task_isaprocess(thread)
+
 #else /* CONFIG_USE_NEW_GROUP */
 #include <kernel/types.h>
 #include <sched/pertask.h>

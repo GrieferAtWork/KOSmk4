@@ -694,10 +694,9 @@ do_TCSETA: {
 
 	case TIOCSCTTY: {
 		int error;
-		error = ttydev_setctty(me,
-		                               true,
-		                               (uintptr_t)arg != 0 && capable(CAP_ALLOW_CTTY_STEALING),
-		                               false);
+		error = ttydev_setctty(me, true,
+		                       (uintptr_t)arg != 0 && capable(CAP_ALLOW_CTTY_STEALING),
+		                       false);
 		if (error == TTYDEV_SETCTTY_INUSE)
 			THROW(E_INSUFFICIENT_RIGHTS, CAP_ALLOW_CTTY_STEALING);
 		if (error == TTYDEV_SETCTTY_DIFFERENT)

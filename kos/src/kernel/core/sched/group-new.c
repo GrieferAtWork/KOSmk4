@@ -34,7 +34,7 @@
 #include <kernel/user.h>
 #include <sched/group-new.h>
 #include <sched/pid.h>
-#include <sched/posix-signal.h>
+#include <sched/sigaction.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -900,8 +900,6 @@ again:
 	/* Enumerate child processes */
 	procctl_chlds_read(ctl);
 	FOREACH_procctl_chlds(child, ctl) {
-		REF struct task *thread;
-		uint16_t status;
 		if (!taskpid_hasterminated(child)) {
 			/* Found a child process that has yet to terminate! */
 			result = false;
@@ -999,6 +997,7 @@ fill_wait_info(struct taskpid *__restrict proc,
 		/* XXX: Fill in usage information? */
 	}
 	COMPILER_WRITE_BARRIER();
+	return result;
 }
 
 
@@ -1023,7 +1022,7 @@ waitfor_children(idtype_t which, id_t which_pid,
 		REF struct taskpid *child;
 
 		/* Wait for a specific child thread/process */
-		child = pidns_lookup(proc->tp_ns, which_pid);
+		child = pidns_lookup(proc->tp_ns, (pid_t)which_pid);
 		if unlikely(!child)
 			return -ECHILD; /* No such process */
 		FINALLY_DECREF_UNLIKELY(child);
@@ -1110,7 +1109,7 @@ again_scan_children:
 			assert(taskpid_isaprocess(child));
 			if (which == P_PGID) {
 				/* Ignore if `child' isn't apart of a specific process group. */
-				if (taskpid_getpgid_s(child) != which_pid)
+				if (taskpid_getpgid_s(child) != (pid_t)which_pid)
 					continue;
 			}
 again_read_status_in_nonspecific:

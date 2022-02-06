@@ -36,7 +36,7 @@
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
-#include <sched/posix-signal.h>
+#include <sched/posix-signal.h> /* task_raisesignalthread */
 #include <sched/rpc.h>
 
 #include <hybrid/atomic.h>

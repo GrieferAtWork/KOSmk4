@@ -25,56 +25,42 @@
 
 #include <kernel/compiler.h>
 
-#include <debugger/hook.h> /* DEFINE_DBG_BZERO_OBJECT */
-#include <kernel/coredump.h>
 #include <kernel/except.h>
-#include <kernel/mman.h>
-#include <kernel/mman/event.h> /* DEFINE_PERMMAN_ONEXEC() */
-#include <kernel/mman/nopf.h>
-#include <kernel/paging.h> /* KERNELSPACE_HIGHMEM */
-#include <kernel/printk.h>
 #include <kernel/rt/except-handler.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
-#include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/group.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
-#include <sched/sigmask.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
-#include <hybrid/minmax.h>
 
 #include <compat/config.h>
+#include <kos/except.h>
 #include <kos/except/reason/inval.h>
-#include <sys/param.h>
-#include <sys/wait.h>
 
 #include <assert.h>
 #include <errno.h>
-#include <inttypes.h>
-#include <sched.h>
 #include <signal.h>
 #include <string.h>
 
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/bits/os/siginfo-convert.h>
 #include <compat/bits/os/siginfo.h>
-#include <compat/bits/os/timespec.h>
-#include <compat/kos/types.h>
-#include <compat/pointer.h>
 #include <compat/signal.h>
 #endif /* __ARCH_HAVE_COMPAT */
 
+#ifndef CONFIG_USE_NEW_GROUP
 /* Need pointer sets for gathering targets of
  * process-group-wide   signal    broadcasts. */
 #define POINTER_SET_BUFSIZE 16
 #include <misc/pointer-set.h>
+#endif /* !CONFIG_USE_NEW_GROUP */
 
 DECL_BEGIN
 
@@ -85,54 +71,32 @@ STATIC_ASSERT_MSG(NSIG - 1 <= 0xff,
                   " - RPC_OP_sigblock");
 
 
-/* Decref every task-object from `self'. */
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL taskref_pointer_set_decref_all)(struct pointer_set *__restrict self) {
-	REF struct task *thread;
-	POINTER_SET_FOREACH(thread, self) {
-		/* Arguably a  `decref_likely()', but  only if  the
-		 * total # of threads in the set is extremely high,
-		 * and only if the signal that was send caused most
-		 * if not all of these threads to terminate. */
-		decref(thread);
-	}
-}
-
-/* Finalize a pointer set filled with `REF struct task *' elements. */
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL taskref_pointer_set_fini)(struct pointer_set *__restrict self) {
-	taskref_pointer_set_decref_all(self);
-	pointer_set_fini(self);
-}
-
-
-
 /* Raise a posix signal within a given thread `target'
  * @return: true:  Successfully scheduled/enqueued the signal for delivery to `target'
  * @return: false: The given thread `target' has already terminated execution.
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE: The signal number in `info' is ZERO(0) or > `_NSIG' */
-PUBLIC NONNULL((1)) bool KCALL
+PUBLIC NONNULL((1, 2)) bool FCALL
 task_raisesignalthread(struct task *__restrict target,
-                       USER CHECKED siginfo_t const *info)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE, E_SEGFAULT) {
+                       siginfo_t const *__restrict info)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE) {
 	struct pending_rpc *rpc;
-	/* TODO: If `target's SIGHAND disposition for `info->si_signo' is set
-	 *       to `SIG_IGN', then don't send the signal and silently return
-	 *       with `true'. */
+	if unlikely(info->si_signo <= 0 || info->si_signo >= NSIG) {
+		signo_t signo = info->si_signo;
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+		      signo);
+	}
+
+#ifndef __OPTIMIZE_SIZE__
+	/* XXX: If `target's SIGHAND disposition for `info->si_signo' is set
+	 *      to `SIG_IGN', then don't send the signal and silently return
+	 *      with `true'. */
+#endif /* !__OPTIMIZE_SIZE__ */
 
 	rpc = pending_rpc_alloc_psig(GFP_NORMAL);
 
 	/* Fill in RPC signal information. */
 	memcpy(&rpc->pr_psig, info, sizeof(siginfo_t));
-	COMPILER_READ_BARRIER();
-	if unlikely(rpc->pr_psig.si_signo <= 0 ||
-	            rpc->pr_psig.si_signo >= NSIG) {
-		signo_t signo = rpc->pr_psig.si_signo;
-		pending_rpc_free(rpc);
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
-		      signo);
-	}
 
 	/* Set RPC flags: posix signals are _always_ async */
 	rpc->pr_flags = RPC_SYNCMODE_F_ALLOW_ASYNC |
@@ -152,19 +116,142 @@ task_raisesignalthread(struct task *__restrict target,
 
 
 
+#ifdef CONFIG_USE_NEW_GROUP
+
+/* Raise a posix signal within the given process `proc'
+ * @return: true:  Successfully scheduled/enqueued the signal for delivery to `target'
+ * @return: false: The given process `target' has already terminated execution.
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE: The signal number in `info' is ZERO(0) or >= `_NSIG+1' */
+PUBLIC NONNULL((1, 2)) __BOOL FCALL
+task_raisesignalprocess(struct taskpid *__restrict proc,
+                        siginfo_t const *__restrict info)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE) {
+	struct pending_rpc *rpc;
+	if unlikely(info->si_signo <= 0 || info->si_signo >= NSIG) {
+		signo_t signo = info->si_signo;
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+		      signo);
+	}
+
+#ifndef __OPTIMIZE_SIZE__
+	/* XXX: If any of `target's threads has a SIGHAND disposition for `info->si_signo'
+	 *      that  is set to `SIG_IGN', then don't  send the signal and silently return
+	 *      with `true'. */
+#endif /* !__OPTIMIZE_SIZE__ */
+
+	rpc = pending_rpc_alloc_psig(GFP_NORMAL);
+
+	/* Fill in RPC signal information. */
+	memcpy(&rpc->pr_psig, info, sizeof(siginfo_t));
+
+	/* Set RPC flags: posix signals are _always_ async */
+	rpc->pr_flags = RPC_SYNCMODE_F_ALLOW_ASYNC |
+	                RPC_CONTEXT_SIGNAL |
+	                RPC_SIGNO(rpc->pr_psig.si_signo);
+
+	/* Schedule the RPC */
+	if (proc_rpc_schedule(proc, rpc))
+		return true;
+
+	/* Target thread already died :( */
+	pending_rpc_free(rpc);
+	return false;
+}
+
+#ifndef __pending_rpc_slist_defined
+#define __pending_rpc_slist_defined
+SLIST_HEAD(pending_rpc_slist, pending_rpc);
+#endif /* !__pending_rpc_slist_defined */
+
+/* Send a signal to every process within the given `group'
+ * @return: * : The number of processes to which the signal was delivered. */
+PUBLIC NONNULL((1, 2)) size_t FCALL
+task_raisesignalprocessgroup(struct procgrp *__restrict group,
+                             siginfo_t const *__restrict info)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE) {
+	struct taskpid *member;
+	struct pending_rpc_slist rpcs;
+	size_t rpcs_count = 0; /* # of elements in `rpcs' */
+	size_t proc_count;
+	if unlikely(info->si_signo <= 0 || info->si_signo >= NSIG) {
+		signo_t signo = info->si_signo;
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+		      signo);
+	}
+
+	SLIST_INIT(&rpcs);
+	RAII_FINALLY {
+		/* Always free unused RPCs. */
+		while (!SLIST_EMPTY(&rpcs)) {
+			struct pending_rpc *rpc;
+			rpc = SLIST_FIRST(&rpcs);
+			SLIST_REMOVE_HEAD(&rpcs, pr_link);
+			pending_rpc_free(rpc);
+		}
+	};
+
+	/* Allocate enough RPCs so that we've got at  least
+	 * one for every process that's apart of the group. */
+	for (;;) {
+		procgrp_memb_read(group);
+		proc_count = procgrp_memb_count(group);
+		if (rpcs_count >= proc_count) {
+			if (!proc_count) {
+				/* Special case: empty group */
+				procgrp_memb_endread(group);
+				goto done;
+			}
+			break;
+		}
+		procgrp_memb_endread(group);
+
+		/* Allocate more RPCs. */
+		assert(rpcs_count < proc_count);
+		do {
+			struct pending_rpc *rpc;
+			rpc = pending_rpc_alloc_psig(GFP_NORMAL);
+			memcpy(&rpc->pr_psig, info, sizeof(siginfo_t));
+			rpc->pr_flags = RPC_SYNCMODE_F_ALLOW_ASYNC |
+			                RPC_CONTEXT_SIGNAL |
+			                RPC_SIGNO(rpc->pr_psig.si_signo);
+			SLIST_INSERT(&rpcs, rpc, pr_link);
+		} while (rpcs_count < proc_count);
+	}
+
+	/* Send 1 RPC to every process within the group. */
+	FOREACH_procgrp_memb(member, group) {
+		struct pending_rpc *rpc;
+		assert(!SLIST_EMPTY(&rpcs));
+		rpc = SLIST_FIRST(&rpcs);
+		SLIST_REMOVE_HEAD(&rpcs, pr_link);
+		if (!proc_rpc_schedule(member, rpc))
+			SLIST_INSERT(&rpcs, rpc, pr_link);
+	}
+
+	procgrp_memb_endread(group);
+done:
+	return proc_count;
+}
+
+
+#else /* CONFIG_USE_NEW_GROUP */
 /* Raise a posix signal within a given process that `target' is apart of
  * @return: true:  Successfully scheduled/enqueued the signal for delivery to `target'
  * @return: false: The given process `target' has already terminated execution.
  * @return: false: The given process `target' is a kernel thread.
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE: The signal number in `info' is ZERO(0) or >= `NSIG' */
-PUBLIC NONNULL((1)) bool KCALL
+PUBLIC NONNULL((1, 2)) bool FCALL
 task_raisesignalprocess(struct task *__restrict target,
-                        USER CHECKED siginfo_t const *info)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE, E_SEGFAULT) {
+                        siginfo_t const *__restrict info)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE) {
 	struct pending_rpc *rpc;
-	/* TODO: If any of `target's threads has a SIGHAND disposition for `info->si_signo'
-	 *       that  is set to `SIG_IGN', then don't  send the signal and silently return
-	 *       with `true'. */
+#ifndef __OPTIMIZE_SIZE__
+	/* XXX: If any of `target's threads has a SIGHAND disposition for `info->si_signo'
+	 *      that  is set to `SIG_IGN', then don't  send the signal and silently return
+	 *      with `true'. */
+#endif /* !__OPTIMIZE_SIZE__ */
 
 	rpc = pending_rpc_alloc_psig(GFP_NORMAL);
 
@@ -195,12 +282,33 @@ task_raisesignalprocess(struct task *__restrict target,
 }
 
 
+
+/* Decref every task-object from `self'. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL taskref_pointer_set_decref_all)(struct pointer_set *__restrict self) {
+	REF struct task *thread;
+	POINTER_SET_FOREACH(thread, self) {
+		/* Arguably a  `decref_likely()', but  only if  the
+		 * total # of threads in the set is extremely high,
+		 * and only if the signal that was send caused most
+		 * if not all of these threads to terminate. */
+		decref(thread);
+	}
+}
+
+/* Finalize a pointer set filled with `REF struct task *' elements. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL taskref_pointer_set_fini)(struct pointer_set *__restrict self) {
+	taskref_pointer_set_decref_all(self);
+	pointer_set_fini(self);
+}
+
 /* Send a signal to every process within the same process group that `target' is apart of.
  * @return: * : The number of processes to which the signal was delivered. */
-PUBLIC NONNULL((1)) size_t KCALL
+PUBLIC NONNULL((1, 2)) size_t FCALL
 task_raisesignalprocessgroup(struct task *__restrict target,
-                             USER CHECKED siginfo_t const *info)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE, E_PROCESS_EXITED) {
+                             siginfo_t const *__restrict info)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE) {
 	size_t result = 0;
 	REF struct task *pgroup;
 	struct taskgroup *pgroup_group;
@@ -327,20 +435,21 @@ load_more_threads:
 	}
 	return result;
 }
+#endif /* !CONFIG_USE_NEW_GROUP */
 
 
 
 
-
-
-LOCAL ATTR_PURE WUNUSED NONNULL((1)) size_t KCALL
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) size_t FCALL
 get_pid_indirection(struct task const *__restrict thread) {
+	/* TODO: Remove this function once `CONFIG_USE_NEW_GROUP' becomes mandatory */
 	struct taskpid *pid = FORTASK(thread, this_taskpid);
 	return likely(pid) ? pid->tp_ns->pn_ind : 0;
 }
 
-LOCAL ATTR_PURE WUNUSED NONNULL((1)) pid_t KCALL
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) pid_t FCALL
 taskpid_getpid_ind(struct taskpid *__restrict self, size_t ind) {
+	/* TODO: Remove this function once `CONFIG_USE_NEW_GROUP' becomes mandatory */
 	if likely(ind <= self->tp_ns->pn_ind)
 		return _taskpid_slot_getpidno(self->tp_pids[ind]);
 	return 0;
@@ -355,6 +464,40 @@ taskpid_getpid_ind(struct taskpid *__restrict self, size_t ind) {
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_KILL
 DEFINE_SYSCALL2(errno_t, kill, pid_t, pid, signo_t, signo) {
+#ifdef CONFIG_USE_NEW_GROUP
+	struct taskpid *mypid = task_gettaskpid();
+	siginfo_t info;
+	bzero(&info, sizeof(siginfo_t));
+	info.si_signo = signo;
+	info.si_errno = 0;
+	info.si_code  = SI_USER;
+	info.si_uid   = (__uid_t)cred_geteuid();
+	if (pid > 0) {
+		REF struct taskpid *target;
+		/* Kill the process matching `pid'. */
+		target = pidns_lookup_srch(THIS_PIDNS, pid);
+		FINALLY_DECREF_UNLIKELY(target);
+		info.si_pid = taskpid_getnstid_s(mypid, target->tp_ns);
+		if (!task_raisesignalprocess(target, &info))
+			THROW(E_PROCESS_EXITED, taskpid_getnstid_s(target, mypid->tp_ns));
+	} else if (pid == -1) {
+		/* TODO: Kill all processes that we're allowed to (except for pid=1). */
+		THROW(E_NOT_IMPLEMENTED_TODO);
+	} else {
+		REF struct procgrp *grp;
+		if (pid == 0) {
+			grp = task_getprocgrp();
+		} else {
+			grp = pidns_grplookup(mypid->tp_ns, -pid);
+			if unlikely(!grp)
+				THROW(E_PROCESS_EXITED, -pid);
+		}
+		FINALLY_DECREF_UNLIKELY(grp);
+		if (!task_raisesignalprocessgroup(grp, &info, mypid))
+			THROW(E_PROCESS_EXITED, -pid);
+	}
+	return -EOK;
+#else /* CONFIG_USE_NEW_GROUP */
 	REF struct task *target;
 	struct taskpid *mypid;
 	siginfo_t info;
@@ -395,6 +538,7 @@ do_inherit_target_and_raise_processgroup:
 			THROW(E_PROCESS_EXITED, task_getpid_of_s(target));
 	}
 	return -EOK;
+#endif /* !CONFIG_USE_NEW_GROUP */
 }
 #endif /* __ARCH_WANT_SYSCALL_KILL */
 
@@ -407,6 +551,9 @@ DEFINE_SYSCALL3(errno_t, tgkill,
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
 		      signo);
+	/* TODO: Refactor `E_INVALID_ARGUMENT_CONTEXT_RAISE_PID' to `E_INVALID_ARGUMENT_CONTEXT_BADTID' */
+	/* TODO: Get rid of `E_INVALID_ARGUMENT_CONTEXT_RAISE_TID' and use `E_INVALID_ARGUMENT_CONTEXT_BADTID' */
+	/* TODO: Throw `E_INVALID_ARGUMENT_CONTEXT_BADTID' from within `pidns_lookup[task]_srch()' */
 	if unlikely(pid <= 0)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID,
@@ -538,6 +685,29 @@ siginfo_from_compat_user(siginfo_t *__restrict info, signo_t usigno,
 DEFINE_SYSCALL3(errno_t, rt_sigqueueinfo,
                 pid_t, pid, signo_t, signo,
                 USER UNCHECKED siginfo_t const *, uinfo) {
+#ifdef CONFIG_USE_NEW_GROUP
+	REF struct taskpid *target;
+	siginfo_t info;
+	if unlikely(pid <= 0) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, pid);
+	}
+	siginfo_from_user(&info, signo, uinfo);
+	target = pidns_lookup_srch(THIS_PIDNS, pid);
+	FINALLY_DECREF_UNLIKELY(target);
+
+	/* Don't allow sending arbitrary signals to other processes. */
+	if ((info.si_code >= 0 || info.si_code == SI_TKILL) &&
+	    (taskpid_getprocpid(target) != task_getprocpid()))
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE,
+		      info.si_code);
+	if (signo != 0) {
+		if (!task_raisesignalprocess(target, &info))
+			THROW(E_PROCESS_EXITED, pid);
+	}
+	return -EOK;
+#else /* CONFIG_USE_NEW_GROUP */
 	REF struct task *target;
 	siginfo_t info;
 	if unlikely(pid <= 0) {
@@ -547,6 +717,7 @@ DEFINE_SYSCALL3(errno_t, rt_sigqueueinfo,
 	siginfo_from_user(&info, signo, uinfo);
 	target = pidns_lookuptask_srch(THIS_PIDNS, pid);
 	FINALLY_DECREF_UNLIKELY(target);
+
 	/* Don't allow sending arbitrary signals to other processes. */
 	if ((info.si_code >= 0 || info.si_code == SI_TKILL) &&
 	    (task_getprocess_of(target) != task_getprocess()))
@@ -558,6 +729,7 @@ DEFINE_SYSCALL3(errno_t, rt_sigqueueinfo,
 			THROW(E_PROCESS_EXITED, task_getpid_of_s(target));
 	}
 	return -EOK;
+#endif /* !CONFIG_USE_NEW_GROUP */
 }
 #endif /* __ARCH_WANT_SYSCALL_RT_SIGQUEUEINFO */
 
@@ -565,6 +737,37 @@ DEFINE_SYSCALL3(errno_t, rt_sigqueueinfo,
 DEFINE_SYSCALL4(errno_t, rt_tgsigqueueinfo,
                 pid_t, pid, pid_t, tid, signo_t, signo,
                 USER UNCHECKED siginfo_t const *, uinfo) {
+#ifdef CONFIG_USE_NEW_GROUP
+	siginfo_t info;
+	REF struct task *target;
+	struct taskpid *leader;
+	struct taskpid *mypid = task_gettaskpid();
+	if unlikely(pid <= 0)
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, pid);
+	if unlikely(tid <= 0)
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TID, tid);
+	siginfo_from_user(&info, signo, uinfo);
+	target = pidns_lookuptask_srch(mypid->tp_ns, tid);
+	FINALLY_DECREF_UNLIKELY(target);
+	leader = task_getprocpid_of(target);
+	if ((info.si_code >= 0 || info.si_code == SI_TKILL) &&
+	    (leader != taskpid_getprocpid(mypid)))
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE,
+		      info.si_code);
+
+	/* Check if the thread-group ID matches that of the leader of the requested thread-group. */
+	if (taskpid_getnstid_s(leader, mypid->tp_ns) != pid)
+		THROW(E_PROCESS_EXITED, pid);
+
+	if (signo != 0) {
+		if (!task_raisesignalthread(target, &info))
+			THROW(E_PROCESS_EXITED, task_gettid_of_s(target));
+	}
+	return -EOK;
+#else /* CONFIG_USE_NEW_GROUP */
 	siginfo_t info;
 	REF struct task *target;
 	struct task *leader;
@@ -591,6 +794,7 @@ DEFINE_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 			THROW(E_PROCESS_EXITED, task_gettid_of_s(target));
 	}
 	return -EOK;
+#endif /* !CONFIG_USE_NEW_GROUP */
 }
 #endif /* __ARCH_WANT_SYSCALL_RT_TGSIGQUEUEINFO */
 
@@ -598,6 +802,28 @@ DEFINE_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 DEFINE_COMPAT_SYSCALL3(errno_t, rt_sigqueueinfo,
                        pid_t, pid, signo_t, signo,
                        USER UNCHECKED compat_siginfo_t const *, uinfo) {
+#ifdef CONFIG_USE_NEW_GROUP
+	REF struct taskpid *target;
+	struct taskpid *mypid = task_gettaskpid();
+	siginfo_t info;
+	if unlikely(pid <= 0)
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, pid);
+	siginfo_from_compat_user(&info, signo, uinfo);
+	target = pidns_lookup_srch(mypid->tp_ns, pid);
+	FINALLY_DECREF_UNLIKELY(target);
+	/* Don't allow sending arbitrary signals to other processes. */
+	if ((info.si_code >= 0 || info.si_code == SI_TKILL) &&
+	    (taskpid_getprocpid(target) != taskpid_getprocpid(mypid)))
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE,
+		      info.si_code);
+	if (signo != 0) {
+		if (!task_raisesignalprocess(target, &info))
+			THROW(E_PROCESS_EXITED, pid);
+	}
+	return -EOK;
+#else /* CONFIG_USE_NEW_GROUP */
 	REF struct task *target;
 	siginfo_t info;
 	if unlikely(pid <= 0)
@@ -617,6 +843,7 @@ DEFINE_COMPAT_SYSCALL3(errno_t, rt_sigqueueinfo,
 			THROW(E_PROCESS_EXITED, task_getpid_of_s(target));
 	}
 	return -EOK;
+#endif /* !CONFIG_USE_NEW_GROUP */
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_RT_SIGQUEUEINFO */
 
@@ -624,6 +851,37 @@ DEFINE_COMPAT_SYSCALL3(errno_t, rt_sigqueueinfo,
 DEFINE_COMPAT_SYSCALL4(errno_t, rt_tgsigqueueinfo,
                        pid_t, pid, pid_t, tid, signo_t, signo,
                        USER UNCHECKED compat_siginfo_t const *, uinfo) {
+#ifdef CONFIG_USE_NEW_GROUP
+	siginfo_t info;
+	REF struct task *target;
+	struct taskpid *leader;
+	struct taskpid *mypid = task_gettaskpid();
+	if unlikely(pid <= 0)
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, pid);
+	if unlikely(tid <= 0)
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TID, tid);
+	siginfo_from_compat_user(&info, signo, uinfo);
+	target = pidns_lookuptask_srch(mypid->tp_ns, tid);
+	FINALLY_DECREF_UNLIKELY(target);
+	/* Don't allow sending arbitrary signals to other processes. */
+	leader = task_getprocpid_of(target);
+	if ((info.si_code >= 0 || info.si_code == SI_TKILL) &&
+	    (leader != taskpid_getprocpid(mypid)))
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE,
+		      info.si_code);
+	/* Check if the thread-group ID matches that of the leader of the requested thread-group. */
+	if (taskpid_getnstid_s(leader, mypid->tp_ns) != pid)
+		THROW(E_PROCESS_EXITED, pid);
+
+	if (signo != 0) {
+		if (!task_raisesignalthread(target, &info))
+			THROW(E_PROCESS_EXITED, tid);
+	}
+	return -EOK;
+#else /* CONFIG_USE_NEW_GROUP */
 	siginfo_t info;
 	REF struct task *target;
 	struct task *leader;
@@ -650,6 +908,7 @@ DEFINE_COMPAT_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 			THROW(E_PROCESS_EXITED, task_gettid_of_s(target));
 	}
 	return -EOK;
+#endif /* !CONFIG_USE_NEW_GROUP */
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_RT_TGSIGQUEUEINFO */
 
@@ -691,54 +950,49 @@ signal_waitfor(CHECKED USER sigset_t const *uthese,
 	 * receive notification when such a signal arrives, even though
 	 * we're unable to handle it by "normal" means. */
 	ATOMIC_OR(THIS_TASK->t_flags, TASK_FWAKEONMSKRPC);
-	TRY {
-		for (;;) {
-			struct pending_rpc *rpc;
+	RAII_FINALLY { ATOMIC_AND(THIS_TASK->t_flags, ~TASK_FWAKEONMSKRPC); };
+	for (;;) {
+		struct pending_rpc *rpc;
 
-			/* Disable preemption for interlocking with  sporadic
-			 * wakeups send as the result of new RPCs being added
-			 * to our thread's or process's pending lists. */
-			PREEMPTION_DISABLE();
+		/* Disable preemption for interlocking with  sporadic
+		 * wakeups send as the result of new RPCs being added
+		 * to our thread's or process's pending lists. */
+		PREEMPTION_DISABLE();
 
-			/* Try to steal RPCs. */
-			rpc = task_rpc_pending_steal_posix_signal(&these);
-			if (rpc == NULL) {
-				rpc = proc_rpc_pending_trysteal_posix_signal(&these);
-				if (rpc == PROC_RPC_PENDING_TRYSTEAL_POSIX_SIGNAL_WOULDBLOCK) {
-					struct process_pending_rpcs *proc_rpcs;
-					PREEMPTION_ENABLE();
-					/* Yield until the lock becomes available. */
-					proc_rpcs = &THIS_PROCESS_RPCS;
-					process_pending_rpcs_waitwrite(proc_rpcs);
-					continue;
-				}
-			}
-
-			if (rpc != NULL) {
-				/* Got one! */
-				signo_t result;
-				ATOMIC_AND(THIS_TASK->t_flags, ~TASK_FWAKEONMSKRPC);
+		/* Try to steal RPCs. */
+		rpc = task_rpc_pending_steal_posix_signal(&these);
+		if (rpc == NULL) {
+			rpc = proc_rpc_pending_trysteal_posix_signal(&these);
+			if (rpc == PROC_RPC_PENDING_TRYSTEAL_POSIX_SIGNAL_WOULDBLOCK) {
+				struct process_pending_rpcs *proc_rpcs;
 				PREEMPTION_ENABLE();
-				assert(!(rpc->pr_flags & RPC_CONTEXT_KERN));
-				assert(rpc->pr_flags & RPC_CONTEXT_SIGNAL);
-				result = rpc->pr_psig.si_signo;
-				/* Copy signal information to userspace */
-				RAII_FINALLY { pending_rpc_free(rpc); };
-				memcpy(uinfo, &rpc->pr_psig, sizeof(siginfo_t));
-				return result;
-			}
-
-			/* Like always, serve RPCs (and posix signals) before going to sleep. */
-			if (task_serve())
+				/* Yield until the lock becomes available. */
+				proc_rpcs = &THIS_PROCESS_RPCS;
+				process_pending_rpcs_waitwrite(proc_rpcs);
 				continue;
-
-			/* Sleep until the next sporadic interrupt. */
-			if (!task_sleep(abs_timeout))
-				return 0;
+			}
 		}
-	} EXCEPT {
-		ATOMIC_AND(THIS_TASK->t_flags, ~TASK_FWAKEONMSKRPC);
-		RETHROW();
+
+		if (rpc != NULL) {
+			/* Got one! */
+			signo_t result;
+			PREEMPTION_ENABLE();
+			assert(!(rpc->pr_flags & RPC_CONTEXT_KERN));
+			assert(rpc->pr_flags & RPC_CONTEXT_SIGNAL);
+			result = rpc->pr_psig.si_signo;
+			/* Copy signal information to userspace */
+			RAII_FINALLY { pending_rpc_free(rpc); };
+			memcpy(uinfo, &rpc->pr_psig, sizeof(siginfo_t));
+			return result;
+		}
+
+		/* Like always, serve RPCs (and posix signals) before going to sleep. */
+		if (task_serve())
+			continue;
+
+		/* Sleep until the next sporadic interrupt. */
+		if (!task_sleep(abs_timeout))
+			return 0;
 	}
 }
 #endif /* WANT_SIGTIMEDWAIT */

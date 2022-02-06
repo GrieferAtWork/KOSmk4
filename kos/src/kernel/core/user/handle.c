@@ -2059,18 +2059,6 @@ handle_lookup(unsigned int fd)
 		result.h_data = task_getprocessparentpid();
 		break;
 
-	case (unsigned int)AT_GROUP_LEADER:
-		result.h_type = HANDLE_TYPE_TASK;
-		result.h_mode = IO_RDONLY;
-		result.h_data = task_getprocessgroupleaderpid();
-		break;
-
-	case (unsigned int)AT_SESSION_LEADER:
-		result.h_type = HANDLE_TYPE_TASK;
-		result.h_mode = IO_RDONLY;
-		result.h_data = task_getsessionleaderpid();
-		break;
-
 	default:
 		result = handle_lookupin(fd, THIS_HANDLE_MANAGER);
 		break;

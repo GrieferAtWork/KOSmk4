@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#ifndef CONFIG_USE_NEW_GROUP
 #ifndef GUARD_KERNEL_INCLUDE_SCHED_GROUP_H
 #include <sched/group.h>
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_GROUP_H */
@@ -40,8 +41,6 @@ DECL_BEGIN
 /* Return a reference to the controlling terminal of the calling/given process. */
 LOCAL WUNUSED REF struct ttydev *KCALL task_getctty(void) THROWS(E_WOULDBLOCK);
 LOCAL WUNUSED REF struct ttydev *NOTHROW(KCALL task_getctty_nx)(void);
-LOCAL WUNUSED REF struct ttydev *KCALL task_getctty_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
-LOCAL WUNUSED REF struct ttydev *NOTHROW(KCALL task_getctty_of_nx)(struct task *__restrict thread);
 
 
 #ifndef __INTELLISENSE__
@@ -68,30 +67,6 @@ NOTHROW(KCALL task_getctty_nx)(void) {
 	decref_unlikely(session_leader);
 	return result;
 }
-
-LOCAL WUNUSED REF struct ttydev *KCALL
-task_getctty_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
-	REF struct ttydev *result;
-	REF struct task *session_leader;
-	session_leader = task_getsessionleader_of(thread);
-	if unlikely(!session_leader)
-		return __NULLPTR;
-	result = axref_get(&FORTASK(session_leader, this_taskgroup).tg_ctty);
-	decref_unlikely(session_leader);
-	return result;
-}
-
-LOCAL WUNUSED REF struct ttydev *
-NOTHROW(KCALL task_getctty_of_nx)(struct task *__restrict thread) {
-	REF struct ttydev *result;
-	REF struct task *session_leader;
-	session_leader = task_getsessionleader_of_nx(thread);
-	if unlikely(!session_leader)
-		return __NULLPTR;
-	result = axref_get(&FORTASK(session_leader, this_taskgroup).tg_ctty);
-	decref_unlikely(session_leader);
-	return result;
-}
 #endif /* !__INTELLISENSE__ */
 
 
@@ -100,5 +75,6 @@ NOTHROW(KCALL task_getctty_of_nx)(struct task *__restrict thread) {
 
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_GROUP */
 
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_GROUP_CTTY_H */

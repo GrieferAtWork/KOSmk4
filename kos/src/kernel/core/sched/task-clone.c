@@ -58,6 +58,7 @@
 #include <kos/kernel/paging.h>
 
 #include <assert.h>
+#include <signal.h>
 #include <string.h>
 
 #if defined(__i386__) || defined(__x86_64__)
@@ -681,6 +682,7 @@ again_release_kernel_and_cc:
 			/* Figure out what will be the new thread's top-level PID namespace. */
 again_assign_pid:
 			if unlikely(clone_flags & CLONE_NEWPID) {
+				/* TODO: CLONE_THREAD must imply !CLONE_NEWPID */
 				result_pidns = pidns_alloc(result_pidns);
 			} else {
 				result_pidns = incref(result_pidns);
