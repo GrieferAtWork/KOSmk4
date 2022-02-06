@@ -36,9 +36,9 @@
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
-#include <sched/posix-signal.h> /* kernel_sigmask_full */
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
+#include <sched/sigmask.h>
 #include <sched/signal.h>
 #include <sched/task.h>
 
@@ -60,6 +60,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
+#include <signal.h>
 #include <stdalign.h>
 #include <stddef.h>
 #include <string.h>

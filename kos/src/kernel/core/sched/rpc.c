@@ -27,9 +27,9 @@
 #include <kernel/rt/except-handler.h>
 #include <kernel/types.h>
 #include <sched/group.h>
-#include <sched/posix-signal.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
+#include <sched/sigmask.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -40,6 +40,7 @@
 
 #include <assert.h>
 #include <inttypes.h>
+#include <signal.h>
 #include <stdalign.h>
 #include <stdbool.h>
 #include <stddef.h>

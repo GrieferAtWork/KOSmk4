@@ -43,6 +43,7 @@
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
 #include <sched/scheduler.h>
+#include <sched/sigmask.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>

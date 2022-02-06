@@ -23,6 +23,8 @@
 //#define DEFINE_x86_userexcept_callsignal64
 #endif /* __INTELLISENSE__ */
 
+#include <sched/posix-signal.h>
+#include <sched/sigmask.h>
 #include <sched/x86/eflags-mask.h>
 
 #if (defined(DEFINE_x86_userexcept_callsignal32) + \

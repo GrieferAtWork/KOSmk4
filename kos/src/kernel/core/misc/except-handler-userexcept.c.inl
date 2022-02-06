@@ -25,6 +25,7 @@
 #endif /* __INTELLISENSE__ */
 
 #include <sched/group.h>
+#include <sched/sigmask.h>
 
 #include <stdalign.h>
 

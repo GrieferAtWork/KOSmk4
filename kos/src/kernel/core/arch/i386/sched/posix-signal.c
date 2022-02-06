@@ -31,9 +31,9 @@
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
-#include <sched/posix-signal.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
+#include <sched/sigmask.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -89,19 +89,19 @@ x86_userexcept_callsignal32(struct icpustate *__restrict state,
                             struct kernel_sigaction const *__restrict action,
                             siginfo_t const *__restrict siginfo,
                             struct rpc_syscall_info const *sc_info)
-THROWS(E_SEGFAULT);
+		THROWS(E_SEGFAULT);
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
 x86_userexcept_callsignal64(struct icpustate *__restrict state,
                             struct kernel_sigaction const *__restrict action,
                             siginfo_t const *__restrict siginfo,
                             struct rpc_syscall_info const *sc_info)
-THROWS(E_SEGFAULT);
+		THROWS(E_SEGFAULT);
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
 userexcept_callsignal(struct icpustate *__restrict state,
                       struct kernel_sigaction const *__restrict action,
                       siginfo_t const *__restrict siginfo,
                       struct rpc_syscall_info const *sc_info)
-THROWS(E_SEGFAULT) {
+		THROWS(E_SEGFAULT) {
 	return icpustate_iscompat(state) ? x86_userexcept_callsignal32(state, action, siginfo, sc_info)
 	                                 : x86_userexcept_callsignal64(state, action, siginfo, sc_info);
 }
@@ -114,7 +114,7 @@ THROWS(E_SEGFAULT) {
  * to the calling thread's userprocmask. */
 PRIVATE NONNULL((1)) void FCALL
 sigreturn_restore_sigmask(USER CHECKED sigset_t const *sigmask)
-THROWS(E_SEGFAULT) {
+		THROWS(E_SEGFAULT) {
 	bool changed;
 	sigset_t newmask;
 	memcpy(&newmask, sigmask, sizeof(sigset_t));

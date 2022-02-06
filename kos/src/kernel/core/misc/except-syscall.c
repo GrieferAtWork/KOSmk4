@@ -29,13 +29,14 @@
 #include <kernel/mman/event.h>     /* DEFINE_PERMMAN_ONEXEC() */
 #include <kernel/mman/mpartmeta.h> /* mman_broadcastfutex() */
 #include <kernel/paging.h>
+#include <kernel/rt/except-syscall.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/group.h>
-#include <sched/posix-signal.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
+#include <sched/sigmask.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
