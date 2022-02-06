@@ -84,7 +84,7 @@ struct __siginfo_struct /*[NAME(siginfo)][PREFIX(si_)]*/ {
 	__INT32_TYPE__ __si_pad; /* ... */
 #endif /* __SIZEOF_POINTER__ > 4 */
 #if (defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
-	 defined(__COMPILER_HAVE_TRANSPARENT_UNION))
+     defined(__COMPILER_HAVE_TRANSPARENT_UNION))
 #ifndef __USE_KOS_ALTERATIONS
 	struct {
 #endif /* !__USE_KOS_ALTERATIONS */
@@ -134,8 +134,8 @@ struct __siginfo_struct /*[NAME(siginfo)][PREFIX(si_)]*/ {
 	};
 #endif /* Transparent struct/union */
 #if (!defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) || \
-	 !defined(__COMPILER_HAVE_TRANSPARENT_UNION) || \
-	 !defined(__USE_KOS_ALTERATIONS))
+     !defined(__COMPILER_HAVE_TRANSPARENT_UNION) ||  \
+     !defined(__USE_KOS_ALTERATIONS))
 	union {
 		__INT32_TYPE__ _pad[__SI_PAD_SIZE];
 		struct { /* kill(). */
@@ -180,7 +180,7 @@ struct __siginfo_struct /*[NAME(siginfo)][PREFIX(si_)]*/ {
 	} _sifields;
 #endif /* ... */
 #if (defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
-	 defined(__COMPILER_HAVE_TRANSPARENT_UNION))
+     defined(__COMPILER_HAVE_TRANSPARENT_UNION))
 #ifndef __USE_KOS_ALTERATIONS
 	};
 #endif /* !__USE_KOS_ALTERATIONS */

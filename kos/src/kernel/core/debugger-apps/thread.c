@@ -154,43 +154,31 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 
 
 
-PRIVATE ATTR_DBGTEXT ssize_t KCALL
-task_enum_eq_cb(void *arg,
-                struct task *thread,
-                struct taskpid *UNUSED(pid)) {
+PRIVATE ATTR_DBGTEXT ssize_t TASK_ENUM_CC
+task_enum_eq_cb(void *arg, struct task *thread) {
 	return (struct task *)arg == thread ? -1 : 0;
 }
 
-
 PRIVATE ATTR_DBGTEXT bool KCALL
 verify_thread_address(struct task *p) {
-	return task_enum_all(&task_enum_eq_cb, p) < 0;
+	return system_enum_threads_nb(&task_enum_eq_cb, p) < 0;
 }
 
-PRIVATE ATTR_DBGTEXT ssize_t KCALL
-task_enum_print_cb(void *UNUSED(arg),
-                   struct task *thread,
-                   struct taskpid *pid) {
-	if (!thread) {
-		dbg_printf(DBGSTR("<DEAD>     %u       " AC_WITHCOLOR(ANSITTY_CL_MAROON,
-		                                                      ANSITTY_CL_LIGHT_GRAY,
-		                                                      "D") "\n"),
-		           pid->tp_pids[0]);
-	} else {
-		unsigned int state;
-		uintptr_t flags;
-		flags = ATOMIC_READ(thread->t_flags);
-		if (flags & TASK_FRUNNING)
-			state = THREAD_STATE_RUNNING;
-		else if (flags & TASK_FTERMINATING)
-			state = THREAD_STATE_TERMINATED;
-		else if (thread == &FORCPU(thread->t_cpu, thiscpu_idle))
-			state = THREAD_STATE_IDLING;
-		else  {
-			state = THREAD_STATE_SLEEPING;
-		}
-		enum_thread(thread, state);
+PRIVATE ATTR_DBGTEXT ssize_t TASK_ENUM_CC
+task_enum_print_cb(void *UNUSED(arg), struct task *thread) {
+	unsigned int state;
+	uintptr_t flags;
+	flags = ATOMIC_READ(thread->t_flags);
+	if (flags & TASK_FRUNNING)
+		state = THREAD_STATE_RUNNING;
+	else if (flags & TASK_FTERMINATING)
+		state = THREAD_STATE_TERMINATED;
+	else if (thread == &FORCPU(thread->t_cpu, thiscpu_idle))
+		state = THREAD_STATE_IDLING;
+	else  {
+		state = THREAD_STATE_SLEEPING;
 	}
+	enum_thread(thread, state);
 	return 1;
 }
 
@@ -199,7 +187,7 @@ DBG_COMMAND(lsthread,
             "lsthread\n"
             "\tList all threads running on the system\n") {
 	dbg_print(DBGSTR("program    pid tid S cpu location\n"));
-	task_enum_all(&task_enum_print_cb, NULL);
+	system_enum_threads_nb(&task_enum_print_cb, NULL);
 	return 0;
 }
 

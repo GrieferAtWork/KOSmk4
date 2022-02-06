@@ -453,6 +453,7 @@ NOTHROW(KCALL cpu_destroy)(struct cpu *__restrict self) {
 	/* Remove the IDLE thread PID */
 	pidns_removepid(&pidns_root, FORCPU(self, thiscpu_idle_pid).tp_pids[0].tps_pid);
 	--pidns_root.pn_refcnt;
+	--pidns_root.pn_size;
 
 	/* Unmap, sync, & unprepare the mappings for the CPU's IDLE and #DF stacks.
 	 * NOTE: Because these mappings are private the the CPU itself, we don't
@@ -524,6 +525,7 @@ i386_allocate_secondary_cores(void) {
 		FORCPU(altcore, thiscpu_idle_pid).tp_pids[0].tps_pid = pidns_root.pn_npid++;
 		pidns_insertpid(&pidns_root, &FORCPU(altcore, thiscpu_idle_pid));
 		++pidns_root.pn_refcnt;
+		++pidns_root.pn_size;
 
 #ifdef CONFIG_USE_NEW_GROUP
 		/* Join the process group of /bin/init (like all other kernel threads) */

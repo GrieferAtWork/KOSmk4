@@ -478,6 +478,50 @@ NOTHROW(FCALL task_rpc_schedule)(struct task *__restrict thread,
 }
 
 
+#ifdef CONFIG_USE_NEW_GROUP
+/* Same as `task_rpc_schedule()', but schedule the RPC for execution
+ * by some arbitrary thread apart of the process `proc->tp_pctl'.
+ * NOTE: Process-directed user-RPCs must not make use of `RPC_SYNCMODE_F_REQUIRE_SC'
+ *       or `RPC_SYNCMODE_F_REQUIRE_CP'. Attempting to do so causes this function to
+ *       trigger an internal assertion check.
+ *       All other RPC functionality works as expected, though obviously  RPCs
+ * NOTE: The caller must be holding a read-lock to `proc->tp_pctl->pc_chlds_lock'
+ * @return: true:  Success. (Even if the process terminates before the RPC can be served
+ *                 normally, it will  still be served  as `RPC_REASONCTX_SHUTDOWN'  when
+ *                 true has been returned here)
+ * @return: false: The target process was marked as having terminated. */
+PUBLIC NOBLOCK WUNUSED NONNULL((1, 2)) bool
+NOTHROW(FCALL proc_rpc_schedule)(struct taskpid *__restrict proc,
+                                 /*inherit(on_success)*/ struct pending_rpc *__restrict rpc) {
+	uintptr_t rpc_flags = rpc->pr_flags;
+	struct procctl *ctl = proc->tp_pctl;
+	struct pending_rpc *head;
+
+	/* Insert into the process's pending RPC list. */
+	do {
+		head = ATOMIC_READ(ctl->pc_sig_list.slh_first);
+		if unlikely(head == THIS_RPCS_TERMINATED) {
+			DBG_memset(&rpc->pr_link, 0xcc, sizeof(rpc->pr_link));
+			return false; /* Already terminated */
+		}
+		rpc->pr_link.sle_next = head;
+		COMPILER_BARRIER();
+	} while (!ATOMIC_CMPXCH_WEAK(ctl->pc_sig_list.slh_first, head, rpc));
+	sig_broadcast(&ctl->pc_sig_more);
+
+	/* Wake-up threads within the process. */
+	if unlikely(rpc_flags & RPC_CONTEXT_KERN) {
+		userexcept_sysret_injectproc_safe(proc, rpc_flags);
+	} else {
+		assertf(!(rpc_flags & RPC_SYNCMODE_F_REQUIRE_SC),
+		        "Flag `RPC_SYNCMODE_F_REQUIRE_SC' cannot be used for user-space process RPCs");
+		assertf(!(rpc_flags & RPC_SYNCMODE_F_REQUIRE_CP),
+		        "Flag `RPC_SYNCMODE_F_REQUIRE_CP' cannot be used for user-space process RPCs");
+		userexcept_sysret_injectproc_and_marksignal_safe(proc, rpc_flags);
+	}
+	return true;
+}
+#else /* CONFIG_USE_NEW_GROUP */
 /* Same as `task_rpc_schedule()', but schedule the RPC for execution by
  * some arbitrary thread apart of the same process as `thread_in_proc'.
  * NOTE: Process-directed user-RPCs must not make use of `RPC_SYNCMODE_F_REQUIRE_SC'
@@ -529,6 +573,7 @@ NOTHROW(FCALL proc_rpc_schedule)(struct task *__restrict thread_in_proc,
 	}
 	return true;
 }
+#endif /* !CONFIG_USE_NEW_GROUP */
 
 
 

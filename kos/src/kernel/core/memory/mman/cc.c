@@ -54,13 +54,16 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/pipe.h>
 #include <sched/enum.h>
 #include <sched/epoll.h>
+#include <sched/pid.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/overflow.h>
 
 #include <kos/kernel/handle.h>
 #include <network/socket.h>
 
+#include <alloca.h>
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>
@@ -789,10 +792,8 @@ NOTHROW(FCALL system_cc_pertask)(struct task *__restrict self,
 	/* TODO: There are probably more per-task things we could try to do. */
 }
 
-PRIVATE NOBLOCK ssize_t
-NOTHROW(KCALL system_cc_pertask_cb)(void *arg,
-                                    struct task *thread,
-                                    struct taskpid *UNUSED(pid)) {
+PRIVATE NOBLOCK NONNULL((1, 2)) ssize_t
+NOTHROW(TASK_ENUM_CC system_cc_pertask_cb)(void *arg, struct task *__restrict thread) {
 	if (thread) {
 		struct ccinfo *info = (struct ccinfo *)arg;
 		system_cc_pertask(thread, info);
@@ -803,23 +804,148 @@ NOTHROW(KCALL system_cc_pertask_cb)(void *arg,
 }
 
 
+PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+NOTHROW(KCALL system_cc_root_pidtree)(struct taskpid *__restrict pid,
+                                      struct ccinfo *__restrict info) {
+	REF struct task *thread;
+again:
+	thread = taskpid_gettask(pid);
+	if likely(thread) {
+		system_cc_pertask(thread, info);
+		if (ATOMIC_DECFETCH(thread->t_refcnt) == 0) {
+			ccinfo_account(info, sizeof(struct task)); /* ... */
+			task_destroy(thread);
+		}
+		if (ccinfo_isdone(info))
+			return;
+	}
+	if (pid->tp_pids[0].tps_link.rb_lhs) {
+		if (pid->tp_pids[0].tps_link.rb_rhs) {
+			system_cc_root_pidtree(pid->tp_pids[0].tps_link.rb_rhs, info);
+			if (ccinfo_isdone(info))
+				return;
+		}
+		pid = pid->tp_pids[0].tps_link.rb_lhs;
+		goto again;
+	}
+	if (pid->tp_pids[0].tps_link.rb_rhs) {
+		pid = pid->tp_pids[0].tps_link.rb_rhs;
+		goto again;
+	}
+}
+
+
+/* Gather up to `count' threads starting at `*p_minpid', which is
+ * updated to 1+ the last PID enumerated. The return value is the
+ * number of threads stored in `buf'. -- When less than `count',
+ * that means that all threads were enumerated. */
+PRIVATE NOBLOCK NONNULL((1, 3, 4)) size_t
+NOTHROW(KCALL pidns_root_gather_threads)(REF struct task **buf, size_t count,
+                                         pid_t *__restrict p_minpid,
+                                         struct ccinfo *__restrict info) {
+	size_t result = 0;
+	pid_t minpid  = *p_minpid;
+	while (result < count && minpid >= 0) {
+		REF struct taskpid *npid;
+		REF struct task *thread;
+		npid = pidns_lookupnext_locked(&pidns_root, minpid);
+		if (!npid)
+			break; /* Done enumerating */
+		if (OVERFLOW_SADD(npid->tp_pids[0].tps_pid, 1, &minpid))
+			minpid = -1;
+		thread = taskpid_gettask(npid);
+		if (ATOMIC_DECFETCH(npid->tp_refcnt) == 0) {
+			ccinfo_account(info, _taskpid_sizeof(npid->tp_ns));
+			taskpid_destroy(npid);
+		}
+		/* Append the associated thread (if still alive) to the result list. */
+		if (thread != NULL)
+			buf[result++] = thread; /* Inherit reference */
+	}
+	*p_minpid = minpid;
+	return result;
+}
+
+/* NOTE: This function inherits a lock to `pidns_root'
+ * NOTE: This function assumes `!ccinfo_noblock(info)' */
+PRIVATE ATTR_NOINLINE NONNULL((1)) bool
+NOTHROW(KCALL system_cc_root_pidns_chunkwise)(struct ccinfo *__restrict info) {
+	pid_t minpid = 0;
+	size_t i, chunksize, count;
+	REF struct task **chunkbase;
+	/* Figure out how large we want the chunk to be. */
+	chunksize = get_stack_avail() / (2 * sizeof(REF struct task *));
+
+	/* No need to make the chunk larger than the # of threads in the root namespace. */
+	if (chunksize > pidns_root.pn_size)
+		chunksize = pidns_root.pn_size;
+
+	/* Also apply some more limits for sanity. */
+	if (chunksize > 4096)
+		chunksize = 4096;
+	if (chunksize < 4)
+		chunksize = 4;
+
+	/* Allocate our chunk buffer (on the stack) */
+	chunkbase = (REF struct task **)alloca(chunksize * sizeof(REF struct task *));
+
+	/* Gather threads from the root namespace. */
+again_gather:
+	count = pidns_root_gather_threads(chunkbase, chunksize, &minpid, info);
+	pidns_endread(&pidns_root);
+
+	/* Work through the list of gathered threads. */
+	for (i = 0; i < count; ++i) {
+		REF struct task *thread = chunkbase[i];
+		if (!ccinfo_isdone(info))
+			system_cc_pertask(thread, info);
+		if (ATOMIC_DECFETCH(thread->t_refcnt) == 0) {
+			ccinfo_account(info, sizeof(struct task)); /* ... */
+			task_destroy(thread);
+		}
+	}
+
+	/* Gather more threads if that's what we should do. */
+	if (count >= chunksize && !ccinfo_isdone(info)) {
+		if (!pidns_read_nx(&pidns_root))
+			return false;
+		goto again_gather;
+	}
+	return true;
+}
+
 /* Enumerate threads and call `system_cc_pertask()'. */
 PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_threads)(struct ccinfo *__restrict info) {
-	if (ccinfo_noblock(info)) {
+	if (pidns_tryread(&pidns_root)) {
+		/* Enumerate threads via the root PID namespace. */
+do_enum_root_pidns:
+		if (ccinfo_noblock(info)) {
+			/* Do the enumeration whilst keeping a lock to the PID namespace. */
+			if likely(pidns_root.pn_tree != NULL)
+				system_cc_root_pidtree(pidns_root.pn_tree, info);
+			pidns_endread(&pidns_root);
+		} else {
+			/* Enumerate by PID to collect threads in batches, which are then
+			 * processed before resuming executing with the next greater PID. */
+			if (!system_cc_root_pidns_chunkwise(info))
+				goto do_enum_nonblocking;
+		}
+	} else if (ccinfo_noblock(info)) {
 		/* Not allowed to block -> can enumerate threads using the non-blocking method. */
-		task_enum_all_nb(&system_cc_pertask_cb, info);
+do_enum_nonblocking:
+		system_enum_threads_nb(&system_cc_pertask_cb, info);
 	} else {
 		gfp_t saved_gfp;
-		/* TODO: do  this  better (to  be precise:  in a  way that  doesn't require
-		 *       `GFP_ATOMIC' to be set when doing per-task cache-clear operations)
-		 * Solution: It doesn't matter if we enumerate some thread more than once,
-		 *           or even if we accidentally skip one of the threads. The  only
-		 *           thing that _does_ matter is  that we terminate in  guarantied
-		 *           finite time, and do our best to hit every thread out there. */
+
+		/* Try to do a blocking-wait for the root PID namespace. */
+		if (pidns_read_nx(&pidns_root))
+			goto do_enum_root_pidns;
+
+		/* Force a non-blocking thread enumeration */
 		saved_gfp = info->ci_gfp;
 		info->ci_gfp |= GFP_ATOMIC;
-		task_enum_all_nb(&system_cc_pertask_cb, info);
+		system_enum_threads_nb(&system_cc_pertask_cb, info);
 		info->ci_gfp = saved_gfp;
 	}
 }
@@ -916,7 +1042,7 @@ again:
 			 * Anyways: since they did, they're would have had to incref() the part
 			 *          to do so, so we have to decref() it since we were unable to
 			 *          have the part re-inherit its original global reference. */
-			if (ATOMIC_FETCHDEC(iter->mp_refcnt) != 0)
+			if (ATOMIC_DECFETCH(iter->mp_refcnt) != 0)
 				goto part_not_unloaded;
 		}
 		/* Part got destroyed! */

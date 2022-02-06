@@ -331,6 +331,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 		parpid = incref(task_gettaskpid_of(parent));
 		decref_unlikely(parent);
 	} else {
+		/* In this case, `parpid' is the PID of the associated process */
 		parpid = incref(taskpid_getprocpid(pid));
 	}
 #endif /* CONFIG_USE_NEW_GROUP */
@@ -379,58 +380,70 @@ again_process_children:
 		while (!LIST_EMPTY(&ctl->pc_chlds_list)) {
 			struct taskpid *child;
 			child = LIST_FIRST(&ctl->pc_chlds_list);
-			if (taskpid_isaprocess(child)) {
-				/* Re-parent onto /bin/init */
-				if (!procctl_chlds_trywrite(&boottask_procctl)) {
-					procctl_chlds_endwrite(ctl);
-					procctl_chlds_waitwrite(&boottask_procctl); /* Never throws because preemption is enabled */
-					goto again_process_children;
-				}
 
-				/* NOTE: Because  we're holding a lock to `ctl->pc_chlds_lock',
-				 *       we know that the parent reference of any child process
-				 *       can't be changed,  since doing so  requires one to  be
-				 *       holding said lock. */
-				assertf(arref_ptr(&child->tp_pctl->pc_parent) == caller,
-				        "Child process indicates wrong parent:\n"
-				        "arref_ptr(&child->tp_pctl->pc_parent) = %p\n"
-				        "caller                                = %p",
-				        arref_ptr(&child->tp_pctl->pc_parent), caller);
-
-				/* Change the parent pointer to &boottask */
-				arref_set(&child->tp_pctl->pc_parent, &boottask);
-				procctl_chlds_remove(ctl, child);               /* Inherit reference */
-				procctl_chlds_insert(&boottask_procctl, child); /* Inherit reference */
-				procctl_chlds_endwrite(&boottask_procctl);
-				sig_broadcast(&boottask_procctl.pc_chld_changed);
-			} else {
-				REF struct task *child_thread;
-				procctl_chlds_unbind(ctl, child); /* Inherit reference */
-				child_thread = taskpid_gettask(child);
-				decref_unlikely(child); /* Inherited from `procctl_chlds_unbind()' */
-				if (child_thread) {
-					/* Use the child thread's exit RPC to terminate
-					 * it, as well  as propagate  our exit  status. */
-					if (ATOMIC_CMPXCH(FORTASK(child_thread, this_exitrpc.pr_kern.k_func),
-					                  NULL, &propagate_process_exit_status))
-						task_rpc_schedule(child_thread, &FORTASK(child_thread, this_exitrpc));
-					decref_unlikely(child_thread);
-				}
+			/* Re-parent onto /bin/init */
+			if (!procctl_chlds_trywrite(&boottask_procctl)) {
+				procctl_chlds_endwrite(ctl);
+				procctl_chlds_waitwrite(&boottask_procctl); /* Never throws because preemption is enabled */
+				goto again_process_children;
 			}
+
+			/* NOTE: Because  we're holding a lock to `ctl->pc_chlds_lock',
+			 *       we know that the parent reference of any child process
+			 *       can't be changed,  since doing so  requires one to  be
+			 *       holding said lock. */
+			assertf(arref_ptr(&child->tp_pctl->pc_parent) == caller,
+			        "Child process indicates wrong parent:\n"
+			        "arref_ptr(&child->tp_pctl->pc_parent) = %p\n"
+			        "caller                                = %p",
+			        arref_ptr(&child->tp_pctl->pc_parent), caller);
+
+			/* Change the parent pointer to &boottask */
+			arref_set(&child->tp_pctl->pc_parent, &boottask);
+			procctl_chlds_remove(ctl, child);               /* Inherit reference */
+			procctl_chlds_insert(&boottask_procctl, child); /* Inherit reference */
+			procctl_chlds_endwrite(&boottask_procctl);
+			sig_broadcast(&boottask_procctl.pc_chld_changed);
 		}
 		procctl_chlds_endwrite(ctl);
-	}
 
-	/* Automatically unbind our PID from our parent's list of children. */
-	if (flags & TASK_FDETACHED) {
+		/* Terminate all other threads within the process. */
+		PREEMPTION_DISABLE();
+		procctl_thrds_acquire_nopr(ctl);
+		while (!LIST_EMPTY(&ctl->pc_chlds_list)) {
+			REF struct task *child_thread;
+			struct taskpid *child;
+			child = LIST_FIRST(&ctl->pc_chlds_list);
+			procctl_thrds_unbind(ctl, child); /* Inherit reference */
+			procctl_thrds_release_nopr(ctl);
+			PREEMPTION_ENABLE();
+			child_thread = taskpid_gettask(child);
+			decref_unlikely(child); /* Inherited from `procctl_thrds_unbind()' */
+			if (child_thread != NULL) {
+				/* Use the child thread's exit RPC to terminate
+				 * it, as well  as propagate  our exit  status. */
+				if (ATOMIC_CMPXCH(FORTASK(child_thread, this_exitrpc.pr_kern.k_func),
+				                  NULL, &propagate_process_exit_status))
+					task_rpc_schedule(child_thread, &FORTASK(child_thread, this_exitrpc));
+				decref_unlikely(child_thread);
+			}
+			PREEMPTION_DISABLE();
+			procctl_thrds_acquire_nopr(ctl);
+		}
+		procctl_thrds_release_nopr(ctl);
+		PREEMPTION_ENABLE();
+	} else if (flags & TASK_FDETACHED) {
+		/* Automatically unbind our PID from our process's list of threads. */
 		struct procctl *parctl = parpid->tp_pctl;
 		assert(PREEMPTION_ENABLED());
-		procctl_chlds_write(parctl); /* Never throws because preemption is enabled */
+		PREEMPTION_DISABLE();
+		procctl_thrds_acquire_nopr(parctl);
 		if likely(LIST_ISBOUND(pid, tp_parsib)) {
 			procctl_chlds_unbind(parctl, pid); /* Inherit reference */
 			decref_nokill(pid);                /* nokill because of reference in `THIS_TASKPID' */
 		}
-		procctl_chlds_endwrite(parctl);
+		procctl_thrds_release_nopr(parctl);
+		PREEMPTION_ENABLE();
 	}
 
 	/* XXX: send `pid->tp_SIGCLD' to our parent process */
@@ -449,7 +462,7 @@ again_process_children:
 #ifdef CONFIG_FPU
 	/* Unset the  calling thread  potentially holding  the FPU  state.
 	 * Since the task will go away, we don't actually have to save it. */
-	ATOMIC_CMPXCH(FORCPU(me, thiscpu_fputhread), THIS_TASK, NULL);
+	ATOMIC_CMPXCH(FORCPU(me, thiscpu_fputhread), caller, NULL);
 #endif /* CONFIG_FPU */
 
 	/* Account for timings and scheduler internals, as well as figure out a successor thread. */

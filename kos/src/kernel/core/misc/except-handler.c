@@ -1004,19 +1004,68 @@ NOTHROW(FCALL userexcept_sysret_inject_and_marksignal_safe)(struct task *__restr
 }
 
 
-PRIVATE NOBLOCK ssize_t
-NOTHROW(KCALL _enum_inject_sysret)(void *arg,
-                                   struct task *thread,
-                                   struct taskpid *UNUSED(pid)) {
+#ifdef CONFIG_USE_NEW_GROUP
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL userexcept_sysret_injectpid_safe)(struct taskpid *__restrict pid,
+                                                syscall_ulong_t rpc_flags) {
+	REF struct task *thread = taskpid_gettask(pid);
+	if (thread) {
+		userexcept_sysret_inject_safe(thread, rpc_flags);
+		decref_unlikely(thread);
+	}
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL userexcept_sysret_injectpid_and_marksignal_safe)(struct taskpid *__restrict pid,
+                                                               syscall_ulong_t rpc_flags) {
+	REF struct task *thread = taskpid_gettask(pid);
+	if (thread) {
+		userexcept_sysret_inject_and_marksignal_safe(thread, rpc_flags);
+		decref_unlikely(thread);
+	}
+}
+
+/* Invoke  `userexcept_sysret_inject_safe()'  for every  thread  apart of
+ * `proc', as well as set the `TASK_FRPC' flag for each of those threads. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL userexcept_sysret_injectproc_safe)(struct taskpid *__restrict proc,
+                                                 syscall_ulong_t rpc_flags) {
+	struct taskpid *iter;
+	struct procctl *ctl = proc->tp_pctl;
+	userexcept_sysret_injectpid_safe(proc->tp_proc, rpc_flags);
+	procctl_thrds_acquire(ctl);
+	FOREACH_procctl_thrds(iter, ctl) {
+		userexcept_sysret_injectpid_safe(iter, rpc_flags);
+	}
+	procctl_thrds_release(ctl);
+}
+
+/* Invoke `userexcept_sysret_inject_and_marksignal_safe()' for every thread apart of `proc' */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL userexcept_sysret_injectproc_and_marksignal_safe)(struct taskpid *__restrict proc,
+                                                                syscall_ulong_t rpc_flags) {
+	struct taskpid *iter;
+	struct procctl *ctl = proc->tp_pctl;
+	userexcept_sysret_injectpid_and_marksignal_safe(proc->tp_proc, rpc_flags);
+	procctl_thrds_acquire(ctl);
+	FOREACH_procctl_thrds(iter, ctl) {
+		userexcept_sysret_injectpid_and_marksignal_safe(iter, rpc_flags);
+	}
+	procctl_thrds_release(ctl);
+}
+
+#else /* CONFIG_USE_NEW_GROUP */
+PRIVATE NOBLOCK NONNULL((1)) ssize_t
+NOTHROW(TASK_ENUM_CC _enum_inject_sysret)(void *arg, struct task *thread,
+                                          struct taskpid *__restrict UNUSED(pid)) {
 	if (thread != NULL)
 		userexcept_sysret_inject_safe(thread, (syscall_ulong_t)(uintptr_t)arg);
 	return 0;
 }
 
-PRIVATE NOBLOCK ssize_t
-NOTHROW(KCALL _enum_inject_sysret_and_marksignal)(void *arg,
-                                                  struct task *thread,
-                                                  struct taskpid *UNUSED(pid)) {
+PRIVATE NOBLOCK NONNULL((1)) ssize_t
+NOTHROW(TASK_ENUM_CC _enum_inject_sysret_and_marksignal)(void *arg, struct task *thread,
+                                                         struct taskpid *__restrict UNUSED(pid)) {
 	if (thread != NULL)
 		userexcept_sysret_inject_and_marksignal_safe(thread, (syscall_ulong_t)(uintptr_t)arg);
 	return 0;
@@ -1028,15 +1077,16 @@ NOTHROW(KCALL _enum_inject_sysret_and_marksignal)(void *arg,
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL userexcept_sysret_injectproc_safe)(struct task *__restrict proc,
                                                  syscall_ulong_t rpc_flags) {
-	task_enum_process_threads_nb(&_enum_inject_sysret, (void *)(uintptr_t)rpc_flags, proc);
+	task_enum_proc_thrds_nb(&_enum_inject_sysret, (void *)(uintptr_t)rpc_flags, proc);
 }
 
 /* Invoke `userexcept_sysret_inject_and_marksignal_safe()' for every thread apart of `proc' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL userexcept_sysret_injectproc_and_marksignal_safe)(struct task *__restrict proc,
                                                                 syscall_ulong_t rpc_flags) {
-	task_enum_process_threads_nb(&_enum_inject_sysret_and_marksignal, (void *)(uintptr_t)rpc_flags, proc);
+	task_enum_proc_thrds_nb(&_enum_inject_sysret_and_marksignal, (void *)(uintptr_t)rpc_flags, proc);
 }
+#endif /* !CONFIG_USE_NEW_GROUP */
 
 
 

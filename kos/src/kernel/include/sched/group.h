@@ -24,6 +24,41 @@
 
 #ifdef CONFIG_USE_NEW_GROUP
 #include <sched/group-new.h>
+
+/* Backwards-compatibility */
+#define THIS_PROCESS_RPCS                 (*THIS_TASKPID->tp_pctl)
+#define process_pending_rpcs              procctl
+#define ppr_lock                          pc_sig_lock
+#define ppr_list                          pc_sig_list
+#define ppr_more                          pc_sig_more
+#define process_pending_rpcs_mustreap     procctl_chlds_mustreap
+#define process_pending_rpcs_reap         _procctl_chlds_reap
+#define _process_pending_rpcs_reap        procctl_chlds_reap
+#define process_pending_rpcs_write        procctl_chlds_write
+#define process_pending_rpcs_write_nx     procctl_chlds_write_nx
+#define process_pending_rpcs_trywrite     procctl_chlds_trywrite
+#define process_pending_rpcs_endwrite     procctl_chlds_endwrite
+#define _process_pending_rpcs_endwrite    _procctl_chlds_endwrite
+#define process_pending_rpcs_read         procctl_chlds_read
+#define process_pending_rpcs_read_nx      procctl_chlds_read_nx
+#define process_pending_rpcs_tryread      procctl_chlds_tryread
+#define _process_pending_rpcs_endread     _procctl_chlds_endread
+#define process_pending_rpcs_endread      procctl_chlds_endread
+#define _process_pending_rpcs_end         _procctl_chlds_end
+#define process_pending_rpcs_end          procctl_chlds_end
+#define process_pending_rpcs_upgrade      procctl_chlds_upgrade
+#define process_pending_rpcs_upgrade_nx   procctl_chlds_upgrade_nx
+#define process_pending_rpcs_tryupgrade   procctl_chlds_tryupgrade
+#define process_pending_rpcs_downgrade    procctl_chlds_downgrade
+#define process_pending_rpcs_reading      procctl_chlds_reading
+#define process_pending_rpcs_writing      procctl_chlds_writing
+#define process_pending_rpcs_canread      procctl_chlds_canread
+#define process_pending_rpcs_canwrite     procctl_chlds_canwrite
+#define process_pending_rpcs_waitread     procctl_chlds_waitread
+#define process_pending_rpcs_waitwrite    procctl_chlds_waitwrite
+#define process_pending_rpcs_waitread_nx  procctl_chlds_waitread_nx
+#define process_pending_rpcs_waitwrite_nx procctl_chlds_waitwrite_nx
+
 #else /* CONFIG_USE_NEW_GROUP */
 #include <kernel/types.h>
 #include <sched/pertask.h>

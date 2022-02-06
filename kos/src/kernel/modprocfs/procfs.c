@@ -421,7 +421,6 @@ find_first_taskpid_greater_or_equal(struct pidns *__restrict ns,
 		return NULL;
 	pidns_read(ns);
 	result = pidns_lookupnext_locked(ns, (pid_t)pid);
-	xincref(result);
 	pidns_endread(ns);
 	return result;
 }

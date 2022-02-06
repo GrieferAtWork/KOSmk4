@@ -662,8 +662,8 @@ again_release_kernel_and_cc:
 		{
 			/* Figure out which PID namespace(s) the new thread should appear in. */
 			REF struct taskpid *result_pid;
-			REF struct taskpid *parent_pid;
-			struct procctl *parent_ctl;
+			REF struct taskpid *owner_pid;
+			struct procctl *owner_ctl;
 			REF struct pidns *result_pidns, *ns_iter;
 			struct taskpid *caller_pid;
 			struct procctl *result_ctl     = NULL;
@@ -705,11 +705,11 @@ again_assign_pid:
 			/* Allocate process information. */
 			if (clone_flags & CLONE_THREAD) {
 				/* Simply case: create another thread within the calling process. */
-				parent_pid = taskpid_getprocpid(caller_pid);
-				assert(caller_pid->tp_pctl == parent_pid->tp_pctl);
-				result_pid->tp_proc = parent_pid;
-				ATOMIC_ADD(parent_pid->tp_refcnt, 2); /* +1: `parent_pid', +1: `result_pid->tp_proc' */
-				result_pid->tp_pctl = parent_pid->tp_pctl;
+				owner_pid = taskpid_getprocpid(caller_pid);
+				assert(caller_pid->tp_pctl == owner_pid->tp_pctl);
+				result_pid->tp_proc = owner_pid;
+				ATOMIC_ADD(owner_pid->tp_refcnt, 2); /* +1: `owner_pid', +1: `result_pid->tp_proc' */
+				result_pid->tp_pctl = owner_pid->tp_pctl;
 				if (clone_flags & CLONE_DETACHED)
 					result->t_flags |= TASK_FDETACHED; /* Auto-reap on exit */
 			} else {
@@ -723,6 +723,10 @@ again_assign_pid:
 					_taskpid_free(result_pid);
 					RETHROW();
 				}
+#ifndef CONFIG_NO_SMP
+				atomic_lock_init(&result_ctl->pc_thrds_lock);
+#endif /* !CONFIG_NO_SMP */
+				LIST_INIT(&result_ctl->pc_thrds_list);
 				atomic_rwlock_init(&result_ctl->pc_chlds_lock);
 				LIST_INIT(&result_ctl->pc_chlds_list);
 				sig_init(&result_ctl->pc_chld_changed);
@@ -765,50 +769,54 @@ use_boottask_as_parent:
 						THROW(E_EXIT_THREAD, taskpid_getprocpid(caller_pid)->tp_status);
 					}
 				}
-				parent_pid = incref(task_gettaskpid_of(parent_proc));
+				owner_pid = incref(task_gettaskpid_of(parent_proc));
 				arref_init(&result_ctl->pc_parent, parent_proc); /* Inherit reference */
 				result_pid->tp_proc = result_pid;                /* New process */
 				result_pid->tp_pctl = result_ctl;                /* Process controller */
 				incref(result_grp);                              /* Keep around a second reference! */
 			}
 
-			FINALLY_DECREF_UNLIKELY(parent_pid);
-			parent_ctl = taskpid_getprocctl(parent_pid);
+			FINALLY_DECREF_UNLIKELY(owner_pid);
+			owner_ctl = taskpid_getprocctl(owner_pid);
 
 			/* Acquire all of the relevant locks in order to make the new thread visible. */
 again_acquire_locks:
 			TRY {
-				procctl_chlds_write(parent_ctl);
 				ns_iter = pidns_trywriteall(result_pidns);
 				if unlikely(ns_iter) {
-					_procctl_chlds_endwrite(parent_ctl);
-					procctl_chlds_reap(parent_ctl);
 					pidns_waitwrite(ns_iter);
 					goto again_acquire_locks;
 				}
-				if (result_ctl && unlikely(!procgrp_memb_trywrite(result_grp))) {
-					procctl_chlds_endwrite(parent_ctl);
-					pidns_endwriteall(result_pidns);
-					procgrp_memb_waitwrite(result_grp);
-					goto again_acquire_locks;
+				if (result_ctl) {
+					if (!procctl_chlds_trywrite(owner_ctl)) {
+						pidns_endwriteall(result_pidns);
+						procctl_chlds_waitwrite(owner_ctl);
+						goto again_acquire_locks;
+					}
+					if unlikely(!procgrp_memb_trywrite(result_grp)) {
+						procctl_chlds_endwrite(owner_ctl);
+						pidns_endwriteall(result_pidns);
+						procgrp_memb_waitwrite(result_grp);
+						goto again_acquire_locks;
+					}
 				}
 
 				/* Allocate PIDs for `result_pid' within all namespaces it should appear in. */
-				ns_iter = result_pidns;
-				do {
-					pid_t rpid = pidns_nextpid(ns_iter);
-					if unlikely(rpid == -1) {
-						if (result_ctl != NULL)
-							procgrp_memb_endwrite(result_grp);
-						_procctl_chlds_endwrite(parent_ctl);
-						procctl_chlds_reap(parent_ctl);
-						pidns_endwriteall(result_pidns);
-						THROW(E_BADALLOC); /* XXX: Custom error sub-class */
+#ifdef PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE
+				if (!pidns_allocpids(result_pid)) {
+err_pidns_allocpids_failed:
+					if (result_ctl != NULL) {
+						_procgrp_memb_endwrite(result_grp);
+						_procctl_chlds_endwrite(owner_ctl);
+						procgrp_memb_reap(result_grp);
+						procctl_chlds_reap(owner_ctl);
 					}
-
-					/* Remember which PID we want to use in this namespace. */
-					result_pid->tp_pids[ns_iter->pn_ind].tps_pid = rpid;
-				} while ((ns_iter = ns_iter->pn_par) != NULL);
+					pidns_endwriteall(result_pidns);
+					THROW(E_BADALLOC); /* XXX: Custom error sub-class */
+				}
+#else /* PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE */
+				pidns_allocpids(result_pid);
+#endif /* !PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE */
 
 				if (clone_flags & CLONE_PARENT_SETTID) {
 					/* Write-back  the child TID to the parent  process. Because this is a memory
@@ -832,10 +840,12 @@ again_write_ctid_to_parent_tidptr:
 						 * This cycle continues until the ctid written in a previous cycle matches
 						 * what would have to be written in the next, the calling thread  receives
 						 * an interrupt, or the `write_nopf()' above succeeds. */
-						if (result_ctl != NULL)
-							procgrp_memb_endwrite(result_grp);
-						_procctl_chlds_endwrite(parent_ctl);
-						procctl_chlds_reap(parent_ctl);
+						if (result_ctl != NULL) {
+							_procgrp_memb_endwrite(result_grp);
+							_procctl_chlds_endwrite(owner_ctl);
+							procgrp_memb_reap(result_grp);
+							procctl_chlds_reap(owner_ctl);
+						}
 						pidns_endwriteall(result_pidns);
 
 						/* Do a proper write, which is allowed to fault or be VIO. */
@@ -844,43 +854,38 @@ again_write_ctid_to_parent_tidptr:
 
 						/* Re-acquire locks. */
 again_acquire_locks_inner:
-						procctl_chlds_write(parent_ctl);
 						ns_iter = pidns_trywriteall(result_pidns);
 						if unlikely(ns_iter) {
-							_procctl_chlds_endwrite(parent_ctl);
-							procctl_chlds_reap(parent_ctl);
 							pidns_waitwrite(ns_iter);
 							goto again_acquire_locks_inner;
 						}
-						if (result_ctl && unlikely(!procgrp_memb_trywrite(result_grp))) {
-							procctl_chlds_endwrite(parent_ctl);
-							pidns_endwriteall(result_pidns);
-							procgrp_memb_waitwrite(result_grp);
-							goto again_acquire_locks_inner;
+						if (result_ctl) {
+							if (!procctl_chlds_trywrite(owner_ctl)) {
+								pidns_endwriteall(result_pidns);
+								procctl_chlds_waitwrite(owner_ctl);
+								goto again_acquire_locks_inner;
+							}
+							if unlikely(!procgrp_memb_trywrite(result_grp)) {
+								procctl_chlds_endwrite(owner_ctl);
+								pidns_endwriteall(result_pidns);
+								procgrp_memb_waitwrite(result_grp);
+								goto again_acquire_locks_inner;
+							}
 						}
 
 						/* Allocate PIDs for `result_pid' within all namespaces it should appear in. */
-						ns_iter = result_pidns;
-						do {
-							pid_t rpid = pidns_nextpid(ns_iter);
-							if unlikely(rpid == -1) {
-								if (result_ctl != NULL)
-									procgrp_memb_endwrite(result_grp);
-								_procctl_chlds_endwrite(parent_ctl);
-								procctl_chlds_reap(parent_ctl);
-								pidns_endwriteall(result_pidns);
-								THROW(E_BADALLOC); /* XXX: Custom error sub-class */
-							}
-
-							/* Remember which PID we want to use in this namespace. */
-							result_pid->tp_pids[ns_iter->pn_ind].tps_pid = rpid;
-						} while ((ns_iter = ns_iter->pn_par) != NULL);
+#ifdef PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE
+						if (!pidns_allocpids(result_pid))
+							goto err_pidns_allocpids_failed;
+#else /* PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE */
+						pidns_allocpids(result_pid);
+#endif /* !PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE */
 
 						/* Check if we were able  to allocate the same  TID.
 						 * If we were, then we also know that the same value
 						 * has previously been written to user-space! */
 						new_ctid = taskpid_getnstid(result_pid, caller_pid->tp_ns);
-						if (ctid != new_ctid) {
+						if unlikely(ctid != new_ctid) {
 							ctid = new_ctid;
 							goto again_write_ctid_to_parent_tidptr;
 						}
@@ -894,8 +899,8 @@ again_acquire_locks_inner:
 					_procctl_free(result_ctl);
 					decref_unlikely(result_grp);
 				} else {
-					assert(result_pid->tp_proc == parent_pid);
-					decref_nokill(parent_pid);
+					assert(result_pid->tp_proc == owner_pid);
+					decref_nokill(owner_pid);
 				}
 				_taskpid_free(result_pid);
 				decref_unlikely(result_pidns);
@@ -903,35 +908,35 @@ again_acquire_locks_inner:
 			}
 
 			/* While interlocked with `parent_ctl->pc_chlds_lock', check if the parent
-			 * process (as pointed-to by `parent_pid') has already terminated. - If it
+			 * process (as pointed-to by `owner_pid') has already terminated. - If it
 			 * has, then we have to release all  of our locks, and free most  relevant
 			 * data,  before looping back  to the point where  the parent process gets
 			 * calculated, which is then able to deal with that process having exited. */
 			{
-				REF struct task *parent_task;
-				parent_task = taskpid_gettask(parent_pid);
-				if unlikely(!parent_task || (ATOMIC_READ(parent_task->t_flags) & (TASK_FTERMINATED |
-				                                                                  TASK_FTERMINATING))) {
-					if (result_ctl != NULL) {
-						procgrp_memb_endwrite(result_grp);
-						decref_unlikely(result_grp);
-					}
-					procctl_chlds_endwrite(parent_ctl);
+				REF struct task *owner_task;
+				owner_task = taskpid_gettask(owner_pid);
+				if unlikely(!owner_task || (ATOMIC_READ(owner_task->t_flags) & (TASK_FTERMINATED |
+				                                                                TASK_FTERMINATING))) {
 					pidns_endwriteall(result_pidns);
-					xdecref_unlikely(parent_task);
 					if (result_ctl != NULL) {
+						_procgrp_memb_endwrite(result_grp);
+						_procctl_chlds_endwrite(owner_ctl);
+						procgrp_memb_reap(result_grp);
+						procctl_chlds_reap(owner_ctl);
+						decref_unlikely(result_grp);
 						arref_fini(&result_ctl->pc_grp);
 						arref_fini(&result_ctl->pc_parent);
 						_procctl_free(result_ctl);
 						decref_unlikely(result_grp);
 					} else {
-						assert(result_pid->tp_proc == parent_pid);
-						decref_nokill(parent_pid);
+						assert(result_pid->tp_proc == owner_pid);
+						decref_nokill(owner_pid);
 					}
+					xdecref_unlikely(owner_task);
 					_taskpid_free(result_pid);
 					decref_unlikely(result_pidns);
 					_task_serve();
-					if (task_gettaskpid_of(parent_task) == taskpid_getprocpid(caller_pid)) {
+					if (task_gettaskpid_of(owner_task) == taskpid_getprocpid(caller_pid)) {
 						/* Might  get here if the calling process's main thread is currently
 						 * in the process of exiting (inside task_exit: already set the flag
 						 * `TASK_FTERMINATING', but has yet to propagate its exit status  to
@@ -943,7 +948,7 @@ again_acquire_locks_inner:
 					}
 					goto again_assign_pid;
 				}
-				decref_unlikely(parent_task);
+				decref_unlikely(owner_task);
 			}
 
 			/* Whilst interlocked with all of the locks needed to make a new thread
@@ -968,13 +973,33 @@ again_acquire_locks_inner:
 			 * we facilitate by checking for TASK_FRPC, and even if that one's not
 			 * set, we also go through signals send to our process in order to see
 			 * if there are any that aren't marked by the calling thread.
+			 *
+			 * FIXME: What about a process-directed RPC with the intend of killing the
+			 *        targeted process, but then one of the process's thread took that
+			 *        RPC  and began handling it (so we're  no longer able to see it).
+			 *        Now handling of the RPCs hasn't  finished yet, but once it  has,
+			 *        the receiving thread will cause  our process to terminate,  only
+			 *        at that point it's too late because we ended up creating the new
+			 *        process...
+			 * Solution: until the kernel-side part relating to execution of a
+			 *           process-directed RPC has finished, there must be some
+			 *           kind of  flag "PROCESS_RPC_HANDLING_IN_PROCESS"  that
+			 *           remains set for as long as a process-directed RPC  is
+			 *           still being processed by some thread of the  process.
+			 *           The flag also comes with a `struct sig' (possibly one
+			 *           that is global), and that  we can then wait on  here,
+			 *           so-as to ensure  that no  process-directed RPC  could
+			 *           possibly exist  that might  stop  creation of  a  new
+			 *           thread.
 			 */
 			if (ATOMIC_READ(caller->t_flags) & TASK_FRPC) {
 do_task_serve_and_acquire_locks:
-				if (result_ctl != NULL)
-					procgrp_memb_endwrite(result_grp);
-				_procctl_chlds_endwrite(parent_ctl);
-				procctl_chlds_reap(parent_ctl);
+				if (result_ctl != NULL) {
+					_procgrp_memb_endwrite(result_grp);
+					_procctl_chlds_endwrite(owner_ctl);
+					procgrp_memb_reap(result_grp);
+					procctl_chlds_reap(owner_ctl);
+				}
 				pidns_endwriteall(result_pidns);
 				_task_serve();
 				goto again_acquire_locks;
@@ -990,10 +1015,12 @@ do_task_serve_and_acquire_locks:
 				struct pending_rpc_slist pending;
 				caller_ctl = caller_pid->tp_pctl;
 				if (!procctl_sig_tryread(caller_ctl)) {
-					if (result_ctl != NULL)
-						procgrp_memb_endwrite(result_grp);
-					_procctl_chlds_endwrite(parent_ctl);
-					procctl_chlds_reap(parent_ctl);
+					if (result_ctl != NULL) {
+						_procgrp_memb_endwrite(result_grp);
+						_procctl_chlds_endwrite(owner_ctl);
+						procgrp_memb_reap(result_grp);
+						procctl_chlds_reap(owner_ctl);
+					}
 					pidns_endwriteall(result_pidns);
 					procctl_sig_waitread(caller_ctl);
 					goto again_acquire_locks;
@@ -1017,13 +1044,15 @@ sig_endread_and_force_task_serve_and_acquire_locks:
 							/* Copy the calling thread's userprocmask so we can use that one! */
 							USER CHECKED struct userprocmask *um;
 							USER UNCHECKED sigset_t *current_sigmask;
-							if (result_ctl != NULL)
-								procgrp_memb_endwrite(result_grp);
 							_procctl_sig_endread(caller_ctl);
-							_procctl_chlds_endwrite(parent_ctl);
-							procctl_chlds_reap(parent_ctl);
-							procctl_sig_reap(caller_ctl);
+							if (result_ctl != NULL) {
+								_procgrp_memb_endwrite(result_grp);
+								_procctl_chlds_endwrite(owner_ctl);
+								procgrp_memb_reap(result_grp);
+								procctl_chlds_reap(owner_ctl);
+							}
 							pidns_endwriteall(result_pidns);
+							procctl_sig_reap(caller_ctl);
 							COMPILER_BARRIER();
 							um              = PERTASK_GET(this_userprocmask_address);
 							current_sigmask = ATOMIC_READ(um->pm_sigmask);
@@ -1050,13 +1079,21 @@ sig_endread_and_force_task_serve_and_acquire_locks:
 				pidns_insertpid(ns_iter, result_pid);
 			} while ((ns_iter = ns_iter->pn_par) != NULL);
 
-			/* Insert the new thread into the relevant process controller's child list. */
-			procctl_chlds_insert(parent_ctl, result_pid);
-
 			/* Insert a new process PID into the calling process's process group. */
 			assert((result_grp != NULL) == (result_ctl != NULL));
-			if (result_ctl != NULL)
+			assert((result_grp != NULL) == ((clone_flags & CLONE_THREAD) == 0));
+			if (result_ctl != NULL) {
+				/* Insert the new thread into the relevant process controller's child list. */
+				procctl_chlds_insert(owner_ctl, result_pid);
 				procgrp_memb_insert(result_grp, result_pid); /* Initializes `pc_grpmember' */
+			} else {
+				/* Add thread to main process's thread list. */
+				procctl_thrds_acquire(owner_ctl); /* SMP-lock, so nesting is allowed! */
+				/* FIXME: Must check if the current process terminated _AFTER_ `procctl_thrds_acquire'! */
+
+				procctl_thrds_insert(owner_ctl, result_pid);
+				procctl_thrds_release(owner_ctl);
+			}
 
 			/* Insert the new task into its mman's thread-list */
 			mman_threadslock_acquire(result->t_mman); /* SMP-lock, so nesting is allowed! */
@@ -1068,12 +1105,12 @@ sig_endread_and_force_task_serve_and_acquire_locks:
 				procgrp_memb_endwrite(result_grp);
 				decref_unlikely(result_grp);
 			}
-			_procctl_chlds_endwrite(parent_ctl);
-			procctl_chlds_reap(parent_ctl);
+			_procctl_chlds_endwrite(owner_ctl);
+			procctl_chlds_reap(owner_ctl);
 			pidns_endwriteall(result_pidns);
 
 			/* Indicate to the process controller that its list of children has changed. */
-			sig_broadcast(&parent_ctl->pc_chld_changed);
+			sig_broadcast(&owner_ctl->pc_chld_changed);
 		} /* Scope... */
 #endif /* CONFIG_USE_NEW_GROUP */
 

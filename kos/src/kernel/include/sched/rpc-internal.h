@@ -157,6 +157,22 @@ FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL
 NOTHROW(FCALL task_rpc_schedule)(struct task *__restrict thread,
                                  /*inherit(on_success)*/ struct pending_rpc *__restrict rpc);
 
+#ifdef CONFIG_USE_NEW_GROUP
+/* Same as `task_rpc_schedule()', but schedule the RPC for execution
+ * by some arbitrary thread apart of the process `proc->tp_pctl'.
+ * NOTE: Process-directed user-RPCs must not make use of `RPC_SYNCMODE_F_REQUIRE_SC'
+ *       or `RPC_SYNCMODE_F_REQUIRE_CP'. Attempting to do so causes this function to
+ *       trigger an internal assertion check.
+ *       All other RPC functionality works as expected, though obviously  RPCs
+ *       will be served by some arbitrary thread within the specified process.
+ * @return: true:  Success. (Even if the process terminates before the RPC can be served
+ *                 normally, it will  still be served  as `RPC_REASONCTX_SHUTDOWN'  when
+ *                 true has been returned here)
+ * @return: false: The target process was marked as having terminated. */
+FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL
+NOTHROW(FCALL proc_rpc_schedule)(struct taskpid *__restrict proc,
+                                 /*inherit(on_success)*/ struct pending_rpc *__restrict rpc);
+#else /* CONFIG_USE_NEW_GROUP */
 /* Same as `task_rpc_schedule()', but schedule the RPC for execution by
  * some arbitrary thread apart of the same process as `thread_in_proc'.
  * NOTE: Process-directed user-RPCs must not make use of `RPC_SYNCMODE_F_REQUIRE_SC'
@@ -171,6 +187,7 @@ NOTHROW(FCALL task_rpc_schedule)(struct task *__restrict thread,
 FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL
 NOTHROW(FCALL proc_rpc_schedule)(struct task *__restrict thread_in_proc,
                                  /*inherit(on_success)*/ struct pending_rpc *__restrict rpc);
+#endif /* !CONFIG_USE_NEW_GROUP */
 
 /* Gather the set of posix signal numbers used by pending RPCs
  * of calling thread or process.  These functions are used  to

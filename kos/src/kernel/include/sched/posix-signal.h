@@ -82,7 +82,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct kernel_sigmask, sm_refcnt, kfree)
 /* An empty signal mask used to initialize `this_kernel_sigmask' */
 DATDEF struct kernel_sigmask kernel_sigmask_empty;
 
-/* A full signal mask (i.e. one that blocks all signals (except for SIGKILL and SIGSTOP)) */
+/* A full signal mask (i.e. one that blocks all signals; except for SIGKILL and SIGSTOP) */
 DATDEF struct kernel_sigmask kernel_sigmask_full;
 
 #ifndef __kernel_sigmask_arref_defined

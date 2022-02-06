@@ -1352,12 +1352,11 @@ INTDEF byte_t __debug_malloc_tracked_size[];
 ARREF(driver_loadlist_arref, driver_loadlist);
 #endif /* !__driver_loadlist_arref_defined */
 
-PRIVATE NOBLOCK ATTR_COLDTEXT ssize_t
-NOTHROW(KCALL gc_reachable_thread_cb)(void *UNUSED(arg),
-                                      struct task *thread,
-                                      struct taskpid *UNUSED(pid)) {
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((2)) ssize_t
+NOTHROW(TASK_ENUM_CC gc_reachable_thread_cb)(void *UNUSED(arg),
+                                             struct task *__restrict thread) {
 	size_t result = 0;
-	if (thread && thread != THIS_TASK) {
+	if (thread != THIS_TASK) {
 		gc_reachable_thread(thread);
 		result += gc_reachable_thread_scpustate(thread, FORTASK(thread, this_sstate));
 	}
@@ -1469,7 +1468,7 @@ NOTHROW(KCALL gc_find_reachable_impl)(void) {
 
 	/* Search all threads on all CPUs. */
 	PRINT_LEAKS_SEARCH_PHASE("Phase #2: Scan running threads\n");
-	task_enum_all_noipi_nb(&gc_reachable_thread_cb, NULL);
+	system_enum_threads_noipi_nb(&gc_reachable_thread_cb, NULL);
 
 	PRINT_LEAKS_SEARCH_PHASE("Phase #2.1: Scan the calling thread\n");
 	gc_reachable_this_thread();
@@ -1726,21 +1725,15 @@ NOTHROW(KCALL gc_task_unskew)(struct task *__restrict self) {
 	gc_mman_unskew(self->t_mman);
 }
 
-PRIVATE NOBLOCK ATTR_COLDTEXT ssize_t
-NOTHROW(KCALL _gc_task_skew_enum_cb)(void *UNUSED(arg),
-                                     struct task *thread,
-                                     struct taskpid *UNUSED(pid)) {
-	if (thread)
-		gc_task_skew(thread);
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((2)) ssize_t
+NOTHROW(TASK_ENUM_CC _gc_task_skew_enum_cb)(void *UNUSED(arg), struct task *__restrict thread) {
+	gc_task_skew(thread);
 	return 0;
 }
 
-PRIVATE NOBLOCK ATTR_COLDTEXT ssize_t
-NOTHROW(KCALL _gc_task_unskew_enum_cb)(void *UNUSED(arg),
-                                       struct task *thread,
-                                       struct taskpid *UNUSED(pid)) {
-	if (thread)
-		gc_task_unskew(thread);
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((2)) ssize_t
+NOTHROW(TASK_ENUM_CC _gc_task_unskew_enum_cb)(void *UNUSED(arg), struct task *__restrict thread) {
+	gc_task_unskew(thread);
 	return 0;
 }
 
@@ -1758,7 +1751,7 @@ NOTHROW(KCALL gc_globals_skew)(void) {
 	gc_mman_skew(&mman_kernel);
 
 	/* Skew global pointers relating to threads. */
-	task_enum_all_noipi_nb(&_gc_task_skew_enum_cb, NULL);
+	system_enum_threads_noipi_nb(&_gc_task_skew_enum_cb, NULL);
 }
 
 PRIVATE NOBLOCK ATTR_COLDTEXT void
@@ -1772,7 +1765,7 @@ NOTHROW(KCALL gc_globals_unskew)(void) {
 	gc_mman_unskew(&mman_kernel);
 
 	/* Unskew global pointers relating to threads. */
-	task_enum_all_noipi_nb(&_gc_task_unskew_enum_cb, NULL);
+	system_enum_threads_noipi_nb(&_gc_task_unskew_enum_cb, NULL);
 }
 
 

@@ -241,10 +241,14 @@ PUBLIC struct procgrp boottask_procgrp = {
 
 /* Process controller for `boottask' (aka. `/bin/init') */
 PUBLIC struct procctl boottask_procctl = {
-	.pc_chlds_lock = ATOMIC_RWLOCK_INIT,
+#ifndef CONFIG_NO_SMP
+	.pc_thrds_lock = ATOMIC_LOCK_INIT,
+#endif /* !CONFIG_NO_SMP */
 	/* s.a. the static initializer of `asyncwork_pid', which is statically
 	 *      set-up to behave  like the  first element of  this very  list! */
-	.pc_chlds_list   = { &asyncwork_pid },
+	.pc_thrds_list   = { &asyncwork_pid },
+	.pc_chlds_lock   = ATOMIC_RWLOCK_INIT,
+	.pc_chlds_list   = LIST_HEAD_INITIALIZER(boottask_procctl.pc_chlds_list),
 	.pc_chld_changed = SIG_INIT,
 	/* Even though it  doesn't ~really~  make sense, /bin/init  is set-up  to
 	 * behave as its own parent process. Because the parent field must always
@@ -893,13 +897,11 @@ try_reap_all_children(struct procctl *__restrict ctl,
 	bool result = true;
 	struct taskpid *child;
 again:
-	/* Enumerate child threads (and processes) */
+	/* Enumerate child processes */
 	procctl_chlds_read(ctl);
-	LIST_FOREACH (child, &ctl->pc_chlds_list, tp_parsib) {
+	FOREACH_procctl_chlds(child, ctl) {
 		REF struct task *thread;
 		uint16_t status;
-		if (!taskpid_isaprocess(child))
-			continue; /* Ignore child threads. (we only care about processes) */
 		if (!taskpid_hasterminated(child)) {
 			/* Found a child process that has yet to terminate! */
 			result = false;
@@ -1045,18 +1047,29 @@ again_consume_status_stop_cont:
 again_child_has_exited:
 			if (!(options & WNOREAP)) {
 				/* Reap child */
-				procctl_chlds_write(ctl);
-				if (taskpid_getparentprocessptr(child) != taskpid_gettaskptr(proc)) {
+				if (taskpid_isaprocess(child)) {
+					procctl_chlds_write(ctl);
+					if (taskpid_getparentprocessptr(child) != taskpid_gettaskptr(proc)) {
+						procctl_chlds_endwrite(ctl);
+						return -ECHILD; /* Not a child */
+					}
+					if likely(LIST_ISBOUND(child, tp_parsib)) {
+						procctl_chlds_unbind(ctl, child); /* Inherit reference */
+						decref_nokill(child);             /* Still got our reference from `pidns_lookup()'! */
+					}
 					procctl_chlds_endwrite(ctl);
-					return -ECHILD; /* Not a child */
+				} else {
+					procctl_thrds_acquire(ctl);
+					if likely(LIST_ISBOUND(child, tp_parsib)) {
+						procctl_thrds_unbind(ctl, child); /* Inherit reference */
+						decref_nokill(child);             /* Still got our reference from `pidns_lookup()'! */
+					}
+					procctl_thrds_release(ctl);
 				}
-				procctl_chlds_unbind(ctl, child); /* Inherit reference */
-				procctl_chlds_endwrite(ctl);
-				decref_nokill(child); /* Still got our reference from `pidns_lookup()'! */
 			}
 		} else if (options & WNOHANG) {
 			/* Don't block */
-			return -EAGAIN;
+			goto err_EAGAIN;
 		} else {
 			/* Wait for child to change status. */
 			task_connect_for_poll(&child->tp_changed);
@@ -1092,10 +1105,9 @@ again_scan_children:
 		}
 
 		/* Enumerate child processes. (in this case, we ignore threads) */
-		LIST_FOREACH (child, &ctl->pc_chlds_list, tp_parsib) {
+		FOREACH_procctl_chlds (child, ctl) {
 			uint16_t status;
-			if (!taskpid_isaprocess(child))
-				continue;
+			assert(taskpid_isaprocess(child));
 			if (which == P_PGID) {
 				/* Ignore if `child' isn't apart of a specific process group. */
 				if (taskpid_getpgid_s(child) != which_pid)
@@ -1140,10 +1152,24 @@ again_read_status_in_nonspecific:
 			return -ECHILD; /* No candidates */
 		}
 		if (options & WNOHANG)
-			return -EAGAIN; /* Operation would have blocked */
+			goto err_EAGAIN; /* Operation would have blocked */
 		task_waitfor();
 		goto again_scan_children;
 	}
+	__builtin_unreachable();
+err_EAGAIN:
+	if (infop) {
+		/* From `man 2 waitpid':
+		 * """
+		 *    POSIX.1-2008 Technical Corrigendum 1 (2013) adds the requirement
+		 *    that when  WNOHANG is  specified in  options and  there were  no
+		 *    children  in a waitable state, then waitid() should zero out the
+		 *    si_pid and si_signo fields of the structure. [...]
+		 * """ */
+		infop->si_pid   = 0;
+		infop->si_signo = 0;
+	}
+	return -EAGAIN;
 }
 #endif /* WANT_WAIT */
 

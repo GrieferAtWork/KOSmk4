@@ -28,6 +28,7 @@
 #include <sched/signal.h>
 
 #include <hybrid/sequence/list.h>
+#include <hybrid/sync/atomic-lock.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <kos/aref.h>
@@ -195,7 +196,7 @@ struct procgrp {
 	COMPILER_FLEXIBLE_ARRAY(struct procgrp_slot, pgr_pids);     /* [const][tp_ns->pn_ind+1] Task PID value from different namespaces. */
 };
 
-/* Destroy the given procgrp. */
+/* Destroy the given process group. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL procgrp_destroy)(struct procgrp *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct procgrp, pgr_refcnt, procgrp_destroy)
@@ -252,11 +253,6 @@ DEFINE_REFCOUNT_FUNCTIONS(struct procgrp, pgr_refcnt, procgrp_destroy)
 
 
 
-/* Destroy the given process group. */
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL procgrp_destroy)(struct procgrp *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct procgrp, pgr_refcnt, procgrp_destroy)
-
 /* Return information regarding the session associated with a given process group. */
 #define procgrp_getsessionleader(self) (self)->pgr_sleader
 #define procgrp_issessionleader(self)  ((self) == procgrp_getsessionleader(self))
@@ -310,18 +306,21 @@ ARREF(procgrp_arref, procgrp);
 #endif /* !__procgrp_arref_defined */
 
 struct procctl {
+#ifndef CONFIG_NO_SMP
+	struct atomic_lock       pc_thrds_lock;   /* SMP-lock for `pc_thrds_list' (needs to be
+	                                           * an  SMP-lock  for  `proc_rpc_schedule()') */
+#endif /* !CONFIG_NO_SMP */
+	struct REF taskpid_list  pc_thrds_list;   /* [0..n][lock(!PREEMPTION && pc_thrds_lock)][link(tp_parsib)]
+	                                           * List of threads (excluding the  main thread) that are  apart
+	                                           * of this process. Note that threads with the `TASK_FDETACHED'
+	                                           * flag  will  automatically remove  themselves from  this list
+	                                           * during `task_exit()'.
+	                                           * NOTE: Elements may only be added to this list for
+	                                           *       as long as this process's main thread isn't
+	                                           *       marked as `TASK_FTERMINATING'! */
 	struct atomic_rwlock     pc_chlds_lock;   /* Lock for `pc_chlds_list' */
 	struct REF taskpid_list  pc_chlds_list;   /* [0..n][lock(pc_chlds_lock)][link(tp_parsib)]
-	                                           * Child  tasks of this process. This includes both
-	                                           * threads  (other than the main thread) within the
-	                                           * process,  as well as  processes that were fork'd
-	                                           * from this one (or re-parented to this one). Note
-	                                           * that threads with the `TASK_FDETACHED' flag will
-	                                           * automatically remove themselves  from this  list
-	                                           * during `task_exit()'. Child  processes don't  do
-	                                           * this  and must instead  be removed with wait(2),
-	                                           * as can  also be  done for  threads (that  aren't
-	                                           * detached)
+	                                           * Child processes of this process.
 	                                           * NOTE: Elements may only be added to this list for
 	                                           *       as long as this process's main thread isn't
 	                                           *       marked as `TASK_FTERMINATING'! */
@@ -350,9 +349,59 @@ struct procctl {
 	LIST_ENTRY(taskpid)      pc_grpmember;    /* [0..1][lock(pc_grp->pgr_memb_lock)] Process group member link. */
 };
 
+/* Enumerate threads (other than the main thread) of `self' */
+#define FOREACH_procctl_thrds(iter, self) \
+	LIST_FOREACH (iter, &(self)->pc_thrds_list, tp_parsib)
+
+/* Enumerate child processes of `self' */
+#define FOREACH_procctl_chlds(iter, self) \
+	LIST_FOREACH (iter, &(self)->pc_chlds_list, tp_parsib)
+
+
+
 /* Allocate/Free a `struct procctl' */
 #define _procctl_alloc()    ((struct procctl *)kmalloc(sizeof(struct procctl), GFP_NORMAL))
 #define _procctl_free(self) kfree(self)
+
+/* Helper macros for working with `struct procgrp::pc_thrds_lock' */
+#ifndef CONFIG_NO_SMP
+#define procctl_thrds_tryacquire_nopr(self) atomic_lock_tryacquire(&(self)->pc_thrds_lock)
+#define procctl_thrds_acquire_nopr(self)    atomic_lock_acquire_nopr(&(self)->pc_thrds_lock)
+#define procctl_thrds_release_nopr(self)    atomic_lock_release(&(self)->pc_thrds_lock)
+#define procctl_thrds_acquired(self)        atomic_lock_acquired(&(self)->pc_thrds_lock)
+#define procctl_thrds_available(self)       atomic_lock_available(&(self)->pc_thrds_lock)
+#else /* !CONFIG_NO_SMP */
+#define procctl_thrds_tryacquire_nopr(self) 1
+#define procctl_thrds_acquire_nopr(self)    (void)0
+#define procctl_thrds_release_nopr(self)    (void)0
+#define procctl_thrds_acquired(self)        (!PREEMPTION_ENABLED())
+#define procctl_thrds_available(self)       1
+#endif /* CONFIG_NO_SMP */
+#define procctl_thrds_acquire(self)                  \
+	do {                                             \
+		pflag_t __pclthr_was = PREEMPTION_PUSHOFF(); \
+		procctl_thrds_acquire_nopr(self)
+#define procctl_thrds_release(self)       \
+		procctl_thrds_release_nopr(self); \
+		PREEMPTION_POP(__pclthr_was);     \
+	}	__WHILE0
+
+
+/* Helper macros for adding/removing elements from `struct procctl::pc_thrds_list'
+ * NOTE: For all of these, the caller must be holding an SMP-lock to `self->pc_thrds_lock' */
+#define _procctl_thrds_assert(self, /*IN_REF*/ struct_taskpid_to_insert) \
+	__hybrid_assertf(!taskpid_isaprocess(struct_taskpid_to_insert),      \
+	                 "processes must reside in `pc_chlds_list'")
+#define procctl_thrds_insert(self, /*IN_REF*/ struct_taskpid_to_insert) \
+	(_procctl_thrds_assert(self, struct_taskpid_to_insert),             \
+	 LIST_INSERT_HEAD(&(self)->pc_thrds_list, struct_taskpid_to_insert, tp_parsib))
+#define procctl_thrds_remove(self, /*OUT_REF*/ struct_taskpid_to_remove) \
+	(_procctl_thrds_assert(self, struct_taskpid_to_remove),              \
+	 LIST_REMOVE(struct_taskpid_to_remove, tp_parsib))
+#define procctl_thrds_unbind(self, /*OUT_REF*/ struct_taskpid_to_unbind) \
+	(_procctl_thrds_assert(self, struct_taskpid_to_unbind),              \
+	 LIST_UNBIND(struct_taskpid_to_unbind, tp_parsib))
+
 
 /* Helper macros for working with `struct procgrp::pc_chlds_lock' */
 #define procctl_chlds_mustreap(self)     0
@@ -385,12 +434,18 @@ struct procctl {
 
 /* Helper macros for adding/removing elements from `struct procctl::pc_chlds_list'
  * NOTE: For all of these, the caller must be holding a write-lock to `self->pc_chlds_lock' */
+#define _procctl_chlds_assert(self, /*IN_REF*/ struct_taskpid_to_insert) \
+	__hybrid_assertf(taskpid_isaprocess(struct_taskpid_to_insert),       \
+	                 "threads must reside in `pc_thrds_list'")
 #define procctl_chlds_insert(self, /*IN_REF*/ struct_taskpid_to_insert) \
-	LIST_INSERT_HEAD(&(self)->pc_chlds_list, struct_taskpid_to_insert, tp_parsib)
+	(_procctl_chlds_assert(self, struct_taskpid_to_insert),             \
+	 LIST_INSERT_HEAD(&(self)->pc_chlds_list, struct_taskpid_to_insert, tp_parsib))
 #define procctl_chlds_remove(self, /*OUT_REF*/ struct_taskpid_to_remove) \
-	LIST_REMOVE(struct_taskpid_to_remove, tp_parsib)
+	(_procctl_chlds_assert(self, struct_taskpid_to_remove),              \
+	 LIST_REMOVE(struct_taskpid_to_remove, tp_parsib))
 #define procctl_chlds_unbind(self, /*OUT_REF*/ struct_taskpid_to_unbind) \
-	LIST_UNBIND(struct_taskpid_to_unbind, tp_parsib)
+	(_procctl_chlds_assert(self, struct_taskpid_to_unbind),              \
+	 LIST_UNBIND(struct_taskpid_to_unbind, tp_parsib))
 
 /* Helper macros for working with `struct procgrp::pc_sig_lock' */
 #define procctl_sig_mustreap(self)     0

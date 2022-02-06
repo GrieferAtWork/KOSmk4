@@ -118,7 +118,7 @@ struct icpustate *task_serve_with_icpustate(struct icpustate *__restrict state) 
 	ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
 
 	/* Load RPC functions. This must happen _AFTER_ we clear
-	 * the pending-RPC flag to prevent a race condition. */
+	 * the  pending-RPC  flag to  prevent a  race condition. */
 	pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
 
 handle_pending:
@@ -269,7 +269,7 @@ NOTHROW(FCALL userexcept_handler)(struct icpustate *__restrict state,
 	ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
 
 	/* Load RPC functions. This must happen _AFTER_ we clear
-	 * the pending-RPC flag to prevent a race condition. */
+	 * the  pending-RPC  flag to  prevent a  race condition. */
 	pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
 
 handle_pending:
@@ -568,7 +568,7 @@ The referenced `userexcept_sysret()` function looks very similar and is implemen
 
 ```c
 /* This function is called when any (even just inactive) RPCs are scheduled
- * just before returning to user-space. The given `state' points to the
+ * just before returning  to user-space.  The given `state'  points to  the
  * target user-space location. */
 struct icpustate *userexcept_sysret(struct icpustate *state) {
 	struct pending_rpc_slist sysret_pending;
@@ -827,7 +827,8 @@ again:
 			PREEMPTION_DISABLE();
 			if (task_serve_with_sigmask(&these))
 				continue;
-			task_pause();
+			/* Sleep until a sporadic interrupt */
+			task_sleep();
 		}
 	} EXCEPT {
 		/* This function  only returns  normally
@@ -895,4 +896,3 @@ again:
 	}
 }
 ```
-

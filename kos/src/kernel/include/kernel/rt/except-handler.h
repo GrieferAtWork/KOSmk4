@@ -78,6 +78,7 @@ DECL_BEGIN
 
 struct icpustate;
 struct task;
+struct taskpid;
 
 
 /* Throw the current exception (which must _NOT_ be E_INTERRUPT_USER_RPC)
@@ -369,6 +370,18 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL userexcept_sysret_inject_and_marksignal_safe)(struct task *__restrict thread,
                                                             syscall_ulong_t rpc_flags);
 
+
+#ifdef CONFIG_USE_NEW_GROUP
+/* Invoke  `userexcept_sysret_inject_safe()'  for every  thread  apart of
+ * `proc', as well as set the `TASK_FRPC' flag for each of those threads. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL userexcept_sysret_injectproc_safe)(struct taskpid *__restrict proc,
+                                                 syscall_ulong_t rpc_flags);
+/* Invoke `userexcept_sysret_inject_and_marksignal_safe()' for every thread apart of `proc' */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL userexcept_sysret_injectproc_and_marksignal_safe)(struct taskpid *__restrict proc,
+                                                                syscall_ulong_t rpc_flags);
+#else /* CONFIG_USE_NEW_GROUP */
 /* Invoke  `userexcept_sysret_inject_safe()'  for every  thread  apart of
  * `proc', as well as set the `TASK_FRPC' flag for each of those threads. */
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -378,6 +391,7 @@ NOTHROW(FCALL userexcept_sysret_injectproc_safe)(struct task *__restrict proc,
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL userexcept_sysret_injectproc_and_marksignal_safe)(struct task *__restrict proc,
                                                                 syscall_ulong_t rpc_flags);
+#endif /* !CONFIG_USE_NEW_GROUP */
 
 DECL_END
 #endif /* __CC__ */

@@ -72,6 +72,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __NOTHROW(atomic_lock_acquire_
 __LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __NOTHROW(atomic_lock_waitfor_nx)(struct atomic_lock *__restrict __self);
 __LOCAL __NOPREEMPT __ATTR_NONNULL((1)) void __NOTHROW(atomic_lock_acquire_nopr)(struct atomic_lock *__restrict __self);
 __LOCAL __NOPREEMPT __ATTR_NONNULL((1)) void __NOTHROW(atomic_lock_waitfor_nopr)(struct atomic_lock *__restrict __self);
+#define atomic_lock_release_nopr atomic_lock_release
 #endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 
 #if !defined(__INTELLISENSE__) && !defined(__NO_builtin_expect)

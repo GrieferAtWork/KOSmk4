@@ -89,13 +89,9 @@ typedef struct {
 	void                 *ted_arg; /* Argument */
 } GDBThread_Enumerate_Data;
 
-PRIVATE ssize_t
-NOTHROW(KCALL GDBThread_Enumerate_Cb)(void *arg,
-                                      struct task *thread,
-                                      struct taskpid *UNUSED(pid)) {
+PRIVATE NOBLOCK NONNULL((2)) ssize_t
+NOTHROW(TASK_ENUM_CC GDBThread_Enumerate_Cb)(void *arg, struct task *__restrict thread) {
 	GDBThread_Enumerate_Data *cookie;
-	if (!thread)
-		return 0;
 	cookie = (GDBThread_Enumerate_Data *)arg;
 	return (*cookie->ted_cb)(cookie->ted_arg, thread);
 }
@@ -142,8 +138,7 @@ again_check_must_stop:
 	data.ted_cb  = callback;
 	data.ted_arg = arg;
 	/* Enumerate all running threads from all CPUs */
-	result = task_enum_all_noipi_nb(&GDBThread_Enumerate_Cb,
-	                                &data);
+	result = system_enum_threads_noipi_nb(&GDBThread_Enumerate_Cb, &data);
 	PREEMPTION_ENABLE();
 #ifndef CONFIG_NO_SMP
 	if (mustStopAll)

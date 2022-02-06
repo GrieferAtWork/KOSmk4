@@ -32,6 +32,7 @@
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/overflow.h>
 
 #include <kos/except.h>
 
@@ -217,6 +218,18 @@ NOTHROW(FCALL taskpid_destroy)(struct taskpid *__restrict self) {
 /* [1..1][const] The PID associated with the calling thread. */
 PUBLIC ATTR_PERTASK REF struct taskpid *this_taskpid = NULL;
 
+#ifdef CONFIG_USE_NEW_GROUP
+DEFINE_PERTASK_FINI(this_taskpid_fini);
+PRIVATE ATTR_USED NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL this_taskpid_fini)(struct task *__restrict self) {
+	REF struct taskpid *tpid = FORTASK(self, this_taskpid);
+	assert(tpid && awref_ptr(&tpid->tp_thread) == self);
+	awref_clear(&tpid->tp_thread);
+	decref(tpid);
+}
+#endif /* CONFIG_USE_NEW_GROUP */
+
+
 /* Same as `taskpid_gettask()', but throw an exception if the thread has exited. */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL
 taskpid_gettask_srch(struct taskpid *__restrict self)
@@ -265,7 +278,7 @@ for (local x: nodes) {
 	print("	}},");
 	print("#ifdef CONFIG_USE_NEW_GROUP");
 	local prev, next = {
-		"asyncwork"    : ("&boottask_procctl.pc_chlds_list.lh_first", "&bootidle_pid"),
+		"asyncwork"    : ("&boottask_procctl.pc_thrds_list.lh_first", "&bootidle_pid"),
 		"thiscpu_idle" : ("&asyncwork_pid.tp_parsib.le_next", "NULL"),
 	}.get(x.val, ("NULL", "NULL"))...;
 	print("	.tp_parsib = { .le_next = ", next, ", .le_prev = ", prev, " },");
@@ -346,7 +359,7 @@ INTERN struct taskpid asyncwork_pid = {
 		._tp_pad    = {}
 	}},
 #ifdef CONFIG_USE_NEW_GROUP
-	.tp_parsib = { .le_next = &bootidle_pid, .le_prev = &boottask_procctl.pc_chlds_list.lh_first },
+	.tp_parsib = { .le_next = &bootidle_pid, .le_prev = &boottask_procctl.pc_thrds_list.lh_first },
 	.tp_proc   = &boottask_pid,
 	.tp_pctl   = &boottask_procctl,
 #else /* CONFIG_USE_NEW_GROUP */
@@ -376,6 +389,7 @@ PUBLIC struct pidns pidns_root = {
 #endif /* !CONFIG_USE_NEW_GROUP */
 	.pn_ind     = 0,    /* Root namespace indirection */
 	.pn_par     = NULL, /* Root namespace doesn't have a parent */
+	.pn_size    = 3,    /* +1: boottask, +1: bootidle, +1: asyncwork */
 	.pn_lock    = ATOMIC_RWLOCK_INIT,
 	.pn_lops    = SLIST_HEAD_INITIALIZER(pidns_root.pn_lops),
 	.pn_tree    = STATIC_TASKPID_TREE_ROOT,
@@ -412,6 +426,7 @@ pidns_alloc(struct pidns *__restrict parent) THROWS(E_BADALLOC) {
 	result->pn_par    = incref(parent);
 	atomic_rwlock_init(&result->pn_lock);
 	SLIST_INIT(&result->pn_lops);
+	result->pn_size = 0;
 	result->pn_tree = NULL;
 	result->pn_npid = PIDNS_FIRST_NONRESERVED_PID;
 	return result;
@@ -500,11 +515,20 @@ NOTHROW(FCALL pidns_lookuptask_locked)(struct pidns const *__restrict self, pid_
 
 /* Return the taskpid object with the lowest PID (in `self'), that is still `>= min_pid'
  * This  function is  used for task  enumeration for things  such as `opendir("/proc")'. */
-PUBLIC NOBLOCK WUNUSED NONNULL((1)) struct taskpid *
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) REF struct taskpid *
 NOTHROW(FCALL pidns_lookupnext_locked)(struct pidns const *__restrict self, pid_t min_pid) {
+	REF struct taskpid *result;
 	_pidns_tree_minmax_t mima;
+again_locate:
 	_taskpid_tree_minmaxlocate(self->pn_tree, min_pid, PID_MAX, &mima, self->pn_ind);
-	return (struct taskpid *)mima.mm_min;
+	result = (REF struct taskpid *)mima.mm_min;
+	if (result && !tryincref(result)) {
+		/* Dead PID -- Try find another find past this one. */
+		if (!OVERFLOW_SADD(result->tp_pids[self->pn_ind].tps_pid, 1, &min_pid))
+			goto again_locate;
+		result = NULL;
+	}
+	return result;
 }
 
 
@@ -557,6 +581,7 @@ PUBLIC NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL pidns_insertpid)(struct pidns *__restrict self,
                                struct taskpid *__restrict tpid) {
 	_taskpid_tree_insert(&self->pn_tree, tpid, self->pn_ind);
+	++self->pn_size;
 }
 
 /* Do the reverse of `pidns_insertpid()' and remove the PID
@@ -567,7 +592,11 @@ NOTHROW(FCALL pidns_insertpid)(struct pidns *__restrict self,
  * When no taskpid is associated with `pid', return `NULL'. */
 PUBLIC NOBLOCK NONNULL((1)) struct taskpid *
 NOTHROW(FCALL pidns_removepid)(struct pidns *__restrict self, pid_t pid) {
-	return _taskpid_tree_remove(&self->pn_tree, pid, self->pn_ind);
+	struct taskpid *result;
+	result = _taskpid_tree_remove(&self->pn_tree, pid, self->pn_ind);
+	if (result != NULL)
+		--self->pn_size;
+	return result;
 }
 
 
@@ -642,6 +671,31 @@ NOTHROW(FCALL pidns_nextpid)(struct pidns const *__restrict self) {
 
 done:
 	return result;
+}
+
+/* Allocate+assign PIDs of `self' in all of its namespaces.
+ * @return: true:  Success.
+ * @return: false: Failed to allocate a PID in at least one namespace. */
+#ifdef PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE
+PUBLIC WUNUSED NOBLOCK NONNULL((1)) bool
+NOTHROW(FCALL pidns_allocpids)(struct taskpid *__restrict self)
+#else /* PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL pidns_allocpids)(struct taskpid *__restrict self)
+#endif /* !PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE */
+{
+	struct pidns *ns_iter = self->tp_ns;
+	do {
+		pid_t rpid = pidns_nextpid(ns_iter);
+#ifdef PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE
+		if unlikely(rpid == -1)
+			return false;
+#endif /* PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE */
+		self->tp_pids[ns_iter->pn_ind].tps_pid = rpid;
+	} while ((ns_iter = ns_iter->pn_par) != NULL);
+#ifdef PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE
+	return true;
+#endif /* PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE */
 }
 
 

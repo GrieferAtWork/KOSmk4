@@ -167,8 +167,15 @@ DEFINE_REFCOUNT_FUNCTIONS(struct taskpid, tp_refcnt, taskpid_destroy)
 
 /* [1..1][const] The PID associated with the calling thread. */
 DATDEF ATTR_PERTASK REF struct taskpid *this_taskpid;
+#ifdef __INTELLISENSE__
+extern struct taskpid *THIS_TASKPID;
+extern struct pidns *THIS_PIDNS;
+#define THIS_TASKPID THIS_TASKPID
+#define THIS_PIDNS   THIS_PIDNS
+#else /* __INTELLISENSE__ */
 #define THIS_TASKPID PERTASK_GET(this_taskpid)
 #define THIS_PIDNS   PERTASK_GET(this_taskpid)->tp_ns
+#endif /* !__INTELLISENSE__ */
 
 /* Return a reference/pointer to the thread associated with `self'
  * Returns `NULL'  when said  thread has  already been  destroyed. */
@@ -260,6 +267,7 @@ struct pidns {
 	                                         * [valid_if(pn_ind != 0 <=> . != &pidns_root)]
 	                                         * The parenting PID namespace with one less indirection.
 	                                         * NOTE: For `pidns_root', this field is set to `NULL'. */
+	size_t                      pn_size;    /* # of elements in `pn_tree'. -- For the root namespace == # of threads in system */
 	struct atomic_rwlock        pn_lock;    /* Lock for accessing the LLRB-tree below. */
 	Toblockop_slist(pidns)      pn_lops;    /* [0..n][lock(ATOMIC)] Lock operations for `pn_lock'. */
 	LLRBTREE_ROOT(WEAK taskpid) pn_tree;    /* [LINK(->tp_pids[pn_ind].tps_link)][0..n][lock(pn_lock)]
@@ -330,7 +338,7 @@ NOTHROW(FCALL pidns_lookuptask_locked)(struct pidns const *__restrict self, pid_
 
 /* Return the taskpid object with the lowest PID (in `self'), that is still `>= min_pid'
  * This  function is  used for task  enumeration for things  such as `opendir("/proc")'. */
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct taskpid *
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) REF struct taskpid *
 NOTHROW(FCALL pidns_lookupnext_locked)(struct pidns const *__restrict self, pid_t min_pid);
 
 /* Try to acquire write-locks to all PID namespaces reachable from `self'
@@ -385,6 +393,20 @@ NOTHROW(FCALL pidns_nextpid)(struct pidns const *__restrict self);
 #if __SIZEOF_POINTER__ > 4
 #define PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE
 #endif /* __SIZEOF_POINTER__ > 4 */
+
+
+/* Allocate+assign PIDs of `self' in all of its namespaces.
+ * NOTE: This function _DOESNT_ insert `self' into the relevant namespaces.
+ * NOTE: The caller must be holding `pidns_trywriteall(self->tp_ns)'
+ * @return: true:  Success.
+ * @return: false: Failed to allocate a PID in at least one namespace. */
+#ifdef PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE
+FUNDEF WUNUSED NOBLOCK NONNULL((1)) bool
+NOTHROW(FCALL pidns_allocpids)(struct taskpid *__restrict self);
+#else /* PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL pidns_allocpids)(struct taskpid *__restrict self);
+#endif /* !PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE */
 
 
 #ifdef CONFIG_USE_NEW_GROUP
