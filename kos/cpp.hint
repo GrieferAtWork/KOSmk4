@@ -1372,8 +1372,10 @@
 #define FOREACH_thiscpu_running(...) for(;;)
 #define FOREACH_thiscpu_waiting(...) for(;;)
 #define FOREACH_thiscpu_sched_pending(...) for(;;)
-#define FOREACH_taskgroup__proc_threads(...) for(;;)
-#define FOREACH_taskgroup__pgrp_processes(...) for(;;)
+#define FOREACH_procgrp_memb(...) for(;;)
+#define FOREACH_procctl_thrds(...) for(;;)
+#define FOREACH_procctl_chlds(...) for(;;)
+
 
 #define DEFINE_ABS_CALLBACK(...)
 #define DEFINE_REL_CALLBACK(...)

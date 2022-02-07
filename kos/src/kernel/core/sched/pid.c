@@ -614,7 +614,7 @@ again_locate:
 	result = (REF struct taskpid *)mima.mm_min;
 	if (result && !tryincref(result)) {
 		/* Dead PID -- Try find another find past this one. */
-		if (!OVERFLOW_SADD(result->tp_pids[self->pn_ind].tps_pid, 1, &min_pid))
+		if (!OVERFLOW_SADD(taskpid_getnstid(result, self), 1, &min_pid))
 			goto again_locate;
 		result = NULL;
 	}

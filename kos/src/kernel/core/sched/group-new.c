@@ -440,7 +440,11 @@ again_get_oldgrp:
 		ns_iter = newgrp->pgr_ns;
 		do {
 			size_t ind = ns_iter->pn_ind;
+#if 0 /* No need. -- The `__TASKPID_SLOT_REDMASK' flag will get cleared anyways! */
+			newgrp->pgr_pids[ind].pgs_pid = _taskpid_slot_getpidno(self_pid->tp_pids[ind]);
+#else
 			newgrp->pgr_pids[ind].pgs_pid = self_pid->tp_pids[ind].tps_pid;
+#endif
 		} while ((ns_iter = ns_iter->pn_par) != NULL);
 
 		/* Acquire required locks.
@@ -613,8 +617,7 @@ again_get_oldgrp:
 	 *
 	 * Anyways: If the caller is already a process group leader, then
 	 *          we're not  allowed to  make  them a  session  leader! */
-	if (oldgrp->pgr_ns == ns &&
-	    oldgrp->pgr_pids[ns->pn_ind].pgs_pid == pid->tp_pids[ns->pn_ind].tps_pid) {
+	if (procgrp_getrootpgid(oldgrp) == taskpid_getroottid(pid)) {
 		THROW(E_INVALID_ARGUMENT_BAD_STATE,
 		      E_INVALID_ARGUMENT_CONTEXT_SETSID_ALREADY_GROUP_LEADER);
 	}
@@ -645,7 +648,11 @@ again_get_oldgrp:
 	ns_iter = newgrp->pgr_ns;
 	do {
 		size_t ind = ns_iter->pn_ind;
+#if 0 /* No need. -- The `__TASKPID_SLOT_REDMASK' flag will get cleared anyways! */
+		newgrp->pgr_pids[ind].pgs_pid = _taskpid_slot_getpidno(pid->tp_pids[ind]);
+#else
 		newgrp->pgr_pids[ind].pgs_pid = pid->tp_pids[ind].tps_pid;
+#endif
 	} while ((ns_iter = ns_iter->pn_par) != NULL);
 
 	/* Return the new session's process group ID */
@@ -692,10 +699,10 @@ again_lock_oldgrp_for_new_group:
 
 	/* Insert the new process group into all of the namespaces.
 	 *
-	 * Note that the "if (pid->tp_pids[ind].tps_pid == oldgrp->pgr_pids[ind].pgs_pid)"
-	 * check  above already asserted  (when combined with POSIX's  rules on PID reuse)
-	 * that there cannot be pre-existing process groups already using our new  group's
-	 * IDs within any of those namespaces! */
+	 * Note that the  "if (procgrp_getrootpgid(oldgrp) == taskpid_getroottid(pid))"
+	 * check above already asserted (when combined with POSIX's rules on PID reuse)
+	 * that  there  cannot be  pre-existing process  groups  already using  our new
+	 * group's IDs within any of those namespaces! */
 	ns_iter = newgrp->pgr_ns;
 	do {
 		pidns_grpinsert(ns_iter, newgrp);
@@ -766,7 +773,7 @@ DEFINE_SYSCALL1(errno_t, detach, pid_t, pid) {
 	} else {
 		REF struct taskpid *detach;
 		if (pid == 0) /* Use the caller's TID instead. */
-			pid = caller_task->tp_pids[ns->pn_ind].tps_pid;
+			pid = taskpid_getnstid(caller_task, ns);
 
 		/* Lookup the task to detach. */
 		detach = pidns_lookup_srch(ns, pid);

@@ -453,8 +453,8 @@ again_process_children:
 		 *
 		 * IOW: If the caller is a session leader, disconnect their CTTY. */
 		grp = procctl_getprocgrp(ctl);
-		if (procgrp_issessionleader(grp) && grp->pgr_ns == pid->tp_ns &&
-		    grp->pgr_pids[0].pgs_pid == pid->tp_pids[0].tps_pid) {
+		if (procgrp_issessionleader(grp) &&
+		    procgrp_getrootpgid(grp) == taskpid_getroottid(pid)) {
 			struct procsession *session = grp->pgr_session;
 			REF struct ttydev *ctty;
 again_get_ctty:
