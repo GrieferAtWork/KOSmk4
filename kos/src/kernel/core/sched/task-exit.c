@@ -418,10 +418,10 @@ again_process_children:
 		/* Terminate all other threads within the process. */
 		PREEMPTION_DISABLE();
 		procctl_thrds_acquire_nopr(ctl);
-		while (!LIST_EMPTY(&ctl->pc_chlds_list)) {
+		while (!LIST_EMPTY(&ctl->pc_thrds_list)) {
 			REF struct task *child_thread;
 			struct taskpid *child;
-			child = LIST_FIRST(&ctl->pc_chlds_list);
+			child = LIST_FIRST(&ctl->pc_thrds_list);
 			procctl_thrds_unbind(ctl, child); /* Inherit reference */
 			procctl_thrds_release_nopr(ctl);
 			PREEMPTION_ENABLE();
