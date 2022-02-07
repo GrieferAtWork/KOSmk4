@@ -1171,6 +1171,7 @@ again_read_status_in_nonspecific:
 				continue;
 			}
 			FINALLY_DECREF_UNLIKELY(child);
+			task_disconnectall();
 			return fill_wait_info(proc, child, status, wstatus, infop, ru);
 		}
 		procctl_chlds_endread(ctl);
@@ -1178,8 +1179,10 @@ again_read_status_in_nonspecific:
 			task_disconnectall();
 			return -ECHILD; /* No candidates */
 		}
-		if (options & WNOHANG)
+		if (options & WNOHANG) {
+			assert(!task_wasconnected());
 			goto err_EAGAIN; /* Operation would have blocked */
+		}
 		task_waitfor();
 		goto again_scan_children;
 	}
