@@ -661,6 +661,11 @@ again_release_kernel_and_cc:
 		 *    create  a  new  thread, rather  than  do something  else,  such as
 		 *    handling a signal. */
 #ifdef CONFIG_USE_NEW_GROUP
+
+		/* TODO: All of the following is _way_ too complicated.
+		 * -> Split this stuff into different function
+		 * -> Have distinct call-paths for CLONE_THREAD and ~CLONE_THREAD
+		 * Also: code below can leak `result_pid' if interrupted at the wrong moment */
 		{
 			/* Figure out which PID namespace(s) the new thread should appear in. */
 			REF struct taskpid *result_pid;

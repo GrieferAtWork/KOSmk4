@@ -175,6 +175,7 @@ task_raisesignalprocessgroup(struct procgrp *__restrict group,
 	struct pending_rpc_slist rpcs;
 	size_t rpcs_count = 0; /* # of elements in `rpcs' */
 	size_t proc_count;
+	size_t multiplier = 1;
 	if unlikely(info->si_signo <= 0 || info->si_signo >= NSIG) {
 		signo_t signo = info->si_signo;
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
@@ -196,6 +197,7 @@ task_raisesignalprocessgroup(struct procgrp *__restrict group,
 	/* Allocate enough RPCs so that we've got at  least
 	 * one for every process that's apart of the group. */
 	for (;;) {
+		size_t req_rpcs;
 		procgrp_memb_read(group);
 		proc_count = procgrp_memb_count(group);
 		if (rpcs_count >= proc_count) {
@@ -206,20 +208,54 @@ task_raisesignalprocessgroup(struct procgrp *__restrict group,
 			}
 			break;
 		}
+		if (multiplier > 2) {
+			/* The third time we get here, try to allocate more RPCs without
+			 * releasing  our lock to the group-member list. -- That way, if
+			 * we are able to allocate _all_ of the required RPCs, we can do
+			 * so whilst interlocked with  the member list, thus  preventing
+			 * more members from being added in the mean time.
+			 *
+			 * This is useful to improve our odds when the group contains a
+			 * run-away "fork bomb", since such a process will be unable to
+			 * add  more processes to our group while we're still holding a
+			 * lock to the group's member list! */
+			do {
+				struct pending_rpc *rpc;
+				rpc = pending_rpc_alloc_psig_nx(GFP_ATOMIC);
+				if (!rpc)
+					break; /* We'll need to block in order to allocate more... :( */
+				SLIST_INSERT(&rpcs, rpc, pr_link);
+				++rpcs_count;
+			} while (rpcs_count < proc_count);
+			if (rpcs_count >= proc_count)
+				break; /* All right -- we've got them all! */
+		}
 		procgrp_memb_endread(group);
 
 		/* Allocate more RPCs. */
-		assert(rpcs_count < proc_count);
+		req_rpcs = proc_count * multiplier;
+		assert(rpcs_count < req_rpcs);
 		do {
 			struct pending_rpc *rpc;
-			rpc = pending_rpc_alloc_psig(GFP_NORMAL);
-			memcpy(&rpc->pr_psig, info, sizeof(siginfo_t));
-			rpc->pr_flags = RPC_SYNCMODE_F_ALLOW_ASYNC |
-			                RPC_CONTEXT_SIGNAL |
-			                RPC_SIGNO(rpc->pr_psig.si_signo);
+			TRY {
+				rpc = pending_rpc_alloc_psig(GFP_NORMAL);
+			} EXCEPT {
+				if (was_thrown(E_BADALLOC) && rpcs_count >= proc_count)
+					break; /* Try our luck with the RPCs we _did_ manage to allocate. */
+				RETHROW();
+			}
 			SLIST_INSERT(&rpcs, rpc, pr_link);
 			++rpcs_count;
-		} while (rpcs_count < proc_count);
+		} while (rpcs_count < req_rpcs);
+
+		/* Overallocate more and more  in case the target  process
+		 * group contains a run-away "fork bomb". -- In this case,
+		 * more threads are constantly added to the group, and  we
+		 * have to be fast enough with our overallocation strategy
+		 * so-as to allocate at least  as many RPCs as there  will
+		 * be processes the next time we get to acquire a lock  to
+		 * `procgrp_memb_read()' */
+		multiplier *= 2;
 	}
 
 	/* Send 1 RPC to every process within the group. */
@@ -228,6 +264,10 @@ task_raisesignalprocessgroup(struct procgrp *__restrict group,
 		assert(!SLIST_EMPTY(&rpcs));
 		rpc = SLIST_FIRST(&rpcs);
 		SLIST_REMOVE_HEAD(&rpcs, pr_link);
+		memcpy(&rpc->pr_psig, info, sizeof(siginfo_t));
+		rpc->pr_flags = RPC_SYNCMODE_F_ALLOW_ASYNC |
+		                RPC_CONTEXT_SIGNAL |
+		                RPC_SIGNO(rpc->pr_psig.si_signo);
 		rpc->pr_psig.si_pid = taskpid_getnstid_s(sender, member->tp_ns);
 		if (!proc_rpc_schedule(member, rpc))
 			SLIST_INSERT(&rpcs, rpc, pr_link);
