@@ -48,7 +48,7 @@
 #endif
 
 #undef CONFIG_USE_NEW_GROUP
-#if 0
+#if 1
 #define CONFIG_USE_NEW_GROUP
 #endif
 
