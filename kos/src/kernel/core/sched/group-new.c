@@ -402,7 +402,8 @@ again_get_oldgrp:
 	/* """
 	 * EPERM The process indicated by the pid argument is a session leader.
 	 * """ */
-	if (procgrp_issessionleader(oldgrp)) {
+	if (procgrp_issessionleader(oldgrp) &&
+		procgrp_getrootpgid(oldgrp) == taskpid_getrootpid(self_pid)) {
 		THROW(E_INVALID_ARGUMENT_BAD_STATE,
 		      E_INVALID_ARGUMENT_CONTEXT_SETPGID_IS_SESSION_LEADER, pid);
 	}
@@ -416,11 +417,8 @@ again_get_oldgrp:
 		 * In this case we mustn't do anything. This is also important in order
 		 * to  ensure that  no process  group matching  `self_pid's IDs already
 		 * exists within any of the associated PID namespaces! */
-		if (self_pid->tp_ns == oldgrp->pgr_ns) {
-			size_t ind = self_pid->tp_ns->pn_ind;
-			if (self_pid->tp_pids[ind].tps_pid == oldgrp->pgr_pids[ind].pgs_pid)
-				return -EOK;
-		}
+		if (procgrp_getrootpgid(oldgrp) == taskpid_getrootpid(self_pid))
+			return -EOK;
 
 		/* Create a new process group. */
 		newgrp = _procgrp_alloc(self_pid->tp_ns);
@@ -486,10 +484,10 @@ again_lock_oldgrp_for_new_group:
 
 		/* Insert the new process group into all of the namespaces.
 		 *
-		 * Note that the "if (self_pid->tp_pids[ind].tps_pid == oldgrp->pgr_pids[ind].pgs_pid)"
-		 * check above already asserted  (when combined with POSIX's  rules on PID reuse)  that
-		 * there cannot be pre-existing process groups already using our new group's IDs within
-		 * any of those namespaces! */
+		 * Note that the  "if (procgrp_getrootpgid(oldgrp) == taskpid_getrootpid(self_pid))"
+		 * check above already asserted (when combined with POSIX's rules on PID reuse) that
+		 * there  cannot be  pre-existing process groups  already using our  new group's IDs
+		 * within any of those namespaces! */
 		ns_iter = newgrp->pgr_ns;
 		do {
 			pidns_grpinsert(ns_iter, newgrp);
