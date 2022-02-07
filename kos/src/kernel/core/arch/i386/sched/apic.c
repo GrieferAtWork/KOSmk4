@@ -528,10 +528,10 @@ i386_allocate_secondary_cores(void) {
 		++pidns_root.pn_size;
 
 #ifdef CONFIG_USE_NEW_GROUP
-		/* Join the process group of /bin/init (like all other kernel threads) */
+		/* Become a thread in /bin/init (like all other kernel threads) */
 		FORCPU(altcore, thiscpu_idle_pid).tp_proc = &boottask_pid;
 		FORCPU(altcore, thiscpu_idle_pid).tp_pctl = &boottask_procctl;
-		LIST_INSERT_HEAD(&boottask_procctl.pc_chlds_list, &FORCPU(altcore, thiscpu_idle_pid), tp_parsib);
+		procctl_thrds_insert(&boottask_procctl, &FORCPU(altcore, thiscpu_idle_pid));
 #endif /* CONFIG_USE_NEW_GROUP */
 
 		/* Insert the new task into the kernel VM's task user list. */

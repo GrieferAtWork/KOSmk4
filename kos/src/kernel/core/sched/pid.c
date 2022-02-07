@@ -806,7 +806,7 @@ pidns_grplookup(struct pidns *__restrict self, pid_t pgid)
 	return result;
 }
 
-FUNDEF WUNUSED NONNULL((1)) REF struct procgrp *FCALL
+PUBLIC WUNUSED NONNULL((1)) REF struct procgrp *FCALL
 pidns_grplookup_srch(struct pidns *__restrict self, pid_t pgid)
 		THROWS(E_WOULDBLOCK, E_PROCESS_GROUP_EXITED, E_INVALID_ARGUMENT_BAD_VALUE) {
 	REF struct procgrp *result;
