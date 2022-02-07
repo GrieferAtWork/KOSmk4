@@ -621,6 +621,25 @@ again_locate:
 	return result;
 }
 
+#ifdef CONFIG_USE_NEW_GROUP
+/* Same as `pidns_lookupnext_locked()', but only enumerate actual processes (skip threads) */
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) REF struct taskpid *
+NOTHROW(FCALL pidns_lookupnextproc_locked)(struct pidns const *__restrict self, pid_t min_pid) {
+	REF struct taskpid *result;
+	_pidns_tree_minmax_t mima;
+again_locate:
+	_taskpid_tree_minmaxlocate(self->pn_tree, min_pid, PID_MAX, &mima, self->pn_ind);
+	result = (REF struct taskpid *)mima.mm_min;
+	if (result && ((result->tp_proc != result) || !tryincref(result))) {
+		/* Dead PID -- Try find another find past this one. */
+		if (!OVERFLOW_SADD(taskpid_getnstid(result, self), 1, &min_pid))
+			goto again_locate;
+		result = NULL;
+	}
+	return result;
+}
+#endif /* CONFIG_USE_NEW_GROUP */
+
 
 
 /* Try to acquire write-locks to all PID namespaces reachable from `self'

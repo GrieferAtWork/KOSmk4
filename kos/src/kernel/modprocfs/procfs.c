@@ -420,7 +420,11 @@ find_first_taskpid_greater_or_equal(struct pidns *__restrict ns,
 	if unlikely(pid < 0)
 		return NULL;
 	pidns_read(ns);
+#ifdef CONFIG_USE_NEW_GROUP
+	result = pidns_lookupnextproc_locked(ns, (pid_t)pid);
+#else /* CONFIG_USE_NEW_GROUP */
 	result = pidns_lookupnext_locked(ns, (pid_t)pid);
+#endif /* !CONFIG_USE_NEW_GROUP */
 	pidns_endread(ns);
 	return result;
 }

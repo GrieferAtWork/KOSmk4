@@ -351,6 +351,12 @@ NOTHROW(FCALL pidns_lookuptask_locked)(struct pidns const *__restrict self, pid_
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) REF struct taskpid *
 NOTHROW(FCALL pidns_lookupnext_locked)(struct pidns const *__restrict self, pid_t min_pid);
 
+#ifdef CONFIG_USE_NEW_GROUP
+/* Same as `pidns_lookupnext_locked()', but only enumerate actual processes (skip threads) */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) REF struct taskpid *
+NOTHROW(FCALL pidns_lookupnextproc_locked)(struct pidns const *__restrict self, pid_t min_pid);
+#endif /* CONFIG_USE_NEW_GROUP */
+
 /* Try to acquire write-locks to all PID namespaces reachable from `self'
  * Upon success, return `NULL'; else: return the blocking PID  namespace.
  * @return: NULL: Success
