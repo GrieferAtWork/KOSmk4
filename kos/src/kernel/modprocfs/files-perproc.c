@@ -3149,8 +3149,8 @@ NOTHROW(KCALL find_first_thread_greater_or_equal)(struct taskpid *__restrict mas
 		if unlikely(iter->tp_ns->pn_ind < myind)
 			continue; /* Cannot be represented */
 		iter_pid = _taskpid_slot_getpidno(iter->tp_pids[myind]);
-		if (!(pid >= iter_pid))
-			continue;
+		if (iter_pid < pid)
+			continue; /* Not part of range which interests us. */
 		if (result_pid < iter_pid)
 			continue; /* Current `result' is better. */
 		if (!tryincref(iter))
