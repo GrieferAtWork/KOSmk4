@@ -280,12 +280,25 @@ done_tmpfs:
 			}
 		}
 
-		/* Wait for the user-shell to die. */
-		/* TODO: Once `CONFIG_USE_NEW_GROUP' is  implemented, this right  here
-		 *       must be changed such that we use `wait(2)' to reap any orphan
-		 *       processes that got reparented to us. */
-		while (waitpid(cpid, NULL, 0) < 0)
-			sched_yield();
+		/* Wait for the user-shell  to die, as well  as
+		 * reap processes that got re-parented onto us. */
+		for (;;) {
+			pid_t wpid;
+			union wait st;
+			wpid = wait(&st);
+			if (wpid < 0) {
+				if (errno != EINTR) {
+					syslog(LOG_ERR, "init: wait(2) failed with %s\n",
+					       strerrorname_np(errno));
+				}
+				sched_yield();
+				continue;
+			}
+			if (wpid == cpid)
+				break; /* Shell died. -- Try to spawn a new one. */
+			syslog(LOG_INFO, "init: reaped detached process %d [status:%#.4x]\n",
+			       wpid, st.w_status);
+		}
 
 		/* Kill  anything which may  have been left  alive by the shell.
 		 * Note that kill(-1, ...) will never kill a process with pid=1,
