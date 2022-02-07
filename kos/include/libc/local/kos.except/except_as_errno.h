@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14a9ae88 */
+/* HASH CRC-32:0xbef972d3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -392,8 +392,9 @@ for (local name: classes.keys.sorted()) {
 		switch(__self->e_subclass) {
 #if defined(__EPERM) && defined(__EINVAL)
 		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_ARGUMENT_BAD_VALUE)):
-			__result = __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID ||
-			        __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID ? __EPERM : __EINVAL;
+			__result = (__self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID ||
+			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID ||
+			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SETPGID_NO_SUCH_GROUP) ? __EPERM : __EINVAL;
 			break;
 #endif /* __EPERM && __EINVAL */
 #if defined(__EAFNOSUPPORT) && defined(__ESOCKTNOSUPPORT) && defined(__EPROTONOSUPPORT) && defined(__EINVAL)
@@ -404,24 +405,32 @@ for (local name: classes.keys.sorted()) {
 			        __EINVAL;
 			break;
 #endif /* __EAFNOSUPPORT && __ESOCKTNOSUPPORT && __EPROTONOSUPPORT && __EINVAL */
-#if defined(__ENOTCONN) && defined(__EDESTADDRREQ) && defined(__EISCONN) && defined(__ENXIO) && defined(__EPIPE) && defined(__ENOMEM) && defined(__EPERM) && defined(__EINVAL)
+#if defined(__ENOTCONN) && defined(__EDESTADDRREQ) && defined(__EISCONN) && defined(__ENXIO) && defined(__EPIPE) && defined(__ENOMEM) && defined(__EPERM) && defined(__ENOTTY) && defined(__EINVAL)
 		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_ARGUMENT_BAD_STATE)):
-			__result = __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED ||
-			        __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED ||
-			        __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED ? __ENOTCONN :
-			        __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED ? __EDESTADDRREQ :
-			        __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED ? __EISCONN :
-			        __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS ? __ENXIO :
-			        __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS ? __EPIPE :
+			__result = (__self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED ||
+			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED ||
+			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED) ? __ENOTCONN :
+			        (__self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED) ? __EDESTADDRREQ :
+			        (__self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED) ? __EISCONN :
+			        (__self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS) ? __ENXIO :
+			        (__self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS) ? __EPIPE :
 			        (__self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_MEMORY ||
 			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_FUTEX) ? __ENOMEM :
 			        (__self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SETPGID_DIFFERENT_SESSION ||
-			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SETPGID_NO_SUCH_GROUP ||
 			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SETPGID_IS_SESSION_LEADER ||
-			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SETSID_ALREADY_GROUP_LEADER) ? __EPERM :
+			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SETSID_ALREADY_GROUP_LEADER ||
+			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCSPGRP_DIFFERENT_SESSION ||
+			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_NOT_SESSION_LEADER ||
+			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_ALREADY_HAVE_CTTY ||
+			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_CANNOT_STEAL_CTTY) ? __EPERM :
+			        (__self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCSPGRP_SIGTTOU ||
+			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCSPGRP_NOT_CALLER_SESSION ||
+			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCGPGRP_NOT_CALLER_SESSION ||
+			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCGSID_NOT_CALLER_SESSION ||
+			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCNOTTY_NOT_CALLER_SESSION) ? __ENOTTY :
 			        __EINVAL;
 			break;
-#endif /* __ENOTCONN && __EDESTADDRREQ && __EISCONN && __ENXIO && __EPIPE && __ENOMEM && __EPERM && __EINVAL */
+#endif /* __ENOTCONN && __EDESTADDRREQ && __EISCONN && __ENXIO && __EPIPE && __ENOMEM && __EPERM && __ENOTTY && __EINVAL */
 #ifdef __ENOPROTOOPT
 		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_ARGUMENT_SOCKET_OPT)):
 			__result = __ENOPROTOOPT;

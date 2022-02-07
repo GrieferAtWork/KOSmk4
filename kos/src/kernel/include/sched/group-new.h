@@ -223,6 +223,17 @@ NOTHROW(FCALL procgrp_destroy)(struct procgrp *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct procgrp, pgr_refcnt, procgrp_destroy)
 
 
+/* Check if a given process group is considered "orphaned" (as per
+ * posix's definition  of  what  a  "Orphaned Process Group"  is):
+ * """
+ *    A process group in which the parent of every member is either itself
+ *    a member of the  group or is  not a member  of the group's  session.
+ * """
+ * NOTE: The caller must be holding `procgrp_memb_read()' */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL
+NOTHROW(FCALL procgrp_orphaned)(struct procgrp const *__restrict self);
+
+
 /* Allocate/Free a `struct procgrp' */
 #define _procgrp_sizeof(ns) \
 	(__builtin_offsetof(struct procgrp, pgr_pids) + ((ns)->pn_ind + 1) * sizeof(struct procgrp_slot))
@@ -257,6 +268,10 @@ DEFINE_REFCOUNT_FUNCTIONS(struct procgrp, pgr_refcnt, procgrp_destroy)
 #define procgrp_memb_waitwrite(self)    atomic_rwlock_waitwrite(&(self)->pgr_memb_lock)
 #define procgrp_memb_waitread_nx(self)  atomic_rwlock_waitread_nx(&(self)->pgr_memb_lock)
 #define procgrp_memb_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->pgr_memb_lock)
+
+/* Check if `tpid' is a member of `self' */
+#define procgrp_ismember(self, tpid) \
+	((self) == taskpid_getprocgrpptr(tpid))
 
 /* Helper macros for adding/removing elements from `struct procgrp::pgr_memb_list'
  * NOTE: For all of these, the caller must be holding a write-lock to `self->pgr_memb_lock' */

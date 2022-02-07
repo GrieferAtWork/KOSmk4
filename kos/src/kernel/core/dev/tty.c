@@ -83,33 +83,147 @@ NOTHROW(KCALL ttydev_log_delsession)(struct ttydev *__restrict self,
 }
 
 
+#ifdef CONFIG_USE_NEW_GROUP
+/* Chechk if the given `signo' is marked, or handled as SIG_IGN */
+PRIVATE WUNUSED bool FCALL
+is_signal_ignored(signo_t signo)
+		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
+	bool result;
+	struct sighand_ptr *handptr;
+	struct sighand *hand;
+	if (sigmask_ismasked(signo))
+		return true;
+	handptr = THIS_SIGHAND_PTR;
+	if (!handptr)
+		return false;
+	hand = sighand_ptr_lockread(handptr);
+	if unlikely(!hand)
+		return false;
+	result = hand->sh_actions[signo - 1].sa_handler == SIG_IGN;
+	sync_endread(hand);
+	return result;
+}
+#endif /* CONFIG_USE_NEW_GROUP */
 
+/* @param: signo: One of `SIGTTOU' or `SIGTTIN' */
 PRIVATE NONNULL((1)) void KCALL
-kernel_terminal_check_sigtty(struct terminal *__restrict self,
-                             bool is_SIGTTOU) {
-	struct ttydev *term;
+kernel_terminal_check_sigtty(struct ttydev *__restrict self,
+                             signo_t signo) {
+#ifdef CONFIG_USE_NEW_GROUP
+	struct taskpid *mypid = task_gettaskpid();
+	struct procgrp *fggrp;
+	REF struct procgrp *mygrp;
+	assert(chrdev_istty(self));
+again:
+	fggrp = awref_ptr(&self->t_fproc);
+	mygrp = taskpid_getprocgrpptr(mypid);
+	if likely(mygrp == fggrp)
+		return; /* Caller is part of foreground process group. */
+	if unlikely(!fggrp)
+		return; /* Also done by linux: if no foreground group is set, allow access */
+	mygrp = taskpid_getprocgrp(mypid);
+	FINALLY_DECREF_UNLIKELY(mygrp);
+	if (mygrp == fggrp)
+		return; /* Caller is part of foreground process group. */
+	if (axref_ptr(&mygrp->pgr_session->ps_ctty) != self) {
+		/* Allow TTY access from processes outside the controlling
+		 * session. POSIX appears silent on  what to do here,  but
+		 * looking at the linux kernel sources, we find:
+		 * drivers/tty/tty_jobctrl.c:__tty_check_change:
+		 * >> if (current->signal->tty != tty)
+		 * >>     return 0;
+		 * Which seems to imply that TTY access is granted if the
+		 * calling process doesn't have the given TTY set as  the
+		 * controlling TTY. */
+		return;
+	}
+	device_getname_lock_acquire(self);
+	printk(KERN_INFO "[tty:%q] Background process group %" PRIuN(__SIZEOF_PID_T__) " "
+	                 "[sid:%" PRIuN(__SIZEOF_PID_T__) "] tried to %s\n",
+	       device_getname(self), procgrp_getrootpgid(mygrp), procgrp_getrootsid(mygrp),
+	       signo == SIGTTIN ? "read" : "write");
+	device_getname_lock_release(self);
+
+	/* ...  Attempts by a process in a background process group to write to its controlling
+	 * terminal shall cause the process group to be sent a SIGTTOU signal unless one of the
+	 * following special cases applies:
+	 *   - If [...] the process is ignoring or blocking the SIGTTOU signal, the process
+	 *     is allowed to  write to the  terminal and  the SIGTTOU signal  is not  sent.
+	 *   - If [...] the  process group of  the writing  process is orphaned,  and the  writing
+	 *     process is not ignoring or blocking the SIGTTOU signal, the write() shall return -1
+	 *     with errno set to [EIO] and no signal shall be sent */
+	if (is_signal_ignored(signo)) {
+		if (signo == SIGTTIN) {
+			/* ...  if the reading process is ignoring or blocking the SIGTTIN signal, or if
+			 * the process group of the reading process is orphaned, the read() shall return
+			 * -1, with errno set to [EIO] and no signal shall be sent. */
+do_throw_E_IOERROR_REASON_TTY_ORPHAN_SIGTTIN:
+			THROW(E_IOERROR_NODATA,
+			      E_IOERROR_SUBSYSTEM_TTY,
+			      E_IOERROR_REASON_TTY_SIGTTIN);
+		}
+		return;
+	}
+
+	procgrp_memb_read(mygrp);
+	/* Check that `mygrp' still is the caller's process group. */
+	if unlikely(mygrp != taskpid_getprocgrpptr(mypid)) {
+		procgrp_memb_endread(mygrp);
+		goto again;
+	}
+	if (!procgrp_orphaned(mygrp)) {
+		/* XXX: The `procgrp_orphaned()'  check must  be made  interlocked with  sending
+		 *      the `SIGTTOU' to the process group. -- If the group stops being orphaned
+		 *      before  we're able to send the signal,  it would violate posix; iow: the
+		 *      special handling  for orphaned  process groups  must happen  interlocked
+		 *      with the sending of a signal to a non-orphaned one. */
+		procgrp_memb_endread(mygrp);
+		task_raisesignalprocessgroup(mygrp, signo);
+		task_serve();
+		/* FIXME: We might get here if the calling process changed groups.
+		 *        This race condition  must be fixed  by keeping the  lock
+		 *        to `procgrp_memb_endread()' until  after we've send  the
+		 *        signal to all of the group members (which is  guarantied
+		 *        to include the calling process).
+		 * The only case  where we ~truely~  want to get  here is when  the
+		 * caller uses a userprocmask that changed `signo' to masked before
+		 * we  were able to send it the  signal. When that happens, we want
+		 * to fall through to the throwing the exception below. */
+		task_raisesignalprocess(mypid, signo);
+		task_serve();
+	} else {
+		procgrp_memb_endread(mygrp);
+	}
+
+do_throw_E_IOERROR_REASON_TTY_ORPHAN_SIGTTOU:
+	if (signo == SIGTTIN)
+		goto do_throw_E_IOERROR_REASON_TTY_ORPHAN_SIGTTIN;
+	THROW(E_IOERROR_NODATA,
+	      E_IOERROR_SUBSYSTEM_TTY,
+	      E_IOERROR_REASON_TTY_SIGTTOU);
+
+#else /* CONFIG_USE_NEW_GROUP */
 	REF struct taskpid *my_leader_pid;
-	term = container_of(self, struct ttydev, t_term);
-	assert(chrdev_istty(term));
+	assert(chrdev_istty(self));
 	my_leader_pid = task_getprocessgroupleaderpid();
 	FINALLY_DECREF_UNLIKELY(my_leader_pid);
-	if unlikely(my_leader_pid != axref_ptr(&term->t_fproc)) {
+	if unlikely(my_leader_pid != axref_ptr(&self->t_fproc)) {
 		REF struct task *my_leader;
 		REF struct task *oldproc;
 		REF struct taskpid *oldpid;
 again_set_myleader_as_fproc:
-		if (axref_cmpxch(&term->t_fproc, NULL, my_leader_pid))
+		if (axref_cmpxch(&self->t_fproc, NULL, my_leader_pid))
 			return; /* Lazily set the caller as the initial foreground process */
 		/* Check if the old foreground process has already
 		 * terminated, but  hasn't been  cleaned up,  yet. */
-		oldpid = axref_get(&term->t_fproc);
+		oldpid = axref_get(&self->t_fproc);
 		if unlikely(!oldpid)
 			goto again_set_myleader_as_fproc;
 		oldproc = taskpid_gettask(oldpid);
 		if unlikely(!oldproc) {
 			bool xch_ok;
 do_try_override_fproc:
-			xch_ok = axref_cmpxch(&term->t_fproc, oldpid, my_leader_pid);
+			xch_ok = axref_cmpxch(&self->t_fproc, oldpid, my_leader_pid);
 			decref_likely(oldpid);
 			if unlikely(!xch_ok)
 				goto again_set_myleader_as_fproc;
@@ -124,13 +238,13 @@ do_try_override_fproc:
 		decref_unlikely(oldpid);
 
 		/* 11.1.4 -- Terminal Access Control */
-		if (is_SIGTTOU) {
-			device_getname_lock_acquire(term);
+		if (signo == SIGTTOU) {
+			device_getname_lock_acquire(self);
 			printk(KERN_INFO "[tty:%q] Background process group %p "
 			                 "[pgid=%" PRIuN(__SIZEOF_PID_T__) "] tried to write\n",
-			       device_getname(term), awref_ptr(&my_leader_pid->tp_thread),
+			       device_getname(self), awref_ptr(&my_leader_pid->tp_thread),
 			       taskpid_getroottid(my_leader_pid));
-			device_getname_lock_release(term);
+			device_getname_lock_release(self);
 
 			/* When `SIGTTOU' is ignored, allow the write */
 			if (THIS_SIGHAND_PTR) {
@@ -161,7 +275,7 @@ do_try_override_fproc:
 do_throw_ttou:
 				THROW(E_IOERROR_NODATA,
 				      E_IOERROR_SUBSYSTEM_TTY,
-				      E_IOERROR_REASON_TTY_ORPHAN_SIGTTOU);
+				      E_IOERROR_REASON_TTY_SIGTTOU);
 			}
 
 			/* NOTE: We also do the same if our process group leader has died, because once
@@ -185,12 +299,12 @@ do_throw_ttou:
 			/* We might get here if `SIGTTOU' is being ignored by the calling thread.
 			 * -> As described by POSIX, allow the process to write in this scenario. */
 		} else {
-			device_getname_lock_acquire(term);
+			device_getname_lock_acquire(self);
 			printk(KERN_INFO "[tty:%q] Background process group %p "
 			                 "[pgid=%" PRIuN(__SIZEOF_PID_T__) "] tried to read\n",
-			       device_getname(term), my_leader_pid,
+			       device_getname(self), my_leader_pid,
 			       taskpid_getroottid(my_leader_pid));
-			device_getname_lock_release(term);
+			device_getname_lock_release(self);
 
 			/* ... if the reading process is ignoring or blocking the SIGTTIN signal, or if
 			 * the process group of the reading process isorphaned, the read() shall return
@@ -218,22 +332,37 @@ do_throw_ttou:
 do_throw_ttin:
 			THROW(E_IOERROR_NODATA,
 			      E_IOERROR_SUBSYSTEM_TTY,
-			      E_IOERROR_REASON_TTY_ORPHAN_SIGTTIN);
+			      E_IOERROR_REASON_TTY_SIGTTIN);
 		}
 	}
-	return;
+#endif /* !CONFIG_USE_NEW_GROUP */
 }
 
 /* Kernel-level implementations for terminal system operators. */
 PUBLIC NONNULL((1)) ssize_t LIBTERM_CC
 ttydev_v_chk_sigttou(struct terminal *__restrict self) {
-	kernel_terminal_check_sigtty(self, true);
+	struct ttydev *tty;
+	tty = container_of(self, struct ttydev, t_term);
+	kernel_terminal_check_sigtty(tty, SIGTTOU);
 	return 0;
 }
 
 PUBLIC NONNULL((1)) ssize_t LIBTERM_CC
 ttydev_v_raise(struct terminal *__restrict self,
                signo_t signo) {
+#ifdef CONFIG_USE_NEW_GROUP
+	REF struct procgrp *fg;
+	struct ttydev *term;
+	term = container_of(self, struct ttydev, t_term);
+	assert(chrdev_istty(term));
+	fg = ttydev_getfproc(term);
+	if (fg) {
+		FINALLY_DECREF_UNLIKELY(fg);
+		task_raisesignalprocessgroup(fg, signo);
+		task_serve();
+	}
+	return 0;
+#else /* CONFIG_USE_NEW_GROUP */
 	REF struct taskpid *fg_pid;
 	struct ttydev *term;
 	term = container_of(self, struct ttydev, t_term);
@@ -252,6 +381,7 @@ ttydev_v_raise(struct terminal *__restrict self,
 		}
 	}
 	return 0;
+#endif /* !CONFIG_USE_NEW_GROUP */
 }
 
 /* Default tty operators. */
@@ -262,7 +392,7 @@ ttydev_v_read(struct mfile *__restrict self,
 	size_t result;
 	struct ttydev *me = mfile_astty(self);
 	assert(mfile_istty(self));
-	kernel_terminal_check_sigtty(&me->t_term, false);
+	kernel_terminal_check_sigtty(me, SIGTTIN);
 	result = terminal_iread(&me->t_term, dst, num_bytes, mode);
 	assert(result <= num_bytes);
 	return result;
@@ -289,7 +419,9 @@ NOTHROW(KCALL ttydev_v_destroy)(struct mfile *__restrict self) {
 	        "meaning that if we truly were supposed to be a CTTY, the "
 	        "associated session should have kept us from being destroyed");
 	terminal_fini(&me->t_term);
+#ifndef CONFIG_USE_NEW_GROUP
 	axref_fini(&me->t_fproc);
+#endif /* !CONFIG_USE_NEW_GROUP */
 	chrdev_v_destroy(self);
 }
 
@@ -387,6 +519,137 @@ termiox_to_termios(USER CHECKED struct termios *__restrict dst,
 	dst->c_ispeed = 0;
 	dst->c_ospeed = 0;
 }
+
+
+#ifndef CONFIG_USE_NEW_GROUP
+#define TTYDEV_SETCTTY_ALREADY     1  /* `self' was already the controlling terminal of the calling session. */
+#define TTYDEV_SETCTTY_SUCCESS     0  /* Successfully assigned `self' as CTTY. */
+#define TTYDEV_SETCTTY_NOTLEADER (-1) /* The calling process isn't the session leader, and `caller_must_be_leader' was true. */
+#define TTYDEV_SETCTTY_DIFFERENT (-2) /* The calling session already had a CTTY assigned, and `override_different_ctty' was false. */
+#define TTYDEV_SETCTTY_INUSE     (-3) /* The tty is already used as the CTTY of another session, and `steal_from_other_session' was false. */
+
+/* [IMPL(TIOCSCTTY)] Set the given tty device as the controlling terminal of the calling session.
+ * @param: steal_from_other_session: Allow the terminal to be stolen from another session.
+ * @return: * : One of `TTYDEV_SETCTTY_*' */
+PRIVATE NOBLOCK NONNULL((1)) int
+NOTHROW(KCALL ttydev_setctty)(struct ttydev *__restrict self,
+                              bool steal_from_other_session) {
+	struct task *proc;
+	REF struct task *session;
+	struct taskpid *session_pid;
+	assert(self);
+	assert(chrdev_istty(self));
+	proc    = task_getprocess();
+	session = task_getsessionleader_srch_of(proc);
+	FINALLY_DECREF_UNLIKELY(session);
+	if unlikely(session != proc)
+		return TTYDEV_SETCTTY_NOTLEADER;
+	session_pid = FORTASK(session, this_taskpid);
+again_check_tg_ctty:
+	if (axref_ptr(&FORTASK(session, this_taskgroup).tg_ctty) != NULL) {
+		REF struct ttydev *old_ctty;
+		old_ctty = axref_get(&FORTASK(session, this_taskgroup).tg_ctty);
+		if likely(old_ctty) {
+			FINALLY_DECREF_UNLIKELY(old_ctty);
+			if (old_ctty == self)
+				return TTYDEV_SETCTTY_ALREADY;
+			return TTYDEV_SETCTTY_DIFFERENT;
+		}
+	}
+again_check_t_cproc:
+	if unlikely(awref_ptr(&self->t_cproc) != NULL) {
+		REF struct taskpid *old_cproc;
+		old_cproc = awref_get(&self->t_cproc);
+		if (old_cproc) {
+			REF struct task *old_cproc_task;
+			FINALLY_DECREF_UNLIKELY(old_cproc);
+			if unlikely(old_cproc == session_pid)
+				return TTYDEV_SETCTTY_ALREADY;
+			if (!steal_from_other_session)
+				return TTYDEV_SETCTTY_INUSE;
+
+			/* Change the TTY's session pointer to the new session. */
+			if unlikely(!awref_cmpxch(&self->t_cproc, old_cproc, session_pid))
+				goto again_check_t_cproc;
+
+			/* Set the TTY link of the new session task descriptor. */
+			if unlikely(!axref_cmpxch(&FORTASK(session, this_taskgroup).tg_ctty, NULL, self)) {
+				awref_cmpxch(&self->t_cproc, session_pid, old_cproc);
+				goto again_check_tg_ctty;
+			}
+
+			/* Delete the TTY link from the old session task descriptor */
+			old_cproc_task = taskpid_gettask(old_cproc);
+			if likely(old_cproc_task) {
+				if (axref_cmpxch(&FORTASK(old_cproc_task, this_taskgroup).tg_ctty, self, NULL))
+					ttydev_log_delsession(self, old_cproc_task, old_cproc);
+				decref_unlikely(old_cproc_task);
+			}
+			ttydev_log_setsession(self, session, session_pid);
+			return TTYDEV_SETCTTY_SUCCESS;
+		}
+	}
+
+	/* Set the TTY's session pointer to the calling session. */
+	if (!awref_cmpxch(&self->t_cproc, NULL, session_pid))
+		goto again_check_t_cproc;
+
+	/* Set the TTY link of the session task descriptor. */
+	if unlikely(!axref_cmpxch(&FORTASK(session, this_taskgroup).tg_ctty, NULL, self)) {
+		awref_cmpxch(&self->t_cproc, FORTASK(session, this_taskpid), NULL);
+		goto again_check_tg_ctty;
+	}
+	ttydev_log_setsession(self, session, session_pid);
+	return TTYDEV_SETCTTY_SUCCESS;
+}
+
+
+#define TTYDEV_HUPCTTY_ALREADY      1  /* The calling session didn't have a CTTY to begin with */
+#define TTYDEV_HUPCTTY_SUCCESS      0  /* Successfully gave up control of the CTTY (when `pold_ctty' was non-NULL, that old CTTY is stored there) */
+#define TTYDEV_HUPCTTY_NOTLEADER  (-1) /* The calling process isn't the session leader, and `caller_must_be_leader' was true. */
+#define TTYDEV_HUPCTTY_DIFFERENT  (-2) /* `required_old_ctty' was non-NULL and differed from the actually set old CTTY */
+
+/* [IMPL(TIOCNOTTY)] Give up the controlling terminal of the calling session.
+ * @return: * : One of `TTYDEV_HUPCTTY_*' */
+PRIVATE NOBLOCK int
+NOTHROW(KCALL ttydev_hupctty)(struct ttydev *required_old_ctty DFL(__NULLPTR)) {
+	struct task *proc;
+	struct taskpid *session_pid;
+	REF struct task *session;
+	assert(!required_old_ctty || chrdev_istty(required_old_ctty));
+	proc    = task_getprocess();
+	session = task_getsessionleader_srch_of(proc);
+	FINALLY_DECREF_UNLIKELY(session);
+	if unlikely(session != proc)
+		return TTYDEV_HUPCTTY_NOTLEADER;
+	session_pid = FORTASK(session, this_taskpid);
+	if (required_old_ctty) {
+again_my_ctty_pointer_cmpxch:
+		if (!axref_cmpxch(&FORTASK(session, this_taskgroup).tg_ctty,
+		                  required_old_ctty, NULL)) {
+			struct ttydev *old_ctty;
+			old_ctty = axref_ptr(&FORTASK(session, this_taskgroup).tg_ctty);
+			if (old_ctty == NULL)
+				return TTYDEV_HUPCTTY_ALREADY;
+			if (old_ctty == required_old_ctty)
+				goto again_my_ctty_pointer_cmpxch;
+			return TTYDEV_HUPCTTY_DIFFERENT;
+		}
+		if (awref_cmpxch(&required_old_ctty->t_cproc, session_pid, NULL))
+			ttydev_log_delsession(required_old_ctty, session, session_pid);
+	} else {
+		REF struct ttydev *old_ctty;
+		old_ctty = axref_steal(&FORTASK(session, this_taskgroup).tg_ctty);
+		if (!old_ctty)
+			return TTYDEV_HUPCTTY_ALREADY;
+		if (awref_cmpxch(&old_ctty->t_cproc, session_pid, NULL))
+			ttydev_log_delsession(old_ctty, session, session_pid);
+		decref(old_ctty);
+	}
+	return TTYDEV_HUPCTTY_SUCCESS;
+}
+#endif /* !CONFIG_USE_NEW_GROUP */
+
 
 
 
@@ -513,6 +776,53 @@ do_TCSETA: {
 
 	case TIOCSPGRP:
 	case _IOW(_IOC_TYPE(TIOCSPGRP), _IOC_NR(TIOCSPGRP), pid_t): {
+#ifdef CONFIG_USE_NEW_GROUP
+		pid_t pid;
+		struct taskpid *mypid;
+		REF struct procgrp *grp;
+		TRY {
+			kernel_terminal_check_sigtty(me, SIGTTOU);
+		} EXCEPT {
+			if (was_thrown(E_IOERROR_NODATA)) {
+				struct exception_data *dat = except_data();
+				bzero(&dat->e_args, sizeof(dat->e_args));
+				dat->e_code                               = EXCEPT_CODEOF(E_INVALID_ARGUMENT_BAD_STATE);
+				dat->e_args.e_invalid_argument.ia_context = E_INVALID_ARGUMENT_CONTEXT_TIOCSPGRP_SIGTTOU;
+			}
+			RETHROW();
+		}
+		validate_readable(arg, sizeof(pid_t));
+		COMPILER_READ_BARRIER();
+		pid = *(USER CHECKED pid_t const *)arg;
+		COMPILER_READ_BARRIER();
+		mypid = task_gettaskpid();
+		{
+			REF struct procgrp *mygrp;
+			mygrp = taskpid_getprocgrp(mypid);
+			FINALLY_DECREF_UNLIKELY(mygrp);
+			if (mygrp->pgr_sleader != awref_ptr(&me->t_cproc)) {
+				THROW(E_INVALID_ARGUMENT_BAD_STATE,
+				      E_INVALID_ARGUMENT_CONTEXT_TIOCSPGRP_NOT_CALLER_SESSION);
+			}
+		}
+		grp = pidns_grplookup_srch(mypid->tp_ns, pid);
+		FINALLY_DECREF_UNLIKELY(grp);
+		if (grp->pgr_sleader != awref_ptr(&me->t_cproc)) {
+			THROW(E_INVALID_ARGUMENT_BAD_STATE,
+			      E_INVALID_ARGUMENT_CONTEXT_TIOCSPGRP_DIFFERENT_SESSION);
+		}
+
+		/* Always assign the taskpid of a process group leader! */
+		device_getname_lock_acquire(me);
+		printk(KERN_TRACE "[tty:%q] Set foreground process group to "
+		                  "[pgid:%" PRIuN(__SIZEOF_PID_T__) ",sid:%" PRIuN(__SIZEOF_PID_T__) "]\n",
+		       device_getname(me), procgrp_getrootpgid(grp), procgrp_getrootsid(grp));
+		device_getname_lock_release(me);
+
+		/* Set `grp' as the foreground process group.
+		 * FIXME: Race condition when the session leader relinquishes CTTY control. */
+		awref_set(&me->t_fproc, grp);
+#else /* CONFIG_USE_NEW_GROUP */
 		pid_t pid;
 		REF struct taskpid *oldpid;
 		REF struct taskpid *newpid;
@@ -535,11 +845,30 @@ do_TCSETA: {
 		device_getname_lock_release(me);
 		oldpid = axref_xch_inherit(&me->t_fproc, newpid);
 		xdecref(oldpid);
+#endif /* !CONFIG_USE_NEW_GROUP */
 	}	break;
 
 	case TIOCGPGRP:
 	case _IOR(_IOC_TYPE(TIOCGPGRP), _IOC_NR(TIOCGPGRP), pid_t): {
 		pid_t respid;
+#ifdef CONFIG_USE_NEW_GROUP
+		REF struct procgrp *grp;
+		{
+			REF struct procgrp *mygrp;
+			mygrp = task_getprocgrp();
+			FINALLY_DECREF_UNLIKELY(mygrp);
+			if (mygrp->pgr_sleader != awref_ptr(&me->t_cproc)) {
+				THROW(E_INVALID_ARGUMENT_BAD_STATE,
+				      E_INVALID_ARGUMENT_CONTEXT_TIOCGPGRP_NOT_CALLER_SESSION);
+			}
+		}
+		respid = 0;
+		grp    = awref_get(&me->t_fproc);
+		if (grp) {
+			respid = procgrp_getpgid_s(grp);
+			decref_unlikely(grp);
+		}
+#else /* CONFIG_USE_NEW_GROUP */
 		REF struct taskpid *tpid;
 		validate_writable(arg, sizeof(pid_t));
 		respid = -ESRCH;
@@ -548,6 +877,8 @@ do_TCSETA: {
 			respid = taskpid_gettid(tpid);
 			decref_unlikely(tpid);
 		}
+#endif /* !CONFIG_USE_NEW_GROUP */
+		validate_writable(arg, sizeof(pid_t));
 		COMPILER_WRITE_BARRIER();
 		*(USER CHECKED pid_t *)arg = respid;
 	}	break;
@@ -555,14 +886,25 @@ do_TCSETA: {
 	case TIOCGSID:
 	case _IOR(_IOC_TYPE(TIOCGSID), _IOC_NR(TIOCGSID), pid_t): {
 		pid_t respid;
+#ifdef CONFIG_USE_NEW_GROUP
+		REF struct procgrp *grp;
+		grp = task_getprocgrp();
+		FINALLY_DECREF_UNLIKELY(grp);
+		if (grp->pgr_sleader != awref_ptr(&me->t_cproc)) {
+			THROW(E_INVALID_ARGUMENT_BAD_STATE,
+			      E_INVALID_ARGUMENT_CONTEXT_TIOCGSID_NOT_CALLER_SESSION);
+		}
+		respid = procgrp_getsid_s(grp);
+#else /* CONFIG_USE_NEW_GROUP */
 		REF struct taskpid *tpid;
-		validate_writable(arg, sizeof(pid_t));
 		respid = -ENOTTY;
 		tpid   = awref_get(&me->t_cproc);
 		if (tpid) {
 			respid = taskpid_gettid(tpid);
 			decref_unlikely(tpid);
 		}
+#endif /* !CONFIG_USE_NEW_GROUP */
+		validate_writable(arg, sizeof(pid_t));
 		COMPILER_WRITE_BARRIER();
 		*(USER CHECKED pid_t *)arg = respid;
 	}	break;
@@ -692,11 +1034,73 @@ do_TCSETA: {
 	/* XXX: Exclusive terminal mode disabled with `TIOCNXCL' */
 	/* XXX: Exclusive terminal mode tested with `TIOCGEXCL' */
 
+#ifdef CONFIG_USE_NEW_GROUP
+	case TIOCSCTTY: {
+		REF struct procgrp *mygrp;
+		REF struct procgrp *oldcproc;
+		struct ttydev *oldtty;
+		mygrp = task_getprocgrp();
+		FINALLY_DECREF_UNLIKELY(mygrp);
+again_TIOCSCTTY:
+		oldtty = axref_ptr(&mygrp->pgr_session->ps_ctty);
+		if (oldtty != NULL) {
+			if (oldtty == me)
+				break; /* No-op. -- This is allowed */
+			THROW(E_INVALID_ARGUMENT_BAD_STATE,
+			      E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_ALREADY_HAVE_CTTY);
+		}
+		if (!procgrp_issessionleader(mygrp)) {
+			THROW(E_INVALID_ARGUMENT_BAD_STATE,
+			      E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_NOT_SESSION_LEADER);
+		}
+		oldcproc = awref_get(&me->t_cproc);
+		if (oldcproc) {
+			FINALLY_DECREF_UNLIKELY(oldcproc);
+			if ((uintptr_t)arg != 1 || !capable(CAP_SYS_ADMIN)) {
+				THROW(E_INVALID_ARGUMENT_BAD_STATE,
+				      E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_CANNOT_STEAL_CTTY);
+			}
+			if (!axref_cmpxch(&oldcproc->pgr_session->ps_ctty, me, NULL))
+				goto again_TIOCSCTTY;
+			if (!awref_cmpxch(&me->t_cproc, oldcproc, mygrp)) {
+				axref_cmpxch(&oldcproc->pgr_session->ps_ctty, NULL, me);
+				goto again_TIOCSCTTY;
+			}
+		} else {
+			if (!awref_cmpxch(&me->t_cproc, NULL, mygrp))
+				goto again_TIOCSCTTY;
+		}
+		awref_set(&me->t_fproc, mygrp);
+	}	break;
+
+	case TIOCNOTTY: {
+		REF struct procgrp *mygrp = task_getprocgrp();
+		FINALLY_DECREF_UNLIKELY(mygrp);
+again_TIOCNOTTY:
+		if (axref_ptr(&mygrp->pgr_session->ps_ctty) != me) {
+			THROW(E_INVALID_ARGUMENT_BAD_STATE,
+			      E_INVALID_ARGUMENT_CONTEXT_TIOCNOTTY_NOT_CALLER_SESSION);
+		}
+		if (!awref_cmpxch(&me->t_cproc, mygrp->pgr_sleader, NULL))
+			goto again_TIOCNOTTY;
+		if (!axref_cmpxch(&mygrp->pgr_session->ps_ctty, me, NULL))
+			goto again_TIOCNOTTY;
+		for (;;) {
+			REF struct procgrp *fproc;
+			fproc = awref_get(&me->t_fproc);
+			if (!fproc)
+				break;
+			FINALLY_DECREF_UNLIKELY(fproc);
+			if (fproc->pgr_sleader != mygrp->pgr_sleader)
+				break;
+			if (awref_cmpxch(&me->t_fproc, fproc, NULL))
+				break;
+		}
+	}	break;
+#else /* CONFIG_USE_NEW_GROUP */
 	case TIOCSCTTY: {
 		int error;
-		error = ttydev_setctty(me, true,
-		                       (uintptr_t)arg != 0 && capable(CAP_ALLOW_CTTY_STEALING),
-		                       false);
+		error = ttydev_setctty(me, (uintptr_t)arg != 0 && capable(CAP_ALLOW_CTTY_STEALING));
 		if (error == TTYDEV_SETCTTY_INUSE)
 			THROW(E_INSUFFICIENT_RIGHTS, CAP_ALLOW_CTTY_STEALING);
 		if (error == TTYDEV_SETCTTY_DIFFERENT)
@@ -713,6 +1117,7 @@ do_TCSETA: {
 		if (error == TTYDEV_HUPCTTY_DIFFERENT)
 			THROW(E_INVALID_CONTEXT_CTTY_DIFFERS);
 	}	break;
+#endif /* !CONFIG_USE_NEW_GROUP */
 
 	/* XXX: TIOCMGET: Modem bits? */
 	/* XXX: TIOCMBIS: Modem bits? */
@@ -937,187 +1342,6 @@ ttydev_v_stat(struct mfile *__restrict self,
 	                  ATOMIC_READ(me->t_term.t_ipend.lb_line.lc_size) +
 	                  ATOMIC_READ(me->t_term.t_canon.lb_line.lc_size);
 }
-
-/* [IMPL(TIOCSCTTY)] Set the given tty device as the controlling terminal of the calling session.
- * @param: steal_from_other_session: Allow the terminal to be stolen from another session.
- * @param: override_different_ctty:  If the calling session already had a CTTY assigned, override it.
- * @return: * : One of `TTYDEV_SETCTTY_*' */
-PUBLIC NOBLOCK NONNULL((1)) int
-NOTHROW(KCALL ttydev_setctty)(struct ttydev *__restrict self,
-                              bool caller_must_be_leader,
-                              bool steal_from_other_session,
-                              bool override_different_ctty) {
-	struct task *proc;
-	REF struct task *session;
-	struct taskpid *session_pid;
-	assert(self);
-	assert(chrdev_istty(self));
-	proc    = task_getprocess();
-	session = task_getsessionleader_srch_of(proc);
-	FINALLY_DECREF_UNLIKELY(session);
-	if unlikely(session != proc && caller_must_be_leader)
-		return TTYDEV_SETCTTY_NOTLEADER;
-	session_pid = FORTASK(session, this_taskpid);
-again_check_tg_ctty:
-	if (axref_ptr(&FORTASK(session, this_taskgroup).tg_ctty) != NULL) {
-		REF struct ttydev *old_ctty;
-		old_ctty = axref_get(&FORTASK(session, this_taskgroup).tg_ctty);
-		if likely(old_ctty) {
-			FINALLY_DECREF_UNLIKELY(old_ctty);
-			if (old_ctty == self)
-				return TTYDEV_SETCTTY_ALREADY;
-			if (!override_different_ctty)
-				return TTYDEV_SETCTTY_DIFFERENT;
-again_check_t_cproc_inner:
-			if unlikely(awref_ptr(&self->t_cproc) != NULL) {
-				REF struct taskpid *old_cproc;
-				old_cproc = awref_get(&self->t_cproc);
-				if (old_cproc) {
-					REF struct task *old_cproc_task;
-					FINALLY_DECREF_UNLIKELY(old_cproc);
-					if unlikely(old_cproc == session_pid)
-						return TTYDEV_SETCTTY_ALREADY;
-					if (!steal_from_other_session)
-						return TTYDEV_SETCTTY_INUSE;
-
-					/* Change the TTY's session pointer to the new session. */
-					if unlikely(!awref_cmpxch(&self->t_cproc, old_cproc, session_pid))
-						goto again_check_t_cproc_inner;
-
-					/* Set the TTY link of the new session task descriptor. */
-					if unlikely(!axref_cmpxch(&FORTASK(session, this_taskgroup).tg_ctty, old_ctty, self)) {
-						awref_cmpxch(&self->t_cproc, session_pid, old_cproc);
-						goto again_check_tg_ctty;
-					}
-
-					/* Delete the TTY link from the old session task descriptor */
-					old_cproc_task = taskpid_gettask(old_cproc);
-					if likely(old_cproc_task) {
-						if (axref_cmpxch(&FORTASK(old_cproc_task, this_taskgroup).tg_ctty, self, NULL))
-							ttydev_log_delsession(self, old_cproc_task, old_cproc);
-						decref_unlikely(old_cproc_task);
-					}
-					goto remove_from_old_ctty_and_succeed;
-				}
-			}
-
-			/* Change the TTY's session pointer to the new session. */
-			if unlikely(!awref_cmpxch(&self->t_cproc, NULL, session_pid))
-				goto again_check_t_cproc_inner;
-
-			/* Change the calling session's CTTY link to the new TTY */
-			if unlikely(!axref_cmpxch(&FORTASK(session, this_taskgroup).tg_ctty, old_ctty, self)) {
-				awref_cmpxch(&self->t_cproc, session_pid, NULL);
-				goto again_check_tg_ctty;
-			}
-
-			/* Remove the calling session from the old TTY's session link */
-remove_from_old_ctty_and_succeed:
-			if (awref_cmpxch(&old_ctty->t_cproc, session_pid, NULL))
-				ttydev_log_delsession(old_ctty, session, session_pid);
-			ttydev_log_setsession(self, session, session_pid);
-			return TTYDEV_SETCTTY_SUCCESS;
-		}
-	}
-again_check_t_cproc:
-	if unlikely(awref_ptr(&self->t_cproc) != NULL) {
-		REF struct taskpid *old_cproc;
-		old_cproc = awref_get(&self->t_cproc);
-		if (old_cproc) {
-			REF struct task *old_cproc_task;
-			FINALLY_DECREF_UNLIKELY(old_cproc);
-			if unlikely(old_cproc == session_pid)
-				return TTYDEV_SETCTTY_ALREADY;
-			if (!steal_from_other_session)
-				return TTYDEV_SETCTTY_INUSE;
-
-			/* Change the TTY's session pointer to the new session. */
-			if unlikely(!awref_cmpxch(&self->t_cproc, old_cproc, session_pid))
-				goto again_check_t_cproc;
-
-			/* Set the TTY link of the new session task descriptor. */
-			if unlikely(!axref_cmpxch(&FORTASK(session, this_taskgroup).tg_ctty, NULL, self)) {
-				awref_cmpxch(&self->t_cproc, session_pid, old_cproc);
-				goto again_check_tg_ctty;
-			}
-
-			/* Delete the TTY link from the old session task descriptor */
-			old_cproc_task = taskpid_gettask(old_cproc);
-			if likely(old_cproc_task) {
-				if (axref_cmpxch(&FORTASK(old_cproc_task, this_taskgroup).tg_ctty, self, NULL))
-					ttydev_log_delsession(self, old_cproc_task, old_cproc);
-				decref_unlikely(old_cproc_task);
-			}
-			ttydev_log_setsession(self, session, session_pid);
-			return TTYDEV_SETCTTY_SUCCESS;
-		}
-	}
-
-	/* Set the TTY's session pointer to the calling session. */
-	if (!awref_cmpxch(&self->t_cproc, NULL, session_pid))
-		goto again_check_t_cproc;
-
-	/* Set the TTY link of the session task descriptor. */
-	if unlikely(!axref_cmpxch(&FORTASK(session, this_taskgroup).tg_ctty, NULL, self)) {
-		awref_cmpxch(&self->t_cproc, FORTASK(session, this_taskpid), NULL);
-		goto again_check_tg_ctty;
-	}
-	ttydev_log_setsession(self, session, session_pid);
-	return TTYDEV_SETCTTY_SUCCESS;
-}
-
-/* [IMPL(TIOCNOTTY)] Give up the controlling terminal of the calling session.
- * @param: old_ctty:  The expected old CTTY, or NULL if the CTTY should always be given up.
- * @param: pold_ctty: When non-NULL, store the old CTTY here upon success.
- * @return: * : One of `TTYDEV_HUPCTTY_*' */
-PUBLIC NOBLOCK int
-NOTHROW(KCALL ttydev_hupctty)(struct ttydev *required_old_ctty,
-                              bool caller_must_be_leader,
-                              REF struct ttydev **pold_ctty) {
-	struct task *proc;
-	struct taskpid *session_pid;
-	REF struct task *session;
-	assert(!required_old_ctty || chrdev_istty(required_old_ctty));
-	proc    = task_getprocess();
-	session = task_getsessionleader_srch_of(proc);
-	FINALLY_DECREF_UNLIKELY(session);
-	if unlikely(session != proc && caller_must_be_leader)
-		return TTYDEV_HUPCTTY_NOTLEADER;
-	session_pid = FORTASK(session, this_taskpid);
-	if (required_old_ctty) {
-again_my_ctty_pointer_cmpxch:
-		if (!axref_cmpxch(&FORTASK(session, this_taskgroup).tg_ctty,
-		                  required_old_ctty, NULL)) {
-			struct ttydev *old_ctty;
-			old_ctty = axref_ptr(&FORTASK(session, this_taskgroup).tg_ctty);
-			if (old_ctty == NULL)
-				return TTYDEV_HUPCTTY_ALREADY;
-			if (old_ctty == required_old_ctty)
-				goto again_my_ctty_pointer_cmpxch;
-			return TTYDEV_HUPCTTY_DIFFERENT;
-		}
-		if (awref_cmpxch(&required_old_ctty->t_cproc, session_pid, NULL))
-			ttydev_log_delsession(required_old_ctty, session, session_pid);
-		if (pold_ctty) {
-			incref(required_old_ctty);
-			*pold_ctty = required_old_ctty;
-		}
-	} else {
-		REF struct ttydev *old_ctty;
-		old_ctty = axref_steal(&FORTASK(session, this_taskgroup).tg_ctty);
-		if (!old_ctty)
-			return TTYDEV_HUPCTTY_ALREADY;
-		if (awref_cmpxch(&old_ctty->t_cproc, session_pid, NULL))
-			ttydev_log_delsession(old_ctty, session, session_pid);
-		if (pold_ctty) {
-			*pold_ctty = old_ctty;
-		} else {
-			decref(old_ctty);
-		}
-	}
-	return TTYDEV_HUPCTTY_SUCCESS;
-}
-
 
 
 

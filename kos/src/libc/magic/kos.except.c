@@ -641,8 +641,9 @@ for (local name: classes.keys.sorted()) {
 		switch(self->@e_subclass@) {
 @@pp_if defined(EPERM) && defined(EINVAL)@@
 		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_INVALID_ARGUMENT_BAD_VALUE@)):
-			result = self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID@ ||
-			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID@ ? EPERM : EINVAL;
+			result = (self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID@ ||
+			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID@ ||
+			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SETPGID_NO_SUCH_GROUP@) ? EPERM : EINVAL;
 			break;
 @@pp_endif@@
 @@pp_if defined(EAFNOSUPPORT) && defined(ESOCKTNOSUPPORT) && defined(EPROTONOSUPPORT) && defined(EINVAL)@@
@@ -653,21 +654,29 @@ for (local name: classes.keys.sorted()) {
 			        EINVAL;
 			break;
 @@pp_endif@@
-@@pp_if defined(ENOTCONN) && defined(EDESTADDRREQ) && defined(EISCONN) && defined(ENXIO) && defined(EPIPE) && defined(ENOMEM) && defined(EPERM) && defined(EINVAL)@@
+@@pp_if defined(ENOTCONN) && defined(EDESTADDRREQ) && defined(EISCONN) && defined(ENXIO) && defined(EPIPE) && defined(ENOMEM) && defined(EPERM) && defined(ENOTTY) && defined(EINVAL)@@
 		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_INVALID_ARGUMENT_BAD_STATE@)):
-			result = self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED@ ||
-			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED@ ||
-			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED@ ? ENOTCONN :
-			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED@ ? EDESTADDRREQ :
-			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED@ ? EISCONN :
-			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS@ ? ENXIO :
-			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS@ ? EPIPE :
+			result = (self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED@ ||
+			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED@ ||
+			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED@) ? ENOTCONN :
+			        (self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED@) ? EDESTADDRREQ :
+			        (self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED@) ? EISCONN :
+			        (self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS@) ? ENXIO :
+			        (self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS@) ? EPIPE :
 			        (self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_MEMORY@ ||
 			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_FUTEX@) ? ENOMEM :
 			        (self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SETPGID_DIFFERENT_SESSION@ ||
-			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SETPGID_NO_SUCH_GROUP@ ||
 			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SETPGID_IS_SESSION_LEADER@ ||
-			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SETSID_ALREADY_GROUP_LEADER@) ? EPERM :
+			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SETSID_ALREADY_GROUP_LEADER@ ||
+			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_TIOCSPGRP_DIFFERENT_SESSION@ ||
+			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_NOT_SESSION_LEADER@ ||
+			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_ALREADY_HAVE_CTTY@ ||
+			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_CANNOT_STEAL_CTTY@) ? EPERM :
+			        (self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_TIOCSPGRP_SIGTTOU@ ||
+			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_TIOCSPGRP_NOT_CALLER_SESSION@ ||
+			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_TIOCGPGRP_NOT_CALLER_SESSION@ ||
+			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_TIOCGSID_NOT_CALLER_SESSION@ ||
+			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_TIOCNOTTY_NOT_CALLER_SESSION@) ? ENOTTY :
 			        EINVAL;
 			break;
 @@pp_endif@@
@@ -1099,10 +1108,10 @@ char const *except_name(except_code_t code) {
 	"\0E_NOT_IMPLEMENTED_TODO\0E_SERVICE_EXITED\0\1E_INVALID_HANDLE\0E_INV"
 	"ALID_HANDLE_FILE\0E_INVALID_HANDLE_FILETYPE\0E_INVALID_HANDLE_OPER"
 	"ATION\0E_INVALID_HANDLE_NET_OPERATION\0\1E_WOULDBLOCK\0E_WOULDBLOCK_"
-	"PREEMPTED\0E_WOULDBLOCK_WAITFORSIGNAL\0\1E_PROCESS_EXITED\0\1E_NO_DEV"
-	"ICE\0\1E_UNKNOWN_SYSTEMCALL\0\1E_NO_SUCH_OBJECT\0E_NO_SUCH_PROCESS\0E_"
-	"NO_SUCH_PIDNS\0E_NO_CTTY\0\1E_ILLEGAL_OPERATION\0E_ILLEGAL_PROCESS_O"
-	"PERATION\0E_ILLEGAL_REFERENCE_LOOP\0\1";
+	"PREEMPTED\0E_WOULDBLOCK_WAITFORSIGNAL\0\1E_PROCESS_EXITED\0E_PROCESS"
+	"_GROUP_EXITED\0\1E_NO_DEVICE\0\1E_UNKNOWN_SYSTEMCALL\0\1E_NO_SUCH_OBJE"
+	"CT\0E_NO_SUCH_PROCESS\0E_NO_SUCH_PIDNS\0E_NO_CTTY\0\1E_ILLEGAL_OPERAT"
+	"ION\0E_ILLEGAL_PROCESS_OPERATION\0E_ILLEGAL_REFERENCE_LOOP\0\1";
 	static char const e_linear_0081h_0091h[] =
 	"E_NET_ERROR\0E_NET_HOST_UNREACHABLE\0E_NET_ADDRESS_IN_USE\0E_NET_ME"
 	"SSAGE_TOO_LONG\0E_NET_CONNECTION_ABORT\0E_NET_CONNECTION_REFUSED\0E"
@@ -1228,10 +1237,10 @@ non_linear_prefix:
 	"\0E_NOT_IMPLEMENTED_TODO\0E_SERVICE_EXITED\0\1E_INVALID_HANDLE\0E_INV"
 	"ALID_HANDLE_FILE\0E_INVALID_HANDLE_FILETYPE\0E_INVALID_HANDLE_OPER"
 	"ATION\0E_INVALID_HANDLE_NET_OPERATION\0\1E_WOULDBLOCK\0E_WOULDBLOCK_"
-	"PREEMPTED\0E_WOULDBLOCK_WAITFORSIGNAL\0\1E_PROCESS_EXITED\0\1E_NO_DEV"
-	"ICE\0\1E_UNKNOWN_SYSTEMCALL\0\1E_NO_SUCH_OBJECT\0E_NO_SUCH_PROCESS\0E_"
-	"NO_SUCH_PIDNS\0E_NO_CTTY\0\1E_ILLEGAL_OPERATION\0E_ILLEGAL_PROCESS_O"
-	"PERATION\0E_ILLEGAL_REFERENCE_LOOP\0\1";
+	"PREEMPTED\0E_WOULDBLOCK_WAITFORSIGNAL\0\1E_PROCESS_EXITED\0E_PROCESS"
+	"_GROUP_EXITED\0\1E_NO_DEVICE\0\1E_UNKNOWN_SYSTEMCALL\0\1E_NO_SUCH_OBJE"
+	"CT\0E_NO_SUCH_PROCESS\0E_NO_SUCH_PIDNS\0E_NO_CTTY\0\1E_ILLEGAL_OPERAT"
+	"ION\0E_ILLEGAL_PROCESS_OPERATION\0E_ILLEGAL_REFERENCE_LOOP\0\1";
 	static char const e_linear_0081h_0091h[] =
 	"E_NET_ERROR\0E_NET_HOST_UNREACHABLE\0E_NET_ADDRESS_IN_USE\0E_NET_ME"
 	"SSAGE_TOO_LONG\0E_NET_CONNECTION_ABORT\0E_NET_CONNECTION_REFUSED\0E"

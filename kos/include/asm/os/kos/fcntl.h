@@ -162,13 +162,15 @@
  * These descriptors cannot be overwritten,
  * and their  meaning is  context-sensible. */
 #define __AT_THIS_TASK     (-180)
-#define __AT_THIS_MMAN     __AT_THIS_TASK /* DEPRECATED */
-#define __AT_THIS_STACK    __AT_THIS_TASK /* DEPRECATED */
 #if __KOS_VERSION__ >= 400
-#define __AT_THIS_PROCESS     (-181) /* HANDLE_TYPE_TASK (writable, Equivalent of `getpid()') */
-#define __AT_PARENT_PROCESS   (-182) /* HANDLE_TYPE_TASK (writable, Equivalent of `getppid()') */
+#define __AT_THIS_PROCESS   (-181) /* HANDLE_TYPE_TASK (read-only, Equivalent of `getpid()') */
+#define __AT_PARENT_PROCESS (-182) /* HANDLE_TYPE_TASK (read-only, Equivalent of `getppid()') */
 #endif /* __KOS_VERSION__ >= 400 */
 #if __KOS_VERSION__ >= 300
+#if __KOS_VERSION__ < 400
+#define __AT_THIS_MMAN  __AT_THIS_TASK
+#define __AT_THIS_STACK __AT_THIS_TASK
+#endif /* __KOS_VERSION__ < 400 */
 /* DOS Drive root / current-working paths.
  * These are special file descriptors that can be written to using `dup2()',
  * where   they  expect  to  receive  either  a  FILE  or  PATH  descriptor.

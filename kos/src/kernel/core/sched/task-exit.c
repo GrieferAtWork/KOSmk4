@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#include <dev/tty.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
 #include <kernel/fpu.h>
@@ -365,6 +366,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 		/* Propagate exit status to child threads, and
 		 * reparent all child process onto  /bin/init. */
 		struct procctl *ctl = pid->tp_pctl;
+		REF struct procgrp *grp;
 
 		/* NOTE: As per the requirements, we're allowed to assume  that
 		 *       no-one is allowed to still be adding additional  items
@@ -428,6 +430,52 @@ again_process_children:
 		}
 		procctl_thrds_release_nopr(ctl);
 		PREEMPTION_ENABLE();
+
+		/* Posix:
+		 * """
+		 * When a controlling process terminates, the controlling terminal is
+		 * dissociated from the current session,  allowing it to be  acquired
+		 * by a new session leader.
+		 * """
+		 *
+		 * IOW: If the caller is a session leader, disconnect their CTTY. */
+		grp = procctl_getprocgrp(ctl);
+		if (procgrp_issessionleader(grp) && grp->pgr_ns == pid->tp_ns &&
+		    grp->pgr_pids[0].pgs_pid == pid->tp_pids[0].tps_pid) {
+			struct procsession *session = grp->pgr_session;
+			REF struct ttydev *ctty;
+again_get_ctty:
+			ctty = axref_get(&session->ps_ctty);
+			if (ctty) {
+				bool ok;
+				/* Clear the controlling process group field */
+				awref_cmpxch(&ctty->t_cproc, grp, NULL);
+				/* If the foreground process group is part of
+				 * our  session,  clear that  field  as well. */
+				for (;;) {
+					REF struct procgrp *fproc;
+					fproc = awref_get(&ctty->t_fproc);
+					if (!fproc)
+						break;
+					ok = true;
+					if (procgrp_getsessionleader(fproc) == grp)
+						ok = awref_cmpxch(&ctty->t_fproc, fproc, NULL);
+					decref_unlikely(fproc);
+					if (ok)
+						break;
+				}
+				/* Clear the session's CTTY reference. */
+				ok = axref_cmpxch(&session->ps_ctty, ctty, NULL);
+				decref_unlikely(ctty);
+				if (!ok)
+					goto again_get_ctty;
+			}
+		}
+		decref_unlikely(grp);
+
+		/* XXX: send `pid->tp_SIGCLD' to our parent process */
+		/* XXX: Posix also say a bunch of stuff about SIGHUP relating to process
+		 *      groups becoming orphaned as the  result of a process  exiting... */
 	} else if (flags & TASK_FDETACHED) {
 		/* Automatically unbind our PID from our process's list of threads. */
 		struct procctl *parctl = parpid->tp_pctl;
@@ -442,9 +490,6 @@ again_process_children:
 		PREEMPTION_ENABLE();
 	}
 
-	/* XXX: send `pid->tp_SIGCLD' to our parent process */
-	/* XXX: Posix also say a bunch of stuff about SIGHUP relating to process
-	 *      groups becoming orphaned as the  result of a process  exiting... */
 #else /* CONFIG_USE_NEW_GROUP */
 	maybe_propagate_exit_to_procss_children(caller);
 #endif /* !CONFIG_USE_NEW_GROUP */

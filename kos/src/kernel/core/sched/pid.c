@@ -35,6 +35,7 @@
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
+#include <kos/except/reason/inval.h>
 
 #include <assert.h>
 #include <signal.h>
@@ -460,27 +461,38 @@ pidns_lookuptask(struct pidns *__restrict self, pid_t pid)
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct taskpid *FCALL
 pidns_lookup_srch(struct pidns *__restrict self, pid_t pid)
-		THROWS(E_WOULDBLOCK, E_PROCESS_EXITED) {
+		THROWS(E_WOULDBLOCK, E_PROCESS_EXITED, E_INVALID_ARGUMENT_BAD_VALUE) {
 	REF struct taskpid *result;
 	pidns_read(self);
 	result = pidns_lookup_locked(self, pid);
 	if unlikely(!result || !tryincref(result)) {
 		pidns_endread(self);
+		if (pid < 0) {
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_BAD_PID,
+			      pid);
+		}
 		THROW(E_PROCESS_EXITED, pid);
+	} else {
+		pidns_endread(self);
 	}
-	pidns_endread(self);
 	return result;
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL
 pidns_lookuptask_srch(struct pidns *__restrict self, pid_t pid)
-		THROWS(E_WOULDBLOCK, E_PROCESS_EXITED) {
+		THROWS(E_WOULDBLOCK, E_PROCESS_EXITED, E_INVALID_ARGUMENT_BAD_VALUE) {
 	REF struct task *result;
 	REF struct taskpid *tpid;
 	pidns_read(self);
 	tpid = pidns_lookup_locked(self, pid);
 	if unlikely(!tpid || !tryincref(tpid)) {
 		pidns_endread(self);
+		if (pid < 0) {
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_BAD_PID,
+			      pid);
+		}
 		goto throw_exited;
 	}
 	pidns_endread(self);
@@ -701,22 +713,43 @@ NOTHROW(FCALL pidns_allocpids)(struct taskpid *__restrict self)
 
 
 #ifdef CONFIG_USE_NEW_GROUP
-/* Return the process group associated with `gpid' within `self' */
+/* Return the process group associated with `pgid' within `self' */
 PUBLIC WUNUSED NONNULL((1)) REF struct procgrp *FCALL
-pidns_grplookup(struct pidns *__restrict self, pid_t gpid)
+pidns_grplookup(struct pidns *__restrict self, pid_t pgid)
 		THROWS(E_WOULDBLOCK) {
 	REF struct procgrp *result;
 	pidns_read(self);
-	result = _procgrp_tree_locate(self->pn_tree, gpid, self->pn_ind);
+	result = _procgrp_tree_locate(self->pn_tree, pgid, self->pn_ind);
 	if (result && !tryincref(result))
 		result = NULL;
 	pidns_endread(self);
 	return result;
 }
 
+FUNDEF WUNUSED NONNULL((1)) REF struct procgrp *FCALL
+pidns_grplookup_srch(struct pidns *__restrict self, pid_t pgid)
+		THROWS(E_WOULDBLOCK, E_PROCESS_GROUP_EXITED, E_INVALID_ARGUMENT_BAD_VALUE) {
+	REF struct procgrp *result;
+	pidns_read(self);
+	result = _procgrp_tree_locate(self->pn_tree, pgid, self->pn_ind);
+	if (result && !tryincref(result)) {
+		pidns_endread(self);
+		if (pgid < 0) {
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_BAD_PGID,
+			      pgid);
+		}
+		THROW(E_PROCESS_GROUP_EXITED, pgid);
+	} else {
+		pidns_endread(self);
+	}
+	return result;
+}
+
+
 PUBLIC WUNUSED NONNULL((1)) struct procgrp *
-NOTHROW(FCALL pidns_grplookup_locked)(struct pidns *__restrict self, pid_t gpid) {
-	return _procgrp_tree_locate(self->pn_tree, gpid, self->pn_ind);
+NOTHROW(FCALL pidns_grplookup_locked)(struct pidns *__restrict self, pid_t pgid) {
+	return _procgrp_tree_locate(self->pn_tree, pgid, self->pn_ind);
 }
 
 /* Insert/Remove a process group to/from the given namespace. */
@@ -727,8 +760,8 @@ NOTHROW(FCALL pidns_grpinsert)(struct pidns *__restrict self,
 }
 
 PUBLIC NOBLOCK NONNULL((1)) struct procgrp *
-NOTHROW(FCALL pidns_grpremove)(struct pidns *__restrict self, pid_t gpid) {
-	return _procgrp_tree_remove(&self->pn_tree_pg, gpid, self->pn_ind);
+NOTHROW(FCALL pidns_grpremove)(struct pidns *__restrict self, pid_t pgid) {
+	return _procgrp_tree_remove(&self->pn_tree_pg, pgid, self->pn_ind);
 }
 #endif /* CONFIG_USE_NEW_GROUP */
 

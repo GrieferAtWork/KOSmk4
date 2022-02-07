@@ -1059,12 +1059,6 @@ enum __pid_type {
 #if !defined(AT_THIS_TASK) && defined(__AT_THIS_TASK)
 #define AT_THIS_TASK __AT_THIS_TASK
 #endif /* !AT_THIS_TASK && __AT_THIS_TASK */
-#if !defined(AT_THIS_MMAN) && defined(__AT_THIS_MMAN)
-#define AT_THIS_MMAN __AT_THIS_MMAN   /* DEPRECATED */
-#endif /* !AT_THIS_MMAN && __AT_THIS_MMAN */
-#if !defined(AT_THIS_STACK) && defined(__AT_THIS_STACK)
-#define AT_THIS_STACK __AT_THIS_STACK /* DEPRECATED */
-#endif /* !AT_THIS_STACK && __AT_THIS_STACK */
 
 /* HANDLE_TYPE_TASK (writable, Equivalent of `getpid()') */
 #if !defined(AT_THIS_PROCESS) && defined(__AT_THIS_PROCESS)

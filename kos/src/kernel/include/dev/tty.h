@@ -182,45 +182,17 @@ _ttydev_tryioctl(struct mfile *__restrict self, ioctl_t cmd,
 
 
 
-
-
-/************************************************************************/
-/* TTY Device API Functions                                             */
-/************************************************************************/
-
-/* [IMPL(TIOCSCTTY)] Set the given tty device as the controlling terminal of the calling session.
- * @param: steal_from_other_session: Allow the terminal to be stolen from another session.
- * @param: override_different_ctty:  If the calling session already had a CTTY assigned, override it.
- * @param: caller_must_be_leader:    Fail if the calling process isn't the session leader.
- * @return: * : One of `TTYDEV_SETCTTY_*' */
-FUNDEF NOBLOCK NONNULL((1)) int
-NOTHROW(KCALL ttydev_setctty)(struct ttydev *__restrict self,
-                              __BOOL caller_must_be_leader DFL(1),
-                              __BOOL steal_from_other_session DFL(0),
-                              __BOOL override_different_ctty DFL(0));
-#define TTYDEV_SETCTTY_ALREADY     1  /* `self' was already the controlling terminal of the calling session. */
-#define TTYDEV_SETCTTY_SUCCESS     0  /* Successfully assigned `self' as CTTY. */
-#define TTYDEV_SETCTTY_NOTLEADER (-1) /* The calling process isn't the session leader, and `caller_must_be_leader' was true. */
-#define TTYDEV_SETCTTY_DIFFERENT (-2) /* The calling session already had a CTTY assigned, and `override_different_ctty' was false. */
-#define TTYDEV_SETCTTY_INUSE     (-3) /* The tty is already used as the CTTY of another session, and `steal_from_other_session' was false. */
-
-/* [IMPL(TIOCNOTTY)] Give up the controlling terminal of the calling session.
- * @param: required_old_ctty: The expected old CTTY, or NULL if the CTTY should always be given up.
- * @param: pold_ctty:         When non-NULL, store the old CTTY here upon success.
- * @return: * : One of `TTYDEV_HUPCTTY_*' */
-FUNDEF NOBLOCK int
-NOTHROW(KCALL ttydev_hupctty)(struct ttydev *required_old_ctty DFL(__NULLPTR),
-                              __BOOL caller_must_be_leader DFL(1),
-                              REF struct ttydev **pold_ctty DFL(__NULLPTR));
-#define TTYDEV_HUPCTTY_ALREADY      1  /* The calling session didn't have a CTTY to begin with */
-#define TTYDEV_HUPCTTY_SUCCESS      0  /* Successfully gave up control of the CTTY (when `pold_ctty' was non-NULL, that old CTTY is stored there) */
-#define TTYDEV_HUPCTTY_NOTLEADER  (-1) /* The calling process isn't the session leader, and `caller_must_be_leader' was true. */
-#define TTYDEV_HUPCTTY_DIFFERENT  (-2) /* `required_old_ctty' was non-NULL and differed from the actually set old CTTY */
-
+#ifdef CONFIG_USE_NEW_GROUP
+/* Returns a reference to the controlling- or foreground process
+ * group, or NULL if the specified field hasn't been set. */
+#define ttydev_getcproc(self) awref_get(&(self)->t_cproc)
+#define ttydev_getfproc(self) awref_get(&(self)->t_fproc)
+#else /* CONFIG_USE_NEW_GROUP */
 /* Returns a reference to the controlling- or foreground process's
  * PID descriptor, or NULL if the specified field hasn't been set. */
 #define ttydev_getcproc(self) awref_get(&(self)->t_cproc)
 #define ttydev_getfproc(self) axref_get(&(self)->t_fproc)
+#endif /* !CONFIG_USE_NEW_GROUP */
 
 #endif /* __CC__ */
 

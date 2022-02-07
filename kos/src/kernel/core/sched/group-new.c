@@ -204,6 +204,41 @@ NOTHROW(FCALL procgrp_destroy)(struct procgrp *__restrict self) {
 }
 
 
+/* Check if a given process group is considered "orphaned" (as per
+ * posix's definition  of  what  a  "Orphaned Process Group"  is):
+ * """
+ *    A process group in which the parent of every member is either itself
+ *    a member of the  group or is  not a member  of the group's  session.
+ * """
+ * NOTE: The caller must be holding `procgrp_memb_read()' */
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL procgrp_orphaned)(struct procgrp const *__restrict self) {
+	struct taskpid *member;
+	FOREACH_procgrp_memb(member, self) {
+		REF struct task *parent;
+		REF struct procgrp *pargrp;
+		struct procsession *parses;
+		parent = taskpid_getparentprocess(member);
+		pargrp = task_getprocgrp_of(parent);
+		decref_unlikely(parent);
+		if (pargrp == self) {
+			/* Also a group member --> doesn't indicate non-orphaned */
+			decref_nokill(pargrp);
+			continue;
+		}
+		parses = pargrp->pgr_session;
+		decref_unlikely(pargrp);
+		if (parses != self->pgr_session) {
+			/* Not member of our session --> doesn't indicate non-orphaned */
+			continue;
+		}
+		return false;
+	}
+	return true;
+}
+
+
+
 
 
 /************************************************************************/
@@ -467,18 +502,13 @@ again_lock_oldgrp_for_new_group:
 	} else {
 		REF struct procgrp *newgrp;
 		/* Join an existing process group. */
-		newgrp = pidns_grplookup(caller_pid->tp_ns, pgid);
+		newgrp = pidns_grplookup_srch(caller_pid->tp_ns, pgid);
 		if unlikely(!newgrp) {
 			if unlikely(pgid < 0) {
-				/* """
-				 * EINVAL The value of the pgid argument is less than 0, or is not a
-				 *        value supported by the implementation.
-				 * """ */
 				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-				      E_INVALID_ARGUMENT_CONTEXT_SETPGID_INVALID_PGID,
+				      E_INVALID_ARGUMENT_CONTEXT_BAD_PGID,
 				      pgid);
 			}
-
 			/* """
 			 * EPERM  The value of the pgid argument is valid but does not  match
 			 *        the  process  ID  of  the  process  indicated  by  the  pid
@@ -488,7 +518,7 @@ again_lock_oldgrp_for_new_group:
 			 * """
 			 * [*] "valid" here only means that the value is positive */
 throw_no_such_group:
-			THROW(E_INVALID_ARGUMENT_BAD_STATE,
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_SETPGID_NO_SUCH_GROUP,
 			      pgid);
 		}
@@ -853,6 +883,7 @@ again_write_ctl:
 /* Check if `SIGCLD' is being ignored by the calling thread */
 PRIVATE WUNUSED bool FCALL
 is_ignoring_SIGCLD(void) THROWS(E_WOULDBLOCK) {
+	bool result;
 	struct sighand_ptr *handptr;
 	struct sighand *hand;
 	handptr = THIS_SIGHAND_PTR;
@@ -861,11 +892,10 @@ is_ignoring_SIGCLD(void) THROWS(E_WOULDBLOCK) {
 	hand = sighand_ptr_lockread(handptr);
 	if unlikely(!hand)
 		return false;
-	if (hand->sh_actions[SIGCLD - 1].sa_flags & SA_NOCLDWAIT)
-		return true; /* This also triggers `SIG_IGN' behavior! */
-	if (hand->sh_actions[SIGCLD - 1].sa_handler == SIG_IGN)
-		return true; /* SIGCLD is explicitly set to SIG_IGN */
-	return false;
+	result = (hand->sh_actions[SIGCLD - 1].sa_flags & SA_NOCLDWAIT) || /* This also triggers `SIG_IGN' behavior! */
+	         (hand->sh_actions[SIGCLD - 1].sa_handler == SIG_IGN);     /* SIGCLD is explicitly set to SIG_IGN */
+	sync_endread(hand);
+	return result;
 }
 
 /* Check if the thread of a given `taskpid' has terminated (or is terminating). */

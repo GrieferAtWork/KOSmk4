@@ -488,9 +488,7 @@ DEFINE_SYSCALL2(errno_t, kill, pid_t, pid, signo_t, signo) {
 		if (pid == 0) {
 			grp = task_getprocgrp();
 		} else {
-			grp = pidns_grplookup(mypid->tp_ns, -pid);
-			if unlikely(!grp)
-				THROW(E_PROCESS_EXITED, -pid);
+			grp = pidns_grplookup_srch(mypid->tp_ns, -pid);
 		}
 		FINALLY_DECREF_UNLIKELY(grp);
 		if (!task_raisesignalprocessgroup(grp, &info, mypid))

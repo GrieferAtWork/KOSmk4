@@ -327,8 +327,8 @@ pidns_alloc(struct pidns *__restrict parent) THROWS(E_BADALLOC);
 /* Lookup a thread in a given PID namespace. */
 FUNDEF WUNUSED NONNULL((1)) REF struct taskpid *FCALL pidns_lookup(struct pidns *__restrict self, pid_t pid) THROWS(E_WOULDBLOCK);
 FUNDEF WUNUSED NONNULL((1)) REF struct task *FCALL pidns_lookuptask(struct pidns *__restrict self, pid_t pid) THROWS(E_WOULDBLOCK);
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct taskpid *FCALL pidns_lookup_srch(struct pidns *__restrict self, pid_t pid) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED);
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL pidns_lookuptask_srch(struct pidns *__restrict self, pid_t pid) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED);
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct taskpid *FCALL pidns_lookup_srch(struct pidns *__restrict self, pid_t pid) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED, E_INVALID_ARGUMENT_BAD_VALUE);
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL pidns_lookuptask_srch(struct pidns *__restrict self, pid_t pid) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED, E_INVALID_ARGUMENT_BAD_VALUE);
 
 /* Return the taskpid object associated with `pid' within `self' */
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct taskpid *
@@ -410,18 +410,21 @@ NOTHROW(FCALL pidns_allocpids)(struct taskpid *__restrict self);
 
 
 #ifdef CONFIG_USE_NEW_GROUP
-/* Return the process group associated with `gpid' within `self' */
+/* Return the process group associated with `pgid' within `self' */
 FUNDEF WUNUSED NONNULL((1)) REF struct procgrp *FCALL
-pidns_grplookup(struct pidns *__restrict self, pid_t gpid) THROWS(E_WOULDBLOCK);
+pidns_grplookup(struct pidns *__restrict self, pid_t pgid) THROWS(E_WOULDBLOCK);
+FUNDEF WUNUSED NONNULL((1)) REF struct procgrp *FCALL
+pidns_grplookup_srch(struct pidns *__restrict self, pid_t pgid)
+		THROWS(E_WOULDBLOCK, E_PROCESS_GROUP_EXITED, E_INVALID_ARGUMENT_BAD_VALUE);
 FUNDEF WUNUSED NONNULL((1)) struct procgrp *
-NOTHROW(FCALL pidns_grplookup_locked)(struct pidns *__restrict self, pid_t gpid);
+NOTHROW(FCALL pidns_grplookup_locked)(struct pidns *__restrict self, pid_t pgid);
 
 /* Insert/Remove a process group to/from the given namespace. */
 FUNDEF NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL pidns_grpinsert)(struct pidns *__restrict self,
                                struct procgrp *__restrict grp);
 FUNDEF NOBLOCK NONNULL((1)) struct procgrp *
-NOTHROW(FCALL pidns_grpremove)(struct pidns *__restrict self, pid_t gpid);
+NOTHROW(FCALL pidns_grpremove)(struct pidns *__restrict self, pid_t pgid);
 #endif /* CONFIG_USE_NEW_GROUP */
 
 
