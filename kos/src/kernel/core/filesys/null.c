@@ -920,14 +920,8 @@ PRIVATE struct mfile_stream_ops const devkmsg_stream_ops = {
 /* Alias device for the process's controlling terminal (/dev/tty)       */
 /************************************************************************/
 
-#ifdef CONFIG_USE_NEW_GROUP
 LOCAL ATTR_RETNONNULL WUNUSED REF struct ttydev *
-getctty(void) THROWS(E_NO_CTTY)
-#else /* CONFIG_USE_NEW_GROUP */
-LOCAL ATTR_RETNONNULL WUNUSED REF struct ttydev *
-getctty(void) THROWS(E_WOULDBLOCK, E_NO_CTTY)
-#endif /* !CONFIG_USE_NEW_GROUP */
-{
+getctty(void) THROWS(E_NO_CTTY) {
 	REF struct ttydev *result;
 	result = task_getctty();
 	if unlikely(!result)

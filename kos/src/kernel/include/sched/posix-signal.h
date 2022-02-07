@@ -41,9 +41,7 @@ DECL_BEGIN
 
 struct task;
 struct taskpid;
-#ifdef CONFIG_USE_NEW_GROUP
 struct procgrp;
-#endif /* CONFIG_USE_NEW_GROUP */
 
 #ifndef __siginfo_t_defined
 #define __siginfo_t_defined
@@ -60,7 +58,6 @@ task_raisesignalthread(struct task *__restrict target,
                        siginfo_t const *__restrict info)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE);
 
-#ifdef CONFIG_USE_NEW_GROUP
 /* Raise a posix signal within the given process `proc'
  * @return: true:  Successfully scheduled/enqueued the signal for delivery to `target'
  * @return: false: The given process `target' has already terminated execution.
@@ -79,30 +76,10 @@ task_raisesignalprocessgroup(struct procgrp *__restrict group,
                              struct taskpid *__restrict sender)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE);
 
-#else /* CONFIG_USE_NEW_GROUP */
-/* Raise a posix signal within a given process that `target' is apart of
- * @return: true:  Successfully scheduled/enqueued the signal for delivery to `target'
- * @return: false: The given process `target' has already terminated execution.
- * @return: false: The given process `target' is a kernel thread.
- * @throw: E_INVALID_ARGUMENT_BAD_VALUE: The signal number in `info' is ZERO(0) or >= `_NSIG+1' */
-FUNDEF NONNULL((1, 2)) __BOOL FCALL
-task_raisesignalprocess(struct task *__restrict target,
-                        siginfo_t const *__restrict info)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE);
-
-
-/* Send a signal to every process within the same process group that `target' is apart of.
- * @return: * : The number of processes to which the signal was delivered. */
-FUNDEF NONNULL((1, 2)) size_t FCALL
-task_raisesignalprocessgroup(struct task *__restrict target,
-                             siginfo_t const *__restrict info)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE);
-#endif /* !CONFIG_USE_NEW_GROUP */
-
-
 
 #ifdef __cplusplus
 extern "C++" {
+
 LOCAL ATTR_ARTIFICIAL NONNULL((1)) __BOOL FCALL
 task_raisesignalthread(struct task *__restrict target, signo_t signo)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE) {
@@ -112,7 +89,6 @@ task_raisesignalthread(struct task *__restrict target, signo_t signo)
 	return task_raisesignalthread(target, &info);
 }
 
-#ifdef CONFIG_USE_NEW_GROUP
 LOCAL ATTR_ARTIFICIAL NONNULL((1)) __BOOL FCALL
 task_raisesignalprocess(struct taskpid *__restrict target, signo_t signo)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE) {
@@ -144,27 +120,8 @@ task_raisesignalprocessgroup(struct procgrp *__restrict target,
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE) {
 	return task_raisesignalprocessgroup(target, info, task_gettaskpid());
 }
-#else /* CONFIG_USE_NEW_GROUP */
-LOCAL ATTR_ARTIFICIAL NONNULL((1)) __BOOL FCALL
-task_raisesignalprocess(struct task *__restrict target, signo_t signo)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE) {
-	siginfo_t info;
-	__libc_memset(&info, 0, sizeof(info));
-	info.si_signo = signo;
-	return task_raisesignalprocess(target, &info);
-}
 
-LOCAL ATTR_ARTIFICIAL NONNULL((1)) size_t FCALL
-task_raisesignalprocessgroup(struct task *__restrict target, signo_t signo)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE) {
-	siginfo_t info;
-	__libc_memset(&info, 0, sizeof(info));
-	info.si_signo = signo;
-	return task_raisesignalprocessgroup(target, &info);
-}
-#endif /* !CONFIG_USE_NEW_GROUP */
-
-}
+} /* extern "C++" */
 #endif /* __cplusplus */
 
 DECL_END

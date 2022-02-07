@@ -660,7 +660,6 @@ again_release_kernel_and_cc:
 		 *    to die right  now, can we  say for certain  that we're allowed  to
 		 *    create  a  new  thread, rather  than  do something  else,  such as
 		 *    handling a signal. */
-#ifdef CONFIG_USE_NEW_GROUP
 
 		/* TODO: All of the following is _way_ too complicated.
 		 * -> Split this stuff into different function
@@ -1120,7 +1119,6 @@ sig_endread_and_force_task_serve_and_acquire_locks:
 			/* Indicate to the process controller that its list of children has changed. */
 			sig_broadcast(&owner_ctl->pc_chld_changed);
 		} /* Scope... */
-#endif /* CONFIG_USE_NEW_GROUP */
 
 	} EXCEPT {
 		/* Cleanup on error. */
@@ -1160,61 +1158,6 @@ sig_endread_and_force_task_serve_and_acquire_locks:
 	 * The  only thing that's still left to do is to start it (and in
 	 * the case of vfork(): wait for it to exit(2) or exec(2)). */
 	TRY {
-#ifndef CONFIG_USE_NEW_GROUP
-		/* Allocate the PID descriptor for the new thread. */
-		if (clone_flags & CLONE_NEWPID) {
-			REF struct pidns *ns;
-			ns = pidns_alloc(FORTASK(caller, this_taskpid)->tp_ns);
-			FINALLY_DECREF_UNLIKELY(ns);
-			task_setpid(result, ns, 0);
-		} else {
-			task_setpid(result, THIS_PIDNS, 0);
-		}
-
-		/* TODO: Remember `flags & CSIGNAL' as signal to-be send on exit! */
-		if (clone_flags & CLONE_THREAD) {
-			/* Add to the same process as the caller */
-			task_setthread(result, caller);
-		} else if (clone_flags & CLONE_PARENT) {
-			REF struct task *my_parent;
-			my_parent = task_getprocessparent_of(caller);
-			FINALLY_XDECREF_UNLIKELY(my_parent);
-			/* Inherit parent, group & session of the caller */
-			task_setprocess(result, my_parent, caller, caller);
-		} else {
-			/* Inherit group & session of the caller; set caller as parent */
-			task_setprocess(result, caller, caller, caller);
-		}
-
-		/* Already pre-detach the thread if instructed to */
-		if (clone_flags & CLONE_DETACHED)
-			task_detach(result);
-
-		/* Insert the new task into its mman's thread-list */
-		mman_threadslock_acquire(result->t_mman);
-		LIST_INSERT_HEAD(&result->t_mman->mm_threads, result, t_mman_tasks);
-		mman_threadslock_release(result->t_mman);
-
-		/* Write-back the new thread's TID to the caller-given  memory
-		 * location within the calling process. TODO: This also has to
-		 * happen whilst interlocked with other systems which are able
-		 * to  make the thread visible. In the case where the pointed-
-		 * to  memory  is  VIO,   the  operation  must  happen   like:
-		 * >>    lock_pid_system();
-		 * >>again:
-		 * >>    ...
-		 * >>    pid_t cpid = NEXT_FREE_PID;
-		 * >>    unlock_pid_system();
-		 * >>    *parent_tidptr = cpid;
-		 * >>    lock_pid_system();
-		 * >>    if (cpid != NEXT_FREE_PID)
-		 * >>        goto again;
-		 * >>    ...
-		 * >>    unlock_pid_system();
-		 */
-		if (clone_flags & CLONE_PARENT_SETTID)
-			ATOMIC_WRITE(*parent_tidptr, task_gettid_of(result));
-#endif /* !CONFIG_USE_NEW_GROUP */
 
 		/* Deal with vfork() */
 		if (clone_flags & CLONE_VFORK) {

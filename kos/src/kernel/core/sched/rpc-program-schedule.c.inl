@@ -307,7 +307,6 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 	COMPILER_WRITE_BARRIER();
 
 	{
-#ifdef CONFIG_USE_NEW_GROUP
 		/* Lookup the target thread. */
 		struct taskpid *mypid;
 		REF struct taskpid *target;
@@ -342,25 +341,6 @@ err_target_exited:
 			if unlikely(!task_rpc_schedule(target_thread, rpc))
 				goto err_target_exited;
 		}
-#else /* CONFIG_USE_NEW_GROUP */
-		/* Lookup the target thread. */
-		REF struct task *target;
-		target = pidns_lookuptask_srch(THIS_PIDNS, target_tid);
-		FINALLY_DECREF_UNLIKELY(target);
-		is_caller_potential_target = target == THIS_TASK ||
-		                             ((mode & RPC_DOMAIN_F_PROC) &&
-		                              task_getprocess_of(target) == task_getprocess());
-
-		/* Schedule the RPC */
-		rpc->pr_user.pur_refcnt = 2; /* +1 for the target component's list. */
-		COMPILER_WRITE_BARRIER();
-		if unlikely(!(mode & RPC_DOMAIN_F_PROC ? proc_rpc_schedule(target, rpc)
-		                                       : task_rpc_schedule(target, rpc))) {
-			rpc->pr_user.pur_refcnt = 1;
-			COMPILER_WRITE_BARRIER();
-			THROW(E_PROCESS_EXITED, target_tid);
-		}
-#endif /* !CONFIG_USE_NEW_GROUP */
 	}
 
 	/* (possibly) wait for completion */

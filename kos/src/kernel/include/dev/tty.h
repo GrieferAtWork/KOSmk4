@@ -37,24 +37,11 @@ DECL_BEGIN
 struct taskpid;
 struct stat;
 
-#ifdef CONFIG_USE_NEW_GROUP
 #ifndef __procgrp_awref_defined
 #define __procgrp_awref_defined
 struct procgrp;
 AWREF(procgrp_awref, procgrp);
 #endif /* !__procgrp_awref_defined */
-#else /* CONFIG_USE_NEW_GROUP */
-#ifndef __taskpid_axref_defined
-#define __taskpid_axref_defined
-AXREF(taskpid_axref, taskpid);
-#endif /* !__taskpid_axref_defined */
-
-#ifndef __taskpid_awref_defined
-#define __taskpid_awref_defined
-AWREF(taskpid_awref, taskpid);
-#endif /* !__taskpid_awref_defined */
-#endif /* !CONFIG_USE_NEW_GROUP */
-
 
 struct ttydev_ops {
 	struct chrdev_ops to_cdev; /* Character device operators. */
@@ -74,17 +61,8 @@ struct ttydev
 #define _ttydev_chr_     /* nothing */
 #endif /* !__WANT_FS_INLINE_STRUCTURES */
 	struct terminal      t_term;  /* The associated terminal driver controller. */
-#ifdef CONFIG_USE_NEW_GROUP
 	struct procgrp_awref t_cproc; /* [0..1] Session controlled by this tty. */
 	struct procgrp_awref t_fproc; /* [0..1] Foreground process group. */
-#else /* CONFIG_USE_NEW_GROUP */
-	struct taskpid_awref t_cproc; /* [0..1] Controlling terminal support.
-	                               * When  non-NULL,  points  to  a  session  leader  thread,  such that
-	                               * `FORTASK(taskpid_gettask(t_cproc), this_taskgroup).tg_ctty == self'
-	                               * is the case. */
-	struct taskpid_axref t_fproc; /* [0..1] PID of the foreground process group leader.
-	                               * This process is usually apart of the same session as `t_cproc' */
-#endif /* !CONFIG_USE_NEW_GROUP */
 };
 
 
@@ -161,7 +139,6 @@ _ttydev_tryioctl(struct mfile *__restrict self, ioctl_t cmd,
  * @param: struct ttydev       *self:     TTY to initialize.
  * @param: struct ttydev_ops   *ops:      TTY operators.
  * @param: pterminal_oprinter_t oprinter: [1..1] Terminal output printer. */
-#ifdef CONFIG_USE_NEW_GROUP
 #define _ttydev_init(self, ops, oprinter)                \
 	(___ttydev_assert_ops_(ops)                          \
 	 _chrdev_init(_ttydev_aschr(self), &(ops)->to_cdev), \
@@ -178,49 +155,18 @@ _ttydev_tryioctl(struct mfile *__restrict self, ioctl_t cmd,
 	               &__ttydev_v_chk_sigttou),              \
 	 awref_cinit(&(self)->t_cproc, __NULLPTR),            \
 	 awref_cinit(&(self)->t_fproc, __NULLPTR))
-#else /* CONFIG_USE_NEW_GROUP */
-#define _ttydev_init(self, ops, oprinter)                \
-	(___ttydev_assert_ops_(ops)                          \
-	 _chrdev_init(_ttydev_aschr(self), &(ops)->to_cdev), \
-	 terminal_init(&(self)->t_term, oprinter,            \
-	               &__ttydev_v_raise,                    \
-	               &__ttydev_v_chk_sigttou),             \
-	 awref_init(&(self)->t_cproc, __NULLPTR),            \
-	 axref_init(&(self)->t_fproc, __NULLPTR))
-#define _ttydev_cinit(self, ops)                          \
-	(___ttydev_assert_ops_(ops)                           \
-	 _chrdev_cinit(_ttydev_aschr(self), &(ops)->to_cdev), \
-	 terminal_init(&(self)->t_term, oprinter,             \
-	               &__ttydev_v_raise,                     \
-	               &__ttydev_v_chk_sigttou),              \
-	 awref_cinit(&(self)->t_cproc, __NULLPTR),            \
-	 axref_cinit(&(self)->t_fproc, __NULLPTR))
-#endif /* !CONFIG_USE_NEW_GROUP */
 /* Finalize a partially initialized `struct ttydev' (as initialized by `_ttydev_init()') */
 #define _ttydev_fini(self) _chrdev_fini(_ttydev_aschr(self))
 
 
 
-#ifdef CONFIG_USE_NEW_GROUP
 /* Returns a reference to the controlling- or foreground process
  * group, or NULL if the specified field hasn't been set. */
 #define ttydev_getcproc(self) awref_get(&(self)->t_cproc)
 #define ttydev_getfproc(self) awref_get(&(self)->t_fproc)
-#else /* CONFIG_USE_NEW_GROUP */
-/* Returns a reference to the controlling- or foreground process's
- * PID descriptor, or NULL if the specified field hasn't been set. */
-#define ttydev_getcproc(self) awref_get(&(self)->t_cproc)
-#define ttydev_getfproc(self) axref_get(&(self)->t_fproc)
-#endif /* !CONFIG_USE_NEW_GROUP */
 
 #endif /* __CC__ */
 
 DECL_END
-
-#ifdef GUARD_KERNEL_INCLUDE_SCHED_PID_H
-#ifndef GUARD_KERNEL_INCLUDE_SCHED_PID_CTTY_H
-#include <sched/group-ctty.h>
-#endif /* !GUARD_KERNEL_INCLUDE_SCHED_PID_CTTY_H */
-#endif /* GUARD_KERNEL_INCLUDE_SCHED_PID_H */
 
 #endif /* !GUARD_KERNEL_INCLUDE_DEV_TTY_H */

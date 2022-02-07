@@ -495,13 +495,8 @@
                                                                                  * [msg("Illegal operation")]
                                                                                  * [fld(reason: syscall_ulong_t, "One of `E_ILLEGAL_OPERATION_CONTEXT_*'")] */
 #endif /* !E_ILLEGAL_OPERATION */
-#ifndef E_ILLEGAL_PROCESS_OPERATION
-#define E_ILLEGAL_PROCESS_OPERATION               (E_ILLEGAL_OPERATION, 0x0001) /* [msg("Illegal process operation")]
-                                                                                 * [fld(pid:  pid_t, "The Pid of the process in question")]
-                                                                                 * [fld(pid2: pid_t, "A second pid, or 0 if unused")] */
-#endif /* !E_ILLEGAL_PROCESS_OPERATION */
 #ifndef E_ILLEGAL_REFERENCE_LOOP
-#define E_ILLEGAL_REFERENCE_LOOP                  (E_ILLEGAL_OPERATION, 0x0002) /* [errno($reason == E_ILLEGAL_OPERATION_CONTEXT_EPOLL_MONITOR_SELF_LOOP ? EINVAL : ELOOP)]
+#define E_ILLEGAL_REFERENCE_LOOP                  (E_ILLEGAL_OPERATION, 0x0001) /* [errno($reason == E_ILLEGAL_OPERATION_CONTEXT_EPOLL_MONITOR_SELF_LOOP ? EINVAL : ELOOP)]
                                                                                  * [msg("Reference loop detected")] */
 #endif /* !E_ILLEGAL_REFERENCE_LOOP */
 
@@ -861,15 +856,8 @@
 #ifndef E_INVALID_CONTEXT
 #define E_INVALID_CONTEXT                         (0x0085)                    /* [errno(EPERM), msg("Insufficient Context")] */
 #endif /* !E_INVALID_CONTEXT */
-#ifndef E_INVALID_CONTEXT_NOT_SESSION_LEADER
-#define E_INVALID_CONTEXT_NOT_SESSION_LEADER      (E_INVALID_CONTEXT, 0x0001) /* [msg("The calling process isn't the session leader")] */
-#endif /* !E_INVALID_CONTEXT_NOT_SESSION_LEADER */
-#ifndef E_INVALID_CONTEXT_CTTY_ALREADY_ASSIGNED
-#define E_INVALID_CONTEXT_CTTY_ALREADY_ASSIGNED   (E_INVALID_CONTEXT, 0x0002) /* [msg("A controlling terminal had already been assigned")] */
-#endif /* !E_INVALID_CONTEXT_CTTY_ALREADY_ASSIGNED */
-#ifndef E_INVALID_CONTEXT_CTTY_DIFFERS
-#define E_INVALID_CONTEXT_CTTY_DIFFERS            (E_INVALID_CONTEXT, 0x0003) /* [msg("The calling session uses a different CTTY")] */
-#endif /* !E_INVALID_CONTEXT_CTTY_DIFFERS */
+/* TODO: Get rid of `E_INVALID_ARGUMENT_BAD_STATE' and use `E_INVALID_CONTEXT'
+ *       (and  sub-classes  of  it   to-be  added  as  appropriate)   instead. */
 
 
 

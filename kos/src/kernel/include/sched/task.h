@@ -62,11 +62,9 @@ DECL_BEGIN
                                                    *                  - The thread must no longer appear in the scheduler of any CPU. */
 #define TASK_FKEEPCORE     __UINT32_C(0x00000100) /* [lock(PRIVATE(THIS_TASK))] Don't allow this task's core to change randomly. */
 #define TASK_FSUSPENDED    __UINT32_C(0x00000200) /* [lock(PRIVATE(THIS_TASK))] Used internally to implement of SIGSTOP/SIGCONT */
-#ifdef CONFIG_USE_NEW_GROUP
-#define TASK_FDETACHED     __UINT32_C(0x00000400) /* [lock(WRITE_ONCE)] The thread/process will automatically remove  itself
-                                                   * from `task_getprocctl_of(task_getparentprocess())' as part of task_exit
+#define TASK_FDETACHED     __UINT32_C(0x00000400) /* [lock(WRITE_ONCE)] The thread will automatically remove
+                                                   * itself from `task_getprocctl()'  as part of  task_exit.
                                                    * Additionally, this task cannot be wait(2)-ed for. */
-#endif /* CONFIG_USE_NEW_GROUP */
 /*      TASK_F             __UINT32_C(0x00000800)  * ... */
 /*      TASK_F             __UINT32_C(0x00001000)  * ... */
 /*      TASK_F             __UINT32_C(0x00002000)  * ... */
@@ -364,7 +362,6 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
 FUNDEF ABNORMAL_RETURN ATTR_NORETURN void
 NOTHROW(FCALL task_exit)(int w_status DFL(__W_EXITCODE(0, 0)));
 
-#ifdef CONFIG_USE_NEW_GROUP
 /* Same as `task_exit()', but propagate the same status
  * to  all  other threads  within the  current process.
  *
@@ -372,7 +369,6 @@ NOTHROW(FCALL task_exit)(int w_status DFL(__W_EXITCODE(0, 0)));
  * main thread of the calling process. */
 FUNDEF ABNORMAL_RETURN ATTR_NORETURN void
 NOTHROW(FCALL process_exit)(int w_status DFL(__W_EXITCODE(0, 0)));
-#endif /* CONFIG_USE_NEW_GROUP */
 
 #ifdef __cplusplus
 extern "C++" {

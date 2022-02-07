@@ -356,20 +356,6 @@ struct __exception_illegal_instruction_data32 {
 /* E_ILLEGAL_OPERATION */
 struct __exception_illegal_operation_data32 {
 	__UINT32_TYPE__ /*syscall_ulong_t*/ io_reason; /* One of `E_ILLEGAL_OPERATION_CONTEXT_*' */
-	union {
-#undef io_process_operation
-
-		struct {
-			__UINT32_TYPE__ /*pid_t*/ o_pid;  /* The Pid of the process in question */
-			__UINT32_TYPE__ /*pid_t*/ o_pid2; /* A second pid, or 0 if unused */
-		} io_process_operation; /* E_ILLEGAL_PROCESS_OPERATION */
-
-	}
-#ifndef __COMPILER_HAVE_TRANSPARENT_UNION
-	_io_classes
-#define io_process_operation _io_classes.io_process_operation
-#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
-	;
 };
 
 /* E_INDEX_ERROR */

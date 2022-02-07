@@ -156,9 +156,7 @@ __DECL_END
 #define TIOCSTI    __TIOCSTI    /* [char const *byte] Insert the given byte in the input queue. */
 #endif /* !TIOCSTI && __TIOCSTI */
 #if !defined(TIOCNOTTY) && defined(__TIOCNOTTY)
-#define TIOCNOTTY    __TIOCNOTTY    /* Given up control over this CTTY
-                                     * @throws: E_INVALID_CONTEXT_NOT_SESSION_LEADER: The calling process isn't the session leader
-                                     * @throws: E_INVALID_CONTEXT_CTTY_DIFFERS:       The calling session uses a different CTTY */
+#define TIOCNOTTY    __TIOCNOTTY    /* Given up control over this CTTY */
 #endif /* !TIOCNOTTY && __TIOCNOTTY */
 
 #if !defined(TIOCPKT) && defined(__TIOCPKT)
@@ -207,10 +205,7 @@ __DECL_END
 #define TIOCCONS     __TIOCCONS     /* ... */
 #endif /* !TIOCCONS && __TIOCCONS */
 #if !defined(TIOCSCTTY) && defined(__TIOCSCTTY)
-#define TIOCSCTTY __TIOCSCTTY /* [int steal_if_necessary] Make this terminal the controlling terminal of the calling process
-                               * @throws: E_INVALID_CONTEXT_NOT_SESSION_LEADER:    The calling process isn't the session leader
-                               * @throws: E_INVALID_CONTEXT_CTTY_ALREADY_ASSIGNED: The calling session already has a different CTTY assigned (use `TIOCNOTTY' to disconnect from it)
-                               * @throws: E_INSUFFICIENT_RIGHTS_CTTY_STEALING:     `steal_if_necessary' was zero, or the calling thread doesn't have `CAP_SYS_ADMIN' */
+#define TIOCSCTTY __TIOCSCTTY /* [int steal_if_necessary] Make this terminal the controlling terminal of the calling process */
 #endif /* !TIOCSCTTY && __TIOCSCTTY */
 #if !defined(TIOCEXT) && defined(__TIOCEXT)
 #define TIOCEXT     __TIOCEXT /* ... */

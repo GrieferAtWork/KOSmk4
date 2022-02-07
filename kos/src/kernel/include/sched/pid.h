@@ -80,9 +80,7 @@ DECL_BEGIN
 struct pidns;
 struct taskpid;
 struct task;
-#ifdef CONFIG_USE_NEW_GROUP
-struct procgrp; /* Defined in <sched/group-new.h> */
-#endif /* CONFIG_USE_NEW_GROUP */
+struct procgrp; /* Defined in <sched/group.h> */
 
 #ifndef __task_awref_defined
 #define __task_awref_defined
@@ -126,12 +124,10 @@ struct taskpid {
 		Toblockop(pidns)     _tp_nslop;   /* Used internally during destruction */
 		Tobpostlockop(pidns) _tp_nsplop;  /* Used internally during destruction */
 #endif /* __WANT_TASKPID__tp_nslop */
-#ifdef CONFIG_USE_NEW_GROUP
 #ifdef __WANT_TASKPID__tp_grplop
 		Toblockop(procgrp)     _tp_grplop;   /* Used internally during destruction */
 		Tobpostlockop(procgrp) _tp_grpplop;  /* Used internally during destruction */
 #endif /* __WANT_TASKPID__tp_grplop */
-#endif /* CONFIG_USE_NEW_GROUP */
 	};
 #else /* ... */
 	struct task_awref       tp_thread;  /* [0..1] The pointed-to task (or `NULL' if destroyed) */
@@ -143,20 +139,12 @@ struct taskpid {
 	uint8_t                 tp_SIGCLD;  /* [const] Signal number send to parent process when `tp_status' changes. */
 	uint8_t                _tp_pad[sizeof(void *) - 3]; /* ... */
 #endif /* !... */
-#ifdef CONFIG_USE_NEW_GROUP
 	REF struct taskpid     *tp_proc;    /* [1..1][ref_if(!= this)][const] PID descriptor for associated process. */
 	struct procctl         *tp_pctl;    /* [1..1][owned_if(tp_proc == this)][== tp_proc->tp_pctl][const] Process controller. */
 	LIST_ENTRY(REF taskpid) tp_parsib;  /* [0..1] Chain of sibling tasks:
 	                                     * - If `tp_proc == this': Link in chain of other processes spawned by the parent process of `tp_thread'
 	                                     * - If `tp_proc != this': Link in chain of sibling threads spawned within the same process
 	                                     * Marked as unbound if this taskpid has been wait(2)-ed for. */
-#else /* CONFIG_USE_NEW_GROUP */
-	LIST_ENTRY(REF taskpid) tp_parsib;  /* [0..1] Chain of sibling tasks:
-	                                     * - If `tp_proc == this':
-	                                     *   Link in chain of other processes spawned by the parent process of `tp_thread'
-	                                     * - If `tp_proc != this':
-	                                     *   Link in chain of sibling threads spawned within the same process */
-#endif /* !CONFIG_USE_NEW_GROUP */
 	REF struct pidns       *tp_ns;      /* [1..1][const][== tp_proc->tp_ns]
 	                                     * Top-level PID namespace containing this descriptor. Note
 	                                     * that threads are  _required_ to reside  in the same  PID
@@ -244,7 +232,6 @@ taskpid_gettask_srch(struct taskpid *__restrict self)
 /* Query the process ID of a given taskpid */
 #define taskpid_gettidcount(self) ((self)->tp_ns->pn_ind + 1)
 
-#ifdef CONFIG_USE_NEW_GROUP
 /* Query sub-elements of `struct taskpid' */
 #define taskpid_getprocpid(self)   (self)->tp_proc
 #define taskpid_getprocctl(self)   (self)->tp_pctl
@@ -258,7 +245,6 @@ taskpid_gettask_srch(struct taskpid *__restrict self)
 #define taskpid_getpid_s(self)       taskpid_gettid_s(taskpid_getprocpid(self))
 #define taskpid_getselfpid(self)     taskpid_getselftid(taskpid_getprocpid(self))
 #define taskpid_getrootpid(self)     taskpid_getroottid(taskpid_getprocpid(self))
-#endif /* CONFIG_USE_NEW_GROUP */
 
 
 
@@ -282,10 +268,8 @@ struct pidns {
 	Toblockop_slist(pidns)      pn_lops;    /* [0..n][lock(ATOMIC)] Lock operations for `pn_lock'. */
 	LLRBTREE_ROOT(WEAK taskpid) pn_tree;    /* [LINK(->tp_pids[pn_ind].tps_link)][0..n][lock(pn_lock)]
 	                                         * Tree of PIDs (pids remove themselves upon destruction). */
-#ifdef CONFIG_USE_NEW_GROUP
 	LLRBTREE_ROOT(WEAK procgrp) pn_tree_pg; /* [LINK(->pgc_pids[pn_ind].pgs_link)][0..n][lock(pn_lock)]
 	                                         * Tree of process groups (groups remove themselves upon destruction). */
-#endif /* CONFIG_USE_NEW_GROUP */
 	pid_t                       pn_npid;    /* [lock(pn_lock)] Next PID to hand out. (in [PIDNS_FIRST_NONRESERVED_PID,PID_MAX]) */
 };
 
@@ -351,11 +335,9 @@ NOTHROW(FCALL pidns_lookuptask_locked)(struct pidns const *__restrict self, pid_
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) REF struct taskpid *
 NOTHROW(FCALL pidns_lookupnext_locked)(struct pidns const *__restrict self, pid_t min_pid);
 
-#ifdef CONFIG_USE_NEW_GROUP
 /* Same as `pidns_lookupnext_locked()', but only enumerate actual processes (skip threads) */
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) REF struct taskpid *
 NOTHROW(FCALL pidns_lookupnextproc_locked)(struct pidns const *__restrict self, pid_t min_pid);
-#endif /* CONFIG_USE_NEW_GROUP */
 
 /* Try to acquire write-locks to all PID namespaces reachable from `self'
  * Upon success, return `NULL'; else: return the blocking PID  namespace.
@@ -425,7 +407,6 @@ NOTHROW(FCALL pidns_allocpids)(struct taskpid *__restrict self);
 #endif /* !PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE */
 
 
-#ifdef CONFIG_USE_NEW_GROUP
 /* Return the process group associated with `pgid' within `self' */
 FUNDEF WUNUSED NONNULL((1)) REF struct procgrp *FCALL
 pidns_grplookup(struct pidns *__restrict self, pid_t pgid) THROWS(E_WOULDBLOCK);
@@ -441,10 +422,7 @@ NOTHROW(FCALL pidns_grpinsert)(struct pidns *__restrict self,
                                struct procgrp *__restrict grp);
 FUNDEF NOBLOCK NONNULL((1)) struct procgrp *
 NOTHROW(FCALL pidns_grpremove)(struct pidns *__restrict self, pid_t pgid);
-#endif /* CONFIG_USE_NEW_GROUP */
 
-
-#ifdef CONFIG_USE_NEW_GROUP
 
 #define task_gettaskpid()          THIS_TASKPID                                   /* Return task-pid of calling thread */
 #define task_getprocpid()          task_gettaskpid()->tp_proc                     /* Return proc-pid of calling thread */
@@ -491,17 +469,7 @@ NOTHROW(FCALL pidns_grpremove)(struct pidns *__restrict self, pid_t pgid);
 #define task_getnspid_of(thread, ns)   taskpid_getnstid(task_getprocpid_of(thread), ns)   /* Return PID of given thread (in given namespace; panic/undefined if not mapped) */
 #define task_getnspid_of_s(thread, ns) taskpid_getnstid_s(task_getprocpid_of(thread), ns) /* Return PID of given thread (in given namespace; `0' if not mapped) */
 
-#endif /* CONFIG_USE_NEW_GROUP */
-
-
-
 DECL_END
 #endif /* __CC__ */
-
-#ifndef CONFIG_USE_NEW_GROUP
-#ifndef GUARD_KERNEL_INCLUDE_SCHED_GROUP_H
-#include <sched/group.h> /* Forward-compatibility for stuff like `task_gettid()' */
-#endif /* !GUARD_KERNEL_INCLUDE_SCHED_GROUP_H */
-#endif /* !CONFIG_USE_NEW_GROUP */
 
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_PID_H */

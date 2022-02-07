@@ -99,10 +99,7 @@
 #define TIOCNXCL  __TIOCNXCL    /* ... */
 #endif /* !TIOCNXCL && __TIOCNXCL */
 #if !defined(TIOCSCTTY) && defined(__TIOCSCTTY)
-#define TIOCSCTTY __TIOCSCTTY   /* [int steal_if_necessary] Make this terminal the controlling terminal of the calling process
-                                 * @throws: E_INVALID_CONTEXT_NOT_SESSION_LEADER:    The calling process isn't the session leader
-                                 * @throws: E_INVALID_CONTEXT_CTTY_ALREADY_ASSIGNED: The calling session already has a different CTTY assigned (use `TIOCNOTTY' to disconnect from it)
-                                 * @throws: E_INSUFFICIENT_RIGHTS_CTTY_STEALING:     `steal_if_necessary' was zero, or the calling thread doesn't have `CAP_SYS_ADMIN' */
+#define TIOCSCTTY __TIOCSCTTY   /* [int steal_if_necessary] Make this terminal the controlling terminal of the calling process */
 #endif /* !TIOCSCTTY && __TIOCSCTTY */
 #if !defined(TIOCGPGRP) && defined(__TIOCGPGRP)
 #define TIOCGPGRP  __TIOCGPGRP  /* [pid_t *arg] Store the PID of the foreground process group in arg */
@@ -166,9 +163,7 @@
 #define FIONBIO      __FIONBIO      /* [int *arg] Set (*arg != 0) or clear (*arg == 0) O_NONBLOCK / IO_NONBLOCK */
 #endif /* !FIONBIO && __FIONBIO */
 #if !defined(TIOCNOTTY) && defined(__TIOCNOTTY)
-#define TIOCNOTTY    __TIOCNOTTY    /* Given up control over this CTTY
-                                     * @throws: E_INVALID_CONTEXT_NOT_SESSION_LEADER: The calling process isn't the session leader
-                                     * @throws: E_INVALID_CONTEXT_CTTY_DIFFERS:       The calling session uses a different CTTY */
+#define TIOCNOTTY    __TIOCNOTTY    /* Given up control over this CTTY */
 #endif /* !TIOCNOTTY && __TIOCNOTTY */
 #if !defined(TIOCSETD) && defined(__TIOCSETD)
 #define TIOCSETD    __TIOCSETD      /* [int const *ld] Set the terminal's line discipline to *ld */

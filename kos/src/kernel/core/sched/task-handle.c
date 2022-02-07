@@ -92,14 +92,8 @@ handle_task_polltest(struct taskpid *__restrict self, poll_mode_t what) {
 
 
 /* Ensure that the calling thread has permission to do `pidfd_open(self)' */
-#ifdef CONFIG_USE_NEW_GROUP
 PRIVATE NONNULL((1)) void FCALL
-require_pidfd_open(struct taskpid *__restrict self)
-#else /* CONFIG_USE_NEW_GROUP */
-PRIVATE NONNULL((1)) void FCALL
-require_pidfd_open(struct task *__restrict self)
-#endif /* !CONFIG_USE_NEW_GROUP */
-{
+require_pidfd_open(struct taskpid *__restrict self) {
 	/* TODO */
 	(void)self;
 	COMPILER_IMPURE();
@@ -113,7 +107,6 @@ handle_task_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
                   USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	switch (cmd) {
 
-#ifdef CONFIG_USE_NEW_GROUP
 	case TASK_IOC_GETTID: {
 		validate_writable(arg, sizeof(pid_t));
 		*(USER CHECKED pid_t *)arg = taskpid_gettid_s(self);
@@ -162,104 +155,10 @@ handle_task_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
 		require_pidfd_open((struct taskpid *)hand.h_data);
 		return handle_installopenfd((USER UNCHECKED struct openfd *)arg, hand);
 	}	break;
-#else /* CONFIG_USE_NEW_GROUP */
-	case TASK_IOC_GETTID: {
-		validate_writable(arg, sizeof(pid_t));
-		*(USER CHECKED pid_t *)arg = taskpid_gettid(self);
-		return 0;
-	}	break;
-
-	case TASK_IOC_GETPID: {
-		REF struct task *thread;
-		validate_writable(arg, sizeof(pid_t));
-		thread = taskpid_gettask_srch(self);
-		FINALLY_DECREF_UNLIKELY(thread);
-		*(USER CHECKED pid_t *)arg = task_getpid_of_s(thread);
-		return 0;
-	}	break;
-
-	case TASK_IOC_GETPPID: {
-		REF struct task *thread;
-		REF struct taskpid *parent_pid;
-		validate_writable(arg, sizeof(pid_t));
-		thread = taskpid_gettask_srch(self);
-		{
-			FINALLY_DECREF_UNLIKELY(thread);
-			parent_pid = task_getprocessparentpid_of(thread);
-		}
-		if unlikely(!parent_pid)
-			THROW(E_NO_SUCH_PROCESS);
-		FINALLY_DECREF_UNLIKELY(parent_pid);
-		*(USER CHECKED pid_t *)arg = taskpid_gettid(parent_pid);
-		return 0;
-	}	break;
-
-	case TASK_IOC_GETPGID: {
-		REF struct task *thread;
-		REF struct taskpid *group_pid;
-		validate_writable(arg, sizeof(pid_t));
-		thread = taskpid_gettask_srch(self);
-		{
-			FINALLY_DECREF_UNLIKELY(thread);
-			group_pid = task_getprocessgroupleaderpid_of(thread);
-		}
-		if unlikely(!group_pid)
-			THROW(E_NO_SUCH_PROCESS);
-		FINALLY_DECREF_UNLIKELY(group_pid);
-		*(USER CHECKED pid_t *)arg = taskpid_gettid(group_pid);
-		return 0;
-	}	break;
-
-	case TASK_IOC_GETSID: {
-		REF struct task *thread;
-		REF struct taskpid *session_pid;
-		validate_writable(arg, sizeof(pid_t));
-		thread = taskpid_gettask_srch(self);
-		{
-			FINALLY_DECREF_UNLIKELY(thread);
-			session_pid = task_getsessionleaderpid_of(thread);
-		}
-		if unlikely(!session_pid)
-			THROW(E_NO_SUCH_PROCESS);
-		FINALLY_DECREF_UNLIKELY(session_pid);
-		*(USER CHECKED pid_t *)arg = taskpid_gettid(session_pid);
-		return 0;
-	}	break;
-
-	case TASK_IOC_OPENPID: {
-		struct handle hand;
-		REF struct task *thread;
-		thread = taskpid_gettask_srch(self);
-		FINALLY_DECREF_UNLIKELY(thread);
-		thread = task_getprocess_of(thread);
-		require_pidfd_open(thread);
-		hand.h_type = HANDLE_TYPE_TASK;
-		hand.h_mode = mode;
-		hand.h_data = FORTASK(thread, this_taskpid);
-		return handle_installopenfd((USER UNCHECKED struct openfd *)arg, hand);
-	}	break;
-
-	case TASK_IOC_OPENPPID: {
-		struct handle hand;
-		REF struct task *thread;
-		thread = taskpid_gettask_srch(self);
-		{
-			FINALLY_DECREF_UNLIKELY(thread);
-			thread = task_getprocessparent_of(thread);
-		}
-		if unlikely(!thread)
-			THROW(E_NO_SUCH_PROCESS);
-		FINALLY_DECREF_UNLIKELY(thread);
-		require_pidfd_open(thread);
-		hand.h_type = HANDLE_TYPE_TASK;
-		hand.h_mode = mode;
-		hand.h_data = FORTASK(thread, this_taskpid);
-		return handle_installopenfd((USER UNCHECKED struct openfd *)arg, hand);
-	}	break;
-#endif /* !CONFIG_USE_NEW_GROUP */
 
 	case TASK_IOC_EXITCODE: {
 		REF struct task *thread;
+		union wait st;
 		thread = taskpid_gettask(self);
 		if (thread) {
 			if (!(thread->t_flags & TASK_FTERMINATING)) {
@@ -271,7 +170,8 @@ handle_task_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
 			decref_unlikely(thread);
 		}
 		validate_writable(arg, sizeof(union wait));
-		memcpy(arg, &self->tp_status, sizeof(union wait));
+		st.w_status = self->tp_status;
+		memcpy(arg, &st, sizeof(union wait));
 		return 0;
 	}	break;
 
@@ -289,7 +189,6 @@ handle_task_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
 DEFINE_SYSCALL2(fd_t, pidfd_open,
                 pid_t, pid,
                 syscall_ulong_t, flags) {
-#ifdef CONFIG_USE_NEW_GROUP
 	unsigned int result;
 	struct handle hand;
 	REF struct taskpid *target;
@@ -318,39 +217,6 @@ DEFINE_SYSCALL2(fd_t, pidfd_open,
 	/* Install the handle within our handle namespace. */
 	result = handle_install(THIS_HANDLE_MANAGER, hand);
 	return (fd_t)result;
-#else /* CONFIG_USE_NEW_GROUP */
-	unsigned int result;
-	struct handle hand;
-	REF struct taskpid *thread_pid;
-	REF struct task *thread;
-	if unlikely(flags != 0) {
-		THROW(E_INVALID_ARGUMENT_RESERVED_ARGUMENT,
-		      E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_FLAGS,
-		      flags);
-	}
-	thread_pid = pidns_lookup_srch(THIS_PIDNS, pid);
-	FINALLY_DECREF_UNLIKELY(thread_pid);
-	thread = taskpid_gettask_srch(thread_pid);
-	{
-		FINALLY_DECREF_UNLIKELY(thread);
-		/* Only allow pidfd_open() for process leaders */
-		if (!task_isprocessleader_p(thread) && !has_personality(KP_PIDFD_OPEN_THREAD)) {
-			THROW(E_INVALID_ARGUMENT_BAD_STATE,
-			      E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_NOTALEADER);
-		}
-
-		/* Verify that the caller can access `pid' */
-		require_pidfd_open(thread);
-	}
-
-	hand.h_type = HANDLE_TYPE_TASK;
-	hand.h_mode = IO_RDWR | IO_CLOEXEC;
-	hand.h_data = thread_pid;
-
-	/* Install the handle within our handle namespace. */
-	result = handle_install(THIS_HANDLE_MANAGER, hand);
-	return (fd_t)result;
-#endif /* !CONFIG_USE_NEW_GROUP */
 }
 #endif /* __ARCH_WANT_SYSCALL_PIDFD_OPEN */
 
@@ -399,7 +265,6 @@ PRIVATE NONNULL((2)) errno_t KCALL
 pidfd_send_signal_impl(fd_t pidfd,
                        siginfo_t const *__restrict info,
                        syscall_ulong_t flags) {
-#ifdef CONFIG_USE_NEW_GROUP
 	REF struct taskpid *target;
 	if unlikely(flags != 0) {
 		THROW(E_INVALID_ARGUMENT_RESERVED_ARGUMENT,
@@ -419,26 +284,6 @@ pidfd_send_signal_impl(fd_t pidfd,
 			THROW(E_PROCESS_EXITED, taskpid_gettid_s(target));
 	}
 	return -EOK;
-#else /* CONFIG_USE_NEW_GROUP */
-	REF struct task *target;
-	if unlikely(flags != 0) {
-		THROW(E_INVALID_ARGUMENT_RESERVED_ARGUMENT,
-		      E_INVALID_ARGUMENT_CONTEXT_PIDFD_PIDFD_SEND_SIGNAL_FLAGS);
-	}
-	target = handle_get_task((unsigned int)pidfd);
-	FINALLY_DECREF_UNLIKELY(target);
-	/* Don't allow sending arbitrary signals to other processes. */
-	if ((info->si_code >= 0 || info->si_code == SI_TKILL) &&
-	    (task_getprocess_of(target) != task_getprocess()))
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE,
-		      info->si_code);
-	if (info->si_signo != 0) {
-		if (!task_raisesignalprocess(target, info))
-			THROW(E_PROCESS_EXITED, task_getpid_of_s(target));
-	}
-	return -EOK;
-#endif /* !CONFIG_USE_NEW_GROUP */
 }
 
 

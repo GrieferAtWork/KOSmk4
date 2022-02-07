@@ -2461,7 +2461,6 @@ DEFINE_SYSCALL0(errno_t, pause) {
 #ifdef __ARCH_WANT_SYSCALL_KCMP
 PRIVATE NONNULL((1)) void KCALL
 kcmp_require_inspect_process(struct task *__restrict thread) {
-#ifdef CONFIG_USE_NEW_GROUP
 	struct task *me = THIS_TASK;
 	if (thread == me)
 		return; /* Always allowed to inspect yourself */
@@ -2469,15 +2468,6 @@ kcmp_require_inspect_process(struct task *__restrict thread) {
 		return; /* Another thread within the current process */
 	if (task_getprocptr_of(me) == task_getprocessparentptr_of(thread))
 		return; /* One of our child threads */
-#else /* CONFIG_USE_NEW_GROUP */
-	struct task *me = THIS_TASK;
-	struct task *thread_parent;
-	if (thread == me)
-		return; /* Always allowed to inspect yourself */
-	thread_parent = task_getprocessparentptr_of(thread);
-	if (thread_parent == task_getprocess_of(me))
-		return; /* Check if the caller's process is the parent of `thread' */
-#endif /* !CONFIG_USE_NEW_GROUP */
 	require(CAP_SYS_PTRACE);
 }
 

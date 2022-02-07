@@ -41,12 +41,7 @@ DECL_BEGIN
 #define OS_REGISTER_ROOTPGID  5 /* ProcessGroupID (root namespace) */
 #define OS_REGISTER_SID       6 /* SessionID */
 #define OS_REGISTER_ROOTSID   7 /* SessionID (root namespace) */
-#ifdef CONFIG_USE_NEW_GROUP
 #define OS_REGISTER_COUNT     7
-#else /* CONFIG_USE_NEW_GROUP */
-#define OS_REGISTER_IS_ORPHAN 8 /* task_isorphan() */
-#define OS_REGISTER_COUNT     8
-#endif /* !CONFIG_USE_NEW_GROUP */
 
 PRIVATE ATTR_CONST WUNUSED char const *
 NOTHROW(FCALL GDB_GetOsRegisterName)(uintptr_t os_regno) {
@@ -77,11 +72,6 @@ NOTHROW(FCALL GDB_GetOsRegisterName)(uintptr_t os_regno) {
 	case OS_REGISTER_ROOTSID:
 		result = "rootsid";
 		break;
-#ifndef CONFIG_USE_NEW_GROUP
-	case OS_REGISTER_IS_ORPHAN:
-		result = "is_orphan";
-		break;
-#endif /* !CONFIG_USE_NEW_GROUP */
 
 	default:
 		result = NULL;
@@ -133,7 +123,6 @@ NOTHROW(FCALL GDB_PrintOsRegisterValue)(struct task *__restrict thread, uintptr_
 
 	case OS_REGISTER_PGID:
 	case OS_REGISTER_ROOTPGID: {
-#ifdef CONFIG_USE_NEW_GROUP
 		REF struct procgrp *grp;
 		grp    = task_getprocgrp_of(thread);
 		result = format_printf(printer, arg, "%u",
@@ -141,23 +130,10 @@ NOTHROW(FCALL GDB_PrintOsRegisterValue)(struct task *__restrict thread, uintptr_
 		                       ? procgrp_getnspgid(grp, grp->pgr_ns)
 		                       : procgrp_getrootpgid(grp));
 		decref_unlikely(grp);
-#else /* CONFIG_USE_NEW_GROUP */
-		REF struct taskpid *tpid;
-		tpid = task_getprocessgroupleaderpid_of_nx(thread);
-		if (!tpid) {
-			result = (*printer)(arg, "?", 1);
-		} else {
-			result = format_printf(printer, arg, "%u",
-			                       os_regno == OS_REGISTER_PGID ? taskpid_getselftid(tpid)
-			                                                    : taskpid_getroottid(tpid));
-			decref_unlikely(tpid);
-		}
-#endif /* !CONFIG_USE_NEW_GROUP */
 	}	break;
 
 	case OS_REGISTER_SID:
 	case OS_REGISTER_ROOTSID: {
-#ifdef CONFIG_USE_NEW_GROUP
 		REF struct procgrp *grp;
 		grp    = task_getprocgrp_of(thread);
 		result = format_printf(printer, arg, "%u",
@@ -165,26 +141,7 @@ NOTHROW(FCALL GDB_PrintOsRegisterValue)(struct task *__restrict thread, uintptr_
 		                       ? procgrp_getnssid(grp, grp->pgr_ns)
 		                       : procgrp_getrootsid(grp));
 		decref_unlikely(grp);
-#else /* CONFIG_USE_NEW_GROUP */
-		REF struct taskpid *tpid;
-		tpid = task_getsessionleaderpid_of_nx(thread);
-		if (!tpid) {
-			result = (*printer)(arg, "?", 1);
-		} else {
-			result = format_printf(printer, arg, "%u",
-			                       os_regno == OS_REGISTER_SID ? taskpid_getselftid(tpid)
-			                                                   : taskpid_getroottid(tpid));
-			decref_unlikely(tpid);
-		}
-#endif /* !CONFIG_USE_NEW_GROUP */
 	}	break;
-
-#ifndef CONFIG_USE_NEW_GROUP
-	case OS_REGISTER_IS_ORPHAN:
-		result = format_printf(printer, arg, "%u",
-		                       task_isorphan_p(thread) ? 1 : 0);
-		break;
-#endif /* !CONFIG_USE_NEW_GROUP */
 
 	default:
 		result = 0;

@@ -55,13 +55,6 @@
 #include <compat/signal.h>
 #endif /* __ARCH_HAVE_COMPAT */
 
-#ifndef CONFIG_USE_NEW_GROUP
-/* Need pointer sets for gathering targets of
- * process-group-wide   signal    broadcasts. */
-#define POINTER_SET_BUFSIZE 16
-#include <misc/pointer-set.h>
-#endif /* !CONFIG_USE_NEW_GROUP */
-
 DECL_BEGIN
 
 STATIC_ASSERT_MSG(NSIG - 1 <= 0xff,
@@ -113,10 +106,6 @@ task_raisesignalthread(struct task *__restrict target,
 }
 
 
-
-
-
-#ifdef CONFIG_USE_NEW_GROUP
 
 /* Raise a posix signal within the given process `proc'
  * @return: true:  Successfully scheduled/enqueued the signal for delivery to `target'
@@ -279,224 +268,8 @@ done:
 }
 
 
-#else /* CONFIG_USE_NEW_GROUP */
-/* Raise a posix signal within a given process that `target' is apart of
- * @return: true:  Successfully scheduled/enqueued the signal for delivery to `target'
- * @return: false: The given process `target' has already terminated execution.
- * @return: false: The given process `target' is a kernel thread.
- * @throw: E_INVALID_ARGUMENT_BAD_VALUE: The signal number in `info' is ZERO(0) or >= `NSIG' */
-PUBLIC NONNULL((1, 2)) bool FCALL
-task_raisesignalprocess(struct task *__restrict target,
-                        siginfo_t const *__restrict info)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE) {
-	struct pending_rpc *rpc;
-#ifndef __OPTIMIZE_SIZE__
-	/* XXX: If any of `target's threads has a SIGHAND disposition for `info->si_signo'
-	 *      that  is set to `SIG_IGN', then don't  send the signal and silently return
-	 *      with `true'. */
-#endif /* !__OPTIMIZE_SIZE__ */
-
-	rpc = pending_rpc_alloc_psig(GFP_NORMAL);
-
-	/* Fill in RPC signal information. */
-	memcpy(&rpc->pr_psig, info, sizeof(siginfo_t));
-	COMPILER_READ_BARRIER();
-	if unlikely(rpc->pr_psig.si_signo <= 0 ||
-	            rpc->pr_psig.si_signo >= NSIG) {
-		signo_t signo = rpc->pr_psig.si_signo;
-		pending_rpc_free(rpc);
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
-		      signo);
-	}
-
-	/* Set RPC flags: posix signals are _always_ async */
-	rpc->pr_flags = RPC_SYNCMODE_F_ALLOW_ASYNC |
-	                RPC_CONTEXT_SIGNAL |
-	                RPC_SIGNO(rpc->pr_psig.si_signo);
-
-	/* Schedule the RPC */
-	if (proc_rpc_schedule(target, rpc))
-		return true;
-
-	/* Target thread already died :( */
-	pending_rpc_free(rpc);
-	return false;
-}
 
 
-
-/* Decref every task-object from `self'. */
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL taskref_pointer_set_decref_all)(struct pointer_set *__restrict self) {
-	REF struct task *thread;
-	POINTER_SET_FOREACH(thread, self) {
-		/* Arguably a  `decref_likely()', but  only if  the
-		 * total # of threads in the set is extremely high,
-		 * and only if the signal that was send caused most
-		 * if not all of these threads to terminate. */
-		decref(thread);
-	}
-}
-
-/* Finalize a pointer set filled with `REF struct task *' elements. */
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL taskref_pointer_set_fini)(struct pointer_set *__restrict self) {
-	taskref_pointer_set_decref_all(self);
-	pointer_set_fini(self);
-}
-
-/* Send a signal to every process within the same process group that `target' is apart of.
- * @return: * : The number of processes to which the signal was delivered. */
-PUBLIC NONNULL((1, 2)) size_t FCALL
-task_raisesignalprocessgroup(struct task *__restrict target,
-                             siginfo_t const *__restrict info)
-		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE) {
-	size_t result = 0;
-	REF struct task *pgroup;
-	struct taskgroup *pgroup_group;
-	struct pointer_set ps; /* Set of processes already visited. */
-	/* Deliver the first signal to the process group leader. */
-	pgroup = task_getprocessgroupleader_srch_of(target);
-	pgroup_group = &FORTASK(pgroup, this_taskgroup);
-	TRY {
-		if (task_raisesignalprocess(pgroup, info))
-			++result;
-	} EXCEPT {
-		decref_unlikely(pgroup);
-		RETHROW();
-	}
-	pointer_set_init(&ps);
-	RAII_FINALLY {
-		taskref_pointer_set_fini(&ps);
-		decref_unlikely(pgroup);
-	};
-	{
-		REF struct task *pending_delivery_procv[8];
-		size_t pending_delivery_procc;
-		bool there_are_more_procs;
-		struct task *iter;
-load_more_threads:
-		pending_delivery_procc = 0;
-		there_are_more_procs = false;
-		sync_read(&pgroup_group->tg_pgrp_processes_lock);
-		FOREACH_taskgroup__pgrp_processes(iter, pgroup_group) {
-			assert(iter != pgroup);
-			if (pointer_set_contains(&ps, iter))
-				continue;
-			if (!tryincref(iter))
-				continue;
-			/* Always re-start as  long as  we're able to  find any  other process that  is able  to
-			 * receive  the signal. Otherwise, there would be  a race condition between us releasing
-			 * the `tg_pgrp_processes_lock' lock,  and some process  calling `task_setprocess()'  to
-			 * add itself to the process group. When this happens, that process wouldn't receive the
-			 * signal that we're sending to every process within the group.
-			 *
-			 * This might sound like intended behavior on the surface, but this could also lead
-			 * to a scenario  where you're  unable to kill  everyone from  some process  group:
-			 *
-			 *  #1: Thread[5]: setpgid(0, 0)                          - Become a process group leader
-			 *  #2: Thread[5]: sys_fork()                             - Create new Process Thread[6]
-			 *  #3: Thread[2]: kill(-5, SIGKILL);                     - Send SIGKILL to every process in PGROUP[5]
-			 *  #4: Thread[2]: task_raisesignalprocessgroup()
-			 *  #5: Thread[2]: sync_read(tg_pgrp_processes_lock)      - Acquire the lock to view every process apart of PGROUP[5]
-			 *  #6: Thread[6]: sys_fork()                             - Try to create Thread[7]
-			 *  #7: Thread[6]: task_setprocess(Thread[7])
-			 *  #8: Thread[6]: sync_write(tg_pgrp_processes_lock)     - Acquire  the  lock  to add  Thread[7]  to PGROUP[5].
-			 *                                                          This  blocks because we're  already holding the lock
-			 *                                                          from step #5, so the call blocks until the lock will
-			 *                                                          become available.
-			 *  #9: Thread[2]: -- Gather all processes from PGROUP[5] (but keep `there_are_more_procs = false')
-			 * #10: Thread[2]: sync_endread(tg_pgrp_processes_lock)             - The scheduler chooses not to wake-up `Thread[6]'
-			 * #11: Thread[2]: -- Send SIGKILL to every process in PGROUP[5]
-			 * #12: Thread[2]: sync_read(tg_pgrp_processes_lock)
-			 * #13: Thread[2]: -- Scan for more processes that haven't gotten the signal, yet
-			 * #14: Thread[2]: sync_endread(tg_pgrp_processes_lock)
-			 * #15: Thread[2]: -- No further processes found
-			 * #16: Thread[6]: sync_write(tg_pgrp_processes_lock)     - Finally stops blocking
-			 * #17: Thread[6]: -- Add Thread[7] to process to PGROUP[5]
-			 * #18: Thread[6]: sync_endwrite(tg_pgrp_processes_lock)
-			 *
-			 * #19: -- Every thread handles its signals in a random order and terminates.
-			 *         However, Thread[7] was never given sent a signal and will continue
-			 *         to run indefinitely.
-			 *
-			 * This is fixed  by always  keeping on searching  for more  processes to  receive
-			 * the signal, which then interlocks with the call to `task_serve()' in `clone()',
-			 * that is done by the parent process and can be used to prevent the child process
-			 * from being started. */
-			there_are_more_procs = true;
-			pending_delivery_procv[pending_delivery_procc] = iter;
-			++pending_delivery_procc;
-			if (pending_delivery_procc >= COMPILER_LENOF(pending_delivery_procv))
-				break;
-		}
-		sync_endread(&pgroup_group->tg_pgrp_processes_lock);
-		TRY {
-			while (pending_delivery_procc) {
-				REF struct task *thread;
-				thread = pending_delivery_procv[pending_delivery_procc - 1];
-				/* Deliver to this process. */
-				if (task_raisesignalprocess(thread, info))
-					++result;
-				/* NOTE: We must insert references to threads which already had
-				 *       a signal get delivered. This is _required_ to  prevent
-				 *       the scenario where:
-				 *        - SEND_SIGNAL_TO_THREAD(t1);
-				 *        - ps.insert(t1);
-				 *        - In t1: task_exit();
-				 *        - In t1: decref(THIS_TASK);
-				 *        - In t1: destroy(THIS_TASK);
-				 *        - In t1: free(THIS_TASK);
-				 *        - In t2: clone();
-				 *        - In t2: t3 = kmalloc(struct task);   // addrof(t3) == addrof(t2)
-				 *        - In t2: init(t3);
-				 *        - In t2: task_start(t3);
-				 *       In this case, we'd never end up sending a signal to `t3',
-				 *       since we'd think that that thread already had the  signal
-				 *       delivered.
-				 *
-				 * It is kind-of sad  that we have to  keep references to all  of
-				 * the threads that already got the signal, since we really don't
-				 * need those references for anything else. But it's the simplest
-				 * thing we can do here.
-				 *
-				 * NOTE: We don't keep references for the taskpid structures of
-				 * threads that already got the signal, since certain types  of
-				 * thread (kernel threads) don't have taskpid descriptors! */
-				pointer_set_insert(&ps, thread, GFP_NORMAL); /* Inherit reference. */
-				/*decref_unlikely(thread);*/ /* Inherited by `ps' */
-				--pending_delivery_procc;
-			}
-		} EXCEPT {
-			while (pending_delivery_procc--)
-				decref_unlikely(pending_delivery_procv[pending_delivery_procc]);
-			RETHROW();
-		}
-		if (there_are_more_procs)
-			goto load_more_threads;
-	}
-	return result;
-}
-#endif /* !CONFIG_USE_NEW_GROUP */
-
-
-
-
-LOCAL ATTR_PURE WUNUSED NONNULL((1)) size_t FCALL
-get_pid_indirection(struct task const *__restrict thread) {
-	/* TODO: Remove this function once `CONFIG_USE_NEW_GROUP' becomes mandatory */
-	struct taskpid *pid = FORTASK(thread, this_taskpid);
-	return likely(pid) ? pid->tp_ns->pn_ind : 0;
-}
-
-LOCAL ATTR_PURE WUNUSED NONNULL((1)) pid_t FCALL
-taskpid_getpid_ind(struct taskpid *__restrict self, size_t ind) {
-	/* TODO: Remove this function once `CONFIG_USE_NEW_GROUP' becomes mandatory */
-	if likely(ind <= self->tp_ns->pn_ind)
-		return _taskpid_slot_getpidno(self->tp_pids[ind]);
-	return 0;
-}
 
 
 
@@ -507,7 +280,6 @@ taskpid_getpid_ind(struct taskpid *__restrict self, size_t ind) {
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_KILL
 DEFINE_SYSCALL2(errno_t, kill, pid_t, pid, signo_t, signo) {
-#ifdef CONFIG_USE_NEW_GROUP
 	struct taskpid *mypid = task_gettaskpid();
 	siginfo_t info;
 	bzero(&info, sizeof(siginfo_t));
@@ -538,48 +310,6 @@ DEFINE_SYSCALL2(errno_t, kill, pid_t, pid, signo_t, signo) {
 			THROW(E_PROCESS_EXITED, -pid);
 	}
 	return -EOK;
-#else /* CONFIG_USE_NEW_GROUP */
-	REF struct task *target;
-	struct taskpid *mypid;
-	siginfo_t info;
-	bzero(&info, sizeof(siginfo_t));
-
-	/* Make sure we've been given a valid signal number. */
-	if unlikely(signo <= 0 || signo >= NSIG) {
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
-		      signo);
-	}
-	info.si_signo = signo;
-	info.si_errno = 0;
-	info.si_code  = SI_USER;
-	info.si_uid   = (__uid_t)cred_geteuid();
-	mypid         = THIS_TASKPID;
-	if (pid > 0) {
-		/* Kill the thread matching `pid'. */
-		target = pidns_lookuptask_srch(THIS_PIDNS, pid);
-		FINALLY_DECREF_UNLIKELY(target);
-		info.si_pid = taskpid_getpid_ind(mypid, get_pid_indirection(target));
-		if (!task_raisesignalprocess(target, &info))
-			THROW(E_PROCESS_EXITED, task_gettid_of_s(target));
-	} else if (pid == 0) {
-		/* Kill all processes in the calling thread's process group. */
-		target = task_getprocessgroupleader_srch();
-		goto do_inherit_target_and_raise_processgroup;
-	} else if (pid == -1) {
-		/* TODO: Kill all processes that we're allowed to (except for pid=1). */
-		THROW(E_NOT_IMPLEMENTED_TODO);
-	} else {
-		/* Kill the entirety of a process group. */
-		target = pidns_lookuptask_srch(THIS_PIDNS, -pid);
-do_inherit_target_and_raise_processgroup:
-		FINALLY_DECREF_UNLIKELY(target);
-		info.si_pid = taskpid_getpid_ind(mypid, get_pid_indirection(target));
-		if (!task_raisesignalprocessgroup(target, &info))
-			THROW(E_PROCESS_EXITED, task_getpid_of_s(target));
-	}
-	return -EOK;
-#endif /* !CONFIG_USE_NEW_GROUP */
 }
 #endif /* __ARCH_WANT_SYSCALL_KILL */
 
@@ -620,7 +350,7 @@ DEFINE_SYSCALL3(errno_t, tgkill,
 		info.si_errno = 0;
 		info.si_code  = SI_TKILL;
 		info.si_uid   = (__uid_t)cred_geteuid();
-		info.si_pid   = (__pid_t)taskpid_getpid_ind(THIS_TASKPID, get_pid_indirection(target));
+		info.si_pid   = (__pid_t)task_getnstid_s(task_gettaskpid_of(target)->tp_ns);
 		if (!task_raisesignalthread(target, &info))
 			THROW(E_PROCESS_EXITED, task_gettid_of_s(target));
 	}
@@ -648,7 +378,7 @@ DEFINE_SYSCALL2(errno_t, tkill, pid_t, tid, signo_t, signo) {
 		info.si_errno = 0;
 		info.si_code  = SI_TKILL;
 		info.si_uid   = (__uid_t)cred_geteuid();
-		info.si_pid   = (__pid_t)taskpid_getpid_ind(THIS_TASKPID, get_pid_indirection(target));
+		info.si_pid   = (__pid_t)task_getnstid_s(task_gettaskpid_of(target)->tp_ns);
 		if (!task_raisesignalthread(target, &info))
 			THROW(E_PROCESS_EXITED, task_gettid_of_s(target));
 	}
@@ -726,7 +456,6 @@ siginfo_from_compat_user(siginfo_t *__restrict info, signo_t usigno,
 DEFINE_SYSCALL3(errno_t, rt_sigqueueinfo,
                 pid_t, pid, signo_t, signo,
                 USER UNCHECKED siginfo_t const *, uinfo) {
-#ifdef CONFIG_USE_NEW_GROUP
 	REF struct taskpid *target;
 	siginfo_t info;
 	if unlikely(pid <= 0) {
@@ -748,29 +477,6 @@ DEFINE_SYSCALL3(errno_t, rt_sigqueueinfo,
 			THROW(E_PROCESS_EXITED, pid);
 	}
 	return -EOK;
-#else /* CONFIG_USE_NEW_GROUP */
-	REF struct task *target;
-	siginfo_t info;
-	if unlikely(pid <= 0) {
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, pid);
-	}
-	siginfo_from_user(&info, signo, uinfo);
-	target = pidns_lookuptask_srch(THIS_PIDNS, pid);
-	FINALLY_DECREF_UNLIKELY(target);
-
-	/* Don't allow sending arbitrary signals to other processes. */
-	if ((info.si_code >= 0 || info.si_code == SI_TKILL) &&
-	    (task_getprocess_of(target) != task_getprocess()))
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE,
-		      info.si_code);
-	if (signo != 0) {
-		if (!task_raisesignalprocess(target, &info))
-			THROW(E_PROCESS_EXITED, task_getpid_of_s(target));
-	}
-	return -EOK;
-#endif /* !CONFIG_USE_NEW_GROUP */
 }
 #endif /* __ARCH_WANT_SYSCALL_RT_SIGQUEUEINFO */
 
@@ -778,7 +484,6 @@ DEFINE_SYSCALL3(errno_t, rt_sigqueueinfo,
 DEFINE_SYSCALL4(errno_t, rt_tgsigqueueinfo,
                 pid_t, pid, pid_t, tid, signo_t, signo,
                 USER UNCHECKED siginfo_t const *, uinfo) {
-#ifdef CONFIG_USE_NEW_GROUP
 	siginfo_t info;
 	REF struct task *target;
 	struct taskpid *leader;
@@ -808,34 +513,6 @@ DEFINE_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 			THROW(E_PROCESS_EXITED, task_gettid_of_s(target));
 	}
 	return -EOK;
-#else /* CONFIG_USE_NEW_GROUP */
-	siginfo_t info;
-	REF struct task *target;
-	struct task *leader;
-	if unlikely(pid <= 0)
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, pid);
-	if unlikely(tid <= 0)
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TID, tid);
-	siginfo_from_user(&info, signo, uinfo);
-	target = pidns_lookuptask_srch(THIS_PIDNS, tid);
-	FINALLY_DECREF_UNLIKELY(target);
-	/* Don't allow sending arbitrary signals to other processes. */
-	leader = task_getprocess_of(target);
-	if ((info.si_code >= 0 || info.si_code == SI_TKILL) && leader != task_getprocess())
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE,
-		      info.si_code);
-	/* Check if the thread-group ID matches that of the leader of the requested thread-group. */
-	if (task_gettid_of_s(leader) != pid)
-		THROW(E_PROCESS_EXITED, pid);
-	if (signo != 0) {
-		if (!task_raisesignalthread(target, &info))
-			THROW(E_PROCESS_EXITED, task_gettid_of_s(target));
-	}
-	return -EOK;
-#endif /* !CONFIG_USE_NEW_GROUP */
 }
 #endif /* __ARCH_WANT_SYSCALL_RT_TGSIGQUEUEINFO */
 
@@ -843,7 +520,6 @@ DEFINE_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 DEFINE_COMPAT_SYSCALL3(errno_t, rt_sigqueueinfo,
                        pid_t, pid, signo_t, signo,
                        USER UNCHECKED compat_siginfo_t const *, uinfo) {
-#ifdef CONFIG_USE_NEW_GROUP
 	REF struct taskpid *target;
 	struct taskpid *mypid = task_gettaskpid();
 	siginfo_t info;
@@ -864,27 +540,6 @@ DEFINE_COMPAT_SYSCALL3(errno_t, rt_sigqueueinfo,
 			THROW(E_PROCESS_EXITED, pid);
 	}
 	return -EOK;
-#else /* CONFIG_USE_NEW_GROUP */
-	REF struct task *target;
-	siginfo_t info;
-	if unlikely(pid <= 0)
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, pid);
-	siginfo_from_compat_user(&info, signo, uinfo);
-	target = pidns_lookuptask_srch(THIS_PIDNS, pid);
-	FINALLY_DECREF_UNLIKELY(target);
-	/* Don't allow sending arbitrary signals to other processes. */
-	if ((info.si_code >= 0 || info.si_code == SI_TKILL) &&
-	    (task_getprocess_of(target) != task_getprocess()))
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE,
-		      info.si_code);
-	if (signo != 0) {
-		if (!task_raisesignalprocess(target, &info))
-			THROW(E_PROCESS_EXITED, task_getpid_of_s(target));
-	}
-	return -EOK;
-#endif /* !CONFIG_USE_NEW_GROUP */
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_RT_SIGQUEUEINFO */
 
@@ -892,7 +547,6 @@ DEFINE_COMPAT_SYSCALL3(errno_t, rt_sigqueueinfo,
 DEFINE_COMPAT_SYSCALL4(errno_t, rt_tgsigqueueinfo,
                        pid_t, pid, pid_t, tid, signo_t, signo,
                        USER UNCHECKED compat_siginfo_t const *, uinfo) {
-#ifdef CONFIG_USE_NEW_GROUP
 	siginfo_t info;
 	REF struct task *target;
 	struct taskpid *leader;
@@ -922,34 +576,6 @@ DEFINE_COMPAT_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 			THROW(E_PROCESS_EXITED, tid);
 	}
 	return -EOK;
-#else /* CONFIG_USE_NEW_GROUP */
-	siginfo_t info;
-	REF struct task *target;
-	struct task *leader;
-	if unlikely(pid <= 0)
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, pid);
-	if unlikely(tid <= 0)
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TID, tid);
-	siginfo_from_compat_user(&info, signo, uinfo);
-	target = pidns_lookuptask_srch(THIS_PIDNS, tid);
-	FINALLY_DECREF_UNLIKELY(target);
-	/* Don't allow sending arbitrary signals to other processes. */
-	leader = task_getprocess_of(target);
-	if ((info.si_code >= 0 || info.si_code == SI_TKILL) && leader != task_getprocess())
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE,
-		      info.si_code);
-	/* Check if the thread-group ID matches that of the leader of the requested thread-group. */
-	if (task_gettid_of_s(leader) != pid)
-		THROW(E_PROCESS_EXITED, pid);
-	if (signo != 0) {
-		if (!task_raisesignalthread(target, &info))
-			THROW(E_PROCESS_EXITED, task_gettid_of_s(target));
-	}
-	return -EOK;
-#endif /* !CONFIG_USE_NEW_GROUP */
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_RT_TGSIGQUEUEINFO */
 

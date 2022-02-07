@@ -68,6 +68,7 @@ DECL_BEGIN
 
 PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 enum_thread(struct task *__restrict thread, unsigned int state) {
+	struct mexecinfo *ei;
 	ssize_t len;
 	struct task *old_current;
 	pid_t pid, tid;
@@ -77,29 +78,21 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 		dbg_hline(0, dbg_getcur_y(), dbg_screen_width, ' ');
 	}
 	dbg_savecolor();
-#ifdef CONFIG_USE_NEW_GROUP
 	if (task_getprocpid_of(thread) == task_getprocpid_of(dbg_current))
 		dbg_setbgcolor(ANSITTY_CL_DARK_GRAY);
-#else /* CONFIG_USE_NEW_GROUP */
-	if (task_getprocess_of(thread) == task_getprocess_of(dbg_current))
-		dbg_setbgcolor(ANSITTY_CL_DARK_GRAY);
-#endif /* !CONFIG_USE_NEW_GROUP */
-	{
-		struct mexecinfo *ei;
-		ei = &FORMMAN(thread->t_mman, thismman_execinfo);
-		if (ei->mei_dent) {
-			len = dbg_printer(NULL,
-			                  ei->mei_dent->fd_name,
-			                  ei->mei_dent->fd_namelen);
-		} else if (thread->t_flags & TASK_FKERNTHREAD) {
-			len = dbg_print(DBGSTR("kernel"));
-		} else {
-			len = dbg_print(DBGSTR("??" /**/ "?"));
-		}
-		while (len < 10) {
-			dbg_putc(' ');
-			++len;
-		}
+	ei = &FORMMAN(thread->t_mman, thismman_execinfo);
+	if (ei->mei_dent) {
+		len = dbg_printer(NULL,
+		                  ei->mei_dent->fd_name,
+		                  ei->mei_dent->fd_namelen);
+	} else if (thread->t_flags & TASK_FKERNTHREAD) {
+		len = dbg_print(DBGSTR("kernel"));
+	} else {
+		len = dbg_print(DBGSTR("??" /**/ "?"));
+	}
+	while (len < 10) {
+		dbg_putc(' ');
+		++len;
 	}
 	pid = task_getrootpid_of(thread);
 	len = dbg_printf(DBGSTR(" %u"), pid);

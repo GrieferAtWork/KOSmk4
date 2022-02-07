@@ -218,20 +218,10 @@ NOTHROW(KCALL kernel_initialize_scheduler_after_smp)(void) {
 	assert(FORTASK(task_template, this_kernel_stackpart_).mp_state = MPART_ST_MEM);
 	assert(FORTASK(task_template, this_fs) == &fs_kernel);
 	assert(FORTASK(task_template, this_handle_manager) == &handle_manager_kernel);
-#ifndef CONFIG_USE_NEW_GROUP
-	assert(FORTASK(task_template, this_taskgroup).tg_process == &bootidle);
-	assert(FORTASK(task_template, this_taskgroup).tg_proc_group == &bootidle_pid);
-	assert(FORTASK(task_template, this_taskgroup).tg_pgrp_session == &bootidle_pid);
-#endif /* !CONFIG_USE_NEW_GROUP */
 	task_template->t_mman                                   = NULL;
 	FORTASK(task_template, this_kernel_stackpart_).mp_state = MPART_ST_VOID;
 	FORTASK(task_template, this_fs)                         = NULL;
 	FORTASK(task_template, this_handle_manager)             = NULL;
-#ifndef CONFIG_USE_NEW_GROUP
-	FORTASK(task_template, this_taskgroup).tg_process       = NULL;
-	FORTASK(task_template, this_taskgroup).tg_proc_group    = NULL;
-	FORTASK(task_template, this_taskgroup).tg_pgrp_session  = NULL;
-#endif /* !CONFIG_USE_NEW_GROUP */
 #ifndef CONFIG_EVERYONE_IS_ROOT
 	assert(FORTASK(task_template, this_cred) == &cred_kernel);
 	FORTASK(task_template, this_cred) = NULL;
@@ -280,13 +270,6 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	FORTASK(&boottask, this_taskpid)  = &boottask_pid;
 	FORTASK(&bootidle, this_taskpid)  = &bootidle_pid;
 	FORTASK(&asyncwork, this_taskpid) = &asyncwork_pid;
-
-#ifndef CONFIG_USE_NEW_GROUP
-	/* Special handling for boottask (which will become /bin/init) */
-	FORTASK(&boottask, this_taskgroup).tg_process      = &boottask;     /* The boottask is its own process. */
-	FORTASK(&boottask, this_taskgroup).tg_proc_group   = &boottask_pid; /* the boot task is a process group */
-	FORTASK(&boottask, this_taskgroup).tg_pgrp_session = &boottask_pid; /* the boot task is a session */
-#endif /* !CONFIG_USE_NEW_GROUP */
 
 	/* Figure out where to put the initial trampolines for boottask and bootidle */
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE

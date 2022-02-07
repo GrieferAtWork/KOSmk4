@@ -124,96 +124,25 @@ userkern_segment_writeq(struct vioargs *__restrict args,
 
 	case offsetof(USERKERN_STRUCT, uk_ppid): {
 #ifdef DEFINE_IO_READ
-#ifdef CONFIG_USE_NEW_GROUP
 		result = task_getppid_s();
-#else /* CONFIG_USE_NEW_GROUP */
-		REF struct task *parent;
-		result = 0;
-		parent = task_getprocessparent();
-		if likely(parent) {
-			result = task_getpid_of(parent);
-			decref(parent);
-		}
-#endif /* !CONFIG_USE_NEW_GROUP */
 #else /* DEFINE_IO_READ */
-#ifdef CONFIG_USE_NEW_GROUP
 		THROW(E_NOT_IMPLEMENTED_TODO);
-#else /* CONFIG_USE_NEW_GROUP */
-		if (value != 0)
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_USERKERN_PPID,
-			      value);
-		task_detach(task_getprocess());
-#endif /* !CONFIG_USE_NEW_GROUP */
 #endif /* !DEFINE_IO_READ */
 	}	break;
 
 	case offsetof(USERKERN_STRUCT, uk_pgid): {
 #ifdef DEFINE_IO_READ
-#ifdef CONFIG_USE_NEW_GROUP
 		result = task_getpgid_s();
-#else /* CONFIG_USE_NEW_GROUP */
-		REF struct task *leader;
-		leader = task_getprocessgroupleader_srch();
-		result = task_getpid_of(leader);
-		decref(leader);
-#endif /* !CONFIG_USE_NEW_GROUP */
 #else /* DEFINE_IO_READ */
-#ifdef CONFIG_USE_NEW_GROUP
 		THROW(E_NOT_IMPLEMENTED_TODO);
-#else /* CONFIG_USE_NEW_GROUP */
-		struct task *caller;
-		caller = THIS_TASK;
-		if (value == 0)
-			task_setprocessgroupleader(THIS_TASK, caller);
-		else {
-			unsigned int error;
-			REF struct task *group;
-			group = pidns_lookuptask_srch(THIS_PIDNS, value);
-			{
-				FINALLY_DECREF_UNLIKELY(group);
-				error = task_setprocessgroupleader(caller, group);
-			}
-			if (error == TASK_SETPROCESSGROUPLEADER_EXITED)
-				THROW(E_PROCESS_EXITED, value);
-			if (error == TASK_SETPROCESSGROUPLEADER_LEADER) {
-				THROW(E_ILLEGAL_PROCESS_OPERATION,
-				      E_ILLEGAL_OPERATION_CONTEXT_SETPGID_LEADER,
-				      0, value);
-			}
-		}
-#endif /* !CONFIG_USE_NEW_GROUP */
 #endif /* !DEFINE_IO_READ */
 	}	break;
 
 	case offsetof(USERKERN_STRUCT, uk_sid): {
 #ifdef DEFINE_IO_READ
-#ifdef CONFIG_USE_NEW_GROUP
 		result = task_getsid_s();
-#else /* CONFIG_USE_NEW_GROUP */
-		REF struct task *leader;
-		leader = task_getsessionleader_srch();
-		result = task_getpid_of(leader);
-		decref(leader);
-#endif /* !CONFIG_USE_NEW_GROUP */
 #else /* DEFINE_IO_READ */
-#ifdef CONFIG_USE_NEW_GROUP
 		THROW(E_NOT_IMPLEMENTED_TODO);
-#else /* CONFIG_USE_NEW_GROUP */
-		struct task *caller;
-		caller = THIS_TASK;
-		if (value != (VALUE_TYPE)0 &&
-		    value != (VALUE_TYPE)task_gettid_of(caller) &&
-		    value != (VALUE_TYPE)task_getpid_of(caller))
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_USERKERN_SID,
-			      value);
-		task_setsessionleader(caller,
-		                      caller,
-		                      NULL,
-		                      NULL,
-		                      NULL);
-#endif /* CONFIG_USE_NEW_GROUP */
 #endif /* !DEFINE_IO_READ */
 	}	break;
 

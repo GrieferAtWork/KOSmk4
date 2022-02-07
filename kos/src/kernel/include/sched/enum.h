@@ -81,27 +81,6 @@ NOTHROW(FCALL system_enum_threads_cpu_noipi_nb)(system_enum_threads_cb_t cb, voi
                                                 struct cpu *__restrict me);
 #endif /* !CONFIG_NO_SMP */
 
-
-#ifndef CONFIG_USE_NEW_GROUP
-/* Callback prototype for task enumeration functions.
- * @param: thread: The actual thread (or `NULL' if `pid' is non-NULL,
- *                 and the thread has become a zombie)
- * @param: pid:    The PID of the thread (or `NULL' if there is none)
- * @return: >= 0: Add this value to the to-be returned value of the enumerator.
- * @return: <  0: Stop enumeration and immediately re-return this value. */
-typedef NONNULL((3)) ssize_t
-(TASK_ENUM_CC *task_enum_cb_t)(void *arg, struct task *thread,
-                               struct taskpid *__restrict pid);
-
-/* These functions are the same as those above, however these may only be used
- * when `cb' is NOBLOCK+NOEXCEPT, as these may invoke said function while non-
- * reentrant, internal locks are held. */
-FUNDEF NOBLOCK NONNULL((1)) ssize_t NOTHROW(FCALL task_enum_all_nb)(task_enum_cb_t cb, void *arg);
-FUNDEF NOBLOCK NONNULL((1, 3)) ssize_t NOTHROW(FCALL task_enum_cpu_nb)(task_enum_cb_t cb, void *arg, struct cpu *__restrict c);
-FUNDEF NOBLOCK NONNULL((1)) ssize_t NOTHROW(FCALL task_enum_kernel_nb)(task_enum_cb_t cb, void *arg);
-FUNDEF NOBLOCK NONNULL((1, 3)) ssize_t NOTHROW(FCALL task_enum_proc_thrds_nb)(task_enum_cb_t cb, void *arg, struct task *__restrict proc);
-#endif /* !CONFIG_USE_NEW_GROUP */
-
 #endif /* __CC__ */
 
 

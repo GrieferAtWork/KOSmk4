@@ -27,7 +27,6 @@
 
 #include <kernel/malloc.h>
 #include <sched/async.h>
-#include <sched/group-new.h>
 #include <sched/group.h>
 #include <sched/pid.h>
 #include <sched/rpc-internal.h>
@@ -102,14 +101,12 @@ STATIC_ASSERT(sizeof(((struct _pidtree_slot *)0)->pts_link) == sizeof(((struct t
 STATIC_ASSERT(offsetof(struct _pidtree_slot, pts_pid) == offsetof(struct taskpid_slot, tps_pid));
 STATIC_ASSERT(sizeof(((struct _pidtree_slot *)0)->pts_pid) == sizeof(((struct taskpid_slot *)0)->tps_pid));
 
-#ifdef CONFIG_USE_NEW_GROUP
 /* Assert binary compatibility between `struct _pidtree_slot' and `struct procgrp_slot' */
 STATIC_ASSERT((offsetof(struct procgrp, pgr_pids[1]) - offsetof(struct procgrp, pgr_pids[0])) == sizeof(struct procgrp_slot));
 STATIC_ASSERT(offsetof(struct _pidtree_slot, pts_link) == offsetof(struct procgrp_slot, pgs_link));
 STATIC_ASSERT(sizeof(((struct _pidtree_slot *)0)->pts_link) == sizeof(((struct procgrp_slot *)0)->pgs_link));
 STATIC_ASSERT(offsetof(struct _pidtree_slot, pts_pid) == offsetof(struct procgrp_slot, pgs_pid));
 STATIC_ASSERT(sizeof(((struct _pidtree_slot *)0)->pts_pid) == sizeof(((struct procgrp_slot *)0)->pgs_pid));
-#endif /* CONFIG_USE_NEW_GROUP */
 
 
 /************************************************************************/
@@ -206,7 +203,6 @@ again_lock_ns:
 	_taskpid_free(self);
 }
 
-#ifdef CONFIG_USE_NEW_GROUP
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(LOCKOP_CC taskpid_remove_from_group_postlop)(Tobpostlockop(procgrp) *__restrict self,
                                                      struct procgrp *__restrict obj) {
@@ -233,7 +229,6 @@ NOTHROW(LOCKOP_CC taskpid_remove_from_group_lop)(Toblockop(procgrp) *__restrict 
 	me->_tp_grpplop.oplo_func = &taskpid_remove_from_group_postlop;
 	return &me->_tp_grpplop;
 }
-#endif /* CONFIG_USE_NEW_GROUP */
 
 
 /* Destroy the given taskpid. */
@@ -243,7 +238,6 @@ NOTHROW(FCALL taskpid_destroy)(struct taskpid *__restrict self) {
 	        "If this wasn't the case, `FORTASK(tp_thread, this_taskpid)' "
 	        "should have kept us alive!");
 	sig_broadcast_for_fini(&self->tp_changed);
-#ifdef CONFIG_USE_NEW_GROUP
 	assertf(!LIST_ISBOUND(self, tp_parsib),
 	        "The parent-sibling link should have kept us alive");
 	if (self->tp_proc == self) {
@@ -287,7 +281,6 @@ NOTHROW(FCALL taskpid_destroy)(struct taskpid *__restrict self) {
 		COMPILER_READ_BARRIER();
 		decref_unlikely(self->tp_proc);
 	}
-#endif /* CONFIG_USE_NEW_GROUP */
 	taskpid_remove_from_namespaces_and_free(self);
 }
 
@@ -297,7 +290,6 @@ NOTHROW(FCALL taskpid_destroy)(struct taskpid *__restrict self) {
 /* [1..1][const] The PID associated with the calling thread. */
 PUBLIC ATTR_PERTASK REF struct taskpid *this_taskpid = NULL;
 
-#ifdef CONFIG_USE_NEW_GROUP
 DEFINE_PERTASK_FINI(this_taskpid_fini);
 PRIVATE ATTR_USED NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL this_taskpid_fini)(struct task *__restrict self) {
@@ -306,7 +298,6 @@ NOTHROW(KCALL this_taskpid_fini)(struct task *__restrict self) {
 	awref_clear(&tpid->tp_thread);
 	decref(tpid);
 }
-#endif /* CONFIG_USE_NEW_GROUP */
 
 
 /* Same as `taskpid_gettask()', but throw an exception if the thread has exited. */
@@ -355,7 +346,6 @@ for (local x: nodes) {
 	print("		.tp_SIGCLD  = SIGCLD,");
 	print("		._tp_pad    = {}");
 	print("	}},");
-	print("#ifdef CONFIG_USE_NEW_GROUP");
 	local prev, next = {
 		"asyncwork"    : ("&boottask_procctl.pc_thrds_list.lh_first", "&bootidle_pid"),
 		"thiscpu_idle" : ("&asyncwork_pid.tp_parsib.le_next", "NULL"),
@@ -363,9 +353,6 @@ for (local x: nodes) {
 	print("	.tp_proc   = &boottask_pid,");
 	print("	.tp_pctl   = &boottask_procctl,");
 	print("	.tp_parsib = { .le_next = ", next, ", .le_prev = ", prev, " },");
-	print("#else /" "* CONFIG_USE_NEW_GROUP *" "/");
-	print("	.tp_parsib = LIST_ENTRY_UNBOUND_INITIALIZER,");
-	print("#endif /" "* !CONFIG_USE_NEW_GROUP *" "/");
 	print("	.tp_ns     = &pidns_root,");
 	print("	.tp_pids   = {");
 	print("		[0] = {");
@@ -389,13 +376,9 @@ INTERN struct taskpid boottask_pid = {
 		.tp_SIGCLD  = SIGCLD,
 		._tp_pad    = {}
 	}},
-#ifdef CONFIG_USE_NEW_GROUP
 	.tp_proc   = &boottask_pid,
 	.tp_pctl   = &boottask_procctl,
 	.tp_parsib = { .le_next = NULL, .le_prev = NULL },
-#else /* CONFIG_USE_NEW_GROUP */
-	.tp_parsib = LIST_ENTRY_UNBOUND_INITIALIZER,
-#endif /* !CONFIG_USE_NEW_GROUP */
 	.tp_ns     = &pidns_root,
 	.tp_pids   = {
 		[0] = {
@@ -413,13 +396,9 @@ INTERN ATTR_PERCPU struct taskpid thiscpu_idle_pid = {
 		.tp_SIGCLD  = SIGCLD,
 		._tp_pad    = {}
 	}},
-#ifdef CONFIG_USE_NEW_GROUP
 	.tp_proc   = &boottask_pid,
 	.tp_pctl   = &boottask_procctl,
 	.tp_parsib = { .le_next = NULL, .le_prev = &asyncwork_pid.tp_parsib.le_next },
-#else /* CONFIG_USE_NEW_GROUP */
-	.tp_parsib = LIST_ENTRY_UNBOUND_INITIALIZER,
-#endif /* !CONFIG_USE_NEW_GROUP */
 	.tp_ns     = &pidns_root,
 	.tp_pids   = {
 		[0] = {
@@ -437,13 +416,9 @@ INTERN struct taskpid asyncwork_pid = {
 		.tp_SIGCLD  = SIGCLD,
 		._tp_pad    = {}
 	}},
-#ifdef CONFIG_USE_NEW_GROUP
 	.tp_proc   = &boottask_pid,
 	.tp_pctl   = &boottask_procctl,
 	.tp_parsib = { .le_next = &bootidle_pid, .le_prev = &boottask_procctl.pc_thrds_list.lh_first },
-#else /* CONFIG_USE_NEW_GROUP */
-	.tp_parsib = LIST_ENTRY_UNBOUND_INITIALIZER,
-#endif /* !CONFIG_USE_NEW_GROUP */
 	.tp_ns     = &pidns_root,
 	.tp_pids   = {
 		[0] = {
@@ -461,20 +436,14 @@ PUBLIC pid_t pid_recycle_threshold = PID_RECYCLE_THRESHOLD_DEFAULT;
 
 /* The root PID namespace. */
 PUBLIC struct pidns pidns_root = {
-#ifdef CONFIG_USE_NEW_GROUP
 	.pn_refcnt  = 5,    /* +1: pidns_root, +1: boottask_pid, +1: bootidle_pid, +1: asyncwork_pid, +1: boottask_procgrp.pgr_ns */
-#else /* CONFIG_USE_NEW_GROUP */
-	.pn_refcnt  = 4,    /* +1: pidns_root, +1: boottask_pid, +1: bootidle_pid, +1: asyncwork_pid */
-#endif /* !CONFIG_USE_NEW_GROUP */
 	.pn_ind     = 0,    /* Root namespace indirection */
 	.pn_par     = NULL, /* Root namespace doesn't have a parent */
 	.pn_size    = 3,    /* +1: boottask, +1: bootidle, +1: asyncwork */
 	.pn_lock    = ATOMIC_RWLOCK_INIT,
 	.pn_lops    = SLIST_HEAD_INITIALIZER(pidns_root.pn_lops),
 	.pn_tree    = STATIC_TASKPID_TREE_ROOT,
-#ifdef CONFIG_USE_NEW_GROUP
 	.pn_tree_pg = &boottask_procgrp, /* First and initial process group */
-#endif /* CONFIG_USE_NEW_GROUP */
 	.pn_npid    = 4, /* 1-3 are already in use */
 };
 
@@ -488,9 +457,7 @@ NOTHROW(FCALL pidns_destroy)(struct pidns *__restrict self) {
 	pidns_reap(self);
 	assert(SLIST_EMPTY(&self->pn_lops));
 	assertf(self->pn_tree == NULL, "Any taskpid should have kept us alive");
-#ifdef CONFIG_USE_NEW_GROUP
 	assertf(self->pn_tree_pg == NULL, "Any procgrp should have kept us alive");
-#endif /* CONFIG_USE_NEW_GROUP */
 	decref_unlikely(self->pn_par);
 	kfree(self);
 }
@@ -621,7 +588,6 @@ again_locate:
 	return result;
 }
 
-#ifdef CONFIG_USE_NEW_GROUP
 /* Same as `pidns_lookupnext_locked()', but only enumerate actual processes (skip threads) */
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) REF struct taskpid *
 NOTHROW(FCALL pidns_lookupnextproc_locked)(struct pidns const *__restrict self, pid_t min_pid) {
@@ -638,7 +604,6 @@ again_locate:
 	}
 	return result;
 }
-#endif /* CONFIG_USE_NEW_GROUP */
 
 
 
@@ -716,17 +681,12 @@ NOTHROW(FCALL pidns_findpid)(struct pidns const *__restrict self,
                              pid_t minpid, pid_t maxpid) {
 	if (minpid <= maxpid) {
 		for (;;) {
-#ifdef CONFIG_USE_NEW_GROUP
 			/* PIDs cannot be re-used if there is EITHER a process
 			 * with that  ID, or  a process  group with  that  ID!
 			 * -> s.a. posix -- "4.13 Process ID Reuse" */
 			if (_taskpid_tree_locate(self->pn_tree, minpid, self->pn_ind) == NULL &&
 			    _procgrp_tree_locate(self->pn_tree_pg, minpid, self->pn_ind) == NULL)
 				return minpid;
-#else /* CONFIG_USE_NEW_GROUP */
-			if (_taskpid_tree_locate(self->pn_tree, minpid, self->pn_ind) == NULL)
-				return minpid;
-#endif /* !CONFIG_USE_NEW_GROUP */
 			if (minpid >= maxpid)
 				break;
 			++minpid;
@@ -811,7 +771,6 @@ NOTHROW(FCALL pidns_allocpids)(struct taskpid *__restrict self)
 
 
 
-#ifdef CONFIG_USE_NEW_GROUP
 /* Return the process group associated with `pgid' within `self' */
 PUBLIC WUNUSED NONNULL((1)) REF struct procgrp *FCALL
 pidns_grplookup(struct pidns *__restrict self, pid_t pgid)
@@ -862,7 +821,6 @@ PUBLIC NOBLOCK NONNULL((1)) struct procgrp *
 NOTHROW(FCALL pidns_grpremove)(struct pidns *__restrict self, pid_t pgid) {
 	return _procgrp_tree_remove(&self->pn_tree_pg, pgid, self->pn_ind);
 }
-#endif /* CONFIG_USE_NEW_GROUP */
 
 
 DECL_END

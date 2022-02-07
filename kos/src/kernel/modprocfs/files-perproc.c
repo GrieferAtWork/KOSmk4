@@ -1274,7 +1274,6 @@ no_exec:
 		}
 		print(&state, 1);
 	}
-#ifdef CONFIG_USE_NEW_GROUP
 	if (printf(" %" PRIuN(__SIZEOF_PID_T__) " ",
 	           taskpid_getppid_s(tpid)) < 0)
 		return;
@@ -1312,78 +1311,6 @@ no_exec:
 		           tty_devno_encoded, fgpid) < 0)
 			return;
 	}
-#else /* CONFIG_USE_NEW_GROUP */
-	if (thread) {
-		REF struct task *parent;
-		parent = task_getprocessparent_of(thread);
-		if unlikely(!parent)
-			goto noparent;
-		FINALLY_DECREF_UNLIKELY(parent);
-		if (printf(" %" PRIuN(__SIZEOF_PID_T__) " ",
-		           task_gettid_of_s(parent)) < 0)
-			return;
-	} else {
-noparent:
-		if (PRINT(" 0 ") < 0)
-			return;
-	}
-	if (thread) {
-		REF struct task *group;
-		group = task_getprocessgroupleader_of(thread);
-		if unlikely(!group)
-			goto nogroup;
-		FINALLY_DECREF_UNLIKELY(group);
-		if (printf("%" PRIuN(__SIZEOF_PID_T__) " ",
-		           task_gettid_of_s(group)) < 0)
-			return;
-	} else {
-nogroup:
-		if (PRINT("0 ") < 0)
-			return;
-	}
-	if (thread) {
-		REF struct task *session;
-		REF struct ttydev *ctty;
-		REF struct taskpid *fproc;
-		dev_t tty_devno;
-		u32 tty_devno_encoded;
-		session = task_getsessionleader_of(thread);
-		if unlikely(!session)
-			goto nosession;
-		FINALLY_DECREF_UNLIKELY(session);
-		if (printf("%" PRIuN(__SIZEOF_PID_T__) " ",
-		           task_gettid_of_s(session)) < 0)
-			return;
-		ctty = axref_get(&FORTASK(thread, this_taskgroup).tg_ctty);
-		if (!ctty)
-			goto noctty;
-		FINALLY_DECREF_UNLIKELY(ctty);
-		tty_devno = device_getdevno(ctty);
-		tty_devno_encoded = ((MAJOR(tty_devno) & 0xff) << 8) |
-		                    ((MINOR(tty_devno) & 0xff) |
-		                     (MINOR(tty_devno) & 0xffff00) << 8);
-		if (printf("%" PRIu32 " ",
-		           tty_devno_encoded) < 0)
-			return;
-		fproc = axref_get(&ctty->t_fproc);
-		if (!fproc)
-			goto nofproc;
-		FINALLY_DECREF_UNLIKELY(fproc);
-		if (printf("%" PRIuN(__SIZEOF_PID_T__) " ",
-		           taskpid_gettid_s(fproc)) < 0)
-			return;
-	} else {
-nosession:
-		if ((*printer)(arg, "0 ", 2) < 0)
-			return;
-noctty:
-		if ((*printer)(arg, "0 ", 2) < 0)
-			return;
-nofproc:
-		if ((*printer)(arg, "-1 ", 3) < 0)
-			return;
-	}
-#endif /* !CONFIG_USE_NEW_GROUP */
 	if ((*printer)(arg, "0 ", 2) < 0)
 		return; /* Flags? */
 	if ((*printer)(arg, "1 ", 2) < 0)
@@ -3076,20 +3003,10 @@ procfs_perproc_task_v_lookup(struct fdirnode *__restrict self,
 			REF struct procfs_perproc_root_dirent *result;
 			if (pid != master_pid) {
 				/* Check that this is actually a child thread of `master_pid' */
-#ifdef CONFIG_USE_NEW_GROUP
 				if (taskpid_getprocpid(pid) != master_pid) {
 					decref_unlikely(pid);
 					return NULL;
 				}
-#else /* CONFIG_USE_NEW_GROUP */
-				REF struct task *thread;
-				bool ischild;
-				thread  = taskpid_gettask(pid);
-				ischild = task_getprocess_of(thread) == taskpid_gettaskptr(master_pid);
-				decref_unlikely(thread);
-				if (!ischild)
-					return NULL;
-#endif /* !CONFIG_USE_NEW_GROUP */
 			}
 
 			/* Allocate the directory entry. */
@@ -3133,7 +3050,6 @@ NOTHROW(KCALL procfs_task_direnum_v_fini)(struct fdirenum *__restrict UNUSED(sel
 	COMPILER_IMPURE();
 }
 
-#ifdef CONFIG_USE_NEW_GROUP
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) REF struct taskpid *
 NOTHROW(KCALL find_first_thread_greater_or_equal)(struct taskpid *__restrict master,
                                                   upid_t pid, size_t myind) {
@@ -3183,70 +3099,12 @@ NOTHROW(KCALL get_greatest_child_pid_plus_one)(struct taskpid *__restrict master
 	procctl_thrds_release(ctl);
 	return result;
 }
-#else /* CONFIG_USE_NEW_GROUP */
-PRIVATE WUNUSED NONNULL((1)) REF struct taskpid *KCALL
-find_first_thread_greater_or_equal(struct task *__restrict master,
-                                   upid_t pid, size_t myind) {
-	struct taskpid *iter;
-	REF struct taskpid *result;
-	upid_t result_pid;
-	struct taskgroup *group;
-	assert(task_isprocessleader_p(master));
-	result     = NULL;
-	result_pid = (upid_t)-1;
-	group      = &FORTASK(master, this_taskgroup);
-	atomic_rwlock_read(&group->tg_proc_threads_lock);
-	LIST_FOREACH (iter, &group->tg_proc_threads, tp_parsib) {
-		upid_t iter_pid;
-		if unlikely(iter->tp_ns->pn_ind < myind)
-			continue; /* Cannot be represented */
-		iter_pid = _taskpid_slot_getpidno(iter->tp_pids[myind]);
-		if (!(pid >= iter_pid))
-			continue;
-		if (result_pid < iter_pid)
-			continue; /* Current `result' is better. */
-		if (!tryincref(iter))
-			continue; /* Dead... */
-		xdecref_unlikely(result);
-		result     = iter;
-		result_pid = iter_pid;
-	}
-	atomic_rwlock_endread(&group->tg_proc_threads_lock);
-	return result;
-}
-
-PRIVATE WUNUSED NONNULL((1)) upid_t KCALL
-get_greatest_child_pid_plus_one(struct task *__restrict master) {
-	struct taskpid *iter;
-	upid_t result;
-	size_t myind;
-	struct taskgroup *group;
-	assert(task_isprocessleader_p(master));
-	myind  = THIS_PIDNS->pn_ind;
-	result = 0;
-	group  = &FORTASK(master, this_taskgroup);
-	atomic_rwlock_read(&group->tg_proc_threads_lock);
-	LIST_FOREACH (iter, &group->tg_proc_threads, tp_parsib) {
-		upid_t iter_pid;
-		if unlikely(iter->tp_ns->pn_ind < myind)
-			continue; /* Cannot be represented */
-		iter_pid = _taskpid_slot_getpidno(iter->tp_pids[myind]) + 1;
-		if (result < iter_pid)
-			result = iter_pid;
-	}
-	atomic_rwlock_endread(&group->tg_proc_threads_lock);
-	return result;
-}
-#endif /* !CONFIG_USE_NEW_GROUP */
 
 
 PRIVATE BLOCKING NONNULL((1)) size_t KCALL
 procfs_task_direnum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
                               size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
-#ifndef CONFIG_USE_NEW_GROUP
-	REF struct task *master;
-#endif /* !CONFIG_USE_NEW_GROUP */
 	REF struct taskpid *pid;
 	upid_t pid_id;
 	u16 namelen;
@@ -3254,13 +3112,7 @@ procfs_task_direnum_v_readdir(struct fdirenum *__restrict self, USER CHECKED str
 	upid_t index, newindex;
 	ssize_t result;
 	struct procfs_task_direnum *me;
-	me     = (struct procfs_task_direnum *)self;
-#ifndef CONFIG_USE_NEW_GROUP
-	master = taskpid_gettask(me->ptd_pid);
-	if unlikely(!master)
-		return 0; /* End-of-directory */
-	FINALLY_DECREF_UNLIKELY(master);
-#endif /* !CONFIG_USE_NEW_GROUP */
+	me = (struct procfs_task_direnum *)self;
 
 again:
 	/* Read current index. */
@@ -3277,11 +3129,7 @@ again:
 			goto gotpid;
 		}
 	}
-#ifdef CONFIG_USE_NEW_GROUP
 	pid = find_first_thread_greater_or_equal(me->ptd_pid, index, myind);
-#else /* CONFIG_USE_NEW_GROUP */
-	pid = find_first_thread_greater_or_equal(master, index, myind);
-#endif /* !CONFIG_USE_NEW_GROUP */
 	if (!pid)
 		return 0; /* End-of-directory */
 	pid_id   = _taskpid_slot_getpidno(pid->tp_pids[myind]);
@@ -3337,16 +3185,7 @@ procfs_task_direnum_v_seekdir(struct fdirenum *__restrict self,
 	case SEEK_END: {
 		upid_t dirsiz = 0;
 		/* The end of the directory is relative to the largest in-use PID */
-#ifdef CONFIG_USE_NEW_GROUP
 		dirsiz = get_greatest_child_pid_plus_one(me->ptd_pid);
-#else /* CONFIG_USE_NEW_GROUP */
-		REF struct task *master;
-		master = taskpid_gettask(me->ptd_pid);
-		if (master) {
-			FINALLY_DECREF_UNLIKELY(master);
-			dirsiz = get_greatest_child_pid_plus_one(master);
-		}
-#endif /* !CONFIG_USE_NEW_GROUP */
 		newpos = dirsiz + (pid_t)offset;
 		if unlikely(offset < 0 ? newpos > dirsiz
 		                       : newpos < dirsiz)

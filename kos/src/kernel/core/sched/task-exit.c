@@ -55,13 +55,11 @@ NOTHROW(PRPC_EXEC_CALLBACK_CC task_decref_for_exit_rpc)(struct rpc_context *__re
 	decref((struct task *)cookie);
 }
 
-#ifdef CONFIG_USE_NEW_GROUP
 PRIVATE NONNULL((1, 2)) void
 NOTHROW(PRPC_EXEC_CALLBACK_CC taskpid_destroy_rpc)(struct rpc_context *__restrict UNUSED(ctx),
                                                    void *cookie) {
 	taskpid_destroy((struct taskpid *)cookie);
 }
-#endif /* CONFIG_USE_NEW_GROUP */
 
 PRIVATE ATTR_KERNEL_PANIC_NORETURN ATTR_COLD ATTR_NOINLINE NONNULL((1)) void
 NOTHROW(FCALL panic_critical_thread_exited)(struct task *__restrict caller) {
@@ -129,13 +127,7 @@ NOTHROW(FCALL terminate_pending_rpcs)(struct task *__restrict caller) {
 }
 
 
-#ifndef CONFIG_USE_NEW_GROUP
-INTDEF NOBLOCK NONNULL((1)) void /* From "sched/group.c" */
-NOTHROW(KCALL maybe_propagate_exit_to_procss_children)(struct task *__restrict caller);
-#endif /* !CONFIG_USE_NEW_GROUP */
 
-
-#ifdef CONFIG_USE_NEW_GROUP
 struct _task_exitrpc {
 	SLIST_ENTRY(pending_rpc) pr_link;  /* ... */
 	uintptr_t                pr_flags; /* ... */
@@ -147,7 +139,7 @@ struct _task_exitrpc {
 #endif
 };
 
-/* Ensure binary compatiblity. */
+/* Ensure binary compatibility. */
 STATIC_ASSERT(offsetof(struct pending_rpc, pr_link) == offsetof(struct _task_exitrpc, pr_link));
 STATIC_ASSERT(offsetafter(struct pending_rpc, pr_link) == offsetafter(struct _task_exitrpc, pr_link));
 STATIC_ASSERT(offsetof(struct pending_rpc, pr_flags) == offsetof(struct _task_exitrpc, pr_flags));
@@ -272,7 +264,6 @@ NOTHROW(FCALL process_exit)(int w_status) {
 	}
 	task_exit(w_status);
 }
-#endif /* CONFIG_USE_NEW_GROUP */
 
 
 /* Terminate the calling thread immediately.
@@ -294,12 +285,8 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	struct task *caller = THIS_TASK, *next;
 	struct cpu *me;
 	uintptr_t flags;
-#ifdef CONFIG_USE_NEW_GROUP
 	struct taskpid *pid = task_gettaskpid_of(caller);
 	REF struct taskpid *parpid;
-#else /* CONFIG_USE_NEW_GROUP */
-	struct taskpid *pid = THIS_TASKPID;
-#endif /* !CONFIG_USE_NEW_GROUP */
 
 	assert(!WIFSTOPPED(w_status));
 	assert(!WIFCONTINUED(w_status));
@@ -323,7 +310,6 @@ NOTHROW(FCALL task_exit)(int w_status) {
 
 	printk(KERN_TRACE "[sched] Exiting thread %p\n", caller);
 
-#ifdef CONFIG_USE_NEW_GROUP
 	/* Determine the PID of the thread of which we are a child. */
 	if (taskpid_isaprocess(pid)) {
 		parpid = taskpid_getparentprocesspid(pid);
@@ -331,7 +317,6 @@ NOTHROW(FCALL task_exit)(int w_status) {
 		/* In this case, `parpid' is the PID of the associated process */
 		parpid = incref(taskpid_getprocpid(pid));
 	}
-#endif /* CONFIG_USE_NEW_GROUP */
 
 	/* Trigger the appropriate debug trap associated with thread/process  exits.
 	 * This is required because otherwise GDB  will sooner or later hang  itself
@@ -341,15 +326,9 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	 * s.a. /kos/misc/gdbridge/gdbride.dee */
 	if (kernel_debugtrap_enabled()) {
 		struct debugtrap_reason reason;
-#ifdef CONFIG_USE_NEW_GROUP
 		reason.dtr_reason = taskpid_isaprocess(pid)
 		                    ? DEBUGTRAP_REASON_PEXITED
 		                    : DEBUGTRAP_REASON_TEXITED;
-#else /* CONFIG_USE_NEW_GROUP */
-		reason.dtr_reason = task_isprocessleader_p(caller)
-		                    ? DEBUGTRAP_REASON_PEXITED
-		                    : DEBUGTRAP_REASON_TEXITED;
-#endif /* !CONFIG_USE_NEW_GROUP */
 		reason.dtr_signo  = w_status;
 		reason.dtr_ptrarg = caller;
 		kernel_debugtrap(&reason);
@@ -361,7 +340,6 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	/* Reap all remaining RPCs and invoke them in a SHUTDOWN context. */
 	terminate_pending_rpcs(caller);
 
-#ifdef CONFIG_USE_NEW_GROUP
 	if (taskpid_isaprocess(pid)) {
 		/* Propagate exit status to child threads, and
 		 * reparent all child process onto  /bin/init. */
@@ -503,10 +481,6 @@ again_get_ctty:
 		PREEMPTION_ENABLE();
 	}
 
-#else /* CONFIG_USE_NEW_GROUP */
-	maybe_propagate_exit_to_procss_children(caller);
-#endif /* !CONFIG_USE_NEW_GROUP */
-
 	PREEMPTION_DISABLE();
 	me = caller->t_cpu;
 	assertf(FORCPU(me, thiscpu_sched_current) == caller, "Inconsistent scheduler state");
@@ -593,7 +567,6 @@ again_get_ctty:
 	 * re-schedule  others threads that may be waiting for us to exit. */
 	sig_broadcast_as_nopr(&pid->tp_changed, next);
 
-#ifdef CONFIG_USE_NEW_GROUP
 	/* Also notify our parent process that one of its children has changed state. */
 	sig_broadcast_as_nopr(&parpid->tp_pctl->pc_chld_changed, next);
 	if unlikely(ATOMIC_DECFETCH(parpid->tp_refcnt) == 0) {
@@ -602,7 +575,6 @@ again_get_ctty:
 		state = task_asyncrpc_push(state, &taskpid_destroy_rpc, parpid);
 		FORTASK(next, this_sstate) = state;
 	}
-#endif /* CONFIG_USE_NEW_GROUP */
 
 	/* Good bye... */
 	cpu_run_current_nopr();

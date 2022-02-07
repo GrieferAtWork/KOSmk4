@@ -1713,20 +1713,11 @@ do_set_step_newThread:
 							}
 							if (newThread.ts_mode == GDBTHREADSEL_MODE_PROCESS) {
 								GDBThreadStopEvent *iter;
-#ifdef CONFIG_USE_NEW_GROUP
 								struct taskpid *procpid = task_getprocpid_of(newThread.ts_thread);
-#else /* CONFIG_USE_NEW_GROUP */
-								struct task *proc = task_getprocess_of(newThread.ts_thread);
-#endif /* !CONFIG_USE_NEW_GROUP */
 								for (iter = GDBThread_Stopped; iter;
 								     iter = iter->tse_next) {
-#ifdef CONFIG_USE_NEW_GROUP
 									if (task_getprocpid_of(iter->tse_thread) != procpid)
 										continue; /* Different process */
-#else /* CONFIG_USE_NEW_GROUP */
-									if (task_getprocess_of(iter->tse_thread) != proc)
-										continue; /* Different process */
-#endif /* !CONFIG_USE_NEW_GROUP */
 									GDB_SetSingleStep(iter->tse_thread, action == 's');
 								}
 							} else {

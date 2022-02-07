@@ -98,34 +98,6 @@ again:
 
 
 
-#ifndef CONFIG_USE_NEW_GROUP
-PRIVATE ABNORMAL_RETURN ATTR_NORETURN void
-NOTHROW(FCALL process_exit)(int reason) {
-	if (!task_isprocessleader()) {
-		/* We need to terminate the _process_; not just this thread!
-		 * This can be done by re-using our exit RPC, and sending it
-		 * to the process leader. */
-		struct pending_rpc *rpc;
-		rpc = ATOMIC_XCH(PERTASK(this_taskgroup.tg_thread_exit), NULL);
-		/* When `rpc' was already `NULL', then our leader must already be
-		 * in the process of exiting, and already took our exit RPC away,
-		 * trying to terminate us.
-		 * Handle this case by letting it do its thing, even though this
-		 * will cause us to use a different exit reason than the leader. */
-		if likely(rpc) {
-			rpc->pr_kern.k_cookie = (void *)(uintptr_t)(unsigned int)reason;
-			if (task_rpc_schedule(task_getprocess(), rpc))
-				goto done;
-			/* Failed to deliver the RPC because the process
-			 * leader has/is already terminated/terminating,
-			 * and is no longer able to service any RPCs. */
-			_pending_rpc_maybe_free(rpc);
-		}
-	}
-done:
-	task_exit(reason);
-}
-#endif /* !CONFIG_USE_NEW_GROUP */
 
 PRIVATE ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL process_exit_for_exception_after_coredump)(struct exception_data const *__restrict error) {
@@ -1006,7 +978,6 @@ NOTHROW(FCALL userexcept_sysret_inject_and_marksignal_safe)(struct task *__restr
 }
 
 
-#ifdef CONFIG_USE_NEW_GROUP
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL userexcept_sysret_injectpid_safe)(struct taskpid *__restrict pid,
                                                 syscall_ulong_t rpc_flags) {
@@ -1055,41 +1026,6 @@ NOTHROW(FCALL userexcept_sysret_injectproc_and_marksignal_safe)(struct taskpid *
 	}
 	procctl_thrds_release(ctl);
 }
-
-#else /* CONFIG_USE_NEW_GROUP */
-PRIVATE NOBLOCK NONNULL((1)) ssize_t
-NOTHROW(TASK_ENUM_CC _enum_inject_sysret)(void *arg, struct task *thread,
-                                          struct taskpid *__restrict UNUSED(pid)) {
-	if (thread != NULL)
-		userexcept_sysret_inject_safe(thread, (syscall_ulong_t)(uintptr_t)arg);
-	return 0;
-}
-
-PRIVATE NOBLOCK NONNULL((1)) ssize_t
-NOTHROW(TASK_ENUM_CC _enum_inject_sysret_and_marksignal)(void *arg, struct task *thread,
-                                                         struct taskpid *__restrict UNUSED(pid)) {
-	if (thread != NULL)
-		userexcept_sysret_inject_and_marksignal_safe(thread, (syscall_ulong_t)(uintptr_t)arg);
-	return 0;
-}
-
-
-/* Invoke  `userexcept_sysret_inject_safe()'  for every  thread  apart of
- * `proc', as well as set the `TASK_FRPC' flag for each of those threads. */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL userexcept_sysret_injectproc_safe)(struct task *__restrict proc,
-                                                 syscall_ulong_t rpc_flags) {
-	task_enum_proc_thrds_nb(&_enum_inject_sysret, (void *)(uintptr_t)rpc_flags, proc);
-}
-
-/* Invoke `userexcept_sysret_inject_and_marksignal_safe()' for every thread apart of `proc' */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL userexcept_sysret_injectproc_and_marksignal_safe)(struct task *__restrict proc,
-                                                                syscall_ulong_t rpc_flags) {
-	task_enum_proc_thrds_nb(&_enum_inject_sysret_and_marksignal, (void *)(uintptr_t)rpc_flags, proc);
-}
-#endif /* !CONFIG_USE_NEW_GROUP */
-
 
 
 

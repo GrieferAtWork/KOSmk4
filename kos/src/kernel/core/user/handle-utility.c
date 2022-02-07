@@ -297,16 +297,12 @@ handle_get_task(unsigned int fd)
 		return incref(THIS_TASK);
 
 	case (unsigned int)AT_THIS_PROCESS: {
-#ifdef CONFIG_USE_NEW_GROUP
 		REF struct task *result;
 		while ((result = task_getproc()) == NULL) {
 			task_yield();
 			task_serve();
 		}
 		return result;
-#else /* CONFIG_USE_NEW_GROUP */
-		return incref(task_getprocess());
-#endif /* !CONFIG_USE_NEW_GROUP */
 	}	break;
 
 	case (unsigned int)AT_PARENT_PROCESS: {
