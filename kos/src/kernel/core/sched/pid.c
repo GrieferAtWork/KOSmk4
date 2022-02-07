@@ -799,7 +799,7 @@ pidns_grplookup(struct pidns *__restrict self, pid_t pgid)
 		THROWS(E_WOULDBLOCK) {
 	REF struct procgrp *result;
 	pidns_read(self);
-	result = _procgrp_tree_locate(self->pn_tree, pgid, self->pn_ind);
+	result = _procgrp_tree_locate(self->pn_tree_pg, pgid, self->pn_ind);
 	if (result && !tryincref(result))
 		result = NULL;
 	pidns_endread(self);
@@ -811,7 +811,7 @@ pidns_grplookup_srch(struct pidns *__restrict self, pid_t pgid)
 		THROWS(E_WOULDBLOCK, E_PROCESS_GROUP_EXITED, E_INVALID_ARGUMENT_BAD_VALUE) {
 	REF struct procgrp *result;
 	pidns_read(self);
-	result = _procgrp_tree_locate(self->pn_tree, pgid, self->pn_ind);
+	result = _procgrp_tree_locate(self->pn_tree_pg, pgid, self->pn_ind);
 	if (!result || !tryincref(result)) {
 		pidns_endread(self);
 		if (pgid < 0) {
@@ -829,7 +829,7 @@ pidns_grplookup_srch(struct pidns *__restrict self, pid_t pgid)
 
 PUBLIC WUNUSED NONNULL((1)) struct procgrp *
 NOTHROW(FCALL pidns_grplookup_locked)(struct pidns *__restrict self, pid_t pgid) {
-	return _procgrp_tree_locate(self->pn_tree, pgid, self->pn_ind);
+	return _procgrp_tree_locate(self->pn_tree_pg, pgid, self->pn_ind);
 }
 
 /* Insert/Remove a process group to/from the given namespace. */
