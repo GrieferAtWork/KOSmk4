@@ -496,7 +496,7 @@ again_get_ctty:
 		PREEMPTION_DISABLE();
 		procctl_thrds_acquire_nopr(parctl);
 		if likely(LIST_ISBOUND(pid, tp_parsib)) {
-			procctl_chlds_unbind(parctl, pid); /* Inherit reference */
+			procctl_thrds_unbind(parctl, pid); /* Inherit reference */
 			decref_nokill(pid);                /* nokill because of reference in `THIS_TASKPID' */
 		}
 		procctl_thrds_release_nopr(parctl);
