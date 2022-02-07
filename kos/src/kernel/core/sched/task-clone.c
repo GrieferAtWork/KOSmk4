@@ -1105,11 +1105,11 @@ sig_endread_and_force_task_serve_and_acquire_locks:
 
 			/* Release locks... */
 			if (result_ctl != NULL) {
-				procgrp_memb_endwrite(result_grp);
-				decref_unlikely(result_grp);
+				_procgrp_memb_endwrite(result_grp);
+				_procctl_chlds_endwrite(owner_ctl);
+				procgrp_memb_reap(result_grp);
+				procctl_chlds_reap(owner_ctl);
 			}
-			_procctl_chlds_endwrite(owner_ctl);
-			procctl_chlds_reap(owner_ctl);
 			pidns_endwriteall(result_pidns);
 
 			/* Indicate to the process controller that its list of children has changed. */
