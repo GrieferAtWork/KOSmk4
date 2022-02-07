@@ -218,6 +218,7 @@ task_raisesignalprocessgroup(struct procgrp *__restrict group,
 			                RPC_CONTEXT_SIGNAL |
 			                RPC_SIGNO(rpc->pr_psig.si_signo);
 			SLIST_INSERT(&rpcs, rpc, pr_link);
+			++rpcs_count;
 		} while (rpcs_count < proc_count);
 	}
 
