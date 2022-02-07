@@ -62,6 +62,25 @@
 
 DECL_BEGIN
 
+#ifdef CONFIG_USE_NEW_GROUP
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL ttydev_log_setsession)(struct ttydev *__restrict self,
+                                     struct procgrp *__restrict session) {
+	device_getname_lock_acquire(self);
+	printk(KERN_NOTICE "[ctty][+] Assign tty %q as controller for session %u\n",
+	       device_getname(self), procgrp_getrootpgid(session));
+	device_getname_lock_release(self);
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL ttydev_log_delsession)(struct ttydev *__restrict self,
+                                     struct procgrp *__restrict session) {
+	device_getname_lock_acquire(self);
+	printk(KERN_NOTICE "[ctty][-] Remove tty %q as controller for session %u\n",
+	       device_getname(self), procgrp_getrootpgid(session));
+	device_getname_lock_release(self);
+}
+#else /* CONFIG_USE_NEW_GROUP */
 PRIVATE NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(KCALL ttydev_log_setsession)(struct ttydev *__restrict self,
                                      struct task *__restrict UNUSED(session),
@@ -81,6 +100,7 @@ NOTHROW(KCALL ttydev_log_delsession)(struct ttydev *__restrict self,
 	       device_getname(self), taskpid_getroottid(session_pid));
 	device_getname_lock_release(self);
 }
+#endif /* !CONFIG_USE_NEW_GROUP */
 
 
 #ifdef CONFIG_USE_NEW_GROUP
@@ -195,7 +215,7 @@ do_throw_E_IOERROR_REASON_TTY_ORPHAN_SIGTTIN:
 		procgrp_memb_endread(mygrp);
 	}
 
-do_throw_E_IOERROR_REASON_TTY_ORPHAN_SIGTTOU:
+/*do_throw_E_IOERROR_REASON_TTY_ORPHAN_SIGTTOU:*/
 	if (signo == SIGTTIN)
 		goto do_throw_E_IOERROR_REASON_TTY_ORPHAN_SIGTTIN;
 	THROW(E_IOERROR_NODATA,
@@ -805,7 +825,12 @@ do_TCSETA: {
 				      E_INVALID_ARGUMENT_CONTEXT_TIOCSPGRP_NOT_CALLER_SESSION);
 			}
 		}
-		grp = pidns_grplookup_srch(mypid->tp_ns, pid);
+		if (pid == 0) {
+			/* KOS extension: we accept `0' as alias for "current process group" */
+			grp = taskpid_getprocgrp(mypid);
+		} else {
+			grp = pidns_grplookup_srch(mypid->tp_ns, pid);
+		}
 		FINALLY_DECREF_UNLIKELY(grp);
 		if (grp->pgr_sleader != awref_ptr(&me->t_cproc)) {
 			THROW(E_INVALID_ARGUMENT_BAD_STATE,
@@ -1066,11 +1091,13 @@ again_TIOCSCTTY:
 				axref_cmpxch(&oldcproc->pgr_session->ps_ctty, NULL, me);
 				goto again_TIOCSCTTY;
 			}
+			ttydev_log_delsession(me, oldcproc);
 		} else {
 			if (!awref_cmpxch(&me->t_cproc, NULL, mygrp))
 				goto again_TIOCSCTTY;
 		}
 		awref_set(&me->t_fproc, mygrp);
+		ttydev_log_setsession(me, mygrp);
 	}	break;
 
 	case TIOCNOTTY: {
@@ -1096,6 +1123,7 @@ again_TIOCNOTTY:
 			if (awref_cmpxch(&me->t_fproc, fproc, NULL))
 				break;
 		}
+		ttydev_log_delsession(me, mygrp);
 	}	break;
 #else /* CONFIG_USE_NEW_GROUP */
 	case TIOCSCTTY: {

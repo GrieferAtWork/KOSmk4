@@ -842,9 +842,9 @@ again_write_ctl:
 				}
 
 				/* Update list membership. */
-				procctl_chlds_remove(ctl, detach);
+				procctl_chlds_remove(ctl, detach); /* Inherit reference */
 				assert(!(boottask.t_flags & TASK_FTERMINATING));
-				procctl_chlds_insert(&boottask_procctl, detach);
+				procctl_chlds_insert(&boottask_procctl, detach); /* Inherit reference */
 
 				/* Release locks. */
 				_procctl_chlds_endwrite(&boottask_procctl);

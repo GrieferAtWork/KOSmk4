@@ -787,23 +787,38 @@ NOTHROW(FCALL decref_if_not_destroy)(struct task *__restrict thread) {
 INTERN NONNULL((1)) void
 NOTHROW(FCALL GDBThread_StopProcess)(struct task *__restrict thread,
                                      bool generateAsyncStopEvents) {
+#ifdef CONFIG_USE_NEW_GROUP
+	struct procctl *ctl;
+	struct taskpid *iter;
+#else /* CONFIG_USE_NEW_GROUP */
 	struct task *proc;
 	struct taskgroup *group;
 	struct taskpid *iter;
+#endif /* !CONFIG_USE_NEW_GROUP */
 	if (GDBThread_IsAllStopModeActive && !generateAsyncStopEvents)
 		return;
 	if (GDBThread_IsKernelThread(thread)) {
 		GDB_DEBUG("[gdb] TODO: Stop all kernel threads\n");
 		return;
 	}
+#ifdef CONFIG_USE_NEW_GROUP
+	ctl = task_getprocctl_of(thread);
+#else /* CONFIG_USE_NEW_GROUP */
 	proc = task_getprocess_of(thread);
 	group = &FORTASK(proc, this_taskgroup);
+#endif /* !CONFIG_USE_NEW_GROUP */
 	/* FIXME: Must use a  timeout here, and  switch to all-stop  mode
 	 *        in case one of the already stopped threads is currently
 	 *        holding this lock. */
 again_threads:
+#ifdef CONFIG_USE_NEW_GROUP
+	procctl_thrds_acquire(ctl);
+	FOREACH_procctl_thrds(iter, ctl)
+#else /* CONFIG_USE_NEW_GROUP */
 	sync_read(&group->tg_proc_threads_lock);
-	FOREACH_taskgroup__proc_threads(iter, group) {
+	FOREACH_taskgroup__proc_threads(iter, group)
+#endif /* !CONFIG_USE_NEW_GROUP */
+	{
 		REF struct task *pt;
 		pt = taskpid_gettask(iter);
 		if (!pt)
@@ -811,18 +826,38 @@ again_threads:
 		if (GDBThread_IsStoppedExplicitly(pt)) {
 			if (decref_if_not_destroy(pt))
 				continue;
+#ifdef CONFIG_USE_NEW_GROUP
+			procctl_thrds_break(ctl);
+#else /* CONFIG_USE_NEW_GROUP */
 			sync_endread(&group->tg_proc_threads_lock);
+#endif /* !CONFIG_USE_NEW_GROUP */
 			decref_likely(pt);
 			goto again_threads;
 		}
 		/* Must stop this thread! */
+#ifdef CONFIG_USE_NEW_GROUP
+		procctl_thrds_break(ctl);
+#else /* CONFIG_USE_NEW_GROUP */
 		sync_endread(&group->tg_proc_threads_lock);
+#endif /* !CONFIG_USE_NEW_GROUP */
 		GDBThread_Stop(pt, generateAsyncStopEvents);
 		decref_unlikely(pt);
 		goto again_threads;
 	}
+#ifdef CONFIG_USE_NEW_GROUP
+	procctl_thrds_release(ctl);
+	{
+		REF struct task *proc;
+		proc = task_getproc_of(thread);
+		if (proc) {
+			FINALLY_DECREF_UNLIKELY(proc);
+			GDBThread_Stop(proc, generateAsyncStopEvents);
+		}
+	}
+#else /* CONFIG_USE_NEW_GROUP */
 	sync_endread(&group->tg_proc_threads_lock);
 	GDBThread_Stop(proc, generateAsyncStopEvents);
+#endif /* !CONFIG_USE_NEW_GROUP */
 }
 
 INTERN NONNULL((1)) void
@@ -848,12 +883,23 @@ again_piter_kern:
 			goto again_piter_kern;
 		}
 	} else {
+#ifdef CONFIG_USE_NEW_GROUP
+		struct taskpid *procpid;
+again_piter:
+		procpid = task_getprocpid_of(thread);
+#else /* CONFIG_USE_NEW_GROUP */
 		struct task *proc;
 again_piter:
 		proc = task_getprocess_of(thread);
+#endif /* !CONFIG_USE_NEW_GROUP */
 		for (; (iter = *piter) != NULL; piter = &iter->tse_next) {
+#ifdef CONFIG_USE_NEW_GROUP
+			if (task_getprocpid_of(iter->tse_thread) != procpid)
+				continue; /* Different process. */
+#else /* CONFIG_USE_NEW_GROUP */
 			if (task_getprocess_of(iter->tse_thread) != proc)
 				continue; /* Different process. */
+#endif /* !CONFIG_USE_NEW_GROUP */
 			if (iter->tse_isacpu) {
 				ATOMIC_AND(iter->tse_thread->t_flags, ~TASK_FGDB_STOPPED);
 				continue; /* whole-cpu stop events are resumed later. */
@@ -933,11 +979,21 @@ NOTHROW(FCALL GDBThread_PopStopEventProcess)(struct task *__restrict thread,
 			pnext = &iter->tse_next;
 		}
 	} else {
+#ifdef CONFIG_USE_NEW_GROUP
+		struct taskpid *procpid;
+		procpid = task_getprocpid_of(thread);
+#else /* CONFIG_USE_NEW_GROUP */
 		struct task *proc;
-		proc   = task_getprocess_of(thread);
+		proc = task_getprocess_of(thread);
+#endif /* !CONFIG_USE_NEW_GROUP */
 		piter  = &GDBThread_Stopped;
 		while ((iter = *piter) != NULL) {
-			if (task_getprocess_of(iter->tse_thread) != proc) {
+#ifdef CONFIG_USE_NEW_GROUP
+			if (task_getprocpid_of(iter->tse_thread) != procpid)
+#else /* CONFIG_USE_NEW_GROUP */
+			if (task_getprocess_of(iter->tse_thread) != proc)
+#endif /* !CONFIG_USE_NEW_GROUP */
+			{
 				piter = &iter->tse_next;
 				continue; /* Different process. */
 			}

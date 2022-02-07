@@ -168,7 +168,8 @@ SLIST_HEAD(pending_rpc_slist, pending_rpc);
  * @return: * : The number of processes to which the signal was delivered. */
 PUBLIC NONNULL((1, 2)) size_t FCALL
 task_raisesignalprocessgroup(struct procgrp *__restrict group,
-                             siginfo_t const *__restrict info)
+                             siginfo_t const *__restrict info,
+                             struct taskpid *__restrict sender)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE) {
 	struct taskpid *member;
 	struct pending_rpc_slist rpcs;
@@ -226,6 +227,7 @@ task_raisesignalprocessgroup(struct procgrp *__restrict group,
 		assert(!SLIST_EMPTY(&rpcs));
 		rpc = SLIST_FIRST(&rpcs);
 		SLIST_REMOVE_HEAD(&rpcs, pr_link);
+		rpc->pr_psig.si_pid = taskpid_getnstid_s(sender, member->tp_ns);
 		if (!proc_rpc_schedule(member, rpc))
 			SLIST_INSERT(&rpcs, rpc, pr_link);
 	}

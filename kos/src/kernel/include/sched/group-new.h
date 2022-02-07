@@ -390,7 +390,7 @@ struct procctl {
 	struct procgrp_arref     pc_grp;          /* [1..1][lock(READ(ATOMIC), WRITE(OLD->pgr_memb_lock &&
 	                                           *                                 NEW->pgr_memb_lock))]
 	                                           * Process group controller. */
-	LIST_ENTRY(taskpid)      pc_grpmember;    /* [0..1][lock(pc_grp->pgr_memb_lock)] Process group member link. */
+	LIST_ENTRY(taskpid)      pc_grpmember;    /* [1..1][lock(pc_grp->pgr_memb_lock)] Process group member link. */
 };
 
 /* Enumerate threads (other than the main thread) of `self' */
@@ -421,6 +421,8 @@ struct procctl {
 #define procctl_thrds_acquired(self)        (!PREEMPTION_ENABLED())
 #define procctl_thrds_available(self)       1
 #endif /* CONFIG_NO_SMP */
+#define procctl_thrds_reacquire(self) (__pclthr_was = PREEMPTION_PUSHOFF(), procctl_thrds_acquire_nopr(self))
+#define procctl_thrds_break(self)     (procctl_thrds_release_nopr(self), PREEMPTION_POP(__pclthr_was))
 #define procctl_thrds_acquire(self)                  \
 	do {                                             \
 		pflag_t __pclthr_was = PREEMPTION_PUSHOFF(); \

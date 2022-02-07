@@ -161,6 +161,24 @@ _ttydev_tryioctl(struct mfile *__restrict self, ioctl_t cmd,
  * @param: struct ttydev       *self:     TTY to initialize.
  * @param: struct ttydev_ops   *ops:      TTY operators.
  * @param: pterminal_oprinter_t oprinter: [1..1] Terminal output printer. */
+#ifdef CONFIG_USE_NEW_GROUP
+#define _ttydev_init(self, ops, oprinter)                \
+	(___ttydev_assert_ops_(ops)                          \
+	 _chrdev_init(_ttydev_aschr(self), &(ops)->to_cdev), \
+	 terminal_init(&(self)->t_term, oprinter,            \
+	               &__ttydev_v_raise,                    \
+	               &__ttydev_v_chk_sigttou),             \
+	 awref_init(&(self)->t_cproc, __NULLPTR),            \
+	 awref_init(&(self)->t_fproc, __NULLPTR))
+#define _ttydev_cinit(self, ops)                          \
+	(___ttydev_assert_ops_(ops)                           \
+	 _chrdev_cinit(_ttydev_aschr(self), &(ops)->to_cdev), \
+	 terminal_init(&(self)->t_term, oprinter,             \
+	               &__ttydev_v_raise,                     \
+	               &__ttydev_v_chk_sigttou),              \
+	 awref_cinit(&(self)->t_cproc, __NULLPTR),            \
+	 awref_cinit(&(self)->t_fproc, __NULLPTR))
+#else /* CONFIG_USE_NEW_GROUP */
 #define _ttydev_init(self, ops, oprinter)                \
 	(___ttydev_assert_ops_(ops)                          \
 	 _chrdev_init(_ttydev_aschr(self), &(ops)->to_cdev), \
@@ -177,6 +195,7 @@ _ttydev_tryioctl(struct mfile *__restrict self, ioctl_t cmd,
 	               &__ttydev_v_chk_sigttou),              \
 	 awref_cinit(&(self)->t_cproc, __NULLPTR),            \
 	 axref_cinit(&(self)->t_fproc, __NULLPTR))
+#endif /* !CONFIG_USE_NEW_GROUP */
 /* Finalize a partially initialized `struct ttydev' (as initialized by `_ttydev_init()') */
 #define _ttydev_fini(self) _chrdev_fini(_ttydev_aschr(self))
 

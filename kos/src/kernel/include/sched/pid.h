@@ -80,6 +80,10 @@ DECL_BEGIN
 struct pidns;
 struct taskpid;
 struct task;
+#ifdef CONFIG_USE_NEW_GROUP
+struct procgrp; /* Defined in <sched/group-new.h> */
+#endif /* CONFIG_USE_NEW_GROUP */
+
 #ifndef __task_awref_defined
 #define __task_awref_defined
 AWREF(task_awref, task);
@@ -108,7 +112,8 @@ struct taskpid_slot {
 /************************************************************************/
 struct taskpid {
 	WEAK refcnt_t           tp_refcnt;  /* Reference counter. */
-#ifdef __WANT_TASKPID__tp_lop
+#if (defined(__WANT_TASKPID__tp_nslop) || \
+     defined(__WANT_TASKPID__tp_grplop))
 	union {
 		struct {
 			struct task_awref tp_thread;  /* ... */
@@ -117,10 +122,18 @@ struct taskpid {
 			uint8_t           tp_SIGCLD;  /* ... */
 			uint8_t          _tp_pad[sizeof(void *) - 3]; /* ... */
 		};
-		Toblockop(pidns)     _tp_lop;   /* Used internally during destruction */
-		Tobpostlockop(pidns) _tp_plop;  /* Used internally during destruction */
+#ifdef __WANT_TASKPID__tp_nslop
+		Toblockop(pidns)     _tp_nslop;   /* Used internally during destruction */
+		Tobpostlockop(pidns) _tp_nsplop;  /* Used internally during destruction */
+#endif /* __WANT_TASKPID__tp_nslop */
+#ifdef CONFIG_USE_NEW_GROUP
+#ifdef __WANT_TASKPID__tp_grplop
+		Toblockop(procgrp)     _tp_grplop;   /* Used internally during destruction */
+		Tobpostlockop(procgrp) _tp_grpplop;  /* Used internally during destruction */
+#endif /* __WANT_TASKPID__tp_grplop */
+#endif /* CONFIG_USE_NEW_GROUP */
 	};
-#else /* __WANT_TASKPID__tp_lop */
+#else /* ... */
 	struct task_awref       tp_thread;  /* [0..1] The pointed-to task (or `NULL' if destroyed) */
 	struct sig              tp_changed; /* Signal broadcast after changing `tp_status'. */
 	uint16_t                tp_status;  /* [const_if(!tp_thread || wasdestroyed(tp_thread) ||
@@ -129,7 +142,7 @@ struct taskpid {
 	                                     * Current thread status (~ala `union wait'). */
 	uint8_t                 tp_SIGCLD;  /* [const] Signal number send to parent process when `tp_status' changes. */
 	uint8_t                _tp_pad[sizeof(void *) - 3]; /* ... */
-#endif /* !__WANT_TASKPID__tp_lop */
+#endif /* !... */
 #ifdef CONFIG_USE_NEW_GROUP
 	REF struct taskpid     *tp_proc;    /* [1..1][ref_if(!= this)][const] PID descriptor for associated process. */
 	struct procctl         *tp_pctl;    /* [1..1][owned_if(tp_proc == this)][== tp_proc->tp_pctl][const] Process controller. */
@@ -254,9 +267,6 @@ taskpid_gettask_srch(struct taskpid *__restrict self)
 /************************************************************************/
 /* TASK PID NAMESPACE                                                   */
 /************************************************************************/
-#ifdef CONFIG_USE_NEW_GROUP
-struct procgrp; /* Defined in <sched/group-new.h> */
-#endif /* CONFIG_USE_NEW_GROUP */
 struct pidns {
 	WEAK refcnt_t               pn_refcnt;  /* Reference counter. */
 	size_t                      pn_ind;     /* [const][(== 0) == (. == &pidns_root)]

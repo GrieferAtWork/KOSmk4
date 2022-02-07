@@ -48,6 +48,7 @@
 #include <kernel/user.h>
 #include <sched/atomic64.h>
 #include <sched/group.h>
+#include <sched/rpc.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -295,8 +296,18 @@ handle_get_task(unsigned int fd)
 	case (unsigned int)AT_THIS_TASK:
 		return incref(THIS_TASK);
 
-	case (unsigned int)AT_THIS_PROCESS:
+	case (unsigned int)AT_THIS_PROCESS: {
+#ifdef CONFIG_USE_NEW_GROUP
+		REF struct task *result;
+		while ((result = task_getproc()) == NULL) {
+			task_yield();
+			task_serve();
+		}
+		return result;
+#else /* CONFIG_USE_NEW_GROUP */
 		return incref(task_getprocess());
+#endif /* !CONFIG_USE_NEW_GROUP */
+	}	break;
 
 	case (unsigned int)AT_PARENT_PROCESS: {
 		REF struct task *temp;

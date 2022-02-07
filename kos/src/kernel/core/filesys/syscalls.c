@@ -2461,8 +2461,13 @@ kernel_execveat(fd_t dirfd,
 
 		/* Check if we're the main thread. If no, send an
 		 * RPC  to it and  have it do  the exec() for us. */
+#ifdef CONFIG_USE_NEW_GROUP
+		if (!task_isaprocess(caller))
+			goto send_rpc_to_main_thread;
+#else /* CONFIG_USE_NEW_GROUP */
 		if (caller != task_getprocess_of(caller))
 			goto send_rpc_to_main_thread;
+#endif /* !CONFIG_USE_NEW_GROUP */
 
 		/* Immediately do the exec */
 		args.ea_state = state;
@@ -2478,7 +2483,14 @@ kernel_execveat(fd_t dirfd,
 		struct kernel_exec_rpc_data *data;
 		struct task *proc;
 send_rpc_to_main_thread:
+#ifdef CONFIG_USE_NEW_GROUP
+		while ((proc = task_getproc()) == NULL) {
+			task_yield();
+			task_serve();
+		}
+#else /* CONFIG_USE_NEW_GROUP */
 		proc = task_getprocess_of(caller);
+#endif /* !CONFIG_USE_NEW_GROUP */
 		TRY {
 			data = (struct kernel_exec_rpc_data *)kmalloc(sizeof(struct kernel_exec_rpc_data), GFP_LOCKED);
 		} EXCEPT {

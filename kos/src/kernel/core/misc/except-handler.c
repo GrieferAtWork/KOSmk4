@@ -52,6 +52,7 @@
 #include <kos/bits/except.h>
 #include <kos/except.h>
 #include <kos/kernel/cpu-state-helpers.h>
+#include <sys/wait.h>
 
 #include <assert.h>
 #include <inttypes.h>

@@ -77,8 +77,13 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 		dbg_hline(0, dbg_getcur_y(), dbg_screen_width, ' ');
 	}
 	dbg_savecolor();
+#ifdef CONFIG_USE_NEW_GROUP
+	if (task_getprocpid_of(thread) == task_getprocpid_of(dbg_current))
+		dbg_setbgcolor(ANSITTY_CL_DARK_GRAY);
+#else /* CONFIG_USE_NEW_GROUP */
 	if (task_getprocess_of(thread) == task_getprocess_of(dbg_current))
 		dbg_setbgcolor(ANSITTY_CL_DARK_GRAY);
+#endif /* !CONFIG_USE_NEW_GROUP */
 	{
 		struct mexecinfo *ei;
 		ei = &FORMMAN(thread->t_mman, thismman_execinfo);

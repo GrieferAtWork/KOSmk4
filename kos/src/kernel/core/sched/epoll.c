@@ -948,20 +948,36 @@ NOTHROW(FCALL epoll_rpc_trigger)(/*inherit(always)*/ struct epoll_monitor_rpc *_
 	bool ok = false;
 	REF struct taskpid *target_pid;
 	REF struct task *target;
+#ifdef CONFIG_USE_NEW_GROUP
+	target_pid = rpc->emr_target;
+	/* Schedule the RPC, and destroy is if the target already died. */
+	if (rpc->emr_rpc.pr_flags & RPC_DOMAIN_F_PROC) {
+		rpc->emr_rpc.pr_flags &= ~RPC_DOMAIN_F_PROC;
+		ok = proc_rpc_schedule(target_pid, &rpc->emr_rpc);
+		decref_unlikely(target_pid);
+	} else {
+		/* Lookup the actual target */
+		target = taskpid_gettask(target_pid);
+		decref_unlikely(target_pid);
+		if likely(target != NULL) {
+			ok = task_rpc_schedule(target, &rpc->emr_rpc);
+			decref_unlikely(target);
+		}
+	}
+#else /* CONFIG_USE_NEW_GROUP */
 	syscall_ulong_t rpc_flags;
 	target_pid = rpc->emr_target;
 	rpc_flags  = rpc->emr_rpc.pr_flags & RPC_DOMAIN_F_PROC;
-	rpc->emr_rpc.pr_flags &= ~RPC_DOMAIN_F_PROC;
-
-	/* Lookup the actual target */
 	target = taskpid_gettask(target_pid);
 	decref_unlikely(target_pid);
 	if likely(target != NULL) {
+		rpc->emr_rpc.pr_flags &= ~RPC_DOMAIN_F_PROC;
 		/* Schedule the RPC, and destroy is if the target already died. */
 		ok = rpc_flags & RPC_DOMAIN_F_PROC ? proc_rpc_schedule(target, &rpc->emr_rpc)
 		                                   : task_rpc_schedule(target, &rpc->emr_rpc);
 		decref_unlikely(target);
 	}
+#endif /* !CONFIG_USE_NEW_GROUP */
 
 	/* If scheduling failed due to the target terminating, destroy the RPC via shutdown. */
 	if (!ok)

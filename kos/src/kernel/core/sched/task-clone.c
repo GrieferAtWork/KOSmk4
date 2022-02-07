@@ -695,7 +695,7 @@ again_assign_pid:
 				decref_unlikely(result_pidns);
 				RETHROW();
 			}
-			result_pid->tp_refcnt = 1;
+			result_pid->tp_refcnt = 2; /* +1: this_taskpid, +1: procctl_chlds_insert/procctl_thrds_insert */
 			awref_init(&result_pid->tp_thread, result);
 			sig_init(&result_pid->tp_changed);
 			result_pid->tp_status = 0;

@@ -368,6 +368,16 @@ NOTHROW(FCALL task_exit)(int w_status) {
 		struct procctl *ctl = pid->tp_pctl;
 		REF struct procgrp *grp;
 
+		/* Clear all still-pending process-directed RPCs. */
+		{
+			struct pending_rpc *rpcs;
+			assert(PREEMPTION_ENABLED());
+			procctl_sig_write(ctl); /* Never throws because preemption is enabled */
+			rpcs = ATOMIC_XCH(ctl->pc_sig_list.slh_first, THIS_RPCS_TERMINATED);
+			procctl_sig_endwrite(ctl);
+			task_asyncrpc_destroy_list_for_shutdown(rpcs);
+		}
+
 		/* NOTE: As per the requirements, we're allowed to assume  that
 		 *       no-one is allowed to still be adding additional  items
 		 *       to `ctl->pc_chlds_list' (because we, as the associated
@@ -421,8 +431,11 @@ again_process_children:
 				/* Use the child thread's exit RPC to terminate
 				 * it, as well  as propagate  our exit  status. */
 				if (ATOMIC_CMPXCH(FORTASK(child_thread, this_exitrpc.pr_kern.k_func),
-				                  NULL, &propagate_process_exit_status))
-					task_rpc_schedule(child_thread, &FORTASK(child_thread, this_exitrpc));
+				                  NULL, &propagate_process_exit_status)) {
+					bool ok;
+					ok = task_rpc_schedule(child_thread, &FORTASK(child_thread, this_exitrpc));
+					(void)ok; /* Unused */
+				}
 				decref_unlikely(child_thread);
 			}
 			PREEMPTION_DISABLE();

@@ -19,7 +19,8 @@
  */
 #ifndef GUARD_KERNEL_SRC_SCHED_PID_C
 #define GUARD_KERNEL_SRC_SCHED_PID_C 1
-#define __WANT_TASKPID__tp_lop
+#define __WANT_TASKPID__tp_nslop
+#define __WANT_TASKPID__tp_grplop
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -29,6 +30,8 @@
 #include <sched/group-new.h>
 #include <sched/group.h>
 #include <sched/pid.h>
+#include <sched/rpc-internal.h>
+#include <sched/rpc.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -138,7 +141,7 @@ PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(LOCKOP_CC pidns_removepid_postlop)(Tobpostlockop(pidns) *__restrict self,
                                            struct pidns *__restrict obj) {
 	struct taskpid *me;
-	me = container_of(self, struct taskpid, _tp_plop);
+	me = container_of(self, struct taskpid, _tp_nsplop);
 	assert(me->tp_ns == obj);
 	decref_nokill(obj); /* *_nokill, because caller is still holding a reference */
 	me->tp_ns = obj->pn_par;
@@ -156,15 +159,15 @@ PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(pidns) *
 NOTHROW(LOCKOP_CC pidns_removepid_lop)(Toblockop(pidns) *__restrict self,
                                        struct pidns *__restrict obj) {
 	struct taskpid *me;
-	me = container_of(self, struct taskpid, _tp_lop);
+	me = container_of(self, struct taskpid, _tp_nslop);
 	assert(me->tp_ns == obj);
 
 	/* Remove from the just-locked namespace. */
 	taskpid_remove_from_ns(me, obj);
 
 	/* Do the rest of the accounting work in a post-lockop */
-	me->_tp_plop.oplo_func = &pidns_removepid_postlop;
-	return &me->_tp_plop;
+	me->_tp_nsplop.oplo_func = &pidns_removepid_postlop;
+	return &me->_tp_nsplop;
 }
 
 
@@ -182,9 +185,9 @@ again_lock_ns:
 		pidns_endwrite(ns);
 	} else {
 		/* Must use a lock-op */
-		self->_tp_lop.olo_func = &pidns_removepid_lop;
+		self->_tp_nslop.olo_func = &pidns_removepid_lop;
 		incref(ns);
-		oblockop_enqueue(&ns->pn_lops, &self->_tp_lop);
+		oblockop_enqueue(&ns->pn_lops, &self->_tp_nslop);
 		_pidns_reap(ns);
 		decref_unlikely(ns);
 		return;
@@ -203,6 +206,36 @@ again_lock_ns:
 	_taskpid_free(self);
 }
 
+#ifdef CONFIG_USE_NEW_GROUP
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(LOCKOP_CC taskpid_remove_from_group_postlop)(Tobpostlockop(procgrp) *__restrict self,
+                                                     struct procgrp *__restrict obj) {
+	struct taskpid *me  = container_of(self, struct taskpid, _tp_grpplop);
+	struct procctl *ctl = me->tp_pctl;
+	assert(me->tp_proc == me);
+	assert(arref_ptr(&ctl->pc_grp) == obj);
+#if 0
+	arref_fini(&ctl->pc_grp);
+#else
+	decref_nokill(obj); /* nokill, because caller still got a reference. */
+#endif
+	_procctl_free(ctl);
+	taskpid_remove_from_namespaces_and_free(me);
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(procgrp) *
+NOTHROW(LOCKOP_CC taskpid_remove_from_group_lop)(Toblockop(procgrp) *__restrict self,
+                                                 struct procgrp *__restrict obj) {
+	struct taskpid *me  = container_of(self, struct taskpid, _tp_grplop);
+	struct procctl *ctl = me->tp_pctl;
+	assert(obj == arref_ptr(&ctl->pc_grp));
+	procgrp_memb_remove(obj, me);
+	me->_tp_grpplop.oplo_func = &taskpid_remove_from_group_postlop;
+	return &me->_tp_grpplop;
+}
+#endif /* CONFIG_USE_NEW_GROUP */
+
+
 /* Destroy the given taskpid. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL taskpid_destroy)(struct taskpid *__restrict self) {
@@ -210,6 +243,51 @@ NOTHROW(FCALL taskpid_destroy)(struct taskpid *__restrict self) {
 	        "If this wasn't the case, `FORTASK(tp_thread, this_taskpid)' "
 	        "should have kept us alive!");
 	sig_broadcast_for_fini(&self->tp_changed);
+#ifdef CONFIG_USE_NEW_GROUP
+	assertf(!LIST_ISBOUND(self, tp_parsib),
+	        "The parent-sibling link should have kept us alive");
+	if (self->tp_proc == self) {
+		struct procctl *ctl = self->tp_pctl;
+		REF struct procgrp *grp;
+		assertf(LIST_EMPTY(&ctl->pc_thrds_list), "Child threads should have kept us alive");
+		assertf(LIST_EMPTY(&ctl->pc_chlds_list), "Child processes should have kept us alive");
+		assertf(ATOMIC_READ(ctl->pc_sig_list.slh_first) == THIS_RPCS_TERMINATED,
+		        "This should have happened in `task_exit()'");
+		sig_broadcast_for_fini(&ctl->pc_chld_changed);
+
+		/* We know that we're no longer part of the parent's list of child
+		 * processes, so there's no need to tinker around with removing
+		 * ourselves from said list. */
+		arref_fini(&ctl->pc_parent);
+
+		/* Clear `pc_sig_list' (handling remaining RPCs via SHUTDOWN) */
+		sig_broadcast_for_fini(&ctl->pc_sig_more);
+
+		/* Remove from `ctl->pc_grp->pgr_memb_list' (using lockops) */
+		grp = arref_ptr(&ctl->pc_grp);
+		if (procgrp_memb_trywrite(grp)) {
+			assert(grp == arref_ptr(&ctl->pc_grp));
+			procgrp_memb_remove(grp, self);
+			procgrp_memb_endwrite(grp);
+		} else {
+			incref(grp);
+			self->_tp_grplop.olo_func = &taskpid_remove_from_group_lop;
+			oblockop_enqueue(&grp->pgr_memb_lops, &self->_tp_grplop);
+			_procgrp_memb_reap(grp);
+			decref_unlikely(grp);
+			return;
+		}
+#if 0
+		arref_fini(&ctl->pc_grp);
+#else
+		decref(grp);
+#endif
+		_procctl_free(ctl);
+	} else {
+		COMPILER_READ_BARRIER();
+		decref_unlikely(self->tp_proc);
+	}
+#endif /* CONFIG_USE_NEW_GROUP */
 	taskpid_remove_from_namespaces_and_free(self);
 }
 
@@ -282,9 +360,9 @@ for (local x: nodes) {
 		"asyncwork"    : ("&boottask_procctl.pc_thrds_list.lh_first", "&bootidle_pid"),
 		"thiscpu_idle" : ("&asyncwork_pid.tp_parsib.le_next", "NULL"),
 	}.get(x.val, ("NULL", "NULL"))...;
-	print("	.tp_parsib = { .le_next = ", next, ", .le_prev = ", prev, " },");
 	print("	.tp_proc   = &boottask_pid,");
 	print("	.tp_pctl   = &boottask_procctl,");
+	print("	.tp_parsib = { .le_next = ", next, ", .le_prev = ", prev, " },");
 	print("#else /" "* CONFIG_USE_NEW_GROUP *" "/");
 	print("	.tp_parsib = LIST_ENTRY_UNBOUND_INITIALIZER,");
 	print("#endif /" "* !CONFIG_USE_NEW_GROUP *" "/");
@@ -312,9 +390,9 @@ INTERN struct taskpid boottask_pid = {
 		._tp_pad    = {}
 	}},
 #ifdef CONFIG_USE_NEW_GROUP
-	.tp_parsib = { .le_next = NULL, .le_prev = NULL },
 	.tp_proc   = &boottask_pid,
 	.tp_pctl   = &boottask_procctl,
+	.tp_parsib = { .le_next = NULL, .le_prev = NULL },
 #else /* CONFIG_USE_NEW_GROUP */
 	.tp_parsib = LIST_ENTRY_UNBOUND_INITIALIZER,
 #endif /* !CONFIG_USE_NEW_GROUP */
@@ -336,9 +414,9 @@ INTERN ATTR_PERCPU struct taskpid thiscpu_idle_pid = {
 		._tp_pad    = {}
 	}},
 #ifdef CONFIG_USE_NEW_GROUP
-	.tp_parsib = { .le_next = NULL, .le_prev = &asyncwork_pid.tp_parsib.le_next },
 	.tp_proc   = &boottask_pid,
 	.tp_pctl   = &boottask_procctl,
+	.tp_parsib = { .le_next = NULL, .le_prev = &asyncwork_pid.tp_parsib.le_next },
 #else /* CONFIG_USE_NEW_GROUP */
 	.tp_parsib = LIST_ENTRY_UNBOUND_INITIALIZER,
 #endif /* !CONFIG_USE_NEW_GROUP */
@@ -360,9 +438,9 @@ INTERN struct taskpid asyncwork_pid = {
 		._tp_pad    = {}
 	}},
 #ifdef CONFIG_USE_NEW_GROUP
-	.tp_parsib = { .le_next = &bootidle_pid, .le_prev = &boottask_procctl.pc_thrds_list.lh_first },
 	.tp_proc   = &boottask_pid,
 	.tp_pctl   = &boottask_procctl,
+	.tp_parsib = { .le_next = &bootidle_pid, .le_prev = &boottask_procctl.pc_thrds_list.lh_first },
 #else /* CONFIG_USE_NEW_GROUP */
 	.tp_parsib = LIST_ENTRY_UNBOUND_INITIALIZER,
 #endif /* !CONFIG_USE_NEW_GROUP */
@@ -704,6 +782,8 @@ NOTHROW(FCALL pidns_allocpids)(struct taskpid *__restrict self)
 			return false;
 #endif /* PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE */
 		self->tp_pids[ns_iter->pn_ind].tps_pid = rpid;
+		if (OVERFLOW_SADD(rpid, 1, &ns_iter->pn_npid))
+			ns_iter->pn_npid = PIDNS_FIRST_NONRESERVED_PID;
 	} while ((ns_iter = ns_iter->pn_par) != NULL);
 #ifdef PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE
 	return true;
@@ -732,7 +812,7 @@ pidns_grplookup_srch(struct pidns *__restrict self, pid_t pgid)
 	REF struct procgrp *result;
 	pidns_read(self);
 	result = _procgrp_tree_locate(self->pn_tree, pgid, self->pn_ind);
-	if (result && !tryincref(result)) {
+	if (!result || !tryincref(result)) {
 		pidns_endread(self);
 		if (pgid < 0) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
