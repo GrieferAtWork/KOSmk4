@@ -145,13 +145,13 @@
 
 
 /* _SYSFAST_WANT(NAME, name) =
- *   SYSCALL_FASTPASS_KIND_SYS64:
- *      defined(__ARCH_WANT_SYSCALL_##NAME)
- *   SYSCALL_FASTPASS_KIND_SYS32_INT80:
- *      defined(__ARCH_WANT_SYSCALL_##NAME) || (defined(__x86_64__) && defined(__ARCH_WANT_COMPAT_SYSCALL_##NAME))
- *   SYSCALL_FASTPASS_KIND_SYS32_SYSENTER:
- *      (defined(__ARCH_WANT_SYSCALL_##NAME) || (defined(__x86_64__) && defined(__ARCH_WANT_COMPAT_SYSCALL_##NAME))) &&
- *      (__NR32RC_##name  >=  5)  //  NOTE:  Variants  with  register-count  0..4  are  binary-compatible  with  int80!
+ * - SYSCALL_FASTPASS_KIND_SYS64:
+ *   >>   defined(__ARCH_WANT_SYSCALL_##NAME)
+ * - SYSCALL_FASTPASS_KIND_SYS32_INT80:
+ *   >>   defined(__ARCH_WANT_SYSCALL_##NAME) || (defined(__x86_64__) && defined(__ARCH_WANT_COMPAT_SYSCALL_##NAME))
+ * - SYSCALL_FASTPASS_KIND_SYS32_SYSENTER:
+ *   >>   (defined(__ARCH_WANT_SYSCALL_##NAME) || (defined(__x86_64__) && defined(__ARCH_WANT_COMPAT_SYSCALL_##NAME))) &&
+ *   >>   (__NR32RC_##name >= 5) // NOTE: Variants with register-count 0..4 are binary-compatible with int80!
  */
 #ifdef SYSCALL_FASTPASS_KIND_SYS64
 #define _SYSFAST_WANT(NAME, name) IS_DEFINED(__ARCH_WANT_SYSCALL_##NAME)
@@ -191,11 +191,11 @@
 #endif /* !__SYSFAST_ARCH_WANT */
 
 #ifdef SYSCALL_FASTPASS_KIND_SYS32_SYSENTER
-#define _SYSFAST_WANT(NAME, name) __SYSFAST_ARCH_WANT(NAME)
-#define _SYSFAST_SETALIAS(name)   /* nothing */
-#else /* SYSCALL_FASTPASS_KIND_SYS32_SYSENTER */
 #define _SYSFAST_WANT(NAME, name) (__SYSFAST_ARCH_WANT(NAME) && __NR32RC_##name >= 5)
 #define _SYSFAST_SETALIAS(name)   __SYSFAST_SETALIAS_INT80_SYSENTER_IF_NOT(__SYSFAST_ARCH_ISREG_56(name), name)
+#else /* SYSCALL_FASTPASS_KIND_SYS32_SYSENTER */
+#define _SYSFAST_WANT(NAME, name) __SYSFAST_ARCH_WANT(NAME)
+#define _SYSFAST_SETALIAS(name)   /* nothing */
 #endif /* !SYSCALL_FASTPASS_KIND_SYS32_SYSENTER */
 #endif /* !SYSCALL_FASTPASS_KIND_SYS64 */
 
