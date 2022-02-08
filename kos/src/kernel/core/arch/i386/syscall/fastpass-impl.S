@@ -328,8 +328,28 @@
  */
 #ifdef __x86_64__
 #ifndef SC_PUSH_ICPUSTATE
-#define SC_PUSH_ICPUSTATE ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
-#define SC_POP_ICPUSTATE  ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
+#define SC_PUSH_ICPUSTATE        ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
+#define SC_POP_ICPUSTATE         ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
+#define SC_POP_CLOBBER_NOPAX_ICPUSTATE \
+	addq  $(32), %rsp;                 \
+	.cfi_restore %r15;                 \
+	.cfi_restore %r14;                 \
+	.cfi_restore %r13;                 \
+	.cfi_restore %r12;                 \
+	popq_cfi_r %r11;                   \
+	popq_cfi_r %r10;                   \
+	popq_cfi_r %r9;                    \
+	popq_cfi_r %r8;                    \
+	popq_cfi_r %rdi;                   \
+	popq_cfi_r %rsi;                   \
+	movq  16(%rsp), %rdx;              \
+	.cfi_restore %rdx;                 \
+	movq  24(%rsp), %rcx;              \
+	.cfi_restore %rcx;                 \
+	addq  $(40), %rsp;                 \
+	.cfi_restore %rbp;                 \
+	.cfi_restore %rbx;                 \
+	.cfi_restore %rax
 #endif /* !SC_PUSH_ICPUSTATE */
 #else /* __x86_64__ */
 #ifndef SC_PUSH_ICPUSTATE
@@ -339,6 +359,21 @@
 	SC386_INIT_SEGMENT_REGISTERS
 #define SC_POP_ICPUSTATE \
 	popal_cfi_r;         \
+	SC386_POP_SEGMENT_REGISTERS
+/* Only restore clobber-registers, excluding %Pax */
+#define SC_POP_CLOBBER_NOPAX_ICPUSTATE     \
+	movl  OFFSET_GPREGS32_EDX(%esp), %edx; \
+	.cfi_restore %edx;                     \
+	movl  OFFSET_GPREGS32_ECX(%esp), %ecx; \
+	.cfi_restore %ecx;                     \
+	addl  $(32), %esp;                     \
+	.cfi_adjust_cfa_offset -32;            \
+	.cfi_restore %edi;                     \
+	.cfi_restore %esi;                     \
+	.cfi_restore %ebp;                     \
+/*	.cfi_restore %esp; */                  \
+	.cfi_restore %ebx;                     \
+	.cfi_restore %eax;                     \
 	SC386_POP_SEGMENT_REGISTERS
 #endif /* !SC_PUSH_ICPUSTATE */
 #undef SC_PUSH_ICPUSTATE_AND_CHECK_SYSENTER_EXTENSION
@@ -558,6 +593,46 @@ SC_BEGIN(iopl)
 	SC_IRET
 SC_END(iopl)
 #endif /* iopl... */
+
+
+
+
+
+
+
+
+/* >> errno_t clone3(struct ucpustate const *state,
+ * >>                   struct clone3_reason const *reason); */
+#if _SYSFAST_WANT(CLONE3, clone3)
+SC_BEGIN(clone3)
+	SC_PUSH_ICPUSTATE
+
+	/* Call forward to `sys_clone3(32|64)_impl()' */
+#ifdef __x86_64__
+#ifdef SYSCALL_FASTPASS_KIND_SYS64
+	movq   %rsi, %rdx   /* Arg #2 (struct clone3_reason const *ureason) */
+	movq   %rdi, %rsi   /* Arg #1 (struct ucpustate const *state) */
+	movq   %rsp, %rdi   /* struct icpustate *return_state */
+#else /* SYSCALL_FASTPASS_KIND_SYS64 */
+	movzlq %ecx, %rdx   /* Arg #2 (struct clone3_reason const *ureason) */
+	movzlq %ebx, %rsi   /* Arg #1 (struct ucpustate const *state) */
+	movq   %rsp, %rdi   /* struct icpustate *return_state */
+#endif /* !SYSCALL_FASTPASS_KIND_SYS64 */
+	EXTERN(sys_clone3_impl)
+	call   sys_clone3_impl
+#else /* __x86_64__ */
+	pushl_cfi %ecx        /* Arg #2 (struct clone3_reason const *ureason) */
+	movl   %ebx, %edx     /* Arg #1 (struct ucpustate const *state) */
+	leal   4(%esp), %ecx  /* struct icpustate *return_state */
+	EXTERN(sys_clone3_impl)
+	call   sys_clone3_impl
+	.cfi_adjust_cfa_offset -4
+#endif /* !__x86_64__ */
+
+	SC_POP_CLOBBER_NOPAX_ICPUSTATE
+	SC_IRET
+SC_END(clone3)
+#endif /* clone3... */
 
 
 
