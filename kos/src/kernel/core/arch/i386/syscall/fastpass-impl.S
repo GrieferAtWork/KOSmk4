@@ -648,8 +648,7 @@ SC_BEGIN(fork)
 	movP   %Psp, %R_fcall0P
 	EXTERN(sys_fork_impl)
 	call   sys_fork_impl
-	movP   %Pax, %Psp
-	SC_POP_ICPUSTATE
+	SC_POP_CLOBBER_NOPAX_ICPUSTATE
 	SC_IRET
 SC_END(fork)
 #endif /* fork... */
@@ -668,8 +667,7 @@ SC_BEGIN(vfork)
 	movP   %Psp, %R_fcall0P
 	EXTERN(sys_vfork_impl)
 	call   sys_vfork_impl
-	movP   %Pax, %Psp
-	SC_POP_ICPUSTATE
+	SC_POP_CLOBBER_NOPAX_ICPUSTATE
 	SC_IRET
 SC_END(vfork)
 #endif /* vfork... */

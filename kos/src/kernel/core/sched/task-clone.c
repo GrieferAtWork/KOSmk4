@@ -856,7 +856,7 @@ NOTHROW(FCALL _task_init_relocations)(struct task *__restrict self) {
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_CLONE3
 INTERN NONNULL((1)) pid_t FCALL
-sys_clone3_impl(struct icpustate *__restrict state,
+sys_clone3_impl(struct icpustate const *__restrict state,
                 USER UNCHECKED struct clone_args *cl_args,
                 size_t size) {
 	pid_t cpid;
@@ -960,8 +960,8 @@ DEFINE_SYSCALL2(syscall_slong_t, clone3,
 /* fork()                                                               */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_FORK
-INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
-sys_fork_impl(struct icpustate *__restrict state) {
+INTERN NONNULL((1)) pid_t FCALL
+sys_fork_impl(struct icpustate const *__restrict state) {
 	pid_t child_tid;
 	REF struct task *child_tsk;
 	struct task_clone_args cargs;
@@ -976,15 +976,16 @@ sys_fork_impl(struct icpustate *__restrict state) {
 	child_tsk = task_clone(state, &cargs);
 	child_tid = task_gettid_of(child_tsk);
 	decref(child_tsk);
-	gpregs_setpax(&state->ics_gpregs, child_tid);
-	return state;
+	return child_tid;
 }
 
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 sys_fork_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
+	pid_t cpid;
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
-	ctx->rc_state = sys_fork_impl(ctx->rc_state);
+	cpid = sys_fork_impl(ctx->rc_state);
+	icpustate_setreturn(ctx->rc_state, cpid);
 
 	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
 	ctx->rc_context = RPC_REASONCTX_SYSRET;
@@ -1005,8 +1006,8 @@ DEFINE_SYSCALL0(pid_t, fork) {
 /* vfork()                                                              */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_VFORK
-INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
-sys_vfork_impl(struct icpustate *__restrict state) {
+INTERN NONNULL((1)) pid_t FCALL
+sys_vfork_impl(struct icpustate const *__restrict state) {
 	pid_t child_tid;
 	REF struct task *child_tsk;
 	struct task_clone_args cargs;
@@ -1022,15 +1023,16 @@ sys_vfork_impl(struct icpustate *__restrict state) {
 	child_tsk = task_clone(state, &cargs);
 	child_tid = task_gettid_of(child_tsk);
 	decref(child_tsk);
-	gpregs_setpax(&state->ics_gpregs, child_tid);
-	return state;
+	return child_tid;
 }
 
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 sys_vfork_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
+	pid_t cpid;
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
-	ctx->rc_state = sys_vfork_impl(ctx->rc_state);
+	cpid = sys_vfork_impl(ctx->rc_state);
+	icpustate_setreturn(ctx->rc_state, cpid);
 
 	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
 	ctx->rc_context = RPC_REASONCTX_SYSRET;
