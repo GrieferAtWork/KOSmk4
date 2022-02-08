@@ -2233,41 +2233,60 @@ again:
 	 *       that other CPUs are currently trying to acquire  them,
 	 *       preventing us from reaching them.
 	 * Technically, this shouldn't happen,  since you shouldn't do  a
-	 * `while (!trylock()) task_pause();'  loop  (meaning that  a cpu
+	 * `while (!trylock()) task_pause();'  loop  (meaning that  a CPU
 	 * that is blocking-waiting for an  atomic lock should also  have
 	 * preemption enabled), and where you are allowed to do this kind
 	 * of loop, you're actually dealing with an SMP-lock, which  also
 	 * requires that preemption be  disabled, where becoming a  super
 	 * override will implicitly cause  one to acquire all  SMP-locks,
-	 * since a CPU that hold an  SMP-lock must release it before  re-
+	 * since a CPU that holds an SMP-lock must release it before  re-
 	 * enabling preemption, meaning  that being able  to send an  IPI
-	 * to every CPU, and having every  cpu ACK that IPI also  implies
+	 * to every CPU, and having every CPU ACK that IPI, also  implies
 	 * that all CPUs had preemption enabled, which then implies  that
-	 * no CPU was holding onto an SMP-lock.
+	 * no CPU was holding an SMP-lock.
 	 *
-	 * But despite all of that, it's better to be safe than sorry.
-	 *
-	 * HINT: `smplock' (see above) is (like the name says) an  SMP-lock,
-	 *       so we implicitly acquire it by being the super-override, so
-	 *       we don't actually have to deal with that one at all! */
+	 * But despite all of that, it's better to be safe than sorry. */
 	sched_super_override_start();
 
 	/* Ensure that required locks are available.
 	 * Because we're running single-threaded, we don't actually have  to
 	 * acquire those locks proper, but  to ensure consistency, we  still
 	 * need to make sure they're available (because if they aren't, then
-	 * relevant data structures may be in an inconsistent state) */
+	 * relevant data structures may be in an inconsistent state)
+	 *
+	 * Also: collection of certain types of memory leaks requires us to
+	 *       allocate additional memory (e.g. when we detect that  part
+	 *       of the coreheap, or a mem-node has leaked). In those cases
+	 *       the call to `gc_gather_explicit_leak()' makes a heap alloc
+	 *       call that in turn must acquire a lock to the heap. And  if
+	 *       that lock isn't available after we get the super override,
+	 *       it  will never become so until we allow the holding thread
+	 *       to run some more (which can only happen if we stop being a
+	 *       super override). */
 	if (!waitfor_locks_or_unlock())
 		goto again;
 
-	/* Actually search for memory leaks. */
-	result = kmalloc_leaks_gather();
+	{
+		RAII_FINALLY {
+			/* Release the scheduler super-override, thereby
+			 * allowing normal system  execution to  resume.
+			 *
+			 * This must _always_ happen, so we use FINALLY. */
+			sched_super_override_end();
 
-	/* Release the scheduler super-override, allowing normal
-	 * system execution to resume. */
-	sched_super_override_end();
+		};
 
-	/* Sort memory leaks by number of x-refs */
+		/* Actually search for memory leaks. */
+		result = kmalloc_leaks_gather();
+	}
+
+	/* Sort memory leaks by number of x-refs
+	 *
+	 * This can happen after we  stop being a super-override,  since
+	 * the fact that all of these are memory leaks also implies that
+	 * no other piece of code on the entire system knows about them,
+	 * meaning  that we're the only ones which are currently able to
+	 * access any of them. */
 	if (result)
 		result = kmalloc_leaks_sort(result);
 
@@ -2336,9 +2355,9 @@ kmalloc_leaks_print(kmalloc_leaks_t leaks,
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 		case TRACE_NODE_KIND_SLAB:
 			/* Slab allocations are way too light-weight to be able to support tracebacks.
-			 * As  such, we _are_ able to detect slab  memory leaks, but we aren't able to
-			 * tell   the   user   where/how    the   leaking   memory   was    allocated.
-			 * However,  since   slab   allocators   are   always   allowed   to   either:
+			 * As such, while we _are_ able to detect slab memory leaks, we aren't able to
+			 * tell  the user where/how  the leaking memory  was allocated. However, since
+			 * slab allocators are always allowed to either...
 			 *
 			 *   - Allocate regular kmalloc()-style memory (as a matter of fact, most calls
 			 *     to slab allocators actually use compile-time dispatching from inside  of
@@ -2352,9 +2371,12 @@ kmalloc_leaks_print(kmalloc_leaks_t leaks,
 			 *     memory mapping will simply prevent us from expanding slab space any further.
 			 *     Due  to this case,  pure slab allocators (i.e.  slab allocator function that
 			 *     will never return  conventional heap  memory) are always  allowed to  simply
-			 *     return `NULL', which is indicative of their inability to allocate additional
-			 *     slab memory.
-			 */
+			 *     return `NULL', which  is indicative  of their  inability to  find space  for
+			 *     additional slab memory.
+			 *
+			 * ... we can tell the user to reboot with "noslab" to turn of the system, thus
+			 *     causing tracebacks to be generated for  all the cases where slabs  would
+			 *     normally be used. */
 			if (!gc_slab_leak_did_notify_noslab_boot_option) {
 				gc_slab_leak_did_notify_noslab_boot_option = true;
 				PRINT("slab: Slab memory leaks don't include tracebacks.\n"
@@ -2414,6 +2436,12 @@ kmalloc_leaks_print(kmalloc_leaks_t leaks,
 				                    pc_ent, "Called here"));
 			}
 		}
+		/* If  the amount of leaked memory is small enough, also print a hexdump of
+		 * its contents. This might reveal sensitive data, but can be highly useful
+		 * to learn more about what got leaked.
+		 * Also: opening  and interacting with /proc/kos/leaks requires CAP_SYS_ADMIN,
+		 *       so it's OK if there ends being something sensitive that gets revealed
+		 *       by this. */
 		if (umin + 1024 > umax) {
 			PRINTF("%$[hex]\n",
 			       (size_t)(umax - umin) + 1,
