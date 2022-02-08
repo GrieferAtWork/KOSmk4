@@ -605,14 +605,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       for filling the remainder  of exception_info (except for  ei_nesting
 	 *       and ei_flags) with 0xcc bytes. */
 
-	/* TODO: Research how kill(2) should work for signals that are already pending.
-	 *       If it turns out that  a pending signal is  not put in-flight a  second
-	 *       time, then kill(2) can be implemented  via a sigset_t of signals  that
-	 *       should be raised  as soon  as the  target process  (yes: process;  not
-	 *       thread in this  case) is ready,  which would  get rid of  the risk  of
-	 *       the send operation running into an E_BADALLOC error.
-	 * From `man 2 fcntl': "Note that SIGIO is one of the nonqueuing standard signals" */
-
 	/* TODO: During unwinding, .cfi_signal_frame must result in the NEXT stack-frame
 	 *       searching for the associated FDE _NOT_  decrementing its PC by 1.  Note
 	 *       that this should only affect  the _NEXT_ stack-frame, as signal  frames

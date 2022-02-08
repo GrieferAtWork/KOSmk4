@@ -417,6 +417,29 @@ struct procctl {
 	                                           * NOTE: User-RPCs must not have the `RPC_SYNCMODE_F_REQUIRE_SC'
 	                                           *       or `RPC_SYNCMODE_F_REQUIRE_CP'  flag set.  If they  do,
 	                                           *       an internal assertion check will trigger. */
+#if 0 /* TODO */
+	/* Posix says:
+	 * """
+	 * [...] it is implementation-defined  as to whether  the signal is  delivered or accepted  more
+	 * than  once in circumstances other than those in which queuing is required. The order in which
+	 * multiple, simultaneously pending signals outside the range SIGRTMIN to SIGRTMAX are delivered
+	 * to or accepted by a process is unspecified.
+	 * """
+	 * In other words: signals [1..SIGRTMIN-1] (when not send with an attached `siginfo_t'), can be
+	 *                 schedule via a bitset of pending signals. Furthermore, on KOS this range  is
+	 *                 only  [1..31], so it becomes possible for us to have a word of extra pending
+	 *                 signals (that may not also be  present in `pc_sig_list'), that should  none-
+	 *                 the-less be raised within the process. */
+	uint32_t                 pc_sig_pend;     /* [lock(SET(ATOMIC), CLEAR(pc_sig_lock))]
+	                                           * Bitset of extra signals (1-31; bit `0' mustn't get set)
+	                                           * that should  be delivered  to some  thread within  this
+	                                           * process. Bit `1 << N' in this set behaves identical  to
+	                                           * a `struct pending_rpc' in `pc_sig_list' that  indicates
+	                                           * a signal `RPC_SIGNO(N)'. */
+#if __SIZEOF_POINTER__ > 4
+	byte_t                  _pc_pad[__SIZEOF_POINTER__ - 4]; /* ... */
+#endif /* __SIZEOF_POINTER__ > 4 */
+#endif
 	struct sig               pc_sig_more;     /* A signal that is broadcast whenever something is added to `pc_sig_list'
 	                                           * This  signal is _only_  used to implement  `signalfd(2)', as you're not
 	                                           * normally supposed to "wait" for signals to arrive; you just always  get
