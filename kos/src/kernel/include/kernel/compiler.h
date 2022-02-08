@@ -178,6 +178,36 @@
 #define ATTR_PERTASK     ATTR_SECTION(".data.pertask") /* Per-task template data. */
 #define ATTR_PERMMAN     ATTR_SECTION(".data.permman") /* Per-memory-manager template data. */
 
+/* Force minimal alignment in data declarations. This
+ * attribute must be used when declaring ATTR_PERTASK
+ * and ATTR_PERMMAN variables, so-as to ensure that no
+ * unnecessary alignment-padding is inserted.
+ *
+ * For reference:
+ * >>struct foo { void *a, *b, *c, *d; };
+ * >>PUBLIC struct foo my_data_symbol = {};
+ * ASM(x86_64-kos-gcc):
+ * >>	.globl my_data_symbol
+ * >>	.section .bss
+ * >>	.align 32
+ * >>	.type my_data_symbol, @object
+ * >>	.size my_data_symbol, 32
+ * >>my_data_symbol:
+ * >>	.zero 32
+ *
+ * Using this attribute:
+ * >>struct foo { void *a, *b, *c, *d; };
+ * >>PUBLIC ATTR_ALIGN(struct foo) my_data_symbol = {};
+ * ASM(x86_64-kos-gcc):
+ * >>	.globl my_data_symbol
+ * >>	.section .bss
+ * >>	.align 8
+ * >>	.type my_data_symbol, @object
+ * >>	.size my_data_symbol, 32
+ * >>my_data_symbol:
+ * >>	.zero 32 */
+#define ATTR_ALIGN(...)  ATTR_ALIGNED(COMPILER_ALIGNOF(__VA_ARGS__)) __VA_ARGS__
+
 
 
 #if defined(__x86_64__)

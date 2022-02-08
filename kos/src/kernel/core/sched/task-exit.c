@@ -153,7 +153,7 @@ STATIC_ASSERT(offsetafter(struct pending_rpc, pr_kern.k_func) == offsetafter(str
  * as the main thread to all non-main threads. */
 INTDEF struct pending_rpc this_exitrpc ASMNAME("this_exitrpc");
 INTDEF struct _task_exitrpc __this_exitrpc ASMNAME("this_exitrpc");
-INTERN ATTR_SECTION(".data.pertask.middle") struct _task_exitrpc __this_exitrpc = {
+INTERN ATTR_SECTION(".data.pertask.middle") ATTR_ALIGN(struct _task_exitrpc) __this_exitrpc = {
 	.pr_link  = { NULL },
 	.pr_flags = RPC_CONTEXT_KERN | _RPC_CONTEXT_DONTFREE,
 	.k_func   = NULL, /* Allocated if non-NULL (set to either `propagate_process_exit_status' or `propagate_thread_exit_status') */

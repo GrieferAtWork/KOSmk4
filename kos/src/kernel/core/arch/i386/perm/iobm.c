@@ -49,7 +49,7 @@ DECL_BEGIN
 /* [0..1][lock(WRITE_ONCE)]
  * The I/O permissions bitmap of the calling thread.
  * Lazily allocated during `ioperm()' and `#PF' (s.a. documentation in <sched/tss.h>) */
-PUBLIC ATTR_PERTASK REF struct ioperm_bitmap *this_x86_ioperm_bitmap = NULL;
+PUBLIC ATTR_PERTASK ATTR_ALIGN(REF struct ioperm_bitmap *) this_x86_ioperm_bitmap = NULL;
 
 /* [0..1][lock(THIS_CPU && !PREEMPTION_ENABLED())]
  * The I/O  permissions  bitmap  currently active  within  the  calling  CPU.

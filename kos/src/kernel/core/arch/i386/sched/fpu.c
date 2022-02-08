@@ -67,7 +67,7 @@ PUBLIC unsigned int _x86_fpustate_variant ASMNAME("x86_fpustate_variant") = FPU_
 PUBLIC ATTR_PERCPU struct task *thiscpu_fputhread = NULL;
 
 /* [0..1][owned] The per-task FPU state (lazily allocated) */
-PUBLIC ATTR_PERTASK struct fpustate *this_fpustate = NULL;
+PUBLIC ATTR_PERTASK ATTR_ALIGN(struct fpustate *) this_fpustate = NULL;
 
 DEFINE_PERTASK_FINI(pertask_finalize_fpustate);
 INTERN NOBLOCK void

@@ -197,7 +197,7 @@ PUBLIC struct cred cred_kernel = {
 /* [1..1][lock(read(THIS_TASK || INTERN(lock)), write(THIS_TASK && INTERN(lock)))]
  * Per-thread credentials controller.
  * NOTE: Initialize changed to `NULL' in `kernel_initialize_scheduler_after_smp()' */
-PUBLIC ATTR_PERTASK REF struct cred *this_cred = &cred_kernel;
+PUBLIC ATTR_PERTASK ATTR_ALIGN(REF struct cred *) this_cred = &cred_kernel;
 
 DEFINE_PERTASK_FINI(fini_this_cred);
 PRIVATE ATTR_USED NOBLOCK NONNULL((1)) void

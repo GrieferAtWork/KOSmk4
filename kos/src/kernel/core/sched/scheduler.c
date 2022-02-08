@@ -260,12 +260,12 @@ again:
 
 /* [lock(PRIVATE(THIS_CPU))]
  * Linked-list node for other threads. Used internally by scheduling. */
-PUBLIC ATTR_PERTASK REF _sched_link_t this_sched_link = LIST_ENTRY_UNBOUND_INITIALIZER;
+PUBLIC ATTR_PERTASK ATTR_ALIGN(REF _sched_link_t) this_sched_link = LIST_ENTRY_UNBOUND_INITIALIZER;
 
 /* [lock(PRIVATE(THIS_TASK))][valid_if(!TASK_FRUNNING)]
  * Timeout for when this thread should resume execution
  * by setting `TASK_FRUNNING | TASK_FTIMEOUT'. */
-PUBLIC ATTR_PERTASK ktime_t this_sched_timeout = KTIME_INFINITE;
+PUBLIC ATTR_PERTASK ATTR_ALIGN(ktime_t) this_sched_timeout = KTIME_INFINITE;
 
 /* [1..1][lock(PRIVATE(THIS_CPU))] The currently running thread. */
 PUBLIC ATTR_PERCPU struct task *thiscpu_sched_current = NULL;

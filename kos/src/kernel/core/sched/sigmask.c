@@ -169,7 +169,7 @@ print("#endif /" "* ... *" "/");
  * Reference to the signal mask (set of signals being blocked) in the  current
  * thread. The pointed-to object is meaningless (but must still be valid) when
  * the associated thread make use of userprocmask. */
-PUBLIC ATTR_PERTASK struct kernel_sigmask_arref
+PUBLIC ATTR_PERTASK ATTR_ALIGN(struct kernel_sigmask_arref)
 this_kernel_sigmask = ARREF_INIT(&kernel_sigmask_empty);
 
 DEFINE_PERTASK_FINI(fini_this_kernel_sigmask);

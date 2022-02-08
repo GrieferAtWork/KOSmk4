@@ -288,7 +288,7 @@ NOTHROW(FCALL taskpid_destroy)(struct taskpid *__restrict self) {
 
 
 /* [1..1][const] The PID associated with the calling thread. */
-PUBLIC ATTR_PERTASK REF struct taskpid *this_taskpid = NULL;
+PUBLIC ATTR_PERTASK ATTR_ALIGN(REF struct taskpid *) this_taskpid = NULL;
 
 DEFINE_PERTASK_FINI(this_taskpid_fini);
 PRIVATE ATTR_USED NOBLOCK NONNULL((1)) void

@@ -80,7 +80,7 @@ STATIC_ASSERT(offsetof(struct task, _t_next) == OFFSET_TASK__NEXT);
 
 
 PRIVATE ATTR_USED ATTR_SECTION(".data.pertask.head")
-struct task task_header = {
+ATTR_ALIGN(struct task) task_header = {
 	.t_self       = NULL, /* Filled in by the initializer. */
 	.t_refcnt     = 1,
 	.t_flags      = TASK_FNORMAL,
@@ -104,7 +104,7 @@ DATDEF ATTR_PERTASK struct mnode this_kernel_stackguard_ ASMNAME("this_kernel_st
  *          as KOS may use special, arch-specific stacks  to deal with certain CPU exceptions  that
  *          require execution on  a separate stack  (such as  the #DF-stack on  x86). To  determine
  *          available/used stack memory, use the function below. */
-PUBLIC ATTR_PERTASK struct mpart this_kernel_stackpart_ = {
+PUBLIC ATTR_PERTASK ATTR_ALIGN(struct mpart) this_kernel_stackpart_ = {
 	MPART_INIT_mp_refcnt(1),
 	MPART_INIT_mp_flags(MPART_F_NOSPLIT | MPART_F_NOMERGE |
 	                    MPART_F_MLOCK_FROZEN | MPART_F_MLOCK),
@@ -123,7 +123,7 @@ PUBLIC ATTR_PERTASK struct mpart this_kernel_stackpart_ = {
 	MPART_INIT_mp_meta(NULL)
 };
 
-PUBLIC ATTR_PERTASK struct mnode this_kernel_stacknode_ = {
+PUBLIC ATTR_PERTASK ATTR_ALIGN(struct mnode) this_kernel_stacknode_ = {
 	MNODE_INIT_mn_mement({ {} }),
 	MNODE_INIT_mn_minaddr(MAP_FAILED),
 	MNODE_INIT_mn_maxaddr(KERNEL_STACKSIZE - 1),
@@ -142,7 +142,7 @@ PUBLIC ATTR_PERTASK struct mnode this_kernel_stacknode_ = {
 };
 
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-PUBLIC ATTR_PERTASK struct mnode this_kernel_stackguard_ = {
+PUBLIC ATTR_PERTASK ATTR_ALIGN(struct mnode) this_kernel_stackguard_ = {
 	MNODE_INIT_mn_mement({}),
 	MNODE_INIT_mn_minaddr(MAP_FAILED),
 	MNODE_INIT_mn_maxaddr(PAGESIZE - 1),
@@ -185,7 +185,7 @@ INTDEF NOBLOCK FREE WUNUSED void *
 NOTHROW(FCALL kernel_initialize_boot_trampolines)(void);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
-PUBLIC ATTR_PERTASK struct exception_info this_exception_info = {};
+PUBLIC ATTR_PERTASK ATTR_ALIGN(struct exception_info) this_exception_info = {};
 
 
 INTDEF byte_t __kernel_boottask_stack[];

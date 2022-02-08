@@ -66,7 +66,7 @@ DECL_BEGIN
 #endif /* !KERNELSPACE_...MEM */
 
 /* MMan exec() information */
-PUBLIC ATTR_PERMMAN struct mexecinfo thismman_execinfo = {
+PUBLIC ATTR_PERMMAN ATTR_ALIGN(struct mexecinfo) thismman_execinfo = {
 	.mei_file = NULL,
 	.mei_dent = NULL,
 	.mei_path = NULL,
@@ -81,7 +81,7 @@ PUBLIC ATTR_PERMMAN struct mexecinfo thismman_execinfo = {
 /* A special per-MMAN node that is  used to cover the kernel  core
  * with a reservation within user-space memory manager. Within the
  * kernel mman itself, this field is undefined. */
-PUBLIC ATTR_PERMMAN struct mnode thismman_kernel_reservation = {
+PUBLIC ATTR_PERMMAN ATTR_ALIGN(struct mnode) thismman_kernel_reservation = {
 	MNODE_INIT_mn_mement({}),
 	MNODE_INIT_mn_minaddr(KS_MINADDR),
 	MNODE_INIT_mn_maxaddr(KS_MAXADDR),
@@ -105,7 +105,7 @@ PUBLIC ATTR_PERMMAN struct mnode thismman_kernel_reservation = {
 
 /* [0..n] Linked chain of pending  operations that should be  executed
  * (via a reap-mechanism) whenever the lock for this mman is released. */
-PUBLIC ATTR_PERMMAN Toblockop_slist(mman)
+PUBLIC ATTR_PERMMAN ATTR_ALIGN(Toblockop_slist(mman))
 thismman_lockops = SLIST_HEAD_INITIALIZER(thismman_lockops);
 
 

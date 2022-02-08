@@ -441,7 +441,9 @@ DEFINE_DBG_BZERO_IF(THIS_HANDLE_MANAGER != NULL,
 
 /* [1..1][lock(PRIVATE(THIS_TASK))] Handle manager of the calling thread.
  * NOTE: Initialize changed to `NULL' in `kernel_initialize_scheduler_after_smp()' */
-PUBLIC ATTR_PERTASK struct handle_manager *this_handle_manager = &handle_manager_kernel;
+PUBLIC ATTR_PERTASK ATTR_ALIGN(struct handle_manager *)
+this_handle_manager = &handle_manager_kernel;
+
 DEFINE_PERTASK_FINI(fini_this_handle_manager);
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL fini_this_handle_manager)(struct task *__restrict self) {

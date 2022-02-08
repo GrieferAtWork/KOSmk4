@@ -430,6 +430,8 @@
 #define __ATTR_RETNONNULL
 #define ATTR_ALIGNED(x)
 #define __ATTR_ALIGNED(x)
+#define ATTR_ALIGN(...) __VA_ARGS__
+#define __ATTR_ALIGN(...) __VA_ARGS__
 #define ATTR_ALIAS(x)
 #define __ATTR_ALIAS(x)
 #define ATTR_INLINE

@@ -1224,7 +1224,7 @@ NOTHROW(KCALL copypagestophys_nopf)(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst,
 /************************************************************************/
 /* A mem-node used to describe a single, reserved page. */
 DATDEF ATTR_PERTASK struct mnode this_trampoline_node_ ASMNAME("this_trampoline_node");
-PUBLIC ATTR_PERTASK struct mnode this_trampoline_node_ = {
+PUBLIC ATTR_PERTASK ATTR_ALIGN(struct mnode) this_trampoline_node_ = {
 	MNODE_INIT_mn_mement({}),
 	MNODE_INIT_mn_minaddr((byte_t *)MAP_FAILED),
 	MNODE_INIT_mn_maxaddr(PAGESIZE - 1),

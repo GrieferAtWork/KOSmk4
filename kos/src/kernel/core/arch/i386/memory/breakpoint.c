@@ -43,11 +43,11 @@ DECL_BEGIN
  *       any changes made will become lost the next time the mman
  *       is changed.
  * NOTE: These fields are _NOT_ inherited during `mman_fork()'! */
-PUBLIC ATTR_PERMMAN void *thismman_x86_dr0 = 0;
-PUBLIC ATTR_PERMMAN void *thismman_x86_dr1 = 0;
-PUBLIC ATTR_PERMMAN void *thismman_x86_dr2 = 0;
-PUBLIC ATTR_PERMMAN void *thismman_x86_dr3 = 0;
-PUBLIC ATTR_PERMMAN uintptr_t thismman_x86_dr7 = 0;
+PUBLIC ATTR_PERMMAN ATTR_ALIGN(void *) thismman_x86_dr0    = 0;
+PUBLIC ATTR_PERMMAN ATTR_ALIGN(void *) thismman_x86_dr1    = 0;
+PUBLIC ATTR_PERMMAN ATTR_ALIGN(void *) thismman_x86_dr2    = 0;
+PUBLIC ATTR_PERMMAN ATTR_ALIGN(void *) thismman_x86_dr3    = 0;
+PUBLIC ATTR_PERMMAN ATTR_ALIGN(uintptr_t) thismman_x86_dr7 = 0;
 
 
 #define thismman_x86_drN(n) (*thismman_x86_drN_impl(n))

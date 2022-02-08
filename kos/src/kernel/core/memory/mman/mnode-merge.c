@@ -300,7 +300,7 @@ union mman_mergenodes_lop {
 /* A special per-mman lockop may be used to enqueue an async call to `mman_mergenodes()'
  * NOTE: The `olo_func' field of this lockop  carries a special role with  its
  *       meaning, in that it may only be set to one of `MERGENODES_LOP_FUNC_*' */
-PRIVATE ATTR_PERMMAN union mman_mergenodes_lop
+PRIVATE ATTR_PERMMAN ATTR_ALIGN(union mman_mergenodes_lop)
 thismman_mergenodes_lop = { { {}, MERGENODES_LOP_FUNC_INACTIVE } };
 
 

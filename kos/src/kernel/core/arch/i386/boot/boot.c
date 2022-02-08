@@ -690,7 +690,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *   (Where N is the # of open file handles)
 	 *
 	 * New name (idea):
-	 *   - DATDEF ATTR_PERTASK struct handtab *this_handtab;
+	 *   - DATDEF ATTR_PERTASK ATTR_ALIGN(struct handtab *) this_handtab;
 	 */
 
 	/* TODO: `system_clearcache()' needs to be a blocking function (and can be
@@ -890,6 +890,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 */
 
 	/* TODO: Refactor `HANDLE_TYPE_TASK' --> `HANDLE_TYPE_PIDFD' */
+
+	/* TODO: Enable `-Wpadded' (warns abiut implicit padding in structures; on KOS,
+	 *       structs should be  declared with hidden  padding made visible  through
+	 *       explicitly declared fields) */
 
 	return state;
 }

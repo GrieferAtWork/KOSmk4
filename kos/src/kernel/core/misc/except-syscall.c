@@ -60,7 +60,7 @@
 DECL_BEGIN
 
 /* User-space exception handler mode for the current thread. */
-PUBLIC ATTR_PERTASK struct user_except_handler this_user_except_handler = {
+PUBLIC ATTR_PERTASK ATTR_ALIGN(struct user_except_handler) this_user_except_handler = {
 	.ueh_mode    = EXCEPT_HANDLER_MODE_DISABLED,
 	.ueh_handler = NULL,
 	.ueh_stack   = EXCEPT_HANDLER_SP_CURRENT,
@@ -84,7 +84,7 @@ PUBLIC ATTR_PERTASK struct user_except_handler this_user_except_handler = {
  * the given `ctid' to be used as  the initial value for `this_tid_address', while  the
  * `CLONE_CHILD_SETTID' flag will cause the same address to be filled with the thread's
  * TID. */
-PUBLIC ATTR_PERTASK USER CHECKED pid_t *this_tid_address = NULL;
+PUBLIC ATTR_PERTASK ATTR_ALIGN(USER CHECKED pid_t *) this_tid_address = NULL;
 
 DEFINE_PERMMAN_ONEXEC(reset_user_except_handler);
 PRIVATE ATTR_USED NOBLOCK void

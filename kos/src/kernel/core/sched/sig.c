@@ -66,7 +66,7 @@
 DECL_BEGIN
 
 /* Root connections set. */
-PUBLIC ATTR_PERTASK struct task_connections this_root_connections = {
+PUBLIC ATTR_PERTASK ATTR_ALIGN(struct task_connections) this_root_connections = {
 	.tsc_prev   = NULL,
 	.tcs_thread = NULL,
 	.tcs_con    = NULL,
@@ -76,7 +76,8 @@ PUBLIC ATTR_PERTASK struct task_connections this_root_connections = {
 
 /* [1..1][lock(PRIVATE(THIS_TASK))]  Current   set   of   in-use   connections.
  * Most of the time, this will simply point to `PERTASK(this_root_connections)' */
-PUBLIC ATTR_PERTASK struct task_connections *this_connections = &this_root_connections;
+PUBLIC ATTR_PERTASK ATTR_ALIGN(struct task_connections *)
+this_connections = &this_root_connections;
 
 
 INTERN NOBLOCK NONNULL((1)) void

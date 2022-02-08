@@ -853,7 +853,7 @@ LIST_HEAD(userelf_module_list, userelf_module);
 SLIST_HEAD(userelf_module_slist, userelf_module);
 
 /* [0..n][lock(mman::mm_lock)] Per-mman UserELF Module Cache */
-PRIVATE ATTR_PERMMAN struct REF userelf_module_list
+PRIVATE ATTR_PERMMAN ATTR_ALIGN(struct REF userelf_module_list)
 thismman_uemc = LIST_HEAD_INITIALIZER(thismman_uemc);
 
 

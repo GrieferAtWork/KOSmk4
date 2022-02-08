@@ -61,13 +61,13 @@ DECL_BEGIN
  * Pending RPCs. (Set of `THIS_RPCS_TERMINATED' when RPCs may no longer
  * be executed, and all that were there prior to this becoming the case
  * are/were serviced with `RPC_REASONCTX_SHUTDOWN') */
-PUBLIC ATTR_PERTASK struct pending_rpc_slist this_rpcs = SLIST_HEAD_INITIALIZER(this_rpcs);
+PUBLIC ATTR_PERTASK ATTR_ALIGN(struct pending_rpc_slist) this_rpcs = SLIST_HEAD_INITIALIZER(this_rpcs);
 
 /* A  signal that is broadcast whenever something is added to `this_rpcs'
  * This signal is _only_ used  to implement `signalfd(2)', as you're  not
  * normally supposed to "wait" for signals to arrive; you just always get
  * a sporadic interrupt once they do arrive. */
-PUBLIC ATTR_PERTASK struct sig this_rpcs_sig = SIG_INIT;
+PUBLIC ATTR_PERTASK ATTR_ALIGN(struct sig) this_rpcs_sig = SIG_INIT;
 
 /* High-level RPC scheduling function.
  * This is the kernel-equivalent of the userspace `rpc_exec()' from <kos/rpc.h>

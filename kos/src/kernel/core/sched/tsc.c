@@ -54,7 +54,7 @@ typedef __CRT_PRIVATE_UINT(__SIZEOF_SUSECONDS_T__) unsigned_suseconds_t;
 
 
 /* [const] Initial timestamp of when this thread started. */
-PUBLIC ATTR_PERTASK ktime_t this_starttime = 0;
+PUBLIC ATTR_PERTASK ATTR_ALIGN(ktime_t) this_starttime = 0;
 
 /* [lock(PRIVATE(THIS_CPU))]
  * Timestamp of the last time  this thread was last  preempted.
@@ -63,7 +63,7 @@ PUBLIC ATTR_PERTASK ktime_t this_starttime = 0;
  *
  * For the current thread, this indicates the point in
  * time  since when the  caller has ran uninterrupted. */
-PUBLIC ATTR_PERTASK ktime_t this_stoptime = 0;
+PUBLIC ATTR_PERTASK ATTR_ALIGN(ktime_t) this_stoptime = 0;
 
 /* [lock(PRIVATE(THIS_CPU))]
  * Total time  this thread  spent being  active, as  measured  since
@@ -71,7 +71,7 @@ PUBLIC ATTR_PERTASK ktime_t this_stoptime = 0;
  * recent quantum  (iow:  for  your own  thread,  to  calculate  the
  * correct value, use `this_activetime + (ktime() - this_stoptime)',
  * but make  sure to  disable preemption  during this  calculation). */
-PUBLIC ATTR_PERTASK ktime_t this_activetime = 0;
+PUBLIC ATTR_PERTASK ATTR_ALIGN(ktime_t) this_activetime = 0;
 
 
 

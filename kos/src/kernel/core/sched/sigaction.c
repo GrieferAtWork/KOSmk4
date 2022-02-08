@@ -61,7 +61,7 @@ DECL_BEGIN
 
 /* [0..1][valid_if(!TASK_FKERNTHREAD)][lock(PRIVATE(THIS_TASK))]
  * User-space  signal   handlers   for   the   calling   thread. */
-PUBLIC ATTR_PERTASK REF struct sighand_ptr *this_sighand_ptr = NULL;
+PUBLIC ATTR_PERTASK ATTR_ALIGN(REF struct sighand_ptr *) this_sighand_ptr = NULL;
 
 DEFINE_PERTASK_FINI(fini_this_sighand_ptr);
 PRIVATE NOBLOCK ATTR_USED void

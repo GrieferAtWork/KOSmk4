@@ -126,14 +126,14 @@ PUBLIC ATTR_PERCPU struct segment thiscpu_x86_ldt[LDT_SEGMENT_COUNT] = {
 
 /* The per-task value written to `t_psp0' during scheduler preemption.
  * HINT: Initialized by `_task_init_arch_sstate()' */
-PUBLIC ATTR_PERTASK uintptr_t _this_x86_kernel_psp0 ASMNAME("this_x86_kernel_psp0") = 0;
+PUBLIC ATTR_PERTASK ATTR_ALIGN(uintptr_t) _this_x86_kernel_psp0 ASMNAME("this_x86_kernel_psp0") = 0;
 
 #ifndef __x86_64__
 /* The  per-task values with which the `SEGMENT_USER_FSBASE' and
  * `SEGMENT_USER_GSBASE' segments are populated during scheduler
  * preemption. */
-PUBLIC ATTR_PERTASK uintptr_t this_x86_user_fsbase = 0;
-PUBLIC ATTR_PERTASK uintptr_t this_x86_user_gsbase = 0;
+PUBLIC ATTR_PERTASK ATTR_ALIGN(uintptr_t) this_x86_user_fsbase = 0;
+PUBLIC ATTR_PERTASK ATTR_ALIGN(uintptr_t) this_x86_user_gsbase = 0;
 #endif /* !__x86_64__ */
 
 #define WORD64(a, b) (u64)((u64)(u32)(a) | (u64)(u32)(b) << 32)
