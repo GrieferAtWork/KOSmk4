@@ -280,9 +280,21 @@ NOTHROW(LIBCCALL pthread_exit_thread)(struct pthread *__restrict me, int exitcod
 	__builtin_unreachable();
 }
 
+
+/* Allow these to  be overwritten on  a per-architecture  basis.
+ * This makes it possible for assembly to pass arguments through
+ * registers to `libc_pthread_main()' in the most efficient way. */
+#ifndef LIBC_PTHREAD_MAIN_CC
+#define LIBC_PTHREAD_MAIN_CC __FCALL
+#endif /* !LIBC_PTHREAD_MAIN_CC */
+#ifndef LIBC_PTHREAD_MAIN_ARGS
+#define LIBC_PTHREAD_MAIN_ARGS     \
+	struct pthread *__restrict me, \
+	void *(LIBCCALL start)(void *arg)
+#endif /* !LIBC_PTHREAD_MAIN_ARGS */
+
 INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.sched.pthread") void
-NOTHROW(__FCALL libc_pthread_main)(struct pthread *__restrict me,
-                                   void *(LIBCCALL start)(void *arg)) {
+NOTHROW(LIBC_PTHREAD_MAIN_CC libc_pthread_main)(LIBC_PTHREAD_MAIN_ARGS) {
 	/* NOTE: At this point, me == &current */
 	int exitcode = 0;
 	/* Apply the initial affinity mask (if given) */

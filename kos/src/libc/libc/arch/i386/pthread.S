@@ -85,16 +85,19 @@ END(libc_handle)
 INTERN_FUNCTION(libc_pthread_clone)
 	.cfi_startproc
 #ifndef __x86_64__
-	pushP_cfi_r %Pbx                          /* For `R_syscall0P' */
+	pushP_cfi_r %Pbx /* For `R_syscall0P' */
+	pushP_cfi_r %Pdi /* For `void *(LIBCCALL start)(void *arg)' */
 #endif /* !__x86_64__ */
 
 	/* Load argument 0: `struct clone_args *args' */
 #ifdef __x86_64__
-	movP   %R_fcall1P, %Pdx                   /* %Pdx = %Psi (struct pthread *__restrict thread) */
-/*	movP   %R_fcall0P, %R_syscall0P */        /* %Pdi = %Pdi */
+	movP   %R_fcall1P,                    %Pdx /* %Pdx = %Psi                    -- struct pthread *__restrict thread */
+	movP   SIZEOF_CLONE_ARGS(%R_fcall0P), %r8  /* %r10 = SIZEOF_CLONE_ARGS(%Pdi) -- void *(LIBCCALL start)(void *arg) */
+/*	movP   %R_fcall0P, %R_syscall0P */         /* %Pdi = %Pdi */
 #else /* __x86_64__ */
-/*	movP   %R_fcall1P, %Pdx */                /* %Pdx = %Pdx (struct pthread *__restrict thread) */
-	movP   %R_fcall0P, %R_syscall0P           /* %Pbx = %Pcx */
+/*	movP   %R_fcall1P, %Pdx */                 /* %Pdx = %Pdx                    -- struct pthread *__restrict thread */
+	movP   SIZEOF_CLONE_ARGS(%R_fcall0P), %Pdi /* %Pdi = SIZEOF_CLONE_ARGS(%Pdi) -- void *(LIBCCALL start)(void *arg) */
+	movP   %R_fcall0P, %R_syscall0P            /* %Pbx = %Pcx */
 #endif /* !__x86_64__ */
 
 	/* Load argument 1: `size_t size' */
@@ -105,13 +108,9 @@ INTERN_FUNCTION(libc_pthread_clone)
 	syscall /* NOTE: Can't use `libc___i386_syscall', because that one needs
 	         * the stack (which the child doesn't have upon syscall  return) */
 
-	/* Load FCALL arguments for `libc_pthread_main' */
-#ifdef __x86_64__
-	movP   SIZEOF_CLONE_ARGS(%R_syscall0P), %R_fcall1P /* %Psi = SIZEOF_CLONE_ARGS(%Pdi) -- void *(LIBCCALL start)(void *arg) */
-	movP   %Pdx,                            %R_fcall0P /* %Pdi = %Pdx                    -- struct pthread *__restrict me */
-#else /* __x86_64__ */
-	movP   %Pdx,                            %R_fcall0P /* %Pcx = %Pdx                    -- struct pthread *__restrict me */
-	movP   SIZEOF_CLONE_ARGS(%R_syscall0P), %R_fcall1P /* %Pdx = SIZEOF_CLONE_ARGS(%Pbx) -- void *(LIBCCALL start)(void *arg) */
+#ifndef __x86_64__
+	/* Load missing FCALL argument for `libc_pthread_main': */
+	movP   %Pdi, %Pcx /* %Pcx = void *(LIBCCALL start)(void *arg) */
 #endif /* !__x86_64__ */
 
 	/* Check  if we're inside  of the child thread.
@@ -123,47 +122,47 @@ INTERN_FUNCTION(libc_pthread_clone)
 	jz     libc_pthread_main
 
 #ifndef __x86_64__
-	popP_cfi_r %Pbx                           /* For `R_syscall0P' */
+	popP_cfi_r %Pdi /* For `void *(LIBCCALL start)(void *arg)' */
+	popP_cfi_r %Pbx /* For `R_syscall0P' */
 #endif /* !__x86_64__ */
 	ret
 	.cfi_endproc
 END(libc_pthread_clone)
 
 
+/* >> INTDEF ATTR_NORETURN void FCALL
+ * >> libc_pthread_unmap_stack_and_exit(void *stackaddr,
+ * >>                                   size_t stacksize,
+ * >>                                   int    exitcode); */
 .section .text.crt.sched.pthread
 INTERN_FUNCTION(libc_pthread_unmap_stack_and_exit)
-#ifdef __x86_64__
-	/* INTDEF ATTR_NORETURN void __FCALL
-	 * libc_pthread_unmap_stack_and_exit(%rdi: void *stackaddr,
-	 *                                   %rsi: size_t stacksize,
-	 *                                   %rdx: int exitcode); */
-	movq   %rdx, %rbp          /* int exitcode */
-	movq   $(SYS_munmap), %rax
-	syscall                    /* unmap our own stack. */
-	/* WARNING: No more accessing stack memory from here on! */
-
-	movq   %rbp,        %rdi   /* int exitcode */
-	movq   $(SYS_exit), %rax
-	syscall
-#else /* __x86_64__ */
-	/* INTDEF ATTR_NORETURN void __FCALL
-	 * libc_pthread_unmap_stack_and_exit(void *stackaddr,
-	 *                                   size_t stacksize,
-	 *                                   int    exitcode); */
 	/* NOTE: We  must use `int 80h' for syscalls here, since the (more efficient)
 	 *       method of using `__i386_syscall()' would require use of stack memory
 	 *       _after_ we've already unmapped the stack. */
-	movl   4(%esp), %esp       /* int exitcode */
-	movl   %ecx,          %ebx /* munmap:addr = void *stackaddr */
-	movl   %edx,          %ecx /* munmap:len  = size_t stacksize */
-	movl   $(SYS_munmap), %eax
-	int    $(0x80)             /* unmap our own stack. */
+
+#ifdef __x86_64__
+	movq   %R_sysvabi2P, %Psp          /* %Psp = %Pdx -- int exitcode */
+#else /* __x86_64__ */
+	movP   PS(%Psp), %Psp              /* %Psp = ...  -- int exitcode */
+#endif /* !__x86_64__ */
+
+#ifdef __x86_64__
+//	movP   %R_sysvabi0P, %R_syscall0P  /* %Pdi = %Pdi -- munmap:addr = void *stackaddr */
+//	movP   %R_sysvabi1P, %R_syscall1P  /* %Psi = %Psi -- munmap:len  = size_t stacksize */
+#else /* __x86_64__ */
+	movP   %R_fcall0P, %R_syscall0P    /* %Pbx = %Pcx -- munmap:addr = void *stackaddr */
+	movP   %R_fcall1P, %R_syscall1P    /* %Pcx = %Pdx -- munmap:len  = size_t stacksize */
+#endif /* !__x86_64__ */
+
+	movP   $(SYS_munmap), %Pax
+	syscall                    /* unmap our own stack. */
+
 	/* WARNING: No more accessing stack memory from here on! */
 
-	movl   %esp,        %ebx   /* int exitcode */
-	movl   $(SYS_exit), %eax
-	int    $(0x80)
-#endif /* !__x86_64__ */
+	movP   %Psp,        %R_syscall0P /* int exitcode */
+	movP   $(SYS_exit), %Pax
+	syscall
+
 	/* -unreachable- */
 	hlt
 END(libc_pthread_unmap_stack_and_exit)

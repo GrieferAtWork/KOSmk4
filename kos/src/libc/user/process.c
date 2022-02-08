@@ -126,7 +126,7 @@ NOTHROW_NCX(LIBCCALL libc__beginthreadex)(void *sec,
 	data->dtd_arg   = arg;
 	/* TODO: Don't call clone() here -- Instead, use pthread_create()! */
 	result = clone(&dos_thread_entry,
-	               CLONE_CHILDSTACK_AUTO,
+	               (void *)-1, /* TODO: CLONE_CHILDSTACK_AUTO isn't supported by KOSmk4! */
 	               CLONE_VM | CLONE_FS | CLONE_FILES |
 	               CLONE_SIGHAND | CLONE_THREAD,
 	               arg);

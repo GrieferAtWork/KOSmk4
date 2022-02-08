@@ -233,6 +233,22 @@
 
 DECL_BEGIN
 
+#ifdef __x86_64__
+#define LIBC_PTHREAD_MAIN_CC __ATTR_SYSVABI
+#define LIBC_PTHREAD_MAIN_ARGS                \
+	uintptr_t UNUSED(__ignored_Pdi),          \
+	uintptr_t UNUSED(__ignored_Psi),          \
+	struct pthread *__restrict me, /* %Pdx */ \
+	uintptr_t UNUSED(__ignored_Pcx),          \
+	void *(LIBCCALL start)(void *arg) /* %r8 */
+#else /* __x86_64__ */
+#define LIBC_PTHREAD_MAIN_CC __FCALL
+#define LIBC_PTHREAD_MAIN_ARGS                    \
+	void *(LIBCCALL start)(void *arg), /* %Pcx */ \
+	struct pthread *__restrict me      /* %Pdx */
+#endif /* !__x86_64__ */
+
+
 struct ucpustate;
 struct fpustate;
 struct rpc_syscall_info;
