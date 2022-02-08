@@ -293,7 +293,6 @@ DECL_END
 #define RBTREE_ISRED(self)    ((self)->tn_flags & TRACE_NODE_FLAG_ISRED)
 #define RBTREE_SETRED(self)   ((self)->tn_flags |= TRACE_NODE_FLAG_ISRED)
 #define RBTREE_SETBLACK(self) ((self)->tn_flags &= ~TRACE_NODE_FLAG_ISRED)
-#ifdef CONFIG_HAVE_DEBUGGER
 #define RBTREE_WANT_MINMAXLOCATE
 #define RBTREE_WANT_PREV_NEXT_NODE
 #ifdef RBTREE_LEFT_LEANING
@@ -304,7 +303,6 @@ DECL_END
 #define tm_nodes_nextnode(node) trace_node_tree_nextnode(node)
 #endif /* !RBTREE_LEFT_LEANING */
 #define tm_nodes_minmaxlocate(minkey, maxkey, result) trace_node_tree_minmaxlocate(tm_nodes, minkey, maxkey, result)
-#endif /* CONFIG_HAVE_DEBUGGER */
 #include <hybrid/sequence/rbtree-abi.h>
 
 DECL_BEGIN
@@ -1903,6 +1901,40 @@ again:
 		goto next; /* Can't trace outside of kernel-space. */
 	if (self->mn_part == NULL)
 		goto next; /* Don't consider reserved mappings as leaks. */
+
+	/* There is a chance during  our leak scan, _all_ kernel  pointers
+	 * which we _did_ find, actually pointed directly into fully valid
+	 * trace-malloc nodes.
+	 *
+	 * If you look at `gc_reachable_pointer()', you will see that we
+	 * only mark mnode-s as `MNODE_F__REACH' when we don't manage to
+	 * find any trace-nodes at the reachable address.
+	 *
+	 * As such, we  have to make  up for not  marking mem-nodes if  we
+	 * find trace-nodes now, by  simply not considering any  seemingly
+	 * unreachable nodes as truly unreachable, if there are any trace-
+	 * nodes  within the range  of the mem-node  that are _NOT_ leaks.
+	 *
+	 * Also  note that for this purpose, we also consider nodes marked
+	 * to be non-leaking as indicators that any backing mem-nodes also
+	 * isn't being leaked. */
+	{
+		trace_node_tree_minmax_t mima;
+		tm_nodes_minmaxlocate((uintptr_t)mnode_getminaddr(self),
+		                      (uintptr_t)mnode_getmaxaddr(self),
+		                      &mima);
+		if (mima.mm_min) {
+			for (;;) {
+				if (mima.mm_min->tn_reach == gc_version)
+					goto next; /* (seemingly) unreachable mem-node contains reachable trace-node */
+				if (mima.mm_min->tn_flags & TRACE_NODE_FLAG_NOLEAK)
+					goto next; /* (seemingly) unreachable mem-node contains non-leaking trace-node */
+				if (mima.mm_min == mima.mm_max)
+					break;
+				mima.mm_min = tm_nodes_nextnode(mima.mm_min);
+			}
+		}
+	}
 
 	/* NOTE: There may be  more situations where  a mem-node  should
 	 *       be considered reachable, even when no pointers pointing
