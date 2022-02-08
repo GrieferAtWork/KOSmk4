@@ -2591,19 +2591,34 @@ $errno_t pthread_key_delete(pthread_key_t key);
 @@@return: NULL: The current value is `NULL'
 @@@return: NULL: No value has been bound, yet
 @@@return: NULL: Invalid `key'
-[[wunused, export_alias("tss_get")]]
+[[wunused, userimpl, export_alias("tss_get")]]
 [[decl_include("<bits/crt/pthreadtypes.h>")]]
-void *pthread_getspecific(pthread_key_t key);
+[[requires_function(pthread_getspecificptr_np)]]
+void *pthread_getspecific(pthread_key_t key) {
+	void **slot = pthread_getspecificptr_np(key);
+	return likely(slot) ? *slot : NULL;
+}
 
 @@>> pthread_setspecific(3)
 @@Store POINTER in the thread-specific data slot identified by `key'
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid `key'
-@@@return: ENOMEM: `pointer'  is non-`NULL', `key' had yet to be allowed for the
-@@                 calling thread, and an attempt to allocate it just now failed
+@@@return: ENOMEM: `pointer' is non-`NULL', `key' had yet to be allocated for the
+@@                 calling  thread, and an attempt to allocate it just now failed
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[export_alias("thr_setspecific")]]
 $errno_t pthread_setspecific(pthread_key_t key, void const *pointer);
+
+%#ifdef __USE_KOS
+@@>> pthread_getspecificptr_np(3)
+@@Return a pointer to the per-thread storage location associated with `key'
+@@@return: * :   The address read/written by `pthread_getspecific()' / `pthread_setspecific()'
+@@@return: NULL: `key' had yet to be allocated for the calling thread,
+@@               and an  attempt  to  allocate  it  just  now  failed.
+@@@return: NULL: Invalid `key'.
+[[wunused, decl_include("<bits/crt/pthreadtypes.h>")]]
+void **pthread_getspecificptr_np(pthread_key_t key);
+%#endif /* __USE_KOS */
 
 %#ifdef __USE_XOPEN2K
 @@>> pthread_getcpuclockid(3)

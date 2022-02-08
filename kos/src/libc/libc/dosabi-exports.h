@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x758b122e */
+/* HASH CRC-32:0x3e164feb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1297,6 +1297,7 @@ DEFINE_PUBLIC_ALIAS(DOS$tss_get, libd_pthread_getspecific);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_getspecific, libd_pthread_getspecific);
 DEFINE_PUBLIC_ALIAS(DOS$thr_setspecific, libd_pthread_setspecific);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_setspecific, libd_pthread_setspecific);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_getspecificptr_np, libd_pthread_getspecificptr_np);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_getcpuclockid, libd_pthread_getcpuclockid);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_atfork, libd_pthread_atfork);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_set_num_processors_np, libd_pthread_set_num_processors_np);

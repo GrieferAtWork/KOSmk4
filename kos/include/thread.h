@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81e0a41a */
+/* HASH CRC-32:0xaeede27c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -240,21 +240,21 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIB
  * Store POINTER in the thread-specific data slot identified by `key'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `key'
- * @return: ENOMEM: `pointer'  is non-`NULL', `key' had yet to be allowed for the
- *                  calling thread, and an attempt to allocate it just now failed */
+ * @return: ENOMEM: `pointer' is non-`NULL', `key' had yet to be allocated for the
+ *                  calling  thread, and an attempt to allocate it just now failed */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,thr_setspecific,(thread_key_t __key, void *__val),pthread_setspecific,(__key,__val))
 #elif defined(__CRT_HAVE_thr_setspecific)
 /* >> pthread_setspecific(3)
  * Store POINTER in the thread-specific data slot identified by `key'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `key'
- * @return: ENOMEM: `pointer'  is non-`NULL', `key' had yet to be allowed for the
- *                  calling thread, and an attempt to allocate it just now failed */
+ * @return: ENOMEM: `pointer' is non-`NULL', `key' had yet to be allocated for the
+ *                  calling  thread, and an attempt to allocate it just now failed */
 __CDECLARE(,__errno_t,__NOTHROW_NCX,thr_setspecific,(thread_key_t __key, void *__val),(__key,__val))
 #endif /* ... */
 #ifdef __CRT_HAVE_thr_getspecific
 __CDECLARE(,__errno_t,__NOTHROW_NCX,thr_getspecific,(thread_key_t __key, void **__p_val),(__key,__p_val))
-#elif (defined(__CRT_HAVE_pthread_getspecific) || defined(__CRT_HAVE_tss_get)) && (defined(__CRT_HAVE_pthread_setspecific) || defined(__CRT_HAVE_thr_setspecific))
+#elif (defined(__CRT_HAVE_pthread_getspecific) || defined(__CRT_HAVE_tss_get) || defined(__CRT_HAVE_pthread_getspecificptr_np)) && (defined(__CRT_HAVE_pthread_setspecific) || defined(__CRT_HAVE_thr_setspecific))
 #include <libc/local/thread/thr_getspecific.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(thr_getspecific, __FORCELOCAL __ATTR_ARTIFICIAL __errno_t __NOTHROW_NCX(__LIBCCALL thr_getspecific)(thread_key_t __key, void **__p_val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thr_getspecific))(__key, __p_val); })
 #endif /* ... */

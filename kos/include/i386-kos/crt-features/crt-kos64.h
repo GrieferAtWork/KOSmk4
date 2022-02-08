@@ -3290,6 +3290,7 @@
 #define __CRT_HAVE_pthread_getname_np
 #define __CRT_HAVE_pthread_getschedparam
 #define __CRT_HAVE_pthread_getspecific
+#define __CRT_HAVE_pthread_getspecificptr_np
 #define __CRT_HAVE_pthread_gettid_np
 #define __CRT_HAVE_pthread_join
 #define __CRT_HAVE_pthread_key_create
@@ -8237,6 +8238,7 @@
 #define __CRT_HAVE_KOS$pthread_getname_np
 #define __CRT_HAVE_KOS$pthread_getschedparam
 #define __CRT_HAVE_KOS$pthread_getspecific
+#define __CRT_HAVE_KOS$pthread_getspecificptr_np
 #define __CRT_HAVE_KOS$pthread_gettid_np
 #define __CRT_HAVE_KOS$pthread_join
 #define __CRT_HAVE_KOS$pthread_key_delete
@@ -12231,6 +12233,7 @@
 #define __CRT_HAVE_DOS$pthread_getname_np
 #define __CRT_HAVE_DOS$pthread_getschedparam
 #define __CRT_HAVE_DOS$pthread_getspecific
+#define __CRT_HAVE_DOS$pthread_getspecificptr_np
 #define __CRT_HAVE_DOS$pthread_gettid_np
 #define __CRT_HAVE_DOS$pthread_join
 #define __CRT_HAVE_DOS$pthread_key_delete

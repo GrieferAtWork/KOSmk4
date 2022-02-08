@@ -366,12 +366,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 	/* Initialize the new thread's initial userprocmask structure,
 	 * such  that it will  lazily initialize it  the first time it
 	 * performs a call to `sigprocmask(2)'. */
-	memset(&pt->pt_pmask, 0, offsetof(struct userprocmask, pm_pending));
+	bzero(&pt->pt_pmask, offsetof(struct userprocmask, pm_pending));
 #if USERPROCMASK_FLAG_NORMAL != 0
 	pt->pt_pmask.lpm_pmask.pm_flags = USERPROCMASK_FLAG_NORMAL;
 #endif /* USERPROCMASK_FLAG_NORMAL != 0 */
 	pt->pt_pmask.lpm_pmask.pm_sigsize = sizeof(sigset_t);
-/*	pt->pt_pmask.lpm_pmask.pm_sigmask = NULL; */ /* Already done by the memset (NULL means not-yet-initialized) */
+/*	pt->pt_pmask.lpm_pmask.pm_sigmask = NULL; */ /* Already done by the bzero (NULL means not-yet-initialized) */
 #endif /* __LIBC_CONFIG_HAVE_USERPROCMASK */
 	pt->pt_refcnt    = 2;
 	pt->pt_flags     = PTHREAD_FNORMAL;
@@ -4154,6 +4154,7 @@ NOTHROW_NCX(LIBCCALL get_pthread_tls_segment)(void) {
 		                    /* perthread_callback_arg: */ NULL);
 		if unlikely(!handle)
 			return NULL;
+
 		/* Remember the handle. */
 		real_handle = ATOMIC_CMPXCH_VAL(tls_handle, NULL, handle);
 		if unlikely(real_handle != NULL) {
@@ -4161,8 +4162,10 @@ NOTHROW_NCX(LIBCCALL get_pthread_tls_segment)(void) {
 			handle = real_handle;
 		}
 	}
+
 	/* Now load the segment for the calling thread. */
 	result = dltlsaddr(handle);
+
 	/* And return its address. */
 	return (struct pthread_tls_segment *)result;
 }
@@ -4183,27 +4186,34 @@ NOTHROW_NCX(LIBCCALL get_pthread_tls_slot)(size_t id) {
 	self = get_pthread_tls_segment();
 	if unlikely(!self)
 		return NULL;
+
+	/* Check if the given `id' is allocated. */
 	if unlikely(id >= self->pts_alloc) {
 		void *old_base, *new_base;
+
 		/* Must allocate more memory. */
 		old_base = self->pts_values;
 		if (old_base == self->pts_static)
 			old_base = NULL;
+
 		/* Use recalloc(), so we automatically zero-initialize newly
 		 * allocated slots. */
 		new_base = recalloc(old_base, id + 1, sizeof(void *));
 		if unlikely(!new_base)
 			return NULL;
+
 		/* If the old base was the static vector, then we must
 		 * manually copy over old TLS values. */
 		if (old_base == self->pts_static) {
 			memcpy(new_base, self->pts_static,
 			       self->pts_alloc, sizeof(void *));
 		}
+
 		/* Write-back updated TLS values. */
 		self->pts_alloc  = id + 1;
 		self->pts_values = (void **)new_base;
 	}
+
 	/* Return the pointer to the appropriate slot. */
 	return &self->pts_values[id];
 }
@@ -4357,23 +4367,25 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getspecific)(pthread_key_t key)
 	} else {
 		void **slot;
 		tls_endread();
+
 		/* Lookup the slot for `key' */
 		slot = get_pthread_tls_slot((size_t)key);
+
 		/* Load the value of `slot' */
-		if (slot)
+		if likely(slot)
 			result = *slot;
 	}
 	return result;
 }
 /*[[[end:libc_pthread_getspecific]]]*/
 
-/*[[[head:libc_pthread_setspecific,hash:CRC-32=0x602a7428]]]*/
+/*[[[head:libc_pthread_setspecific,hash:CRC-32=0x2eeff4ed]]]*/
 /* >> pthread_setspecific(3)
  * Store POINTER in the thread-specific data slot identified by `key'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `key'
- * @return: ENOMEM: `pointer'  is non-`NULL', `key' had yet to be allowed for the
- *                  calling thread, and an attempt to allocate it just now failed */
+ * @return: ENOMEM: `pointer' is non-`NULL', `key' had yet to be allocated for the
+ *                  calling  thread, and an attempt to allocate it just now failed */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_setspecific)(pthread_key_t key,
                                                void const *pointer)
@@ -4388,21 +4400,50 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setspecific)(pthread_key_t key,
 		return EINVAL;
 	}
 	tls_endread();
+
 	/* Lookup the slot for `key' */
 	slot = get_pthread_tls_slot((size_t)key);
-	if (!slot)
+	if unlikely(!slot)
 		return ENOMEM;
+
 	/* Write the value to the slot. */
 	*slot = (void *)pointer;
 	return EOK;
 }
 /*[[[end:libc_pthread_setspecific]]]*/
 
+/*[[[head:libc_pthread_getspecificptr_np,hash:CRC-32=0x1e511275]]]*/
+/* >> pthread_getspecificptr_np(3)
+ * Return a pointer to the per-thread storage location associated with `key'
+ * @return: * :   The address read/written by `pthread_getspecific()' / `pthread_setspecific()'
+ * @return: NULL: `key' had yet to be allocated for the calling thread,
+ *                and an  attempt  to  allocate  it  just  now  failed.
+ * @return: NULL: Invalid `key'. */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED void **
+NOTHROW_NCX(LIBCCALL libc_pthread_getspecificptr_np)(pthread_key_t key)
+/*[[[body:libc_pthread_getspecificptr_np]]]*/
+{
+	void **result = NULL;
+	/* Verify that `key' is actually valid. */
+	tls_read();
+	if unlikely(!tls_keyok(key)) {
+		tls_endread();
+		/* Bad key! */
+	} else {
+		tls_endread();
+
+		/* Lookup the slot for `key' */
+		result = get_pthread_tls_slot((size_t)key);
+	}
+	return result;
+}
+/*[[[end:libc_pthread_getspecificptr_np]]]*/
 
 
 
 
-/*[[[start:exports,hash:CRC-32=0xce92074d]]]*/
+
+/*[[[start:exports,hash:CRC-32=0xd44aeeb1]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(DOS$pthread_create, libd_pthread_create);
 #endif /* !__LIBCCALL_IS_LIBDCALL */
@@ -4548,6 +4589,7 @@ DEFINE_PUBLIC_ALIAS(tss_get, libc_pthread_getspecific);
 DEFINE_PUBLIC_ALIAS(pthread_getspecific, libc_pthread_getspecific);
 DEFINE_PUBLIC_ALIAS(thr_setspecific, libc_pthread_setspecific);
 DEFINE_PUBLIC_ALIAS(pthread_setspecific, libc_pthread_setspecific);
+DEFINE_PUBLIC_ALIAS(pthread_getspecificptr_np, libc_pthread_getspecificptr_np);
 DEFINE_PUBLIC_ALIAS(pthread_getcpuclockid, libc_pthread_getcpuclockid);
 DEFINE_PUBLIC_ALIAS(pthread_atfork, libc_pthread_atfork);
 /*[[[end:exports]]]*/

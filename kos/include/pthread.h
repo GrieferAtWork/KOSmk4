@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a1b17e2 */
+/* HASH CRC-32:0xc4541fce */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2460,24 +2460,42 @@ __CDECLARE(__ATTR_WUNUSED,void *,__NOTHROW_NCX,pthread_getspecific,(pthread_key_
  * @return: NULL: No value has been bound, yet
  * @return: NULL: Invalid `key' */
 __CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,pthread_getspecific,(pthread_key_t __key),tss_get,(__key))
+#elif defined(__CRT_HAVE_pthread_getspecificptr_np)
+#include <libc/local/pthread/pthread_getspecific.h>
+/* >> pthread_getspecific(3)
+ * Return current value of the thread-specific data slot identified by `key'
+ * @return: * :   The value currently associated with `key' in the calling thread
+ * @return: NULL: The current value is `NULL'
+ * @return: NULL: No value has been bound, yet
+ * @return: NULL: Invalid `key' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_getspecific, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED void *__NOTHROW_NCX(__LIBCCALL pthread_getspecific)(pthread_key_t __key) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_getspecific))(__key); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_setspecific
 /* >> pthread_setspecific(3)
  * Store POINTER in the thread-specific data slot identified by `key'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `key'
- * @return: ENOMEM: `pointer'  is non-`NULL', `key' had yet to be allowed for the
- *                  calling thread, and an attempt to allocate it just now failed */
+ * @return: ENOMEM: `pointer' is non-`NULL', `key' had yet to be allocated for the
+ *                  calling  thread, and an attempt to allocate it just now failed */
 __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_setspecific,(pthread_key_t __key, void const *__pointer),(__key,__pointer))
 #elif defined(__CRT_HAVE_thr_setspecific)
 /* >> pthread_setspecific(3)
  * Store POINTER in the thread-specific data slot identified by `key'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `key'
- * @return: ENOMEM: `pointer'  is non-`NULL', `key' had yet to be allowed for the
- *                  calling thread, and an attempt to allocate it just now failed */
+ * @return: ENOMEM: `pointer' is non-`NULL', `key' had yet to be allocated for the
+ *                  calling  thread, and an attempt to allocate it just now failed */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_setspecific,(pthread_key_t __key, void const *__pointer),thr_setspecific,(__key,__pointer))
 #endif /* ... */
+#ifdef __USE_KOS
+/* >> pthread_getspecificptr_np(3)
+ * Return a pointer to the per-thread storage location associated with `key'
+ * @return: * :   The address read/written by `pthread_getspecific()' / `pthread_setspecific()'
+ * @return: NULL: `key' had yet to be allocated for the calling thread,
+ *                and an  attempt  to  allocate  it  just  now  failed.
+ * @return: NULL: Invalid `key'. */
+__CDECLARE_OPT(__ATTR_WUNUSED,void **,__NOTHROW_NCX,pthread_getspecificptr_np,(pthread_key_t __key),(__key))
+#endif /* __USE_KOS */
 #ifdef __USE_XOPEN2K
 /* >> pthread_getcpuclockid(3)
  * Get the ID of CPU-time clock for thread `pthread'

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ad42ee2 */
+/* HASH CRC-32:0x9947be87 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -616,6 +616,12 @@ __CREDIRECT(,void *,__NOTHROW_NCX,tss_get,(tss_t __tss_id),pthread_getspecific,(
  * Return the calling thread's value for the given TLS key (s.a. `pthread_getspecific(3)')
  * @return: * : The calling thread's value of the given TLS variable */
 __CDECLARE(,void *,__NOTHROW_NCX,tss_get,(tss_t __tss_id),(__tss_id))
+#elif defined(__CRT_HAVE_pthread_getspecificptr_np)
+#include <libc/local/pthread/pthread_getspecific.h>
+/* >> tss_get(3)
+ * Return the calling thread's value for the given TLS key (s.a. `pthread_getspecific(3)')
+ * @return: * : The calling thread's value of the given TLS variable */
+__FORCELOCAL __ATTR_ARTIFICIAL void *__NOTHROW_NCX(__LIBCCALL tss_get)(tss_t __tss_id) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_getspecific))((__pthread_key_t)__tss_id); }
 #endif /* ... */
 #ifdef __CRT_HAVE_tss_set
 /* >> tss_set(3)

@@ -3473,6 +3473,7 @@
 #define __CRT_HAVE_pthread_getname_np
 #define __CRT_HAVE_pthread_getschedparam
 #define __CRT_HAVE_pthread_getspecific
+#define __CRT_HAVE_pthread_getspecificptr_np
 #define __CRT_HAVE_pthread_gettid_np
 #define __CRT_HAVE_pthread_join
 #define __CRT_HAVE_pthread_key_create

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd9865aa */
+/* HASH CRC-32:0x3caf9ee2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -784,9 +784,16 @@ INTDEF WUNUSED void *NOTHROW_NCX(LIBDCALL libd_pthread_getspecific)(pthread_key_
  * Store POINTER in the thread-specific data slot identified by `key'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `key'
- * @return: ENOMEM: `pointer'  is non-`NULL', `key' had yet to be allowed for the
- *                  calling thread, and an attempt to allocate it just now failed */
+ * @return: ENOMEM: `pointer' is non-`NULL', `key' had yet to be allocated for the
+ *                  calling  thread, and an attempt to allocate it just now failed */
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_setspecific)(pthread_key_t key, void const *pointer);
+/* >> pthread_getspecificptr_np(3)
+ * Return a pointer to the per-thread storage location associated with `key'
+ * @return: * :   The address read/written by `pthread_getspecific()' / `pthread_setspecific()'
+ * @return: NULL: `key' had yet to be allocated for the calling thread,
+ *                and an  attempt  to  allocate  it  just  now  failed.
+ * @return: NULL: Invalid `key'. */
+INTDEF WUNUSED void **NOTHROW_NCX(LIBDCALL libd_pthread_getspecificptr_np)(pthread_key_t key);
 /* >> pthread_getcpuclockid(3)
  * Get the ID of CPU-time clock for thread `pthread'
  * @return: EOK: Success */
