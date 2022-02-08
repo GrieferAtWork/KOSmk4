@@ -264,6 +264,12 @@ task_clone_sighand(struct task *__restrict result,
 	if (clone_flags & CLONE_SIGHAND) {
 		/* Must share signal handlers. */
 		REF struct sighand_ptr *myptr;
+		if unlikely(!(clone_flags & CLONE_VM)) {
+			/* In order for signal handler sharing to make sense, memory must also be shared! */
+			THROW(E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION,
+			      E_INVALID_ARGUMENT_CONTEXT_CLONE_SIGHAND_WITHOUT_VM,
+			      clone_flags, CLONE_SIGHAND | CLONE_VM, CLONE_SIGHAND);
+		}
 		myptr = FORTASK(caller, this_sighand_ptr);
 		if (!myptr) {
 			/* Must allocate the signal handler table pointer so we can share it! */
@@ -543,9 +549,9 @@ again_release_kernel_and_cc:
 			struct scpustate *child_state;
 			KERNEL byte_t *kernel_stack;
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
-			kernel_stack = FORTASK(result, this_kernel_stacknode_).mn_maxaddr + 1;
+			kernel_stack = (KERNEL byte_t *)mnode_getendaddr(&FORTASK(result, this_kernel_stacknode_));
 #else /* __ARCH_STACK_GROWS_DOWNWARDS */
-			kernel_stack = FORTASK(result, this_kernel_stacknode_).mn_minaddr;
+			kernel_stack = (KERNEL byte_t *)mnode_getaddr(&FORTASK(result, this_kernel_stacknode_));
 #endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
 
 			/* Construct the initial scheduler CPU state from the caller-given `init_state' */
@@ -594,7 +600,7 @@ again_release_kernel_and_cc:
 				child_state = task_asyncrpc_push(child_state, &clone_set_child_tid, args->tca_child_tid);
 			}
 
-			/* Apply some finalizing transformations to `child_state' */
+			/* Apply some finalizing transformations to `child_state' (and `result') */
 			_task_init_arch_sstate(result, caller, &child_state);
 
 			/* Save the CPU context with which the child will launch */
@@ -619,11 +625,18 @@ again_release_kernel_and_cc:
 		{
 			struct fs *result_fs = FORTASK(caller, this_fs);
 			if (clone_flags & CLONE_FS) {
+				if unlikely(clone_flags & CLONE_NEWNS) {
+					THROW(E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION,
+					      E_INVALID_ARGUMENT_CONTEXT_CLONE_FS_WITH_NEWNS,
+					      (syscall_ulong_t)clone_flags,
+					      CLONE_FS | CLONE_NEWNS,
+					      CLONE_FS | CLONE_NEWNS);
+				}
 				result_fs = incref(result_fs);
 			} else {
 				result_fs = fs_clone(result_fs, (clone_flags & CLONE_NEWNS) != 0);
 			}
-			FORTASK(result, this_fs) = result_fs;
+			FORTASK(result, this_fs) = result_fs; /* Inherit reference */
 		}
 
 		/* Clone credentials */
