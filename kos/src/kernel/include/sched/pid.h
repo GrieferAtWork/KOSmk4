@@ -159,7 +159,7 @@ struct taskpid {
 	((__builtin_offsetof(struct taskpid, tp_pids) + \
 	  ((ns)->pn_ind + 1) * sizeof(struct taskpid_slot)))
 #define _taskpid_alloc(ns)  ((struct taskpid *)kmalloc(_taskpid_sizeof(ns), GFP_NORMAL))
-#define _taskpid_free(self) kfree(self)
+#define _taskpid_free(self) kfree(__COMPILER_REQTYPE(struct taskpid *, self))
 
 /* Destroy the given taskpid. */
 FUNDEF NOBLOCK NONNULL((1)) void

@@ -148,7 +148,7 @@ NOTHROW(LOCKOP_CC pidns_removepid_postlop)(Tobpostlockop(pidns) *__restrict self
 		taskpid_remove_from_namespaces_and_free(me);
 	} else {
 		/* Free the taskpid descriptor. */
-		_taskpid_free(self);
+		_taskpid_free(me);
 	}
 }
 
