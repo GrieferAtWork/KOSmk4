@@ -897,6 +897,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * >> void foo([[inout(count)]] void *buf, size_t count);     --> __attribute__((access(read_write, 1, 2))) void foo(void *buf, size_t count);
 	 */
 
+	/* TODO: Refactor `HANDLE_TYPE_TASK' --> `HANDLE_TYPE_PIDFD' */
+
 	return state;
 }
 

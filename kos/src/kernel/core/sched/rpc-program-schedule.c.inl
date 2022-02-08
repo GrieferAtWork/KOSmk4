@@ -314,13 +314,10 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 		target = pidns_lookup_srch(mypid->tp_ns, target_tid);
 		FINALLY_DECREF_UNLIKELY(target);
 
-		is_caller_potential_target = false;
-		if (target == mypid) {
-			is_caller_potential_target = true;
-		} else if (mode & RPC_DOMAIN_F_PROC) {
-			is_caller_potential_target = taskpid_getprocpid(target) ==
-			                             taskpid_getprocpid(mypid);
-		}
+		/* Check if the calling thread is a potential target. */
+		is_caller_potential_target = (target == mypid) ||
+		                             ((mode & RPC_DOMAIN_F_PROC) &&
+		                              taskpid_sameproc(target, mypid));
 
 		/* Schedule the RPC */
 		rpc->pr_user.pur_refcnt = 2; /* +1 for the target component's list. */

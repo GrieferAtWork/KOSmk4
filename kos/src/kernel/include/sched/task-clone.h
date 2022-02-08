@@ -116,7 +116,7 @@ DECL_BEGIN
  * @param: ARCH_CLONE__PARAMS: Additional, arch-specific parameters */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *KCALL
 task_clone(struct icpustate const *__restrict init_state,
-           uintptr_t clone_flags,
+           syscall_ulong_t clone_flags,
            USER UNCHECKED pid_t *parent_tidptr,
            USER UNCHECKED pid_t *child_tidptr
            ARCH_CLONE__PARAMS)

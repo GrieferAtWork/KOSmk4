@@ -73,6 +73,12 @@
 
 DECL_BEGIN
 
+#if !defined(NDEBUG) && !defined(NDEBUG_FINI)
+#define DBG_memset memset
+#else /* !NDEBUG && !NDEBUG_FINI */
+#define DBG_memset(...) (void)0
+#endif /* NDEBUG || NDEBUG_FINI */
+
 typedef void (KCALL *pertask_clone_t)(struct task *__restrict result, uintptr_t flags);
 INTDEF pertask_clone_t __kernel_pertask_clone_start[];
 INTDEF pertask_clone_t __kernel_pertask_clone_end[];
@@ -165,7 +171,7 @@ waitfor_vfork_completion(struct task *__restrict thread)
 PRIVATE NONNULL((1, 2)) void KCALL
 task_clone_sigmask(struct task *__restrict result,
                    struct task *__restrict caller,
-                   uintptr_t clone_flags) {
+                   syscall_ulong_t clone_flags) {
 	/* Clone the current signal mask. */
 	(void)clone_flags;
 	assert(arref_ptr(&FORTASK(result, this_kernel_sigmask)) == &kernel_sigmask_empty);
@@ -246,11 +252,12 @@ inherit_parent_userprocmask:
 }
 
 
+
 /* Clone the calling thread's signal handlers into `result'. */
 PRIVATE NONNULL((1, 2)) void KCALL
 task_clone_sighand(struct task *__restrict result,
                    struct task *__restrict caller,
-                   uintptr_t clone_flags) {
+                   syscall_ulong_t clone_flags) {
 	if (clone_flags & CLONE_SIGHAND) {
 		/* Must share signal handlers. */
 		REF struct sighand_ptr *myptr;
@@ -341,6 +348,29 @@ NOTHROW(KCALL x86_ioperm_bitmap_unset_write_access)(struct task *__restrict call
 #endif /* __i386__ || __x86_64__ */
 
 
+#ifdef __INTELLISENSE__
+PRIVATE NONNULL((1, 2)) void FCALL
+task_clone_thrdpid(struct task *__restrict result,
+                   struct task *__restrict caller,
+                   syscall_ulong_t clone_flags,
+                   USER UNCHECKED pid_t *parent_tidptr);
+PRIVATE NONNULL((1, 2)) void FCALL
+task_clone_procpid(struct task *__restrict result,
+                   struct task *__restrict caller,
+                   syscall_ulong_t clone_flags,
+                   USER UNCHECKED pid_t *parent_tidptr);
+#else /* __INTELLISENSE__ */
+DECL_END
+
+#define DEFINE_task_clone_thrdpid
+#include "task-clone-pid.c.inl"
+#define DEFINE_task_clone_procpid
+#include "task-clone-pid.c.inl"
+
+DECL_BEGIN
+#endif /* !__INTELLISENSE__ */
+
+
 
 /* High-level implementation for the `clone(2)' system call.
  * @param: init_state:    The CPU state of the thead that called `clone(2)'
@@ -352,7 +382,7 @@ NOTHROW(KCALL x86_ioperm_bitmap_unset_write_access)(struct task *__restrict call
  * @param: ARCH_CLONE__PARAMS: Additional, arch-specific parameters */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *KCALL
 task_clone(struct icpustate const *__restrict init_state,
-           uintptr_t clone_flags,
+           syscall_ulong_t clone_flags,
            USER UNCHECKED pid_t *parent_tidptr,
            USER UNCHECKED pid_t *child_tidptr
            ARCH_CLONE__PARAMS)
@@ -660,466 +690,11 @@ again_release_kernel_and_cc:
 		 *    to die right  now, can we  say for certain  that we're allowed  to
 		 *    create  a  new  thread, rather  than  do something  else,  such as
 		 *    handling a signal. */
-
-		/* TODO: All of the following is _way_ too complicated.
-		 * -> Split this stuff into different function
-		 * -> Have distinct call-paths for CLONE_THREAD and ~CLONE_THREAD
-		 * Also: code below can leak `result_pid' if interrupted at the wrong moment */
-		{
-			/* Figure out which PID namespace(s) the new thread should appear in. */
-			REF struct taskpid *result_pid;
-			REF struct taskpid *owner_pid;
-			struct procctl *owner_ctl;
-			REF struct pidns *result_pidns, *ns_iter;
-			struct taskpid *caller_pid;
-			struct procctl *result_ctl     = NULL;
-			REF struct procgrp *result_grp = NULL;
-#ifdef CONFIG_HAVE_USERPROCMASK
-			sigset_t caller_sigmask;
-			bool have_caller_sigmask = false;
-#endif /* CONFIG_HAVE_USERPROCMASK */
-
-			/* Figure out the caller's PID relationship */
-			caller_pid   = task_gettaskpid_of(caller);
-			result_pidns = caller_pid->tp_ns;
-
-			/* Figure out what will be the new thread's top-level PID namespace. */
-again_assign_pid:
-			if unlikely(clone_flags & CLONE_NEWPID) {
-				/* TODO: CLONE_THREAD must imply !CLONE_NEWPID */
-				result_pidns = pidns_alloc(result_pidns);
-			} else {
-				result_pidns = incref(result_pidns);
-			}
-
-			/* Allocate a PID descriptor for the new thread. */
-			TRY {
-				result_pid = _taskpid_alloc(result_pidns);
-			} EXCEPT {
-				decref_unlikely(result_pidns);
-				RETHROW();
-			}
-			result_pid->tp_refcnt = 2; /* +1: this_taskpid, +1: procctl_chlds_insert/procctl_thrds_insert */
-			awref_init(&result_pid->tp_thread, result);
-			sig_init(&result_pid->tp_changed);
-			result_pid->tp_status = 0;
-			result_pid->tp_SIGCLD = clone_flags & CSIGNAL;
-			if (result_pid->tp_SIGCLD == 0)
-				result_pid->tp_SIGCLD = SIGCLD;
-			result_pid->tp_ns             = result_pidns; /* Inherit reference */
-			FORTASK(result, this_taskpid) = result_pid;   /* Inherit reference */
-
-			/* Allocate process information. */
-			if (clone_flags & CLONE_THREAD) {
-				/* Simply case: create another thread within the calling process. */
-				owner_pid = taskpid_getprocpid(caller_pid);
-				assert(caller_pid->tp_pctl == owner_pid->tp_pctl);
-				result_pid->tp_proc = owner_pid;
-				ATOMIC_ADD(owner_pid->tp_refcnt, 2); /* +1: `owner_pid', +1: `result_pid->tp_proc' */
-				result_pid->tp_pctl = owner_pid->tp_pctl;
-				if (clone_flags & CLONE_DETACHED)
-					result->t_flags |= TASK_FDETACHED; /* Auto-reap on exit */
-			} else {
-				REF struct task *parent_proc;
-
-				/* Allocate a new process controller. */
-				TRY {
-					result_ctl = _procctl_alloc();
-				} EXCEPT {
-					decref_unlikely(result_pidns);
-					_taskpid_free(result_pid);
-					RETHROW();
-				}
-#ifndef CONFIG_NO_SMP
-				atomic_lock_init(&result_ctl->pc_thrds_lock);
-#endif /* !CONFIG_NO_SMP */
-				LIST_INIT(&result_ctl->pc_thrds_list);
-				atomic_rwlock_init(&result_ctl->pc_chlds_lock);
-				LIST_INIT(&result_ctl->pc_chlds_list);
-				sig_init(&result_ctl->pc_chld_changed);
-				/*result_ctl->pc_parent = ...;*/ /* Initialized next */
-				atomic_rwlock_init(&result_ctl->pc_sig_lock);
-				SLIST_INIT(&result_ctl->pc_sig_list);
-				sig_init(&result_ctl->pc_sig_more);
-				result_grp = taskpid_getprocgrp(caller_pid);
-				arref_init(&result_ctl->pc_grp, result_grp);
-				/*result_ctl->pc_grpmember = ...;*/ /* Initialized below */
-
-				/* Select who should be the process's parent. */
-				if (clone_flags & CLONE_DETACHED) {
-					/* Launch in detached state, meaning /bin/init is parent. */
-use_boottask_as_parent:
-					parent_proc = incref(&boottask);
-				} else if (clone_flags & CLONE_PARENT) {
-					/* Re-use parent of calling process as parent of child process */
-					parent_proc = taskpid_getparentprocess(caller_pid);
-					if unlikely(ATOMIC_READ(parent_proc->t_flags) & (TASK_FTERMINATING |
-					                                                 TASK_FTERMINATED)) {
-						/* The calling process's parent has already terminated.
-						 * -> Simply use `boottask' instead, emulating what would
-						 *    have been done  by `parent_proc' in  `task_exit()'. */
-						decref_unlikely(parent_proc);
-						goto use_boottask_as_parent;
-					}
-				} else {
-					/* Using calling process as parent. */
-					parent_proc = taskpid_gettask(taskpid_getprocpid(caller_pid));
-					if unlikely(!parent_proc || (ATOMIC_READ(parent_proc->t_flags) & (TASK_FTERMINATING |
-					                                                                  TASK_FTERMINATED))) {
-						/* Current process has exited. */
-						arref_fini(&result_ctl->pc_grp);
-						_procctl_free(result_ctl);
-						_taskpid_free(result_pid);
-						decref_unlikely(result_pidns);
-						_task_serve(); /* Serve main thread's exit RPC */
-						/* Really shouldn't get here! */
-						THROW(E_EXIT_THREAD, taskpid_getprocpid(caller_pid)->tp_status);
-					}
-				}
-				owner_pid = incref(task_gettaskpid_of(parent_proc));
-				arref_init(&result_ctl->pc_parent, parent_proc); /* Inherit reference */
-				result_pid->tp_proc = result_pid;                /* New process */
-				result_pid->tp_pctl = result_ctl;                /* Process controller */
-				incref(result_grp);                              /* Keep around a second reference! */
-			}
-
-			FINALLY_DECREF_UNLIKELY(owner_pid);
-			owner_ctl = taskpid_getprocctl(owner_pid);
-
-			/* Acquire all of the relevant locks in order to make the new thread visible. */
-again_acquire_locks:
-			TRY {
-				ns_iter = pidns_trywriteall(result_pidns);
-				if unlikely(ns_iter) {
-					pidns_waitwrite(ns_iter);
-					goto again_acquire_locks;
-				}
-				if (result_ctl) {
-					if (!procctl_chlds_trywrite(owner_ctl)) {
-						pidns_endwriteall(result_pidns);
-						procctl_chlds_waitwrite(owner_ctl);
-						goto again_acquire_locks;
-					}
-					if unlikely(!procgrp_memb_trywrite(result_grp)) {
-						procctl_chlds_endwrite(owner_ctl);
-						pidns_endwriteall(result_pidns);
-						procgrp_memb_waitwrite(result_grp);
-						goto again_acquire_locks;
-					}
-				}
-
-				/* Allocate PIDs for `result_pid' within all namespaces it should appear in. */
-#ifdef PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE
-				if (!pidns_allocpids(result_pid)) {
-err_pidns_allocpids_failed:
-					if (result_ctl != NULL) {
-						_procgrp_memb_endwrite(result_grp);
-						_procctl_chlds_endwrite(owner_ctl);
-						procgrp_memb_reap(result_grp);
-						procctl_chlds_reap(owner_ctl);
-					}
-					pidns_endwriteall(result_pidns);
-					THROW(E_BADALLOC); /* XXX: Custom error sub-class */
-				}
-#else /* PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE */
-				pidns_allocpids(result_pid);
-#endif /* !PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE */
-
-				if (clone_flags & CLONE_PARENT_SETTID) {
-					/* Write-back  the child TID to the parent  process. Because this is a memory
-					 * access, we have to be very careful when it comes to writing to VIO memory.
-					 * As  such, we have to interlock this write with all of locks above, as well
-					 * as the allocation of (at least) the PID within the initial namespace. */
-					pid_t ctid;
-					ctid = taskpid_getnstid(result_pid, caller_pid->tp_ns);
-again_write_ctid_to_parent_tidptr:
-					if (!write_nopf(parent_tidptr, ctid)) {
-						pid_t new_ctid;
-						/* Complicated case: writing to the user-given address faults. - This can
-						 * happen for VIO memory,  if the pointer is  actually faulty, or if  the
-						 * associated page simply hasn't been allocated, yet.
-						 *
-						 * Whatever the case be, we have to release locks, repeat the write, then
-						 * re-acquire locks and allocate PIDs again. - Afterwards, we check if we
-						 * were  able to allocate the `ctid', and if not, we try to write the new
-						 * value back to user-space once again.
-						 *
-						 * This cycle continues until the ctid written in a previous cycle matches
-						 * what would have to be written in the next, the calling thread  receives
-						 * an interrupt, or the `write_nopf()' above succeeds. */
-						if (result_ctl != NULL) {
-							_procgrp_memb_endwrite(result_grp);
-							_procctl_chlds_endwrite(owner_ctl);
-							procgrp_memb_reap(result_grp);
-							procctl_chlds_reap(owner_ctl);
-						}
-						pidns_endwriteall(result_pidns);
-
-						/* Do a proper write, which is allowed to fault or be VIO. */
-						ATOMIC_WRITE(*parent_tidptr, ctid);
-						task_serve();
-
-						/* Re-acquire locks. */
-again_acquire_locks_inner:
-						ns_iter = pidns_trywriteall(result_pidns);
-						if unlikely(ns_iter) {
-							pidns_waitwrite(ns_iter);
-							goto again_acquire_locks_inner;
-						}
-						if (result_ctl) {
-							if (!procctl_chlds_trywrite(owner_ctl)) {
-								pidns_endwriteall(result_pidns);
-								procctl_chlds_waitwrite(owner_ctl);
-								goto again_acquire_locks_inner;
-							}
-							if unlikely(!procgrp_memb_trywrite(result_grp)) {
-								procctl_chlds_endwrite(owner_ctl);
-								pidns_endwriteall(result_pidns);
-								procgrp_memb_waitwrite(result_grp);
-								goto again_acquire_locks_inner;
-							}
-						}
-
-						/* Allocate PIDs for `result_pid' within all namespaces it should appear in. */
-#ifdef PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE
-						if (!pidns_allocpids(result_pid))
-							goto err_pidns_allocpids_failed;
-#else /* PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE */
-						pidns_allocpids(result_pid);
-#endif /* !PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE */
-
-						/* Check if we were able  to allocate the same  TID.
-						 * If we were, then we also know that the same value
-						 * has previously been written to user-space! */
-						new_ctid = taskpid_getnstid(result_pid, caller_pid->tp_ns);
-						if unlikely(ctid != new_ctid) {
-							ctid = new_ctid;
-							goto again_write_ctid_to_parent_tidptr;
-						}
-					}
-				}
-			} EXCEPT {
-				assert((result_grp != NULL) == (result_ctl != NULL));
-				if (result_ctl != NULL) {
-					arref_fini(&result_ctl->pc_grp);
-					arref_fini(&result_ctl->pc_parent);
-					_procctl_free(result_ctl);
-					decref_unlikely(result_grp);
-				} else {
-					assert(result_pid->tp_proc == owner_pid);
-					decref_nokill(owner_pid);
-				}
-				_taskpid_free(result_pid);
-				decref_unlikely(result_pidns);
-				RETHROW();
-			}
-
-			/* While interlocked with `parent_ctl->pc_chlds_lock', check if the parent
-			 * process (as pointed-to by `owner_pid') has already terminated. - If it
-			 * has, then we have to release all  of our locks, and free most  relevant
-			 * data,  before looping back  to the point where  the parent process gets
-			 * calculated, which is then able to deal with that process having exited. */
-			{
-				REF struct task *owner_task;
-				owner_task = taskpid_gettask(owner_pid);
-				if unlikely(!owner_task || (ATOMIC_READ(owner_task->t_flags) & (TASK_FTERMINATED |
-				                                                                TASK_FTERMINATING))) {
-					pidns_endwriteall(result_pidns);
-					if (result_ctl != NULL) {
-						_procgrp_memb_endwrite(result_grp);
-						_procctl_chlds_endwrite(owner_ctl);
-						procgrp_memb_reap(result_grp);
-						procctl_chlds_reap(owner_ctl);
-						decref_unlikely(result_grp);
-						arref_fini(&result_ctl->pc_grp);
-						arref_fini(&result_ctl->pc_parent);
-						_procctl_free(result_ctl);
-						decref_unlikely(result_grp);
-					} else {
-						assert(result_pid->tp_proc == owner_pid);
-						decref_nokill(owner_pid);
-					}
-					xdecref_unlikely(owner_task);
-					_taskpid_free(result_pid);
-					decref_unlikely(result_pidns);
-					_task_serve();
-					if (task_gettaskpid_of(owner_task) == taskpid_getprocpid(caller_pid)) {
-						/* Might  get here if the calling process's main thread is currently
-						 * in the process of exiting (inside task_exit: already set the flag
-						 * `TASK_FTERMINATING', but has yet to propagate its exit status  to
-						 * all of the other threads)
-						 *
-						 * In this case, don't wait for the RPC to arrive, but do the work
-						 * ourselves  by  throwing the  relevant  E_EXIT_THREAD exception! */
-						THROW(E_EXIT_THREAD, taskpid_getprocpid(caller_pid)->tp_status);
-					}
-					goto again_assign_pid;
-				}
-				decref_unlikely(owner_task);
-			}
-
-			/* Whilst interlocked with all of the locks needed to make a new thread
-			 * globally visible, check if our own  thread might need to serve  some
-			 * RPCs  right now. -- If it does,  then we mustn't actually go through
-			 * with creation of a  new thread, since there  might be an RPC  that's
-			 * meant for us to terminate,  and might originate from something  like
-			 * a process-group-wide broadcast of a SIGINT.
-			 *
-			 * When something like that happens, we mustn't be allowed to add a new
-			 * process to the process group, which would then no longer be apart of
-			 * the original set of processes that received the SIGINT.
-			 *
-			 * Furthermore,  this is a special case in  that we can't solely rely on
-			 * the presence of `TASK_FRPC' to indicate the presence of pending RPCs,
-			 * which  in the case of process-wide RPCs might get set asynchronously,
-			 * in which case there can be a process-directed RPC pending right  now,
-			 * which is also meant to kill,  even though our `TASK_FRPC' flag  isn't
-			 * set right now.
-			 *
-			 * Because of this, we need a custom way of checking for signal, which
-			 * we facilitate by checking for TASK_FRPC, and even if that one's not
-			 * set, we also go through signals send to our process in order to see
-			 * if there are any that aren't marked by the calling thread.
-			 *
-			 * FIXME: What about a process-directed RPC with the intend of killing the
-			 *        targeted process, but then one of the process's thread took that
-			 *        RPC  and began handling it (so we're  no longer able to see it).
-			 *        Now handling of the RPCs hasn't  finished yet, but once it  has,
-			 *        the receiving thread will cause  our process to terminate,  only
-			 *        at that point it's too late because we ended up creating the new
-			 *        process...
-			 * Solution: until the kernel-side part relating to execution of a
-			 *           process-directed RPC has finished, there must be some
-			 *           kind of  flag "PROCESS_RPC_HANDLING_IN_PROCESS"  that
-			 *           remains set for as long as a process-directed RPC  is
-			 *           still being processed by some thread of the  process.
-			 *           The flag also comes with a `struct sig' (possibly one
-			 *           that is global), and that  we can then wait on  here,
-			 *           so-as to ensure  that no  process-directed RPC  could
-			 *           possibly exist  that might  stop  creation of  a  new
-			 *           thread.
-			 */
-			if (ATOMIC_READ(caller->t_flags) & TASK_FRPC) {
-do_task_serve_and_acquire_locks:
-				if (result_ctl != NULL) {
-					_procgrp_memb_endwrite(result_grp);
-					_procctl_chlds_endwrite(owner_ctl);
-					procgrp_memb_reap(result_grp);
-					procctl_chlds_reap(owner_ctl);
-				}
-				pidns_endwriteall(result_pidns);
-				_task_serve();
-				goto again_acquire_locks;
-			}
-
-			/* Check for unmasked process-directed signals.
-			 * Note that for this, we need yet another lock, which has to be held
-			 * at the same time as all of the other locks in order to ensure that
-			 * everything operates interlocked! */
-			{
-				struct procctl *caller_ctl;
-				struct pending_rpc *rpc;
-				struct pending_rpc_slist pending;
-				caller_ctl = caller_pid->tp_pctl;
-				if (!procctl_sig_tryread(caller_ctl)) {
-					if (result_ctl != NULL) {
-						_procgrp_memb_endwrite(result_grp);
-						_procctl_chlds_endwrite(owner_ctl);
-						procgrp_memb_reap(result_grp);
-						procctl_chlds_reap(owner_ctl);
-					}
-					pidns_endwriteall(result_pidns);
-					procctl_sig_waitread(caller_ctl);
-					goto again_acquire_locks;
-				}
-				pending.slh_first = ATOMIC_READ(caller_ctl->pc_sig_list.slh_first);
-				if unlikely(pending.slh_first == THIS_RPCS_TERMINATED) {
-sig_endread_and_force_task_serve_and_acquire_locks:
-					procctl_sig_endread(caller_ctl);
-					/* Set the RPC flag ourselves, so `_task_serve()' actually does its job! */
-					ATOMIC_OR(caller->t_flags, TASK_FRPC);
-					goto do_task_serve_and_acquire_locks;
-				}
-				SLIST_FOREACH (rpc, &pending, pr_link) {
-					int status;
-					status = sigmask_ismasked_nopf(_RPC_GETSIGNO(rpc->pr_flags));
-					if (status == SIGMASK_ISMASKED_NOPF_NO)
-						goto sig_endread_and_force_task_serve_and_acquire_locks; /* Unmasked, pending RPC! */
-#ifdef CONFIG_HAVE_USERPROCMASK
-					if (status == SIGMASK_ISMASKED_NOPF_FAULT) {
-						if (!have_caller_sigmask) {
-							/* Copy the calling thread's userprocmask so we can use that one! */
-							USER CHECKED struct userprocmask *um;
-							USER UNCHECKED sigset_t *current_sigmask;
-							_procctl_sig_endread(caller_ctl);
-							if (result_ctl != NULL) {
-								_procgrp_memb_endwrite(result_grp);
-								_procctl_chlds_endwrite(owner_ctl);
-								procgrp_memb_reap(result_grp);
-								procctl_chlds_reap(owner_ctl);
-							}
-							pidns_endwriteall(result_pidns);
-							procctl_sig_reap(caller_ctl);
-							COMPILER_BARRIER();
-							um              = PERTASK_GET(this_userprocmask_address);
-							current_sigmask = ATOMIC_READ(um->pm_sigmask);
-							validate_readable(current_sigmask, sizeof(sigset_t));
-							memcpy(&caller_sigmask, current_sigmask, sizeof(sigset_t));
-							sigdelset(&caller_sigmask, SIGKILL);
-							sigdelset(&caller_sigmask, SIGSTOP);
-							have_caller_sigmask = true;
-							goto again_acquire_locks;
-						}
-						if (!sigismember(&caller_sigmask, _RPC_GETSIGNO(rpc->pr_flags)))
-							goto sig_endread_and_force_task_serve_and_acquire_locks; /* Unmasked, pending RPC! */
-					}
-#endif /* CONFIG_HAVE_USERPROCMASK */
-				}
-				procctl_sig_endread(caller_ctl);
-			}
-
-			/* ========== Point of no return: From here on, we'll be making the thread visible! */
-
-			/* Insert `result_pid' into all of the PID namespaces it should appear in. */
-			ns_iter = result_pidns;
-			do {
-				pidns_insertpid(ns_iter, result_pid);
-			} while ((ns_iter = ns_iter->pn_par) != NULL);
-
-			/* Insert a new process PID into the calling process's process group. */
-			assert((result_grp != NULL) == (result_ctl != NULL));
-			assert((result_grp != NULL) == ((clone_flags & CLONE_THREAD) == 0));
-			if (result_ctl != NULL) {
-				/* Insert the new thread into the relevant process controller's child list. */
-				procctl_chlds_insert(owner_ctl, result_pid);
-				procgrp_memb_insert(result_grp, result_pid); /* Initializes `pc_grpmember' */
-			} else {
-				/* Add thread to main process's thread list. */
-				procctl_thrds_acquire(owner_ctl); /* SMP-lock, so nesting is allowed! */
-				/* FIXME: Must check if the current process terminated _AFTER_ `procctl_thrds_acquire'! */
-
-				procctl_thrds_insert(owner_ctl, result_pid);
-				procctl_thrds_release(owner_ctl);
-			}
-
-			/* Insert the new task into its mman's thread-list */
-			mman_threadslock_acquire(result->t_mman); /* SMP-lock, so nesting is allowed! */
-			LIST_INSERT_HEAD(&result->t_mman->mm_threads, result, t_mman_tasks);
-			mman_threadslock_release(result->t_mman);
-
-			/* Release locks... */
-			if (result_ctl != NULL) {
-				_procgrp_memb_endwrite(result_grp);
-				_procctl_chlds_endwrite(owner_ctl);
-				procgrp_memb_reap(result_grp);
-				procctl_chlds_reap(owner_ctl);
-			}
-			pidns_endwriteall(result_pidns);
-
-			/* Indicate to the process controller that its list of children has changed. */
-			sig_broadcast(&owner_ctl->pc_chld_changed);
-		} /* Scope... */
-
+		if (clone_flags & CLONE_THREAD) {
+			task_clone_thrdpid(result, caller, clone_flags, parent_tidptr);
+		} else {
+			task_clone_procpid(result, caller, clone_flags, parent_tidptr);
+		}
 	} EXCEPT {
 		/* Cleanup on error. */
 #if defined(__i386__) || defined(__x86_64__)

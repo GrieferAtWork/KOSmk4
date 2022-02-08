@@ -1453,7 +1453,7 @@ procfs_pp_status_printer(struct printnode *__restrict self,
                          pos_t UNUSED(offset_hint)) {
 	REF struct task *thread;
 	REF struct mman *thread_mm             = NULL;
-	REF struct taskpid *parent_pid         = NULL;
+	REF struct task *parent                = NULL;
 	REF struct cred *thread_cred           = NULL;
 	REF struct handle_manager *thread_hman = NULL;
 	struct taskpid *tpid;
@@ -1465,13 +1465,13 @@ procfs_pp_status_printer(struct printnode *__restrict self,
 		xdecref_unlikely(thread);
 		xdecref_unlikely(thread_mm);
 		xdecref_unlikely(thread_cred);
-		xdecref_unlikely(parent_pid);
+		xdecref_unlikely(parent);
 		xdecref_unlikely(thread_hman);
 	};
 	if (thread) {
 		thread_mm   = task_getmman(thread);
 		thread_cred = task_getcred(thread);
-		parent_pid  = task_getprocessparentpid_of(thread);
+		parent      = task_getparentprocess_of(thread);
 		thread_hman = task_gethandlemanager(thread);
 	}
 	PRINT("Name:\t");
@@ -1523,9 +1523,9 @@ no_exec:
 	           "FDSize:\t%u\n"
 	           "Groups:\t%" PRIuN(__SIZEOF_GID_T__),
 	           state,
-	           thread ? task_getpid_of_s(thread) : 0,         /* Tgid */
-	           thread ? task_getpid_of_s(thread) : 0,         /* Pid */
-	           parent_pid ? taskpid_gettid_s(parent_pid) : 0, /* PPid */
+	           thread ? task_getpid_of_s(thread) : 0, /* Tgid  (actually: PID) */
+	           thread ? task_gettid_of_s(thread) : 0, /* Pid   (actually: TID) */
+	           parent ? task_gettid_of_s(parent) : 0, /* PPid */
 	           thread_cred ? ATOMIC_READ(thread_cred->c_ruid) : 0,
 	           thread_cred ? ATOMIC_READ(thread_cred->c_euid) : 0,
 	           thread_cred ? ATOMIC_READ(thread_cred->c_suid) : 0,

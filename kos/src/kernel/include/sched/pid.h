@@ -246,6 +246,9 @@ taskpid_gettask_srch(struct taskpid *__restrict self)
 #define taskpid_getselfpid(self)     taskpid_getselftid(taskpid_getprocpid(self))
 #define taskpid_getrootpid(self)     taskpid_getroottid(taskpid_getprocpid(self))
 
+/* Check if `a' and `b' are part of the same process */
+#define taskpid_sameproc(a, b) (taskpid_getprocpid(a) == taskpid_getprocpid(b))
+
 
 
 

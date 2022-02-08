@@ -173,7 +173,7 @@ task_enum_print_cb(void *UNUSED(arg), struct task *thread) {
 		state = THREAD_STATE_TERMINATED;
 	else if (thread == &FORCPU(thread->t_cpu, thiscpu_idle))
 		state = THREAD_STATE_IDLING;
-	else  {
+	else {
 		state = THREAD_STATE_SLEEPING;
 	}
 	enum_thread(thread, state);

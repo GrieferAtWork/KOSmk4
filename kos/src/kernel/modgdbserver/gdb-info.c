@@ -393,7 +393,7 @@ NOTHROW(FCALL GDBInfo_PrintProcessList_Callback)(void *closure,
 	pid_t pid;
 	ssize_t temp, result = 0;
 	pformatprinter printer; void *arg;
-	if (!task_isprocessleader_p(thread))
+	if (!task_isaprocess(thread))
 		goto done;
 	if (GDBThread_IsKernelThread(thread))
 		goto done;
@@ -558,7 +558,7 @@ NOTHROW(FCALL GDBInfo_PrintFdList_Callback)(void *closure,
 	pformatprinter printer; void *arg;
 	REF struct handle_manager *hman;
 	unsigned int i;
-	if (!task_isprocessleader_p(thread))
+	if (!task_isaprocess(thread))
 		goto done;
 	if (GDBThread_IsKernelThread(thread))
 		goto done;

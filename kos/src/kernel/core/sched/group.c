@@ -1176,7 +1176,7 @@ again_read_status_in_nonspecific:
 				has_candidates = true;
 				continue;
 			}
-			FINALLY_DECREF_UNLIKELY(child);
+			FINALLY_DECREF(child);
 			task_disconnectall();
 			return fill_wait_info(proc, child, status, wstatus, infop, ru);
 		}

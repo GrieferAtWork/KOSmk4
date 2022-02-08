@@ -73,11 +73,12 @@
 
 
 #if 0
-#include <sched/group-ctty.h>
+#include <dev/tty.h>
+#include <sched/group.h>
 DECL_BEGIN
 #define TRACE_HOOK() trace_hook()
 PRIVATE void trace_hook() {
-	REF struct ttydev *tty = task_getctty_nx();
+	REF struct ttydev *tty = task_getctty();
 	if (!tty)
 		return;
 	refcnt_t rc = tty->mf_refcnt - 1;

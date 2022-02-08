@@ -2466,7 +2466,7 @@ kcmp_require_inspect_process(struct task *__restrict thread) {
 		return; /* Always allowed to inspect yourself */
 	if (task_getprocpid_of(me) == task_getprocpid_of(thread))
 		return; /* Another thread within the current process */
-	if (task_getprocptr_of(me) == task_getprocessparentptr_of(thread))
+	if (task_getprocptr_of(me) == task_getparentprocessptr_of(thread))
 		return; /* One of our child threads */
 	require(CAP_SYS_PTRACE);
 }

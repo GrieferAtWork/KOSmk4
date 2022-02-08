@@ -305,12 +305,8 @@ handle_get_task(unsigned int fd)
 		return result;
 	}	break;
 
-	case (unsigned int)AT_PARENT_PROCESS: {
-		REF struct task *temp;
-		temp = task_getprocessparent();
-		if likely(temp)
-			return temp;
-	}	break;
+	case (unsigned int)AT_PARENT_PROCESS:
+		return task_getparentprocess();
 
 	default: break;
 	}

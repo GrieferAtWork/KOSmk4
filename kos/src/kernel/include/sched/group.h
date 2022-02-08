@@ -35,7 +35,7 @@
 
 
 /* BEGIN: TODO: Remove these deprecated aliases */
-#define THIS_PROCESS_RPCS                    (*THIS_TASKPID->tp_pctl)
+#define THIS_PROCESS_RPCS                    (*task_getprocctl())
 #define process_pending_rpcs                 procctl
 #define ppr_lock                             pc_sig_lock
 #define ppr_list                             pc_sig_list
@@ -67,16 +67,6 @@
 #define process_pending_rpcs_waitwrite       procctl_chlds_waitwrite
 #define process_pending_rpcs_waitread_nx     procctl_chlds_waitread_nx
 #define process_pending_rpcs_waitwrite_nx    procctl_chlds_waitwrite_nx
-#define task_getprocessparent()              task_getparentprocess()
-#define task_getprocessparentpid()           task_getparentprocesspid()
-#define task_getprocessparent_of(self)       task_getparentprocess_of(self)
-#define task_getprocessparentpid_of(self)    task_getparentprocesspid_of(self)
-#define task_getprocessparent_nx()           task_getprocessparent()
-#define task_getprocessparent_of_nx(self)    task_getprocessparent_of(self)
-#define task_getprocessparentpid_of_nx(self) task_getprocessparentpid_of(self)
-#define task_getprocessparentptr_of(self)    task_getparentprocessptr_of(self)
-#define task_isprocessleader()               task_isprocess()
-#define task_isprocessleader_p(thread)       task_isaprocess(thread)
 /* END: TODO: Remove these deprecated aliases */
 
 
@@ -224,8 +214,6 @@ struct procsession {
 #define task_getctty_of(thread)   __procgrp_inherit_and_getctty(task_getprocgrp_of(thread))
 #define taskpid_getctty(self)     __procgrp_inherit_and_getctty(taskpid_getprocgrp(self))
 #define procctl_getctty(self)     __procgrp_inherit_and_getctty(procctl_getprocgrp(self))
-
-#define task_getctty_nx() task_getctty() /* Deprecated alias */
 
 
 
@@ -414,8 +402,8 @@ struct procctl {
 	                                           * NOTE: Elements may only be added to this list for
 	                                           *       as long as this process's main thread isn't
 	                                           *       marked as `TASK_FTERMINATING'! */
-	struct sig               pc_chld_changed; /* Broadcast when one of `pc_chlds_list' changes
-	                                           * status.  (s.a.  `struct taskpid::tp_changed') */
+	struct sig               pc_chld_changed; /* Broadcast when one of `pc_chlds_list' or `pc_thrds_list'
+	                                           * changes   status.   (s.a.  `struct taskpid::tp_changed') */
 	struct task_arref        pc_parent;       /* [1..1][lock(READ(ATOMIC), WRITE(OLD->pc_chlds_lock &&
 	                                           *                                 NEW->pc_chlds_lock))]
 	                                           * Parent process. When the parent thread exits, it will

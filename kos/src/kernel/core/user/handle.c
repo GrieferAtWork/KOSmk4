@@ -2056,7 +2056,7 @@ handle_lookup(unsigned int fd)
 	case (unsigned int)AT_PARENT_PROCESS:
 		result.h_type = HANDLE_TYPE_TASK;
 		result.h_mode = IO_RDONLY;
-		result.h_data = task_getprocessparentpid();
+		result.h_data = task_getparentprocesspid();
 		break;
 
 	default:

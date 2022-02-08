@@ -232,8 +232,7 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 	        "Task hasn't been given a restore-state at which execution can start");
 	if (!(ATOMIC_FETCHOR(thread->t_flags, TASK_FSTARTING) & TASK_FSTARTING)) {
 		if (kernel_debugtrap_enabled()) {
-			if (thread->t_mman == THIS_MMAN || thread->t_mman == &mman_kernel ||
-			    thread->t_flags & TASK_FKERNTHREAD || !task_isprocessleader_p(thread)) {
+			if (!task_isaprocess(thread)) {
 				struct scpustate *state;
 				/* New thread.
 				 * -> In this case, we must trigger a clone()
