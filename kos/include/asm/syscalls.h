@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59f948ce */
+/* HASH CRC-32:0x27a4b932 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -231,8 +231,7 @@
  * @param: exit_code: Thread exit code (as returned by `wait(2)') */
 #define __NR_exit_group             0x5e  /* void exit_group(syscall_ulong_t exit_code) */
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
- *                  optionally     or'd     with     `WNOHANG | WNOWAIT' */
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 #define __NR_waitid                 0x5f  /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop, syscall_ulong_t options, struct rusage *ru) */
 #define __NR_set_tid_address        0x60  /* pid_t set_tid_address(pid_t *tidptr) */
 /* param: what: Set of `CLONE_*' */

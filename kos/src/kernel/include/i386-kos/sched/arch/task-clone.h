@@ -23,18 +23,45 @@
 #include <kernel/compiler.h>
 
 #include <kernel/types.h>
+#include <kernel/x86/gdt.h>
+
+#include <hybrid/host.h>
+
+#ifdef __x86_64__
+#include <kernel/arch/compat.h>
+#endif /* __x86_64__ */
 
 #ifdef __CC__
 DECL_BEGIN
 
-/* Arch-specific parameters for `task_clone()' */
-#define ARCH_CLONE__PARAMS              \
-	,                                   \
-	USER UNCHECKED void *x86_child_psp, \
-	uintptr_t x86_child_gsbase,         \
-	uintptr_t x86_child_fsbase
-#define ARCH_CLONE__ARGS \
-	, x86_child_psp, x86_child_gsbase, x86_child_fsbase
+#define ARCH_HAVE_ARCH_TASK_CLONE_ARGS
+struct arch_task_clone_args {
+	uintptr_t atca_x86_fsbase; /* Initial child %fs.base */
+	uintptr_t atca_x86_gsbase; /* Initial child %gs.base */
+};
+#define arch_task_clone_args_initfork(self)                 \
+	(void)((self)->atca_x86_fsbase = x86_get_user_fsbase(), \
+	       (self)->atca_x86_gsbase = x86_get_user_gsbase())
+#define __arch_task_clone_args_inittls32(self, clone_flags, tls)     \
+	(void)((self)->atca_x86_fsbase = x86_get_user_fsbase(),          \
+	       (self)->atca_x86_gsbase = (uintptr_t)(tls),               \
+	       !((clone_flags)&CLONE_SETTLS)                             \
+	       ? (void)((self)->atca_x86_gsbase = x86_get_user_gsbase()) \
+	       : (void)0)
+#ifdef __x86_64__
+#define __arch_task_clone_args_inittls64(self, clone_flags, tls)     \
+	(void)((self)->atca_x86_gsbase = x86_get_user_gsbase(),          \
+	       (self)->atca_x86_fsbase = (uintptr_t)(tls),               \
+	       !((clone_flags)&CLONE_SETTLS)                             \
+	       ? (void)((self)->atca_x86_fsbase = x86_get_user_fsbase()) \
+	       : (void)0)
+#define arch_task_clone_args_inittls(self, clone_flags, tls)                       \
+	(syscall_iscompat() ? __arch_task_clone_args_inittls32(self, clone_flags, tls) \
+	                    : __arch_task_clone_args_inittls64(self, clone_flags, tls))
+#else /* __x86_64__ */
+#define arch_task_clone_args_inittls __arch_task_clone_args_inittls32
+#endif /* !__x86_64__ */
+
 
 /* The per-task value written to `t_psp0' during scheduler preemption. */
 DATDEF ATTR_PERTASK uintptr_t _this_x86_kernel_psp0 ASMNAME("this_x86_kernel_psp0");

@@ -36,6 +36,7 @@
 #include <kernel/mman/unmapped.h>
 #include <kernel/rt/except-handler.h>
 #include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_USERPROCMASK */
+#include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
@@ -53,12 +54,14 @@
 #include <hybrid/host.h>
 
 #include <kos/except.h>
+#include <kos/except/reason/inval.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/paging.h>
 
 #include <assert.h>
 #include <signal.h>
+#include <stdint.h>
 #include <string.h>
 
 #if defined(__i386__) || defined(__x86_64__)
@@ -171,7 +174,7 @@ waitfor_vfork_completion(struct task *__restrict thread)
 PRIVATE NONNULL((1, 2)) void KCALL
 task_clone_sigmask(struct task *__restrict result,
                    struct task *__restrict caller,
-                   syscall_ulong_t clone_flags) {
+                   uint64_t clone_flags) {
 	/* Clone the current signal mask. */
 	(void)clone_flags;
 	assert(arref_ptr(&FORTASK(result, this_kernel_sigmask)) == &kernel_sigmask_empty);
@@ -257,7 +260,7 @@ inherit_parent_userprocmask:
 PRIVATE NONNULL((1, 2)) void KCALL
 task_clone_sighand(struct task *__restrict result,
                    struct task *__restrict caller,
-                   syscall_ulong_t clone_flags) {
+                   uint64_t clone_flags) {
 	if (clone_flags & CLONE_SIGHAND) {
 		/* Must share signal handlers. */
 		REF struct sighand_ptr *myptr;
@@ -352,12 +355,12 @@ NOTHROW(KCALL x86_ioperm_bitmap_unset_write_access)(struct task *__restrict call
 PRIVATE NONNULL((1, 2)) void FCALL
 task_clone_thrdpid(struct task *__restrict result,
                    struct task *__restrict caller,
-                   syscall_ulong_t clone_flags,
+                   uint64_t clone_flags,
                    USER UNCHECKED pid_t *parent_tidptr);
 PRIVATE NONNULL((1, 2)) void FCALL
 task_clone_procpid(struct task *__restrict result,
                    struct task *__restrict caller,
-                   syscall_ulong_t clone_flags,
+                   uint64_t clone_flags,
                    USER UNCHECKED pid_t *parent_tidptr);
 #else /* __INTELLISENSE__ */
 DECL_END
@@ -380,21 +383,13 @@ DECL_BEGIN
  * @param: child_tidptr:  [valid_if(CLONE_CHILD_CLEARTID | CLONE_CHILD_SETTID)]
  *                        Store child TID here in child process
  * @param: ARCH_CLONE__PARAMS: Additional, arch-specific parameters */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *KCALL
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL
 task_clone(struct icpustate const *__restrict init_state,
-           syscall_ulong_t clone_flags,
-           USER UNCHECKED pid_t *parent_tidptr,
-           USER UNCHECKED pid_t *child_tidptr
-           ARCH_CLONE__PARAMS)
+           struct task_clone_args const *__restrict args)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	struct task *result;
 	struct task *caller = THIS_TASK;
-
-	/* Validate arguments. */
-	if (clone_flags & CLONE_PARENT_SETTID)
-		validate_writable(parent_tidptr, sizeof(*parent_tidptr));
-	if (clone_flags & (CLONE_CHILD_CLEARTID | CLONE_CHILD_SETTID))
-		validate_writable(child_tidptr, sizeof(*child_tidptr));
+	uint64_t clone_flags = args->tca_flags;
 
 	/* Allocate a new task structure. */
 	{
@@ -423,6 +418,12 @@ task_clone(struct icpustate const *__restrict init_state,
 		/* Assign the thread's mman */
 		assert(result->t_mman == NULL);
 		if (clone_flags & (CLONE_VM | CLONE_VFORK)) {
+			if (!(clone_flags & CLONE_VM)) {
+				THROW(E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION,
+				      E_INVALID_ARGUMENT_CONTEXT_CLONE_VFORK_WITHOUT_VM,
+				      (syscall_ulong_t)clone_flags,
+				      CLONE_VM | CLONE_VFORK, CLONE_VFORK);
+			}
 			/* The mman is being shared */
 			result->t_mman = incref(caller->t_mman);
 			/* Set the VFORK flag to cause the thread to execute in VFORK-mode.
@@ -551,8 +552,8 @@ again_release_kernel_and_cc:
 #ifdef __x86_64__
 			child_state = icpustate_to_scpustate_p_ex(init_state,
 			                                          kernel_stack,
-			                                          x86_child_gsbase,
-			                                          x86_child_fsbase,
+			                                          args->tca_arch.atca_x86_gsbase,
+			                                          args->tca_arch.atca_x86_fsbase,
 			                                          __rdgs(),
 			                                          __rdfs(),
 			                                          __rdes(),
@@ -561,19 +562,24 @@ again_release_kernel_and_cc:
 			child_state = icpustate_to_scpustate_p(init_state, kernel_stack);
 #endif /* !__x86_64__ */
 
+			/* Assign the given stack pointer for the new thread. */
+#ifdef scpustate_setuserpsp
+			scpustate_setuserpsp(child_state, (uintptr_t)args->tca_stack);
+#else /* scpustate_setuserpsp */
+			scpustate_setpsp(child_state, (uintptr_t)args->tca_stack);
+#endif /* !scpustate_setuserpsp */
+
 			/* Do additional, arch-specific initialization */
 #if defined(__i386__) || defined(__x86_64__)
-			/* Assign the given stack pointer for the new thread. */
-			scpustate_setuserpsp(child_state, (uintptr_t)x86_child_psp);
-
 			/* Reset iopl() for the child thread/process */
 			if ((clone_flags & CLONE_THREAD) ? !x86_iopl_keep_after_clone
 			                                 : !x86_iopl_keep_after_fork)
 				child_state->scs_irregs.ir_Pflags &= ~EFLAGS_IOPLMASK;
 #endif /* __i386__ || __x86_64__ */
+
 #if defined(__i386__) && !defined(__x86_64__)
-			FORTASK(result, this_x86_user_gsbase) = x86_child_gsbase;
-			FORTASK(result, this_x86_user_fsbase) = x86_child_fsbase;
+			FORTASK(result, this_x86_user_fsbase) = args->tca_arch.atca_x86_fsbase;
+			FORTASK(result, this_x86_user_gsbase) = args->tca_arch.atca_x86_gsbase;
 #endif /* __i386__ && !__x86_64__ */
 
 			/* Have `fork(2)' and `clone(2)' return `0' in the child thread/process */
@@ -583,8 +589,10 @@ again_release_kernel_and_cc:
 			 * This always needs to be done in the context of the child, so that exceptions
 			 * during the write are handled in the proper context, as well as in regards to
 			 * the child actually existing in a  different VM when `CLONE_VM' isn't  given. */
-			if (clone_flags & CLONE_CHILD_SETTID)
-				child_state = task_asyncrpc_push(child_state, &clone_set_child_tid, child_tidptr);
+			if (clone_flags & CLONE_CHILD_SETTID) {
+				validate_writable(args->tca_child_tid, sizeof(*args->tca_child_tid));
+				child_state = task_asyncrpc_push(child_state, &clone_set_child_tid, args->tca_child_tid);
+			}
 
 			/* Apply some finalizing transformations to `child_state' */
 			_task_init_arch_sstate(result, caller, &child_state);
@@ -593,8 +601,10 @@ again_release_kernel_and_cc:
 			FORTASK(result, this_sstate) = child_state;
 		}
 
-		if (clone_flags & CLONE_CHILD_CLEARTID)
-			FORTASK(result, this_tid_address) = child_tidptr; /* `set_tid_address(child_tidptr)' */
+		if (clone_flags & CLONE_CHILD_CLEARTID) {
+			validate_writable(args->tca_child_tid, sizeof(*args->tca_child_tid));
+			FORTASK(result, this_tid_address) = args->tca_child_tid; /* `set_tid_address(child_tidptr)' */
+		}
 
 		/************************************************************************/
 		/* CLONE THREAD CONTEXT                                                 */
@@ -691,9 +701,9 @@ again_release_kernel_and_cc:
 		 *    create  a  new  thread, rather  than  do something  else,  such as
 		 *    handling a signal. */
 		if (clone_flags & CLONE_THREAD) {
-			task_clone_thrdpid(result, caller, clone_flags, parent_tidptr);
+			task_clone_thrdpid(result, caller, clone_flags, args->tca_parent_tid);
 		} else {
-			task_clone_procpid(result, caller, clone_flags, parent_tidptr);
+			task_clone_procpid(result, caller, clone_flags, args->tca_parent_tid);
 		}
 	} EXCEPT {
 		/* Cleanup on error. */
@@ -823,6 +833,202 @@ NOTHROW(FCALL _task_init_relocations)(struct task *__restrict self) {
 	assert(FORTASK(self, this_connections) == &FORTASK(self, this_root_connections));
 	assert(FORTASK(self, this_root_connections).tcs_thread == self);
 }
+
+
+
+
+
+/************************************************************************/
+/* clone3()                                                             */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_CLONE3
+INTERN NONNULL((1)) pid_t FCALL
+sys_clone3_impl(struct icpustate *__restrict state,
+                USER UNCHECKED struct clone_args *cl_args,
+                size_t size) {
+	pid_t cpid;
+	REF struct task *child;
+	struct task_clone_args cargs;
+	bzero(&cargs, sizeof(cargs));
+	switch (size) {
+
+	case 88:
+		cargs.tca_cgroup = cl_args->ca_cgroup;
+		ATTR_FALLTHROUGH
+	case 80:
+		cargs.tca_set_tid     = cl_args->ca_set_tid;
+		cargs.tca_set_tid_siz = cl_args->ca_set_tid_size;
+		ATTR_FALLTHROUGH
+	case 64: {
+		size_t stacksize;
+		USER UNCHECKED void *stackbase;
+		validate_readable(cl_args, size);
+		cargs.tca_flags       = cl_args->ca_flags;
+		cargs.tca_pidfd       = cl_args->ca_pidfd;
+		cargs.tca_child_tid   = cl_args->ca_child_tid;
+		cargs.tca_parent_tid  = cl_args->ca_parent_tid;
+		cargs.tca_exit_signal = cl_args->ca_exit_signal;
+
+		/* Load the requested stack */
+		stacksize = cl_args->ca_stack_size;
+		stackbase = cl_args->ca_stack;
+		if (stacksize || (cargs.tca_flags & CLONE_VM)) {
+#ifdef __ARCH_STACK_GROWS_DOWNWARDS
+			stackbase = (byte_t *)stackbase + stacksize;
+#endif /* __ARCH_STACK_GROWS_DOWNWARDS */
+			cargs.tca_stack = stackbase;
+		} else {
+#ifdef icpustate_getuserpsp
+			cargs.tca_stack = (USER UNCHECKED void *)icpustate_getuserpsp(state);
+#else /* icpustate_getuserpsp */
+			cargs.tca_stack = (USER UNCHECKED void *)icpustate_getpsp(state);
+#endif /* !icpustate_getuserpsp */
+		}
+
+		/* Initialize arch-specific TLS data. */
+#ifdef ARCH_HAVE_ARCH_TASK_CLONE_ARGS
+		arch_task_clone_args_inittls(&cargs.tca_arch, cargs.tca_flags, cl_args->ca_tls);
+#endif /* ARCH_HAVE_ARCH_TASK_CLONE_ARGS */
+	}	break;
+
+	default:
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_SIZE,
+		      size);
+		break;
+	}
+	COMPILER_READ_BARRIER();
+
+	/* Verify the user-given `flags' argument. */
+	if (cargs.tca_flags & ~(UINT64_C(0x00000000ffffff00) | CLONE_CLEAR_SIGHAND |
+	                        CLONE_INTO_CGROUP | CLONE_NEWTIME | CLONE_CRED)) {
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_FLAG,
+		      E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_FLAGS, cargs.tca_flags,
+		      ~(CLONE_CLEAR_SIGHAND | CLONE_INTO_CGROUP | CLONE_NEWTIME | CLONE_CRED));
+	}
+
+	/* Spawn a new child thread/process */
+	child = task_clone(state, &cargs);
+	cpid  = task_gettid_of(child);
+	decref_unlikely(child);
+	return cpid;
+}
+
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+sys_clone3_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
+	pid_t cpid;
+	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+	cpid = sys_clone3_impl(ctx->rc_state,
+	                       (USER UNCHECKED struct clone_args *)ctx->rc_scinfo.rsi_regs[0],
+	                       (size_t)ctx->rc_scinfo.rsi_regs[1]);
+	icpustate_setreturn(ctx->rc_state, cpid);
+
+	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
+}
+
+DEFINE_SYSCALL2(syscall_slong_t, clone3,
+                USER UNCHECKED struct clone_args *, cl_args,
+                size_t, size) {
+	(void)cl_args;
+	(void)size;
+
+	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
+	task_rpc_userunwind(&sys_clone3_rpc, NULL);
+	__builtin_unreachable();
+}
+#endif /* __ARCH_WANT_SYSCALL_CLONE3 */
+
+
+
+
+/************************************************************************/
+/* fork()                                                               */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_FORK
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
+sys_fork_impl(struct icpustate *__restrict state) {
+	pid_t child_tid;
+	REF struct task *child_tsk;
+	struct task_clone_args cargs;
+
+	/* Set-up clone args. */
+	bzero(&cargs, sizeof(cargs));
+	cargs.tca_exit_signal = SIGCHLD;
+	cargs.tca_stack       = (USER UNCHECKED void *)icpustate_getusersp(state);
+	arch_task_clone_args_initfork(&cargs.tca_arch);
+
+	/* Do the clone. */
+	child_tsk = task_clone(state, &cargs);
+	child_tid = task_gettid_of(child_tsk);
+	decref(child_tsk);
+	gpregs_setpax(&state->ics_gpregs, child_tid);
+	return state;
+}
+
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+sys_fork_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
+	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+	ctx->rc_state = sys_fork_impl(ctx->rc_state);
+
+	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
+}
+
+DEFINE_SYSCALL0(pid_t, fork) {
+	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
+	task_rpc_userunwind(&sys_fork_rpc, NULL);
+	__builtin_unreachable();
+}
+#endif /* __ARCH_WANT_SYSCALL_FORK */
+
+
+
+
+
+/************************************************************************/
+/* vfork()                                                              */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_VFORK
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
+sys_vfork_impl(struct icpustate *__restrict state) {
+	pid_t child_tid;
+	REF struct task *child_tsk;
+	struct task_clone_args cargs;
+
+	/* Set-up clone args. */
+	bzero(&cargs, sizeof(cargs));
+	cargs.tca_flags       = CLONE_VM | CLONE_VFORK;
+	cargs.tca_exit_signal = SIGCHLD;
+	cargs.tca_stack       = (USER UNCHECKED void *)icpustate_getusersp(state);
+	arch_task_clone_args_initvfork(&cargs.tca_arch);
+
+	/* Do the clone. */
+	child_tsk = task_clone(state, &cargs);
+	child_tid = task_gettid_of(child_tsk);
+	decref(child_tsk);
+	gpregs_setpax(&state->ics_gpregs, child_tid);
+	return state;
+}
+
+PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
+sys_vfork_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
+	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
+		return;
+	ctx->rc_state = sys_vfork_impl(ctx->rc_state);
+
+	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
+}
+
+DEFINE_SYSCALL0(pid_t, vfork) {
+	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
+	task_rpc_userunwind(&sys_vfork_rpc, NULL);
+	__builtin_unreachable();
+}
+#endif /* __ARCH_WANT_SYSCALL_VFORK */
 
 
 DECL_END

@@ -26,7 +26,7 @@
 #if (defined(DEFINE_task_clone_thrdpid) + \
      defined(DEFINE_task_clone_procpid)) != 1
 #error "Must #define exactly one of these"
-#endif
+#endif /* ... */
 
 DECL_BEGIN
 
@@ -34,14 +34,14 @@ DECL_BEGIN
 PRIVATE NONNULL((1, 2)) void FCALL
 task_clone_thrdpid(struct task *__restrict result,
                    struct task *__restrict caller,
-                   syscall_ulong_t clone_flags,
+                   uint64_t clone_flags,
                    USER UNCHECKED pid_t *parent_tidptr)
 #define LOCAL_IS_THRD
 #else /* DEFINE_task_clone_thrdpid */
 PRIVATE NONNULL((1, 2)) void FCALL
 task_clone_procpid(struct task *__restrict result,
                    struct task *__restrict caller,
-                   syscall_ulong_t clone_flags,
+                   uint64_t clone_flags,
                    USER UNCHECKED pid_t *parent_tidptr)
 #define LOCAL_IS_PROC
 #endif /* !DEFINE_task_clone_thrdpid */
@@ -68,7 +68,12 @@ task_clone_procpid(struct task *__restrict result,
 	/* Allocate a PID descriptor for the new thread. */
 #ifdef LOCAL_IS_THRD
 	if unlikely(clone_flags & CLONE_NEWPID) {
-		/* TODO: CLONE_THREAD must imply !CLONE_NEWPID */
+		/* CLONE_THREAD must imply !CLONE_NEWPID */
+		THROW(E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION,
+		      E_INVALID_ARGUMENT_CONTEXT_CLONE_THREAD_WITH_NEWPID,
+		      (syscall_ulong_t)clone_flags,
+		      CLONE_THREAD | CLONE_NEWPID,
+		      CLONE_THREAD | CLONE_NEWPID);
 	}
 	result_pid        = _taskpid_alloc(caller_pid->tp_ns);
 	result_pid->tp_ns = caller_pid->tp_ns; /* Incref'd later */

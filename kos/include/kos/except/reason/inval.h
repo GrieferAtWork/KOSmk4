@@ -257,6 +257,10 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_ALREADY_HAVE_CTTY,        /* E_INVALID_ARGUMENT_BAD_STATE: [EPERM] Tried to use `TIOCSCTTY', but caller already has a ctty. */
 	E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_CANNOT_STEAL_CTTY,        /* E_INVALID_ARGUMENT_BAD_STATE: [EPERM] Tried to use `TIOCSCTTY', but tty is already a ctty, and stealing isn't wanted (arg != 1) or permitted (!capable(CAP_SYS_ADMIN)). */
 	E_INVALID_ARGUMENT_CONTEXT_TIOCNOTTY_NOT_CALLER_SESSION,       /* E_INVALID_ARGUMENT_BAD_STATE: [ENOTTY] Tried to use `TIOCNOTTY' on a tty that's not your controlling tty. */
+	E_INVALID_ARGUMENT_CONTEXT_CLONE_THREAD_WITH_NEWPID,           /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `CLONE_THREAD` and 'CLONE_NEWPID' were given. */
+	E_INVALID_ARGUMENT_CONTEXT_CLONE_VFORK_WITHOUT_VM,             /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `CLONE_VFORK` was given without 'CLONE_VM' were given. */
+	E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_FLAGS,               /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unrecognized `struct clone_args::ca_flags' passed to `clone3(2)' */
+	E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_SIZE,                /* E_INVALID_ARGUMENT_BAD_VALUE: Unrecognized `size' argument passed to `clone3(2)' */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -489,6 +493,10 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_ALREADY_HAVE_CTTY        E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_ALREADY_HAVE_CTTY        /* E_INVALID_ARGUMENT_BAD_STATE: [EPERM] Tried to use `TIOCSCTTY', but caller already has a ctty. */
 #define E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_CANNOT_STEAL_CTTY        E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_CANNOT_STEAL_CTTY        /* E_INVALID_ARGUMENT_BAD_STATE: [EPERM] Tried to use `TIOCSCTTY', but tty is already a ctty, and stealing isn't wanted (arg != 1) or permitted (!capable(CAP_SYS_ADMIN)). */
 #define E_INVALID_ARGUMENT_CONTEXT_TIOCNOTTY_NOT_CALLER_SESSION       E_INVALID_ARGUMENT_CONTEXT_TIOCNOTTY_NOT_CALLER_SESSION       /* E_INVALID_ARGUMENT_BAD_STATE: [ENOTTY] Tried to use `TIOCNOTTY' on a tty that's not your controlling tty. */
+#define E_INVALID_ARGUMENT_CONTEXT_CLONE_THREAD_WITH_NEWPID           E_INVALID_ARGUMENT_CONTEXT_CLONE_THREAD_WITH_NEWPID           /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `CLONE_THREAD` and 'CLONE_NEWPID' were given. */
+#define E_INVALID_ARGUMENT_CONTEXT_CLONE_VFORK_WITHOUT_VM             E_INVALID_ARGUMENT_CONTEXT_CLONE_VFORK_WITHOUT_VM             /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `CLONE_VFORK` was given without 'CLONE_VM' were given. */
+#define E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_FLAGS               E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_FLAGS               /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unrecognized `struct clone_args::ca_flags' passed to `clone3(2)' (note: exception meta-data reflects upper 32 bits of flags) */
+#define E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_SIZE                E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_SIZE                /* E_INVALID_ARGUMENT_BAD_VALUE: Unrecognized `size' argument passed to `clone3(2)' */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -718,6 +726,10 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_ALREADY_HAVE_CTTY        205 /* E_INVALID_ARGUMENT_BAD_STATE: [EPERM] Tried to use `TIOCSCTTY', but caller already has a ctty. */
 #define E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_CANNOT_STEAL_CTTY        206 /* E_INVALID_ARGUMENT_BAD_STATE: [EPERM] Tried to use `TIOCSCTTY', but tty is already a ctty, and stealing isn't wanted (arg != 1) or permitted (!capable(CAP_SYS_ADMIN)). */
 #define E_INVALID_ARGUMENT_CONTEXT_TIOCNOTTY_NOT_CALLER_SESSION       207 /* E_INVALID_ARGUMENT_BAD_STATE: [ENOTTY] Tried to use `TIOCNOTTY' on a tty that's not your controlling tty. */
+#define E_INVALID_ARGUMENT_CONTEXT_CLONE_THREAD_WITH_NEWPID           208 /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `CLONE_THREAD` and 'CLONE_NEWPID' were given. */
+#define E_INVALID_ARGUMENT_CONTEXT_CLONE_VFORK_WITHOUT_VM             209 /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `CLONE_VFORK` was given without 'CLONE_VM' were given. */
+#define E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_FLAGS               210 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unrecognized `struct clone_args::ca_flags' passed to `clone3(2)' (note: exception meta-data reflects upper 32 bits of flags) */
+#define E_INVALID_ARGUMENT_CONTEXT_CLONE3_INVALID_SIZE                211 /* E_INVALID_ARGUMENT_BAD_VALUE: Unrecognized `size' argument passed to `clone3(2)' */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

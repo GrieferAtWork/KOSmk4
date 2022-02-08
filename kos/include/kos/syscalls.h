@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1188bff */
+/* HASH CRC-32:0x2c5a1106 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1560,8 +1560,7 @@ __CDECLARE_SC(,__pid_t,wait4,(__pid_t __pid, __int32_t *__stat_loc, __syscall_ul
 #endif /* __CRT_HAVE_SC(wait4) */
 #if __CRT_HAVE_SC(waitid)
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
- *                  optionally     or'd     with     `WNOHANG | WNOWAIT' */
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 __CDECLARE_SC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfo_struct *__infop, __syscall_ulong_t __options, struct rusage *__ru),(__idtype,__id,__infop,__options,__ru))
 #endif /* __CRT_HAVE_SC(waitid) */
 #if __CRT_HAVE_SC(write)
@@ -3014,8 +3013,7 @@ __CDECLARE_XSC(,__pid_t,wait4,(__pid_t __pid, __int32_t *__stat_loc, __syscall_u
 #endif /* __CRT_HAVE_XSC(wait4) */
 #if __CRT_HAVE_XSC(waitid)
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
- *                  optionally     or'd     with     `WNOHANG | WNOWAIT' */
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 __CDECLARE_XSC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfo_struct *__infop, __syscall_ulong_t __options, struct rusage *__ru),(__idtype,__id,__infop,__options,__ru))
 #endif /* __CRT_HAVE_XSC(waitid) */
 #if __CRT_HAVE_XSC(write)

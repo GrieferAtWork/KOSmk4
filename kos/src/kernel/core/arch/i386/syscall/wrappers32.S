@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49e4e7cc */
+/* HASH CRC-32:0x44d1926d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -10758,8 +10758,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kexec_load)
 END(__x86_asm32_int80_kexec_load)
 
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
- *                  optionally     or'd     with     `WNOHANG | WNOWAIT' */
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32 *ru) */
 .section .text.x86.asm32_syscall_int80.waitid
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid)
@@ -16516,7 +16515,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pidfd_open)
 	.cfi_endproc
 END(__x86_asm32_int80_pidfd_open)
 
-/* errno_t clone3(int TODO_PROTOTYPE) */
+/* syscall_slong_t clone3(struct clone_args *cl_args, size_t size) */
 .section .text.x86.asm32_syscall_int80.clone3
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_clone3)
 	.cfi_startproc simple
@@ -16535,14 +16534,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clone3)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_clone3)
 	call   sys_clone3
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -17087,8 +17086,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fmkdirat)
 END(__x86_asm32_int80_fmkdirat)
 
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
- *                  optionally     or'd     with     `WNOHANG | WNOWAIT' */
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 /* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
 .section .text.x86.asm32_syscall_int80.waitid64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid64)
@@ -19052,9 +19050,9 @@ END(__x86_asm32_int80_openpty)
  * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
  * 
  * @param: target_tid:      The TID of the targeted thread
- * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
+ * @param: mode:            One of `RPC_SYNCMODE_*',  optionally or'd  with
  *                          one of `RPC_SYSRESTART_*', optionally or'd with
- *                          one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                          one of `RPC_PRIORITY_*',  optionally or'd  with
  *                          one of  `RPC_DOMAIN_*',  optionally  or'd  with
  *                          one of `RPC_JOIN_*'
  * @param: program:         The RPC program to execute (sequences of `RPC_OP_*')
@@ -19284,54 +19282,15 @@ END(__x86_asm32_int80_getdrives)
  *     turning its chain of children into a clean slate that no longer contains
  *     any wait(2)able child threads or processes.
  *     If no waitable children existed, `ECHILD' is set; else `0' is returned.
- * Before any of this is done, the thread referred to by `PID' is one of the following:
- *   - The leader of the process that called `fork()' or `clone()' without
- *    `CLONE_PARENT' to create the thread referred to by `PID'
- *   - The creator of the process containing a thread that called
- *    `clone()' with `CLONE_PARENT', which then created the thread
- *     referred to by `PID'.
- *   - Even if  the thread  doesn't deliver  a signal  upon it  terminating,
- *     the process that would have received such a signal is still relevant.
- *   -> In other words: The thread `PID' must be one of your children,
- *                      or had you assigned as its parent.
- * If the calling thread isn't part of that process that will receive
- * the signal if the thread  dies without being detached first,  then
- * the   call   fails    by   throwing   an    `E_ILLEGAL_OPERATION'.
- * If  the thread had  already been detached, then  the call fails by
- * throwing an `E_ILLEGAL_OPERATION' as well.
- * Upon success, the thread  referred to by `PID'  will clean up its  own
- * PID descriptor without the need of anyone to wait() for it, a behavior
- * that linux implements using  `CLONE_THREAD' (which you shouldn't  use,
- * because it's flawed by design)
- * Once detached, any further use of  PID results in a race  condition
- * (which linux neglects to mention for `CLONE_THREAD'), because there
- * is no way of ensuring that PID still refers to the original thread,
- * as another thread may have been  created using the same PID,  after
- * the detached thread exited.
+ * The given `pid' must be:
+ *   - A thread without the caller's process
+ *   - A child process of the caller's process
  * NOTE: If a thread is created using clone() with `CLONE_DETACHED' set,
  *       it will behave effectively as though this function had  already
  *       be called.
- * NOTE: If the thread already has terminated, detaching it will kill
- *       its zombie the same way wait() would.
- * NOTE: Passing ZERO(0)  for `PID'  will detach  the calling  thread.
- *       However, this  operation fails  if the  calling thread  isn't
- *       part of the same process as the parent process of the thread.
- *       In other words,  the child  of a  fork() can't  do this,  and
- *       neither can the spawnee of  clone(CLONE_THREAD|CLONE_PARENT),
- *       clone(0) or clone(CLONE_PARENT).
- * @return: -EPERM:             The  calling  process isn't  the recipient  of signals
- *                              delivered when `PID'  changes state.  This can  either
- *                              be because `PID' has already been detached, or because
- *                              YOU CAN'T DETACH SOMEONE ELSE'S THREAD!
- *                              Another  possibility is that the thread was already
- *                              detached, then exited, following which a new thread
- *                              got created and had been  assigned the PID of  your
- *                              ancient, no longer existent thread.
- * @return: -ECHILD:           `PID' was equal to `-1', but no waitable children existed
- * @throw: E_PROCESS_EXITED:    The  process  referred  to  by  `PID'  doesn't exist.
- *                              This could  mean that  it had  already been  detached
- *                              and exited, or that the `PID' is just invalid  (which
- *                              would also be the case if it was valid at some point) */
+ * @return: -ECHILD:         `PID' was equal to `-1', but no waitable children existed
+ * @throw: E_PROCESS_EXITED: No such  thread/process exists,  or  the thread  isn't  isn't
+ *                           a thread in your process, or a child process of your process. */
 /* errno_t detach(pid_t pid) */
 .section .text.x86.asm32_syscall_int80.detach
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_detach)
@@ -30223,8 +30182,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kexec_load)
 END(__x86_asm32_sysenter_kexec_load)
 
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
- *                  optionally     or'd     with     `WNOHANG | WNOWAIT' */
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32 *ru) */
 .section .text.x86.asm32_syscall_sysenter.waitid
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid)
@@ -36035,7 +35993,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pidfd_open)
 	.cfi_endproc
 END(__x86_asm32_sysenter_pidfd_open)
 
-/* errno_t clone3(int TODO_PROTOTYPE) */
+/* syscall_slong_t clone3(struct clone_args *cl_args, size_t size) */
 .section .text.x86.asm32_syscall_sysenter.clone3
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clone3)
 	.cfi_startproc simple
@@ -36054,14 +36012,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clone3)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_clone3)
 	call   sys_clone3
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -36616,8 +36574,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fmkdirat)
 END(__x86_asm32_sysenter_fmkdirat)
 
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
- *                  optionally     or'd     with     `WNOHANG | WNOWAIT' */
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 /* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
 .section .text.x86.asm32_syscall_sysenter.waitid64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid64)
@@ -38601,9 +38558,9 @@ END(__x86_asm32_sysenter_openpty)
  * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
  * 
  * @param: target_tid:      The TID of the targeted thread
- * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
+ * @param: mode:            One of `RPC_SYNCMODE_*',  optionally or'd  with
  *                          one of `RPC_SYSRESTART_*', optionally or'd with
- *                          one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                          one of `RPC_PRIORITY_*',  optionally or'd  with
  *                          one of  `RPC_DOMAIN_*',  optionally  or'd  with
  *                          one of `RPC_JOIN_*'
  * @param: program:         The RPC program to execute (sequences of `RPC_OP_*')
@@ -38837,54 +38794,15 @@ END(__x86_asm32_sysenter_getdrives)
  *     turning its chain of children into a clean slate that no longer contains
  *     any wait(2)able child threads or processes.
  *     If no waitable children existed, `ECHILD' is set; else `0' is returned.
- * Before any of this is done, the thread referred to by `PID' is one of the following:
- *   - The leader of the process that called `fork()' or `clone()' without
- *    `CLONE_PARENT' to create the thread referred to by `PID'
- *   - The creator of the process containing a thread that called
- *    `clone()' with `CLONE_PARENT', which then created the thread
- *     referred to by `PID'.
- *   - Even if  the thread  doesn't deliver  a signal  upon it  terminating,
- *     the process that would have received such a signal is still relevant.
- *   -> In other words: The thread `PID' must be one of your children,
- *                      or had you assigned as its parent.
- * If the calling thread isn't part of that process that will receive
- * the signal if the thread  dies without being detached first,  then
- * the   call   fails    by   throwing   an    `E_ILLEGAL_OPERATION'.
- * If  the thread had  already been detached, then  the call fails by
- * throwing an `E_ILLEGAL_OPERATION' as well.
- * Upon success, the thread  referred to by `PID'  will clean up its  own
- * PID descriptor without the need of anyone to wait() for it, a behavior
- * that linux implements using  `CLONE_THREAD' (which you shouldn't  use,
- * because it's flawed by design)
- * Once detached, any further use of  PID results in a race  condition
- * (which linux neglects to mention for `CLONE_THREAD'), because there
- * is no way of ensuring that PID still refers to the original thread,
- * as another thread may have been  created using the same PID,  after
- * the detached thread exited.
+ * The given `pid' must be:
+ *   - A thread without the caller's process
+ *   - A child process of the caller's process
  * NOTE: If a thread is created using clone() with `CLONE_DETACHED' set,
  *       it will behave effectively as though this function had  already
  *       be called.
- * NOTE: If the thread already has terminated, detaching it will kill
- *       its zombie the same way wait() would.
- * NOTE: Passing ZERO(0)  for `PID'  will detach  the calling  thread.
- *       However, this  operation fails  if the  calling thread  isn't
- *       part of the same process as the parent process of the thread.
- *       In other words,  the child  of a  fork() can't  do this,  and
- *       neither can the spawnee of  clone(CLONE_THREAD|CLONE_PARENT),
- *       clone(0) or clone(CLONE_PARENT).
- * @return: -EPERM:             The  calling  process isn't  the recipient  of signals
- *                              delivered when `PID'  changes state.  This can  either
- *                              be because `PID' has already been detached, or because
- *                              YOU CAN'T DETACH SOMEONE ELSE'S THREAD!
- *                              Another  possibility is that the thread was already
- *                              detached, then exited, following which a new thread
- *                              got created and had been  assigned the PID of  your
- *                              ancient, no longer existent thread.
- * @return: -ECHILD:           `PID' was equal to `-1', but no waitable children existed
- * @throw: E_PROCESS_EXITED:    The  process  referred  to  by  `PID'  doesn't exist.
- *                              This could  mean that  it had  already been  detached
- *                              and exited, or that the `PID' is just invalid  (which
- *                              would also be the case if it was valid at some point) */
+ * @return: -ECHILD:         `PID' was equal to `-1', but no waitable children existed
+ * @throw: E_PROCESS_EXITED: No such  thread/process exists,  or  the thread  isn't  isn't
+ *                           a thread in your process, or a child process of your process. */
 /* errno_t detach(pid_t pid) */
 .section .text.x86.asm32_syscall_sysenter.detach
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_detach)

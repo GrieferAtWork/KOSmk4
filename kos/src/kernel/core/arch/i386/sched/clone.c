@@ -33,6 +33,7 @@
 
 #include <signal.h>
 #include <stddef.h>
+#include <string.h>
 
 #ifndef CONFIG_NO_USERKERN_SEGMENT
 #include <kernel/rand.h>
@@ -79,17 +80,22 @@ NOTHROW(KCALL x86_get_random_userkern_address32)(void) {
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 sys_clone64_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	pid_t child_tid;
+	struct task_clone_args cargs;
 	REF struct task *child_tsk;
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
-	child_tsk = task_clone(ctx->rc_state,
-	                       ctx->rc_scinfo.rsi_regs[0],                         /* clone_flags */
-	                       (USER UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[2], /* parent_tidptr */
-	                       (USER UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[3], /* child_tidptr */
-	                       (USER UNCHECKED void *)ctx->rc_scinfo.rsi_regs[1],  /* child_stack */
-	                       x86_get_user_gsbase(),
-	                       ctx->rc_scinfo.rsi_regs[0] & CLONE_SETTLS ? ctx->rc_scinfo.rsi_regs[4]
-	                                                                 : x86_get_user_fsbase());
+	bzero(&cargs, sizeof(cargs));
+	cargs.tca_flags       = ctx->rc_scinfo.rsi_regs[0] & ~CSIGNAL;              /* clone_flags */
+	cargs.tca_exit_signal = ctx->rc_scinfo.rsi_regs[0] & CSIGNAL;               /* clone_flags */
+	cargs.tca_pidfd       = (USER UNCHECKED fd_t *)ctx->rc_scinfo.rsi_regs[2];  /* parent_tidptr */
+	cargs.tca_parent_tid  = (USER UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[2]; /* parent_tidptr */
+	cargs.tca_child_tid   = (USER UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[3]; /* child_tidptr */
+	cargs.tca_stack       = (USER UNCHECKED void *)ctx->rc_scinfo.rsi_regs[1];  /* child_stack */
+	cargs.tca_arch.atca_x86_gsbase = x86_get_user_gsbase();
+	cargs.tca_arch.atca_x86_fsbase = ctx->rc_scinfo.rsi_regs[4];
+	if (!(ctx->rc_scinfo.rsi_regs[0] & CLONE_SETTLS))
+		cargs.tca_arch.atca_x86_fsbase = x86_get_user_fsbase();
+	child_tsk = task_clone(ctx->rc_state, &cargs);
 	child_tid = task_gettid_of(child_tsk);
 	decref(child_tsk);
 	icpustate_setreturn(ctx->rc_state, child_tid);
@@ -122,16 +128,21 @@ PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 sys_clone32_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
 	pid_t child_tid;
 	REF struct task *child_tsk;
+	struct task_clone_args cargs;
 	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
-	child_tsk = task_clone(ctx->rc_state,
-	                       ctx->rc_scinfo.rsi_regs[0],                         /* clone_flags */
-	                       (USER UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[2], /* parent_tidptr */
-	                       (USER UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[4], /* child_tidptr */
-	                       (USER UNCHECKED void *)ctx->rc_scinfo.rsi_regs[1],  /* child_stack */
-	                       ctx->rc_scinfo.rsi_regs[0] & CLONE_SETTLS ? ctx->rc_scinfo.rsi_regs[3]
-	                                                                 : x86_get_user_gsbase(),
-	                       x86_get_user_fsbase());
+	bzero(&cargs, sizeof(cargs));
+	cargs.tca_flags       = ctx->rc_scinfo.rsi_regs[0] & ~CSIGNAL;              /* clone_flags */
+	cargs.tca_exit_signal = ctx->rc_scinfo.rsi_regs[0] & CSIGNAL;               /* clone_flags */
+	cargs.tca_pidfd       = (USER UNCHECKED fd_t *)ctx->rc_scinfo.rsi_regs[2];  /* parent_tidptr */
+	cargs.tca_parent_tid  = (USER UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[2]; /* parent_tidptr */
+	cargs.tca_child_tid   = (USER UNCHECKED pid_t *)ctx->rc_scinfo.rsi_regs[4]; /* child_tidptr */
+	cargs.tca_stack       = (USER UNCHECKED void *)ctx->rc_scinfo.rsi_regs[1];  /* child_stack */
+	cargs.tca_arch.atca_x86_fsbase = x86_get_user_fsbase();
+	cargs.tca_arch.atca_x86_gsbase = ctx->rc_scinfo.rsi_regs[3];
+	if (!(ctx->rc_scinfo.rsi_regs[0] & CLONE_SETTLS))
+		cargs.tca_arch.atca_x86_gsbase = x86_get_user_gsbase();
+	child_tsk = task_clone(ctx->rc_state, &cargs);
 	child_tid = task_gettid_of(child_tsk);
 	decref(child_tsk);
 	icpustate_setreturn(ctx->rc_state, child_tid);
@@ -157,84 +168,6 @@ DEFINE_SYSCALL32_5(pid_t, clone,
 	__builtin_unreachable();
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_CLONE || (__ARCH_WANT_SYSCALL_CLONE && !__x86_64__) */
-
-
-
-
-
-/************************************************************************/
-/* fork()                                                               */
-/************************************************************************/
-#ifdef __ARCH_WANT_SYSCALL_FORK
-INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
-sys_fork_impl(struct icpustate *__restrict state) {
-	pid_t child_tid;
-	REF struct task *child_tsk;
-	child_tsk = task_clone(state, SIGCHLD, NULL, NULL,
-	                       (USER UNCHECKED void *)icpustate_getusersp(state),
-	                       x86_get_user_gsbase(),
-	                       x86_get_user_fsbase());
-	child_tid = task_gettid_of(child_tsk);
-	decref(child_tsk);
-	gpregs_setpax(&state->ics_gpregs, child_tid);
-	return state;
-}
-
-PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
-sys_fork_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
-	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
-		return;
-	ctx->rc_state = sys_fork_impl(ctx->rc_state);
-
-	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
-	ctx->rc_context = RPC_REASONCTX_SYSRET;
-}
-
-DEFINE_SYSCALL0(pid_t, fork) {
-	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-	task_rpc_userunwind(&sys_fork_rpc, NULL);
-	__builtin_unreachable();
-}
-#endif /* __ARCH_WANT_SYSCALL_FORK */
-
-
-
-
-
-/************************************************************************/
-/* fork()                                                               */
-/************************************************************************/
-#ifdef __ARCH_WANT_SYSCALL_VFORK
-INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
-sys_vfork_impl(struct icpustate *__restrict state) {
-	pid_t child_tid;
-	REF struct task *child_tsk;
-	child_tsk = task_clone(state, CLONE_VM | CLONE_VFORK | SIGCHLD, NULL, NULL,
-	                       (USER UNCHECKED void *)icpustate_getusersp(state),
-	                       x86_get_user_gsbase(),
-	                       x86_get_user_fsbase());
-	child_tid = task_gettid_of(child_tsk);
-	decref(child_tsk);
-	gpregs_setpax(&state->ics_gpregs, child_tid);
-	return state;
-}
-
-PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
-sys_vfork_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
-	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
-		return;
-	ctx->rc_state = sys_vfork_impl(ctx->rc_state);
-
-	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
-	ctx->rc_context = RPC_REASONCTX_SYSRET;
-}
-
-DEFINE_SYSCALL0(pid_t, vfork) {
-	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-	task_rpc_userunwind(&sys_vfork_rpc, NULL);
-	__builtin_unreachable();
-}
-#endif /* __ARCH_WANT_SYSCALL_VFORK */
 
 DECL_END
 

@@ -52,6 +52,7 @@
 
 #include <sched.h>
 #include <stddef.h>
+#include <string.h>
 
 #include <libinstrlen/instrlen.h>
 
@@ -77,6 +78,8 @@ again:
 	TRY {
 		u32 *argv;
 		unsigned i;
+		struct task_clone_args cargs;
+
 		/* NOTE: cast ARGV to u32, thus truncating the pointer (this is intentional!) */
 		argv = (u32 *)((uintptr_t)(u32)icpustate_getuserpsp(state));
 		for (i = 0; i < __NR32RC_clone; ++i) {
@@ -91,15 +94,20 @@ again:
 			syscall_trace(&sc_info);
 #endif /* !CONFIG_NO_SYSCALL_TRACING */
 
+		bzero(&cargs, sizeof(cargs));
+		cargs.tca_flags       = sc_info.rsi_regs[0] & ~CSIGNAL;              /* clone_flags */
+		cargs.tca_exit_signal = sc_info.rsi_regs[0] & CSIGNAL;               /* clone_flags */
+		cargs.tca_pidfd       = (USER UNCHECKED fd_t *)sc_info.rsi_regs[2];  /* parent_tidptr */
+		cargs.tca_parent_tid  = (USER UNCHECKED pid_t *)sc_info.rsi_regs[2]; /* parent_tidptr */
+		cargs.tca_child_tid   = (USER UNCHECKED pid_t *)sc_info.rsi_regs[4]; /* child_tidptr */
+		cargs.tca_stack       = (USER UNCHECKED void *)sc_info.rsi_regs[1];  /* child_stack */
+		cargs.tca_arch.atca_x86_fsbase = x86_get_user_fsbase();
+		cargs.tca_arch.atca_x86_gsbase = sc_info.rsi_regs[3];
+		if (!(sc_info.rsi_regs[0] & CLONE_SETTLS))
+			cargs.tca_arch.atca_x86_gsbase = x86_get_user_gsbase();
+
 		/* Invoke the actual clone system call implementation. */
-		ctsk = task_clone(state,
-		                  sc_info.rsi_regs[0],                         /* clone_flags */
-		                  (USER UNCHECKED pid_t *)sc_info.rsi_regs[2], /* parent_tidptr */
-		                  (USER UNCHECKED pid_t *)sc_info.rsi_regs[4], /* child_tidptr */
-		                  (USER UNCHECKED void *)sc_info.rsi_regs[1],  /* child_stack */
-		                  sc_info.rsi_regs[0] & CLONE_SETTLS ? sc_info.rsi_regs[3]
-		                                                     : x86_get_user_gsbase(),
-		                  x86_get_user_fsbase());
+		ctsk = task_clone(state, &cargs);
 	} EXCEPT {
 #ifdef CONFIG_NO_SYSCALL_TRACING
 		sc_info.rsi_sysno = __NR32_clone;

@@ -319,12 +319,15 @@ NOTHROW(__FCALL libc_pthread_main)(struct pthread *__restrict me,
 	pthread_exit_thread(me, exitcode);
 }
 
-/* Assembly-side for the process of cloning a thread.
- * This function  simply  clones  the  calling  thread  before  invoking
- * `libc_pthread_main()' within the context of the newly spawned thread.
- * NOTE: This function also fills in `thread->pt_tid' */
-INTDEF pid_t NOTHROW(__FCALL libc_pthread_clone)(struct pthread *__restrict thread,
-                                                 void *(LIBCCALL start)(void *arg));
+/* Assembly-side for the process of cloning a thread. */
+INTDEF NONNULL((1, 2)) pid_t
+NOTHROW(__FCALL libc_pthread_clone)(struct pthread_clone_args *__restrict args,
+                                    struct pthread *__restrict thread);
+
+struct pthread_clone_args {
+	struct clone_args pca_args;              /* Clone arguments. */
+	void  *(LIBCCALL *pca_start)(void *arg); /* [1..1] Thread start function */
+};
 
 
 PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2, 3)) errno_t
@@ -335,6 +338,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 	void *tls;
 	pid_t cpid;
 	struct pthread *pt;
+	struct pthread_clone_args args;
+
 	/* Allocate the DL TLS segment */
 	tls = dltlsallocseg();
 	if unlikely(!tls)
@@ -388,8 +393,23 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 		/* The thread uses a custom, user-provided stack. */
 		pt->pt_flags |= PTHREAD_FUSERSTACK;
 	}
-	pt->pt_retval = arg;
-	cpid = libc_pthread_clone(pt, start_routine);
+
+	/* Set-up clone arguments. */
+	bzero(&args, sizeof(args));
+	args.pca_args.ca_flags = CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE |
+	                         CLONE_PARENT | CLONE_THREAD | CLONE_SYSVSEM | CLONE_SETTLS |
+	                         CLONE_CHILD_CLEARTID | CLONE_DETACHED | CLONE_CHILD_SETTID |
+	                         CLONE_IO | CLONE_PARENT_SETTID | CLONE_CRED;
+	args.pca_args.ca_stack      = pt->pt_stackaddr;
+	args.pca_args.ca_stack_size = pt->pt_stacksize;
+	args.pca_args.ca_tls        = pt->pt_tls;
+	args.pca_args.ca_parent_tid = &pt->pt_tid;
+	args.pca_args.ca_child_tid  = &pt->pt_tid;
+	args.pca_start              = start_routine;
+	pt->pt_retval               = arg;
+
+	/* Do the actual clone. */
+	cpid = libc_pthread_clone(&args, pt);
 	if unlikely(E_ISERR(cpid)) {
 		/* The clone() system call failed. */
 		if (pt->pt_cpuset != (cpu_set_t *)&pt->pt_cpusetsize)

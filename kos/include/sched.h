@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8685434d */
+/* HASH CRC-32:0xc8e1d6da */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -169,10 +169,9 @@ __SYSDECL_BEGIN
 #if !defined(CLONE_SIGHAND) && defined(__CLONE_SIGHAND)
 #define CLONE_SIGHAND        __CLONE_SIGHAND        /* Set if signal handlers shared. */
 #endif /* !CLONE_SIGHAND && __CLONE_SIGHAND */
-#if !defined(CLONE_CRED) && defined(__CLONE_CRED)
-#define CLONE_CRED           __CLONE_CRED           /* Set if credentials (user/group ids and special permissions) are shared. \
-                                                     * Note that during  an exec() credentials  are unshared  unconditionally. */
-#endif /* !CLONE_CRED && __CLONE_CRED */
+#if !defined(CLONE_PIDFD) && defined(__CLONE_PIDFD)
+#define CLONE_PIDFD          __CLONE_PIDFD          /* Set to create+store pidfd at `*parent_tidptr' */
+#endif /* !CLONE_PIDFD && __CLONE_PIDFD */
 #if !defined(CLONE_PTRACE) && defined(__CLONE_PTRACE)
 #define CLONE_PTRACE         __CLONE_PTRACE         /* Set if tracing continues on the child. */
 #endif /* !CLONE_PTRACE && __CLONE_PTRACE */
@@ -228,93 +227,25 @@ __SYSDECL_BEGIN
 #define CLONE_IO             __CLONE_IO             /* Clone I/O context. */
 #endif /* !CLONE_IO && __CLONE_IO */
 
-#ifdef __USE_KOS
-/* Value passed for 'CHILD_STACK' to 'clone()':
- * When given, let the kernel decide where and how to allocate a new stack for the child.
- * NOTE: The value was chosen due to the  fact that it represents the wrap-around  address
- *       that would otherwise cause a STACK_FAULT when attempted to be used with push/pop,
- *       meaning that it can't be used for any other meaningful purpose.
- * HINT: The   kernel's  auto-generated  stack   will  be  automatically   configured  to  either  be
- *       a copy of  the calling thread's  stack (at the  same address in  case CLONE_VM was  passed),
- *       or be located at a different address and consist of a pre-mapped portion (e.g.: 4K), as well
- *       as a guard page  with the potential of  extending the stack some  number of times (e.g.:  8)
- *       The  stack  memory  itself  will  be  lazily  allocated  on  access  and  be pre-initialized
- *       to either all ZEROs or a debug constant such as `0xCC'.
- * NOTE: Of  course   this  auto-generated   stack  will   also  be   automatically
- *       munmap()'ed  once  the thread  exits,  meaning it's  the  perfect solution
- *       for simple user-space multithreading that doesn't want to use <pthread.h>. */
-/* TODO: KOSmk4  no  longer   supports  automatic  user-space   stacks,  but   this
- *       functionality is currently assumed and made use of by `_beginthreadex(3)'.
- *     > Fix this by restricting this constant to __KOS_VERSION__ < 400, and re-write
- *       said function to simply make use of `pthread_create()' */
-#ifndef CLONE_CHILDSTACK_AUTO
-#ifdef __ARCH_STACK_GROWS_DOWNWARDS
-#define CLONE_CHILDSTACK_AUTO ((void *)0)
-#else /* __ARCH_STACK_GROWS_DOWNWARDS */
-#define CLONE_CHILDSTACK_AUTO ((void *)-1)
-#endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
-#endif /* !CLONE_CHILDSTACK_AUTO */
-
-#ifndef CLONE_NEW_THREAD
-#ifdef __CLONE_THREAD
-#define __PRIVATE_CLONE_THREAD __CLONE_THREAD
-#else /* __CLONE_THREAD */
-#define __PRIVATE_CLONE_THREAD 0
-#endif /* !__CLONE_THREAD */
-#ifdef __CLONE_VM
-#define __PRIVATE_CLONE_VM __CLONE_VM
-#else /* __CLONE_VM */
-#define __PRIVATE_CLONE_VM 0
-#endif /* !__CLONE_VM */
-#ifdef __CLONE_FS
-#define __PRIVATE_CLONE_FS __CLONE_FS
-#else /* __CLONE_FS */
-#define __PRIVATE_CLONE_FS 0
-#endif /* !__CLONE_FS */
-#ifdef __CLONE_FILES
-#define __PRIVATE_CLONE_FILES __CLONE_FILES
-#else /* __CLONE_FILES */
-#define __PRIVATE_CLONE_FILES 0
-#endif /* !__CLONE_FILES */
-#ifdef __CLONE_SIGHAND
-#define __PRIVATE_CLONE_SIGHAND __CLONE_SIGHAND
-#else /* __CLONE_SIGHAND */
-#define __PRIVATE_CLONE_SIGHAND 0
-#endif /* !__CLONE_SIGHAND */
-#ifdef __CLONE_CRED
-#define __PRIVATE_CLONE_CRED __CLONE_CRED
-#else /* __CLONE_CRED */
-#define __PRIVATE_CLONE_CRED 0
-#endif /* !__CLONE_CRED */
-#ifdef __CLONE_IO
-#define __PRIVATE_CLONE_IO __CLONE_IO
-#else /* __CLONE_IO */
-#define __PRIVATE_CLONE_IO 0
-#endif /* !__CLONE_IO */
-
-/* Generic set of clone flags implementing behavior
- * that one would expect  for a thread or  process. */
-#define CLONE_NEW_THREAD       \
-	(__PRIVATE_CLONE_THREAD |  \
-	 __PRIVATE_CLONE_VM |      \
-	 __PRIVATE_CLONE_FS |      \
-	 __PRIVATE_CLONE_FILES |   \
-	 __PRIVATE_CLONE_SIGHAND | \
-	 __PRIVATE_CLONE_CRED |    \
-	 __PRIVATE_CLONE_IO)
-#endif /* !CLONE_NEW_THREAD */
-
-/* Same flags as used by fork() */
-#ifndef CLONE_NEW_PROCESS
-#ifdef __SIGCHLD
-#define CLONE_NEW_PROCESS (__SIGCHLD)
-#else /* __SIGCHLD */
-#define CLONE_NEW_PROCESS 0
-#endif /* !__SIGCHLD */
-#endif /* !CLONE_NEW_PROCESS */
-
-#endif /* __USE_KOS */
+/* For `clone3(2)' */
+#if !defined(CLONE_CLEAR_SIGHAND) && defined(__CLONE_CLEAR_SIGHAND)
+#define CLONE_CLEAR_SIGHAND __CLONE_CLEAR_SIGHAND   /* Set all signal handlers to `SIG_DFL'. */
+#endif /* !CLONE_CLEAR_SIGHAND && __CLONE_CLEAR_SIGHAND */
+#if !defined(CLONE_INTO_CGROUP) && defined(__CLONE_INTO_CGROUP)
+#define CLONE_INTO_CGROUP   __CLONE_INTO_CGROUP     /* Use `clone_args::cgroup' */
+#endif /* !CLONE_INTO_CGROUP && __CLONE_INTO_CGROUP */
+#if !defined(CLONE_NEWTIME) && defined(__CLONE_NEWTIME)
+#define CLONE_NEWTIME       __CLONE_NEWTIME         /* New time namespace */
+#endif /* !CLONE_NEWTIME && __CLONE_NEWTIME */
 #endif /* __USE_GNU || __USE_KOS */
+
+#ifdef __USE_KOS
+/* For `clone3(2)' */
+#if !defined(CLONE_CRED) && defined(__CLONE_CRED)
+#define CLONE_CRED           __CLONE_CRED           /* Set if credentials (user/group ids and special permissions) are shared. \
+                                                     * Note that during  an exec() credentials  are unshared  unconditionally. */
+#endif /* !CLONE_CRED && __CLONE_CRED */
+#endif /* __USE_KOS */
 
 #ifdef __CC__
 #if defined(__USE_GNU) || defined(__USE_KOS)

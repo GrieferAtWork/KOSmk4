@@ -44,10 +44,9 @@
 #if !defined(CLONE_SIGHAND) && defined(__CLONE_SIGHAND)
 #define CLONE_SIGHAND        __CLONE_SIGHAND        /* Set if signal handlers shared. */
 #endif /* !CLONE_SIGHAND && __CLONE_SIGHAND */
-#if !defined(CLONE_CRED) && defined(__CLONE_CRED)
-#define CLONE_CRED           __CLONE_CRED           /* Set if credentials (user/group ids and special permissions) are shared. \
-                                                     * Note that during  an exec() credentials  are unshared  unconditionally. */
-#endif /* !CLONE_CRED && __CLONE_CRED */
+#if !defined(CLONE_PIDFD) && defined(__CLONE_PIDFD)
+#define CLONE_PIDFD          __CLONE_PIDFD          /* Set to create+store pidfd at `*parent_tidptr' */
+#endif /* !CLONE_PIDFD && __CLONE_PIDFD */
 #if !defined(CLONE_PTRACE) && defined(__CLONE_PTRACE)
 #define CLONE_PTRACE         __CLONE_PTRACE         /* Set if tracing continues on the child. */
 #endif /* !CLONE_PTRACE && __CLONE_PTRACE */
@@ -103,23 +102,60 @@
 #define CLONE_IO             __CLONE_IO             /* Clone I/O context. */
 #endif /* !CLONE_IO && __CLONE_IO */
 
+/* For `clone3(2)' */
+#if !defined(CLONE_CLEAR_SIGHAND) && defined(__CLONE_CLEAR_SIGHAND)
+#define CLONE_CLEAR_SIGHAND __CLONE_CLEAR_SIGHAND   /* Set all signal handlers to `SIG_DFL'. */
+#endif /* !CLONE_CLEAR_SIGHAND && __CLONE_CLEAR_SIGHAND */
+#if !defined(CLONE_INTO_CGROUP) && defined(__CLONE_INTO_CGROUP)
+#define CLONE_INTO_CGROUP   __CLONE_INTO_CGROUP     /* Use `clone_args::cgroup' */
+#endif /* !CLONE_INTO_CGROUP && __CLONE_INTO_CGROUP */
+#if !defined(CLONE_NEWTIME) && defined(__CLONE_NEWTIME)
+#define CLONE_NEWTIME       __CLONE_NEWTIME         /* New time namespace */
+#endif /* !CLONE_NEWTIME && __CLONE_NEWTIME */
+#if !defined(CLONE_CRED) && defined(__CLONE_CRED)
+#define CLONE_CRED           __CLONE_CRED           /* Set if credentials (user/group ids and special permissions) are shared. \
+                                                     * Note that during  an exec() credentials  are unshared  unconditionally. */
+#endif /* !CLONE_CRED && __CLONE_CRED */
+
 #ifdef __CC__
 DECL_BEGIN
 
+struct task_clone_args {
+	uint64_t                    tca_flags;       /* Set of `CLONE_*' */
+	USER UNCHECKED fd_t        *tca_pidfd;       /* [valid_if(CLONE_PIDFD)] Where to store pidfd */
+	USER UNCHECKED pid_t       *tca_child_tid;   /* [valid_if(CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID)] Store child TID here in child memory */
+	USER UNCHECKED pid_t       *tca_parent_tid;  /* [valid_if(CLONE_PARENT_SETTID)] Store child TID here in parent memory */
+	signo_t                     tca_exit_signal; /* [type(signo_t)] Signal to send to parent on child exit */
+	USER UNCHECKED void        *tca_stack;       /* Child stack starting address */
+	USER UNCHECKED pid_t       *tca_set_tid;     /* [0..tca_set_tid] set-tid array base */
+	size_t                      tca_set_tid_siz; /* set-tid array length */
+	fd_t                        tca_cgroup;      /* [valid_if(CLONE_INTO_CGROUP)] cgroup file descriptor */
+#ifdef ARCH_HAVE_ARCH_TASK_CLONE_ARGS
+	struct arch_task_clone_args tca_arch;        /* Arch-specific */
+#endif /* ARCH_HAVE_ARCH_TASK_CLONE_ARGS */
+};
+
+#ifdef ARCH_HAVE_ARCH_TASK_CLONE_ARGS
+#ifndef arch_task_clone_args_inittls
+#error "Arch must #define arch_task_clone_args_inittls"
+#endif /* !arch_task_clone_args_inittls */
+#ifndef arch_task_clone_args_initfork
+#error "Arch must #define arch_task_clone_args_initfork"
+#endif /* !arch_task_clone_args_initfork */
+#ifndef arch_task_clone_args_initvfork
+#define arch_task_clone_args_initvfork(self) \
+	arch_task_clone_args_initfork(self)
+#endif /* !arch_task_clone_args_initvfork */
+#endif /* ARCH_HAVE_ARCH_TASK_CLONE_ARGS */
+
+
 /* High-level implementation for the `clone(2)' system call.
- * @param: init_state:    The CPU state of the thead that called `clone(2)'
- * @param: clone_flags:   Set of `CLONE_*' (as defined in <sched.h>)
- * @param: parent_tidptr: [valid_if(CLONE_PARENT_SETTID)]
- *                        Store child TID here in parent process
- * @param: child_tidptr:  [valid_if(CLONE_CHILD_CLEARTID | CLONE_CHILD_SETTID)]
- *                        Store child TID here in child process
+ * @param: init_state: The CPU state of the thead that called `clone(2)'
+ * @param: args:       Clone arguments.
  * @param: ARCH_CLONE__PARAMS: Additional, arch-specific parameters */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL
 task_clone(struct icpustate const *__restrict init_state,
-           syscall_ulong_t clone_flags,
-           USER UNCHECKED pid_t *parent_tidptr,
-           USER UNCHECKED pid_t *child_tidptr
-           ARCH_CLONE__PARAMS)
+           struct task_clone_args const *__restrict args)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 
 

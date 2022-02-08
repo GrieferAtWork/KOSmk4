@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed315708 */
+/* HASH CRC-32:0x54d64552 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -619,8 +619,7 @@
 #define __NR_mq_getsetattr                0x11a                  /* errno_t mq_getsetattr(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldattr) */
 #define __NR_kexec_load                   0x11b                  /* errno_t kexec_load(int TODO_PROTOTYPE) */
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
- *                  optionally     or'd     with     `WNOHANG | WNOWAIT' */
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 #define __NR_waitid                       0x11c                  /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32 *ru) */
 #define __NR_add_key                      0x11e                  /* errno_t add_key(int TODO_PROTOTYPE) */
 #define __NR_request_key                  0x11f                  /* errno_t request_key(int TODO_PROTOTYPE) */
@@ -1061,7 +1060,7 @@
  * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_NOTALEADER:    [...]
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS:                                           [...] */
 #define __NR_pidfd_open                   0x1b2                  /* fd_t pidfd_open(pid_t pid, syscall_ulong_t flags) */
-#define __NR_clone3                       0x1b3                  /* errno_t clone3(int TODO_PROTOTYPE) */
+#define __NR_clone3                       0x1b3                  /* syscall_slong_t clone3(struct clone_args *cl_args, size_t size) */
 #define __NR_close_range                  0x1b4                  /* errno_t close_range(int TODO_PROTOTYPE) */
 #define __NR_openat2                      0x1b5                  /* errno_t openat2(int TODO_PROTOTYPE) */
 /* Duplicate the  handle  of  a  foreign  process into  a  handle  for  the  caller.
@@ -1099,8 +1098,7 @@
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define __NR_fmkdirat                     __UINT32_C(0xfffffed8) /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
- *                  optionally     or'd     with     `WNOHANG | WNOWAIT' */
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 #define __NR_waitid64                     __UINT32_C(0xfffffee4) /* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
 /* @param: times:    When NULL, set the current time
  * @param: times[0]: New access time
@@ -1401,9 +1399,9 @@
  * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
  * 
  * @param: target_tid:      The TID of the targeted thread
- * @param: mode:            One of  `RPC_SYNCMODE_*', optionally or'd  with
+ * @param: mode:            One of `RPC_SYNCMODE_*',  optionally or'd  with
  *                          one of `RPC_SYSRESTART_*', optionally or'd with
- *                          one of  `RPC_PRIORITY_*', optionally or'd  with
+ *                          one of `RPC_PRIORITY_*',  optionally or'd  with
  *                          one of  `RPC_DOMAIN_*',  optionally  or'd  with
  *                          one of `RPC_JOIN_*'
  * @param: program:         The RPC program to execute (sequences of `RPC_OP_*')
@@ -1481,54 +1479,15 @@
  *     turning its chain of children into a clean slate that no longer contains
  *     any wait(2)able child threads or processes.
  *     If no waitable children existed, `ECHILD' is set; else `0' is returned.
- * Before any of this is done, the thread referred to by `PID' is one of the following:
- *   - The leader of the process that called `fork()' or `clone()' without
- *    `CLONE_PARENT' to create the thread referred to by `PID'
- *   - The creator of the process containing a thread that called
- *    `clone()' with `CLONE_PARENT', which then created the thread
- *     referred to by `PID'.
- *   - Even if  the thread  doesn't deliver  a signal  upon it  terminating,
- *     the process that would have received such a signal is still relevant.
- *   -> In other words: The thread `PID' must be one of your children,
- *                      or had you assigned as its parent.
- * If the calling thread isn't part of that process that will receive
- * the signal if the thread  dies without being detached first,  then
- * the   call   fails    by   throwing   an    `E_ILLEGAL_OPERATION'.
- * If  the thread had  already been detached, then  the call fails by
- * throwing an `E_ILLEGAL_OPERATION' as well.
- * Upon success, the thread  referred to by `PID'  will clean up its  own
- * PID descriptor without the need of anyone to wait() for it, a behavior
- * that linux implements using  `CLONE_THREAD' (which you shouldn't  use,
- * because it's flawed by design)
- * Once detached, any further use of  PID results in a race  condition
- * (which linux neglects to mention for `CLONE_THREAD'), because there
- * is no way of ensuring that PID still refers to the original thread,
- * as another thread may have been  created using the same PID,  after
- * the detached thread exited.
+ * The given `pid' must be:
+ *   - A thread without the caller's process
+ *   - A child process of the caller's process
  * NOTE: If a thread is created using clone() with `CLONE_DETACHED' set,
  *       it will behave effectively as though this function had  already
  *       be called.
- * NOTE: If the thread already has terminated, detaching it will kill
- *       its zombie the same way wait() would.
- * NOTE: Passing ZERO(0)  for `PID'  will detach  the calling  thread.
- *       However, this  operation fails  if the  calling thread  isn't
- *       part of the same process as the parent process of the thread.
- *       In other words,  the child  of a  fork() can't  do this,  and
- *       neither can the spawnee of  clone(CLONE_THREAD|CLONE_PARENT),
- *       clone(0) or clone(CLONE_PARENT).
- * @return: -EPERM:             The  calling  process isn't  the recipient  of signals
- *                              delivered when `PID'  changes state.  This can  either
- *                              be because `PID' has already been detached, or because
- *                              YOU CAN'T DETACH SOMEONE ELSE'S THREAD!
- *                              Another  possibility is that the thread was already
- *                              detached, then exited, following which a new thread
- *                              got created and had been  assigned the PID of  your
- *                              ancient, no longer existent thread.
- * @return: -ECHILD:           `PID' was equal to `-1', but no waitable children existed
- * @throw: E_PROCESS_EXITED:    The  process  referred  to  by  `PID'  doesn't exist.
- *                              This could  mean that  it had  already been  detached
- *                              and exited, or that the `PID' is just invalid  (which
- *                              would also be the case if it was valid at some point) */
+ * @return: -ECHILD:         `PID' was equal to `-1', but no waitable children existed
+ * @throw: E_PROCESS_EXITED: No such  thread/process exists,  or  the thread  isn't  isn't
+ *                           a thread in your process, or a child process of your process. */
 #define __NR_detach                       __UINT32_C(0xfffffffb) /* errno_t detach(pid_t pid) */
 /* Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
@@ -2688,7 +2647,7 @@
 #define __NRRC_fsmount                      1
 #define __NRRC_fspick                       1
 #define __NRRC_pidfd_open                   2
-#define __NRRC_clone3                       1
+#define __NRRC_clone3                       2
 #define __NRRC_close_range                  1
 #define __NRRC_openat2                      1
 #define __NRRC_pidfd_getfd                  3
