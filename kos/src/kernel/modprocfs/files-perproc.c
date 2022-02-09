@@ -1276,6 +1276,9 @@ procfs_pp_stat_print(struct printnode *__restrict self,
 	REF struct task *thread;
 	REF struct mman *mm = NULL;
 	struct taskpid *tpid;
+#ifdef CONFIG_HAVE_TASK_COMM
+	char comm_name[TASK_COMM_LEN];
+#endif /* CONFIG_HAVE_TASK_COMM */
 	tpid   = self->fn_fsdata;
 	thread = taskpid_gettask(tpid);
 	FINALLY_XDECREF_UNLIKELY(thread);
@@ -1285,6 +1288,15 @@ procfs_pp_stat_print(struct printnode *__restrict self,
 	if (printf("%" PRIuN(__SIZEOF_PID_T__) " (",
 	           taskpid_gettid_s(tpid)) < 0)
 		return;
+#ifdef CONFIG_HAVE_TASK_COMM
+	comm_name[0] = '\0';
+	if (thread)
+		task_getcomm_of(thread, comm_name);
+	if (comm_name[0] != '\0') {
+		/* Print custom thread command name. */
+		printf("%#q", comm_name);
+	} else
+#endif /* CONFIG_HAVE_TASK_COMM */
 	if (mm) {
 		bool has_path;
 		REF struct fdirent *exec_name;
