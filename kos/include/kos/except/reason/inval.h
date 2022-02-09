@@ -263,7 +263,9 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_CLONE_VFORK_WITHOUT_VM,             /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `CLONE_VFORK` was given without 'CLONE_VM'. */
 	E_INVALID_ARGUMENT_CONTEXT_CLONE_FS_WITH_NEWNS,                /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `CLONE_FS` and 'CLONE_NEWNS' were given. */
 	E_INVALID_ARGUMENT_CONTEXT_CLONE_SIGHAND_WITHOUT_VM,           /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `CLONE_SIGHAND` was given without 'CLONE_VM'. */
-	E_INVALID_ARGUMENT_CONTEXT_COMM_DIFFERENT_PROCESS,             /* E_INVALID_ARGUMENT_BAD_STATE: Tried to change the `comm' of a thread in a different process. */
+	E_INVALID_ARGUMENT_CONTEXT_PROC_COMM_DIFFERENT_PROCESS,        /* E_INVALID_ARGUMENT_BAD_STATE: Tried to change the `comm' of a thread in a different process. */
+	E_INVALID_ARGUMENT_CONTEXT_PROC_PEB_ADDR_DIFFERENT_PROCESS,    /* E_INVALID_ARGUMENT_BAD_STATE: Tried to change the `/proc/[pid]/kos/peb-addr' or `/proc/[pid]/kos/peb-compat' of a thread in a different mman (CLONE_VM). */
+	E_INVALID_ARGUMENT_CONTEXT_BAD_POINTER_STRING,                 /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to write a malformed pointer to a system configuration file */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -502,7 +504,9 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_CLONE_VFORK_WITHOUT_VM             E_INVALID_ARGUMENT_CONTEXT_CLONE_VFORK_WITHOUT_VM             /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `CLONE_VFORK` was given without 'CLONE_VM'. */
 #define E_INVALID_ARGUMENT_CONTEXT_CLONE_FS_WITH_NEWNS                E_INVALID_ARGUMENT_CONTEXT_CLONE_FS_WITH_NEWNS                /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `CLONE_FS` and 'CLONE_NEWNS' were given. */
 #define E_INVALID_ARGUMENT_CONTEXT_CLONE_SIGHAND_WITHOUT_VM           E_INVALID_ARGUMENT_CONTEXT_CLONE_SIGHAND_WITHOUT_VM           /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `CLONE_SIGHAND` was given without 'CLONE_VM'. */
-#define E_INVALID_ARGUMENT_CONTEXT_COMM_DIFFERENT_PROCESS             E_INVALID_ARGUMENT_CONTEXT_COMM_DIFFERENT_PROCESS             /* E_INVALID_ARGUMENT_BAD_STATE: Tried to change the `comm' of a thread in a different process. */
+#define E_INVALID_ARGUMENT_CONTEXT_PROC_COMM_DIFFERENT_PROCESS        E_INVALID_ARGUMENT_CONTEXT_PROC_COMM_DIFFERENT_PROCESS        /* E_INVALID_ARGUMENT_BAD_STATE: Tried to change the `comm' of a thread in a different process. */
+#define E_INVALID_ARGUMENT_CONTEXT_PROC_PEB_ADDR_DIFFERENT_PROCESS    E_INVALID_ARGUMENT_CONTEXT_PROC_PEB_ADDR_DIFFERENT_PROCESS    /* E_INVALID_ARGUMENT_BAD_STATE: Tried to change the `kos/peb-addr' of a thread in a different mman (CLONE_VM). */
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_POINTER_STRING                 E_INVALID_ARGUMENT_CONTEXT_BAD_POINTER_STRING                 /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to write a malformed pointer to a system configuration file */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -738,7 +742,9 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_CLONE_VFORK_WITHOUT_VM             211 /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `CLONE_VFORK` was given without 'CLONE_VM'. */
 #define E_INVALID_ARGUMENT_CONTEXT_CLONE_FS_WITH_NEWNS                212 /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `CLONE_FS` and 'CLONE_NEWNS' were given. */
 #define E_INVALID_ARGUMENT_CONTEXT_CLONE_SIGHAND_WITHOUT_VM           213 /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `CLONE_SIGHAND` was given without 'CLONE_VM'. */
-#define E_INVALID_ARGUMENT_CONTEXT_COMM_DIFFERENT_PROCESS             214 /* E_INVALID_ARGUMENT_BAD_STATE: Tried to change the `comm' of a thread in a different process. */
+#define E_INVALID_ARGUMENT_CONTEXT_PROC_COMM_DIFFERENT_PROCESS        214 /* E_INVALID_ARGUMENT_BAD_STATE: Tried to change the `comm' of a thread in a different process. */
+#define E_INVALID_ARGUMENT_CONTEXT_PROC_PEB_ADDR_DIFFERENT_PROCESS    215 /* E_INVALID_ARGUMENT_BAD_STATE: Tried to change the `kos/peb-addr' of a thread in a different mman (CLONE_VM). */
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_POINTER_STRING                 216 /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to write a malformed pointer to a system configuration file */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

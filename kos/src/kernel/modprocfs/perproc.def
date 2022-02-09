@@ -44,6 +44,8 @@
 
 #include <hybrid/host.h>
 
+#include <compat/config.h>
+
 /* clang-format off */
 
 
@@ -92,9 +94,17 @@ MKREG_RO(procfs_pp_attr_current, procfs_pp_attr_current_print)
 
 /* /proc/[PID]/kos */
 MKDIR_BEGIN(procfs_pp_kos)
-	MKDIR_ENT("dcwd",   DT_DIR, 0555, &procfs_pp_kos_dcwd,   /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x88327e84, 0x64776364, 0x877f3284, 0x64776364)/*[[[end]]]*/)
-	MKDIR_ENT("drives", DT_DIR, 0555, &procfs_pp_kos_drives, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x29b578e9, 0x736576697264, 0x8806288b, 0x736576697264)/*[[[end]]]*/)
+	MKDIR_ENT("dcwd",       DT_DIR, 0555, &procfs_pp_kos_dcwd,       /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x88327e84, 0x64776364, 0x877f3284, 0x64776364)/*[[[end]]]*/)
+	MKDIR_ENT("drives",     DT_DIR, 0555, &procfs_pp_kos_drives,     /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x29b578e9, 0x736576697264, 0x8806288b, 0x736576697264)/*[[[end]]]*/)
+	MKDIR_ENT("peb-addr",   DT_REG, 0644, &procfs_pp_kos_peb_addr,   /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x61a99fd9, 0x587876a987590f0, 0xfc9b983f, 0xf39073986c878802)/*[[[end]]]*/)
+#ifdef __ARCH_HAVE_COMPAT
+	MKDIR_ENT("peb-compat", DT_REG, 0644, &procfs_pp_kos_peb_compat, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x4ffb774c, 0xf3d8ea7c98760551, 0xeff5d8e, 0xf39073987eeb4d51)/*[[[end]]]*/)
+#endif /* __ARCH_HAVE_COMPAT */
 MKDIR_END
+MKREG_RW(procfs_pp_kos_peb_addr, procfs_pp_kos_peb_addr_print, procfs_pp_kos_peb_addr_write)
+#ifdef __ARCH_HAVE_COMPAT
+MKREG_RW(procfs_pp_kos_peb_compat, procfs_pp_kos_peb_compat_print, procfs_pp_kos_peb_compat_write)
+#endif /* __ARCH_HAVE_COMPAT */
 
 #if defined(__x86_64__) || defined(__i386__)
 /* /proc/[PID]/x86 */

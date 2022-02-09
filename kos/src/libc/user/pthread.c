@@ -2885,7 +2885,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_consistent)(pthread_mutex_t *mutex)
  *   rw_lock             sl_lock                 # of read-locks, or (uint32_t)-1 if a write-lock is active
  *   rw_readers_wakeup   sl_rdwait               Futex for read-lock waiters (non-zero if threads may be waiting)
  *   rw_writer_wakeup    sl_wrwait               Futex for write-lock waiters (non-zero if threads may be waiting)
- *   rw_flags            N/A                     One of `PTHREAD_RWLOCK_PREFER_*'
+ *   rw_flags            N/A                     Non-zero if `PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP'
  *   rw_writer           N/A                     TID of thread holding write-lock (else: `0')
  *   rw_nr_writers       N/A                     Write-lock recursion under `PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP'
  *
@@ -3042,7 +3042,7 @@ readlock_tls_data_dodel(struct readlock_tls_data *__restrict self,
 		ent  = &self->rtd_rdlock_list[i & self->rtd_rdlock_mask];
 		emon = ent->rb_lock;
 		if (emon == READLOCK_BUCKET_SENTINEL)
-			return EPERM; /* No such monitor. */
+			return EPERM; /* No such read-lock. */
 		if (emon == lck)
 			break; /* Found it! */
 	}
@@ -3064,7 +3064,7 @@ NOTHROW(CC readlock_tls_data_contains)(struct readlock_tls_data const *__restric
 	for (;; pthread_rwlock_hashnx(i, perturb)) {
 		emon = self->rtd_rdlock_list[i & self->rtd_rdlock_mask].rb_lock;
 		if (emon == READLOCK_BUCKET_SENTINEL)
-			return false; /* No such monitor. */
+			return false; /* No such read-lock. */
 		if (emon == lck)
 			return true; /* Found it! */
 	}

@@ -56,23 +56,29 @@ DECL_BEGIN
  * In order words: If  the  user passes  a pointer  that  is part  of kernel-space,
  *                 these functions are used to deny the user access to such memory.
  * @throw E_SEGFAULT: User-space has not been granted access to the given address range. */
-FUNDEF void KCALL validate_user(UNCHECKED USER void const *base, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF void KCALL validate_userm(UNCHECKED USER void const *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
-FUNDEF void KCALL validate_readable(UNCHECKED USER void const *base, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF void KCALL validate_readablem(UNCHECKED USER void const *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
-FUNDEF void KCALL validate_writable(UNCHECKED USER void *base, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF void KCALL validate_writablem(UNCHECKED USER void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
-FUNDEF void KCALL validate_readwrite(UNCHECKED USER void *base, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF void KCALL validate_readwritem(UNCHECKED USER void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
-FUNDEF void KCALL validate_executable(UNCHECKED USER void const *base) THROWS(E_SEGFAULT);
+FUNDEF void FCALL validate_user(UNCHECKED USER void const *base, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF void FCALL validate_userm(UNCHECKED USER void const *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
+FUNDEF void FCALL validate_readable(UNCHECKED USER void const *base, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF void FCALL validate_readablem(UNCHECKED USER void const *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
+FUNDEF void FCALL validate_readableaddr(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT);
+FUNDEF void FCALL validate_writable(UNCHECKED USER void *base, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF void FCALL validate_writablem(UNCHECKED USER void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
+FUNDEF void FCALL validate_writableaddr(UNCHECKED USER void *addr) THROWS(E_SEGFAULT);
+FUNDEF void FCALL validate_readwrite(UNCHECKED USER void *base, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF void FCALL validate_readwritem(UNCHECKED USER void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
+FUNDEF void FCALL validate_executable(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT);
+FUNDEF void FCALL validate_readwriteaddr(UNCHECKED USER void *addr) THROWS(E_SEGFAULT);
 /* Same as the function above, but also accept `NULL' */
-FUNDEF void KCALL validate_readable_opt(UNCHECKED USER void const *base, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF void KCALL validate_readablem_opt(UNCHECKED USER void const *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
-FUNDEF void KCALL validate_writable_opt(UNCHECKED USER void *base, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF void KCALL validate_writablem_opt(UNCHECKED USER void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
-FUNDEF void KCALL validate_readwrite_opt(UNCHECKED USER void *base, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF void KCALL validate_readwritem_opt(UNCHECKED USER void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
-FUNDEF void KCALL validate_executable_opt(UNCHECKED USER void const *base) THROWS(E_SEGFAULT);
+FUNDEF void FCALL validate_readable_opt(UNCHECKED USER void const *base, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF void FCALL validate_readablem_opt(UNCHECKED USER void const *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
+FUNDEF void FCALL validate_readableaddr_opt(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT);
+FUNDEF void FCALL validate_writable_opt(UNCHECKED USER void *base, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF void FCALL validate_writablem_opt(UNCHECKED USER void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
+FUNDEF void FCALL validate_writableaddr_opt(UNCHECKED USER void *addr) THROWS(E_SEGFAULT);
+FUNDEF void FCALL validate_readwrite_opt(UNCHECKED USER void *base, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF void FCALL validate_readwritem_opt(UNCHECKED USER void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT);
+FUNDEF void FCALL validate_readwriteaddr_opt(UNCHECKED USER void *addr) THROWS(E_SEGFAULT);
+FUNDEF void FCALL validate_executable_opt(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT);
 
 /* Same as the regular validate functions, but are allowed to be used for verification
  * of  pointers originating from  compatibility mode (this  allows for an optimization

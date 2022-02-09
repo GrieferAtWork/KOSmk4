@@ -158,6 +158,9 @@ ProcFS_ParseU32(USER CHECKED void const *buf, size_t bufsize, u32 minval DFL(0),
 INTDEF NONNULL((1)) u64 FCALL
 ProcFS_ParseU64(USER CHECKED void const *buf, size_t bufsize, u64 minval DFL(0), u64 maxval DFL((u64)-1))
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE, E_BUFFER_TOO_SMALL);
+INTDEF NONNULL((1)) USER UNCHECKED void *FCALL
+ProcFS_ParsePtr(USER CHECKED void const *buf, size_t bufsize)
+		THROWS(E_SEGFAULT, E_BUFFER_TOO_SMALL);
 
 #if __SIZEOF_SIZE_T__ >= 8
 #define ProcFS_ParseSize ProcFS_ParseU64

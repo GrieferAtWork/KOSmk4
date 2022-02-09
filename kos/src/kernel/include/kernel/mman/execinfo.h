@@ -32,16 +32,29 @@ struct fdirent;
 struct path;
 
 struct mexecinfo {
-	REF struct mfile   *mei_file; /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec INode */
-	REF struct fdirent *mei_dent; /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec directory entry */
-	REF struct path    *mei_path; /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec path */
-	USER CHECKED void  *mei_peb;  /* [?..1][lock(:THIS_MMAN->mm_lock)] PEB base address. */
+	/* NOTE: Fields of this structure are exposed in procfs:
+	 * - mei_file:           $ cat /proc/[pid]/exe
+	 * - mei_dent, mei_path: $ readlink /proc/[pid]/exe
+	 * - mei_peb:            $ cat /proc/[pid]/kos/peb-addr   && echo 0x1234 > /proc/[pid]/kos/peb-addr
+	 * - mei_peb_iscompat:   $ cat /proc/[pid]/kos/peb-compat && echo 0|1    > /proc/[pid]/kos/peb-compat
+	 */
+
+	REF struct mfile   *mei_file;         /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec INode */
+	REF struct fdirent *mei_dent;         /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec directory entry */
+	REF struct path    *mei_path;         /* [0..1][lock(:THIS_MMAN->mm_lock)] Exec path */
+	USER CHECKED void  *mei_peb;          /* [?..1][lock(:THIS_MMAN->mm_lock)] PEB base address. */
 #ifdef __ARCH_HAVE_COMPAT
-	bool mei_peb_iscompat; /* [lock(:THIS_MMAN->mm_lock)] True if the PEB is in compatibility mode. */
+	bool                mei_peb_iscompat; /* [lock(:THIS_MMAN->mm_lock)] True if the PEB is in compatibility mode. */
 #endif /* __ARCH_HAVE_COMPAT */
 };
 
-/* MMan exec() information */
+/* MMan exec() information
+ * NOTE: For `mman_kernel', this structure is initialized as:
+ *  - mei_file         = NULL;  // or `kernel_driver.md_file'
+ *  - mei_dent         = kernel_driver.md_fsname;
+ *  - mei_path         = NULL;
+ *  - mei_peb          = NULL;
+ *  - mei_peb_iscompat = false; */
 DATDEF ATTR_PERMMAN struct mexecinfo thismman_execinfo;
 
 DECL_END

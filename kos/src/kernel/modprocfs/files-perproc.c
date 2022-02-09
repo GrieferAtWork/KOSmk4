@@ -47,6 +47,7 @@ DECL_END
 #include <kernel/fs/vfs.h>
 #include <kernel/handle.h>
 #include <kernel/mman.h>
+#include <kernel/mman/driver.h>
 #include <kernel/mman/enum.h>
 #include <kernel/mman/execinfo.h>
 #include <kernel/mman/memfd.h>
@@ -716,10 +717,24 @@ procfs_pp_cmdline_print(struct printnode *__restrict self,
 	thread   = taskpid_gettask_srch(self->fn_fsdata);
 	threadmm = task_getmman(thread);
 	decref_unlikely(thread);
+	if (threadmm == &mman_kernel) {
+		/* Special case: printing the commandline of a kernel thread. */
+		char const *cmd;
+		size_t length;
+		decref_nokill(threadmm);
+		cmd    = kernel_driver.d_cmdline;
+		length = strlen(cmd);
+		while (cmd[length + 1]) {
+			++length;
+			length += strlen(cmd + length);
+		}
+		(*printer)(arg, cmd, length);
+		return;
+	}
 	FINALLY_DECREF_UNLIKELY(threadmm);
-	peb = FORMMAN(threadmm, thismman_execinfo).mei_peb;
+	peb = ATOMIC_READ(FORMMAN(threadmm, thismman_execinfo).mei_peb);
 #ifdef __ARCH_HAVE_COMPAT
-	if (FORMMAN(threadmm, thismman_execinfo).mei_peb_iscompat) {
+	if (ATOMIC_READ(FORMMAN(threadmm, thismman_execinfo).mei_peb_iscompat)) {
 		compat_peb_print_cmdline(threadmm, printer, arg,
 		                         (USER CHECKED struct compat_process_peb const *)peb);
 	} else
@@ -760,7 +775,8 @@ procfs_pp_comm_write(struct mfile *__restrict self, USER CHECKED void const *src
 	/* Must be within the same process. */
 	if (taskpid_getprocpid(me->fn_fsdata) != task_getprocpid()) {
 		THROW(E_INVALID_ARGUMENT_BAD_STATE,
-		      E_INVALID_ARGUMENT_CONTEXT_COMM_DIFFERENT_PROCESS);
+		      E_INVALID_ARGUMENT_CONTEXT_PROC_COMM_DIFFERENT_PROCESS,
+		      taskpid_gettid_s(me->fn_fsdata));
 	}
 	thread = taskpid_gettask_srch(me->fn_fsdata);
 	FINALLY_DECREF_UNLIKELY(thread);
@@ -851,9 +867,9 @@ procfs_pp_environ_print(struct printnode *__restrict self,
 	threadmm = task_getmman(thread);
 	decref_unlikely(thread);
 	FINALLY_DECREF_UNLIKELY(threadmm);
-	peb = FORMMAN(threadmm, thismman_execinfo).mei_peb;
+	peb = ATOMIC_READ(FORMMAN(threadmm, thismman_execinfo).mei_peb);
 #ifdef __ARCH_HAVE_COMPAT
-	if (FORMMAN(threadmm, thismman_execinfo).mei_peb_iscompat) {
+	if (ATOMIC_READ(FORMMAN(threadmm, thismman_execinfo).mei_peb_iscompat)) {
 		compat_peb_print_environ(threadmm, printer, arg,
 		                         (USER CHECKED struct compat_process_peb const *)peb);
 	} else
@@ -1696,6 +1712,111 @@ procfs_pp_attr_current_print(struct printnode *__restrict self,
 	(void)self;
 	PRINT("unconfined");
 }
+
+
+
+/************************************************************************/
+/* /proc/[PID]/kos/peb-addr                                             */
+/************************************************************************/
+INTERN NONNULL((1, 2)) void KCALL
+procfs_pp_kos_peb_addr_print(struct printnode *__restrict self,
+                             pformatprinter printer, void *arg,
+                             pos_t UNUSED(offset_hint)) {
+	REF struct task *thread;
+	REF struct mman *threadmm;
+	USER CHECKED void *peb;
+
+	/* Lookup the relevant mman. */
+	thread   = taskpid_gettask_srch(self->fn_fsdata);
+	threadmm = task_getmman(thread);
+	decref_unlikely(thread);
+	peb = ATOMIC_READ(FORMMAN(threadmm, thismman_execinfo).mei_peb);
+	decref_unlikely(threadmm);
+	format_printf(printer, arg, "%#" PRIxPTR, peb);
+}
+
+INTERN NONNULL((1, 2)) size_t KCALL
+procfs_pp_kos_peb_addr_write(struct mfile *__restrict self, USER CHECKED void const *src,
+                             size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) {
+	struct printnode *me = mfile_asprintnode(self);
+	REF struct task *thread;
+	REF struct mman *threadmm;
+	USER CHECKED void *peb;
+	/* Can only write at addr=0 */
+	if (addr != 0)
+		THROW(E_IOERROR_BADBOUNDS, E_IOERROR_SUBSYSTEM_FILE);
+
+	/* Lookup the relevant mman. */
+	thread   = taskpid_gettask_srch(me->fn_fsdata);
+	threadmm = task_getmman(thread);
+	decref_unlikely(thread);
+	FINALLY_DECREF_UNLIKELY(threadmm);
+	if (threadmm != THIS_MMAN) {
+		/* May only set the PEB address for your own process. */
+		THROW(E_INVALID_ARGUMENT_BAD_STATE,
+		      E_INVALID_ARGUMENT_CONTEXT_PROC_PEB_ADDR_DIFFERENT_PROCESS,
+		      taskpid_gettid_s(me->fn_fsdata));
+	}
+	peb = ProcFS_ParsePtr(src, num_bytes);
+	validate_readableaddr(peb);
+	mman_lock_acquire(threadmm);
+	ATOMIC_WRITE(FORMMAN(threadmm, thismman_execinfo).mei_peb, peb);
+	mman_lock_release(threadmm);
+	return num_bytes;
+}
+
+
+
+#ifdef __ARCH_HAVE_COMPAT
+/************************************************************************/
+/* /proc/[PID]/kos/peb-compat                                           */
+/************************************************************************/
+INTERN NONNULL((1, 2)) void KCALL
+procfs_pp_kos_peb_compat_print(struct printnode *__restrict self,
+                               pformatprinter printer, void *arg,
+                               pos_t UNUSED(offset_hint)) {
+	REF struct task *thread;
+	REF struct mman *threadmm;
+	bool peb_iscompat;
+
+	/* Lookup the relevant mman. */
+	thread   = taskpid_gettask_srch(self->fn_fsdata);
+	threadmm = task_getmman(thread);
+	decref_unlikely(thread);
+	peb_iscompat = ATOMIC_READ(FORMMAN(threadmm, thismman_execinfo).mei_peb_iscompat);
+	decref_unlikely(threadmm);
+	ProcFS_PrintBool(printer, arg, peb_iscompat);
+}
+
+INTERN NONNULL((1, 2)) size_t KCALL
+procfs_pp_kos_peb_compat_write(struct mfile *__restrict self, USER CHECKED void const *src,
+                               size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) {
+	struct printnode *me = mfile_asprintnode(self);
+	REF struct task *thread;
+	REF struct mman *threadmm;
+	bool peb_iscompat;
+	/* Can only write at addr=0 */
+	if (addr != 0)
+		THROW(E_IOERROR_BADBOUNDS, E_IOERROR_SUBSYSTEM_FILE);
+
+	/* Lookup the relevant mman. */
+	thread   = taskpid_gettask_srch(me->fn_fsdata);
+	threadmm = task_getmman(thread);
+	decref_unlikely(thread);
+	FINALLY_DECREF_UNLIKELY(threadmm);
+	if (threadmm != THIS_MMAN) {
+		/* May only set the PEB address for your own process. */
+		THROW(E_INVALID_ARGUMENT_BAD_STATE,
+		      E_INVALID_ARGUMENT_CONTEXT_PROC_PEB_ADDR_DIFFERENT_PROCESS,
+		      taskpid_gettid_s(me->fn_fsdata));
+	}
+	peb_iscompat = ProcFS_ParseBool(src, num_bytes);
+	mman_lock_acquire(threadmm);
+	ATOMIC_WRITE(FORMMAN(threadmm, thismman_execinfo).mei_peb_iscompat, peb_iscompat);
+	mman_lock_release(threadmm);
+	return num_bytes;
+}
+#endif /* __ARCH_HAVE_COMPAT */
 
 
 
