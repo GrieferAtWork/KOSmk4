@@ -794,12 +794,26 @@ again_release_kernel_and_cc:
 				}
 
 				/* Restore the old (saved) state of the user-space  signal
-				 * mask, as it was prior to the vfork-child being started.
-				 * NOTE: Do this _after_  we've already  restored the  kernel-side
-				 *       of the calling thread's TLS state. That way, if something
-				 *       goes wrong while we're  restoring the user-space side  of
-				 *       things, it won't actually our fault! */
+				 * mask, as it was prior to the vfork-child being started. */
+#if 0 /* Don't do this! -- See comment below */
 				memcpy(user_sigmask, &saved_user_sigset, sizeof(sigset_t));
+#else
+				/* NOTE: Check word-wise for modified sigmask words, and only
+				 *       restore those that actually changed. -- In case none
+				 *       changed, we mustn't do any writes since the mask may
+				 *       reside in read-only memory! */
+				{
+					size_t i;
+					for (i = 0; i < COMPILER_LENOF(user_sigmask->__val); ++i) {
+						if (user_sigmask->__val[i] != saved_user_sigset.__val[i])
+							user_sigmask->__val[i] = saved_user_sigset.__val[i];
+					}
+				}
+#endif
+				/* Also restore the active userprocmask pointer to what it was
+				 * prior  to the vfork(2) (just in case the child modified it,
+				 * since we want everything about the parent's signal mask  to
+				 * go back to what it was before they called vfork(2)) */
 				ATOMIC_WRITE(um->pm_sigmask, user_sigmask);
 			} else
 #endif /* CONFIG_HAVE_USERPROCMASK */

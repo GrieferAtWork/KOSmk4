@@ -37,7 +37,8 @@
  *    that parent can assume that (among everything else that is memory),
  *    its  `errno' was shared with the child process, such that (assuming
  *    that the error was  caused by exec(2)->errno=ENOENT), the  vfork(2)
- *    system call will (seemingly) return with `errno=ENOENT'
+ *    system call will return the child pid as usual, but errno was  left
+ *    set to the same `ENOENT'.
  *
  * -> Knowing this, it becomes  significantly easier to implement  error
  *    propagation as the result of a failed exec() in situations such as
@@ -74,24 +75,37 @@
  *    >> //   - Further calls to `sigprocmask()' won't actually be able
  *    >> //     to alter the effective mask set (which remains equal to
  *    >> //     `_nmask') until `RUN_AFTER_EXEC()' loads `_omask'.
- *    >> //     Instead, further call to `sigprocmask()' alter `_omask'.
- *    >> #define vfork_with_sigmask()                            \
- *    >>    ({                                                   \
- *    >>        sigset_t _nmask, _omask;                         \
- *    >>        pid_t _pid;                                      \
- *    >>        sigfillset(&_nmask);                             \
- *    >>        sigdelset(SIGKILL, &_nmask);                     \
- *    >>        sigdelset(SIGSTOP, &_nmask);                     \
- *    >>        sigprocmask(SIG_SETMASK, &_nmask, &_omask);      \
- *    >>        _pid = vfork();                                  \
- *    >>        if (_pid == 0) {                                 \
- *    >>            RUN_AFTER_EXEC({                             \
- *    >>                sigprocmask(SIG_SETMASK, &_omask, NULL); \
- *    >>            });                                          \
- *    >>        } else {                                         \
- *    >>            sigprocmask(SIG_SETMASK, &_omask, NULL);     \
- *    >>        }                                                \
- *    >>        _pid;                                            \
+ *    >> //     Instead, further call to `sigprocmask()' alter `_omask2',
+ *    >> //     meaning further changes only become effective in case of
+ *    >> //     a successful exec.
+ *    >> //     Also note that this mechanism has been designed in such
+ *    >> //     a manner that it correctly works with threads that make
+ *    >> //     use of the userprocmask mechanism. (in this case, exec
+ *    >> //     loads the vfork'd thread's userprocmask into the kernel
+ *    >> //     sigmask, launching the new executable with the contents
+ *    >> //     of the userprocmask at the time of the exec(). Then, when
+ *    >> //     the parent awakes from waiting for the child in clone,
+ *    >> //     it will write a copy it took of the userprocmask prior
+ *    >> //     to staring the child, such that changes made to it before
+ *    >> //     doing exec() or exit() don't remain visible in the parent)
+ *    >> #define vfork_with_sigmask()                             \
+ *    >>    ({                                                    \
+ *    >>        sigset_t _nmask, _omask;                          \
+ *    >>        pid_t _pid;                                       \
+ *    >>        sigfillset(&_nmask);                              \
+ *    >>        sigdelset(SIGKILL, &_nmask);                      \
+ *    >>        sigdelset(SIGSTOP, &_nmask);                      \
+ *    >>        sigprocmask(SIG_SETMASK, &_nmask, &_omask);       \
+ *    >>        _pid = vfork();                                   \
+ *    >>        if (_pid == 0) {                                  \
+ *    >>            sigset_t _omask2 = _omask;                    \
+ *    >>            RUN_AFTER_EXEC({                              \
+ *    >>                sigprocmask(SIG_SETMASK, &_omask2, NULL); \
+ *    >>            });                                           \
+ *    >>        } else {                                          \
+ *    >>            sigprocmask(SIG_SETMASK, &_omask, NULL);      \
+ *    >>        }                                                 \
+ *    >>        _pid;                                             \
  *    >>    })
  *    >> #endif // !__ARCH_HAVE_SIGBLOCK_VFORK
  *

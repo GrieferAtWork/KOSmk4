@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x215d7219 */
+/* HASH CRC-32:0xf03a3484 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,8 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(cwait))(int *__tstat, __pid_t __pid, 
 	 * (It even returns the same  thing, that being the  PID of the joined  process...) */
 	/* NOTE: Apparently, the `action' argument is completely ignored... */
 	(void)__action;
-	return (__NAMESPACE_LOCAL_SYM __localdep_waitpid)(__pid, __tstat, __WEXITED);
+	/* NOTE: `waitpid(2)' with `options: 0' means `WEXITED' */
+	return (__NAMESPACE_LOCAL_SYM __localdep_waitpid)(__pid, __tstat, 0);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_cwait_defined

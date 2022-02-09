@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a5a49a7 */
+/* HASH CRC-32:0x62905cb9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -203,7 +203,7 @@ NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set,
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sigisemptyset)(sigset_t const *__restrict set) {
 	size_t i;
-	for (i = 0; i < sizeof(sigset_t) / sizeof(ulongptr_t); ++i) {
+	for (i = 0; i < COMPILER_LENOF(set->__val); ++i) {
 		if (set->__val[i] != 0)
 			return 0; /* Not empty! */
 	}
@@ -217,7 +217,7 @@ NOTHROW_NCX(LIBCCALL libc_sigandset)(sigset_t *set,
                                      sigset_t const *left,
                                      sigset_t const *right) {
 	size_t i;
-	for (i = 0; i < sizeof(sigset_t) / sizeof(ulongptr_t); ++i)
+	for (i = 0; i < COMPILER_LENOF(set->__val); ++i)
 		set->__val[i] = left->__val[i] & right->__val[i];
 	return 0;
 }
@@ -229,7 +229,7 @@ NOTHROW_NCX(LIBCCALL libc_sigorset)(sigset_t *set,
                                     sigset_t const *left,
                                     sigset_t const *right) {
 	size_t i;
-	for (i = 0; i < sizeof(sigset_t) / sizeof(ulongptr_t); ++i)
+	for (i = 0; i < COMPILER_LENOF(set->__val); ++i)
 		set->__val[i] = left->__val[i] | right->__val[i];
 	return 0;
 }
@@ -241,7 +241,7 @@ NOTHROW_NCX(LIBCCALL libc_signandset)(sigset_t *set,
                                       sigset_t const *left,
                                       sigset_t const *right) {
 	size_t i;
-	for (i = 0; i < sizeof(sigset_t) / sizeof(ulongptr_t); ++i)
+	for (i = 0; i < COMPILER_LENOF(set->__val); ++i)
 		set->__val[i] = left->__val[i] & ~right->__val[i];
 	return 0;
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1b0f819 */
+/* HASH CRC-32:0x40adbf8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,6 +61,11 @@ INTERN ATTR_SECTION(".text.crt.dos.fs.dlfcn") __procfun
 	(void)ord;
 	return (__procfun)dlsym((void *)(uintptr_t)hnd, symname);
 }
+/* >> cwait(3)
+ * DOS name for `waitpid(2)', except that `action' is ignored. Use
+ * this function together with the `spawn(3)' family of functions.
+ * @return: pid: Child process exited.
+ * @return: -1:  Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.dos.fs.exec.spawn") pid_t
 NOTHROW_RPC(LIBCCALL libc_cwait)(int *tstat,
                                  pid_t pid,
@@ -69,7 +74,8 @@ NOTHROW_RPC(LIBCCALL libc_cwait)(int *tstat,
 	 * (It even returns the same  thing, that being the  PID of the joined  process...) */
 	/* NOTE: Apparently, the `action' argument is completely ignored... */
 	(void)action;
-	return libc_waitpid(pid, tstat, WEXITED);
+	/* NOTE: `waitpid(2)' with `options: 0' means `WEXITED' */
+	return libc_waitpid(pid, tstat, 0);
 }
 #include <libc/template/environ.h>
 INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") NONNULL((2, 3)) pid_t

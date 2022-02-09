@@ -817,8 +817,18 @@ NOTHROW(FCALL userexcept_sysret_inject_safe)(struct task *__restrict thread,
 #ifdef IPI_USEREXCEPT_SYSRET_INJECT_SAFE_ALLOW_QUANTUM_HEIST
 		args[1] = (void *)rpc_flags;
 #endif /* IPI_USEREXCEPT_SYSRET_INJECT_SAFE_ALLOW_QUANTUM_HEIST */
+		/* Must use `CPU_IPI_FWAITFOR' to  ensure that `thread' won't  be
+		 * in user-space by the time we return. -- This is important  for
+		 * the use-case of getting threads out of user-space during exec,
+		 * where we need to unmap user-space (and can't have anyone still
+		 * be in there when we do so)
+		 *
+		 * NOTE: this works correctly even in  the case where the  target
+		 *       thread changes CPU, since a thread changing its CPU will
+		 *       also  force  it to  do `userexcept_sysret_inject_self()'
+		 *       following the transition having been made. */
 		while (!cpu_sendipi(target_cpu, &ipi_userexcept_sysret_inject_safe,
-		                    args, CPU_IPI_FWAKEUP))
+		                    args, CPU_IPI_FWAKEUP | CPU_IPI_FWAITFOR))
 			task_pause();
 		PREEMPTION_POP(was);
 	} else
@@ -862,7 +872,7 @@ NOTHROW(FCALL userexcept_sysret_inject_and_marksignal_nopr)(struct task *__restr
 	/* If the signal isn't masked, or masking cannot be determined, inject a sysret.
 	 * Also  wake up the thread if it is explicitly requesting to be woken for every
 	 * signal it is send, even if that signal is being masked. Such behavior is used
-	 * to implement the `sigtimedwait(2)' system call. */
+	 * to implement the `sigtimedwait(2)' and `sigsuspend(2)' system calls. */
 	if (status != SIGMASK_ISMASKED_NOPF_YES || (thread->t_flags & TASK_FWAKEONMSKRPC)) {
 		/* Set the thread's `TASK_FRPC' flag to indicate that it's got work to do */
 		ATOMIC_OR(thread->t_flags, TASK_FRPC);
@@ -946,8 +956,18 @@ NOTHROW(FCALL userexcept_sysret_inject_and_marksignal_safe)(struct task *__restr
 		void *args[CPU_IPI_ARGCOUNT];
 		args[0] = (void *)incref(thread);
 		args[1] = (void *)(uintptr_t)rpc_flags;
+		/* Must use `CPU_IPI_FWAITFOR' to  ensure that `thread' won't  be
+		 * in user-space by the time we return. -- This is important  for
+		 * the use-case of getting threads out of user-space during exec,
+		 * where we need to unmap user-space (and can't have anyone still
+		 * be in there when we do so)
+		 *
+		 * NOTE: this works correctly even in  the case where the  target
+		 *       thread changes CPU, since a thread changing its CPU will
+		 *       also  force  it to  do `userexcept_sysret_inject_self()'
+		 *       following the transition having been made. */
 		while (!cpu_sendipi(target_cpu, &ipi_userexcept_sysret_inject_and_marksignal_safe,
-		                    args, CPU_IPI_FWAKEUP))
+		                    args, CPU_IPI_FWAKEUP | CPU_IPI_FWAITFOR))
 			task_pause();
 		PREEMPTION_POP(was);
 	} else

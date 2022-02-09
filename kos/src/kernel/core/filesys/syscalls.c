@@ -2422,17 +2422,21 @@ kernel_execveat(fd_t dirfd,
 
 		/* Convert  the handle into  the 3 relevant  objects. If any of
 		 * these conversions fail, then the given handle can't be used. */
-		args.ea_xdentry = (REF struct fdirent *)handle_tryas_noinherit(hand, HANDLE_TYPE_DIRENT);
 		TRY {
-			args.ea_xpath = (REF struct path *)handle_tryas_noinherit(hand, HANDLE_TYPE_PATH);
+			args.ea_xdentry = (REF struct fdirent *)handle_tryas_noinherit(hand, HANDLE_TYPE_DIRENT);
 			TRY {
-				args.ea_xfile = handle_as_mfile(hand); /* This inherits `hand' on success */
+				args.ea_xpath = (REF struct path *)handle_tryas_noinherit(hand, HANDLE_TYPE_PATH);
+				TRY {
+					args.ea_xfile = handle_as_mfile(hand); /* This inherits `hand' on success */
+				} EXCEPT {
+					xdecref_unlikely(args.ea_xpath);
+					RETHROW();
+				}
 			} EXCEPT {
-				xdecref_unlikely(args.ea_xpath);
+				xdecref_unlikely(args.ea_xdentry);
 				RETHROW();
 			}
 		} EXCEPT {
-			xdecref_unlikely(args.ea_xdentry);
 			decref_unlikely(hand);
 			RETHROW();
 		}

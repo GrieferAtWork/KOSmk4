@@ -450,6 +450,12 @@ intptr_t _wspawnlpe(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__rest
 %[insert:extern(execlpe)]
 
 %[default:section(".text.crt.dos.fs.exec.spawn")]
+
+@@>> cwait(3)
+@@DOS name for `waitpid(2)', except that `action' is ignored. Use
+@@this function together with the `spawn(3)' family of functions.
+@@@return: pid: Child process exited.
+@@@return: -1:  Error (s.a. `errno')
 [[decl_include("<features.h>", "<bits/types.h>")]]
 [[cp, dos_only_export_alias("_cwait"), requires_function(waitpid)]]
 $pid_t cwait(int *tstat, $pid_t pid, __STDC_INT_AS_UINT_T action) {
@@ -457,7 +463,8 @@ $pid_t cwait(int *tstat, $pid_t pid, __STDC_INT_AS_UINT_T action) {
 	 * (It even returns the same  thing, that being the  PID of the joined  process...) */
 	/* NOTE: Apparently, the `action' argument is completely ignored... */
 	(void)action;
-	return waitpid(pid, tstat, WEXITED);
+	/* NOTE: `waitpid(2)' with `options: 0' means `WEXITED' */
+	return waitpid(pid, tstat, 0);
 }
 
 %[default:section(".text.crt{|.dos}.fs.exec.spawn")]

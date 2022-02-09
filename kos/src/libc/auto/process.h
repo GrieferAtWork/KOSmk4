@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32fb51dc */
+/* HASH CRC-32:0xc035711c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,9 +55,19 @@ INTDEF __procfun (LIBDCALL libd__getdllprocaddr)(intptr_t hnd, char __KOS_FIXED_
 INTDEF __procfun (LIBCCALL libc__getdllprocaddr)(intptr_t hnd, char __KOS_FIXED_CONST *symname, intptr_t ord) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> cwait(3)
+ * DOS name for `waitpid(2)', except that `action' is ignored. Use
+ * this function together with the `spawn(3)' family of functions.
+ * @return: pid: Child process exited.
+ * @return: -1:  Error (s.a. `errno') */
 INTDEF pid_t NOTHROW_RPC(LIBDCALL libd_cwait)(int *tstat, pid_t pid, __STDC_INT_AS_UINT_T action);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> cwait(3)
+ * DOS name for `waitpid(2)', except that `action' is ignored. Use
+ * this function together with the `spawn(3)' family of functions.
+ * @return: pid: Child process exited.
+ * @return: -1:  Error (s.a. `errno') */
 INTDEF pid_t NOTHROW_RPC(LIBCCALL libc_cwait)(int *tstat, pid_t pid, __STDC_INT_AS_UINT_T action);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

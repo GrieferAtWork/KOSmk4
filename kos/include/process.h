@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e4154f3 */
+/* HASH CRC-32:0x87200d7c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -423,11 +423,26 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _e
 #endif /* __CRT_HAVE_execvpe || __CRT_HAVE__execvpe || ((__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_execve || __CRT_HAVE__execve || __CRT_HAVE___execve || __CRT_HAVE___libc_execve) && __hybrid_alloca) */
 #endif /* !... */
 #ifdef __CRT_HAVE_cwait
+/* >> cwait(3)
+ * DOS name for `waitpid(2)', except that `action' is ignored. Use
+ * this function together with the `spawn(3)' family of functions.
+ * @return: pid: Child process exited.
+ * @return: -1:  Error (s.a. `errno') */
 __CREDIRECT(,__pid_t,__NOTHROW_RPC,_cwait,(int *__tstat, __pid_t __pid, __STDC_INT_AS_UINT_T __action),cwait,(__tstat,__pid,__action))
 #elif defined(__CRT_HAVE__cwait)
+/* >> cwait(3)
+ * DOS name for `waitpid(2)', except that `action' is ignored. Use
+ * this function together with the `spawn(3)' family of functions.
+ * @return: pid: Child process exited.
+ * @return: -1:  Error (s.a. `errno') */
 __CDECLARE(,__pid_t,__NOTHROW_RPC,_cwait,(int *__tstat, __pid_t __pid, __STDC_INT_AS_UINT_T __action),(__tstat,__pid,__action))
 #elif defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)
 #include <libc/local/process/cwait.h>
+/* >> cwait(3)
+ * DOS name for `waitpid(2)', except that `action' is ignored. Use
+ * this function together with the `spawn(3)' family of functions.
+ * @return: pid: Child process exited.
+ * @return: -1:  Error (s.a. `errno') */
 __FORCELOCAL __ATTR_ARTIFICIAL __pid_t __NOTHROW_RPC(__LIBCCALL _cwait)(int *__tstat, __pid_t __pid, __STDC_INT_AS_UINT_T __action) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cwait))(__tstat, __pid, __action); }
 #endif /* ... */
 #ifdef __CRT_HAVE_spawnv
@@ -1173,11 +1188,26 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execlpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_S
 #endif /* !... */
 #endif /* !__execlpe_defined */
 #ifdef __CRT_HAVE_cwait
+/* >> cwait(3)
+ * DOS name for `waitpid(2)', except that `action' is ignored. Use
+ * this function together with the `spawn(3)' family of functions.
+ * @return: pid: Child process exited.
+ * @return: -1:  Error (s.a. `errno') */
 __CDECLARE(,__pid_t,__NOTHROW_RPC,cwait,(int *__tstat, __pid_t __pid, __STDC_INT_AS_UINT_T __action),(__tstat,__pid,__action))
 #elif defined(__CRT_HAVE__cwait)
+/* >> cwait(3)
+ * DOS name for `waitpid(2)', except that `action' is ignored. Use
+ * this function together with the `spawn(3)' family of functions.
+ * @return: pid: Child process exited.
+ * @return: -1:  Error (s.a. `errno') */
 __CREDIRECT(,__pid_t,__NOTHROW_RPC,cwait,(int *__tstat, __pid_t __pid, __STDC_INT_AS_UINT_T __action),_cwait,(__tstat,__pid,__action))
 #elif defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)
 #include <libc/local/process/cwait.h>
+/* >> cwait(3)
+ * DOS name for `waitpid(2)', except that `action' is ignored. Use
+ * this function together with the `spawn(3)' family of functions.
+ * @return: pid: Child process exited.
+ * @return: -1:  Error (s.a. `errno') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cwait, __FORCELOCAL __ATTR_ARTIFICIAL __pid_t __NOTHROW_RPC(__LIBCCALL cwait)(int *__tstat, __pid_t __pid, __STDC_INT_AS_UINT_T __action) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cwait))(__tstat, __pid, __action); })
 #endif /* ... */
 #ifndef __spawnv_defined

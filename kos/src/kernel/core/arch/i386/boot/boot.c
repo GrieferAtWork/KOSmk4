@@ -885,6 +885,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       structs should be  declared with hidden  padding made visible  through
 	 *       explicitly declared fields) */
 
+	/* TODO: When a thread changes CPUs, it must call `userexcept_sysret_inject_self()'
+	 *       s.a. explaination in `userexcept_sysret_inject_safe()' */
+
 	return state;
 }
 

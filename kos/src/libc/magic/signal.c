@@ -1751,7 +1751,7 @@ int sigwait([[nonnull]] sigset_t const *__restrict set,
 [[kernel, pure, wunused, decl_include("<bits/os/sigset.h>")]]
 int sigisemptyset([[nonnull]] $sigset_t const *__restrict set) {
 	size_t i;
-	for (i = 0; i < sizeof(sigset_t) / sizeof($ulongptr_t); ++i) {
+	for (i = 0; i < COMPILER_LENOF(set->__val); ++i) {
 		if (set->__val[i] != 0)
 			return 0; /* Not empty! */
 	}
@@ -1767,7 +1767,7 @@ int sigandset([[nonnull]] $sigset_t *set,
               [[nonnull]] $sigset_t const *left,
               [[nonnull]] $sigset_t const *right) {
 	size_t i;
-	for (i = 0; i < sizeof(sigset_t) / sizeof($ulongptr_t); ++i)
+	for (i = 0; i < COMPILER_LENOF(set->__val); ++i)
 		set->__val[i] = left->__val[i] & right->__val[i];
 	return 0;
 }
@@ -1780,7 +1780,7 @@ int sigorset([[nonnull]] $sigset_t *set,
              [[nonnull]] $sigset_t const *left,
              [[nonnull]] $sigset_t const *right) {
 	size_t i;
-	for (i = 0; i < sizeof(sigset_t) / sizeof($ulongptr_t); ++i)
+	for (i = 0; i < COMPILER_LENOF(set->__val); ++i)
 		set->__val[i] = left->__val[i] | right->__val[i];
 	return 0;
 }
@@ -1796,7 +1796,7 @@ int signandset([[nonnull]] $sigset_t *set,
                [[nonnull]] $sigset_t const *left,
                [[nonnull]] $sigset_t const *right) {
 	size_t i;
-	for (i = 0; i < sizeof(sigset_t) / sizeof($ulongptr_t); ++i)
+	for (i = 0; i < COMPILER_LENOF(set->__val); ++i)
 		set->__val[i] = left->__val[i] & ~right->__val[i];
 	return 0;
 }
