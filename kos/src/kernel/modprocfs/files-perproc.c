@@ -1286,14 +1286,27 @@ procfs_pp_stat_print(struct printnode *__restrict self,
 	           taskpid_gettid_s(tpid)) < 0)
 		return;
 	if (mm) {
+		bool has_path;
 		REF struct fdirent *exec_name;
+		char const *exec_namestr;
+		u16 exec_namelen;
 		mman_lock_read(mm);
-		exec_name = xincref(FORMMAN(mm, thismman_execinfo).mei_dent);
+		has_path  = FORMMAN(mm, thismman_execinfo.mei_path) != NULL;
+		exec_name = xincref(FORMMAN(mm, thismman_execinfo.mei_dent));
 		mman_lock_endread(mm);
 		if (!exec_name)
 			goto no_exec;
 		FINALLY_DECREF_UNLIKELY(exec_name);
-		print(exec_name->fd_name, exec_name->fd_namelen);
+		exec_namestr = exec_name->fd_name;
+		exec_namelen = exec_name->fd_namelen;
+		if (!has_path) {
+			/* The path may be embedded within the exec name. */
+			char const *newbase;
+			newbase = (char const *)memrend(exec_namestr, '/', exec_namelen);
+			exec_namelen -= (size_t)(newbase - exec_namestr);
+			exec_namestr = newbase;
+		}
+		print(exec_namestr, exec_namelen);
 	} else {
 no_exec:
 		PRINT("?");
