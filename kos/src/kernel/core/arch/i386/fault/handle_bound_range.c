@@ -72,14 +72,19 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 			 * the address bounds  structure, so-as not  to leak kernel  memory. */
 			if (icpustate_isuser(state))
 				validate_readable(addr, (flags & EMU86_F_OP16) ? 4 : 8);
-			if (flags & EMU86_F_OP16) {
+#if !defined(__x86_64__) && !defined(__I386_NO_VM86)
+			if (EMU86_F_IS16(flags) ? (flags & EMU86_F_OP16) == 0 : (flags & EMU86_F_OP16) != 0)
+#else /* !__x86_64__ && !__I386_NO_VM86 */
+			if (flags & EMU86_F_OP16)
+#endif /* __x86_64__ || __I386_NO_VM86 */
+			{
 				bound_index = modrm_getregw(state, &mod, flags);
 				bound_min   = UNALIGNED_GETLE16((u16 const *)(addr + 0));
-				bound_max   = UNALIGNED_GETLE16((u16 const *)(addr + 2));
+				bound_max   = UNALIGNED_GETLE16((u16 const *)(addr + 2)) + 2;
 			} else {
 				bound_index = modrm_getregl(state, &mod, flags);
 				bound_min   = UNALIGNED_GETLE32((u32 const *)(addr + 0));
-				bound_max   = UNALIGNED_GETLE32((u32 const *)(addr + 4));
+				bound_max   = UNALIGNED_GETLE32((u32 const *)(addr + 4)) + 4;
 			}
 		} EXCEPT {
 			icpustate_setpc(state, next_pc);

@@ -49,7 +49,7 @@ case EMU86_OPCODE_ENCODE(0x62): {
 			EMU86_READ_USER_MEMORY(addr, 4);
 			temp.dword = EMU86_MEMREADL(addr);
 			bound_min  = temp.words[0];
-			bound_max  = temp.words[1];
+			bound_max  = temp.words[1] + 2;
 			bound_idx  = (s32)(s16)MODRM_GETREGW();
 		} else {
 			union {
@@ -64,7 +64,7 @@ case EMU86_OPCODE_ENCODE(0x62): {
 			temp.dwords[1] = EMU86_MEMREADL(addr + 4);
 #endif /* !CONFIG_LIBEMU86_WANT_64BIT */
 			bound_min = temp.dwords[0];
-			bound_max = temp.dwords[1];
+			bound_max = temp.dwords[1] + 4;
 			bound_idx = (s32)MODRM_GETREGL();
 		}
 		if (!(bound_idx >= bound_min && bound_idx <= bound_max))
