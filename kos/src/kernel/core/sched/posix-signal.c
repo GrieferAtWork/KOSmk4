@@ -673,6 +673,11 @@ DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait,
 	syscall_slong_t result;
 	ktime_t abs_timeout = KTIME_INFINITE;
 	/* Validate user-structure pointers. */
+	if unlikely(sigsetsize != sizeof(sigset_t)) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
+		      sigsetsize);
+	}
 	validate_readable(uthese, sigsetsize);
 	validate_writable(uinfo, sizeof(siginfo_t));
 	if (uts) {
@@ -708,6 +713,11 @@ DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait_time64,
 	syscall_slong_t result;
 	ktime_t abs_timeout = KTIME_INFINITE;
 	/* Validate user-structure pointers. */
+	if unlikely(sigsetsize != sizeof(sigset_t)) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
+		      sigsetsize);
+	}
 	validate_readable(uthese, sigsetsize);
 	validate_writable(uinfo, sizeof(siginfo_t));
 	if (uts) {
@@ -734,6 +744,11 @@ DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait,
 	siginfo_t info;
 	ktime_t abs_timeout = KTIME_INFINITE;
 	/* Validate user-structure pointers. */
+	if unlikely(sigsetsize != sizeof(sigset_t)) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
+		      sigsetsize);
+	}
 	validate_readable(uthese, sigsetsize);
 	validate_writable(uinfo, sizeof(siginfo_t));
 	if (uts) {
@@ -773,6 +788,11 @@ DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait_time64,
 	siginfo_t info;
 	ktime_t abs_timeout = KTIME_INFINITE;
 	/* Validate user-structure pointers. */
+	if unlikely(sigsetsize != sizeof(sigset_t)) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
+		      sigsetsize);
+	}
 	validate_readable(uthese, sigsetsize);
 	validate_writable(uinfo, sizeof(siginfo_t));
 	if (uts) {

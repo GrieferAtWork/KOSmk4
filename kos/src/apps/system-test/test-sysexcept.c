@@ -24,18 +24,19 @@
 
 #include <hybrid/compiler.h>
 
-#include <kos/types.h>
 #include <kos/except.h>
-#include <kos/unistd.h>
+#include <kos/kernel/paging.h>
 #include <kos/syscalls.h>
-#include <sys/syscall.h>
-#include <sys/syscall-proto.h>
-#include <stdio.h>
-#include <syslog.h>
+#include <kos/types.h>
 #include <kos/ukern.h>
+#include <kos/unistd.h>
+#include <sys/syscall-proto.h>
+#include <sys/syscall.h>
 #include <system-test/ctest.h>
 
 #include <assert.h>
+#include <stdio.h>
+#include <syslog.h>
 
 #if defined(__i386__) || defined(__x86_64__)
 #include <asm/cfi.h>
@@ -175,6 +176,45 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 	} EXCEPT {
 		assert_except_code(E_SEGFAULT);
 	}
+#ifdef KERNELSPACE_BASE
+	ctest_subtestf("Pipe(KERNELSPACE_BASE) breaks");
+	TRY {
+		int *volatile kbase = (int *)KERNELSPACE_BASE;
+		Pipe(kbase);
+		assert_failed("syscall:libc: Shouldn't get here!");
+	} EXCEPT {
+		assert_except_code(E_SEGFAULT);
+	}
+	ctest_subtestf("Pipe(KERNELSPACE_BASE-1) breaks");
+	TRY {
+		int *volatile kbase = (int *)((uintptr_t)KERNELSPACE_BASE - 1);
+		Pipe(kbase);
+		assert_failed("syscall:libc: Shouldn't get here!");
+	} EXCEPT {
+		assert_except_code(E_SEGFAULT);
+	}
+#if defined(__i386__) || defined(__x86_64__)
+	ctest_subtestf("Pipe(KERNEL_CORE_BASE+X) breaks");
+	{
+		static uint32_t const offsets[] = {
+			0x00000000, 0x00000200, 0x00100000, 0x00100200,
+			0x00110000, 0x00110200, 0x00120000, 0x00120200,
+			0x00130000, 0x00130200, 0x00140000, 0x00140200,
+		};
+		unsigned int i;
+		for (i = 0; i < COMPILER_LENOF(offsets); ++i) {
+			TRY {
+				int *volatile kbase = (int *)(KERNEL_CORE_BASE + offsets[i]);
+				Pipe(kbase);
+				assert_failed("syscall:libc: Shouldn't get here! [addr:%p]", kbase);
+			} EXCEPT {
+				assert_except_code(E_SEGFAULT);
+			}
+		}
+	}
+#endif /* __i386__ || __x86_64__ */
+#endif /* KERNELSPACE_BASE */
+
 
 	/* The libc direct syscall function */
 	ctest_subtestf("sys_Xpipe() works");

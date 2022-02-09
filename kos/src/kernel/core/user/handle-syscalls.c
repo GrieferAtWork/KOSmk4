@@ -1875,12 +1875,11 @@ DEFINE_SYSCALL5(ssize_t, select, size_t, nfds,
                 USER UNCHECKED struct timeval32 *, timeout)
 #endif /* !__ARCH_WANT_SYSCALL__NEWSELECT */
 {
-	size_t result, nfd_size;
+	size_t result;
 	ktime_t abs_timeout;
-	nfd_size = CEILDIV(nfds, __NFDBITS);
-	validate_readwrite_opt(readfds, nfd_size);
-	validate_readwrite_opt(writefds, nfd_size);
-	validate_readwrite_opt(exceptfds, nfd_size);
+	validate_readwritem_opt(readfds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
+	validate_readwritem_opt(writefds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
+	validate_readwritem_opt(exceptfds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
 	abs_timeout = KTIME_INFINITE;
 	if (timeout) {
 		validate_readable(timeout, sizeof(*timeout));
@@ -1923,12 +1922,11 @@ DEFINE_SYSCALL5(ssize_t, select_time64, size_t, nfds,
                 USER UNCHECKED struct timeval64 *, timeout)
 #endif /* !__ARCH_WANT_SYSCALL_SELECT64 */
 {
-	size_t result, nfd_size;
+	size_t result;
 	ktime_t abs_timeout;
-	nfd_size = CEILDIV(nfds, __NFDBITS);
-	validate_readwrite_opt(readfds, nfd_size);
-	validate_readwrite_opt(writefds, nfd_size);
-	validate_readwrite_opt(exceptfds, nfd_size);
+	validate_readwritem_opt(readfds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
+	validate_readwritem_opt(writefds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
+	validate_readwritem_opt(exceptfds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
 	abs_timeout = KTIME_INFINITE;
 	if (timeout) {
 		validate_readable(timeout, sizeof(*timeout));
@@ -1950,12 +1948,11 @@ compat_sys_select_impl(size_t nfds,
                        USER UNCHECKED fd_set *writefds,
                        USER UNCHECKED fd_set *exceptfds,
                        USER UNCHECKED struct compat_timeval32 *timeout) {
-	size_t result, nfd_size;
+	size_t result;
 	ktime_t abs_timeout;
-	nfd_size = CEILDIV(nfds, __NFDBITS);
-	compat_validate_readwrite_opt(readfds, nfd_size);
-	compat_validate_readwrite_opt(writefds, nfd_size);
-	compat_validate_readwrite_opt(exceptfds, nfd_size);
+	compat_validate_readwritem_opt(readfds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
+	compat_validate_readwritem_opt(writefds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
+	compat_validate_readwritem_opt(exceptfds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
 	abs_timeout = KTIME_INFINITE;
 	if (timeout) {
 		compat_validate_readable(timeout, sizeof(*timeout));
@@ -2027,12 +2024,11 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, select_time64, size_t, nfds,
                        USER UNCHECKED struct compat_timeval64 *, timeout)
 #endif /* !__ARCH_WANT_COMPAT_SYSCALL_SELECT64 */
 {
-	size_t result, nfd_size;
+	size_t result;
 	ktime_t abs_timeout;
-	nfd_size = CEILDIV(nfds, __NFDBITS);
-	compat_validate_readwrite_opt(readfds, nfd_size);
-	compat_validate_readwrite_opt(writefds, nfd_size);
-	compat_validate_readwrite_opt(exceptfds, nfd_size);
+	compat_validate_readwritem_opt(readfds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
+	compat_validate_readwritem_opt(writefds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
+	compat_validate_readwritem_opt(exceptfds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
 	abs_timeout = KTIME_INFINITE;
 	if (timeout) {
 		compat_validate_readable(timeout, sizeof(*timeout));
@@ -2056,11 +2052,10 @@ sys_pselect_generic(struct icpustate *__restrict state,
                     USER UNCHECKED fd_set *readfds, USER UNCHECKED fd_set *writefds,
                     USER UNCHECKED fd_set *exceptfds, ktime_t abs_timeout,
                     USER UNCHECKED sigset_t const *sigmask, size_t sigsetsize) {
-	size_t result, nfd_size;
-	nfd_size = CEILDIV(nfds, __NFDBITS);
-	validate_readwrite_opt(readfds, nfd_size);
-	validate_readwrite_opt(writefds, nfd_size);
-	validate_readwrite_opt(exceptfds, nfd_size);
+	size_t result;
+	validate_readwritem_opt(readfds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
+	validate_readwritem_opt(writefds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
+	validate_readwritem_opt(exceptfds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
 	if (sigmask) {
 		sigset_t these;
 		if unlikely(sigsetsize != sizeof(sigset_t)) {
@@ -2157,7 +2152,7 @@ DEFINE_SYSCALL6(ssize_t, pselect6, size_t, nfds,
 		size_t          ss_len;
 	};
 	struct sigset_and_len ss;
-	size_t result, nfd_size;
+	size_t result;
 	ktime_t abs_timeout;
 	validate_readable(sigmask_sigset_and_len, sizeof(ss));
 	COMPILER_READ_BARRIER();
@@ -2168,10 +2163,9 @@ DEFINE_SYSCALL6(ssize_t, pselect6, size_t, nfds,
 		task_rpc_userunwind(&sys_pselect6_rpc, NULL);
 		__builtin_unreachable();
 	}
-	nfd_size = CEILDIV(nfds, __NFDBITS);
-	validate_readwrite_opt(readfds, nfd_size);
-	validate_readwrite_opt(writefds, nfd_size);
-	validate_readwrite_opt(exceptfds, nfd_size);
+	validate_readwritem_opt(readfds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
+	validate_readwritem_opt(writefds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
+	validate_readwritem_opt(exceptfds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
 	abs_timeout = KTIME_INFINITE;
 	if (timeout) {
 		validate_readable(timeout, sizeof(*timeout));
@@ -2238,7 +2232,7 @@ DEFINE_SYSCALL6(ssize_t, pselect6_time64, size_t, nfds,
 		size_t          ss_len;
 	};
 	struct sigset_and_len ss;
-	size_t result, nfd_size;
+	size_t result;
 	ktime_t abs_timeout;
 	validate_readable(sigmask_sigset_and_len, sizeof(ss));
 	COMPILER_READ_BARRIER();
@@ -2249,10 +2243,9 @@ DEFINE_SYSCALL6(ssize_t, pselect6_time64, size_t, nfds,
 		task_rpc_userunwind(&sys_pselect6_time64_rpc, NULL);
 		__builtin_unreachable();
 	}
-	nfd_size = CEILDIV(nfds, __NFDBITS);
-	validate_readwrite_opt(readfds, nfd_size);
-	validate_readwrite_opt(writefds, nfd_size);
-	validate_readwrite_opt(exceptfds, nfd_size);
+	validate_readwritem_opt(readfds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
+	validate_readwritem_opt(writefds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
+	validate_readwritem_opt(exceptfds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
 	abs_timeout = KTIME_INFINITE;
 	if (timeout) {
 		validate_readable(timeout, sizeof(*timeout));
@@ -2321,7 +2314,7 @@ DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6, size_t, nfds,
 		compat_size_t                     ss_len;
 	};
 	struct sigset_and_len ss;
-	size_t result, nfd_size;
+	size_t result;
 	ktime_t abs_timeout;
 	compat_validate_readable(sigmask_sigset_and_len, sizeof(ss));
 	COMPILER_READ_BARRIER();
@@ -2332,10 +2325,9 @@ DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6, size_t, nfds,
 		task_rpc_userunwind(&sys_compat_pselect6_rpc, NULL);
 		__builtin_unreachable();
 	}
-	nfd_size = CEILDIV(nfds, __NFDBITS);
-	compat_validate_readwrite_opt(readfds, nfd_size);
-	compat_validate_readwrite_opt(writefds, nfd_size);
-	compat_validate_readwrite_opt(exceptfds, nfd_size);
+	compat_validate_readwritem_opt(readfds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
+	compat_validate_readwritem_opt(writefds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
+	compat_validate_readwritem_opt(exceptfds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
 	abs_timeout = KTIME_INFINITE;
 	if (timeout) {
 		compat_validate_readable(timeout, sizeof(*timeout));
@@ -2404,7 +2396,7 @@ DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6_time64, size_t, nfds,
 		compat_size_t                     ss_len;
 	};
 	struct sigset_and_len ss;
-	size_t result, nfd_size;
+	size_t result;
 	ktime_t abs_timeout;
 	compat_validate_readable(sigmask_sigset_and_len, sizeof(ss));
 	COMPILER_READ_BARRIER();
@@ -2415,10 +2407,9 @@ DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6_time64, size_t, nfds,
 		task_rpc_userunwind(&sys_compat_pselect6_time64_rpc, NULL);
 		__builtin_unreachable();
 	}
-	nfd_size = CEILDIV(nfds, __NFDBITS);
-	compat_validate_readwrite_opt(readfds, nfd_size);
-	compat_validate_readwrite_opt(writefds, nfd_size);
-	compat_validate_readwrite_opt(exceptfds, nfd_size);
+	compat_validate_readwritem_opt(readfds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
+	compat_validate_readwritem_opt(writefds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
+	compat_validate_readwritem_opt(exceptfds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
 	abs_timeout = KTIME_INFINITE;
 	if (timeout) {
 		compat_validate_readable(timeout, sizeof(*timeout));

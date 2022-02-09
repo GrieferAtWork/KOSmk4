@@ -31,162 +31,67 @@
 
 DECL_BEGIN
 
+PUBLIC ATTR_COLDTEXT ATTR_COLD ATTR_NORETURN void FCALL
+except_throw_unmapped_user_rd(UNCHECKED USER void const *addr)
+		THROWS(E_SEGFAULT_UNMAPPED) {
+	uintptr_t flags = E_SEGFAULT_CONTEXT_USERCODE;
+#ifdef ADDR_IS_NONCANON
+	if (!ADDR_IS_NONCANON(addr))
+		flags |= E_SEGFAULT_CONTEXT_NONCANON;
+#endif /* ADDR_IS_NONCANON */
+	THROW(E_SEGFAULT_UNMAPPED, addr, flags);
+}
+
+PUBLIC ATTR_COLDTEXT ATTR_COLD ATTR_NORETURN void FCALL
+except_throw_unmapped_user_wr(UNCHECKED USER void const *addr)
+		THROWS(E_SEGFAULT_UNMAPPED) {
+	uintptr_t flags = E_SEGFAULT_CONTEXT_USERCODE | E_SEGFAULT_CONTEXT_WRITING;
+#ifdef ADDR_IS_NONCANON
+	if (!ADDR_IS_NONCANON(addr))
+		flags |= E_SEGFAULT_CONTEXT_NONCANON;
+#endif /* ADDR_IS_NONCANON */
+	THROW(E_SEGFAULT_UNMAPPED, addr, flags);
+}
+
+PUBLIC ATTR_COLDTEXT ATTR_COLD ATTR_NORETURN void FCALL
+except_throw_noexec_user(UNCHECKED USER void const *addr)
+		THROWS(E_SEGFAULT_NOTEXECUTABLE) {
+	uintptr_t flags = E_SEGFAULT_CONTEXT_USERCODE;
+#ifdef ADDR_IS_NONCANON
+	if (!ADDR_IS_NONCANON(addr))
+		flags |= E_SEGFAULT_CONTEXT_NONCANON;
+#endif /* ADDR_IS_NONCANON */
+	THROW(E_SEGFAULT_NOTEXECUTABLE, addr, flags);
+}
+
+
+
 /* Validate user-pointers for being allowed to be used for the specified operations.
  * Since the kernel  is allowed to  access memory that  is marked as  `PROT_NOUSER',
  * user-pointers passed from user-space must  be checked for the same  restrictions.
  * In order words: If  the  user passes  a pointer  that  is part  of kernel-space,
  *                 these functions are used to deny the user access to such memory.
  * @throw E_SEGFAULT: User-space has not been granted access to the given address range. */
-PUBLIC void FCALL
-validate_user(UNCHECKED USER void const *base, size_t num_bytes) THROWS(E_SEGFAULT) {
-	uintptr_t endaddr;
-	if unlikely(OVERFLOW_UADD((uintptr_t)base, num_bytes, &endaddr) ||
-	            !ADDRRANGE_ISUSER(base, endaddr)) {
-		THROW(E_SEGFAULT_UNMAPPED, base, E_SEGFAULT_CONTEXT_USERCODE);
-	}
-}
-
-PUBLIC void FCALL
-validate_userm(UNCHECKED USER void const *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT) {
-	size_t total_size;
-	uintptr_t endaddr;
-	if unlikely(OVERFLOW_UMUL(num_items, item_size_in_bytes, &total_size) ||
-	            OVERFLOW_UADD((uintptr_t)base, total_size, &endaddr) ||
-	            !ADDRRANGE_ISUSER(base, endaddr)) {
-		THROW(E_SEGFAULT_UNMAPPED, base, E_SEGFAULT_CONTEXT_USERCODE);
-	}
-}
-
-PUBLIC void FCALL
-validate_useraddr(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT) {
+PUBLIC USER CHECKED void const *FCALL
+validate_readableaddr(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT) {
 	if unlikely(!ADDR_ISUSER(addr))
-		THROW(E_SEGFAULT_UNMAPPED, addr, E_SEGFAULT_CONTEXT_USERCODE);
+		except_throw_unmapped_user_rd(addr);
+	return addr;
 }
 
-
-DEFINE_PUBLIC_ALIAS(validate_readable, validate_user);
-DEFINE_PUBLIC_ALIAS(validate_readableaddr, validate_useraddr);
-DEFINE_PUBLIC_ALIAS(validate_readwrite, validate_user);
-DEFINE_PUBLIC_ALIAS(validate_readwriteaddr, validate_useraddr);
-DEFINE_PUBLIC_ALIAS(validate_readablem, validate_userm);
-DEFINE_PUBLIC_ALIAS(validate_readwritem, validate_userm);
-
-PUBLIC void FCALL
-validate_writable(UNCHECKED USER void *base, size_t num_bytes) THROWS(E_SEGFAULT) {
-	uintptr_t endaddr;
-	if unlikely(OVERFLOW_UADD((uintptr_t)base, num_bytes, &endaddr) ||
-	            !ADDRRANGE_ISUSER(base, endaddr)) {
-		THROW(E_SEGFAULT_UNMAPPED, base, E_SEGFAULT_CONTEXT_USERCODE | E_SEGFAULT_CONTEXT_WRITING);
-	}
-}
-
-PUBLIC void FCALL
-validate_writablem(UNCHECKED USER void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT) {
-	size_t total_size;
-	uintptr_t endaddr;
-	if unlikely(OVERFLOW_UMUL(num_items, item_size_in_bytes, &total_size) ||
-	            OVERFLOW_UADD((uintptr_t)base, total_size, &endaddr) ||
-	            !ADDRRANGE_ISUSER(base, endaddr)) {
-		THROW(E_SEGFAULT_UNMAPPED, base, E_SEGFAULT_CONTEXT_USERCODE | E_SEGFAULT_CONTEXT_WRITING);
-	}
-}
-
-PUBLIC void FCALL
+PUBLIC USER CHECKED void *FCALL
 validate_writableaddr(UNCHECKED USER void *addr) THROWS(E_SEGFAULT) {
-	if unlikely(!ADDR_ISUSER(addr))
-		THROW(E_SEGFAULT_UNMAPPED, addr, E_SEGFAULT_CONTEXT_USERCODE | E_SEGFAULT_CONTEXT_WRITING);
+	if unlikely(!__ADDR_ISUSER(addr))
+		except_throw_unmapped_user_wr(addr);
+	return addr;
 }
 
-PUBLIC void FCALL
+PUBLIC USER CHECKED void const *FCALL
 validate_executable(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT) {
-	if unlikely(!ADDR_ISUSER(addr))
-		THROW(E_SEGFAULT_NOTEXECUTABLE, addr, E_SEGFAULT_CONTEXT_USERCODE);
+	if unlikely(!__ADDR_ISUSER(addr))
+		except_throw_noexec_user(addr);
+	return addr;
 }
-
-#ifndef KERNELSPACE_LOWMEM
-DEFINE_PUBLIC_ALIAS(validate_readable_opt, validate_readable);
-DEFINE_PUBLIC_ALIAS(validate_readablem_opt, validate_readablem);
-DEFINE_PUBLIC_ALIAS(validate_readableaddr_opt, validate_readableaddr);
-DEFINE_PUBLIC_ALIAS(validate_writable_opt, validate_writable);
-DEFINE_PUBLIC_ALIAS(validate_writablem_opt, validate_writablem);
-DEFINE_PUBLIC_ALIAS(validate_writableaddr_opt, validate_writableaddr);
-DEFINE_PUBLIC_ALIAS(validate_executable_opt, validate_executable);
-DEFINE_PUBLIC_ALIAS(validate_readwrite_opt, validate_readwrite);
-DEFINE_PUBLIC_ALIAS(validate_readwritem_opt, validate_readwritem);
-DEFINE_PUBLIC_ALIAS(validate_readwriteaddr_opt, validate_readwriteaddr);
-#else /* KERNELSPACE_LOWMEM */
-
-PUBLIC void FCALL
-validate_readable_opt(UNCHECKED USER void const *base,
-                      size_t num_bytes) THROWS(E_SEGFAULT) {
-	if (base != NULL)
-		validate_readable(base, num_bytes);
-}
-
-PUBLIC void FCALL
-validate_readablem_opt(UNCHECKED USER void const *base,
-                       size_t num_items,
-                       size_t item_size_in_bytes) THROWS(E_SEGFAULT) {
-	if (base != NULL)
-		validate_readablem(base, num_items, item_size_in_bytes);
-}
-
-PUBLIC void FCALL
-validate_readableaddr_opt(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT) {
-	if (addr != NULL)
-		validate_readableaddr(addr);
-}
-
-PUBLIC void FCALL
-validate_writable_opt(UNCHECKED USER void *base,
-                      size_t num_bytes) THROWS(E_SEGFAULT) {
-	if (base != NULL)
-		validate_writable(base, num_bytes);
-}
-
-PUBLIC void FCALL
-validate_writablem_opt(UNCHECKED USER void *base,
-                       size_t num_items,
-                       size_t item_size_in_bytes) THROWS(E_SEGFAULT) {
-	if (base != NULL)
-		validate_writablem(base, num_items, item_size_in_bytes);
-}
-
-PUBLIC void FCALL
-validate_writableaddr_opt(UNCHECKED USER void *addr) THROWS(E_SEGFAULT) {
-	if (addr != NULL)
-		validate_writableaddr(addr);
-}
-
-PUBLIC void FCALL
-validate_readwrite_opt(UNCHECKED USER void *base,
-                       size_t num_bytes) THROWS(E_SEGFAULT) {
-	if (base != NULL)
-		validate_readwrite(base, num_bytes);
-}
-
-PUBLIC void FCALL
-validate_readwritem_opt(UNCHECKED USER void *base,
-                        size_t num_items,
-                        size_t item_size_in_bytes) THROWS(E_SEGFAULT) {
-	if (base != NULL)
-		validate_readwritem(base, num_items, item_size_in_bytes);
-}
-
-PUBLIC void FCALL
-validate_readwriteaddr_opt(UNCHECKED USER void *addr) THROWS(E_SEGFAULT) {
-	if (addr != NULL)
-		validate_readwriteaddr(addr);
-}
-
-PUBLIC void FCALL
-validate_executable_opt(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT) {
-	if (addr != NULL)
-		validate_executable(addr);
-}
-
-#endif /* !KERNELSPACE_LOWMEM */
-
 
 DECL_END
 
