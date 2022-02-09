@@ -363,7 +363,8 @@ Fat_GetFileCluster(struct fnode *__restrict self,
 							goto create_more_clusters_already_locked;
 						/* Try to free unused memory. */
 						new_vector = (FatClusterIndex *)krealloc_nx(dat->fn_clusterv,
-						                                            dat->fn_clusterc * sizeof(FatClusterIndex),
+						                                            dat->fn_clusterc *
+						                                            sizeof(FatClusterIndex),
 						                                            GFP_NORMAL);
 						if likely(new_vector)
 							dat->fn_clusterv = new_vector;
@@ -402,11 +403,10 @@ Fat_GetFileCluster(struct fnode *__restrict self,
 	}
 create_more_clusters_already_locked:
 	TRY {
-		preallocate_cluster_vector_entries(self, dat, super, nth_cluster + 1);
+		preallocate_cluster_vector_entries(self, dat, super, nth_cluster + 2);
 		FatSuper_FatLockWrite(super);
 		RAII_FINALLY { FatSuper_FatLockEndWrite(super); };
 		assert(dat->fn_clusterv[dat->fn_clusterc - 1] >= super->ft_cluster_eof);
-		assert((kmalloc_usable_size(dat->fn_clusterv) / sizeof(FatClusterIndex)) >= nth_cluster + 1);
 		/* Create more clusters. */
 		for (;;) {
 			result = Fat_FindFreeCluster(super);
@@ -419,6 +419,8 @@ create_more_clusters_already_locked:
 				if (fnode_isreg(self))
 					zero_initialize_cluster(super, result);
 				assert(super->ft_cluster_eof_marker != FAT_CLUSTER_UNUSED);
+				assert((kmalloc_usable_size(dat->fn_clusterv)) >=
+				       (dat->fn_clusterc + 1) * sizeof(FatClusterIndex));
 				dat->fn_clusterv[dat->fn_clusterc - 1] = result;
 				dat->fn_clusterv[dat->fn_clusterc] = super->ft_cluster_eof_marker;
 				++dat->fn_clusterc;
