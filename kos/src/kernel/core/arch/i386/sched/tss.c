@@ -27,6 +27,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/hook.h>
+#include <debugger/rt.h>
 #include <kernel/memory.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
@@ -176,24 +177,29 @@ PUBLIC ATTR_PERCPU struct tss thiscpu_x86_tssdf = {
 
 PUBLIC NOBLOCK ATTR_PURE WUNUSED size_t
 NOTHROW(KCALL get_stack_avail)(void) {
-	void *start, *end, *sp = __rdsp();
-#ifndef __x86_64__
-	struct cpu *c = THIS_CPU;
-	if unlikely(FORCPU(c, thiscpu_x86_tssdf.t_ecx)) {
-		struct mnode const *node;
-		node  = &FORCPU(c, thiscpu_x86_dfstacknode);
-		start = mnode_getaddr(node);
-		end   = mnode_getendaddr(node);
-	} else
-#endif /* !__x86_64__ */
+	void *sp = __rdsp();
+	struct mnode const *node;
+	node  = THIS_KERNEL_STACK;
+	if (mnode_containsaddr(node, sp))
+		return (uintptr_t)sp - (uintptr_t)mnode_getaddr(node);
+#ifdef CONFIG_HAVE_DEBUGGER
+	if (sp >= dbg_stack && sp < COMPILER_ENDOF(dbg_stack))
+		return (uintptr_t)sp - (uintptr_t)dbg_stack;
+#endif /* CONFIG_HAVE_DEBUGGER */
+#ifdef CONFIG_NO_SMP
+	node = &FORCPU(&bootcpu, thiscpu_x86_dfstacknode);
+	if (mnode_containsaddr(node, sp))
+		return (uintptr_t)sp - (uintptr_t)mnode_getaddr(node);
+#else /* CONFIG_NO_SMP */
 	{
-		struct mnode const *node;
-		node  = THIS_KERNEL_STACK;
-		start = mnode_getaddr(node);
-		end   = mnode_getendaddr(node);
+		unsigned int i;
+		for (i = 0; i < cpu_count; ++i) {
+			node = &FORCPU(cpu_vector[i], thiscpu_x86_dfstacknode);
+			if (mnode_containsaddr(node, sp))
+				return (uintptr_t)sp - (uintptr_t)mnode_getaddr(node);
+		}
 	}
-	if likely(sp >= start && sp < end)
-		return (size_t)((byte_t *)sp - (byte_t *)start);
+#endif /* !CONFIG_NO_SMP */
 	/* FIXME: This  is  an ugly  work-around  for when  the  kernel is
 	 *        running from a custom stack, such as the debugger stack,
 	 *        or the stack defined by the GDB server driver. */
@@ -202,24 +208,29 @@ NOTHROW(KCALL get_stack_avail)(void) {
 
 PUBLIC NOBLOCK ATTR_PURE WUNUSED size_t
 NOTHROW(KCALL get_stack_inuse)(void) {
-	void *start, *end, *sp = __rdsp();
-#ifndef __x86_64__
-	struct cpu *c = THIS_CPU;
-	if unlikely(FORCPU(c, thiscpu_x86_tssdf.t_ecx)) {
-		struct mnode const *node;
-		node  = &FORCPU(c, thiscpu_x86_dfstacknode);
-		start = mnode_getaddr(node);
-		end   = mnode_getendaddr(node);
-	} else
-#endif /* !__x86_64__ */
+	void *sp = __rdsp();
+	struct mnode const *node;
+	node  = THIS_KERNEL_STACK;
+	if (mnode_containsaddr(node, sp))
+		return (uintptr_t)mnode_getendaddr(node) - (uintptr_t)sp;
+#ifdef CONFIG_HAVE_DEBUGGER
+	if (sp >= dbg_stack && sp < COMPILER_ENDOF(dbg_stack))
+		return (uintptr_t)COMPILER_ENDOF(dbg_stack) - (uintptr_t)sp;
+#endif /* CONFIG_HAVE_DEBUGGER */
+#ifdef CONFIG_NO_SMP
+	node = &FORCPU(&bootcpu, thiscpu_x86_dfstacknode);
+	if (mnode_containsaddr(node, sp))
+		return (uintptr_t)mnode_getendaddr(node) - (uintptr_t)sp;
+#else /* CONFIG_NO_SMP */
 	{
-		struct mnode const *node;
-		node  = THIS_KERNEL_STACK;
-		start = mnode_getaddr(node);
-		end   = mnode_getendaddr(node);
+		unsigned int i;
+		for (i = 0; i < cpu_count; ++i) {
+			node = &FORCPU(cpu_vector[i], thiscpu_x86_dfstacknode);
+			if (mnode_containsaddr(node, sp))
+				return (uintptr_t)mnode_getendaddr(node) - (uintptr_t)sp;
+		}
 	}
-	if likely(sp >= start && sp < end)
-		return (size_t)((byte_t *)end - (byte_t *)sp);
+#endif /* !CONFIG_NO_SMP */
 	return 0;
 }
 
@@ -228,27 +239,40 @@ NOTHROW(KCALL get_stack_inuse)(void) {
  * @param: pend:  Filled with a pointer one past the highest-address byte that is still apart of the stack. */
 PUBLIC NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL get_stack_for)(void **pbase, void **pend, void *sp) {
-	void *start, *end;
-#ifndef __x86_64__
-	struct cpu *c = THIS_CPU;
-	if unlikely(FORCPU(c, thiscpu_x86_tssdf.t_ecx)) {
-		struct mnode const *node;
-		node  = &FORCPU(c, thiscpu_x86_dfstacknode);
-		start = mnode_getaddr(node);
-		end   = mnode_getendaddr(node);
-	} else
-#endif /* !__x86_64__ */
-	{
-		struct mnode const *node;
-		node  = THIS_KERNEL_STACK;
-		start = mnode_getaddr(node);
-		end   = mnode_getendaddr(node);
-	}
-	if likely(sp >= start && sp < end) {
-		*pbase = start;
-		*pend  = end;
+	struct mnode const *node;
+	node  = THIS_KERNEL_STACK;
+	if (mnode_containsaddr(node, sp)) {
+		*pbase = mnode_getaddr(node);
+		*pend  = mnode_getendaddr(node);
 		return;
 	}
+#ifdef CONFIG_HAVE_DEBUGGER
+	if (sp >= dbg_stack && sp < COMPILER_ENDOF(dbg_stack)) {
+		*pbase = dbg_stack;
+		*pend  = COMPILER_ENDOF(dbg_stack);
+		return;
+	}
+#endif /* CONFIG_HAVE_DEBUGGER */
+#ifdef CONFIG_NO_SMP
+	node = &FORCPU(&bootcpu, thiscpu_x86_dfstacknode);
+	if (mnode_containsaddr(node, sp)) {
+		*pbase = mnode_getaddr(node);
+		*pend  = mnode_getendaddr(node);
+		return;
+	}
+#else /* CONFIG_NO_SMP */
+	{
+		unsigned int i;
+		for (i = 0; i < cpu_count; ++i) {
+			node = &FORCPU(cpu_vector[i], thiscpu_x86_dfstacknode);
+			if (mnode_containsaddr(node, sp)) {
+				*pbase = mnode_getaddr(node);
+				*pend  = mnode_getendaddr(node);
+				return;
+			}
+		}
+	}
+#endif /* !CONFIG_NO_SMP */
 	/* FIXME: This  is  an ugly  work-around  for when  the  kernel is
 	 *        running from a custom stack, such as the debugger stack,
 	 *        or the stack defined by the GDB server driver. */

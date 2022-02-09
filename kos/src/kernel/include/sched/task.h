@@ -356,11 +356,10 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
  * data  cannot  be  propagated  to  userspace  in  the  event  of an
  * interrupt throwing some error, whilst originating from user-space.
  * @param: w_status: The task's exit status (mustn't be `WIFSTOPPED()' or `WIFCONTINUED()').
- *                   This argument is ignored for kernel-threads.
  * WARNING: Calling this function from an IDLE task, or any other
  *          task that is critical will cause the kernel to PANIC! */
 FUNDEF ABNORMAL_RETURN ATTR_NORETURN void
-NOTHROW(FCALL task_exit)(int w_status DFL(__W_EXITCODE(0, 0)));
+NOTHROW(FCALL task_exit)(uint16_t w_status DFL(__W_EXITCODE(0, 0)));
 
 /* Same as `task_exit()', but propagate the same status
  * to  all  other threads  within the  current process.
@@ -368,13 +367,17 @@ NOTHROW(FCALL task_exit)(int w_status DFL(__W_EXITCODE(0, 0)));
  * This is the same as calling `task_exit()' from the
  * main thread of the calling process. */
 FUNDEF ABNORMAL_RETURN ATTR_NORETURN void
-NOTHROW(FCALL process_exit)(int w_status DFL(__W_EXITCODE(0, 0)));
+NOTHROW(FCALL process_exit)(uint16_t w_status DFL(__W_EXITCODE(0, 0)));
 
 #ifdef __cplusplus
 extern "C++" {
 FORCELOCAL ABNORMAL_RETURN ATTR_ARTIFICIAL ATTR_NORETURN void
 NOTHROW(FCALL task_exit)(union wait status) {
-	task_exit(status.w_status);
+	task_exit((uint16_t)status.w_status);
+}
+FORCELOCAL ABNORMAL_RETURN ATTR_ARTIFICIAL ATTR_NORETURN void
+NOTHROW(FCALL process_exit)(union wait status) {
+	process_exit((uint16_t)status.w_status);
 }
 } /* extern "C++" */
 #endif /* __cplusplus */
@@ -387,7 +390,7 @@ NOTHROW(FCALL task_exit)(union wait status) {
 #ifndef CONFIG_NO_SMP
 FUNDEF NOBLOCK void NOTHROW(KCALL task_pause)(void);
 #else /* !CONFIG_NO_SMP */
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void NOTHROW(KCALL task_pause)(void) { }
+#define task_pause() (void)0
 #endif /* CONFIG_NO_SMP */
 
 /* Try to yield execution in the calling thread, but never thrown an exception.

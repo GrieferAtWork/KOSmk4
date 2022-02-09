@@ -512,6 +512,14 @@ handle_manager_cloexec(struct handle_manager *__restrict self)
 	unsigned int minfree         = (unsigned int)-1;
 	struct handle *delete_vector = NULL;
 	struct handle *vec;
+	/* TODO:
+	 * """
+	 *    If a process sharing a file descriptor table calls
+	 *    execve(2), its file descriptor table is duplicated
+	 *    (unshared).
+	 * """
+	 */
+
 	if (!ATOMIC_READ(self->hm_cloexec_count))
 		return;
 	sync_write(&self->hm_lock);

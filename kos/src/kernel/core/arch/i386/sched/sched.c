@@ -118,7 +118,7 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
 	va_list args; byte_t *dest;
 	va_start(args, argc);
 	dest = (byte_t *)FORTASK(thread, this_x86_kernel_psp0);
-	*(u64 *)(dest -= 8) = (u64)(void *)((void *)(void(FCALL *)(int))&task_exit);
+	*(u64 *)(dest -= 8) = (u64)(void *)((void *)(void(FCALL *)(uint16_t))&task_exit);
 	if (argc > 6)
 		dest -= (argc - 6) * 8;
 	state = (struct scpustate *)(dest - SIZEOF_SCPUSTATE);
@@ -158,7 +158,7 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
 #define PUSH(x) (dest -= sizeof(u32), *(u32 *)dest = (x))
 	dest -= argc * sizeof(void *);
 	memcpy(dest, &argc + 1, argc, sizeof(void *));
-	PUSH((u32)(void *)(void(FCALL *)(int)) & task_exit); /* Return address */
+	PUSH((u32)(void *)(void(FCALL *)(uint16_t))&task_exit); /* Return address */
 	dest -= OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL;
 	state = (struct scpustate *)dest;
 	/* Initialize the thread's entry state. */

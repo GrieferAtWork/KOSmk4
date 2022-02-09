@@ -405,6 +405,10 @@ struct mnode {
 #define mnode_getsize(self)    ((size_t)((self)->mn_maxaddr - (self)->mn_minaddr) + 1)
 #define mnode_iskern(self)     ADDRRANGE_ISKERN((self)->mn_minaddr, (self)->mn_maxaddr + 1)
 #define mnode_isuser(self)     ADDRRANGE_ISUSER((self)->mn_minaddr, (self)->mn_maxaddr + 1)
+#define mnode_containsaddr(self, addr)                     \
+	((uintptr_t)(addr) >= (uintptr_t)(self)->mn_minaddr && \
+	 (uintptr_t)(addr) <= (uintptr_t)(self)->mn_maxaddr)
+
 /* Return the part-relative min-/max-address that is being mapped. */
 #define mnode_getpartaddr(self)    ((mpart_reladdr_t)((self)->mn_partoff))
 #define mnode_getpartminaddr(self) ((mpart_reladdr_t)((self)->mn_partoff))

@@ -153,10 +153,13 @@ STATIC_ASSERT(offsetafter(struct pending_rpc, pr_kern.k_func) == offsetafter(str
  * as the main thread to all non-main threads. */
 INTDEF struct pending_rpc this_exitrpc ASMNAME("this_exitrpc");
 INTDEF struct _task_exitrpc __this_exitrpc ASMNAME("this_exitrpc");
-INTERN ATTR_SECTION(".data.pertask.middle") ATTR_ALIGN(struct _task_exitrpc) __this_exitrpc = {
+INTERN ATTR_SECTION(".data.pertask.middle")
+ATTR_ALIGN(struct _task_exitrpc) __this_exitrpc = {
 	.pr_link  = { NULL },
 	.pr_flags = RPC_CONTEXT_KERN | _RPC_CONTEXT_DONTFREE,
-	.k_func   = NULL, /* Allocated if non-NULL (set to either `propagate_process_exit_status' or `propagate_thread_exit_status') */
+	.k_func   = NULL, /* Allocated if non-NULL; set to one of:
+	                   * - `propagate_process_exit_status'
+	                   * - `propagate_thread_exit_status' */
 };
 
 /* Called in context of worker threads: propagate exit status of process leader */
@@ -177,7 +180,7 @@ propagate_process_exit_status(struct rpc_context *__restrict ctx,
 }
 
 
-/* Called in context of main threads: propagate exit status of worker thread */
+/* Called in context of main thread: propagate exit status of worker threads */
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 propagate_thread_exit_status(struct rpc_context *__restrict ctx,
                              void *cookie) {
@@ -190,7 +193,7 @@ propagate_thread_exit_status(struct rpc_context *__restrict ctx,
 	 * an  RPC to the process's main thread (that  RPC is us, and we are said
 	 * main  thread). As such, because `_RPC_CONTEXT_DONTFREE' means `cookie'
 	 * is  a  pointer to  the sending  thread's `this_exitrpc',  we can  do a
-	 * container_of-style operation to determine the origin! */
+	 * container_of-style  operation to determine the origin's `struct task'! */
 	origin = (REF struct task *)((byte_t *)cookie - (uintptr_t)&this_exitrpc);
 
 	/* Using the sending thread, we can determine their `struct taskpid' */
@@ -203,7 +206,7 @@ propagate_thread_exit_status(struct rpc_context *__restrict ctx,
 	 * let this RPC inherit a reference to the sending thread. Now that we're
 	 * done  accessing the originating thread's TLS memory, we must drop that
 	 * reference! */
-	decref_unlikely(origin);
+	decref(origin);
 
 	if (ctx->rc_context == RPC_REASONCTX_SHUTDOWN)
 		return; /* Already being shut down for some other reason --> don't do anything */
@@ -219,7 +222,7 @@ propagate_thread_exit_status(struct rpc_context *__restrict ctx,
  * This is the same as calling `task_exit()' from the
  * main thread of the calling process. */
 PUBLIC ABNORMAL_RETURN ATTR_NORETURN void
-NOTHROW(FCALL process_exit)(int w_status) {
+NOTHROW(FCALL process_exit)(uint16_t w_status) {
 	struct task *caller = THIS_TASK;
 	struct taskpid *pid = task_gettaskpid_of(caller);
 
@@ -235,10 +238,10 @@ NOTHROW(FCALL process_exit)(int w_status) {
 				if (ATOMIC_CMPXCH(FORTASK(caller, this_exitrpc.pr_kern.k_func),
 				                  NULL, &propagate_thread_exit_status)) {
 
-					/* This write is repeated  in `task_exit()', but that's  OK
-					 * It also has to happen here, so that the RPC will be able
-					 * to talk to  our thread  in order to  determine the  exit
-					 * status that should be propagated. */
+					/* This write is repeated in `task_exit()', but that's OK.
+					 * It also has to  be done here, so  that the RPC will  be
+					 * able  to talk to  our thread in  order to determine the
+					 * exit status that should be propagated. */
 					ATOMIC_WRITE(pid->tp_status, w_status);
 
 					/* Inherited by `propagate_thread_exit_status()' */
@@ -277,13 +280,12 @@ NOTHROW(FCALL process_exit)(int w_status) {
  * data  cannot  be  propagated  to  userspace  in  the  event  of an
  * interrupt throwing some error, whilst originating from user-space.
  * @param: w_status: The task's exit status (mustn't be `WIFSTOPPED()' or `WIFCONTINUED()').
- *                   This argument is ignored for kernel-threads.
  * WARNING: Calling this function from an IDLE task, or any other
  *          task that is critical will cause the kernel to PANIC! */
 PUBLIC ABNORMAL_RETURN ATTR_NORETURN void
-NOTHROW(FCALL task_exit)(int w_status) {
+NOTHROW(FCALL task_exit)(uint16_t w_status) {
 	struct task *caller = THIS_TASK, *next;
-	struct cpu *me;
+	struct cpu *mycpu;
 	uintptr_t flags;
 	struct taskpid *pid = task_gettaskpid_of(caller);
 	REF struct taskpid *parpid;
@@ -482,19 +484,19 @@ again_get_ctty:
 	}
 
 	PREEMPTION_DISABLE();
-	me = caller->t_cpu;
-	assertf(FORCPU(me, thiscpu_sched_current) == caller, "Inconsistent scheduler state");
-	assertf(FORCPU(me, thiscpu_sched_override) != caller, "Cannot exit while being the scheduling override");
-	assertf(caller != &FORCPU(me, thiscpu_idle), "The IDLE task cannot be terminated");
+	mycpu = caller->t_cpu;
+	assertf(FORCPU(mycpu, thiscpu_sched_current) == caller, "Inconsistent scheduler state");
+	assertf(FORCPU(mycpu, thiscpu_sched_override) != caller, "Cannot exit while being the scheduling override");
+	assertf(caller != &FORCPU(mycpu, thiscpu_idle), "The IDLE task cannot be terminated");
 
 #ifdef CONFIG_FPU
 	/* Unset the  calling thread  potentially holding  the FPU  state.
 	 * Since the task will go away, we don't actually have to save it. */
-	ATOMIC_CMPXCH(FORCPU(me, thiscpu_fputhread), caller, NULL);
+	ATOMIC_CMPXCH(FORCPU(mycpu, thiscpu_fputhread), caller, NULL);
 #endif /* CONFIG_FPU */
 
 	/* Account for timings and scheduler internals, as well as figure out a successor thread. */
-	next = sched_intern_yield_onexit(me, caller); /* NOTE: This causes us to inherit a reference to `caller' */
+	next = sched_intern_yield_onexit(mycpu, caller); /* NOTE: This causes us to inherit a reference to `caller' */
 
 	/* Hi-jack the execution stack of the next thread to have it do the decref()
 	 * of our own thread, thus preventing  the undefined behavior that would  be
@@ -553,7 +555,7 @@ again_get_ctty:
 	}
 
 	/* Update the current-thread field to indicate who's about to start running. */
-	FORCPU(me, thiscpu_sched_current) = next;
+	FORCPU(mycpu, thiscpu_sched_current) = next;
 
 	/* For the sake of easier  interlocking, we only broadcast our  thread's
 	 * status change _after_ setting the TASK_FTERMINATED flag. -- That way,
