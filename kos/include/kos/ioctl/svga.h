@@ -52,7 +52,7 @@ __DECL_BEGIN
  *  - SVGA_IOC_SETMODE: [svga] Sets the video mode of the currently active tty.
  *                             When a video lock is  active, the video mode  of
  *                             the tty that will be loaded once the video  lock
- *                             is released is set.
+ *                             is released.
  *  - SVGA_IOC_SETMODE: [tty]  Sets the video mode of this tty. If the tty is
  *                             not currently active, changes will only become
  *                             visible once it gets activated.

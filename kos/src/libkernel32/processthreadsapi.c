@@ -27,7 +27,10 @@
 /**/
 
 #include <asm/intrin.h>
+#include <kos/io.h>
+#include <kos/ioctl/fd.h>
 #include <kos/ioctl/pidfd.h>
+#include <kos/kernel/handle.h>
 #include <kos/rpc.h>
 #include <kos/syscalls.h>
 #include <kos/types.h>
@@ -132,6 +135,8 @@ INTERN HANDLE WINAPI
 libk32_OpenThread(DWORD dwDesiredAccess, WINBOOL bInheritHandle, DWORD dwThreadId) {
 	fd_t result;
 	char filename[64];
+	struct fdcast cast;
+	int status;
 	TRACE("OpenThread(%#x, %u, %#x)", dwDesiredAccess, bInheritHandle, dwThreadId);
 	(void)dwDesiredAccess;
 	/* NOTE: For linux compat, `sys_pidfd_open()' can't be used to open thread
@@ -142,7 +147,23 @@ libk32_OpenThread(DWORD dwDesiredAccess, WINBOOL bInheritHandle, DWORD dwThreadI
 	                             : (O_RDWR | O_DIRECTORY | O_CLOEXEC));
 	if (result == -1)
 		return NULL;
-	return NTHANDLE_FROMFD(result);
+	/* Explicitly cast into a PIDFD handle. Most operations will already work
+	 * as expected when using the directory handle from procfs, but we  don't
+	 * want  to take any chances in that  regard, so by explicitly casting to
+	 * a PIDFD handle, we can guaranty that the correct object is returned.
+	 *
+	 * This is also required to ensure that kcmp(2) for multiple invocations
+	 * of this functions  returns indicative of  the same underlying  kernel
+	 * object. */
+	bzero(&cast, sizeof(cast));
+	cast.fc_rqtyp          = HANDLE_TYPE_PIDFD;
+	cast.fc_resfd.of_mode  = OPENFD_MODE_AUTO;
+	cast.fc_resfd.of_flags = IO_CLOEXEC;
+	status = ioctl(result, FD_IOC_CAST, &cast);
+	close(result);
+	if (status < 0)
+		return NULL;
+	return NTHANDLE_FROMFD(cast.fc_resfd.of_hint);
 }
 
 DEFINE_INTERN_ALIAS(libk32_GetProcessIdOfThread, libk32_GetProcessId);
