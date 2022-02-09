@@ -55,7 +55,7 @@
  *  Linux  0x54 ('T')  T*                  <sys/ioctl.h>             TTY & standard
  *  Linux  0x58 ('X')  FI*                 <linux/fs.h>
  *  KOS    0x46 ('F')  FILE_IOC_*          <kos/ioctl/file.h>
- *  KOS    0x4B ('K')  KBDIO_*             <kos/ioctl/keyboard.h>
+ *  KOS    0x4B ('K')  KBD_IOC_*           <kos/ioctl/kbd.h>
  *  KOS    0x4C ('L')  LEAKS_IOC_*         <kos/ioctl/leaks.h>
  *  KOS    0x4D ('M')  MOUSEIO_*           <kos/ioctl/mouse.h>
  *  KOS    0x50 ('P')  PIPE_IOC_*          <kos/ioctl/pipe.h>

@@ -663,7 +663,7 @@ incdir("");
 #include <kos/ioctl/_openfd.h>
 #include <kos/ioctl/fd.h>
 #include <kos/ioctl/file.h>
-#include <kos/ioctl/keyboard.h>
+#include <kos/ioctl/kbd.h>
 #include <kos/ioctl/leaks.h>
 #include <kos/ioctl/mod.h>
 #include <kos/ioctl/mouse.h>

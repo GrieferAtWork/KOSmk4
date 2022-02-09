@@ -202,17 +202,10 @@ mkttydev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 
 	default: {
 		syscall_slong_t result;
-		if (_IOC_ISKOS(cmd)) {
-			if (_IOC_TYPE(cmd) == 'K') /* KBDIO_* */
-				goto predict_input_device_command;
-			if (_IOC_TYPE(cmd) == 'V') /* VIDEOIO_* */
-				goto predict_output_device_command;
-		} else {
-			if (_IOC_TYPE(cmd) == 'K') /* <linux/kd.h> */
-				goto predict_input_device_command;
-			if (_IOC_TYPE(cmd) == 'V') /* <linux/vt.h> */
-				goto predict_output_device_command;
-		}
+		if (_IOC_TYPE(cmd) == 'K') /* _IOC_ISKOS(cmd) ? KBD_IOC_* : <linux/kd.h> */
+			goto predict_input_device_command;
+		if (_IOC_TYPE(cmd) == 'V') /* _IOC_ISKOS(cmd) ? VID_IOC_* : <linux/vt.h> */
+			goto predict_output_device_command;
 		result = _ttydev_tryioctl(self, cmd, arg, mode);
 		if (result != -EINVAL)
 			return result;

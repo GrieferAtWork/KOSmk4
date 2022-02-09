@@ -23,7 +23,7 @@
 
 #include <hybrid/compiler.h>
 
-#include <kos/ioctl/keyboard.h>
+#include <kos/ioctl/kbd.h>
 #include <kos/types.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
 	struct stat st;
 	struct keymap keymap;
 	void *keymap_mapping;
-	struct keyboard_keymap io;
+	struct kbd_keymap io;
 	ssize_t codesize;
 	char *map_filename;
 
@@ -120,7 +120,7 @@ int main(int argc, char *argv[]) {
 	io.km_maptext = (byte_t *)keymap.km_ext;
 	io.km_mapsize = (size_t)codesize;
 	io.km_defenc  = keymap.km_defencoding;
-	if (ioctl(kbdev, KBDIO_SETKEYMAP, &io) < 0) {
+	if (ioctl(kbdev, KBD_IOC_SETKEYMAP, &io) < 0) {
 		fprintf(stderr, "%s: Failed to set keymap file %s: %m\n",
 		        argv[0], map_filename);
 		exit(EXIT_FAILURE);

@@ -842,13 +842,13 @@ NOTHROW(FCALL dbg_getkey)(void) {
 }
 
 
-struct keyboard_keymap {
+struct kbd_keymap {
 	u8 km_press[128]; /* Regular key map. */
 	u8 km_shift[128]; /* Key map while the shift-key is held. */
 	u8 km_altgr[128]; /* Key map when RALT or CTRL+ALT is held down. */
 };
 
-PRIVATE ATTR_DBGDATA struct keyboard_keymap keymap = {
+PRIVATE ATTR_DBGDATA struct kbd_keymap keymap = {
 /*[[[deemon
 #include "../../../../../../include/kos/keyboard.h"
 #include <util>

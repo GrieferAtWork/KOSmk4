@@ -843,7 +843,7 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 			ATOMIC_OR(me->md_flags, MOUSE_DEVICE_FLAG_GENABS);
 		} else {
 			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-			      E_INVALID_ARGUMENT_CONTEXT_IOCTL_MOUSEIO_SETABSMODE_BADMODE,
+			      E_INVALID_ARGUMENT_CONTEXT_IOCTL_MOUSE_SETABSMODE_BADMODE,
 			      mode);
 		}
 	}	break;
@@ -869,7 +869,7 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 		            new_rect.mr_minx + INT32_MAX < new_rect.mr_maxx ||
 		            new_rect.mr_miny + INT32_MAX < new_rect.mr_maxy) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_IOCTL_MOUSEIO_SETABSRECT_BADBOUNDS,
+			      E_INVALID_ARGUMENT_CONTEXT_IOCTL_MOUSE_SETABSRECT_BADBOUNDS,
 			      new_rect.mr_minx, new_rect.mr_miny,
 			      new_rect.mr_maxx, new_rect.mr_maxy);
 		}

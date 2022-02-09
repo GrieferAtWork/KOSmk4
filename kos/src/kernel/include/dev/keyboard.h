@@ -300,8 +300,8 @@ FUNDEF NONNULL((1)) u16 KCALL kbdbuf_getkey(struct kbdbuf *__restrict self) THRO
 
 /* Try to read a key stroke from the given keyboard.
  * @return: { KEY_NONE, ? }: The buffer is empty. */
-FUNDEF NONNULL((1)) struct keyboard_key_packet KCALL kbddev_trygetkey(struct kbddev *__restrict self) THROWS(E_IOERROR, ...);
-FUNDEF NONNULL((1)) struct keyboard_key_packet KCALL kbddev_getkey(struct kbddev *__restrict self) THROWS(E_WOULDBLOCK, E_IOERROR, ...);
+FUNDEF NONNULL((1)) struct kbd_packet KCALL kbddev_trygetkey(struct kbddev *__restrict self) THROWS(E_IOERROR, ...);
+FUNDEF NONNULL((1)) struct kbd_packet KCALL kbddev_getkey(struct kbddev *__restrict self) THROWS(E_WOULDBLOCK, E_IOERROR, ...);
 
 /* Try to read a single byte from the keyboard data stream.
  * Same as `kbddev_v_read()'.

@@ -129,7 +129,7 @@ typedef struct __ATTR_PACKED {
 
 /* Max supported code size for keymaps (when code becomes larger than  this,
  * the kernel may choose to disallow the code being loaded into a the keymap
- * of some given keyboard; s.a. `KBDIO_SETKEYMAP') */
+ * of some given keyboard; s.a. `KBD_IOC_SETKEYMAP') */
 #ifndef KEYMAP_MAX_CODESIZE
 #define KEYMAP_MAX_CODESIZE (1024 * 1024)
 #endif /* !KEYMAP_MAX_CODESIZE */

@@ -37,7 +37,7 @@
 
 #include <hybrid/atomic.h>
 
-#include <kos/ioctl/keyboard.h>
+#include <kos/ioctl/kbd.h>
 
 #include <assert.h>
 #include <stdio.h>

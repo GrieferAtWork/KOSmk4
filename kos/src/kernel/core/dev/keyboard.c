@@ -39,7 +39,7 @@
 #include <hybrid/atomic.h>
 
 #include <kos/except/reason/inval.h>
-#include <kos/ioctl/keyboard.h>
+#include <kos/ioctl/kbd.h>
 #include <kos/kernel/handle.h>
 #include <linux/kd.h> /* Needed to emulate the linux keyboard interface */
 #include <sys/stat.h>
@@ -186,9 +186,9 @@ kbdbuf_getkey(struct kbdbuf *__restrict self)
 }
 
 
-PRIVATE NOBLOCK struct keyboard_key_packet
+PRIVATE NOBLOCK struct kbd_packet
 NOTHROW(KCALL keyboard_device_trygetkey_locked_noled)(struct kbddev *__restrict self) {
-	struct keyboard_key_packet result;
+	struct kbd_packet result;
 	assert(kbddev_map_reading(self));
 	result.kp_key = kbdbuf_trygetkey(&self->kd_buf);
 	switch (result.kp_key) {
@@ -390,10 +390,10 @@ sync_leds(struct kbddev *__restrict self)
 
 /* Try to read a key stroke from the given keyboard.
  * @return: { KEY_NONE, ? }: The buffer is empty. */
-PUBLIC NONNULL((1)) struct keyboard_key_packet KCALL
+PUBLIC NONNULL((1)) struct kbd_packet KCALL
 kbddev_trygetkey(struct kbddev *__restrict self)
 		THROWS(E_WOULDBLOCK, E_IOERROR, ...) {
-	struct keyboard_key_packet result;
+	struct kbd_packet result;
 	kbddev_map_read(self);
 	result = keyboard_device_trygetkey_locked_noled(self);
 	kbddev_map_endread(self);
@@ -404,10 +404,10 @@ kbddev_trygetkey(struct kbddev *__restrict self)
 	return result;
 }
 
-PUBLIC NONNULL((1)) struct keyboard_key_packet KCALL
+PUBLIC NONNULL((1)) struct kbd_packet KCALL
 kbddev_getkey(struct kbddev *__restrict self)
 		THROWS(E_WOULDBLOCK, E_IOERROR, ...) {
-	struct keyboard_key_packet result;
+	struct kbd_packet result;
 	assert(!task_wasconnected());
 	for (;;) {
 		result = kbddev_trygetkey(self);
@@ -717,7 +717,7 @@ again:
 		            self->kd_pendsz);
 		kbddev_map_endwrite(self);
 	} else {
-		struct keyboard_key_packet packet;
+		struct kbd_packet packet;
 		result = -1;
 again_getkey:
 		packet = keyboard_device_trygetkey_locked_noled(self);
@@ -1021,27 +1021,27 @@ kbddev_v_ioctl(struct mfile *__restrict self,
 	(void)mode;
 	switch (cmd) {
 
-	case KBDIO_TRYGETKEY: {
-		struct keyboard_key_packet key;
-		validate_writable(arg, sizeof(struct keyboard_key_packet));
+	case KBD_IOC_TRYGETKEY: {
+		struct kbd_packet key;
+		validate_writable(arg, sizeof(struct kbd_packet));
 		key = kbddev_trygetkey(me);
 		if (!key.kp_key)
 			return -EAGAIN;
 		COMPILER_WRITE_BARRIER();
-		memcpy(arg, &key, sizeof(struct keyboard_key_packet));
+		memcpy(arg, &key, sizeof(struct kbd_packet));
 		COMPILER_WRITE_BARRIER();
 	}	break;
 
-	case KBDIO_GETKEY: {
-		struct keyboard_key_packet key;
-		validate_writable(arg, sizeof(struct keyboard_key_packet));
+	case KBD_IOC_GETKEY: {
+		struct kbd_packet key;
+		validate_writable(arg, sizeof(struct kbd_packet));
 		key = kbddev_getkey(me);
 		COMPILER_WRITE_BARRIER();
-		memcpy(arg, &key, sizeof(struct keyboard_key_packet));
+		memcpy(arg, &key, sizeof(struct kbd_packet));
 		COMPILER_WRITE_BARRIER();
 	}	break;
 
-	case KBDIO_GETLED: {
+	case KBD_IOC_GETLED: {
 		uintptr_t leds;
 		validate_writable(arg, sizeof(__uint32_t));
 		leds = ATOMIC_READ(me->kd_leds);
@@ -1050,7 +1050,7 @@ kbddev_v_ioctl(struct mfile *__restrict self,
 		COMPILER_WRITE_BARRIER();
 	}	break;
 
-	case KBDIO_SETLED: {
+	case KBD_IOC_SETLED: {
 		uintptr_t new_mods;
 		validate_readable(arg, sizeof(__uint32_t));
 		COMPILER_READ_BARRIER();
@@ -1068,12 +1068,12 @@ kbddev_v_ioctl(struct mfile *__restrict self,
 		}
 	}	break;
 
-	case KBDIO_MASKLED: {
-		USER CHECKED struct keyboard_ledmask *data;
+	case KBD_IOC_MASKLED: {
+		USER CHECKED struct kbd_ledmask *data;
 		u32 old_leds, new_mods;
 		u32 led_mask, led_flag, led_fxor;
-		validate_readable(arg, sizeof(struct keyboard_ledmask));
-		data = (USER CHECKED struct keyboard_ledmask *)arg;
+		validate_readable(arg, sizeof(struct kbd_ledmask));
+		data = (USER CHECKED struct kbd_ledmask *)arg;
 		COMPILER_READ_BARRIER();
 		led_mask = ATOMIC_READ(data->lm_mask);
 		led_flag = ATOMIC_READ(data->lm_flag);
@@ -1099,7 +1099,7 @@ kbddev_v_ioctl(struct mfile *__restrict self,
 		COMPILER_WRITE_BARRIER();
 	}	break;
 
-	case KBDIO_GETMOD: {
+	case KBD_IOC_GETMOD: {
 		uintptr_t mods;
 		validate_writable(arg, sizeof(__uint32_t));
 		mods = ATOMIC_READ(me->kd_mods);
@@ -1108,7 +1108,7 @@ kbddev_v_ioctl(struct mfile *__restrict self,
 		COMPILER_WRITE_BARRIER();
 	}	break;
 
-	case KBDIO_SETMOD: {
+	case KBD_IOC_SETMOD: {
 		uintptr_t new_mods;
 		validate_readable(arg, sizeof(__uint32_t));
 		COMPILER_READ_BARRIER();
@@ -1117,12 +1117,12 @@ kbddev_v_ioctl(struct mfile *__restrict self,
 		ATOMIC_WRITE(me->kd_mods, new_mods);
 	}	break;
 
-	case KBDIO_MASKMOD: {
-		USER CHECKED struct keyboard_ledmask *data;
+	case KBD_IOC_MASKMOD: {
+		USER CHECKED struct kbd_ledmask *data;
 		u32 old_mods, new_mods;
 		u32 mod_mask, mod_flag, mod_fxor;
-		validate_readable(arg, sizeof(struct keyboard_ledmask));
-		data = (USER CHECKED struct keyboard_ledmask *)arg;
+		validate_readable(arg, sizeof(struct kbd_ledmask));
+		data = (USER CHECKED struct kbd_ledmask *)arg;
 		COMPILER_READ_BARRIER();
 		mod_mask = ATOMIC_READ(data->lm_mask);
 		mod_flag = ATOMIC_READ(data->lm_flag);
@@ -1138,12 +1138,12 @@ kbddev_v_ioctl(struct mfile *__restrict self,
 		COMPILER_WRITE_BARRIER();
 	}	break;
 
-	case KBDIO_GETKEYMAP: {
-		struct keyboard_keymap data;
+	case KBD_IOC_GETKEYMAP: {
+		struct kbd_keymap data;
 		size_t mapsize;
 		uint8_t default_encoding;
-		validate_readwrite(arg, sizeof(struct keyboard_keymap));
-		memcpy(&data, arg, sizeof(struct keyboard_keymap));
+		validate_readwrite(arg, sizeof(struct kbd_keymap));
+		memcpy(&data, arg, sizeof(struct kbd_keymap));
 		validate_writable(data.km_maptext, data.km_mapsize);
 		kbddev_map_read(me);
 restart_getkeymap_locked:
@@ -1180,23 +1180,23 @@ continue_copy_keymap:
 		kbddev_map_endread(me);
 		COMPILER_WRITE_BARRIER();
 		/* Write back the required buffer size, as well as the default encoding. */
-		((struct keyboard_keymap *)arg)->km_mapsize = mapsize;
-		((struct keyboard_keymap *)arg)->km_defenc  = default_encoding;
+		((struct kbd_keymap *)arg)->km_mapsize = mapsize;
+		((struct kbd_keymap *)arg)->km_defenc  = default_encoding;
 		COMPILER_WRITE_BARRIER();
 	}	break;
 
-	case KBDIO_SETKEYMAP: {
-		struct keyboard_keymap data;
+	case KBD_IOC_SETKEYMAP: {
+		struct kbd_keymap data;
 		byte_t *new_map, *new_map2, *old_map;
-		validate_readable(arg, sizeof(struct keyboard_keymap));
-		memcpy(&data, arg, sizeof(struct keyboard_keymap));
+		validate_readable(arg, sizeof(struct kbd_keymap));
+		memcpy(&data, arg, sizeof(struct kbd_keymap));
 		if unlikely(data.km_mapsize > KEYMAP_MAX_CODESIZE)
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBDIO_SETKEYMAP_TOO_LARGE,
+			      E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBD_SETKEYMAP_TOO_LARGE,
 			      data.km_mapsize);
 		if unlikely(data.km_defenc > KMP_ENCODING_MAX)
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBDIO_SETKEYMAP_BAD_ENCODING,
+			      E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBD_SETKEYMAP_BAD_ENCODING,
 			      data.km_defenc);
 		validate_readable(data.km_maptext, data.km_mapsize);
 		while (data.km_mapsize && ATOMIC_READ(*((byte_t *)data.km_maptext + data.km_mapsize - 1)) == 0)
@@ -1211,7 +1211,7 @@ continue_copy_keymap:
 			real_length = keymap_codesize(new_map, &reg_enc, data.km_defenc);
 			if unlikely(real_length < 0)
 				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-				      E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBDIO_SETKEYMAP_BAD_MAPTEXT, 0);
+				      E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBD_SETKEYMAP_BAD_MAPTEXT, 0);
 			assert((size_t)real_length <= data.km_mapsize + KEYMAP_UNTRUSTED_NUM_TRAILING_ZERO_BYTES);
 			new_map2 = (byte_t *)krealloc_nx(new_map, real_length, GFP_NORMAL);
 			if likely(new_map2)
@@ -1232,7 +1232,7 @@ continue_copy_keymap:
 		kfree(old_map);
 	}	break;
 
-	case KBDIO_RESETKEYMAP: {
+	case KBD_IOC_RESETKEYMAP: {
 		byte_t *old_map;
 		kbddev_map_write(me);
 		old_map = (byte_t *)me->kd_map.km_ext;
@@ -1241,9 +1241,9 @@ continue_copy_keymap:
 		kfree(old_map);
 	}	break;
 
-	case KBDIO_FLUSHPENDING: {
+	case KBD_IOC_FLUSHPENDING: {
 		for (;;) {
-			struct keyboard_key_packet packet;
+			struct kbd_packet packet;
 			packet = kbddev_trygetkey(me);
 			if (packet.kp_key == KEY_NONE)
 				break; /* Buffer became empty. */
@@ -1251,7 +1251,7 @@ continue_copy_keymap:
 		ATOMIC_WRITE(me->kd_pendsz, 0);
 	}	break;
 
-	case KBDIO_PUTCHAR: {
+	case KBD_IOC_PUTCHAR: {
 		char ch;
 		validate_readable(arg, sizeof(char));
 		COMPILER_READ_BARRIER();
@@ -1269,13 +1269,13 @@ continue_copy_keymap:
 		kbddev_map_endwrite(me);
 	}	break;
 
-	case KBDIO_PUTSTR: {
-		struct keyboard_string data;
+	case KBD_IOC_PUTSTR: {
+		struct kbd_string data;
 		byte_t new_buf[COMPILER_LENOF(me->kd_pend)];
 		size_t avail;
-		validate_readable(arg, sizeof(struct keyboard_string));
+		validate_readable(arg, sizeof(struct kbd_string));
 		COMPILER_READ_BARRIER();
-		memcpy(&data, arg, sizeof(struct keyboard_string));
+		memcpy(&data, arg, sizeof(struct kbd_string));
 		COMPILER_READ_BARRIER();
 		validate_readable(data.ks_text, data.ks_size);
 		if (data.ks_size > COMPILER_LENOF(me->kd_pend))
@@ -1294,7 +1294,7 @@ continue_copy_keymap:
 		return avail;
 	}	break;
 
-	case KBDIO_PUTKEY: {
+	case KBD_IOC_PUTKEY: {
 		u16 key;
 		validate_readable(arg, sizeof(u16));
 		COMPILER_READ_BARRIER();
@@ -1303,7 +1303,7 @@ continue_copy_keymap:
 		return kbddev_putkey(me, key);
 	}	break;
 
-	case KBDIO_GETDBGF12: {
+	case KBD_IOC_GETDBGF12: {
 		validate_writable(arg, sizeof(int));
 		COMPILER_WRITE_BARRIER();
 #ifdef KEYBOARD_DEVICE_FLAG_DBGF12
@@ -1314,7 +1314,7 @@ continue_copy_keymap:
 		COMPILER_WRITE_BARRIER();
 	}	break;
 
-	case KBDIO_SETDBGF12: {
+	case KBD_IOC_SETDBGF12: {
 		int f12_mode;
 		validate_readable(arg, sizeof(int));
 		COMPILER_READ_BARRIER();
@@ -1329,7 +1329,7 @@ continue_copy_keymap:
 #endif /* KEYBOARD_DEVICE_FLAG_DBGF12 */
 		} else {
 			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-			      E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBDIO_SETDBGF12_BADDMODE,
+			      E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBD_SETDBGF12_BADDMODE,
 			      f12_mode);
 		}
 	}	break;
