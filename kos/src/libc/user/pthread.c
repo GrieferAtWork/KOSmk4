@@ -42,6 +42,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <limits.h>
 #include <malloc.h>
 #include <sched.h>
@@ -1469,6 +1470,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setschedprio)(pthread_t target_thread,
 }
 /*[[[end:libc_pthread_setschedprio]]]*/
 
+/* FROM: /kos/src/kernel/include/sched/comm.h */
+#ifndef TASK_COMM_LEN
+#define TASK_COMM_LEN 16 /* The max length of the task command name (including the trailing NUL) */
+#endif /* !TASK_COMM_LEN */
+
 /*[[[head:libc_pthread_getname_np,hash:CRC-32=0xbcd11cdc]]]*/
 /* >> pthread_getname_np(3)
  * Get thread name visible in the kernel and its interfaces
@@ -1481,13 +1487,23 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getname_np)(pthread_t target_thread,
 /*[[[body:libc_pthread_getname_np]]]*/
 {
 	pid_t tid;
+	fd_t commfd;
+	ssize_t result;
+	char pathname[COMPILER_LENOF("/proc/" PRIMAXu "/comm")];
 	tid = ATOMIC_READ(target_thread->pt_tid);
 	if unlikely(tid == 0)
 		return ESRCH;
-	if unlikely(snprintf(buf, buflen, "tid{%u}", tid) >= buflen)
-		return ERANGE;
-	if unlikely(ATOMIC_READ(target_thread->pt_tid) == 0)
-		return ESRCH;
+	sprintf(pathname, "/proc/%u/comm", tid);
+	commfd = sys_open(pathname, O_RDONLY, 0);
+	if unlikely(E_ISERR(commfd))
+		return -commfd;
+	result = sys_read(commfd, buf, buflen);
+	sys_close(commfd);
+	if (E_ISERR(result))
+		return -result;
+	if ((size_t)result == buflen)
+		return ERANGE;  /* Need more space for trailing NUL */
+	buf[result] = '\0'; /* Append trailing NUL */
 	return EOK;
 }
 /*[[[end:libc_pthread_getname_np]]]*/
@@ -1503,13 +1519,32 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthread_t target_thread,
 /*[[[body:libc_pthread_setname_np]]]*/
 {
 	pid_t tid;
+	fd_t commfd;
+	size_t namelen;
+	ssize_t result;
+	char pathname[COMPILER_LENOF("/proc/" PRIMAXu "/comm")];
 	tid = ATOMIC_READ(target_thread->pt_tid);
 	if unlikely(tid == 0)
 		return ESRCH;
-	COMPILER_IMPURE();
-	/* Unsupported */
-	(void)name;
-	return ENOSYS;
+	/* Just like under linux,  KOS's /proc/[pid]/comm file always  re-returns
+	 * the given `num_bytes' argument, rather than return the # of bytes that
+	 * were actually written to the thread's comm name.
+	 *
+	 * Because of this (and because we mustn't modify the thread's actual
+	 * name in case the caller-given name is too long), we have to  check
+	 * the length of `name' before even passing it along to the kernel! */
+	namelen = strlen(name);
+	if unlikely(namelen > (TASK_COMM_LEN - 1))
+		return ERANGE;
+	sprintf(pathname, "/proc/%u/comm", tid);
+	commfd = sys_open(pathname, O_WRONLY, 0);
+	if unlikely(E_ISERR(commfd))
+		return -commfd;
+	result = sys_write(commfd, name, namelen * sizeof(char));
+	sys_close(commfd);
+	if (E_ISERR(result))
+		return -result;
+	return EOK;
 }
 /*[[[end:libc_pthread_setname_np]]]*/
 
