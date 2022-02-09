@@ -56,6 +56,7 @@ DECL_END
 #include <kernel/mman/rw.h>
 #include <kernel/mman/stat.h>
 #include <kernel/user.h>
+#include <sched/comm.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/epoll.h>
@@ -704,9 +705,9 @@ compat_peb_print_cmdline(struct mman *__restrict mm, pformatprinter printer,
 #endif /* __ARCH_HAVE_COMPAT */
 
 INTERN NONNULL((1, 2)) void KCALL
-procfs_pp_cmdline_printer(struct printnode *__restrict self,
-                          pformatprinter printer, void *arg,
-                          pos_t UNUSED(offset_hint)) {
+procfs_pp_cmdline_print(struct printnode *__restrict self,
+                        pformatprinter printer, void *arg,
+                        pos_t UNUSED(offset_hint)) {
 	REF struct task *thread;
 	REF struct mman *threadmm;
 	USER CHECKED void *peb;
@@ -727,6 +728,51 @@ procfs_pp_cmdline_printer(struct printnode *__restrict self,
 		peb_print_cmdline(threadmm, printer, arg,
 		                  (USER CHECKED struct process_peb const *)peb);
 	}
+}
+
+
+
+/************************************************************************/
+/* /proc/[PID]/comm                                                     */
+/************************************************************************/
+INTERN NONNULL((1, 2)) void KCALL
+procfs_pp_comm_print(struct printnode *__restrict self,
+                     pformatprinter printer, void *arg,
+                     pos_t UNUSED(offset_hint)) {
+	REF struct task *thread;
+	char name[TASK_COMM_LEN];
+	thread = taskpid_gettask_srch(self->fn_fsdata);
+	FINALLY_DECREF_UNLIKELY(thread);
+	task_getcomm_of(thread, name);
+	(*printer)(arg, name, strlen(name));
+}
+
+INTERN WUNUSED NONNULL((1)) size_t KCALL
+procfs_pp_comm_write(struct mfile *__restrict self, USER CHECKED void const *src,
+                     size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
+	REF struct task *thread;
+	struct printnode *me = mfile_asprintnode(self);
+	char newname[TASK_COMM_LEN];
+	size_t setlen;
+	/* Can only write at addr=0 */
+	if (addr != 0)
+		THROW(E_IOERROR_BADBOUNDS, E_IOERROR_SUBSYSTEM_FILE);
+	/* Must be within the same process. */
+	if (taskpid_getprocpid(me->fn_fsdata) != task_getprocpid()) {
+		THROW(E_INVALID_ARGUMENT_BAD_STATE,
+		      E_INVALID_ARGUMENT_CONTEXT_COMM_DIFFERENT_PROCESS);
+	}
+	thread = taskpid_gettask_srch(me->fn_fsdata);
+	FINALLY_DECREF_UNLIKELY(thread);
+	setlen = num_bytes;
+	if (setlen > TASK_COMM_LEN * sizeof(char))
+		setlen = TASK_COMM_LEN * sizeof(char);
+	memcpy(newname, src, setlen);
+	/* NOTE: `task_setcomm_of()' does all of the
+	 * NUL-termination and sanitization for  us! */
+	if (!task_setcomm_of(thread, newname))
+		THROW(E_PROCESS_EXITED, taskpid_gettid_s(me->fn_fsdata));
+	return num_bytes;
 }
 
 
@@ -793,9 +839,9 @@ compat_peb_print_environ(struct mman *__restrict mm, pformatprinter printer,
 #endif /* __ARCH_HAVE_COMPAT */
 
 INTERN NONNULL((1, 2)) void KCALL
-procfs_pp_environ_printer(struct printnode *__restrict self,
-                          pformatprinter printer, void *arg,
-                          pos_t UNUSED(offset_hint)) {
+procfs_pp_environ_print(struct printnode *__restrict self,
+                        pformatprinter printer, void *arg,
+                        pos_t UNUSED(offset_hint)) {
 	REF struct task *thread;
 	REF struct mman *threadmm;
 	USER CHECKED void *peb;
@@ -970,9 +1016,9 @@ err:
 }
 
 INTERN NONNULL((1, 2)) void KCALL
-procfs_pp_maps_printer(struct printnode *__restrict self,
-                       pformatprinter printer, void *arg,
-                       pos_t UNUSED(offset_hint)) {
+procfs_pp_maps_print(struct printnode *__restrict self,
+                     pformatprinter printer, void *arg,
+                     pos_t UNUSED(offset_hint)) {
 	REF struct task *thread;
 	REF struct mman *threadmm;
 	struct maps_printer_data pd;
@@ -1072,9 +1118,9 @@ smaps_printer_cb(void *maps_arg, struct mmapinfo_ex *__restrict info) {
 }
 
 INTERN NONNULL((1, 2)) void KCALL
-procfs_pp_smaps_printer(struct printnode *__restrict self,
-                        pformatprinter printer, void *arg,
-                        pos_t UNUSED(offset_hint)) {
+procfs_pp_smaps_print(struct printnode *__restrict self,
+                      pformatprinter printer, void *arg,
+                      pos_t UNUSED(offset_hint)) {
 	REF struct task *thread;
 	REF struct mman *threadmm;
 	struct maps_printer_data pd;
@@ -1165,9 +1211,9 @@ err:
 }
 
 INTERN NONNULL((1, 2)) void KCALL
-procfs_pp_mounts_printer(struct printnode *__restrict self,
-                         pformatprinter printer, void *arg,
-                         pos_t UNUSED(offset_hint)) {
+procfs_pp_mounts_print(struct printnode *__restrict self,
+                       pformatprinter printer, void *arg,
+                       pos_t UNUSED(offset_hint)) {
 	REF struct path *fsroot;
 	REF struct pathmount *iter;
 	REF struct vfs *threadvfs;
@@ -1224,9 +1270,9 @@ NOTHROW(FCALL mman_get_total_mapped_bytes)(struct mman const *__restrict self) {
 }
 
 INTERN NONNULL((1, 2)) void KCALL
-procfs_pp_stat_printer(struct printnode *__restrict self,
-                       pformatprinter printer, void *arg,
-                       pos_t UNUSED(offset_hint)) {
+procfs_pp_stat_print(struct printnode *__restrict self,
+                     pformatprinter printer, void *arg,
+                     pos_t UNUSED(offset_hint)) {
 	REF struct task *thread;
 	REF struct mman *mm = NULL;
 	struct taskpid *tpid;
@@ -1448,9 +1494,9 @@ NOTHROW(FCALL credcap_as_u64)(struct credcap const *__restrict self) {
 }
 
 INTERN NONNULL((1, 2)) void KCALL
-procfs_pp_status_printer(struct printnode *__restrict self,
-                         pformatprinter printer, void *arg,
-                         pos_t UNUSED(offset_hint)) {
+procfs_pp_status_print(struct printnode *__restrict self,
+                       pformatprinter printer, void *arg,
+                       pos_t UNUSED(offset_hint)) {
 	REF struct task *thread;
 	REF struct mman *thread_mm             = NULL;
 	REF struct task *parent                = NULL;
@@ -1619,9 +1665,9 @@ no_exec:
 /* /proc/[PID]/attr/current                                             */
 /************************************************************************/
 INTERN NONNULL((1, 2)) void KCALL
-procfs_pp_attr_current_printer(struct printnode *__restrict self,
-                               pformatprinter printer, void *arg,
-                               pos_t UNUSED(offset_hint)) {
+procfs_pp_attr_current_print(struct printnode *__restrict self,
+                             pformatprinter printer, void *arg,
+                             pos_t UNUSED(offset_hint)) {
 	(void)self;
 	PRINT("unconfined");
 }

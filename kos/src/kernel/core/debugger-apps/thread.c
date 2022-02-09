@@ -40,6 +40,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/mman.h>
 #include <kernel/mman/execinfo.h>
 #include <sched/async.h>
+#include <sched/comm.h>
 #include <sched/cpu.h>
 #include <sched/enum.h>
 #include <sched/group.h>
@@ -81,6 +82,11 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 	if (task_getprocpid_of(thread) == task_getprocpid_of(dbg_current))
 		dbg_setbgcolor(ANSITTY_CL_DARK_GRAY);
 	ei = &FORMMAN(thread->t_mman, thismman_execinfo);
+#ifdef CONFIG_HAVE_TASK_COMM
+	if (FORTASK(thread, this_comm[0]) != '\0') {
+		len = dbg_print(FORTASK(thread, this_comm));
+	} else
+#endif /* CONFIG_HAVE_TASK_COMM */
 	if (ei->mei_dent) {
 		len = dbg_printer(NULL,
 		                  ei->mei_dent->fd_name,
@@ -184,7 +190,7 @@ task_enum_print_cb(void *UNUSED(arg), struct task *thread) {
 DBG_COMMAND(lsthread,
             "lsthread\n"
             "\tList all threads running on the system\n") {
-	dbg_print(DBGSTR("program    pid tid S cpu location\n"));
+	dbg_print(DBGSTR("comm       pid tid S cpu location\n"));
 	system_enum_threads_nb(&task_enum_print_cb, NULL);
 	return 0;
 }

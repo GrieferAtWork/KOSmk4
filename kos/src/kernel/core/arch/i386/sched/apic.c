@@ -44,6 +44,7 @@
 #include <kernel/x86/gdt.h>
 #include <kernel/x86/pic.h>
 #include <kernel/x86/pit.h>
+#include <sched/comm.h>
 #include <sched/cpu.h>
 #include <sched/group.h>
 #include <sched/pid.h>
@@ -67,6 +68,7 @@
 #include <assert.h>
 #include <inttypes.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -518,6 +520,12 @@ i386_allocate_secondary_cores(void) {
 		/*FORCPU(altcore, thiscpu_scheduler).s_waiting_last = NULL;*/
 		FORTASK(altidle, this_sched_link).le_prev = &FORCPU(altcore, thiscpu_scheduler).s_running.lh_first;
 		/*FORTASK(altidle, this_sched_link).le_next = NULL;*/
+
+		/* Assign name to IDLE thread. */
+#ifdef CONFIG_HAVE_TASK_COMM
+		/* XXX: This assumes that `TASK_COMM_LEN' is large enough (which it is, but... this could be done better) */
+		sprintf(FORTASK(altidle, this_comm), "idle%u", i);
+#endif /* CONFIG_HAVE_TASK_COMM */
 
 		/* Allocate a PID for the IDLE thread. */
 		FORTASK(altidle, this_taskpid) = &FORCPU(altcore, thiscpu_idle_pid);

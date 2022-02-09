@@ -53,6 +53,7 @@
 #include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_USERPROCMASK */
 #include <kernel/syscall.h>
 #include <kernel/user.h>
+#include <sched/comm.h>
 #include <sched/cred.h>
 #include <sched/group.h>
 #include <sched/rpc.h>
@@ -2273,6 +2274,9 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 			mman_exec(args);
 		}
 	}
+
+	/* Rename calling thread. */
+	task_setcomm(args->ea_xdentry->fd_name);
 
 	/* Upon success, run onexec callbacks (which will clear all CLOEXEC handles). */
 	run_permman_onexec();

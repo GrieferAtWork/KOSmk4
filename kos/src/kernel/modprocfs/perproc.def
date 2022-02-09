@@ -53,6 +53,7 @@
 /* /proc/[PID] */
 ROOTENT("attr",      DT_DIR, 0555, &procfs_pp_attr,      /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x6181769, 0x72747461, 0x6d181802, 0x72747461)/*[[[end]]]*/)
 ROOTENT("cmdline",   DT_REG, 0444, &procfs_pp_cmdline,   /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xcfed46e4, 0x656e696c646d63, 0x7f3df635, 0x656e696c646d63)/*[[[end]]]*/)
+ROOTENT("comm",      DT_REG, 0644, &procfs_pp_comm,      /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xd8d8ea7b, 0x6d6d6f63, 0x7eead8d5, 0x6d6d6f63)/*[[[end]]]*/)
 ROOTENT("cwd",       DT_LNK, 0777, &procfs_pp_cwd,       /*[[[fdirent_hash]]]*/0x647763/*[[[end]]]*/)
 ROOTENT("environ",   DT_REG, 0444, &procfs_pp_environ,   /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xb59850ff, 0x6e6f7269766e65, 0x91509923, 0x6e6f7269766e65)/*[[[end]]]*/)
 ROOTENT("exe",       DT_LNK, 0777, &procfs_pp_exe,       /*[[[fdirent_hash]]]*/0x657865/*[[[end]]]*/)
@@ -73,20 +74,21 @@ ROOTENT("task",      DT_DIR, 0555, &procfs_pp_task,      /*[[[fdirent_hash]]]*/F
 ROOTENT("x86",       DT_DIR, 0555, &procfs_pp_x86,       /*[[[fdirent_hash]]]*/0x363878/*[[[end]]]*/)
 #endif /* __x86_64__ || __i386__ */
 
-MKREG_RO(procfs_pp_cmdline, procfs_pp_cmdline_printer)
-MKREG_RO(procfs_pp_environ, procfs_pp_environ_printer)
-MKREG_RO(procfs_pp_maps, procfs_pp_maps_printer)
-MKREG_RO(procfs_pp_mounts, procfs_pp_mounts_printer)
-MKREG_RO(procfs_pp_smaps, procfs_pp_smaps_printer)
-MKREG_RO(procfs_pp_stat, procfs_pp_stat_printer)
-MKREG_RO(procfs_pp_status, procfs_pp_status_printer)
+MKREG_RO(procfs_pp_cmdline, procfs_pp_cmdline_print)
+MKREG_RW(procfs_pp_comm, procfs_pp_comm_print, procfs_pp_comm_write)
+MKREG_RO(procfs_pp_environ, procfs_pp_environ_print)
+MKREG_RO(procfs_pp_maps, procfs_pp_maps_print)
+MKREG_RO(procfs_pp_mounts, procfs_pp_mounts_print)
+MKREG_RO(procfs_pp_smaps, procfs_pp_smaps_print)
+MKREG_RO(procfs_pp_stat, procfs_pp_stat_print)
+MKREG_RO(procfs_pp_status, procfs_pp_status_print)
 
 
 /* /proc/[PID]/attr */
 MKDIR_BEGIN(procfs_pp_attr)
 	MKDIR_ENT("current", DT_REG, 0666, &procfs_pp_attr_current, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x67a8ee0, 0x746e6572727563, 0x7f957467, 0x746e6572727563)/*[[[end]]]*/)
 MKDIR_END
-MKREG_RO(procfs_pp_attr_current, procfs_pp_attr_current_printer)
+MKREG_RO(procfs_pp_attr_current, procfs_pp_attr_current_print)
 
 /* /proc/[PID]/kos */
 MKDIR_BEGIN(procfs_pp_kos)

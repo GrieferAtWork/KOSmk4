@@ -79,6 +79,15 @@ struct __sigset_struct;
 typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
 
+
+/* Header needed for ABI compatibility when using `_RPC_CONTEXT_DONTFREE' */
+struct pending_rpc_head {
+	SLIST_ENTRY(pending_rpc) prh_link;  /* [0..1][lock(ATOMIC)] Link in the list of pending RPCs */
+	uintptr_t                prh_flags; /* [const] RPC flags: RPC_CONTEXT_KERN, ...
+	                                     * NOTE: When `RPC_CONTEXT_INACTIVE' is set, then the RPC is inactive. */
+	prpc_exec_callback_t     prh_func;  /* [1..1][const] Function to invoke. */
+};
+
 #define OFFSET_PENDING_RPC_LINK  0
 #define OFFSET_PENDING_RPC_FLAGS __SIZEOF_POINTER__
 struct pending_rpc {

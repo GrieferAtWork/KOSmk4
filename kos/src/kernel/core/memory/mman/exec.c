@@ -27,11 +27,13 @@
 #include <kernel/driver-param.h>
 #include <kernel/driver.h>
 #include <kernel/execabi.h>
+#include <kernel/fs/dirent.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/path.h>
 #include <kernel/mman.h>
 #include <kernel/mman/exec.h>
 #include <kernel/mman/mfile.h>
+#include <sched/comm.h>
 #include <sched/rpc.h> /* task_serve() */
 
 #include <kos/except.h>
@@ -182,6 +184,9 @@ NOTHROW(KCALL kernel_initialize_exec_init)(struct icpustate *__restrict state) {
 	args.ea_state = state;
 	mman_exec(&args);
 	state = args.ea_state;
+
+	/* Set task name. */
+	task_setcomm(args.ea_xdentry->fd_name);
 
 	/* Finalize exec arguments. */
 	execargs_fini(&args);

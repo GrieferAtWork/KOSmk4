@@ -43,6 +43,7 @@
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <sched/async.h>
+#include <sched/comm.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/group.h>
@@ -270,6 +271,18 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	FORTASK(&boottask, this_taskpid)  = &boottask_pid;
 	FORTASK(&bootidle, this_taskpid)  = &bootidle_pid;
 	FORTASK(&asyncwork, this_taskpid) = &asyncwork_pid;
+
+	/* Assign task command names. */
+#ifdef CONFIG_HAVE_TASK_COMM
+#define SET_TASK_NAME(thread, name)                         \
+	memcpy(FORTASK(thread, this_comm), name,                \
+	       MIN_C(COMPILER_STRLEN(name), TASK_COMM_LEN - 1), \
+	       sizeof(char))
+	SET_TASK_NAME(&boottask, "boot");
+	SET_TASK_NAME(&bootidle, "idle0");
+	SET_TASK_NAME(&asyncwork, "async0");
+#undef SET_TASK_NAME
+#endif /* CONFIG_HAVE_TASK_COMM */
 
 	/* Figure out where to put the initial trampolines for boottask and bootidle */
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
