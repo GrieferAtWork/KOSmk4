@@ -42,7 +42,7 @@
 #include <compat/config.h>
 #include <kos/except/reason/inval.h>
 #include <kos/io.h>
-#include <kos/ioctl/task.h>
+#include <kos/ioctl/pidfd.h>
 #include <kos/kernel/handle.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
@@ -61,10 +61,10 @@
 DECL_BEGIN
 
 /* Task HOP functions */
-DEFINE_HANDLE_REFCNT_FUNCTIONS(task, struct taskpid);
+DEFINE_HANDLE_REFCNT_FUNCTIONS(pidfd, struct taskpid);
 INTERN void KCALL
-handle_task_stat(struct taskpid *__restrict self,
-                 USER CHECKED struct stat *result) {
+handle_pidfd_stat(struct taskpid *__restrict self,
+                  USER CHECKED struct stat *result) {
 	bzero(result, sizeof(*result));
 	/* TODO: st_ctim: Thread creation time? */
 	/* TODO: st_atim: End of the latest quantum */
@@ -73,14 +73,14 @@ handle_task_stat(struct taskpid *__restrict self,
 }
 
 INTERN void KCALL
-handle_task_pollconnect(struct taskpid *__restrict self, poll_mode_t what) {
+handle_pidfd_pollconnect(struct taskpid *__restrict self, poll_mode_t what) {
 	/* POLLINMASK: Terminated */
 	if (what & POLLINMASK)
 		task_connect_for_poll(&self->tp_changed);
 }
 
 INTERN ATTR_PURE WUNUSED poll_mode_t KCALL
-handle_task_polltest(struct taskpid *__restrict self, poll_mode_t what) {
+handle_pidfd_polltest(struct taskpid *__restrict self, poll_mode_t what) {
 	poll_mode_t result = 0;
 	/* POLLINMASK: Terminated */
 	if (what & POLLINMASK) {
@@ -103,52 +103,52 @@ require_pidfd_open(struct taskpid *__restrict self) {
 
 
 INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
-handle_task_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
-                  USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+handle_pidfd_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
+                   USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	switch (cmd) {
 
-	case TASK_IOC_GETTID: {
+	case PIDFD_IOC_GETTID: {
 		validate_writable(arg, sizeof(pid_t));
 		*(USER CHECKED pid_t *)arg = taskpid_gettid_s(self);
 		return 0;
 	}	break;
 
-	case TASK_IOC_GETPID: {
+	case PIDFD_IOC_GETPID: {
 		validate_writable(arg, sizeof(pid_t));
 		*(USER CHECKED pid_t *)arg = taskpid_getpid_s(self);
 		return 0;
 	}	break;
 
-	case TASK_IOC_GETPPID: {
+	case PIDFD_IOC_GETPPID: {
 		validate_writable(arg, sizeof(pid_t));
 		*(USER CHECKED pid_t *)arg = taskpid_getppid_s(self);
 		return 0;
 	}	break;
 
-	case TASK_IOC_GETPGID: {
+	case PIDFD_IOC_GETPGID: {
 		validate_writable(arg, sizeof(pid_t));
 		*(USER CHECKED pid_t *)arg = taskpid_getpgid_s(self);
 		return 0;
 	}	break;
 
-	case TASK_IOC_GETSID: {
+	case PIDFD_IOC_GETSID: {
 		validate_writable(arg, sizeof(pid_t));
 		*(USER CHECKED pid_t *)arg = taskpid_getsid_s(self);
 		return 0;
 	}	break;
 
-	case TASK_IOC_OPENPID: {
+	case PIDFD_IOC_OPENPID: {
 		struct handle hand;
-		hand.h_type = HANDLE_TYPE_TASK;
+		hand.h_type = HANDLE_TYPE_PIDFD;
 		hand.h_mode = mode;
 		hand.h_data = taskpid_getprocpid(self);
 		require_pidfd_open((struct taskpid *)hand.h_data);
 		return handle_installopenfd((USER UNCHECKED struct openfd *)arg, hand);
 	}	break;
 
-	case TASK_IOC_OPENPPID: {
+	case PIDFD_IOC_OPENPPID: {
 		struct handle hand;
-		hand.h_type = HANDLE_TYPE_TASK;
+		hand.h_type = HANDLE_TYPE_PIDFD;
 		hand.h_mode = mode;
 		hand.h_data = taskpid_getparentprocesspid(self);
 		FINALLY_DECREF_UNLIKELY((struct taskpid *)hand.h_data);
@@ -156,7 +156,7 @@ handle_task_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
 		return handle_installopenfd((USER UNCHECKED struct openfd *)arg, hand);
 	}	break;
 
-	case TASK_IOC_EXITCODE: {
+	case PIDFD_IOC_EXITCODE: {
 		REF struct task *thread;
 		union wait st;
 		thread = taskpid_gettask(self);
@@ -210,7 +210,7 @@ DEFINE_SYSCALL2(fd_t, pidfd_open,
 	/* Verify that the caller can access `pid' */
 	require_pidfd_open(target);
 
-	hand.h_type = HANDLE_TYPE_TASK;
+	hand.h_type = HANDLE_TYPE_PIDFD;
 	hand.h_mode = IO_RDWR | IO_CLOEXEC;
 	hand.h_data = target;
 

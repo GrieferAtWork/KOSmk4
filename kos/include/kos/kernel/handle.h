@@ -52,7 +52,7 @@
 #define HANDLE_TYPE_EVENTFD_SEMA    0x000e /* `struct eventfd' (with `EFD_SEMAPHORE') */
 #define HANDLE_TYPE_SIGNALFD        0x000f /* `struct signalfd' */
 #define HANDLE_TYPE_FUTEXFD         0x0010 /* `struct mfutexfd' */
-#define HANDLE_TYPE_TASK            0x0011 /* `struct taskpid' */
+#define HANDLE_TYPE_PIDFD           0x0011 /* `struct taskpid' */
 #define HANDLE_TYPE_MODULE          0x0012 /* `struct module' */
 #define HANDLE_TYPE_DRIVER_LOADLIST 0x0013 /* `struct driver_loadlist' */
 #define HANDLE_TYPE_REFCOUNTABLE    0x0014 /* `struct refcountable' */
@@ -67,7 +67,7 @@
 	cb(HANDLE_TYPE_FILEHANDLE, struct filehandle)        \
 	cb(HANDLE_TYPE_DIRHANDLE, struct dirhandle)          \
 	cb(HANDLE_TYPE_PATH, struct path)                    \
-	cb(HANDLE_TYPE_TASK, struct taskpid)                 \
+	cb(HANDLE_TYPE_PIDFD, struct taskpid)                \
 	cb(HANDLE_TYPE_MODULE, struct driver)                \
 	cb(HANDLE_TYPE_PIPE, struct pipe)                    \
 	cb(HANDLE_TYPE_PIPE_READER, struct pipe_reader)      \

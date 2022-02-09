@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa27e5ab */
+/* HASH CRC-32:0xf57bc383 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -903,7 +903,7 @@
 #define __NR64_io_pgetevents            0x14d                          /* errno_t io_pgetevents(int TODO_PROTOTYPE) */
 #define __NR64_rseq                     0x14e                          /* errno_t rseq(int TODO_PROTOTYPE) */
 /* Send a signal to the process of a given pidfd
- * @param: pidfd:  A `HANDLE_TYPE_TASK'-handle
+ * @param: pidfd:  A `HANDLE_TYPE_PIDFD'-handle
  * @param: usigno: The signal that should be sent
  * @param: uinfo:  [0..1] Additional signal information
  * @param: flags:  Must always be `0' (for now)
@@ -924,7 +924,7 @@
 #define __NR64_fsconfig                 0x1af                          /* errno_t fsconfig(int TODO_PROTOTYPE) */
 #define __NR64_fsmount                  0x1b0                          /* errno_t fsmount(int TODO_PROTOTYPE) */
 #define __NR64_fspick                   0x1b1                          /* errno_t fspick(int TODO_PROTOTYPE) */
-/* Return a `HANDLE_TYPE_TASK' handle for the given `pid'
+/* Return a `HANDLE_TYPE_PIDFD' handle for the given `pid'
  * This system call exists for compatibility with linux, which does not  allow
  * this call to succeed when `pid' isn't a process leader (i.e. main() thread)
  * @param: flags: Must always be `0' (for now)
@@ -940,7 +940,7 @@
 /* Duplicate the  handle  of  a  foreign  process into  a  handle  for  the  caller.
  * This system call duplicates the functionality of `open("/proc/[pid]/fd/[fdno]")',
  * which may also be used to duplicate file handles from another process.
- * @param: pidfd: A `HANDLE_TYPE_TASK'-handle
+ * @param: pidfd: A `HANDLE_TYPE_PIDFD'-handle
  * @param: fd:    The FD-number of the handle to clone
  * @param: flags: Must always be `0' (for now)
  * @return: * :   The duplicated handle number

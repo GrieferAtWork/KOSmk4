@@ -2052,19 +2052,19 @@ handle_lookup(unsigned int fd)
 	}	break;
 
 	case (unsigned int)AT_THIS_TASK:
-		result.h_type = HANDLE_TYPE_TASK;
+		result.h_type = HANDLE_TYPE_PIDFD;
 		result.h_mode = IO_RDONLY;
 		result.h_data = incref(THIS_TASKPID);
 		break;
 
 	case (unsigned int)AT_THIS_PROCESS:
-		result.h_type = HANDLE_TYPE_TASK;
+		result.h_type = HANDLE_TYPE_PIDFD;
 		result.h_mode = IO_RDONLY;
 		result.h_data = incref(task_getprocesspid());
 		break;
 
 	case (unsigned int)AT_PARENT_PROCESS:
-		result.h_type = HANDLE_TYPE_TASK;
+		result.h_type = HANDLE_TYPE_PIDFD;
 		result.h_mode = IO_RDONLY;
 		result.h_data = task_getparentprocesspid();
 		break;

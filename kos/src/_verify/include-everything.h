@@ -667,9 +667,9 @@ incdir("");
 #include <kos/ioctl/leaks.h>
 #include <kos/ioctl/mod.h>
 #include <kos/ioctl/mouse.h>
+#include <kos/ioctl/pidfd.h>
 #include <kos/ioctl/pipe.h>
 #include <kos/ioctl/svga.h>
-#include <kos/ioctl/task.h>
 #include <kos/ioctl/tty.h>
 #include <kos/ioctl/video.h>
 #include <kos/kernel/handle.h>

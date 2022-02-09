@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7755be31 */
+/* HASH CRC-32:0x6b3f2589 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -10702,7 +10702,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rseq)
 END(__x86_asm64_syscall_rseq)
 
 /* Send a signal to the process of a given pidfd
- * @param: pidfd:  A `HANDLE_TYPE_TASK'-handle
+ * @param: pidfd:  A `HANDLE_TYPE_PIDFD'-handle
  * @param: usigno: The signal that should be sent
  * @param: uinfo:  [0..1] Additional signal information
  * @param: flags:  Must always be `0' (for now)
@@ -11014,7 +11014,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fspick)
 	.cfi_endproc
 END(__x86_asm64_syscall_fspick)
 
-/* Return a `HANDLE_TYPE_TASK' handle for the given `pid'
+/* Return a `HANDLE_TYPE_PIDFD' handle for the given `pid'
  * This system call exists for compatibility with linux, which does not  allow
  * this call to succeed when `pid' isn't a process leader (i.e. main() thread)
  * @param: flags: Must always be `0' (for now)
@@ -11146,7 +11146,7 @@ END(__x86_asm64_syscall_openat2)
 /* Duplicate the  handle  of  a  foreign  process into  a  handle  for  the  caller.
  * This system call duplicates the functionality of `open("/proc/[pid]/fd/[fdno]")',
  * which may also be used to duplicate file handles from another process.
- * @param: pidfd: A `HANDLE_TYPE_TASK'-handle
+ * @param: pidfd: A `HANDLE_TYPE_PIDFD'-handle
  * @param: fd:    The FD-number of the handle to clone
  * @param: flags: Must always be `0' (for now)
  * @return: * :   The duplicated handle number
@@ -23636,7 +23636,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_rr_get_interval_time64)
 END(__x86_asm32_int80_sched_rr_get_interval_time64)
 
 /* Send a signal to the process of a given pidfd
- * @param: pidfd:  A `HANDLE_TYPE_TASK'-handle
+ * @param: pidfd:  A `HANDLE_TYPE_PIDFD'-handle
  * @param: usigno: The signal that should be sent
  * @param: uinfo:  [0..1] Additional signal information
  * @param: flags:  Must always be `0' (for now)
@@ -23881,7 +23881,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fspick)
 	.cfi_endproc
 END(__x86_asm32_int80_fspick)
 
-/* Return a `HANDLE_TYPE_TASK' handle for the given `pid'
+/* Return a `HANDLE_TYPE_PIDFD' handle for the given `pid'
  * This system call exists for compatibility with linux, which does not  allow
  * this call to succeed when `pid' isn't a process leader (i.e. main() thread)
  * @param: flags: Must always be `0' (for now)
@@ -23987,7 +23987,7 @@ END(__x86_asm32_int80_openat2)
 /* Duplicate the  handle  of  a  foreign  process into  a  handle  for  the  caller.
  * This system call duplicates the functionality of `open("/proc/[pid]/fd/[fdno]")',
  * which may also be used to duplicate file handles from another process.
- * @param: pidfd: A `HANDLE_TYPE_TASK'-handle
+ * @param: pidfd: A `HANDLE_TYPE_PIDFD'-handle
  * @param: fd:    The FD-number of the handle to clone
  * @param: flags: Must always be `0' (for now)
  * @return: * :   The duplicated handle number
@@ -29353,7 +29353,7 @@ END(__x86_asm32_sysenter_futex_time64)
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sched_rr_get_interval_time64, __x86_asm32_int80_sched_rr_get_interval_time64)
 
 /* Send a signal to the process of a given pidfd
- * @param: pidfd:  A `HANDLE_TYPE_TASK'-handle
+ * @param: pidfd:  A `HANDLE_TYPE_PIDFD'-handle
  * @param: usigno: The signal that should be sent
  * @param: uinfo:  [0..1] Additional signal information
  * @param: flags:  Must always be `0' (for now)
@@ -29394,7 +29394,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fsmount, __x86_asm32_int80_fsmount
 /* errno_t fspick(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fspick, __x86_asm32_int80_fspick)
 
-/* Return a `HANDLE_TYPE_TASK' handle for the given `pid'
+/* Return a `HANDLE_TYPE_PIDFD' handle for the given `pid'
  * This system call exists for compatibility with linux, which does not  allow
  * this call to succeed when `pid' isn't a process leader (i.e. main() thread)
  * @param: flags: Must always be `0' (for now)
@@ -29418,7 +29418,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_openat2, __x86_asm32_int80_openat2
 /* Duplicate the  handle  of  a  foreign  process into  a  handle  for  the  caller.
  * This system call duplicates the functionality of `open("/proc/[pid]/fd/[fdno]")',
  * which may also be used to duplicate file handles from another process.
- * @param: pidfd: A `HANDLE_TYPE_TASK'-handle
+ * @param: pidfd: A `HANDLE_TYPE_PIDFD'-handle
  * @param: fd:    The FD-number of the handle to clone
  * @param: flags: Must always be `0' (for now)
  * @return: * :   The duplicated handle number
@@ -35601,7 +35601,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_rr_get_interval_time64)
 END(__x86_asm32_sysrun32_sched_rr_get_interval_time64)
 
 /* Send a signal to the process of a given pidfd
- * @param: pidfd:  A `HANDLE_TYPE_TASK'-handle
+ * @param: pidfd:  A `HANDLE_TYPE_PIDFD'-handle
  * @param: usigno: The signal that should be sent
  * @param: uinfo:  [0..1] Additional signal information
  * @param: flags:  Must always be `0' (for now)
@@ -35715,7 +35715,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fspick)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_fspick)
 
-/* Return a `HANDLE_TYPE_TASK' handle for the given `pid'
+/* Return a `HANDLE_TYPE_PIDFD' handle for the given `pid'
  * This system call exists for compatibility with linux, which does not  allow
  * this call to succeed when `pid' isn't a process leader (i.e. main() thread)
  * @param: flags: Must always be `0' (for now)
@@ -35769,7 +35769,7 @@ END(__x86_asm32_sysrun32_openat2)
 /* Duplicate the  handle  of  a  foreign  process into  a  handle  for  the  caller.
  * This system call duplicates the functionality of `open("/proc/[pid]/fd/[fdno]")',
  * which may also be used to duplicate file handles from another process.
- * @param: pidfd: A `HANDLE_TYPE_TASK'-handle
+ * @param: pidfd: A `HANDLE_TYPE_PIDFD'-handle
  * @param: fd:    The FD-number of the handle to clone
  * @param: flags: Must always be `0' (for now)
  * @return: * :   The duplicated handle number

@@ -140,19 +140,19 @@ EIDECLARE(, USER CHECKED void const *, , FCALL, validate_executable, (UNCHECKED 
 #define validate_readwriteaddr_opt(addr)                             validate_readwriteaddr(addr)
 #define validate_executable_opt(addr)                                validate_executable(addr)
 #else /* KERNELSPACE_HIGHMEM */
-#define validate_user_opt(base, num_bytes)                           (void)(!(base) || (validate_user(base, num_bytes), 0))
-#define validate_userm_opt(base, num_items, item_size_in_bytes)      (void)(!(base) || (validate_userm(base, num_items, item_size_in_bytes), 0))
-#define validate_useraddr_opt(base, num_bytes)                       (void)(!(base) || (validate_useraddr(base, num_bytes), 0))
-#define validate_readable_opt(base, num_bytes)                       (void)(!(base) || (validate_readable(base, num_bytes), 0))
-#define validate_readablem_opt(base, num_items, item_size_in_bytes)  (void)(!(base) || (validate_readablem(base, num_items, item_size_in_bytes), 0))
-#define validate_readableaddr_opt(addr)                              (void)(!(addr) || (validate_readableaddr(addr), 0))
-#define validate_writable_opt(base, num_bytes)                       (void)(!(base) || (validate_writable(base, num_bytes), 0))
-#define validate_writablem_opt(base, num_items, item_size_in_bytes)  (void)(!(base) || (validate_writablem(base, num_items, item_size_in_bytes), 0))
-#define validate_writableaddr_opt(addr)                              (void)(!(addr) || (validate_writableaddr(addr), 0))
-#define validate_readwrite_opt(base, num_bytes)                      (void)(!(base) || (validate_readwrite(base, num_bytes), 0))
-#define validate_readwritem_opt(base, num_items, item_size_in_bytes) (void)(!(base) || (validate_readwritem(base, num_items, item_size_in_bytes), 0))
-#define validate_readwriteaddr_opt(addr)                             (void)(!(addr) || (validate_readwriteaddr(addr), 0))
-#define validate_executable_opt(addr)                                (void)(!(addr) || (validate_executable(addr), 0))
+#define validate_user_opt(base, num_bytes)                           (!(base) ? __NULLPTR : validate_user(base, num_bytes))
+#define validate_userm_opt(base, num_items, item_size_in_bytes)      (!(base) ? __NULLPTR : validate_userm(base, num_items, item_size_in_bytes))
+#define validate_useraddr_opt(base, num_bytes)                       (!(base) ? __NULLPTR : validate_useraddr(base, num_bytes))
+#define validate_readable_opt(base, num_bytes)                       (!(base) ? __NULLPTR : validate_readable(base, num_bytes))
+#define validate_readablem_opt(base, num_items, item_size_in_bytes)  (!(base) ? __NULLPTR : validate_readablem(base, num_items, item_size_in_bytes))
+#define validate_readableaddr_opt(addr)                              (!(addr) ? __NULLPTR : validate_readableaddr(addr))
+#define validate_writable_opt(base, num_bytes)                       (!(base) ? __NULLPTR : validate_writable(base, num_bytes))
+#define validate_writablem_opt(base, num_items, item_size_in_bytes)  (!(base) ? __NULLPTR : validate_writablem(base, num_items, item_size_in_bytes))
+#define validate_writableaddr_opt(addr)                              (!(addr) ? __NULLPTR : validate_writableaddr(addr))
+#define validate_readwrite_opt(base, num_bytes)                      (!(base) ? __NULLPTR : validate_readwrite(base, num_bytes))
+#define validate_readwritem_opt(base, num_items, item_size_in_bytes) (!(base) ? __NULLPTR : validate_readwritem(base, num_items, item_size_in_bytes))
+#define validate_readwriteaddr_opt(addr)                             (!(addr) ? __NULLPTR : validate_readwriteaddr(addr))
+#define validate_executable_opt(addr)                                (!(addr) ? __NULLPTR : validate_executable(addr))
 #endif /* !KERNELSPACE_HIGHMEM */
 #endif /* !__INTELLISENSE__ */
 
@@ -189,11 +189,11 @@ EIDECLARE(, USER CHECKED void const *, , FCALL, validate_executable, (UNCHECKED 
  *       native-sized pointers mustn't use these validation macros, since obviously
  *       those pointers can't be considered compatibility-mode.
  */
-#define __compat_assert_user(base, num_bytes)                      __hybrid_assert(ADDR_ISUSER(base))
+#define __compat_assert_user(base, num_bytes)                      (__hybrid_assert(ADDR_ISUSER(base)), (base))
 #define __compat_assert_user_opt                                   __compat_assert_user
-#define __compat_assert_userm(base, num_items, item_size_in_bytes) __hybrid_assert(ADDR_ISUSER(base))
+#define __compat_assert_userm(base, num_items, item_size_in_bytes) (__hybrid_assert(ADDR_ISUSER(base)), (base))
 #define __compat_assert_userm_opt                                  __compat_assert_userm
-#define __compat_assert_useraddr(addr)                             __hybrid_assert(ADDR_ISUSER(addr))
+#define __compat_assert_useraddr(addr)                             (__hybrid_assert(ADDR_ISUSER(addr)), (base))
 #define __compat_assert_useraddr_opt                               __compat_assert_useraddr
 
 #define compat_validate_user(base, num_bytes)                               __compat_assert_user(base, num_bytes)

@@ -301,7 +301,7 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
 
 #define KSYSCTL_OPEN_KERNEL_DRIVER             0xfffe0001 /* [struct openfd *result] Open a handle `HANDLE_TYPE_MODULE' to `kernel_driver'
                                                            * @return: == result->of_hint */
-#define KSYSCTL_OPEN_BOOT_TASK                 0xfffe0002 /* [struct openfd *result] Open a handle `HANDLE_TYPE_TASK' to `boottask'
+#define KSYSCTL_OPEN_BOOT_TASK                 0xfffe0002 /* [struct openfd *result] Open a handle `HANDLE_TYPE_PIDFD' to `boottask'
                                                            * @return: == result->of_hint */
 
 

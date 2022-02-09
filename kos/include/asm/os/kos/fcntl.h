@@ -161,10 +161,10 @@
 /* Special, symbolic file numbers.
  * These descriptors cannot be overwritten,
  * and their  meaning is  context-sensible. */
-#define __AT_THIS_TASK     (-180)
+#define __AT_THIS_TASK      (-180) /* HANDLE_TYPE_PIDFD (read-only, Equivalent of `pidfd_open(gettid())') */
 #if __KOS_VERSION__ >= 400
-#define __AT_THIS_PROCESS   (-181) /* HANDLE_TYPE_TASK (read-only, Equivalent of `getpid()') */
-#define __AT_PARENT_PROCESS (-182) /* HANDLE_TYPE_TASK (read-only, Equivalent of `getppid()') */
+#define __AT_THIS_PROCESS   (-181) /* HANDLE_TYPE_PIDFD (read-only, Equivalent of `pidfd_open(getpid())') */
+#define __AT_PARENT_PROCESS (-182) /* HANDLE_TYPE_PIDFD (read-only, Equivalent of `pidfd_open(getppid())') */
 #endif /* __KOS_VERSION__ >= 400 */
 #if __KOS_VERSION__ >= 300
 #if __KOS_VERSION__ < 400

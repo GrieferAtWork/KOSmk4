@@ -241,7 +241,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BADSIZ,                    /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: O_DIRECT-io attempted with unaligned buffer size. */
 	E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BADBUF,                    /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: O_DIRECT-io attempted with unaligned buffer addr. */
 	E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_APPEND,                    /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Tried to write(2) with both `O_DIRECT' and `O_APPEND' */
-	E_INVALID_ARGUMENT_CONTEXT_TASK_NOT_EXITED,                    /* E_INVALID_ARGUMENT_BAD_STATE: Tried to use `TASK_IOC_EXITCODE', but the thread hasn't exited, yet. */
+	E_INVALID_ARGUMENT_CONTEXT_TASK_NOT_EXITED,                    /* E_INVALID_ARGUMENT_BAD_STATE: Tried to use `PIDFD_IOC_EXITCODE', but the thread hasn't exited, yet. */
 	E_INVALID_ARGUMENT_CONTEXT_BAD_PID,                            /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid PID used */
 	E_INVALID_ARGUMENT_CONTEXT_BAD_PGID,                           /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid PGID used */
 	E_INVALID_ARGUMENT_CONTEXT_SETPGID_DIFFERENT_SESSION,          /* E_INVALID_ARGUMENT_BAD_STATE: Tried to set the progress group of a process apart of a different session */
@@ -482,7 +482,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BADSIZ                    E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BADSIZ                    /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: O_DIRECT-io attempted with unaligned buffer size. */
 #define E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BADBUF                    E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BADBUF                    /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: O_DIRECT-io attempted with unaligned buffer addr. */
 #define E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_APPEND                    E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_APPEND                    /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Tried to write(2) with both `O_DIRECT' and `O_APPEND' */
-#define E_INVALID_ARGUMENT_CONTEXT_TASK_NOT_EXITED                    E_INVALID_ARGUMENT_CONTEXT_TASK_NOT_EXITED                    /* E_INVALID_ARGUMENT_BAD_STATE: Tried to use `TASK_IOC_EXITCODE', but the thread hasn't exited, yet. */
+#define E_INVALID_ARGUMENT_CONTEXT_TASK_NOT_EXITED                    E_INVALID_ARGUMENT_CONTEXT_TASK_NOT_EXITED                    /* E_INVALID_ARGUMENT_BAD_STATE: Tried to use `PIDFD_IOC_EXITCODE', but the thread hasn't exited, yet. */
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_PID                            E_INVALID_ARGUMENT_CONTEXT_BAD_PID                            /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid PID used */
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_PGID                           E_INVALID_ARGUMENT_CONTEXT_BAD_PGID                           /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid PGID used */
 #define E_INVALID_ARGUMENT_CONTEXT_SETPGID_DIFFERENT_SESSION          E_INVALID_ARGUMENT_CONTEXT_SETPGID_DIFFERENT_SESSION          /* E_INVALID_ARGUMENT_BAD_STATE: Tried to set the progress group of a process apart of a different session */
@@ -505,7 +505,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_CLONE_FS_WITH_NEWNS                E_INVALID_ARGUMENT_CONTEXT_CLONE_FS_WITH_NEWNS                /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `CLONE_FS` and 'CLONE_NEWNS' were given. */
 #define E_INVALID_ARGUMENT_CONTEXT_CLONE_SIGHAND_WITHOUT_VM           E_INVALID_ARGUMENT_CONTEXT_CLONE_SIGHAND_WITHOUT_VM           /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `CLONE_SIGHAND` was given without 'CLONE_VM'. */
 #define E_INVALID_ARGUMENT_CONTEXT_PROC_COMM_DIFFERENT_PROCESS        E_INVALID_ARGUMENT_CONTEXT_PROC_COMM_DIFFERENT_PROCESS        /* E_INVALID_ARGUMENT_BAD_STATE: Tried to change the `comm' of a thread in a different process. */
-#define E_INVALID_ARGUMENT_CONTEXT_PROC_PEB_ADDR_DIFFERENT_PROCESS    E_INVALID_ARGUMENT_CONTEXT_PROC_PEB_ADDR_DIFFERENT_PROCESS    /* E_INVALID_ARGUMENT_BAD_STATE: Tried to change the `kos/peb-addr' of a thread in a different mman (CLONE_VM). */
+#define E_INVALID_ARGUMENT_CONTEXT_PROC_PEB_ADDR_DIFFERENT_PROCESS    E_INVALID_ARGUMENT_CONTEXT_PROC_PEB_ADDR_DIFFERENT_PROCESS    /* E_INVALID_ARGUMENT_BAD_STATE: Tried to change the `/proc/[pid]/kos/peb-addr' or `/proc/[pid]/kos/peb-compat' of a thread in a different mman (CLONE_VM). */
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_POINTER_STRING                 E_INVALID_ARGUMENT_CONTEXT_BAD_POINTER_STRING                 /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to write a malformed pointer to a system configuration file */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
@@ -720,7 +720,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BADSIZ                    189 /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: O_DIRECT-io attempted with unaligned buffer size. */
 #define E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BADBUF                    190 /* E_INVALID_ARGUMENT_BAD_ALIGNMENT: O_DIRECT-io attempted with unaligned buffer addr. */
 #define E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_APPEND                    191 /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Tried to write(2) with both `O_DIRECT' and `O_APPEND' */
-#define E_INVALID_ARGUMENT_CONTEXT_TASK_NOT_EXITED                    192 /* E_INVALID_ARGUMENT_BAD_STATE: Tried to use `TASK_IOC_EXITCODE', but the thread hasn't exited, yet. */
+#define E_INVALID_ARGUMENT_CONTEXT_TASK_NOT_EXITED                    192 /* E_INVALID_ARGUMENT_BAD_STATE: Tried to use `PIDFD_IOC_EXITCODE', but the thread hasn't exited, yet. */
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_PID                            193 /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid PID used */
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_PGID                           194 /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid PGID used */
 #define E_INVALID_ARGUMENT_CONTEXT_SETPGID_DIFFERENT_SESSION          195 /* E_INVALID_ARGUMENT_BAD_STATE: Tried to set the progress group of a process apart of a different session */
@@ -743,7 +743,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_CLONE_FS_WITH_NEWNS                212 /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `CLONE_FS` and 'CLONE_NEWNS' were given. */
 #define E_INVALID_ARGUMENT_CONTEXT_CLONE_SIGHAND_WITHOUT_VM           213 /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `CLONE_SIGHAND` was given without 'CLONE_VM'. */
 #define E_INVALID_ARGUMENT_CONTEXT_PROC_COMM_DIFFERENT_PROCESS        214 /* E_INVALID_ARGUMENT_BAD_STATE: Tried to change the `comm' of a thread in a different process. */
-#define E_INVALID_ARGUMENT_CONTEXT_PROC_PEB_ADDR_DIFFERENT_PROCESS    215 /* E_INVALID_ARGUMENT_BAD_STATE: Tried to change the `kos/peb-addr' of a thread in a different mman (CLONE_VM). */
+#define E_INVALID_ARGUMENT_CONTEXT_PROC_PEB_ADDR_DIFFERENT_PROCESS    215 /* E_INVALID_ARGUMENT_BAD_STATE: Tried to change the `/proc/[pid]/kos/peb-addr' or `/proc/[pid]/kos/peb-compat' of a thread in a different mman (CLONE_VM). */
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_POINTER_STRING                 216 /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to write a malformed pointer to a system configuration file */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/

@@ -2523,7 +2523,7 @@ epoll_nextmon_locked:
 		PRINT("\n");
 	}	break;
 
-	case HANDLE_TYPE_TASK: {
+	case HANDLE_TYPE_PIDFD: {
 		struct pidns *myns = THIS_PIDNS;
 		struct taskpid *hand;
 		pid_t tpid;

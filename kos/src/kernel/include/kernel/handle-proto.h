@@ -815,35 +815,35 @@ INTDEF BLOCKING WUNUSED NONNULL((1)) poll_mode_t KCALL handle_futexfd_polltest(s
 INTDEF BLOCKING NONNULL((1)) REF void *KCALL handle_futexfd_tryas(struct mfutexfd *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 INTDEF BLOCKING NONNULL((1, 2)) ssize_t KCALL handle_futexfd_printlink(struct mfutexfd *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
-/* Handle operators for `HANDLE_TYPE_TASK' (`struct taskpid') */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_task_refcnt)(struct taskpid const *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_task_incref)(struct taskpid *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_task_decref)(REF struct taskpid *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_task_tryincref)(struct taskpid *__restrict self);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_task_weakgetref)(struct taskpid *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct taskpid *NOTHROW(FCALL handle_task_weaklckref)(void *__restrict weakref_ptr);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_task_weakdecref)(WEAK REF void *__restrict weakref_ptr);
-INTDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL handle_task_read(struct taskpid *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF BLOCKING NONNULL((1)) size_t KCALL handle_task_write(struct taskpid *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL handle_task_pread(struct taskpid *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF BLOCKING NONNULL((1)) size_t KCALL handle_task_pwrite(struct taskpid *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL handle_task_readv(struct taskpid *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF BLOCKING NONNULL((1, 2)) size_t KCALL handle_task_writev(struct taskpid *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL handle_task_preadv(struct taskpid *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF BLOCKING NONNULL((1, 2)) size_t KCALL handle_task_pwritev(struct taskpid *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL handle_task_readdir(struct taskpid *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_task_seek(struct taskpid *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_task_ioctl(struct taskpid *__restrict self, ioctl_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF BLOCKING NONNULL((1)) void KCALL handle_task_truncate(struct taskpid *__restrict self, pos_t new_size) THROWS(...);
-INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_task_mmap(struct taskpid *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
-INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_task_allocate(struct taskpid *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF BLOCKING NONNULL((1)) void KCALL handle_task_sync(struct taskpid *__restrict self) THROWS(...);
-INTDEF BLOCKING NONNULL((1)) void KCALL handle_task_datasync(struct taskpid *__restrict self) THROWS(...);
-INTDEF BLOCKING NONNULL((1)) void KCALL handle_task_stat(struct taskpid *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF BLOCKING NONNULL((1)) void KCALL handle_task_pollconnect(struct taskpid *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF BLOCKING WUNUSED NONNULL((1)) poll_mode_t KCALL handle_task_polltest(struct taskpid *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF BLOCKING NONNULL((1)) REF void *KCALL handle_task_tryas(struct taskpid *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
-INTDEF BLOCKING NONNULL((1, 2)) ssize_t KCALL handle_task_printlink(struct taskpid *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
+/* Handle operators for `HANDLE_TYPE_PIDFD' (`struct taskpid') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_pidfd_refcnt)(struct taskpid const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pidfd_incref)(struct taskpid *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pidfd_decref)(REF struct taskpid *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_pidfd_tryincref)(struct taskpid *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_pidfd_weakgetref)(struct taskpid *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct taskpid *NOTHROW(FCALL handle_pidfd_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pidfd_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL handle_pidfd_read(struct taskpid *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) size_t KCALL handle_pidfd_write(struct taskpid *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL handle_pidfd_pread(struct taskpid *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) size_t KCALL handle_pidfd_pwrite(struct taskpid *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL handle_pidfd_readv(struct taskpid *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1, 2)) size_t KCALL handle_pidfd_writev(struct taskpid *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL handle_pidfd_preadv(struct taskpid *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1, 2)) size_t KCALL handle_pidfd_pwritev(struct taskpid *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL handle_pidfd_readdir(struct taskpid *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_pidfd_seek(struct taskpid *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_pidfd_ioctl(struct taskpid *__restrict self, ioctl_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_pidfd_truncate(struct taskpid *__restrict self, pos_t new_size) THROWS(...);
+INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_pidfd_mmap(struct taskpid *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_pidfd_allocate(struct taskpid *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_pidfd_sync(struct taskpid *__restrict self) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_pidfd_datasync(struct taskpid *__restrict self) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_pidfd_stat(struct taskpid *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_pidfd_pollconnect(struct taskpid *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1)) poll_mode_t KCALL handle_pidfd_polltest(struct taskpid *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) REF void *KCALL handle_pidfd_tryas(struct taskpid *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF BLOCKING NONNULL((1, 2)) ssize_t KCALL handle_pidfd_printlink(struct taskpid *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 /* Handle operators for `HANDLE_TYPE_MODULE' (`struct module') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_module_refcnt)(struct module const *__restrict self);

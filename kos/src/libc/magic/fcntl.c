@@ -1056,16 +1056,18 @@ enum __pid_type {
 /* Special, symbolic file numbers.
  * These descriptors cannot be overwritten,
  * and their  meaning is  context-sensible. */
+
+/* HANDLE_TYPE_PIDFD (writable, Equivalent of `pidfd_open(gettid())') */
 #if !defined(AT_THIS_TASK) && defined(__AT_THIS_TASK)
 #define AT_THIS_TASK __AT_THIS_TASK
 #endif /* !AT_THIS_TASK && __AT_THIS_TASK */
 
-/* HANDLE_TYPE_TASK (writable, Equivalent of `getpid()') */
+/* HANDLE_TYPE_PIDFD (writable, Equivalent of `pidfd_open(getpid())') */
 #if !defined(AT_THIS_PROCESS) && defined(__AT_THIS_PROCESS)
 #define AT_THIS_PROCESS __AT_THIS_PROCESS
 #endif /* !AT_THIS_PROCESS && __AT_THIS_PROCESS */
 
-/* HANDLE_TYPE_TASK (writable, Equivalent of `getppid()') */
+/* HANDLE_TYPE_PIDFD (writable, Equivalent of `pidfd_open(getppid())') */
 #if !defined(AT_PARENT_PROCESS) && defined(__AT_PARENT_PROCESS)
 #define AT_PARENT_PROCESS __AT_PARENT_PROCESS
 #endif /* !AT_PARENT_PROCESS && __AT_PARENT_PROCESS */

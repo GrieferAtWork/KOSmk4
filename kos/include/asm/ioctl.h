@@ -64,7 +64,7 @@
  *  KOS    0x56 ('V')  VID_IOC_*           <kos/ioctl/video.h>
  *  KOS    0x66 ('f')  FD_IOC_*            <kos/ioctl/fd.h>
  *  KOS    0x6D ('m')  MOD_IOC_*           <kos/ioctl/mod.h>
- *  KOS    0x70 ('p')  TASK_IOC_*          <kos/ioctl/task.h>
+ *  KOS    0x70 ('p')  PIDFD_IOC_*         <kos/ioctl/pidfd.h>
  *
  * TODO: The above list is incomplete
  */

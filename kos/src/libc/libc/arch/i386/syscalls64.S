@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x398f702f */
+/* HASH CRC-32:0x9a288a71 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3321,7 +3321,7 @@ END(libc_sys_rseq)
 DEFINE_PUBLIC_ALIAS(sys_rseq, libc_sys_rseq)
 
 /* Send a signal to the process of a given pidfd
- * @param: pidfd:  A `HANDLE_TYPE_TASK'-handle
+ * @param: pidfd:  A `HANDLE_TYPE_PIDFD'-handle
  * @param: usigno: The signal that should be sent
  * @param: uinfo:  [0..1] Additional signal information
  * @param: flags:  Must always be `0' (for now)
@@ -3413,7 +3413,7 @@ INTERN_FUNCTION(libc_sys_fspick)
 END(libc_sys_fspick)
 DEFINE_PUBLIC_ALIAS(sys_fspick, libc_sys_fspick)
 
-/* Return a `HANDLE_TYPE_TASK' handle for the given `pid'
+/* Return a `HANDLE_TYPE_PIDFD' handle for the given `pid'
  * This system call exists for compatibility with linux, which does not  allow
  * this call to succeed when `pid' isn't a process leader (i.e. main() thread)
  * @param: flags: Must always be `0' (for now)
@@ -3457,7 +3457,7 @@ DEFINE_PUBLIC_ALIAS(sys_openat2, libc_sys_openat2)
 /* Duplicate the  handle  of  a  foreign  process into  a  handle  for  the  caller.
  * This system call duplicates the functionality of `open("/proc/[pid]/fd/[fdno]")',
  * which may also be used to duplicate file handles from another process.
- * @param: pidfd: A `HANDLE_TYPE_TASK'-handle
+ * @param: pidfd: A `HANDLE_TYPE_PIDFD'-handle
  * @param: fd:    The FD-number of the handle to clone
  * @param: flags: Must always be `0' (for now)
  * @return: * :   The duplicated handle number
@@ -8153,7 +8153,7 @@ END(libc_sys_Xrseq)
 DEFINE_PUBLIC_ALIAS(sys_Xrseq, libc_sys_Xrseq)
 
 /* Send a signal to the process of a given pidfd
- * @param: pidfd:  A `HANDLE_TYPE_TASK'-handle
+ * @param: pidfd:  A `HANDLE_TYPE_PIDFD'-handle
  * @param: usigno: The signal that should be sent
  * @param: uinfo:  [0..1] Additional signal information
  * @param: flags:  Must always be `0' (for now)
@@ -8265,7 +8265,7 @@ INTERN_FUNCTION(libc_sys_Xfspick)
 END(libc_sys_Xfspick)
 DEFINE_PUBLIC_ALIAS(sys_Xfspick, libc_sys_Xfspick)
 
-/* Return a `HANDLE_TYPE_TASK' handle for the given `pid'
+/* Return a `HANDLE_TYPE_PIDFD' handle for the given `pid'
  * This system call exists for compatibility with linux, which does not  allow
  * this call to succeed when `pid' isn't a process leader (i.e. main() thread)
  * @param: flags: Must always be `0' (for now)
@@ -8317,7 +8317,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xopenat2, libc_sys_Xopenat2)
 /* Duplicate the  handle  of  a  foreign  process into  a  handle  for  the  caller.
  * This system call duplicates the functionality of `open("/proc/[pid]/fd/[fdno]")',
  * which may also be used to duplicate file handles from another process.
- * @param: pidfd: A `HANDLE_TYPE_TASK'-handle
+ * @param: pidfd: A `HANDLE_TYPE_PIDFD'-handle
  * @param: fd:    The FD-number of the handle to clone
  * @param: flags: Must always be `0' (for now)
  * @return: * :   The duplicated handle number

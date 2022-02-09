@@ -41,7 +41,7 @@ DECL_END
 #include <kernel/user.h>
 #include <sched/group.h>
 
-#include <kos/ioctl/task.h>
+#include <kos/ioctl/pidfd.h>
 #include <kos/kernel/handle.h>
 
 #include <assert.h>
@@ -686,10 +686,10 @@ procfs_perproc_root_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
 	struct fdirnode *me = mfile_asdir(self);
 
-	/* Forward ioctls from <kos/ioctl/task.h> to the bound taskpid object. */
-	if (_IOC_ISKOS(cmd) && _IOC_TYPE(cmd) == _IOC_TYPE(TASK_IOC_GETTID)) {
-		return (*handle_type_db.h_ioctl[HANDLE_TYPE_TASK])(me->dn_node.fn_fsdata,
-		                                                   cmd, arg, mode);
+	/* Forward ioctls from <kos/ioctl/pidfd.h> to the bound taskpid object. */
+	if (_IOC_ISKOS(cmd) && _IOC_TYPE(cmd) == _IOC_TYPE(PIDFD_IOC_GETTID)) {
+		return (*handle_type_db.h_ioctl[HANDLE_TYPE_PIDFD])(me->dn_node.fn_fsdata,
+		                                                    cmd, arg, mode);
 	}
 
 	/* Fallback: do an ioctl on the directory itself. */
@@ -706,7 +706,7 @@ procfs_perproc_root_v_tryas(struct mfile *__restrict self,
 	 * to be casted into the underlying taskpid object,  thus
 	 * mirroring linux's pidfd_open(42) <=>  open("/proc/42")
 	 * behavior. */
-	if (wanted_type == HANDLE_TYPE_TASK)
+	if (wanted_type == HANDLE_TYPE_PIDFD)
 		return incref(me->dn_node.fn_fsdata);
 	return NULL;
 }

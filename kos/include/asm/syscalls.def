@@ -2009,7 +2009,7 @@ epoll_pwait:(fd_t epfd, [tostr(out:STRUCT_EPOLL_EVENTS:maxevents)] struct epoll_
 /************************************************************************/
 /* PidFd                                                                */
 /************************************************************************/
-@@Return a `HANDLE_TYPE_TASK' handle for the given `pid'
+@@Return a `HANDLE_TYPE_PIDFD' handle for the given `pid'
 @@This system call exists for compatibility with linux, which does not  allow
 @@this call to succeed when `pid' isn't a process leader (i.e. main() thread)
 @@@param: flags: Must always be `0' (for now)
@@ -2023,7 +2023,7 @@ pidfd_open:(pid_t pid, syscall_ulong_t flags) -> fd_t;
 @@Duplicate the  handle  of  a  foreign  process into  a  handle  for  the  caller.
 @@This system call duplicates the functionality of `open("/proc/[pid]/fd/[fdno]")',
 @@which may also be used to duplicate file handles from another process.
-@@@param: pidfd: A `HANDLE_TYPE_TASK'-handle
+@@@param: pidfd: A `HANDLE_TYPE_PIDFD'-handle
 @@@param: fd:    The FD-number of the handle to clone
 @@@param: flags: Must always be `0' (for now)
 @@@return: * :   The duplicated handle number
@@ -2036,7 +2036,7 @@ pidfd_getfd:(fd_t pidfd, fd_t foreign_fd, syscall_ulong_t flags) -> fd_t;
 
 %[startgroup]
 @@Send a signal to the process of a given pidfd
-@@@param: pidfd:  A `HANDLE_TYPE_TASK'-handle
+@@@param: pidfd:  A `HANDLE_TYPE_PIDFD'-handle
 @@@param: usigno: The signal that should be sent
 @@@param: uinfo:  [0..1] Additional signal information
 @@@param: flags:  Must always be `0' (for now)

@@ -353,7 +353,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    =  "eventfd_sema",
 		[HANDLE_TYPE_SIGNALFD]        =  "signalfd",
 		[HANDLE_TYPE_FUTEXFD]         =  "futexfd",
-		[HANDLE_TYPE_TASK]            =  "task",
+		[HANDLE_TYPE_PIDFD]           =  "pidfd",
 		[HANDLE_TYPE_MODULE]          =  "module",
 		[HANDLE_TYPE_DRIVER_LOADLIST] =  "driver_loadlist",
 		[HANDLE_TYPE_REFCOUNTABLE]    =  "refcountable"
@@ -376,7 +376,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (refcnt_t (FCALL *)(void const *__restrict))&handle_eventfd_sema_refcnt,
 		[HANDLE_TYPE_SIGNALFD]        = (refcnt_t (FCALL *)(void const *__restrict))&handle_signalfd_refcnt,
 		[HANDLE_TYPE_FUTEXFD]         = (refcnt_t (FCALL *)(void const *__restrict))&handle_futexfd_refcnt,
-		[HANDLE_TYPE_TASK]            = (refcnt_t (FCALL *)(void const *__restrict))&handle_task_refcnt,
+		[HANDLE_TYPE_PIDFD]           = (refcnt_t (FCALL *)(void const *__restrict))&handle_pidfd_refcnt,
 		[HANDLE_TYPE_MODULE]          = (refcnt_t (FCALL *)(void const *__restrict))&handle_module_refcnt,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (refcnt_t (FCALL *)(void const *__restrict))&handle_driver_loadlist_refcnt,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (refcnt_t (FCALL *)(void const *__restrict))&handle_refcountable_refcnt
@@ -399,7 +399,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (FCALL *)(void *__restrict))&handle_eventfd_sema_incref,
 		[HANDLE_TYPE_SIGNALFD]        = (void (FCALL *)(void *__restrict))&handle_signalfd_incref,
 		[HANDLE_TYPE_FUTEXFD]         = (void (FCALL *)(void *__restrict))&handle_futexfd_incref,
-		[HANDLE_TYPE_TASK]            = (void (FCALL *)(void *__restrict))&handle_task_incref,
+		[HANDLE_TYPE_PIDFD]           = (void (FCALL *)(void *__restrict))&handle_pidfd_incref,
 		[HANDLE_TYPE_MODULE]          = (void (FCALL *)(void *__restrict))&handle_module_incref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (FCALL *)(void *__restrict))&handle_driver_loadlist_incref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (FCALL *)(void *__restrict))&handle_refcountable_incref
@@ -422,7 +422,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (FCALL *)(REF void *__restrict))&handle_eventfd_sema_decref,
 		[HANDLE_TYPE_SIGNALFD]        = (void (FCALL *)(REF void *__restrict))&handle_signalfd_decref,
 		[HANDLE_TYPE_FUTEXFD]         = (void (FCALL *)(REF void *__restrict))&handle_futexfd_decref,
-		[HANDLE_TYPE_TASK]            = (void (FCALL *)(REF void *__restrict))&handle_task_decref,
+		[HANDLE_TYPE_PIDFD]           = (void (FCALL *)(REF void *__restrict))&handle_pidfd_decref,
 		[HANDLE_TYPE_MODULE]          = (void (FCALL *)(REF void *__restrict))&handle_module_decref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (FCALL *)(REF void *__restrict))&handle_driver_loadlist_decref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (FCALL *)(REF void *__restrict))&handle_refcountable_decref
@@ -445,7 +445,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (__BOOL (FCALL *)(void *__restrict))&handle_eventfd_sema_tryincref,
 		[HANDLE_TYPE_SIGNALFD]        = (__BOOL (FCALL *)(void *__restrict))&handle_signalfd_tryincref,
 		[HANDLE_TYPE_FUTEXFD]         = (__BOOL (FCALL *)(void *__restrict))&handle_futexfd_tryincref,
-		[HANDLE_TYPE_TASK]            = (__BOOL (FCALL *)(void *__restrict))&handle_task_tryincref,
+		[HANDLE_TYPE_PIDFD]           = (__BOOL (FCALL *)(void *__restrict))&handle_pidfd_tryincref,
 		[HANDLE_TYPE_MODULE]          = (__BOOL (FCALL *)(void *__restrict))&handle_module_tryincref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (__BOOL (FCALL *)(void *__restrict))&handle_driver_loadlist_tryincref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (__BOOL (FCALL *)(void *__restrict))&handle_refcountable_tryincref
@@ -468,7 +468,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (WEAK REF void *(FCALL *)(void *__restrict))&handle_eventfd_sema_weakgetref,
 		[HANDLE_TYPE_SIGNALFD]        = (WEAK REF void *(FCALL *)(void *__restrict))&handle_signalfd_weakgetref,
 		[HANDLE_TYPE_FUTEXFD]         = (WEAK REF void *(FCALL *)(void *__restrict))&handle_futexfd_weakgetref,
-		[HANDLE_TYPE_TASK]            = (WEAK REF void *(FCALL *)(void *__restrict))&handle_task_weakgetref,
+		[HANDLE_TYPE_PIDFD]           = (WEAK REF void *(FCALL *)(void *__restrict))&handle_pidfd_weakgetref,
 		[HANDLE_TYPE_MODULE]          = (WEAK REF void *(FCALL *)(void *__restrict))&handle_module_weakgetref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (WEAK REF void *(FCALL *)(void *__restrict))&handle_driver_loadlist_weakgetref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (WEAK REF void *(FCALL *)(void *__restrict))&handle_refcountable_weakgetref
@@ -491,7 +491,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (REF void *(FCALL *)(void *__restrict))&handle_eventfd_sema_weaklckref,
 		[HANDLE_TYPE_SIGNALFD]        = (REF void *(FCALL *)(void *__restrict))&handle_signalfd_weaklckref,
 		[HANDLE_TYPE_FUTEXFD]         = (REF void *(FCALL *)(void *__restrict))&handle_futexfd_weaklckref,
-		[HANDLE_TYPE_TASK]            = (REF void *(FCALL *)(void *__restrict))&handle_task_weaklckref,
+		[HANDLE_TYPE_PIDFD]           = (REF void *(FCALL *)(void *__restrict))&handle_pidfd_weaklckref,
 		[HANDLE_TYPE_MODULE]          = (REF void *(FCALL *)(void *__restrict))&handle_module_weaklckref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (REF void *(FCALL *)(void *__restrict))&handle_driver_loadlist_weaklckref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (REF void *(FCALL *)(void *__restrict))&handle_refcountable_weaklckref
@@ -514,7 +514,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (FCALL *)(WEAK REF void *__restrict))&handle_eventfd_sema_weakdecref,
 		[HANDLE_TYPE_SIGNALFD]        = (void (FCALL *)(WEAK REF void *__restrict))&handle_signalfd_weakdecref,
 		[HANDLE_TYPE_FUTEXFD]         = (void (FCALL *)(WEAK REF void *__restrict))&handle_futexfd_weakdecref,
-		[HANDLE_TYPE_TASK]            = (void (FCALL *)(WEAK REF void *__restrict))&handle_task_weakdecref,
+		[HANDLE_TYPE_PIDFD]           = (void (FCALL *)(WEAK REF void *__restrict))&handle_pidfd_weakdecref,
 		[HANDLE_TYPE_MODULE]          = (void (FCALL *)(WEAK REF void *__restrict))&handle_module_weakdecref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (FCALL *)(WEAK REF void *__restrict))&handle_driver_loadlist_weakdecref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (FCALL *)(WEAK REF void *__restrict))&handle_refcountable_weakdecref
@@ -537,7 +537,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_eventfd_sema_read,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_signalfd_read,
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_futexfd_read,
-		[HANDLE_TYPE_TASK]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_task_read,
+		[HANDLE_TYPE_PIDFD]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_pidfd_read,
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_module_read,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_driver_loadlist_read,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_refcountable_read
@@ -560,7 +560,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_eventfd_sema_write,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_signalfd_write,
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_futexfd_write,
-		[HANDLE_TYPE_TASK]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_task_write,
+		[HANDLE_TYPE_PIDFD]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_pidfd_write,
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_module_write,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_driver_loadlist_write,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_refcountable_write
@@ -583,7 +583,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_eventfd_sema_pread,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_signalfd_pread,
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_futexfd_pread,
-		[HANDLE_TYPE_TASK]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_task_pread,
+		[HANDLE_TYPE_PIDFD]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_pidfd_pread,
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_module_pread,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_driver_loadlist_pread,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_refcountable_pread
@@ -606,7 +606,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_eventfd_sema_pwrite,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_signalfd_pwrite,
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_futexfd_pwrite,
-		[HANDLE_TYPE_TASK]            = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_task_pwrite,
+		[HANDLE_TYPE_PIDFD]           = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_pidfd_pwrite,
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_module_pwrite,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_driver_loadlist_pwrite,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_refcountable_pwrite
@@ -629,7 +629,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_eventfd_sema_readv,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_signalfd_readv,
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_futexfd_readv,
-		[HANDLE_TYPE_TASK]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_task_readv,
+		[HANDLE_TYPE_PIDFD]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_pidfd_readv,
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_module_readv,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_driver_loadlist_readv,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_refcountable_readv
@@ -652,7 +652,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_eventfd_sema_writev,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_signalfd_writev,
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_futexfd_writev,
-		[HANDLE_TYPE_TASK]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_task_writev,
+		[HANDLE_TYPE_PIDFD]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_pidfd_writev,
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_module_writev,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_driver_loadlist_writev,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_refcountable_writev
@@ -675,7 +675,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_eventfd_sema_preadv,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_signalfd_preadv,
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_futexfd_preadv,
-		[HANDLE_TYPE_TASK]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_task_preadv,
+		[HANDLE_TYPE_PIDFD]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pidfd_preadv,
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_module_preadv,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_driver_loadlist_preadv,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_refcountable_preadv
@@ -698,7 +698,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_eventfd_sema_pwritev,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_signalfd_pwritev,
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_futexfd_pwritev,
-		[HANDLE_TYPE_TASK]            = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_task_pwritev,
+		[HANDLE_TYPE_PIDFD]           = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pidfd_pwritev,
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_module_pwritev,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_driver_loadlist_pwritev,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_refcountable_pwritev
@@ -721,7 +721,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_eventfd_sema_readdir,
 		[HANDLE_TYPE_SIGNALFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_signalfd_readdir,
 		[HANDLE_TYPE_FUTEXFD]         = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_futexfd_readdir,
-		[HANDLE_TYPE_TASK]            = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_task_readdir,
+		[HANDLE_TYPE_PIDFD]           = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_pidfd_readdir,
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_module_readdir,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_driver_loadlist_readdir,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_refcountable_readdir
@@ -744,7 +744,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_eventfd_sema_seek,
 		[HANDLE_TYPE_SIGNALFD]        = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_signalfd_seek,
 		[HANDLE_TYPE_FUTEXFD]         = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_futexfd_seek,
-		[HANDLE_TYPE_TASK]            = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_task_seek,
+		[HANDLE_TYPE_PIDFD]           = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_pidfd_seek,
 		[HANDLE_TYPE_MODULE]          = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_module_seek,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_driver_loadlist_seek,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_refcountable_seek
@@ -767,7 +767,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_eventfd_sema_ioctl,
 		[HANDLE_TYPE_SIGNALFD]        = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_signalfd_ioctl,
 		[HANDLE_TYPE_FUTEXFD]         = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_futexfd_ioctl,
-		[HANDLE_TYPE_TASK]            = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_task_ioctl,
+		[HANDLE_TYPE_PIDFD]           = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_pidfd_ioctl,
 		[HANDLE_TYPE_MODULE]          = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_module_ioctl,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_driver_loadlist_ioctl,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_refcountable_ioctl
@@ -790,7 +790,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (KCALL *)(void *__restrict, pos_t))&handle_eventfd_sema_truncate,
 		[HANDLE_TYPE_SIGNALFD]        = (void (KCALL *)(void *__restrict, pos_t))&handle_signalfd_truncate,
 		[HANDLE_TYPE_FUTEXFD]         = (void (KCALL *)(void *__restrict, pos_t))&handle_futexfd_truncate,
-		[HANDLE_TYPE_TASK]            = (void (KCALL *)(void *__restrict, pos_t))&handle_task_truncate,
+		[HANDLE_TYPE_PIDFD]           = (void (KCALL *)(void *__restrict, pos_t))&handle_pidfd_truncate,
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict, pos_t))&handle_module_truncate,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict, pos_t))&handle_driver_loadlist_truncate,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict, pos_t))&handle_refcountable_truncate
@@ -813,7 +813,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_eventfd_sema_mmap,
 		[HANDLE_TYPE_SIGNALFD]        = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_signalfd_mmap,
 		[HANDLE_TYPE_FUTEXFD]         = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_futexfd_mmap,
-		[HANDLE_TYPE_TASK]            = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_task_mmap,
+		[HANDLE_TYPE_PIDFD]           = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_pidfd_mmap,
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_module_mmap,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_driver_loadlist_mmap,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_refcountable_mmap
@@ -836,7 +836,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_eventfd_sema_allocate,
 		[HANDLE_TYPE_SIGNALFD]        = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_signalfd_allocate,
 		[HANDLE_TYPE_FUTEXFD]         = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_futexfd_allocate,
-		[HANDLE_TYPE_TASK]            = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_task_allocate,
+		[HANDLE_TYPE_PIDFD]           = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_pidfd_allocate,
 		[HANDLE_TYPE_MODULE]          = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_module_allocate,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_driver_loadlist_allocate,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_refcountable_allocate
@@ -859,7 +859,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (KCALL *)(void *__restrict))&handle_eventfd_sema_sync,
 		[HANDLE_TYPE_SIGNALFD]        = (void (KCALL *)(void *__restrict))&handle_signalfd_sync,
 		[HANDLE_TYPE_FUTEXFD]         = (void (KCALL *)(void *__restrict))&handle_futexfd_sync,
-		[HANDLE_TYPE_TASK]            = (void (KCALL *)(void *__restrict))&handle_task_sync,
+		[HANDLE_TYPE_PIDFD]           = (void (KCALL *)(void *__restrict))&handle_pidfd_sync,
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict))&handle_module_sync,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict))&handle_driver_loadlist_sync,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict))&handle_refcountable_sync
@@ -882,7 +882,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (KCALL *)(void *__restrict))&handle_eventfd_sema_datasync,
 		[HANDLE_TYPE_SIGNALFD]        = (void (KCALL *)(void *__restrict))&handle_signalfd_datasync,
 		[HANDLE_TYPE_FUTEXFD]         = (void (KCALL *)(void *__restrict))&handle_futexfd_datasync,
-		[HANDLE_TYPE_TASK]            = (void (KCALL *)(void *__restrict))&handle_task_datasync,
+		[HANDLE_TYPE_PIDFD]           = (void (KCALL *)(void *__restrict))&handle_pidfd_datasync,
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict))&handle_module_datasync,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict))&handle_driver_loadlist_datasync,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict))&handle_refcountable_datasync
@@ -905,7 +905,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_eventfd_sema_stat,
 		[HANDLE_TYPE_SIGNALFD]        = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_signalfd_stat,
 		[HANDLE_TYPE_FUTEXFD]         = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_futexfd_stat,
-		[HANDLE_TYPE_TASK]            = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_task_stat,
+		[HANDLE_TYPE_PIDFD]           = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_pidfd_stat,
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_module_stat,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_driver_loadlist_stat,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_refcountable_stat
@@ -928,7 +928,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_eventfd_sema_pollconnect,
 		[HANDLE_TYPE_SIGNALFD]        = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_signalfd_pollconnect,
 		[HANDLE_TYPE_FUTEXFD]         = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_futexfd_pollconnect,
-		[HANDLE_TYPE_TASK]            = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_task_pollconnect,
+		[HANDLE_TYPE_PIDFD]           = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_pidfd_pollconnect,
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_module_pollconnect,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_driver_loadlist_pollconnect,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_refcountable_pollconnect
@@ -951,7 +951,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_eventfd_sema_polltest,
 		[HANDLE_TYPE_SIGNALFD]        = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_signalfd_polltest,
 		[HANDLE_TYPE_FUTEXFD]         = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_futexfd_polltest,
-		[HANDLE_TYPE_TASK]            = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_task_polltest,
+		[HANDLE_TYPE_PIDFD]           = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_pidfd_polltest,
 		[HANDLE_TYPE_MODULE]          = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_module_polltest,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_driver_loadlist_polltest,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_refcountable_polltest
@@ -974,7 +974,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_eventfd_sema_tryas,
 		[HANDLE_TYPE_SIGNALFD]        = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_signalfd_tryas,
 		[HANDLE_TYPE_FUTEXFD]         = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_futexfd_tryas,
-		[HANDLE_TYPE_TASK]            = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_task_tryas,
+		[HANDLE_TYPE_PIDFD]           = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_pidfd_tryas,
 		[HANDLE_TYPE_MODULE]          = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_module_tryas,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_driver_loadlist_tryas,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_refcountable_tryas
@@ -997,7 +997,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_EVENTFD_SEMA]    = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_eventfd_sema_printlink,
 		[HANDLE_TYPE_SIGNALFD]        = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_signalfd_printlink,
 		[HANDLE_TYPE_FUTEXFD]         = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_futexfd_printlink,
-		[HANDLE_TYPE_TASK]            = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_task_printlink,
+		[HANDLE_TYPE_PIDFD]           = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_pidfd_printlink,
 		[HANDLE_TYPE_MODULE]          = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_module_printlink,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_driver_loadlist_printlink,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_refcountable_printlink
@@ -1534,37 +1534,37 @@ handle_futexfd_printlink(struct mfutexfd *__restrict self, pformatprinter printe
 	return handle_generic_printlink(self, HANDLE_TYPE_FUTEXFD, printer, arg);
 }
 
-/* Weakly define operators for `HANDLE_TYPE_TASK' (`struct taskpid') */
-DEFINE_INTERN_WEAK_ALIAS(handle_task_refcnt, handle_undefined_refcnt);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_incref, handle_undefined_incref);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_tryincref, handle_undefined_tryincref);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_weakgetref, handle_undefined_weakgetref);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_weaklckref, handle_undefined_weaklckref);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_weakdecref, handle_undefined_weakdecref);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_read, handle_undefined_read);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_write, handle_undefined_write);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_pread, handle_undefined_pread);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_pwrite, handle_undefined_pwrite);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_readv, handle_undefined_readv);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_writev, handle_undefined_writev);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_preadv, handle_undefined_preadv);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_pwritev, handle_undefined_pwritev);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_readdir, handle_undefined_readdir);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_seek, handle_undefined_seek);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_ioctl, handle_undefined_ioctl);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_truncate, handle_undefined_truncate);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_mmap, handle_undefined_mmap);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_allocate, handle_undefined_allocate);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_sync, handle_undefined_sync);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_datasync, handle_undefined_datasync);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_pollconnect, handle_undefined_pollconnect);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_tryas, handle_undefined_tryas);
-INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_task.printlink") ssize_t KCALL
-handle_task_printlink(struct taskpid *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
-	return handle_generic_printlink(self, HANDLE_TYPE_TASK, printer, arg);
+/* Weakly define operators for `HANDLE_TYPE_PIDFD' (`struct taskpid') */
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_incref, handle_undefined_incref);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_decref, handle_undefined_decref);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_weakdecref, handle_undefined_weakdecref);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_read, handle_undefined_read);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_write, handle_undefined_write);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_pread, handle_undefined_pread);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_pwrite, handle_undefined_pwrite);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_readv, handle_undefined_readv);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_writev, handle_undefined_writev);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_preadv, handle_undefined_preadv);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_pwritev, handle_undefined_pwritev);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_readdir, handle_undefined_readdir);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_seek, handle_undefined_seek);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_ioctl, handle_undefined_ioctl);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_truncate, handle_undefined_truncate);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_mmap, handle_undefined_mmap);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_sync, handle_undefined_sync);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_datasync, handle_undefined_datasync);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_stat, handle_undefined_stat);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_polltest, handle_undefined_polltest);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidfd_tryas, handle_undefined_tryas);
+INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_pidfd.printlink") ssize_t KCALL
+handle_pidfd_printlink(struct taskpid *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
+	return handle_generic_printlink(self, HANDLE_TYPE_PIDFD, printer, arg);
 }
 
 /* Weakly define operators for `HANDLE_TYPE_MODULE' (`struct module') */

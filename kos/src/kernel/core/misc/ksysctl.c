@@ -530,7 +530,7 @@ again_get_oldpath:
 	case KSYSCTL_OPEN_BOOT_TASK: {
 		struct handle temp;
 		require(CAP_KERNEL_QUERY);
-		temp.h_type = HANDLE_TYPE_TASK;
+		temp.h_type = HANDLE_TYPE_PIDFD;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = FORTASK(&boottask, this_taskpid);
 		return handle_installopenfd((USER UNCHECKED struct openfd *)arg, temp);

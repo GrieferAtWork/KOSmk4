@@ -27,7 +27,7 @@
 /**/
 
 #include <asm/intrin.h>
-#include <kos/ioctl/task.h>
+#include <kos/ioctl/pidfd.h>
 #include <kos/rpc.h>
 #include <kos/syscalls.h>
 #include <kos/types.h>
@@ -111,7 +111,7 @@ libk32_GetExitCodeProcess(HANDLE hProcess, LPDWORD lpExitCode) {
 		errno = EBADF;
 		return FALSE;
 	}
-	if (ioctl(NTHANDLE_ASFD(hProcess), TASK_IOC_EXITCODE, &w) < 0) {
+	if (ioctl(NTHANDLE_ASFD(hProcess), PIDFD_IOC_EXITCODE, &w) < 0) {
 		if (errno == EINVAL) {
 			*lpExitCode = STILL_ACTIVE;
 			return TRUE;
@@ -154,7 +154,7 @@ libk32_GetProcessId(HANDLE hProcess) {
 		errno = EBADF;
 		return 0;
 	}
-	if (ioctl(NTHANDLE_ASFD(hProcess), TASK_IOC_GETPID, &result) < 0)
+	if (ioctl(NTHANDLE_ASFD(hProcess), PIDFD_IOC_GETPID, &result) < 0)
 		return 0;
 	return result;
 }
@@ -167,7 +167,7 @@ libk32_GetThreadId(HANDLE hThread) {
 		errno = EBADF;
 		return 0;
 	}
-	if (ioctl(NTHANDLE_ASFD(hThread), TASK_IOC_GETTID, &result) < 0)
+	if (ioctl(NTHANDLE_ASFD(hThread), PIDFD_IOC_GETTID, &result) < 0)
 		return 0;
 	return result;
 }

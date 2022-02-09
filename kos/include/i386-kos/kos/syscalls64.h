@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5f796b4 */
+/* HASH CRC-32:0x8d23fc80 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1269,7 +1269,7 @@ __CDECLARE_SC(,__errno_t,personality,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 /* Duplicate the  handle  of  a  foreign  process into  a  handle  for  the  caller.
  * This system call duplicates the functionality of `open("/proc/[pid]/fd/[fdno]")',
  * which may also be used to duplicate file handles from another process.
- * @param: pidfd: A `HANDLE_TYPE_TASK'-handle
+ * @param: pidfd: A `HANDLE_TYPE_PIDFD'-handle
  * @param: fd:    The FD-number of the handle to clone
  * @param: flags: Must always be `0' (for now)
  * @return: * :   The duplicated handle number
@@ -1281,7 +1281,7 @@ __CDECLARE_SC(,__errno_t,personality,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__fd_t,pidfd_getfd,(__fd_t __pidfd, __fd_t __foreign_fd, __syscall_ulong_t __flags),(__pidfd,__foreign_fd,__flags))
 #endif /* __CRT_HAVE_SC(pidfd_getfd) */
 #if __CRT_HAVE_SC(pidfd_open)
-/* Return a `HANDLE_TYPE_TASK' handle for the given `pid'
+/* Return a `HANDLE_TYPE_PIDFD' handle for the given `pid'
  * This system call exists for compatibility with linux, which does not  allow
  * this call to succeed when `pid' isn't a process leader (i.e. main() thread)
  * @param: flags: Must always be `0' (for now)
@@ -1294,7 +1294,7 @@ __CDECLARE_SC(,__fd_t,pidfd_open,(__pid_t __pid, __syscall_ulong_t __flags),(__p
 #endif /* __CRT_HAVE_SC(pidfd_open) */
 #if __CRT_HAVE_SC(pidfd_send_signal)
 /* Send a signal to the process of a given pidfd
- * @param: pidfd:  A `HANDLE_TYPE_TASK'-handle
+ * @param: pidfd:  A `HANDLE_TYPE_PIDFD'-handle
  * @param: usigno: The signal that should be sent
  * @param: uinfo:  [0..1] Additional signal information
  * @param: flags:  Must always be `0' (for now)
@@ -3385,7 +3385,7 @@ __CDECLARE_XSC(,__errno_t,personality,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 /* Duplicate the  handle  of  a  foreign  process into  a  handle  for  the  caller.
  * This system call duplicates the functionality of `open("/proc/[pid]/fd/[fdno]")',
  * which may also be used to duplicate file handles from another process.
- * @param: pidfd: A `HANDLE_TYPE_TASK'-handle
+ * @param: pidfd: A `HANDLE_TYPE_PIDFD'-handle
  * @param: fd:    The FD-number of the handle to clone
  * @param: flags: Must always be `0' (for now)
  * @return: * :   The duplicated handle number
@@ -3397,7 +3397,7 @@ __CDECLARE_XSC(,__errno_t,personality,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__fd_t,pidfd_getfd,(__fd_t __pidfd, __fd_t __foreign_fd, __syscall_ulong_t __flags),(__pidfd,__foreign_fd,__flags))
 #endif /* __CRT_HAVE_XSC(pidfd_getfd) */
 #if __CRT_HAVE_XSC(pidfd_open)
-/* Return a `HANDLE_TYPE_TASK' handle for the given `pid'
+/* Return a `HANDLE_TYPE_PIDFD' handle for the given `pid'
  * This system call exists for compatibility with linux, which does not  allow
  * this call to succeed when `pid' isn't a process leader (i.e. main() thread)
  * @param: flags: Must always be `0' (for now)
@@ -3410,7 +3410,7 @@ __CDECLARE_XSC(,__fd_t,pidfd_open,(__pid_t __pid, __syscall_ulong_t __flags),(__
 #endif /* __CRT_HAVE_XSC(pidfd_open) */
 #if __CRT_HAVE_XSC(pidfd_send_signal)
 /* Send a signal to the process of a given pidfd
- * @param: pidfd:  A `HANDLE_TYPE_TASK'-handle
+ * @param: pidfd:  A `HANDLE_TYPE_PIDFD'-handle
  * @param: usigno: The signal that should be sent
  * @param: uinfo:  [0..1] Additional signal information
  * @param: flags:  Must always be `0' (for now)

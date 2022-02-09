@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d32d482 */
+/* HASH CRC-32:0xa5682059 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1032,7 +1032,7 @@
 #define SYS_futex_time64                 __NR_futex_time64                 /* syscall_slong_t futex_time64(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
 #define SYS_sched_rr_get_interval_time64 __NR_sched_rr_get_interval_time64 /* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *ts) */
 /* Send a signal to the process of a given pidfd
- * @param: pidfd:  A `HANDLE_TYPE_TASK'-handle
+ * @param: pidfd:  A `HANDLE_TYPE_PIDFD'-handle
  * @param: usigno: The signal that should be sent
  * @param: uinfo:  [0..1] Additional signal information
  * @param: flags:  Must always be `0' (for now)
@@ -1053,7 +1053,7 @@
 #define SYS_fsconfig                     __NR_fsconfig                     /* errno_t fsconfig(int TODO_PROTOTYPE) */
 #define SYS_fsmount                      __NR_fsmount                      /* errno_t fsmount(int TODO_PROTOTYPE) */
 #define SYS_fspick                       __NR_fspick                       /* errno_t fspick(int TODO_PROTOTYPE) */
-/* Return a `HANDLE_TYPE_TASK' handle for the given `pid'
+/* Return a `HANDLE_TYPE_PIDFD' handle for the given `pid'
  * This system call exists for compatibility with linux, which does not  allow
  * this call to succeed when `pid' isn't a process leader (i.e. main() thread)
  * @param: flags: Must always be `0' (for now)
@@ -1069,7 +1069,7 @@
 /* Duplicate the  handle  of  a  foreign  process into  a  handle  for  the  caller.
  * This system call duplicates the functionality of `open("/proc/[pid]/fd/[fdno]")',
  * which may also be used to duplicate file handles from another process.
- * @param: pidfd: A `HANDLE_TYPE_TASK'-handle
+ * @param: pidfd: A `HANDLE_TYPE_PIDFD'-handle
  * @param: fd:    The FD-number of the handle to clone
  * @param: flags: Must always be `0' (for now)
  * @return: * :   The duplicated handle number

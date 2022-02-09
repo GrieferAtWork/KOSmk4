@@ -380,7 +380,7 @@ PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL
 handle_as_task(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED) {
 	/* Special case: The handle already has the correct typing */
-	if (self->h_type == HANDLE_TYPE_TASK) {
+	if (self->h_type == HANDLE_TYPE_PIDFD) {
 		REF struct task *result;
 		struct taskpid *tpid;
 		tpid   = (REF struct taskpid *)self->h_data;
@@ -389,7 +389,7 @@ handle_as_task(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		return result;
 	} else {
 		REF struct taskpid *tpid;
-		tpid = (REF struct taskpid *)_handle_tryas(*self, HANDLE_TYPE_TASK);
+		tpid = (REF struct taskpid *)_handle_tryas(*self, HANDLE_TYPE_PIDFD);
 		if likely(tpid) {
 			REF struct task *result;
 			{
@@ -401,7 +401,7 @@ handle_as_task(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		}
 	}
 	throw_invalid_handle_type(self,
-	                          HANDLE_TYPE_TASK,
+	                          HANDLE_TYPE_PIDFD,
 	                          HANDLE_TYPEKIND_GENERIC);
 }
 
