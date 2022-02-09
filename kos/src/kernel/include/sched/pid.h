@@ -328,7 +328,7 @@ FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct taskpid *FCALL pidns_look
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL pidns_lookuptask_srch(struct pidns *__restrict self, pid_t pid) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED, E_INVALID_ARGUMENT_BAD_VALUE);
 
 /* Return the taskpid object associated with `pid' within `self' */
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct taskpid *
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) struct taskpid *
 NOTHROW(FCALL pidns_lookup_locked)(struct pidns const *__restrict self, pid_t pid);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) REF struct task *
 NOTHROW(FCALL pidns_lookuptask_locked)(struct pidns const *__restrict self, pid_t pid);
@@ -376,7 +376,7 @@ NOTHROW(FCALL pidns_removepid)(struct pidns *__restrict self, pid_t pid);
 
 /* Find the first (lowest) unused  pid that is in  [minpid,maxpid]
  * If no such pid exists (or when `minpid > maxpid'), return `-1'. */
-FUNDEF WUNUSED NOBLOCK NONNULL((1)) pid_t
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) pid_t
 NOTHROW(FCALL pidns_findpid)(struct pidns const *__restrict self,
                              pid_t minpid, pid_t maxpid);
 
@@ -389,7 +389,7 @@ NOTHROW(FCALL pidns_findpid)(struct pidns const *__restrict self,
  * addition to this, the  caller must also increment  `self->pn_npid'
  * to `return + 1' once  they inserted the  PID into this  namespace!
  * This only happens when `#ifdef PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE' */
-FUNDEF WUNUSED NOBLOCK NONNULL((1)) pid_t
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) pid_t
 NOTHROW(FCALL pidns_nextpid)(struct pidns const *__restrict self);
 #if __SIZEOF_POINTER__ > 4
 #define PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE
@@ -402,7 +402,7 @@ NOTHROW(FCALL pidns_nextpid)(struct pidns const *__restrict self);
  * @return: true:  Success.
  * @return: false: Failed to allocate a PID in at least one namespace. */
 #ifdef PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE
-FUNDEF WUNUSED NOBLOCK NONNULL((1)) bool
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL pidns_allocpids)(struct taskpid *__restrict self);
 #else /* PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE */
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -416,8 +416,8 @@ pidns_grplookup(struct pidns *__restrict self, pid_t pgid) THROWS(E_WOULDBLOCK);
 FUNDEF WUNUSED NONNULL((1)) REF struct procgrp *FCALL
 pidns_grplookup_srch(struct pidns *__restrict self, pid_t pgid)
 		THROWS(E_WOULDBLOCK, E_PROCESS_GROUP_EXITED, E_INVALID_ARGUMENT_BAD_VALUE);
-FUNDEF WUNUSED NONNULL((1)) struct procgrp *
-NOTHROW(FCALL pidns_grplookup_locked)(struct pidns *__restrict self, pid_t pgid);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) struct procgrp *
+NOTHROW(FCALL pidns_grplookup_locked)(struct pidns const *__restrict self, pid_t pgid);
 
 /* Insert/Remove a process group to/from the given namespace. */
 FUNDEF NOBLOCK NONNULL((1, 2)) void

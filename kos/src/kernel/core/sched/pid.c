@@ -552,7 +552,7 @@ throw_exited:
 
 
 /* Return the taskpid object associated with `pid' within `self' */
-PUBLIC NOBLOCK WUNUSED NONNULL((1)) struct taskpid *
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) struct taskpid *
 NOTHROW(FCALL pidns_lookup_locked)(struct pidns const *__restrict self, pid_t pid) {
 	return _taskpid_tree_locate(self->pn_tree, pid, self->pn_ind);
 }
@@ -676,7 +676,7 @@ NOTHROW(FCALL pidns_removepid)(struct pidns *__restrict self, pid_t pid) {
 
 /* Find the first (lowest) unused  pid that is in  [minpid,maxpid]
  * If no such pid exists (or when `minpid > maxpid'), return `-1'. */
-PUBLIC WUNUSED NOBLOCK NONNULL((1)) pid_t
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) pid_t
 NOTHROW(FCALL pidns_findpid)(struct pidns const *__restrict self,
                              pid_t minpid, pid_t maxpid) {
 	if (minpid <= maxpid) {
@@ -704,7 +704,7 @@ NOTHROW(FCALL pidns_findpid)(struct pidns const *__restrict self,
  * addition to this, the  caller must also increment  `self->pn_npid'
  * to `return + 1' once  they inserted the  PID into this  namespace!
  * This only happens when `#ifdef PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE' */
-PUBLIC WUNUSED NOBLOCK NONNULL((1)) pid_t
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) pid_t
 NOTHROW(FCALL pidns_nextpid)(struct pidns const *__restrict self) {
 	pid_t recycle = ATOMIC_READ(pid_recycle_threshold);
 	pid_t result;
@@ -746,7 +746,7 @@ done:
  * @return: true:  Success.
  * @return: false: Failed to allocate a PID in at least one namespace. */
 #ifdef PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE
-PUBLIC WUNUSED NOBLOCK NONNULL((1)) bool
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL pidns_allocpids)(struct taskpid *__restrict self)
 #else /* PIDNS_NEXTPID_CAN_RETURN_MINUS_ONE */
 PUBLIC NOBLOCK NONNULL((1)) void
@@ -805,8 +805,8 @@ pidns_grplookup_srch(struct pidns *__restrict self, pid_t pgid)
 }
 
 
-PUBLIC WUNUSED NONNULL((1)) struct procgrp *
-NOTHROW(FCALL pidns_grplookup_locked)(struct pidns *__restrict self, pid_t pgid) {
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) struct procgrp *
+NOTHROW(FCALL pidns_grplookup_locked)(struct pidns const *__restrict self, pid_t pgid) {
 	return _procgrp_tree_locate(self->pn_tree_pg, pgid, self->pn_ind);
 }
 

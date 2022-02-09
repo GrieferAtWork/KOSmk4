@@ -1047,6 +1047,7 @@ print("	}");
 		break;
 	}
 /*[[[end]]]*/
+	COMPILER_IMPURE(); /* Prevent warning: `-Wsuggest-attribute=pure' */
 	return (char *)result;
 }
 

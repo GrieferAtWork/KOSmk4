@@ -415,7 +415,7 @@ again_locked:
 /************************************************************************/
 
 /* Begin deletion of `self' */
-PRIVATE WUNUSED NOBLOCK NONNULL((1)) bool
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL mfile_begin_delete)(struct mfile *__restrict self) {
 	uintptr_t old_flags;
 

@@ -3075,6 +3075,17 @@ struct popen_execve_args {
 	char *const *pxa_envp; /* [1..1][0..n] Environ to pass to program */
 };
 
+
+/* GCC doesn't like the way we use vfork(), when in fact it's perfectly valid
+ * GCC simply doesn't understand that vfork() returns `0' the first time, and
+ * only returns non-0 the second time around.
+ * >>> warning : variable 'child_override_fdvl' might be clobbered by 'longjmp' or 'vfork' [-Wclobbered]
+ */
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wclobbered"
+#endif /* __GNUC__ */
+
 #define LIBC_POPEN_COMMAND 0 /* arg: `[0..1] char const *command;' */
 #define LIBC_POPEN_EXECVE  1 /* arg: `[1..1] struct popen_execve_args *args;' */
 PRIVATE ATTR_SECTION(".text.crt.FILE.utility.popen") WUNUSED NONNULL((1)) FILE *
@@ -3188,6 +3199,11 @@ err_r:
 	file_free(result);
 	return NULL;
 }
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif /* __GNUC__ */
+
 
 
 

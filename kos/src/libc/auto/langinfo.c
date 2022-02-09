@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x484be51 */
+/* HASH CRC-32:0xc0cca941 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -848,6 +848,7 @@ print("	}");
 		break;
 	}
 /*[[[end]]]*/
+	COMPILER_IMPURE(); /* Prevent warning: `-Wsuggest-attribute=pure' */
 	return (char *)result;
 }
 /* >> nl_langinfo(3), nl_langinfo_l(3)

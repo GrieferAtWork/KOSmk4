@@ -2121,7 +2121,7 @@ driver_dlsym_ex(struct driver *__restrict self,
 	return result;
 }
 
-PRIVATE WUNUSED NOBLOCK unsigned int
+PRIVATE NOBLOCK WUNUSED unsigned int
 NOTHROW(FCALL get_max_dependency_depth)(void) {
 	unsigned int result;
 	REF struct driver_loadlist *ll;

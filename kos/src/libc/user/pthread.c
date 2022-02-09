@@ -3053,9 +3053,10 @@ readlock_tls_data_dodel(struct readlock_tls_data *__restrict self,
 }
 
 /* Remove `lck' from the set of locks of `self' */
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) bool CC
-readlock_tls_data_contains(struct readlock_tls_data const *__restrict self,
-                           pthread_rwlock_t const *__restrict lck) {
+ATTR_SECTION(".text.crt.sched.pthread") 
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) bool
+NOTHROW(CC readlock_tls_data_contains)(struct readlock_tls_data const *__restrict self,
+                                       pthread_rwlock_t const *__restrict lck) {
 	uintptr_t hash, i, perturb;
 	pthread_rwlock_t *emon;
 	hash = pthread_rwlock_hashof(lck);
