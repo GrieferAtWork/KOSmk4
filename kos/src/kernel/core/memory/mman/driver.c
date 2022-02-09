@@ -696,8 +696,8 @@ PRIVATE struct module_ops const kernel_module_ops = {
 };
 
 PRIVATE ATTR_COLDRODATA char const kernel_driver_name[] = KERNEL_DRIVER_NAME;
-PRIVATE ATTR_COLDDATA struct fdirent kernel_driver_fsname = {
-	.fd_refcnt  = 1, /* +1: kernel_driver.d_module.md_fsname */
+INTERN ATTR_COLDDATA struct fdirent kernel_driver_fsname = {
+	.fd_refcnt  = 2, /* +1: kernel_driver.d_module.md_fsname, +1: FORMMAN(&mman_kernel, thismman_execinfo.mei_dent) */
 	.fd_ops     = &fdirent_empty_ops,
 	.fd_ino     = 0,
 #if __SIZEOF_POINTER__ == 8

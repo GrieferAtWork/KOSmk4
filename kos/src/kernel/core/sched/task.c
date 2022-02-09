@@ -33,6 +33,7 @@
 #include <kernel/heap.h>
 #include <kernel/mman.h>
 #include <kernel/mman/cache.h>
+#include <kernel/mman/execinfo.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
@@ -229,6 +230,9 @@ NOTHROW(KCALL kernel_initialize_scheduler_after_smp)(void) {
 #endif /* !CONFIG_EVERYONE_IS_ROOT */
 }
 
+/* Define in "mman/driver.c" -- dirent with the string "/os/kernel.bin" */
+extern struct fdirent kernel_driver_fsname;
+
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	void *boot_trampoline_pages;
@@ -283,6 +287,12 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	SET_TASK_NAME(&asyncwork, "async0");
 #undef SET_TASK_NAME
 #endif /* CONFIG_HAVE_TASK_COMM */
+
+	/* Assign exec information to `mman_kernel'.
+	 * This might not be the perfect place to do so, but since I don't want to add
+	 * a initializer just to do this one thing, we might as well fill in that field
+	 * here! */
+	FORMMAN(&mman_kernel, thismman_execinfo.mei_dent) = &kernel_driver_fsname;
 
 	/* Figure out where to put the initial trampolines for boottask and bootidle */
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
