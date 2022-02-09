@@ -483,9 +483,9 @@ PRIVATE struct fdirent_ops const procfs_perproc_dirent_ops_nomap = {
 };
 
 /* Return the set of directory entry operators used for per-process files of `dt_type' (one of `DT_*') */
-#define procfs_perproc_dirent_ops_for(dt_type)             \
-	((dt_type) == S_IFREG ? &procfs_perproc_dirent_ops_reg \
-	                      : &procfs_perproc_dirent_ops_nomap)
+#define procfs_perproc_dirent_ops_for(dt_type)            \
+	((dt_type) == DT_REG ? &procfs_perproc_dirent_ops_reg \
+	                     : &procfs_perproc_dirent_ops_nomap)
 
 
 
