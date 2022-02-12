@@ -1469,17 +1469,19 @@ retry_lfn:
 		matchsize = retry_hex ? 2 : 6;
 		reader = ent->fad_ent.fde_ent.fd_name;
 		rdend  = reader + ent->fad_ent.fde_ent.fd_namelen;
-		writer = ent->fad_dos.f_nameext;
+		while (reader < rdend && (*reader == '.' || isspace(*reader)))
+			++reader; /* Skip leading dots and spaces for conversion */
+		writer = ent->fad_dos.f_name;
 		for (i = 0; i < matchsize; ++i) {
 			char32_t ch;
 			ch = unicode_readutf8_n(&reader, rdend);
-			if (ch == '.') {
-				reader = rdend;
-			} else if (ch >= 'a' && ch <= 'z') {
-				ch += ('A' - 'a');
+			if (ch >= 'a' && ch <= 'z')
+				ch += ('A' - 'a'); /* Force ASCII lower to uppercase. */
+			if (!Fat_IsAccepted83(ch)) {
+				if (!ch)
+					break; /* Allow 8.3 alternates that are shorter than 8 characters */
+				ch = '~'; /* Replace illegals with '~' */
 			}
-			if (!Fat_IsAccepted83(ch))
-				ch = '~';
 			*writer++ = (char)(unsigned char)ch;
 		}
 		if (retry_hex) {
@@ -1491,7 +1493,7 @@ retry_lfn:
 			*writer++ = _itoa_upper_digits[(retry_hex & 0x00f0) >> 4];
 			*writer++ = _itoa_upper_digits[(retry_hex & 0x000f)];
 		}
-		assert(writer == ent->fad_dos.f_nameext + 6);
+		assert(writer <= ent->fad_dos.f_name + 6);
 
 		/* Following the shared name and the hex part is always a tilde '~' */
 		*writer++ = '~';
@@ -1499,9 +1501,13 @@ retry_lfn:
 		/* The last character then, is the non-hex digit (1..9) */
 		*writer++ = '1' + retry_dig;
 
+		/* Fill the rest with space characters. */
+		while (writer < COMPILER_ENDOF(ent->fad_dos.f_name))
+			*writer++ = ' ';
+
 		/* Fix 0xe5 --> 0x05 */
-		if ((unsigned char)ent->fad_dos.f_nameext[0] == 0xe5)
-			ent->fad_dos.f_nameext[0] = (char)MARKER_IS0XE5;
+		if (ent->fad_dos.f_marker == 0xe5)
+			ent->fad_dos.f_marker = MARKER_IS0XE5;
 
 		/* If the 8.3 filename already exists, then try to generate another one. */
 		if unlikely(FatDir_Contains83Filename(dir, ent)) {
@@ -1530,7 +1536,7 @@ retry_lfn:
 				THROW(E_FSERROR_ILLEGAL_PATH);
 			}
 			if unlikely(!Fat_IsAcceptedLFN(ch))
-				THROW(E_FSERROR_ILLEGAL_PATH); /* Character isn't even allowed in LFN */
+				THROW(E_FSERROR_ILLEGAL_PATH); /* Character isn't allowed, even in LFN */
 			if unlikely(writer >= (lfn_name + LFN_SEQNUM_MAXCOUNT * LFN_NAME) - 1)
 				THROW(E_FSERROR_ILLEGAL_PATH); /* Filename too long */
 			writer = unicode_writeutf16_chk(writer, ch);
