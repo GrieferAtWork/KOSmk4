@@ -723,16 +723,25 @@ again_TIOCSCTTY:
 				THROW(E_ILLEGAL_BECAUSE_GROUPING,
 				      E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCSCTTY_CANNOT_STEAL_CTTY);
 			}
-			if (!axref_cmpxch(&oldcproc->pgr_session->ps_ctty, me, NULL))
+			if (!axref_cmpxch(&mygrp->pgr_session->ps_ctty, NULL, me))
 				goto again_TIOCSCTTY;
+			if (!axref_cmpxch(&oldcproc->pgr_session->ps_ctty, me, NULL)) {
+				axref_cmpxch(&mygrp->pgr_session->ps_ctty, me, NULL);
+				goto again_TIOCSCTTY;
+			}
 			if (!awref_cmpxch(&me->t_cproc, oldcproc, mygrp)) {
 				axref_cmpxch(&oldcproc->pgr_session->ps_ctty, NULL, me);
+				axref_cmpxch(&mygrp->pgr_session->ps_ctty, me, NULL);
 				goto again_TIOCSCTTY;
 			}
 			ttydev_log_delsession(me, oldcproc);
 		} else {
-			if (!awref_cmpxch(&me->t_cproc, NULL, mygrp))
+			if (!axref_cmpxch(&mygrp->pgr_session->ps_ctty, NULL, me))
 				goto again_TIOCSCTTY;
+			if (!awref_cmpxch(&me->t_cproc, NULL, mygrp)) {
+				axref_cmpxch(&mygrp->pgr_session->ps_ctty, me, NULL);
+				goto again_TIOCSCTTY;
+			}
 		}
 		awref_set(&me->t_fproc, mygrp);
 		ttydev_log_setsession(me, mygrp);

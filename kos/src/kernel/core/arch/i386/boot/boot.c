@@ -890,6 +890,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Add futex support to pthread_once() (via an alternate [[userimpl]]) */
 
+	/* TODO: Implement `O_NOCTTY' -- Currently, opening ttys always behaves as though this flag was set.
+	 *       Also note that we should implement this by overriding `mfile_stream_ops::mso_open' for  tty
+	 *       objects, and having them check for `O_NOCTTY'! */
+
 	return state;
 }
 
