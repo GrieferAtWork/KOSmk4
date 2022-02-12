@@ -2204,8 +2204,8 @@ print_signo_t(pformatprinter printer, void *arg, signo_t signo) {
 /*[[[deemon
 import * from deemon;
 import * from ...misc.libgen.strendN;
-local sockaf = getPrefixedMacrosFromFile("../../include/asm/os/kos/socket.h", "__AF_");
-local sockpf = getPrefixedMacrosFromFile("../../include/asm/os/kos/socket.h", "__PF_");
+local sockaf = getPrefixedMacrosFromFileAsMapping("../../include/asm/os/kos/socket.h", "__AF_");
+local sockpf = getPrefixedMacrosFromFileAsMapping("../../include/asm/os/kos/socket.h", "__PF_");
 
 printStrendNDatabase("SOCKAF", sockaf);
 if (sockaf == sockpf) {
@@ -2341,8 +2341,14 @@ err:
 /*[[[deemon
 import * from deemon;
 import * from ...misc.libgen.strendN;
-local typ = getPrefixedMacrosFromFile("../../include/asm/os/kos/socket.h", "__SOCK_");
-printStrendNDatabase("SOCKTYPE", typ[:255]);
+local typ = getPrefixedMacrosFromFileAsMapping("../../include/asm/os/kos/socket.h", "__SOCK_");
+for (;;) {
+	local maxkey = typ.keys > ...;
+	if (maxkey < 255)
+		break;
+	del typ[maxkey];
+}
+printStrendNDatabase("SOCKTYPE", typ);
 ]]]*/
 #define GETBASE_SOCKTYPE(result, index) \
 	(((index) <= 0xa) ? ((result) = repr_SOCKTYPE_0h, true) : false)
@@ -2462,7 +2468,7 @@ err:
 /*[[[deemon
 import * from deemon;
 import * from ...misc.libgen.strendN;
-local typ = getPrefixedMacrosFromFile("../../include/asm/os/kos/stdio.h", "__SEEK_");
+local typ = getPrefixedMacrosFromFileAsMapping("../../include/asm/os/kos/stdio.h", "__SEEK_");
 printStrendNDatabase("SEEK", typ);
 ]]]*/
 #define GETBASE_SEEK(result, index) \
@@ -2503,7 +2509,7 @@ print_seek_whence(pformatprinter printer, void *arg,
 /*[[[deemon
 import * from deemon;
 import * from ...misc.libgen.strendN;
-local typ = getPrefixedMacrosFromFile("../../include/asm/os/kos/fcntl.h", "__F_");
+local typ = getPrefixedMacrosFromFileAsMapping("../../include/asm/os/kos/fcntl.h", "__F_");
 printStrendNDatabase("FCNTL", typ);
 ]]]*/
 #define GETBASE_FCNTL(result, index) \
@@ -2627,7 +2633,7 @@ err:
 /*[[[deemon
 import * from deemon;
 import * from ...misc.libgen.strendN;
-local typ = getPrefixedMacrosFromFile("../../include/asm/os/kos/fcntl.h", "__F_OWNER_");
+local typ = getPrefixedMacrosFromFileAsMapping("../../include/asm/os/kos/fcntl.h", "__F_OWNER_");
 printStrendNDatabase("F_OWNER", typ);
 ]]]*/
 #define GETBASE_F_OWNER(result, index) \
@@ -3095,7 +3101,7 @@ err:
 /*[[[deemon
 import * from deemon;
 import * from ...misc.libgen.strendN;
-local typ = getPrefixedMacrosFromFile("../../include/asm/os/kos/socket.h", "__SOL_");
+local typ = getPrefixedMacrosFromFileAsMapping("../../include/asm/os/kos/socket.h", "__SOL_");
 printStrendNDatabase("SOL", typ);
 ]]]*/
 #define GETBASE_SOL(result, index) \
@@ -3141,7 +3147,7 @@ print_sockopt_level(pformatprinter printer, void *arg,
 /*[[[deemon
 import * from deemon;
 import * from ...misc.libgen.strendN;
-local typ = getPrefixedMacrosFromFile("../../include/asm/os/kos/socket.h", "__SO_");
+local typ = getPrefixedMacrosFromFileAsMapping("../../include/asm/os/kos/socket.h", "__SO_");
 printStrendNDatabase("SOCKET_SO", typ);
 ]]]*/
 #define GETBASE_SOCKET_SO(result, index) \
@@ -3758,7 +3764,7 @@ err:
 /*[[[deemon
 import * from deemon;
 import * from ...misc.libgen.strendN;
-local epop = getPrefixedMacrosFromFile("../../include/asm/os/kos/epoll.h", "__EPOLL_CTL_");
+local epop = getPrefixedMacrosFromFileAsMapping("../../include/asm/os/kos/epoll.h", "__EPOLL_CTL_");
 printStrendNDatabase("EPOLL_CTL", epop);
 ]]]*/
 #define GETBASE_EPOLL_CTL(result, index) \
@@ -3835,7 +3841,7 @@ print_mremap_flags(pformatprinter printer, void *arg,
 /*[[[deemon
 import * from deemon;
 import * from ...misc.libgen.strendN;
-local prctl = getPrefixedMacrosFromFile("../../include/i386-kos/asm/os/kos/prctl.h", "ARCH_");
+local prctl = getPrefixedMacrosFromFileAsMapping("../../include/i386-kos/asm/os/kos/prctl.h", "ARCH_");
 printStrendNDatabase("ARCH_", prctl);
 ]]]*/
 #define GETBASE_ARCH(result, index) \

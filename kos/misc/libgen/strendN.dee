@@ -265,6 +265,10 @@ function splitValues(values: {string...} | {int: string}): {(int, {string...})..
 	yield (currentStart, values[currentStart:count]);
 }
 
+
+@@Print a strend^N database for  compactly mapping integers to  strings
+@@The mapping to generate is given in @values, and the function is most
+@@efficient when values to map are packed close together.
 function printStrendNDatabase(
 		prefix: string, values: {string...} | {int: string},
 		attr: string = "") {
@@ -313,33 +317,6 @@ function printStrendNDatabase(
 	print;
 }
 
-
-/* TODO: Get rid of this function (doesn't scale for large numbers)
- * Instead, use `getPrefixedMacrosFromFileAsMapping()' everywhere! */
-function getPrefixedMacrosFromFile(
-		filename: string, prefix: string, suffix: string = "",
-		requireNoSpaceAfterPound: bool = false): {string...} {
-	local result = [];
-	for (local macroName, macroValue: enumerateMacrosFromFile(
-			filename, requireNoSpaceAfterPound)) {
-		if (!macroName.startswith(prefix))
-			continue;
-		if (suffix) {
-			if (!macroName.endswith(suffix))
-				continue;
-			macroName = macroName[:-#suffix];
-		}
-		macroName = macroName[#prefix:];
-		macroValue = getMacroIntValue(macroValue);
-		if (macroValue !is int)
-			continue;
-		if (macroValue >= #result)
-			result.resize(macroValue + 1);
-		if (result[macroValue] is none)
-			result[macroValue] = macroName;
-	}
-	return result;
-}
 
 function getPrefixedMacrosFromFileAsMapping(
 		filename: string, prefix: string, suffix: string = "",
