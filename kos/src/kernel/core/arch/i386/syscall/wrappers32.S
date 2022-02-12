@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69237148 */
+/* HASH CRC-32:0xbdac18cf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -14825,15 +14825,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_statx)
 	.cfi_endproc
 END(__x86_asm32_int80_statx)
 
-/* >> arch_prctl(2)
- * Arch-dependent system process control interface. (But don't go and
- * think that the normal `prctl(2)' doesn't feature arch-dependent
- * commands -- honestly, this syscall shouldn't exist if you ask me,
- * but it does on linux, and so it must also on KOS...)
- * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
- * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
- * @return: * :  Return value depends on `command' */
-/* syscall_slong_t arch_prctl(unsigned int command, syscall_ulong_t addr) */
+/* syscall_slong_t arch_prctl(unsigned int command, uint32_t *addr) */
 .section .text.x86.asm32_syscall_int80.arch_prctl
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_arch_prctl)
 	.cfi_startproc simple
@@ -34313,15 +34305,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_statx)
 	.cfi_endproc
 END(__x86_asm32_sysenter_statx)
 
-/* >> arch_prctl(2)
- * Arch-dependent system process control interface. (But don't go and
- * think that the normal `prctl(2)' doesn't feature arch-dependent
- * commands -- honestly, this syscall shouldn't exist if you ask me,
- * but it does on linux, and so it must also on KOS...)
- * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
- * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
- * @return: * :  Return value depends on `command' */
-/* syscall_slong_t arch_prctl(unsigned int command, syscall_ulong_t addr) */
+/* syscall_slong_t arch_prctl(unsigned int command, uint32_t *addr) */
 .section .text.x86.asm32_syscall_sysenter.arch_prctl
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_arch_prctl)
 	.cfi_startproc simple

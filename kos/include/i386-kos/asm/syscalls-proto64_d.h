@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b49c336 */
+/* HASH CRC-32:0x22cfeea1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1183,7 +1183,7 @@
 #define __NR64AT3_prctl                    (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT4_prctl                    (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_arch_prctl               (unsigned int, unsigned int)
-#define __NR64AT1_arch_prctl               (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT1_arch_prctl               (uint64_t *, __uint64_t *)
 #define __NR64AT0_adjtimex                 (struct timex *, struct timex *)
 #define __NR64AT0_setrlimit                (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT1_setrlimit                (struct rlimit const *, struct rlimit const *)
@@ -1938,7 +1938,7 @@
 #define __NR64AM_pivot_root(a, b, c, d, e, f)               (int)a
 #define __NR64AM__sysctl(a, b, c, d, e, f)                  (int)a
 #define __NR64AM_prctl(a, b, c, d, e, f)                    (unsigned int)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NR64AM_arch_prctl(a, b, c, d, e, f)               (unsigned int)a, (__syscall_ulong_t)b
+#define __NR64AM_arch_prctl(a, b, c, d, e, f)               (unsigned int)a, (__uint64_t *)b
 #define __NR64AM_adjtimex(a, b, c, d, e, f)                 (struct timex *)a
 #define __NR64AM_setrlimit(a, b, c, d, e, f)                (__syscall_ulong_t)a, (struct rlimit const *)b
 #define __NR64AM_chroot(a, b, c, d, e, f)                   (char const *)a

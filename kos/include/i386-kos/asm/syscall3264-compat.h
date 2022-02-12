@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd538957f */
+/* HASH CRC-32:0x2bd851b4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,6 @@
 #define __NR3264COMPAT_add_key                  1(add_key)
 #define __NR3264COMPAT_afs_syscall              1(afs_syscall)
 #define __NR3264COMPAT_alarm                    1(alarm)
-#define __NR3264COMPAT_arch_prctl               1(arch_prctl)
 #define __NR3264COMPAT_bind                     1(bind)
 #define __NR3264COMPAT_bpf                      1(bpf)
 #define __NR3264COMPAT_brk                      1(brk)

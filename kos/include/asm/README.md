@@ -21,6 +21,7 @@ Normally, `<asm/...>` headers are all internal and not meant to be directly incl
 	- `#define PAGE_SIZE  <Integer>`
 	- `#define PAGE_SHIFT <Integer>`
 - `<asm/unistd.h>` (not kos-specific)
+- `<asm/prctl.h>` (not kos-specific)
 
 Some more headers also exist, but those are arch-specific (`<asm/cfi.h>`, `<asm/cpu-*.h>`, `<asm/intrin-*.h>`, `<asm/registers.h>`, ...)
 

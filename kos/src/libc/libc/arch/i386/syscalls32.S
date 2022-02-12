@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x306ca1f3 */
+/* HASH CRC-32:0x7296a008 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3452,15 +3452,7 @@ INTERN_FUNCTION(libc_sys_statx)
 END(libc_sys_statx)
 DEFINE_PUBLIC_ALIAS(sys_statx, libc_sys_statx)
 
-/* >> arch_prctl(2)
- * Arch-dependent system process control interface. (But don't go and
- * think that the normal `prctl(2)' doesn't feature arch-dependent
- * commands -- honestly, this syscall shouldn't exist if you ask me,
- * but it does on linux, and so it must also on KOS...)
- * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
- * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
- * @return: * :  Return value depends on `command' */
-/* syscall_slong_t arch_prctl(unsigned int command, syscall_ulong_t addr) */
+/* syscall_slong_t arch_prctl(unsigned int command, uint32_t *addr) */
 INTERN_FUNCTION(libc_sys_arch_prctl)
 	movl   $(0x180), %eax
 	jmp    libc_x86_exec_syscall2
@@ -7862,15 +7854,7 @@ INTERN_FUNCTION(libc_sys_Xstatx)
 END(libc_sys_Xstatx)
 DEFINE_PUBLIC_ALIAS(sys_Xstatx, libc_sys_Xstatx)
 
-/* >> arch_prctl(2)
- * Arch-dependent system process control interface. (But don't go and
- * think that the normal `prctl(2)' doesn't feature arch-dependent
- * commands -- honestly, this syscall shouldn't exist if you ask me,
- * but it does on linux, and so it must also on KOS...)
- * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
- * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
- * @return: * :  Return value depends on `command' */
-/* syscall_slong_t arch_prctl(unsigned int command, syscall_ulong_t addr) */
+/* syscall_slong_t arch_prctl(unsigned int command, uint32_t *addr) */
 INTERN_FUNCTION(libc_sys_Xarch_prctl)
 	movl   $(0x180), %eax
 	jmp    libc_x86_exec_Xsyscall2

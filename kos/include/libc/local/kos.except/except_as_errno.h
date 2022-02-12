@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda6e84cf */
+/* HASH CRC-32:0x437cc9e4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -624,6 +624,12 @@ for (local name: classes.keys.sorted()) {
 		__result = __ENOSYS;
 		break;
 #endif /* __ENOSYS */
+
+#ifdef __ENODEV
+	case E_UNSUPPORTED_DEVICE:
+		__result = __ENODEV;
+		break;
+#endif /* __ENODEV */
 
 #ifdef __EAGAIN
 	case E_WOULDBLOCK:

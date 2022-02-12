@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12099244 */
+/* HASH CRC-32:0x46917d41 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -204,15 +204,7 @@ __CDECLARE_SC(,__errno_t,afs_syscall,(void),())
 __CDECLARE_SC(,__syscall_ulong_t,alarm,(__syscall_ulong_t __seconds),(__seconds))
 #endif /* __CRT_HAVE_SC(alarm) */
 #if __CRT_HAVE_SC(arch_prctl)
-/* >> arch_prctl(2)
- * Arch-dependent system process control interface. (But don't go and
- * think that the normal `prctl(2)' doesn't feature arch-dependent
- * commands -- honestly, this syscall shouldn't exist if you ask me,
- * but it does on linux, and so it must also on KOS...)
- * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
- * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
- * @return: * :  Return value depends on `command' */
-__CDECLARE_SC(,__syscall_slong_t,arch_prctl,(unsigned int __command, __syscall_ulong_t __addr),(__command,__addr))
+__CDECLARE_SC(,__syscall_slong_t,arch_prctl,(unsigned int __command, __uint64_t *__addr),(__command,__addr))
 #endif /* __CRT_HAVE_SC(arch_prctl) */
 #if __CRT_HAVE_SC(bind)
 /* Bind the given socket `sockfd' to the specified local address.
@@ -2336,15 +2328,7 @@ __CDECLARE_XSC(,__errno_t,afs_syscall,(void),())
 __CDECLARE_XSC(,__syscall_ulong_t,alarm,(__syscall_ulong_t __seconds),(__seconds))
 #endif /* __CRT_HAVE_XSC(alarm) */
 #if __CRT_HAVE_XSC(arch_prctl)
-/* >> arch_prctl(2)
- * Arch-dependent system process control interface. (But don't go and
- * think that the normal `prctl(2)' doesn't feature arch-dependent
- * commands -- honestly, this syscall shouldn't exist if you ask me,
- * but it does on linux, and so it must also on KOS...)
- * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
- * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
- * @return: * :  Return value depends on `command' */
-__CDECLARE_XSC(,__syscall_slong_t,arch_prctl,(unsigned int __command, __syscall_ulong_t __addr),(__command,__addr))
+__CDECLARE_XSC(,__syscall_slong_t,arch_prctl,(unsigned int __command, __uint64_t *__addr),(__command,__addr))
 #endif /* __CRT_HAVE_XSC(arch_prctl) */
 #if __CRT_HAVE_XSC(bind)
 /* Bind the given socket `sockfd' to the specified local address.

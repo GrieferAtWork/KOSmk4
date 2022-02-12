@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf8b39ba */
+/* HASH CRC-32:0xc7522196 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,7 +61,7 @@ __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(except_name))(__except_code_t __code) {
 	subClassVariableName: "err_subclass");
 ]]]*/
 #if !defined(__i386__) && !defined(__x86_64__)
-	static char const __e_linear_0000h_000bh[] =
+	static char const __e_linear_0000h_000ch[] =
 	"E_OK\0\1E_BADALLOC\0E_BADALLOC_INSUFFICIENT_HEAP_MEMORY\0E_BADALLOC_"
 	"INSUFFICIENT_VIRTUAL_MEMORY\0E_BADALLOC_ADDRESS_ALREADY_EXISTS\0E_"
 	"BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY\0E_BADALLOC_INSUFFICIENT_SW"
@@ -82,7 +82,8 @@ __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(except_name))(__except_code_t __code) {
 	"_UNKNOWN_SYSTEMCALL\0\1E_NO_SUCH_OBJECT\0E_NO_CTTY\0\1E_ILLEGAL_OPERA"
 	"TION\0E_ILLEGAL_REFERENCE_LOOP\0E_ILLEGAL_BECAUSE_NOT_READY\0E_ILLE"
 	"GAL_BECAUSE_GROUPING\0E_ILLEGAL_IO_OPERATION\0E_ILLEGAL_RESOURCE_L"
-	"IMIT_EXCEEDED\0E_INVALID_OPERATION\0\1E_BROKEN_PIPE\0\1";
+	"IMIT_EXCEEDED\0E_INVALID_OPERATION\0\1E_BROKEN_PIPE\0\1E_UNSUPPORTED_"
+	"DEVICE\0\1";
 	static char const __e_linear_0081h_0091h[] =
 	"E_NET_ERROR\0E_NET_HOST_UNREACHABLE\0E_NET_ADDRESS_IN_USE\0E_NET_ME"
 	"SSAGE_TOO_LONG\0E_NET_CONNECTION_ABORT\0E_NET_CONNECTION_REFUSED\0E"
@@ -112,8 +113,8 @@ __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(except_name))(__except_code_t __code) {
 	char const *__result;
 	__except_class_t __class_offset;
 	__except_subclass_t __subclass_offset;
-	if (__err_class <= 0x000b) {
-		__result = __e_linear_0000h_000bh;
+	if (__err_class <= 0x000c) {
+		__result = __e_linear_0000h_000ch;
 		__class_offset = __err_class;
 	} else if (__err_class >= 0x0081 && __err_class <= 0x0091) {
 		__result = __e_linear_0081h_0091h;
@@ -190,7 +191,7 @@ __non_linear_prefix:
 		__result = __NULLPTR;
 	return __result;
 #else /* ... */
-	static char const __e_linear_0000h_000bh[] =
+	static char const __e_linear_0000h_000ch[] =
 	"E_OK\0\1E_BADALLOC\0E_BADALLOC_INSUFFICIENT_HEAP_MEMORY\0E_BADALLOC_"
 	"INSUFFICIENT_VIRTUAL_MEMORY\0E_BADALLOC_ADDRESS_ALREADY_EXISTS\0E_"
 	"BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY\0E_BADALLOC_INSUFFICIENT_SW"
@@ -211,7 +212,8 @@ __non_linear_prefix:
 	"_UNKNOWN_SYSTEMCALL\0\1E_NO_SUCH_OBJECT\0E_NO_CTTY\0\1E_ILLEGAL_OPERA"
 	"TION\0E_ILLEGAL_REFERENCE_LOOP\0E_ILLEGAL_BECAUSE_NOT_READY\0E_ILLE"
 	"GAL_BECAUSE_GROUPING\0E_ILLEGAL_IO_OPERATION\0E_ILLEGAL_RESOURCE_L"
-	"IMIT_EXCEEDED\0E_INVALID_OPERATION\0\1E_BROKEN_PIPE\0\1";
+	"IMIT_EXCEEDED\0E_INVALID_OPERATION\0\1E_BROKEN_PIPE\0\1E_UNSUPPORTED_"
+	"DEVICE\0\1";
 	static char const __e_linear_0081h_0091h[] =
 	"E_NET_ERROR\0E_NET_HOST_UNREACHABLE\0E_NET_ADDRESS_IN_USE\0E_NET_ME"
 	"SSAGE_TOO_LONG\0E_NET_CONNECTION_ABORT\0E_NET_CONNECTION_REFUSED\0E"
@@ -238,8 +240,8 @@ __non_linear_prefix:
 	char const *__result;
 	__except_class_t __class_offset;
 	__except_subclass_t __subclass_offset;
-	if (__err_class <= 0x000b) {
-		__result = __e_linear_0000h_000bh;
+	if (__err_class <= 0x000c) {
+		__result = __e_linear_0000h_000ch;
 		__class_offset = __err_class;
 	} else if (__err_class >= 0x0081 && __err_class <= 0x0091) {
 		__result = __e_linear_0081h_0091h;

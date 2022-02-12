@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a075130 */
+/* HASH CRC-32:0xb8b40a30 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1183,7 +1183,7 @@
 #define __NRAT3_prctl                    (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT4_prctl                    (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_arch_prctl               (unsigned int, unsigned int)
-#define __NRAT1_arch_prctl               (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT1_arch_prctl               (uint64_t *, __uint64_t *)
 #define __NRAT0_adjtimex                 (struct timex *, struct timex *)
 #define __NRAT0_setrlimit                (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_setrlimit                (struct rlimit const *, struct rlimit const *)
@@ -1938,7 +1938,7 @@
 #define __NRAM_pivot_root(a, b, c, d, e, f)               (int)a
 #define __NRAM__sysctl(a, b, c, d, e, f)                  (int)a
 #define __NRAM_prctl(a, b, c, d, e, f)                    (unsigned int)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NRAM_arch_prctl(a, b, c, d, e, f)               (unsigned int)a, (__syscall_ulong_t)b
+#define __NRAM_arch_prctl(a, b, c, d, e, f)               (unsigned int)a, (__uint64_t *)b
 #define __NRAM_adjtimex(a, b, c, d, e, f)                 (struct timex *)a
 #define __NRAM_setrlimit(a, b, c, d, e, f)                (__syscall_ulong_t)a, (struct rlimit const *)b
 #define __NRAM_chroot(a, b, c, d, e, f)                   (char const *)a

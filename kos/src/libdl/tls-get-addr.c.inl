@@ -57,7 +57,7 @@ libdl_dltlsaddr2(USER DlModule *self, USER struct tls_segment *seg) THROWS(E_SEG
 	if unlikely(!DL_VERIFY_TLS_SEGMENT(seg))
 		goto err_badseg;
 #else /* !FAIL_ON_ERROR */
-	seg = (struct tls_segment *)RD_TLS_BASE_REGISTER();
+	RD_TLS_BASE_REGISTER(*(void **)&seg);
 #endif /* FAIL_ON_ERROR */
 	/* Simple case: Static TLS, and special case: Empty TLS */
 	if (self->dm_tlsstoff || unlikely(!self->dm_tlsmsize))

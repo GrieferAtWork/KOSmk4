@@ -1447,7 +1447,7 @@ do_read_bit_pieces:
 				goto do_make_top_const_or_register;
 			if (self->ue_tlsbase == (byte_t *)-1) {
 #ifdef __KERNEL__
-				self->ue_tlsbase = (byte_t *)RD_TLS_BASE_REGISTER();
+				RD_TLS_BASE_REGISTER(*(void **)&self->ue_tlsbase);
 #ifdef CONFIG_HAVE_DEBUGGER
 				if unlikely(dbg_active)
 					self->ue_tlsbase = (byte_t *)dbg_current;
@@ -1456,7 +1456,11 @@ do_read_bit_pieces:
 				{
 					/* Try to use the TLS-base of the associated module */
 					void *base = dltlsaddr(dlgethandle(pc));
-					self->ue_tlsbase = base ? (byte_t *)base : (byte_t *)RD_TLS_BASE_REGISTER();
+					if (base != NULL) {
+						self->ue_tlsbase = (byte_t *)base;
+					} else {
+						RD_TLS_BASE_REGISTER(*(void **)&self->ue_tlsbase);
+					}
 				}
 #endif /* !__KERNEL__ */
 			}

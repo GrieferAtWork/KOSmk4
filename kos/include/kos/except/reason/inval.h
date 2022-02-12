@@ -165,6 +165,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_IOPL_LEVEL = 0x0800, /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t level] The `level' argument passed to `iopl()' was negative, or greater than `3' */
 	E_INVALID_ARGUMENT_CONTEXT_IOPERM_RANGE,        /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t first_bad_port] At least one of the ports specified by the given range lies outside the valid port bounds */
 	E_INVALID_ARGUMENT_CONTEXT_IOPERM_TURNON,       /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t turn_on] The `turn_on' argument is neither `0' nor `1' */
+	E_INVALID_ARGUMENT_CONTEXT_ARCH_PRCTL_COMMAND,  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown `arch_prctl(2)' command */
 
 	/* System calls: misc... */
 	E_INVALID_ARGUMENT_CONTEXT_SYSLOG_LEVEL = 0x0c00, /* E_INVALID_ARGUMENT_BAD_VALUE: The `level' argument passed to `syslog()' wasn't recognized. */
@@ -438,6 +439,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_IOPL_LEVEL                       E_INVALID_ARGUMENT_CONTEXT_IOPL_LEVEL                       /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t level] The `level' argument passed to `iopl()' was negative, or greater than `3' */
 #define E_INVALID_ARGUMENT_CONTEXT_IOPERM_RANGE                     E_INVALID_ARGUMENT_CONTEXT_IOPERM_RANGE                     /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t first_bad_port] At least one of the ports specified by the given range lies outside the valid port bounds */
 #define E_INVALID_ARGUMENT_CONTEXT_IOPERM_TURNON                    E_INVALID_ARGUMENT_CONTEXT_IOPERM_TURNON                    /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t turn_on] The `turn_on' argument is neither `0' nor `1' */
+#define E_INVALID_ARGUMENT_CONTEXT_ARCH_PRCTL_COMMAND               E_INVALID_ARGUMENT_CONTEXT_ARCH_PRCTL_COMMAND               /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown `arch_prctl(2)' command */
 /* System calls: misc... */
 #define E_INVALID_ARGUMENT_CONTEXT_SYSLOG_LEVEL                     E_INVALID_ARGUMENT_CONTEXT_SYSLOG_LEVEL                     /* E_INVALID_ARGUMENT_BAD_VALUE: The `level' argument passed to `syslog()' wasn't recognized. */
 #define E_INVALID_ARGUMENT_CONTEXT_KSYSCTL_COMMAND                  E_INVALID_ARGUMENT_CONTEXT_KSYSCTL_COMMAND                  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `cmd' passed to `ksysctl()' wasn't recognized */
@@ -689,6 +691,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_IOPL_LEVEL                       2048 /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t level] The `level' argument passed to `iopl()' was negative, or greater than `3' */
 #define E_INVALID_ARGUMENT_CONTEXT_IOPERM_RANGE                     2049 /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t first_bad_port] At least one of the ports specified by the given range lies outside the valid port bounds */
 #define E_INVALID_ARGUMENT_CONTEXT_IOPERM_TURNON                    2050 /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t turn_on] The `turn_on' argument is neither `0' nor `1' */
+#define E_INVALID_ARGUMENT_CONTEXT_ARCH_PRCTL_COMMAND               2051 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown `arch_prctl(2)' command */
 /* System calls: misc... */
 #define E_INVALID_ARGUMENT_CONTEXT_SYSLOG_LEVEL                     3072 /* E_INVALID_ARGUMENT_BAD_VALUE: The `level' argument passed to `syslog()' wasn't recognized. */
 #define E_INVALID_ARGUMENT_CONTEXT_KSYSCTL_COMMAND                  3073 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `cmd' passed to `ksysctl()' wasn't recognized */

@@ -342,7 +342,7 @@ again:
 INTERN void CC DlModule_RunAllTlsFinalizers(void) THROWS(...) {
 	struct tls_segment *self;
 	struct dtls_extension *ext_free;
-	self = (struct tls_segment *)RD_TLS_BASE_REGISTER();
+	RD_TLS_BASE_REGISTER(*(void **)&self);
 	if unlikely(!self)
 		return;
 	tls_segment_ex_write(self);
@@ -626,7 +626,7 @@ NOTHROW(CC DlModule_TryGetTLSAddr)(DlModule *__restrict self) {
 	struct dtls_extension *extab;
 	if unlikely(!self->dm_tlsmsize)
 		return NULL; /* No TLS segment. */
-	tls = (struct tls_segment *)RD_TLS_BASE_REGISTER();
+	RD_TLS_BASE_REGISTER(*(void **)&tls);
 
 	/* Simple case: Static TLS */
 	if (self->dm_tlsstoff)
@@ -644,7 +644,7 @@ INTERN WUNUSED void *__DLFCN_DLTLSADDR_CC
 libdl_dltlsaddr(USER DlModule *self) THROWS(E_SEGFAULT, ...) {
 	void *result;
 	struct tls_segment *seg;
-	seg    = (struct tls_segment *)RD_TLS_BASE_REGISTER();
+	RD_TLS_BASE_REGISTER(*(void **)&seg);
 	result = libdl_dltlsaddr2(self, seg);
 	return result;
 }

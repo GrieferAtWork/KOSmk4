@@ -311,4 +311,6 @@ __DECL_END
 
 
 
+/* TODO: KOS-specific PR_* codes to explicitly map the kernel's version of libdl into memory. */
+
 #endif /* !_LINUX_PRCTL_H */

@@ -117,6 +117,7 @@ lstat64 = lstatx32_64;
 stat = statx32;
 stat64 = statx32_64;
 sysinfo = sysinfox32;
+arch_prctl = arch_prctlx32;
 
 getitimer = getitimerx32;
 getitimer64 = getitimerx32_64;

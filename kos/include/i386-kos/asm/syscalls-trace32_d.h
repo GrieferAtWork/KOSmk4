@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45725ae3 */
+/* HASH CRC-32:0xcda52724 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2472,7 +2472,7 @@
 #define __NR32ATR0_statx                        SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_statx                         SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_arch_prctl                   SC_REPR_UNSIGNED_INT                                                 /* command */ 
-#define __NR32ATR1_arch_prctl                   SC_REPR_SYSCALL_ULONG_T                                              /* addr */ 
+#define __NR32ATR1_arch_prctl                   SC_REPR_POINTER                                                      /* addr */ 
 #define __NR32RTR_arch_prctl                    SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NR32ATR0_io_pgetevents                SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_io_pgetevents                 SC_REPR_ERRNO_T                                                      /* return */

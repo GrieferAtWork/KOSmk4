@@ -2242,13 +2242,21 @@ prctl:(unsigned int command, syscall_ulong_t arg2, syscall_ulong_t arg3,
 
 @@>> arch_prctl(2)
 @@Arch-dependent system process control interface. (But don't go and
-@@think that the normal `prctl(2)' doesn't feature arch-dependent
-@@commands -- honestly, this syscall shouldn't exist if you ask me,
+@@think that the  normal `prctl(2)'  doesn't feature  arch-dependent
+@@commands  -- honestly, this syscall shouldn't exist if you ask me,
 @@but it does on linux, and so it must also on KOS...)
 @@@param: command: One of `ARCH_*' (from <asm/prctl.h>)
 @@@param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
 @@@return: * :  Return value depends on `command'
-arch_prctl:(unsigned int command, syscall_ulong_t addr) -> syscall_slong_t;
+%[startgroup]
+arch_prctl:(unsigned int command, uintptr_t *addr) -> syscall_slong_t;
+arch_prctlx32:(unsigned int command, uint32_t *addr) -> syscall_slong_t;
+arch_prctlx64:(unsigned int command, uint64_t *addr) -> syscall_slong_t;
+%[endgroup]
+/* NOTE: We declare `arch_prctl()' with `uintptr_t *addr' so that the
+ *       function isn't considered compatible with its compatibility-
+ *       mode variant. -- We want 2 separate implementations for  32-
+ *       bit, and 64- bit when compiling for x86_64! */
 
 
 

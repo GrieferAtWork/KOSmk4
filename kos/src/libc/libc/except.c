@@ -1010,7 +1010,7 @@ NOTHROW_NCX(LIBCCALL libc_Unwind_GetIPInfo)(struct _Unwind_Context const *__rest
 		/* nopf support */                                   \
 		void *pc = (void *)kcpustate_getpc(state);           \
 		if (libc_x86_nopf_check(pc)) {                       \
-			/* Don't do this for E_EXIT_THREAD and similar! */ \
+			/* XXX: Don't do this for E_EXIT_THREAD? */      \
 			kcpustate_setpc(state, libc_x86_nopf_retof(pc)); \
 			return state;                                    \
 		}                                                    \
@@ -1040,7 +1040,7 @@ x86_verify_tls(except_register_state_t *__restrict state,
 	                     : "a" (0)
 	                     : "cc");
 	if likely(!readerror) {
-		tlsbase = RD_TLS_BASE_REGISTER_S();
+		RD_TLS_BASE_REGISTER_S(tlsbase);
 		if likely(tlsbase == tlsptr0)
 			return;
 	}
@@ -1056,18 +1056,24 @@ x86_verify_tls(except_register_state_t *__restrict state,
  * architecture-specific checks/features, as  well as (if  supported)
  * to verify TLS and fail with `UNWIND_USER_BADTLS' on error. */
 #ifndef EXCEPT_HANDLER_ON_ENTRY
+#define EXCEPT_HANDLER_ON_ENTRY_IS_NOOP
 #define EXCEPT_HANDLER_ON_ENTRY(state, error) (void)0
 #endif /* !EXCEPT_HANDLER_ON_ENTRY */
 
 
+#ifdef EXCEPT_HANDLER_ON_ENTRY_IS_NOOP
 INTERN SECTION_EXCEPT_TEXT except_register_state_t *__EXCEPT_HANDLER_CC
 libc_except_handler3_impl(except_register_state_t *__restrict state,
-                          struct exception_data *__restrict error) {
+                          struct exception_data *__restrict error)
+#define libc_except_handler3_impl_without_on_entry libc_except_handler3_impl
+#else /* EXCEPT_HANDLER_ON_ENTRY_IS_NOOP */
+PRIVATE SECTION_EXCEPT_TEXT except_register_state_t *__EXCEPT_HANDLER_CC
+libc_except_handler3_impl_without_on_entry(except_register_state_t *__restrict state,
+                                           struct exception_data *__restrict error)
+#endif /* !EXCEPT_HANDLER_ON_ENTRY_IS_NOOP */
+{
 	struct exception_info *info;
 	uintptr_t recursion_flag;
-
-	/* If supported by the architecture, verify the TLS context. */
-	EXCEPT_HANDLER_ON_ENTRY(state, error);
 
 	/* Load TLS context */
 	info           = &current.pt_except;
@@ -1101,6 +1107,16 @@ libc_except_handler3_impl(except_register_state_t *__restrict state,
 	COMPILER_BARRIER();
 	return state;
 }
+
+#ifndef EXCEPT_HANDLER_ON_ENTRY_IS_NOOP
+INTERN SECTION_EXCEPT_TEXT except_register_state_t *__EXCEPT_HANDLER_CC
+libc_except_handler3_impl(except_register_state_t *__restrict state,
+                          struct exception_data *__restrict error) {
+	/* If supported by the architecture, verify the TLS context. */
+	EXCEPT_HANDLER_ON_ENTRY(state, error);
+	return libc_except_handler3_impl_without_on_entry(state, error);
+}
+#endif /* !EXCEPT_HANDLER_ON_ENTRY_IS_NOOP */
 
 INTERN SECTION_EXCEPT_TEXT except_register_state_t *__EXCEPT_HANDLER_CC
 libc_except_handler4_impl(except_register_state_t *__restrict state,
@@ -1230,7 +1246,7 @@ install_first_handler:
 	memcpy(state, &first_handler, sizeof(*state));
 	return state;
 handle_mode_3:
-	return libc_except_handler3_impl(state, error);
+	return libc_except_handler3_impl_without_on_entry(state, error);
 raise_signal:
 
 	/* Restore the old exception */

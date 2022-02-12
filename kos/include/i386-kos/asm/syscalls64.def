@@ -146,6 +146,7 @@ pidfd_send_signal = pidfd_send_signalx64;
 times = timesx64;
 socketcall = socketcallx64;
 sysinfo = sysinfox64;
+arch_prctl = arch_prctlx64;
 
 
 /* Syscall definition syntax

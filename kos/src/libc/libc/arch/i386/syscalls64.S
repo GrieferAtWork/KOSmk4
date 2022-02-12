@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c65e443 */
+/* HASH CRC-32:0x760dc4aa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1645,15 +1645,7 @@ INTERN_FUNCTION(libc_sys_prctl)
 END(libc_sys_prctl)
 DEFINE_PUBLIC_ALIAS(sys_prctl, libc_sys_prctl)
 
-/* >> arch_prctl(2)
- * Arch-dependent system process control interface. (But don't go and
- * think that the normal `prctl(2)' doesn't feature arch-dependent
- * commands -- honestly, this syscall shouldn't exist if you ask me,
- * but it does on linux, and so it must also on KOS...)
- * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
- * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
- * @return: * :  Return value depends on `command' */
-/* syscall_slong_t arch_prctl(unsigned int command, syscall_ulong_t addr) */
+/* syscall_slong_t arch_prctl(unsigned int command, uint64_t *addr) */
 INTERN_FUNCTION(libc_sys_arch_prctl)
 	movq   $(0x9e), %rax
 	syscall
@@ -6140,15 +6132,7 @@ INTERN_FUNCTION(libc_sys_Xprctl)
 END(libc_sys_Xprctl)
 DEFINE_PUBLIC_ALIAS(sys_Xprctl, libc_sys_Xprctl)
 
-/* >> arch_prctl(2)
- * Arch-dependent system process control interface. (But don't go and
- * think that the normal `prctl(2)' doesn't feature arch-dependent
- * commands -- honestly, this syscall shouldn't exist if you ask me,
- * but it does on linux, and so it must also on KOS...)
- * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
- * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
- * @return: * :  Return value depends on `command' */
-/* syscall_slong_t arch_prctl(unsigned int command, syscall_ulong_t addr) */
+/* syscall_slong_t arch_prctl(unsigned int command, uint64_t *addr) */
 INTERN_FUNCTION(libc_sys_Xarch_prctl)
 	movq   $(0x9e), %rax
 	std /* Enable exceptions */

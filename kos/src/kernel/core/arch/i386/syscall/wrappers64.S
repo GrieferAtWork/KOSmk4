@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x651a7573 */
+/* HASH CRC-32:0x2ce0bad9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5132,15 +5132,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_prctl)
 	.cfi_endproc
 END(__x86_asm64_syscall_prctl)
 
-/* >> arch_prctl(2)
- * Arch-dependent system process control interface. (But don't go and
- * think that the normal `prctl(2)' doesn't feature arch-dependent
- * commands -- honestly, this syscall shouldn't exist if you ask me,
- * but it does on linux, and so it must also on KOS...)
- * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
- * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
- * @return: * :  Return value depends on `command' */
-/* syscall_slong_t arch_prctl(unsigned int command, syscall_ulong_t addr) */
+/* syscall_slong_t arch_prctl(unsigned int command, uint64_t *addr) */
 .section .text.x86.asm64_syscall.arch_prctl
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_arch_prctl)
 	.cfi_startproc simple
@@ -22827,15 +22819,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_statx)
 	.cfi_endproc
 END(__x86_asm32_int80_statx)
 
-/* >> arch_prctl(2)
- * Arch-dependent system process control interface. (But don't go and
- * think that the normal `prctl(2)' doesn't feature arch-dependent
- * commands -- honestly, this syscall shouldn't exist if you ask me,
- * but it does on linux, and so it must also on KOS...)
- * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
- * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
- * @return: * :  Return value depends on `command' */
-/* syscall_slong_t arch_prctl(unsigned int command, syscall_ulong_t addr) */
+/* syscall_slong_t arch_prctl(unsigned int command, uint32_t *addr) */
 .section .text.x86.asm32_syscall_int80.arch_prctl
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_arch_prctl)
 	.cfi_startproc simple
@@ -29118,15 +29102,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_pkey_free, __x86_asm32_int80_pkey_
 /* errno_t statx(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_statx, __x86_asm32_int80_statx)
 
-/* >> arch_prctl(2)
- * Arch-dependent system process control interface. (But don't go and
- * think that the normal `prctl(2)' doesn't feature arch-dependent
- * commands -- honestly, this syscall shouldn't exist if you ask me,
- * but it does on linux, and so it must also on KOS...)
- * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
- * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
- * @return: * :  Return value depends on `command' */
-/* syscall_slong_t arch_prctl(unsigned int command, syscall_ulong_t addr) */
+/* syscall_slong_t arch_prctl(unsigned int command, uint32_t *addr) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_arch_prctl, __x86_asm32_int80_arch_prctl)
 
 /* errno_t io_pgetevents(int TODO_PROTOTYPE) */
@@ -35302,15 +35278,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_statx)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_statx)
 
-/* >> arch_prctl(2)
- * Arch-dependent system process control interface. (But don't go and
- * think that the normal `prctl(2)' doesn't feature arch-dependent
- * commands -- honestly, this syscall shouldn't exist if you ask me,
- * but it does on linux, and so it must also on KOS...)
- * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
- * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
- * @return: * :  Return value depends on `command' */
-/* syscall_slong_t arch_prctl(unsigned int command, syscall_ulong_t addr) */
+/* syscall_slong_t arch_prctl(unsigned int command, uint32_t *addr) */
 .section .text.x86.asm32_syscall_sysrun32.arch_prctl
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_arch_prctl)
 	.cfi_startproc

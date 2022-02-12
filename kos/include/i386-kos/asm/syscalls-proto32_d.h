@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a1ec387 */
+/* HASH CRC-32:0xa9402bf1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1877,7 +1877,7 @@
 #define __NR32AT0_pkey_free                    (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_statx                        (int, int)
 #define __NR32AT0_arch_prctl                   (unsigned int, unsigned int)
-#define __NR32AT1_arch_prctl                   (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT1_arch_prctl                   (uint32_t *, __uint32_t *)
 #define __NR32AT0_io_pgetevents                (int, int)
 #define __NR32AT0_rseq                         (int, int)
 #define __NR32AT0_semget                       (int, int)
@@ -2560,7 +2560,7 @@
 #define __NR32AM_pkey_alloc(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AM_pkey_free(a, b, c, d, e, f)                    (__syscall_ulong_t)a
 #define __NR32AM_statx(a, b, c, d, e, f)                        (int)a
-#define __NR32AM_arch_prctl(a, b, c, d, e, f)                   (unsigned int)a, (__syscall_ulong_t)b
+#define __NR32AM_arch_prctl(a, b, c, d, e, f)                   (unsigned int)a, (__uint32_t *)b
 #define __NR32AM_io_pgetevents(a, b, c, d, e, f)                (int)a
 #define __NR32AM_rseq(a, b, c, d, e, f)                         (int)a
 #define __NR32AM_semget(a, b, c, d, e, f)                       (int)a

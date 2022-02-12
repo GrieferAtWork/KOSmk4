@@ -29,7 +29,9 @@
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
-#include <asm/intrin.h>
+#if defined(__i386__) || defined(__x86_64__)
+#include <kos/bits/thread.h>
+#endif /* __i386__ || __x86_64__ */
 
 /* Thread Information Block (mainly for SEH) */
 
@@ -62,10 +64,10 @@ typedef NT_TIB *PNT_TIB;
 
 #ifdef __x86_64__
 #define _GetTibFieldEx(bwlq, offset) __rdgs##bwlq(offset)
-#define _SetTib(addr)                __wrgsbase(addr)
+#define _SetTib(addr)                __x86_fast_wrgsbase(addr)
 #elif defined(__i386__)
 #define _GetTibFieldEx(bwlq, offset) __rdfs##bwlq(offset)
-#define _SetTib(addr)                __wrfsbase(addr)
+#define _SetTib(addr)                __x86_fast_wrfsbase(addr)
 #endif /* ... */
 #define _GetTib()              ((NT_TIB *)_GetTibFieldEx(ptr, __builtin_offsetof(NT_TIB, Self)))
 #define _GetNativePeTlsArray() ((void **)_GetTibFieldEx(ptr, __builtin_offsetof(NT_TIB, NativePeTlsArray)))

@@ -189,11 +189,11 @@ EIDECLARE(, USER CHECKED void const *, , FCALL, validate_executable, (UNCHECKED 
  *       native-sized pointers mustn't use these validation macros, since obviously
  *       those pointers can't be considered compatibility-mode.
  */
-#define __compat_assert_user(base, num_bytes)                      (__hybrid_assert(ADDR_ISUSER(base)), (base))
+#define __compat_assert_user(base, num_bytes)                      (__hybrid_assert(__ADDR_ISUSER(base)), (base))
 #define __compat_assert_user_opt                                   __compat_assert_user
-#define __compat_assert_userm(base, num_items, item_size_in_bytes) (__hybrid_assert(ADDR_ISUSER(base)), (base))
+#define __compat_assert_userm(base, num_items, item_size_in_bytes) (__hybrid_assert(__ADDR_ISUSER(base)), (base))
 #define __compat_assert_userm_opt                                  __compat_assert_userm
-#define __compat_assert_useraddr(addr)                             (__hybrid_assert(ADDR_ISUSER(addr)), (base))
+#define __compat_assert_useraddr(addr)                             (__hybrid_assert(__ADDR_ISUSER(addr)), (base))
 #define __compat_assert_useraddr_opt                               __compat_assert_useraddr
 
 #define compat_validate_user(base, num_bytes)                               __compat_assert_user(base, num_bytes)

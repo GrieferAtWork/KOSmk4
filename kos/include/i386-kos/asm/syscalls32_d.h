@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x693d7e81 */
+/* HASH CRC-32:0x519715bf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -988,15 +988,7 @@
 #define __NR32_pkey_alloc                   0x17d                  /* syscall_slong_t pkey_alloc(syscall_ulong_t flags, syscall_ulong_t access_rights) */
 #define __NR32_pkey_free                    0x17e                  /* errno_t pkey_free(syscall_ulong_t key) */
 #define __NR32_statx                        0x17f                  /* errno_t statx(int TODO_PROTOTYPE) */
-/* >> arch_prctl(2)
- * Arch-dependent system process control interface. (But don't go and
- * think that the normal `prctl(2)' doesn't feature arch-dependent
- * commands -- honestly, this syscall shouldn't exist if you ask me,
- * but it does on linux, and so it must also on KOS...)
- * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
- * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
- * @return: * :  Return value depends on `command' */
-#define __NR32_arch_prctl                   0x180                  /* syscall_slong_t arch_prctl(unsigned int command, syscall_ulong_t addr) */
+#define __NR32_arch_prctl                   0x180                  /* syscall_slong_t arch_prctl(unsigned int command, uint32_t *addr) */
 #define __NR32_io_pgetevents                0x181                  /* errno_t io_pgetevents(int TODO_PROTOTYPE) */
 #define __NR32_rseq                         0x182                  /* errno_t rseq(int TODO_PROTOTYPE) */
 #define __NR32_semget                       0x189                  /* errno_t semget(int TODO_PROTOTYPE) */
