@@ -382,9 +382,12 @@ NOTHROW(KCALL simple_insert_and_activate)(struct mnode *__restrict node,
 DATDEF VIRT byte_t volatile *x86_lapicbase_ ASMNAME("x86_lapicbase");
 
 PRIVATE NOBLOCK ATTR_FREETEXT void
-NOTHROW(FCALL pagedir_unmap_and_sync_one)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
+NOTHROW(FCALL pagedir_prepare_and_unmap_and_sync_one)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
+	if (!pagedir_kernelprepareone(addr))
+		kernel_panic(FREESTR("Failed to prepare page at %p"), addr);
 	pagedir_unmapone(addr);
 	pagedir_syncone(addr);
+	/* NOTE: Intentionally kept prepared! */
 }
 
 INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
@@ -508,9 +511,9 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 	 * physical memory identity mapping containing  the kernel core image,  or
 	 * may have also not been mapped at all (in which case this is a no-op)
 	 * s.a.: the comment inside of `copyfromphys_noidentity_partial()' in `boot/acpi.c' */
-	pagedir_unmap_and_sync_one(FORTASK(&boottask, this_trampoline));
-	pagedir_unmap_and_sync_one(FORTASK(&bootidle, this_trampoline));
-	pagedir_unmap_and_sync_one(FORTASK(&asyncwork, this_trampoline));
+	pagedir_prepare_and_unmap_and_sync_one(FORTASK(&boottask, this_trampoline));
+	pagedir_prepare_and_unmap_and_sync_one(FORTASK(&bootidle, this_trampoline));
+	pagedir_prepare_and_unmap_and_sync_one(FORTASK(&asyncwork, this_trampoline));
 	/* All right! that's our entire kernel MMan all cleaned up! */
 }
 
