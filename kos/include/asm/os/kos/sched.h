@@ -116,29 +116,29 @@ __ATTR_ALIGNED(8)
 #endif /* __ALIGNOF_INT64__ < 8 */
 struct clone_args {
 #if defined(__USE_KOS_ALTERATIONS) && defined(__COMPILER_HAVE_TRANSPARENT_UNION)
-	union { __uint64_t ca_flags; /*       */ __uint64_t __ca_al_flags; /*       */ }; /* Set of `CLONE_*' */
-	union { __fd_t    *ca_pidfd; /*       */ __uint64_t __ca_al_pidfd; /*       */ }; /* [valid_if(CLONE_PIDFD)][type(fd_t *)] Where to store pidfd */
-	union { __pid_t   *ca_child_tid; /*   */ __uint64_t __ca_al_child_tid; /*   */ }; /* [valid_if(CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID)][type(pid_t *)] Store child TID here in child memory */
-	union { __pid_t   *ca_parent_tid; /*  */ __uint64_t __ca_al_parent_tid; /*  */ }; /* [valid_if(CLONE_PARENT_SETTID)][type(pid_t *)] Store child TID here in parent memory */
-	union { __signo_t  ca_exit_signal; /* */ __uint64_t __ca_al_exit_signal; /* */ }; /* [type(signo_t)] Signal to send to parent on child exit */
-	union { void      *ca_stack; /*       */ __uint64_t __ca_al_stack; /*       */ }; /* [valid_if(ca_stack_size != 0), type(void *)] Child stack base address */
-	union { __size_t   ca_stack_size; /*  */ __uint64_t __ca_al_stack_size; /*  */ }; /* [if(CLONE_VM, [!= 0])] Child stack size (must be non-zero unless `CLONE_VM' is given) */
-	union { void      *ca_tls; /*         */ __uint64_t __ca_al_tls; /*         */ }; /* [valid_if(CLONE_SETTLS)] Child TLS address */
-	union { __pid_t   *ca_set_tid; /*     */ __uint64_t __ca_al_set_tid; /*     */ }; /* [valid_if(ca_set_tid_size != 0)][type(pid_t *)] set-tid array base */
-	union { __size_t   ca_set_tid_size; /**/ __uint64_t __ca_al_set_tid_size; /**/ }; /* [type(size_t)] set-tid array length */
-	union { __fd_t     ca_cgroup; /*      */ __uint64_t __ca_al_cgroup; /*      */ }; /* [valid_if(CLONE_INTO_CGROUP)][type(fd_t)] cgroup file descriptor */
+	union { __uint64_t     ca_flags; /*       */ __uint64_t __ca_al_flags; /*       */ }; /* Set of `CLONE_*' */
+	union { __fd_t        *ca_pidfd; /*       */ __uint64_t __ca_al_pidfd; /*       */ }; /* [valid_if(CLONE_PIDFD)][type(fd_t *)] Where to store pidfd */
+	union { __pid_t       *ca_child_tid; /*   */ __uint64_t __ca_al_child_tid; /*   */ }; /* [valid_if(CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID)][type(pid_t *)] Store child TID here in child memory */
+	union { __pid_t       *ca_parent_tid; /*  */ __uint64_t __ca_al_parent_tid; /*  */ }; /* [valid_if(CLONE_PARENT_SETTID)][type(pid_t *)] Store child TID here in parent memory */
+	union { __signo_t      ca_exit_signal; /* */ __uint64_t __ca_al_exit_signal; /* */ }; /* [type(signo_t)] Signal to send to parent on child exit */
+	union { void          *ca_stack; /*       */ __uint64_t __ca_al_stack; /*       */ }; /* [valid_if(ca_stack_size != 0), type(void *)] Child stack base address */
+	union { __size_t       ca_stack_size; /*  */ __uint64_t __ca_al_stack_size; /*  */ }; /* [if(CLONE_VM, [!= 0])] Child stack size (must be non-zero unless `CLONE_VM' is given) */
+	union { void          *ca_tls; /*         */ __uint64_t __ca_al_tls; /*         */ }; /* [valid_if(CLONE_SETTLS)] Child TLS address */
+	union { __pid_t const *ca_set_tid; /*     */ __uint64_t __ca_al_set_tid; /*     */ }; /* [valid_if(ca_set_tid_size != 0)][type(pid_t const *)] set-tid array base */
+	union { __size_t       ca_set_tid_size; /**/ __uint64_t __ca_al_set_tid_size; /**/ }; /* [type(size_t)] set-tid array length */
+	union { __fd_t         ca_cgroup; /*      */ __uint64_t __ca_al_cgroup; /*      */ }; /* [valid_if(CLONE_INTO_CGROUP)][type(fd_t)] cgroup file descriptor */
 #elif defined(__USE_KOS) && defined(__COMPILER_HAVE_TRANSPARENT_UNION)
-	union { __uint64_t ca_flags; /*       */ __uint64_t flags; /*       */ }; /* Set of `CLONE_*' */
-	union { __fd_t    *ca_pidfd; /*       */ __uint64_t pidfd; /*       */ }; /* [valid_if(CLONE_PIDFD)][type(fd_t *)] Where to store pidfd */
-	union { __pid_t   *ca_child_tid; /*   */ __uint64_t child_tid; /*   */ }; /* [valid_if(CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID)][type(pid_t *)] Store child TID here in child memory */
-	union { __pid_t   *ca_parent_tid; /*  */ __uint64_t parent_tid; /*  */ }; /* [valid_if(CLONE_PARENT_SETTID)][type(pid_t *)] Store child TID here in parent memory */
-	union { __signo_t  ca_exit_signal; /* */ __uint64_t exit_signal; /* */ }; /* [type(signo_t)] Signal to send to parent on child exit */
-	union { void      *ca_stack; /*       */ __uint64_t stack; /*       */ }; /* [valid_if(ca_stack_size != 0), type(void *)] Child stack base address */
-	union { __size_t   ca_stack_size; /*  */ __uint64_t stack_size; /*  */ }; /* [if(CLONE_VM, [!= 0])] Child stack size (must be non-zero unless `CLONE_VM' is given) */
-	union { void      *ca_tls; /*         */ __uint64_t tls; /*         */ }; /* [valid_if(CLONE_SETTLS)] Child TLS address */
-	union { __pid_t   *ca_set_tid; /*     */ __uint64_t set_tid; /*     */ }; /* [valid_if(ca_set_tid_size != 0)][type(pid_t *)] set-tid array base */
-	union { __size_t   ca_set_tid_size; /**/ __uint64_t set_tid_size; /**/ }; /* [type(size_t)] set-tid array length */
-	union { __fd_t     ca_cgroup; /*      */ __uint64_t cgroup; /*      */ }; /* [valid_if(CLONE_INTO_CGROUP)][type(fd_t)] cgroup file descriptor */
+	union { __uint64_t     ca_flags; /*       */ __uint64_t flags; /*       */ }; /* Set of `CLONE_*' */
+	union { __fd_t        *ca_pidfd; /*       */ __uint64_t pidfd; /*       */ }; /* [valid_if(CLONE_PIDFD)][type(fd_t *)] Where to store pidfd */
+	union { __pid_t       *ca_child_tid; /*   */ __uint64_t child_tid; /*   */ }; /* [valid_if(CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID)][type(pid_t *)] Store child TID here in child memory */
+	union { __pid_t       *ca_parent_tid; /*  */ __uint64_t parent_tid; /*  */ }; /* [valid_if(CLONE_PARENT_SETTID)][type(pid_t *)] Store child TID here in parent memory */
+	union { __signo_t      ca_exit_signal; /* */ __uint64_t exit_signal; /* */ }; /* [type(signo_t)] Signal to send to parent on child exit */
+	union { void          *ca_stack; /*       */ __uint64_t stack; /*       */ }; /* [valid_if(ca_stack_size != 0), type(void *)] Child stack base address */
+	union { __size_t       ca_stack_size; /*  */ __uint64_t stack_size; /*  */ }; /* [if(CLONE_VM, [!= 0])] Child stack size (must be non-zero unless `CLONE_VM' is given) */
+	union { void          *ca_tls; /*         */ __uint64_t tls; /*         */ }; /* [valid_if(CLONE_SETTLS)] Child TLS address */
+	union { __pid_t const *ca_set_tid; /*     */ __uint64_t set_tid; /*     */ }; /* [valid_if(ca_set_tid_size != 0)][type(pid_t const *)] set-tid array base */
+	union { __size_t       ca_set_tid_size; /**/ __uint64_t set_tid_size; /**/ }; /* [type(size_t)] set-tid array length */
+	union { __fd_t         ca_cgroup; /*      */ __uint64_t cgroup; /*      */ }; /* [valid_if(CLONE_INTO_CGROUP)][type(fd_t)] cgroup file descriptor */
 #else /* ... */
 	__uint64_t flags;        /* Set of `CLONE_*' */
 	__uint64_t pidfd;        /* [valid_if(CLONE_PIDFD)][type(fd_t *)] Where to store pidfd */
@@ -148,7 +148,7 @@ struct clone_args {
 	__uint64_t stack;        /* [valid_if(ca_stack_size != 0), type(void *)] Child stack base address */
 	__uint64_t stack_size;   /* [if(CLONE_VM, [!= 0])] Child stack size (must be non-zero unless `CLONE_VM' is given) */
 	__uint64_t tls;          /* [valid_if(CLONE_SETTLS)] Child TLS address */
-	__uint64_t set_tid;      /* [valid_if(ca_set_tid_size != 0)][type(pid_t *)] set-tid array base */
+	__uint64_t set_tid;      /* [valid_if(ca_set_tid_size != 0)][type(pid_t const *)] set-tid array base */
 	__uint64_t set_tid_size; /* [type(size_t)] set-tid array length */
 	__uint64_t cgroup;       /* [valid_if(CLONE_INTO_CGROUP)][type(fd_t)] cgroup file descriptor */
 #ifdef __USE_KOS

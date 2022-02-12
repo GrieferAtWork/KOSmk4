@@ -127,7 +127,7 @@ struct task_clone_args {
 	USER UNCHECKED pid_t       *tca_parent_tid;  /* [valid_if(CLONE_PARENT_SETTID)] Store child TID here in parent memory */
 	signo_t                     tca_exit_signal; /* [type(signo_t)] Signal to send to parent on child exit */
 	USER UNCHECKED void        *tca_stack;       /* Child stack starting address */
-	USER UNCHECKED pid_t       *tca_set_tid;     /* [0..tca_set_tid] set-tid array base */
+	USER UNCHECKED pid_t const *tca_set_tid;     /* [0..tca_set_tid] set-tid array base */
 	size_t                      tca_set_tid_siz; /* set-tid array length */
 	fd_t                        tca_cgroup;      /* [valid_if(CLONE_INTO_CGROUP)] cgroup file descriptor */
 #ifdef ARCH_HAVE_ARCH_TASK_CLONE_ARGS

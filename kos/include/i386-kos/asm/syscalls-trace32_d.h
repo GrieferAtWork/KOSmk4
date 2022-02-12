@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc065e8ff */
+/* HASH CRC-32:0xc7abeca5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2627,7 +2627,7 @@
 #define __NR32ATR0_pidfd_open                   SC_REPR_PID_T                                                        /* pid */ 
 #define __NR32ATR1_pidfd_open                   SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
 #define __NR32RTR_pidfd_open                    SC_REPR_FD_T                                                         /* return */
-#define __NR32ATR0_clone3                       SC_REPR_CLONE_ARGS                                                   /* cl_args */ 
+#define __NR32ATR0_clone3                       SC_REPR_STRUCT_CLONE_ARGS                                            /* cl_args */ 
 #define __NR32ATL0_clone3                       1                                                                    /* cl_args -> size */ 
 #define __NR32ATR1_clone3                       SC_REPR_SIZE_T                                                       /* size */ 
 #define __NR32RTR_clone3                        SC_REPR_SYSCALL_SLONG_T                                              /* return */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x862e412d */
+/* HASH CRC-32:0xc05d8d08 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2160,7 +2160,7 @@
 #define __NRATR0_pidfd_open               SC_REPR_PID_T                                                        /* pid */ 
 #define __NRATR1_pidfd_open               SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
 #define __NRRTR_pidfd_open                SC_REPR_FD_T                                                         /* return */
-#define __NRATR0_clone3                   SC_REPR_CLONE_ARGS                                                   /* cl_args */ 
+#define __NRATR0_clone3                   SC_REPR_STRUCT_CLONE_ARGS                                            /* cl_args */ 
 #define __NRATL0_clone3                   1                                                                    /* cl_args -> size */ 
 #define __NRATR1_clone3                   SC_REPR_SIZE_T                                                       /* size */ 
 #define __NRRTR_clone3                    SC_REPR_SYSCALL_SLONG_T                                              /* return */

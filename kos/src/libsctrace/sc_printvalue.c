@@ -75,6 +75,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <fcntl.h>
 #include <format-printer.h>
 #include <inttypes.h>
+#include <sched.h>
 #include <signal.h>
 #include <stddef.h>
 #include <string.h>
@@ -494,6 +495,22 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_prctl_command
 #endif /* HAVE_SC_REPR_PRCTL_COMMAND */
 
+#ifdef HAVE_SC_REPR_STRUCT_CLONE_ARGS
+#define NEED_print_clone_args
+#endif /* HAVE_SC_REPR_STRUCT_CLONE_ARGS */
+
+#ifdef HAVE_SC_REPR_CLONE_FLAGS
+#define NEED_print_clone_flags
+#endif /* HAVE_SC_REPR_CLONE_FLAGS */
+
+#ifdef HAVE_SC_REPR_CLONE_FLAGS_SETNS
+#define NEED_print_clone_flags
+#endif /* HAVE_SC_REPR_CLONE_FLAGS_SETNS */
+
+#ifdef HAVE_SC_REPR_CLONE_FLAGS_UNSHARE
+#define NEED_print_clone_flags
+#endif /* HAVE_SC_REPR_CLONE_FLAGS_UNSHARE */
+
 
 
 
@@ -609,6 +626,23 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_socket_type_flags
 #endif /* NEED_print_socket_type */
 
+#ifdef NEED_print_clone_args
+#define NEED_print_clone_flags_ex
+#define NEED_print_signo_t
+#define NEED_print_fd_t
+#endif /* NEED_print_clone_args */
+
+#ifdef NEED_print_clone_flags_ex
+#define NEED_print_clone_flags
+#endif /* NEED_print_clone_flags_ex */
+
+#ifdef NEED_print_clone_flags
+#ifdef NEED_print_clone_args
+#define NEED_print_flagset64
+#endif /* NEED_print_clone_args */
+#define NEED_print_signo_t
+#endif /* NEED_print_clone_flags */
+
 
 
 
@@ -688,12 +722,17 @@ DECL_BEGIN
 #define PIPESTR_S SYNSPACE "|" SYNSPACE
 #define PIPESTR   PIPESTR_S
 
+#define NULLSTR_S "NULL"
+#define NULLSTR   NULLSTR_S
 
 /* Ensure that `PIPESTR' doesn't get allocated multiple times. */
 PRIVATE ATTR_UNUSED char const PIPESTR_[] = PIPESTR;
-PRIVATE /*ATTR_UNUSED*/ char const NULLSTR[]  = "NULL";
 #undef PIPESTR
 #define PIPESTR PIPESTR_
+
+PRIVATE /*ATTR_UNUSED*/ char const NULLSTR_[] = NULLSTR;
+#undef NULLSTR
+#define NULLSTR NULLSTR_
 
 
 
@@ -787,6 +826,41 @@ err:
 	return temp;
 }
 #endif /* NEED_print_flagset32 */
+
+
+
+
+#ifdef NEED_print_flagset64
+PRIVATE ssize_t CC
+print_flagset64(pformatprinter printer, void *arg,
+                void const *flags_db, size_t stride,
+                char const *flag_prefix, uint64_t flags) {
+	ssize_t temp, result = 0;
+	bool is_first = true;
+	unsigned int i;
+	for (i = 0;; ++i) {
+		uint64_t const *pflag;
+		uint64_t flag;
+		pflag = (uint64_t const *)((byte_t const *)flags_db + i * stride);
+		if ((flag = *pflag) == 0)
+			break;
+		if (!(flags & flag))
+			continue;
+		PRINTF("%s%s%s",
+		       is_first ? "" : PIPESTR,
+		       flag_prefix, (char const *)(pflag + 1));
+		flags &= ~flag;
+		is_first = false;
+	}
+	if (flags || is_first) {
+		/* Print unknown flags. */
+		PRINTF("%s%#" PRIx64, is_first ? "" : PIPESTR, flags);
+	}
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_flagset64 */
 
 
 
@@ -3939,6 +4013,180 @@ print_prctl_command(pformatprinter printer, void *arg,
 
 
 
+#if defined(NEED_print_clone_flags) || defined(__DEEMON__)
+PRIVATE struct {
+#ifdef NEED_print_clone_flags_ex
+	uint64_t   pn_flag;
+#else /* NEED_print_clone_flags_ex */
+	uint32_t   pn_flag;
+#endif /* !NEED_print_clone_flags_ex */
+	char const pn_name[16];
+} const clone_flags[] = {
+	{ CLONE_VM,             "VM" },
+	{ CLONE_FS,             "FS" },
+	{ CLONE_FILES,          "FILES" },
+	{ CLONE_SIGHAND,        "SIGHAND" },
+	{ CLONE_PIDFD,          "PIDFD" },
+	{ CLONE_PTRACE,         "PTRACE" },
+	{ CLONE_VFORK,          "VFORK" },
+	{ CLONE_PARENT,         "PARENT" },
+	{ CLONE_THREAD,         "THREAD" },
+	{ CLONE_NEWNS,          "NEWNS" },
+	{ CLONE_SYSVSEM,        "SYSVSEM" },
+	{ CLONE_SETTLS,         "SETTLS" },
+	{ CLONE_PARENT_SETTID,  "PARENT_SETTID" },
+	{ CLONE_CHILD_CLEARTID, "CHILD_CLEARTID" },
+	{ CLONE_DETACHED,       "DETACHED" },
+	{ CLONE_UNTRACED,       "UNTRACED" },
+	{ CLONE_CHILD_SETTID,   "CHILD_SETTID" },
+	{ CLONE_NEWCGROUP,      "NEWCGROUP" },
+	{ CLONE_NEWUTS,         "NEWUTS" },
+	{ CLONE_NEWIPC,         "NEWIPC" },
+	{ CLONE_NEWUSER,        "NEWUSER" },
+	{ CLONE_NEWPID,         "NEWPID" },
+	{ CLONE_NEWNET,         "NEWNET" },
+	{ CLONE_IO,             "IO" },
+	/* 64-bit flags: */
+#ifdef NEED_print_clone_flags_ex
+	{ CLONE_CLEAR_SIGHAND,  "CLEAR_SIGHAND" },
+	{ CLONE_INTO_CGROUP,    "INTO_CGROUP" },
+	{ CLONE_NEWTIME,        "NEWTIME" },
+	{ CLONE_CRED,           "CRED" },
+#endif /* NEED_print_clone_flags_ex */
+	{ 0, "" }
+};
+
+#ifdef NEED_print_clone_flags_ex
+PRIVATE ssize_t CC
+print_clone_flags_ex(pformatprinter printer, void *arg,
+                     uint64_t flags, uint64_t valid_flags,
+                     bool allow_csignal)
+#define print_clone_flags(printer, arg, flags, valid_flags) \
+	print_clone_flags_ex(printer, arg, (uint64_t)(flags), (uint64_t)(uint32_t)(valid_flags), true)
+#else /* NEED_print_clone_flags_ex */
+PRIVATE ssize_t CC
+print_clone_flags(pformatprinter printer, void *arg,
+                  uint32_t flags, uint32_t valid_flags)
+#endif /* !NEED_print_clone_flags_ex */
+{
+	ssize_t temp, result = 0;
+	uint64_t invalid_flags;
+	invalid_flags = flags & ~valid_flags;
+	flags         = flags & valid_flags;
+#ifdef NEED_print_clone_flags_ex
+	if ((flags & CSIGNAL) != 0 && allow_csignal)
+#else /* NEED_print_clone_flags_ex */
+	if ((flags & CSIGNAL) != 0)
+#endif /* !NEED_print_clone_flags_ex */
+	{
+		result = print_signo_t(printer, arg, flags & CSIGNAL);
+		if unlikely(result < 0)
+			return result;
+		flags &= ~CSIGNAL;
+	}
+#ifdef NEED_print_clone_flags_ex
+	temp = print_flagset64(printer, arg, clone_flags,
+	                       sizeof(*clone_flags),
+	                       "CLONE_", flags);
+#else /* NEED_print_clone_flags_ex */
+	temp = print_flagset32(printer, arg, clone_flags,
+	                       sizeof(*clone_flags),
+	                       "CLONE_", flags);
+#endif /* !NEED_print_clone_flags_ex */
+	if unlikely(temp < 0)
+		goto err;
+	result += temp;
+	if (invalid_flags) {
+		temp = format_printf(printer, arg,
+		                     PIPESTR_S "%" PRIu64,
+		                     invalid_flags);
+		if unlikely(temp < 0)
+			goto err;
+		result += temp;
+	}
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_clone_flags */
+
+
+
+
+
+#if defined(NEED_print_clone_args) || defined(__DEEMON__)
+PRIVATE ssize_t CC
+print_clone_args(pformatprinter printer, void *arg,
+                 USER UNCHECKED struct clone_args const *_user_cargs,
+                 size_t sizeof_args) {
+	ssize_t temp, result;
+	struct clone_args cargs;
+	validate_readable(_user_cargs, sizeof_args);
+	if (sizeof_args > sizeof(struct clone_args))
+		sizeof_args = sizeof(struct clone_args);
+	bzero(mempcpy(&cargs, _user_cargs, sizeof_args),
+	      sizeof(struct clone_args) - sizeof_args);
+	result = DOPRINT("{" SYNSPACE SYNFIELD("flags"));
+	if unlikely(result < 0)
+		goto done;
+	DO(print_clone_flags_ex(printer, arg, cargs.ca_flags, (uint64_t)-1, false));
+	if (cargs.ca_flags & CLONE_PIDFD)
+		PRINTF("," SYNSPACE SYNFIELD("pidfd") "%#" PRIxPTR, cargs.ca_pidfd);
+	if (cargs.ca_flags & (CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID))
+		PRINTF("," SYNSPACE SYNFIELD("child_tid") "%#" PRIxPTR, cargs.ca_child_tid);
+	if (cargs.ca_flags & CLONE_PARENT_SETTID)
+		PRINTF("," SYNSPACE SYNFIELD("parent_tid") "%#" PRIxPTR, cargs.ca_parent_tid);
+	PRINT("," SYNSPACE SYNFIELD("exit_signal"));
+	DO(print_signo_t(printer, arg, cargs.ca_exit_signal));
+	if ((cargs.ca_flags & CLONE_VM) || cargs.ca_stack_size) {
+		PRINTF("," SYNSPACE SYNFIELD("stack") "%#" PRIxPTR
+		       "," SYNSPACE SYNFIELD("stack_size") "%#" PRIxSIZ,
+		       cargs.ca_stack, cargs.ca_stack_size);
+	}
+	if (cargs.ca_flags & CLONE_SETTLS)
+		PRINTF("," SYNSPACE SYNFIELD("tls") "%#" PRIxPTR, cargs.ca_tls);
+	if (sizeof_args >= offsetafter(struct clone_args, ca_set_tid_size)) {
+		if (cargs.ca_set_tid_size != 0) {
+			size_t i, count;
+			USER UNCHECKED pid_t const *pid_array = (USER UNCHECKED pid_t const *)cargs.ca_set_tid;
+			validate_readablem(pid_array, cargs.ca_set_tid_size, sizeof(size_t));
+			count = cargs.ca_set_tid_size;
+			if (count > LIMIT_STRINGVECTOR)
+				count = LIMIT_STRINGVECTOR;
+			PRINT("," SYNSPACE SYNFIELD("set_tid") "[");
+			for (i = 0; i < count; ++i) {
+				if (i != 0)
+					PRINT("," SYNSPACE);
+				PRINTF("%" PRIdN(__SIZEOF_PID_T__), pid_array[i]);
+			}
+			if (cargs.ca_set_tid_size > LIMIT_STRINGVECTOR)
+				PRINT(",...");
+			PRINT("]");
+		} else if (cargs.ca_set_tid == NULL) {
+			PRINT("," SYNSPACE SYNFIELD("set_tid") NULLSTR_S);
+		} else {
+			PRINTF("," SYNSPACE SYNFIELD("set_tid") "%#" PRIxPTR, cargs.ca_set_tid);
+		}
+		PRINTF("," SYNSPACE SYNFIELD("set_tid_size") "%#" PRIxSIZ, cargs.ca_set_tid_size);
+	}
+	if (sizeof_args >= offsetafter(struct clone_args, ca_cgroup)) {
+		if (cargs.ca_flags & CLONE_INTO_CGROUP) {
+			PRINT("," SYNSPACE SYNFIELD("cgroup"));
+			DO(print_fd_t(printer, arg, cargs.ca_cgroup));
+		}
+	}
+	PRINT(SYNSPACE "}");
+done:
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_clone_args */
+
+
+
+
+
 
 
 
@@ -3999,10 +4247,6 @@ for (local c: knownCases.sorted()) {
 }
 ]]]*/
 	// TODO: #define HAVE_SC_REPR_ACCESS_TYPE
-	// TODO: #define HAVE_SC_REPR_CLONE_ARGS
-	// TODO: #define HAVE_SC_REPR_CLONE_FLAGS
-	// TODO: #define HAVE_SC_REPR_CLONE_FLAGS_SETNS
-	// TODO: #define HAVE_SC_REPR_CLONE_FLAGS_UNSHARE
 	// TODO: #define HAVE_SC_REPR_CPUSET
 	// TODO: #define HAVE_SC_REPR_EVENTFD2_FLAGS
 	// TODO: #define HAVE_SC_REPR_EXCEPTION_HANDLER_MODE
@@ -4109,6 +4353,40 @@ for (local c: knownCases.sorted()) {
 	// TODO: #define HAVE_SC_REPR_WAITID_OPTIONS
 	// TODO: #define HAVE_SC_REPR_XATTR_FLAGS
 /*[[[end]]]*/
+
+#ifdef HAVE_SC_REPR_STRUCT_CLONE_ARGS
+	case SC_REPR_STRUCT_CLONE_ARGS:
+		result = print_clone_args(printer, arg,
+		                          (USER UNCHECKED struct clone_args const *)(uintptr_t)value.sv_u64,
+		                          link ? (size_t)link->sa_value.sv_u64 : sizeof(struct clone_args));
+		break;
+#endif /* HAVE_SC_REPR_STRUCT_CLONE_ARGS */
+
+#ifdef HAVE_SC_REPR_CLONE_FLAGS
+	case SC_REPR_CLONE_FLAGS:
+		result = print_clone_flags(printer, arg, (syscall_ulong_t)value.sv_u64,
+		                           UINT32_C(0xffffffff));
+		break;
+#endif /* HAVE_SC_REPR_CLONE_FLAGS */
+
+#ifdef HAVE_SC_REPR_CLONE_FLAGS_SETNS
+	case SC_REPR_CLONE_FLAGS_SETNS:
+		result = print_clone_flags(printer, arg, (syscall_ulong_t)value.sv_u64,
+		                           CLONE_NEWCGROUP | CLONE_NEWIPC | CLONE_NEWNET |
+		                           CLONE_NEWNS | CLONE_NEWPID | CLONE_NEWTIME |
+		                           CLONE_NEWUSER | CLONE_NEWUTS);
+		break;
+#endif /* HAVE_SC_REPR_CLONE_FLAGS_SETNS */
+
+#ifdef HAVE_SC_REPR_CLONE_FLAGS_UNSHARE
+	case SC_REPR_CLONE_FLAGS_UNSHARE:
+		result = print_clone_flags(printer, arg, (syscall_ulong_t)value.sv_u64,
+		                           CLONE_FILES | CLONE_FS | CLONE_NEWCGROUP | CLONE_NEWIPC |
+		                           CLONE_NEWNET | CLONE_NEWNS | CLONE_NEWPID | CLONE_NEWTIME |
+		                           CLONE_NEWUSER | CLONE_NEWUTS | CLONE_SYSVSEM | CLONE_THREAD |
+		                           CLONE_SIGHAND | CLONE_VM);
+		break;
+#endif /* HAVE_SC_REPR_CLONE_FLAGS_UNSHARE */
 
 #ifdef HAVE_SC_REPR_PRCTL_COMMAND
 	case SC_REPR_PRCTL_COMMAND:

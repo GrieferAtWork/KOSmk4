@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8e1d6da */
+/* HASH CRC-32:0xa4d2732b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -208,6 +208,9 @@ __SYSDECL_BEGIN
 #if !defined(CLONE_CHILD_SETTID) && defined(__CLONE_CHILD_SETTID)
 #define CLONE_CHILD_SETTID   __CLONE_CHILD_SETTID   /* Store TID in userlevel buffer in the child. */
 #endif /* !CLONE_CHILD_SETTID && __CLONE_CHILD_SETTID */
+#if !defined(CLONE_NEWCGROUP) && defined(__CLONE_NEWCGROUP)
+#define CLONE_NEWCGROUP      __CLONE_NEWCGROUP      /* New cgroup namespace */
+#endif /* !CLONE_NEWCGROUP && __CLONE_NEWCGROUP */
 #if !defined(CLONE_NEWUTS) && defined(__CLONE_NEWUTS)
 #define CLONE_NEWUTS         __CLONE_NEWUTS         /* New utsname group. */
 #endif /* !CLONE_NEWUTS && __CLONE_NEWUTS */
