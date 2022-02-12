@@ -114,6 +114,7 @@ print(tempfp.string),;
 #define __exception_index_error_data32         exception_index_error_data
 #define __exception_insufficient_rights_data32 exception_insufficient_rights_data
 #define __exception_invalid_argument_data32    exception_invalid_argument_data
+#define __exception_invalid_context_data32     exception_invalid_context_data
 #define __exception_invalid_handle_data32      exception_invalid_handle_data
 #define __exception_ioerror_data32             exception_ioerror_data
 #define __exception_net_error_data32           exception_net_error_data
@@ -462,6 +463,11 @@ struct __exception_invalid_argument_data32 {
 	;
 };
 
+/* E_INVALID_CONTEXT */
+struct __exception_invalid_context_data32 {
+	__UINT32_TYPE__ /*intptr_t*/ ic_context; /* Context (one of `E_INVALID_CONTEXT_*' from `<kos/except/reason/context.h>') */
+};
+
 /* E_INVALID_HANDLE */
 struct __exception_invalid_handle_data32 {
 	__UINT32_TYPE__ /*fd_t*/ ih_fd; /* The FD number that was accessed */
@@ -636,6 +642,7 @@ union __exception_data_pointers32 {
 	struct __exception_index_error_data32         e_index_error;         /* E_INDEX_ERROR */
 	struct __exception_insufficient_rights_data32 e_insufficient_rights; /* E_INSUFFICIENT_RIGHTS */
 	struct __exception_invalid_argument_data32    e_invalid_argument;    /* E_INVALID_ARGUMENT */
+	struct __exception_invalid_context_data32     e_invalid_context;     /* E_INVALID_CONTEXT */
 	struct __exception_invalid_handle_data32      e_invalid_handle;      /* E_INVALID_HANDLE */
 	struct __exception_ioerror_data32             e_ioerror;             /* E_IOERROR */
 	struct __exception_net_error_data32           e_net_error;           /* E_NET_ERROR */

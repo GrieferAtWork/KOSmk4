@@ -854,8 +854,12 @@
 /* E_INVALID_CONTEXT                                                    */
 /************************************************************************/
 #ifndef E_INVALID_CONTEXT
-#define E_INVALID_CONTEXT                         (0x0085)                    /* [errno(EPERM), msg("Insufficient Context")] */
+#define E_INVALID_CONTEXT                         (0x0085)                    /* [errno(EPERM), msg("Invalid context")]
+                                                                               * [fld(context: intptr_t, "Context (one of `E_INVALID_CONTEXT_*' from `<kos/except/reason/context.h>')")] */
 #endif /* !E_INVALID_CONTEXT */
+#ifndef E_INVALID_CONTEXT_NOT_PERMITTED
+#define E_INVALID_CONTEXT_NOT_PERMITTED           (E_INVALID_CONTEXT, 0x0001) /* [msg("Operation cannot be permitted")] */
+#endif /* !E_INVALID_CONTEXT_NOT_PERMITTED */
 /* TODO: Get rid of `E_INVALID_ARGUMENT_BAD_STATE' and use `E_INVALID_CONTEXT'
  *       (and  sub-classes  of  it   to-be  added  as  appropriate)   instead. */
 

@@ -56,10 +56,12 @@
 #define PR_SET_KEEPCAPS        8  /* [bool arg] Set `THIS_CRED->c_securebits & SECBIT_KEEP_CAPS' */
 
 /* FPU emulation mode */
+#if !defined(__USE_KOS_PURE) || defined(__ia64__)
 #define PR_GET_FPEMU           9  /* [unsigned int *arg] Get FPU emulation mode (set of `PR_FPEMU_*') */
 #define PR_SET_FPEMU           10 /* [unsigned int arg] Set FPU emulation mode (set of `PR_FPEMU_*') */
 #   define PR_FPEMU_NOPRINT    0x00000001 /* Silently emulate FPU operations */
 #   define PR_FPEMU_SIGFPE     0x00000002 /* Raise SIGBUS on FPU operation (only on certain architectures) */
+#endif /* !__USE_KOS_PURE || __ia64__ */
 
 /* FPU exception mode */
 #if !defined(__USE_KOS_PURE) || defined(__powerpc__)
@@ -231,8 +233,8 @@ __DECL_END
 #define PR_GET_CHILD_SUBREAPER 37 /* [int *arg] Return caller's child sub-reaper attribute */
 
 /* Get/Set process no-new-privs attribute -- When non-zero, exec() calls do not add new permissions. */
-#define PR_SET_NO_NEW_PRIVS    38 /* [int arg] Set `THIS_CRED->c_no_new_privs = arg' (cannot be set to 0 if already non-zero) */
-#define PR_GET_NO_NEW_PRIVS    39 /* [int return] Return `THIS_CRED->c_no_new_privs' */
+#define PR_SET_NO_NEW_PRIVS    38 /* [int arg, 0, 0, 0] Set `THIS_CRED->c_no_new_privs = arg' (cannot be set to 0 if already non-zero) */
+#define PR_GET_NO_NEW_PRIVS    39 /* [int return, 0, 0, 0, 0] Return `THIS_CRED->c_no_new_privs' */
 
 /* Thread TID address. */
 #define PR_GET_TID_ADDRESS     40 /* [pid_t **arg] Return thread TID address (s.a. `set_tid_address(2)', `CLONE_CHILD_CLEARTID') */

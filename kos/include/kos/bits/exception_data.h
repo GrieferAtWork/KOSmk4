@@ -397,6 +397,11 @@ struct exception_invalid_argument_data {
 	;
 };
 
+/* E_INVALID_CONTEXT */
+struct exception_invalid_context_data {
+	__syscall_ulong_t /*intptr_t*/ ic_context; /* Context (one of `E_INVALID_CONTEXT_*' from `<kos/except/reason/context.h>') */
+};
+
 /* E_INVALID_HANDLE */
 struct exception_invalid_handle_data {
 	__syscall_ulong_t /*fd_t*/ ih_fd; /* The FD number that was accessed */
@@ -571,6 +576,7 @@ union exception_data_pointers {
 	struct exception_index_error_data         e_index_error;         /* E_INDEX_ERROR */
 	struct exception_insufficient_rights_data e_insufficient_rights; /* E_INSUFFICIENT_RIGHTS */
 	struct exception_invalid_argument_data    e_invalid_argument;    /* E_INVALID_ARGUMENT */
+	struct exception_invalid_context_data     e_invalid_context;     /* E_INVALID_CONTEXT */
 	struct exception_invalid_handle_data      e_invalid_handle;      /* E_INVALID_HANDLE */
 	struct exception_ioerror_data             e_ioerror;             /* E_IOERROR */
 	struct exception_net_error_data           e_net_error;           /* E_NET_ERROR */
