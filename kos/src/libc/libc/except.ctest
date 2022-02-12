@@ -115,7 +115,6 @@ DEFINE_TEST(kernel_exceptions_function_correctly_with_cxx_handlers) {
 	ASSERT_ERROR_NAME(E_INSUFFICIENT_RIGHTS, /*               */ "E_INSUFFICIENT_RIGHTS");
 	ASSERT_ERROR_NAME(E_BUFFER_TOO_SMALL, /*                  */ "E_BUFFER_TOO_SMALL");
 	ASSERT_ERROR_NAME(E_INTERRUPT, /*                         */ "E_INTERRUPT");
-	ASSERT_ERROR_NAME(__E_RETRY_RWLOCK, /*                    */ "__E_RETRY_RWLOCK");
 	ASSERT_ERROR_NAME(E_EXIT_THREAD, /*                       */ "E_EXIT_THREAD");
 	ASSERT_ERROR_NAME(E_EXIT_PROCESS, /*                      */ "E_EXIT_PROCESS");
 	ASSERT_ERROR_NAME(E_UNHANDLED_INTERRUPT, /*               */ "E_UNHANDLED_INTERRUPT");

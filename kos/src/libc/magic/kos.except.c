@@ -1140,8 +1140,8 @@ char const *except_name(except_code_t code) {
 	"AULTY\0E_NOT_EXECUTABLE_TOOLARGE\0E_NOT_EXECUTABLE_TOOSMALL\0\1E_INS"
 	"UFFICIENT_RIGHTS\0\1\1\1\1\1\1\1\1\1\1\1\1E_BUFFER_TOO_SMALL\0\1E_UNICODE_ERROR"
 	"\0\1";
-	static char const e_linear_f000h_f001h[] =
-	"E_INTERRUPT\0E_INTERRUPT_USER_RPC\0\1__E_RETRY_RWLOCK\0\1";
+	static char const e_linear_f000h_f000h[] =
+	"E_INTERRUPT\0E_INTERRUPT_USER_RPC\0\1";
 	static char const e_linear_fe40h_fe40h[] =
 	"E_EXIT_THREAD\0\1";
 	static char const e_linear_fe81h_fe81h[] =
@@ -1164,8 +1164,8 @@ char const *except_name(except_code_t code) {
 	} else if (err_class >= 0x0081 && err_class <= 0x0091) {
 		result = e_linear_0081h_0091h;
 		class_offset = err_class - 0x0081;
-	} else if (err_class >= 0xf000 && err_class <= 0xf001) {
-		result = e_linear_f000h_f001h;
+	} else if (err_class >= 0xf000 && err_class <= 0xf000) {
+		result = e_linear_f000h_f000h;
 		class_offset = err_class - 0xf000;
 	} else if (err_class >= 0xfe40 && err_class <= 0xfe40) {
 		result = e_linear_fe40h_fe40h;
@@ -1269,8 +1269,8 @@ non_linear_prefix:
 	"AULTY\0E_NOT_EXECUTABLE_TOOLARGE\0E_NOT_EXECUTABLE_TOOSMALL\0\1E_INS"
 	"UFFICIENT_RIGHTS\0\1\1\1\1\1\1\1\1\1\1\1\1E_BUFFER_TOO_SMALL\0\1E_UNICODE_ERROR"
 	"\0\1";
-	static char const e_linear_f000h_f001h[] =
-	"E_INTERRUPT\0E_INTERRUPT_USER_RPC\0\1__E_RETRY_RWLOCK\0\1";
+	static char const e_linear_f000h_f000h[] =
+	"E_INTERRUPT\0E_INTERRUPT_USER_RPC\0\1";
 	static char const e_linear_fe40h_fe40h[] =
 	"E_EXIT_THREAD\0\1";
 	static char const e_linear_fe81h_fe81h[] =
@@ -1290,8 +1290,8 @@ non_linear_prefix:
 	} else if (err_class >= 0x0081 && err_class <= 0x0091) {
 		result = e_linear_0081h_0091h;
 		class_offset = err_class - 0x0081;
-	} else if (err_class >= 0xf000 && err_class <= 0xf001) {
-		result = e_linear_f000h_f001h;
+	} else if (err_class >= 0xf000 && err_class <= 0xf000) {
+		result = e_linear_f000h_f000h;
 		class_offset = err_class - 0xf000;
 	} else if (err_class >= 0xfe40 && err_class <= 0xfe40) {
 		result = e_linear_fe40h_fe40h;

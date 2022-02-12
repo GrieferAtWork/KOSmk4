@@ -921,18 +921,6 @@
 
 
 /************************************************************************/
-/* __E_RETRY_RWLOCK                                                     */
-/************************************************************************/
-#ifndef __E_RETRY_RWLOCK
-#define __E_RETRY_RWLOCK                          (0xf001) /* [fld(lock: struct rwlock *)]
-                                                            * The thread should re-attempt to acquire an R/W-lock */
-#endif /* !__E_RETRY_RWLOCK */
-
-
-
-
-
-/************************************************************************/
 /* RTL Thread/Process exit (E_EXIT_THREAD, E_EXIT_PROCESS)              */
 /************************************************************************/
 /*[[[end]]]*/

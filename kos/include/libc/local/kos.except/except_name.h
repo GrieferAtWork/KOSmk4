@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6883b2e */
+/* HASH CRC-32:0xbf8b39ba */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -94,8 +94,8 @@ __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(except_name))(__except_code_t __code) {
 	"AULTY\0E_NOT_EXECUTABLE_TOOLARGE\0E_NOT_EXECUTABLE_TOOSMALL\0\1E_INS"
 	"UFFICIENT_RIGHTS\0\1\1\1\1\1\1\1\1\1\1\1\1E_BUFFER_TOO_SMALL\0\1E_UNICODE_ERROR"
 	"\0\1";
-	static char const __e_linear_f000h_f001h[] =
-	"E_INTERRUPT\0E_INTERRUPT_USER_RPC\0\1__E_RETRY_RWLOCK\0\1";
+	static char const __e_linear_f000h_f000h[] =
+	"E_INTERRUPT\0E_INTERRUPT_USER_RPC\0\1";
 	static char const __e_linear_fe40h_fe40h[] =
 	"E_EXIT_THREAD\0\1";
 	static char const __e_linear_fe81h_fe81h[] =
@@ -118,8 +118,8 @@ __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(except_name))(__except_code_t __code) {
 	} else if (__err_class >= 0x0081 && __err_class <= 0x0091) {
 		__result = __e_linear_0081h_0091h;
 		__class_offset = __err_class - 0x0081;
-	} else if (__err_class >= 0xf000 && __err_class <= 0xf001) {
-		__result = __e_linear_f000h_f001h;
+	} else if (__err_class >= 0xf000 && __err_class <= 0xf000) {
+		__result = __e_linear_f000h_f000h;
 		__class_offset = __err_class - 0xf000;
 	} else if (__err_class >= 0xfe40 && __err_class <= 0xfe40) {
 		__result = __e_linear_fe40h_fe40h;
@@ -223,8 +223,8 @@ __non_linear_prefix:
 	"AULTY\0E_NOT_EXECUTABLE_TOOLARGE\0E_NOT_EXECUTABLE_TOOSMALL\0\1E_INS"
 	"UFFICIENT_RIGHTS\0\1\1\1\1\1\1\1\1\1\1\1\1E_BUFFER_TOO_SMALL\0\1E_UNICODE_ERROR"
 	"\0\1";
-	static char const __e_linear_f000h_f001h[] =
-	"E_INTERRUPT\0E_INTERRUPT_USER_RPC\0\1__E_RETRY_RWLOCK\0\1";
+	static char const __e_linear_f000h_f000h[] =
+	"E_INTERRUPT\0E_INTERRUPT_USER_RPC\0\1";
 	static char const __e_linear_fe40h_fe40h[] =
 	"E_EXIT_THREAD\0\1";
 	static char const __e_linear_fe81h_fe81h[] =
@@ -244,8 +244,8 @@ __non_linear_prefix:
 	} else if (__err_class >= 0x0081 && __err_class <= 0x0091) {
 		__result = __e_linear_0081h_0091h;
 		__class_offset = __err_class - 0x0081;
-	} else if (__err_class >= 0xf000 && __err_class <= 0xf001) {
-		__result = __e_linear_f000h_f001h;
+	} else if (__err_class >= 0xf000 && __err_class <= 0xf000) {
+		__result = __e_linear_f000h_f000h;
 		__class_offset = __err_class - 0xf000;
 	} else if (__err_class >= 0xfe40 && __err_class <= 0xfe40) {
 		__result = __e_linear_fe40h_fe40h;

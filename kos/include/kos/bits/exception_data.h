@@ -549,11 +549,6 @@ struct exception_unknown_systemcall_data {
 	__syscall_ulong_t /*syscall_ulong_t*/ us_arg5;
 };
 
-/* __E_RETRY_RWLOCK */
-struct exception___e_retry_rwlock_data {
-	__syscall_ulong_t /*struct rwlock **/ _err_lock;
-};
-
 union exception_data_pointers {
 	__UINTPTR_TYPE__                          e_pointers[EXCEPTION_DATA_POINTERS];
 	struct exception_badalloc_data            e_badalloc;            /* E_BADALLOC */
@@ -580,7 +575,6 @@ union exception_data_pointers {
 	struct exception_segfault_data            e_segfault;            /* E_SEGFAULT */
 	struct exception_unhandled_interrupt_data e_unhandled_interrupt; /* E_UNHANDLED_INTERRUPT */
 	struct exception_unknown_systemcall_data  e_unknown_systemcall;  /* E_UNKNOWN_SYSTEMCALL */
-	struct exception___e_retry_rwlock_data    __e_retry_rwlock;      /* __E_RETRY_RWLOCK */
 };
 /*[[[end]]]*/
 
