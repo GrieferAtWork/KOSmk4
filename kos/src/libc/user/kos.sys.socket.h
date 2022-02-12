@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x978395a3 */
+/* HASH CRC-32:0xc0424ce6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,7 +63,7 @@ INTDEF NONNULL((4)) void (LIBCCALL libc_SocketPair)(__STDC_INT_AS_UINT_T domain,
  * @return: 0 : Success
  * @return: -1: [errno=EADDRINUSE]    E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
  * @return: -1: [errno=EINVAL]        E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
- * @return: -1: [errno=EINVAL]        E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @return: -1: [errno=EINVAL]        E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND
  * @return: -1: [errno=EADDRNOTAVAIL] E_NET_ADDRESS_NOT_AVAILABLE
  * @return: -1: [errno=ERANGE]        E_BUFFER_TOO_SMALL   (`addr_len' is incorrect) */
 INTDEF NONNULL((2)) void (LIBCCALL libc_Bind)(fd_t sockfd, __CONST_SOCKADDR_ARG addr, socklen_t addr_len) THROWS(...);
@@ -88,7 +88,7 @@ INTDEF NONNULL((2, 3)) void (LIBCCALL libc_GetSockName)(fd_t sockfd, __SOCKADDR_
  * @return: 0 : Success
  * @return: -1: [errno=EADDRINUSE]    E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
  * @return: -1: [errno=EINVAL]        E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
- * @return: -1: [errno=EINVAL]        E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @return: -1: [errno=EINVAL]        E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND
  * @return: -1: [errno=EADDRNOTAVAIL] E_NET_ADDRESS_NOT_AVAILABLE
  * @return: -1: [errno=ECONNREFUSED]  E_NET_CONNECTION_REFUSED
  * @return: -1: [errno=ERANGE]        E_BUFFER_TOO_SMALL   (addr_len is incorrect) */
@@ -101,7 +101,7 @@ INTDEF NONNULL((2)) void (LIBCCALL libc_Connect)(fd_t sockfd, __CONST_SOCKADDR_A
  *                         This may be more than was given, in which case
  *                         the  address was truncated and may be invalid.
  * @return: 0 : Success
- * @return: -1: [errno=ENOTCONN]  E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
+ * @return: -1: [errno=ENOTCONN] E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_GETPEERNAME_NOT_CONNECTED
  * @return: -1: Error (s.a. `errno') */
 INTDEF NONNULL((2, 3)) void (LIBCCALL libc_GetPeerName)(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len) THROWS(...);
 /* >> send(2)
@@ -109,7 +109,7 @@ INTDEF NONNULL((2, 3)) void (LIBCCALL libc_GetPeerName)(fd_t sockfd, __SOCKADDR_
  * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
  * @return: * : [<= bufsize] The actual # of send bytes
- * @return: -1: [errno=EDESTADDRREQ] E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
+ * @return: -1: [errno=EDESTADDRREQ] E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SEND_NOT_CONNECTED
  * @return: -1: [errno=EMSGSIZE]     E_NET_MESSAGE_TOO_LONG
  * @return: -1: [errno=ECONNRESET]   E_NET_CONNECTION_RESET
  * @return: -1: [errno=EPIPE]        E_NET_SHUTDOWN */
@@ -119,7 +119,7 @@ INTDEF NONNULL((2)) size_t (LIBCCALL libc_Send)(fd_t sockfd, void const *buf, si
  * @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
  * @return: * : [<= bufsize] The actual # of received bytes
- * @return: -1: [errno=ENOTCONN]     E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+ * @return: -1: [errno=ENOTCONN]     E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED
  * @return: -1: [errno=ECONNREFUSED] E_NET_CONNECTION_REFUSED */
 INTDEF WUNUSED NONNULL((2)) size_t (LIBCCALL libc_Recv)(fd_t sockfd, void *buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags) THROWS(...);
 /* >> sendto(2)
@@ -133,7 +133,7 @@ INTDEF WUNUSED NONNULL((2)) size_t (LIBCCALL libc_Recv)(fd_t sockfd, void *buf, 
  *                    for            `send(sockfd, buf, bufsize, msg_flags)'
  * @return: * : [<= bufsize] The actual # of send bytes
  * @return: -1: [errno=EINVAL]       E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY
- * @return: -1: [errno=EDESTADDRREQ] E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
+ * @return: -1: [errno=EDESTADDRREQ] E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SEND_NOT_CONNECTED
  * @return: -1: [errno=EMSGSIZE]     E_NET_MESSAGE_TOO_LONG
  * @return: -1: [errno=ECONNRESET]   E_NET_CONNECTION_RESET
  * @return: -1: [errno=EPIPE]        E_NET_SHUTDOWN
@@ -152,7 +152,7 @@ INTDEF NONNULL((2)) size_t (LIBCCALL libc_SendTo)(fd_t sockfd, void const *buf, 
  *                           This may be more than was given, in which case
  *                           the address was truncated and may be invalid.
  * @return: * : [<= bufsize] The actual # of received bytes
- * @return: -1: [errno=ENOTCONN]     E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+ * @return: -1: [errno=ENOTCONN]     E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED
  * @return: -1: [errno=ECONNREFUSED] E_NET_CONNECTION_REFUSED
  * @return: -1: [errno=EAGAIN]       E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked) */
 INTDEF WUNUSED NONNULL((2)) size_t (LIBCCALL libc_RecvFrom)(fd_t sockfd, void *__restrict buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len) THROWS(...);
@@ -216,7 +216,7 @@ INTDEF void (LIBCCALL libc_Listen)(fd_t sockfd, __STDC_INT_AS_UINT_T max_backlog
  *                           If this happens,  the caller  can still  determine
  *                           the correct address through use of `getpeername()'
  * @return: * : A file descriptor for the newly accept(2)-ed connection
- * @return: -1: [errno=EINVAL]       E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @return: -1: [errno=EINVAL]       E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_ACCEPT_NOT_LISTENING
  * @return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
  * @return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT */
 INTDEF fd_t (LIBCCALL libc_Accept)(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len) THROWS(...);
@@ -226,7 +226,7 @@ INTDEF fd_t (LIBCCALL libc_Accept)(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *
  * of data (causing `send(2)' to throw an `E_NET_SHUTDOWN' exception)
  * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
  * @return: 0 : Success
- * @return: -1: [errno=ENOTCONN] E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED */
+ * @return: -1: [errno=ENOTCONN] E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SHUTDOWN_NOT_CONNECTED */
 INTDEF void (LIBCCALL libc_Shutdown)(fd_t sockfd, __STDC_INT_AS_UINT_T how) THROWS(...);
 /* >> accept4(2)
  * Accept incoming client (aka. peer) connection requests.
@@ -240,7 +240,7 @@ INTDEF void (LIBCCALL libc_Shutdown)(fd_t sockfd, __STDC_INT_AS_UINT_T how) THRO
  *                            the correct address through use of `getpeername()'
  * @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
  * @return: * : A file descriptor for the newly accept(2)-ed connection
- * @return: -1: [errno=EINVAL]       E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @return: -1: [errno=EINVAL]       E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_ACCEPT_NOT_LISTENING
  * @return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
  * @return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT */
 INTDEF fd_t (LIBCCALL libc_Accept4)(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len, __STDC_INT_AS_UINT_T sock_flags) THROWS(...);

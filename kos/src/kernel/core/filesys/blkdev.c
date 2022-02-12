@@ -53,6 +53,7 @@
 #include <hw/disk/part/mbr.h>
 #include <kos/dev.h>
 #include <kos/except.h>
+#include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <linux/fs.h>
 
@@ -235,8 +236,8 @@ blkdev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 
 	case BLKRRPART:
 		if (blkdev_ispart(me)) {
-			THROW(E_INVALID_ARGUMENT_BAD_STATE,
-			      E_INVALID_ARGUMENT_CONTEXT_BLKRRPART_NOT_DRIVE_ROOT);
+			THROW(E_INVALID_OPERATION,
+			      E_ILLEGAL_OPERATION_CONTEXT_BLKRRPART_NOT_DRIVE_ROOT);
 		}
 		blkdev_repart(me);
 		return 0;

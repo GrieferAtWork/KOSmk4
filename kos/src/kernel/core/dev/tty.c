@@ -41,6 +41,7 @@
 
 #include <compat/config.h>
 #include <compat/kos/types.h>
+#include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <kos/except/reason/io.h>
 #include <kos/ioctl/tty.h>
@@ -490,8 +491,8 @@ do_TCSETA: {
 			if (was_thrown(E_IOERROR_NODATA)) {
 				struct exception_data *dat = except_data();
 				bzero(&dat->e_args, sizeof(dat->e_args));
-				dat->e_code                               = EXCEPT_CODEOF(E_INVALID_ARGUMENT_BAD_STATE);
-				dat->e_args.e_invalid_argument.ia_context = E_INVALID_ARGUMENT_CONTEXT_TIOCSPGRP_SIGTTOU;
+				dat->e_code                               = EXCEPT_CODEOF(E_ILLEGAL_BECAUSE_GROUPING);
+				dat->e_args.e_invalid_argument.ia_context = E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCSPGRP_SIGTTOU;
 			}
 			RETHROW();
 		}
@@ -505,8 +506,8 @@ do_TCSETA: {
 			mygrp = taskpid_getprocgrp(mypid);
 			FINALLY_DECREF_UNLIKELY(mygrp);
 			if (mygrp->pgr_sleader != awref_ptr(&me->t_cproc)) {
-				THROW(E_INVALID_ARGUMENT_BAD_STATE,
-				      E_INVALID_ARGUMENT_CONTEXT_TIOCSPGRP_NOT_CALLER_SESSION);
+				THROW(E_ILLEGAL_BECAUSE_GROUPING,
+				      E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCSPGRP_NOT_CALLER_SESSION);
 			}
 		}
 		if (pid == 0) {
@@ -517,8 +518,8 @@ do_TCSETA: {
 		}
 		FINALLY_DECREF_UNLIKELY(grp);
 		if (grp->pgr_sleader != awref_ptr(&me->t_cproc)) {
-			THROW(E_INVALID_ARGUMENT_BAD_STATE,
-			      E_INVALID_ARGUMENT_CONTEXT_TIOCSPGRP_DIFFERENT_SESSION);
+			THROW(E_ILLEGAL_BECAUSE_GROUPING,
+			      E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCSPGRP_DIFFERENT_SESSION);
 		}
 
 		/* Always assign the taskpid of a process group leader! */
@@ -540,8 +541,8 @@ do_TCSETA: {
 		grp = task_getprocgrp();
 		if (grp->pgr_sleader != awref_ptr(&me->t_cproc)) {
 			decref_unlikely(grp);
-			THROW(E_INVALID_ARGUMENT_BAD_STATE,
-			      E_INVALID_ARGUMENT_CONTEXT_TIOCGPGRP_NOT_CALLER_SESSION);
+			THROW(E_ILLEGAL_BECAUSE_GROUPING,
+			      E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCGPGRP_NOT_CALLER_SESSION);
 		}
 		decref_unlikely(grp);
 		respid = 0;
@@ -562,8 +563,8 @@ do_TCSETA: {
 		grp = task_getprocgrp();
 		if (grp->pgr_sleader != awref_ptr(&me->t_cproc)) {
 			decref_unlikely(grp);
-			THROW(E_INVALID_ARGUMENT_BAD_STATE,
-			      E_INVALID_ARGUMENT_CONTEXT_TIOCGSID_NOT_CALLER_SESSION);
+			THROW(E_ILLEGAL_BECAUSE_GROUPING,
+			      E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCGSID_NOT_CALLER_SESSION);
 		}
 		respid = procgrp_getsid_s(grp);
 		decref_unlikely(grp);
@@ -708,19 +709,19 @@ again_TIOCSCTTY:
 		if (oldtty != NULL) {
 			if (oldtty == me)
 				break; /* No-op. -- This is allowed */
-			THROW(E_INVALID_ARGUMENT_BAD_STATE,
-			      E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_ALREADY_HAVE_CTTY);
+			THROW(E_ILLEGAL_BECAUSE_GROUPING,
+			      E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCSCTTY_ALREADY_HAVE_CTTY);
 		}
 		if (!procgrp_issessionleader(mygrp)) {
-			THROW(E_INVALID_ARGUMENT_BAD_STATE,
-			      E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_NOT_SESSION_LEADER);
+			THROW(E_ILLEGAL_BECAUSE_GROUPING,
+			      E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCSCTTY_NOT_SESSION_LEADER);
 		}
 		oldcproc = awref_get(&me->t_cproc);
 		if (oldcproc) {
 			FINALLY_DECREF_UNLIKELY(oldcproc);
 			if ((uintptr_t)arg != 1 || !capable(CAP_SYS_ADMIN)) {
-				THROW(E_INVALID_ARGUMENT_BAD_STATE,
-				      E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_CANNOT_STEAL_CTTY);
+				THROW(E_ILLEGAL_BECAUSE_GROUPING,
+				      E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCSCTTY_CANNOT_STEAL_CTTY);
 			}
 			if (!axref_cmpxch(&oldcproc->pgr_session->ps_ctty, me, NULL))
 				goto again_TIOCSCTTY;
@@ -742,8 +743,8 @@ again_TIOCSCTTY:
 		FINALLY_DECREF_UNLIKELY(mygrp);
 again_TIOCNOTTY:
 		if (axref_ptr(&mygrp->pgr_session->ps_ctty) != me) {
-			THROW(E_INVALID_ARGUMENT_BAD_STATE,
-			      E_INVALID_ARGUMENT_CONTEXT_TIOCNOTTY_NOT_CALLER_SESSION);
+			THROW(E_ILLEGAL_BECAUSE_GROUPING,
+			      E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCNOTTY_NOT_CALLER_SESSION);
 		}
 		if (!awref_cmpxch(&me->t_cproc, mygrp->pgr_sleader, NULL))
 			goto again_TIOCNOTTY;

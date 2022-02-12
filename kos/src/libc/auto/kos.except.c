@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35bd156f */
+/* HASH CRC-32:0xeab98aec */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -203,6 +203,12 @@ for (local name: classes.keys.sorted()) {
 		break;
 #endif /* EINVAL */
 
+#ifdef EPIPE
+	case E_BROKEN_PIPE:
+		result = EPIPE;
+		break;
+#endif /* EPIPE */
+
 #ifdef ERANGE
 	case E_BUFFER_TOO_SMALL:
 		result = ERANGE;
@@ -375,6 +381,41 @@ for (local name: classes.keys.sorted()) {
 			result = self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_EPOLL_MONITOR_SELF_LOOP ? EINVAL : ELOOP;
 			break;
 #endif /* EINVAL && ELOOP */
+#if defined(ENOTCONN) && defined(EDESTADDRREQ) && defined(EISCONN) && defined(EINVAL)
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_ILLEGAL_BECAUSE_NOT_READY)):
+			result = (self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SHUTDOWN_NOT_CONNECTED ||
+			         self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_SOCKET_GETPEERNAME_NOT_CONNECTED ||
+			         self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED) ? ENOTCONN :
+			        (self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SEND_NOT_CONNECTED) ? EDESTADDRREQ :
+			        (self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_SOCKET_CONNECT_ALREADY_CONNECTED) ? EISCONN :
+			         EINVAL;
+			break;
+#endif /* ENOTCONN && EDESTADDRREQ && EISCONN && EINVAL */
+#if defined(ENOTTY) && defined(EPERM)
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_ILLEGAL_BECAUSE_GROUPING)):
+			result = (self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCSPGRP_SIGTTOU ||
+			         self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCSPGRP_NOT_CALLER_SESSION ||
+			         self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCGPGRP_NOT_CALLER_SESSION ||
+			         self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCGSID_NOT_CALLER_SESSION ||
+			         self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCNOTTY_NOT_CALLER_SESSION) ? ENOTTY :
+			         EPERM;
+			break;
+#endif /* ENOTTY && EPERM */
+#ifdef ENXIO
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_ILLEGAL_IO_OPERATION)):
+			result = ENXIO;
+			break;
+#endif /* ENXIO */
+#ifdef ENOMEM
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_ILLEGAL_RESOURCE_LIMIT_EXCEEDED)):
+			result = ENOMEM;
+			break;
+#endif /* ENOMEM */
+#ifdef EINVAL
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_OPERATION)):
+			result = EINVAL;
+			break;
+#endif /* EINVAL */
 		default: break;
 		}
 		break;
@@ -417,32 +458,6 @@ for (local name: classes.keys.sorted()) {
 			        EINVAL;
 			break;
 #endif /* EAFNOSUPPORT && ESOCKTNOSUPPORT && EPROTONOSUPPORT && EINVAL */
-#if defined(ENOTCONN) && defined(EDESTADDRREQ) && defined(EISCONN) && defined(ENXIO) && defined(EPIPE) && defined(ENOMEM) && defined(EPERM) && defined(ENOTTY) && defined(EINVAL)
-		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_ARGUMENT_BAD_STATE)):
-			result = (self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED ||
-			         self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED ||
-			         self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED) ? ENOTCONN :
-			        (self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED) ? EDESTADDRREQ :
-			        (self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED) ? EISCONN :
-			        (self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS) ? ENXIO :
-			        (self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS) ? EPIPE :
-			        (self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_MEMORY ||
-			         self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_FUTEX) ? ENOMEM :
-			        (self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SETPGID_DIFFERENT_SESSION ||
-			         self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SETPGID_IS_SESSION_LEADER ||
-			         self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SETSID_ALREADY_GROUP_LEADER ||
-			         self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCSPGRP_DIFFERENT_SESSION ||
-			         self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_NOT_SESSION_LEADER ||
-			         self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_ALREADY_HAVE_CTTY ||
-			         self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_CANNOT_STEAL_CTTY) ? EPERM :
-			        (self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCSPGRP_SIGTTOU ||
-			         self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCSPGRP_NOT_CALLER_SESSION ||
-			         self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCGPGRP_NOT_CALLER_SESSION ||
-			         self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCGSID_NOT_CALLER_SESSION ||
-			         self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCNOTTY_NOT_CALLER_SESSION) ? ENOTTY :
-			        EINVAL;
-			break;
-#endif /* ENOTCONN && EDESTADDRREQ && EISCONN && ENXIO && EPIPE && ENOMEM && EPERM && ENOTTY && EINVAL */
 #ifdef ENOPROTOOPT
 		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_ARGUMENT_SOCKET_OPT)):
 			result = ENOPROTOOPT;
@@ -456,12 +471,6 @@ for (local name: classes.keys.sorted()) {
 		default: break;
 		}
 		break;
-
-#ifdef EPERM
-	case E_INVALID_CONTEXT:
-		result = EPERM;
-		break;
-#endif /* EPERM */
 
 	case E_INVALID_HANDLE:
 #ifdef EBADF
@@ -567,11 +576,19 @@ for (local name: classes.keys.sorted()) {
 		break;
 #endif /* ENODEV */
 
-#ifdef ENODATA
 	case E_NO_SUCH_OBJECT:
+#ifdef ENODATA
 		result = ENODATA;
-		break;
 #endif /* ENODATA */
+		switch(self->e_subclass) {
+#ifdef ENODEV
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_NO_CTTY)):
+			result = ENODEV;
+			break;
+#endif /* ENODEV */
+		default: break;
+		}
+		break;
 
 #ifdef EOK
 	case E_OK:
@@ -839,7 +856,7 @@ NOTHROW(LIBKCALL libc_except_name)(except_code_t code) {
 	subClassVariableName: "err_subclass");
 ]]]*/
 #if !defined(__i386__) && !defined(__x86_64__)
-	static char const e_linear_0000h_000ah[] =
+	static char const e_linear_0000h_000bh[] =
 	"E_OK\0\1E_BADALLOC\0E_BADALLOC_INSUFFICIENT_HEAP_MEMORY\0E_BADALLOC_"
 	"INSUFFICIENT_VIRTUAL_MEMORY\0E_BADALLOC_ADDRESS_ALREADY_EXISTS\0E_"
 	"BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY\0E_BADALLOC_INSUFFICIENT_SW"
@@ -851,15 +868,16 @@ NOTHROW(LIBKCALL libc_except_name)(except_code_t code) {
 	"INATION\0E_INVALID_ARGUMENT_BAD_FLAG_MASK\0E_INVALID_ARGUMENT_BAD_"
 	"ALIGNMENT\0E_INVALID_ARGUMENT_BAD_VALUE\0E_INVALID_ARGUMENT_RESERV"
 	"ED_ARGUMENT\0E_INVALID_ARGUMENT_UNKNOWN_COMMAND\0E_INVALID_ARGUMEN"
-	"T_BAD_STATE\0E_INVALID_ARGUMENT_SOCKET_OPT\0E_INVALID_ARGUMENT_UNE"
-	"XPECTED_COMMAND\0\1E_NOT_IMPLEMENTED\0E_NOT_IMPLEMENTED_UNSUPPORTED"
-	"\0E_NOT_IMPLEMENTED_TODO\0E_SERVICE_EXITED\0\1E_INVALID_HANDLE\0E_INV"
-	"ALID_HANDLE_FILE\0E_INVALID_HANDLE_FILETYPE\0E_INVALID_HANDLE_OPER"
-	"ATION\0E_INVALID_HANDLE_NET_OPERATION\0\1E_WOULDBLOCK\0E_WOULDBLOCK_"
-	"PREEMPTED\0E_WOULDBLOCK_WAITFORSIGNAL\0\1E_PROCESS_EXITED\0E_PROCESS"
-	"_GROUP_EXITED\0\1E_NO_DEVICE\0\1E_UNKNOWN_SYSTEMCALL\0\1E_NO_SUCH_OBJE"
-	"CT\0E_NO_SUCH_PROCESS\0E_NO_SUCH_PIDNS\0E_NO_CTTY\0\1E_ILLEGAL_OPERAT"
-	"ION\0E_ILLEGAL_REFERENCE_LOOP\0\1";
+	"T_SOCKET_OPT\0E_INVALID_ARGUMENT_UNEXPECTED_COMMAND\0\1E_NOT_IMPLEM"
+	"ENTED\0E_NOT_IMPLEMENTED_UNSUPPORTED\0E_NOT_IMPLEMENTED_TODO\0E_SER"
+	"VICE_EXITED\0\1E_INVALID_HANDLE\0E_INVALID_HANDLE_FILE\0E_INVALID_HA"
+	"NDLE_FILETYPE\0E_INVALID_HANDLE_OPERATION\0E_INVALID_HANDLE_NET_OP"
+	"ERATION\0\1E_WOULDBLOCK\0E_WOULDBLOCK_PREEMPTED\0E_WOULDBLOCK_WAITFO"
+	"RSIGNAL\0\1E_PROCESS_EXITED\0E_PROCESS_GROUP_EXITED\0\1E_NO_DEVICE\0\1E"
+	"_UNKNOWN_SYSTEMCALL\0\1E_NO_SUCH_OBJECT\0E_NO_CTTY\0\1E_ILLEGAL_OPERA"
+	"TION\0E_ILLEGAL_REFERENCE_LOOP\0E_ILLEGAL_BECAUSE_NOT_READY\0E_ILLE"
+	"GAL_BECAUSE_GROUPING\0E_ILLEGAL_IO_OPERATION\0E_ILLEGAL_RESOURCE_L"
+	"IMIT_EXCEEDED\0E_INVALID_OPERATION\0\1E_BROKEN_PIPE\0\1";
 	static char const e_linear_0081h_0091h[] =
 	"E_NET_ERROR\0E_NET_HOST_UNREACHABLE\0E_NET_ADDRESS_IN_USE\0E_NET_ME"
 	"SSAGE_TOO_LONG\0E_NET_CONNECTION_ABORT\0E_NET_CONNECTION_REFUSED\0E"
@@ -869,8 +887,8 @@ NOTHROW(LIBKCALL libc_except_name)(except_code_t code) {
 	"R_NODATA\0\1E_NOT_EXECUTABLE\0E_NOT_EXECUTABLE_NOEXEC\0E_NOT_EXECUTA"
 	"BLE_NOT_REGULAR\0E_NOT_EXECUTABLE_NOT_A_BINARY\0E_NOT_EXECUTABLE_F"
 	"AULTY\0E_NOT_EXECUTABLE_TOOLARGE\0E_NOT_EXECUTABLE_TOOSMALL\0\1E_INS"
-	"UFFICIENT_RIGHTS\0\1E_INVALID_CONTEXT\0E_INVALID_CONTEXT_NOT_PERMIT"
-	"TED\0\1\1\1\1\1\1\1\1\1\1\1E_BUFFER_TOO_SMALL\0\1E_UNICODE_ERROR\0\1";
+	"UFFICIENT_RIGHTS\0\1\1\1\1\1\1\1\1\1\1\1\1E_BUFFER_TOO_SMALL\0\1E_UNICODE_ERROR"
+	"\0\1";
 	static char const e_linear_f000h_f001h[] =
 	"E_INTERRUPT\0E_INTERRUPT_USER_RPC\0\1__E_RETRY_RWLOCK\0\1";
 	static char const e_linear_fe40h_fe40h[] =
@@ -889,8 +907,8 @@ NOTHROW(LIBKCALL libc_except_name)(except_code_t code) {
 	char const *result;
 	except_class_t class_offset;
 	except_subclass_t subclass_offset;
-	if (err_class <= 0x000a) {
-		result = e_linear_0000h_000ah;
+	if (err_class <= 0x000b) {
+		result = e_linear_0000h_000bh;
 		class_offset = err_class;
 	} else if (err_class >= 0x0081 && err_class <= 0x0091) {
 		result = e_linear_0081h_0091h;
@@ -967,7 +985,7 @@ non_linear_prefix:
 		result = NULL;
 	return result;
 #else /* ... */
-	static char const e_linear_0000h_000ah[] =
+	static char const e_linear_0000h_000bh[] =
 	"E_OK\0\1E_BADALLOC\0E_BADALLOC_INSUFFICIENT_HEAP_MEMORY\0E_BADALLOC_"
 	"INSUFFICIENT_VIRTUAL_MEMORY\0E_BADALLOC_ADDRESS_ALREADY_EXISTS\0E_"
 	"BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY\0E_BADALLOC_INSUFFICIENT_SW"
@@ -979,15 +997,16 @@ non_linear_prefix:
 	"INATION\0E_INVALID_ARGUMENT_BAD_FLAG_MASK\0E_INVALID_ARGUMENT_BAD_"
 	"ALIGNMENT\0E_INVALID_ARGUMENT_BAD_VALUE\0E_INVALID_ARGUMENT_RESERV"
 	"ED_ARGUMENT\0E_INVALID_ARGUMENT_UNKNOWN_COMMAND\0E_INVALID_ARGUMEN"
-	"T_BAD_STATE\0E_INVALID_ARGUMENT_SOCKET_OPT\0E_INVALID_ARGUMENT_UNE"
-	"XPECTED_COMMAND\0\1E_NOT_IMPLEMENTED\0E_NOT_IMPLEMENTED_UNSUPPORTED"
-	"\0E_NOT_IMPLEMENTED_TODO\0E_SERVICE_EXITED\0\1E_INVALID_HANDLE\0E_INV"
-	"ALID_HANDLE_FILE\0E_INVALID_HANDLE_FILETYPE\0E_INVALID_HANDLE_OPER"
-	"ATION\0E_INVALID_HANDLE_NET_OPERATION\0\1E_WOULDBLOCK\0E_WOULDBLOCK_"
-	"PREEMPTED\0E_WOULDBLOCK_WAITFORSIGNAL\0\1E_PROCESS_EXITED\0E_PROCESS"
-	"_GROUP_EXITED\0\1E_NO_DEVICE\0\1E_UNKNOWN_SYSTEMCALL\0\1E_NO_SUCH_OBJE"
-	"CT\0E_NO_SUCH_PROCESS\0E_NO_SUCH_PIDNS\0E_NO_CTTY\0\1E_ILLEGAL_OPERAT"
-	"ION\0E_ILLEGAL_REFERENCE_LOOP\0\1";
+	"T_SOCKET_OPT\0E_INVALID_ARGUMENT_UNEXPECTED_COMMAND\0\1E_NOT_IMPLEM"
+	"ENTED\0E_NOT_IMPLEMENTED_UNSUPPORTED\0E_NOT_IMPLEMENTED_TODO\0E_SER"
+	"VICE_EXITED\0\1E_INVALID_HANDLE\0E_INVALID_HANDLE_FILE\0E_INVALID_HA"
+	"NDLE_FILETYPE\0E_INVALID_HANDLE_OPERATION\0E_INVALID_HANDLE_NET_OP"
+	"ERATION\0\1E_WOULDBLOCK\0E_WOULDBLOCK_PREEMPTED\0E_WOULDBLOCK_WAITFO"
+	"RSIGNAL\0\1E_PROCESS_EXITED\0E_PROCESS_GROUP_EXITED\0\1E_NO_DEVICE\0\1E"
+	"_UNKNOWN_SYSTEMCALL\0\1E_NO_SUCH_OBJECT\0E_NO_CTTY\0\1E_ILLEGAL_OPERA"
+	"TION\0E_ILLEGAL_REFERENCE_LOOP\0E_ILLEGAL_BECAUSE_NOT_READY\0E_ILLE"
+	"GAL_BECAUSE_GROUPING\0E_ILLEGAL_IO_OPERATION\0E_ILLEGAL_RESOURCE_L"
+	"IMIT_EXCEEDED\0E_INVALID_OPERATION\0\1E_BROKEN_PIPE\0\1";
 	static char const e_linear_0081h_0091h[] =
 	"E_NET_ERROR\0E_NET_HOST_UNREACHABLE\0E_NET_ADDRESS_IN_USE\0E_NET_ME"
 	"SSAGE_TOO_LONG\0E_NET_CONNECTION_ABORT\0E_NET_CONNECTION_REFUSED\0E"
@@ -997,8 +1016,8 @@ non_linear_prefix:
 	"R_NODATA\0\1E_NOT_EXECUTABLE\0E_NOT_EXECUTABLE_NOEXEC\0E_NOT_EXECUTA"
 	"BLE_NOT_REGULAR\0E_NOT_EXECUTABLE_NOT_A_BINARY\0E_NOT_EXECUTABLE_F"
 	"AULTY\0E_NOT_EXECUTABLE_TOOLARGE\0E_NOT_EXECUTABLE_TOOSMALL\0\1E_INS"
-	"UFFICIENT_RIGHTS\0\1E_INVALID_CONTEXT\0E_INVALID_CONTEXT_NOT_PERMIT"
-	"TED\0\1\1\1\1\1\1\1\1\1\1\1E_BUFFER_TOO_SMALL\0\1E_UNICODE_ERROR\0\1";
+	"UFFICIENT_RIGHTS\0\1\1\1\1\1\1\1\1\1\1\1\1E_BUFFER_TOO_SMALL\0\1E_UNICODE_ERROR"
+	"\0\1";
 	static char const e_linear_f000h_f001h[] =
 	"E_INTERRUPT\0E_INTERRUPT_USER_RPC\0\1__E_RETRY_RWLOCK\0\1";
 	static char const e_linear_fe40h_fe40h[] =
@@ -1014,8 +1033,8 @@ non_linear_prefix:
 	char const *result;
 	except_class_t class_offset;
 	except_subclass_t subclass_offset;
-	if (err_class <= 0x000a) {
-		result = e_linear_0000h_000ah;
+	if (err_class <= 0x000b) {
+		result = e_linear_0000h_000bh;
 		class_offset = err_class;
 	} else if (err_class >= 0x0081 && err_class <= 0x0091) {
 		result = e_linear_0081h_0091h;

@@ -961,7 +961,7 @@ int socketpair(__STDC_INT_AS_UINT_T domain, __STDC_INT_AS_UINT_T type,
 @@@return: 0 : Success
 @@@return: -1: [errno=EADDRINUSE]    E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
 @@@return: -1: [errno=EINVAL]        E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
-@@@return: -1: [errno=EINVAL]        E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+@@@return: -1: [errno=EINVAL]        E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND
 @@@return: -1: [errno=EADDRNOTAVAIL] E_NET_ADDRESS_NOT_AVAILABLE
 @@@return: -1: [errno=ERANGE]        E_BUFFER_TOO_SMALL   (`addr_len' is incorrect)
 [[decl_include("<bits/types.h>", "<bits/os/sockaddr.h>")]]
@@ -992,7 +992,7 @@ int getsockname($fd_t sockfd, [[outp(*addr_len)]] __SOCKADDR_ARG addr,
 @@@return: 0 : Success
 @@@return: -1: [errno=EADDRINUSE]    E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
 @@@return: -1: [errno=EINVAL]        E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
-@@@return: -1: [errno=EINVAL]        E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+@@@return: -1: [errno=EINVAL]        E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND
 @@@return: -1: [errno=EADDRNOTAVAIL] E_NET_ADDRESS_NOT_AVAILABLE
 @@@return: -1: [errno=ECONNREFUSED]  E_NET_CONNECTION_REFUSED
 @@@return: -1: [errno=ERANGE]        E_BUFFER_TOO_SMALL   (addr_len is incorrect)
@@ -1008,7 +1008,7 @@ int connect($fd_t sockfd, [[inp(addr_len)]] __CONST_SOCKADDR_ARG addr,
 @@                        This may be more than was given, in which case
 @@                        the  address was truncated and may be invalid.
 @@@return: 0 : Success
-@@@return: -1: [errno=ENOTCONN]  E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
+@@@return: -1: [errno=ENOTCONN] E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_GETPEERNAME_NOT_CONNECTED
 @@@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/types.h>", "<bits/os/sockaddr.h>")]]
 int getpeername($fd_t sockfd, [[outp(*addr_len)]] __SOCKADDR_ARG addr,
@@ -1019,7 +1019,7 @@ int getpeername($fd_t sockfd, [[outp(*addr_len)]] __SOCKADDR_ARG addr,
 @@@param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
 @@                           MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
 @@@return: * : [<= bufsize] The actual # of send bytes
-@@@return: -1: [errno=EDESTADDRREQ] E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
+@@@return: -1: [errno=EDESTADDRREQ] E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SEND_NOT_CONNECTED
 @@@return: -1: [errno=EMSGSIZE]     E_NET_MESSAGE_TOO_LONG
 @@@return: -1: [errno=ECONNRESET]   E_NET_CONNECTION_RESET
 @@@return: -1: [errno=EPIPE]        E_NET_SHUTDOWN
@@ -1032,7 +1032,7 @@ ssize_t send($fd_t sockfd, [[inp(bufsize)]] void const *buf,
 @@@param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
 @@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
 @@@return: * : [<= bufsize] The actual # of received bytes
-@@@return: -1: [errno=ENOTCONN]     E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+@@@return: -1: [errno=ENOTCONN]     E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED
 @@@return: -1: [errno=ECONNREFUSED] E_NET_CONNECTION_REFUSED
 [[cp, wunused, export_alias("__recv"), decl_include("<features.h>", "<bits/types.h>")]]
 ssize_t recv($fd_t sockfd, [[outp(bufsize)]] void *buf,
@@ -1049,7 +1049,7 @@ ssize_t recv($fd_t sockfd, [[outp(bufsize)]] void *buf,
 @@                   for            `send(sockfd, buf, bufsize, msg_flags)'
 @@@return: * : [<= bufsize] The actual # of send bytes
 @@@return: -1: [errno=EINVAL]       E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY
-@@@return: -1: [errno=EDESTADDRREQ] E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
+@@@return: -1: [errno=EDESTADDRREQ] E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SEND_NOT_CONNECTED
 @@@return: -1: [errno=EMSGSIZE]     E_NET_MESSAGE_TOO_LONG
 @@@return: -1: [errno=ECONNRESET]   E_NET_CONNECTION_RESET
 @@@return: -1: [errno=EPIPE]        E_NET_SHUTDOWN
@@ -1073,7 +1073,7 @@ ssize_t sendto($fd_t sockfd, [[inp(bufsize)]] void const *buf,
 @@                          This may be more than was given, in which case
 @@                          the address was truncated and may be invalid.
 @@@return: * : [<= bufsize] The actual # of received bytes
-@@@return: -1: [errno=ENOTCONN]     E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+@@@return: -1: [errno=ENOTCONN]     E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED
 @@@return: -1: [errno=ECONNREFUSED] E_NET_CONNECTION_REFUSED
 @@@return: -1: [errno=EAGAIN]       E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked)
 [[cp, wunused, decl_include("<features.h>", "<bits/types.h>", "<bits/os/sockaddr.h>")]]
@@ -1156,7 +1156,7 @@ int listen($fd_t sockfd, __STDC_INT_AS_UINT_T max_backlog);
 @@                          If this happens,  the caller  can still  determine
 @@                          the correct address through use of `getpeername()'
 @@@return: * : A file descriptor for the newly accept(2)-ed connection
-@@@return: -1: [errno=EINVAL]       E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+@@@return: -1: [errno=EINVAL]       E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_ACCEPT_NOT_LISTENING
 @@@return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
 @@@return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT
 [[cp, decl_include("<bits/types.h>", "<bits/os/sockaddr.h>")]]
@@ -1169,7 +1169,7 @@ $fd_t accept($fd_t sockfd, [[outp_opt(*addr_len)]] __SOCKADDR_ARG addr,
 @@of data (causing `send(2)' to throw an `E_NET_SHUTDOWN' exception)
 @@@param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
 @@@return: 0 : Success
-@@@return: -1: [errno=ENOTCONN] E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED
+@@@return: -1: [errno=ENOTCONN] E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SHUTDOWN_NOT_CONNECTED
 [[decl_include("<features.h>", "<bits/types.h>")]]
 int shutdown($fd_t sockfd, __STDC_INT_AS_UINT_T how);
 
@@ -1187,7 +1187,7 @@ int shutdown($fd_t sockfd, __STDC_INT_AS_UINT_T how);
 @@                           the correct address through use of `getpeername()'
 @@@param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
 @@@return: * : A file descriptor for the newly accept(2)-ed connection
-@@@return: -1: [errno=EINVAL]       E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+@@@return: -1: [errno=EINVAL]       E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_ACCEPT_NOT_LISTENING
 @@@return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
 @@@return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT
 [[cp, decl_include("<features.h>", "<bits/types.h>", "<bits/os/sockaddr.h>")]]

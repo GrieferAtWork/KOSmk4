@@ -38,7 +38,7 @@ __DECL_BEGIN
  *
  * NOTES:
  *  - SVGA_IOC_GETMODE: [svga] Throws `E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND' if no tty/lck is active
- *  - SVGA_IOC_GETMODE: [lck]  Throws `E_INVALID_ARGUMENT_CONTEXT_SVGA_NO_MODE_SET' if no video  mode
+ *  - SVGA_IOC_GETMODE: [lck]  Throws `E_ILLEGAL_OPERATION_CONTEXT_SVGA_NO_MODE_SET' if no video mode
  *                             was set. This only happens if a video lock is set when no tty had been
  *                             active. When a tty was active before, its video mode will be inherited
  *                             during `SVGA_IOC_MAKELCK'.

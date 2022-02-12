@@ -38,8 +38,8 @@
 #include <sched/cred.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
-#include <sched/sigmask.h>
 #include <sched/sig.h>
+#include <sched/sigmask.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -51,6 +51,7 @@
 
 #include <asm/signed-shift.h>
 #include <compat/config.h>
+#include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
@@ -324,8 +325,8 @@ rpc_mem_getfutex(struct rpc_mem *__restrict self, USER UNCHECKED void *addr) {
 
 	/* Must construct a new descriptor entry. */
 	if (self->rm_futxc >= RPC_PROG_FUTEX_MAX) {
-		THROW(E_INVALID_ARGUMENT_BAD_STATE,
-		      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_FUTEX);
+		THROW(E_ILLEGAL_RESOURCE_LIMIT_EXCEEDED,
+		      E_ILLEGAL_OPERATION_CONTEXT_RPC_PROGRAM_FUTEX_COUNT_EXCEEDED);
 	}
 
 	/* Insert the new futex descriptor. */
@@ -399,7 +400,8 @@ PRIVATE NONNULL((1, 3)) void FCALL
 rpc_mem_readwrite(struct rpc_mem *__restrict self,
                   USER UNCHECKED byte_t *addr,
                   void *buf, size_t num_bytes,
-                  bool is_writing) {
+                  bool is_writing)
+		THROWS(E_ILLEGAL_RESOURCE_LIMIT_EXCEEDED) {
 	size_t i;
 	struct rpc_membank *bank;
 	struct rpc_membank *pred, *succ;
@@ -520,8 +522,8 @@ rw_bank:
 				if (st != (RPC_MEMBANK_STATUS_F_LOADED | RPC_MEMBANK_STATUS_F_CHANGED)) {
 					if (!(st & RPC_MEMBANK_STATUS_F_LOADED)) {
 						if (++self->rm_access >= RPC_PROG_MEMORY_MAX)
-							THROW(E_INVALID_ARGUMENT_BAD_STATE,
-							      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_MEMORY);
+							THROW(E_ILLEGAL_RESOURCE_LIMIT_EXCEEDED,
+							      E_ILLEGAL_OPERATION_CONTEXT_RPC_PROGRAM_MEMORY_EXCEEDED);
 					}
 					/* Ensure that the address is writable, but don't write the final value, yet. */
 					verify_writable_byte(addr + j);
@@ -536,8 +538,8 @@ rw_bank:
 				int st = rpc_membank_getstatus(bank, reladdr);
 				if (!(st & RPC_MEMBANK_STATUS_F_LOADED)) {
 					if (++self->rm_access >= RPC_PROG_MEMORY_MAX)
-						THROW(E_INVALID_ARGUMENT_BAD_STATE,
-						      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_MEMORY);
+						THROW(E_ILLEGAL_RESOURCE_LIMIT_EXCEEDED,
+						      E_ILLEGAL_OPERATION_CONTEXT_RPC_PROGRAM_MEMORY_EXCEEDED);
 					bankdat[j] = ATOMIC_READ(addr[j]);
 					st |= RPC_MEMBANK_STATUS_F_LOADED;
 					rpc_membank_setstatus(bank, reladdr, st);
@@ -882,7 +884,8 @@ rpc_vm_push2user(struct rpc_vm *__restrict self,
 
 /* Push the given buffer onto the user-space. */
 PRIVATE NONNULL((1)) void FCALL
-rpc_vm_pushreg(struct rpc_vm *__restrict self, unwind_regno_t regno) {
+rpc_vm_pushreg(struct rpc_vm *__restrict self, unwind_regno_t regno)
+		THROWS(E_ILLEGAL_RESOURCE_LIMIT_EXCEEDED, ...) {
 	unsigned int error;
 	alignas(alignof(uintptr_t))
 	byte_t buf[CFI_REGISTER_MAXSIZE];
@@ -895,13 +898,13 @@ rpc_vm_pushreg(struct rpc_vm *__restrict self, unwind_regno_t regno) {
 	bzero(buf, regsz);
 	error = rpc_vm_getreg(self, regno, buf);
 	if unlikely(error != UNWIND_SUCCESS) {
-		THROW(E_INVALID_ARGUMENT_BAD_STATE,
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNKNOWN_REGISTER,
 		      regno);
 	}
 	if unlikely(!CANPUSH(words)) {
-		THROW(E_INVALID_ARGUMENT_BAD_STATE,
-		      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_STACK_OVERFLOW);
+		THROW(E_ILLEGAL_RESOURCE_LIMIT_EXCEEDED,
+		      E_ILLEGAL_OPERATION_CONTEXT_RPC_PROGRAM_STACK_OVERFLOW);
 	}
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	while unlikely(words > 1) {
@@ -929,8 +932,8 @@ rpc_vm_popreg(struct rpc_vm *__restrict self, unwind_regno_t regno) {
 	size_t words = CEILDIV(regsz, adrsz);
 	assert(words);
 	if unlikely(!CANPOP(words)) {
-		THROW(E_INVALID_ARGUMENT_BAD_STATE,
-		      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_STACK_UNDERFLOW);
+		THROW(E_INVALID_OPERATION,
+		      E_ILLEGAL_OPERATION_CONTEXT_RPC_PROGRAM_STACK_UNDERFLOW);
 	}
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	*(uintptr_t *)buf = POP();
@@ -950,7 +953,7 @@ rpc_vm_popreg(struct rpc_vm *__restrict self, unwind_regno_t regno) {
 	/* Save the register */
 	error = rpc_vm_setreg(self, regno, buf);
 	if unlikely(error != UNWIND_SUCCESS) {
-		THROW(E_INVALID_ARGUMENT_BAD_STATE,
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNKNOWN_REGISTER,
 		      regno);
 	}
@@ -971,7 +974,7 @@ rpc_vm_pushreg2user(struct rpc_vm *__restrict self, unwind_regno_t regno) {
 	bzero(buf, regsz);
 	error = rpc_vm_getreg(self, regno, buf);
 	if unlikely(error != UNWIND_SUCCESS) {
-		THROW(E_INVALID_ARGUMENT_BAD_STATE,
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNKNOWN_REGISTER,
 		      regno);
 	}
@@ -1831,11 +1834,11 @@ err_illegal_instruction:
 	}
 	return true;
 err_stack_overflow:
-	THROW(E_INVALID_ARGUMENT_BAD_STATE,
-	      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_STACK_OVERFLOW);
+	THROW(E_ILLEGAL_RESOURCE_LIMIT_EXCEEDED,
+	      E_ILLEGAL_OPERATION_CONTEXT_RPC_PROGRAM_STACK_OVERFLOW);
 err_stack_underflow:
-	THROW(E_INVALID_ARGUMENT_BAD_STATE,
-	      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_STACK_UNDERFLOW);
+	THROW(E_INVALID_OPERATION,
+	      E_ILLEGAL_OPERATION_CONTEXT_RPC_PROGRAM_STACK_UNDERFLOW);
 err_no_syscall_info:
 	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 	      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_NO_SYSINFO,

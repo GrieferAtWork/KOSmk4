@@ -36,7 +36,7 @@
 #include <hybrid/atomic.h>
 
 #include <kos/except.h>
-#include <kos/except/reason/inval.h>
+#include <kos/except/reason/illop.h>
 #include <kos/kernel/handle.h> /* HANDLE_TYPE_FIFOHANDLE */
 #include <sys/stat.h>
 
@@ -154,11 +154,11 @@ NOTHROW(FCALL fifohandle_destroy)(struct fifohandle *__restrict self) {
  * NOTE: If  applicable,  the  caller  should  fill  in `fu_path'
  *       and/or `fu_dirent' directly after calling this function.
  * @param: iomode: Set of `IO_ACCMODE | IO_NONBLOCK' (other bits are silently ignored)
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS: [...] */
+ * @throw: E_ILLEGAL_IO_OPERATION:E_ILLEGAL_OPERATION_CONTEXT_OPEN_FIFO_WRITER_WITHOUT_READERS: [...] */
 PUBLIC BLOCKING ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fifohandle *FCALL
 fifohandle_new(struct ffifonode *__restrict self, iomode_t iomode,
                struct path *access_path, struct fdirent *access_dent)
-		THROWS(E_BADALLOC, E_INVALID_ARGUMENT_BAD_STATE, ...) {
+		THROWS(E_BADALLOC, E_ILLEGAL_IO_OPERATION, ...) {
 	REF struct fifohandle *result;
 	assert(!task_wasconnected());
 	result = (REF struct fifohandle *)kmalloc(sizeof(struct fifohandle),
@@ -194,8 +194,8 @@ fifohandle_new(struct ffifonode *__restrict self, iomode_t iomode,
 				 * non-block mode should have us throw some kind of error
 				 * that will result in `ENXIO' */
 				if (iomode & IO_NONBLOCK) {
-					THROW(E_INVALID_ARGUMENT_BAD_STATE,
-					      E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS);
+					THROW(E_ILLEGAL_IO_OPERATION,
+					      E_ILLEGAL_OPERATION_CONTEXT_OPEN_FIFO_WRITER_WITHOUT_READERS);
 				}
 				task_connect_for_poll(&self->ff_buffer.rb_nfull);
 				if (ATOMIC_READ(self->ff_rdcnt) != 0) {

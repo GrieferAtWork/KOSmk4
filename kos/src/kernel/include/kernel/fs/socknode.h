@@ -64,13 +64,13 @@ struct fdirent;
 struct handle;
 
 /* Default operator for opening fsocknode files. This will unconditionally
- * throw:  `E_ILLEGAL_OPERATION:E_ILLEGAL_OPERATION_CONTEXT_OPEN_S_IFSOCK' */
+ * throw:  `E_ILLEGAL_IO_OPERATION:E_ILLEGAL_OPERATION_CONTEXT_OPEN_S_IFSOCK' */
 FUNDEF NONNULL((1, 2)) void KCALL
 fsocknode_v_open(struct mfile *__restrict self,
                  struct handle *__restrict hand,
                  struct path *access_path,
                  struct fdirent *access_dent)
-		THROWS(E_ILLEGAL_OPERATION);
+		THROWS(E_ILLEGAL_IO_OPERATION);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL fsocknode_v_destroy)(struct mfile *__restrict self);
 #define fsocknode_v_changed fnode_v_changed

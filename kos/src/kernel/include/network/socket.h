@@ -245,18 +245,18 @@ struct socket_ops {
 	 * Determine  the   address   (aka.   name)  of   the   connected/masked   peer
 	 * This is usually the same address as was previously set by `socket_connect()'
 	 * @return: * : The required buffer size
-	 * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED: [...] */
+	 * @throws: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_GETPEERNAME_NOT_CONNECTED: [...] */
 	NONNULL((1)) socklen_t
 	(KCALL *so_getpeername)(struct socket *__restrict self,
 	                        USER CHECKED struct sockaddr *addr,
 	                        socklen_t addr_len)
-			THROWS(E_INVALID_ARGUMENT_BAD_STATE);
+			THROWS(E_ILLEGAL_BECAUSE_NOT_READY);
 
 	/* [1..1]
 	 * Bind this socket to the specified local address.
 	 * @throws: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT:                                  [...]
 	 * @throws: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY: [...]
-	 * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND:                 [...]
+	 * @throws: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND:                 [...]
 	 * @throws: E_NET_ADDRESS_NOT_AVAILABLE:                                                                [...]
 	 * @throws: E_BUFFER_TOO_SMALL: The given `addr_len' is too small */
 	NONNULL((1)) void
@@ -264,14 +264,14 @@ struct socket_ops {
 	                 USER CHECKED struct sockaddr const *addr,
 	                 socklen_t addr_len)
 			THROWS(E_NET_ADDRESS_IN_USE, E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
-			       E_INVALID_ARGUMENT_BAD_STATE, E_BUFFER_TOO_SMALL);
+			       E_ILLEGAL_BECAUSE_NOT_READY, E_BUFFER_TOO_SMALL);
 
 	/* [1..1]
 	 * Connect to the specified address.
 	 * WARNING: `aio'  must  only  ever  store  weak  references  to  `self'!
 	 *          Otherwise, a reference loop may be created unintentionally...
 	 * @throws: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT:                                     [...]
-	 * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED:             [...]
+	 * @throws: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_CONNECT_ALREADY_CONNECTED:             [...]
 	 * @throws: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_CONNECT_WRONG_ADDRESS_FAMILY: [...]
 	 * @throws: E_BADALLOC_INSUFFICIENT_PORT_NUMBERS:                                                          [...]
 	 * @throws: E_NET_CONNECTION_REFUSED:                                                                      [...]
@@ -282,7 +282,7 @@ struct socket_ops {
 	(KCALL *so_connect)(struct socket *__restrict self,
 	                    USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
 	                    /*out*/ struct aio_handle *__restrict aio)
-			THROWS_INDIRECT(E_NET_ADDRESS_IN_USE, E_INVALID_ARGUMENT_BAD_STATE,
+			THROWS_INDIRECT(E_NET_ADDRESS_IN_USE, E_ILLEGAL_BECAUSE_NOT_READY,
 			                E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
 			                E_BADALLOC_INSUFFICIENT_PORT_NUMBERS,
 			                E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT,
@@ -326,7 +326,7 @@ struct socket_ops {
 	 * @param: msg_flags:   Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_EOR | MSG_MORE | MSG_OOB'
 	 *                      Additionally, the `MSG_DONTWAIT' may be passed (though implementers
 	 *                      of this operator are allowed to ignore that flag; see above)
-	 * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED: [...]
+	 * @throws: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SEND_NOT_CONNECTED: [...]
 	 * @throws: E_NET_MESSAGE_TOO_LONG:                                                     [...]
 	 * @throws: E_NET_CONNECTION_RESET:                                                     [...]
 	 * @throws: E_NET_SHUTDOWN: [...] (NOTE: The caller of this function will deal with `SIGPIPE') */
@@ -335,7 +335,7 @@ struct socket_ops {
 	                 USER CHECKED void const *buf, size_t bufsize,
 	                 struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
 	                 /*out*/ struct aio_handle *__restrict aio)
-			THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_MESSAGE_TOO_LONG,
+			THROWS_INDIRECT(E_ILLEGAL_BECAUSE_NOT_READY, E_NET_MESSAGE_TOO_LONG,
 			                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN);
 	/* [if(!so_sendto, [1..1]), else([0..1])] */
 	NONNULL((1, 2, 6)) void
@@ -343,7 +343,7 @@ struct socket_ops {
 	                  struct iov_buffer const *__restrict buf, size_t bufsize,
 	                  struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
 	                  /*out*/ struct aio_handle *__restrict aio)
-			THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_MESSAGE_TOO_LONG,
+			THROWS_INDIRECT(E_ILLEGAL_BECAUSE_NOT_READY, E_NET_MESSAGE_TOO_LONG,
 			                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN);
 
 	/* [0..1]
@@ -401,7 +401,7 @@ struct socket_ops {
 	 * @param: abs_timeout:   Timeout  after  which  to  throw  `E_NET_TIMEOUT'  in  the  event
 	 *                        that  no  data could  be received  up  until that  point. Ignored
 	 *                        when already operating in non-blocking mode (aka. `MSG_DONTWAIT')
-	 * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED: [...]
+	 * @throws: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED: [...]
 	 * @throws: E_NET_CONNECTION_REFUSED:                                                   [...]
 	 * @throws: E_WOULDBLOCK:  MSG_DONTWAIT was given, and the operation would have blocked.
 	 * @throws: E_NET_TIMEOUT: The given `abs_timeout' expired */
@@ -412,7 +412,7 @@ struct socket_ops {
 	                 struct ancillary_rmessage const *msg_control,
 	                 syscall_ulong_t msg_flags,
 	                 ktime_t abs_timeout)
-			THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED,
+			THROWS(E_ILLEGAL_BECAUSE_NOT_READY, E_NET_CONNECTION_REFUSED,
 			       E_NET_TIMEOUT, E_WOULDBLOCK);
 	/* [if(!so_recvfromv, [1..1]), else([0..1])] */
 	NONNULL((1, 2)) size_t
@@ -422,7 +422,7 @@ struct socket_ops {
 	                  struct ancillary_rmessage const *msg_control,
 	                  syscall_ulong_t msg_flags,
 	                  ktime_t abs_timeout)
-			THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED,
+			THROWS(E_ILLEGAL_BECAUSE_NOT_READY, E_NET_CONNECTION_REFUSED,
 			       E_NET_TIMEOUT, E_WOULDBLOCK);
 
 	/* [0..1]
@@ -443,7 +443,7 @@ struct socket_ops {
 	 * @param: abs_timeout:   Timeout  after  which  to  throw  `E_NET_TIMEOUT'  in  the  event
 	 *                        that  no  data could  be received  up  until that  point. Ignored
 	 *                        when already operating in non-blocking mode (aka. `MSG_DONTWAIT')
-	 * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED: [...]
+	 * @throws: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED: [...]
 	 * @throws: E_NET_CONNECTION_REFUSED:                                                   [...]
 	 * @throws: E_WOULDBLOCK: MSG_DONTWAIT was given, and the operation would have blocked. */
 	NONNULL((1)) size_t
@@ -483,12 +483,12 @@ struct socket_ops {
 	 *       In the later case, you may poll() for clients via `POLLINMASK'
 	 * @return: * :   A reference to a socket that has been connected to a peer.
 	 * @return: NULL: `IO_NONBLOCK' was given, and no client socket is available right now.
-	 * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING: [...]
+	 * @throws: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_ACCEPT_NOT_LISTENING: [...]
 	 * @throws: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT:                        [...] (same as not implementing)
 	 * @throws: E_NET_CONNECTION_ABORT:                                                       [...] */
 	NONNULL((1)) REF struct socket *
 	(KCALL *so_accept)(struct socket *__restrict self, iomode_t mode)
-			THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_INVALID_HANDLE_NET_OPERATION,
+			THROWS(E_ILLEGAL_BECAUSE_NOT_READY, E_INVALID_HANDLE_NET_OPERATION,
 			       E_NET_CONNECTION_ABORT);
 
 	/* [0..1]
@@ -496,11 +496,11 @@ struct socket_ops {
 	 * as all currently queued data  has been read), and/or further  transmission
 	 * of data (causing `send()' to throw an `E_NET_SHUTDOWN' exception)
 	 * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
-	 * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED: [...] */
+	 * @throws: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SHUTDOWN_NOT_CONNECTED: [...] */
 	NONNULL((1)) void
 	(KCALL *so_shutdown)(struct socket *__restrict self,
 	                     syscall_ulong_t how)
-			THROWS(E_INVALID_ARGUMENT_BAD_STATE);
+			THROWS(E_ILLEGAL_BECAUSE_NOT_READY);
 
 	/* [0..1]
 	 * Get the value of the named socket option `level:optname' and store it in `optval'
@@ -732,17 +732,17 @@ socket_getsockname(struct socket *__restrict self,
 /* Determine  the   address   (aka.   name)  of   the   connected/masked   peer
  * This is usually the same address as was previously set by `socket_connect()'
  * @return: * : The required buffer size
- * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED: [...] */
+ * @throws: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_GETPEERNAME_NOT_CONNECTED: [...] */
 extern NONNULL((1)) socklen_t KCALL
 socket_getpeername(struct socket *__restrict self,
                    USER CHECKED struct sockaddr *addr,
                    socklen_t addr_len)
-		THROWS(E_INVALID_ARGUMENT_BAD_STATE);
+		THROWS(E_ILLEGAL_BECAUSE_NOT_READY);
 
 /* Bind this socket to the specified address.
  * @throws: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT:                                  [...]
  * @throws: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY: [...]
- * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND:                 [...]
+ * @throws: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND:                 [...]
  * @throws: E_NET_ADDRESS_NOT_AVAILABLE:                                                                [...]
  * @throws: E_BUFFER_TOO_SMALL: The given `addr_len' is too small */
 extern NONNULL((1)) void KCALL
@@ -750,11 +750,11 @@ socket_bind(struct socket *__restrict self,
             USER CHECKED struct sockaddr const *addr,
             socklen_t addr_len)
 		THROWS(E_NET_ADDRESS_IN_USE, E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
-		       E_INVALID_ARGUMENT_BAD_STATE, E_BUFFER_TOO_SMALL);
+		       E_ILLEGAL_BECAUSE_NOT_READY, E_BUFFER_TOO_SMALL);
 
 /* Connect to the specified address.
  * @throws: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT:                                     [...]
- * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED:             [...]
+ * @throws: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_CONNECT_ALREADY_CONNECTED:             [...]
  * @throws: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_CONNECT_WRONG_ADDRESS_FAMILY: [...]
  * @throws: E_BADALLOC_INSUFFICIENT_PORT_NUMBERS:                                                          [...]
  * @throws: E_NET_CONNECTION_REFUSED:                                                                      [...]
@@ -765,7 +765,7 @@ extern NONNULL((1, 4)) void KCALL
 socket_aconnect(struct socket *__restrict self,
                 USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
                 /*out*/ struct aio_handle *__restrict aio)
-		THROWS_INDIRECT(E_NET_ADDRESS_IN_USE, E_INVALID_ARGUMENT_BAD_STATE,
+		THROWS_INDIRECT(E_NET_ADDRESS_IN_USE, E_ILLEGAL_BECAUSE_NOT_READY,
 		                E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
 		                E_BADALLOC_INSUFFICIENT_PORT_NUMBERS,
 		                E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT,
@@ -788,7 +788,7 @@ FUNDEF NONNULL((1)) int KCALL
 socket_connect(struct socket *__restrict self,
                USER CHECKED struct sockaddr const *addr,
                socklen_t addr_len, iomode_t mode)
-		THROWS(E_NET_ADDRESS_IN_USE, E_INVALID_ARGUMENT_BAD_STATE,
+		THROWS(E_NET_ADDRESS_IN_USE, E_ILLEGAL_BECAUSE_NOT_READY,
 		       E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
 		       E_BADALLOC_INSUFFICIENT_PORT_NUMBERS,
 		       E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT,
@@ -809,7 +809,7 @@ socket_connect(struct socket *__restrict self,
  *                      own copy of this structure)
  * @param: msg_flags:   Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_EOR |
  *                              MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
- * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED: [...]
+ * @throws: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SEND_NOT_CONNECTED: [...]
  * @throws: E_NET_MESSAGE_TOO_LONG:                                                     [...]
  * @throws: E_NET_CONNECTION_RESET:                                                     [...]
  * @throws: E_NET_SHUTDOWN:                                                             [...] */
@@ -818,14 +818,14 @@ socket_asend(struct socket *__restrict self,
              USER CHECKED void const *buf, size_t bufsize,
              struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
              /*out*/ struct aio_handle *__restrict aio)
-		THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_MESSAGE_TOO_LONG,
+		THROWS_INDIRECT(E_ILLEGAL_BECAUSE_NOT_READY, E_NET_MESSAGE_TOO_LONG,
 		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN);
 FUNDEF NONNULL((1, 2, 6)) void KCALL
 socket_asendv(struct socket *__restrict self,
               struct iov_buffer const *__restrict buf, size_t bufsize,
               struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
               /*out*/ struct aio_handle *__restrict aio)
-		THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_MESSAGE_TOO_LONG,
+		THROWS_INDIRECT(E_ILLEGAL_BECAUSE_NOT_READY, E_NET_MESSAGE_TOO_LONG,
 		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN);
 
 /* Send helper functions for blocking and non-blocking operations.
@@ -838,14 +838,14 @@ socket_send(struct socket *__restrict self,
             USER CHECKED void const *buf, size_t bufsize,
             struct ancillary_message const *msg_control,
             syscall_ulong_t msg_flags, iomode_t mode)
-		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_MESSAGE_TOO_LONG,
+		THROWS(E_ILLEGAL_BECAUSE_NOT_READY, E_NET_MESSAGE_TOO_LONG,
 		       E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_WOULDBLOCK);
 FUNDEF NONNULL((1, 2)) size_t KCALL
 socket_sendv(struct socket *__restrict self,
              struct iov_buffer const *__restrict buf, size_t bufsize,
              struct ancillary_message const *msg_control,
              syscall_ulong_t msg_flags, iomode_t mode)
-		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_MESSAGE_TOO_LONG,
+		THROWS(E_ILLEGAL_BECAUSE_NOT_READY, E_NET_MESSAGE_TOO_LONG,
 		       E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_WOULDBLOCK);
 
 /* Send the contents of a given buffer over this socket to the specified address.
@@ -920,7 +920,7 @@ socket_sendtov(struct socket *__restrict self,
  *                        that  no  data could  be received  up  until that  point. Ignored
  *                        when already operating in non-blocking mode (aka. `MSG_DONTWAIT')
  *                        When `KTIME_INFINITE', the `sk_rcvtimeo' timeout is used instead.
- * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED: [...]
+ * @throws: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED: [...]
  * @throws: E_NET_CONNECTION_REFUSED:                                                   [...]
  * @throws: E_WOULDBLOCK:  MSG_DONTWAIT was given, and the operation would have blocked.
  * @throws: E_NET_TIMEOUT: The given `abs_timeout' (or default SO_RCVTIMEO-timeout) expired */
@@ -931,7 +931,7 @@ socket_recv(struct socket *__restrict self,
             struct ancillary_rmessage const *msg_control,
             syscall_ulong_t msg_flags,
             ktime_t abs_timeout DFL(KTIME_INFINITE))
-		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED,
+		THROWS(E_ILLEGAL_BECAUSE_NOT_READY, E_NET_CONNECTION_REFUSED,
 		       E_NET_TIMEOUT, E_WOULDBLOCK);
 FUNDEF WUNUSED NONNULL((1, 2)) size_t KCALL
 socket_recvv(struct socket *__restrict self,
@@ -940,7 +940,7 @@ socket_recvv(struct socket *__restrict self,
              struct ancillary_rmessage const *msg_control,
              syscall_ulong_t msg_flags,
              ktime_t abs_timeout DFL(KTIME_INFINITE))
-		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED,
+		THROWS(E_ILLEGAL_BECAUSE_NOT_READY, E_NET_CONNECTION_REFUSED,
 		       E_NET_TIMEOUT, E_WOULDBLOCK);
 
 
@@ -960,7 +960,7 @@ socket_recvv(struct socket *__restrict self,
  *                        that  no  data could  be received  up  until that  point. Ignored
  *                        when already operating in non-blocking mode (aka. `MSG_DONTWAIT')
  *                        When `KTIME_INFINITE', the `sk_rcvtimeo' timeout is used instead.
- * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED: [...]
+ * @throws: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED: [...]
  * @throws: E_NET_CONNECTION_REFUSED:                                                   [...]
  * @throws: E_WOULDBLOCK: MSG_DONTWAIT was given, and the operation would have blocked. */
 FUNDEF WUNUSED NONNULL((1)) size_t KCALL
@@ -998,23 +998,23 @@ socket_listen(struct socket *__restrict self,
  *       In this  case, you  may poll()  for clients  via  `POLLINMASK'
  * @return: * :   A reference to a socket that has been connected to a peer.
  * @return: NULL: `IO_NONBLOCK' was given, and no client socket is available right now.
- * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING: [...]
+ * @throws: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_ACCEPT_NOT_LISTENING: [...]
  * @throws: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT:                        [...] (same as not implementing)
  * @throws: E_NET_CONNECTION_ABORT:                                                       [...] * */
 FUNDEF NONNULL((1)) REF struct socket *KCALL
 socket_accept(struct socket *__restrict self, iomode_t mode)
-		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_INVALID_HANDLE_NET_OPERATION,
+		THROWS(E_ILLEGAL_BECAUSE_NOT_READY, E_INVALID_HANDLE_NET_OPERATION,
 		       E_NET_CONNECTION_ABORT);
 
 /* Disallow further reception of data (causing `recv()' to return `0' as soon
  * as all currently queued data  has been read), and/or further  transmission
  * of data (causing `send()' to throw an `E_NET_SHUTDOWN' exception)
  * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
- * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED: [...] */
+ * @throws: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SHUTDOWN_NOT_CONNECTED: [...] */
 FUNDEF NONNULL((1)) void KCALL
 socket_shutdown(struct socket *__restrict self,
                 syscall_ulong_t how)
-		THROWS(E_INVALID_ARGUMENT_BAD_STATE);
+		THROWS(E_ILLEGAL_BECAUSE_NOT_READY);
 
 /* Get the value of the named socket option and store it in `optval'
  * @return: * : The required buffer size.

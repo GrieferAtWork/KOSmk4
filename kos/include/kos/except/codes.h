@@ -262,33 +262,8 @@
                                                                                 * [msg("An unknown command was given")]
                                                                                 * [fld(command: uintptr_t, "The command that was given")] */
 #endif /* !E_INVALID_ARGUMENT_UNKNOWN_COMMAND */
-#ifndef E_INVALID_ARGUMENT_BAD_STATE
-#define E_INVALID_ARGUMENT_BAD_STATE              (E_INVALID_ARGUMENT, 0x0009) /* [errno(($context == E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED ||
-                                                                                *         $context == E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED ||
-                                                                                *         $context == E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED) ? ENOTCONN :
-                                                                                *        ($context == E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED) ? EDESTADDRREQ :
-                                                                                *        ($context == E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED) ? EISCONN :
-                                                                                *        ($context == E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS) ? ENXIO :
-                                                                                *        ($context == E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS) ? EPIPE :
-                                                                                *        ($context == E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_MEMORY ||
-                                                                                *         $context == E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_FUTEX) ? ENOMEM :
-                                                                                *        ($context == E_INVALID_ARGUMENT_CONTEXT_SETPGID_DIFFERENT_SESSION ||
-                                                                                *         $context == E_INVALID_ARGUMENT_CONTEXT_SETPGID_IS_SESSION_LEADER ||
-                                                                                *         $context == E_INVALID_ARGUMENT_CONTEXT_SETSID_ALREADY_GROUP_LEADER ||
-                                                                                *         $context == E_INVALID_ARGUMENT_CONTEXT_TIOCSPGRP_DIFFERENT_SESSION ||
-                                                                                *         $context == E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_NOT_SESSION_LEADER ||
-                                                                                *         $context == E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_ALREADY_HAVE_CTTY ||
-                                                                                *         $context == E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_CANNOT_STEAL_CTTY) ? EPERM :
-                                                                                *        ($context == E_INVALID_ARGUMENT_CONTEXT_TIOCSPGRP_SIGTTOU ||
-                                                                                *         $context == E_INVALID_ARGUMENT_CONTEXT_TIOCSPGRP_NOT_CALLER_SESSION ||
-                                                                                *         $context == E_INVALID_ARGUMENT_CONTEXT_TIOCGPGRP_NOT_CALLER_SESSION ||
-                                                                                *         $context == E_INVALID_ARGUMENT_CONTEXT_TIOCGSID_NOT_CALLER_SESSION ||
-                                                                                *         $context == E_INVALID_ARGUMENT_CONTEXT_TIOCNOTTY_NOT_CALLER_SESSION) ? ENOTTY :
-                                                                                *        EINVAL)]
-                                                                                * [msg("The current object state does not allow this operation")] */
-#endif /* !E_INVALID_ARGUMENT_BAD_STATE */
 #ifndef E_INVALID_ARGUMENT_SOCKET_OPT
-#define E_INVALID_ARGUMENT_SOCKET_OPT             (E_INVALID_ARGUMENT, 0x000a) /* [errno(ENOPROTOOPT), msg("Unrecognized combination of level/optname")]
+#define E_INVALID_ARGUMENT_SOCKET_OPT             (E_INVALID_ARGUMENT, 0x0009) /* [errno(ENOPROTOOPT), msg("Unrecognized combination of level/optname")]
                                                                                 * [fld(level:          uintptr_t, "The level that was given to `getoptname()' or `setoptname()'")]
                                                                                 * [fld(optname:        uintptr_t, "The optname that was given to `getoptname()' or `setoptname()'")]
                                                                                 * [fld(address_family: uintptr_t, "The socket's address family (one of `AF_*')")]
@@ -296,7 +271,7 @@
                                                                                 * [fld(protocol:       uintptr_t, "The socket's protocol (dependent on `address_family' and `socket_type')")] */
 #endif /* !E_INVALID_ARGUMENT_SOCKET_OPT */
 #ifndef E_INVALID_ARGUMENT_UNEXPECTED_COMMAND
-#define E_INVALID_ARGUMENT_UNEXPECTED_COMMAND     (E_INVALID_ARGUMENT, 0x000b) /* [errno($context == E_INVALID_ARGUMENT_CONTEXT_CONNECT_WRONG_ADDRESS_FAMILY ? EAFNOSUPPORT : EINVAL)]
+#define E_INVALID_ARGUMENT_UNEXPECTED_COMMAND     (E_INVALID_ARGUMENT, 0x000a) /* [errno($context == E_INVALID_ARGUMENT_CONTEXT_CONNECT_WRONG_ADDRESS_FAMILY ? EAFNOSUPPORT : EINVAL)]
                                                                                 * [msg("One command was given when a different one was expected")]
                                                                                 * [fld(command:          uintptr_t, "The command that was given")]
                                                                                 * [fld(expected_command: uintptr_t, "The command that had been expected")] */
@@ -473,14 +448,8 @@
 #ifndef E_NO_SUCH_OBJECT
 #define E_NO_SUCH_OBJECT                          (0x0009)                   /* [errno(ENODATA), msg("The specified object doesn't exist")] */
 #endif /* !E_NO_SUCH_OBJECT */
-#ifndef E_NO_SUCH_PROCESS
-#define E_NO_SUCH_PROCESS                         (E_NO_SUCH_OBJECT, 0x0001) /* [msg("No process has been bound")] */
-#endif /* !E_NO_SUCH_PROCESS */
-#ifndef E_NO_SUCH_PIDNS
-#define E_NO_SUCH_PIDNS                           (E_NO_SUCH_OBJECT, 0x0002) /* [msg("No pid namespace has been bound")] */
-#endif /* !E_NO_SUCH_PIDNS */
 #ifndef E_NO_CTTY
-#define E_NO_CTTY                                 (E_NO_SUCH_OBJECT, 0x0003) /* [msg("No controlling terminal has been assigned to the calling session")] */
+#define E_NO_CTTY                                 (E_NO_SUCH_OBJECT, 0x0001) /* [errno(ENODEV), msg("No controlling terminal has been assigned to the calling session")] */
 #endif /* !E_NO_CTTY */
 
 
@@ -499,6 +468,45 @@
 #define E_ILLEGAL_REFERENCE_LOOP                  (E_ILLEGAL_OPERATION, 0x0001) /* [errno($reason == E_ILLEGAL_OPERATION_CONTEXT_EPOLL_MONITOR_SELF_LOOP ? EINVAL : ELOOP)]
                                                                                  * [msg("Reference loop detected")] */
 #endif /* !E_ILLEGAL_REFERENCE_LOOP */
+#ifndef E_ILLEGAL_BECAUSE_NOT_READY
+#define E_ILLEGAL_BECAUSE_NOT_READY               (E_ILLEGAL_OPERATION, 0x0002) /* [errno(($reason == E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SHUTDOWN_NOT_CONNECTED ||
+                                                                                 *         $reason == E_ILLEGAL_OPERATION_CONTEXT_SOCKET_GETPEERNAME_NOT_CONNECTED ||
+                                                                                 *         $reason == E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED) ? ENOTCONN :
+                                                                                 *        ($reason == E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SEND_NOT_CONNECTED) ? EDESTADDRREQ :
+                                                                                 *        ($reason == E_ILLEGAL_OPERATION_CONTEXT_SOCKET_CONNECT_ALREADY_CONNECTED) ? EISCONN :
+                                                                                 *         EINVAL)]
+                                                                                 * [msg("Object isn't ready for the requested operation")] */
+#endif /* !E_ILLEGAL_BECAUSE_NOT_READY */
+#ifndef E_ILLEGAL_BECAUSE_GROUPING
+#define E_ILLEGAL_BECAUSE_GROUPING                (E_ILLEGAL_OPERATION, 0x0003) /* [errno(($reason == E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCSPGRP_SIGTTOU ||
+                                                                                 *         $reason == E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCSPGRP_NOT_CALLER_SESSION ||
+                                                                                 *         $reason == E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCGPGRP_NOT_CALLER_SESSION ||
+                                                                                 *         $reason == E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCGSID_NOT_CALLER_SESSION ||
+                                                                                 *         $reason == E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCNOTTY_NOT_CALLER_SESSION) ? ENOTTY :
+                                                                                 *         EPERM)]
+                                                                                 * [msg("Operation not permitted due to process/process-group/session association")] */
+#endif /* !E_ILLEGAL_BECAUSE_GROUPING */
+#ifndef E_ILLEGAL_IO_OPERATION
+#define E_ILLEGAL_IO_OPERATION                    (E_ILLEGAL_OPERATION, 0x0004) /* [errno(ENXIO)]
+                                                                                 * [msg("Illegal I/O operation")] */
+#endif /* !E_ILLEGAL_IO_OPERATION */
+#ifndef E_ILLEGAL_RESOURCE_LIMIT_EXCEEDED
+#define E_ILLEGAL_RESOURCE_LIMIT_EXCEEDED         (E_ILLEGAL_OPERATION, 0x0005) /* [errno(ENOMEM), msg("Resource limit exceeded")] */
+#endif /* !E_ILLEGAL_RESOURCE_LIMIT_EXCEEDED */
+#ifndef E_INVALID_OPERATION
+#define E_INVALID_OPERATION                       (E_ILLEGAL_OPERATION, 0x0006) /* [errno(EINVAL), msg("Operation is invalid in this context")] */
+#endif /* !E_INVALID_OPERATION */
+
+
+
+
+
+/************************************************************************/
+/* E_BROKEN_PIPE                                                        */
+/************************************************************************/
+#ifndef E_BROKEN_PIPE
+#define E_BROKEN_PIPE                             (0x000b) /* [errno(EPIPE), msg("Tried to write to a pipe without any readers")] */
+#endif /* !E_BROKEN_PIPE */
 
 
 
@@ -845,23 +853,6 @@
 #define E_INSUFFICIENT_RIGHTS                     (0x0084) /* [errno(EACCES), msg("Insufficient Rights")]
                                                             * [fld(capability: intptr_t, "The missing capability (one of `CAP_*' from `<kos/capability.h>')")] */
 #endif /* !E_INSUFFICIENT_RIGHTS */
-
-
-
-
-
-/************************************************************************/
-/* E_INVALID_CONTEXT                                                    */
-/************************************************************************/
-#ifndef E_INVALID_CONTEXT
-#define E_INVALID_CONTEXT                         (0x0085)                    /* [errno(EPERM), msg("Invalid context")]
-                                                                               * [fld(context: intptr_t, "Context (one of `E_INVALID_CONTEXT_*' from `<kos/except/reason/context.h>')")] */
-#endif /* !E_INVALID_CONTEXT */
-#ifndef E_INVALID_CONTEXT_NOT_PERMITTED
-#define E_INVALID_CONTEXT_NOT_PERMITTED           (E_INVALID_CONTEXT, 0x0001) /* [msg("Operation cannot be permitted")] */
-#endif /* !E_INVALID_CONTEXT_NOT_PERMITTED */
-/* TODO: Get rid of `E_INVALID_ARGUMENT_BAD_STATE' and use `E_INVALID_CONTEXT'
- *       (and  sub-classes  of  it   to-be  added  as  appropriate)   instead. */
 
 
 

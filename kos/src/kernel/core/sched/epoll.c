@@ -1294,8 +1294,8 @@ epoll_controller_modmonitor(struct epoll_controller *__restrict self,
 		if unlikely(epoll_handle_monitor_isrpc(monitor)) {
 			/* Error: `EPOLL_CTL_MOD' cannot be used to alter an RPC monitor. */
 			epoll_controller_lock_release(self);
-			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-			      E_INVALID_ARGUMENT_CONTEXT_EPOLL_MOD_RPC);
+			THROW(E_INVALID_OPERATION,
+			      E_ILLEGAL_OPERATION_CONTEXT_EPOLL_MOD_RPC);
 		}
 #endif /* CONFIG_HAVE_EPOLL_RPC */
 

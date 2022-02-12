@@ -74,6 +74,7 @@ DECL_END
 #include <compat/config.h>
 #include <kos/dev.h>
 #include <kos/except.h>
+#include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <kos/except/reason/io.h>
 #include <kos/exec/peb.h>
@@ -774,8 +775,8 @@ procfs_pp_comm_write(struct mfile *__restrict self, USER CHECKED void const *src
 		THROW(E_IOERROR_BADBOUNDS, E_IOERROR_SUBSYSTEM_FILE);
 	/* Must be within the same process. */
 	if (taskpid_getprocpid(me->fn_fsdata) != task_getprocpid()) {
-		THROW(E_INVALID_ARGUMENT_BAD_STATE,
-		      E_INVALID_ARGUMENT_CONTEXT_PROC_COMM_DIFFERENT_PROCESS,
+		THROW(E_ILLEGAL_BECAUSE_GROUPING,
+		      E_ILLEGAL_OPERATION_CONTEXT_PROC_COMM_DIFFERENT_PROCESS,
 		      taskpid_gettid_s(me->fn_fsdata));
 	}
 	thread = taskpid_gettask_srch(me->fn_fsdata);
@@ -1753,8 +1754,8 @@ procfs_pp_kos_peb_addr_write(struct mfile *__restrict self, USER CHECKED void co
 	FINALLY_DECREF_UNLIKELY(threadmm);
 	if (threadmm != THIS_MMAN) {
 		/* May only set the PEB address for your own process. */
-		THROW(E_INVALID_ARGUMENT_BAD_STATE,
-		      E_INVALID_ARGUMENT_CONTEXT_PROC_PEB_ADDR_DIFFERENT_PROCESS,
+		THROW(E_ILLEGAL_BECAUSE_GROUPING,
+		      E_ILLEGAL_OPERATION_CONTEXT_PROC_PEB_DIFFERENT_PROCESS,
 		      taskpid_gettid_s(me->fn_fsdata));
 	}
 	peb = ProcFS_ParsePtr(src, num_bytes);
@@ -1806,8 +1807,8 @@ procfs_pp_kos_peb_compat_write(struct mfile *__restrict self, USER CHECKED void 
 	FINALLY_DECREF_UNLIKELY(threadmm);
 	if (threadmm != THIS_MMAN) {
 		/* May only set the PEB address for your own process. */
-		THROW(E_INVALID_ARGUMENT_BAD_STATE,
-		      E_INVALID_ARGUMENT_CONTEXT_PROC_PEB_ADDR_DIFFERENT_PROCESS,
+		THROW(E_ILLEGAL_BECAUSE_GROUPING,
+		      E_ILLEGAL_OPERATION_CONTEXT_PROC_PEB_DIFFERENT_PROCESS,
 		      taskpid_gettid_s(me->fn_fsdata));
 	}
 	peb_iscompat = ProcFS_ParseBool(src, num_bytes);

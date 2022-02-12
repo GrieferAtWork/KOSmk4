@@ -42,6 +42,7 @@
 #include <bits/os/rusage.h>
 #include <compat/config.h>
 #include <kos/except.h>
+#include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <sys/wait.h>
 
@@ -394,8 +395,8 @@ again_get_oldgrp:
 	 * """
 	 */
 	if (procgrp_getsession(oldgrp) != procgrp_getsession(caller_grp)) {
-		THROW(E_INVALID_ARGUMENT_BAD_STATE,
-		      E_INVALID_ARGUMENT_CONTEXT_SETPGID_DIFFERENT_SESSION, pid);
+		THROW(E_ILLEGAL_BECAUSE_GROUPING,
+		      E_ILLEGAL_OPERATION_CONTEXT_SETPGID_DIFFERENT_SESSION, pid);
 	}
 
 	/* """
@@ -403,8 +404,8 @@ again_get_oldgrp:
 	 * """ */
 	if (procgrp_issessionleader(oldgrp) &&
 		procgrp_getrootpgid(oldgrp) == taskpid_getrootpid(self_pid)) {
-		THROW(E_INVALID_ARGUMENT_BAD_STATE,
-		      E_INVALID_ARGUMENT_CONTEXT_SETPGID_IS_SESSION_LEADER, pid);
+		THROW(E_ILLEGAL_BECAUSE_GROUPING,
+		      E_ILLEGAL_OPERATION_CONTEXT_SETPGID_IS_SESSION_LEADER, pid);
 	}
 
 	/* Figure out which group we want to join. */
@@ -617,8 +618,8 @@ again_get_oldgrp:
 	 * Anyways: If the caller is already a process group leader, then
 	 *          we're not  allowed to  make  them a  session  leader! */
 	if (procgrp_getrootpgid(oldgrp) == taskpid_getroottid(pid)) {
-		THROW(E_INVALID_ARGUMENT_BAD_STATE,
-		      E_INVALID_ARGUMENT_CONTEXT_SETSID_ALREADY_GROUP_LEADER);
+		THROW(E_ILLEGAL_BECAUSE_GROUPING,
+		      E_ILLEGAL_OPERATION_CONTEXT_SETSID_ALREADY_GROUP_LEADER);
 	}
 
 	/* All right: let's construct a new process group! */

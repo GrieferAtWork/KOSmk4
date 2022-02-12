@@ -193,8 +193,7 @@ INTERN ATTR_NORETURN void KCALL pipe_throw_broken_pipe(void) {
 
 	/* If SIGPIPE is being ignored, we must instead throw some
 	 * exception that  causes user-space  to set  errno=EPIPE. */
-	THROW(E_INVALID_ARGUMENT_BAD_STATE,
-	      E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS);
+	THROW(E_BROKEN_PIPE);
 }
 
 INTERN size_t KCALL

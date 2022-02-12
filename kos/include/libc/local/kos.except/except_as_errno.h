@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbef972d3 */
+/* HASH CRC-32:0xfa61b79a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -191,6 +191,12 @@ for (local name: classes.keys.sorted()) {
 		break;
 #endif /* __EINVAL */
 
+#ifdef __EPIPE
+	case E_BROKEN_PIPE:
+		__result = __EPIPE;
+		break;
+#endif /* __EPIPE */
+
 #ifdef __ERANGE
 	case E_BUFFER_TOO_SMALL:
 		__result = __ERANGE;
@@ -363,6 +369,41 @@ for (local name: classes.keys.sorted()) {
 			__result = __self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_EPOLL_MONITOR_SELF_LOOP ? __EINVAL : __ELOOP;
 			break;
 #endif /* __EINVAL && __ELOOP */
+#if defined(__ENOTCONN) && defined(__EDESTADDRREQ) && defined(__EISCONN) && defined(__EINVAL)
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_ILLEGAL_BECAUSE_NOT_READY)):
+			__result = (__self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SHUTDOWN_NOT_CONNECTED ||
+			         __self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_SOCKET_GETPEERNAME_NOT_CONNECTED ||
+			         __self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED) ? __ENOTCONN :
+			        (__self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SEND_NOT_CONNECTED) ? __EDESTADDRREQ :
+			        (__self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_SOCKET_CONNECT_ALREADY_CONNECTED) ? __EISCONN :
+			         __EINVAL;
+			break;
+#endif /* __ENOTCONN && __EDESTADDRREQ && __EISCONN && __EINVAL */
+#if defined(__ENOTTY) && defined(__EPERM)
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_ILLEGAL_BECAUSE_GROUPING)):
+			__result = (__self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCSPGRP_SIGTTOU ||
+			         __self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCSPGRP_NOT_CALLER_SESSION ||
+			         __self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCGPGRP_NOT_CALLER_SESSION ||
+			         __self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCGSID_NOT_CALLER_SESSION ||
+			         __self->e_args.e_illegal_operation.io_reason == E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCNOTTY_NOT_CALLER_SESSION) ? __ENOTTY :
+			         __EPERM;
+			break;
+#endif /* __ENOTTY && __EPERM */
+#ifdef __ENXIO
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_ILLEGAL_IO_OPERATION)):
+			__result = __ENXIO;
+			break;
+#endif /* __ENXIO */
+#ifdef __ENOMEM
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_ILLEGAL_RESOURCE_LIMIT_EXCEEDED)):
+			__result = __ENOMEM;
+			break;
+#endif /* __ENOMEM */
+#ifdef __EINVAL
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_OPERATION)):
+			__result = __EINVAL;
+			break;
+#endif /* __EINVAL */
 		default: break;
 		}
 		break;
@@ -405,32 +446,6 @@ for (local name: classes.keys.sorted()) {
 			        __EINVAL;
 			break;
 #endif /* __EAFNOSUPPORT && __ESOCKTNOSUPPORT && __EPROTONOSUPPORT && __EINVAL */
-#if defined(__ENOTCONN) && defined(__EDESTADDRREQ) && defined(__EISCONN) && defined(__ENXIO) && defined(__EPIPE) && defined(__ENOMEM) && defined(__EPERM) && defined(__ENOTTY) && defined(__EINVAL)
-		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_ARGUMENT_BAD_STATE)):
-			__result = (__self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED ||
-			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED ||
-			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED) ? __ENOTCONN :
-			        (__self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED) ? __EDESTADDRREQ :
-			        (__self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED) ? __EISCONN :
-			        (__self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS) ? __ENXIO :
-			        (__self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS) ? __EPIPE :
-			        (__self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_MEMORY ||
-			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_FUTEX) ? __ENOMEM :
-			        (__self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SETPGID_DIFFERENT_SESSION ||
-			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SETPGID_IS_SESSION_LEADER ||
-			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SETSID_ALREADY_GROUP_LEADER ||
-			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCSPGRP_DIFFERENT_SESSION ||
-			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_NOT_SESSION_LEADER ||
-			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_ALREADY_HAVE_CTTY ||
-			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCSCTTY_CANNOT_STEAL_CTTY) ? __EPERM :
-			        (__self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCSPGRP_SIGTTOU ||
-			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCSPGRP_NOT_CALLER_SESSION ||
-			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCGPGRP_NOT_CALLER_SESSION ||
-			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCGSID_NOT_CALLER_SESSION ||
-			         __self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_TIOCNOTTY_NOT_CALLER_SESSION) ? __ENOTTY :
-			        __EINVAL;
-			break;
-#endif /* __ENOTCONN && __EDESTADDRREQ && __EISCONN && __ENXIO && __EPIPE && __ENOMEM && __EPERM && __ENOTTY && __EINVAL */
 #ifdef __ENOPROTOOPT
 		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_ARGUMENT_SOCKET_OPT)):
 			__result = __ENOPROTOOPT;
@@ -444,12 +459,6 @@ for (local name: classes.keys.sorted()) {
 		default: break;
 		}
 		break;
-
-#ifdef __EPERM
-	case E_INVALID_CONTEXT:
-		__result = __EPERM;
-		break;
-#endif /* __EPERM */
 
 	case E_INVALID_HANDLE:
 #ifdef __EBADF
@@ -555,11 +564,19 @@ for (local name: classes.keys.sorted()) {
 		break;
 #endif /* __ENODEV */
 
-#ifdef __ENODATA
 	case E_NO_SUCH_OBJECT:
+#ifdef __ENODATA
 		__result = __ENODATA;
-		break;
 #endif /* __ENODATA */
+		switch(__self->e_subclass) {
+#ifdef __ENODEV
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_NO_CTTY)):
+			__result = __ENODEV;
+			break;
+#endif /* __ENODEV */
+		default: break;
+		}
+		break;
 
 #ifdef __EOK
 	case E_OK:

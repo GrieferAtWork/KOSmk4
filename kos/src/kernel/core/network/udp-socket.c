@@ -28,6 +28,7 @@
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 
+#include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
@@ -143,14 +144,14 @@ PRIVATE NONNULL((1)) socklen_t KCALL
 udp_getpeername(struct socket *__restrict self,
                 USER CHECKED struct sockaddr *addr,
                 socklen_t addr_len)
-		THROWS(E_INVALID_ARGUMENT_BAD_STATE) {
+		THROWS(E_ILLEGAL_BECAUSE_NOT_READY) {
 	struct udp_socket *me;
 	USER CHECKED struct sockaddr_in *in;
 	me = (struct udp_socket *)self;
 	in = (USER CHECKED struct sockaddr_in *)addr;
 	if (!(me->us_state & UDP_SOCKET_STATE_F_HASPEER)) {
-		THROW(E_INVALID_ARGUMENT_BAD_STATE,
-		      E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED);
+		THROW(E_ILLEGAL_BECAUSE_NOT_READY,
+		      E_ILLEGAL_OPERATION_CONTEXT_SOCKET_GETPEERNAME_NOT_CONNECTED);
 	}
 	if likely(addr_len >= offsetafter(struct sockaddr_in, sin_family))
 		in->sin_family = AF_INET;
@@ -166,14 +167,14 @@ PRIVATE NONNULL((1)) void KCALL
 udp_bind(struct socket *__restrict self,
          USER CHECKED struct sockaddr const *addr,
          socklen_t addr_len)
-		THROWS(E_INVALID_ARGUMENT_BAD_STATE) {
+		THROWS(E_ILLEGAL_BECAUSE_NOT_READY) {
 	struct udp_socket *me;
 	USER CHECKED struct sockaddr_in const *in;
 	me = (struct udp_socket *)self;
 	in = udp_verify_sockaddr(addr, addr_len);
 	/* Switch to binding-mode */
 	if (ATOMIC_FETCHOR(me->us_state, UDP_SOCKET_STATE_F_BINDING) & UDP_SOCKET_STATE_F_BINDING)
-		THROW(E_INVALID_ARGUMENT_BAD_STATE, E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND);
+		THROW(E_ILLEGAL_BECAUSE_NOT_READY, E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND);
 	TRY {
 		/* Assign a port and  */
 		COMPILER_BARRIER();

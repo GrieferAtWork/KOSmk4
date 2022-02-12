@@ -40,6 +40,7 @@
 #include <hybrid/atomic.h>
 
 #include <compat/config.h>
+#include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <kos/io.h>
 #include <kos/ioctl/pidfd.h>
@@ -163,8 +164,8 @@ handle_pidfd_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
 		if (thread) {
 			if (!(thread->t_flags & TASK_FTERMINATING)) {
 				decref_unlikely(thread);
-				THROW(E_INVALID_ARGUMENT_BAD_STATE,
-				      E_INVALID_ARGUMENT_CONTEXT_TASK_NOT_EXITED,
+				THROW(E_ILLEGAL_BECAUSE_NOT_READY,
+				      E_ILLEGAL_OPERATION_CONTEXT_TASK_NOT_EXITED,
 				      taskpid_gettid_s(self));
 			}
 			decref_unlikely(thread);
@@ -201,11 +202,21 @@ DEFINE_SYSCALL2(fd_t, pidfd_open,
 	target = pidns_lookup_srch(mypid->tp_ns, pid);
 	FINALLY_DECREF_UNLIKELY(target);
 
-	/* Only allow pidfd_open() for process leaders */
-	if (!taskpid_isaprocess(target) && !has_personality(KP_PIDFD_OPEN_THREAD)) {
-		THROW(E_INVALID_ARGUMENT_BAD_STATE,
-		      E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_NOTALEADER);
-	}
+	/* Only allow pidfd_open() for process leaders
+	 * NOTE: Programs that don't want to rely on `KP_PIDFD_OPEN_THREAD' can do:
+	 *    >> char buf[COMPILER_LENOF("/proc/" PRIMAXd)];
+	 *    >> sprintf(buf, "/proc/%d", tid);
+	 *    >> temp = open(buf, O_RDONLY);
+	 *    >> struct fdcast cast;
+	 *    >> bzero(&cast, sizeof(cast));
+	 *    >> cast.fc_rqtyp         = HANDLE_TYPE_PIDFD;
+	 *    >> cast.fc_resfd.of_mode = OPENFD_MODE_AUTO;
+	 *    >> ioctl(temp, FD_IOC_CAST, &cast);
+	 *    >> close(temp);
+	 *    >> return cast.fc_resfd.of_hint;
+	 */
+	if (!taskpid_isaprocess(target) && !has_personality(KP_PIDFD_OPEN_THREAD))
+		THROW(E_PROCESS_EXITED, pid);
 
 	/* Verify that the caller can access `pid' */
 	require_pidfd_open(target);

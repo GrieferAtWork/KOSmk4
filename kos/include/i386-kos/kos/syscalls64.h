@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf48d1505 */
+/* HASH CRC-32:0x5d8756f1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -161,7 +161,7 @@ __CDECLARE_SC(,__errno_t,_sysctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
  *                           the  address  was  truncated and  may  be invalid.
  *                           If this happens,  the caller  can still  determine
  *                           the correct address through use of `getpeername()'
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_ACCEPT_NOT_LISTENING
  * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
  * @throw: E_NET_CONNECTION_ABORT
  * @return: * : A file descriptor for the newly accept(2)-ed connection */
@@ -178,7 +178,7 @@ __CDECLARE_SC(,__fd_t,accept,(__fd_t __sockfd, struct sockaddr *__addr, __sockle
  *                            If this happens,  the caller  can still  determine
  *                            the correct address through use of `getpeername()'
  * @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_ACCEPT_NOT_LISTENING
  * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
  * @throw: E_NET_CONNECTION_ABORT
  * @return: * : A file descriptor for the newly accept(2)-ed connection */
@@ -218,7 +218,7 @@ __CDECLARE_SC(,__syscall_slong_t,arch_prctl,(unsigned int __command, __syscall_u
 /* Bind the given socket `sockfd' to the specified local address.
  * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
  * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND
  * @throw: E_NET_ADDRESS_NOT_AVAILABLE
  * @throw: E_BUFFER_TOO_SMALL   (`addr_len' is incorrect)
  * @return: 0 : Success */
@@ -282,7 +282,7 @@ __CDECLARE_SC(,__errno_t,close_range,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
  * that  will implicitly be  used as destination  by `send(2)' and `write(2)'
  * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
  * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND
  * @throw: E_NET_ADDRESS_NOT_AVAILABLE
  * @throw: E_NET_CONNECTION_REFUSED
  * @throw: E_BUFFER_TOO_SMALL   (addr_len is incorrect)
@@ -777,7 +777,7 @@ __CDECLARE_SC(,__errno_t,getitimer,(__syscall_ulong_t __which, struct __itimerva
  *                   [out] The amount of required memory for the address.
  *                         This may be more than was given, in which case
  *                         the  address was truncated and may be invalid.
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_GETPEERNAME_NOT_CONNECTED
  * @return: 0 : Success */
 __CDECLARE_SC(,__errno_t,getpeername,(__fd_t __sockfd, struct sockaddr *__addr, __socklen_t *__addr_len),(__sockfd,__addr,__addr_len))
 #endif /* __CRT_HAVE_SC(getpeername) */
@@ -1296,7 +1296,6 @@ __CDECLARE_SC(,__fd_t,pidfd_getfd,(__fd_t __pidfd, __fd_t __foreign_fd, __syscal
  * @return: * :   A handle for the process `pid'
  * @throw: E_PROCESS_EXITED:                                                                 [...]
  * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_FLAGS: [...]
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_NOTALEADER:    [...]
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS:                                           [...] */
 __CDECLARE_SC(,__fd_t,pidfd_open,(__pid_t __pid, __syscall_ulong_t __flags),(__pid,__flags))
 #endif /* __CRT_HAVE_SC(pidfd_open) */
@@ -1489,7 +1488,7 @@ __CDECLARE_SC(,__errno_t,reboot,(__syscall_ulong_t __how),(__how))
  *                    [out]  The amount of required memory for the address.
  *                           This may be more than was given, in which case
  *                           the address was truncated and may be invalid.
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED
  * @throw: E_NET_CONNECTION_REFUSED
  * @throw: E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked)
  * @return: * : [<= bufsize] The actual # of received bytes */
@@ -1806,7 +1805,7 @@ __CDECLARE_SC(,__ssize_t,sendmsg,(__fd_t __sockfd, struct __msghdrx64 const *__m
  * @param: addr_len:  Size of `addr', or `0' to have this behave as an alias
  *                    for            `send(sockfd, buf, bufsize, msg_flags)'
  * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SEND_NOT_CONNECTED
  * @throw: E_NET_MESSAGE_TOO_LONG
  * @throw: E_NET_CONNECTION_RESET
  * @throw: E_NET_SHUTDOWN
@@ -1993,7 +1992,7 @@ __CDECLARE_SC(,__errno_t,shmget,(__key_t __key, __size_t __size, __syscall_ulong
  * as  all currently queued  data has been  read), and/or further transmission
  * of data (causing `send(2)' to throw an `E_NET_SHUTDOWN' exception)
  * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SHUTDOWN_NOT_CONNECTED
  * @return: 0 : Success */
 __CDECLARE_SC(,__errno_t,shutdown,(__fd_t __sockfd, __syscall_ulong_t __how),(__sockfd,__how))
 #endif /* __CRT_HAVE_SC(shutdown) */
@@ -2294,7 +2293,7 @@ __CDECLARE_XSC(,__errno_t,_sysctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
  *                           the  address  was  truncated and  may  be invalid.
  *                           If this happens,  the caller  can still  determine
  *                           the correct address through use of `getpeername()'
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_ACCEPT_NOT_LISTENING
  * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
  * @throw: E_NET_CONNECTION_ABORT
  * @return: * : A file descriptor for the newly accept(2)-ed connection */
@@ -2311,7 +2310,7 @@ __CDECLARE_XSC(,__fd_t,accept,(__fd_t __sockfd, struct sockaddr *__addr, __sockl
  *                            If this happens,  the caller  can still  determine
  *                            the correct address through use of `getpeername()'
  * @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_ACCEPT_NOT_LISTENING
  * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
  * @throw: E_NET_CONNECTION_ABORT
  * @return: * : A file descriptor for the newly accept(2)-ed connection */
@@ -2351,7 +2350,7 @@ __CDECLARE_XSC(,__syscall_slong_t,arch_prctl,(unsigned int __command, __syscall_
 /* Bind the given socket `sockfd' to the specified local address.
  * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
  * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND
  * @throw: E_NET_ADDRESS_NOT_AVAILABLE
  * @throw: E_BUFFER_TOO_SMALL   (`addr_len' is incorrect)
  * @return: 0 : Success */
@@ -2415,7 +2414,7 @@ __CDECLARE_XSC(,__errno_t,close_range,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
  * that  will implicitly be  used as destination  by `send(2)' and `write(2)'
  * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
  * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND
  * @throw: E_NET_ADDRESS_NOT_AVAILABLE
  * @throw: E_NET_CONNECTION_REFUSED
  * @throw: E_BUFFER_TOO_SMALL   (addr_len is incorrect)
@@ -2910,7 +2909,7 @@ __CDECLARE_XSC(,__errno_t,getitimer,(__syscall_ulong_t __which, struct __itimerv
  *                   [out] The amount of required memory for the address.
  *                         This may be more than was given, in which case
  *                         the  address was truncated and may be invalid.
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_GETPEERNAME_NOT_CONNECTED
  * @return: 0 : Success */
 __CDECLARE_XSC(,__errno_t,getpeername,(__fd_t __sockfd, struct sockaddr *__addr, __socklen_t *__addr_len),(__sockfd,__addr,__addr_len))
 #endif /* __CRT_HAVE_XSC(getpeername) */
@@ -3429,7 +3428,6 @@ __CDECLARE_XSC(,__fd_t,pidfd_getfd,(__fd_t __pidfd, __fd_t __foreign_fd, __sysca
  * @return: * :   A handle for the process `pid'
  * @throw: E_PROCESS_EXITED:                                                                 [...]
  * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_FLAGS: [...]
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_NOTALEADER:    [...]
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS:                                           [...] */
 __CDECLARE_XSC(,__fd_t,pidfd_open,(__pid_t __pid, __syscall_ulong_t __flags),(__pid,__flags))
 #endif /* __CRT_HAVE_XSC(pidfd_open) */
@@ -3622,7 +3620,7 @@ __CDECLARE_XSC(,__errno_t,reboot,(__syscall_ulong_t __how),(__how))
  *                    [out]  The amount of required memory for the address.
  *                           This may be more than was given, in which case
  *                           the address was truncated and may be invalid.
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED
  * @throw: E_NET_CONNECTION_REFUSED
  * @throw: E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked)
  * @return: * : [<= bufsize] The actual # of received bytes */
@@ -3922,7 +3920,7 @@ __CDECLARE_XSC(,__ssize_t,sendmsg,(__fd_t __sockfd, struct __msghdrx64 const *__
  * @param: addr_len:  Size of `addr', or `0' to have this behave as an alias
  *                    for            `send(sockfd, buf, bufsize, msg_flags)'
  * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SEND_NOT_CONNECTED
  * @throw: E_NET_MESSAGE_TOO_LONG
  * @throw: E_NET_CONNECTION_RESET
  * @throw: E_NET_SHUTDOWN
@@ -4109,7 +4107,7 @@ __CDECLARE_XSC(,__errno_t,shmget,(__key_t __key, __size_t __size, __syscall_ulon
  * as  all currently queued  data has been  read), and/or further transmission
  * of data (causing `send(2)' to throw an `E_NET_SHUTDOWN' exception)
  * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SHUTDOWN_NOT_CONNECTED
  * @return: 0 : Success */
 __CDECLARE_XSC(,__errno_t,shutdown,(__fd_t __sockfd, __syscall_ulong_t __how),(__sockfd,__how))
 #endif /* __CRT_HAVE_XSC(shutdown) */

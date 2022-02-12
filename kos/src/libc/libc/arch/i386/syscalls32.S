@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6dc278c6 */
+/* HASH CRC-32:0xf3e96a71 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3169,7 +3169,7 @@ DEFINE_PUBLIC_ALIAS(sys_socketpair, libc_sys_socketpair)
 /* Bind the given socket `sockfd' to the specified local address.
  * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
  * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND
  * @throw: E_NET_ADDRESS_NOT_AVAILABLE
  * @throw: E_BUFFER_TOO_SMALL   (`addr_len' is incorrect)
  * @return: 0 : Success */
@@ -3185,7 +3185,7 @@ DEFINE_PUBLIC_ALIAS(sys_bind, libc_sys_bind)
  * that  will implicitly be  used as destination  by `send(2)' and `write(2)'
  * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
  * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND
  * @throw: E_NET_ADDRESS_NOT_AVAILABLE
  * @throw: E_NET_CONNECTION_REFUSED
  * @throw: E_BUFFER_TOO_SMALL   (addr_len is incorrect)
@@ -3222,7 +3222,7 @@ DEFINE_PUBLIC_ALIAS(sys_listen, libc_sys_listen)
  *                            If this happens,  the caller  can still  determine
  *                            the correct address through use of `getpeername()'
  * @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_ACCEPT_NOT_LISTENING
  * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
  * @throw: E_NET_CONNECTION_ABORT
  * @return: * : A file descriptor for the newly accept(2)-ed connection */
@@ -3289,7 +3289,7 @@ DEFINE_PUBLIC_ALIAS(sys_getsockname, libc_sys_getsockname)
  *                   [out] The amount of required memory for the address.
  *                         This may be more than was given, in which case
  *                         the  address was truncated and may be invalid.
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_GETPEERNAME_NOT_CONNECTED
  * @return: 0 : Success */
 /* errno_t getpeername(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
 INTERN_FUNCTION(libc_sys_getpeername)
@@ -3307,7 +3307,7 @@ DEFINE_PUBLIC_ALIAS(sys_getpeername, libc_sys_getpeername)
  * @param: addr_len:  Size of `addr', or `0' to have this behave as an alias
  *                    for            `send(sockfd, buf, bufsize, msg_flags)'
  * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SEND_NOT_CONNECTED
  * @throw: E_NET_MESSAGE_TOO_LONG
  * @throw: E_NET_CONNECTION_RESET
  * @throw: E_NET_SHUTDOWN
@@ -3344,7 +3344,7 @@ DEFINE_PUBLIC_ALIAS(sys_sendmsg, libc_sys_sendmsg)
  *                    [out]  The amount of required memory for the address.
  *                           This may be more than was given, in which case
  *                           the address was truncated and may be invalid.
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED
  * @throw: E_NET_CONNECTION_REFUSED
  * @throw: E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked)
  * @return: * : [<= bufsize] The actual # of received bytes */
@@ -3373,7 +3373,7 @@ DEFINE_PUBLIC_ALIAS(sys_recvmsg, libc_sys_recvmsg)
  * as  all currently queued  data has been  read), and/or further transmission
  * of data (causing `send(2)' to throw an `E_NET_SHUTDOWN' exception)
  * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SHUTDOWN_NOT_CONNECTED
  * @return: 0 : Success */
 /* errno_t shutdown(fd_t sockfd, syscall_ulong_t how) */
 INTERN_FUNCTION(libc_sys_shutdown)
@@ -3796,7 +3796,6 @@ DEFINE_PUBLIC_ALIAS(sys_fspick, libc_sys_fspick)
  * @return: * :   A handle for the process `pid'
  * @throw: E_PROCESS_EXITED:                                                                 [...]
  * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_FLAGS: [...]
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_NOTALEADER:    [...]
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS:                                           [...] */
 /* fd_t pidfd_open(pid_t pid, syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_pidfd_open)
@@ -7580,7 +7579,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xsocketpair, libc_sys_Xsocketpair)
 /* Bind the given socket `sockfd' to the specified local address.
  * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
  * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND
  * @throw: E_NET_ADDRESS_NOT_AVAILABLE
  * @throw: E_BUFFER_TOO_SMALL   (`addr_len' is incorrect)
  * @return: 0 : Success */
@@ -7596,7 +7595,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xbind, libc_sys_Xbind)
  * that  will implicitly be  used as destination  by `send(2)' and `write(2)'
  * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
  * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND
  * @throw: E_NET_ADDRESS_NOT_AVAILABLE
  * @throw: E_NET_CONNECTION_REFUSED
  * @throw: E_BUFFER_TOO_SMALL   (addr_len is incorrect)
@@ -7633,7 +7632,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xlisten, libc_sys_Xlisten)
  *                            If this happens,  the caller  can still  determine
  *                            the correct address through use of `getpeername()'
  * @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_ACCEPT_NOT_LISTENING
  * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
  * @throw: E_NET_CONNECTION_ABORT
  * @return: * : A file descriptor for the newly accept(2)-ed connection */
@@ -7700,7 +7699,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xgetsockname, libc_sys_Xgetsockname)
  *                   [out] The amount of required memory for the address.
  *                         This may be more than was given, in which case
  *                         the  address was truncated and may be invalid.
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_GETPEERNAME_NOT_CONNECTED
  * @return: 0 : Success */
 /* errno_t getpeername(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
 INTERN_FUNCTION(libc_sys_Xgetpeername)
@@ -7718,7 +7717,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xgetpeername, libc_sys_Xgetpeername)
  * @param: addr_len:  Size of `addr', or `0' to have this behave as an alias
  *                    for            `send(sockfd, buf, bufsize, msg_flags)'
  * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SEND_NOT_CONNECTED
  * @throw: E_NET_MESSAGE_TOO_LONG
  * @throw: E_NET_CONNECTION_RESET
  * @throw: E_NET_SHUTDOWN
@@ -7755,7 +7754,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xsendmsg, libc_sys_Xsendmsg)
  *                    [out]  The amount of required memory for the address.
  *                           This may be more than was given, in which case
  *                           the address was truncated and may be invalid.
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED
  * @throw: E_NET_CONNECTION_REFUSED
  * @throw: E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked)
  * @return: * : [<= bufsize] The actual # of received bytes */
@@ -7784,7 +7783,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xrecvmsg, libc_sys_Xrecvmsg)
  * as  all currently queued  data has been  read), and/or further transmission
  * of data (causing `send(2)' to throw an `E_NET_SHUTDOWN' exception)
  * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED
+ * @throw: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SHUTDOWN_NOT_CONNECTED
  * @return: 0 : Success */
 /* errno_t shutdown(fd_t sockfd, syscall_ulong_t how) */
 INTERN_FUNCTION(libc_sys_Xshutdown)
@@ -8207,7 +8206,6 @@ DEFINE_PUBLIC_ALIAS(sys_Xfspick, libc_sys_Xfspick)
  * @return: * :   A handle for the process `pid'
  * @throw: E_PROCESS_EXITED:                                                                 [...]
  * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_FLAGS: [...]
- * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_NOTALEADER:    [...]
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS:                                           [...] */
 /* fd_t pidfd_open(pid_t pid, syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_Xpidfd_open)

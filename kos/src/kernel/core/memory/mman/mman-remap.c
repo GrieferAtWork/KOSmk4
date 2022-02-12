@@ -45,6 +45,7 @@
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
+#include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 
 #include <assert.h>
@@ -122,8 +123,8 @@ err_unmapped_old_address:
 	if unlikely(!(mnode_flags & MNODE_F_SHARED)) {
 		mman_lock_release(self);
 err_not_shareable:
-		THROW(E_INVALID_ARGUMENT_BAD_STATE,
-		      E_INVALID_ARGUMENT_CONTEXT_MREMAP_OLDSZ0_NOT_SHAREABLE);
+		THROW(E_INVALID_OPERATION,
+		      E_ILLEGAL_OPERATION_CONTEXT_MREMAP_OLDSZ0_NOT_SHAREABLE);
 	}
 
 	/* Fill in our mfile mapping descriptor with information from `node' */

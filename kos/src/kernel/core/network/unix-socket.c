@@ -47,6 +47,7 @@ gcc_opt.removeif([](x) -> x.startswith("-O")); // TODO: Why are optimizations di
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
+#include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <kos/except/reason/net.h>
 #include <network/unix-socket.h>
@@ -482,8 +483,8 @@ UnixSocket_GetName(UnixSocket *__restrict self,
 	/* Check if the socket is bound/connected */
 	if (!node || node == (struct fsocknode *)-1) {
 		if (error_if_not_bound) {
-			THROW(E_INVALID_ARGUMENT_BAD_STATE,
-			      E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED);
+			THROW(E_ILLEGAL_BECAUSE_NOT_READY,
+			      E_ILLEGAL_OPERATION_CONTEXT_SOCKET_GETPEERNAME_NOT_CONNECTED);
 		}
 
 		/* Follow what linux does and kind-of break the rules:
@@ -531,7 +532,7 @@ PRIVATE NONNULL((1)) socklen_t KCALL
 UnixSocket_GetPeerName(struct socket *__restrict self,
                        USER CHECKED struct sockaddr *addr,
                        socklen_t addr_len)
-		THROWS(E_INVALID_ARGUMENT_BAD_STATE) {
+		THROWS(E_ILLEGAL_BECAUSE_NOT_READY) {
 	return UnixSocket_GetName((UnixSocket *)self,
 	                          (USER CHECKED struct sockaddr_un *)addr,
 	                          addr_len, true);
@@ -543,7 +544,7 @@ UnixSocket_Bind(struct socket *__restrict self,
                 USER CHECKED struct sockaddr const *addr,
                 socklen_t addr_len)
 		THROWS(E_NET_ADDRESS_IN_USE, E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
-		       E_INVALID_ARGUMENT_BAD_STATE, E_BUFFER_TOO_SMALL) {
+		       E_ILLEGAL_BECAUSE_NOT_READY, E_BUFFER_TOO_SMALL) {
 	size_t pathlen;
 	UnixSocket *me = (UnixSocket *)self;
 	USER CHECKED struct sockaddr_un *addr_un;
@@ -592,8 +593,8 @@ UnixSocket_Bind(struct socket *__restrict self,
 	 * already bound, or is currently being bound by some other thread. */
 	if unlikely(!ATOMIC_CMPXCH(me->us_node, NULL, (REF struct fsocknode *)-1)) {
 		decref_unlikely(bind_path);
-		THROW(E_INVALID_ARGUMENT_BAD_STATE,
-		      E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND);
+		THROW(E_ILLEGAL_BECAUSE_NOT_READY,
+		      E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND);
 	}
 	/* At this point, we need to create a socket-file within `bind_path',
 	 * under   the   name   `socket_filename_ptr...+=socket_filename_len' */
@@ -754,7 +755,7 @@ PRIVATE NONNULL((1)) void KCALL
 UnixSocket_Connect(struct socket *__restrict self,
                    USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
                    /*out*/ struct aio_handle *__restrict aio)
-		THROWS_INDIRECT(E_NET_ADDRESS_IN_USE, E_INVALID_ARGUMENT_BAD_STATE,
+		THROWS_INDIRECT(E_NET_ADDRESS_IN_USE, E_ILLEGAL_BECAUSE_NOT_READY,
 		                E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
 		                E_BADALLOC_INSUFFICIENT_PORT_NUMBERS,
 		                E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT,
@@ -791,8 +792,8 @@ UnixSocket_Connect(struct socket *__restrict self,
 	                  addr_len -
 	                  offsetof(struct sockaddr_un, sun_path));
 	if unlikely(!ATOMIC_CMPXCH(me->us_node, NULL, (REF struct fsocknode *)-1)) {
-		THROW(E_INVALID_ARGUMENT_BAD_STATE,
-		      E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED);
+		THROW(E_ILLEGAL_BECAUSE_NOT_READY,
+		      E_ILLEGAL_OPERATION_CONTEXT_SOCKET_CONNECT_ALREADY_CONNECTED);
 	}
 	TRY {
 		/* Traverse the given path to find the associated socket. */
@@ -919,8 +920,8 @@ UnixSocket_Listen(struct socket *__restrict self,
 	/* Verify that we've been bound. */
 	if unlikely(!server_node || server_node == (struct fsocknode *)-1) {
 socket_is_not_bound:
-		THROW(E_INVALID_ARGUMENT_BAD_STATE,
-		      E_INVALID_ARGUMENT_CONTEXT_LISTEN_NOT_BOUND);
+		THROW(E_ILLEGAL_BECAUSE_NOT_READY,
+		      E_ILLEGAL_OPERATION_CONTEXT_SOCKET_LISTEN_NOT_BOUND);
 	}
 
 	/* Verify  that  we're  a  server  socket.  (i.e.  don't  have  one  of   those
@@ -959,7 +960,7 @@ NOTHROW(KCALL raise_pb_buffer_limit)(struct pb_buffer *__restrict self,
 
 PRIVATE NONNULL((1)) REF struct socket *KCALL
 UnixSocket_Accept(struct socket *__restrict self, iomode_t mode)
-		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_INVALID_HANDLE_NET_OPERATION,
+		THROWS(E_ILLEGAL_BECAUSE_NOT_READY, E_INVALID_HANDLE_NET_OPERATION,
 		       E_NET_CONNECTION_ABORT) {
 	REF UnixSocket *result;
 	REF struct unix_client *result_client;
@@ -970,8 +971,8 @@ UnixSocket_Accept(struct socket *__restrict self, iomode_t mode)
 	/* Verify that we've been bound. */
 	if unlikely(!server_node || server_node == (struct fsocknode *)-1) {
 socket_is_not_bound:
-		THROW(E_INVALID_ARGUMENT_BAD_STATE,
-		      E_INVALID_ARGUMENT_CONTEXT_ACCEPT_NOT_LISTENING);
+		THROW(E_ILLEGAL_BECAUSE_NOT_READY,
+		      E_ILLEGAL_OPERATION_CONTEXT_SOCKET_ACCEPT_NOT_LISTENING);
 	}
 
 	/* Verify that we're a server socket. */
@@ -1355,7 +1356,7 @@ UnixSocket_Sendv(struct socket *__restrict self,
                  struct iov_buffer const *__restrict buf, size_t bufsize,
                  struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
                  /*out*/ struct aio_handle *__restrict aio)
-		THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_MESSAGE_TOO_LONG,
+		THROWS_INDIRECT(E_ILLEGAL_BECAUSE_NOT_READY, E_NET_MESSAGE_TOO_LONG,
 		                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN) {
 	UnixSocket *me;
 	struct pb_buffer *pbuf;
@@ -1370,14 +1371,14 @@ UnixSocket_Sendv(struct socket *__restrict self,
 
 		/* make sure we're actually connected. */
 		if unlikely(node == NULL || node == (struct fsocknode *)-1) {
-			THROW(E_INVALID_ARGUMENT_BAD_STATE,
-			      E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED);
+			THROW(E_ILLEGAL_BECAUSE_NOT_READY,
+			      E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SEND_NOT_CONNECTED);
 		}
 
 		/* make sure that this one's a client-socket. */
 		if unlikely(!me->us_client) {
-			THROW(E_INVALID_ARGUMENT_BAD_STATE,
-			      E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED);
+			THROW(E_ILLEGAL_BECAUSE_NOT_READY,
+			      E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SEND_NOT_CONNECTED);
 		}
 	}
 
@@ -1504,7 +1505,7 @@ UnixSocket_Recvv(struct socket *__restrict self,
                  struct ancillary_rmessage const *msg_control,
                  syscall_ulong_t msg_flags,
                  ktime_t abs_timeout)
-		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED,
+		THROWS(E_ILLEGAL_BECAUSE_NOT_READY, E_NET_CONNECTION_REFUSED,
 		       E_NET_TIMEOUT, E_WOULDBLOCK) {
 	size_t result;
 	UnixSocket *me;
@@ -1518,14 +1519,14 @@ UnixSocket_Recvv(struct socket *__restrict self,
 
 		/* make sure we're actually connected. */
 		if unlikely(node == NULL || node == (struct fsocknode *)-1) {
-			THROW(E_INVALID_ARGUMENT_BAD_STATE,
-			      E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED);
+			THROW(E_ILLEGAL_BECAUSE_NOT_READY,
+			      E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED);
 		}
 
 		/* make sure that this one's a client-socket. */
 		if unlikely(!me->us_client) {
-			THROW(E_INVALID_ARGUMENT_BAD_STATE,
-			      E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED);
+			THROW(E_ILLEGAL_BECAUSE_NOT_READY,
+			      E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED);
 		}
 	}
 
@@ -1735,7 +1736,7 @@ done:
 PRIVATE NONNULL((1)) void KCALL
 UnixSocket_Shutdown(struct socket *__restrict self,
                     syscall_ulong_t how)
-		THROWS(E_INVALID_ARGUMENT_BAD_STATE) {
+		THROWS(E_ILLEGAL_BECAUSE_NOT_READY) {
 	UnixSocket *me;
 	struct fsocknode *node;
 	me   = (UnixSocket *)self;
@@ -1743,14 +1744,14 @@ UnixSocket_Shutdown(struct socket *__restrict self,
 
 	/* make sure we're actually connected. */
 	if unlikely(node == NULL || node == (struct fsocknode *)-1) {
-		THROW(E_INVALID_ARGUMENT_BAD_STATE,
-		      E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED);
+		THROW(E_ILLEGAL_BECAUSE_NOT_READY,
+		      E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SHUTDOWN_NOT_CONNECTED);
 	}
 
 	/* make sure that this one's a client-socket. */
 	if unlikely(!me->us_client) {
-		THROW(E_INVALID_ARGUMENT_BAD_STATE,
-		      E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED);
+		THROW(E_ILLEGAL_BECAUSE_NOT_READY,
+		      E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SHUTDOWN_NOT_CONNECTED);
 	}
 	/* Simply close the specified buffers. */
 	if (SHUT_ISRD(how))
@@ -1762,7 +1763,7 @@ UnixSocket_Shutdown(struct socket *__restrict self,
 PRIVATE ATTR_RETNONNULL struct unix_client *KCALL
 UnixSocket_GetClient(struct unix_socket *__restrict self,
                      unsigned int error_context)
-		THROWS(E_INVALID_ARGUMENT_BAD_STATE) {
+		THROWS(E_ILLEGAL_BECAUSE_NOT_READY) {
 	struct unix_client *result;
 	struct fsocknode *server_node;
 	server_node = ATOMIC_READ(self->us_node);
@@ -1771,7 +1772,7 @@ UnixSocket_GetClient(struct unix_socket *__restrict self,
 	/* Verify that we've been bound. */
 	if unlikely(!server_node || server_node == (struct fsocknode *)-1) {
 not_connected:
-		THROW(E_INVALID_ARGUMENT_BAD_STATE, error_context);
+		THROW(E_ILLEGAL_BECAUSE_NOT_READY, error_context);
 	}
 	result = self->us_client;
 	if unlikely(result == NULL)
@@ -1794,7 +1795,7 @@ UnixSocket_GetSockOpt(struct socket *__restrict self,
 			struct unix_client *client;
 			if (optlen != sizeof(struct ucred))
 				THROW(E_BUFFER_TOO_SMALL, sizeof(struct ucred), optlen);
-			client = UnixSocket_GetClient(me, E_INVALID_ARGUMENT_CONTEXT_SO_PEERCRED_NOT_CONNECTED);
+			client = UnixSocket_GetClient(me, E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SO_PEERCRED_NOT_CONNECTED);
 			memcpy(optval, &client->uc_cred, sizeof(struct ucred));
 			return sizeof(struct ucred);
 		}	break;

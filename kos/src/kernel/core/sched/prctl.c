@@ -37,7 +37,7 @@
 
 #include <compat/config.h>
 #include <kos/except.h>
-#include <kos/except/reason/context.h>
+#include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <linux/prctl.h>
 
@@ -106,8 +106,8 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 		cred_write(mycred);
 		if (mycred->c_securebits & SECBIT_KEEP_CAPS_LOCKED) {
 			cred_endwrite(mycred);
-			THROW(E_INVALID_CONTEXT_NOT_PERMITTED,
-			      E_INVALID_CONTEXT_PRCTL_SET_KEEPCAPS_LOCKED);
+			THROW(E_ILLEGAL_OPERATION,
+			      E_ILLEGAL_OPERATION_CONTEXT_PRCTL_SET_KEEPCAPS_LOCKED);
 		}
 		mycred->c_securebits &= ~SECBIT_KEEP_CAPS;
 		if (arg2)
@@ -212,8 +212,8 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 		/* Don't allow locks to be released. (they can only be added) */
 		if ((mycred->c_securebits & ~arg2 & SECBITS_LOCKS) != 0) {
 			cred_endwrite(mycred);
-			THROW(E_INVALID_CONTEXT_NOT_PERMITTED,
-			      E_INVALID_CONTEXT_PRCTL_SET_SECUREBITS_UNLOCK);
+			THROW(E_ILLEGAL_OPERATION,
+			      E_ILLEGAL_OPERATION_CONTEXT_PRCTL_SET_SECUREBITS_UNLOCK);
 		}
 
 		/* Don't allow changes to locked bits. */
@@ -221,8 +221,8 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 		     ((mycred->c_securebits & SECBITS_LOCKS) >> 1)                         /* Bitset of immutable non-lock bits */
 		     ) != 0) {
 			cred_endwrite(mycred);
-			THROW(E_INVALID_CONTEXT_NOT_PERMITTED,
-			      E_INVALID_CONTEXT_PRCTL_SET_SECUREBITS_LOCKED);
+			THROW(E_ILLEGAL_OPERATION,
+			      E_ILLEGAL_OPERATION_CONTEXT_PRCTL_SET_SECUREBITS_LOCKED);
 		}
 		mycred->c_securebits = (typeof(mycred->c_securebits))arg2;
 		cred_endwrite(mycred);
@@ -260,8 +260,8 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 		cred_write(mycred);
 		if (arg2 == 0 && mycred->c_no_new_privs != 0) {
 			cred_endwrite(mycred);
-			THROW(E_INVALID_CONTEXT_NOT_PERMITTED,
-			      E_INVALID_CONTEXT_PRCTL_SET_NO_NEW_PRIVS_CANNOT_DISABLE);
+			THROW(E_ILLEGAL_OPERATION,
+			      E_ILLEGAL_OPERATION_CONTEXT_PRCTL_SET_NO_NEW_PRIVS_CANNOT_DISABLE);
 		}
 		mycred->c_no_new_privs = (typeof(mycred->c_no_new_privs))arg2;
 		cred_endwrite(mycred);
@@ -344,15 +344,15 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 			cred_write(mycred);
 			if unlikely(mycred->c_securebits & SECBIT_NO_CAP_AMBIENT_RAISE) {
 				cred_endwrite(mycred);
-				THROW(E_INVALID_CONTEXT_NOT_PERMITTED,
-				      E_INVALID_CONTEXT_PRCTL_CAP_AMBIENT_RAISE_DISABLED,
+				THROW(E_ILLEGAL_OPERATION,
+				      E_ILLEGAL_OPERATION_CONTEXT_PRCTL_CAP_AMBIENT_RAISE_DISABLED,
 				      (syscall_slong_t)arg3);
 			}
 			if (!credcap_capable(&mycred->c_cap_permitted, (syscall_slong_t)arg3) ||
 			    !credcap_capable(&mycred->c_cap_inheritable, (syscall_slong_t)arg3)) {
 				cred_endwrite(mycred);
-				THROW(E_INVALID_CONTEXT_NOT_PERMITTED,
-				      E_INVALID_CONTEXT_PRCTL_CAP_AMBIENT_RAISE_DENIED,
+				THROW(E_ILLEGAL_OPERATION,
+				      E_ILLEGAL_OPERATION_CONTEXT_PRCTL_CAP_AMBIENT_RAISE_DENIED,
 				      (syscall_slong_t)arg3);
 			}
 			credcap_turnon(&mycred->c_cap_ambient, (syscall_slong_t)arg3);

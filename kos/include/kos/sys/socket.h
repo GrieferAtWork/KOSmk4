@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8bacc882 */
+/* HASH CRC-32:0x9fdbf814 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,7 +68,7 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((4)),__THROWING,SocketPair,(__STDC_INT_AS_UIN
  * @return: 0 : Success
  * @return: -1: [errno=EADDRINUSE]    E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
  * @return: -1: [errno=EINVAL]        E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
- * @return: -1: [errno=EINVAL]        E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @return: -1: [errno=EINVAL]        E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND
  * @return: -1: [errno=EADDRNOTAVAIL] E_NET_ADDRESS_NOT_AVAILABLE
  * @return: -1: [errno=ERANGE]        E_BUFFER_TOO_SMALL   (`addr_len' is incorrect) */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,Bind,(__fd_t __sockfd, __CONST_SOCKADDR_ARG __addr, socklen_t __addr_len),(__sockfd,__addr,__addr_len))
@@ -93,7 +93,7 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((2, 3)),__THROWING,GetSockName,(__fd_t __sock
  * @return: 0 : Success
  * @return: -1: [errno=EADDRINUSE]    E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
  * @return: -1: [errno=EINVAL]        E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
- * @return: -1: [errno=EINVAL]        E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
+ * @return: -1: [errno=EINVAL]        E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND
  * @return: -1: [errno=EADDRNOTAVAIL] E_NET_ADDRESS_NOT_AVAILABLE
  * @return: -1: [errno=ECONNREFUSED]  E_NET_CONNECTION_REFUSED
  * @return: -1: [errno=ERANGE]        E_BUFFER_TOO_SMALL   (addr_len is incorrect) */
@@ -106,7 +106,7 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,Connect,(__fd_t __sockfd, __C
  *                         This may be more than was given, in which case
  *                         the  address was truncated and may be invalid.
  * @return: 0 : Success
- * @return: -1: [errno=ENOTCONN]  E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
+ * @return: -1: [errno=ENOTCONN] E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_GETPEERNAME_NOT_CONNECTED
  * @return: -1: Error (s.a. `errno') */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((2, 3)),__THROWING,GetPeerName,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__addr,__addr_len))
 /* >> send(2)
@@ -114,7 +114,7 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((2, 3)),__THROWING,GetPeerName,(__fd_t __sock
  * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
  * @return: * : [<= bufsize] The actual # of send bytes
- * @return: -1: [errno=EDESTADDRREQ] E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
+ * @return: -1: [errno=EDESTADDRREQ] E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SEND_NOT_CONNECTED
  * @return: -1: [errno=EMSGSIZE]     E_NET_MESSAGE_TOO_LONG
  * @return: -1: [errno=ECONNRESET]   E_NET_CONNECTION_RESET
  * @return: -1: [errno=EPIPE]        E_NET_SHUTDOWN */
@@ -124,7 +124,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),size_t,__THROWING,Send,(__fd_t __sockfd, void
  * @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
  * @return: * : [<= bufsize] The actual # of received bytes
- * @return: -1: [errno=ENOTCONN]     E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+ * @return: -1: [errno=ENOTCONN]     E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED
  * @return: -1: [errno=ECONNREFUSED] E_NET_CONNECTION_REFUSED */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((2)),size_t,__THROWING,Recv,(__fd_t __sockfd, void *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __msg_flags),(__sockfd,__buf,__bufsize,__msg_flags))
 /* >> sendto(2)
@@ -138,7 +138,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((2)),size_t,__THROWING,Recv,(__fd_t
  *                    for            `send(sockfd, buf, bufsize, msg_flags)'
  * @return: * : [<= bufsize] The actual # of send bytes
  * @return: -1: [errno=EINVAL]       E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY
- * @return: -1: [errno=EDESTADDRREQ] E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
+ * @return: -1: [errno=EDESTADDRREQ] E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SEND_NOT_CONNECTED
  * @return: -1: [errno=EMSGSIZE]     E_NET_MESSAGE_TOO_LONG
  * @return: -1: [errno=ECONNRESET]   E_NET_CONNECTION_RESET
  * @return: -1: [errno=EPIPE]        E_NET_SHUTDOWN
@@ -157,7 +157,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),size_t,__THROWING,SendTo,(__fd_t __sockfd, vo
  *                           This may be more than was given, in which case
  *                           the address was truncated and may be invalid.
  * @return: * : [<= bufsize] The actual # of received bytes
- * @return: -1: [errno=ENOTCONN]     E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED
+ * @return: -1: [errno=ENOTCONN]     E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED
  * @return: -1: [errno=ECONNREFUSED] E_NET_CONNECTION_REFUSED
  * @return: -1: [errno=EAGAIN]       E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked) */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((2)),size_t,__THROWING,RecvFrom,(__fd_t __sockfd, void *__restrict __buf, size_t __bufsize, __STDC_INT_AS_UINT_T __msg_flags, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__buf,__bufsize,__msg_flags,__addr,__addr_len))
@@ -221,7 +221,7 @@ __CDECLARE_VOID_OPT(,__THROWING,Listen,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __
  *                           If this happens,  the caller  can still  determine
  *                           the correct address through use of `getpeername()'
  * @return: * : A file descriptor for the newly accept(2)-ed connection
- * @return: -1: [errno=EINVAL]       E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @return: -1: [errno=EINVAL]       E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_ACCEPT_NOT_LISTENING
  * @return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
  * @return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT */
 __CDECLARE_OPT(,__fd_t,__THROWING,Accept,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__addr,__addr_len))
@@ -231,7 +231,7 @@ __CDECLARE_OPT(,__fd_t,__THROWING,Accept,(__fd_t __sockfd, __SOCKADDR_ARG __addr
  * of data (causing `send(2)' to throw an `E_NET_SHUTDOWN' exception)
  * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
  * @return: 0 : Success
- * @return: -1: [errno=ENOTCONN] E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED */
+ * @return: -1: [errno=ENOTCONN] E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SHUTDOWN_NOT_CONNECTED */
 __CDECLARE_VOID_OPT(,__THROWING,Shutdown,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __how),(__sockfd,__how))
 
 #ifdef __USE_GNU
@@ -247,7 +247,7 @@ __CDECLARE_VOID_OPT(,__THROWING,Shutdown,(__fd_t __sockfd, __STDC_INT_AS_UINT_T 
  *                            the correct address through use of `getpeername()'
  * @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
  * @return: * : A file descriptor for the newly accept(2)-ed connection
- * @return: -1: [errno=EINVAL]       E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
+ * @return: -1: [errno=EINVAL]       E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_ACCEPT_NOT_LISTENING
  * @return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
  * @return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT */
 __CDECLARE_OPT(,__fd_t,__THROWING,Accept4,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len, __STDC_INT_AS_UINT_T __sock_flags),(__sockfd,__addr,__addr_len,__sock_flags))

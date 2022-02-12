@@ -41,6 +41,7 @@
 
 #include <hw/video/vga.h>
 #include <kos/except.h>
+#include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <kos/ioctl/svga.h>
 
@@ -249,8 +250,8 @@ svgalck_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		validate_writable(arg, sizeof(struct svga_modeinfo));
 		mymode = ATOMIC_READ(me->slc_mode);
 		if (!mymode) {
-			THROW(E_INVALID_ARGUMENT_BAD_STATE,
-			      E_INVALID_ARGUMENT_CONTEXT_SVGA_NO_MODE_SET);
+			THROW(E_ILLEGAL_BECAUSE_NOT_READY,
+			      E_ILLEGAL_OPERATION_CONTEXT_SVGA_NO_MODE_SET);
 		}
 		memcpy(arg, mymode, sizeof(struct svga_modeinfo));
 		return 0;
