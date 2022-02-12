@@ -490,6 +490,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_arch_prctl_command
 #endif /* HAVE_SC_REPR_ARCH_PRCTL_COMMAND */
 
+#ifdef HAVE_SC_REPR_PRCTL_COMMAND
+#define NEED_print_prctl_command
+#endif /* HAVE_SC_REPR_PRCTL_COMMAND */
+
 
 
 
@@ -3842,7 +3846,9 @@ PRIVATE char const repr_ARCH_1001h[] =
 PRIVATE char const repr_ARCH_2001h[] =
 "MAP_VDSO_X32\0MAP_VDSO_32\0MAP_VDSO_64";
 /*[[[end]]]*/
-#endif /* __i386__ || __x86_64__ */
+#else /* __i386__ || __x86_64__ */
+#error "Need arch_prctl command reprs, but don't know where to find on this arch"
+#endif /* !__i386__ && !__x86_64__ */
 
 PRIVATE ATTR_CONST WUNUSED char const *CC
 get_arch_prctl_name(syscall_ulong_t op) {
@@ -3867,6 +3873,61 @@ print_arch_prctl_command(pformatprinter printer, void *arg,
 	return format_printf(printer, arg, "%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__), command);
 }
 #endif /* NEED_print_arch_prctl_command */
+
+
+
+#if defined(NEED_print_prctl_command) || defined(__DEEMON__)
+/*[[[deemon
+import * from deemon;
+import * from ...misc.libgen.strendN;
+local prctl = getPrefixedMacrosFromFileAsMapping(
+	"../../include/linux/prctl.h", "PR_",
+	requireNoSpaceAfterPound: true);
+printStrendNDatabase("PR_", prctl);
+]]]*/
+#define GETBASE_PR(result, index) \
+	(((index) <= 0x3a) ? ((result) = repr_PR_0h, true) : \
+	 ((index) == 0x59616d61) ? ((index) = 0, (result) = repr_PR_59616d61h, true) : false)
+PRIVATE char const repr_PR_0h[] =
+"\0SET_PDEATHSIG\0GET_PDEATHSIG\0GET_DUMPABLE\0SET_DUMPABLE\0GET_UNALI"
+"GN\0SET_UNALIGN\0GET_KEEPCAPS\0SET_KEEPCAPS\0GET_FPEMU\0SET_FPEMU\0GET"
+"_FPEXC\0SET_FPEXC\0GET_TIMING\0SET_TIMING\0SET_NAME\0GET_NAME\0\0\0GET_E"
+"NDIAN\0SET_ENDIAN\0GET_SECCOMP\0SET_SECCOMP\0CAPBSET_READ\0CAPBSET_DR"
+"OP\0GET_TSC\0SET_TSC\0GET_SECUREBITS\0SET_SECUREBITS\0SET_TIMERSLACK\0"
+"GET_TIMERSLACK\0TASK_PERF_EVENTS_DISABLE\0TASK_PERF_EVENTS_ENABLE\0"
+"MCE_KILL\0MCE_KILL_GET\0SET_MM\0SET_CHILD_SUBREAPER\0GET_CHILD_SUBRE"
+"APER\0SET_NO_NEW_PRIVS\0GET_NO_NEW_PRIVS\0GET_TID_ADDRESS\0SET_THP_D"
+"ISABLE\0GET_THP_DISABLE\0MPX_ENABLE_MANAGEMENT\0MPX_DISABLE_MANAGEM"
+"ENT\0SET_FP_MODE\0GET_FP_MODE\0CAP_AMBIENT\0\0\0\0\0GET_SPECULATION_CTRL"
+"\0SET_SPECULATION_CTRL\0PAC_RESET_KEYS\0SET_TAGGED_ADDR_CTRL\0GET_TA"
+"GGED_ADDR_CTRL\0SET_IO_FLUSHER\0GET_IO_FLUSHER";
+PRIVATE char const repr_PR_59616d61h[] =
+"SET_PTRACER";
+/*[[[end]]]*/
+
+PRIVATE ATTR_CONST WUNUSED char const *CC
+get_prctl_name(syscall_ulong_t op) {
+	char const *result = NULL;
+	if (!GETBASE_PR(result, op))
+		goto done;
+	for (; op; --op)
+		result = strend(result) + 1;
+	if (!*result)
+		result = NULL;
+done:
+	return result;
+}
+
+PRIVATE ssize_t CC
+print_prctl_command(pformatprinter printer, void *arg,
+                    syscall_ulong_t command) {
+	char const *name;
+	name = get_prctl_name(command);
+	if (name)
+		return format_printf(printer, arg, "PR_%s", name);
+	return format_printf(printer, arg, "%" PRIuN(__SIZEOF_SYSCALL_LONG_T__), command);
+}
+#endif /* NEED_print_prctl_command */
 
 
 
@@ -3963,7 +4024,6 @@ for (local c: knownCases.sorted()) {
 	// TODO: #define HAVE_SC_REPR_MEMFD_CREATE_FLAGS
 	// TODO: #define HAVE_SC_REPR_MLOCKALL_FLAGS
 	// TODO: #define HAVE_SC_REPR_MOUNT_FLAGS
-	// TODO: #define HAVE_SC_REPR_PRCTL_COMMAND
 	// TODO: #define HAVE_SC_REPR_REBOOT_HOW
 	// TODO: #define HAVE_SC_REPR_RENAMEAT2_FLAGS
 	// TODO: #define HAVE_SC_REPR_RLIMIT_RESOURCE
@@ -4043,6 +4103,12 @@ for (local c: knownCases.sorted()) {
 	// TODO: #define HAVE_SC_REPR_WAITID_OPTIONS
 	// TODO: #define HAVE_SC_REPR_XATTR_FLAGS
 /*[[[end]]]*/
+
+#ifdef HAVE_SC_REPR_PRCTL_COMMAND
+	case SC_REPR_PRCTL_COMMAND:
+		result = print_prctl_command(printer, arg, (syscall_ulong_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_PRCTL_COMMAND */
 
 #ifdef HAVE_SC_REPR_ARCH_PRCTL_COMMAND
 	case SC_REPR_ARCH_PRCTL_COMMAND:

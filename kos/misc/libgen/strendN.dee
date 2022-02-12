@@ -81,14 +81,19 @@ function replaceKeywordsWithMacros(
 @@This will be enumerated as:
 @@> yield ("FOO", "42");
 @@> yield ("BAR", "42");
-function enumerateMacrosFromFile(filename: string): {(string, string)...} {
+function enumerateMacrosFromFile(filename: string,
+		requireNoSpaceAfterPound: bool = false): {(string, string)...} {
+	local scanfFormatString = {
+		true:  " #define %[^ ] %[^]",
+		false: " # define %[^ ] %[^]",
+	}[requireNoSpaceAfterPound];
 	local knownMacros: {string: string} = Dict();
 	with (local fp = File.open(filename)) {
 		for (local l: fp) {
 			l = l.strip();
 			local macroName, macroValue;
 			try {
-				macroName, macroValue = l.scanf(" # define %[^ ] %[^]")...;
+				macroName, macroValue = l.scanf(scanfFormatString)...;
 			} catch (...) {
 				continue;
 			}
@@ -104,10 +109,11 @@ function enumerateMacrosFromFile(filename: string): {(string, string)...} {
 
 @@Same as @enumerateMacrosFromFile, but enumerate multiple files
 @@Note  that  function  also  accepts  wildcards  in  filenames!
-function enumerateMacrosFromFiles(filenames: {string...}): {(string, string)...} {
+function enumerateMacrosFromFiles(filenames: {string...},
+		requireNoSpaceAfterPound: bool = false): {(string, string)...} {
 	for (local filename: filenames) {
 		if ("*" !in filename && "?" !in filename) {
-			yield enumerateMacrosFromFile(filename)...;
+			yield enumerateMacrosFromFile(filename, requireNoSpaceAfterPound)...;
 			continue;
 		}
 		/* `filename' contains wildcards! */
@@ -116,7 +122,7 @@ function enumerateMacrosFromFiles(filenames: {string...}): {(string, string)...}
 		for (local e: fs.dir(head)) {
 			if (!e.wmatch(tail))
 				continue;
-			yield enumerateMacrosFromFile(fs.joinpath(head, e))...;
+			yield enumerateMacrosFromFile(fs.joinpath(head, e), requireNoSpaceAfterPound)...;
 		}
 	}
 }
@@ -160,8 +166,9 @@ again:
 	return none;
 }
 
-function enumerateIntegerMacrosFromFile(filename: string): {(string, int)...} {
-	for (local name, value: enumerateMacrosFromFile(filename)) {
+function enumerateIntegerMacrosFromFile(filename: string,
+		requireNoSpaceAfterPound: bool = false): {(string, int)...} {
+	for (local name, value: enumerateMacrosFromFile(filename, requireNoSpaceAfterPound)) {
 		value = getMacroIntValue(value);
 		if (value !is none)
 			yield (name, value);
@@ -200,7 +207,37 @@ function parititionIds(ids: {int...}): {(int, int)...} {
 
 
 @@Split a given set of @values to prevent large holes within the data-set
-function splitValues(values: {string...}): {(int, {string...})...} {
+function splitValues(values: {string...} | {int: string}): {(int, {string...})...} {
+	if (values is Mapping) {
+		local valueKeys = List(values.keys);
+		valueKeys.sort();
+		while (valueKeys && !values[valueKeys.last])
+			valueKeys.popback();
+		while (valueKeys && !values[valueKeys.first])
+			valueKeys.popfront();
+		local currentKey = valueKeys.popfront();
+		local currentBlock = [values[currentKey]];
+		if (currentKey > 0 && currentKey < 12) {
+			currentBlock = ([""] * currentKey) + currentBlock;
+			currentKey   = 0; /* A base-start of 0 simplifies branching. */
+		}
+		while (valueKeys) {
+			local nextKey = valueKeys.popfront();
+			local nextValue = values[nextKey];
+			local nextDelta = nextKey - (currentKey + #currentBlock);
+			if (nextDelta >= REPR_SPLIT_THRESHOLD) {
+				yield (currentKey, currentBlock);
+				currentKey = nextKey;
+				currentBlock = [nextValue];
+			} else {
+				if (nextDelta)
+					currentBlock.extend([""] * nextDelta);
+				currentBlock.append(nextValue);
+			}
+		}
+		yield (currentKey, currentBlock);
+		return;
+	}
 	local currentStart = 0;
 	local numEmptySlots = 0;
 	local count = #values;
@@ -229,7 +266,7 @@ function splitValues(values: {string...}): {(int, {string...})...} {
 }
 
 function printStrendNDatabase(
-		prefix: string, values: {string...},
+		prefix: string, values: {string...} | {int: string},
 		attr: string = "") {
 	local splitSet = List(splitValues(values));
 	print("#define GETBASE_", prefix.strip("_"), "(result, index) \\");
@@ -277,10 +314,14 @@ function printStrendNDatabase(
 }
 
 
+/* TODO: Get rid of this function (doesn't scale for large numbers)
+ * Instead, use `getPrefixedMacrosFromFileAsMapping()' everywhere! */
 function getPrefixedMacrosFromFile(
-		filename: string, prefix: string, suffix: string = ""): {string...} {
+		filename: string, prefix: string, suffix: string = "",
+		requireNoSpaceAfterPound: bool = false): {string...} {
 	local result = [];
-	for (local macroName, macroValue: enumerateMacrosFromFile(filename)) {
+	for (local macroName, macroValue: enumerateMacrosFromFile(
+			filename, requireNoSpaceAfterPound)) {
 		if (!macroName.startswith(prefix))
 			continue;
 		if (suffix) {
@@ -301,9 +342,11 @@ function getPrefixedMacrosFromFile(
 }
 
 function getPrefixedMacrosFromFileAsMapping(
-		filename: string, prefix: string, suffix: string = ""): {int: string} {
+		filename: string, prefix: string, suffix: string = "",
+		requireNoSpaceAfterPound: bool = false): {int: string} {
 	local result = Dict();
-	for (local macroName, macroValue: enumerateMacrosFromFile(filename)) {
+	for (local macroName, macroValue: enumerateMacrosFromFile(
+			filename, requireNoSpaceAfterPound)) {
 		if (!macroName.startswith(prefix))
 			continue;
 		if (suffix) {

@@ -29,6 +29,13 @@
 
 #include <bits/types.h>
 
+/* IMPORTANT:
+ *  - Macros "#define PR_foo" will appear in libsctrace
+ *  - Macros "#   define PR_bar" will NOT appear in libsctrace
+ * For this purpose, turn off clang-format for this file! */
+
+/* clang-format off */
+
 /************************************************************************/
 /* Command codes for `prctl(2)'                                         */
 /************************************************************************/
@@ -309,6 +316,8 @@ __DECL_END
 #define PR_SET_PTRACER         0x59616d61 /* Set PID of who can trace this process (0: no-one; PR_SET_PTRACER_ANY: everyone) */
 #   define PR_SET_PTRACER_ANY  (__CCAST(__syscall_ulong_t)(-1)) /* Anyone can trace this process */
 
+
+/* clang-format on */
 
 
 /* TODO: KOS-specific PR_* codes to explicitly map the kernel's version of libdl into memory. */
