@@ -244,13 +244,49 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 	}
 
 	/* Set the default signal number `SIGRPC' if none was specified. */
-	if ((mode & RPC_SIGNO_MASK) == 0)
+	if ((mode & RPC_SIGNO_MASK) == 0) {
+		STATIC_ASSERT(SIGRPC != SIGKILL);
+		STATIC_ASSERT(SIGRPC != SIGSTOP);
 		mode |= RPC_SIGNO(SIGRPC);
-	else {
+	} else {
 		signo_t signo = _RPC_GETSIGNO(mode);
 		if unlikely(signo <= 0 || signo >= NSIG) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
+			      signo);
+		} else if unlikely(signo == SIGKILL || signo == SIGSTOP) {
+			/* We do not allow use of SIGKILL or SIGSTOP as underlying signal number for use
+			 * with RPCs. Because these signals cannot be masked, associated RPCs also can't
+			 * be masked. This in turn could lead to program crashes. e.g.:
+			 *
+			 * >> pid_t parent = gettid();
+			 * >> pid_t child  = vfork();
+			 * >> if (child == 0) {
+			 * >>     rpc_exec(parent, RPC_SIGNO(SIGKILL) | RPC_SYNCMODE_ASYNC, &somefunc, NULL);
+			 * >>     for (;;) {
+			 * >>         dprintf(STDOUT_FILENO, "Idling...\n");
+			 * >>         sched_yield();
+			 * >>     }
+			 * >> }
+			 * This program crashes because the RPC forces the parent to stop waiting  for
+			 * the child to exec() or exit(). -- Because of this, the parent will suddenly
+			 * start using its stack again, leading to 2 threads now using the same stack.
+			 * The results are what you'd expect...
+			 *
+			 * You could argue that something like that might be intended, and that SIGKILL
+			 * and SIGSTOP in the context of RPCs  can be thought of as NMIs  (non-maskable
+			 * interrupts). And you'd be right, and they would in fact work just like that.
+			 * But I really don't like the idea of this being how they work. Plus: NMIs are
+			 * already a pain in  the a$$ when working  in kernel-space. -- And  user-space
+			 * really shouldn't need to worry about something like that, too.
+			 *
+			 * So  to be safe, we simply disallow use  of these 2 signals in the context of
+			 * RPCs. If you want some thread to handle your RPC immediately, you'll have to
+			 * make sure that the  signal you're using isn't  masked by the target  thread.
+			 * And if it is, your RPC will only be handled once it gets unmasked, and there
+			 * isn't supposed to be any way around this restriction! */
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_ILLSIGNO,
 			      signo);
 		}
 	}

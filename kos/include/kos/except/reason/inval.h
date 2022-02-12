@@ -172,7 +172,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_KSYSCTL_COMMAND,       /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `cmd' passed to `ksysctl()' wasn't recognized */
 	E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON,          /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t reason] Bad reason code passed to `debugtrap()' */
 	E_INVALID_ARGUMENT_CONTEXT_DEBUG_TRAPNO,          /* E_INVALID_ARGUMENT_BAD_VALUE: Bad trap number passed to `debugtrap()' */
-	E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY,       /* E_INVALID_ARGUMENT_BAD_VALUE:    [uintptr_t perso]    Bad    personality    code    passed    to   `SYSCTL_SYSCALL_(GET|SET)_PERSONALITY'
+	E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY,       /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t perso] Bad personality code passed to `SYSCTL_SYSCALL_(GET|SET)_PERSONALITY'
 	                                                   * E_INVALID_ARGUMENT_UNKNOWN_FLAG: The least significant argument-bit of `SYSCTL_SYSCALL_GET_PERSONALITY' was set (arg should be `kp << 1') */
 	E_INVALID_ARGUMENT_CONTEXT_KCMP_TYPE,             /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `type' argument passed to `kcmp(2)' isn't one of `KCMP_*' from `<linux/kcmp.h>' */
 	E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS,       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `getrandom(2)' isn't a set of `GRND_NONBLOCK | GRND_RANDOM' */
@@ -194,8 +194,8 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_LFUTEXEXPR_FD_WITH_TIMEOUT, /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `timeout' argument of `lfutexexpr(2)' was non-NULL when `LFUTEX_FDBIT' was given. */
 
 	/* system call: `rpc_schedule(2)' */
-	E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_FLAGS = 0x1140,   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `rpc_schedule()' is malformed */
-	E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE,             /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `rpc_schedule(2)' or `EPOLL_CTL_RPC_PROG'. */
+	E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE = 0x1140,    /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `rpc_schedule(2)' or `EPOLL_CTL_RPC_PROG'. */
+	E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_ILLSIGNO,         /* E_INVALID_ARGUMENT_BAD_VALUE: Tried to send the RPC via `RPC_SIGNO(SIGKILL)' or `RPC_SIGNO(SIGSTOP)' */
 	E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_TOO_MANY_PARAMS,  /* E_INVALID_ARGUMENT_BAD_VALUE: The `max_param_count' passed to `rpc_schedule(2)' is greater than `RPC_PROG_PARAMS_MAX'. */
 	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION,       /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: An RPC program contains an unrecognized (or currently illegal) instruction. */
 	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNKNOWN_REGISTER,  /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to access an unknown register */
@@ -445,7 +445,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_KSYSCTL_COMMAND                  E_INVALID_ARGUMENT_CONTEXT_KSYSCTL_COMMAND                  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `cmd' passed to `ksysctl()' wasn't recognized */
 #define E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON                     E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON                     /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t reason] Bad reason code passed to `debugtrap()' */
 #define E_INVALID_ARGUMENT_CONTEXT_DEBUG_TRAPNO                     E_INVALID_ARGUMENT_CONTEXT_DEBUG_TRAPNO                     /* E_INVALID_ARGUMENT_BAD_VALUE: Bad trap number passed to `debugtrap()' */
-#define E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY                  E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY                  /* E_INVALID_ARGUMENT_BAD_VALUE:    [uintptr_t perso]    Bad    personality    code    passed    to   `SYSCTL_SYSCALL_(GET|SET)_PERSONALITY'
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY                  E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY                  /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t perso] Bad personality code passed to `SYSCTL_SYSCALL_(GET|SET)_PERSONALITY'
                                                                                                                                  * E_INVALID_ARGUMENT_UNKNOWN_FLAG: The least significant argument-bit of `SYSCTL_SYSCALL_GET_PERSONALITY' was set (arg should be `kp << 1') */
 #define E_INVALID_ARGUMENT_CONTEXT_KCMP_TYPE                        E_INVALID_ARGUMENT_CONTEXT_KCMP_TYPE                        /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `type' argument passed to `kcmp(2)' isn't one of `KCMP_*' from `<linux/kcmp.h>' */
 #define E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS                  E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS                  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `getrandom(2)' isn't a set of `GRND_NONBLOCK | GRND_RANDOM' */
@@ -464,8 +464,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_FUTEX_OP                         E_INVALID_ARGUMENT_CONTEXT_FUTEX_OP                         /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: [syscall_ulong_t futex_op] The `futex_op' given to one of `futex()' is invalid. */
 #define E_INVALID_ARGUMENT_CONTEXT_LFUTEXEXPR_FD_WITH_TIMEOUT       E_INVALID_ARGUMENT_CONTEXT_LFUTEXEXPR_FD_WITH_TIMEOUT       /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `timeout' argument of `lfutexexpr(2)' was non-NULL when `LFUTEX_FDBIT' was given. */
 /* system call: `rpc_schedule(2)' */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_FLAGS               E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_FLAGS               /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `rpc_schedule()' is malformed */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE                E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE                /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `rpc_schedule(2)' or `EPOLL_CTL_RPC_PROG'. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_ILLSIGNO            E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_ILLSIGNO            /* E_INVALID_ARGUMENT_BAD_VALUE: Tried to send the RPC via `RPC_SIGNO(SIGKILL)' or `RPC_SIGNO(SIGSTOP)' */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_TOO_MANY_PARAMS     E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_TOO_MANY_PARAMS     /* E_INVALID_ARGUMENT_BAD_VALUE: The `max_param_count' passed to `rpc_schedule(2)' is greater than `RPC_PROG_PARAMS_MAX'. */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION          E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION          /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: An RPC program contains an unrecognized (or currently illegal) instruction. */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNKNOWN_REGISTER     E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNKNOWN_REGISTER     /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to access an unknown register */
@@ -697,7 +697,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_KSYSCTL_COMMAND                  3073 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `cmd' passed to `ksysctl()' wasn't recognized */
 #define E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON                     3074 /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t reason] Bad reason code passed to `debugtrap()' */
 #define E_INVALID_ARGUMENT_CONTEXT_DEBUG_TRAPNO                     3075 /* E_INVALID_ARGUMENT_BAD_VALUE: Bad trap number passed to `debugtrap()' */
-#define E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY                  3076 /* E_INVALID_ARGUMENT_BAD_VALUE:    [uintptr_t perso]    Bad    personality    code    passed    to   `SYSCTL_SYSCALL_(GET|SET)_PERSONALITY'
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY                  3076 /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t perso] Bad personality code passed to `SYSCTL_SYSCALL_(GET|SET)_PERSONALITY'
                                                                           * E_INVALID_ARGUMENT_UNKNOWN_FLAG: The least significant argument-bit of `SYSCTL_SYSCALL_GET_PERSONALITY' was set (arg should be `kp << 1') */
 #define E_INVALID_ARGUMENT_CONTEXT_KCMP_TYPE                        3077 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `type' argument passed to `kcmp(2)' isn't one of `KCMP_*' from `<linux/kcmp.h>' */
 #define E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS                  3078 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `getrandom(2)' isn't a set of `GRND_NONBLOCK | GRND_RANDOM' */
@@ -716,8 +716,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_FUTEX_OP                         4385 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: [syscall_ulong_t futex_op] The `futex_op' given to one of `futex()' is invalid. */
 #define E_INVALID_ARGUMENT_CONTEXT_LFUTEXEXPR_FD_WITH_TIMEOUT       4386 /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `timeout' argument of `lfutexexpr(2)' was non-NULL when `LFUTEX_FDBIT' was given. */
 /* system call: `rpc_schedule(2)' */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_FLAGS               4416 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `rpc_schedule()' is malformed */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE                4417 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `rpc_schedule(2)' or `EPOLL_CTL_RPC_PROG'. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE                4416 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `rpc_schedule(2)' or `EPOLL_CTL_RPC_PROG'. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_ILLSIGNO            4417 /* E_INVALID_ARGUMENT_BAD_VALUE: Tried to send the RPC via `RPC_SIGNO(SIGKILL)' or `RPC_SIGNO(SIGSTOP)' */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_TOO_MANY_PARAMS     4418 /* E_INVALID_ARGUMENT_BAD_VALUE: The `max_param_count' passed to `rpc_schedule(2)' is greater than `RPC_PROG_PARAMS_MAX'. */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION          4419 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: An RPC program contains an unrecognized (or currently illegal) instruction. */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNKNOWN_REGISTER     4420 /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to access an unknown register */

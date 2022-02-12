@@ -888,25 +888,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: When a thread changes CPUs, it must call `userexcept_sysret_inject_self()'
 	 *       s.a. explaination in `userexcept_sysret_inject_safe()' */
 
-	/* TODO: User-space should not be allowed create RPCs that piggy-back on SIGKILL
-	 *       or  SIGSTOP. -- Because these signals cannot be masked, associated RPCs
-	 *       also can't be masked. This in turn can lead to program crashes. e.g.:
-	 * >> pid_t parent = gettid();
-	 * >> pid_t child  = vfork();
-	 * >> if (child == 0) {
-	 * >>     rpc_exec(parent, RPC_SIGNO(SIGKILL) | RPC_SYNCMODE_ASYNC, &somefunc, NULL);
-	 * >>     for (;;) {
-	 * >>         dprintf(STDOUT_FILENO, "Idling...\n");
-	 * >>         sched_yield();
-	 * >>     }
-	 * >> }
-	 * This program crashes because the RPC forces the parent to stop waiting  for
-	 * the child to exec() or exit(). -- Because of this, the parent will suddenly
-	 * start using its stack again, leading to 2 threads now using the same stack.
-	 * The results are what you'd expect... */
-
-	/* TODO: Add support for prctl(2) */
-
 	/* TODO: Add futex support to pthread_once() (via an alternate [[userimpl]]) */
 
 	return state;
