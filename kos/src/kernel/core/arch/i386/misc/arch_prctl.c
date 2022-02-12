@@ -81,7 +81,8 @@ DEFINE_SYSCALL2(syscall_slong_t, arch_prctl,
                 USER UNCHECKED uintptr_t *, addr) {
 	/* Predict (and optimize for) the use by libdl, which uses
 	 * this system call to assign  the address of the  initial
-	 * TLS segment. */
+	 * TLS segment.
+	 * s.a. <kos/bits/thread.h>: `__x86_fast_wr(fs|gs)base()' */
 #ifdef __x86_64__
 	switch (__builtin_expect(command, ARCH_SET_FS))
 #else /* __x86_64__ */
@@ -127,7 +128,8 @@ DEFINE_COMPAT_SYSCALL2(syscall_slong_t, arch_prctl,
                        USER UNCHECKED compat_uintptr_t *, addr) {
 	/* Predict (and optimize for) the use by libdl, which uses
 	 * this system call to assign  the address of the  initial
-	 * TLS segment. */
+	 * TLS segment.
+	 * s.a. <kos/bits/thread.h>: `__x86_fast_wrgsbase()' */
 	switch (__builtin_expect(command, ARCH_SET_GS)) {
 
 	case ARCH_SET_GS:

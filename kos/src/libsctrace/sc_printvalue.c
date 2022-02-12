@@ -92,6 +92,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <compat/bits/os/timeval.h>
 #endif /* __ARCH_HAVE_COMPAT */
 
+#ifdef HAVE_SC_REPR_ARCH_PRCTL_COMMAND
+#include <asm/prctl.h>
+#endif /* HAVE_SC_REPR_ARCH_PRCTL_COMMAND */
+
 #ifdef __KERNEL__
 #include <kernel/fs/blkdev.h>
 #include <kernel/fs/chrdev.h>
@@ -481,6 +485,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifdef HAVE_SC_REPR_MREMAP_FLAGS
 #define NEED_print_mremap_flags
 #endif /* HAVE_SC_REPR_MREMAP_FLAGS */
+
+#ifdef HAVE_SC_REPR_ARCH_PRCTL_COMMAND
+#define NEED_print_arch_prctl_command
+#endif /* HAVE_SC_REPR_ARCH_PRCTL_COMMAND */
 
 
 
@@ -3818,6 +3826,51 @@ print_mremap_flags(pformatprinter printer, void *arg,
 
 
 
+#if defined(NEED_print_arch_prctl_command) || defined(__DEEMON__)
+#if defined(__i386__) || defined(__x86_64__) || defined(__DEEMON__)
+/*[[[deemon
+import * from deemon;
+import * from ...misc.libgen.strendN;
+local prctl = getPrefixedMacrosFromFile("../../include/i386-kos/asm/os/kos/prctl.h", "ARCH_");
+printStrendNDatabase("ARCH_", prctl);
+]]]*/
+#define GETBASE_ARCH(result, index) \
+	(((index) >= 0x1001 && (index) <= 0x1012) ? ((index) -= 0x1001, (result) = repr_ARCH_1001h, true) : \
+	 ((index) >= 0x2001 && (index) <= 0x2003) ? ((index) -= 0x2001, (result) = repr_ARCH_2001h, true) : false)
+PRIVATE char const repr_ARCH_1001h[] =
+"SET_GS\0SET_FS\0GET_FS\0GET_GS\0\0\0\0\0\0\0\0\0\0\0\0\0GET_CPUID\0SET_CPUID";
+PRIVATE char const repr_ARCH_2001h[] =
+"MAP_VDSO_X32\0MAP_VDSO_32\0MAP_VDSO_64";
+/*[[[end]]]*/
+#endif /* __i386__ || __x86_64__ */
+
+PRIVATE ATTR_CONST WUNUSED char const *CC
+get_arch_prctl_name(syscall_ulong_t op) {
+	char const *result = NULL;
+	if (!GETBASE_ARCH(result, op))
+		goto done;
+	for (; op; --op)
+		result = strend(result) + 1;
+	if (!*result)
+		result = NULL;
+done:
+	return result;
+}
+
+PRIVATE ssize_t CC
+print_arch_prctl_command(pformatprinter printer, void *arg,
+                         syscall_ulong_t command) {
+	char const *name;
+	name = get_arch_prctl_name(command);
+	if (name)
+		return format_printf(printer, arg, "ARCH_%s", name);
+	return format_printf(printer, arg, "%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__), command);
+}
+#endif /* NEED_print_arch_prctl_command */
+
+
+
+
 
 
 
@@ -3910,6 +3963,7 @@ for (local c: knownCases.sorted()) {
 	// TODO: #define HAVE_SC_REPR_MEMFD_CREATE_FLAGS
 	// TODO: #define HAVE_SC_REPR_MLOCKALL_FLAGS
 	// TODO: #define HAVE_SC_REPR_MOUNT_FLAGS
+	// TODO: #define HAVE_SC_REPR_PRCTL_COMMAND
 	// TODO: #define HAVE_SC_REPR_REBOOT_HOW
 	// TODO: #define HAVE_SC_REPR_RENAMEAT2_FLAGS
 	// TODO: #define HAVE_SC_REPR_RLIMIT_RESOURCE
@@ -3989,6 +4043,12 @@ for (local c: knownCases.sorted()) {
 	// TODO: #define HAVE_SC_REPR_WAITID_OPTIONS
 	// TODO: #define HAVE_SC_REPR_XATTR_FLAGS
 /*[[[end]]]*/
+
+#ifdef HAVE_SC_REPR_ARCH_PRCTL_COMMAND
+	case SC_REPR_ARCH_PRCTL_COMMAND:
+		result = print_arch_prctl_command(printer, arg, (syscall_ulong_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_ARCH_PRCTL_COMMAND */
 
 #ifdef HAVE_SC_REPR_MREMAP_FLAGS
 	case SC_REPR_MREMAP_FLAGS:

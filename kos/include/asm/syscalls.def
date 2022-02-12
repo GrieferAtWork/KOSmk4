@@ -2237,7 +2237,8 @@ ioperm:(syscall_ulong_t from, syscall_ulong_t num, syscall_ulong_t turn_on) -> e
 @@              the documentation for that command includes the number
 @@              of unused, but required trailing 0s in its comment.
 @@@return: * :  Return value depends on `command'
-prctl:(unsigned int command, syscall_ulong_t arg2, syscall_ulong_t arg3,
+prctl:([tostr(PRCTL_COMMAND)] unsigned int command,
+       syscall_ulong_t arg2, syscall_ulong_t arg3,
        syscall_ulong_t arg4, syscall_ulong_t arg5) -> syscall_slong_t;
 
 @@>> arch_prctl(2)
@@ -2249,9 +2250,9 @@ prctl:(unsigned int command, syscall_ulong_t arg2, syscall_ulong_t arg3,
 @@@param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
 @@@return: * :  Return value depends on `command'
 %[startgroup]
-arch_prctl:(unsigned int command, uintptr_t *addr) -> syscall_slong_t;
-arch_prctlx32:(unsigned int command, uint32_t *addr) -> syscall_slong_t;
-arch_prctlx64:(unsigned int command, uint64_t *addr) -> syscall_slong_t;
+arch_prctl:([tostr(ARCH_PRCTL_COMMAND)] unsigned int command, uintptr_t *addr) -> syscall_slong_t;
+arch_prctlx32:([tostr(ARCH_PRCTL_COMMAND)] unsigned int command, uint32_t *addr) -> syscall_slong_t;
+arch_prctlx64:([tostr(ARCH_PRCTL_COMMAND)] unsigned int command, uint64_t *addr) -> syscall_slong_t;
 %[endgroup]
 /* NOTE: We declare `arch_prctl()' with `uintptr_t *addr' so that the
  *       function isn't considered compatible with its compatibility-

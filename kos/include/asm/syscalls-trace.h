@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa7b5d84 */
+/* HASH CRC-32:0x425df0b8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1373,7 +1373,7 @@
 #define __NRRTR_getrusage               SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_umask                  SC_REPR_MODE_T                                          /* mode */ 
 #define __NRRTR_umask                   SC_REPR_MODE_T                                          /* return */
-#define __NRATR0_prctl                  SC_REPR_UNSIGNED_INT                                    /* command */ 
+#define __NRATR0_prctl                  SC_REPR_PRCTL_COMMAND                                   /* command */ 
 #define __NRATR1_prctl                  SC_REPR_SYSCALL_ULONG_T                                 /* arg2 */ 
 #define __NRATR2_prctl                  SC_REPR_SYSCALL_ULONG_T                                 /* arg3 */ 
 #define __NRATR3_prctl                  SC_REPR_SYSCALL_ULONG_T                                 /* arg4 */ 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b6586f0 */
+/* HASH CRC-32:0x489df2d0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1649,7 +1649,7 @@
 #define __NRATR1_getresgid                    SC_REPR_POINTER                                                      /* egid */ 
 #define __NRATR2_getresgid                    SC_REPR_POINTER                                                      /* sgid */ 
 #define __NRRTR_getresgid                     SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_prctl                        SC_REPR_UNSIGNED_INT                                                 /* command */ 
+#define __NRATR0_prctl                        SC_REPR_PRCTL_COMMAND                                                /* command */ 
 #define __NRATR1_prctl                        SC_REPR_SYSCALL_ULONG_T                                              /* arg2 */ 
 #define __NRATR2_prctl                        SC_REPR_SYSCALL_ULONG_T                                              /* arg3 */ 
 #define __NRATR3_prctl                        SC_REPR_SYSCALL_ULONG_T                                              /* arg4 */ 
@@ -2471,7 +2471,7 @@
 #define __NRRTR_pkey_free                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_statx                        SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_statx                         SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_arch_prctl                   SC_REPR_UNSIGNED_INT                                                 /* command */ 
+#define __NRATR0_arch_prctl                   SC_REPR_ARCH_PRCTL_COMMAND                                           /* command */ 
 #define __NRATR1_arch_prctl                   SC_REPR_POINTER                                                      /* addr */ 
 #define __NRRTR_arch_prctl                    SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NRATR0_io_pgetevents                SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
