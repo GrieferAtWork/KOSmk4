@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2574cb9a */
+/* HASH CRC-32:0x62dc9f7c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2138,6 +2138,7 @@
 #define __CRT_HAVE_DOS$powl
 #define __CRT_HAVE_DOS$ppoll
 #define __CRT_HAVE_DOS$ppoll64
+#define __CRT_HAVE_DOS$prctl
 #define __CRT_HAVE_DOS$pread
 #define __CRT_HAVE_DOS$pread64
 #define __CRT_HAVE_DOS$preadall
@@ -5746,6 +5747,7 @@
 #define __CRT_HAVE_powl
 #define __CRT_HAVE_ppoll
 #define __CRT_HAVE_ppoll64
+#define __CRT_HAVE_prctl
 #define __CRT_HAVE_pread
 #define __CRT_HAVE_pread64
 #define __CRT_HAVE_preadall

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ef9d88d */
+/* HASH CRC-32:0x9a075130 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -195,8 +195,8 @@
 #define __NRAC_modify_ldt               3
 #define __NRAC_pivot_root               1
 #define __NRAC__sysctl                  1
-#define __NRAC_prctl                    1
-#define __NRAC_arch_prctl               1
+#define __NRAC_prctl                    5
+#define __NRAC_arch_prctl               2
 #define __NRAC_adjtimex                 1
 #define __NRAC_setrlimit                2
 #define __NRAC_chroot                   1
@@ -600,8 +600,8 @@
 #define __NRRT_modify_ldt               (syscall_slong_t, __syscall_slong_t)
 #define __NRRT_pivot_root               (errno_t, __errno_t)
 #define __NRRT__sysctl                  (errno_t, __errno_t)
-#define __NRRT_prctl                    (errno_t, __errno_t)
-#define __NRRT_arch_prctl               (errno_t, __errno_t)
+#define __NRRT_prctl                    (syscall_slong_t, __syscall_slong_t)
+#define __NRRT_arch_prctl               (syscall_slong_t, __syscall_slong_t)
 #define __NRRT_adjtimex                 (errno_t, __errno_t)
 #define __NRRT_setrlimit                (errno_t, __errno_t)
 #define __NRRT_chroot                   (errno_t, __errno_t)
@@ -1177,8 +1177,13 @@
 #define __NRAT2_modify_ldt               (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_pivot_root               (int, int)
 #define __NRAT0__sysctl                  (int, int)
-#define __NRAT0_prctl                    (int, int)
-#define __NRAT0_arch_prctl               (int, int)
+#define __NRAT0_prctl                    (unsigned int, unsigned int)
+#define __NRAT1_prctl                    (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT2_prctl                    (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT3_prctl                    (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT4_prctl                    (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT0_arch_prctl               (unsigned int, unsigned int)
+#define __NRAT1_arch_prctl               (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_adjtimex                 (struct timex *, struct timex *)
 #define __NRAT0_setrlimit                (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_setrlimit                (struct rlimit const *, struct rlimit const *)
@@ -1932,8 +1937,8 @@
 #define __NRAM_modify_ldt(a, b, c, d, e, f)               (__syscall_ulong_t)a, (void *)b, (__syscall_ulong_t)c
 #define __NRAM_pivot_root(a, b, c, d, e, f)               (int)a
 #define __NRAM__sysctl(a, b, c, d, e, f)                  (int)a
-#define __NRAM_prctl(a, b, c, d, e, f)                    (int)a
-#define __NRAM_arch_prctl(a, b, c, d, e, f)               (int)a
+#define __NRAM_prctl(a, b, c, d, e, f)                    (unsigned int)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NRAM_arch_prctl(a, b, c, d, e, f)               (unsigned int)a, (__syscall_ulong_t)b
 #define __NRAM_adjtimex(a, b, c, d, e, f)                 (struct timex *)a
 #define __NRAM_setrlimit(a, b, c, d, e, f)                (__syscall_ulong_t)a, (struct rlimit const *)b
 #define __NRAM_chroot(a, b, c, d, e, f)                   (char const *)a
@@ -2337,8 +2342,8 @@
 #define __NRAP_modify_ldt(a, b, c)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_pivot_root(a)                              (__syscall_ulong_t)a
 #define __NRAP__sysctl(a)                                 (__syscall_ulong_t)a
-#define __NRAP_prctl(a)                                   (__syscall_ulong_t)a
-#define __NRAP_arch_prctl(a)                              (__syscall_ulong_t)a
+#define __NRAP_prctl(a, b, c, d, e)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NRAP_arch_prctl(a, b)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_adjtimex(a)                                (__syscall_ulong_t)a
 #define __NRAP_setrlimit(a, b)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_chroot(a)                                  (__syscall_ulong_t)a

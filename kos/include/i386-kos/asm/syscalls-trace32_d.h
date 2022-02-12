@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56ac54d2 */
+/* HASH CRC-32:0x45725ae3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -316,7 +316,11 @@
 #define __NR32AN0_getresgid                    rgid
 #define __NR32AN1_getresgid                    egid
 #define __NR32AN2_getresgid                    sgid
-#define __NR32AN0_prctl                        TODO_PROTOTYPE
+#define __NR32AN0_prctl                        command
+#define __NR32AN1_prctl                        arg2
+#define __NR32AN2_prctl                        arg3
+#define __NR32AN3_prctl                        arg4
+#define __NR32AN4_prctl                        arg5
 #define __NR32AN0_rt_sigreturn                 restore_fpu
 #define __NR32AN1_rt_sigreturn                 unused1
 #define __NR32AN2_rt_sigreturn                 unused2
@@ -860,7 +864,8 @@
 #define __NR32AN1_pkey_alloc                   access_rights
 #define __NR32AN0_pkey_free                    key
 #define __NR32AN0_statx                        TODO_PROTOTYPE
-#define __NR32AN0_arch_prctl                   TODO_PROTOTYPE
+#define __NR32AN0_arch_prctl                   command
+#define __NR32AN1_arch_prctl                   addr
 #define __NR32AN0_io_pgetevents                TODO_PROTOTYPE
 #define __NR32AN0_rseq                         TODO_PROTOTYPE
 #define __NR32AN0_semget                       TODO_PROTOTYPE
@@ -1644,8 +1649,12 @@
 #define __NR32ATR1_getresgid                    SC_REPR_POINTER                                                      /* egid */ 
 #define __NR32ATR2_getresgid                    SC_REPR_POINTER                                                      /* sgid */ 
 #define __NR32RTR_getresgid                     SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_prctl                        SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
-#define __NR32RTR_prctl                         SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_prctl                        SC_REPR_UNSIGNED_INT                                                 /* command */ 
+#define __NR32ATR1_prctl                        SC_REPR_SYSCALL_ULONG_T                                              /* arg2 */ 
+#define __NR32ATR2_prctl                        SC_REPR_SYSCALL_ULONG_T                                              /* arg3 */ 
+#define __NR32ATR3_prctl                        SC_REPR_SYSCALL_ULONG_T                                              /* arg4 */ 
+#define __NR32ATR4_prctl                        SC_REPR_SYSCALL_ULONG_T                                              /* arg5 */ 
+#define __NR32RTR_prctl                         SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NR32ATR0_rt_sigreturn                 SC_REPR_STRUCT_FPUSTATE32                                            /* restore_fpu */ 
 #define __NR32ATR1_rt_sigreturn                 SC_REPR_SYSCALL_ULONG_T                                              /* unused1 */ 
 #define __NR32ATR2_rt_sigreturn                 SC_REPR_SYSCALL_ULONG_T                                              /* unused2 */ 
@@ -2462,8 +2471,9 @@
 #define __NR32RTR_pkey_free                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_statx                        SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_statx                         SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_arch_prctl                   SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
-#define __NR32RTR_arch_prctl                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_arch_prctl                   SC_REPR_UNSIGNED_INT                                                 /* command */ 
+#define __NR32ATR1_arch_prctl                   SC_REPR_SYSCALL_ULONG_T                                              /* addr */ 
+#define __NR32RTR_arch_prctl                    SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NR32ATR0_io_pgetevents                SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_io_pgetevents                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_rseq                         SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 

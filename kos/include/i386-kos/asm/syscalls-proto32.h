@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4db64bf4 */
+/* HASH CRC-32:0x160bfff9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -210,7 +210,7 @@
 #define __NRAC_nfsservctl                   1
 #define __NRAC_setresgid                    3
 #define __NRAC_getresgid                    3
-#define __NRAC_prctl                        1
+#define __NRAC_prctl                        5
 #define __NRAC_rt_sigreturn                 6
 #define __NRAC_rt_sigaction                 4
 #define __NRAC_rt_sigprocmask               4
@@ -418,7 +418,7 @@
 #define __NRAC_pkey_alloc                   2
 #define __NRAC_pkey_free                    1
 #define __NRAC_statx                        1
-#define __NRAC_arch_prctl                   1
+#define __NRAC_arch_prctl                   2
 #define __NRAC_io_pgetevents                1
 #define __NRAC_rseq                         1
 #define __NRAC_semget                       1
@@ -710,7 +710,7 @@
 #define __NRRT_nfsservctl                   (errno_t, __errno_t)
 #define __NRRT_setresgid                    (errno_t, __errno_t)
 #define __NRRT_getresgid                    (errno_t, __errno_t)
-#define __NRRT_prctl                        (errno_t, __errno_t)
+#define __NRRT_prctl                        (syscall_slong_t, __syscall_slong_t)
 #define __NRRT_rt_sigreturn                 (void, void)
 #define __NRRT_rt_sigaction                 (errno_t, __errno_t)
 #define __NRRT_rt_sigprocmask               (errno_t, __errno_t)
@@ -918,7 +918,7 @@
 #define __NRRT_pkey_alloc                   (syscall_slong_t, __syscall_slong_t)
 #define __NRRT_pkey_free                    (errno_t, __errno_t)
 #define __NRRT_statx                        (errno_t, __errno_t)
-#define __NRRT_arch_prctl                   (errno_t, __errno_t)
+#define __NRRT_arch_prctl                   (syscall_slong_t, __syscall_slong_t)
 #define __NRRT_io_pgetevents                (errno_t, __errno_t)
 #define __NRRT_rseq                         (errno_t, __errno_t)
 #define __NRRT_semget                       (errno_t, __errno_t)
@@ -1328,7 +1328,11 @@
 #define __NRAT0_getresgid                    (uint16_t *, __uint16_t *)
 #define __NRAT1_getresgid                    (uint16_t *, __uint16_t *)
 #define __NRAT2_getresgid                    (uint16_t *, __uint16_t *)
-#define __NRAT0_prctl                        (int, int)
+#define __NRAT0_prctl                        (unsigned int, unsigned int)
+#define __NRAT1_prctl                        (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT2_prctl                        (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT3_prctl                        (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT4_prctl                        (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_rt_sigreturn                 (struct fpustate32 const *, struct fpustate32 const *)
 #define __NRAT1_rt_sigreturn                 (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT2_rt_sigreturn                 (syscall_ulong_t, __syscall_ulong_t)
@@ -1872,7 +1876,8 @@
 #define __NRAT1_pkey_alloc                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_pkey_free                    (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_statx                        (int, int)
-#define __NRAT0_arch_prctl                   (int, int)
+#define __NRAT0_arch_prctl                   (unsigned int, unsigned int)
+#define __NRAT1_arch_prctl                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_io_pgetevents                (int, int)
 #define __NRAT0_rseq                         (int, int)
 #define __NRAT0_semget                       (int, int)
@@ -2347,7 +2352,7 @@
 #define __NRAM_nfsservctl(a, b, c, d, e, f)                   (int)a
 #define __NRAM_setresgid(a, b, c, d, e, f)                    (__uint16_t)a, (__uint16_t)b, (__uint16_t)c
 #define __NRAM_getresgid(a, b, c, d, e, f)                    (__uint16_t *)a, (__uint16_t *)b, (__uint16_t *)c
-#define __NRAM_prctl(a, b, c, d, e, f)                        (int)a
+#define __NRAM_prctl(a, b, c, d, e, f)                        (unsigned int)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAM_rt_sigreturn(a, b, c, d, e, f)                 (struct fpustate32 const *)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (struct __sigset_struct const *)d, (struct rpc_syscall_info32 const *)e, (struct ucpustate32 const *)f
 #define __NRAM_rt_sigaction(a, b, c, d, e, f)                 (__signo_t)a, (struct __sigactionx32 const *)b, (struct __sigactionx32 *)c, (__size_t)d
 #define __NRAM_rt_sigprocmask(a, b, c, d, e, f)               (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c, (__size_t)d
@@ -2555,7 +2560,7 @@
 #define __NRAM_pkey_alloc(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAM_pkey_free(a, b, c, d, e, f)                    (__syscall_ulong_t)a
 #define __NRAM_statx(a, b, c, d, e, f)                        (int)a
-#define __NRAM_arch_prctl(a, b, c, d, e, f)                   (int)a
+#define __NRAM_arch_prctl(a, b, c, d, e, f)                   (unsigned int)a, (__syscall_ulong_t)b
 #define __NRAM_io_pgetevents(a, b, c, d, e, f)                (int)a
 #define __NRAM_rseq(a, b, c, d, e, f)                         (int)a
 #define __NRAM_semget(a, b, c, d, e, f)                       (int)a
@@ -2847,7 +2852,7 @@
 #define __NRAP_nfsservctl(a)                                  (__syscall_ulong_t)a
 #define __NRAP_setresgid(a, b, c)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_getresgid(a, b, c)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NRAP_prctl(a)                                       (__syscall_ulong_t)a
+#define __NRAP_prctl(a, b, c, d, e)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_rt_sigreturn(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NRAP_rt_sigaction(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_rt_sigprocmask(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
@@ -3055,7 +3060,7 @@
 #define __NRAP_pkey_alloc(a, b)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_pkey_free(a)                                   (__syscall_ulong_t)a
 #define __NRAP_statx(a)                                       (__syscall_ulong_t)a
-#define __NRAP_arch_prctl(a)                                  (__syscall_ulong_t)a
+#define __NRAP_arch_prctl(a, b)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_io_pgetevents(a)                               (__syscall_ulong_t)a
 #define __NRAP_rseq(a)                                        (__syscall_ulong_t)a
 #define __NRAP_semget(a)                                      (__syscall_ulong_t)a

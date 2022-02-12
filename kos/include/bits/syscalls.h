@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7991514c */
+/* HASH CRC-32:0xb09e9c93 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -393,7 +393,16 @@
 /* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
 #define SYS_getrusage              __NR_getrusage              /* errno_t getrusage(syscall_slong_t who, struct rusage *usage) */
 #define SYS_umask                  __NR_umask                  /* mode_t umask(mode_t mode) */
-#define SYS_prctl                  __NR_prctl                  /* errno_t prctl(int TODO_PROTOTYPE) */
+/* >> prctl(2)
+ * System process control interface. (Linux compatible)
+ * @param: command: One of `PR_*' (from <linux/prctl.h>)
+ * @param: ... : Up  to 4 additional arguments (dependent on `command')
+ *               Note that some control codes  require you to pass  `0'
+ *               for  all seemingly "unused" arguments. In these cases,
+ *               the documentation for that command includes the number
+ *               of unused, but required trailing 0s in its comment.
+ * @return: * :  Return value depends on `command' */
+#define SYS_prctl                  __NR_prctl                  /* syscall_slong_t prctl(unsigned int command, syscall_ulong_t arg2, syscall_ulong_t arg3, syscall_ulong_t arg4, syscall_ulong_t arg5) */
 #define SYS_getcpu                 __NR_getcpu                 /* errno_t getcpu(uint32_t *cpu, uint32_t *node, struct getcpu_cache *tcache) */
 #define SYS_gettimeofday           __NR_gettimeofday           /* errno_t gettimeofday(struct timeval *tv, struct timezone *tz) */
 #define SYS_settimeofday           __NR_settimeofday           /* errno_t settimeofday(struct timeval const *tv, struct timezone const *tz) */

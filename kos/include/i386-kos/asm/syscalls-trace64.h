@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc21af624 */
+/* HASH CRC-32:0x2759572f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -355,8 +355,13 @@
 #define __NRAN2_modify_ldt               bytecount
 #define __NRAN0_pivot_root               TODO_PROTOTYPE
 #define __NRAN0__sysctl                  TODO_PROTOTYPE
-#define __NRAN0_prctl                    TODO_PROTOTYPE
-#define __NRAN0_arch_prctl               TODO_PROTOTYPE
+#define __NRAN0_prctl                    command
+#define __NRAN1_prctl                    arg2
+#define __NRAN2_prctl                    arg3
+#define __NRAN3_prctl                    arg4
+#define __NRAN4_prctl                    arg5
+#define __NRAN0_arch_prctl               command
+#define __NRAN1_arch_prctl               addr
 #define __NRAN0_adjtimex                 ntx
 #define __NRAN0_setrlimit                resource
 #define __NRAN1_setrlimit                rlimits
@@ -1470,10 +1475,15 @@
 #define __NRRTR_pivot_root                SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0__sysctl                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR__sysctl                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_prctl                    SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
-#define __NRRTR_prctl                     SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_arch_prctl               SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
-#define __NRRTR_arch_prctl                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_prctl                    SC_REPR_UNSIGNED_INT                                                 /* command */ 
+#define __NRATR1_prctl                    SC_REPR_SYSCALL_ULONG_T                                              /* arg2 */ 
+#define __NRATR2_prctl                    SC_REPR_SYSCALL_ULONG_T                                              /* arg3 */ 
+#define __NRATR3_prctl                    SC_REPR_SYSCALL_ULONG_T                                              /* arg4 */ 
+#define __NRATR4_prctl                    SC_REPR_SYSCALL_ULONG_T                                              /* arg5 */ 
+#define __NRRTR_prctl                     SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRATR0_arch_prctl               SC_REPR_UNSIGNED_INT                                                 /* command */ 
+#define __NRATR1_arch_prctl               SC_REPR_SYSCALL_ULONG_T                                              /* addr */ 
+#define __NRRTR_arch_prctl                SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NRATR0_adjtimex                 SC_REPR_POINTER                                                      /* ntx */ 
 #define __NRRTR_adjtimex                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_setrlimit                SC_REPR_RLIMIT_RESOURCE                                              /* resource */ 

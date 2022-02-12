@@ -3394,6 +3394,7 @@
 #define __CRT_HAVE_powl
 #define __CRT_HAVE_ppoll
 #define __CRT_HAVE_ppoll64
+#define __CRT_HAVE_prctl
 #define __CRT_HAVE_pread
 #define __CRT_HAVE_pread64
 #define __CRT_HAVE_preadall

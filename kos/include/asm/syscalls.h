@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27a4b932 */
+/* HASH CRC-32:0x4ad93590 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -390,7 +390,16 @@
 /* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
 #define __NR_getrusage              0xa5  /* errno_t getrusage(syscall_slong_t who, struct rusage *usage) */
 #define __NR_umask                  0xa6  /* mode_t umask(mode_t mode) */
-#define __NR_prctl                  0xa7  /* errno_t prctl(int TODO_PROTOTYPE) */
+/* >> prctl(2)
+ * System process control interface. (Linux compatible)
+ * @param: command: One of `PR_*' (from <linux/prctl.h>)
+ * @param: ... : Up  to 4 additional arguments (dependent on `command')
+ *               Note that some control codes  require you to pass  `0'
+ *               for  all seemingly "unused" arguments. In these cases,
+ *               the documentation for that command includes the number
+ *               of unused, but required trailing 0s in its comment.
+ * @return: * :  Return value depends on `command' */
+#define __NR_prctl                  0xa7  /* syscall_slong_t prctl(unsigned int command, syscall_ulong_t arg2, syscall_ulong_t arg3, syscall_ulong_t arg4, syscall_ulong_t arg5) */
 #define __NR_getcpu                 0xa8  /* errno_t getcpu(uint32_t *cpu, uint32_t *node, struct getcpu_cache *tcache) */
 #define __NR_gettimeofday           0xa9  /* errno_t gettimeofday(struct timeval *tv, struct timezone *tz) */
 #define __NR_settimeofday           0xaa  /* errno_t settimeofday(struct timeval const *tv, struct timezone const *tz) */
@@ -1495,7 +1504,7 @@
 #define __NRRC_setrlimit              2
 #define __NRRC_getrusage              2
 #define __NRRC_umask                  1
-#define __NRRC_prctl                  1
+#define __NRRC_prctl                  5
 #define __NRRC_getcpu                 3
 #define __NRRC_gettimeofday           2
 #define __NRRC_settimeofday           2

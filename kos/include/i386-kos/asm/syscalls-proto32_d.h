@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x874db09 */
+/* HASH CRC-32:0x1a1ec387 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -210,7 +210,7 @@
 #define __NR32AC_nfsservctl                   1
 #define __NR32AC_setresgid                    3
 #define __NR32AC_getresgid                    3
-#define __NR32AC_prctl                        1
+#define __NR32AC_prctl                        5
 #define __NR32AC_rt_sigreturn                 6
 #define __NR32AC_rt_sigaction                 4
 #define __NR32AC_rt_sigprocmask               4
@@ -418,7 +418,7 @@
 #define __NR32AC_pkey_alloc                   2
 #define __NR32AC_pkey_free                    1
 #define __NR32AC_statx                        1
-#define __NR32AC_arch_prctl                   1
+#define __NR32AC_arch_prctl                   2
 #define __NR32AC_io_pgetevents                1
 #define __NR32AC_rseq                         1
 #define __NR32AC_semget                       1
@@ -710,7 +710,7 @@
 #define __NR32RT_nfsservctl                   (errno_t, __errno_t)
 #define __NR32RT_setresgid                    (errno_t, __errno_t)
 #define __NR32RT_getresgid                    (errno_t, __errno_t)
-#define __NR32RT_prctl                        (errno_t, __errno_t)
+#define __NR32RT_prctl                        (syscall_slong_t, __syscall_slong_t)
 #define __NR32RT_rt_sigreturn                 (void, void)
 #define __NR32RT_rt_sigaction                 (errno_t, __errno_t)
 #define __NR32RT_rt_sigprocmask               (errno_t, __errno_t)
@@ -918,7 +918,7 @@
 #define __NR32RT_pkey_alloc                   (syscall_slong_t, __syscall_slong_t)
 #define __NR32RT_pkey_free                    (errno_t, __errno_t)
 #define __NR32RT_statx                        (errno_t, __errno_t)
-#define __NR32RT_arch_prctl                   (errno_t, __errno_t)
+#define __NR32RT_arch_prctl                   (syscall_slong_t, __syscall_slong_t)
 #define __NR32RT_io_pgetevents                (errno_t, __errno_t)
 #define __NR32RT_rseq                         (errno_t, __errno_t)
 #define __NR32RT_semget                       (errno_t, __errno_t)
@@ -1328,7 +1328,11 @@
 #define __NR32AT0_getresgid                    (uint16_t *, __uint16_t *)
 #define __NR32AT1_getresgid                    (uint16_t *, __uint16_t *)
 #define __NR32AT2_getresgid                    (uint16_t *, __uint16_t *)
-#define __NR32AT0_prctl                        (int, int)
+#define __NR32AT0_prctl                        (unsigned int, unsigned int)
+#define __NR32AT1_prctl                        (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT2_prctl                        (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT3_prctl                        (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT4_prctl                        (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_rt_sigreturn                 (struct fpustate32 const *, struct fpustate32 const *)
 #define __NR32AT1_rt_sigreturn                 (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT2_rt_sigreturn                 (syscall_ulong_t, __syscall_ulong_t)
@@ -1872,7 +1876,8 @@
 #define __NR32AT1_pkey_alloc                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_pkey_free                    (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_statx                        (int, int)
-#define __NR32AT0_arch_prctl                   (int, int)
+#define __NR32AT0_arch_prctl                   (unsigned int, unsigned int)
+#define __NR32AT1_arch_prctl                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_io_pgetevents                (int, int)
 #define __NR32AT0_rseq                         (int, int)
 #define __NR32AT0_semget                       (int, int)
@@ -2347,7 +2352,7 @@
 #define __NR32AM_nfsservctl(a, b, c, d, e, f)                   (int)a
 #define __NR32AM_setresgid(a, b, c, d, e, f)                    (__uint16_t)a, (__uint16_t)b, (__uint16_t)c
 #define __NR32AM_getresgid(a, b, c, d, e, f)                    (__uint16_t *)a, (__uint16_t *)b, (__uint16_t *)c
-#define __NR32AM_prctl(a, b, c, d, e, f)                        (int)a
+#define __NR32AM_prctl(a, b, c, d, e, f)                        (unsigned int)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AM_rt_sigreturn(a, b, c, d, e, f)                 (struct fpustate32 const *)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (struct __sigset_struct const *)d, (struct rpc_syscall_info32 const *)e, (struct ucpustate32 const *)f
 #define __NR32AM_rt_sigaction(a, b, c, d, e, f)                 (__signo_t)a, (struct __sigactionx32 const *)b, (struct __sigactionx32 *)c, (__size_t)d
 #define __NR32AM_rt_sigprocmask(a, b, c, d, e, f)               (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c, (__size_t)d
@@ -2555,7 +2560,7 @@
 #define __NR32AM_pkey_alloc(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AM_pkey_free(a, b, c, d, e, f)                    (__syscall_ulong_t)a
 #define __NR32AM_statx(a, b, c, d, e, f)                        (int)a
-#define __NR32AM_arch_prctl(a, b, c, d, e, f)                   (int)a
+#define __NR32AM_arch_prctl(a, b, c, d, e, f)                   (unsigned int)a, (__syscall_ulong_t)b
 #define __NR32AM_io_pgetevents(a, b, c, d, e, f)                (int)a
 #define __NR32AM_rseq(a, b, c, d, e, f)                         (int)a
 #define __NR32AM_semget(a, b, c, d, e, f)                       (int)a
@@ -2847,7 +2852,7 @@
 #define __NR32AP_nfsservctl(a)                                  (__syscall_ulong_t)a
 #define __NR32AP_setresgid(a, b, c)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_getresgid(a, b, c)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NR32AP_prctl(a)                                       (__syscall_ulong_t)a
+#define __NR32AP_prctl(a, b, c, d, e)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_rt_sigreturn(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NR32AP_rt_sigaction(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_rt_sigprocmask(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
@@ -3055,7 +3060,7 @@
 #define __NR32AP_pkey_alloc(a, b)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_pkey_free(a)                                   (__syscall_ulong_t)a
 #define __NR32AP_statx(a)                                       (__syscall_ulong_t)a
-#define __NR32AP_arch_prctl(a)                                  (__syscall_ulong_t)a
+#define __NR32AP_arch_prctl(a, b)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_io_pgetevents(a)                               (__syscall_ulong_t)a
 #define __NR32AP_rseq(a)                                        (__syscall_ulong_t)a
 #define __NR32AP_semget(a)                                      (__syscall_ulong_t)a

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4101c328 */
+/* HASH CRC-32:0xc87296ad */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -208,6 +208,7 @@
 #define HAVE_SC_REPR_UID_T
 #define HAVE_SC_REPR_UINT32_T
 #define HAVE_SC_REPR_UINT64_T
+#define HAVE_SC_REPR_UNSIGNED_INT
 #define HAVE_SC_REPR_UNWIND_ERROR
 #define HAVE_SC_REPR_VOID_VECTOR32
 #define HAVE_SC_REPR_VOID_VECTOR64
@@ -407,6 +408,7 @@ __SYSCALL_REPR(SC_REPR_TIMER_T)
 __SYSCALL_REPR(SC_REPR_UID_T)
 __SYSCALL_REPR(SC_REPR_UINT32_T)
 __SYSCALL_REPR(SC_REPR_UINT64_T)
+__SYSCALL_REPR(SC_REPR_UNSIGNED_INT)
 __SYSCALL_REPR(SC_REPR_UNWIND_ERROR)
 __SYSCALL_REPR(SC_REPR_VOID_VECTOR32)
 __SYSCALL_REPR(SC_REPR_VOID_VECTOR64)

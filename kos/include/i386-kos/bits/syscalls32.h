@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5682059 */
+/* HASH CRC-32:0xa121327a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -375,7 +375,16 @@
  * Get the real, effective, and saved GID of the calling thread.
  * @return: 0 : Success */
 #define SYS_getresgid                    __NR_getresgid                    /* errno_t getresgid(uint16_t *rgid, uint16_t *egid, uint16_t *sgid) */
-#define SYS_prctl                        __NR_prctl                        /* errno_t prctl(int TODO_PROTOTYPE) */
+/* >> prctl(2)
+ * System process control interface. (Linux compatible)
+ * @param: command: One of `PR_*' (from <linux/prctl.h>)
+ * @param: ... : Up  to 4 additional arguments (dependent on `command')
+ *               Note that some control codes  require you to pass  `0'
+ *               for  all seemingly "unused" arguments. In these cases,
+ *               the documentation for that command includes the number
+ *               of unused, but required trailing 0s in its comment.
+ * @return: * :  Return value depends on `command' */
+#define SYS_prctl                        __NR_prctl                        /* syscall_slong_t prctl(unsigned int command, syscall_ulong_t arg2, syscall_ulong_t arg3, syscall_ulong_t arg4, syscall_ulong_t arg5) */
 /* Restore the specified register state when returning from a signal handler
  * Note that the order and locations of arguments taken by this system  call
  * are of great importance, as they must match what is encoded by the kernel
@@ -982,7 +991,15 @@
 #define SYS_pkey_alloc                   __NR_pkey_alloc                   /* syscall_slong_t pkey_alloc(syscall_ulong_t flags, syscall_ulong_t access_rights) */
 #define SYS_pkey_free                    __NR_pkey_free                    /* errno_t pkey_free(syscall_ulong_t key) */
 #define SYS_statx                        __NR_statx                        /* errno_t statx(int TODO_PROTOTYPE) */
-#define SYS_arch_prctl                   __NR_arch_prctl                   /* errno_t arch_prctl(int TODO_PROTOTYPE) */
+/* >> arch_prctl(2)
+ * Arch-dependent system process control interface. (But don't go and
+ * think that the normal `prctl(2)' doesn't feature arch-dependent
+ * commands -- honestly, this syscall shouldn't exist if you ask me,
+ * but it does on linux, and so it must also on KOS...)
+ * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
+ * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
+ * @return: * :  Return value depends on `command' */
+#define SYS_arch_prctl                   __NR_arch_prctl                   /* syscall_slong_t arch_prctl(unsigned int command, syscall_ulong_t addr) */
 #define SYS_io_pgetevents                __NR_io_pgetevents                /* errno_t io_pgetevents(int TODO_PROTOTYPE) */
 #define SYS_rseq                         __NR_rseq                         /* errno_t rseq(int TODO_PROTOTYPE) */
 #define SYS_semget                       __NR_semget                       /* errno_t semget(int TODO_PROTOTYPE) */

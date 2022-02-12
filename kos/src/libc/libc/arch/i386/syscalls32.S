@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb464800 */
+/* HASH CRC-32:0x6dc278c6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1588,10 +1588,19 @@ INTERN_FUNCTION(libc_sys_getresgid)
 END(libc_sys_getresgid)
 DEFINE_PUBLIC_ALIAS(sys_getresgid, libc_sys_getresgid)
 
-/* errno_t prctl(int TODO_PROTOTYPE) */
+/* >> prctl(2)
+ * System process control interface. (Linux compatible)
+ * @param: command: One of `PR_*' (from <linux/prctl.h>)
+ * @param: ... : Up  to 4 additional arguments (dependent on `command')
+ *               Note that some control codes  require you to pass  `0'
+ *               for  all seemingly "unused" arguments. In these cases,
+ *               the documentation for that command includes the number
+ *               of unused, but required trailing 0s in its comment.
+ * @return: * :  Return value depends on `command' */
+/* syscall_slong_t prctl(unsigned int command, syscall_ulong_t arg2, syscall_ulong_t arg3, syscall_ulong_t arg4, syscall_ulong_t arg5) */
 INTERN_FUNCTION(libc_sys_prctl)
 	movl   $(0xac), %eax
-	jmp    libc_x86_exec_syscall1
+	jmp    libc_x86_exec_syscall5
 END(libc_sys_prctl)
 DEFINE_PUBLIC_ALIAS(sys_prctl, libc_sys_prctl)
 
@@ -3443,10 +3452,18 @@ INTERN_FUNCTION(libc_sys_statx)
 END(libc_sys_statx)
 DEFINE_PUBLIC_ALIAS(sys_statx, libc_sys_statx)
 
-/* errno_t arch_prctl(int TODO_PROTOTYPE) */
+/* >> arch_prctl(2)
+ * Arch-dependent system process control interface. (But don't go and
+ * think that the normal `prctl(2)' doesn't feature arch-dependent
+ * commands -- honestly, this syscall shouldn't exist if you ask me,
+ * but it does on linux, and so it must also on KOS...)
+ * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
+ * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
+ * @return: * :  Return value depends on `command' */
+/* syscall_slong_t arch_prctl(unsigned int command, syscall_ulong_t addr) */
 INTERN_FUNCTION(libc_sys_arch_prctl)
 	movl   $(0x180), %eax
-	jmp    libc_x86_exec_syscall1
+	jmp    libc_x86_exec_syscall2
 END(libc_sys_arch_prctl)
 DEFINE_PUBLIC_ALIAS(sys_arch_prctl, libc_sys_arch_prctl)
 
@@ -5995,10 +6012,19 @@ INTERN_FUNCTION(libc_sys_Xgetresgid)
 END(libc_sys_Xgetresgid)
 DEFINE_PUBLIC_ALIAS(sys_Xgetresgid, libc_sys_Xgetresgid)
 
-/* errno_t prctl(int TODO_PROTOTYPE) */
+/* >> prctl(2)
+ * System process control interface. (Linux compatible)
+ * @param: command: One of `PR_*' (from <linux/prctl.h>)
+ * @param: ... : Up  to 4 additional arguments (dependent on `command')
+ *               Note that some control codes  require you to pass  `0'
+ *               for  all seemingly "unused" arguments. In these cases,
+ *               the documentation for that command includes the number
+ *               of unused, but required trailing 0s in its comment.
+ * @return: * :  Return value depends on `command' */
+/* syscall_slong_t prctl(unsigned int command, syscall_ulong_t arg2, syscall_ulong_t arg3, syscall_ulong_t arg4, syscall_ulong_t arg5) */
 INTERN_FUNCTION(libc_sys_Xprctl)
 	movl   $(0xac), %eax
-	jmp    libc_x86_exec_Xsyscall1
+	jmp    libc_x86_exec_Xsyscall5
 END(libc_sys_Xprctl)
 DEFINE_PUBLIC_ALIAS(sys_Xprctl, libc_sys_Xprctl)
 
@@ -7837,10 +7863,18 @@ INTERN_FUNCTION(libc_sys_Xstatx)
 END(libc_sys_Xstatx)
 DEFINE_PUBLIC_ALIAS(sys_Xstatx, libc_sys_Xstatx)
 
-/* errno_t arch_prctl(int TODO_PROTOTYPE) */
+/* >> arch_prctl(2)
+ * Arch-dependent system process control interface. (But don't go and
+ * think that the normal `prctl(2)' doesn't feature arch-dependent
+ * commands -- honestly, this syscall shouldn't exist if you ask me,
+ * but it does on linux, and so it must also on KOS...)
+ * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
+ * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
+ * @return: * :  Return value depends on `command' */
+/* syscall_slong_t arch_prctl(unsigned int command, syscall_ulong_t addr) */
 INTERN_FUNCTION(libc_sys_Xarch_prctl)
 	movl   $(0x180), %eax
-	jmp    libc_x86_exec_Xsyscall1
+	jmp    libc_x86_exec_Xsyscall2
 END(libc_sys_Xarch_prctl)
 DEFINE_PUBLIC_ALIAS(sys_Xarch_prctl, libc_sys_Xarch_prctl)
 

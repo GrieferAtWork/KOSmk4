@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5596832d */
+/* HASH CRC-32:0x50dde6d3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -510,8 +510,25 @@
 #define SYS_modify_ldt               __NR_modify_ldt               /* syscall_slong_t modify_ldt(syscall_ulong_t func, void *ptr, syscall_ulong_t bytecount) */
 #define SYS_pivot_root               __NR_pivot_root               /* errno_t pivot_root(int TODO_PROTOTYPE) */
 #define SYS__sysctl                  __NR__sysctl                  /* errno_t _sysctl(int TODO_PROTOTYPE) */
-#define SYS_prctl                    __NR_prctl                    /* errno_t prctl(int TODO_PROTOTYPE) */
-#define SYS_arch_prctl               __NR_arch_prctl               /* errno_t arch_prctl(int TODO_PROTOTYPE) */
+/* >> prctl(2)
+ * System process control interface. (Linux compatible)
+ * @param: command: One of `PR_*' (from <linux/prctl.h>)
+ * @param: ... : Up  to 4 additional arguments (dependent on `command')
+ *               Note that some control codes  require you to pass  `0'
+ *               for  all seemingly "unused" arguments. In these cases,
+ *               the documentation for that command includes the number
+ *               of unused, but required trailing 0s in its comment.
+ * @return: * :  Return value depends on `command' */
+#define SYS_prctl                    __NR_prctl                    /* syscall_slong_t prctl(unsigned int command, syscall_ulong_t arg2, syscall_ulong_t arg3, syscall_ulong_t arg4, syscall_ulong_t arg5) */
+/* >> arch_prctl(2)
+ * Arch-dependent system process control interface. (But don't go and
+ * think that the normal `prctl(2)' doesn't feature arch-dependent
+ * commands -- honestly, this syscall shouldn't exist if you ask me,
+ * but it does on linux, and so it must also on KOS...)
+ * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
+ * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
+ * @return: * :  Return value depends on `command' */
+#define SYS_arch_prctl               __NR_arch_prctl               /* syscall_slong_t arch_prctl(unsigned int command, syscall_ulong_t addr) */
 #define SYS_adjtimex                 __NR_adjtimex                 /* errno_t adjtimex(struct timex *ntx) */
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 #define SYS_setrlimit                __NR_setrlimit                /* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */

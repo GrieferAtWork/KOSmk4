@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b607cd4 */
+/* HASH CRC-32:0xcd030e32 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -216,7 +216,15 @@ __CDECLARE_SC(,__errno_t,afs_syscall,(void),())
 __CDECLARE_SC(,__syscall_ulong_t,alarm,(__syscall_ulong_t __seconds),(__seconds))
 #endif /* __CRT_HAVE_SC(alarm) */
 #if __CRT_HAVE_SC(arch_prctl)
-__CDECLARE_SC(,__errno_t,arch_prctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+/* >> arch_prctl(2)
+ * Arch-dependent system process control interface. (But don't go and
+ * think that the normal `prctl(2)' doesn't feature arch-dependent
+ * commands -- honestly, this syscall shouldn't exist if you ask me,
+ * but it does on linux, and so it must also on KOS...)
+ * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
+ * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
+ * @return: * :  Return value depends on `command' */
+__CDECLARE_SC(,__syscall_slong_t,arch_prctl,(unsigned int __command, __syscall_ulong_t __addr),(__command,__addr))
 #endif /* __CRT_HAVE_SC(arch_prctl) */
 #if __CRT_HAVE_SC(bdflush)
 __CDECLARE_SC(,__errno_t,bdflush,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -1479,7 +1487,16 @@ __CDECLARE_SC(,__ssize_t,ppoll,(struct pollfd *__fds, __size_t __nfds, struct __
 __CDECLARE_SC(,__ssize_t,ppoll_time64,(struct pollfd *__fds, __size_t __nfds, struct __timespecx32_64 const *__timeout_ts, struct __sigset_struct const *__sigmask, __size_t __sigsetsize),(__fds,__nfds,__timeout_ts,__sigmask,__sigsetsize))
 #endif /* __CRT_HAVE_SC(ppoll_time64) */
 #if __CRT_HAVE_SC(prctl)
-__CDECLARE_SC(,__errno_t,prctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+/* >> prctl(2)
+ * System process control interface. (Linux compatible)
+ * @param: command: One of `PR_*' (from <linux/prctl.h>)
+ * @param: ... : Up  to 4 additional arguments (dependent on `command')
+ *               Note that some control codes  require you to pass  `0'
+ *               for  all seemingly "unused" arguments. In these cases,
+ *               the documentation for that command includes the number
+ *               of unused, but required trailing 0s in its comment.
+ * @return: * :  Return value depends on `command' */
+__CDECLARE_SC(,__syscall_slong_t,prctl,(unsigned int __command, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5),(__command,__arg2,__arg3,__arg4,__arg5))
 #endif /* __CRT_HAVE_SC(prctl) */
 #if __CRT_HAVE_SC(pread64)
 __CDECLARE_SC(,__ssize_t,pread64,(__fd_t __fd, void *__buf, __size_t __bufsize, __uint64_t __offset),(__fd,__buf,__bufsize,__offset))
@@ -2676,7 +2693,15 @@ __CDECLARE_XSC(,__errno_t,afs_syscall,(void),())
 __CDECLARE_XSC(,__syscall_ulong_t,alarm,(__syscall_ulong_t __seconds),(__seconds))
 #endif /* __CRT_HAVE_XSC(alarm) */
 #if __CRT_HAVE_XSC(arch_prctl)
-__CDECLARE_XSC(,__errno_t,arch_prctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+/* >> arch_prctl(2)
+ * Arch-dependent system process control interface. (But don't go and
+ * think that the normal `prctl(2)' doesn't feature arch-dependent
+ * commands -- honestly, this syscall shouldn't exist if you ask me,
+ * but it does on linux, and so it must also on KOS...)
+ * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
+ * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
+ * @return: * :  Return value depends on `command' */
+__CDECLARE_XSC(,__syscall_slong_t,arch_prctl,(unsigned int __command, __syscall_ulong_t __addr),(__command,__addr))
 #endif /* __CRT_HAVE_XSC(arch_prctl) */
 #if __CRT_HAVE_XSC(bdflush)
 __CDECLARE_XSC(,__errno_t,bdflush,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -3939,7 +3964,16 @@ __CDECLARE_XSC(,__ssize_t,ppoll,(struct pollfd *__fds, __size_t __nfds, struct _
 __CDECLARE_XSC(,__ssize_t,ppoll_time64,(struct pollfd *__fds, __size_t __nfds, struct __timespecx32_64 const *__timeout_ts, struct __sigset_struct const *__sigmask, __size_t __sigsetsize),(__fds,__nfds,__timeout_ts,__sigmask,__sigsetsize))
 #endif /* __CRT_HAVE_XSC(ppoll_time64) */
 #if __CRT_HAVE_XSC(prctl)
-__CDECLARE_XSC(,__errno_t,prctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+/* >> prctl(2)
+ * System process control interface. (Linux compatible)
+ * @param: command: One of `PR_*' (from <linux/prctl.h>)
+ * @param: ... : Up  to 4 additional arguments (dependent on `command')
+ *               Note that some control codes  require you to pass  `0'
+ *               for  all seemingly "unused" arguments. In these cases,
+ *               the documentation for that command includes the number
+ *               of unused, but required trailing 0s in its comment.
+ * @return: * :  Return value depends on `command' */
+__CDECLARE_XSC(,__syscall_slong_t,prctl,(unsigned int __command, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5),(__command,__arg2,__arg3,__arg4,__arg5))
 #endif /* __CRT_HAVE_XSC(prctl) */
 #if __CRT_HAVE_XSC(pread64)
 __CDECLARE_XSC(,__ssize_t,pread64,(__fd_t __fd, void *__buf, __size_t __bufsize, __uint64_t __offset),(__fd,__buf,__bufsize,__offset))

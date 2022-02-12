@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f21ecbb */
+/* HASH CRC-32:0xf1894a22 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2036,6 +2036,9 @@ DFUN(".text.crt.dos.system.ioperm", libd_iopl, libc_iopl, TD, 1, TD)
 DFUN(".text.crt.dos.io.poll", libd_poll, libc_poll, TD, 3, TP, TP, TD)
 DFUN(".text.crt.dos.io.poll", libd_ppoll, libc_ppoll, TD, 4, TP, TP, TP, TP)
 DFUN(".text.crt.dos.io.poll", libd_ppoll64, libc_ppoll64, TD, 4, TP, TP, TP, TP)
+
+/* sys.prctl */
+DFUN(".text.crt.dos.unsorted", libd_prctl, libc_prctl, TD, 5, TD, TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__))
 
 /* sys.ptrace */
 DFUN(".text.crt.dos.system.ptrace", libd_ptrace, libc_ptrace, TP, 4, TD, TIn(__SIZEOF_PID_T__), TP, TP)

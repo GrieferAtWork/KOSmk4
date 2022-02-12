@@ -3211,6 +3211,7 @@
 #define __CRT_HAVE_powl
 #define __CRT_HAVE_ppoll
 #define __CRT_HAVE_ppoll64
+#define __CRT_HAVE_prctl
 #define __CRT_HAVE_pread
 #define __CRT_HAVE_pread64
 #define __CRT_HAVE_preadall
@@ -8162,6 +8163,7 @@
 #define __CRT_HAVE_KOS$powl
 #define __CRT_HAVE_KOS$ppoll
 #define __CRT_HAVE_KOS$ppoll64
+#define __CRT_HAVE_KOS$prctl
 #define __CRT_HAVE_KOS$pread
 #define __CRT_HAVE_KOS$pread64
 #define __CRT_HAVE_KOS$preadall
@@ -12157,6 +12159,7 @@
 #define __CRT_HAVE_DOS$powl
 #define __CRT_HAVE_DOS$ppoll
 #define __CRT_HAVE_DOS$ppoll64
+#define __CRT_HAVE_DOS$prctl
 #define __CRT_HAVE_DOS$pread
 #define __CRT_HAVE_DOS$pread64
 #define __CRT_HAVE_DOS$preadall

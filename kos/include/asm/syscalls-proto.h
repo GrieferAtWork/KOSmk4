@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f3065ce */
+/* HASH CRC-32:0x66d96d53 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -196,7 +196,7 @@
 #define __NRAC_setrlimit              2
 #define __NRAC_getrusage              2
 #define __NRAC_umask                  1
-#define __NRAC_prctl                  1
+#define __NRAC_prctl                  5
 #define __NRAC_getcpu                 3
 #define __NRAC_gettimeofday           2
 #define __NRAC_settimeofday           2
@@ -518,7 +518,7 @@
 #define __NRRT_setrlimit              (errno_t, __errno_t)
 #define __NRRT_getrusage              (errno_t, __errno_t)
 #define __NRRT_umask                  (mode_t, __mode_t)
-#define __NRRT_prctl                  (errno_t, __errno_t)
+#define __NRRT_prctl                  (syscall_slong_t, __syscall_slong_t)
 #define __NRRT_getcpu                 (errno_t, __errno_t)
 #define __NRRT_gettimeofday           (errno_t, __errno_t)
 #define __NRRT_settimeofday           (errno_t, __errno_t)
@@ -1067,7 +1067,11 @@
 #define __NRAT0_getrusage              (syscall_slong_t, __syscall_slong_t)
 #define __NRAT1_getrusage              (struct rusage *, struct rusage *)
 #define __NRAT0_umask                  (mode_t, __mode_t)
-#define __NRAT0_prctl                  (int, int)
+#define __NRAT0_prctl                  (unsigned int, unsigned int)
+#define __NRAT1_prctl                  (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT2_prctl                  (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT3_prctl                  (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT4_prctl                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_getcpu                 (uint32_t *, __uint32_t *)
 #define __NRAT1_getcpu                 (uint32_t *, __uint32_t *)
 #define __NRAT2_getcpu                 (struct getcpu_cache *, struct getcpu_cache *)
@@ -1589,7 +1593,7 @@
 #define __NRAM_setrlimit(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__syscall_ulong_t)a, (struct rlimit const *)b
 #define __NRAM_getrusage(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__syscall_slong_t)a, (struct rusage *)b
 #define __NRAM_umask(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__mode_t)a
-#define __NRAM_prctl(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (int)a
+#define __NRAM_prctl(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (unsigned int)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAM_getcpu(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (__uint32_t *)a, (__uint32_t *)b, (struct getcpu_cache *)c
 #define __NRAM_gettimeofday(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (struct timeval *)a, (struct timezone *)b
 #define __NRAM_settimeofday(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (struct timeval const *)a, (struct timezone const *)b
@@ -1911,7 +1915,7 @@
 #define __NRAP_setrlimit(a, b)                                                                                      (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_getrusage(a, b)                                                                                      (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_umask(a)                                                                                             (__syscall_ulong_t)a
-#define __NRAP_prctl(a)                                                                                             (__syscall_ulong_t)a
+#define __NRAP_prctl(a, b, c, d, e)                                                                                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_getcpu(a, b, c)                                                                                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_gettimeofday(a, b)                                                                                   (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_settimeofday(a, b)                                                                                   (__syscall_ulong_t)a, (__syscall_ulong_t)b

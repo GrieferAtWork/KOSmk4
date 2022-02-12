@@ -174,13 +174,15 @@ enum {
 /* Linux-compatible `securebits' flags.
  * These flags can be get/set through use of `prctl(PR_GET_SECUREBITS)' and `prctl(PR_SET_SECUREBITS)'
  * NOTE: Use of the later requires `CAP_ALLOW_PR_SET_SECUREBITS' (== `CAP_SETPCAP') capabilities. */
-#define SECBIT_NOROOT                 0x0001 /* Disable special handling for exec() with euid=0 */
-#define SECBIT_NOROOT_LOCKED          0x0002 /* Make `SECBIT_NOROOT' immutable (this flag cannot be unset) */
-#define SECBIT_NO_SETUID_FIXUP        0x0004 /* Disable changes to capabilities when any of (r|e|s)uid
-                                              * becomes   0   /   all  of   (r|e|s)uid   become  non-0 */
-#define SECBIT_NO_SETUID_FIXUP_LOCKED 0x0008 /* Make `SECBIT_NO_SETUID_FIXUP' immutable (this flag cannot be unset) */
-#define SECBIT_KEEP_CAPS              0x0010 /* Don't clear permitted capabilities when all of (r|e|s)uid become non-0 */
-#define SECBIT_KEEP_CAPS_LOCKED       0x0020 /* Make `SECBIT_KEEP_CAPS' immutable (this flag cannot be unset) */
+#define SECBIT_NOROOT                      0x0001 /* Disable special handling for exec() with euid=0 */
+#define SECBIT_NOROOT_LOCKED               0x0002 /* Make `SECBIT_NOROOT' immutable (this flag cannot be unset) */
+#define SECBIT_NO_SETUID_FIXUP             0x0004 /* Disable changes to capabilities when any of (r|e|s)uid
+                                                   * becomes   0   /   all  of   (r|e|s)uid   become  non-0 */
+#define SECBIT_NO_SETUID_FIXUP_LOCKED      0x0008 /* Make `SECBIT_NO_SETUID_FIXUP' immutable (this flag cannot be unset) */
+#define SECBIT_KEEP_CAPS                   0x0010 /* Don't clear permitted capabilities when all of (r|e|s)uid become non-0 */
+#define SECBIT_KEEP_CAPS_LOCKED            0x0020 /* Make `SECBIT_KEEP_CAPS' immutable (this flag cannot be unset) */
+#define SECBIT_NO_CAP_AMBIENT_RAISE        0x0040 /* Disallow `PR_CAP_AMBIENT_RAISE' */
+#define SECBIT_NO_CAP_AMBIENT_RAISE_LOCKED 0x0080 /* Make `SECBIT_NO_CAP_AMBIENT_RAISE' immutable (this flag cannot be unset) */
 
 
 

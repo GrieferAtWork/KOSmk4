@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b3f2589 */
+/* HASH CRC-32:0x2f0bcf96 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5092,7 +5092,16 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall__sysctl)
 	.cfi_endproc
 END(__x86_asm64_syscall__sysctl)
 
-/* errno_t prctl(int TODO_PROTOTYPE) */
+/* >> prctl(2)
+ * System process control interface. (Linux compatible)
+ * @param: command: One of `PR_*' (from <linux/prctl.h>)
+ * @param: ... : Up  to 4 additional arguments (dependent on `command')
+ *               Note that some control codes  require you to pass  `0'
+ *               for  all seemingly "unused" arguments. In these cases,
+ *               the documentation for that command includes the number
+ *               of unused, but required trailing 0s in its comment.
+ * @return: * :  Return value depends on `command' */
+/* syscall_slong_t prctl(unsigned int command, syscall_ulong_t arg2, syscall_ulong_t arg3, syscall_ulong_t arg4, syscall_ulong_t arg5) */
 .section .text.x86.asm64_syscall.prctl
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_prctl)
 	.cfi_startproc simple
@@ -5108,6 +5117,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_prctl)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
+	movq   %r10, %rcx
 	EXTERN(sys_prctl)
 	call   sys_prctl
 	popq_cfi_r %r11
@@ -5122,7 +5132,15 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_prctl)
 	.cfi_endproc
 END(__x86_asm64_syscall_prctl)
 
-/* errno_t arch_prctl(int TODO_PROTOTYPE) */
+/* >> arch_prctl(2)
+ * Arch-dependent system process control interface. (But don't go and
+ * think that the normal `prctl(2)' doesn't feature arch-dependent
+ * commands -- honestly, this syscall shouldn't exist if you ask me,
+ * but it does on linux, and so it must also on KOS...)
+ * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
+ * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
+ * @return: * :  Return value depends on `command' */
+/* syscall_slong_t arch_prctl(unsigned int command, syscall_ulong_t addr) */
 .section .text.x86.asm64_syscall.arch_prctl
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_arch_prctl)
 	.cfi_startproc simple
@@ -17186,7 +17204,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getresgid)
 	.cfi_endproc
 END(__x86_asm32_int80_getresgid)
 
-/* errno_t prctl(int TODO_PROTOTYPE) */
+/* >> prctl(2)
+ * System process control interface. (Linux compatible)
+ * @param: command: One of `PR_*' (from <linux/prctl.h>)
+ * @param: ... : Up  to 4 additional arguments (dependent on `command')
+ *               Note that some control codes  require you to pass  `0'
+ *               for  all seemingly "unused" arguments. In these cases,
+ *               the documentation for that command includes the number
+ *               of unused, but required trailing 0s in its comment.
+ * @return: * :  Return value depends on `command' */
+/* syscall_slong_t prctl(unsigned int command, syscall_ulong_t arg2, syscall_ulong_t arg3, syscall_ulong_t arg4, syscall_ulong_t arg5) */
 .section .text.x86.asm32_syscall_int80.prctl
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_prctl)
 	.cfi_startproc simple
@@ -17198,7 +17225,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_prctl)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	movslq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_prctl)
 	call   sys32_prctl
 	popq_cfi_r %rdi
@@ -22796,7 +22828,15 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_statx)
 	.cfi_endproc
 END(__x86_asm32_int80_statx)
 
-/* errno_t arch_prctl(int TODO_PROTOTYPE) */
+/* >> arch_prctl(2)
+ * Arch-dependent system process control interface. (But don't go and
+ * think that the normal `prctl(2)' doesn't feature arch-dependent
+ * commands -- honestly, this syscall shouldn't exist if you ask me,
+ * but it does on linux, and so it must also on KOS...)
+ * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
+ * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
+ * @return: * :  Return value depends on `command' */
+/* syscall_slong_t arch_prctl(unsigned int command, syscall_ulong_t addr) */
 .section .text.x86.asm32_syscall_int80.arch_prctl
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_arch_prctl)
 	.cfi_startproc simple
@@ -22808,7 +22848,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_arch_prctl)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	movslq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_arch_prctl)
 	call   sys32_arch_prctl
 	popq_cfi_r %rdi
@@ -26935,8 +26976,50 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setresgid, __x86_asm32_int80_setre
 /* errno_t getresgid(uint16_t *rgid, uint16_t *egid, uint16_t *sgid) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getresgid, __x86_asm32_int80_getresgid)
 
-/* errno_t prctl(int TODO_PROTOTYPE) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_prctl, __x86_asm32_int80_prctl)
+/* >> prctl(2)
+ * System process control interface. (Linux compatible)
+ * @param: command: One of `PR_*' (from <linux/prctl.h>)
+ * @param: ... : Up  to 4 additional arguments (dependent on `command')
+ *               Note that some control codes  require you to pass  `0'
+ *               for  all seemingly "unused" arguments. In these cases,
+ *               the documentation for that command includes the number
+ *               of unused, but required trailing 0s in its comment.
+ * @return: * :  Return value depends on `command' */
+/* syscall_slong_t prctl(unsigned int command, syscall_ulong_t arg2, syscall_ulong_t arg3, syscall_ulong_t arg4, syscall_ulong_t arg5) */
+.section .text.x86.asm32_syscall_sysenter.prctl
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_prctl)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xac
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_prctl)
+	call   sys32_prctl
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET32
+	.cfi_endproc
+END(__x86_asm32_sysenter_prctl)
 
 /* Restore the specified register state when returning from a signal handler
  * Note that the order and locations of arguments taken by this system  call
@@ -29037,7 +29120,15 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_pkey_free, __x86_asm32_int80_pkey_
 /* errno_t statx(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_statx, __x86_asm32_int80_statx)
 
-/* errno_t arch_prctl(int TODO_PROTOTYPE) */
+/* >> arch_prctl(2)
+ * Arch-dependent system process control interface. (But don't go and
+ * think that the normal `prctl(2)' doesn't feature arch-dependent
+ * commands -- honestly, this syscall shouldn't exist if you ask me,
+ * but it does on linux, and so it must also on KOS...)
+ * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
+ * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
+ * @return: * :  Return value depends on `command' */
+/* syscall_slong_t arch_prctl(unsigned int command, syscall_ulong_t addr) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_arch_prctl, __x86_asm32_int80_arch_prctl)
 
 /* errno_t io_pgetevents(int TODO_PROTOTYPE) */
@@ -32413,10 +32504,23 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getresgid)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_getresgid)
 
-/* errno_t prctl(int TODO_PROTOTYPE) */
+/* >> prctl(2)
+ * System process control interface. (Linux compatible)
+ * @param: command: One of `PR_*' (from <linux/prctl.h>)
+ * @param: ... : Up  to 4 additional arguments (dependent on `command')
+ *               Note that some control codes  require you to pass  `0'
+ *               for  all seemingly "unused" arguments. In these cases,
+ *               the documentation for that command includes the number
+ *               of unused, but required trailing 0s in its comment.
+ * @return: * :  Return value depends on `command' */
+/* syscall_slong_t prctl(unsigned int command, syscall_ulong_t arg2, syscall_ulong_t arg3, syscall_ulong_t arg4, syscall_ulong_t arg5) */
 .section .text.x86.asm32_syscall_sysrun32.prctl
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_prctl)
 	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
 	EXTERN(sys32_prctl)
 	jmp    sys32_prctl
@@ -35201,10 +35305,19 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_statx)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_statx)
 
-/* errno_t arch_prctl(int TODO_PROTOTYPE) */
+/* >> arch_prctl(2)
+ * Arch-dependent system process control interface. (But don't go and
+ * think that the normal `prctl(2)' doesn't feature arch-dependent
+ * commands -- honestly, this syscall shouldn't exist if you ask me,
+ * but it does on linux, and so it must also on KOS...)
+ * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
+ * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
+ * @return: * :  Return value depends on `command' */
+/* syscall_slong_t arch_prctl(unsigned int command, syscall_ulong_t addr) */
 .section .text.x86.asm32_syscall_sysrun32.arch_prctl
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_arch_prctl)
 	.cfi_startproc
+	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
 	EXTERN(sys32_arch_prctl)
 	jmp    sys32_arch_prctl

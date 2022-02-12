@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x364c124f */
+/* HASH CRC-32:0xfa7b5d84 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -411,7 +411,11 @@
 #define __NRAN0_getrusage              who
 #define __NRAN1_getrusage              usage
 #define __NRAN0_umask                  mode
-#define __NRAN0_prctl                  TODO_PROTOTYPE
+#define __NRAN0_prctl                  command
+#define __NRAN1_prctl                  arg2
+#define __NRAN2_prctl                  arg3
+#define __NRAN3_prctl                  arg4
+#define __NRAN4_prctl                  arg5
 #define __NRAN0_getcpu                 cpu
 #define __NRAN1_getcpu                 node
 #define __NRAN2_getcpu                 tcache
@@ -1369,8 +1373,12 @@
 #define __NRRTR_getrusage               SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_umask                  SC_REPR_MODE_T                                          /* mode */ 
 #define __NRRTR_umask                   SC_REPR_MODE_T                                          /* return */
-#define __NRATR0_prctl                  SC_REPR_INT                                             /* TODO_PROTOTYPE */ 
-#define __NRRTR_prctl                   SC_REPR_ERRNO_T                                         /* return */
+#define __NRATR0_prctl                  SC_REPR_UNSIGNED_INT                                    /* command */ 
+#define __NRATR1_prctl                  SC_REPR_SYSCALL_ULONG_T                                 /* arg2 */ 
+#define __NRATR2_prctl                  SC_REPR_SYSCALL_ULONG_T                                 /* arg3 */ 
+#define __NRATR3_prctl                  SC_REPR_SYSCALL_ULONG_T                                 /* arg4 */ 
+#define __NRATR4_prctl                  SC_REPR_SYSCALL_ULONG_T                                 /* arg5 */ 
+#define __NRRTR_prctl                   SC_REPR_SYSCALL_SLONG_T                                 /* return */
 #define __NRATR0_getcpu                 SC_REPR_POINTER                                         /* cpu */ 
 #define __NRATR1_getcpu                 SC_REPR_POINTER                                         /* node */ 
 #define __NRATR2_getcpu                 SC_REPR_POINTER                                         /* tcache */ 

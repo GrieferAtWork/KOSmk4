@@ -37,6 +37,7 @@
 #include <kos/thread.h>
 #include <kos/types.h>
 #include <linux/futex.h>
+#include <linux/prctl.h> /* TASK_COMM_LEN */
 #include <sys/mman.h>
 #include <sys/resource.h>
 
@@ -1469,11 +1470,6 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setschedprio)(pthread_t target_thread,
 	return EOK;
 }
 /*[[[end:libc_pthread_setschedprio]]]*/
-
-/* FROM: /kos/src/kernel/include/sched/comm.h */
-#ifndef TASK_COMM_LEN
-#define TASK_COMM_LEN 16 /* The max length of the task command name (including the trailing NUL) */
-#endif /* !TASK_COMM_LEN */
 
 /*[[[head:libc_pthread_getname_np,hash:CRC-32=0xbcd11cdc]]]*/
 /* >> pthread_getname_np(3)

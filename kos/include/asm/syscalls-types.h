@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcab76950 */
+/* HASH CRC-32:0x4524fa36 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -144,6 +144,7 @@
 #define HAVE_SC_REPR_UID_T
 #define HAVE_SC_REPR_UINT32_T
 #define HAVE_SC_REPR_UINT64_T
+#define HAVE_SC_REPR_UNSIGNED_INT
 #define HAVE_SC_REPR_WAITFLAG
 #define HAVE_SC_REPR_WAITID_OPTIONS
 #define HAVE_SC_REPR_XATTR_FLAGS
@@ -276,6 +277,7 @@ __SYSCALL_REPR(SC_REPR_TIMER_T)
 __SYSCALL_REPR(SC_REPR_UID_T)
 __SYSCALL_REPR(SC_REPR_UINT32_T)
 __SYSCALL_REPR(SC_REPR_UINT64_T)
+__SYSCALL_REPR(SC_REPR_UNSIGNED_INT)
 __SYSCALL_REPR(SC_REPR_WAITFLAG)
 __SYSCALL_REPR(SC_REPR_WAITID_OPTIONS)
 __SYSCALL_REPR(SC_REPR_XATTR_FLAGS)

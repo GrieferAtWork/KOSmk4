@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x370c76d1 */
+/* HASH CRC-32:0x1b49c336 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -195,8 +195,8 @@
 #define __NR64AC_modify_ldt               3
 #define __NR64AC_pivot_root               1
 #define __NR64AC__sysctl                  1
-#define __NR64AC_prctl                    1
-#define __NR64AC_arch_prctl               1
+#define __NR64AC_prctl                    5
+#define __NR64AC_arch_prctl               2
 #define __NR64AC_adjtimex                 1
 #define __NR64AC_setrlimit                2
 #define __NR64AC_chroot                   1
@@ -600,8 +600,8 @@
 #define __NR64RT_modify_ldt               (syscall_slong_t, __syscall_slong_t)
 #define __NR64RT_pivot_root               (errno_t, __errno_t)
 #define __NR64RT__sysctl                  (errno_t, __errno_t)
-#define __NR64RT_prctl                    (errno_t, __errno_t)
-#define __NR64RT_arch_prctl               (errno_t, __errno_t)
+#define __NR64RT_prctl                    (syscall_slong_t, __syscall_slong_t)
+#define __NR64RT_arch_prctl               (syscall_slong_t, __syscall_slong_t)
 #define __NR64RT_adjtimex                 (errno_t, __errno_t)
 #define __NR64RT_setrlimit                (errno_t, __errno_t)
 #define __NR64RT_chroot                   (errno_t, __errno_t)
@@ -1177,8 +1177,13 @@
 #define __NR64AT2_modify_ldt               (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_pivot_root               (int, int)
 #define __NR64AT0__sysctl                  (int, int)
-#define __NR64AT0_prctl                    (int, int)
-#define __NR64AT0_arch_prctl               (int, int)
+#define __NR64AT0_prctl                    (unsigned int, unsigned int)
+#define __NR64AT1_prctl                    (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT2_prctl                    (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT3_prctl                    (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT4_prctl                    (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT0_arch_prctl               (unsigned int, unsigned int)
+#define __NR64AT1_arch_prctl               (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_adjtimex                 (struct timex *, struct timex *)
 #define __NR64AT0_setrlimit                (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT1_setrlimit                (struct rlimit const *, struct rlimit const *)
@@ -1932,8 +1937,8 @@
 #define __NR64AM_modify_ldt(a, b, c, d, e, f)               (__syscall_ulong_t)a, (void *)b, (__syscall_ulong_t)c
 #define __NR64AM_pivot_root(a, b, c, d, e, f)               (int)a
 #define __NR64AM__sysctl(a, b, c, d, e, f)                  (int)a
-#define __NR64AM_prctl(a, b, c, d, e, f)                    (int)a
-#define __NR64AM_arch_prctl(a, b, c, d, e, f)               (int)a
+#define __NR64AM_prctl(a, b, c, d, e, f)                    (unsigned int)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NR64AM_arch_prctl(a, b, c, d, e, f)               (unsigned int)a, (__syscall_ulong_t)b
 #define __NR64AM_adjtimex(a, b, c, d, e, f)                 (struct timex *)a
 #define __NR64AM_setrlimit(a, b, c, d, e, f)                (__syscall_ulong_t)a, (struct rlimit const *)b
 #define __NR64AM_chroot(a, b, c, d, e, f)                   (char const *)a
@@ -2337,8 +2342,8 @@
 #define __NR64AP_modify_ldt(a, b, c)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_pivot_root(a)                              (__syscall_ulong_t)a
 #define __NR64AP__sysctl(a)                                 (__syscall_ulong_t)a
-#define __NR64AP_prctl(a)                                   (__syscall_ulong_t)a
-#define __NR64AP_arch_prctl(a)                              (__syscall_ulong_t)a
+#define __NR64AP_prctl(a, b, c, d, e)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NR64AP_arch_prctl(a, b)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR64AP_adjtimex(a)                                (__syscall_ulong_t)a
 #define __NR64AP_setrlimit(a, b)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR64AP_chroot(a)                                  (__syscall_ulong_t)a

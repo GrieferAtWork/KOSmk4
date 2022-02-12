@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a288a71 */
+/* HASH CRC-32:0xbe287c27 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1627,15 +1627,33 @@ INTERN_FUNCTION(libc_sys__sysctl)
 END(libc_sys__sysctl)
 DEFINE_PUBLIC_ALIAS(sys__sysctl, libc_sys__sysctl)
 
-/* errno_t prctl(int TODO_PROTOTYPE) */
+/* >> prctl(2)
+ * System process control interface. (Linux compatible)
+ * @param: command: One of `PR_*' (from <linux/prctl.h>)
+ * @param: ... : Up  to 4 additional arguments (dependent on `command')
+ *               Note that some control codes  require you to pass  `0'
+ *               for  all seemingly "unused" arguments. In these cases,
+ *               the documentation for that command includes the number
+ *               of unused, but required trailing 0s in its comment.
+ * @return: * :  Return value depends on `command' */
+/* syscall_slong_t prctl(unsigned int command, syscall_ulong_t arg2, syscall_ulong_t arg3, syscall_ulong_t arg4, syscall_ulong_t arg5) */
 INTERN_FUNCTION(libc_sys_prctl)
 	movq   $(0x9d), %rax
+	movq   %rcx, %r10
 	syscall
 	ret
 END(libc_sys_prctl)
 DEFINE_PUBLIC_ALIAS(sys_prctl, libc_sys_prctl)
 
-/* errno_t arch_prctl(int TODO_PROTOTYPE) */
+/* >> arch_prctl(2)
+ * Arch-dependent system process control interface. (But don't go and
+ * think that the normal `prctl(2)' doesn't feature arch-dependent
+ * commands -- honestly, this syscall shouldn't exist if you ask me,
+ * but it does on linux, and so it must also on KOS...)
+ * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
+ * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
+ * @return: * :  Return value depends on `command' */
+/* syscall_slong_t arch_prctl(unsigned int command, syscall_ulong_t addr) */
 INTERN_FUNCTION(libc_sys_arch_prctl)
 	movq   $(0x9e), %rax
 	syscall
@@ -6103,9 +6121,19 @@ INTERN_FUNCTION(libc_sys_X_sysctl)
 END(libc_sys_X_sysctl)
 DEFINE_PUBLIC_ALIAS(sys_X_sysctl, libc_sys_X_sysctl)
 
-/* errno_t prctl(int TODO_PROTOTYPE) */
+/* >> prctl(2)
+ * System process control interface. (Linux compatible)
+ * @param: command: One of `PR_*' (from <linux/prctl.h>)
+ * @param: ... : Up  to 4 additional arguments (dependent on `command')
+ *               Note that some control codes  require you to pass  `0'
+ *               for  all seemingly "unused" arguments. In these cases,
+ *               the documentation for that command includes the number
+ *               of unused, but required trailing 0s in its comment.
+ * @return: * :  Return value depends on `command' */
+/* syscall_slong_t prctl(unsigned int command, syscall_ulong_t arg2, syscall_ulong_t arg3, syscall_ulong_t arg4, syscall_ulong_t arg5) */
 INTERN_FUNCTION(libc_sys_Xprctl)
 	movq   $(0x9d), %rax
+	movq   %rcx, %r10
 	std /* Enable exceptions */
 	syscall
 	cld /* Disable exceptions */
@@ -6113,7 +6141,15 @@ INTERN_FUNCTION(libc_sys_Xprctl)
 END(libc_sys_Xprctl)
 DEFINE_PUBLIC_ALIAS(sys_Xprctl, libc_sys_Xprctl)
 
-/* errno_t arch_prctl(int TODO_PROTOTYPE) */
+/* >> arch_prctl(2)
+ * Arch-dependent system process control interface. (But don't go and
+ * think that the normal `prctl(2)' doesn't feature arch-dependent
+ * commands -- honestly, this syscall shouldn't exist if you ask me,
+ * but it does on linux, and so it must also on KOS...)
+ * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
+ * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
+ * @return: * :  Return value depends on `command' */
+/* syscall_slong_t arch_prctl(unsigned int command, syscall_ulong_t addr) */
 INTERN_FUNCTION(libc_sys_Xarch_prctl)
 	movq   $(0x9e), %rax
 	std /* Enable exceptions */
