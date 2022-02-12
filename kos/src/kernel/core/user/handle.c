@@ -2176,7 +2176,7 @@ handle_fcntl(struct handle_manager *__restrict self,
 		struct handle *p;
 		VALIDATE_FLAGSET((uintptr_t)arg,
 		                 FD_CLOEXEC | FD_CLOFORK,
-		                 E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG);
+		                 E_INVALID_ARGUMENT_CONTEXT_F_SETFD_FDFLAGS);
 		sync_write(&self->hm_lock);
 		p = handle_lookup_ptr(fd, self);
 		/* Account for old handle flags. */
@@ -2216,7 +2216,7 @@ handle_fcntl(struct handle_manager *__restrict self,
 		struct handle *p;
 		VALIDATE_FLAGSET((uintptr_t)arg,
 		                 IO_SETFL_MASK,
-		                 E_INVALID_ARGUMENT_CONTEXT_SETFL_OFLAG);
+		                 E_INVALID_ARGUMENT_CONTEXT_F_SETFL_OFLAGS);
 		sync_write(&self->hm_lock);
 		p      = handle_lookup_ptr(fd, self);
 		result = IO_TO_OPENFLAG_NOHANDLE(p->h_mode & IO_SETFL_MASK);
@@ -2271,7 +2271,7 @@ handle_fcntl(struct handle_manager *__restrict self,
 		if unlikely(newsize < 1) {
 			/* Linux requires PAGESIZE here... */
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_BAD_PIPE_BUFFER_SIZE,
+			      E_INVALID_ARGUMENT_CONTEXT_F_SETPIPE_SZ_TOO_SMALL,
 			      newsize);
 		}
 		/* Permissions checking is done in `ringbuffer_set_pipe_limit()' */

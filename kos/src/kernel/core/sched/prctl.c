@@ -77,7 +77,7 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 	case PR_SET_PDEATHSIG:
 		if unlikely(arg2 == 0 || arg2 >= NSIG) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+			      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 			      arg2);
 		}
 		mypid->tp_SIGCLD = (uint8_t)arg2;
@@ -161,7 +161,7 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 		struct cred *mycred = FORTASK(me, this_cred);
 		if ((syscall_slong_t)arg2 < CAP_FIRST_CAP ||
 		    (syscall_slong_t)arg2 > CAP_LAST_CAP) {
-			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_BADCAP,
 			      (syscall_slong_t)arg2);
 		}
@@ -173,7 +173,7 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 		require(CAP_SETPCAP);
 		if ((syscall_slong_t)arg2 < CAP_FIRST_CAP ||
 		    (syscall_slong_t)arg2 > CAP_LAST_CAP) {
-			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_BADCAP,
 			      (syscall_slong_t)arg2);
 		}
@@ -331,7 +331,7 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 		}
 		if ((syscall_slong_t)arg3 < CAP_FIRST_CAP ||
 		    (syscall_slong_t)arg3 > CAP_LAST_CAP) {
-			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_BADCAP,
 			      (syscall_slong_t)arg3);
 		}

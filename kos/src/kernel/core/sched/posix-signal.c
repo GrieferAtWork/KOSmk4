@@ -76,7 +76,7 @@ task_raisesignalthread(struct task *__restrict target,
 	if unlikely(info->si_signo <= 0 || info->si_signo >= NSIG) {
 		signo_t signo = info->si_signo;
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+		      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 		      signo);
 	}
 
@@ -119,7 +119,7 @@ task_raisesignalprocess(struct taskpid *__restrict proc,
 	if unlikely(info->si_signo <= 0 || info->si_signo >= NSIG) {
 		signo_t signo = info->si_signo;
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+		      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 		      signo);
 	}
 
@@ -168,7 +168,7 @@ task_raisesignalprocessgroup(struct procgrp *__restrict group,
 	if unlikely(info->si_signo <= 0 || info->si_signo >= NSIG) {
 		signo_t signo = info->si_signo;
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+		      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 		      signo);
 	}
 
@@ -320,24 +320,19 @@ DEFINE_SYSCALL3(errno_t, tgkill,
 	REF struct task *target;
 	if unlikely(signo < 0 || signo >= NSIG)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+		      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 		      signo);
-	/* TODO: Refactor `E_INVALID_ARGUMENT_CONTEXT_RAISE_PID' to `E_INVALID_ARGUMENT_CONTEXT_BADTID' */
-	/* TODO: Get rid of `E_INVALID_ARGUMENT_CONTEXT_RAISE_TID' and use `E_INVALID_ARGUMENT_CONTEXT_BADTID' */
-	/* TODO: Throw `E_INVALID_ARGUMENT_CONTEXT_BADTID' from within `pidns_lookup[task]_srch()' */
-	if unlikely(pid <= 0)
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID,
-		      pid);
-	if unlikely(tid <= 0)
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TID,
-		      tid);
 	target = pidns_lookuptask_srch(THIS_PIDNS, tid);
 	FINALLY_DECREF_UNLIKELY(target);
 
 	/* Check if the given TGID matches the group of this thread. */
 	if (task_getpid_of_s(target) != pid) {
+		if unlikely(pid <= 0) {
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_BAD_PID,
+			      pid);
+		}
+
 		/* Maybe not necessarily exited, but no need to create a new exception type for this... */
 		THROW(E_PROCESS_EXITED, pid);
 	}
@@ -363,10 +358,7 @@ DEFINE_SYSCALL2(errno_t, tkill, pid_t, tid, signo_t, signo) {
 	REF struct task *target;
 	if unlikely(signo < 0 || signo >= NSIG)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO, signo);
-	if unlikely(tid <= 0)
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TID, tid);
+		      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO, signo);
 	target = pidns_lookuptask_srch(THIS_PIDNS, tid);
 	FINALLY_DECREF_UNLIKELY(target);
 
@@ -400,7 +392,7 @@ siginfo_from_user(siginfo_t *__restrict info, signo_t usigno,
                   USER UNCHECKED siginfo_t const *uinfo) {
 	if unlikely(usigno < 0 || usigno >= NSIG) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+		      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 		      usigno);
 	}
 	if (uinfo) {
@@ -429,7 +421,7 @@ siginfo_from_compat_user(siginfo_t *__restrict info, signo_t usigno,
                          USER UNCHECKED compat_siginfo_t const *uinfo) {
 	if unlikely(usigno < 0 || usigno >= NSIG) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+		      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 		      usigno);
 	}
 	if (uinfo) {
@@ -458,10 +450,6 @@ DEFINE_SYSCALL3(errno_t, rt_sigqueueinfo,
                 USER UNCHECKED siginfo_t const *, uinfo) {
 	REF struct taskpid *target;
 	siginfo_t info;
-	if unlikely(pid <= 0) {
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, pid);
-	}
 	siginfo_from_user(&info, signo, uinfo);
 	target = pidns_lookup_srch(THIS_PIDNS, pid);
 	FINALLY_DECREF_UNLIKELY(target);
@@ -488,12 +476,6 @@ DEFINE_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 	REF struct task *target;
 	struct taskpid *leader;
 	struct taskpid *mypid = task_gettaskpid();
-	if unlikely(pid <= 0)
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, pid);
-	if unlikely(tid <= 0)
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TID, tid);
 	siginfo_from_user(&info, signo, uinfo);
 	target = pidns_lookuptask_srch(mypid->tp_ns, tid);
 	FINALLY_DECREF_UNLIKELY(target);
@@ -505,8 +487,13 @@ DEFINE_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 		      info.si_code);
 
 	/* Check if the thread-group ID matches that of the leader of the requested thread-group. */
-	if (taskpid_getnstid_s(leader, mypid->tp_ns) != pid)
+	if (taskpid_getnstid_s(leader, mypid->tp_ns) != pid) {
+		if unlikely(pid <= 0) {
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_BAD_PID, pid);
+		}
 		THROW(E_PROCESS_EXITED, pid);
+	}
 
 	if (signo != 0) {
 		if (!task_raisesignalthread(target, &info))
@@ -523,9 +510,6 @@ DEFINE_COMPAT_SYSCALL3(errno_t, rt_sigqueueinfo,
 	REF struct taskpid *target;
 	struct taskpid *mypid = task_gettaskpid();
 	siginfo_t info;
-	if unlikely(pid <= 0)
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, pid);
 	siginfo_from_compat_user(&info, signo, uinfo);
 	target = pidns_lookup_srch(mypid->tp_ns, pid);
 	FINALLY_DECREF_UNLIKELY(target);
@@ -551,12 +535,6 @@ DEFINE_COMPAT_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 	REF struct task *target;
 	struct taskpid *leader;
 	struct taskpid *mypid = task_gettaskpid();
-	if unlikely(pid <= 0)
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, pid);
-	if unlikely(tid <= 0)
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TID, tid);
 	siginfo_from_compat_user(&info, signo, uinfo);
 	target = pidns_lookuptask_srch(mypid->tp_ns, tid);
 	FINALLY_DECREF_UNLIKELY(target);
@@ -568,8 +546,13 @@ DEFINE_COMPAT_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE,
 		      info.si_code);
 	/* Check if the thread-group ID matches that of the leader of the requested thread-group. */
-	if (taskpid_getnstid_s(leader, mypid->tp_ns) != pid)
+	if (taskpid_getnstid_s(leader, mypid->tp_ns) != pid) {
+		if unlikely(pid <= 0) {
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_BAD_PID, pid);
+		}
 		THROW(E_PROCESS_EXITED, pid);
+	}
 
 	if (signo != 0) {
 		if (!task_raisesignalthread(target, &info))

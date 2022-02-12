@@ -1673,7 +1673,7 @@ follow_jmp:
 		signo = (signo_t)TOP;
 		if unlikely(signo <= 0 || signo >= NSIG) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+			      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 			      signo);
 		}
 		if (!(self->rv_flags & RPC_VM_HAVESIGMASK)) {

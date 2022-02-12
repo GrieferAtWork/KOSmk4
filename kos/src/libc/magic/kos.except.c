@@ -683,8 +683,7 @@ for (local name: classes.keys.sorted()) {
 @@pp_if defined(EPERM) && defined(EINVAL)@@
 		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_INVALID_ARGUMENT_BAD_VALUE@)):
 			result = (self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID@ ||
-			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID@ ||
-			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SETPGID_NO_SUCH_GROUP@) ? EPERM : EINVAL;
+			         self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID@) ? EPERM : EINVAL;
 			break;
 @@pp_endif@@
 @@pp_if defined(EAFNOSUPPORT) && defined(ESOCKTNOSUPPORT) && defined(EPROTONOSUPPORT) && defined(EINVAL)@@

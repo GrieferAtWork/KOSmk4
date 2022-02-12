@@ -810,7 +810,7 @@ do_TCSETX:
 		COMPILER_READ_BARRIER();
 		if unlikely(signo <= 0 || signo >= NSIG) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+			      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 			      signo);
 		}
 		ttydev_v_raise(&me->t_term, signo);

@@ -111,16 +111,9 @@ struct userkern64 /*[PREFIX(uk_)]*/ {
 	                                       *       if the TLS register base no longer points into kernel-space. */
 	__uint64_t const            uk_tid;   /* [const] TID of the calling thread. */
 	__uint64_t const            uk_pid;   /* [const] PID of the calling process. */
-	__uint64_t                  uk_ppid;  /* PID of the calling process's parent process.
-	                                       * You may write `0' to this field for the same effect that `detach(getpid())' would have had.
-	                                       * Attempting  to  write  other  values  causes  an  `E_INVALID_ARGUMENT_BAD_VALUE'  exception
-	                                       * to be thrown (context `E_INVALID_ARGUMENT_CONTEXT_USERKERN_PPID') */
-	__uint64_t                  uk_pgid;  /* ID  of  the process  group  that the  calling  thread is  apart of.
-	                                       * Writing to this field has the same effect as `setpgid(0, <value>)'. */
-	__uint64_t                  uk_sid;   /* ID of the session that the calling thread is apart of.
-	                                       * Writing either `0' of  the TID or PID  of the calling thread  has the same effect  as
-	                                       * `setsid()'. Attempting to write other values causes an `E_INVALID_ARGUMENT_BAD_VALUE'
-	                                       * exception to be thrown (context `E_INVALID_ARGUMENT_CONTEXT_USERKERN_SID') */
+	__uint64_t const            uk_ppid;  /* [const] PID of the calling process's parent process. */
+	__uint64_t const            uk_pgid;  /* [const] ID of the process group that the calling thread is apart of. */
+	__uint64_t const            uk_sid;   /* [const] ID of the session that the calling thread is apart of. */
 	__uint64_t volatile         uk_uid;   /* Access to real uid (`getuid()' / `setuid()') of the calling process */
 	__uint64_t volatile         uk_gid;   /* Access to real gid (`getgid()' / `setgid()') of the calling process */
 	__uint64_t volatile         uk_euid;  /* Access to effective uid (`geteuid()' / `seteuid()') of the calling process */

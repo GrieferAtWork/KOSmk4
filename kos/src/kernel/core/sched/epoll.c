@@ -1858,7 +1858,7 @@ epoll_create_rpc_monitor(struct epoll_controller *__restrict self,
 		signo_t signo = _RPC_GETSIGNO(mode);
 		if unlikely(signo <= 0 || signo >= NSIG) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+			      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 			      signo);
 		}
 	}

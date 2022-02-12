@@ -113,7 +113,7 @@ compat_mfutexfd_new(REF struct mfutex *__restrict futex,
 				break;
 
 			default:
-				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+				THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 				      E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP,
 				      result->mfd_expr[dst].fe_condition);
 			}
@@ -143,7 +143,7 @@ done_expr:
 		}
 		if unlikely(dst == 0) {
 			/* Not allowed: no expressions */
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 			      E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP,
 			      LFUTEX_EXPREND);
 		}

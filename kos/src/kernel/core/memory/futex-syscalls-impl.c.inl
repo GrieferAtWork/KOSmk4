@@ -304,7 +304,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 	/* TODO: Futex FD support (LFUTEX_FDBIT) */
 
 	default:
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP,
 		      futex_op);
 		break;
@@ -352,7 +352,7 @@ DEFINE_SYSCALL5(errno_t, lfutexexpr,
 			REF struct mfutexfd *mfd;
 			if unlikely(timeout != NULL) {
 				THROW(E_INVALID_ARGUMENT_RESERVED_ARGUMENT,
-				      E_INVALID_ARGUMENT_CONTEXT_LFUTEXFD_EXPR_TIMEOUT);
+				      E_INVALID_ARGUMENT_CONTEXT_LFUTEXEXPR_FD_WITH_TIMEOUT);
 			}
 			VALIDATE_FLAGSET(flags, LFUTEX_FDBIT,
 			                 E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP);
@@ -430,7 +430,7 @@ DEFINE_SYSCALL5(errno_t, lfutexexpr,
 
 			default:
 bad_opcode:
-				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+				THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 				      E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP,
 				      cond);
 				break;

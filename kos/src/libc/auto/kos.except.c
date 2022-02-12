@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeab98aec */
+/* HASH CRC-32:0xe2ddbe93 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -446,8 +446,7 @@ for (local name: classes.keys.sorted()) {
 #if defined(EPERM) && defined(EINVAL)
 		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_ARGUMENT_BAD_VALUE)):
 			result = (self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID ||
-			         self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID ||
-			         self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_SETPGID_NO_SUCH_GROUP) ? EPERM : EINVAL;
+			         self->e_args.e_invalid_argument.ia_context == E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID) ? EPERM : EINVAL;
 			break;
 #endif /* EPERM && EINVAL */
 #if defined(EAFNOSUPPORT) && defined(ESOCKTNOSUPPORT) && defined(EPROTONOSUPPORT) && defined(EINVAL)

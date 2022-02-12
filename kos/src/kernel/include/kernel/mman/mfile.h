@@ -97,7 +97,7 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
  * HINTS: Disallowing certain operations for `struct mfile' users:
  *
  * - MFILE_F_FIXEDFILESIZE:
- *    - mfile_truncate()   (throws: E_INVALID_ARGUMENT_CONTEXT_FIXED_LENGTH_FILE)
+ *    - mfile_truncate()   (throws: E_FSERROR_READONLY)
  *    - mfile_tailread()   (for offsets >= mf_filesize: blocks forever)
  *    - mfile_tailwrite()  (THROW(E_FSERROR_FILE_TOO_BIG))
  *    - mfile_read()       (for offsets >= mf_filesize: returns `0')
@@ -1208,7 +1208,7 @@ mfile_sync(struct mfile *__restrict self)
  * @return: * : A reference to a part that (at some point in the past) contained
  *              the given `addr'. It may no  longer contain that address now  as
  *              the result of being truncated since.
- * @throw: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE: ... */
+ * @throw: E_INVALID_OPERATION:E_ILLEGAL_OPERATION_CONTEXT_MMAP_BEYOND_END_OF_FILE: ... */
 FUNDEF ATTR_RETNONNULL NONNULL((1)) REF struct mpart *FCALL
 mfile_getpart(struct mfile *__restrict self,
               PAGEDIR_PAGEALIGNED pos_t addr,

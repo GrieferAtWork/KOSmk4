@@ -546,7 +546,7 @@ do_sigaction(signo_t signo,
 	struct sighand *hand;
 	if unlikely(signo <= 0 || signo >= NSIG)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+		      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 		      signo);
 	if (!act) {
 		if (oact) {

@@ -520,8 +520,8 @@ again_lock_oldgrp_for_new_group:
 			 * """
 			 * [*] "valid" here only means that the value is positive */
 throw_no_such_group:
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SETPGID_NO_SUCH_GROUP,
+			THROW(E_ILLEGAL_OPERATION,
+			      E_ILLEGAL_OPERATION_CONTEXT_SETPGID_NO_SUCH_GROUP,
 			      pgid);
 		}
 

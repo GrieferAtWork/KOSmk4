@@ -35,7 +35,7 @@
 #include <hybrid/overflow.h>
 
 #include <kos/except.h>
-#include <kos/except/reason/inval.h>
+#include <kos/except/reason/illop.h>
 
 #include <assert.h>
 #include <stddef.h>
@@ -304,12 +304,12 @@ mfile_makepart(struct mfile *__restrict self,
  * @return: * : A reference to a part that (at some point in the past) contained
  *              the given `addr'. It may no  longer contain that address now  as
  *              the result of being truncated since.
- * @throw: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE: ... */
+ * @throw: E_INVALID_OPERATION:E_ILLEGAL_OPERATION_CONTEXT_MMAP_BEYOND_END_OF_FILE: ... */
 PUBLIC ATTR_RETNONNULL NONNULL((1)) REF struct mpart *FCALL
 mfile_getpart(struct mfile *__restrict self,
               PAGEDIR_PAGEALIGNED pos_t addr,
               PAGEDIR_PAGEALIGNED size_t hint_bytes)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_ARGUMENT) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_OPERATION) {
 	REF struct mpart *result;
 	size_t num_bytes;
 	pos_t loadmax;
@@ -356,8 +356,8 @@ makeanon:
 			if likely(filsiz >= self->mf_part_amask) {
 				if unlikely(addr >= filsiz) {
 					mfile_lock_endread(self);
-					THROW(E_INVALID_ARGUMENT,
-					      E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE,
+					THROW(E_INVALID_OPERATION,
+					      E_ILLEGAL_OPERATION_CONTEXT_MMAP_BEYOND_END_OF_FILE,
 					      (uintptr_t)addr);
 				}
 				if (loadmax >= (filsiz - 1)) {
@@ -434,8 +434,8 @@ again_extend_part:
 						if unlikely(addr >= filsiz) {
 							mfile_lock_endwrite(self);
 							mfile_extendpart_data_fini(&extdat);
-							THROW(E_INVALID_ARGUMENT,
-							      E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE,
+							THROW(E_INVALID_OPERATION,
+							      E_ILLEGAL_OPERATION_CONTEXT_MMAP_BEYOND_END_OF_FILE,
 							      (uintptr_t)addr);
 						}
 						if (loadmax >= (filsiz - 1)) {

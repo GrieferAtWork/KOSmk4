@@ -63,13 +63,13 @@ struct handle_mmap_info {
 	pos_t               hmi_minaddr; /* [in|out] Lowest mmap-able address from `hmi_file'. This value will also
 	                                  * be used as an addend to the offset-argument of `mmap(2)', meaning  that
 	                                  * any file-map operation will be relative to this. */
-	pos_t               hmi_maxaddr; /* [in|out] Similar  to `hmi_minaddr':  The max  address that  may be mapped
-	                                  * by user-space.  Note  that  this  field slightly  differs  from  an  mmap
-	                                  * limit   which   may  be   imposed  by   `hmi_file->mf_filesize':  Whereas
-	                                  * the later will throw `E_INVALID_ARGUMENT_CONTEXT_MMAP_BEYOND_END_OF_FILE'
-	                                  * when trying  to  mmap  beyond the  end  of  a file,  attempting  to  mmap
-	                                  * memory beyond  this  address  will  simply result  in  mfile_zero  to  be
-	                                  * mapped within  that area,  rather than  the intended  file being  mapped.
+	pos_t               hmi_maxaddr; /* [in|out] Similar to `hmi_minaddr': The max address that may be  mapped
+	                                  * by user-space.  Note that  this field  slightly differs  from an  mmap
+	                                  * limit which  may be  imposed by  `hmi_file->mf_filesize': Whereas  the
+	                                  * later will throw `E_ILLEGAL_OPERATION_CONTEXT_MMAP_BEYOND_END_OF_FILE'
+	                                  * when trying  to mmap  beyond the  end of  a file,  attempting to  mmap
+	                                  * memory beyond  this address  will simply  result in  mfile_zero to  be
+	                                  * mapped within that area, rather  than the intended file being  mapped.
 	                                  * s.a. `mman_map_subrange()' and `mfile_getpart()' */
 	REF struct path    *hmi_fspath;  /* [0..1][in|out] Filesystem path of `hmi_file' */
 	REF struct fdirent *hmi_fsname;  /* [0..1][in|out] Filesystem name of `hmi_file' */

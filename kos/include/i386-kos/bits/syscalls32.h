@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c7446df */
+/* HASH CRC-32:0x944f95d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -400,7 +400,7 @@
 /* @param: usigno: The signal that should be sent
  * @param: uinfo:  [0..1] Additional signal information
  * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO: [...]
- * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO:              [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
 #define SYS_rt_sigqueueinfo              __NR_rt_sigqueueinfo              /* errno_t rt_sigqueueinfo(pid_t pid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
@@ -755,7 +755,7 @@
 /* @param: usigno: The signal that should be sent
  * @param: uinfo:  [0..1] Additional signal information
  * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO: [...]
- * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO:              [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
 #define SYS_rt_tgsigqueueinfo            __NR_rt_tgsigqueueinfo            /* errno_t rt_tgsigqueueinfo(pid_t pid, pid_t tid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
@@ -1056,7 +1056,7 @@
  * @throw: E_PROCESS_EXITED:                                                                  [...]
  * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS: [...]
  * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO:    [...]
- * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:               [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO:                 [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:     [...]
  * @throw: E_INVALID_HANDLE_FILE:                                                             [...]
  * @throw: E_ILLEGAL_OPERATION:                                                               [...] */

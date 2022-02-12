@@ -246,8 +246,7 @@
 #endif /* !E_INVALID_ARGUMENT_BAD_ALIGNMENT */
 #ifndef E_INVALID_ARGUMENT_BAD_VALUE
 #define E_INVALID_ARGUMENT_BAD_VALUE              (E_INVALID_ARGUMENT, 0x0006) /* [errno(($context == E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID ||
-                                                                                *         $context == E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID ||
-                                                                                *         $context == E_INVALID_ARGUMENT_CONTEXT_SETPGID_NO_SUCH_GROUP) ? EPERM : EINVAL)]
+                                                                                *         $context == E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID) ? EPERM : EINVAL)]
                                                                                 * [msg("A given value is invalid for the associated argument")]
                                                                                 * [fld(value:   uintptr_t, "The value that was given")] */
 #endif /* !E_INVALID_ARGUMENT_BAD_VALUE */

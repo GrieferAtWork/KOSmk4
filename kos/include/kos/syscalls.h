@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e52ee9 */
+/* HASH CRC-32:0x5ea357f9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1082,7 +1082,7 @@ __CDECLARE_SC(,__errno_t,rt_sigprocmask,(__syscall_ulong_t __how, struct __sigse
 /* @param: usigno: The signal that should be sent
  * @param: uinfo:  [0..1] Additional signal information
  * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO: [...]
- * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO:              [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
 __CDECLARE_SC(,__errno_t,rt_sigqueueinfo,(__pid_t __pid, __signo_t __usigno, struct __siginfo_struct const *__uinfo),(__pid,__usigno,__uinfo))
@@ -1106,7 +1106,7 @@ __CDECLARE_SC(,__syscall_slong_t,rt_sigtimedwait,(struct __sigset_struct const *
 /* @param: usigno: The signal that should be sent
  * @param: uinfo:  [0..1] Additional signal information
  * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO: [...]
- * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO:              [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
 __CDECLARE_SC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __pid, __pid_t __tid, __signo_t __usigno, struct __siginfo_struct const *__uinfo),(__pid,__tid,__usigno,__uinfo))
@@ -2547,7 +2547,7 @@ __CDECLARE_XSC(,__errno_t,rt_sigprocmask,(__syscall_ulong_t __how, struct __sigs
 /* @param: usigno: The signal that should be sent
  * @param: uinfo:  [0..1] Additional signal information
  * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO: [...]
- * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO:              [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
 __CDECLARE_XSC(,__errno_t,rt_sigqueueinfo,(__pid_t __pid, __signo_t __usigno, struct __siginfo_struct const *__uinfo),(__pid,__usigno,__uinfo))
@@ -2568,7 +2568,7 @@ __CDECLARE_XSC(,__syscall_slong_t,rt_sigtimedwait,(struct __sigset_struct const 
 /* @param: usigno: The signal that should be sent
  * @param: uinfo:  [0..1] Additional signal information
  * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO: [...]
- * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO:              [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
 __CDECLARE_XSC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __pid, __pid_t __tid, __signo_t __usigno, struct __siginfo_struct const *__uinfo),(__pid,__tid,__usigno,__uinfo))

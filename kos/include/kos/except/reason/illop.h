@@ -74,6 +74,8 @@ enum {
 	E_ILLEGAL_OPERATION_CONTEXT_TASK_NOT_EXITED,                       /* E_ILLEGAL_BECAUSE_NOT_READY: [EINVAL] Tried to use `PIDFD_IOC_EXITCODE', but the thread hasn't exited, yet. */
 	E_ILLEGAL_OPERATION_CONTEXT_SVGA_NO_MODE_SET,                      /* E_ILLEGAL_BECAUSE_NOT_READY: [EINVAL] `SVGA_IOC_GETMODE' used on a video lock when no mode has been set. */
 	E_ILLEGAL_OPERATION_CONTEXT_EPOLL_MOD_RPC,                         /* E_INVALID_OPERATION: [EINVAL] Attempted to `EPOLL_CTL_MOD' an RPC monitor, which isn't allowed. */
+	E_ILLEGAL_OPERATION_CONTEXT_MMAP_BEYOND_END_OF_FILE,               /* E_INVALID_OPERATION: [EINVAL] Attempted to access a mem-part beyond the end of its associated file. */
+	E_ILLEGAL_OPERATION_CONTEXT_SETPGID_NO_SUCH_GROUP,                 /* E_ILLEGAL_OPERATION: [EINVAL] `pgid' doesn't indicate creation of a new process group, and no group with the given ID exists in the calling session. */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -123,6 +125,8 @@ enum {
 #define E_ILLEGAL_OPERATION_CONTEXT_TASK_NOT_EXITED                       E_ILLEGAL_OPERATION_CONTEXT_TASK_NOT_EXITED                       /* E_ILLEGAL_BECAUSE_NOT_READY: [EINVAL] Tried to use `PIDFD_IOC_EXITCODE', but the thread hasn't exited, yet. */
 #define E_ILLEGAL_OPERATION_CONTEXT_SVGA_NO_MODE_SET                      E_ILLEGAL_OPERATION_CONTEXT_SVGA_NO_MODE_SET                      /* E_ILLEGAL_BECAUSE_NOT_READY: [EINVAL] `SVGA_IOC_GETMODE' used on a video lock when no mode has been set. */
 #define E_ILLEGAL_OPERATION_CONTEXT_EPOLL_MOD_RPC                         E_ILLEGAL_OPERATION_CONTEXT_EPOLL_MOD_RPC                         /* E_INVALID_OPERATION: [EINVAL] Attempted to `EPOLL_CTL_MOD' an RPC monitor, which isn't allowed. */
+#define E_ILLEGAL_OPERATION_CONTEXT_MMAP_BEYOND_END_OF_FILE               E_ILLEGAL_OPERATION_CONTEXT_MMAP_BEYOND_END_OF_FILE               /* E_INVALID_OPERATION: [EINVAL] Attempted to access a mem-part beyond the end of its associated file. */
+#define E_ILLEGAL_OPERATION_CONTEXT_SETPGID_NO_SUCH_GROUP                 E_ILLEGAL_OPERATION_CONTEXT_SETPGID_NO_SUCH_GROUP                 /* E_INVALID_OPERATION: [EINVAL] `pgid' doesn't indicate creation of a new process group, and no group with the given ID exists in the calling session. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_ILLEGAL_OPERATION_CONTEXT_GENERIC                               0  /* Generic context */
 #define E_ILLEGAL_OPERATION_CONTEXT_OPEN_S_IFSOCK                         1  /* E_ILLEGAL_IO_OPERATION: Attempted to open(2) an `S_IFSOCK'-file */
@@ -169,6 +173,8 @@ enum {
 #define E_ILLEGAL_OPERATION_CONTEXT_TASK_NOT_EXITED                       42 /* E_ILLEGAL_BECAUSE_NOT_READY: [EINVAL] Tried to use `PIDFD_IOC_EXITCODE', but the thread hasn't exited, yet. */
 #define E_ILLEGAL_OPERATION_CONTEXT_SVGA_NO_MODE_SET                      43 /* E_ILLEGAL_BECAUSE_NOT_READY: [EINVAL] `SVGA_IOC_GETMODE' used on a video lock when no mode has been set. */
 #define E_ILLEGAL_OPERATION_CONTEXT_EPOLL_MOD_RPC                         44 /* E_INVALID_OPERATION: [EINVAL] Attempted to `EPOLL_CTL_MOD' an RPC monitor, which isn't allowed. */
+#define E_ILLEGAL_OPERATION_CONTEXT_MMAP_BEYOND_END_OF_FILE               45 /* E_INVALID_OPERATION: [EINVAL] Attempted to access a mem-part beyond the end of its associated file. */
+#define E_ILLEGAL_OPERATION_CONTEXT_SETPGID_NO_SUCH_GROUP                 46 /* E_INVALID_OPERATION: [EINVAL] `pgid' doesn't indicate creation of a new process group, and no group with the given ID exists in the calling session. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

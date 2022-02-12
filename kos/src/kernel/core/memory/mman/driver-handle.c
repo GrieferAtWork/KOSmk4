@@ -185,7 +185,7 @@ driver_ioctl_getstring(struct module *__restrict self, uint64_t index,
 
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-		      E_INVALID_ARGUMENT_CONTEXT_MODULE_STRING,
+		      E_INVALID_ARGUMENT_CONTEXT_MOD_IOC_GETSTRING_BADINDEX,
 		      (uintptr_t)index);
 		break;
 	}

@@ -142,7 +142,7 @@ sys_futex_impl(USER UNCHECKED uint32_t *uaddr,
 		(void)val3;
 
 	default:
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_FUTEX_OP,
 		      futex_op);
 		break;
