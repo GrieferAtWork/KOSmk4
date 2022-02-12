@@ -131,7 +131,7 @@ task_setcomm_of(struct task *__restrict self, char const *__restrict name)
 	task_connect(&rpc->tscr_done);
 
 	/* Send the RPC to the given thread */
-	if (!task_rpc_schedule(self, (struct pending_rpc *)rpc)) {
+	if (!task_rpc_schedule(self, rpc)) {
 		/* Thread already exited. */
 		task_disconnectall();
 		kfree(rpc);

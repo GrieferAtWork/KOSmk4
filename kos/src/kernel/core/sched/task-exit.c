@@ -127,39 +127,17 @@ NOTHROW(FCALL terminate_pending_rpcs)(struct task *__restrict caller) {
 }
 
 
-
-struct _task_exitrpc {
-	SLIST_ENTRY(pending_rpc) pr_link;  /* ... */
-	uintptr_t                pr_flags; /* ... */
-	prpc_exec_callback_t     k_func;   /* ... */
-#if 0 /* Technically, this would need to go here. But because `_RPC_CONTEXT_DONTFREE'
-       * causes  `k_cookie' to  remain unused, the  RPC system will  instead pass the
-       * address of the `struct pending_rpc' to `k_func'! */
-	void                    *k_cookie;
-#endif
-};
-
-/* Ensure binary compatibility. */
-STATIC_ASSERT(offsetof(struct pending_rpc, pr_link) == offsetof(struct _task_exitrpc, pr_link));
-STATIC_ASSERT(offsetafter(struct pending_rpc, pr_link) == offsetafter(struct _task_exitrpc, pr_link));
-STATIC_ASSERT(offsetof(struct pending_rpc, pr_flags) == offsetof(struct _task_exitrpc, pr_flags));
-STATIC_ASSERT(offsetafter(struct pending_rpc, pr_flags) == offsetafter(struct _task_exitrpc, pr_flags));
-STATIC_ASSERT(offsetof(struct pending_rpc, pr_kern.k_func) == offsetof(struct _task_exitrpc, k_func));
-STATIC_ASSERT(offsetafter(struct pending_rpc, pr_kern.k_func) == offsetafter(struct _task_exitrpc, k_func));
-
 /* [valid_if(!taskpid_isaprocess(THIS_TASKPID))]
  * Buffer used for holding a mini-RPC that can be used to propagate
  * exit  commands from non-main threads to the main thread, as well
  * as the main thread to all non-main threads. */
-INTDEF struct pending_rpc this_exitrpc ASMNAME("this_exitrpc");
-INTDEF struct _task_exitrpc __this_exitrpc ASMNAME("this_exitrpc");
-INTERN ATTR_SECTION(".data.pertask.middle")
-ATTR_ALIGN(struct _task_exitrpc) __this_exitrpc = {
-	.pr_link  = { NULL },
-	.pr_flags = RPC_CONTEXT_KERN | _RPC_CONTEXT_DONTFREE,
-	.k_func   = NULL, /* Allocated if non-NULL; set to one of:
-	                   * - `propagate_process_exit_status'
-	                   * - `propagate_thread_exit_status' */
+PRIVATE ATTR_SECTION(".data.pertask.middle")
+ATTR_ALIGN(struct pending_rpc_head) this_exitrpc = {
+	.prh_link  = { NULL },
+	.prh_flags = RPC_CONTEXT_KERN | _RPC_CONTEXT_DONTFREE,
+	.prh_func  = NULL, /* Allocated if non-NULL; set to one of:
+	                    * - `propagate_process_exit_status'
+	                    * - `propagate_thread_exit_status' */
 };
 
 /* Called in context of worker threads: propagate exit status of process leader */
@@ -235,7 +213,7 @@ NOTHROW(FCALL process_exit)(uint16_t w_status) {
 				/* Main thread hasn't terminated, yet. */
 
 				/* Send an RPC to the main thread in order to terminate it. */
-				if (ATOMIC_CMPXCH(FORTASK(caller, this_exitrpc.pr_kern.k_func),
+				if (ATOMIC_CMPXCH(FORTASK(caller, this_exitrpc.prh_func),
 				                  NULL, &propagate_thread_exit_status)) {
 
 					/* This write is repeated in `task_exit()', but that's OK.
@@ -410,7 +388,7 @@ again_process_children:
 			if (child_thread != NULL) {
 				/* Use the child thread's exit RPC to terminate
 				 * it, as well  as propagate  our exit  status. */
-				if (ATOMIC_CMPXCH(FORTASK(child_thread, this_exitrpc.pr_kern.k_func),
+				if (ATOMIC_CMPXCH(FORTASK(child_thread, this_exitrpc.prh_func),
 				                  NULL, &propagate_process_exit_status)) {
 					bool ok;
 					ok = task_rpc_schedule(child_thread, &FORTASK(child_thread, this_exitrpc));

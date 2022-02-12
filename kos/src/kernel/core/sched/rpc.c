@@ -57,6 +57,15 @@ DECL_BEGIN
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
+
+/* Ensure binary compatibility between `struct pending_rpc' and `struct pending_rpc_head'. */
+STATIC_ASSERT(offsetof(struct pending_rpc, pr_link) == offsetof(struct pending_rpc_head, prh_link));
+STATIC_ASSERT(offsetafter(struct pending_rpc, pr_link) == offsetafter(struct pending_rpc_head, prh_link));
+STATIC_ASSERT(offsetof(struct pending_rpc, pr_flags) == offsetof(struct pending_rpc_head, prh_flags));
+STATIC_ASSERT(offsetafter(struct pending_rpc, pr_flags) == offsetafter(struct pending_rpc_head, prh_flags));
+STATIC_ASSERT(offsetof(struct pending_rpc, pr_kern.k_func) == offsetof(struct pending_rpc_head, prh_func));
+STATIC_ASSERT(offsetafter(struct pending_rpc, pr_kern.k_func) == offsetafter(struct pending_rpc_head, prh_func));
+
 /* [0..n][lock(INSERT(ATOMIC), CLEAR(ATOMIC && THIS_TASK))]
  * Pending RPCs. (Set of `THIS_RPCS_TERMINATED' when RPCs may no longer
  * be executed, and all that were there prior to this becoming the case

@@ -49,11 +49,11 @@ DECL_BEGIN
 
 struct pending_rpc;
 struct pending_user_rpc {
-	WEAK refcnt_t                                        pur_refcnt; /* Reference counter. */
-	uintptr_t                                            pur_status; /* RPC status (one of `PENDING_USER_RPC_STATUS_*') */
-	struct sig                                           pur_stchng; /* Signal broadcast when `pur_status' is changed
-	                                                                  * by someone  other than  the original  sender. */
-	REF struct mman                                     *pur_mman;   /* [1..1][const] The mman within which `pur_prog' resides. */
+	WEAK refcnt_t    pur_refcnt; /* Reference counter. */
+	uintptr_t        pur_status; /* RPC status (one of `PENDING_USER_RPC_STATUS_*') */
+	struct sig       pur_stchng; /* Signal broadcast when `pur_status' is changed
+	                              * by someone  other than  the original  sender. */
+	REF struct mman *pur_mman;   /* [1..1][const] The mman within which `pur_prog' resides. */
 	union {
 		struct {
 			USER CHECKED void const   *pur_prog;       /* [1..1][const] Userspace RPC program */
@@ -165,6 +165,14 @@ DATDEF ATTR_PERTASK struct sig this_rpcs_sig;
 FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL
 NOTHROW(FCALL task_rpc_schedule)(struct task *__restrict thread,
                                  /*inherit(on_success)*/ struct pending_rpc *__restrict rpc);
+#ifdef __cplusplus
+extern "C++" {
+FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL
+NOTHROW(FCALL task_rpc_schedule)(struct task *__restrict thread,
+                                 /*inherit(on_success)*/ struct pending_rpc_head *__restrict rpc)
+		ASMNAME("task_rpc_schedule");
+} /* extern "C++" */
+#endif /* __cplusplus */
 
 /* Same as `task_rpc_schedule()', but schedule the RPC for execution
  * by some arbitrary thread apart of the process `proc->tp_pctl'.
@@ -180,6 +188,14 @@ NOTHROW(FCALL task_rpc_schedule)(struct task *__restrict thread,
 FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL
 NOTHROW(FCALL proc_rpc_schedule)(struct taskpid *__restrict proc,
                                  /*inherit(on_success)*/ struct pending_rpc *__restrict rpc);
+#ifdef __cplusplus
+extern "C++" {
+FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) __BOOL
+NOTHROW(FCALL proc_rpc_schedule)(struct taskpid *__restrict proc,
+                                 /*inherit(on_success)*/ struct pending_rpc_head *__restrict rpc)
+		ASMNAME("proc_rpc_schedule");
+} /* extern "C++" */
+#endif /* __cplusplus */
 
 /* Gather the set of posix signal numbers used by pending RPCs
  * of calling thread or process.  These functions are used  to
