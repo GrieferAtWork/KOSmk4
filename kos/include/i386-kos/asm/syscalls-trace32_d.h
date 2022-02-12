@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7abeca5 */
+/* HASH CRC-32:0xeb51761f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1193,7 +1193,7 @@
 #define __NR32RTR_close                         SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_waitpid                      SC_REPR_PID_T                                                        /* pid */ 
 #define __NR32ATR1_waitpid                      SC_REPR_POINTER                                                      /* stat_loc */ 
-#define __NR32ATR2_waitpid                      SC_REPR_WAITFLAG                                                     /* options */ 
+#define __NR32ATR2_waitpid                      SC_REPR_WAITFLAGS                                                    /* options */ 
 #define __NR32RTR_waitpid                       SC_REPR_PID_T                                                        /* return */
 #define __NR32ATR0_creat                        SC_REPR_FILENAME                                                     /* filename */ 
 #define __NR32ATR1_creat                        SC_REPR_MODE_T                                                       /* mode */ 
@@ -1474,7 +1474,7 @@
 #define __NR32RTR_vm86old                       SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_wait4                        SC_REPR_PID_T                                                        /* pid */ 
 #define __NR32ATR1_wait4                        SC_REPR_POINTER                                                      /* stat_loc */ 
-#define __NR32ATR2_wait4                        SC_REPR_WAITFLAG                                                     /* options */ 
+#define __NR32ATR2_wait4                        SC_REPR_WAITFLAGS                                                    /* options */ 
 #define __NR32ATR3_wait4                        SC_REPR_POINTER                                                      /* usage */ 
 #define __NR32RTR_wait4                         SC_REPR_PID_T                                                        /* return */
 #define __NR32ATR0_swapoff                      SC_REPR_FILENAME                                                     /* pathname */ 
@@ -2032,7 +2032,7 @@
 #define __NR32ATR1_waitid                       SC_REPR_ID_T                                                         /* id */ 
 #define __NR32ATL1_waitid                       0                                                                    /* id -> idtype */ 
 #define __NR32ATR2_waitid                       SC_REPR_POINTER                                                      /* infop */ 
-#define __NR32ATR3_waitid                       SC_REPR_WAITID_OPTIONS                                               /* options */ 
+#define __NR32ATR3_waitid                       SC_REPR_WAITFLAGS                                                    /* options */ 
 #define __NR32ATR4_waitid                       SC_REPR_POINTER                                                      /* ru */ 
 #define __NR32RTR_waitid                        SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_add_key                      SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
@@ -2702,7 +2702,7 @@
 #define __NR32ATR1_waitid64                     SC_REPR_ID_T                                                         /* id */ 
 #define __NR32ATL1_waitid64                     0                                                                    /* id -> idtype */ 
 #define __NR32ATR2_waitid64                     SC_REPR_POINTER                                                      /* infop */ 
-#define __NR32ATR3_waitid64                     SC_REPR_WAITID_OPTIONS                                               /* options */ 
+#define __NR32ATR3_waitid64                     SC_REPR_WAITFLAGS                                                    /* options */ 
 #define __NR32ATR4_waitid64                     SC_REPR_POINTER                                                      /* ru */ 
 #define __NR32RTR_waitid64                      SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_utimes64                     SC_REPR_FILENAME                                                     /* filename */ 
@@ -2763,7 +2763,7 @@
 #define __NR32RTR_kreaddir                      SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_wait4_64                     SC_REPR_PID_T                                                        /* pid */ 
 #define __NR32ATR1_wait4_64                     SC_REPR_POINTER                                                      /* stat_loc */ 
-#define __NR32ATR2_wait4_64                     SC_REPR_WAITFLAG                                                     /* options */ 
+#define __NR32ATR2_wait4_64                     SC_REPR_WAITFLAGS                                                    /* options */ 
 #define __NR32ATR3_wait4_64                     SC_REPR_POINTER                                                      /* usage */ 
 #define __NR32RTR_wait4_64                      SC_REPR_PID_T                                                        /* return */
 #define __NR32ATR0_getitimer64                  SC_REPR_ITIMER_WHICH                                                 /* which */ 
@@ -2862,7 +2862,8 @@
 #define __NR32RTR_get_exception_handler         SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_set_exception_handler        SC_REPR_EXCEPTION_HANDLER_MODE                                       /* mode */ 
 #define __NR32ATR1_set_exception_handler        SC_REPR_EXCEPT_HANDLER_T                                             /* handler */ 
-#define __NR32ATR2_set_exception_handler        SC_REPR_POINTER                                                      /* handler_sp */ 
+#define __NR32ATR2_set_exception_handler        SC_REPR_EXCEPTION_HANDLER_SP                                         /* handler_sp */ 
+#define __NR32ATL2_set_exception_handler        0                                                                    /* handler_sp -> mode */ 
 #define __NR32RTR_set_exception_handler         SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_time64                       SC_REPR_POINTER                                                      /* timer */ 
 #define __NR32RTR_time64                        SC_REPR_TIME_T                                                       /* return */

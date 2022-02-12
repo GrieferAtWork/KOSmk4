@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x602de2c9 */
+/* HASH CRC-32:0x302048c5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1193,7 +1193,7 @@
 #define __NRRTR_close                         SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_waitpid                      SC_REPR_PID_T                                                        /* pid */ 
 #define __NRATR1_waitpid                      SC_REPR_POINTER                                                      /* stat_loc */ 
-#define __NRATR2_waitpid                      SC_REPR_WAITFLAG                                                     /* options */ 
+#define __NRATR2_waitpid                      SC_REPR_WAITFLAGS                                                    /* options */ 
 #define __NRRTR_waitpid                       SC_REPR_PID_T                                                        /* return */
 #define __NRATR0_creat                        SC_REPR_FILENAME                                                     /* filename */ 
 #define __NRATR1_creat                        SC_REPR_MODE_T                                                       /* mode */ 
@@ -1474,7 +1474,7 @@
 #define __NRRTR_vm86old                       SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_wait4                        SC_REPR_PID_T                                                        /* pid */ 
 #define __NRATR1_wait4                        SC_REPR_POINTER                                                      /* stat_loc */ 
-#define __NRATR2_wait4                        SC_REPR_WAITFLAG                                                     /* options */ 
+#define __NRATR2_wait4                        SC_REPR_WAITFLAGS                                                    /* options */ 
 #define __NRATR3_wait4                        SC_REPR_POINTER                                                      /* usage */ 
 #define __NRRTR_wait4                         SC_REPR_PID_T                                                        /* return */
 #define __NRATR0_swapoff                      SC_REPR_FILENAME                                                     /* pathname */ 
@@ -2032,7 +2032,7 @@
 #define __NRATR1_waitid                       SC_REPR_ID_T                                                         /* id */ 
 #define __NRATL1_waitid                       0                                                                    /* id -> idtype */ 
 #define __NRATR2_waitid                       SC_REPR_POINTER                                                      /* infop */ 
-#define __NRATR3_waitid                       SC_REPR_WAITID_OPTIONS                                               /* options */ 
+#define __NRATR3_waitid                       SC_REPR_WAITFLAGS                                                    /* options */ 
 #define __NRATR4_waitid                       SC_REPR_POINTER                                                      /* ru */ 
 #define __NRRTR_waitid                        SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_add_key                      SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
@@ -2702,7 +2702,7 @@
 #define __NRATR1_waitid64                     SC_REPR_ID_T                                                         /* id */ 
 #define __NRATL1_waitid64                     0                                                                    /* id -> idtype */ 
 #define __NRATR2_waitid64                     SC_REPR_POINTER                                                      /* infop */ 
-#define __NRATR3_waitid64                     SC_REPR_WAITID_OPTIONS                                               /* options */ 
+#define __NRATR3_waitid64                     SC_REPR_WAITFLAGS                                                    /* options */ 
 #define __NRATR4_waitid64                     SC_REPR_POINTER                                                      /* ru */ 
 #define __NRRTR_waitid64                      SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_utimes64                     SC_REPR_FILENAME                                                     /* filename */ 
@@ -2763,7 +2763,7 @@
 #define __NRRTR_kreaddir                      SC_REPR_SSIZE_T                                                      /* return */
 #define __NRATR0_wait4_64                     SC_REPR_PID_T                                                        /* pid */ 
 #define __NRATR1_wait4_64                     SC_REPR_POINTER                                                      /* stat_loc */ 
-#define __NRATR2_wait4_64                     SC_REPR_WAITFLAG                                                     /* options */ 
+#define __NRATR2_wait4_64                     SC_REPR_WAITFLAGS                                                    /* options */ 
 #define __NRATR3_wait4_64                     SC_REPR_POINTER                                                      /* usage */ 
 #define __NRRTR_wait4_64                      SC_REPR_PID_T                                                        /* return */
 #define __NRATR0_getitimer64                  SC_REPR_ITIMER_WHICH                                                 /* which */ 
@@ -2862,7 +2862,8 @@
 #define __NRRTR_get_exception_handler         SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_set_exception_handler        SC_REPR_EXCEPTION_HANDLER_MODE                                       /* mode */ 
 #define __NRATR1_set_exception_handler        SC_REPR_EXCEPT_HANDLER_T                                             /* handler */ 
-#define __NRATR2_set_exception_handler        SC_REPR_POINTER                                                      /* handler_sp */ 
+#define __NRATR2_set_exception_handler        SC_REPR_EXCEPTION_HANDLER_SP                                         /* handler_sp */ 
+#define __NRATL2_set_exception_handler        0                                                                    /* handler_sp -> mode */ 
 #define __NRRTR_set_exception_handler         SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_time64                       SC_REPR_POINTER                                                      /* timer */ 
 #define __NRRTR_time64                        SC_REPR_TIME_T                                                       /* return */

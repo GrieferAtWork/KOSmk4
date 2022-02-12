@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x425df0b8 */
+/* HASH CRC-32:0x146d8b5e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1141,7 +1141,7 @@
 #define __NRATR1_waitid                 SC_REPR_ID_T                                            /* id */ 
 #define __NRATL1_waitid                 0                                                       /* id -> idtype */ 
 #define __NRATR2_waitid                 SC_REPR_POINTER                                         /* infop */ 
-#define __NRATR3_waitid                 SC_REPR_WAITID_OPTIONS                                  /* options */ 
+#define __NRATR3_waitid                 SC_REPR_WAITFLAGS                                       /* options */ 
 #define __NRATR4_waitid                 SC_REPR_POINTER                                         /* ru */ 
 #define __NRRTR_waitid                  SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_set_tid_address        SC_REPR_POINTER                                         /* tidptr */ 
@@ -1633,7 +1633,7 @@
 #define __NRRTR_recvmmsg                SC_REPR_SSIZE_T                                         /* return */
 #define __NRATR0_wait4                  SC_REPR_PID_T                                           /* pid */ 
 #define __NRATR1_wait4                  SC_REPR_POINTER                                         /* stat_loc */ 
-#define __NRATR2_wait4                  SC_REPR_WAITFLAG                                        /* options */ 
+#define __NRATR2_wait4                  SC_REPR_WAITFLAGS                                       /* options */ 
 #define __NRATR3_wait4                  SC_REPR_POINTER                                         /* usage */ 
 #define __NRRTR_wait4                   SC_REPR_PID_T                                           /* return */
 #define __NRATR0_prlimit64              SC_REPR_PID_T                                           /* pid */ 
@@ -1894,7 +1894,7 @@
 #define __NRRTR_vfork                   SC_REPR_PID_T                                           /* return */
 #define __NRATR0_oldwait4               SC_REPR_PID_T                                           /* pid */ 
 #define __NRATR1_oldwait4               SC_REPR_POINTER                                         /* stat_loc */ 
-#define __NRATR2_oldwait4               SC_REPR_WAITFLAG                                        /* options */ 
+#define __NRATR2_oldwait4               SC_REPR_WAITFLAGS                                       /* options */ 
 #define __NRATR3_oldwait4               SC_REPR_POINTER                                         /* usage */ 
 #define __NRRTR_oldwait4                SC_REPR_PID_T                                           /* return */
 #define __NRATR0_recv                   SC_REPR_FD_T                                            /* sockfd */ 

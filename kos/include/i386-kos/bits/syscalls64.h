@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6941dbbb */
+/* HASH CRC-32:0x4a10eb91 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -520,6 +520,14 @@
  *               of unused, but required trailing 0s in its comment.
  * @return: * :  Return value depends on `command' */
 #define SYS_prctl                    __NR_prctl                    /* syscall_slong_t prctl(unsigned int command, syscall_ulong_t arg2, syscall_ulong_t arg3, syscall_ulong_t arg4, syscall_ulong_t arg5) */
+/* >> arch_prctl(2)
+ * Arch-dependent system process control interface. (But don't go and
+ * think that the  normal `prctl(2)'  doesn't feature  arch-dependent
+ * commands  -- honestly, this syscall shouldn't exist if you ask me,
+ * but it does on linux, and so it must also on KOS...)
+ * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
+ * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
+ * @return: * :  Return value depends on `command' */
 #define SYS_arch_prctl               __NR_arch_prctl               /* syscall_slong_t arch_prctl(unsigned int command, uint64_t *addr) */
 #define SYS_adjtimex                 __NR_adjtimex                 /* errno_t adjtimex(struct timex *ntx) */
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
@@ -810,7 +818,7 @@
  * delivery of signals masked by `sigmask' to the waiting  thread/process.
  * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
 #define SYS_signalfd4                __NR_signalfd4                /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize, syscall_ulong_t flags) */
-/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
+/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC | EFD_CLOFORK' */
 #define SYS_eventfd2                 __NR_eventfd2                 /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
 /* >> epoll_create1(2)
  * Create  a new epoll control descriptor which can be used for

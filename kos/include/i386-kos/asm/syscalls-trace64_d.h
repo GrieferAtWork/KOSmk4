@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe383a42e */
+/* HASH CRC-32:0xf24d7891 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1214,7 +1214,7 @@
 #define __NR64RTR_exit                      SC_REPR_SIGNO_T                                                      /* return */
 #define __NR64ATR0_wait4                    SC_REPR_PID_T                                                        /* pid */ 
 #define __NR64ATR1_wait4                    SC_REPR_POINTER                                                      /* stat_loc */ 
-#define __NR64ATR2_wait4                    SC_REPR_WAITFLAG                                                     /* options */ 
+#define __NR64ATR2_wait4                    SC_REPR_WAITFLAGS                                                    /* options */ 
 #define __NR64ATR3_wait4                    SC_REPR_POINTER                                                      /* usage */ 
 #define __NR64RTR_wait4                     SC_REPR_PID_T                                                        /* return */
 #define __NR64ATR0_kill                     SC_REPR_PID_T                                                        /* pid */ 
@@ -1764,7 +1764,7 @@
 #define __NR64ATR1_waitid                   SC_REPR_ID_T                                                         /* id */ 
 #define __NR64ATL1_waitid                   0                                                                    /* id -> idtype */ 
 #define __NR64ATR2_waitid                   SC_REPR_POINTER                                                      /* infop */ 
-#define __NR64ATR3_waitid                   SC_REPR_WAITID_OPTIONS                                               /* options */ 
+#define __NR64ATR3_waitid                   SC_REPR_WAITFLAGS                                                    /* options */ 
 #define __NR64ATR4_waitid                   SC_REPR_POINTER                                                      /* ru */ 
 #define __NR64RTR_waitid                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_add_key                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
@@ -2323,7 +2323,8 @@
 #define __NR64RTR_ioctlf                    SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NR64ATR0_set_exception_handler    SC_REPR_EXCEPTION_HANDLER_MODE                                       /* mode */ 
 #define __NR64ATR1_set_exception_handler    SC_REPR_EXCEPT_HANDLER_T                                             /* handler */ 
-#define __NR64ATR2_set_exception_handler    SC_REPR_POINTER                                                      /* handler_sp */ 
+#define __NR64ATR2_set_exception_handler    SC_REPR_EXCEPTION_HANDLER_SP                                         /* handler_sp */ 
+#define __NR64ATL2_set_exception_handler    0                                                                    /* handler_sp -> mode */ 
 #define __NR64RTR_set_exception_handler     SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_get_exception_handler    SC_REPR_POINTER                                                      /* pmode */ 
 #define __NR64ATR1_get_exception_handler    SC_REPR_POINTER                                                      /* phandler */ 

@@ -48,7 +48,7 @@
 #define __WAIT_ANY    (-1) /* Any process. */
 #define __WAIT_MYPGRP 0    /* Any process in my process group. */
 
-/* Macros for constructing status values. */
+/* Macros for constructing wait status values. */
 #define __W_EXITCODE(ret, sig) ((ret) << 8 | (sig))
 #define __W_STOPCODE(sig)      ((sig) << 8 | 0x7f)
 #define __W_CONTINUED          0xffff

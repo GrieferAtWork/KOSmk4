@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ea357f9 */
+/* HASH CRC-32:0xd06f4252 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -345,7 +345,7 @@ __CDECLARE_SC(,__ssize_t,epoll_wait,(__fd_t __epfd, struct epoll_event *__events
 __CDECLARE_SC(,__fd_t,eventfd,(__syscall_ulong_t __initval),(__initval))
 #endif /* __CRT_HAVE_SC(eventfd) */
 #if __CRT_HAVE_SC(eventfd2)
-/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
+/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC | EFD_CLOFORK' */
 __CDECLARE_SC(,__fd_t,eventfd2,(__syscall_ulong_t __initval, __syscall_ulong_t __flags),(__initval,__flags))
 #endif /* __CRT_HAVE_SC(eventfd2) */
 #if __CRT_HAVE_SC(execve)
@@ -1810,7 +1810,7 @@ __CDECLARE_XSC(,__ssize_t,epoll_wait,(__fd_t __epfd, struct epoll_event *__event
 __CDECLARE_XSC(,__fd_t,eventfd,(__syscall_ulong_t __initval),(__initval))
 #endif /* __CRT_HAVE_XSC(eventfd) */
 #if __CRT_HAVE_XSC(eventfd2)
-/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
+/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC | EFD_CLOFORK' */
 __CDECLARE_XSC(,__fd_t,eventfd2,(__syscall_ulong_t __initval, __syscall_ulong_t __flags),(__initval,__flags))
 #endif /* __CRT_HAVE_XSC(eventfd2) */
 #if __CRT_HAVE_XSC(execve)

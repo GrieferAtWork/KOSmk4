@@ -56,6 +56,7 @@
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
 
+/* Macros for constructing wait status values. */
 #ifdef __USE_MISC
 #if !defined(WCOREFLAG) && defined(__WCOREFLAG)
 #define WCOREFLAG __WCOREFLAG

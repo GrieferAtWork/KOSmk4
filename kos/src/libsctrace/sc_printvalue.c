@@ -49,6 +49,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <bits/os/timeval.h>
 #include <kos/anno.h>
 #include <kos/dev.h>
+#include <kos/except-handler.h>
 #include <kos/except.h>
 #include <kos/futex.h>
 #include <kos/io.h>
@@ -60,16 +61,19 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <linux/hdreg.h>
 #include <linux/kd.h>
 #include <sys/epoll.h>
+#include <sys/eventfd.h>
 #include <sys/filio.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/mount.h>
 #include <sys/param.h>
 #include <sys/poll.h>
+#include <sys/signalfd.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/uio.h>
+#include <sys/wait.h>
 
 #include <ctype.h>
 #include <fcntl.h>
@@ -511,6 +515,38 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_clone_flags
 #endif /* HAVE_SC_REPR_CLONE_FLAGS_UNSHARE */
 
+#ifdef HAVE_SC_REPR_WAITFLAGS
+#define NEED_print_waitflags
+#endif /* HAVE_SC_REPR_WAITFLAGS */
+
+#ifdef HAVE_SC_REPR_IDTYPE_T
+#define NEED_print_idtype_t
+#endif /* HAVE_SC_REPR_IDTYPE_T */
+
+#ifdef HAVE_SC_REPR_SIGNALFD4_FLAGS
+#define NEED_print_signalfd_flags
+#endif /* HAVE_SC_REPR_SIGNALFD4_FLAGS */
+
+#ifdef HAVE_SC_REPR_EVENTFD2_FLAGS
+#define NEED_print_eventfd_flags
+#endif /* HAVE_SC_REPR_EVENTFD2_FLAGS */
+
+#ifdef HAVE_SC_REPR_EXIT_STATUS
+#define NEED_print_exit_status
+#endif /* HAVE_SC_REPR_EXIT_STATUS */
+
+#ifdef HAVE_SC_REPR_EXCEPTION_HANDLER_MODE
+#define NEED_print_exception_handler_mode
+#endif /* HAVE_SC_REPR_EXCEPTION_HANDLER_MODE */
+
+#ifdef HAVE_SC_REPR_KCMP_TYPE
+#define NEED_print_kcmp_type
+#endif /* HAVE_SC_REPR_KCMP_TYPE */
+
+#ifdef HAVE_SC_REPR_ACCESS_TYPE
+#define NEED_print_access_type
+#endif /* HAVE_SC_REPR_ACCESS_TYPE */
+
 
 
 
@@ -643,6 +679,14 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_signo_t
 #endif /* NEED_print_clone_flags */
 
+#ifdef NEED_print_waitflags
+#define NEED_print_flagset32
+#endif /* NEED_print_waitflags */
+
+#ifdef NEED_print_access_type
+#define NEED_print_flagset8
+#endif /* NEED_print_access_type */
+
 
 
 
@@ -754,6 +798,42 @@ typedef uint8_t va_uint_t;
 #elif !defined(__DEEMON__)
 #error "Unsupported `__VA_SIZE'"
 #endif
+
+
+
+
+#ifdef NEED_print_flagset8
+PRIVATE ssize_t CC
+print_flagset8(pformatprinter printer, void *arg,
+               void const *flags_db, size_t stride,
+               char const *flag_prefix, syscall_ulong_t flags) {
+	ssize_t temp, result = 0;
+	bool is_first = true;
+	unsigned int i;
+	for (i = 0;; ++i) {
+		uint8_t const *pflag;
+		uint8_t flag;
+		pflag = (uint8_t const *)((byte_t const *)flags_db + i * stride);
+		if ((flag = *pflag) == 0)
+			break;
+		if (!(flags & flag))
+			continue;
+		PRINTF("%s%s%s",
+		       is_first ? "" : PIPESTR,
+		       flag_prefix, (char const *)(pflag + 1));
+		flags &= ~flag;
+		is_first = false;
+	}
+	if (flags || is_first) {
+		/* Print unknown flags. */
+		PRINTF("%s%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
+		       is_first ? "" : PIPESTR, flags);
+	}
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_flagset8 */
 
 
 
@@ -3876,8 +3956,6 @@ print_epoll_ctl(pformatprinter printer, void *arg,
 
 
 
-
-
 #if defined(NEED_print_mremap_flags) || defined(__DEEMON__)
 PRIVATE struct {
 	uint32_t   pn_flag;
@@ -4185,6 +4263,289 @@ err:
 
 
 
+#if defined(NEED_print_waitflags) || defined(__DEEMON__)
+PRIVATE struct {
+	uint32_t   pn_flag;
+	char const pn_name[12];
+} const waitflags[] = {
+	{ WNOHANG,    "NOHANG" },
+	{ WUNTRACED,  "UNTRACED" },
+	{ WSTOPPED,   "STOPPED" },
+	{ WEXITED,    "EXITED" },
+	{ WCONTINUED, "CONTINUED" },
+	{ WNOWAIT,    "NOWAIT" },
+	{ WNOTHREAD,  "NOTHREAD" },
+	{ WALL,       "ALL" },
+	{ WCLONE,     "CLONE" },
+	{ 0, "" }
+};
+
+PRIVATE ssize_t CC
+print_waitflags(pformatprinter printer, void *arg,
+                syscall_ulong_t flags) {
+	return print_flagset32(printer, arg, waitflags,
+	                       sizeof(*waitflags),
+	                       "W", flags);
+}
+#endif /* NEED_print_waitflags */
+
+
+
+#if defined(NEED_print_idtype_t) || defined(__DEEMON__)
+/*[[[deemon
+import * from deemon;
+import * from ...misc.libgen.strendN;
+local typ = getPrefixedMacrosFromFileAsMapping("../../include/asm/os/kos/wait.h", "__P_");
+printStrendNDatabase("IDTYPE_T", typ);
+]]]*/
+#define GETBASE_IDTYPE_T(result, index) \
+	(((index) <= 0x2) ? ((result) = repr_IDTYPE_T_0h, true) : false)
+PRIVATE char const repr_IDTYPE_T_0h[] =
+"ALL\0PID\0PGID";
+/*[[[end]]]*/
+
+PRIVATE ATTR_CONST WUNUSED char const *CC
+get_idtype_t_name(syscall_ulong_t idtype) {
+	char const *result = NULL;
+	if (!GETBASE_IDTYPE_T(result, idtype))
+		goto done;
+	for (; idtype; --idtype)
+		result = strend(result) + 1;
+	if (!*result)
+		result = NULL;
+done:
+	return result;
+}
+
+PRIVATE ssize_t CC
+print_idtype_t(pformatprinter printer, void *arg,
+               syscall_ulong_t idtype) {
+	char const *name;
+	name = get_idtype_t_name(idtype);
+	if (name)
+		return format_printf(printer, arg, "P_%s", name);
+	return format_printf(printer, arg, "%" PRIuN(__SIZEOF_SYSCALL_LONG_T__), idtype);
+}
+#endif /* NEED_print_idtype_t */
+
+
+
+#if defined(NEED_print_eventfd_flags) || defined(__DEEMON__)
+PRIVATE struct {
+	uint32_t   pn_flag;
+	char const pn_name[12];
+} const eventfd_flags[] = {
+	{ EFD_SEMAPHORE, "SEMAPHORE" },
+	{ EFD_NONBLOCK,  "NONBLOCK" },
+	{ EFD_CLOEXEC,   "CLOEXEC" },
+	{ EFD_CLOFORK,   "CLOFORK" },
+	{ 0, "" }
+};
+
+PRIVATE ssize_t CC
+print_eventfd_flags(pformatprinter printer, void *arg,
+                    syscall_ulong_t flags) {
+	return print_flagset32(printer, arg, eventfd_flags,
+	                       sizeof(*eventfd_flags),
+	                       "EFD_", flags);
+}
+#endif /* NEED_print_eventfd_flags */
+
+
+
+#if defined(NEED_print_signalfd_flags) || defined(__DEEMON__)
+#if (defined(NEED_print_eventfd_flags) && \
+     __SFD_NONBLOCK == __EFD_NONBLOCK &&  \
+     __SFD_CLOEXEC == __EFD_CLOEXEC &&    \
+     __SFD_CLOFORK == __EFD_CLOFORK)
+#define signalfd_flags (eventfd_flags + 1) /* Skip `EFD_SEMAPHORE' */
+#else /* ... */
+PRIVATE struct {
+	uint32_t   pn_flag;
+	char const pn_name[12];
+} const signalfd_flags[] = {
+	{ SFD_NONBLOCK, "NONBLOCK" },
+	{ SFD_CLOEXEC,  "CLOEXEC" },
+	{ SFD_CLOFORK,  "CLOFORK" },
+	{ 0, "" }
+};
+#endif /* !... */
+
+PRIVATE ssize_t CC
+print_signalfd_flags(pformatprinter printer, void *arg,
+                     syscall_ulong_t flags) {
+	return print_flagset32(printer, arg, signalfd_flags,
+	                       sizeof(*signalfd_flags),
+	                       "SFD_", flags);
+}
+#endif /* NEED_print_signalfd_flags */
+
+
+
+#if defined(NEED_print_exit_status) || defined(__DEEMON__)
+/*[[[deemon
+import * from deemon;
+import * from ...misc.libgen.strendN;
+local typ = getPrefixedMacrosFromFileAsMapping("../../include/asm/os/stdlib.h", "__EXIT_");
+printStrendNDatabase("EXIT_STATUS", typ);
+]]]*/
+#define GETBASE_EXIT_STATUS(result, index) \
+	(((index) <= 0x1) ? ((result) = repr_EXIT_STATUS_0h, true) : false)
+PRIVATE char const repr_EXIT_STATUS_0h[] =
+"SUCCESS\0FAILURE";
+/*[[[end]]]*/
+
+PRIVATE ATTR_CONST WUNUSED char const *CC
+get_exit_status_name(syscall_ulong_t idtype) {
+	char const *result = NULL;
+	if (!GETBASE_EXIT_STATUS(result, idtype))
+		goto done;
+	for (; idtype; --idtype)
+		result = strend(result) + 1;
+	if (!*result)
+		result = NULL;
+done:
+	return result;
+}
+
+PRIVATE ssize_t CC
+print_exit_status(pformatprinter printer, void *arg,
+                  syscall_ulong_t idtype) {
+	char const *name;
+	name = get_exit_status_name(idtype);
+	if (name)
+		return format_printf(printer, arg, "EXIT_%s", name);
+	return format_printf(printer, arg, "%" PRIuN(__SIZEOF_SYSCALL_LONG_T__), idtype);
+}
+#endif /* NEED_print_exit_status */
+
+
+
+#if defined(NEED_print_exception_handler_mode) || defined(__DEEMON__)
+/*[[[deemon
+import * from deemon;
+import * from ...misc.libgen.strendN;
+local typ = getPrefixedMacrosFromFileAsMapping("../../include/kos/except-handler.h", "EXCEPT_HANDLER_MODE_");
+for (;;) {
+	local key = typ.keys > ...;
+	if (key < 0xf)
+		break;
+	del typ[key];
+}
+printStrendNDatabase("EXCEPT_HANDLER_MODE", typ);
+]]]*/
+#define GETBASE_EXCEPT_HANDLER_MODE(result, index) \
+	(((index) <= 0x3) ? ((result) = repr_EXCEPT_HANDLER_MODE_0h, true) : false)
+PRIVATE char const repr_EXCEPT_HANDLER_MODE_0h[] =
+"UNCHANGED\0DISABLED\0ENABLED\0SIGHAND";
+/*[[[end]]]*/
+
+PRIVATE ATTR_CONST WUNUSED char const *CC
+get_except_handler_mode_name(syscall_ulong_t mode) {
+	char const *result = NULL;
+	if (!GETBASE_EXCEPT_HANDLER_MODE(result, mode))
+		goto done;
+	for (; mode; --mode)
+		result = strend(result) + 1;
+	if (!*result)
+		result = NULL;
+done:
+	return result;
+}
+
+PRIVATE ssize_t CC
+print_exception_handler_mode(pformatprinter printer, void *arg,
+                             syscall_ulong_t mode) {
+	ssize_t temp, result;
+	char const *basename;
+	basename = get_except_handler_mode_name(mode & EXCEPT_HANDLER_MODE_MASK);
+	if (basename) {
+		result = format_printf(printer, arg, "EXCEPT_HANDLER_%s", basename);
+	} else {
+		result = format_printf(printer, arg, "%" PRIuN(__SIZEOF_SYSCALL_LONG_T__),
+		                       mode & EXCEPT_HANDLER_MODE_MASK);
+	}
+	if unlikely(result < 0)
+		goto done;
+	if (mode & EXCEPT_HANDLER_FLAG_ONESHOT)
+		PRINT(PIPESTR_S "EXCEPT_HANDLER_FLAG_ONESHOT");
+	if (mode & EXCEPT_HANDLER_FLAG_SETHANDLER)
+		PRINT(PIPESTR_S "EXCEPT_HANDLER_FLAG_SETHANDLER");
+	if (mode & EXCEPT_HANDLER_FLAG_SETSTACK)
+		PRINT(PIPESTR_S "EXCEPT_HANDLER_FLAG_SETSTACK");
+	mode &= ~(EXCEPT_HANDLER_MODE_MASK | EXCEPT_HANDLER_FLAG_ONESHOT |
+	          EXCEPT_HANDLER_FLAG_SETHANDLER | EXCEPT_HANDLER_FLAG_SETSTACK);
+	if (mode)
+		PRINTF(PIPESTR_S "%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__), mode);
+done:
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_exception_handler_mode */
+
+
+
+#if defined(NEED_print_kcmp_type) || defined(__DEEMON__)
+/*[[[deemon
+import * from deemon;
+import * from ...misc.libgen.strendN;
+local typ = getPrefixedMacrosFromFileAsMapping("../../include/linux/kcmp.h", "KCMP_");
+printStrendNDatabase("KCMP", typ);
+]]]*/
+#define GETBASE_KCMP(result, index) \
+	(((index) <= 0x8) ? ((result) = repr_KCMP_0h, true) : false)
+PRIVATE char const repr_KCMP_0h[] =
+"FILE\0VM\0FILES\0FS\0SIGHAND\0IO\0SYSVSEM\0EPOLL_TFD\0TYPES";
+/*[[[end]]]*/
+
+PRIVATE ATTR_CONST WUNUSED char const *CC
+get_kcmp_type_name(syscall_ulong_t kcmp_type) {
+	char const *result = NULL;
+	if (!GETBASE_KCMP(result, kcmp_type))
+		goto done;
+	for (; kcmp_type; --kcmp_type)
+		result = strend(result) + 1;
+	if (!*result)
+		result = NULL;
+done:
+	return result;
+}
+
+PRIVATE ssize_t CC
+print_kcmp_type(pformatprinter printer, void *arg,
+                syscall_ulong_t kcmp_type) {
+	char const *name;
+	name = get_kcmp_type_name(kcmp_type);
+	if (name)
+		return format_printf(printer, arg, "KCMP_%s", name);
+	return format_printf(printer, arg, "%" PRIuN(__SIZEOF_SYSCALL_LONG_T__), kcmp_type);
+}
+#endif /* NEED_print_kcmp_type */
+
+
+
+#if defined(NEED_print_access_type) || defined(__DEEMON__)
+PRIVATE struct {
+	uint8_t    pn_flag;
+	char const pn_name[5];
+} const access_type_flags[] = {
+	{ X_OK, "X_OK" },
+	{ W_OK, "W_OK" },
+	{ R_OK, "R_OK" },
+	{ 0, "" }
+};
+
+PRIVATE ssize_t CC
+print_access_type(pformatprinter printer, void *arg,
+                  syscall_ulong_t flags) {
+	if (flags == F_OK)
+		return DOPRINT("F_OK");
+	return print_flagset8(printer, arg, access_type_flags,
+	                      sizeof(*access_type_flags),
+	                      "", flags);
+}
+#endif /* NEED_print_access_type */
 
 
 
@@ -4192,8 +4553,14 @@ err:
 
 
 
-/* Print the representation of a given system call  argument
- * value, given both its `argtype' (one of `*'), and `value'
+
+
+
+
+
+/* Print the representation of a given system call argument
+ * value, given both its `argtype' (one of `SC_REPR_*'), as
+ * well as its `value'.
  * WARNING: Depending on `argtype', an exception may be thrown
  *          if the system call invoker has passed some invalid
  *          argument to a system  call (i.e. a faulty  pointer
@@ -4246,11 +4613,7 @@ for (local c: knownCases.sorted()) {
 	}
 }
 ]]]*/
-	// TODO: #define HAVE_SC_REPR_ACCESS_TYPE
 	// TODO: #define HAVE_SC_REPR_CPUSET
-	// TODO: #define HAVE_SC_REPR_EVENTFD2_FLAGS
-	// TODO: #define HAVE_SC_REPR_EXCEPTION_HANDLER_MODE
-	// TODO: #define HAVE_SC_REPR_EXIT_STATUS
 	// TODO: #define HAVE_SC_REPR_FALLOCATE_MODE
 	// TODO: #define HAVE_SC_REPR_FSMODE
 	// TODO: #define HAVE_SC_REPR_FUTEX_OP
@@ -4259,14 +4622,11 @@ for (local c: knownCases.sorted()) {
 	// TODO: #define HAVE_SC_REPR_GID_VECTOR
 	// TODO: #define HAVE_SC_REPR_GID_VECTOR16
 	// TODO: #define HAVE_SC_REPR_GID_VECTOR32
-	// TODO: #define HAVE_SC_REPR_IDTYPE_T
-	// TODO: #define HAVE_SC_REPR_ID_T
 	// TODO: #define HAVE_SC_REPR_IOCTL_ARG
 	// TODO: #define HAVE_SC_REPR_IOPRIO_ID
 	// TODO: #define HAVE_SC_REPR_IOPRIO_VALUE
 	// TODO: #define HAVE_SC_REPR_IOPRIO_WHO
 	// TODO: #define HAVE_SC_REPR_ITIMER_WHICH
-	// TODO: #define HAVE_SC_REPR_KCMP_TYPE
 	// TODO: #define HAVE_SC_REPR_KSYSCTL_ARG
 	// TODO: #define HAVE_SC_REPR_KSYSCTL_COMMAND
 	// TODO: #define HAVE_SC_REPR_LFUTEX_OP
@@ -4281,7 +4641,6 @@ for (local c: knownCases.sorted()) {
 	// TODO: #define HAVE_SC_REPR_SCHED_POLICY
 	// TODO: #define HAVE_SC_REPR_SCHED_PRIORITY_WHICH
 	// TODO: #define HAVE_SC_REPR_SIGMASK
-	// TODO: #define HAVE_SC_REPR_SIGNALFD4_FLAGS
 	// TODO: #define HAVE_SC_REPR_SIGPROCMASK_HOW
 	// TODO: #define HAVE_SC_REPR_SOCKETCALL_ARGS
 	// TODO: #define HAVE_SC_REPR_SOCKETCALL_CALL
@@ -4349,10 +4708,70 @@ for (local c: knownCases.sorted()) {
 	// TODO: #define HAVE_SC_REPR_UNWIND_ERROR
 	// TODO: #define HAVE_SC_REPR_VOID_VECTOR32
 	// TODO: #define HAVE_SC_REPR_VOID_VECTOR64
-	// TODO: #define HAVE_SC_REPR_WAITFLAG
-	// TODO: #define HAVE_SC_REPR_WAITID_OPTIONS
 	// TODO: #define HAVE_SC_REPR_XATTR_FLAGS
 /*[[[end]]]*/
+
+#ifdef HAVE_SC_REPR_ACCESS_TYPE
+	case SC_REPR_ACCESS_TYPE:
+		result = print_access_type(printer, arg, (uintptr_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_ACCESS_TYPE */
+
+#ifdef HAVE_SC_REPR_KCMP_TYPE
+	case SC_REPR_KCMP_TYPE:
+		result = print_kcmp_type(printer, arg, (uintptr_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_KCMP_TYPE */
+
+#ifdef HAVE_SC_REPR_EXCEPTION_HANDLER_SP
+	case SC_REPR_EXCEPTION_HANDLER_SP:
+		if (link && !(link->sa_value.sv_u64 & EXCEPT_HANDLER_FLAG_SETSTACK)) {
+			/* Only have special treatment for `EXCEPT_HANDLER_SP_CURRENT'
+			 * when the stack pointer is being set! */
+			goto do_pointer;
+		}
+		if ((void *)(uintptr_t)value.sv_u64 == EXCEPT_HANDLER_SP_CURRENT) {
+			result = DOPRINT("EXCEPT_HANDLER_SP_CURRENT");
+			break;
+		}
+		goto do_pointer;
+#endif /* HAVE_SC_REPR_EXCEPTION_HANDLER_SP */
+
+#ifdef HAVE_SC_REPR_EXCEPTION_HANDLER_MODE
+	case SC_REPR_EXCEPTION_HANDLER_MODE:
+		result = print_exception_handler_mode(printer, arg, (uintptr_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_EXCEPTION_HANDLER_MODE */
+
+#ifdef HAVE_SC_REPR_EXIT_STATUS
+	case SC_REPR_EXIT_STATUS:
+		result = print_exit_status(printer, arg, (uintptr_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_EXIT_STATUS */
+
+#ifdef HAVE_SC_REPR_EVENTFD2_FLAGS
+	case SC_REPR_EVENTFD2_FLAGS:
+		result = print_eventfd_flags(printer, arg, (uintptr_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_EVENTFD2_FLAGS */
+
+#ifdef HAVE_SC_REPR_SIGNALFD4_FLAGS
+	case SC_REPR_SIGNALFD4_FLAGS:
+		result = print_signalfd_flags(printer, arg, (uintptr_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_SIGNALFD4_FLAGS */
+
+#ifdef HAVE_SC_REPR_IDTYPE_T
+	case SC_REPR_IDTYPE_T:
+		result = print_idtype_t(printer, arg, (uintptr_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_IDTYPE_T */
+
+#ifdef HAVE_SC_REPR_WAITFLAGS
+	case SC_REPR_WAITFLAGS:
+		result = print_waitflags(printer, arg, (uintptr_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_WAITFLAGS */
 
 #ifdef HAVE_SC_REPR_STRUCT_CLONE_ARGS
 	case SC_REPR_STRUCT_CLONE_ARGS:
@@ -5544,6 +5963,25 @@ do_struct_timespecx64:
 #error "Unsupported `__SIZEOF_UID_T__'"
 #endif /* __SIZEOF_UID_T__ != ... */
 #endif /* HAVE_SC_REPR_UID_T */
+
+#ifdef HAVE_SC_REPR_ID_T
+		case SC_REPR_ID_T:
+#if __SIZEOF_ID_T__ == 1
+#define NEED_do_int8_t
+		goto do_int8_t;
+#elif __SIZEOF_ID_T__ == 2
+#define NEED_do_int16_t
+		goto do_int16_t;
+#elif __SIZEOF_ID_T__ == 4
+#define NEED_do_int32_t
+		goto do_int32_t;
+#elif __SIZEOF_ID_T__ == 8
+#define NEED_do_int64_t
+		goto do_int64_t;
+#else /* __SIZEOF_ID_T__ == ... */
+#error "Unsupported `__SIZEOF_ID_T__'"
+#endif /* __SIZEOF_ID_T__ != ... */
+#endif /* HAVE_SC_REPR_ID_T */
 
 #ifdef HAVE_SC_REPR_PID_T
 		case SC_REPR_PID_T:

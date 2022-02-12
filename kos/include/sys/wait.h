@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3da7740a */
+/* HASH CRC-32:0x1d54086 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,6 +52,7 @@
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
 
+/* Macros for constructing wait status values. */
 #ifdef __USE_MISC
 #if !defined(WCOREFLAG) && defined(__WCOREFLAG)
 #define WCOREFLAG __WCOREFLAG

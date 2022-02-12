@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ce0bad9 */
+/* HASH CRC-32:0x337d96bc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5132,6 +5132,14 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_prctl)
 	.cfi_endproc
 END(__x86_asm64_syscall_prctl)
 
+/* >> arch_prctl(2)
+ * Arch-dependent system process control interface. (But don't go and
+ * think that the  normal `prctl(2)'  doesn't feature  arch-dependent
+ * commands  -- honestly, this syscall shouldn't exist if you ask me,
+ * but it does on linux, and so it must also on KOS...)
+ * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
+ * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
+ * @return: * :  Return value depends on `command' */
 /* syscall_slong_t arch_prctl(unsigned int command, uint64_t *addr) */
 .section .text.x86.asm64_syscall.arch_prctl
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_arch_prctl)
@@ -9289,7 +9297,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_signalfd4)
 	.cfi_endproc
 END(__x86_asm64_syscall_signalfd4)
 
-/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
+/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC | EFD_CLOFORK' */
 /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.eventfd2
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_eventfd2)
@@ -21199,7 +21207,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_signalfd4)
 	.cfi_endproc
 END(__x86_asm32_int80_signalfd4)
 
-/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
+/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC | EFD_CLOFORK' */
 /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.eventfd2
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_eventfd2)
@@ -22819,6 +22827,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_statx)
 	.cfi_endproc
 END(__x86_asm32_int80_statx)
 
+/* >> arch_prctl(2)
+ * Arch-dependent system process control interface. (But don't go and
+ * think that the  normal `prctl(2)'  doesn't feature  arch-dependent
+ * commands  -- honestly, this syscall shouldn't exist if you ask me,
+ * but it does on linux, and so it must also on KOS...)
+ * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
+ * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
+ * @return: * :  Return value depends on `command' */
 /* syscall_slong_t arch_prctl(unsigned int command, uint32_t *addr) */
 .section .text.x86.asm32_syscall_int80.arch_prctl
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_arch_prctl)
@@ -28293,7 +28309,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timerfd_gettime, __x86_asm32_int80
 /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize, syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_signalfd4, __x86_asm32_int80_signalfd4)
 
-/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
+/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC | EFD_CLOFORK' */
 /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_eventfd2, __x86_asm32_int80_eventfd2)
 
@@ -29102,6 +29118,14 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_pkey_free, __x86_asm32_int80_pkey_
 /* errno_t statx(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_statx, __x86_asm32_int80_statx)
 
+/* >> arch_prctl(2)
+ * Arch-dependent system process control interface. (But don't go and
+ * think that the  normal `prctl(2)'  doesn't feature  arch-dependent
+ * commands  -- honestly, this syscall shouldn't exist if you ask me,
+ * but it does on linux, and so it must also on KOS...)
+ * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
+ * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
+ * @return: * :  Return value depends on `command' */
 /* syscall_slong_t arch_prctl(unsigned int command, uint32_t *addr) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_arch_prctl, __x86_asm32_int80_arch_prctl)
 
@@ -34405,7 +34429,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_signalfd4)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_signalfd4)
 
-/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
+/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC | EFD_CLOFORK' */
 /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.eventfd2
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_eventfd2)
@@ -35278,6 +35302,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_statx)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_statx)
 
+/* >> arch_prctl(2)
+ * Arch-dependent system process control interface. (But don't go and
+ * think that the  normal `prctl(2)'  doesn't feature  arch-dependent
+ * commands  -- honestly, this syscall shouldn't exist if you ask me,
+ * but it does on linux, and so it must also on KOS...)
+ * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
+ * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
+ * @return: * :  Return value depends on `command' */
 /* syscall_slong_t arch_prctl(unsigned int command, uint32_t *addr) */
 .section .text.x86.asm32_syscall_sysrun32.arch_prctl
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_arch_prctl)

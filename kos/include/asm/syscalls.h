@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdca017e9 */
+/* HASH CRC-32:0xea66fa29 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@
 #define __NR_fremovexattr           0x10  /* errno_t fremovexattr(fd_t fd, char const *name) */
 #define __NR_getcwd                 0x11  /* ssize_t getcwd(char *buf, size_t size) */
 #define __NR_lookup_dcookie         0x12  /* errno_t lookup_dcookie(int TODO_PROTOTYPE) */
-/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
+/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC | EFD_CLOFORK' */
 #define __NR_eventfd2               0x13  /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
 /* >> epoll_create1(2)
  * Create  a new epoll control descriptor which can be used for

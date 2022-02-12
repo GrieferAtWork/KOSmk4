@@ -46,8 +46,9 @@ INTDEF NONNULL((1, 2)) bool
 NOTHROW_NCX(CC libsc_getdesc)(struct rpc_syscall_info const *__restrict sc_info,
                               struct sc_desc *__restrict desc);
 
-/* Print the representation of a given system call  argument
- * value, given both its `argtype' (one of `*'), and `value'
+/* Print the representation of a given system call argument
+ * value, given both its `argtype' (one of `SC_REPR_*'), as
+ * well as its `value'.
  * WARNING: Depending on `argtype', an exception may be thrown
  *          if the system call invoker has passed some invalid
  *          argument to a system  call (i.e. a faulty  pointer

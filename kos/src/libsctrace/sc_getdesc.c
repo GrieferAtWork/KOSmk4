@@ -2,6 +2,7 @@
 local gcc_opt = options.setdefault("GCC.options", []);
 if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 	gcc_opt.append("-Os");
+gcc_opt.remove("-g"); // Disable debug informations for this file!
 ]]]*/
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *

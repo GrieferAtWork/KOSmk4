@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x760dc4aa */
+/* HASH CRC-32:0x66d6ff62 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1645,6 +1645,14 @@ INTERN_FUNCTION(libc_sys_prctl)
 END(libc_sys_prctl)
 DEFINE_PUBLIC_ALIAS(sys_prctl, libc_sys_prctl)
 
+/* >> arch_prctl(2)
+ * Arch-dependent system process control interface. (But don't go and
+ * think that the  normal `prctl(2)'  doesn't feature  arch-dependent
+ * commands  -- honestly, this syscall shouldn't exist if you ask me,
+ * but it does on linux, and so it must also on KOS...)
+ * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
+ * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
+ * @return: * :  Return value depends on `command' */
 /* syscall_slong_t arch_prctl(unsigned int command, uint64_t *addr) */
 INTERN_FUNCTION(libc_sys_arch_prctl)
 	movq   $(0x9e), %rax
@@ -2898,7 +2906,7 @@ INTERN_FUNCTION(libc_sys_signalfd4)
 END(libc_sys_signalfd4)
 DEFINE_PUBLIC_ALIAS(sys_signalfd4, libc_sys_signalfd4)
 
-/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
+/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC | EFD_CLOFORK' */
 /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_eventfd2)
 	movq   $(0x122), %rax
@@ -6132,6 +6140,14 @@ INTERN_FUNCTION(libc_sys_Xprctl)
 END(libc_sys_Xprctl)
 DEFINE_PUBLIC_ALIAS(sys_Xprctl, libc_sys_Xprctl)
 
+/* >> arch_prctl(2)
+ * Arch-dependent system process control interface. (But don't go and
+ * think that the  normal `prctl(2)'  doesn't feature  arch-dependent
+ * commands  -- honestly, this syscall shouldn't exist if you ask me,
+ * but it does on linux, and so it must also on KOS...)
+ * @param: command: One of `ARCH_*' (from <asm/prctl.h>)
+ * @param: addr: Either a `syscall_ulong_t' or `syscall_ulong_t *', depending on `command'
+ * @return: * :  Return value depends on `command' */
 /* syscall_slong_t arch_prctl(unsigned int command, uint64_t *addr) */
 INTERN_FUNCTION(libc_sys_Xarch_prctl)
 	movq   $(0x9e), %rax
@@ -7649,7 +7665,7 @@ INTERN_FUNCTION(libc_sys_Xsignalfd4)
 END(libc_sys_Xsignalfd4)
 DEFINE_PUBLIC_ALIAS(sys_Xsignalfd4, libc_sys_Xsignalfd4)
 
-/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
+/* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC | EFD_CLOFORK' */
 /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_Xeventfd2)
 	movq   $(0x122), %rax
