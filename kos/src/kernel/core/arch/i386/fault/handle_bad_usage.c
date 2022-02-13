@@ -1373,7 +1373,7 @@ err_privileged_segment:
 #define EMU86_EMULATE_HANDLE_CPUID() cpuid(_state)
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) void
 NOTHROW(KCALL cpuid)(struct icpustate *__restrict state) {
-	struct cpuinfo const *info = &CURRENT_X86_CPUID;
+	struct cpuinfo const *info = &THISCPU_X86_CPUID;
 	if ((u32)state->ics_gpregs.gp_Pax & UINT32_C(0x80000000)) {
 		switch ((u32)state->ics_gpregs.gp_Pax) {
 		case UINT32_C(0x80000000):

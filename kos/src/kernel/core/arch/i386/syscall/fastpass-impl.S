@@ -232,6 +232,15 @@
 #define SC_IRET_NOCLOBBER iret
 #endif /* !... */
 
+/* Prefix for accessing linear memory without loading segment registers */
+#undef CSMEM
+#ifdef __x86_64__
+#define CSMEM /* nothing */
+#else /* __x86_64__ */
+#define CSMEM %cs:
+#endif /* !__x86_64__ */
+
+
 
 /* Define _all_ low-level system call variants of a  system
  * call that is  entirely unable to  throw any  exceptions.
@@ -559,7 +568,7 @@ SC_BEGIN(debugtrap)
 	/* Load the new register context stack. */
 	movP   %Pax, %Psp
 	SC_POP_ICPUSTATE
-	SC_IRET
+	SC_IRET_NOCLOBBER /* State may have been modified; -- Mustn't clobber any registers! */
 SC_END(debugtrap)
 #endif /* debugtrap... */
 
@@ -601,8 +610,7 @@ SC_END(iopl)
 
 
 
-/* >> errno_t clone3(struct ucpustate const *state,
- * >>                   struct clone3_reason const *reason); */
+/* >> pid_t clone3(struct clone_args *args, size_t size); */
 #if _SYSFAST_WANT(CLONE3, clone3)
 SC_BEGIN(clone3)
 	SC_PUSH_ICPUSTATE
@@ -688,7 +696,7 @@ SC_BEGIN(rtm_begin)
 	call   sys_rtm_begin_impl
 	movP   %Pax, %Psp
 	SC_POP_ICPUSTATE
-	SC_IRET
+	SC_IRET_NOCLOBBER /* State may have been modified; -- Mustn't clobber any registers! */
 SC_END(rtm_begin)
 #endif /* rtm_begin... */
 
@@ -710,7 +718,7 @@ SC_BEGIN_ALL_NOTHROW(rtm_test)
 	 *    when outside of RTM mode), we do the same, thus
 	 *    simplifying the user-space RTM testing code.
 	 */
-	orP  $(EFLAGS_ZF), OFFSET_IRREGS_PFLAGS(%Psp)
+	orP  $(EFLAGS_ZF), CSMEM OFFSET_IRREGS_PFLAGS(%Psp)
 	/* return 0 */
 	xorP %Pax, %Pax
 	SC_IRET

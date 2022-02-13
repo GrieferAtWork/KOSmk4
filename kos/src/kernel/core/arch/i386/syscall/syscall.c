@@ -84,12 +84,12 @@ DECL_BEGIN
  * Can't happen on x86_64, since it defines any 32-bit user-space address as valid, which
  * is what sysenter extensions vectors are limited to in compatibility mode. */
 #ifndef __x86_64__
-INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
+INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(FCALL __asm32_bad_sysenter_extension_impl)(struct icpustate *__restrict state) {
 	struct rpc_syscall_info sc_info;
 	struct exception_info *info = except_info();
 
-	/* Fill in system call information */
+	/* Fill in system call information (as far as we can) */
 	sc_info.rsi_flags   = (RPC_SYSCALL_INFO_FREGVALID(0) | RPC_SYSCALL_INFO_FREGVALID(1) |
 	                       RPC_SYSCALL_INFO_FREGVALID(2) | RPC_SYSCALL_INFO_FREGVALID(3) |
 	                       RPC_SYSCALL_INFO_METHOD_SYSENTER_32);
@@ -328,7 +328,7 @@ NOTHROW(KCALL x86_initialize_sysenter)(void) {
 		PRIVATE ATTR_FREERODATA byte_t const intr_exit[] = {
 			0xfa,                         /*     cli                   */
 			0xf6, 0x44, 0x24, 0x08, 0x03, /*     testb  $0x3,0x8(%rsp) */
-			0x74, 0x03,                   /*     je     1f             */
+			0x74, 0x03,                   /*     jz     1f             */
 			0x0f, 0x01, 0xf8,             /*     swapgs                */
 			0x48, 0xcf                    /* 1:  iretq                 */
 		};

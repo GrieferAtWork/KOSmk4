@@ -141,7 +141,7 @@ DATDEF ATTR_PERCPU u16 const thiscpu_x86_cpufeatures;
  * NOTE: When `CPU_FEATURE_FCPUID' isn't set, all members are ZERO-initialized.
  * Information gathered from `cpuid' */
 DATDEF ATTR_PERCPU struct cpuinfo const thiscpu_x86_cpuid;
-#define CURRENT_X86_CPUID PERCPU(thiscpu_x86_cpuid)
+#define THISCPU_X86_CPUID PERCPU(thiscpu_x86_cpuid)
 
 
 DATDEF u16 const bootcpu_x86_cpufeatures;
@@ -195,9 +195,9 @@ DATDEF struct cpuinfo const bootcpu_x86_cpuid;
 
 /* Same as above, but for the current CPU (whereas
  * the macros  above are  only for  the boot  CPU) */
-#define X86_THISCPU_HAVE_SYSENTER      (CURRENT_X86_CPUID.ci_1d & CPUID_1D_SEP)
+#define X86_THISCPU_HAVE_SYSENTER      (THISCPU_X86_CPUID.ci_1d & CPUID_1D_SEP)
 #ifdef __x86_64__
-#define X86_THISCPU_HAVE_SYSCALL       (CURRENT_X86_CPUID.ci_80000001d & CPUID_80000001D_SYSCALL)
+#define X86_THISCPU_HAVE_SYSCALL       (THISCPU_X86_CPUID.ci_80000001d & CPUID_80000001D_SYSCALL)
 #else /* __x86_64__ */
 #define X86_THISCPU_HAVE_SYSCALL       0 /* 64-bit only feature */
 #endif /* !__x86_64__ */

@@ -280,16 +280,20 @@ function printStrendNDatabase(
 		local minIndex = startAndItems[0];
 		local maxIndex = minIndex + #startAndItems[1] - 1;
 		print("\t", i ? " " : "("),;
+		print("("),;
 		if (minIndex == maxIndex) {
-			print("((index) == ", minIndex.hex(), ") ? ("),;
+			print("(index) == ", minIndex.hex()),;
 		} else if (minIndex == 0) {
-			print("((index) <= ", maxIndex.hex(), ") ? ("),;
+			print("(index) <= ", maxIndex.hex()),;
 		} else {
-			print("((index) >= ", minIndex.hex(), " && (index) <= ", maxIndex.hex(), ") ? ("),;
+			print("(index) >= ", minIndex.hex(), " && (index) <= ", maxIndex.hex()),;
 		}
+		print(") ? ("),;
 		if (minIndex != 0) {
 			if (minIndex == maxIndex) {
 				print("(index) = 0, "),;
+			} else if (minIndex < 0) {
+				print("(index) += ", (-minIndex).hex(), ", "),;
 			} else {
 				print("(index) -= ", minIndex.hex(), ", "),;
 			}
@@ -320,11 +324,14 @@ function printStrendNDatabase(
 
 function getPrefixedMacrosFromFileAsMapping(
 		filename: string, prefix: string, suffix: string = "",
-		requireNoSpaceAfterPound: bool = false): {int: string} {
+		requireNoSpaceAfterPound: bool = false,
+		filter: Callable with string = none): {int: string} {
 	local result = Dict();
 	for (local macroName, macroValue: enumerateMacrosFromFile(
 			filename, requireNoSpaceAfterPound)) {
 		if (!macroName.startswith(prefix))
+			continue;
+		if (filter !is none && !filter(macroName))
 			continue;
 		if (suffix) {
 			if (!macroName.endswith(suffix))

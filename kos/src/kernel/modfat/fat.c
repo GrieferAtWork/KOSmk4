@@ -1506,7 +1506,7 @@ retry_lfn:
 			*writer++ = ' ';
 
 		/* Fix 0xe5 --> 0x05 */
-		if (ent->fad_dos.f_marker == 0xe5)
+		if (ent->fad_dos.f_marker == 0xe5) /* f_marker <===> f_name[0] */
 			ent->fad_dos.f_marker = MARKER_IS0XE5;
 
 		/* If the 8.3 filename already exists, then try to generate another one. */

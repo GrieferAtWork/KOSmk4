@@ -30,6 +30,7 @@
 #include <kernel/malloc.h>
 #include <kernel/syscall-trace.h>
 #include <kernel/syscall.h>
+#include <sched/task.h>
 
 #include <hybrid/atomic.h>
 

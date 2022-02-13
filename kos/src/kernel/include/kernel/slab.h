@@ -40,28 +40,28 @@
 DECL_BEGIN
 
 /* Slab allocators.
- *  - Used by kmalloc() for very small, but efficient allocations (< HEAP_MINSIZE)
- *  - Uses the same mechanism as corebase, in that memory is allocated in pages,
- *    but then handed out in very small, fixed-length segments that are  tracked
- *    via a bitset within the page.
- *  - Each slab has its own chain of in-use pages (that still contain unused segments)
- *  - All slabs share 2 small pools of pages that are entirely free (usually up to 3)
- *    - When a new page is required for allocation, they are taken from the pools
- *    - One pool is for locked pages, while the other is for swap-capable ones.
- *  - Memory is freed  by loading  the page address  of a  pointer, where  meta-data
- *    including the size of segments within that page is stored, as well as a bitset
- *    describing which segments have been allocated.
- *  - Once a slab page contains no further in-use segments, it is added to the pool
- *    of  free pages. If the pool would then exceed its limit, the oldest free page
- *    is released to the core.
- *  - Slab allocators are used for all allocations `>= HEAP_ALIGNMENT' and `<= SLAB_MAXSIZE'
- *  - Assuming 4-byte alignment, and a `SLAB_MAXSIZE' of `20'
- *    bytes, this makes 5 slab variants: 4, 8, 12, 16, 20
- *  - Since slab-memory cannot  be realloc()'ed, by  default only  kmalloc()
- *    will allocate slab  memory, while krealloc()  will only ever  allocate
- *    actual heap memory. However, krealloc(SLAB_PTR) still works, but  will
- *    never re-return SLAB_PTR (i.e. inplace_realloc), unless the block size
- *    didn't change (and even then: it's not guarantied to do so) */
+ * - Used by kmalloc() for very small, but efficient allocations (< HEAP_MINSIZE)
+ * - Uses the same mechanism as corebase, in that memory is allocated in pages,
+ *   but then handed out in very small, fixed-length segments that are  tracked
+ *   via a bitset within the page.
+ * - Each slab has its own chain of in-use pages (that still contain unused segments)
+ * - All slabs share 2 small pools of pages that are entirely free (usually up to 3)
+ *   - When a new page is required for allocation, they are taken from the pools
+ *   - One pool is for locked pages, while the other is for swap-capable ones.
+ * - Memory is freed  by loading  the page address  of a  pointer, where  meta-data
+ *   including the size of segments within that page is stored, as well as a bitset
+ *   describing  which segments have  been allocated. This  bitset is then updated.
+ * - Once a slab page contains no further in-use segments, it is added to the pool
+ *   of  free pages. If the pool would then exceed its limit, the oldest free page
+ *   is released to the core.
+ * - Slab allocators are used for all fixed-length allocations `<= SLAB_MAXSIZE'
+ * - Slab sizes have a granularity of `sizeof(void *)', with all possible values
+ *   that are `<= SLAB_MAXSIZE' having a dedicated slab.
+ * - Since slab-memory  cannot be  realloc()'ed,  by default  only  kmalloc()
+ *   will allocate  slab memory,  while krealloc()  will only  ever  allocate
+ *   actual heap memory.  However, krealloc(SLAB_PTR) still  works, but  will
+ *   never re-return SLAB_PTR (i.e. inplace_realloc doesn't work), unless the
+ *   block  size didn't change (and even then:  it's not guarantied to do so) */
 
 
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
@@ -170,18 +170,18 @@ struct slab {
 	((PAGESIZE - SLAB_SEGMENT_OFFSET(segment_size)) / (segment_size))
 
 
-#define PRIVATE_SLAB_GET_ADDR2(a,b) a
-#define PRIVATE_SLAB_GET_ADDR(x) PRIVATE_SLAB_GET_ADDR2 x
+#define PRIVATE_SLAB_GET_ADDR2(a, b) a
+#define PRIVATE_SLAB_GET_ADDR(x)     PRIVATE_SLAB_GET_ADDR2 x
+#define PRIVATE_SLAB_GET_HINT2(a, b) b
+#define PRIVATE_SLAB_GET_HINT(x)     PRIVATE_SLAB_GET_HINT2 x
 
-#define PRIVATE_SLAB_GET_HINT2(a,b) b
-#define PRIVATE_SLAB_GET_HINT(x) PRIVATE_SLAB_GET_HINT2 x
 #undef CONFIG_SLAB_GROWS_UPWARDS
 #undef CONFIG_SLAB_GROWS_DOWNWARDS
-#if PRIVATE_SLAB_GET_HINT(KERNEL_MHINT_SLAB) == __MAP_GROWSDOWN
+#if (PRIVATE_SLAB_GET_HINT(KERNEL_MHINT_SLAB) & (__MAP_GROWSUP | __MAP_GROWSDOWN)) == __MAP_GROWSDOWN
 #define CONFIG_SLAB_GROWS_DOWNWARDS 1
-#else /* PRIVATE_SLAB_GET_HINT(KERNEL_MHINT_SLAB) == __MAP_GROWSDOWN */
+#else /* (PRIVATE_SLAB_GET_HINT(KERNEL_MHINT_SLAB) & (__MAP_GROWSUP | __MAP_GROWSDOWN)) == __MAP_GROWSDOWN */
 #define CONFIG_SLAB_GROWS_UPWARDS 1
-#endif /* PRIVATE_SLAB_GET_HINT(KERNEL_MHINT_SLAB) != __MAP_GROWSDOWN */
+#endif /* (PRIVATE_SLAB_GET_HINT(KERNEL_MHINT_SLAB) & (__MAP_GROWSUP | __MAP_GROWSDOWN)) != __MAP_GROWSDOWN */
 
 
 #define KERNEL_SLAB_INITIAL \
@@ -222,24 +222,41 @@ DATDEF void *kernel_slab_break;
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 struct slab_pending_free {
-	/* TODO: Use SLIST_ENTRY() */
-	struct slab_pending_free *spf_next; /* [0..1] Next pending free. */
+	/* Using an SLIST of pending-free objects here instead of a proper
+	 * lockop system might seem like bad  design, and on some level  I
+	 * have to admit that you're probably right. But:
+	 *  - If you take a look at `SLAB_FOREACH_SIZE()', you'll see that
+	 *    the smallest possible slab has a sizeof() == sizeof(void *).
+	 *  - As  such, if we want to async/non-blocking free of slabs, we
+	 *    have to ensure that a pending-free descriptor is able to fit
+	 *    into the smallest possible slab element.
+	 *  - Because a lockop descriptor consists of 2 pointers  (being
+	 *    the SLIST-next link, and the function invoked), we  aren't
+	 *    actually able to fit all of that in here, meaning that  we
+	 *    are  forced  to implement  async/non-blocking free  with a
+	 *    special-purpose linked list  of pending-free chunks.  That
+	 *    way, we don't need the pointer-to-function-to-execute, and
+	 *    everything fits into a single pointer! */
+	SLIST_ENTRY(slab_pending_free) spf_link; /* [0..1] Next pending free. */
 };
+
+SLIST_HEAD(slab_pending_free_slist, slab_pending_free);
+
 LIST_HEAD(slab_list, slab);
 struct slab_descriptor {
 	/* Data descriptor for some fixed-length-segment slab. */
-	struct atomic_lock             sd_lock; /* Lock for this slab descriptor. */
-	struct slab_list               sd_free; /* [0..n][lock(sd_lock)] Chain of partially free slab pages. */
+	struct atomic_lock                  sd_lock; /* Lock for this slab descriptor. */
+	struct slab_list                    sd_free; /* [0..n][lock(sd_lock)] Chain of partially free slab pages. */
 #ifdef CONFIG_TRACE_MALLOC
-	struct slab_list               sd_used; /* [0..n][lock(sd_lock)] Chain of fully allocated slab pages. */
+	struct slab_list                    sd_used; /* [0..n][lock(sd_lock)] Chain of fully allocated slab pages. */
 #endif /* CONFIG_TRACE_MALLOC */
-	WEAK struct slab_pending_free *sd_pend; /* [0..1] Chain of pending free segments. */
+	WEAK struct slab_pending_free_slist sd_pend; /* [0..1] Chain of pending free segments. (pseudo-lockop list) */
 };
 
 /* Helper macros for `struct slab_descriptor::sd_lock' */
 #define _slab_descriptor_reap(self)      LOCAL_slab_descriptor_service_pending() /* Define locally to clear our `sd_pend' */
 #define slab_descriptor_reap(self)       (!slab_descriptor_mustreap(self) || (_slab_descriptor_reap(self), 0))
-#define slab_descriptor_mustreap(self)   (__hybrid_atomic_load((self)->sd_pend, __ATOMIC_ACQUIRE) != __NULLPTR)
+#define slab_descriptor_mustreap(self)   (__hybrid_atomic_load((self)->sd_pend.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
 #define slab_descriptor_tryacquire(self) atomic_lock_tryacquire(&(self)->sd_lock)
 #define slab_descriptor_acquire(self)    atomic_lock_acquire(&(self)->sd_lock)
 #define slab_descriptor_acquire_nx(self) atomic_lock_acquire_nx(&(self)->sd_lock)
@@ -249,7 +266,6 @@ struct slab_descriptor {
 #define slab_descriptor_available(self)  atomic_lock_available(&(self)->sd_lock)
 #define slab_descriptor_waitfor(self)    atomic_lock_waitfor(&(self)->sd_lock)
 #define slab_descriptor_waitfor_nx(self) atomic_lock_waitfor_nx(&(self)->sd_lock)
-
 
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 

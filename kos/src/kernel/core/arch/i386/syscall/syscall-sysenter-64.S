@@ -270,7 +270,11 @@ PUBLIC_FUNCTION(x86_syscall_emulate_sysenter_r)
 
 	/* Check if our user-space return location got re-directed.
 	 * If it was, we need to apply the register override at the
-	 * saved return location, rather than the active one. */
+	 * saved return location, rather than the active one.
+	 *
+	 * After all: we don't ~actually~ do a sysret here; we just
+	 *            barely  scrape by the edge of kernel-space in
+	 *            order to fully reset our stack. */
 	EXTERN(x86_userexcept_sysret)
 	cmpq   $(x86_userexcept_sysret), OFFSET_IRREGS_RIP(%rsp)
 	jne    1f

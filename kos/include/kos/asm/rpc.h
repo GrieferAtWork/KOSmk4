@@ -408,8 +408,8 @@
                                       * as though the `RPC_CONTEXT_KERN' wasn't set. As a consequence, RPCs
                                       * with this flag will only ever be invoked with reasons:
                                       *   - RPC_REASONCTX_SYSRET     (Return to user-space location)
-                                      *   - RPC_REASONCTX_SYSCALL    (Interrupt was unwound)
-                                      *   - RPC_REASONCTX_INTERRUPT  (syscall was unwound)
+                                      *   - RPC_REASONCTX_SYSCALL    (syscall was unwound)
+                                      *   - RPC_REASONCTX_INTERRUPT  (Interrupt was unwound)
                                       *   - RPC_REASONCTX_SHUTDOWN   (Thread is exiting) */
 #define RPC_SYNCMODE_F_SYSRET 0x0400 /* Combine with `RPC_SYNCMODE_F_USER': Service the RPC in the sysret path. */
 #endif /* __KERNEL__ */

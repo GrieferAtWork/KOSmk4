@@ -567,6 +567,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_flagset32
 #endif /* NEED_print_epoll_create1_flags */
 
+#ifdef NEED_print_socket_type_flags
+#define NEED_print_flagset32
+#endif /* NEED_print_socket_type_flags */
+
 #ifdef NEED_print_mremap_flags
 #define NEED_print_flagset32
 #endif /* NEED_print_mremap_flags */
@@ -686,6 +690,22 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifdef NEED_print_access_type
 #define NEED_print_flagset8
 #endif /* NEED_print_access_type */
+
+#ifdef NEED_print_fd_flags
+#define NEED_print_flagset8
+#endif /* NEED_print_fd_flags */
+
+#ifdef NEED_print_dn_flags
+#define NEED_print_flagset32
+#endif /* NEED_print_dn_flags */
+
+#ifdef NEED_print_f_lock
+#define NEED_print_flagset8
+#endif /* NEED_print_f_lock */
+
+#ifdef NEED_print_sigaction_flags
+#define NEED_print_flagset32
+#endif /* NEED_print_sigaction_flags */
 
 
 
@@ -1391,42 +1411,41 @@ done:
 
 
 
-#ifdef NEED_print_clockid_t
-PRIVATE struct {
-	clockid_t cn_clid;     /* Clock ID */
-	char      cn_name[20]; /* Clock ID name. */
-} const clockid_names[] = {
-	/* TODO: Use strend^n encoding for these! */
-	{ CLOCK_REALTIME,           "REALTIME" },
-	{ CLOCK_MONOTONIC,          "MONOTONIC" },
-	{ CLOCK_PROCESS_CPUTIME_ID, "PROCESS_CPUTIME_ID" },
-	{ CLOCK_THREAD_CPUTIME_ID,  "THREAD_CPUTIME_ID" },
-	{ CLOCK_MONOTONIC_RAW,      "MONOTONIC_RAW" },
-	{ CLOCK_REALTIME_COARSE,    "REALTIME_COARSE" },
-	{ CLOCK_MONOTONIC_COARSE,   "MONOTONIC_COARSE" },
-	{ CLOCK_BOOTTIME,           "BOOTTIME" },
-	{ CLOCK_REALTIME_ALARM,     "REALTIME_ALARM" },
-	{ CLOCK_BOOTTIME_ALARM,     "BOOTTIME_ALARM" },
-	{ CLOCK_TAI,                "TAI" },
-};
+#if defined(NEED_print_clockid_t) || defined(__DEEMON__)
+/*[[[deemon
+import * from deemon;
+import * from ...misc.libgen.strendN;
+local typ = getPrefixedMacrosFromFileAsMapping("../../include/asm/os/kos/clock.h", "__CLOCK_");
+printStrendNDatabase("CLOCKID", typ);
+]]]*/
+#define GETBASE_CLOCKID(result, index) \
+	(((index) <= 0xb) ? ((result) = repr_CLOCKID_0h, true) : false)
+PRIVATE char const repr_CLOCKID_0h[] =
+"REALTIME\0MONOTONIC\0PROCESS_CPUTIME_ID\0THREAD_CPUTIME_ID\0MONOTONI"
+"C_RAW\0REALTIME_COARSE\0MONOTONIC_COARSE\0BOOTTIME\0REALTIME_ALARM\0B"
+"OOTTIME_ALARM\0\0TAI";
+/*[[[end]]]*/
+
+PRIVATE ATTR_CONST WUNUSED char const *CC
+get_clockid_name(clockid_t clockid) {
+	char const *result = NULL;
+	if (!GETBASE_CLOCKID(result, clockid))
+		goto done;
+	for (; clockid; --clockid)
+		result = strend(result) + 1;
+	if (!*result)
+		result = NULL;
+done:
+	return result;
+}
 
 PRIVATE ssize_t CC
 print_clockid_t(pformatprinter printer, void *arg, clockid_t clockid) {
-	ssize_t result;
-	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(clockid_names); ++i) {
-		if (clockid_names[i].cn_clid == clockid) {
-			char const *name;
-			name = clockid_names[i].cn_name;
-			result = format_printf(printer, arg, "CLOCK_%s", name);
-			goto done;
-		}
-	}
-	result = format_printf(printer, arg,
-	                       "%" PRIuN(__SIZEOF_CLOCKID_T__),
-	                       clockid);
-done:
-	return result;
+	char const *name;
+	name = get_clockid_name(clockid);
+	if (name)
+		return format_printf(printer, arg, "CLOCK_%s", name);
+	return format_printf(printer, arg, "%" PRIuN(__SIZEOF_CLOCKID_T__), clockid);
 }
 #endif /* NEED_print_clockid_t */
 
@@ -1560,62 +1579,46 @@ err:
 
 
 
-#ifdef NEED_print_sighandler_t
-PRIVATE struct {
-	sighandler_t sn_hand;    /* Signal handler constant */
-	char         sn_name[8]; /* Signal handler name. */
-} const sighandler_names[] = {
-#ifdef SIG_ERR
-	{ SIG_ERR,  "ERR" },
-#endif /* SIG_ERR */
-#ifdef SIG_DFL
-	{ SIG_DFL,  "DFL" },
-#endif /* SIG_DFL */
-#ifdef SIG_IGN
-	{ SIG_IGN,  "IGN" },
-#endif /* SIG_IGN */
-#ifdef SIG_HOLD
-	{ SIG_HOLD, "HOLD" },
-#endif /* SIG_HOLD */
-#ifdef SIG_TERM
-	{ SIG_TERM, "TERM" },
-#endif /* SIG_TERM */
-#ifdef SIG_EXIT
-	{ SIG_EXIT, "EXIT" },
-#endif /* SIG_EXIT */
-#ifdef SIG_CONT
-	{ SIG_CONT, "CONT" },
-#endif /* SIG_CONT */
-#ifdef SIG_STOP
-	{ SIG_STOP, "STOP" },
-#endif /* SIG_STOP */
-#ifdef SIG_CORE
-	{ SIG_CORE, "CORE" },
-#endif /* SIG_CORE */
-#ifdef SIG_GET
-	{ SIG_GET,  "GET" }
-#endif /* SIG_GET */
-};
+#if defined(NEED_print_sighandler_t) || defined(__DEEMON__)
+/*[[[deemon
+import * from deemon;
+import * from ...misc.libgen.strendN;
+local typ = getPrefixedMacrosFromFileAsMapping(
+	"../../include/asm/os/kos/signal.h", "__SIG_",
+	filter: [](x) -> x !in { "__SIG_BLOCK", "__SIG_UNBLOCK", "__SIG_SETMASK" });
+printStrendNDatabase("SIGHANDLER", typ);
+]]]*/
+#define GETBASE_SIGHANDLER(result, index) \
+	(((index) >= -0x1 && (index) <= 0xb) ? ((index) += 0x1, (result) = repr_SIGHANDLER_x1h, true) : false)
+PRIVATE char const repr_SIGHANDLER_x1h[] =
+"ERR\0DFL\0IGN\0HOLD\0TERM\0EXIT\0\0\0\0CONT\0STOP\0CORE\0GET";
+/*[[[end]]]*/
+
+PRIVATE ATTR_CONST WUNUSED char const *CC
+get_sighandler_t_name(intptr_t hand) {
+	char const *result = NULL;
+	if (!GETBASE_SIGHANDLER(result, hand))
+		goto done;
+	for (; hand; --hand)
+		result = strend(result) + 1;
+	if (!*result)
+		result = NULL;
+done:
+	return result;
+}
 
 PRIVATE ssize_t CC
 print_sighandler_t(pformatprinter printer, void *arg,
                    sighandler_t hand) {
-	ssize_t result;
-	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(sighandler_names); ++i) {
-		if (sighandler_names[i].sn_hand == hand) {
-			char const *name;
-			name   = sighandler_names[i].sn_name;
-			result = format_printf(printer, arg, "SIG_%s", name);
-			goto done;
-		}
-	}
-	result = format_printf(printer, arg, "%#" PRIxPTR,
-	                       *(void **)&hand);
-done:
-	return result;
+	char const *name;
+	name = get_sighandler_t_name((intptr_t)(uintptr_t)hand);
+	if (name)
+		return format_printf(printer, arg, "SIG_%s", name);
+	return format_printf(printer, arg, "%#" PRIxPTR, *(void **)&hand);
 }
 #endif /* NEED_print_sighandler_t */
+
+
 
 #ifdef NEED_print_poll_what
 PRIVATE struct {
@@ -1673,6 +1676,8 @@ print_poll_what(pformatprinter printer, void *arg, uint16_t events) {
 }
 #endif /* NEED_print_poll_what */
 
+
+
 #ifdef NEED_print_epoll_what
 PRIVATE struct {
 	uint16_t   pn_flag;
@@ -1711,7 +1716,7 @@ PRIVATE struct {
 #ifdef EPOLLHUP
 	{ EPOLLHUP,    "HUP" },
 #endif /* EPOLLHUP */
-	{ 0, "" }
+	{ 0, "" },
 };
 
 PRIVATE ssize_t CC
@@ -2461,31 +2466,16 @@ struct socket_type_flag {
 PRIVATE struct socket_type_flag const socket_type_flags[] = {
 	{ SOCK_NONBLOCK, "NONBLOCK" },
 	{ SOCK_CLOEXEC,  "CLOEXEC" },
-	{ SOCK_CLOFORK,  "CLOFORK" }
+	{ SOCK_CLOFORK,  "CLOFORK" },
+	{ 0, "" },
 };
 
 PRIVATE ssize_t CC
 print_socket_type_flags(pformatprinter printer, void *arg,
                         syscall_ulong_t type_flags) {
-	ssize_t temp, result = 0;
-	bool is_first = true;
-	unsigned int i;
-	/* Print type flags. */
-	for (i = 0; i < COMPILER_LENOF(socket_type_flags); ++i) {
-		if (!(type_flags & socket_type_flags[i].stf_flag))
-			continue;
-		PRINTF("%sSOCK_%s", is_first ? "" : PIPESTR,
-		       socket_type_flags[i].stf_name);
-		type_flags &= ~socket_type_flags[i].stf_flag;
-		is_first = false;
-	}
-	if (type_flags || is_first) {
-		PRINTF("%s%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
-		       is_first ? "" : PIPESTR, type_flags);
-	}
-	return result;
-err:
-	return temp;
+	return print_flagset32(printer, arg, socket_type_flags,
+	                       sizeof(*socket_type_flags),
+	                       "SOCK_", type_flags);
 }
 #endif /* NEED_print_socket_type */
 
@@ -2711,28 +2701,21 @@ print_fcntl_command(pformatprinter printer, void *arg,
 
 
 #ifdef NEED_print_fd_flags
+struct fdflag_name {
+	__uint8_t fd_flag;
+	char      fd_name[8];
+};
+PRIVATE struct fdflag_name const fdflag_names[] = {
+	{ FD_CLOEXEC, "CLOEXEC" },
+	{ FD_CLOFORK, "CLOFORK" },
+	{ 0, "" },
+};
 PRIVATE ssize_t CC
 print_fd_flags(pformatprinter printer, void *arg,
                syscall_ulong_t fd_flags) {
-	ssize_t temp, result = 0;
-	bool is_first = true;
-	if (fd_flags & FD_CLOEXEC) {
-		PRINT("FD_CLOEXEC");
-		fd_flags &= ~FD_CLOEXEC;
-		is_first = false;
-	}
-	if (fd_flags & FD_CLOFORK) {
-		PRINTF("%sFD_CLOFORK", is_first ? "" : PIPESTR);
-		fd_flags &= ~FD_CLOFORK;
-		is_first = false;
-	}
-	if (fd_flags) {
-		PRINTF("%s%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
-		       is_first ? "" : PIPESTR, fd_flags);
-	}
-	return result;
-err:
-	return temp;
+	return print_flagset8(printer, arg, fdflag_names,
+	                      sizeof(*fdflag_names),
+	                      "FD_", fd_flags);
 }
 #endif /* NEED_print_fd_flags */
 
@@ -2753,29 +2736,15 @@ PRIVATE struct dn_flag_name const dn_flag_names[] = {
 	{ DN_RENAME, /*   */ "RENAME" },
 	{ DN_ATTRIB, /*   */ "ATTRIB" },
 	{ DN_MULTISHOT, /**/ "MULTISHOT" },
+	{ 0, "" },
 };
 
 PRIVATE ssize_t CC
 print_dn_flags(pformatprinter printer, void *arg,
                syscall_ulong_t dn_flags) {
-	ssize_t temp, result = 0;
-	bool is_first = true;
-	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(dn_flag_names); ++i) {
-		if (!(dn_flags & dn_flag_names[i].dfn_flag))
-			continue;
-		PRINTF("%sDN_%s", is_first ? "" : PIPESTR,
-		       dn_flag_names[i].dfn_name);
-		dn_flags &= ~dn_flag_names[i].dfn_flag;
-		is_first = false;
-	}
-	if (dn_flags) {
-		PRINTF("%s%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
-		       is_first ? "" : PIPESTR, dn_flags);
-	}
-	return result;
-err:
-	return temp;
+	return print_flagset32(printer, arg, dn_flag_names,
+	                       sizeof(*dn_flag_names),
+	                       "DN_", dn_flags);
 }
 #endif /* NEED_print_dn_flags */
 
@@ -2826,37 +2795,23 @@ print_f_owner_type(pformatprinter printer, void *arg,
 #ifdef NEED_print_f_lock
 struct f_lock_name {
 	__uint8_t f_lock;
-	char      f_name[3];
+	char      f_name[6];
 };
 PRIVATE struct f_lock_name const f_lock_names[] = {
-	{ F_RDLCK, "RD" },
-	{ F_WRLCK, "WR" },
-	{ F_UNLCK, "UN" },
-	{ F_EXLCK, "EX" },
-	{ F_SHLCK, "SH" }
+	{ F_RDLCK, "RDLCK" },
+	{ F_WRLCK, "WRLCK" },
+	{ F_UNLCK, "UNLCK" },
+	{ F_EXLCK, "EXLCK" },
+	{ F_SHLCK, "SHLCK" },
+	{ 0, "" },
 };
 
 PRIVATE ssize_t CC
 print_f_lock(pformatprinter printer, void *arg,
              syscall_ulong_t lock) {
-	ssize_t temp, result = 0;
-	bool is_first = true;
-	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(f_lock_names); ++i) {
-		if (!(lock & f_lock_names[i].f_lock))
-			continue;
-		PRINTF("%sF_%sLCK", is_first ? "" : PIPESTR,
-		       f_lock_names[i].f_name);
-		lock &= ~f_lock_names[i].f_lock;
-		is_first = false;
-	}
-	if (lock) {
-		PRINTF("%s%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
-		       is_first ? "" : PIPESTR, lock);
-	}
-	return result;
-err:
-	return temp;
+	return print_flagset8(printer, arg, f_lock_names,
+	                      sizeof(*f_lock_names),
+	                      "FD_", lock);
 }
 #endif /* NEED_print_f_lock */
 
@@ -3368,6 +3323,7 @@ print_sigset(pformatprinter printer, void *arg,
              size_t sigsetsize) {
 	signo_t signo_max;
 	ssize_t temp, result = 0;
+	bool has_prefix = false;
 	bool is_first, inverse = false;
 	if (sigsetsize > (__PRIVATE_MAX_S(__SIZEOF_SIGNO_T__) - 1) / NBBY)
 		sigsetsize = (__PRIVATE_MAX_S(__SIZEOF_SIGNO_T__) - 1) / NBBY;
@@ -3396,7 +3352,8 @@ print_sigset(pformatprinter printer, void *arg,
 		         : DOPRINT("{" SYNSPACE);
 		if unlikely(result < 0)
 			goto done;
-		count    = 0;
+		has_prefix = true;
+		count      = 0;
 		for (signo = 1; signo <= signo_max; ++signo) {
 			if (!!sigismember(sigset, signo) == inverse)
 				continue;
@@ -3417,7 +3374,8 @@ print_sigset(pformatprinter printer, void *arg,
 			PRINT("," SYNSPACE2);
 		PRINT("<segfault>");
 	}
-	PRINT(SYNSPACE "}");
+	if (has_prefix)
+		PRINT(SYNSPACE "}");
 done:
 	return result;
 err:
@@ -3805,33 +3763,17 @@ PRIVATE struct sigaction_flag const sigaction_flags[] = {
 #ifdef SA_INTERRUPT
 	{ SA_INTERRUPT, "INTERRUPT" },
 #endif /* SA_INTERRUPT */
+	{ 0, "" },
 };
 
 PRIVATE ssize_t CC
 print_sigaction_flags(pformatprinter printer, void *arg,
                       syscall_ulong_t flags) {
-	ssize_t temp, result = 0;
-	bool is_first = true;
-	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(sigaction_flags); ++i) {
-		if (!(flags & sigaction_flags[i].sf_flag))
-			continue;
-		PRINTF("%sSA_%s",
-		       is_first ? "" : PIPESTR,
-		       sigaction_flags[i].sf_name);
-		flags &= ~sigaction_flags[i].sf_flag;
-		is_first = false;
-	}
-	if unlikely(flags) {
-		/* Print unknown flags. */
-		PRINTF("%s%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
-		       is_first ? "" : PIPESTR, flags);
-	}
-	return result;
-err:
-	return temp;
+	return print_flagset32(printer, arg, sigaction_flags,
+	                       sizeof(*sigaction_flags),
+	                       "SA_", flags);
 }
-#endif /* NEED_print_mmap_flags */
+#endif /* NEED_print_sigaction_flags */
 
 
 
@@ -3874,7 +3816,7 @@ PRIVATE struct {
 } const epoll_create1_flags[] = {
 	{ EPOLL_CLOEXEC, "CLOEXEC" },
 	{ EPOLL_CLOFORK, "CLOFORK" },
-	{ 0, "" }
+	{ 0, "" },
 };
 
 PRIVATE ssize_t CC
@@ -3974,7 +3916,7 @@ PRIVATE struct {
 	{ MREMAP_STACK,           "STACK" },
 	{ MREMAP_FIXED_NOREPLACE, "FIXED_NOREPLACE" },
 	{ MREMAP_NOASLR,          "NOASLR" },
-	{ 0, "" }
+	{ 0, "" },
 };
 
 PRIVATE ssize_t CC
@@ -4131,7 +4073,7 @@ PRIVATE struct {
 	{ CLONE_NEWTIME,        "NEWTIME" },
 	{ CLONE_CRED,           "CRED" },
 #endif /* NEED_print_clone_flags_ex */
-	{ 0, "" }
+	{ 0, "" },
 };
 
 #ifdef NEED_print_clone_flags_ex
@@ -4277,7 +4219,7 @@ PRIVATE struct {
 	{ WNOTHREAD,  "NOTHREAD" },
 	{ WALL,       "ALL" },
 	{ WCLONE,     "CLONE" },
-	{ 0, "" }
+	{ 0, "" },
 };
 
 PRIVATE ssize_t CC
@@ -4339,7 +4281,7 @@ PRIVATE struct {
 	{ EFD_NONBLOCK,  "NONBLOCK" },
 	{ EFD_CLOEXEC,   "CLOEXEC" },
 	{ EFD_CLOFORK,   "CLOFORK" },
-	{ 0, "" }
+	{ 0, "" },
 };
 
 PRIVATE ssize_t CC
@@ -4533,7 +4475,7 @@ PRIVATE struct {
 	{ X_OK, "X_OK" },
 	{ W_OK, "W_OK" },
 	{ R_OK, "R_OK" },
-	{ 0, "" }
+	{ 0, "" },
 };
 
 PRIVATE ssize_t CC

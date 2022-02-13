@@ -60,7 +60,7 @@ INTERN struct slab_descriptor LOCAL_desc = {
 #ifdef CONFIG_TRACE_MALLOC
 	.sd_used = LIST_HEAD_INITIALIZER(LOCAL_desc.sd_used),
 #endif /* CONFIG_TRACE_MALLOC */
-	.sd_pend = NULL,
+	.sd_pend = SLIST_HEAD_INITIALIZER(LOCAL_desc.sd_pend),
 };
 
 struct LOCAL_segment {
@@ -118,30 +118,25 @@ LOCAL void
 NOTHROW(KCALL LOCAL_slab_descriptor_service_pending)(void) {
 	struct slab_pending_free *pend, *next;
 again:
-	pend = ATOMIC_XCH(LOCAL_desc.sd_pend, NULL);
+	pend = SLIST_ATOMIC_CLEAR(&LOCAL_desc.sd_pend);
 	if unlikely(!pend)
 		return;
 	assert(KERNEL_SLAB_CHECKPTR(pend));
 	if unlikely(!slab_descriptor_tryacquire(&LOCAL_desc)) {
-		if (!ATOMIC_CMPXCH(LOCAL_desc.sd_pend, NULL, pend)) {
-			struct slab_pending_free *more;
+		if (!ATOMIC_CMPXCH(LOCAL_desc.sd_pend.slh_first, NULL, pend)) {
 			next = pend;
-			while (next->spf_next)
-				next = next->spf_next;
-			do {
-				more = ATOMIC_READ(LOCAL_desc.sd_pend);
-				next->spf_next = more;
-				COMPILER_WRITE_BARRIER();
-			} while (!ATOMIC_CMPXCH_WEAK(LOCAL_desc.sd_pend, more, pend));
+			while (SLIST_NEXT(next, spf_link))
+				next = SLIST_NEXT(next, spf_link);
+			SLIST_ATOMIC_INSERT_R(&LOCAL_desc.sd_pend, pend, next, spf_link);
 		}
 		if unlikely(slab_descriptor_available(&LOCAL_desc))
 			goto again;
 		return;
 	}
 	do {
-		next = pend->spf_next;
+		next = SLIST_NEXT(pend, spf_link);
 #ifdef CONFIG_DEBUG_HEAP
-		mempatl(&pend->spf_next, DEBUGHEAP_NO_MANS_LAND, sizeof(pend->spf_next));
+		mempatl(&pend->spf_link, DEBUGHEAP_NO_MANS_LAND, sizeof(pend->spf_link));
 #endif /* CONFIG_DEBUG_HEAP */
 		LOCAL_slab_dofreeptr(SLAB_GET(pend), pend, GFP_NORMAL);
 		pend = next;
@@ -164,20 +159,18 @@ NOTHROW(KCALL LOCAL_slab_freeptr)(struct slab *__restrict self,
 		LOCAL_slab_dofreeptr(self, ptr, flags);
 		slab_descriptor_release(&LOCAL_desc);
 	} else {
-		struct slab_pending_free *pend, *next;
+		/* Free asynchronously once the lock becomes available. */
+		struct slab_pending_free *pend;
+		pend = (struct slab_pending_free *)ptr;
 #ifdef CONFIG_DEBUG_HEAP
 #if SEGMENT_SIZE > __SIZEOF_POINTER__
-		if (flags & GFP_CALLOC)
-			mempatl((byte_t *)ptr + sizeof(void *), DEBUGHEAP_NO_MANS_LAND, SEGMENT_SIZE - sizeof(void *));
+		if (flags & GFP_CALLOC) {
+			mempatl(pend + 1, DEBUGHEAP_NO_MANS_LAND,
+			        SEGMENT_SIZE - sizeof(*pend));
+		}
 #endif /* SEGMENT_SIZE > __SIZEOF_POINTER__ */
 #endif /* CONFIG_DEBUG_HEAP */
-		pend = (struct slab_pending_free *)ptr;
-		do {
-			next = ATOMIC_READ(LOCAL_desc.sd_pend);
-			pend->spf_next = next;
-			COMPILER_WRITE_BARRIER();
-		} while unlikely(!ATOMIC_CMPXCH_WEAK(LOCAL_desc.sd_pend,
-		                                     next, pend));
+		SLIST_ATOMIC_INSERT(&LOCAL_desc.sd_pend, pend, spf_link);
 		LOCAL_slab_descriptor_service_pending();
 	}
 }
@@ -221,6 +214,7 @@ again:
 				;
 			assert(j < (BITS_PER_POINTER / SLAB_SEGMENT_STATUS_BITS));
 			assert(mask == (uintptr_t)SLAB_SEGMENT_STATUS_ALLOC << (j * SLAB_SEGMENT_STATUS_BITS));
+
 			/* Add our new allocation mask to mark our new segment as allocated. */
 			(INUSE_BITSET(result_page)[i]) = word | mask;
 			page_flags = result_page->s_flags;

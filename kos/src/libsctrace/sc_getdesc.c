@@ -426,6 +426,7 @@ NOTHROW_NCX(CC sc_lookup)(struct rpc_syscall_info const *__restrict sc_info) {
 	}
 	if unlikely(offset == (syscalldb_offset_t)-1)
 		goto unknown_syscall; /* Unknown system call */
+
 	/* Apply the offset to the start of the system call's descriptor entry. */
 	result += offset;
 	return result;
@@ -447,16 +448,19 @@ NOTHROW_NCX(CC libsc_getdesc)(struct rpc_syscall_info const *__restrict sc_info,
 	uint8_t header;
 	byte_t const *sc;
 	unsigned int i, regi;
+
 	/* Lookup the system call within the system call descriptor database. */
 	sc = sc_lookup(sc_info);
 	if unlikely(!sc)
 		goto unknown_syscall;
+
 	/* Decode the system call database entry.
 	 * NOTE: The exact format is documented at the top of this file! */
 	header = *sc++;
 	desc->sc_argc = header & 7; /* Mask 0xf8 describes double-wide arguments. */
 	desc->sc_name = (char const *)sc;
 	header >>= 3;
+
 	/* Per-argument information. */
 	for (i = 0, regi = 0; i < desc->sc_argc; ++i) {
 		uint16_t word;
@@ -470,6 +474,7 @@ NOTHROW_NCX(CC libsc_getdesc)(struct rpc_syscall_info const *__restrict sc_info,
 		desc->sc_argv[i].sa_name = (char const *)sc;
 		if unlikely(regi >= 6)
 			goto unknown_syscall; /* Shouldn't happen! */
+
 		/* Load the argument value. */
 		if ((header & ((uint8_t)1 << i)) != 0) {
 			/* Double-wide argument */
@@ -492,7 +497,7 @@ NOTHROW_NCX(CC libsc_getdesc)(struct rpc_syscall_info const *__restrict sc_info,
 				 *      in total.  However,  since  KOS doesn't  actually  have  any  128-bit
 				 *      system calls when running with a 64-bit bus width, this functionality
 				 *      is  unused, though  still partially  implemented in  case such system
-				 *      calls ever needs to be defined. */
+				 *      calls ever need to be defined. */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 				desc->sc_argv[i].sa_value.sv_u64 = (uint64_t)((uint64_t)(uintptr_t)sc_info->rsi_regs[regi] |
 				                                              (uint64_t)(uintptr_t)sc_info->rsi_regs[regi + 1] << 32);
@@ -517,6 +522,7 @@ NOTHROW_NCX(CC libsc_getdesc)(struct rpc_syscall_info const *__restrict sc_info,
 		}
 		++regi;
 	}
+
 	/* Special handling for certain system calls. */
 #ifdef __ARCH_HAVE_COMPAT
 	if (RPC_SYSCALL_INFO_METHOD_ISCOMPAT(sc_info->rsi_flags)) {
@@ -601,8 +607,9 @@ NOTHROW_NCX(CC libsc_getdesc)(struct rpc_syscall_info const *__restrict sc_info,
 	}
 
 	return true;
-unknown_syscall:
+
 	/* Fallback: Fill in `desc' with stub-values */
+unknown_syscall:
 	desc->sc_argc = 6;
 	desc->sc_name = NULL;
 	for (i = 0; i < 6; ++i) {
