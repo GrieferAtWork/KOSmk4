@@ -19,8 +19,8 @@
  */
 #ifdef __INTELLISENSE__
 #define __ASSEMBLER__ 1
-#define SYSCALL_FASTPASS_KIND_SYS32_SYSENTER 1
-//#define SYSCALL_FASTPASS_KIND_SYS32_INT80 1
+//#define SYSCALL_FASTPASS_KIND_SYS32_SYSENTER 1
+#define SYSCALL_FASTPASS_KIND_SYS32_INT80 1
 //#define    SYSCALL_FASTPASS_KIND_SYS64    1
 #endif /* __INTELLISENSE__ */
 
@@ -51,6 +51,8 @@
 #include <asm/cpu-flags.h>
 #include <asm/instr/compat.h>
 #include <asm/instr/movzxq.h>
+#include <kos/asm/rpc-method.h>
+#include <kos/asm/rpc.h>
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state.h>
@@ -75,6 +77,10 @@
 
 /* Headers needed by the actual fastpass implementations. */
 #include <fcntl.h> /* AT_FDCWD */
+
+#ifndef Pn
+#define Pn(x) ((x)*__SIZEOF_POINTER__)
+#endif /* !Pn */
 
 
 #ifndef IS_DEFINED
@@ -104,16 +110,19 @@
  *   - _SYSFAST_SETALIAS(name):   Define possibly aliasing symbols for `_SYSFAST_SECTNAME(name)'
  */
 #ifdef SYSCALL_FASTPASS_KIND_SYS32_SYSENTER
+#define _SYSFAST_RPCMETHOD      RPC_SYSCALL_INFO_METHOD_SYSENTER_32
 #define _SYSFAST_SECTNAME(name) .text.x86.asm32_syscall_sysenter.fastpass_##name
 #define _SYSFAST_FUNCNAME       X86_ASMSYSCALL32_SYSENTER
 #define _SYSFAST_SYSNO(name)    __NR32_##name
 #define _SYSFAST_PERSO          x86_syscall_personality_asm32_sysenter
 #elif defined(SYSCALL_FASTPASS_KIND_SYS32_INT80)
+#define _SYSFAST_RPCMETHOD      RPC_SYSCALL_INFO_METHOD_INT80H_32
 #define _SYSFAST_SECTNAME(name) .text.x86.asm32_syscall_int80.fastpass_##name
 #define _SYSFAST_FUNCNAME       X86_ASMSYSCALL32_INT80
 #define _SYSFAST_SYSNO(name)    __NR32_##name
 #define _SYSFAST_PERSO          x86_syscall_personality_asm32_int80
 #elif defined(SYSCALL_FASTPASS_KIND_SYS64)
+#define _SYSFAST_RPCMETHOD      RPC_SYSCALL_INFO_METHOD_INT80H_64
 #define _SYSFAST_SECTNAME(name) .text.x86.asm64_syscall.fastpass_##name
 #define _SYSFAST_FUNCNAME       X86_ASMSYSCALL64
 #define _SYSFAST_SYSNO(name)    __NR64_##name
@@ -192,10 +201,10 @@
 
 #ifdef SYSCALL_FASTPASS_KIND_SYS32_SYSENTER
 #define _SYSFAST_WANT(NAME, name) (__SYSFAST_ARCH_WANT(NAME) && __NR32RC_##name >= 5)
-#define _SYSFAST_SETALIAS(name)   __SYSFAST_SETALIAS_INT80_SYSENTER_IF_NOT(__SYSFAST_ARCH_ISREG_56(name), name)
+#define _SYSFAST_SETALIAS(name)   /* nothing */
 #else /* SYSCALL_FASTPASS_KIND_SYS32_SYSENTER */
 #define _SYSFAST_WANT(NAME, name) __SYSFAST_ARCH_WANT(NAME)
-#define _SYSFAST_SETALIAS(name)   /* nothing */
+#define _SYSFAST_SETALIAS(name)   __SYSFAST_SETALIAS_INT80_SYSENTER_IF_NOT(__SYSFAST_ARCH_ISREG_56(name), name)
 #endif /* !SYSCALL_FASTPASS_KIND_SYS32_SYSENTER */
 #endif /* !SYSCALL_FASTPASS_KIND_SYS64 */
 
@@ -752,11 +761,117 @@ SC_END_ALL_NOTHROW(rtm_abort)
 
 
 
+/* >> errno_t sigsuspend(USER UNCHECKED sigset_t const *unot_these); */
+#if _SYSFAST_WANT(SIGSUSPEND, sigsuspend)
+SC_BEGIN(sigsuspend)
+	SC_PUSH_ICPUSTATE
+#ifdef __x86_64__ /* Because %R_fcall0P <=> %R_syscall0P <=> %rdi */
+	subP   $(Pn(5)), %Psp                                           /* rpc_syscall_info::rsi_regs[1-5] */
+	.cfi_adjust_cfa_offset Pn(5)
+#ifdef SYSCALL_FASTPASS_KIND_SYS64
+	pushq_cfi %rdi                                                  /* rpc_syscall_info::rsi_regs[0] */
+#else /* SYSCALL_FASTPASS_KIND_SYS64 */
+	movzlq %ebx, %rbx
+	pushq_cfi %rbx                                                  /* rpc_syscall_info::rsi_regs[0] */
+#endif /* !SYSCALL_FASTPASS_KIND_SYS64 */
+	leaP   Pn(6)(%Psp), %R_fcall0P              /* arg: sys_sigsuspend_impl@state */
+#else /* __x86_64__ */
+	movP   %Psp, %R_fcall0P                     /* arg: sys_sigsuspend_impl@state */
+	subP   $(Pn(5)), %Psp                                           /* rpc_syscall_info::rsi_regs[1-5] */
+	.cfi_adjust_cfa_offset Pn(5)
+	pushl_cfi %ebx                                                  /* rpc_syscall_info::rsi_regs[0] */
+#endif /* !__x86_64__ */
+	pushP_cfi $(_SYSFAST_SYSNO(sigsuspend))                         /* rpc_syscall_info::rsi_sysno */
+	pushP_cfi $(_SYSFAST_RPCMETHOD | RPC_SYSCALL_INFO_FREGVALID(0)) /* rpc_syscall_info::rsi_flags */
+	testP  $(EFLAGS_DF), OFFSET_ICPUSTATE_IRREGS+OFFSET_IRREGS_PFLAGS(%R_fcall0P)
+	jz     1f
+	orP    $(RPC_SYSCALL_INFO_FEXCEPT), 0(%Psp)
+1:	movP   %Psp, %R_fcall1P                     /* arg: sys_sigsuspend_impl@sc_info */
+#ifdef __x86_64__
+	movP   $(__SIZEOF_SIGSET_T__), %R_sysvabi2P /* arg: sys_sigsuspend_impl@sigsetsize */
+#else /* __x86_64__ */
+	pushP_cfi $(__SIZEOF_SIGSET_T__)            /* arg: sys_sigsuspend_impl@sigsetsize */
+#endif /* !__x86_64__ */
+	EXTERN(sys_sigsuspend_impl)
+	call   sys_sigsuspend_impl
+	/* Never returns in a normal way */
+	nop
+SC_END(sigsuspend)
+#endif /* sigsuspend... */
+
+
+
+
+
+
+
+
+/* >> errno_t rt_sigsuspend(USER UNCHECKED sigset_t const *unot_these, size_t sigsetsize); */
+#if _SYSFAST_WANT(RT_SIGSUSPEND, rt_sigsuspend)
+SC_BEGIN(rt_sigsuspend)
+	SC_PUSH_ICPUSTATE
+	subP   $(Pn(4)), %Psp                                           /* rpc_syscall_info::rsi_regs[2-5] */
+	.cfi_adjust_cfa_offset Pn(4)
+#ifdef SYSCALL_FASTPASS_KIND_SYS64
+	pushP_cfi %R_syscall1P                                          /* rpc_syscall_info::rsi_regs[1] */
+	pushP_cfi %R_syscall0P                                          /* rpc_syscall_info::rsi_regs[0] */
+#else /* SYSCALL_FASTPASS_KIND_SYS64 */
+#ifdef __x86_64__
+	movzlq %ecx, %rcx /* Zero-extend */
+	movzlq %ebx, %rbx /* Zero-extend */
+#endif /* __x86_64__ */
+	pushP_cfi %Pcx  /* %R_syscall1P */                              /* rpc_syscall_info::rsi_regs[1] */
+	pushP_cfi %Pbx  /* %R_syscall0P */                              /* rpc_syscall_info::rsi_regs[0] */
+#endif /* !SYSCALL_FASTPASS_KIND_SYS64 */
+	pushP_cfi $(_SYSFAST_SYSNO(rt_sigsuspend))                      /* rpc_syscall_info::rsi_sysno */
+	pushP_cfi $(_SYSFAST_RPCMETHOD | RPC_SYSCALL_INFO_FREGVALID(0) | \
+	            RPC_SYSCALL_INFO_FREGVALID(1))                      /* rpc_syscall_info::rsi_flags */
+	testP  $(EFLAGS_DF), (OFFSET_ICPUSTATE_IRREGS+OFFSET_IRREGS_PFLAGS+Pn(8))(%Psp)
+	jz     1f
+	orP    $(RPC_SYSCALL_INFO_FEXCEPT), 0(%Psp)
+1:
+#ifdef SYSCALL_FASTPASS_KIND_SYS64
+	/* TRANSFORM:
+	 *   %Psp       --> %Psi   (%Psp         --> %R_sysvabi1P)
+	 *   %Psi       --> %Pdx   (%R_syscall1P --> %R_sysvabi2P)
+	 *   %Psp+Pn(8) --> %Pdi   (%Psp+Pn(8)   --> %R_sysvabi0P) */
+	leaP   Pn(8)(%Psp),  %R_sysvabi0P /* arg: sys_sigsuspend_impl@state */
+	movP   %R_syscall1P, %R_sysvabi2P /* arg: sys_sigsuspend_impl@sigsetsize */
+	movP   %Psp,         %R_sysvabi1P /* arg: sys_sigsuspend_impl@sc_info */
+#elif defined(__x86_64__)
+	/* TRANSFORM:
+	 *   %Psp       --> %Psi   (%Psp                --> %R_sysvabi1P)
+	 *   %Pcx       --> %Pdx   (%COMPAT_R_syscall1P --> %R_sysvabi2P)
+	 *   %Psp+Pn(8) --> %Pdi   (%Psp+Pn(8)          --> %R_sysvabi0P) */
+	leaP   Pn(8)(%Psp),  %R_sysvabi0P /* arg: sys_sigsuspend_impl@state */
+	movP   %Pcx,         %R_sysvabi2P /* arg: sys_sigsuspend_impl@sigsetsize */
+	movP   %Psp,         %R_sysvabi1P /* arg: sys_sigsuspend_impl@sc_info */
+#else /* __x86_64__ */
+	/* TRANSFORM:
+	 *   %Psp       --> %Pdx   (%Psp                --> %R_fcall1P)
+	 *   pushP %Pcx            (pushP %R_syscall1P)
+	 *   %Psp+Pn(8) --> %Pcx   (%Psp+Pn(8)          --> %R_fcall0P) */
+	movP   %Psp, %R_fcall1P           /* arg: sys_sigsuspend_impl@sc_info */
+	pushP_cfi %R_syscall1P            /* arg: sys_sigsuspend_impl@sigsetsize */
+	leaP   Pn(9)(%Psp), %R_fcall0P    /* arg: sys_sigsuspend_impl@state */
+#endif /* !__x86_64__ */
+	EXTERN(sys_sigsuspend_impl)
+	call   sys_sigsuspend_impl
+	/* Never returns in a normal way */
+	nop
+SC_END(rt_sigsuspend)
+#endif /* rt_sigsuspend... */
+
+
+
+
+
+
+
+
 /* TODO: sigreturn() / rt_sigreturn() */
 /* TODO: clone() */
 /* TODO: coredump() */
-/* TODO: sigsuspend() */
-/* TODO: rt_sigsuspend() */
 
 #undef _SYSFAST_R_arg1
 #undef _SYSFAST_R_arg2
@@ -767,6 +882,7 @@ SC_END_ALL_NOTHROW(rtm_abort)
 
 #undef _SYSFAST_SECTNAME
 #undef _SYSFAST_FUNCNAME
+#undef _SYSFAST_RPCMETHOD
 #undef _SYSFAST_SYSNO
 #undef _SYSFAST_PERSO
 #undef _SYSFAST_SETALIAS
