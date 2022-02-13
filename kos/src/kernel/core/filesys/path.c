@@ -1215,10 +1215,12 @@ again_lookup_dent:
  * and follow DOS or UNIX semantics, based on `atflags & AT_DOSPATH'. When
  * requested via `plastseg != NULL',  a pointer to  the last  path-segment
  * is stored in `*plastseg' and `*plastlen'.
- *  - Path segments are separated by '/' (or '\\' when `AT_DOSPATH' is given)
- *  - When no last segment exists within `upath', but one was requested,  then
- *    `*plastlen = 0' is written, and the sequence's finally path is returned.
- *  - When `plastseg == NULL' the path is always fully unwound into a whole path
+ *  - Path segments are separated by '/' (or alternatively '\\' when `AT_DOSPATH' is given)
+ *  - When no last segment exists within `upath', but one was requested, then
+ *    `*plastlen = 0' is written, and the sequence's final path is  returned.
+ *  - When `plastseg == NULL' the path is  always fully traversed, and the  last
+ *    element is required to be a directory (as implied by a `struct path' being
+ *    returned).
  * Examples:
  *  - upath = ""             --> return=$cwd;          lastseg=""    (when `AT_EMPTY_PATH' isn't given, this isn't allowed)
  *  - upath = "."            --> return=$cwd;          lastseg=""
@@ -1228,6 +1230,7 @@ again_lookup_dent:
  *  - upath = "foo/"         --> return=$cwd;          lastseg="foo" (with AT_IGNORE_TRAILING_SLASHES)
  *  - upath = "foo/."        --> return=$cwd/foo;      lastseg=""
  *  - upath = "foo/bar/.."   --> return=$cwd/foo;      lastseg=""    (No unwinding in this case!)
+ * When `AT_DOSPATH' isn't given:
  *  - upath = "/."           --> return=$root;         lastseg=""
  *  - upath = "/"            --> return=$root;         lastseg=""
  *  - upath = "/.."          --> return=$root;         lastseg=""
@@ -1289,9 +1292,15 @@ path_traverse_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 	            upath[6] == '\\') {
 		char ch;
 		upath += COMPILER_STRLEN("\\\\unix\\");
-		atflags &= ~AT_DOSPATH; /* The original value is kept for `sep_atflags' */
 		ch = upath[0];
-		if (ch == '.' && (ch = upath[1], ch == '/' || (ch == '\\' && (sep_atflags & AT_DOSPATH)))) {
+
+		/* Directory-element resolution _always_ happens
+		 * as case-sensitive, but  we still accept  '\\'
+		 * as an alias for '/'  in the remainder of  the
+		 * path. */
+		atflags &= ~AT_DOSPATH;
+		sep_atflags |= AT_DOSPATH;
+		if (ch == '.' && (ch = upath[1], ch == '/' || ch == '\\')) {
 			/* Relative to current directory */
 			upath += 2;
 		} else {
@@ -1334,7 +1343,7 @@ do_drive_root_rel:
 						vfs_driveslock_endread(myvfs);
 						THROW(E_FSERROR_PATH_NOT_FOUND, E_FILESYSTEM_PATH_NOT_FOUND_DRIVE);
 					}
-					ATOMIC_ADD(root_ref->p_refcnt, 2);
+					ATOMIC_ADD(root_ref->p_refcnt, 2); /* +1: root_ref, +1: cwd_ref */
 					cwd_ref = root_ref;
 					vfs_driveslock_endread(myvfs);
 				} else {
@@ -1871,9 +1880,9 @@ path_open_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 			info.mkf_creat.c_mtime = info.mkf_creat.c_atime;
 			info.mkf_creat.c_ctime = info.mkf_creat.c_atime;
 
-#if 0 /* This can't be asserted here and needs to happen while holding fs-specific
+#if 0 /* This can't be asserted here and instead happens while holding fs-specific
        * locks, after having learned that  the file to-be created doesn't  already
-       * exist. */
+       * exist. (s.a. `struct fdirnode_ops::dno_mkfile') */
 			fnode_access(access_path->p_dir, W_OK);
 #endif
 

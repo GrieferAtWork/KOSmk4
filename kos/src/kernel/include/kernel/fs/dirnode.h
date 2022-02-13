@@ -333,6 +333,7 @@ struct fdirnode_ops {
 	 * >>         return FDIRNODE_MKFILE_EXISTS;
 	 * >>     }
 	 * >> }
+	 * >> fnode_access(self, W_OK);
 	 * >> INSERT_DIRECTORY_ENTRY(self, newent);
 	 * >> info->mkf_dent  = incref(newent);
 	 * >> info->mkf_rnode = incref(newfil);

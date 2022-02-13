@@ -469,10 +469,12 @@ path_expandchildnode(struct path *__restrict self, u32 *__restrict premaining_sy
  * and follow DOS or UNIX semantics, based on `atflags & AT_DOSPATH'. When
  * requested via `plastseg != NULL',  a pointer to  the last  path-segment
  * is stored in `*plastseg' and `*plastlen'.
- *  - Path segments are separated by '/' (or '\\' when `AT_DOSPATH' is given)
- *  - When no last segment exists within `upath', but one was requested,  then
- *    `*plastlen = 0' is written, and the sequence's finally path is returned.
- *  - When `plastseg == NULL' the path is always fully unwound into a whole path
+ *  - Path segments are separated by '/' (or alternatively '\\' when `AT_DOSPATH' is given)
+ *  - When no last segment exists within `upath', but one was requested, then
+ *    `*plastlen = 0' is written, and the sequence's final path is  returned.
+ *  - When `plastseg == NULL' the path is  always fully traversed, and the  last
+ *    element is required to be a directory (as implied by a `struct path' being
+ *    returned).
  * Examples:
  *  - upath = ""             --> return=$cwd;          lastseg=""    (when `AT_EMPTY_PATH' isn't given, this isn't allowed)
  *  - upath = "."            --> return=$cwd;          lastseg=""
@@ -482,6 +484,7 @@ path_expandchildnode(struct path *__restrict self, u32 *__restrict premaining_sy
  *  - upath = "foo/"         --> return=$cwd;          lastseg="foo" (with AT_IGNORE_TRAILING_SLASHES)
  *  - upath = "foo/."        --> return=$cwd/foo;      lastseg=""
  *  - upath = "foo/bar/.."   --> return=$cwd/foo;      lastseg=""    (No unwinding in this case!)
+ * When `AT_DOSPATH' isn't given:
  *  - upath = "/."           --> return=$root;         lastseg=""
  *  - upath = "/"            --> return=$root;         lastseg=""
  *  - upath = "/.."          --> return=$root;         lastseg=""
