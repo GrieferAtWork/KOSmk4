@@ -587,8 +587,10 @@ again_switch_action_handler:
 					xdecref_unlikely(action.sa_mask);
 					return false; /* Load other RPCs and try again. */
 				}
-				if (except_priority(error->ei_code) < except_priority(tls->ei_code))
+				if (except_priority(error->ei_code) < except_priority(tls->ei_code)) {
 					memcpy(error, tls, sizeof(struct exception_info));
+					ctx->rc_context = RPC_REASONCTX_SYSRET; /* Will need to return to user-space to handle this exception */
+				}
 			}
 			break;
 		}
@@ -665,8 +667,10 @@ again_switch_action_handler:
 			struct exception_info *tls = except_info();
 			if (tls->ei_code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC))
 				return false; /* Load other RPCs before trying to serve this one again. */
-			if (except_priority(error->ei_code) < except_priority(tls->ei_code))
+			if (except_priority(error->ei_code) < except_priority(tls->ei_code)) {
 				memcpy(error, tls, sizeof(struct exception_info));
+				ctx->rc_context = RPC_REASONCTX_SYSRET; /* Will need to return to user-space to handle this exception */
+			}
 			new_state = ctx->rc_state;
 		}
 		decref(&rpc->pr_user);

@@ -134,6 +134,8 @@ NOTHROW(FCALL userexcept_sysret)(struct icpustate *__restrict state)
 	} else {
 		ctx.rc_context = RPC_REASONCTX_INTERRUPT;
 	}
+	if (error.ei_code != EXCEPT_CODEOF(E_OK))
+		ctx.rc_context = RPC_REASONCTX_SYSRET; /* Will need to return to user-space to handle this exception */
 #else /* !LOCAL_IS_SYSRET */
 	/* Re-enable disabled RPCs and serve kernel RPCs with `RPC_REASONCTX_SYSRET' */
 	ctx.rc_context = RPC_REASONCTX_SYSRET;
@@ -221,8 +223,10 @@ handle_pending:
 				} EXCEPT {
 					/* Prioritize errors. */
 					struct exception_info *tls = except_info();
-					if (except_priority(error.ei_code) < except_priority(tls->ei_code))
+					if (except_priority(error.ei_code) < except_priority(tls->ei_code)) {
 						memcpy(&error, tls, sizeof(error));
+						ctx.rc_context = RPC_REASONCTX_SYSRET; /* Will need to return to user-space to handle this exception */
+					}
 					assert(!(rpc->pr_flags & _RPC_CONTEXT_DONTFREE));
 					if (rpc->pr_flags & RPC_CONTEXT_SIGNAL) {
 						pending_rpc_free(rpc);
@@ -465,6 +469,10 @@ check_next_proc_rpc:
 					SLIST_INSERT_HEAD(&restore, repeat_rpc, pr_link);
 				}
 				if (!SLIST_EMPTY(&restore)) {
+					/* WARNING: User-space RPCs in `restore' may still be marked as INACTIVE
+					 *          at this point. This is normally  OK, but in case the  system
+					 *          call doesn't want that, it  has to clear the INACTIVE  flags
+					 *          itself. -- This has to be done in the case of  sigsuspend()! */
 					restore_pending_rpcs(SLIST_FIRST(&restore));
 					ATOMIC_OR(PERTASK(this_task.t_flags), TASK_FRPC);
 					assert(PREEMPTION_ENABLED());
@@ -481,13 +489,16 @@ check_next_proc_rpc:
 					struct exception_info *tls = except_info();
 					/* Prioritize errors. */
 					if (except_priority(error.ei_code) < except_priority(tls->ei_code) &&
-					    tls->ei_code != EXCEPT_CODEOF(E_INTERRUPT_USER_RPC))
+					    tls->ei_code != EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {
 						memcpy(&error, tls, sizeof(error));
+						ctx.rc_context = RPC_REASONCTX_SYSRET; /* Will need to return to user-space to handle this exception */
+					}
 				}
 				restore_plast = SLIST_PFIRST(&restore);
 				SLIST_INIT(&kernel_rpcs);
 				ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
 				pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
+				DBG_memset(&restore, 0xcc, sizeof(restore));
 				goto handle_pending;
 			} else {
 				uintptr_t rpc_flags = rpc->pr_flags;

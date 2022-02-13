@@ -84,7 +84,9 @@ typedef struct __sigset_struct sigset_t;
 struct pending_rpc_head {
 	SLIST_ENTRY(pending_rpc) prh_link;  /* [0..1][lock(ATOMIC)] Link in the list of pending RPCs */
 	uintptr_t                prh_flags; /* [const] RPC flags: RPC_CONTEXT_KERN, ...
-	                                     * NOTE: When `RPC_CONTEXT_INACTIVE' is set, then the RPC is inactive. */
+	                                     * NOTE: When `_RPC_CONTEXT_INACTIVE' is set, then the RPC is inactive.
+	                                     * NOTE: In the case of thread-directed RPCs, some flags are non-[const],
+	                                     *       but are instead [lock(PRIVATE(THIS_TASK))]. */
 	prpc_exec_callback_t     prh_func;  /* [1..1][const] Function to invoke. */
 };
 
@@ -93,7 +95,9 @@ struct pending_rpc_head {
 struct pending_rpc {
 	SLIST_ENTRY(pending_rpc) pr_link;  /* [0..1][lock(ATOMIC)] Link in the list of pending RPCs */
 	uintptr_t                pr_flags; /* [const] RPC flags: RPC_CONTEXT_KERN, ...
-	                                    * NOTE: When `RPC_CONTEXT_INACTIVE' is set, then the RPC is inactive. */
+	                                    * NOTE: When `_RPC_CONTEXT_INACTIVE' is set, then the RPC is inactive.
+	                                    * NOTE: In the case of thread-directed RPCs, some flags are non-[const],
+	                                    *       but are instead [lock(PRIVATE(THIS_TASK))]. */
 	union {
 		struct {
 			prpc_exec_callback_t k_func;   /* [1..1][const] Function to invoke. */
