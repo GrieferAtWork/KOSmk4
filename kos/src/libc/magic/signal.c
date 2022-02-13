@@ -81,6 +81,8 @@
 )]%[insert:prefix(
 #include <bits/os/sigset.h>
 )]%[insert:prefix(
+#include <hybrid/typecore.h>
+)]%[insert:prefix(
 #include <bits/types.h>
 )]%[insert:prefix(
 #include <libc/errno.h>
@@ -1215,13 +1217,21 @@ typedef __sighandler_t sig_t;
 
 }
 
+
+/* NOTE: We can only leave our the `!= 0' check in `sigismember()',
+ *       and do `return sigset->word & mask', when doing so can't
+ *       cause the value to be truncated to zero. The later would
+ *       happen in the above when `mask > UINT_MAX', in which case
+ *       casting everything to `int' would cut off the upper non-
+ *       zero bits, and cause the function to return `0' when it
+ *       should in fact return non-zero. */
 %[define(DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO =
 #ifndef __PRIVATE_SIGSET_VALIDATE_SIGNO
-#ifdef __KERNEL__
+#if defined(__KERNEL__) && __SIZEOF_INT__ >= __SIZEOF_POINTER__
 #define __PRIVATE_SIGSET_ISMEMBER_EXT /* nothing */
-#else /* __KERNEL__ */
+#else /* __KERNEL__ && __SIZEOF_INT__ >= __SIZEOF_POINTER__ */
 #define __PRIVATE_SIGSET_ISMEMBER_EXT != 0
-#endif /* !__KERNEL__ */
+#endif /* !__KERNEL__ && __SIZEOF_INT__ < __SIZEOF_POINTER__ */
 #if defined(__KERNEL__) && defined(__KOS__)
 #define __PRIVATE_SIGSET_VALIDATE_SIGNO(@signo@) /* nothing */
 #elif defined(__NSIG) && defined(__EINVAL)
@@ -1569,6 +1579,7 @@ int sigfillset([[nonnull]] $sigset_t *set) {
 [[if(!defined(__KERNEL__)), export_as("__sigaddset")]]
 [[decl_include("<bits/types.h>", "<bits/os/sigset.h>")]]
 [[impl_include("<libc/errno.h>", "<asm/os/signal.h>")]]
+[[impl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO)]]
 int sigaddset([[nonnull]] $sigset_t *set, $signo_t signo) {
 	$ulongptr_t mask, word;
@@ -1588,6 +1599,7 @@ int sigaddset([[nonnull]] $sigset_t *set, $signo_t signo) {
 [[if(!defined(__KERNEL__)), export_as("__sigdelset")]]
 [[decl_include("<bits/types.h>", "<bits/os/sigset.h>")]]
 [[impl_include("<libc/errno.h>", "<asm/os/signal.h>")]]
+[[impl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO)]]
 int sigdelset([[nonnull]] $sigset_t *set, $signo_t signo) {
 	$ulongptr_t mask, word;
@@ -1608,6 +1620,7 @@ int sigdelset([[nonnull]] $sigset_t *set, $signo_t signo) {
 [[kernel, extern_inline, pure, wunused, alias("__sigismember")]]
 [[if(!defined(__KERNEL__)), export_as("__sigismember")]]
 [[decl_include("<bits/types.h>", "<bits/os/sigset.h>")]]
+[[impl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO)]]
 int sigismember([[nonnull]] $sigset_t const *set, $signo_t signo) {
 	$ulongptr_t mask, word;

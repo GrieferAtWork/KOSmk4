@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25f9b8d6 */
+/* HASH CRC-32:0x3230ede9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -367,12 +367,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_sigismember
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
+#include <hybrid/typecore.h>
 #ifndef __PRIVATE_SIGSET_VALIDATE_SIGNO
-#ifdef __KERNEL__
+#if defined(__KERNEL__) && __SIZEOF_INT__ >= __SIZEOF_POINTER__
 #define __PRIVATE_SIGSET_ISMEMBER_EXT /* nothing */
-#else /* __KERNEL__ */
+#else /* __KERNEL__ && __SIZEOF_INT__ >= __SIZEOF_POINTER__ */
 #define __PRIVATE_SIGSET_ISMEMBER_EXT != 0
-#endif /* !__KERNEL__ */
+#endif /* !__KERNEL__ && __SIZEOF_INT__ < __SIZEOF_POINTER__ */
 #if defined(__KERNEL__) && defined(__KOS__)
 #define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) /* nothing */
 #elif defined(__NSIG) && defined(__EINVAL)
@@ -402,12 +403,13 @@ __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,_
 #elif defined(__CRT_HAVE___sigismember)
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
+#include <hybrid/typecore.h>
 #ifndef __PRIVATE_SIGSET_VALIDATE_SIGNO
-#ifdef __KERNEL__
+#if defined(__KERNEL__) && __SIZEOF_INT__ >= __SIZEOF_POINTER__
 #define __PRIVATE_SIGSET_ISMEMBER_EXT /* nothing */
-#else /* __KERNEL__ */
+#else /* __KERNEL__ && __SIZEOF_INT__ >= __SIZEOF_POINTER__ */
 #define __PRIVATE_SIGSET_ISMEMBER_EXT != 0
-#endif /* !__KERNEL__ */
+#endif /* !__KERNEL__ && __SIZEOF_INT__ < __SIZEOF_POINTER__ */
 #if defined(__KERNEL__) && defined(__KOS__)
 #define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) /* nothing */
 #elif defined(__NSIG) && defined(__EINVAL)
@@ -437,12 +439,13 @@ __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,_
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
+#include <hybrid/typecore.h>
 #ifndef __PRIVATE_SIGSET_VALIDATE_SIGNO
-#ifdef __KERNEL__
+#if defined(__KERNEL__) && __SIZEOF_INT__ >= __SIZEOF_POINTER__
 #define __PRIVATE_SIGSET_ISMEMBER_EXT /* nothing */
-#else /* __KERNEL__ */
+#else /* __KERNEL__ && __SIZEOF_INT__ >= __SIZEOF_POINTER__ */
 #define __PRIVATE_SIGSET_ISMEMBER_EXT != 0
-#endif /* !__KERNEL__ */
+#endif /* !__KERNEL__ && __SIZEOF_INT__ < __SIZEOF_POINTER__ */
 #if defined(__KERNEL__) && defined(__KOS__)
 #define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) /* nothing */
 #elif defined(__NSIG) && defined(__EINVAL)

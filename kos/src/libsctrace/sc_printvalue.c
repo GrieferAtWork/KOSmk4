@@ -39,6 +39,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <hybrid/__va_size.h>
 #include <hybrid/align.h>
+#include <hybrid/overflow.h>
 #include <hybrid/typecore.h>
 
 #include <arpa/inet.h>
@@ -3321,17 +3322,16 @@ PRIVATE ssize_t CC
 print_sigset(pformatprinter printer, void *arg,
              USER UNCHECKED sigset_t const *sigset,
              size_t sigsetsize) {
-	signo_t signo_max;
+	signo_t signo_max = NSIG - 1;
 	ssize_t temp, result = 0;
+	size_t signo_limit;
 	bool has_prefix = false;
-	bool is_first, inverse = false;
-	if (sigsetsize > (__PRIVATE_MAX_S(__SIZEOF_SIGNO_T__) - 1) / NBBY)
-		sigsetsize = (__PRIVATE_MAX_S(__SIZEOF_SIGNO_T__) - 1) / NBBY;
-	signo_max = (signo_t)(sigsetsize * NBBY);
-	if (signo_max >= NSIG)
-		signo_max = NSIG - 1;
-	is_first = true;
+	bool is_first   = true;
+	if (!OVERFLOW_UMUL(sigsetsize, sizeof(sigset->__val[0]), &signo_limit) &&
+	    !OVERFLOW_UMUL(signo_limit, NBBY, &signo_limit) && (size_t)(signo_max - 1) > signo_limit)
+		signo_max = (signo_t)(signo_limit + 1);
 	TRY {
+		bool inverse = false;
 		signo_t signo;
 		unsigned int count, limit;
 		validate_readable(sigset, sigsetsize);
