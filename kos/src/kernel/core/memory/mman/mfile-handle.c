@@ -369,7 +369,8 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 PUBLIC NONNULL((1, 2)) void KCALL
 mfile_v_open(struct mfile *__restrict self,
              /*in|out*/ REF struct handle *__restrict hand,
-             struct path *access_path, struct fdirent *access_dent)
+             struct path *access_path, struct fdirent *access_dent,
+             oflag_t UNUSED(oflags))
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	REF struct filehandle *fh;
 	assert(hand->h_type == HANDLE_TYPE_MFILE);
@@ -390,27 +391,28 @@ mfile_v_open(struct mfile *__restrict self,
  * wrapper  objects   and  the   like.  This   function  is   implemented   as:
  * >> struct mfile_stream_ops const *stream = self->mf_ops->mo_stream;
  * >> if (!stream) {
- * >>     mfile_v_open(self, hand, access_path, access_dent);
+ * >>     mfile_v_open(self, hand, access_path, access_dent, oflags);
  * >> } else if (stream->mso_open) {
- * >>     (*stream->mso_open)(self, hand, access_path, access_dent);
+ * >>     (*stream->mso_open)(self, hand, access_path, access_dent, oflags);
  * >> } else if (!stream->mso_read && !stream->mso_readv &&
  * >>            !stream->mso_write && !stream->mso_writev) {
- * >>     mfile_v_open(self, hand, access_path, access_dent);
+ * >>     mfile_v_open(self, hand, access_path, access_dent, oflags);
  * >> } else {
  * >>     // Open mfile itself (iow: `hand->h_data == self')
  * >> } */
 PUBLIC BLOCKING NONNULL((1, 2)) void KCALL
 mfile_open(struct mfile *__restrict self, struct handle *__restrict hand,
-           struct path *access_path, struct fdirent *access_dent)
+           struct path *access_path, struct fdirent *access_dent,
+           oflag_t oflags)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, ...) {
 	struct mfile_stream_ops const *stream = self->mf_ops->mo_stream;
 	if (!stream) {
-		mfile_v_open(self, hand, access_path, access_dent);
+		mfile_v_open(self, hand, access_path, access_dent, oflags);
 	} else if (stream->mso_open) {
-		(*stream->mso_open)(self, hand, access_path, access_dent);
+		(*stream->mso_open)(self, hand, access_path, access_dent, oflags);
 	} else if (!stream->mso_read && !stream->mso_readv &&
 	           !stream->mso_write && !stream->mso_writev) {
-		mfile_v_open(self, hand, access_path, access_dent);
+		mfile_v_open(self, hand, access_path, access_dent, oflags);
 	} else {
 		/* Open mfile itself (iow: `hand->h_data == self') */
 	}

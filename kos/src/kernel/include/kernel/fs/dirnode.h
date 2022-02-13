@@ -514,7 +514,8 @@ struct handle;
 FUNDEF NONNULL((1, 2)) void KCALL
 fdirnode_v_open(struct mfile *__restrict self,
                 /*in|out*/ REF struct handle *__restrict hand,
-                struct path *access_path, struct fdirent *access_dent)
+                struct path *access_path, struct fdirent *access_dent,
+                oflag_t oflags)
 		THROWS(E_BADALLOC);
 FUNDEF NONNULL((1)) void KCALL /* Writes `st_blocks = 1;', `st_size = mfile_getblocksize(self);' */
 fdirnode_v_stat(struct mfile *__restrict self,

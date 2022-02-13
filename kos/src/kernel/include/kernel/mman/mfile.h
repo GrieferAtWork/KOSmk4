@@ -152,6 +152,8 @@ struct mfile_stream_ops {
 	 *                        reference both on entry and exit!
 	 * @param: access_path: [0..1] The path by which the open is being performed (if available)
 	 * @param: access_dent: [0..1] The directory entry of `self' (if available)
+	 * @param: oflags:      Additional open-flags. Set of: `0 | O_NOCTTY'
+	 *                      All other flags  should be silently  ignored.
 	 * HINT: `hand' is initialized as follows upon entry:
 	 * >> hand->h_type = HANDLE_TYPE_MFILE;
 	 * >> hand->h_mode = ...; // Depending on o-flags passed to open(2).
@@ -162,7 +164,8 @@ struct mfile_stream_ops {
 	(KCALL *mso_open)(struct mfile *__restrict self,
 	                  /*in|out*/ REF struct handle *__restrict hand,
 	                  struct path *access_path,
-	                  struct fdirent *access_dent);
+	                  struct fdirent *access_dent,
+	                  oflag_t oflags);
 
 	/* [0..1] Hooks  for `read(2)' and  `readv(2)': stream-oriented file reading.
 	 * Note that for consistency, anything that implements these operators should
@@ -358,7 +361,8 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 FUNDEF NONNULL((1, 2)) void KCALL
 mfile_v_open(struct mfile *__restrict self,
              /*in|out*/ REF struct handle *__restrict hand,
-             struct path *access_path, struct fdirent *access_dent)
+             struct path *access_path, struct fdirent *access_dent,
+             oflag_t oflags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Generic open function for mem-file arbitrary mem-file objects. This function
@@ -366,18 +370,19 @@ mfile_v_open(struct mfile *__restrict self,
  * wrapper  objects   and  the   like.  This   function  is   implemented   as:
  * >> struct mfile_stream_ops const *stream = self->mf_ops->mo_stream;
  * >> if (!stream) {
- * >>     mfile_v_open(self, hand, access_path, access_dent);
+ * >>     mfile_v_open(self, hand, access_path, access_dent, oflags);
  * >> } else if (stream->mso_open) {
- * >>     (*stream->mso_open)(self, hand, access_path, access_dent);
+ * >>     (*stream->mso_open)(self, hand, access_path, access_dent, oflags);
  * >> } else if (!stream->mso_read && !stream->mso_readv &&
  * >>            !stream->mso_write && !stream->mso_writev) {
- * >>     mfile_v_open(self, hand, access_path, access_dent);
+ * >>     mfile_v_open(self, hand, access_path, access_dent, oflags);
  * >> } else {
  * >>     // Open mfile itself (iow: `hand->h_data == self')
  * >> } */
 FUNDEF BLOCKING NONNULL((1, 2)) void KCALL
 mfile_open(struct mfile *__restrict self, struct handle *__restrict hand,
-           struct path *access_path, struct fdirent *access_dent)
+           struct path *access_path, struct fdirent *access_dent,
+           oflag_t oflags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 struct aio_multihandle;

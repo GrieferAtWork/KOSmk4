@@ -99,13 +99,19 @@ FUNDEF NONNULL((1)) ssize_t LIBTERM_CC __ttydev_v_raise(struct terminal *__restr
 /* Default tty operators. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ttydev_v_destroy)(struct mfile *__restrict self);
+FUNDEF BLOCKING NONNULL((1, 2)) void KCALL /* Implements handling for `O_NOCTTY' */
+ttydev_v_open(struct mfile *__restrict self,
+              /*in|out*/ REF struct handle *__restrict hand,
+              struct path *access_path,
+              struct fdirent *access_dent,
+              oflag_t oflags);
 #define ttydev_v_changed chrdev_v_changed
 #define ttydev_v_wrattr  chrdev_v_wrattr
 #define ttydev_v_tryas   chrdev_v_tryas
-FUNDEF NONNULL((1)) size_t KCALL /* NOTE: This read operator is _MANDATORY_ and may not be overwritten by sub-classes! */
+FUNDEF NONNULL((1)) size_t KCALL /* NOTE: This read operator is _MANDATORY_ and may NOT be overwritten by sub-classes! */
 ttydev_v_read(struct mfile *__restrict self, USER CHECKED void *dst,
               size_t num_bytes, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) size_t KCALL /* NOTE: This read operator is _MANDATORY_ and may not be overwritten by sub-classes! */
+FUNDEF NONNULL((1)) size_t KCALL /* NOTE: This write operator is _MANDATORY_ and may NOT be overwritten by sub-classes! */
 ttydev_v_write(struct mfile *__restrict self, USER CHECKED void const *src,
                size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) syscall_slong_t KCALL

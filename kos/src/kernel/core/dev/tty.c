@@ -261,6 +261,64 @@ NOTHROW(KCALL ttydev_v_destroy)(struct mfile *__restrict self) {
 	chrdev_v_destroy(self);
 }
 
+/* Implements handling for `O_NOCTTY' */
+PUBLIC BLOCKING NONNULL((1, 2)) void KCALL
+ttydev_v_open(struct mfile *__restrict self,
+              /*in|out*/ REF struct handle *__restrict UNUSED(hand),
+              struct path *UNUSED(access_path),
+              struct fdirent *UNUSED(access_dent),
+              oflag_t oflags) {
+	REF struct procgrp *caller_grp;
+	struct procsession *session;
+	struct ttydev *me = mfile_astty(self);
+
+	/* When `O_NOCTTY' is given, never auto-assign ttys as session controllers. */
+	if (oflags & O_NOCTTY)
+		return;
+
+	/* If the calling session doesn't have a CTTY yet,
+	 * and `me' isn't a session controller then assign
+	 * `me' for that purpose. */
+	if (awref_ptr(&me->t_cproc) != NULL)
+		return; /* TTY is already a session controller. */
+	caller_grp = task_getprocgrp();
+	session    = caller_grp->pgr_session;
+	if (axref_ptr(&session->ps_ctty) != NULL)
+		goto done_caller_grp; /* Calling session already has a CTTY. */
+
+	/* All right! -- Everything looks correct, so let's see if we can do this! */
+	if (!axref_cmpxch(&session->ps_ctty, NULL, me))
+		goto done_caller_grp;
+	if (!awref_cmpxch(&me->t_cproc, NULL, caller_grp->pgr_sleader)) {
+		axref_cmpxch(&session->ps_ctty, me, NULL);
+		goto done_caller_grp;
+	}
+
+	/* Set the calling process group as foreground. */
+	for (;;) {
+		bool cx_ok;
+		REF struct procgrp *old_fg;
+		if (awref_cmpxch(&me->t_fproc, NULL, caller_grp))
+			break;
+		old_fg = awref_get(&me->t_fproc);
+		if (!old_fg)
+			continue;
+		if (old_fg->pgr_session == session) {
+			decref_unlikely(old_fg);
+			break;
+		}
+		cx_ok = awref_cmpxch(&me->t_fproc, old_fg, caller_grp);
+		decref_unlikely(old_fg);
+		if (cx_ok)
+			break;
+	}
+
+	/* Log the fact that the caller's session got a new CTTY. */
+	ttydev_log_setsession(me, caller_grp->pgr_sleader);
+done_caller_grp:
+	decref_unlikely(caller_grp);
+}
+
 
 LOCAL NONNULL((1, 2)) void KCALL
 termios_to_termios2(USER CHECKED struct termios2 *__restrict dst,

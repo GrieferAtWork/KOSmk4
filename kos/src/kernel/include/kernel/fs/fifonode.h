@@ -167,7 +167,8 @@ FUNDEF BLOCKING NONNULL((1, 2)) void KCALL
 ffifonode_v_open(struct mfile *__restrict self,
                  struct handle *__restrict hand,
                  struct path *access_path,
-                 struct fdirent *access_dent)
+                 struct fdirent *access_dent,
+                 oflag_t oflags)
 		THROWS(E_BADALLOC, E_ILLEGAL_IO_OPERATION, ...);
 FUNDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 ffifonode_v_read(struct mfile *__restrict self, USER CHECKED void *dst,

@@ -1966,9 +1966,11 @@ again_deref_lnknode:
 									result.h_type = HANDLE_TYPE_MFILE;
 									result.h_data = incref(open_file);
 									TRY {
-										mfile_open(open_file, &result, open_path, open_dirent);
+										mfile_open(open_file, &result, open_path, open_dirent, oflags);
 										/* Clear a regular file if O_TRUNC was given. */
-										if ((oflags & O_TRUNC) && (oflags & O_ACCMODE) != O_RDONLY && fnode_isreg(open_file))
+										if ((oflags & O_TRUNC) != 0 &&
+										    (oflags & O_ACCMODE) != O_RDONLY &&
+										    fnode_isreg(open_file))
 											mfile_utruncate(open_file, 0);
 									} EXCEPT {
 										decref(result);
@@ -2102,9 +2104,11 @@ again_handle_traversed_file:
 						result.h_type = HANDLE_TYPE_MFILE;
 						result.h_data = incref(open_file);
 						TRY {
-							mfile_open(open_file, &result, open_path, open_dirent);
+							mfile_open(open_file, &result, open_path, open_dirent, oflags);
 							/* Clear a regular file if O_TRUNC was given. */
-							if ((oflags & O_TRUNC) && (oflags & O_ACCMODE) != O_RDONLY && fnode_isreg(open_file))
+							if ((oflags & O_TRUNC) != 0 &&
+							    (oflags & O_ACCMODE) != O_RDONLY &&
+							    fnode_isreg(open_file))
 								mfile_utruncate(open_file, 0);
 						} EXCEPT {
 							decref(result);
@@ -2133,10 +2137,12 @@ again_handle_traversed_file:
 
 		/* Invoke custom open operators (and create a `struct filehandle' if necessary). */
 		TRY {
-			mfile_open(file, &result, access_path, access_dent);
+			mfile_open(file, &result, access_path, access_dent, oflags);
 
 			/* Clear a regular file if O_TRUNC was given. */
-			if ((oflags & O_TRUNC) && (oflags & O_ACCMODE) != O_RDONLY && fnode_isreg(file))
+			if ((oflags & O_TRUNC) != 0 &&
+			    (oflags & O_ACCMODE) != O_RDONLY &&
+			    fnode_isreg(file))
 				mfile_utruncate(file, 0);
 		} EXCEPT {
 			decref(result);

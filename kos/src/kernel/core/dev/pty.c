@@ -304,6 +304,7 @@ ptymaster_v_polltest(struct mfile *__restrict self,
 
 /* Operators used by `struct ptyslave' */
 PRIVATE struct mfile_stream_ops const ptyslave_stream_ops = {
+	.mso_open        = &ttydev_v_open,
 	.mso_read        = &ttydev_v_read,
 	.mso_write       = &ttydev_v_write,
 	.mso_stat        = &ttydev_v_stat,

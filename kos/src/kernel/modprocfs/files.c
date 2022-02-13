@@ -1942,7 +1942,8 @@ PRIVATE BLOCKING NONNULL((1, 2)) void KCALL
 procfs_r_kos_leaks_v_open(struct mfile *__restrict self,
                           /*in|out*/ REF struct handle *__restrict hand,
                           struct path *access_path,
-                          struct fdirent *access_dent) {
+                          struct fdirent *access_dent,
+                          oflag_t UNUSED(oflags)) {
 	REF struct memleaks *file;
 	REF struct filehandle *fh;
 

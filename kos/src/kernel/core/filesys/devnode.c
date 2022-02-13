@@ -43,7 +43,8 @@ PUBLIC NONNULL((1, 2)) void KCALL
 fdevnode_v_open(struct mfile *__restrict self,
                 struct handle *__restrict hand,
                 struct path *access_path,
-                struct fdirent *access_dent)
+                struct fdirent *access_dent,
+                oflag_t oflags)
 		THROWS(E_WOULDBLOCK, E_NO_DEVICE) {
 	ino_t devfs_ino;
 	REF struct device *node;
@@ -52,6 +53,7 @@ fdevnode_v_open(struct mfile *__restrict self,
 	assert(hand->h_data == me);
 	assert((me->fn_mode & S_IFMT) == S_IFCHR ||
 	       (me->fn_mode & S_IFMT) == S_IFBLK);
+
 	/* Construct the INO number used for *true* (non-aliasing) device files */
 	devfs_ino = devfs_devnode_makeino(me->fn_mode, me->dn_devno);
 
@@ -76,7 +78,7 @@ fdevnode_v_open(struct mfile *__restrict self,
 
 	/* Open the pointed-to device. */
 	FINALLY_DECREF_UNLIKELY(node);
-	mfile_open(node, hand, access_path, access_dent);
+	mfile_open(node, hand, access_path, access_dent, oflags);
 }
 
 

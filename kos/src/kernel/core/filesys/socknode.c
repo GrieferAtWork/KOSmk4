@@ -37,7 +37,8 @@ PUBLIC NONNULL((1, 2)) void KCALL
 fsocknode_v_open(struct mfile *__restrict UNUSED(self),
                  /*in|out*/ REF struct handle *__restrict UNUSED(hand),
                  struct path *UNUSED(access_path),
-                 struct fdirent *UNUSED(access_dent))
+                 struct fdirent *UNUSED(access_dent),
+                 oflag_t UNUSED(oflags))
 		THROWS(E_ILLEGAL_IO_OPERATION) {
 	THROW(E_ILLEGAL_IO_OPERATION,
 	      E_ILLEGAL_OPERATION_CONTEXT_OPEN_S_IFSOCK);

@@ -315,6 +315,7 @@ typedef poll_mode_t (KCALL *phandle_polltest_function_t)(void *__restrict ptr, p
 
 
 PRIVATE struct mfile_stream_ops const mktty_stream_ops = {
+	.mso_open        = &ttydev_v_open,
 	.mso_read        = &ttydev_v_read,
 	.mso_write       = &ttydev_v_write,
 	.mso_mmap        = &mkttydev_v_mmap,

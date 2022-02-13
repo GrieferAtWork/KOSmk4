@@ -219,7 +219,8 @@ fdirenum_feedent_fast(USER CHECKED struct dirent *buf,
 PUBLIC NONNULL((1, 2)) void KCALL
 fdirnode_v_open(struct mfile *__restrict self,
                 /*in|out*/ REF struct handle *__restrict hand,
-                struct path *access_path, struct fdirent *access_dent)
+                struct path *access_path, struct fdirent *access_dent,
+                oflag_t UNUSED(oflags))
 		THROWS(E_BADALLOC) {
 	REF struct dirhandle *dh;
 	/* Construct the directory handle. */
