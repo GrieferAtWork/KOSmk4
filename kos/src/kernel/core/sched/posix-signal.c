@@ -828,8 +828,8 @@ sys_sigsuspend_impl(struct icpustate *__restrict state,
 	sigdelset(&not_these, SIGKILL);
 
 	/* Indicate that we want to receive wake-ups for masked signals.
-	 * NOTE: We also set the RPC flag in case there are pending RPCs
-	 *       that  would   normally   be   considered   as   masked! */
+	 * NOTE: We also set the RPC flag in case there are pending
+	 *       RPCs  that would normally be considered as masked! */
 	ATOMIC_OR(me->t_flags, (TASK_FWAKEONMSKRPC | TASK_FRPC));
 
 	/* This will clear `TASK_FWAKEONMSKRPC', as well as
@@ -868,12 +868,12 @@ sys_sigsuspend_impl(struct icpustate *__restrict state,
 	 */
 	{
 		struct pending_rpc *rpcs;
-		/* NOTE: No need to steal pending RPCs. -- These are private to
-		 *       our thread, and while other threads are allowed to add
-		 *       more (hence the ATOMIC_READ from the list head),  only
-		 *       we are allowed to remove threads, meaning that we know
-		 *       that (other than the list head), none of the  pointers
-		 *       between elements can change.
+		/* NOTE: No need to steal pending  RPCs. -- These are private  to
+		 *       our thread, and while other  threads are allowed to  add
+		 *       more (hence the  ATOMIC_READ from the  list head),  only
+		 *       we are allowed to remove them, meaning that we know that
+		 *       (other than the list head), none of the pointers between
+		 *       elements can change.
 		 * Also note that in case another thread adds a new RPC, it will
 		 * come  without the INACTIVE  flag, so it'll  already be in the
 		 * state we want all of our RPCs to be in! */

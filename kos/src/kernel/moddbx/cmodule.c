@@ -714,15 +714,18 @@ NOTHROW(FCALL prefer_symbol)(struct cmodsym *__restrict a,
 
 /* Lookup the given `name' within `self' */
 #ifdef CMODSYM_NAME_NEEDS_MODULE
-PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2, 3)) struct cmodsym *
+NONNULL((1, 2, 3))
 #else /* CMODSYM_NAME_NEEDS_MODULE */
-PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) struct cmodsym *
-#define cmodsymtab_lookup(self, mod, name, namlen, ns) cmodsymtab_lookup(self, name, namlen, ns)
+NONNULL((1, 2))
 #endif /* !CMODSYM_NAME_NEEDS_MODULE */
+PRIVATE ATTR_PURE WUNUSED struct cmodsym *
 NOTHROW(FCALL cmodsymtab_lookup)(struct cmodsymtab const *__restrict self,
 #ifdef CMODSYM_NAME_NEEDS_MODULE
                                  struct cmodule const *__restrict mod,
-#endif /* CMODSYM_NAME_NEEDS_MODULE */
+#else /* CMODSYM_NAME_NEEDS_MODULE */
+#define cmodsymtab_lookup(self, mod, name, namlen, ns) \
+	cmodsymtab_lookup(self, name, namlen, ns)
+#endif /* !CMODSYM_NAME_NEEDS_MODULE */
                                  char const *__restrict name, size_t namelen,
                                  uintptr_t ns) {
 	struct cmodsym *result;

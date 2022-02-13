@@ -86,6 +86,8 @@
 #define __BLOCKING_IF(x)
 #define NOPREEMPT
 #define __NOPREEMPT
+#define ABNORMAL_RETURN
+#define __ABNORMAL_RETURN
 #define PAGEDIR_PAGEALIGNED
 #define THROWS(...)
 #define __THROWS(...)
@@ -700,6 +702,10 @@
 #define __LIBM_LOCAL_VALUE(name)               ::__local_imp::__libm_##name
 
 
+#define __ATTR_MALL_DEFAULT_ALIGNED
+#define ATTR_MALL_DEFAULT_ALIGNED
+#define __ATTR_MALL_PAGEALIGNED
+#define ATTR_MALL_PAGEALIGNED
 #define __ATTR_LIBC_PRINTF(a,b)
 #define ATTR_LIBC_PRINTF(a,b)
 #define __ATTR_LIBC_PRINTF_P(a,b)
@@ -708,18 +714,32 @@
 #define ATTR_LIBC_SCANF(a,b)
 #define __ATTR_LIBC_STRFMON(a,b)
 #define ATTR_LIBC_STRFMON(a,b)
+#define __ATTR_LIBC_STRFTIME(a,b)
+#define ATTR_LIBC_STRFTIME(a,b)
 #define __ATTR_LIBC_WPRINTF(a,b)
 #define ATTR_LIBC_WPRINTF(a,b)
 #define __ATTR_LIBC_WPRINTF_P(a,b)
 #define ATTR_LIBC_WPRINTF_P(a,b)
 #define __ATTR_LIBC_WSCANF(a,b)
 #define ATTR_LIBC_WSCANF(a,b)
-#define __ATTR_LIBC_WSTRFMON(a,b)
-#define ATTR_LIBC_WSTRFMON(a,b)
-#define __ATTR_MALL_DEFAULT_ALIGNED
-#define ATTR_MALL_DEFAULT_ALIGNED
-#define __ATTR_MALL_PAGEALIGNED
-#define ATTR_MALL_PAGEALIGNED
+#define __ATTR_LIBC_WCSFTIME(a,b)
+#define ATTR_LIBC_WCSFTIME(a,b)
+#define __ATTR_LIBC_C16PRINTF(a,b)
+#define ATTR_LIBC_C16PRINTF(a,b)
+#define __ATTR_LIBC_C16PRINTF_P(a,b)
+#define ATTR_LIBC_C16PRINTF_P(a,b)
+#define __ATTR_LIBC_C16SCANF(a,b)
+#define ATTR_LIBC_C16SCANF(a,b)
+#define __ATTR_LIBC_C16FTIME(a,b)
+#define ATTR_LIBC_C16FTIME(a,b)
+#define __ATTR_LIBC_C32PRINTF(a,b)
+#define ATTR_LIBC_C32PRINTF(a,b)
+#define __ATTR_LIBC_C32PRINTF_P(a,b)
+#define ATTR_LIBC_C32PRINTF_P(a,b)
+#define __ATTR_LIBC_C32SCANF(a,b)
+#define ATTR_LIBC_C32SCANF(a,b)
+#define __ATTR_LIBC_C32FTIME(a,b)
+#define ATTR_LIBC_C32FTIME(a,b)
 
 #define __DECL_SIMD_cos
 #define __DECL_SIMD_cosf
