@@ -1219,11 +1219,11 @@ typedef __sighandler_t sig_t;
 
 
 /* NOTE: We can only leave our the `!= 0' check in `sigismember()',
- *       and do `return sigset->word & mask', when doing so can't
- *       cause the value to be truncated to zero. The later would
- *       happen in the above when `mask > UINT_MAX', in which case
- *       casting everything to `int' would cut off the upper non-
- *       zero bits, and cause the function to return `0' when it
+ *       and do `return sigset->word & mask',  when doing so  can't
+ *       cause the value to be  truncated to zero. The later  would
+ *       happen in the above when `mask > UINT_MAX', in which  case
+ *       casting everything to `int' would  cut off the upper  non-
+ *       zero  bits, and cause  the function to  return `0' when it
  *       should in fact return non-zero. */
 %[define(DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO =
 #ifndef __PRIVATE_SIGSET_VALIDATE_SIGNO

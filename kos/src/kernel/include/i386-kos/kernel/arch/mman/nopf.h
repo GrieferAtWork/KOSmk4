@@ -385,7 +385,7 @@ NOTHROW(KCALL writeq_nopf)(USER CHECKED void *addr,
  * allowing a necessary #PF to run its course without the caller  holding
  * an atomic lock.
  * @return: 0 : The copy operation completed without any problems.
- * @return: * : The number of bytes that could not be transfered.
+ * @return: * : The number of bytes that could not be transferred.
  *              The affected memory ranges are:
  *               - `dst + num_bytes - return ... dst + num_bytes - 1'
  *               - `src + num_bytes - return ... src + num_bytes - 1' */

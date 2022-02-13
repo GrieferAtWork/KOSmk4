@@ -178,8 +178,8 @@
 #define ATTR_PERTASK     ATTR_SECTION(".data.pertask") /* Per-task template data. */
 #define ATTR_PERMMAN     ATTR_SECTION(".data.permman") /* Per-memory-manager template data. */
 
-/* Force minimal alignment in data declarations. This
- * attribute must be used when declaring ATTR_PERTASK
+/* Force  minimal alignment in data declarations. This
+ * attribute  must be used when declaring ATTR_PERTASK
  * and ATTR_PERMMAN variables, so-as to ensure that no
  * unnecessary alignment-padding is inserted.
  *

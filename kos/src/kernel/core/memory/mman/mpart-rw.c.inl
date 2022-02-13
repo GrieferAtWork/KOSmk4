@@ -199,8 +199,8 @@ LOCAL__mpart_buffered_rw(struct mpart *__restrict self,
 
 
 /* Read/write raw data to/from a given mem-part.
- * @return: * : The # of bytes that were transfered. May be less than `num_bytes' if the part
- *              is too small, or if  the given `filepos' lies  outside of the part's  bounds. */
+ * @return: * : The # of bytes that were transferred. May be less than `num_bytes' if the part
+ *              is too small, or  if the given  `filepos' lies outside  of the part's  bounds. */
 PUBLIC BLOCKING NONNULL((1)) size_t KCALL
 LOCAL_mpart_rw(struct mpart *__restrict self,
                LOCAL_buffer_t buffer,
@@ -391,7 +391,7 @@ done:
  *    return == 0:          mpart_lock_release(self); unlock();
  *    return == (size_t)-1: mpart_lock_release(self); unlock();  (never returned by *_p variants)
  *    return == *:          mpart_lock_acquired(self);
- * Upon success, return the (non-zero) # of transfered bytes.
+ * Upon success, return the (non-zero) # of transferred bytes.
  * The caller must ensure that:
  *    >> num_bytes != 0
  *    >> MPART_ST_INCORE(self->mp_state)   // Can be ensured by `mpart_setcore_or_unlock()'

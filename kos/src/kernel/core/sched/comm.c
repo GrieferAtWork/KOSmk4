@@ -139,7 +139,7 @@ task_setcomm_of(struct task *__restrict self, char const *__restrict name)
 	}
 
 	/* Because `this_comm' can only be changed by `THIS_TASK', we have to
-	 * send an RPC to the given `self' that will apply the new name. But
+	 * send  an RPC to the given `self' that will apply the new name. But
 	 * because we're supposed to be a synchronous operation, we also have
 	 * to wait for that RPC to complete. */
 	FINALLY_DECREF(rpc);

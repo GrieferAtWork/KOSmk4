@@ -58,7 +58,7 @@ struct ringbuffer {
 	__size_t             rb_rdtot;  /* [lock(rb_lock)] Total number of bytes read since the last re-size. */
 	__WEAK __size_t      rb_limit;  /* Max size to which the buffer may grow when writing (set to 0 to indicate that
 	                                 * the buffer was closed, in which case both reading or writing will immediately
-	                                 * indicate that no data was transfered) */
+	                                 * indicate that no data was transferred) */
 	sched_signal_t       rb_nempty; /* Signal broadcast when the buffer becomes non-empty, or gets closed */
 	sched_signal_t       rb_nfull;  /* Signal broadcast when the buffer becomes non-full, or gets closed */
 };

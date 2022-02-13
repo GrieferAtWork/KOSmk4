@@ -147,10 +147,10 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 			/* Must insert the node into the part's list of deleted nodes. */
 			weakincref(self->mn_mman); /* A weak reference here is required by the ABI */
 
-			/* Insert into the  lock-operations list of  `part'
-			 * The act of doing this is what essentially causes
-			 * ownership of our node to be transfered to `part'
-			 * Additionally,  `mnode_unlink_from_part_lockop()'
+			/* Insert into  the lock-operations  list of  `part'
+			 * The act of doing this is what essentially  causes
+			 * ownership of our node to be transferred to `part'
+			 * Additionally,   `mnode_unlink_from_part_lockop()'
 			 * inherits our reference to `part'! */
 			lop = (Toblockop(mpart) *)self;
 			lop->olo_func = &mnode_unlink_from_part_lockop;

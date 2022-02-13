@@ -1452,8 +1452,8 @@ NOTHROW(FCALL mpart_mmap_node_p)(struct mpart const *__restrict self,
 
 
 /* Read/write raw data to/from a given mem-part.
- * @return: * : The # of bytes that were transfered. May be less than `num_bytes' if the part
- *              is too small, or if  the given `filepos' lies  outside of the part's  bounds. */
+ * @return: * : The # of bytes that were transferred. May be less than `num_bytes' if the part
+ *              is too small, or  if the given  `filepos' lies outside  of the part's  bounds. */
 FUNDEF BLOCKING NONNULL((1)) size_t KCALL mpart_read(struct mpart *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1)) size_t KCALL mpart_write(struct mpart *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1)) size_t KCALL mpart_read_p(struct mpart *__restrict self, physaddr_t dst, size_t num_bytes, pos_t filepos) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
@@ -1484,7 +1484,7 @@ FUNDEF BLOCKING NONNULL((1, 2)) size_t KCALL _mpart_buffered_writev(struct mpart
  *    return == 0:          mpart_lock_release(self); unlock();
  *    return == (size_t)-1: mpart_lock_release(self); unlock();  (never returned by *_p variants)
  *    return == *:          mpart_lock_acquired(self);
- * Upon success, return the (non-zero) # of transfered bytes.
+ * Upon success, return the (non-zero) # of transferred bytes.
  * The caller must ensure that:
  *    >> num_bytes != 0
  *    >> MPART_ST_INCORE(self->mp_state)   // Can be ensured by `mpart_setcore_or_unlock()'

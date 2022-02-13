@@ -61,11 +61,11 @@
 struct userkern /*[PREFIX(uk_)]*/ {
 	/* Thread-local state information provided by the kernel.
 	 * NOTE: This structure is implemented through VIO, so it doesn't really behave
-	 *       like you would expect it to, while any sort of memory access is quite
+	 *       like  you would expect it to, while any sort of memory access is quite
 	 *       slow and should be kept at a minimum for that reason.
 	 *  - The contents of this structure are thread-local for the most part
 	 *  - Calling the address of this structure after adding an offset of one of `__NR_*',
-	 *    allows that system call to be invoked as a regular, old function:
+	 *    allows   that  system   call  to  be   invoked  as  a   regular,  old  function:
 	 *    >> typedef int (*POPEN)(char const *filename, oflag_t flags, ...);
 	 *    >> typedef int (*PCLOSE)(int fd);
 	 *    >> struct userkern *t = userkern_get();
@@ -80,18 +80,18 @@ struct userkern /*[PREFIX(uk_)]*/ {
 	 *  - Attempting to write to one of the constant fields of this structure will
 	 *    cause an E_SEGFAULT_READONLY exception to be thrown. */
 	struct userkern   *uk_base;  /* [1..1][== self] Base address of the thread segment.
-	                              * During thread creation, this address is first randomized before
+	                              * During thread creation, this  address is first randomized  before
 	                              * being assigned to the TLS register returned by `userkern_self()'.
-	                              * Note that the userkern descriptor is implemented through VIO, as
+	                              * Note that the userkern descriptor is implemented through VIO,  as
 	                              * well as the fact that it always points into kernel-space (meaning
 	                              * that it doesn't use up any user-space memory ranges)
-	                              * NOTE: This field can be written to in order to move the base address
-	                              *       of the userkern segment, although the new address must remain
+	                              * NOTE: This field  can be  written to  in  order to  move the  base  address
+	                              *       of  the  userkern  segment,  although  the  new  address  must remain
 	                              *       within kernel-space, with an `E_INVALID_ARGUMENT_BAD_VALUE' exception
-	                              *       being thrown (context `E_INVALID_ARGUMENT_CONTEXT_USERKERN_BASE')
-	                              * NOTE: userkern functionality is only provided while the thread's TLS
-	                              *       register points into user-space. - When altering the address of
-	                              *       the TLS register (e.g. on x86 `__wr(fs|gs)base()'), the userkern
+	                              *       being  thrown  (context   `E_INVALID_ARGUMENT_CONTEXT_USERKERN_BASE')
+	                              * NOTE: userkern functionality  is only  provided while  the thread's  TLS
+	                              *       register points into  user-space. - When  altering the address  of
+	                              *       the TLS register (e.g.  on x86 `__wr(fs|gs)base()'), the  userkern
 	                              *       segment is moved as well, however access to this structure is lost
 	                              *       if the TLS register base no longer points into kernel-space. */
 	__pid_t const      uk_tid;   /* [const] TID of the calling thread. */
@@ -116,7 +116,7 @@ struct userkern /*[PREFIX(uk_)]*/ {
 	__USERKERN_PAD_UID(__uk_pad9)
 	__gid_t volatile   uk_sgid;  /* Access to saved gid of the calling process */
 	__USERKERN_PAD_GID(__uk_pad10)
-	struct ucpustate   uk_regs;  /* Your current register state. (essentially, this is can be
+	struct ucpustate   uk_regs;  /* Your current register  state. (essentially, this  is can  be
 	                              * used as a memory-mapped copy of your current register state) */
 	/* TODO: Thread priority/scheduling control */
 	/* TODO: Thread I/O permission control (ioperm) */

@@ -51,6 +51,7 @@
 %[typesize(*:[time32_t] = syscall_ulong_t)]
 %[typesize(*:[time64_t] = 8)]
 
+/* These types are signed, and when passed to system calls, may need to be sign-extended. */
 %[signed_types(schar, short, signed, int, long, llong)]
 %[signed_types(s8, int8_t, __INT8_TYPE__)]
 %[signed_types(s16, int16_t, __INT16_TYPE__)]
@@ -61,15 +62,7 @@
 %[signed_types(time32_t, time64_t, ssize_t)]
 %[signed_types(errno_t, signo_t, oflag_t, fd_t)]
 
-/* Syscall definition syntax
- * >> sysno:name
- * This is used as:
- * >> #define __NR_<name>  <sysno>      // In <asm/unistd.h>
- * >> #define SYS_<name>   __NR_<name>  // In <sys/syscall.h>
- * >> DEFINE_SYSCALLn(int, <name>, ...) // Somewhere in kernel-space
- * >> int <name>(...);                  // In <kos/syscalls.h>
- */
-
+/* Define which headers to include to get the definitions for specific types */
 %[typeorg(<hybrid/typecore.h>: __UINT8_TYPE__, __INT8_TYPE__)]
 %[typeorg(<hybrid/typecore.h>: __UINT16_TYPE__, __INT16_TYPE__)]
 %[typeorg(<hybrid/typecore.h>: __UINT32_TYPE__, __INT32_TYPE__)]
@@ -102,7 +95,7 @@
 %[typeorg(<bits/types.h>: __blksize_t, __nlink_t, __fsid_t)]
 %[typeorg(<bits/types.h>: __time32_t, __time64_t)]
 %[typeorg(<bits/types.h>: __quantum_diff_t, __clock_t, __suseconds_t, __clockid_t)]
-%[typeorg(<bits/types.h>: __gid_t, __uid_t, __useconds_t, __jtime_t, __timer_t)]
+%[typeorg(<bits/types.h>: __gid_t, __uid_t, __useconds_t, __timer_t)]
 %[typeorg(<bits/os/itimerspec.h>: itimerspec, itimerspec32, itimerspec64, __itimerspec32, __itimerspec64)]
 %[typeorg(<bits/os/generic/itimerspec32.h>: __itimerspecx32, __itimerspecx32_64, itimerspecx32, itimerspecx32_64)]
 %[typeorg(<bits/os/generic/itimerspec64.h>: __itimerspecx64, itimerspecx64)]
@@ -250,8 +243,16 @@
 %[typecompat(*:linux_dirent64 = *:linux_dirent64)]
 %[typecompat(*:clone_args = *:clone_args)]
 
+/* Certain keywords which -- if they appear in system call
+ * declarations  -- must be #undef'd before being written.
+ *
+ * The  reason for this is that these keywords may be defined
+ * as macros in other system headers, so we need to wrap  our
+ * stuff with #pragma push_macro()+#undef+#pragma pop_maco(). */
 %[mustundef(timezone, timeb, stat, dirent)]
 
+
+/* Define default rules on how libsctrace should represent argument types. */
 %[define_tostr(char               = CHAR)]
 %[define_tostr(signed char        = SIGNED_CHAR)]
 %[define_tostr(unsigned char      = UNSIGNED_CHAR)]
@@ -2965,6 +2966,15 @@ faccessat2:(int TODO_PROTOTYPE) -> errno_t;
 
 
 
+
+/* Syscall definition syntax
+ * >> sysno:name
+ * This is used as:
+ * >> #define __NR_<name>  <sysno>      // In <asm/unistd.h>
+ * >> #define SYS_<name>   __NR_<name>  // In <sys/syscall.h>
+ * >> DEFINE_SYSCALLn(int, <name>, ...) // Somewhere in kernel-space
+ * >> int <name>(...);                  // In <kos/syscalls.h>
+ */
 
 
 

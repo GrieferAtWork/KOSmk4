@@ -175,7 +175,7 @@ FUNDEF NOBLOCK void NOTHROW(KCALL bzerophyscc)(PHYS physaddr_t dst, size_t num_b
 
 /* no-#PF variants of `copy(from|to)phys()'.
  * @return: 0 : The copy operation completed without any problems.
- * @return: * : The number of bytes that could not be transfered.
+ * @return: * : The number of bytes that could not be transferred.
  *              The affected memory range is:
  *               - `(dst|src) + num_bytes - return ... (dst|src) + num_bytes - 1' */
 FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL copyfromphys_nopf)(USER CHECKED void *dst, PHYS physaddr_t src, size_t num_bytes);

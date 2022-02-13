@@ -250,7 +250,7 @@ NOTHROW(FCALL taskpid_destroy)(struct taskpid *__restrict self) {
 		sig_broadcast_for_fini(&ctl->pc_chld_changed);
 
 		/* We know that we're no longer part of the parent's list of child
-		 * processes, so there's no need to tinker around with removing
+		 * processes, so there's  no need to  tinker around with  removing
 		 * ourselves from said list. */
 		arref_fini(&ctl->pc_parent);
 

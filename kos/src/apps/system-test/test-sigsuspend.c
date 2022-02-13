@@ -70,7 +70,7 @@ DEFINE_TEST(sigsuspend) {
 	EQd(-EINTR, sys_sigsuspend(&mask));
 #else /* SYS_sigsuspend */
 	EQd(0, sigdelset(&mask, SIGUSR1));
-	++handler_called; /* Pshht -- don't tell anything ;) */
+	++handler_called; /* Pshht -- don't tell anyone ;) */
 #endif /* !SYS_sigsuspend */
 	EQu(1, handler_called);
 

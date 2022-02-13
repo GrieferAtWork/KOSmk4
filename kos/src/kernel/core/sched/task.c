@@ -289,7 +289,7 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 #endif /* CONFIG_HAVE_TASK_COMM */
 
 	/* Assign exec information to `mman_kernel'.
-	 * This might not be the perfect place to do so, but since I don't want to add
+	 * This might not be the perfect place to do so, but since I don't want to  add
 	 * a initializer just to do this one thing, we might as well fill in that field
 	 * here! */
 	FORMMAN(&mman_kernel, thismman_execinfo.mei_dent) = &kernel_driver_fsname;

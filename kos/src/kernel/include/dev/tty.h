@@ -167,7 +167,7 @@ _ttydev_tryioctl(struct mfile *__restrict self, ioctl_t cmd,
 
 
 /* Returns a reference to the controlling- or foreground process
- * group, or NULL if the specified field hasn't been set. */
+ * group, or  NULL  if  the specified  field  hasn't  been  set. */
 #define ttydev_getcproc(self) awref_get(&(self)->t_cproc)
 #define ttydev_getfproc(self) awref_get(&(self)->t_fproc)
 

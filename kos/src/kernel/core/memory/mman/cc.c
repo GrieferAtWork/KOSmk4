@@ -837,7 +837,7 @@ again:
 
 /* Gather up to `count' threads starting at `*p_minpid', which is
  * updated to 1+ the last PID enumerated. The return value is the
- * number of threads stored in `buf'. -- When less than `count',
+ * number  of threads stored in `buf'. -- When less than `count',
  * that means that all threads were enumerated. */
 PRIVATE NOBLOCK NONNULL((1, 3, 4)) size_t
 NOTHROW(KCALL pidns_root_gather_threads)(REF struct task **buf, size_t count,

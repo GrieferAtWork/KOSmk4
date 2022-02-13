@@ -1412,7 +1412,7 @@ NOTHROW(FCALL task_transfer_thread_to_other_cpu)(struct cpu *__restrict me,
 	assert(!(thread->t_flags & TASK_FRUNNING));
 	assert(thread != &sched_idle);
 	if (thread->t_flags & (TASK_FKEEPCORE | TASK_FTERMINATING))
-		return false; /* Thread cannot be transfered. */
+		return false; /* Thread cannot be transferred. */
 	target = &bootcpu; /* TODO: Dynamically determine based on recent load. */
 	assert(thread->t_cpu == me);
 	if unlikely(target == me)
@@ -1601,13 +1601,13 @@ disable_custom_deadline_and_start_over:
 				next = sched_next(self);
 				assert((sched.s_waiting_last == self) == (next == NULL));
 				if (task_transfer_thread_to_other_cpu(me, self, CPUSET_PTR(pending_cpu_wake))) {
-					/* Thread was transfered (fix-up our CPU's wait-queue chain) */
+					/* Thread was transferred (fix-up our CPU's wait-queue chain) */
 					if ((*pself = next) != NULL)
 						sched_pself(next) = pself;
 					continue;
 				}
 
-				/* Thread wasn't transfered.
+				/* Thread wasn't transferred.
 				 * This means that we won't be able to shut down, so
 				 * we might as well stop trying and just get back to
 				 * normal execution. */
@@ -1620,7 +1620,7 @@ disable_custom_deadline_and_start_over:
 				goto again;
 			}
 
-			/* With all sleeping threads transfered, fix-up the waiting-last pointer. */
+			/* With all sleeping threads transferred, fix-up the waiting-last pointer. */
 			assert(sched_s_waiting == NULL);
 			sched.s_waiting_last = NULL;
 

@@ -155,10 +155,10 @@ NOTHROW(FCALL forktree_mnode_destroy)(struct forktree *__restrict self,
 			weakincref(node->mn_mman); /* A weak reference here is required by the ABI */
 			DBG_memset(&node->mn_part, 0xcc, sizeof(node->mn_part));
 
-			/* Insert into the  lock-operations list of  `part'
-			 * The act of doing this is what essentially causes
-			 * ownership of our node to be transfered to `part'
-			 * Additionally,  `mnode_unlink_from_part_lockop()'
+			/* Insert into  the lock-operations  list of  `part'
+			 * The act of doing this is what essentially  causes
+			 * ownership of our node to be transferred to `part'
+			 * Additionally,   `mnode_unlink_from_part_lockop()'
 			 * inherits our reference to `part'! */
 			lop = (Toblockop(mpart) *)node;
 			lop->olo_func = &mnode_unlink_from_part_lockop;

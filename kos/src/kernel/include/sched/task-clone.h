@@ -176,12 +176,12 @@ task_clone(struct icpustate const *__restrict init_state,
 INTDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL _task_init_relocations)(struct task *__restrict self);
 
-/* Do some additional arch-specific initialization that should be
+/* Do  some additional arch-specific initialization that should be
  * done just before `FORTASK(self, this_sstate)' will be assigned.
  *
  * @param: child:    The new thread that is being initialized
  * @param: caller:   The calling thread (THIS_TASK)
- * @param: p_sstate: `struct scpustate **' Pointer to the state
+ * @param: p_sstate: `struct scpustate **' Pointer to the  state
  *                   that will be assigned to `this_sstate' once
  *                   this function returns. */
 #ifndef _task_init_arch_sstate

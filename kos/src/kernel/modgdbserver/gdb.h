@@ -305,7 +305,7 @@ INTDEF void NOTHROW(FCALL GDB_CloneAllBreakpointsFromMMan)(struct mman *__restri
 /* Read/Write memory
  * WARNING: `GDB_WriteMemory()' and `GDB_MMan_WriteMemory()' may modify the contents of the given `buf'!
  * @return: 0 : The copy operation completed without any problems.
- * @return: * : The number of bytes that could not be transfered.
+ * @return: * : The number of bytes that could not be transferred.
  *              The affected memory ranges are:
  *               - `addr + num_bytes - return ... addr + num_bytes - 1'
  *               - `buf + num_bytes - return ... buf + num_bytes - 1' */

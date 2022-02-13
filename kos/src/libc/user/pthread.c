@@ -3049,7 +3049,7 @@ readlock_tls_data_dodel(struct readlock_tls_data *__restrict self,
 }
 
 /* Remove `lck' from the set of locks of `self' */
-ATTR_SECTION(".text.crt.sched.pthread") 
+ATTR_SECTION(".text.crt.sched.pthread")
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) bool
 NOTHROW(CC readlock_tls_data_contains)(struct readlock_tls_data const *__restrict self,
                                        pthread_rwlock_t const *__restrict lck) {

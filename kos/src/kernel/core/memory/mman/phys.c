@@ -631,7 +631,7 @@ again:
 
 /* no-#PF variants of `copy(from|to)phys()'.
  * @return: 0 : The copy operation completed without any problems.
- * @return: * : The number of bytes that could not be transfered.
+ * @return: * : The number of bytes that could not be transferred.
  *              The affected memory range is:
  *               - `(dst|src) + num_bytes - return ... (dst|src) + num_bytes - 1' */
 PUBLIC NOBLOCK WUNUSED size_t

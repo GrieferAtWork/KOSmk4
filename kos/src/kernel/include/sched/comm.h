@@ -67,7 +67,7 @@ NOTHROW(FCALL task_getcomm_of)(struct task const *__restrict self,
 /* Set the command name of an arbitrary thread
  * NOTES:
  *  - `name' must be NUL-terminated and not longer than `TASK_COMM_LEN'!
- *    When `name[TASK_COMM_LEN-1]' isn't NUL, it will be replaced with
+ *    When `name[TASK_COMM_LEN-1]' isn't NUL,  it will be replaced  with
  *    that character in `this_comm'
  *  - `name' must not contain any 0xff bytes. If any byte with that value
  *    is encountered, it will be replaced by `0x00'

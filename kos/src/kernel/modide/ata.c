@@ -430,8 +430,8 @@ do_cancel:
 	PREEMPTION_POP(was);
 }
 
-/* Return the # of bytes that have already been transfered as part
- * of the currently in-progress AIO operation. If no AIO operation
+/* Return the # of bytes that have already been transferred as part
+ * of the currently in-progress AIO operation. If no AIO  operation
  * is currently in progress, the return value is weakly undefined. */
 PRIVATE NOBLOCK size_t
 NOTHROW(FCALL AtaBus_HW_GetDmaProgress)(AtaBus *__restrict self) {

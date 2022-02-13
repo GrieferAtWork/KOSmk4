@@ -46,7 +46,7 @@ DECL_BEGIN
  * Note that these functions behave similar to memcpy_nopf(), in that they
  * will only ever copy _true_ RAM, and never access VIO or cause  LOA/COW.
  * @return: 0 : The copy operation completed without any problems.
- * @return: * : The number of bytes that could not be transfered.
+ * @return: * : The number of bytes that could not be transferred.
  *              The affected memory range is:
  *               - `buf + num_bytes - return ... buf + num_bytes - 1' */
 PUBLIC NOBLOCK NONNULL((1)) size_t

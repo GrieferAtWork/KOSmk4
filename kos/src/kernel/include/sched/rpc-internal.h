@@ -179,7 +179,7 @@ NOTHROW(FCALL task_rpc_schedule)(struct task *__restrict thread,
 #endif /* __cplusplus */
 
 /* Same as `task_rpc_schedule()', but schedule the RPC for execution
- * by some arbitrary thread apart of the process `proc->tp_pctl'.
+ * by some arbitrary  thread apart of  the process  `proc->tp_pctl'.
  * NOTE: Process-directed user-RPCs must not make use of `RPC_SYNCMODE_F_REQUIRE_SC'
  *       or `RPC_SYNCMODE_F_REQUIRE_CP'. Attempting to do so causes this function to
  *       trigger an internal assertion check.

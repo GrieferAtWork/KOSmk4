@@ -182,10 +182,10 @@ EIDECLARE(, USER CHECKED void const *, , FCALL, validate_executable, (UNCHECKED 
  * page of kernel-space, putting an end to  user-space trying to trick us into  using
  * our own memory!
  *
- * NOTE: If any of these assertions fail, you might be applying sign extension to a
+ * NOTE: If any of these assertions fail, you  might be applying sign extension to  a
  *       compatibility-mode pointer, or a given pointer isn't actually proper compat-
  *       mode.
- *       Also note that system interfaces that allow compatibility-mode to define
+ *       Also note that system interfaces  that allow compatibility-mode to  define
  *       native-sized pointers mustn't use these validation macros, since obviously
  *       those pointers can't be considered compatibility-mode.
  */

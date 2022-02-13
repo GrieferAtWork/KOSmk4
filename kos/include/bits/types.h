@@ -163,9 +163,6 @@ __DECL_BEGIN
 #ifndef __SIZEOF_UID_T__
 #define __SIZEOF_UID_T__            4
 #endif /* !__SIZEOF_UID_T__ */
-#ifndef __SIZEOF_JTIME_T__
-#define __SIZEOF_JTIME_T__          8
-#endif /* !__SIZEOF_JTIME_T__ */
 #ifndef __SIZEOF_TIMER_T__
 #define __SIZEOF_TIMER_T__          __SIZEOF_POINTER__
 #endif /* !__SIZEOF_TIMER_T__ */
@@ -403,7 +400,6 @@ typedef __bitwise__ __UINT64_TYPE__ __be64;
 #define __gid_t           __CRT_PRIVATE_UINT(__SIZEOF_GID_T__)
 #define __uid_t           __CRT_PRIVATE_UINT(__SIZEOF_UID_T__)
 #define __useconds_t      __CRT_PRIVATE_UINT(__SIZEOF_USECONDS_T__)
-#define __jtime_t         __CRT_PRIVATE_UINT(__SIZEOF_JTIME_T__)
 #define __fsword_t        __CRT_PRIVATE_SLNG(__SIZEOF_FSWORD_T__)
 #define __port_t          __CRT_PRIVATE_UINT(__SIZEOF_PORT_T__)
 #define __physaddr_t      __CRT_PRIVATE_ULNG(__SIZEOF_PHYSADDR_T__)
@@ -414,16 +410,17 @@ typedef __bitwise__ __UINT64_TYPE__ __be64;
 #define _TIME64_T_DEFINED 1
 #define __time64_t        __CRT_PRIVATE_SINT(__SIZEOF_TIME64_T__)
 #define __ioctl_t         __CRT_PRIVATE_ULNG(__SIZEOF_IOCTL_T__) /* Type for `ioctl(2)'s `cmd' argument. */
-#define __fcntl_t         __CRT_PRIVATE_UINT(__SIZEOF_FCNTL_T__) /* Type for `fcntl(2)'s `cmd' argument. */
 
 /* Types that change sign based on feature flags. */
 #ifdef __USE_KOS_ALTERATIONS
+#define __fcntl_t    __CRT_PRIVATE_UINT(__SIZEOF_FCNTL_T__) /* Type for `fcntl(2)'s `cmd' argument. */
 #define __oflag_t    __CRT_PRIVATE_UINT(__SIZEOF_OFLAG_T__)
 #define __atflag_t   __CRT_PRIVATE_UINT(__SIZEOF_ATFLAG_T__)
 #define __blkcnt32_t __CRT_PRIVATE_ULNG(__SIZEOF_BLKCNT32_T__)
 #define __blkcnt64_t __CRT_PRIVATE_ULNG(__SIZEOF_BLKCNT64_T__)
 #define __blksize_t  __CRT_PRIVATE_ULNG(__SIZEOF_BLKSIZE_T__)
 #else /* __USE_KOS_ALTERATIONS */
+#define __fcntl_t    __CRT_PRIVATE_SINT(__SIZEOF_FCNTL_T__) /* Type for `fcntl(2)'s `cmd' argument. */
 #define __oflag_t    __CRT_PRIVATE_SINT(__SIZEOF_OFLAG_T__)
 #define __atflag_t   __CRT_PRIVATE_SINT(__SIZEOF_ATFLAG_T__)
 #define __blkcnt32_t __CRT_PRIVATE_SLNG(__SIZEOF_BLKCNT32_T__)
