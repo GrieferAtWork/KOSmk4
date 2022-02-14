@@ -889,12 +889,12 @@ again_write_ctl:
 PRIVATE WUNUSED bool FCALL
 is_ignoring_SIGCLD(void) THROWS(E_WOULDBLOCK) {
 	bool result;
-	struct sighand_ptr *handptr;
+	struct sighand_ptr *ptr;
 	struct sighand *hand;
-	handptr = THIS_SIGHAND_PTR;
-	if (!handptr)
+	ptr = THIS_SIGHAND_PTR;
+	if (!ptr)
 		return false;
-	hand = sighand_ptr_lockread(handptr);
+	hand = sighand_ptr_lockread(ptr);
 	if unlikely(!hand)
 		return false;
 	result = (hand->sh_actions[SIGCLD - 1].sa_flags & SA_NOCLDWAIT) || /* This also triggers `SIG_IGN' behavior! */

@@ -199,7 +199,7 @@ abort_SIGINT_program_without_exception_handler(struct icpustate *__restrict stat
  * This function also implements handling of `SA_RESETHAND' */
 PRIVATE WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
 userexcept_callsignal_and_maybe_restart_syscall(struct icpustate *__restrict state,
-                                                struct kernel_sigaction_ const *__restrict action,
+                                                struct kernel_sigaction const *__restrict action,
                                                 siginfo_t const *__restrict siginfo,
                                                 struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT) {
@@ -280,7 +280,7 @@ userexcept_raisesignal_from_exception(struct icpustate *__restrict state,
                                       struct exception_info const *__restrict error)
 		THROWS(E_SEGFAULT) {
 	struct icpustate *result;
-	struct kernel_sigaction_ action;
+	struct kernel_sigaction action;
 	siginfo_t siginfo;
 
 	/* Try to translate the given `error' into a signal. */
@@ -295,20 +295,7 @@ userexcept_raisesignal_from_exception(struct icpustate *__restrict state,
 again_gethand:
 	assert(siginfo.si_signo != 0);
 	assert(siginfo.si_signo < NSIG);
-	if (!THIS_SIGHAND_PTR) {
-default_sighand:
-		action.sa_handler = SIG_DFL;
-		action.sa_flags   = 0;
-		action.sa_mask    = NULL;
-	} else {
-		struct sighand *hand;
-		hand = sighand_ptr_lockread(THIS_SIGHAND_PTR);
-		if unlikely(!hand)
-			goto default_sighand;
-		action = hand->sh_actions[siginfo.si_signo - 1];
-		xincref(action.sa_mask);
-		sync_endread(hand);
-	}
+	sighand_getaction(siginfo.si_signo, &action);
 
 	/* Check for special signal handlers. */
 	if (action.sa_handler == SIG_DFL)
@@ -317,13 +304,11 @@ default_sighand:
 
 	case __SIG_IGN:
 	case __SIG_CONT:
-		xdecref_unlikely(action.sa_mask);
 		if (sc_info)
 			state = userexcept_seterrno(state, sc_info, &error->ei_data);
 		return state;
 
 	case __SIG_CORE:
-		xdecref_unlikely(action.sa_mask);
 		/* If we've gotten here because of a system call, then we can assume that
 		 * the exception does have a kernel-space side, and thus we must  include
 		 * information about that exception's origin. */
@@ -331,15 +316,12 @@ default_sighand:
 		process_exit(W_EXITCODE(1, siginfo.si_signo) | WCOREFLAG);
 
 	case __SIG_TERM:
-		xdecref_unlikely(action.sa_mask);
 		process_exit(W_EXITCODE(1, siginfo.si_signo));
 
 	case __SIG_EXIT:
-		xdecref_unlikely(action.sa_mask);
 		task_exit(W_EXITCODE(1, siginfo.si_signo));
 
 	case __SIG_STOP:
-		xdecref_unlikely(action.sa_mask);
 		state = process_waitfor_SIG_CONT(state, W_STOPCODE(siginfo.si_signo));
 		return state;
 
@@ -347,10 +329,7 @@ default_sighand:
 	}
 
 	/* Invoke a regular, old signal handler. */
-	{
-		FINALLY_XDECREF_UNLIKELY(action.sa_mask);
-		result = userexcept_callsignal_and_maybe_restart_syscall(state, &action, &siginfo, sc_info);
-	}
+	result = userexcept_callsignal_and_maybe_restart_syscall(state, &action, &siginfo, sc_info);
 	if unlikely(!result)
 		goto again_gethand;
 	return result;
@@ -501,26 +480,12 @@ NOTHROW(FCALL userexcept_exec_user_rpc)(/*in|out*/ struct rpc_context *__restric
 		 * This is required for signal actions such as SIG_CORE, or
 		 * SIG_STOP, which introduce  custom control routing  which
 		 * could otherwise interfere with normal RPC handling. */
-		struct kernel_sigaction_ action;
+		struct kernel_sigaction action;
 		assert(rpc->pr_psig.si_signo != 0);
 		assert(rpc->pr_psig.si_signo < NSIG);
 again_load_threadsig_action:
-		if (!THIS_SIGHAND_PTR) {
-default_sighand:
-			action.sa_handler = SIG_DFL;
-			action.sa_flags   = 0;
-			action.sa_mask    = NULL;
-		} else {
-			struct sighand *hand;
-			/* NOTE: This call to `sighand_ptr_lockread()'
-			 * can't throw because preemption is  enabled! */
-			hand = sighand_ptr_lockread(THIS_SIGHAND_PTR);
-			if unlikely(!hand)
-				goto default_sighand;
-			action = hand->sh_actions[rpc->pr_psig.si_signo - 1];
-			xincref(action.sa_mask);
-			sync_endread(hand);
-		}
+		sighand_getaction(rpc->pr_psig.si_signo, &action);
+
 		/* Custom handlers. */
 again_switch_action_handler:
 		switch ((uintptr_t)action.sa_handler) {
@@ -583,10 +548,8 @@ again_switch_action_handler:
 			} EXCEPT {
 				/* Prioritize errors. */
 				struct exception_info *tls = except_info();
-				if (tls->ei_code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC)) {
-					xdecref_unlikely(action.sa_mask);
+				if (tls->ei_code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC))
 					return false; /* Load other RPCs and try again. */
-				}
 				if (except_priority(error->ei_code) < except_priority(tls->ei_code)) {
 					memcpy(error, tls, sizeof(struct exception_info));
 					ctx->rc_context = RPC_REASONCTX_SYSRET; /* Will need to return to user-space to handle this exception */
@@ -594,7 +557,6 @@ again_switch_action_handler:
 			}
 			break;
 		}
-		xdecref_unlikely(action.sa_mask);
 		assert(!(rpc->pr_flags & _RPC_CONTEXT_DONTFREE));
 		pending_rpc_free(rpc);
 	} else {

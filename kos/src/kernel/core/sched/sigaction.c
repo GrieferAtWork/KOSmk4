@@ -112,19 +112,8 @@ NOTHROW(FCALL task_setsighand_ptr)(struct sighand_ptr *newsighand_ptr) {
 
 
 
-
-
-
-PUBLIC NOBLOCK void
-NOTHROW(KCALL sighand_destroy)(struct sighand *__restrict self) {
-	unsigned int i;
-	for (i = 0; i < NSIG - 1; ++i)
-		xdecref(self->sh_actions[i].sa_mask);
-	kfree(self);
-}
-
-PUBLIC NOBLOCK void
-NOTHROW(KCALL sighand_ptr_destroy)(struct sighand_ptr *__restrict self) {
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL sighand_ptr_destroy)(struct sighand_ptr *__restrict self) {
 	if (self->sp_hand)
 		sighand_decshare(self->sp_hand);
 	kfree(self);
@@ -148,7 +137,7 @@ NOTHROW(KCALL sighand_ptr_destroy)(struct sighand_ptr *__restrict self) {
  * copy-on-write signal handler  tables, while still  keeping association  of
  * handlers in check when it comes to shared handler tables, as usually found
  * within the same process. */
-PUBLIC WUNUSED NONNULL((1)) struct sighand *KCALL
+PUBLIC WUNUSED NONNULL((1)) struct sighand *FCALL
 sighand_ptr_lockread(struct sighand_ptr *__restrict ptr)
 		THROWS(E_WOULDBLOCK) {
 	struct sighand *result;
@@ -167,7 +156,7 @@ again:
 	return result;
 }
 
-PUBLIC ATTR_RETNONNULL WUNUSED struct sighand *KCALL
+PUBLIC ATTR_RETNONNULL WUNUSED struct sighand *FCALL
 sighand_ptr_lockwrite(void) THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	struct sighand *result;
 	struct sighand_ptr *ptr;
@@ -226,6 +215,7 @@ again_lock_ptr:
 		kfree(result);
 		goto again_lock_ptr;
 	}
+
 	/* Got the handler table! - Now to lock it. */
 	lock_ok = sync_trywrite(result);
 	sync_endread(ptr);
@@ -233,6 +223,7 @@ again_lock_ptr:
 		task_yield();
 		goto again_lock_ptr;
 	}
+
 	/* At  this point we have a write-lock to the handler table.
 	 * Now we must verify that the table isn't being shared, and
 	 * if it is being shared, we must unshare it and replace  it
@@ -242,7 +233,6 @@ again_lock_ptr:
 		sync_endwrite(result);
 		copy = (struct sighand *)kmalloc(sizeof(struct sighand), GFP_NORMAL);
 		TRY {
-			unsigned int i;
 again_lock_ptr_for_copy:
 			sync_write(ptr);
 			COMPILER_READ_BARRIER();
@@ -267,12 +257,7 @@ again_lock_ptr_for_copy:
 				return result;
 			}
 			/* Initialize the new copy as a duplicate of the old handler table. */
-			memcpy(copy->sh_actions,
-			       result->sh_actions,
-			       sizeof(result->sh_actions));
-			/* Load references to signal masks. */
-			for (i = 0; i < NSIG - 1; ++i)
-				xincref(copy->sh_actions[i].sa_mask);
+			memcpy(copy->sh_actions, result->sh_actions, sizeof(result->sh_actions));
 			sync_endread(result);
 			copy->sh_share = 1; /* Only 1 sighand_ptr will use this copy (for now) */
 			atomic_rwlock_init_write(&copy->sh_lock);
@@ -298,9 +283,9 @@ again_lock_ptr_for_copy:
 
 /* Return the default action to perform when faced with `signo' configured as `SIG_DFL'
  * @return: * : One of `SIG_*' (excluding `SIG_DFL' and `SIG_GET') */
-PUBLIC NOBLOCK ATTR_CONST WUNUSED user_sighandler_func_t
-NOTHROW(KCALL sighand_default_action)(signo_t signo) {
-	user_sighandler_func_t result;
+PUBLIC NOBLOCK ATTR_CONST WUNUSED sighandler_t
+NOTHROW(FCALL sighand_default_action)(signo_t signo) {
+	sighandler_t result;
 	result = SIG_IGN;
 	switch (signo) {
 
@@ -364,6 +349,50 @@ NOTHROW(KCALL sighand_default_action)(signo_t signo) {
 	return result;
 }
 
+/* Copies the calling thread's action for `signo' into `*action' */
+PUBLIC NONNULL((2)) void FCALL
+sighand_getaction(signo_t signo, struct kernel_sigaction *__restrict action)
+		THROWS(E_WOULDBLOCK) {
+	struct sighand_ptr *ptr;
+	assert(signo >= 1 && signo < NSIG);
+	ptr = THIS_SIGHAND_PTR;
+	if (!ptr) {
+default_sighand:
+		action->sa_handler = SIG_DFL;
+		action->sa_flags   = 0;
+		sigemptyset(&action->sa_mask);
+	} else {
+		struct sighand *hand;
+		hand = sighand_ptr_lockread(ptr);
+		if unlikely(!hand)
+			goto default_sighand;
+		memcpy(action, &hand->sh_actions[signo - 1],
+		       sizeof(struct kernel_sigaction));
+		sync_endread(hand);
+	}
+}
+
+PUBLIC ATTR_PURE WUNUSED sighandler_t FCALL
+sighand_gethandler(signo_t signo)
+		THROWS(E_WOULDBLOCK) {
+	sighandler_t result = SIG_DFL;
+	struct sighand_ptr *ptr;
+	struct sighand *hand;
+	assert(signo >= 1 && signo <= NSIG);
+	ptr = THIS_SIGHAND_PTR;
+	if (ptr == NULL)
+		goto done;
+	hand = sighand_ptr_lockread(ptr);
+	if (hand == NULL)
+		goto done;
+	result = hand->sh_actions[signo - 1].sa_handler;
+	sync_endread(hand);
+done:
+	return result;
+}
+
+
+
 
 
 /* Reset  the current handler for `signo' when  `current_action' matches the currently set action.
@@ -371,9 +400,9 @@ NOTHROW(KCALL sighand_default_action)(signo_t signo) {
  * behavior of `SA_RESETHAND' when handling a signal.
  * @return: true:  Successfully reset the handler
  * @return: false: The given `current_action' didn't match the currently set action. */
-PUBLIC bool KCALL
+PUBLIC WUNUSED NONNULL((2)) bool FCALL
 sighand_reset_handler(signo_t signo,
-                      struct kernel_sigaction_ const *__restrict current_action)
+                      struct kernel_sigaction const *__restrict current_action)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	struct sighand *hand;
 	assert(signo != 0);
@@ -383,19 +412,14 @@ sighand_reset_handler(signo_t signo,
 	hand = sighand_ptr_lockwrite();
 	if (memcmp(current_action,
 	           &hand->sh_actions[signo - 1],
-	           sizeof(struct kernel_sigaction_)) != 0) {
+	           sizeof(struct kernel_sigaction)) != 0) {
 		sync_endwrite(hand);
 		return false;
 	}
+
 	/* Reset the action. */
-	bzero(&hand->sh_actions[signo - 1],
-	      sizeof(struct kernel_sigaction_));
+	bzero(&hand->sh_actions[signo - 1], sizeof(struct kernel_sigaction));
 	sync_endwrite(hand);
-	/* Drop the reference held by the `sh_actions' vector.
-	 * Note however that since the caller must have copied that action at one point,
-	 * they  must currently  be holding a  reference to its  `sa_mask', meaning that
-	 * decref-ing that field mustn't be able to destroy the mask object! */
-	xdecref_nokill(current_action->sa_mask);
 	return true;
 }
 
@@ -405,7 +429,7 @@ sighand_reset_handler(signo_t signo,
  * SIG_IGN that wouldn't be set as such by default. */
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL sighand_has_nondefault_sig_ign)(struct sighand const *__restrict self) {
-	unsigned int i;
+	signo_t i;
 	for (i = 0; i < NSIG - 1; ++i) {
 		/* Check if the handler's action is SIG_IGN */
 		if (self->sh_actions[i].sa_handler != SIG_IGN)
@@ -539,17 +563,12 @@ done_handptr:
 #endif /* ... */
 
 #ifdef WANT_SIGACTION
-PRIVATE ATTR_PURE WUNUSED bool KCALL
-contains_nonzero_bytes(USER CHECKED void const *buf, size_t buflen) {
-	return memxchr(buf, 0, buflen) != NULL;
-}
-
 PRIVATE void KCALL
 sys_sigaction_impl(signo_t signo,
                    CHECKED USER struct kernel_sigaction const *act,
                    CHECKED USER struct kernel_sigaction *oact,
                    size_t sigsetsize) {
-	struct kernel_sigaction_ ohandler;
+	struct kernel_sigaction ohandler;
 	struct sighand *hand;
 	size_t overflow = 0;
 	if (sigsetsize > sizeof(sigset_t)) {
@@ -570,17 +589,13 @@ sys_sigaction_impl(signo_t signo,
 				if (!hand)
 					goto no_old_handler;
 				memcpy(&ohandler, &hand->sh_actions[signo - 1],
-				       sizeof(struct kernel_sigaction_));
-				xincref(ohandler.sa_mask);
+				       sizeof(struct kernel_sigaction));
 				sync_endread(hand);
-inherit_and_copy_ohandler:
-				FINALLY_XDECREF(ohandler.sa_mask);
+copy_old_handler:
 				COMPILER_WRITE_BARRIER();
-				oact->sa_handler  = ohandler.sa_handler;
-				oact->sa_flags    = ohandler.sa_flags;
-				oact->sa_restorer = ohandler.sa_restore;
-				memset(ohandler.sa_mask ? mempcpy(&oact->sa_mask, &ohandler.sa_mask->sm_mask, sigsetsize)
-				                        : mempset(&oact->sa_mask, 0, sigsetsize),
+				memset(mempcpy(oact, &ohandler,
+				               offsetof(struct kernel_sigaction, sa_mask) +
+				               sigsetsize),
 				       0xff, overflow);
 				COMPILER_WRITE_BARRIER();
 			} else {
@@ -589,10 +604,9 @@ no_old_handler:
 			}
 		}
 	} else {
-		struct kernel_sigaction_ nhandler;
-		COMPILER_READ_BARRIER();
-		nhandler.sa_handler = act->sa_handler;
-		nhandler.sa_flags   = act->sa_flags;
+		struct kernel_sigaction nhandler;
+		memset(mempcpy(&nhandler, act, offsetof(struct kernel_sigaction, sa_mask) + sigsetsize),
+		       0xff, sizeof(sigset_t) - sigsetsize);
 		COMPILER_READ_BARRIER();
 #ifndef KERNELSPACE_HIGHMEM
 		if ((uintptr_t)nhandler.sa_handler >= __SIG_GET)
@@ -600,50 +614,25 @@ no_old_handler:
 		{
 			validate_executable((void const *)nhandler.sa_handler);
 		}
+#ifdef __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER
+		if (nhandler.sa_flags & SA_RESTORER)
+			validate_executable((void const *)nhandler.sa_restorer);
+#endif /* __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER */
 		VALIDATE_FLAGSET(nhandler.sa_flags,
 		                 SA_NOCLDSTOP | SA_NOCLDWAIT | SA_SIGINFO |
 		                 SA_RESTORER | SA_ONSTACK | SA_RESTART |
 		                 SA_NODEFER | SA_RESETHAND | SA_INTERRUPT,
 		                 E_INVALID_ARGUMENT_CONTEXT_SIGACTION_ACT_FLAGS);
-		COMPILER_BARRIER();
-		nhandler.sa_restore = NULL;
-		if (nhandler.sa_flags & SA_RESTORER) {
-			nhandler.sa_restore = act->sa_restorer;
-			COMPILER_READ_BARRIER();
-			validate_executable((void const *)nhandler.sa_restore);
-		}
-		COMPILER_BARRIER();
-		nhandler.sa_mask = NULL;
-		/* Check if the given signal set is empty. */
-		if (contains_nonzero_bytes(&act->sa_mask, sigsetsize)) {
-			/* Must allocate a custom signal mask. */
-			REF struct kernel_sigmask *mask;
-			mask = (REF struct kernel_sigmask *)kmalloc(sizeof(struct kernel_sigmask), GFP_NORMAL);
-			TRY {
-				memcpy(&mask->sm_mask, &act->sa_mask, sigsetsize);
-			} EXCEPT {
-				kfree(mask);
-				RETHROW();
-			}
-			mask->sm_refcnt  = 1;
-			mask->sm_share   = 1;
-			nhandler.sa_mask = mask;
-		}
-		COMPILER_BARRIER();
-		TRY {
-			hand = sighand_ptr_lockwrite();
-		} EXCEPT {
-			kfree(nhandler.sa_mask);
-			RETHROW();
-		}
-		/* Change the signal action. */
-		memcpy(&ohandler, &hand->sh_actions[signo - 1], sizeof(ohandler));
-		memcpy(&hand->sh_actions[signo - 1], &nhandler, sizeof(nhandler));
+
+		/* Actually change signal actions. */
+		hand = sighand_ptr_lockwrite();
+		memcpy(&ohandler, &hand->sh_actions[signo - 1], sizeof(struct kernel_sigaction));
+		memcpy(&hand->sh_actions[signo - 1], &nhandler, sizeof(struct kernel_sigaction));
 		sync_endwrite(hand);
+
 		/* Check if user-space also wants to get the old action. */
-		if (oact)
-			goto inherit_and_copy_ohandler;
-		xdecref(ohandler.sa_mask);
+		if (oact != NULL)
+			goto copy_old_handler;
 	}
 }
 #endif /* WANT_SIGACTION */

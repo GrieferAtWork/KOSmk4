@@ -65,9 +65,9 @@
 #define __sigaction_sa_sigaction_t         __sigactionx64_sa_sigaction_t
 #define __sigactionx64                     sigaction
 #define __kernel_sigaction                 sigaction /* Binary compatible! */
-#ifdef __USE_KOS_KERNEL
+#if defined(__KERNEL__) || defined(__USE_KOS_KERNEL)
 #define kernel_sigaction sigaction /* Binary compatible! */
-#endif /* __USE_KOS_KERNEL */
+#endif /* __KERNEL__ || __USE_KOS_KERNEL */
 #ifndef ____sighandler_t_defined
 #define ____sighandler_t_defined
 #define __sigactionx64_sa_handler_t __sighandler_t

@@ -125,7 +125,7 @@ PRIVATE
 #endif /* __x86_64__ || !DEFINE_x86_userexcept_callsignal32 */
 ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
 LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
-                            struct kernel_sigaction_ const *__restrict action,
+                            struct kernel_sigaction const *__restrict action,
                             siginfo_t const *__restrict siginfo,
                             struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT) {
@@ -142,9 +142,11 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 
 	/* Figure out how, and if we need to mask signals. */
 	must_restore_sigmask = false;
-	if (action->sa_mask || !(action->sa_flags & SA_NODEFER)) {
+	if (!sigisemptyset(&action->sa_mask) || !(action->sa_flags & SA_NODEFER)) {
 #ifdef CONFIG_HAVE_USERPROCMASK
 		if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
+			size_t i;
+
 			/* NOTE: The below code is _very_ careful not to modify the userprocmask
 			 *       in cases where it's state already reflects what it needs to be.
 			 * This is required because the user's signal mask may point to read-only
@@ -164,17 +166,13 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 
 			/* Signal  actions are allowed  to define a secondary  set of signal numbers
 			 * that should be masked upon entry to the specific signal handler function. */
-			if (action->sa_mask != NULL) {
-				unsigned int i;
-				sigset_t const *more = &action->sa_mask->sm_mask;
-				for (i = 0; i < COMPILER_LENOF(old_sigmask.__val); ++i) {
-					ulongptr_t oldword, newword;
-					oldword = old_sigmask.__val[i];
-					newword = oldword | more->__val[i];
-					if (oldword != newword) {
-						umask->__val[i]      = newword;
-						must_restore_sigmask = true;
-					}
+			for (i = 0; i < COMPILER_LENOF(action->sa_mask.__val); ++i) {
+				ulongptr_t oldword, newword;
+				oldword = old_sigmask.__val[i];
+				newword = oldword | action->sa_mask.__val[i];
+				if (oldword != newword) {
+					umask->__val[i]      = newword;
+					must_restore_sigmask = true;
 				}
 			}
 		} else
@@ -192,8 +190,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 
 			/* Signal  actions are allowed  to define a secondary  set of signal numbers
 			 * that should be masked upon entry to the specific signal handler function. */
-			if (action->sa_mask != NULL)
-				sigorset(&new_sigmask, &new_sigmask, &action->sa_mask->sm_mask);
+			sigorset(&new_sigmask, &new_sigmask, &action->sa_mask);
 
 			/* Never mask SIGKILL or SIGSTOP */
 			sigdelset(&new_sigmask, SIGKILL);
@@ -394,7 +391,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 	 */
 
 	if (action->sa_flags & SA_RESTORER) {
-		user_rstor = (LOCAL_uintptr_t)(uintptr_t)action->sa_restore;
+		user_rstor = (LOCAL_uintptr_t)(uintptr_t)action->sa_restorer;
 	} else {
 		/* Must push assembly onto the user-stack:
 		 * >>     movl  $SYS_rt_sigreturn, %eax
@@ -421,7 +418,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 		validate_writable(usp, sizeof(sigreturn_invoke_assembly));
 		COMPILER_WRITE_BARRIER();
 		memcpy(usp, sigreturn_invoke_assembly, sizeof(sigreturn_invoke_assembly));
-		user_rstor = (LOCAL_uintptr_t)(uintptr_t)(user_sigrestore_func_t)usp;
+		user_rstor = (LOCAL_uintptr_t)(uintptr_t)usp;
 	}
 
 	/* Push the arguments for the actual signal handler. */

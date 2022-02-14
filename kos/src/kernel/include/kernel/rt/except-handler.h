@@ -27,6 +27,7 @@
 #include <kernel/arch/rt/except-handler.h>
 #include <kernel/types.h>
 
+#include <bits/os/sigaction.h> /* `struct kernel_sigaction' */
 #include <kos/bits/syscall-info.h>
 #include <kos/rpc.h>
 
@@ -139,7 +140,7 @@ typedef struct __siginfo_struct siginfo_t;
  * @return: * :     The updated CPU state. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
 userexcept_callsignal(struct icpustate *__restrict state,
-                      struct kernel_sigaction_ const *__restrict action,
+                      struct kernel_sigaction const *__restrict action,
                       siginfo_t const *__restrict siginfo,
                       struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT);

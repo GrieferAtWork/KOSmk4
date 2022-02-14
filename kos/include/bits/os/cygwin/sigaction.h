@@ -48,6 +48,9 @@
 #define __ALIGNOF_SIGACTION          __ALIGNOF_SIGACTION_CYGWIN
 #define __sigaction_cygwin           sigaction
 #define __kernel_sigaction           sigaction
+#if defined(__KERNEL__) || defined(__USE_KOS_KERNEL)
+#define kernel_sigaction sigaction
+#endif /* __KERNEL__ || __USE_KOS_KERNEL */
 #ifndef ____sighandler_t_defined
 #define ____sighandler_t_defined
 #define __sighandler_cygwin_t __sighandler_t

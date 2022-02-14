@@ -82,23 +82,14 @@ NOTHROW(KCALL ttydev_log_delsession)(struct ttydev *__restrict self,
 
 
 /* Chechk if the given `signo' is marked, or handled as SIG_IGN */
-PRIVATE WUNUSED bool FCALL
+PRIVATE ATTR_PURE WUNUSED bool FCALL
 is_signal_ignored(signo_t signo)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
-	bool result;
-	struct sighand_ptr *handptr;
-	struct sighand *hand;
 	if (sigmask_ismasked(signo))
-		return true;
-	handptr = THIS_SIGHAND_PTR;
-	if (!handptr)
-		return false;
-	hand = sighand_ptr_lockread(handptr);
-	if unlikely(!hand)
-		return false;
-	result = hand->sh_actions[signo - 1].sa_handler == SIG_IGN;
-	sync_endread(hand);
-	return result;
+		return true; /* Signal is masked */
+	if (sighand_gethandler(signo) == SIG_IGN)
+		return true; /* Signal is defined as ignored */
+	return false;
 }
 
 /* @param: signo: One of `SIGTTOU' or `SIGTTIN' */

@@ -65,12 +65,12 @@
 #define __sigaction_sa_restorer_t          __sigactionx32_sa_restorer_t
 #define __sigaction_sa_sigaction_t         __sigactionx32_sa_sigaction_t
 #define __sigactionx32                     sigaction
-#ifdef __USE_KOS_KERNEL
+#if defined(__KERNEL__) || defined(__USE_KOS_KERNEL)
 #define __kernel_sigaction    kernel_sigaction
 #define __kernel_sigactionx32 kernel_sigaction
-#else /* __USE_KOS_KERNEL */
+#else /* __KERNEL__ || __USE_KOS_KERNEL */
 #define __kernel_sigactionx32 __kernel_sigaction
-#endif /* !__USE_KOS_KERNEL */
+#endif /* !__KERNEL__ && !__USE_KOS_KERNEL */
 #ifdef __USE_KOS_KERNEL
 #define __OFFSET_OLD_KERNEL_SIGACTION_HANDLER   __OFFSET_OLD_KERNEL_SIGACTIONX32_HANDLER
 #define __OFFSET_OLD_KERNEL_SIGACTION_MASK      __OFFSET_OLD_KERNEL_SIGACTIONX32_MASK

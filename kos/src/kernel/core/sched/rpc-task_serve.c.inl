@@ -156,7 +156,7 @@ handle_pending:
 					 * signal  being discarded, the system call being started, and all of
 					 * it starting again by the thread sending itself the signal again! */
 					if (rpc->pr_flags & RPC_CONTEXT_SIGNAL) {
-						user_sighandler_func_t func;
+						sighandler_t func;
 						struct sighand_ptr *handptr;
 						func    = SIG_DFL;
 						handptr = THIS_SIGHAND_PTR;

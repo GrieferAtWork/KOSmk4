@@ -163,10 +163,13 @@ struct sigaction /*[PREFIX(sa_)]*/ {
 /* This is the struct accepted by `sys_rt_sigaction(2)' */
 #ifdef __ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION
 #define __kernel_sigaction sigaction
-#ifdef __USE_KOS_KERNEL
+#if defined(__KERNEL__) || defined(__USE_KOS_KERNEL)
 #define kernel_sigaction sigaction
-#endif /* __USE_KOS_KERNEL */
+#endif /* __KERNEL__ || __USE_KOS_KERNEL */
 #else /* __ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION */
+#if defined(__KERNEL__) || defined(__USE_KOS_KERNEL)
+#define __kernel_sigaction kernel_sigaction
+#endif /* __KERNEL__ || __USE_KOS_KERNEL */
 struct __kernel_sigaction /*[NAME(kernel_sigaction)][PREFIX(sa_)]*/ {
 #ifdef __ARCH_HAVE_IRIX_KERNEL_SIGACTION
 	__ULONGPTR_TYPE__         sa_flags;    /* Special flags (set of `SA_*' from <signal.h>) */

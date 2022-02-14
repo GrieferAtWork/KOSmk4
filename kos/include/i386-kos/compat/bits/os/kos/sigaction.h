@@ -30,6 +30,9 @@
 #define __compat_sigaction_sa_handler_t   __sigactionx32_sa_handler_t
 #define __compat_sigaction_sa_restorer_t  __sigactionx32_sa_restorer_t
 #define __compat_sigaction_sa_sigaction_t __sigactionx32_sa_sigaction_t
+#if defined(__KERNEL__) || defined(__USE_KOS_KERNEL)
+#define compat_kernel_sigaction __kernel_sigactionx32
+#endif /* __KERNEL__ || __USE_KOS_KERNEL */
 #ifdef __USE_KOS_KERNEL
 #define __compat_old_kernel_sigaction     __old_kernel_sigactionx32
 #endif /* __USE_KOS_KERNEL */
