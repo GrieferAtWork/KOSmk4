@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63c3f0e7 */
+/* HASH CRC-32:0x32094889 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -176,8 +176,8 @@
  * the old signal mask.
  * @param: set: The set of signals on which to wait
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
-#define SYS_sigsuspend                   __NR_sigsuspend                   /* errno_t sigsuspend(struct __sigset_struct const *set) */
-#define SYS_sigpending                   __NR_sigpending                   /* errno_t sigpending(struct __sigset_struct *set) */
+#define SYS_sigsuspend                   __NR_sigsuspend                   /* errno_t sigsuspend(struct __old_sigset_struct const *set) */
+#define SYS_sigpending                   __NR_sigpending                   /* errno_t sigpending(struct __old_sigset_struct *set) */
 #define SYS_sethostname                  __NR_sethostname                  /* errno_t sethostname(char const *name, size_t len) */
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 #define SYS_setrlimit                    __NR_setrlimit                    /* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
@@ -265,7 +265,7 @@
 /* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
 #define SYS_mprotect                     __NR_mprotect                     /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
-#define SYS_sigprocmask                  __NR_sigprocmask                  /* errno_t sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset) */
+#define SYS_sigprocmask                  __NR_sigprocmask                  /* errno_t sigprocmask(syscall_ulong_t how, struct __old_sigset_struct const *set, struct __old_sigset_struct *oset) */
 #define SYS_create_module                __NR_create_module                /* errno_t create_module(void) */
 /* Load a  kernel  driver  from an  ELF  image  `module_image...+=len'
  * This system call exists for linux compatibility, and is implemented

@@ -795,26 +795,19 @@ sys_rt_sigsuspend_impl(struct icpustate *__restrict state,
 	USER UNCHECKED sigset_t *uthese;
 	uthese     = (USER UNCHECKED sigset_t *)sc_info->rsi_regs[0];
 	sigsetsize = (size_t)sc_info->rsi_regs[1];
-	if unlikely(sigsetsize != sizeof(sigset_t)) {
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-		      sigsetsize);
-	}
-	validate_readable(uthese, sizeof(sigset_t));
-	memcpy(&these, uthese, sizeof(sigset_t));
+
+	validate_readable(uthese, sigsetsize);
+	if (sigsetsize > sizeof(sigset_t))
+		sigsetsize = sizeof(sigset_t);
+	memset(mempcpy(&these, uthese, sigsetsize),
+	       0xff, sizeof(sigset_t) - sigsetsize);
 
 	/* These signals cannot be masked.  */
 	sigdelset(&these, SIGSTOP);
 	sigdelset(&these, SIGKILL);
 
-	/* Indicate that we want to receive wake-ups for masked signals. */
-	ATOMIC_OR(THIS_TASK->t_flags, TASK_FWAKEONMSKRPC);
-
-	/* This will clear `TASK_FWAKEONMSKRPC', as well as
-	 * perform a check for signals not in `these' which
-	 * may have also appeared in the mean time prior to
-	 * returning to user-space. */
-	userexcept_sysret_inject_self();
+	/* Prepare the calling thread for a sigsuspend() operation. */
+	sigmask_prepare_sigsuspend();
 again:
 	TRY {
 		/* The  normal implementation of the system call,
@@ -834,7 +827,7 @@ again:
 		/* This function  only returns  normally
 		 * when the syscall should be restarted. */
 		state = userexcept_handler_with_sigmask(state, sc_info, &these);
-		PERTASK_SET(this_exception_code, 1); /* Prevent internal fault */
+		PERTASK_SET(this_exception_code, 1); /* Prevent internal fault (leaving EXCEPT asserts `except_active()') */
 		goto again;
 	}
 	__builtin_unreachable();

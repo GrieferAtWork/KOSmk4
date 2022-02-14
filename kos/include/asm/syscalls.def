@@ -1515,8 +1515,8 @@ ssetmask:([tostr(SIGMASK)] syscall_ulong_t sigmask) -> [tostr(SIGMASK)] syscall_
 
 @@@param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
 sigprocmask:([tostr(SIGPROCMASK_HOW)] syscall_ulong_t how,
-             [tostr(STRUCT_SIGSET)] struct __sigset_struct const *set,
-             [tostr(out:STRUCT_SIGSET)] struct __sigset_struct *oset) -> errno_t;
+             [tostr(STRUCT_SIGSET)] struct __old_sigset_struct const *set,
+             [tostr(out:STRUCT_SIGSET)] struct __old_sigset_struct *oset) -> errno_t;
 
 @@@param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
 rt_sigprocmask:([tostr(SIGPROCMASK_HOW)] syscall_ulong_t how,
@@ -1660,7 +1660,7 @@ rt_tgsigqueueinfo:(pid_t pid, pid_t tid, signo_t usigno, [tostr(STRUCT_SIGINFO)]
 @@@return: 0 : Always, unconditionally returned.
 [restart(dont)] rpc_serve_sysret:() -> errno_t;
 
-sigpending:(struct __sigset_struct *set) -> errno_t;
+sigpending:(struct __old_sigset_struct *set) -> errno_t;
 rt_sigpending:([tostr(out:STRUCT_SIGSET:sigsetsize)] struct __sigset_struct *set,
                size_t sigsetsize) -> errno_t;
 
@@ -1671,7 +1671,7 @@ rt_sigpending:([tostr(out:STRUCT_SIGSET:sigsetsize)] struct __sigset_struct *set
 @@@param: set: The set of signals on which to wait
 @@@return: -1: [errno=EINTR] The signal handler for `signo' was executed.
 [cp][restart(dont)]
-sigsuspend:([tostr(STRUCT_SIGSET)] struct __sigset_struct const *set) -> errno_t;
+sigsuspend:([tostr(STRUCT_SIGSET)] struct __old_sigset_struct const *set) -> errno_t;
 [cp][restart(dont)][doc_alias(sigsuspend)]
 rt_sigsuspend:([tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *set,
                size_t sigsetsize) -> errno_t;
@@ -1679,9 +1679,9 @@ rt_sigsuspend:([tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *s
 vhangup:() -> errno_t; /* UNIMPLEMENTED! */
 
 %[startgroup]
-[restart(must)][noexcept] sigreturn:([tostr(STRUCT_FPUSTATE)] struct fpustate const *restore_fpu, [tostr(STRUCT_SIGSET)] struct __sigset_struct const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO)] struct rpc_syscall_info const *sc_info, [tostr(STRUCT_UCPUSTATE)] struct ucpustate const *restore_cpu);
-[restart(must)][noexcept] sigreturn32:([tostr(STRUCT_FPUSTATE32)] struct fpustate32 const *restore_fpu, [tostr(STRUCT_SIGSET)] struct __sigset_struct const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO32)] struct rpc_syscall_info32 const *sc_info, [tostr(STRUCT_UCPUSTATE32)] struct ucpustate32 const *restore_cpu);
-[restart(must)][noexcept] sigreturn64:([tostr(STRUCT_FPUSTATE64)] struct fpustate64 const *restore_fpu, [tostr(STRUCT_SIGSET)] struct __sigset_struct const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO64)] struct rpc_syscall_info64 const *sc_info, [tostr(STRUCT_UCPUSTATE64)] struct ucpustate64 const *restore_cpu);
+[restart(must)][noexcept] sigreturn:([tostr(STRUCT_FPUSTATE)] struct fpustate const *restore_fpu, [tostr(STRUCT_SIGSET)] struct __old_sigset_struct const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO)] struct rpc_syscall_info const *sc_info, [tostr(STRUCT_UCPUSTATE)] struct ucpustate const *restore_cpu);
+[restart(must)][noexcept] sigreturn32:([tostr(STRUCT_FPUSTATE32)] struct fpustate32 const *restore_fpu, [tostr(STRUCT_SIGSET)] struct __old_sigset_struct const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO32)] struct rpc_syscall_info32 const *sc_info, [tostr(STRUCT_UCPUSTATE32)] struct ucpustate32 const *restore_cpu);
+[restart(must)][noexcept] sigreturn64:([tostr(STRUCT_FPUSTATE64)] struct fpustate64 const *restore_fpu, [tostr(STRUCT_SIGSET)] struct __old_sigset_struct const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO64)] struct rpc_syscall_info64 const *sc_info, [tostr(STRUCT_UCPUSTATE64)] struct ucpustate64 const *restore_cpu);
 [restart(must)][noexcept] rt_sigreturn:([tostr(STRUCT_FPUSTATE)] struct fpustate const *restore_fpu, [tostr(STRUCT_SIGSET)] struct __sigset_struct const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO)] struct rpc_syscall_info const *sc_info, [tostr(STRUCT_UCPUSTATE)] struct ucpustate const *restore_cpu);
 [restart(must)][noexcept] rt_sigreturn32:([tostr(STRUCT_FPUSTATE32)] struct fpustate32 const *restore_fpu, [tostr(STRUCT_SIGSET)] struct __sigset_struct const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO32)] struct rpc_syscall_info32 const *sc_info, [tostr(STRUCT_UCPUSTATE32)] struct ucpustate32 const *restore_cpu);
 [restart(must)][noexcept] rt_sigreturn64:([tostr(STRUCT_FPUSTATE64)] struct fpustate64 const *restore_fpu, [tostr(STRUCT_SIGSET)] struct __sigset_struct const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO64)] struct rpc_syscall_info64 const *sc_info, [tostr(STRUCT_UCPUSTATE64)] struct ucpustate64 const *restore_cpu);

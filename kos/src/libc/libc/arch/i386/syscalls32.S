@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x126ede7c */
+/* HASH CRC-32:0xcbf794ee */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -789,14 +789,14 @@ DEFINE_PUBLIC_ALIAS(sys_setregid, libc_sys_setregid)
  * the old signal mask.
  * @param: set: The set of signals on which to wait
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
-/* errno_t sigsuspend(struct __sigset_struct const *set) */
+/* errno_t sigsuspend(struct __old_sigset_struct const *set) */
 INTERN_FUNCTION(libc_sys_sigsuspend)
 	movl   $(0x48), %eax
 	jmp    libc_x86_exec_syscall1
 END(libc_sys_sigsuspend)
 DEFINE_PUBLIC_ALIAS(sys_sigsuspend, libc_sys_sigsuspend)
 
-/* errno_t sigpending(struct __sigset_struct *set) */
+/* errno_t sigpending(struct __old_sigset_struct *set) */
 INTERN_FUNCTION(libc_sys_sigpending)
 	movl   $(0x49), %eax
 	jmp    libc_x86_exec_syscall1
@@ -1202,7 +1202,7 @@ END(libc_sys_mprotect)
 DEFINE_PUBLIC_ALIAS(sys_mprotect, libc_sys_mprotect)
 
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
-/* errno_t sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset) */
+/* errno_t sigprocmask(syscall_ulong_t how, struct __old_sigset_struct const *set, struct __old_sigset_struct *oset) */
 INTERN_FUNCTION(libc_sys_sigprocmask)
 	movl   $(0x7e), %eax
 	jmp    libc_x86_exec_syscall3
@@ -5251,14 +5251,14 @@ DEFINE_PUBLIC_ALIAS(sys_Xsetregid, libc_sys_Xsetregid)
  * the old signal mask.
  * @param: set: The set of signals on which to wait
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
-/* errno_t sigsuspend(struct __sigset_struct const *set) */
+/* errno_t sigsuspend(struct __old_sigset_struct const *set) */
 INTERN_FUNCTION(libc_sys_Xsigsuspend)
 	movl   $(0x48), %eax
 	jmp    libc_x86_exec_Xsyscall1
 END(libc_sys_Xsigsuspend)
 DEFINE_PUBLIC_ALIAS(sys_Xsigsuspend, libc_sys_Xsigsuspend)
 
-/* errno_t sigpending(struct __sigset_struct *set) */
+/* errno_t sigpending(struct __old_sigset_struct *set) */
 INTERN_FUNCTION(libc_sys_Xsigpending)
 	movl   $(0x49), %eax
 	jmp    libc_x86_exec_Xsyscall1
@@ -5651,7 +5651,7 @@ END(libc_sys_Xmprotect)
 DEFINE_PUBLIC_ALIAS(sys_Xmprotect, libc_sys_Xmprotect)
 
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
-/* errno_t sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset) */
+/* errno_t sigprocmask(syscall_ulong_t how, struct __old_sigset_struct const *set, struct __old_sigset_struct *oset) */
 INTERN_FUNCTION(libc_sys_Xsigprocmask)
 	movl   $(0x7e), %eax
 	jmp    libc_x86_exec_Xsyscall3

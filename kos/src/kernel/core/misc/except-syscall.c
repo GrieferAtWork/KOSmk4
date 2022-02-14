@@ -435,6 +435,7 @@ DEFINE_SYSCALL1(errno_t, set_userprocmask_address,
 		/* Verify that the controller's idea of the size of a signal set matches our's */
 		sigsetsize = ATOMIC_READ(ctl->pm_sigsize);
 		if (sigsetsize != sizeof(sigset_t)) {
+			/* TODO: Allow variable-sized signal masks! */
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
 			      sigsetsize);

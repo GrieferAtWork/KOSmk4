@@ -151,6 +151,14 @@ NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo);
 #endif /* !CONFIG_HAVE_USERPROCMASK */
 
 
+/* Prepare the calling thread for a sigsuspend operation.
+ *
+ * This  function must be  called during the  setup phase of a
+ * system call that intends to use `task_serve_with_sigmask()' */
+FUNDEF NOBLOCK void
+NOTHROW(FCALL sigmask_prepare_sigsuspend)(void);
+
+
 DECL_END
 #endif /* __CC__ */
 

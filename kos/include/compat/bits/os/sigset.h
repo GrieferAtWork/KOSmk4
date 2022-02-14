@@ -22,8 +22,13 @@
 
 #include <compat/config.h>
 #ifdef __ARCH_HAVE_COMPAT
+#include <features.h>
+
 #include <bits/os/sigset.h>
 #define __compat_sigset_struct __sigset_struct
+#ifdef __USE_KOS_KERNEL
+#define __compat_old_sigset_struct __old_sigset_struct
+#endif /* __USE_KOS_KERNEL */
 #endif /* __ARCH_HAVE_COMPAT */
 
 #endif /* !_COMPAT_BITS_OS_SIGSET_H */

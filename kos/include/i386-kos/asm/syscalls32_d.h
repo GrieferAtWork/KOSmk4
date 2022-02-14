@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32368855 */
+/* HASH CRC-32:0x8874b01f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -173,8 +173,8 @@
  * the old signal mask.
  * @param: set: The set of signals on which to wait
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
-#define __NR32_sigsuspend                   0x48                   /* errno_t sigsuspend(struct __sigset_struct const *set) */
-#define __NR32_sigpending                   0x49                   /* errno_t sigpending(struct __sigset_struct *set) */
+#define __NR32_sigsuspend                   0x48                   /* errno_t sigsuspend(struct __old_sigset_struct const *set) */
+#define __NR32_sigpending                   0x49                   /* errno_t sigpending(struct __old_sigset_struct *set) */
 #define __NR32_sethostname                  0x4a                   /* errno_t sethostname(char const *name, size_t len) */
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 #define __NR32_setrlimit                    0x4b                   /* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
@@ -262,7 +262,7 @@
 /* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
 #define __NR32_mprotect                     0x7d                   /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
-#define __NR32_sigprocmask                  0x7e                   /* errno_t sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset) */
+#define __NR32_sigprocmask                  0x7e                   /* errno_t sigprocmask(syscall_ulong_t how, struct __old_sigset_struct const *set, struct __old_sigset_struct *oset) */
 #define __NR32_create_module                0x7f                   /* errno_t create_module(void) */
 /* Load a  kernel  driver  from an  ELF  image  `module_image...+=len'
  * This system call exists for linux compatibility, and is implemented

@@ -581,19 +581,12 @@ DEFINE_COMPAT_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 #ifdef WANT_SIGTIMEDWAIT
 /* @return: 0 : The timeout has expired
  * @return: * : The accepted signal number */
-PRIVATE signo_t KCALL
-signal_waitfor(CHECKED USER sigset_t const *uthese,
+PRIVATE NONNULL((1)) signo_t KCALL
+signal_waitfor(sigset_t const *__restrict these,
                CHECKED USER siginfo_t *uinfo,
                ktime_t abs_timeout) {
-	sigset_t these;
 	assert(!task_wasconnected());
 	assert(PREEMPTION_ENABLED());
-	memcpy(&these, uthese, sizeof(sigset_t));
-	COMPILER_BARRIER();
-	/* Make sure that we don't steal these signals */
-	sigdelset(&these, SIGKILL);
-	sigdelset(&these, SIGSTOP);
-	COMPILER_WRITE_BARRIER();
 
 	/* Since we may (very likely)  be waiting for signals that  are
 	 * currently masked,  we need  to make  certain that  we  still
@@ -610,9 +603,9 @@ signal_waitfor(CHECKED USER sigset_t const *uthese,
 		PREEMPTION_DISABLE();
 
 		/* Try to steal RPCs. */
-		rpc = task_rpc_pending_steal_posix_signal(&these);
+		rpc = task_rpc_pending_steal_posix_signal(these);
 		if (rpc == NULL) {
-			rpc = proc_rpc_pending_trysteal_posix_signal(&these);
+			rpc = proc_rpc_pending_trysteal_posix_signal(these);
 			if (rpc == PROC_RPC_PENDING_TRYSTEAL_POSIX_SIGNAL_WOULDBLOCK) {
 				struct process_pending_rpcs *proc_rpcs;
 				PREEMPTION_ENABLE();
@@ -653,23 +646,27 @@ DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait,
                 UNCHECKED USER siginfo_t *, uinfo,
                 UNCHECKED USER struct timespec32 const *, uts,
                 size_t, sigsetsize) {
+	sigset_t these;
 	syscall_slong_t result;
 	ktime_t abs_timeout = KTIME_INFINITE;
-	/* Validate user-structure pointers. */
-	if unlikely(sigsetsize != sizeof(sigset_t)) {
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-		      sigsetsize);
-	}
 	validate_readable(uthese, sigsetsize);
 	validate_writable(uinfo, sizeof(siginfo_t));
+	if (sigsetsize > sizeof(sigset_t))
+		sigsetsize = sizeof(sigset_t);
+	bzero(mempcpy(&these, uthese, sigsetsize),
+	      sizeof(sigset_t) - sigsetsize);
+
+	/* Make sure that we don't steal these signals */
+	sigdelset(&these, SIGKILL);
+	sigdelset(&these, SIGSTOP);
+
 	if (uts) {
 		validate_readable(uts, sizeof(*uts));
 		abs_timeout = relktime_from_user_rel(uts);
 		if (abs_timeout != 0)
 			abs_timeout += ktime();
 	}
-	result = (syscall_slong_t)signal_waitfor(uthese, uinfo,
+	result = (syscall_slong_t)signal_waitfor(&these, uinfo,
 	                                         abs_timeout);
 	if (!result)
 		result = -EAGAIN; /* Posix says EAGAIN for this. */
@@ -693,23 +690,26 @@ DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait_time64,
                 size_t, sigsetsize)
 #endif /* !__ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT64 */
 {
+	sigset_t these;
 	syscall_slong_t result;
 	ktime_t abs_timeout = KTIME_INFINITE;
-	/* Validate user-structure pointers. */
-	if unlikely(sigsetsize != sizeof(sigset_t)) {
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-		      sigsetsize);
-	}
 	validate_readable(uthese, sigsetsize);
 	validate_writable(uinfo, sizeof(siginfo_t));
+	if (sigsetsize > sizeof(sigset_t))
+		sigsetsize = sizeof(sigset_t);
+	bzero(mempcpy(&these, uthese, sigsetsize),
+	      sizeof(sigset_t) - sigsetsize);
+
+	/* Make sure that we don't steal these signals */
+	sigdelset(&these, SIGKILL);
+	sigdelset(&these, SIGSTOP);
 	if (uts) {
 		validate_readable(uts, sizeof(*uts));
 		abs_timeout = relktime_from_user_rel(uts);
 		if (abs_timeout != 0)
 			abs_timeout += ktime();
 	}
-	result = (syscall_slong_t)signal_waitfor(uthese, uinfo,
+	result = (syscall_slong_t)signal_waitfor(&these, uinfo,
 	                                         abs_timeout);
 	if (!result)
 		result = -EAGAIN; /* Posix says EAGAIN for this. */
@@ -723,24 +723,27 @@ DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait,
                        UNCHECKED USER compat_siginfo_t *, uinfo,
                        UNCHECKED USER struct compat_timespec32 const *, uts,
                        size_t, sigsetsize) {
-	syscall_slong_t result;
+	sigset_t these;
 	siginfo_t info;
+	syscall_slong_t result;
 	ktime_t abs_timeout = KTIME_INFINITE;
-	/* Validate user-structure pointers. */
-	if unlikely(sigsetsize != sizeof(sigset_t)) {
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-		      sigsetsize);
-	}
 	validate_readable(uthese, sigsetsize);
 	validate_writable(uinfo, sizeof(siginfo_t));
+	if (sigsetsize > sizeof(sigset_t))
+		sigsetsize = sizeof(sigset_t);
+	bzero(mempcpy(&these, uthese, sigsetsize),
+	      sizeof(sigset_t) - sigsetsize);
+
+	/* Make sure that we don't steal these signals */
+	sigdelset(&these, SIGKILL);
+	sigdelset(&these, SIGSTOP);
 	if (uts) {
 		validate_readable(uts, sizeof(*uts));
 		abs_timeout = relktime_from_user_rel(uts);
 		if (abs_timeout != 0)
 			abs_timeout += ktime();
 	}
-	result = (syscall_slong_t)signal_waitfor(uthese, &info,
+	result = (syscall_slong_t)signal_waitfor(&these, &info,
 	                                         abs_timeout);
 	if (!result)
 		result = -EAGAIN; /* Posix says EAGAIN for this. */
@@ -767,17 +770,20 @@ DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait_time64,
                        size_t, sigsetsize)
 #endif /* !__ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT64 */
 {
-	syscall_slong_t result;
+	sigset_t these;
 	siginfo_t info;
+	syscall_slong_t result;
 	ktime_t abs_timeout = KTIME_INFINITE;
-	/* Validate user-structure pointers. */
-	if unlikely(sigsetsize != sizeof(sigset_t)) {
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-		      sigsetsize);
-	}
 	validate_readable(uthese, sigsetsize);
 	validate_writable(uinfo, sizeof(siginfo_t));
+	if (sigsetsize > sizeof(sigset_t))
+		sigsetsize = sizeof(sigset_t);
+	bzero(mempcpy(&these, uthese, sigsetsize),
+	      sizeof(sigset_t) - sigsetsize);
+
+	/* Make sure that we don't steal these signals */
+	sigdelset(&these, SIGKILL);
+	sigdelset(&these, SIGSTOP);
 	if (uts) {
 		validate_readable(uts, sizeof(*uts));
 		abs_timeout = relktime_from_user_rel(uts);
@@ -794,179 +800,6 @@ DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait_time64,
 	return result;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT64 || __ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT_TIME64 */
-
-
-
-
-
-/************************************************************************/
-/* rt_sigsuspend(), sigsuspend()                                        */
-/************************************************************************/
-
-#if (defined(__ARCH_WANT_SYSCALL_RT_SIGSUSPEND) || \
-     defined(__ARCH_WANT_SYSCALL_SIGSUSPEND) ||    \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_SIGSUSPEND))
-/* This function is also called from arch-specific, optimized syscall routers. */
-INTERN ABNORMAL_RETURN ATTR_NORETURN NONNULL((1, 2)) void FCALL
-sys_sigsuspend_impl(struct icpustate *__restrict state,
-                    struct rpc_syscall_info *__restrict sc_info,
-                    size_t sigsetsize) {
-	sigset_t not_these;
-	USER UNCHECKED sigset_t const *unot_these;
-	struct task *me = THIS_TASK;
-	if unlikely(sigsetsize != sizeof(sigset_t)) {
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-		      sigsetsize);
-	}
-	unot_these = (USER UNCHECKED sigset_t const *)sc_info->rsi_regs[0];
-	validate_readable(unot_these, sizeof(sigset_t));
-	memcpy(&not_these, unot_these, sizeof(sigset_t));
-
-	/* These signals cannot be masked. (iow: _always_ wait for these signals) */
-	sigdelset(&not_these, SIGSTOP);
-	sigdelset(&not_these, SIGKILL);
-
-	/* Indicate that we want to receive wake-ups for masked signals.
-	 * NOTE: We also set the RPC flag in case there are pending
-	 *       RPCs  that would normally be considered as masked! */
-	ATOMIC_OR(me->t_flags, (TASK_FWAKEONMSKRPC | TASK_FRPC));
-
-	/* This will clear `TASK_FWAKEONMSKRPC', as well as
-	 * perform a check for signals not in `these' which
-	 * may have also appeared in the mean time prior to
-	 * returning to user-space. */
-	userexcept_sysret_inject_self();
-
-	/* Because we may have  come here from `userexcept_handler()',  we
-	 * have to do some additional work in order to make sure that  all
-	 * thread-directed RPCs are  active. Otherwise, we  won't be  able
-	 * to pick up on RPCs that were already present before the  system
-	 * call, but were masked by the caller's *actual* signal mask, and
-	 * subsequently marked as INACTIVE.
-	 *
-	 * Because a different signal mask is used below, we have to make
-	 * sure that `task_serve()' won't skip over them.
-	 *
-	 * Normally,  RPC handlers are allowed to go tinker with the internals
-	 * of other pending RPCs, but because we only get here if the RPC gets
-	 * triggered as `RPC_REASONCTX_SYSCALL', we  have a much more  lenient
-	 * execution context which doesn't even require us to return normally.
-	 * The only thing we have to guaranty in this scenario, is to  respect
-	 * the  setting of `userexcept_sysret_inject_self()' (which we already
-	 * do unconditionally), so that it could clear the INACTIVE flags just
-	 * like we do here, whilst also executing SYSRET RPCs, all of which we
-	 * want to be able to interrupt our `task_serve()' below!
-	 *
-	 * s.a.: (copied verbatim from "misc/except-handler-userexcept.c.inl"):
-	 * """
-	 * WARNING: User-space RPCs in `restore' may still be marked as INACTIVE
-	 *          at this point. This is normally  OK, but in case the  system
-	 *          call doesn't want that, it  has to clear the INACTIVE  flags
-	 *          itself. -- This has to be done in the case of  sigsuspend()!
-	 * """
-	 */
-	{
-		struct pending_rpc *rpcs;
-		/* NOTE: No need to steal pending  RPCs. -- These are private  to
-		 *       our thread, and while other  threads are allowed to  add
-		 *       more (hence the  ATOMIC_READ from the  list head),  only
-		 *       we are allowed to remove them, meaning that we know that
-		 *       (other than the list head), none of the pointers between
-		 *       elements can change.
-		 * Also note that in case another thread adds a new RPC, it will
-		 * come  without the INACTIVE  flag, so it'll  already be in the
-		 * state we want all of our RPCs to be in! */
-		rpcs = ATOMIC_READ(FORTASK(me, this_rpcs.slh_first));
-		assertf(rpcs != THIS_RPCS_TERMINATED, "How did we get here from task_exit()?");
-		for (; rpcs; rpcs = SLIST_NEXT(rpcs, pr_link))
-			rpcs->pr_flags &= ~_RPC_CONTEXT_INACTIVE;
-	}
-
-again:
-	TRY {
-		/* The  normal implementation of the system call,
-		 * except that `task_serve_with_sigmask' replaces
-		 * calls to `task_serve()'
-		 *
-		 * In case of  `sigsuspend(2)`, the "normal"  implementation
-		 * is `pause(2)`, which can simply be implemented like this: */
-		for (;;) {
-			PREEMPTION_DISABLE();
-			if (task_serve_with_sigmask(&not_these))
-				continue;
-			task_sleep();
-		}
-	} EXCEPT {
-		/* This function  only returns  normally
-		 * when the syscall should be restarted. */
-		state = userexcept_handler_with_sigmask(state, sc_info, &not_these);
-		PERTASK_SET(this_exception_code, 1); /* Prevent internal fault */
-		goto again;
-	}
-	__builtin_unreachable();
-}
-#endif /* ... */
-
-#ifdef __ARCH_WANT_SYSCALL_RT_SIGSUSPEND
-PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
-sys_rt_sigsuspend_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
-	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
-		return;
-	sys_sigsuspend_impl(ctx->rc_state, &ctx->rc_scinfo,
-	                    (size_t)ctx->rc_scinfo.rsi_regs[1]);
-	__builtin_unreachable();
-}
-
-DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
-                USER UNCHECKED sigset_t const *, unot_these,
-                size_t, sigsetsize) {
-	(void)unot_these;
-	(void)sigsetsize;
-
-	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-	task_rpc_userunwind(&sys_rt_sigsuspend_rpc, NULL);
-	__builtin_unreachable();
-}
-#endif /* __ARCH_WANT_SYSCALL_RT_SIGSUSPEND */
-
-#ifdef __ARCH_WANT_SYSCALL_SIGSUSPEND
-PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
-sys_sigsuspend_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
-	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
-		return;
-	sys_sigsuspend_impl(ctx->rc_state, &ctx->rc_scinfo, sizeof(sigset_t));
-	__builtin_unreachable();
-}
-
-DEFINE_SYSCALL1(errno_t, sigsuspend,
-                USER UNCHECKED sigset_t const *, unot_these) {
-	(void)unot_these;
-
-	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-	task_rpc_userunwind(&sys_sigsuspend_rpc, NULL);
-	__builtin_unreachable();
-}
-#endif /* __ARCH_WANT_SYSCALL_SIGSUSPEND */
-
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_SIGSUSPEND
-PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
-sys_compat_sigsuspend_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
-	if (ctx->rc_context != RPC_REASONCTX_SYSCALL)
-		return;
-	sys_sigsuspend_impl(ctx->rc_state, &ctx->rc_scinfo, sizeof(compat_sigset_t));
-	__builtin_unreachable();
-}
-
-DEFINE_COMPAT_SYSCALL1(errno_t, sigsuspend,
-                       USER UNCHECKED compat_sigset_t const *, unot_these) {
-	(void)unot_these;
-
-	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-	task_rpc_userunwind(&sys_compat_sigsuspend_rpc, NULL);
-	__builtin_unreachable();
-}
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_SIGSUSPEND */
 
 DECL_END
 

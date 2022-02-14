@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_SCHED_POSIX_SIGNALFD_C
 #define GUARD_KERNEL_SRC_SCHED_POSIX_SIGNALFD_C 1
+#define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -45,18 +46,22 @@
 #include <signal.h>
 #include <string.h>
 
+#undef sigmask
+
 DECL_BEGIN
 
 /* Handle object type integration */
 DEFINE_HANDLE_REFCNT_FUNCTIONS(signalfd, struct signalfd);
 
 PRIVATE ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct signalfd *KCALL
-signalfd_create(USER CHECKED sigset_t const *mask) THROWS(E_BADALLOC, E_SEGFAULT) {
+signalfd_create(USER CHECKED sigset_t const *mask, size_t sigsetsize)
+		THROWS(E_BADALLOC, E_SEGFAULT) {
 	struct signalfd *result;
 	result = signalfd_alloc();
 	result->sf_refcnt = 1;
 	TRY {
-		memcpy(&result->sf_mask, mask, sizeof(sigset_t));
+		bzero(mempcpy(&result->sf_mask, mask, sigsetsize),
+		      sizeof(sigset_t) - sigsetsize);
 	} EXCEPT {
 		signalfd_free(result);
 		RETHROW();
@@ -193,14 +198,15 @@ handle_signalfd_polltest(struct signalfd *__restrict self,
 
 PRIVATE ATTR_NOINLINE void KCALL
 update_signalfd(unsigned int fd,
-                USER CHECKED sigset_t const *sigmask) {
+                USER CHECKED sigset_t const *sigmask,
+                size_t sigsetsize) {
 	struct signalfd *sfd;
 	sigset_t newmask;
 	struct handle hnd = handle_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hnd); };
 
 	/* Make sure that it's a SIGNALFD handle. */
-	if (hnd.h_type != HANDLE_TYPE_SIGNALFD) {
+	if unlikely(hnd.h_type != HANDLE_TYPE_SIGNALFD) {
 		THROW(E_INVALID_HANDLE_FILETYPE,
 		      fd,
 		      HANDLE_TYPE_SIGNALFD,
@@ -210,7 +216,8 @@ update_signalfd(unsigned int fd,
 	}
 	sfd = (struct signalfd *)hnd.h_data;
 	COMPILER_BARRIER();
-	memcpy(&newmask, sigmask, sizeof(sigset_t));
+	bzero(mempcpy(&newmask, sigmask, sigsetsize),
+	      sizeof(sigset_t) - sigsetsize);
 	COMPILER_BARRIER();
 
 	/* Always remove  SIGKILL and  SIGSTOP from  the new  mask
@@ -250,18 +257,15 @@ DEFINE_SYSCALL4(fd_t, signalfd4, fd_t, fd,
 	VALIDATE_FLAGSET(flags,
 	                 SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK,
 	                 E_INVALID_ARGUMENT_CONTEXT_SIGNALFD_FLAGS);
-	if unlikely(sigsetsize != sizeof(sigset_t)) {
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-		      sigsetsize);
-	}
-	validate_readable(sigmask, sizeof(sigset_t));
+	validate_readable(sigmask, sigsetsize);
+	if (sigsetsize > sizeof(sigset_t))
+		sigsetsize = sizeof(sigset_t);
 	if (fd != -1) {
 		/* Update an existing signalfd descriptor. */
 		result = (unsigned int)fd;
-		update_signalfd(result, sigmask);
+		update_signalfd(result, sigmask, sigsetsize);
 	} else {
-		sfd = signalfd_create(sigmask);
+		sfd = signalfd_create(sigmask, sigsetsize);
 		TRY {
 			struct handle hnd;
 			hnd.h_data = sfd;

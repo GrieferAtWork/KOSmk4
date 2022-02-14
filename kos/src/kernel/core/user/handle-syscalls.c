@@ -41,6 +41,7 @@
 #include <sched/group.h>
 #include <sched/rpc.h>
 #include <sched/sigaction.h>
+#include <sched/sigmask.h>
 #include <sched/tsc.h>
 
 #include <hybrid/align.h>
@@ -1580,27 +1581,18 @@ sys_ppoll_generic(struct icpustate *__restrict state,
 	validate_readwritem(fds, nfds, sizeof(struct pollfd));
 	if (sigmask) {
 		sigset_t these;
-		if unlikely(sigsetsize != sizeof(sigset_t)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-			      sigsetsize);
-		}
-		validate_readable(sigmask, sizeof(sigset_t));
-		memcpy(&these, sigmask, sizeof(sigset_t));
+		validate_readable(sigmask, sigsetsize);
+		if (sigsetsize > sizeof(sigset_t))
+			sigsetsize = sizeof(sigset_t);
+		memset(mempcpy(&these, sigmask, sigsetsize),
+		       0xff, sizeof(sigset_t) - sigsetsize);
 
 		/* These signals cannot be masked.  */
 		sigdelset(&these, SIGSTOP);
 		sigdelset(&these, SIGKILL);
 
-		/* Indicate that we want to receive wake-ups for masked signals. */
-		ATOMIC_OR(THIS_TASK->t_flags, TASK_FWAKEONMSKRPC);
-
-		/* This will clear `TASK_FWAKEONMSKRPC', as well as
-		 * perform a check for signals not in `these' which
-		 * may have also appeared in the mean time prior to
-		 * returning to user-space. */
-		userexcept_sysret_inject_self();
-
+		/* Prepare the calling thread for a sigsuspend() operation. */
+		sigmask_prepare_sigsuspend();
 again:
 		TRY {
 			result = do_poll_with_sigmask(fds, nfds, abs_timeout, &these);
@@ -2058,27 +2050,18 @@ sys_pselect_generic(struct icpustate *__restrict state,
 	validate_readwritem_opt(exceptfds, CEILDIV(nfds, __NFDBITS), __SIZEOF_FD_MASK);
 	if (sigmask) {
 		sigset_t these;
-		if unlikely(sigsetsize != sizeof(sigset_t)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-			      sigsetsize);
-		}
-		validate_readable(sigmask, sizeof(sigset_t));
-		memcpy(&these, sigmask, sizeof(sigset_t));
+		validate_readable(sigmask, sigsetsize);
+		if (sigsetsize > sizeof(sigset_t))
+			sigsetsize = sizeof(sigset_t);
+		memset(mempcpy(&these, sigmask, sigsetsize),
+			   0xff, sizeof(sigset_t) - sigsetsize);
 
 		/* These signals cannot be masked.  */
 		sigdelset(&these, SIGSTOP);
 		sigdelset(&these, SIGKILL);
 
-		/* Indicate that we want to receive wake-ups for masked signals. */
-		ATOMIC_OR(THIS_TASK->t_flags, TASK_FWAKEONMSKRPC);
-
-		/* This will clear `TASK_FWAKEONMSKRPC', as well as
-		 * perform a check for signals not in `these' which
-		 * may have also appeared in the mean time prior to
-		 * returning to user-space. */
-		userexcept_sysret_inject_self();
-
+		/* Prepare the calling thread for a sigsuspend() operation. */
+		sigmask_prepare_sigsuspend();
 again:
 		TRY {
 			result = do_select_with_sigmask(nfds, readfds, writefds, exceptfds, abs_timeout, &these);

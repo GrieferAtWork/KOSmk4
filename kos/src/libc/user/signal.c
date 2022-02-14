@@ -155,11 +155,7 @@ NOTHROW_NCX(LIBCCALL libc_sysv_signal)(signo_t signo,
 	libc_sigemptyset(&act.sa_mask);
 	act.sa_flags = (SA_RESETHAND | SA_NODEFER) & ~SA_RESTART;
 	SET_SIGRESTORE(act);
-#ifdef __NR_sigaction
-	result = sys_sigaction(signo, &act, &oact);
-#else /* __NR_sigaction */
 	result = sys_rt_sigaction(signo, &act, &oact, sizeof(sigset_t));
-#endif /* !__NR_sigaction */
 	if unlikely(E_ISERR(result)) {
 		libc_seterrno_neg(result);
 		oact.sa_handler = SIG_ERR;
@@ -314,11 +310,9 @@ NOTHROW_NCX(LIBCCALL libc_kill)(pid_t pid,
 /*[[[end:libc_kill]]]*/
 
 
-#ifndef __NR_sigprocmask
+#undef sys_sigprocmask
 #define sys_sigprocmask(how, set, oset) \
 	sys_rt_sigprocmask(how, set, oset, sizeof(sigset_t))
-#endif /* !__NR_sigprocmask */
-
 
 /*[[[head:libc_sigprocmask,hash:CRC-32=0x45302536]]]*/
 /* Change  the signal mask for the calling thread. Note that portable
@@ -410,7 +404,7 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 		if (how == SIG_BLOCK)
 			return 0;
 
-		for (i = 0; i < __SIGSET_NWORDS; ++i) {
+		for (i = 0; i < COMPILER_LENOF(me->pt_pmask.lpm_pmask.pm_pending.__val); ++i) {
 			ulongptr_t pending_word;
 			ulongptr_t newmask_word;
 			pending_word = ATOMIC_READ(me->pt_pmask.lpm_pmask.pm_pending.__val[i]);
@@ -546,7 +540,7 @@ NOTHROW_NCX(LIBCCALL libc_setsigmaskptr)(sigset_t *sigmaskptr)
 	/* Check previously pending signals became available */
 	if (me->pt_pmask.lpm_pmask.pm_flags & USERPROCMASK_FLAG_HASPENDING) {
 		unsigned int i;
-		for (i = 0; i < __SIGSET_NWORDS; ++i) {
+		for (i = 0; i < COMPILER_LENOF(me->pt_pmask.lpm_pmask.pm_pending.__val); ++i) {
 			ulongptr_t pending_word;
 			ulongptr_t newmask_word;
 			pending_word = ATOMIC_READ(me->pt_pmask.lpm_pmask.pm_pending.__val[i]);
@@ -671,7 +665,7 @@ NOTHROW(LIBCCALL libc_chkuserprocmask)(void)
 		sigset_t *sigmaskptr;
 		unsigned int i;
 		sigmaskptr = me->pt_pmask.lpm_pmask.pm_sigmask;
-		for (i = 0; i < __SIGSET_NWORDS; ++i) {
+		for (i = 0; i < COMPILER_LENOF(me->pt_pmask.lpm_pmask.pm_pending.__val); ++i) {
 			ulongptr_t pending_word;
 			ulongptr_t newmask_word;
 			pending_word = ATOMIC_READ(me->pt_pmask.lpm_pmask.pm_pending.__val[i]);
@@ -715,11 +709,7 @@ NOTHROW_RPC(LIBCCALL libc_sigsuspend)(sigset_t const *set)
 /*[[[body:libc_sigsuspend]]]*/
 {
 	errno_t result;
-#ifdef __NR_sigsuspend
-	result = sys_sigsuspend(set);
-#else /* __NR_sigsuspend */
 	result = sys_rt_sigsuspend(set, sizeof(sigset_t));
-#endif /* !__NR_sigsuspend */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_sigsuspend]]]*/
@@ -747,11 +737,7 @@ NOTHROW_NCX(LIBCCALL libc_sigaction)(signo_t signo,
 		act = &real_act;
 	}
 #endif /* LIBC_ARCH_HAVE_SIG_RESTORE */
-#ifdef __NR_sigaction
-	result = sys_sigaction(signo, act, oact);
-#else /* __NR_sigaction */
 	result = sys_rt_sigaction(signo, act, oact, sizeof(sigset_t));
-#endif /* !__NR_sigaction */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_sigaction]]]*/
@@ -766,11 +752,7 @@ NOTHROW_NCX(LIBCCALL libc_sigpending)(sigset_t *__restrict set)
 /*[[[body:libc_sigpending]]]*/
 {
 	errno_t result;
-#ifdef __NR_sigpending
-	result = sys_sigpending(set);
-#else /* __NR_sigpending */
 	result = sys_rt_sigpending(set, sizeof(sigset_t));
-#endif /* !__NR_sigpending */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_sigpending]]]*/

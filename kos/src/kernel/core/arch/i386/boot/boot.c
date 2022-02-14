@@ -897,7 +897,21 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       the  point where we only keep track of bits for signals `1..255' (since other signals can't
 	 *       be encoded in `rpc_schedule(2)' or `clone(2)')
 	 * Essentially, the kernel should be configurable to support any # of signals, and user-space should
-	 * work, no matter what it tells the kernel to be its wanted sigset_t size. */
+	 * work, no matter what it tells the kernel to be its wanted sigset_t size.
+	 *
+	 * TODO: Systems that still need to be updated:
+	 * - sys_sigreturn(2)      (why do we even have this? This is one of those syscalls that aren't even linux-compatible...)
+	 * - sys_rt_sigreturn(2)   (needs another argument that specifies sizeof(sigset_t))
+	 * - sys_sigaction(2)      (research what "struct old_sigaction" looks like)
+	 * - sys_rt_sigaction(2)   (Figure out how we want to do variable-sized signal masks.
+	 *                         Sadly, the `sigset_t' isn't at  the end of the  structure,
+	 *                         so  the offsets of  other fields are  also affected by the
+	 *                         size of `sigset_t')
+	 * - The whole userprocmask mechanism. -- This one already includes a sigsetsize field,
+	 *   but aside from being validated  once during sys_set_userprocmask_address(), it  is
+	 *   never  used again. -- As per the specs,  we are allowed to either re-read the size
+	 *   field every time we need it, _or_ read it once during setup and keep using what we
+	 *   read at that time. */
 
 	return state;
 }

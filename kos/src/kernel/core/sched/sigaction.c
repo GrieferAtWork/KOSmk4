@@ -656,6 +656,7 @@ DEFINE_SYSCALL4(errno_t, rt_sigaction, signo_t, signo,
                 UNCHECKED USER struct sigaction *, oact,
                 size_t, sigsetsize) {
 	if unlikely(sigsetsize != sizeof(sigset_t)) {
+		/* TODO: Allow variable-sized signal masks! */
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
 		      sigsetsize);
@@ -732,6 +733,7 @@ DEFINE_COMPAT_SYSCALL4(compat_errno_t, rt_sigaction, compat_signo_t, signo,
                        UNCHECKED USER struct compat_sigaction *, oact,
                        size_t, sigsetsize) {
 	if unlikely(sigsetsize != sizeof(sigset_t)) {
+		/* TODO: Allow variable-sized signal masks! */
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
 		      sigsetsize);

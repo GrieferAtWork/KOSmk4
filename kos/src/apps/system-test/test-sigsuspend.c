@@ -67,7 +67,7 @@ DEFINE_TEST(sigsuspend) {
 	EQu(0, handler_called);
 	EQd(-EFAULT, sys_sigsuspend(NULL));
 	EQu(0, handler_called);
-	EQd(-EINTR, sys_sigsuspend(&mask));
+	EQd(-EINTR, sys_sigsuspend((struct __old_sigset_struct const *)&mask));
 #else /* SYS_sigsuspend */
 	EQd(0, sigdelset(&mask, SIGUSR1));
 	++handler_called; /* Pshht -- don't tell anyone ;) */

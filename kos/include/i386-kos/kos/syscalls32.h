@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3ef74c6 */
+/* HASH CRC-32:0xd130e8b9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,6 +114,7 @@ struct __itimervalx32_64;
 struct __kos_statx32;
 struct __mmsghdrx32;
 struct __msghdrx32;
+struct __old_sigset_struct;
 struct __rusagex32;
 struct __rusagex32_64;
 struct __sigactionx32;
@@ -2288,11 +2289,11 @@ __CDECLARE_SC(,__errno_t,signalfd,(__fd_t __fd, struct __sigset_struct const *__
 __CDECLARE_SC(,__errno_t,signalfd4,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigmasksize, __syscall_ulong_t __flags),(__fd,__sigmask,__sigmasksize,__flags))
 #endif /* __CRT_HAVE_SC(signalfd4) */
 #if __CRT_HAVE_SC(sigpending)
-__CDECLARE_SC(,__errno_t,sigpending,(struct __sigset_struct *__set),(__set))
+__CDECLARE_SC(,__errno_t,sigpending,(struct __old_sigset_struct *__set),(__set))
 #endif /* __CRT_HAVE_SC(sigpending) */
 #if __CRT_HAVE_SC(sigprocmask)
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
-__CDECLARE_SC(,__errno_t,sigprocmask,(__syscall_ulong_t __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),(__how,__set,__oset))
+__CDECLARE_SC(,__errno_t,sigprocmask,(__syscall_ulong_t __how, struct __old_sigset_struct const *__set, struct __old_sigset_struct *__oset),(__how,__set,__oset))
 #endif /* __CRT_HAVE_SC(sigprocmask) */
 #if __CRT_HAVE_SC(sigreturn)
 /* Restore the specified register state when returning from a signal handler
@@ -2310,7 +2311,7 @@ __CDECLARE_VOID_SC(,sigreturn,(struct fpustate32 const *__restore_fpu, __syscall
  * the old signal mask.
  * @param: set: The set of signals on which to wait
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
-__CDECLARE_SC(,__errno_t,sigsuspend,(struct __sigset_struct const *__set),(__set))
+__CDECLARE_SC(,__errno_t,sigsuspend,(struct __old_sigset_struct const *__set),(__set))
 #endif /* __CRT_HAVE_SC(sigsuspend) */
 #if __CRT_HAVE_SC(socket)
 /* Create a new socket for the given domain/type/protocol triple.
@@ -4781,11 +4782,11 @@ __CDECLARE_XSC(,__errno_t,signalfd,(__fd_t __fd, struct __sigset_struct const *_
 __CDECLARE_XSC(,__errno_t,signalfd4,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigmasksize, __syscall_ulong_t __flags),(__fd,__sigmask,__sigmasksize,__flags))
 #endif /* __CRT_HAVE_XSC(signalfd4) */
 #if __CRT_HAVE_XSC(sigpending)
-__CDECLARE_XSC(,__errno_t,sigpending,(struct __sigset_struct *__set),(__set))
+__CDECLARE_XSC(,__errno_t,sigpending,(struct __old_sigset_struct *__set),(__set))
 #endif /* __CRT_HAVE_XSC(sigpending) */
 #if __CRT_HAVE_XSC(sigprocmask)
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
-__CDECLARE_XSC(,__errno_t,sigprocmask,(__syscall_ulong_t __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),(__how,__set,__oset))
+__CDECLARE_XSC(,__errno_t,sigprocmask,(__syscall_ulong_t __how, struct __old_sigset_struct const *__set, struct __old_sigset_struct *__oset),(__how,__set,__oset))
 #endif /* __CRT_HAVE_XSC(sigprocmask) */
 #if __CRT_HAVE_XSC(sigsuspend)
 /* >> sigsuspend(2), rt_sigsuspend(2)
@@ -4794,7 +4795,7 @@ __CDECLARE_XSC(,__errno_t,sigprocmask,(__syscall_ulong_t __how, struct __sigset_
  * the old signal mask.
  * @param: set: The set of signals on which to wait
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
-__CDECLARE_XSC(,__errno_t,sigsuspend,(struct __sigset_struct const *__set),(__set))
+__CDECLARE_XSC(,__errno_t,sigsuspend,(struct __old_sigset_struct const *__set),(__set))
 #endif /* __CRT_HAVE_XSC(sigsuspend) */
 #if __CRT_HAVE_XSC(socket)
 /* Create a new socket for the given domain/type/protocol triple.

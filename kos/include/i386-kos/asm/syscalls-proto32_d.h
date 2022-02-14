@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9402bf1 */
+/* HASH CRC-32:0x6afd70e5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1136,8 +1136,8 @@
 #define __NR32AT1_setreuid                     (uint16_t, __uint16_t)
 #define __NR32AT0_setregid                     (uint16_t, __uint16_t)
 #define __NR32AT1_setregid                     (uint16_t, __uint16_t)
-#define __NR32AT0_sigsuspend                   (struct __sigset_struct const *, struct __sigset_struct const *)
-#define __NR32AT0_sigpending                   (struct __sigset_struct *, struct __sigset_struct *)
+#define __NR32AT0_sigsuspend                   (struct __old_sigset_struct const *, struct __old_sigset_struct const *)
+#define __NR32AT0_sigpending                   (struct __old_sigset_struct *, struct __old_sigset_struct *)
 #define __NR32AT0_sethostname                  (char const *, char const *)
 #define __NR32AT1_sethostname                  (size_t, __size_t)
 #define __NR32AT0_setrlimit                    (syscall_ulong_t, __syscall_ulong_t)
@@ -1246,8 +1246,8 @@
 #define __NR32AT1_mprotect                     (size_t, __size_t)
 #define __NR32AT2_mprotect                     (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_sigprocmask                  (syscall_ulong_t, __syscall_ulong_t)
-#define __NR32AT1_sigprocmask                  (struct __sigset_struct const *, struct __sigset_struct const *)
-#define __NR32AT2_sigprocmask                  (struct __sigset_struct *, struct __sigset_struct *)
+#define __NR32AT1_sigprocmask                  (struct __old_sigset_struct const *, struct __old_sigset_struct const *)
+#define __NR32AT2_sigprocmask                  (struct __old_sigset_struct *, struct __old_sigset_struct *)
 #define __NR32AT0_init_module                  (void const *, void const *)
 #define __NR32AT1_init_module                  (size_t, __size_t)
 #define __NR32AT2_init_module                  (char const *, char const *)
@@ -2252,8 +2252,8 @@
 #define __NR32AM_ssetmask(a, b, c, d, e, f)                     (__syscall_ulong_t)a
 #define __NR32AM_setreuid(a, b, c, d, e, f)                     (__uint16_t)a, (__uint16_t)b
 #define __NR32AM_setregid(a, b, c, d, e, f)                     (__uint16_t)a, (__uint16_t)b
-#define __NR32AM_sigsuspend(a, b, c, d, e, f)                   (struct __sigset_struct const *)a
-#define __NR32AM_sigpending(a, b, c, d, e, f)                   (struct __sigset_struct *)a
+#define __NR32AM_sigsuspend(a, b, c, d, e, f)                   (struct __old_sigset_struct const *)a
+#define __NR32AM_sigpending(a, b, c, d, e, f)                   (struct __old_sigset_struct *)a
 #define __NR32AM_sethostname(a, b, c, d, e, f)                  (char const *)a, (__size_t)b
 #define __NR32AM_setrlimit(a, b, c, d, e, f)                    (__syscall_ulong_t)a, (struct rlimit const *)b
 #define __NR32AM_getrlimit(a, b, c, d, e, f)                    (__syscall_ulong_t)a, (struct rlimit *)b
@@ -2306,7 +2306,7 @@
 #define __NR32AM_modify_ldt(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (void *)b, (__syscall_ulong_t)c
 #define __NR32AM_adjtimex(a, b, c, d, e, f)                     (struct timex *)a
 #define __NR32AM_mprotect(a, b, c, d, e, f)                     (void *)a, (__size_t)b, (__syscall_ulong_t)c
-#define __NR32AM_sigprocmask(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c
+#define __NR32AM_sigprocmask(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (struct __old_sigset_struct const *)b, (struct __old_sigset_struct *)c
 #define __NR32AM_create_module(a, b, c, d, e, f)                /* nothing */
 #define __NR32AM_init_module(a, b, c, d, e, f)                  (void const *)a, (__size_t)b, (char const *)c
 #define __NR32AM_delete_module(a, b, c, d, e, f)                (char const *)a, (__oflag_t)b

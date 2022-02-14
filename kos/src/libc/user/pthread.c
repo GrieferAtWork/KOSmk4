@@ -220,10 +220,9 @@ libc_pthread_unmap_stack_and_exit(void *stackaddr,
                                   size_t stacksize,
                                   int exitcode);
 
-#ifndef __NR_sigprocmask
+#undef sys_sigprocmask
 #define sys_sigprocmask(how, set, oset) \
 	sys_rt_sigprocmask(how, set, oset, sizeof(sigset_t))
-#endif /* !__NR_sigprocmask */
 
 
 /* Perform cleanup & terminate the current thread `me'. */

@@ -786,11 +786,11 @@ SC_BEGIN(sigsuspend)
 	testP  $(EFLAGS_DF), OFFSET_ICPUSTATE_IRREGS+OFFSET_IRREGS_PFLAGS(%R_fcall0P)
 	jz     1f
 	orP    $(RPC_SYSCALL_INFO_FEXCEPT), 0(%Psp)
-1:	movP   %Psp, %R_fcall1P                     /* arg: sys_sigsuspend_impl@sc_info */
+1:	movP   %Psp, %R_fcall1P                         /* arg: sys_sigsuspend_impl@sc_info */
 #ifdef __x86_64__
-	movP   $(__SIZEOF_SIGSET_T__), %R_sysvabi2P /* arg: sys_sigsuspend_impl@sigsetsize */
+	movP   $(__SIZEOF_OLD_SIGSET_T__), %R_sysvabi2P /* arg: sys_sigsuspend_impl@sigsetsize */
 #else /* __x86_64__ */
-	pushP_cfi $(__SIZEOF_SIGSET_T__)            /* arg: sys_sigsuspend_impl@sigsetsize */
+	pushP_cfi $(__SIZEOF_OLD_SIGSET_T__)            /* arg: sys_sigsuspend_impl@sigsetsize */
 #endif /* !__x86_64__ */
 	EXTERN(sys_sigsuspend_impl)
 	call   sys_sigsuspend_impl

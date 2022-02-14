@@ -31,9 +31,11 @@
  */
 
 #include <__stdinc.h>
+#include <features.h>
+
+#include <hybrid/typecore.h>
 
 #include <asm/os/sigset.h> /* __SIZEOF_SIGSET_T__ */
-#include <hybrid/typecore.h>
 
 #ifndef __ALIGNOF_SIGSET_T__
 #define __ALIGNOF_SIGSET_T__ __SIZEOF_POINTER__
@@ -48,6 +50,16 @@ __ATTR_ALIGNED(__ALIGNOF_SIGSET_T__)
 struct __sigset_struct {
 	__ULONGPTR_TYPE__ __val[__SIGSET_NWORDS];
 };
+
+#ifdef __USE_KOS_KERNEL
+struct __old_sigset_struct {
+#if __SIZEOF_OLD_SIGSET_T__ == __SIZEOF_POINTER__
+	__ULONGPTR_TYPE__ __ss_sigmask;
+#else /* __SIZEOF_OLD_SIGSET_T__ == __SIZEOF_POINTER__ */
+	__ULONGPTR_TYPE__ __ss_sigmasks[__SIZEOF_OLD_SIGSET_T__ / __SIZEOF_POINTER__];
+#endif /* __SIZEOF_OLD_SIGSET_T__ != __SIZEOF_POINTER__ */
+};
+#endif /* __USE_KOS_KERNEL */
 
 #if __SIGSET_NWORDS == 1
 #define __SIGSET_INIT(f) \

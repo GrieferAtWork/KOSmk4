@@ -23,7 +23,20 @@
 #include <__stdinc.h>
 
 #if defined(__KOS__) || defined(__linux__)
+#include <hybrid/typecore.h>
+
+/* Size of the "old" sigset_t type, as used by the non
+ * old,  rt_* variants of signal-related system calls. */
+#define __SIZEOF_OLD_SIGSET_T__ __SIZEOF_POINTER__
+
+#if defined(__KOS__) && defined(__KERNEL__)
+/* TODO: The kernel's sigset can be smaller than userspace's, so-long as all
+ *       of the new-style  sigset system calls  accept arbitrary values  for
+ *       their `sigsetsize' argument. */
 #define __SIZEOF_SIGSET_T__ 128 /* 1024/8 */
+#else /* __KOS__ && __KERNEL__ */
+#define __SIZEOF_SIGSET_T__ 128 /* 1024/8 */
+#endif /* !__KOS__ || !__KERNEL__ */
 #endif /* __KOS__ || __linux__ */
 
 

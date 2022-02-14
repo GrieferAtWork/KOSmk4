@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4aa6581 */
+/* HASH CRC-32:0xe5e6f46d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2735,7 +2735,7 @@ END(__x86_asm32_int80_setregid)
  * the old signal mask.
  * @param: set: The set of signals on which to wait
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
-/* errno_t sigsuspend(struct __sigset_struct const *set) */
+/* errno_t sigsuspend(struct __old_sigset_struct const *set) */
 .section .text.x86.asm32_syscall_int80.sigsuspend
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigsuspend)
 	.cfi_startproc simple
@@ -2772,7 +2772,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigsuspend)
 	.cfi_endproc
 END(__x86_asm32_int80_sigsuspend)
 
-/* errno_t sigpending(struct __sigset_struct *set) */
+/* errno_t sigpending(struct __old_sigset_struct *set) */
 .section .text.x86.asm32_syscall_int80.sigpending
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigpending)
 	.cfi_startproc simple
@@ -4778,7 +4778,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mprotect)
 END(__x86_asm32_int80_mprotect)
 
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
-/* errno_t sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset) */
+/* errno_t sigprocmask(syscall_ulong_t how, struct __old_sigset_struct const *set, struct __old_sigset_struct *oset) */
 .section .text.x86.asm32_syscall_int80.sigprocmask
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigprocmask)
 	.cfi_startproc simple
@@ -22171,7 +22171,7 @@ END(__x86_asm32_sysenter_setregid)
  * the old signal mask.
  * @param: set: The set of signals on which to wait
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
-/* errno_t sigsuspend(struct __sigset_struct const *set) */
+/* errno_t sigsuspend(struct __old_sigset_struct const *set) */
 .section .text.x86.asm32_syscall_sysenter.sigsuspend
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigsuspend)
 	.cfi_startproc simple
@@ -22208,7 +22208,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigsuspend)
 	.cfi_endproc
 END(__x86_asm32_sysenter_sigsuspend)
 
-/* errno_t sigpending(struct __sigset_struct *set) */
+/* errno_t sigpending(struct __old_sigset_struct *set) */
 .section .text.x86.asm32_syscall_sysenter.sigpending
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigpending)
 	.cfi_startproc simple
@@ -24220,7 +24220,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mprotect)
 END(__x86_asm32_sysenter_mprotect)
 
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
-/* errno_t sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset) */
+/* errno_t sigprocmask(syscall_ulong_t how, struct __old_sigset_struct const *set, struct __old_sigset_struct *oset) */
 .section .text.x86.asm32_syscall_sysenter.sigprocmask
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigprocmask)
 	.cfi_startproc simple

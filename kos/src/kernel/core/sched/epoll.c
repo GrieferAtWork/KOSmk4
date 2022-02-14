@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_SCHED_EPOLL_C
 #define GUARD_KERNEL_SRC_SCHED_EPOLL_C 1
+#define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -36,6 +37,7 @@
 #include <sched/rpc.h>
 #include <sched/sig-completion.h>
 #include <sched/sig.h>
+#include <sched/sigmask.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 
@@ -62,6 +64,8 @@
 #include <kernel/mman.h>
 #include <sched/group.h>
 #endif /* CONFIG_HAVE_EPOLL_RPC */
+
+#undef sigmask
 
 DECL_BEGIN
 
@@ -2011,13 +2015,11 @@ sys_epoll_pwait_impl(struct icpustate *__restrict state,
 	if (sigmask) {
 		size_t result;
 		sigset_t these;
-		if unlikely(sigsetsize != sizeof(sigset_t)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-			      sigsetsize);
-		}
-		validate_readable(sigmask, sizeof(sigset_t));
-		memcpy(&these, sigmask, sizeof(sigset_t));
+		validate_readable(sigmask, sigsetsize);
+		if (sigsetsize > sizeof(sigset_t))
+			sigsetsize = sizeof(sigset_t);
+		memset(mempcpy(&these, sigmask, sigsetsize),
+		       0xff, sizeof(sigset_t) - sigsetsize);
 
 		/* These signals cannot be masked.  */
 		sigdelset(&these, SIGSTOP);
@@ -2031,14 +2033,8 @@ sys_epoll_pwait_impl(struct icpustate *__restrict state,
 			      maxevents);
 		}
 
-		/* Indicate that we want to receive wake-ups for masked signals. */
-		ATOMIC_OR(THIS_TASK->t_flags, TASK_FWAKEONMSKRPC);
-
-		/* This will clear `TASK_FWAKEONMSKRPC', as well as
-		 * perform a check for signals not in `these' which
-		 * may have also appeared in the mean time prior to
-		 * returning to user-space. */
-		userexcept_sysret_inject_self();
+		/* Prepare the calling thread for a sigsuspend() operation. */
+		sigmask_prepare_sigsuspend();
 again:
 		TRY {
 			REF struct epoll_controller *self;
