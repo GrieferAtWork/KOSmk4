@@ -105,10 +105,8 @@ NOTHROW_NCX(LIBCCALL libc_sched_getcpu)(void)
 	uint32_t res;
 	/* XXX: Figure out how linux implements `struct getcpu_cache' */
 	error = sys_getcpu(&res, NULL, NULL);
-	if (E_ISERR(error)) {
-		libc_seterrno_neg(error);
-		return -1;
-	}
+	if (E_ISERR(error))
+		return libc_seterrno_neg(error);
 	return (int)(unsigned int)res;
 }
 /*[[[end:libc_sched_getcpu]]]*/

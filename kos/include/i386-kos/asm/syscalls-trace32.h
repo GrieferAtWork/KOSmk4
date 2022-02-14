@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x302048c5 */
+/* HASH CRC-32:0x96de62c5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -363,8 +363,8 @@
 #define __NRAN0_capset                       TODO_PROTOTYPE
 #define __NRAN0_sigaltstack                  ss
 #define __NRAN1_sigaltstack                  oss
-#define __NRAN0_sendfile                     out_fd
-#define __NRAN1_sendfile                     in_fd
+#define __NRAN0_sendfile                     outfd
+#define __NRAN1_sendfile                     infd
 #define __NRAN2_sendfile                     pin_offset
 #define __NRAN3_sendfile                     num_bytes
 #define __NRAN0_ugetrlimit                   TODO_PROTOTYPE
@@ -477,8 +477,8 @@
 #define __NRAN1_fremovexattr                 name
 #define __NRAN0_tkill                        tid
 #define __NRAN1_tkill                        signo
-#define __NRAN0_sendfile64                   out_fd
-#define __NRAN1_sendfile64                   in_fd
+#define __NRAN0_sendfile64                   outfd
+#define __NRAN1_sendfile64                   infd
 #define __NRAN2_sendfile64                   pin_offset
 #define __NRAN3_sendfile64                   num_bytes
 #define __NRAN0_futex                        uaddr
@@ -1716,8 +1716,8 @@
 #define __NRATR0_sigaltstack                  SC_REPR_STRUCT_SIGALTSTACKX32                                        /* ss */ 
 #define __NRATR1_sigaltstack                  SC_REPR_POINTER                                                      /* oss */ 
 #define __NRRTR_sigaltstack                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_sendfile                     SC_REPR_FD_T                                                         /* out_fd */ 
-#define __NRATR1_sendfile                     SC_REPR_FD_T                                                         /* in_fd */ 
+#define __NRATR0_sendfile                     SC_REPR_FD_T                                                         /* outfd */ 
+#define __NRATR1_sendfile                     SC_REPR_FD_T                                                         /* infd */ 
 #define __NRATR2_sendfile                     SC_REPR_POINTER                                                      /* pin_offset */ 
 #define __NRATR3_sendfile                     SC_REPR_SIZE_T                                                       /* num_bytes */ 
 #define __NRRTR_sendfile                      SC_REPR_SSIZE_T                                                      /* return */
@@ -1885,8 +1885,8 @@
 #define __NRATR0_tkill                        SC_REPR_PID_T                                                        /* tid */ 
 #define __NRATR1_tkill                        SC_REPR_SIGNO_T                                                      /* signo */ 
 #define __NRRTR_tkill                         SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_sendfile64                   SC_REPR_FD_T                                                         /* out_fd */ 
-#define __NRATR1_sendfile64                   SC_REPR_FD_T                                                         /* in_fd */ 
+#define __NRATR0_sendfile64                   SC_REPR_FD_T                                                         /* outfd */ 
+#define __NRATR1_sendfile64                   SC_REPR_FD_T                                                         /* infd */ 
 #define __NRATR2_sendfile64                   SC_REPR_POINTER                                                      /* pin_offset */ 
 #define __NRATR3_sendfile64                   SC_REPR_SIZE_T                                                       /* num_bytes */ 
 #define __NRRTR_sendfile64                    SC_REPR_SSIZE_T                                                      /* return */

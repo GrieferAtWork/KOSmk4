@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf24d7891 */
+/* HASH CRC-32:0xd5f83e4e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -127,8 +127,8 @@
 #define __NR64AN0_setitimer                which
 #define __NR64AN1_setitimer                newval
 #define __NR64AN2_setitimer                oldval
-#define __NR64AN0_sendfile                 out_fd
-#define __NR64AN1_sendfile                 in_fd
+#define __NR64AN0_sendfile                 outfd
+#define __NR64AN1_sendfile                 infd
 #define __NR64AN2_sendfile                 pin_offset
 #define __NR64AN3_sendfile                 num_bytes
 #define __NR64AN0_socket                   domain
@@ -1114,8 +1114,8 @@
 #define __NR64ATR2_setitimer                SC_REPR_POINTER                                                      /* oldval */ 
 #define __NR64RTR_setitimer                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64RTR_getpid                    SC_REPR_PID_T                                                        /* return */
-#define __NR64ATR0_sendfile                 SC_REPR_FD_T                                                         /* out_fd */ 
-#define __NR64ATR1_sendfile                 SC_REPR_FD_T                                                         /* in_fd */ 
+#define __NR64ATR0_sendfile                 SC_REPR_FD_T                                                         /* outfd */ 
+#define __NR64ATR1_sendfile                 SC_REPR_FD_T                                                         /* infd */ 
 #define __NR64ATR2_sendfile                 SC_REPR_POINTER                                                      /* pin_offset */ 
 #define __NR64ATR3_sendfile                 SC_REPR_SIZE_T                                                       /* num_bytes */ 
 #define __NR64RTR_sendfile                  SC_REPR_SSIZE_T                                                      /* return */

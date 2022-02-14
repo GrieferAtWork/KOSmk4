@@ -890,6 +890,15 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Add futex support to pthread_once() (via an alternate [[userimpl]]) */
 
+	/* TODO: Non-rt_ syscalls that take a sigset have a definition of `typedef ulongptr_t old_sigset_t;'
+	 *       that  is used instead of the modern `sigset_t'!  Support this, but also improve support for
+	 *       custom-sized user-space sigset structures, such that user-space can use any sigset size  it
+	 *       wants to. Also change  the size of the  kernel's internal sigset_t to  be much smaller,  to
+	 *       the  point where we only keep track of bits for signals `1..255' (since other signals can't
+	 *       be encoded in `rpc_schedule(2)' or `clone(2)')
+	 * Essentially, the kernel should be configurable to support any # of signals, and user-space should
+	 * work, no matter what it tells the kernel to be its wanted sigset_t size. */
+
 	return state;
 }
 

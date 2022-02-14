@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1d41d50 */
+/* HASH CRC-32:0x126ede7c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1721,7 +1721,20 @@ INTERN_FUNCTION(libc_sys_sigaltstack)
 END(libc_sys_sigaltstack)
 DEFINE_PUBLIC_ALIAS(sys_sigaltstack, libc_sys_sigaltstack)
 
-/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
+/* Read up to `num_bytes' from `infd', and write that data to `outfd'
+ * Files must be opened with the relevant access permissions (same as
+ * would be enforced by `read(2)' and `write(2)')
+ * When `pin_offset != NULL', the pointed-to location is used to track
+ * the read-position in `infd'. Note that in the event that writing to
+ * this address faults, data may  have still been written to  `outfd',
+ * so be sure to have this point to writable memory.
+ * @param: outfd:      Output file descriptor
+ * @param: infd:       Input file descriptor
+ * @param: pin_offset: If non-NULL, position from which to start reading,
+ *                     and updated to reflect  how much could be  copied.
+ * @param: num_bytes:  The max number of bytes to transfer
+ * @return: * :        The actual number of bytes transferred */
+/* ssize_t sendfile(fd_t outfd, fd_t infd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
 INTERN_FUNCTION(libc_sys_sendfile)
 	movl   $(0xbb), %eax
 	jmp    libc_x86_exec_syscall4
@@ -2152,7 +2165,20 @@ INTERN_FUNCTION(libc_sys_tkill)
 END(libc_sys_tkill)
 DEFINE_PUBLIC_ALIAS(sys_tkill, libc_sys_tkill)
 
-/* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) */
+/* Read up to `num_bytes' from `infd', and write that data to `outfd'
+ * Files must be opened with the relevant access permissions (same as
+ * would be enforced by `read(2)' and `write(2)')
+ * When `pin_offset != NULL', the pointed-to location is used to track
+ * the read-position in `infd'. Note that in the event that writing to
+ * this address faults, data may  have still been written to  `outfd',
+ * so be sure to have this point to writable memory.
+ * @param: outfd:      Output file descriptor
+ * @param: infd:       Input file descriptor
+ * @param: pin_offset: If non-NULL, position from which to start reading,
+ *                     and updated to reflect  how much could be  copied.
+ * @param: num_bytes:  The max number of bytes to transfer
+ * @return: * :        The actual number of bytes transferred */
+/* ssize_t sendfile64(fd_t outfd, fd_t infd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) */
 INTERN_FUNCTION(libc_sys_sendfile64)
 	movl   $(0xef), %eax
 	jmp    libc_x86_exec_syscall4
@@ -6131,7 +6157,20 @@ INTERN_FUNCTION(libc_sys_Xsigaltstack)
 END(libc_sys_Xsigaltstack)
 DEFINE_PUBLIC_ALIAS(sys_Xsigaltstack, libc_sys_Xsigaltstack)
 
-/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
+/* Read up to `num_bytes' from `infd', and write that data to `outfd'
+ * Files must be opened with the relevant access permissions (same as
+ * would be enforced by `read(2)' and `write(2)')
+ * When `pin_offset != NULL', the pointed-to location is used to track
+ * the read-position in `infd'. Note that in the event that writing to
+ * this address faults, data may  have still been written to  `outfd',
+ * so be sure to have this point to writable memory.
+ * @param: outfd:      Output file descriptor
+ * @param: infd:       Input file descriptor
+ * @param: pin_offset: If non-NULL, position from which to start reading,
+ *                     and updated to reflect  how much could be  copied.
+ * @param: num_bytes:  The max number of bytes to transfer
+ * @return: * :        The actual number of bytes transferred */
+/* ssize_t sendfile(fd_t outfd, fd_t infd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
 INTERN_FUNCTION(libc_sys_Xsendfile)
 	movl   $(0xbb), %eax
 	jmp    libc_x86_exec_Xsyscall4
@@ -6562,7 +6601,20 @@ INTERN_FUNCTION(libc_sys_Xtkill)
 END(libc_sys_Xtkill)
 DEFINE_PUBLIC_ALIAS(sys_Xtkill, libc_sys_Xtkill)
 
-/* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) */
+/* Read up to `num_bytes' from `infd', and write that data to `outfd'
+ * Files must be opened with the relevant access permissions (same as
+ * would be enforced by `read(2)' and `write(2)')
+ * When `pin_offset != NULL', the pointed-to location is used to track
+ * the read-position in `infd'. Note that in the event that writing to
+ * this address faults, data may  have still been written to  `outfd',
+ * so be sure to have this point to writable memory.
+ * @param: outfd:      Output file descriptor
+ * @param: infd:       Input file descriptor
+ * @param: pin_offset: If non-NULL, position from which to start reading,
+ *                     and updated to reflect  how much could be  copied.
+ * @param: num_bytes:  The max number of bytes to transfer
+ * @return: * :        The actual number of bytes transferred */
+/* ssize_t sendfile64(fd_t outfd, fd_t infd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) */
 INTERN_FUNCTION(libc_sys_Xsendfile64)
 	movl   $(0xef), %eax
 	jmp    libc_x86_exec_Xsyscall4

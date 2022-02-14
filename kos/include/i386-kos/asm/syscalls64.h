@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4f342c1 */
+/* HASH CRC-32:0xf695be38 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -129,7 +129,20 @@
 /* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
 #define __NR_setitimer                0x26                           /* errno_t setitimer(syscall_ulong_t which, struct __itimervalx64 const *newval, struct __itimervalx64 *oldval) */
 #define __NR_getpid                   0x27                           /* pid_t getpid(void) */
-#define __NR_sendfile                 0x28                           /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *pin_offset, size_t num_bytes) */
+/* Read up to `num_bytes' from `infd', and write that data to `outfd'
+ * Files must be opened with the relevant access permissions (same as
+ * would be enforced by `read(2)' and `write(2)')
+ * When `pin_offset != NULL', the pointed-to location is used to track
+ * the read-position in `infd'. Note that in the event that writing to
+ * this address faults, data may  have still been written to  `outfd',
+ * so be sure to have this point to writable memory.
+ * @param: outfd:      Output file descriptor
+ * @param: infd:       Input file descriptor
+ * @param: pin_offset: If non-NULL, position from which to start reading,
+ *                     and updated to reflect  how much could be  copied.
+ * @param: num_bytes:  The max number of bytes to transfer
+ * @return: * :        The actual number of bytes transferred */
+#define __NR_sendfile                 0x28                           /* ssize_t sendfile(fd_t outfd, fd_t infd, syscall_ulong_t *pin_offset, size_t num_bytes) */
 /* Create a new socket for the given domain/type/protocol triple.
  * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
  * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')

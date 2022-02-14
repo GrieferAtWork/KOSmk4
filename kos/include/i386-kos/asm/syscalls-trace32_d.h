@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb51761f */
+/* HASH CRC-32:0x6c2edc00 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -363,8 +363,8 @@
 #define __NR32AN0_capset                       TODO_PROTOTYPE
 #define __NR32AN0_sigaltstack                  ss
 #define __NR32AN1_sigaltstack                  oss
-#define __NR32AN0_sendfile                     out_fd
-#define __NR32AN1_sendfile                     in_fd
+#define __NR32AN0_sendfile                     outfd
+#define __NR32AN1_sendfile                     infd
 #define __NR32AN2_sendfile                     pin_offset
 #define __NR32AN3_sendfile                     num_bytes
 #define __NR32AN0_ugetrlimit                   TODO_PROTOTYPE
@@ -477,8 +477,8 @@
 #define __NR32AN1_fremovexattr                 name
 #define __NR32AN0_tkill                        tid
 #define __NR32AN1_tkill                        signo
-#define __NR32AN0_sendfile64                   out_fd
-#define __NR32AN1_sendfile64                   in_fd
+#define __NR32AN0_sendfile64                   outfd
+#define __NR32AN1_sendfile64                   infd
 #define __NR32AN2_sendfile64                   pin_offset
 #define __NR32AN3_sendfile64                   num_bytes
 #define __NR32AN0_futex                        uaddr
@@ -1716,8 +1716,8 @@
 #define __NR32ATR0_sigaltstack                  SC_REPR_STRUCT_SIGALTSTACKX32                                        /* ss */ 
 #define __NR32ATR1_sigaltstack                  SC_REPR_POINTER                                                      /* oss */ 
 #define __NR32RTR_sigaltstack                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_sendfile                     SC_REPR_FD_T                                                         /* out_fd */ 
-#define __NR32ATR1_sendfile                     SC_REPR_FD_T                                                         /* in_fd */ 
+#define __NR32ATR0_sendfile                     SC_REPR_FD_T                                                         /* outfd */ 
+#define __NR32ATR1_sendfile                     SC_REPR_FD_T                                                         /* infd */ 
 #define __NR32ATR2_sendfile                     SC_REPR_POINTER                                                      /* pin_offset */ 
 #define __NR32ATR3_sendfile                     SC_REPR_SIZE_T                                                       /* num_bytes */ 
 #define __NR32RTR_sendfile                      SC_REPR_SSIZE_T                                                      /* return */
@@ -1885,8 +1885,8 @@
 #define __NR32ATR0_tkill                        SC_REPR_PID_T                                                        /* tid */ 
 #define __NR32ATR1_tkill                        SC_REPR_SIGNO_T                                                      /* signo */ 
 #define __NR32RTR_tkill                         SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_sendfile64                   SC_REPR_FD_T                                                         /* out_fd */ 
-#define __NR32ATR1_sendfile64                   SC_REPR_FD_T                                                         /* in_fd */ 
+#define __NR32ATR0_sendfile64                   SC_REPR_FD_T                                                         /* outfd */ 
+#define __NR32ATR1_sendfile64                   SC_REPR_FD_T                                                         /* infd */ 
 #define __NR32ATR2_sendfile64                   SC_REPR_POINTER                                                      /* pin_offset */ 
 #define __NR32ATR3_sendfile64                   SC_REPR_SIZE_T                                                       /* num_bytes */ 
 #define __NR32RTR_sendfile64                    SC_REPR_SSIZE_T                                                      /* return */

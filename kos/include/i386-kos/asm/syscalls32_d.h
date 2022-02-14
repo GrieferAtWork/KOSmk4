@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95148db3 */
+/* HASH CRC-32:0x32368855 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -415,7 +415,20 @@
 #define __NR32_capget                       0xb8                   /* errno_t capget(int TODO_PROTOTYPE) */
 #define __NR32_capset                       0xb9                   /* errno_t capset(int TODO_PROTOTYPE) */
 #define __NR32_sigaltstack                  0xba                   /* errno_t sigaltstack(struct __sigaltstackx32 const *ss, struct __sigaltstackx32 *oss) */
-#define __NR32_sendfile                     0xbb                   /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
+/* Read up to `num_bytes' from `infd', and write that data to `outfd'
+ * Files must be opened with the relevant access permissions (same as
+ * would be enforced by `read(2)' and `write(2)')
+ * When `pin_offset != NULL', the pointed-to location is used to track
+ * the read-position in `infd'. Note that in the event that writing to
+ * this address faults, data may  have still been written to  `outfd',
+ * so be sure to have this point to writable memory.
+ * @param: outfd:      Output file descriptor
+ * @param: infd:       Input file descriptor
+ * @param: pin_offset: If non-NULL, position from which to start reading,
+ *                     and updated to reflect  how much could be  copied.
+ * @param: num_bytes:  The max number of bytes to transfer
+ * @return: * :        The actual number of bytes transferred */
+#define __NR32_sendfile                     0xbb                   /* ssize_t sendfile(fd_t outfd, fd_t infd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
 #define __NR32_getpmsg                      0xbc                   /* errno_t getpmsg(void) */
 #define __NR32_putpmsg                      0xbd                   /* errno_t putpmsg(void) */
 /* Same as `fork(2)', but the child process may be executed within in the same VM
@@ -546,7 +559,20 @@
 #define __NR32_lremovexattr                 0xec                   /* errno_t lremovexattr(char const *path, char const *name) */
 #define __NR32_fremovexattr                 0xed                   /* errno_t fremovexattr(fd_t fd, char const *name) */
 #define __NR32_tkill                        0xee                   /* errno_t tkill(pid_t tid, signo_t signo) */
-#define __NR32_sendfile64                   0xef                   /* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) */
+/* Read up to `num_bytes' from `infd', and write that data to `outfd'
+ * Files must be opened with the relevant access permissions (same as
+ * would be enforced by `read(2)' and `write(2)')
+ * When `pin_offset != NULL', the pointed-to location is used to track
+ * the read-position in `infd'. Note that in the event that writing to
+ * this address faults, data may  have still been written to  `outfd',
+ * so be sure to have this point to writable memory.
+ * @param: outfd:      Output file descriptor
+ * @param: infd:       Input file descriptor
+ * @param: pin_offset: If non-NULL, position from which to start reading,
+ *                     and updated to reflect  how much could be  copied.
+ * @param: num_bytes:  The max number of bytes to transfer
+ * @return: * :        The actual number of bytes transferred */
+#define __NR32_sendfile64                   0xef                   /* ssize_t sendfile64(fd_t outfd, fd_t infd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) */
 /* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
 #define __NR32_futex                        0xf0                   /* syscall_slong_t futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
 #define __NR32_sched_setaffinity            0xf1                   /* errno_t sched_setaffinity(pid_t pid, size_t cpusetsize, struct __cpu_set_struct const *cpuset) */

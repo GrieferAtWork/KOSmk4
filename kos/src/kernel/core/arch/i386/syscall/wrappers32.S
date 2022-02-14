@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21febbb6 */
+/* HASH CRC-32:0xa4aa6581 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7150,7 +7150,20 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigaltstack)
 	.cfi_endproc
 END(__x86_asm32_int80_sigaltstack)
 
-/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
+/* Read up to `num_bytes' from `infd', and write that data to `outfd'
+ * Files must be opened with the relevant access permissions (same as
+ * would be enforced by `read(2)' and `write(2)')
+ * When `pin_offset != NULL', the pointed-to location is used to track
+ * the read-position in `infd'. Note that in the event that writing to
+ * this address faults, data may  have still been written to  `outfd',
+ * so be sure to have this point to writable memory.
+ * @param: outfd:      Output file descriptor
+ * @param: infd:       Input file descriptor
+ * @param: pin_offset: If non-NULL, position from which to start reading,
+ *                     and updated to reflect  how much could be  copied.
+ * @param: num_bytes:  The max number of bytes to transfer
+ * @return: * :        The actual number of bytes transferred */
+/* ssize_t sendfile(fd_t outfd, fd_t infd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
 .section .text.x86.asm32_syscall_int80.sendfile
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendfile)
 	.cfi_startproc simple
@@ -9092,7 +9105,20 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_tkill)
 	.cfi_endproc
 END(__x86_asm32_int80_tkill)
 
-/* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) */
+/* Read up to `num_bytes' from `infd', and write that data to `outfd'
+ * Files must be opened with the relevant access permissions (same as
+ * would be enforced by `read(2)' and `write(2)')
+ * When `pin_offset != NULL', the pointed-to location is used to track
+ * the read-position in `infd'. Note that in the event that writing to
+ * this address faults, data may  have still been written to  `outfd',
+ * so be sure to have this point to writable memory.
+ * @param: outfd:      Output file descriptor
+ * @param: infd:       Input file descriptor
+ * @param: pin_offset: If non-NULL, position from which to start reading,
+ *                     and updated to reflect  how much could be  copied.
+ * @param: num_bytes:  The max number of bytes to transfer
+ * @return: * :        The actual number of bytes transferred */
+/* ssize_t sendfile64(fd_t outfd, fd_t infd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) */
 .section .text.x86.asm32_syscall_int80.sendfile64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendfile64)
 	.cfi_startproc simple
@@ -26580,7 +26606,20 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigaltstack)
 	.cfi_endproc
 END(__x86_asm32_sysenter_sigaltstack)
 
-/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
+/* Read up to `num_bytes' from `infd', and write that data to `outfd'
+ * Files must be opened with the relevant access permissions (same as
+ * would be enforced by `read(2)' and `write(2)')
+ * When `pin_offset != NULL', the pointed-to location is used to track
+ * the read-position in `infd'. Note that in the event that writing to
+ * this address faults, data may  have still been written to  `outfd',
+ * so be sure to have this point to writable memory.
+ * @param: outfd:      Output file descriptor
+ * @param: infd:       Input file descriptor
+ * @param: pin_offset: If non-NULL, position from which to start reading,
+ *                     and updated to reflect  how much could be  copied.
+ * @param: num_bytes:  The max number of bytes to transfer
+ * @return: * :        The actual number of bytes transferred */
+/* ssize_t sendfile(fd_t outfd, fd_t infd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
 .section .text.x86.asm32_syscall_sysenter.sendfile
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sendfile)
 	.cfi_startproc simple
@@ -28530,7 +28569,20 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_tkill)
 	.cfi_endproc
 END(__x86_asm32_sysenter_tkill)
 
-/* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) */
+/* Read up to `num_bytes' from `infd', and write that data to `outfd'
+ * Files must be opened with the relevant access permissions (same as
+ * would be enforced by `read(2)' and `write(2)')
+ * When `pin_offset != NULL', the pointed-to location is used to track
+ * the read-position in `infd'. Note that in the event that writing to
+ * this address faults, data may  have still been written to  `outfd',
+ * so be sure to have this point to writable memory.
+ * @param: outfd:      Output file descriptor
+ * @param: infd:       Input file descriptor
+ * @param: pin_offset: If non-NULL, position from which to start reading,
+ *                     and updated to reflect  how much could be  copied.
+ * @param: num_bytes:  The max number of bytes to transfer
+ * @return: * :        The actual number of bytes transferred */
+/* ssize_t sendfile64(fd_t outfd, fd_t infd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) */
 .section .text.x86.asm32_syscall_sysenter.sendfile64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sendfile64)
 	.cfi_startproc simple

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfaa6f90 */
+/* HASH CRC-32:0x7db1b371 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -127,8 +127,8 @@
 #define __NRAN0_setitimer                which
 #define __NRAN1_setitimer                newval
 #define __NRAN2_setitimer                oldval
-#define __NRAN0_sendfile                 out_fd
-#define __NRAN1_sendfile                 in_fd
+#define __NRAN0_sendfile                 outfd
+#define __NRAN1_sendfile                 infd
 #define __NRAN2_sendfile                 pin_offset
 #define __NRAN3_sendfile                 num_bytes
 #define __NRAN0_socket                   domain
@@ -1114,8 +1114,8 @@
 #define __NRATR2_setitimer                SC_REPR_POINTER                                                      /* oldval */ 
 #define __NRRTR_setitimer                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NRRTR_getpid                    SC_REPR_PID_T                                                        /* return */
-#define __NRATR0_sendfile                 SC_REPR_FD_T                                                         /* out_fd */ 
-#define __NRATR1_sendfile                 SC_REPR_FD_T                                                         /* in_fd */ 
+#define __NRATR0_sendfile                 SC_REPR_FD_T                                                         /* outfd */ 
+#define __NRATR1_sendfile                 SC_REPR_FD_T                                                         /* infd */ 
 #define __NRATR2_sendfile                 SC_REPR_POINTER                                                      /* pin_offset */ 
 #define __NRATR3_sendfile                 SC_REPR_SIZE_T                                                       /* num_bytes */ 
 #define __NRRTR_sendfile                  SC_REPR_SSIZE_T                                                      /* return */

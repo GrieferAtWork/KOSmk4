@@ -550,9 +550,22 @@ execveatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname,
 %[endgroup]
 
 %[startgroup]
-[cp][restart(dont)] sendfile:(fd_t out_fd, fd_t in_fd, syscall_ulong_t *pin_offset, size_t num_bytes) -> ssize_t;    /* UNIMPLEMENTED! */
-[cp][restart(dont)] sendfile32:(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) -> ssize_t; /* UNIMPLEMENTED! */
-[cp][restart(dont)] sendfile64:(fd_t out_fd, fd_t in_fd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) -> ssize_t; /* UNIMPLEMENTED! */
+@@Read up to `num_bytes' from `infd', and write that data to `outfd'
+@@Files must be opened with the relevant access permissions (same as
+@@would be enforced by `read(2)' and `write(2)')
+@@When `pin_offset != NULL', the pointed-to location is used to track
+@@the read-position in `infd'. Note that in the event that writing to
+@@this address faults, data may  have still been written to  `outfd',
+@@so be sure to have this point to writable memory.
+@@@param: outfd:      Output file descriptor
+@@@param: infd:       Input file descriptor
+@@@param: pin_offset: If non-NULL, position from which to start reading,
+@@                    and updated to reflect  how much could be  copied.
+@@@param: num_bytes:  The max number of bytes to transfer
+@@@return: * :        The actual number of bytes transferred
+[cp][restart(dont)] sendfile:(fd_t outfd, fd_t infd, syscall_ulong_t *pin_offset, size_t num_bytes) -> ssize_t;
+[cp][restart(dont)][doc_alias(sendfile)] sendfile32:(fd_t outfd, fd_t infd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) -> ssize_t;
+[cp][restart(dont)][doc_alias(sendfile)] sendfile64:(fd_t outfd, fd_t infd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) -> ssize_t;
 %[endgroup]
 
 @@@param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT'
@@ -739,6 +752,9 @@ memfd_create:(char const *name, [tostr(MEMFD_CREATE_FLAGS)] syscall_ulong_t flag
 @@@param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK | O_NONBLOCK'
 userviofd:(size_t initial_size, [tostr(OFLAG__CLOEXEC__CLOFORK__NONBLOCK)] syscall_ulong_t flags) -> fd_t;
 
+userfaultfd:(syscall_ulong_t flags) -> fd_t; /* UNIMPLEMENTED */
+
+
 
 
 
@@ -785,22 +801,22 @@ maplibrary:(void *addr,
 @@@param: flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED'
 mremap:(void *addr, size_t old_len, size_t new_len,
         [tostr(MREMAP_FLAGS)] syscall_ulong_t flags,
-        void *new_address) -> void *; /* UNIMPLEMENTED! */
+        void *new_address) -> void *;
 
 remap_file_pages:(void *start, size_t size,
                   [tostr(MMAP_PROT)] syscall_ulong_t prot,
                   size_t pgoff, syscall_ulong_t flags) -> errno_t; /* UNIMPLEMENTED! */
 
-mincore:(void *start, size_t len, uint8_t *vec) -> errno_t;                 /* UNIMPLEMENTED! */
+mincore:(void *start, size_t len, uint8_t *vec) -> errno_t;
 madvise:(void *addr, size_t len, syscall_ulong_t advice) -> errno_t;        /* UNIMPLEMENTED! */
-mlock:(void const *addr, size_t len) -> errno_t;                            /* UNIMPLEMENTED! */
-mlock2:(void const *addr, size_t length, syscall_ulong_t flags) -> errno_t; /* UNIMPLEMENTED! */
-munlock:(void const *addr, size_t len) -> errno_t;                          /* UNIMPLEMENTED! */
-[cp] msync:(void *addr, size_t len, syscall_ulong_t flags) -> errno_t;      /* UNIMPLEMENTED! */
+mlock:(void const *addr, size_t len) -> errno_t;
+mlock2:(void const *addr, size_t length, syscall_ulong_t flags) -> errno_t;
+munlock:(void const *addr, size_t len) -> errno_t;
+[cp] msync:(void *addr, size_t len, syscall_ulong_t flags) -> errno_t;
 
 @@@param: flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT'
-mlockall:([tostr(MLOCKALL_FLAGS)] syscall_ulong_t flags) -> errno_t; /* UNIMPLEMENTED! */
-munlockall:() -> errno_t;                                            /* UNIMPLEMENTED! */
+mlockall:([tostr(MLOCKALL_FLAGS)] syscall_ulong_t flags) -> errno_t;
+munlockall:() -> errno_t;
 
 uselib:([tostr(FILENAME)] char const *library) -> errno_t; /* UNIMPLEMENTED! */
 
@@ -848,7 +864,7 @@ process_vm_writevx64:(pid_t pid,
 @@@param: futex_op: One of `FUTEX_*' from <linux/futex.h>
 [cp] futex:(uint32_t *uaddr, [tostr(FUTEX_OP)] syscall_ulong_t futex_op, uint32_t val, [tostr(STRUCT_TIMESPEC_OR_UINT32:futex_op)] struct timespec const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
 [cp][doc_alias(futex)] futex32:(uint32_t *uaddr, [tostr(FUTEX_OP)] syscall_ulong_t futex_op, uint32_t val, [tostr(STRUCT_TIMESPEC32_OR_UINT32:futex_op)] struct timespec32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
-[cp][doc_alias(futex)] futex64:(uint32_t *uaddr, [tostr(FUTEX_OP)] syscall_ulong_t futex_op, uint32_t val, [tostr(STRUCT_TIMESPEC64_OR_UINT32:futex_op)] struct timespec64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t; /* UNIMPLEMENTED! */
+[cp][doc_alias(futex)] futex64:(uint32_t *uaddr, [tostr(FUTEX_OP)] syscall_ulong_t futex_op, uint32_t val, [tostr(STRUCT_TIMESPEC64_OR_UINT32:futex_op)] struct timespec64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
 [cp][doc_alias(futex)] futexx32:(uint32_t *uaddr, [tostr(FUTEX_OP)] syscall_ulong_t futex_op, uint32_t val, [tostr(STRUCT_TIMESPECX32_OR_UINT32:futex_op)] struct timespecx32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
 [cp][doc_alias(futex)] futexx32_64:(uint32_t *uaddr, [tostr(FUTEX_OP)] syscall_ulong_t futex_op, uint32_t val, [tostr(STRUCT_TIMESPECX32_64_OR_UINT32:futex_op)] struct timespecx32_64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
 [cp][doc_alias(futex)] futexx64:(uint32_t *uaddr, [tostr(FUTEX_OP)] syscall_ulong_t futex_op, uint32_t val, [tostr(STRUCT_TIMESPECX64_OR_UINT32:futex_op)] struct timespecx64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
@@ -1038,7 +1054,7 @@ rmdir:(char const *path) -> errno_t;
 @@@param: flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE | AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH'
 [cp] renameat2:(fd_t olddirfd, [tostr(FILENAME:olddirfd)] char const *oldpath,
                 fd_t newdirfd, [tostr(FILENAME:newdirfd)] char const *newpath,
-                [tostr(RENAMEAT2_FLAGS)] atflag_t flags) -> errno_t; /* UNIMPLEMENTED! */
+                [tostr(RENAMEAT2_FLAGS)] atflag_t flags) -> errno_t;
 
 %[startgroup]
 truncate:([tostr(FILENAME)] char const *filename, syscall_ulong_t length) -> errno_t;
@@ -1855,6 +1871,8 @@ stime:([tostr(TIME32_T_PTR)] time32_t const *t) -> errno_t;   /* UNIMPLEMENTED! 
 stime64:([tostr(TIME64_T_PTR)] time64_t const *t) -> errno_t; /* UNIMPLEMENTED! */
 %[endgroup]
 
+adjtimex:(struct timex *ntx) -> errno_t;
+
 %[startgroup]
 ftime:([tostr(out:STRUCT_TIMEB)] struct timeb *tp) -> errno_t;
 ftime32:([tostr(out:STRUCT_TIMEB32)] struct timeb32 *tp) -> errno_t;
@@ -2258,7 +2276,7 @@ arch_prctl:([tostr(ARCH_PRCTL_COMMAND)] unsigned int command, uintptr_t *addr) -
 /* NOTE: We declare `arch_prctl()' with `uintptr_t *addr' so that the
  *       function isn't considered compatible with its compatibility-
  *       mode variant. -- We want 2 separate implementations for  32-
- *       bit, and 64- bit when compiling for x86_64! */
+ *       bit, and 64-bit when compiling for x86_64! */
 
 
 
@@ -2807,17 +2825,6 @@ modify_ldt:(syscall_ulong_t func, void *ptr, syscall_ulong_t bytecount) -> sysca
 pkey_alloc:(syscall_ulong_t flags, syscall_ulong_t access_rights) -> syscall_slong_t;          /* UNIMPLEMENTED! */
 pkey_free:(syscall_ulong_t key) -> errno_t;                                                    /* UNIMPLEMENTED! */
 pkey_mprotect:(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t pkey) -> errno_t; /* UNIMPLEMENTED! */
-
-
-
-
-
-
-/************************************************************************/
-/* INIMPLEMENTED                                                        */
-/************************************************************************/
-userfaultfd:(syscall_ulong_t flags) -> fd_t;
-adjtimex:(struct timex *ntx) -> errno_t;
 
 
 

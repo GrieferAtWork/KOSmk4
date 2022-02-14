@@ -107,6 +107,13 @@ handle_filehandle_write(struct filehandle *__restrict self,
 	if (mode & IO_APPEND) {
 		result = mfile_utailwrite(self->fh_file, src, num_bytes, mode);
 	} else {
+#if 1 /* This is still better than potentially overwriting unrelated data... */
+		uint64_t oldpos, newpos;
+		oldpos = atomic64_read(&self->fh_offset);
+		result = mfile_upwrite(self->fh_file, src, num_bytes, (pos_t)oldpos, mode);
+		newpos = oldpos + result;
+		atomic64_write(&self->fh_offset, newpos);
+#else
 		uint64_t oldpos, newpos;
 again:
 		oldpos = atomic64_read(&self->fh_offset);
@@ -114,6 +121,7 @@ again:
 		newpos = oldpos + result;
 		if (!atomic64_cmpxch(&self->fh_offset, oldpos, newpos))
 			goto again;
+#endif
 	}
 	return result;
 }
@@ -154,6 +162,13 @@ handle_filehandle_writev(struct filehandle *__restrict self,
 	if (mode & IO_APPEND) {
 		result = mfile_utailwritev(self->fh_file, src, num_bytes, mode);
 	} else {
+#if 1 /* This is still better than potentially overwriting unrelated data... */
+		uint64_t oldpos, newpos;
+		oldpos = atomic64_read(&self->fh_offset);
+		result = mfile_upwritev(self->fh_file, src, num_bytes, (pos_t)oldpos, mode);
+		newpos = oldpos + result;
+		atomic64_write(&self->fh_offset, newpos);
+#else
 		uint64_t oldpos, newpos;
 again:
 		oldpos = atomic64_read(&self->fh_offset);
@@ -161,6 +176,7 @@ again:
 		newpos = oldpos + result;
 		if (!atomic64_cmpxch(&self->fh_offset, oldpos, newpos))
 			goto again;
+#endif
 	}
 	return result;
 }

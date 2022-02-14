@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea66fa29 */
+/* HASH CRC-32:0x15bc49a3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -761,7 +761,20 @@
 /* Create a poll(2)-able file descriptor which can be used to wait for the
  * delivery of signals masked by `sigmask' to the waiting  thread/process. */
 #define __NR_signalfd               0x415 /* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize) */
-#define __NR_sendfile               0x416 /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *pin_offset, size_t num_bytes) */
+/* Read up to `num_bytes' from `infd', and write that data to `outfd'
+ * Files must be opened with the relevant access permissions (same as
+ * would be enforced by `read(2)' and `write(2)')
+ * When `pin_offset != NULL', the pointed-to location is used to track
+ * the read-position in `infd'. Note that in the event that writing to
+ * this address faults, data may  have still been written to  `outfd',
+ * so be sure to have this point to writable memory.
+ * @param: outfd:      Output file descriptor
+ * @param: infd:       Input file descriptor
+ * @param: pin_offset: If non-NULL, position from which to start reading,
+ *                     and updated to reflect  how much could be  copied.
+ * @param: num_bytes:  The max number of bytes to transfer
+ * @return: * :        The actual number of bytes transferred */
+#define __NR_sendfile               0x416 /* ssize_t sendfile(fd_t outfd, fd_t infd, syscall_ulong_t *pin_offset, size_t num_bytes) */
 #define __NR_ftruncate              0x417 /* errno_t ftruncate(fd_t fd, syscall_ulong_t length) */
 #define __NR_truncate               0x418 /* errno_t truncate(char const *filename, syscall_ulong_t length) */
 #define __NR_stat                   0x419 /* errno_t stat(char const *filename, struct linux_stat *statbuf) */

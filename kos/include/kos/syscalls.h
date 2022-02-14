@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd06f4252 */
+/* HASH CRC-32:0xab6e87f3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1179,7 +1179,20 @@ __CDECLARE_SC(,__errno_t,semtimedop,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__ssize_t,send,(__fd_t __sockfd, void const *__buf, __size_t __bufsize, __syscall_ulong_t __msg_flags),(__sockfd,__buf,__bufsize,__msg_flags))
 #endif /* __CRT_HAVE_SC(send) */
 #if __CRT_HAVE_SC(sendfile)
-__CDECLARE_SC(,__ssize_t,sendfile,(__fd_t __out_fd, __fd_t __in_fd, __syscall_ulong_t *__pin_offset, __size_t __num_bytes),(__out_fd,__in_fd,__pin_offset,__num_bytes))
+/* Read up to `num_bytes' from `infd', and write that data to `outfd'
+ * Files must be opened with the relevant access permissions (same as
+ * would be enforced by `read(2)' and `write(2)')
+ * When `pin_offset != NULL', the pointed-to location is used to track
+ * the read-position in `infd'. Note that in the event that writing to
+ * this address faults, data may  have still been written to  `outfd',
+ * so be sure to have this point to writable memory.
+ * @param: outfd:      Output file descriptor
+ * @param: infd:       Input file descriptor
+ * @param: pin_offset: If non-NULL, position from which to start reading,
+ *                     and updated to reflect  how much could be  copied.
+ * @param: num_bytes:  The max number of bytes to transfer
+ * @return: * :        The actual number of bytes transferred */
+__CDECLARE_SC(,__ssize_t,sendfile,(__fd_t __outfd, __fd_t __infd, __syscall_ulong_t *__pin_offset, __size_t __num_bytes),(__outfd,__infd,__pin_offset,__num_bytes))
 #endif /* __CRT_HAVE_SC(sendfile) */
 #if __CRT_HAVE_SC(sendmmsg)
 /* Same as `sendmsg(2)', but may be used to send many
@@ -2641,7 +2654,20 @@ __CDECLARE_XSC(,__errno_t,semtimedop,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__ssize_t,send,(__fd_t __sockfd, void const *__buf, __size_t __bufsize, __syscall_ulong_t __msg_flags),(__sockfd,__buf,__bufsize,__msg_flags))
 #endif /* __CRT_HAVE_XSC(send) */
 #if __CRT_HAVE_XSC(sendfile)
-__CDECLARE_XSC(,__ssize_t,sendfile,(__fd_t __out_fd, __fd_t __in_fd, __syscall_ulong_t *__pin_offset, __size_t __num_bytes),(__out_fd,__in_fd,__pin_offset,__num_bytes))
+/* Read up to `num_bytes' from `infd', and write that data to `outfd'
+ * Files must be opened with the relevant access permissions (same as
+ * would be enforced by `read(2)' and `write(2)')
+ * When `pin_offset != NULL', the pointed-to location is used to track
+ * the read-position in `infd'. Note that in the event that writing to
+ * this address faults, data may  have still been written to  `outfd',
+ * so be sure to have this point to writable memory.
+ * @param: outfd:      Output file descriptor
+ * @param: infd:       Input file descriptor
+ * @param: pin_offset: If non-NULL, position from which to start reading,
+ *                     and updated to reflect  how much could be  copied.
+ * @param: num_bytes:  The max number of bytes to transfer
+ * @return: * :        The actual number of bytes transferred */
+__CDECLARE_XSC(,__ssize_t,sendfile,(__fd_t __outfd, __fd_t __infd, __syscall_ulong_t *__pin_offset, __size_t __num_bytes),(__outfd,__infd,__pin_offset,__num_bytes))
 #endif /* __CRT_HAVE_XSC(sendfile) */
 #if __CRT_HAVE_XSC(sendmmsg)
 /* Same as `sendmsg(2)', but may be used to send many
