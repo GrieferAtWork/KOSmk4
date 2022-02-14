@@ -110,74 +110,6 @@ userexcept_callsignal(struct icpustate *__restrict state,
 
 
 
-/* Restore the given `sigmask' as the current thread signal mask.
- * This function may modify user-space for the purpose of writing
- * to the calling thread's userprocmask. */
-PRIVATE NONNULL((1)) void FCALL
-sigreturn_restore_sigmask(USER CHECKED sigset_t const *sigmask)
-		THROWS(E_SEGFAULT) {
-	bool changed;
-	sigset_t newmask;
-	memcpy(&newmask, sigmask, sizeof(sigset_t));
-	sigdelset(&newmask, SIGKILL);
-	sigdelset(&newmask, SIGSTOP);
-
-#ifdef CONFIG_HAVE_USERPROCMASK
-	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
-		unsigned int i;
-		USER UNCHECKED sigset_t *umask;
-		umask = ATOMIC_READ(PERTASK_GET(this_userprocmask_address)->pm_sigmask);
-		validate_readwrite(umask, sizeof(sigset_t));
-		/* Because the userprocmask may  point to read-only memory,  only
-		 * write memory if contents have actually changed (otherwise, the
-		 * signal mask restore can be considered a no-op)
-		 *
-		 * Keep the old setting for SIGKILL and SIGSTOP (they're state is
-		 * ignored within the userprocmask, but  try not to change  their
-		 * actual state, so-as not to  accidentally write to a  read-only
-		 * mask blob) */
-		if (sigismember(umask, SIGKILL))
-			sigaddset(&newmask, SIGKILL);
-		if (sigismember(umask, SIGSTOP))
-			sigaddset(&newmask, SIGSTOP);
-
-		/* Copy values, but only if they actually changed. */
-		for (i = 0; i < COMPILER_LENOF(newmask.__val); ++i) {
-			if (umask->__val[i] != newmask.__val[i]) {
-				COMPILER_BARRIER(); /* Prevent compiler optimizations! */
-				umask->__val[i] = newmask.__val[i];
-				COMPILER_BARRIER(); /* *ditto* */
-				changed = true;
-			}
-		}
-	} else
-#endif /* !CONFIG_HAVE_USERPROCMASK */
-	{
-		sigset_t *tls_sigmask;
-		tls_sigmask = &sigmask_kernel_getwr()->sm_mask;
-		changed     = memcmp(tls_sigmask, &newmask, sizeof(sigset_t)) != 0;
-		if (changed)
-			memcpy(tls_sigmask, &newmask, sizeof(sigset_t));
-	}
-
-	/* If the signal mask changed (technically only needed if it became
-	 * less restrictive), then ensure that pending signals are  checked
-	 * prior to the next return to user-space.
-	 * We don't call `task_serve()' immediately because we still want to
-	 * restart  the caller's system  call, but if  that system call ends
-	 * up making a call to `task_serve()', then it is able to  interrupt
-	 * itself  and service the  RPC, at which  point the sc_info context
-	 * will  be present (meaning that in that  case it won't be the call
-	 * to sigreturn(2)  that's attempted  to be  restarted, but  instead
-	 * the actual *inner* system call) */
-	if (changed)
-		userexcept_sysret_inject_self();
-}
-
-
-
-
-
 
 
 
@@ -248,8 +180,15 @@ sys_sigreturn32_impl(struct icpustate *__restrict state,
 	}
 
 	/* Restore the given signal mask. */
-	if (restore_sigmask != NULL)
-		sigreturn_restore_sigmask(restore_sigmask);
+	if (restore_sigmask != NULL) {
+		/* TODO: This `sizeof(sigset_t)' must come from user-space! */
+		if (sigmask_setmask_from_user(restore_sigmask, sizeof(sigset_t))) {
+			/* If the signal mask changed (technically only needed if it became
+			 * less restrictive), then ensure that pending signals are  checked
+			 * prior to the next return to user-space. */
+			userexcept_sysret_inject_self();
+		}
+	}
 
 	/* Restore the FPU context */
 	if (restore_fpu)
@@ -403,8 +342,15 @@ sys_sigreturn64_impl(struct icpustate *__restrict state,
 	}
 
 	/* Restore the given signal mask. */
-	if (restore_sigmask != NULL)
-		sigreturn_restore_sigmask(restore_sigmask);
+	if (restore_sigmask != NULL) {
+		/* TODO: This `sizeof(sigset_t)' must come from user-space! */
+		if (sigmask_setmask_from_user(restore_sigmask, sizeof(sigset_t))) {
+			/* If the signal mask changed (technically only needed if it became
+			 * less restrictive), then ensure that pending signals are  checked
+			 * prior to the next return to user-space. */
+			userexcept_sysret_inject_self();
+		}
+	}
 
 	/* Restore the FPU context */
 	if (restore_fpu)

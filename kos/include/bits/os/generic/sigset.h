@@ -45,13 +45,15 @@
 
 #ifdef __CC__
 #if __ALIGNOF_SIGSET_T__ != __SIZEOF_POINTER__
-struct __ATTR_ALIGNED(__ALIGNOF_SIGSET_T__) __sigset_struct
-#else /* __ALIGNOF_SIGSET_T__ != __SIZEOF_POINTER__ */
-struct __sigset_struct
-#endif /* __ALIGNOF_SIGSET_T__ == __SIZEOF_POINTER__ */
-{
+__ATTR_ALIGNED(__ALIGNOF_SIGSET_T__)
+struct __sigset_struct {
 	__ULONGPTR_TYPE__ __val[__SIGSET_NWORDS];
 };
+#else /* __ALIGNOF_SIGSET_T__ != __SIZEOF_POINTER__ */
+struct __sigset_struct {
+	__ULONGPTR_TYPE__ __val[__SIGSET_NWORDS];
+};
+#endif /* __ALIGNOF_SIGSET_T__ == __SIZEOF_POINTER__ */
 
 #ifdef __USE_KOS_KERNEL
 struct __old_sigset_struct {

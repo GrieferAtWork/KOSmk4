@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_SCHED_TASK_CLONE_C
 #define GUARD_KERNEL_SRC_SCHED_TASK_CLONE_C 1
+#define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -52,6 +53,7 @@
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/host.h>
+#include <hybrid/unaligned.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
@@ -139,6 +141,7 @@ clone_set_child_tid(struct rpc_context *__restrict UNUSED(ctx), void *cookie) {
 PRIVATE NONNULL((1)) void FCALL
 waitfor_vfork_completion(struct task *__restrict thread)
 		THROWS(E_INTERRUPT) {
+	/* Wait until the child thread is done vfork()-ing */
 	while ((ATOMIC_READ(thread->t_flags) & TASK_FVFORK) != 0) {
 		struct taskpid *pid;
 		pid = FORTASK(thread, this_taskpid);
@@ -149,14 +152,9 @@ waitfor_vfork_completion(struct task *__restrict thread)
 			break;
 		}
 
-		/* Because we're doing a wait with a custom signal mask, we  have
-		 * to  inject the current  system call's return  path with a call
-		 * to `userexcept_sysret()' that will check for posix signal that
-		 * may have become pending while we  were waiting with a mask  in
-		 * which those signals were being suppressed.
-		 *
-		 * This always has to happen in the parent process of a vfork(2). */
-		userexcept_sysret_inject_self();
+		/* Prepare the calling thread  for the fact that  we're
+		 * about to use a custom signal mask when service RPCs. */
+		sigmask_prepare_sigsuspend();
 
 		/* The specs say that we should ignore (mask) all POSIX
 		 * signals until the  child indicate VFORK  completion.
@@ -165,9 +163,53 @@ waitfor_vfork_completion(struct task *__restrict thread)
 		 * custom mask that has all signal bits set to `1'.
 		 *
 		 * s.a. `__ARCH_HAVE_SIGBLOCK_VFORK' */
-		task_waitfor_with_sigmask(&kernel_sigmask_full.sm_mask);
+		task_waitfor_with_sigmask(&sigmask_full);
 	}
 }
+
+
+#ifdef CONFIG_HAVE_USERPROCMASK
+PRIVATE NONNULL((4)) void KCALL
+restore_userprocmask_after_vfork(USER CHECKED struct userprocmask *um,
+                                 USER CHECKED sigset_t *umask,
+                                 size_t umasksize,
+                                 sigset_t const *__restrict saved) {
+#if 0 /* Don't do this! -- See comment below */
+	memcpy(umask, saved, umasksize);
+#else
+	/* NOTE: Check word-wise for modified sigmask words, and only
+	 *       restore those that actually changed. -- In case none
+	 *       changed, we mustn't do any writes since the mask may
+	 *       reside in read-only memory! */
+	while (umasksize >= sizeof(ulongptr_t)) {
+		ulongptr_t oword, nword;
+		oword = UNALIGNED_GET((USER CHECKED ulongptr_t const *)umask);
+		nword = *(ulongptr_t const *)saved;
+		if (nword != oword)
+			UNALIGNED_SET((USER CHECKED ulongptr_t *)umask, nword);
+		umask = (USER CHECKED sigset_t *)((byte_t *)umask + sizeof(ulongptr_t));
+		saved = (sigset_t const *)((byte_t const *)saved + sizeof(ulongptr_t));
+		umasksize -= sizeof(ulongptr_t);
+	}
+	while (umasksize) {
+		byte_t oword, nword;
+		oword = *(USER CHECKED byte_t const *)umask;
+		nword = *(byte_t const *)saved;
+		if (nword != oword)
+			*(USER CHECKED byte_t *)umask = nword;
+		umask = (USER CHECKED sigset_t *)((byte_t *)umask + 1);
+		saved = (sigset_t const *)((byte_t const *)saved + 1);
+		umasksize -= 1;
+	}
+#endif
+
+	/* Also restore the active userprocmask pointer to what it was
+	 * prior  to the vfork(2) (just in case the child modified it,
+	 * since we want everything about the parent's signal mask  to
+	 * go back to what it was before they called vfork(2)) */
+	ATOMIC_WRITE(um->pm_sigmask, umask);
+}
+#endif /* CONFIG_HAVE_USERPROCMASK */
 
 
 /* Clone the calling thread's signal mask into `result'. */
@@ -177,7 +219,6 @@ task_clone_sigmask(struct task *__restrict result,
                    uint64_t clone_flags) {
 	/* Clone the current signal mask. */
 	(void)clone_flags;
-	assert(arref_ptr(&FORTASK(result, this_kernel_sigmask)) == &kernel_sigmask_empty);
 #ifdef CONFIG_HAVE_USERPROCMASK
 	if (caller->t_flags & TASK_FUSERPROCMASK) {
 		struct userprocmask *um;
@@ -217,40 +258,24 @@ inherit_parent_userprocmask:
 			 *
 			 * In other words: We must copy `um->pm_sigmask' into `FORTASK(result, this_kernel_sigmask)'
 			 */
-			struct kernel_sigmask *new_thread_mask;
-			new_thread_mask = (struct kernel_sigmask *)kmalloc(sizeof(struct kernel_sigmask),
-			                                                   GFP_NORMAL);
-			TRY {
-				USER UNCHECKED sigset_t *parent_umask;
-				parent_umask = ATOMIC_READ(um->pm_sigmask);
-				validate_readable(parent_umask, sizeof(sigset_t));
-				memcpy(&new_thread_mask->sm_mask, parent_umask, sizeof(sigset_t));
-			} EXCEPT {
-				kfree(new_thread_mask);
-				RETHROW();
-			}
-			new_thread_mask->sm_refcnt = 1;
-			new_thread_mask->sm_share  = 1;
-			/* Initialize the new  thread's signal mask  with
-			 * the copy of the parent's current userprocmask. */
-			arref_init(&FORTASK(result, this_kernel_sigmask), new_thread_mask);
+			USER UNCHECKED sigset_t *parent_umask;
+			size_t parent_umasksize;
+			parent_umask     = um->pm_sigmask;
+			parent_umasksize = um->pm_sigsize;
+			COMPILER_READ_BARRIER();
+			validate_readable(parent_umask, parent_umasksize);
+			if (parent_umasksize > sizeof(sigset_t))
+				parent_umasksize = sizeof(sigset_t);
+			memset(memcpy(&FORTASK(result, this_kernel_sigmask),
+			              parent_umask, parent_umasksize),
+			       0xff, sizeof(sigset_t) - parent_umasksize);
 		}
 	} else
 #endif /* CONFIG_HAVE_USERPROCMASK */
 	{
-		if (sigmask_kernel_getrd() == &kernel_sigmask_empty) {
-			/* Nothing to do here! */
-		} else {
-			REF struct kernel_sigmask *mask;
-			struct kernel_sigmask_arref *maskref;
-			maskref = &PERTASK(this_kernel_sigmask);
-			mask    = arref_get(maskref);
-			assert(mask != &kernel_sigmask_empty);
-			ATOMIC_INC(mask->sm_share);
-			COMPILER_WRITE_BARRIER();
-			arref_init(&FORTASK(result, this_kernel_sigmask), mask); /* Inherit reference. */
-			COMPILER_WRITE_BARRIER();
-		}
+		memcpy(&FORTASK(result, this_kernel_sigmask),
+		       &FORTASK(caller, this_kernel_sigmask),
+		       sizeof(sigset_t));
 	}
 }
 
@@ -729,8 +754,6 @@ again_release_kernel_and_cc:
 #endif /* __i386__ || __x86_64__ */
 		xdecref(FORTASK(result, this_handle_manager));
 		xdecref(FORTASK(result, this_sighand_ptr));
-		if (arref_ptr(&FORTASK(result, this_kernel_sigmask)) != &kernel_sigmask_empty)
-			decref(arref_ptr(&FORTASK(result, this_kernel_sigmask)));
 		xdecref(FORTASK(result, this_cred));
 		xdecref(FORTASK(result, this_fs));
 		if (result->t_mman) {
@@ -770,13 +793,18 @@ again_release_kernel_and_cc:
 			 * anything, and without those changes remaining visible once  the
 			 * parent process is resumed. */
 			if (caller->t_flags & TASK_FUSERPROCMASK) {
-				sigset_t saved_user_sigset;
-				USER UNCHECKED sigset_t *user_sigmask;
+				sigset_t saved_umask;
 				USER CHECKED struct userprocmask *um;
-				um = PERTASK_GET(this_userprocmask_address);
-				user_sigmask = ATOMIC_READ(um->pm_sigmask);
-				validate_readwrite(user_sigmask, sizeof(sigset_t));
-				memcpy(&saved_user_sigset, user_sigmask, sizeof(sigset_t));
+				USER UNCHECKED sigset_t *umask;
+				size_t umasksize;
+				um        = PERTASK_GET(this_userprocmask_address);
+				umask     = um->pm_sigmask;
+				umasksize = um->pm_sigsize;
+				COMPILER_READ_BARRIER();
+				validate_readwrite(umask, umasksize);
+				if (umasksize > sizeof(sigset_t))
+					umasksize = sizeof(sigset_t);
+				memcpy(&saved_umask, umask, umasksize);
 
 				TRY {
 					/* Actually start execution of the newly created thread. */
@@ -787,34 +815,14 @@ again_release_kernel_and_cc:
 				} EXCEPT {
 					{
 						NESTED_EXCEPTION;
-						memcpy(user_sigmask, &saved_user_sigset, sizeof(sigset_t));
-						ATOMIC_WRITE(um->pm_sigmask, user_sigmask);
+						restore_userprocmask_after_vfork(um, umask, umasksize, &saved_umask);
 					}
 					RETHROW();
 				}
 
 				/* Restore the old (saved) state of the user-space  signal
 				 * mask, as it was prior to the vfork-child being started. */
-#if 0 /* Don't do this! -- See comment below */
-				memcpy(user_sigmask, &saved_user_sigset, sizeof(sigset_t));
-#else
-				/* NOTE: Check word-wise for modified sigmask words, and only
-				 *       restore those that actually changed. -- In case none
-				 *       changed, we mustn't do any writes since the mask may
-				 *       reside in read-only memory! */
-				{
-					size_t i;
-					for (i = 0; i < COMPILER_LENOF(user_sigmask->__val); ++i) {
-						if (user_sigmask->__val[i] != saved_user_sigset.__val[i])
-							user_sigmask->__val[i] = saved_user_sigset.__val[i];
-					}
-				}
-#endif
-				/* Also restore the active userprocmask pointer to what it was
-				 * prior  to the vfork(2) (just in case the child modified it,
-				 * since we want everything about the parent's signal mask  to
-				 * go back to what it was before they called vfork(2)) */
-				ATOMIC_WRITE(um->pm_sigmask, user_sigmask);
+				restore_userprocmask_after_vfork(um, umask, umasksize, &saved_umask);
 			} else
 #endif /* CONFIG_HAVE_USERPROCMASK */
 			{

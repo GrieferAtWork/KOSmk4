@@ -344,23 +344,25 @@ DEFINE_COMPAT_SYSCALL2(errno_t, sigaltstack,
 PRIVATE void KCALL
 load_userprocmask_into_kernelspace(USER CHECKED struct userprocmask *ctl) {
 	USER UNCHECKED sigset_t *old_sigset;
-	struct kernel_sigmask *kernel_mask;
+	size_t old_sigsetsize;
+	sigset_t newmask;
+
 	/* Read the old userprocmask descriptor's final signal mask into
 	 * the kernel mask buffer of the current thread. Once we've done
 	 * that we'll no longer need to access `ctl' */
-	old_sigset = ATOMIC_READ(ctl->pm_sigmask);
-	validate_readable(old_sigset, sizeof(sigset_t));
-	kernel_mask = sigmask_kernel_getwr();
-	RAII_FINALLY {
-		/* Make sure  that  SIGKILL  and  SIGSTOP  are  never  masked
-		 * Note  however that we  don't need to check  for them to be
-		 * pending, since our thread is still in `TASK_FUSERPROCMASK'
-		 * mode,  meaning  that the  is-pending check  isn't actually
-		 * using our thread's kernel signal mask! */
-		sigdelset(&kernel_mask->sm_mask, SIGKILL);
-		sigdelset(&kernel_mask->sm_mask, SIGSTOP);
-	};
-	memcpy(&kernel_mask->sm_mask, old_sigset, sizeof(sigset_t));
+	old_sigset     = ctl->pm_sigmask;
+	old_sigsetsize = ctl->pm_sigsize;
+	COMPILER_BARRIER();
+	validate_readable(old_sigset, old_sigsetsize);
+	if (old_sigsetsize > sizeof(sigset_t))
+		old_sigsetsize = sizeof(sigset_t);
+	memset(mempcpy(&newmask, old_sigset, old_sigsetsize),
+	       0xff, sizeof(sigset_t) - old_sigsetsize);
+	sigdelset(&newmask, SIGKILL);
+	sigdelset(&newmask, SIGSTOP);
+
+	/* Install the updated signal mask. */
+	memcpy(&THIS_KERNEL_SIGMASK, &newmask, sizeof(sigset_t));
 }
 #endif /* CONFIG_HAVE_USERPROCMASK */
 
@@ -388,7 +390,7 @@ DEFINE_SYSCALL1(pid_t, set_tid_address,
 		/* Clear  the userprocmask flag(s), the same way a
 		 * call `sys_set_userprocmask_address(NULL)' would
 		 * have. */
-		ATOMIC_AND(THIS_TASK->t_flags,
+		ATOMIC_AND(PERTASK(this_task.t_flags),
 		           ~(TASK_FUSERPROCMASK |
 		             TASK_FUSERPROCMASK_AFTER_VFORK));
 	}
@@ -418,60 +420,69 @@ DEFINE_SYSCALL1(errno_t, set_userprocmask_address,
 	if unlikely(!ctl) {
 		/* Disable USERPROCMASK mode. */
 		PERTASK_SET(this_userprocmask_address, (struct userprocmask *)NULL);
-		ATOMIC_AND(THIS_TASK->t_flags,
+		ATOMIC_AND(PERTASK(this_task.t_flags),
 		           ~(TASK_FUSERPROCMASK |
 		             TASK_FUSERPROCMASK_AFTER_VFORK));
 	} else {
-		size_t sigsetsize;
+		size_t sigsetsize, overflow;
 		sigset_t initial_pending;
 		uintptr_t initial_flags;
 		USER UNCHECKED sigset_t *new_sigset;
-		struct kernel_sigmask *kernel_mask;
 
 		/* Enable USERPROCMASK mode. */
 		validate_readwrite_opt(ctl, sizeof(*ctl));
 		COMPILER_BARRIER();
 
-		/* Verify that the controller's idea of the size of a signal set matches our's */
-		sigsetsize = ATOMIC_READ(ctl->pm_sigsize);
-		if (sigsetsize != sizeof(sigset_t)) {
-			/* TODO: Allow variable-sized signal masks! */
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-			      sigsetsize);
-		}
-
 		/* Load the address for the initial signal mask. We'll be copying
 		 * our threads kernel signal mask into this field for the purpose
 		 * of initialization. */
-		new_sigset = ATOMIC_READ(ctl->pm_sigmask);
+		new_sigset = ctl->pm_sigmask;
+		sigsetsize = ctl->pm_sigsize;
 		COMPILER_BARRIER();
-		validate_readwrite(new_sigset, sizeof(sigset_t));
+		validate_readwrite(new_sigset, sigsetsize);
+		overflow = 0;
+		if (sigsetsize > sizeof(sigset_t)) {
+			overflow   = sigsetsize - sizeof(sigset_t);
+			sigsetsize = sizeof(sigset_t);
+		}
 
-		/* Initialize the user's initial signal mask with what was their
-		 * thread's signal mask before. */
-		kernel_mask = sigmask_kernel_getrd();
-		memcpy(new_sigset, &kernel_mask->sm_mask, sizeof(sigset_t));
+		/* Initialize the user's initial signal mask with
+		 * what was their thread's signal mask before. */
+		{
+			sigset_t const *kmask = &THIS_KERNEL_SIGMASK;
+			memset(mempcpy(new_sigset, kmask, sigsetsize),
+			       0xff, sizeof(sigset_t) - sigsetsize);
+		}
 
 		/* Fill in the initial set of pending signals for user-space. */
 		sigemptyset(&initial_pending);
 		task_rpc_pending_sigset(&initial_pending);
 		proc_rpc_pending_sigset(&initial_pending);
+		if (sigsetsize < sizeof(sigset_t)) {
+			/* Clear pending bits that will be invisible to user-space. */
+			bzero((byte_t *)&initial_pending + sigsetsize,
+			      sizeof(sigset_t) - sigsetsize);
+		}
 
 		/* If any signals are pending, set the HASPENDING flag. */
 		initial_flags = USERPROCMASK_FLAG_NORMAL;
 		if (!sigisemptyset(&initial_pending))
 			initial_flags |= USERPROCMASK_FLAG_HASPENDING;
 
+		/* Populate user-space with information
+		 * about the initial set of pending signals. */
+		bzero(mempcpy(&ctl->pm_pending,
+		              &initial_pending,
+		              sigsetsize),
+		      overflow);
+
+		/* Set the has-pending flag _AFTER_ filling in the pending set. */
 		COMPILER_BARRIER();
-		memcpy(&ctl->pm_pending, &initial_pending, sizeof(sigset_t));
-		COMPILER_BARRIER();
-		ATOMIC_WRITE(ctl->pm_flags, initial_flags);
-		COMPILER_BARRIER();
+		ctl->pm_flags = initial_flags;
 
 		/* Finally, initialize the TID field to that of the calling thread. */
-		ctl->pm_mytid = task_gettid();
 		COMPILER_BARRIER();
+		ctl->pm_mytid = task_gettid();
 
 		/* Store the controller address for our thread. */
 		PERTASK_SET(this_userprocmask_address, ctl);

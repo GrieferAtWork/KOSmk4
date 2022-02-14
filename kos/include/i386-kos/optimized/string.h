@@ -166,7 +166,11 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 				                     , "1" (__n_bytes >> 3)
 				                     , "2" (__386_edi)
 				                     , "3" (__386_esi)
+#if 1 /* Work-around for GCC bug */
+				                     , "X" (__n_bytes)
+#else
 				                     , "i" (__n_bytes)
+#endif
 				                     );
 			} else {
 				__asm__ __volatile__(
@@ -200,7 +204,11 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 				                     : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __src))
 				                     , "1" (__386_edi)
 				                     , "2" (__386_esi)
+#if 1 /* Work-around for GCC bug */
+				                     , "X" (__n_bytes)
+#else
 				                     , "i" (__n_bytes)
+#endif
 				                     );
 			}
 #else /* __x86_64__ */
@@ -225,7 +233,11 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 				                     , "1" (__n_bytes >> 2)
 				                     , "2" (__386_edi)
 				                     , "3" (__386_esi)
+#if 1 /* Work-around for GCC bug */
+				                     , "X" (__n_bytes)
+#else
 				                     , "i" (__n_bytes)
+#endif
 				                     );
 			} else {
 				__asm__ __volatile__(
@@ -256,7 +268,11 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 				                     : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __src))
 				                     , "1" (__386_edi)
 				                     , "2" (__386_esi)
+#if 1 /* Work-around for GCC bug */
+				                     , "X" (__n_bytes)
+#else
 				                     , "i" (__n_bytes)
+#endif
 				                     );
 			}
 #endif /* !__x86_64__ */
@@ -376,7 +392,11 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 				                     , "1" (__n_bytes >> 3)
 				                     , "2" (__386_edi)
 				                     , "3" (__386_esi)
+#if 1 /* Work-around for GCC bug */
+				                     , "X" (__n_bytes)
+#else
 				                     , "i" (__n_bytes)
+#endif
 				                     );
 			} else {
 				__asm__ __volatile__(
@@ -410,7 +430,11 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 				                     : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __src))
 				                     , "1" (__386_edi)
 				                     , "2" (__386_esi)
+#if 1 /* Work-around for GCC bug */
+				                     , "X" (__n_bytes)
+#else
 				                     , "i" (__n_bytes)
+#endif
 				                     );
 			}
 #else /* __x86_64__ */
@@ -435,7 +459,11 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 				                     , "1" (__n_bytes >> 2)
 				                     , "2" (__386_edi)
 				                     , "3" (__386_esi)
+#if 1 /* Work-around for GCC bug */
+				                     , "X" (__n_bytes)
+#else
 				                     , "i" (__n_bytes)
+#endif
 				                     );
 			} else {
 				__asm__ __volatile__(
@@ -466,7 +494,11 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 				                     : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __src))
 				                     , "1" (__386_edi)
 				                     , "2" (__386_esi)
+#if 1 /* Work-around for GCC bug */
+				                     , "X" (__n_bytes)
+#else
 				                     , "i" (__n_bytes)
+#endif
 				                     );
 			}
 #endif /* !__x86_64__ */

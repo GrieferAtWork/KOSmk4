@@ -446,18 +446,24 @@ sig_endread_and_release_locks_and_force_do_task_serve:
 					if (!have_caller_sigmask) {
 						/* Copy the calling thread's userprocmask so we can use that one! */
 						USER CHECKED struct userprocmask *um;
-						USER UNCHECKED sigset_t *current_sigmask;
+						USER UNCHECKED sigset_t *umask;
+						size_t umasksize;
 						_procctl_sig_endread(caller_ctl);
 						LOCAL_RELEASE_ALL_LOCKS();
 #ifdef LOCAL_IS_PROC
 						decref_unlikely(result_grp);
 #endif /* LOCAL_IS_PROC */
 						procctl_sig_reap(caller_ctl);
+						um = PERTASK_GET(this_userprocmask_address);
 						COMPILER_BARRIER();
-						um              = PERTASK_GET(this_userprocmask_address);
-						current_sigmask = ATOMIC_READ(um->pm_sigmask);
-						validate_readable(current_sigmask, sizeof(sigset_t));
-						memcpy(&caller_sigmask, current_sigmask, sizeof(sigset_t));
+						umask     = um->pm_sigmask;
+						umasksize = um->pm_sigsize;
+						COMPILER_READ_BARRIER();
+						validate_readable(umask, umasksize);
+						if (umasksize > sizeof(sigset_t))
+							umasksize = sizeof(sigset_t);
+						memset(mempcpy(&caller_sigmask, umask, umasksize),
+						       0xff, sizeof(sigset_t) - umasksize);
 						sigdelset(&caller_sigmask, SIGKILL);
 						sigdelset(&caller_sigmask, SIGSTOP);
 						have_caller_sigmask = true;

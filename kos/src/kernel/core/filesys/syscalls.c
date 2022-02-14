@@ -2175,19 +2175,23 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 	 * the exec. Note that the `TASK_FUSERPROCMASK' flag itself
 	 * is later unset by `reset_user_except_handler()' */
 	if (thread_flags & TASK_FUSERPROCMASK) {
-		struct kernel_sigmask *mymask;
 		USER CHECKED struct userprocmask *um;
 		USER UNCHECKED sigset_t *um_sigset;
+		size_t um_sigsiz;
 		um        = PERTASK_GET(this_userprocmask_address);
-		um_sigset = ATOMIC_READ(um->pm_sigmask);
-		validate_readable(um_sigset, sizeof(sigset_t));
+		um_sigset = um->pm_sigmask;
+		um_sigsiz = um->pm_sigsize;
+		COMPILER_READ_BARRIER();
+		validate_readable(um_sigset, um_sigsiz);
+		if (um_sigsiz > sizeof(sigset_t))
+			um_sigsiz = sizeof(sigset_t);
 
 		/* Copy the final user-space signal mask into kernel-space.
 		 * If  the exec() ends up succeeding, then this will be the
 		 * signal mask that  the new program  will start  execution
 		 * under. */
-		mymask = sigmask_kernel_getwr();
-		memcpy(&mymask->sm_mask, um_sigset, sizeof(sigset_t));
+		memset(mempcpy(&THIS_KERNEL_SIGMASK, um_sigset, um_sigsiz),
+		       0xff, sizeof(sigset_t) - um_sigsiz);
 	}
 #endif /* CONFIG_HAVE_USERPROCMASK */
 
@@ -2215,7 +2219,13 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 			/* Special case: If  userprocmask  was enabled  after  vfork(), then
 			 *               we must write-back a NULL to its `pm_sigmask' field
 			 *               in order  to indicate  to the  parent process  that
-			 *               their userprocmask hasn't been enabled, yet. */
+			 *               their userprocmask hasn't been enabled, yet.
+			 * This is actually (kind-of) a libc-specific implementation detail,
+			 * as other libcs which want  to implement userprocmask support  may
+			 * choose a different mechanism for indicating that the mask  hasn't
+			 * been  initialized for some given thread. Yet KOS's native libc is
+			 * using  a NULL-pointer in `pm_sigmask' for this, so that's what we
+			 * rely on here (s.a. `libc_sigprocmask(3)') */
 			if (old_flags & TASK_FUSERPROCMASK_AFTER_VFORK) {
 				USER CHECKED struct userprocmask *um;
 				um = PERTASK_GET(this_userprocmask_address);

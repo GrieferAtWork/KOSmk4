@@ -143,77 +143,22 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 	/* Figure out how, and if we need to mask signals. */
 	must_restore_sigmask = false;
 	if (!sigisemptyset(&action->sa_mask) || !(action->sa_flags & SA_NODEFER)) {
-#ifdef CONFIG_HAVE_USERPROCMASK
-		if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
-			size_t i;
+		sigset_t maskthese;
+		memcpy(&maskthese, &action->sa_mask, sizeof(sigset_t));
 
-			/* NOTE: The below code is _very_ careful not to modify the userprocmask
-			 *       in cases where it's state already reflects what it needs to be.
-			 * This is required because the user's signal mask may point to read-only
-			 * memory,  in which case we mustn't fault  if what we're trying to write
-			 * is what's already there! (s.a. `setsigmaskfullptr(3)') */
-			USER UNCHECKED sigset_t *umask;
-			umask = ATOMIC_READ(PERTASK_GET(this_userprocmask_address)->pm_sigmask);
-			validate_readwrite(umask, sizeof(sigset_t));
-			memcpy(&old_sigmask, umask, sizeof(sigset_t));
+		/* Unless `SA_NODEFER' is set, mask the signal that is being invoked. */
+		if (!(action->sa_flags & SA_NODEFER))
+			sigaddset(&maskthese, siginfo->si_signo);
 
-			/* Unless `SA_NODEFER' is set, mask the signal that is being invoked. */
-			if (!(action->sa_flags & SA_NODEFER) &&
-			    !sigismember(&old_sigmask, siginfo->si_signo)) {
-				sigaddset(umask, siginfo->si_signo);
-				must_restore_sigmask = true;
-			}
+		/* Never mask SIGKILL or SIGSTOP */
+		sigdelset(&maskthese, SIGKILL);
+		sigdelset(&maskthese, SIGSTOP);
 
-			/* Signal  actions are allowed  to define a secondary  set of signal numbers
-			 * that should be masked upon entry to the specific signal handler function. */
-			for (i = 0; i < COMPILER_LENOF(action->sa_mask.__val); ++i) {
-				ulongptr_t oldword, newword;
-				oldword = old_sigmask.__val[i];
-				newword = oldword | action->sa_mask.__val[i];
-				if (oldword != newword) {
-					umask->__val[i]      = newword;
-					must_restore_sigmask = true;
-				}
-			}
-		} else
-#endif /* CONFIG_HAVE_USERPROCMASK */
-		{
-			sigset_t new_sigmask;
-			sigset_t *tls_sigmask;
-			tls_sigmask = &sigmask_kernel_getrd()->sm_mask;
-			memcpy(&old_sigmask, tls_sigmask, sizeof(sigset_t));
-			memcpy(&new_sigmask, tls_sigmask, sizeof(sigset_t));
-
-			/* Unless `SA_NODEFER' is set, mask the signal that is being invoked. */
-			if (!(action->sa_flags & SA_NODEFER))
-				sigaddset(&new_sigmask, siginfo->si_signo);
-
-			/* Signal  actions are allowed  to define a secondary  set of signal numbers
-			 * that should be masked upon entry to the specific signal handler function. */
-			sigorset(&new_sigmask, &new_sigmask, &action->sa_mask);
-
-			/* Never mask SIGKILL or SIGSTOP */
-			sigdelset(&new_sigmask, SIGKILL);
-			sigdelset(&new_sigmask, SIGSTOP);
-
-			/* If changes were made, then we must restore `old_sigmask' later on. */
-			must_restore_sigmask = memcmp(&old_sigmask, &new_sigmask, sizeof(sigset_t)) != 0;
-
-			/* Set the new signal mask. */
-			if (must_restore_sigmask) {
-				tls_sigmask = &sigmask_kernel_getwr()->sm_mask;
-				memcpy(tls_sigmask, &new_sigmask, sizeof(sigset_t));
-			}
-		}
-#if 0 /* No needed because the signal mask _only_ became more restrictive! */
-		if (must_restore_sigmask)
-			userexcept_sysret_inject_self();
-#endif
-
-	} else {
-		USER CHECKED sigset_t const *sigmask;
-		sigmask = sigmask_getrd();
-		memcpy(&old_sigmask, sigmask, sizeof(sigset_t));
+		/* If changes were made, then we must restore `old_sigmask' later on. */
+		must_restore_sigmask = sigmask_getmask_and_blockmask(&old_sigmask, &maskthese);
+	} else if (action->sa_flags & SA_SIGINFO) {
+		/* Still need the old mask for `user_ucontext->uc_sigmask' */
+		sigmask_getmask(&old_sigmask);
 	}
 
 	/* Figure out which stack we should write data to. */
@@ -317,6 +262,15 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 			validate_writable(user_sigset, sizeof(sigset_t));
 			COMPILER_WRITE_BARRIER();
 			memcpy(user_sigset, &old_sigmask, sizeof(sigset_t));
+			/* TODO: Also pass along `sizeof(sigset_t)'.
+			 * Idea: Do this by replacing `user_sigset' with a struct:
+			 * >> struct sigreturn_sigset_t {
+			 * >>     size_t   ss_sigsetsize;
+			 * >>     sigset_t ss_sigset;
+			 * >> };
+			 * This  way,  we still  only  need 1  register,  and the
+			 * expected signal set size is able to be variable-sized.
+			 */
 		}
 	}
 

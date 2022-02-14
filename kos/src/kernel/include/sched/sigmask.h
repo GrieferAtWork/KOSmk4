@@ -28,6 +28,14 @@
 #include <bits/os/sigset.h>
 #include <kos/aref.h>
 
+#ifndef CONFIG_HAVE_USERPROCMASK
+#include <libc/string.h>
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+
+#ifndef SIGSET_NWORDS
+#define SIGSET_NWORDS __SIGSET_NWORDS
+#endif /* !SIGSET_NWORDS */
+
 #ifdef __CC__
 DECL_BEGIN
 
@@ -39,60 +47,16 @@ typedef struct __sigset_struct sigset_t;
 /************************************************************************/
 /* SIGNAL MASK                                                          */
 /************************************************************************/
-struct kernel_sigmask {
-	WEAK refcnt_t sm_refcnt;  /* Signal mask reference counter. */
-	WEAK refcnt_t sm_share;   /* [<= sm_refcnt] Signal mask share counter.
-	                           * NOTE: Only allowed to be incremented when `this == sigmask_getrd()' */
-	sigset_t      sm_mask;    /* [const_if(sm_share > 1)] Set of signals. */
-};
-
-#ifndef ____os_free_defined
-#define ____os_free_defined
-FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
-#endif /* !____os_free_defined */
-DEFINE_REFCOUNT_FUNCTIONS(struct kernel_sigmask, sm_refcnt, __os_free)
-
-/* An empty signal mask used to initialize `this_kernel_sigmask' */
-DATDEF struct kernel_sigmask kernel_sigmask_empty;
 
 /* A full signal mask (i.e. one that blocks all signals; except for SIGKILL and SIGSTOP) */
-DATDEF struct kernel_sigmask kernel_sigmask_full;
-
-#ifndef __kernel_sigmask_arref_defined
-#define __kernel_sigmask_arref_defined
-ARREF(kernel_sigmask_arref, kernel_sigmask);
-#endif /* !__kernel_sigmask_arref_defined */
+DATDEF sigset_t const sigmask_full;
 
 /* [1..1][lock(READ(ATOMIC), WRITE(THIS_TASK))]
  * Reference to the signal mask (set of signals being blocked) in the  current
  * thread. The pointed-to object is meaningless (but must still be valid) when
  * the associated thread make use of userprocmask. */
-DATDEF ATTR_PERTASK struct kernel_sigmask_arref this_kernel_sigmask;
-
-/* Return a pointer to the kernel signal mask of the calling thread. */
-#define sigmask_kernel_getrd() PERTASK_GET(this_kernel_sigmask.arr_obj)
-
-/* Make sure that `this_kernel_sigmask' is allocated, and isn't being
- * shared.  Then,  always  return  `PERTASK_GET(this_kernel_sigmask)' */
-FUNDEF ATTR_RETNONNULL WUNUSED struct kernel_sigmask *KCALL
-sigmask_kernel_getwr(void) THROWS(E_BADALLOC);
-
-
-#ifdef CONFIG_HAVE_USERPROCMASK
-/* Return a pointer to the signal mask of the calling thread. */
-FUNDEF WUNUSED USER CHECKED sigset_t const *KCALL sigmask_getrd(void) THROWS(E_SEGFAULT);
-
-/* Make sure that `this_kernel_sigmask' is allocated, and isn't being shared.
- * Then, always return `PERTASK_GET(this_kernel_sigmask)'
- * NOTE: When  calling thread has  the `TASK_FUSERPROCMASK' flag set,
- *       then this function will return the address of the currently-
- *       assigned  user-space signal mask,  rather than its in-kernel
- *       counterpart! */
-FUNDEF WUNUSED USER CHECKED sigset_t *KCALL sigmask_getwr(void) THROWS(E_BADALLOC, E_SEGFAULT, ...);
-#else /* CONFIG_HAVE_USERPROCMASK */
-#define sigmask_getrd() (&sigmask_kernel_getrd()->sm_mask)
-#define sigmask_getwr() (&sigmask_kernel_getwr()->sm_mask)
-#endif /* !CONFIG_HAVE_USERPROCMASK */
+DATDEF ATTR_PERTASK sigset_t this_kernel_sigmask;
+#define THIS_KERNEL_SIGMASK PERTASK(this_kernel_sigmask)
 
 
 /* Check if a given `signo' is currently masked. This function
@@ -100,9 +64,9 @@ FUNDEF WUNUSED USER CHECKED sigset_t *KCALL sigmask_getwr(void) THROWS(E_BADALLO
  * TASK_USERPROCMASK, as well as making sure that SIGSTOP  and
  * SIGKILL are never considered to be masked. */
 #ifdef CONFIG_HAVE_USERPROCMASK
-FUNDEF ATTR_PURE WUNUSED bool FCALL sigmask_ismasked(signo_t signo) THROWS(E_SEGFAULT);
+FUNDEF ATTR_PURE WUNUSED __BOOL FCALL sigmask_ismasked(signo_t signo) THROWS(E_SEGFAULT);
 #else /* CONFIG_HAVE_USERPROCMASK */
-FUNDEF NOBLOCK ATTR_PURE WUNUSED bool NOTHROW(FCALL sigmask_ismasked)(signo_t signo);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(FCALL sigmask_ismasked)(signo_t signo);
 #endif /* !CONFIG_HAVE_USERPROCMASK */
 
 
@@ -142,13 +106,168 @@ NOTHROW(FCALL sigmask_ismasked_nopf)(signo_t signo);
 FUNDEF NOBLOCK_IF(!allow_blocking_and_exception_when_self_is_THIS_TASK || self != THIS_TASK)
 ATTR_PURE WUNUSED NONNULL((1)) int FCALL
 sigmask_ismasked_in(struct task *__restrict self, signo_t signo,
-                    bool allow_blocking_and_exception_when_self_is_THIS_TASK __DFL(false))
+                    __BOOL allow_blocking_and_exception_when_self_is_THIS_TASK __DFL(0))
 		THROWS(E_SEGFAULT); /* Is NOTHROW when `allow_blocking_and_exception_when_self_is_THIS_TASK == false && self == THIS_TASK' */
 #else /* CONFIG_HAVE_USERPROCMASK */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo);
 #define sigmask_ismasked_in(self, signo, ...) sigmask_ismasked_in(self, signo)
 #endif /* !CONFIG_HAVE_USERPROCMASK */
+
+
+/* Set  the given signal mask as active for the calling thread.
+ * Primarily used for  `sigreturn(2)', this  function has  some
+ * special handling to ensure that `SIGKILL' and `SIGSTOP'  are
+ * not masked, whilst still ensuring not to modify a  potential
+ * userprocmask unless absolutely necessary (including the case
+ * where the userprocmask indicates that SIGKILL or SIGSTOP are
+ * currently masked (which isn't actually the case))
+ *
+ * @return: true:  Changes were made to the caller's signal mask. In
+ *                 this case, the caller should make another call to
+ *                 `userexcept_sysret_inject_self()'  in  order   to
+ *                 check for pending signals upon the next return to
+ *                 user-space (unless it  is known  that the  signal
+ *                 mask didn't get less restrictive)
+ * @return: false: The caller's signal mask remains unchanged. */
+#ifdef CONFIG_HAVE_USERPROCMASK
+FUNDEF NONNULL((1)) __BOOL FCALL
+sigmask_setmask(sigset_t const *__restrict mask)
+		THROWS(E_SEGFAULT);
+#else /* CONFIG_HAVE_USERPROCMASK */
+FUNDEF NOBLOCK NONNULL((1)) __BOOL
+NOTHROW(FCALL sigmask_setmask)(sigset_t const *__restrict mask);
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+
+/* Helper wrapper for `sigmask_setmask()' that takes a signal-set from user-space. */
+FUNDEF __BOOL FCALL
+sigmask_setmask_from_user(USER CHECKED sigset_t const *mask, size_t size)
+		THROWS(E_SEGFAULT);
+
+/* Get the calling thread's current signal mask. */
+#ifdef CONFIG_HAVE_USERPROCMASK
+FUNDEF NONNULL((1)) void FCALL
+sigmask_getmask(sigset_t *__restrict mask)
+		THROWS(E_SEGFAULT);
+#else /* CONFIG_HAVE_USERPROCMASK */
+#define sigmask_getmask(mask) \
+	(void)__libc_memcpy(mask, &THIS_KERNEL_SIGMASK, sizeof(sigset_t))
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+
+/* Return the first word from the calling thread's signal mask. */
+#ifdef CONFIG_HAVE_USERPROCMASK
+FUNDEF ATTR_PURE WUNUSED ulongptr_t FCALL sigmask_getmask_word0(void) THROWS(E_SEGFAULT);
+#else /* CONFIG_HAVE_USERPROCMASK */
+#define sigmask_getmask_word0() PERTASK_GET(this_kernel_sigmask.__val[0])
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+
+/* Return the `index' word from the calling thread's signal mask.
+ * @param: index: Index into the caller's sigmask mask sigset (`< SIGSET_NWORDS') */
+#if SIGSET_NWORDS <= 1
+#define sigmask_getmask_word(index)   sigmask_getmask_word0()
+#elif defined(CONFIG_HAVE_USERPROCMASK)
+FUNDEF ATTR_PURE WUNUSED ulongptr_t FCALL
+sigmask_getmask_word(size_t index)
+		THROWS(E_SEGFAULT);
+#else /* CONFIG_HAVE_USERPROCMASK */
+#define sigmask_getmask_word(index) \
+	PERTASK_GET(this_kernel_sigmask.__val[index])
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+
+/* Same as `sigmask_getmask_word()', but returns `(ulongptr_t)-1' when `index' is invalid. */
+#define sigmask_getmask_word_s(index) \
+	(likely((index) < SIGSET_NWORDS) ? sigmask_getmask_word(index) : (ulongptr_t)-1)
+
+
+/* Or the given set of signals `these' with the calling thread's
+ * signal mask, thus effectively blocking all of those  signals. */
+#ifdef CONFIG_HAVE_USERPROCMASK
+FUNDEF NONNULL((1)) void FCALL
+sigmask_blockmask(sigset_t const *__restrict these)
+		THROWS(E_SEGFAULT);
+#else /* CONFIG_HAVE_USERPROCMASK */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL sigmask_blockmask)(sigset_t const *__restrict these);
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+
+
+/* Unblock the given set of signals `these' within the calling thread's signal mask.
+ * @return: true:  Changes were made to the caller's signal mask. In
+ *                 this case, the caller should make another call to
+ *                 `userexcept_sysret_inject_self()'  in  order   to
+ *                 check for pending signals upon the next return to
+ *                 user-space (unless it  is known  that the  signal
+ *                 mask didn't get less restrictive)
+ * @return: false: The caller's signal mask remains unchanged. */
+#ifdef CONFIG_HAVE_USERPROCMASK
+FUNDEF NONNULL((1)) __BOOL FCALL
+sigmask_unblockmask(sigset_t const *__restrict these)
+		THROWS(E_SEGFAULT);
+#else /* CONFIG_HAVE_USERPROCMASK */
+FUNDEF NOBLOCK NONNULL((1)) __BOOL
+NOTHROW(FCALL sigmask_unblockmask)(sigset_t const *__restrict these);
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+
+
+
+/* Combination of `sigmask_getmask()' and `sigmask_setmask()'
+ *
+ * @return: true:  Changes were made to the caller's signal mask. In
+ *                 this case, the caller should make another call to
+ *                 `userexcept_sysret_inject_self()'  in  order   to
+ *                 check for pending signals upon the next return to
+ *                 user-space (unless it  is known  that the  signal
+ *                 mask didn't get less restrictive)
+ * @return: false: The caller's signal mask remains unchanged. */
+#ifdef CONFIG_HAVE_USERPROCMASK
+FUNDEF NONNULL((1, 2)) __BOOL FCALL
+sigmask_getmask_and_setmask(sigset_t *__restrict oldmask,
+                            sigset_t const *__restrict newmask)
+		THROWS(E_SEGFAULT);
+#else /* CONFIG_HAVE_USERPROCMASK */
+FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL
+NOTHROW(FCALL sigmask_getmask_and_setmask)(sigset_t *__restrict oldmask,
+                                           sigset_t const *__restrict newmask);
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+
+
+
+/* Combination of `sigmask_getmask()' and `sigmask_blockmask()'
+ * @return: true:  Changes were made to the caller's signal mask.
+ * @return: false: The caller's signal mask remains unchanged. */
+#ifdef CONFIG_HAVE_USERPROCMASK
+FUNDEF NONNULL((1, 2)) __BOOL FCALL
+sigmask_getmask_and_blockmask(sigset_t *__restrict oldmask,
+                              sigset_t const *__restrict these)
+		THROWS(E_SEGFAULT);
+#else /* CONFIG_HAVE_USERPROCMASK */
+FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL
+NOTHROW(FCALL sigmask_getmask_and_blockmask)(sigset_t *__restrict oldmask,
+                                             sigset_t const *__restrict these);
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+
+
+
+/* Combination of `sigmask_getmask()' and `sigmask_unblockmask()'
+ * @return: true:  Changes were made to the caller's signal mask. In
+ *                 this case, the caller should make another call to
+ *                 `userexcept_sysret_inject_self()'  in  order   to
+ *                 check for pending signals upon the next return to
+ *                 user-space (unless it  is known  that the  signal
+ *                 mask didn't get less restrictive)
+ * @return: false: The caller's signal mask remains unchanged. */
+#ifdef CONFIG_HAVE_USERPROCMASK
+FUNDEF NONNULL((1, 2)) __BOOL FCALL
+sigmask_getmask_and_unblockmask(sigset_t *__restrict oldmask,
+                                sigset_t const *__restrict these)
+		THROWS(E_SEGFAULT);
+#else /* CONFIG_HAVE_USERPROCMASK */
+FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL
+NOTHROW(FCALL sigmask_getmask_and_unblockmask)(sigset_t *__restrict oldmask,
+                                               sigset_t const *__restrict these);
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+
+
 
 
 /* Prepare the calling thread for a sigsuspend operation.

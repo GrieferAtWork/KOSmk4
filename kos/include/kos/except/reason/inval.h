@@ -203,8 +203,6 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SYSINFO_WORD,  /* E_INVALID_ARGUMENT_BAD_VALUE: The index-operand of `RPC_OP_push_sc_info' is invalid */
 	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_NO_SYSINFO,        /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: `RPC_OP_push_sc_info' or `RPC_OP_sppush_sc_info' was used, but no syscall info is available. */
 	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_PARAM_INDEX_OOB,   /* E_INVALID_ARGUMENT_BAD_VALUE: The operand of `RPC_OP_push_param' is greater than the `max_param_count' passed to `rpc_schedule(2)'. */
-	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SIGSET_WORD,   /* E_INVALID_ARGUMENT_BAD_VALUE: The index-operand of `RPC_OP_push_sigmask' is too large. */
-	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNSUP_SIGSET_SIZE, /* E_INVALID_ARGUMENT_BAD_VALUE: The signal mask size specified by `RPC_OP_sppush_sigmask' isn't supported. */
 	E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_WIDTH,         /* E_INVALID_ARGUMENT_BAD_VALUE: The operand of `RPC_OP_widenz' or `RPC_OP_widens' isn't supported. */
 
 	/* system call: `prctl(2)' */
@@ -473,8 +471,6 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SYSINFO_WORD     E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SYSINFO_WORD     /* E_INVALID_ARGUMENT_BAD_VALUE: The index-operand of `RPC_OP_push_sc_info' is invalid */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_NO_SYSINFO           E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_NO_SYSINFO           /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: `RPC_OP_push_sc_info' or `RPC_OP_sppush_sc_info' was used, but no syscall info is available. */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_PARAM_INDEX_OOB      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_PARAM_INDEX_OOB      /* E_INVALID_ARGUMENT_BAD_VALUE: The operand of `RPC_OP_push_param' is greater than the `max_param_count' passed to `rpc_schedule(2)'. */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SIGSET_WORD      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SIGSET_WORD      /* E_INVALID_ARGUMENT_BAD_VALUE: The index-operand of `RPC_OP_push_sigmask' is too large. */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNSUP_SIGSET_SIZE    E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNSUP_SIGSET_SIZE    /* E_INVALID_ARGUMENT_BAD_VALUE: The signal mask size specified by `RPC_OP_sppush_sigmask' isn't supported. */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_WIDTH            E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_WIDTH            /* E_INVALID_ARGUMENT_BAD_VALUE: The operand of `RPC_OP_widenz' or `RPC_OP_widens' isn't supported. */
 /* system call: `prctl(2)' */
 #define E_INVALID_ARGUMENT_CONTEXT_PRCTL_COMMAND                    E_INVALID_ARGUMENT_CONTEXT_PRCTL_COMMAND                    /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown prctl() command */
@@ -725,9 +721,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SYSINFO_WORD     4422 /* E_INVALID_ARGUMENT_BAD_VALUE: The index-operand of `RPC_OP_push_sc_info' is invalid */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_NO_SYSINFO           4423 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: `RPC_OP_push_sc_info' or `RPC_OP_sppush_sc_info' was used, but no syscall info is available. */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_PARAM_INDEX_OOB      4424 /* E_INVALID_ARGUMENT_BAD_VALUE: The operand of `RPC_OP_push_param' is greater than the `max_param_count' passed to `rpc_schedule(2)'. */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SIGSET_WORD      4425 /* E_INVALID_ARGUMENT_BAD_VALUE: The index-operand of `RPC_OP_push_sigmask' is too large. */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNSUP_SIGSET_SIZE    4426 /* E_INVALID_ARGUMENT_BAD_VALUE: The signal mask size specified by `RPC_OP_sppush_sigmask' isn't supported. */
-#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_WIDTH            4427 /* E_INVALID_ARGUMENT_BAD_VALUE: The operand of `RPC_OP_widenz' or `RPC_OP_widens' isn't supported. */
+#define E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_WIDTH            4425 /* E_INVALID_ARGUMENT_BAD_VALUE: The operand of `RPC_OP_widenz' or `RPC_OP_widens' isn't supported. */
 /* system call: `prctl(2)' */
 #define E_INVALID_ARGUMENT_CONTEXT_PRCTL_COMMAND                    4448 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown prctl() command */
 #define E_INVALID_ARGUMENT_CONTEXT_PRCTL_SET_KEEPCAPS_BADBOOL       4449 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: `arg' in `prctl(PR_SET_KEEPCAPS, arg)' must be `0' or `1' */

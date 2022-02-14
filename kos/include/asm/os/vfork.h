@@ -59,9 +59,9 @@
  *    the former is shared,  but a signal handler  of the vfork()'d child  may
  *    still run  the  handler,  thinking it's  the  parent)  and  consequently
  *    close a file handle that remains open for the parent).
- * >> On KOS this problem is handled differently, such that a thread with
- *    the `TASK_FVFORK' flag set  is handled as though  `sigmask_getrd()'
- *    always returned a signal mask identical to `&kernel_sigmask_full'
+ * >> On KOS this problem is handled  differently, such that a thread  with
+ *    the `TASK_FVFORK' flag set is handled as though `this_kernel_sigmask'
+ *    always were a signal mask identical to `&sigmask_full'
  * >> As far as semantics go, you can think of `__ARCH_HAVE_SIGBLOCK_VFORK'
  *    like this:
  *    >> #ifdef __ARCH_HAVE_SIGBLOCK_VFORK

@@ -906,11 +906,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * TODO: Systems that still need to be updated:
 	 * - sys_sigreturn(2)      (why do we even have this? This is one of those syscalls that aren't even linux-compatible...)
 	 * - sys_rt_sigreturn(2)   (needs another argument that specifies sizeof(sigset_t))
-	 * - The whole userprocmask mechanism. -- This one already includes a sigsetsize field,
-	 *   but aside from being validated  once during sys_set_userprocmask_address(), it  is
-	 *   never  used again. -- As per the specs,  we are allowed to either re-read the size
-	 *   field every time we need it, _or_ read it once during setup and keep using what we
-	 *   read at that time. */
+	 * - SA_SIGINFO-signal-handler (struct ucontext::uc_sigmask) */
 
 	return state;
 }

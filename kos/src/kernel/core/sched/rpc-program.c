@@ -58,6 +58,7 @@
 #include <kos/rpc.h>
 #include <sys/param.h>
 
+#include <alloca.h>
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
@@ -556,6 +557,25 @@ rw_bank:
 	goto again;
 }
 
+PRIVATE NONNULL((1)) void FCALL
+rpc_mem_fill(struct rpc_mem *__restrict self,
+             USER UNCHECKED byte_t *addr,
+             byte_t filler, size_t num_bytes)
+		THROWS(E_ILLEGAL_RESOURCE_LIMIT_EXCEEDED) {
+	void *buffer;
+	size_t bufsize = 256;
+	if (bufsize > num_bytes)
+		bufsize = num_bytes;
+	buffer = memset(alloca(bufsize), filler, bufsize);
+	while (num_bytes) {
+		if (bufsize > num_bytes)
+			bufsize = num_bytes;
+		rpc_mem_write(self, addr, buffer, bufsize);
+		num_bytes -= bufsize;
+		addr += bufsize;
+	}
+}
+
 
 
 /* Flags for `struct rpc_vm::rv_flags' */
@@ -629,29 +649,9 @@ struct rpc_vm {
 #define rpc_vm_setreg(self, dw_regno, src) (*rpc_vm_setreg_cb(self))(rpc_vm_setreg_arg(self), dw_regno, src)
 
 /* Access user-space memory. */
-#define rpc_vm_rdmem(self, addr, buf, num_bytes) rpc_mem_read(&(self)->rv_mem, addr, buf, num_bytes)
-#define rpc_vm_wrmem(self, addr, buf, num_bytes) rpc_mem_write(&(self)->rv_mem, addr, buf, num_bytes)
-
-
-PRIVATE NONNULL((1)) void FCALL
-rpc_vm_mask_signals(sigset_t const *__restrict maskthese) {
-#ifdef CONFIG_HAVE_USERPROCMASK
-	size_t i;
-	USER CHECKED sigset_t *mymask = sigmask_getwr();
-	/* Don't try to write to a userprocmask if it already contains the correct bits! */
-	for (i = 0; i < COMPILER_LENOF(mymask->__val); ++i) {
-		ulongptr_t old_word, new_word;
-		old_word = mymask->__val[i];
-		new_word = old_word | maskthese->__val[i];
-		if (new_word != old_word)
-			mymask->__val[i] = new_word;
-	}
-#else /* CONFIG_HAVE_USERPROCMASK */
-	sigset_t *mymask = sigmask_getwr();
-	sigorset(mymask, mymask, maskthese);
-#endif /* !CONFIG_HAVE_USERPROCMASK */
-}
-
+#define rpc_vm_rdmem(self, addr, buf, num_bytes)   rpc_mem_read(&(self)->rv_mem, addr, buf, num_bytes)
+#define rpc_vm_wrmem(self, addr, buf, num_bytes)   rpc_mem_write(&(self)->rv_mem, addr, buf, num_bytes)
+#define rpc_vm_memset(self, addr, byte, num_bytes) rpc_mem_fill(&(self)->rv_mem, addr, byte, num_bytes)
 
 
 PRIVATE NONNULL((1, 3)) unsigned int LIBUNWIND_CC
@@ -870,6 +870,45 @@ rpc_vm_push2user(struct rpc_vm *__restrict self,
 	rpc_vm_setsp(self, sp);
 }
 
+
+PRIVATE NONNULL((1)) void FCALL
+rpc_vm_push2user_fill(struct rpc_vm *__restrict self,
+                      byte_t byte, size_t num_bytes)
+		THROWS(E_SEGFAULT) {
+	USER UNCHECKED byte_t *sp;
+	sp = rpc_vm_getsp(self);
+#ifdef __ARCH_STACK_GROWS_DOWNWARDS
+	sp -= num_bytes;
+#endif /* __ARCH_STACK_GROWS_DOWNWARDS */
+	rpc_vm_memset(self, sp, byte, num_bytes);
+#ifndef __ARCH_STACK_GROWS_DOWNWARDS
+	sp += num_bytes;
+#endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
+	rpc_vm_setsp(self, sp);
+}
+
+
+PRIVATE ATTR_NOINLINE NONNULL((1)) void FCALL
+rpc_vm_push2user_sigset(struct rpc_vm *__restrict self,
+                        size_t sigsetsize)
+		THROWS(E_SEGFAULT) {
+	size_t overflow = 0;
+	sigset_t sigset;
+	sigmask_getmask(&sigset);
+	if (sigsetsize > sizeof(sigset_t)) {
+		overflow   = sigsetsize - sizeof(sigset_t);
+		sigsetsize = sizeof(sigset_t);
+	}
+#ifdef __ARCH_STACK_GROWS_DOWNWARDS
+	if (overflow != 0)
+		rpc_vm_push2user_fill(self, 0xff, overflow);
+	rpc_vm_push2user(self, &sigset, sigsetsize);
+#else /* __ARCH_STACK_GROWS_DOWNWARDS */
+	rpc_vm_push2user(self, &sigset, sigsetsize);
+	if (overflow != 0)
+		rpc_vm_push2user_fill(self, 0xff, overflow);
+#endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
+}
 
 
 #define CANPUSH(n) (self->rv_stacksz <= RPC_PROG_STACK_MAX - (n))
@@ -1676,6 +1715,8 @@ follow_jmp:
 			      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 			      signo);
 		}
+		if unlikely(signo == SIGKILL || signo == SIGSTOP)
+			break; /* Don't allow masking of these signals! */
 		if (!(self->rv_flags & RPC_VM_HAVESIGMASK)) {
 			sigemptyset(&self->rv_sigmask);
 			self->rv_flags |= RPC_VM_HAVESIGMASK;
@@ -1685,43 +1726,33 @@ follow_jmp:
 
 	case RPC_OP_push_sigmask_word: {
 		uint8_t index = rpc_vm_pc_rdb(self);
-		USER CHECKED sigset_t const *mymask;
+		ulongptr_t sigmask_word;
 		TRACE_INSTRUCTION("RPC_OP_push_sigmask_word %" PRIu8 "\n", index);
 		if unlikely(!CANPUSH(1))
 			goto err_stack_overflow;
-		mymask = sigmask_getrd();
-#ifdef __ARCH_HAVE_COMPAT
+#if defined(__ARCH_HAVE_COMPAT) && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__)
 		if (ucpustate_iscompat(&self->rv_cpu)) {
-			if unlikely(index >= (__SIZEOF_SIGSET_T__ / __ARCH_COMPAT_SIZEOF_POINTER)) {
-				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-				      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SIGSET_WORD,
-				      index);
-			}
+#if __ARCH_COMPAT_SIZEOF_POINTER == (__SIZEOF_POINTER__ / 2)
+			sigmask_word = sigmask_getmask_word_s(index >> 1);
+			if (index & 1)
+				sigmask_word >>= ((__SIZEOF_POINTER__ / 2) * NBBY);
 			/* Force sign-extension in compatibility mode. */
-			PUSH((uintptr_t)(intptr_t)((compat_longptr_t const *)mymask)[index]);
+			sigmask_word = (uintptr_t)(intptr_t)(compat_longptr_t)(compat_ulongptr_t)sigmask_word;
+#else /* ... */
+#error "Unsupported configuration"
+#endif /* !... */
 		} else
 #endif /* __ARCH_HAVE_COMPAT */
 		{
-			if unlikely(index >= COMPILER_LENOF(((sigset_t *)0)->__val)) {
-				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-				      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_BAD_SIGSET_WORD,
-				      index);
-			}
-			PUSH(mymask->__val[index]);
+			sigmask_word = sigmask_getmask_word_s(index);
 		}
+		PUSH(sigmask_word);
 	}	break;
 
 	case RPC_OP_sppush_sigmask: {
 		uint16_t sigsetsz = rpc_vm_pc_rdw(self);
 		TRACE_INSTRUCTION("RPC_OP_sppush_sigmask %" PRIu16 "\n", sigsetsz);
-		USER CHECKED sigset_t const *mymask;
-		if unlikely(sigsetsz > sizeof(sigset_t)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_UNSUP_SIGSET_SIZE,
-			      sigsetsz);
-		}
-		mymask = sigmask_getrd();
-		rpc_vm_push2user(self, mymask, sigsetsz);
+		rpc_vm_push2user_sigset(self, sigsetsz);
 	}	break;
 
 	CASE(RPC_OP_push_signal)
@@ -1948,7 +1979,7 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 			 * with a signal mask that is  masking all signals except for  the
 			 * mandatory `SIGKILL' and `SIGSTOP'  is made after executing  any
 			 * given instruction. */
-			task_serve_with_sigmask(&kernel_sigmask_full.sm_mask);
+			task_serve_with_sigmask(&sigmask_full);
 		}
 
 		/* Write-back the register state (and verify that all values are allowed) */
@@ -2003,8 +2034,11 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 		                   0)) {
 
 			/* Mask additional signals */
-			if (vm.rv_flags & RPC_VM_HAVESIGMASK)
-				rpc_vm_mask_signals(&vm.rv_sigmask);
+			if (vm.rv_flags & RPC_VM_HAVESIGMASK) {
+				assert(!sigismember(&vm.rv_sigmask, SIGKILL));
+				assert(!sigismember(&vm.rv_sigmask, SIGSTOP));
+				sigmask_blockmask(&vm.rv_sigmask);
+			}
 
 #ifdef CONFIG_FPU
 			/* Write-back FPU register modifications and masked signals. */

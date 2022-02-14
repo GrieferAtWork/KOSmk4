@@ -44,6 +44,7 @@
 
 #include <hybrid/atomic.h>
 #include <hybrid/typecore.h>
+#include <hybrid/unaligned.h>
 
 #include <compat/config.h>
 #include <kos/except.h>
@@ -65,30 +66,18 @@
 
 DECL_BEGIN
 
-/* An empty signal mask used to initialize `this_kernel_sigmask' */
-PUBLIC struct kernel_sigmask kernel_sigmask_empty = {
-	.sm_refcnt = 2,
-	.sm_share  = 2,
-	.sm_mask   = {{ 0 }}
-};
-
-
 #define SIGSET_WORD_C   __UINTPTR_C
 #define SIGSET_WORDBITS (__SIZEOF_POINTER__ * NBBY)
 #define SIGSET_NUMBITS  (__SIGSET_NWORDS * SIGSET_WORDBITS)
 
-
 /* A full signal mask (i.e. one that blocks all signals (except for SIGKILL and SIGSTOP)) */
-PUBLIC struct kernel_sigmask kernel_sigmask_full = {
-	.sm_refcnt = 2,
-	.sm_share  = 2,
-	.sm_mask   = {{
+PUBLIC_CONST sigset_t const sigmask_full = {{
 /*[[[deemon
 
 // Supported values for various signal constants
 local supported_SIGKILL_values = [9];
 local supported_SIGSTOP_values = [19];
-local supported_sigset_bits    = [1024];
+local supported_sigset_bits    = [32, 64, 128, 1024];
 local supported_pointer_bits   = [32, 64];
 
 function printMap(unmaskedSignals, bitsof_sigset, bits_per_word) {
@@ -106,7 +95,7 @@ function printMap(unmaskedSignals, bitsof_sigset, bits_per_word) {
 	import util;
 	for (i, v: util.enumerate(wordValues)) {
 		if ((i % 4) == 0)
-			print("\t\t"),;
+			print("\t"),;
 		else {
 			print(" "),;
 		}
@@ -145,26 +134,37 @@ print("#elif !defined(__DEEMON__)");
 print("#error \"Unsupported combination of signal constants\"");
 print("#endif /" "* ... *" "/");
 ]]]*/
-#if SIGKILL == 9 && SIGSTOP == 19 && SIGSET_NUMBITS == 1024 && SIGSET_WORDBITS == 32
-		SIGSET_WORD_C(0xfffbfeff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff),
-		SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff),
-		SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff),
-		SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff),
-		SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff),
-		SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff),
-		SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff),
-		SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff)
+#if SIGKILL == 9 && SIGSTOP == 19 && SIGSET_NUMBITS == 32 && SIGSET_WORDBITS == 32
+	SIGSET_WORD_C(0xfffbfeff)
+#elif SIGKILL == 9 && SIGSTOP == 19 && SIGSET_NUMBITS == 32 && SIGSET_WORDBITS == 64
+	SIGSET_WORD_C(0xfffffffffffbfeff)
+#elif SIGKILL == 9 && SIGSTOP == 19 && SIGSET_NUMBITS == 64 && SIGSET_WORDBITS == 32
+	SIGSET_WORD_C(0xfffbfeff), SIGSET_WORD_C(0xffffffff)
+#elif SIGKILL == 9 && SIGSTOP == 19 && SIGSET_NUMBITS == 64 && SIGSET_WORDBITS == 64
+	SIGSET_WORD_C(0xfffffffffffbfeff)
+#elif SIGKILL == 9 && SIGSTOP == 19 && SIGSET_NUMBITS == 128 && SIGSET_WORDBITS == 32
+	SIGSET_WORD_C(0xfffbfeff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff)
+#elif SIGKILL == 9 && SIGSTOP == 19 && SIGSET_NUMBITS == 128 && SIGSET_WORDBITS == 64
+	SIGSET_WORD_C(0xfffffffffffbfeff), SIGSET_WORD_C(0xffffffffffffffff)
+#elif SIGKILL == 9 && SIGSTOP == 19 && SIGSET_NUMBITS == 1024 && SIGSET_WORDBITS == 32
+	SIGSET_WORD_C(0xfffbfeff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff),
+	SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff),
+	SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff),
+	SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff),
+	SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff),
+	SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff),
+	SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff),
+	SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff), SIGSET_WORD_C(0xffffffff)
 #elif SIGKILL == 9 && SIGSTOP == 19 && SIGSET_NUMBITS == 1024 && SIGSET_WORDBITS == 64
-		SIGSET_WORD_C(0xfffffffffffbfeff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff),
-		SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff),
-		SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff),
-		SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff)
+	SIGSET_WORD_C(0xfffffffffffbfeff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff),
+	SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff),
+	SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff),
+	SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff), SIGSET_WORD_C(0xffffffffffffffff)
 #elif !defined(__DEEMON__)
 #error "Unsupported combination of signal constants"
 #endif /* ... */
 /*[[[end]]]*/
-	}}
-};
+}};
 
 
 
@@ -172,17 +172,8 @@ print("#endif /" "* ... *" "/");
  * Reference to the signal mask (set of signals being blocked) in the  current
  * thread. The pointed-to object is meaningless (but must still be valid) when
  * the associated thread make use of userprocmask. */
-PUBLIC ATTR_PERTASK ATTR_ALIGN(struct kernel_sigmask_arref)
-this_kernel_sigmask = ARREF_INIT(&kernel_sigmask_empty);
-
-DEFINE_PERTASK_FINI(fini_this_kernel_sigmask);
-PRIVATE NOBLOCK ATTR_USED NONNULL((1)) void
-NOTHROW(KCALL fini_this_kernel_sigmask)(struct task *__restrict thread) {
-	REF struct kernel_sigmask *mask;
-	mask = arref_ptr(&FORTASK(thread, this_kernel_sigmask));
-	if (mask != &kernel_sigmask_empty)
-		decref(mask);
-}
+PUBLIC ATTR_PERTASK ATTR_ALIGN(sigset_t)
+this_kernel_sigmask = SIGSET_INIT_EMPTY;
 
 
 
@@ -417,11 +408,10 @@ sigmask_ismasked_in(struct task *__restrict self, signo_t signo,
 #else /* CONFIG_HAVE_USERPROCMASK */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo)
-#define sigmask_ismasked_in(self, signo, x) sigmask_ismasked_in(self, signo)
+#define sigmask_ismasked_in(self, signo, _) sigmask_ismasked_in(self, signo)
 #endif /* !CONFIG_HAVE_USERPROCMASK */
 {
 	int result;
-	REF struct kernel_sigmask *sm;
 	uintptr_t thread_flags = ATOMIC_READ(self->t_flags);
 #ifdef CONFIG_HAVE_USERPROCMASK
 	if (thread_flags & (TASK_FVFORK | TASK_FUSERPROCMASK))
@@ -434,15 +424,18 @@ NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo)
 		 * may say. */
 		if (signo == SIGKILL || signo == SIGSTOP)
 			return SIGMASK_ISMASKED_NOPF_NO; /* Cannot be masked. */
+
 		/* A vfork'd thread always has all signals masked. */
 #ifndef CONFIG_HAVE_USERPROCMASK
 		return SIGMASK_ISMASKED_NOPF_YES;
 #else /* !CONFIG_HAVE_USERPROCMASK */
 		if unlikely(thread_flags & TASK_FVFORK)
 			return SIGMASK_ISMASKED_NOPF_YES;
+
 		/* Special handling for when `self' is the caller. */
 		if (self == THIS_TASK && allow_blocking_and_exception_when_self_is_THIS_TASK)
 			return (int)usersigmask_ismasked_chk(signo);
+
 		/* USERPROCMASK  would  have  a  soft-lock  scenario,  where a
 		 * signal  sent to  a process  containing at  least 2 threads,
 		 * with the first (in terms of checking-order when determining
@@ -534,12 +527,13 @@ NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo)
 		return result;
 #endif /* CONFIG_HAVE_USERPROCMASK */
 	}
-	sm     = arref_get(&FORTASK(self, this_kernel_sigmask));
-	result = (int)!!sigismember(&sm->sm_mask, signo);
-	decref_unlikely(sm);
-	if (result != SIGMASK_ISMASKED_NOPF_NO &&
-	    unlikely(signo == SIGKILL || signo == SIGSTOP))
-		result = SIGMASK_ISMASKED_NOPF_NO; /* Cannot be masked. */
+
+	/* Use the normal per-thread kernel sigmask. */
+	result = (int)!!sigismember(&FORTASK(self, this_kernel_sigmask), signo);
+	assertf(signo == SIGKILL || signo == SIGSTOP
+	        ? result == SIGMASK_ISMASKED_NOPF_NO
+	        : true,
+	        "These 2 signals must never appear as masked in `this_kernel_sigmask'");
 	return result;
 }
 
@@ -547,14 +541,8 @@ NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo)
  * This function doesn't perform  any special checks for  VFORK
  * or  USERPROCMASK  scenarios.  Use  `sigmask_ismasked()'   if
  * these situations must also be handled. */
-PRIVATE NOBLOCK ATTR_PURE WUNUSED bool
-NOTHROW(FCALL sigmask_ismasked_nospecial)(signo_t signo) {
-	bool result;
-	struct kernel_sigmask *sm;
-	sm     = sigmask_kernel_getrd();
-	result = sigismember(&sm->sm_mask, signo);
-	return result;
-}
+#define this_kernel_sigmask_ismember(signo) \
+	sigismember(&THIS_KERNEL_SIGMASK, signo)
 
 /* Check if a given `signo' is currently masked. This function
  * handles all of the special cases, including TASK_VFORK  and
@@ -577,9 +565,10 @@ NOTHROW(FCALL sigmask_ismasked)(signo_t signo)
 	if (thread_flags & TASK_FVFORK)
 #endif /* !CONFIG_HAVE_USERPROCMASK */
 	{
-		/* Always behave as though this was `kernel_sigmask_full'. */
+		/* Always behave as though this was `sigmask_full'. */
 		if (signo == SIGKILL || signo == SIGSTOP)
 			return false; /* Cannot be masked. */
+
 		/* A vfork'd thread always has all signals masked. */
 #ifndef CONFIG_HAVE_USERPROCMASK
 		return true;
@@ -591,7 +580,7 @@ NOTHROW(FCALL sigmask_ismasked)(signo_t signo)
 		return result;
 #endif /* CONFIG_HAVE_USERPROCMASK */
 	}
-	result = sigmask_ismasked_nospecial(signo);
+	result = this_kernel_sigmask_ismember(signo) != 0;
 	return result;
 }
 
@@ -614,71 +603,9 @@ NOTHROW(FCALL sigmask_ismasked_nopf)(signo_t signo) {
 		/* The nitty-gritty case: The thread is using a userprocmask... */
 		return sigmask_ismasked_in_my_userprocmask_nopf(signo);
 	}
-	return sigmask_ismasked_nospecial(signo);
-}
-#endif /* CONFIG_HAVE_USERPROCMASK */
-
-
-
-/* Return a pointer to the signal mask of the calling thread. */
-#ifdef CONFIG_HAVE_USERPROCMASK
-PUBLIC WUNUSED USER CHECKED sigset_t const *KCALL
-sigmask_getrd(void) THROWS(E_SEGFAULT) {
-	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
-		USER CHECKED sigset_t *result;
-		result = ATOMIC_READ(PERTASK_GET(this_userprocmask_address)->pm_sigmask);
-		validate_readable(result, sizeof(sigset_t));
-		return result;
-	}
-	return &sigmask_kernel_getrd()->sm_mask;
-}
-#endif /* CONFIG_HAVE_USERPROCMASK */
-
-/* Make sure that `this_kernel_sigmask' is allocated, and isn't being
- * shared.  Then,  always  return  `PERTASK_GET(this_kernel_sigmask)' */
-PUBLIC ATTR_RETNONNULL WUNUSED struct kernel_sigmask *KCALL
-sigmask_kernel_getwr(void) THROWS(E_BADALLOC) {
-	struct kernel_sigmask *mymask;
-	mymask = sigmask_kernel_getrd();
-	if (ATOMIC_READ(mymask->sm_share) > 1) {
-		/* Unshare. */
-		struct kernel_sigmask *copy;
-		struct kernel_sigmask_arref *maskref;
-		copy = (struct kernel_sigmask *)kmalloc(sizeof(struct kernel_sigmask),
-		                                        GFP_CALLOC);
-		memcpy(&copy->sm_mask, &mymask->sm_mask, sizeof(sigset_t));
-		copy->sm_refcnt = 1;
-		copy->sm_share  = 1;
-
-		maskref = &PERTASK(this_kernel_sigmask);
-		mymask  = arref_xch_inherit(maskref, copy);
-		if (mymask != &kernel_sigmask_empty) {
-			ATOMIC_DEC(mymask->sm_share);
-			decref_unlikely(mymask);
-		}
-		mymask = copy;
-	}
-	assert(mymask != &kernel_sigmask_empty);
-	return mymask;
-}
-
-#ifdef CONFIG_HAVE_USERPROCMASK
-/* Make sure that `this_kernel_sigmask' is allocated, and isn't being shared.
- * Then, always return `PERTASK_GET(this_kernel_sigmask)'
- * NOTE: When  calling thread has  the `TASK_FUSERPROCMASK' flag set,
- *       then this function will return the address of the currently-
- *       assigned  user-space signal mask,  rather than its in-kernel
- *       counterpart! */
-PUBLIC WUNUSED USER CHECKED sigset_t *KCALL
-sigmask_getwr(void) THROWS(E_BADALLOC, E_SEGFAULT, ...) {
-	USER CHECKED sigset_t *result;
-	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
-		result = ATOMIC_READ(PERTASK_GET(this_userprocmask_address)->pm_sigmask);
-		validate_readwrite(result, sizeof(sigset_t));
-	} else {
-		result = &sigmask_kernel_getwr()->sm_mask;
-	}
-	return result;
+	if (this_kernel_sigmask_ismember(signo))
+		return SIGMASK_ISMASKED_NOPF_YES;
+	return SIGMASK_ISMASKED_NOPF_NO;
 }
 #endif /* CONFIG_HAVE_USERPROCMASK */
 
@@ -749,6 +676,596 @@ NOTHROW(FCALL sigmask_prepare_sigsuspend)(void) {
 }
 
 
+/* Set  the given signal mask as active for the calling thread.
+ * Primarily used for  `sigreturn(2)', this  function has  some
+ * special handling to ensure that `SIGKILL' and `SIGSTOP'  are
+ * not masked, whilst still ensuring not to modify a  potential
+ * userprocmask unless absolutely necessary (including the case
+ * where the userprocmask indicates that SIGKILL or SIGSTOP are
+ * currently masked (which isn't actually the case))
+ *
+ * @return: true:  Changes were made to the caller's signal mask. In
+ *                 this case, the caller should make another call to
+ *                 `userexcept_sysret_inject_self()'  in  order   to
+ *                 check for pending signals upon the next return to
+ *                 user-space (unless it  is known  that the  signal
+ *                 mask didn't get less restrictive)
+ * @return: false: The caller's signal mask remains unchanged. */
+#ifdef CONFIG_HAVE_USERPROCMASK
+PUBLIC NONNULL((1)) bool FCALL
+sigmask_setmask(sigset_t const *__restrict mask)
+		THROWS(E_SEGFAULT)
+#else /* CONFIG_HAVE_USERPROCMASK */
+PUBLIC NOBLOCK NONNULL((1)) bool
+NOTHROW(FCALL sigmask_setmask)(sigset_t const *__restrict mask)
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+{
+	bool changed;
+#ifdef CONFIG_HAVE_USERPROCMASK
+	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
+		USER CHECKED struct userprocmask *um;
+		USER UNCHECKED sigset_t *umask;
+		sigset_t new_umask;
+		sigset_t current_umask;
+		size_t umasksize;
+		um        = PERTASK_GET(this_userprocmask_address);
+		umask     = um->pm_sigmask;
+		umasksize = um->pm_sigsize;
+		COMPILER_READ_BARRIER();
+		validate_readwrite(umask, umasksize);
+		if (umasksize > sizeof(sigset_t))
+			umasksize = sizeof(sigset_t);
+
+		/* Load the current userprocmask */
+		memset(mempcpy(&current_umask, umask, umasksize),
+		       0xff, sizeof(sigset_t) - umasksize);
+
+		/* Because the userprocmask may  point to read-only memory,  only
+		 * write memory if contents have actually changed (otherwise, the
+		 * signal mask restore can be considered a no-op)
+		 *
+		 * Keep the old setting for SIGKILL and SIGSTOP (they're state is
+		 * ignored within the userprocmask, but  try not to change  their
+		 * actual state, so-as not to  accidentally write to a  read-only
+		 * mask blob) */
+		if (sigismember(&current_umask, SIGKILL)) {
+			mask = (sigset_t *)memcpy(&new_umask, mask, sizeof(sigset_t));
+			sigaddset(&new_umask, SIGKILL);
+		}
+		if (sigismember(&current_umask, SIGSTOP)) {
+			if (mask != &new_umask)
+				mask = (sigset_t *)memcpy(&new_umask, mask, sizeof(sigset_t));
+			sigaddset(&new_umask, SIGKILL);
+		}
+
+		/* Check if the masks differ. */
+		changed = memcmp(&current_umask, mask, sizeof(sigset_t)) != 0;
+
+		/* If changes are present, write-back the new mask.
+		 * Note that in this case, we don't modify extended
+		 * mask bits which may appear in the userprocmask.
+		 *
+		 * We only write signals bits present within the actually used range. */
+		if (changed)
+			memcpy(umask, mask, umasksize);
+	} else
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+	{
+		sigset_t *mymask;
+		mymask  = &THIS_KERNEL_SIGMASK;
+		changed = memcmp(mymask, mask, sizeof(sigset_t)) != 0;
+		if (changed)
+			memcpy(mymask, mask, sizeof(sigset_t));
+	}
+	return changed;
+}
+
+/* Helper wrapper for `sigmask_setmask()' that takes a signal-set from user-space. */
+PUBLIC bool FCALL
+sigmask_setmask_from_user(USER CHECKED sigset_t const *mask, size_t size)
+		THROWS(E_SEGFAULT) {
+	sigset_t newmask;
+	if (size > sizeof(sigset_t))
+		size = sizeof(sigset_t);
+	memset(mempcpy(&newmask, mask, size),
+	       0xff, sizeof(sigset_t) - size);
+
+	/* Never mask these 2 signals! */
+	sigdelset(&newmask, SIGKILL);
+	sigdelset(&newmask, SIGSTOP);
+
+	/* Apply the new signal mask. */
+	return sigmask_setmask(&newmask);
+}
+
+
+/* Get the calling thread's current signal mask. */
+#ifdef CONFIG_HAVE_USERPROCMASK
+PUBLIC NONNULL((1)) void FCALL
+sigmask_getmask(sigset_t *__restrict mask)
+		THROWS(E_SEGFAULT) {
+	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
+		USER CHECKED struct userprocmask *um;
+		USER UNCHECKED sigset_t *umask;
+		size_t umasksize;
+		um        = PERTASK_GET(this_userprocmask_address);
+		umask     = um->pm_sigmask;
+		umasksize = um->pm_sigsize;
+		COMPILER_READ_BARRIER();
+		validate_readwrite(umask, umasksize);
+		if (umasksize > sizeof(sigset_t))
+			umasksize = sizeof(sigset_t);
+		memset(mempcpy(mask, umask, umasksize),
+		       0xff, sizeof(sigset_t) - umasksize);
+		COMPILER_BARRIER();
+
+		/* Ignore user-space trying to mask these signals. */
+		sigdelset(mask, SIGKILL);
+		sigdelset(mask, SIGSTOP);
+	} else {
+		memcpy(mask, &THIS_KERNEL_SIGMASK, sizeof(sigset_t));
+	}
+}
+#endif /* CONFIG_HAVE_USERPROCMASK */
+
+/* Return the first word from the calling thread's signal mask. */
+#ifdef CONFIG_HAVE_USERPROCMASK
+PUBLIC ATTR_PURE WUNUSED ulongptr_t FCALL
+sigmask_getmask_word0(void) THROWS(E_SEGFAULT) {
+	union {
+		ulongptr_t word;
+		byte_t bytes[sizeof(ulongptr_t)];
+	} result;
+	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
+		USER CHECKED struct userprocmask *um;
+		USER UNCHECKED sigset_t *umask;
+		size_t umasksize;
+		um        = PERTASK_GET(this_userprocmask_address);
+		umask     = um->pm_sigmask;
+		umasksize = um->pm_sigsize;
+		COMPILER_READ_BARRIER();
+		validate_readwrite(umask, umasksize);
+		if likely(umasksize >= sizeof(result.bytes)) {
+			result.word = UNALIGNED_GET(&umask->__val[0]);
+		} else {
+			result.word = (ulongptr_t)-1;
+			memcpy(result.bytes, &umask->__val[0], umasksize);
+		}
+		COMPILER_BARRIER();
+
+		/* Ignore user-space trying to mask these signals. */
+		__STATIC_IF(__sigset_word(SIGKILL) == 0 && __sigset_word(SIGSTOP) == 0) {
+			result.word &= ~(__sigset_mask(SIGKILL) | __sigset_mask(SIGSTOP));
+		}
+		__STATIC_IF(__sigset_word(SIGKILL) == 0 && __sigset_word(SIGSTOP) != 0) {
+			result.word &= ~(__sigset_mask(SIGKILL));
+		}
+		__STATIC_IF(__sigset_word(SIGKILL) != 0 && __sigset_word(SIGSTOP) == 0) {
+			result.word &= ~(__sigset_mask(SIGSTOP));
+		}
+	} else {
+		result.word = PERTASK_GET(this_kernel_sigmask.__val[0]);
+	}
+	return result.word;
+}
+#endif /* CONFIG_HAVE_USERPROCMASK */
+
+/* Return the `index' word from the calling thread's signal mask.
+ * @param: index: Index into the caller's sigmask mask sigset (`< SIGSET_NWORDS') */
+#if defined(CONFIG_HAVE_USERPROCMASK) && SIGSET_NWORDS > 1
+PUBLIC ATTR_PURE WUNUSED ulongptr_t FCALL
+sigmask_getmask_word(size_t index)
+		THROWS(E_SEGFAULT) {
+	assert(index < SIGSET_NWORDS);
+	union {
+		ulongptr_t word;
+		byte_t bytes[sizeof(ulongptr_t)];
+	} result;
+	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
+		USER CHECKED struct userprocmask *um;
+		USER UNCHECKED sigset_t *umask;
+		size_t umasksize, skip;
+		um        = PERTASK_GET(this_userprocmask_address);
+		umask     = um->pm_sigmask;
+		umasksize = um->pm_sigsize;
+		COMPILER_READ_BARRIER();
+		validate_readwrite(umask, umasksize);
+		skip = index * sizeof(ulongptr_t);
+		if likely(umasksize >= skip + sizeof(ulongptr_t)) {
+			result.word = UNALIGNED_GET(&umask->__val[index]);
+		} else if likely(umasksize >= skip) {
+			result.word = (ulongptr_t)-1;
+			memcpy(result.bytes, &umask->__val[0], umasksize - skip);
+		} else {
+			result.word = (ulongptr_t)-1;
+		}
+		COMPILER_BARRIER();
+
+		/* Ignore user-space trying to mask these signals. */
+		__STATIC_IF(__sigset_word(SIGKILL) == __sigset_word(SIGSTOP)) {
+			if (__sigset_word(SIGKILL) == index)
+				result.word &= ~(__sigset_mask(SIGKILL) | __sigset_mask(SIGSTOP));
+		} __STATIC_ELSE(__sigset_word(SIGKILL) == __sigset_word(SIGSTOP)) {
+			if (__sigset_word(SIGKILL) == index)
+				result.word &= ~__sigset_mask(SIGKILL);
+			if (__sigset_word(SIGSTOP) == index)
+				result.word &= ~__sigset_mask(SIGSTOP);
+		}
+	} else {
+		result.word = PERTASK_GET(this_kernel_sigmask.__val[0]);
+	}
+	return result.word;
+}
+#endif /* CONFIG_HAVE_USERPROCMASK && SIGSET_NWORDS > 1 */
+
+#ifdef CONFIG_HAVE_USERPROCMASK
+/* Copy masking bits for `SIGKILL' and `SIGSTOP' from `src' to `dst',
+ * and return the new value for `dst'. Both `dst' and `src' are  mask
+ * words who's least significant bit represents `signal_word_base'. */
+PRIVATE ATTR_CONST WUNUSED ulongptr_t
+NOTHROW(FCALL copy_nmi_signal_mask_bits)(ulongptr_t dst,
+                                         ulongptr_t src,
+                                         signo_t signal_word_base) {
+#define IS_SIGNAL_IN_RANGE(signo)   ((signo)-1 >= signal_word_base && (signo)-1 < (signal_word_base + (sizeof(ulongptr_t) * NBBY)))
+#define RELATIVE_SIGNAL_MASK(signo) ((ulongptr_t)1 << (((signo)-1) - signal_word_base))
+	ulongptr_t copymask = 0;
+	if (IS_SIGNAL_IN_RANGE(SIGKILL))
+		copymask |= RELATIVE_SIGNAL_MASK(SIGKILL);
+	if (IS_SIGNAL_IN_RANGE(SIGSTOP))
+		copymask |= RELATIVE_SIGNAL_MASK(SIGSTOP);
+	dst &= ~copymask;      /* Clear bits to-be inherited from `src' */
+	dst |= src & copymask; /* Copy bits inherited from `src' */
+	return dst;
+#undef RELATIVE_SIGNAL_MASK
+#undef IS_SIGNAL_IN_RANGE
+}
+#endif /* CONFIG_HAVE_USERPROCMASK */
+
+/* Or the given set of signals `these' with the calling thread's
+ * signal mask, thus effectively blocking all of those  signals. */
+#ifdef CONFIG_HAVE_USERPROCMASK
+PUBLIC NONNULL((1)) void FCALL
+sigmask_blockmask(sigset_t const *__restrict these)
+		THROWS(E_SEGFAULT)
+#else /* CONFIG_HAVE_USERPROCMASK */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL sigmask_blockmask)(sigset_t const *__restrict these)
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+{
+#ifdef CONFIG_HAVE_USERPROCMASK
+	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
+		signo_t sigbase;
+		USER CHECKED struct userprocmask *um;
+		USER UNCHECKED sigset_t *umask;
+		size_t umasksize;
+		um        = PERTASK_GET(this_userprocmask_address);
+		umask     = um->pm_sigmask;
+		umasksize = um->pm_sigsize;
+		COMPILER_READ_BARRIER();
+		validate_readwrite(umask, umasksize);
+		if (umasksize > sizeof(sigset_t))
+			umasksize = sizeof(sigset_t);
+		sigbase = 0;
+		while (umasksize >= sizeof(ulongptr_t)) {
+			ulongptr_t word, blck, nwrd;
+			word = UNALIGNED_GET((USER CHECKED ulongptr_t const *)umask);
+			blck = *(ulongptr_t const *)these;
+			nwrd = word | blck;
+			if (nwrd != word) {
+				nwrd = copy_nmi_signal_mask_bits(nwrd, word, sigbase);
+				if (nwrd != word)
+					UNALIGNED_SET((USER CHECKED ulongptr_t *)umask, nwrd);
+			}
+			umask = (USER CHECKED sigset_t *)((byte_t *)umask + sizeof(ulongptr_t));
+			these = (sigset_t const *)((byte_t const *)these + sizeof(ulongptr_t));
+			umasksize -= sizeof(ulongptr_t);
+			sigbase += sizeof(ulongptr_t) * NBBY;
+		}
+		while (umasksize) {
+			byte_t word, blck, nwrd;
+			word = *(USER CHECKED byte_t const *)umask;
+			blck = *(byte_t const *)these;
+			nwrd = word | blck;
+			if (nwrd != word) {
+				nwrd = (byte_t)copy_nmi_signal_mask_bits(nwrd, word, sigbase);
+				if (nwrd != word)
+					*(USER CHECKED byte_t *)umask = nwrd;
+			}
+			umask = (USER CHECKED sigset_t *)((byte_t *)umask + 1);
+			these = (sigset_t const *)((byte_t const *)these + 1);
+			umasksize -= 1;
+		}
+	} else
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+	{
+		sigset_t *mymask;
+		mymask = &THIS_KERNEL_SIGMASK;
+		sigorset(mymask, mymask, these);
+	}
+}
+
+
+
+/* Unblock the given set of signals `these' within the calling thread's signal mask.
+ * @return: true:  Changes were made to the caller's signal mask. In
+ *                 this case, the caller should make another call to
+ *                 `userexcept_sysret_inject_self()'  in  order   to
+ *                 check for pending signals upon the next return to
+ *                 user-space (unless it  is known  that the  signal
+ *                 mask didn't get less restrictive)
+ * @return: false: The caller's signal mask remains unchanged. */
+#ifdef CONFIG_HAVE_USERPROCMASK
+PUBLIC NONNULL((1)) bool FCALL
+sigmask_unblockmask(sigset_t const *__restrict these)
+		THROWS(E_SEGFAULT)
+#else /* CONFIG_HAVE_USERPROCMASK */
+PUBLIC NOBLOCK NONNULL((1)) bool
+NOTHROW(FCALL sigmask_unblockmask)(sigset_t const *__restrict these)
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+{
+	bool result;
+#ifdef CONFIG_HAVE_USERPROCMASK
+	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
+		signo_t sigbase;
+		USER CHECKED struct userprocmask *um;
+		USER UNCHECKED sigset_t *umask;
+		size_t umasksize;
+		um        = PERTASK_GET(this_userprocmask_address);
+		umask     = um->pm_sigmask;
+		umasksize = um->pm_sigsize;
+		COMPILER_READ_BARRIER();
+		validate_readwrite(umask, umasksize);
+		if (umasksize > sizeof(sigset_t))
+			umasksize = sizeof(sigset_t);
+		result  = false;
+		sigbase = 0;
+		while (umasksize >= sizeof(ulongptr_t)) {
+			ulongptr_t word, blck, nwrd;
+			word = UNALIGNED_GET((USER CHECKED ulongptr_t const *)umask);
+			blck = *(ulongptr_t const *)these;
+			nwrd = word & ~blck;
+			if (nwrd != word) {
+				nwrd = copy_nmi_signal_mask_bits(nwrd, word, sigbase);
+				if (nwrd != word) {
+					UNALIGNED_SET((USER CHECKED ulongptr_t *)umask, nwrd);
+					result = true;
+				}
+			}
+			umask = (USER CHECKED sigset_t *)((byte_t *)umask + sizeof(ulongptr_t));
+			these = (sigset_t const *)((byte_t const *)these + sizeof(ulongptr_t));
+			umasksize -= sizeof(ulongptr_t);
+			sigbase += sizeof(ulongptr_t) * NBBY;
+		}
+		while (umasksize) {
+			byte_t word, blck, nwrd;
+			word = *(USER CHECKED byte_t const *)umask;
+			blck = *(byte_t const *)these;
+			nwrd = word & ~blck;
+			if (nwrd != word) {
+				nwrd = (byte_t)copy_nmi_signal_mask_bits(nwrd, word, sigbase);
+				if (nwrd != word) {
+					*(USER CHECKED byte_t *)umask = nwrd;
+					result = true;
+				}
+			}
+			umask = (USER CHECKED sigset_t *)((byte_t *)umask + 1);
+			these = (sigset_t const *)((byte_t const *)these + 1);
+			umasksize -= 1;
+		}
+	} else
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+	{
+		size_t i;
+		sigset_t *mymask;
+		mymask = &THIS_KERNEL_SIGMASK;
+		for (i = 0; i < SIGSET_NWORDS; ++i) {
+			ulongptr_t word, nwrd;
+			word = mymask->__val[i];
+			nwrd = word & ~these->__val[i];
+			if (word == nwrd)
+				continue;
+			mymask->__val[i] = nwrd;
+			result = true;
+		}
+	}
+	return result;
+}
+
+
+
+/* Combination of `sigmask_getmask()' and `sigmask_setmask()'
+ *
+ * @return: true:  Changes were made to the caller's signal mask. In
+ *                 this case, the caller should make another call to
+ *                 `userexcept_sysret_inject_self()'  in  order   to
+ *                 check for pending signals upon the next return to
+ *                 user-space (unless it  is known  that the  signal
+ *                 mask didn't get less restrictive)
+ * @return: false: The caller's signal mask remains unchanged. */
+#ifdef CONFIG_HAVE_USERPROCMASK
+PUBLIC NONNULL((1, 2)) bool FCALL
+sigmask_getmask_and_setmask(sigset_t *__restrict oldmask,
+                            sigset_t const *__restrict newmask)
+		THROWS(E_SEGFAULT)
+#else /* CONFIG_HAVE_USERPROCMASK */
+PUBLIC NOBLOCK NONNULL((1, 2)) bool
+NOTHROW(FCALL sigmask_getmask_and_setmask)(sigset_t *__restrict oldmask,
+                                           sigset_t const *__restrict newmask)
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+{
+	bool result;
+	assert(!sigismember(newmask, SIGKILL));
+	assert(!sigismember(newmask, SIGSTOP));
+#ifdef CONFIG_HAVE_USERPROCMASK
+	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
+		USER CHECKED struct userprocmask *um;
+		USER UNCHECKED sigset_t *umask;
+		size_t umasksize;
+		um        = PERTASK_GET(this_userprocmask_address);
+		umask     = um->pm_sigmask;
+		umasksize = um->pm_sigsize;
+		COMPILER_READ_BARRIER();
+		validate_readwrite(umask, umasksize);
+		if (umasksize > sizeof(sigset_t))
+			umasksize = sizeof(sigset_t);
+		memset(mempcpy(oldmask, umask, umasksize), 0xff,
+		       sizeof(sigset_t) - umasksize);
+		result = memcmp(newmask, oldmask, sizeof(sigset_t)) != 0;
+		if (result) {
+			/* Check if the mask still contains changes if  */
+			sigset_t used_newmask;
+			memcpy(&used_newmask, newmask, sizeof(sigset_t));
+			used_newmask.__val[__sigset_word(SIGKILL)] |= oldmask->__val[__sigset_word(SIGKILL)] & __sigset_mask(SIGKILL);
+			used_newmask.__val[__sigset_word(SIGSTOP)] |= oldmask->__val[__sigset_word(SIGSTOP)] & __sigset_mask(SIGSTOP);
+			result = memcmp(&used_newmask, oldmask, sizeof(sigset_t)) != 0;
+			if (result) {
+				/* Write-back modified words into user-space. */
+				memcpy(umask, &used_newmask, umasksize);
+			}
+		}
+
+		/* Don't tell the caller if these were masked in the userprocmask. */
+		sigdelset(oldmask, SIGKILL);
+		sigdelset(oldmask, SIGSTOP);
+	} else
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+	{
+		sigset_t *mymask = &THIS_KERNEL_SIGMASK;
+		memcpy(oldmask, mymask, sizeof(sigset_t)); /* Get old mask */
+		memcpy(mymask, newmask, sizeof(sigset_t)); /* Set new mask */
+		result = memcmp(oldmask, newmask, sizeof(sigset_t)) != 0;
+	}
+	return result;
+}
+
+
+
+/* Combination of `sigmask_getmask()' and `sigmask_blockmask()'
+ * @return: true:  Changes were made to the caller's signal mask.
+ * @return: false: The caller's signal mask remains unchanged. */
+#ifdef CONFIG_HAVE_USERPROCMASK
+PUBLIC NONNULL((1, 2)) bool FCALL
+sigmask_getmask_and_blockmask(sigset_t *__restrict oldmask,
+                              sigset_t const *__restrict these)
+		THROWS(E_SEGFAULT)
+#else /* CONFIG_HAVE_USERPROCMASK */
+PUBLIC NOBLOCK NONNULL((1, 2)) bool
+NOTHROW(FCALL sigmask_getmask_and_blockmask)(sigset_t *__restrict oldmask,
+                                             sigset_t const *__restrict these)
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+{
+	bool result;
+	assert(!sigismember(these, SIGKILL));
+	assert(!sigismember(these, SIGSTOP));
+#ifdef CONFIG_HAVE_USERPROCMASK
+	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
+		sigset_t newmask;
+		USER CHECKED struct userprocmask *um;
+		USER UNCHECKED sigset_t *umask;
+		size_t umasksize;
+		um        = PERTASK_GET(this_userprocmask_address);
+		umask     = um->pm_sigmask;
+		umasksize = um->pm_sigsize;
+		COMPILER_READ_BARRIER();
+		validate_readwrite(umask, umasksize);
+		if (umasksize > sizeof(sigset_t))
+			umasksize = sizeof(sigset_t);
+		memset(mempcpy(oldmask, umask, umasksize), 0xff,
+		       sizeof(sigset_t) - umasksize);
+		sigorset(&newmask, oldmask, these);
+		result = memcmp(&newmask, oldmask, sizeof(sigset_t)) != 0;
+		if (result) {
+			/* Write-back modified words into user-space. */
+			memcpy(umask, &newmask, umasksize);
+		}
+
+		/* Don't tell the caller if these were masked in the userprocmask. */
+		sigdelset(oldmask, SIGKILL);
+		sigdelset(oldmask, SIGSTOP);
+	} else
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+	{
+		sigset_t *mymask = &THIS_KERNEL_SIGMASK;
+		memcpy(oldmask, mymask, sizeof(sigset_t));
+		sigorset(mymask, mymask, these);
+		result = memcmp(oldmask, mymask, sizeof(sigset_t)) != 0;
+	}
+	return result;
+}
+
+
+
+/* Combination of `sigmask_getmask()' and `sigmask_unblockmask()'
+ * @return: true:  Changes were made to the caller's signal mask. In
+ *                 this case, the caller should make another call to
+ *                 `userexcept_sysret_inject_self()'  in  order   to
+ *                 check for pending signals upon the next return to
+ *                 user-space (unless it  is known  that the  signal
+ *                 mask didn't get less restrictive)
+ * @return: false: The caller's signal mask remains unchanged. */
+#ifdef CONFIG_HAVE_USERPROCMASK
+PUBLIC NONNULL((1, 2)) bool FCALL
+sigmask_getmask_and_unblockmask(sigset_t *__restrict oldmask,
+                                sigset_t const *__restrict these)
+		THROWS(E_SEGFAULT)
+#else /* CONFIG_HAVE_USERPROCMASK */
+PUBLIC NOBLOCK NONNULL((1, 2)) bool
+NOTHROW(FCALL sigmask_getmask_and_unblockmask)(sigset_t *__restrict oldmask,
+                                               sigset_t const *__restrict these)
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+{
+	bool result;
+#ifdef CONFIG_HAVE_USERPROCMASK
+	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
+		sigset_t newmask;
+		USER CHECKED struct userprocmask *um;
+		USER UNCHECKED sigset_t *umask;
+		size_t umasksize;
+		um        = PERTASK_GET(this_userprocmask_address);
+		umask     = um->pm_sigmask;
+		umasksize = um->pm_sigsize;
+		COMPILER_READ_BARRIER();
+		validate_readwrite(umask, umasksize);
+		if (umasksize > sizeof(sigset_t))
+			umasksize = sizeof(sigset_t);
+		memset(mempcpy(oldmask, umask, umasksize), 0xff,
+		       sizeof(sigset_t) - umasksize);
+		signandset(&newmask, oldmask, these);
+		result = memcmp(&newmask, oldmask, sizeof(sigset_t)) != 0;
+		if (result) {
+			/* Don't do anything if the only thing that changed are SIGKILL or SIGSTOP
+			 * They don't matter in the case of  a userprocmask, and we don't want  to
+			 * make any modifications if we don't need to (since the userprocmask  may
+			 * reside in read-only memory) */
+			newmask.__val[__sigset_word(SIGKILL)] |= oldmask->__val[__sigset_word(SIGKILL)] & __sigset_mask(SIGKILL);
+			newmask.__val[__sigset_word(SIGSTOP)] |= oldmask->__val[__sigset_word(SIGSTOP)] & __sigset_mask(SIGSTOP);
+			result = memcmp(&newmask, oldmask, sizeof(sigset_t)) != 0;
+			if (result) {
+				/* Write-back modified words into user-space. */
+				memcpy(umask, &newmask, umasksize);
+			}
+		}
+
+		/* Don't tell the caller if these were masked in the userprocmask. */
+		sigdelset(oldmask, SIGKILL);
+		sigdelset(oldmask, SIGSTOP);
+	} else
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+	{
+		sigset_t *mymask = &THIS_KERNEL_SIGMASK;
+		memcpy(oldmask, mymask, sizeof(sigset_t));
+		signandset(mymask, mymask, these);
+		result = memcmp(oldmask, mymask, sizeof(sigset_t)) != 0;
+	}
+	return result;
+}
+
+
+
+
+
+
+
 
 
 
@@ -761,10 +1278,14 @@ NOTHROW(FCALL sigmask_prepare_sigsuspend)(void) {
 /************************************************************************/
 /* sigprocmask(), rt_sigprocmask()                                      */
 /************************************************************************/
-#ifdef __ARCH_WANT_SYSCALL_RT_SIGPROCMASK
-DEFINE_SYSCALL4(errno_t, rt_sigprocmask, syscall_ulong_t, how,
-                UNCHECKED USER sigset_t const *, set,
-                UNCHECKED USER sigset_t *, oset, size_t, sigsetsize) {
+#if (defined(__ARCH_WANT_SYSCALL_RT_SIGPROCMASK) || \
+     defined(__ARCH_WANT_SYSCALL_SIGPROCMASK) ||    \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_SIGPROCMASK))
+PRIVATE errno_t KCALL
+sys_sigprocmask_impl(syscall_ulong_t how,
+                     UNCHECKED USER sigset_t const *set,
+                     UNCHECKED USER sigset_t *oset,
+                     size_t sigsetsize) {
 	size_t overflow = 0;
 	if (sigsetsize > sizeof(sigset_t)) {
 		overflow   = sigsetsize - sizeof(sigset_t);
@@ -772,121 +1293,66 @@ DEFINE_SYSCALL4(errno_t, rt_sigprocmask, syscall_ulong_t, how,
 	}
 	validate_readable_opt(set, sigsetsize);
 	validate_writable_opt(oset, sigsetsize);
-	if (!set) {
-		if (oset) {
-			USER CHECKED sigset_t const *mymask = sigmask_getrd();
-			memset(mempcpy(oset, mymask, sigsetsize), 0xff, overflow);
+	if (set == NULL) {
+		if (oset != NULL) {
+			/* Simply read the current signal mask. */
+			sigset_t mask;
+			sigmask_getmask(&mask);
+			memset(mempcpy(oset, &mask, sigsetsize),
+			       0xff, overflow);
 		}
 	} else {
-		sigset_t newmask;
-		USER CHECKED sigset_t *mymask;
-		mymask = sigmask_getwr();
-		if (oset)
-			memset(mempcpy(oset, mymask, sigsetsize), 0xff, overflow);
-		memset(mempcpy(&newmask, set, sigsetsize),
-		       how == SIG_SETMASK ? 0xff : 0x00,
-		       sizeof(sigset_t) - sigsetsize);
 		switch (how) {
 
-		case SIG_BLOCK: {
-			size_t i;
-
-			/* Don't block these signals. Technically, this safety measure is
-			 * only necessary when USERPROCMASK  is disabled, but it  doesn't
-			 * hurt to do it unconditionally. */
+		case SIG_SETMASK: {
+			bool changed;
+			sigset_t newmask;
+			memset(mempcpy(&newmask, set, sigsetsize),
+			       0xff, sizeof(sigset_t) - sigsetsize);
 			sigdelset(&newmask, SIGKILL);
 			sigdelset(&newmask, SIGSTOP);
-
-			/* Don't try to write to a userprocmask if it already contains the correct bits!
-			 * This is required since a userprocmask may be read-only if the user knows that
-			 * certain signals will never be marked as masked. */
-#ifdef CONFIG_HAVE_USERPROCMASK
-			for (i = 0; i < COMPILER_LENOF(mymask->__val); ++i) {
-				ulongptr_t oldword, newword;
-				oldword = mymask->__val[i];
-				newword = oldword | newmask.__val[i];
-				if (oldword != newword)
-					mymask->__val[i] = newword;
+			if (oset) {
+				sigset_t oldmask;
+				changed = sigmask_getmask_and_setmask(&oldmask, &newmask);
+				memset(mempcpy(oset, &oldmask, sigsetsize), 0xff, overflow);
+			} else {
+				changed = sigmask_setmask(&newmask);
 			}
-#else /* CONFIG_HAVE_USERPROCMASK */
-			sigorset(mymask, mymask, &newmask);
-#endif /* !CONFIG_HAVE_USERPROCMASK */
+			if (changed)
+				userexcept_sysret_inject_self();
+		}	break;
+
+		case SIG_BLOCK: {
+			sigset_t these;
+			memset(mempcpy(&these, set, sigsetsize),
+			       0xff, sizeof(sigset_t) - sigsetsize);
+			sigdelset(&these, SIGKILL);
+			sigdelset(&these, SIGSTOP);
+			if (oset) {
+				sigset_t oldmask;
+				sigmask_getmask_and_blockmask(&oldmask, &these);
+				memset(mempcpy(oset, &oldmask, sigsetsize), 0xff, overflow);
+			} else {
+				sigmask_blockmask(&these);
+			}
 		}	break;
 
 		case SIG_UNBLOCK: {
-			size_t i;
-			bool did_unmask = false;
-
-			/* Don't  modify the state of these signals. Technically, this is only
-			 * necessary  when USERPROCMASK is  enabled, in which  case we have to
-			 * do our best to make as few modifications to their mask as possible,
-			 * thus  improving the chances that no writes  are done at all in case
-			 * the mask is read-only. */
-#ifdef CONFIG_HAVE_USERPROCMASK
-			sigdelset(&newmask, SIGKILL);
-			sigdelset(&newmask, SIGSTOP);
-#endif /* CONFIG_HAVE_USERPROCMASK */
-
-			/* No need to check for  mandatory masks being clear,  since
-			 * this command is only able to clear masks from the get-go. */
-			for (i = 0; i < COMPILER_LENOF(mymask->__val); ++i) {
-				ulongptr_t oldword, newword;
-				oldword = mymask->__val[i];
-				newword = oldword & ~newmask.__val[i];
-				if (oldword != newword) {
-					mymask->__val[i] = newword;
-					did_unmask       = true;
-				}
+			bool changed;
+			sigset_t these;
+			/* NOTE: in the case of UNBLOCK, we don't unblock any signals
+			 *       which  aren't apart of the caller-given signal mask! */
+			bzero(mempcpy(&these, set, sigsetsize),
+			      sizeof(sigset_t) - sigsetsize);
+			if (oset) {
+				sigset_t oldmask;
+				changed = sigmask_getmask_and_unblockmask(&oldmask, &these);
+				memset(mempcpy(oset, &oldmask, sigsetsize), 0xff, overflow);
+			} else {
+				changed = sigmask_unblockmask(&these);
 			}
-			if (did_unmask) {
-				/* Check for pending  signals now that  the
-				 * mask (may have) gotten less restrictive. */
+			if (changed)
 				userexcept_sysret_inject_self();
-			}
-		}	break;
-
-		case SIG_SETMASK: {
-			size_t i;
-			bool did_unmask = false;
-
-			/* Don't allow masking of these signals! */
-			sigdelset(&newmask, SIGKILL);
-			sigdelset(&newmask, SIGSTOP);
-
-			/* When the userprocmask is enabled,  retain
-			 * the old state of mandatory signals. Their
-			 * state  doesn't actually matter, but if we
-			 * retain  it, we may improve the chances of
-			 * not having to do any modifications. */
-#ifdef CONFIG_HAVE_USERPROCMASK
-			if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
-				if (sigismember(mymask, SIGKILL))
-					sigaddset(&newmask, SIGKILL);
-				if (sigismember(mymask, SIGSTOP))
-					sigaddset(&newmask, SIGSTOP);
-			}
-#endif /* CONFIG_HAVE_USERPROCMASK */
-
-			/* Modify the signal mask, but only write to fields
-			 * that actually changed (needed to be done for the
-			 * sake of userprocmask support) */
-			for (i = 0; i < COMPILER_LENOF(mymask->__val); ++i) {
-				ulongptr_t oldword, newword;
-				oldword = mymask->__val[i];
-				newword = newmask.__val[i];
-				if (oldword != newword) {
-					mymask->__val[i] = newword;
-					if ((oldword & ~newword) != 0)
-						did_unmask = true; /* some signal just became unmasked! */
-				}
-			}
-
-			/* If some signal became unmasked, check for pending signals. */
-			if (did_unmask) {
-				/* Check for pending  signals now that  the
-				 * mask (may have) gotten less restrictive. */
-				userexcept_sysret_inject_self();
-			}
 		}	break;
 
 		default:
@@ -897,16 +1363,24 @@ DEFINE_SYSCALL4(errno_t, rt_sigprocmask, syscall_ulong_t, how,
 	}
 	return -EOK;
 }
+#endif /* ... */
+
+#ifdef __ARCH_WANT_SYSCALL_RT_SIGPROCMASK
+DEFINE_SYSCALL4(errno_t, rt_sigprocmask, syscall_ulong_t, how,
+                UNCHECKED USER sigset_t const *, set,
+                UNCHECKED USER sigset_t *, oset, size_t, sigsetsize) {
+	return sys_sigprocmask_impl(how, set, oset, sigsetsize);
+}
 #endif /* __ARCH_WANT_SYSCALL_RT_SIGPROCMASK */
 
 #ifdef __ARCH_WANT_SYSCALL_SIGPROCMASK
 DEFINE_SYSCALL3(errno_t, sigprocmask, syscall_ulong_t, how,
                 UNCHECKED USER struct __old_sigset_struct const *, set,
                 UNCHECKED USER struct __old_sigset_struct *, oset) {
-	return sys_rt_sigprocmask(how,
-	                          (UNCHECKED USER sigset_t const *)set,
-	                          (UNCHECKED USER sigset_t *)oset,
-	                          sizeof(struct __old_sigset_struct));
+	return sys_sigprocmask_impl(how,
+	                            (UNCHECKED USER sigset_t const *)set,
+	                            (UNCHECKED USER sigset_t *)oset,
+	                            sizeof(struct __old_sigset_struct));
 }
 #endif /* __ARCH_WANT_SYSCALL_SIGPROCMASK */
 
@@ -914,10 +1388,10 @@ DEFINE_SYSCALL3(errno_t, sigprocmask, syscall_ulong_t, how,
 DEFINE_COMPAT_SYSCALL3(errno_t, sigprocmask, syscall_ulong_t, how,
                        UNCHECKED USER struct __compat_old_sigset_struct const *, set,
                        UNCHECKED USER struct __compat_old_sigset_struct *, oset) {
-	return sys_rt_sigprocmask(how,
-	                          (UNCHECKED USER sigset_t const *)set,
-	                          (UNCHECKED USER sigset_t *)oset,
-	                          sizeof(struct __compat_old_sigset_struct));
+	return sys_sigprocmask_impl(how,
+	                            (UNCHECKED USER sigset_t const *)set,
+	                            (UNCHECKED USER sigset_t *)oset,
+	                            sizeof(struct __compat_old_sigset_struct));
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SIGPROCMASK */
 
@@ -930,73 +1404,46 @@ DEFINE_COMPAT_SYSCALL3(errno_t, sigprocmask, syscall_ulong_t, how,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_SGETMASK
 DEFINE_SYSCALL0(syscall_ulong_t, sgetmask) {
-	syscall_ulong_t result;
-	USER CHECKED sigset_t const *mymask;
-	mymask = sigmask_getrd();
-#if __SIZEOF_SIGSET_T__ < __SIZEOF_SYSCALL_LONG_T__
-	result = 0;
-#endif /* __SIZEOF_SIGSET_T__ < __SIZEOF_SYSCALL_LONG_T__ */
-	memcpy(&result, mymask, MIN_C(sizeof(sigset_t), sizeof(result)));
-	return result;
+	COMPILER_IMPURE(); /* Yes, this syscall is pure, but we don't care about it in this case. */
+	return sigmask_getmask_word0();
 }
 #endif /* __ARCH_WANT_SYSCALL_SGETMASK */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SGETMASK
 DEFINE_COMPAT_SYSCALL0(syscall_ulong_t, sgetmask) {
-	compat_syscall_ulong_t result;
-	USER CHECKED sigset_t const *mymask;
-	mymask = sigmask_getrd();
-#if __SIZEOF_SIGSET_T__ < __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T
-	result = 0;
-#endif /* __SIZEOF_SIGSET_T__ < __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T */
-	memcpy(&result, mymask, MIN_C(sizeof(sigset_t), sizeof(result)));
-	return result;
+	COMPILER_IMPURE(); /* Yes, this syscall is pure, but we don't care about it in this case. */
+	return (compat_syscall_ulong_t)sigmask_getmask_word0();
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SGETMASK */
 
 #ifdef __ARCH_WANT_SYSCALL_SSETMASK
 DEFINE_SYSCALL1(syscall_ulong_t, ssetmask, syscall_ulong_t, new_sigmask) {
-	syscall_ulong_t result;
-	sigset_t *mymask;
-	mymask = sigmask_getwr();
-#if __SIZEOF_SIGSET_T__ < __SIZEOF_SYSCALL_LONG_T__
-	result = 0;
-#endif /* __SIZEOF_SIGSET_T__ < __SIZEOF_SYSCALL_LONG_T__ */
-	memcpy(&result, mymask, MIN_C(sizeof(sigset_t), sizeof(result)));
-	memcpy(mymask, &new_sigmask, MIN_C(sizeof(sigset_t), sizeof(new_sigmask)));
-#if __SIZEOF_SIGSET_T__ > __SIZEOF_SYSCALL_LONG_T__
-	memset((byte_t *)mymask + sizeof(new_sigmask), 0xff,
-	       sizeof(sigset_t) - sizeof(new_sigmask));
-#endif /* __SIZEOF_SIGSET_T__ > __SIZEOF_SYSCALL_LONG_T__ */
-	/* Make sure that these two signals aren't being masked! */
-	sigdelset(mymask, SIGKILL);
-	sigdelset(mymask, SIGSTOP);
-	userexcept_sysret_inject_self();
-	return result;
+	sigset_t oldmask, newmask;
+	sigmask_getmask(&oldmask);
+	memcpy(&newmask, &oldmask, sizeof(sigset_t));
+	newmask.__val[0] = new_sigmask;
+	__STATIC_IF(__sigset_word(SIGKILL) == 0) { newmask.__val[0] &= ~__sigset_mask(SIGKILL); }
+	__STATIC_IF(__sigset_word(SIGSTOP) == 0) { newmask.__val[0] &= ~__sigset_mask(SIGSTOP); }
+	if (sigmask_setmask(&newmask))
+		userexcept_sysret_inject_self();
+	return oldmask.__val[0];
 }
 #endif /* __ARCH_WANT_SYSCALL_SSETMASK */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SSETMASK
 DEFINE_COMPAT_SYSCALL1(syscall_ulong_t, ssetmask, syscall_ulong_t, new_sigmask) {
-	compat_syscall_ulong_t result;
-	compat_syscall_ulong_t used_sigmask;
-	USER CHECKED sigset_t *mymask;
-	mymask = sigmask_getwr();
-	used_sigmask = (compat_syscall_ulong_t)new_sigmask;
-#if __SIZEOF_SIGSET_T__ < __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T
-	result = 0;
-#endif /* __SIZEOF_SIGSET_T__ < __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T */
-	memcpy(&result, mymask, MIN_C(sizeof(sigset_t), sizeof(result)));
-	memcpy(mymask, &used_sigmask, MIN_C(sizeof(sigset_t), sizeof(used_sigmask)));
-#if __SIZEOF_SIGSET_T__ > __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T
-	memset((byte_t *)mymask + sizeof(used_sigmask), 0xff,
-	       sizeof(sigset_t) - sizeof(used_sigmask));
-#endif /* __SIZEOF_SIGSET_T__ > __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T */
-	/* Make sure that these two signals aren't being masked! */
-	sigdelset(mymask, SIGKILL);
-	sigdelset(mymask, SIGSTOP);
-	userexcept_sysret_inject_self();
-	return result;
+	union {
+		sigset_t s;
+		compat_syscall_ulong_t w;
+	} oldmask, newmask;
+	sigmask_getmask(&oldmask.s);
+	memcpy(&newmask.s, &oldmask, sizeof(sigset_t));
+	newmask.w = new_sigmask;
+	__STATIC_IF(__sigset_word(SIGKILL) == 0) { newmask.s.__val[0] &= ~__sigset_mask(SIGKILL); }
+	__STATIC_IF(__sigset_word(SIGSTOP) == 0) { newmask.s.__val[0] &= ~__sigset_mask(SIGSTOP); }
+	if (sigmask_setmask(&newmask.s))
+		userexcept_sysret_inject_self();
+	return oldmask.w;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SSETMASK */
 
