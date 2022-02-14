@@ -45,19 +45,23 @@
 
 #ifdef __CC__
 #if __ALIGNOF_SIGSET_T__ != __SIZEOF_POINTER__
-__ATTR_ALIGNED(__ALIGNOF_SIGSET_T__)
-#endif /* __ALIGNOF_SIGSET_T__ != __SIZEOF_POINTER__ */
-struct __sigset_struct {
+struct __ATTR_ALIGNED(__ALIGNOF_SIGSET_T__) __sigset_struct
+#else /* __ALIGNOF_SIGSET_T__ != __SIZEOF_POINTER__ */
+struct __sigset_struct
+#endif /* __ALIGNOF_SIGSET_T__ == __SIZEOF_POINTER__ */
+{
 	__ULONGPTR_TYPE__ __val[__SIGSET_NWORDS];
 };
 
 #ifdef __USE_KOS_KERNEL
 struct __old_sigset_struct {
-#if __SIZEOF_OLD_SIGSET_T__ == __SIZEOF_POINTER__
-	__ULONGPTR_TYPE__ __ss_sigmask;
-#else /* __SIZEOF_OLD_SIGSET_T__ == __SIZEOF_POINTER__ */
-	__ULONGPTR_TYPE__ __ss_sigmasks[__SIZEOF_OLD_SIGSET_T__ / __SIZEOF_POINTER__];
-#endif /* __SIZEOF_OLD_SIGSET_T__ != __SIZEOF_POINTER__ */
+#if __SIZEOF_OLD_SIGSET_T__ == 4
+	__ULONG32_TYPE__ __ss_sigmask;
+#elif __SIZEOF_OLD_SIGSET_T__ == 8
+	__ULONG64_TYPE__ __ss_sigmask;
+#else /* __SIZEOF_OLD_SIGSET_T__ == ... */
+	__BYTE_TYPE__ __ss_bits[__SIZEOF_OLD_SIGSET_T__];
+#endif /* __SIZEOF_OLD_SIGSET_T__ != ... */
 };
 #endif /* __USE_KOS_KERNEL */
 

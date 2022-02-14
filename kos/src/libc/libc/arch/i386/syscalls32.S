@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbf794ee */
+/* HASH CRC-32:0x7e57f513 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -601,7 +601,7 @@ INTERN_FUNCTION(libc_sys_getgid)
 END(libc_sys_getgid)
 DEFINE_PUBLIC_ALIAS(sys_getgid, libc_sys_getgid)
 
-/* sighandler_t signal(signo_t signo, sighandler_t handler) */
+/* __sigactionx32_sa_handler_t signal(signo_t signo, __sigactionx32_sa_handler_t handler) */
 INTERN_FUNCTION(libc_sys_signal)
 	movl   $(0x30), %eax
 	jmp    libc_x86_exec_syscall2
@@ -740,7 +740,7 @@ INTERN_FUNCTION(libc_sys_setsid)
 END(libc_sys_setsid)
 DEFINE_PUBLIC_ALIAS(sys_setsid, libc_sys_setsid)
 
-/* errno_t sigaction(signo_t signo, struct __sigactionx32 const *act, struct __sigactionx32 *oact) */
+/* errno_t sigaction(signo_t signo, struct __old_kernel_sigactionx32 const *act, struct __old_kernel_sigactionx32 *oact) */
 INTERN_FUNCTION(libc_sys_sigaction)
 	movl   $(0x43), %eax
 	jmp    libc_x86_exec_syscall3
@@ -1617,7 +1617,7 @@ INTERN_FUNCTION(libc_sys_rt_sigreturn)
 END(libc_sys_rt_sigreturn)
 DEFINE_PUBLIC_ALIAS(sys_rt_sigreturn, libc_sys_rt_sigreturn)
 
-/* errno_t rt_sigaction(signo_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact, size_t sigsetsize) */
+/* errno_t rt_sigaction(signo_t signo, struct __kernel_sigactionx32 const *act, struct __kernel_sigactionx32 *oact, size_t sigsetsize) */
 INTERN_FUNCTION(libc_sys_rt_sigaction)
 	movl   $(0xae), %eax
 	jmp    libc_x86_exec_syscall4
@@ -5063,7 +5063,7 @@ INTERN_FUNCTION(libc_sys_Xgetgid)
 END(libc_sys_Xgetgid)
 DEFINE_PUBLIC_ALIAS(sys_Xgetgid, libc_sys_Xgetgid)
 
-/* sighandler_t signal(signo_t signo, sighandler_t handler) */
+/* __sigactionx32_sa_handler_t signal(signo_t signo, __sigactionx32_sa_handler_t handler) */
 INTERN_FUNCTION(libc_sys_Xsignal)
 	movl   $(0x30), %eax
 	jmp    libc_x86_exec_Xsyscall2
@@ -5202,7 +5202,7 @@ INTERN_FUNCTION(libc_sys_Xsetsid)
 END(libc_sys_Xsetsid)
 DEFINE_PUBLIC_ALIAS(sys_Xsetsid, libc_sys_Xsetsid)
 
-/* errno_t sigaction(signo_t signo, struct __sigactionx32 const *act, struct __sigactionx32 *oact) */
+/* errno_t sigaction(signo_t signo, struct __old_kernel_sigactionx32 const *act, struct __old_kernel_sigactionx32 *oact) */
 INTERN_FUNCTION(libc_sys_Xsigaction)
 	movl   $(0x43), %eax
 	jmp    libc_x86_exec_Xsyscall3
@@ -6053,7 +6053,7 @@ INTERN_FUNCTION(libc_sys_Xprctl)
 END(libc_sys_Xprctl)
 DEFINE_PUBLIC_ALIAS(sys_Xprctl, libc_sys_Xprctl)
 
-/* errno_t rt_sigaction(signo_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact, size_t sigsetsize) */
+/* errno_t rt_sigaction(signo_t signo, struct __kernel_sigactionx32 const *act, struct __kernel_sigactionx32 *oact, size_t sigsetsize) */
 INTERN_FUNCTION(libc_sys_Xrt_sigaction)
 	movl   $(0xae), %eax
 	jmp    libc_x86_exec_Xsyscall4

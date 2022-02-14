@@ -23,8 +23,15 @@
 #include <compat/config.h>
 #ifdef __ARCH_HAVE_COMPAT
 #include <bits/os/sigaction.h>
-#define compat_sigaction      sigaction
-#define __compat_sighandler_t __sighandler_t
+#define compat_sigaction                  sigaction
+#define __compat_sighandler_t             __sighandler_t
+#define __compat_kernel_sigaction         __kernel_sigaction
+#define __compat_sigaction_sa_handler_t   __sigaction_sa_handler_t
+#define __compat_sigaction_sa_restorer_t  __sigaction_sa_restorer_t
+#define __compat_sigaction_sa_sigaction_t __sigaction_sa_sigaction_t
+#ifdef __USE_KOS_KERNEL
+#define __compat_old_kernel_sigaction __old_kernel_sigaction
+#endif /* __USE_KOS_KERNEL */
 #endif /* __ARCH_HAVE_COMPAT */
 
 #endif /* !_COMPAT_BITS_OS_GENERIC_SIGACTION_H */

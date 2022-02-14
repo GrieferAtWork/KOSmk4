@@ -47,6 +47,7 @@
 #define __SIZEOF_SIGACTION           __SIZEOF_SIGACTION_CYGWIN
 #define __ALIGNOF_SIGACTION          __ALIGNOF_SIGACTION_CYGWIN
 #define __sigaction_cygwin           sigaction
+#define __kernel_sigaction           sigaction
 #ifndef ____sighandler_t_defined
 #define ____sighandler_t_defined
 #define __sighandler_cygwin_t __sighandler_t
@@ -86,6 +87,7 @@ struct __sigaction_cygwin /*[NAME(sigaction_cygwin)][PREFIX(sa_)]*/ {
 	struct __sigset_struct sa_mask;  /* Additional set of signals to be blocked. */
 	__uint32_t             sa_flags; /* Special flags (set of `SA_*' from <signal.h>) */
 };
+
 #endif /* __CC__ */
 
 __SYSDECL_END

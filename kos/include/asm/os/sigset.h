@@ -27,7 +27,7 @@
 
 /* Size of the "old" sigset_t type, as used by the non
  * old,  rt_* variants of signal-related system calls. */
-#define __SIZEOF_OLD_SIGSET_T__ __SIZEOF_POINTER__
+#define __SIZEOF_OLD_SIGSET_T__ 4
 
 #if defined(__KOS__) && defined(__KERNEL__)
 /* TODO: The kernel's sigset can be smaller than userspace's, so-long as all

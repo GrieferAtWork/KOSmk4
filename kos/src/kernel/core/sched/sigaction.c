@@ -47,6 +47,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <signal.h>
+#include <stdalign.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -538,16 +539,28 @@ done_handptr:
 #endif /* ... */
 
 #ifdef WANT_SIGACTION
+PRIVATE ATTR_PURE WUNUSED bool KCALL
+contains_nonzero_bytes(USER CHECKED void const *buf, size_t buflen) {
+	return memxchr(buf, 0, buflen) != NULL;
+}
+
 PRIVATE void KCALL
-do_sigaction(signo_t signo,
-             CHECKED USER struct sigaction const *act,
-             CHECKED USER struct sigaction *oact) {
+sys_sigaction_impl(signo_t signo,
+                   CHECKED USER struct __kernel_sigaction const *act,
+                   CHECKED USER struct __kernel_sigaction *oact,
+                   size_t sigsetsize) {
 	struct kernel_sigaction ohandler;
 	struct sighand *hand;
-	if unlikely(signo <= 0 || signo >= NSIG)
+	size_t overflow = 0;
+	if (sigsetsize > sizeof(sigset_t)) {
+		overflow   = sigsetsize - sizeof(sigset_t);
+		sigsetsize = sizeof(sigset_t);
+	}
+	if unlikely(signo <= 0 || signo >= NSIG) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 		      signo);
+	}
 	if (!act) {
 		if (oact) {
 			struct sighand_ptr *handptr;
@@ -556,9 +569,8 @@ do_sigaction(signo_t signo,
 				hand = sighand_ptr_lockread(handptr);
 				if (!hand)
 					goto no_old_handler;
-				memcpy(&ohandler,
-				       &hand->sh_actions[signo - 1],
-				       sizeof(ohandler));
+				memcpy(&ohandler, &hand->sh_actions[signo - 1],
+				       sizeof(struct kernel_sigaction));
 				xincref(ohandler.sa_mask);
 				sync_endread(hand);
 inherit_and_copy_ohandler:
@@ -567,13 +579,9 @@ inherit_and_copy_ohandler:
 				oact->sa_handler  = ohandler.sa_handler;
 				oact->sa_flags    = ohandler.sa_flags;
 				oact->sa_restorer = ohandler.sa_restore;
-				if (ohandler.sa_mask) {
-					memcpy(&oact->sa_mask,
-					       &ohandler.sa_mask->sm_mask,
-					       sizeof(sigset_t));
-				} else {
-					bzero(&oact->sa_mask, sizeof(sigset_t));
-				}
+				memset(ohandler.sa_mask ? mempcpy(&oact->sa_mask, &ohandler.sa_mask->sm_mask, sigsetsize)
+				                        : mempset(&oact->sa_mask, 0, sigsetsize),
+				       0xff, overflow);
 				COMPILER_WRITE_BARRIER();
 			} else {
 no_old_handler:
@@ -607,29 +615,19 @@ no_old_handler:
 		COMPILER_BARRIER();
 		nhandler.sa_mask = NULL;
 		/* Check if the given signal set is empty. */
-		{
-			size_t i;
-			for (i = 0; i < COMPILER_LENOF(act->sa_mask.__val); ++i) {
-				REF struct kernel_sigmask *mask;
-				if (act->sa_mask.__val[i] == 0)
-					continue;
-				COMPILER_READ_BARRIER();
-				/* Must allocate a custom signal mask. */
-				mask = (REF struct kernel_sigmask *)kmalloc(sizeof(struct kernel_sigmask),
-				                                            GFP_NORMAL);
-				TRY {
-					COMPILER_READ_BARRIER();
-					memcpy(&mask->sm_mask, &act->sa_mask, sizeof(sigset_t));
-					COMPILER_READ_BARRIER();
-				} EXCEPT {
-					kfree(mask);
-					RETHROW();
-				}
-				mask->sm_refcnt  = 1;
-				mask->sm_share   = 1;
-				nhandler.sa_mask = mask;
-				break;
+		if (contains_nonzero_bytes(&act->sa_mask, sigsetsize)) {
+			/* Must allocate a custom signal mask. */
+			REF struct kernel_sigmask *mask;
+			mask = (REF struct kernel_sigmask *)kmalloc(sizeof(struct kernel_sigmask), GFP_NORMAL);
+			TRY {
+				memcpy(&mask->sm_mask, &act->sa_mask, sigsetsize);
+			} EXCEPT {
+				kfree(mask);
+				RETHROW();
 			}
+			mask->sm_refcnt  = 1;
+			mask->sm_share   = 1;
+			nhandler.sa_mask = mask;
 		}
 		COMPILER_BARRIER();
 		TRY {
@@ -652,101 +650,157 @@ no_old_handler:
 
 #ifdef __ARCH_WANT_SYSCALL_RT_SIGACTION
 DEFINE_SYSCALL4(errno_t, rt_sigaction, signo_t, signo,
-                UNCHECKED USER struct sigaction const *, act,
-                UNCHECKED USER struct sigaction *, oact,
+                UNCHECKED USER struct __kernel_sigaction const *, act,
+                UNCHECKED USER struct __kernel_sigaction *, oact,
                 size_t, sigsetsize) {
-	if unlikely(sigsetsize != sizeof(sigset_t)) {
-		/* TODO: Allow variable-sized signal masks! */
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-		      sigsetsize);
-	}
 	/* Validate user-structure pointers. */
-	validate_readable_opt(act, sizeof(*act));
-	validate_writable_opt(oact, sizeof(*oact));
-	do_sigaction(signo, act, oact);
+	validate_readable_opt(act, offsetof(struct __kernel_sigaction, sa_mask) + sigsetsize);
+	validate_writable_opt(oact, offsetof(struct __kernel_sigaction, sa_mask) + sigsetsize);
+	sys_sigaction_impl(signo, act, oact, sigsetsize);
 	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_RT_SIGACTION */
 
 #ifdef __ARCH_WANT_SYSCALL_SIGACTION
 DEFINE_SYSCALL3(errno_t, sigaction, signo_t, signo,
-                UNCHECKED USER struct sigaction const *, act,
-                UNCHECKED USER struct sigaction *, oact) {
-	return sys_rt_sigaction(signo, act, oact, sizeof(sigset_t));
+                UNCHECKED USER struct __old_kernel_sigaction const *, old_act,
+                UNCHECKED USER struct __old_kernel_sigaction *, old_oact) {
+	alignas(alignof(struct __kernel_sigaction))
+	byte_t _buf_act[offsetof(struct __kernel_sigaction, sa_mask) +
+	                sizeof(struct __old_sigset_struct)];
+	alignas(alignof(struct __kernel_sigaction))
+	byte_t _buf_oact[offsetof(struct __kernel_sigaction, sa_mask) +
+	                 sizeof(struct __old_sigset_struct)];
+	struct __kernel_sigaction *act  = NULL;
+	struct __kernel_sigaction *oact = NULL;
+	if (old_act != NULL) {
+		validate_readable(old_act, sizeof(*old_act));
+		act = (struct __kernel_sigaction *)_buf_act;
+		act->sa_handler = (typeof(act->sa_handler))(uintptr_t)(void *)old_act->sa_handler;
+		act->sa_flags   = (typeof(act->sa_flags))old_act->sa_flags;
+#ifdef __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER
+		act->sa_restorer = (typeof(act->sa_restorer))(uintptr_t)(void *)old_act->sa_restorer;
+#endif /* __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER */
+		memcpy(&act->sa_mask, &old_act->sa_mask, sizeof(struct __old_sigset_struct));
+	}
+	if (old_oact != NULL) {
+		validate_writable(old_oact, sizeof(*old_oact));
+		oact = (struct __kernel_sigaction *)_buf_oact;
+	}
+	sys_sigaction_impl(signo, act, oact, sizeof(struct __old_sigset_struct));
+	if (old_oact != NULL) {
+		old_oact->sa_handler = (typeof(old_oact->sa_handler))(uintptr_t)(void *)oact->sa_handler;
+		old_oact->sa_flags   = (typeof(old_oact->sa_flags))oact->sa_flags;
+#ifdef __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER
+		old_oact->sa_restorer = (typeof(old_oact->sa_restorer))(uintptr_t)(void *)oact->sa_restorer;
+#endif /* __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER */
+		memcpy(&old_oact->sa_mask, &oact->sa_mask, sizeof(struct __old_sigset_struct));
+	}
+	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_SIGACTION */
 
-#if (defined(__ARCH_WANT_COMPAT_SYSCALL_RT_SIGACTION) || \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_SIGACTION))
-PRIVATE void KCALL
-compat_sigaction_to_sigaction(CHECKED USER struct compat_sigaction const *self,
-                              struct sigaction *__restrict result) {
-	*(void **)&result->sa_handler  = (void *)self->sa_handler;
-	memcpy(&result->sa_mask, &self->sa_mask,
-	       MIN_C(sizeof(sigset_t), sizeof(compat_sigset_t)));
-	__STATIC_IF(sizeof(sigset_t) > sizeof(compat_sigset_t)) {
-		bzero((byte_t *)&result->sa_mask + sizeof(compat_sigset_t),
-		      sizeof(sigset_t) - sizeof(compat_sigset_t));
-	}
-	result->sa_flags = self->sa_flags;
-	*(void **)&result->sa_restorer  = (void *)self->sa_restorer;
-}
-
-PRIVATE void KCALL
-sigaction_to_compat_sigaction(struct sigaction const *__restrict self,
-                              CHECKED USER struct compat_sigaction *result) {
-	typedef compat_funptr(void, , compat_sigrestorer_t, (void));
-	result->sa_handler = (compat_sighandler_t)(uintptr_t)(void *)self->sa_handler;
-	memcpy(&result->sa_mask, &self->sa_mask,
-	       MIN_C(sizeof(sigset_t), sizeof(compat_sigset_t)));
-	__STATIC_IF(sizeof(compat_sigset_t) > sizeof(sigset_t)) {
-		bzero((byte_t *)&result->sa_mask + sizeof(sigset_t),
-		      sizeof(compat_sigset_t) - sizeof(sigset_t));
-	}
-	result->sa_flags = self->sa_flags;
-	result->sa_restorer = (compat_sigrestorer_t)(uintptr_t)(void *)self->sa_restorer;
-}
-
-PRIVATE errno_t KCALL
-do_compat_sigaction(compat_signo_t signo,
-                    UNCHECKED USER struct compat_sigaction const *act,
-                    UNCHECKED USER struct compat_sigaction *oact) {
-	struct sigaction real_act, real_oact;
-	/* Validate user-structure pointers. */
-	validate_readable_opt(act, sizeof(*act));
-	validate_writable_opt(oact, sizeof(*oact));
-	if (act)
-		compat_sigaction_to_sigaction(act, &real_act);
-	do_sigaction(signo,
-	             act ? &real_act : NULL,
-	             oact ? &real_oact : NULL);
-	if (oact)
-		sigaction_to_compat_sigaction(&real_oact, oact);
-	return -EOK;
-}
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_SIGACTION */
-
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_RT_SIGACTION
 DEFINE_COMPAT_SYSCALL4(compat_errno_t, rt_sigaction, compat_signo_t, signo,
-                       UNCHECKED USER struct compat_sigaction const *, act,
-                       UNCHECKED USER struct compat_sigaction *, oact,
+                       UNCHECKED USER struct __compat_kernel_sigaction const *, compat_act,
+                       UNCHECKED USER struct __compat_kernel_sigaction *, compat_oact,
                        size_t, sigsetsize) {
-	if unlikely(sigsetsize != sizeof(sigset_t)) {
-		/* TODO: Allow variable-sized signal masks! */
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
-		      sigsetsize);
+	size_t overflow = 0;
+	struct __kernel_sigaction _buf_act, _buf_oact;
+	struct __kernel_sigaction *act  = NULL;
+	struct __kernel_sigaction *oact = NULL;
+
+	/* Figure out the offsets of fields in `struct __compat_kernel_sigaction' */
+#define CALCULATE_OFFSETOF(field)                              \
+	(offsetof(struct __compat_kernel_sigaction, field) >       \
+	 offsetof(struct __compat_kernel_sigaction, sa_mask)       \
+	 ? (offsetof(struct __compat_kernel_sigaction, sa_mask) +  \
+	    sigsetsize +                                           \
+	    (offsetof(struct __compat_kernel_sigaction, field) -   \
+	     offsetof(struct __compat_kernel_sigaction, sa_mask))) \
+	 : offsetof(struct __compat_kernel_sigaction, field))
+	size_t const offsetof_sa_mask = offsetof(struct __compat_kernel_sigaction, sa_mask);
+	size_t offsetof_sa_handler    = CALCULATE_OFFSETOF(sa_handler);
+	size_t offsetof_sa_flags      = CALCULATE_OFFSETOF(sa_flags);
+#ifdef __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER
+	size_t offsetof_sa_restorer = CALCULATE_OFFSETOF(sa_restorer);
+#endif /* __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER */
+#undef CALCULATE_OFFSETOF
+
+	/* Access the named field of a `struct __compat_kernel_sigaction *self' */
+#define compat_kernel_sigaction_field(self, field) \
+	(*((typeof(&((struct __compat_kernel_sigaction *)0)->field))((byte_t *)(self) + offsetof_##field)))
+
+	/* Limit how large the sigsets we accept can get. */
+	if (sigsetsize > sizeof(sigset_t)) {
+		overflow   = sigsetsize - sizeof(sigset_t);
+		sigsetsize = sizeof(sigset_t);
 	}
-	return do_compat_sigaction(signo, act, oact);
+	if (compat_act != NULL) {
+		validate_readable(compat_act, sizeof(*compat_act));
+		act = &_buf_act;
+		act->sa_handler = (typeof(act->sa_handler))(uintptr_t)(void *)compat_kernel_sigaction_field(compat_act, sa_handler);
+		act->sa_flags   = (typeof(act->sa_flags))compat_kernel_sigaction_field(compat_act, sa_flags);
+#ifdef __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER
+		act->sa_restorer = (typeof(act->sa_restorer))(uintptr_t)(void *)compat_kernel_sigaction_field(compat_act, sa_restorer);
+#endif /* __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER */
+		memcpy(&act->sa_mask, &compat_kernel_sigaction_field(compat_act, sa_mask), sizeof(struct __old_sigset_struct));
+	}
+	if (compat_oact != NULL) {
+		validate_writable(compat_oact, sizeof(*compat_oact));
+		oact = &_buf_oact;
+	}
+	sys_sigaction_impl(signo, act, oact, sigsetsize);
+	if (compat_oact != NULL) {
+		compat_kernel_sigaction_field(compat_oact, sa_handler) = (typeof(compat_oact->sa_handler))(uintptr_t)(void *)oact->sa_handler;
+		compat_kernel_sigaction_field(compat_oact, sa_flags)   = (typeof(compat_oact->sa_flags))oact->sa_flags;
+#ifdef __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER
+		compat_kernel_sigaction_field(compat_oact, sa_restorer) = (typeof(compat_oact->sa_restorer))(uintptr_t)(void *)oact->sa_restorer;
+#endif /* __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER */
+		memset(mempcpy(&compat_kernel_sigaction_field(compat_oact, sa_mask),
+		               &oact->sa_mask, sigsetsize),
+		       0xff, overflow);
+	}
+	return -EOK;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_RT_SIGACTION */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SIGACTION
 DEFINE_COMPAT_SYSCALL3(compat_errno_t, sigaction, compat_signo_t, signo,
-                       UNCHECKED USER struct compat_sigaction const *, act,
-                       UNCHECKED USER struct compat_sigaction *, oact) {
-	return do_compat_sigaction(signo, act, oact);
+                       UNCHECKED USER struct __compat_old_kernel_sigaction const *, old_act,
+                       UNCHECKED USER struct __compat_old_kernel_sigaction *, old_oact) {
+	alignas(alignof(struct __kernel_sigaction))
+	byte_t _buf_act[offsetof(struct __kernel_sigaction, sa_mask) +
+	                sizeof(struct __old_sigset_struct)];
+	alignas(alignof(struct __kernel_sigaction))
+	byte_t _buf_oact[offsetof(struct __kernel_sigaction, sa_mask) +
+	                 sizeof(struct __old_sigset_struct)];
+	struct __kernel_sigaction *act  = NULL;
+	struct __kernel_sigaction *oact = NULL;
+	if (old_act != NULL) {
+		validate_readable(old_act, sizeof(*old_act));
+		act = (struct __kernel_sigaction *)_buf_act;
+		act->sa_handler = (typeof(act->sa_handler))(uintptr_t)(void *)old_act->sa_handler;
+		act->sa_flags   = (typeof(act->sa_flags))old_act->sa_flags;
+#ifdef __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER
+		act->sa_restorer = (typeof(act->sa_restorer))(uintptr_t)(void *)old_act->sa_restorer;
+#endif /* __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER */
+		memcpy(&act->sa_mask, &old_act->sa_mask, sizeof(struct __old_sigset_struct));
+	}
+	if (old_oact != NULL) {
+		validate_writable(old_oact, sizeof(*old_oact));
+		oact = (struct __kernel_sigaction *)_buf_oact;
+	}
+	sys_sigaction_impl(signo, act, oact, sizeof(struct __old_sigset_struct));
+	if (old_oact != NULL) {
+		old_oact->sa_handler = (typeof(old_oact->sa_handler))(uintptr_t)(void *)oact->sa_handler;
+		old_oact->sa_flags   = (typeof(old_oact->sa_flags))oact->sa_flags;
+#ifdef __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER
+		old_oact->sa_restorer = (typeof(old_oact->sa_restorer))(uintptr_t)(void *)oact->sa_restorer;
+#endif /* __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER */
+		memcpy(&old_oact->sa_mask, &oact->sa_mask, sizeof(struct __old_sigset_struct));
+	}
+	return -EOK;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SIGACTION */
 
@@ -754,31 +808,41 @@ DEFINE_COMPAT_SYSCALL3(compat_errno_t, sigaction, compat_signo_t, signo,
 DEFINE_SYSCALL2(sighandler_t, signal,
                 signo_t, signo,
                 UNCHECKED USER sighandler_t, handler) {
-	struct sigaction oact, act;
-	if (handler == SIG_GET) {
-		do_sigaction(signo, NULL, &oact);
+	alignas(alignof(struct __kernel_sigaction))
+	byte_t _buf_act[offsetof(struct __kernel_sigaction, sa_mask)];
+	alignas(alignof(struct __kernel_sigaction))
+	byte_t _buf_oact[offsetof(struct __kernel_sigaction, sa_mask)];
+	struct __kernel_sigaction *act  = (struct __kernel_sigaction *)_buf_act;
+	struct __kernel_sigaction *oact = (struct __kernel_sigaction *)_buf_oact;
+	if ((void *)handler == (void *)SIG_GET) {
+		sys_sigaction_impl(signo, NULL, oact, 0);
 	} else {
-		bzero(&act, sizeof(act));
-		act.sa_handler = handler;
-		do_sigaction(signo, &act, &oact);
+		bzero(&act, offsetof(struct __kernel_sigaction, sa_mask));
+		act->sa_handler = (typeof(act->sa_handler))(void *)handler;
+		sys_sigaction_impl(signo, act, oact, 0);
 	}
-	return oact.sa_handler;
+	return (sighandler_t)(uintptr_t)(void *)oact->sa_handler;
 }
 #endif /* __ARCH_WANT_SYSCALL_SIGNAL */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SIGNAL
-DEFINE_COMPAT_SYSCALL2(sighandler_t, signal,
+DEFINE_COMPAT_SYSCALL2(compat_sighandler_t, signal,
                        compat_signo_t, signo,
-                       UNCHECKED USER sighandler_t, handler) {
-	struct sigaction oact, act;
-	if (handler == SIG_GET) {
-		do_sigaction(signo, NULL, &oact);
+                       UNCHECKED USER compat_sighandler_t, handler) {
+	alignas(alignof(struct __kernel_sigaction))
+	byte_t _buf_act[offsetof(struct __kernel_sigaction, sa_mask)];
+	alignas(alignof(struct __kernel_sigaction))
+	byte_t _buf_oact[offsetof(struct __kernel_sigaction, sa_mask)];
+	struct __kernel_sigaction *act  = (struct __kernel_sigaction *)_buf_act;
+	struct __kernel_sigaction *oact = (struct __kernel_sigaction *)_buf_oact;
+	if ((void *)handler == (void *)SIG_GET) {
+		sys_sigaction_impl(signo, NULL, oact, 0);
 	} else {
-		bzero(&act, sizeof(act));
-		act.sa_handler = handler;
-		do_sigaction(signo, &act, &oact);
+		bzero(&act, offsetof(struct __kernel_sigaction, sa_mask));
+		act->sa_handler = (typeof(act->sa_handler))(void *)handler;
+		sys_sigaction_impl(signo, act, oact, 0);
 	}
-	return oact.sa_handler;
+	return (compat_sighandler_t)(uintptr_t)(void *)oact->sa_handler;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SIGNAL */
 

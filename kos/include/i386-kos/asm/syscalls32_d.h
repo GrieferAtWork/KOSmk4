@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8874b01f */
+/* HASH CRC-32:0xe47af4d3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -129,7 +129,7 @@
 /* >> getgid(2)
  * @return: * : The GID of the calling thread (this is the so-called ~real~ GID) */
 #define __NR32_getgid                       0x2f                   /* uint16_t getgid(void) */
-#define __NR32_signal                       0x30                   /* sighandler_t signal(signo_t signo, sighandler_t handler) */
+#define __NR32_signal                       0x30                   /* __sigactionx32_sa_handler_t signal(signo_t signo, __sigactionx32_sa_handler_t handler) */
 /* >> geteuid(2)
  * @return: * : The   effective  UID  of  the  calling  thread.
  *              This is the one used for most permission checks */
@@ -154,7 +154,7 @@
 #define __NR32_getppid                      0x40                   /* pid_t getppid(void) */
 #define __NR32_getpgrp                      0x41                   /* pid_t getpgrp(void) */
 #define __NR32_setsid                       0x42                   /* pid_t setsid(void) */
-#define __NR32_sigaction                    0x43                   /* errno_t sigaction(signo_t signo, struct __sigactionx32 const *act, struct __sigactionx32 *oact) */
+#define __NR32_sigaction                    0x43                   /* errno_t sigaction(signo_t signo, struct __old_kernel_sigactionx32 const *act, struct __old_kernel_sigactionx32 *oact) */
 #define __NR32_sgetmask                     0x44                   /* syscall_ulong_t sgetmask(void) */
 #define __NR32_ssetmask                     0x45                   /* syscall_ulong_t ssetmask(syscall_ulong_t sigmask) */
 /* >> setreuid(2)
@@ -389,7 +389,7 @@
  * The order chosen is also important, as it is selected such that arguments
  * are  only  passed   through  registers  that   are  preserved  by   CDECL */
 #define __NR32_rt_sigreturn                 0xad                   /* void rt_sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
-#define __NR32_rt_sigaction                 0xae                   /* errno_t rt_sigaction(signo_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact, size_t sigsetsize) */
+#define __NR32_rt_sigaction                 0xae                   /* errno_t rt_sigaction(signo_t signo, struct __kernel_sigactionx32 const *act, struct __kernel_sigactionx32 *oact, size_t sigsetsize) */
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 #define __NR32_rt_sigprocmask               0xaf                   /* errno_t rt_sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset, size_t sigsetsize) */
 #define __NR32_rt_sigpending                0xb0                   /* errno_t rt_sigpending(struct __sigset_struct *set, size_t sigsetsize) */

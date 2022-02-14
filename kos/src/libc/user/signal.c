@@ -62,8 +62,17 @@ libc_sigms_dos2kos(int dos_sigms) {
 
 
 #ifdef LIBC_ARCH_HAVE_SIG_RESTORE
+#ifndef __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER
+#error "libc arch defines `sa_restorer' function, but `struct __kernel_sigaction' doesn't have the field..."
+#endif /* !__ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER */
 INTDEF void /*ASMCALL*/ libc_sig_restore(void);
+#ifdef __ARCH_HAVE_SIGACTION_SA_RESTORER
 #define SET_SIGRESTORE(x) ((x).sa_restorer = &libc_sig_restore, (x).sa_flags |= SA_RESTORER)
+#endif /* __ARCH_HAVE_SIGACTION_SA_RESTORER */
+#else /* LIBC_ARCH_HAVE_SIG_RESTORE */
+#ifdef __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER
+#warning "`struct __kernel_sigaction' has a field `sa_restorer', but libc doesn't define a hook for this"
+#endif /* __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER */
 #endif /* LIBC_ARCH_HAVE_SIG_RESTORE */
 
 #ifndef SET_SIGRESTORE
@@ -145,7 +154,6 @@ NOTHROW_NCX(LIBCCALL libc_sysv_signal)(signo_t signo,
                                        sighandler_t handler)
 /*[[[body:libc_sysv_signal]]]*/
 {
-	errno_t result;
 	struct sigaction act, oact;
 	if unlikely(handler == SIG_ERR) {
 		libc_seterrno(EINVAL);
@@ -155,11 +163,8 @@ NOTHROW_NCX(LIBCCALL libc_sysv_signal)(signo_t signo,
 	libc_sigemptyset(&act.sa_mask);
 	act.sa_flags = (SA_RESETHAND | SA_NODEFER) & ~SA_RESTART;
 	SET_SIGRESTORE(act);
-	result = sys_rt_sigaction(signo, &act, &oact, sizeof(sigset_t));
-	if unlikely(E_ISERR(result)) {
-		libc_seterrno_neg(result);
+	if unlikely(libc_sigaction(signo, &act, &oact) != 0)
 		oact.sa_handler = SIG_ERR;
-	}
 	return oact.sa_handler;
 }
 /*[[[end:libc_sysv_signal]]]*/
@@ -729,15 +734,57 @@ NOTHROW_NCX(LIBCCALL libc_sigaction)(signo_t signo,
 /*[[[body:libc_sigaction]]]*/
 {
 	errno_t result;
+#ifdef __ARCH_HAS_KERNEL_SIGACTION_IS_LIBC_SIGACTION
+	/* libc's `sigaction' matches the kernel's, so no conversion needed! */
 #ifdef LIBC_ARCH_HAVE_SIG_RESTORE
 	struct sigaction real_act;
-	if (act && !(act->sa_flags & SA_RESTORER)) {
+#ifdef __ARCH_HAVE_SIGACTION_SA_RESTORER
+	if (act && !(act->sa_flags & SA_RESTORER))
+#else /* __ARCH_HAVE_SIGACTION_SA_RESTORER */
+	if (act)
+#endif /* !__ARCH_HAVE_SIGACTION_SA_RESTORER */
+	{
 		memcpy(&real_act, act, sizeof(struct sigaction));
-		SET_SIGRESTORE(real_act);
+		real_act.sa_restorer = &libc_sig_restore;
+		real_act.sa_flags |= SA_RESTORER;
 		act = &real_act;
 	}
 #endif /* LIBC_ARCH_HAVE_SIG_RESTORE */
 	result = sys_rt_sigaction(signo, act, oact, sizeof(sigset_t));
+#else /* __ARCH_HAS_KERNEL_SIGACTION_IS_LIBC_SIGACTION */
+	/* libc's  `sigaction'  differs from  the  kernel's. As
+	 * such, we have to convert between the 2 formats here. */
+	struct __kernel_sigaction kact, koact;
+	if (act) {
+		kact.sa_flags   = (typeof(kact.sa_flags))act->sa_flags;
+		kact.sa_handler = (typeof(kact.sa_handler))(uintptr_t)(void *)act->sa_handler;
+#if defined(__ARCH_HAVE_SIGACTION_SA_RESTORER) && defined(__ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER)
+		kact.sa_restorer = (typeof(kact.sa_restorer))(uintptr_t)(void *)&libc_sig_restore;
+#endif /* __ARCH_HAVE_SIGACTION_SA_RESTORER && __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER */
+		memcpy(&kact.sa_mask, &act->sa_mask, sizeof(sigset_t));
+#ifdef LIBC_ARCH_HAVE_SIG_RESTORE
+#ifdef __ARCH_HAVE_SIGACTION_SA_RESTORER
+		if (!(kact.sa_flags & SA_RESTORER))
+#endif /* __ARCH_HAVE_SIGACTION_SA_RESTORER */
+		{
+			kact.sa_restorer = (typeof(kact.sa_restorer))(uintptr_t)(void *)&libc_sig_restore;
+			kact.sa_flags |= SA_RESTORER;
+		}
+#endif /* LIBC_ARCH_HAVE_SIG_RESTORE */
+	}
+	result = sys_rt_sigaction(signo,
+	                          act ? &kact : NULL,
+	                          oact ? &koact : NULL,
+	                          sizeof(sigset_t));
+	if (likely(E_ISOK(result)) && oact) {
+		oact->sa_flags   = (typeof(oact->sa_flags))kact.sa_flags;
+		oact->sa_handler = (typeof(oact->sa_handler))(uintptr_t)(void *)kact.sa_handler;
+#if defined(__ARCH_HAVE_SIGACTION_SA_RESTORER) && defined(__ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER)
+		oact->sa_restorer = (typeof(oact->sa_restorer))(uintptr_t)(void *)kact.sa_restorer;
+#endif /* __ARCH_HAVE_SIGACTION_SA_RESTORER && __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER */
+		memcpy(&oact->sa_mask, &kact.sa_mask, sizeof(sigset_t));
+	}
+#endif /* !__ARCH_HAS_KERNEL_SIGACTION_IS_LIBC_SIGACTION */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_sigaction]]]*/

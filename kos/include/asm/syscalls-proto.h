@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66d96d53 */
+/* HASH CRC-32:0x4aa4976d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1000,8 +1000,8 @@
 #define __NRAT0_rt_sigsuspend          (struct __sigset_struct const *, struct __sigset_struct const *)
 #define __NRAT1_rt_sigsuspend          (size_t, __size_t)
 #define __NRAT0_rt_sigaction           (signo_t, __signo_t)
-#define __NRAT1_rt_sigaction           (struct sigaction const *, struct sigaction const *)
-#define __NRAT2_rt_sigaction           (struct sigaction *, struct sigaction *)
+#define __NRAT1_rt_sigaction           (struct __kernel_sigaction const *, struct __kernel_sigaction const *)
+#define __NRAT2_rt_sigaction           (struct __kernel_sigaction *, struct __kernel_sigaction *)
 #define __NRAT3_rt_sigaction           (size_t, __size_t)
 #define __NRAT0_rt_sigprocmask         (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_rt_sigprocmask         (struct __sigset_struct const *, struct __sigset_struct const *)
@@ -1560,7 +1560,7 @@
 #define __NRAM_tgkill(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (__pid_t)a, (__pid_t)b, (__signo_t)c
 #define __NRAM_sigaltstack(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            (struct sigaltstack const *)a, (struct sigaltstack *)b
 #define __NRAM_rt_sigsuspend(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (struct __sigset_struct const *)a, (__size_t)b
-#define __NRAM_rt_sigaction(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (__signo_t)a, (struct sigaction const *)b, (struct sigaction *)c, (__size_t)d
+#define __NRAM_rt_sigaction(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (__signo_t)a, (struct __kernel_sigaction const *)b, (struct __kernel_sigaction *)c, (__size_t)d
 #define __NRAM_rt_sigprocmask(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)         (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c, (__size_t)d
 #define __NRAM_rt_sigpending(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (struct __sigset_struct *)a, (__size_t)b
 #define __NRAM_rt_sigtimedwait(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (struct __sigset_struct const *)a, (struct __siginfo_struct *)b, (struct timespec const *)c, (__size_t)d

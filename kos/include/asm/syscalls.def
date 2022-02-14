@@ -123,9 +123,9 @@
 %[typeorg(<bits/os/statfs.h>: statfs, statfs32, statfs64, __statfs32, __statfs64)]
 %[typeorg(<bits/os/kos/statfs32.h>: statfsx32, __statfsx32, statfsx32_64, __statfsx32_64)]
 %[typeorg(<bits/os/kos/statfs64.h>: statfsx64, __statfsx64)]
-%[typeorg(<bits/os/sigaction.h>: sigaction, __sighandler_t)]
-%[typeorg(<bits/os/kos/sigaction32.h>: sigactionx32, __sigactionx32, __sighandlerx32_t)]
-%[typeorg(<bits/os/kos/sigaction64.h>: sigactionx64, __sigactionx64, __sighandlerx64_t)]
+%[typeorg(<bits/os/sigaction.h>: sigaction, __kernel_sigaction, __old_kernel_sigaction, __sigaction_sa_handler_t, __sighandler_t)]
+%[typeorg(<bits/os/kos/sigaction32.h>: __sigactionx32, __kernel_sigactionx32, __old_kernel_sigactionx32, __sigactionx32_sa_handler_t)]
+%[typeorg(<bits/os/kos/sigaction64.h>: __sigactionx64, __kernel_sigactionx64, __old_kernel_sigactionx64, __sigactionx64_sa_handler_t)]
 %[typeorg(<bits/os/siginfo.h>: __siginfo_struct, siginfo_t)]
 %[typeorg(<bits/os/kos/siginfo32.h>: __siginfox32_struct, siginfox32_t)]
 %[typeorg(<bits/os/kos/siginfo64.h>: __siginfox64_struct, siginfox64_t)]
@@ -164,7 +164,6 @@
 %[typeorg(<asm/os/sched.h>: clone_args)]
 
 /* Define how specific struct names should be escaped in headers */
-%[struct_escape(sigactionx32 = __sigactionx32, sigactionx64 = __sigactionx64)]
 %[struct_escape(iovecx32 = __iovecx32, iovecx64 = __iovecx64)]
 %[struct_escape(msghdrx32 = __msghdrx32, msghdrx64 = __msghdrx64)]
 %[struct_escape(cmsghdrx32 = __cmsghdrx32, cmsghdrx64 = __cmsghdrx64)]
@@ -273,7 +272,10 @@
 
 %[define_tostr(char const *         = STRING)]
 %[define_tostr(timer_t              = TIMER_T)]
-%[define_tostr(sighandler_t         = SIGHANDLER_T)]
+%[define_tostr(__sighandler_t              = SIGHANDLER_T)]
+%[define_tostr(__sigaction_sa_handler_t    = SIGHANDLER_T)]
+%[define_tostr(__sigactionx32_sa_handler_t = SIGHANDLER_T)]
+%[define_tostr(__sigactionx64_sa_handler_t = SIGHANDLER_T)]
 %[define_tostr(except_handler_t     = EXCEPT_HANDLER_T)]
 %[define_tostr(__except_handler32_t = EXCEPT_HANDLER_T)]
 %[define_tostr(__except_handler64_t = EXCEPT_HANDLER_T)]
@@ -1488,18 +1490,22 @@ kill:(pid_t pid, signo_t signo) -> errno_t;
 tkill:(pid_t tid, signo_t signo) -> errno_t;
 tgkill:(pid_t pid, pid_t tid, signo_t signo) -> errno_t;
 
-signal:(signo_t signo, sighandler_t handler) -> sighandler_t;
-
 %[startgroup]
-sigaction:(signo_t signo, [tostr(STRUCT_SIGACTION)] struct sigaction const *act, [tostr(out:STRUCT_SIGACTION)] struct sigaction *oact) -> errno_t;
-sigactionx32:(signo_t signo, [tostr(STRUCT_SIGACTIONX32)] struct __sigactionx32 const *act, [tostr(out:STRUCT_SIGACTIONX32)] struct __sigactionx32 *oact) -> errno_t;
-sigactionx64:(signo_t signo, [tostr(STRUCT_SIGACTIONX64)] struct __sigactionx64 const *act, [tostr(out:STRUCT_SIGACTIONX64)] struct __sigactionx64 *oact) -> errno_t;
+signal:(signo_t signo, __sigaction_sa_handler_t handler) -> __sigaction_sa_handler_t;
+signalx32:(signo_t signo, __sigactionx32_sa_handler_t handler) -> __sigactionx32_sa_handler_t;
+signalx64:(signo_t signo, __sigactionx64_sa_handler_t handler) -> __sigactionx64_sa_handler_t;
 %[endgroup]
 
 %[startgroup]
-rt_sigaction:(signo_t signo, [tostr(STRUCT_SIGACTION:sigsetsize)] struct sigaction const *act, [tostr(out:STRUCT_SIGACTION:sigsetsize)] struct sigaction *oact, size_t sigsetsize) -> errno_t;
-rt_sigactionx32:(signo_t signo, [tostr(STRUCT_SIGACTIONX32:sigsetsize)] struct sigactionx32 const *act, [tostr(out:STRUCT_SIGACTIONX32:sigsetsize)] struct sigactionx32 *oact, size_t sigsetsize) -> errno_t;
-rt_sigactionx64:(signo_t signo, [tostr(STRUCT_SIGACTIONX64:sigsetsize)] struct sigactionx64 const *act, [tostr(out:STRUCT_SIGACTIONX64:sigsetsize)] struct sigactionx64 *oact, size_t sigsetsize) -> errno_t;
+sigaction:(signo_t signo, [tostr(STRUCT_SIGACTION)] struct __old_kernel_sigaction const *act, [tostr(out:STRUCT_SIGACTION)] struct __old_kernel_sigaction *oact) -> errno_t;
+sigactionx32:(signo_t signo, [tostr(STRUCT_SIGACTIONX32)] struct __old_kernel_sigactionx32 const *act, [tostr(out:STRUCT_SIGACTIONX32)] struct __old_kernel_sigactionx32 *oact) -> errno_t;
+sigactionx64:(signo_t signo, [tostr(STRUCT_SIGACTIONX64)] struct __old_kernel_sigactionx64 const *act, [tostr(out:STRUCT_SIGACTIONX64)] struct __old_kernel_sigactionx64 *oact) -> errno_t;
+%[endgroup]
+
+%[startgroup]
+rt_sigaction:(signo_t signo, [tostr(STRUCT_SIGACTION:sigsetsize)] struct __kernel_sigaction const *act, [tostr(out:STRUCT_SIGACTION:sigsetsize)] struct __kernel_sigaction *oact, size_t sigsetsize) -> errno_t;
+rt_sigactionx32:(signo_t signo, [tostr(STRUCT_SIGACTIONX32:sigsetsize)] struct __kernel_sigactionx32 const *act, [tostr(out:STRUCT_SIGACTIONX32:sigsetsize)] struct __kernel_sigactionx32 *oact, size_t sigsetsize) -> errno_t;
+rt_sigactionx64:(signo_t signo, [tostr(STRUCT_SIGACTIONX64:sigsetsize)] struct __kernel_sigactionx64 const *act, [tostr(out:STRUCT_SIGACTIONX64:sigsetsize)] struct __kernel_sigactionx64 *oact, size_t sigsetsize) -> errno_t;
 %[endgroup]
 
 %[startgroup]

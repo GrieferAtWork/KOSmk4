@@ -34,6 +34,7 @@
 
 #include <hybrid/__pointer.h> /* __HYBRID_PTR32 */
 #include <hybrid/host.h>      /* __x86_64__, __i386__ */
+#include <hybrid/typecore.h>
 
 #include <bits/os/kos/mcontext32.h> /* struct __mcontextx32 */
 #include <bits/os/kos/sigstack32.h> /* struct __sigaltstackx32 */
@@ -62,13 +63,13 @@ __DECL_BEGIN
 
 #ifndef ____sigsetx32_t_defined
 #define ____sigsetx32_t_defined
-#ifdef __x86_64__
+#if __SIZEOF_POINTER__ == 4
+#define __sigset_structx32 __sigset_struct
+#else /* __SIZEOF_POINTER__ == 4 */
 struct __sigset_structx32 {
 	__UINT32_TYPE__ __val[__SIZEOF_SIGSET_T__ / 4];
 };
-#else /* __x86_64__ */
-#define __sigset_structx32 __sigset_struct
-#endif /* !__x86_64__ */
+#endif /* !__SIZEOF_POINTER__ != 4 */
 #endif /* !____sigsetx32_t_defined */
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd130e8b9 */
+/* HASH CRC-32:0x8d5063dd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,6 @@
 #include <bits/os/kos/utimbuf32.h>
 #include <bits/os/mqueue.h>
 #include <bits/os/pollfd.h>
-#include <bits/os/sigaction.h>
 #include <bits/os/sigevent.h>
 #include <bits/os/timex.h>
 #include <bits/types.h>
@@ -111,13 +110,14 @@ struct __itimerspecx32;
 struct __itimerspecx32_64;
 struct __itimervalx32;
 struct __itimervalx32_64;
+struct __kernel_sigactionx32;
 struct __kos_statx32;
 struct __mmsghdrx32;
 struct __msghdrx32;
+struct __old_kernel_sigactionx32;
 struct __old_sigset_struct;
 struct __rusagex32;
 struct __rusagex32_64;
-struct __sigactionx32;
 struct __sigaltstackx32;
 struct __siginfox32_struct;
 struct __sigset_struct;
@@ -1793,7 +1793,7 @@ __CDECLARE_SC(,__errno_t,rpc_serve_sysret,(void),())
 __CDECLARE_SC(,__errno_t,rseq,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(rseq) */
 #if __CRT_HAVE_SC(rt_sigaction)
-__CDECLARE_SC(,__errno_t,rt_sigaction,(__signo_t __signo, struct __sigactionx32 const *__act, struct __sigactionx32 *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
+__CDECLARE_SC(,__errno_t,rt_sigaction,(__signo_t __signo, struct __kernel_sigactionx32 const *__act, struct __kernel_sigactionx32 *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
 #endif /* __CRT_HAVE_SC(rt_sigaction) */
 #if __CRT_HAVE_SC(rt_sigpending)
 __CDECLARE_SC(,__errno_t,rt_sigpending,(struct __sigset_struct *__set, __size_t __sigsetsize),(__set,__sigsetsize))
@@ -2269,13 +2269,13 @@ __CDECLARE_SC(,__errno_t,shmget,(__key_t __key, __size_t __size, __syscall_ulong
 __CDECLARE_SC(,__errno_t,shutdown,(__fd_t __sockfd, __syscall_ulong_t __how),(__sockfd,__how))
 #endif /* __CRT_HAVE_SC(shutdown) */
 #if __CRT_HAVE_SC(sigaction)
-__CDECLARE_SC(,__errno_t,sigaction,(__signo_t __signo, struct __sigactionx32 const *__act, struct __sigactionx32 *__oact),(__signo,__act,__oact))
+__CDECLARE_SC(,__errno_t,sigaction,(__signo_t __signo, struct __old_kernel_sigactionx32 const *__act, struct __old_kernel_sigactionx32 *__oact),(__signo,__act,__oact))
 #endif /* __CRT_HAVE_SC(sigaction) */
 #if __CRT_HAVE_SC(sigaltstack)
 __CDECLARE_SC(,__errno_t,sigaltstack,(struct __sigaltstackx32 const *__ss, struct __sigaltstackx32 *__oss),(__ss,__oss))
 #endif /* __CRT_HAVE_SC(sigaltstack) */
 #if __CRT_HAVE_SC(signal)
-__CDECLARE_SC(,__sighandler_t,signal,(__signo_t __signo, __sighandler_t __handler),(__signo,__handler))
+__CDECLARE_SC(,__sigactionx32_sa_handler_t,signal,(__signo_t __signo, __sigactionx32_sa_handler_t __handler),(__signo,__handler))
 #endif /* __CRT_HAVE_SC(signal) */
 #if __CRT_HAVE_SC(signalfd)
 /* Create a poll(2)-able file descriptor which can be used to wait for the
@@ -4295,7 +4295,7 @@ __CDECLARE_XSC(,__errno_t,rpc_serve_sysret,(void),())
 __CDECLARE_XSC(,__errno_t,rseq,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(rseq) */
 #if __CRT_HAVE_XSC(rt_sigaction)
-__CDECLARE_XSC(,__errno_t,rt_sigaction,(__signo_t __signo, struct __sigactionx32 const *__act, struct __sigactionx32 *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
+__CDECLARE_XSC(,__errno_t,rt_sigaction,(__signo_t __signo, struct __kernel_sigactionx32 const *__act, struct __kernel_sigactionx32 *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
 #endif /* __CRT_HAVE_XSC(rt_sigaction) */
 #if __CRT_HAVE_XSC(rt_sigpending)
 __CDECLARE_XSC(,__errno_t,rt_sigpending,(struct __sigset_struct *__set, __size_t __sigsetsize),(__set,__sigsetsize))
@@ -4762,13 +4762,13 @@ __CDECLARE_XSC(,__errno_t,shmget,(__key_t __key, __size_t __size, __syscall_ulon
 __CDECLARE_XSC(,__errno_t,shutdown,(__fd_t __sockfd, __syscall_ulong_t __how),(__sockfd,__how))
 #endif /* __CRT_HAVE_XSC(shutdown) */
 #if __CRT_HAVE_XSC(sigaction)
-__CDECLARE_XSC(,__errno_t,sigaction,(__signo_t __signo, struct __sigactionx32 const *__act, struct __sigactionx32 *__oact),(__signo,__act,__oact))
+__CDECLARE_XSC(,__errno_t,sigaction,(__signo_t __signo, struct __old_kernel_sigactionx32 const *__act, struct __old_kernel_sigactionx32 *__oact),(__signo,__act,__oact))
 #endif /* __CRT_HAVE_XSC(sigaction) */
 #if __CRT_HAVE_XSC(sigaltstack)
 __CDECLARE_XSC(,__errno_t,sigaltstack,(struct __sigaltstackx32 const *__ss, struct __sigaltstackx32 *__oss),(__ss,__oss))
 #endif /* __CRT_HAVE_XSC(sigaltstack) */
 #if __CRT_HAVE_XSC(signal)
-__CDECLARE_XSC(,__sighandler_t,signal,(__signo_t __signo, __sighandler_t __handler),(__signo,__handler))
+__CDECLARE_XSC(,__sigactionx32_sa_handler_t,signal,(__signo_t __signo, __sigactionx32_sa_handler_t __handler),(__signo,__handler))
 #endif /* __CRT_HAVE_XSC(signal) */
 #if __CRT_HAVE_XSC(signalfd)
 /* Create a poll(2)-able file descriptor which can be used to wait for the

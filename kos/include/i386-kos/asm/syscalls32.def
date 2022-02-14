@@ -101,6 +101,7 @@ fstatfs64 = fstatfsx32_64;
 execve = execvex32;
 execveat = execveatx32;
 maplibrary = maplibraryx32;
+signal = signalx32;
 sigaction = sigactionx32;
 rt_sigaction = rt_sigactionx32;
 sigaltstack = sigaltstackx32;

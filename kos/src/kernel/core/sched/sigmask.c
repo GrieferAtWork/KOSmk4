@@ -767,7 +767,7 @@ DEFINE_SYSCALL4(errno_t, rt_sigprocmask, syscall_ulong_t, how,
                 UNCHECKED USER sigset_t *, oset, size_t, sigsetsize) {
 	size_t overflow = 0;
 	if (sigsetsize > sizeof(sigset_t)) {
-		overflow   = sizeof(sigset_t) - sigsetsize;
+		overflow   = sigsetsize - sizeof(sigset_t);
 		sigsetsize = sizeof(sigset_t);
 	}
 	validate_readable_opt(set, sigsetsize);

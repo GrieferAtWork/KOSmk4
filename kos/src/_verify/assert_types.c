@@ -850,6 +850,16 @@ static_assert(offsetof(struct sigaction, sa_sigaction) == __OFFSET_SIGACTION_SIG
 static_assert(sizeof(struct sigaction) == __SIZEOF_SIGACTION);
 static_assert(alignof(struct sigaction) == __ALIGNOF_SIGACTION);
 
+/* struct __kernel_sigaction */
+static_assert(offsetof(struct __kernel_sigaction, sa_flags) == __OFFSET_KERNEL_SIGACTION_FLAGS);
+static_assert(offsetof(struct __kernel_sigaction, sa_handler) == __OFFSET_KERNEL_SIGACTION_HANDLER);
+static_assert(offsetof(struct __kernel_sigaction, sa_mask) == __OFFSET_KERNEL_SIGACTION_MASK);
+static_assert(offsetof(struct __kernel_sigaction, sa_restorer) == __OFFSET_KERNEL_SIGACTION_RESTORER);
+static_assert(alignof(struct __kernel_sigaction) == __ALIGNOF_KERNEL_SIGACTION);
+
+/* struct __old_kernel_sigaction */
+/* ... */
+
 
 
 

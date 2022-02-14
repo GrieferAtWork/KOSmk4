@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15bc49a3 */
+/* HASH CRC-32:0xc4036667 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -301,7 +301,7 @@
  * @param: set: The set of signals on which to wait
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 #define __NR_rt_sigsuspend          0x85  /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
-#define __NR_rt_sigaction           0x86  /* errno_t rt_sigaction(signo_t signo, struct sigaction const *act, struct sigaction *oact, size_t sigsetsize) */
+#define __NR_rt_sigaction           0x86  /* errno_t rt_sigaction(signo_t signo, struct __kernel_sigaction const *act, struct __kernel_sigaction *oact, size_t sigsetsize) */
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 #define __NR_rt_sigprocmask         0x87  /* errno_t rt_sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset, size_t sigsetsize) */
 #define __NR_rt_sigpending          0x88  /* errno_t rt_sigpending(struct __sigset_struct *set, size_t sigsetsize) */

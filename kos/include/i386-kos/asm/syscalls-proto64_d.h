@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22cfeea1 */
+/* HASH CRC-32:0x4998798a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -883,8 +883,8 @@
 #define __NR64AT1_munmap                   (size_t, __size_t)
 #define __NR64AT0_brk                      (void *, void *)
 #define __NR64AT0_rt_sigaction             (signo_t, __signo_t)
-#define __NR64AT1_rt_sigaction             (struct sigactionx64 const *, struct __sigactionx64 const *)
-#define __NR64AT2_rt_sigaction             (struct sigactionx64 *, struct __sigactionx64 *)
+#define __NR64AT1_rt_sigaction             (struct __kernel_sigactionx64 const *, struct __kernel_sigactionx64 const *)
+#define __NR64AT2_rt_sigaction             (struct __kernel_sigactionx64 *, struct __kernel_sigactionx64 *)
 #define __NR64AT3_rt_sigaction             (size_t, __size_t)
 #define __NR64AT0_rt_sigprocmask           (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT1_rt_sigprocmask           (struct __sigset_struct const *, struct __sigset_struct const *)
@@ -1793,7 +1793,7 @@
 #define __NR64AM_mprotect(a, b, c, d, e, f)                 (void *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NR64AM_munmap(a, b, c, d, e, f)                   (void *)a, (__size_t)b
 #define __NR64AM_brk(a, b, c, d, e, f)                      (void *)a
-#define __NR64AM_rt_sigaction(a, b, c, d, e, f)             (__signo_t)a, (struct __sigactionx64 const *)b, (struct __sigactionx64 *)c, (__size_t)d
+#define __NR64AM_rt_sigaction(a, b, c, d, e, f)             (__signo_t)a, (struct __kernel_sigactionx64 const *)b, (struct __kernel_sigactionx64 *)c, (__size_t)d
 #define __NR64AM_rt_sigprocmask(a, b, c, d, e, f)           (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c, (__size_t)d
 #define __NR64AM_rt_sigreturn(a, b, c, d, e, f)             /* nothing */
 #define __NR64AM_ioctl(a, b, c, d, e, f)                    (__fd_t)a, (__ioctl_t)b, (void *)c

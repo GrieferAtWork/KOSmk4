@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8ca9518 */
+/* HASH CRC-32:0x27aff234 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -586,7 +586,7 @@
 #define __NRRT_brk                          (errno_t, __errno_t)
 #define __NRRT_setgid                       (errno_t, __errno_t)
 #define __NRRT_getgid                       (uint16_t, __uint16_t)
-#define __NRRT_signal                       (sighandler_t, __sighandler_t)
+#define __NRRT_signal                       (__sigactionx32_sa_handler_t, __sigactionx32_sa_handler_t)
 #define __NRRT_geteuid                      (uint16_t, __uint16_t)
 #define __NRRT_getegid                      (uint16_t, __uint16_t)
 #define __NRRT_acct                         (errno_t, __errno_t)
@@ -1109,7 +1109,7 @@
 #define __NRAT0_brk                          (void *, void *)
 #define __NRAT0_setgid                       (uint16_t, __uint16_t)
 #define __NRAT0_signal                       (signo_t, __signo_t)
-#define __NRAT1_signal                       (sighandler_t, __sighandler_t)
+#define __NRAT1_signal                       (__sigactionx32_sa_handler_t, __sigactionx32_sa_handler_t)
 #define __NRAT0_acct                         (char const *, char const *)
 #define __NRAT0_umount2                      (char const *, char const *)
 #define __NRAT1_umount2                      (syscall_ulong_t, __syscall_ulong_t)
@@ -1129,8 +1129,8 @@
 #define __NRAT0_dup2                         (fd_t, __fd_t)
 #define __NRAT1_dup2                         (fd_t, __fd_t)
 #define __NRAT0_sigaction                    (signo_t, __signo_t)
-#define __NRAT1_sigaction                    (struct __sigactionx32 const *, struct __sigactionx32 const *)
-#define __NRAT2_sigaction                    (struct __sigactionx32 *, struct __sigactionx32 *)
+#define __NRAT1_sigaction                    (struct __old_kernel_sigactionx32 const *, struct __old_kernel_sigactionx32 const *)
+#define __NRAT2_sigaction                    (struct __old_kernel_sigactionx32 *, struct __old_kernel_sigactionx32 *)
 #define __NRAT0_ssetmask                     (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_setreuid                     (uint16_t, __uint16_t)
 #define __NRAT1_setreuid                     (uint16_t, __uint16_t)
@@ -1340,8 +1340,8 @@
 #define __NRAT4_rt_sigreturn                 (struct rpc_syscall_info32 const *, struct rpc_syscall_info32 const *)
 #define __NRAT5_rt_sigreturn                 (struct ucpustate32 const *, struct ucpustate32 const *)
 #define __NRAT0_rt_sigaction                 (signo_t, __signo_t)
-#define __NRAT1_rt_sigaction                 (struct sigactionx32 const *, struct __sigactionx32 const *)
-#define __NRAT2_rt_sigaction                 (struct sigactionx32 *, struct __sigactionx32 *)
+#define __NRAT1_rt_sigaction                 (struct __kernel_sigactionx32 const *, struct __kernel_sigactionx32 const *)
+#define __NRAT2_rt_sigaction                 (struct __kernel_sigactionx32 *, struct __kernel_sigactionx32 *)
 #define __NRAT3_rt_sigaction                 (size_t, __size_t)
 #define __NRAT0_rt_sigprocmask               (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_rt_sigprocmask               (struct __sigset_struct const *, struct __sigset_struct const *)
@@ -2228,7 +2228,7 @@
 #define __NRAM_brk(a, b, c, d, e, f)                          (void *)a
 #define __NRAM_setgid(a, b, c, d, e, f)                       (__uint16_t)a
 #define __NRAM_getgid(a, b, c, d, e, f)                       /* nothing */
-#define __NRAM_signal(a, b, c, d, e, f)                       (__signo_t)a, (__sighandler_t)b
+#define __NRAM_signal(a, b, c, d, e, f)                       (__signo_t)a, (__sigactionx32_sa_handler_t)b
 #define __NRAM_geteuid(a, b, c, d, e, f)                      /* nothing */
 #define __NRAM_getegid(a, b, c, d, e, f)                      /* nothing */
 #define __NRAM_acct(a, b, c, d, e, f)                         (char const *)a
@@ -2247,7 +2247,7 @@
 #define __NRAM_getppid(a, b, c, d, e, f)                      /* nothing */
 #define __NRAM_getpgrp(a, b, c, d, e, f)                      /* nothing */
 #define __NRAM_setsid(a, b, c, d, e, f)                       /* nothing */
-#define __NRAM_sigaction(a, b, c, d, e, f)                    (__signo_t)a, (struct __sigactionx32 const *)b, (struct __sigactionx32 *)c
+#define __NRAM_sigaction(a, b, c, d, e, f)                    (__signo_t)a, (struct __old_kernel_sigactionx32 const *)b, (struct __old_kernel_sigactionx32 *)c
 #define __NRAM_sgetmask(a, b, c, d, e, f)                     /* nothing */
 #define __NRAM_ssetmask(a, b, c, d, e, f)                     (__syscall_ulong_t)a
 #define __NRAM_setreuid(a, b, c, d, e, f)                     (__uint16_t)a, (__uint16_t)b
@@ -2354,7 +2354,7 @@
 #define __NRAM_getresgid(a, b, c, d, e, f)                    (__uint16_t *)a, (__uint16_t *)b, (__uint16_t *)c
 #define __NRAM_prctl(a, b, c, d, e, f)                        (unsigned int)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAM_rt_sigreturn(a, b, c, d, e, f)                 (struct fpustate32 const *)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (struct __sigset_struct const *)d, (struct rpc_syscall_info32 const *)e, (struct ucpustate32 const *)f
-#define __NRAM_rt_sigaction(a, b, c, d, e, f)                 (__signo_t)a, (struct __sigactionx32 const *)b, (struct __sigactionx32 *)c, (__size_t)d
+#define __NRAM_rt_sigaction(a, b, c, d, e, f)                 (__signo_t)a, (struct __kernel_sigactionx32 const *)b, (struct __kernel_sigactionx32 *)c, (__size_t)d
 #define __NRAM_rt_sigprocmask(a, b, c, d, e, f)               (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c, (__size_t)d
 #define __NRAM_rt_sigpending(a, b, c, d, e, f)                (struct __sigset_struct *)a, (__size_t)b
 #define __NRAM_rt_sigtimedwait(a, b, c, d, e, f)              (struct __sigset_struct const *)a, (struct __siginfox32_struct *)b, (struct __timespecx32 const *)c, (__size_t)d

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x990d35bb */
+/* HASH CRC-32:0x15e08b2e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -103,11 +103,11 @@ struct __fd_set_struct;
 struct __iovecx64;
 struct __itimerspecx64;
 struct __itimervalx64;
+struct __kernel_sigactionx64;
 struct __kos_statx64;
 struct __mmsghdrx64;
 struct __msghdrx64;
 struct __rusagex64;
-struct __sigactionx64;
 struct __sigaltstackx64;
 struct __siginfox64_struct;
 struct __sigset_struct;
@@ -1616,7 +1616,7 @@ __CDECLARE_SC(,__errno_t,rpc_serve_sysret,(void),())
 __CDECLARE_SC(,__errno_t,rseq,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(rseq) */
 #if __CRT_HAVE_SC(rt_sigaction)
-__CDECLARE_SC(,__errno_t,rt_sigaction,(__signo_t __signo, struct __sigactionx64 const *__act, struct __sigactionx64 *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
+__CDECLARE_SC(,__errno_t,rt_sigaction,(__signo_t __signo, struct __kernel_sigactionx64 const *__act, struct __kernel_sigactionx64 *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
 #endif /* __CRT_HAVE_SC(rt_sigaction) */
 #if __CRT_HAVE_SC(rt_sigpending)
 __CDECLARE_SC(,__errno_t,rt_sigpending,(struct __sigset_struct *__set, __size_t __sigsetsize),(__set,__sigsetsize))
@@ -3761,7 +3761,7 @@ __CDECLARE_XSC(,__errno_t,rpc_serve_sysret,(void),())
 __CDECLARE_XSC(,__errno_t,rseq,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(rseq) */
 #if __CRT_HAVE_XSC(rt_sigaction)
-__CDECLARE_XSC(,__errno_t,rt_sigaction,(__signo_t __signo, struct __sigactionx64 const *__act, struct __sigactionx64 *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
+__CDECLARE_XSC(,__errno_t,rt_sigaction,(__signo_t __signo, struct __kernel_sigactionx64 const *__act, struct __kernel_sigactionx64 *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
 #endif /* __CRT_HAVE_XSC(rt_sigaction) */
 #if __CRT_HAVE_XSC(rt_sigpending)
 __CDECLARE_XSC(,__errno_t,rt_sigpending,(struct __sigset_struct *__set, __size_t __sigsetsize),(__set,__sigsetsize))

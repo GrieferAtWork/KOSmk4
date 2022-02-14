@@ -570,6 +570,21 @@ static_assert(offsetof(struct __sigactionx32, sa_sigaction) == __OFFSET_SIGACTIO
 static_assert(sizeof(struct __sigactionx32) == __SIZEOF_SIGACTIONX32);
 static_assert(alignof(struct __sigactionx32) == __ALIGNOF_SIGACTIONX32);
 
+/* struct __kernel_sigactionx32 */
+static_assert(offsetof(struct __kernel_sigactionx32, sa_flags) == __OFFSET_KERNEL_SIGACTIONX32_FLAGS);
+static_assert(offsetof(struct __kernel_sigactionx32, sa_handler) == __OFFSET_KERNEL_SIGACTIONX32_HANDLER);
+static_assert(offsetof(struct __kernel_sigactionx32, sa_mask) == __OFFSET_KERNEL_SIGACTIONX32_MASK);
+static_assert(offsetof(struct __kernel_sigactionx32, sa_restorer) == __OFFSET_KERNEL_SIGACTIONX32_RESTORER);
+static_assert(alignof(struct __kernel_sigactionx32) == __ALIGNOF_KERNEL_SIGACTIONX32);
+
+/* struct __old_kernel_sigactionx32 */
+static_assert(offsetof(struct __old_kernel_sigactionx32, sa_flags) == __OFFSET_OLD_KERNEL_SIGACTIONX32_FLAGS);
+static_assert(offsetof(struct __old_kernel_sigactionx32, sa_handler) == __OFFSET_OLD_KERNEL_SIGACTIONX32_HANDLER);
+static_assert(offsetof(struct __old_kernel_sigactionx32, sa_mask) == __OFFSET_OLD_KERNEL_SIGACTIONX32_MASK);
+static_assert(offsetof(struct __old_kernel_sigactionx32, sa_restorer) == __OFFSET_OLD_KERNEL_SIGACTIONX32_RESTORER);
+static_assert(sizeof(struct __old_kernel_sigactionx32) == __SIZEOF_OLD_KERNEL_SIGACTIONX32);
+static_assert(alignof(struct __old_kernel_sigactionx32) == __ALIGNOF_OLD_KERNEL_SIGACTIONX32);
+
 
 
 
@@ -1532,7 +1547,7 @@ static_assert(sizeof(struct debugtrap_reason64) == __SIZEOF_DEBUGTRAP_REASON64);
 /* struct __exception_exit_thread_data32 */
 /* ... */
 
-/* struct __exception_fsexcept_data32 */
+/* struct __exception_fserror_data32 */
 /* ... */
 
 /* struct __exception_illegal_instruction_data32 */
@@ -1541,7 +1556,7 @@ static_assert(sizeof(struct debugtrap_reason64) == __SIZEOF_DEBUGTRAP_REASON64);
 /* struct __exception_illegal_operation_data32 */
 /* ... */
 
-/* struct __exception_index_except_data32 */
+/* struct __exception_index_error_data32 */
 /* ... */
 
 /* struct __exception_insufficient_rights_data32 */
@@ -1553,10 +1568,10 @@ static_assert(sizeof(struct debugtrap_reason64) == __SIZEOF_DEBUGTRAP_REASON64);
 /* struct __exception_invalid_handle_data32 */
 /* ... */
 
-/* struct __exception_ioexcept_data32 */
+/* struct __exception_ioerror_data32 */
 /* ... */
 
-/* struct __exception_net_except_data32 */
+/* struct __exception_net_error_data32 */
 /* ... */
 
 /* struct __exception_not_executable_data32 */
@@ -1575,9 +1590,6 @@ static_assert(sizeof(struct debugtrap_reason64) == __SIZEOF_DEBUGTRAP_REASON64);
 /* ... */
 
 /* struct __exception_unknown_systemcall_data32 */
-/* ... */
-
-/* struct __exception___e_retry_rwlock_data32 */
 /* ... */
 
 /* union __exception_data_pointers32 */
@@ -1609,7 +1621,7 @@ static_assert(sizeof(struct __exception_data32) == __SIZEOF_EXCEPTION_DATA32);
 /* struct __exception_exit_thread_data64 */
 /* ... */
 
-/* struct __exception_fsexcept_data64 */
+/* struct __exception_fserror_data64 */
 /* ... */
 
 /* struct __exception_illegal_instruction_data64 */
@@ -1618,7 +1630,7 @@ static_assert(sizeof(struct __exception_data32) == __SIZEOF_EXCEPTION_DATA32);
 /* struct __exception_illegal_operation_data64 */
 /* ... */
 
-/* struct __exception_index_except_data64 */
+/* struct __exception_index_error_data64 */
 /* ... */
 
 /* struct __exception_insufficient_rights_data64 */
@@ -1630,10 +1642,10 @@ static_assert(sizeof(struct __exception_data32) == __SIZEOF_EXCEPTION_DATA32);
 /* struct __exception_invalid_handle_data64 */
 /* ... */
 
-/* struct __exception_ioexcept_data64 */
+/* struct __exception_ioerror_data64 */
 /* ... */
 
-/* struct __exception_net_except_data64 */
+/* struct __exception_net_error_data64 */
 /* ... */
 
 /* struct __exception_not_executable_data64 */
@@ -1652,9 +1664,6 @@ static_assert(sizeof(struct __exception_data32) == __SIZEOF_EXCEPTION_DATA32);
 /* ... */
 
 /* struct __exception_unknown_systemcall_data64 */
-/* ... */
-
-/* struct __exception___e_retry_rwlock_data64 */
 /* ... */
 
 /* union __exception_data_pointers64 */

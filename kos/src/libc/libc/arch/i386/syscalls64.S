@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6953cb4b */
+/* HASH CRC-32:0x77ae49fa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -162,7 +162,7 @@ INTERN_FUNCTION(libc_sys_brk)
 END(libc_sys_brk)
 DEFINE_PUBLIC_ALIAS(sys_brk, libc_sys_brk)
 
-/* errno_t rt_sigaction(signo_t signo, struct sigactionx64 const *act, struct sigactionx64 *oact, size_t sigsetsize) */
+/* errno_t rt_sigaction(signo_t signo, struct __kernel_sigactionx64 const *act, struct __kernel_sigactionx64 *oact, size_t sigsetsize) */
 INTERN_FUNCTION(libc_sys_rt_sigaction)
 	movq   $(0xd), %rax
 	movq   %rcx, %r10
@@ -4404,7 +4404,7 @@ INTERN_FUNCTION(libc_sys_Xbrk)
 END(libc_sys_Xbrk)
 DEFINE_PUBLIC_ALIAS(sys_Xbrk, libc_sys_Xbrk)
 
-/* errno_t rt_sigaction(signo_t signo, struct sigactionx64 const *act, struct sigactionx64 *oact, size_t sigsetsize) */
+/* errno_t rt_sigaction(signo_t signo, struct __kernel_sigactionx64 const *act, struct __kernel_sigactionx64 *oact, size_t sigsetsize) */
 INTERN_FUNCTION(libc_sys_Xrt_sigaction)
 	movq   $(0xd), %rax
 	movq   %rcx, %r10

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6dff67da */
+/* HASH CRC-32:0x5ff38496 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,7 +69,7 @@
 #define SYS_mprotect                 __NR_mprotect                 /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 #define SYS_munmap                   __NR_munmap                   /* errno_t munmap(void *addr, size_t len) */
 #define SYS_brk                      __NR_brk                      /* errno_t brk(void *addr) */
-#define SYS_rt_sigaction             __NR_rt_sigaction             /* errno_t rt_sigaction(signo_t signo, struct sigactionx64 const *act, struct sigactionx64 *oact, size_t sigsetsize) */
+#define SYS_rt_sigaction             __NR_rt_sigaction             /* errno_t rt_sigaction(signo_t signo, struct __kernel_sigactionx64 const *act, struct __kernel_sigactionx64 *oact, size_t sigsetsize) */
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 #define SYS_rt_sigprocmask           __NR_rt_sigprocmask           /* errno_t rt_sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset, size_t sigsetsize) */
 /* Restore  the  given CPU/FPU  context descriptors,  as  well as  signal mask

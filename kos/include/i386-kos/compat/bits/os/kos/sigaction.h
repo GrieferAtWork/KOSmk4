@@ -24,8 +24,15 @@
 
 #ifdef __x86_64__
 #include <bits/os/kos/sigaction32.h>
-#define compat_sigaction       __sigactionx32
-#define __compat_sighandler_t  __sighandlerx32_t
+#define compat_sigaction                  __sigactionx32
+#define __compat_sighandler_t             __sigactionx32_sa_handler_t
+#define __compat_kernel_sigaction         __kernel_sigactionx32
+#define __compat_sigaction_sa_handler_t   __sigactionx32_sa_handler_t
+#define __compat_sigaction_sa_restorer_t  __sigactionx32_sa_restorer_t
+#define __compat_sigaction_sa_sigaction_t __sigactionx32_sa_sigaction_t
+#ifdef __USE_KOS_KERNEL
+#define __compat_old_kernel_sigaction     __old_kernel_sigactionx32
+#endif /* __USE_KOS_KERNEL */
 #endif /* __x86_64__ */
 
 #endif /* !_I386_KOS_COMPAT_BITS_OS_KOS_SIGACTION_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8b40a30 */
+/* HASH CRC-32:0xe1c558fa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -883,8 +883,8 @@
 #define __NRAT1_munmap                   (size_t, __size_t)
 #define __NRAT0_brk                      (void *, void *)
 #define __NRAT0_rt_sigaction             (signo_t, __signo_t)
-#define __NRAT1_rt_sigaction             (struct sigactionx64 const *, struct __sigactionx64 const *)
-#define __NRAT2_rt_sigaction             (struct sigactionx64 *, struct __sigactionx64 *)
+#define __NRAT1_rt_sigaction             (struct __kernel_sigactionx64 const *, struct __kernel_sigactionx64 const *)
+#define __NRAT2_rt_sigaction             (struct __kernel_sigactionx64 *, struct __kernel_sigactionx64 *)
 #define __NRAT3_rt_sigaction             (size_t, __size_t)
 #define __NRAT0_rt_sigprocmask           (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_rt_sigprocmask           (struct __sigset_struct const *, struct __sigset_struct const *)
@@ -1793,7 +1793,7 @@
 #define __NRAM_mprotect(a, b, c, d, e, f)                 (void *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NRAM_munmap(a, b, c, d, e, f)                   (void *)a, (__size_t)b
 #define __NRAM_brk(a, b, c, d, e, f)                      (void *)a
-#define __NRAM_rt_sigaction(a, b, c, d, e, f)             (__signo_t)a, (struct __sigactionx64 const *)b, (struct __sigactionx64 *)c, (__size_t)d
+#define __NRAM_rt_sigaction(a, b, c, d, e, f)             (__signo_t)a, (struct __kernel_sigactionx64 const *)b, (struct __kernel_sigactionx64 *)c, (__size_t)d
 #define __NRAM_rt_sigprocmask(a, b, c, d, e, f)           (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c, (__size_t)d
 #define __NRAM_rt_sigreturn(a, b, c, d, e, f)             /* nothing */
 #define __NRAM_ioctl(a, b, c, d, e, f)                    (__fd_t)a, (__ioctl_t)b, (void *)c

@@ -25,7 +25,7 @@
  *
  * Definitions:
  *    - struct __sigactionx64 { ... };
- *    - typedef ... __sighandlerx64_t;
+ *    - typedef ... __sigactionx64_sa_handler_t;
  * #ifdef __x86_64__
  *    - typedef ... __sighandler_t;
  *    - struct sigaction { ... };
@@ -42,41 +42,34 @@
 #include <bits/types.h>
 
 #ifdef __x86_64__
-#define __OFFSET_SIGACTION_HANDLER   __OFFSET_SIGACTIONX64_HANDLER
-#define __OFFSET_SIGACTION_SIGACTION __OFFSET_SIGACTIONX64_SIGACTION
-#define __OFFSET_SIGACTION_FLAGS     __OFFSET_SIGACTIONX64_FLAGS
-#define __OFFSET_SIGACTION_RESTORER  __OFFSET_SIGACTIONX64_RESTORER
-#define __OFFSET_SIGACTION_MASK      __OFFSET_SIGACTIONX64_MASK
-#define __SIZEOF_SIGACTION           __SIZEOF_SIGACTIONX64
-#define __ALIGNOF_SIGACTION          __ALIGNOF_SIGACTIONX64
-#define __sigactionx64 sigaction
+/* Portable system feature spec macros */
+#define __ARCH_HAVE_SIGACTION_SA_RESTORER
+#define __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER
+#define __ARCH_HAS_KERNEL_SIGACTION_IS_LIBC_SIGACTION
+
+/* Portable names */
+#define __OFFSET_SIGACTION_HANDLER         __OFFSET_SIGACTIONX64_HANDLER
+#define __OFFSET_SIGACTION_SIGACTION       __OFFSET_SIGACTIONX64_SIGACTION
+#define __OFFSET_SIGACTION_FLAGS           __OFFSET_SIGACTIONX64_FLAGS
+#define __OFFSET_SIGACTION_RESTORER        __OFFSET_SIGACTIONX64_RESTORER
+#define __OFFSET_SIGACTION_MASK            __OFFSET_SIGACTIONX64_MASK
+#define __SIZEOF_SIGACTION                 __SIZEOF_SIGACTIONX64
+#define __ALIGNOF_SIGACTION                __ALIGNOF_SIGACTIONX64
+#define __OFFSET_KERNEL_SIGACTION_HANDLER  __OFFSET_KERNEL_SIGACTIONX64_HANDLER
+#define __OFFSET_KERNEL_SIGACTION_FLAGS    __OFFSET_KERNEL_SIGACTIONX64_FLAGS
+#define __OFFSET_KERNEL_SIGACTION_RESTORER __OFFSET_KERNEL_SIGACTIONX64_RESTORER
+#define __OFFSET_KERNEL_SIGACTION_MASK     __OFFSET_KERNEL_SIGACTIONX64_MASK
+#define __ALIGNOF_KERNEL_SIGACTION         __ALIGNOF_KERNEL_SIGACTIONX64
+#define __sigaction_sa_handler_t           __sigactionx64_sa_handler_t
+#define __sigaction_sa_restorer_t          __sigactionx64_sa_restorer_t
+#define __sigaction_sa_sigaction_t         __sigactionx64_sa_sigaction_t
+#define __sigactionx64                     sigaction
+#define __kernel_sigaction                 sigaction /* Binary compatible! */
 #ifndef ____sighandler_t_defined
 #define ____sighandler_t_defined
-#define __sighandlerx64_t __sighandler_t
+#define __sigactionx64_sa_handler_t __sighandler_t
 #endif /* !____sighandler_t_defined */
 #endif /* __x86_64__ */
-
-
-__SYSDECL_BEGIN
-
-#ifdef __CC__
-typedef __HYBRID_FUNCPTR64(void,__ATTR_SYSVABI,__sighandlerx64_t,(int __signo));
-
-#ifdef __USE_POSIX199309
-#ifdef __x86_64__
-struct __siginfo_struct;
-#else /* __x86_64__ */
-struct __siginfo64_struct;
-#endif /* !__x86_64__ */
-#ifdef __USE_KOS_ALTERATIONS
-#ifdef __x86_64__
-struct ucontext;
-#else /* __x86_64__ */
-struct __ucontextx64;
-#endif /* !__x86_64__ */
-#endif /* __USE_KOS_ALTERATIONS */
-#endif /* __USE_POSIX199309 */
-#endif /* __CC__ */
 
 
 #define __OFFSET_SIGACTIONX64_HANDLER   0
@@ -86,43 +79,64 @@ struct __ucontextx64;
 #define __OFFSET_SIGACTIONX64_MASK      24
 #define __SIZEOF_SIGACTIONX64           152
 #define __ALIGNOF_SIGACTIONX64          8
+
+#define __OFFSET_KERNEL_SIGACTIONX64_HANDLER   __OFFSET_SIGACTIONX64_HANDLER
+#define __OFFSET_KERNEL_SIGACTIONX64_FLAGS     __OFFSET_SIGACTIONX64_FLAGS
+#define __OFFSET_KERNEL_SIGACTIONX64_RESTORER  __OFFSET_SIGACTIONX64_RESTORER
+#define __OFFSET_KERNEL_SIGACTIONX64_MASK      __OFFSET_SIGACTIONX64_MASK
+#define __ALIGNOF_KERNEL_SIGACTIONX64          __ALIGNOF_SIGACTIONX64
+/* No sizeof, because actual size is flexible. */
+
 #ifdef __CC__
+__DECL_BEGIN
+
+#ifdef __x86_64__
+typedef void (__ATTR_SYSVABI *__sigactionx64_sa_handler_t)(int __signo);
+typedef void (__ATTR_SYSVABI *__sigactionx64_sa_restorer_t)(void);
+struct __siginfo_struct;
+#ifdef __USE_KOS_ALTERATIONS
+struct ucontext;
+typedef void (__ATTR_SYSVABI *__sigactionx64_sa_sigaction_t)(int __signo, struct __siginfo_struct *__info, struct ucontext *__ctx);
+#else /* __USE_KOS_ALTERATIONS */
+typedef void (__ATTR_SYSVABI *__sigactionx64_sa_sigaction_t)(int __signo, struct __siginfo_struct *__info, void *__ctx);
+#endif /* !__USE_KOS_ALTERATIONS */
+#else /* __x86_64__ */
+struct __siginfox64_struct;
+typedef __HYBRID_FUNCPTR64(void, , __sigactionx64_sa_handler_t, (int __signo));
+typedef __HYBRID_FUNCPTR64(void, , __sigactionx64_sa_restorer_t, (void));
+#ifdef __USE_KOS_ALTERATIONS
+struct __ucontextx64;
+typedef __HYBRID_FUNCPTR64(void, , __sigactionx64_sa_sigaction_t, (int __signo, struct __siginfox64_struct *__info, struct __ucontextx64 *__ctx));
+#else /* __USE_KOS_ALTERATIONS */
+typedef __HYBRID_FUNCPTR64(void, , __sigactionx64_sa_sigaction_t, (int __signo, struct __siginfox64_struct *__info, void *__ctx));
+#endif /* !__USE_KOS_ALTERATIONS */
+#endif /* !__x86_64__ */
+
+
+
 /* Structure describing the action to be taken when a signal arrives. */
 struct __ATTR_ALIGNED(__ALIGNOF_SIGACTIONX64) __sigactionx64 /*[NAME(sigactionx64)][PREFIX(sa_)]*/ {
 	/* Signal handler. */
 #ifdef __USE_POSIX199309
 	union {
-		/* [valid_if(!(sa_flags & SA_SIGINFO))] */
-		__sighandlerx64_t sa_handler;
-
-		/* [valid_if(sa_flags & SA_SIGINFO)] */
-#ifdef __USE_KOS_ALTERATIONS
-#ifdef __x86_64__
-		__HYBRID_FUNCPTR64(void, __ATTR_SYSVABI, sa_sigaction, (int __signo, struct __siginfo_struct *__info, struct ucontext *__ctx));
-#else /* __x86_64__ */
-		__HYBRID_FUNCPTR64(void, , sa_sigaction, (int __signo, struct __siginfo64_struct *__info, struct __ucontextx64 *__ctx));
-#endif /* !__x86_64__ */
-#else /* __USE_KOS_ALTERATIONS */
-#ifdef __x86_64__
-		__HYBRID_FUNCPTR64(void, __ATTR_SYSVABI, sa_sigaction, (int __signo, struct __siginfo_struct *__info, void *__ctx));
-#else /* __x86_64__ */
-		__HYBRID_FUNCPTR64(void, , sa_sigaction, (int __signo, struct __siginfo64_struct *__info, void *__ctx));
-#endif /* !__x86_64__ */
-#endif /* !__USE_KOS_ALTERATIONS */
+		__sigactionx64_sa_handler_t   sa_handler;   /* [valid_if(!(sa_flags & SA_SIGINFO))] */
+		__sigactionx64_sa_sigaction_t sa_sigaction; /* [valid_if(sa_flags & SA_SIGINFO)] */
 	};
 #else /* __USE_POSIX199309 */
-	__sighandlerx64_t sa_handler;
+	__sigactionx64_sa_handler_t  sa_handler;  /* Signal handler */
 #endif /* !__USE_POSIX199309 */
-	__uint64_t                               sa_flags; /* Special flags (set of `SA_*' from <signal.h>) */
-#ifdef __x86_64__
-	__HYBRID_FUNCPTR64(void, __ATTR_SYSVABI, sa_restorer, (void)); /* [valid_if(sa_flags & SA_RESTORER)] Restore handler. */
-#else /* __x86_64__ */
-	__HYBRID_FUNCPTR64(void, ,               sa_restorer, (void)); /* [valid_if(sa_flags & SA_RESTORER)] Restore handler. */
-#endif /* !__x86_64__ */
-	struct __sigset_struct                   sa_mask;  /* Additional set of signals to be blocked. */
+	__uint64_t                   sa_flags;    /* Special flags (set of `SA_*' from <signal.h>) */
+	__sigactionx64_sa_restorer_t sa_restorer; /* [valid_if(sa_flags & SA_RESTORER)] Restore handler. */
+	struct __sigset_struct       sa_mask;     /* Additional set of signals to be blocked. */
 };
+
+
+
+/* Because of `__ARCH_HAS_KERNEL_SIGACTION_IS_LIBC_SIGACTION', the kernel's `struct sigaction' matches libc's! */
+#define __kernel_sigactionx64 __sigactionx64
+
+__DECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
 
 #endif /* !_I386_KOS_BITS_OS_KOS_SIGACTION64_H */

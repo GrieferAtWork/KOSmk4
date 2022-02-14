@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf84fb442 */
+/* HASH CRC-32:0xbbb7dd93 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -459,7 +459,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_brk)
 	.cfi_endproc
 END(__x86_asm64_syscall_brk)
 
-/* errno_t rt_sigaction(signo_t signo, struct sigactionx64 const *act, struct sigactionx64 *oact, size_t sigsetsize) */
+/* errno_t rt_sigaction(signo_t signo, struct __kernel_sigactionx64 const *act, struct __kernel_sigactionx64 *oact, size_t sigsetsize) */
 .section .text.x86.asm64_syscall.rt_sigaction
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigaction)
 	.cfi_startproc simple
@@ -14139,7 +14139,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgid)
 	.cfi_endproc
 END(__x86_asm32_int80_getgid)
 
-/* sighandler_t signal(signo_t signo, sighandler_t handler) */
+/* __sigactionx32_sa_handler_t signal(signo_t signo, __sigactionx32_sa_handler_t handler) */
 .section .text.x86.asm32_syscall_int80.signal
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_signal)
 	.cfi_startproc simple
@@ -14583,7 +14583,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setsid)
 	.cfi_endproc
 END(__x86_asm32_int80_setsid)
 
-/* errno_t sigaction(signo_t signo, struct __sigactionx32 const *act, struct __sigactionx32 *oact) */
+/* errno_t sigaction(signo_t signo, struct __old_kernel_sigactionx32 const *act, struct __old_kernel_sigactionx32 *oact) */
 .section .text.x86.asm32_syscall_int80.sigaction
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigaction)
 	.cfi_startproc simple
@@ -17288,7 +17288,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigreturn)
 	.cfi_endproc
 END(__x86_asm32_int80_rt_sigreturn)
 
-/* errno_t rt_sigaction(signo_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact, size_t sigsetsize) */
+/* errno_t rt_sigaction(signo_t signo, struct __kernel_sigactionx32 const *act, struct __kernel_sigactionx32 *oact, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_int80.rt_sigaction
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigaction)
 	.cfi_startproc simple
@@ -26320,7 +26320,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setgid, __x86_asm32_int80_setgid)
 /* uint16_t getgid(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getgid, __x86_asm32_int80_getgid)
 
-/* sighandler_t signal(signo_t signo, sighandler_t handler) */
+/* __sigactionx32_sa_handler_t signal(signo_t signo, __sigactionx32_sa_handler_t handler) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_signal, __x86_asm32_int80_signal)
 
 /* >> geteuid(2)
@@ -26383,7 +26383,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getpgrp, __x86_asm32_int80_getpgrp
 /* pid_t setsid(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setsid, __x86_asm32_int80_setsid)
 
-/* errno_t sigaction(signo_t signo, struct __sigactionx32 const *act, struct __sigactionx32 *oact) */
+/* errno_t sigaction(signo_t signo, struct __old_kernel_sigactionx32 const *act, struct __old_kernel_sigactionx32 *oact) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sigaction, __x86_asm32_int80_sigaction)
 
 /* syscall_ulong_t sgetmask(void) */
@@ -27101,7 +27101,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_sigreturn)
 	.cfi_endproc
 END(__x86_asm32_sysenter_rt_sigreturn)
 
-/* errno_t rt_sigaction(signo_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact, size_t sigsetsize) */
+/* errno_t rt_sigaction(signo_t signo, struct __kernel_sigactionx32 const *act, struct __kernel_sigactionx32 *oact, size_t sigsetsize) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigaction, __x86_asm32_int80_rt_sigaction)
 
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
@@ -31216,7 +31216,7 @@ END(__x86_asm32_sysrun32_setgid)
 /* uint16_t getgid(void) */
 /* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_getgid, sys32_getgid); */
 
-/* sighandler_t signal(signo_t signo, sighandler_t handler) */
+/* __sigactionx32_sa_handler_t signal(signo_t signo, __sigactionx32_sa_handler_t handler) */
 .section .text.x86.asm32_syscall_sysrun32.signal
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_signal)
 	.cfi_startproc
@@ -31365,7 +31365,7 @@ END(__x86_asm32_sysrun32_dup2)
 /* pid_t setsid(void) */
 /* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_setsid, sys32_setsid); */
 
-/* errno_t sigaction(signo_t signo, struct __sigactionx32 const *act, struct __sigactionx32 *oact) */
+/* errno_t sigaction(signo_t signo, struct __old_kernel_sigactionx32 const *act, struct __old_kernel_sigactionx32 *oact) */
 .section .text.x86.asm32_syscall_sysrun32.sigaction
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sigaction)
 	.cfi_startproc
@@ -32610,7 +32610,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigreturn)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_rt_sigreturn)
 
-/* errno_t rt_sigaction(signo_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact, size_t sigsetsize) */
+/* errno_t rt_sigaction(signo_t signo, struct __kernel_sigactionx32 const *act, struct __kernel_sigactionx32 *oact, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_sysrun32.rt_sigaction
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigaction)
 	.cfi_startproc
