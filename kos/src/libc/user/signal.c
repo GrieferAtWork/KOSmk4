@@ -734,7 +734,7 @@ NOTHROW_NCX(LIBCCALL libc_sigaction)(signo_t signo,
 /*[[[body:libc_sigaction]]]*/
 {
 	errno_t result;
-#ifdef __ARCH_HAS_KERNEL_SIGACTION_IS_LIBC_SIGACTION
+#ifdef __ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION
 	/* libc's `sigaction' matches the kernel's, so no conversion needed! */
 #ifdef LIBC_ARCH_HAVE_SIG_RESTORE
 	struct sigaction real_act;
@@ -751,7 +751,7 @@ NOTHROW_NCX(LIBCCALL libc_sigaction)(signo_t signo,
 	}
 #endif /* LIBC_ARCH_HAVE_SIG_RESTORE */
 	result = sys_rt_sigaction(signo, act, oact, sizeof(sigset_t));
-#else /* __ARCH_HAS_KERNEL_SIGACTION_IS_LIBC_SIGACTION */
+#else /* __ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION */
 	/* libc's  `sigaction'  differs from  the  kernel's. As
 	 * such, we have to convert between the 2 formats here. */
 	struct __kernel_sigaction kact, koact;
@@ -784,7 +784,7 @@ NOTHROW_NCX(LIBCCALL libc_sigaction)(signo_t signo,
 #endif /* __ARCH_HAVE_SIGACTION_SA_RESTORER && __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER */
 		memcpy(&oact->sa_mask, &kact.sa_mask, sizeof(sigset_t));
 	}
-#endif /* !__ARCH_HAS_KERNEL_SIGACTION_IS_LIBC_SIGACTION */
+#endif /* !__ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_sigaction]]]*/

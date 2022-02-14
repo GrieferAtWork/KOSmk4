@@ -45,23 +45,23 @@
 #define __ARCH_HAVE_SIGACTION_SA_RESTORER
 #define __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER
 #endif /* ... */
-#undef __ARCH_HAS_IRIX_SIGACTION
+#undef __ARCH_HAVE_IRIX_KERNEL_SIGACTION
 #ifdef __mips__
-#define __ARCH_HAS_IRIX_SIGACTION
+#define __ARCH_HAVE_IRIX_KERNEL_SIGACTION
 #endif /* ... */
-#undef __ARCH_HAS_KERNEL_SIGACTION_IS_LIBC_SIGACTION
-#if !defined(__i386__) /* XXX: Incomplete! */
-#define __ARCH_HAS_KERNEL_SIGACTION_IS_LIBC_SIGACTION
+#undef __ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION
+#if !defined(__i386__) /* XXX: May be incomplete! */
+#define __ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION
 #endif /* ... */
 
 /* Offsets for `struct __kernel_sigaction' (no SIZEOF, because variable-sized due to sigmask) */
-#ifdef __ARCH_HAS_IRIX_SIGACTION
+#ifdef __ARCH_HAVE_IRIX_KERNEL_SIGACTION
 #define __OFFSET_KERNEL_SIGACTION_FLAGS   0
 #define __OFFSET_KERNEL_SIGACTION_HANDLER __SIZEOF_POINTER__
-#else /* __ARCH_HAS_IRIX_SIGACTION */
+#else /* __ARCH_HAVE_IRIX_KERNEL_SIGACTION */
 #define __OFFSET_KERNEL_SIGACTION_HANDLER 0
 #define __OFFSET_KERNEL_SIGACTION_FLAGS   __SIZEOF_POINTER__
-#endif /* !__ARCH_HAS_IRIX_SIGACTION */
+#endif /* !__ARCH_HAVE_IRIX_KERNEL_SIGACTION */
 #ifdef __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER
 #define __OFFSET_KERNEL_SIGACTION_RESTORER (__SIZEOF_POINTER__ * 2)
 #define __OFFSET_KERNEL_SIGACTION_MASK     (__SIZEOF_POINTER__ * 3)
@@ -72,7 +72,7 @@
 
 
 /* `struct sigaction': Structure describing the action to be taken when a signal arrives. */
-#ifdef __ARCH_HAS_KERNEL_SIGACTION_IS_LIBC_SIGACTION
+#ifdef __ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION
 #define __OFFSET_SIGACTION_HANDLER  __OFFSET_KERNEL_SIGACTION_HANDLER
 #define __OFFSET_SIGACTION_FLAGS    __OFFSET_KERNEL_SIGACTION_FLAGS
 #ifdef __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER
@@ -122,10 +122,10 @@ typedef __sigaction_sa_handler_t __sighandler_t;
 
 /* This is the struct accepted by `sigaction(3)' (iow: the one from libc; assuming glibc compat) */
 struct sigaction /*[PREFIX(sa_)]*/ {
-#ifdef __ARCH_HAS_KERNEL_SIGACTION_IS_LIBC_SIGACTION
-#ifdef __ARCH_HAS_IRIX_SIGACTION
+#ifdef __ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION
+#ifdef __ARCH_HAVE_IRIX_KERNEL_SIGACTION
 	__ULONGPTR_TYPE__         sa_flags;    /* Special flags (set of `SA_*' from <signal.h>) */
-#endif /* __ARCH_HAS_IRIX_SIGACTION */
+#endif /* __ARCH_HAVE_IRIX_KERNEL_SIGACTION */
 #ifdef __USE_POSIX199309
 	union {
 		__sigaction_sa_handler_t   sa_handler;   /* [valid_if(!(sa_flags & SA_SIGINFO))] */
@@ -134,9 +134,9 @@ struct sigaction /*[PREFIX(sa_)]*/ {
 #else /* __USE_POSIX199309 */
 	__sighandler_t            sa_handler;  /* Signal handler. */
 #endif /* !__USE_POSIX199309 */
-#ifndef __ARCH_HAS_IRIX_SIGACTION
+#ifndef __ARCH_HAVE_IRIX_KERNEL_SIGACTION
 	__ULONGPTR_TYPE__         sa_flags;    /* Special flags (set of `SA_*' from <signal.h>) */
-#endif /* __ARCH_HAS_IRIX_SIGACTION */
+#endif /* __ARCH_HAVE_IRIX_KERNEL_SIGACTION */
 #ifdef __ARCH_HAVE_SIGACTION_SA_RESTORER
 	__sigaction_sa_restorer_t sa_restorer; /* [valid_if(sa_flags & SA_RESTORER)] Restore handler. */
 #endif /* __ARCH_HAVE_SIGACTION_SA_RESTORER */
@@ -161,23 +161,26 @@ struct sigaction /*[PREFIX(sa_)]*/ {
 
 
 /* This is the struct accepted by `sys_rt_sigaction(2)' */
-#ifdef __ARCH_HAS_KERNEL_SIGACTION_IS_LIBC_SIGACTION
+#ifdef __ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION
 #define __kernel_sigaction sigaction
-#else /* __ARCH_HAS_KERNEL_SIGACTION_IS_LIBC_SIGACTION */
+#ifdef __USE_KOS_KERNEL
+#define kernel_sigaction sigaction
+#endif /* __USE_KOS_KERNEL */
+#else /* __ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION */
 struct __kernel_sigaction /*[NAME(kernel_sigaction)][PREFIX(sa_)]*/ {
-#ifdef __ARCH_HAS_IRIX_SIGACTION
+#ifdef __ARCH_HAVE_IRIX_KERNEL_SIGACTION
 	__ULONGPTR_TYPE__         sa_flags;    /* Special flags (set of `SA_*' from <signal.h>) */
 	__sighandler_t            sa_handler;  /* Signal handler. */
-#else /* __ARCH_HAS_IRIX_SIGACTION */
+#else /* __ARCH_HAVE_IRIX_KERNEL_SIGACTION */
 	__sighandler_t            sa_handler;  /* Signal handler. */
 	__ULONGPTR_TYPE__         sa_flags;    /* Special flags (set of `SA_*' from <signal.h>) */
-#endif /* !__ARCH_HAS_IRIX_SIGACTION */
+#endif /* !__ARCH_HAVE_IRIX_KERNEL_SIGACTION */
 #ifdef __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER
 	__sigaction_sa_restorer_t sa_restorer; /* [valid_if(sa_flags & SA_RESTORER)] Restore handler. */
 #endif /* __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER */
 	struct __sigset_struct    sa_mask;     /* Additional set of signals to be blocked. */
 };
-#endif /* !__ARCH_HAS_KERNEL_SIGACTION_IS_LIBC_SIGACTION */
+#endif /* !__ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION */
 
 
 

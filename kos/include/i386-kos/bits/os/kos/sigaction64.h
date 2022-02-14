@@ -45,7 +45,7 @@
 /* Portable system feature spec macros */
 #define __ARCH_HAVE_SIGACTION_SA_RESTORER
 #define __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER
-#define __ARCH_HAS_KERNEL_SIGACTION_IS_LIBC_SIGACTION
+#define __ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION
 
 /* Portable names */
 #define __OFFSET_SIGACTION_HANDLER         __OFFSET_SIGACTIONX64_HANDLER
@@ -65,6 +65,9 @@
 #define __sigaction_sa_sigaction_t         __sigactionx64_sa_sigaction_t
 #define __sigactionx64                     sigaction
 #define __kernel_sigaction                 sigaction /* Binary compatible! */
+#ifdef __USE_KOS_KERNEL
+#define kernel_sigaction sigaction /* Binary compatible! */
+#endif /* __USE_KOS_KERNEL */
 #ifndef ____sighandler_t_defined
 #define ____sighandler_t_defined
 #define __sigactionx64_sa_handler_t __sighandler_t
@@ -132,7 +135,7 @@ struct __ATTR_ALIGNED(__ALIGNOF_SIGACTIONX64) __sigactionx64 /*[NAME(sigactionx6
 
 
 
-/* Because of `__ARCH_HAS_KERNEL_SIGACTION_IS_LIBC_SIGACTION', the kernel's `struct sigaction' matches libc's! */
+/* Because of `__ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION', the kernel's `struct sigaction' matches libc's! */
 #define __kernel_sigactionx64 __sigactionx64
 
 __DECL_END

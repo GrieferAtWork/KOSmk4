@@ -46,7 +46,7 @@
 /* Portable system feature spec macros */
 #define __ARCH_HAVE_SIGACTION_SA_RESTORER
 #define __ARCH_HAVE_KERNEL_SIGACTION_SA_RESTORER
-#undef __ARCH_HAS_KERNEL_SIGACTION_IS_LIBC_SIGACTION
+#undef __ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION
 
 /* Portable names */
 #define __OFFSET_SIGACTION_HANDLER         __OFFSET_SIGACTIONX32_HANDLER
@@ -65,7 +65,12 @@
 #define __sigaction_sa_restorer_t          __sigactionx32_sa_restorer_t
 #define __sigaction_sa_sigaction_t         __sigactionx32_sa_sigaction_t
 #define __sigactionx32                     sigaction
-#define __kernel_sigactionx32              __kernel_sigaction
+#ifdef __USE_KOS_KERNEL
+#define __kernel_sigaction    kernel_sigaction
+#define __kernel_sigactionx32 kernel_sigaction
+#else /* __USE_KOS_KERNEL */
+#define __kernel_sigactionx32 __kernel_sigaction
+#endif /* !__USE_KOS_KERNEL */
 #ifdef __USE_KOS_KERNEL
 #define __OFFSET_OLD_KERNEL_SIGACTION_HANDLER   __OFFSET_OLD_KERNEL_SIGACTIONX32_HANDLER
 #define __OFFSET_OLD_KERNEL_SIGACTION_MASK      __OFFSET_OLD_KERNEL_SIGACTIONX32_MASK
@@ -162,7 +167,7 @@ struct __ATTR_ALIGNED(__ALIGNOF_SIGACTIONX32) __sigactionx32 /*[NAME(sigactionx3
 
 
 
-/* Because of `#undef __ARCH_HAS_KERNEL_SIGACTION_IS_LIBC_SIGACTION', we also define the kernel's `struct sigaction' */
+/* Because of `#undef __ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION', we also define the kernel's `struct sigaction' */
 struct __ATTR_ALIGNED(__ALIGNOF_KERNEL_SIGACTIONX32) __kernel_sigactionx32 /*[NAME(kernel_sigactionx32)][PREFIX(sa_)]*/ {
 	__sigactionx32_sa_handler_t  sa_handler;  /* Signal handler */
 	__ULONG32_TYPE__             sa_flags;    /* Special flags (set of `SA_*' from <signal.h>) */

@@ -125,7 +125,7 @@ PRIVATE
 #endif /* __x86_64__ || !DEFINE_x86_userexcept_callsignal32 */
 ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
 LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
-                            struct kernel_sigaction const *__restrict action,
+                            struct kernel_sigaction_ const *__restrict action,
                             siginfo_t const *__restrict siginfo,
                             struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT) {

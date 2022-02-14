@@ -199,7 +199,7 @@ abort_SIGINT_program_without_exception_handler(struct icpustate *__restrict stat
  * This function also implements handling of `SA_RESETHAND' */
 PRIVATE WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
 userexcept_callsignal_and_maybe_restart_syscall(struct icpustate *__restrict state,
-                                                struct kernel_sigaction const *__restrict action,
+                                                struct kernel_sigaction_ const *__restrict action,
                                                 siginfo_t const *__restrict siginfo,
                                                 struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT) {
@@ -280,7 +280,7 @@ userexcept_raisesignal_from_exception(struct icpustate *__restrict state,
                                       struct exception_info const *__restrict error)
 		THROWS(E_SEGFAULT) {
 	struct icpustate *result;
-	struct kernel_sigaction action;
+	struct kernel_sigaction_ action;
 	siginfo_t siginfo;
 
 	/* Try to translate the given `error' into a signal. */
@@ -501,7 +501,7 @@ NOTHROW(FCALL userexcept_exec_user_rpc)(/*in|out*/ struct rpc_context *__restric
 		 * This is required for signal actions such as SIG_CORE, or
 		 * SIG_STOP, which introduce  custom control routing  which
 		 * could otherwise interfere with normal RPC handling. */
-		struct kernel_sigaction action;
+		struct kernel_sigaction_ action;
 		assert(rpc->pr_psig.si_signo != 0);
 		assert(rpc->pr_psig.si_signo < NSIG);
 again_load_threadsig_action:

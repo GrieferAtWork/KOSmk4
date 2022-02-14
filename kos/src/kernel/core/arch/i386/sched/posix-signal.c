@@ -87,19 +87,19 @@ DECL_BEGIN
 #ifdef __x86_64__
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
 x86_userexcept_callsignal32(struct icpustate *__restrict state,
-                            struct kernel_sigaction const *__restrict action,
+                            struct kernel_sigaction_ const *__restrict action,
                             siginfo_t const *__restrict siginfo,
                             struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT);
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
 x86_userexcept_callsignal64(struct icpustate *__restrict state,
-                            struct kernel_sigaction const *__restrict action,
+                            struct kernel_sigaction_ const *__restrict action,
                             siginfo_t const *__restrict siginfo,
                             struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT);
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
 userexcept_callsignal(struct icpustate *__restrict state,
-                      struct kernel_sigaction const *__restrict action,
+                      struct kernel_sigaction_ const *__restrict action,
                       siginfo_t const *__restrict siginfo,
                       struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT) {

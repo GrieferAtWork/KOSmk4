@@ -27,6 +27,7 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <asm/os/signal.h>
+#include <bits/os/sigaction.h>
 
 #ifndef NSIG
 #define NSIG __NSIG
@@ -51,7 +52,7 @@ typedef void (*user_sigaction_func_t)(signo_t signo, siginfo_t *info, struct uco
 typedef void (*user_sigrestore_func_t)(void);
 
 
-struct kernel_sigaction {
+struct kernel_sigaction_ { /* TODO: Remove me once kernel's sizeof(sigset_t) gets reduced */
 	union {
 		USER CHECKED user_sighandler_func_t sa_handler;   /* [1..1][valid_if(!SA_ONSTACK)] Normal signal handler */
 		USER CHECKED user_sigaction_func_t  sa_sigaction; /* [1..1][valid_if(SA_ONSTACK)] Extended signal handler */
@@ -65,10 +66,10 @@ struct kernel_sigaction {
 
 struct sighand {
 	/* Descriptor for how signals ought to be handled. */
-	struct atomic_rwlock    sh_lock;              /* Lock for this signal handler descriptor. */
-	WEAK refcnt_t           sh_share;             /* [lock(INC(sh_lock), DEC(ATOMIC))]
-	                                               * Amount of unrelated processes sharing this sighand. */
-	struct kernel_sigaction sh_actions[NSIG - 1]; /* Signal handlers. */
+	struct atomic_rwlock     sh_lock;              /* Lock for this signal handler descriptor. */
+	WEAK refcnt_t            sh_share;             /* [lock(INC(sh_lock), DEC(ATOMIC))]
+	                                                * Amount of unrelated processes sharing this sighand. */
+	struct kernel_sigaction_ sh_actions[NSIG - 1]; /* Signal handlers. */
 };
 __DEFINE_SYNC_PROXY(struct sighand, sh_lock)
 
@@ -154,7 +155,7 @@ NOTHROW(KCALL sighand_default_action)(signo_t signo);
  * @return: false: The given `current_action' didn't match the currently set action. */
 FUNDEF bool KCALL
 sighand_reset_handler(signo_t signo,
-                      struct kernel_sigaction const *__restrict current_action)
+                      struct kernel_sigaction_ const *__restrict current_action)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 DECL_END
