@@ -44,9 +44,9 @@
 #ifdef __x86_64__
 #define __OFFSET_SIGACTION_HANDLER   __OFFSET_SIGACTIONX64_HANDLER
 #define __OFFSET_SIGACTION_SIGACTION __OFFSET_SIGACTIONX64_SIGACTION
-#define __OFFSET_SIGACTION_MASK      __OFFSET_SIGACTIONX64_MASK
 #define __OFFSET_SIGACTION_FLAGS     __OFFSET_SIGACTIONX64_FLAGS
 #define __OFFSET_SIGACTION_RESTORER  __OFFSET_SIGACTIONX64_RESTORER
+#define __OFFSET_SIGACTION_MASK      __OFFSET_SIGACTIONX64_MASK
 #define __SIZEOF_SIGACTION           __SIZEOF_SIGACTIONX64
 #define __ALIGNOF_SIGACTION          __ALIGNOF_SIGACTIONX64
 #define __sigactionx64 sigaction
@@ -58,7 +58,6 @@
 
 
 __SYSDECL_BEGIN
-
 
 #ifdef __CC__
 typedef __HYBRID_FUNCPTR64(void,__ATTR_SYSVABI,__sighandlerx64_t,(int __signo));
@@ -82,9 +81,9 @@ struct __ucontextx64;
 
 #define __OFFSET_SIGACTIONX64_HANDLER   0
 #define __OFFSET_SIGACTIONX64_SIGACTION 0
-#define __OFFSET_SIGACTIONX64_MASK      8
-#define __OFFSET_SIGACTIONX64_FLAGS     136
-#define __OFFSET_SIGACTIONX64_RESTORER  144
+#define __OFFSET_SIGACTIONX64_FLAGS     8
+#define __OFFSET_SIGACTIONX64_RESTORER  16
+#define __OFFSET_SIGACTIONX64_MASK      24
 #define __SIZEOF_SIGACTIONX64           152
 #define __ALIGNOF_SIGACTIONX64          8
 #ifdef __CC__
@@ -93,9 +92,10 @@ struct __ATTR_ALIGNED(__ALIGNOF_SIGACTIONX64) __sigactionx64 /*[NAME(sigactionx6
 	/* Signal handler. */
 #ifdef __USE_POSIX199309
 	union {
-		/* Used if SA_SIGINFO is not set. */
+		/* [valid_if(!(sa_flags & SA_SIGINFO))] */
 		__sighandlerx64_t sa_handler;
-		/* Used if SA_SIGINFO is set. */
+
+		/* [valid_if(sa_flags & SA_SIGINFO)] */
 #ifdef __USE_KOS_ALTERATIONS
 #ifdef __x86_64__
 		__HYBRID_FUNCPTR64(void, __ATTR_SYSVABI, sa_sigaction, (int __signo, struct __siginfo_struct *__info, struct ucontext *__ctx));
@@ -113,14 +113,13 @@ struct __ATTR_ALIGNED(__ALIGNOF_SIGACTIONX64) __sigactionx64 /*[NAME(sigactionx6
 #else /* __USE_POSIX199309 */
 	__sighandlerx64_t sa_handler;
 #endif /* !__USE_POSIX199309 */
-	struct __sigset_struct sa_mask;  /* Additional set of signals to be blocked. */
-	__uint32_t             sa_flags; /* Special flags (set of `SA_*' from <signal.h>) */
-	__uint32_t           __sa_pad;   /* ... */
+	__uint64_t                               sa_flags; /* Special flags (set of `SA_*' from <signal.h>) */
 #ifdef __x86_64__
-	__HYBRID_FUNCPTR64(void, __ATTR_SYSVABI, sa_restorer, (void)); /* Restore handler. */
+	__HYBRID_FUNCPTR64(void, __ATTR_SYSVABI, sa_restorer, (void)); /* [valid_if(sa_flags & SA_RESTORER)] Restore handler. */
 #else /* __x86_64__ */
-	__HYBRID_FUNCPTR64(void, , sa_restorer, (void)); /* Restore handler. */
+	__HYBRID_FUNCPTR64(void, ,               sa_restorer, (void)); /* [valid_if(sa_flags & SA_RESTORER)] Restore handler. */
 #endif /* !__x86_64__ */
+	struct __sigset_struct                   sa_mask;  /* Additional set of signals to be blocked. */
 };
 #endif /* __CC__ */
 

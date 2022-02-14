@@ -62,22 +62,22 @@ struct sigaction /*[PREFIX(sa_)]*/ {
 	/* Signal handler. */
 #ifdef __USE_POSIX199309
 	union {
-		__sighandler_t sa_handler; /* Used if SA_SIGINFO is not set. */
+		/* [valid_if(!(sa_flags & SA_SIGINFO))] */
+		__sighandler_t sa_handler;
+
+		/* [valid_if(sa_flags & SA_SIGINFO)] */
 #ifdef __USE_KOS_ALTERATIONS
-		void (__LIBKCALL *sa_sigaction)(int __signo, struct __siginfo_struct *__info, struct ucontext *__ctx); /* Used if SA_SIGINFO is set. */
+		void (__LIBKCALL *sa_sigaction)(int __signo, struct __siginfo_struct *__info, struct ucontext *__ctx);
 #else /* __USE_KOS_ALTERATIONS */
-		void (__LIBKCALL *sa_sigaction)(int __signo, struct __siginfo_struct *__info, void *__ctx); /* Used if SA_SIGINFO is set. */
+		void (__LIBKCALL *sa_sigaction)(int __signo, struct __siginfo_struct *__info, void *__ctx);
 #endif /* !__USE_KOS_ALTERATIONS */
 	};
 #else /* __USE_POSIX199309 */
 	__sighandler_t sa_handler;
 #endif /* !__USE_POSIX199309 */
-	struct __sigset_struct sa_mask;  /* Additional set of signals to be blocked. */
-	int                    sa_flags; /* Special flags (set of `SA_*' from <signal.h>) */
-#if __SIZEOF_POINTER__ > __SIZEOF_INT__
-	__byte_t             __sa_pad[__SIZEOF_POINTER__ - __SIZEOF_INT__]; /* ... */
-#endif /* __SIZEOF_POINTER__ > __SIZEOF_INT__ */
-	void      (__LIBKCALL *sa_restorer)(void); /* Restore handler. */
+	__ULONGPTR_TYPE__      sa_flags;           /* Special flags (set of `SA_*' from <signal.h>) */
+	void      (__LIBKCALL *sa_restorer)(void); /* [valid_if(sa_flags & SA_RESTORER)] Restore handler. */
+	struct __sigset_struct sa_mask;            /* Additional set of signals to be blocked. */
 };
 
 __DECL_END

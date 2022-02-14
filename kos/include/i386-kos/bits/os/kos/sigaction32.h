@@ -102,9 +102,10 @@ struct __ATTR_ALIGNED(__ALIGNOF_SIGACTIONX32) __sigactionx32 /*[NAME(sigactionx3
 	/* Signal handler. */
 #ifdef __USE_POSIX199309
 	union {
-		/* Used if SA_SIGINFO is not set. */
+		/* [valid_if(!(sa_flags & SA_SIGINFO))] */
 		__sighandlerx32_t sa_handler;
-		/* Used if SA_SIGINFO is set. */
+
+		/* [valid_if(sa_flags & SA_SIGINFO)] */
 #ifdef __USE_KOS_ALTERATIONS
 #if ((defined(__linux__) || (defined(__KOS__) && __KOS_VERSION__ < 300)) && \
      (!defined(__x86_64__) && defined(__i386__)))
@@ -134,9 +135,9 @@ struct __ATTR_ALIGNED(__ALIGNOF_SIGACTIONX32) __sigactionx32 /*[NAME(sigactionx3
 	struct __sigset_structx32 sa_mask;  /* Additional set of signals to be blocked. */
 	__uint32_t                sa_flags; /* Special flags (set of `SA_*' from <signal.h>) */
 #ifdef __x86_64__
-	__HYBRID_FUNCPTR32(void, , sa_restorer, (void)); /* Restore handler. */
+	__HYBRID_FUNCPTR32(void, , sa_restorer, (void)); /* [valid_if(sa_flags & SA_RESTORER)] Restore handler. */
 #else /* __x86_64__ */
-	__HYBRID_FUNCPTR32(void, __ATTR_CDECL, sa_restorer, (void)); /* Restore handler. */
+	__HYBRID_FUNCPTR32(void, __ATTR_CDECL, sa_restorer, (void)); /* [valid_if(sa_flags & SA_RESTORER)] Restore handler. */
 #endif /* !__x86_64__ */
 };
 
