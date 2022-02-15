@@ -61,7 +61,7 @@
 @@Arguments:
 @@ - %rbp: [1..1] struct ucpustate64 const *restore_cpu;
 @@ - %rbx: [0..1] struct fpustate64 const *restore_fpu;
-@@ - %r12: [0..1] sigset_t const *restore_sigmask;
+@@ - %r12: [0..1] struct __sigset_with_sizex64 const *restore_sigmask;
 @@ - %r13: [0..1] struct rpc_syscall_info64 const *sc_info;
 @@This system call uses a custom calling convention because registers passed
 @@must not get clobbered  during execution of a  normal C function. On  i386
@@ -69,7 +69,7 @@
 @@exist  that are preserved by a C function,  but are still used by at least
 @@one  system call invocation  method. However on  x86_64, no such registers
 @@exist, requiring the use of a custom protocol.
-[restart(must)][noexcept] rt_sigreturn:();
+[restart(must)][noexcept] ksigreturn:();
 
 clone:([tostr(CLONE_FLAGS)] syscall_ulong_t flags, void *child_stack,
        pid_t *ptid, pid_t *ctid, [tostr(POINTER)] uintptr_t newtls) -> pid_t;
@@ -737,8 +737,8 @@ arch_prctl = arch_prctlx64;
 -0x000000000000000b:frealpathat
 -0x000000000000000c:rpc_schedule
 -0x000000000000000d:openpty
--0x000000000000000e:get_exception_handler
--0x000000000000000f:set_exception_handler
+/*x000000000000000e:...*/
+-0x000000000000000f:ksigreturn
 -0x0000000000000010:ioctlf
 -0x0000000000000011:pread64f
 -0x0000000000000012:pwrite64f
@@ -761,8 +761,8 @@ arch_prctl = arch_prctlx64;
 -0x0000000000000023:rtm_test
 -0x0000000000000024:set_userprocmask_address
 -0x0000000000000025:rpc_serve_sysret
-/*x0000000000000026:...*/
-/*x0000000000000027:...*/
+-0x0000000000000026:get_exception_handler
+-0x0000000000000027:set_exception_handler
 /*x0000000000000028:...*/
 /*x0000000000000029:...*/
 /*x000000000000002a:...*/

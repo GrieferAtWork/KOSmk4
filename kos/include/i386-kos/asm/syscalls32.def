@@ -52,12 +52,14 @@
 @@are of great importance, as they must match what is encoded by the kernel
 @@within `userexcept_callsignal()'
 @@The order chosen is also important, as it is selected such that arguments
-@@are  only  passed   through  registers  that   are  preserved  by   CDECL
+@@are only passed through registers  that are natively preserved by  signal
+@@handler functions.
 [restart(must)][noexcept]
-sigreturn:([tostr(STRUCT_FPUSTATE32)] struct fpustate32 const *restore_fpu, syscall_ulong_t unused1,
-           syscall_ulong_t unused2, [tostr(STRUCT_SIGSET)] struct __sigset_struct const *restore_sigmask,
-           [tostr(STRUCT_RPC_SYSCALL_INFO32)] struct rpc_syscall_info32 const *sc_info,
-           [tostr(STRUCT_UCPUSTATE32)] struct ucpustate32 const *restore_cpu);
+ksigreturn:([tostr(STRUCT_FPUSTATE32)] struct fpustate32 const *restore_fpu,
+            syscall_ulong_t unused1, syscall_ulong_t unused2,
+            [tostr(STRUCT_SIGSET_WITH_SIZE_X32)] struct __sigset_with_sizex32 const *restore_sigmask,
+            [tostr(STRUCT_RPC_SYSCALL_INFO32)] struct rpc_syscall_info32 const *sc_info,
+            [tostr(STRUCT_UCPUSTATE32)] struct ucpustate32 const *restore_cpu);
 
 clone:([tostr(CLONE_FLAGS)] syscall_ulong_t flags, void *child_stack,
        pid_t *ptid, [tostr(POINTER)] uintptr_t newtls, pid_t *ctid) -> pid_t;
@@ -195,7 +197,6 @@ mq_timedsend = mq_timedsendx32;
 mq_timedsend_time64 = mq_timedsendx32_64;
 mq_timedreceive = mq_timedreceivex32;
 mq_timedreceive_time64 = mq_timedreceivex32_64;
-rt_sigreturn = sigreturn;
 semtimedop_time64 = semtimedopx32_64;
 io_pgetevents = io_pgeteventsx32;
 io_pgetevents_time64 = io_pgeteventsx32_64;
@@ -835,7 +836,7 @@ select64 = selectx32_64;
 /*x000000aa:...*/
 /*x000000ab:...*/
 /*x000000ac:...*/
-/*x000000ad:...*/
+-0x000000ad:ksigreturn
 /*x000000ae:...*/
 /*x000000af:...*/
 /*x000000b0:...*/

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6be36ded */
+/* HASH CRC-32:0xb93f2bea */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -157,7 +157,7 @@
 #define __NRAC_sysinfo                      1
 #define __NRAC_ipc                          1
 #define __NRAC_fsync                        1
-#define __NRAC_sigreturn                    6
+#define __NRAC_sigreturn                    0
 #define __NRAC_clone                        5
 #define __NRAC_setdomainname                2
 #define __NRAC_uname                        1
@@ -211,7 +211,7 @@
 #define __NRAC_setresgid                    3
 #define __NRAC_getresgid                    3
 #define __NRAC_prctl                        5
-#define __NRAC_rt_sigreturn                 6
+#define __NRAC_rt_sigreturn                 0
 #define __NRAC_rt_sigaction                 4
 #define __NRAC_rt_sigprocmask               4
 #define __NRAC_rt_sigpending                2
@@ -484,6 +484,7 @@
 #define __NRAC_kstat                        2
 #define __NRAC_pwrite64f                    5
 #define __NRAC_pread64f                     5
+#define __NRAC_ksigreturn                   6
 #define __NRAC_nanosleep64                  2
 #define __NRAC_rpc_serve                    0
 #define __NRAC_ksysctl                      2
@@ -984,6 +985,7 @@
 #define __NRRT_kstat                        (errno_t, __errno_t)
 #define __NRRT_pwrite64f                    (ssize_t, __ssize_t)
 #define __NRRT_pread64f                     (ssize_t, __ssize_t)
+#define __NRRT_ksigreturn                   (void, void)
 #define __NRRT_nanosleep64                  (errno_t, __errno_t)
 #define __NRRT_rpc_serve                    (errno_t, __errno_t)
 #define __NRRT_ksysctl                      (syscall_slong_t, __syscall_slong_t)
@@ -1224,12 +1226,6 @@
 #define __NRAT0_sysinfo                      (struct __sysinfox32 *, struct __sysinfox32 *)
 #define __NRAT0_ipc                          (int, int)
 #define __NRAT0_fsync                        (fd_t, __fd_t)
-#define __NRAT0_sigreturn                    (struct fpustate32 const *, struct fpustate32 const *)
-#define __NRAT1_sigreturn                    (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT2_sigreturn                    (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT3_sigreturn                    (struct __sigset_struct const *, struct __sigset_struct const *)
-#define __NRAT4_sigreturn                    (struct rpc_syscall_info32 const *, struct rpc_syscall_info32 const *)
-#define __NRAT5_sigreturn                    (struct ucpustate32 const *, struct ucpustate32 const *)
 #define __NRAT0_clone                        (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_clone                        (void *, void *)
 #define __NRAT2_clone                        (pid_t *, __pid_t *)
@@ -1333,12 +1329,6 @@
 #define __NRAT2_prctl                        (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT3_prctl                        (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT4_prctl                        (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT0_rt_sigreturn                 (struct fpustate32 const *, struct fpustate32 const *)
-#define __NRAT1_rt_sigreturn                 (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT2_rt_sigreturn                 (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT3_rt_sigreturn                 (struct __sigset_struct const *, struct __sigset_struct const *)
-#define __NRAT4_rt_sigreturn                 (struct rpc_syscall_info32 const *, struct rpc_syscall_info32 const *)
-#define __NRAT5_rt_sigreturn                 (struct ucpustate32 const *, struct ucpustate32 const *)
 #define __NRAT0_rt_sigaction                 (signo_t, __signo_t)
 #define __NRAT1_rt_sigaction                 (struct __kernel_sigactionx32 const *, struct __kernel_sigactionx32 const *)
 #define __NRAT2_rt_sigaction                 (struct __kernel_sigactionx32 *, struct __kernel_sigactionx32 *)
@@ -2053,6 +2043,12 @@
 #define __NRAT2_pread64f                     (size_t, __size_t)
 #define __NRAT3_pread64f                     (uint64_t, __uint64_t)
 #define __NRAT4_pread64f                     (iomode_t, __iomode_t)
+#define __NRAT0_ksigreturn                   (struct fpustate32 const *, struct fpustate32 const *)
+#define __NRAT1_ksigreturn                   (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT2_ksigreturn                   (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT3_ksigreturn                   (struct __sigset_with_sizex32 const *, struct __sigset_with_sizex32 const *)
+#define __NRAT4_ksigreturn                   (struct rpc_syscall_info32 const *, struct rpc_syscall_info32 const *)
+#define __NRAT5_ksigreturn                   (struct ucpustate32 const *, struct ucpustate32 const *)
 #define __NRAT0_nanosleep64                  (struct timespecx32_64 const *, struct __timespecx32_64 const *)
 #define __NRAT1_nanosleep64                  (struct timespecx32_64 *, struct __timespecx32_64 *)
 #define __NRAT0_ksysctl                      (ioctl_t, __ioctl_t)
@@ -2299,7 +2295,7 @@
 #define __NRAM_sysinfo(a, b, c, d, e, f)                      (struct __sysinfox32 *)a
 #define __NRAM_ipc(a, b, c, d, e, f)                          (int)a
 #define __NRAM_fsync(a, b, c, d, e, f)                        (__fd_t)a
-#define __NRAM_sigreturn(a, b, c, d, e, f)                    (struct fpustate32 const *)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (struct __sigset_struct const *)d, (struct rpc_syscall_info32 const *)e, (struct ucpustate32 const *)f
+#define __NRAM_sigreturn(a, b, c, d, e, f)                    /* nothing */
 #define __NRAM_clone(a, b, c, d, e, f)                        (__syscall_ulong_t)a, (void *)b, (__pid_t *)c, (__uintptr_t)d, (__pid_t *)e
 #define __NRAM_setdomainname(a, b, c, d, e, f)                (char const *)a, (__size_t)b
 #define __NRAM_uname(a, b, c, d, e, f)                        (struct utsname *)a
@@ -2353,7 +2349,7 @@
 #define __NRAM_setresgid(a, b, c, d, e, f)                    (__uint16_t)a, (__uint16_t)b, (__uint16_t)c
 #define __NRAM_getresgid(a, b, c, d, e, f)                    (__uint16_t *)a, (__uint16_t *)b, (__uint16_t *)c
 #define __NRAM_prctl(a, b, c, d, e, f)                        (unsigned int)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NRAM_rt_sigreturn(a, b, c, d, e, f)                 (struct fpustate32 const *)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (struct __sigset_struct const *)d, (struct rpc_syscall_info32 const *)e, (struct ucpustate32 const *)f
+#define __NRAM_rt_sigreturn(a, b, c, d, e, f)                 /* nothing */
 #define __NRAM_rt_sigaction(a, b, c, d, e, f)                 (__signo_t)a, (struct __kernel_sigactionx32 const *)b, (struct __kernel_sigactionx32 *)c, (__size_t)d
 #define __NRAM_rt_sigprocmask(a, b, c, d, e, f)               (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c, (__size_t)d
 #define __NRAM_rt_sigpending(a, b, c, d, e, f)                (struct __sigset_struct *)a, (__size_t)b
@@ -2626,6 +2622,7 @@
 #define __NRAM_kstat(a, b, c, d, e, f)                        (char const *)a, (struct __kos_statx32 *)b
 #define __NRAM_pwrite64f(a, b, c, d, e, f)                    (__fd_t)a, (void const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32), (__iomode_t)f
 #define __NRAM_pread64f(a, b, c, d, e, f)                     (__fd_t)a, (void *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32), (__iomode_t)f
+#define __NRAM_ksigreturn(a, b, c, d, e, f)                   (struct fpustate32 const *)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (struct __sigset_with_sizex32 const *)d, (struct rpc_syscall_info32 const *)e, (struct ucpustate32 const *)f
 #define __NRAM_nanosleep64(a, b, c, d, e, f)                  (struct __timespecx32_64 const *)a, (struct __timespecx32_64 *)b
 #define __NRAM_rpc_serve(a, b, c, d, e, f)                    /* nothing */
 #define __NRAM_ksysctl(a, b, c, d, e, f)                      (__ioctl_t)a, (void *)b
@@ -2799,7 +2796,7 @@
 #define __NRAP_sysinfo(a)                                     (__syscall_ulong_t)a
 #define __NRAP_ipc(a)                                         (__syscall_ulong_t)a
 #define __NRAP_fsync(a)                                       (__syscall_ulong_t)a
-#define __NRAP_sigreturn(a, b, c, d, e, f)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
+#define __NRAP_sigreturn()                                    /* nothing */
 #define __NRAP_clone(a, b, c, d, e)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_setdomainname(a, b)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_uname(a)                                       (__syscall_ulong_t)a
@@ -2853,7 +2850,7 @@
 #define __NRAP_setresgid(a, b, c)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_getresgid(a, b, c)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_prctl(a, b, c, d, e)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NRAP_rt_sigreturn(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
+#define __NRAP_rt_sigreturn()                                 /* nothing */
 #define __NRAP_rt_sigaction(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_rt_sigprocmask(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_rt_sigpending(a, b)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b
@@ -3126,6 +3123,7 @@
 #define __NRAP_kstat(a, b)                                    (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_pwrite64f(a, b, c, d, e)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)((__uint64_t)d >> 32), (__syscall_ulong_t)e
 #define __NRAP_pread64f(a, b, c, d, e)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)((__uint64_t)d >> 32), (__syscall_ulong_t)e
+#define __NRAP_ksigreturn(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NRAP_nanosleep64(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_rpc_serve()                                    /* nothing */
 #define __NRAP_ksysctl(a, b)                                  (__syscall_ulong_t)a, (__syscall_ulong_t)b

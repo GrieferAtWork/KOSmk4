@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f9d7614 */
+/* HASH CRC-32:0x4039642a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -360,10 +360,6 @@
 #define __NRAN0_rt_sigqueueinfo        pid
 #define __NRAN1_rt_sigqueueinfo        usigno
 #define __NRAN2_rt_sigqueueinfo        uinfo
-#define __NRAN0_rt_sigreturn           restore_fpu
-#define __NRAN1_rt_sigreturn           restore_sigmask
-#define __NRAN2_rt_sigreturn           sc_info
-#define __NRAN3_rt_sigreturn           restore_cpu
 #define __NRAN0_setpriority            which
 #define __NRAN1_setpriority            who
 #define __NRAN2_setpriority            value
@@ -1057,7 +1053,7 @@
 #define __NRATR3_pselect6               SC_REPR_STRUCT_FDSET                                    /* exceptfds */ 
 #define __NRATL3_pselect6               0                                                       /* exceptfds -> nfds */ 
 #define __NRATR4_pselect6               SC_REPR_STRUCT_TIMESPEC                                 /* timeout */ 
-#define __NRATR5_pselect6               SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE                 /* sigmask_sigset_with_size */ 
+#define __NRATR5_pselect6               SC_REPR_STRUCT_SIGSET_WITH_SIZE                         /* sigmask_sigset_with_size */ 
 #define __NRRTR_pselect6                SC_REPR_SSIZE_T                                         /* return */
 #define __NRATR0_ppoll                  SC_REPR_STRUCT_POLLFD                                   /* fds */ 
 #define __NRATL0_ppoll                  1                                                       /* fds -> nfds */ 
@@ -1291,10 +1287,6 @@
 #define __NRATR1_rt_sigqueueinfo        SC_REPR_SIGNO_T                                         /* usigno */ 
 #define __NRATR2_rt_sigqueueinfo        SC_REPR_STRUCT_SIGINFO                                  /* uinfo */ 
 #define __NRRTR_rt_sigqueueinfo         SC_REPR_ERRNO_T                                         /* return */
-#define __NRATR0_rt_sigreturn           SC_REPR_STRUCT_FPUSTATE                                 /* restore_fpu */ 
-#define __NRATR1_rt_sigreturn           SC_REPR_STRUCT_SIGSET                                   /* restore_sigmask */ 
-#define __NRATR2_rt_sigreturn           SC_REPR_STRUCT_RPC_SYSCALL_INFO                         /* sc_info */ 
-#define __NRATR3_rt_sigreturn           SC_REPR_STRUCT_UCPUSTATE                                /* restore_cpu */ 
 #define __NRRTR_rt_sigreturn            SC_REPR_SIGNO_T                                         /* return */
 #define __NRATR0_setpriority            SC_REPR_SCHED_PRIORITY_WHICH                            /* which */ 
 #define __NRATR1_setpriority            SC_REPR_ID_T                                            /* who */ 

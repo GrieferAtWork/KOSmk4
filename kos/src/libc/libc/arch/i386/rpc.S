@@ -60,9 +60,6 @@
 #define R_sigreturn_sc_info edi
 #define syscall             int $0x80
 #endif /* !__x86_64__ */
-#ifndef SYS_sigreturn
-#define SYS_sigreturn SYS_rt_sigreturn
-#endif /* !SYS_sigreturn */
 
 
 .section .text.crt.sched.rpc
@@ -100,14 +97,17 @@ INTERN_FUNCTION(libc_x86_rpc_restorer)
 	leaP   rc_scinfo(%Psp), %R_sigreturn_sc_info
 	cmpP   $(RPC_REASONCTX_SYSCALL), rc_context(%Psp)  /* Check if we must restart a system call. */
 	cmovneP %R_sigreturn_sigmask, %R_sigreturn_sc_info /* if (rc_context != RPC_REASONCTX_SYSCALL) sc_info = NULL; */
-	movP   $(SYS_sigreturn), %Pax
+	movP   $(SYS_ksigreturn), %Pax
 	std    /* Enable  exceptions (this syscall shouldn't fail, but
 	        * if it does, it shouldn't return with a normal error,
 	        * but with an exception that  will likely turn into  a
 	        * coredump) */
 	syscall
-	.cfi_endproc
+
+	/* Really shouldn't get here, but should we ever, intentionally crash */
+	hlt
 END(libc_x86_rpc_restorer)
+	.cfi_endproc
 
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72662d0e */
+/* HASH CRC-32:0x983de82c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -402,6 +402,8 @@
 #define __NR64AC_fchdirat                 3
 #define __NR64AC_kreaddirf                5
 #define __NR64AC_kreaddir                 4
+#define __NR64AC_set_exception_handler    3
+#define __NR64AC_get_exception_handler    3
 #define __NR64AC_rpc_serve_sysret         0
 #define __NR64AC_set_userprocmask_address 1
 #define __NR64AC_rtm_test                 0
@@ -420,8 +422,7 @@
 #define __NR64AC_pwrite64f                5
 #define __NR64AC_pread64f                 5
 #define __NR64AC_ioctlf                   4
-#define __NR64AC_set_exception_handler    3
-#define __NR64AC_get_exception_handler    3
+#define __NR64AC_ksigreturn               0
 #define __NR64AC_openpty                  5
 #define __NR64AC_rpc_schedule             5
 #define __NR64AC_frealpathat              5
@@ -807,6 +808,8 @@
 #define __NR64RT_fchdirat                 (errno_t, __errno_t)
 #define __NR64RT_kreaddirf                (ssize_t, __ssize_t)
 #define __NR64RT_kreaddir                 (ssize_t, __ssize_t)
+#define __NR64RT_set_exception_handler    (errno_t, __errno_t)
+#define __NR64RT_get_exception_handler    (errno_t, __errno_t)
 #define __NR64RT_rpc_serve_sysret         (errno_t, __errno_t)
 #define __NR64RT_set_userprocmask_address (errno_t, __errno_t)
 #define __NR64RT_rtm_test                 (syscall_ulong_t, __syscall_ulong_t)
@@ -825,8 +828,7 @@
 #define __NR64RT_pwrite64f                (ssize_t, __ssize_t)
 #define __NR64RT_pread64f                 (ssize_t, __ssize_t)
 #define __NR64RT_ioctlf                   (syscall_slong_t, __syscall_slong_t)
-#define __NR64RT_set_exception_handler    (errno_t, __errno_t)
-#define __NR64RT_get_exception_handler    (errno_t, __errno_t)
+#define __NR64RT_ksigreturn               (void, void)
 #define __NR64RT_openpty                  (errno_t, __errno_t)
 #define __NR64RT_rpc_schedule             (errno_t, __errno_t)
 #define __NR64RT_frealpathat              (ssize_t, __ssize_t)
@@ -1682,6 +1684,12 @@
 #define __NR64AT1_kreaddir                 (struct dirent *, struct dirent *)
 #define __NR64AT2_kreaddir                 (size_t, __size_t)
 #define __NR64AT3_kreaddir                 (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT0_set_exception_handler    (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT1_set_exception_handler    (except_handler_t, __except_handler_t)
+#define __NR64AT2_set_exception_handler    (void *, void *)
+#define __NR64AT0_get_exception_handler    (__ULONG64_TYPE__ *, __ULONG64_TYPE__ *)
+#define __NR64AT1_get_exception_handler    (__except_handler64_t *, __except_handler64_t *)
+#define __NR64AT2_get_exception_handler    (__HYBRID_PTR64(void) *, __HYBRID_PTR64(void) *)
 #define __NR64AT0_set_userprocmask_address (struct userprocmask *, struct userprocmask *)
 #define __NR64AT0_rtm_abort                (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_userviofd                (size_t, __size_t)
@@ -1730,12 +1738,6 @@
 #define __NR64AT1_ioctlf                   (ioctl_t, __ioctl_t)
 #define __NR64AT2_ioctlf                   (iomode_t, __iomode_t)
 #define __NR64AT3_ioctlf                   (void *, void *)
-#define __NR64AT0_set_exception_handler    (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT1_set_exception_handler    (except_handler_t, __except_handler_t)
-#define __NR64AT2_set_exception_handler    (void *, void *)
-#define __NR64AT0_get_exception_handler    (__ULONG64_TYPE__ *, __ULONG64_TYPE__ *)
-#define __NR64AT1_get_exception_handler    (__except_handler64_t *, __except_handler64_t *)
-#define __NR64AT2_get_exception_handler    (__HYBRID_PTR64(void) *, __HYBRID_PTR64(void) *)
 #define __NR64AT0_openpty                  (fd_t *, __fd_t *)
 #define __NR64AT1_openpty                  (fd_t *, __fd_t *)
 #define __NR64AT2_openpty                  (char *, char *)
@@ -2144,6 +2146,8 @@
 #define __NR64AM_fchdirat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__atflag_t)c
 #define __NR64AM_kreaddirf(a, b, c, d, e, f)                (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d, (__iomode_t)e
 #define __NR64AM_kreaddir(a, b, c, d, e, f)                 (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d
+#define __NR64AM_set_exception_handler(a, b, c, d, e, f)    (__syscall_ulong_t)a, (__except_handler_t)b, (void *)c
+#define __NR64AM_get_exception_handler(a, b, c, d, e, f)    (__ULONG64_TYPE__ *)a, (__except_handler64_t *)b, (__HYBRID_PTR64(void) *)c
 #define __NR64AM_rpc_serve_sysret(a, b, c, d, e, f)         /* nothing */
 #define __NR64AM_set_userprocmask_address(a, b, c, d, e, f) (struct userprocmask *)a
 #define __NR64AM_rtm_test(a, b, c, d, e, f)                 /* nothing */
@@ -2162,8 +2166,7 @@
 #define __NR64AM_pwrite64f(a, b, c, d, e, f)                (__fd_t)a, (void const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
 #define __NR64AM_pread64f(a, b, c, d, e, f)                 (__fd_t)a, (void *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
 #define __NR64AM_ioctlf(a, b, c, d, e, f)                   (__fd_t)a, (__ioctl_t)b, (__iomode_t)c, (void *)d
-#define __NR64AM_set_exception_handler(a, b, c, d, e, f)    (__syscall_ulong_t)a, (__except_handler_t)b, (void *)c
-#define __NR64AM_get_exception_handler(a, b, c, d, e, f)    (__ULONG64_TYPE__ *)a, (__except_handler64_t *)b, (__HYBRID_PTR64(void) *)c
+#define __NR64AM_ksigreturn(a, b, c, d, e, f)               /* nothing */
 #define __NR64AM_openpty(a, b, c, d, e, f)                  (__fd_t *)a, (__fd_t *)b, (char *)c, (struct termios const *)d, (struct winsize const *)e
 #define __NR64AM_rpc_schedule(a, b, c, d, e, f)             (__pid_t)a, (__syscall_ulong_t)b, (void const *)c, (__HYBRID_PTR64(void const) const *)d, (__size_t)e
 #define __NR64AM_frealpathat(a, b, c, d, e, f)              (__fd_t)a, (char const *)b, (char *)c, (__size_t)d, (__atflag_t)e
@@ -2549,6 +2552,8 @@
 #define __NR64AP_fchdirat(a, b, c)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_kreaddirf(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR64AP_kreaddir(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR64AP_set_exception_handler(a, b, c)             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NR64AP_get_exception_handler(a, b, c)             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_rpc_serve_sysret()                         /* nothing */
 #define __NR64AP_set_userprocmask_address(a)                (__syscall_ulong_t)a
 #define __NR64AP_rtm_test()                                 /* nothing */
@@ -2567,8 +2572,7 @@
 #define __NR64AP_pwrite64f(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR64AP_pread64f(a, b, c, d, e)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR64AP_ioctlf(a, b, c, d)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NR64AP_set_exception_handler(a, b, c)             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NR64AP_get_exception_handler(a, b, c)             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NR64AP_ksigreturn()                               /* nothing */
 #define __NR64AP_openpty(a, b, c, d, e)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR64AP_rpc_schedule(a, b, c, d, e)                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR64AP_frealpathat(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e

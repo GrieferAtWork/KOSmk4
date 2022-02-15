@@ -27,10 +27,8 @@
 #ifndef __KERNEL__
 #ifndef LIBC_ARCH_HAVE_LIBC_SYS_SIGRETURN
 #include <kos/syscalls.h>
-#ifdef __NR_rt_sigreturn
-#define libc_sys_sigreturn sys_rt_sigreturn
-#elif defined(__NR_sigreturn)
-#define libc_sys_sigreturn sys_sigreturn
+#ifdef __NR_ksigreturn
+#define libc_sys_sigreturn sys_ksigreturn
 #else /* ... */
 #error "No way to implement libc_sys_sigreturn"
 #endif /* !... */

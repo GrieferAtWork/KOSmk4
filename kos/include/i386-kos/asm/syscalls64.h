@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67f3bf95 */
+/* HASH CRC-32:0xf1432cae */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,20 +69,6 @@
 #define __NR_rt_sigaction             0xd                            /* errno_t rt_sigaction(signo_t signo, struct __kernel_sigactionx64 const *act, struct __kernel_sigactionx64 *oact, size_t sigsetsize) */
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 #define __NR_rt_sigprocmask           0xe                            /* errno_t rt_sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset, size_t sigsetsize) */
-/* Restore  the  given CPU/FPU  context descriptors,  as  well as  signal mask
- * before resuming execution by either invoking another system call `sc_info',
- * which  will then return  to `restore_cpu', or  by directly returning there.
- * Arguments:
- *  - %rbp: [1..1] struct ucpustate64 const *restore_cpu;
- *  - %rbx: [0..1] struct fpustate64 const *restore_fpu;
- *  - %r12: [0..1] sigset_t const *restore_sigmask;
- *  - %r13: [0..1] struct rpc_syscall_info64 const *sc_info;
- * This system call uses a custom calling convention because registers passed
- * must not get clobbered  during execution of a  normal C function. On  i386
- * this doesn't require  a custom calling  convention since enough  registers
- * exist  that are preserved by a C function,  but are still used by at least
- * one  system call invocation  method. However on  x86_64, no such registers
- * exist, requiring the use of a custom protocol. */
 #define __NR_rt_sigreturn             0xf                            /* void rt_sigreturn(void) */
 #define __NR_ioctl                    0x10                           /* syscall_slong_t ioctl(fd_t fd, ioctl_t command, void *arg) */
 #define __NR_pread64                  0x11                           /* ssize_t pread64(fd_t fd, void *buf, size_t bufsize, uint64_t offset) */
@@ -1019,6 +1005,32 @@
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
  *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
 #define __NR_kreaddir                 __UINT64_C(0xffffffffffffffb2) /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
+/* Set the exception handler mode for the calling thread.
+ * Examples:
+ *   - Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
+ *   - Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
+ *                                                           EXCEPT_HANDLER_FLAG_SETHANDLER,
+ *                                                           &except_handler4, NULL)'
+ * @param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
+ * @param: handler:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
+ * @param: handler_sp: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
+ * @return: 0 :        Success.
+ * @return: -1:EINVAL: The given `mode' is invalid */
+#define __NR_set_exception_handler    __UINT64_C(0xffffffffffffffd9) /* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
+/* Get the current exception handler mode for the calling thread.
+ * @param: pmode:       When non-`NULL', store the current mode, which is encoded as:
+ *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
+ *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
+ * @param: phandler:    When   non-`NULL',   store  the   address   of  the   user-space   exception  handler.
+ *                      Note that when no handler has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
+ *                      then this pointer is set to `NULL'.
+ * @param: phandler_sp: When non-`NULL', store the starting address of the user-space exception handler stack.
+ *                      Note that  when no  stack has  been set  (`!(*pmode & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+ *                      or when the stack was defined to re-use the previous stack,
+ *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
+ * @return: 0 :         Success.
+ * @return: -1:EFAULT:  One of the given pointers is non-`NULL' and faulty */
+#define __NR_get_exception_handler    __UINT64_C(0xffffffffffffffda) /* errno_t get_exception_handler(__ULONG64_TYPE__ *pmode, __except_handler64_t *phandler, __HYBRID_PTR64(void) *phandler_sp) */
 /* >> rpc_serve_sysret(2)
  * Very similar to `rpc_serve(2)', but with the addition that this one
  * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
@@ -1231,32 +1243,21 @@
 #define __NR_pwrite64f                __UINT64_C(0xffffffffffffffee) /* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
 #define __NR_pread64f                 __UINT64_C(0xffffffffffffffef) /* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
 #define __NR_ioctlf                   __UINT64_C(0xfffffffffffffff0) /* syscall_slong_t ioctlf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
-/* Set the exception handler mode for the calling thread.
- * Examples:
- *   - Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
- *   - Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
- *                                                           EXCEPT_HANDLER_FLAG_SETHANDLER,
- *                                                           &except_handler4, NULL)'
- * @param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
- * @param: handler:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
- * @param: handler_sp: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
- * @return: 0 :        Success.
- * @return: -1:EINVAL: The given `mode' is invalid */
-#define __NR_set_exception_handler    __UINT64_C(0xfffffffffffffff1) /* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
-/* Get the current exception handler mode for the calling thread.
- * @param: pmode:       When non-`NULL', store the current mode, which is encoded as:
- *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
- *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: phandler:    When   non-`NULL',   store  the   address   of  the   user-space   exception  handler.
- *                      Note that when no handler has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
- *                      then this pointer is set to `NULL'.
- * @param: phandler_sp: When non-`NULL', store the starting address of the user-space exception handler stack.
- *                      Note that  when no  stack has  been set  (`!(*pmode & EXCEPT_HANDLER_FLAG_SETSTACK)'),
- *                      or when the stack was defined to re-use the previous stack,
- *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
- * @return: 0 :         Success.
- * @return: -1:EFAULT:  One of the given pointers is non-`NULL' and faulty */
-#define __NR_get_exception_handler    __UINT64_C(0xfffffffffffffff2) /* errno_t get_exception_handler(__ULONG64_TYPE__ *pmode, __except_handler64_t *phandler, __HYBRID_PTR64(void) *phandler_sp) */
+/* Restore  the  given CPU/FPU  context descriptors,  as  well as  signal mask
+ * before resuming execution by either invoking another system call `sc_info',
+ * which  will then return  to `restore_cpu', or  by directly returning there.
+ * Arguments:
+ *  - %rbp: [1..1] struct ucpustate64 const *restore_cpu;
+ *  - %rbx: [0..1] struct fpustate64 const *restore_fpu;
+ *  - %r12: [0..1] struct __sigset_with_sizex64 const *restore_sigmask;
+ *  - %r13: [0..1] struct rpc_syscall_info64 const *sc_info;
+ * This system call uses a custom calling convention because registers passed
+ * must not get clobbered  during execution of a  normal C function. On  i386
+ * this doesn't require  a custom calling  convention since enough  registers
+ * exist  that are preserved by a C function,  but are still used by at least
+ * one  system call invocation  method. However on  x86_64, no such registers
+ * exist, requiring the use of a custom protocol. */
+#define __NR_ksigreturn               __UINT64_C(0xfffffffffffffff1) /* void ksigreturn(void) */
 /* Create a new pseudo-terminal driver and store handles to both the
  * master  and slave ends  of the connection  in the given pointers. */
 #define __NR_openpty                  __UINT64_C(0xfffffffffffffff3) /* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
@@ -1781,6 +1782,8 @@
 #define __NRRM_fchdirat                 0
 #define __NRRM_kreaddirf                0
 #define __NRRM_kreaddir                 0
+#define __NRRM_set_exception_handler    2
+#define __NRRM_get_exception_handler    2
 #define __NRRM_rpc_serve_sysret         1
 #define __NRRM_set_userprocmask_address 0
 #define __NRRM_rtm_test                 0
@@ -1799,8 +1802,7 @@
 #define __NRRM_pwrite64f                0
 #define __NRRM_pread64f                 0
 #define __NRRM_ioctlf                   0
-#define __NRRM_set_exception_handler    2
-#define __NRRM_get_exception_handler    2
+#define __NRRM_ksigreturn               2
 #define __NRRM_openpty                  0
 #define __NRRM_rpc_schedule             0
 #define __NRRM_frealpathat              0
@@ -2335,6 +2337,8 @@
 #define __NRRC_fchdirat                 3
 #define __NRRC_kreaddirf                5
 #define __NRRC_kreaddir                 4
+#define __NRRC_set_exception_handler    3
+#define __NRRC_get_exception_handler    3
 #define __NRRC_rpc_serve_sysret         0
 #define __NRRC_set_userprocmask_address 1
 #define __NRRC_rtm_test                 0
@@ -2353,8 +2357,7 @@
 #define __NRRC_pwrite64f                5
 #define __NRRC_pread64f                 5
 #define __NRRC_ioctlf                   4
-#define __NRRC_set_exception_handler    3
-#define __NRRC_get_exception_handler    3
+#define __NRRC_ksigreturn               0
 #define __NRRC_openpty                  5
 #define __NRRC_rpc_schedule             5
 #define __NRRC_frealpathat              5

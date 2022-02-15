@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3769c71b */
+/* HASH CRC-32:0xe62854e7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -860,6 +860,12 @@
 #define __NR64AN1_kreaddir                 buf
 #define __NR64AN2_kreaddir                 bufsize
 #define __NR64AN3_kreaddir                 mode
+#define __NR64AN0_set_exception_handler    mode
+#define __NR64AN1_set_exception_handler    handler
+#define __NR64AN2_set_exception_handler    handler_sp
+#define __NR64AN0_get_exception_handler    pmode
+#define __NR64AN1_get_exception_handler    phandler
+#define __NR64AN2_get_exception_handler    phandler_sp
 #define __NR64AN0_set_userprocmask_address ctl
 #define __NR64AN0_rtm_abort                code
 #define __NR64AN0_userviofd                initial_size
@@ -908,12 +914,6 @@
 #define __NR64AN1_ioctlf                   command
 #define __NR64AN2_ioctlf                   mode
 #define __NR64AN3_ioctlf                   arg
-#define __NR64AN0_set_exception_handler    mode
-#define __NR64AN1_set_exception_handler    handler
-#define __NR64AN2_set_exception_handler    handler_sp
-#define __NR64AN0_get_exception_handler    pmode
-#define __NR64AN1_get_exception_handler    phandler
-#define __NR64AN2_get_exception_handler    phandler_sp
 #define __NR64AN0_openpty                  amaster
 #define __NR64AN1_openpty                  aslave
 #define __NR64AN2_openpty                  name
@@ -1878,7 +1878,7 @@
 #define __NR64ATR3_pselect6                 SC_REPR_STRUCT_FDSET                                                 /* exceptfds */ 
 #define __NR64ATL3_pselect6                 0                                                                    /* exceptfds -> nfds */ 
 #define __NR64ATR4_pselect6                 SC_REPR_STRUCT_TIMESPECX64                                           /* timeout */ 
-#define __NR64ATR5_pselect6                 SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE_X64                          /* sigmask_sigset_with_size */ 
+#define __NR64ATR5_pselect6                 SC_REPR_STRUCT_SIGSET_WITH_SIZE_X64                                  /* sigmask_sigset_with_size */ 
 #define __NR64RTR_pselect6                  SC_REPR_SSIZE_T                                                      /* return */
 #define __NR64ATR0_ppoll                    SC_REPR_STRUCT_POLLFD                                                /* fds */ 
 #define __NR64ATL0_ppoll                    1                                                                    /* fds -> nfds */ 
@@ -2250,6 +2250,15 @@
 #define __NR64ATR2_kreaddir                 SC_REPR_SIZE_T                                                       /* bufsize */ 
 #define __NR64ATR3_kreaddir                 SC_REPR_KREADDIR_MODE                                                /* mode */ 
 #define __NR64RTR_kreaddir                  SC_REPR_SSIZE_T                                                      /* return */
+#define __NR64ATR0_set_exception_handler    SC_REPR_EXCEPTION_HANDLER_MODE                                       /* mode */ 
+#define __NR64ATR1_set_exception_handler    SC_REPR_EXCEPT_HANDLER_T                                             /* handler */ 
+#define __NR64ATR2_set_exception_handler    SC_REPR_EXCEPTION_HANDLER_SP                                         /* handler_sp */ 
+#define __NR64ATL2_set_exception_handler    0                                                                    /* handler_sp -> mode */ 
+#define __NR64RTR_set_exception_handler     SC_REPR_ERRNO_T                                                      /* return */
+#define __NR64ATR0_get_exception_handler    SC_REPR_POINTER                                                      /* pmode */ 
+#define __NR64ATR1_get_exception_handler    SC_REPR_POINTER                                                      /* phandler */ 
+#define __NR64ATR2_get_exception_handler    SC_REPR_POINTER                                                      /* phandler_sp */ 
+#define __NR64RTR_get_exception_handler     SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64RTR_rpc_serve_sysret          SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_set_userprocmask_address SC_REPR_POINTER                                                      /* ctl */ 
 #define __NR64RTR_set_userprocmask_address  SC_REPR_ERRNO_T                                                      /* return */
@@ -2321,15 +2330,7 @@
 #define __NR64ATR3_ioctlf                   SC_REPR_IOCTL_ARG                                                    /* arg */ 
 #define __NR64ATL3_ioctlf                   1                                                                    /* arg -> command */ 
 #define __NR64RTR_ioctlf                    SC_REPR_SYSCALL_SLONG_T                                              /* return */
-#define __NR64ATR0_set_exception_handler    SC_REPR_EXCEPTION_HANDLER_MODE                                       /* mode */ 
-#define __NR64ATR1_set_exception_handler    SC_REPR_EXCEPT_HANDLER_T                                             /* handler */ 
-#define __NR64ATR2_set_exception_handler    SC_REPR_EXCEPTION_HANDLER_SP                                         /* handler_sp */ 
-#define __NR64ATL2_set_exception_handler    0                                                                    /* handler_sp -> mode */ 
-#define __NR64RTR_set_exception_handler     SC_REPR_ERRNO_T                                                      /* return */
-#define __NR64ATR0_get_exception_handler    SC_REPR_POINTER                                                      /* pmode */ 
-#define __NR64ATR1_get_exception_handler    SC_REPR_POINTER                                                      /* phandler */ 
-#define __NR64ATR2_get_exception_handler    SC_REPR_POINTER                                                      /* phandler_sp */ 
-#define __NR64RTR_get_exception_handler     SC_REPR_ERRNO_T                                                      /* return */
+#define __NR64RTR_ksigreturn                SC_REPR_SIGNO_T                                                      /* return */
 #define __NR64ATR0_openpty                  SC_REPR_POINTER                                                      /* amaster */ 
 #define __NR64ATR1_openpty                  SC_REPR_POINTER                                                      /* aslave */ 
 #define __NR64ATR2_openpty                  SC_REPR_POINTER                                                      /* name */ 

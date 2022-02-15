@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e2259b6 */
+/* HASH CRC-32:0xec7bfb70 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1145,16 +1145,10 @@ INTERN_FUNCTION(libc_sys_fsync)
 END(libc_sys_fsync)
 DEFINE_PUBLIC_ALIAS(sys_fsync, libc_sys_fsync)
 
-/* Restore the specified register state when returning from a signal handler
- * Note that the order and locations of arguments taken by this system  call
- * are of great importance, as they must match what is encoded by the kernel
- * within `userexcept_callsignal()'
- * The order chosen is also important, as it is selected such that arguments
- * are  only  passed   through  registers  that   are  preserved  by   CDECL */
-/* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
+/* void sigreturn(void) */
 INTERN_FUNCTION(libc_sys_sigreturn)
 	movl   $(0x77), %eax
-	jmp    libc_x86_exec_syscall6
+	jmp    libc___i386_syscall
 END(libc_sys_sigreturn)
 DEFINE_PUBLIC_ALIAS(sys_sigreturn, libc_sys_sigreturn)
 
@@ -1604,16 +1598,10 @@ INTERN_FUNCTION(libc_sys_prctl)
 END(libc_sys_prctl)
 DEFINE_PUBLIC_ALIAS(sys_prctl, libc_sys_prctl)
 
-/* Restore the specified register state when returning from a signal handler
- * Note that the order and locations of arguments taken by this system  call
- * are of great importance, as they must match what is encoded by the kernel
- * within `userexcept_callsignal()'
- * The order chosen is also important, as it is selected such that arguments
- * are  only  passed   through  registers  that   are  preserved  by   CDECL */
-/* void rt_sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
+/* void rt_sigreturn(void) */
 INTERN_FUNCTION(libc_sys_rt_sigreturn)
 	movl   $(0xad), %eax
-	jmp    libc_x86_exec_syscall6
+	jmp    libc___i386_syscall
 END(libc_sys_rt_sigreturn)
 DEFINE_PUBLIC_ALIAS(sys_rt_sigreturn, libc_sys_rt_sigreturn)
 
@@ -4013,6 +4001,20 @@ INTERN_FUNCTION(libc_sys_pread64f)
 	jmp    libc_x86_exec_syscall6
 END(libc_sys_pread64f)
 DEFINE_PUBLIC_ALIAS(sys_pread64f, libc_sys_pread64f)
+
+/* Restore the specified register state when returning from a signal handler
+ * Note that the order and locations of arguments taken by this system  call
+ * are of great importance, as they must match what is encoded by the kernel
+ * within `userexcept_callsignal()'
+ * The order chosen is also important, as it is selected such that arguments
+ * are only passed through registers  that are natively preserved by  signal
+ * handler functions. */
+/* void ksigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_with_sizex32 const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
+INTERN_FUNCTION(libc_sys_ksigreturn)
+	movl   $(0xffffff53), %eax
+	jmp    libc_x86_exec_syscall6
+END(libc_sys_ksigreturn)
+DEFINE_PUBLIC_ALIAS(sys_ksigreturn, libc_sys_ksigreturn)
 
 /* errno_t nanosleep64(struct timespecx32_64 const *req, struct timespecx32_64 *rem) */
 INTERN_FUNCTION(libc_sys_nanosleep64)

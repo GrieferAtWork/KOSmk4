@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85941dfc */
+/* HASH CRC-32:0xc2357d15 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -522,20 +522,6 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigprocmask)
 	.cfi_endproc
 END(__x86_asm64_syscall_rt_sigprocmask)
 
-/* Restore  the  given CPU/FPU  context descriptors,  as  well as  signal mask
- * before resuming execution by either invoking another system call `sc_info',
- * which  will then return  to `restore_cpu', or  by directly returning there.
- * Arguments:
- *  - %rbp: [1..1] struct ucpustate64 const *restore_cpu;
- *  - %rbx: [0..1] struct fpustate64 const *restore_fpu;
- *  - %r12: [0..1] sigset_t const *restore_sigmask;
- *  - %r13: [0..1] struct rpc_syscall_info64 const *sc_info;
- * This system call uses a custom calling convention because registers passed
- * must not get clobbered  during execution of a  normal C function. On  i386
- * this doesn't require  a custom calling  convention since enough  registers
- * exist  that are preserved by a C function,  but are still used by at least
- * one  system call invocation  method. However on  x86_64, no such registers
- * exist, requiring the use of a custom protocol. */
 /* void rt_sigreturn(void) */
 .section .text.x86.asm64_syscall.rt_sigreturn
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigreturn)
@@ -11671,6 +11657,90 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kreaddir)
 	.cfi_endproc
 END(__x86_asm64_syscall_kreaddir)
 
+/* Set the exception handler mode for the calling thread.
+ * Examples:
+ *   - Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
+ *   - Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
+ *                                                           EXCEPT_HANDLER_FLAG_SETHANDLER,
+ *                                                           &except_handler4, NULL)'
+ * @param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
+ * @param: handler:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
+ * @param: handler_sp: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
+ * @return: 0 :        Success.
+ * @return: -1:EINVAL: The given `mode' is invalid */
+/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
+.section .text.x86.asm64_syscall.set_exception_handler
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_exception_handler)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffd9
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_set_exception_handler)
+	call   sys_set_exception_handler
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_set_exception_handler)
+
+/* Get the current exception handler mode for the calling thread.
+ * @param: pmode:       When non-`NULL', store the current mode, which is encoded as:
+ *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
+ *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
+ * @param: phandler:    When   non-`NULL',   store  the   address   of  the   user-space   exception  handler.
+ *                      Note that when no handler has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
+ *                      then this pointer is set to `NULL'.
+ * @param: phandler_sp: When non-`NULL', store the starting address of the user-space exception handler stack.
+ *                      Note that  when no  stack has  been set  (`!(*pmode & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+ *                      or when the stack was defined to re-use the previous stack,
+ *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
+ * @return: 0 :         Success.
+ * @return: -1:EFAULT:  One of the given pointers is non-`NULL' and faulty */
+/* errno_t get_exception_handler(__ULONG64_TYPE__ *pmode, __except_handler64_t *phandler, __HYBRID_PTR64(void) *phandler_sp) */
+.section .text.x86.asm64_syscall.get_exception_handler
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_get_exception_handler)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffda
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_get_exception_handler)
+	call   sys_get_exception_handler
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_get_exception_handler)
+
 /* >> rpc_serve_sysret(2)
  * Very similar to `rpc_serve(2)', but with the addition that this one
  * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
@@ -12414,20 +12484,23 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ioctlf)
 	.cfi_endproc
 END(__x86_asm64_syscall_ioctlf)
 
-/* Set the exception handler mode for the calling thread.
- * Examples:
- *   - Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
- *   - Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
- *                                                           EXCEPT_HANDLER_FLAG_SETHANDLER,
- *                                                           &except_handler4, NULL)'
- * @param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
- * @param: handler:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
- * @param: handler_sp: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
- * @return: 0 :        Success.
- * @return: -1:EINVAL: The given `mode' is invalid */
-/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
-.section .text.x86.asm64_syscall.set_exception_handler
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_exception_handler)
+/* Restore  the  given CPU/FPU  context descriptors,  as  well as  signal mask
+ * before resuming execution by either invoking another system call `sc_info',
+ * which  will then return  to `restore_cpu', or  by directly returning there.
+ * Arguments:
+ *  - %rbp: [1..1] struct ucpustate64 const *restore_cpu;
+ *  - %rbx: [0..1] struct fpustate64 const *restore_fpu;
+ *  - %r12: [0..1] struct __sigset_with_sizex64 const *restore_sigmask;
+ *  - %r13: [0..1] struct rpc_syscall_info64 const *sc_info;
+ * This system call uses a custom calling convention because registers passed
+ * must not get clobbered  during execution of a  normal C function. On  i386
+ * this doesn't require  a custom calling  convention since enough  registers
+ * exist  that are preserved by a C function,  but are still used by at least
+ * one  system call invocation  method. However on  x86_64, no such registers
+ * exist, requiring the use of a custom protocol. */
+/* void ksigreturn(void) */
+.section .text.x86.asm64_syscall.ksigreturn
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ksigreturn)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm64_syscall
 	.cfi_lsda 0, 0xfffffffffffffff1
@@ -12441,8 +12514,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_exception_handler)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	EXTERN(sys_set_exception_handler)
-	call   sys_set_exception_handler
+	EXTERN(sys_ksigreturn)
+	call   sys_ksigreturn
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -12453,50 +12526,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_exception_handler)
 	popq_cfi_r %rcx
 	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
-END(__x86_asm64_syscall_set_exception_handler)
-
-/* Get the current exception handler mode for the calling thread.
- * @param: pmode:       When non-`NULL', store the current mode, which is encoded as:
- *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
- *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: phandler:    When   non-`NULL',   store  the   address   of  the   user-space   exception  handler.
- *                      Note that when no handler has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
- *                      then this pointer is set to `NULL'.
- * @param: phandler_sp: When non-`NULL', store the starting address of the user-space exception handler stack.
- *                      Note that  when no  stack has  been set  (`!(*pmode & EXCEPT_HANDLER_FLAG_SETSTACK)'),
- *                      or when the stack was defined to re-use the previous stack,
- *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
- * @return: 0 :         Success.
- * @return: -1:EFAULT:  One of the given pointers is non-`NULL' and faulty */
-/* errno_t get_exception_handler(__ULONG64_TYPE__ *pmode, __except_handler64_t *phandler, __HYBRID_PTR64(void) *phandler_sp) */
-.section .text.x86.asm64_syscall.get_exception_handler
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_get_exception_handler)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xfffffffffffffff2
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	EXTERN(sys_get_exception_handler)
-	call   sys_get_exception_handler
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	X86_IRET_BUT_PREFER_SYSRET64
-	.cfi_endproc
-END(__x86_asm64_syscall_get_exception_handler)
+END(__x86_asm64_syscall_ksigreturn)
 
 /* Create a new pseudo-terminal driver and store handles to both the
  * master  and slave ends  of the connection  in the given pointers. */
@@ -15866,13 +15896,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsync)
 	.cfi_endproc
 END(__x86_asm32_int80_fsync)
 
-/* Restore the specified register state when returning from a signal handler
- * Note that the order and locations of arguments taken by this system  call
- * are of great importance, as they must match what is encoded by the kernel
- * within `userexcept_callsignal()'
- * The order chosen is also important, as it is selected such that arguments
- * are  only  passed   through  registers  that   are  preserved  by   CDECL */
-/* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
+/* void sigreturn(void) */
 .section .text.x86.asm32_syscall_int80.sigreturn
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigreturn)
 	.cfi_startproc simple
@@ -15884,13 +15908,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigreturn)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %ebp, %r9 /* ARG5 = REG5 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_sigreturn)
 	call   sys32_sigreturn
 	popq_cfi_r %rdi
@@ -17253,13 +17270,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_prctl)
 	.cfi_endproc
 END(__x86_asm32_int80_prctl)
 
-/* Restore the specified register state when returning from a signal handler
- * Note that the order and locations of arguments taken by this system  call
- * are of great importance, as they must match what is encoded by the kernel
- * within `userexcept_callsignal()'
- * The order chosen is also important, as it is selected such that arguments
- * are  only  passed   through  registers  that   are  preserved  by   CDECL */
-/* void rt_sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
+/* void rt_sigreturn(void) */
 .section .text.x86.asm32_syscall_int80.rt_sigreturn
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigreturn)
 	.cfi_startproc simple
@@ -17271,13 +17282,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigreturn)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %ebp, %r9 /* ARG5 = REG5 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_rt_sigreturn)
 	call   sys32_rt_sigreturn
 	popq_cfi_r %rdi
@@ -24611,6 +24615,42 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pread64f)
 	.cfi_endproc
 END(__x86_asm32_int80_pread64f)
 
+/* Restore the specified register state when returning from a signal handler
+ * Note that the order and locations of arguments taken by this system  call
+ * are of great importance, as they must match what is encoded by the kernel
+ * within `userexcept_callsignal()'
+ * The order chosen is also important, as it is selected such that arguments
+ * are only passed through registers  that are natively preserved by  signal
+ * handler functions. */
+/* void ksigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_with_sizex32 const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
+.section .text.x86.asm32_syscall_int80.ksigreturn
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_ksigreturn)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffff53
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %ebp, %r9 /* ARG5 = REG5 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_ksigreturn)
+	call   sys32_ksigreturn
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_ksigreturn)
+
 /* errno_t nanosleep64(struct timespecx32_64 const *req, struct timespecx32_64 *rem) */
 .section .text.x86.asm32_syscall_int80.nanosleep64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_nanosleep64)
@@ -26614,48 +26654,8 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ipc, __x86_asm32_int80_ipc)
 /* errno_t fsync(fd_t fd) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fsync, __x86_asm32_int80_fsync)
 
-/* Restore the specified register state when returning from a signal handler
- * Note that the order and locations of arguments taken by this system  call
- * are of great importance, as they must match what is encoded by the kernel
- * within `userexcept_callsignal()'
- * The order chosen is also important, as it is selected such that arguments
- * are  only  passed   through  registers  that   are  preserved  by   CDECL */
-/* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
-.section .text.x86.asm32_syscall_sysenter.sigreturn
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigreturn)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x77
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq 4(%ebp), %r9 /* ARG5 = 4(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_sigreturn)
-	call   sys32_sigreturn
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	X86_IRET_BUT_PREFER_SYSRET32
-	.cfi_endproc
-END(__x86_asm32_sysenter_sigreturn)
+/* void sigreturn(void) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sigreturn, __x86_asm32_int80_sigreturn)
 
 /* pid_t clone(syscall_ulong_t flags, void *child_stack, pid_t *ptid, uintptr_t newtls, pid_t *ctid) */
 .section .text.x86.asm32_syscall_sysenter.clone
@@ -27058,48 +27058,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_prctl)
 	.cfi_endproc
 END(__x86_asm32_sysenter_prctl)
 
-/* Restore the specified register state when returning from a signal handler
- * Note that the order and locations of arguments taken by this system  call
- * are of great importance, as they must match what is encoded by the kernel
- * within `userexcept_callsignal()'
- * The order chosen is also important, as it is selected such that arguments
- * are  only  passed   through  registers  that   are  preserved  by   CDECL */
-/* void rt_sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
-.section .text.x86.asm32_syscall_sysenter.rt_sigreturn
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_sigreturn)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xad
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq 4(%ebp), %r9 /* ARG5 = 4(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_rt_sigreturn)
-	call   sys32_rt_sigreturn
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	X86_IRET_BUT_PREFER_SYSRET32
-	.cfi_endproc
-END(__x86_asm32_sysenter_rt_sigreturn)
+/* void rt_sigreturn(void) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigreturn, __x86_asm32_int80_rt_sigreturn)
 
 /* errno_t rt_sigaction(signo_t signo, struct __kernel_sigactionx32 const *act, struct __kernel_sigactionx32 *oact, size_t sigsetsize) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigaction, __x86_asm32_int80_rt_sigaction)
@@ -29969,6 +29929,50 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pread64f)
 	.cfi_endproc
 END(__x86_asm32_sysenter_pread64f)
 
+/* Restore the specified register state when returning from a signal handler
+ * Note that the order and locations of arguments taken by this system  call
+ * are of great importance, as they must match what is encoded by the kernel
+ * within `userexcept_callsignal()'
+ * The order chosen is also important, as it is selected such that arguments
+ * are only passed through registers  that are natively preserved by  signal
+ * handler functions. */
+/* void ksigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_with_sizex32 const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
+.section .text.x86.asm32_syscall_sysenter.ksigreturn
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ksigreturn)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xffffff53
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq 4(%ebp), %r9 /* ARG5 = 4(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_ksigreturn)
+	call   sys32_ksigreturn
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET32
+	.cfi_endproc
+END(__x86_asm32_sysenter_ksigreturn)
+
 /* errno_t nanosleep64(struct timespecx32_64 const *req, struct timespecx32_64 *rem) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_nanosleep64, __x86_asm32_int80_nanosleep64)
 
@@ -31946,26 +31950,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fsync)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_fsync)
 
-/* Restore the specified register state when returning from a signal handler
- * Note that the order and locations of arguments taken by this system  call
- * are of great importance, as they must match what is encoded by the kernel
- * within `userexcept_callsignal()'
- * The order chosen is also important, as it is selected such that arguments
- * are  only  passed   through  registers  that   are  preserved  by   CDECL */
-/* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
-.section .text.x86.asm32_syscall_sysrun32.sigreturn
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sigreturn)
-	.cfi_startproc
-	movzlq 40(%rdi), %r9
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_sigreturn)
-	jmp    sys32_sigreturn
-	.cfi_endproc
-END(__x86_asm32_sysrun32_sigreturn)
+/* void sigreturn(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_sigreturn, sys32_sigreturn); */
 
 /* pid_t clone(syscall_ulong_t flags, void *child_stack, pid_t *ptid, uintptr_t newtls, pid_t *ctid) */
 .section .text.x86.asm32_syscall_sysrun32.clone
@@ -32589,26 +32575,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_prctl)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_prctl)
 
-/* Restore the specified register state when returning from a signal handler
- * Note that the order and locations of arguments taken by this system  call
- * are of great importance, as they must match what is encoded by the kernel
- * within `userexcept_callsignal()'
- * The order chosen is also important, as it is selected such that arguments
- * are  only  passed   through  registers  that   are  preserved  by   CDECL */
-/* void rt_sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
-.section .text.x86.asm32_syscall_sysrun32.rt_sigreturn
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigreturn)
-	.cfi_startproc
-	movzlq 40(%rdi), %r9
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_rt_sigreturn)
-	jmp    sys32_rt_sigreturn
-	.cfi_endproc
-END(__x86_asm32_sysrun32_rt_sigreturn)
+/* void rt_sigreturn(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_rt_sigreturn, sys32_rt_sigreturn); */
 
 /* errno_t rt_sigaction(signo_t signo, struct __kernel_sigactionx32 const *act, struct __kernel_sigactionx32 *oact, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_sysrun32.rt_sigaction
@@ -36255,6 +36223,28 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pread64f)
 	jmp    sys32_pread64f
 	.cfi_endproc
 END(__x86_asm32_sysrun32_pread64f)
+
+/* Restore the specified register state when returning from a signal handler
+ * Note that the order and locations of arguments taken by this system  call
+ * are of great importance, as they must match what is encoded by the kernel
+ * within `userexcept_callsignal()'
+ * The order chosen is also important, as it is selected such that arguments
+ * are only passed through registers  that are natively preserved by  signal
+ * handler functions. */
+/* void ksigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_with_sizex32 const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
+.section .text.x86.asm32_syscall_sysrun32.ksigreturn
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ksigreturn)
+	.cfi_startproc
+	movzlq 40(%rdi), %r9
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_ksigreturn)
+	jmp    sys32_ksigreturn
+	.cfi_endproc
+END(__x86_asm32_sysrun32_ksigreturn)
 
 /* errno_t nanosleep64(struct timespecx32_64 const *req, struct timespecx32_64 *rem) */
 .section .text.x86.asm32_syscall_sysrun32.nanosleep64

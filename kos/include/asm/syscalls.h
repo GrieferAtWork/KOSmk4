@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94614df9 */
+/* HASH CRC-32:0x79c52d1d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -313,7 +313,7 @@
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
 #define __NR_rt_sigqueueinfo        0x8a  /* errno_t rt_sigqueueinfo(pid_t pid, signo_t usigno, struct __siginfo_struct const *uinfo) */
-#define __NR_rt_sigreturn           0x8b  /* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info const *sc_info, struct ucpustate const *restore_cpu) */
+#define __NR_rt_sigreturn           0x8b  /* void rt_sigreturn(void) */
 /* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */
 #define __NR_setpriority            0x8c  /* errno_t setpriority(syscall_ulong_t which, id_t who, syscall_ulong_t value) */
 /* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */
@@ -1489,7 +1489,7 @@
 #define __NRRC_rt_sigpending          2
 #define __NRRC_rt_sigtimedwait        4
 #define __NRRC_rt_sigqueueinfo        3
-#define __NRRC_rt_sigreturn           4
+#define __NRRC_rt_sigreturn           0
 #define __NRRC_setpriority            3
 #define __NRRC_getpriority            2
 #define __NRRC_reboot                 1

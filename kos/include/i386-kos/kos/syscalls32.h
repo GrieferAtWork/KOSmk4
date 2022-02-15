@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe9e0f6a */
+/* HASH CRC-32:0xb48c7e3a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1083,6 +1083,16 @@ __CDECLARE_SC(,__ssize_t,kreaddir,(__fd_t __fd, struct dirent *__buf, __size_t _
  *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
 __CDECLARE_SC(,__ssize_t,kreaddirf,(__fd_t __fd, struct dirent *__buf, __size_t __bufsize, __syscall_ulong_t __mode, __iomode_t __iomode),(__fd,__buf,__bufsize,__mode,__iomode))
 #endif /* __CRT_HAVE_SC(kreaddirf) */
+#if __CRT_HAVE_SC(ksigreturn)
+/* Restore the specified register state when returning from a signal handler
+ * Note that the order and locations of arguments taken by this system  call
+ * are of great importance, as they must match what is encoded by the kernel
+ * within `userexcept_callsignal()'
+ * The order chosen is also important, as it is selected such that arguments
+ * are only passed through registers  that are natively preserved by  signal
+ * handler functions. */
+__CDECLARE_VOID_SC(,ksigreturn,(struct fpustate32 const *__restore_fpu, __syscall_ulong_t __unused1, __syscall_ulong_t __unused2, struct __sigset_with_sizex32 const *__restore_sigmask, struct rpc_syscall_info32 const *__sc_info, struct ucpustate32 const *__restore_cpu),(__restore_fpu,__unused1,__unused2,__restore_sigmask,__sc_info,__restore_cpu))
+#endif /* __CRT_HAVE_SC(ksigreturn) */
 #if __CRT_HAVE_SC(kstat)
 __CDECLARE_SC(,__errno_t,kstat,(char const *__filename, struct __kos_statx32 *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_SC(kstat) */
@@ -1814,13 +1824,7 @@ __CDECLARE_SC(,__errno_t,rt_sigprocmask,(__syscall_ulong_t __how, struct __sigse
 __CDECLARE_SC(,__errno_t,rt_sigqueueinfo,(__pid_t __pid, __signo_t __usigno, struct __siginfox32_struct const *__uinfo),(__pid,__usigno,__uinfo))
 #endif /* __CRT_HAVE_SC(rt_sigqueueinfo) */
 #if __CRT_HAVE_SC(rt_sigreturn)
-/* Restore the specified register state when returning from a signal handler
- * Note that the order and locations of arguments taken by this system  call
- * are of great importance, as they must match what is encoded by the kernel
- * within `userexcept_callsignal()'
- * The order chosen is also important, as it is selected such that arguments
- * are  only  passed   through  registers  that   are  preserved  by   CDECL */
-__CDECLARE_VOID_SC(,rt_sigreturn,(struct fpustate32 const *__restore_fpu, __syscall_ulong_t __unused1, __syscall_ulong_t __unused2, struct __sigset_struct const *__restore_sigmask, struct rpc_syscall_info32 const *__sc_info, struct ucpustate32 const *__restore_cpu),(__restore_fpu,__unused1,__unused2,__restore_sigmask,__sc_info,__restore_cpu))
+__CDECLARE_VOID_SC(,rt_sigreturn,(void),())
 #endif /* __CRT_HAVE_SC(rt_sigreturn) */
 #if __CRT_HAVE_SC(rt_sigsuspend)
 /* >> sigsuspend(2), rt_sigsuspend(2)
@@ -2298,13 +2302,7 @@ __CDECLARE_SC(,__errno_t,sigpending,(struct __old_sigset_struct *__set),(__set))
 __CDECLARE_SC(,__errno_t,sigprocmask,(__syscall_ulong_t __how, struct __old_sigset_struct const *__set, struct __old_sigset_struct *__oset),(__how,__set,__oset))
 #endif /* __CRT_HAVE_SC(sigprocmask) */
 #if __CRT_HAVE_SC(sigreturn)
-/* Restore the specified register state when returning from a signal handler
- * Note that the order and locations of arguments taken by this system  call
- * are of great importance, as they must match what is encoded by the kernel
- * within `userexcept_callsignal()'
- * The order chosen is also important, as it is selected such that arguments
- * are  only  passed   through  registers  that   are  preserved  by   CDECL */
-__CDECLARE_VOID_SC(,sigreturn,(struct fpustate32 const *__restore_fpu, __syscall_ulong_t __unused1, __syscall_ulong_t __unused2, struct __sigset_struct const *__restore_sigmask, struct rpc_syscall_info32 const *__sc_info, struct ucpustate32 const *__restore_cpu),(__restore_fpu,__unused1,__unused2,__restore_sigmask,__sc_info,__restore_cpu))
+__CDECLARE_VOID_SC(,sigreturn,(void),())
 #endif /* __CRT_HAVE_SC(sigreturn) */
 #if __CRT_HAVE_SC(sigsuspend)
 /* >> sigsuspend(2), rt_sigsuspend(2)

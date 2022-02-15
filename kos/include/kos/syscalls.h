@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbcdc80db */
+/* HASH CRC-32:0xbbed1fb0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,12 +45,9 @@
 #include <bits/os/tms.h>
 #include <bits/os/utimbuf.h>
 #include <bits/types.h>
-#include <kos/bits/syscall-info.h>
 #include <kos/compat/linux-dirent.h>
 #include <kos/compat/linux-dirent64.h>
 #include <kos/compat/linux-stat.h>
-#include <kos/kernel/cpu-state.h>
-#include <kos/kernel/fpu-state.h>
 
 
 #ifndef __CDECLARE_SC
@@ -94,7 +91,6 @@ struct __siginfo_struct;
 struct __sigset_struct;
 struct epoll_event;
 struct file_handle;
-struct fpustate;
 struct getcpu_cache;
 struct iovec;
 struct itimerspec;
@@ -109,7 +105,6 @@ struct msghdr;
 struct pollfd;
 struct rlimit;
 struct rlimit64;
-struct rpc_syscall_info;
 struct rusage;
 struct sched_param;
 struct shmid_ds;
@@ -124,7 +119,6 @@ struct timeval;
 struct timex;
 struct timezone;
 struct tms;
-struct ucpustate;
 struct ustat;
 struct utimbuf;
 struct utsname;
@@ -1090,7 +1084,7 @@ __CDECLARE_SC(,__errno_t,rt_sigprocmask,(__syscall_ulong_t __how, struct __sigse
 __CDECLARE_SC(,__errno_t,rt_sigqueueinfo,(__pid_t __pid, __signo_t __usigno, struct __siginfo_struct const *__uinfo),(__pid,__usigno,__uinfo))
 #endif /* __CRT_HAVE_SC(rt_sigqueueinfo) */
 #if __CRT_HAVE_SC(rt_sigreturn)
-__CDECLARE_VOID_SC(,rt_sigreturn,(struct fpustate const *__restore_fpu, struct __sigset_struct const *__restore_sigmask, struct rpc_syscall_info const *__sc_info, struct ucpustate const *__restore_cpu),(__restore_fpu,__restore_sigmask,__sc_info,__restore_cpu))
+__CDECLARE_VOID_SC(,rt_sigreturn,(void),())
 #endif /* __CRT_HAVE_SC(rt_sigreturn) */
 #if __CRT_HAVE_SC(rt_sigsuspend)
 /* >> sigsuspend(2), rt_sigsuspend(2)

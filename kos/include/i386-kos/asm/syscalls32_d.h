@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe24a632 */
+/* HASH CRC-32:0x137679ac */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -247,13 +247,7 @@
 /* Synchronize a file (including its descriptor which contains timestamps, and its size),
  * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
 #define __NR32_fsync                        0x76                   /* errno_t fsync(fd_t fd) */
-/* Restore the specified register state when returning from a signal handler
- * Note that the order and locations of arguments taken by this system  call
- * are of great importance, as they must match what is encoded by the kernel
- * within `userexcept_callsignal()'
- * The order chosen is also important, as it is selected such that arguments
- * are  only  passed   through  registers  that   are  preserved  by   CDECL */
-#define __NR32_sigreturn                    0x77                   /* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
+#define __NR32_sigreturn                    0x77                   /* void sigreturn(void) */
 #define __NR32_clone                        0x78                   /* pid_t clone(syscall_ulong_t flags, void *child_stack, pid_t *ptid, uintptr_t newtls, pid_t *ctid) */
 #define __NR32_setdomainname                0x79                   /* errno_t setdomainname(char const *name, size_t len) */
 #define __NR32_uname                        0x7a                   /* errno_t uname(struct utsname *name) */
@@ -382,13 +376,7 @@
  *               of unused, but required trailing 0s in its comment.
  * @return: * :  Return value depends on `command' */
 #define __NR32_prctl                        0xac                   /* syscall_slong_t prctl(unsigned int command, syscall_ulong_t arg2, syscall_ulong_t arg3, syscall_ulong_t arg4, syscall_ulong_t arg5) */
-/* Restore the specified register state when returning from a signal handler
- * Note that the order and locations of arguments taken by this system  call
- * are of great importance, as they must match what is encoded by the kernel
- * within `userexcept_callsignal()'
- * The order chosen is also important, as it is selected such that arguments
- * are  only  passed   through  registers  that   are  preserved  by   CDECL */
-#define __NR32_rt_sigreturn                 0xad                   /* void rt_sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
+#define __NR32_rt_sigreturn                 0xad                   /* void rt_sigreturn(void) */
 #define __NR32_rt_sigaction                 0xae                   /* errno_t rt_sigaction(signo_t signo, struct __kernel_sigactionx32 const *act, struct __kernel_sigactionx32 *oact, size_t sigsetsize) */
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 #define __NR32_rt_sigprocmask               0xaf                   /* errno_t rt_sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset, size_t sigsetsize) */
@@ -1154,6 +1142,14 @@
 #define __NR32_kstat                        __UINT32_C(0xffffff3d) /* errno_t kstat(char const *filename, struct __kos_statx32 *statbuf) */
 #define __NR32_pwrite64f                    __UINT32_C(0xffffff4b) /* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
 #define __NR32_pread64f                     __UINT32_C(0xffffff4c) /* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
+/* Restore the specified register state when returning from a signal handler
+ * Note that the order and locations of arguments taken by this system  call
+ * are of great importance, as they must match what is encoded by the kernel
+ * within `userexcept_callsignal()'
+ * The order chosen is also important, as it is selected such that arguments
+ * are only passed through registers  that are natively preserved by  signal
+ * handler functions. */
+#define __NR32_ksigreturn                   __UINT32_C(0xffffff53) /* void ksigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_with_sizex32 const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
 #define __NR32_nanosleep64                  __UINT32_C(0xffffff5e) /* errno_t nanosleep64(struct timespecx32_64 const *req, struct timespecx32_64 *rem) */
 /* >> rpc_serve(2)
  * Check for pending signals and RPCs. This is a wrapper around the
@@ -2030,6 +2026,7 @@
 #define __NR32RM_kstat                        0
 #define __NR32RM_pwrite64f                    0
 #define __NR32RM_pread64f                     0
+#define __NR32RM_ksigreturn                   2
 #define __NR32RM_nanosleep64                  1
 #define __NR32RM_rpc_serve                    1
 #define __NR32RM_ksysctl                      0
@@ -2384,7 +2381,7 @@
 #define __NR32RC_sysinfo                      1
 #define __NR32RC_ipc                          1
 #define __NR32RC_fsync                        1
-#define __NR32RC_sigreturn                    6
+#define __NR32RC_sigreturn                    0
 #define __NR32RC_clone                        5
 #define __NR32RC_setdomainname                2
 #define __NR32RC_uname                        1
@@ -2438,7 +2435,7 @@
 #define __NR32RC_setresgid                    3
 #define __NR32RC_getresgid                    3
 #define __NR32RC_prctl                        5
-#define __NR32RC_rt_sigreturn                 6
+#define __NR32RC_rt_sigreturn                 0
 #define __NR32RC_rt_sigaction                 4
 #define __NR32RC_rt_sigprocmask               4
 #define __NR32RC_rt_sigpending                2
@@ -2711,6 +2708,7 @@
 #define __NR32RC_kstat                        2
 #define __NR32RC_pwrite64f                    6 /* __NR32AC_pwrite64f + 1 */
 #define __NR32RC_pread64f                     6 /* __NR32AC_pread64f + 1 */
+#define __NR32RC_ksigreturn                   6
 #define __NR32RC_nanosleep64                  2
 #define __NR32RC_rpc_serve                    0
 #define __NR32RC_ksysctl                      2

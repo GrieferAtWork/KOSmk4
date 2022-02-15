@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49bcd43e */
+/* HASH CRC-32:0xd10311f7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -181,20 +181,6 @@ INTERN_FUNCTION(libc_sys_rt_sigprocmask)
 END(libc_sys_rt_sigprocmask)
 DEFINE_PUBLIC_ALIAS(sys_rt_sigprocmask, libc_sys_rt_sigprocmask)
 
-/* Restore  the  given CPU/FPU  context descriptors,  as  well as  signal mask
- * before resuming execution by either invoking another system call `sc_info',
- * which  will then return  to `restore_cpu', or  by directly returning there.
- * Arguments:
- *  - %rbp: [1..1] struct ucpustate64 const *restore_cpu;
- *  - %rbx: [0..1] struct fpustate64 const *restore_fpu;
- *  - %r12: [0..1] sigset_t const *restore_sigmask;
- *  - %r13: [0..1] struct rpc_syscall_info64 const *sc_info;
- * This system call uses a custom calling convention because registers passed
- * must not get clobbered  during execution of a  normal C function. On  i386
- * this doesn't require  a custom calling  convention since enough  registers
- * exist  that are preserved by a C function,  but are still used by at least
- * one  system call invocation  method. However on  x86_64, no such registers
- * exist, requiring the use of a custom protocol. */
 /* void rt_sigreturn(void) */
 INTERN_FUNCTION(libc_sys_rt_sigreturn)
 	movq   $(0xf), %rax
@@ -3652,6 +3638,46 @@ INTERN_FUNCTION(libc_sys_kreaddir)
 END(libc_sys_kreaddir)
 DEFINE_PUBLIC_ALIAS(sys_kreaddir, libc_sys_kreaddir)
 
+/* Set the exception handler mode for the calling thread.
+ * Examples:
+ *   - Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
+ *   - Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
+ *                                                           EXCEPT_HANDLER_FLAG_SETHANDLER,
+ *                                                           &except_handler4, NULL)'
+ * @param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
+ * @param: handler:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
+ * @param: handler_sp: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
+ * @return: 0 :        Success.
+ * @return: -1:EINVAL: The given `mode' is invalid */
+/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
+INTERN_FUNCTION(libc_sys_set_exception_handler)
+	movq   $(0xffffffffffffffd9), %rax
+	syscall
+	ret
+END(libc_sys_set_exception_handler)
+DEFINE_PUBLIC_ALIAS(sys_set_exception_handler, libc_sys_set_exception_handler)
+
+/* Get the current exception handler mode for the calling thread.
+ * @param: pmode:       When non-`NULL', store the current mode, which is encoded as:
+ *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
+ *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
+ * @param: phandler:    When   non-`NULL',   store  the   address   of  the   user-space   exception  handler.
+ *                      Note that when no handler has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
+ *                      then this pointer is set to `NULL'.
+ * @param: phandler_sp: When non-`NULL', store the starting address of the user-space exception handler stack.
+ *                      Note that  when no  stack has  been set  (`!(*pmode & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+ *                      or when the stack was defined to re-use the previous stack,
+ *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
+ * @return: 0 :         Success.
+ * @return: -1:EFAULT:  One of the given pointers is non-`NULL' and faulty */
+/* errno_t get_exception_handler(__ULONG64_TYPE__ *pmode, __except_handler64_t *phandler, __HYBRID_PTR64(void) *phandler_sp) */
+INTERN_FUNCTION(libc_sys_get_exception_handler)
+	movq   $(0xffffffffffffffda), %rax
+	syscall
+	ret
+END(libc_sys_get_exception_handler)
+DEFINE_PUBLIC_ALIAS(sys_get_exception_handler, libc_sys_get_exception_handler)
+
 /* >> rpc_serve_sysret(2)
  * Very similar to `rpc_serve(2)', but with the addition that this one
  * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
@@ -3999,45 +4025,27 @@ INTERN_FUNCTION(libc_sys_ioctlf)
 END(libc_sys_ioctlf)
 DEFINE_PUBLIC_ALIAS(sys_ioctlf, libc_sys_ioctlf)
 
-/* Set the exception handler mode for the calling thread.
- * Examples:
- *   - Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
- *   - Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
- *                                                           EXCEPT_HANDLER_FLAG_SETHANDLER,
- *                                                           &except_handler4, NULL)'
- * @param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
- * @param: handler:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
- * @param: handler_sp: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
- * @return: 0 :        Success.
- * @return: -1:EINVAL: The given `mode' is invalid */
-/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
-INTERN_FUNCTION(libc_sys_set_exception_handler)
+/* Restore  the  given CPU/FPU  context descriptors,  as  well as  signal mask
+ * before resuming execution by either invoking another system call `sc_info',
+ * which  will then return  to `restore_cpu', or  by directly returning there.
+ * Arguments:
+ *  - %rbp: [1..1] struct ucpustate64 const *restore_cpu;
+ *  - %rbx: [0..1] struct fpustate64 const *restore_fpu;
+ *  - %r12: [0..1] struct __sigset_with_sizex64 const *restore_sigmask;
+ *  - %r13: [0..1] struct rpc_syscall_info64 const *sc_info;
+ * This system call uses a custom calling convention because registers passed
+ * must not get clobbered  during execution of a  normal C function. On  i386
+ * this doesn't require  a custom calling  convention since enough  registers
+ * exist  that are preserved by a C function,  but are still used by at least
+ * one  system call invocation  method. However on  x86_64, no such registers
+ * exist, requiring the use of a custom protocol. */
+/* void ksigreturn(void) */
+INTERN_FUNCTION(libc_sys_ksigreturn)
 	movq   $(0xfffffffffffffff1), %rax
 	syscall
 	ret
-END(libc_sys_set_exception_handler)
-DEFINE_PUBLIC_ALIAS(sys_set_exception_handler, libc_sys_set_exception_handler)
-
-/* Get the current exception handler mode for the calling thread.
- * @param: pmode:       When non-`NULL', store the current mode, which is encoded as:
- *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
- *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: phandler:    When   non-`NULL',   store  the   address   of  the   user-space   exception  handler.
- *                      Note that when no handler has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
- *                      then this pointer is set to `NULL'.
- * @param: phandler_sp: When non-`NULL', store the starting address of the user-space exception handler stack.
- *                      Note that  when no  stack has  been set  (`!(*pmode & EXCEPT_HANDLER_FLAG_SETSTACK)'),
- *                      or when the stack was defined to re-use the previous stack,
- *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
- * @return: 0 :         Success.
- * @return: -1:EFAULT:  One of the given pointers is non-`NULL' and faulty */
-/* errno_t get_exception_handler(__ULONG64_TYPE__ *pmode, __except_handler64_t *phandler, __HYBRID_PTR64(void) *phandler_sp) */
-INTERN_FUNCTION(libc_sys_get_exception_handler)
-	movq   $(0xfffffffffffffff2), %rax
-	syscall
-	ret
-END(libc_sys_get_exception_handler)
-DEFINE_PUBLIC_ALIAS(sys_get_exception_handler, libc_sys_get_exception_handler)
+END(libc_sys_ksigreturn)
+DEFINE_PUBLIC_ALIAS(sys_ksigreturn, libc_sys_ksigreturn)
 
 /* Create a new pseudo-terminal driver and store handles to both the
  * master  and slave ends  of the connection  in the given pointers. */
@@ -8572,6 +8580,50 @@ INTERN_FUNCTION(libc_sys_Xkreaddir)
 END(libc_sys_Xkreaddir)
 DEFINE_PUBLIC_ALIAS(sys_Xkreaddir, libc_sys_Xkreaddir)
 
+/* Set the exception handler mode for the calling thread.
+ * Examples:
+ *   - Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
+ *   - Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
+ *                                                           EXCEPT_HANDLER_FLAG_SETHANDLER,
+ *                                                           &except_handler4, NULL)'
+ * @param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
+ * @param: handler:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
+ * @param: handler_sp: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
+ * @return: 0 :        Success.
+ * @return: -1:EINVAL: The given `mode' is invalid */
+/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
+INTERN_FUNCTION(libc_sys_Xset_exception_handler)
+	movq   $(0xffffffffffffffd9), %rax
+	std /* Enable exceptions */
+	syscall
+	cld /* Disable exceptions */
+	ret
+END(libc_sys_Xset_exception_handler)
+DEFINE_PUBLIC_ALIAS(sys_Xset_exception_handler, libc_sys_Xset_exception_handler)
+
+/* Get the current exception handler mode for the calling thread.
+ * @param: pmode:       When non-`NULL', store the current mode, which is encoded as:
+ *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
+ *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
+ * @param: phandler:    When   non-`NULL',   store  the   address   of  the   user-space   exception  handler.
+ *                      Note that when no handler has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
+ *                      then this pointer is set to `NULL'.
+ * @param: phandler_sp: When non-`NULL', store the starting address of the user-space exception handler stack.
+ *                      Note that  when no  stack has  been set  (`!(*pmode & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+ *                      or when the stack was defined to re-use the previous stack,
+ *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
+ * @return: 0 :         Success.
+ * @return: -1:EFAULT:  One of the given pointers is non-`NULL' and faulty */
+/* errno_t get_exception_handler(__ULONG64_TYPE__ *pmode, __except_handler64_t *phandler, __HYBRID_PTR64(void) *phandler_sp) */
+INTERN_FUNCTION(libc_sys_Xget_exception_handler)
+	movq   $(0xffffffffffffffda), %rax
+	std /* Enable exceptions */
+	syscall
+	cld /* Disable exceptions */
+	ret
+END(libc_sys_Xget_exception_handler)
+DEFINE_PUBLIC_ALIAS(sys_Xget_exception_handler, libc_sys_Xget_exception_handler)
+
 /* >> rpc_serve_sysret(2)
  * Very similar to `rpc_serve(2)', but with the addition that this one
  * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
@@ -8954,50 +9006,6 @@ INTERN_FUNCTION(libc_sys_Xioctlf)
 	ret
 END(libc_sys_Xioctlf)
 DEFINE_PUBLIC_ALIAS(sys_Xioctlf, libc_sys_Xioctlf)
-
-/* Set the exception handler mode for the calling thread.
- * Examples:
- *   - Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
- *   - Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
- *                                                           EXCEPT_HANDLER_FLAG_SETHANDLER,
- *                                                           &except_handler4, NULL)'
- * @param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
- * @param: handler:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
- * @param: handler_sp: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
- * @return: 0 :        Success.
- * @return: -1:EINVAL: The given `mode' is invalid */
-/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
-INTERN_FUNCTION(libc_sys_Xset_exception_handler)
-	movq   $(0xfffffffffffffff1), %rax
-	std /* Enable exceptions */
-	syscall
-	cld /* Disable exceptions */
-	ret
-END(libc_sys_Xset_exception_handler)
-DEFINE_PUBLIC_ALIAS(sys_Xset_exception_handler, libc_sys_Xset_exception_handler)
-
-/* Get the current exception handler mode for the calling thread.
- * @param: pmode:       When non-`NULL', store the current mode, which is encoded as:
- *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
- *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: phandler:    When   non-`NULL',   store  the   address   of  the   user-space   exception  handler.
- *                      Note that when no handler has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
- *                      then this pointer is set to `NULL'.
- * @param: phandler_sp: When non-`NULL', store the starting address of the user-space exception handler stack.
- *                      Note that  when no  stack has  been set  (`!(*pmode & EXCEPT_HANDLER_FLAG_SETSTACK)'),
- *                      or when the stack was defined to re-use the previous stack,
- *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
- * @return: 0 :         Success.
- * @return: -1:EFAULT:  One of the given pointers is non-`NULL' and faulty */
-/* errno_t get_exception_handler(__ULONG64_TYPE__ *pmode, __except_handler64_t *phandler, __HYBRID_PTR64(void) *phandler_sp) */
-INTERN_FUNCTION(libc_sys_Xget_exception_handler)
-	movq   $(0xfffffffffffffff2), %rax
-	std /* Enable exceptions */
-	syscall
-	cld /* Disable exceptions */
-	ret
-END(libc_sys_Xget_exception_handler)
-DEFINE_PUBLIC_ALIAS(sys_Xget_exception_handler, libc_sys_Xget_exception_handler)
 
 /* Create a new pseudo-terminal driver and store handles to both the
  * master  and slave ends  of the connection  in the given pointers. */

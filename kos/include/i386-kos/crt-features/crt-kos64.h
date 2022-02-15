@@ -4532,6 +4532,7 @@
 #define __CRT_HAVE_sys_klstat
 #define __CRT_HAVE_sys_kreaddir
 #define __CRT_HAVE_sys_kreaddirf
+#define __CRT_HAVE_sys_ksigreturn
 #define __CRT_HAVE_sys_kstat
 #define __CRT_HAVE_sys_ksysctl
 #define __CRT_HAVE_sys_lchown

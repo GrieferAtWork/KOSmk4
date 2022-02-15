@@ -890,46 +890,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Add futex support to pthread_once() (via an alternate [[userimpl]]) */
 
-	/* TODO: Non-rt_ syscalls that take a sigset have a definition of `typedef ulongptr_t old_sigset_t;'
-	 *       that  is used instead of the modern `sigset_t'!  Support this, but also improve support for
-	 *       custom-sized user-space sigset structures, such that user-space can use any sigset size  it
-	 *       wants to. Also change  the size of the  kernel's internal sigset_t to  be much smaller,  to
-	 *       the  point where we only keep track of bits for signals `1..255' (since other signals can't
-	 *       be encoded in `rpc_schedule(2)' or `clone(2)')
-	 * Essentially, the kernel should be configurable to support any # of signals, and user-space should
-	 * work, no matter what it tells the kernel to be its wanted sigset_t size.
-	 *
-	 * TODO: One the size of the kernel's `sigset_t' has been reduced, get rid of `struct kernel_sigmask'
-	 *       and just store sigsets in-line,  which'll have less overhead and  use even less memory  than
-	 *       the current copy-on-write system.
-	 *
-	 * TODO: Systems that still need to be updated:
-	 * - sigreturn:
-	 *   - sys_sigreturn(2)      (why do we even have this? This is one of those syscalls that aren't even linux-compatible...)
-	 *   - sys_rt_sigreturn(2)   (needs another argument that specifies sizeof(sigset_t))
-	 *   Simply get rid of these 2 system calls and replace them
-	 *   with  a new, KOS-specific system call `sys_ksigreturn',
-	 *   that fulfills the same job without ruining future linux
-	 *   compatibility.
-	 * - SA_SIGINFO-signal-handler (struct  ucontext::uc_sigmask)
-	 *   For this purpose, refactor `struct ucontext' to move its
-	 *   sigmask member to be at the tail of the structure.
-	 *   - Also, for forward compatibility, add a KOS-specific field
-	 *     just  before the trailing  sigmask member which indicates
-	 *     the size of the following sigset. That way, future  state
-	 *     fields can got to `offsetof(uc_sigmask) + _uc_sigsize'
-	 *   - This field will be unused by getcontext(3) and friends,
-	 *     but `sys_ksigreturn(2)' takes a pointer to it in  place
-	 *     of its `sigmask' argument, which will be typed as a new
-	 *     struct:
-	 *     >> struct __sigset_with_size_struct {
-	 *     >>     size_t   sws_setsize; // == sizeof(sigset_t)
-	 *     >>     sigset_t sws_sigmask;
-	 *     >> };
-	 *
-	 */
-
-	/* TODO: Add missing header <nl_types.h> (and include it in <langinfo.h>) */
+	/* TODO: Use a smaller sigset_t size in kernel-space (only need 64 bits for the 64 `< NSIG' signals) */
 
 	return state;
 }

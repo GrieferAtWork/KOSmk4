@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44039f5 */
+/* HASH CRC-32:0x84f6bddd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -168,7 +168,7 @@
 #define __NRAC_rt_sigpending          2
 #define __NRAC_rt_sigtimedwait        4
 #define __NRAC_rt_sigqueueinfo        3
-#define __NRAC_rt_sigreturn           4
+#define __NRAC_rt_sigreturn           0
 #define __NRAC_setpriority            3
 #define __NRAC_getpriority            2
 #define __NRAC_reboot                 1
@@ -1016,10 +1016,6 @@
 #define __NRAT0_rt_sigqueueinfo        (pid_t, __pid_t)
 #define __NRAT1_rt_sigqueueinfo        (signo_t, __signo_t)
 #define __NRAT2_rt_sigqueueinfo        (struct __siginfo_struct const *, struct __siginfo_struct const *)
-#define __NRAT0_rt_sigreturn           (struct fpustate const *, struct fpustate const *)
-#define __NRAT1_rt_sigreturn           (struct __sigset_struct const *, struct __sigset_struct const *)
-#define __NRAT2_rt_sigreturn           (struct rpc_syscall_info const *, struct rpc_syscall_info const *)
-#define __NRAT3_rt_sigreturn           (struct ucpustate const *, struct ucpustate const *)
 #define __NRAT0_setpriority            (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_setpriority            (id_t, __id_t)
 #define __NRAT2_setpriority            (syscall_ulong_t, __syscall_ulong_t)
@@ -1565,7 +1561,7 @@
 #define __NRAM_rt_sigpending(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (struct __sigset_struct *)a, (__size_t)b
 #define __NRAM_rt_sigtimedwait(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (struct __sigset_struct const *)a, (struct __siginfo_struct *)b, (struct timespec const *)c, (__size_t)d
 #define __NRAM_rt_sigqueueinfo(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (__pid_t)a, (__signo_t)b, (struct __siginfo_struct const *)c
-#define __NRAM_rt_sigreturn(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (struct fpustate const *)a, (struct __sigset_struct const *)b, (struct rpc_syscall_info const *)c, (struct ucpustate const *)d
+#define __NRAM_rt_sigreturn(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           /* nothing */
 #define __NRAM_setpriority(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            (__syscall_ulong_t)a, (__id_t)b, (__syscall_ulong_t)c
 #define __NRAM_getpriority(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            (__syscall_ulong_t)a, (__id_t)b
 #define __NRAM_reboot(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (__syscall_ulong_t)a
@@ -1887,7 +1883,7 @@
 #define __NRAP_rt_sigpending(a, b)                                                                                  (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_rt_sigtimedwait(a, b, c, d)                                                                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_rt_sigqueueinfo(a, b, c)                                                                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NRAP_rt_sigreturn(a, b, c, d)                                                                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_rt_sigreturn()                                                                                       /* nothing */
 #define __NRAP_setpriority(a, b, c)                                                                                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_getpriority(a, b)                                                                                    (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_reboot(a)                                                                                            (__syscall_ulong_t)a

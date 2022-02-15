@@ -227,9 +227,9 @@
 #ifdef __CC__
 #include <bits/types.h>
 #include <kos/asm/syscall.h>
-#ifndef __NR_rt_sigreturn
+#ifndef __NR_ksigreturn
 #include <asm/syscalls.h>
-#endif /* !__NR_rt_sigreturn */
+#endif /* !__NR_ksigreturn */
 
 DECL_BEGIN
 
@@ -252,13 +252,13 @@ DECL_BEGIN
 struct ucpustate;
 struct fpustate;
 struct rpc_syscall_info;
-struct __sigset_struct;
+struct sigset_with_size;
 
 /* Need special handling for sys_sigreturn() */
 LOCAL ATTR_NORETURN NONNULL((1)) void
 NOTHROW(libc_sys_sigreturn)(struct ucpustate const *restore_cpu,
                             struct fpustate const *restore_fpu,
-                            struct __sigset_struct const *restore_sigmask,
+                            struct sigset_with_size const *restore_sigmask,
                             struct rpc_syscall_info const *restart_sc_info) {
 #ifdef __x86_64__
 	__register __syscall_ulong_t __r12 __asm__("%r12") = (__syscall_ulong_t)restore_sigmask;
@@ -266,7 +266,7 @@ NOTHROW(libc_sys_sigreturn)(struct ucpustate const *restore_cpu,
 	__asm__ __volatile__("movq %q1, %%rbp\n\t"
 	                     "syscall"
 	                     :
-	                     : "a" (__NR_rt_sigreturn)
+	                     : "a" (__NR_ksigreturn)
 	                     , "g" (restore_cpu)
 	                     , "b" (restore_fpu)
 	                     , "r" (__r12)
@@ -276,7 +276,7 @@ NOTHROW(libc_sys_sigreturn)(struct ucpustate const *restore_cpu,
 	__asm__ __volatile__("movl %k1, %%ebp\n\t"
 	                     "call libc___i386_syscall"
 	                     :
-	                     : "a" (__NR_rt_sigreturn)
+	                     : "a" (__NR_ksigreturn)
 	                     , "g" (restore_cpu)
 	                     , "b" (restore_fpu)
 	                     , "S" (restore_sigmask)

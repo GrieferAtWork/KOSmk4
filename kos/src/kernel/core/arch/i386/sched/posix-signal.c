@@ -44,6 +44,7 @@
 #include <asm/cpu-flags.h>
 #include <asm/syscalls32_d.h>
 #include <asm/syscalls64_d.h>
+#include <bits/os/generic/sigset_with_size32.h>
 #include <bits/os/kos/mcontext32.h>
 #include <bits/os/kos/siginfo-convert.h>
 #include <bits/os/kos/ucontext32.h>
@@ -63,6 +64,7 @@
 #include <string.h>
 
 #ifdef __x86_64__
+#include <bits/os/generic/sigset_with_size64.h>
 #include <bits/os/kos/mcontext64.h>
 #include <bits/os/kos/ucontext64.h>
 #include <kos/bits/syscall-info64.h>
@@ -114,24 +116,32 @@ userexcept_callsignal(struct icpustate *__restrict state,
 
 
 /************************************************************************/
-/* 32-BIT SIGRETURN(2)                                                  */
+/* 32-BIT KSIGRETURN(2)                                                 */
 /************************************************************************/
 
 /* Sigreturn system call implementation.
  * WARNING: This function may not necessarily return normally, or by throwing an exception! */
 INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
-sys_sigreturn32_impl(struct icpustate *__restrict state,
-                     USER UNCHECKED struct ucpustate32 const *restore_cpu,
-                     USER UNCHECKED struct fpustate32 const *restore_fpu,
-                     USER UNCHECKED sigset_t const *restore_sigmask,
-                     USER UNCHECKED struct rpc_syscall_info32 const *restart_sc_info) {
+sys_ksigreturn32_impl(struct icpustate *__restrict state,
+                      USER UNCHECKED struct ucpustate32 const *restore_cpu,
+                      USER UNCHECKED struct fpustate32 const *restore_fpu,
+                      USER UNCHECKED struct __sigset_with_sizex32 const *restore_sigmask,
+                      USER UNCHECKED struct rpc_syscall_info32 const *restart_sc_info) {
+	struct __sigset_with_sizex32 rmask;
+
+	/* TODO: `i386_validate_readable()'  (validate_readable() on i386; compat_validate_readable() on x86_64) */
+
 	/* Validate arguments. */
 	validate_readable(restore_cpu, sizeof(*restore_cpu));
 	validate_readable_opt(restore_fpu,
 	                      MIN_C(sizeof(struct sfpustate),
 	                            sizeof(struct xfpustate32)));
-	validate_readable_opt(restore_sigmask, sizeof(*restore_sigmask));
 	validate_readable_opt(restart_sc_info, sizeof(*restart_sc_info));
+	bzero(&rmask, sizeof(rmask));
+	if (restore_sigmask) {
+		memcpy(&rmask, validate_readable(restore_sigmask, sizeof(rmask)), sizeof(rmask));
+		validate_readable(rmask.sws_sigset, rmask.sws_sigsiz);
+	}
 
 	/* Load CPU state information from user-space data structures. */
 	{
@@ -180,9 +190,9 @@ sys_sigreturn32_impl(struct icpustate *__restrict state,
 	}
 
 	/* Restore the given signal mask. */
-	if (restore_sigmask != NULL) {
-		/* TODO: This `sizeof(sigset_t)' must come from user-space! */
-		if (sigmask_setmask_from_user(restore_sigmask, sizeof(sigset_t))) {
+	if (rmask.sws_sigset != NULL) {
+		if (sigmask_setmask_from_user((USER CHECKED sigset_t const *)(void *)rmask.sws_sigset,
+		                              rmask.sws_sigsiz)) {
 			/* If the signal mask changed (technically only needed if it became
 			 * less restrictive), then ensure that pending signals are  checked
 			 * prior to the next return to user-space. */
@@ -226,43 +236,32 @@ sys_sigreturn32_impl(struct icpustate *__restrict state,
 
 
 PRIVATE ABNORMAL_RETURN NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
-sys_sigreturn32_rpc(struct rpc_context *__restrict ctx,
-                    void *UNUSED(cookie)) {
+sys_ksigreturn32_rpc(struct rpc_context *__restrict ctx,
+                     void *UNUSED(cookie)) {
 	USER UNCHECKED struct ucpustate32 const *restore_cpu;
 	USER UNCHECKED struct fpustate32 const *restore_fpu;
-	USER UNCHECKED sigset_t const *restore_sigmask;
+	USER UNCHECKED struct __sigset_with_sizex32 const *restore_sigmask;
 	USER UNCHECKED struct rpc_syscall_info32 const *restart_sc_info;
 	if unlikely(ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
 	restore_cpu     = (USER UNCHECKED struct ucpustate32 const *)ctx->rc_scinfo.rsi_regs[SIGRETURN32_ARGID_RESTORE_CPU];
 	restore_fpu     = (USER UNCHECKED struct fpustate32 const *)ctx->rc_scinfo.rsi_regs[SIGRETURN32_ARGID_RESTORE_FPU];
-	restore_sigmask = (USER UNCHECKED sigset_t const *)ctx->rc_scinfo.rsi_regs[SIGRETURN32_ARGID_RESTORE_SIGMASK];
+	restore_sigmask = (USER UNCHECKED struct __sigset_with_sizex32 const *)ctx->rc_scinfo.rsi_regs[SIGRETURN32_ARGID_RESTORE_SIGMASK];
 	restart_sc_info = (USER UNCHECKED struct rpc_syscall_info32 const *)ctx->rc_scinfo.rsi_regs[SIGRETURN32_ARGID_SC_INFO];
 
-	ctx->rc_state = sys_sigreturn32_impl(ctx->rc_state, restore_cpu,
-	                                     restore_fpu, restore_sigmask,
-	                                     restart_sc_info);
+	ctx->rc_state = sys_ksigreturn32_impl(ctx->rc_state, restore_cpu,
+	                                      restore_fpu, restore_sigmask,
+	                                      restart_sc_info);
 
 	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
 	ctx->rc_context = RPC_REASONCTX_SYSRET;
 }
 
-/* Define `rt_sigreturn()' as an alias for `sigreturn()' */
-#ifdef __x86_64__
-#ifdef __NR32_rt_sigreturn
-DEFINE_PUBLIC_ALIAS(sys32_rt_sigreturn, sys32_sigreturn);
-#endif /* __NR32_rt_sigreturn */
-#else  /* __x86_64__ */
-#ifdef __NR_rt_sigreturn
-DEFINE_PUBLIC_ALIAS(sys_rt_sigreturn, sys_sigreturn);
-#endif /* __NR_rt_sigreturn */
-#endif /* !__x86_64__ */
-
-DEFINE_SYSCALL32_6(void, sigreturn,
+DEFINE_SYSCALL32_6(void, ksigreturn,
                    USER UNCHECKED struct fpustate32 const *, restore_fpu,
                    syscall_ulong_t, unused1,
                    syscall_ulong_t, unused2,
-                   USER UNCHECKED sigset_t const *, restore_sigmask,
+                   USER UNCHECKED struct __sigset_with_sizex32 const *, restore_sigmask,
                    USER UNCHECKED struct rpc_syscall_info32 const *, sc_info,
                    USER UNCHECKED struct ucpustate32 const *, restore_cpu) {
 	(void)restore_fpu;
@@ -273,7 +272,7 @@ DEFINE_SYSCALL32_6(void, sigreturn,
 	(void)restore_cpu;
 
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-	task_rpc_userunwind(&sys_sigreturn32_rpc, NULL);
+	task_rpc_userunwind(&sys_ksigreturn32_rpc, NULL);
 	__builtin_unreachable();
 }
 
@@ -286,24 +285,29 @@ DEFINE_SYSCALL32_6(void, sigreturn,
 
 #ifdef __x86_64__
 /************************************************************************/
-/* 64-BIT SIGRETURN(2)                                                  */
+/* 64-BIT KSIGRETURN(2)                                                 */
 /************************************************************************/
 
 /* Sigreturn system call implementation.
  * WARNING: This function may not necessarily return normally, or by throwing an exception! */
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
-sys_sigreturn64_impl(struct icpustate *__restrict state,
-                     USER UNCHECKED struct ucpustate64 const *restore_cpu,
-                     USER UNCHECKED struct fpustate64 const *restore_fpu,
-                     USER UNCHECKED sigset_t const *restore_sigmask,
-                     USER UNCHECKED struct rpc_syscall_info64 const *restart_sc_info) {
+sys_ksigreturn64_impl(struct icpustate *__restrict state,
+                      USER UNCHECKED struct ucpustate64 const *restore_cpu,
+                      USER UNCHECKED struct fpustate64 const *restore_fpu,
+                      USER UNCHECKED struct __sigset_with_sizex64 const *restore_sigmask,
+                      USER UNCHECKED struct rpc_syscall_info64 const *restart_sc_info) {
+	struct __sigset_with_sizex64 rmask;
 	/* Validate arguments. */
 	validate_readable(restore_cpu, sizeof(*restore_cpu));
 	validate_readable_opt(restore_fpu,
 	                      MIN_C(sizeof(struct sfpustate),
 	                            sizeof(struct xfpustate64)));
-	validate_readable_opt(restore_sigmask, sizeof(*restore_sigmask));
 	validate_readable_opt(restart_sc_info, sizeof(*restart_sc_info));
+	bzero(&rmask, sizeof(rmask));
+	if (restore_sigmask) {
+		memcpy(&rmask, validate_readable(restore_sigmask, sizeof(rmask)), sizeof(rmask));
+		validate_readable(rmask.sws_sigset, rmask.sws_sigsiz);
+	}
 
 	/* Load CPU state information from user-space data structures. */
 	{
@@ -342,9 +346,8 @@ sys_sigreturn64_impl(struct icpustate *__restrict state,
 	}
 
 	/* Restore the given signal mask. */
-	if (restore_sigmask != NULL) {
-		/* TODO: This `sizeof(sigset_t)' must come from user-space! */
-		if (sigmask_setmask_from_user(restore_sigmask, sizeof(sigset_t))) {
+	if (rmask.sws_sigset != NULL) {
+		if (sigmask_setmask_from_user(rmask.sws_sigset, rmask.sws_sigsiz)) {
 			/* If the signal mask changed (technically only needed if it became
 			 * less restrictive), then ensure that pending signals are  checked
 			 * prior to the next return to user-space. */
@@ -381,30 +384,30 @@ sys_sigreturn64_impl(struct icpustate *__restrict state,
 }
 
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
-sys_sigreturn64_rpc(struct rpc_context *__restrict ctx,
-                    void *UNUSED(cookie)) {
+sys_ksigreturn64_rpc(struct rpc_context *__restrict ctx,
+                     void *UNUSED(cookie)) {
 	USER UNCHECKED struct ucpustate64 const *restore_cpu;
 	USER UNCHECKED struct fpustate64 const *restore_fpu;
-	USER UNCHECKED sigset_t const *restore_sigmask;
+	USER UNCHECKED struct __sigset_with_sizex64 const *restore_sigmask;
 	USER UNCHECKED struct rpc_syscall_info64 const *restart_sc_info;
 	if unlikely(ctx->rc_context != RPC_REASONCTX_SYSCALL)
 		return;
 	restore_cpu     = (USER UNCHECKED struct ucpustate64 const *)gpregs_getpbp(&ctx->rc_state->ics_gpregs);
 	restore_fpu     = (USER UNCHECKED struct fpustate64 const *)gpregs_getpbx(&ctx->rc_state->ics_gpregs);
-	restore_sigmask = (USER UNCHECKED sigset_t const *)gpregs_getp12(&ctx->rc_state->ics_gpregs);
+	restore_sigmask = (USER UNCHECKED struct __sigset_with_sizex64 const *)gpregs_getp12(&ctx->rc_state->ics_gpregs);
 	restart_sc_info = (USER UNCHECKED struct rpc_syscall_info64 const *)gpregs_getp13(&ctx->rc_state->ics_gpregs);
 
-	ctx->rc_state = sys_sigreturn64_impl(ctx->rc_state, restore_cpu,
-	                                     restore_fpu, restore_sigmask,
-	                                     restart_sc_info);
+	ctx->rc_state = sys_ksigreturn64_impl(ctx->rc_state, restore_cpu,
+	                                      restore_fpu, restore_sigmask,
+	                                      restart_sc_info);
 
 	/* Indicate that the system call has completed; further RPCs should never try to restart it! */
 	ctx->rc_context = RPC_REASONCTX_SYSRET;
 }
 
-DEFINE_SYSCALL64_0(void, rt_sigreturn) {
+DEFINE_SYSCALL64_0(void, ksigreturn) {
 	/* Send an RPC to ourselves, so we can gain access to the user-space register state. */
-	task_rpc_userunwind(&sys_sigreturn64_rpc, NULL);
+	task_rpc_userunwind(&sys_ksigreturn64_rpc, NULL);
 	__builtin_unreachable();
 }
 #endif /* __x86_64__ */

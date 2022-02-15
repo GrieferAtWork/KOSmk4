@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90705a84 */
+/* HASH CRC-32:0xbe654a0f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -402,6 +402,8 @@
 #define __NRAC_fchdirat                 3
 #define __NRAC_kreaddirf                5
 #define __NRAC_kreaddir                 4
+#define __NRAC_set_exception_handler    3
+#define __NRAC_get_exception_handler    3
 #define __NRAC_rpc_serve_sysret         0
 #define __NRAC_set_userprocmask_address 1
 #define __NRAC_rtm_test                 0
@@ -420,8 +422,7 @@
 #define __NRAC_pwrite64f                5
 #define __NRAC_pread64f                 5
 #define __NRAC_ioctlf                   4
-#define __NRAC_set_exception_handler    3
-#define __NRAC_get_exception_handler    3
+#define __NRAC_ksigreturn               0
 #define __NRAC_openpty                  5
 #define __NRAC_rpc_schedule             5
 #define __NRAC_frealpathat              5
@@ -807,6 +808,8 @@
 #define __NRRT_fchdirat                 (errno_t, __errno_t)
 #define __NRRT_kreaddirf                (ssize_t, __ssize_t)
 #define __NRRT_kreaddir                 (ssize_t, __ssize_t)
+#define __NRRT_set_exception_handler    (errno_t, __errno_t)
+#define __NRRT_get_exception_handler    (errno_t, __errno_t)
 #define __NRRT_rpc_serve_sysret         (errno_t, __errno_t)
 #define __NRRT_set_userprocmask_address (errno_t, __errno_t)
 #define __NRRT_rtm_test                 (syscall_ulong_t, __syscall_ulong_t)
@@ -825,8 +828,7 @@
 #define __NRRT_pwrite64f                (ssize_t, __ssize_t)
 #define __NRRT_pread64f                 (ssize_t, __ssize_t)
 #define __NRRT_ioctlf                   (syscall_slong_t, __syscall_slong_t)
-#define __NRRT_set_exception_handler    (errno_t, __errno_t)
-#define __NRRT_get_exception_handler    (errno_t, __errno_t)
+#define __NRRT_ksigreturn               (void, void)
 #define __NRRT_openpty                  (errno_t, __errno_t)
 #define __NRRT_rpc_schedule             (errno_t, __errno_t)
 #define __NRRT_frealpathat              (ssize_t, __ssize_t)
@@ -1682,6 +1684,12 @@
 #define __NRAT1_kreaddir                 (struct dirent *, struct dirent *)
 #define __NRAT2_kreaddir                 (size_t, __size_t)
 #define __NRAT3_kreaddir                 (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT0_set_exception_handler    (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT1_set_exception_handler    (except_handler_t, __except_handler_t)
+#define __NRAT2_set_exception_handler    (void *, void *)
+#define __NRAT0_get_exception_handler    (__ULONG64_TYPE__ *, __ULONG64_TYPE__ *)
+#define __NRAT1_get_exception_handler    (__except_handler64_t *, __except_handler64_t *)
+#define __NRAT2_get_exception_handler    (__HYBRID_PTR64(void) *, __HYBRID_PTR64(void) *)
 #define __NRAT0_set_userprocmask_address (struct userprocmask *, struct userprocmask *)
 #define __NRAT0_rtm_abort                (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_userviofd                (size_t, __size_t)
@@ -1730,12 +1738,6 @@
 #define __NRAT1_ioctlf                   (ioctl_t, __ioctl_t)
 #define __NRAT2_ioctlf                   (iomode_t, __iomode_t)
 #define __NRAT3_ioctlf                   (void *, void *)
-#define __NRAT0_set_exception_handler    (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT1_set_exception_handler    (except_handler_t, __except_handler_t)
-#define __NRAT2_set_exception_handler    (void *, void *)
-#define __NRAT0_get_exception_handler    (__ULONG64_TYPE__ *, __ULONG64_TYPE__ *)
-#define __NRAT1_get_exception_handler    (__except_handler64_t *, __except_handler64_t *)
-#define __NRAT2_get_exception_handler    (__HYBRID_PTR64(void) *, __HYBRID_PTR64(void) *)
 #define __NRAT0_openpty                  (fd_t *, __fd_t *)
 #define __NRAT1_openpty                  (fd_t *, __fd_t *)
 #define __NRAT2_openpty                  (char *, char *)
@@ -2144,6 +2146,8 @@
 #define __NRAM_fchdirat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__atflag_t)c
 #define __NRAM_kreaddirf(a, b, c, d, e, f)                (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d, (__iomode_t)e
 #define __NRAM_kreaddir(a, b, c, d, e, f)                 (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d
+#define __NRAM_set_exception_handler(a, b, c, d, e, f)    (__syscall_ulong_t)a, (__except_handler_t)b, (void *)c
+#define __NRAM_get_exception_handler(a, b, c, d, e, f)    (__ULONG64_TYPE__ *)a, (__except_handler64_t *)b, (__HYBRID_PTR64(void) *)c
 #define __NRAM_rpc_serve_sysret(a, b, c, d, e, f)         /* nothing */
 #define __NRAM_set_userprocmask_address(a, b, c, d, e, f) (struct userprocmask *)a
 #define __NRAM_rtm_test(a, b, c, d, e, f)                 /* nothing */
@@ -2162,8 +2166,7 @@
 #define __NRAM_pwrite64f(a, b, c, d, e, f)                (__fd_t)a, (void const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
 #define __NRAM_pread64f(a, b, c, d, e, f)                 (__fd_t)a, (void *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
 #define __NRAM_ioctlf(a, b, c, d, e, f)                   (__fd_t)a, (__ioctl_t)b, (__iomode_t)c, (void *)d
-#define __NRAM_set_exception_handler(a, b, c, d, e, f)    (__syscall_ulong_t)a, (__except_handler_t)b, (void *)c
-#define __NRAM_get_exception_handler(a, b, c, d, e, f)    (__ULONG64_TYPE__ *)a, (__except_handler64_t *)b, (__HYBRID_PTR64(void) *)c
+#define __NRAM_ksigreturn(a, b, c, d, e, f)               /* nothing */
 #define __NRAM_openpty(a, b, c, d, e, f)                  (__fd_t *)a, (__fd_t *)b, (char *)c, (struct termios const *)d, (struct winsize const *)e
 #define __NRAM_rpc_schedule(a, b, c, d, e, f)             (__pid_t)a, (__syscall_ulong_t)b, (void const *)c, (__HYBRID_PTR64(void const) const *)d, (__size_t)e
 #define __NRAM_frealpathat(a, b, c, d, e, f)              (__fd_t)a, (char const *)b, (char *)c, (__size_t)d, (__atflag_t)e
@@ -2549,6 +2552,8 @@
 #define __NRAP_fchdirat(a, b, c)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_kreaddirf(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_kreaddir(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_set_exception_handler(a, b, c)             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NRAP_get_exception_handler(a, b, c)             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_rpc_serve_sysret()                         /* nothing */
 #define __NRAP_set_userprocmask_address(a)                (__syscall_ulong_t)a
 #define __NRAP_rtm_test()                                 /* nothing */
@@ -2567,8 +2572,7 @@
 #define __NRAP_pwrite64f(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_pread64f(a, b, c, d, e)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_ioctlf(a, b, c, d)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_set_exception_handler(a, b, c)             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NRAP_get_exception_handler(a, b, c)             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NRAP_ksigreturn()                               /* nothing */
 #define __NRAP_openpty(a, b, c, d, e)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_rpc_schedule(a, b, c, d, e)                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_frealpathat(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e

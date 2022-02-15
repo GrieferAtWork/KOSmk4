@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f2c23d4 */
+/* HASH CRC-32:0xd2833486 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -212,12 +212,6 @@
 #define __NRAN0_sysinfo                      info
 #define __NRAN0_ipc                          TODO_PROTOTYPE
 #define __NRAN0_fsync                        fd
-#define __NRAN0_sigreturn                    restore_fpu
-#define __NRAN1_sigreturn                    unused1
-#define __NRAN2_sigreturn                    unused2
-#define __NRAN3_sigreturn                    restore_sigmask
-#define __NRAN4_sigreturn                    sc_info
-#define __NRAN5_sigreturn                    restore_cpu
 #define __NRAN0_clone                        flags
 #define __NRAN1_clone                        child_stack
 #define __NRAN2_clone                        ptid
@@ -321,12 +315,6 @@
 #define __NRAN2_prctl                        arg3
 #define __NRAN3_prctl                        arg4
 #define __NRAN4_prctl                        arg5
-#define __NRAN0_rt_sigreturn                 restore_fpu
-#define __NRAN1_rt_sigreturn                 unused1
-#define __NRAN2_rt_sigreturn                 unused2
-#define __NRAN3_rt_sigreturn                 restore_sigmask
-#define __NRAN4_rt_sigreturn                 sc_info
-#define __NRAN5_rt_sigreturn                 restore_cpu
 #define __NRAN0_rt_sigaction                 signo
 #define __NRAN1_rt_sigaction                 act
 #define __NRAN2_rt_sigaction                 oact
@@ -1041,6 +1029,12 @@
 #define __NRAN2_pread64f                     bufsize
 #define __NRAN3_pread64f                     offset
 #define __NRAN4_pread64f                     mode
+#define __NRAN0_ksigreturn                   restore_fpu
+#define __NRAN1_ksigreturn                   unused1
+#define __NRAN2_ksigreturn                   unused2
+#define __NRAN3_ksigreturn                   restore_sigmask
+#define __NRAN4_ksigreturn                   sc_info
+#define __NRAN5_ksigreturn                   restore_cpu
 #define __NRAN0_nanosleep64                  req
 #define __NRAN1_nanosleep64                  rem
 #define __NRAN0_ksysctl                      command
@@ -1485,12 +1479,6 @@
 #define __NRRTR_ipc                           SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_fsync                        SC_REPR_FD_T                                                         /* fd */ 
 #define __NRRTR_fsync                         SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_sigreturn                    SC_REPR_STRUCT_FPUSTATE32                                            /* restore_fpu */ 
-#define __NRATR1_sigreturn                    SC_REPR_SYSCALL_ULONG_T                                              /* unused1 */ 
-#define __NRATR2_sigreturn                    SC_REPR_SYSCALL_ULONG_T                                              /* unused2 */ 
-#define __NRATR3_sigreturn                    SC_REPR_STRUCT_SIGSET                                                /* restore_sigmask */ 
-#define __NRATR4_sigreturn                    SC_REPR_STRUCT_RPC_SYSCALL_INFO32                                    /* sc_info */ 
-#define __NRATR5_sigreturn                    SC_REPR_STRUCT_UCPUSTATE32                                           /* restore_cpu */ 
 #define __NRRTR_sigreturn                     SC_REPR_SIGNO_T                                                      /* return */
 #define __NRATR0_clone                        SC_REPR_CLONE_FLAGS                                                  /* flags */ 
 #define __NRATR1_clone                        SC_REPR_POINTER                                                      /* child_stack */ 
@@ -1655,12 +1643,6 @@
 #define __NRATR3_prctl                        SC_REPR_SYSCALL_ULONG_T                                              /* arg4 */ 
 #define __NRATR4_prctl                        SC_REPR_SYSCALL_ULONG_T                                              /* arg5 */ 
 #define __NRRTR_prctl                         SC_REPR_SYSCALL_SLONG_T                                              /* return */
-#define __NRATR0_rt_sigreturn                 SC_REPR_STRUCT_FPUSTATE32                                            /* restore_fpu */ 
-#define __NRATR1_rt_sigreturn                 SC_REPR_SYSCALL_ULONG_T                                              /* unused1 */ 
-#define __NRATR2_rt_sigreturn                 SC_REPR_SYSCALL_ULONG_T                                              /* unused2 */ 
-#define __NRATR3_rt_sigreturn                 SC_REPR_STRUCT_SIGSET                                                /* restore_sigmask */ 
-#define __NRATR4_rt_sigreturn                 SC_REPR_STRUCT_RPC_SYSCALL_INFO32                                    /* sc_info */ 
-#define __NRATR5_rt_sigreturn                 SC_REPR_STRUCT_UCPUSTATE32                                           /* restore_cpu */ 
 #define __NRRTR_rt_sigreturn                  SC_REPR_SIGNO_T                                                      /* return */
 #define __NRATR0_rt_sigaction                 SC_REPR_SIGNO_T                                                      /* signo */ 
 #define __NRATR1_rt_sigaction                 SC_REPR_STRUCT_SIGACTIONX32                                          /* act */ 
@@ -2146,7 +2128,7 @@
 #define __NRATR3_pselect6                     SC_REPR_STRUCT_FDSET                                                 /* exceptfds */ 
 #define __NRATL3_pselect6                     0                                                                    /* exceptfds -> nfds */ 
 #define __NRATR4_pselect6                     SC_REPR_STRUCT_TIMESPECX32                                           /* timeout */ 
-#define __NRATR5_pselect6                     SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE_X32                          /* sigmask_sigset_with_size */ 
+#define __NRATR5_pselect6                     SC_REPR_STRUCT_SIGSET_WITH_SIZE_X32                                  /* sigmask_sigset_with_size */ 
 #define __NRRTR_pselect6                      SC_REPR_SSIZE_T                                                      /* return */
 #define __NRATR0_ppoll                        SC_REPR_STRUCT_POLLFD                                                /* fds */ 
 #define __NRATL0_ppoll                        1                                                                    /* fds -> nfds */ 
@@ -2551,7 +2533,7 @@
 #define __NRATR3_pselect6_time64              SC_REPR_STRUCT_FDSET                                                 /* exceptfds */ 
 #define __NRATL3_pselect6_time64              0                                                                    /* exceptfds -> nfds */ 
 #define __NRATR4_pselect6_time64              SC_REPR_STRUCT_TIMESPECX32_64                                        /* timeout */ 
-#define __NRATR5_pselect6_time64              SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE_X32                          /* sigmask_sigset_with_size */ 
+#define __NRATR5_pselect6_time64              SC_REPR_STRUCT_SIGSET_WITH_SIZE_X32                                  /* sigmask_sigset_with_size */ 
 #define __NRRTR_pselect6_time64               SC_REPR_SSIZE_T                                                      /* return */
 #define __NRATR0_ppoll_time64                 SC_REPR_STRUCT_POLLFD                                                /* fds */ 
 #define __NRATL0_ppoll_time64                 1                                                                    /* fds -> nfds */ 
@@ -2736,6 +2718,13 @@
 #define __NRATR3_pread64f                     SC_REPR_UINT64_T                                                     /* offset */ 
 #define __NRATR4_pread64f                     SC_REPR_IOMODE_T                                                     /* mode */ 
 #define __NRRTR_pread64f                      SC_REPR_SSIZE_T                                                      /* return */
+#define __NRATR0_ksigreturn                   SC_REPR_STRUCT_FPUSTATE32                                            /* restore_fpu */ 
+#define __NRATR1_ksigreturn                   SC_REPR_SYSCALL_ULONG_T                                              /* unused1 */ 
+#define __NRATR2_ksigreturn                   SC_REPR_SYSCALL_ULONG_T                                              /* unused2 */ 
+#define __NRATR3_ksigreturn                   SC_REPR_STRUCT_SIGSET_WITH_SIZE_X32                                  /* restore_sigmask */ 
+#define __NRATR4_ksigreturn                   SC_REPR_STRUCT_RPC_SYSCALL_INFO32                                    /* sc_info */ 
+#define __NRATR5_ksigreturn                   SC_REPR_STRUCT_UCPUSTATE32                                           /* restore_cpu */ 
+#define __NRRTR_ksigreturn                    SC_REPR_SIGNO_T                                                      /* return */
 #define __NRATR0_nanosleep64                  SC_REPR_STRUCT_TIMESPECX32_64                                        /* req */ 
 #define __NRATR1_nanosleep64                  SC_REPR_POINTER                                                      /* rem */ 
 #define __NRRTR_nanosleep64                   SC_REPR_ERRNO_T                                                      /* return */

@@ -53,6 +53,7 @@ DECL_BEGIN
 #define LOCAL_ucontext_t              struct __ucontextx64
 #define LOCAL_struct_fpustate         struct fpustate64
 #define LOCAL_struct_xfpustate        struct xfpustate64
+#define LOCAL_struct_sigset_with_size struct __sigset_with_sizex64
 #define LOCAL_SIX_USER_MAX_SIZE       __SIX64_USER_MAX_SIZE
 #define LOCAL_SIX_KERNEL_MAX_SIZE     __SIX64_KERNEL_MAX_SIZE
 #define LOCAL_fpustate_saveinto       fpustate64_saveinto
@@ -70,7 +71,7 @@ DECL_BEGIN
 #define LOCAL_ucs_Pip                 ucs_rip
 #define LOCAL_kernel_syscall_regcnt   kernel_syscall64_regcnt
 #define LOCAL_rpc_syscall_info_encode rpc_syscall_info_to_rpc_syscall_info64
-#define LOCAL_NR_sigreturn            __NR64_rt_sigreturn
+#define LOCAL_NR_ksigreturn           __NR64_ksigreturn
 #else /* DEFINE_x86_userexcept_callsignal64 */
 #define LOCAL_struct_rpc_syscall_info struct rpc_syscall_info32
 #define LOCAL_uintptr_t               u32
@@ -78,6 +79,7 @@ DECL_BEGIN
 #define LOCAL_ucontext_t              struct __ucontextx32
 #define LOCAL_struct_fpustate         struct fpustate32
 #define LOCAL_struct_xfpustate        struct xfpustate32
+#define LOCAL_struct_sigset_with_size struct __sigset_with_sizex32
 #define LOCAL_SIX_USER_MAX_SIZE       __SIX32_USER_MAX_SIZE
 #define LOCAL_SIX_KERNEL_MAX_SIZE     __SIX32_KERNEL_MAX_SIZE
 #define LOCAL_fpustate_saveinto       fpustate32_saveinto
@@ -95,7 +97,7 @@ DECL_BEGIN
 #define LOCAL_ucs_Pip                 ucs_eip
 #define LOCAL_kernel_syscall_regcnt   kernel_syscall32_regcnt
 #define LOCAL_rpc_syscall_info_encode rpc_syscall_info_to_rpc_syscall_info32
-#define LOCAL_NR_sigreturn            __NR32_rt_sigreturn
+#define LOCAL_NR_ksigreturn           __NR32_ksigreturn
 #endif /* !DEFINE_x86_userexcept_callsignal64 */
 
 
@@ -134,7 +136,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 	sigset_t old_sigmask;
 	USER CHECKED LOCAL_siginfo_t *user_siginfo;
 	USER CHECKED LOCAL_ucontext_t *user_ucontext;
-	USER CHECKED sigset_t *user_sigset;
+	USER CHECKED LOCAL_struct_sigset_with_size *user_sigset;
 	USER CHECKED LOCAL_struct_fpustate *user_fpustate;
 	USER CHECKED LOCAL_struct_rpc_syscall_info *user_sc_info;
 	USER CHECKED LOCAL_uintptr_t user_rstor;
@@ -183,8 +185,8 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 #endif /* !DEFINE_x86_userexcept_callsignal32 */
 
 	/* At this point, the following options affect how we need to set up the stack:
-	 *  - sc_info:                                  When non-NULL, we must restart an interrupted system call
-	 *  - must_restore_sigmask:                     When true, we must restore `old_sigmask'
+	 *  - sc_info:                        When non-NULL, we must restart an interrupted system call
+	 *  - must_restore_sigmask:           When true, we must restore `old_sigmask'
 	 *  - action->sa_flags & SA_SIGINFO:  When true, we must invoke a 3-argument handler
 	 *  - action->sa_flags & SA_RESTORER: When true, we must have the handler return to `sa_restore' */
 
@@ -193,21 +195,26 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 	user_sigset   = NULL;
 	user_fpustate = NULL;
 	if (action->sa_flags & SA_SIGINFO) {
+		/* TODO: Use the sigsetsize passed to `sys_rt_sigaction()' when this handler was installed */
+		size_t sigsetsize = sizeof(sigset_t);
+
 		/* In 3-argument mode, we always have to push everything... */
 		STATIC_ASSERT(LOCAL_SIX_USER_MAX_SIZE >= LOCAL_SIX_KERNEL_MAX_SIZE);
 		STATIC_ASSERT(LOCAL_SIX_KERNEL_MAX_SIZE == sizeof(LOCAL_siginfo_t));
 
 		/* Try to have the padding of `siginfo_t' overlap with `ucontextN_t' */
+#define sizeof_LOCAL_ucontext_t (offsetof(LOCAL_ucontext_t, uc_sigmask) + sigsetsize)
 #define EFFECTIVE_PADDING_SIGINFO_T (LOCAL_SIX_USER_MAX_SIZE - LOCAL_SIX_KERNEL_MAX_SIZE)
 #define EFFECTIVE_SIZEOF_SIGINFO_T                               \
-		(EFFECTIVE_PADDING_SIGINFO_T <= sizeof(LOCAL_ucontext_t) \
+		(EFFECTIVE_PADDING_SIGINFO_T <= sizeof_LOCAL_ucontext_t \
 		 ? LOCAL_SIX_KERNEL_MAX_SIZE                             \
-		 : (LOCAL_SIX_USER_MAX_SIZE - sizeof(LOCAL_ucontext_t)))
+		 : (LOCAL_SIX_USER_MAX_SIZE - sizeof_LOCAL_ucontext_t))
 
 		/* Must push a full `ucontextN_t' */
-		user_ucontext = (LOCAL_ucontext_t *)(usp - sizeof(LOCAL_ucontext_t));
+		user_ucontext = (LOCAL_ucontext_t *)(usp - sizeof_LOCAL_ucontext_t);
 		validate_writable((byte_t *)user_ucontext - EFFECTIVE_SIZEOF_SIGINFO_T,
-		                  sizeof(LOCAL_ucontext_t) + EFFECTIVE_SIZEOF_SIGINFO_T);
+		                  sizeof_LOCAL_ucontext_t + EFFECTIVE_SIZEOF_SIGINFO_T);
+
 		COMPILER_WRITE_BARRIER();
 		user_ucontext->uc_link              = (LOCAL_ucontext_t *)NULL; /* Unused... */
 		user_ucontext->uc_stack.ss_sp       = usp;
@@ -215,8 +222,16 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 		user_ucontext->uc_stack.ss_size     = 0;
 		user_ucontext->uc_mcontext.mc_cr2   = 0;
 		user_ucontext->uc_mcontext.mc_flags = 0;
-		user_sigset = (USER CHECKED sigset_t *)memcpy(&user_ucontext->uc_sigmask,
-		                                              &old_sigmask, sizeof(sigset_t));
+
+		/* Fill in the `struct ucontext's signal mask (using the requested signal mask size) */
+		{
+			size_t limited_sigsetsize = sigsetsize;
+			if (limited_sigsetsize > sizeof(sigset_t))
+				limited_sigsetsize = sizeof(sigset_t);
+			memset(mempcpy(&user_ucontext->uc_sigmask,
+			               &old_sigmask, limited_sigsetsize),
+			       0xff, sigsetsize - limited_sigsetsize);
+		}
 		if (siginfo->si_signo == SIGSEGV) {
 			user_ucontext->uc_mcontext.mc_cr2 = (ulongptr_t)siginfo->si_addr;
 			user_ucontext->uc_mcontext.mc_flags |= MCONTEXT_FLAG_HAVECR2;
@@ -226,13 +241,23 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 			LOCAL_fpustate_saveinto(user_fpustate);
 			user_ucontext->uc_mcontext.mc_flags |= MCONTEXT_FLAG_HAVEFPU;
 		}
-		usp -= sizeof(LOCAL_ucontext_t) + EFFECTIVE_SIZEOF_SIGINFO_T;
+		usp -= EFFECTIVE_SIZEOF_SIGINFO_T + sizeof_LOCAL_ucontext_t;
 
 		/* Copy signal information into user-space. */
 		user_siginfo = (LOCAL_siginfo_t *)usp;
 		LOCAL_siginfo_encode(siginfo, user_siginfo);
+
+		if (must_restore_sigmask) {
+			/* Allocate the `struct sigset_with_size' to-be loaded by `sys_ksigreturn(2)'. */
+			user_sigset             = (LOCAL_struct_sigset_with_size *)usp;
+			user_sigset->sws_sigset = (typeof(user_sigset->sws_sigset))(uintptr_t)&user_ucontext->uc_sigmask;
+			user_sigset->sws_sigsiz = (typeof(user_sigset->sws_sigsiz))sigsetsize;
+			usp -= sizeof(LOCAL_struct_sigset_with_size);
+		}
+
 #undef EFFECTIVE_PADDING_SIGINFO_T
 #undef EFFECTIVE_SIZEOF_SIGINFO_T
+#undef sizeof_LOCAL_ucontext_t
 	} else {
 		/* Only push the bare minimum */
 		user_ucontext = container_of((LOCAL_struct_ucpustate *)(usp - sizeof(LOCAL_struct_ucpustate)),
@@ -255,22 +280,24 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 			LOCAL_fpustate_saveinto(user_fpustate);
 		}
 
-		/* Only save the sigmask if it was changed. */
+		/* Only save the sigmask if it was changed.
+		 *
+		 * NOTE: In this case we can always use the kernel-space sigset-size,
+		 *       as this structure (even though it resides on the user-stack)
+		 *       isn't actually exposed to user-space. -- It's only there  so
+		 *       that sys_ksigreturn(2) will be able to restore it upon being
+		 *       called. */
 		if (must_restore_sigmask) {
+			USER CHECKED sigset_t *user_sigbuf;
 			usp -= sizeof(sigset_t);
-			user_sigset = (USER CHECKED sigset_t *)usp;
-			validate_writable(user_sigset, sizeof(sigset_t));
+			user_sigbuf = (USER CHECKED sigset_t *)usp;
+			usp -= sizeof(LOCAL_struct_sigset_with_size);
+			user_sigset = (USER CHECKED LOCAL_struct_sigset_with_size *)usp;
+			validate_writable(usp, sizeof(LOCAL_struct_sigset_with_size) + sizeof(sigset_t));
 			COMPILER_WRITE_BARRIER();
-			memcpy(user_sigset, &old_sigmask, sizeof(sigset_t));
-			/* TODO: Also pass along `sizeof(sigset_t)'.
-			 * Idea: Do this by replacing `user_sigset' with a struct:
-			 * >> struct sigreturn_sigset_t {
-			 * >>     size_t   ss_sigsetsize;
-			 * >>     sigset_t ss_sigset;
-			 * >> };
-			 * This  way,  we still  only  need 1  register,  and the
-			 * expected signal set size is able to be variable-sized.
-			 */
+			user_sigbuf = (USER CHECKED sigset_t *)memcpy(user_sigbuf, &old_sigmask, sizeof(sigset_t));
+			user_sigset->sws_sigset = (typeof(user_sigset->sws_sigset))(uintptr_t)user_sigbuf;
+			user_sigset->sws_sigsiz = (typeof(user_sigset->sws_sigsiz))sizeof(sigset_t);
 		}
 	}
 
@@ -335,7 +362,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 	}
 
 	/* At this point, we must setup everything to restore:
-	 * >> if (must_restore_sigmask)
+	 * >> if (user_sigset)
 	 * >>     RESTORE_SIGMASK(user_sigset);
 	 * >> if (user_fpustate)
 	 * >>     RESTORE_FPUSTATE(user_fpustate);
@@ -348,16 +375,16 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 		user_rstor = (LOCAL_uintptr_t)(uintptr_t)action->sa_restorer;
 	} else {
 		/* Must push assembly onto the user-stack:
-		 * >>     movl  $SYS_rt_sigreturn, %eax
+		 * >>     movl  $SYS_ksigreturn, %eax
 		 * >>     int   $(0x80) */
 		/* NOTE: This assembly block's size must be pointer-aligned! */
 		PRIVATE byte_t const sigreturn_invoke_assembly[8] = {
-			/* movl  $SYS_rt_sigreturn, %eax */
+			/* movl  $SYS_ksigreturn, %eax */
 			0xb8,
-			(LOCAL_NR_sigreturn >> 0) & 0xff,
-			(LOCAL_NR_sigreturn >> 8) & 0xff,
-			(LOCAL_NR_sigreturn >> 16) & 0xff,
-			(LOCAL_NR_sigreturn >> 24) & 0xff,
+			(LOCAL_NR_ksigreturn >> 0) & 0xff,
+			(LOCAL_NR_ksigreturn >> 8) & 0xff,
+			(LOCAL_NR_ksigreturn >> 16) & 0xff,
+			(LOCAL_NR_ksigreturn >> 24) & 0xff,
 #ifdef DEFINE_x86_userexcept_callsignal64
 			/* syscall */
 			0x0f, 0x05,
@@ -406,7 +433,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 	/* Setup the user-space to-be invoked with the following register state:
 	 *   - %rbp == &user_ucontext->uc_mcontext.mc_context
 	 *   - %rbx == user_fpustate ?: NULL
-	 *   - %r12 == must_restore_sigmask ? user_sigset : NULL
+	 *   - %r12 == user_sigset ?: NULL
 	 *   - %r13 == user_sc_info ?: NULL
 	 * NOTE: This register state is what is expected by  `sys_sigreturn'
 	 *       Note also that  we can only  use callee-preserve  registers
@@ -414,13 +441,13 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 	 *       handler itself. */
 	gpregs_setpbp(&state->ics_gpregs, (u64)(uintptr_t)&user_ucontext->uc_mcontext.mc_context);
 	gpregs_setpbx(&state->ics_gpregs, (u64)(uintptr_t)user_fpustate);
-	gpregs_setp12(&state->ics_gpregs, (u64)(uintptr_t)(must_restore_sigmask ? user_sigset : NULL));
+	gpregs_setp12(&state->ics_gpregs, (u64)(uintptr_t)user_sigset);
 	gpregs_setp13(&state->ics_gpregs, (u64)(uintptr_t)user_sc_info);
 #else /* DEFINE_x86_userexcept_callsignal64 */
 	/* Setup the user-space to-be invoked with the following register state:
 	 *   - %ebp == &user_ucontext->uc_mcontext.mc_context
 	 *   - %ebx == user_fpustate ?: NULL
-	 *   - %esi == must_restore_sigmask ? user_sigset : NULL
+	 *   - %esi == user_sigset ?: NULL
 	 *   - %edi == user_sc_info ?: NULL
 	 * NOTE: This register state is what is expected by  `sys_sigreturn'
 	 *       Note also that  we can only  use callee-preserve  registers
@@ -428,7 +455,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 	 *       handler itself. */
 	gpregs_setpbp(&state->ics_gpregs, (u32)(uintptr_t)&user_ucontext->uc_mcontext.mc_context);
 	gpregs_setpbx(&state->ics_gpregs, (u32)(uintptr_t)user_fpustate);
-	gpregs_setpsi(&state->ics_gpregs, (u32)(uintptr_t)(must_restore_sigmask ? user_sigset : NULL));
+	gpregs_setpsi(&state->ics_gpregs, (u32)(uintptr_t)user_sigset);
 	gpregs_setpdi(&state->ics_gpregs, (u32)(uintptr_t)user_sc_info);
 #endif /* !DEFINE_x86_userexcept_callsignal64 */
 
@@ -452,6 +479,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 #undef LOCAL_siginfo_t
 #undef LOCAL_ucontext_t
 #undef LOCAL_struct_fpustate
+#undef LOCAL_struct_sigset_with_size
 #undef LOCAL_struct_xfpustate
 #undef LOCAL_SIX_USER_MAX_SIZE
 #undef LOCAL_SIX_KERNEL_MAX_SIZE
@@ -470,7 +498,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 #undef LOCAL_ucs_Pip
 #undef LOCAL_kernel_syscall_regcnt
 #undef LOCAL_rpc_syscall_info_encode
-#undef LOCAL_NR_sigreturn
+#undef LOCAL_NR_ksigreturn
 
 DECL_END
 

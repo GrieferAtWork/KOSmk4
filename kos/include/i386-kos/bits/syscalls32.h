@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ebe49cd */
+/* HASH CRC-32:0xe2e63bab */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -250,13 +250,7 @@
 /* Synchronize a file (including its descriptor which contains timestamps, and its size),
  * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
 #define SYS_fsync                        __NR_fsync                        /* errno_t fsync(fd_t fd) */
-/* Restore the specified register state when returning from a signal handler
- * Note that the order and locations of arguments taken by this system  call
- * are of great importance, as they must match what is encoded by the kernel
- * within `userexcept_callsignal()'
- * The order chosen is also important, as it is selected such that arguments
- * are  only  passed   through  registers  that   are  preserved  by   CDECL */
-#define SYS_sigreturn                    __NR_sigreturn                    /* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
+#define SYS_sigreturn                    __NR_sigreturn                    /* void sigreturn(void) */
 #define SYS_clone                        __NR_clone                        /* pid_t clone(syscall_ulong_t flags, void *child_stack, pid_t *ptid, uintptr_t newtls, pid_t *ctid) */
 #define SYS_setdomainname                __NR_setdomainname                /* errno_t setdomainname(char const *name, size_t len) */
 #define SYS_uname                        __NR_uname                        /* errno_t uname(struct utsname *name) */
@@ -385,13 +379,7 @@
  *               of unused, but required trailing 0s in its comment.
  * @return: * :  Return value depends on `command' */
 #define SYS_prctl                        __NR_prctl                        /* syscall_slong_t prctl(unsigned int command, syscall_ulong_t arg2, syscall_ulong_t arg3, syscall_ulong_t arg4, syscall_ulong_t arg5) */
-/* Restore the specified register state when returning from a signal handler
- * Note that the order and locations of arguments taken by this system  call
- * are of great importance, as they must match what is encoded by the kernel
- * within `userexcept_callsignal()'
- * The order chosen is also important, as it is selected such that arguments
- * are  only  passed   through  registers  that   are  preserved  by   CDECL */
-#define SYS_rt_sigreturn                 __NR_rt_sigreturn                 /* void rt_sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
+#define SYS_rt_sigreturn                 __NR_rt_sigreturn                 /* void rt_sigreturn(void) */
 #define SYS_rt_sigaction                 __NR_rt_sigaction                 /* errno_t rt_sigaction(signo_t signo, struct __kernel_sigactionx32 const *act, struct __kernel_sigactionx32 *oact, size_t sigsetsize) */
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 #define SYS_rt_sigprocmask               __NR_rt_sigprocmask               /* errno_t rt_sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset, size_t sigsetsize) */
@@ -1157,6 +1145,14 @@
 #define SYS_kstat                        __NR_kstat                        /* errno_t kstat(char const *filename, struct __kos_statx32 *statbuf) */
 #define SYS_pwrite64f                    __NR_pwrite64f                    /* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
 #define SYS_pread64f                     __NR_pread64f                     /* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
+/* Restore the specified register state when returning from a signal handler
+ * Note that the order and locations of arguments taken by this system  call
+ * are of great importance, as they must match what is encoded by the kernel
+ * within `userexcept_callsignal()'
+ * The order chosen is also important, as it is selected such that arguments
+ * are only passed through registers  that are natively preserved by  signal
+ * handler functions. */
+#define SYS_ksigreturn                   __NR_ksigreturn                   /* void ksigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_with_sizex32 const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
 #define SYS_nanosleep64                  __NR_nanosleep64                  /* errno_t nanosleep64(struct timespecx32_64 const *req, struct timespecx32_64 *rem) */
 /* >> rpc_serve(2)
  * Check for pending signals and RPCs. This is a wrapper around the

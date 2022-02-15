@@ -31,20 +31,18 @@
 
 #include <syscall.h>
 
-#ifdef __x86_64__
-#define SYS_sigreturn SYS_rt_sigreturn
-#else /* __x86_64__ */
-#define syscall       int $0x80
+#ifndef __x86_64__
+#define syscall int $(0x80)
 #endif /* !__x86_64__ */
 
 
 .section .text.crt.sched.signal
 	.cfi_startproc simple
 	.cfi_signal_frame
-	/* %Pbp:        [1..1] struct ucpustate const *restore_cpu  CPU context */
-	/* %Pbx:        [0..1] struct fpustate const *restore_fpu   FPU context */
-	/* [%esi,%r12]: [0..1] sigset_t const *restore_sigmask      Signal mask */
-	/* [%edi,%r13]: [0..1] struct rpc_syscall_info *sc_info     Restartable system call */
+	/* %Pbp:        [1..1] struct ucpustate const        *restore_cpu        CPU context */
+	/* %Pbx:        [0..1] struct fpustate const         *restore_fpu        FPU context */
+	/* [%esi,%r12]: [0..1] struct sigset_with_size const *restore_sigmask    Signal mask */
+	/* [%edi,%r13]: [0..1] struct rpc_syscall_info       *sc_info            Restartable system call */
 	.cfi_def_cfa %Pbp, 0
 	ASM_CFI_REL_OFFSET_RESTORE_UCPUSTATE(0)
 
@@ -212,12 +210,15 @@ print("#endif /" "* !__x86_64__ *" "/");
 
 	nop /* For unwinding... */
 INTERN_FUNCTION(libc_sig_restore)
-	movP  $(SYS_sigreturn), %Pax
+	movP  $(SYS_ksigreturn), %Pax
 	std   /* Enable  exceptions (this syscall shouldn't fail, but
 	       * if it does, it shouldn't return with a normal error,
 	       * but with an exception that  will likely turn into  a
 	       * coredump) */
 	syscall
+
+	/* Really shouldn't get here, but should we ever, intentionally crash */
+	hlt
 END(libc_sig_restore)
 	.cfi_endproc
 

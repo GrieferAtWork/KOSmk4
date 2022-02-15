@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x255ef5d6 */
+/* HASH CRC-32:0x69dabb3e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -980,6 +980,23 @@ __CDECLARE_SC(,__ssize_t,kreaddir,(__fd_t __fd, struct dirent *__buf, __size_t _
  *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
 __CDECLARE_SC(,__ssize_t,kreaddirf,(__fd_t __fd, struct dirent *__buf, __size_t __bufsize, __syscall_ulong_t __mode, __iomode_t __iomode),(__fd,__buf,__bufsize,__mode,__iomode))
 #endif /* __CRT_HAVE_SC(kreaddirf) */
+#if __CRT_HAVE_SC(ksigreturn)
+/* Restore  the  given CPU/FPU  context descriptors,  as  well as  signal mask
+ * before resuming execution by either invoking another system call `sc_info',
+ * which  will then return  to `restore_cpu', or  by directly returning there.
+ * Arguments:
+ *  - %rbp: [1..1] struct ucpustate64 const *restore_cpu;
+ *  - %rbx: [0..1] struct fpustate64 const *restore_fpu;
+ *  - %r12: [0..1] struct __sigset_with_sizex64 const *restore_sigmask;
+ *  - %r13: [0..1] struct rpc_syscall_info64 const *sc_info;
+ * This system call uses a custom calling convention because registers passed
+ * must not get clobbered  during execution of a  normal C function. On  i386
+ * this doesn't require  a custom calling  convention since enough  registers
+ * exist  that are preserved by a C function,  but are still used by at least
+ * one  system call invocation  method. However on  x86_64, no such registers
+ * exist, requiring the use of a custom protocol. */
+__CDECLARE_VOID_SC(,ksigreturn,(void),())
+#endif /* __CRT_HAVE_SC(ksigreturn) */
 #if __CRT_HAVE_SC(kstat)
 __CDECLARE_SC(,__errno_t,kstat,(char const *__filename, struct __kos_statx64 *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_SC(kstat) */
@@ -1637,20 +1654,6 @@ __CDECLARE_SC(,__errno_t,rt_sigprocmask,(__syscall_ulong_t __how, struct __sigse
 __CDECLARE_SC(,__errno_t,rt_sigqueueinfo,(__pid_t __pid, __signo_t __usigno, struct __siginfox64_struct const *__uinfo),(__pid,__usigno,__uinfo))
 #endif /* __CRT_HAVE_SC(rt_sigqueueinfo) */
 #if __CRT_HAVE_SC(rt_sigreturn)
-/* Restore  the  given CPU/FPU  context descriptors,  as  well as  signal mask
- * before resuming execution by either invoking another system call `sc_info',
- * which  will then return  to `restore_cpu', or  by directly returning there.
- * Arguments:
- *  - %rbp: [1..1] struct ucpustate64 const *restore_cpu;
- *  - %rbx: [0..1] struct fpustate64 const *restore_fpu;
- *  - %r12: [0..1] sigset_t const *restore_sigmask;
- *  - %r13: [0..1] struct rpc_syscall_info64 const *sc_info;
- * This system call uses a custom calling convention because registers passed
- * must not get clobbered  during execution of a  normal C function. On  i386
- * this doesn't require  a custom calling  convention since enough  registers
- * exist  that are preserved by a C function,  but are still used by at least
- * one  system call invocation  method. However on  x86_64, no such registers
- * exist, requiring the use of a custom protocol. */
 __CDECLARE_VOID_SC(,rt_sigreturn,(void),())
 #endif /* __CRT_HAVE_SC(rt_sigreturn) */
 #if __CRT_HAVE_SC(rt_sigsuspend)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9455167e */
+/* HASH CRC-32:0xfae6f98e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -316,7 +316,7 @@
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
 #define SYS_rt_sigqueueinfo        __NR_rt_sigqueueinfo        /* errno_t rt_sigqueueinfo(pid_t pid, signo_t usigno, struct __siginfo_struct const *uinfo) */
-#define SYS_rt_sigreturn           __NR_rt_sigreturn           /* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info const *sc_info, struct ucpustate const *restore_cpu) */
+#define SYS_rt_sigreturn           __NR_rt_sigreturn           /* void rt_sigreturn(void) */
 /* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */
 #define SYS_setpriority            __NR_setpriority            /* errno_t setpriority(syscall_ulong_t which, id_t who, syscall_ulong_t value) */
 /* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */

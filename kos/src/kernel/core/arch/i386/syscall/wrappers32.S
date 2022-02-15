@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6bc6518 */
+/* HASH CRC-32:0x4ac792b0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4502,13 +4502,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsync)
 	.cfi_endproc
 END(__x86_asm32_int80_fsync)
 
-/* Restore the specified register state when returning from a signal handler
- * Note that the order and locations of arguments taken by this system  call
- * are of great importance, as they must match what is encoded by the kernel
- * within `userexcept_callsignal()'
- * The order chosen is also important, as it is selected such that arguments
- * are  only  passed   through  registers  that   are  preserved  by   CDECL */
-/* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
+/* void sigreturn(void) */
 .section .text.x86.asm32_syscall_int80.sigreturn
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigreturn)
 	.cfi_startproc simple
@@ -4527,19 +4521,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigreturn)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ebp  /* Arg #5 */
-	pushl_cfi_r %edi  /* Arg #4 */
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
 	EXTERN(sys_sigreturn)
 	call   sys_sigreturn
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $(12), %esp
-	.cfi_adjust_cfa_offset -12
+	popl_cfi_r %ecx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -6594,13 +6581,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_prctl)
 	.cfi_endproc
 END(__x86_asm32_int80_prctl)
 
-/* Restore the specified register state when returning from a signal handler
- * Note that the order and locations of arguments taken by this system  call
- * are of great importance, as they must match what is encoded by the kernel
- * within `userexcept_callsignal()'
- * The order chosen is also important, as it is selected such that arguments
- * are  only  passed   through  registers  that   are  preserved  by   CDECL */
-/* void rt_sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
+/* void rt_sigreturn(void) */
 .section .text.x86.asm32_syscall_int80.rt_sigreturn
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigreturn)
 	.cfi_startproc simple
@@ -6619,19 +6600,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigreturn)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ebp  /* Arg #5 */
-	pushl_cfi_r %edi  /* Arg #4 */
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
 	EXTERN(sys_rt_sigreturn)
 	call   sys_rt_sigreturn
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $(12), %esp
-	.cfi_adjust_cfa_offset -12
+	popl_cfi_r %ecx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -17452,6 +17426,55 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pread64f)
 	.cfi_endproc
 END(__x86_asm32_int80_pread64f)
 
+/* Restore the specified register state when returning from a signal handler
+ * Note that the order and locations of arguments taken by this system  call
+ * are of great importance, as they must match what is encoded by the kernel
+ * within `userexcept_callsignal()'
+ * The order chosen is also important, as it is selected such that arguments
+ * are only passed through registers  that are natively preserved by  signal
+ * handler functions. */
+/* void ksigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_with_sizex32 const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
+.section .text.x86.asm32_syscall_int80.ksigreturn
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_ksigreturn)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffff53
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ebp  /* Arg #5 */
+	pushl_cfi_r %edi  /* Arg #4 */
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_ksigreturn)
+	call   sys_ksigreturn
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	addl   $(12), %esp
+	.cfi_adjust_cfa_offset -12
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_ksigreturn)
+
 /* errno_t nanosleep64(struct timespecx32_64 const *req, struct timespecx32_64 *rem) */
 .section .text.x86.asm32_syscall_int80.nanosleep64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_nanosleep64)
@@ -23940,13 +23963,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fsync)
 	.cfi_endproc
 END(__x86_asm32_sysenter_fsync)
 
-/* Restore the specified register state when returning from a signal handler
- * Note that the order and locations of arguments taken by this system  call
- * are of great importance, as they must match what is encoded by the kernel
- * within `userexcept_callsignal()'
- * The order chosen is also important, as it is selected such that arguments
- * are  only  passed   through  registers  that   are  preserved  by   CDECL */
-/* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
+/* void sigreturn(void) */
 .section .text.x86.asm32_syscall_sysenter.sigreturn
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigreturn)
 	.cfi_startproc simple
@@ -23965,21 +23982,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigreturn)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNELSPACE_BASE), %ebp
-	jae    __asm32_bad_sysenter_extension
-	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
-	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
 	EXTERN(sys_sigreturn)
 	call   sys_sigreturn
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $(12), %esp
-	.cfi_adjust_cfa_offset -12
+	popl_cfi_r %ecx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -26044,13 +26052,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_prctl)
 	.cfi_endproc
 END(__x86_asm32_sysenter_prctl)
 
-/* Restore the specified register state when returning from a signal handler
- * Note that the order and locations of arguments taken by this system  call
- * are of great importance, as they must match what is encoded by the kernel
- * within `userexcept_callsignal()'
- * The order chosen is also important, as it is selected such that arguments
- * are  only  passed   through  registers  that   are  preserved  by   CDECL */
-/* void rt_sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
+/* void rt_sigreturn(void) */
 .section .text.x86.asm32_syscall_sysenter.rt_sigreturn
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_sigreturn)
 	.cfi_startproc simple
@@ -26069,21 +26071,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_sigreturn)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNELSPACE_BASE), %ebp
-	jae    __asm32_bad_sysenter_extension
-	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
-	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
 	EXTERN(sys_rt_sigreturn)
 	call   sys_rt_sigreturn
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $(12), %esp
-	.cfi_adjust_cfa_offset -12
+	popl_cfi_r %ecx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -36995,6 +36988,57 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pread64f)
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
 END(__x86_asm32_sysenter_pread64f)
+
+/* Restore the specified register state when returning from a signal handler
+ * Note that the order and locations of arguments taken by this system  call
+ * are of great importance, as they must match what is encoded by the kernel
+ * within `userexcept_callsignal()'
+ * The order chosen is also important, as it is selected such that arguments
+ * are only passed through registers  that are natively preserved by  signal
+ * handler functions. */
+/* void ksigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_with_sizex32 const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
+.section .text.x86.asm32_syscall_sysenter.ksigreturn
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ksigreturn)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xffffff53
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	cmpl   $(KERNELSPACE_BASE), %ebp
+	jae    __asm32_bad_sysenter_extension
+	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
+	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_ksigreturn)
+	call   sys_ksigreturn
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	addl   $(12), %esp
+	.cfi_adjust_cfa_offset -12
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_ksigreturn)
 
 /* errno_t nanosleep64(struct timespecx32_64 const *req, struct timespecx32_64 *rem) */
 .section .text.x86.asm32_syscall_sysenter.nanosleep64

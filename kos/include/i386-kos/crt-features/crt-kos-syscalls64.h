@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff0b1a5b */
+/* HASH CRC-32:0x924be409 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -172,6 +172,7 @@
 #define __CRT_HAVE_sys_klstat
 #define __CRT_HAVE_sys_kreaddir
 #define __CRT_HAVE_sys_kreaddirf
+#define __CRT_HAVE_sys_ksigreturn
 #define __CRT_HAVE_sys_kstat
 #define __CRT_HAVE_sys_ksysctl
 #define __CRT_HAVE_sys_lchown

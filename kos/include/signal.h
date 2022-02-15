@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15c96854 */
+/* HASH CRC-32:0xaf8230b2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -335,12 +335,8 @@ __SYSDECL_BEGIN
 
 #ifdef __USE_KOS_KERNEL
 #if !defined(SA_RESTORER) && defined(__SA_RESTORER)
-#define SA_RESTORER __SA_RESTORER /* A custom signal restore function (`sa_restorer') was given.
-                                   * This flag is set by libc, after having filled in the `sa_restorer' field.
-                                   * NOTE: On x86, the kernel assumes that this points to a function:
-                                   * >> sa_restorer:
-                                   * >>     movl   $SYS_sigreturn, %eax
-                                   * >>     int    $0x80 */
+#define SA_RESTORER __SA_RESTORER /* A custom  signal restore  function (`sa_restorer')  was given.  This
+                                   * flag is set by libc, after having filled in the `sa_restorer' field. */
 #endif /* !SA_RESTORER && __SA_RESTORER */
 #endif /* __USE_KOS_KERNEL */
 

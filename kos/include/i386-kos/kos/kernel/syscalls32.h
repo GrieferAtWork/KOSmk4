@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc4fd5b0 */
+/* HASH CRC-32:0xccb15ed3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -205,6 +205,7 @@
 #define __ARCH_WANT_SYSCALL_KLSTAT
 #define __ARCH_WANT_SYSCALL_KREADDIR
 #define __ARCH_WANT_SYSCALL_KREADDIRF
+#define __ARCH_WANT_SYSCALL_KSIGRETURN
 #define __ARCH_WANT_SYSCALL_KSTAT
 #define __ARCH_WANT_SYSCALL_KSYSCTL
 #define __ARCH_WANT_SYSCALL_LCHOWN
