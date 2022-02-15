@@ -168,10 +168,21 @@ print("#endif /" "* ... *" "/");
 
 
 
-/* [1..1][lock(READ(ATOMIC), WRITE(THIS_TASK))]
+/* [lock(READ(ATOMIC), WRITE(THIS_TASK))]
  * Reference to the signal mask (set of signals being blocked) in the  current
  * thread. The pointed-to object is meaningless (but must still be valid) when
- * the associated thread make use of userprocmask. */
+ * the associated thread make use of userprocmask.
+ *
+ * WARNING: This signal set must  _NEVER_ contain `SIGKILL' or  `SIGSTOP'.
+ *          Not when `TASK_USERPROCMASK' is set, and neither for only just
+ *          a couple of moments. -- NO EXCEPTIONS!
+ * Furthermore, this set may not contain garbage when `TASK_USERPROCMASK'
+ * is set. Instead, in this case  it must contain the last-active  signal
+ * mask prior to the calling thread activating `TASK_USERPROCMASK'.  This
+ * is needed so that after  checking that `TASK_USERPROCMASK' isn't  set,
+ * any  thread can safely read from this  set with the knowledge that any
+ * unmasked signal was masked at  the time of the of  `TASK_USERPROCMASK'
+ * not having been set, or has since become masked by the thread  itself. */
 PUBLIC ATTR_PERTASK ATTR_ALIGN(sigset_t)
 this_kernel_sigmask = SIGSET_INIT_EMPTY;
 

@@ -27,54 +27,6 @@
  *    - struct ucontext { ... };
  */
 
-#include <__stdinc.h>
-
-#include <hybrid/typecore.h>
-
-#include <bits/os/mcontext.h> /* struct mcontext */
-#include <bits/os/sigset.h>   /* struct __sigset_struct */
-#include <bits/os/sigstack.h> /* struct sigaltstack */
-
-#ifndef __ALIGNOF_UCONTEXT
-#if defined(__ALIGNOF_MCONTEXT) && (__ALIGNOF_MCONTEXT > __SIZEOF_POINTER__)
-#define __ALIGNOF_UCONTEXT __ALIGNOF_MCONTEXT
-#else /* __ALIGNOF_MCONTEXT */
-#define __ALIGNOF_UCONTEXT __SIZEOF_POINTER__
-#endif /* !__ALIGNOF_MCONTEXT */
-#endif /* !__ALIGNOF_UCONTEXT */
-
-#define __OFFSET_UCONTEXT_MCONTEXT 0
-#if (__SIZEOF_MCONTEXT % __ALIGNOF_SIGSET_T__) == 0
-#define __OFFSET_UCONTEXT_SIGMASK  __SIZEOF_MCONTEXT
-#else /*  (__SIZEOF_MCONTEXT % __ALIGNOF_SIGSET_T__) == 0 */
-#define __OFFSET_UCONTEXT_SIGMASK  (__SIZEOF_MCONTEXT + __ALIGNOF_SIGSET_T__ - (__SIZEOF_MCONTEXT % __ALIGNOF_SIGSET_T__))
-#endif /* (__SIZEOF_MCONTEXT % __ALIGNOF_SIGSET_T__) != 0 */
-#define __OFFSET_UCONTEXT_STACK     (__OFFSET_UCONTEXT_SIGMASK + __SIZEOF_SIGSET_T__)
-#define __OFFSET_UCONTEXT_LINK      (__OFFSET_UCONTEXT_SIGMASK + __SIZEOF_SIGSET_T__ + __SIZEOF_SIGALTSTACK)
-#define __OFFSETAFTER_UCONTEXT_LINK (__OFFSET_UCONTEXT_SIGMASK + __SIZEOF_SIGSET_T__ + __SIZEOF_SIGALTSTACK + __SIZEOF_POINTER__)
-
-#ifndef __SIZEOF_UCONTEXT
-#define __SIZEOF_UCONTEXT __OFFSETAFTER_UCONTEXT_LINK
-#endif /* !__SIZEOF_UCONTEXT */
-
-#ifdef __CC__
-__DECL_BEGIN
-
-struct __ATTR_ALIGNED(__ALIGNOF_UCONTEXT) ucontext /*[NAME(ucontext)][PREFIX(uc_)]*/ {
-	/* Userlevel context. */
-	struct mcontext        uc_mcontext;
-#if (__SIZEOF_MCONTEXT % __ALIGNOF_SIGSET_T__) != 0
-	__BYTE_TYPE__        __uc_pad[__ALIGNOF_SIGSET_T__ - (__SIZEOF_MCONTEXT % __ALIGNOF_SIGSET_T__)];
-#endif /* (__SIZEOF_MCONTEXT % __ALIGNOF_SIGSET_T__) != 0 */
-	struct __sigset_struct uc_sigmask;
-	struct sigaltstack     uc_stack;
-	struct ucontext       *uc_link;
-#if __SIZEOF_UCONTEXT > __OFFSETAFTER_UCONTEXT_LINK
-	__BYTE_TYPE__        __uc_tailblob[__SIZEOF_UCONTEXT - __OFFSETAFTER_UCONTEXT_LINK];
-#endif /* __SIZEOF_UCONTEXT > __OFFSETAFTER_UCONTEXT_LINK */
-};
-
-__DECL_END
-#endif /* __CC__ */
+#include <bits/os/generic/ucontext.h>
 
 #endif /* !_BITS_OS_UCONTEXT_H */

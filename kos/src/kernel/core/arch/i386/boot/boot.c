@@ -904,9 +904,32 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       the current copy-on-write system.
 	 *
 	 * TODO: Systems that still need to be updated:
-	 * - sys_sigreturn(2)      (why do we even have this? This is one of those syscalls that aren't even linux-compatible...)
-	 * - sys_rt_sigreturn(2)   (needs another argument that specifies sizeof(sigset_t))
-	 * - SA_SIGINFO-signal-handler (struct ucontext::uc_sigmask) */
+	 * - sigreturn:
+	 *   - sys_sigreturn(2)      (why do we even have this? This is one of those syscalls that aren't even linux-compatible...)
+	 *   - sys_rt_sigreturn(2)   (needs another argument that specifies sizeof(sigset_t))
+	 *   Simply get rid of these 2 system calls and replace them
+	 *   with  a new, KOS-specific system call `sys_ksigreturn',
+	 *   that fulfills the same job without ruining future linux
+	 *   compatibility.
+	 * - SA_SIGINFO-signal-handler (struct  ucontext::uc_sigmask)
+	 *   For this purpose, refactor `struct ucontext' to move its
+	 *   sigmask member to be at the tail of the structure.
+	 *   - Also, for forward compatibility, add a KOS-specific field
+	 *     just  before the trailing  sigmask member which indicates
+	 *     the size of the following sigset. That way, future  state
+	 *     fields can got to `offsetof(uc_sigmask) + _uc_sigsize'
+	 *   - This field will be unused by getcontext(3) and friends,
+	 *     but `sys_ksigreturn(2)' takes a pointer to it in  place
+	 *     of its `sigmask' argument, which will be typed as a new
+	 *     struct:
+	 *     >> struct __sigset_with_size_struct {
+	 *     >>     size_t   sws_setsize; // == sizeof(sigset_t)
+	 *     >>     sigset_t sws_sigmask;
+	 *     >> };
+	 *
+	 */
+
+	/* TODO: Add missing header <nl_types.h> (and include it in <langinfo.h>) */
 
 	return state;
 }
