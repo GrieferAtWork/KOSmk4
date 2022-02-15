@@ -1,3 +1,4 @@
+/* HASH CRC-32:0xf313e697 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,14 +18,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: diet libc (/include/asm/prctl.h) */
-#ifndef _I386_KOS_ASM_PRCTL_H
-#define _I386_KOS_ASM_PRCTL_H 1
+#ifndef GUARD_LIBC_AUTO_NL_TYPES_H
+#define GUARD_LIBC_AUTO_NL_TYPES_H 1
 
-#include <__stdinc.h>
+#include "../api.h"
 
-#if defined(__KOS__) || defined(__linux__)
-#include <asm/os/kos/prctl.h>
-#endif /* __KOS__ || __linux__ */
+#include <hybrid/typecore.h>
+#include <kos/types.h>
+#include <nl_types.h>
 
-#endif /* !_I386_KOS_ASM_PRCTL_H */
+DECL_BEGIN
+
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF NONNULL((1)) nl_catd NOTHROW_RPC(LIBDCALL libd_catopen)(char const *cat_name, int flag);
+INTDEF NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_catgets)(nl_catd catalog, int set, int number, char const *string);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_catclose)(nl_catd catalog);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+
+DECL_END
+
+#endif /* !GUARD_LIBC_AUTO_NL_TYPES_H */

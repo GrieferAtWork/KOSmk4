@@ -1964,6 +1964,9 @@
 #define __CRT_HAVE_catanhf
 #define __CRT_HAVE_catanhl
 #define __CRT_HAVE_catanl
+#define __CRT_HAVE_catclose
+#define __CRT_HAVE_catgets
+#define __CRT_HAVE_catopen
 #define __CRT_HAVE_cbrt
 #define __CRT_HAVE_cbrtf
 #define __CRT_HAVE_cbrtl

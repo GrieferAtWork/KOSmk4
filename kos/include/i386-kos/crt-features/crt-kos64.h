@@ -1782,6 +1782,9 @@
 #define __CRT_HAVE_catanhf
 #define __CRT_HAVE_catanhl
 #define __CRT_HAVE_catanl
+#define __CRT_HAVE_catclose
+#define __CRT_HAVE_catgets
+#define __CRT_HAVE_catopen
 #define __CRT_HAVE_cbrt
 #define __CRT_HAVE_cbrtf
 #define __CRT_HAVE_cbrtl
@@ -6939,6 +6942,9 @@
 #define __CRT_HAVE_KOS$catanhf
 #define __CRT_HAVE_KOS$catanhl
 #define __CRT_HAVE_KOS$catanl
+#define __CRT_HAVE_KOS$catclose
+#define __CRT_HAVE_KOS$catgets
+#define __CRT_HAVE_KOS$catopen
 #define __CRT_HAVE_KOS$cbrt
 #define __CRT_HAVE_KOS$cbrtf
 #define __CRT_HAVE_KOS$cbrtl
@@ -10935,6 +10941,9 @@
 #define __CRT_HAVE_DOS$catanhf
 #define __CRT_HAVE_DOS$catanhl
 #define __CRT_HAVE_DOS$catanl
+#define __CRT_HAVE_DOS$catclose
+#define __CRT_HAVE_DOS$catgets
+#define __CRT_HAVE_DOS$catopen
 #define __CRT_HAVE_DOS$cbrt
 #define __CRT_HAVE_DOS$cbrtf
 #define __CRT_HAVE_DOS$cbrtl

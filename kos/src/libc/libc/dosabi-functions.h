@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1894a22 */
+/* HASH CRC-32:0xbd426686 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -891,6 +891,11 @@ DFUN(".text.crt.dos.net.inet.6.ipv4_source_filter", libd_getipv4sourcefilter, li
 DFUN(".text.crt.dos.net.inet.6.ipv4_source_filter", libd_setipv4sourcefilter, libc_setipv4sourcefilter, TD, 6, TIn(__SIZEOF_FD_T__), TS(__SIZEOF_IN_ADDR), TS(__SIZEOF_IN_ADDR), TI32, TI32, TP)
 DFUN(".text.crt.dos.net.inet.6.source_filter", libd_getsourcefilter, libc_getsourcefilter, TD, 7, TIn(__SIZEOF_FD_T__), TI32, TP, TIn(__SIZEOF_SOCKLEN_T__), TP, TP, TP)
 DFUN(".text.crt.dos.net.inet.6.source_filter", libd_setsourcefilter, libc_setsourcefilter, TD, 7, TIn(__SIZEOF_FD_T__), TI32, TP, TIn(__SIZEOF_SOCKLEN_T__), TI32, TI32, TP)
+
+/* nl_types */
+DFUN(".text.crt.dos.heap.malloc", libd_catopen, libc_catopen, TP, 2, TP, TD)
+DFUN(".text.crt.dos.heap.malloc", libd_catgets, libc_catgets, TP, 4, TP, TD, TD, TP)
+DFUN(".text.crt.dos.heap.malloc", libd_catclose, libc_catclose, TD, 1, TP)
 
 /* process */
 DFUN(".text.crt.dos.sched.thread", libd__beginthread, libc__beginthread, TP, 3, TP, TI32, TP)

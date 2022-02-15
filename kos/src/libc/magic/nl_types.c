@@ -17,14 +17,48 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: diet libc (/include/asm/prctl.h) */
-#ifndef _I386_KOS_ASM_PRCTL_H
-#define _I386_KOS_ASM_PRCTL_H 1
+%(c_prefix){
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/nl_types.h) */
+/* (#) Portability: FreeBSD       (/include/nl_types.h) */
+/* (#) Portability: GNU C Library (/catgets/nl_types.h) */
+/* (#) Portability: NetBSD        (/include/nl_types.h) */
+/* (#) Portability: OpenBSD       (/include/nl_types.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/nl_types.h) */
+/* (#) Portability: diet libc     (/include/nl_types.h) */
+/* (#) Portability: libc4/5       (/include/nl_types.h) */
+/* (#) Portability: libc6         (/include/nl_types.h) */
+/* (#) Portability: musl libc     (/include/nl_types.h) */
+/* (#) Portability: uClibc        (/include/nl_types.h) */
+}
 
-#include <__stdinc.h>
+%[define_replacement(locale_t = __locale_t)]
+%[default:section(".text.crt.dos.heap.malloc")]
 
-#if defined(__KOS__) || defined(__linux__)
-#include <asm/os/kos/prctl.h>
-#endif /* __KOS__ || __linux__ */
+%[insert:prefix(
+#include <features.h>
+)]%{
 
-#endif /* !_I386_KOS_ASM_PRCTL_H */
+#define NL_SETD 1
+#define NL_CAT_LOCALE 1
+
+#ifdef __CC__
+__SYSDECL_BEGIN
+
+typedef void *nl_catd;
+typedef int nl_item;
+
+}
+
+%[define_replacement(nl_catd = "void *")]
+%[define_replacement(nl_item = "int")]
+
+[[cp]] nl_catd catopen([[nonnull]] char const *cat_name, int flag);
+char *catgets([[nonnull]] nl_catd catalog, int set, int number, char const *string);
+int catclose([[nonnull]] nl_catd catalog);
+
+%{
+
+__SYSDECL_END
+#endif /* __CC__ */
+
+}

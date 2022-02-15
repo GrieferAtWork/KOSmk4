@@ -110,7 +110,7 @@ NOTHROW(FCALL libc_stack_failure_core)(struct kcpustate *__restrict state) {
  * set, raise that signal at the given `state' */
 PRIVATE ATTR_NOINLINE ATTR_SECTION(".text.crt.assert") NONNULL((1)) void FCALL
 maybe_raise_SIGABRT(struct kcpustate *__restrict state) {
-	struct sigaction sa;
+	struct __kernel_sigaction sa;
 	struct ucpustate uc;
 	struct rpc_syscall_info sc_info;
 	siginfo_t si;

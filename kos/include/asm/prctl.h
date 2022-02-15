@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: diet libc (/include/asm/prctl.h) */
 #ifndef _ASM_PRCTL_H
 #define _ASM_PRCTL_H 1
 

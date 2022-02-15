@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50581a75 */
+/* HASH CRC-32:0xc851ffdc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -162,6 +162,9 @@
 #define __stub_catanhf
 #define __stub_catanhl
 #define __stub_catanl
+#define __stub_catclose
+#define __stub_catgets
+#define __stub_catopen
 #define __stub_ccos
 #define __stub_ccosf
 #define __stub_ccosh

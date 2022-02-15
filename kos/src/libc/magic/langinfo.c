@@ -37,6 +37,8 @@
 #include <features.h>
 )]%[insert:prefix(
 #include <asm/crt/langinfo.h>
+)]%[insert:prefix(
+#include <nl_types.h>
 )]%{
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>

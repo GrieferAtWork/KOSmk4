@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62dc9f7c */
+/* HASH CRC-32:0x37dd1fc5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -790,6 +790,9 @@
 #define __CRT_HAVE_DOS$catanhf
 #define __CRT_HAVE_DOS$catanhl
 #define __CRT_HAVE_DOS$catanl
+#define __CRT_HAVE_DOS$catclose
+#define __CRT_HAVE_DOS$catgets
+#define __CRT_HAVE_DOS$catopen
 #define __CRT_HAVE_DOS$cbrt
 #define __CRT_HAVE_DOS$cbrtf
 #define __CRT_HAVE_DOS$cbrtl
@@ -4338,6 +4341,9 @@
 #define __CRT_HAVE_catanhf
 #define __CRT_HAVE_catanhl
 #define __CRT_HAVE_catanl
+#define __CRT_HAVE_catclose
+#define __CRT_HAVE_catgets
+#define __CRT_HAVE_catopen
 #define __CRT_HAVE_cbrt
 #define __CRT_HAVE_cbrtf
 #define __CRT_HAVE_cbrtl

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe8220db */
+/* HASH CRC-32:0x49d8bd49 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,6 +41,7 @@
 
 #include <features.h>
 #include <asm/crt/langinfo.h>
+#include <nl_types.h>
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 */
