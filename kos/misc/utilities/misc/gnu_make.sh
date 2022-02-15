@@ -730,7 +730,8 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 
 			# Auto-configure a custom config.site for ./configure
 			if ! test -z "$PACKAGE_CONFIG_SITE"; then
-				CONFIG_SITE="$PACKAGE_CONFIG_SITE\n$CONFIG_SITE"
+				CONFIG_SITE="$PACKAGE_CONFIG_SITE
+$CONFIG_SITE"
 				if ! test -z "$CONFIG_SITE"; then
 					echo "Using given \$PACKAGE_CONFIG_SITE and \$CONFIG_SITE options:"
 					while IFS= read -r line; do
@@ -758,7 +759,8 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 							#          what we're capable of via a custom config.site entry.
 							if ! [[ "$CONFIG_SITE" == *ac_cv_func_mmap_fixed_mapped* ]]; then
 								echo "	config.site: ac_cv_func_mmap_fixed_mapped=yes"
-								CONFIG_SITE="ac_cv_func_mmap_fixed_mapped=yes\n$CONFIG_SITE"
+								CONFIG_SITE="ac_cv_func_mmap_fixed_mapped=yes
+$CONFIG_SITE"
 							fi
 							;;
 

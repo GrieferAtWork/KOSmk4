@@ -20,7 +20,7 @@
 # Helpers to automatically install files from $DESTDIR to disk
 # Variables:
 #   $INSTALL_NONE:      If non-empty, don't install anything
-#   $DESTDIR:           Path to files that should be installed
+#   $DESTDIR:           Sysroot of files that should be installed
 #   $INSTALL_SKIP:      Space-seperated list of files to never install
 #   $PACKAGE_*:         Generic package information variables
 
