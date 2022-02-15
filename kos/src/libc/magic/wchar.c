@@ -323,16 +323,19 @@ size_t mbrtowc([[nullable]] wchar_t *pwc,
                [[inp_opt(maxlen)]] char const *__restrict str, size_t maxlen,
                [[nullable]] mbstate_t *mbs) {
 	size_t error;
-	if (!mbs) {
+	wchar_t fallback_wc;
+	if (mbs == NULL) {
 		static mbstate_t mbrtowc_ps = __MBSTATE_INIT;
 		mbs = &mbrtowc_ps;
 	}
-	if (!str) {
+	if (str == NULL) {
 		mbstate_init(mbs);
 		return 0;
 	}
-	if (!maxlen || !*str)
+	if (maxlen == 0 || *str == '\0')
 		return 0;
+	if unlikely(pwc == NULL)
+		pwc = &fallback_wc;
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
 	error = unicode_c8toc16((char16_t *)pwc, str, maxlen, mbs);
 @@pp_else@@

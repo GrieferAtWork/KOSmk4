@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41e62453 */
+/* HASH CRC-32:0x17c5a62f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,16 +52,19 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(mbrtowc) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbrtowc))(__WCHAR_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, struct __mbstate *__mbs) {
 	__SIZE_TYPE__ __error;
-	if (!__mbs) {
+	__WCHAR_TYPE__ __fallback_wc;
+	if (__mbs == __NULLPTR) {
 		static struct __mbstate __mbrtowc_ps = __MBSTATE_INIT;
 		__mbs = &__mbrtowc_ps;
 	}
-	if (!__str) {
+	if (__str == __NULLPTR) {
 		__mbstate_init(__mbs);
 		return 0;
 	}
-	if (!__maxlen || !*__str)
+	if (__maxlen == 0 || *__str == '\0')
 		return 0;
+	if __unlikely(__pwc == __NULLPTR)
+		__pwc = &__fallback_wc;
 #if __SIZEOF_WCHAR_T__ == 2
 	__error = (__NAMESPACE_LOCAL_SYM __localdep_unicode_c8toc16)((__CHAR16_TYPE__ *)__pwc, __str, __maxlen, __mbs);
 #else /* __SIZEOF_WCHAR_T__ == 2 */

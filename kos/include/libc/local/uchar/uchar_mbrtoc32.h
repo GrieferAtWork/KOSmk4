@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb32ddcd5 */
+/* HASH CRC-32:0x498b9eee */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,16 +52,19 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(uchar_mbrtoc32) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(uchar_mbrtoc32))(__CHAR32_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, struct __mbstate *__mbs) {
 	__SIZE_TYPE__ __error;
-	if (!__mbs) {
+	__CHAR32_TYPE__ __fallback_wc;
+	if (__mbs == __NULLPTR) {
 		static struct __mbstate __mbrtowc_ps = __MBSTATE_INIT;
 		__mbs = &__mbrtowc_ps;
 	}
-	if (!__str) {
+	if (__str == __NULLPTR) {
 		__mbstate_init(__mbs);
 		return 0;
 	}
-	if (!__maxlen || !*__str)
+	if (__maxlen == 0 || *__str == '\0')
 		return 0;
+	if __unlikely(__pwc == __NULLPTR)
+		__pwc = &__fallback_wc;
 
 
 

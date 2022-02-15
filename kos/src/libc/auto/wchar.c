@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d4c115e */
+/* HASH CRC-32:0xb75f5b64 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -148,16 +148,19 @@ NOTHROW_NCX(LIBDCALL libd_mbrtowc)(char16_t *pwc,
                                    size_t maxlen,
                                    mbstate_t *mbs) {
 	size_t error;
-	if (!mbs) {
+	char16_t fallback_wc;
+	if (mbs == NULL) {
 		static mbstate_t mbrtowc_ps = __MBSTATE_INIT;
 		mbs = &mbrtowc_ps;
 	}
-	if (!str) {
+	if (str == NULL) {
 		mbstate_init(mbs);
 		return 0;
 	}
-	if (!maxlen || !*str)
+	if (maxlen == 0 || *str == '\0')
 		return 0;
+	if unlikely(pwc == NULL)
+		pwc = &fallback_wc;
 
 	error = libc_unicode_c8toc16((char16_t *)pwc, str, maxlen, mbs);
 
@@ -177,16 +180,19 @@ NOTHROW_NCX(LIBKCALL libc_mbrtowc)(char32_t *pwc,
                                    size_t maxlen,
                                    mbstate_t *mbs) {
 	size_t error;
-	if (!mbs) {
+	char32_t fallback_wc;
+	if (mbs == NULL) {
 		static mbstate_t mbrtowc_ps = __MBSTATE_INIT;
 		mbs = &mbrtowc_ps;
 	}
-	if (!str) {
+	if (str == NULL) {
 		mbstate_init(mbs);
 		return 0;
 	}
-	if (!maxlen || !*str)
+	if (maxlen == 0 || *str == '\0')
 		return 0;
+	if unlikely(pwc == NULL)
+		pwc = &fallback_wc;
 
 
 
