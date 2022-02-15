@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe36d149 */
+/* HASH CRC-32:0x2ebe49cd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -703,7 +703,7 @@
 /* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
  * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
 #define SYS_faccessat                    __NR_faccessat                    /* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
-#define SYS_pselect6                     __NR_pselect6                     /* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32 const *timeout, void const *sigmask_sigset_and_len) */
+#define SYS_pselect6                     __NR_pselect6                     /* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32 const *timeout, struct __sigset_with_sizex32 const *sigmask_sigset_with_size) */
 #define SYS_ppoll                        __NR_ppoll                        /* ssize_t ppoll(struct pollfd *fds, size_t nfds, struct timespecx32 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
 /* param: what: Set of `CLONE_*' */
 #define SYS_unshare                      __NR_unshare                      /* errno_t unshare(syscall_ulong_t what) */
@@ -1055,7 +1055,7 @@
 #define SYS_timerfd_settime64            __NR_timerfd_settime64            /* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 #define SYS_utimensat_time64             __NR_utimensat_time64             /* errno_t utimensat_time64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
-#define SYS_pselect6_time64              __NR_pselect6_time64              /* ssize_t pselect6_time64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
+#define SYS_pselect6_time64              __NR_pselect6_time64              /* ssize_t pselect6_time64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, struct __sigset_with_sizex32 const *sigmask_sigset_with_size) */
 #define SYS_ppoll_time64                 __NR_ppoll_time64                 /* ssize_t ppoll_time64(struct pollfd *fds, size_t nfds, struct timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
 #define SYS_io_pgetevents_time64         __NR_io_pgetevents_time64         /* errno_t io_pgetevents_time64(int TODO_PROTOTYPE) */
 /* Same as `recvmsg(2)', but may be used to receive many

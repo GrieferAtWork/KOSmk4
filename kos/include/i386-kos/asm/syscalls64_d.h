@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13f39255 */
+/* HASH CRC-32:0x24507b29 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -760,7 +760,7 @@
 /* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
  * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
 #define __NR64_faccessat                0x10d                          /* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
-#define __NR64_pselect6                 0x10e                          /* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx64 const *timeout, void const *sigmask_sigset_and_len) */
+#define __NR64_pselect6                 0x10e                          /* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx64 const *timeout, struct __sigset_with_sizex64 const *sigmask_sigset_with_size) */
 #define __NR64_ppoll                    0x10f                          /* ssize_t ppoll(struct pollfd *fds, size_t nfds, struct timespecx64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
 /* param: what: Set of `CLONE_*' */
 #define __NR64_unshare                  0x110                          /* errno_t unshare(syscall_ulong_t what) */

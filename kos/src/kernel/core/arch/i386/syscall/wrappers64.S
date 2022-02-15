@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbb7dd93 */
+/* HASH CRC-32:0x85941dfc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -8650,7 +8650,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_faccessat)
 	.cfi_endproc
 END(__x86_asm64_syscall_faccessat)
 
-/* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx64 const *timeout, void const *sigmask_sigset_and_len) */
+/* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx64 const *timeout, struct __sigset_with_sizex64 const *sigmask_sigset_with_size) */
 .section .text.x86.asm64_syscall.pselect6
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pselect6)
 	.cfi_startproc simple
@@ -20689,7 +20689,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_faccessat)
 	.cfi_endproc
 END(__x86_asm32_int80_faccessat)
 
-/* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32 const *timeout, void const *sigmask_sigset_and_len) */
+/* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32 const *timeout, struct __sigset_with_sizex32 const *sigmask_sigset_with_size) */
 .section .text.x86.asm32_syscall_int80.pselect6
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_pselect6)
 	.cfi_startproc simple
@@ -23438,7 +23438,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimensat_time64)
 	.cfi_endproc
 END(__x86_asm32_int80_utimensat_time64)
 
-/* ssize_t pselect6_time64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
+/* ssize_t pselect6_time64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, struct __sigset_with_sizex32 const *sigmask_sigset_with_size) */
 .section .text.x86.asm32_syscall_int80.pselect6_time64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_pselect6_time64)
 	.cfi_startproc simple
@@ -28107,7 +28107,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fchmodat, __x86_asm32_int80_fchmod
 /* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_faccessat, __x86_asm32_int80_faccessat)
 
-/* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32 const *timeout, void const *sigmask_sigset_and_len) */
+/* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32 const *timeout, struct __sigset_with_sizex32 const *sigmask_sigset_with_size) */
 .section .text.x86.asm32_syscall_sysenter.pselect6
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pselect6)
 	.cfi_startproc simple
@@ -29267,7 +29267,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timerfd_settime64, __x86_asm32_int
 /* errno_t utimensat_time64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utimensat_time64, __x86_asm32_int80_utimensat_time64)
 
-/* ssize_t pselect6_time64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
+/* ssize_t pselect6_time64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, struct __sigset_with_sizex32 const *sigmask_sigset_with_size) */
 .section .text.x86.asm32_syscall_sysenter.pselect6_time64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pselect6_time64)
 	.cfi_startproc simple
@@ -34234,7 +34234,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_faccessat)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_faccessat)
 
-/* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32 const *timeout, void const *sigmask_sigset_and_len) */
+/* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32 const *timeout, struct __sigset_with_sizex32 const *sigmask_sigset_with_size) */
 .section .text.x86.asm32_syscall_sysrun32.pselect6
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pselect6)
 	.cfi_startproc
@@ -35662,7 +35662,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utimensat_time64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_utimensat_time64)
 
-/* ssize_t pselect6_time64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
+/* ssize_t pselect6_time64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, struct __sigset_with_sizex32 const *sigmask_sigset_with_size) */
 .section .text.x86.asm32_syscall_sysrun32.pselect6_time64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pselect6_time64)
 	.cfi_startproc

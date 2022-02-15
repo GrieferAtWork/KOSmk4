@@ -356,6 +356,7 @@ static_assert(__builtin_types_compatible_p(ptrdiff_t, __typeof__((int *)42 - (in
 
 /* Ensure that our max_align_t is correctly chosen. */
 static_assert(alignof(max_align_t) == __ALIGNOF_MAX_ALIGN_T__);
+static_assert(__builtin_types_compatible_p(max_align_t, __MAX_ALIGN_TYPE__));
 static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_CHAR__);
 static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_CHAR__);
 static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_CHAR__);
@@ -470,7 +471,6 @@ local files = {
 	"../../include/bits/os/kos/stat.h",
 	"../../include/bits/os/kos/statfs.h",
 	"../../include/bits/os/kos/timeb.h",
-	"../../include/bits/os/ucontext.h",
 	"../../include/bits/os/kos/ustat.h",
 	"../../include/bits/os/kos/utimbuf.h",
 	"../../include/bits/os/kos/utsname.h",
@@ -1137,20 +1137,6 @@ static_assert(offsetof(struct __timeb32, millitm) == __OFFSET_TIMEB32_MILLITM);
 static_assert(offsetof(struct __timeb32, time) == __OFFSET_TIMEB32_TIME);
 static_assert(offsetof(struct __timeb32, timezone) == __OFFSET_TIMEB32_TIMEZONE);
 static_assert(sizeof(struct __timeb32) == __SIZEOF_TIMEB32);
-
-
-
-
-
-#include <bits/os/ucontext.h>
-
-/* struct ucontext */
-static_assert(offsetof(struct ucontext, uc_link) == __OFFSET_UCONTEXT_LINK);
-static_assert(offsetof(struct ucontext, uc_mcontext) == __OFFSET_UCONTEXT_MCONTEXT);
-static_assert(offsetof(struct ucontext, uc_sigmask) == __OFFSET_UCONTEXT_SIGMASK);
-static_assert(offsetof(struct ucontext, uc_stack) == __OFFSET_UCONTEXT_STACK);
-static_assert(sizeof(struct ucontext) == __SIZEOF_UCONTEXT);
-static_assert(alignof(struct ucontext) == __ALIGNOF_UCONTEXT);
 
 
 

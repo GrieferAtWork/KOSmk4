@@ -67,6 +67,8 @@ local files = {
 	"../../../../include/i386-kos/bits/os/generic/timespec64.h",
 	"../../../../include/i386-kos/bits/os/generic/timeval32.h",
 	"../../../../include/i386-kos/bits/os/generic/timeval64.h",
+	"../../../../include/i386-kos/bits/os/generic/sigset_with_size32.h",
+	"../../../../include/i386-kos/bits/os/generic/sigset_with_size64.h",
 	"../../../../include/i386-kos/bits/os/kos/cmsghdr32.h",
 	"../../../../include/i386-kos/bits/os/kos/cmsghdr64.h",
 	"../../../../include/i386-kos/bits/os/kos/flock32.h",
@@ -347,6 +349,33 @@ static_assert(alignof(struct timevalx64) == __ALIGNOF_TIMEVALX64);
 
 /* struct __timevalx64_alt */
 /* ... */
+
+
+
+
+
+#include <bits/os/generic/sigset_with_size32.h>
+
+/* struct __sigset_structx32 */
+/* ... */
+
+/* struct __sigset_with_sizex32 */
+static_assert(offsetof(struct __sigset_with_sizex32, sws_sigset) == __OFFSET_SIGSET_WITH_SIZEX32_SIGSET);
+static_assert(offsetof(struct __sigset_with_sizex32, sws_sigsiz) == __OFFSET_SIGSET_WITH_SIZEX32_SIGSIZ);
+static_assert(sizeof(struct __sigset_with_sizex32) == __SIZEOF_SIGSET_WITH_SIZEX32);
+static_assert(alignof(struct __sigset_with_sizex32) == __ALIGNOF_SIGSET_WITH_SIZEX32);
+
+
+
+
+
+#include <bits/os/generic/sigset_with_size64.h>
+
+/* struct __sigset_with_sizex64 */
+static_assert(offsetof(struct __sigset_with_sizex64, sws_sigset) == __OFFSET_SIGSET_WITH_SIZEX64_SIGSET);
+static_assert(offsetof(struct __sigset_with_sizex64, sws_sigsiz) == __OFFSET_SIGSET_WITH_SIZEX64_SIGSIZ);
+static_assert(sizeof(struct __sigset_with_sizex64) == __SIZEOF_SIGSET_WITH_SIZEX64);
+static_assert(alignof(struct __sigset_with_sizex64) == __ALIGNOF_SIGSET_WITH_SIZEX64);
 
 
 
@@ -1423,7 +1452,6 @@ static_assert(offsetof(struct __ucontextx32, uc_link) == __OFFSET_UCONTEXTX32_LI
 static_assert(offsetof(struct __ucontextx32, uc_mcontext) == __OFFSET_UCONTEXTX32_MCONTEXT);
 static_assert(offsetof(struct __ucontextx32, uc_sigmask) == __OFFSET_UCONTEXTX32_SIGMASK);
 static_assert(offsetof(struct __ucontextx32, uc_stack) == __OFFSET_UCONTEXTX32_STACK);
-static_assert(sizeof(struct __ucontextx32) == __SIZEOF_UCONTEXTX32);
 static_assert(alignof(struct __ucontextx32) == __ALIGNOF_UCONTEXTX32);
 
 
@@ -1437,7 +1465,6 @@ static_assert(offsetof(struct __ucontextx64, uc_link) == __OFFSET_UCONTEXTX64_LI
 static_assert(offsetof(struct __ucontextx64, uc_mcontext) == __OFFSET_UCONTEXTX64_MCONTEXT);
 static_assert(offsetof(struct __ucontextx64, uc_sigmask) == __OFFSET_UCONTEXTX64_SIGMASK);
 static_assert(offsetof(struct __ucontextx64, uc_stack) == __OFFSET_UCONTEXTX64_STACK);
-static_assert(sizeof(struct __ucontextx64) == __SIZEOF_UCONTEXTX64);
 static_assert(alignof(struct __ucontextx64) == __ALIGNOF_UCONTEXTX64);
 
 

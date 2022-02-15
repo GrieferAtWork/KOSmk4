@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1c558fa */
+/* HASH CRC-32:0x90705a84 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1435,7 +1435,7 @@
 #define __NRAT2_pselect6                 (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NRAT3_pselect6                 (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NRAT4_pselect6                 (struct timespecx64 const *, struct __timespecx64 const *)
-#define __NRAT5_pselect6                 (void const *, void const *)
+#define __NRAT5_pselect6                 (struct __sigset_with_sizex64 const *, struct __sigset_with_sizex64 const *)
 #define __NRAT0_ppoll                    (struct pollfd *, struct pollfd *)
 #define __NRAT1_ppoll                    (size_t, __size_t)
 #define __NRAT2_ppoll                    (struct timespecx64 const *, struct __timespecx64 const *)
@@ -2050,7 +2050,7 @@
 #define __NRAM_readlinkat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (char *)c, (__size_t)d
 #define __NRAM_fchmodat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__mode_t)c, (__atflag_t)d
 #define __NRAM_faccessat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__syscall_ulong_t)c, (__atflag_t)d
-#define __NRAM_pselect6(a, b, c, d, e, f)                 (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct __timespecx64 const *)e, (void const *)f
+#define __NRAM_pselect6(a, b, c, d, e, f)                 (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct __timespecx64 const *)e, (struct __sigset_with_sizex64 const *)f
 #define __NRAM_ppoll(a, b, c, d, e, f)                    (struct pollfd *)a, (__size_t)b, (struct __timespecx64 const *)c, (struct __sigset_struct const *)d, (__size_t)e
 #define __NRAM_unshare(a, b, c, d, e, f)                  (__syscall_ulong_t)a
 #define __NRAM_set_robust_list(a, b, c, d, e, f)          (int)a

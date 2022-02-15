@@ -162,6 +162,9 @@
 %[typeorg(<bits/os/kos/sysinfo32.h>: sysinfox32, __sysinfox32)]
 %[typeorg(<bits/os/kos/sysinfo64.h>: sysinfox64, __sysinfox64)]
 %[typeorg(<asm/os/sched.h>: clone_args)]
+%[typeorg(<bits/os/sigset_with_size.h>: sigset_with_size)]
+%[typeorg(<bits/os/generic/sigset_with_size32.h>: __sigset_with_sizex32)]
+%[typeorg(<bits/os/generic/sigset_with_size64.h>: __sigset_with_sizex64)]
 
 /* Define how specific struct names should be escaped in headers */
 %[struct_escape(iovecx32 = __iovecx32, iovecx64 = __iovecx64)]
@@ -697,12 +700,12 @@ poll:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds,
 %[endgroup]
 
 %[startgroup]
-[cp][restart(dont)] pselect6:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_AND_LEN)] void const *sigmask_sigset_and_len) -> ssize_t;
-[cp][restart(dont)] pselect6_32:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_AND_LEN)] void const *sigmask_sigset_and_len) -> ssize_t;
-[cp][restart(dont)] pselect6_64:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_AND_LEN)] void const *sigmask_sigset_and_len) -> ssize_t;
-[cp][restart(dont)] pselect6_x32:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_AND_LEN_X32)] void const *sigmask_sigset_and_len) -> ssize_t;
-[cp][restart(dont)] pselect6_x32_64:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_AND_LEN_X32)] void const *sigmask_sigset_and_len) -> ssize_t;
-[cp][restart(dont)] pselect6_x64:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_AND_LEN_X64)] void const *sigmask_sigset_and_len) -> ssize_t;
+[cp][restart(dont)] pselect6:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_WITH_SIZE)] struct sigset_with_size const *sigmask_sigset_with_size) -> ssize_t;
+[cp][restart(dont)] pselect6_32:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_WITH_SIZE)] struct sigset_with_size const *sigmask_sigset_with_size) -> ssize_t;
+[cp][restart(dont)] pselect6_64:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_WITH_SIZE)] struct sigset_with_size const *sigmask_sigset_with_size) -> ssize_t;
+[cp][restart(dont)] pselect6_x32:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_WITH_SIZE_X32)] struct __sigset_with_sizex32 const *sigmask_sigset_with_size) -> ssize_t;
+[cp][restart(dont)] pselect6_x32_64:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_WITH_SIZE_X32)] struct __sigset_with_sizex32 const *sigmask_sigset_with_size) -> ssize_t;
+[cp][restart(dont)] pselect6_x64:(size_t nfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *readfds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *writefds, [tostr(STRUCT_FDSET:nfds)] struct __fd_set_struct *exceptfds, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *timeout, [tostr(STRUCT_SIGMASK_SIGSET_WITH_SIZE_X64)] struct __sigset_with_sizex64 const *sigmask_sigset_with_size) -> ssize_t;
 %[endgroup]
 
 @@@param: type: One of  `KCMP_FILE',  `KCMP_FILES',  `KCMP_FS',  `KCMP_IO',

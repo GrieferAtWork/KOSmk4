@@ -454,11 +454,11 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_sigset
 #endif /* HAVE_SC_REPR_STRUCT_SIGSET */
 
-#if (defined(HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN) ||     \
-     defined(HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X32) || \
-     defined(HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X64))
+#if (defined(HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE) ||     \
+     defined(HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE_X32) || \
+     defined(HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE_X64))
 #define NEED_print_sigmask_sigset_and_len
-#endif /* HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN */
+#endif /* HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE */
 
 #ifdef HAVE_SC_REPR_MMAP_PROT
 #define NEED_print_mmap_prot
@@ -3391,7 +3391,7 @@ err:
 #undef NEED_print_sigmask_sigset_and_len_sizearg
 #undef NEED_print_sigmask_sigset_and_len_x32
 #undef NEED_print_sigmask_sigset_and_len_x64
-#ifdef HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN
+#ifdef HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE
 #if __SIZEOF_POINTER__ == 4
 #define NEED_print_sigmask_sigset_and_len_x32
 #elif __SIZEOF_POINTER__ == 8
@@ -3400,13 +3400,13 @@ err:
 #define NEED_print_sigmask_sigset_and_len_misc
 #define NEED_print_sigmask_sigset_and_len_sizearg
 #endif /* __SIZEOF_POINTER__ != ... */
-#endif /* HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN */
-#ifdef HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X32
+#endif /* HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE */
+#ifdef HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE_X32
 #define NEED_print_sigmask_sigset_and_len_x32
-#endif /* HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X32 */
-#ifdef HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X64
+#endif /* HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE_X32 */
+#ifdef HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE_X64
 #define NEED_print_sigmask_sigset_and_len_x64
-#endif /* HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X64 */
+#endif /* HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE_X64 */
 #if (defined(NEED_print_sigmask_sigset_and_len_x32) && \
      defined(NEED_print_sigmask_sigset_and_len_x64))
 #define NEED_print_sigmask_sigset_and_len_sizearg
@@ -4892,8 +4892,8 @@ for (local c: knownCases.sorted()) {
 	}	break;
 #endif /* HAVE_SC_REPR_STRUCT_SIGSET */
 
-#ifdef HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN
-	case SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN: {
+#ifdef HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE
+	case SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE: {
 		USER UNCHECKED void *valptr;
 		valptr = (USER UNCHECKED void *)(uintptr_t)(syscall_ulong_t)value.sv_u64;
 		if (!valptr)
@@ -4901,10 +4901,10 @@ for (local c: knownCases.sorted()) {
 		validate_readable(valptr, sizeof(void *) + sizeof(size_t));
 		result = print_sigmask_sigset_and_len(printer, arg, valptr, sizeof(void *));
 	}	break;
-#endif /* HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN */
+#endif /* HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE */
 
-#ifdef HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X32
-	case SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X32: {
+#ifdef HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE_X32
+	case SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE_X32: {
 		USER UNCHECKED void *valptr;
 		valptr = (USER UNCHECKED void *)(uintptr_t)(syscall_ulong_t)value.sv_u64;
 		if (!valptr)
@@ -4912,10 +4912,10 @@ for (local c: knownCases.sorted()) {
 		validate_readable(valptr, 2 * 4);
 		result = print_sigmask_sigset_and_len(printer, arg, valptr, 4);
 	}	break;
-#endif /* HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X32 */
+#endif /* HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE_X32 */
 
-#ifdef HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X64
-	case SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X64: {
+#ifdef HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE_X64
+	case SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE_X64: {
 		USER UNCHECKED void *valptr;
 		valptr = (USER UNCHECKED void *)(uintptr_t)(syscall_ulong_t)value.sv_u64;
 		if (!valptr)
@@ -4923,7 +4923,7 @@ for (local c: knownCases.sorted()) {
 		validate_readable(valptr, 2 * 8);
 		result = print_sigmask_sigset_and_len(printer, arg, valptr, 8);
 	}	break;
-#endif /* HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X64 */
+#endif /* HAVE_SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE_X64 */
 
 #ifdef HAVE_SC_REPR_SOCKOPT_LEVEL
 	case SC_REPR_SOCKOPT_LEVEL:

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77ae49fa */
+/* HASH CRC-32:0x49bcd43e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2699,7 +2699,7 @@ INTERN_FUNCTION(libc_sys_faccessat)
 END(libc_sys_faccessat)
 DEFINE_PUBLIC_ALIAS(sys_faccessat, libc_sys_faccessat)
 
-/* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx64 const *timeout, void const *sigmask_sigset_and_len) */
+/* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx64 const *timeout, struct __sigset_with_sizex64 const *sigmask_sigset_with_size) */
 INTERN_FUNCTION(libc_sys_pselect6)
 	movq   $(0x10e), %rax
 	movq   %rcx, %r10
@@ -7431,7 +7431,7 @@ INTERN_FUNCTION(libc_sys_Xfaccessat)
 END(libc_sys_Xfaccessat)
 DEFINE_PUBLIC_ALIAS(sys_Xfaccessat, libc_sys_Xfaccessat)
 
-/* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx64 const *timeout, void const *sigmask_sigset_and_len) */
+/* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx64 const *timeout, struct __sigset_with_sizex64 const *sigmask_sigset_with_size) */
 INTERN_FUNCTION(libc_sys_Xpselect6)
 	movq   $(0x10e), %rax
 	movq   %rcx, %r10

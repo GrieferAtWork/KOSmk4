@@ -23,6 +23,7 @@
 #include "../api.h"
 /**/
 
+#include <bits/os/sigset_with_size.h>
 #include <kos/syscalls.h>
 
 #include <syscall.h> /* SYS_* */
@@ -101,11 +102,6 @@ NOTHROW_RPC(LIBCCALL libc_select)(__STDC_INT_AS_SIZE_T nfds,
 }
 /*[[[end:libc_select]]]*/
 
-struct sigset_and_len {
-	sigset_t const *ss_ptr;
-	size_t          ss_len;
-};
-
 
 /*[[[head:libc_pselect,hash:CRC-32=0xdabe3c5c]]]*/
 /* >> select(2), select64(2), pselect(2), pselect64(2)
@@ -149,9 +145,9 @@ NOTHROW_RPC(LIBCCALL libc_pselect)(__STDC_INT_AS_SIZE_T nfds,
 /*[[[body:libc_pselect]]]*/
 {
 	ssize_t result;
-	struct sigset_and_len ss;
-	ss.ss_ptr = sigmask;
-	ss.ss_len = sizeof(sigset_t);
+	struct sigset_with_size ss;
+	ss.sws_sigset = (sigset_t *)sigmask;
+	ss.sws_sigsiz = sizeof(sigset_t);
 	result = sys_pselect6(nfds, readfds, writefds, exceptfds, timeout, &ss);
 	return libc_seterrno_syserr(result);
 }
@@ -258,9 +254,9 @@ NOTHROW_RPC(LIBCCALL libc_pselect64)(__STDC_INT_AS_SIZE_T nfds,
 /*[[[body:libc_pselect64]]]*/
 {
 	ssize_t result;
-	struct sigset_and_len ss;
-	ss.ss_ptr = sigmask;
-	ss.ss_len = sizeof(sigset_t);
+	struct sigset_with_size ss;
+	ss.sws_sigset = (sigset_t *)sigmask;
+	ss.sws_sigsiz = sizeof(sigset_t);
 #ifdef SYS_pselect6_64
 	result = sys_pselect6_64(nfds, readfds, writefds, exceptfds, timeout, &ss);
 #elif defined(SYS_pselect6_time64)

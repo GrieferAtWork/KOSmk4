@@ -17,44 +17,36 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_BITS_OS_KOS_UCONTEXT32_H
-#define _I386_KOS_BITS_OS_KOS_UCONTEXT32_H 1
+#ifndef _I386_KOS_BITS_OS_GENERIC_SIGSET_WITH_SIZE32_H
+#define _I386_KOS_BITS_OS_GENERIC_SIGSET_WITH_SIZE32_H 1
 
 /* File:
- *    <i386-kos/bits/os/kos/ucontext32.h>
+ *    <i386-kos/bits/os/generic/sigset_with_size.h>
  *
  * Definitions:
- *    - struct __ucontextx32 { ... };
- * #if !defined(__x86_64__) && defined(__i386__)
- *    - struct ucontext { ... };
- * #endif
+ *    - struct sigset_with_size { ... };
  */
 
 #include <__stdinc.h>
 
-#include <hybrid/__pointer.h> /* __HYBRID_PTR32 */
-#include <hybrid/host.h>      /* __x86_64__, __i386__ */
-#include <hybrid/typecore.h>
+#include <hybrid/__pointer.h>
+#include <hybrid/host.h>
 
-#include <bits/os/kos/mcontext32.h> /* struct __mcontextx32 */
-#include <bits/os/kos/sigstack32.h> /* struct __sigaltstackx32 */
-#include <bits/os/sigset.h>         /* struct __sigset_struct */
+#include <bits/os/sigset.h>
+#include <bits/types.h>
 
-#if !defined(__x86_64__) && defined(__i386__)
-#define __OFFSET_UCONTEXT_MCONTEXT __OFFSET_UCONTEXTX32_MCONTEXT
-#define __OFFSET_UCONTEXT_STACK    __OFFSET_UCONTEXTX32_STACK
-#define __OFFSET_UCONTEXT_LINK     __OFFSET_UCONTEXTX32_LINK
-#define __OFFSET_UCONTEXT_SIGMASK  __OFFSET_UCONTEXTX32_SIGMASK
-#define __ALIGNOF_UCONTEXT         __ALIGNOF_UCONTEXTX32
-#define __ucontextx32              ucontext
-#endif /* !__x86_64__ && __i386__ */
+#if defined(__i386__) && !defined(__x86_64__)
+#define __sigset_with_sizex32            sigset_with_size
+#define __OFFSET_SIGSET_WITH_SIZE_SIGSET __OFFSET_SIGSET_WITH_SIZEX32_SIGSET
+#define __OFFSET_SIGSET_WITH_SIZE_SIGSIZ __OFFSET_SIGSET_WITH_SIZEX32_SIGSIZ
+#define __SIZEOF_SIGSET_WITH_SIZE        __SIZEOF_SIGSET_WITH_SIZEX32
+#define __ALIGNOF_SIGSET_WITH_SIZE       __ALIGNOF_SIGSET_WITH_SIZEX32
+#endif /* __i386__ && !__x86_64__ */
 
-
-#define __OFFSET_UCONTEXTX32_MCONTEXT 0
-#define __OFFSET_UCONTEXTX32_STACK    592
-#define __OFFSET_UCONTEXTX32_LINK     604
-#define __OFFSET_UCONTEXTX32_SIGMASK  608
-#define __ALIGNOF_UCONTEXTX32         __ALIGNOF_MCONTEXTX32
+#define __OFFSET_SIGSET_WITH_SIZEX32_SIGSET 0
+#define __OFFSET_SIGSET_WITH_SIZEX32_SIGSIZ 4
+#define __SIZEOF_SIGSET_WITH_SIZEX32        8
+#define __ALIGNOF_SIGSET_WITH_SIZEX32       4
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -70,17 +62,13 @@ struct __sigset_structx32 {
 #endif /* !__SIZEOF_POINTER__ != 4 */
 #endif /* !____sigsetx32_t_defined */
 
-/* Userlevel context. */
-struct __ATTR_ALIGNED(__ALIGNOF_UCONTEXTX32) __ucontextx32 /*[NAME(ucontextx32)][PREFIX(uc_)]*/ {
-	struct __mcontextx32                 uc_mcontext;    /* CPU context. */
-	struct __sigaltstackx32              uc_stack;       /* Program stack (only used for <ucontext.h>; currently meaningless in signal handlers) */
-	__HYBRID_PTR32(struct __ucontextx32) uc_link;        /* [0..1] Linked context (only used for <ucontext.h>; NULL in signal handlers) */
-	struct __sigset_structx32            uc_sigmask;     /* Signal mask to apply upon context load */
+struct __sigset_with_sizex32 /*[NAME(sigset_with_sizex32)][PREFIX(sws_)]*/ {
+	__HYBRID_PTR32(struct __sigset_structx32) sws_sigset; /* [0..sws_sigsiz] Signal set. */
+	__UINT32_TYPE__                           sws_sigsiz; /* Signal set size. */
 };
 
 __DECL_END
 #endif /* __CC__ */
 
 
-
-#endif /* !_I386_KOS_BITS_OS_KOS_UCONTEXT32_H */
+#endif /* !_I386_KOS_BITS_OS_GENERIC_SIGSET_WITH_SIZE32_H */

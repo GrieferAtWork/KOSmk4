@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4aa4976d */
+/* HASH CRC-32:0x44039f5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -862,7 +862,7 @@
 #define __NRAT2_pselect6               (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NRAT3_pselect6               (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NRAT4_pselect6               (struct timespec const *, struct timespec const *)
-#define __NRAT5_pselect6               (void const *, void const *)
+#define __NRAT5_pselect6               (struct sigset_with_size const *, struct sigset_with_size const *)
 #define __NRAT0_ppoll                  (struct pollfd *, struct pollfd *)
 #define __NRAT1_ppoll                  (size_t, __size_t)
 #define __NRAT2_ppoll                  (struct timespec const *, struct timespec const *)
@@ -1500,7 +1500,7 @@
 #define __NRAM_pwrite64(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__fd_t)a, (void const *)b, (__size_t)c, (__uint64_t)d
 #define __NRAM_preadv(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (__fd_t)a, (struct iovec const *)b, (__size_t)c, (__uint64_t)d
 #define __NRAM_pwritev(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                (__fd_t)a, (struct iovec const *)b, (__size_t)c, (__uint64_t)d
-#define __NRAM_pselect6(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct timespec const *)e, (void const *)f
+#define __NRAM_pselect6(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct timespec const *)e, (struct sigset_with_size const *)f
 #define __NRAM_ppoll(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (struct pollfd *)a, (__size_t)b, (struct timespec const *)c, (struct __sigset_struct const *)d, (__size_t)e
 #define __NRAM_signalfd4(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__fd_t)a, (struct __sigset_struct const *)b, (__size_t)c, (__syscall_ulong_t)d
 #define __NRAM_vmsplice(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__fd_t)a, (struct iovec const *)b, (__size_t)c, (__syscall_ulong_t)d

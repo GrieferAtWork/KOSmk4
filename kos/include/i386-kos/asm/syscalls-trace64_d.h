@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5f83e4e */
+/* HASH CRC-32:0x3769c71b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -613,7 +613,7 @@
 #define __NR64AN2_pselect6                 writefds
 #define __NR64AN3_pselect6                 exceptfds
 #define __NR64AN4_pselect6                 timeout
-#define __NR64AN5_pselect6                 sigmask_sigset_and_len
+#define __NR64AN5_pselect6                 sigmask_sigset_with_size
 #define __NR64AN0_ppoll                    fds
 #define __NR64AN1_ppoll                    nfds
 #define __NR64AN2_ppoll                    timeout_ts
@@ -1878,7 +1878,7 @@
 #define __NR64ATR3_pselect6                 SC_REPR_STRUCT_FDSET                                                 /* exceptfds */ 
 #define __NR64ATL3_pselect6                 0                                                                    /* exceptfds -> nfds */ 
 #define __NR64ATR4_pselect6                 SC_REPR_STRUCT_TIMESPECX64                                           /* timeout */ 
-#define __NR64ATR5_pselect6                 SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X64                            /* sigmask_sigset_and_len */ 
+#define __NR64ATR5_pselect6                 SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE_X64                          /* sigmask_sigset_with_size */ 
 #define __NR64RTR_pselect6                  SC_REPR_SSIZE_T                                                      /* return */
 #define __NR64ATR0_ppoll                    SC_REPR_STRUCT_POLLFD                                                /* fds */ 
 #define __NR64ATL0_ppoll                    1                                                                    /* fds -> nfds */ 

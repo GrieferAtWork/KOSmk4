@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ff38496 */
+/* HASH CRC-32:0x824eb5f8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -763,7 +763,7 @@
 /* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
  * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
 #define SYS_faccessat                __NR_faccessat                /* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
-#define SYS_pselect6                 __NR_pselect6                 /* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx64 const *timeout, void const *sigmask_sigset_and_len) */
+#define SYS_pselect6                 __NR_pselect6                 /* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx64 const *timeout, struct __sigset_with_sizex64 const *sigmask_sigset_with_size) */
 #define SYS_ppoll                    __NR_ppoll                    /* ssize_t ppoll(struct pollfd *fds, size_t nfds, struct timespecx64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
 /* param: what: Set of `CLONE_*' */
 #define SYS_unshare                  __NR_unshare                  /* errno_t unshare(syscall_ulong_t what) */

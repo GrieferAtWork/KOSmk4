@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7db1b371 */
+/* HASH CRC-32:0xeba25fa1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -613,7 +613,7 @@
 #define __NRAN2_pselect6                 writefds
 #define __NRAN3_pselect6                 exceptfds
 #define __NRAN4_pselect6                 timeout
-#define __NRAN5_pselect6                 sigmask_sigset_and_len
+#define __NRAN5_pselect6                 sigmask_sigset_with_size
 #define __NRAN0_ppoll                    fds
 #define __NRAN1_ppoll                    nfds
 #define __NRAN2_ppoll                    timeout_ts
@@ -1878,7 +1878,7 @@
 #define __NRATR3_pselect6                 SC_REPR_STRUCT_FDSET                                                 /* exceptfds */ 
 #define __NRATL3_pselect6                 0                                                                    /* exceptfds -> nfds */ 
 #define __NRATR4_pselect6                 SC_REPR_STRUCT_TIMESPECX64                                           /* timeout */ 
-#define __NRATR5_pselect6                 SC_REPR_STRUCT_SIGMASK_SIGSET_AND_LEN_X64                            /* sigmask_sigset_and_len */ 
+#define __NRATR5_pselect6                 SC_REPR_STRUCT_SIGMASK_SIGSET_WITH_SIZE_X64                          /* sigmask_sigset_with_size */ 
 #define __NRRTR_pselect6                  SC_REPR_SSIZE_T                                                      /* return */
 #define __NRATR0_ppoll                    SC_REPR_STRUCT_POLLFD                                                /* fds */ 
 #define __NRATL0_ppoll                    1                                                                    /* fds -> nfds */ 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15e08b2e */
+/* HASH CRC-32:0x255ef5d6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@
 #include <bits/os/generic/iovec64.h>
 #include <bits/os/generic/itimerspec64.h>
 #include <bits/os/generic/itimerval64.h>
+#include <bits/os/generic/sigset_with_size64.h>
 #include <bits/os/generic/timespec64.h>
 #include <bits/os/generic/timeval64.h>
 #include <bits/os/kos/mmsghdr64.h>
@@ -111,6 +112,7 @@ struct __rusagex64;
 struct __sigaltstackx64;
 struct __siginfox64_struct;
 struct __sigset_struct;
+struct __sigset_with_sizex64;
 struct __statfsx64;
 struct __sysinfox64;
 struct __timespecx64;
@@ -1388,7 +1390,7 @@ __CDECLARE_SC(,__ssize_t,process_vm_readv,(__pid_t __pid, struct __iovecx64 cons
 __CDECLARE_SC(,__ssize_t,process_vm_writev,(__pid_t __pid, struct __iovecx64 const *__local_iov, __size_t __liovcnt, struct __iovecx64 const *__remote_iov, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
 #endif /* __CRT_HAVE_SC(process_vm_writev) */
 #if __CRT_HAVE_SC(pselect6)
-__CDECLARE_SC(,__ssize_t,pselect6,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timespecx64 const *__timeout, void const *__sigmask_sigset_and_len),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask_sigset_and_len))
+__CDECLARE_SC(,__ssize_t,pselect6,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timespecx64 const *__timeout, struct __sigset_with_sizex64 const *__sigmask_sigset_with_size),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask_sigset_with_size))
 #endif /* __CRT_HAVE_SC(pselect6) */
 #if __CRT_HAVE_SC(ptrace)
 __CDECLARE_SC(,__syscall_slong_t,ptrace,(__syscall_ulong_t __request, __pid_t __pid, void *__addr, void *__data),(__request,__pid,__addr,__data))
@@ -3533,7 +3535,7 @@ __CDECLARE_XSC(,__ssize_t,process_vm_readv,(__pid_t __pid, struct __iovecx64 con
 __CDECLARE_XSC(,__ssize_t,process_vm_writev,(__pid_t __pid, struct __iovecx64 const *__local_iov, __size_t __liovcnt, struct __iovecx64 const *__remote_iov, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
 #endif /* __CRT_HAVE_XSC(process_vm_writev) */
 #if __CRT_HAVE_XSC(pselect6)
-__CDECLARE_XSC(,__ssize_t,pselect6,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timespecx64 const *__timeout, void const *__sigmask_sigset_and_len),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask_sigset_and_len))
+__CDECLARE_XSC(,__ssize_t,pselect6,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timespecx64 const *__timeout, struct __sigset_with_sizex64 const *__sigmask_sigset_with_size),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask_sigset_with_size))
 #endif /* __CRT_HAVE_XSC(pselect6) */
 #if __CRT_HAVE_XSC(ptrace)
 __CDECLARE_XSC(,__syscall_slong_t,ptrace,(__syscall_ulong_t __request, __pid_t __pid, void *__addr, void *__data),(__request,__pid,__addr,__data))

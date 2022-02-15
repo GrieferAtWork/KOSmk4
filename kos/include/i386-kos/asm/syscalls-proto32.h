@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27aff234 */
+/* HASH CRC-32:0x6be36ded */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1656,7 +1656,7 @@
 #define __NRAT2_pselect6                     (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NRAT3_pselect6                     (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NRAT4_pselect6                     (struct timespecx32 const *, struct __timespecx32 const *)
-#define __NRAT5_pselect6                     (void const *, void const *)
+#define __NRAT5_pselect6                     (struct __sigset_with_sizex32 const *, struct __sigset_with_sizex32 const *)
 #define __NRAT0_ppoll                        (struct pollfd *, struct pollfd *)
 #define __NRAT1_ppoll                        (size_t, __size_t)
 #define __NRAT2_ppoll                        (struct timespecx32 const *, struct __timespecx32 const *)
@@ -1928,7 +1928,7 @@
 #define __NRAT2_pselect6_time64              (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NRAT3_pselect6_time64              (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NRAT4_pselect6_time64              (struct timespecx32_64 const *, struct __timespecx32_64 const *)
-#define __NRAT5_pselect6_time64              (void const *, void const *)
+#define __NRAT5_pselect6_time64              (struct __sigset_with_sizex32 const *, struct __sigset_with_sizex32 const *)
 #define __NRAT0_ppoll_time64                 (struct pollfd *, struct pollfd *)
 #define __NRAT1_ppoll_time64                 (size_t, __size_t)
 #define __NRAT2_ppoll_time64                 (struct timespecx32_64 const *, struct __timespecx32_64 const *)
@@ -2484,7 +2484,7 @@
 #define __NRAM_readlinkat(a, b, c, d, e, f)                   (__fd_t)a, (char const *)b, (char *)c, (__size_t)d
 #define __NRAM_fchmodat(a, b, c, d, e, f)                     (__fd_t)a, (char const *)b, (__mode_t)c, (__atflag_t)d
 #define __NRAM_faccessat(a, b, c, d, e, f)                    (__fd_t)a, (char const *)b, (__syscall_ulong_t)c, (__atflag_t)d
-#define __NRAM_pselect6(a, b, c, d, e, f)                     (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct __timespecx32 const *)e, (void const *)f
+#define __NRAM_pselect6(a, b, c, d, e, f)                     (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct __timespecx32 const *)e, (struct __sigset_with_sizex32 const *)f
 #define __NRAM_ppoll(a, b, c, d, e, f)                        (struct pollfd *)a, (__size_t)b, (struct __timespecx32 const *)c, (struct __sigset_struct const *)d, (__size_t)e
 #define __NRAM_unshare(a, b, c, d, e, f)                      (__syscall_ulong_t)a
 #define __NRAM_set_robust_list(a, b, c, d, e, f)              (int)a
@@ -2583,7 +2583,7 @@
 #define __NRAM_timerfd_gettime64(a, b, c, d, e, f)            (__fd_t)a, (struct __itimerspecx32_64 *)b
 #define __NRAM_timerfd_settime64(a, b, c, d, e, f)            (__fd_t)a, (__syscall_ulong_t)b, (struct __itimerspecx32_64 const *)c, (struct __itimerspecx32_64 *)d
 #define __NRAM_utimensat_time64(a, b, c, d, e, f)             (__fd_t)a, (char const *)b, (struct __timespecx32_64 const *)c, (__atflag_t)d
-#define __NRAM_pselect6_time64(a, b, c, d, e, f)              (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct __timespecx32_64 const *)e, (void const *)f
+#define __NRAM_pselect6_time64(a, b, c, d, e, f)              (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct __timespecx32_64 const *)e, (struct __sigset_with_sizex32 const *)f
 #define __NRAM_ppoll_time64(a, b, c, d, e, f)                 (struct pollfd *)a, (__size_t)b, (struct __timespecx32_64 const *)c, (struct __sigset_struct const *)d, (__size_t)e
 #define __NRAM_io_pgetevents_time64(a, b, c, d, e, f)         (int)a
 #define __NRAM_recvmmsg_time64(a, b, c, d, e, f)              (__fd_t)a, (struct __mmsghdrx32 *)b, (__size_t)c, (__syscall_ulong_t)d, (struct __timespecx32_64 const *)e

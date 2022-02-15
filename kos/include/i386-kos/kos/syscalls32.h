@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d5063dd */
+/* HASH CRC-32:0xfe9e0f6a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@
 #include <bits/os/generic/iovec32.h>
 #include <bits/os/generic/itimerspec32.h>
 #include <bits/os/generic/itimerval32.h>
+#include <bits/os/generic/sigset_with_size32.h>
 #include <bits/os/generic/timespec32.h>
 #include <bits/os/generic/timeval32.h>
 #include <bits/os/kos/mmsghdr32.h>
@@ -121,6 +122,7 @@ struct __rusagex32_64;
 struct __sigaltstackx32;
 struct __siginfox32_struct;
 struct __sigset_struct;
+struct __sigset_with_sizex32;
 struct __statfsx32;
 struct __statfsx32_64;
 struct __sysinfox32;
@@ -1542,10 +1544,10 @@ __CDECLARE_SC(,__errno_t,prof,(void),())
 __CDECLARE_SC(,__errno_t,profil,(void),())
 #endif /* __CRT_HAVE_SC(profil) */
 #if __CRT_HAVE_SC(pselect6)
-__CDECLARE_SC(,__ssize_t,pselect6,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timespecx32 const *__timeout, void const *__sigmask_sigset_and_len),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask_sigset_and_len))
+__CDECLARE_SC(,__ssize_t,pselect6,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timespecx32 const *__timeout, struct __sigset_with_sizex32 const *__sigmask_sigset_with_size),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask_sigset_with_size))
 #endif /* __CRT_HAVE_SC(pselect6) */
 #if __CRT_HAVE_SC(pselect6_time64)
-__CDECLARE_SC(,__ssize_t,pselect6_time64,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timespecx32_64 const *__timeout, void const *__sigmask_sigset_and_len),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask_sigset_and_len))
+__CDECLARE_SC(,__ssize_t,pselect6_time64,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timespecx32_64 const *__timeout, struct __sigset_with_sizex32 const *__sigmask_sigset_with_size),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask_sigset_with_size))
 #endif /* __CRT_HAVE_SC(pselect6_time64) */
 #if __CRT_HAVE_SC(ptrace)
 __CDECLARE_SC(,__syscall_slong_t,ptrace,(__syscall_ulong_t __request, __pid_t __pid, void *__addr, void *__data),(__request,__pid,__addr,__data))
@@ -4044,10 +4046,10 @@ __CDECLARE_XSC(,__errno_t,prof,(void),())
 __CDECLARE_XSC(,__errno_t,profil,(void),())
 #endif /* __CRT_HAVE_XSC(profil) */
 #if __CRT_HAVE_XSC(pselect6)
-__CDECLARE_XSC(,__ssize_t,pselect6,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timespecx32 const *__timeout, void const *__sigmask_sigset_and_len),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask_sigset_and_len))
+__CDECLARE_XSC(,__ssize_t,pselect6,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timespecx32 const *__timeout, struct __sigset_with_sizex32 const *__sigmask_sigset_with_size),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask_sigset_with_size))
 #endif /* __CRT_HAVE_XSC(pselect6) */
 #if __CRT_HAVE_XSC(pselect6_time64)
-__CDECLARE_XSC(,__ssize_t,pselect6_time64,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timespecx32_64 const *__timeout, void const *__sigmask_sigset_and_len),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask_sigset_and_len))
+__CDECLARE_XSC(,__ssize_t,pselect6_time64,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timespecx32_64 const *__timeout, struct __sigset_with_sizex32 const *__sigmask_sigset_with_size),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask_sigset_with_size))
 #endif /* __CRT_HAVE_XSC(pselect6_time64) */
 #if __CRT_HAVE_XSC(ptrace)
 __CDECLARE_XSC(,__syscall_slong_t,ptrace,(__syscall_ulong_t __request, __pid_t __pid, void *__addr, void *__data),(__request,__pid,__addr,__data))

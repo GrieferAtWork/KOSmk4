@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd569aa0 */
+/* HASH CRC-32:0x9455167e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -189,7 +189,7 @@
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 #define SYS_pwritev                __NR_pwritev                /* ssize_t pwritev(fd_t fd, struct iovec const *iovec, size_t count, uint64_t offset) */
-#define SYS_pselect6               __NR_pselect6               /* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespec const *timeout, void const *sigmask_sigset_and_len) */
+#define SYS_pselect6               __NR_pselect6               /* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespec const *timeout, struct sigset_with_size const *sigmask_sigset_with_size) */
 #define SYS_ppoll                  __NR_ppoll                  /* ssize_t ppoll(struct pollfd *fds, size_t nfds, struct timespec const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
 /* Create a poll(2)-able file descriptor which can be used to wait for the
  * delivery of signals masked by `sigmask' to the waiting  thread/process.
