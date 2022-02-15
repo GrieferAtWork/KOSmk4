@@ -890,8 +890,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Add futex support to pthread_once() (via an alternate [[userimpl]]) */
 
-	/* TODO: Use a smaller sigset_t size in kernel-space (only need 64 bits for the 64 `< NSIG' signals) */
-
 	return state;
 }
 
