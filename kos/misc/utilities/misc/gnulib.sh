@@ -26,7 +26,7 @@
 ############################################################################
 
 ############################################################################
-# Options we intentinoally don't set:
+# Options we intentionally don't set (because they're too CPU-specific):
 # - gl_cv_cc_double_expbit0
 # - gl_cv_cc_float_expbit0
 # - gl_cv_cc_long_double_expbit0

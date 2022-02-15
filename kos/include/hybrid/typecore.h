@@ -1398,7 +1398,7 @@
 #ifndef __ALIGNOF_LONG_DOUBLE__
 #ifdef _LONG_DOUBLE_ALIGNMENT
 #define __ALIGNOF_LONG_DOUBLE__ _LONG_DOUBLE_ALIGNMENT
-#elif __ALIGNOF_INT64__ < 8
+#elif defined(__ALIGNOF_INT64__) && __ALIGNOF_INT64__ < 8
 #define __ALIGNOF_LONG_DOUBLE__ __ALIGNOF_INT64__
 #elif defined(__INTELLISENSE_GCC__) && defined(__i386__)
 #define __ALIGNOF_LONG_DOUBLE__ 4
@@ -1500,20 +1500,94 @@
 
 
 #ifndef __MAX_ALIGN_TYPE__
-#define __MAX_ALIGN_TYPE__ __LONGDOUBLE
 #ifdef _MAX_ALIGNMENT
 #define __ALIGNOF_MAX_ALIGN_T__ _MAX_ALIGNMENT
-#define __SIZEOF_MAX_ALIGN_T__  _MAX_ALIGNMENT
 #elif defined(__BIGGEST_ALIGNMENT__)
 #define __ALIGNOF_MAX_ALIGN_T__ __BIGGEST_ALIGNMENT__
-#define __SIZEOF_MAX_ALIGN_T__  __BIGGEST_ALIGNMENT__
-#elif defined(__ALIGNOF_LONG_DOUBLE__)
-#define __ALIGNOF_MAX_ALIGN_T__ __ALIGNOF_LONG_DOUBLE__
-#define __SIZEOF_MAX_ALIGN_T__  __ALIGNOF_LONG_DOUBLE__
 #else /* ... */
-#define __ALIGNOF_MAX_ALIGN_T__ 8
+#define __ALIGNOF_MAX_ALIGN_T__ __ALIGNOF_INT32__
+#define __SIZEOF_MAX_ALIGN_T__  4
+#define __MAX_ALIGN_TYPE__      __UINT32_TYPE__
+#if defined(__ALIGNOF_INT64__) && __ALIGNOF_INT64__ > __ALIGNOF_MAX_ALIGN_T__
+#undef __ALIGNOF_MAX_ALIGN_T__
+#undef __SIZEOF_MAX_ALIGN_T__
+#undef __MAX_ALIGN_TYPE__
+#define __ALIGNOF_MAX_ALIGN_T__ __ALIGNOF_INT64__
 #define __SIZEOF_MAX_ALIGN_T__  8
+#define __MAX_ALIGN_TYPE__      __UINT64_TYPE__
+#endif /* __ALIGNOF_INT64__ > __ALIGNOF_MAX_ALIGN_T__ */
+#if defined(__ALIGNOF_INT128__) && __ALIGNOF_INT128__ > __ALIGNOF_MAX_ALIGN_T__
+#undef __ALIGNOF_MAX_ALIGN_T__
+#undef __SIZEOF_MAX_ALIGN_T__
+#undef __MAX_ALIGN_TYPE__
+#define __ALIGNOF_MAX_ALIGN_T__ __ALIGNOF_INT128__
+#define __SIZEOF_MAX_ALIGN_T__  16
+#define __MAX_ALIGN_TYPE__      __UINT128_TYPE__
+#endif /* __ALIGNOF_INT128__ > __ALIGNOF_MAX_ALIGN_T__ */
+#ifndef __NO_FPU
+#if (defined(__ALIGNOF_LONG_DOUBLE__) &&                     \
+     (__ALIGNOF_LONG_DOUBLE__ > __ALIGNOF_MAX_ALIGN_T__ ||   \
+      (__ALIGNOF_LONG_DOUBLE__ == __ALIGNOF_MAX_ALIGN_T__ && \
+       __SIZEOF_LONG_DOUBLE__ < __SIZEOF_MAX_ALIGN_T__)))
+#undef __ALIGNOF_MAX_ALIGN_T__
+#undef __SIZEOF_MAX_ALIGN_T__
+#undef __MAX_ALIGN_TYPE__
+#define __ALIGNOF_MAX_ALIGN_T__ __ALIGNOF_LONG_DOUBLE__
+#define __SIZEOF_MAX_ALIGN_T__  __SIZEOF_LONG_DOUBLE__
+#define __MAX_ALIGN_TYPE__      __LONGDOUBLE
+#endif /* __ALIGNOF_LONG_DOUBLE__ > __ALIGNOF_MAX_ALIGN_T__ */
+#if (defined(__ALIGNOF_DOUBLE__) &&                     \
+     (__ALIGNOF_DOUBLE__ > __ALIGNOF_MAX_ALIGN_T__ ||   \
+      (__ALIGNOF_DOUBLE__ == __ALIGNOF_MAX_ALIGN_T__ && \
+       __SIZEOF_DOUBLE__ < __SIZEOF_MAX_ALIGN_T__)))
+#undef __ALIGNOF_MAX_ALIGN_T__
+#undef __SIZEOF_MAX_ALIGN_T__
+#undef __MAX_ALIGN_TYPE__
+#define __ALIGNOF_MAX_ALIGN_T__ __ALIGNOF_DOUBLE__
+#define __SIZEOF_MAX_ALIGN_T__  __SIZEOF_DOUBLE__
+#define __MAX_ALIGN_TYPE__      __LONGDOUBLE
+#endif /* __ALIGNOF_DOUBLE__ > __ALIGNOF_MAX_ALIGN_T__ */
+#endif /* !__NO_FPU */
 #endif /* !... */
+
+#ifndef __MAX_ALIGN_TYPE__
+#if __ALIGNOF_MAX_ALIGN_T__ == __ALIGNOF_INT8__
+#define __SIZEOF_MAX_ALIGN_T__ 1
+#define __MAX_ALIGN_TYPE__     __UINT8_TYPE__
+#elif __ALIGNOF_MAX_ALIGN_T__ == __ALIGNOF_INT16__
+#define __SIZEOF_MAX_ALIGN_T__ 2
+#define __MAX_ALIGN_TYPE__     __UINT16_TYPE__
+#elif __ALIGNOF_MAX_ALIGN_T__ == __ALIGNOF_INT32__
+#define __SIZEOF_MAX_ALIGN_T__ 4
+#define __MAX_ALIGN_TYPE__     __UINT32_TYPE__
+#elif __ALIGNOF_MAX_ALIGN_T__ == __ALIGNOF_FLOAT__
+#define __SIZEOF_MAX_ALIGN_T__ __SIZEOF_FLOAT__
+#define __MAX_ALIGN_TYPE__     float
+#elif __ALIGNOF_MAX_ALIGN_T__ == __ALIGNOF_INT64__
+#define __SIZEOF_MAX_ALIGN_T__ 8
+#define __MAX_ALIGN_TYPE__     __UINT64_TYPE__
+#elif __ALIGNOF_MAX_ALIGN_T__ == __ALIGNOF_DOUBLE__
+#define __SIZEOF_MAX_ALIGN_T__ __SIZEOF_DOUBLE__
+#define __MAX_ALIGN_TYPE__     double
+#elif defined(__COMPILER_HAVE_LONGDOUBLE) && __ALIGNOF_MAX_ALIGN_T__ == __ALIGNOF_LONG_DOUBLE__
+#define __SIZEOF_MAX_ALIGN_T__ __SIZEOF_LONG_DOUBLE__
+#define __MAX_ALIGN_TYPE__     __LONGDOUBLE
+#elif defined(__UINT128_TYPE__) && __ALIGNOF_MAX_ALIGN_T__ == __ALIGNOF_INT128__
+#define __SIZEOF_MAX_ALIGN_T__ __SIZEOF_INT128__
+#define __MAX_ALIGN_TYPE__     __UINT128_TYPE__
+#else /* ... */
+/* Fallback: try to construct a custom type */
+#define __SIZEOF_MAX_ALIGN_T__ __ALIGNOF_MAX_ALIGN_T__
+#define __MAX_ALIGN_TYPE__     struct __NAMESPACE_INT_SYM ____max_align_t_struct
+#ifdef __CC__
+__NAMESPACE_INT_BEGIN
+struct __ATTR_ALIGNED(__ALIGNOF_MAX_ALIGN_T__) ____max_align_t_struct {
+	__BYTE_TYPE__ __mat_bytes[__SIZEOF_MAX_ALIGN_T__];
+};
+__NAMESPACE_INT_END
+#endif /* __CC__ */
+#endif /* !... */
+#endif /* !__MAX_ALIGN_TYPE__ */
 #endif /* !__MAX_ALIGN_TYPE__ */
 
 

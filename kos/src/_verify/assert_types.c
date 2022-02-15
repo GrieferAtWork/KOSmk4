@@ -354,6 +354,54 @@ static_assert(__builtin_types_compatible_p(uintptr_t, __ULONGLONG));
 static_assert(__builtin_types_compatible_p(size_t, __typeof__(sizeof(42))));
 static_assert(__builtin_types_compatible_p(ptrdiff_t, __typeof__((int *)42 - (int *)41)));
 
+/* Ensure that our max_align_t is correctly chosen. */
+static_assert(alignof(max_align_t) == __ALIGNOF_MAX_ALIGN_T__);
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_CHAR__);
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_CHAR__);
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_CHAR__);
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_SHORT__);
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_SHORT__);
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_SHORT__);
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_INT__);
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_INT__);
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_INT__);
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_LONG__);
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_LONG__);
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_LONG__);
+#ifdef __COMPILER_HAVE_LONGLONG
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_LONG_LONG__);
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_LONG_LONG__);
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_LONG_LONG__);
+#endif /* __COMPILER_HAVE_LONGLONG */
+#ifndef __NO_FPU
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_FLOAT__);
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_DOUBLE__);
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_LONG_DOUBLE__);
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* !__NO_FPU */
+#ifdef __native_wchar_t_defined
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_WCHAR_T__);
+#endif /* __native_wchar_t_defined */
+#ifdef __native_char16_t_defined
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_INT16__);
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_INT32__);
+#endif /* __native_char16_t_defined */
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_INT8__);
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_INT8__);
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_INT16__);
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_INT16__);
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_INT32__);
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_INT32__);
+#ifdef __UINT64_TYPE__
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_INT64__);
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_INT64__);
+#endif /* __UINT64_TYPE__ */
+#ifdef __UINT128_TYPE__
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_INT128__);
+static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_INT128__);
+#endif /* __UINT128_TYPE__ */
+
 
 #include <pthread.h>
 static_assert(sizeof(pthread_t) == __SIZEOF_PTHREAD_T);
