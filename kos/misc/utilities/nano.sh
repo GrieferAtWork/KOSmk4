@@ -26,7 +26,7 @@ PACKAGE_URL="https://nano-editor.org/dist/v4/nano-4.4.tar.xz"
 CONFIGURE=""
 CONFIGURE="$CONFIGURE --enable-largefile"
 CONFIGURE="$CONFIGURE --disable-threads"
-CONFIGURE="$CONFIGURE --disable-nls"
+CONFIGURE="$CONFIGURE --enable-nls"
 CONFIGURE="$CONFIGURE --enable-browser"
 CONFIGURE="$CONFIGURE --enable-color"
 CONFIGURE="$CONFIGURE --enable-comment"
@@ -48,28 +48,8 @@ CONFIGURE="$CONFIGURE --disable-debug"
 CONFIGURE="$CONFIGURE --disable-tiny"
 CONFIGURE="$CONFIGURE --enable-utf8"
 
-# gnulib is a piece work:
-#  - checking for working GNU getopt function... guessing no
-#  - checking whether memchr works... guessing no
-#  - checking whether the utimes function works... guessing no
-#  - checking for working POSIX fnmatch... guessing no
-#  - checking whether futimens works... guessing no
-#  - checking whether mbrtowc works on empty input... guessing no
-#  - checking whether the C locale is free of encoding errors... guessing no
-#    >> This it actually guesses correctly; C local means utf-8, and
-#       only bytes 00-7F can be encoded 1-on-1, but 80-FF are incomplete
-#       and partly even invalid.
-#  - checking for working re_compile_pattern... guessing no
-#    >> Maybe some day...
-PACKAGE_CONFIG_SITE="
-gl_cv_func_getopt_gnu=yes
-gl_cv_func_memchr_works=yes
-gl_cv_func_working_utimes=yes
-gl_fnmatch_cache_var=yes
-gl_cv_func_futimens_works=yes
-gl_cv_func_mbrtowc_empty_input=yes
-"
 
 
 # Automatically build+install using autoconf
+. "$KOS_MISC/utilities/misc/gnulib.sh"
 . "$KOS_MISC/utilities/misc/gnu_make.sh"

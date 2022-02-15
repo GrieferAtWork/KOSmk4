@@ -658,6 +658,22 @@ sys_renameat2_impl(fd_t olddirfd, USER UNCHECKED char const *oldpath,
 	/* Lookup paths. */
 	oldpathob = path_traverse_r(olddirfd, oldpath, &oldname, &oldnamelen, atflags);
 	FINALLY_DECREF_UNLIKELY(oldpathob);
+
+	/* FIXME: When `oldname' points to a directory (and `AT_RENAME_MOVETODIR' isn't given),
+	 *        then we have to ignore trailing slashes. Currently, we always ignore slashes.
+	 * s.a. `gl_cv_func_rename_slash_dst_works'
+	 *
+	 * Expected behavior (after `echo hi > /tmp/file; mkdir /tmp/dir`):
+	 *
+	 * >> rename("/tmp/dir",   "/tmp/dir-new")    --> 0;                   (KOS is compliant)
+	 * >> rename("/tmp/dir",   "/tmp/dir-new/")   --> 0;                   (KOS is compliant)
+	 * >> rename("/tmp/dir/",  "/tmp/dir-new")    --> 0;                   (KOS is compliant)
+	 * >> rename("/tmp/dir/",  "/tmp/dir-new/")   --> 0;                   (KOS is compliant)
+	 * >> rename("/tmp/file",  "/tmp/file-new")   --> 0;                   (KOS is compliant)
+	 * >> rename("/tmp/file",  "/tmp/file-new/")  --> -1; errno=ENOTDIR    (KOS is non-compliant)
+	 * >> rename("/tmp/file/", "/tmp/file-new")   --> -1; errno=ENOTDIR    (KOS is non-compliant)
+	 * >> rename("/tmp/file/", "/tmp/file-new/")  --> -1; errno=ENOTDIR    (KOS is non-compliant)
+	 */
 	newpathob = path_traverse_r(newdirfd, newpath, &newname, &newnamelen, atflags);
 	FINALLY_DECREF_UNLIKELY(newpathob);
 
