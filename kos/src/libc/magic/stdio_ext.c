@@ -168,6 +168,10 @@ void _flushlbf();
 @@@param: type: One of `FSETLOCKING_*'
 int __fsetlocking([[nonnull]] $FILE *stream, int type);
 
+@@>> __fseterr(3)
+@@Set the error indicator for the given `stream' (s.a. `ferror()')
+void __fseterr([[nonnull]] $FILE *stream);
+
 %{
 #endif /* __CC__ */
 

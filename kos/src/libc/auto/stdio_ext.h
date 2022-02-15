@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c57043 */
+/* HASH CRC-32:0x6a1be587 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,6 +62,9 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBDCALL libd___fpendin
  * Set locking status of `stream' to `type'
  * @param: type: One of `FSETLOCKING_*' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd___fsetlocking)(FILE *stream, int type);
+/* >> __fseterr(3)
+ * Set the error indicator for the given `stream' (s.a. `ferror()') */
+INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd___fseterr)(FILE *stream);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

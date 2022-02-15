@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6a6f677 */
+/* HASH CRC-32:0x435156b1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1913,6 +1913,7 @@ DEFINE_PUBLIC_ALIAS(DOS$fpurge, libd___fpurge);
 DEFINE_PUBLIC_ALIAS(DOS$__fpurge, libd___fpurge);
 DEFINE_PUBLIC_ALIAS(DOS$__fpending, libd___fpending);
 DEFINE_PUBLIC_ALIAS(DOS$__fsetlocking, libd___fsetlocking);
+DEFINE_PUBLIC_ALIAS(DOS$__fseterr, libd___fseterr);
 
 /* stdlib */
 DEFINE_PUBLIC_ALIAS(DOS$labs, libd_labs);

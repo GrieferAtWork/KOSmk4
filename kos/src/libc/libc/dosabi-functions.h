@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd426686 */
+/* HASH CRC-32:0x40ee879 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1491,6 +1491,7 @@ DFUN(".text.crt.dos.FILE.utility.ext", libd___flbf, libc___flbf, TD, 1, TP)
 DFUN(".text.crt.dos.FILE.utility.ext", libd___fpurge, libc___fpurge, TV, 1, TP)
 DFUN(".text.crt.dos.FILE.utility.ext", libd___fpending, libc___fpending, TI, 1, TP)
 DFUN(".text.crt.dos.FILE.utility.ext", libd___fsetlocking, libc___fsetlocking, TD, 2, TP, TD)
+DFUN(".text.crt.dos.FILE.utility.ext", libd___fseterr, libc___fseterr, TV, 1, TP)
 
 /* stdlib */
 DFUN(".text.crt.dos.math.utility", libd_labs, libc_labs, TL, 1, TL)

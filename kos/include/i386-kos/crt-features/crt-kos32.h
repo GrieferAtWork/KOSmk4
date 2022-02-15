@@ -500,6 +500,7 @@
 #define __CRT_HAVE___frexp
 #define __CRT_HAVE___frexpf
 #define __CRT_HAVE___frexpl
+#define __CRT_HAVE___fseterr
 #define __CRT_HAVE___fsetlocking
 #define __CRT_HAVE___fstatfs
 #define __CRT_HAVE___fsync

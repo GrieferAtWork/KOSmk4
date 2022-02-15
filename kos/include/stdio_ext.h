@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd18b4cd */
+/* HASH CRC-32:0x1fa89ad6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -157,6 +157,9 @@ __CREDIRECT_VOID(,__THROWING,_flushlbf,(void),_IO_flush_all_linebuffere,())
  * Set locking status of `stream' to `type'
  * @param: type: One of `FSETLOCKING_*' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__fsetlocking,(__FILE *__stream, int __type),(__stream,__type))
+/* >> __fseterr(3)
+ * Set the error indicator for the given `stream' (s.a. `ferror()') */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__NOTHROW_NCX,__fseterr,(__FILE *__stream),(__stream))
 #endif /* __CC__ */
 
 /* Never actually needed */

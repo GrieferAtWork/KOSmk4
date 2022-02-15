@@ -206,11 +206,23 @@ NOTHROW_NCX(LIBCCALL libc___fsetlocking)(FILE *stream,
 }
 /*[[[end:libc___fsetlocking]]]*/
 
+/*[[[head:libc___fseterr,hash:CRC-32=0xbf21e9db]]]*/
+/* >> __fseterr(3)
+ * Set the error indicator for the given `stream' (s.a. `ferror()') */
+INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") NONNULL((1)) void
+NOTHROW_NCX(LIBCCALL libc___fseterr)(FILE *stream)
+/*[[[body:libc___fseterr]]]*/
+{
+	stream = file_fromuser(stream);
+	FSETERROR(stream);
+}
+/*[[[end:libc___fseterr]]]*/
 
 
 
 
-/*[[[start:exports,hash:CRC-32=0x8a0deb0e]]]*/
+
+/*[[[start:exports,hash:CRC-32=0xc6d4ade5]]]*/
 DEFINE_PUBLIC_ALIAS(__fbufsize, libc___fbufsize);
 DEFINE_PUBLIC_ALIAS(__freading, libc___freading);
 DEFINE_PUBLIC_ALIAS(__fwriting, libc___fwriting);
@@ -223,6 +235,7 @@ DEFINE_PUBLIC_ALIAS(__fpending, libc___fpending);
 DEFINE_PUBLIC_ALIAS(_IO_flush_all_linebuffere, libc__flushlbf);
 DEFINE_PUBLIC_ALIAS(_flushlbf, libc__flushlbf);
 DEFINE_PUBLIC_ALIAS(__fsetlocking, libc___fsetlocking);
+DEFINE_PUBLIC_ALIAS(__fseterr, libc___fseterr);
 /*[[[end:exports]]]*/
 
 DECL_END

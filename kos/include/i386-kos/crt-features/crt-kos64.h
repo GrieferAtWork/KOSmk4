@@ -500,6 +500,7 @@
 #define __CRT_HAVE___frexp
 #define __CRT_HAVE___frexpf
 #define __CRT_HAVE___frexpl
+#define __CRT_HAVE___fseterr
 #define __CRT_HAVE___fsetlocking
 #define __CRT_HAVE___fstatfs
 #define __CRT_HAVE___fsync
@@ -5533,6 +5534,7 @@
 #define __CRT_HAVE_KOS$__frexp
 #define __CRT_HAVE_KOS$__frexpf
 #define __CRT_HAVE_KOS$__frexpl
+#define __CRT_HAVE_KOS$__fseterr
 #define __CRT_HAVE_KOS$__fsetlocking
 #define __CRT_HAVE_KOS$__fstatfs
 #define __CRT_HAVE_KOS$__fsync
@@ -9532,6 +9534,7 @@
 #define __CRT_HAVE_DOS$__frexp
 #define __CRT_HAVE_DOS$__frexpf
 #define __CRT_HAVE_DOS$__frexpl
+#define __CRT_HAVE_DOS$__fseterr
 #define __CRT_HAVE_DOS$__fsetlocking
 #define __CRT_HAVE_DOS$__fstatfs
 #define __CRT_HAVE_DOS$__fsync
