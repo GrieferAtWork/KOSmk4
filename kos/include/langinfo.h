@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49d8bd49 */
+/* HASH CRC-32:0x7ad82d37 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -187,6 +187,18 @@ __SYSDECL_BEGIN
 #define __NOEXPR             _NL_MESSAGES_NOEXPR             /* "^[nN]" */
 #define __YESSTR             _NL_MESSAGES_YESSTR             /* "" */
 #define __NOSTR              _NL_MESSAGES_NOSTR              /* "" */
+#define __ALTMON_1           _NL_TIME_ALTMON_1               /* "January" */
+#define __ALTMON_2           _NL_TIME_ALTMON_2               /* "February" */
+#define __ALTMON_3           _NL_TIME_ALTMON_3               /* "March" */
+#define __ALTMON_4           _NL_TIME_ALTMON_4               /* "April" */
+#define __ALTMON_5           _NL_TIME_ALTMON_5               /* "May" */
+#define __ALTMON_6           _NL_TIME_ALTMON_6               /* "June" */
+#define __ALTMON_7           _NL_TIME_ALTMON_7               /* "July" */
+#define __ALTMON_8           _NL_TIME_ALTMON_8               /* "August" */
+#define __ALTMON_9           _NL_TIME_ALTMON_9               /* "September" */
+#define __ALTMON_10          _NL_TIME_ALTMON_10              /* "October" */
+#define __ALTMON_11          _NL_TIME_ALTMON_11              /* "November" */
+#define __ALTMON_12          _NL_TIME_ALTMON_12              /* "December" */
 
 /* Some more unescaped aliases for `nl_langinfo(3)' */
 #define CODESET   _NL_CTYPE_CODESET_NAME /* "utf-8" */
@@ -223,6 +235,18 @@ __SYSDECL_BEGIN
 #define DECIMAL_POINT      __DECIMAL_POINT      /* "." */
 #define THOUSANDS_SEP      __THOUSANDS_SEP      /* "" */
 #define GROUPING           __GROUPING           /* [0x00] [array-of-uint8_t] */
+#define ALTMON_1           _NL_TIME_ALTMON_1    /* "January" */
+#define ALTMON_2           _NL_TIME_ALTMON_2    /* "February" */
+#define ALTMON_3           _NL_TIME_ALTMON_3    /* "March" */
+#define ALTMON_4           _NL_TIME_ALTMON_4    /* "April" */
+#define ALTMON_5           _NL_TIME_ALTMON_5    /* "May" */
+#define ALTMON_6           _NL_TIME_ALTMON_6    /* "June" */
+#define ALTMON_7           _NL_TIME_ALTMON_7    /* "July" */
+#define ALTMON_8           _NL_TIME_ALTMON_8    /* "August" */
+#define ALTMON_9           _NL_TIME_ALTMON_9    /* "September" */
+#define ALTMON_10          _NL_TIME_ALTMON_10   /* "October" */
+#define ALTMON_11          _NL_TIME_ALTMON_11   /* "November" */
+#define ALTMON_12          _NL_TIME_ALTMON_12   /* "December" */
 #endif /* __USE_GNU */
 #if defined(__USE_GNU) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
 #define YESSTR __YESSTR /* "" */

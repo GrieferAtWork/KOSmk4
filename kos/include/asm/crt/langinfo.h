@@ -140,7 +140,55 @@
 #define _NL_TIME_DATE_FMT                      _NL_ITEM(__LC_TIME, 0x6c) /* "%a %b %e %H:%M:%S %Z %Y" */
 #define _NL_TIME_W_DATE_FMT                    _NL_ITEM(__LC_TIME, 0x6d) /* L"%a %b %e %H:%M:%S %Z %Y" */
 #define _NL_TIME_CODESET                       _NL_ITEM(__LC_TIME, 0x6e) /* "utf-8" */
-#define _NL_NUM_LC_TIME                        _NL_ITEM(__LC_TIME, 0x6f)
+#define _NL_TIME_ALTMON_1                      _NL_ITEM(__LC_TIME, 0x6f) /* "January" */
+#define _NL_TIME_ALTMON_2                      _NL_ITEM(__LC_TIME, 0x70) /* "February" */
+#define _NL_TIME_ALTMON_3                      _NL_ITEM(__LC_TIME, 0x71) /* "March" */
+#define _NL_TIME_ALTMON_4                      _NL_ITEM(__LC_TIME, 0x72) /* "April" */
+#define _NL_TIME_ALTMON_5                      _NL_ITEM(__LC_TIME, 0x73) /* "May" */
+#define _NL_TIME_ALTMON_6                      _NL_ITEM(__LC_TIME, 0x74) /* "June" */
+#define _NL_TIME_ALTMON_7                      _NL_ITEM(__LC_TIME, 0x75) /* "July" */
+#define _NL_TIME_ALTMON_8                      _NL_ITEM(__LC_TIME, 0x76) /* "August" */
+#define _NL_TIME_ALTMON_9                      _NL_ITEM(__LC_TIME, 0x77) /* "September" */
+#define _NL_TIME_ALTMON_10                     _NL_ITEM(__LC_TIME, 0x78) /* "October" */
+#define _NL_TIME_ALTMON_11                     _NL_ITEM(__LC_TIME, 0x79) /* "November" */
+#define _NL_TIME_ALTMON_12                     _NL_ITEM(__LC_TIME, 0x7a) /* "December" */
+#define _NL_TIME_WALTMON_1                     _NL_ITEM(__LC_TIME, 0x7b) /* L"January" */
+#define _NL_TIME_WALTMON_2                     _NL_ITEM(__LC_TIME, 0x7c) /* L"February" */
+#define _NL_TIME_WALTMON_3                     _NL_ITEM(__LC_TIME, 0x7d) /* L"March" */
+#define _NL_TIME_WALTMON_4                     _NL_ITEM(__LC_TIME, 0x7e) /* L"April" */
+#define _NL_TIME_WALTMON_5                     _NL_ITEM(__LC_TIME, 0x7f) /* L"May" */
+#define _NL_TIME_WALTMON_6                     _NL_ITEM(__LC_TIME, 0x80) /* L"June" */
+#define _NL_TIME_WALTMON_7                     _NL_ITEM(__LC_TIME, 0x81) /* L"July" */
+#define _NL_TIME_WALTMON_8                     _NL_ITEM(__LC_TIME, 0x82) /* L"August" */
+#define _NL_TIME_WALTMON_9                     _NL_ITEM(__LC_TIME, 0x83) /* L"September" */
+#define _NL_TIME_WALTMON_10                    _NL_ITEM(__LC_TIME, 0x84) /* L"October" */
+#define _NL_TIME_WALTMON_11                    _NL_ITEM(__LC_TIME, 0x85) /* L"November" */
+#define _NL_TIME_WALTMON_12                    _NL_ITEM(__LC_TIME, 0x86) /* L"December" */
+#define _NL_TIME_ABALTMON_1                    _NL_ITEM(__LC_TIME, 0x87) /* "Jan" */
+#define _NL_TIME_ABALTMON_2                    _NL_ITEM(__LC_TIME, 0x88) /* "Feb" */
+#define _NL_TIME_ABALTMON_3                    _NL_ITEM(__LC_TIME, 0x89) /* "Mar" */
+#define _NL_TIME_ABALTMON_4                    _NL_ITEM(__LC_TIME, 0x8a) /* "Apr" */
+#define _NL_TIME_ABALTMON_5                    _NL_ITEM(__LC_TIME, 0x8b) /* "May" */
+#define _NL_TIME_ABALTMON_6                    _NL_ITEM(__LC_TIME, 0x8c) /* "Jun" */
+#define _NL_TIME_ABALTMON_7                    _NL_ITEM(__LC_TIME, 0x8d) /* "Jul" */
+#define _NL_TIME_ABALTMON_8                    _NL_ITEM(__LC_TIME, 0x8e) /* "Aug" */
+#define _NL_TIME_ABALTMON_9                    _NL_ITEM(__LC_TIME, 0x8f) /* "Sep" */
+#define _NL_TIME_ABALTMON_10                   _NL_ITEM(__LC_TIME, 0x90) /* "Oct" */
+#define _NL_TIME_ABALTMON_11                   _NL_ITEM(__LC_TIME, 0x91) /* "Nov" */
+#define _NL_TIME_ABALTMON_12                   _NL_ITEM(__LC_TIME, 0x92) /* "Dec" */
+#define _NL_TIME_WABALTMON_1                   _NL_ITEM(__LC_TIME, 0x93) /* L"Jan" */
+#define _NL_TIME_WABALTMON_2                   _NL_ITEM(__LC_TIME, 0x94) /* L"Feb" */
+#define _NL_TIME_WABALTMON_3                   _NL_ITEM(__LC_TIME, 0x95) /* L"Mar" */
+#define _NL_TIME_WABALTMON_4                   _NL_ITEM(__LC_TIME, 0x96) /* L"Apr" */
+#define _NL_TIME_WABALTMON_5                   _NL_ITEM(__LC_TIME, 0x97) /* L"May" */
+#define _NL_TIME_WABALTMON_6                   _NL_ITEM(__LC_TIME, 0x98) /* L"Jun" */
+#define _NL_TIME_WABALTMON_7                   _NL_ITEM(__LC_TIME, 0x99) /* L"Jul" */
+#define _NL_TIME_WABALTMON_8                   _NL_ITEM(__LC_TIME, 0x9a) /* L"Aug" */
+#define _NL_TIME_WABALTMON_9                   _NL_ITEM(__LC_TIME, 0x9b) /* L"Sep" */
+#define _NL_TIME_WABALTMON_10                  _NL_ITEM(__LC_TIME, 0x9c) /* L"Oct" */
+#define _NL_TIME_WABALTMON_11                  _NL_ITEM(__LC_TIME, 0x9d) /* L"Nov" */
+#define _NL_TIME_WABALTMON_12                  _NL_ITEM(__LC_TIME, 0x9e) /* L"Dec" */
+#define _NL_NUM_LC_TIME                        _NL_ITEM(__LC_TIME, 0x9f)
 #define _NL_COLLATE_NRULES                     _NL_ITEM(__LC_COLLATE, 0x00) /* 0 [uintptr_t] */
 #define _NL_COLLATE_RULESETS                   _NL_ITEM(__LC_COLLATE, 0x01) /* "" */
 #define _NL_COLLATE_TABLEMB                    _NL_ITEM(__LC_COLLATE, 0x02) /* L"..." */

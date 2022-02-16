@@ -187,6 +187,18 @@ __SYSDECL_BEGIN
 #define __NOEXPR             _NL_MESSAGES_NOEXPR             /* "^[nN]" */
 #define __YESSTR             _NL_MESSAGES_YESSTR             /* "" */
 #define __NOSTR              _NL_MESSAGES_NOSTR              /* "" */
+#define __ALTMON_1           _NL_TIME_ALTMON_1               /* "January" */
+#define __ALTMON_2           _NL_TIME_ALTMON_2               /* "February" */
+#define __ALTMON_3           _NL_TIME_ALTMON_3               /* "March" */
+#define __ALTMON_4           _NL_TIME_ALTMON_4               /* "April" */
+#define __ALTMON_5           _NL_TIME_ALTMON_5               /* "May" */
+#define __ALTMON_6           _NL_TIME_ALTMON_6               /* "June" */
+#define __ALTMON_7           _NL_TIME_ALTMON_7               /* "July" */
+#define __ALTMON_8           _NL_TIME_ALTMON_8               /* "August" */
+#define __ALTMON_9           _NL_TIME_ALTMON_9               /* "September" */
+#define __ALTMON_10          _NL_TIME_ALTMON_10              /* "October" */
+#define __ALTMON_11          _NL_TIME_ALTMON_11              /* "November" */
+#define __ALTMON_12          _NL_TIME_ALTMON_12              /* "December" */
 
 /* Some more unescaped aliases for `nl_langinfo(3)' */
 #define CODESET   _NL_CTYPE_CODESET_NAME /* "utf-8" */
@@ -223,6 +235,18 @@ __SYSDECL_BEGIN
 #define DECIMAL_POINT      __DECIMAL_POINT      /* "." */
 #define THOUSANDS_SEP      __THOUSANDS_SEP      /* "" */
 #define GROUPING           __GROUPING           /* [0x00] [array-of-uint8_t] */
+#define ALTMON_1           _NL_TIME_ALTMON_1    /* "January" */
+#define ALTMON_2           _NL_TIME_ALTMON_2    /* "February" */
+#define ALTMON_3           _NL_TIME_ALTMON_3    /* "March" */
+#define ALTMON_4           _NL_TIME_ALTMON_4    /* "April" */
+#define ALTMON_5           _NL_TIME_ALTMON_5    /* "May" */
+#define ALTMON_6           _NL_TIME_ALTMON_6    /* "June" */
+#define ALTMON_7           _NL_TIME_ALTMON_7    /* "July" */
+#define ALTMON_8           _NL_TIME_ALTMON_8    /* "August" */
+#define ALTMON_9           _NL_TIME_ALTMON_9    /* "September" */
+#define ALTMON_10          _NL_TIME_ALTMON_10   /* "October" */
+#define ALTMON_11          _NL_TIME_ALTMON_11   /* "November" */
+#define ALTMON_12          _NL_TIME_ALTMON_12   /* "December" */
 #endif /* __USE_GNU */
 #if defined(__USE_GNU) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
 #define YESSTR __YESSTR /* "" */
@@ -840,7 +864,7 @@ print("	}");
 	}	break;
 
 	case __LC_TIME: {
-		static uint16_t const offtab_LC_TIME[111] = {
+		static uint16_t const offtab_LC_TIME[159] = {
 @@pp_if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__@@
 			1678,1698,1670,1666,1674,1722,1686,1598,1605,1486,1393,1423,1612,1432,1718,1726,
 			1706,1738,1702,1710,1714,1734,1682,1690,1694,1730,1502,1450,1644,1650,1702,1656,
@@ -848,7 +872,10 @@ print("	}");
 			1,1,1,1,1086,1166,1054,1038,1070,1262,1118,775,803,679,347,427,
 			831,463,1246,1278,1198,1326,1182,1214,1230,1310,1102,1134,1150,1294,743,535,
 			887,911,1182,980,1000,859,387,711,499,571,1369,1357,96,607,643,255,
-			89,89,89,89,89,1754,0,1756,1760,1758,1760,1,935,0,1626
+			89,89,89,89,89,1754,0,1756,1760,1758,1760,1,935,0,1626,1502,
+			1450,1644,1650,1702,1656,1661,1619,1403,1494,1441,1459,743,535,887,911,1182,
+			980,1000,859,387,711,499,571,1718,1726,1706,1738,1702,1710,1714,1734,1682,
+			1690,1694,1730,1246,1278,1198,1326,1182,1214,1230,1310,1102,1134,1150,1294
 @@pp_else@@
 			1678,1698,1670,1666,1674,1722,1686,1598,1605,1486,1393,1423,1612,1432,1718,1726,
 			1706,1738,1702,1710,1714,1734,1682,1690,1694,1730,1502,1450,1644,1650,1702,1656,
@@ -856,7 +883,10 @@ print("	}");
 			0,0,0,0,1086,1166,1054,1038,1070,1262,1118,775,803,679,347,427,
 			831,463,1246,1278,1198,1326,1182,1214,1230,1310,1102,1134,1150,1294,743,535,
 			911,935,1182,980,1000,859,387,711,499,571,1381,1369,96,607,643,255,
-			92,92,92,92,92,1754,0,1756,1760,1758,1760,0,887,0,1626
+			92,92,92,92,92,1754,0,1756,1760,1758,1760,0,887,0,1626,1502,
+			1450,1644,1650,1702,1656,1661,1619,1403,1494,1441,1459,743,535,911,935,1182,
+			980,1000,859,387,711,499,571,1718,1726,1706,1738,1702,1710,1714,1734,1682,
+			1690,1694,1730,1246,1278,1198,1326,1182,1214,1230,1310,1102,1134,1150,1294
 @@pp_endif@@
 		};
 		if (idx == 0xffff) {
@@ -867,7 +897,7 @@ print("	}");
 			result = (char const *)(uintptr_t)UINTPTR_C(19971130);
 			break;
 		}
-		if likely(idx < 111) {
+		if likely(idx < 159) {
 			uint16_t offset = offtab_LC_TIME[idx];
 			result = (char const *)(byteblob + offset);
 		}
