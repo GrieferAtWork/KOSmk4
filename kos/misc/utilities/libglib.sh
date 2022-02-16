@@ -35,8 +35,9 @@ CONFIGURE="$CONFIGURE -Dinstalled_tests=false"
 CONFIGURE="$CONFIGURE -Dnls=enabled"
 
 # Don't install these files the "normal" way:
-INSTALL_SKIP=""
-INSTALL_SKIP="$INSTALL_SKIP /lib/glib-2.0/include/glibconfig.h"
+INSTALL_SKIP="
+/lib/glib-2.0/include/glibconfig.h
+"
 
 # Fix the messed-up header include system as far as that is possible
 _fix_glib_relative_includes() {

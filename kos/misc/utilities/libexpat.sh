@@ -23,8 +23,10 @@ require_utility libzlib "$PKG_CONFIG_PATH/zlib.pc"
 PACKAGE_NAME="libexpat-2.2.9"
 PACKAGE_URL="https://github.com/libexpat/libexpat/releases/download/R_2_2_9/expat-2.2.9.tar.gz"
 
-INSTALL_SKIP=""
-INSTALL_SKIP="$INSTALL_SKIP /usr/include/expat_config.h" # Contains arch-specific code
+# /usr/include/expat_config.h -- Contains arch-specific code
+INSTALL_SKIP="
+/usr/include/expat_config.h
+"
 
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"

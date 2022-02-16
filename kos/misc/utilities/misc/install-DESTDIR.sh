@@ -21,7 +21,7 @@
 # Variables:
 #   $INSTALL_NONE:      If non-empty, don't install anything
 #   $DESTDIR:           Sysroot of files that should be installed
-#   $INSTALL_SKIP:      Space-seperated list of files to never install
+#   $INSTALL_SKIP:      NL-seperated list of files to never install
 #   $PACKAGE_*:         Generic package information variables
 
 
@@ -50,7 +50,20 @@ if test -z "$INSTALL_NONE"; then
 		line="${line#.}"
 		if ! test -z "$line"; then
 			if ! test -z "$INSTALL_SKIP"; then
-				if [[ " $INSTALL_SKIP " == *" $line "* ]]; then
+				if [[ "$INSTALL_SKIP" == *"
+$line
+"* ]]; then
+					continue
+				fi
+				scan="${line%/*}"
+				should_skip=""
+				while ! test -z "$scan"; do
+					if [[ "$INSTALL_SKIP" == *"
+$scan
+"* ]]; then should_skip=yes; break; fi
+					scan="${scan%/*}"
+				done
+				if ! test -z "$should_skip"; then
 					continue
 				fi
 			fi

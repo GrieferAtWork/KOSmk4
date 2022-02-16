@@ -748,13 +748,24 @@ $CONFIG_SITE"
 				fi
 				echo "Scanning '$SRCPATH/configure' for needed config.site options..."
 				_config_site_option() {
-						if ! [[ "$CONFIG_SITE" == *$1* ]]; then
-							echo "	config.site: $1=$2"
-							CONFIG_SITE="$1=$2
+					if ! [[ "$CONFIG_SITE" == *$1* ]]; then
+						echo "	config.site: $1=$2"
+						CONFIG_SITE="$1=$2
 $CONFIG_SITE"
-						fi
+					fi
 				}
-
+				_test_links() {
+					"${CROSS_PREFIX}gcc" -o "$OPTPATH/_gm_outfile" -x c - > /dev/null 2>&1
+					local error="$?"
+					unlink "$OPTPATH/_gm_outfile" > /dev/null 2>&1
+					return "$error"
+				}
+				_test_expr() {
+					_test_links <<< "$2
+					static int a[($1) ? 1 : -1] = { 42 };
+					int main() { return a[0]; }
+					"
+				}
 				while IFS= read -r line; do
 					case "$line" in
 
@@ -1010,6 +1021,8 @@ $CONFIG_SITE"
 						_config_site_option "fu_cv_sys_stat_statfs2_bsize" "yes"; ;;
 					*fu_cv_sys_stat_statfs4*) # Some other statfs() variant
 						_config_site_option "fu_cv_sys_stat_statfs4" "no"; ;;
+					*fu_cv_sys_stat_statfs2_fsize*) # DECLARED(statfs(char const *file, struct statfs *buf)) && EXISTS(struct statfs::f_fsize)
+						_config_site_option "fu_cv_sys_stat_statfs2_fsize" "no"; ;;
 					*gl_cv_func_ftello_works*)
 						_config_site_option "gl_cv_func_ftello_works" "yes"; ;;
 					*gl_cv_func_futimens_works*)
@@ -1534,8 +1547,59 @@ $CONFIG_SITE"
 							_config_site_option "gl_cv_C_locale_sans_EILSEQ" "yes"
 						fi
 						;;
+					############################################################################
+					# Options we intentionally don't set (because they're too CPU-specific):
+					# - gl_cv_cc_double_expbit0
+					# - gl_cv_cc_float_expbit0
+					# - gl_cv_cc_long_double_expbit0
+					# - ac_cv_x87_double_rounding
+					############################################################################
 
-					# Some more found in nano
+					############################################################################
+					# Detection of type sizes always takes forever, so we speed it up
+					*ac_cv_sizeof_*)
+						. "$KOS_MISC/utilities/misc/target-info.sh"
+						_config_site_option "ac_cv_sizeof_char" "$TARGET_CONFIG_SIZEOF_CHAR"
+						_config_site_option "ac_cv_sizeof_short" "$TARGET_CONFIG_SIZEOF_SHORT"
+						_config_site_option "ac_cv_sizeof_int" "$TARGET_CONFIG_SIZEOF_INT"
+						_config_site_option "ac_cv_sizeof_long" "$TARGET_CONFIG_SIZEOF_LONG"
+						_config_site_option "ac_cv_sizeof_long_long" "$TARGET_CONFIG_SIZEOF_LLONG"
+						_config_site_option "ac_cv_sizeof_wchar_t" "$TARGET_CONFIG_SIZEOF_WCHAR_T"
+						_config_site_option "ac_cv_sizeof_float" "$TARGET_CONFIG_SIZEOF_FLOAT"
+						_config_site_option "ac_cv_sizeof_double" "$TARGET_CONFIG_SIZEOF_DOUBLE"
+						_config_site_option "ac_cv_sizeof_long_double" "$TARGET_CONFIG_SIZEOF_LDOUBLE"
+						_config_site_option "ac_cv_sizeof_void_p" "$TARGET_CONFIG_SIZEOF_POINTER"
+						_config_site_option "ac_cv_sizeof_size_t" "$TARGET_CONFIG_SIZEOF_POINTER"
+						_config_site_option "ac_cv_sizeof_ssize_t" "$TARGET_CONFIG_SIZEOF_POINTER"
+						_config_site_option "ac_cv_sizeof_ptrdiff_t" "$TARGET_CONFIG_SIZEOF_POINTER"
+						_config_site_option "ac_cv_sizeof_intptr_t" "$TARGET_CONFIG_SIZEOF_POINTER"
+						_config_site_option "ac_cv_sizeof_uintptr_t" "$TARGET_CONFIG_SIZEOF_POINTER"
+						;;
+					*ac_cv_alignof_*)
+						. "$KOS_MISC/utilities/misc/target-info.sh"
+						_config_site_option "ac_cv_alignof_char" "$TARGET_CONFIG_ALIGNOF_CHAR"
+						_config_site_option "ac_cv_alignof_short" "$TARGET_CONFIG_ALIGNOF_SHORT"
+						_config_site_option "ac_cv_alignof_int" "$TARGET_CONFIG_ALIGNOF_INT"
+						_config_site_option "ac_cv_alignof_long" "$TARGET_CONFIG_ALIGNOF_LONG"
+						_config_site_option "ac_cv_alignof_long_long" "$TARGET_CONFIG_ALIGNOF_LLONG"
+						_config_site_option "ac_cv_alignof_wchar_t" "$TARGET_CONFIG_ALIGNOF_WCHAR_T"
+						_config_site_option "ac_cv_alignof_float" "$TARGET_CONFIG_ALIGNOF_FLOAT"
+						_config_site_option "ac_cv_alignof_double" "$TARGET_CONFIG_ALIGNOF_DOUBLE"
+						_config_site_option "ac_cv_alignof_long_double" "$TARGET_CONFIG_ALIGNOF_LDOUBLE"
+						_config_site_option "ac_cv_alignof_void_p" "$TARGET_CONFIG_ALIGNOF_POINTER"
+						_config_site_option "ac_cv_alignof_size_t" "$TARGET_CONFIG_ALIGNOF_POINTER"
+						_config_site_option "ac_cv_alignof_ssize_t" "$TARGET_CONFIG_ALIGNOF_POINTER"
+						_config_site_option "ac_cv_alignof_ptrdiff_t" "$TARGET_CONFIG_ALIGNOF_POINTER"
+						_config_site_option "ac_cv_alignof_intptr_t" "$TARGET_CONFIG_ALIGNOF_POINTER"
+						_config_site_option "ac_cv_alignof_uintptr_t" "$TARGET_CONFIG_ALIGNOF_POINTER"
+						_config_site_option "ac_cv_alignof_maxalign_t" "$TARGET_CONFIG_ALIGNOF_MAXALIGN_T"
+						;;
+					############################################################################
+
+
+					# Some more found in misc programs
+
+					# nano
 					*gl_cv_func_printf_enomem*)
 						_config_site_option "gl_cv_func_printf_enomem" "yes"; ;;
 					*gt_cv_func_printf_posix*)
@@ -1544,6 +1608,90 @@ $CONFIG_SITE"
 						_config_site_option "gl_cv_func_gettimeofday_clobber" "no"; ;;
 					*gt_cv_int_divbyzero_sigfpe*)
 						_config_site_option "gt_cv_int_divbyzero_sigfpe" "yes"; ;;
+
+					# Xorg
+					*xorg_cv_malloc0_returns_null*)
+						_config_site_option "xorg_cv_malloc0_returns_null" "no"; ;;
+
+					# Python
+					*ac_cv_pthread_is_default*) # <pthread.h> works even without passing "-pthread" (yes: it does)
+						_config_site_option "ac_cv_pthread_is_default" "yes"; ;;
+					*ac_cv_pthread*)
+						# Yes, our gcc does define "-pthread", but it only does "-D_REENTRANT"
+						# This in turn turns on "__USE_REENTRANT", which is used to expose a
+						# couple of functions here and there, but doesn't affect <pthread.h>
+						_config_site_option "ac_cv_pthread" "yes"; ;;
+					*ac_cv_kpthread*) # No, our gcc doesn't accept "-Kpthread"
+						_config_site_option "ac_cv_kpthread" "no"; ;;
+					*ac_cv_kthread*) # No, our gcc doesn't accept "-Kthread"
+						_config_site_option "ac_cv_kthread" "no"; ;;
+					*ac_cv_pthread_system_supported*) # pthread_attr_setscope(PTHREAD_SCOPE_SYSTEM) doesn't return an error (which it doesn't')
+						_config_site_option "ac_cv_pthread_system_supported" "yes"; ;;
+					*ac_cv_have_chflags*) # As for right now, we don't have this function. But it may be added someday
+						_config_site_option "ac_cv_have_chflags" "no"; ;;
+					*ac_cv_have_lchflags*) # As for right now, we don't have this function. But it may be added someday
+						_config_site_option "ac_cv_have_lchflags" "no"; ;;
+					*ac_cv_buggy_getaddrinfo*)
+						_config_site_option "ac_cv_buggy_getaddrinfo" "no"; ;;
+					*ac_cv_little_endian_double* | *ac_cv_big_endian_double* | *ac_cv_mixed_endian_double*)
+						if _test_expr "__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__" "#include <ieee754.h>"; then
+							_config_site_option "ac_cv_little_endian_double" "no"
+							_config_site_option "ac_cv_big_endian_double" "yes"
+							_config_site_option "ac_cv_mixed_endian_double" "no"
+						elif _test_expr "__FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__" "#include <ieee754.h>"; then
+							_config_site_option "ac_cv_little_endian_double" "no"
+							_config_site_option "ac_cv_big_endian_double" "no"
+							_config_site_option "ac_cv_mixed_endian_double" "yes"
+						else
+							_config_site_option "ac_cv_little_endian_double" "yes"
+							_config_site_option "ac_cv_big_endian_double" "no"
+							_config_site_option "ac_cv_mixed_endian_double" "no"
+						fi
+						;;
+					*ac_cv_tanh_preserves_zero_sign*)
+						_config_site_option "ac_cv_tanh_preserves_zero_sign" "yes"; ;;
+					*ac_cv_posix_semaphores_enabled*)
+						_config_site_option "ac_cv_posix_semaphores_enabled" "yes"; ;;
+					*ac_cv_broken_sem_getvalue*)
+						_config_site_option "ac_cv_broken_sem_getvalue" "no"; ;;
+					*ac_cv_file__dev_ptmx*)
+						_config_site_option "ac_cv_file__dev_ptmx" "no"; ;;
+					*ac_cv_file__dev_ptc*)
+						_config_site_option "ac_cv_file__dev_ptc" "no"; ;;
+					*ac_cv_wchar_t_signed*)
+						# s.a. __WCHAR_UNSIGNED__
+						if _test_expr "(wchar_t)-1 < (wchar_t)0" "#include <wchar.h>"; then
+							_config_site_option "ac_cv_wchar_t_signed" "yes"
+						else
+							_config_site_option "ac_cv_wchar_t_signed" "no"
+						fi
+						;;
+					*ac_cv_rshift_extends_sign*)
+						# s.a. __ARCH_SIGNED_SHIFT_IS_SDIV
+						if _test_links <<< "
+							#include <asm/signed-shift.h>
+							#ifndef __ARCH_SIGNED_SHIFT_IS_SDIV
+							#error coke me
+							#endif
+							int main() { return 0; }
+						"; then
+							_config_site_option "ac_cv_rshift_extends_sign" "yes"
+						else
+							_config_site_option "ac_cv_rshift_extends_sign" "no"
+						fi
+						;;
+					*ac_cv_broken_nice*)
+						_config_site_option "ac_cv_broken_nice" "no"; ;;
+					*ac_cv_broken_poll*)
+						_config_site_option "ac_cv_broken_poll" "no"; ;;
+					*ac_cv_working_tzset*)
+						_config_site_option "ac_cv_working_tzset" "yes"; ;;
+					*ac_cv_have_long_long_format*) # printf("%lld")
+						_config_site_option "ac_cv_have_long_long_format" "yes"; ;;
+					*ac_cv_have_size_t_format*) # printf("%zd")
+						_config_site_option "ac_cv_have_size_t_format" "yes"; ;;
+					*ac_cv_computed_gotos*) # At least under GCC
+						_config_site_option "ac_cv_computed_gotos" "yes"; ;;
 
 					*) ;;
 					esac

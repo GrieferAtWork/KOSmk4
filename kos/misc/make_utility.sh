@@ -133,7 +133,7 @@ TARGET_CPUNAME="$TARGET_NAME"
 TARGET_LIBPATH="lib"
 TARGET_INCPATH="$TARGET_CPUNAME-kos"
 KOS_MISC="$(dirname "$(readlink -f "$0")")"
-KOS_PATCHES="${KOS_MISC}/patches"
+KOS_PATCHES="$KOS_MISC/patches"
 cmd cd "$KOS_MISC/../../"
 KOS_ROOT="$(pwd)"
 MTOOLS="$KOS_ROOT/binutils/misc/bin/mtools"
@@ -156,11 +156,11 @@ if [ "$TARGET_CPUNAME" == "x86_64" ]; then
 fi
 
 
-TARGET_SYSROOT="${KOS_ROOT}/bin/${TARGET_NAME}-kos-common"
-BINUTILS_SYSROOT="${KOS_ROOT}/binutils/${TARGET_NAME}-kos"
+TARGET_SYSROOT="$KOS_ROOT/bin/$TARGET_NAME-kos-common"
+BINUTILS_SYSROOT="$KOS_ROOT/binutils/$TARGET_NAME-kos"
 
 if ! [ -d "$TARGET_SYSROOT" ]; then
-	echo "Common system root ${TARGET_SYSROOT} is missing (re-run 'make_toolchain.sh' to fix)"
+	echo "Common system root $TARGET_SYSROOT is missing (re-run 'make_toolchain.sh' to fix)"
 	exit 1
 fi
 
@@ -286,23 +286,23 @@ install_file() {
 		DIDUPDATE="no"
 		if ! [ -f "$TARGET_DISPATH" ] || [ "$2" -nt "$TARGET_DISPATH" ]; then
 			unlink "$TARGET_DISPATH" > /dev/null 2>&1
-			echo "Installing file ${TARGET_NAME}-kos:/$DISPATH"
+			echo "Installing file $TARGET_NAME-kos:/$DISPATH"
 			DIDUPDATE="yes"
 			if ! cp "$2" "$TARGET_DISPATH" > /dev/null 2>&1; then
 				cmd mkdir -p "$(dirname "$TARGET_DISPATH")"
 				cmd cp "$2" "$TARGET_DISPATH"
 			fi
 		else
-			echo "Installing file ${TARGET_NAME}-kos:/$DISPATH (up to date)"
+			echo "Installing file $TARGET_NAME-kos:/$DISPATH (up to date)"
 		fi
 		local OLDPWD="$(pwd)"
-		cmd cd "${KOS_ROOT}/bin"
-		local BUILD_CONFIG_NAMES=$(echo ${TARGET_NAME}-kos-*)
+		cmd cd "$KOS_ROOT/bin"
+		local BUILD_CONFIG_NAMES=$(echo $TARGET_NAME-kos-*)
 		cmd cd "$OLDPWD"
 		local TARGET_DISPATH_MODIFIED="$(stat -c %Y "$TARGET_DISPATH")"
 		for BUILD_CONFIG in $BUILD_CONFIG_NAMES; do
-			if [ "$BUILD_CONFIG" != "${TARGET_NAME}-kos-common" ]; then
-				local CONFIG_SYSROOT="${KOS_ROOT}/bin/${BUILD_CONFIG}"
+			if [ "$BUILD_CONFIG" != "$TARGET_NAME-kos-common" ]; then
+				local CONFIG_SYSROOT="$KOS_ROOT/bin/$BUILD_CONFIG"
 				local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
 				local DISKIMAGE="$CONFIG_SYSROOT/disk.img"
 				if [ -f "$DISKIMAGE" ]; then
@@ -339,27 +339,27 @@ install_symlink() {
 		DIDUPDATE="no"
 		HOST_LINKTEXT="$2"
 		if [[ "$2" == "/"* ]]; then
-			HOST_LINKTEXT="${TARGET_SYSROOT}$2"
+			HOST_LINKTEXT="$TARGET_SYSROOT$2"
 		fi
 		if ! [ -f "$TARGET_DISPATH" ] || \
 		     [ "$(readlink "$TARGET_DISPATH")" != "$HOST_LINKTEXT" ]; then
 			unlink "$TARGET_DISPATH" > /dev/null 2>&1
-			echo "Installing symlink ${TARGET_NAME}-kos:/$DISPATH (ln -s \"$HOST_LINKTEXT\")"
+			echo "Installing symlink $TARGET_NAME-kos:/$DISPATH (ln -s \"$HOST_LINKTEXT\")"
 			DIDUPDATE="yes"
 			if ! ln -s "$HOST_LINKTEXT" "$TARGET_DISPATH" > /dev/null 2>&1; then
 				cmd mkdir -p "$(dirname "$TARGET_DISPATH")"
 				cmd ln -s "$HOST_LINKTEXT" "$TARGET_DISPATH"
 			fi
 		else
-			echo "Installing symlink ${TARGET_NAME}-kos:/$DISPATH (up to date)"
+			echo "Installing symlink $TARGET_NAME-kos:/$DISPATH (up to date)"
 		fi
 		local OLDPWD="$(pwd)"
-		cmd cd "${KOS_ROOT}/bin"
-		local BUILD_CONFIG_NAMES=$(echo ${TARGET_NAME}-kos-*)
+		cmd cd "$KOS_ROOT/bin"
+		local BUILD_CONFIG_NAMES=$(echo $TARGET_NAME-kos-*)
 		cmd cd "$OLDPWD"
 		for BUILD_CONFIG in $BUILD_CONFIG_NAMES; do
-			if [ "$BUILD_CONFIG" != "${TARGET_NAME}-kos-common" ]; then
-				local CONFIG_SYSROOT="${KOS_ROOT}/bin/${BUILD_CONFIG}"
+			if [ "$BUILD_CONFIG" != "$TARGET_NAME-kos-common" ]; then
+				local CONFIG_SYSROOT="$KOS_ROOT/bin/$BUILD_CONFIG"
 				local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
 				local DISKIMAGE="$CONFIG_SYSROOT/disk.img"
 				if [ -f "$DISKIMAGE" ]; then
@@ -396,22 +396,22 @@ install_symlink_nodisk() {
 		if ! [ -f "$TARGET_DISPATH" ] || \
 		     [ "$(readlink "$TARGET_DISPATH")" != "$2" ]; then
 			unlink "$TARGET_DISPATH" > /dev/null 2>&1
-			echo "Installing symlink ${TARGET_NAME}-kos:/$DISPATH (ln -s \"$2\")"
+			echo "Installing symlink $TARGET_NAME-kos:/$DISPATH (ln -s \"$2\")"
 			DIDUPDATE="yes"
 			if ! ln -s "$2" "$TARGET_DISPATH" > /dev/null 2>&1; then
 				cmd mkdir -p "$(dirname "$TARGET_DISPATH")"
 				cmd ln -s "$2" "$TARGET_DISPATH"
 			fi
 		else
-			echo "Installing symlink ${TARGET_NAME}-kos:/$DISPATH (up to date)"
+			echo "Installing symlink $TARGET_NAME-kos:/$DISPATH (up to date)"
 		fi
 		local OLDPWD="$(pwd)"
-		cmd cd "${KOS_ROOT}/bin"
-		local BUILD_CONFIG_NAMES=$(echo ${TARGET_NAME}-kos-*)
+		cmd cd "$KOS_ROOT/bin"
+		local BUILD_CONFIG_NAMES=$(echo $TARGET_NAME-kos-*)
 		cmd cd "$OLDPWD"
 		for BUILD_CONFIG in $BUILD_CONFIG_NAMES; do
-			if [ "$BUILD_CONFIG" != "${TARGET_NAME}-kos-common" ]; then
-				local CONFIG_SYSROOT="${KOS_ROOT}/bin/${BUILD_CONFIG}"
+			if [ "$BUILD_CONFIG" != "$TARGET_NAME-kos-common" ]; then
+				local CONFIG_SYSROOT="$KOS_ROOT/bin/$BUILD_CONFIG"
 				local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
 				if [ "$DIDUPDATE" == yes ] || ! [ -f "$CONFIG_DISPATH" ]; then
 					echo "    Conf: '$CONFIG_SYSROOT'"
@@ -437,20 +437,20 @@ install_mkdir() {
 		TARGET_DISPATH="$TARGET_SYSROOT/$DISPATH"
 		DIDUPDATE="no"
 		if ! [ -d "$TARGET_DISPATH" ]; then
-			echo "Installing dir ${TARGET_NAME}-kos:/$DISPATH"
+			echo "Installing dir $TARGET_NAME-kos:/$DISPATH"
 			DIDUPDATE="yes"
 			cmd mkdir -p "$TARGET_DISPATH"
 		else
-			echo "Installing dir ${TARGET_NAME}-kos:/$DISPATH (up to date)"
+			echo "Installing dir $TARGET_NAME-kos:/$DISPATH (up to date)"
 		fi
 		local OLDPWD="$(pwd)"
-		cmd cd "${KOS_ROOT}/bin"
-		local BUILD_CONFIG_NAMES=$(echo ${TARGET_NAME}-kos-*)
+		cmd cd "$KOS_ROOT/bin"
+		local BUILD_CONFIG_NAMES=$(echo $TARGET_NAME-kos-*)
 		cmd cd "$OLDPWD"
 		local TARGET_DISPATH_MODIFIED="$(stat -c %Y "$TARGET_DISPATH")"
 		for BUILD_CONFIG in $BUILD_CONFIG_NAMES; do
-			if [ "$BUILD_CONFIG" != "${TARGET_NAME}-kos-common" ]; then
-				local CONFIG_SYSROOT="${KOS_ROOT}/bin/${BUILD_CONFIG}"
+			if [ "$BUILD_CONFIG" != "$TARGET_NAME-kos-common" ]; then
+				local CONFIG_SYSROOT="$KOS_ROOT/bin/$BUILD_CONFIG"
 				local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
 				local DISKIMAGE="$CONFIG_SYSROOT/disk.img"
 				if [ -f "$DISKIMAGE" ]; then
@@ -482,22 +482,22 @@ install_file_nodisk() {
 		DIDUPDATE="no"
 		if ! [ -f "$TARGET_DISPATH" ] || [ "$TARGET_DISPATH" -ot "$2" ]; then
 			unlink "$TARGET_DISPATH" > /dev/null 2>&1
-			echo "Installing file ${TARGET_NAME}-kos:/$DISPATH"
+			echo "Installing file $TARGET_NAME-kos:/$DISPATH"
 			DIDUPDATE="yes"
 			if ! cp "$2" "$TARGET_DISPATH" > /dev/null 2>&1; then
 				cmd mkdir -p "$(dirname "$TARGET_DISPATH")"
 				cmd cp "$2" "$TARGET_DISPATH"
 			fi
 		else
-			echo "Installing file ${TARGET_NAME}-kos:/$DISPATH (up to date)"
+			echo "Installing file $TARGET_NAME-kos:/$DISPATH (up to date)"
 		fi
 		local OLDPWD="$(pwd)"
-		cmd cd "${KOS_ROOT}/bin"
-		local BUILD_CONFIG_NAMES=$(echo ${TARGET_NAME}-kos-*)
+		cmd cd "$KOS_ROOT/bin"
+		local BUILD_CONFIG_NAMES=$(echo $TARGET_NAME-kos-*)
 		cmd cd "$OLDPWD"
 		for BUILD_CONFIG in $BUILD_CONFIG_NAMES; do
-			if [ "$BUILD_CONFIG" != "${TARGET_NAME}-kos-common" ]; then
-				local CONFIG_SYSROOT="${KOS_ROOT}/bin/${BUILD_CONFIG}"
+			if [ "$BUILD_CONFIG" != "$TARGET_NAME-kos-common" ]; then
+				local CONFIG_SYSROOT="$KOS_ROOT/bin/$BUILD_CONFIG"
 				local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
 				if [ "$DIDUPDATE" == yes ] || ! [ -e "$CONFIG_DISPATH" ]; then
 					echo "    Conf: '$CONFIG_SYSROOT'"
@@ -522,21 +522,21 @@ install_path() {
 		DISPATH="${1#/}"
 		TARGET_DISPATH="$TARGET_SYSROOT/$DISPATH"
 		if ! [ -e "$TARGET_DISPATH" ]; then
-			echo "Installing path ${TARGET_NAME}-kos:/$DISPATH/*"
+			echo "Installing path $TARGET_NAME-kos:/$DISPATH/*"
 			if ! ln -r -s "$2" "$TARGET_DISPATH" > /dev/null 2>&1; then
 				cmd mkdir -p "$(dirname "$TARGET_DISPATH")"
 				cmd ln -r -s "$2" "$TARGET_DISPATH"
 			fi
 		else
-			echo "Installing path ${TARGET_NAME}-kos:/$DISPATH/* (up to date)"
+			echo "Installing path $TARGET_NAME-kos:/$DISPATH/* (up to date)"
 		fi
 		local OLDPWD="$(pwd)"
-		cmd cd "${KOS_ROOT}/bin"
-		local BUILD_CONFIG_NAMES=$(echo ${TARGET_NAME}-kos-*)
+		cmd cd "$KOS_ROOT/bin"
+		local BUILD_CONFIG_NAMES=$(echo $TARGET_NAME-kos-*)
 		cmd cd "$OLDPWD"
 		for BUILD_CONFIG in $BUILD_CONFIG_NAMES; do
-			if [ "$BUILD_CONFIG" != "${TARGET_NAME}-kos-common" ]; then
-				local CONFIG_SYSROOT="${KOS_ROOT}/bin/${BUILD_CONFIG}"
+			if [ "$BUILD_CONFIG" != "$TARGET_NAME-kos-common" ]; then
+				local CONFIG_SYSROOT="$KOS_ROOT/bin/$BUILD_CONFIG"
 				local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
 				local DISKIMAGE="$CONFIG_SYSROOT/disk.img"
 				if [ -f "$DISKIMAGE" ]; then
@@ -567,18 +567,18 @@ install_path_hardcopy() {
 		DISPATH="${1#/}"
 		TARGET_DISPATH="$TARGET_SYSROOT/$DISPATH"
 		if true; then
-			echo "Installing path ${TARGET_NAME}-kos:/$DISPATH/* (hardcopy)"
+			echo "Installing path $TARGET_NAME-kos:/$DISPATH/* (hardcopy)"
 			cmd mkdir -p "$(dirname "$TARGET_DISPATH")"
 			unlink "$TARGET_DISPATH" > /dev/null 2>&1
 			cmd cp -R -n "$2" "$TARGET_DISPATH"
 		fi
 		local OLDPWD="$(pwd)"
-		cmd cd "${KOS_ROOT}/bin"
-		local BUILD_CONFIG_NAMES=$(echo ${TARGET_NAME}-kos-*)
+		cmd cd "$KOS_ROOT/bin"
+		local BUILD_CONFIG_NAMES=$(echo $TARGET_NAME-kos-*)
 		cmd cd "$OLDPWD"
 		for BUILD_CONFIG in $BUILD_CONFIG_NAMES; do
-			if [ "$BUILD_CONFIG" != "${TARGET_NAME}-kos-common" ]; then
-				local CONFIG_SYSROOT="${KOS_ROOT}/bin/${BUILD_CONFIG}"
+			if [ "$BUILD_CONFIG" != "$TARGET_NAME-kos-common" ]; then
+				local CONFIG_SYSROOT="$KOS_ROOT/bin/$BUILD_CONFIG"
 				local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
 				local DISKIMAGE="$CONFIG_SYSROOT/disk.img"
 				if [ -f "$DISKIMAGE" ]; then
@@ -604,7 +604,7 @@ install_path_hardcopy() {
 #>> rundeemon <ARGS...>
 # Invoke `deemon $*`
 rundeemon() {
-	"${KOS_ROOT}/binutils/deemon/deemon" $*
+	"$KOS_ROOT/binutils/deemon/deemon" $*
 	return $?
 }
 
@@ -660,7 +660,7 @@ export PATH="$BINUTILS_CONFIG_BIN:$PATH"
 case "$UTILITY_NAME" in
 *\**)
 	RARGS="$(print_make_utility_options) $TARGET_NAME"
-	cmd cd "${KOS_ROOT}/kos/misc/utilities"
+	cmd cd "$KOS_ROOT/kos/misc/utilities"
 	for util in $UTILITY_NAME; do
 		if [[ "$util" == *".sh" ]] && [ -f "$util" ]; then
 			util="${util::-3}"
@@ -675,7 +675,7 @@ case "$UTILITY_NAME" in
 	;;
 esac
 
-UTILITY_SCRIPT="${KOS_ROOT}/kos/misc/utilities/${UTILITY_NAME}.sh"
+UTILITY_SCRIPT="$KOS_ROOT/kos/misc/utilities/$UTILITY_NAME.sh"
 if ! [ -f "$UTILITY_SCRIPT" ]; then
 	echo "Unknown utility '$UTILITY_NAME'"
 	exit 1

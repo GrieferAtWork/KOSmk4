@@ -57,9 +57,10 @@ CONFIGURE="$CONFIGURE --disable-stripping"
 #CONFIGURE="$CONFIGURE --enable-assertions"
 CONFIGURE="$CONFIGURE --enable-widec"
 
-INSTALL_SKIP=""
-INSTALL_SKIP="$INSTALL_SKIP /bin/ncurses6-config"
-INSTALL_SKIP="$INSTALL_SKIP /bin/ncursesw6-config"
+INSTALL_SKIP="
+/bin/ncurses6-config
+/bin/ncursesw6-config
+"
 
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"

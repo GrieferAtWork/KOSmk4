@@ -27,10 +27,11 @@ VERSION="16"
 CONFIGURE=""
 CONFIGURE="$CONFIGURE --enable-hardware-optimizations"
 
-INSTALL_SKIP=""
-INSTALL_SKIP="$INSTALL_SKIP /bin/libpng-config"
-INSTALL_SKIP="$INSTALL_SKIP /bin/libpng${VERSION}-config"
-INSTALL_SKIP="$INSTALL_SKIP /usr/include/libpng${VERSION}/pnglibconf.h"
+INSTALL_SKIP="
+/bin/libpng-config
+/bin/libpng${VERSION}-config
+/usr/include/libpng${VERSION}/pnglibconf.h
+"
 
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"
