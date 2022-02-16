@@ -24,8 +24,9 @@ PACKAGE_URL="https://github.com/glennrp/libpng/archive/v1.6.35.tar.gz"
 PACKAGE_NAME="libpng-1.6.35"
 VERSION="16"
 
-CONFIGURE=""
-CONFIGURE="$CONFIGURE --enable-hardware-optimizations"
+CONFIGURE=(
+	"--enable-hardware-optimizations"
+)
 
 INSTALL_SKIP="
 /bin/libpng-config

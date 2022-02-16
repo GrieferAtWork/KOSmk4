@@ -25,11 +25,12 @@ require_utility Xorg/libXext   "$PKG_CONFIG_PATH/xext.pc"
 
 PACKAGE_URL="https://www.x.org/releases/individual/lib/libXmu-1.1.3.tar.gz"
 
-CONFIGURE=""
-CONFIGURE="$CONFIGURE --enable-unix-transport"
-CONFIGURE="$CONFIGURE --disable-tcp-transport"
-CONFIGURE="$CONFIGURE --disable-ipv6"
-CONFIGURE="$CONFIGURE --enable-local-transport"
+CONFIGURE=(
+	"--enable-unix-transport"
+	"--disable-tcp-transport"
+	"--disable-ipv6"
+	"--enable-local-transport"
+)
 
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"

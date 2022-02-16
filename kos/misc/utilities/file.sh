@@ -25,13 +25,14 @@ require_utility liblzma  "$PKG_CONFIG_PATH/liblzma.pc"
 PACKAGE_NAME="file-5.39"
 PACKAGE_URL="https://github.com/file/file/archive/FILE5_39.tar.gz"
 
-CONFIGURE=""
-CONFIGURE="$CONFIGURE --enable-elf"
-CONFIGURE="$CONFIGURE --enable-elf-core"
-CONFIGURE="$CONFIGURE --enable-zlib"
-CONFIGURE="$CONFIGURE --enable-bzlib"
-CONFIGURE="$CONFIGURE --enable-xzlib"
-CONFIGURE="$CONFIGURE --disable-libseccomp"
+CONFIGURE=(
+	"--enable-elf"
+	"--enable-elf-core"
+	"--enable-zlib"
+	"--enable-bzlib"
+	"--enable-xzlib"
+	"--disable-libseccomp"
+)
 
 
 # In order to build the "file" utility, you need install same version on

@@ -28,9 +28,10 @@ require_utility Xorg/libXpm    "$PKG_CONFIG_PATH/xpm.pc"
 
 PACKAGE_URL="https://www.x.org/releases/individual/lib/libXaw-1.0.13.tar.gz"
 
-CONFIGURE=""
-CONFIGURE="$CONFIGURE --enable-xaw6"
-CONFIGURE="$CONFIGURE --enable-xaw7"
+CONFIGURE=(
+	"--enable-xaw6"
+	"--enable-xaw7"
+)
 
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"

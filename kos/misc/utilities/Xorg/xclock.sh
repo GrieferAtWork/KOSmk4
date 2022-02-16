@@ -29,9 +29,10 @@ require_utility Xorg/libxkbfile  "$PKG_CONFIG_PATH/xkbfile.pc"
 
 PACKAGE_URL="https://www.x.org/releases/individual/app/xclock-1.0.9.tar.gz"
 
-CONFIGURE=""
-CONFIGURE="$CONFIGURE --with-xft"
-CONFIGURE="$CONFIGURE --with-xkb"
+CONFIGURE=(
+	"--with-xft"
+	"--with-xkb"
+)
 
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"

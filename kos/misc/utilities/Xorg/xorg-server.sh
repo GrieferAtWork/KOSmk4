@@ -65,108 +65,117 @@ X_xkb_bin_directory="/bin"                   # Should be: ${bindir}
 
 PACKAGE_URL="https://www.x.org/releases/individual/xserver/xorg-server-1.20.9.tar.gz"
 
-CONFIGURE=""
-CONFIGURE="$CONFIGURE --disable-listen-tcp"
-CONFIGURE="$CONFIGURE --enable-listen-unix"
-CONFIGURE="$CONFIGURE --enable-listen-local"
-CONFIGURE="$CONFIGURE --disable-sparkle"
-CONFIGURE="$CONFIGURE --enable-visibility"
-CONFIGURE="$CONFIGURE --enable-composite"
-CONFIGURE="$CONFIGURE --enable-mitshm"
-CONFIGURE="$CONFIGURE --enable-xres"
-CONFIGURE="$CONFIGURE --enable-record"
-CONFIGURE="$CONFIGURE --enable-xv"
-CONFIGURE="$CONFIGURE --enable-xvmc"
-CONFIGURE="$CONFIGURE --enable-dga"
-CONFIGURE="$CONFIGURE --enable-screensaver"
-CONFIGURE="$CONFIGURE --disable-xdmcp"
-CONFIGURE="$CONFIGURE --disable-xdm-auth-1"
-CONFIGURE="$CONFIGURE --disable-glx"  # TODO
-CONFIGURE="$CONFIGURE --disable-dri"  # TODO
-CONFIGURE="$CONFIGURE --disable-dri2" # TODO
-CONFIGURE="$CONFIGURE --disable-dri3" # TODO
-CONFIGURE="$CONFIGURE --enable-present"
-CONFIGURE="$CONFIGURE --disable-xinerama" # Multi-monitor extension
-CONFIGURE="$CONFIGURE --enable-xf86vidmode"
-CONFIGURE="$CONFIGURE --disable-xace" # X-Access-Control-Extension
-CONFIGURE="$CONFIGURE --disable-xselinux"
-CONFIGURE="$CONFIGURE --disable-xcsecurity"
-CONFIGURE="$CONFIGURE --enable-dbe" # Double-Buffer-Extension
-CONFIGURE="$CONFIGURE --enable-xf86bigfont"
-CONFIGURE="$CONFIGURE --enable-dpms"             # Display-Power-Management-Signaling
-CONFIGURE="$CONFIGURE --disable-config-udev"     # Don't have -ludev
-CONFIGURE="$CONFIGURE --disable-config-udev-kms" # ???
-CONFIGURE="$CONFIGURE --disable-config-hal"      # Don't have -lhal
-CONFIGURE="$CONFIGURE --disable-config-wscons"   # BSD-specific thingy
-CONFIGURE="$CONFIGURE --enable-xfree86-utils"
-CONFIGURE="$CONFIGURE --enable-vgahw"
-CONFIGURE="$CONFIGURE --enable-vbe"
-CONFIGURE="$CONFIGURE --enable-int10-module"
-CONFIGURE="$CONFIGURE --disable-windowswm " # Only needed for_ X-window-on-cygwin
-CONFIGURE="$CONFIGURE --disable-windowsdri" # Only needed for_ X-window-on-cygwin
-CONFIGURE="$CONFIGURE --enable-libdrm"
-CONFIGURE="$CONFIGURE --enable-clientids"
-CONFIGURE="$CONFIGURE --enable-pciaccess"
-CONFIGURE="$CONFIGURE --disable-linux-acpi" # TODO
-CONFIGURE="$CONFIGURE --disable-linux-apm " # TODO
-CONFIGURE="$CONFIGURE --disable-systemd-logind"
-CONFIGURE="$CONFIGURE --disable-suid-wrapper"
-CONFIGURE="$CONFIGURE --enable-xorg"     # Yes, we want the actual server!
-CONFIGURE="$CONFIGURE --disable-dmx"     # X-window proxy server? (seems related to xinerama)
-CONFIGURE="$CONFIGURE --disable-xvfb"    # It´s a dummy X-window server (no need)
-CONFIGURE="$CONFIGURE --disable-xnest"   # Nested windowing? (might wanna enable this in the future)
-CONFIGURE="$CONFIGURE --disable-xquartz" # OS-X-specific thingy
-CONFIGURE="$CONFIGURE --disable-xwayland"
-CONFIGURE="$CONFIGURE --disable-xwayland-eglstream"
-CONFIGURE="$CONFIGURE --disable-standalone-xpbproxy"
-CONFIGURE="$CONFIGURE --disable-xwin"   # Only needed for_ X-window-on-cygwin
-CONFIGURE="$CONFIGURE --disable-glamor" # ???
-CONFIGURE="$CONFIGURE --disable-kdrive"
-CONFIGURE="$CONFIGURE --disable-xephyr"
-CONFIGURE="$CONFIGURE --disable-libunwind" # Can/will never be ported due to incompatibility with KOS´s native libunwind
-CONFIGURE="$CONFIGURE --enable-xshmfence"
-CONFIGURE="$CONFIGURE --disable-install-setuid" # Wouldn´t matter; We do our own install
-CONFIGURE="$CONFIGURE --enable-unix-transport"  # Unix domain socket support
-CONFIGURE="$CONFIGURE --disable-tcp-transport"  # Not needed
-CONFIGURE="$CONFIGURE --disable-ipv6"           # Not needed
-CONFIGURE="$CONFIGURE --enable-local-transport"
-CONFIGURE="$CONFIGURE --disable-secure-rpc"
-CONFIGURE="$CONFIGURE --enable-input-thread"
-CONFIGURE="$CONFIGURE --enable-xtrans-send-fds"
+CONFIGURE=(
+	"--disable-listen-tcp"
+	"--enable-listen-unix"
+	"--enable-listen-local"
+	"--disable-sparkle"
+	"--enable-visibility"
+	"--enable-composite"
+	"--enable-mitshm"
+	"--enable-xres"
+	"--enable-record"
+	"--enable-xv"
+	"--enable-xvmc"
+	"--enable-dga"
+	"--enable-screensaver"
+	"--disable-xdmcp"
+	"--disable-xdm-auth-1"
+	"--disable-glx"  # TODO
+	"--disable-dri"  # TODO
+	"--disable-dri2" # TODO
+	"--disable-dri3" # TODO
+	"--enable-present"
+	"--disable-xinerama" # Multi-monitor extension
+	"--enable-xf86vidmode"
+	"--disable-xace" # X-Access-Control-Extension
+	"--disable-xselinux"
+	"--disable-xcsecurity"
+	"--enable-dbe" # Double-Buffer-Extension
+	"--enable-xf86bigfont"
+	"--enable-dpms"             # Display-Power-Management-Signaling
+	"--disable-config-udev"     # Don't have -ludev
+	"--disable-config-udev-kms" # ???
+	"--disable-config-hal"      # Don't have -lhal
+	"--disable-config-wscons"   # BSD-specific thingy
+	"--enable-xfree86-utils"
+	"--enable-vgahw"
+	"--enable-vbe"
+	"--enable-int10-module"
+	"--disable-windowswm " # Only needed for_ X-window-on-cygwin
+	"--disable-windowsdri" # Only needed for_ X-window-on-cygwin
+	"--enable-libdrm"
+	"--enable-clientids"
+	"--enable-pciaccess"
+	"--disable-linux-acpi" # TODO
+	"--disable-linux-apm " # TODO
+	"--disable-systemd-logind"
+	"--disable-suid-wrapper"
+	"--enable-xorg"     # Yes, we want the actual server!
+	"--disable-dmx"     # X-window proxy server? (seems related to xinerama)
+	"--disable-xvfb"    # It´s a dummy X-window server (no need)
+	"--disable-xnest"   # Nested windowing? (might wanna enable this in the future)
+	"--disable-xquartz" # OS-X-specific thingy
+	"--disable-xwayland"
+	"--disable-xwayland-eglstream"
+	"--disable-standalone-xpbproxy"
+	"--disable-xwin"   # Only needed for_ X-window-on-cygwin
+	"--disable-glamor" # ???
+	"--disable-kdrive"
+	"--disable-xephyr"
+	"--disable-libunwind" # Can/will never be ported due to incompatibility with KOS´s native libunwind
+	"--enable-xshmfence"
+	"--disable-install-setuid" # Wouldn´t matter; We do our own install
+	"--enable-unix-transport"  # Unix domain socket support
+	"--disable-tcp-transport"  # Not needed
+	"--disable-ipv6"           # Not needed
+	"--enable-local-transport"
+	"--disable-secure-rpc"
+	"--enable-input-thread"
+	"--enable-xtrans-send-fds"
+)
 
-CONFIGURE="$CONFIGURE --without-dtrace"
-CONFIGURE="$CONFIGURE --with-int10=x86emu" # TODO: vm86 (dispatch to libvm86 from libc)
-CONFIGURE="$CONFIGURE --with-vendor-name=Griefer@Work"
-CONFIGURE="$CONFIGURE --with-vendor-name-short=G@W"
-CONFIGURE="$CONFIGURE --with-vendor-web=https://github.com/GrieferAtWork/KOSmk4"
-CONFIGURE="$CONFIGURE --with-module-dir=$X_module_dir"
-CONFIGURE="$CONFIGURE --with-log-dir=$X_log_dir"
-CONFIGURE="$CONFIGURE --with-builder-addr=Griefer@Work"
-CONFIGURE="$CONFIGURE --with-os-name=KOS"
-CONFIGURE="$CONFIGURE --with-os-vendor=Griefer@Work"
-CONFIGURE="$CONFIGURE --with-fontrootdir=$X_fontrootdir"
-CONFIGURE="$CONFIGURE --with-fontmiscdir=$X_fontrootdir/misc"
-CONFIGURE="$CONFIGURE --with-fontotfdir=$X_fontrootdir/OTF"
-CONFIGURE="$CONFIGURE --with-fontttfdir=$X_fontrootdir/TTF"
-CONFIGURE="$CONFIGURE --with-fonttype1dir=$X_fontrootdir/Type1"
-CONFIGURE="$CONFIGURE --with-font75dpidir=$X_fontrootdir/75dpi"
-CONFIGURE="$CONFIGURE --with-font100dpidir=$X_fontrootdir/100dpi"
-CONFIGURE="$CONFIGURE --with-default-font-path=\
+CONFIGURE+=(
+	"--without-dtrace"
+	"--with-int10=x86emu" # TODO: vm86 (dispatch to libvm86 from libc)
+	"--with-vendor-name=Griefer@Work"
+	"--with-vendor-name-short=G@W"
+	"--with-vendor-web=https://github.com/GrieferAtWork/KOSmk4"
+	"--with-module-dir=$X_module_dir"
+	"--with-log-dir=$X_log_dir"
+	"--with-builder-addr=Griefer@Work"
+	"--with-os-name=KOS"
+	"--with-os-vendor=Griefer@Work"
+	"--with-fontrootdir=$X_fontrootdir"
+	"--with-fontmiscdir=$X_fontrootdir/misc"
+	"--with-fontotfdir=$X_fontrootdir/OTF"
+	"--with-fontttfdir=$X_fontrootdir/TTF"
+	"--with-fonttype1dir=$X_fontrootdir/Type1"
+	"--with-font75dpidir=$X_fontrootdir/75dpi"
+	"--with-font100dpidir=$X_fontrootdir/100dpi"
+)
+
+CONFIGURE+=(
+	"--with-default-font-path=\
 built-ins,$X_fontrootdir/misc/,$X_fontrootdir/ttf/,$X_fontrootdir/otf/,\
 $X_fontrootdir/Type1/,$X_fontrootdir/100dpi/,$X_fontrootdir/75dpi/"
+)
 
-CONFIGURE="$CONFIGURE --with-xkb-path=$X_xkb_path"
-CONFIGURE="$CONFIGURE --with-xkb-output=$X_xkb_output"
-CONFIGURE="$CONFIGURE --with-fallback-input-driver=" # ???
-CONFIGURE="$CONFIGURE --with-default-xkb-rules=base"
-CONFIGURE="$CONFIGURE --with-default-xkb-model=pc105" # ???
-CONFIGURE="$CONFIGURE --with-default-xkb-layout=us"
-CONFIGURE="$CONFIGURE --with-default-xkb-variant="
-CONFIGURE="$CONFIGURE --with-default-xkb-options="
-CONFIGURE="$CONFIGURE --with-serverconfig-path=$X_serverconfig_path"
-CONFIGURE="$CONFIGURE --with-xkb-bin-directory=$X_xkb_bin_directory"
-CONFIGURE="$CONFIGURE --without-systemd-daemon"
-CONFIGURE="$CONFIGURE --with-sha1=libcrypto"
+CONFIGURE+=(
+	"--with-xkb-path=$X_xkb_path"
+	"--with-xkb-output=$X_xkb_output"
+	"--with-fallback-input-driver=" # ???
+	"--with-default-xkb-rules=base"
+	"--with-default-xkb-model=pc105" # ???
+	"--with-default-xkb-layout=us"
+	"--with-default-xkb-variant="
+	"--with-default-xkb-options="
+	"--with-serverconfig-path=$X_serverconfig_path"
+	"--with-xkb-bin-directory=$X_xkb_bin_directory"
+	"--without-systemd-daemon"
+	"--with-sha1=libcrypto"
+)
+
 
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"

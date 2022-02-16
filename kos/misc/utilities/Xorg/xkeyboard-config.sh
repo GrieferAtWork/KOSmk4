@@ -31,8 +31,9 @@ require_program xkbcomp
 
 PACKAGE_URL="https://www.x.org/releases/individual/data/xkeyboard-config/xkeyboard-config-2.31.tar.gz"
 
-CONFIGURE=""
-CONFIGURE="$CONFIGURE --with-xkb-base=/usr/share/X11/xkb"
+CONFIGURE=(
+	"--with-xkb-base=/usr/share/X11/xkb"
+)
 
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"

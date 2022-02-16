@@ -22,8 +22,9 @@ require_utility Xorg/libxkbfile "$PKG_CONFIG_PATH/xkbfile.pc"
 
 PACKAGE_URL="https://www.x.org/releases/individual/app/xkbcomp-1.4.3.tar.gz"
 
-CONFIGURE=""
-CONFIGURE="$CONFIGURE --with-xkb-config-root=/usr/share/X11/xkb"
+CONFIGURE=(
+	"--with-xkb-config-root=/usr/share/X11/xkb"
+)
 
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"

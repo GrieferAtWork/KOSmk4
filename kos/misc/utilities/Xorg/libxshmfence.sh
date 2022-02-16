@@ -22,10 +22,11 @@ require_utility Xorg/xorgproto "$PKG_CONFIG_PATH/xproto.pc"
 
 PACKAGE_URL="https://www.x.org/releases/individual/lib/libxshmfence-1.3.tar.gz"
 
-CONFIGURE=""
-CONFIGURE="$CONFIGURE --enable-futex"
-CONFIGURE="$CONFIGURE --enable-visibility"
-CONFIGURE="$CONFIGURE --with-shared-memory-dir=/dev/shm"
+CONFIGURE=(
+	"--enable-futex"
+	"--enable-visibility"
+	"--with-shared-memory-dir=/dev/shm"
+)
 
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"

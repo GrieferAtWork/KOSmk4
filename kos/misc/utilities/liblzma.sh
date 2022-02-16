@@ -23,9 +23,9 @@
 PACKAGE_URL="https://tukaani.org/xz/xz-5.2.5.tar.gz"
 PACKAGE_NAME="liblzma-5.2.5"
 
-CONFIGURE=""
-CONFIGURE="$CONFIGURE --enable-debug"
-
+CONFIGURE=(
+	"--enable-debug"
+)
 
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"

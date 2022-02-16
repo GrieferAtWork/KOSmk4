@@ -25,11 +25,12 @@ PACKAGE_URL="https://sourceforge.net/projects/pcre/files/pcre/8.37/pcre-8.37.tar
 PACKAGE_NAME="libpcre-8.37"
 
 # Additions configure options
-CONFIGURE=""
-CONFIGURE="$CONFIGURE --enable-utf"
-CONFIGURE="$CONFIGURE --enable-newline-is-anycrlf"
-CONFIGURE="$CONFIGURE --enable-pcregrep-libz"
-CONFIGURE="$CONFIGURE --enable-pcregrep-libbz2"
+CONFIGURE=(
+	"--enable-utf"
+	"--enable-newline-is-anycrlf"
+	"--enable-pcregrep-libz"
+	"--enable-pcregrep-libbz2"
+)
 
 INSTALL_SKIP="
 /bin/pcre-config

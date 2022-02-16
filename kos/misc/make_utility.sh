@@ -155,7 +155,7 @@ if [ "$TARGET_CPUNAME" == "x86_64" ]; then
 	TARGET_LIBPATH="lib64"
 fi
 
-
+SH=${SH:-bash}
 TARGET_SYSROOT="$KOS_ROOT/bin/$TARGET_NAME-kos-common"
 BINUTILS_SYSROOT="$KOS_ROOT/binutils/$TARGET_NAME-kos"
 
@@ -165,8 +165,8 @@ if ! [ -d "$TARGET_SYSROOT" ]; then
 fi
 
 # This is the path where PKG_CONFIG utilities load/install their config files
-export PKG_CONFIG_PATH="$BINUTILS_SYSROOT/opt/pkg_config"
-export PKG_CONFIG_LIBDIR="$PKG_CONFIG_PATH"
+export PKG_CONFIG_LIBDIR="$BINUTILS_SYSROOT/opt/pkg_config"
+export PKG_CONFIG_PATH="$PKG_CONFIG_LIBDIR"
 
 
 require_program() {
@@ -183,11 +183,11 @@ require_utility() {
 	if ! [ -f "$2" ]; then
 		if test x"$MODE_RECURSIVE" == xyes; then
 			echo "Required untility not installed: $1 (file '$2' does't exist; install automatically)"
-			vcmd bash "$KOS_MISC/make_utility.sh" $(print_make_utility_options) $TARGET_NAME $1
+			vcmd "$SH" "$KOS_MISC/make_utility.sh" $(print_make_utility_options) $TARGET_NAME $1
 		else
 			echo "Required untility not installed: $1 (file '$2' does't exist)"
 			echo "Resolve this issue by running:"
-			echo "\$ bash make_utility.sh $TARGET_NAME $1"
+			echo "\$ $SH make_utility.sh $TARGET_NAME $1"
 			exit 1
 		fi
 	fi
@@ -665,8 +665,7 @@ case "$UTILITY_NAME" in
 		if [[ "$util" == *".sh" ]] && [ -f "$util" ]; then
 			util="${util::-3}"
 			echo ">>> Now making: $util <<<"
-			cmd bash "$KOS_MISC/make_utility.sh" $RARGS $util
-			echo ""
+			cmd "$SH" "$KOS_MISC/make_utility.sh" $RARGS $util
 		fi
 	done
 	exit 0
@@ -681,5 +680,5 @@ if ! [ -f "$UTILITY_SCRIPT" ]; then
 	exit 1
 fi
 
-# Include the utility-specific build-script as an inlined bash script here
+# Include the utility-specific build-script as an inlined shell script here
 . "$UTILITY_SCRIPT"

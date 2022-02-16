@@ -25,12 +25,13 @@ require_utility libuuid        "$PKG_CONFIG_PATH/uuid.pc"
 
 PACKAGE_URL="https://www.x.org/releases/individual/lib/libSM-1.2.3.tar.gz"
 
-CONFIGURE=""
-CONFIGURE="$CONFIGURE --enable-unix-transport"
-CONFIGURE="$CONFIGURE --disable-tcp-transport"
-CONFIGURE="$CONFIGURE --disable-ipv6"
-CONFIGURE="$CONFIGURE --enable-local-transport"
-CONFIGURE="$CONFIGURE --with-libuuid"
+CONFIGURE=(
+	"--enable-unix-transport"
+	"--disable-tcp-transport"
+	"--disable-ipv6"
+	"--enable-local-transport"
+	"--with-libuuid"
+)
 
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"

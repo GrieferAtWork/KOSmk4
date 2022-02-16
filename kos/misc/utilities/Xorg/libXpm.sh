@@ -26,9 +26,10 @@ require_utility Xorg/libXext   "$PKG_CONFIG_PATH/xext.pc"
 
 PACKAGE_URL="https://www.x.org/releases/individual/lib/libXpm-3.5.13.tar.gz"
 
-CONFIGURE=""
-CONFIGURE="$CONFIGURE --enable-stat-zfile"
-CONFIGURE="$CONFIGURE --with-localedir=/usr/share/locale"
+CONFIGURE=(
+	"--enable-stat-zfile"
+	"--with-localedir=/usr/share/locale"
+)
 
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"

@@ -26,11 +26,12 @@ require_utility Xorg/xorgproto "$PKG_CONFIG_PATH/xproto.pc"
 
 PACKAGE_URL="https://www.x.org/releases/individual/lib/libXt-1.2.0.tar.gz"
 
-CONFIGURE=""
-CONFIGURE="$CONFIGURE --enable-xkb"
-CONFIGURE="$CONFIGURE --enable-const"
-CONFIGURE="$CONFIGURE --disable-geo-tattler"
-CONFIGURE="$CONFIGURE --with-appdefaultdir=/usr/share/X11/app-defaults"
+CONFIGURE=(
+	"--enable-xkb"
+	"--enable-const"
+	"--disable-geo-tattler"
+	"--with-appdefaultdir=/usr/share/X11/app-defaults"
+)
 
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"

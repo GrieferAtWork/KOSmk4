@@ -275,7 +275,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 				--sharedstatedir "$PACKAGE_SHAREDSTATEDIR" \
 				--sysconfdir "$PACKAGE_SYSCONFDIR" \
 				--cross-file "$MESON_CROSSFILE" \
-				$CONFIGURE \
+				"${CONFIGURE[@]}" \
 				"$SRCPATH" \
 				"$OPTPATH"
 

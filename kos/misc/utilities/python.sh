@@ -26,18 +26,19 @@ require_utility libzlib    "$PKG_CONFIG_PATH/zlib.pc"
 PACKAGE_URL="https://www.python.org/ftp/python/2.7.16/Python-2.7.16.tar.xz"
 
 # Additions configure options
-CONFIGURE=""
-CONFIGURE="$CONFIGURE --enable-ipv6"
-CONFIGURE="$CONFIGURE --enable-unicode=ucs4"
-CONFIGURE="$CONFIGURE --with-suffix=no"
-CONFIGURE="$CONFIGURE --with-system-ffi=yes"
-CONFIGURE="$CONFIGURE --with-system-expat"
-CONFIGURE="$CONFIGURE --with-signal-module"
-CONFIGURE="$CONFIGURE --with-threads"
-CONFIGURE="$CONFIGURE --with-wctype-functions"
-CONFIGURE="$CONFIGURE --with-libm=no"
-CONFIGURE="$CONFIGURE --with-libc=-lc"
-CONFIGURE="$CONFIGURE --with-computed-gotos"
+CONFIGURE=(
+	"--enable-ipv6"
+	"--enable-unicode=ucs4"
+	"--with-suffix=no"
+	"--with-system-ffi=yes"
+	"--with-system-expat"
+	"--with-signal-module"
+	"--with-threads"
+	"--with-wctype-functions"
+	"--with-libm=no"
+	"--with-libc=-lc"
+	"--with-computed-gotos"
+)
 
 _gm_hook_before_make_or_install() {
 	# This is needed to appease python's annoying build system, which

@@ -24,9 +24,10 @@ require_utility libpng  "$PKG_CONFIG_PATH/libpng.pc"
 PACKAGE_NAME="libpixman-0.40.0"
 PACKAGE_URL="https://www.cairographics.org/releases/pixman-0.40.0.tar.gz"
 
-CONFIGURE=""
-CONFIGURE="$CONFIGURE --disable-openmp"
-CONFIGURE="$CONFIGURE --enable-libpng"
+CONFIGURE=(
+	"--disable-openmp"
+	"--enable-libpng"
+)
 
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"

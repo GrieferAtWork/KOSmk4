@@ -209,42 +209,45 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 				done
 				# (Try to) generate configure (if it's missing)
 				if ! [ -f "$SRCPATH/configure" ]; then
-					if [ -f "$SRCPATH/configure.ac" ]; then
-						_PACKAGE_AUTOCONF_INPUT="$SRCPATH/configure.ac"
-					elif [ -f "$SRCPATH/configure.in" ]; then
-						_PACKAGE_AUTOCONF_INPUT="$SRCPATH/configure.in"
-					else
-						echo "Not a GNU autoconf project (missing file: 'configure')"
-						exit 1
-					fi
-					# Check for autoconf dependencies of this project
-					ac_requires_xorg=no
-					while IFS= read -r line; do
-						case "$line" in
-
-						*XORG_MACROS_VERSION*)
-							ac_requires_xorg=yes
-							;;
-
-						*) ;;
-						esac
-					done < "$_PACKAGE_AUTOCONF_INPUT"
-					# Bind xorg-macros
-					if test x"$ac_requires_xorg" != xno; then
-						. "$KOS_MISC/utilities/Xorg/misc/xorg-macros.sh"
-					fi
-					# Generate all of the missing files.
-					cmd autoreconf -i
-					if ! [ -f "$SRCPATH/Makefile.in" ] && [ -f "$SRCPATH/Makefile.am" ]; then
-						cmd cd "$SRCPATH"
-						cmd automake
-					fi
+					${GM_HOOK_BEFORE_AUTOCONF:-:}
 					if ! [ -f "$SRCPATH/configure" ]; then
-						cmd cd "$SRCPATH"
-						cmd autoconf
+						if [ -f "$SRCPATH/configure.ac" ]; then
+							_PACKAGE_AUTOCONF_INPUT="$SRCPATH/configure.ac"
+						elif [ -f "$SRCPATH/configure.in" ]; then
+							_PACKAGE_AUTOCONF_INPUT="$SRCPATH/configure.in"
+						else
+							echo "Not a GNU autoconf project (missing file: 'configure')"
+							exit 1
+						fi
+						# Check for autoconf dependencies of this project
+						ac_requires_xorg=no
+						while IFS= read -r line; do
+							case "$line" in
+
+							*XORG_MACROS_VERSION*)
+								ac_requires_xorg=yes
+								;;
+
+							*) ;;
+							esac
+						done < "$_PACKAGE_AUTOCONF_INPUT"
+						# Bind xorg-macros
+						if test x"$ac_requires_xorg" != xno; then
+							. "$KOS_MISC/utilities/Xorg/misc/xorg-macros.sh"
+						fi
+						# Generate all of the missing files.
+						cmd autoreconf -i
+						if ! [ -f "$SRCPATH/Makefile.in" ] && [ -f "$SRCPATH/Makefile.am" ]; then
+							cmd cd "$SRCPATH"
+							cmd automake
+						fi
+						if ! [ -f "$SRCPATH/configure" ]; then
+							cmd cd "$SRCPATH"
+							cmd autoconf
+						fi
+						# Try to converse disk space by getting rid of cache files created by autoreconf.
+						rm -r "$SRCPATH/autom4te.cache" > /dev/null 2>&1
 					fi
-					# Try to converse disk space by getting rid of cache files created by autoreconf.
-					rm -r "$SRCPATH/autom4te.cache" > /dev/null 2>&1
 				fi
 			fi
 			if [ -f "$KOS_PATCHES/$PACKAGE_NAME.patch" ]; then
@@ -259,10 +262,11 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 
 			# Auto-configure arguments for ./configure
 			if ! test -z "$PACKAGE_CONFIGURE"; then
-				CONFIGURE="$PACKAGE_CONFIGURE $CONFIGURE"
+				if test -z "$CONFIGURE"; then CONFIGURE=(); fi
+				CONFIGURE+=("${PACKAGE_CONFIGURE[@]}")
 				if ! test -z "$CONFIGURE"; then
 					echo "Using given \$PACKAGE_CONFIGURE and \$CONFIGURE options:"
-					for opt in $CONFIGURE; do
+					for opt in "${CONFIGURE[@]}"; do
 						echo "	option: $opt"
 					done
 				fi
@@ -270,457 +274,298 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 				# Auto-detect supported, but unset options
 				if ! [ -f "$SRCPATH/._configure_help" ]; then
 					echo "Creating file: '$SRCPATH/._configure_help'"
-					cmd bash "$SRCPATH/configure" --help > "$SRCPATH/._configure_help.temp" 2>&1
+					cmd "$SH" "$SRCPATH/configure" --help > "$SRCPATH/._configure_help.temp" 2>&1
 					cmd mv "$SRCPATH/._configure_help.temp" "$SRCPATH/._configure_help"
 				fi
 				if ! test -z "$CONFIGURE"; then
 					echo "Using given \$CONFIGURE options:"
-					for opt in $CONFIGURE; do
+					for opt in "${CONFIGURE[@]}"; do
 						echo "	option: $opt"
 					done
+				else
+					CONFIGURE=()
 				fi
+				hasconf() {
+					printf -v _CONFSTR -- ',,%q' "${CONFIGURE[@]}"
+					[[ "${_CONFSTR},," =~ .*,,"$1".* ]]
+				}
+				hasconfx() {
+					printf -v _CONFSTR -- ',,%q' "${CONFIGURE[@]}"
+					[[ "${_CONFSTR},," =~ ,,"$1",, ]]
+				}
+				addconf() {
+					if ! hasconf "$1"; then
+						echo "	option: $1$2"
+						CONFIGURE+=("$1$2");
+					fi
+				}
+				addconfx() {
+					if ! hasconfx "$1"; then
+						echo "	option: $1"
+						CONFIGURE+=("$1");
+					fi
+				}
+
 				echo "Scanning '$SRCPATH/configure --help' for options..."
 				while IFS= read -r line; do
 					case "$line" in
-					*--prefix=*)         if ! [[ "$CONFIGURE" == *--prefix=*         ]]; then echo "	option: --prefix=$PACKAGE_PREFIX";                 CONFIGURE="$CONFIGURE --prefix=$PACKAGE_PREFIX"; fi ;;
-					*--eprefix=*)        if ! [[ "$CONFIGURE" == *--eprefix=*        ]]; then echo "	option: --eprefix=$PACKAGE_EPREFIX";               CONFIGURE="$CONFIGURE --eprefix=$PACKAGE_EPREFIX"; fi ;;
-					*--exec-prefix=*)    if ! [[ "$CONFIGURE" == *--exec-prefix=*    ]]; then echo "	option: --exec-prefix=$PACKAGE_EPREFIX";           CONFIGURE="$CONFIGURE --exec-prefix=$PACKAGE_EPREFIX"; fi ;;
-					*--bindir=*)         if ! [[ "$CONFIGURE" == *--bindir=*         ]]; then echo "	option: --bindir=$PACKAGE_BINDIR";                 CONFIGURE="$CONFIGURE --bindir=$PACKAGE_BINDIR"; fi ;;
-					*--sbindir=*)        if ! [[ "$CONFIGURE" == *--sbindir=*        ]]; then echo "	option: --sbindir=$PACKAGE_SBINDIR";               CONFIGURE="$CONFIGURE --sbindir=$PACKAGE_SBINDIR"; fi ;;
-					*--libexecdir=*)     if ! [[ "$CONFIGURE" == *--libexecdir=*     ]]; then echo "	option: --libexecdir=$PACKAGE_SBINDIR";            CONFIGURE="$CONFIGURE --libexecdir=$PACKAGE_SBINDIR"; fi ;;
-					*--sysconfdir=*)     if ! [[ "$CONFIGURE" == *--sysconfdir=*     ]]; then echo "	option: --sysconfdir=$PACKAGE_SYSCONFDIR";         CONFIGURE="$CONFIGURE --sysconfdir=$PACKAGE_SYSCONFDIR"; fi ;;
-					*--sharedstatedir=*) if ! [[ "$CONFIGURE" == *--sharedstatedir=* ]]; then echo "	option: --sharedstatedir=$PACKAGE_SHAREDSTATEDIR"; CONFIGURE="$CONFIGURE --sharedstatedir=$PACKAGE_SHAREDSTATEDIR"; fi ;;
-					*--localstatedir=*)  if ! [[ "$CONFIGURE" == *--localstatedir=*  ]]; then echo "	option: --localstatedir=$PACKAGE_LOCALSTATEDIR";   CONFIGURE="$CONFIGURE --localstatedir=$PACKAGE_LOCALSTATEDIR"; fi ;;
-					*--runstatedir=*)    if ! [[ "$CONFIGURE" == *--runstatedir=*    ]]; then echo "	option: --runstatedir=$PACKAGE_RUNSTATEDIR";       CONFIGURE="$CONFIGURE --runstatedir=$PACKAGE_RUNSTATEDIR"; fi ;;
-					*--libdir=*)         if ! [[ "$CONFIGURE" == *--libdir=*         ]]; then echo "	option: --libdir=$PACKAGE_LIBDIR";                 CONFIGURE="$CONFIGURE --libdir=$PACKAGE_LIBDIR"; fi ;;
-					*--includedir=*)     if ! [[ "$CONFIGURE" == *--includedir=*     ]]; then echo "	option: --includedir=$PACKAGE_INCLUDEDIR";         CONFIGURE="$CONFIGURE --includedir=$PACKAGE_INCLUDEDIR"; fi ;;
-					*--oldincludedir=*)  if ! [[ "$CONFIGURE" == *--oldincludedir=*  ]]; then echo "	option: --oldincludedir=$PACKAGE_OLDINCLUDEDIR";   CONFIGURE="$CONFIGURE --oldincludedir=$PACKAGE_OLDINCLUDEDIR"; fi ;;
-					*--datarootdir=*)    if ! [[ "$CONFIGURE" == *--datarootdir=*    ]]; then echo "	option: --datarootdir=$PACKAGE_DATAROOTDIR";       CONFIGURE="$CONFIGURE --datarootdir=$PACKAGE_DATAROOTDIR"; fi ;;
-					*--datadir=*)        if ! [[ "$CONFIGURE" == *--datadir=*        ]]; then echo "	option: --datadir=$PACKAGE_DATADIR";               CONFIGURE="$CONFIGURE --datadir=$PACKAGE_DATADIR"; fi ;;
-					*--infodir=*)        if ! [[ "$CONFIGURE" == *--infodir=*        ]]; then echo "	option: --infodir=$PACKAGE_INFODIR";               CONFIGURE="$CONFIGURE --infodir=$PACKAGE_INFODIR"; fi ;;
-					*--localedir=*)      if ! [[ "$CONFIGURE" == *--localedir=*      ]]; then echo "	option: --localedir=$PACKAGE_LOCALEDIR";           CONFIGURE="$CONFIGURE --localedir=$PACKAGE_LOCALEDIR"; fi ;;
-					*--mandir=*)         if ! [[ "$CONFIGURE" == *--mandir=*         ]]; then echo "	option: --mandir=$PACKAGE_MANDIR";                 CONFIGURE="$CONFIGURE --mandir=$PACKAGE_MANDIR"; fi ;;
-					*--docdir=*)         if ! [[ "$CONFIGURE" == *--docdir=*         ]]; then echo "	option: --docdir=$PACKAGE_DOCDIR";                 CONFIGURE="$CONFIGURE --docdir=$PACKAGE_DOCDIR"; fi ;;
-					*--htmldir=*)        if ! [[ "$CONFIGURE" == *--htmldir=*        ]]; then echo "	option: --htmldir=$PACKAGE_HTMLDIR";               CONFIGURE="$CONFIGURE --htmldir=$PACKAGE_HTMLDIR"; fi ;;
-					*--dvidir=*)         if ! [[ "$CONFIGURE" == *--dvidir=*         ]]; then echo "	option: --dvidir=$PACKAGE_DVIDIR";                 CONFIGURE="$CONFIGURE --dvidir=$PACKAGE_DVIDIR"; fi ;;
-					*--pdfdir=*)         if ! [[ "$CONFIGURE" == *--pdfdir=*         ]]; then echo "	option: --pdfdir=$PACKAGE_PDFDIR";                 CONFIGURE="$CONFIGURE --pdfdir=$PACKAGE_PDFDIR"; fi ;;
-					*--psdir=*)          if ! [[ "$CONFIGURE" == *--psdir=*          ]]; then echo "	option: --psdir=$PACKAGE_PSDIR";                   CONFIGURE="$CONFIGURE --psdir=$PACKAGE_PSDIR"; fi ;;
-					*--host=*)           if ! [[ "$CONFIGURE" == *--host=*           ]]; then echo "	option: --host=$PACKAGE_HOST";                     CONFIGURE="$CONFIGURE --host=$PACKAGE_HOST"; fi ;;
-					*--target=*)         if ! [[ "$CONFIGURE" == *--target=*         ]]; then echo "	option: --target=$PACKAGE_TARGET";                 CONFIGURE="$CONFIGURE --target=$PACKAGE_TARGET"; fi ;;
+					*--prefix=*)             addconf "--prefix="         "$PACKAGE_PREFIX"; ;;
+					*--eprefix=*)            addconf "--eprefix="        "$PACKAGE_EPREFIX"; ;;
+					*--exec-prefix=*)        addconf "--exec-prefix="    "$PACKAGE_EPREFIX"; ;;
+					*--bindir=*)             addconf "--bindir="         "$PACKAGE_BINDIR"; ;;
+					*--sbindir=*)            addconf "--sbindir="        "$PACKAGE_SBINDIR"; ;;
+					*--libexecdir=*)         addconf "--libexecdir="     "$PACKAGE_SBINDIR"; ;;
+					*--sysconfdir=*)         addconf "--sysconfdir="     "$PACKAGE_SYSCONFDIR"; ;;
+					*--sharedstatedir=*)     addconf "--sharedstatedir=" "$PACKAGE_SHAREDSTATEDIR"; ;;
+					*--localstatedir=*)      addconf "--localstatedir="  "$PACKAGE_LOCALSTATEDIR"; ;;
+					*--runstatedir=*)        addconf "--runstatedir="    "$PACKAGE_RUNSTATEDIR"; ;;
+					*--libdir=*)             addconf "--libdir="         "$PACKAGE_LIBDIR"; ;;
+					*--includedir=*)         addconf "--includedir="     "$PACKAGE_INCLUDEDIR"; ;;
+					*--oldincludedir=*)      addconf "--oldincludedir="  "$PACKAGE_OLDINCLUDEDIR"; ;;
+					*--datarootdir=*)        addconf "--datarootdir="    "$PACKAGE_DATAROOTDIR"; ;;
+					*--datadir=*)            addconf "--datadir="        "$PACKAGE_DATADIR"; ;;
+					*--infodir=*)            addconf "--infodir="        "$PACKAGE_INFODIR"; ;;
+					*--localedir=*)          addconf "--localedir="      "$PACKAGE_LOCALEDIR"; ;;
+					*--mandir=*)             addconf "--mandir="         "$PACKAGE_MANDIR"; ;;
+					*--docdir=*)             addconf "--docdir="         "$PACKAGE_DOCDIR"; ;;
+					*--htmldir=*)            addconf "--htmldir="        "$PACKAGE_HTMLDIR"; ;;
+					*--dvidir=*)             addconf "--dvidir="         "$PACKAGE_DVIDIR"; ;;
+					*--pdfdir=*)             addconf "--pdfdir="         "$PACKAGE_PDFDIR"; ;;
+					*--psdir=*)              addconf "--psdir="          "$PACKAGE_PSDIR"; ;;
+					*--host=*)               addconf "--host="           "$PACKAGE_HOST"; ;;
+					*--target=*)             addconf "--target="         "$PACKAGE_TARGET"; ;;
 
 					# System root
 					*--with-sysroot*)
-						if ! [[ "$CONFIGURE" == *--with-sysroot=* ]]; then
-							echo "	option: --with-sysroot=$BINUTILS_SYSROOT"
-							CONFIGURE="$CONFIGURE --with-sysroot=$BINUTILS_SYSROOT"
-						fi
+						addconf "--with-sysroot=" "$BINUTILS_SYSROOT"
 						;;
 
 					# Install location
 					*--with-install-prefix*)
-						if ! [[ "$CONFIGURE" == *--with-install-prefix=* ]]; then
-							echo "	option: --with-install-prefix=$DESTDIR-temp"
-							CONFIGURE="$CONFIGURE --with-install-prefix=$DESTDIR-temp"
-						fi
+						addconf "--with-install-prefix=" "$DESTDIR-temp"
+						;;
+
+					# PKG_CONFIG directory
+					*--with-crosspkgdir=*)
+						addconf "--with-crosspkgdir=" "$PKG_CONFIG_LIBDIR"
 						;;
 
 					# Name of the host machine
 					*--build=*)
-						if ! [[ "$CONFIGURE" == *--build=* ]]; then
-							if test -z "$PACKAGE_BUILD"; then
-								PACKAGE_BUILD="$(gcc -dumpmachine)"
-							fi
-							echo "	option: --build=$PACKAGE_BUILD"
-							CONFIGURE="$CONFIGURE --build=$PACKAGE_BUILD"
-						fi
+						if test -z "$PACKAGE_BUILD"; then PACKAGE_BUILD="$(gcc -dumpmachine)"; fi
+						addconf "--build=" "$PACKAGE_BUILD"
 						;;
 
 					# Misc default feature selection
 					*--disable-largefile* | *--enable-largefile*)
-						if ! [[ "$CONFIGURE" == *--enable-largefile* ]] && \
-						   ! [[ "$CONFIGURE" == *--disable-largefile* ]]; then
-							if test -z "$PACKAGE_WITHOUT_LARGEFILE"; then
-								echo "	option: --enable-largefile"
-								CONFIGURE="$CONFIGURE --enable-largefile"
-							else
-								echo "	option: --disable-largefile"
-								CONFIGURE="$CONFIGURE --disable-largefile"
-							fi
+						if test -z "$PACKAGE_WITHOUT_LARGEFILE"; then
+							addconfx "--enable-largefile"
+						else
+							addconfx "--disable-largefile"
 						fi
 						;;
 
 					*--disable-nls* | *--enable-nls*)
-						if ! [[ "$CONFIGURE" == *--enable-nls* ]] && \
-						   ! [[ "$CONFIGURE" == *--disable-nls* ]]; then
-							echo "	option: --enable-nls"
-							CONFIGURE="$CONFIGURE --enable-nls"
-						fi
+						addconfx "--enable-nls"
 						;;
 
 					*--enable-malloc0returnsnull* | *--disable-malloc0returnsnull*)
 						# Used by (some) Xorg utilities
-						if ! [[ "$CONFIGURE" == *--enable-malloc0returnsnull* ]] && \
-						   ! [[ "$CONFIGURE" == *--disable-malloc0returnsnull* ]]; then
-							echo "	option: --disable-malloc0returnsnull"
-							CONFIGURE="$CONFIGURE --disable-malloc0returnsnull"
-						fi
+						addconfx "--disable-malloc0returnsnull"
 						;;
 
 					*--disable-specs* | *--enable-specs*)
 						# Used by Xorg utilities
-						if ! [[ "$CONFIGURE" == *--enable-specs* ]] && \
-						   ! [[ "$CONFIGURE" == *--disable-specs* ]]; then
-							if test -z "$PACKAGE_WITH_SPECS"; then
-								echo "	option: --disable-specs"
-								CONFIGURE="$CONFIGURE --disable-specs"
-							else
-								echo "	option: --enable-specs"
-								CONFIGURE="$CONFIGURE --enable-specs"
-							fi
+						if test -z "$PACKAGE_WITH_SPECS"; then
+							addconfx "--disable-specs"
+						else
+							addconfx "--enable-specs"
 						fi
 						;;
 
 					*--disable-docs* | *--enable-docs*)
-						if ! [[ "$CONFIGURE" == *--enable-docs* ]] && \
-						   ! [[ "$CONFIGURE" == *--disable-docs* ]]; then
-							if test -z "$PACKAGE_WITH_DOCS"; then
-								echo "	option: --disable-docs"
-								CONFIGURE="$CONFIGURE --disable-docs"
-							else
-								echo "	option: --enable-docs"
-								CONFIGURE="$CONFIGURE --enable-docs"
-							fi
+						if test -z "$PACKAGE_WITH_DOCS"; then
+							addconfx "--disable-docs"
+						else
+							addconfx "--enable-docs"
 						fi
 						;;
 
 					*--disable-doc* | *--enable-doc*)
-						if ! [[ "$CONFIGURE" == *--enable-doc* ]] && \
-						   ! [[ "$CONFIGURE" == *--disable-doc* ]]; then
-							if test -z "$PACKAGE_WITH_DOCS"; then
-								echo "	option: --disable-doc"
-								CONFIGURE="$CONFIGURE --disable-doc"
-							else
-								echo "	option: --enable-doc"
-								CONFIGURE="$CONFIGURE --enable-doc"
-							fi
+						if test -z "$PACKAGE_WITH_DOCS"; then
+							addconfx "--disable-doc"
+						else
+							addconfx "--enable-doc"
 						fi
 						;;
 
 					*--without-docs* | *--with-docs*)
-						if ! [[ "$CONFIGURE" == *--with-docs* ]] && \
-						   ! [[ "$CONFIGURE" == *--without-docs* ]]; then
-							if test -z "$PACKAGE_WITH_DOCS"; then
-								echo "	option: --without-docs"
-								CONFIGURE="$CONFIGURE --without-docs"
-							else
-								echo "	option: --with-docs"
-								CONFIGURE="$CONFIGURE --with-docs"
-							fi
+						if test -z "$PACKAGE_WITH_DOCS"; then
+							addconfx "--without-docs"
+						else
+							addconfx "--with-docs"
 						fi
 						;;
 
 					*--disable-devel-docs* | *--enable-devel-docs*)
-						if ! [[ "$CONFIGURE" == *--enable-devel-docs* ]] && \
-						   ! [[ "$CONFIGURE" == *--disable-devel-docs* ]]; then
-							if test -z "$PACKAGE_WITH_DOCS"; then
-								echo "	option: --disable-devel-docs"
-								CONFIGURE="$CONFIGURE --disable-devel-docs"
-							else
-								echo "	option: --enable-devel-docs"
-								CONFIGURE="$CONFIGURE --enable-devel-docs"
-							fi
+						if test -z "$PACKAGE_WITH_DOCS"; then
+							addconfx "--disable-devel-docs"
+						else
+							addconfx "--enable-devel-docs"
 						fi
 						;;
 
 					*--without-manpages* | *--with-manpages*)
-						if ! [[ "$CONFIGURE" == *--with-manpages* ]] && \
-						   ! [[ "$CONFIGURE" == *--without-manpages* ]]; then
-							if test -z "$PACKAGE_WITH_DOCS"; then
-								echo "	option: --without-manpages"
-								CONFIGURE="$CONFIGURE --without-manpages"
-							else
-								echo "	option: --with-manpages"
-								CONFIGURE="$CONFIGURE --with-manpages"
-							fi
+						if test -z "$PACKAGE_WITH_DOCS"; then
+							addconfx "--without-manpages"
+						else
+							addconfx "--with-manpages"
 						fi
 						;;
 
 					*--without-examples* | *--with-examples*)
-						if ! [[ "$CONFIGURE" == *--with-examples* ]] && \
-						   ! [[ "$CONFIGURE" == *--without-examples* ]]; then
-							echo "	option: --without-examples"
-							CONFIGURE="$CONFIGURE --without-examples"
-						fi
+						addconfx "--without-examples"
 						;;
 
 					*--without-doxygen* | *--with-doxygen*)
-						if ! [[ "$CONFIGURE" == *--with-doxygen* ]] && \
-						   ! [[ "$CONFIGURE" == *--without-doxygen* ]]; then
-							echo "	option: --without-doxygen"
-							CONFIGURE="$CONFIGURE --without-doxygen"
-						fi
+						addconfx "--without-doxygen"
 						;;
 
 					*--without-tests* | *--with-tests*)
-						if ! [[ "$CONFIGURE" == *--with-tests* ]] && \
-						   ! [[ "$CONFIGURE" == *--without-tests* ]]; then
-							echo "	option: --without-tests"
-							CONFIGURE="$CONFIGURE --without-tests"
-						fi
+						addconfx "--without-tests"
 						;;
 
 					*--disable-tests* | *--enable-tests*)
-						if ! [[ "$CONFIGURE" == *--enable-tests* ]] && \
-						   ! [[ "$CONFIGURE" == *--disable-tests* ]]; then
-							echo "	option: --disable-tests"
-							CONFIGURE="$CONFIGURE --disable-tests"
-						fi
+						addconfx "--disable-tests"
 						;;
 
 					*--disable-unit-tests* | *--enable-unit-tests*)
-						if ! [[ "$CONFIGURE" == *--enable-unit-tests* ]] && \
-						   ! [[ "$CONFIGURE" == *--disable-unit-tests* ]]; then
-							echo "	option: --disable-unit-tests"
-							CONFIGURE="$CONFIGURE --disable-unit-tests"
-						fi
+						addconfx "--disable-unit-tests"
 						;;
 
 					*--without-xmlto* | *--with-xmlto*)
-						if ! [[ "$CONFIGURE" == *--with-xmlto* ]] && \
-						   ! [[ "$CONFIGURE" == *--without-xmlto* ]]; then
-							echo "	option: --without-xmlto"
-							CONFIGURE="$CONFIGURE --without-xmlto"
-						fi
+						addconfx "--without-xmlto"
 						;;
 
 					*--without-fop* | *--with-fop*)
-						if ! [[ "$CONFIGURE" == *--with-fop* ]] && \
-						   ! [[ "$CONFIGURE" == *--without-fop* ]]; then
-							echo "	option: --without-fop"
-							CONFIGURE="$CONFIGURE --without-fop"
-						fi
+						addconfx "--without-fop"
 						;;
 
 					*--without-lint* | *--with-lint*)
-						if ! [[ "$CONFIGURE" == *--with-lint* ]] && \
-						   ! [[ "$CONFIGURE" == *--without-lint* ]]; then
-							echo "	option: --without-lint"
-							CONFIGURE="$CONFIGURE --without-lint"
-						fi
+						addconfx "--without-lint"
 						;;
 
 					*--without-launchd* | *--with-launchd*)
-						if ! [[ "$CONFIGURE" == *--with-launchd* ]] && \
-						   ! [[ "$CONFIGURE" == *--without-launchd* ]]; then
-							echo "	option: --without-launchd"
-							CONFIGURE="$CONFIGURE --without-launchd"
-						fi
+						addconfx "--without-launchd"
 						;;
 
 					# Misc options
 					*--with-libiconv-prefix* | *--without-libiconv-prefix*)
-						if ! [[ "$CONFIGURE" == *--with-libiconv-prefix* ]] && \
-						   ! [[ "$CONFIGURE" == *--without-libiconv-prefix* ]]; then
-							echo "	option: --without-libiconv-prefix"
-							CONFIGURE="$CONFIGURE --without-libiconv-prefix"
-						fi
+						addconfx "--without-libiconv-prefix"
 						;;
 
 					*--with-libintl-prefix* | *--without-libintl-prefix*)
-						if ! [[ "$CONFIGURE" == *--with-libintl-prefix* ]] && \
-						   ! [[ "$CONFIGURE" == *--without-libintl-prefix* ]]; then
-							echo "	option: --without-libintl-prefix"
-							CONFIGURE="$CONFIGURE --without-libintl-prefix"
-						fi
+						addconfx "--without-libintl-prefix"
 						;;
 
 					*--with-gnu-ld* | *--without-gnu-ld*)
-						if ! [[ "$CONFIGURE" == *--with-gnu-ld* ]] && \
-						   ! [[ "$CONFIGURE" == *--without-gnu-ld* ]]; then
-							if test -z "$PACKAGE_WITHOUT_GNU_LD"; then
-								echo "	option: --with-gnu-ld"
-								CONFIGURE="$CONFIGURE --with-gnu-ld"
-							else
-								echo "	option: --without-gnu-ld"
-								CONFIGURE="$CONFIGURE --without-gnu-ld"
-							fi
+						if test -z "$PACKAGE_WITHOUT_GNU_LD"; then
+							addconfx "--with-gnu-ld"
+						else
+							addconfx "--without-gnu-ld"
 						fi
 						;;
 
 					*--enable-rpath* | *--disable-rpath*)
-						if ! [[ "$CONFIGURE" == *--enable-rpath* ]] && \
-						   ! [[ "$CONFIGURE" == *--disable-rpath* ]]; then
-							echo "	option: --disable-rpath"
-							CONFIGURE="$CONFIGURE --disable-rpath"
-						fi
+						addconfx "--disable-rpath"
 						;;
 
 					*--enable-shared* | *--disable-shared*)
-						if ! [[ "$CONFIGURE" == *--enable-shared* ]] && \
-						   ! [[ "$CONFIGURE" == *--disable-shared* ]]; then
-							echo "	option: --enable-shared"
-							CONFIGURE="$CONFIGURE --enable-shared"
-						fi
+						addconfx "--enable-shared"
 						;;
 
 					*--enable-static* | *--disable-static*)
-						if ! [[ "$CONFIGURE" == *--enable-static* ]] && \
-						   ! [[ "$CONFIGURE" == *--disable-static* ]]; then
-							echo "	option: --enable-static"
-							CONFIGURE="$CONFIGURE --enable-static"
-						fi
+						addconfx "--enable-static"
 						;;
 
 					*--with-shared* | *--without-shared*)
 						# Alternate name for --enable-shared
-						if ! [[ "$CONFIGURE" == *--with-shared* ]] && \
-						   ! [[ "$CONFIGURE" == *--without-shared* ]]; then
-							echo "	option: --with-shared"
-							CONFIGURE="$CONFIGURE --with-shared"
-						fi
+						addconfx "--with-shared"
 						;;
 
 					*--with-normal* | *--without-normal*)
 						# Alternate name for --enable-static
-						if ! [[ "$CONFIGURE" == *--with-normal* ]] && \
-						   ! [[ "$CONFIGURE" == *--without-normal* ]]; then
-							echo "	option: --with-normal"
-							CONFIGURE="$CONFIGURE --with-normal"
-						fi
+						addconfx "--with-normal"
 						;;
 
 					*--with-debug* | *--without-debug*)
 						# Enable debug features (KOS is still young, so any debug
 						# features offered by hosted applications should be enabled
 						# by default)
-						if ! [[ "$CONFIGURE" == *--with-debug* ]] && \
-						   ! [[ "$CONFIGURE" == *--without-debug* ]]; then
-							echo "	option: --with-debug"
-							CONFIGURE="$CONFIGURE --with-debug"
-						fi
+						addconfx "--with-debug"
 						;;
 
 					*--with-profile* | *--without-profile*)
 						# Disable profiling features by default
-						if ! [[ "$CONFIGURE" == *--with-profile* ]] && \
-						   ! [[ "$CONFIGURE" == *--without-profile* ]]; then
-							echo "	option: --without-profile"
-							CONFIGURE="$CONFIGURE --without-profile"
-						fi
+						addconfx "--without-profile"
 						;;
 
 					*--enable-stripping* | *--disable-stripping*)
 						# Prevent debug symbols from being stripped
-						if ! [[ "$CONFIGURE" == *--enable-stripping* ]] && \
-						   ! [[ "$CONFIGURE" == *--disable-stripping* ]]; then
-							echo "	option: --disable-stripping"
-							CONFIGURE="$CONFIGURE --disable-stripping"
-						fi
+						addconfx "--disable-stripping"
 						;;
 
 					*--enable-pc-files* | *--disable-pc-files*)
 						# Instruct to generate *.pc (PKG_CONFIG) files
-						if ! [[ "$CONFIGURE" == *--enable-pc-files* ]] && \
-						   ! [[ "$CONFIGURE" == *--disable-pc-files* ]]; then
-							echo "	option: --enable-pc-files"
-							CONFIGURE="$CONFIGURE --enable-pc-files"
-						fi
+						addconfx "--enable-pc-files"
 						;;
 
 					*--enable-lint-library* | *--disable-lint-library*)
-						if ! [[ "$CONFIGURE" == *--enable-lint-library* ]] && \
-						   ! [[ "$CONFIGURE" == *--disable-lint-library* ]]; then
-							echo "	option: --disable-lint-library"
-							CONFIGURE="$CONFIGURE --disable-lint-library"
-						fi
+						addconfx "--disable-lint-library"
 						;;
 
 					*--with-xsltproc* | *--without-xsltproc*)
-						if ! [[ "$CONFIGURE" == *--with-xsltproc* ]] && \
-						   ! [[ "$CONFIGURE" == *--without-xsltproc* ]]; then
-							echo "	option: --without-xsltproc"
-							CONFIGURE="$CONFIGURE --without-xsltproc"
-						fi
+						addconfx "--without-xsltproc"
 						;;
 
 					*--disable-doxygen-doc* | *--enable-doxygen-doc*)
-						if ! [[ "$CONFIGURE" == *--disable-doxygen-doc* ]] && \
-						   ! [[ "$CONFIGURE" == *--enable-doxygen-doc* ]]; then
-							echo "	option: --disable-doxygen-doc"
-							CONFIGURE="$CONFIGURE --disable-doxygen-doc"
-						fi
+						addconfx "--disable-doxygen-doc"
 						;;
 
 					*--disable-doxygen-dot* | *--enable-doxygen-dot*)
-						if ! [[ "$CONFIGURE" == *--disable-doxygen-dot* ]] && \
-						   ! [[ "$CONFIGURE" == *--enable-doxygen-dot* ]]; then
-							echo "	option: --disable-doxygen-dot"
-							CONFIGURE="$CONFIGURE --disable-doxygen-dot"
-						fi
+						addconfx "--disable-doxygen-dot"
 						;;
 
 					*--disable-doxygen-man* | *--enable-doxygen-man*)
-						if ! [[ "$CONFIGURE" == *--disable-doxygen-man* ]] && \
-						   ! [[ "$CONFIGURE" == *--enable-doxygen-man* ]]; then
-							echo "	option: --disable-doxygen-man"
-							CONFIGURE="$CONFIGURE --disable-doxygen-man"
-						fi
+						addconfx "--disable-doxygen-man"
 						;;
 
 					*--disable-doxygen-rtf* | *--enable-doxygen-rtf*)
-						if ! [[ "$CONFIGURE" == *--disable-doxygen-rtf* ]] && \
-						   ! [[ "$CONFIGURE" == *--enable-doxygen-rtf* ]]; then
-							echo "	option: --disable-doxygen-rtf"
-							CONFIGURE="$CONFIGURE --disable-doxygen-rtf"
-						fi
+						addconfx "--disable-doxygen-rtf"
 						;;
 
 					*--disable-doxygen-xml* | *--enable-doxygen-xml*)
-						if ! [[ "$CONFIGURE" == *--disable-doxygen-xml* ]] && \
-						   ! [[ "$CONFIGURE" == *--enable-doxygen-xml* ]]; then
-							echo "	option: --disable-doxygen-xml"
-							CONFIGURE="$CONFIGURE --disable-doxygen-xml"
-						fi
+						addconfx "--disable-doxygen-xml"
 						;;
 
 					*--disable-doxygen-chm* | *--enable-doxygen-chm*)
-						if ! [[ "$CONFIGURE" == *--disable-doxygen-chm* ]] && \
-						   ! [[ "$CONFIGURE" == *--enable-doxygen-chm* ]]; then
-							echo "	option: --disable-doxygen-chm"
-							CONFIGURE="$CONFIGURE --disable-doxygen-chm"
-						fi
+						addconfx "--disable-doxygen-chm"
 						;;
 
 					*--disable-doxygen-chi* | *--enable-doxygen-chi*)
-						if ! [[ "$CONFIGURE" == *--disable-doxygen-chi* ]] && \
-						   ! [[ "$CONFIGURE" == *--enable-doxygen-chi* ]]; then
-							echo "	option: --disable-doxygen-chi"
-							CONFIGURE="$CONFIGURE --disable-doxygen-chi"
-						fi
+						addconfx "--disable-doxygen-chi"
 						;;
 
 					*--disable-doxygen-html* | *--enable-doxygen-html*)
-						if ! [[ "$CONFIGURE" == *--disable-doxygen-html* ]] && \
-						   ! [[ "$CONFIGURE" == *--enable-doxygen-html* ]]; then
-							echo "	option: --disable-doxygen-html"
-							CONFIGURE="$CONFIGURE --disable-doxygen-html"
-						fi
+						addconfx "--disable-doxygen-html"
 						;;
 
 					*--disable-doxygen-ps* | *--enable-doxygen-ps*)
-						if ! [[ "$CONFIGURE" == *--disable-doxygen-ps* ]] && \
-						   ! [[ "$CONFIGURE" == *--enable-doxygen-ps* ]]; then
-							echo "	option: --disable-doxygen-ps"
-							CONFIGURE="$CONFIGURE --disable-doxygen-ps"
-						fi
+						addconfx "--disable-doxygen-ps"
 						;;
 
 					*--disable-doxygen-pdf* | *--enable-doxygen-pdf*)
-						if ! [[ "$CONFIGURE" == *--disable-doxygen-pdf* ]] && \
-						   ! [[ "$CONFIGURE" == *--enable-doxygen-pdf* ]]; then
-							echo "	option: --disable-doxygen-pdf"
-							CONFIGURE="$CONFIGURE --disable-doxygen-pdf"
-						fi
+						addconfx "--disable-doxygen-pdf"
 						;;
 
 					*) ;;
@@ -745,13 +590,16 @@ $CONFIG_SITE"
 					while IFS= read -r line; do
 						echo "	>> $line"
 					done <<< "$CONFIG_SITE"
+					CONFIG_SITE="
+$CONFIG_SITE"
 				fi
 				echo "Scanning '$SRCPATH/configure' for needed config.site options..."
 				_config_site_option() {
-					if ! [[ "$CONFIG_SITE" == *$1* ]]; then
+					if ! [[ "$CONFIG_SITE" == *"
+$1="* ]]; then
 						echo "	config.site: $1=$2"
-						CONFIG_SITE="$1=$2
-$CONFIG_SITE"
+						CONFIG_SITE="$CONFIG_SITE
+$1=$2"
 					fi
 				}
 				_test_links() {
@@ -1711,7 +1559,7 @@ $CONFIG_SITE"
 				${GM_HOOK_BEFORE_CONFIGURE:-:}
 				cmd cd "$OPTPATH"
 				echo "gnu_make: Now running $PACKAGE_NAME: './configure'..."
-				cmd bash "$SRCPATH/configure" $CONFIGURE
+				cmd "$SH" "$SRCPATH/configure" "${CONFIGURE[@]}"
 			) || exit $?
 			${GM_HOOK_AFTER_CONFIGURE:-:}
 		fi # if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ];

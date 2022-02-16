@@ -25,14 +25,15 @@ PACKAGE_NAME="libglib-2.70.3"
 
 GLIB_HEADER_VERSION="2.0"
 
-CONFIGURE=""
-CONFIGURE="$CONFIGURE -Diconv=external"
-CONFIGURE="$CONFIGURE -Dman=false"
-CONFIGURE="$CONFIGURE -Dgtk_doc=false"
-CONFIGURE="$CONFIGURE -Dforce_posix_threads=true"
-CONFIGURE="$CONFIGURE -Dtests=false"
-CONFIGURE="$CONFIGURE -Dinstalled_tests=false"
-CONFIGURE="$CONFIGURE -Dnls=enabled"
+CONFIGURE=(
+	"-Diconv=external"
+	"-Dman=false"
+	"-Dgtk_doc=false"
+	"-Dforce_posix_threads=true"
+	"-Dtests=false"
+	"-Dinstalled_tests=false"
+	"-Dnls=enabled"
+)
 
 # Don't install these files the "normal" way:
 INSTALL_SKIP="

@@ -28,18 +28,19 @@ require_utility Xorg/libxcb    "$PKG_CONFIG_PATH/xcb.pc"
 
 PACKAGE_URL="https://www.x.org/releases/individual/lib/libX11-1.6.12.tar.gz"
 
-CONFIGURE=""
-CONFIGURE="$CONFIGURE --enable-unix-transport"
-CONFIGURE="$CONFIGURE --disable-tcp-transport"
-CONFIGURE="$CONFIGURE --disable-ipv6"
-CONFIGURE="$CONFIGURE --enable-local-transport"
-CONFIGURE="$CONFIGURE --disable-loadable-i18n"
-CONFIGURE="$CONFIGURE --enable-loadable-xcursor"
-CONFIGURE="$CONFIGURE --enable-xthreads"
-CONFIGURE="$CONFIGURE --enable-xlocaledir"
-CONFIGURE="$CONFIGURE --enable-xf86bigfont"
-CONFIGURE="$CONFIGURE --enable-xkb"
-CONFIGURE="$CONFIGURE --with-locale-lib-dir=/$TARGET_LIBPATH/X11/locale"
+CONFIGURE=(
+	"--enable-unix-transport"
+	"--disable-tcp-transport"
+	"--disable-ipv6"
+	"--enable-local-transport"
+	"--disable-loadable-i18n"
+	"--enable-loadable-xcursor"
+	"--enable-xthreads"
+	"--enable-xlocaledir"
+	"--enable-xf86bigfont"
+	"--enable-xkb"
+	"--with-locale-lib-dir=/$TARGET_LIBPATH/X11/locale"
+)
 
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"

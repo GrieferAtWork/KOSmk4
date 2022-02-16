@@ -23,16 +23,17 @@ require_utility Xorg/xorgproto   "$PKG_CONFIG_PATH/xproto.pc"
 
 PACKAGE_URL="https://www.x.org/releases/individual/app/xinit-1.4.1.tar.gz"
 
-CONFIGURE=""
-CONFIGURE="$CONFIGURE --with-xrdb=/bin/xrdb"
-CONFIGURE="$CONFIGURE --with-xmodmap=/bin/xmodmap"
-CONFIGURE="$CONFIGURE --with-twm=/bin/twm"
-CONFIGURE="$CONFIGURE --with-xclock=/bin/xclock"
-CONFIGURE="$CONFIGURE --with-xterm=/bin/xterm"
-CONFIGURE="$CONFIGURE --with-xserver=/bin/Xorg"
-CONFIGURE="$CONFIGURE --with-xauth=/bin/xauth"
-CONFIGURE="$CONFIGURE --with-xinit=/bin/xinit"
-CONFIGURE="$CONFIGURE --with-xinitdir=/$TARGET_LIBPATH/X11/xinit"
+CONFIGURE=(
+	"--with-xrdb=/bin/xrdb"
+	"--with-xmodmap=/bin/xmodmap"
+	"--with-twm=/bin/twm"
+	"--with-xclock=/bin/xclock"
+	"--with-xterm=/bin/xterm"
+	"--with-xserver=/bin/Xorg"
+	"--with-xauth=/bin/xauth"
+	"--with-xinit=/bin/xinit"
+	"--with-xinitdir=/$TARGET_LIBPATH/X11/xinit"
+)
 
 # Skip automatic install (we only install manually)
 INSTALL_NONE=yes
