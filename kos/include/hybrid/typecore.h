@@ -824,6 +824,8 @@
                                  __WCHAR_MAX__ == __PRIVATE_MAX_U1 || \
                                  __WCHAR_MAX__ == __PRIVATE_MAX_U8)))
 #define __WCHAR_UNSIGNED__ 1
+#elif !defined(__WCHAR_MIN__) && !defined(__WCHAR_MAX__)
+#define __WCHAR_UNSIGNED__ 1 /* Guess... */
 #endif /* ... */
 #endif /* !__WCHAR_UNSIGNED__ */
 #endif /* __SIZEOF_WCHAR_T__ */

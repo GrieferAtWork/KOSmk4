@@ -31,6 +31,7 @@
 #include <hybrid/compiler.h>
 
 #include <hybrid/floatcore.h>
+#include <hybrid/limitcore.h>
 #include <hybrid/typecore.h>
 
 #include <kos/types.h>
@@ -39,6 +40,29 @@
 #include <assert.h> /* static_assert() */
 #include <stdalign.h>
 #include <stddef.h>
+
+/* Assert type signs. */
+#ifdef __CHAR_UNSIGNED__
+static_assert((char)-1 > 0);
+#else /* __CHAR_UNSIGNED__ */
+static_assert((char)-1 < 0);
+#endif /* !__CHAR_UNSIGNED__ */
+#ifdef __WCHAR_UNSIGNED__
+static_assert((wchar_t)-1 > 0);
+#else /* __WCHAR_UNSIGNED__ */
+static_assert((wchar_t)-1 < 0);
+#endif /* !__WCHAR_UNSIGNED__ */
+#ifdef __WINT_UNSIGNED__
+static_assert((wint_t)-1 > 0);
+#else /* __WINT_UNSIGNED__ */
+static_assert((wint_t)-1 < 0);
+#endif /* !__WINT_UNSIGNED__ */
+#ifdef __SIG_ATOMIC_UNSIGNED__
+static_assert((__SIG_ATOMIC_TYPE__)-1 > 0);
+#else /* __SIG_ATOMIC_UNSIGNED__ */
+static_assert((__SIG_ATOMIC_TYPE__)-1 < 0);
+#endif /* !__SIG_ATOMIC_UNSIGNED__ */
+
 
 static_assert(sizeof(char) == __SIZEOF_CHAR__);
 static_assert(sizeof(signed char) == __SIZEOF_CHAR__);
