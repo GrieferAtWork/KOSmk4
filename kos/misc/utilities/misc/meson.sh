@@ -122,7 +122,7 @@ OPTPATH="$BINUTILS_SYSROOT/opt/${_UTILITY_RELPATH}$PACKAGE_NAME"
 DESTDIR="$BINUTILS_SYSROOT/opt/${_UTILITY_RELPATH}${PACKAGE_NAME}-install"
 
 MESON_CROSSFILE="$BINUTILS_SYSROOT/opt/meson/cross.txt"
-if ! [ -f "$MESON_CROSSFILE" ]; then
+if ! [ -f "$MESON_CROSSFILE" ] || [ "$MESON_CROSSFILE" -ot "$KOS_MISC/utilities/misc/meson.sh" ]; then
 	. "$KOS_MISC/utilities/misc/target-info.sh"
 	cmd mkdir -p "$BINUTILS_SYSROOT/opt/meson"
 	cmd cat > "$MESON_CROSSFILE" <<EOF
@@ -152,7 +152,6 @@ cmake = '$(which cmake 2> /dev/null || echo "cmake")'
 [properties]
 sys_root = '$BINUTILS_SYSROOT'
 pkg_config_libdir = '$PKG_CONFIG_LIBDIR'
-
 sizeof_char = $TARGET_CONFIG_SIZEOF_CHAR
 sizeof_short = $TARGET_CONFIG_SIZEOF_SHORT
 sizeof_int = $TARGET_CONFIG_SIZEOF_INT
@@ -171,6 +170,15 @@ alignment_void* = $TARGET_CONFIG_ALIGNOF_POINTER
 alignment_float = $TARGET_CONFIG_ALIGNOF_FLOAT
 alignment_double = $TARGET_CONFIG_ALIGNOF_DOUBLE
 alignment_long_double = $TARGET_CONFIG_ALIGNOF_LDOUBLE
+
+# System features used by programs:
+#  - libglib
+growing_stack = `if test "$TARGET_CONFIG_STACK_DIRECTION"="-1"; then echo "false"; else echo "true"; fi`
+have_c99_vsnprintf = true
+have_c99_snprintf = true
+have_unix98_printf = true
+have_strlcpy = true
+have_proc_self_cmdline = true
 
 EOF
 fi
