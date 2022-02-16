@@ -1,5 +1,6 @@
 # KOS mk4 Hobby Operating System Kernel
 
+A monolithic/modular x86 OS + userspace with an emphasis on re-envisioning and extending other mainstream OSes (primarily Linux), whilst still being API/ABI-compatible.
 
 KOSmk4 (the 4th rendition of the KOS operating system series) is a home-made, hobby, monolithic, but still modular kernel for __i386__ and __x86_64__ (including its 32-bit compatibility mode) machines, and is written in c++ (though only to use function overloads and exceptions; __all__ ABIs are always C-compatible).
 
