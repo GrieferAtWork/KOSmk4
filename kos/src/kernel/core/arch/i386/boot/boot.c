@@ -868,6 +868,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * The combination of O_PATH|O_NOFOLLOW can be used to directly open flnknode nodes,
 	 * similar to the (now abandoned  and now longer available) KOS-specific  O_SYMLINK. */
 
+	/* TODO: As per `man 2 open', O_PATH is also allowed to return regular files (in the
+	 *       case of KOS, that would be the raw `struct mfile' objects). Currently, our
+	 *       implementation restricts O_PATH to only work for directories. */
+
 	/* TODO: Update the toolchain gcc to the latest version.
 	 *       Afterwards, add `__attribute__((access(...)))' support to magic:
 	 * >> void foo([[in]] char const *buf);                       --> __attribute__((access(read_only, 1), nonnull(1))) void foo(char const *buf);

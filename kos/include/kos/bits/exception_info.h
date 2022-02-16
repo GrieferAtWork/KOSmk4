@@ -116,7 +116,7 @@ struct exception_info {
 #if __EXCEPT_BACKTRACE_SIZE != 0
 	/* Exception backtrace (from least-recent[0] to most-recent[__EXCEPT_BACKTRACE_SIZE - 1])
 	 * This vector is populated as  the stack is unwound, until  it is either full, or  until
-	 * a new exception is thrown.
+	 * the exception is handled.
 	 * The  vector's ends either  when `__EXCEPT_BACKTRACE_SIZE' were found,  or upon the first
 	 * entry that evaluates to `NULL'. If a `NULL' entry was found, and the caller is currently
 	 * in the process of unwinding the stack,  the traceback continues where their CPU  context

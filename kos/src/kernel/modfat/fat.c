@@ -2038,7 +2038,7 @@ fat_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 
 	case VFAT_IOCTL_READDIR_BOTH:
 	case VFAT_IOCTL_READDIR_SHORT:
-		/* As documented  these  throw  not-a-directory  when
+		/* As  documented,  these throw  not-a-directory when
 		 * attempting to use them without an offset-argument. */
 		THROW(E_FSERROR_NOT_A_DIRECTORY,
 		      E_FILESYSTEM_NOT_A_DIRECTORY_IOCTL);

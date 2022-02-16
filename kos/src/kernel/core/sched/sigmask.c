@@ -230,6 +230,63 @@ usersigmask_ismasked_chk(signo_t signo) THROWS(E_SEGFAULT) {
 #endif /* CONFIG_HAVE_USERPROCMASK */
 
 
+/* NMI Signals (NonMaskableInterrupt)
+ * Userspace is unable to block these signals, no matter what they do. */
+#undef NMI_SIGNALS_ALL_SAME_WORD
+#undef NMI_SIGNALS_IN_WORD0
+#undef __CCAST
+#define __CCAST(T) /* Nothing */
+#if __sigset_word(SIGKILL) ==  __sigset_word(SIGSTOP)
+#define NMI_SIGNALS_ALL_SAME_WORD
+#if __sigset_word(SIGKILL) ==  0
+#define NMI_SIGNALS_IN_WORD0
+#endif /* __sigset_word(SIGKILL) ==  0 */
+#endif /* __sigset_word(SIGKILL) ==  __sigset_word(SIGSTOP) */
+#undef __CCAST
+#define __CCAST /* Nothing */
+
+
+/* Inherit/clear/set SIGKILL and SIGSTOP within a given signal set */
+#ifdef NMI_SIGNALS_ALL_SAME_WORD
+#define _NMI_SIGNALS_WORD (__sigset_word(SIGKILL))
+#define _NMI_SIGNALS_MASK (__sigset_mask(SIGKILL) | __sigset_mask(SIGSTOP))
+#define nmiandorset(dst, src) \
+	((dst)->__val[_NMI_SIGNALS_WORD] |= (src)->__val[_NMI_SIGNALS_WORD] & _NMI_SIGNALS_MASK)
+#define nmidelset(self) \
+	((self)->__val[_NMI_SIGNALS_WORD] &= ~_NMI_SIGNALS_MASK)
+#define nmiaddset(self) \
+	((self)->__val[_NMI_SIGNALS_WORD] |= _NMI_SIGNALS_MASK)
+#ifdef NMI_SIGNALS_IN_WORD0
+#define nmidelsetword0(p_word) (void)(*(p_word) &= ~_NMI_SIGNALS_MASK)
+#else /* NMI_SIGNALS_IN_WORD0 */
+#define nmidelsetword0(p_word) (void)0
+#endif /* !NMI_SIGNALS_IN_WORD0 */
+#define nmidelsetword(p_word, word_index) \
+	((word_index) == _NMI_SIGNALS_WORD ? (void)(*(p_word) &= ~_NMI_SIGNALS_MASK) : (void)0)
+#else /* NMI_SIGNALS_ALL_SAME_WORD */
+#define nmiandorset(dst, src)                                                                               \
+	((dst)->__val[__sigset_word(SIGKILL)] |= (src)->__val[__sigset_word(SIGKILL)] & __sigset_mask(SIGKILL), \
+	 (dst)->__val[__sigset_word(SIGSTOP)] |= (src)->__val[__sigset_word(SIGSTOP)] & __sigset_mask(SIGSTOP))
+#define nmidelset(self)                                                \
+	((self)->__val[__sigset_word(SIGKILL)] &= ~__sigset_mask(SIGKILL), \
+	 (self)->__val[__sigset_word(SIGSTOP)] &= ~__sigset_mask(SIGSTOP))
+#define nmiaddset(self)                                               \
+	((self)->__val[__sigset_word(SIGKILL)] |= __sigset_mask(SIGKILL), \
+	 (self)->__val[__sigset_word(SIGSTOP)] |= __sigset_mask(SIGSTOP))
+#define nmidelsetword(p_word, word_index)                                                             \
+	((word_index) == __sigset_word(SIGKILL) ? (void)(*(p_word) &= ~__sigset_mask(SIGKILL)) : (void)0, \
+	 (word_index) == __sigset_word(SIGSTOP) ? (void)(*(p_word) &= ~__sigset_mask(SIGSTOP)) : (void)0)
+#endif /* !NMI_SIGNALS_ALL_SAME_WORD */
+#ifndef nmidelsetword0
+#define nmidelsetword0(p_word) nmidelsetword(p_word, 0)
+#endif /* !nmidelsetword0 */
+
+/* Check if `signo' is a "non-maskable-interrupt" signal. */
+#define isnmi(signo) ((signo) == SIGKILL || (signo) == SIGSTOP)
+
+/* Check if `set' contains any NMI signals */
+#define nmiismember(set) (sigismember(set, SIGKILL) || sigismember(set, SIGSTOP))
+
 
 
 /* Make sure that casting boolean expressions to
@@ -430,10 +487,9 @@ NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo)
 	if (thread_flags & TASK_FVFORK)
 #endif /* !CONFIG_HAVE_USERPROCMASK */
 	{
-		/* Special case for SIGKILL and  SIGSTOP, which are assumed  to
-		 * always be unmasked, no matter what the thread's userprocmask
-		 * may say. */
-		if (signo == SIGKILL || signo == SIGSTOP)
+		/* Special case for NMI signals, which are assumed to always be
+		 * unmasked, no matter what the thread's userprocmask may  say. */
+		if (isnmi(signo))
 			return SIGMASK_ISMASKED_NOPF_NO; /* Cannot be masked. */
 
 		/* A vfork'd thread always has all signals masked. */
@@ -541,7 +597,7 @@ NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo)
 
 	/* Use the normal per-thread kernel sigmask. */
 	result = (int)!!sigismember(&FORTASK(self, this_kernel_sigmask), signo);
-	assertf(signo == SIGKILL || signo == SIGSTOP
+	assertf(isnmi(signo)
 	        ? result == SIGMASK_ISMASKED_NOPF_NO
 	        : true,
 	        "These 2 signals must never appear as masked in `this_kernel_sigmask'");
@@ -577,7 +633,7 @@ NOTHROW(FCALL sigmask_ismasked)(signo_t signo)
 #endif /* !CONFIG_HAVE_USERPROCMASK */
 	{
 		/* Always behave as though this was `sigmask_full'. */
-		if (signo == SIGKILL || signo == SIGSTOP)
+		if (isnmi(signo))
 			return false; /* Cannot be masked. */
 
 		/* A vfork'd thread always has all signals masked. */
@@ -604,7 +660,7 @@ NOTHROW(FCALL sigmask_ismasked_nopf)(signo_t signo) {
 	uintptr_t thread_flags;
 	thread_flags = PERTASK_GET(this_task.t_flags);
 	if (thread_flags & (TASK_FVFORK | TASK_FUSERPROCMASK)) {
-		if (signo == SIGKILL || signo == SIGSTOP)
+		if (isnmi(signo))
 			return SIGMASK_ISMASKED_NOPF_NO; /* Cannot be masked. */
 
 		/* A vfork'd thread always has all signals masked. */
@@ -739,14 +795,9 @@ NOTHROW(FCALL sigmask_setmask)(sigset_t const *__restrict mask)
 		 * ignored within the userprocmask, but  try not to change  their
 		 * actual state, so-as not to  accidentally write to a  read-only
 		 * mask blob) */
-		if (sigismember(&current_umask, SIGKILL)) {
+		if (nmiismember(&current_umask)) {
 			mask = (sigset_t *)memcpy(&new_umask, mask, sizeof(sigset_t));
-			sigaddset(&new_umask, SIGKILL);
-		}
-		if (sigismember(&current_umask, SIGSTOP)) {
-			if (mask != &new_umask)
-				mask = (sigset_t *)memcpy(&new_umask, mask, sizeof(sigset_t));
-			sigaddset(&new_umask, SIGKILL);
+			nmiandorset(&new_umask, &current_umask);
 		}
 
 		/* Check if the masks differ. */
@@ -781,9 +832,8 @@ sigmask_setmask_from_user(USER CHECKED sigset_t const *mask, size_t size)
 	memset(mempcpy(&newmask, mask, size),
 	       0xff, sizeof(sigset_t) - size);
 
-	/* Never mask these 2 signals! */
-	sigdelset(&newmask, SIGKILL);
-	sigdelset(&newmask, SIGSTOP);
+	/* Never mask NMI signals! */
+	nmidelset(&newmask);
 
 	/* Apply the new signal mask. */
 	return sigmask_setmask(&newmask);
@@ -811,8 +861,7 @@ sigmask_getmask(sigset_t *__restrict mask)
 		COMPILER_BARRIER();
 
 		/* Ignore user-space trying to mask these signals. */
-		sigdelset(mask, SIGKILL);
-		sigdelset(mask, SIGSTOP);
+		nmidelset(mask);
 	} else {
 		memcpy(mask, &THIS_KERNEL_SIGMASK, sizeof(sigset_t));
 	}
@@ -844,16 +893,8 @@ sigmask_getmask_word0(void) THROWS(E_SEGFAULT) {
 		}
 		COMPILER_BARRIER();
 
-		/* Ignore user-space trying to mask these signals. */
-		__STATIC_IF(__sigset_word(SIGKILL) == 0 && __sigset_word(SIGSTOP) == 0) {
-			result.word &= ~(__sigset_mask(SIGKILL) | __sigset_mask(SIGSTOP));
-		}
-		__STATIC_IF(__sigset_word(SIGKILL) == 0 && __sigset_word(SIGSTOP) != 0) {
-			result.word &= ~(__sigset_mask(SIGKILL));
-		}
-		__STATIC_IF(__sigset_word(SIGKILL) != 0 && __sigset_word(SIGSTOP) == 0) {
-			result.word &= ~(__sigset_mask(SIGSTOP));
-		}
+		/* Ignore user-space trying to mask NMI signals. */
+		nmidelsetword0(&result.word);
 	} else {
 		result.word = PERTASK_GET(this_kernel_sigmask.__val[0]);
 	}
@@ -892,16 +933,8 @@ sigmask_getmask_word(size_t index)
 		}
 		COMPILER_BARRIER();
 
-		/* Ignore user-space trying to mask these signals. */
-		__STATIC_IF(__sigset_word(SIGKILL) == __sigset_word(SIGSTOP)) {
-			if (__sigset_word(SIGKILL) == index)
-				result.word &= ~(__sigset_mask(SIGKILL) | __sigset_mask(SIGSTOP));
-		} __STATIC_ELSE(__sigset_word(SIGKILL) == __sigset_word(SIGSTOP)) {
-			if (__sigset_word(SIGKILL) == index)
-				result.word &= ~__sigset_mask(SIGKILL);
-			if (__sigset_word(SIGSTOP) == index)
-				result.word &= ~__sigset_mask(SIGSTOP);
-		}
+		/* Ignore user-space trying to mask NMI signals. */
+		nmidelsetword(&result.word, index);
 	} else {
 		result.word = PERTASK_GET(this_kernel_sigmask.__val[0]);
 	}
@@ -1105,8 +1138,7 @@ NOTHROW(FCALL sigmask_getmask_and_setmask)(sigset_t *__restrict oldmask,
 #endif /* !CONFIG_HAVE_USERPROCMASK */
 {
 	bool result;
-	assert(!sigismember(newmask, SIGKILL));
-	assert(!sigismember(newmask, SIGSTOP));
+	assert(!nmiismember(newmask));
 #ifdef CONFIG_HAVE_USERPROCMASK
 	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
 		USER CHECKED struct userprocmask *um;
@@ -1123,11 +1155,10 @@ NOTHROW(FCALL sigmask_getmask_and_setmask)(sigset_t *__restrict oldmask,
 		       sizeof(sigset_t) - umasksize);
 		result = memcmp(newmask, oldmask, sizeof(sigset_t)) != 0;
 		if (result) {
-			/* Check if the mask still contains changes if  */
+			/* Check if the mask still contains changes (but keep the state of change SIGKILL or SIGSTOP) */
 			sigset_t used_newmask;
 			memcpy(&used_newmask, newmask, sizeof(sigset_t));
-			used_newmask.__val[__sigset_word(SIGKILL)] |= oldmask->__val[__sigset_word(SIGKILL)] & __sigset_mask(SIGKILL);
-			used_newmask.__val[__sigset_word(SIGSTOP)] |= oldmask->__val[__sigset_word(SIGSTOP)] & __sigset_mask(SIGSTOP);
+			nmiandorset(&used_newmask, oldmask);
 			result = memcmp(&used_newmask, oldmask, sizeof(sigset_t)) != 0;
 			if (result) {
 				/* Write-back modified words into user-space. */
@@ -1136,8 +1167,7 @@ NOTHROW(FCALL sigmask_getmask_and_setmask)(sigset_t *__restrict oldmask,
 		}
 
 		/* Don't tell the caller if these were masked in the userprocmask. */
-		sigdelset(oldmask, SIGKILL);
-		sigdelset(oldmask, SIGSTOP);
+		nmidelset(oldmask);
 	} else
 #endif /* !CONFIG_HAVE_USERPROCMASK */
 	{
@@ -1166,8 +1196,7 @@ NOTHROW(FCALL sigmask_getmask_and_blockmask)(sigset_t *__restrict oldmask,
 #endif /* !CONFIG_HAVE_USERPROCMASK */
 {
 	bool result;
-	assert(!sigismember(these, SIGKILL));
-	assert(!sigismember(these, SIGSTOP));
+	assert(!nmiismember(these));
 #ifdef CONFIG_HAVE_USERPROCMASK
 	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
 		sigset_t newmask;
@@ -1191,8 +1220,7 @@ NOTHROW(FCALL sigmask_getmask_and_blockmask)(sigset_t *__restrict oldmask,
 		}
 
 		/* Don't tell the caller if these were masked in the userprocmask. */
-		sigdelset(oldmask, SIGKILL);
-		sigdelset(oldmask, SIGSTOP);
+		nmidelset(oldmask);
 	} else
 #endif /* !CONFIG_HAVE_USERPROCMASK */
 	{
@@ -1242,24 +1270,22 @@ NOTHROW(FCALL sigmask_getmask_and_unblockmask)(sigset_t *__restrict oldmask,
 		memset(mempcpy(oldmask, umask, umasksize), 0xff,
 		       sizeof(sigset_t) - umasksize);
 		signandset(&newmask, oldmask, these);
+
+		/* Don't do anything if the only thing that changed are SIGKILL or SIGSTOP
+		 * They don't matter in the case of  a userprocmask, and we don't want  to
+		 * make any modifications if we don't need to (since the userprocmask  may
+		 * reside in read-only memory) */
+		nmiandorset(&newmask, oldmask);
+
+		/* Check if changes have been made */
 		result = memcmp(&newmask, oldmask, sizeof(sigset_t)) != 0;
 		if (result) {
-			/* Don't do anything if the only thing that changed are SIGKILL or SIGSTOP
-			 * They don't matter in the case of  a userprocmask, and we don't want  to
-			 * make any modifications if we don't need to (since the userprocmask  may
-			 * reside in read-only memory) */
-			newmask.__val[__sigset_word(SIGKILL)] |= oldmask->__val[__sigset_word(SIGKILL)] & __sigset_mask(SIGKILL);
-			newmask.__val[__sigset_word(SIGSTOP)] |= oldmask->__val[__sigset_word(SIGSTOP)] & __sigset_mask(SIGSTOP);
-			result = memcmp(&newmask, oldmask, sizeof(sigset_t)) != 0;
-			if (result) {
-				/* Write-back modified words into user-space. */
-				memcpy(umask, &newmask, umasksize);
-			}
+			/* Write-back modified words into user-space. */
+			memcpy(umask, &newmask, umasksize);
 		}
 
 		/* Don't tell the caller if these were masked in the userprocmask. */
-		sigdelset(oldmask, SIGKILL);
-		sigdelset(oldmask, SIGSTOP);
+		nmidelset(oldmask);
 	} else
 #endif /* !CONFIG_HAVE_USERPROCMASK */
 	{
@@ -1320,8 +1346,7 @@ sys_sigprocmask_impl(syscall_ulong_t how,
 			sigset_t newmask;
 			memset(mempcpy(&newmask, set, sigsetsize),
 			       0xff, sizeof(sigset_t) - sigsetsize);
-			sigdelset(&newmask, SIGKILL);
-			sigdelset(&newmask, SIGSTOP);
+			nmidelset(&newmask);
 			if (oset) {
 				sigset_t oldmask;
 				changed = sigmask_getmask_and_setmask(&oldmask, &newmask);
@@ -1337,8 +1362,7 @@ sys_sigprocmask_impl(syscall_ulong_t how,
 			sigset_t these;
 			memset(mempcpy(&these, set, sigsetsize),
 			       0xff, sizeof(sigset_t) - sigsetsize);
-			sigdelset(&these, SIGKILL);
-			sigdelset(&these, SIGSTOP);
+			nmidelset(&these);
 			if (oset) {
 				sigset_t oldmask;
 				sigmask_getmask_and_blockmask(&oldmask, &these);
@@ -1433,8 +1457,7 @@ DEFINE_SYSCALL1(syscall_ulong_t, ssetmask, syscall_ulong_t, new_sigmask) {
 	sigmask_getmask(&oldmask);
 	memcpy(&newmask, &oldmask, sizeof(sigset_t));
 	newmask.__val[0] = new_sigmask;
-	__STATIC_IF(__sigset_word(SIGKILL) == 0) { newmask.__val[0] &= ~__sigset_mask(SIGKILL); }
-	__STATIC_IF(__sigset_word(SIGSTOP) == 0) { newmask.__val[0] &= ~__sigset_mask(SIGSTOP); }
+	nmidelset(&newmask);
 	if (sigmask_setmask(&newmask))
 		userexcept_sysret_inject_self();
 	return oldmask.__val[0];
@@ -1450,8 +1473,7 @@ DEFINE_COMPAT_SYSCALL1(syscall_ulong_t, ssetmask, syscall_ulong_t, new_sigmask) 
 	sigmask_getmask(&oldmask.s);
 	memcpy(&newmask.s, &oldmask, sizeof(sigset_t));
 	newmask.w = new_sigmask;
-	__STATIC_IF(__sigset_word(SIGKILL) == 0) { newmask.s.__val[0] &= ~__sigset_mask(SIGKILL); }
-	__STATIC_IF(__sigset_word(SIGSTOP) == 0) { newmask.s.__val[0] &= ~__sigset_mask(SIGSTOP); }
+	nmidelset(&newmask.s);
 	if (sigmask_setmask(&newmask.s))
 		userexcept_sysret_inject_self();
 	return oldmask.w;
@@ -1530,8 +1552,7 @@ sys_sigsuspend_impl(struct icpustate *__restrict state,
 	       0xff, sizeof(sigset_t) - sigsetsize);
 
 	/* These signals cannot be masked. (iow: _always_ wait for these signals) */
-	sigdelset(&not_these, SIGSTOP);
-	sigdelset(&not_these, SIGKILL);
+	nmidelset(&not_these);
 
 	/* Prepare the calling thread for a sigsuspend() operation. */
 	sigmask_prepare_sigsuspend();

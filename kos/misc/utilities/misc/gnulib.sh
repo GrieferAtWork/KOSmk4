@@ -344,5 +344,3 @@ gt_cv_int_divbyzero_sigfpe=yes
 gl_cv_C_locale_sans_EILSEQ=no
 $PACKAGE_CONFIG_SITE
 "
-
-echo "$PACKAGE_CONFIG_SITE"

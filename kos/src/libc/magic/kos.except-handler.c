@@ -81,7 +81,7 @@
  * In practice, you  will usually  encounter 1 of  4 modes,  though KOS  system
  * libraries often assume that either mode #3 or #4 is enabled, and in practice
  * there  is little to no reason to ever  concern yourself with any of this, as
- * libc will by default allow for the use of exceptions:
+ * libc will by default allow for the use of exceptions (via mode #4):
  *
  *  #1 KOS exceptions are fully disabled
  *     Behavior:
@@ -166,7 +166,7 @@
  *                    When anything else is returned:
  *                        Move on to step #SIG
  *         #7:    If no handler apart of a dlexceptaware-module was found in step #6, move on to step #SIG
- *         #8:    Make   sure   that   both   `EXCEPT_FINEXCEPT'   and   `EXCEPT_FMAYSIGNAL'   are    set.
+ *         #8:    Make sure that both `EXCEPT_FINEXCEPT' and `EXCEPT_FMAYSIGNAL' are set.
  *         #9:    Unwind to the closest found exception handler and resume execution there.
  *                Note that this unwinding will invoke personality functions a second time,
  *                which  differs from the usual single-pass unwinding used for handling all
@@ -175,11 +175,11 @@
  *                Translate the exception into a signal which is  raised
  *                within the calling thread (s.a. `except_as_signal(3)')
  *                If the exception cannot be translated into a signal, move on to step #CORE.
- *         #CORE: Trigger a coredump to terminate the current application. (s.a. `sys_coredump(2)')
- *                If the kernel  is configured  to allow it,  this may  also trigger a  trap in  an
- *                attached  debugger,  or switch  to the  kernel's  builtin debugger,  allowing you
- *                to  view  tracebacks,  register  states,  and  the  values  of  local  variables,
- *                assuming that  you  program  was  compiled with  debug  info  enabled  (gcc  -g).
+ *         #CORE: Trigger a  coredump to  terminate the  current application.  (s.a.  `sys_coredump(2)')
+ *                If the kernel is configured to allow it,  this may also trigger a trap in an  attached
+ *                debugger, or switch to the kernel's builtin debugger, allowing you to view tracebacks,
+ *                register states, and  the values  of local variables,  assuming that  you program  was
+ *                compiled with debug info enabled (gcc -g).
  *                s.a. `kernel_debug_on & KERNEL_DEBUG_ON_COREDUMP' in
  *                     `/kos/src/kernel/core/include/debugger/entry.h'
  *     Environment:

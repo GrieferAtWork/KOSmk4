@@ -34,8 +34,8 @@ __SYSDECL_BEGIN
 
 /* A hybrid between alloca and malloc, using alloca for
  * small  allocations,  but malloc()  for  larger ones.
- * NOTE: In all cases, 'afree()' should be used to clean up a
- *       pointer previously allocated  using 'amalloc()'  and
+ * NOTE: In all cases, 'freea()' should be used to clean up a
+ *       pointer previously allocated  using 'malloca()'  and
  *       friends. */
 #if (((defined(____libc_malloc_defined) && defined(____libc_free_defined)) || \
       (defined(__KOS__) && defined(__KERNEL__))) &&                           \
@@ -282,7 +282,7 @@ __LOCAL void *(__local_calloca_heap)(__SIZE_TYPE__ __s) {
 	__res += __MALLOCA_ALIGN;
 	return (void *)__res;
 }
-__LOCAL void __NOTHROW(__local_afree)(void *__p) {
+__LOCAL void __NOTHROW(__local_freea)(void *__p) {
 	if (__MALLOCA_MUSTFREE(__p))
 		__os_free((void *)((__BYTE_TYPE__ *)__p - __MALLOCA_ALIGN));
 }
@@ -302,7 +302,7 @@ __LOCAL void *(__local_calloca_heap)(__SIZE_TYPE__ __s) {
 	__res += __MALLOCA_ALIGN;
 	return (void *)__res;
 }
-__LOCAL void __NOTHROW(__local_afree)(void *__p) {
+__LOCAL void __NOTHROW(__local_freea)(void *__p) {
 	if (__MALLOCA_MUSTFREE(__p))
 		kfree((void *)((__BYTE_TYPE__ *)__p - __MALLOCA_ALIGN));
 }
@@ -327,7 +327,7 @@ __LOCAL void *__NOTHROW_NCX(__local_calloca_heap)(__SIZE_TYPE__ __s) {
 	}
 	return (void *)__res;
 }
-__LOCAL void __NOTHROW_NCX(__local_afree)(void *__p) {
+__LOCAL void __NOTHROW_NCX(__local_freea)(void *__p) {
 	if (__MALLOCA_MUSTFREE(__p))
 		__libc_free((void *)((__BYTE_TYPE__ *)__p - __MALLOCA_ALIGN));
 }
@@ -359,7 +359,7 @@ __NAMESPACE_INT_END
 	((s) > __MALLOCA_MAX - __MALLOCA_ALIGN         \
 	 ? __NAMESPACE_INT_SYM __local_calloca_heap(s) \
 	 : __NAMESPACE_INT_SYM __local_cinita_stack(__hybrid_alloca((s) + __MALLOCA_ALIGN), (s)))
-#define __freea(p) (__NAMESPACE_INT_SYM __local_afree(p))
+#define __freea(p) (__NAMESPACE_INT_SYM __local_freea(p))
 #endif /* __NO_XBLOCK */
 #if defined(__KOS__) && defined(__KERNEL__)
 #ifdef __OMIT_KMALLOC_CONSTANT_P_WRAPPERS

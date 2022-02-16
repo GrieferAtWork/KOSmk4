@@ -70,9 +70,9 @@ PRIVATE ATTR_SECTION(".data.crt.FILE.std_files") struct iofile_data_novtab defau
 PRIVATE ATTR_SECTION(".data.crt.FILE.std_files") struct iofile_data_novtab default_stdout_data = IOFILE_DATA_NOVTAB_INIT();
 PRIVATE ATTR_SECTION(".data.crt.FILE.std_files") struct iofile_data_novtab default_stderr_data = IOFILE_DATA_NOVTAB_INIT();
 INTERN ATTR_SECTION(".data.crt.FILE.std_files") FILE libc_iob[3] = {
-    [0] = __IO_FILE_INIT(NULL, 0, NULL, IO_LNBUF, STDIN_FILENO, { 0 }, 0, (struct iofile_data *)&default_stdin_data),             /* !Relocation: &default_stdin_io */
-    [1] = __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNIFTYY, STDOUT_FILENO, { 0 }, 0, (struct iofile_data *)&default_stdout_data), /* !Relocation: &default_stdout_io */
-    [2] = __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNIFTYY, STDERR_FILENO, { 0 }, 0, (struct iofile_data *)&default_stderr_data), /* !Relocation: &default_stderr_io */
+	[0] = __IO_FILE_INIT(NULL, 0, NULL, IO_LNBUF, STDIN_FILENO, { 0 }, 0, (struct iofile_data *)&default_stdin_data),             /* !Relocation: &default_stdin_io */
+	[1] = __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNIFTYY, STDOUT_FILENO, { 0 }, 0, (struct iofile_data *)&default_stdout_data), /* !Relocation: &default_stdout_io */
+	[2] = __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNIFTYY, STDERR_FILENO, { 0 }, 0, (struct iofile_data *)&default_stderr_data), /* !Relocation: &default_stderr_io */
 };
 
 /* These are the actual, exported std* stream symbols. */
@@ -157,34 +157,34 @@ struct IO_FILE_84 {
 	 *   set to ZEROes (which is one of the way to comply with I/O requirements).
 	 */
 
-	/*32|64-bit * ..................................... *     32-bit | 64-bit */
-	/* 0|  0*/ uint32_t io84_flags; /* if_ptr     | if_ptr */
+	/*32|64-bit * .................................... *     32-bit | 64-bit */
+	/* 0|  0*/ uint32_t io84_flags;                   /* if_ptr     | if_ptr */
 #if __SIZEOF_POINTER__ > 4
-	/*     4*/ uint32_t _io84_pad;         /* -          | if_ptr (cont.) */
-#endif                                     /* __SIZEOF_POINTER__ > 4 */
-	/* 4|  8*/ byte_t *io84_IO_read_ptr;   /* if_cnt     | if_cnt+__if_pad0 */
-	/* 8| 16*/ byte_t *io84_IO_read_end;   /* if_base    | if_base */
-	/*12| 24*/ byte_t *io84_IO_read_base;  /* if_flag    | if_flag+if_fd */
-	/*16| 32*/ byte_t *io84_IO_write_base; /* if_fd      | if_charbuf+if_bufsiz */
-	/*20| 40*/ byte_t *io84_IO_write_ptr;  /* if_charbuf | if_exdata */
-	/*24| 48*/ byte_t *io84_IO_write_end;  /* if_bufsiz  | - */
-	/*28| 56*/ byte_t *io84_IO_buf_base;   /* if_exdata  | - */
-	/*32| 64*/ byte_t *io84_IO_buf_end;
-	/*36| 72*/ byte_t *io84_IO_save_base;
-	/*40| 80*/ byte_t *io84_IO_backup_base;
-	/*44| 88*/ byte_t *io84_IO_save_end;
-	/*48| 96*/ void *io84_markers;
-	/*52|104*/ struct IO_FILE_84 *io84_chain;
-	/*56|112*/ uint32_t io84_fileno;
-	/*60|116*/ uint32_t io84_blksize;
-	/*64|120*/ uint64_t io84_offset;
-	/*72|128*/ uint16_t io84_cur_column;
-	/*74|130*/ uint8_t io84_unused;
-	/*75|131*/ uint8_t io84_shortbuf[1];
-#if __SIZEOF_POINTER__ > 4
-	/*  |132*/ uint32_t _io84_pad2;
+	/*     4*/ uint32_t _io84_pad;                    /* -          | if_ptr (cont.) */
 #endif /* __SIZEOF_POINTER__ > 4 */
-	/*76|136*/ void *io84_lock;
+	/* 4|  8*/ byte_t            *io84_IO_read_ptr;   /* if_cnt     | if_cnt+__if_pad0 */
+	/* 8| 16*/ byte_t            *io84_IO_read_end;   /* if_base    | if_base */
+	/*12| 24*/ byte_t            *io84_IO_read_base;  /* if_flag    | if_flag+if_fd */
+	/*16| 32*/ byte_t            *io84_IO_write_base; /* if_fd      | if_charbuf+if_bufsiz */
+	/*20| 40*/ byte_t            *io84_IO_write_ptr;  /* if_charbuf | if_exdata */
+	/*24| 48*/ byte_t            *io84_IO_write_end;  /* if_bufsiz  | - */
+	/*28| 56*/ byte_t            *io84_IO_buf_base;   /* if_exdata  | - */
+	/*32| 64*/ byte_t            *io84_IO_buf_end;
+	/*36| 72*/ byte_t            *io84_IO_save_base;
+	/*40| 80*/ byte_t            *io84_IO_backup_base;
+	/*44| 88*/ byte_t            *io84_IO_save_end;
+	/*48| 96*/ void              *io84_markers;
+	/*52|104*/ struct IO_FILE_84 *io84_chain;
+	/*56|112*/ uint32_t           io84_fileno;
+	/*60|116*/ uint32_t           io84_blksize;
+	/*64|120*/ uint64_t           io84_offset ATTR_PACKED;
+	/*72|128*/ uint16_t           io84_cur_column;
+	/*74|130*/ uint8_t            io84_unused;
+	/*75|131*/ uint8_t            io84_shortbuf[1];
+#if __SIZEOF_POINTER__ > 4
+	/*  |132*/ uint32_t          _io84_pad2;
+#endif /* __SIZEOF_POINTER__ > 4 */
+	/*76|136*/ void              *io84_lock;
 	/*80|144*/ void const *const *io84_vtable;
 	/*84|152*/ /* End-of-struct */
 };
@@ -200,9 +200,9 @@ struct IO_FILE_84 {
 struct linux_default_stdio_file {
 #if __SIZEOF_POINTER__ == 4
 	byte_t ldsf_zero[sizeof(struct IO_FILE_84) - sizeof(FILE)]; /* 0 bytes... */
-	FILE ldsf_stdio;                                            /* The actual file object */
+	FILE   ldsf_stdio;                                          /* The actual file object */
 #elif __SIZEOF_POINTER__ == 8
-	FILE ldsf_stdio;                                            /* The actual file object */
+	FILE   ldsf_stdio;                                          /* The actual file object */
 	byte_t ldsf_zero[sizeof(struct IO_FILE_84) - sizeof(FILE)]; /* Pad with 0-byts. */
 #else /* __SIZEOF_POINTER__ == ... */
 #error "Unsupported sizeof(void *)"
@@ -233,7 +233,8 @@ file_calloc(size_t extsize) {
 
 
 /* Lazily allocated linux STDIO file objects. */
-PRIVATE ATTR_SECTION(".bss.crt.compat.linux.stdio") struct linux_default_stdio_file *linux_stdio_files = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.compat.linux.stdio")
+struct linux_default_stdio_file *linux_stdio_files = NULL;
 
 
 /* Helper for loading std stream addresses in compatibility mode. */
@@ -379,9 +380,9 @@ PRIVATE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux.heap")
 PNEW_HANDLER *LIBCCALL libc_p_new_handler(void) {
 	PNEW_HANDLER *result;
 	result = (PNEW_HANDLER *)dlsym(RTLD_DEFAULT, name___new_handler);
-	if unlikely (!result)
+	if unlikely(!result)
 		result = libc___new_handler_cb(); /* Shouldn't happen */
-	if unlikely (!*result)
+	if unlikely(!*result)
 		*result = &libc_default_new_handler;
 	return result;
 }
@@ -404,7 +405,7 @@ ATTR_SECTION(".text.crt.compat.linux.heap")
 INTERN ATTR_MALLOC ATTR_RETNONNULL WUNUSED void *LIBCCALL
 libc___builtin_new(size_t sz) {
 	void *result = malloc(sz);
-	if unlikely (result == NULL)
+	if unlikely(result == NULL)
 		(*__new_handler)();
 	return result;
 }
@@ -939,7 +940,7 @@ construct_dos_commandline(void) {
 		format_aprintf_data_init(&printer);
 		error = (*cmdline_encode)(&format_aprintf_printer, &printer,
 		                          peb->pp_argc, peb->pp_argv);
-		if unlikely (error < 0) {
+		if unlikely(error < 0) {
 			format_aprintf_data_fini(&printer);
 		} else {
 			result = format_aprintf_pack(&printer, NULL);

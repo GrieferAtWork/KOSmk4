@@ -549,6 +549,8 @@
                                                                        * A directory was expected, but something else was found */
 #endif /* !E_FSERROR_NOT_A_DIRECTORY */
 /*[[[end]]]*/
+/* TODO: Refactor the below from `E_FILESYSTEM_NOT_A_DIRECTORY_*' to `E_FSERROR_NOT_A_DIRECTORY_*'
+ *       The same should go for all of the other `E_FILESYSTEM_*' macros. */
 #ifndef E_FILESYSTEM_NOT_A_DIRECTORY_WALK
 #define E_FILESYSTEM_NOT_A_DIRECTORY_WALK    1 /* Thrown as the  result of attempting  to traverse a  non-directory
                                                 * item as though it was one (e.g. `open("/opt/readme.txt/foobar")') */

@@ -268,9 +268,9 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 			 * >>         sched_yield();
 			 * >>     }
 			 * >> }
-			 * This program crashes because the RPC forces the parent to stop waiting  for
-			 * the child to exec() or exit(). -- Because of this, the parent will suddenly
-			 * start using its stack again, leading to 2 threads now using the same stack.
+			 * This program would crash because the RPC forces the parent to stop waiting for
+			 * the child to exec() or  exit(). -- Because of  this, the parent will  suddenly
+			 * start using its stack again,  leading to 2 threads  now using the same  stack.
 			 * The results are what you'd expect...
 			 *
 			 * You could argue that something like that might be intended, and that SIGKILL
