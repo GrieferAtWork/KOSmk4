@@ -38,7 +38,7 @@
 #     v -- "Fix reading from a buffered input file"
 DEEMON_VERSION="05b752b6d5ca3c9b9295db4bba39c06ba93469f3"
 
-MAKE_PARALLEL_COUNT=$(grep -c ^processor /proc/cpuinfo)
+MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
 # Version numbers for dependencies
 BINUTILS_VERSION_NUMBER="2.32"
@@ -51,11 +51,15 @@ MTOOLS_VERSION_NUMBER="4.0.23"
 
 # The KOS configuration used for generating libc/libm/crt0 for libgcc_s and libstdc++
 KOS_CONFIG_FOR_LINKING="nOD"
-KOS_VALID_BUILD_CONFIGS="OD nOD OnD nOnD"
-CXX_COMPAT_HEADER_NAMES="\
-assert ctype errno fenv float inttypes iso646 limits locale math setjmp \
-signal stdalign stdarg stdbool stddef stdint stdio stdlib string time \
-uchar wchar wctype tgmath complex"
+KOS_VALID_BUILD_CONFIGS=("OD" "nOD" "OnD" "nOnD")
+CXX_COMPAT_HEADER_NAMES=(
+	"assert" "ctype" "errno" "fenv" "float"
+	"inttypes" "iso646" "limits" "locale"
+	"math" "setjmp" "signal" "stdalign"
+	"stdarg" "stdbool" "stddef" "stdint"
+	"stdio" "stdlib" "string" "time" "uchar"
+	"wchar" "wctype" "tgmath" "complex"
+)
 
 
 BINUTILS_VERSION="binutils-${BINUTILS_VERSION_NUMBER}"
@@ -65,7 +69,7 @@ GCC_VERSION_URL="https://ftp.gnu.org/gnu/gcc/gcc-${GCC_VERSION_NUMBER}/gcc-${GCC
 MTOOLS_VERSION="mtools-${MTOOLS_VERSION_NUMBER}"
 MTOOLS_VERSION_URL="ftp://ftp.gnu.org/gnu/mtools/mtools-${MTOOLS_VERSION_NUMBER}.tar.gz"
 
-KOS_MISC="$(dirname $(readlink -f "$0"))"
+KOS_MISC="$(dirname "$(readlink -f "$0")")"
 
 if (($# < 1)); then
 	echo "Usage: ./make_toolchain.sh <TARGET>"
@@ -75,9 +79,8 @@ if (($# < 1)); then
 	exit 1
 fi
 
-CONFIGURE_OPTIONS_BINUTILS=""
-CONFIGURE_OPTIONS_GCC=""
-CONFIGURE_OPTIONS_GDB=""
+CONFIGURE_OPTIONS_BINUTILS=()
+CONFIGURE_OPTIONS_GCC=()
 
 
 ############################################################################################
@@ -86,7 +89,7 @@ CONFIGURE_OPTIONS_GDB=""
 download_binutils() {
 	echo "Checking for $BINUTILS_VERSION"
 	if ! [ -f "src/$BINUTILS_VERSION/configure" ]; then
-		cd src
+		cmd cd "src"
 		if ! [ -f "$BINUTILS_VERSION.tar" ]; then
 			if ! [ -f "$BINUTILS_VERSION.tar.gz" ]; then
 				echo "    Downloading: $BINUTILS_VERSION_URL"
@@ -97,7 +100,7 @@ download_binutils() {
 		fi
 		echo "    Unpacking: $BINUTILS_VERSION.tar"
 		cmd tar -xf "$BINUTILS_VERSION.tar"
-		cd ..
+		cmd cd ".."
 		if ! [ -f "src/$BINUTILS_VERSION/configure" ]; then
 			echo "ERROR: Missing file: src/$BINUTILS_VERSION/configure"
 			exit 1
@@ -128,7 +131,7 @@ patch_binutils() {
 download_gcc() {
 	echo "Checking for $GCC_VERSION..."
 	if ! [ -f "src/$GCC_VERSION/configure" ]; then
-		cd src
+		cmd cd "src"
 		if ! [ -f "$GCC_VERSION.tar" ]; then
 			if ! [ -f "$GCC_VERSION.tar.gz" ]; then
 				echo "    Downloading: $GCC_VERSION_URL"
@@ -139,7 +142,7 @@ download_gcc() {
 		fi
 		echo "    Unpacking: $GCC_VERSION.tar"
 		cmd tar -xf "$GCC_VERSION.tar"
-		cd ..
+		cmd cd ".."
 		if ! [ -f "src/$GCC_VERSION/configure" ]; then
 			echo "ERROR: Missing file: src/$GCC_VERSION/configure"
 			exit 1
@@ -183,7 +186,7 @@ patch_mtools() {
 download_mtool() {
 	echo "Checking for $MTOOLS_VERSION..."
 	if ! [ -f "src/$MTOOLS_VERSION/configure" ]; then
-		cd src
+		cmd cd "src"
 		if ! [ -f "$MTOOLS_VERSION.tar" ]; then
 			if ! [ -f "$MTOOLS_VERSION.tar.gz" ]; then
 				echo "    Downloading: $MTOOLS_VERSION_URL"
@@ -194,7 +197,7 @@ download_mtool() {
 		fi
 		echo "    Unpacking: $MTOOLS_VERSION.tar"
 		cmd tar -xf "$MTOOLS_VERSION.tar"
-		cd ..
+		cmd cd ".."
 		if ! [ -f "src/$MTOOLS_VERSION/configure" ]; then
 			echo "ERROR: Missing file: src/$MTOOLS_VERSION/configure"
 			exit 1
@@ -261,29 +264,29 @@ cmd() {
 
 # Configure based on selected target.
 if [[ "$1" == i?86-kos ]]; then
-	TARGET_NAME=i386
-	NAME=i386-kos
-	INCLUDE_NAME=i386-kos
-	TARGET_GDB=i686-elf
-	BINLIBDIRNAME=lib
-	export TARGET=i686-kos
+	TARGET_NAME="i386"
+	NAME="i386-kos"
+	INCLUDE_NAME="i386-kos"
+	TARGET_GDB="i686-elf"
+	BINLIBDIRNAME="lib"
+	export TARGET="i686-kos"
 elif [[ "$1" == x86_64-kos ]]; then
 	if ! [ -f "${KOS_MISC}/../../binutils/i386-kos/bin/i686-kos-gcc" ] && \
 	   ! [ -f "${KOS_MISC}/../../binutils/i386-kos/bin/i686-kos-gcc.exe" ]; then
 		# Because of compatibility mode, the x86_64-kos toolchain also requires i386-kos
 		# in order to build stuff such as the 32-bit libdl.so driver, among others.
-		cmd bash "${KOS_MISC}/make_toolchain.sh" i386-kos
+		cmd bash "${KOS_MISC}/make_toolchain.sh" "i386-kos"
 	fi
-	TARGET_NAME=x86_64
-	NAME=x86_64-kos
-	TARGET_GDB=x86_64-elf
-	INCLUDE_NAME=i386-kos
-	BINLIBDIRNAME=lib64
-	CONFIGURE_OPTIONS_BINUTILS="$CONFIGURE_OPTIONS_BINUTILS --enable-64-bit-bfd"
-	CONFIGURE_OPTIONS_GCC="$CONFIGURE_OPTIONS_GCC --enable-64-bit-bfd"
-	export TARGET=x86_64-kos
+	TARGET_NAME="x86_64"
+	NAME="x86_64-kos"
+	TARGET_GDB="x86_64-elf"
+	INCLUDE_NAME="i386-kos"
+	BINLIBDIRNAME="lib64"
+	CONFIGURE_OPTIONS_BINUTILS+=("--enable-64-bit-bfd")
+	CONFIGURE_OPTIONS_GCC+=("--enable-64-bit-bfd")
+	export TARGET="x86_64-kos"
 else
-	echo "Unknown target: $1"
+	echo "Unknown target: '$1'"
 	exit 1
 fi
 
@@ -298,7 +301,7 @@ require_program() {
 }
 
 KOS_PATCHES="${KOS_MISC}/patches"
-cd "$KOS_MISC/../../"
+cmd cd "$KOS_MISC/../../"
 KOS_ROOT="$(pwd)"
 
 if [ -f "${KOS_ROOT}/kos/misc/config/launch.vs.json" ]; then
@@ -323,7 +326,7 @@ cmd mkdir -p "$NAME"
 cmd mkdir -p "src"
 
 # Make sure that we have required programs in $PATH
-require_program make
+require_program "make"
 
 # If the user doesn't have deemon installed, download, configure,
 # and build a version that can be used to drive the KOS toolchain.
@@ -338,21 +341,21 @@ elif [ -f "$KOS_BINUTILS/deemon/deemon" ]; then
 else
 	echo "    Deemon is missing (now downloading, configuring and building a local copy)"
 	if ! [ -f "$KOS_BINUTILS/deemon/configure" ]; then
-		require_program git
+		require_program "git"
 		rm -rf "$KOS_BINUTILS/deemon" > /dev/null 2>&1
 		cmd mkdir -p "$KOS_BINUTILS/deemon"
 		cmd cd "$KOS_BINUTILS/deemon"
 		# https://stackoverflow.com/questions/3489173/how-to-clone-git-repository-with-specific-revision-changeset
 		cmd git init
-		cmd git remote add origin https://github.com/GrieferAtWork/deemon.git
-		cmd git fetch origin $DEEMON_VERSION
+		cmd git remote add origin "https://github.com/GrieferAtWork/deemon.git"
+		cmd git fetch origin "$DEEMON_VERSION"
 		cmd git reset --hard FETCH_HEAD
 	fi
 	cmd cd "$KOS_BINUTILS/deemon"
 	echo "Configuring deemon..."
-	cmd bash ./configure
+	cmd bash "./configure"
 	echo "Making deemon..."
-	cmd make -j $MAKE_PARALLEL_COUNT
+	cmd make -j "$MAKE_PARALLEL_COUNT"
 	cmd cd "$KOS_BINUTILS"
 	if [ -f "$KOS_BINUTILS/deemon/deemon.exe" ]; then
 		DEEMON="$KOS_BINUTILS/deemon/deemon.exe"
@@ -410,12 +413,12 @@ do_symlink "$NAME-$KOS_CONFIG_FOR_LINKING" "$KOS_ROOT/bin/$NAME"
 # and system header paths (note that `../../../bin/$NAME' is another symlink
 # that gets automagically rotated by magic.dee depending on the last-used build
 # configuration, which is a set of OPTIMIZE=y/n and DEBUG=y/n)
-do_symlink "../../../bin/$NAME/bin"     "$PREFIX/usr/bin"
+do_symlink "../../../bin/$NAME/bin"               "$PREFIX/usr/bin"
 do_symlink "../../../bin/$NAME/$BINLIBDIRNAME"    "$PREFIX/usr/lib"
-do_symlink "../../../kos/include"       "$PREFIX/usr/include"
-do_symlink "../../../../bin/$NAME/bin"  "$PREFIX/$TARGET/usr/bin"
+do_symlink "../../../kos/include"                 "$PREFIX/usr/include"
+do_symlink "../../../../bin/$NAME/bin"            "$PREFIX/$TARGET/usr/bin"
 do_symlink "../../../../bin/$NAME/$BINLIBDIRNAME" "$PREFIX/$TARGET/usr/lib"
-do_symlink "../../../../kos/include"    "$PREFIX/$TARGET/usr/include"
+do_symlink "../../../../kos/include"              "$PREFIX/$TARGET/usr/include"
 
 
 echo "Checking if $BINUTILS_VERSION has been configured"
@@ -423,14 +426,14 @@ if ! [ -f "$PREFIX/binutils/Makefile" ]; then
 	echo "    Now configuring $BINUTILS_VERSION"
 	cmd cd "$PREFIX/binutils"
 	cmd bash "../../src/$BINUTILS_VERSION/configure" \
-		$CONFIGURE_OPTIONS_BINUTILS \
-		--target="$TARGET" \
-		--prefix="$PREFIX" \
-		--with-sysroot="$PREFIX" \
-		--with-headers="$PREFIX/usr/include" \
-		--disable-nls \
-		--disable-werror \
-		--enable-multilib
+		"${CONFIGURE_OPTIONS_BINUTILS[@]}" \
+		"--target=$TARGET" \
+		"--prefix=$PREFIX" \
+		"--with-sysroot=$PREFIX" \
+		"--with-headers=$PREFIX/usr/include" \
+		"--disable-nls" \
+		"--disable-werror" \
+		"--enable-multilib"
 	cmd cd "$KOS_BINUTILS"
 else
 	echo "    Already configured"
@@ -463,24 +466,24 @@ if ! [ -f "$PREFIX/gcc/Makefile" ]; then
 	echo "    Now configuring $GCC_VERSION"
 	cmd cd "$PREFIX/gcc"
 	cmd bash "../../src/$GCC_VERSION/configure" \
-		$CONFIGURE_OPTIONS_GCC \
-		--target="$TARGET" \
-		--prefix="$PREFIX" \
-		--with-sysroot="$PREFIX" \
-		--with-gnu-ld \
-		--with-gnu-as \
-		--with-dwarf2 \
-		--enable-gnu-unique-object \
-		--disable-vtable-verify \
-		--enable-threads=single \
-		--enable-targets=all \
-		--enable-languages=c,c++ \
-		--disable-nls \
-		--enable-multiarch \
-		--enable-initfini-array \
-		--enable-__cxa_atexit \
-		--enable-multilib \
-		--enable-gnu-indirect-function
+		"${CONFIGURE_OPTIONS_GCC[@]}" \
+		"--target=$TARGET" \
+		"--prefix=$PREFIX" \
+		"--with-sysroot=$PREFIX" \
+		"--with-gnu-ld" \
+		"--with-gnu-as" \
+		"--with-dwarf2" \
+		"--enable-gnu-unique-object" \
+		"--disable-vtable-verify" \
+		"--enable-threads=single" \
+		"--enable-targets=all" \
+		"--enable-languages=c,c++" \
+		"--disable-nls" \
+		"--enable-multiarch" \
+		"--enable-initfini-array" \
+		"--enable-__cxa_atexit" \
+		"--enable-multilib" \
+		"--enable-gnu-indirect-function"
 	cmd cd "$KOS_BINUTILS"
 else
 	echo "    Already configured"
@@ -541,13 +544,15 @@ if ! [ -f "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" ] || \
 	echo "    Making crt0.o and crt0S.o for $GCC_VERSION:libgcc"
 	cmd cd "$KOS_ROOT"
 	cmd "$DEEMON" "magic.dee" \
-		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/crt0.o" \
-		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/crt0S.o" \
-		--target="$TARGET_NAME" \
-		--config="$KOS_CONFIG_FOR_LINKING"
+		"--gen=bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/crt0.o" \
+		"--gen=bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/crt0S.o" \
+		"--target=$TARGET_NAME" \
+		"--config=$KOS_CONFIG_FOR_LINKING"
 	echo "    Making $GCC_VERSION:libgcc"
 	cmd cd "$PREFIX/gcc"
-	if ! make -j $MAKE_PARALLEL_COUNT all-target-libgcc; then
+	if ! make -j "$MAKE_PARALLEL_COUNT" "all-target-libgcc"; then
+		echo ">>>> DON'T PANIC! -- I think I know how to fix that error ;)"
+
 		# This is a bit hacky:
 		#   - In order to build libgcc_s.so, we already need to have libc.so.
 		#   - In order to build libc.so, we need to have libgcc.a
@@ -558,22 +563,26 @@ if ! [ -f "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" ] || \
 		#   - Delete the libgcc.a we installed before
 		#   - Try the make command above again
 		unlink "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" > /dev/null 2>&1
-		cmd cp "$PREFIX/gcc/$TARGET/libgcc/libgcc.a" "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a"
+		cmd cp \
+			"$PREFIX/gcc/$TARGET/libgcc/libgcc.a" \
+			"$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a"
+
 		# Now try to build our libc.so (and also libm.so just to be safe)
 		cmd cd "$KOS_ROOT"
 		remove_bad_fixinclude
 		cmd "$DEEMON" "magic.dee" \
-			--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/libc.so" \
-			--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/libm.so" \
-			--target="$TARGET_NAME" \
-			--config="$KOS_CONFIG_FOR_LINKING"
+			"--gen=bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/libc.so" \
+			"--gen=bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/libm.so" \
+			"--target=$TARGET_NAME" \
+			"--config=$KOS_CONFIG_FOR_LINKING"
 		cmd cd "$PREFIX/gcc"
 		unlink "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" > /dev/null 2>&1
+
 		# Try to build libgcc again
-		cmd make -j $MAKE_PARALLEL_COUNT all-target-libgcc
+		cmd make -j "$MAKE_PARALLEL_COUNT" "all-target-libgcc"
 	fi
-	cmd make -j $MAKE_PARALLEL_COUNT all-target-libgcc
-	cmd make -j $MAKE_PARALLEL_COUNT install-target-libgcc
+	cmd make -j "$MAKE_PARALLEL_COUNT" "all-target-libgcc"
+	cmd make -j "$MAKE_PARALLEL_COUNT" "install-target-libgcc"
 	remove_bad_fixinclude
 	cmd cd "$KOS_BINUTILS"
 else
@@ -615,7 +624,9 @@ if ! [ -f "$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" ] || \
 		--config="$KOS_CONFIG_FOR_LINKING"
 	echo "    Making $GCC_VERSION:libstdc++"
 	cmd cd "$PREFIX/gcc"
-	if ! make -j $MAKE_PARALLEL_COUNT all-target-libstdc++-v3; then
+	if ! make -j "$MAKE_PARALLEL_COUNT" "all-target-libstdc++-v3"; then
+		echo ">>>> DON'T PANIC! -- I think I know how to fix that error ;)"
+
 		# Yet another place where we need to be hacky with fixing up headers.
 		# This time around, it's libstdc++ that only half-heartedly understands
 		# the fact that KOS's system headers already define c++ functions, and
@@ -641,12 +652,12 @@ if ! [ -f "$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" ] || \
 			cmd ln -s "$KOS_ROOT/kos/include/$1.h" "$PREFIX/gcc/$TARGET/libstdc++-v3/include/$1.h"
 		}
 		echo "Fixup libstdc++ build-time headers"
-		for HEADER_NAME in $(echo $CXX_COMPAT_HEADER_NAMES); do
-			use_real_header $HEADER_NAME
+		for HEADER_NAME in "${CXX_COMPAT_HEADER_NAMES[@]}"; do
+			use_real_header "$HEADER_NAME"
 		done
-		cmd make -j $MAKE_PARALLEL_COUNT all-target-libstdc++-v3
+		cmd make -j "$MAKE_PARALLEL_COUNT" "all-target-libstdc++-v3"
 	fi
-	cmd make -j $MAKE_PARALLEL_COUNT install-target-libstdc++-v3
+	cmd make -j "$MAKE_PARALLEL_COUNT" "install-target-libstdc++-v3"
 	remove_bad_fixinclude
 	cmd cd "$KOS_BINUTILS"
 	# Restore the arch-specific portion of the other toolchain
@@ -666,7 +677,9 @@ install_libstdcxx() {
 	if ! [ -f "$1/libstdc++.so.$LIBSTDCXX_VERSION" ]; then
 		echo "    Copying $GCC_VERSION:libstdc++ into $1"
 		cmd mkdir -p "$1"
-		cmd cp "$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" "$1/libstdc++.so.$LIBSTDCXX_VERSION"
+		cmd cp \
+			"$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" \
+			"$1/libstdc++.so.$LIBSTDCXX_VERSION"
 	else
 		echo "    $GCC_VERSION:libstdc++ has already installed to $1"
 	fi
@@ -674,7 +687,9 @@ install_libstdcxx() {
 	if ! [ -f "$1/libgcc_s.so.$LIBGCC_VERSION" ]; then
 		echo "    Copying $GCC_VERSION:libgcc_s into $1"
 		cmd mkdir -p "$1"
-		cmd cp "$PREFIX/$TARGET/lib/libgcc_s.so.$LIBGCC_VERSION_FULL" "$1/libgcc_s.so.$LIBGCC_VERSION"
+		cmd cp \
+			"$PREFIX/$TARGET/lib/libgcc_s.so.$LIBGCC_VERSION_FULL" \
+			"$1/libgcc_s.so.$LIBGCC_VERSION"
 	else
 		echo "    $GCC_VERSION:libgcc_s has already been installed to $1"
 	fi
@@ -685,7 +700,9 @@ install_libstdcxx_symlinks() {
 	if ! [ -f "$1/libstdc++.so.$LIBSTDCXX_VERSION" ]; then
 		echo "    Installing $GCC_VERSION:libstdc++ into $1"
 		cmd mkdir -p "$1"
-		cmd ln -s "../../${NAME}-common/$BINLIBDIRNAME/libstdc++.so.$LIBSTDCXX_VERSION" "$1/libstdc++.so.$LIBSTDCXX_VERSION"
+		cmd ln -s \
+			"../../${NAME}-common/$BINLIBDIRNAME/libstdc++.so.$LIBSTDCXX_VERSION" \
+			"$1/libstdc++.so.$LIBSTDCXX_VERSION"
 	else
 		echo "    $GCC_VERSION:libstdc++ has already installed to $1"
 	fi
@@ -693,20 +710,22 @@ install_libstdcxx_symlinks() {
 	if ! [ -f "$1/libgcc_s.so.$LIBGCC_VERSION" ]; then
 		echo "    Installing $GCC_VERSION:libgcc_s into $1"
 		cmd mkdir -p "$1"
-		cmd ln -s "../../${NAME}-common/$BINLIBDIRNAME/libgcc_s.so.$LIBGCC_VERSION_FULL" "$1/libgcc_s.so.$LIBGCC_VERSION_FULL"
+		cmd ln -s \
+			"../../${NAME}-common/$BINLIBDIRNAME/libgcc_s.so.$LIBGCC_VERSION_FULL" \
+			"$1/libgcc_s.so.$LIBGCC_VERSION_FULL"
 	else
 		echo "    $GCC_VERSION:libgcc_s has already been installed to $1"
 	fi
 }
 
 install_libstdcxx "${KOS_ROOT}/bin/${NAME}-common/$BINLIBDIRNAME"
-for BUILD_CONFIG in $(echo $KOS_VALID_BUILD_CONFIGS); do
+for BUILD_CONFIG in "${KOS_VALID_BUILD_CONFIGS[@]}"; do
 	install_libstdcxx_symlinks "${KOS_ROOT}/bin/${NAME}-${BUILD_CONFIG}/$BINLIBDIRNAME"
 done
 
 # Installing libstdc++ leaves behind a bunch of unwanted overrides for system headers which
 # we're already providing ourself. - Just remove those headers
-for HEADER_NAME in $(echo $CXX_COMPAT_HEADER_NAMES); do
+for HEADER_NAME in "${CXX_COMPAT_HEADER_NAMES[@]}"; do
 	delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/c$HEADER_NAME"
 	delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/$HEADER_NAME.h"
 done
@@ -788,7 +807,7 @@ install_cat_file() {
 	echo "Checking for $1"
 	if ! [ -f "$1" ]; then
 		echo "Creating file $1"
-		cat > "$1" < /dev/stdin
+		cat > "$1"
 	else
 		echo "    File already exists"
 	fi
@@ -799,8 +818,8 @@ install_cat_file() {
 install_cat_file "$PREFIX/opt/pkg_config/pciaccess.pc" <<EOF
 prefix=/
 exec_prefix=/
-libdir=$KOS_ROOT/bin/$NAME/$BINLIBDIRNAME
-includedir=$KOS_ROOT/kos/include
+libdir="$KOS_ROOT/bin/$NAME/$BINLIBDIRNAME"
+includedir="$KOS_ROOT/kos/include"
 
 Name: pciaccess
 Description: KOS-specific reimplementation
@@ -819,14 +838,16 @@ libiconv_mirror_include() {
 	NLINK=$(stat --printf="%h" "$KOS_ROOT/kos/src/libiconv/include/$1" 2>/dev/null)
 	if [[ "$NLINK" != 2 ]]; then
 		unlink "$KOS_ROOT/kos/src/libiconv/include/$1" > /dev/null 2>&1
-		if ln -P "$KOS_ROOT/kos/include/libiconv/$1" \
-		         "$KOS_ROOT/kos/src/libiconv/include/$1" \
-		         > /dev/null 2>&1; then
+		if ln -P \
+			"$KOS_ROOT/kos/include/libiconv/$1" \
+			"$KOS_ROOT/kos/src/libiconv/include/$1" \
+		> /dev/null 2>&1; then
 			echo "	Hard link created"
 		else
 			echo "	Failed to create hard link (use copy instead)"
-			cmd cp "$KOS_ROOT/kos/include/libiconv/$1" \
-			       "$KOS_ROOT/kos/src/libiconv/include/$1"
+			cmd cp \
+				"$KOS_ROOT/kos/include/libiconv/$1" \
+				"$KOS_ROOT/kos/src/libiconv/include/$1"
 		fi
 		# As fallback (if the filesystem doesn't support hard links), just copy back the file
 
@@ -840,25 +861,25 @@ done
 
 
 # On windows, try to build the gdbridge wrapper program
-if [[ `uname -s` == *CYGWIN* ]]; then
+if [[ "$(uname -s)" == *"CYGWIN"* ]]; then
 	if ! [ -f "$KOS_MISC/gdbridge/gdbridge.exe" ] || \
 	     [ "$KOS_MISC/gdbridge/gdbridge.exe" -ot "$KOS_MISC/gdbridge/gdbridge.c" ]; then
 		echo "Building GDBridge wrapper"
-		GDBRIDGE_FLAGS="-g -Wall"
-		GDBRIDGE_CMDLINE="$(cygpath -w "$DEEMON")"
+		GDBRIDGE_FLAGS=("-g" "-Wall")
 		GDBRIDGE_SCRIPT="$(cygpath -w "$KOS_MISC/gdbridge/gdbridge.dee")"
+		GDBRIDGE_CMDLINE="$(cygpath -w "$DEEMON")"
 		GDBRIDGE_CMDLINE="$GDBRIDGE_CMDLINE \"${GDBRIDGE_SCRIPT}\""
 		GDBRIDGE_CMDLINE="${GDBRIDGE_CMDLINE//\\/\\\\}"
 		GDBRIDGE_CMDLINE="${GDBRIDGE_CMDLINE//\"/\\\"}"
 		GDBRIDGE_CMDLINE="\"${GDBRIDGE_CMDLINE}\""
 		echo "cmdline: $GDBRIDGE_CMDLINE"
-		gcc $GDBRIDGE_FLAGS \
-			-DCMDLINE="$GDBRIDGE_CMDLINE" \
+		gcc "${GDBRIDGE_FLAGS[@]}" \
+			"-DCMDLINE=$GDBRIDGE_CMDLINE" \
 			-o "$KOS_MISC/gdbridge/gdbridge.exe" \
 			"$KOS_MISC/gdbridge/gdbridge.c" \
 		|| {
 			local error=$?
-			echo "ERROR: Command failed 'gcc $GDBRIDGE_FLAGS -DCMDLINE=\"$GDBRIDGE_CMDLINE\" -o \"$KOS_MISC/gdbridge/gdbridge.exe\" \"$KOS_MISC/gdbridge/gdbridge.c\"' -> '$error'"
+			echo "ERROR: Command failed 'gcc ${GDBRIDGE_FLAGS[@]} -DCMDLINE=\"$GDBRIDGE_CMDLINE\" -o \"$KOS_MISC/gdbridge/gdbridge.exe\" \"$KOS_MISC/gdbridge/gdbridge.c\"' -> '$error'"
 			exit $error
 		}
 	fi
