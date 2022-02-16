@@ -339,7 +339,7 @@ gl_cv_func_wcwidth_works=yes
 # Some more found in nano
 gl_cv_func_printf_enomem=yes
 gt_cv_func_printf_posix=yes
-gl_cv_func_gettimeofday_clobber=yes
+gl_cv_func_gettimeofday_clobber=no      # No, our gettimeofday() doesn't clobber localtime(3)'s buffer
 gt_cv_int_divbyzero_sigfpe=yes
 gl_cv_C_locale_sans_EILSEQ=no
 $PACKAGE_CONFIG_SITE
