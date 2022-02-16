@@ -133,7 +133,7 @@ __DECL_BEGIN
 			}                                               \
 			__HYBRID_PP_BUBBLE_GET(f, 3)((l).v_elem);       \
 		}                                                   \
-	} __WHILE0
+	}	__WHILE0
 #define __HYBRID_SEQ_VECTOR_FINI_F_IMPL3_7(l, fini_elem, f) \
 	do {                                                    \
 		if ((l).v_elem) {                                   \
@@ -144,7 +144,7 @@ __DECL_BEGIN
 			}                                               \
 			__HYBRID_PP_BUBBLE_GET(f, 5)((l).v_elem);       \
 		}                                                   \
-	} __WHILE0
+	}	__WHILE0
 #define __HYBRID_SEQ_VECTOR_FINI_P_IMPL3(l, T, fini_elem) \
 	__HYBRID_SEQ_VECTOR_FINI_P_IMPL4(l, T, fini_elem, VECTOR_FUNCTIONS)
 #define __HYBRID_SEQ_VECTOR_FINI_P_IMPL4(l, T, fini_elem, f)         \
@@ -161,7 +161,7 @@ __DECL_BEGIN
 			}                                                                  \
 			__HYBRID_PP_BUBBLE_GET(f, 3)((l).v_elem);                          \
 		}                                                                      \
-	} __WHILE0
+	}	__WHILE0
 #define __HYBRID_SEQ_VECTOR_FINI_P_IMPL4_7(l, T, fini_elem, f)                 \
 	do {                                                                       \
 		if ((l).v_elem) {                                                      \
@@ -172,7 +172,7 @@ __DECL_BEGIN
 			}                                                                  \
 			__HYBRID_PP_BUBBLE_GET(f, 5)((l).v_elem);                          \
 		}                                                                      \
-	} __WHILE0
+	}	__WHILE0
 
 
 /* >> void VECTOR_CLEAR(VECTOR l, FUNCTIONS f = VECTOR_FUNCTIONS);
@@ -209,7 +209,7 @@ __DECL_BEGIN
 			(l).v_size  = 0;                                    \
 			(l).v_alloc = 0;                                    \
 		}                                                       \
-	} __WHILE0
+	}	__WHILE0
 #define __HYBRID_SEQ_VECTOR_CLEAR_F_IMPL3_4_1 __HYBRID_SEQ_VECTOR_CLEAR_F_IMPL3_5
 #define __HYBRID_SEQ_VECTOR_CLEAR_F_IMPL3_5(l, clear_elem, f) \
 	do {                                                      \
@@ -223,7 +223,7 @@ __DECL_BEGIN
 			(l).v_elem = NULL;                                \
 			(l).v_size = 0;                                   \
 		}                                                     \
-	} __WHILE0
+	}	__WHILE0
 #define __HYBRID_SEQ_VECTOR_CLEAR_F_IMPL3_6(l, clear_elem, f) \
 	do {                                                      \
 		if ((l).v_elem) {                                     \
@@ -237,7 +237,7 @@ __DECL_BEGIN
 			(l).v_size  = 0;                                  \
 			(l).v_alloc = 0;                                  \
 		}                                                     \
-	} __WHILE0
+	}	__WHILE0
 #define __HYBRID_SEQ_VECTOR_CLEAR_F_IMPL3_7(l, clear_elem, f) \
 	do {                                                      \
 		if ((l).v_elem) {                                     \
@@ -250,7 +250,7 @@ __DECL_BEGIN
 			(l).v_elem = NULL;                                \
 			(l).v_size = 0;                                   \
 		}                                                     \
-	} __WHILE0
+	}	__WHILE0
 #define __HYBRID_SEQ_VECTOR_CLEAR_P_IMPL3(l, T, clear_elem) \
 	__HYBRID_SEQ_VECTOR_CLEAR_P_IMPL4(l, T, clear_elem, VECTOR_FUNCTIONS)
 #define __HYBRID_SEQ_VECTOR_CLEAR_P_IMPL4(l, T, clear_elem, f)        \
@@ -341,7 +341,7 @@ __DECL_BEGIN
 				(l).v_alloc           = (l).v_size;                                            \
 			}                                                                                  \
 		}                                                                                      \
-	} __WHILE0
+	}	__WHILE0
 #define __HYBRID_SEQ_VECTOR_TRUNC_IMPL2_5_0(l, f)                                          \
 	do {                                                                                   \
 		void *__vector_trunc_newvec;                                                       \
@@ -350,7 +350,7 @@ __DECL_BEGIN
 		                                                     __HYBRID_VECTOR_ELEMSIZE(l)); \
 		if __likely(__vector_trunc_newvec)                                                 \
 			*(void **)&(l).v_elem = __vector_trunc_newvec;                                 \
-	} __WHILE0
+	}	__WHILE0
 #define __HYBRID_SEQ_VECTOR_TRUNC_IMPL2_6(l, f)                                                \
 	do {                                                                                       \
 		if ((l).v_alloc > (l).v_size) {                                                        \
@@ -363,7 +363,7 @@ __DECL_BEGIN
 				(l).v_alloc           = (l).v_size;                                            \
 			}                                                                                  \
 		}                                                                                      \
-	} __WHILE0
+	}	__WHILE0
 #define __HYBRID_SEQ_VECTOR_TRUNC_IMPL2_7(l, f)                                            \
 	do {                                                                                   \
 		void *__vector_trunc_newvec;                                                       \
@@ -372,7 +372,7 @@ __DECL_BEGIN
 		                                                     __HYBRID_VECTOR_ELEMSIZE(l)); \
 		if __likely(__vector_trunc_newvec)                                                 \
 			*(void **)&(l).v_elem = __vector_trunc_newvec;                                 \
-	} __WHILE0
+	}	__WHILE0
 
 
 /* >> size_t VECTOR_ALLOC(VECTOR l, FUNCTIONS f = VECTOR_FUNCTIONS);
@@ -431,7 +431,7 @@ __DECL_BEGIN
 		}                                                                                       \
 		*(void **)&(l).v_elem = __v_new_vector;                                                 \
 		(l).v_alloc           = __v_new_alloc;                                                  \
-	} __WHILE0
+	}	__WHILE0
 #define __HYBRID_VECTOR_REQUIRE1_IMPL_5_0(l, err, f)                                                     \
 	do {                                                                                                 \
 		void *__v_new_vector;                                                                            \
@@ -446,7 +446,7 @@ __DECL_BEGIN
 				goto err;                                                                                \
 		}                                                                                                \
 		*(void **)&(l).v_elem = __v_new_vector;                                                          \
-	} __WHILE0
+	}	__WHILE0
 #define __HYBRID_VECTOR_REQUIRE1_IMPL_6_0(l, err, f)                                            \
 	do {                                                                                        \
 		__SIZE_TYPE__ __v_new_alloc;                                                            \
@@ -465,7 +465,7 @@ __DECL_BEGIN
 		}                                                                                       \
 		*(void **)&(l).v_elem = __v_new_vector;                                                 \
 		(l).v_alloc           = __v_new_alloc;                                                  \
-	} __WHILE0
+	}	__WHILE0
 #define __HYBRID_VECTOR_REQUIRE1_IMPL_7_0(l, err, f)                                                     \
 	do {                                                                                                 \
 		void *__v_new_vector;                                                                            \
@@ -480,7 +480,7 @@ __DECL_BEGIN
 				goto err;                                                                                \
 		}                                                                                                \
 		*(void **)&(l).v_elem = __v_new_vector;                                                          \
-	} __WHILE0
+	}	__WHILE0
 #define __HYBRID_VECTOR_REQUIRE1_IMPL_4_1(l, err, f)                                     \
 	(*(void **)&(l).v_elem = (void *)__HYBRID_PP_BUBBLE_GET(f, 2)((void *)(l).v_elem,    \
 	                                                              (VECTOR_SIZE(l) + 1) * \
@@ -505,8 +505,7 @@ __DECL_BEGIN
 		}                                                                                       \
 		*(void **)&(l).v_elem = __v_new_vector;                                                 \
 		(l).v_alloc           = __v_new_alloc;                                                  \
-	}                                                                                           \
-	__WHILE0
+	}	__WHILE0
 #define __HYBRID_VECTOR_REQUIRE1_IMPL_7_1(l, err, f)                                                     \
 	do {                                                                                                 \
 		void *__v_new_vector;                                                                            \
@@ -519,7 +518,7 @@ __DECL_BEGIN
 			                                                      __HYBRID_VECTOR_ELEMSIZE(l));          \
 		}                                                                                                \
 		*(void **)&(l).v_elem = __v_new_vector;                                                          \
-	} __WHILE0
+	}	__WHILE0
 
 /* void VECTOR_MOVE(VECTOR l, size_t dst, size_t src, size_t count); */
 #define VECTOR_MOVE(l,dst,src,count) \
@@ -536,7 +535,7 @@ __DECL_BEGIN
 		if ((l).v_size >= __HYBRID_SEQ_VECTOR_ALLOC2(l, f)) \
 			__HYBRID_VECTOR_REQUIRE13(l, err, f);           \
 		(l).v_elem[(l).v_size++] = (elem);                  \
-	} __WHILE0
+	}	__WHILE0
 
 /* >> void VECTOR_EAPPEND(VECTOR l, TYPE T, (elem)(expr) pred, LABEL err = <undefined>, FUNCTIONS f = VECTOR_FUNCTIONS);
  * $ VECTOR(int) vec = VECTOR_INIT;
@@ -554,7 +553,7 @@ __DECL_BEGIN
 		__HYBRID_PP_BUBBLE_GET(pred, 0) = &(l).v_elem[(l).v_size]; \
 		__HYBRID_PP_BUBBLE_GET(pred, 1);                           \
 		++(l).v_size;                                              \
-	} __WHILE0
+	}	__WHILE0
 
 
 /* >> void VECTOR_INSERT(VECTOR l, size_t index, T elem, LABEL err = <undefined>, FUNCTIONS f = VECTOR_FUNCTIONS); */
@@ -570,7 +569,7 @@ __DECL_BEGIN
 		VECTOR_MOVE(l, (index) + 1, (index), (l).v_size - (index)); \
 		(l).v_elem[index] = (elem);                                 \
 		++(l).v_size;                                               \
-	} __WHILE0
+	}	__WHILE0
 
 /* >> void VECTOR_EINSERT(VECTOR l, TYPE T, size_t index, (elem)(expr) pred, LABEL err = <undefined>, FUNCTIONS f = VECTOR_FUNCTIONS);
  * $ VECTOR(int) vec = VECTOR_INIT;
@@ -590,7 +589,7 @@ __DECL_BEGIN
 		__HYBRID_PP_BUBBLE_GET(pred, 0) = &(l).v_elem[index];       \
 		__HYBRID_PP_BUBBLE_GET(pred, 1);                            \
 		++(l).v_size;                                               \
-	} __WHILE0
+	}	__WHILE0
 
 
 

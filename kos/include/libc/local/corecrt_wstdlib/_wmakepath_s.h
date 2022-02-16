@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89b26350 */
+/* HASH CRC-32:0xdda45f35 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,13 +61,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wmakepath_s))(__WCHAR_TYPE__ *__buf,
 		if __unlikely(__buflen < __n)                          \
 			goto __err_buflen;                             \
 		__buf = (__WCHAR_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_mempcpyc)(__buf, __p, __n, sizeof(__WCHAR_TYPE__)); \
-	} __WHILE0
+	}	__WHILE0
 #define __path_putc(__ch)          \
 	do {                       \
 		if __unlikely(!__buflen--) \
 			goto __err_buflen;   \
 		*__buf++ = (__ch);         \
-	} __WHILE0
+	}	__WHILE0
 	if (__drive && *__drive) {
 		__path_putc(*__drive);
 		__path_putc(':');

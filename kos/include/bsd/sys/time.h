@@ -54,7 +54,7 @@
 			++(result)->tv_sec;                          \
 			(result)->tv_usec -= 1000000;                \
 		}                                                \
-	} __WHILE0
+	}	__WHILE0
 #endif /* !timeradd */
 #ifndef timersub
 #define timersub(a, b, result)                           \
@@ -65,7 +65,7 @@
 			--(result)->tv_sec;                          \
 			(result)->tv_usec += 1000000;                \
 		}                                                \
-	} __WHILE0
+	}	__WHILE0
 #endif /* !timersub */
 #ifndef timespecisset
 #define timespecisset(tsp) ((tsp)->tv_sec || (tsp)->tv_nsec)
@@ -88,7 +88,7 @@
 			++(vsp)->tv_sec;                              \
 			(vsp)->tv_nsec -= 1000000000L;                \
 		}                                                 \
-	} __WHILE0
+	}	__WHILE0
 #endif /* !timespecadd */
 #ifndef timespecsub
 #define timespecsub(tsp, usp, vsp)                        \
@@ -99,7 +99,7 @@
 			--(vsp)->tv_sec;                              \
 			(vsp)->tv_nsec += 1000000000L;                \
 		}                                                 \
-	} __WHILE0
+	}	__WHILE0
 #endif /* !timespecsub */
 #endif /* __CC__ */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbdaadc48 */
+/* HASH CRC-32:0xc34fec8a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,38 +18,68 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_AUTO_KOS_UNISTD_H
-#define GUARD_LIBC_AUTO_KOS_UNISTD_H 1
+#ifndef GUARD_LIBC_AUTO_KOS_UNISTD_C
+#define GUARD_LIBC_AUTO_KOS_UNISTD_C 1
 
 #include "../api.h"
-
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include <kos/unistd.h>
+#include "../user/kos.unistd.h"
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
+#include <parts/redirect-exec.h>
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
  * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
-INTDEF ATTR_NORETURN ATTR_SENTINEL NONNULL((1)) void (VLIBCCALL libc_Execl)(char const *__restrict path, char const *args, ...) THROWS(...);
+INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL NONNULL((1)) void
+(VLIBCCALL libc_Execl)(char const *__restrict path,
+                       char const *args,
+                       ...) THROWS(...) {
+	__REDIRECT_XEXECL(char, libc_Execv, path, args)
+}
+#include <parts/redirect-exec.h>
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
  * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
-INTDEF ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void (VLIBCCALL libc_Execle)(char const *__restrict path, char const *args, ...) THROWS(...);
+INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void
+(VLIBCCALL libc_Execle)(char const *__restrict path,
+                        char const *args,
+                        ...) THROWS(...) {
+	__REDIRECT_XEXECLE(char, libc_Execve, path, args)
+}
+#include <parts/redirect-exec.h>
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
  * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
-INTDEF ATTR_NORETURN ATTR_SENTINEL NONNULL((1)) void (VLIBCCALL libc_Execpl)(char const *__restrict file, char const *args, ...) THROWS(...);
+INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL NONNULL((1)) void
+(VLIBCCALL libc_Execpl)(char const *__restrict file,
+                        char const *args,
+                        ...) THROWS(...) {
+	__REDIRECT_XEXECL(char, libc_Execvp, file, args)
+}
+#include <parts/redirect-exec.h>
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
  * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
-INTDEF ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void (VLIBCCALL libc_Execlpe)(char const *__restrict file, char const *args, ...) THROWS(...);
+INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void
+(VLIBCCALL libc_Execlpe)(char const *__restrict file,
+                         char const *args,
+                         ...) THROWS(...) {
+	__REDIRECT_XEXECLE(char, libc_Execvpe, file, args)
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
 
-#endif /* !GUARD_LIBC_AUTO_KOS_UNISTD_H */
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(Execl, libc_Execl);
+DEFINE_PUBLIC_ALIAS(Execle, libc_Execle);
+DEFINE_PUBLIC_ALIAS(Execpl, libc_Execpl);
+DEFINE_PUBLIC_ALIAS(Execlpe, libc_Execlpe);
+#endif /* !__KERNEL__ */
+
+#endif /* !GUARD_LIBC_AUTO_KOS_UNISTD_C */

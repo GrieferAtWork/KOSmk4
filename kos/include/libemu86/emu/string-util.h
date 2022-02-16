@@ -37,7 +37,7 @@
 		EMU86_READ_STRING_EX_IMPL(EMU86_ADDRSIZE_SWITCH,       \
 		                          DS, SI, BWLQ, Nbits, Nbytes, \
 		                          value, isrep, useval)        \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_READ_STRING_EX_IMPL(addrsize_switch,              \
                                   DS, SI, BWLQ, Nbits, Nbytes,  \
                                   value, isrep, useval)         \
@@ -107,7 +107,7 @@
 	do {                                                                 \
 		EMU86_WRITE_STRING_EX_IMPL(EMU86_ADDRSIZE_SWITCH, ES, DI, BWLQ,  \
 		                           Nbits, Nbytes, value, isrep)          \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_WRITE_STRING_EX_IMPL(addrsize_switch, ES, DI, BWLQ, \
                                    Nbits, Nbytes, value, isrep)   \
 	{                                                             \

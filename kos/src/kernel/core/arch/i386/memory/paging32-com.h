@@ -104,7 +104,7 @@ PRIVATE ATTR_WRITEMOSTLY WEAK uintptr_t x86_pagedir_prepare_version = 0;
 		}                                                             \
 		PREEMPTION_POP(was);                                          \
 		task_tryyield_or_pause();                                     \
-	} __WHILE1
+	}	__WHILE1
 #define X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_READ_NOVER(was)            \
 	do {                                                            \
 		was = PREEMPTION_PUSHOFF();                                 \
@@ -112,7 +112,7 @@ PRIVATE ATTR_WRITEMOSTLY WEAK uintptr_t x86_pagedir_prepare_version = 0;
 			break;                                                  \
 		PREEMPTION_POP(was);                                        \
 		task_tryyield_or_pause();                                   \
-	} __WHILE1
+	}	__WHILE1
 #define X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_WRITE(was)                  \
 	do {                                                             \
 		was = PREEMPTION_PUSHOFF();                                  \
@@ -120,17 +120,17 @@ PRIVATE ATTR_WRITEMOSTLY WEAK uintptr_t x86_pagedir_prepare_version = 0;
 			break;                                                   \
 		PREEMPTION_POP(was);                                         \
 		task_tryyield_or_pause();                                    \
-	} __WHILE1
+	}	__WHILE1
 #define X86_PAGEDIR_PREPARE_LOCK_RELEASE_READ(was)        \
 	do {                                                  \
 		atomic_rwlock_endread(&x86_pagedir_prepare_lock); \
 		PREEMPTION_POP(was);                              \
-	} __WHILE0
+	}	__WHILE0
 #define X86_PAGEDIR_PREPARE_LOCK_RELEASE_WRITE(was)        \
 	do {                                                   \
 		atomic_rwlock_endwrite(&x86_pagedir_prepare_lock); \
 		PREEMPTION_POP(was);                               \
-	} __WHILE0
+	}	__WHILE0
 
 
 DECL_END

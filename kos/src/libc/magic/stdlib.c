@@ -5320,13 +5320,13 @@ errno_t _makepath_s([[nonnull]] char *buf, $size_t buflen,
 		if unlikely(buflen < n)                          \
 			goto err_buflen;                             \
 		buf = (char *)mempcpyc(buf, p, n, sizeof(char)); \
-	} __WHILE0
+	}	__WHILE0
 #define path_putc(ch)          \
 	do {                       \
 		if unlikely(!buflen--) \
 			goto err_buflen;   \
 		*buf++ = (ch);         \
-	} __WHILE0
+	}	__WHILE0
 	if (drive && *drive) {
 		path_putc(*drive);
 		path_putc(':');

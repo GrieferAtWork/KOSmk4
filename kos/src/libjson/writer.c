@@ -53,7 +53,7 @@ DECL_BEGIN
 			goto err;                                     \
 		if (self->jw_state == JSON_WRITER_STATE_BADUSAGE) \
 			return -2;                                    \
-	} __WHILE0
+	}	__WHILE0
 
 
 LOCAL NONNULL((1, 2)) int CC

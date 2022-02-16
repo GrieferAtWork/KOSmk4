@@ -141,7 +141,7 @@ EMU86_EMULATE_IF_CONFIG_LOCK_SHIFT(do_shift##Nbits:, (void)0);                  
 			eflags_addend |= emu86_geteflags_test##bwlq(newval);                    \
 			EMU86_MSKFLAGS(~eflags_mask, eflags_addend);                            \
 		}                                                                           \
-	} __WHILE0
+	}	__WHILE0
 #if CONFIG_LIBEMU86_WANT_64BIT
 #define NEED_return_unknown_instruction_rmreg
 #endif /* CONFIG_LIBEMU86_WANT_64BIT */

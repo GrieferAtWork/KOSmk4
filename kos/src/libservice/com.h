@@ -661,7 +661,7 @@ struct service {
 #define libservice_shmlock_release(self)       \
 		libservice_shmlock_release_nopr(self); \
 		PREEMPTION_POP(_was);                  \
-	} __WHILE0
+	}	__WHILE0
 
 
 

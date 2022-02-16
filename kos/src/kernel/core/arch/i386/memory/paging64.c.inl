@@ -365,12 +365,12 @@ PRIVATE ATTR_WRITEMOSTLY WEAK uintptr_t x86_pagedir_prepare_version = 0;
 	do {                                                  \
 		atomic_rwlock_endread(&x86_pagedir_prepare_lock); \
 		PREEMPTION_POP(was);                              \
-	} __WHILE0
+	}	__WHILE0
 #define X86_PAGEDIR_PREPARE_LOCK_RELEASE_WRITE(was)        \
 	do {                                                   \
 		atomic_rwlock_endwrite(&x86_pagedir_prepare_lock); \
 		PREEMPTION_POP(was);                               \
-	} __WHILE0
+	}	__WHILE0
 
 
 LOCAL NOBLOCK WUNUSED NONNULL((1)) physpage_t
@@ -2157,11 +2157,10 @@ NOTHROW(FCALL p64_pagedir_unmap_userspace)(void) {
 				--free_count;                                                    \
 				page_freeone_for_paging((physpage_t)free_pages[free_count]);     \
 			} while (free_count);                                                \
-		}                                                                        \
-		else {                                                                   \
+		} else {                                                                 \
 			free_pages[free_count++] = (u64)(pageptr);                           \
 		}                                                                        \
-	} __WHILE0
+	}	__WHILE0
 
 	/* Map all pages before the share-segment as absent. */
 	for (vec4 = 0; vec4 < 256; ++vec4) {

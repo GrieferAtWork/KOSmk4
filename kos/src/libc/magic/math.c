@@ -1556,9 +1556,9 @@ double scalb(double x, double fn) {
 			if (__LIBM_MATHFUN(@finite@, x)) {
 				return __kernel_standard(x, fn, result, __LIBM_KMATHERR_SCALB_OVERFLOW); /* scalb overflow */
 			} else {
-#ifdef __ERANGE
-				(void)libc_seterrno(__ERANGE);
-#endif /* __ERANGE */
+@@pp_ifdef ERANGE@@
+				(void)libc_seterrno(ERANGE);
+@@pp_endif@@
 			}
 		} else if (result == 0.0 && result != x) {
 			return __kernel_standard(x, fn, result, __LIBM_KMATHERR_SCALB_UNDERFLOW); /* scalb underflow */

@@ -70,7 +70,7 @@ DATDEF struct x86_cmos_struct x86_cmos;
 		 PREEMPTION_POP(_cl_was))
 #define x86_cmos_lock_release() \
 		x86_cmos_lock_break();  \
-	} __WHILE0
+	}	__WHILE0
 
 /* Read CMOS control register `reg' */
 #define cmos_rd(reg)                           \

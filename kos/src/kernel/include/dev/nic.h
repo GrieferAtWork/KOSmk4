@@ -133,7 +133,7 @@ struct nic_packet {
 			cb(self->np_payloadv[_npp_i].ive_base, self->np_payloadv[_npp_i].ive_size); \
 		}                                                                             \
 		cb((self)->np_tail, nic_packet_tailsize(self));                               \
-	} __WHILE0
+	}	__WHILE0
 
 /* Destroy a given network packet. */
 FUNDEF NOBLOCK NONNULL((1)) void

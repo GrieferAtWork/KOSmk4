@@ -58,7 +58,6 @@
 #include <termios.h>
 #include <unistd.h>
 
-#include "../libc/capture-varargs.h"
 #include "../libc/dl.h"
 #include "../libc/globals.h"
 #include "../libc/tls.h"

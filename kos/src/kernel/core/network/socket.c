@@ -1314,7 +1314,7 @@ socket_shutdown(struct socket *__restrict self,
 			COMPILER_WRITE_BARRIER();                          \
 		}                                                      \
 		goto done;                                             \
-	} __WHILE0
+	}	__WHILE0
 
 PRIVATE NONNULL((1)) socklen_t KCALL
 socket_getsockopt_default(struct socket *__restrict self,

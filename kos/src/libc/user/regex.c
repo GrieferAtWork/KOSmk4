@@ -90,7 +90,7 @@ again_read_libregex:
 		*(void **)&pdyn_FUNC = dlsym(lregex, name_FUNC); \
 		if unlikely(!pdyn_FUNC)                          \
 			goto err;                                    \
-	} __WHILE0
+	}	__WHILE0
 	BIND(pdyn_regex_matchesptr, name_regex_matchesptr);
 	BIND(pdyn_regex_find, name_regex_find);
 	BIND(pdyn_regex_rfind, name_regex_rfind);

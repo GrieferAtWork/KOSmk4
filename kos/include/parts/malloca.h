@@ -377,7 +377,7 @@ __NAMESPACE_INT_END
 			(void)__MALLOCA_SKEW_ALLOCA(__math_res, __math_s - __MALLOCA_ALIGN);                                             \
 		}                                                                                                                    \
 		*(void **)&(result) = __math_res;                                                                                    \
-	} __WHILE0
+	}	__WHILE0
 #define __calloca_tryhard(result, s)                                                                               \
 	do {                                                                                                           \
 		__SIZE_TYPE__ const __cath_s = (s) + __MALLOCA_ALIGN;                                                      \
@@ -392,7 +392,7 @@ __NAMESPACE_INT_END
 			__libc_memset(__cath_res, 0, __cath_s - __MALLOCA_ALIGN);                                              \
 		}                                                                                                          \
 		*(void **)&(result) = __cath_res;                                                                          \
-	} __WHILE0
+	}	__WHILE0
 #else /* __OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
 #define __malloca_tryhard(result, s)                                                                                     \
 	do {                                                                                                                 \
@@ -408,7 +408,7 @@ __NAMESPACE_INT_END
 			(void)__MALLOCA_SKEW_ALLOCA(__math_res, __math_s - __MALLOCA_ALIGN);                                         \
 		}                                                                                                                \
 		*(void **)&(result) = __math_res;                                                                                \
-	} __WHILE0
+	}	__WHILE0
 #define __calloca_tryhard(result, s)                                                                           \
 	do {                                                                                                       \
 		__SIZE_TYPE__ const __cath_s = (s) + __MALLOCA_ALIGN;                                                  \
@@ -423,7 +423,7 @@ __NAMESPACE_INT_END
 			__libc_memset(__cath_res, 0, __cath_s - __MALLOCA_ALIGN);                                          \
 		}                                                                                                      \
 		*(void **)&(result) = __cath_res;                                                                      \
-	} __WHILE0
+	}	__WHILE0
 #endif /* !__OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
 #else  /* __KOS__ && __KERNEL__ */
 #define __malloca_tryhard(result, s)                                                                            \
@@ -440,7 +440,7 @@ __NAMESPACE_INT_END
 			(void)__MALLOCA_SKEW_ALLOCA(__math_res, __math_s - __MALLOCA_ALIGN);                                \
 		}                                                                                                       \
 		*(void **)&(result) = __math_res;                                                                       \
-	} __WHILE0
+	}	__WHILE0
 #define __calloca_tryhard(result, s)                                                                               \
 	do {                                                                                                           \
 		__SIZE_TYPE__ const __cath_s = (s) + __MALLOCA_ALIGN;                                                      \
@@ -455,7 +455,7 @@ __NAMESPACE_INT_END
 			__libc_memset(__cath_res, 0, __cath_s - __MALLOCA_ALIGN);                                              \
 		}                                                                                                          \
 		*(void **)&(result) = __cath_res;                                                                          \
-	} __WHILE0
+	}	__WHILE0
 #endif /* !__KOS__ || !__KERNEL__ */
 #elif defined(__hybrid_alloca)
 /* Fallback: Only stack allocation is possible. */
@@ -481,7 +481,7 @@ __NAMESPACE_INT_END
 	do {                                                                                         \
 		__SIZE_TYPE__ const __calloca_num_bytes = (num_bytes);                                   \
 		*(void **)&(result) = __libc_memset(__hybrid_alloca(num_bytes), 0, __calloca_num_bytes); \
-	} __WHILE0
+	}	__WHILE0
 #elif defined(____libc_malloc_defined) && defined(____libc_free_defined)
 /* Fallback: Only heap allocation is possible. */
 #define __malloca_mayfail                    1

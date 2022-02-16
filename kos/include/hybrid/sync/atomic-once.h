@@ -53,7 +53,7 @@ struct atomic_once {
 			__VA_ARGS__;               \
 			atomic_once_success(self); \
 		}                              \
-	} __WHILE0
+	}	__WHILE0
 
 
 /* Enter the atomic-once block

@@ -60,7 +60,7 @@ DATDEF bool dbg_logecho_enabled;
 		(dbg_logecho_enabled = _dle_old)
 #define dbg_logecho_pop() \
 		dbg_logecho_enabled = _dle_old; \
-	} __WHILE0
+	}	__WHILE0
 
 /* format-printer compatible function to manually write text
  * to the external debugger logecho sink.
@@ -239,8 +239,7 @@ typedef u8 dbg_color_t;
 		_old_color = dbg_getcolor()
 #define dbg_loadcolor()           \
 		dbg_setcolor(_old_color); \
-	} __WHILE0
-
+	}	__WHILE0
 
 #endif /* __CC__ */
 

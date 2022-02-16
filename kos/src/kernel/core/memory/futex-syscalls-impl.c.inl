@@ -157,7 +157,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 			                             (_oldval & mask_and) | \
 			                             mask_or));             \
 			COMPILER_WRITE_BARRIER();                           \
-		} __WHILE0
+		}	__WHILE0
 #else /* __OPTIMIZE_SIZE__ */
 #define APPLY_MASK()                                                \
 		do {                                                        \
@@ -175,7 +175,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 				                             mask_or));             \
 			}                                                       \
 			COMPILER_WRITE_BARRIER();                               \
-		} __WHILE0
+		}	__WHILE0
 #endif /* !__OPTIMIZE_SIZE__ */
 		if unlikely((futex_op & LFUTEX_FLAGMASK) != 0) {
 			THROW(E_INVALID_ARGUMENT_RESERVED_FLAG,

@@ -50,7 +50,7 @@
 			EMU86_MEMWRITEL(sp, _value);             \
 		}                                            \
 		EMU86_SETSTACKPTR(sp);                       \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_PUSH1632_NOSUP()                               \
 	do {                                                     \
 		byte_t *sp;                                          \
@@ -69,7 +69,7 @@
 			EMU86_UNSUPPORTED_MEMACCESS(sp, 4, false, true); \
 		}                                                    \
 		goto return_unsupported_instruction;                 \
-	} __WHILE0
+	}	__WHILE0
 #elif EMU86_EMULATE_CONFIG_CHECKERROR
 #define EMU86_PUSH1632(T, value) goto return_unsupported_instruction
 #define EMU86_PUSH1632_NOSUP()   goto return_unsupported_instruction
@@ -102,7 +102,7 @@
 		}                                            \
 		setter(_value);                              \
 		EMU86_SETSTACKPTR(sp);                       \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_POP1632_PEEK(T, setter)                \
 	do {                                             \
 		byte_t *sp;                                  \
@@ -124,7 +124,7 @@
 			sp += 4;                                 \
 		}                                            \
 		setter(_value);                              \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_POP1632_NOSUP()                                \
 	do {                                                     \
 		byte_t *sp;                                          \
@@ -142,7 +142,7 @@
 			EMU86_UNSUPPORTED_MEMACCESS(sp, 4, true, false); \
 		}                                                    \
 		goto return_unsupported_instruction;                 \
-	} __WHILE0
+	}	__WHILE0
 #elif EMU86_EMULATE_CONFIG_CHECKERROR
 #define EMU86_POP1632(T, setter)      goto return_unsupported_instruction
 #define EMU86_POP1632_PEEK(T, setter) goto return_unsupported_instruction
@@ -176,7 +176,7 @@
 			EMU86_MEMWRITEL(sp, value32);                              \
 		})                                                             \
 		EMU86_SETSTACKPTR(sp);                                         \
-	} __WHILE0
+	}	__WHILE0
 
 #define EMU86_PUSH163264_NOSUP()                                       \
 	do {                                                               \
@@ -197,7 +197,7 @@
 			EMU86_EMULATE_PUSH(sp, 4);                                 \
 			EMU86_UNSUPPORTED_MEMACCESS(sp, 4, false, true);           \
 		})                                                             \
-	} __WHILE0
+	}	__WHILE0
 
 /* [66] XX push64  (in 64-bit mode)
  *  66  XX push16 (outside 64-bit mode)
@@ -223,7 +223,7 @@
 			EMU86_MEMWRITEL(sp, value32);                              \
 		})                                                             \
 		EMU86_SETSTACKPTR(sp);                                         \
-	} __WHILE0
+	}	__WHILE0
 
 #define EMU86_PUSH163264_FORCE64_NOSUP()                               \
 	do {                                                               \
@@ -242,7 +242,7 @@
 			EMU86_EMULATE_PUSH(sp, 4);                                 \
 			EMU86_UNSUPPORTED_MEMACCESS(sp, 4, false, true);           \
 		})                                                             \
-	} __WHILE0
+	}	__WHILE0
 
 
 /* 66 XX pop16
@@ -254,13 +254,13 @@
 		sp = EMU86_GETSTACKPTR();                          \
 		EMU86_POP163264_IMPL(setter16, setter32, setter64) \
 		EMU86_SETSTACKPTR(sp);                             \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_POP163264_PEEK(setter16, setter32, setter64) \
 	do {                                                   \
 		byte_t *sp;                                        \
 		sp = EMU86_GETSTACKPTR();                          \
 		EMU86_POP163264_IMPL(setter16, setter32, setter64) \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_POP163264_IMPL(setter16, setter32, setter64)             \
 		if (IS_16BIT()) {                                              \
 			u16 _value;                                                \
@@ -293,7 +293,7 @@
 		byte_t *sp;                  \
 		sp = EMU86_GETSTACKPTR();    \
 		EMU86_POP163264_NOSUP_IMPL() \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_POP163264_NOSUP_IMPL()                                   \
 		if (IS_16BIT()) {                                              \
 			EMU86_EMULATE_POP(sp, 2);                                  \

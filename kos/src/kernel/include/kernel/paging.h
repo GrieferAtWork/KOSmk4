@@ -280,7 +280,7 @@ FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unmap_userspace_nosync_p)(pagedir_phys
 		if (_old_pdir != (self))    \
 			pagedir_set(_old_pdir); \
 		PREEMPTION_POP(_p_was);     \
-	} __WHILE0
+	}	__WHILE0
 #define PAGEDIR_P_BEGINUSE_KEEP_PR(self)                      \
 	do {                                                      \
 		pagedir_phys_t _old_pdir;                             \
@@ -293,7 +293,7 @@ FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unmap_userspace_nosync_p)(pagedir_phys
 		__WHILE0;                      \
 		if (_old_pdir != (self))       \
 			pagedir_set(_old_pdir);    \
-	} __WHILE0
+	}	__WHILE0
 #endif /* !__INTELLISENSE__ */
 
 

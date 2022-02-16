@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7eb4c396 */
+/* HASH CRC-32:0xb3d941bc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3969,13 +3969,13 @@ NOTHROW_NCX(LIBCCALL libc__makepath_s)(char *buf,
 		if unlikely(buflen < n)                          \
 			goto err_buflen;                             \
 		buf = (char *)libc_mempcpyc(buf, p, n, sizeof(char)); \
-	} __WHILE0
+	}	__WHILE0
 #define path_putc(ch)          \
 	do {                       \
 		if unlikely(!buflen--) \
 			goto err_buflen;   \
 		*buf++ = (ch);         \
-	} __WHILE0
+	}	__WHILE0
 	if (drive && *drive) {
 		path_putc(*drive);
 		path_putc(':');

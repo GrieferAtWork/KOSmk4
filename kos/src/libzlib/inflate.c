@@ -161,7 +161,7 @@ enum{ _zl_startid = __COUNTER__ };
 		goto done;                                  \
 	case _myid:                                     \
 		LOAD();                                     \
-	} __WHILE0
+	}	__WHILE0
 
 #define YIELD_FOREVER(val)                          \
 	do {                                            \
@@ -170,14 +170,14 @@ enum{ _zl_startid = __COUNTER__ };
 	case _myid:                                     \
 		result = (val);                             \
 		goto done;                                  \
-	} __WHILE0
+	}	__WHILE0
 
 #define GETC(value)                              \
 	do {                                         \
 		while (self->zr_incur >= self->zr_inend) \
 			YIELD(decompressed_bytes);           \
 		(value) = *self->zr_incur++;             \
-	} __WHILE0
+	}	__WHILE0
 
 #define REQUIREBITS(num_bits)                                 \
 	do {                                                      \
@@ -189,7 +189,7 @@ enum{ _zl_startid = __COUNTER__ };
 			self->zr_bitcnt += 8;                             \
 			assert(self->zr_bitcnt <= 32);                    \
 		}                                                     \
-	} __WHILE0
+	}	__WHILE0
 
 #define PEEKBITS(num_bits) \
 	(self->zr_bitbuf & (((u32)1 << (num_bits)) - 1))
@@ -202,7 +202,7 @@ enum{ _zl_startid = __COUNTER__ };
 		REQUIREBITS(num_bits);         \
 		(result) = PEEKBITS(num_bits); \
 		TAKEBITS(num_bits);            \
-	} __WHILE0
+	}	__WHILE0
 
 #define MAX_BITS 15 /* max # of compressed bits for any literal */
 

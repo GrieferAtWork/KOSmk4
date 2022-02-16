@@ -76,42 +76,42 @@ DECL_END
 		error = libvm86_inb(self, portno, &(result)); \
 		if (error != VM86_SUCCESS)                    \
 			return error;                             \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_EMULATE_INW(portno, result)             \
 	do {                                              \
 		int error;                                    \
 		error = libvm86_inw(self, portno, &(result)); \
 		if (error != VM86_SUCCESS)                    \
 			return error;                             \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_EMULATE_INL(portno, result)             \
 	do {                                              \
 		int error;                                    \
 		error = libvm86_inl(self, portno, &(result)); \
 		if (error != VM86_SUCCESS)                    \
 			return error;                             \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_EMULATE_OUTB(portno, value)          \
 	do {                                           \
 		int error;                                 \
 		error = libvm86_outb(self, portno, value); \
 		if (error != VM86_SUCCESS)                 \
 			return error;                          \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_EMULATE_OUTW(portno, value)          \
 	do {                                           \
 		int error;                                 \
 		error = libvm86_outw(self, portno, value); \
 		if (error != VM86_SUCCESS)                 \
 			return error;                          \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_EMULATE_OUTL(portno, value)          \
 	do {                                           \
 		int error;                                 \
 		error = libvm86_outl(self, portno, value); \
 		if (error != VM86_SUCCESS)                 \
 			return error;                          \
-	} __WHILE0
+	}	__WHILE0
 
 
 #define EMU86_EMULATE_DECL         INTERN
@@ -202,12 +202,12 @@ PRIVATE uintptr_t const vm86_breg_offset[8] = {
 	do {                                                  \
 		if unlikely(!vm86_state_canpush(self, num_bytes)) \
 			return VM86_DOUBLE_FAULT;                     \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_EMULATE_POP(old_sp, num_bytes)             \
 	do {                                                 \
 		if unlikely(!vm86_state_canpop(self, num_bytes)) \
 			return VM86_DOUBLE_FAULT;                    \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_GETSEG(regno)        self->vr_regs.vr_segments[regno]
 #define EMU86_SETSEG(regno, value) self->vr_regs.vr_segments[regno] = (value)
 #define EMU86_GETREGB(regno, ...)        REG8(regno)
@@ -388,12 +388,12 @@ PRIVATE uintptr_t const vm86_breg_offset[8] = {
 	do {                                               \
 		if (EMU86_EMULATE_RDCR0() != (value))          \
 			return libvm86_intr(self, 0x0d /* #GP */); \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_EMULATE_WRCR4(value)                     \
 	do {                                               \
 		if (EMU86_EMULATE_RDCR4() != (value))          \
 			return libvm86_intr(self, 0x0d /* #GP */); \
-	} __WHILE0
+	}	__WHILE0
 /* %cr2 and %cr3 are treated as auxiliary general purpose registers. */
 #define EMU86_EMULATE_RDCR2()      (u32)self->vr_regs.vr_cr2
 #define EMU86_EMULATE_RDCR3()      (u32)self->vr_regs.vr_cr3

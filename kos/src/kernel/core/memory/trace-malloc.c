@@ -334,7 +334,7 @@ DEFINE_DBG_BZERO_OBJECT(tm_smplock);
 #define lock_release()           \
 		 smplock_release_nopr(); \
 		 PREEMPTION_POP(_l_was); \
-	} __WHILE0
+	}	__WHILE0
 
 
 /* [0..1] Tree of traced nodes */

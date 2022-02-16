@@ -115,7 +115,7 @@ PRIVATE void create_and_pop_nodes2(unsigned int const ins_order[10]) {
 	do {                                                     \
 		PRIVATE unsigned int const _order[10] = __VA_ARGS__; \
 		create_and_pop_nodes(ins_order, _order);             \
-	} __WHILE0
+	}	__WHILE0
 	CREATE_AND_POP_WITH_ORDER({ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
 	CREATE_AND_POP_WITH_ORDER({ 9, 0, 1, 2, 3, 4, 5, 6, 7, 8 });
 	CREATE_AND_POP_WITH_ORDER({ 8, 9, 0, 1, 2, 3, 4, 5, 6, 7 });
@@ -219,7 +219,7 @@ DEFINE_TEST(rbtree)
 	do {                                                     \
 		PRIVATE unsigned int const _order[10] = __VA_ARGS__; \
 		create_and_pop_nodes2(_order);                       \
-	} __WHILE0
+	}	__WHILE0
 	CREATE_WITH_ORDER_AND_POP({ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
 	CREATE_WITH_ORDER_AND_POP({ 9, 0, 1, 2, 3, 4, 5, 6, 7, 8 });
 	CREATE_WITH_ORDER_AND_POP({ 8, 9, 0, 1, 2, 3, 4, 5, 6, 7 });

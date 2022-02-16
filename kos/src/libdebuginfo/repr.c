@@ -391,7 +391,7 @@ NOTHROW(CC libdi_debug_repr_DW_EH_PE)(uint8_t value) {
 		if unlikely((temp = (expr)) < 0) \
 			goto err;                    \
 		result += temp;                  \
-	} __WHILE0
+	}	__WHILE0
 #define PRINT(s)            DO((*printer)(arg, REPR_STRING(s), COMPILER_STRLEN(s)))
 #define PRINTF(format, ...) DO(format_printf(printer, arg, REPR_STRING(format), ##__VA_ARGS__))
 

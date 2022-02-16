@@ -512,23 +512,23 @@ mousebuf_getpacket(struct mousebuf *__restrict self) THROWS(E_WOULDBLOCK) {
 			PREEMPTION_POP(was);                     \
 			task_yield();                            \
 		}                                            \
-	} __WHILE0
+	}	__WHILE0
 #define MD_LOCK_WRITE_NOPR(self)                       \
 	do {                                               \
 		assert(!PREEMPTION_ENABLED());                 \
 		while unlikely(!sync_trywrite(&self->md_lock)) \
 			task_tryyield_or_pause();                  \
-	} __WHILE0
+	}	__WHILE0
 #define MD_LOCK_ENDWRITE(self, was)    \
 	do {                               \
 		sync_endwrite(&self->md_lock); \
 		PREEMPTION_POP(was);           \
-	} __WHILE0
+	}	__WHILE0
 #define MD_LOCK_ENDWRITE_NOPR(self)    \
 	do {                               \
 		assert(!PREEMPTION_ENABLED()); \
 		sync_endwrite(&self->md_lock); \
-	} __WHILE0
+	}	__WHILE0
 #else /* !CONFIG_NO_SMP */
 #define MD_LOCK_WRITE(self, was)    ((was) = PREEMPTION_PUSHOFF())
 #define MD_LOCK_WRITE_NOPR(self)    (assert(!PREEMPTION_ENABLED()))

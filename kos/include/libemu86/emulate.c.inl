@@ -1509,7 +1509,7 @@ void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CON
 	do {                                                      \
 		static int volatile fence_word = 0;                   \
 		__hybrid_atomic_xch(fence_word, 1, __ATOMIC_SEQ_CST); \
-	} __WHILE0
+	}	__WHILE0
 #endif /* !EMU86_EMULATE_FENCELOCK */
 #endif /* !EMU86_EMULATE_CONFIG_NO_INTRIN */
 
@@ -1942,7 +1942,7 @@ void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CON
 	do {                                                          \
 		if unlikely(!EMU86_VALIDATE_IS_CANONICAL(addr))           \
 			EMU86_EMULATE_THROW_SEGFAULT_UNMAPPED_NONCANON(addr); \
-	} __WHILE0
+	}	__WHILE0
 #else /* EMU86_EMULATE_THROW_SEGFAULT_UNMAPPED_NONCANON */
 #define EMU86_VALIDATE_CANONICAL_IS_NOOP 1
 #define EMU86_VALIDATE_CANONICAL(addr) (void)0
@@ -2108,7 +2108,7 @@ void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CON
 		_kernel_gsbase = EMU86_EMULATE_RDMSR(IA32_KERNEL_GS_BASE);      \
 		EMU86_SETGSBASE(_kernel_gsbase);                                \
 		EMU86_EMULATE_WRMSR(IA32_KERNEL_GS_BASE, _gsbase);              \
-	} __WHILE0
+	}	__WHILE0
 #endif /* !EMU86_EMULATE_SWAPGS && ... */
 
 
@@ -3304,7 +3304,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 		pc = emu86_modrm_decode(pc, &modrm, op_flags); \
 		if (!EMU86_MODRM_ISMEM(modrm.mi_type))         \
 			goto return_expected_memory_modrm;         \
-	} __WHILE0
+	}	__WHILE0
 #if EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #define NEED_return_expected_memory_modrm
 #define MODRM_DECODE() MODRM_DECODE_MEMONLY()
@@ -3321,7 +3321,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 	do {                                              \
 		if (EMU86_ISUSER())                           \
 			EMU86_VALIDATE_READABLE(addr, num_bytes); \
-	} __WHILE0
+	}	__WHILE0
 #else /* EMU86_EMULATE_CONFIG_CHECKUSER && !EMU86_VALIDATE_READABLE_IS_NOOP */
 #define EMU86_READ_USER_MEMORY(addr, num_bytes)  (void)0
 #endif /* !EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_VALIDATE_READABLE_IS_NOOP */
@@ -3333,7 +3333,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 	do {                                              \
 		if (EMU86_ISUSER())                           \
 			EMU86_VALIDATE_WRITABLE(addr, num_bytes); \
-	} __WHILE0
+	}	__WHILE0
 #else /* EMU86_EMULATE_CONFIG_CHECKUSER && !EMU86_VALIDATE_WRITABLE_IS_NOOP */
 #define EMU86_WRITE_USER_MEMORY(addr, num_bytes) (void)0
 #endif /* !EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_VALIDATE_WRITABLE_IS_NOOP */
@@ -3345,7 +3345,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_NAME)(EMU86_EMULATE_ARGS) {
 	do {                                               \
 		if (EMU86_ISUSER())                            \
 			EMU86_VALIDATE_READWRITE(addr, num_bytes); \
-	} __WHILE0
+	}	__WHILE0
 #else /* EMU86_EMULATE_CONFIG_CHECKUSER && !EMU86_VALIDATE_READWRITE_IS_NOOP */
 #define EMU86_READWRITE_USER_MEMORY(addr, num_bytes) (void)0
 #endif /* !EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_VALIDATE_READWRITE_IS_NOOP */

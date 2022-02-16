@@ -370,7 +370,7 @@ libvideo_gfx_ramgfx_getcolor_with_key(struct video_gfx const *__restrict self,
 		case GFX_BLENDMODE_ONE_MINUS_CONSTANT_ALPHA: callback(blend_one_minus_constant_alpha); break; \
 		default:                                     callback(blend_zero); break;                     \
 		}                                                                                             \
-	} __WHILE0
+	}	__WHILE0
 
 #define func_add(a,b)              a + b
 #define func_subtract(a,b)         a - b
@@ -384,7 +384,7 @@ libvideo_gfx_ramgfx_getcolor_with_key(struct video_gfx const *__restrict self,
 		case GFX_BLENDFUNC_MAX:              callback(max); break;                   \
 		default:                             callback(func_add); break;              \
 		}                                                                            \
-	} __WHILE0
+	}	__WHILE0
 
 
 LOCAL ATTR_CONST WUNUSED video_color_t CC

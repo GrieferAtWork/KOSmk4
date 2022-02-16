@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55e432a6 */
+/* HASH CRC-32:0xcf68f1b3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_KOS_UNISTD_H 1
 
 #include "../api.h"
+#include "../auto/kos.unistd.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>
@@ -42,24 +43,6 @@ INTDEF ATTR_NORETURN NONNULL((1, 2, 3)) void (LIBCCALL libc_Execve)(char const *
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTDEF ATTR_NORETURN NONNULL((1, 2)) void (LIBCCALL libc_Execvp)(char const *__restrict file, __TARGV) THROWS(...);
-/* >> execl(3)
- * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
-INTDEF ATTR_NORETURN ATTR_SENTINEL NONNULL((1)) void (VLIBCCALL libc_Execl)(char const *__restrict path, char const *args, ...) THROWS(...);
-/* >> execle(3)
- * Replace the calling process with the application image referred to by `path' / `file'
- * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
- * and setting `environ' to a `char **' passed after the NULL sentinel */
-INTDEF ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void (VLIBCCALL libc_Execle)(char const *__restrict path, char const *args, ...) THROWS(...);
-/* >> execlp(3)
- * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
-INTDEF ATTR_NORETURN ATTR_SENTINEL NONNULL((1)) void (VLIBCCALL libc_Execpl)(char const *__restrict file, char const *args, ...) THROWS(...);
-/* >> execle(3)
- * Replace the calling process with the application image referred to by `path' / `file'
- * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
- * and setting `environ' to a `char **' passed after the NULL sentinel */
-INTDEF ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void (VLIBCCALL libc_Execlpe)(char const *__restrict file, char const *args, ...) THROWS(...);
 /* >> pipe(2)
  * Create a new pair of connected pipes ([0] = reader, [1] = writer)
  * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer

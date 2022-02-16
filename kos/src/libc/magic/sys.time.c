@@ -676,24 +676,20 @@ int futimesat64($fd_t fd, [[nonnull]] char const *file,
 	(((a)->tv_sec == (b)->tv_sec)      \
 	 ? ((a)->tv_usec CMP (b)->tv_usec) \
 	 : ((a)->tv_sec CMP (b)->tv_sec))
-#define timeradd(a, b, result)                           \
-	do {                                                 \
-		(result)->tv_sec  = (a)->tv_sec + (b)->tv_sec;   \
-		(result)->tv_usec = (a)->tv_usec + (b)->tv_usec; \
-		if ((result)->tv_usec >= 1000000) {              \
-			++(result)->tv_sec;                          \
-			(result)->tv_usec -= 1000000;                \
-		}                                                \
-	} __WHILE0
-#define timersub(a, b, result)                           \
-	do {                                                 \
-		(result)->tv_sec  = (a)->tv_sec - (b)->tv_sec;   \
-		(result)->tv_usec = (a)->tv_usec - (b)->tv_usec; \
-		if ((result)->tv_usec < 0) {                     \
-			--(result)->tv_sec;                          \
-			(result)->tv_usec += 1000000;                \
-		}                                                \
-	} __WHILE0
+#define timeradd(a, b, result)                        \
+	((result)->tv_sec  = (a)->tv_sec + (b)->tv_sec,   \
+	 (result)->tv_usec = (a)->tv_usec + (b)->tv_usec, \
+	 (result)->tv_usec >= 1000000                     \
+	 ? (void)(++(result)->tv_sec,                     \
+	          (result)->tv_usec -= 1000000)           \
+	 : (void)0)
+#define timersub(a, b, result)                        \
+	((result)->tv_sec  = (a)->tv_sec - (b)->tv_sec,   \
+	 (result)->tv_usec = (a)->tv_usec - (b)->tv_usec, \
+	 (result)->tv_usec < 0                            \
+	 ? (void)(--(result)->tv_sec,                     \
+	          (result)->tv_usec += 1000000)           \
+	 : (void)0)
 #endif /* __USE_MISC */
 
 #ifdef __USE_NETBSD
@@ -706,24 +702,20 @@ int futimesat64($fd_t fd, [[nonnull]] char const *file,
 	(((a)->tv_sec == (b)->tv_sec)      \
 	 ? ((a)->tv_nsec CMP (b)->tv_nsec) \
 	 : ((a)->tv_sec CMP (b)->tv_sec))
-#define timespecadd(tsp, usp, vsp)                        \
-	do {                                                  \
-		(vsp)->tv_sec  = (tsp)->tv_sec + (usp)->tv_sec;   \
-		(vsp)->tv_nsec = (tsp)->tv_nsec + (usp)->tv_nsec; \
-		if ((vsp)->tv_nsec >= 1000000000L) {              \
-			++(vsp)->tv_sec;                              \
-			(vsp)->tv_nsec -= 1000000000L;                \
-		}                                                 \
-	} __WHILE0
-#define timespecsub(tsp, usp, vsp)                        \
-	do {                                                  \
-		(vsp)->tv_sec  = (tsp)->tv_sec - (usp)->tv_sec;   \
-		(vsp)->tv_nsec = (tsp)->tv_nsec - (usp)->tv_nsec; \
-		if ((vsp)->tv_nsec < 0) {                         \
-			--(vsp)->tv_sec;                              \
-			(vsp)->tv_nsec += 1000000000L;                \
-		}                                                 \
-	} __WHILE0
+#define timespecadd(tsp, usp, vsp)                     \
+	((vsp)->tv_sec  = (tsp)->tv_sec + (usp)->tv_sec,   \
+	 (vsp)->tv_nsec = (tsp)->tv_nsec + (usp)->tv_nsec, \
+	 (vsp)->tv_nsec >= 1000000000L                     \
+	 ? (void)(++(vsp)->tv_sec,                         \
+	          (vsp)->tv_nsec -= 1000000000L)           \
+	 : (void)0)
+#define timespecsub(tsp, usp, vsp)                     \
+	((vsp)->tv_sec  = (tsp)->tv_sec - (usp)->tv_sec,   \
+	 (vsp)->tv_nsec = (tsp)->tv_nsec - (usp)->tv_nsec, \
+	 (vsp)->tv_nsec < 0                                \
+	 ? (void)(--(vsp)->tv_sec,                         \
+	          (vsp)->tv_nsec += 1000000000L)           \
+	 : (void)0)
 #define timespec2ns(tsp) \
 	(((__uint64_t)(tsp)->tv_sec) * 1000000000L + (tsp)->tv_nsec)
 #endif /* __USE_NETBSD */

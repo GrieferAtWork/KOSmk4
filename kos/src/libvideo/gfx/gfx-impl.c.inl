@@ -84,7 +84,7 @@ GFX_FUNC(libvideo_gfx_defaultgfx_line)(struct video_gfx *__restrict self,
 			(result) |= COHSUTH_YMIN;        \
 		else if ((y) >= (intptr_t)GFX_YEND)  \
 			(result) |= COHSUTH_YMAX;        \
-	} __WHILE0
+	}	__WHILE0
 	COHSUTH_COMPUTEOUTCODE(x1, y1, outcode0);
 	COHSUTH_COMPUTEOUTCODE(x2, y2, outcode1);
 	while ((outcode0 | outcode1) != 0) {

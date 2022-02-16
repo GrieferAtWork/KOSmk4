@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61853a23 */
+/* HASH CRC-32:0xbbe10b89 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -674,13 +674,13 @@ NOTHROW_NCX(LIBDCALL libd__wmakepath_s)(char16_t *buf,
 		if unlikely(buflen < n)                          \
 			goto err_buflen;                             \
 		buf = (char16_t *)libc_mempcpyc(buf, p, n, sizeof(char16_t)); \
-	} __WHILE0
+	}	__WHILE0
 #define path_putc(ch)          \
 	do {                       \
 		if unlikely(!buflen--) \
 			goto err_buflen;   \
 		*buf++ = (ch);         \
-	} __WHILE0
+	}	__WHILE0
 	if (drive && *drive) {
 		path_putc(*drive);
 		path_putc(':');
@@ -725,13 +725,13 @@ NOTHROW_NCX(LIBKCALL libc__wmakepath_s)(char32_t *buf,
 		if unlikely(buflen < n)                          \
 			goto err_buflen;                             \
 		buf = (char32_t *)libc_mempcpyc(buf, p, n, sizeof(char32_t)); \
-	} __WHILE0
+	}	__WHILE0
 #define path_putc(ch)          \
 	do {                       \
 		if unlikely(!buflen--) \
 			goto err_buflen;   \
 		*buf++ = (ch);         \
-	} __WHILE0
+	}	__WHILE0
 	if (drive && *drive) {
 		path_putc(*drive);
 		path_putc(':');

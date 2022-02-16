@@ -353,7 +353,7 @@ PRIVATE struct atomic_rwlock kernel_debug_info_inside_malloc = ATOMIC_RWLOCK_INI
 		if (!(dbg_active ? atomic_rwlock_trywrite(&kernel_debug_info_inside_malloc)  \
 		                 : atomic_rwlock_tryread(&kernel_debug_info_inside_malloc))) \
 			return NULL;                                                             \
-	} __WHILE0
+	}	__WHILE0
 #define MY_KMALLOC_RELEASE_LOCK() \
 	atomic_rwlock_end(&kernel_debug_info_inside_malloc)
 

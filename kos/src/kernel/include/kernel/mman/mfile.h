@@ -978,10 +978,10 @@ struct mfile {
 	}	__WHILE0
 #define mfile_tslock_release(self)     \
 		mfile_tslock_release_br(self); \
-	} __WHILE0
+	}	__WHILE0
 #define mfile_tslock_release_pronly(self)     \
 		mfile_tslock_release_pronly_br(self); \
-	} __WHILE0
+	}	__WHILE0
 
 
 /* Mark `what' as having changed for `self'

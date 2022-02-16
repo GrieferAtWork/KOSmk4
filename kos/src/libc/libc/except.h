@@ -137,7 +137,7 @@ INTDEF ATTR_NORETURN void __EXCEPT_HANDLER_CC libc_except_handler4(except_regist
 		/* Bind the kernel-space exception handler using `sys_set_exception_handler()' */       \
 		sys_set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND | EXCEPT_HANDLER_FLAG_SETHANDLER, \
 		                          &libc_except_handler4, NULL);                                 \
-	} __WHILE0
+	}	__WHILE0
 
 #endif /* !__KERNEL__ */
 

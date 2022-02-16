@@ -166,7 +166,7 @@ line_lhhl(struct video_gfx *__restrict self,
 			                      _y,        \
 			                      color);    \
 		}                                    \
-	} __WHILE0
+	}	__WHILE0
 #define line_vert(self, x, y, length, color) \
 	do {                                     \
 		uintptr_t _x = (x);                  \
@@ -179,9 +179,8 @@ line_lhhl(struct video_gfx *__restrict self,
 			                      _y + _i,   \
 			                      color);    \
 		}                                    \
-	} __WHILE0
+	}	__WHILE0
 #else
-
 LOCAL NONNULL((1)) void CC
 line_hori(struct video_gfx *__restrict self,
           uintptr_t x, uintptr_t y, size_t length,

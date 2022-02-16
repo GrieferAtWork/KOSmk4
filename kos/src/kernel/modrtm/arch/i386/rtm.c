@@ -1007,37 +1007,37 @@ NOTHROW(KCALL i386_get_rtm_segment_base)(struct rtm_machstate *__restrict self,
 	do {                                       \
 		if (EMU86_GETES() != (v))              \
 			return ABORT_WITH(_XABORT_FAILED); \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_SETCS(v)                         \
 	do {                                       \
 		if (EMU86_GETCS() != (v))              \
 			return ABORT_WITH(_XABORT_FAILED); \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_SETSS(v)                         \
 	do {                                       \
 		if (EMU86_GETSS() != (v))              \
 			return ABORT_WITH(_XABORT_FAILED); \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_SETDS(v)                         \
 	do {                                       \
 		if (EMU86_GETDS() != (v))              \
 			return ABORT_WITH(_XABORT_FAILED); \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_SETFS(v)                         \
 	do {                                       \
 		if (EMU86_GETFS() != (v))              \
 			return ABORT_WITH(_XABORT_FAILED); \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_SETGS(v)                         \
 	do {                                       \
 		if (EMU86_GETGS() != (v))              \
 			return ABORT_WITH(_XABORT_FAILED); \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_SETSEG(regno, value)             \
 	do {                                       \
 		if (EMU86_GETSEG(regno) != (value))    \
 			return ABORT_WITH(_XABORT_FAILED); \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_SETREGP(regno, value, op_flags) DONT_USE /* Unused */
 
 #define EMU86_VALIDATE_IO(portno, num_ports) DONE_USE
@@ -1379,7 +1379,7 @@ DEFINE_CMPXCH_FUNCTIONS(x, uint128_t)
 	do {                                                      \
 		if (mach.r_mem.rm_mem_avl.rm_chkuser)                 \
 			validate_executable((void *)(start_pc));          \
-	} __WHILE0
+	}	__WHILE0
 #endif /* !CONFIG_RTM_USERSPACE_ONLY */
 
 
@@ -1390,7 +1390,7 @@ DEFINE_CMPXCH_FUNCTIONS(x, uint128_t)
 			return ABORT_WITH(_XABORT_CAPACITY);       \
 		++self->r_nesting;                             \
 		return X86_RTM_STATUS_CONTINUE;                \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_EMULATE_RETURN_AFTER_XABORT(code) \
 	return ABORT_WITH(_XABORT_EXPLICIT | (((u32)(code) << _XABORT_CODE_S) & _XABORT_CODE_M))
 #define EMU86_EMULATE_RETURN_AFTER_XEND()   \
@@ -1399,7 +1399,7 @@ DEFINE_CMPXCH_FUNCTIONS(x, uint128_t)
 			return X86_RTM_STATUS_COMPLETE; \
 		--self->r_nesting;                  \
 		return X86_RTM_STATUS_CONTINUE;     \
-	} __WHILE0
+	}	__WHILE0
 #define EMU86_EMULATE_XTEST()      1
 #define EMU86_EMULATE_XTEST_IS_ONE 1
 

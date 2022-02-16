@@ -37,7 +37,6 @@
 #include <unistd.h>
 
 #include "../libc/globals.h"
-#include "../libc/capture-varargs.h"
 #include "kos.unistd.h"
 
 DECL_BEGIN
@@ -118,123 +117,6 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((1, 2
 	THROW(E_FSERROR_FILE_NOT_FOUND);
 }
 /*[[[end:libc_Execvpe]]]*/
-
-
-/*[[[head:libc_Execl,hash:CRC-32=0x7e39f891]]]*/
-/* >> execl(3)
- * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
-INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL NONNULL((1)) void
-(VLIBCCALL libc_Execl)(char const *__restrict path,
-                       char const *args,
-                       ...) THROWS(...)
-/*[[[body:libc_Execl]]]*/
-{
-#if defined(__i386__) && !defined(__x86_64__)
-	Execv(path, (char *const *)&args);
-#else
-	va_list vargs;
-	char **vector;
-	va_start(vargs, args);
-	CAPTURE_VARARGS_PLUS_ONE(char, vector, vargs, args);
-	va_end(vargs);
-	Execv(path, (char *const *)vector);
-#endif
-	__builtin_unreachable();
-}
-/*[[[end:libc_Execl]]]*/
-
-/*[[[head:libc_Execle,hash:CRC-32=0xa4bfdc0a]]]*/
-/* >> execle(3)
- * Replace the calling process with the application image referred to by `path' / `file'
- * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
- * and setting `environ' to a `char **' passed after the NULL sentinel */
-INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void
-(VLIBCCALL libc_Execle)(char const *__restrict path,
-                        char const *args,
-                        ...) THROWS(...)
-/*[[[body:libc_Execle]]]*/
-{
-#if defined(__i386__) && !defined(__x86_64__)
-	char ***penvp = (char ***)&args;
-	while (*penvp++)
-		; /* Envp is located 1 after the first NULL-entry */
-	Execve(path,
-	       (char *const *)&args,
-	       (char *const *)*penvp);
-#else
-	va_list vargs;
-	char **vector, **envp;
-	va_start(vargs, args);
-	CAPTURE_VARARGS_PLUS_ONE(char, vector, vargs, args);
-	envp = va_arg(vargs, char **);
-	va_end(vargs);
-	Execve(path,
-	       (char *const *)vector,
-	       (char *const *)envp);
-#endif
-	__builtin_unreachable();
-}
-/*[[[end:libc_Execle]]]*/
-
-/*[[[head:libc_Execpl,hash:CRC-32=0x67de5ef2]]]*/
-/* >> execlp(3)
- * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
-INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL NONNULL((1)) void
-(VLIBCCALL libc_Execpl)(char const *__restrict file,
-                        char const *args,
-                        ...) THROWS(...)
-/*[[[body:libc_Execpl]]]*/
-{
-#if defined(__i386__) && !defined(__x86_64__)
-	Execvp(file, (char *const *)&args);
-#else
-	va_list vargs;
-	char **vector;
-	va_start(vargs, args);
-	CAPTURE_VARARGS_PLUS_ONE(char, vector, vargs, args);
-	va_end(vargs);
-	Execvp(file, (char *const *)vector);
-#endif
-	__builtin_unreachable();
-}
-/*[[[end:libc_Execpl]]]*/
-
-/*[[[head:libc_Execlpe,hash:CRC-32=0xaf89e92b]]]*/
-/* >> execle(3)
- * Replace the calling process with the application image referred to by `path' / `file'
- * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
- * and setting `environ' to a `char **' passed after the NULL sentinel */
-INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void
-(VLIBCCALL libc_Execlpe)(char const *__restrict file,
-                         char const *args,
-                         ...) THROWS(...)
-/*[[[body:libc_Execlpe]]]*/
-{
-#if defined(__i386__) && !defined(__x86_64__)
-	char ***penvp = (char ***)&args;
-	while (*penvp++)
-		; /* Envp is located 1 after the first NULL-entry */
-	Execvpe(file,
-	        (char *const *)&args,
-	        (char *const *)*penvp);
-#else
-	va_list vargs;
-	char **vector, **envp;
-	va_start(vargs, args);
-	CAPTURE_VARARGS_PLUS_ONE(char, vector, vargs, args);
-	envp = va_arg(vargs, char **);
-	va_end(vargs);
-	Execvpe(file,
-	        (char *const *)vector,
-	        (char *const *)envp);
-#endif
-	__builtin_unreachable();
-}
-/*[[[end:libc_Execlpe]]]*/
-
-
 
 
 /*[[[head:libc_ReadAll,hash:CRC-32=0x115bba12]]]*/
@@ -616,13 +498,9 @@ INTERN ATTR_SECTION(".text.crt.except.system.configuration") NONNULL((1)) void
 
 
 
-/*[[[start:exports,hash:CRC-32=0x28eb2e37]]]*/
+/*[[[start:exports,hash:CRC-32=0x9ba5928b]]]*/
 DEFINE_PUBLIC_ALIAS(Execv, libc_Execv);
 DEFINE_PUBLIC_ALIAS(Execvp, libc_Execvp);
-DEFINE_PUBLIC_ALIAS(Execl, libc_Execl);
-DEFINE_PUBLIC_ALIAS(Execle, libc_Execle);
-DEFINE_PUBLIC_ALIAS(Execpl, libc_Execpl);
-DEFINE_PUBLIC_ALIAS(Execlpe, libc_Execlpe);
 DEFINE_PUBLIC_ALIAS(ReadAll, libc_ReadAll);
 DEFINE_PUBLIC_ALIAS(GetCwd, libc_GetCwd);
 DEFINE_PUBLIC_ALIAS(PRead, libc_PRead);

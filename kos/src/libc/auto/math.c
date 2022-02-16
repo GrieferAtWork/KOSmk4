@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b0efcb2 */
+/* HASH CRC-32:0xcc5beda8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2151,9 +2151,9 @@ NOTHROW(LIBCCALL libc_scalb)(double x,
 			if (__LIBM_MATHFUN(finite, x)) {
 				return __kernel_standard(x, fn, result, __LIBM_KMATHERR_SCALB_OVERFLOW); /* scalb overflow */
 			} else {
-#ifdef __ERANGE
-				(void)libc_seterrno(__ERANGE);
-#endif /* __ERANGE */
+#ifdef ERANGE
+				(void)libc_seterrno(ERANGE);
+#endif /* ERANGE */
 			}
 		} else if (result == 0.0 && result != x) {
 			return __kernel_standard(x, fn, result, __LIBM_KMATHERR_SCALB_UNDERFLOW); /* scalb underflow */
@@ -2205,9 +2205,9 @@ NOTHROW(LIBCCALL libc_scalbf)(float x,
 			if (__LIBM_MATHFUNF(finite, x)) {
 				return __kernel_standard_f(x, fn, result, __LIBM_KMATHERR_SCALB_OVERFLOW); /* scalb overflow */
 			} else {
-#ifdef __ERANGE
-				(void)libc_seterrno(__ERANGE);
-#endif /* __ERANGE */
+#ifdef ERANGE
+				(void)libc_seterrno(ERANGE);
+#endif /* ERANGE */
 			}
 		} else if (result == 0.0f && result != x) {
 			return __kernel_standard_f(x, fn, result, __LIBM_KMATHERR_SCALB_UNDERFLOW); /* scalb underflow */
@@ -2262,9 +2262,9 @@ NOTHROW(LIBCCALL libc_scalbl)(__LONGDOUBLE x,
 			if (__LIBM_MATHFUNL(finite, x)) {
 				return __kernel_standard_l(x, fn, result, __LIBM_KMATHERR_SCALB_OVERFLOW); /* scalb overflow */
 			} else {
-#ifdef __ERANGE
-				(void)libc_seterrno(__ERANGE);
-#endif /* __ERANGE */
+#ifdef ERANGE
+				(void)libc_seterrno(ERANGE);
+#endif /* ERANGE */
 			}
 		} else if (result == 0.0L && result != x) {
 			return __kernel_standard_l(x, fn, result, __LIBM_KMATHERR_SCALB_UNDERFLOW); /* scalb underflow */

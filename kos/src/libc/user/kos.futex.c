@@ -42,8 +42,7 @@ DECL_BEGIN
 #ifdef __OPTIMIZE_SIZE__
 #define NO_FUTEX_SPIN 1
 #define SPIN_WHILE(should_wait_if_this_expression_is_true) \
-	do {                                                   \
-	} __WHILE0
+	(void)0
 #else /* __OPTIMIZE_SIZE__ */
 #undef NO_FUTEX_SPIN
 INTERN ATTR_READMOSTLY unsigned int futex_spin_counter = 4;
@@ -60,7 +59,7 @@ INTERN ATTR_READMOSTLY unsigned int futex_spin_counter = 4;
 				break;                                     \
 			--_count;                                      \
 		}                                                  \
-	} __WHILE0
+	}	__WHILE0
 #endif /* !__OPTIMIZE_SIZE__ */
 
 

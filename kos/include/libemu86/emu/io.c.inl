@@ -29,7 +29,7 @@ EMU86_INTELLISENSE_BEGIN(io) {
 	do {                                           \
 		if (EMU86_ISUSER())                        \
 			EMU86_VALIDATE_IO(portno, num_ports);  \
-	} __WHILE0
+	}	__WHILE0
 #else /* EMU86_EMULATE_CONFIG_CHECKUSER && !EMU86_VALIDATE_IO_IS_NOOP */
 #define VERIFY_USER_PORT_ACCESS(portno, num_ports) (void)0
 #endif /* !EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_VALIDATE_IO_IS_NOOP */
