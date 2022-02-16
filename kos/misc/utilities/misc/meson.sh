@@ -173,7 +173,7 @@ alignment_long_double = $TARGET_CONFIG_ALIGNOF_LDOUBLE
 
 # System features used by programs:
 #  - libglib
-growing_stack = `if test "$TARGET_CONFIG_STACK_DIRECTION"="-1"; then echo "false"; else echo "true"; fi`
+growing_stack = `if [[ "$TARGET_CONFIG_STACK_DIRECTION" == "-1" ]]; then echo "false"; else echo "true"; fi`
 have_c99_vsnprintf = true
 have_c99_snprintf = true
 have_unix98_printf = true

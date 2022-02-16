@@ -48,8 +48,5 @@ CONFIGURE="$CONFIGURE --disable-debug"
 CONFIGURE="$CONFIGURE --disable-tiny"
 CONFIGURE="$CONFIGURE --enable-utf8"
 
-
-
 # Automatically build+install using autoconf
-. "$KOS_MISC/utilities/misc/gnulib.sh"
 . "$KOS_MISC/utilities/misc/gnu_make.sh"

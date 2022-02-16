@@ -17,6 +17,7 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
+if test -z "$TARGET_CONFIG_SIZEOF_POINTER"; then
 
 case "$TARGET_CPUNAME" in
 
@@ -45,7 +46,7 @@ esac
 
 
 if test -z "$TARGET_CPUFAMILY"; then TARGET_CPUFAMILY="$TARGET_CPUNAME"; fi
-if test -z "$TARGET_ENDIAN"; then TARGET_ENDIAN="little"; fi
+if test -z "$TARGET_ENDIAN"; then TARGET_ENDIAN="little"; fi # Or "big"
 if test -z "$TARGET_CONFIG_SIZEOF_POINTER"; then
 	if ! test -z "$TARGET_CONFIG_LP64"; then
 		TARGET_CONFIG_SIZEOF_POINTER="8"
@@ -94,3 +95,5 @@ if test -z "$TARGET_CONFIG_ALIGNOF_WCHAR_T"; then TARGET_CONFIG_ALIGNOF_WCHAR_T=
 if test -z "$TARGET_CONFIG_ALIGNOF_MAXALIGN_T"; then TARGET_CONFIG_ALIGNOF_MAXALIGN_T="$TARGET_CONFIG_ALIGNOF_LDOUBLE"; fi
 if test -z "$TARGET_CONFIG_STACK_DIRECTION"; then TARGET_CONFIG_STACK_DIRECTION="-1"; fi # Grows downwards
 
+
+fi
