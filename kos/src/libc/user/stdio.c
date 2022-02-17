@@ -3186,7 +3186,7 @@ NOTHROW_RPC(LIBCCALL libc_popen_impl)(char const *modes, unsigned int how, void 
 
 	/* Parse open flags. */
 	flags = file_evalmodes(modes, &oflags);
-	if unlikely(flags & IO_RW) {
+	if unlikely((oflags & O_ACCMODE) == O_RDWR) {
 		/* Even though it could be done (by use of 4 pipe files), the
 		 * standard  doesn't  allow for  bi-directional communication
 		 * with processes opened via popen(3)...

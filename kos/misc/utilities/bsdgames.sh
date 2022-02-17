@@ -54,7 +54,7 @@ require_utility openssl    "$PKG_CONFIG_PATH/openssl.pc"
 #    pom(1):          Unimplemented function called: `sin()'
 #    ppt(1):          Works
 #    primes(1):       Works
-#    quiz(1):         "quiz: /bin/less: Invalid argument"
+#    quiz(1):         Works
 #    rain(1):         Works (but feels a little too fast w/o something like `rain -d 90')
 #    random(1):       Works
 #    robots(1):       Works (Though I don't know how to play that game)
