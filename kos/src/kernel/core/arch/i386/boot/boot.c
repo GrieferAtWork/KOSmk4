@@ -902,6 +902,33 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       change ioctlf() to use the RWF_* flags, rather than `iomode_t'
 	 * Also: When offset=(pos_t)-1 should behave like read(2) / write(2) */
 
+	/* TODO: Symlink creation on FAT appears broken:
+	 * $ cd /var
+	 * $ ln -s foo bar
+	 * $ ls -la
+	 * d-wxr----x    1 0        0              512 Feb 17 14:47 .
+	 * drwxrwxrwx    1 0        0              512 Feb 17 14:47 ..
+	 * lrwsr-sr-t    1 0        0                3 Feb 17 14:47 bar -> dm
+	 * drwxrwxrwx    1 0        0              512 Feb 17 14:33 games
+	 * $ sync
+	 * $ cc
+	 * $ ls -la
+	 * d-wxr----x    1 0        0              512 Feb 17 14:47 .
+	 * drwxrwxrwx    1 0        0              512 Feb 17 14:47 ..
+	 * lrwsr-sr-t    1 0        0                3 Feb 17 14:47 bar -> foo
+	 * drwxrwxrwx    1 0        0              512 Feb 17 14:33 games
+	 *
+	 * In other words: correct data gets written to disk, but the initial
+	 * symlink object contains invalid data until it is evicted from cache
+	 * and re-loaded from disk (via sync+cc)
+	 */
+
+	/* TODO: Fix non-working bsd games:
+	 * - Implement fgetln(3)   (quiz(1))
+	 * - Figure out why time doesn't move in `snake(1)' and `worm(1)'
+	 *   -- I have a feeling it's because we don't implement `alarm(2)' or `timer_*(2)'
+	 */
+
 	return state;
 }
 

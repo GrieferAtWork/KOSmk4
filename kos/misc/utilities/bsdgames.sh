@@ -21,6 +21,58 @@
 require_utility libncurses "$TARGET_SYSROOT/$TARGET_LIBPATH/libncursesw.so"
 require_utility openssl    "$PKG_CONFIG_PATH/openssl.pc"
 
+# bsd-games is-working status:
+#    adventure(1):    Prints "Invalid data section number: -88", followed by jumbled garbage
+#    arithmetic(1):   Works
+#    backgammon(1):   Works (Though I don't know how to play that game)
+#    banner(1):       Works
+#    battlestart(1):  Works
+#    bcd(1):          Works
+#    caesar(1):       Works
+#    canfield(1):     Works
+#    cfscores(1):     "You are not listed in the password file?!?"
+#                     >> yeah... maybe implement /etc/passwd?
+#                     Related: `whoami` --> "whoami: unknown uid 0"
+#    countmail(1):    Shell-script (appears broken; probably due to busybox)
+#    cribbage(1):     Works (Though I don't know how to play that game)
+#    dab(1):          Spams the system log with "Unimplemented function called: `lrand48()'"
+#    dm(1):           TODO: Investigate
+#    factor(1):       Works
+#    fortune(1):      Works
+#    go-fish(1):      Works
+#    gomoku(1):       Works (Though I don't know how to play that game)
+#    hack(1):         Uses hard-links, which FAT doesn't support (TODO: re-try in a ramfs setting)
+#    hangman(1):      "hangman: fopen /usr/share/dict/words: No such file or directory"
+#    hunt(1):         "hunt: Can't find myself."
+#    huntd(1):        ... (I think this is a server?)
+#    mille(1):        Works (Though I don't know how to play that game)
+#    monop(1):        Works
+#    morse(1):        Works
+#    number(1):       Works
+#    phantasia(1):    Coredumps immediatly
+#    pig(1):          Works
+#    pom(1):          Unimplemented function called: `sin()'
+#    ppt(1):          Works
+#    primes(1):       Works
+#    quiz(1):         Unimplemented function called: `fgetln()'
+#    rain(1):         Works (but feels a little too fast w/o something like `rain -d 90')
+#    random(1):       Works
+#    robots(1):       Works (Though I don't know how to play that game)
+#    rot13(1):        Works
+#    sail(1):         "sail: syncfile: No such file or directory"
+#    snake(1):        Works, but time doesn't move unless you do (I feel like this isn't intended...)
+#    snscores(1):     "No scores recorded yet!" (even after running and playing snake(1))
+#    teachgammon(1):  Works, but I'm not sitting through all that!
+#    tetris-bsd(1):   Works, but I like vitetris more -- this one w/o colors :(
+#    trek(1):         "What length game:" -- No matter what's typed, prints "invalid input"
+#    wargames(1):     Works (kind-of, but it's a shell-script, so not my fault if it doesn't)
+#    worm(1):         Works, but time doesn't move unless you do (I feel like this isn't intended...)
+#    worms(1):        Works perfectly (lol! This one looks so cool)
+#    wtf(1):          Doesn't appear to be working, but is a shell script so probably busybox's fault
+#    wump(1):         Works
+
+
+
 SRCPATH="$KOS_ROOT/binutils/src/bsdgames-git"
 OPTPATH="$BINUTILS_SYSROOT/opt/bsdgames"
 DESTDIR="$BINUTILS_SYSROOT/opt/bsdgames-install"
