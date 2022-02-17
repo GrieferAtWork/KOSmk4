@@ -83,6 +83,8 @@ PRIVATE void console_sane_ios(void) {
  *       the `TASK_FCRITICAL' flag, meaning that if this program ever dies,
  *       then the kernel will (intentionally) PANIC! */
 int main(int argc, char *argv[], char *envp[]) {
+	volatile int have_fortune;
+
 	(void)argc;
 	(void)argv;
 	(void)envp;
@@ -247,6 +249,9 @@ done_tmpfs:
 	}
 #endif
 
+	/* Just for fun :P */
+	have_fortune = access("/usr/bin/fortune", X_OK);
+
 	for (;;) {
 		pid_t cpid;
 		/* Do some cleanup on the console. */
@@ -256,6 +261,17 @@ done_tmpfs:
 		        AC_RIS    /* Reset all terminal settings (except for cursor position and screen contents) */
 		        AC_ED("") /* Clear screen */
 		        "");
+
+		/* If you've got bsdgames installed, I'll tell you your fortune */
+		if ((have_fortune == 0) && (VFork() == 0)) {
+			signal(SIGHUP, SIG_DFL);
+			signal(SIGINT, SIG_DFL);
+			signal(SIGTTIN, SIG_DFL);
+			signal(SIGTTOU, SIG_DFL);
+			execle("/usr/bin/fortune", "fortune", (char *)NULL, init_envp);
+			have_fortune = -1; /* VFork() means we share VM, so this writes to parent process! */
+			_Exit(127);
+		}
 
 		/* Don't directly exec() busybox.
 		 * Instead, fork()+exec(),  then keep  on doing  so
