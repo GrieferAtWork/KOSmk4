@@ -169,7 +169,7 @@ did_update_x86_64_kernel:
 		));
 	}
 	try {
-		final local trace_filename = "qemu-events";
+		final local trace_filename = "qemu.events";
 		local trace_file = File.open(trace_filename, "r");
 		for (local l: trace_file) {
 			l = l.strip();
@@ -184,38 +184,51 @@ did_update_x86_64_kernel:
 		}
 	} catch (...) {
 	}
+	for (local l: (try File.open("qemu.conf", "r") catch (...) none)) {
+		l = l.strip();
+		if (l.startswith("#") || !l)
+			continue;
+		l = l.decode("utf-8");
+		local cmd, none, arg = l.partition("=")...;
+		switch (cmd) {
+		case "accel":
+			qemu_arguments.extend({ "-accel", arg });
+			break;
+		case "xdrive1":
+		case "xdrive2":
+		case "xdrive3":
+			if (!fs.stat.exists(arg))
+				break;
+			/* FALLTHRU */
+		case "drive1":
+		case "drive2":
+		case "drive3":
+			qemu_arguments.extend({
+				"-drive",
+				"file={},format=raw,index={},media=disk"
+					.format({ arg, cmd.last })
+			});
+			break;
+		case "args":
+			qemu_arguments.extend(arg.split(" "));
+			break;
+		default:
+			throw Error("Unknown qemu conf option: {!r}".format({ cmd }));
+			break;
+		}
+		break;
+	}
 	qemu_arguments.extend({
-//		"-accel", "hax",
 		"-kernel", KERNEL,
-//		"-initrd", "bin/i386-kos/drivers/ext2fs e f g h",
 		"-drive", "file=" + DISK_FILENAME + ",format=raw,index=0,media=disk",
 		"-smp", options.get(opt.SMP, opt.SMP_DEFAULT),
 		"-display", "gtk",
 		"-device", "isa-debug-exit,iobase=0xf4,iosize=0x04",
 //		"-d", "int",
-
-//		"-netdev", "user,id=n1", "-device", "rtl8139,netdev=n1",
-		"-netdev", "user,id=n1", "-device", "ne2k_pci,netdev=n1",
-		"-object", "filter-dump,id=f1,netdev=n1,file=qemu-netdump.dat",
 		"-vga", "std",
 		/* Enable the VM-based RTC clock, which pauses when the kernel is paused. */
 		"-rtc", "base=utc,clock=vm"
 	});
-	if (fs.stat.exists("../disk.img")) {
-		qemu_arguments.extend({
-			"-drive", "file=../disk.img,format=raw,index=1,media=disk"
-		});
-	}
-	if (fs.stat.exists("bin/ext2.img")) {
-		qemu_arguments.extend({
-			"-blockdev", "driver=file,node-name=usb1,filename=bin/ext2.img",
-			"-device", "pci-ohci,id=ohci",
-			"-device", "vt82c686b-usb-uhci,id=uhci",
-			"-device", "usb-storage,bus=uhci.0,drive=usb1",
-			"-device", "usb-mouse,bus=ohci.0",
-//			"-device", "usb-kbd,bus=uhci.0",
-		});
-	}
 	local enableMonitorCommands = false;
 	local monitorCommandPipe = none;
 	if (enableMonitorCommands) {
