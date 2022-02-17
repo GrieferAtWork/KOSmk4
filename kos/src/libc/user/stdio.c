@@ -1647,6 +1647,7 @@ file_openfd(/*inherit(on_success)*/ fd_t fd, uint32_t flags) {
 	ex = (struct iofile_data *)(result + 1);
 	result->if_exdata = ex;
 	result->if_fd     = fd; /* Inherit reference */
+	assert(ex->io_getln == NULL);
 	atomic_owner_rwlock_cinit(&ex->io_lock);
 	assert(ex->io_zero == 0);
 	ex->io_refcnt   = 1;
@@ -2803,6 +2804,7 @@ fp_funopen(void const *cookie,
 		goto done;
 	ex = (struct iofile_data *)(result + 1);
 	result->if_exdata = ex;
+	assert(ex->io_getln == NULL);
 	atomic_owner_rwlock_cinit(&ex->io_lock);
 	assert(ex->io_zero == 0);
 	ex->io_refcnt = 1;
@@ -3204,6 +3206,7 @@ NOTHROW_RPC(LIBCCALL libc_popen_impl)(char const *modes, unsigned int how, void 
 	/* Initialize generate FILE fields. */
 	ex = (struct iofile_data_popen *)(result + 1);
 	result->if_exdata = (struct iofile_data *)ex;
+	assert(ex->io_getln == NULL);
 	atomic_owner_rwlock_cinit(&ex->io_lock);
 	assert(ex->io_zero == 0);
 	ex->io_refcnt   = 1;
