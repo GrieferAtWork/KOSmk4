@@ -98,8 +98,8 @@ function start(
 		if (qemu is none)
 			throw Error("Cannot locate qemu binary");
 	}
-	local qemu_arguments = [];
-	qemu_arguments.extend({ "-serial", "stdio" });
+	local qemuArgs = [];
+	qemuArgs.extend({ "-serial", "stdio" });
 	if (opt.getBool(options, opt.HOSTED, true)) {
 		/* NOTE: Qemu will refuse to guest requests for a reboot when
 		 *       -no-reboot is given. However, reboot-on-tripple-fault
@@ -107,31 +107,31 @@ function start(
 		 *       probably isn't something you'd want...
 		 * NOTE: When GDB is enabled, you'll get a SIGQUIT trap when
 		 *       the guest tries to  reboot, and -no-reboot is  set. */
-//		qemu_arguments.extend({ "-no-shutdown" });
-		qemu_arguments.extend({ "-no-reboot", "-no-shutdown" });
+//		qemuArgs.extend({ "-no-shutdown" });
+		qemuArgs.extend({ "-no-reboot", "-no-shutdown" });
 	}
-	local gdb_mode = options.get(opt.GDB);
-	local boot_drivers = List(DRIVERS);
-	if (gdb_mode !is none) {
-		local gdb_port = options.get(opt.GDB_PORT, "1234");
-		if (gdb_mode == "server") {
+	local gdbMode = options.get(opt.GDB);
+	local bootDrivers = List(DRIVERS);
+	if (gdbMode !is none) {
+		local gdbPort = options.get(opt.GDB_PORT, "1234");
+		if (gdbMode == "server") {
 			/* Make use of out GDB server driver */
-			boot_drivers.append((
+			bootDrivers.append((
 				BINPATH + "/os/drivers/gdbserver",
 				"transport=serial:0x2f8:0xf3"
 			));
-			qemu_arguments.extend({ "-serial", "tcp::" + gdb_port + ",server" });
-		} else if (gdb_mode == "emulator") {
+			qemuArgs.extend({ "-serial", "tcp::" + gdbPort + ",server" });
+		} else if (gdbMode == "emulator") {
 			/* Use qemu's builtin GDB support */
 			/* Make use of out GDB-stub driver */
-			if (gdb_port != "1234") {
-				qemu_arguments.extend({ "-gdb", "tcp::" + gdb_port });
+			if (gdbPort != "1234") {
+				qemuArgs.extend({ "-gdb", "tcp::" + gdbPort });
 			} else {
-				qemu_arguments.append("-s");
+				qemuArgs.append("-s");
 			}
-			qemu_arguments.append("-S");
+			qemuArgs.append("-S");
 		} else {
-			throw Error("Invalid GDB mode: " + repr gdb_mode);
+			throw Error("Invalid GDB mode: " + repr gdbMode);
 		}
 	}
 	if (TARGET_ARCH == "x86_64") {
@@ -156,10 +156,10 @@ function start(
 did_update_x86_64_kernel:
 		KERNEL = kernel386;
 	}
-	if (boot_drivers) {
-		qemu_arguments.append("-initrd");
-		qemu_arguments.append(",".join(
-			for (local name, cmdline: boot_drivers)
+	if (bootDrivers) {
+		qemuArgs.append("-initrd");
+		qemuArgs.append(",".join(
+			for (local name, cmdline: bootDrivers)
 				!cmdline
 					? name.replace(",", ",,")
 					: "{} {}".format({
@@ -176,7 +176,7 @@ did_update_x86_64_kernel:
 			if (l.startswith("#") || !l)
 				continue;
 			/* Non-empty trace file */
-			qemu_arguments.extend({
+			qemuArgs.extend({
 				"-trace",
 				"events=" + trace_filename
 			});
@@ -192,7 +192,11 @@ did_update_x86_64_kernel:
 		local cmd, none, arg = l.partition("=")...;
 		switch (cmd) {
 		case "accel":
-			qemu_arguments.extend({ "-accel", arg });
+			/* "-accel hax" breaks qemu's builtin GDB stub. :(
+			 * -> For now, ignore accel options if GDB is on. */
+			if (gdbMode != "emulator") {
+				qemuArgs.extend({ "-accel", arg });
+			}
 			break;
 		case "xdrive1":
 		case "xdrive2":
@@ -203,14 +207,14 @@ did_update_x86_64_kernel:
 		case "drive1":
 		case "drive2":
 		case "drive3":
-			qemu_arguments.extend({
+			qemuArgs.extend({
 				"-drive",
 				"file={},format=raw,index={},media=disk"
 					.format({ arg, cmd.last })
 			});
 			break;
 		case "args":
-			qemu_arguments.extend(arg.split(" "));
+			qemuArgs.extend(arg.split(" "));
 			break;
 		default:
 			throw Error("Unknown qemu conf option: {!r}".format({ cmd }));
@@ -218,7 +222,7 @@ did_update_x86_64_kernel:
 		}
 		break;
 	}
-	qemu_arguments.extend({
+	qemuArgs.extend({
 		"-kernel", KERNEL,
 		"-drive", "file=" + DISK_FILENAME + ",format=raw,index=0,media=disk",
 		"-smp", options.get(opt.SMP, opt.SMP_DEFAULT),
@@ -233,18 +237,18 @@ did_update_x86_64_kernel:
 	local monitorCommandPipe = none;
 	if (enableMonitorCommands) {
 		final local port = "1235";
-		qemu_arguments.extend({ "-monitor", "tcp::" + port + ",server" });
+		qemuArgs.extend({ "-monitor", "tcp::" + port + ",server" });
 		local r;
 		r, monitorCommandPipe = ipc.Pipe.new()...;
 		enableMonitorCommands = Thread(qemuMonitorBackend, ("localhost:" + port, r));
 	}
 	local cmdline = options.get(opt.CMDLINE);
 	if (cmdline) {
-		qemu_arguments.append("-append");
-		qemu_arguments.append(cmdline);
+		qemuArgs.append("-append");
+		qemuArgs.append(cmdline);
 	}
-	print "qemu:", repr qemu_arguments;
-	local proc = ipc.Process(qemu, qemu_arguments);
+	print "qemu:", repr qemuArgs;
+	local proc = ipc.Process(qemu, qemuArgs);
 	local r, w = ipc.Pipe.new()...;
 	proc.stdout = w;
 	proc.stderr = w;
