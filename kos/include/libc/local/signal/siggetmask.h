@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87ff8ec3 */
+/* HASH CRC-32:0xc62c138d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,7 +74,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(siggetmask))(void) {
 	if ((__NAMESPACE_LOCAL_SYM __localdep_sigprocmask)(0, __NULLPTR, &__sigset))
 		return -1;
 #endif /* !__SIG_SETMASK */
-	return __sigset.__val[0] & __INT_MAX__;
+	return (int)(unsigned int)__sigset.__val[0];
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_siggetmask_defined

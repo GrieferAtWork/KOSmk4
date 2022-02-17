@@ -1583,6 +1583,7 @@ $1=$2"
 				export READELF="${CROSS_PREFIX}readelf"
 #				export SIZE="${CROSS_PREFIX}size"
 				export STRIP="${CROSS_PREFIX}strip"
+				export AR="${CROSS_PREFIX}ar"
 				if ! test -z "$CONFIG_SITE"; then
 					cat > "$OPTPATH/config.site" <<< "$CONFIG_SITE"
 					export CONFIG_SITE="$OPTPATH/config.site"
@@ -1597,7 +1598,7 @@ $1=$2"
 		${GM_HOOK_BEFORE_MAKE:-:}
 		cmd cd "$OPTPATH"
 		echo "gnu_make: Now running $PACKAGE_NAME: 'make'..."
-		cmd make -j $MAKE_PARALLEL_COUNT
+		cmd make -j "$MAKE_PARALLEL_COUNT"
 		${GM_HOOK_AFTER_MAKE:-:}
 		> "$OPTPATH/_didmake"
 	fi     # if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/_didmake" ]
@@ -1609,7 +1610,7 @@ $1=$2"
 	(
 		export DESTDIR="$DESTDIR-temp"
 		${GM_HOOK_BEFORE_INSTALL:-:}
-		cmd make -j $MAKE_PARALLEL_COUNT DESTDIR="$DESTDIR" install
+		cmd make -j "$MAKE_PARALLEL_COUNT" DESTDIR="$DESTDIR" install
 	) || exit $?
 	${GM_HOOK_AFTER_INSTALL:-:}
 	rm -r "$DESTDIR" > /dev/null 2>&1

@@ -1385,41 +1385,49 @@ int gsignal($signo_t signo) {
 }
 
 @@>> sigblock(3)
-@@Deprecated method of SIG_BLOCK-ing a given set of signals.
-@@Modern   code   should   use   `sigprocmask()'    instead.
-@@@return: 0: Success
+@@Deprecated  method  of  SIG_BLOCK-ing  a  given  set  of
+@@signals. Modern code should use `sigprocmask()' instead.
+@@@return: * : First 32 bits of previous signal mask (or however many fit in `int')
 [[deprecated("Using `sigprocmask(SIG_BLOCK)' instead")]]
 [[requires_include("<asm/os/signal.h>"), export_alias("__sigblock")]]
 [[requires(defined(__SIG_BLOCK) && $has_function(sigprocmask))]]
-[[impl_include("<asm/os/signal.h>", "<bits/os/sigset.h>")]]
+[[impl_include("<asm/os/signal.h>", "<bits/os/sigset.h>", "<hybrid/typecore.h>")]]
 int sigblock(int mask) {
-	sigset_t sigset;
-	sigemptyset(&sigset);
-	sigset.@__val@[0] = (uintptr_t)(unsigned int)mask;
-	return sigprocmask(__SIG_BLOCK, &sigset, NULL);
+	sigset_t sigset, osigset;
+	sigfillset(&sigset);
+	sigset.@__val@[0] = (ulongptr_t)(unsigned int)mask;
+@@pp_if __SIZEOF_POINTER__ > __SIZEOF_INT__@@
+	sigset.__val[0] |= ((ulongptr_t)-1 << (__SIZEOF_INT__ * 8));
+@@pp_endif@@
+	if (sigprocmask(__SIG_BLOCK, &sigset, &osigset) != 0)
+		sigemptyset(&osigset);
+	return osigset.@__val@[0];
 }
 
 @@>> sigsetmask(3)
 @@Deprecated method of SIG_SETMASK-ing a given set of signals.
 @@Modern code should  use `sigprocmask(SIG_SETMASK)'  instead.
-@@@return: 0: Success
+@@@return: * : First 32 bits of previous signal mask (or however many fit in `int')
 [[deprecated("Using `sigprocmask()' instead")]]
 [[requires_include("<asm/os/signal.h>"), export_alias("__sigsetmask")]]
 [[requires(defined(__SIG_SETMASK) && $has_function(sigprocmask))]]
 [[impl_include("<asm/os/signal.h>", "<bits/os/sigset.h>")]]
 int sigsetmask(int mask) {
-	sigset_t sigset;
-	sigemptyset(&sigset);
-	sigset.@__val@[0] = (uintptr_t)(unsigned int)mask;
-	return sigprocmask(__SIG_SETMASK, &sigset, NULL);
+	sigset_t sigset, osigset;
+	sigfillset(&sigset);
+	sigset.@__val@[0] = (ulongptr_t)(unsigned int)mask;
+@@pp_if __SIZEOF_POINTER__ > __SIZEOF_INT__@@
+	sigset.__val[0] |= ((ulongptr_t)-1 << (__SIZEOF_INT__ * 8));
+@@pp_endif@@
+	if (sigprocmask(__SIG_SETMASK, &sigset, &osigset) != 0)
+		sigemptyset(&osigset);
+	return (int)(unsigned int)osigset.@__val@[0];
 }
 
 @@>> sigsetmask(3)
 @@Deprecated method of  retrieving the masking-state  of
 @@the lowest-numberred `sizeof(int) * NBBY - 1' signals.
-@@@return: <= INT_MAX: An incomplete signal mask bitset for a couple
-@@                     of  the  lowest-numbered  couple  of  signal.
-@@@return: -1:         Error
+@@@return: * : First 32 bits of signal mask (or however many fit in `int')
 [[deprecated("Using `sigprocmask()' instead")]]
 [[requires($has_function(sigprocmask)), export_alias("__siggetmask")]]
 [[impl_include("<asm/os/signal.h>", "<bits/os/sigset.h>", "<hybrid/typecore.h>")]]
@@ -1432,7 +1440,21 @@ int siggetmask(void) {
 	if (sigprocmask(0, NULL, &sigset))
 		return -1;
 @@pp_endif@@
-	return sigset.@__val@[0] & @__INT_MAX__@;
+	return (int)(unsigned int)sigset.@__val@[0];
+}
+
+@@>> __old_sigpause(3)
+@@For historical reasons, this is the ABI `sigpause(3)' function...
+[[hidden, requires($has_function(sigsuspend)), crt_name("sigpause")]]
+[[impl_include("<asm/os/signal.h>", "<bits/os/sigset.h>", "<hybrid/typecore.h>")]]
+int __old_sigpause(int sigmask0) {
+	sigset_t sigset;
+	sigfillset(&sigset);
+	sigset.__val[0] = (ulongptr_t)(unsigned int)sigmask0;
+#if __SIZEOF_POINTER__ > __SIZEOF_INT__
+	sigset.__val[0] |= ((ulongptr_t)-1 << (__SIZEOF_INT__ * 8));
+#endif /* __SIZEOF_POINTER__ > __SIZEOF_INT__ */
+	return sigsuspend(&sigset);
 }
 
 

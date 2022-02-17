@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40ee879 */
+/* HASH CRC-32:0xba2fb4ac */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1194,6 +1194,7 @@ DFUN(".text.crt.dos.database.shadow", libd_fgetspent_r, libc_fgetspent_r, TD, 5,
 /* signal */
 DFUN(".text.crt.dos.sched.signal", libd_sigblock, libc_sigblock, TD, 1, TD)
 DFUN(".text.crt.dos.sched.signal", libd_sigsetmask, libc_sigsetmask, TD, 1, TD)
+DFUN(".text.crt.dos.sched.signal", libd_sigpause, libc_sigpause, TD, 1, TD)
 DFUN(".text.crt.dos.sched.signal", libd_sigreturn, libc_sigreturn, TV, 1, TP)
 DFUN(".text.crt.dos.sched.signal", libd___xpg_sigpause, libc___xpg_sigpause, TD, 1, TIn(__SIZEOF_SIGNO_T__))
 DFUN(".text.crt.dos.sched.signal", libd_kill, libc_kill, TD, 2, TIn(__SIZEOF_PID_T__), TIn(__SIZEOF_SIGNO_T__))

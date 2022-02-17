@@ -3762,6 +3762,7 @@
 #define __CRT_HAVE_significandf
 #define __CRT_HAVE_significandl
 #define __CRT_HAVE_sigorset
+#define __CRT_HAVE_sigpause
 #define __CRT_HAVE_sigpending
 #define __CRT_HAVE_sigprocmask
 #define __CRT_HAVE_sigqueue
@@ -8641,6 +8642,7 @@
 #define __CRT_HAVE_KOS$significandf
 #define __CRT_HAVE_KOS$significandl
 #define __CRT_HAVE_KOS$sigorset
+#define __CRT_HAVE_KOS$sigpause
 #define __CRT_HAVE_KOS$sigpending
 #define __CRT_HAVE_KOS$sigprocmask
 #define __CRT_HAVE_KOS$sigqueue
@@ -12641,6 +12643,7 @@
 #define __CRT_HAVE_DOS$significandf
 #define __CRT_HAVE_DOS$significandl
 #define __CRT_HAVE_DOS$sigorset
+#define __CRT_HAVE_DOS$sigpause
 #define __CRT_HAVE_DOS$sigpending
 #define __CRT_HAVE_DOS$sigprocmask
 #define __CRT_HAVE_DOS$sigqueue

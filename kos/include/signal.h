@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf8230b2 */
+/* HASH CRC-32:0x7c522474 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1433,68 +1433,62 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(gsignal, __FORCELOCAL __ATTR_ARTIFICIAL int __NO
 #endif /* ... */
 #ifdef __CRT_HAVE_sigblock
 /* >> sigblock(3)
- * Deprecated method of SIG_BLOCK-ing a given set of signals.
- * Modern   code   should   use   `sigprocmask()'    instead.
- * @return: 0: Success */
+ * Deprecated  method  of  SIG_BLOCK-ing  a  given  set  of
+ * signals. Modern code should use `sigprocmask()' instead.
+ * @return: * : First 32 bits of previous signal mask (or however many fit in `int') */
 __CDECLARE(__ATTR_DEPRECATED("Using `sigprocmask(SIG_BLOCK)\' instead"),int,__NOTHROW_NCX,sigblock,(int __mask),(__mask))
 #elif defined(__CRT_HAVE___sigblock)
 /* >> sigblock(3)
- * Deprecated method of SIG_BLOCK-ing a given set of signals.
- * Modern   code   should   use   `sigprocmask()'    instead.
- * @return: 0: Success */
+ * Deprecated  method  of  SIG_BLOCK-ing  a  given  set  of
+ * signals. Modern code should use `sigprocmask()' instead.
+ * @return: * : First 32 bits of previous signal mask (or however many fit in `int') */
 __CREDIRECT(__ATTR_DEPRECATED("Using `sigprocmask(SIG_BLOCK)\' instead"),int,__NOTHROW_NCX,sigblock,(int __mask),__sigblock,(__mask))
 #elif defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask) || defined(__CRT_HAVE_thr_sigsetmask))
 #include <libc/local/signal/sigblock.h>
 /* >> sigblock(3)
- * Deprecated method of SIG_BLOCK-ing a given set of signals.
- * Modern   code   should   use   `sigprocmask()'    instead.
- * @return: 0: Success */
+ * Deprecated  method  of  SIG_BLOCK-ing  a  given  set  of
+ * signals. Modern code should use `sigprocmask()' instead.
+ * @return: * : First 32 bits of previous signal mask (or however many fit in `int') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigblock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Using `sigprocmask(SIG_BLOCK)\' instead") int __NOTHROW_NCX(__LIBCCALL sigblock)(int __mask) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigblock))(__mask); })
 #endif /* ... */
 #ifdef __CRT_HAVE_sigsetmask
 /* >> sigsetmask(3)
  * Deprecated method of SIG_SETMASK-ing a given set of signals.
  * Modern code should  use `sigprocmask(SIG_SETMASK)'  instead.
- * @return: 0: Success */
+ * @return: * : First 32 bits of previous signal mask (or however many fit in `int') */
 __CDECLARE(__ATTR_DEPRECATED("Using `sigprocmask()\' instead"),int,__NOTHROW_NCX,sigsetmask,(int __mask),(__mask))
 #elif defined(__CRT_HAVE___sigsetmask)
 /* >> sigsetmask(3)
  * Deprecated method of SIG_SETMASK-ing a given set of signals.
  * Modern code should  use `sigprocmask(SIG_SETMASK)'  instead.
- * @return: 0: Success */
+ * @return: * : First 32 bits of previous signal mask (or however many fit in `int') */
 __CREDIRECT(__ATTR_DEPRECATED("Using `sigprocmask()\' instead"),int,__NOTHROW_NCX,sigsetmask,(int __mask),__sigsetmask,(__mask))
 #elif defined(__SIG_SETMASK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask) || defined(__CRT_HAVE_thr_sigsetmask))
 #include <libc/local/signal/sigsetmask.h>
 /* >> sigsetmask(3)
  * Deprecated method of SIG_SETMASK-ing a given set of signals.
  * Modern code should  use `sigprocmask(SIG_SETMASK)'  instead.
- * @return: 0: Success */
+ * @return: * : First 32 bits of previous signal mask (or however many fit in `int') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigsetmask, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Using `sigprocmask()\' instead") int __NOTHROW_NCX(__LIBCCALL sigsetmask)(int __mask) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigsetmask))(__mask); })
 #endif /* ... */
 #ifdef __CRT_HAVE_siggetmask
 /* >> sigsetmask(3)
  * Deprecated method of  retrieving the masking-state  of
  * the lowest-numberred `sizeof(int) * NBBY - 1' signals.
- * @return: <= INT_MAX: An incomplete signal mask bitset for a couple
- *                      of  the  lowest-numbered  couple  of  signal.
- * @return: -1:         Error */
+ * @return: * : First 32 bits of signal mask (or however many fit in `int') */
 __CDECLARE(__ATTR_DEPRECATED("Using `sigprocmask()\' instead"),int,__NOTHROW_NCX,siggetmask,(void),())
 #elif defined(__CRT_HAVE___siggetmask)
 /* >> sigsetmask(3)
  * Deprecated method of  retrieving the masking-state  of
  * the lowest-numberred `sizeof(int) * NBBY - 1' signals.
- * @return: <= INT_MAX: An incomplete signal mask bitset for a couple
- *                      of  the  lowest-numbered  couple  of  signal.
- * @return: -1:         Error */
+ * @return: * : First 32 bits of signal mask (or however many fit in `int') */
 __CREDIRECT(__ATTR_DEPRECATED("Using `sigprocmask()\' instead"),int,__NOTHROW_NCX,siggetmask,(void),__siggetmask,())
 #elif defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask) || defined(__CRT_HAVE_thr_sigsetmask)
 #include <libc/local/signal/siggetmask.h>
 /* >> sigsetmask(3)
  * Deprecated method of  retrieving the masking-state  of
  * the lowest-numberred `sizeof(int) * NBBY - 1' signals.
- * @return: <= INT_MAX: An incomplete signal mask bitset for a couple
- *                      of  the  lowest-numbered  couple  of  signal.
- * @return: -1:         Error */
+ * @return: * : First 32 bits of signal mask (or however many fit in `int') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(siggetmask, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Using `sigprocmask()\' instead") int __NOTHROW_NCX(__LIBCCALL siggetmask)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(siggetmask))(); })
 #endif /* ... */
 

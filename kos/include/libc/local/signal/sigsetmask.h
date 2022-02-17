@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8021f682 */
+/* HASH CRC-32:0x61539779 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,6 +38,20 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_sigemptyset __LIBC_LOCAL_NAME(sigemptyset)
 #endif /* !__CRT_HAVE_sigemptyset */
 #endif /* !__local___localdep_sigemptyset_defined */
+#ifndef __local___localdep_sigfillset_defined
+#define __local___localdep_sigfillset_defined
+#ifdef __CRT_HAVE_sigfillset
+__NAMESPACE_LOCAL_END
+#include <bits/os/sigset.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_sigfillset,(struct __sigset_struct *__set),sigfillset,(__set))
+#else /* __CRT_HAVE_sigfillset */
+__NAMESPACE_LOCAL_END
+#include <libc/local/signal/sigfillset.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_sigfillset __LIBC_LOCAL_NAME(sigfillset)
+#endif /* !__CRT_HAVE_sigfillset */
+#endif /* !__local___localdep_sigfillset_defined */
 #ifndef __local___localdep_sigprocmask_defined
 #define __local___localdep_sigprocmask_defined
 #ifdef __CRT_HAVE_sigprocmask
@@ -79,10 +93,15 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(sigsetmask) __ATTR_DEPRECATED("Using `sigprocmask()\' instead") int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigsetmask))(int __mask) {
-	struct __sigset_struct __sigset;
-	(__NAMESPACE_LOCAL_SYM __localdep_sigemptyset)(&__sigset);
-	__sigset.__val[0] = (__UINTPTR_TYPE__)(unsigned int)__mask;
-	return (__NAMESPACE_LOCAL_SYM __localdep_sigprocmask)(__SIG_SETMASK, &__sigset, __NULLPTR);
+	struct __sigset_struct __sigset, __osigset;
+	(__NAMESPACE_LOCAL_SYM __localdep_sigfillset)(&__sigset);
+	__sigset.__val[0] = (__ULONGPTR_TYPE__)(unsigned int)__mask;
+#if __SIZEOF_POINTER__ > __SIZEOF_INT__
+	__sigset.__val[0] |= ((__ULONGPTR_TYPE__)-1 << (__SIZEOF_INT__ * 8));
+#endif /* __SIZEOF_POINTER__ > __SIZEOF_INT__ */
+	if ((__NAMESPACE_LOCAL_SYM __localdep_sigprocmask)(__SIG_SETMASK, &__sigset, &__osigset) != 0)
+		(__NAMESPACE_LOCAL_SYM __localdep_sigemptyset)(&__osigset);
+	return (int)(unsigned int)__osigset.__val[0];
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sigsetmask_defined

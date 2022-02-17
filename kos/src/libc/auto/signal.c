@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9476681 */
+/* HASH CRC-32:0xa4872e24 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,29 +34,40 @@ DECL_BEGIN
 #ifndef __KERNEL__
 #include <asm/os/signal.h>
 #include <bits/os/sigset.h>
+#include <hybrid/typecore.h>
 /* >> sigblock(3)
- * Deprecated method of SIG_BLOCK-ing a given set of signals.
- * Modern   code   should   use   `sigprocmask()'    instead.
- * @return: 0: Success */
+ * Deprecated  method  of  SIG_BLOCK-ing  a  given  set  of
+ * signals. Modern code should use `sigprocmask()' instead.
+ * @return: * : First 32 bits of previous signal mask (or however many fit in `int') */
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_DEPRECATED("Using `sigprocmask(SIG_BLOCK)\' instead") int
 NOTHROW_NCX(LIBCCALL libc_sigblock)(int mask) {
-	sigset_t sigset;
-	libc_sigemptyset(&sigset);
-	sigset.__val[0] = (uintptr_t)(unsigned int)mask;
-	return libc_sigprocmask(__SIG_BLOCK, &sigset, NULL);
+	sigset_t sigset, osigset;
+	libc_sigfillset(&sigset);
+	sigset.__val[0] = (ulongptr_t)(unsigned int)mask;
+#if __SIZEOF_POINTER__ > __SIZEOF_INT__
+	sigset.__val[0] |= ((ulongptr_t)-1 << (__SIZEOF_INT__ * 8));
+#endif /* __SIZEOF_POINTER__ > __SIZEOF_INT__ */
+	if (libc_sigprocmask(__SIG_BLOCK, &sigset, &osigset) != 0)
+		libc_sigemptyset(&osigset);
+	return osigset.__val[0];
 }
 #include <asm/os/signal.h>
 #include <bits/os/sigset.h>
 /* >> sigsetmask(3)
  * Deprecated method of SIG_SETMASK-ing a given set of signals.
  * Modern code should  use `sigprocmask(SIG_SETMASK)'  instead.
- * @return: 0: Success */
+ * @return: * : First 32 bits of previous signal mask (or however many fit in `int') */
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_DEPRECATED("Using `sigprocmask()\' instead") int
 NOTHROW_NCX(LIBCCALL libc_sigsetmask)(int mask) {
-	sigset_t sigset;
-	libc_sigemptyset(&sigset);
-	sigset.__val[0] = (uintptr_t)(unsigned int)mask;
-	return libc_sigprocmask(__SIG_SETMASK, &sigset, NULL);
+	sigset_t sigset, osigset;
+	libc_sigfillset(&sigset);
+	sigset.__val[0] = (ulongptr_t)(unsigned int)mask;
+#if __SIZEOF_POINTER__ > __SIZEOF_INT__
+	sigset.__val[0] |= ((ulongptr_t)-1 << (__SIZEOF_INT__ * 8));
+#endif /* __SIZEOF_POINTER__ > __SIZEOF_INT__ */
+	if (libc_sigprocmask(__SIG_SETMASK, &sigset, &osigset) != 0)
+		libc_sigemptyset(&osigset);
+	return (int)(unsigned int)osigset.__val[0];
 }
 #include <asm/os/signal.h>
 #include <bits/os/sigset.h>
@@ -64,9 +75,7 @@ NOTHROW_NCX(LIBCCALL libc_sigsetmask)(int mask) {
 /* >> sigsetmask(3)
  * Deprecated method of  retrieving the masking-state  of
  * the lowest-numberred `sizeof(int) * NBBY - 1' signals.
- * @return: <= INT_MAX: An incomplete signal mask bitset for a couple
- *                      of  the  lowest-numbered  couple  of  signal.
- * @return: -1:         Error */
+ * @return: * : First 32 bits of signal mask (or however many fit in `int') */
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_DEPRECATED("Using `sigprocmask()\' instead") int
 NOTHROW_NCX(LIBCCALL libc_siggetmask)(void) {
 	sigset_t sigset;
@@ -77,7 +86,22 @@ NOTHROW_NCX(LIBCCALL libc_siggetmask)(void) {
 	if (libc_sigprocmask(0, NULL, &sigset))
 		return -1;
 #endif /* !__SIG_SETMASK */
-	return sigset.__val[0] & __INT_MAX__;
+	return (int)(unsigned int)sigset.__val[0];
+}
+#include <asm/os/signal.h>
+#include <bits/os/sigset.h>
+#include <hybrid/typecore.h>
+/* >> __old_sigpause(3)
+ * For historical reasons, this is the ABI `sigpause(3)' function... */
+INTERN ATTR_SECTION(".text.crt.sched.signal") int
+NOTHROW_NCX(LIBCCALL libc_sigpause)(int sigmask0) {
+	sigset_t sigset;
+	libc_sigfillset(&sigset);
+	sigset.__val[0] = (ulongptr_t)(unsigned int)sigmask0;
+#if __SIZEOF_POINTER__ > __SIZEOF_INT__
+	sigset.__val[0] |= ((ulongptr_t)-1 << (__SIZEOF_INT__ * 8));
+#endif /* __SIZEOF_POINTER__ > __SIZEOF_INT__ */
+	return libc_sigsuspend(&sigset);
 }
 /* >> sigpause(3)
  * Atomically save and set the caller's signal mask to consist solely
@@ -955,6 +979,7 @@ DEFINE_PUBLIC_ALIAS(__sigsetmask, libc_sigsetmask);
 DEFINE_PUBLIC_ALIAS(sigsetmask, libc_sigsetmask);
 DEFINE_PUBLIC_ALIAS(__siggetmask, libc_siggetmask);
 DEFINE_PUBLIC_ALIAS(siggetmask, libc_siggetmask);
+DEFINE_PUBLIC_ALIAS(sigpause, libc_sigpause);
 DEFINE_PUBLIC_ALIAS(__xpg_sigpause, libc___xpg_sigpause);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(sigemptyset, libc_sigemptyset);

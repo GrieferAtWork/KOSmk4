@@ -30,6 +30,7 @@ if ! [ -f "$SRCPATH/src/nyancat.c" ]; then
 	cmd git remote add origin "https://github.com/klange/nyancat.git"
 	cmd git fetch origin "5ffb6c5c03d0e9156db8f360599d4f0449bb16b9"
 	cmd git reset --hard FETCH_HEAD
+	rm -rf "$SRCPATH/.git" > /dev/null 2>&1
 fi
 
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/nyancat" ]; then

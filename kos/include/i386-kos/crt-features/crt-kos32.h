@@ -3945,6 +3945,7 @@
 #define __CRT_HAVE_significandf
 #define __CRT_HAVE_significandl
 #define __CRT_HAVE_sigorset
+#define __CRT_HAVE_sigpause
 #define __CRT_HAVE_sigpending
 #define __CRT_HAVE_sigprocmask
 #define __CRT_HAVE_sigqueue
