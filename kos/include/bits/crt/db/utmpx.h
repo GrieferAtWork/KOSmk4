@@ -95,7 +95,15 @@ struct utmpx {
 	__pid_t              ut_pid;                 /* Process ID of login process. */
 	char                 ut_line[__UT_LINESIZE]; /* Devicename. */
 	char                 ut_id[4];               /* Inittab ID. */
+#ifdef __COMPILER_HAVE_TRANSPARENT_UNION
+	union {
+		char             ut_name[__UT_NAMESIZE]; /* Username. */
+		char             ut_user[__UT_NAMESIZE]; /* Username. */
+	};
+#else /* __COMPILER_HAVE_TRANSPARENT_UNION */
+#define ut_name          ut_user                 /* Username. */
 	char                 ut_user[__UT_NAMESIZE]; /* Username. */
+#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
 	char                 ut_host[__UT_HOSTSIZE]; /* Hostname for remote login. */
 	struct __exit_status ut_exit;                /* Exit status of a process marked as DEAD_PROCESS. */
 	/* The fields ut_session and ut_tv must be the same size when compiled

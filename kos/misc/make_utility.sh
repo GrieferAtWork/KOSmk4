@@ -640,6 +640,18 @@ apply_patch() {
 set_archpath() {
 	export PATH="$BINUTILS_SYSROOT/bin:$PATH"
 	export CC="${CROSS_PREFIX}gcc"
+	export CFLAGS="-ggdb"
+	export CXX="${CROSS_PREFIX}g++"
+	export CXXFLAGS="-ggdb"
+	export CPP="${CROSS_PREFIX}cpp"
+	export CXXCPP="${CROSS_PREFIX}cpp"
+	export NM="${CROSS_PREFIX}nm"
+	export LD="${CROSS_PREFIX}ld"
+	export OBJCOPY="${CROSS_PREFIX}objcopy"
+	export OBJDUMP="${CROSS_PREFIX}objdump"
+	export READELF="${CROSS_PREFIX}readelf"
+#	export SIZE="${CROSS_PREFIX}size"
+	export STRIP="${CROSS_PREFIX}strip"
 	export AR="${CROSS_PREFIX}ar"
 }
 

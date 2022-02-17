@@ -60,6 +60,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- [myman-0.7.1](https://sourceforge.net/projects/myman/)
 	- [minecurses](https://github.com/EliteTK/minecurses)
 	- [nyancat](https://github.com/klange/nyancat)
+	- [BSDGames](https://github.com/vattam/BSDGames/)
 - Libraries
 	- [libncurses-6.1](https://www.gnu.org/software/ncurses/)
 	- [libzlib-1.2.11](https://www.zlib.net/)
