@@ -139,6 +139,10 @@ __ice__
 /kos/include/i386-kos/glibconfig32.h
 /kos/include/i386-kos/glibconfig64.h
 
+# These headers are installed by `make_utility.sh ... libgmp`
+/kos/include/gmpxx.h
+/kos/include/gmp.h
+
 # These headers are installed by X11-related programs/libraries
 /kos/include/X11/
 /kos/include/xcb/

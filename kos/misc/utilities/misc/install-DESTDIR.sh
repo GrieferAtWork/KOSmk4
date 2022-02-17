@@ -127,11 +127,13 @@ $scan
 				fi
 				;;
 
-			$PACKAGE_INCLUDEDIR/* | $PACKAGE_OLDINCLUDEDIR/*)
+			$PACKAGE_INCLUDEDIR/* | $PACKAGE_OLDINCLUDEDIR/* | /include/*)
 				if [[ "$line" == "$PACKAGE_INCLUDEDIR/"* ]]; then
 					rel_filename="${line:${#PACKAGE_INCLUDEDIR}}"
-				else
+				elif [[ "$line" == "$PACKAGE_OLDINCLUDEDIR/"* ]]; then
 					rel_filename="${line:${#PACKAGE_OLDINCLUDEDIR}}"
+				else
+					rel_filename="${line:8}"
 				fi
 				# Install a 3rd party header file
 				install_rawfile "$KOS_ROOT/kos/include$rel_filename" "$src_filename"

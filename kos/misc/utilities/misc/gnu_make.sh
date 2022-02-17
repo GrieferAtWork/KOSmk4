@@ -737,6 +737,15 @@ $1=$2"
 						_config_site_option "ac_cv_type_getgroups" "gid_t"
 						;;
 
+					*ac_cv_func_closedir_void*)    _config_site_option "ac_cv_func_closedir_void"    "no";  ;; # DECLARED(void closedir(DIR *))
+					*ac_cv_func_getpgrp_void*)     _config_site_option "ac_cv_func_getpgrp_void"     "yes"; ;; # DECLARED(pid_t getpgrp(void))
+					*ac_cv_func_setpgrp_void*)     _config_site_option "ac_cv_func_setpgrp_void"     "yes"; ;; # DECLARED(pid_t setpgrp(void))
+					*ac_cv_func_setvbuf_reversed*) _config_site_option "ac_cv_func_setvbuf_reversed" "no";  ;; # DECLARED(setvbuf(FILE *, int, char *, size_t))
+					*ac_cv_func_memcmp_clean*)     _config_site_option "ac_cv_func_memcmp_clean"     "yes"; ;;
+					*ac_cv_c_long_double*)         _config_site_option "ac_cv_c_long_double"         "yes"; ;; # Assuming gcc from toolchain
+					*ac_cv_sys_restartable_syscalls*)
+						_config_site_option "ac_cv_sys_restartable_syscalls" "yes"; ;;
+
 					# Misc stuff from gnulib
 					*ac_cv_func__set_invalid_parameter_handler*) # We might emulate it, but not by default; plus: this tends to screw up a bunch of stuff...
 						_config_site_option "ac_cv_func__set_invalid_parameter_handler" "no"; ;;
@@ -1514,6 +1523,14 @@ $1=$2"
 							_config_site_option "ac_cv_wchar_t_signed" "no"
 						fi
 						;;
+					*ac_cv_c_char_unsigned*)
+						# s.a. __CHAR_UNSIGNED__
+						if _test_expr "(char)-1 < (char)0" ""; then
+							_config_site_option "ac_cv_c_char_unsigned" "no"
+						else
+							_config_site_option "ac_cv_c_char_unsigned" "yes"
+						fi
+						;;
 					*ac_cv_rshift_extends_sign*)
 						# s.a. __ARCH_SIGNED_SHIFT_IS_SDIV
 						if _test_links <<< "
@@ -1541,6 +1558,13 @@ $1=$2"
 					*ac_cv_computed_gotos*) # At least under GCC
 						_config_site_option "ac_cv_computed_gotos" "yes"; ;;
 
+					# GMP
+					*gmp_cv_func_vsnprintf*)
+						_config_site_option "gmp_cv_func_vsnprintf" "yes"; ;;
+					*gmp_cv_asm_underscore*)
+						_config_site_option "gmp_cv_asm_underscore" "no"; ;;
+
+
 					*) ;;
 					esac
 				done < "$SRCPATH/configure"
@@ -1552,6 +1576,13 @@ $1=$2"
 				export CXXFLAGS="-ggdb"
 				export CPP="${CROSS_PREFIX}cpp"
 				export CXXCPP="${CROSS_PREFIX}cpp"
+				export NM="${CROSS_PREFIX}nm"
+				export LD="${CROSS_PREFIX}ld"
+				export OBJCOPY="${CROSS_PREFIX}objcopy"
+				export OBJDUMP="${CROSS_PREFIX}objdump"
+				export READELF="${CROSS_PREFIX}readelf"
+#				export SIZE="${CROSS_PREFIX}size"
+				export STRIP="${CROSS_PREFIX}strip"
 				if ! test -z "$CONFIG_SITE"; then
 					cat > "$OPTPATH/config.site" <<< "$CONFIG_SITE"
 					export CONFIG_SITE="$OPTPATH/config.site"
