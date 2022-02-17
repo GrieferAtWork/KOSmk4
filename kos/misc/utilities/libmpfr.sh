@@ -1,4 +1,4 @@
-#TEST: require_utility libgmp "$PKG_CONFIG_PATH/gmp.pc"
+#TEST: require_utility libmpfr "$PKG_CONFIG_PATH/mpfr.pc"
 # Copyright (c) 2019-2022 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -18,15 +18,14 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-PACKAGE_URL="https://ftp.gnu.org/gnu/gmp/gmp-6.2.1.tar.xz"
-PACKAGE_NAME="libgmp-6.2.1"
+require_utility libgmp "$PKG_CONFIG_PATH/gmp.pc"
+
+PACKAGE_URL="https://ftp.gnu.org/gnu/mpfr/mpfr-4.1.0.tar.xz"
+PACKAGE_NAME="libmpfr-4.1.0"
 
 # Additions configure options
 CONFIGURE=(
-	"--enable-alloca"
-	"--enable-cxx"
-	"--enable-assembly"
-	"--enable-fft"
+	"--enable-thread-safe"
 )
 
 # Automatically build+install using autoconf
