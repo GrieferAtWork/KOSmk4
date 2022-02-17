@@ -119,6 +119,8 @@ typedef struct __mbstate mbstate_t;
 struct iofile_data_novtab {
 	uintptr_t                  io_zero;   /* Always ZERO(0). - Required for binary compatibility with DOS. */
 	__WEAK refcnt_t            io_refcnt; /* Reference counter. */
+	char                      *io_getln;  /* [0..1] malloc'd buffer for `fgetln(3)' (no lock, because
+	                                       * only  used by `fgetln()' which already is thread-unsafe) */
 	struct atomic_owner_rwlock io_lock;   /* Lock for the file. */
 	byte_t                    *io_chng;   /* [>= :if_base][+io_chsz <= :if_base + :if_bufsiz]
 	                                       * [valid_if(io_chsz != 0)][lock(fb_lock)]

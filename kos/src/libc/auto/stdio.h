@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7fb2984 */
+/* HASH CRC-32:0xe5ebb57b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -707,8 +707,22 @@ INTDEF WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBDCAL
 INTDEF WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_scanf_unlocked)(char const *__restrict format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> fgetln(3) */
-INTDEF WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_fgetln)(FILE *__restrict fp, size_t *__restrict lenp);
+/* >> fgetln(3)
+ * A slightly more convenient (but way less portable) alternative to `fgets(3)'
+ * This function automatically malloc's a  buffer of sufficient length for  the
+ * next line in the given `stream', and stores its length in `*lenp'
+ * NOTE: KOS adds the following extensions to this function:
+ *  - We guaranty that "return[*lenp] == '\0'" upon a non-NULL return
+ *  - You may pass `lenp == NULL', which simply ignores that argument
+ * @return: NULL: The EOF flag of `stream' is set (fix this with `clearerr(3)'),
+ *                or the underlying file has been fully read.
+ * @return: * :   Pointer to an  automatically malloc'd  buffer (to-be  freed
+ *                by  fclose(3)  once you  call  that function  on  the given
+ *                `stream'). The buffer is re-used in subsequence invocations
+ *                of this function, and documentation states that it may also
+ *                be invalidated during any  other I/O operation relating  to
+ *                `stream', tough this isn't the case under KOS. */
+INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_fgetln)(FILE *__restrict stream, size_t *__restrict lenp);
 /* >> fmtcheck(3)
  * Check if `user_format' may be used as a drop-in replacement for `good_format'
  * in the context of a call to `printf(3)' (or `format_printf()'), such that all

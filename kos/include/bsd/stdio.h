@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x789b66e8 */
+/* HASH CRC-32:0x39456c5f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,8 +52,22 @@ __CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) __ATTR_FORMAT_AR
 #endif /* !__fmtcheck_defined && __CRT_HAVE_fmtcheck */
 #if !defined(__fgetln_defined) && defined(__CRT_HAVE_fgetln)
 #define __fgetln_defined
-/* >> fgetln(3) */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,fgetln,(__FILE *__restrict __fp, __SIZE_TYPE__ *__restrict __lenp),(__fp,__lenp))
+/* >> fgetln(3)
+ * A slightly more convenient (but way less portable) alternative to `fgets(3)'
+ * This function automatically malloc's a  buffer of sufficient length for  the
+ * next line in the given `stream', and stores its length in `*lenp'
+ * NOTE: KOS adds the following extensions to this function:
+ *  - We guaranty that "return[*lenp] == '\0'" upon a non-NULL return
+ *  - You may pass `lenp == NULL', which simply ignores that argument
+ * @return: NULL: The EOF flag of `stream' is set (fix this with `clearerr(3)'),
+ *                or the underlying file has been fully read.
+ * @return: * :   Pointer to an  automatically malloc'd  buffer (to-be  freed
+ *                by  fclose(3)  once you  call  that function  on  the given
+ *                `stream'). The buffer is re-used in subsequence invocations
+ *                of this function, and documentation states that it may also
+ *                be invalidated during any  other I/O operation relating  to
+ *                `stream', tough this isn't the case under KOS. */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,fgetln,(__FILE *__restrict __stream, __SIZE_TYPE__ *__restrict __lenp),(__stream,__lenp))
 #endif /* !__fgetln_defined && __CRT_HAVE_fgetln */
 #ifndef __fpurge_defined
 #define __fpurge_defined

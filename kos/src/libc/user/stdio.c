@@ -553,6 +553,9 @@ file_destroy(FILE *__restrict self) {
 	if (self->if_flag & IO_MALLBUF)
 		free(self->if_base);
 
+	/* Free the dynamically allocated fgetln(3) buffer. */
+	free(ex->io_getln);
+
 #if 1 /* This is always the case... */
 	assert(ex == (struct iofile_data *)(self + 1));
 #else
@@ -2665,18 +2668,100 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.utility") NONNULL((1)) int
 #endif /* MAGIC:alias */
 /*[[[end:libc_fftruncate64_unlocked]]]*/
 
-/*[[[head:libc_fgetln,hash:CRC-32=0x22063a80]]]*/
-/* >> fgetln(3) */
-INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED NONNULL((1, 2)) char *
-NOTHROW_NCX(LIBCCALL libc_fgetln)(FILE *__restrict fp,
+/*[[[head:libc_fgetln,hash:CRC-32=0xc64629dd]]]*/
+/* >> fgetln(3)
+ * A slightly more convenient (but way less portable) alternative to `fgets(3)'
+ * This function automatically malloc's a  buffer of sufficient length for  the
+ * next line in the given `stream', and stores its length in `*lenp'
+ * NOTE: KOS adds the following extensions to this function:
+ *  - We guaranty that "return[*lenp] == '\0'" upon a non-NULL return
+ *  - You may pass `lenp == NULL', which simply ignores that argument
+ * @return: NULL: The EOF flag of `stream' is set (fix this with `clearerr(3)'),
+ *                or the underlying file has been fully read.
+ * @return: * :   Pointer to an  automatically malloc'd  buffer (to-be  freed
+ *                by  fclose(3)  once you  call  that function  on  the given
+ *                `stream'). The buffer is re-used in subsequence invocations
+ *                of this function, and documentation states that it may also
+ *                be invalidated during any  other I/O operation relating  to
+ *                `stream', tough this isn't the case under KOS. */
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED NONNULL((1)) char *
+NOTHROW_NCX(LIBCCALL libc_fgetln)(FILE *__restrict stream,
                                   size_t *__restrict lenp)
 /*[[[body:libc_fgetln]]]*/
-/*AUTO*/{
-	(void)fp;
-	(void)lenp;
-	CRT_UNIMPLEMENTEDF("fgetln(%p, %p)", fp, lenp); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+{
+	size_t i, bufsiz;
+	char *result;
+	if unlikely(!stream) {
+		libc_seterrno(EINVAL);
+		return NULL;
+	}
+	stream = file_fromuser(stream);
+	if (FEOF(stream)) /* XXX: Also do this on FERROR()? */
+		return NULL;  /* Must return `NULL' after EOF */
+	result = stream->if_exdata->io_getln;
+	if (!result) {
+		result = (char *)malloc(IOBUF_MIN, sizeof(char));
+		if unlikely(!result)
+			return NULL;
+		stream->if_exdata->io_getln = result;
+	}
+	bufsiz = malloc_usable_size(result) / sizeof(char);
+	assert(bufsiz != 0);
+	for (i = 0;; ++i) {
+		int ch;
+		if (i >= bufsiz - 1) {
+			/* Allocate larger buffer. */
+			size_t new_bufsiz = bufsiz * 2;
+			char *new_result;
+			new_result = (char *)realloc(result, new_bufsiz, sizeof(char));
+			if unlikely(!new_result) {
+				new_bufsiz = i + 2;
+				new_result = (char *)realloc(result, new_bufsiz, sizeof(char));
+				if unlikely(!new_result)
+					return NULL;
+			}
+			result = new_result;
+			bufsiz = malloc_usable_size(result) / sizeof(char);
+			assert(bufsiz >= new_bufsiz);
+			stream->if_exdata->io_getln = result;
+		}
+		ch = libc_fgetc(stream);
+		if (ch == EOF)
+			break; /* End-of-file */
+		if (ch == '\r') {
+			/* Special handling to convert both `\r' and `\r\n' into `\n' */
+			result[i++] = '\n';
+			ch = libc_fgetc(stream);
+			if (ch == EOF)
+				break;
+			if (ch == '\r')
+				continue;
+			libc_ungetc(ch, stream);
+			break;
+		}
+		result[i] = (char)ch;
+		if (ch == '\n') {
+			++i; /* Must keep the trailing '\n' at the end of lines! */
+			break;
+		}
+	}
+
+	/* Special case: absolutely _must_ return `NULL' on EOF */
+	if (i == 0)
+		return NULL;
+
+	/* NUL-terminate line.
+	 * NOTE: This is actually a KOS extension, as BSD's fgetln()
+	 *       documents that it doesn't NUL-terminate the line! */
+	result[i] = '\0';
+
+	/* KOS extension: we make the `lenp' argument optional. */
+	if (lenp != NULL)
+		*lenp = i;
+	return result;
+
+
+
 }
 /*[[[end:libc_fgetln]]]*/
 
