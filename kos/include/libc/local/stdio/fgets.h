@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9adfdeb */
+/* HASH CRC-32:0x6845bdd6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -118,10 +118,12 @@ __LOCAL_LIBC(fgets) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) char *
 			break;
 		}
 		__buf[__n] = (char)__ch;
-		if (__ch == '\n')
+		if (__ch == '\n') {
+			++__n; /* Must keep the trailing '\n' at the end of lines! */
 			break;
+		}
 	}
-	__buf[__n] = '\0';
+	__buf[__n] = '\0'; /* NUL-terminate line */
 	return __buf;
 }
 __NAMESPACE_LOCAL_END

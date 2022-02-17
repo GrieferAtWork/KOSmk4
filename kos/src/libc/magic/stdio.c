@@ -964,10 +964,12 @@ char *fgets([[outp(min(strlen(return), bufsize))]] char *__restrict buf,
 			break;
 		}
 		buf[n] = (char)ch;
-		if (ch == '\n')
+		if (ch == '\n') {
+			++n; /* Must keep the trailing '\n' at the end of lines! */
 			break;
+		}
 	}
-	buf[n] = '\0';
+	buf[n] = '\0'; /* NUL-terminate line */
 	return buf;
 }
 

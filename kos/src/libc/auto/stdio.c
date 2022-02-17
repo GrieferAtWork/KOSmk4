@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94908de4 */
+/* HASH CRC-32:0xb5e18c33 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -141,10 +141,12 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 3)) c
 			break;
 		}
 		buf[n] = (char)ch;
-		if (ch == '\n')
+		if (ch == '\n') {
+			++n; /* Must keep the trailing '\n' at the end of lines! */
 			break;
+		}
 	}
-	buf[n] = '\0';
+	buf[n] = '\0'; /* NUL-terminate line */
 	return buf;
 }
 /* >> fputs(3)
