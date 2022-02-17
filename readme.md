@@ -47,6 +47,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- [busybox-1.31.0](https://www.busybox.net)
 	- [file-5.39](https://github.com/file/file)
 	- [midnight-commander-4.8.27](http://midnight-commander.org/) (mc)
+	- [tree](https://github.com/rubicks/tree)
 - Programming
 	- [tcc-0.9.27](https://bellard.org/tcc/)
 	- [nano-4.4](https://www.nano-editor.org/)

@@ -22,17 +22,23 @@
 
 # Extract the package filename from the URL
 _PACKAGE_URL_FILENAME="${PACKAGE_URL##*/}"
+if test -z "$_PACKAGE_URL_FILENAME"; then
+	_PACKAGE_URL_FILENAME="${PACKAGE_GIT_URL##*/}"
+fi
 
 # Extract the package name from its filename
 if test -z "$PACKAGE_NAME"; then
 	PACKAGE_NAME="$_PACKAGE_URL_FILENAME"
 	if [[ "$PACKAGE_NAME" == *.tar* ]]; then
 		PACKAGE_NAME="${PACKAGE_NAME%.tar*}"
+	elif [[ "$PACKAGE_NAME" == *.git* ]]; then
+		PACKAGE_NAME="${PACKAGE_NAME%.git*}"
 	fi
 	if [[ "$PACKAGE_NAME" == "$_PACKAGE_URL_FILENAME" ]]; then
 		echo "Unable to determine PACKAGE_NAME from"
-		echo "	PACKAGE_URL:           $PACKAGE_URL"
-		echo "	_PACKAGE_URL_FILENAME: $_PACKAGE_URL_FILENAME"
+		echo "	PACKAGE_URL:           '$PACKAGE_URL'"
+		echo "	PACKAGE_GIT_URL:       '$PACKAGE_GIT_URL'"
+		echo "	_PACKAGE_URL_FILENAME: '$_PACKAGE_URL_FILENAME'"
 		exit 1
 	fi
 fi
@@ -42,13 +48,14 @@ if test -z "$PACKAGE_RAWNAME"; then
 	if [[ "$PACKAGE_RAWNAME" == *-* ]]; then
 		PACKAGE_RAWNAME="${PACKAGE_RAWNAME%-*}"
 	fi
-	if [[ "$PACKAGE_RAWNAME" == "$PACKAGE_NAME" ]]; then
-		echo "Unable to determine PACKAGE_RAWNAME from"
-		echo "	PACKAGE_NAME:          $PACKAGE_NAME"
-		echo "	PACKAGE_URL:           $PACKAGE_URL"
-		echo "	_PACKAGE_URL_FILENAME: $_PACKAGE_URL_FILENAME"
-		exit 1
-	fi
+#	if [[ "$PACKAGE_RAWNAME" == "$PACKAGE_NAME" ]]; then
+#		echo "Unable to determine PACKAGE_RAWNAME from"
+#		echo "	PACKAGE_NAME:          '$PACKAGE_NAME'"
+#		echo "	PACKAGE_URL:           '$PACKAGE_URL'"
+#		echo "	PACKAGE_GIT_URL:       '$PACKAGE_GIT_URL'"
+#		echo "	_PACKAGE_URL_FILENAME: '$_PACKAGE_URL_FILENAME'"
+#		exit 1
+#	fi
 fi
 
 if test -z "$PACKAGE_VERSION"; then
@@ -57,11 +64,12 @@ if test -z "$PACKAGE_VERSION"; then
 		PACKAGE_VERSION="${PACKAGE_VERSION#*-}"
 	fi
 	if [[ "$PACKAGE_VERSION" == "$PACKAGE_NAME" ]]; then
-		echo "Unable to determine PACKAGE_VERSION from"
-		echo "	PACKAGE_NAME:          $PACKAGE_NAME"
-		echo "	PACKAGE_URL:           $PACKAGE_URL"
-		echo "	_PACKAGE_URL_FILENAME: $_PACKAGE_URL_FILENAME"
-		exit 1
+		PACKAGE_VERSION=""
+#		echo "Unable to determine PACKAGE_VERSION from"
+#		echo "	PACKAGE_NAME:          $PACKAGE_NAME"
+#		echo "	PACKAGE_URL:           $PACKAGE_URL"
+#		echo "	_PACKAGE_URL_FILENAME: $_PACKAGE_URL_FILENAME"
+#		exit 1
 	fi
 fi
 
@@ -185,11 +193,14 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						# Figure out the directory name that
 						cmd mkdir -p "$SRCPATH"
 						cmd cd "$SRCPATH"
-						cmd git clone "$PACKAGE_GIT_URL"
 						if ! test -z "$PACKAGE_GIT_COMMIT"; then
-							# Checkout the requested git revision
-							cmd cd "$(ls -A)"
-							cmd git checkout -f "$PACKAGE_GIT_COMMIT"
+							# https://stackoverflow.com/questions/3489173/how-to-clone-git-repository-with-specific-revision-changeset
+							cmd git init
+							cmd git remote add origin "$PACKAGE_GIT_URL"
+							cmd git fetch origin "$PACKAGE_GIT_COMMIT"
+							cmd git reset --hard FETCH_HEAD
+						else
+							cmd git clone "$PACKAGE_GIT_URL"
 						fi
 					else
 						echo "No way of downloading $PACKAGE_NAME"
@@ -207,6 +218,11 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 					cmd mv ".${PACKAGE_NAME}-real" "${PACKAGE_NAME}"
 					cmd cd "$SRCPATH"
 				done
+				if ! test -z "$PACKAGE_GIT_URL"; then
+					# Delete unnecessary .git history data
+					rm -rf "$SRCPATH/.git" > /dev/null 2>&1
+				fi
+
 				# (Try to) generate configure (if it's missing)
 				if ! [ -f "$SRCPATH/configure" ]; then
 					${GM_HOOK_BEFORE_AUTOCONF:-:}
