@@ -719,7 +719,7 @@ int strncmp([[nonnull]] char const *s1,
 [[std, wunused, crtbuiltin, pure]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRSTR))]]
 char *strstr([[nonnull]] char const *haystack, [[nonnull]] char const *needle)
-	[([[nonnull]] char *haystack, [[nonnull]] char *needle): char *]
+	[([[nonnull]] char *haystack, [[nonnull]] char const *needle): char *]
 	[([[nonnull]] char const *haystack, [[nonnull]] char const *needle): char const *]
 {
 	char ch, needle_start = *needle++;
@@ -873,7 +873,7 @@ size_t strxfrm(char *dst, [[nonnull]] char const *__restrict src, size_t maxlen)
 }
 
 [[decl_include("<bits/types.h>")]]
-[[std, wunused, ATTR_COLD, crt_dos_variant]]
+[[std, wunused, cold, crt_dos_variant]]
 [[nonnull, section(".text.crt{|.dos}.errno")]]
 [[impl_include("<libc/template/itoa_digits.h>")]]
 char *strerror($errno_t errnum) {
@@ -988,14 +988,14 @@ $size_t strxfrm_l(char *dst, [[nonnull]] char const *__restrict src,
 	return strxfrm(dst, src, maxlen);
 }
 
-[[ATTR_COLD, wunused, section(".text.crt{|.dos}.errno")]]
+[[cold, wunused, section(".text.crt{|.dos}.errno")]]
 char *strerror_l(int errnum, $locale_t locale) {
 	(void)locale;
 	return strerror(errnum);
 }
 
 [[decl_include("<bits/types.h>")]]
-[[wunused, ATTR_COLD, guard, crt_dos_variant]]
+[[wunused, cold, guard, crt_dos_variant]]
 [[nonnull, section(".text.crt{|.dos}.string.memory.strsignal")]]
 [[decl_include("<bits/types.h>")]]
 char *strsignal($signo_t signo) {
@@ -3175,7 +3175,7 @@ char const *sigdescr_np($signo_t signum) {
 %#ifdef __USE_XOPEN2K
 %#ifdef __USE_GNU
 [[decl_include("<bits/types.h>")]]
-[[ATTR_COLD, export_alias("__strerror_r")]]
+[[cold, export_alias("__strerror_r")]]
 [[nonnull, section(".text.crt{|.dos}.errno")]]
 [[impl_include("<hybrid/__assert.h>"), crt_dos_variant]]
 char *strerror_r($errno_t errnum, [[nonnull]] char *buf, $size_t buflen) {
@@ -3203,7 +3203,7 @@ fallback:
 %#else /* __USE_GNU */
 
 [[decl_include("<bits/types.h>"), impl_include("<libc/errno.h>")]]
-[[ATTR_COLD, exposed_name("strerror_r"), section(".text.crt{|.dos}.errno")]]
+[[cold, exposed_name("strerror_r"), section(".text.crt{|.dos}.errno")]]
 $errno_t __xpg_strerror_r($errno_t errnum, [[nonnull]] char *buf, $size_t buflen) {
 	size_t msg_len;
 	char const *string;

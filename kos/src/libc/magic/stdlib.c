@@ -701,7 +701,7 @@ int system([[nullable]] char const *command) {
 }
 
 
-[[std, guard, crtbuiltin, ATTR_NORETURN, throws]]
+[[std, guard, crtbuiltin, noreturn, throws]]
 [[section(".text.crt{|.dos}.application.exit")]]
 [[export_alias("_ZSt9terminatev", "terminate")]]
 [[dos_only_export_alias("?terminate@@YAXXZ")]]
@@ -711,7 +711,7 @@ void abort() {
 	_Exit(@__EXIT_FAILURE@);
 }
 
-[[std, guard, crtbuiltin, ATTR_NORETURN, throws]]
+[[std, guard, crtbuiltin, noreturn, throws]]
 [[section(".text.crt{|.dos}.application.exit")]]
 [[alias("quick_exit", "_exit", "_Exit")]]
 void exit(int status);
@@ -724,7 +724,7 @@ int atexit([[nonnull]] void (LIBCCALL *func)(void));
 
 %(std, c, ccompat)#if defined(__USE_ISOC11) || defined(__USE_ISOCXX11)
 [[section(".text.crt{|.dos}.sched.process")]]
-[[std, ATTR_NORETURN, throws, alias("exit", "_exit", "_Exit")]]
+[[std, noreturn, throws, alias("exit", "_exit", "_Exit")]]
 void quick_exit(int status);
 
 [[dos_only_export_alias("_crt_at_quick_exit")]]
@@ -738,7 +738,7 @@ int at_quick_exit([[nonnull]] void (LIBCCALL *func)(void));
 [[std, crtbuiltin, export_alias("_exit"), alias("quick_exit", "exit")]]
 [[if(__has_builtin(__builtin__exit) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline("_exit", { __builtin__exit(status); })]]
-[[ATTR_NORETURN, throws, section(".text.crt{|.dos}.application.exit")]]
+[[noreturn, throws, section(".text.crt{|.dos}.application.exit")]]
 void _Exit(int status);
 %(std, c, ccompat)#endif /* __USE_ISOC99 */
 

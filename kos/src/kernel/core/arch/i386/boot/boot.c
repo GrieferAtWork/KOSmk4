@@ -869,7 +869,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * similar to the (now abandoned  and now longer available) KOS-specific  O_SYMLINK. */
 
 	/* TODO: As per `man 2 open', O_PATH is also allowed to return regular files (in the
-	 *       case of KOS, that would be the raw `struct mfile' objects). Currently, our
+	 *       case of KOS, that would be the raw `struct mfile' objects). Currently,  our
 	 *       implementation restricts O_PATH to only work for directories. */
 
 	/* TODO: Update the toolchain gcc to the latest version.
@@ -893,6 +893,14 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       s.a. explaination in `userexcept_sysret_inject_safe()' */
 
 	/* TODO: Add futex support to pthread_once() (via an alternate [[userimpl]]) */
+
+	/* TODO: Add support for preadv2(2) and pwritev2(2)
+	 * XXX:  On  that note, maybe also get rid of preadvf(2) / pwritevf(2),
+	 *       since  these  2  system  calls  kind-of  do  the  same  thing?
+	 *       If so, also  consider getting rid  of preadf() and  pwritef(),
+	 *       as well as  readf(2) and writef(2).  Additionally, maybe  also
+	 *       change ioctlf() to use the RWF_* flags, rather than `iomode_t'
+	 * Also: When offset=(pos_t)-1 should behave like read(2) / write(2) */
 
 	return state;
 }

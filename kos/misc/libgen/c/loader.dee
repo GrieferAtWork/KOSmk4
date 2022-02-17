@@ -76,13 +76,14 @@ global final SIMPLE_RETURN_TYPE_ATTRIBUTE_ANNOTATIONS: {string: string} = {
 
 @@Same as @SIMPLE_RETURN_TYPE_ATTRIBUTE_ANNOTATIONS, but only applicable to functions as a whole
 global final SIMPLE_ATTRIBUTE_ANNOTATIONS: {string: string} = {
-	"ATTR_MCONST" : "",
-	"noreturn"    : "ATTR_NORETURN",
-	"const"       : "ATTR_CONST",
-	"pure"        : "ATTR_PURE",
-	"cold"        : "ATTR_COLD",
-	"hot"         : "ATTR_HOT",
-	"leaf"        : "ATTR_LEAF",
+	"ATTR_MCONST"   : "",
+	"returns_twice" : "ATTR_RETURNS_TWICE",
+	"noreturn"      : "ATTR_NORETURN",
+	"const"         : "ATTR_CONST",
+	"pure"          : "ATTR_PURE",
+	"cold"          : "ATTR_COLD",
+	"hot"           : "ATTR_HOT",
+	"leaf"          : "ATTR_LEAF",
 };
 
 @@Same as @SIMPLE_ATTRIBUTE_ANNOTATIONS, but used to define @FunctionPrototype.nothrow

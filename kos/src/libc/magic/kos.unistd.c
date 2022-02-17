@@ -428,7 +428,7 @@ void SetResGid($gid_t rgid, $gid_t egid, $gid_t sgid);
 
 %#if (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8)) || \
 %     defined(__USE_MISC)
-[[ATTR_RETURNS_TWICE, wunused, decl_include("<bits/types.h>")]]
+[[returns_twice, wunused, decl_include("<bits/types.h>")]]
 [[throws, doc_alias("vfork"), section(".text.crt{|.dos}.sched.access")]]
 $pid_t VFork();
 %#endif

@@ -25,7 +25,8 @@
 
 DECL_BEGIN
 
-#define CRT_NOT_REALL_UNIMPLEMENTED CRT_UNIMPLEMENTED
+#define CRT_NOT_REALLY_UNIMPLEMENTED \
+	CRT_UNIMPLEMENTED
 
 /*[[[head:libc_getcontext,hash:CRC-32=0x202b2566]]]*/
 #ifndef LIBC_ARCH_HAVE_GETCONTEXT
@@ -46,7 +47,7 @@ NOTHROW_NCX(LIBCCALL libc_getcontext)(ucontext_t *__restrict ucp)
 /*[[[body:libc_getcontext]]]*/
 {
 	(void)ucp;
-	CRT_NOT_REALL_UNIMPLEMENTED("getcontext");
+	CRT_NOT_REALLY_UNIMPLEMENTED("getcontext");
 	return libc_seterrno(ENOSYS);
 }
 #endif /* MAGIC:impl_if */
@@ -81,7 +82,7 @@ NOTHROW_NCX(LIBCCALL libc_setcontext)(ucontext_t const *__restrict ucp)
 /*[[[body:libc_setcontext]]]*/
 {
 	(void)ucp;
-	CRT_NOT_REALL_UNIMPLEMENTED("setcontext");
+	CRT_NOT_REALLY_UNIMPLEMENTED("setcontext");
 	return libc_seterrno(ENOSYS);
 }
 #endif /* MAGIC:impl_if */
@@ -111,7 +112,7 @@ NOTHROW_NCX(LIBCCALL libc_swapcontext)(ucontext_t *__restrict oucp,
 {
 	(void)oucp;
 	(void)ucp;
-	CRT_NOT_REALL_UNIMPLEMENTED("swapcontext");
+	CRT_NOT_REALLY_UNIMPLEMENTED("swapcontext");
 	return libc_seterrno(ENOSYS);
 }
 #endif /* MAGIC:impl_if */
@@ -148,7 +149,7 @@ NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp,
 	(void)ucp;
 	(void)func;
 	(void)argc;
-	CRT_NOT_REALL_UNIMPLEMENTED("makecontext");
+	CRT_NOT_REALLY_UNIMPLEMENTED("makecontext");
 }
 #endif /* MAGIC:impl_if */
 /*[[[end:libc_makecontext]]]*/

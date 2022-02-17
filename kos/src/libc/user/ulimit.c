@@ -21,14 +21,18 @@
 #define GUARD_LIBC_USER_ULIMIT_C 1
 
 #include "../api.h"
-#include "ulimit.h"
-
-#include <kos/syscalls.h>
-#include <limits.h>
-#include <stdint.h>
+/**/
 
 #include <hybrid/host.h>
 #include <hybrid/minmax.h>
+
+#include <kos/kernel/paging.h>
+#include <kos/syscalls.h>
+
+#include <limits.h>
+#include <stdint.h>
+
+#include "ulimit.h"
 
 DECL_BEGIN
 
@@ -56,14 +60,7 @@ NOTHROW_NCX(VLIBCCALL libc_ulimit)(__STDC_INT_AS_UINT_T cmd,
 
 	case __UL_GETMAXBRK:
 		/* Return the maximum possible address of the data segment. */
-#if defined(__x86_64__)
-		result = (long int)(unsigned long)UINT64_C(0x0000ffffffffffff);
-#elif defined(__i386__)
-		result = (long int)(unsigned long)UINT32_C(0xbfffffff);
-#else
-#warning "Unsupported architecture"
-		result = (long)libc_seterrno(ENOSYS);
-#endif
+		result = (long int)(unsigned long)(USERSPACE_END - 1);
 		break;
 
 	case __UL_GETOPENMAX:

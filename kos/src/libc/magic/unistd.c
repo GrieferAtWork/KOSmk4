@@ -1444,6 +1444,14 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 }
 
 
+@@>> get_current_dir_name(3)
+@@Return an malloc(3)'d string  representing the current working  directory
+@@This is usually the same  as `getcwd(NULL, 0)', however standards  caused
+@@this function to be badly designed, as iff `$PWD' is defined and correct,
+@@it is strdup(3)'d  and returned (correctness  is determined by  comparing
+@@`stat($PWD)' against `stat(".")').
+@@Due to the mandatory dependency on `getenv(3)', this function can't be
+@@made thread-safe, so try not to use this one.
 [[crt_dos_variant, cp, wunused, ATTR_MALLOC]]
 [[section(".text.crt{|.dos}.fs.basic_property")]]
 [[impl_include("<bits/os/stat.h>")]]
@@ -1477,8 +1485,51 @@ int syncfs($fd_t fd) {
 
 %[default:section(".text.crt{|.dos}.sched.user")];
 
+@@>> group_member(3)
+@@Check if `gid' is an element of `getgroups(2)'
+@@@return:  1: Yes, it's a member
+@@@return:  0: No, it's not a member
+@@@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/types.h>")]]
-int group_member($gid_t gid);
+[[requires_include("<hybrid/__alloca.h>", "<libc/errno.h>")]]
+[[requires($has_function(getgroups) && defined(__hybrid_alloca) &&
+           defined(__libc_geterrno) && defined(__EINVAL))]]
+[[impl_include("<hybrid/__alloca.h>", "<asm/os/limits.h>", "<libc/errno.h>")]]
+[[impl_prefix(
+@@push_namespace(local)@@
+__LOCAL_LIBC(__group_member_impl) __ATTR_NOINLINE int
+(__LIBCCALL __group_member_impl)($gid_t gid, unsigned int bufsize) {
+	unsigned int i;
+	gid_t *groups = (gid_t *)__hybrid_alloca(bufsize * sizeof(*groups));
+	int n         = getgroups((int)bufsize, groups);
+	if unlikely(n < 0)
+		return n;
+	for (i = 0; i < (unsigned int)n; ++i) {
+		if (groups[i] == gid)
+			return 1;
+	}
+	return 0;
+}
+@@pop_namespace@@
+)]]
+int group_member($gid_t gid) {
+	int result;
+@@pp_if !defined(__NGROUPS_MAX) || __NGROUPS_MAX <= 0 || __NGROUPS_MAX >= 32@@
+	unsigned int size = 32;
+@@pp_else@@
+	unsigned int size = __NGROUPS_MAX;
+@@pp_endif@@
+	for (;;) {
+		result = (__NAMESPACE_LOCAL_SYM __group_member_impl)(gid, size);
+		if (result >= 0)
+			break;
+		if (__libc_geterrno() != __EINVAL)
+			break;
+		/* Try again with a larger buffer. */
+		size *= 2;
+	}
+	return result;
+}
 
 @@>> getresuid(2)
 @@Get the real, effective, and saved UID of the calling thread.
@@ -1517,18 +1568,32 @@ int setresgid($gid_t rgid, $gid_t egid, $gid_t sgid);
 void __crtSleep($uint32_t msecs);
 
 
+@@>> usleep(3)
 @@Sleep for `useconds' microseconds (1/1.000.000 seconds)
 [[cp, section(".text.crt{|.dos}.system.utility")]]
-[[userimpl, requires_function(__crtSleep)]]
 [[decl_include("<bits/types.h>")]]
+[[requires($has_function(nanosleep) || $has_function(__crtSleep))]]
+[[impl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
 int usleep($useconds_t useconds) {
+@@pp_if $has_function(nanosleep)@@
+	struct timespec ts;
+	ts.@tv_sec@  = (time_t)(useconds / USEC_PER_SEC);
+	ts.@tv_nsec@ = (syscall_ulong_t)(useconds % USEC_PER_SEC) * NSEC_PER_USEC;
+	return nanosleep(&ts, NULL);
+@@pp_else@@
 	__crtSleep(useconds / 1000l); /*USEC_PER_MSEC*/
 	return 0;
+@@pp_endif@@
 }
 
+@@>> getwd(3)
+@@Deprecated, alternate variant of `getcwd()'. It
+@@should be obvious why you shouldn't use this one.
+@@And if it isn't, take a look at the arguments of
+@@this function, compared to `getcwd()'
 [[crt_dos_variant, cp, deprecated("Use getcwd()")]]
 [[section(".text.crt{|.dos}.fs.basic_property")]]
-[[userimpl, requires_function(getcwd)]]
+[[requires_function(getcwd)]]
 [[impl_include("<hybrid/typecore.h>")]]
 char *getwd([[nonnull]] char *buf) {
 	return getcwd(buf, (size_t)-1);
@@ -1536,7 +1601,22 @@ char *getwd([[nonnull]] char *buf) {
 
 [[section(".text.crt{|.dos}.system.utility")]]
 [[decl_include("<bits/types.h>")]]
-$useconds_t ualarm($useconds_t value, $useconds_t interval);
+[[requires_include("<asm/os/itimer.h>")]]
+[[requires(defined(__ITIMER_REAL) && $has_function(setitimer))]]
+[[impl_include("<asm/os/itimer.h>", "<bits/os/itimerval.h>")]]
+$useconds_t ualarm($useconds_t value, $useconds_t interval) {
+	struct itimerval timer, otimer;
+	timer.@it_value@.@tv_sec@     = value / 1000000;
+	timer.@it_value@.@tv_usec@    = value % 1000000;
+	timer.@it_interval@.@tv_sec@  = interval / 1000000;
+	timer.@it_interval@.@tv_usec@ = interval % 1000000;
+	if unlikely(setitimer((__itimer_which_t)__ITIMER_REAL, &timer, &otimer) < 0)
+		goto err;
+	return (otimer.@it_value@.@tv_sec@ * 1000000) +
+	       (otimer.@it_value@.@tv_usec@);
+err:
+	return (useconds_t)-1;
+}
 
 @@>> vfork(2)
 @@Same as `fork(2)', but the child process may be executed within in the same VM
@@ -1565,7 +1645,7 @@ $useconds_t ualarm($useconds_t value, $useconds_t interval);
 @@which  case the parent process will not  actually get suspended until the child
 @@process performs any of the actions above.
 [[guard, section(".text.crt{|.dos}.sched.access"), export_alias("__vfork")]]
-[[ATTR_RETURNS_TWICE, wunused, decl_include("<bits/types.h>")]]
+[[returns_twice, wunused, decl_include("<bits/types.h>")]]
 $pid_t vfork();
 %#endif /* (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) || __USE_MISC */
 

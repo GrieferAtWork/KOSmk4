@@ -256,7 +256,7 @@ __NOTHROW_NCX(__hybrid_atomic_cmpxch_val)(__T &__x, __OV __oldv, __NV __newv,
 			                           : __xv_res,            \
 			                           succ, fail))           \
 				break;                                        \
-		} __WHILE1;                                           \
+		}	__WHILE1;                                         \
 		__XRETURN __xv_res;                                   \
 	})
 #else /* __NO_XBLOCK */
@@ -276,7 +276,7 @@ __NOTHROW_NCX(__hybrid_atomic_cmpxch_val)(__T &__x, __OV __oldv, __NV __newv,
 			                           : __res,                                  \
 			                           __succ, __fail))                          \
 				break;                                                           \
-		} __WHILE1;                                                              \
+		}	__WHILE1;                                                            \
 		return __res;                                                            \
 	}
 __NAMESPACE_INT_BEGIN

@@ -400,6 +400,14 @@ struct sigevent;
 
 %[define_replacement(tm = "__NAMESPACE_STD_SYM tm")];
 
+%[define(MSEC_PER_SEC  = __UINT16_C(1000))]
+%[define(USEC_PER_MSEC = __UINT16_C(1000))]
+%[define(NSEC_PER_USEC = __UINT16_C(1000))]
+%[define(NSEC_PER_MSEC = __UINT32_C(1000000))]
+%[define(USEC_PER_SEC  = __UINT32_C(1000000))]
+%[define(NSEC_PER_SEC  = __UINT32_C(1000000000))]
+%[define(FSEC_PER_SEC  = __UINT64_C(1000000000000000))]
+
 
 
 [[ignore, nocrt]]

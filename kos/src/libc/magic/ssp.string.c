@@ -41,48 +41,48 @@ __SYSDECL_BEGIN
 
 }
 
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __memcpy_chk([[nonnull]] void *__restrict dst,
              [[nonnull]] void const *__restrict src,
              $size_t n_bytes, $size_t dst_objsize)
 		-> [[== dst]] void *
 	%{chk}
 
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __memmove_chk([[nonnull]] void *dst,
               [[nonnull]] void const *src,
               $size_t n_bytes, $size_t dst_objsize)
 		-> [[== dst]] void *
 	%{chk}
 
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __memset_chk([[nonnull]] void *__restrict dst, int byte,
              $size_t n_bytes, $size_t dst_objsize)
 		-> [[== dst]] void *
 	%{chk}
 
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __strcat_chk([[nonnull]] char *__restrict dst,
              [[nonnull]] char const *__restrict src,
              $size_t dst_objsize)
 		-> [[== dst]] char *
 	%{chk("strcat", "(void)dst_objsize; /* TODO */")}
 
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __strcpy_chk([[nonnull]] char *__restrict dst,
              [[nonnull]] char const *__restrict src,
              $size_t dst_objsize)
 		-> [[== dst]] char *
 	%{chk("strcpy", "(void)dst_objsize; /* TODO */")}
 
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __strncat_chk([[nonnull]] char *__restrict dst,
               [[nonnull]] char const *__restrict src,
               $size_t buflen, $size_t dst_objsize)
 		-> [[== dst]] char *
 	%{chk("strncat", "(void)dst_objsize; /* TODO */")}
 
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __strncpy_chk([[nonnull]] char *__restrict dst,
               [[nonnull]] char const *__restrict src,
               $size_t buflen, $size_t dst_objsize)
@@ -91,7 +91,7 @@ __strncpy_chk([[nonnull]] char *__restrict dst,
 
 %
 %#ifdef __USE_GNU
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __mempcpy_chk([[nonnull]] void *__restrict dst,
               [[nonnull]] void const *__restrict src,
               $size_t n_bytes, $size_t dst_objsize)
@@ -101,14 +101,14 @@ __mempcpy_chk([[nonnull]] void *__restrict dst,
 
 %
 %#ifdef __USE_XOPEN2K8
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __stpcpy_chk:([[nonnull]] char *__restrict dst,
               [[nonnull]] char const *__restrict src,
               $size_t dst_objsize)
 		-> [== dst + strlen(src)] char *
 	%{chk("stpcpy", "(void)dst_objsize; /* TODO */")}
 
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __stpncpy_chk:([[nonnull]] char *__restrict dst,
                [[nonnull]] char const *__restrict src,
                $size_t buflen, $size_t dst_objsize)
@@ -118,43 +118,43 @@ __stpncpy_chk:([[nonnull]] char *__restrict dst,
 
 %
 %#ifdef __USE_KOS
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __mempmove_chk([[nonnull]] void *dst, [[nonnull]] void const *src,
                $size_t n_bytes, $size_t dst_objsize)
 		-> [[== dst + n_bytes]] void *
 	%{chk}
 
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __mempset_chk([[nonnull]] void *__restrict dst, int byte,
               $size_t n_bytes, $size_t dst_objsize)
 		-> [[== dst + n_bytes]] void *
 	%{chk}
 
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __memmoveup_chk([[nonnull]] void *dst, [[nonnull]] void const *src,
                 $size_t n_bytes, $size_t dst_objsize)
 		-> [[== dst]] void *
 	%{chk}
 
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __memmovedown_chk([[nonnull]] void *dst, [[nonnull]] void const *src,
                   $size_t n_bytes, $size_t dst_objsize)
 		-> [[== dst]] void *
 	%{chk}
 
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __mempmoveup_chk([[nonnull]] void *dst, [[nonnull]] void const *src,
                  $size_t n_bytes, $size_t dst_objsize)
 		-> [[== dst + n_bytes]] void *
 	%{chk}
 
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __mempmovedown_chk([[nonnull]] void *dst, [[nonnull]] void const *src,
                    $size_t n_bytes, $size_t dst_objsize)
 		-> [[== dst + n_bytes]] void *
 	%{chk}
 
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __memcpyc_chk([[nonnull]] void *__restrict dst,
               [[nonnull]] void const *__restrict src,
               $size_t elem_count, $size_t elem_size,
@@ -162,13 +162,13 @@ __memcpyc_chk([[nonnull]] void *__restrict dst,
 		-> [[== dst]] void *
 	%{chk}
 
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __memmovec_chk([[nonnull]] void *dst, [[nonnull]] void const *src,
                $size_t elem_count, $size_t elem_size, $size_t dst_objsize)
 		-> [[== dst]] void *
 	%{chk}
 
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __mempcpyc_chk([[nonnull]] void *__restrict dst,
                [[nonnull]] void const *__restrict src,
                $size_t elem_count, $size_t elem_size,
@@ -176,35 +176,35 @@ __mempcpyc_chk([[nonnull]] void *__restrict dst,
 		-> [[== dst + (elem_count * elem_size)]] void *
 	%{chk}
 
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __mempmovec_chk([[nonnull]] void *dst, [[nonnull]] void const *src,
                 $size_t elem_count, $size_t elem_size,
                 $size_t dst_objsize)
 		-> [[== dst + (elem_count * elem_size)]] void *
 	%{chk}
 
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __memmoveupc_chk([[nonnull]] void *dst, [[nonnull]] void const *src,
                  $size_t elem_count, $size_t elem_size,
                  $size_t dst_objsize)
 		-> [[== dst]] void *
 	%{chk}
 
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __memmovedownc_chk([[nonnull]] void *dst, [[nonnull]] void const *src,
                    $size_t elem_count, $size_t elem_size,
                    $size_t dst_objsize)
 		-> [[== dst]] void *
 	%{chk}
 
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __mempmoveupc_chk([[nonnull]] void *dst, [[nonnull]] void const *src,
                   $size_t elem_count, $size_t elem_size,
                   $size_t dst_objsize)
 		-> [[== dst + (elem_count * elem_size)]] void *
 	%{chk}
 
-[[libc, fast, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __mempmovedownc_chk([[nonnull]] void *dst, [[nonnull]] void const *src,
                     $size_t elem_count, $size_t elem_size,
                     $size_t dst_objsize)
@@ -216,129 +216,129 @@ __mempmovedownc_chk([[nonnull]] void *dst, [[nonnull]] void const *src,
 
 %#ifdef __USE_STRING_BWLQ
 
-[[fast, libc, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("__wmemcpy_chk")]]
 __memcpyw_chk([[nonnull]] /*aligned(2)*/ void *__restrict dst,
               [[nonnull]] /*aligned(2)*/ void const *__restrict src,
               $size_t n_words, $size_t dst_objsize)
 		-> [[== dst]] $uint16_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("__wmempcpy_chk")]]
 __mempcpyw_chk([[nonnull]] /*aligned(2)*/ void *__restrict dst,
                [[nonnull]] /*aligned(2)*/ void const *__restrict src,
                $size_t n_words, $size_t dst_objsize)
 		-> [== dst + n_words * 2] $uint16_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("__wmemmove_chk")]]
 __memmovew_chk([[nonnull]] /*aligned(2)*/ void *dst,
                [[nonnull]] /*aligned(2)*/ void const *src,
                $size_t n_words, $size_t dst_objsize)
 		-> [[== dst]] $uint16_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("__wmemcpy_chk")]]
 __memcpyl_chk([[nonnull]] /*aligned(4)*/ void *__restrict dst,
               [[nonnull]] /*aligned(4)*/ void const *__restrict src,
               $size_t n_dwords, $size_t dst_objsize)
 		-> [[== dst]] $uint32_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("__wmempcpy_chk")]]
 __mempcpyl_chk([[nonnull]] /*aligned(4)*/ void *__restrict dst,
                [[nonnull]] /*aligned(4)*/ void const *__restrict src,
                $size_t n_dwords, $size_t dst_objsize)
 		-> [== dst + n_dwords * 4] $uint32_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("__wmemmove_chk")]]
 __memmovel_chk([[nonnull]] /*aligned(4)*/ void *dst,
                [[nonnull]] /*aligned(4)*/ void const *src,
                $size_t n_dwords, $size_t dst_objsize)
 		-> [[== dst]] $uint32_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, decl_include("<hybrid/typecore.h>")]]
 __mempmovew_chk([[nonnull]] /*aligned(2)*/ void *dst,
                 [[nonnull]] /*aligned(2)*/ void const *src,
                 $size_t n_words, $size_t dst_objsize)
 		-> [== dst + n_words * 2] $uint16_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, decl_include("<hybrid/typecore.h>")]]
 __mempmovel_chk([[nonnull]] /*aligned(4)*/ void *dst,
                 [[nonnull]] /*aligned(4)*/ void const *src,
                 $size_t n_dwords, $size_t dst_objsize)
 		-> [== dst + n_dwords * 4] $uint32_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, decl_include("<hybrid/typecore.h>")]]
 __memsetw_chk([[nonnull]] /*aligned(2)*/ void *__restrict dst,
               $uint16_t word, $size_t n_words, $size_t dst_objsize)
 		-> [[== dst]] $uint16_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, decl_include("<hybrid/typecore.h>")]]
 __mempsetw_chk([[nonnull]] /*aligned(2)*/ void *__restrict dst,
                $uint16_t word, $size_t n_words, $size_t dst_objsize)
 		-> [== dst + n_words * 2] $uint16_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, decl_include("<hybrid/typecore.h>")]]
 __memsetl_chk([[nonnull]] /*aligned(4)*/ void *__restrict dst,
               $uint32_t dword, $size_t n_dwords, $size_t dst_objsize)
 		-> [[== dst]] $uint32_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, decl_include("<hybrid/typecore.h>")]]
 __mempsetl_chk([[nonnull]] /*aligned(4)*/ void *__restrict dst,
                $uint32_t dword, $size_t n_dwords, $size_t dst_objsize)
 		-> [== dst + n_dwords * 4] $uint32_t * %{chk}
 
 
 %#ifdef __USE_KOS
-[[fast, libc, ATTR_LEAF, alias("__memmovew_chk"), decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, alias("__memmovew_chk"), decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("__wmemmove_chk")]]
 __memmoveupw_chk([[nonnull]] /*aligned(2)*/ void *dst,
                  [[nonnull]] /*aligned(2)*/ void const *src,
                  $size_t n_words, $size_t dst_objsize)
 		-> [[== dst]] $uint16_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, alias("__memmovew_chk"), decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, alias("__memmovew_chk"), decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("__wmemmove_chk")]]
 __memmovedownw_chk([[nonnull]] /*aligned(2)*/ void *dst,
                    [[nonnull]] /*aligned(2)*/ void const *src,
                    $size_t n_words, $size_t dst_objsize)
 		-> [[== dst]] $uint16_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, alias("__memmovel_chk"), decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, alias("__memmovel_chk"), decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("__wmemmove_chk")]]
 __memmoveupl_chk([[nonnull]] /*aligned(4)*/ void *dst,
                  [[nonnull]] /*aligned(4)*/ void const *src,
                  $size_t n_dwords, $size_t dst_objsize)
 		-> [[== dst]] $uint32_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, alias("__memmovel_chk"), decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, alias("__memmovel_chk"), decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("__wmemmove_chk")]]
 __memmovedownl_chk([[nonnull]] /*aligned(4)*/ void *dst,
                    [[nonnull]] /*aligned(4)*/ void const *src,
                    $size_t n_dwords, $size_t dst_objsize)
 		-> [[== dst]] $uint32_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, alias("__mempmovew_chk"), decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, alias("__mempmovew_chk"), decl_include("<hybrid/typecore.h>")]]
 __mempmoveupw_chk([[nonnull]] /*aligned(2)*/ void *dst,
                   [[nonnull]] /*aligned(2)*/ void const *src,
                   $size_t n_words, $size_t dst_objsize)
 		-> [== dst + n_words * 2] $uint16_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, alias("__mempmovew_chk"), decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, alias("__mempmovew_chk"), decl_include("<hybrid/typecore.h>")]]
 __mempmovedownw_chk([[nonnull]] /*aligned(2)*/ void *dst,
                     [[nonnull]] /*aligned(2)*/ void const *src,
                     $size_t n_words, $size_t dst_objsize)
 		-> [== dst + n_words * 2] $uint16_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, alias("__mempmovel_chk"), decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, alias("__mempmovel_chk"), decl_include("<hybrid/typecore.h>")]]
 __mempmoveupl_chk([[nonnull]] /*aligned(4)*/ void *dst,
                   [[nonnull]] /*aligned(4)*/ void const *src,
                   $size_t n_dwords, $size_t dst_objsize)
 		-> [== dst + n_dwords * 4] $uint32_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, alias("__mempmovel_chk"), decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, alias("__mempmovel_chk"), decl_include("<hybrid/typecore.h>")]]
 __mempmovedownl_chk([[nonnull]] /*aligned(4)*/ void *dst,
                     [[nonnull]] /*aligned(4)*/ void const *src,
                     $size_t n_dwords, $size_t dst_objsize)
@@ -346,60 +346,60 @@ __mempmovedownl_chk([[nonnull]] /*aligned(4)*/ void *dst,
 
 %#endif /* __USE_KOS */
 %#ifdef __UINT64_TYPE__
-[[fast, libc, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, decl_include("<hybrid/typecore.h>")]]
 __memcpyq_chk([[nonnull]] /*aligned(8)*/ void *__restrict dst,
               [[nonnull]] /*aligned(8)*/ void const *__restrict src,
               $size_t n_qwords, $size_t dst_objsize)
 		-> [[== dst]] $uint64_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, decl_include("<hybrid/typecore.h>")]]
 __mempcpyq_chk([[nonnull]] /*aligned(8)*/ void *__restrict dst,
                [[nonnull]] /*aligned(8)*/ void const *__restrict src,
                $size_t n_qwords, $size_t dst_objsize)
 		-> [[== dst + n_qwords * 8]] $uint64_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, decl_include("<hybrid/typecore.h>")]]
 __memmoveq_chk([[nonnull]] /*aligned(8)*/ void *dst,
                [[nonnull]] /*aligned(8)*/ void const *src,
                $size_t n_qwords, $size_t dst_objsize)
 		-> [[== dst]] $uint64_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, decl_include("<hybrid/typecore.h>")]]
 __mempmoveq_chk([[nonnull]] /*aligned(8)*/ void *__restrict dst,
                 [[nonnull]] /*aligned(8)*/ void const *__restrict src,
                 $size_t n_qwords, $size_t dst_objsize)
 		-> [[== dst + n_qwords * 8]] $uint64_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, decl_include("<hybrid/typecore.h>")]]
 __memsetq_chk([[nonnull]] /*aligned(8)*/ void *__restrict dst,
               $uint64_t qword, $size_t n_qwords, $size_t dst_objsize)
 		-> [[== dst]] $uint64_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, decl_include("<hybrid/typecore.h>")]]
 __mempsetq_chk([[nonnull]] /*aligned(8)*/ void *__restrict dst,
                $uint64_t qword, $size_t n_qwords, $size_t dst_objsize)
 		-> [[== dst + n_qwords * 8]] $uint64_t * %{chk}
 
 %#ifdef __USE_KOS
-[[fast, libc, ATTR_LEAF, alias("__memmoveq_chk"), decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, alias("__memmoveq_chk"), decl_include("<hybrid/typecore.h>")]]
 __memmoveupq_chk([[nonnull]] /*aligned(8)*/ void *dst,
                  [[nonnull]] /*aligned(8)*/ void const *src,
                  $size_t n_qwords, $size_t dst_objsize)
 		-> [[== dst]] $uint64_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, alias("__memmoveq_chk"), decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, alias("__memmoveq_chk"), decl_include("<hybrid/typecore.h>")]]
 __memmovedownq_chk([[nonnull]] /*aligned(8)*/ void *dst,
                    [[nonnull]] /*aligned(8)*/ void const *src,
                    $size_t n_qwords, $size_t dst_objsize)
 		-> [[== dst]] $uint64_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, alias("__mempmoveq_chk"), decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, alias("__mempmoveq_chk"), decl_include("<hybrid/typecore.h>")]]
 __mempmoveupq_chk([[nonnull]] /*aligned(8)*/ void *__restrict dst,
                   [[nonnull]] /*aligned(8)*/ void const *__restrict src,
                   $size_t n_qwords, $size_t dst_objsize)
 		-> [[== dst + n_qwords * 8]] $uint64_t * %{chk}
 
-[[fast, libc, ATTR_LEAF, alias("__mempmoveq_chk"), decl_include("<hybrid/typecore.h>")]]
+[[fast, libc, leaf, alias("__mempmoveq_chk"), decl_include("<hybrid/typecore.h>")]]
 __mempmovedownq_chk([[nonnull]] /*aligned(8)*/ void *__restrict dst,
                     [[nonnull]] /*aligned(8)*/ void const *__restrict src,
                     $size_t n_qwords, $size_t dst_objsize)

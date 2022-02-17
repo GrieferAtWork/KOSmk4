@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b3ef10 */
+/* HASH CRC-32:0x180d2f3e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,16 +21,15 @@
 #ifndef __local_delay_defined
 #define __local_delay_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_usleep) || defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_delay)
+#include <features.h>
+#include <bits/types.h>
+#if defined(__CRT_HAVE_usleep) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep) || defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_delay)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_usleep_defined
 #define __local___localdep_usleep_defined
 #ifdef __CRT_HAVE_usleep
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_usleep,(__useconds_t __useconds),usleep,(__useconds))
-#elif defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_delay)
+#elif defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep) || defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_delay)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/usleep.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -39,9 +38,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_usleep_defined
 #endif /* !... */
 #endif /* !__local___localdep_usleep_defined */
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(delay) void
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(delay))(unsigned int __mill) {
 	(__NAMESPACE_LOCAL_SYM __localdep_usleep)((__useconds_t)__mill * 1000);
@@ -51,7 +47,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_delay_defined
 #define __localdep_delay __LIBC_LOCAL_NAME(delay)
 #endif /* !__local___localdep_delay_defined */
-#else /* __CRT_HAVE_usleep || __CRT_HAVE___crtSleep || __CRT_HAVE_delay */
+#else /* __CRT_HAVE_usleep || __CRT_HAVE_nanosleep64 || __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep || __CRT_HAVE___libc_nanosleep || __CRT_HAVE___crtSleep || __CRT_HAVE_delay */
 #undef __local_delay_defined
-#endif /* !__CRT_HAVE_usleep && !__CRT_HAVE___crtSleep && !__CRT_HAVE_delay */
+#endif /* !__CRT_HAVE_usleep && !__CRT_HAVE_nanosleep64 && !__CRT_HAVE_nanosleep && !__CRT_HAVE___nanosleep && !__CRT_HAVE___libc_nanosleep && !__CRT_HAVE___crtSleep && !__CRT_HAVE_delay */
 #endif /* !__local_delay_defined */

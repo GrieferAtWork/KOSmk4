@@ -25,41 +25,41 @@
 
 /* KOS futex  operations (for  use with  the lfutex()  system
  * call, though can't be used with the futex() system call!). */
-#define LFUTEX_WAKE               0x00000000 /* >> result = 0; while (val && sig_send(uaddr)) ++result; return result; */
-#define LFUTEX_EXPREND            0x00000000 /* Expression terminator for `lfutexexpr(2)' */
-#define LFUTEX_NOP                0x00000001 /* >> return 0; // Only valid in `lfutexexpr(2)' */
-#define LFUTEX_WAKEMASK           0x00000001 /* Same as `LFUTEX_WAKE', but clear/set  certain bits once there are  no
-                                              * more threads to wake up, before broadcasting all remaining threads to
-                                              * ensure that futex bits are in a consistent state.
-                                              * Mainly intended to be used like this (allowing something like `sem_post()'
-                                              * to be  implemented  without the  need  of  a system  call  whenever  there
-                                              * aren't any waiting threads):
-                                              * >> if (BIT_SET(LFUTEX_WAIT_LOCK_WAITERS))
-                                              * >>     wakemask(timeout: ~LFUTEX_WAIT_LOCK_WAITERS, val2: 0);
-                                              * Behavior:
-                                              * >> result = 0;
-                                              * >> while (val && sig_send(uaddr))
-                                              * >>     ++result, --val;
-                                              * >> if (result < val && val != 0) {
-                                              * >>     *uaddr = (*uaddr & (lfutex_t)timeout) | val2;
-                                              * >>     result += sig_broadcast(uaddr);
-                                              * >>     if (result > val)
-                                              * >>         result = val;
-                                              * >> }
-                                              * >> return result; */
-#define LFUTEX_WAIT_WHILE         0x00000010 /* >> if (*uaddr == val) return waitfor(uaddr); return 1; */
-#define LFUTEX_WAIT_UNTIL         0x00000011 /* >> if (*uaddr != val) return waitfor(uaddr); return 1; */
-#define LFUTEX_WAIT_WHILE_ABOVE   0x00000012 /* >> if ((unsigned)*uaddr > val) return waitfor(uaddr); return 1; */
-#define LFUTEX_WAIT_WHILE_BELOW   0x00000013 /* >> if ((unsigned)*uaddr < val) return waitfor(uaddr); return 1; */
-#define LFUTEX_WAIT_WHILE_BITMASK 0x00000014 /* >> if ((*uaddr & val) == val2) return waitfor(uaddr); return 1; */
-#define LFUTEX_WAIT_UNTIL_BITMASK 0x00000015 /* >> if ((*uaddr & val) != val2) return waitfor(uaddr); return 1; */
-#define LFUTEX_WAIT_LOCK          0x00000018 /* >> if ((*uaddr & LFUTEX_WAIT_LOCK_TIDMASK) == 0) {
-                                              * >>     *uaddr = (*uaddr & ~LFUTEX_WAIT_LOCK_TIDMASK) | (val ? val : gettid());
-                                              * >>     return 1;
-                                              * >> } else {
-                                              * >>     *uaddr |= LFUTEX_WAIT_LOCK_WAITERS;
-                                              * >>     return waitfor(uaddr); // 0, E_INTERRUPT or -ETIMEDOUT
-                                              * >> } */
+#define LFUTEX_WAKE               __UINT32_C(0x00000000) /* >> result = 0; while (val && sig_send(uaddr)) ++result; return result; */
+#define LFUTEX_EXPREND            __UINT32_C(0x00000000) /* Expression terminator for `lfutexexpr(2)' */
+#define LFUTEX_NOP                __UINT32_C(0x00000001) /* >> return 0; // Only valid in `lfutexexpr(2)' */
+#define LFUTEX_WAKEMASK           __UINT32_C(0x00000001) /* Same as `LFUTEX_WAKE', but clear/set  certain bits once there are  no
+                                                          * more threads to wake up, before broadcasting all remaining threads to
+                                                          * ensure that futex bits are in a consistent state.
+                                                          * Mainly intended to be used like this (allowing something like `sem_post()'
+                                                          * to be  implemented  without the  need  of  a system  call  whenever  there
+                                                          * aren't any waiting threads):
+                                                          * >> if (BIT_SET(LFUTEX_WAIT_LOCK_WAITERS))
+                                                          * >>     wakemask(timeout: ~LFUTEX_WAIT_LOCK_WAITERS, val2: 0);
+                                                          * Behavior:
+                                                          * >> result = 0;
+                                                          * >> while (val && sig_send(uaddr))
+                                                          * >>     ++result, --val;
+                                                          * >> if (result < val && val != 0) {
+                                                          * >>     *uaddr = (*uaddr & (lfutex_t)timeout) | val2;
+                                                          * >>     result += sig_broadcast(uaddr);
+                                                          * >>     if (result > val)
+                                                          * >>         result = val;
+                                                          * >> }
+                                                          * >> return result; */
+#define LFUTEX_WAIT_WHILE         __UINT32_C(0x00000010) /* >> if (*uaddr == val) return waitfor(uaddr); return 1; */
+#define LFUTEX_WAIT_UNTIL         __UINT32_C(0x00000011) /* >> if (*uaddr != val) return waitfor(uaddr); return 1; */
+#define LFUTEX_WAIT_WHILE_ABOVE   __UINT32_C(0x00000012) /* >> if ((unsigned)*uaddr > val) return waitfor(uaddr); return 1; */
+#define LFUTEX_WAIT_WHILE_BELOW   __UINT32_C(0x00000013) /* >> if ((unsigned)*uaddr < val) return waitfor(uaddr); return 1; */
+#define LFUTEX_WAIT_WHILE_BITMASK __UINT32_C(0x00000014) /* >> if ((*uaddr & val) == val2) return waitfor(uaddr); return 1; */
+#define LFUTEX_WAIT_UNTIL_BITMASK __UINT32_C(0x00000015) /* >> if ((*uaddr & val) != val2) return waitfor(uaddr); return 1; */
+#define LFUTEX_WAIT_LOCK          __UINT32_C(0x00000018) /* >> if ((*uaddr & LFUTEX_WAIT_LOCK_TIDMASK) == 0) {
+                                                          * >>     *uaddr = (*uaddr & ~LFUTEX_WAIT_LOCK_TIDMASK) | (val ? val : gettid());
+                                                          * >>     return 1;
+                                                          * >> } else {
+                                                          * >>     *uaddr |= LFUTEX_WAIT_LOCK_WAITERS;
+                                                          * >>     return waitfor(uaddr); // 0, E_INTERRUPT or -ETIMEDOUT
+                                                          * >> } */
 
 
 
@@ -116,13 +116,13 @@
 
 /* Check if the given futex command `x' uses the timeout argument. */
 #define LFUTEX_USES_TIMEOUT(x) ((x) & 0x10)
-#define LFUTEX_CMDMASK  0x00ffffff
-#define LFUTEX_FLAGMASK 0xff000000
+#define LFUTEX_CMDMASK         __UINT32_C(0x00ffffff) /* Mask for lfutex(2) command code */
+#define LFUTEX_FLAGMASK        __UINT32_C(0xff000000) /* Mask for lfutex(2) command flags */
 
 /* Flags for waiter futex functions. */
-#define LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE 0x00000000 /* Default: Timeouts are given as absolute positions of CPU quantum time (`CLOCK_PROCESS_CPUTIME_ID') */
-#define LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE 0x40000000 /* The given timeout argument describes a timeout relative to the point when waiting starts */
-#define LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME 0x80000000 /* The given timeout argument is in absolute realtime (`CLOCK_REALTIME') */
-#define LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL  0x20000000 /* Connect to signals for polling. (s.a. `task_connect_for_poll()') */
+#define LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE __UINT32_C(0x00000000) /* Default: Timeouts are given as absolute positions of CPU quantum time (`CLOCK_PROCESS_CPUTIME_ID') */
+#define LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE __UINT32_C(0x40000000) /* The given timeout argument describes a timeout relative to the point when waiting starts */
+#define LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME __UINT32_C(0x80000000) /* The given timeout argument is in absolute realtime (`CLOCK_REALTIME') */
+#define LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL  __UINT32_C(0x20000000) /* Connect to signals for polling. (s.a. `task_connect_for_poll()') */
 
 #endif /* !_KOS_ASM_FUTEX_H */

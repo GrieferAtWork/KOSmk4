@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf68f1b3 */
+/* HASH CRC-32:0xc4b40329 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -203,6 +203,14 @@ INTDEF NONNULL((2)) size_t (LIBCCALL libc_PReadAll64)(fd_t fd, void *buf, size_t
  * @return: -1: Error (s.a. `errno') */
 INTDEF NONNULL((1)) void (LIBCCALL libc_Pipe2)(fd_t pipedes[2], oflag_t flags) THROWS(...);
 INTDEF fd_t (LIBCCALL libc_Dup3)(fd_t oldfd, fd_t newfd, oflag_t flags) THROWS(...);
+/* >> get_current_dir_name(3)
+ * Return an malloc(3)'d string  representing the current working  directory
+ * This is usually the same  as `getcwd(NULL, 0)', however standards  caused
+ * this function to be badly designed, as iff `$PWD' is defined and correct,
+ * it is strdup(3)'d  and returned (correctness  is determined by  comparing
+ * `stat($PWD)' against `stat(".")').
+ * Due to the mandatory dependency on `getenv(3)', this function can't be
+ * made thread-safe, so try not to use this one. */
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED char *(LIBCCALL libc_GetCurrentDirName)(void) THROWS(...);
 INTDEF void (LIBCCALL libc_SyncFs)(fd_t fd) THROWS(...);
 INTDEF void (LIBCCALL libc_GetResUid)(uid_t *ruid, uid_t *euid, uid_t *suid) THROWS(...);

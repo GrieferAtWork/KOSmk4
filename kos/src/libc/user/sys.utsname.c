@@ -21,9 +21,11 @@
 #define GUARD_LIBC_USER_SYS_UTSNAME_C 1
 
 #include "../api.h"
-#include "sys.utsname.h"
+/**/
 
 #include <kos/syscalls.h>
+
+#include "sys.utsname.h"
 
 DECL_BEGIN
 
@@ -36,15 +38,10 @@ INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_uname)(struct utsname *name)
 /*[[[body:libc_uname]]]*/
 {
-	errno_t result;
-	result = sys_uname(name);
+	errno_t result = sys_uname(name);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_uname]]]*/
-
-
-
-
 
 /*[[[start:exports,hash:CRC-32=0xe2e9031d]]]*/
 DEFINE_PUBLIC_ALIAS(__uname, libc_uname);

@@ -298,7 +298,15 @@ INTERN ATTR_SECTION(".text.crt.except.io.large.read") NONNULL((2)) size_t
 #endif /* MAGIC:alias */
 /*[[[end:libc_PReadAll64]]]*/
 
-/*[[[head:libc_GetCurrentDirName,hash:CRC-32=0x749e7a69]]]*/
+/*[[[head:libc_GetCurrentDirName,hash:CRC-32=0x8c0d341a]]]*/
+/* >> get_current_dir_name(3)
+ * Return an malloc(3)'d string  representing the current working  directory
+ * This is usually the same  as `getcwd(NULL, 0)', however standards  caused
+ * this function to be badly designed, as iff `$PWD' is defined and correct,
+ * it is strdup(3)'d  and returned (correctness  is determined by  comparing
+ * `stat($PWD)' against `stat(".")').
+ * Due to the mandatory dependency on `getenv(3)', this function can't be
+ * made thread-safe, so try not to use this one. */
 INTERN ATTR_SECTION(".text.crt.except.fs.basic_property") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED char *
 (LIBCCALL libc_GetCurrentDirName)(void) THROWS(...)
 /*[[[body:libc_GetCurrentDirName]]]*/

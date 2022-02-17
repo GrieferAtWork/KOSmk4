@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6f8cbb4 */
+/* HASH CRC-32:0xddfa587a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -478,9 +478,25 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(PReadAll64, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,Pipe2,(__fd_t __pipedes[2], __oflag_t __flags),(__pipedes,__flags))
 __CDECLARE_OPT(,__fd_t,__THROWING,Dup3,(__fd_t __oldfd, __fd_t __newfd, __oflag_t __flags),(__oldfd,__newfd,__flags))
 #ifdef __CRT_HAVE_GetCurrentDirName
+/* >> get_current_dir_name(3)
+ * Return an malloc(3)'d string  representing the current working  directory
+ * This is usually the same  as `getcwd(NULL, 0)', however standards  caused
+ * this function to be badly designed, as iff `$PWD' is defined and correct,
+ * it is strdup(3)'d  and returned (correctness  is determined by  comparing
+ * `stat($PWD)' against `stat(".")').
+ * Due to the mandatory dependency on `getenv(3)', this function can't be
+ * made thread-safe, so try not to use this one. */
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED,char *,__THROWING,GetCurrentDirName,(void),())
 #elif defined(__CRT_HAVE_GetCwd)
 #include <libc/local/kos.unistd/GetCurrentDirName.h>
+/* >> get_current_dir_name(3)
+ * Return an malloc(3)'d string  representing the current working  directory
+ * This is usually the same  as `getcwd(NULL, 0)', however standards  caused
+ * this function to be badly designed, as iff `$PWD' is defined and correct,
+ * it is strdup(3)'d  and returned (correctness  is determined by  comparing
+ * `stat($PWD)' against `stat(".")').
+ * Due to the mandatory dependency on `getenv(3)', this function can't be
+ * made thread-safe, so try not to use this one. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(GetCurrentDirName, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED char *(__LIBCCALL GetCurrentDirName)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(GetCurrentDirName))(); })
 #endif /* ... */
 #ifdef __CRT_HAVE_SyncFs

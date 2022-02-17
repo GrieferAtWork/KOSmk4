@@ -132,7 +132,8 @@ NOTHROW_RPC(LIBCCALL libc_preadv)(fd_t fd,
 /*[[[body:libc_preadv]]]*/
 {
 	ssize_t result;
-	result = sys_preadv(fd, iov, (size_t)count, (uint64_t)(pos_t)offset);
+	result = sys_preadv(fd, iov, (size_t)count,
+	                    (uint64_t)(pos_t)offset);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_preadv]]]*/
@@ -150,7 +151,8 @@ NOTHROW_RPC(LIBCCALL libc_pwritev)(fd_t fd,
 /*[[[body:libc_pwritev]]]*/
 {
 	ssize_t result;
-	result = sys_pwritev(fd, iov, (size_t)count, (uint64_t)(pos_t)offset);
+	result = sys_pwritev(fd, iov, (size_t)count,
+	                     (uint64_t)(pos_t)offset);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_pwritev]]]*/
@@ -171,7 +173,8 @@ NOTHROW_RPC(LIBCCALL libc_preadv64)(fd_t fd,
 /*[[[body:libc_preadv64]]]*/
 {
 	ssize_t result;
-	result = sys_preadv(fd, iov, (size_t)count, (uint64_t)(pos64_t)offset);
+	result = sys_preadv(fd, iov, (size_t)count,
+	                    (uint64_t)(pos64_t)offset);
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
@@ -193,7 +196,8 @@ NOTHROW_RPC(LIBCCALL libc_pwritev64)(fd_t fd,
 /*[[[body:libc_pwritev64]]]*/
 {
 	ssize_t result;
-	result = sys_pwritev(fd, iov, (size_t)count, (uint64_t)(pos64_t)offset);
+	result = sys_pwritev(fd, iov, (size_t)count,
+	                     (uint64_t)(pos64_t)offset);
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */

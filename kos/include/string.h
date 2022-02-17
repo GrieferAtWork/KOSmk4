@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ae4f776 */
+/* HASH CRC-32:0xd5d152d4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -611,7 +611,7 @@ extern "C++" {
 /* >> strstr(3)
  * Search for a given `needle' appearing as a sub-string within `haystack'
  * If no such needle exists, return `NULL' */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strstr,(char *__haystack, char *__needle),strstr,{ return __builtin_strstr(__haystack, __needle); })
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strstr,(char *__haystack, char const *__needle),strstr,{ return __builtin_strstr(__haystack, __needle); })
 /* >> strstr(3)
  * Search for a given `needle' appearing as a sub-string within `haystack'
  * If no such needle exists, return `NULL' */
@@ -629,7 +629,7 @@ extern "C++" {
 /* >> strstr(3)
  * Search for a given `needle' appearing as a sub-string within `haystack'
  * If no such needle exists, return `NULL' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strstr,(char *__haystack, char *__needle),strstr,(__haystack,__needle))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strstr,(char *__haystack, char const *__needle),strstr,(__haystack,__needle))
 /* >> strstr(3)
  * Search for a given `needle' appearing as a sub-string within `haystack'
  * If no such needle exists, return `NULL' */
@@ -650,7 +650,7 @@ extern "C++" {
 /* >> strstr(3)
  * Search for a given `needle' appearing as a sub-string within `haystack'
  * If no such needle exists, return `NULL' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strstr)(char *__haystack, char *__needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strstr))(__haystack, __needle); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strstr)(char *__haystack, char const *__needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strstr))(__haystack, __needle); }
 /* >> strstr(3)
  * Search for a given `needle' appearing as a sub-string within `haystack'
  * If no such needle exists, return `NULL' */

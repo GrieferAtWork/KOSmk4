@@ -21,8 +21,11 @@
 #define GUARD_LIBC_USER_SYS_USTAT_C 1
 
 #include "../api.h"
-#include "sys.ustat.h"
+/**/
+
 #include <kos/syscalls.h>
+
+#include "sys.ustat.h"
 
 DECL_BEGIN
 
@@ -33,8 +36,7 @@ NOTHROW_NCX(LIBCCALL libc_ustat)(dev_t dev,
                                  struct ustat *ubuf)
 /*[[[body:libc_ustat]]]*/
 {
-	errno_t result;
-	result = sys_ustat(dev, ubuf);
+	errno_t result = sys_ustat(dev, ubuf);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_ustat]]]*/

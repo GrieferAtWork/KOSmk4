@@ -1583,8 +1583,8 @@ double scalb(double x, double fn) {
 %#endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) */
 
 %#ifdef __USE_MISC
-[[crtbuiltin, dos_only_export_alias("_scalbf")]]
-[[export_alias("__scalbf")]]             scalbf(*) %{generate(double2float("scalb"))}
+[[dos_only_export_alias("_scalbf")]]
+[[crtbuiltin, export_alias("__scalbf")]] scalbf(*) %{generate(double2float("scalb"))}
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[crtbuiltin, export_alias("__scalbl")]] scalbl(*) %{generate(double2ldouble("scalb"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */

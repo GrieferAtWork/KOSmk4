@@ -326,7 +326,7 @@ int setns($fd_t fd, __STDC_INT_AS_UINT_T nstype);
 @@Assuming that  the calling  thread was  constructed by  `clone()',
 @@calling this function has the same effect as returning `EXIT_CODE'
 @@from `clone()'s `FN' callback
-[[ATTR_NORETURN, section(".text.crt{|.dos}.sched.access")]]
+[[noreturn, section(".text.crt{|.dos}.sched.access")]]
 void exit_thread(int exit_code);
 %#endif /* __USE_KOS */
 %#endif /* __USE_GNU || __USE_KOS */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13cff908 */
+/* HASH CRC-32:0xde1f9537 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -373,7 +373,6 @@ INTDEF fd_t NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd, fd_t newfd, oflag_t flag
  * @return: -1: Error (s.a. `errno') */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pipe2)(fd_t pipedes[2], oflag_t flags);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_syncfs)(fd_t fd);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_group_member)(gid_t gid);
 /* >> getresuid(2)
  * Get the real, effective, and saved UID of the calling thread.
  * @return: 0 : Success
@@ -395,11 +394,6 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_setresuid)(uid_t ruid, uid_t euid, uid_t su
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setresgid)(gid_t rgid, gid_t egid, gid_t sgid);
-/* Sleep for `useconds' microseconds (1/1.000.000 seconds) */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_usleep)(useconds_t useconds);
-INTDEF ATTR_DEPRECATED("Use getcwd()") NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_getwd)(char *buf);
-INTDEF ATTR_DEPRECATED("Use getcwd()") NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_getwd)(char *buf);
-INTDEF useconds_t NOTHROW_NCX(LIBCCALL libc_ualarm)(useconds_t value, useconds_t interval);
 /* >> vfork(2)
  * Same as `fork(2)', but the child process may be executed within in the same VM
  * as the parent process, with the  parent process remaining suspended until  the

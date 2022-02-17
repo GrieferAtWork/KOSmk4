@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7812cc88 */
+/* HASH CRC-32:0xeafbca7a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2014,9 +2014,25 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 #endif /* !... */
 #endif /* !__environ_defined */
 #ifdef __CRT_HAVE_get_current_dir_name
+/* >> get_current_dir_name(3)
+ * Return an malloc(3)'d string  representing the current working  directory
+ * This is usually the same  as `getcwd(NULL, 0)', however standards  caused
+ * this function to be badly designed, as iff `$PWD' is defined and correct,
+ * it is strdup(3)'d  and returned (correctness  is determined by  comparing
+ * `stat($PWD)' against `stat(".")').
+ * Due to the mandatory dependency on `getenv(3)', this function can't be
+ * made thread-safe, so try not to use this one. */
 __CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_RPC,get_current_dir_name,(void),())
 #elif defined(__CRT_HAVE_getcwd) || defined(__CRT_HAVE__getcwd)
 #include <libc/local/unistd/get_current_dir_name.h>
+/* >> get_current_dir_name(3)
+ * Return an malloc(3)'d string  representing the current working  directory
+ * This is usually the same  as `getcwd(NULL, 0)', however standards  caused
+ * this function to be badly designed, as iff `$PWD' is defined and correct,
+ * it is strdup(3)'d  and returned (correctness  is determined by  comparing
+ * `stat($PWD)' against `stat(".")').
+ * Due to the mandatory dependency on `getenv(3)', this function can't be
+ * made thread-safe, so try not to use this one. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(get_current_dir_name, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED char *__NOTHROW_RPC(__LIBCCALL get_current_dir_name)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(get_current_dir_name))(); })
 #endif /* ... */
 #ifdef __CRT_HAVE_syncfs
@@ -2025,7 +2041,26 @@ __CDECLARE(,int,__NOTHROW_RPC,syncfs,(__fd_t __fd),(__fd))
 #include <libc/local/unistd/syncfs.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(syncfs, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL syncfs)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(syncfs))(__fd); })
 #endif /* !__CRT_HAVE_syncfs */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,group_member,(__gid_t __gid),(__gid))
+#ifdef __CRT_HAVE_group_member
+/* >> group_member(3)
+ * Check if `gid' is an element of `getgroups(2)'
+ * @return:  1: Yes, it's a member
+ * @return:  0: No, it's not a member
+ * @return: -1: Error (s.a. `errno') */
+__CDECLARE(,int,__NOTHROW_NCX,group_member,(__gid_t __gid),(__gid))
+#else /* __CRT_HAVE_group_member */
+#include <hybrid/__alloca.h>
+#include <libc/errno.h>
+#if (defined(__CRT_HAVE_getgroups) || defined(__CRT_HAVE___getgroups) || defined(__CRT_HAVE___libc_getgroups)) && defined(__hybrid_alloca) && defined(__libc_geterrno) && defined(__EINVAL)
+#include <libc/local/unistd/group_member.h>
+/* >> group_member(3)
+ * Check if `gid' is an element of `getgroups(2)'
+ * @return:  1: Yes, it's a member
+ * @return:  0: No, it's not a member
+ * @return: -1: Error (s.a. `errno') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(group_member, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL group_member)(__gid_t __gid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(group_member))(__gid); })
+#endif /* (__CRT_HAVE_getgroups || __CRT_HAVE___getgroups || __CRT_HAVE___libc_getgroups) && __hybrid_alloca && __libc_geterrno && __EINVAL */
+#endif /* !__CRT_HAVE_group_member */
 /* >> getresuid(2)
  * Get the real, effective, and saved UID of the calling thread.
  * @return: 0 : Success
@@ -2050,20 +2085,40 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,setresgid,(__gid_t __rgid, __gid_t __egid, __g
 #endif /* __USE_GNU */
 #if (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8)) || defined(__USE_MISC)
 #ifdef __CRT_HAVE_usleep
-/* Sleep for `useconds' microseconds (1/1.000.000 seconds) */
+/* >> usleep(3)
+ * Sleep for `useconds' microseconds (1/1.000.000 seconds) */
 __CDECLARE(,int,__NOTHROW_RPC,usleep,(__useconds_t __useconds),(__useconds))
-#elif defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_delay)
+#elif defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep) || defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_delay)
 #include <libc/local/unistd/usleep.h>
-/* Sleep for `useconds' microseconds (1/1.000.000 seconds) */
+/* >> usleep(3)
+ * Sleep for `useconds' microseconds (1/1.000.000 seconds) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(usleep, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL usleep)(__useconds_t __useconds) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(usleep))(__useconds); })
 #endif /* ... */
 #ifdef __CRT_HAVE_getwd
+/* >> getwd(3)
+ * Deprecated, alternate variant of `getcwd()'. It
+ * should be obvious why you shouldn't use this one.
+ * And if it isn't, take a look at the arguments of
+ * this function, compared to `getcwd()' */
 __CDECLARE(__ATTR_DEPRECATED("Use getcwd()") __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getwd,(char *__buf),(__buf))
 #elif defined(__CRT_HAVE_getcwd) || defined(__CRT_HAVE__getcwd)
 #include <libc/local/unistd/getwd.h>
+/* >> getwd(3)
+ * Deprecated, alternate variant of `getcwd()'. It
+ * should be obvious why you shouldn't use this one.
+ * And if it isn't, take a look at the arguments of
+ * this function, compared to `getcwd()' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getwd, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Use getcwd()") __ATTR_NONNULL((1)) char *__NOTHROW_RPC(__LIBCCALL getwd)(char *__buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getwd))(__buf); })
 #endif /* ... */
-__CDECLARE_OPT(,__useconds_t,__NOTHROW_NCX,ualarm,(__useconds_t __value, __useconds_t __interval),(__value,__interval))
+#ifdef __CRT_HAVE_ualarm
+__CDECLARE(,__useconds_t,__NOTHROW_NCX,ualarm,(__useconds_t __value, __useconds_t __interval),(__value,__interval))
+#else /* __CRT_HAVE_ualarm */
+#include <asm/os/itimer.h>
+#if defined(__ITIMER_REAL) && (defined(__CRT_HAVE_setitimer64) || defined(__CRT_HAVE_setitimer) || defined(__CRT_HAVE___setitimer) || defined(__CRT_HAVE___libc_setitimer))
+#include <libc/local/unistd/ualarm.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(ualarm, __FORCELOCAL __ATTR_ARTIFICIAL __useconds_t __NOTHROW_NCX(__LIBCCALL ualarm)(__useconds_t __value, __useconds_t __interval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ualarm))(__value, __interval); })
+#endif /* __ITIMER_REAL && (__CRT_HAVE_setitimer64 || __CRT_HAVE_setitimer || __CRT_HAVE___setitimer || __CRT_HAVE___libc_setitimer) */
+#endif /* !__CRT_HAVE_ualarm */
 #ifndef __vfork_defined
 #define __vfork_defined
 #ifdef __CRT_HAVE_vfork

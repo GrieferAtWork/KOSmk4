@@ -21,6 +21,8 @@
 #define GUARD_LIBC_USER_TTYENT_C 1
 
 #include "../api.h"
+/**/
+
 #include "ttyent.h"
 
 DECL_BEGIN

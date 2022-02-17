@@ -54,8 +54,6 @@ NOTHROW_NCX(libd___timezone)(void) {
 }
 
 
-
-
 /*[[[head:libc_tzset,hash:CRC-32=0x58b1d4b5]]]*/
 /* >> tzset(3)
  * Set time conversion information from the `$TZ' environment variable.

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ccf73aa */
+/* HASH CRC-32:0xe57d5999 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -307,12 +307,43 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_pwriteall64)(fd_t fd, void
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_pipe2)(fd_t pipedes[2], oflag_t flags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> get_current_dir_name(3)
+ * Return an malloc(3)'d string  representing the current working  directory
+ * This is usually the same  as `getcwd(NULL, 0)', however standards  caused
+ * this function to be badly designed, as iff `$PWD' is defined and correct,
+ * it is strdup(3)'d  and returned (correctness  is determined by  comparing
+ * `stat($PWD)' against `stat(".")').
+ * Due to the mandatory dependency on `getenv(3)', this function can't be
+ * made thread-safe, so try not to use this one. */
 INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_RPC(LIBDCALL libd_get_current_dir_name)(void);
+/* >> get_current_dir_name(3)
+ * Return an malloc(3)'d string  representing the current working  directory
+ * This is usually the same  as `getcwd(NULL, 0)', however standards  caused
+ * this function to be badly designed, as iff `$PWD' is defined and correct,
+ * it is strdup(3)'d  and returned (correctness  is determined by  comparing
+ * `stat($PWD)' against `stat(".")').
+ * Due to the mandatory dependency on `getenv(3)', this function can't be
+ * made thread-safe, so try not to use this one. */
 INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_RPC(LIBCCALL libc_get_current_dir_name)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF int NOTHROW_RPC(LIBDCALL libd_syncfs)(fd_t fd);
+/* >> group_member(3)
+ * Check if `gid' is an element of `getgroups(2)'
+ * @return:  1: Yes, it's a member
+ * @return:  0: No, it's not a member
+ * @return: -1: Error (s.a. `errno') */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_group_member)(gid_t gid);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> group_member(3)
+ * Check if `gid' is an element of `getgroups(2)'
+ * @return:  1: Yes, it's a member
+ * @return:  0: No, it's not a member
+ * @return: -1: Error (s.a. `errno') */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_group_member)(gid_t gid);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getresuid(2)
  * Get the real, effective, and saved UID of the calling thread.
  * @return: 0 : Success
@@ -334,9 +365,34 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_setresuid)(uid_t ruid, uid_t euid, uid_t su
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_setresgid)(gid_t rgid, gid_t egid, gid_t sgid);
-/* Sleep for `useconds' microseconds (1/1.000.000 seconds) */
+/* >> usleep(3)
+ * Sleep for `useconds' microseconds (1/1.000.000 seconds) */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_usleep)(useconds_t useconds);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> usleep(3)
+ * Sleep for `useconds' microseconds (1/1.000.000 seconds) */
+INTDEF int NOTHROW_RPC(LIBCCALL libc_usleep)(useconds_t useconds);
+/* >> getwd(3)
+ * Deprecated, alternate variant of `getcwd()'. It
+ * should be obvious why you shouldn't use this one.
+ * And if it isn't, take a look at the arguments of
+ * this function, compared to `getcwd()' */
+INTDEF ATTR_DEPRECATED("Use getcwd()") NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_getwd)(char *buf);
+/* >> getwd(3)
+ * Deprecated, alternate variant of `getcwd()'. It
+ * should be obvious why you shouldn't use this one.
+ * And if it isn't, take a look at the arguments of
+ * this function, compared to `getcwd()' */
+INTDEF ATTR_DEPRECATED("Use getcwd()") NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_getwd)(char *buf);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF useconds_t NOTHROW_NCX(LIBDCALL libd_ualarm)(useconds_t value, useconds_t interval);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF useconds_t NOTHROW_NCX(LIBCCALL libc_ualarm)(useconds_t value, useconds_t interval);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fchown(2)
  * Change the ownership of a given `fd' to `group:owner' */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_fchown)(fd_t fd, uid_t owner, gid_t group);

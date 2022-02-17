@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd543dea */
+/* HASH CRC-32:0xfd6845a3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,9 @@
 #include "../user/sys.ioctl.h"
 #include "../user/sys.poll.h"
 #include "../user/sys.socket.h"
+#include "../user/sys.time.h"
 #include "termios.h"
+#include "../user/time.h"
 
 DECL_BEGIN
 
@@ -285,6 +287,14 @@ NOTHROW_NCX(LIBCCALL libc_isatty)(fd_t fd) {
 #endif /* (!__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl) || !__TCGETA */
 }
 #include <bits/os/stat.h>
+/* >> get_current_dir_name(3)
+ * Return an malloc(3)'d string  representing the current working  directory
+ * This is usually the same  as `getcwd(NULL, 0)', however standards  caused
+ * this function to be badly designed, as iff `$PWD' is defined and correct,
+ * it is strdup(3)'d  and returned (correctness  is determined by  comparing
+ * `stat($PWD)' against `stat(".")').
+ * Due to the mandatory dependency on `getenv(3)', this function can't be
+ * made thread-safe, so try not to use this one. */
 INTERN ATTR_SECTION(".text.crt.dos.fs.basic_property") ATTR_MALLOC WUNUSED char *
 NOTHROW_RPC(LIBDCALL libd_get_current_dir_name)(void) {
 #if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && ((defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))) || (defined(__CRT_HAVE_stat64) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)))) && (defined(__CRT_HAVE_strdup) || defined(__CRT_HAVE__strdup) || defined(__CRT_HAVE___strdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign))
@@ -305,6 +315,14 @@ NOTHROW_RPC(LIBDCALL libd_get_current_dir_name)(void) {
 	return libd_getcwd(NULL, 0);
 }
 #include <bits/os/stat.h>
+/* >> get_current_dir_name(3)
+ * Return an malloc(3)'d string  representing the current working  directory
+ * This is usually the same  as `getcwd(NULL, 0)', however standards  caused
+ * this function to be badly designed, as iff `$PWD' is defined and correct,
+ * it is strdup(3)'d  and returned (correctness  is determined by  comparing
+ * `stat($PWD)' against `stat(".")').
+ * Due to the mandatory dependency on `getenv(3)', this function can't be
+ * made thread-safe, so try not to use this one. */
 INTERN ATTR_SECTION(".text.crt.fs.basic_property") ATTR_MALLOC WUNUSED char *
 NOTHROW_RPC(LIBCCALL libc_get_current_dir_name)(void) {
 #if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && ((defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))) || (defined(__CRT_HAVE_stat64) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)))) && (defined(__CRT_HAVE_strdup) || defined(__CRT_HAVE__strdup) || defined(__CRT_HAVE___strdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign))
@@ -323,6 +341,99 @@ NOTHROW_RPC(LIBCCALL libc_get_current_dir_name)(void) {
 	}
 #endif /* (__CRT_HAVE_getenv || __LOCAL_environ) && ((__CRT_HAVE_kstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_stat && (!__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) || (__CRT_HAVE_stat64 && (__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64))) && (__CRT_HAVE_strdup || __CRT_HAVE__strdup || __CRT_HAVE___strdup || __CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) */
 	return libc_getcwd(NULL, 0);
+}
+#include <hybrid/__alloca.h>
+#include <asm/os/limits.h>
+#include <libc/errno.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(__group_member_impl) __ATTR_NOINLINE int
+(__LIBCCALL __group_member_impl)(gid_t gid, unsigned int bufsize) {
+	unsigned int i;
+	gid_t *groups = (gid_t *)__hybrid_alloca(bufsize * sizeof(*groups));
+	int n         = getgroups((int)bufsize, groups);
+	if unlikely(n < 0)
+		return n;
+	for (i = 0; i < (unsigned int)n; ++i) {
+		if (groups[i] == gid)
+			return 1;
+	}
+	return 0;
+}
+__NAMESPACE_LOCAL_END
+/* >> group_member(3)
+ * Check if `gid' is an element of `getgroups(2)'
+ * @return:  1: Yes, it's a member
+ * @return:  0: No, it's not a member
+ * @return: -1: Error (s.a. `errno') */
+INTERN ATTR_SECTION(".text.crt.sched.user") int
+NOTHROW_NCX(LIBCCALL libc_group_member)(gid_t gid) {
+	int result;
+#if !defined(__NGROUPS_MAX) || __NGROUPS_MAX <= 0 || __NGROUPS_MAX >= 32
+	unsigned int size = 32;
+#else /* !__NGROUPS_MAX || __NGROUPS_MAX <= 0 || __NGROUPS_MAX >= 32 */
+	unsigned int size = __NGROUPS_MAX;
+#endif /* __NGROUPS_MAX && __NGROUPS_MAX > 0 && __NGROUPS_MAX < 32 */
+	for (;;) {
+		result = (__NAMESPACE_LOCAL_SYM __group_member_impl)(gid, size);
+		if (result >= 0)
+			break;
+		if (__libc_geterrno() != __EINVAL)
+			break;
+		/* Try again with a larger buffer. */
+		size *= 2;
+	}
+	return result;
+}
+#include <bits/os/timespec.h>
+#include <bits/types.h>
+/* >> usleep(3)
+ * Sleep for `useconds' microseconds (1/1.000.000 seconds) */
+INTERN ATTR_SECTION(".text.crt.system.utility") int
+NOTHROW_RPC(LIBCCALL libc_usleep)(useconds_t useconds) {
+#if defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
+	struct timespec ts;
+	ts.tv_sec  = (time_t)(useconds / __UINT32_C(1000000));
+	ts.tv_nsec = (syscall_ulong_t)(useconds % __UINT32_C(1000000)) * __UINT16_C(1000);
+	return libc_nanosleep(&ts, NULL);
+#else /* __CRT_HAVE_nanosleep64 || __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep || __CRT_HAVE___libc_nanosleep */
+	__crtSleep(useconds / 1000l); /*USEC_PER_MSEC*/
+	return 0;
+#endif /* !__CRT_HAVE_nanosleep64 && !__CRT_HAVE_nanosleep && !__CRT_HAVE___nanosleep && !__CRT_HAVE___libc_nanosleep */
+}
+/* >> getwd(3)
+ * Deprecated, alternate variant of `getcwd()'. It
+ * should be obvious why you shouldn't use this one.
+ * And if it isn't, take a look at the arguments of
+ * this function, compared to `getcwd()' */
+INTERN ATTR_SECTION(".text.crt.dos.fs.basic_property") ATTR_DEPRECATED("Use getcwd()") NONNULL((1)) char *
+NOTHROW_RPC(LIBDCALL libd_getwd)(char *buf) {
+	return libd_getcwd(buf, (size_t)-1);
+}
+/* >> getwd(3)
+ * Deprecated, alternate variant of `getcwd()'. It
+ * should be obvious why you shouldn't use this one.
+ * And if it isn't, take a look at the arguments of
+ * this function, compared to `getcwd()' */
+INTERN ATTR_SECTION(".text.crt.fs.basic_property") ATTR_DEPRECATED("Use getcwd()") NONNULL((1)) char *
+NOTHROW_RPC(LIBCCALL libc_getwd)(char *buf) {
+	return libc_getcwd(buf, (size_t)-1);
+}
+#include <asm/os/itimer.h>
+#include <bits/os/itimerval.h>
+INTERN ATTR_SECTION(".text.crt.system.utility") useconds_t
+NOTHROW_NCX(LIBCCALL libc_ualarm)(useconds_t value,
+                                  useconds_t interval) {
+	struct itimerval timer, otimer;
+	timer.it_value.tv_sec     = value / 1000000;
+	timer.it_value.tv_usec    = value % 1000000;
+	timer.it_interval.tv_sec  = interval / 1000000;
+	timer.it_interval.tv_usec = interval % 1000000;
+	if unlikely(libc_setitimer((__itimer_which_t)__ITIMER_REAL, &timer, &otimer) < 0)
+		goto err;
+	return (otimer.it_value.tv_sec * 1000000) +
+	       (otimer.it_value.tv_usec);
+err:
+	return (useconds_t)-1;
 }
 #include <asm/pagesize.h>
 /* >> getpagesize(3)
@@ -1248,6 +1359,11 @@ DEFINE_PUBLIC_ALIAS(__isatty, libc_isatty);
 DEFINE_PUBLIC_ALIAS(isatty, libc_isatty);
 DEFINE_PUBLIC_ALIAS(DOS$get_current_dir_name, libd_get_current_dir_name);
 DEFINE_PUBLIC_ALIAS(get_current_dir_name, libc_get_current_dir_name);
+DEFINE_PUBLIC_ALIAS(group_member, libc_group_member);
+DEFINE_PUBLIC_ALIAS(usleep, libc_usleep);
+DEFINE_PUBLIC_ALIAS(DOS$getwd, libd_getwd);
+DEFINE_PUBLIC_ALIAS(getwd, libc_getwd);
+DEFINE_PUBLIC_ALIAS(ualarm, libc_ualarm);
 DEFINE_PUBLIC_ALIAS(__getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_ALIAS(getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_ALIAS(__getdtablesize, libc_getdtablesize);
