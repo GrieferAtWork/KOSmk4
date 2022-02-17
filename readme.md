@@ -71,9 +71,10 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- [libuuid-1.0.3](https://sourceforge.net/projects/libuuid/files/)
 	- [libjson-c-0.15-20200726](https://github.com/json-c/json-c)
 	- [liblzma-5.2.5](https://tukaani.org/xz/)
+	- [glib-2.70.3](https://gitlab.gnome.org/GNOME/glib/) (libglib)
 	- [libgmp-6.2.1](https://ftp.gnu.org/gnu/gmp/)
 	- [libmpfr-4.1.0](https://ftp.gnu.org/gnu/mpfr/mpfr/)
-	- [glib-2.70.3](https://gitlab.gnome.org/GNOME/glib/) (libglib)
+	- [libmpc-1.2.1](https://ftp.gnu.org/gnu/mpc/)
 - Misc
 	- [X-Server (Experimental)](kos/misc/utilities/README.md#X-server)
 
