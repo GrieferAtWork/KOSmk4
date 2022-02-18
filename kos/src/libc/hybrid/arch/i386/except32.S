@@ -350,9 +350,6 @@ IU(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_E
 IU(	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX(%esp), %ecx)
 IU(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX))
 	movl   %ebx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EBX)
-	leal   SIZEOF_KCPUSTATE(%esp), %ecx
-	movl   %ecx, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP(%esp)
-	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP)
 	movl   %ebp, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EBP)
 	movl   %esi, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESI)
 	movl   %edi, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDI)
@@ -363,7 +360,9 @@ IU(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_E
 	movl   %ecx, FIELD_ERROR_FAULTADDR
 	/* Copy exception information. */
 	movb   $(EXCEPT_FNORMAL), FIELD_ERROR_FLAGS
-	leal   SIZEOF_KCPUSTATE(%esp), %esi /* %esi = &code */
+	leal   SIZEOF_KCPUSTATE(%esp), %esi /* %esi = &code  (== return-sp) */
+	movl   %esi, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP(%esp)
+	movl   %esi, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP)
 IK(	movl   $(this_exception_code), %edi)
 IK(	addl   %fs:0, %edi                            /* %edi = &%fs:this_exception_code */)
 IU(	leal   OFFSET_EXCEPTION_INFO_CODE(%eax), %edi /* %edi = &libc_except_info()->ei_code */)
