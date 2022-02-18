@@ -739,7 +739,8 @@ END(x86_unwind_scpustate_Psp)
 	movq   $(0), thiscpu_x86_ioperm_bitmap(%rbx)
 	movq   %rcx, 0x0(%Pdx)
 	movq   %rcx, 0x8(%Pdx)
-	invlpg (%Pdx)
+	invlpg (thiscpu_x86_iob + 0 * PAGESIZE)(%Pbx)
+	invlpg (thiscpu_x86_iob + 1 * PAGESIZE)(%Pbx)
 #else /* __x86_64__ */
 	xorl   %ecx, %ecx  /* P32_PAGE_ABSENT / PAE_PAGE_ABSENT */
 	movl   %ecx, thiscpu_x86_ioperm_bitmap(%ebx)
@@ -754,7 +755,8 @@ INTERN_FUNCTION(__x86_lazy_disable_ioperm_bitmap_pae)
 END(__x86_lazy_disable_ioperm_bitmap_pae)
 #endif /* !CONFIG_NO_PAGING_PAE */
 .alt_if X86_FEAT_INVLPG
-	invlpg (%Pdx)
+	invlpg (thiscpu_x86_iob + 0 * PAGESIZE)(%Pbx)
+	invlpg (thiscpu_x86_iob + 1 * PAGESIZE)(%Pbx)
 .alt_else
 	/* ... */
 .alt_endif
