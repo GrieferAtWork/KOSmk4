@@ -88,11 +88,11 @@ struct file_blkshift {
  * a normal `pread(2)', with the exception that trying to read past
  * the end of a file will not indicate EOF, but will instead  cause
  * the system call to block until the file was extended by at least
- * one byte.
+ * one byte (blocking is only done on the first byte at `ftr_pos').
  *
  * When the associated file is deleted (as per `unlink(2)') while a
- * tail-read is blocking, the read will no longer block and instead
- * always indicate EOF.
+ * tail-read  is blocking, the  read will no  longer block and will
+ * instead always indicate EOF.
  *
  * Should the file get extended by means of a write() past the end
  * of the file, whatever was written beyond the file's end will be
@@ -104,7 +104,7 @@ struct file_blkshift {
  * doing other os-specific shenanigans relating to dnotify.
  *
  * NOTE: This ioctl can only be used on files that support the  "raw"
- *       i/o  mechanism  (`mfile_hasrawio()'), and  doesn't overwrite
+ *       i/o mechanism (`FILE_IOC_HASRAWIO'),  and doesn't  overwrite
  *       the pread(2) operator. Trying to use this function on a file
  *       to  which this doesn't apply will cause this ioctl to behave
  *       the  same  as `preadf(..., IO_NONBLOCK)',  meaning  that the

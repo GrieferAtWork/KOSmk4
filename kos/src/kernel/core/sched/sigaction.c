@@ -65,7 +65,7 @@ DECL_BEGIN
 PUBLIC ATTR_PERTASK ATTR_ALIGN(REF struct sighand_ptr *) this_sighand_ptr = NULL;
 
 DEFINE_PERTASK_FINI(fini_this_sighand_ptr);
-PRIVATE NOBLOCK ATTR_USED void
+PRIVATE NOBLOCK ATTR_USED NONNULL((1)) void
 NOTHROW(KCALL fini_this_sighand_ptr)(struct task *__restrict thread) {
 	xdecref(FORTASK(thread, this_sighand_ptr));
 }

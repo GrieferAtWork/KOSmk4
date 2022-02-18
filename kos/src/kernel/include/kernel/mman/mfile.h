@@ -930,11 +930,13 @@ struct mfile {
 
 
 
-/* Increment or decrement the size-lock counter. In order to use these  functions,
- * the caller must currently be holding a lock to `self->mf_lock', or at least one
- * of the parts found in the tree of `self->mf_parts'.
- * Alternatively, when `mfile_isanon(self)' is true, then no such requirements are
- * imposed, and use of these functions becomes optional. */
+/* Increment or decrement the size-lock counter. In order to  use
+ * `mfile_trunclock_inc',  the caller must currently be holding a
+ * lock to `self->mf_lock', or at least one of the parts found in
+ * the tree of `self->mf_parts'.
+ * Alternatively, when `mfile_isanon(self)' is true, then no such
+ * requirements are imposed, and  use of these functions  becomes
+ * optional. */
 #define mfile_trunclock_inc(self) \
 	__hybrid_atomic_inc((self)->mf_trunclock, __ATOMIC_ACQUIRE)
 #define mfile_trunclock_dec(self)                                        \
@@ -986,14 +988,14 @@ struct mfile {
 
 /* Mark `what' as having changed for `self'
  * @param: what: Set of `MFILE_F_CHANGED | MFILE_F_ATTRCHANGED' */
-FORCELOCAL NOBLOCK NONNULL((1)) void
-NOTHROW(mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
+EIDECLARE(NOBLOCK NONNULL((1)), void, NOTHROW, FCALL,
+          mfile_changed, (struct mfile *__restrict self, uintptr_t what), {
 	uintptr_t old_flags, new_flags;
 	old_flags = __hybrid_atomic_fetchor(self->mf_flags, what, __ATOMIC_SEQ_CST);
 	new_flags = old_flags | what;
 	if (old_flags != new_flags && self->mf_ops->mo_changed)
 		(*self->mf_ops->mo_changed)(self, old_flags, new_flags);
-}
+})
 
 
 #define _mfile_cinit_blockshift _mfile_init_blockshift

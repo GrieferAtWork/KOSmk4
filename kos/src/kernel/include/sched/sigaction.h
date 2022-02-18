@@ -94,7 +94,7 @@ NOTHROW(FCALL sighand_ptr_destroy)(struct sighand_ptr *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct sighand_ptr, sp_refcnt, sighand_ptr_destroy)
 
 /* [0..1][lock(PRIVATE(THIS_TASK))]
- * User-space  signal   handlers   for   the   calling   thread. */
+ * User-space signal handlers for the calling thread. */
 /* TODO: This field should be changed to [1..1] */
 DATDEF ATTR_PERTASK REF struct sighand_ptr *this_sighand_ptr;
 #define THIS_SIGHAND_PTR        PERTASK_GET(this_sighand_ptr)

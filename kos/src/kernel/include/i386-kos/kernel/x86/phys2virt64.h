@@ -68,7 +68,8 @@ DECL_BEGIN
  * NOTE: When called before `x86_initialize_phys2virt64()',
  *       this function may throw an E_SEGFAULT. Afterwards,
  *       this function is unconditionally NOTHROW! */
-FUNDEF NOBLOCK NOPREEMPT void KCALL x86_phys2virt64_require(void *addr);
+FUNDEF NOBLOCK NOPREEMPT void FCALL
+x86_phys2virt64_require(void *addr);
 
 /* A  special VM  node (that isn't  linked to any  backing data part,
  * and is thus a so-called ~reserved~ memory mapping), but is checked
