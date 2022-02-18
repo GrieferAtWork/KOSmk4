@@ -89,6 +89,11 @@ PRIVATE PAGEDIR_PAGEALIGNED size_t metadata_avail = 0;
 #ifndef CONFIG_NO_SMP
 /* Lock that must be held while modifying phys2virt mappings on an SMP machine. */
 PRIVATE struct atomic_lock metadata_lock = ATOMIC_LOCK_INIT;
+#define metadata_lock_acquire_nopr() atomic_lock_acquire_nopr(&metadata_lock)
+#define metadata_lock_release_nopr() atomic_lock_release_nopr(&metadata_lock)
+#else /* !CONFIG_NO_SMP */
+#define metadata_lock_acquire_nopr() (void)0
+#define metadata_lock_release_nopr() (void)0
 #endif /* !CONFIG_NO_SMP */
 
 
@@ -156,7 +161,7 @@ NOTHROW(KCALL x86_initialize_phys2virt64)(void) {
 /* - Clear all currently used phys2virt metadata vectors,
  * - Set `metadata_avail' to `metadata_size'
  * - Broadcast an INVLPG IPI to all CPUs that are currently online. */
-LOCAL NOBLOCK NOPREEMPT void
+PRIVATE NOBLOCK NOPREEMPT void
 NOTHROW(KCALL metadata_clearall)(void) {
 	unsigned int vec4;
 	for (vec4 = P64_PDIR_VEC4INDEX(KERNEL_PHYS2VIRT_BASE);
@@ -203,7 +208,7 @@ NOTHROW(KCALL metadata_clearall)(void) {
  * NOTE: When called before `x86_initialize_phys2virt64()',
  *       this function may throw an E_SEGFAULT. Afterwards,
  *       this function is unconditionally NOTHROW! */
-PUBLIC NOBLOCK NOPREEMPT void KCALL
+PUBLIC NOBLOCK NOPREEMPT void FCALL
 x86_phys2virt64_require(void *addr) {
 	unsigned int vec4, vec3;
 	union p64_pdir_e3 e3;
@@ -216,9 +221,8 @@ x86_phys2virt64_require(void *addr) {
 	vec3 = P64_PDIR_VEC3INDEX(addr);
 	assert(vec4 >= 256);
 	assert(P64_PDIR_E4_IDENTITY[vec4].p_vec3.v_present);
+	metadata_lock_acquire_nopr();
 #ifndef CONFIG_NO_SMP
-	while (!sync_trywrite(&metadata_lock))
-		task_pause();
 again_read_e3_word:
 #endif /* !CONFIG_NO_SMP */
 
@@ -233,9 +237,7 @@ again_read_e3_word:
 	if unlikely(!metadata_avail) {
 		/* Check for special case: No metadata has ever been allocated... */
 		if unlikely(!metadata_size) {
-#ifndef CONFIG_NO_SMP
-			sync_endwrite(&metadata_lock);
-#endif /* !CONFIG_NO_SMP */
+			metadata_lock_release_nopr();
 			THROW(E_SEGFAULT_UNMAPPED, addr);
 		}
 		metadata_clearall();
@@ -302,10 +304,7 @@ again_read_e3_word:
 	       (byte_t *)P64_PDIR_VECADDR(vec4, vec3, 0, 0),
 	       (byte_t *)P64_PDIR_VECADDR(vec4, vec3, 511, 511) + PAGESIZE - 1);
 done:
-#ifndef CONFIG_NO_SMP
-	sync_endwrite(&metadata_lock);
-#endif /* !CONFIG_NO_SMP */
-	;
+	metadata_lock_release_nopr();
 }
 
 /* A  special VM  node (that isn't  linked to any  backing data part,
