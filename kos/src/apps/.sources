@@ -45,18 +45,18 @@ DEFINE_SIMPLE_CXX_APPLICATION("gfx", USELIB("libvideo-gfx"))
 
 if (TARGET_ARCH in ["i386", "x86_64"]) {
 	DEFINE_SIMPLE_C_APPLICATION("scanpci", USELIB("libpciaccess"))
-	BEGIN GROUP("apps.leaks") { COMPILE, LINK, MCOPY };
-		SET_NOSTDLIB()
-		SET_LANGUAGE("assembler-with-cpp")
-		SET_OUTPUT("/bin/leaks")
-		SOURCE({ "misc/leaks.S" })
+#define DEFINE_SIMPLE_X86_ASM_APPLICATION(name)         \
+	BEGIN GROUP("apps." name) { COMPILE, LINK, MCOPY }; \
+		SET_NOSTDLIB()                                  \
+		SET_LANGUAGE("assembler-with-cpp")              \
+		SET_OUTPUT("/bin/" name)                        \
+		SOURCE({ "misc/" name ".S" })                   \
 	END
-	BEGIN GROUP("apps.cc") { COMPILE, LINK, MCOPY };
-		SET_NOSTDLIB()
-		SET_LANGUAGE("assembler-with-cpp")
-		SET_OUTPUT("/bin/cc")
-		SOURCE({ "misc/cc.S" })
-	END
+	DEFINE_SIMPLE_X86_ASM_APPLICATION("leaks")
+	DEFINE_SIMPLE_X86_ASM_APPLICATION("cc")
+	DEFINE_SIMPLE_X86_ASM_APPLICATION("true")
+	DEFINE_SIMPLE_X86_ASM_APPLICATION("false")
+#undef DEFINE_SIMPLE_X86_ASM_APPLICATION
 }
 
 

@@ -169,16 +169,15 @@ did_update_x86_64_kernel:
 		));
 	}
 	try {
-		final local trace_filename = "qemu.events";
-		local trace_file = File.open(trace_filename, "r");
-		for (local l: trace_file) {
+		final local traceFilename = "qemu.events";
+		for (local l: File.open(traceFilename, "r")) {
 			l = l.strip();
 			if (l.startswith("#") || !l)
 				continue;
 			/* Non-empty trace file */
 			qemuArgs.extend({
 				"-trace",
-				"events=" + trace_filename
+				"events=" + traceFilename
 			});
 			break;
 		}

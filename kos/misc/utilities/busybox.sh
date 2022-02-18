@@ -59,6 +59,11 @@ fi
 # KOS to display tracebacks through busybox!
 install_file /bin/busybox "${OPTPATH}/busybox_unstripped"
 
+SKIP_LINK="
+/bin/true
+/bin/false
+"
+
 # Install symbolic links
 while read line; do
 	text="/bin/busybox"
@@ -69,7 +74,11 @@ while read line; do
 	elif [[ "$line" == "/"* ]] && ! [[ "$line" == "/"*/ ]]; then
 		text="bin/busybox";
 	fi
-	install_symlink "$line" "$text"
+	if ! [[ "$SKIP_LINK" == *"
+$line
+"* ]]; then
+		install_symlink "$line" "$text"
+	fi
 done < "${OPTPATH}/busybox.links"
 
 # Since busybox is kind-of needed to do anything with KOS, this

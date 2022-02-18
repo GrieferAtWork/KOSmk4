@@ -38,7 +38,7 @@
 _start:
 	movP  $(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS), %R_syscall0P
 	movP  $(SYS_ksysctl), %Pax
-	stc
+	std
 	syscall
 	cmpP  $(0), %Pax
 	je    .Lexit
@@ -46,7 +46,7 @@ _start:
 .Lexit:
 	movP  $(0),        %R_syscall0P
 	movP  $(SYS_exit), %Pax
-	stc
+	std
 	syscall
 	jmp   .Lexit
 .size _start, . - _start
