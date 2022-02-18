@@ -64,34 +64,14 @@ DATDEF ATTR_PERTASK uintptr_t const this_x86_kernel_psp0;
 
 /* Get/Set the user-space FS/GS base for the current thread. */
 #ifdef __x86_64__
-LOCAL WUNUSED uintptr_t KCALL x86_get_user_fsbase(void) {
-	return (uintptr_t)__rdfsbase();
-}
-
-LOCAL void KCALL x86_set_user_fsbase(uintptr_t value) {
-	__wrfsbase((void *)value);
-}
-
-LOCAL WUNUSED uintptr_t KCALL x86_get_user_gsbase(void) {
-	/* We must  read the  KERNEL_GS_BASE MSR  here, as  it
-	 * currently contains the effective user-space GS-base */
-	return (uintptr_t)__rdmsr(IA32_KERNEL_GS_BASE);
-}
-
-LOCAL void KCALL x86_set_user_gsbase(uintptr_t value) {
-	/* We must write  the KERNEL_GS_BASE MSR  here, as  it
-	 * currently contains the effective user-space GS-base */
-	__wrmsr(IA32_KERNEL_GS_BASE, (uint64_t)value);
-}
-
-LOCAL void KCALL x86_update_user_fsbase(void) {
-	/* Nothing */
-}
-
-LOCAL void KCALL x86_update_user_gsbase(void) {
-	/* Nothing */
-}
-
+#define x86_get_user_fsbase()       ((uintptr_t)__rdfsbaseq())
+#define x86_set_user_fsbase(v)      __wrfsbaseq((uint64_t)(v));
+#define x86_set_user_fsbase_nopr(v) __wrfsbaseq((uint64_t)(v));
+/* We must  read the  KERNEL_GS_BASE MSR  here, as  it
+ * currently contains the effective user-space GS-base */
+#define x86_get_user_gsbase()       ((uintptr_t)__rdmsr(IA32_KERNEL_GS_BASE))
+#define x86_set_user_gsbase(v)      __wrmsr(IA32_KERNEL_GS_BASE, (uint64_t)(v))
+#define x86_set_user_gsbase_nopr(v) __wrmsr(IA32_KERNEL_GS_BASE, (uint64_t)(v))
 #else /* __x86_64__ */
 
 /* The  per-task values with which the `SEGMENT_USER_FSBASE' and
@@ -100,87 +80,55 @@ LOCAL void KCALL x86_update_user_gsbase(void) {
 DATDEF ATTR_PERTASK uintptr_t this_x86_user_fsbase;
 DATDEF ATTR_PERTASK uintptr_t this_x86_user_gsbase;
 
-LOCAL WUNUSED uintptr_t KCALL x86_get_user_fsbase(void) {
-	return PERTASK_GET(this_x86_user_fsbase);
-}
-
-LOCAL void KCALL x86_set_user_fsbase_noreload(uintptr_t value) {
-	PERTASK_SET(this_x86_user_fsbase, value);
-	segment_wrbaseX(&PERCPU(thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_FSBASE)]), value);
-}
-
-LOCAL void KCALL x86_set_user_fsbase(uintptr_t value) {
-	x86_set_user_fsbase_noreload(value);
-#ifndef SEGMENT_KERNEL_FSBASE
-	{
-		__register uintptr_t temp;
-		/* Reload the FS register, which likely wouldn't be done without this. */
-		__asm__ __volatile__("movw %%fs, %w0\n\t"
-		                     "movw %w0, %%fs"
-		                     : "=&r" (temp)
-		                     :
-		                     : "memory");
-	}
-#endif /* !SEGMENT_KERNEL_FSBASE */
-}
-
-LOCAL void KCALL x86_update_user_fsbase(void) {
-	segment_wrbaseX(&PERCPU(thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_FSBASE)]),
-	                PERTASK_GET(this_x86_user_fsbase));
-#ifndef SEGMENT_KERNEL_FSBASE
-	{
-		__register uintptr_t temp;
-		/* Reload the FS register, which likely wouldn't be done without this. */
-		__asm__ __volatile__("movw %%fs, %w0\n\t"
-		                     "movw %w0, %%fs"
-		                     : "=&r" (temp)
-		                     :
-		                     : "memory");
-	}
-#endif /* !SEGMENT_KERNEL_FSBASE */
-}
-
-LOCAL WUNUSED uintptr_t KCALL x86_get_user_gsbase(void) {
-	return PERTASK_GET(this_x86_user_gsbase);
-}
-
-LOCAL void KCALL x86_set_user_gsbase_noreload(uintptr_t value) {
-	PERTASK_SET(this_x86_user_gsbase, value);
-	segment_wrbaseX(&PERCPU(thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]), value);
-}
-
-LOCAL void KCALL x86_set_user_gsbase(uintptr_t value) {
-	x86_set_user_gsbase_noreload(value);
-#ifndef SEGMENT_KERNEL_GSBASE
-	{
-		/* Reload the GS register, which likely wouldn't be done without this. */
-		__register uintptr_t temp;
-		__asm__ __volatile__("movw %%gs, %w0\n\t"
-		                     "movw %w0, %%gs"
-		                     : "=&r" (temp)
-		                     :
-		                     : "memory");
-	}
-#endif /* !SEGMENT_KERNEL_GSBASE */
-}
-
-LOCAL void KCALL x86_update_user_gsbase(void) {
-	segment_wrbaseX(&PERCPU(thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]),
-	                PERTASK_GET(this_x86_user_gsbase));
-#ifndef SEGMENT_KERNEL_GSBASE
-	{
-		/* Reload the GS register, which likely wouldn't be done without this. */
-		__register uintptr_t temp;
-		__asm__ __volatile__("movw %%gs, %w0\n\t"
-		                     "movw %w0, %%gs"
-		                     : "=&r" (temp)
-		                     :
-		                     : "memory");
-	}
-#endif /* !SEGMENT_KERNEL_GSBASE */
-}
+#define x86_get_user_fsbase() PERTASK_GET(this_x86_user_fsbase)
+#define x86_get_user_gsbase() PERTASK_GET(this_x86_user_gsbase)
+#define x86_set_user_fsbase_nopr(v)                                                       \
+	do {                                                                                  \
+		PERTASK_SET(this_x86_user_fsbase, v);                                             \
+		segment_wrbaseX(&PERCPU(thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_FSBASE)]), v); \
+		/* NOTE: No need to reload the %fs register here, since it'll                     \
+		 *       be reloaded anyways once we return to user-space; at                     \
+		 *       the moment's it's `SEGMENT_KERNEL_FSBASE' anyways! */                    \
+	}	__WHILE0
+#define x86_set_user_fsbase(v)                                                            \
+	do {                                                                                  \
+		pflag_t _xsufnr_was;                                                              \
+		PERTASK_SET(this_x86_user_fsbase, v);                                             \
+		_xsufnr_was = PREEMPTION_PUSHOFF();                                               \
+		segment_wrbaseX(&PERCPU(thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_FSBASE)]), v); \
+		PREEMPTION_POP(_xsufnr_was);                                                      \
+		/* NOTE: No need to reload the %fs register here, since it'll                     \
+		 *       be reloaded anyways once we return to user-space; at                     \
+		 *       the moment's it's `SEGMENT_KERNEL_FSBASE' anyways! */                    \
+	}	__WHILE0
+#define x86_set_user_gsbase_nopr(v)                                                       \
+	do {                                                                                  \
+		pflag_t _xsugnr_was;                                                              \
+		PERTASK_SET(this_x86_user_gsbase, v);                                             \
+		segment_wrbaseX(&PERCPU(thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]), v); \
+		/* Reload the GS register, which likely wouldn't be done without this. */         \
+		__asm__ __volatile__("movw %%gs, %w0\n\t"                                         \
+		                     "movw %w0, %%gs"                                             \
+		                     : "=&r" (_xsugnr_temp)                                       \
+		                     :                                                            \
+		                     : "memory");                                                 \
+	}	__WHILE0
+#define x86_set_user_gsbase(v)                                                            \
+	do {                                                                                  \
+		pflag_t _xsugnr_was;                                                              \
+		__register uintptr_t _xsugnr_temp;                                                \
+		PERTASK_SET(this_x86_user_gsbase, v);                                             \
+		_xsugnr_was = PREEMPTION_PUSHOFF();                                               \
+		segment_wrbaseX(&PERCPU(thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]), v); \
+		PREEMPTION_POP(_xsugnr_was);                                                      \
+		/* Reload the GS register, which likely wouldn't be done without this. */         \
+		__asm__ __volatile__("movw %%gs, %w0\n\t"                                         \
+		                     "movw %w0, %%gs"                                             \
+		                     : "=&r" (_xsugnr_temp)                                       \
+		                     :                                                            \
+		                     : "memory");                                                 \
+	}	__WHILE0
 #endif /* !__x86_64__ */
-
 #endif /* __CC__ */
 
 DECL_END

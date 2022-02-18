@@ -1668,11 +1668,11 @@ i386_setsegment_base(struct icpustate32 *__restrict state,
 	switch (segment_index & ~3) {
 
 	case SEGMENT_USER_FSBASE:
-		x86_set_user_fsbase_noreload(value);
+		x86_set_user_fsbase(value);
 		break;
 
 	case SEGMENT_USER_GSBASE:
-		x86_set_user_gsbase_noreload(value);
+		x86_set_user_gsbase(value);
 		break;
 
 	default:

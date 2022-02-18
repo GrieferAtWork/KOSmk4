@@ -511,7 +511,8 @@ done_bss:
 		state = args->ea_state;
 #ifdef __x86_64__
 		if (IS_NATIVE) {
-			x86_set_user_gsbase(x86_get_random_userkern_address());  /* re-roll the ukern address. */
+			uint64_t addr = x86_get_random_userkern_address();
+			x86_set_user_gsbase(addr);                               /* re-roll the ukern address. */
 			gpregs_setpdi(&state->ics_gpregs, (uintptr_t)stack_end); /* ELF_ARCHX86_64_DL_RTLDDATA_REGISTER */
 			gpregs_setpsi(&state->ics_gpregs, (uintptr_t)loadaddr);  /* ELF_ARCHX86_64_DL_LOADADDR_REGISTER */
 			gpregs_setpdx(&state->ics_gpregs, (uintptr_t)peb_base);  /* ELF_ARCHX86_64_PEB_REGISTER */
@@ -519,7 +520,8 @@ done_bss:
 		} else
 #endif /* __x86_64__ */
 		{
-			x86_set_user_fsbase(x86_get_random_userkern_address32()); /* re-roll the ukern address. */
+			uint32_t addr = x86_get_random_userkern_address32();
+			x86_set_user_fsbase(addr);                                /* re-roll the ukern address. */
 			gpregs_setpcx(&state->ics_gpregs, (uintptr_t)stack_end);  /* ELF_ARCH386_DL_RTLDDATA_REGISTER */
 			gpregs_setpdx(&state->ics_gpregs, (uintptr_t)loadaddr);   /* ELF_ARCH386_DL_LOADADDR_REGISTER */
 			gpregs_setpbp(&state->ics_gpregs, (uintptr_t)peb_base);   /* ELF_ARCH386_PEB_REGISTER */

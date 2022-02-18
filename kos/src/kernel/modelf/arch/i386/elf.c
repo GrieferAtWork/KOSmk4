@@ -83,7 +83,10 @@ elfexec_init_entry(struct icpustate *__restrict user_state,
 		      ehdr->e_ident[EI_OSABI]);
 		break;
 	}
-	x86_set_user_gsbase(x86_get_random_userkern_address());         /* re-roll the ukern address. */
+	{
+		u64 addr = x86_get_random_userkern_address();
+		x86_set_user_gsbase(addr); /* re-roll the ukern address. */
+	}
 	gpregs_setpdx(&user_state->ics_gpregs, (uintptr_t)peb_address); /* ELF_ARCHX86_64_PEB_REGISTER */
 	gpregs_setpbp(&user_state->ics_gpregs, (uintptr_t)peb_address); /* ELF_ARCHX86_64_PEB_REGISTER2 */
 	icpustate_setpc(user_state, entry_pc);
@@ -190,8 +193,10 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
 	 * This is where we begin to modify user-level registers.
 	 * This  may  _only_ happen  _after_ we're  done touching
 	 * user-space memory! */
-
-	x86_set_user_gsbase(x86_get_random_userkern_address());                  /* re-roll the ukern address. */
+	{
+		u64 addr = x86_get_random_userkern_address();
+		x86_set_user_gsbase(addr); /* re-roll the ukern address. */
+	}
 	gpregs_setpdi(&user_state->ics_gpregs, (uintptr_t)dl_data);              /* ELF_ARCHX86_64_DL_RTLDDATA_REGISTER */
 	gpregs_setpsi(&user_state->ics_gpregs, (uintptr_t)application_loadaddr); /* ELF_ARCHX86_64_DL_LOADADDR_REGISTER */
 	gpregs_setpdx(&user_state->ics_gpregs, (uintptr_t)peb_address);          /* ELF_ARCHX86_64_PEB_REGISTER */
@@ -258,7 +263,10 @@ elfexec_init_entry32(struct icpustate *__restrict user_state,
 		      ehdr->e_ident[EI_OSABI]);
 		break;
 	}
-	x86_set_user_fsbase(x86_get_random_userkern_address32());       /* re-roll the ukern address. */
+	{
+		u32 addr = x86_get_random_userkern_address32();
+		x86_set_user_fsbase(addr); /* re-roll the ukern address. */
+	}
 	gpregs_setpbp(&user_state->ics_gpregs, (uintptr_t)peb_address); /* ELF_ARCH386_PEB_REGISTER */
 	icpustate_setpc(user_state, entry_pc);
 	icpustate_setusersp(user_state, (byte_t const *)ustack_base + ustack_size);
@@ -381,8 +389,10 @@ elfexec_init_rtld32(struct icpustate *__restrict user_state,
 	 * This is where we begin to modify user-level registers.
 	 * This  may  _only_ happen  _after_ we're  done touching
 	 * user-space memory! */
-
-	x86_set_user_fsbase(x86_get_random_userkern_address32());                /* re-roll the ukern address. */
+	{
+		u32 addr = x86_get_random_userkern_address32();
+		x86_set_user_fsbase(addr); /* re-roll the ukern address. */
+	}
 	gpregs_setpcx(&user_state->ics_gpregs, (uintptr_t)dl_data);              /* ELF_ARCH386_DL_RTLDDATA_REGISTER */
 	gpregs_setpdx(&user_state->ics_gpregs, (uintptr_t)application_loadaddr); /* ELF_ARCH386_DL_LOADADDR_REGISTER */
 	gpregs_setpbp(&user_state->ics_gpregs, (uintptr_t)peb_address);          /* ELF_ARCH386_PEB_REGISTER */

@@ -2047,14 +2047,8 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 #endif /* CONFIG_FPU */
 
 #if defined(__i386__) && !defined(__x86_64__)
-			/* NOTE: No need to reload the %fs register here, since it'll
-			 *       be reloaded anyways once we return to user-space; at
-			 *       the moment's it's `SEGMENT_KERNEL_FSBASE' anyways! */
 			if (vm.rv_flags & RPC_VM_HAVE_FSBASE)
-				x86_set_user_fsbase_noreload(vm.rv_386_fsbase);
-
-			/* %gs (probably) won't be re-loaded before we return to
-			 * user-space, so include the manual reload in this case! */
+				x86_set_user_fsbase(vm.rv_386_fsbase);
 			if (vm.rv_flags & RPC_VM_HAVE_GSBASE)
 				x86_set_user_gsbase(vm.rv_386_gsbase);
 #endif /* __i386__ && !__x86_64__ */

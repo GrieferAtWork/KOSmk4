@@ -294,11 +294,10 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
 
 
 
-#ifndef __x86_64__
-DEFINE_SYSCALL3(syscall_slong_t, modify_ldt,
-                syscall_ulong_t, func,
-                USER UNCHECKED void *, ptr,
-                syscall_ulong_t, bytecount) {
+DEFINE_SYSCALL32_3(syscall_slong_t, modify_ldt,
+                   syscall_ulong_t, func,
+                   USER UNCHECKED void *, ptr,
+                   syscall_ulong_t, bytecount) {
 	switch (func) {
 
 	case 2:
@@ -310,16 +309,18 @@ DEFINE_SYSCALL3(syscall_slong_t, modify_ldt,
 	case 0x11: {
 		struct linux_user_desc *desc;
 		unsigned int entry;
+		uintptr_t addr;
 		validate_readable(ptr, bytecount);
 		if (bytecount < sizeof(struct linux_user_desc))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct linux_user_desc), bytecount);
 		desc  = (struct linux_user_desc *)ptr;
 		entry = ATOMIC_READ(desc->entry_number);
 		/* We ignore everything except for `base_addr' */
+		addr = ATOMIC_READ(desc->base_addr);
 		if ((entry & ~7) == SEGMENT_USER_FSBASE) {
-			x86_set_user_fsbase(ATOMIC_READ(desc->base_addr)); /* %fs */
+			x86_set_user_fsbase(addr); /* %fs */
 		} else if ((entry & ~7) == SEGMENT_USER_GSBASE) {
-			x86_set_user_gsbase(ATOMIC_READ(desc->base_addr)); /* %gs */
+			x86_set_user_gsbase(addr); /* %gs */
 		} else {
 			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, entry);
 		}
@@ -333,7 +334,6 @@ DEFINE_SYSCALL3(syscall_slong_t, modify_ldt,
 	}
 	return 0;
 }
-#endif /* !__x86_64__ */
 
 
 DECL_END

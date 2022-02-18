@@ -26,6 +26,7 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <kernel/x86/gdt.h>
+#include <sched/task.h>
 
 #include <asm/cpu-msr.h>
 #include <asm/intrin.h>
