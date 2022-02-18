@@ -54,20 +54,18 @@ DATDEF struct ioperm_bitmap ioperm_bitmap_empty;
  * The I/O permissions bitmap of the calling thread.
  * Lazily allocated during `ioperm()' and `#PF' (s.a. documentation in <sched/tss.h>) */
 DATDEF ATTR_PERTASK REF struct ioperm_bitmap *this_x86_ioperm_bitmap;
-#define THIS_X86_IOPERM_BITMAP PERTASK_GET(this_x86_ioperm_bitmap)
+#define THIS_X86_IOPERM_BITMAP    PERTASK_GET(this_x86_ioperm_bitmap)
 
-/* [0..1][== NULL || == THIS_X86_IOPERM_BITMAP]
- * The   currently   mapped   I/O   permissions   bitmap   within   the   current    CPU.
- * During   preemption,  this   variable  is  checked   and  cleared  to   `NULL'  if  it
- * was found to be non-NULL, and during the first access made to `thiscpu_x86_iob' during
- * the life-time of thread, this  variable will be filled with  `THIS_X86_IOPERM_BITMAP'.
- * It's main purpose is  to keep track  of the is-mapped  state of the  `thiscpu_x86_iob'
- * memory area for the duration of some thread's quantum. */
+/* [0..1][lock(THIS_CPU && !PREEMPTION_ENABLED())]
+ * The I/O  permissions  bitmap  currently active  within  the  calling  CPU.
+ * Set to `NULL' during preemption; Filled in during the first #PF that ended
+ * up being caused by  the CPU trying to  access the I/O permissions  bitmap. */
 DATDEF ATTR_PERCPU struct ioperm_bitmap *thiscpu_x86_ioperm_bitmap;
 
 
 /* Destroy the given I/O permissions bitmap. */
-FUNDEF NOBLOCK void NOTHROW(FCALL ioperm_bitmap_destroy)(struct ioperm_bitmap *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL ioperm_bitmap_destroy)(struct ioperm_bitmap *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct ioperm_bitmap, ib_refcnt, ioperm_bitmap_destroy)
 
 /* Allocate a new io permissions bitmap with all permission bits set to disallow access. */
@@ -79,15 +77,15 @@ FUNDEF ATTR_MALLOC WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC)
 REF struct ioperm_bitmap *NOTHROW(KCALL ioperm_bitmap_allocf_nx)(gfp_t flags);
 
 /* Create a copy of the given I/O permissions bitmap. */
-FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct ioperm_bitmap *KCALL
+FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct ioperm_bitmap *KCALL
 ioperm_bitmap_copy(struct ioperm_bitmap const *__restrict self) THROWS(E_BADALLOC);
-FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC) REF struct ioperm_bitmap *KCALL
+FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC) NONNULL((1)) REF struct ioperm_bitmap *KCALL
 ioperm_bitmap_copyf(struct ioperm_bitmap const *__restrict self, gfp_t flags) THROWS(E_BADALLOC);
-FUNDEF ATTR_MALLOC WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC) REF struct ioperm_bitmap *
+FUNDEF ATTR_MALLOC WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC) NONNULL((1)) REF struct ioperm_bitmap *
 NOTHROW(KCALL ioperm_bitmap_copyf_nx)(struct ioperm_bitmap const *__restrict self, gfp_t flags);
 
 /* Turn permission bits for a given range on/off. */
-FUNDEF NOBLOCK void
+FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ioperm_bitmap_setrange)(struct ioperm_bitmap *__restrict self,
                                       u16 minport, u16 maxport, bool turn_on);
 

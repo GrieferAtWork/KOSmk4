@@ -535,7 +535,7 @@ INTERN_FUNCTION(x86_idt_preemption)
 	ja32   x86_unwind_scpustate_Psp /* if (deadline[0] > now[0]) goto x86_unwind_scpustate_Psp; */
 1:
 #endif /* !__x86_64__ */
-	/* Deadline has expirted (and the current time is now stored in %rax / %edx:%eax) */
+	/* Deadline has expired (and the current time is now stored in %rax / %edx:%eax) */
 
 	EXTERN(this_sstate)
 	movP   %Psp, this_sstate(%Pbp)
@@ -559,7 +559,7 @@ INTERN_FUNCTION(x86_idt_preemption)
 	cmpP   %Pbp, %Pax
 	je32   x86_unwind_scpustate_Psp
 
-	/* Switch the task returned by `tsc_deadline_passed()' */
+	/* Switch to the task returned by `tsc_deadline_passed()' */
 	EXTERN(thiscpu_sched_current)
 	movP   %Pax, thiscpu_sched_current(%Pbx)
 

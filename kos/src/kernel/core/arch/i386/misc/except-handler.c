@@ -161,24 +161,30 @@ userexcept_callhandler(struct icpustate *__restrict state,
 	USER CHECKED struct kcpustate32 *user_state;
 	USER CHECKED struct __exception_data32 *user_error;
 	unsigned int i;
+
 	/* Call the user-space exception handler */
-	mode    = PERTASK_GET(this_user_except_handler.ueh_mode);
-	handler = (__except_handler32_t)(uintptr_t)(void *)PERTASK_GET(this_user_except_handler.ueh_handler);
-	stack   = (byte_t *)PERTASK_GET(this_user_except_handler.ueh_stack);
+	mode = PERTASK_GET(this_user_except_handler.ueh_mode);
 	if unlikely(!(mode & EXCEPT_HANDLER_FLAG_SETHANDLER))
 		return NULL; /* No handler defined */
+	handler = (__except_handler32_t)(uintptr_t)(void *)PERTASK_GET(this_user_except_handler.ueh_handler);
+	stack   = (byte_t *)PERTASK_GET(this_user_except_handler.ueh_stack);
 	if (stack == EXCEPT_HANDLER_SP_CURRENT)
 		stack = icpustate_getusersp(state);
+
 	/* Align the stack. */
 	stack = (byte_t *)((uintptr_t)stack & ~3);
+
 	/* Allocate structures */
 	user_state = (struct kcpustate32 *)(stack - sizeof(struct kcpustate32));
 	user_error = (struct __exception_data32 *)((byte_t *)user_state - sizeof(struct __exception_data32));
+
 	/* Ensure that we can write to the given stack. */
 	validate_writable(user_error, sizeof(struct __exception_data32) + sizeof(struct kcpustate32));
 	COMPILER_WRITE_BARRIER();
+
 	/* Fill in user-space context information */
 	icpustate_user_to_kcpustate32(state, user_state);
+
 	/* Copy exception data onto the user-space stack. */
 #ifdef __x86_64__
 	/* Propagate class & sub-class individually, since the way in
@@ -190,12 +196,14 @@ userexcept_callhandler(struct icpustate *__restrict state,
 #endif /* !__x86_64__ */
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 		user_error->e_args.e_pointers[i] = (u32)error->e_args.e_pointers[i];
+
 	/* In case of  a system call,  set the  fault
 	 * address as the system call return address. */
 	user_error->e_faultaddr = sc_info != NULL
 	                          ? (__HYBRID_PTR32(void))(u32)(uintptr_t)icpustate_getusersp(state)
 	                          : (__HYBRID_PTR32(void))(u32)(uintptr_t)error->e_faultaddr;
 	log_userexcept_error_propagate(state, sc_info, error, mode, (void *)handler, user_error);
+
 	/* Redirect the given CPU state to return to the user-space handler. */
 	gpregs_setpcx(&state->ics_gpregs, (uintptr_t)user_state); /* struct kcpustate32 *__restrict state */
 	gpregs_setpdx(&state->ics_gpregs, (uintptr_t)user_error); /* struct __exception_data32 *__restrict error */
@@ -208,6 +216,7 @@ userexcept_callhandler(struct icpustate *__restrict state,
 		icpustate_mskpflags(state, word.uem_mask, word.uem_flag);
 	}
 	COMPILER_WRITE_BARRIER();
+
 	/* Disable exception handling in one-shot mode. */
 	if (mode & EXCEPT_HANDLER_FLAG_ONESHOT) {
 		PERTASK_SET(this_user_except_handler.ueh_mode,
@@ -231,35 +240,42 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 	USER CHECKED struct __exception_data64 *user_error;
 	unsigned int i;
 	/* Call the user-space exception handler */
-	mode    = PERTASK_GET(this_user_except_handler.ueh_mode);
-	handler = (__except_handler64_t)(uintptr_t)(void *)PERTASK_GET(this_user_except_handler.ueh_handler);
-	stack   = PERTASK_GET(this_user_except_handler.ueh_stack);
+	mode = PERTASK_GET(this_user_except_handler.ueh_mode);
 	if unlikely(!(mode & EXCEPT_HANDLER_FLAG_SETHANDLER))
 		return NULL; /* No handler defined */
+	handler = (__except_handler64_t)(uintptr_t)(void *)PERTASK_GET(this_user_except_handler.ueh_handler);
+	stack   = PERTASK_GET(this_user_except_handler.ueh_stack);
 	if (stack == EXCEPT_HANDLER_SP_CURRENT) {
 		stack = icpustate_getusersp(state);
 		stack = (byte_t *)stack - 128; /* Red zone (TODO: Make this configurable!) */
 	}
+
 	/* Align the stack. */
 	stack = (void *)((uintptr_t)stack & ~7);
+
 	/* Allocate structures */
 	user_state = (struct kcpustate64 *)((byte_t *)stack - sizeof(struct kcpustate64));
 	user_error = (struct __exception_data64 *)((byte_t *)user_state - sizeof(struct __exception_data64));
+
 	/* Ensure that we can write to the given stack. */
 	validate_writable(user_error, sizeof(struct __exception_data64) + sizeof(struct kcpustate64));
 	COMPILER_WRITE_BARRIER();
+
 	/* Fill in user-space context information */
 	icpustate_user_to_kcpustate64(state, user_state);
+
 	/* Copy exception data onto the user-space stack. */
 	user_error->e_code = (__except_code64_t)error->e_code;
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 		user_error->e_args.e_pointers[i] = (u64)error->e_args.e_pointers[i];
+
 	/* In case of  a system call,  set the  fault
 	 * address as the system call return address. */
 	user_error->e_faultaddr = sc_info != NULL
 	                          ? (__HYBRID_PTR64(void))(u64)(uintptr_t)icpustate_getusersp(state)
 	                          : (__HYBRID_PTR64(void))(u64)(uintptr_t)error->e_faultaddr;
 	log_userexcept_error_propagate(state, sc_info, error, mode, (void *)handler, user_error);
+
 	/* Redirect the given CPU state to return to the user-space handler. */
 	gpregs_setpdi(&state->ics_gpregs, (uintptr_t)user_state); /* struct kcpustate64 *__restrict state */
 	gpregs_setpsi(&state->ics_gpregs, (uintptr_t)user_error); /* struct __exception_data64 *__restrict error */
@@ -272,6 +288,7 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 		icpustate_mskpflags(state, word.uem_mask, word.uem_flag);
 	}
 	COMPILER_WRITE_BARRIER();
+
 	/* Disable exception handling in one-shot mode. */
 	if (mode & EXCEPT_HANDLER_FLAG_ONESHOT) {
 		PERTASK_SET(this_user_except_handler.ueh_mode,

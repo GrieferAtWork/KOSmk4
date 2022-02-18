@@ -801,7 +801,7 @@ PRIVATE ATTR_PURE WUNUSED u32 NOTHROW(KCALL emulate_rdpid)(void) {
 }
 
 #define EMU86_EMULATE_RDTSCP(tsc_aux) emulate_rdtscp(&(tsc_aux))
-LOCAL WUNUSED NONNULL((1)) u64
+PRIVATE WUNUSED NONNULL((1)) u64
 NOTHROW(KCALL emulate_rdtscp)(u32 *__restrict p_tsc_aux) {
 	u64 tsc;
 	pflag_t was;

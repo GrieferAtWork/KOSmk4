@@ -129,7 +129,7 @@ ioperm_bitmap_alloc(void) THROWS(E_BADALLOC) {
 
 
 /* Create a copy of the given I/O permissions bitmap. */
-PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC) REF struct ioperm_bitmap *KCALL
+PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC) NONNULL((1)) REF struct ioperm_bitmap *KCALL
 ioperm_bitmap_copyf(struct ioperm_bitmap const *__restrict self, gfp_t flags) THROWS(E_BADALLOC) {
 	physpage_t iob;
 	REF struct ioperm_bitmap *result;
@@ -148,7 +148,7 @@ ioperm_bitmap_copyf(struct ioperm_bitmap const *__restrict self, gfp_t flags) TH
 	return result;
 }
 
-PUBLIC ATTR_MALLOC WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC) REF struct ioperm_bitmap *
+PUBLIC ATTR_MALLOC WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC) NONNULL((1)) REF struct ioperm_bitmap *
 NOTHROW(KCALL ioperm_bitmap_copyf_nx)(struct ioperm_bitmap const *__restrict self, gfp_t flags) {
 	physpage_t iob;
 	REF struct ioperm_bitmap *result;
@@ -169,14 +169,14 @@ NOTHROW(KCALL ioperm_bitmap_copyf_nx)(struct ioperm_bitmap const *__restrict sel
 	return result;
 }
 
-PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct ioperm_bitmap *KCALL
+PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct ioperm_bitmap *KCALL
 ioperm_bitmap_copy(struct ioperm_bitmap const *__restrict self) THROWS(E_BADALLOC) {
 	return ioperm_bitmap_copyf(self, GFP_LOCKED | GFP_PREFLT);
 }
 
 
 
-LOCAL NOBLOCK void
+LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ioperm_bitmap_maskbyte)(struct ioperm_bitmap *__restrict self,
                                       size_t byte_index, u8 byte_mask, u8 byte_flag) {
 	u8 *byte, oldval;
@@ -188,7 +188,7 @@ NOTHROW(KCALL ioperm_bitmap_maskbyte)(struct ioperm_bitmap *__restrict self,
 	mptram_fini(&pt);
 }
 
-LOCAL NOBLOCK void
+LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ioperm_bitmap_maskbyte_c)(struct ioperm_bitmap *__restrict self,
                                         size_t byte_index, shift_t minbit,
                                         shift_t bitcnt, bool turn_on) {
@@ -200,7 +200,7 @@ NOTHROW(KCALL ioperm_bitmap_maskbyte_c)(struct ioperm_bitmap *__restrict self,
 }
 
 /* Turn permission bits for a given range on/off. */
-PUBLIC NOBLOCK void
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ioperm_bitmap_setrange)(struct ioperm_bitmap *__restrict self,
                                       u16 minport, u16 maxport, bool turn_on) {
 	size_t minbyte, maxbyte;

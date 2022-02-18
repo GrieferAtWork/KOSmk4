@@ -95,10 +95,11 @@
 
 DECL_BEGIN
 
-LOCAL NONNULL((1, 3)) void KCALL
+PRIVATE NONNULL((1, 3)) void KCALL
 LOCAL_ucpustate_decode(struct icpustate const *__restrict return_state,
                        USER CHECKED LOCAL_struct_ucpustate const *ust,
-                       struct ucpustate *__restrict result) {
+                       struct ucpustate *__restrict result)
+		THROWS(E_INVALID_ARGUMENT_BAD_VALUE) {
 #ifdef DEFINE_sys32_coredump
 	ucpustate32_to_ucpustate(ust, result);
 #else /* DEFINE_sys32_coredump */

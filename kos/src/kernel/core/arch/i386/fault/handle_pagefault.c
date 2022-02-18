@@ -165,7 +165,7 @@ __asm__(".pushsection .text.cold\n\t"
 
 /* @return: true:  Success
  * @return: false: Must try again (preemption had to be enabled) */
-LOCAL bool FCALL
+PRIVATE NONNULL((1)) bool FCALL
 handle_iob_access(struct cpu *__restrict me,
                   bool is_writing,
                   bool allow_preemption) {
@@ -265,7 +265,7 @@ handle_iob_access(struct cpu *__restrict me,
 
 #ifndef CONFIG_NO_SMP
 /* Check if the given `node' is the IOB vector of some CPU */
-LOCAL NOBLOCK ATTR_CONST WUNUSED bool
+PRIVATE NOBLOCK ATTR_CONST WUNUSED bool
 NOTHROW(FCALL is_iob_mnode)(struct mnode *node) {
 	unsigned int i;
 	for (i = 0; i < cpu_count; ++i) {
@@ -277,7 +277,7 @@ NOTHROW(FCALL is_iob_mnode)(struct mnode *node) {
 
 /* Check if `*pc' points to some I/O instruction that doesn't
  * perform   a   read  or   write  access   to  `fault_addr'. */
-LOCAL WUNUSED bool FCALL
+PRIVATE WUNUSED bool FCALL
 is_io_instruction_and_not_memory_access(byte_t const *pc,
                                         struct icpustate *state,
                                         uintptr_t fault_addr) {

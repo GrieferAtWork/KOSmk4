@@ -373,7 +373,7 @@ PRIVATE ATTR_WRITEMOSTLY WEAK uintptr_t x86_pagedir_prepare_version = 0;
 	}	__WHILE0
 
 
-LOCAL NOBLOCK WUNUSED NONNULL((1)) physpage_t
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) physpage_t
 NOTHROW(FCALL p64_create_e1_vector_from_e2_word)(struct mptram *__restrict ptram,
                                                  u64 e2_word,
                                                  unsigned int vec1_prepare_start,
@@ -432,7 +432,7 @@ done:
 }
 
 /* Create an E2-vector from a given E3-word  */
-LOCAL NOBLOCK WUNUSED NONNULL((1)) physpage_t
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) physpage_t
 NOTHROW(FCALL p64_create_e2_vector_from_e3_word_and_e1_vector)(struct mptram *__restrict ptram,
                                                                u64 e3_word,
                                                                unsigned int vec2,
@@ -798,7 +798,7 @@ err:
 
 
 
-LOCAL NOBLOCK WUNUSED NONNULL((1, 2)) bool
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) bool
 NOTHROW(KCALL p64_pagedir_can_flatten_e1_vector)(union p64_pdir_e1 const e1_p[512],
                                                  u64 *__restrict new_e2_word,
                                                  unsigned int still_prepared_vec2) {
@@ -862,7 +862,7 @@ NOTHROW(KCALL p64_pagedir_can_flatten_e1_vector)(union p64_pdir_e1 const e1_p[51
 	return true;
 }
 
-LOCAL NOBLOCK WUNUSED NONNULL((1, 2)) bool
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) bool
 NOTHROW(KCALL p64_pagedir_can_flatten_e2_vector)(union p64_pdir_e2 const e2_p[512],
                                                  u64 *__restrict new_e3_word) {
 	unsigned int vec2;
@@ -919,7 +919,7 @@ NOTHROW(KCALL p64_pagedir_can_flatten_e2_vector)(union p64_pdir_e2 const e2_p[51
 	return true;
 }
 
-LOCAL NOBLOCK WUNUSED NONNULL((1, 2)) bool
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) bool
 NOTHROW(KCALL p64_pagedir_can_flatten_e3_vector)(union p64_pdir_e3 const e3_p[512],
                                                  u64 *__restrict new_e4_word) {
 	unsigned int vec3;

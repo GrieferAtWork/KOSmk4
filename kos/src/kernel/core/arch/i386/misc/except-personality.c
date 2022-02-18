@@ -87,8 +87,8 @@ NOTHROW(FCALL syscall_info_amend_FEXCEPT)(struct rpc_syscall_info *__restrict se
 
 /* The personality function used  to handle exceptions propagated  through
  * system calls. - Specifically, the special handling that is required for
- * servicing an RPC as `rpc_serve_user_redirection_all' */
-INTERN WUNUSED NONNULL((1, 2)) unsigned int
+ * servicing an RPC during `userexcept_handler()' */
+INTERN ABNORMAL_RETURN WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_int80)(struct unwind_fde_struct *__restrict fde,
                                                                    struct kcpustate *__restrict state) {
 	struct ucpustate ustate;
@@ -112,12 +112,13 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_int80)(struct unwind
 	rpc_syscall_info_get32_int80h(&sc_info, &ustate);
 	syscall_info_amend_FEXCEPT(&sc_info, &ustate);
 	userexcept_handler_ucpustate(&ustate, &sc_info);
+	__builtin_unreachable();
 }
 
 /* The personality function used  to handle exceptions propagated  through
  * system calls. - Specifically, the special handling that is required for
- * servicing an RPC as `rpc_serve_user_redirection_all' */
-INTERN WUNUSED NONNULL((1, 2)) unsigned int
+ * servicing an RPC during `userexcept_handler()' */
+INTERN ABNORMAL_RETURN WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_sysenter)(struct unwind_fde_struct *__restrict fde,
                                                                       struct kcpustate *__restrict state) {
 	struct ucpustate ustate;
@@ -141,6 +142,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_sysenter)(struct unw
 	rpc_syscall_info_get32_sysenter_nx(&sc_info, &ustate);
 	syscall_info_amend_FEXCEPT(&sc_info, &ustate);
 	userexcept_handler_ucpustate(&ustate, &sc_info);
+	__builtin_unreachable();
 }
 
 
@@ -149,8 +151,8 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_sysenter)(struct unw
 
 /* The personality function used  to handle exceptions propagated  through
  * system calls. - Specifically, the special handling that is required for
- * servicing an RPC as `rpc_serve_user_redirection_all' */
-INTERN WUNUSED NONNULL((1, 2)) unsigned int
+ * servicing an RPC during `userexcept_handler()' */
+INTERN ABNORMAL_RETURN WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm64_syscall)(struct unwind_fde_struct *__restrict fde,
                                                                      struct kcpustate *__restrict state) {
 	struct ucpustate ustate;
@@ -174,6 +176,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm64_syscall)(struct unwi
 	rpc_syscall_info_get64_int80h(&sc_info, &ustate);
 	syscall_info_amend_FEXCEPT(&sc_info, &ustate);
 	userexcept_handler_ucpustate(&ustate, &sc_info);
+	__builtin_unreachable();
 }
 #endif /* __x86_64__ */
 
@@ -194,8 +197,8 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm64_syscall)(struct unwi
 /************************************************************************/
 /* Personality functions for restartable interrupt handlers             */
 /************************************************************************/
-/* Don't look; this is super hacked together and works in tandem with
- * `idt/exceptidt32-exception.S'  and   `idt/exceptidt64-exception.S' */
+/* Don't look; this is super hacked together and works in tandem
+ * with   `idt/idt32-exception.S'   and  `idt/idt64-exception.S' */
 
 /* The following registers are passed (unmodified) to LSDA: %Pbx, %Pbp
  * LSDA   is   passed   via   register:   [i386:'%edi', x86_64:'%r12']
@@ -272,7 +275,7 @@ extern void ASMCALL _x86_xintr3_userexcept_unwind(void);
 	}	__WHILE0
 #endif /* !__x86_64__ */
 
-INTERN WUNUSED NONNULL((1, 2)) unsigned int
+INTERN ABNORMAL_RETURN WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr1_userexcept_personality)(struct unwind_fde_struct *__restrict fde,
                                                                  struct kcpustate *__restrict state) {
 	struct icpustate *st;
@@ -284,7 +287,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr1_userexcept_personality)(struct unwind_f
 	x86_xintr1_userexcept_unwind(st, fde->f_lsdaaddr);
 }
 
-INTERN WUNUSED NONNULL((1, 2)) unsigned int
+INTERN ABNORMAL_RETURN WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr2_userexcept_personality)(struct unwind_fde_struct *__restrict fde,
                                                                  struct kcpustate *__restrict state) {
 	struct icpustate *st;
@@ -298,7 +301,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr2_userexcept_personality)(struct unwind_f
 	x86_xintr2_userexcept_unwind(st, fde->f_lsdaaddr, ecode);
 }
 
-INTERN WUNUSED NONNULL((1, 2)) unsigned int
+INTERN ABNORMAL_RETURN WUNUSED NONNULL((1, 2)) unsigned int
 NOTHROW(EXCEPT_PERSONALITY_CC x86_xintr3_userexcept_personality)(struct unwind_fde_struct *__restrict fde,
                                                                  struct kcpustate *__restrict state) {
 	struct icpustate *st;
@@ -343,7 +346,8 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_asm_except_personality)(struct unwind_fde_stru
 	ent = (struct x86_asm_except_entry const *)fde->f_lsdaaddr;
 	if (ent) {
 		for (; ent->ee_entry != 0; ++ent) {
-			/* NOTE: Adjust for the fact that `pc' */
+			/* NOTE: Compare while keeping in mind that `pc' points
+			 *       _after_  the  faulting /  calling instruction. */
 			if (pc > ent->ee_start && pc <= ent->ee_end) {
 				if (ent->ee_mask != (uintptr_t)-1) {
 					except_code_t code = except_code();

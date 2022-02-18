@@ -282,7 +282,7 @@ NOTHROW(FCALL p32_pagedir_sync_flattened_e1_vector)(unsigned int vec2) {
 
 
 
-LOCAL NOBLOCK NONNULL((1, 2)) bool
+PRIVATE NOBLOCK NONNULL((1, 2)) bool
 NOTHROW(KCALL p32_pagedir_can_flatten_e1_vector)(union p32_pdir_e1 const e1_p[1024],
                                                  u32 *__restrict new_e2_word,
                                                  unsigned int still_prepared_vec2) {

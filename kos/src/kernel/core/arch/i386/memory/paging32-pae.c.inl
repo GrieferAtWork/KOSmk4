@@ -470,7 +470,7 @@ NOTHROW(FCALL pae_pagedir_sync_flattened_e1_vector)(unsigned int vec3,
 
 
 
-LOCAL NOBLOCK WUNUSED NONNULL((1, 2)) bool
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) bool
 NOTHROW(KCALL pae_pagedir_can_flatten_e1_vector)(union pae_pdir_e1 const e1_p[512],
                                                  u64 *__restrict new_e2_word,
                                                  unsigned int still_prepared_vec2) {
