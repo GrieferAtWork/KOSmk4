@@ -748,6 +748,16 @@ $1=$2"
 						fi
 						;;
 
+					*ac_cv_c_little_endian*)
+						# "... to see if this is a little endian host"
+						. "$KOS_MISC/utilities/misc/target-info.sh"
+						if [[ "$TARGET_ENDIAN" == "little" ]]; then
+							_config_site_option "ac_cv_c_little_endian" "yes"
+						else
+							_config_site_option "ac_cv_c_little_endian" "no"
+						fi
+						;;
+
 					*ac_cv_type_getgroups*)
 						# "... type of array argument to getgroups"
 						_config_site_option "ac_cv_type_getgroups" "gid_t"
@@ -1580,6 +1590,13 @@ $1=$2"
 					*gmp_cv_asm_underscore*)
 						_config_site_option "gmp_cv_asm_underscore" "no"; ;;
 
+					# binutils
+					*ac_cv_func_strncmp_works*)
+						_config_site_option "ac_cv_func_strncmp_works" "yes"; ;;
+					*tcl_cv_api_serial*)
+						_config_site_option "tcl_cv_api_serial" "termios"; ;;
+					*tcl_cv_strtod_buggy*)
+						_config_site_option "tcl_cv_strtod_buggy" "ok"; ;;
 
 					*) ;;
 					esac

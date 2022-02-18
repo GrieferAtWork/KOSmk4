@@ -311,7 +311,7 @@ done_caller_grp:
 }
 
 
-LOCAL NONNULL((1, 2)) void KCALL
+PRIVATE NONNULL((1, 2)) void KCALL
 termios_to_termios2(USER CHECKED struct termios2 *__restrict dst,
                     USER CHECKED struct termios const *__restrict src) {
 	dst->c_iflag = src->c_iflag;
@@ -327,7 +327,7 @@ termios_to_termios2(USER CHECKED struct termios2 *__restrict dst,
 	dst->c_ospeed = src->c_ospeed;
 }
 
-LOCAL NONNULL((1, 2)) void KCALL
+PRIVATE NONNULL((1, 2)) void KCALL
 termios2_to_termios(USER CHECKED struct termios *__restrict dst,
                     USER CHECKED struct termios2 const *__restrict src) {
 	dst->c_iflag = src->c_iflag;
@@ -344,7 +344,7 @@ termios2_to_termios(USER CHECKED struct termios *__restrict dst,
 	dst->c_ospeed = src->c_ospeed;
 }
 
-LOCAL NONNULL((1, 2)) void KCALL
+PRIVATE NONNULL((1, 2)) void KCALL
 termios_to_termio(USER CHECKED struct termio *__restrict dst,
                   USER CHECKED struct termios const *__restrict src) {
 	dst->c_iflag = (u16)src->c_iflag;
@@ -358,7 +358,7 @@ termios_to_termio(USER CHECKED struct termio *__restrict dst,
 	}
 }
 
-LOCAL NONNULL((1, 2)) void KCALL
+PRIVATE NONNULL((1, 2)) void KCALL
 termio_to_termios(USER CHECKED struct termios *__restrict dst,
                   USER CHECKED struct termio const *__restrict src) {
 	dst->c_iflag = src->c_iflag;
@@ -375,7 +375,7 @@ termio_to_termios(USER CHECKED struct termios *__restrict dst,
 	dst->c_ospeed = 0;
 }
 
-LOCAL NONNULL((1, 2)) void KCALL
+PRIVATE NONNULL((1, 2)) void KCALL
 termios_to_termiox(USER CHECKED struct termiox *__restrict dst,
                    USER CHECKED struct termios const *__restrict src) {
 	/* I have no idea if this flag-mapping is even correct... */
@@ -388,7 +388,7 @@ termios_to_termiox(USER CHECKED struct termiox *__restrict dst,
 	}
 }
 
-LOCAL NONNULL((1, 2)) void KCALL
+PRIVATE NONNULL((1, 2)) void KCALL
 termiox_to_termios(USER CHECKED struct termios *__restrict dst,
                    USER CHECKED struct termiox const *__restrict src) {
 	dst->c_iflag = src->x_hflag;

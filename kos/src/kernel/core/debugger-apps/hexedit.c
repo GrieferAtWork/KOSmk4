@@ -267,15 +267,15 @@ hd_getline(void const *start_addr, byte_t data[HD_MAXLINESIZE], u64 *pchanged) {
 
 
 /* Convert a nibble index */
-LOCAL ATTR_DBGTEXT unsigned int FCALL
-hd_convnibble(unsigned int nibble, unsigned int sel_region) {
+LOCAL ATTR_DBGTEXT ATTR_PURE unsigned int
+NOTHROW(FCALL hd_convnibble)(unsigned int nibble, unsigned int sel_region) {
 	if (hd_hex_le && sel_region == HD_REGION_HEX)
 		nibble = (((hd_bytes_per_word - 1) - (nibble / 2)) * 2) + (nibble & 1);
 	return nibble;
 }
 
-LOCAL ATTR_DBGTEXT ATTR_PURE char FCALL
-hd_tohex(byte_t val, bool is_valid) {
+LOCAL ATTR_CONST ATTR_DBGTEXT char
+NOTHROW(FCALL hd_tohex)(byte_t val, bool is_valid) {
 	if (!is_valid)
 		return '?';
 	return _itoa_upper_digits[val];

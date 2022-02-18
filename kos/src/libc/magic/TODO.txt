@@ -106,7 +106,7 @@ TODO: Expand generate_headers.dee and magic.dee to:
 		  #endif
 		  should exist
 		  api.h should then #define WANT_ALL if building the shared library
-	- Add listings of recognized WANT_xxx options within seperate files that
+	- Add listings of recognized WANT_xxx options within separate files that
 	  are generated alongside auto source files
 	- When building the static version of libc, read in the option files and
 	  compile the master file once for every -DWANT_xxx option found therein,
@@ -114,7 +114,7 @@ TODO: Expand generate_headers.dee and magic.dee to:
 	- The result of all of this should be a fairly well-optimized static
 	  version of libc (at least as far as automatically generated functions
 	  go)
-	- Alternatively, generate tiny, seperate source files for every libc-auto
+	- Alternatively, generate tiny, separate source files for every libc-auto
 	  function. Those files could then be compiled much faster than the larger
 	  combined files, since it'd be possible to directly include only the
 	  relevant function dependencies.
