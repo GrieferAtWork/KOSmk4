@@ -328,6 +328,7 @@ INTERN_FUNCTION(libc_except_thrown)
 	/* ATTR_NORETURN void except_thrown(except_code_t code, unsigned int argc, ...) */
 	.cfi_startproc
 	pushfl_cfi_r
+IK(	cld) /* User-space may have set this one (must clear it because kernel is compiled with "-mcld") */
 	pushal_cfi_r
 IU(	INTERN(libc_except_info))
 IU(	call   libc_except_info)
