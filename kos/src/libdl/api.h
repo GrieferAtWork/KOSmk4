@@ -27,10 +27,11 @@
 
 
 /* Setup a custom CRT configuration for our very specific setup:
- *   - Free-standing
- *   - Custom CRT feature functions (see __CRT_HAVE_* below)
- *   - Functions are linked as INTERN
- *   - Substitute the rest using implementations from <libc/local/xxx/yyy.h> */
+ * - Free-standing
+ * - Inline system call declarations (s.a. <kos/syscalls.h>)
+ * - Custom CRT feature functions (see __CRT_HAVE_* below)
+ * - Functions are linked as INTERN
+ * - Substitute the rest using implementations from <libc/local/xxx/yyy.h> */
 #define __CRT_FREESTANDING 1
 #define __LIBC __INTDEF
 
@@ -45,14 +46,6 @@
 #define __NO_PRINTF_STRERROR       1 /* %m */
 #define __NO_SCANF_FLOATING_POINT  1 /* %f, %e, %g, %E, %a */
 
-/* Invoke  system  calls as  inline (NOTE:  We  don't enable  support for
- * i386   sysenter  optimizations  because  this  would  require  linking
- * against  parts of the libc source tree,  as well as add an unnecessary
- * page-fault when the first system call is invoked. - libdl should  have
- * minimal startup time, and be optimized for size; not performance, both
- * of which are  followed more  closely by always  just using  `int 80h') */
-#define __WANT_INLINE_SYSCALLS 1
-
 /* Prevent the global variable  `__peb' from being defined  prematurely
  * (and breaking the visibility of us exporting that variable for real) */
 #define ____peb_defined
@@ -60,6 +53,8 @@
 /* Commit our custom configuration by using it to setup CRT definitions. */
 #include <__crt.h>
 
+/* Ensure that our __CRT_HAVE_* namespace is empty by checking for a
+ * symbol we can assume to be defined under "normal" configurations. */
 #ifdef __CRT_HAVE_memcpy
 #error "Bad configuration"
 #endif /* __CRT_HAVE_memcpy */

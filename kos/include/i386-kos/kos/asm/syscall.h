@@ -62,15 +62,14 @@
 #define __CRT_HAVE_XSC(name) 0
 
 #else /* __KERNEL__ */
-#undef __HAVE_INLINE_SYSCALLS
-#ifdef __WANT_INLINE_SYSCALLS
-#define __HAVE_INLINE_SYSCALLS 1
 
+#undef __HAVE_INLINE_SYSCALLS
+/* Enable inline system calls if explicitly requested, or under freestanding configurations */
+#if defined(__WANT_INLINE_SYSCALLS) || defined(__CRT_FREESTANDING)
+#define __HAVE_INLINE_SYSCALLS 1
 #ifdef __CC__
 #include <hybrid/host.h>
 #include <bits/types.h>
-#include <__crt.h>
-
 
 #if !defined(__NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_PACKER) || \
     !defined(__NRFEAT_DEFINED_SYSCALL_ATTR_NORETURN)
@@ -82,21 +81,21 @@
 #endif /* !... */
 
 #define __CRT_HAVE_SC(name) __X86_SYSCALL_EXISTS(__NRRC_##name)
-#define __CRT_HAVE_XSC __CRT_HAVE_SC
+#define __CRT_HAVE_XSC      __CRT_HAVE_SC
 
 #define __X86_SYSCALL_NORETURN_UNREACHABLE2_0   /* nothing */
 #define __X86_SYSCALL_NORETURN_UNREACHABLE2_1   __builtin_unreachable();
 #define __X86_SYSCALL_NORETURN_UNREACHABLE2(is) __X86_SYSCALL_NORETURN_UNREACHABLE2_##is
 #define __X86_SYSCALL_NORETURN_UNREACHABLE(is)  __X86_SYSCALL_NORETURN_UNREACHABLE2(is)
-#define __X86_SYSCALL_COMMA_IF_ARGC_0   /* nothing */
-#define __X86_SYSCALL_COMMA_IF_ARGC_1   ,
-#define __X86_SYSCALL_COMMA_IF_ARGC_2   ,
-#define __X86_SYSCALL_COMMA_IF_ARGC_3   ,
-#define __X86_SYSCALL_COMMA_IF_ARGC_4   ,
-#define __X86_SYSCALL_COMMA_IF_ARGC_5   ,
-#define __X86_SYSCALL_COMMA_IF_ARGC_6   ,
-#define __X86_SYSCALL_COMMA_IF_ARGC2(n) __X86_SYSCALL_COMMA_IF_ARGC_##n
-#define __X86_SYSCALL_COMMA_IF_ARGC(n) __X86_SYSCALL_COMMA_IF_ARGC2(n)
+#define __X86_SYSCALL_COMMA_IF_ARGC_0           /* nothing */
+#define __X86_SYSCALL_COMMA_IF_ARGC_1           ,
+#define __X86_SYSCALL_COMMA_IF_ARGC_2           ,
+#define __X86_SYSCALL_COMMA_IF_ARGC_3           ,
+#define __X86_SYSCALL_COMMA_IF_ARGC_4           ,
+#define __X86_SYSCALL_COMMA_IF_ARGC_5           ,
+#define __X86_SYSCALL_COMMA_IF_ARGC_6           ,
+#define __X86_SYSCALL_COMMA_IF_ARGC2(n)         __X86_SYSCALL_COMMA_IF_ARGC_##n
+#define __X86_SYSCALL_COMMA_IF_ARGC(n)          __X86_SYSCALL_COMMA_IF_ARGC2(n)
 
 
 __SYSDECL_BEGIN

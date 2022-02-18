@@ -17,34 +17,21 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_APPS_MISC_TRUE_S
-#define GUARD_APPS_MISC_TRUE_S 1
-#define __ASSEMBLER__ 1
+#ifndef GUARD_APPS_MISC_LEAKS_C
+#define GUARD_APPS_MISC_LEAKS_C 1
+#define __CRT_FREESTANDING
 
-#include <hybrid/host.h>
-
-#include <asm/instr/compat.h>
 #include <kos/ksysctl.h>
+#include <kos/syscalls.h>
 
-#include <syscall.h>
+#include <intrin.h>
+#include <stddef.h>
+#include <stdlib.h>
 
-#ifndef __x86_64__
-#define syscall int $0x80
-#endif /* __x86_64__ */
+void _start(void) {
+	if (sys_Xksysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS, NULL) != 0)
+		__breakpoint();
+	sys_Xexit(EXIT_SUCCESS);
+}
 
-#ifndef EXIT_CODE
-#define EXIT_CODE 0
-#endif /* !EXIT_CODE */
-
-.section .text
-.global _start
-.type _start, @function
-_start:
-	movP  $(EXIT_CODE), %R_syscall0P
-	movP  $(SYS_exit),  %Pax
-	std
-	syscall
-	hlt
-.size _start, . - _start
-
-#endif /* !GUARD_APPS_MISC_TRUE_S */
+#endif /* !GUARD_APPS_MISC_LEAKS_C */

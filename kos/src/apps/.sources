@@ -45,19 +45,23 @@ DEFINE_SIMPLE_CXX_APPLICATION("gfx", USELIB("libvideo-gfx"))
 
 if (TARGET_ARCH in ["i386", "x86_64"]) {
 	DEFINE_SIMPLE_C_APPLICATION("scanpci", USELIB("libpciaccess"))
-#define DEFINE_SIMPLE_X86_ASM_APPLICATION(name)         \
-	BEGIN GROUP("apps." name) { COMPILE, LINK, MCOPY }; \
-		SET_NOSTDLIB()                                  \
-		SET_LANGUAGE("assembler-with-cpp")              \
-		SET_OUTPUT("/bin/" name)                        \
-		SOURCE({ "misc/" name ".S" })                   \
-	END
-	DEFINE_SIMPLE_X86_ASM_APPLICATION("leaks")
-	DEFINE_SIMPLE_X86_ASM_APPLICATION("cc")
-	DEFINE_SIMPLE_X86_ASM_APPLICATION("true")
-	DEFINE_SIMPLE_X86_ASM_APPLICATION("false")
-#undef DEFINE_SIMPLE_X86_ASM_APPLICATION
 }
+
+/* Super-simple, statically linked (freestanding) applications. */
+#define DEFINE_FREESTANDING_C_APPLICATION(name)          \
+	BEGIN GROUP("apps." name) { COMPILE, LINK, MCOPY };  \
+		REMOVE_GCC_FLAGS({ "-fstack-protector-strong" }) \
+		SET_NOSTDLIB()                                   \
+		SET_LANGUAGE("c")                                \
+		SET_OUTPUT("/bin/" name)                         \
+		SOURCE({ "misc/" name ".c" })                    \
+	END
+DEFINE_FREESTANDING_C_APPLICATION("leaks")
+DEFINE_FREESTANDING_C_APPLICATION("cc")
+DEFINE_FREESTANDING_C_APPLICATION("true")
+DEFINE_FREESTANDING_C_APPLICATION("false")
+#undef DEFINE_FREESTANDING_C_APPLICATION
+
 
 
 BEGIN GROUP("apps.insmod") { COMPILE, LINK, MCOPY }; SET_OUTPUT("/bin/insmod") SOURCE({ "insmod/insmod.c" }) END

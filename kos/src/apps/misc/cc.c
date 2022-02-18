@@ -17,5 +17,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#define EXIT_CODE 1
-#include "true.S"
+#ifndef GUARD_APPS_MISC_CC_C
+#define GUARD_APPS_MISC_CC_C 1
+#define __CRT_FREESTANDING
+
+#include <kos/ksysctl.h>
+#include <kos/syscalls.h>
+
+#include <stddef.h>
+#include <stdlib.h>
+
+void _start(void) {
+	sys_Xksysctl(KSYSCTL_SYSTEM_CLEARCACHES, NULL);
+	sys_Xexit(EXIT_SUCCESS);
+}
+
+#endif /* !GUARD_APPS_MISC_CC_C */

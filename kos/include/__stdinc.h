@@ -402,9 +402,9 @@
 #ifndef __INTERN_COMDAT
 #ifdef __cplusplus
 #define __INTERN_COMDAT inline __ATTR_NOINLINE __ATTR_UNUSED __ATTR_VISIBILITY("hidden")
-#elif !defined(__NO_ATTR_SELECTANY) && 0 /* __ATTR_SELECTANY can only be used for data... */
+#elif !defined(__NO_ATTR_SELECTANY) && 0 /* __ATTR_SELECTANY can only be used for data... :( */
 #define __INTERN_COMDAT extern __ATTR_UNUSED __ATTR_SELECTANY __ATTR_VISIBILITY("hidden")
-#elif !defined(__NO_ATTR_WEAK)
+#elif !defined(__NO_ATTR_WEAK) && 0 /* weak causes functions to be defined, even if unused :( */
 #define __INTERN_COMDAT __ATTR_UNUSED __ATTR_WEAK __ATTR_VISIBILITY("hidden")
 #else /* ... */
 #define __INTERN_COMDAT static __ATTR_UNUSED

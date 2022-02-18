@@ -17,35 +17,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_APPS_MISC_LEAKS_S
-#define GUARD_APPS_MISC_LEAKS_S 1
-#define __ASSEMBLER__ 1
+#ifndef GUARD_APPS_MISC_TRUE_C
+#define GUARD_APPS_MISC_TRUE_C 1
+#define __CRT_FREESTANDING
 
-#include <hybrid/host.h>
+#include <kos/syscalls.h>
 
-#include <asm/instr/compat.h>
-#include <kos/ksysctl.h>
+#include <stdlib.h>
 
-#include <syscall.h>
+#ifndef EXIT_CODE
+#define EXIT_CODE EXIT_SUCCESS
+#endif /* !EXIT_CODE */
 
-#ifndef __x86_64__
-#define syscall int $0x80
-#endif /* __x86_64__ */
+void _start(void) {
+	sys_Xexit(EXIT_CODE);
+}
 
-.section .text
-.global _start
-.type _start, @function
-_start:
-	movP  $(KSYSCTL_SYSTEM_CLEARCACHES), %R_syscall0P
-	movP  $(SYS_ksysctl), %Pax
-	std
-	syscall
-.Lexit:
-	movP  $(0),        %R_syscall0P
-	movP  $(SYS_exit), %Pax
-	std
-	syscall
-	jmp   .Lexit
-.size _start, . - _start
-
-#endif /* !GUARD_APPS_MISC_LEAKS_S */
+#endif /* !GUARD_APPS_MISC_TRUE_C */
