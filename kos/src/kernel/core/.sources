@@ -106,11 +106,13 @@ BEGIN
 		"memory/*.c",
 		"memory/mman/*.c",
 		"dev/*.c",
+		"fd/*.c",
 		"filesys/*.c",
 		"misc/*.c",
 		"network/*.c",
 		"sched/*.c",
-		"user/*.c",
+
+		/* Do arch-specific files last */
 		"arch/" + XARCH + "/*.c",
 	];
 	for (local x: fs.dir("kos/src/kernel/core/arch/" + XARCH)) {

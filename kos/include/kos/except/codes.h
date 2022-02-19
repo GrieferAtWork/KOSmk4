@@ -178,6 +178,7 @@
                                                                         * [fld(cur_handles: unsigned int, "The number of handles currently allocated")]
                                                                         * [fld(max_handles: unsigned int, "The max number of handles that may be allocated by the caller")] */
 #endif /* !E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS */
+/* TODO: Get rid of `E_BADALLOC_INSUFFICIENT_HANDLE_RANGE' */
 #ifndef E_BADALLOC_INSUFFICIENT_HANDLE_RANGE
 #define E_BADALLOC_INSUFFICIENT_HANDLE_RANGE      (E_BADALLOC, 0x0007) /* [errno(ENFILE), msg("File handle too great")]
                                                                         * [fld(req_handle: unsigned int, "The requested handle number, past which no more unused handles exist.")]
@@ -309,6 +310,7 @@
 #endif /* !E_INVALID_HANDLE */
 #ifndef E_INVALID_HANDLE_FILE
 #define E_INVALID_HANDLE_FILE                     (E_INVALID_HANDLE, 0x0001) /* [msg("The given file descriptor is invalid")]
+                                                                              * [errno($reason == E_INVALID_HANDLE_FILE_ILLEGAL_F_DUPFD ? EINVAL : EBADF)]
                                                                               * [fld(reason:   syscall_ulong_t, "One of `E_INVALID_HANDLE_FILE_*'")]
                                                                               * [fld(fd_max:   unsigned int,    "1+ the max FD number that is currently in use")]
                                                                               * [fld(fd_limit: unsigned int,    "The max allowed FD number that may be assigned")] */
@@ -338,12 +340,20 @@
 #ifndef E_INVALID_HANDLE_FILE_UNBOUND
 #define E_INVALID_HANDLE_FILE_UNBOUND          0x0001 /* The FD slot associated with the given number has no bound value */
 #endif /* !E_INVALID_HANDLE_FILE_UNBOUND */
-#ifndef E_INVALID_HANDLE_FILE_UNALLOCATED
-#define E_INVALID_HANDLE_FILE_UNALLOCATED      0x0002 /* The FD slot associated with the given number isn't allocated (`fd >= fd_max') */
-#endif /* !E_INVALID_HANDLE_FILE_UNALLOCATED */
+#ifndef E_INVALID_HANDLE_FILE_NEGATIVE
+#define E_INVALID_HANDLE_FILE_NEGATIVE         0x0002 /* The given `fd < 0', and symbolic handles are either not accepted, or `fd' isn't a symbolic handle */
+#endif /* !E_INVALID_HANDLE_FILE_NEGATIVE */
 #ifndef E_INVALID_HANDLE_FILE_ILLEGAL
 #define E_INVALID_HANDLE_FILE_ILLEGAL          0x0003 /* The FD slot associated with the given number may not be used (`fd > fd_limit') */
 #endif /* !E_INVALID_HANDLE_FILE_ILLEGAL */
+#ifndef E_INVALID_HANDLE_FILE_ILLEGAL_F_DUPFD
+#define E_INVALID_HANDLE_FILE_ILLEGAL_F_DUPFD  0x0004 /* Same as `E_INVALID_HANDLE_FILE_ILLEGAL', but context is `fcntl(F_DUPFD)'.
+                                                       * -> Translated to EINVAL instead of EBADF for compatibility with linux. */
+#endif /* !E_INVALID_HANDLE_FILE_ILLEGAL_F_DUPFD */
+/* TODO: Remove `E_INVALID_HANDLE_FILE_UNALLOCATED' once `CONFIG_USE_NEW_HANDMAN' becomes mandatory */
+#ifndef E_INVALID_HANDLE_FILE_UNALLOCATED
+#define E_INVALID_HANDLE_FILE_UNALLOCATED      0x0005 /* The FD slot associated with the given number isn't allocated (`fd >= fd_max') */
+#endif /* !E_INVALID_HANDLE_FILE_UNALLOCATED */
 #ifndef E_INVALID_HANDLE_OPERATION_READ
 #define E_INVALID_HANDLE_OPERATION_READ        0x0001 /* Attempted to read() on a handle opened as IO_WRONLY */
 #endif /* !E_INVALID_HANDLE_OPERATION_READ */

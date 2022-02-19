@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_USER_UTIL_C
-#define GUARD_KERNEL_SRC_USER_UTIL_C 1
+#ifndef GUARD_KERNEL_SRC_MISC_USER_C
+#define GUARD_KERNEL_SRC_MISC_USER_C 1
 
 #include <kernel/compiler.h>
 
@@ -261,4 +261,4 @@ ioctl_intarg_setsize(ioctl_t cmd, USER UNCHECKED void *arg, size_t value)
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_USER_UTIL_C */
+#endif /* !GUARD_KERNEL_SRC_MISC_USER_C */

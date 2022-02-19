@@ -713,6 +713,11 @@ for (local name: classes.keys.sorted()) {
 		result = EBADF;
 @@pp_endif@@
 		switch(self->@e_subclass@) {
+@@pp_if defined(EINVAL) && defined(EBADF)@@
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_INVALID_HANDLE_FILE@)):
+			result = self->@e_args@.@e_invalid_handle@.@ih_file@.@f_reason@ == @E_INVALID_HANDLE_FILE_ILLEGAL_F_DUPFD@ ? EINVAL : EBADF;
+			break;
+@@pp_endif@@
 @@pp_if defined(ENOTSOCK) && defined(EBADFD)@@
 		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_INVALID_HANDLE_FILETYPE@)):
 			result = self->@e_args@.@e_invalid_handle@.@ih_filetype@.@f_needed_handle_type@ == @HANDLE_TYPE_SOCKET@ ? ENOTSOCK : EBADFD;

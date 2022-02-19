@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_USER_SENDFILE_C
-#define GUARD_KERNEL_SRC_USER_SENDFILE_C 1
+#ifndef GUARD_KERNEL_SRC_FD_SENDFILE_C
+#define GUARD_KERNEL_SRC_FD_SENDFILE_C 1
 
 #include <kernel/compiler.h>
 
@@ -230,4 +230,4 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, sendfile, fd_t, outfd, fd_t, infd,
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_USER_SENDFILE_C */
+#endif /* !GUARD_KERNEL_SRC_FD_SENDFILE_C */

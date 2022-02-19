@@ -202,10 +202,16 @@ DATDEF struct handle_types const handle_type_db;
 #endif /* __CC__ */
 
 #ifdef __CC__
+
 struct handle {
+	REF void      *h_data; /* [1..1] Handle data pointer. */
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	iomode_t       h_mode; /* Handle I/O mode (Set of `IO_*'). */
+	uintptr_half_t h_type; /* Handle type (One of `HANDLE_TYPE_*') */
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
 	uintptr_half_t h_type; /* Handle type (One of `HANDLE_TYPE_*') */
 	iomode_t       h_mode; /* Handle I/O mode (Set of `IO_*'). */
-	REF void      *h_data; /* [1..1] Handle data pointer. */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 };
 
 
@@ -334,11 +340,116 @@ NOTHROW(KCALL decref_unlikely)(struct handle const *__restrict self) {
 
 } /* extern "C++" */
 #endif /* __cplusplus */
+
+struct fnode;
+struct fdirent;
+struct mfile;
+struct fsuper;
+struct path;
+struct taskpid;
+struct task;
+struct mman;
+struct pipe;
+struct driver;
+struct pidns;
+struct socket;
+struct epoll_controller;
+
+/* Cast  the given handle `self' into `wanted_type', and return a reference
+ * to a handle-compatible object with type `wanted_type'. If such a cast is
+ * impossible, an `E_INVALID_HANDLE_FILETYPE' error is thrown.
+ * NOTE: This function also inherits a reference to `self' (unless an exception is thrown) */
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF void *FCALL
+handle_as(/*inherit(on_success)*/ REF struct handle const *__restrict self, uintptr_half_t wanted_type)
+		THROWS(E_INVALID_HANDLE_FILETYPE);
+
+FORCELOCAL BLOCKING WUNUSED REF void *FCALL
+handle_tryas(/*inherit(on_success)*/ REF struct handle const *__restrict self, uintptr_half_t wanted_type)
+		THROWS(E_WOULDBLOCK) {
+	REF void *result;
+	if unlikely(self->h_type == wanted_type)
+		return self->h_data; /* Inherit reference */
+	result = _handle_tryas(*self, wanted_type);
+	if (result)
+		handle_decref(*self);
+	return result;
+}
+
+FORCELOCAL BLOCKING WUNUSED REF void *FCALL
+handle_tryas_noinherit(struct handle const *__restrict self,
+                       uintptr_half_t wanted_type)
+		THROWS(E_WOULDBLOCK) {
+	if unlikely(self->h_type == wanted_type)
+		return self->h_data; /* Inherit reference */
+	return _handle_tryas(*self, wanted_type);
+}
+
+/* Extended handle converted functions */
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fnode *FCALL
+handle_as_fnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+		THROWS(E_INVALID_HANDLE_FILETYPE);
+
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fsuper *FCALL
+handle_as_fsuper_relaxed(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+		THROWS(E_INVALID_HANDLE_FILETYPE);
+
+/* @throw: E_PROCESS_EXITED: `fd' belongs to a task that is no longer allocated. */
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL
+handle_as_task(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+		THROWS(E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED);
+
+#define handle_as_mfile(self)   ((REF struct mfile *)handle_as(self, HANDLE_TYPE_MFILE))
+#define handle_as_fdirent(self) ((REF struct fdirent *)handle_as(self, HANDLE_TYPE_DIRENT))
+#define handle_as_path(self)    ((REF struct path *)handle_as(self, HANDLE_TYPE_PATH))
+#define handle_as_taskpid(self) ((REF struct taskpid *)handle_as(self, HANDLE_TYPE_PIDFD))
+#define handle_as_pipe(self)    ((REF struct pipe *)handle_as(self, HANDLE_TYPE_PIPE))
+#define handle_as_module(self)  ((REF struct driver *)handle_as(self, HANDLE_TYPE_MODULE))
+#define handle_as_socket(self)  ((REF struct socket *)handle_as(self, HANDLE_TYPE_SOCKET))
+
+#if defined(__cplusplus) && !defined(NO_CXX_HANDLE_AS_OVERLOADS)
+extern "C++" {
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF void *FCALL
+handle_as(/*inherit(on_success)*/ REF struct handle const &__restrict self,
+          uintptr_half_t wanted_type)
+		THROWS(E_INVALID_HANDLE_FILETYPE)
+		ASMNAME("handle_as");
+
+FORCELOCAL BLOCKING WUNUSED REF void *FCALL
+handle_tryas(/*inherit(on_success)*/ REF struct handle const &__restrict self,
+             uintptr_half_t wanted_type)
+		THROWS(E_WOULDBLOCK) {
+	return handle_tryas(&self, wanted_type);
+}
+
+FORCELOCAL BLOCKING WUNUSED REF void *FCALL
+handle_tryas_noinherit(struct handle const &__restrict self,
+                       uintptr_half_t wanted_type)
+		THROWS(E_WOULDBLOCK) {
+	return handle_tryas_noinherit(&self, wanted_type);
+}
+
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct fnode *FCALL
+handle_as_fnode(/*inherit(on_success)*/ REF struct handle const &__restrict self)
+		THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_fnode");
+
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct fsuper *FCALL
+handle_as_fsuper_relaxed(/*inherit(on_success)*/ REF struct handle const &__restrict self)
+		THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_fsuper_relaxed");
+
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct task *FCALL
+handle_as_task(/*inherit(on_success)*/ REF struct handle const &__restrict self)
+		THROWS(E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED) ASMNAME("handle_as_task");
+} /* extern "C++" */
+#endif /* __cplusplus && !NO_CXX_HANDLE_AS_OVERLOADS */
+
+
+
 #endif /* __CC__ */
 
 
 
 
+#ifndef CONFIG_USE_NEW_HANDMAN
 #ifdef __CC__
 struct handle_hashent {
 #define HANDLE_HASHENT_SENTINEL_ID ((unsigned int)-1)
@@ -419,10 +530,7 @@ FUNDEF NOBLOCK void
 NOTHROW(KCALL handle_manager_destroy)(struct handle_manager *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct handle_manager, hm_refcnt, handle_manager_destroy)
 
-/* Allocate a new or / copy the given (which won't
- * copy  any  `IO_CLOFORK' handle)  handle manager */
-FUNDEF ATTR_MALLOC ATTR_RETNONNULL REF struct handle_manager *KCALL
-handle_manager_alloc(void) THROWS(E_BADALLOC);
+/* Copy the given handle manager (exclusing `IO_CLOFORK' handles) */
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL REF struct handle_manager *KCALL
 handle_manager_clone(struct handle_manager *__restrict self)
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
@@ -728,97 +836,74 @@ handle_get_task(unsigned int fd)
 #define handle_get_socket(fd)           ((REF struct socket *)handle_getas(fd, HANDLE_TYPE_SOCKET))
 #define handle_get_epoll_controller(fd) ((REF struct epoll_controller *)handle_getas(fd, HANDLE_TYPE_EPOLL))
 
-/* Cast  the given handle `self' into `wanted_type', and return a reference
- * to a handle-compatible object with type `wanted_type'. If such a cast is
- * impossible, an `E_INVALID_HANDLE_FILETYPE' error is thrown.
- * NOTE: This function also inherits a reference to `self' (unless an exception is thrown) */
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF void *FCALL
-handle_as(/*inherit(on_success)*/ REF struct handle const *__restrict self, uintptr_half_t wanted_type)
-		THROWS(E_INVALID_HANDLE_FILETYPE);
-
-FORCELOCAL BLOCKING WUNUSED REF void *FCALL
-handle_tryas(/*inherit(on_success)*/ REF struct handle const *__restrict self, uintptr_half_t wanted_type)
-		THROWS(E_WOULDBLOCK) {
-	REF void *result;
-	if unlikely(self->h_type == wanted_type)
-		return self->h_data; /* Inherit reference */
-	result = _handle_tryas(*self, wanted_type);
-	if (result)
-		handle_decref(*self);
-	return result;
-}
-
-FORCELOCAL BLOCKING WUNUSED REF void *FCALL
-handle_tryas_noinherit(struct handle const *__restrict self,
-                       uintptr_half_t wanted_type)
-		THROWS(E_WOULDBLOCK) {
-	if unlikely(self->h_type == wanted_type)
-		return self->h_data; /* Inherit reference */
-	return _handle_tryas(*self, wanted_type);
-}
-
-/* Extended handle converted functions */
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fnode *FCALL
-handle_as_fnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE);
-
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fsuper *FCALL
-handle_as_fsuper_relaxed(/*inherit(on_success)*/ REF struct handle const *__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE);
-
-/* @throw: E_PROCESS_EXITED: `fd' belongs to a task that is no longer allocated. */
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL
-handle_as_task(/*inherit(on_success)*/ REF struct handle const *__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED);
-
-#define handle_as_mfile(self)   ((REF struct mfile *)handle_as(self, HANDLE_TYPE_MFILE))
-#define handle_as_fdirent(self) ((REF struct fdirent *)handle_as(self, HANDLE_TYPE_DIRENT))
-#define handle_as_path(self)    ((REF struct path *)handle_as(self, HANDLE_TYPE_PATH))
-#define handle_as_taskpid(self) ((REF struct taskpid *)handle_as(self, HANDLE_TYPE_PIDFD))
-#define handle_as_pipe(self)    ((REF struct pipe *)handle_as(self, HANDLE_TYPE_PIPE))
-#define handle_as_module(self)  ((REF struct driver *)handle_as(self, HANDLE_TYPE_MODULE))
-#define handle_as_socket(self)  ((REF struct socket *)handle_as(self, HANDLE_TYPE_SOCKET))
-
-#if defined(__cplusplus) && !defined(NO_CXX_HANDLE_AS_OVERLOADS)
-extern "C++" {
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF void *FCALL
-handle_as(/*inherit(on_success)*/ REF struct handle const &__restrict self,
-          uintptr_half_t wanted_type)
-		THROWS(E_INVALID_HANDLE_FILETYPE)
-		ASMNAME("handle_as");
-
-FORCELOCAL BLOCKING WUNUSED REF void *FCALL
-handle_tryas(/*inherit(on_success)*/ REF struct handle const &__restrict self,
-             uintptr_half_t wanted_type)
-		THROWS(E_WOULDBLOCK) {
-	return handle_tryas(&self, wanted_type);
-}
-
-FORCELOCAL BLOCKING WUNUSED REF void *FCALL
-handle_tryas_noinherit(struct handle const &__restrict self,
-                       uintptr_half_t wanted_type)
-		THROWS(E_WOULDBLOCK) {
-	return handle_tryas_noinherit(&self, wanted_type);
-}
-
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct fnode *FCALL
-handle_as_fnode(/*inherit(on_success)*/ REF struct handle const &__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_fnode");
-
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct fsuper *FCALL
-handle_as_fsuper_relaxed(/*inherit(on_success)*/ REF struct handle const &__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_fsuper_relaxed");
-
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct task *FCALL
-handle_as_task(/*inherit(on_success)*/ REF struct handle const &__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED) ASMNAME("handle_as_task");
-} /* extern "C++" */
-#endif /* __cplusplus && !NO_CXX_HANDLE_AS_OVERLOADS */
-
-
 #endif /* __CC__ */
-
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 
 DECL_END
+
+#ifdef CONFIG_USE_NEW_HANDMAN
+#ifndef GUARD_KERNEL_INCLUDE_KERNEL_HANDMAN_H
+#include <kernel/handman.h>
+#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_HANDMAN_H */
+
+/* Backwards compatibility */
+#define handle_manager_assert_integrity(self) (void)0
+#define handle_manager              handman
+#define _handle_manager_reap        _handman_reap
+#define handle_manager_reap         handman_reap
+#define handle_manager_mustreap     handman_mustreap
+#define handle_manager_write        handman_write
+#define handle_manager_write_nx     handman_write_nx
+#define handle_manager_trywrite     handman_trywrite
+#define handle_manager_endwrite     handman_endwrite
+#define _handle_manager_endwrite    _handman_endwrite
+#define handle_manager_read         handman_read
+#define handle_manager_read_nx      handman_read_nx
+#define handle_manager_tryread      handman_tryread
+#define _handle_manager_endread     _handman_endread
+#define handle_manager_endread      handman_endread
+#define _handle_manager_end         _handman_end
+#define handle_manager_end          handman_end
+#define handle_manager_upgrade      handman_upgrade
+#define handle_manager_upgrade_nx   handman_upgrade_nx
+#define handle_manager_tryupgrade   handman_tryupgrade
+#define handle_manager_downgrade    handman_downgrade
+#define handle_manager_reading      handman_reading
+#define handle_manager_writing      handman_writing
+#define handle_manager_canread      handman_canread
+#define handle_manager_canwrite     handman_canwrite
+#define handle_manager_waitread     handman_waitread
+#define handle_manager_waitwrite    handman_waitwrite
+#define handle_manager_waitread_nx  handman_waitread_nx
+#define handle_manager_waitwrite_nx handman_waitwrite_nx
+#define handle_manager_destroy      handman_destroy
+#define handle_manager_clone        handman_fork
+#define handle_manager_kernel       handman_kernel
+#define this_handle_manager         this_handman
+#define THIS_HANDLE_MANAGER         THIS_HANDMAN
+#define task_gethandlemanager       task_gethandman
+#define task_sethandlemanager       task_sethandman
+#define handle_manager_cloexec      handman_cloexec
+
+/* TODO: When eventually removing the following, make sure to get rid of `(unsigned int)' casts. */
+#define handle_installopenfd(data, hnd) ((unsigned int)handles_install_openfd(hnd, data))
+#define handle_trylookup(self, fd)      handman_trylookup(self, (fd_t)(fd))
+#define handle_lookup(fd)               handles_lookup((fd_t)(fd))
+#define handle_lookupin(fd, self)       handman_lookup(self, (fd_t)(fd))
+#define handle_lookup_nosym(fd)         handman_lookup(THIS_HANDMAN, (fd_t)(fd))
+#define handle_getas(fd, wanted_type)   handles_lookupobj((fd_t)(fd), wanted_type)
+#define handle_get_fnode(fd)            handles_lookupfnode((fd_t)(fd))
+#define handle_get_fsuper_relaxed(fd)   handles_lookupfsuper_relatex((fd_t)(fd))
+#define handle_get_task(fd)             handles_lookuptask((fd_t)(fd))
+#define handle_get_mfile(fd)            handles_lookupmfile((fd_t)(fd))
+#define handle_get_fdirent(fd)          handles_lookupfdirent((fd_t)(fd))
+#define handle_get_path(fd)             handles_lookuppath((fd_t)(fd))
+#define handle_get_taskpid(fd)          handles_lookuptaskpid((fd_t)(fd))
+#define handle_get_pipe(fd)             handles_lookuppipe((fd_t)(fd))
+#define handle_get_module(fd)           handles_lookupmodule((fd_t)(fd))
+#define handle_get_socket(fd)           handles_lookupsocket((fd_t)(fd))
+#define handle_get_epoll_controller(fd) handles_lookupepoll((fd_t)(fd))
+#endif /* CONFIG_USE_NEW_HANDMAN */
+
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_HANDLE_H */

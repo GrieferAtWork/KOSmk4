@@ -23,7 +23,7 @@
 //#define INSTALL_AT 1
 #endif
 
-
+#ifndef CONFIG_USE_NEW_HANDMAN
 DECL_BEGIN
 
 #ifdef INSTALL_IN
@@ -482,3 +482,4 @@ install_hash_handle:
 #undef INSTALL_AT
 
 DECL_END
+#endif /* !CONFIG_USE_NEW_HANDMAN */

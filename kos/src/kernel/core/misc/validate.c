@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_USER_VALIDATE_C
-#define GUARD_KERNEL_SRC_USER_VALIDATE_C 1
+#ifndef GUARD_KERNEL_SRC_MISC_VALIDATE_C
+#define GUARD_KERNEL_SRC_MISC_VALIDATE_C 1
 
 #include <kernel/compiler.h>
 
@@ -95,4 +95,4 @@ validate_executable(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT) {
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_USER_VALIDATE_C */
+#endif /* !GUARD_KERNEL_SRC_MISC_VALIDATE_C */

@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_USER_HANDLE_UTILITY_C
-#define GUARD_KERNEL_SRC_USER_HANDLE_UTILITY_C 1
+#ifndef GUARD_KERNEL_SRC_FD_UTILS_C
+#define GUARD_KERNEL_SRC_FD_UTILS_C 1
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 
@@ -228,6 +228,7 @@ handle_as(/*inherit(on_success)*/ REF struct handle const *__restrict self,
 }
 
 
+#ifndef CONFIG_USE_NEW_HANDMAN
 /* Complete a thrown exception, inherit a reference to
  * `hnd', and  rethrow the  already thrown  exception. */
 PRIVATE ATTR_COLD ATTR_NOINLINE ATTR_NORETURN void FCALL
@@ -239,8 +240,6 @@ handle_getas_complete_except(unsigned int fd)
 	}
 	RETHROW();
 }
-
-
 
 /* Directly translate handlers to references to objects of specific types. */
 PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF void *FCALL
@@ -318,6 +317,7 @@ handle_get_task(unsigned int fd)
 		handle_getas_complete_except(fd);
 	}
 }
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 
 
 
@@ -408,4 +408,4 @@ handle_as_task(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_USER_HANDLE_UTILITY_C */
+#endif /* !GUARD_KERNEL_SRC_FD_UTILS_C */

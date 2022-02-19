@@ -28,7 +28,7 @@
 
 /* KOS Handle type codes.
  * NOTE: Changes to this list must be updated with:
- * $ deemon -F kos/src/kernel/core/user/handle-router.c kos/src/kernel/include/kernel/handle-proto.h && touch kos/src/kernel/include/kernel/handle.h
+ * $ deemon -F kos/src/kernel/core/fd/router.c kos/src/kernel/include/kernel/handle-proto.h && touch kos/src/kernel/include/kernel/handle.h
  */
 #define HANDLE_TYPE_UNDEFINED       0x0000 /* Undefined/unused handle */
 #define HANDLE_TYPE_MFILE           0x0001 /* `struct mfile' */

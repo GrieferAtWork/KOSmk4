@@ -22,8 +22,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_USER_HANDLE_DEBUGGER_C
-#define GUARD_KERNEL_SRC_USER_HANDLE_DEBUGGER_C 1
+#ifndef GUARD_KERNEL_SRC_FD_DBG_C
+#define GUARD_KERNEL_SRC_FD_DBG_C 1
 #define DISABLE_BRANCH_PROFILING
 #define _KOS_SOURCE 1
 
@@ -36,6 +36,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/io.h>
 #include <debugger/rt.h>
 #include <kernel/handle.h>
+#include <kernel/handman.h>
 
 #include <stddef.h>
 
@@ -72,6 +73,22 @@ DBG_COMMAND(lsfd,
 	struct handle_manager *self;
 	self = FORTASK(dbg_current, this_handle_manager);
 	dbg_printf(DBGSTR("fd\tflags type             repr\n"));
+#ifdef CONFIG_USE_NEW_HANDMAN
+	{
+		struct handrange *range;
+		for (range = handman_ranges_first(self); range;
+		     range = handman_ranges_next(self, range)) {
+			unsigned int i, size;
+			size = handrange_count(range);
+			for (i = 0; i < size; ++i) {
+				if (!handrange_slotishand(range, i))
+					continue;
+				printhandle(range->hr_minfd + i,
+				            &range->hr_hand[i].mh_hand);
+			}
+		}
+	}
+#else /* CONFIG_USE_NEW_HANDMAN */
 	if (self->hm_mode == HANDLE_MANAGER_MODE_LINEAR) {
 		unsigned int i;
 		for (i = 0; i < self->hm_linear.hm_alloc; ++i)
@@ -89,6 +106,7 @@ DBG_COMMAND(lsfd,
 			            &self->hm_hashvector.hm_vector[ent.hh_vector_index]);
 		}
 	}
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 	return 0;
 }
 
@@ -98,4 +116,4 @@ DECL_END
 
 #endif /* CONFIG_HAVE_DEBUGGER */
 
-#endif /* !GUARD_KERNEL_SRC_USER_HANDLE_DEBUGGER_C */
+#endif /* !GUARD_KERNEL_SRC_FD_DBG_C */

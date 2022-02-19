@@ -17,13 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_USER_HANDLE_C
-#define GUARD_KERNEL_SRC_USER_HANDLE_C 1
+#ifndef GUARD_KERNEL_SRC_FD_HANDLE_C
+#define GUARD_KERNEL_SRC_FD_HANDLE_C 1
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 
+#ifndef CONFIG_USE_NEW_HANDMAN
 #include <debugger/config.h>
 #include <debugger/hook.h>
 #include <kernel/except.h>
@@ -134,26 +135,6 @@ NOTHROW(KCALL handle_manager_destroy)(struct handle_manager *__restrict self) {
 	kfree(self);
 }
 
-PUBLIC ATTR_MALLOC ATTR_RETNONNULL REF struct handle_manager *KCALL
-handle_manager_alloc(void) THROWS(E_BADALLOC) {
-	REF struct handle_manager *result;
-	result = (REF struct handle_manager *)kmalloc(sizeof(struct handle_manager),
-	                                              GFP_NORMAL);
-	result->hm_refcnt = 1;
-	atomic_rwlock_init(&result->hm_lock);
-	/* -1 is `HANDLE_HASHENT_SENTINEL_ID', which may not be used! */
-	result->hm_cntlimit         = (unsigned int)-2;
-	result->hm_maxlimit         = (unsigned int)-2;
-	result->hm_count            = 0;
-	result->hm_minfree          = 0;
-	result->hm_mode             = HANDLE_MANAGER_MODE_LINEAR;
-	result->hm_clofork_count    = 0;
-	result->hm_cloexec_count    = 0;
-	result->hm_linear.hm_alloc  = 0;
-	result->hm_linear.hm_vector = NULL;
-	return result;
-}
-
 #if HANDLE_TYPE_UNDEFINED == 0
 LOCAL void KCALL
 clear_unused_but_allocated_handle_vector_tail(struct handle *__restrict vector,
@@ -181,6 +162,7 @@ clear_unused_but_allocated_handle_vector_tail(struct handle *__restrict vector,
 #endif /* HANDLE_TYPE_UNDEFINED != 0 */
 
 
+/* Copy the given handle manager (exclusing `IO_CLOFORK' handles) */
 PUBLIC ATTR_MALLOC ATTR_RETNONNULL REF struct handle_manager *KCALL
 handle_manager_clone(struct handle_manager *__restrict self) THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	REF struct handle_manager *result;
@@ -2437,6 +2419,6 @@ DECL_END
 /**/
 #include "handle-install.c.inl"
 #endif /* !__INTELLISENSE__ */
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 
-
-#endif /* !GUARD_KERNEL_SRC_USER_HANDLE_C */
+#endif /* !GUARD_KERNEL_SRC_FD_HANDLE_C */

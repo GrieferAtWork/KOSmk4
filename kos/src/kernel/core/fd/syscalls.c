@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_USER_HANDLE_SYSCALLS_C
-#define GUARD_KERNEL_SRC_USER_HANDLE_SYSCALLS_C 1
+#ifndef GUARD_KERNEL_SRC_FD_SYSCALLS_C
+#define GUARD_KERNEL_SRC_FD_SYSCALLS_C 1
 #define _GNU_SOURCE 1 /* TIMEVAL_TO_TIMESPEC */
 #define _KOS_SOURCE 1
 #define _TIME64_SOURCE 1
@@ -94,6 +94,11 @@
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SELECT && __ARCH_WANT_COMPAT_SYSCALL__NEWSELECT */
 
 #undef sigmask
+
+/* TODO: Move groups of system calls from this file into their own file:
+ *  - select(), poll()                   --> fd/poll.c
+ *  - read(), write(), pread(), pwrite() --> fd/readwrite.c
+ */
 
 DECL_BEGIN
 
@@ -2542,4 +2547,4 @@ DEFINE_SYSCALL5(syscall_slong_t, kcmp,
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_USER_HANDLE_SYSCALLS_C */
+#endif /* !GUARD_KERNEL_SRC_FD_SYSCALLS_C */

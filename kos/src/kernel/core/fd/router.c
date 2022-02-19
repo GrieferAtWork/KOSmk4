@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_USER_HANDLE_C
-#define GUARD_KERNEL_SRC_USER_HANDLE_C 1
+#ifndef GUARD_KERNEL_SRC_FD_ROUTER_C
+#define GUARD_KERNEL_SRC_FD_ROUTER_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -1671,4 +1671,4 @@ handle_refcountable_printlink(struct refcountable *__restrict self, pformatprint
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_USER_HANDLE_C */
+#endif /* !GUARD_KERNEL_SRC_FD_ROUTER_C */
