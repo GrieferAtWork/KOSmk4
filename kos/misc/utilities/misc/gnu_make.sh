@@ -631,6 +631,11 @@ $1=$2"
 					"
 				}
 				while IFS= read -r line; do
+					# NOTE: Options were discovered by searching through 3rd party packages for:
+					#   - AC_TRY_RUN
+					#   - AC_RUN_IFELSE
+					# Matches where then individually looked at for use of AC_CACHE_CHECK
+
 					case "$line" in
 
 					*ac_cv_c_stack_direction*)
@@ -1597,6 +1602,44 @@ $1=$2"
 						_config_site_option "tcl_cv_api_serial" "termios"; ;;
 					*tcl_cv_strtod_buggy*)
 						_config_site_option "tcl_cv_strtod_buggy" "ok"; ;;
+					*gcc_cv_have_tls*)
+						_config_site_option "gcc_cv_have_tls" "yes"; ;;
+					*ac_cv_have_elf_style_weakref*)
+						_config_site_option "ac_cv_have_elf_style_weakref" "yes"; ;;
+
+					# gcc
+					*gcc_cv_initfini_array*)
+						_config_site_option "gcc_cv_initfini_array" "yes"; ;;
+					*gcc_cv_func_mbstowcs_works*) # assert(!CRASHES(mbstowcs(0, "", 0)))  (standards don't mandate this to work, so it doesn't on KOS)
+						_config_site_option "gcc_cv_func_mbstowcs_works" "no"; ;;
+					*libgfor_cv_have_unlink_open_file*) # "...whether the target can unlink an open file"
+						_config_site_option "libgfor_cv_have_unlink_open_file" "yes"; ;;
+					*libgfor_cv_have_crlf*) # No, KOS likes to use "\n" (but we do accept "\r\n" in most places)
+						_config_site_option "libgfor_cv_have_crlf" "no"; ;;
+					*libgfor_cv_have_working_stat*)
+						_config_site_option "libgfor_cv_have_working_stat" "yes"; ;;
+					*libgo_cv_lib_setcontext_clobbers_tls*)
+						_config_site_option "libgo_cv_lib_setcontext_clobbers_tls" "no"; ;;
+
+					# libncurses
+					*cf_cv_good_bcopy*) # bcopy() allows overlapping, like memmove()
+						_config_site_option "cf_cv_good_bcopy" "yes"; ;;
+					*cf_cv_func_nanosleep*)
+						_config_site_option "cf_cv_func_nanosleep" "yes"; ;;
+					*cf_cv_working_poll*)
+						_config_site_option "cf_cv_working_poll" "yes"; ;;
+					*cf_cv_link_funcs*)
+						_config_site_option "cf_cv_link_funcs" "yes"; ;;
+					*cf_cv_func_mkstemp*)
+						_config_site_option "cf_cv_func_mkstemp" "yes"; ;;
+
+					# mc
+					*samba_cv_have_longlong*)
+						_config_site_option "samba_cv_have_longlong" "yes"; ;;
+					*samba_cv_HAVE_GETTIMEOFDAY_TZ*)
+						_config_site_option "samba_cv_HAVE_GETTIMEOFDAY_TZ" "yes"; ;;
+					*samba_cv_HAVE_BROKEN_READDIR*)
+						_config_site_option "samba_cv_HAVE_BROKEN_READDIR" "no"; ;;
 
 					*) ;;
 					esac
