@@ -191,9 +191,7 @@ DECL_END
 #define RBTREE_SETLHS(self, v) (void)((self)->_pd_next_lo = (v))
 #define RBTREE_SETRHS(self, v) (void)((self)->_pd_next_hi = (v))
 #define RBTREE_GETKEY(self)    (self)->pd_addr
-#define RBTREE_ISRED(self)     (self)->_pd_tree_rd
-#define RBTREE_SETRED(self)    ((self)->_pd_tree_rd = 1)
-#define RBTREE_SETBLACK(self)  ((self)->_pd_tree_rd = 0)
+#define RBTREE_REDFIELD        _pd_tree_rd
 #include <hybrid/sequence/rbtree-abi.h>
 
 DECL_BEGIN

@@ -140,14 +140,14 @@ union handslot {
 
 
 /* When a `struct handrange' with this many consecutive `handslot_isfree()' slots
- * exists, that range should be split into 2 smaller ranges, the first of which
+ * exists, that range should be split into  2 smaller ranges, the first of  which
  * ends at the free range, and the second of which starts after the free range.
  *
- * We calculate this threshold quite intuitively as the ceil'd # of the handles
+ * We  calculate this threshold quite intuitively as  the ceil'd # of the handles
  * that fit into the space needed for headers preceding the actual handle vector,
  * meaning that more than this # of consecutive free slots would be wasted space.
  *
- * Finally, we add +2 just for good measure, and since we also want to optimize
+ * Finally,  we add +2 just for good measure, and since we also want to optimize
  * for speed in regards to how many different ranges are pointed-to by the range
  * table of a `struct handman' */
 #define HANDRANGE_FREESLOTS_SPLIT_THRESHOLD            \
@@ -156,18 +156,25 @@ union handslot {
 	  sizeof(struct handle)) +                         \
 	 2)
 
+/* Bits for `struct handrange::hr_flags' */
+#define HANDRANGE_F_NORMAL 0x00000000 /* Normal flags. */
+#define HANDRANGE_F_RED    0x00000001 /* FLAG: This range is a red node. */
+#define _HANDRANGE_F_TRUNC 0x00000002 /* FLAG: The range will be truncated (used internally) */
+
 struct handrange {
 #ifdef CONFIG_HANDMAN_USES_RBTREE
 	RBTREE_NODE(handrange)   hr_node;  /* [lock(:hm_lock)][0..1] Node in tree of handle ranges. */
 #else /* CONFIG_HANDMAN_USES_RBTREE */
 	LLRBTREE_NODE(handrange) hr_node;  /* [lock(:hm_lock)][0..1] Node in tree of handle ranges. */
 #endif /* !CONFIG_HANDMAN_USES_RBTREE */
-	fd_t                     hr_minfd; /* [lock(:hm_lock)] Min file descriptor contained by this range. */
-	fd_t                     hr_maxfd; /* [lock(:hm_lock)] Max file descriptor contained by this range. */
+	uintptr_t                hr_flags; /* [lock(:hm_lock)] Set of `HANDRANGE_F_*' */
+	unsigned int             hr_minfd; /* [lock(:hm_lock)] Min file descriptor contained by this range. */
+	unsigned int             hr_maxfd; /* [lock(:hm_lock)] Max file descriptor contained by this range. */
 	unsigned int             hr_nhint; /* [lock(INC(:hm_lock), DEC(ATOMIC))]
 	                                    * Lowest FD (relative to `hr_minfd') which *may* be `HANDLE_TYPE_UNDEFINED'.
 	                                    * When searching for free slots, we only consider slots above this  relative
-	                                    * value, though due to race conditions, some may also exist below. */
+	                                    * value, though due to race conditions, some may also exist below.
+	                                    * NOTE: Must be considered invalid as `>= handrange_count()' */
 	unsigned int             hr_nlops; /* [lock(INC(:hm_lock), DEC(ATOMIC))] Max # of lop-handles.
 	                                    * When non-zero, the  range may not  be reallocated  (only
 	                                    * inplace-realloc  is  allowed),  as  direct  pointers  to
@@ -184,14 +191,22 @@ struct handrange {
 	                                    * Upper bound for # of handles with IO_CLOEXEC */
 	unsigned int             hr_cfork; /* [lock(INC(:hm_lock || (hr_nlops != 0 && ATOMIC)), DEC(:hm_lock))]
 	                                    * Upper bound for # of handles with IO_CLOFORK */
-	union {
-		Toblockop(handman)     _hr_joinlop;  /* [lock(ATOMIC)] Lock operator (used by `hr_nlops') */
-		Tobpostlockop(handman) _hr_joinplop; /* [lock(ATOMIC)] Post-lock operator (used by `hr_nlops') */
+	union { /* Lock operator (used by `hr_nlops') */
+		Toblockop(handman)     _hr_joinlop;  /* [lock(ATOMIC && (WAS(.olo_func == NULL || CALLER_SET) && hr_nlops != 0))] */
+		Tobpostlockop(handman) _hr_joinplop; /* [lock(ATOMIC && (WAS(.olo_func == NULL || CALLER_SET) && hr_nlops != 0))] */
 	};
 	/* [lock(:hm_lock || ATOMIC(TRANSITION([*].mh_hand.h_type, _MANHANDLE_LOADMARKER, HANDLE_TYPE_*)))]
 	 * Vector handles defined by this range. */
 	COMPILER_FLEXIBLE_ARRAY(union handslot, hr_hand);
 };
+
+#define _handrange_sizeof(num_handles)               (__builtin_offsetof(struct handrange, hr_hand) + (num_handles) * sizeof(union handslot))
+#define _handrange_alloc_nx(num_handles, gfp)        ((struct handrange *)kmalloc_nx(_handrange_sizeof(num_handles), gfp))
+#define _handrange_alloc(num_handles, gfp)           ((struct handrange *)kmalloc(_handrange_sizeof(num_handles), gfp))
+#define _handrange_realloc_nx(ptr, num_handles, gfp) ((struct handrange *)krealloc_nx(ptr, _handrange_sizeof(num_handles), gfp))
+#define _handrange_realloc(ptr, num_handles, gfp)    ((struct handrange *)krealloc(ptr, _handrange_sizeof(num_handles), gfp))
+#define _handrange_free(ptr)                         kfree(ptr)
+
 
 /* Check if reallocation of `self' is currently allowed.
  * The caller  must be  holding  a lock  to  `:hm_lock'! */
@@ -200,7 +215,7 @@ struct handrange {
 
 /* Return the # of handles contained in this handle-range's range. */
 #define handrange_count(self) \
-	((unsigned int)(((self)->hr_maxfd - (self)->hr_minfd) + 1))
+	(((self)->hr_maxfd - (self)->hr_minfd) + 1)
 
 /* Determine the status of a given handle slot:
  *  - handrange_slotishand: h_type != HANDLE_TYPE_UNDEFINED && _handslot_ishand
@@ -290,7 +305,8 @@ struct handrange {
 	 ((mode)&IO_CLOEXEC) ? (void)__hybrid_atomic_inc((range)->hr_cexec, __ATOMIC_RELEASE) : (void)0,  \
 	 ((mode)&IO_CLOFORK) ? (void)__hybrid_atomic_inc((range)->hr_cfork, __ATOMIC_RELEASE) : (void)0,  \
 	 __hybrid_atomic_store((self)->_mh_words[1], __handslot_makeword2(mode, type), __ATOMIC_SEQ_CST), \
-	 handrange_dec_nlops_and_maybe_rejoin(range, man, 0))
+	 handrange_dec_nlops_and_maybe_rejoin(range, man, 0),                                             \
+	 sig_broadcast(&(man)->hm_changed))
 
 /* Similar to `_handslot_commit()', but rather than commit handles,
  * this  one is used to mark pre-allocated handles as unused. (such
@@ -312,6 +328,7 @@ struct handrange {
 		                                      __ATOMIC_RELEASE, __ATOMIC_RELEASE));                                    \
 		__hybrid_atomic_dec((man)->hm_handles, __ATOMIC_SEQ_CST);                                                      \
 		handrange_dec_nlops_and_maybe_rejoin(range, man, 1);                                                           \
+		sig_broadcast(&(man)->hm_changed);                                                                             \
 	}	__WHILE0
 
 /* Asynchronously try to rejoin `self' with its neighboring ranges.
@@ -344,11 +361,11 @@ struct handman {
 	                                      * allocated. When allocating new slots, the system
 	                                      * checks that `(hm_handles + 1) <= hm_maxhand'. If
 	                                      * not: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS. */
-	fd_t                     hm_maxfd;   /* [lock(ATOMIC)] The max file descriptor number which
+	unsigned int             hm_maxfd;   /* [lock(ATOMIC)] The max file descriptor number which
 	                                      * may be assigned (in future operations). Usually set
-	                                      * to  `INT_MAX'.  Handles outside  of this  range (or
-	                                      * those with negative numbers) can never be assigned,
-	                                      * but sometimes have symbolic meaning (e.g. AT_FDCWD)
+	                                      * to  `INT_MAX'. Handles greater  than this (or those
+	                                      * with negative numbers)  cannot be assigned,  though
+	                                      * some have symbolic meaning (e.g. AT_FDCWD)
 	                                      *
 	                                      * This field must not be set of a negative value! */
 };
@@ -537,7 +554,6 @@ handman_trylookup(struct handman *__restrict self, fd_t fd)
 #endif /* __cplusplus */
 
 /* Close the handle `fd' within `self', and store its old contents in `*hand'
- * NOTE:
  * @return: ohand: Always re-returns `ohand'
  * @throw: E_INVALID_HANDLE_FILE:E_INVALID_HANDLE_FILE_NEGATIVE:fd: `fd < 0'
  * @throw: E_INVALID_HANDLE_FILE:E_INVALID_HANDLE_FILE_ILLEGAL:fd:  `fd > self->hm_maxfd'
@@ -552,14 +568,14 @@ handman_close(struct handman *__restrict self, fd_t fd,
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_CLOSE_RANGE_BADRANGE: [...] */
 FUNDEF NONNULL((1)) unsigned int FCALL
 handman_closerange(struct handman *__restrict self,
-                   fd_t minfd, fd_t maxfd)
+                   unsigned int minfd, unsigned int maxfd)
 		THROWS(E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE);
 
 /* The combination of `handman_fork()' and `handman_closerange()'
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_CLOSE_RANGE_BADRANGE: [...] */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct handman *FCALL
 handman_fork_and_closerange(struct handman *__restrict self,
-                            fd_t minfd, fd_t maxfd)
+                            unsigned int minfd, unsigned int maxfd)
 		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
 		       E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE);
 
@@ -567,7 +583,7 @@ handman_fork_and_closerange(struct handman *__restrict self,
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_CLOSE_RANGE_BADRANGE: [...] */
 FUNDEF NONNULL((1)) void FCALL
 handman_setcloexec_range(struct handman *__restrict self,
-                         fd_t minfd, fd_t maxfd)
+                         unsigned int minfd, unsigned int maxfd)
 		THROWS(E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE);
 
 /* Find the next handrange_slotishand handle in a slot >= fd
@@ -705,6 +721,9 @@ NOTHROW(FCALL _handman_install_commit)(struct handman_install_data *__restrict s
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL handman_install_abort)(struct handman_install_data *__restrict self);
 /************************************************************************/
+
+
+
 
 
 

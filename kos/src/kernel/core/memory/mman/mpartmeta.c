@@ -179,18 +179,17 @@ DECL_END
 #define RBTREE_WANT_TRYINSERT
 #define RBTREE_WANT_RLOCATE
 #define RBTREE_WANT_RREMOVE
-#define RBTREE(name)           mfutex_tree_##name
-#define RBTREE_T               struct mfutex
-#define RBTREE_Tkey            mpart_reladdr_t
-#define RBTREE_GETNODE(self)   (self)->mfu_mtaent
-#define RBTREE_GETKEY(self)    mfutex_addr(self)
-#define RBTREE_ISRED(self)     ((self)->mfu_addr & 1)
-#define RBTREE_SETRED(self)    (void)((self)->mfu_addr |= 1)
-#define RBTREE_SETBLACK(self)  (void)((self)->mfu_addr &= ~1)
-#define RBTREE_CC              FCALL
-#define RBTREE_NOTHROW         NOTHROW
-#define RBTREE_DECL            FUNDEF
-#define RBTREE_IMPL            PUBLIC
+#define RBTREE(name)         mfutex_tree_##name
+#define RBTREE_T             struct mfutex
+#define RBTREE_Tkey          mpart_reladdr_t
+#define RBTREE_GETNODE(self) (self)->mfu_mtaent
+#define RBTREE_GETKEY(self)  mfutex_addr(self)
+#define RBTREE_REDFIELD      mfu_addr
+#define RBTREE_REDBIT        1
+#define RBTREE_CC            FCALL
+#define RBTREE_NOTHROW       NOTHROW
+#define RBTREE_DECL          FUNDEF
+#define RBTREE_IMPL          PUBLIC
 #include <hybrid/sequence/rbtree-abi.h>
 
 DECL_BEGIN

@@ -54,11 +54,9 @@ DECL_END
 #define RBTREE_T     struct mynode
 #define RBTREE_Tkey  int
 
-#define RBTREE_GETNODE(self)  (self)->n_node
-#define RBTREE_GETKEY(self)   (self)->n_key
-#define RBTREE_ISRED(self)    (self)->n_isred
-#define RBTREE_SETRED(self)   ((self)->n_isred = 1)
-#define RBTREE_SETBLACK(self) ((self)->n_isred = 0)
+#define RBTREE_GETNODE(self) (self)->n_node
+#define RBTREE_GETKEY(self)  (self)->n_key
+#define RBTREE_REDFIELD      n_isred
 
 #include <hybrid/sequence/rbtree-abi.h>
 /**/

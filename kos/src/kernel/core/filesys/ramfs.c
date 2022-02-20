@@ -61,11 +61,7 @@
 #define RBTREE_Tkey                USER CHECKED char const *
 #define RBTREE_GETNODE(self)       (self)->rde_treenode
 #define RBTREE_GETKEY(self)        (self)->rde_ent.fd_name
-#define RBTREE_ISRED(self)         (self)->rde_isred
-#define RBTREE_SETRED(self)        (void)((self)->rde_isred = 1)
-#define RBTREE_SETBLACK(self)      (void)((self)->rde_isred = 0)
-#define RBTREE_FLIPCOLOR(self)     (void)((self)->rde_isred ^= -1)
-#define RBTREE_COPYCOLOR(dst, src) (void)((dst)->rde_isred = (src)->rde_isred)
+#define RBTREE_REDFIELD            rde_isred
 #define RBTREE_CC                  FCALL
 #define RBTREE_NOTHROW             NOTHROW
 #define RBTREE_NOTHROW_U           /* nothing */

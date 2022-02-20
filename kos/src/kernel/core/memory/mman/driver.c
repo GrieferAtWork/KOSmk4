@@ -2466,22 +2466,19 @@ DECL_END
 #define RBTREE_OMIT_REMOVENODE
 #define RBTREE_OMIT_INSERT
 #define RBTREE_WANT_TRYINSERT
-#define RBTREE_DECL                PRIVATE
-#define RBTREE_IMPL                PRIVATE
-#define RBTREE(name)               dfc_##name
-#define RBTREE_T                   struct driver_fde_cache
-#define RBTREE_Tkey                void const *
-#define RBTREE_CC                  FCALL
-#define RBTREE_NOTHROW             NOTHROW
-#define RBTREE_NODEPATH            dfc_node
-#define RBTREE_ISRED(self)         ((self)->dfc_heapsz & 1)
-#define RBTREE_SETRED(self)        (void)((self)->dfc_heapsz |= 1)
-#define RBTREE_SETBLACK(self)      (void)((self)->dfc_heapsz &= ~1)
-#define RBTREE_FLIPCOLOR(self)     (void)((self)->dfc_heapsz ^= 1)
-#define RBTREE_COPYCOLOR(dst, src) (void)((dst)->dfc_heapsz &= ~1, (dst)->dfc_heapsz |= ((src)->dfc_heapsz & 1))
-#define RBTREE_GETNODE(self)       (self)->dfc_node
-#define RBTREE_GETMINKEY(node)     (node)->dfc_fde.f_pcstart
-#define RBTREE_GETMAXKEY(node)     ((byte_t *)(node)->dfc_fde.f_pcend - 1)
+#define RBTREE_DECL            PRIVATE
+#define RBTREE_IMPL            PRIVATE
+#define RBTREE(name)           dfc_##name
+#define RBTREE_T               struct driver_fde_cache
+#define RBTREE_Tkey            void const *
+#define RBTREE_CC              FCALL
+#define RBTREE_NOTHROW         NOTHROW
+#define RBTREE_NODEFIELD       dfc_node
+#define RBTREE_REDFIELD        dfc_heapsz
+#define RBTREE_REDBIT          1
+#define RBTREE_GETNODE(self)   (self)->dfc_node
+#define RBTREE_GETMINKEY(node) (node)->dfc_fde.f_pcstart
+#define RBTREE_GETMAXKEY(node) ((byte_t *)(node)->dfc_fde.f_pcend - 1)
 #include <hybrid/sequence/rbtree-abi.h>
 
 DECL_BEGIN

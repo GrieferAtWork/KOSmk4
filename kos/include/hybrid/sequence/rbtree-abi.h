@@ -41,12 +41,12 @@
  * >> #define RBTREE_CC                  LIBCCALL
  * >> #define RBTREE_NOTHROW             NOTHROW_NCX
  * >> #define RBTREE_NOTHROW_U           NOTHROW_NCX
- * >> #define RBTREE_SLOT__PARAMS        , int extra, int args  // If needed for accessing RBTREE_NODEPATH or colors
+ * >> #define RBTREE_SLOT__PARAMS        , int extra, int args  // If needed for accessing RBTREE_NODEFIELD or colors
  * >> #define RBTREE_SLOT__ARGS          , extra, args
  * >> #define RBTREE_KEY_LO(a, b)        ((a) < (b))    // Compare keys
  * >> #define RBTREE_KEY_EQ(a, b)        ((a) == (b))   // Compare keys
  * >> #define RBTREE_NULL                NULL           // Null-branch
- * >> #define RBTREE_NODEPATH            rb_node
+ * >> #define RBTREE_NODEFIELD           rb_node
  * >> #define RBTREE_ISRED(self)         ((self)->color == RED)
  * >> #define RBTREE_XISRED(self)        ((self) != NULL && (self)->color == RED)
  * >> #define RBTREE_SETRED(self)        (void)((self)->color = RED)
@@ -385,11 +385,11 @@ __DECL_END
      (!defined(RBTREE_LEFT_LEANING) && (!defined(RBTREE_GETPAR) || \
                                         !defined(RBTREE_SETPAR))))
 #ifndef RBTREE_GETNODE
-#ifdef RBTREE_NODEPATH
-#define RBTREE_GETNODE(self) (self)->RBTREE_NODEPATH
-#else /* RBTREE_NODEPATH */
+#ifdef RBTREE_NODEFIELD
+#define RBTREE_GETNODE(self) (self)->RBTREE_NODEFIELD
+#else /* RBTREE_NODEFIELD */
 #error "Missing macro: `#define RBTREE_GETNODE(self)'"
-#endif /* !RBTREE_NODEPATH */
+#endif /* !RBTREE_NODEFIELD */
 #endif /* !RBTREE_GETNODE */
 #ifndef RBTREE_GETLHS
 #define RBTREE_GETLHS(self)    RBTREE_GETNODE(self).rb_lhs
@@ -413,27 +413,81 @@ __DECL_END
 #endif /* !RBTREE_LEFT_LEANING */
 #endif /* !... */
 
+
+
+
 #ifndef RBTREE_ISRED
+#if defined(RBTREE_REDFIELD) && defined(RBTREE_REDBIT)
+#define RBTREE_ISRED(self) ((self)->RBTREE_REDFIELD & RBTREE_REDBIT)
+#elif defined(RBTREE_REDFIELD) && defined(RBTREE_BLACKBIT)
+#define RBTREE_ISRED(self) (!((self)->RBTREE_REDFIELD & RBTREE_BLACKBIT))
+#elif defined(RBTREE_REDFIELD)
+#define RBTREE_ISRED(self) ((self)->RBTREE_REDFIELD != 0)
+#elif defined(RBTREE_BLACKFIELD)
+#define RBTREE_ISRED(self) ((self)->RBTREE_BLACKFIELD == 0)
+#else /* ... */
 #error "Missing macro: `#define RBTREE_ISRED(self)'"
+#endif /* !... */
 #endif /* !RBTREE_ISRED */
+
 #ifndef RBTREE_SETRED
+#if defined(RBTREE_REDFIELD) && defined(RBTREE_REDBIT)
+#define RBTREE_SETRED(self) (void)((self)->RBTREE_REDFIELD |= RBTREE_REDBIT)
+#elif defined(RBTREE_REDFIELD) && defined(RBTREE_BLACKBIT)
+#define RBTREE_SETRED(self) (void)((self)->RBTREE_REDFIELD &= ~RBTREE_BLACKBIT)
+#elif defined(RBTREE_REDFIELD)
+#define RBTREE_SETRED(self) (void)((self)->RBTREE_REDFIELD = 1)
+#elif defined(RBTREE_BLACKFIELD)
+#define RBTREE_SETRED(self) (void)((self)->RBTREE_BLACKFIELD = 0)
+#else /* ... */
 #error "Missing macro: `#define RBTREE_SETRED(self)'"
+#endif /* !... */
 #endif /* !RBTREE_SETRED */
+
 #ifndef RBTREE_SETBLACK
+#if defined(RBTREE_REDFIELD) && defined(RBTREE_REDBIT)
+#define RBTREE_SETBLACK(self) (void)((self)->RBTREE_REDFIELD &= ~RBTREE_REDBIT)
+#elif defined(RBTREE_REDFIELD) && defined(RBTREE_BLACKBIT)
+#define RBTREE_SETBLACK(self) (void)((self)->RBTREE_REDFIELD |= RBTREE_BLACKBIT)
+#elif defined(RBTREE_REDFIELD)
+#define RBTREE_SETBLACK(self) (void)((self)->RBTREE_REDFIELD = 0)
+#elif defined(RBTREE_BLACKFIELD)
+#define RBTREE_SETBLACK(self) (void)((self)->RBTREE_BLACKFIELD = 1)
+#else /* ... */
 #error "Missing macro: `#define RBTREE_SETBLACK(self)'"
+#endif /* !... */
 #endif /* !RBTREE_SETBLACK */
 
 #ifndef RBTREE_FLIPCOLOR
+#if defined(RBTREE_REDFIELD) && defined(RBTREE_REDBIT)
+#define RBTREE_FLIPCOLOR(self) (void)((self)->RBTREE_REDFIELD ^= RBTREE_REDBIT)
+#elif defined(RBTREE_REDFIELD) && defined(RBTREE_BLACKBIT)
+#define RBTREE_FLIPCOLOR(self) (void)((self)->RBTREE_REDFIELD ^= RBTREE_BLACKBIT)
+#elif defined(RBTREE_REDFIELD)
+#define RBTREE_FLIPCOLOR(self) (void)((self)->RBTREE_REDFIELD ^= -1)
+#elif defined(RBTREE_BLACKFIELD)
+#define RBTREE_FLIPCOLOR(self) (void)((self)->RBTREE_BLACKFIELD ^= -0)
+#else /* ... */
 #define RBTREE_FLIPCOLOR(self)                  \
 	(RBTREE_ISRED(self) ? RBTREE_SETBLACK(self) \
 	                    : RBTREE_SETRED(self))
+#endif /* !... */
 #endif /* !RBTREE_FLIPCOLOR */
 
 #ifndef RBTREE_COPYCOLOR
+#if defined(RBTREE_REDFIELD) && defined(RBTREE_REDBIT)
+#define RBTREE_COPYCOLOR(dst, src) (void)((dst)->RBTREE_REDFIELD = ((dst)->RBTREE_REDFIELD & ~RBTREE_REDBIT) | ((src)->RBTREE_REDFIELD & RBTREE_REDBIT))
+#elif defined(RBTREE_REDFIELD) && defined(RBTREE_BLACKBIT)
+#define RBTREE_COPYCOLOR(dst, src) (void)((dst)->RBTREE_REDFIELD = ((dst)->RBTREE_REDFIELD & ~RBTREE_BLACKBIT) | ((src)->RBTREE_REDFIELD & RBTREE_BLACKBIT))
+#elif defined(RBTREE_REDFIELD)
+#define RBTREE_COPYCOLOR(dst, src) (void)((dst)->RBTREE_REDFIELD = (src)->RBTREE_REDFIELD)
+#elif defined(RBTREE_BLACKFIELD)
+#define RBTREE_COPYCOLOR(dst, src) (void)((dst)->RBTREE_BLACKFIELD = (src)->RBTREE_BLACKFIELD)
+#else /* ... */
 #define RBTREE_COPYCOLOR(dst, src)                \
-	(RBTREE_SETBLACK(dst),                        \
-	 RBTREE_ISRED(src) ? (void)RBTREE_SETRED(dst) \
-	                   : (void)0)
+	(RBTREE_ISRED(src) ? (void)RBTREE_SETRED(dst) \
+	                   : (void)RBTREE_SETBLACK(dst))
+#endif /* !... */
 #endif /* !RBTREE_COPYCOLOR */
 
 #ifndef RBTREE_GETMINKEY
@@ -1989,6 +2043,10 @@ __DECL_END
 #undef RBTREE_KEY_GE
 #undef RBTREE_KEY_LE
 
+#undef RBTREE_REDFIELD
+#undef RBTREE_REDBIT
+#undef RBTREE_BLACKBIT
+#undef RBTREE_BLACKFIELD
 #undef RBTREE_SLOT__PARAMS
 #undef RBTREE_SLOT__ARGS
 #undef RBTREE_GETPAR
@@ -1997,7 +2055,7 @@ __DECL_END
 #undef RBTREE_SETPAR
 #undef RBTREE_SETLHS
 #undef RBTREE_SETRHS
-#undef RBTREE_NODEPATH
+#undef RBTREE_NODEFIELD
 #undef RBTREE_GETNODE
 #undef RBTREE_GETMINKEY
 #undef RBTREE_GETMAXKEY

@@ -81,24 +81,23 @@
 #define RBTREE_WANT_PREV_NEXT_NODE
 #define RBTREE_OMIT_REMOVE
 #define RBTREE_OMIT_LOCATE
-#define RBTREE(name)           devfs_bynametree_##name
-#define RBTREE_T               struct device
-#define RBTREE_Tkey            char const *
-#define RBTREE_GETNODE(self)   (self)->dv_byname_node
-#define RBTREE_GETKEY(self)    device_getname(self)
-#define RBTREE_ISRED(self)     ((self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_flags & _MFILE_DEVFS_BYNAME_RED)
-#define RBTREE_SETRED(self)    (void)((self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_flags |= _MFILE_DEVFS_BYNAME_RED)
-#define RBTREE_SETBLACK(self)  (void)((self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_flags &= ~_MFILE_DEVFS_BYNAME_RED)
-#define RBTREE_CC              FCALL
-#define RBTREE_NOTHROW         NOTHROW
-#define RBTREE_DECL            FUNDEF
-#define RBTREE_IMPL            PUBLIC
-#define RBTREE_KEY_EQ(a, b)    (strcmp(a, b) == 0)
-#define RBTREE_KEY_NE(a, b)    (strcmp(a, b) != 0)
-#define RBTREE_KEY_LO(a, b)    (strcmp(a, b) < 0)
-#define RBTREE_KEY_LE(a, b)    (strcmp(a, b) <= 0)
-#define RBTREE_KEY_GR(a, b)    (strcmp(a, b) > 0)
-#define RBTREE_KEY_GE(a, b)    (strcmp(a, b) >= 0)
+#define RBTREE(name)         devfs_bynametree_##name
+#define RBTREE_T             struct device
+#define RBTREE_Tkey          char const *
+#define RBTREE_GETNODE(self) (self)->dv_byname_node
+#define RBTREE_GETKEY(self)  device_getname(self)
+#define RBTREE_REDFIELD      _device_devnode_ _fdevnode_node_ _fnode_file_ mf_flags
+#define RBTREE_REDBIT        _MFILE_DEVFS_BYNAME_RED
+#define RBTREE_CC            FCALL
+#define RBTREE_NOTHROW       NOTHROW
+#define RBTREE_DECL          FUNDEF
+#define RBTREE_IMPL          PUBLIC
+#define RBTREE_KEY_EQ(a, b)  (strcmp(a, b) == 0)
+#define RBTREE_KEY_NE(a, b)  (strcmp(a, b) != 0)
+#define RBTREE_KEY_LO(a, b)  (strcmp(a, b) < 0)
+#define RBTREE_KEY_LE(a, b)  (strcmp(a, b) <= 0)
+#define RBTREE_KEY_GR(a, b)  (strcmp(a, b) > 0)
+#define RBTREE_KEY_GE(a, b)  (strcmp(a, b) >= 0)
 #include <hybrid/sequence/rbtree-abi.h>
 
 DECL_BEGIN

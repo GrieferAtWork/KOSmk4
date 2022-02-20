@@ -57,21 +57,18 @@
 #define RBTREE_WANT_TRYINSERT
 #define RBTREE_WANT_MINMAXLOCATE
 #define RBTREE_MINMAX_T_DEFINED
-#define fnode_tree_minmax_t        struct fnode_tree_minmax
-#define RBTREE(name)               fnode_tree_##name
-#define RBTREE_T                   struct fnode
-#define RBTREE_Tkey                ino_t
-#define RBTREE_GETNODE(self)       (self)->fn_supent
-#define RBTREE_GETKEY(self)        (self)->fn_ino
-#define RBTREE_ISRED(self)         ((self)->mf_flags & _MFILE_FN__RBRED)
-#define RBTREE_SETRED(self)        (void)((self)->mf_flags |= _MFILE_FN__RBRED)
-#define RBTREE_SETBLACK(self)      (void)((self)->mf_flags &= ~_MFILE_FN__RBRED)
-#define RBTREE_FLIPCOLOR(self)     (void)((self)->mf_flags ^= _MFILE_FN__RBRED)
-#define RBTREE_COPYCOLOR(dst, src) (void)((dst)->mf_flags = ((dst)->mf_flags & ~_MFILE_FN__RBRED) | ((src)->mf_flags & _MFILE_FN__RBRED))
-#define RBTREE_CC                  FCALL
-#define RBTREE_NOTHROW             NOTHROW
-#define RBTREE_DECL                FUNDEF
-#define RBTREE_IMPL                PUBLIC
+#define fnode_tree_minmax_t  struct fnode_tree_minmax
+#define RBTREE(name)         fnode_tree_##name
+#define RBTREE_T             struct fnode
+#define RBTREE_Tkey          ino_t
+#define RBTREE_GETNODE(self) (self)->fn_supent
+#define RBTREE_GETKEY(self)  (self)->fn_ino
+#define RBTREE_REDFIELD      mf_flags
+#define RBTREE_REDBIT        _MFILE_FN__RBRED
+#define RBTREE_CC            FCALL
+#define RBTREE_NOTHROW       NOTHROW
+#define RBTREE_DECL          FUNDEF
+#define RBTREE_IMPL          PUBLIC
 #include <hybrid/sequence/rbtree-abi.h>
 
 DECL_BEGIN

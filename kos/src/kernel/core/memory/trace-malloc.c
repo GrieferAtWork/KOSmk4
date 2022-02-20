@@ -286,13 +286,12 @@ DECL_END
 #endif
 #define RBTREE_WANT_RREMOVE
 #define RBTREE_WANT_TRYINSERT
-#define RBTREE(name)          trace_node_tree_##name
-#define RBTREE_T              struct trace_node
-#define RBTREE_Tkey           uintptr_t
-#define RBTREE_GETNODE(self)  (self)->tn_link
-#define RBTREE_ISRED(self)    ((self)->tn_flags & TRACE_NODE_FLAG_ISRED)
-#define RBTREE_SETRED(self)   ((self)->tn_flags |= TRACE_NODE_FLAG_ISRED)
-#define RBTREE_SETBLACK(self) ((self)->tn_flags &= ~TRACE_NODE_FLAG_ISRED)
+#define RBTREE(name)         trace_node_tree_##name
+#define RBTREE_T             struct trace_node
+#define RBTREE_Tkey          uintptr_t
+#define RBTREE_GETNODE(self) (self)->tn_link
+#define RBTREE_REDFIELD      tn_flags
+#define RBTREE_REDBIT        TRACE_NODE_FLAG_ISRED
 #define RBTREE_WANT_MINMAXLOCATE
 #define RBTREE_WANT_PREV_NEXT_NODE
 #ifdef RBTREE_LEFT_LEANING

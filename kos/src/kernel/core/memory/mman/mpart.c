@@ -459,6 +459,7 @@ DECL_END
 #define RBTREE_ISRED(self)     ((self)->mp_flags & MPART_F__RBRED)
 #define RBTREE_SETRED(self)    ATOMIC_OR((self)->mp_flags, MPART_F__RBRED)
 #define RBTREE_SETBLACK(self)  ATOMIC_AND((self)->mp_flags, ~MPART_F__RBRED)
+#define RBTREE_FLIPCOLOR(self) ATOMIC_XOR((self)->mp_flags, MPART_F__RBRED)
 #define RBTREE_CC              FCALL
 #define RBTREE_NOTHROW         NOTHROW
 #define RBTREE_DECL            FUNDEF

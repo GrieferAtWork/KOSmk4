@@ -73,43 +73,36 @@
 /* R/B-tree ABI for `struct service_shm_handle' */
 #define RBTREE_LEFT_LEANING
 #define RBTREE_OMIT_REMOVE
-#define RBTREE_DECL                PRIVATE
-#define RBTREE_IMPL                PRIVATE
-#define RBTREE(name)               sshtree_##name
-#define RBTREE_T                   struct service_shm_handle
-#define RBTREE_Tkey                void const *
-#define RBTREE_CC                  FCALL
-#define RBTREE_NOTHROW             NOTHROW
-#define RBTREE_GETLHS(self)        (self)->ssh_tree_lhs
-#define RBTREE_GETRHS(self)        (self)->ssh_tree_rhs
-#define RBTREE_SETLHS(self, v)     (void)((self)->ssh_tree_lhs = (v))
-#define RBTREE_SETRHS(self, v)     (void)((self)->ssh_tree_rhs = (v))
-#define RBTREE_ISRED(self)         ((self)->ssh_tree_red)
-#define RBTREE_SETRED(self)        (void)((self)->ssh_tree_red = 1)
-#define RBTREE_SETBLACK(self)      (void)((self)->ssh_tree_red = 0)
-#define RBTREE_FLIPCOLOR(self)     (void)((self)->ssh_tree_red ^= (uintptr_t)-1)
-#define RBTREE_COPYCOLOR(dst, src) (void)((dst)->ssh_tree_red = (src)->ssh_tree_red)
-#define RBTREE_GETMINKEY(node)     ((byte_t *)(node)->ssh_shm)
-#define RBTREE_GETMAXKEY(node)     ((byte_t *)(node)->ssh_endp - 1)
+#define RBTREE_DECL            PRIVATE
+#define RBTREE_IMPL            PRIVATE
+#define RBTREE(name)           sshtree_##name
+#define RBTREE_T               struct service_shm_handle
+#define RBTREE_Tkey            void const *
+#define RBTREE_CC              FCALL
+#define RBTREE_NOTHROW         NOTHROW
+#define RBTREE_GETLHS(self)    (self)->ssh_tree_lhs
+#define RBTREE_GETRHS(self)    (self)->ssh_tree_rhs
+#define RBTREE_SETLHS(self, v) (void)((self)->ssh_tree_lhs = (v))
+#define RBTREE_SETRHS(self, v) (void)((self)->ssh_tree_rhs = (v))
+#define RBTREE_REDFIELD        ssh_tree_red
+#define RBTREE_GETMINKEY(node) ((byte_t *)(node)->ssh_shm)
+#define RBTREE_GETMAXKEY(node) ((byte_t *)(node)->ssh_endp - 1)
 #include <hybrid/sequence/rbtree-abi.h>
 
 /* R/B-tree ABI for `struct service_shm_free' */
 #define RBTREE_LEFT_LEANING
-#define RBTREE_DECL                PRIVATE
-#define RBTREE_IMPL                PRIVATE
-#define RBTREE(name)               sf_##name
-#define RBTREE_T                   struct service_shm_free
-#define RBTREE_Tkey                void const *
-#define RBTREE_CC                  FCALL
-#define RBTREE_NOTHROW             NOTHROW
-#define RBTREE_GETNODE(self)       (self)->ssf_node
-#define RBTREE_ISRED(self)         ((self)->ssf_size & SERVICE_SHM_FREE_REDBIT)
-#define RBTREE_SETRED(self)        (void)((self)->ssf_size |= SERVICE_SHM_FREE_REDBIT)
-#define RBTREE_SETBLACK(self)      (void)((self)->ssf_size &= ~SERVICE_SHM_FREE_REDBIT)
-#define RBTREE_FLIPCOLOR(self)     (void)((self)->ssf_size ^= SERVICE_SHM_FREE_REDBIT)
-#define RBTREE_COPYCOLOR(dst, src) (void)((dst)->ssf_size = ((dst)->ssf_size & ~SERVICE_SHM_FREE_REDBIT) | ((src)->ssf_size & SERVICE_SHM_FREE_REDBIT))
-#define RBTREE_GETMINKEY           service_shm_free_getminaddr
-#define RBTREE_GETMAXKEY           service_shm_free_getmaxaddr
+#define RBTREE_DECL          PRIVATE
+#define RBTREE_IMPL          PRIVATE
+#define RBTREE(name)         sf_##name
+#define RBTREE_T             struct service_shm_free
+#define RBTREE_Tkey          void const *
+#define RBTREE_CC            FCALL
+#define RBTREE_NOTHROW       NOTHROW
+#define RBTREE_GETNODE(self) (self)->ssf_node
+#define RBTREE_REDFIELD      ssf_size
+#define RBTREE_REDBIT        SERVICE_SHM_FREE_REDBIT
+#define RBTREE_GETMINKEY     service_shm_free_getminaddr
+#define RBTREE_GETMAXKEY     service_shm_free_getmaxaddr
 #include <hybrid/sequence/rbtree-abi.h>
 
 DECL_BEGIN

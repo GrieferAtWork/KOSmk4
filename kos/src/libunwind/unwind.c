@@ -84,9 +84,8 @@ DECL_END
 #define RBTREE_GETNODE(self)   (self)->fce_link
 #define RBTREE_GETMINKEY(self) ((self)->fce_fde.f_pcstart)
 #define RBTREE_GETMAXKEY(self) ((byte_t const *)(self)->fce_fde.f_pcend - 1)
-#define RBTREE_ISRED(self)     ((self)->fce_fde.f_sigframe & 0x80)
-#define RBTREE_SETRED(self)    ((self)->fce_fde.f_sigframe |= 0x80)
-#define RBTREE_SETBLACK(self)  ((self)->fce_fde.f_sigframe &= ~0x80)
+#define RBTREE_REDFIELD        f_sigframe
+#define RBTREE_REDBIT          0x80
 #include <hybrid/sequence/rbtree-abi.h>
 
 DECL_BEGIN

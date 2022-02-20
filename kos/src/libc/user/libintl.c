@@ -270,32 +270,30 @@ struct mo_file {
 
 /* Define the R/B-tree API */
 DECL_END
-#define RBTREE_DECL                PRIVATE
-#define RBTREE_IMPL                PRIVATE
-#define RBTREE(name)               mofiletree_##name
-#define RBTREE_T                   struct mo_file
-#define RBTREE_Tkey                char const *
-#define RBTREE_CC                  FCALL
-#define RBTREE_NOTHROW             NOTHROW
-#define RBTREE_KEY_LO(a, b)        (strcmp(a, b) < 0)
-#define RBTREE_KEY_LE(a, b)        (strcmp(a, b) <= 0)
-#define RBTREE_KEY_EQ(a, b)        (strcmp(a, b) == 0)
-#define RBTREE_KEY_NE(a, b)        (strcmp(a, b) != 0)
-#define RBTREE_KEY_GR(a, b)        (strcmp(a, b) > 0)
-#define RBTREE_KEY_GE(a, b)        (strcmp(a, b) >= 0)
-#define RBTREE_ISRED(self)         ((self)->mf_red != 0)
-#define RBTREE_SETRED(self)        (void)((self)->mf_red = 1)
-#define RBTREE_SETBLACK(self)      (void)((self)->mf_red = 0)
-#define RBTREE_FLIPCOLOR(self)     (void)((self)->mf_red ^= 1)
-#define RBTREE_COPYCOLOR(dst, src) (void)((dst)->mf_red = (src)->mf_red)
-#define RBTREE_GETNODE(self)       (self)->mf_node
-#define RBTREE_GETKEY(node)        (node)->mf_name
+
 #define RBTREE_WANT_TRYINSERT
 #define RBTREE_OMIT_REMOVE
 #define RBTREE_OMIT_REMOVENODE
 #define RBTREE_OMIT_INSERT
 #define RBTREE_LEFT_LEANING
+#define RBTREE_DECL          PRIVATE
+#define RBTREE_IMPL          PRIVATE
+#define RBTREE(name)         mofiletree_##name
+#define RBTREE_T             struct mo_file
+#define RBTREE_Tkey          char const *
+#define RBTREE_CC            FCALL
+#define RBTREE_NOTHROW       NOTHROW
+#define RBTREE_REDFIELD      mf_red
+#define RBTREE_GETNODE(self) (self)->mf_node
+#define RBTREE_GETKEY(node)  (node)->mf_name
+#define RBTREE_KEY_LO(a, b)  (strcmp(a, b) < 0)
+#define RBTREE_KEY_LE(a, b)  (strcmp(a, b) <= 0)
+#define RBTREE_KEY_EQ(a, b)  (strcmp(a, b) == 0)
+#define RBTREE_KEY_NE(a, b)  (strcmp(a, b) != 0)
+#define RBTREE_KEY_GR(a, b)  (strcmp(a, b) > 0)
+#define RBTREE_KEY_GE(a, b)  (strcmp(a, b) >= 0)
 #include <hybrid/sequence/rbtree-abi.h>
+
 DECL_BEGIN
 
 /* [0..n][lock(mofiletree_lock)] Root for the .mo file cache tree. */

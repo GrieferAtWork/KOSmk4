@@ -73,9 +73,8 @@
 #define RBTREE_GETNODE(self)   (self)->mf_laddr
 #define RBTREE_GETMINKEY(self) MFREE_MIN(self)
 #define RBTREE_GETMAXKEY(self) MFREE_MAX(self)
-#define RBTREE_ISRED(self)     ((self)->mf_flags & MFREE_FRED)
-#define RBTREE_SETRED(self)    ((self)->mf_flags |= MFREE_FRED)
-#define RBTREE_SETBLACK(self)  ((self)->mf_flags &= ~MFREE_FRED)
+#define RBTREE_REDFIELD        mf_flags
+#define RBTREE_REDBIT          MFREE_FRED
 #include <hybrid/sequence/rbtree-abi.h>
 
 

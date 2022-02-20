@@ -456,9 +456,8 @@ DECL_END
 #define RBTREE_GETNODE(self)   (self)->mn_mement
 #define RBTREE_GETMINKEY(self) mnode_getminaddr(self)
 #define RBTREE_GETMAXKEY(self) mnode_getmaxaddr(self)
-#define RBTREE_ISRED(self)     ((self)->mn_flags & MNODE_F__RBRED)
-#define RBTREE_SETRED(self)    (void)((self)->mn_flags |= MNODE_F__RBRED)
-#define RBTREE_SETBLACK(self)  (void)((self)->mn_flags &= ~MNODE_F__RBRED)
+#define RBTREE_REDFIELD        mn_flags
+#define RBTREE_REDBIT          MNODE_F__RBRED
 #define RBTREE_CC              FCALL
 #define RBTREE_NOTHROW         NOTHROW
 #define RBTREE_DECL            FUNDEF

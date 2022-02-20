@@ -93,14 +93,12 @@ DECL_END
 #define RBTREE_OMIT_REMOVENODE
 #define RBTREE_OMIT_INSERT
 #define RBTREE_WANT_TRYINSERT
-#define RBTREE(name)           device_cache_node_tree_##name
-#define RBTREE_T               struct device_cache_node
-#define RBTREE_Tkey            pci_devnameid_t
-#define RBTREE_GETNODE(self)   (self)->dcn_node
-#define RBTREE_GETKEY(self)    (self)->dcn_id
-#define RBTREE_ISRED(self)     (self)->dcn_red
-#define RBTREE_SETRED(self)    ((self)->dcn_red = 1)
-#define RBTREE_SETBLACK(self)  ((self)->dcn_red = 0)
+#define RBTREE(name)         device_cache_node_tree_##name
+#define RBTREE_T             struct device_cache_node
+#define RBTREE_Tkey          pci_devnameid_t
+#define RBTREE_GETNODE(self) (self)->dcn_node
+#define RBTREE_GETKEY(self)  (self)->dcn_id
+#define RBTREE_REDFIELD      dcn_red
 #include <hybrid/sequence/rbtree-abi.h>
 
 #define RBTREE_LEFT_LEANING
@@ -108,14 +106,12 @@ DECL_END
 #define RBTREE_OMIT_REMOVENODE
 #define RBTREE_OMIT_INSERT
 #define RBTREE_WANT_TRYINSERT
-#define RBTREE(name)           vendor_cache_node_tree_##name
-#define RBTREE_T               struct vendor_cache_node
-#define RBTREE_Tkey            uint16_t
-#define RBTREE_GETNODE(self)   (self)->vcn_node
-#define RBTREE_GETKEY(self)    (self)->vcn_id
-#define RBTREE_ISRED(self)     (self)->vcn_red
-#define RBTREE_SETRED(self)    ((self)->vcn_red = 1)
-#define RBTREE_SETBLACK(self)  ((self)->vcn_red = 0)
+#define RBTREE(name)         vendor_cache_node_tree_##name
+#define RBTREE_T             struct vendor_cache_node
+#define RBTREE_Tkey          uint16_t
+#define RBTREE_GETNODE(self) (self)->vcn_node
+#define RBTREE_GETKEY(self)  (self)->vcn_id
+#define RBTREE_REDFIELD      vcn_red
 #include <hybrid/sequence/rbtree-abi.h>
 
 DECL_BEGIN

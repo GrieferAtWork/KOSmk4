@@ -584,7 +584,7 @@ struct pci_device {
 	} _pd_link;                        /* [0..1][const] Unordered list of all PCI devices. */
 	struct pci_device *_pd_next_lo;    /* [0..1][const] Another device (left node of internal LLRB-tree) */
 	struct pci_device *_pd_next_hi;    /* [0..1][const] Another device (left node of internal LLRB-tree) */
-	__uint8_t          _pd_tree_rd;    /* [const] Read tree leaf. */
+	__uint8_t          _pd_tree_rd;    /* [const] Red tree leaf. */
 #ifdef __USE_KOS
 	__uint8_t          pd_header_type; /* [const] Device header type (== `PCI_DEVC_HEADER(pci_device_cfg_readl(PCI_DEVC))').
 	                                    * One   of  `PCI_DEVC_HEADER_*',  optionally  or'd  with  `PCI_DEVC_HEADER_MULTIDEV' */

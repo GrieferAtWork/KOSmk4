@@ -48,7 +48,7 @@
 #endif
 
 #undef CONFIG_USE_NEW_HANDMAN
-#if 0
+#if 1
 #define CONFIG_USE_NEW_HANDMAN
 #endif
 
