@@ -178,11 +178,32 @@ union handslot {
  * Finally,  we add +2 just for good measure, and since we also want to optimize
  * for speed in regards to how many different ranges are pointed-to by the range
  * table of a `struct handman' */
+#ifndef HANDRANGE_FREESLOTS_SPLIT_THRESHOLD
 #define HANDRANGE_FREESLOTS_SPLIT_THRESHOLD            \
 	(((__builtin_offsetof(struct handrange, hr_hand) + \
 	   sizeof(struct handle) - 1) /                    \
 	  sizeof(struct handle)) +                         \
 	 2)
+#endif /* !HANDRANGE_FREESLOTS_SPLIT_THRESHOLD */
+
+/* Number of leading/trailing free slots before hand-ranges are truncated.
+ * Note that once this threshold  is reached, _all_ leading/trailing  free
+ * slots are freed, meaning that none will remain afterwards. -- This does
+ * not specify how  many should  be left behind  during truncation,  which
+ * always removes _all_ free slots.
+ *
+ * -> Truncation happens when `NUM_SLOTS > HANDRANGE_FREESLOTS_TRUNC_THRESHOLD',
+ *    where  `NUM_SLOTS' is the # of leading  or trailing free-slots if a range.
+ * -> This also doesn't affect ranges that became fully empty. For such a range
+ *    it doesn't matter if it has less than HANDRANGE_FREESLOTS_TRUNC_THRESHOLD
+ *    leading/trailing free slots. -- It is always deleted.
+ * -> This limit is also ignored by `system_cc()', which always trims _all_
+ *    leading/trailing free slots.
+ */
+#ifndef HANDRANGE_FREESLOTS_TRUNC_THRESHOLD
+#define HANDRANGE_FREESLOTS_TRUNC_THRESHOLD 2
+#endif /* !HANDRANGE_FREESLOTS_TRUNC_THRESHOLD */
+
 
 /* Bits for `struct handrange::hr_flags' */
 #define HANDRANGE_F_NORMAL 0x00000000 /* Normal flags. */

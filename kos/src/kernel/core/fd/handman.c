@@ -79,6 +79,9 @@
 
 DECL_BEGIN
 
+STATIC_ASSERT(HANDRANGE_FREESLOTS_SPLIT_THRESHOLD > HANDRANGE_FREESLOTS_TRUNC_THRESHOLD);
+
+
 /* Check if 2 given ranges overlap (that is: share at least 1 common address) */
 #define RANGE_OVERLAPS(a_min, a_max, b_min, b_max) \
 	((a_max) >= (b_min) && (a_min) <= (b_max))
@@ -165,37 +168,42 @@ again:
 	count = handrange_count(self);
 	assert(count > 0);
 	if (handrange_slotisfree(self, count - 1)) {
-		size_t reqsize;
-		--count;
-		while (count && handrange_slotisfree(self, count - 1))
-			--count;
-		handman_ranges_removenode(man, self);
-		if (!count) {
+		unsigned int trailing_free = 1;
+		while (trailing_free < count &&
+		       handrange_slotisfree(self, count - (trailing_free + 1)))
+			++trailing_free;
+		if (trailing_free >= count) {
 			/* Range became fully empty --> Get rid of it. */
+			handman_ranges_removenode(man, self);
 			assert(ATOMIC_READ(self->hr_nlops) == 0);
 			assert(ATOMIC_READ(self->hr_cexec) == 0);
 			assert(ATOMIC_READ(self->hr_cfork) == 0);
 			_handrange_free(self);
 			return NULL;
 		}
+		if (trailing_free > HANDRANGE_FREESLOTS_TRUNC_THRESHOLD) {
+			size_t reqsize;
+			handman_ranges_removenode(man, self);
+			count -= trailing_free;
 
-		/* Update accounting. */
-		self->hr_maxfd = self->hr_minfd + count - 1;
+			/* Update accounting. */
+			self->hr_maxfd = self->hr_minfd + count - 1;
 
-		/* Realloc to save on some space. */
-		reqsize = _handrange_sizeof(count);
-		if ((ATOMIC_READ(self->hr_nlops) != 0) ||
-		    (check_self__hr_joinlop && ATOMIC_READ(self->_hr_joinlop.olo_func) != NULL)) {
-			krealloc_in_place_nx(self, reqsize, GFP_ATOMIC);
-		} else {
-			struct handrange *newrange;
-			newrange = (struct handrange *)krealloc_nx(self, reqsize, GFP_ATOMIC);
-			if likely(newrange)
-				self = newrange;
+			/* Realloc to save on some space. */
+			reqsize = _handrange_sizeof(count);
+			if ((ATOMIC_READ(self->hr_nlops) != 0) ||
+			    (check_self__hr_joinlop && ATOMIC_READ(self->_hr_joinlop.olo_func) != NULL)) {
+				krealloc_in_place_nx(self, reqsize, GFP_ATOMIC);
+			} else {
+				struct handrange *newrange;
+				newrange = (struct handrange *)krealloc_nx(self, reqsize, GFP_ATOMIC);
+				if likely(newrange)
+					self = newrange;
+			}
+
+			/* Re-insert into the range-tree */
+			handman_ranges_insert(man, self);
 		}
-
-		/* Re-insert into the range-tree */
-		handman_ranges_insert(man, self);
 	}
 
 	/* Find the last overlarge free range of `self'. If it isn't followed
@@ -310,23 +318,24 @@ try_trim_leading_slots:
 				break;
 			++free_count;
 		}
+		if (free_count > HANDRANGE_FREESLOTS_TRUNC_THRESHOLD) {
+			/* Trim leading unused slots. */
+			handman_ranges_removenode(man, self);
+			self->hr_minfd += free_count;
+			count = handrange_count(self);
+			memmovedown(&self->hr_hand[0],
+			            &self->hr_hand[free_count],
+			            count, sizeof(union handslot));
 
-		/* Trim leading unused slots. */
-		handman_ranges_removenode(man, self);
-		self->hr_minfd += free_count;
-		count = handrange_count(self);
-		memmovedown(&self->hr_hand[0],
-		            &self->hr_hand[free_count],
-		            count, sizeof(union handslot));
+			/* Reallocate to release unused memory. */
+			reqsize  = _handrange_sizeof(count);
+			temp = (struct handrange *)krealloc_nx(self, reqsize, GFP_ATOMIC);
+			if likely(temp)
+				self = temp;
 
-		/* Reallocate to release unused memory. */
-		reqsize  = _handrange_sizeof(count);
-		temp = (struct handrange *)krealloc_nx(self, reqsize, GFP_ATOMIC);
-		if likely(temp)
-			self = temp;
-
-		/* Re-insert the (now-truncated) range. */
-		handman_ranges_insert(man, self);
+			/* Re-insert the (now-truncated) range. */
+			handman_ranges_insert(man, self);
+		}
 	}
 	return self;
 }
@@ -768,6 +777,7 @@ again:
 		/* `dstrange' may contain overly large gaps, or possibly even no handles at all.
 		 * As such, we must trim unused slots and maybe even split the entire range into
 		 * multiple smaller ones. */
+		unsigned int trailing_free = 0;
 		unsigned int leading_free = 0;
 		unsigned int new_clone_count;
 		while (leading_free < clone_count &&
@@ -778,10 +788,7 @@ again:
 			data->hfd_range = dstrange;
 			goto again;
 		}
-#ifndef __OPTIMIZE_SIZE__
-		if (leading_free)
-#endif /* !__OPTIMIZE_SIZE__ */
-		{
+		if (leading_free > HANDRANGE_FREESLOTS_TRUNC_THRESHOLD) {
 			clone_minfd += leading_free;
 			clone_count -= leading_free;
 			req_rangesize -= leading_free * sizeof(struct handle);
@@ -791,10 +798,13 @@ again:
 		}
 
 		/* Trim trailing free slots */
+		trailing_free = 0;
 		while ((assert(clone_count),
-		        handrange_slotisfree(dstrange, clone_count - 1))) {
-			--clone_count;
-			req_rangesize -= sizeof(struct handle);
+		        handrange_slotisfree(dstrange, clone_count - (trailing_free + 1))))
+			++trailing_free;
+		if (trailing_free > HANDRANGE_FREESLOTS_TRUNC_THRESHOLD) {
+			clone_count -= trailing_free;
+			req_rangesize -= trailing_free * sizeof(struct handle);
 		}
 
 		/* Check for over-large gaps in the middle */
@@ -1135,7 +1145,7 @@ handman_unlock_and_throw_invalid_handle(struct handman *__restrict self,
 }
 
 
-/* Change the iomode_t bits of the handle specified by `fd'. This
+/* Change the iomode_t bits of  the handle specified by `fd'.  This
  * function is used to implement various fcntl() and ioctl() codes.
  * >> omode = hand->h_mode;
  * >> hand->h_mode = (omode & mask) | value;
@@ -1308,19 +1318,18 @@ handman_close(struct handman *__restrict self, fd_t fd,
 
 	/* If the close'd slot was the last one, trim trailing free slots. */
 	if ((unsigned int)fd == range->hr_maxfd) {
-		size_t reqsize;
-		unsigned int count;
+		unsigned int count, trailing_free;
 do_trim_trailing_slots:
-		handman_ranges_removenode(self, range);
-		--range->hr_maxfd;
+		/* Count how many trailing free slots are in this range. */
 		count = handrange_count(range);
-		while (count && handrange_slotisfree(range, count - 1)) {
-			--range->hr_maxfd;
-			--count;
-		}
-		if (!count) {
+		trailing_free = 1;
+		while (trailing_free < count &&
+		       handrange_slotisfree(range, count - (trailing_free + 1)))
+			++trailing_free;
+		if (trailing_free >= count) {
 			/* Range became empty. --> Don't re-insert, but free */
 free_empty_range:
+			handman_ranges_removenode(self, range);
 			assert(ATOMIC_READ(range->hr_nlops) == 0);
 			assert(ATOMIC_READ(range->_hr_joinlop.olo_func) == NULL);
 			assert(range->hr_cexec == 0);
@@ -1329,52 +1338,62 @@ free_empty_range:
 			_handrange_free(range);
 			return ohand;
 		}
-		/* Reallocate to release unused memory. */
-		reqsize = _handrange_sizeof(count);
-		if (ATOMIC_READ(range->hr_nlops) != 0 ||
-		    ATOMIC_READ(range->_hr_joinlop.olo_func) != NULL) {
-			/* Can only do inplace-realloc */
-			krealloc_in_place_nx(range, reqsize, GFP_ATOMIC);
-		} else {
-			struct handrange *temp;
-			temp = (struct handrange *)krealloc_nx(range, reqsize, GFP_ATOMIC);
-			if likely(temp)
-				range = temp;
-		}
+		if (trailing_free > HANDRANGE_FREESLOTS_TRUNC_THRESHOLD) {
+			size_t reqsize;
+			handman_ranges_removenode(self, range);
+			range->hr_maxfd -= trailing_free;
+			count -= trailing_free;
+			assert(count > 0);
 
-		/* Re-insert the (now smaller) range. */
-		handman_ranges_insert(self, range);
+			/* Reallocate to release unused memory. */
+			reqsize = _handrange_sizeof(count);
+			if (ATOMIC_READ(range->hr_nlops) != 0 ||
+			    ATOMIC_READ(range->_hr_joinlop.olo_func) != NULL) {
+				/* Can only do inplace-realloc */
+				krealloc_in_place_nx(range, reqsize, GFP_ATOMIC);
+			} else {
+				struct handrange *temp;
+				temp = (struct handrange *)krealloc_nx(range, reqsize, GFP_ATOMIC);
+				if likely(temp)
+					range = temp;
+			}
+
+			/* Re-insert the (now smaller) range. */
+			handman_ranges_insert(self, range);
+		}
 	} else if ((unsigned int)fd == range->hr_minfd) {
 do_trim_leading_slots:
 		/* Trim unused leading slots (only possible when there are no LOP handles) */
 		if (ATOMIC_READ(range->hr_nlops) == 0) {
 			struct handrange *temp;
 			size_t reqsize;
-			unsigned int count, i;
-			handman_ranges_removenode(self, range);
-			++range->hr_minfd;
+			unsigned int count;
+			unsigned int leading_free;
 			count = handrange_count(range);
-			i     = 1;
-			while (count && handrange_slotisfree(range, i)) {
-				++range->hr_minfd;
-				--count;
-				++i;
-			}
-			if unlikely(!count)
+			leading_free = 1;
+			while (leading_free < count &&
+			       handrange_slotisfree(range, leading_free))
+				++leading_free;
+			if unlikely(leading_free >= count)
 				goto free_empty_range;
+			if (leading_free > HANDRANGE_FREESLOTS_TRUNC_THRESHOLD) {
+				handman_ranges_removenode(self, range);
+				range->hr_minfd += leading_free;
+				count -= leading_free;
 
-			/* Move vector to reflect stripped entries. */
-			memmovedown(&range->hr_hand[0], &range->hr_hand[i],
-			            count, sizeof(union handslot));
+				/* Move vector to reflect stripped entries. */
+				memmovedown(&range->hr_hand[0], &range->hr_hand[leading_free],
+				            count, sizeof(union handslot));
 
-			/* Reallocate to release unused memory. */
-			reqsize  = _handrange_sizeof(count);
-			temp = (struct handrange *)krealloc_nx(range, reqsize, GFP_ATOMIC);
-			if likely(temp)
-				range = temp;
+				/* Reallocate to release unused memory. */
+				reqsize  = _handrange_sizeof(count);
+				temp = (struct handrange *)krealloc_nx(range, reqsize, GFP_ATOMIC);
+				if likely(temp)
+					range = temp;
 
-			/* Re-insert the (now smaller) range. */
-			handman_ranges_insert(self, range);
+				/* Re-insert the (now smaller) range. */
+				handman_ranges_insert(self, range);
+			}
 		}
 	} else {
 		/* The  close'd handle is somewhere in the middle of the range.
