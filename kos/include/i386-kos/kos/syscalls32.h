@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb48c7e3a */
+/* HASH CRC-32:0x4ebcbee9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -313,7 +313,8 @@ __CDECLARE_SC(,__syscall_slong_t,clone3,(struct clone_args *__cl_args, __size_t 
 __CDECLARE_SC(,__errno_t,close,(__fd_t __fd),(__fd))
 #endif /* __CRT_HAVE_SC(close) */
 #if __CRT_HAVE_SC(close_range)
-__CDECLARE_SC(,__errno_t,close_range,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+/* @param: flags: Set of `CLOSE_RANGE_*' from <linux/close_range.h> */
+__CDECLARE_SC(,__errno_t,close_range,(unsigned int __minfd, unsigned int __maxfd, unsigned int __flags),(__minfd,__maxfd,__flags))
 #endif /* __CRT_HAVE_SC(close_range) */
 #if __CRT_HAVE_SC(connect)
 /* Connect to the specified address.
@@ -2813,7 +2814,8 @@ __CDECLARE_XSC(,__syscall_slong_t,clone3,(struct clone_args *__cl_args, __size_t
 __CDECLARE_XSC(,__errno_t,close,(__fd_t __fd),(__fd))
 #endif /* __CRT_HAVE_XSC(close) */
 #if __CRT_HAVE_XSC(close_range)
-__CDECLARE_XSC(,__errno_t,close_range,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+/* @param: flags: Set of `CLOSE_RANGE_*' from <linux/close_range.h> */
+__CDECLARE_XSC(,__errno_t,close_range,(unsigned int __minfd, unsigned int __maxfd, unsigned int __flags),(__minfd,__maxfd,__flags))
 #endif /* __CRT_HAVE_XSC(close_range) */
 #if __CRT_HAVE_XSC(connect)
 /* Connect to the specified address.

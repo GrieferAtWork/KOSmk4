@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe654a0f */
+/* HASH CRC-32:0xf5415656 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -385,7 +385,7 @@
 #define __NRAC_fspick                   1
 #define __NRAC_pidfd_open               2
 #define __NRAC_clone3                   2
-#define __NRAC_close_range              1
+#define __NRAC_close_range              3
 #define __NRAC_openat2                  1
 #define __NRAC_pidfd_getfd              3
 #define __NRAC_faccessat2               1
@@ -1626,7 +1626,9 @@
 #define __NRAT1_pidfd_open               (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_clone3                   (struct clone_args *, struct clone_args *)
 #define __NRAT1_clone3                   (size_t, __size_t)
-#define __NRAT0_close_range              (int, int)
+#define __NRAT0_close_range              (unsigned int, unsigned int)
+#define __NRAT1_close_range              (unsigned int, unsigned int)
+#define __NRAT2_close_range              (unsigned int, unsigned int)
 #define __NRAT0_openat2                  (int, int)
 #define __NRAT0_pidfd_getfd              (fd_t, __fd_t)
 #define __NRAT1_pidfd_getfd              (fd_t, __fd_t)
@@ -2129,7 +2131,7 @@
 #define __NRAM_fspick(a, b, c, d, e, f)                   (int)a
 #define __NRAM_pidfd_open(a, b, c, d, e, f)               (__pid_t)a, (__syscall_ulong_t)b
 #define __NRAM_clone3(a, b, c, d, e, f)                   (struct clone_args *)a, (__size_t)b
-#define __NRAM_close_range(a, b, c, d, e, f)              (int)a
+#define __NRAM_close_range(a, b, c, d, e, f)              (unsigned int)a, (unsigned int)b, (unsigned int)c
 #define __NRAM_openat2(a, b, c, d, e, f)                  (int)a
 #define __NRAM_pidfd_getfd(a, b, c, d, e, f)              (__fd_t)a, (__fd_t)b, (__syscall_ulong_t)c
 #define __NRAM_faccessat2(a, b, c, d, e, f)               (int)a
@@ -2535,7 +2537,7 @@
 #define __NRAP_fspick(a)                                  (__syscall_ulong_t)a
 #define __NRAP_pidfd_open(a, b)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_clone3(a, b)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NRAP_close_range(a)                             (__syscall_ulong_t)a
+#define __NRAP_close_range(a, b, c)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_openat2(a)                                 (__syscall_ulong_t)a
 #define __NRAP_pidfd_getfd(a, b, c)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_faccessat2(a)                              (__syscall_ulong_t)a

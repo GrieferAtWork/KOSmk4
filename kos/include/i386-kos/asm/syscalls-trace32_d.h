@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa23ae6bf */
+/* HASH CRC-32:0x64f522f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -956,7 +956,9 @@
 #define __NR32AN1_pidfd_open                   flags
 #define __NR32AN0_clone3                       cl_args
 #define __NR32AN1_clone3                       size
-#define __NR32AN0_close_range                  TODO_PROTOTYPE
+#define __NR32AN0_close_range                  minfd
+#define __NR32AN1_close_range                  maxfd
+#define __NR32AN2_close_range                  flags
 #define __NR32AN0_openat2                      TODO_PROTOTYPE
 #define __NR32AN0_pidfd_getfd                  pidfd
 #define __NR32AN1_pidfd_getfd                  foreign_fd
@@ -2613,7 +2615,9 @@
 #define __NR32ATL0_clone3                       1                                                                    /* cl_args -> size */ 
 #define __NR32ATR1_clone3                       SC_REPR_SIZE_T                                                       /* size */ 
 #define __NR32RTR_clone3                        SC_REPR_SYSCALL_SLONG_T                                              /* return */
-#define __NR32ATR0_close_range                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32ATR0_close_range                  SC_REPR_UNSIGNED_INT                                                 /* minfd */ 
+#define __NR32ATR1_close_range                  SC_REPR_UNSIGNED_INT                                                 /* maxfd */ 
+#define __NR32ATR2_close_range                  SC_REPR_UNSIGNED_INT                                                 /* flags */ 
 #define __NR32RTR_close_range                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_openat2                      SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_openat2                       SC_REPR_ERRNO_T                                                      /* return */

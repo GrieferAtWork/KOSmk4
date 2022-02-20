@@ -634,6 +634,9 @@ execveatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname,
 //[cp] /* Even though pthread allows this, I thing this would be a _really_ bad idea... */
 [restart(must)] close:(fd_t fd) -> errno_t;
 
+@@@param: flags: Set of `CLOSE_RANGE_*' from <linux/close_range.h>
+[restart(must)] close_range:(unsigned int minfd, unsigned int maxfd, unsigned int flags) -> errno_t;
+
 dup:(fd_t fd) -> fd_t;
 dup2:(fd_t oldfd, fd_t newfd) -> fd_t;
 
@@ -2952,7 +2955,6 @@ fsopen:(int TODO_PROTOTYPE) -> errno_t;
 fsconfig:(int TODO_PROTOTYPE) -> errno_t;
 fsmount:(int TODO_PROTOTYPE) -> errno_t;
 fspick:(int TODO_PROTOTYPE) -> errno_t;
-close_range:(int TODO_PROTOTYPE) -> errno_t;
 openat2:(int TODO_PROTOTYPE) -> errno_t;
 faccessat2:(int TODO_PROTOTYPE) -> errno_t;
 

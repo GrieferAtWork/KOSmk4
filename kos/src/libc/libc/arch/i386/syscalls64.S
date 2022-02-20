@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd10311f7 */
+/* HASH CRC-32:0xb7904da9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3454,7 +3454,8 @@ INTERN_FUNCTION(libc_sys_clone3)
 END(libc_sys_clone3)
 DEFINE_PUBLIC_ALIAS(sys_clone3, libc_sys_clone3)
 
-/* errno_t close_range(int TODO_PROTOTYPE) */
+/* @param: flags: Set of `CLOSE_RANGE_*' from <linux/close_range.h> */
+/* errno_t close_range(unsigned int minfd, unsigned int maxfd, unsigned int flags) */
 INTERN_FUNCTION(libc_sys_close_range)
 	movq   $(0x1b4), %rax
 	syscall
@@ -8362,7 +8363,8 @@ INTERN_FUNCTION(libc_sys_Xclone3)
 END(libc_sys_Xclone3)
 DEFINE_PUBLIC_ALIAS(sys_Xclone3, libc_sys_Xclone3)
 
-/* errno_t close_range(int TODO_PROTOTYPE) */
+/* @param: flags: Set of `CLOSE_RANGE_*' from <linux/close_range.h> */
+/* errno_t close_range(unsigned int minfd, unsigned int maxfd, unsigned int flags) */
 INTERN_FUNCTION(libc_sys_Xclose_range)
 	movq   $(0x1b4), %rax
 	std /* Enable exceptions */

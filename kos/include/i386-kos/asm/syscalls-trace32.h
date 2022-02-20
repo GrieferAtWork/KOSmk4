@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2833486 */
+/* HASH CRC-32:0x99444c9e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -956,7 +956,9 @@
 #define __NRAN1_pidfd_open                   flags
 #define __NRAN0_clone3                       cl_args
 #define __NRAN1_clone3                       size
-#define __NRAN0_close_range                  TODO_PROTOTYPE
+#define __NRAN0_close_range                  minfd
+#define __NRAN1_close_range                  maxfd
+#define __NRAN2_close_range                  flags
 #define __NRAN0_openat2                      TODO_PROTOTYPE
 #define __NRAN0_pidfd_getfd                  pidfd
 #define __NRAN1_pidfd_getfd                  foreign_fd
@@ -2613,7 +2615,9 @@
 #define __NRATL0_clone3                       1                                                                    /* cl_args -> size */ 
 #define __NRATR1_clone3                       SC_REPR_SIZE_T                                                       /* size */ 
 #define __NRRTR_clone3                        SC_REPR_SYSCALL_SLONG_T                                              /* return */
-#define __NRATR0_close_range                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRATR0_close_range                  SC_REPR_UNSIGNED_INT                                                 /* minfd */ 
+#define __NRATR1_close_range                  SC_REPR_UNSIGNED_INT                                                 /* maxfd */ 
+#define __NRATR2_close_range                  SC_REPR_UNSIGNED_INT                                                 /* flags */ 
 #define __NRRTR_close_range                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_openat2                      SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_openat2                       SC_REPR_ERRNO_T                                                      /* return */

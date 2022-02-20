@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec7bfb70 */
+/* HASH CRC-32:0xd3c878ef */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3825,10 +3825,11 @@ INTERN_FUNCTION(libc_sys_clone3)
 END(libc_sys_clone3)
 DEFINE_PUBLIC_ALIAS(sys_clone3, libc_sys_clone3)
 
-/* errno_t close_range(int TODO_PROTOTYPE) */
+/* @param: flags: Set of `CLOSE_RANGE_*' from <linux/close_range.h> */
+/* errno_t close_range(unsigned int minfd, unsigned int maxfd, unsigned int flags) */
 INTERN_FUNCTION(libc_sys_close_range)
 	movl   $(0x1b4), %eax
-	jmp    libc_x86_exec_syscall1
+	jmp    libc_x86_exec_syscall3
 END(libc_sys_close_range)
 DEFINE_PUBLIC_ALIAS(sys_close_range, libc_sys_close_range)
 
@@ -8275,10 +8276,11 @@ INTERN_FUNCTION(libc_sys_Xclone3)
 END(libc_sys_Xclone3)
 DEFINE_PUBLIC_ALIAS(sys_Xclone3, libc_sys_Xclone3)
 
-/* errno_t close_range(int TODO_PROTOTYPE) */
+/* @param: flags: Set of `CLOSE_RANGE_*' from <linux/close_range.h> */
+/* errno_t close_range(unsigned int minfd, unsigned int maxfd, unsigned int flags) */
 INTERN_FUNCTION(libc_sys_Xclose_range)
 	movl   $(0x1b4), %eax
-	jmp    libc_x86_exec_Xsyscall1
+	jmp    libc_x86_exec_Xsyscall3
 END(libc_sys_Xclose_range)
 DEFINE_PUBLIC_ALIAS(sys_Xclose_range, libc_sys_Xclose_range)
 

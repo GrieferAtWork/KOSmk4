@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x137679ac */
+/* HASH CRC-32:0xa3bbb847 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1091,7 +1091,8 @@
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS:                                           [...] */
 #define __NR32_pidfd_open                   0x1b2                  /* fd_t pidfd_open(pid_t pid, syscall_ulong_t flags) */
 #define __NR32_clone3                       0x1b3                  /* syscall_slong_t clone3(struct clone_args *cl_args, size_t size) */
-#define __NR32_close_range                  0x1b4                  /* errno_t close_range(int TODO_PROTOTYPE) */
+/* @param: flags: Set of `CLOSE_RANGE_*' from <linux/close_range.h> */
+#define __NR32_close_range                  0x1b4                  /* errno_t close_range(unsigned int minfd, unsigned int maxfd, unsigned int flags) */
 #define __NR32_openat2                      0x1b5                  /* errno_t openat2(int TODO_PROTOTYPE) */
 /* Duplicate the  handle  of  a  foreign  process into  a  handle  for  the  caller.
  * This system call duplicates the functionality of `open("/proc/[pid]/fd/[fdno]")',
@@ -2005,7 +2006,7 @@
 #define __NR32RM_fspick                       0
 #define __NR32RM_pidfd_open                   0
 #define __NR32RM_clone3                       0
-#define __NR32RM_close_range                  0
+#define __NR32RM_close_range                  2
 #define __NR32RM_openat2                      0
 #define __NR32RM_pidfd_getfd                  0
 #define __NR32RM_faccessat2                   0
@@ -2687,7 +2688,7 @@
 #define __NR32RC_fspick                       1
 #define __NR32RC_pidfd_open                   2
 #define __NR32RC_clone3                       2
-#define __NR32RC_close_range                  1
+#define __NR32RC_close_range                  3
 #define __NR32RC_openat2                      1
 #define __NR32RC_pidfd_getfd                  3
 #define __NR32RC_faccessat2                   1

@@ -56,6 +56,7 @@
 #include <kos/ioctl/fd.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
+#include <linux/close_range.h>
 #include <linux/fs.h>
 #include <linux/kcmp.h>
 #include <sys/ioctl.h>
@@ -565,7 +566,45 @@ DEFINE_SYSCALL1(errno_t, close, fd_t, fd) {
 	return 0;
 }
 #endif /* __ARCH_WANT_SYSCALL_CLOSE */
-/* TODO: close_range(2) */
+#ifdef CONFIG_USE_NEW_HANDMAN
+#ifdef __ARCH_WANT_SYSCALL_CLOSE_RANGE
+DEFINE_SYSCALL3(errno_t, close_range,
+                unsigned int, minfd,
+                unsigned int, maxfd,
+                unsigned int, flags) {
+	struct handman *man = THIS_HANDMAN;
+	VALIDATE_FLAGSET(flags, CLOSE_RANGE_UNSHARE | CLOSE_RANGE_CLOEXEC,
+	                 E_INVALID_ARGUMENT_CONTEXT_CLOSE_RANGE_FLAGS);
+	switch (flags) {
+	case CLOSE_RANGE_UNSHARE:
+		if (isshared(man)) {
+			REF struct handman *omn;
+			man = handman_fork_and_closerange(man, minfd, maxfd);
+			omn = task_sethandman_inherit(man);
+			decref_unlikely(omn);
+			break;
+		}
+		ATTR_FALLTHROUGH
+	case 0:
+		handman_closerange(man, minfd, maxfd);
+		break;
+	case CLOSE_RANGE_CLOEXEC | CLOSE_RANGE_UNSHARE:
+		if (isshared(man)) {
+			REF struct handman *omn;
+			man = handman_fork(man);
+			omn = task_sethandman_inherit(man);
+			decref_unlikely(omn);
+		}
+		ATTR_FALLTHROUGH
+	case CLOSE_RANGE_CLOEXEC:
+		handman_setcloexec_range(man, minfd, maxfd);
+		break;
+	default: __builtin_unreachable();
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_CLOSE_RANGE */
+#endif /* CONFIG_USE_NEW_HANDMAN */
 
 
 

@@ -1090,10 +1090,9 @@ NOTHROW(FCALL task_gethandman)(struct task *__restrict thread) {
 
 /* Exchange the handle manager of the calling thread (and return the old one). */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct handman *
-NOTHROW(FCALL task_sethandman)(struct handman *__restrict newman) {
+NOTHROW(FCALL task_sethandman_inherit)(/*inherit(always)*/ REF struct handman *__restrict newman) {
 	pflag_t was;
 	REF struct handman *result;
-	incref(newman);
 	was = PREEMPTION_PUSHOFF();
 	handman_change_lock_acquire_nopr();
 	result = PERTASK_GET(this_handman);

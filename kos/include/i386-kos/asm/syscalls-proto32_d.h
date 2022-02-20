@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98b2a058 */
+/* HASH CRC-32:0x84ecaccb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -463,7 +463,7 @@
 #define __NR32AC_fspick                       1
 #define __NR32AC_pidfd_open                   2
 #define __NR32AC_clone3                       2
-#define __NR32AC_close_range                  1
+#define __NR32AC_close_range                  3
 #define __NR32AC_openat2                      1
 #define __NR32AC_pidfd_getfd                  3
 #define __NR32AC_faccessat2                   1
@@ -1970,7 +1970,9 @@
 #define __NR32AT1_pidfd_open                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_clone3                       (struct clone_args *, struct clone_args *)
 #define __NR32AT1_clone3                       (size_t, __size_t)
-#define __NR32AT0_close_range                  (int, int)
+#define __NR32AT0_close_range                  (unsigned int, unsigned int)
+#define __NR32AT1_close_range                  (unsigned int, unsigned int)
+#define __NR32AT2_close_range                  (unsigned int, unsigned int)
 #define __NR32AT0_openat2                      (int, int)
 #define __NR32AT0_pidfd_getfd                  (fd_t, __fd_t)
 #define __NR32AT1_pidfd_getfd                  (fd_t, __fd_t)
@@ -2601,7 +2603,7 @@
 #define __NR32AM_fspick(a, b, c, d, e, f)                       (int)a
 #define __NR32AM_pidfd_open(a, b, c, d, e, f)                   (__pid_t)a, (__syscall_ulong_t)b
 #define __NR32AM_clone3(a, b, c, d, e, f)                       (struct clone_args *)a, (__size_t)b
-#define __NR32AM_close_range(a, b, c, d, e, f)                  (int)a
+#define __NR32AM_close_range(a, b, c, d, e, f)                  (unsigned int)a, (unsigned int)b, (unsigned int)c
 #define __NR32AM_openat2(a, b, c, d, e, f)                      (int)a
 #define __NR32AM_pidfd_getfd(a, b, c, d, e, f)                  (__fd_t)a, (__fd_t)b, (__syscall_ulong_t)c
 #define __NR32AM_faccessat2(a, b, c, d, e, f)                   (int)a
@@ -3102,7 +3104,7 @@
 #define __NR32AP_fspick(a)                                      (__syscall_ulong_t)a
 #define __NR32AP_pidfd_open(a, b)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_clone3(a, b)                                   (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR32AP_close_range(a)                                 (__syscall_ulong_t)a
+#define __NR32AP_close_range(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_openat2(a)                                     (__syscall_ulong_t)a
 #define __NR32AP_pidfd_getfd(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_faccessat2(a)                                  (__syscall_ulong_t)a

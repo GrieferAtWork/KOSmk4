@@ -496,7 +496,8 @@ NOTHROW(FCALL task_gethandman)(struct task *__restrict thread);
 
 /* Exchange the handle manager of the calling thread (and return the old one). */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct handman *
-NOTHROW(FCALL task_sethandman)(struct handman *__restrict newman);
+NOTHROW(FCALL task_sethandman_inherit)(/*inherit(always)*/ REF struct handman *__restrict newman);
+#define task_sethandman(newman) task_sethandman_inherit(incref(newman))
 
 
 /* Returns the max used FD +1, or `0' if no FDs are in use

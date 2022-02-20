@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2357d15 */
+/* HASH CRC-32:0x1029e828 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11099,7 +11099,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_clone3)
 	.cfi_endproc
 END(__x86_asm64_syscall_clone3)
 
-/* errno_t close_range(int TODO_PROTOTYPE) */
+/* @param: flags: Set of `CLOSE_RANGE_*' from <linux/close_range.h> */
+/* errno_t close_range(unsigned int minfd, unsigned int maxfd, unsigned int flags) */
 .section .text.x86.asm64_syscall.close_range
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_close_range)
 	.cfi_startproc simple
@@ -24020,7 +24021,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clone3)
 	.cfi_endproc
 END(__x86_asm32_int80_clone3)
 
-/* errno_t close_range(int TODO_PROTOTYPE) */
+/* @param: flags: Set of `CLOSE_RANGE_*' from <linux/close_range.h> */
+/* errno_t close_range(unsigned int minfd, unsigned int maxfd, unsigned int flags) */
 .section .text.x86.asm32_syscall_int80.close_range
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_close_range)
 	.cfi_startproc simple
@@ -24032,7 +24034,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_close_range)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	movslq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_close_range)
 	call   sys32_close_range
 	popq_cfi_r %rdi
@@ -29522,7 +29526,8 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_pidfd_open, __x86_asm32_int80_pidf
 /* syscall_slong_t clone3(struct clone_args *cl_args, size_t size) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clone3, __x86_asm32_int80_clone3)
 
-/* errno_t close_range(int TODO_PROTOTYPE) */
+/* @param: flags: Set of `CLOSE_RANGE_*' from <linux/close_range.h> */
+/* errno_t close_range(unsigned int minfd, unsigned int maxfd, unsigned int flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_close_range, __x86_asm32_int80_close_range)
 
 /* errno_t openat2(int TODO_PROTOTYPE) */
@@ -35914,10 +35919,13 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clone3)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_clone3)
 
-/* errno_t close_range(int TODO_PROTOTYPE) */
+/* @param: flags: Set of `CLOSE_RANGE_*' from <linux/close_range.h> */
+/* errno_t close_range(unsigned int minfd, unsigned int maxfd, unsigned int flags) */
 .section .text.x86.asm32_syscall_sysrun32.close_range
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_close_range)
 	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
 	EXTERN(sys32_close_range)
 	jmp    sys32_close_range

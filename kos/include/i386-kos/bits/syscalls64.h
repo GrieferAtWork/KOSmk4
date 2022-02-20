@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e50769f */
+/* HASH CRC-32:0x53e21caf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -953,7 +953,8 @@
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS:                                           [...] */
 #define SYS_pidfd_open               __NR_pidfd_open               /* fd_t pidfd_open(pid_t pid, syscall_ulong_t flags) */
 #define SYS_clone3                   __NR_clone3                   /* syscall_slong_t clone3(struct clone_args *cl_args, size_t size) */
-#define SYS_close_range              __NR_close_range              /* errno_t close_range(int TODO_PROTOTYPE) */
+/* @param: flags: Set of `CLOSE_RANGE_*' from <linux/close_range.h> */
+#define SYS_close_range              __NR_close_range              /* errno_t close_range(unsigned int minfd, unsigned int maxfd, unsigned int flags) */
 #define SYS_openat2                  __NR_openat2                  /* errno_t openat2(int TODO_PROTOTYPE) */
 /* Duplicate the  handle  of  a  foreign  process into  a  handle  for  the  caller.
  * This system call duplicates the functionality of `open("/proc/[pid]/fd/[fdno]")',

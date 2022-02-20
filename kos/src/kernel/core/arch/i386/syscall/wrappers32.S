@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ac792b0 */
+/* HASH CRC-32:0xa3209086 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -16572,7 +16572,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clone3)
 	.cfi_endproc
 END(__x86_asm32_int80_clone3)
 
-/* errno_t close_range(int TODO_PROTOTYPE) */
+/* @param: flags: Set of `CLOSE_RANGE_*' from <linux/close_range.h> */
+/* errno_t close_range(unsigned int minfd, unsigned int maxfd, unsigned int flags) */
 .section .text.x86.asm32_syscall_int80.close_range
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_close_range)
 	.cfi_startproc simple
@@ -16591,14 +16592,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_close_range)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_close_range)
 	call   sys_close_range
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -36117,7 +36118,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clone3)
 	.cfi_endproc
 END(__x86_asm32_sysenter_clone3)
 
-/* errno_t close_range(int TODO_PROTOTYPE) */
+/* @param: flags: Set of `CLOSE_RANGE_*' from <linux/close_range.h> */
+/* errno_t close_range(unsigned int minfd, unsigned int maxfd, unsigned int flags) */
 .section .text.x86.asm32_syscall_sysenter.close_range
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_close_range)
 	.cfi_startproc simple
@@ -36136,14 +36138,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_close_range)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_close_range)
 	call   sys_close_range
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es

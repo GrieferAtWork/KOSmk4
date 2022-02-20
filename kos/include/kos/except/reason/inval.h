@@ -122,6 +122,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_SIGNALFD_FLAGS,       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `sys_signalfd4()' is not masked by `SFD_NONBLOCK | SFD_CLOEXEC' */
 	E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS,      /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `userviofd(2)' isn't a set of `O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
 	E_INVALID_ARGUMENT_CONTEXT_CLOSE_RANGE_BADRANGE, /* E_INVALID_ARGUMENT_BAD_VALUE: [fd_t first, fd_t last] close_range() called with `first > last' */
+	E_INVALID_ARGUMENT_CONTEXT_CLOSE_RANGE_FLAGS,    /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `close_range(2)' isn't a set of `CLOSE_RANGE_UNSHARE | CLOSE_RANGE_CLOEXEC' */
 
 	/* System calls: exec(2), wait(2). */
 	E_INVALID_ARGUMENT_CONTEXT_EXECVEAT_FLAGS = 0x0300, /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `execveat' isn't a set of `0|AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
@@ -402,6 +403,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_SIGNALFD_FLAGS                   E_INVALID_ARGUMENT_CONTEXT_SIGNALFD_FLAGS                   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `sys_signalfd4()' is not masked by `SFD_NONBLOCK | SFD_CLOEXEC' */
 #define E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS                  E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS                  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `userviofd(2)' isn't a set of `O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
 #define E_INVALID_ARGUMENT_CONTEXT_CLOSE_RANGE_BADRANGE             E_INVALID_ARGUMENT_CONTEXT_CLOSE_RANGE_BADRANGE             /* E_INVALID_ARGUMENT_BAD_VALUE: [fd_t first, fd_t last] close_range() called with `first > last' */
+#define E_INVALID_ARGUMENT_CONTEXT_CLOSE_RANGE_FLAGS                E_INVALID_ARGUMENT_CONTEXT_CLOSE_RANGE_FLAGS                /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `close_range(2)' isn't a set of `CLOSE_RANGE_UNSHARE | CLOSE_RANGE_CLOEXEC' */
 /* System calls: exec(2), wait(2). */
 #define E_INVALID_ARGUMENT_CONTEXT_EXECVEAT_FLAGS                   E_INVALID_ARGUMENT_CONTEXT_EXECVEAT_FLAGS                   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `execveat' isn't a set of `0|AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
 #define E_INVALID_ARGUMENT_CONTEXT_WAITID_OPTIONS                   E_INVALID_ARGUMENT_CONTEXT_WAITID_OPTIONS                   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `options' argument passed to `waitid()' isn't a set of `WNOHANG|WNOREAP|WEXITED|WSTOPPED|WCONTINUED'
@@ -653,6 +655,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_SIGNALFD_FLAGS                   579  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `sys_signalfd4()' is not masked by `SFD_NONBLOCK | SFD_CLOEXEC' */
 #define E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS                  580  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `userviofd(2)' isn't a set of `O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
 #define E_INVALID_ARGUMENT_CONTEXT_CLOSE_RANGE_BADRANGE             581  /* E_INVALID_ARGUMENT_BAD_VALUE: [fd_t first, fd_t last] close_range() called with `first > last' */
+#define E_INVALID_ARGUMENT_CONTEXT_CLOSE_RANGE_FLAGS                582  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `close_range(2)' isn't a set of `CLOSE_RANGE_UNSHARE | CLOSE_RANGE_CLOEXEC' */
 /* System calls: exec(2), wait(2). */
 #define E_INVALID_ARGUMENT_CONTEXT_EXECVEAT_FLAGS                   768  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `execveat' isn't a set of `0|AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
 #define E_INVALID_ARGUMENT_CONTEXT_WAITID_OPTIONS                   769  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `options' argument passed to `waitid()' isn't a set of `WNOHANG|WNOREAP|WEXITED|WSTOPPED|WCONTINUED'
