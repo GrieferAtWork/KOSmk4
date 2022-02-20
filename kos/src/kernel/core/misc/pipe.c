@@ -608,7 +608,7 @@ sys_pipe2_impl(USER UNCHECKED fd_t *pipedes, oflag_t flags) {
 			                       HANDLE_TYPE_PIPE_READER);
 			handles_install_commit(&winstall, obj_writer,
 			                       IO_WRONLY | IO_FROM_OPENFLAG(flags & (O_CLOEXEC | O_CLOFORK | O_NONBLOCK)),
-			                       HANDLE_TYPE_PIPE_READER);
+			                       HANDLE_TYPE_PIPE_WRITER);
 		} EXCEPT {
 			handles_install_abort(&winstall);
 			RETHROW();

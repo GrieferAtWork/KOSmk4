@@ -407,7 +407,8 @@
 #elif !defined(__NO_ATTR_WEAK) && 0 /* weak causes functions to be defined, even if unused :( */
 #define __INTERN_COMDAT __ATTR_UNUSED __ATTR_WEAK __ATTR_VISIBILITY("hidden")
 #else /* ... */
-#define __INTERN_COMDAT static __ATTR_UNUSED
+#define __NO_INTERN_COMDAT
+#define __INTERN_COMDAT static __ATTR_NOINLINE __ATTR_INLINE __ATTR_UNUSED
 #endif /* !... */
 #endif /* !__INTERN_COMDAT */
 #ifndef __PUBLIC_COMDAT

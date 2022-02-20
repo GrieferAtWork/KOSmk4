@@ -306,6 +306,7 @@ struct handrange {
 	 ((mode)&IO_CLOEXEC) ? (void)__hybrid_atomic_inc((range)->hr_cexec, __ATOMIC_RELEASE) : (void)0,  \
 	 ((mode)&IO_CLOFORK) ? (void)__hybrid_atomic_inc((range)->hr_cfork, __ATOMIC_RELEASE) : (void)0,  \
 	 __hybrid_atomic_store((self)->_mh_words[1], __handslot_makeword2(mode, type), __ATOMIC_SEQ_CST), \
+	 handle_incref((self)->mh_hand),                                                                  \
 	 handrange_dec_nlops_and_maybe_rejoin(range, man, 0),                                             \
 	 sig_broadcast(&(man)->hm_changed))
 

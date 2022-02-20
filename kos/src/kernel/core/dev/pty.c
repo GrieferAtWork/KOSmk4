@@ -539,8 +539,6 @@ DEFINE_SYSCALL5(errno_t, openpty,
 	struct handman_install_data minstall;
 	struct handman_install_data sinstall;
 	fd_t mfd, sfd;
-	REF struct ptymaster *master;
-	REF struct ptyslave *slave;
 	validate_readable_opt(termp, sizeof(*termp));
 	validate_readable_opt(winp, sizeof(*winp));
 	validate_writable_opt(name, 1);
@@ -552,6 +550,9 @@ DEFINE_SYSCALL5(errno_t, openpty,
 	TRY {
 		sfd = handles_install_begin(&sinstall);
 		TRY {
+			REF struct ptymaster *master;
+			REF struct ptyslave *slave;
+
 			/* Write handle values to user-space. */
 			COMPILER_WRITE_BARRIER();
 			*amaster = mfd;

@@ -134,7 +134,7 @@ sys_fcntl_impl(fd_t fd, fcntl_t command,
 		VALIDATE_FLAGSET((uintptr_t)arg, IO_SETFL_MASK,
 		                 E_INVALID_ARGUMENT_CONTEXT_F_SETFL_OFLAGS);
 		nmode = IO_FROM_OPENFLAG_NOHANDLE((oflag_t)(uintptr_t)arg);
-		omode = handman_sethandflags(man, fd, ~IO_SETFL_MASK, nmode);
+		omode = handman_sethandflags(man, fd, (iomode_t)~IO_SETFL_MASK, nmode);
 		if (command == F_SETFL)
 			omode = -EOK;
 		return omode;

@@ -1046,6 +1046,13 @@ PUBLIC struct handman handman_kernel = {
 PUBLIC ATTR_PERTASK ATTR_ALIGN(struct handman *)
 this_handman = &handman_kernel;
 
+DEFINE_PERTASK_FINI(fini_this_handman);
+PRIVATE ATTR_USED NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL fini_this_handman)(struct task *__restrict self) {
+	decref(FORTASK(self, this_handman));
+}
+
+
 #ifndef CONFIG_NO_SMP
 /* Lock for accessing any remote thread's this_handman field */
 PRIVATE struct atomic_lock handman_change_lock = ATOMIC_RWLOCK_INIT;
@@ -2091,8 +2098,10 @@ again_check_slot:
 			/* Slot is a LOP -- wait for it to stop being one */
 			task_connect(&self->hm_changed); /* NOTHROW, because first connection */
 			COMPILER_READ_BARRIER();
-			if unlikely(!_handslot_islop(&range->hr_hand[relfd]))
+			if unlikely(!_handslot_islop(&range->hr_hand[relfd])) {
+				task_disconnectall();
 				goto again_check_slot;
+			}
 			handman_endwrite(self);
 
 			/* Wait for the handle to be installed proper */
@@ -2430,7 +2439,7 @@ handman_lock_and_alloc_for_install(struct handman *__restrict self, fd_t minfd,
 	unsigned int relfd, count;
 	struct handrange *result, *next;
 	struct handrange *newrange = NULL;
-	RAII_FINALLY { _handrange_free(result); };
+	RAII_FINALLY { _handrange_free(newrange); };
 
 again:
 	handman_write(self);
@@ -2447,7 +2456,6 @@ again:
 		result = handman_firstrangeafter(self, (unsigned int)minfd);
 	}
 	if (!result || (unsigned int)minfd < result->hr_minfd) {
-create_new_range_for_minfd:
 		/* No range exists above  `minfd', or there is  an
 		 * unmapped gap between `minfd' and its successor.
 		 *
@@ -2455,6 +2463,15 @@ create_new_range_for_minfd:
 		 *    only check if  `minfd' is once  we get  here. */
 		if unlikely(minfd < 0 || (unsigned int)minfd > self->hm_maxfd)
 			handman_endwrite_and_throw_invalid_handle_for_dupfd(self, minfd);
+
+		/* Try to expand another, existing range. */
+		result = handman_extendrange_or_unlock(self, (unsigned int)minfd, &newrange);
+		if (result == HANDMAN_EXTENDRANGE_OR_UNLOCK_UNLOCKED)
+			goto again; /* Lock was lost --> try again */
+		if (result != HANDMAN_EXTENDRANGE_OR_UNLOCK_NORANGE)
+			goto handle_existing_range; /* Insert into newly expanded range! */
+
+create_new_range_for_minfd:
 		/* Allocate a new range. */
 		result = _handrange_alloc_nx(1, GFP_ATOMIC);
 		if (!result) {
@@ -2500,6 +2517,7 @@ create_new_range_for_minfd:
 
 		/* Insert the new range into the tree. */
 		handman_ranges_insert(self, result);
+		ATOMIC_INC(self->hm_handles);
 		return result;
 	}
 handle_existing_range:
@@ -2521,6 +2539,7 @@ insert_into_result:
 				/* Found a free slot! */
 				ATOMIC_WRITE(result->hr_nhint, relfd + 1);
 				*p_relfd = relfd;
+				ATOMIC_INC(self->hm_handles);
 				return result;
 			}
 			++relfd;
@@ -2587,9 +2606,10 @@ handman_install(struct handman *__restrict self,
 
 	/* Install the handle. */
 	memcpy(dest, hand, sizeof(struct handle));
-	if (hand->h_mode & IO_CLOEXEC)
+	handle_incref(*dest);
+	if (dest->h_mode & IO_CLOEXEC)
 		ATOMIC_INC(range->hr_cexec);
-	if (hand->h_mode & IO_CLOFORK)
+	if (dest->h_mode & IO_CLOFORK)
 		ATOMIC_INC(range->hr_cfork);
 
 	/* Release locks. */

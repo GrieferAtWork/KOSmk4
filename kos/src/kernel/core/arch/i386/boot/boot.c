@@ -33,6 +33,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/driver-param.h>
 #include <kernel/fpu.h> /* CONFIG_FPU */
 #include <kernel/malloc.h>
+#include <kernel/mman/driver.h>
 #include <kernel/memory.h>
 #include <kernel/printk.h>
 #include <kernel/rand.h>
@@ -351,6 +352,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 #endif /* CONFIG_SELFTEST */
 
 	__hybrid_assert(!kmalloc_leaks());
+
+	decref(driver_insmod("sctrace"));
 
 	/* Update the given initial user-state to start
 	 * executing /bin/init (or whatever was passed as `init=...') */
