@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b47c3e3 */
+/* HASH CRC-32:0x237b746b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,6 +42,7 @@
 #define HAVE_SC_REPR_CLONE_FLAGS
 #define HAVE_SC_REPR_CLONE_FLAGS_SETNS
 #define HAVE_SC_REPR_CLONE_FLAGS_UNSHARE
+#define HAVE_SC_REPR_CLOSE_RANGE_FLAGS
 #define HAVE_SC_REPR_CPUSET
 #define HAVE_SC_REPR_DEV_BLK
 #define HAVE_SC_REPR_DEV_T
@@ -199,6 +200,7 @@ __SYSCALL_REPR(SC_REPR_CLOCKID_T)
 __SYSCALL_REPR(SC_REPR_CLONE_FLAGS)
 __SYSCALL_REPR(SC_REPR_CLONE_FLAGS_SETNS)
 __SYSCALL_REPR(SC_REPR_CLONE_FLAGS_UNSHARE)
+__SYSCALL_REPR(SC_REPR_CLOSE_RANGE_FLAGS)
 __SYSCALL_REPR(SC_REPR_CPUSET)
 __SYSCALL_REPR(SC_REPR_DEV_BLK)
 __SYSCALL_REPR(SC_REPR_DEV_T)

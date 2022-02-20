@@ -56,6 +56,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kos/io.h>
 #include <kos/kernel/types.h>
 #include <kos/syscalls.h>
+#include <linux/close_range.h>
 #include <linux/fd.h>
 #include <linux/fs.h>
 #include <linux/futex.h>
@@ -548,6 +549,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_access_type
 #endif /* HAVE_SC_REPR_ACCESS_TYPE */
 
+#ifdef HAVE_SC_REPR_CLOSE_RANGE_FLAGS
+#define NEED_print_close_range_flags
+#endif /* HAVE_SC_REPR_CLOSE_RANGE_FLAGS */
+
 
 
 
@@ -707,6 +712,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifdef NEED_print_sigaction_flags
 #define NEED_print_flagset32
 #endif /* NEED_print_sigaction_flags */
+
+#ifdef NEED_print_close_range_flags
+#define NEED_print_flagset8
+#endif /* NEED_print_close_range_flags */
 
 
 
@@ -4467,7 +4476,7 @@ print_kcmp_type(pformatprinter printer, void *arg,
 
 
 
-#if defined(NEED_print_access_type) || defined(__DEEMON__)
+#ifdef NEED_print_access_type
 PRIVATE struct {
 	uint8_t    pn_flag;
 	char const pn_name[5];
@@ -4488,6 +4497,27 @@ print_access_type(pformatprinter printer, void *arg,
 	                      "", flags);
 }
 #endif /* NEED_print_access_type */
+
+
+
+#ifdef NEED_print_close_range_flags
+PRIVATE struct {
+	uint8_t    pn_flag;
+	char const pn_name[8];
+} const close_range_flags[] = {
+	{ CLOSE_RANGE_CLOEXEC, "CLOEXEC" },
+	{ CLOSE_RANGE_UNSHARE, "UNSHARE" },
+	{ 0, "" },
+};
+
+PRIVATE ssize_t CC
+print_close_range_flags(pformatprinter printer, void *arg,
+                        syscall_ulong_t flags) {
+	return print_flagset8(printer, arg, close_range_flags,
+	                      sizeof(*close_range_flags),
+	                      "CLOSE_RANGE_", flags);
+}
+#endif /* NEED_print_close_range_flags */
 
 
 
@@ -4596,7 +4626,6 @@ for (local c: knownCases.sorted()) {
 	// TODO: #define HAVE_SC_REPR_STRUCT_EXCEPTION_DATA32
 	// TODO: #define HAVE_SC_REPR_STRUCT_EXCEPTION_DATA64
 	// TODO: #define HAVE_SC_REPR_STRUCT_FILE_HANDLE
-	// TODO: #define HAVE_SC_REPR_STRUCT_FPUSTATE
 	// TODO: #define HAVE_SC_REPR_STRUCT_FPUSTATE32
 	// TODO: #define HAVE_SC_REPR_STRUCT_ITIMERSPEC
 	// TODO: #define HAVE_SC_REPR_STRUCT_ITIMERSPECX32
@@ -4617,7 +4646,6 @@ for (local c: knownCases.sorted()) {
 	// TODO: #define HAVE_SC_REPR_STRUCT_MSGHDRX64
 	// TODO: #define HAVE_SC_REPR_STRUCT_RLIMIT
 	// TODO: #define HAVE_SC_REPR_STRUCT_RLIMIT64
-	// TODO: #define HAVE_SC_REPR_STRUCT_RPC_SYSCALL_INFO
 	// TODO: #define HAVE_SC_REPR_STRUCT_RPC_SYSCALL_INFO32
 	// TODO: #define HAVE_SC_REPR_STRUCT_SCHED_PARAM
 	// TODO: #define HAVE_SC_REPR_STRUCT_SEL_ARGX32
@@ -4631,7 +4659,6 @@ for (local c: knownCases.sorted()) {
 	// TODO: #define HAVE_SC_REPR_STRUCT_TERMIOS
 	// TODO: #define HAVE_SC_REPR_STRUCT_TIMESPEC_OR_UINT32
 	// TODO: #define HAVE_SC_REPR_STRUCT_TIMEZONE
-	// TODO: #define HAVE_SC_REPR_STRUCT_UCPUSTATE
 	// TODO: #define HAVE_SC_REPR_STRUCT_UCPUSTATE32
 	// TODO: #define HAVE_SC_REPR_STRUCT_UCPUSTATE64
 	// TODO: #define HAVE_SC_REPR_STRUCT_UTIMBUF
@@ -4652,6 +4679,12 @@ for (local c: knownCases.sorted()) {
 	// TODO: #define HAVE_SC_REPR_VOID_VECTOR64
 	// TODO: #define HAVE_SC_REPR_XATTR_FLAGS
 /*[[[end]]]*/
+
+#ifdef HAVE_SC_REPR_CLOSE_RANGE_FLAGS
+	case SC_REPR_CLOSE_RANGE_FLAGS:
+		result = print_close_range_flags(printer, arg, (uintptr_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_CLOSE_RANGE_FLAGS */
 
 #ifdef HAVE_SC_REPR_ACCESS_TYPE
 	case SC_REPR_ACCESS_TYPE:

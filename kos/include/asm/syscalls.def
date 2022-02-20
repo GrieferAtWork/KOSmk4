@@ -635,7 +635,9 @@ execveatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname,
 [restart(must)] close:(fd_t fd) -> errno_t;
 
 @@@param: flags: Set of `CLOSE_RANGE_*' from <linux/close_range.h>
-[restart(must)] close_range:(unsigned int minfd, unsigned int maxfd, unsigned int flags) -> errno_t;
+[restart(must)]
+close_range:(unsigned int minfd, unsigned int maxfd,
+             [tostr(CLOSE_RANGE_FLAGS)] unsigned int flags) -> errno_t;
 
 dup:(fd_t fd) -> fd_t;
 dup2:(fd_t oldfd, fd_t newfd) -> fd_t;

@@ -218,6 +218,7 @@ incdir("");
 #include <asm/pageid.h>
 #include <asm/pagesize.h>
 #include <asm/pkey.h>
+#include <asm/prctl.h>
 #include <asm/redirect.h>
 #include <asm/signed-shift.h>
 #include <asm/syscalls-proto.h>
@@ -309,6 +310,7 @@ incdir("");
 #include <bits/os/siginfo.h>
 #include <bits/os/signalfd_siginfo.h>
 #include <bits/os/sigset.h>
+#include <bits/os/sigset_with_size.h>
 #include <bits/os/sigstack.h>
 #include <bits/os/sigval.h>
 #include <bits/os/sockaddr-common.h>
@@ -424,6 +426,7 @@ incdir("");
 #include <compat/bits/os/siginfo-convert.h>
 #include <compat/bits/os/siginfo.h>
 #include <compat/bits/os/sigset.h>
+#include <compat/bits/os/sigset_with_size.h>
 #include <compat/bits/os/sigstack.h>
 #include <compat/bits/os/sigval.h>
 #include <compat/bits/os/stat-convert.h>
@@ -914,6 +917,7 @@ incdir("");
 #include <link.h>
 #include <linux/agpgart.h>
 #include <linux/bits/posix_types.h>
+#include <linux/close_range.h>
 #include <linux/fd.h>
 #include <linux/fs.h>
 #include <linux/futex.h>
@@ -932,6 +936,7 @@ incdir("");
 #include <linux/param.h>
 #include <linux/pci.h>
 #include <linux/posix_types.h>
+#include <linux/prctl.h>
 #include <linux/socket.h>
 #include <linux/sockios.h>
 #include <linux/stddef.h>
@@ -992,6 +997,7 @@ incdir("");
 #include <netpacket/packet.h>
 #include <new.h>
 #include <newlib.h>
+#include <nl_types.h>
 #include <nt/__stdinc.h>
 #include <nt/debugapi.h>
 #include <nt/errhandlingapi.h>
@@ -1181,6 +1187,7 @@ incdir("");
 #include <sys/pci.h>
 #include <sys/perm.h>
 #include <sys/poll.h>
+#include <sys/prctl.h>
 #include <sys/procfs.h>
 #include <sys/ptrace.h>
 #include <sys/queue.h>
