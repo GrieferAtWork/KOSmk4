@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc3c9d36 */
+/* HASH CRC-32:0x885f11a6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,6 +51,7 @@ __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd,
 #endif /* !__local___localdep_fcntl_defined */
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
+#include <hybrid/__overflow.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fdwalk) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fdwalk))(int (__LIBCCALL *__walk)(void *__arg, __fd_t __fd), void *__arg) __THROWS(...) {
@@ -76,7 +77,8 @@ __LOCAL_LIBC(fdwalk) __ATTR_NONNULL((1)) int
 		__result = (*__walk)(__arg, __fd);
 		if (__result != 0)
 			break;
-		++__fd;
+		if (__hybrid_overflow_sadd(__fd, 1, &__fd))
+			break;
 	}
 	return __result;
 }

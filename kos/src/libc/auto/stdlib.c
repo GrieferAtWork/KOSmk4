@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3d941bc */
+/* HASH CRC-32:0xd2e7cd18 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2309,7 +2309,8 @@ INTERN ATTR_SECTION(".text.crt.solaris") NONNULL((1)) int
 		result = (*walk)(arg, fd);
 		if (result != 0)
 			break;
-		++fd;
+		if (__hybrid_overflow_sadd(fd, 1, &fd))
+			break;
 	}
 	return result;
 }

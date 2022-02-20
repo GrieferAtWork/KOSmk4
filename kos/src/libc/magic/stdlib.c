@@ -3250,7 +3250,7 @@ char const *getexecname() {
 @@invocations return 0, `fdwalk()' will also return 0.
 [[requires_include("<asm/os/fcntl.h>")]]
 [[requires($has_function(fcntl) && defined(__F_NEXT))]]
-[[impl_include("<asm/os/fcntl.h>", "<libc/errno.h>")]]
+[[impl_include("<asm/os/fcntl.h>", "<libc/errno.h>", "<hybrid/__overflow.h>")]]
 [[throws, crt_dos_variant(callback(
 	cook: struct { auto walk = walk; auto arg = arg; },
 	wrap: ($cook *c, $fd_t fd): int { return (*c->walk)(c->arg, fd); },
@@ -3279,7 +3279,8 @@ int fdwalk([[nonnull]] int (LIBCCALL *walk)(void *arg, $fd_t fd), void *arg) {
 		result = (*walk)(arg, fd);
 		if (result != 0)
 			break;
-		++fd;
+		if (__hybrid_overflow_sadd(fd, 1, &fd))
+			break;
 	}
 	return result;
 }
