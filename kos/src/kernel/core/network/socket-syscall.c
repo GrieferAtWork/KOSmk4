@@ -133,9 +133,12 @@ DEFINE_SYSCALL3(errno_t, connect, fd_t, sockfd,
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
 		decref_unlikely(sock);
-		THROW(E_INVALID_HANDLE_FILETYPE, sockfd,
-		      HANDLE_TYPE_SOCKET, sock.h_type,
-		      HANDLE_TYPEKIND_GENERIC, subkind);
+		THROW(E_INVALID_HANDLE_FILETYPE,
+		      /* fd:                 */ sockfd,
+		      /* needed_handle_type: */ HANDLE_TYPE_SOCKET,
+		      /* actual_handle_type: */ sock.h_type,
+		      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+		      /* actual_handle_kind: */ subkind);
 	}
 	FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
 	socket_connect((struct socket *)sock.h_data, addr, addr_len, sock.h_mode);
@@ -189,9 +192,12 @@ DEFINE_SYSCALL3(fd_t, accept, fd_t, sockfd,
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
 		decref_unlikely(sock);
-		THROW(E_INVALID_HANDLE_FILETYPE, sockfd,
-		      HANDLE_TYPE_SOCKET, sock.h_type,
-		      HANDLE_TYPEKIND_GENERIC, subkind);
+		THROW(E_INVALID_HANDLE_FILETYPE,
+		      /* fd:                 */ sockfd,
+		      /* needed_handle_type: */ HANDLE_TYPE_SOCKET,
+		      /* actual_handle_type: */ sock.h_type,
+		      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+		      /* actual_handle_kind: */ subkind);
 	}
 	{
 		FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
@@ -245,9 +251,12 @@ DEFINE_SYSCALL4(fd_t, accept4, fd_t, sockfd,
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
 		decref_unlikely(sock);
-		THROW(E_INVALID_HANDLE_FILETYPE, sockfd,
-		      HANDLE_TYPE_SOCKET, sock.h_type,
-		      HANDLE_TYPEKIND_GENERIC, subkind);
+		THROW(E_INVALID_HANDLE_FILETYPE,
+		      /* fd:                 */ sockfd,
+		      /* needed_handle_type: */ HANDLE_TYPE_SOCKET,
+		      /* actual_handle_type: */ sock.h_type,
+		      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+		      /* actual_handle_kind: */ subkind);
 	}
 	{
 		FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
@@ -307,9 +316,12 @@ DEFINE_SYSCALL5(errno_t, getsockopt, fd_t, sockfd,
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
 		decref_unlikely(sock);
-		THROW(E_INVALID_HANDLE_FILETYPE, sockfd,
-		      HANDLE_TYPE_SOCKET, sock.h_type,
-		      HANDLE_TYPEKIND_GENERIC, subkind);
+		THROW(E_INVALID_HANDLE_FILETYPE,
+		      /* fd:                 */ sockfd,
+		      /* needed_handle_type: */ HANDLE_TYPE_SOCKET,
+		      /* actual_handle_type: */ sock.h_type,
+		      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+		      /* actual_handle_kind: */ subkind);
 	}
 	{
 		FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
@@ -337,9 +349,12 @@ DEFINE_SYSCALL5(errno_t, setsockopt, fd_t, sockfd,
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
 		decref_unlikely(sock);
-		THROW(E_INVALID_HANDLE_FILETYPE, sockfd,
-		      HANDLE_TYPE_SOCKET, sock.h_type,
-		      HANDLE_TYPEKIND_GENERIC, subkind);
+		THROW(E_INVALID_HANDLE_FILETYPE,
+		      /* fd:                 */ sockfd,
+		      /* needed_handle_type: */ HANDLE_TYPE_SOCKET,
+		      /* actual_handle_type: */ sock.h_type,
+		      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+		      /* actual_handle_kind: */ subkind);
 	}
 	{
 		FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
@@ -429,9 +444,12 @@ DEFINE_SYSCALL4(ssize_t, send, fd_t, sockfd,
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
 		decref_unlikely(sock);
-		THROW(E_INVALID_HANDLE_FILETYPE, sockfd,
-		      HANDLE_TYPE_SOCKET, sock.h_type,
-		      HANDLE_TYPEKIND_GENERIC, subkind);
+		THROW(E_INVALID_HANDLE_FILETYPE,
+		      /* fd:                 */ sockfd,
+		      /* needed_handle_type: */ HANDLE_TYPE_SOCKET,
+		      /* actual_handle_type: */ sock.h_type,
+		      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+		      /* actual_handle_kind: */ subkind);
 	}
 	{
 		FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
@@ -460,9 +478,12 @@ DEFINE_SYSCALL6(ssize_t, sendto, fd_t, sockfd,
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
 		decref_unlikely(sock);
-		THROW(E_INVALID_HANDLE_FILETYPE, sockfd,
-		      HANDLE_TYPE_SOCKET, sock.h_type,
-		      HANDLE_TYPEKIND_GENERIC, subkind);
+		THROW(E_INVALID_HANDLE_FILETYPE,
+		      /* fd:                 */ sockfd,
+		      /* needed_handle_type: */ HANDLE_TYPE_SOCKET,
+		      /* actual_handle_type: */ sock.h_type,
+		      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+		      /* actual_handle_kind: */ subkind);
 	}
 	{
 		FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
@@ -502,9 +523,12 @@ DEFINE_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
 		decref_unlikely(sock);
-		THROW(E_INVALID_HANDLE_FILETYPE, sockfd,
-		      HANDLE_TYPE_SOCKET, sock.h_type,
-		      HANDLE_TYPEKIND_GENERIC, subkind);
+		THROW(E_INVALID_HANDLE_FILETYPE,
+		      /* fd:                 */ sockfd,
+		      /* needed_handle_type: */ HANDLE_TYPE_SOCKET,
+		      /* actual_handle_type: */ sock.h_type,
+		      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+		      /* actual_handle_kind: */ subkind);
 	}
 	{
 		size_t iov_total;
@@ -595,9 +619,12 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
 		decref_unlikely(sock);
-		THROW(E_INVALID_HANDLE_FILETYPE, sockfd,
-		      HANDLE_TYPE_SOCKET, sock.h_type,
-		      HANDLE_TYPEKIND_GENERIC, subkind);
+		THROW(E_INVALID_HANDLE_FILETYPE,
+		      /* fd:                 */ sockfd,
+		      /* needed_handle_type: */ HANDLE_TYPE_SOCKET,
+		      /* actual_handle_type: */ sock.h_type,
+		      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+		      /* actual_handle_kind: */ subkind);
 	}
 	{
 		size_t iov_total;
@@ -683,9 +710,12 @@ DEFINE_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
 		decref_unlikely(sock);
-		THROW(E_INVALID_HANDLE_FILETYPE, sockfd,
-		      HANDLE_TYPE_SOCKET, sock.h_type,
-		      HANDLE_TYPEKIND_GENERIC, subkind);
+		THROW(E_INVALID_HANDLE_FILETYPE,
+		      /* fd:                 */ sockfd,
+		      /* needed_handle_type: */ HANDLE_TYPE_SOCKET,
+		      /* actual_handle_type: */ sock.h_type,
+		      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+		      /* actual_handle_kind: */ subkind);
 	}
 	FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
 	for (i = 0; i < vlen; ++i) {
@@ -795,9 +825,12 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
 		decref_unlikely(sock);
-		THROW(E_INVALID_HANDLE_FILETYPE, sockfd,
-		      HANDLE_TYPE_SOCKET, sock.h_type,
-		      HANDLE_TYPEKIND_GENERIC, subkind);
+		THROW(E_INVALID_HANDLE_FILETYPE,
+		      /* fd:                 */ sockfd,
+		      /* needed_handle_type: */ HANDLE_TYPE_SOCKET,
+		      /* actual_handle_type: */ sock.h_type,
+		      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+		      /* actual_handle_kind: */ subkind);
 	}
 	FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
 	msg_flags |= MSG_CMSG_COMPAT; /* Enable compatibility mode */
@@ -915,9 +948,12 @@ DEFINE_SYSCALL4(ssize_t, recv, fd_t, sockfd,
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
 		decref_unlikely(sock);
-		THROW(E_INVALID_HANDLE_FILETYPE, sockfd,
-		      HANDLE_TYPE_SOCKET, sock.h_type,
-		      HANDLE_TYPEKIND_GENERIC, subkind);
+		THROW(E_INVALID_HANDLE_FILETYPE,
+		      /* fd:                 */ sockfd,
+		      /* needed_handle_type: */ HANDLE_TYPE_SOCKET,
+		      /* actual_handle_type: */ sock.h_type,
+		      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+		      /* actual_handle_kind: */ subkind);
 	}
 	{
 		struct socket *me = (struct socket *)sock.h_data;
@@ -961,9 +997,12 @@ DEFINE_SYSCALL6(ssize_t, recvfrom, fd_t, sockfd,
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
 		decref_unlikely(sock);
-		THROW(E_INVALID_HANDLE_FILETYPE, sockfd,
-		      HANDLE_TYPE_SOCKET, sock.h_type,
-		      HANDLE_TYPEKIND_GENERIC, subkind);
+		THROW(E_INVALID_HANDLE_FILETYPE,
+		      /* fd:                 */ sockfd,
+		      /* needed_handle_type: */ HANDLE_TYPE_SOCKET,
+		      /* actual_handle_type: */ sock.h_type,
+		      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+		      /* actual_handle_kind: */ subkind);
 	}
 	{
 		struct socket *me = (struct socket *)sock.h_data;
@@ -1015,9 +1054,12 @@ DEFINE_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
 		decref_unlikely(sock);
-		THROW(E_INVALID_HANDLE_FILETYPE, sockfd,
-		      HANDLE_TYPE_SOCKET, sock.h_type,
-		      HANDLE_TYPEKIND_GENERIC, subkind);
+		THROW(E_INVALID_HANDLE_FILETYPE,
+		      /* fd:                 */ sockfd,
+		      /* needed_handle_type: */ HANDLE_TYPE_SOCKET,
+		      /* actual_handle_type: */ sock.h_type,
+		      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+		      /* actual_handle_kind: */ subkind);
 	}
 	{
 		size_t iov_total;
@@ -1115,9 +1157,12 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
 		decref_unlikely(sock);
-		THROW(E_INVALID_HANDLE_FILETYPE, sockfd,
-		      HANDLE_TYPE_SOCKET, sock.h_type,
-		      HANDLE_TYPEKIND_GENERIC, subkind);
+		THROW(E_INVALID_HANDLE_FILETYPE,
+		      /* fd:                 */ sockfd,
+		      /* needed_handle_type: */ HANDLE_TYPE_SOCKET,
+		      /* actual_handle_type: */ sock.h_type,
+		      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+		      /* actual_handle_kind: */ subkind);
 	}
 	{
 		size_t iov_total;
@@ -1215,9 +1260,12 @@ sys_recvmmsg_impl(fd_t sockfd,
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
 		decref_unlikely(sock);
-		THROW(E_INVALID_HANDLE_FILETYPE, sockfd,
-		      HANDLE_TYPE_SOCKET, sock.h_type,
-		      HANDLE_TYPEKIND_GENERIC, subkind);
+		THROW(E_INVALID_HANDLE_FILETYPE,
+		      /* fd:                 */ sockfd,
+		      /* needed_handle_type: */ HANDLE_TYPE_SOCKET,
+		      /* actual_handle_type: */ sock.h_type,
+		      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+		      /* actual_handle_kind: */ subkind);
 	}
 	me = (struct socket *)sock.h_data;
 	FINALLY_DECREF_UNLIKELY(me);
@@ -1392,9 +1440,12 @@ compat_sys_recvmmsg_impl(fd_t sockfd,
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
 		decref_unlikely(sock);
-		THROW(E_INVALID_HANDLE_FILETYPE, sockfd,
-		      HANDLE_TYPE_SOCKET, sock.h_type,
-		      HANDLE_TYPEKIND_GENERIC, subkind);
+		THROW(E_INVALID_HANDLE_FILETYPE,
+		      /* fd:                 */ sockfd,
+		      /* needed_handle_type: */ HANDLE_TYPE_SOCKET,
+		      /* actual_handle_type: */ sock.h_type,
+		      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+		      /* actual_handle_kind: */ subkind);
 	}
 	me = (struct socket *)sock.h_data;
 	FINALLY_DECREF_UNLIKELY(me);

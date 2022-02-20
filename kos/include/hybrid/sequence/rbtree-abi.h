@@ -464,9 +464,9 @@ __DECL_END
 #elif defined(RBTREE_REDFIELD) && defined(RBTREE_BLACKBIT)
 #define RBTREE_FLIPCOLOR(self) (void)((self)->RBTREE_REDFIELD ^= RBTREE_BLACKBIT)
 #elif defined(RBTREE_REDFIELD)
-#define RBTREE_FLIPCOLOR(self) (void)((self)->RBTREE_REDFIELD ^= -1)
+#define RBTREE_FLIPCOLOR(self) (void)((self)->RBTREE_REDFIELD = !(self)->RBTREE_REDFIELD)
 #elif defined(RBTREE_BLACKFIELD)
-#define RBTREE_FLIPCOLOR(self) (void)((self)->RBTREE_BLACKFIELD ^= -0)
+#define RBTREE_FLIPCOLOR(self) (void)((self)->RBTREE_BLACKFIELD = !(self)->RBTREE_BLACKFIELD)
 #else /* ... */
 #define RBTREE_FLIPCOLOR(self)                  \
 	(RBTREE_ISRED(self) ? RBTREE_SETBLACK(self) \

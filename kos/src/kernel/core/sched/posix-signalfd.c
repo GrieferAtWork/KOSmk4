@@ -208,11 +208,11 @@ update_signalfd(unsigned int fd,
 	/* Make sure that it's a SIGNALFD handle. */
 	if unlikely(hnd.h_type != HANDLE_TYPE_SIGNALFD) {
 		THROW(E_INVALID_HANDLE_FILETYPE,
-		      fd,
-		      HANDLE_TYPE_SIGNALFD,
-		      hnd.h_type,
-		      handle_typekind(&hnd),
-		      HANDLE_TYPEKIND_GENERIC);
+		      /* fd:                 */ fd,
+		      /* needed_handle_type: */ HANDLE_TYPE_SIGNALFD,
+		      /* actual_handle_type: */ hnd.h_type,
+		      /* needed_handle_kind: */ handle_typekind(&hnd),
+		      /* actual_handle_kind: */ HANDLE_TYPEKIND_GENERIC);
 	}
 	sfd = (struct signalfd *)hnd.h_data;
 	COMPILER_BARRIER();

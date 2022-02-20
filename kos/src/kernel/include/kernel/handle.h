@@ -218,6 +218,8 @@ struct handle {
 /* Returns the type-kind code for `self' (One of `HANDLE_TYPEKIND_*') */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_half_t
 NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_half_t
+NOTHROW(KCALL mfile_typekind)(struct mfile const *__restrict self);
 
 /* Try to determine the effective data size of the given handle (as returned by `FIOQSIZE')
  * @return: true:  The data size was stored in `*presult'.
@@ -362,6 +364,9 @@ struct epoll_controller;
 FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF void *FCALL
 handle_as(/*inherit(on_success)*/ REF struct handle const *__restrict self, uintptr_half_t wanted_type)
 		THROWS(E_INVALID_HANDLE_FILETYPE);
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF void *FCALL
+handle_as_noinherit(struct handle const *__restrict self, uintptr_half_t wanted_type)
+		THROWS(E_INVALID_HANDLE_FILETYPE);
 
 FORCELOCAL BLOCKING WUNUSED REF void *FCALL
 handle_tryas(/*inherit(on_success)*/ REF struct handle const *__restrict self, uintptr_half_t wanted_type)
@@ -385,18 +390,6 @@ handle_tryas_noinherit(struct handle const *__restrict self,
 }
 
 /* Extended handle converted functions */
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fnode *FCALL
-handle_as_fnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE);
-
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fsuper *FCALL
-handle_as_fsuper_relaxed(/*inherit(on_success)*/ REF struct handle const *__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE);
-
-/* @throw: E_PROCESS_EXITED: `fd' belongs to a task that is no longer allocated. */
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL
-handle_as_task(/*inherit(on_success)*/ REF struct handle const *__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED);
 
 #define handle_as_mfile(self)   ((REF struct mfile *)handle_as(self, HANDLE_TYPE_MFILE))
 #define handle_as_fdirent(self) ((REF struct fdirent *)handle_as(self, HANDLE_TYPE_DIRENT))
@@ -413,6 +406,11 @@ handle_as(/*inherit(on_success)*/ REF struct handle const &__restrict self,
           uintptr_half_t wanted_type)
 		THROWS(E_INVALID_HANDLE_FILETYPE)
 		ASMNAME("handle_as");
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF void *FCALL
+handle_as_noinherit(/*inherit(on_success)*/ REF struct handle const &__restrict self,
+                    uintptr_half_t wanted_type)
+		THROWS(E_INVALID_HANDLE_FILETYPE)
+		ASMNAME("handle_as_noinherit");
 
 FORCELOCAL BLOCKING WUNUSED REF void *FCALL
 handle_tryas(/*inherit(on_success)*/ REF struct handle const &__restrict self,
@@ -427,18 +425,6 @@ handle_tryas_noinherit(struct handle const &__restrict self,
 		THROWS(E_WOULDBLOCK) {
 	return handle_tryas_noinherit(&self, wanted_type);
 }
-
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct fnode *FCALL
-handle_as_fnode(/*inherit(on_success)*/ REF struct handle const &__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_fnode");
-
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct fsuper *FCALL
-handle_as_fsuper_relaxed(/*inherit(on_success)*/ REF struct handle const &__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_fsuper_relaxed");
-
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct task *FCALL
-handle_as_task(/*inherit(on_success)*/ REF struct handle const &__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED) ASMNAME("handle_as_task");
 } /* extern "C++" */
 #endif /* __cplusplus && !NO_CXX_HANDLE_AS_OVERLOADS */
 
@@ -886,23 +872,27 @@ DECL_END
 #define handle_manager_cloexec      handman_cloexec
 
 /* TODO: When eventually removing the following, make sure to get rid of `(unsigned int)' casts. */
-#define handle_installopenfd(data, hnd) ((unsigned int)handles_install_openfd(hnd, data))
-#define handle_trylookup(self, fd)      handman_trylookup(self, (fd_t)(fd))
-#define handle_lookup(fd)               handles_lookup((fd_t)(fd))
-#define handle_lookupin(fd, self)       handman_lookup(self, (fd_t)(fd))
-#define handle_lookup_nosym(fd)         handman_lookup(THIS_HANDMAN, (fd_t)(fd))
-#define handle_getas(fd, wanted_type)   handles_lookupobj((fd_t)(fd), wanted_type)
-#define handle_get_fnode(fd)            handles_lookupfnode((fd_t)(fd))
-#define handle_get_fsuper_relaxed(fd)   handles_lookupfsuper_relatex((fd_t)(fd))
-#define handle_get_task(fd)             handles_lookuptask((fd_t)(fd))
-#define handle_get_mfile(fd)            handles_lookupmfile((fd_t)(fd))
-#define handle_get_fdirent(fd)          handles_lookupfdirent((fd_t)(fd))
-#define handle_get_path(fd)             handles_lookuppath((fd_t)(fd))
-#define handle_get_taskpid(fd)          handles_lookuptaskpid((fd_t)(fd))
-#define handle_get_pipe(fd)             handles_lookuppipe((fd_t)(fd))
-#define handle_get_module(fd)           handles_lookupmodule((fd_t)(fd))
-#define handle_get_socket(fd)           handles_lookupsocket((fd_t)(fd))
-#define handle_get_epoll_controller(fd) handles_lookupepoll((fd_t)(fd))
+#define handle_install(self, hnd)             ((unsigned int)handman_install(self, hnd))
+#define handle_installat(self, hint, hnd)     ((unsigned int)handman_install(self, hnd, (fd_t)(hint)))
+#define handle_installinto(self, dst_fd, hnd) ((unsigned int)handman_install_into_simple(self, (fd_t)(dst_fd), hnd))
+#define handle_installopenfd(data, hnd)       ((unsigned int)handles_install_openfd(hnd, data))
+#define handle_installinto_sym(dst_fd, hnd)   (void)handles_install_into((fd_t)(dst_fd), hnd)
+#define handle_trylookup(self, fd)            handman_trylookup(self, (fd_t)(fd))
+#define handle_lookup(fd)                     handles_lookup((fd_t)(fd))
+#define handle_lookupin(fd, self)             handman_lookup(self, (fd_t)(fd))
+#define handle_lookup_nosym(fd)               handman_lookup(THIS_HANDMAN, (fd_t)(fd))
+#define handle_getas(fd, wanted_type)         handles_lookupobj((fd_t)(fd), wanted_type)
+#define handle_get_fnode(fd)                  handles_lookupfnode((fd_t)(fd))
+#define handle_get_fsuper_relaxed(fd)         handles_lookupfsuper_relatex((fd_t)(fd))
+#define handle_get_task(fd)                   handles_lookuptask((fd_t)(fd))
+#define handle_get_mfile(fd)                  handles_lookupmfile((fd_t)(fd))
+#define handle_get_fdirent(fd)                handles_lookupfdirent((fd_t)(fd))
+#define handle_get_path(fd)                   handles_lookuppath((fd_t)(fd))
+#define handle_get_taskpid(fd)                handles_lookuppidfd((fd_t)(fd))
+#define handle_get_pipe(fd)                   handles_lookuppipe((fd_t)(fd))
+#define handle_get_module(fd)                 handles_lookupmodule((fd_t)(fd))
+#define handle_get_socket(fd)                 handles_lookupsocket((fd_t)(fd))
+#define handle_get_epoll_controller(fd)       handles_lookupepoll((fd_t)(fd))
 #endif /* CONFIG_USE_NEW_HANDMAN */
 
 

@@ -226,7 +226,8 @@ struct handrange {
 #define handrange_slotisfree(self, relative_fd) handslot_isfree(&(self)->hr_hand[relative_fd])
 #define handrange_slotforked(self, relative_fd) handslot_forked(&(self)->hr_hand[relative_fd])
 
-/* Set/clear flags in `self->hr_hand[relative_fd]' (caller must be holding `:hm_lock') */
+/* Set/clear flags in `self->hr_hand[relative_fd]' (caller must be holding `:hm_lock')
+ * NOTE: The caller must still broadcast `:hm_changed' after using these functions! */
 #define handrange_st_cloexec(self, relative_fd)                          \
 	(((self)->hr_hand[relative_fd].mh_hand.h_mode & IO_CLOEXEC)          \
 	 ? (void)0                                                           \
@@ -361,7 +362,7 @@ struct handman {
 	                                      * allocated. When allocating new slots, the system
 	                                      * checks that `(hm_handles + 1) <= hm_maxhand'. If
 	                                      * not: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS. */
-	unsigned int             hm_maxfd;   /* [lock(ATOMIC)] The max file descriptor number which
+	/*fd_t*/ unsigned int    hm_maxfd;   /* [lock(ATOMIC)] The max file descriptor number which
 	                                      * may be assigned (in future operations). Usually set
 	                                      * to  `INT_MAX'. Handles greater  than this (or those
 	                                      * with negative numbers)  cannot be assigned,  though
@@ -447,6 +448,32 @@ NOTHROW(FCALL task_gethandman)(struct task *__restrict thread);
 /* Exchange the handle manager of the calling thread (and return the old one). */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct handman *
 NOTHROW(FCALL task_sethandman)(struct handman *__restrict newman);
+
+
+/* Returns the max used FD +1, or `0' if no FDs are in use
+ * NOTE: The caller must be holding a lock to `self' */
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) unsigned int
+NOTHROW(FCALL handman_usefdend)(struct handman const *__restrict self);
+
+/* Change the iomode_t bits of the handle specified by `fd'. This
+ * function is used to implement various fcntl() and ioctl() codes.
+ * >> omode = hand->h_mode;
+ * >> hand->h_mode = (omode & mask) | value;
+ * >> return omode;
+ * Throws `E_INVALID_HANDLE_FILE_UNBOUND' for non-committed handles.
+ * @param: mask:  Mask of mode bits to retain (unmasked bits are cleared)
+ * @param: value: Mask of mode bits to add
+ * @return: * :   The old handle mode
+ * @throw: E_INVALID_HANDLE_FILE:E_INVALID_HANDLE_FILE_NEGATIVE:fd: `fd < 0'
+ * @throw: E_INVALID_HANDLE_FILE:E_INVALID_HANDLE_FILE_ILLEGAL:fd:  `fd > self->hm_maxfd'
+ * @throw: E_INVALID_HANDLE_FILE:E_INVALID_HANDLE_FILE_UNBOUND:fd:  [...] */
+FUNDEF NONNULL((1)) iomode_t FCALL
+handman_sethandflags(struct handman *__restrict self,
+                     fd_t fd, iomode_t mask, iomode_t value)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
+FUNDEF NONNULL((1)) iomode_t FCALL
+handman_gethandflags(struct handman *__restrict self, fd_t fd)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
 
 
 
@@ -593,13 +620,13 @@ handman_setcloexec_range(struct handman *__restrict self,
  * @throw: E_INVALID_HANDLE_FILE:E_INVALID_HANDLE_FILE_ILLEGAL:  `fd > self->hm_maxfd'
  * @throw: E_INVALID_HANDLE_FILE:E_INVALID_HANDLE_FILE_NEGATIVE: `fd < 0' */
 FUNDEF WUNUSED NONNULL((1)) fd_t FCALL
-handman_findnext(struct handman *__restrict self, fd_t fd, void **p_data)
+handman_findnext(struct handman *__restrict self, fd_t fd, void **p_data DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
 
 /* Find the next handrange_slotishand handle in a slot >= fd
  * @return: -1: One of the cases where `handman_findnext()' throws `E_INVALID_HANDLE_FILE' */
 FUNDEF WUNUSED NONNULL((1)) fd_t FCALL
-handman_tryfindnext(struct handman *__restrict self, fd_t fd, void **p_data)
+handman_tryfindnext(struct handman *__restrict self, fd_t fd, void **p_data DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK);
 
 /* Install a given handle  under a specific handle  number.
@@ -617,12 +644,57 @@ handman_tryfindnext(struct handman *__restrict self, fd_t fd, void **p_data)
  * @throw: E_INVALID_HANDLE_FILE:E_INVALID_HANDLE_FILE_NEGATIVE: `fd < 0' */
 FUNDEF BLOCKING NONNULL((1, 3, 4)) fd_t FCALL
 handman_install_into(struct handman *__restrict self, fd_t fd,
-                     /*out*/ REF struct handle *__restrict ohand,
-                     struct handle const *__restrict nhand)
+                     struct handle const *__restrict nhand,
+                     /*out*/ REF struct handle *__restrict ohand)
 		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK,
 		       E_INTERRUPT);
+FUNDEF BLOCKING NONNULL((1, 3)) fd_t FCALL
+handman_install_into_simple(struct handman *__restrict self, fd_t fd,
+                            struct handle const *__restrict nhand)
+		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
+		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK,
+		       E_INTERRUPT);
+#ifdef __cplusplus
+extern "C++" {
+FUNDEF BLOCKING NONNULL((1, 4)) fd_t FCALL
+handman_install_into(struct handman *__restrict self, fd_t fd,
+                     struct handle const &__restrict nhand,
+                     /*out*/ REF struct handle *__restrict ohand)
+		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
+		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK,
+		       E_INTERRUPT)
+		ASMNAME("handman_install_into");
+FUNDEF BLOCKING NONNULL((1, 3)) fd_t FCALL
+handman_install_into(struct handman *__restrict self, fd_t fd,
+                     struct handle const *__restrict nhand)
+		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
+		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK,
+		       E_INTERRUPT)
+		ASMNAME("handman_install_into_simple");
+FUNDEF BLOCKING NONNULL((1)) fd_t FCALL
+handman_install_into(struct handman *__restrict self, fd_t fd,
+                     struct handle const &__restrict nhand)
+		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
+		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK,
+		       E_INTERRUPT)
+		ASMNAME("handman_install_into_simple");
+FUNDEF BLOCKING NONNULL((1)) fd_t FCALL
+handman_install_into_simple(struct handman *__restrict self, fd_t fd,
+                            struct handle const &__restrict nhand)
+		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
+		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK,
+		       E_INTERRUPT)
+		ASMNAME("handman_install_into_simple");
+} /* extern "C++" */
+#endif /* __cplusplus */
+
 
 /* A simplified version  of `handman_install_begin()' +  `handman_install_commit()',
  * that skips the allocated+not-assigned handle step by installing the actual handle
@@ -642,6 +714,18 @@ handman_install(struct handman *__restrict self,
 		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK);
+#ifdef __cplusplus
+extern "C++" {
+FUNDEF WUNUSED NONNULL((1)) fd_t FCALL
+handman_install(struct handman *__restrict self,
+                struct handle const &__restrict hand,
+                fd_t minfd DFL(0))
+		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
+		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK)
+		ASMNAME("handman_install");
+} /* extern "C++" */
+#endif /* __cplusplus */
 /************************************************************************/
 
 
@@ -754,16 +838,20 @@ handles_lookupobj(fd_t fd, uintptr_half_t wanted_type)
 
 /* Special wrappers for retrieving specific objects from handles. */
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct fnode *FCALL
-handles_lookupfnode(fd_t fd) THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE);
+handles_lookupfnode(fd_t fd)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE);
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct fsuper *FCALL
-handles_lookupfsuper_relatex(fd_t fd) THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE);
+handles_lookupfsuper_relatex(fd_t fd)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE);
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct task *FCALL
-handles_lookuptask(fd_t fd) THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE);
+handles_lookuptask(fd_t fd)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
+		       E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED);
 
 #define handles_lookupmfile(fd)   ((REF struct mfile *)handles_lookupobj(fd, HANDLE_TYPE_MFILE))
 #define handles_lookupfdirent(fd) ((REF struct fdirent *)handles_lookupobj(fd, HANDLE_TYPE_DIRENT))
 #define handles_lookuppath(fd)    ((REF struct path *)handles_lookupobj(fd, HANDLE_TYPE_PATH))
-#define handles_lookuptaskpid(fd) ((REF struct taskpid *)handles_lookupobj(fd, HANDLE_TYPE_PIDFD))
+#define handles_lookuppidfd(fd)   ((REF struct taskpid *)handles_lookupobj(fd, HANDLE_TYPE_PIDFD))
 #define handles_lookuppipe(fd)    ((REF struct pipe *)handles_lookupobj(fd, HANDLE_TYPE_PIPE))
 #define handles_lookupmodule(fd)  ((REF struct driver *)handles_lookupobj(fd, HANDLE_TYPE_MODULE))
 #define handles_lookupsocket(fd)  ((REF struct socket *)handles_lookupobj(fd, HANDLE_TYPE_SOCKET))
@@ -772,12 +860,66 @@ handles_lookuptask(fd_t fd) THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALI
 /* Same as `handman_install_into()',  but also  accept
  * symbolic handles, and use `THIS_HANDMAN' otherwise. */
 FUNDEF BLOCKING NONNULL((2, 3)) fd_t FCALL
-handles_install_into(fd_t fd,
-                     /*out*/ REF struct handle *__restrict ohand,
-                     struct handle const *__restrict nhand)
+handles_install_into(fd_t fd, struct handle const *__restrict nhand,
+                     /*out*/ REF struct handle *__restrict ohand)
 		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK);
+FUNDEF BLOCKING NONNULL((2)) fd_t FCALL
+handles_install_into_simple(fd_t fd, struct handle const *__restrict nhand)
+		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
+		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK);
+#ifdef __cplusplus
+extern "C++" {
+FUNDEF BLOCKING NONNULL((2)) fd_t FCALL
+handles_install_into(fd_t fd, struct handle const *__restrict nhand,
+                     /*out*/ REF struct handle &__restrict ohand)
+		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
+		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK)
+		ASMNAME("handles_install_into");
+FUNDEF BLOCKING NONNULL((2)) fd_t FCALL
+handles_install_into(fd_t fd, struct handle const *__restrict nhand)
+		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
+		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK)
+		ASMNAME("handles_install_into_simple");
+FUNDEF BLOCKING fd_t FCALL
+handles_install_into(fd_t fd, struct handle const &__restrict nhand)
+		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
+		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK)
+		ASMNAME("handles_install_into_simple");
+FUNDEF BLOCKING fd_t FCALL
+handles_install_into_simple(fd_t fd, struct handle const &__restrict nhand)
+		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
+		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK)
+		ASMNAME("handles_install_into_simple");
+} /* extern "C++" */
+#endif /* __cplusplus */
+
+#ifdef __INTELLISENSE__
+FUNDEF WUNUSED NONNULL((1)) fd_t FCALL
+handles_install(struct handle const *__restrict hand, fd_t minfd DFL(0))
+		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
+		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK);
+#ifdef __cplusplus
+extern "C++" {
+FUNDEF WUNUSED fd_t FCALL
+handles_install(struct handle const &__restrict hand, fd_t minfd DFL(0))
+		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
+		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK)
+		ASMNAME("handles_install");
+} /* extern "C++" */
+#endif /* __cplusplus */
+#else /* __INTELLISENSE__ */
+#define handles_install(...) handman_install(THIS_HANDMAN, __VA_ARGS__)
+#endif /* !__INTELLISENSE__ */
+
 
 /* Install a handle according to user-space openfd instructions.
  * @return: * : The file descriptor slot into which `hand' was installed. */
@@ -786,8 +928,25 @@ handles_install_openfd(struct handle const *__restrict hand,
                        USER UNCHECKED struct openfd *data)
 		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
-		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK);
+		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK,
+		       E_SEGFAULT);
+#ifdef __cplusplus
+extern "C++" {
+FUNDEF BLOCKING fd_t FCALL
+handles_install_openfd(struct handle const &__restrict hand,
+                       USER UNCHECKED struct openfd *data)
+		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
+		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK,
+		       E_SEGFAULT)
+		ASMNAME("handles_install_openfd");
+} /* extern "C++" */
+#endif /* __cplusplus */
 
+
+
+
+/* Helper wrappers */
 #ifdef __cplusplus
 extern "C++" {
 FORCELOCAL WUNUSED REF struct handle FCALL

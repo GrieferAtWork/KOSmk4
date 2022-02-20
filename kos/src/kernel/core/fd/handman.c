@@ -1092,7 +1092,7 @@ NOTHROW(FCALL task_sethandman)(struct handman *__restrict newman) {
 /************************************************************************/
 
 /* Returns the max used FD +1, or `0' if no FDs are in use */
-PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) unsigned int
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) unsigned int
 NOTHROW(FCALL handman_usefdend)(struct handman const *__restrict self) {
 	unsigned int result;
 	struct handrange *range;
@@ -1125,6 +1125,88 @@ handman_unlock_and_throw_invalid_handle(struct handman *__restrict self,
 		reason = E_INVALID_HANDLE_FILE_NEGATIVE;
 	THROW(E_INVALID_HANDLE_FILE, (syscall_slong_t)fd, reason, useend, maxfd);
 }
+
+
+/* Change the iomode_t bits of the handle specified by `fd'. This
+ * function is used to implement various fcntl() and ioctl() codes.
+ * >> omode = hand->h_mode;
+ * >> hand->h_mode = (omode & mask) | value;
+ * >> return omode;
+ * Throws `E_INVALID_HANDLE_FILE_UNBOUND' for non-committed handles.
+ * @param: mask:  Mask of mode bits to retain (unmasked bits are cleared)
+ * @param: value: Mask of mode bits to add
+ * @return: * :   The old handle mode
+ * @throw: E_INVALID_HANDLE_FILE:E_INVALID_HANDLE_FILE_NEGATIVE:fd: `fd < 0'
+ * @throw: E_INVALID_HANDLE_FILE:E_INVALID_HANDLE_FILE_ILLEGAL:fd:  `fd > self->hm_maxfd'
+ * @throw: E_INVALID_HANDLE_FILE:E_INVALID_HANDLE_FILE_UNBOUND:fd:  [...] */
+PUBLIC NONNULL((1)) iomode_t FCALL
+handman_sethandflags(struct handman *__restrict self,
+                     fd_t fd, iomode_t mask, iomode_t value)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE) {
+	iomode_t omode, nmode;
+	unsigned int relfd;
+	struct handrange *range;
+	union handslot *slot;
+	handman_write(self);
+
+	/* Lookup handle. */
+	range = handman_ranges_locate(self, (unsigned int)fd);
+	if unlikely(!range)
+		goto err_badfd;
+	relfd = (unsigned int)fd - range->hr_minfd;
+	if unlikely(!handrange_slotishand(range, relfd))
+		goto err_badfd;
+	slot  = &range->hr_hand[relfd];
+
+	/* Change handle flags. */
+	omode = slot->mh_hand.h_mode;
+	nmode = (omode & mask) | value;
+	slot->mh_hand.h_mode = nmode;
+	if ((omode & IO_CLOEXEC) != (nmode & IO_CLOEXEC)) {
+		if (nmode & IO_CLOEXEC) {
+			ATOMIC_INC(range->hr_cexec);
+		} else {
+			ATOMIC_DEC(range->hr_cexec);
+		}
+	}
+	if ((omode & IO_CLOFORK) != (nmode & IO_CLOFORK)) {
+		if (nmode & IO_CLOFORK) {
+			ATOMIC_INC(range->hr_cfork);
+		} else {
+			ATOMIC_DEC(range->hr_cfork);
+		}
+	}
+
+	/* Cleanup... */
+	handman_endwrite(self);
+	if (omode != nmode)
+		sig_broadcast(&self->hm_changed);
+	return omode;
+err_badfd:
+	handman_unlock_and_throw_invalid_handle(self, fd, false);
+}
+PUBLIC NONNULL((1)) iomode_t FCALL
+handman_gethandflags(struct handman *__restrict self, fd_t fd)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE) {
+	iomode_t result;
+	unsigned int relfd;
+	struct handrange *range;
+	handman_write(self);
+
+	/* Lookup handle. */
+	range = handman_ranges_locate(self, (unsigned int)fd);
+	if unlikely(!range)
+		goto err_badfd;
+	relfd = (unsigned int)fd - range->hr_minfd;
+	if unlikely(!handrange_slotishand(range, relfd))
+		goto err_badfd;
+	result = range->hr_hand[relfd].mh_hand.h_mode;
+	handman_endwrite(self);
+	return result;
+err_badfd:
+	handman_unlock_and_throw_invalid_handle(self, fd, false);
+}
+
 
 /* Lookup the handle `fd' within `self', and store a reference in `*hand'
  * NOTE: A non-committed handle results in `E_INVALID_HANDLE_FILE_UNBOUND'
@@ -1972,8 +2054,8 @@ try_expand_downwards:
  * @throw: E_INVALID_HANDLE_FILE:E_INVALID_HANDLE_FILE_NEGATIVE: `fd < 0' */
 PUBLIC BLOCKING NONNULL((1, 3, 4)) fd_t FCALL
 handman_install_into(struct handman *__restrict self, fd_t fd,
-                     /*out*/ REF struct handle *__restrict ohand,
-                     struct handle const *__restrict nhand)
+                     struct handle const *__restrict nhand,
+                     /*out*/ REF struct handle *__restrict ohand)
 		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK,
@@ -2158,6 +2240,21 @@ again_lock_for_newrange:
 	ohand->h_type = HANDLE_TYPE_UNDEFINED;
 	return fd;
 }
+
+PUBLIC BLOCKING NONNULL((1, 3)) fd_t FCALL
+handman_install_into_simple(struct handman *__restrict self, fd_t fd,
+                            struct handle const *__restrict nhand)
+		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
+		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK,
+		       E_INTERRUPT) {
+	fd_t result;
+	struct handle ohand;
+	result = handman_install_into(self, fd, nhand, &ohand);
+	handle_decref(ohand); /* No-op if `HANDLE_TYPE_UNDEFINED' */
+	return result;
+}
+
 
 
 PRIVATE ATTR_COLD ATTR_NORETURN NONNULL((1)) void FCALL

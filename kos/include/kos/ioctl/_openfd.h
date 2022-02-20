@@ -53,8 +53,13 @@ __DECL_BEGIN
 struct openfd /*[PREFIX(of_)]*/ {
 	__uint16_t of_mode;  /* Open mode (One of `OPENFD_MODE_*') */
 	__uint16_t of_flags; /* Set of `IO_CLOEXEC | IO_CLOFORK' */
+#ifdef CONFIG_USE_NEW_HANDMAN
+	__int32_t  of_hint;  /* [in]  Open hint (s.a. `OPENFD_MODE_INTO')
+	                      * [out] The ID of the handle that has been opened (must be close(2)'ed). */
+#else /* CONFIG_USE_NEW_HANDMAN */
 	__uint32_t of_hint;  /* [in]  Open hint (s.a. `OPENFD_MODE_INTO')
 	                      * [out] The ID of the handle that has been opened (must be close(2)'ed). */
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 };
 
 __DECL_END

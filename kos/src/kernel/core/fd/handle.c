@@ -1756,11 +1756,11 @@ handle_as_path_noinherit(struct handle const *__restrict hnd) {
 
 	default:
 		THROW(E_INVALID_HANDLE_FILETYPE,
-		      -1,
-		      HANDLE_TYPE_PATH,
-		      hnd->h_type,
-		      HANDLE_TYPEKIND_GENERIC,
-		      handle_typekind(hnd));
+		      /* fd:                 */ -1,
+		      /* needed_handle_type: */ HANDLE_TYPE_PATH,
+		      /* actual_handle_type: */ hnd->h_type,
+		      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+		      /* actual_handle_kind: */ handle_typekind(hnd));
 	}
 	return result;
 }
@@ -2244,10 +2244,12 @@ handle_fcntl(struct handle_manager *__restrict self,
 			me = (struct fifohandle *)temp.h_data;
 			rb = &me->fu_fifo->ff_buffer;
 		} else {
-			THROW(E_INVALID_HANDLE_FILETYPE, fd,
-			      HANDLE_TYPE_PIPE, temp.h_type,
-			      HANDLE_TYPEKIND_GENERIC,
-			      handle_typekind(&temp));
+			THROW(E_INVALID_HANDLE_FILETYPE,
+			      /* fd:                 */ fd,
+			      /* needed_handle_type: */ HANDLE_TYPE_PIPE,
+			      /* actual_handle_type: */ temp.h_type,
+			      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+			      /* actual_handle_kind: */ handle_typekind(&temp));
 		}
 		newsize = (size_t)arg;
 		if unlikely(newsize < 1) {
@@ -2279,10 +2281,12 @@ handle_fcntl(struct handle_manager *__restrict self,
 			me = (struct fifohandle *)temp.h_data;
 			rb = &me->fu_fifo->ff_buffer;
 		} else {
-			THROW(E_INVALID_HANDLE_FILETYPE, fd,
-			      HANDLE_TYPE_PIPE, temp.h_type,
-			      HANDLE_TYPEKIND_GENERIC,
-			      handle_typekind(&temp));
+			THROW(E_INVALID_HANDLE_FILETYPE,
+			      /* fd:                 */ fd,
+			      /* needed_handle_type: */ HANDLE_TYPE_PIPE,
+			      /* actual_handle_type: */ temp.h_type,
+			      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+			      /* actual_handle_kind: */ handle_typekind(&temp));
 		}
 		result = ATOMIC_READ(rb->rb_limit);
 	}	break;

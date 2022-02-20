@@ -159,6 +159,7 @@ DEFINE_SYSCALL3(fd_t, dup3, fd_t, oldfd, fd_t, newfd, oflag_t, flags) {
 
 
 
+#ifndef CONFIG_USE_NEW_HANDMAN
 /************************************************************************/
 /* fcntl()                                                              */
 /************************************************************************/
@@ -168,6 +169,7 @@ DEFINE_SYSCALL3(syscall_slong_t, fcntl, fd_t, fd,
 	return handle_fcntl(THIS_HANDLE_MANAGER, fd, command, arg);
 }
 #endif /* __ARCH_WANT_SYSCALL_FCNTL */
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 
 
 
@@ -200,6 +202,22 @@ ioctl_generic(ioctl_t cmd,
 	/* Check for specific commands. */
 	switch (cmd) {
 
+#ifdef CONFIG_USE_NEW_HANDMAN
+	case FIOCLEX: /* aka. FD_IOC_CLEX */
+		/* Set IO_CLOEXEC */
+		if (hand->h_mode & IO_CLOEXEC)
+			break;
+		handman_sethandflags(THIS_HANDMAN, (fd_t)fd, ~0, (IO_CLOEXEC));
+		break;
+
+	case FIONCLEX: /* aka. FD_IOC_NCLEX */
+		/* Clear IO_CLOEXEC */
+		if (!(hand->h_mode & IO_CLOEXEC))
+			break;
+		handman_sethandflags(THIS_HANDMAN, (fd_t)fd, ~(IO_CLOEXEC), 0);
+		break;
+
+#else /* CONFIG_USE_NEW_HANDMAN */
 	case FIOCLEX: /* FD_IOC_CLEX */
 		/* Set IO_CLOEXEC */
 		if (hand->h_mode & IO_CLOEXEC)
@@ -213,6 +231,7 @@ ioctl_generic(ioctl_t cmd,
 			break;
 		handle_chflags(THIS_HANDLE_MANAGER, fd, ~IO_CLOEXEC, 0);
 		break;
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 
 	case FD_IOC_DUPFD:
 		*result = handle_installopenfd((USER UNCHECKED struct openfd *)arg, hand);
@@ -315,14 +334,24 @@ err_bad_handle_type:
 
 		case _IO_WITHSIZE(FIONBIO, 0): /* FD_IOC_NBIO */
 			/* Set/clear IO_NONBLOCK */
+#ifdef CONFIG_USE_NEW_HANDMAN
+			handman_sethandflags(THIS_HANDMAN, (fd_t)fd, ~IO_NONBLOCK,
+			                     ioctl_intarg_getbool(cmd, arg) ? IO_NONBLOCK : 0);
+#else /* CONFIG_USE_NEW_HANDMAN */
 			handle_chflags(THIS_HANDLE_MANAGER, fd, ~IO_NONBLOCK,
 			               ioctl_intarg_getbool(cmd, arg) ? IO_NONBLOCK : 0);
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 			break;
 
 		case _IO_WITHSIZE(FIOASYNC, 0): /* FD_IOC_ASYNC */
 			/* Set/clear IO_ASYNC */
+#ifdef CONFIG_USE_NEW_HANDMAN
+			handman_sethandflags(THIS_HANDMAN, (fd_t)fd, ~IO_ASYNC,
+			                     ioctl_intarg_getbool(cmd, arg) ? IO_ASYNC : 0);
+#else /* CONFIG_USE_NEW_HANDMAN */
 			handle_chflags(THIS_HANDLE_MANAGER, fd, ~IO_ASYNC,
 			               ioctl_intarg_getbool(cmd, arg) ? IO_ASYNC : 0);
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 			break;
 
 		case _IO_WITHSIZE(FIOQSIZE, 0): { /* FD_IOC_QSIZE */
@@ -527,10 +556,16 @@ DEFINE_SYSCALL4(errno_t, fallocate64,
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_CLOSE
 DEFINE_SYSCALL1(errno_t, close, fd_t, fd) {
+#ifdef CONFIG_USE_NEW_HANDMAN
+	struct handle ohand;
+	decref(handles_close(fd, &ohand));
+#else /* CONFIG_USE_NEW_HANDMAN */
 	handle_close((unsigned int)fd);
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 	return 0;
 }
 #endif /* __ARCH_WANT_SYSCALL_CLOSE */
+/* TODO: close_range(2) */
 
 
 

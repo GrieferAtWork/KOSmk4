@@ -1547,11 +1547,11 @@ DEFINE_SYSCALL4(ssize_t, frealpath4,
 		default:
 bad_handle_type:
 			THROW(E_INVALID_HANDLE_FILETYPE,
-			      (unsigned int)fd,
-			      HANDLE_TYPE_PATH,
-			      hand.h_type,
-			      HANDLE_TYPEKIND_GENERIC,
-			      handle_typekind(&hand));
+			      /* fd:                 */ (unsigned int)fd,
+			      /* needed_handle_type: */ HANDLE_TYPE_PATH,
+			      /* actual_handle_type: */ hand.h_type,
+			      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+			      /* actual_handle_kind: */ handle_typekind(&hand));
 			break;
 		}
 	}

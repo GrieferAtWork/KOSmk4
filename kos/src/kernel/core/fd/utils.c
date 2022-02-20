@@ -65,30 +65,35 @@
 
 DECL_BEGIN
 
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_half_t
+NOTHROW(KCALL mfile_typekind)(struct mfile const *__restrict self) {
+	if (mfile_isnode(self)) {
+		struct fnode *node = mfile_asnode(self);
+		/* TODO: With all of the subclasses that exist now, this really needs to be rethought! */
+		if (fnode_issuper(node))
+			return HANDLE_TYPEKIND_MFILE_FSUPER;
+		if (fnode_isreg(node))
+			return HANDLE_TYPEKIND_MFILE_FREGNODE;
+		if (fnode_isdir(node))
+			return HANDLE_TYPEKIND_MFILE_FDIRNODE;
+		if (fnode_islnk(node))
+			return HANDLE_TYPEKIND_MFILE_FLNKNODE;
+		if (fnode_isfifo(node))
+			return HANDLE_TYPEKIND_MFILE_FFIFONODE;
+		if (fnode_issock(node))
+			return HANDLE_TYPEKIND_MFILE_FSOCKNODE;
+		return HANDLE_TYPEKIND_MFILE_FNODE;
+	}
+	return HANDLE_TYPEKIND_MFILE_GENERIC;
+}
+
 /* Returns the type-kind code for `self' (One of `HANDLE_TYPEKIND_*') */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_half_t
 NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self) {
 	switch (self->h_type) {
 
 	case HANDLE_TYPE_MFILE:
-		if (mfile_isnode((struct mfile *)self->h_data)) {
-			struct fnode *node = mfile_asnode((struct mfile *)self->h_data);
-			/* TODO: With all of the subclasses that exist now, this really needs to be rethought! */
-			if (fnode_issuper(node))
-				return HANDLE_TYPEKIND_MFILE_FSUPER;
-			if (fnode_isreg(node))
-				return HANDLE_TYPEKIND_MFILE_FREGNODE;
-			if (fnode_isdir(node))
-				return HANDLE_TYPEKIND_MFILE_FDIRNODE;
-			if (fnode_islnk(node))
-				return HANDLE_TYPEKIND_MFILE_FLNKNODE;
-			if (fnode_isfifo(node))
-				return HANDLE_TYPEKIND_MFILE_FFIFONODE;
-			if (fnode_issock(node))
-				return HANDLE_TYPEKIND_MFILE_FSOCKNODE;
-			return HANDLE_TYPEKIND_MFILE_FNODE;
-		}
-		break;
+		return mfile_typekind((struct mfile *)self->h_data);
 
 	case HANDLE_TYPE_MODULE: {
 		struct module *me = (struct module *)self->h_data;
@@ -227,8 +232,109 @@ handle_as(/*inherit(on_success)*/ REF struct handle const *__restrict self,
 	throw_invalid_handle_type(self, wanted_type, HANDLE_TYPEKIND_GENERIC);
 }
 
+PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF void *FCALL
+handle_as_noinherit(struct handle const *__restrict self, uintptr_half_t wanted_type)
+		THROWS(E_INVALID_HANDLE_FILETYPE) {
+	REF void *result;
+	/* Special case: The handle already has the correct typing */
+	if (self->h_type == wanted_type) {
+		handle_incref(*self);
+		return self->h_data;
+	}
+	result = _handle_tryas(*self, wanted_type);
+	if likely(result)
+		return result;
+	throw_invalid_handle_type(self, wanted_type, HANDLE_TYPEKIND_GENERIC);
+}
 
+
+
+/* Extended handle converted functions */
 #ifndef CONFIG_USE_NEW_HANDMAN
+PRIVATE BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fnode *FCALL
+handle_as_fnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+		THROWS(E_INVALID_HANDLE_FILETYPE) {
+	/* Special case: The handle already has the correct typing */
+	if (self->h_type == HANDLE_TYPE_MFILE) {
+		if likely(mfile_isnode((struct mfile *)self->h_data))
+			return mfile_asnode((REF struct mfile *)self->h_data); /* inherit */
+	} else {
+		REF struct mfile *result;
+		result = (REF struct mfile *)_handle_tryas(*self, HANDLE_TYPE_MFILE);
+		if likely(result) {
+			if likely(mfile_isnode(result)) {
+				handle_decref(*self); /* inherit: on_success */
+				return mfile_asnode(result);
+			}
+			decref_unlikely(result);
+		}
+	}
+	throw_invalid_handle_type(self,
+	                          HANDLE_TYPE_MFILE,
+	                          HANDLE_TYPEKIND_MFILE_FNODE);
+}
+
+PRIVATE BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fsuper *FCALL
+handle_as_fsuper_relaxed(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+		THROWS(E_INVALID_HANDLE_FILETYPE) {
+	/* Special case: The handle already has the correct typing */
+	if (self->h_type == HANDLE_TYPE_MFILE) {
+		if likely(mfile_isnode((struct mfile *)self->h_data)) {
+			REF struct fsuper *result;
+			result = incref(mfile_asnode(self->h_data)->fn_super);
+			decref_unlikely((struct mfile *)self->h_data); /* inherit: on_success */
+			return result;
+		}
+	} else {
+		REF struct mfile *file;
+		file = (REF struct mfile *)_handle_tryas(*self, HANDLE_TYPE_MFILE);
+		if likely(file) {
+			if likely(mfile_isnode(file)) {
+				REF struct fsuper *result;
+				result = incref(mfile_asnode(file)->fn_super);
+				decref_unlikely(file);
+				handle_decref(*self); /* inherit: on_success */
+				return result;
+			}
+			decref_unlikely(file);
+		}
+	}
+	throw_invalid_handle_type(self,
+	                          HANDLE_TYPE_MFILE,
+	                          HANDLE_TYPEKIND_MFILE_FSUPER);
+}
+
+/* @throw: E_PROCESS_EXITED: `fd' belongs to a task that is no longer allocated. */
+PRIVATE BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL
+handle_as_task(/*inherit(on_success)*/ REF struct handle const *__restrict self)
+		THROWS(E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED) {
+	/* Special case: The handle already has the correct typing */
+	if (self->h_type == HANDLE_TYPE_PIDFD) {
+		REF struct task *result;
+		struct taskpid *tpid;
+		tpid   = (REF struct taskpid *)self->h_data;
+		result = taskpid_gettask_srch(tpid);
+		decref_unlikely(tpid); /* inherit: on_success */
+		return result;
+	} else {
+		REF struct taskpid *tpid;
+		tpid = (REF struct taskpid *)_handle_tryas(*self, HANDLE_TYPE_PIDFD);
+		if likely(tpid) {
+			REF struct task *result;
+			{
+				FINALLY_DECREF_UNLIKELY(tpid);
+				result = taskpid_gettask_srch(tpid);
+			}
+			decref_unlikely(self); /* inherit: on_success */
+			return result;
+		}
+	}
+	throw_invalid_handle_type(self,
+	                          HANDLE_TYPE_PIDFD,
+	                          HANDLE_TYPEKIND_GENERIC);
+}
+
+
 /* Complete a thrown exception, inherit a reference to
  * `hnd', and  rethrow the  already thrown  exception. */
 PRIVATE ATTR_COLD ATTR_NOINLINE ATTR_NORETURN void FCALL
@@ -263,7 +369,7 @@ handle_get_fnode(unsigned int fd)
 	REF struct handle hnd;
 	hnd = handle_lookup(fd);
 	TRY {
-		return handle_as_fnode(hnd);
+		return handle_as_fnode(&hnd);
 	} EXCEPT {
 		decref_unlikely(hnd);
 		handle_getas_complete_except(fd);
@@ -318,93 +424,6 @@ handle_get_task(unsigned int fd)
 	}
 }
 #endif /* !CONFIG_USE_NEW_HANDMAN */
-
-
-
-/* Extended handle converted functions */
-PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fnode *FCALL
-handle_as_fnode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE) {
-	/* Special case: The handle already has the correct typing */
-	if (self->h_type == HANDLE_TYPE_MFILE) {
-		if likely(mfile_isnode((struct mfile *)self->h_data))
-			return mfile_asnode((REF struct mfile *)self->h_data); /* inherit */
-	} else {
-		REF struct mfile *result;
-		result = (REF struct mfile *)_handle_tryas(*self, HANDLE_TYPE_MFILE);
-		if likely(result) {
-			if likely(mfile_isnode(result)) {
-				handle_decref(*self); /* inherit: on_success */
-				return mfile_asnode(result);
-			}
-			decref_unlikely(result);
-		}
-	}
-	throw_invalid_handle_type(self,
-	                          HANDLE_TYPE_MFILE,
-	                          HANDLE_TYPEKIND_MFILE_FNODE);
-}
-
-PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fsuper *FCALL
-handle_as_fsuper_relaxed(/*inherit(on_success)*/ REF struct handle const *__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE) {
-	/* Special case: The handle already has the correct typing */
-	if (self->h_type == HANDLE_TYPE_MFILE) {
-		if likely(mfile_isnode((struct mfile *)self->h_data)) {
-			REF struct fsuper *result;
-			result = incref(mfile_asnode(self->h_data)->fn_super);
-			decref_unlikely((struct mfile *)self->h_data); /* inherit: on_success */
-			return result;
-		}
-	} else {
-		REF struct mfile *file;
-		file = (REF struct mfile *)_handle_tryas(*self, HANDLE_TYPE_MFILE);
-		if likely(file) {
-			if likely(mfile_isnode(file)) {
-				REF struct fsuper *result;
-				result = incref(mfile_asnode(file)->fn_super);
-				decref_unlikely(file);
-				handle_decref(*self); /* inherit: on_success */
-				return result;
-			}
-			decref_unlikely(file);
-		}
-	}
-	throw_invalid_handle_type(self,
-	                          HANDLE_TYPE_MFILE,
-	                          HANDLE_TYPEKIND_MFILE_FSUPER);
-}
-
-/* @throw: E_PROCESS_EXITED: `fd' belongs to a task that is no longer allocated. */
-PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL
-handle_as_task(/*inherit(on_success)*/ REF struct handle const *__restrict self)
-		THROWS(E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED) {
-	/* Special case: The handle already has the correct typing */
-	if (self->h_type == HANDLE_TYPE_PIDFD) {
-		REF struct task *result;
-		struct taskpid *tpid;
-		tpid   = (REF struct taskpid *)self->h_data;
-		result = taskpid_gettask_srch(tpid);
-		decref_unlikely(tpid); /* inherit: on_success */
-		return result;
-	} else {
-		REF struct taskpid *tpid;
-		tpid = (REF struct taskpid *)_handle_tryas(*self, HANDLE_TYPE_PIDFD);
-		if likely(tpid) {
-			REF struct task *result;
-			{
-				FINALLY_DECREF_UNLIKELY(tpid);
-				result = taskpid_gettask_srch(tpid);
-			}
-			decref_unlikely(self); /* inherit: on_success */
-			return result;
-		}
-	}
-	throw_invalid_handle_type(self,
-	                          HANDLE_TYPE_PIDFD,
-	                          HANDLE_TYPEKIND_GENERIC);
-}
-
 
 DECL_END
 
