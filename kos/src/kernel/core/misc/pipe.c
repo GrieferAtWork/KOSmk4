@@ -562,10 +562,63 @@ STATIC_ASSERT(IO_NONBLOCK == IO_FROM_OPENFLAG(O_NONBLOCK));
 /************************************************************************/
 /* pipe2(), pipe()                                                      */
 /************************************************************************/
-#ifdef __ARCH_WANT_SYSCALL_PIPE2
-DEFINE_SYSCALL2(errno_t, pipe2,
-                USER UNCHECKED fd_t *, pipedes,
-                oflag_t, flags) {
+#if (defined(__ARCH_WANT_SYSCALL_PIPE2) || \
+     defined(__ARCH_WANT_SYSCALL_PIPE) ||  \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PIPE))
+PRIVATE errno_t KCALL
+sys_pipe2_impl(USER UNCHECKED fd_t *pipedes, oflag_t flags) {
+#ifdef CONFIG_USE_NEW_HANDMAN
+	struct handman_install_data rinstall;
+	struct handman_install_data winstall;
+	fd_t rfd, wfd;
+	REF struct pipe *obj_pipe;
+	REF struct pipe_reader *obj_reader;
+	REF struct pipe_writer *obj_writer;
+
+	validate_writable(pipedes, 2 * sizeof(fd_t));
+	VALIDATE_FLAGSET(flags,
+	                 O_CLOEXEC | O_CLOFORK | O_NONBLOCK | O_DIRECT,
+	                 E_INVALID_ARGUMENT_CONTEXT_PIPE2_FLAGS);
+
+	/* Allocate handles. */
+	rfd = handles_install_begin(&rinstall);
+	TRY {
+		wfd = handles_install_begin(&winstall);
+		TRY {
+			/* Write handle values to user-space. */
+			COMPILER_WRITE_BARRIER();
+			pipedes[0] = rfd;
+			pipedes[1] = wfd;
+			COMPILER_WRITE_BARRIER();
+
+			if (flags & O_DIRECT)
+				THROW(E_NOT_IMPLEMENTED_TODO); /* Packet-mode pipe */
+
+			/* Create objects. */
+			obj_pipe = pipe_create();
+			FINALLY_DECREF_UNLIKELY(obj_pipe);
+			obj_reader = pipe_reader_create(obj_pipe);
+			FINALLY_DECREF_UNLIKELY(obj_reader);
+			obj_writer = pipe_writer_create(obj_pipe);
+			FINALLY_DECREF_UNLIKELY(obj_writer);
+
+			/* Install objects -- POINT OF NO RETURN */
+			handles_install_commit(&rinstall, obj_reader,
+			                       IO_RDONLY | IO_FROM_OPENFLAG(flags & (O_CLOEXEC | O_CLOFORK | O_NONBLOCK)),
+			                       HANDLE_TYPE_PIPE_READER);
+			handles_install_commit(&winstall, obj_writer,
+			                       IO_WRONLY | IO_FROM_OPENFLAG(flags & (O_CLOEXEC | O_CLOFORK | O_NONBLOCK)),
+			                       HANDLE_TYPE_PIPE_READER);
+		} EXCEPT {
+			handles_install_abort(&winstall);
+			RETHROW();
+		}
+	} EXCEPT {
+		handles_install_abort(&rinstall);
+		RETHROW();
+	}
+	return -EOK;
+#else /* CONFIG_USE_NEW_HANDMAN */
 	REF struct pipe *p;
 	REF struct handle r;
 	REF struct handle w;
@@ -605,18 +658,27 @@ DEFINE_SYSCALL2(errno_t, pipe2,
 		RETHROW();
 	}
 	return -EOK;
+#endif /* !CONFIG_USE_NEW_HANDMAN */
+}
+#endif /* ... */
+
+#ifdef __ARCH_WANT_SYSCALL_PIPE2
+DEFINE_SYSCALL2(errno_t, pipe2,
+                USER UNCHECKED fd_t *, pipedes,
+                oflag_t, flags) {
+	return sys_pipe2_impl(pipedes, flags);
 }
 #endif /* __ARCH_WANT_SYSCALL_PIPE2 */
 
 #ifdef __ARCH_WANT_SYSCALL_PIPE
 DEFINE_SYSCALL1(errno_t, pipe, USER UNCHECKED fd_t *, pipedes) {
-	return sys_pipe2(pipedes, 0);
+	return sys_pipe2_impl(pipedes, 0);
 }
 #endif /* __ARCH_WANT_SYSCALL_PIPE */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_PIPE
 DEFINE_COMPAT_SYSCALL1(errno_t, pipe, USER UNCHECKED fd_t *, pipedes) {
-	return sys_pipe2(pipedes, 0);
+	return sys_pipe2_impl(pipedes, 0);
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_PIPE */
 

@@ -602,10 +602,12 @@ NOTHROW(FCALL system_cc_perfs)(struct fs *__restrict self,
 /************************************************************************/
 /* HANDLES                                                              */
 /************************************************************************/
-PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((2, 3)) void
-NOTHROW(KCALL system_cc_perhandle)(uintptr_half_t handle_typ,
-                                   void *__restrict handle_ptr,
-                                   struct ccinfo *__restrict info) {
+
+/* Clear buffers associated with a given handle object. */
+PUBLIC NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((2, 3)) void
+NOTHROW(KCALL system_cc_handle)(uintptr_half_t handle_typ,
+                                void *__restrict handle_ptr,
+                                struct ccinfo *__restrict info) {
 	switch (handle_typ) {
 
 	case HANDLE_TYPE_MFILE: {
@@ -660,6 +662,11 @@ NOTHROW(KCALL system_cc_perhandle)(uintptr_half_t handle_typ,
 	}
 }
 
+#ifdef CONFIG_USE_NEW_HANDMAN
+INTDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void /* From "fd/handman.c" */
+NOTHROW(KCALL system_cc_perhman)(struct handman *__restrict self,
+                                 struct ccinfo *__restrict info);
+#else /* CONFIG_USE_NEW_HANDMAN */
 PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
 NOTHROW(KCALL system_cc_perhman)(struct handle_manager *__restrict self,
                                  struct ccinfo *__restrict info) {
@@ -679,13 +686,14 @@ NOTHROW(KCALL system_cc_perhman)(struct handle_manager *__restrict self,
 		handle_manager_endread(self);
 		if (fdno == (unsigned int)-1)
 			break;
-		system_cc_perhandle(hand.h_type, hand.h_data, info);
+		system_cc_handle(hand.h_type, hand.h_data, info);
 		handle_decref(hand);
 		if (ccinfo_isdone(info))
 			break;
 		++fdno;
 	}
 }
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 
 
 

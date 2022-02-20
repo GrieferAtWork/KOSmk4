@@ -1422,6 +1422,25 @@ NOTHROW(KCALL note_fd_t_value)(pformatprinter printer, void *arg,
 				break;
 			}
 		}
+#ifdef CONFIG_USE_NEW_HANDMAN
+		{
+			struct handrange *range;
+			unsigned int relfd;
+			if (!hman->hm_ranges || !ADDR_ISKERN(hman->hm_ranges))
+				goto badobj;
+			range = handman_ranges_locate(hman, fd);
+			if (!range || !ADDR_ISKERN(range))
+				goto badobj;
+			if (fd < range->hr_minfd)
+				goto badobj;
+			if (fd > range->hr_maxfd)
+				goto badobj;
+			relfd = fd - range->hr_minfd;
+			if (!handrange_slotishand(range, relfd))
+				goto badobj;
+			hand = range->hr_hand[relfd].mh_hand;
+		}
+#else /* CONFIG_USE_NEW_HANDMAN */
 		switch (hman->hm_mode) {
 
 		case HANDLE_MANAGER_MODE_LINEAR:
@@ -1463,6 +1482,7 @@ NOTHROW(KCALL note_fd_t_value)(pformatprinter printer, void *arg,
 		default:
 			goto badobj;
 		}
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 		if (hand.h_type == HANDLE_TYPE_UNDEFINED)
 			goto badobj;
 	} EXCEPT {

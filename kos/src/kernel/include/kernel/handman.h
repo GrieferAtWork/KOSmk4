@@ -326,7 +326,7 @@ struct handrange {
 			if (_mha_ohint <= _mha_nhint)                                                                              \
 				break; /* Only ever lower the hint; never raise it! */                                                 \
 		} while (!__hybrid_atomic_cmpxch_weak((range)->hr_nhint, _mha_ohint, _mha_nhint,                               \
-		                                      __ATOMIC_RELEASE, __ATOMIC_RELEASE));                                    \
+		                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));                                    \
 		__hybrid_atomic_dec((man)->hm_handles, __ATOMIC_SEQ_CST);                                                      \
 		handrange_dec_nlops_and_maybe_rejoin(range, man, 1);                                                           \
 		sig_broadcast(&(man)->hm_changed);                                                                             \
@@ -942,6 +942,26 @@ handles_install_openfd(struct handle const &__restrict hand,
 		ASMNAME("handles_install_openfd");
 } /* extern "C++" */
 #endif /* __cplusplus */
+
+#ifdef __INTELLISENSE__
+FUNDEF WUNUSED NONNULL((1)) fd_t FCALL
+handles_install_begin(struct handman_install_data *__restrict data,
+                      fd_t minfd DFL(0))
+		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
+		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK);
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL handles_install_commit)(struct handman_install_data *__restrict self,
+                                      void *h_data, iomode_t h_mode, uintptr_half_t h_type);
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL handles_install_abort)(struct handman_install_data *__restrict self);
+#else /* __INTELLISENSE__ */
+#define handles_install_begin(data, ...) \
+	((data)->hid_man = THIS_HANDMAN, _handman_install_begin(data, ##__VA_ARGS__))
+#define handles_install_commit(self, h_data, h_mode, h_type) handman_install_commit(self, h_data, h_mode, h_type)
+#define handles_install_abort(self)                          handman_install_abort(self)
+#endif /* !__INTELLISENSE__ */
+
 
 
 

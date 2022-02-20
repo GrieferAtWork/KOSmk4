@@ -93,6 +93,12 @@ FUNDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
 NOTHROW(KCALL system_cc_linebuffer)(struct linebuffer *__restrict self,
                                     struct ccinfo *__restrict info);
 
+/* Clear buffers associated with a given handle object. */
+FUNDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((2, 3)) void
+NOTHROW(KCALL system_cc_handle)(uintptr_half_t handle_typ,
+                                void *__restrict handle_ptr,
+                                struct ccinfo *__restrict info);
+
 
 DECL_END
 #endif /* __CC__ */

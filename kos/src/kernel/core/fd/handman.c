@@ -27,6 +27,7 @@
 #include <kernel/handle.h>
 #include <kernel/handman.h>
 #include <kernel/malloc.h>
+#include <kernel/mman/cc.h>
 #include <kernel/user.h>
 #include <sched/task.h>
 
@@ -40,6 +41,7 @@
 #include <kos/except/reason/inval.h>
 #include <kos/lockop.h>
 
+#include <alloca.h>
 #include <assert.h>
 #include <limits.h>
 #include <stdbool.h>
@@ -60,19 +62,19 @@
 #define RBTREE_WANT_RLOCATE
 #define RBTREE_OMIT_REMOVE
 #define RBTREE_MINMAX_T_DEFINED
-#define mnode_tree_minmax_t    struct handrange_tree_minmax
-#define RBTREE(name)           handrange_tree_##name
-#define RBTREE_T               struct handrange
-#define RBTREE_Tkey            void const *
-#define RBTREE_GETNODE(self)   (self)->hr_node
-#define RBTREE_GETMINKEY(self) (self)->hr_minfd
-#define RBTREE_GETMAXKEY(self) (self)->hr_maxfd
-#define RBTREE_REDFIELD        hr_flags
-#define RBTREE_REDBIT          HANDRANGE_F_RED
-#define RBTREE_CC              FCALL
-#define RBTREE_NOTHROW         NOTHROW
-#define RBTREE_DECL            FUNDEF
-#define RBTREE_IMPL            PUBLIC
+#define handrange_tree_minmax_t struct handrange_tree_minmax
+#define RBTREE(name)            handrange_tree_##name
+#define RBTREE_T                struct handrange
+#define RBTREE_Tkey             unsigned int
+#define RBTREE_GETNODE(self)    (self)->hr_node
+#define RBTREE_GETMINKEY(self)  (self)->hr_minfd
+#define RBTREE_GETMAXKEY(self)  (self)->hr_maxfd
+#define RBTREE_REDFIELD         hr_flags
+#define RBTREE_REDBIT           HANDRANGE_F_RED
+#define RBTREE_CC               FCALL
+#define RBTREE_NOTHROW          NOTHROW
+#define RBTREE_DECL             FUNDEF
+#define RBTREE_IMPL             PUBLIC
 #include <hybrid/sequence/rbtree-abi.h>
 
 DECL_BEGIN
@@ -708,8 +710,7 @@ again:
 	assert(req_rangesize <= got_rangesize);
 
 	/* Figure out how many leading file are being skipped from `srcrange' (usually `0') */
-	skip = clone_minfd - srcrange->hr_minfd;
-	__builtin_expect(skip, 0);
+	skip = __builtin_expect(clone_minfd - srcrange->hr_minfd, 0);
 
 	/* Fill in `dstrange' */
 	if (OVERFLOW_USUB(ATOMIC_READ(srcrange->hr_nhint),
@@ -1035,8 +1036,8 @@ PUBLIC struct handman handman_kernel = {
 	.hm_ranges  = NULL,
 	.hm_changed = SIG_INIT,
 	.hm_handles = 0,
-	.hm_maxhand = (unsigned int)(FD_MAX + 1),
-	.hm_maxfd   = (unsigned int)(FD_MAX),
+	.hm_maxhand = (unsigned int)FD_MAX + 1,
+	.hm_maxfd   = (unsigned int)FD_MAX,
 };
 
 /* [1..1][lock(read(THIS_TASK || INTERN(lock)),
@@ -1046,7 +1047,7 @@ PUBLIC ATTR_PERTASK ATTR_ALIGN(struct handman *)
 this_handman = &handman_kernel;
 
 #ifndef CONFIG_NO_SMP
-/* Lock for accessing any remote thread's this_handle_manager field */
+/* Lock for accessing any remote thread's this_handman field */
 PRIVATE struct atomic_lock handman_change_lock = ATOMIC_RWLOCK_INIT;
 #define handman_change_lock_acquire_nopr() atomic_lock_acquire_nopr(&handman_change_lock)
 #define handman_change_lock_release_nopr() atomic_lock_release_nopr(&handman_change_lock)
@@ -1567,7 +1568,6 @@ NOTHROW(FCALL handrange_clorange)(struct handrange *__restrict self,
 		++*p_decref_len;
 		++result;
 	}
-done:
 	minfd += self->hr_minfd;
 	*p_minfd = minfd;
 	return result;
@@ -1605,6 +1605,7 @@ handman_closerange(struct handman *__restrict self,
 		decref_siz = 1024;
 	if (decref_siz < 16)
 		decref_siz = 16;
+	decref_buf = (struct handle *)alloca(decref_siz * sizeof(struct handle));
 	decref_len = 0;
 again_lock_and_findrange:
 	handman_write(self);
@@ -1716,7 +1717,6 @@ handman_setcloexec_range(struct handman *__restrict self,
 PUBLIC WUNUSED NONNULL((1)) fd_t FCALL
 handman_findnext(struct handman *__restrict self, fd_t fd, void **p_data)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE) {
-	unsigned int relfd;
 	struct handrange *range;
 	handman_read(self);
 
@@ -1727,14 +1727,14 @@ nextrange:
 		goto err_badfd;
 
 	/* If `range' comes after `fd', set `fd' to point to the range's start. */
-	if (fd < range->hr_minfd)
-		fd = range->hr_minfd;
+	if ((unsigned int)fd < range->hr_minfd)
+		fd = (fd_t)range->hr_minfd;
 
 	/* Scan ahead until the next valid FD. */
 	for (;; ++fd) {
-		if (fd > range->hr_maxfd)
+		if ((unsigned int)fd > range->hr_maxfd)
 			goto nextrange;
-		if (handrange_slotishand(range, fd - range->hr_minfd))
+		if (handrange_slotishand(range, (unsigned int)fd - range->hr_minfd))
 			break;
 	}
 
@@ -1755,7 +1755,6 @@ err_badfd:
 PUBLIC WUNUSED NONNULL((1)) fd_t FCALL
 handman_tryfindnext(struct handman *__restrict self, fd_t fd, void **p_data)
 		THROWS(E_WOULDBLOCK) {
-	unsigned int relfd;
 	struct handrange *range;
 	handman_read(self);
 
@@ -1766,14 +1765,14 @@ nextrange:
 		goto err_badfd;
 
 	/* If `range' comes after `fd', set `fd' to point to the range's start. */
-	if (fd < range->hr_minfd)
-		fd = range->hr_minfd;
+	if ((unsigned int)fd < range->hr_minfd)
+		fd = (fd_t)range->hr_minfd;
 
 	/* Scan ahead until the next valid FD. */
 	for (;; ++fd) {
-		if (fd > range->hr_maxfd)
+		if ((unsigned int)fd > range->hr_maxfd)
 			goto nextrange;
-		if (handrange_slotishand(range, fd - range->hr_minfd))
+		if (handrange_slotishand(range, (unsigned int)fd - range->hr_minfd))
 			break;
 	}
 
@@ -2290,7 +2289,7 @@ handman_joinranges_or_unlock(struct handman *__restrict self,
                              struct handrange *__restrict hirange,
                              /*in|out*/ struct handrange **__restrict p_newrange) {
 	unsigned int locount, hicount;
-	size_t reqsize, avlsize, temp;
+	size_t reqsize, avlsize;
 	assert(lorange->hr_maxfd + 1 == hirange->hr_minfd);
 
 	/* If the high range contains LOP handles, then merging is impossible. */
@@ -2668,6 +2667,65 @@ NOTHROW(FCALL handman_install_abort)(struct handman_install_data *__restrict sel
 	                self->hid_range,
 	                self->hid_slot);
 }
+
+
+
+/* Cache clearing hook for handle managers. */
+INTERN NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
+NOTHROW(KCALL system_cc_perhman)(struct handman *__restrict self,
+                                 struct ccinfo *__restrict info) {
+	unsigned int minfd = 0;
+	for (;;) {
+		REF struct handle hand;
+		struct handrange *range;
+		if (!handman_tryread(self)) {
+			if (ccinfo_noblock(info))
+				return;
+			if (!handman_read_nx(self))
+				return;
+		}
+
+		/* Find the first handle with an index >= fdno */
+		range = handman_firstrangeafter(self, minfd);
+		if (!range) {
+unlock_and_done:
+			handman_endread(self);
+			break;
+		}
+		/* TODO: Free unused slots from `range', as per:
+		 *  - handrange_truncate_locked
+		 *  - handrange_rejoin_locked
+		 */
+		for (;;) {
+			if (handrange_slotishand(range, minfd - range->hr_minfd))
+				break;
+			++minfd;
+			if (minfd > range->hr_maxfd) {
+				range = handman_ranges_next(self, range);
+				if (!range)
+					goto unlock_and_done;
+				assert(range->hr_minfd >= minfd);
+				minfd = range->hr_minfd;
+			}
+		}
+
+		/* Load the handle object. */
+		memcpy(&hand,
+		       &range->hr_hand[minfd - range->hr_minfd].mh_hand,
+		       sizeof(struct handle));
+		handle_incref(hand);
+		handman_endread(self);
+
+		/* Clear caches associated with the pointed-to object. */
+		system_cc_handle(hand.h_type, hand.h_data, info);
+		handle_decref(hand);
+		if (ccinfo_isdone(info))
+			break;
+		++minfd;
+	}
+}
+
+
 
 DECL_END
 #endif /* CONFIG_USE_NEW_HANDMAN */

@@ -68,7 +68,8 @@ sys_fcntl_impl(fd_t fd, fcntl_t command,
 		REF struct handle buf;
 		REF struct handle *hand;
 		hand = handles_lookup(fd, &buf);
-		RAII_FINALLY { decref_unlikely(hand); };
+		__builtin_assume(hand == &buf);
+		RAII_FINALLY { decref_unlikely(*hand); };
 		hand->h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
 		return handman_install(man, hand, (fd_t)(intptr_t)(uintptr_t)arg);
 	}	break;
@@ -77,7 +78,8 @@ sys_fcntl_impl(fd_t fd, fcntl_t command,
 		REF struct handle buf;
 		REF struct handle *hand;
 		hand = handles_lookup(fd, &buf);
-		RAII_FINALLY { decref_unlikely(hand); };
+		__builtin_assume(hand == &buf);
+		RAII_FINALLY { decref_unlikely(*hand); };
 		hand->h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
 		hand->h_mode |= IO_CLOEXEC;
 		return handman_install(man, hand, (fd_t)(intptr_t)(uintptr_t)arg);
@@ -87,7 +89,8 @@ sys_fcntl_impl(fd_t fd, fcntl_t command,
 		REF struct handle buf;
 		REF struct handle *hand;
 		hand = handles_lookup(fd, &buf);
-		RAII_FINALLY { decref_unlikely(hand); };
+		__builtin_assume(hand == &buf);
+		RAII_FINALLY { decref_unlikely(*hand); };
 		hand->h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
 		return handman_install_into(man, (fd_t)(intptr_t)(uintptr_t)arg, hand);
 	}	break;
@@ -96,7 +99,8 @@ sys_fcntl_impl(fd_t fd, fcntl_t command,
 		REF struct handle buf;
 		REF struct handle *hand;
 		hand = handles_lookup(fd, &buf);
-		RAII_FINALLY { decref_unlikely(hand); };
+		__builtin_assume(hand == &buf);
+		RAII_FINALLY { decref_unlikely(*hand); };
 		hand->h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
 		hand->h_mode |= IO_CLOEXEC;
 		return handman_install_into(man, (fd_t)(intptr_t)(uintptr_t)arg, hand);
@@ -127,7 +131,6 @@ sys_fcntl_impl(fd_t fd, fcntl_t command,
 	case F_SETFL:
 	case F_SETFL_XCH: {
 		iomode_t omode, nmode;
-		struct handle *p;
 		VALIDATE_FLAGSET((uintptr_t)arg, IO_SETFL_MASK,
 		                 E_INVALID_ARGUMENT_CONTEXT_F_SETFL_OFLAGS);
 		nmode = IO_FROM_OPENFLAG_NOHANDLE((oflag_t)(uintptr_t)arg);
@@ -186,7 +189,8 @@ sys_fcntl_impl(fd_t fd, fcntl_t command,
 		REF struct handle buf;
 		REF struct handle *hand;
 		hand = handles_lookup(fd, &buf);
-		RAII_FINALLY { decref_unlikely(hand); };
+		__builtin_assume(hand == &buf);
+		RAII_FINALLY { decref_unlikely(*hand); };
 
 		/* Switch on the handle type (this fcntl() code
 		 * should have really been an ioctl if you ask me...) */

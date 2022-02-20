@@ -535,6 +535,55 @@ DEFINE_SYSCALL5(errno_t, openpty,
                 USER UNCHECKED char *, name,
                 USER UNCHECKED struct termios const *, termp,
                 USER UNCHECKED struct winsize const *, winp) {
+#ifdef CONFIG_USE_NEW_HANDMAN
+	struct handman_install_data minstall;
+	struct handman_install_data sinstall;
+	fd_t mfd, sfd;
+	REF struct ptymaster *master;
+	REF struct ptyslave *slave;
+	validate_readable_opt(termp, sizeof(*termp));
+	validate_readable_opt(winp, sizeof(*winp));
+	validate_writable_opt(name, 1);
+	validate_writable(aslave, sizeof(*aslave));
+	validate_writable(amaster, sizeof(*amaster));
+
+	/* Allocate handles. */
+	mfd = handles_install_begin(&minstall);
+	TRY {
+		sfd = handles_install_begin(&sinstall);
+		TRY {
+			/* Write handle values to user-space. */
+			COMPILER_WRITE_BARRIER();
+			*amaster = mfd;
+			*aslave  = sfd;
+			COMPILER_WRITE_BARRIER();
+
+			/* Allocate the PTY device pair. */
+			pty_alloc(&master, &slave, termp, winp);
+			FINALLY_DECREF_UNLIKELY(master);
+			FINALLY_DECREF_UNLIKELY(slave);
+			if (name) {
+				REF struct devdirent *devname;
+				device_getname_lock_acquire(master);
+				devname = incref(master->dv_dirent);
+				device_getname_lock_release(master);
+				FINALLY_DECREF_UNLIKELY(devname);
+				sprintf(name, "/dev/%s", devname->dd_dirent.fd_name);
+			}
+
+			/* Install objects -- POINT OF NO RETURN */
+			handles_install_commit(&minstall, master, IO_RDWR, HANDLE_TYPE_MFILE);
+			handles_install_commit(&sinstall, slave, IO_RDWR, HANDLE_TYPE_MFILE);
+		} EXCEPT {
+			handles_install_abort(&minstall);
+			RETHROW();
+		}
+	} EXCEPT {
+		handles_install_abort(&sinstall);
+		RETHROW();
+	}
+	return -EOK;
+#else /* CONFIG_USE_NEW_HANDMAN */
 	struct handle temp;
 	fd_t fdmaster, fdslave;
 	REF struct ptymaster *master;
@@ -583,6 +632,7 @@ DEFINE_SYSCALL5(errno_t, openpty,
 		RETHROW();
 	}
 	return -EOK;
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 }
 #endif /* __ARCH_WANT_SYSCALL_OPENPTY */
 

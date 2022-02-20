@@ -418,21 +418,21 @@ handles_lookupobj(fd_t fd, uintptr_half_t wanted_type)
 		if (result != NULL)
 			return result;
 	}
-	hand = handman_lookup(THIS_HANDMAN, fd, hand);
+	hand = handman_lookup(THIS_HANDMAN, fd, &buf);
 #endif /* !__OPTIMIZE_SIZE__ */
 	if (hand->h_type == wanted_type)
 		return hand->h_data; /* Inherit reference */
 	TRY {
 		result = _handle_tryas(*hand, wanted_type);
 	} EXCEPT {
-		decref(hand);
+		decref(*hand);
 		if (was_thrown(E_INVALID_HANDLE_FILETYPE)) {
 			if (!PERTASK_TEST(this_exception_args.e_invalid_handle.ih_fd))
 				PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, (syscall_slong_t)fd);
 		}
 		RETHROW();
 	}
-	decref(hand);
+	decref(*hand);
 	return result;
 }
 

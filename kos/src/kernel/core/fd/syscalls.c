@@ -558,7 +558,7 @@ DEFINE_SYSCALL4(errno_t, fallocate64,
 DEFINE_SYSCALL1(errno_t, close, fd_t, fd) {
 #ifdef CONFIG_USE_NEW_HANDMAN
 	struct handle ohand;
-	decref(handles_close(fd, &ohand));
+	decref(*handles_close(fd, &ohand));
 #else /* CONFIG_USE_NEW_HANDMAN */
 	handle_close((unsigned int)fd);
 #endif /* !CONFIG_USE_NEW_HANDMAN */

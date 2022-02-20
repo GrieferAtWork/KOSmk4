@@ -320,26 +320,6 @@ NOTHROW(KCALL decref_unlikely)(struct handle const &__restrict self) {
 	handle_decref(self);
 }
 
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) struct handle const *
-NOTHROW(KCALL incref)(struct handle const *__restrict self) {
-	return &incref(*self);
-}
-
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void
-NOTHROW(KCALL decref)(struct handle const *__restrict self) {
-	decref(*self);
-}
-
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void
-NOTHROW(KCALL decref_likely)(struct handle const *__restrict self) {
-	decref_likely(*self);
-}
-
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void
-NOTHROW(KCALL decref_unlikely)(struct handle const *__restrict self) {
-	decref_unlikely(*self);
-}
-
 } /* extern "C++" */
 #endif /* __cplusplus */
 
@@ -833,8 +813,9 @@ DECL_END
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_HANDMAN_H */
 
 /* Backwards compatibility */
-#define handle_manager_assert_integrity(self) (void)0
 #define handle_manager              handman
+#define hm_cntlimit                 hm_maxhand
+#define hm_maxlimit                 hm_maxfd
 #define _handle_manager_reap        _handman_reap
 #define handle_manager_reap         handman_reap
 #define handle_manager_mustreap     handman_mustreap
@@ -870,6 +851,8 @@ DECL_END
 #define task_gethandlemanager       task_gethandman
 #define task_sethandlemanager       task_sethandman
 #define handle_manager_cloexec      handman_cloexec
+
+#define handle_manager_assert_integrity(self) (void)0
 
 /* TODO: When eventually removing the following, make sure to get rid of `(unsigned int)' casts. */
 #define handle_install(self, hnd)             ((unsigned int)handman_install(self, hnd))

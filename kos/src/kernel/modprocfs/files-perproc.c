@@ -2200,7 +2200,11 @@ again:
 	index = ATOMIC_READ(me->pfe_fd);
 
 	/* Find the next handle. */
+#ifdef CONFIG_USE_NEW_HANDMAN
+	newindex = (unsigned int)handman_tryfindnext(me->pfe_hman, (fd_t)index, &hdata);
+#else /* CONFIG_USE_NEW_HANDMAN */
 	newindex = handle_trynextfd(index, me->pfe_hman, &hdata);
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 	if (newindex == (unsigned int)-1)
 		return 0; /* End-of-directory */
 	namelen = (u16)sprintf(namebuf, "%u", newindex);
@@ -2216,6 +2220,16 @@ again:
 	return (size_t)result;
 }
 
+#ifdef CONFIG_USE_NEW_HANDMAN
+PRIVATE WUNUSED NONNULL((1)) unsigned int KCALL
+find_greatest_inuse_fd_plus_one(struct handman *__restrict self) {
+	unsigned int result;
+	handman_read(self);
+	result = handman_usefdend(self);
+	handman_endread(self);
+	return result;
+}
+#else /* CONFIG_USE_NEW_HANDMAN */
 PRIVATE NOBLOCK ATTR_NOINLINE ATTR_PURE WUNUSED NONNULL((1)) unsigned int
 NOTHROW(FCALL handle_manager_get_max_linear_fd_plus_one)(struct handle_manager const *__restrict self) {
 	unsigned int result = self->hm_linear.hm_alloc;
@@ -2256,6 +2270,7 @@ find_greatest_inuse_fd_plus_one(struct handle_manager *__restrict self) {
 	handle_manager_endread(self);
 	return result;
 }
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 
 PRIVATE NONNULL((1)) pos_t KCALL
 procfs_fd_enum_v_seekdir(struct fdirenum *__restrict self,
@@ -2703,7 +2718,11 @@ again:
 	index = ATOMIC_READ(me->pfe_fd);
 
 	/* Find the next handle. */
+#ifdef CONFIG_USE_NEW_HANDMAN
+	newindex = (unsigned int)handman_tryfindnext(me->pfe_hman, (fd_t)index, &hdata);
+#else /* CONFIG_USE_NEW_HANDMAN */
 	newindex = handle_trynextfd(index, me->pfe_hman, &hdata);
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 	if (newindex == (unsigned int)-1)
 		return 0; /* End-of-directory */
 	namelen = (u16)sprintf(namebuf, "%u", newindex);

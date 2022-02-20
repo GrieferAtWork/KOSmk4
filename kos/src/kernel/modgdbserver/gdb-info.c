@@ -557,7 +557,6 @@ NOTHROW(FCALL GDBInfo_PrintFdList_Callback)(void *closure,
 	ssize_t temp, result = 0;
 	pformatprinter printer; void *arg;
 	REF struct handle_manager *hman;
-	unsigned int i;
 	if (!task_isaprocess(thread))
 		goto done;
 	if (GDBThread_IsKernelThread(thread))
@@ -566,6 +565,31 @@ NOTHROW(FCALL GDBInfo_PrintFdList_Callback)(void *closure,
 	arg     = ((struct GDBInfo_PrintThreadList_Data *)closure)->ptld_arg;
 	pid     = task_getrootpid_of(thread);
 	hman    = task_gethandlemanager(thread);
+#ifdef CONFIG_USE_NEW_HANDMAN
+	if (!GDBThread_IsAllStopModeActive) {
+		/* FIXME: What  if one  of the suspended  threads is holding  the VM lock?
+		 *        We should have some kind of timeout here, and switch to all-stop
+		 *        mode if the timeout expires. */
+		handman_read(hman);
+	}
+	{
+		struct handrange *range;
+		for (range = handman_ranges_first(hman); range;
+		     range = handman_ranges_next(hman, range)) {
+			unsigned int i, size;
+			size = handrange_count(range);
+			for (i = 0; i < size; ++i) {
+				if (!handrange_slotishand(range, i))
+					continue;
+				DO(GDBInfo_PrintFdListEntry(printer, arg, thread, pid,
+				                            range->hr_minfd + i,
+				                            &range->hr_hand[i].mh_hand));
+			}
+		}
+	}
+	if (!GDBThread_IsAllStopModeActive)
+		handman_endread(hman);
+#else /* CONFIG_USE_NEW_HANDMAN */
 	if (!GDBThread_IsAllStopModeActive) {
 		/* FIXME: What  if one  of the suspended  threads is holding  the VM lock?
 		 *        We should have some kind of timeout here, and switch to all-stop
@@ -573,6 +597,7 @@ NOTHROW(FCALL GDBInfo_PrintFdList_Callback)(void *closure,
 		sync_read(&hman->hm_lock);
 	}
 	if (hman->hm_mode == HANDLE_MANAGER_MODE_LINEAR) {
+		unsigned int i;
 		for (i = 0; i < hman->hm_linear.hm_alloc; ++i) {
 			if (hman->hm_linear.hm_vector[i].h_type == HANDLE_TYPE_UNDEFINED)
 				continue;
@@ -580,6 +605,7 @@ NOTHROW(FCALL GDBInfo_PrintFdList_Callback)(void *closure,
 			                            &hman->hm_linear.hm_vector[i]));
 		}
 	} else {
+		unsigned int i;
 		for (i = 0; i <= hman->hm_hashvector.hm_hashmsk; ++i) {
 			unsigned int fd, index;
 			fd = hman->hm_hashvector.hm_hashvec[i].hh_handle_id;
@@ -594,6 +620,7 @@ NOTHROW(FCALL GDBInfo_PrintFdList_Callback)(void *closure,
 	}
 	if (!GDBThread_IsAllStopModeActive)
 		sync_endread(&hman->hm_lock);
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 	decref_unlikely(hman);
 done:
 	return result;
