@@ -2021,6 +2021,7 @@
 #define __CRT_HAVE_clogl
 #define __CRT_HAVE_clone
 #define __CRT_HAVE_close
+#define __CRT_HAVE_close_range
 #define __CRT_HAVE_closedir
 #define __CRT_HAVE_closefrom
 #define __CRT_HAVE_closelog

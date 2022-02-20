@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e5e0804 */
+/* HASH CRC-32:0xb82b3924 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -248,13 +248,13 @@ do_exec:
 
 
 #ifdef __POSIX_SPAWN_ACTION_CLOSEFROM
-#if !defined(__CRT_HAVE_closefrom) && ((!defined(__CRT_HAVE_fcntl) && !defined(__CRT_HAVE___fcntl) && !defined(__CRT_HAVE___libc_fcntl)) || !defined(__F_CLOSEM))
+#if !defined(__CRT_HAVE_closefrom) && ((!defined(__CRT_HAVE_fcntl) && !defined(__CRT_HAVE___fcntl) && !defined(__CRT_HAVE___libc_fcntl)) || !defined(__F_CLOSEM)) && !defined(__CRT_HAVE_close_range)
 #define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION 1
-#else /* !__CRT_HAVE_closefrom && ((!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl && !__CRT_HAVE___libc_fcntl) || !__F_CLOSEM) */
+#else /* !__CRT_HAVE_closefrom && ((!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl && !__CRT_HAVE___libc_fcntl) || !__F_CLOSEM) && !__CRT_HAVE_close_range */
 			case __POSIX_SPAWN_ACTION_CLOSEFROM:
 				libc_closefrom(act->__sa_action.__sa_closefrom_action.__sa_fd);
 				break;
-#endif /* __CRT_HAVE_closefrom || ((__CRT_HAVE_fcntl || __CRT_HAVE___fcntl || __CRT_HAVE___libc_fcntl) && __F_CLOSEM) */
+#endif /* __CRT_HAVE_closefrom || ((__CRT_HAVE_fcntl || __CRT_HAVE___fcntl || __CRT_HAVE___libc_fcntl) && __F_CLOSEM) || __CRT_HAVE_close_range */
 #endif /* __POSIX_SPAWN_ACTION_CLOSEFROM */
 
 

@@ -662,40 +662,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       correctly  with all of  the special AT_RENAME_*  flags, since they were
 	 *       implemented before I learned about unix rename() semantics... */
 
-	/* TODO: Rewrite `handle_manager' to make it  possible for fds to be  allocated
-	 *       in a 2-step process: #1: reserve, #2: commit (where commit must behave
-	 *       as NOBLOCK+NOTHROW, and can also be aborted/undone)
-	 * Idea for data structure: LLRBTREE where nodes are linear vectors of file-id
-	 * ranges. This would allow for O(log2(N)) lookup even when 0 and UINT_MAX are
-	 * both  allocated, as well  as guaranty O(log2(N))  calculation of F_NEXT, as
-	 * well as the greatest currently in-use FD, all of which are operations  that
-	 * are dearly needed.
-	 *
-	 * Reserved slots could be represented via a dedicated, special handle type ID
-	 * which cannot be close(2)'d (doing so acts as though the FD wasn't  opened),
-	 * and a NOBLOCK+NOTHROW commit can be done  by use of an SMP-lock to  prevent
-	 * the realloc (and thus base-pointer-change) of FD sub-tables (commit is then
-	 * implemented  as  `SMP_LOCK(); tab->vec[id] = hand; SMP_UNLOCK();').   These
-	 * tables themselves are owned by the handle manager, and are freed when  they
-	 * become  empty, as well  as merged/split as  slots are allocated/freed. (The
-	 * case  where a slot become freed, and a split is attempted must obviously be
-	 * written with emphasis on _ATTEMPT_, since it would _have_ to be a  NOBLOCK+
-	 * NOTHROW  operation, though I guess it may  also be possible with a lockop?)
-	 *
-	 * End goals:
-	 * - NOBLOCK+NOTHROW handle-commit operation (to fix the problem of  O_CREAT
-	 *   to  make a new file, then later fail to install the handle, but leaving
-	 *   the file still created with no NOBLOCK+NOTHROW way to undo this, and no
-	 *   way in general to prevent the  file from already having become  visible
-	 *   globally)
-	 * - Worst case of O(log2(N)) for: lookup, delete, insert,  find_next,
-	 *   with further emphasis put on `lookup' being the fastest of these.
-	 *   (Where N is the # of open file handles)
-	 *
-	 * New name (idea):
-	 *   - DATDEF ATTR_PERTASK ATTR_ALIGN(struct handtab *) this_handtab;
-	 */
-
 	/* TODO: `system_clearcache()' needs to be a blocking function (and can be
 	 *       as well, since it only  gets called automatically in the  context
 	 *       of allocating operations)
@@ -946,11 +912,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * In other words: correct data gets written to disk, but the  initial
 	 * symlink object contains invalid data until it is evicted from cache
 	 * and re-loaded from disk (via sync+cc)
-	 */
-
-	/* TODO: Fix non-working bsd games:
-	 * - Figure out why time doesn't move in `snake(1)' and `worm(1)'
-	 *   -- I have a feeling it's because we don't implement `alarm(2)' or `timer_*(2)'
 	 */
 
 	return state;

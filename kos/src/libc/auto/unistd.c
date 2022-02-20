@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd6845a3 */
+/* HASH CRC-32:0xdd792618 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1196,7 +1196,11 @@ NOTHROW_NCX(LIBCCALL libc_getpeereid)(fd_t sockfd,
  * Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
 INTERN ATTR_SECTION(".text.crt.bsd.io.access") void
 NOTHROW_NCX(LIBCCALL libc_closefrom)(fd_t lowfd) {
+#if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl) || defined(__CRT_HAVE___libc_fcntl)) && defined(__F_CLOSEM)
 	libc_fcntl(lowfd, __F_CLOSEM);
+#else /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl || __CRT_HAVE___libc_fcntl) && __F_CLOSEM */
+	libc_close_range((unsigned int)lowfd, (unsigned int)-1, 0);
+#endif /* (!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl && !__CRT_HAVE___libc_fcntl) || !__F_CLOSEM */
 }
 #include <asm/os/fcntl.h>
 /* >> fchroot(2)

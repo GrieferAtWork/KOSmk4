@@ -834,6 +834,23 @@ NOTHROW_NCX(LIBCCALL libc_close)(fd_t fd)
 }
 /*[[[end:libc_close]]]*/
 
+/*[[[head:libc_close_range,hash:CRC-32=0x62ca1277]]]*/
+/* >> close_range(2)
+ * Close all files handles `>= minfd && <= maxfd' (but see `flags')
+ * @param: flags: Set of `0 | CLOSE_RANGE_UNSHARE | CLOSE_RANGE_CLOEXEC'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+INTERN ATTR_SECTION(".text.crt.bsd.io.access") int
+NOTHROW_NCX(LIBCCALL libc_close_range)(unsigned int minfd,
+                                       unsigned int maxfd,
+                                       unsigned int flags)
+/*[[[body:libc_close_range]]]*/
+{
+	errno_t result = sys_close_range(minfd, maxfd, flags);
+	return libc_seterrno_syserr(result);
+}
+/*[[[end:libc_close_range]]]*/
+
 /*[[[head:libd_access,hash:CRC-32=0x3d46423d]]]*/
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
@@ -3972,7 +3989,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x7ad84b4d]]]*/
+/*[[[start:exports,hash:CRC-32=0xd05edeff]]]*/
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_execve, libc_execve);
 #endif /* __LIBCCALL_IS_LIBDCALL */
@@ -4301,6 +4318,7 @@ DEFINE_PUBLIC_ALIAS(getmode, libc_getmode);
 DEFINE_PUBLIC_ALIAS(ctermid_r, libc_ctermid_r);
 DEFINE_PUBLIC_ALIAS(__sysconf, libc_sysconf);
 DEFINE_PUBLIC_ALIAS(sysconf, libc_sysconf);
+DEFINE_PUBLIC_ALIAS(close_range, libc_close_range);
 /*[[[end:exports]]]*/
 
 DECL_END

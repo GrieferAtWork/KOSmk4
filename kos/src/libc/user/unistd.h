@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde1f9537 */
+/* HASH CRC-32:0xe107507e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -610,6 +610,12 @@ INTDEF char *NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s);
  *                                 limit, and that limit is indeterminate
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
 INTDEF WUNUSED longptr_t NOTHROW_RPC(LIBCCALL libc_sysconf)(__STDC_INT_AS_UINT_T name);
+/* >> close_range(2)
+ * Close all files handles `>= minfd && <= maxfd' (but see `flags')
+ * @param: flags: Set of `0 | CLOSE_RANGE_UNSHARE | CLOSE_RANGE_CLOEXEC'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_close_range)(unsigned int minfd, unsigned int maxfd, unsigned int flags);
 #endif /* !__KERNEL__ */
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9276cf88 */
+/* HASH CRC-32:0x2f7a46ec */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -849,6 +849,7 @@
 #endif /* !__LIBCCALL_IS_LIBDCALL */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$close
+#define __CRT_HAVE_DOS$close_range
 #define __CRT_HAVE_DOS$closedir
 #define __CRT_HAVE_DOS$closefrom
 #define __CRT_HAVE_DOS$cnd_broadcast
@@ -4403,6 +4404,7 @@
 #define __CRT_HAVE_clogl
 #define __CRT_HAVE_clone
 #define __CRT_HAVE_close
+#define __CRT_HAVE_close_range
 #define __CRT_HAVE_closedir
 #define __CRT_HAVE_closefrom
 #define __CRT_HAVE_closelog

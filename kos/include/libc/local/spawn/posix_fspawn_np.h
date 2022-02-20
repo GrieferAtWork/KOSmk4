@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3230ede9 */
+/* HASH CRC-32:0xd6be16cc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -109,14 +109,14 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_closefrom,(__fd_t __lowfd),closefrom,
 __NAMESPACE_LOCAL_END
 #include <asm/os/fcntl.h>
 __NAMESPACE_LOCAL_BEGIN
-#if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl) || defined(__CRT_HAVE___libc_fcntl)) && defined(__F_CLOSEM)
+#if ((defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl) || defined(__CRT_HAVE___libc_fcntl)) && defined(__F_CLOSEM)) || defined(__CRT_HAVE_close_range)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/closefrom.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_closefrom __LIBC_LOCAL_NAME(closefrom)
-#else /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl || __CRT_HAVE___libc_fcntl) && __F_CLOSEM */
+#else /* ((__CRT_HAVE_fcntl || __CRT_HAVE___fcntl || __CRT_HAVE___libc_fcntl) && __F_CLOSEM) || __CRT_HAVE_close_range */
 #undef __local___localdep_closefrom_defined
-#endif /* (!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl && !__CRT_HAVE___libc_fcntl) || !__F_CLOSEM */
+#endif /* ((!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl && !__CRT_HAVE___libc_fcntl) || !__F_CLOSEM) && !__CRT_HAVE_close_range */
 #endif /* !__CRT_HAVE_closefrom */
 #endif /* !__local___localdep_closefrom_defined */
 #if !defined(__local___localdep_crt_posix_spawn_defined) && defined(__CRT_HAVE_posix_spawn)
@@ -748,13 +748,13 @@ __do_exec:
 
 
 #ifdef __POSIX_SPAWN_ACTION_CLOSEFROM
-#if !defined(__CRT_HAVE_closefrom) && ((!defined(__CRT_HAVE_fcntl) && !defined(__CRT_HAVE___fcntl) && !defined(__CRT_HAVE___libc_fcntl)) || !defined(__F_CLOSEM))
+#if !defined(__CRT_HAVE_closefrom) && ((!defined(__CRT_HAVE_fcntl) && !defined(__CRT_HAVE___fcntl) && !defined(__CRT_HAVE___libc_fcntl)) || !defined(__F_CLOSEM)) && !defined(__CRT_HAVE_close_range)
 #define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION 1
-#else /* !__CRT_HAVE_closefrom && ((!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl && !__CRT_HAVE___libc_fcntl) || !__F_CLOSEM) */
+#else /* !__CRT_HAVE_closefrom && ((!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl && !__CRT_HAVE___libc_fcntl) || !__F_CLOSEM) && !__CRT_HAVE_close_range */
 			case __POSIX_SPAWN_ACTION_CLOSEFROM:
 				(__NAMESPACE_LOCAL_SYM __localdep_closefrom)(__act->__sa_action.__sa_closefrom_action.__sa_fd);
 				break;
-#endif /* __CRT_HAVE_closefrom || ((__CRT_HAVE_fcntl || __CRT_HAVE___fcntl || __CRT_HAVE___libc_fcntl) && __F_CLOSEM) */
+#endif /* __CRT_HAVE_closefrom || ((__CRT_HAVE_fcntl || __CRT_HAVE___fcntl || __CRT_HAVE___libc_fcntl) && __F_CLOSEM) || __CRT_HAVE_close_range */
 #endif /* __POSIX_SPAWN_ACTION_CLOSEFROM */
 
 

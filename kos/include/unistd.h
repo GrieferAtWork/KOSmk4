@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeafbca7a */
+/* HASH CRC-32:0xb1e360cc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,6 +56,10 @@
 #include <bits/crt/sys_errlist.h>
 #include <bits/types.h>
 #include <kos/anno.h>
+
+#ifdef __USE_BSD
+#include <linux/close_range.h>
+#endif /* __USE_BSD */
 
 #if defined(__CRT_GLC) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL)
 #include <asm/unistd.h>
@@ -3573,16 +3577,22 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lockf64, __FORCELOCAL __ATTR_ARTIFICIAL int __NO
 __CDECLARE_VOID(,__NOTHROW_NCX,closefrom,(__fd_t __lowfd),(__lowfd))
 #else /* __CRT_HAVE_closefrom */
 #include <asm/os/fcntl.h>
-#if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl) || defined(__CRT_HAVE___libc_fcntl)) && defined(__F_CLOSEM)
+#if ((defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl) || defined(__CRT_HAVE___libc_fcntl)) && defined(__F_CLOSEM)) || defined(__CRT_HAVE_close_range)
 #include <libc/local/unistd/closefrom.h>
 /* >> closefrom(2)
  * Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(closefrom, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL closefrom)(__fd_t __lowfd) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(closefrom))(__lowfd); })
-#else /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl || __CRT_HAVE___libc_fcntl) && __F_CLOSEM */
+#else /* ((__CRT_HAVE_fcntl || __CRT_HAVE___fcntl || __CRT_HAVE___libc_fcntl) && __F_CLOSEM) || __CRT_HAVE_close_range */
 #undef __closefrom_defined
-#endif /* (!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl && !__CRT_HAVE___libc_fcntl) || !__F_CLOSEM */
+#endif /* ((!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl && !__CRT_HAVE___libc_fcntl) || !__F_CLOSEM) && !__CRT_HAVE_close_range */
 #endif /* !__CRT_HAVE_closefrom */
 #endif /* !__closefrom_defined */
+/* >> close_range(2)
+ * Close all files handles `>= minfd && <= maxfd' (but see `flags')
+ * @param: flags: Set of `0 | CLOSE_RANGE_UNSHARE | CLOSE_RANGE_CLOEXEC'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,close_range,(unsigned int __minfd, unsigned int __maxfd, unsigned int __flags),(__minfd,__maxfd,__flags))
 #endif /* __USE_BSD */
 
 #if defined(__USE_SOLARIS) || defined(__USE_NETBSD)

@@ -84,6 +84,10 @@
 #include <kos/anno.h>
 )]%{
 
+#ifdef __USE_BSD
+#include <linux/close_range.h>
+#endif /* __USE_BSD */
+
 #if defined(__CRT_GLC) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL)
 #include <asm/unistd.h>
 #endif /* __CRT_GLC || __CRT_KOS || __CRT_KOS_KERNEL */
@@ -3125,11 +3129,22 @@ $longptr_t sysconf(__STDC_INT_AS_UINT_T name);
 @@Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)')
 [[guard, requires_include("<asm/os/fcntl.h>")]]
 [[section(".text.crt{|.dos}.bsd.io.access")]]
-[[requires($has_function(fcntl) && defined(__F_CLOSEM))]]
+[[requires(($has_function(fcntl) && defined(__F_CLOSEM)) || $has_function(close_range))]]
 void closefrom($fd_t lowfd) {
+@@pp_if $has_function(fcntl) && defined(__F_CLOSEM)@@
 	fcntl(lowfd, __F_CLOSEM);
+@@pp_else@@
+	close_range((unsigned int)lowfd, (unsigned int)-1, 0);
+@@pp_endif@@
 }
 
+@@>> close_range(2)
+@@Close all files handles `>= minfd && <= maxfd' (but see `flags')
+@@@param: flags: Set of `0 | CLOSE_RANGE_UNSHARE | CLOSE_RANGE_CLOEXEC'
+@@@return: 0 : Success
+@@@return: -1: Error (s.a. `errno')
+[[section(".text.crt{|.dos}.bsd.io.access")]]
+int close_range(unsigned int minfd, unsigned int maxfd, unsigned int flags);
 
 %{
 #endif /* __USE_BSD */

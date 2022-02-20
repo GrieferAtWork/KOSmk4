@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe57d5999 */
+/* HASH CRC-32:0x74d9ce60 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -692,6 +692,12 @@ INTDEF void NOTHROW_NCX(LIBDCALL libd_closefrom)(fd_t lowfd);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_closefrom)(fd_t lowfd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> close_range(2)
+ * Close all files handles `>= minfd && <= maxfd' (but see `flags')
+ * @param: flags: Set of `0 | CLOSE_RANGE_UNSHARE | CLOSE_RANGE_CLOEXEC'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+INTDEF int NOTHROW_NCX(LIBDCALL libd_close_range)(unsigned int minfd, unsigned int maxfd, unsigned int flags);
 /* >> fchroot(2)
  * Change the root directory to  `fd'. If `fd' was opened  before a prior call to  `chroot()',
  * and referrs to  a directory,  then this function  can be  used to escape  a chroot()  jail.

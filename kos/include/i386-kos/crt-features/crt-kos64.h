@@ -1839,6 +1839,7 @@
 #define __CRT_HAVE_clogl
 #define __CRT_HAVE_clone
 #define __CRT_HAVE_close
+#define __CRT_HAVE_close_range
 #define __CRT_HAVE_closedir
 #define __CRT_HAVE_closefrom
 #define __CRT_HAVE_closelog
@@ -6999,6 +7000,7 @@
 #define __CRT_HAVE_KOS$clogl
 #define __CRT_HAVE_KOS$clone
 #define __CRT_HAVE_KOS$close
+#define __CRT_HAVE_KOS$close_range
 #define __CRT_HAVE_KOS$closedir
 #define __CRT_HAVE_KOS$closefrom
 #define __CRT_HAVE_KOS$cnd_broadcast
@@ -11000,6 +11002,7 @@
 #define __CRT_HAVE_DOS$clogl
 #define __CRT_HAVE_DOS$clone
 #define __CRT_HAVE_DOS$close
+#define __CRT_HAVE_DOS$close_range
 #define __CRT_HAVE_DOS$closedir
 #define __CRT_HAVE_DOS$closefrom
 #define __CRT_HAVE_DOS$cnd_broadcast
