@@ -2672,12 +2672,12 @@ _handman_install_begin(struct handman_install_data *__restrict data, fd_t minfd)
 
 /* Commit installation of a handle (s.a. `_handslot_commit()') */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL _handman_install_commit)(struct handman_install_data *__restrict self,
-                                       iomode_t h_mode, uintptr_half_t h_type) {
-	__handslot_commit(self->hid_man,
-	                  self->hid_range,
-	                  self->hid_slot,
-	                  h_mode, h_type);
+NOTHROW(FCALL _handman_install_commit_inherit)(struct handman_install_data *__restrict self,
+                                               iomode_t h_mode, uintptr_half_t h_type) {
+	__handslot_commit_inherit(self->hid_man,
+	                          self->hid_range,
+	                          self->hid_slot,
+	                          h_mode, h_type);
 }
 
 /* Abort installation of a handle (s.a. `_handslot_abort()') */

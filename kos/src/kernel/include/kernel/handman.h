@@ -36,6 +36,10 @@
 #include <kos/kernel/paging.h>
 #include <kos/lockop.h>
 
+#ifndef __INTELLISENSE__
+#include <hybrid/pp/__va_nargs.h>
+#endif /* !__INTELLISENSE__ */
+
 #ifdef CONFIG_HANDMAN_USES_LLRBTREE
 #undef CONFIG_HANDMAN_USES_RBTREE
 #elif defined(CONFIG_HANDMAN_USES_RBTREE)
@@ -65,6 +69,30 @@ struct pipe;
 struct driver;
 struct socket;
 struct epoll_controller;
+struct filehandle;
+struct dirhandle;
+struct pipe_reader;
+struct pipe_writer;
+struct driver_state;
+struct signalfd;
+struct mfutexfd;
+struct refcountable;
+
+#ifdef __cplusplus
+extern "C++" {
+struct __PRIVATE_handleidof_tag { };
+template<class T> struct __PRIVATE_handleidof { };
+#define __FOREACH_DEFINE_HANDLEIFOF(id, T)            \
+	T operator,(T const &, __PRIVATE_handleidof_tag); \
+	template<> struct __PRIVATE_handleidof<T> {       \
+		enum { value = id };                          \
+	};
+HANDLE_FOREACH_TYPE(__FOREACH_DEFINE_HANDLEIFOF)
+#undef __FOREACH_DEFINE_HANDLEIFOF
+#define __handleidof(expr) (::__PRIVATE_handleidof<decltype((*(expr), ::__PRIVATE_handleidof_tag()))>::value)
+} /* extern "C++" */
+#endif /* __cplusplus */
+
 
 
 /* Check if a  given `struct handle *self' is  actually
@@ -298,15 +326,14 @@ struct handrange {
  *    or realloc'd by another thread. However,  for the sake of cache  reduction,
  *    we also have to try and re-join a handle region with its neighbors whenever
  *    doing so becomes  allowed. (s.a.  `handrange_dec_nlops_and_maybe_rejoin()') */
-#define _handslot_commit(man, range, self, data, mode, type)              \
+#define _handslot_commit_inherit(man, range, self, data, mode, type)      \
 	(__hybrid_atomic_store((self)->_mh_words[0], data, __ATOMIC_RELEASE), \
-	 __handslot_commit(man, range, self, mode, type))
-#define __handslot_commit(man, range, self, mode, type)                                               \
+	 __handslot_commit_inherit(man, range, self, mode, type))
+#define __handslot_commit_inherit(man, range, self, mode, type)                                       \
 	(__hybrid_assert((self)->mh_hand.h_type == _MANHANDLE_LOADMARKER),                                \
 	 ((mode)&IO_CLOEXEC) ? (void)__hybrid_atomic_inc((range)->hr_cexec, __ATOMIC_RELEASE) : (void)0,  \
 	 ((mode)&IO_CLOFORK) ? (void)__hybrid_atomic_inc((range)->hr_cfork, __ATOMIC_RELEASE) : (void)0,  \
 	 __hybrid_atomic_store((self)->_mh_words[1], __handslot_makeword2(mode, type), __ATOMIC_SEQ_CST), \
-	 handle_incref((self)->mh_hand),                                                                  \
 	 handrange_dec_nlops_and_maybe_rejoin(range, man, 0),                                             \
 	 sig_broadcast(&(man)->hm_changed))
 
@@ -456,7 +483,7 @@ NOTHROW(FCALL task_sethandman)(struct handman *__restrict newman);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) unsigned int
 NOTHROW(FCALL handman_usefdend)(struct handman const *__restrict self);
 
-/* Change the iomode_t bits of the handle specified by `fd'. This
+/* Change the iomode_t bits of  the handle specified by `fd'.  This
  * function is used to implement various fcntl() and ioctl() codes.
  * >> omode = hand->h_mode;
  * >> hand->h_mode = (omode & mask) | value;
@@ -793,14 +820,40 @@ _handman_install_begin(struct handman_install_data *__restrict data,
 FUNDEF NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL handman_install_commit)(struct handman_install_data *__restrict self,
                                       void *h_data, iomode_t h_mode, uintptr_half_t h_type);
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL handman_install_commit_inherit)(struct handman_install_data *__restrict self,
+                                              /*inherit(always)*/ REF void *h_data,
+                                              iomode_t h_mode, uintptr_half_t h_type);
+#ifdef __cplusplus
+extern "C++" {
+#define __FOREACH_HANDLES_INSTALL_COMMIT(id, T)                                                 \
+	FUNDEF NOBLOCK NONNULL((1, 2)) void                                                         \
+	NOTHROW(FCALL handman_install_commit)(struct handman_install_data *__restrict self,         \
+	                                      T *h_data, iomode_t h_mode);                          \
+	FUNDEF NOBLOCK NONNULL((1, 2)) void                                                         \
+	NOTHROW(FCALL handman_install_commit_inherit)(struct handman_install_data *__restrict self, \
+	                                              /*inherit(always)*/ REF T *h_data, iomode_t h_mode);
+HANDLE_FOREACH_TYPE(__FOREACH_HANDLES_INSTALL_COMMIT)
+#undef __FOREACH_HANDLES_INSTALL_COMMIT
+} /* extern "C++" */
+#endif /* __cplusplus */
 #else /* __INTELLISENSE__ */
-#define handman_install_commit(self, h_data, h_mode, h_type)                          \
+#define __PRIVATE_handman_install_commit_inherit4(self, h_data, h_mode, h_type)       \
 	(__hybrid_atomic_store((self)->hid_slot->_mh_words[0], h_data, __ATOMIC_RELEASE), \
-	 _handman_install_commit(self, h_mode, h_type))
+	 _handman_install_commit_inherit(self, h_mode, h_type))
+#define __PRIVATE_handman_install_commit4(self, h_data, h_mode, h_type) \
+	((*handle_type_db.h_incref[h_type])(h_data),                        \
+	 __PRIVATE_handman_install_commit_inherit4(self, h_data, h_mode, h_type))
+#define __PRIVATE_handman_install_commit_inherit3(self, h_data, h_mode) \
+	__PRIVATE_handman_install_commit_inherit4(self, h_data, h_mode, __handleidof(h_data))
+#define __PRIVATE_handman_install_commit3(self, h_data, h_mode) \
+	__PRIVATE_handman_install_commit4(self, h_data, h_mode, __handleidof(h_data))
+#define handman_install_commit_inherit(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_handman_install_commit_inherit, (__VA_ARGS__))(__VA_ARGS__)
+#define handman_install_commit(...)         __HYBRID_PP_VA_OVERLOAD(__PRIVATE_handman_install_commit, (__VA_ARGS__))(__VA_ARGS__)
 #endif /* !__INTELLISENSE__ */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL _handman_install_commit)(struct handman_install_data *__restrict self,
-                                       iomode_t h_mode, uintptr_half_t h_type);
+NOTHROW(FCALL _handman_install_commit_inherit)(struct handman_install_data *__restrict self,
+                                               iomode_t h_mode, uintptr_half_t h_type);
 
 /* Abort installation of a handle (s.a. `_handslot_abort()') */
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -954,13 +1007,31 @@ handles_install_begin(struct handman_install_data *__restrict data,
 FUNDEF NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL handles_install_commit)(struct handman_install_data *__restrict self,
                                       void *h_data, iomode_t h_mode, uintptr_half_t h_type);
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL handles_install_commit_inherit)(struct handman_install_data *__restrict self,
+                                              /*inherit(always)*/ REF void *h_data,
+                                              iomode_t h_mode, uintptr_half_t h_type);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL handles_install_abort)(struct handman_install_data *__restrict self);
+#ifdef __cplusplus
+extern "C++" {
+#define __FOREACH_HANDLES_INSTALL_COMMIT(id, T)                                                 \
+	FUNDEF NOBLOCK NONNULL((1, 2)) void                                                         \
+	NOTHROW(FCALL handles_install_commit)(struct handman_install_data *__restrict self,         \
+	                                      T *h_data, iomode_t h_mode);                          \
+	FUNDEF NOBLOCK NONNULL((1, 2)) void                                                         \
+	NOTHROW(FCALL handles_install_commit_inherit)(struct handman_install_data *__restrict self, \
+	                                              /*inherit(always)*/ REF T *h_data, iomode_t h_mode);
+HANDLE_FOREACH_TYPE(__FOREACH_HANDLES_INSTALL_COMMIT)
+#undef __FOREACH_HANDLES_INSTALL_COMMIT
+} /* extern "C++" */
+#endif /* __cplusplus */
 #else /* __INTELLISENSE__ */
 #define handles_install_begin(data, ...) \
 	((data)->hid_man = THIS_HANDMAN, _handman_install_begin(data, ##__VA_ARGS__))
-#define handles_install_commit(self, h_data, h_mode, h_type) handman_install_commit(self, h_data, h_mode, h_type)
-#define handles_install_abort(self)                          handman_install_abort(self)
+#define handles_install_commit         handman_install_commit
+#define handles_install_commit_inherit handman_install_commit_inherit
+#define handles_install_abort          handman_install_abort
 #endif /* !__INTELLISENSE__ */
 
 

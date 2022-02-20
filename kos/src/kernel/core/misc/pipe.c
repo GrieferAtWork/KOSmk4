@@ -585,6 +585,7 @@ sys_pipe2_impl(USER UNCHECKED fd_t *pipedes, oflag_t flags) {
 	TRY {
 		wfd = handles_install_begin(&winstall);
 		TRY {
+			iomode_t mode;
 			/* Write handle values to user-space. */
 			COMPILER_WRITE_BARRIER();
 			pipedes[0] = rfd;
@@ -603,12 +604,9 @@ sys_pipe2_impl(USER UNCHECKED fd_t *pipedes, oflag_t flags) {
 			FINALLY_DECREF_UNLIKELY(obj_writer);
 
 			/* Install objects -- POINT OF NO RETURN */
-			handles_install_commit(&rinstall, obj_reader,
-			                       IO_RDONLY | IO_FROM_OPENFLAG(flags & (O_CLOEXEC | O_CLOFORK | O_NONBLOCK)),
-			                       HANDLE_TYPE_PIPE_READER);
-			handles_install_commit(&winstall, obj_writer,
-			                       IO_WRONLY | IO_FROM_OPENFLAG(flags & (O_CLOEXEC | O_CLOFORK | O_NONBLOCK)),
-			                       HANDLE_TYPE_PIPE_WRITER);
+			mode = IO_FROM_OPENFLAG(flags & (O_CLOEXEC | O_CLOFORK | O_NONBLOCK));
+			handles_install_commit(&rinstall, obj_reader, IO_RDONLY | mode);
+			handles_install_commit(&winstall, obj_writer, IO_WRONLY | mode);
 		} EXCEPT {
 			handles_install_abort(&winstall);
 			RETHROW();

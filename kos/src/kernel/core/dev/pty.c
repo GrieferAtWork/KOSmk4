@@ -573,8 +573,8 @@ DEFINE_SYSCALL5(errno_t, openpty,
 			}
 
 			/* Install objects -- POINT OF NO RETURN */
-			handles_install_commit(&minstall, master, IO_RDWR, HANDLE_TYPE_MFILE);
-			handles_install_commit(&sinstall, slave, IO_RDWR, HANDLE_TYPE_MFILE);
+			handles_install_commit(&minstall, master, IO_RDWR);
+			handles_install_commit(&sinstall, slave, IO_RDWR);
 		} EXCEPT {
 			handles_install_abort(&minstall);
 			RETHROW();
