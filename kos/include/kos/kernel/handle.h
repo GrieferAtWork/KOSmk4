@@ -69,6 +69,7 @@
 	cb(HANDLE_TYPE_PATH, struct path)                    \
 	cb(HANDLE_TYPE_PIDFD, struct taskpid)                \
 	cb(HANDLE_TYPE_MODULE, struct driver)                \
+	cb(HANDLE_TYPE_EPOLL, struct epoll_controller)       \
 	cb(HANDLE_TYPE_PIPE, struct pipe)                    \
 	cb(HANDLE_TYPE_PIPE_READER, struct pipe_reader)      \
 	cb(HANDLE_TYPE_PIPE_WRITER, struct pipe_writer)      \

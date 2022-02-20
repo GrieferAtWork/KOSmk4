@@ -511,8 +511,8 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
  *       Additionally,   their   `O_*'   equivalent   have   different   values. */
 #define IO_HANDLE_CLOEXEC           IO_CLOEXEC /* Close during exec() */
 #define IO_HANDLE_CLOFORK           IO_CLOFORK /* Close during fork() (or rather: `unshare(CLONE_FILES)') */
-#define IO_HANDLE_FFROM_OPENFLAG(x) (__CCAST(__iomode_t)(((x) & 0x1080000) >> 17))
-#define IO_HANDLE_FTO_OPENFLAG(x)   ((__CCAST(__oflag_t)(x) & 0x84) << 17)
+#define IO_HANDLE_FFROM_OPENFLAG(x) (__CCAST(__iomode_t)(((x) & 0x1080000) >> 17)) /* Convert O_CLOEXEC|O_CLOFORK --> IO_CLOEXEC|IO_CLOFORK */
+#define IO_HANDLE_FTO_OPENFLAG(x)   ((__CCAST(__oflag_t)(x) & 0x84) << 17)         /* Convert IO_CLOEXEC|IO_CLOFORK --> O_CLOEXEC|O_CLOFORK */
 /* Similar to `IO_HANDLE_FFROM_O()' / `IO_HANDLE_FTO_O()', but used for converting `FD_*' flags. */
 #define IO_HANDLE_FFROM_FD(x) (__CCAST(__iomode_t)((x) << 2))
 #define IO_HANDLE_FTO_FD(x)   (((x) & (IO_HANDLE_CLOEXEC | IO_HANDLE_CLOFORK)) >> 2)

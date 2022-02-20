@@ -159,7 +159,7 @@ do_poll_scan(USER CHECKED struct pollfd *fds, size_t nfds) {
 			continue;
 		}
 		TRY {
-			hnd = handle_lookup((unsigned int)pfd.fd);
+			hnd = handles_lookup(pfd.fd);
 		} EXCEPT {
 			if (!was_thrown(E_INVALID_HANDLE))
 				RETHROW();
@@ -288,7 +288,7 @@ do_select_scan(size_t nfds,
 				mode |= POLLSELECT_EXCEPTFDS;
 			if (!mode)
 				continue;
-			hnd = handle_lookup(i * BITS_PER_FDS_WORD + j);
+			hnd = handles_lookup_nosym(i * BITS_PER_FDS_WORD + j);
 			TRY {
 #ifndef __OPTIMIZE_SIZE__
 				/* No need to stay connected to a whole bunch of signals

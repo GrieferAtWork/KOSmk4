@@ -937,8 +937,7 @@ PUBLIC_CONST struct mfile_ops const uvio_mfile_ops = {
  * object can be stored in  a handle slot as  `HANDLE_TYPE_MFILE' */
 PUBLIC REF struct uvio *KCALL uvio_create(void) THROWS(E_BADALLOC) {
 	REF struct uvio *result;
-	result = (REF struct uvio *)kmalloc(sizeof(struct uvio),
-	                                    GFP_NORMAL);
+	result = (REF struct uvio *)kmalloc(sizeof(struct uvio), GFP_NORMAL);
 	_mfile_init(result, &uvio_mfile_ops, PAGESHIFT, PAGESHIFT);
 	result->mf_parts = NULL;
 	SLIST_INIT(&result->mf_changed);
@@ -974,14 +973,35 @@ PUBLIC REF struct uvio *KCALL uvio_create(void) THROWS(E_BADALLOC) {
 DEFINE_SYSCALL2(fd_t, userviofd,
                 size_t, initial_size,
                 syscall_ulong_t, flags) {
-	unsigned int result;
+#ifdef CONFIG_USE_NEW_HANDMAN
+	fd_t resfd;
+	iomode_t mode;
+	REF struct uvio *vio;
+	struct handle_install_data install;
+	VALIDATE_FLAGSET(flags, O_NONBLOCK | O_CLOEXEC | O_CLOFORK,
+	                 E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS);
+
+	/* Allocate a new handle. */
+	resfd = handles_install_begin(&install);
+
+	/* Construct the UVIO object. */
+	TRY {
+		vio = uvio_create();
+	} EXCEPT {
+		handles_install_abort(&install);
+		RETHROW();
+	}
+	atomic64_init(&vio->mf_filesize, initial_size);
+
+	/* Need to be able to read & write to implement the server/client
+	 * architecture that  is  used  to  drive  the  UVIO  sub-system. */
+	mode = IO_RDWR | IO_FROM_OPENFLAG(flags);
+	handles_install_commit_inherit(&install, vio, mode);
+	return (fd_t)resfd;
+#else /* CONFIG_USE_NEW_HANDMAN */
+	unsigned int resfd;
 	struct handle hand;
 	REF struct uvio *result_object;
-
-	/* TODO: Currently ignored (all userviofd objects are unlimited in size right now)
-	 *       This should be changed in the  future, at which point ftruncate()  should
-	 *       be usable to change the size, too! */
-	(void)initial_size;
 
 	VALIDATE_FLAGSET(flags,
 	                 O_NONBLOCK | O_CLOEXEC | O_CLOFORK,
@@ -989,6 +1009,7 @@ DEFINE_SYSCALL2(fd_t, userviofd,
 
 	/* Construct the UVIO object. */
 	result_object = uvio_create();
+	atomic64_init(&result_object->mf_filesize, initial_size);
 	FINALLY_DECREF_UNLIKELY(result_object);
 
 	hand.h_type = HANDLE_TYPE_MFILE;
@@ -998,9 +1019,9 @@ DEFINE_SYSCALL2(fd_t, userviofd,
 	hand.h_data = result_object;
 
 	/* Install the handle to-be returned. */
-	result = handle_install(THIS_HANDLE_MANAGER, hand);
-
-	return (fd_t)result;
+	resfd = handles_install(hand);
+	return (fd_t)resfd;
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 }
 #endif /* __ARCH_WANT_SYSCALL_USERVIOFD */
 

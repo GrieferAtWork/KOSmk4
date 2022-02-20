@@ -80,9 +80,7 @@ INTDEF struct driver_libpath_struct default_library_path;
 #if (defined(__ARCH_WANT_SYSCALL_KSYSCTL) ||     \
      defined(__ARCH_WANT_SYSCALL_FINIT_MODULE))
 PRIVATE ATTR_RETNONNULL WUNUSED REF struct driver *KCALL
-load_driver_from_file_handles(unsigned int fd_node,
-                              unsigned int fd_path,
-                              unsigned int fd_dent,
+load_driver_from_file_handles(fd_t fd_node, fd_t fd_path, fd_t fd_dent,
                               USER CHECKED char const *driver_cmdline,
                               bool *pnew_driver_loaded,
                               unsigned int flags) {
@@ -99,11 +97,11 @@ load_driver_from_file_handles(unsigned int fd_node,
 		xdecref_unlikely(driver_dentry);
 		decref_unlikely(driver_node);
 	};
-	if (fd_path != (unsigned int)-1)
-		driver_path = handle_get_path(fd_path);
-	if (fd_dent != (unsigned int)-1)
-		driver_dentry = handle_get_fdirent(fd_dent);
-	nodehand = handle_lookup(fd_node);
+	if (fd_path != -1)
+		driver_path = handles_lookuppath(fd_path);
+	if (fd_dent != -1)
+		driver_dentry = handles_lookupfdirent(fd_dent);
+	nodehand = handles_lookup(fd_node);
 	TRY {
 		/* (Try to) fill in missing filesystem information from `f_node' */
 		if (!driver_path)
@@ -259,9 +257,9 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		}	break;
 
 		case KSYSCTL_DRIVER_FORMAT_FILE:
-			drv = load_driver_from_file_handles((unsigned int)ATOMIC_READ(data->im_file.f_node),
-			                                    (unsigned int)ATOMIC_READ(data->im_file.f_path),
-			                                    (unsigned int)ATOMIC_READ(data->im_file.f_dentry),
+			drv = load_driver_from_file_handles(ATOMIC_READ(data->im_file.f_node),
+			                                    ATOMIC_READ(data->im_file.f_path),
+			                                    ATOMIC_READ(data->im_file.f_dentry),
 			                                    commandline, &new_driver_loaded,
 			                                    insmod_flags);
 			break;

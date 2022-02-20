@@ -568,8 +568,8 @@ STATIC_ASSERT(IO_NONBLOCK == IO_FROM_OPENFLAG(O_NONBLOCK));
 PRIVATE errno_t KCALL
 sys_pipe2_impl(USER UNCHECKED fd_t *pipedes, oflag_t flags) {
 #ifdef CONFIG_USE_NEW_HANDMAN
-	struct handman_install_data rinstall;
-	struct handman_install_data winstall;
+	struct handle_install_data rinstall;
+	struct handle_install_data winstall;
 	fd_t rfd, wfd;
 	REF struct pipe *obj_pipe;
 	REF struct pipe_reader *obj_reader;
@@ -639,9 +639,9 @@ sys_pipe2_impl(USER UNCHECKED fd_t *pipedes, oflag_t flags) {
 	w.h_data = pipe_writer_create(p);
 	FINALLY_DECREF_UNLIKELY((struct pipe_writer *)w.h_data);
 	/* Install the reader/writer handlers. */
-	rfd = handle_install(THIS_HANDLE_MANAGER, r);
+	rfd = handles_install(r);
 	TRY {
-		wfd = handle_install(THIS_HANDLE_MANAGER, w);
+		wfd = handles_install(w);
 		TRY {
 			COMPILER_WRITE_BARRIER();
 			pipedes[0] = rfd;

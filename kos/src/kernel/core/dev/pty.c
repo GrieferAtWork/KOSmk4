@@ -536,8 +536,8 @@ DEFINE_SYSCALL5(errno_t, openpty,
                 USER UNCHECKED struct termios const *, termp,
                 USER UNCHECKED struct winsize const *, winp) {
 #ifdef CONFIG_USE_NEW_HANDMAN
-	struct handman_install_data minstall;
-	struct handman_install_data sinstall;
+	struct handle_install_data minstall;
+	struct handle_install_data sinstall;
 	fd_t mfd, sfd;
 	validate_readable_opt(termp, sizeof(*termp));
 	validate_readable_opt(winp, sizeof(*winp));
@@ -610,10 +610,10 @@ DEFINE_SYSCALL5(errno_t, openpty,
 	temp.h_type = HANDLE_TYPE_MFILE;
 	temp.h_mode = IO_RDWR;
 	temp.h_data = master;
-	fdmaster    = handle_install(THIS_HANDLE_MANAGER, temp);
+	fdmaster    = handles_install(temp);
 	TRY {
 		temp.h_data = slave;
-		fdslave     = handle_install(THIS_HANDLE_MANAGER, temp);
+		fdslave     = handles_install(temp);
 		TRY {
 			/* Save the master/slave handlers into their user-space pointers. */
 			ATOMIC_WRITE(*amaster, fdmaster);

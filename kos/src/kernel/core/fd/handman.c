@@ -311,7 +311,7 @@ try_trim_leading_slots:
 		unsigned int count, free_count = 1;
 		size_t reqsize;
 		for (;;) {
-			assertf(free_count < count,
+			assertf(free_count < handrange_count(self),
 			        "The case of everything being free was already handled "
 			        "above, so we shouldn't be able to see it again here!");
 			if (!handrange_slotisfree(self, free_count))
@@ -2663,7 +2663,7 @@ handman_install(struct handman *__restrict self,
  * @throw: E_INVALID_HANDLE_FILE:E_INVALID_HANDLE_FILE_NEGATIVE:        `minfd < 0'
  * @throw: E_WOULDBLOCK: [...] */
 PUBLIC WUNUSED NONNULL((1)) fd_t FCALL
-_handman_install_begin(struct handman_install_data *__restrict data, fd_t minfd)
+_handman_install_begin(struct handle_install_data *__restrict data, fd_t minfd)
 		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK) {
@@ -2690,7 +2690,7 @@ _handman_install_begin(struct handman_install_data *__restrict data, fd_t minfd)
 
 /* Commit installation of a handle (s.a. `_handslot_commit()') */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL _handman_install_commit_inherit)(struct handman_install_data *__restrict self,
+NOTHROW(FCALL _handman_install_commit_inherit)(struct handle_install_data *__restrict self,
                                                iomode_t h_mode, uintptr_half_t h_type) {
 	__handslot_commit_inherit(self->hid_man,
 	                          self->hid_range,
@@ -2700,7 +2700,7 @@ NOTHROW(FCALL _handman_install_commit_inherit)(struct handman_install_data *__re
 
 /* Abort installation of a handle (s.a. `_handslot_abort()') */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL handman_install_abort)(struct handman_install_data *__restrict self) {
+NOTHROW(FCALL handman_install_abort)(struct handle_install_data *__restrict self) {
 	_handslot_abort(self->hid_man,
 	                self->hid_range,
 	                self->hid_slot);

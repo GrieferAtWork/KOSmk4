@@ -445,6 +445,70 @@ DEFINE_SYSCALL4(fd_t, mktty,
                 USER UNCHECKED char const *, name,
                 fd_t, keyboard, fd_t, display,
                 syscall_ulong_t, reserved) {
+#ifdef CONFIG_USE_NEW_HANDMAN
+	fd_t result;
+	struct handle_install_data install;
+	REF struct mkttydev *tty;
+	struct handle hkeyboard;
+	struct handle hdisplay;
+	size_t namelen;
+	validate_readable(name, 1);
+	if unlikely(reserved != 0) {
+		THROW(E_INVALID_ARGUMENT_RESERVED_ARGUMENT,
+		      E_INVALID_ARGUMENT_CONTEXT_MKTTY_FLAGS,
+		      reserved);
+	}
+	namelen = strlen(name);
+	if unlikely(namelen >= MKTTY_NAME_MAXLEN) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_MKTTY_NAME,
+		      namelen,
+		      MKTTY_NAME_MAXLEN);
+	}
+
+	result = handles_install_begin(&install);
+	TRY {
+		{
+			hkeyboard = handles_lookup(keyboard);
+			RAII_FINALLY { decref_unlikely(hkeyboard); };
+			hdisplay = handles_lookup(display);
+			RAII_FINALLY { decref_unlikely(hdisplay); };
+			/* Ensure that the caller has permission to:
+			 *   - Read from the keyboard
+			 *   - Write from to the display
+			 */
+			if unlikely(!IO_CANREAD(hkeyboard.h_mode)) {
+				THROW(E_INVALID_HANDLE_OPERATION, (syscall_slong_t)keyboard,
+				      E_INVALID_HANDLE_OPERATION_READ, hkeyboard.h_mode);
+			}
+			if unlikely(!IO_CANWRITE(hdisplay.h_mode)) {
+				THROW(E_INVALID_HANDLE_OPERATION, (syscall_slong_t)display,
+				      E_INVALID_HANDLE_OPERATION_WRITE, hdisplay.h_mode);
+			}
+	
+			/* Construct the new TTY device. */
+			tty = mkttydev_new(hkeyboard.h_type, hkeyboard.h_data,
+			                   hdisplay.h_type, hdisplay.h_data,
+			                   name, namelen);
+		}
+		FINALLY_DECREF_UNLIKELY(tty);
+
+		/* Start forwarding input data. */
+		TRY {
+			mkttydev_startfwd(tty);
+		} EXCEPT {
+			device_delete(tty);
+			RETHROW();
+		}
+
+		/* Install the tty. */
+		handles_install_commit(&install, tty, IO_RDWR);
+	} EXCEPT {
+		handles_install_abort(&install);
+		RETHROW();
+	}
+	return (fd_t)result;
+#else /* CONFIG_USE_NEW_HANDMAN */
 	REF struct mkttydev *tty;
 	unsigned int result;
 	struct handle hkeyboard;
@@ -465,9 +529,9 @@ DEFINE_SYSCALL4(fd_t, mktty,
 	}
 
 	{
-		hkeyboard = handle_lookup((unsigned int)keyboard);
+		hkeyboard = handles_lookup(keyboard);
 		RAII_FINALLY { decref_unlikely(hkeyboard); };
-		hdisplay = handle_lookup((unsigned int)display);
+		hdisplay = handles_lookup(display);
 		RAII_FINALLY { decref_unlikely(hdisplay); };
 		/* Ensure that the caller has permission to:
 		 *   - Read from the keyboard
@@ -500,13 +564,14 @@ DEFINE_SYSCALL4(fd_t, mktty,
 		htty.h_type = HANDLE_TYPE_MFILE;
 		htty.h_mode = IO_RDWR;
 		htty.h_data = tty;
-		result = handle_install(THIS_HANDLE_MANAGER, htty);
+		result = handles_install(htty);
 	} EXCEPT {
 		mkttydev_stopfwd(tty);
 		device_delete(tty);
 		RETHROW();
 	}
 	return (fd_t)result;
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 }
 #endif /* __ARCH_WANT_SYSCALL_MKTTY */
 

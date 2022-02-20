@@ -1436,6 +1436,24 @@ DEFINE_SYSCALL1(errno_t, syncfs, fd_t, fd) {
 PRIVATE fd_t KCALL
 sys_openat_impl(fd_t dirfd, USER UNCHECKED char const *filename,
                 oflag_t oflags, mode_t mode) {
+#ifdef CONFIG_USE_NEW_HANDMAN
+	fd_t result;
+	REF struct handle hand;
+	struct handle_install_data install;
+	validate_readable(filename, 1);
+	result = handles_install_begin(&install);
+	TRY {
+		/* Do the open */
+		hand = path_open(dirfd, filename, oflags, mode);
+	} EXCEPT {
+		handles_install_abort(&install);
+		RETHROW();
+	}
+
+	/* Commit the new handle. */
+	handles_install_commit_inherit(&install, &hand);
+	return result;
+#else /* CONFIG_USE_NEW_HANDMAN */
 	unsigned int result_fd;
 	REF struct handle result;
 	validate_readable(filename, 1);
@@ -1445,8 +1463,9 @@ sys_openat_impl(fd_t dirfd, USER UNCHECKED char const *filename,
 	RAII_FINALLY { decref(result); };
 
 	/* Install the new handle. */
-	result_fd = handle_install(THIS_HANDLE_MANAGER, result);
+	result_fd = handles_install(result);
 	return (fd_t)result_fd;
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 }
 #endif /* open... */
 
@@ -1497,7 +1516,7 @@ DEFINE_SYSCALL4(ssize_t, frealpath4,
 		atflags ^= AT_DOSPATH;
 	root = fs_getroot(THIS_FS);
 	FINALLY_DECREF_UNLIKELY(root);
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	{
 		RAII_FINALLY { decref_unlikely(hand); };
 		switch (hand.h_type) {
@@ -1629,7 +1648,7 @@ system_fstatat(fd_t dirfd,
 LOCAL errno_t KCALL
 system_fstat(fd_t fd, USER CHECKED struct stat *statbuf) {
 	struct handle hand;
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	handle_stat(hand, statbuf);
 	return -EOK;
@@ -2444,7 +2463,7 @@ kernel_execveat(fd_t dirfd,
 	if ((atflags & AT_EMPTY_PATH) && !*pathname) {
 		/* Special case: `fexecve()' */
 		REF struct handle hand;
-		hand = handle_lookup((unsigned int)dirfd);
+		hand = handles_lookup(dirfd);
 
 		/* Convert  the handle into  the 3 relevant  objects. If any of
 		 * these conversions fail, then the given handle can't be used. */

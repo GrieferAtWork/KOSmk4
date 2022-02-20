@@ -157,7 +157,7 @@
 #define __SOCK_NONBLOCK  __UINT32_C(0x00000800) /* Set O_NONBLOCK for the socket file descriptor(s). */
 #define __SOCK_CLOEXEC   __UINT32_C(0x00080000) /* Set O_CLOEXEC for the socket file descriptor(s). */
 #ifdef __KOS__
-#define __SOCK_CLOFORK   __UINT32_C(0x00100000) /* Set O_CLOFORK for the socket file descriptor(s). */
+#define __SOCK_CLOFORK   __UINT32_C(0x01000000) /* Set O_CLOFORK for the socket file descriptor(s). */
 #endif /* __KOS__ */
 
 

@@ -1791,7 +1791,40 @@ again:
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_EPOLL_CREATE1
 DEFINE_SYSCALL1(fd_t, epoll_create1, syscall_ulong_t, flags) {
-	unsigned int result;
+#ifdef CONFIG_USE_NEW_HANDMAN
+	fd_t resfd;
+	REF struct epoll_controller *epoll;
+	struct handle_install_data install;
+	iomode_t mode;
+	VALIDATE_FLAGSET(flags, EPOLL_CLOEXEC | EPOLL_CLOFORK,
+	                 E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS);
+
+	/* Allocate a new handle. */
+	resfd = handles_install_begin(&install);
+
+	/* Create the actual epoll object. */
+	TRY {
+		epoll = epoll_controller_create();
+	} EXCEPT {
+		handles_install_abort(&install);
+		RETHROW();
+	}
+
+	mode = IO_RDWR;
+#define EPOLL_CREATE_FLAGS_IO_SHIFT 17
+#if ((EPOLL_CLOEXEC >> EPOLL_CREATE_FLAGS_IO_SHIFT) == IO_CLOEXEC && \
+     (EPOLL_CLOFORK >> EPOLL_CREATE_FLAGS_IO_SHIFT) == IO_CLOFORK)
+	mode |= flags >> EPOLL_CREATE_FLAGS_IO_SHIFT;
+#else /* ... */
+	if (flags & EPOLL_CLOEXEC)
+		mode |= IO_CLOEXEC;
+	if (flags & EPOLL_CLOFORK)
+		mode |= IO_CLOFORK;
+#endif /* !... */
+	handles_install_commit_inherit(&install, epoll, mode);
+	return resfd;
+#else /* CONFIG_USE_NEW_HANDMAN */
+	unsigned int resfd;
 	struct handle hand;
 	VALIDATE_FLAGSET(flags, EPOLL_CLOEXEC | EPOLL_CLOFORK,
 	                 E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS);
@@ -1807,14 +1840,16 @@ DEFINE_SYSCALL1(fd_t, epoll_create1, syscall_ulong_t, flags) {
 	if (flags & EPOLL_CLOFORK)
 		hand.h_mode |= IO_CLOFORK;
 #endif /* !... */
+
 	/* Create the actual epoll object. */
 	hand.h_data = epoll_controller_create();
 	{
 		FINALLY_DECREF_UNLIKELY((REF struct epoll_controller *)hand.h_data);
 		/* Register the handle. */
-		result = handle_install(THIS_HANDLE_MANAGER, hand);
+		resfd = handles_install(hand);
 	}
-	return (fd_t)result;
+	return (fd_t)resfd;
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 }
 #endif /* __ARCH_WANT_SYSCALL_EPOLL_CREATE1 */
 
@@ -1917,7 +1952,6 @@ epoll_create_rpc_monitor(struct epoll_controller *__restrict self,
 	 * NOTE: This function _always_, _unconditionally_ inherits the given `rpc'! */
 	return epoll_controller_addmonitor_rpc(self, fd_handle, fd, events, rpc);
 }
-
 #endif /* CONFIG_HAVE_EPOLL_RPC */
 
 DEFINE_SYSCALL4(errno_t, epoll_ctl,
@@ -1928,7 +1962,7 @@ DEFINE_SYSCALL4(errno_t, epoll_ctl,
 	REF struct handle fd_handle;
 	self = handle_get_epoll_controller(epfd);
 	FINALLY_DECREF_UNLIKELY(self);
-	fd_handle = handle_lookup(fd);
+	fd_handle = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(fd_handle); };
 	switch (op) {
 

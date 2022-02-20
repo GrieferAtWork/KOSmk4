@@ -271,7 +271,7 @@ handles_install_symbolic(fd_t fd, struct handle const *__restrict nhand,
 		REF struct path *newpath;
 		struct fs *myfs = THIS_FS;
 		if unlikely(!IO_CANREAD(nhand->h_mode)) {
-			THROW(E_INVALID_HANDLE_OPERATION, 0,
+			THROW(E_INVALID_HANDLE_OPERATION, -1,
 			      E_INVALID_HANDLE_OPERATION_READ,
 			      nhand->h_mode);
 		}

@@ -61,11 +61,11 @@ sys_sendfile_impl(fd_t outfd, fd_t infd,
 	uses_stack = bufsize <= (get_stack_avail() / 2);
 
 	/* Lookup handles and verify access permissions. */
-	out = handle_lookup((unsigned int)outfd);
+	out = handles_lookup(outfd);
 	RAII_FINALLY { decref(out); };
 	if unlikely(!IO_CANWRITE(out.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, outfd, E_INVALID_HANDLE_OPERATION_WRITE, out.h_mode);
-	in  = handle_lookup((unsigned int)infd);
+	in  = handles_lookup(infd);
 	RAII_FINALLY { decref(in); };
 	if unlikely(!IO_CANREAD(in.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, infd, E_INVALID_HANDLE_OPERATION_READ, in.h_mode);

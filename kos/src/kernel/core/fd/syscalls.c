@@ -19,7 +19,6 @@
  */
 #ifndef GUARD_KERNEL_SRC_FD_SYSCALLS_C
 #define GUARD_KERNEL_SRC_FD_SYSCALLS_C 1
-#define _GNU_SOURCE 1 /* TIMEVAL_TO_TIMESPEC */
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -54,13 +53,11 @@ DECL_BEGIN
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_DUP
 DEFINE_SYSCALL1(fd_t, dup, fd_t, fd) {
-	unsigned int result;
 	struct handle hand;
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	hand.h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
 	RAII_FINALLY { decref_unlikely(hand); };
-	result = handle_install(THIS_HANDLE_MANAGER, hand);
-	return result;
+	return handles_install(hand);
 }
 #endif /* __ARCH_WANT_SYSCALL_DUP */
 
@@ -68,20 +65,19 @@ DEFINE_SYSCALL1(fd_t, dup, fd_t, fd) {
 #ifdef __ARCH_WANT_SYSCALL_DUP2
 DEFINE_SYSCALL2(fd_t, dup2, fd_t, oldfd, fd_t, newfd) {
 	struct handle hand;
-	hand = handle_lookup((unsigned int)oldfd);
+	hand = handles_lookup(oldfd);
 	hand.h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
 	TRY {
-		handle_installinto_sym((unsigned int)newfd, hand);
+		newfd = handles_install_into(newfd, hand);
 	} EXCEPT {
 		if (was_thrown(E_INVALID_HANDLE_FILETYPE)) {
-			struct exception_data *d = except_data();
-			if (d->e_args.e_invalid_handle.ih_fd == (uintptr_t)-1)
-				d->e_args.e_invalid_handle.ih_fd = (uintptr_t)(intptr_t)oldfd;
+			if (PERTASK_GET(this_exception_args.e_invalid_handle.ih_fd) == (uintptr_t)-1)
+				PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, (uintptr_t)(intptr_t)oldfd);
 		}
-		decref(hand);
+		decref_unlikely(hand);
 		RETHROW();
 	}
-	decref(hand);
+	decref_unlikely(hand);
 	return newfd;
 }
 #endif /* __ARCH_WANT_SYSCALL_DUP2 */
@@ -90,15 +86,18 @@ DEFINE_SYSCALL2(fd_t, dup2, fd_t, oldfd, fd_t, newfd) {
 #ifdef __ARCH_WANT_SYSCALL_DUP3
 DEFINE_SYSCALL3(fd_t, dup3, fd_t, oldfd, fd_t, newfd, oflag_t, flags) {
 	struct handle hand;
-	VALIDATE_FLAGSET(flags,
-	                 O_CLOEXEC | O_CLOFORK,
+	VALIDATE_FLAGSET(flags, O_CLOEXEC | O_CLOFORK,
 	                 E_INVALID_ARGUMENT_CONTEXT_DUP3_OFLAG);
-	hand = handle_lookup((unsigned int)oldfd);
+	if unlikely(oldfd == newfd) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_DUP3_SAMEFD,
+		      (syscall_slong_t)oldfd);
+	}
+	hand = handles_lookup(oldfd);
 	hand.h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
-	hand.h_mode |= IO_HANDLE_FTO_OPENFLAG(flags);
+	hand.h_mode |= IO_HANDLE_FFROM_OPENFLAG(flags);
 	RAII_FINALLY { decref_unlikely(hand); };
-	handle_installinto_sym((unsigned int)newfd, hand);
-	return newfd;
+	return handles_install_into(newfd, hand);
 }
 #endif /* __ARCH_WANT_SYSCALL_DUP3 */
 
@@ -128,7 +127,7 @@ DEFINE_SYSCALL3(syscall_slong_t, fcntl, fd_t, fd,
 #ifdef __ARCH_WANT_SYSCALL_FTRUNCATE
 DEFINE_SYSCALL2(errno_t, ftruncate, fd_t, fd, syscall_ulong_t, length) {
 	struct handle hand;
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANWRITE(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_TRUNC, hand.h_mode);
@@ -140,7 +139,7 @@ DEFINE_SYSCALL2(errno_t, ftruncate, fd_t, fd, syscall_ulong_t, length) {
 #ifdef __ARCH_WANT_SYSCALL_FTRUNCATE64
 DEFINE_SYSCALL2(errno_t, ftruncate64, fd_t, fd, uint64_t, length) {
 	struct handle hand;
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANWRITE(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_TRUNC, hand.h_mode);
@@ -162,7 +161,7 @@ DEFINE_SYSCALL4(errno_t, fallocate,
                 syscall_ulong_t, offset,
                 syscall_ulong_t, length) {
 	struct handle hand;
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	handle_allocate(hand, mode, (pos_t)offset, (pos_t)length);
 	return -EOK;
@@ -174,7 +173,7 @@ DEFINE_SYSCALL4(errno_t, fallocate64,
                 fd_t, fd, syscall_ulong_t, mode,
                 uint64_t, offset, uint64_t, length) {
 	struct handle hand;
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	handle_allocate(hand, mode, (pos_t)offset, (pos_t)length);
 	return -EOK;
@@ -249,7 +248,7 @@ DEFINE_SYSCALL3(errno_t, close_range,
 #ifdef __ARCH_WANT_SYSCALL_FSYNC
 DEFINE_SYSCALL1(errno_t, fsync, fd_t, fd) {
 	struct handle hand;
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	handle_sync(hand);
 	return -EOK;
@@ -259,7 +258,7 @@ DEFINE_SYSCALL1(errno_t, fsync, fd_t, fd) {
 #ifdef __ARCH_WANT_SYSCALL_FDATASYNC
 DEFINE_SYSCALL1(errno_t, fdatasync, fd_t, fd) {
 	struct handle hand;
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	handle_datasync(hand);
 	return -EOK;
@@ -283,7 +282,7 @@ DEFINE_SYSCALL4(ssize_t, kreaddir,
 	                 READDIR_MODEMASK | READDIR_FLAGMASK,
 	                 E_INVALID_ARGUMENT_CONTEXT_KREADDIR_MODE);
 	validate_writable(buf, bufsize);
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANREAD(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
@@ -354,7 +353,7 @@ DEFINE_SYSCALL5(ssize_t, kreaddirf,
 	                 IO_USERF_MASK,
 	                 E_INVALID_ARGUMENT_CONTEXT_KREADDIRF_IOMODE);
 	validate_writable(buf, bufsize);
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANREAD(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
@@ -448,38 +447,32 @@ kcmp_get_thread_from_pid(pid_t pid) {
 	return result;
 }
 
-PRIVATE ATTR_RETNONNULL WUNUSED REF struct handle_manager *KCALL
-kcmp_get_handle_manager_from_pid(pid_t pid) {
-	REF struct handle_manager *result;
+PRIVATE ATTR_RETNONNULL WUNUSED REF struct handman *KCALL
+kcmp_get_handman_from_pid(pid_t pid) {
+	REF struct handman *result;
 	REF struct task *thread;
-	/* Lookup the thread in question */
-	thread = kcmp_get_thread_from_pid(pid);
-	FINALLY_DECREF_UNLIKELY(thread);
-	/* Retrieve the thread's handle manager. */
-	result = task_gethandlemanager(thread);
+	thread = kcmp_get_thread_from_pid(pid); /* Lookup the thread in question */
+	result = task_gethandman(thread);       /* Retrieve the thread's handle manager. */
+	decref_unlikely(thread);
 	return result;
 }
 
 PRIVATE WUNUSED REF struct handle KCALL
-kcmp_get_handle_from_pid(pid_t pid, unsigned int fd) {
-	REF struct handle result;
-	REF struct handle_manager *hman;
-	hman = kcmp_get_handle_manager_from_pid(pid);
+kcmp_get_handle_from_pid(pid_t pid, fd_t fd) {
+	REF struct handman *hman;
+	hman = kcmp_get_handman_from_pid(pid);
 	FINALLY_DECREF_UNLIKELY(hman);
 	/* XXX: Support for symbolic handles? */
-	result = handle_lookupin(fd, hman);
-	return result;
+	return handman_lookup(hman, fd);
 }
 
 PRIVATE ATTR_RETNONNULL WUNUSED REF struct mman *KCALL
 kcmp_get_mman_from_pid(pid_t pid) {
 	REF struct mman *result;
 	REF struct task *thread;
-	/* Lookup the thread in question */
-	thread = kcmp_get_thread_from_pid(pid);
-	FINALLY_DECREF_UNLIKELY(thread);
-	/* Retrieve the thread's mman. */
-	result = task_getmman(thread);
+	thread = kcmp_get_thread_from_pid(pid); /* Lookup the thread in question */
+	result = task_getmman(thread);          /* Retrieve the thread's mman. */
+	decref_unlikely(thread);
 	return result;
 }
 
@@ -487,11 +480,9 @@ PRIVATE ATTR_RETNONNULL WUNUSED REF struct fs *KCALL
 kcmp_get_fs_from_pid(pid_t pid) {
 	REF struct fs *result;
 	REF struct task *thread;
-	/* Lookup the thread in question */
-	thread = kcmp_get_thread_from_pid(pid);
-	FINALLY_DECREF_UNLIKELY(thread);
-	/* Retrieve the thread's filesystem controller. */
-	result = task_getfs(thread);
+	thread = kcmp_get_thread_from_pid(pid); /* Lookup the thread in question */
+	result = task_getfs(thread);            /* Retrieve the thread's filesystem controller. */
+	decref_unlikely(thread);
 	return result;
 }
 
@@ -499,11 +490,9 @@ PRIVATE ATTR_RETNONNULL WUNUSED REF struct sighand_ptr *KCALL
 kcmp_get_sighand_ptr_from_pid(pid_t pid) {
 	REF struct sighand_ptr *result;
 	REF struct task *thread;
-	/* Lookup the thread in question */
-	thread = kcmp_get_thread_from_pid(pid);
-	FINALLY_DECREF_UNLIKELY(thread);
-	/* Retrieve the thread's filesystem controller. */
-	result = task_getsighand_ptr(thread);
+	thread = kcmp_get_thread_from_pid(pid); /* Lookup the thread in question */
+	result = task_getsighand_ptr(thread);   /* Retrieve the thread's filesystem controller. */
+	decref_unlikely(thread);
 	return result;
 }
 
@@ -512,7 +501,7 @@ kcmp_get_sighand_ptr_from_pid(pid_t pid) {
 #define KCMP_ORDER_MORE     2 /* type(pid1:idx1) >  type(pid2:idx2) */
 #define KCMP_ORDER_NOTEQUAL 3 /* type(pid1:idx1) != type(pid2:idx2) */
 
-PRIVATE NOBLOCK syscall_slong_t
+PRIVATE NOBLOCK ATTR_PURE syscall_slong_t
 NOTHROW(FCALL kcmp_pointer)(void *a, void *b) {
 	a = skew_kernel_pointer(a);
 	b = skew_kernel_pointer(b);
@@ -533,9 +522,9 @@ DEFINE_SYSCALL5(syscall_slong_t, kcmp,
 	case KCMP_FILE: {
 		REF struct handle hand1;
 		REF struct handle hand2;
-		hand1 = kcmp_get_handle_from_pid(pid1, (unsigned int)idx1);
+		hand1 = kcmp_get_handle_from_pid(pid1, (fd_t)(syscall_slong_t)idx1);
 		RAII_FINALLY { decref_unlikely(hand1); };
-		hand2  = kcmp_get_handle_from_pid(pid2, (unsigned int)idx2);
+		hand2  = kcmp_get_handle_from_pid(pid2, (fd_t)(syscall_slong_t)idx2);
 		result = kcmp_pointer(hand1.h_data, hand2.h_data);
 		decref_unlikely(hand2);
 	}	break;
@@ -551,11 +540,11 @@ DEFINE_SYSCALL5(syscall_slong_t, kcmp,
 	}	break;
 
 	case KCMP_FILES: {
-		REF struct handle_manager *hman1;
-		REF struct handle_manager *hman2;
-		hman1 = kcmp_get_handle_manager_from_pid(pid1);
+		REF struct handman *hman1;
+		REF struct handman *hman2;
+		hman1 = kcmp_get_handman_from_pid(pid1);
 		FINALLY_DECREF_UNLIKELY(hman1);
-		hman2 = kcmp_get_handle_manager_from_pid(pid2);
+		hman2 = kcmp_get_handman_from_pid(pid2);
 		FINALLY_DECREF_UNLIKELY(hman2);
 		result = kcmp_pointer(hman1, hman2);
 	}	break;

@@ -114,10 +114,10 @@ struct ksysctl_driver_insmod /*[PREFIX(im_)]*/ {
 		}              im_blob;                /* [valid_if(im_format == KSYSCTL_DRIVER_FORMAT_BLOB)]
 		                                        * Data blob from which to load the driver. */
 		struct {
-			__uint32_t f_node;                 /* [1..1] Handle to an INode from which the driver should be loaded. */
-			__uint32_t f_path;                 /* [0..1] Handle to the path containing `f_node', or (uint32_t)-1 if not given
+			__int32_t  f_node;                 /* [1..1] Handle to an INode from which the driver should be loaded. */
+			__int32_t  f_path;                 /* [0..1] Handle to the path containing `f_node', or (uint32_t)-1 if not given
 			                                    * When not given,  the kernel  will try to  retrieve the  path from  `f_node' */
-			__uint32_t f_dentry;               /* [0..1] Handle to the directory entry describing `f_node', or (uint32_t)-1 if not given
+			__int32_t  f_dentry;               /* [0..1] Handle to the directory entry describing `f_node', or (uint32_t)-1 if not given
 			                                    * When not given,  the kernel will  try to  retrieve the directory  entry from  `f_node' */
 		}              im_file;                /* [valid_if(im_format == KSYSCTL_DRIVER_FORMAT_FILE)]
 		                                        * File handle data. */

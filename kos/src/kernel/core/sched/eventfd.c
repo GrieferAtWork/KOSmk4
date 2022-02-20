@@ -219,7 +219,49 @@ DEFINE_INTERN_ALIAS(handle_eventfd_sema_polltest, handle_eventfd_fence_polltest)
 DEFINE_SYSCALL2(fd_t, eventfd2,
                 syscall_ulong_t, initval,
                 syscall_ulong_t, flags) {
-	unsigned int result;
+#ifdef CONFIG_USE_NEW_HANDMAN
+	fd_t resfd;
+	iomode_t mode;
+	uintptr_half_t type;
+	REF struct eventfd *efd;
+	struct handle_install_data install;
+	VALIDATE_FLAGSET(flags,
+	                 EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC,
+	                 E_INVALID_ARGUMENT_CONTEXT_EVENTFD_FLAGS);
+#if __SIZEOF_SYSCALL_LONG_T__ >= 8
+	if (initval >= (uint64_t)-1) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_EVENTFD_WRITE_FFFFFFFFFFFFFFFFh,
+		      initval);
+	}
+#endif /* __SIZEOF_SYSCALL_LONG_T__ >= 8 */
+
+	resfd = handles_install_begin(&install);
+	TRY {
+		efd = eventfd_create((u64)initval);
+	} EXCEPT {
+		handles_install_abort(&install);
+		RETHROW();
+	}
+
+	/* Always grant read/write access to that both post() and wait() work. */
+	mode = IO_RDWR;
+	if (flags & EFD_NONBLOCK)
+		mode |= IO_NONBLOCK;
+	if (flags & EFD_CLOEXEC)
+		mode |= IO_CLOEXEC;
+
+	/* Under KOS, the fence vs. semaphore differentiation
+	 * is made  through use  of the  handle's type  code. */
+	type = HANDLE_TYPE_EVENTFD_FENCE;
+	if (flags & EFD_SEMAPHORE)
+		type = HANDLE_TYPE_EVENTFD_SEMA;
+
+	/* Commit the new handle. */
+	handles_install_commit_inherit(&install, efd, mode, type);
+	return resfd;
+#else /* CONFIG_USE_NEW_HANDMAN */
+	unsigned int resfd;
 	REF struct eventfd *efd;
 	VALIDATE_FLAGSET(flags,
 	                 EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC,
@@ -248,12 +290,13 @@ DEFINE_SYSCALL2(fd_t, eventfd2,
 			hnd.h_mode |= IO_CLOEXEC;
 		hnd.h_data = efd; /* Inherit reference */
 		/* Install the eventfd handle. */
-		result = handle_install(THIS_HANDLE_MANAGER, hnd);
+		resfd = handles_install(hnd);
 	} EXCEPT {
 		destroy(efd);
 		RETHROW();
 	}
-	return (fd_t)result;
+	return (fd_t)resfd;
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 }
 #endif /* __ARCH_WANT_SYSCALL_EVENTFD2 */
 

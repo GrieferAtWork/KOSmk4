@@ -56,7 +56,7 @@ DEFINE_SYSCALL3(syscall_slong_t, lseek,
                 syscall_ulong_t, whence) {
 	pos_t result;
 	struct handle hand;
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	result = handle_seek(hand, (off_t)offset, whence);
 	return (syscall_slong_t)result;
@@ -69,7 +69,7 @@ DEFINE_SYSCALL3(int64_t, lseek64,
                 syscall_ulong_t, whence) {
 	pos_t result;
 	struct handle hand;
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	result = handle_seek(hand, (off_t)offset, whence);
 	return (int64_t)result;
@@ -118,7 +118,7 @@ DEFINE_SYSCALL3(ssize_t, read, fd_t, fd,
 	size_t result;
 	struct handle hand;
 	validate_writable(buf, bufsize);
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANREAD(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
@@ -133,7 +133,7 @@ DEFINE_SYSCALL3(ssize_t, write, fd_t, fd,
 	size_t result;
 	struct handle hand;
 	validate_readable(buf, bufsize);
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANWRITE(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
@@ -152,7 +152,7 @@ DEFINE_SYSCALL4(ssize_t, readf,
 	                 IO_USERF_MASK,
 	                 E_INVALID_ARGUMENT_CONTEXT_READF_MODE);
 	validate_writable(buf, bufsize);
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANREAD(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
@@ -172,7 +172,7 @@ DEFINE_SYSCALL4(ssize_t, writef,
 	                 IO_USERF_MASK,
 	                 E_INVALID_ARGUMENT_CONTEXT_WRITEF_MODE);
 	validate_readable(buf, bufsize);
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANWRITE(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
@@ -196,7 +196,7 @@ DEFINE_SYSCALL4(ssize_t, pread64, fd_t, fd,
 	size_t result;
 	struct handle hand;
 	validate_writable(buf, bufsize);
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANREAD(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
@@ -212,7 +212,7 @@ DEFINE_SYSCALL4(ssize_t, pwrite64, fd_t, fd,
 	size_t result;
 	struct handle hand;
 	validate_readable(buf, bufsize);
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANWRITE(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
@@ -231,7 +231,7 @@ DEFINE_SYSCALL5(ssize_t, pread64f,
 	                 IO_USERF_MASK,
 	                 E_INVALID_ARGUMENT_CONTEXT_PREADF_MODE);
 	validate_writable(buf, bufsize);
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANREAD(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
@@ -251,7 +251,7 @@ DEFINE_SYSCALL5(ssize_t, pwrite64f,
 	                 IO_USERF_MASK,
 	                 E_INVALID_ARGUMENT_CONTEXT_PWRITEF_MODE);
 	validate_readable(buf, bufsize);
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANWRITE(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
@@ -276,7 +276,7 @@ DEFINE_SYSCALL3(ssize_t, readv, fd_t, fd,
 	struct handle hand;
 	struct iov_buffer dst;
 	validate_readablem(iov, count, sizeof(*iov));
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANREAD(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
@@ -313,7 +313,7 @@ DEFINE_SYSCALL3(ssize_t, writev, fd_t, fd,
 	struct handle hand;
 	struct iov_buffer dst;
 	validate_readablem(iov, count, sizeof(*iov));
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANWRITE(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
@@ -350,7 +350,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, readv, fd_t, fd,
 	struct handle hand;
 	struct iov_buffer dst;
 	compat_validate_readablem(iov, count, sizeof(*iov));
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANREAD(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
@@ -387,7 +387,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, writev, fd_t, fd,
 	struct handle hand;
 	struct iov_buffer dst;
 	compat_validate_readablem(iov, count, sizeof(*iov));
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANWRITE(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
@@ -431,7 +431,7 @@ DEFINE_SYSCALL4(ssize_t, preadv, fd_t, fd,
 	struct handle hand;
 	struct iov_buffer dst;
 	validate_readablem(iov, count, sizeof(*iov));
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANREAD(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
@@ -468,7 +468,7 @@ DEFINE_SYSCALL4(ssize_t, pwritev, fd_t, fd,
 	struct handle hand;
 	struct iov_buffer dst;
 	validate_readablem(iov, count, sizeof(*iov));
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANWRITE(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
@@ -505,7 +505,7 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, preadv, fd_t, fd,
 	struct handle hand;
 	struct iov_buffer dst;
 	compat_validate_readablem(iov, count, sizeof(*iov));
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANREAD(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
@@ -542,7 +542,7 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, pwritev, fd_t, fd,
 	struct handle hand;
 	struct iov_buffer dst;
 	compat_validate_readablem(iov, count, sizeof(*iov));
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANWRITE(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);

@@ -52,13 +52,13 @@ DECL_BEGIN
 /************************************************************************/
 #if defined(__ARCH_WANT_SYSCALL_IOCTL) || defined(__ARCH_WANT_SYSCALL_IOCTLF)
 PRIVATE NOBLOCK void
-NOTHROW(KCALL ioctl_complete_exception_info)(unsigned int fd) {
+NOTHROW(KCALL ioctl_complete_exception_info)(fd_t fd) {
 	except_code_t code = except_code();
 	switch (code) {
 
 	case EXCEPT_CODEOF(E_INVALID_HANDLE_OPERATION):
 		if (!PERTASK_TEST(this_exception_args.e_invalid_handle.ih_fd)) /* fd */
-			PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, fd);
+			PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, (uintptr_t)(intptr_t)fd);
 		break;
 
 	default: break;
@@ -66,48 +66,32 @@ NOTHROW(KCALL ioctl_complete_exception_info)(unsigned int fd) {
 }
 
 PRIVATE WUNUSED NONNULL((3, 5)) bool KCALL
-ioctl_generic(ioctl_t cmd,
-              unsigned int fd,
+ioctl_generic(ioctl_t cmd, fd_t fd,
               struct handle const *__restrict hand,
               USER UNCHECKED void *arg,
               syscall_slong_t *__restrict result) {
 	/* Check for specific commands. */
 	switch (cmd) {
 
-#ifdef CONFIG_USE_NEW_HANDMAN
 	case FIOCLEX: /* aka. FD_IOC_CLEX */
 		/* Set IO_CLOEXEC */
 		if (hand->h_mode & IO_CLOEXEC)
 			break;
-		handman_sethandflags(THIS_HANDMAN, (fd_t)fd, ~0, (IO_CLOEXEC));
+		handman_sethandflags(THIS_HANDMAN, fd, ~0, (IO_CLOEXEC));
 		break;
 
 	case FIONCLEX: /* aka. FD_IOC_NCLEX */
 		/* Clear IO_CLOEXEC */
 		if (!(hand->h_mode & IO_CLOEXEC))
 			break;
-		handman_sethandflags(THIS_HANDMAN, (fd_t)fd, ~(IO_CLOEXEC), 0);
+		handman_sethandflags(THIS_HANDMAN, fd, ~(IO_CLOEXEC), 0);
 		break;
 
-#else /* CONFIG_USE_NEW_HANDMAN */
-	case FIOCLEX: /* FD_IOC_CLEX */
-		/* Set IO_CLOEXEC */
-		if (hand->h_mode & IO_CLOEXEC)
-			break;
-		handle_chflags(THIS_HANDLE_MANAGER, fd, ~0, IO_CLOEXEC);
-		break;
-
-	case FIONCLEX: /* FD_IOC_NCLEX */
-		/* Clear IO_CLOEXEC */
-		if (!(hand->h_mode & IO_CLOEXEC))
-			break;
-		handle_chflags(THIS_HANDLE_MANAGER, fd, ~IO_CLOEXEC, 0);
-		break;
-#endif /* !CONFIG_USE_NEW_HANDMAN */
-
-	case FD_IOC_DUPFD:
-		*result = handle_installopenfd((USER UNCHECKED struct openfd *)arg, hand);
-		goto done;
+	case FD_IOC_DUPFD: {
+		USER UNCHECKED struct openfd *ofd;
+		ofd = (USER UNCHECKED struct openfd *)arg;
+		*result = handles_install_openfd(hand, ofd);
+	}	goto done;
 
 	case FD_IOC_NOOP:
 		/* Intentional no-op */
@@ -129,7 +113,7 @@ ioctl_generic(ioctl_t cmd,
 			if unlikely(reqtype >= HANDLE_TYPE_COUNT) {
 err_bad_handle_type:
 				THROW(E_INVALID_HANDLE_FILETYPE,
-				      /* fd:                 */ fd, /* Filled in the caller */
+				      /* fd:                 */ fd,
 				      /* needed_handle_type: */ reqtype,
 				      /* actual_handle_type: */ hand->h_type,
 				      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
@@ -206,24 +190,18 @@ err_bad_handle_type:
 
 		case _IO_WITHSIZE(FIONBIO, 0): /* FD_IOC_NBIO */
 			/* Set/clear IO_NONBLOCK */
-#ifdef CONFIG_USE_NEW_HANDMAN
-			handman_sethandflags(THIS_HANDMAN, (fd_t)fd, ~IO_NONBLOCK,
-			                     ioctl_intarg_getbool(cmd, arg) ? IO_NONBLOCK : 0);
-#else /* CONFIG_USE_NEW_HANDMAN */
-			handle_chflags(THIS_HANDLE_MANAGER, fd, ~IO_NONBLOCK,
-			               ioctl_intarg_getbool(cmd, arg) ? IO_NONBLOCK : 0);
-#endif /* !CONFIG_USE_NEW_HANDMAN */
+			handman_sethandflags(THIS_HANDMAN, fd, ~IO_NONBLOCK,
+			                     ioctl_intarg_getbool(cmd, arg)
+			                     ? IO_NONBLOCK
+			                     : 0);
 			break;
 
 		case _IO_WITHSIZE(FIOASYNC, 0): /* FD_IOC_ASYNC */
 			/* Set/clear IO_ASYNC */
-#ifdef CONFIG_USE_NEW_HANDMAN
-			handman_sethandflags(THIS_HANDMAN, (fd_t)fd, ~IO_ASYNC,
-			                     ioctl_intarg_getbool(cmd, arg) ? IO_ASYNC : 0);
-#else /* CONFIG_USE_NEW_HANDMAN */
-			handle_chflags(THIS_HANDLE_MANAGER, fd, ~IO_ASYNC,
-			               ioctl_intarg_getbool(cmd, arg) ? IO_ASYNC : 0);
-#endif /* !CONFIG_USE_NEW_HANDMAN */
+			handman_sethandflags(THIS_HANDMAN, fd, ~IO_ASYNC,
+			                     ioctl_intarg_getbool(cmd, arg)
+			                     ? IO_ASYNC
+			                     : 0);
 			break;
 
 		case _IO_WITHSIZE(FIOQSIZE, 0): { /* FD_IOC_QSIZE */
@@ -299,7 +277,7 @@ DEFINE_SYSCALL3(syscall_slong_t, ioctl, fd_t, fd,
                 ioctl_t, command, UNCHECKED USER void *, arg) {
 	struct handle hand;
 	syscall_slong_t result;
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	TRY {
 		result = handle_ioctl(hand, command, arg);
@@ -311,11 +289,11 @@ DEFINE_SYSCALL3(syscall_slong_t, ioctl, fd_t, fd,
 				if (ioctl_generic(command, fd, &hand, arg, &result))
 					goto done;
 			} EXCEPT {
-				ioctl_complete_exception_info((unsigned int)fd);
+				ioctl_complete_exception_info(fd);
 				RETHROW();
 			}
 		}
-		ioctl_complete_exception_info((unsigned int)fd);
+		ioctl_complete_exception_info(fd);
 		RETHROW();
 	}
 done:
@@ -332,7 +310,7 @@ DEFINE_SYSCALL4(syscall_slong_t, ioctlf, fd_t, fd,
 	VALIDATE_FLAGSET(mode,
 	                 IO_USERF_MASK,
 	                 E_INVALID_ARGUMENT_CONTEXT_IOCTLF_MODE);
-	hand = handle_lookup((unsigned int)fd);
+	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	TRY {
 		result = handle_ioctlf(hand, command, arg, mode);
@@ -344,11 +322,11 @@ DEFINE_SYSCALL4(syscall_slong_t, ioctlf, fd_t, fd,
 				if (ioctl_generic(command, fd, &hand, arg, &result))
 					goto done;
 			} EXCEPT {
-				ioctl_complete_exception_info((unsigned int)fd);
+				ioctl_complete_exception_info(fd);
 				RETHROW();
 			}
 		}
-		ioctl_complete_exception_info((unsigned int)fd);
+		ioctl_complete_exception_info(fd);
 		RETHROW();
 	}
 done:

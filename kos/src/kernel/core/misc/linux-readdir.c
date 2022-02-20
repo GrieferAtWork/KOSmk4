@@ -218,7 +218,7 @@ struct readdir_buffer {
 PRIVATE NONNULL((1)) void KCALL
 readdir_buffer_init(struct readdir_buffer *__restrict self, fd_t fd) {
 	/* Lookup the given file and set-up the initial, static buffer. */
-	self->rb_file   = handle_lookup((unsigned int)fd);
+	self->rb_file   = handles_lookup(fd);
 	self->rb_buflen = sizeof(self->rb_sbuf);
 	self->rb_buf    = (struct dirent *)self->rb_sbuf;
 	/* Acquire the readdir lock for the file's backing object. */

@@ -857,9 +857,9 @@ DECL_END
 /* TODO: When eventually removing the following, make sure to get rid of `(unsigned int)' casts. */
 #define handle_install(self, hnd)             ((unsigned int)handman_install(self, hnd))
 #define handle_installat(self, hint, hnd)     ((unsigned int)handman_install(self, hnd, (fd_t)(hint)))
-#define handle_installinto(self, dst_fd, hnd) ((unsigned int)handman_install_into_simple(self, (fd_t)(dst_fd), hnd))
+#define handle_installinto(self, dst_fd, hnd) (void)handman_install_into_simple(self, (fd_t)(dst_fd), hnd)
 #define handle_installopenfd(data, hnd)       ((unsigned int)handles_install_openfd(hnd, data))
-#define handle_installinto_sym(dst_fd, hnd)   (void)handles_install_into((fd_t)(dst_fd), hnd)
+#define handle_installinto_sym(dst_fd, hnd)   (void)handles_install_into_simple((fd_t)(dst_fd), hnd)
 #define handle_trylookup(self, fd)            handman_trylookup(self, (fd_t)(fd))
 #define handle_lookup(fd)                     handles_lookup((fd_t)(fd))
 #define handle_lookupin(fd, self)             handman_lookup(self, (fd_t)(fd))

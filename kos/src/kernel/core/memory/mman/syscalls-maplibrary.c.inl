@@ -116,7 +116,7 @@ DEFINE_COMPAT_SYSCALL5(void *, maplibrary,
 	{
 		/* Specific file. */
 		REF struct handle hand;
-		hand = handle_lookup(fd);
+		hand = handles_lookup(fd);
 #ifndef NDEBUG
 		file.hmi_file = NULL;
 #endif /* !NDEBUG */

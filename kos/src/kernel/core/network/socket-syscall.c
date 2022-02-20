@@ -70,8 +70,40 @@ DEFINE_SYSCALL3(fd_t, socket,
                 syscall_ulong_t, domain,
                 syscall_ulong_t, type,
                 syscall_ulong_t, protocol) {
+#ifdef CONFIG_USE_NEW_HANDMAN
+	fd_t result;
+	struct handle_install_data install;
+	result = handles_install_begin(&install);
+	TRY {
+		REF struct socket *sock;
+		iomode_t mode;
+
+		/* Construct the new socket. */
+		sock = socket_create(domain,
+		                     type & ~(SOCK_CLOEXEC |
+		                              SOCK_CLOFORK |
+		                              SOCK_NONBLOCK),
+		                     protocol);
+
+		/* Fill in mode bits */
+		mode = IO_RDWR;
+		if (type & SOCK_CLOEXEC)
+			mode |= IO_CLOEXEC;
+		if (type & SOCK_CLOFORK)
+			mode |= IO_CLOFORK;
+		if (type & SOCK_NONBLOCK)
+			mode |= IO_NONBLOCK;
+
+		/* Commit the new handle. */
+		handles_install_commit_inherit(&install, sock, mode);
+	} EXCEPT {
+		handles_install_abort(&install);
+		RETHROW();
+	}
+	return result;
+#else /* CONFIG_USE_NEW_HANDMAN */
 	REF struct socket *sock;
-	unsigned int result;
+	fd_t result;
 	sock = socket_create(domain,
 	                     type & ~(SOCK_CLOEXEC |
 	                              SOCK_CLOFORK |
@@ -89,9 +121,10 @@ DEFINE_SYSCALL3(fd_t, socket,
 		if (type & SOCK_NONBLOCK)
 			hand.h_mode |= IO_NONBLOCK;
 		FINALLY_DECREF_UNLIKELY(sock);
-		result = handle_install(THIS_HANDLE_MANAGER, hand);
+		result = handles_install(hand);
 	}
-	return (fd_t)result;
+	return result;
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 }
 #endif /* __ARCH_WANT_SYSCALL_SOCKET */
 
@@ -128,7 +161,7 @@ DEFINE_SYSCALL3(errno_t, connect, fd_t, sockfd,
                 socklen_t, addr_len) {
 	struct handle sock;
 	validate_readable(addr, addr_len);
-	sock = handle_lookup((unsigned int)sockfd);
+	sock = handles_lookup(sockfd);
 	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
@@ -175,10 +208,12 @@ DEFINE_SYSCALL2(errno_t, listen, fd_t, sockfd,
 DEFINE_SYSCALL3(fd_t, accept, fd_t, sockfd,
                 USER UNCHECKED struct sockaddr *, addr,
                 USER UNCHECKED socklen_t *, addr_len) {
+#ifdef CONFIG_USE_NEW_HANDMAN
+	REF struct handle sock;
 	REF struct socket *result;
-	struct handle sock;
+	struct handle_install_data install;
 	socklen_t avail_addr_len;
-	unsigned int result_fd;
+	fd_t resfd;
 	avail_addr_len = 0;
 	if (addr_len) {
 		validate_readwrite(addr_len, sizeof(*addr_len));
@@ -187,7 +222,58 @@ DEFINE_SYSCALL3(fd_t, accept, fd_t, sockfd,
 		COMPILER_READ_BARRIER();
 		validate_writable(addr, avail_addr_len);
 	}
-	sock = handle_lookup((unsigned int)sockfd);
+	sock = handles_lookup(sockfd);
+	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
+		uintptr_half_t subkind;
+		subkind = handle_typekind(&sock);
+		decref_unlikely(sock);
+		THROW(E_INVALID_HANDLE_FILETYPE,
+		      /* fd:                 */ sockfd,
+		      /* needed_handle_type: */ HANDLE_TYPE_SOCKET,
+		      /* actual_handle_type: */ sock.h_type,
+		      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+		      /* actual_handle_kind: */ subkind);
+	}
+	{
+		FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
+		resfd = handles_install_begin(&install);
+		TRY {
+			result = socket_accept((struct socket *)sock.h_data, sock.h_mode);
+		} EXCEPT {
+			handles_install_abort(&install);
+			RETHROW();
+		}
+	}
+	if (!result) {
+		/* NOTE: We don't throw an exception for this case! */
+		handles_install_abort(&install);
+		return -EWOULDBLOCK;
+	}
+	if (avail_addr_len) {
+		TRY {
+			*addr_len = socket_getpeername(result, addr, avail_addr_len);
+		} EXCEPT {
+			handles_install_abort(&install);
+			decref_likely(result);
+			RETHROW();
+		}
+	}
+	handles_install_commit_inherit(&install, result, IO_RDWR);
+	return resfd;
+#else /* CONFIG_USE_NEW_HANDMAN */
+	REF struct socket *result;
+	struct handle sock;
+	socklen_t avail_addr_len;
+	unsigned int resfd;
+	avail_addr_len = 0;
+	if (addr_len) {
+		validate_readwrite(addr_len, sizeof(*addr_len));
+		COMPILER_READ_BARRIER();
+		avail_addr_len = *addr_len;
+		COMPILER_READ_BARRIER();
+		validate_writable(addr, avail_addr_len);
+	}
+	sock = handles_lookup(sockfd);
 	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
@@ -220,9 +306,10 @@ DEFINE_SYSCALL3(fd_t, accept, fd_t, sockfd,
 	sock.h_mode = IO_RDWR;
 	{
 		FINALLY_DECREF_UNLIKELY(result);
-		result_fd = handle_install(THIS_HANDLE_MANAGER, sock);
+		resfd = handles_install(sock);
 	}
-	return (fd_t)result_fd;
+	return (fd_t)resfd;
+#endif /* CONFIG_USE_NEW_HANDMAN */
 }
 #endif /* __ARCH_WANT_SYSCALL_ACCEPT */
 
@@ -231,10 +318,13 @@ DEFINE_SYSCALL4(fd_t, accept4, fd_t, sockfd,
                 USER UNCHECKED struct sockaddr *, addr,
                 USER UNCHECKED socklen_t *, addr_len,
                 syscall_ulong_t, sock_flags) {
+#ifdef CONFIG_USE_NEW_HANDMAN
+	REF struct handle sock;
 	REF struct socket *result;
-	struct handle sock;
+	struct handle_install_data install;
 	socklen_t avail_addr_len;
-	unsigned int result_fd;
+	fd_t resfd;
+	iomode_t mode;
 	VALIDATE_FLAGSET(sock_flags,
 	                 SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK,
 	                 E_INVALID_ARGUMENT_CONTEXT_ACCEPT4_SOCK_FLAGS);
@@ -246,7 +336,68 @@ DEFINE_SYSCALL4(fd_t, accept4, fd_t, sockfd,
 		COMPILER_READ_BARRIER();
 		validate_writable(addr, avail_addr_len);
 	}
-	sock = handle_lookup((unsigned int)sockfd);
+	sock = handles_lookup(sockfd);
+	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
+		uintptr_half_t subkind;
+		subkind = handle_typekind(&sock);
+		decref_unlikely(sock);
+		THROW(E_INVALID_HANDLE_FILETYPE,
+		      /* fd:                 */ sockfd,
+		      /* needed_handle_type: */ HANDLE_TYPE_SOCKET,
+		      /* actual_handle_type: */ sock.h_type,
+		      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+		      /* actual_handle_kind: */ subkind);
+	}
+	{
+		FINALLY_DECREF_UNLIKELY((struct socket *)sock.h_data);
+		resfd = handles_install_begin(&install);
+		TRY {
+			result = socket_accept((struct socket *)sock.h_data, sock.h_mode);
+		} EXCEPT {
+			handles_install_abort(&install);
+			RETHROW();
+		}
+	}
+	if (!result) {
+		/* NOTE: We don't throw an exception for this case! */
+		handles_install_abort(&install);
+		return -EWOULDBLOCK;
+	}
+	if (avail_addr_len) {
+		TRY {
+			*addr_len = socket_getpeername(result, addr, avail_addr_len);
+		} EXCEPT {
+			handles_install_abort(&install);
+			decref_likely(result);
+			RETHROW();
+		}
+	}
+	mode = IO_RDWR;
+	if (sock_flags & SOCK_NONBLOCK)
+		mode |= IO_NONBLOCK;
+	if (sock_flags & SOCK_CLOEXEC)
+		mode |= IO_CLOEXEC;
+	if (sock_flags & SOCK_CLOFORK)
+		mode |= IO_CLOFORK;
+	handles_install_commit_inherit(&install, result, mode);
+	return resfd;
+#else /* CONFIG_USE_NEW_HANDMAN */
+	REF struct socket *result;
+	struct handle sock;
+	socklen_t avail_addr_len;
+	unsigned int resfd;
+	VALIDATE_FLAGSET(sock_flags,
+	                 SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK,
+	                 E_INVALID_ARGUMENT_CONTEXT_ACCEPT4_SOCK_FLAGS);
+	avail_addr_len = 0;
+	if (addr_len) {
+		validate_readwrite(addr_len, sizeof(*addr_len));
+		COMPILER_READ_BARRIER();
+		avail_addr_len = *addr_len;
+		COMPILER_READ_BARRIER();
+		validate_writable(addr, avail_addr_len);
+	}
+	sock = handles_lookup(sockfd);
 	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
@@ -285,9 +436,10 @@ DEFINE_SYSCALL4(fd_t, accept4, fd_t, sockfd,
 		sock.h_mode |= IO_CLOFORK;
 	{
 		FINALLY_DECREF_UNLIKELY(result);
-		result_fd = handle_install(THIS_HANDLE_MANAGER, sock);
+		resfd = handles_install(sock);
 	}
-	return (fd_t)result_fd;
+	return (fd_t)resfd;
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 }
 #endif /* __ARCH_WANT_SYSCALL_ACCEPT4 */
 
@@ -311,7 +463,7 @@ DEFINE_SYSCALL5(errno_t, getsockopt, fd_t, sockfd,
 	avail_optlen = *optlen;
 	COMPILER_READ_BARRIER();
 	validate_writable(optval, avail_optlen);
-	sock = handle_lookup((unsigned int)sockfd);
+	sock = handles_lookup(sockfd);
 	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
@@ -344,7 +496,7 @@ DEFINE_SYSCALL5(errno_t, setsockopt, fd_t, sockfd,
                 USER UNCHECKED socklen_t, optlen) {
 	REF struct handle sock;
 	validate_readable(optval, optlen);
-	sock = handle_lookup((unsigned int)sockfd);
+	sock = handles_lookup(sockfd);
 	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
@@ -439,7 +591,7 @@ DEFINE_SYSCALL4(ssize_t, send, fd_t, sockfd,
 	                 MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB,
 	                 E_INVALID_ARGUMENT_CONTEXT_SEND_MSG_FLAGS);
 	validate_readable(buf, bufsize);
-	sock = handle_lookup((unsigned int)sockfd);
+	sock = handles_lookup(sockfd);
 	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
@@ -473,7 +625,7 @@ DEFINE_SYSCALL6(ssize_t, sendto, fd_t, sockfd,
 	                 E_INVALID_ARGUMENT_CONTEXT_SEND_MSG_FLAGS);
 	validate_readable(buf, bufsize);
 	validate_readable_opt(addr, addr_len);
-	sock = handle_lookup((unsigned int)sockfd);
+	sock = handles_lookup(sockfd);
 	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
@@ -518,7 +670,7 @@ DEFINE_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
 	validate_readable_opt(msg.msg_name, msg.msg_namelen);
 	validate_readablem(msg.msg_iov, msg.msg_iovlen, sizeof(*msg.msg_iov));
 	validate_readable_opt(msg.msg_control, msg.msg_controllen);
-	sock = handle_lookup((unsigned int)sockfd);
+	sock = handles_lookup(sockfd);
 	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
@@ -614,7 +766,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, sendmsg, fd_t, sockfd,
 	compat_validate_readable_opt(msg.msg_name, msg.msg_namelen);
 	compat_validate_readablem(msg.msg_iov, msg.msg_iovlen, sizeof(*msg.msg_iov));
 	compat_validate_readable_opt(msg.msg_control, msg.msg_controllen);
-	sock = handle_lookup((unsigned int)sockfd);
+	sock = handles_lookup(sockfd);
 	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
@@ -705,7 +857,7 @@ DEFINE_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 	                 MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB,
 	                 E_INVALID_ARGUMENT_CONTEXT_SEND_MSG_FLAGS);
 	validate_readwritem(vmessages, vlen, sizeof(*vmessages));
-	sock = handle_lookup((unsigned int)sockfd);
+	sock = handles_lookup(sockfd);
 	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
@@ -820,7 +972,7 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, sendmmsg, fd_t, sockfd,
 	                 MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB,
 	                 E_INVALID_ARGUMENT_CONTEXT_SEND_MSG_FLAGS);
 	compat_validate_readwritem(vmessages, vlen, sizeof(*vmessages));
-	sock = handle_lookup((unsigned int)sockfd);
+	sock = handles_lookup(sockfd);
 	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
@@ -943,7 +1095,7 @@ DEFINE_SYSCALL4(ssize_t, recv, fd_t, sockfd,
 	                 MSG_PEEK | MSG_TRUNC | MSG_WAITALL,
 	                 E_INVALID_ARGUMENT_CONTEXT_RECV_MSG_FLAGS);
 	validate_writable(buf, bufsize);
-	sock = handle_lookup((unsigned int)sockfd);
+	sock = handles_lookup(sockfd);
 	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
@@ -992,7 +1144,7 @@ DEFINE_SYSCALL6(ssize_t, recvfrom, fd_t, sockfd,
 		COMPILER_READ_BARRIER();
 		validate_readable_opt(addr, avail_addr_len);
 	}
-	sock = handle_lookup((unsigned int)sockfd);
+	sock = handles_lookup(sockfd);
 	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
@@ -1049,7 +1201,7 @@ DEFINE_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 	validate_writable_opt(msg.msg_name, msg.msg_namelen);
 	validate_readablem(msg.msg_iov, msg.msg_iovlen, sizeof(*msg.msg_iov));
 	validate_writable_opt(msg.msg_control, msg.msg_controllen);
-	sock = handle_lookup((unsigned int)sockfd);
+	sock = handles_lookup(sockfd);
 	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
@@ -1152,7 +1304,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 	compat_validate_writable_opt(msg.msg_name, msg.msg_namelen);
 	compat_validate_readablem(msg.msg_iov, msg.msg_iovlen, sizeof(*msg.msg_iov));
 	compat_validate_writable_opt(msg.msg_control, msg.msg_controllen);
-	sock = handle_lookup((unsigned int)sockfd);
+	sock = handles_lookup(sockfd);
 	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
@@ -1255,7 +1407,7 @@ sys_recvmmsg_impl(fd_t sockfd,
 	                 MSG_WAITFORONE,
 	                 E_INVALID_ARGUMENT_CONTEXT_RECV_MSG_FLAGS);
 	validate_readwritem(vmessages, vlen, sizeof(*vmessages));
-	sock = handle_lookup((unsigned int)sockfd);
+	sock = handles_lookup(sockfd);
 	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
@@ -1435,7 +1587,7 @@ compat_sys_recvmmsg_impl(fd_t sockfd,
 	                 MSG_WAITFORONE,
 	                 E_INVALID_ARGUMENT_CONTEXT_RECV_MSG_FLAGS);
 	validate_readwritem(vmessages, vlen, sizeof(*vmessages));
-	sock = handle_lookup((unsigned int)sockfd);
+	sock = handles_lookup(sockfd);
 	if unlikely(sock.h_type != HANDLE_TYPE_SOCKET) {
 		uintptr_half_t subkind;
 		subkind = handle_typekind(&sock);
@@ -1611,7 +1763,7 @@ DEFINE_SYSCALL2(errno_t, shutdown, fd_t, sockfd,
 		      E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_HOW,
 		      how);
 	}
-	sock = handle_get_socket((unsigned int)sockfd);
+	sock = handles_lookupsocket(sockfd);
 	{
 		FINALLY_DECREF_UNLIKELY(sock);
 		socket_shutdown(sock, how);

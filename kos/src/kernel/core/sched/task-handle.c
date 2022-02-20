@@ -190,7 +190,6 @@ handle_pidfd_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
 DEFINE_SYSCALL2(fd_t, pidfd_open,
                 pid_t, pid,
                 syscall_ulong_t, flags) {
-	unsigned int result;
 	struct handle hand;
 	REF struct taskpid *target;
 	struct taskpid *mypid = task_gettaskpid();
@@ -226,8 +225,7 @@ DEFINE_SYSCALL2(fd_t, pidfd_open,
 	hand.h_data = target;
 
 	/* Install the handle within our handle namespace. */
-	result = handle_install(THIS_HANDLE_MANAGER, hand);
-	return (fd_t)result;
+	return handles_install(hand);
 }
 #endif /* __ARCH_WANT_SYSCALL_PIDFD_OPEN */
 
@@ -237,7 +235,6 @@ DEFINE_SYSCALL3(fd_t, pidfd_getfd,
                 fd_t, pidfd,
                 fd_t, foreign_fd,
                 syscall_ulong_t, flags) {
-	unsigned int result;
 	REF struct handle foreign_handle;
 	REF struct task *thread;
 	REF struct handle_manager *handman;
@@ -245,26 +242,22 @@ DEFINE_SYSCALL3(fd_t, pidfd_getfd,
 		THROW(E_INVALID_ARGUMENT_RESERVED_ARGUMENT,
 		      E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS);
 	}
-	thread = handle_get_task((unsigned int)pidfd);
-	{
-		FINALLY_DECREF_UNLIKELY(thread);
-		handman = task_gethandlemanager(thread);
-	}
+	thread  = handles_lookuptask(pidfd);
+	handman = task_gethandman(thread);
+	decref_unlikely(thread);
 	{
 		FINALLY_DECREF_UNLIKELY(handman);
 		/* XXX: Support  for symbolic handles? It'd be kind-of
 		 *      neat to access, say, PWD of a process by doing
 		 *      `pidfd_getfd(pidfd_open(PID), AT_FDCWD)' as an
 		 *      alias for `open("/proc/[PID]/cwd")'... */
-		foreign_handle = handle_lookupin((unsigned int)foreign_fd, handman);
+		foreign_handle = handman_lookup(handman, foreign_fd);
 	}
 	RAII_FINALLY { decref_unlikely(foreign_handle); };
 	foreign_handle.h_mode &= ~IO_CLOFORK;
 	foreign_handle.h_mode |= IO_CLOEXEC;
 	/* Install the handle into our own table. */
-	result = handle_install(THIS_HANDLE_MANAGER,
-	                        foreign_handle);
-	return (fd_t)result;
+	return handles_install(foreign_handle);
 }
 #endif /* __ARCH_WANT_SYSCALL_PIDFD_GETFD */
 
@@ -282,7 +275,7 @@ pidfd_send_signal_impl(fd_t pidfd,
 		      E_INVALID_ARGUMENT_CONTEXT_PIDFD_PIDFD_SEND_SIGNAL_FLAGS,
 		      flags);
 	}
-	target = handle_get_taskpid((unsigned int)pidfd);
+	target = handles_lookuppidfd(pidfd);
 	FINALLY_DECREF_UNLIKELY(target);
 	/* Don't allow sending arbitrary signals to other processes. */
 	if ((info->si_code >= 0 || info->si_code == SI_TKILL) &&

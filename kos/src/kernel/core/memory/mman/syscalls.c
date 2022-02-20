@@ -194,7 +194,7 @@ sys_mmap_impl(USER UNCHECKED void *addr, size_t length, syscall_ulong_t prot,
 	} else {
 		/* Specific file. */
 		REF struct handle hand;
-		hand = handle_lookup(fd);
+		hand = handles_lookup(fd);
 #ifndef NDEBUG
 		file.hmi_file = NULL;
 #endif /* !NDEBUG */

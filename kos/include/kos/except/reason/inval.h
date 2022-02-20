@@ -116,7 +116,8 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_KREADDIRF_IOMODE,     /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `iomode' passed to `kreaddirf()' could not be masked by `IO_USERF_MASK'. */
 
 	/* System calls: close(2), dup3(2), pipe2(2), eventfd(2), ... */
-	E_INVALID_ARGUMENT_CONTEXT_DUP3_OFLAG = 0x0240,  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `dup3' */
+	E_INVALID_ARGUMENT_CONTEXT_DUP3_OFLAG = 0x0240,  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `dup3(2)' */
+	E_INVALID_ARGUMENT_CONTEXT_DUP3_SAMEFD,          /* E_INVALID_ARGUMENT_BAD_VALUE: [fd_t fd] `oldfd == newfd' in a call to `dup3(2)' */
 	E_INVALID_ARGUMENT_CONTEXT_PIPE2_FLAGS,          /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `pipe2()' cannot be masked by `O_CLOEXEC|O_CLOFORK|O_NONBLOCK|O_DIRECT' */
 	E_INVALID_ARGUMENT_CONTEXT_EVENTFD_FLAGS,        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `sys_eventfd2()' is not masked by `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
 	E_INVALID_ARGUMENT_CONTEXT_SIGNALFD_FLAGS,       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `sys_signalfd4()' is not masked by `SFD_NONBLOCK | SFD_CLOEXEC' */
@@ -397,7 +398,8 @@ enum {
                                                                                                                                  * E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given `mode & READDIR_MODEMASK' isn't recognized */
 #define E_INVALID_ARGUMENT_CONTEXT_KREADDIRF_IOMODE                 E_INVALID_ARGUMENT_CONTEXT_KREADDIRF_IOMODE                 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `iomode' passed to `kreaddirf()' could not be masked by `IO_USERF_MASK'. */
 /* System calls: close(2), dup3(2), pipe2(2), eventfd(2), ... */
-#define E_INVALID_ARGUMENT_CONTEXT_DUP3_OFLAG                       E_INVALID_ARGUMENT_CONTEXT_DUP3_OFLAG                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `dup3' */
+#define E_INVALID_ARGUMENT_CONTEXT_DUP3_OFLAG                       E_INVALID_ARGUMENT_CONTEXT_DUP3_OFLAG                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `dup3(2)' */
+#define E_INVALID_ARGUMENT_CONTEXT_DUP3_SAMEFD                      E_INVALID_ARGUMENT_CONTEXT_DUP3_SAMEFD                      /* E_INVALID_ARGUMENT_BAD_VALUE: [fd_t fd] `oldfd == newfd' in a call to `dup3(2)' */
 #define E_INVALID_ARGUMENT_CONTEXT_PIPE2_FLAGS                      E_INVALID_ARGUMENT_CONTEXT_PIPE2_FLAGS                      /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `pipe2()' cannot be masked by `O_CLOEXEC|O_CLOFORK|O_NONBLOCK|O_DIRECT' */
 #define E_INVALID_ARGUMENT_CONTEXT_EVENTFD_FLAGS                    E_INVALID_ARGUMENT_CONTEXT_EVENTFD_FLAGS                    /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `sys_eventfd2()' is not masked by `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
 #define E_INVALID_ARGUMENT_CONTEXT_SIGNALFD_FLAGS                   E_INVALID_ARGUMENT_CONTEXT_SIGNALFD_FLAGS                   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `sys_signalfd4()' is not masked by `SFD_NONBLOCK | SFD_CLOEXEC' */
@@ -649,13 +651,14 @@ enum {
                                                                           * E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given `mode & READDIR_MODEMASK' isn't recognized */
 #define E_INVALID_ARGUMENT_CONTEXT_KREADDIRF_IOMODE                 519  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `iomode' passed to `kreaddirf()' could not be masked by `IO_USERF_MASK'. */
 /* System calls: close(2), dup3(2), pipe2(2), eventfd(2), ... */
-#define E_INVALID_ARGUMENT_CONTEXT_DUP3_OFLAG                       576  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `dup3' */
-#define E_INVALID_ARGUMENT_CONTEXT_PIPE2_FLAGS                      577  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `pipe2()' cannot be masked by `O_CLOEXEC|O_CLOFORK|O_NONBLOCK|O_DIRECT' */
-#define E_INVALID_ARGUMENT_CONTEXT_EVENTFD_FLAGS                    578  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `sys_eventfd2()' is not masked by `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
-#define E_INVALID_ARGUMENT_CONTEXT_SIGNALFD_FLAGS                   579  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `sys_signalfd4()' is not masked by `SFD_NONBLOCK | SFD_CLOEXEC' */
-#define E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS                  580  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `userviofd(2)' isn't a set of `O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
-#define E_INVALID_ARGUMENT_CONTEXT_CLOSE_RANGE_BADRANGE             581  /* E_INVALID_ARGUMENT_BAD_VALUE: [fd_t first, fd_t last] close_range() called with `first > last' */
-#define E_INVALID_ARGUMENT_CONTEXT_CLOSE_RANGE_FLAGS                582  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `close_range(2)' isn't a set of `CLOSE_RANGE_UNSHARE | CLOSE_RANGE_CLOEXEC' */
+#define E_INVALID_ARGUMENT_CONTEXT_DUP3_OFLAG                       576  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `dup3(2)' */
+#define E_INVALID_ARGUMENT_CONTEXT_DUP3_SAMEFD                      577  /* E_INVALID_ARGUMENT_BAD_VALUE: [fd_t fd] `oldfd == newfd' in a call to `dup3(2)' */
+#define E_INVALID_ARGUMENT_CONTEXT_PIPE2_FLAGS                      578  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `pipe2()' cannot be masked by `O_CLOEXEC|O_CLOFORK|O_NONBLOCK|O_DIRECT' */
+#define E_INVALID_ARGUMENT_CONTEXT_EVENTFD_FLAGS                    579  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `sys_eventfd2()' is not masked by `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
+#define E_INVALID_ARGUMENT_CONTEXT_SIGNALFD_FLAGS                   580  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `sys_signalfd4()' is not masked by `SFD_NONBLOCK | SFD_CLOEXEC' */
+#define E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS                  581  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `userviofd(2)' isn't a set of `O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
+#define E_INVALID_ARGUMENT_CONTEXT_CLOSE_RANGE_BADRANGE             582  /* E_INVALID_ARGUMENT_BAD_VALUE: [fd_t first, fd_t last] close_range() called with `first > last' */
+#define E_INVALID_ARGUMENT_CONTEXT_CLOSE_RANGE_FLAGS                583  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `close_range(2)' isn't a set of `CLOSE_RANGE_UNSHARE | CLOSE_RANGE_CLOEXEC' */
 /* System calls: exec(2), wait(2). */
 #define E_INVALID_ARGUMENT_CONTEXT_EXECVEAT_FLAGS                   768  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `execveat' isn't a set of `0|AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
 #define E_INVALID_ARGUMENT_CONTEXT_WAITID_OPTIONS                   769  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `options' argument passed to `waitid()' isn't a set of `WNOHANG|WNOREAP|WEXITED|WSTOPPED|WCONTINUED'

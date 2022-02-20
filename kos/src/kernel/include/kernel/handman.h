@@ -26,7 +26,84 @@
 #include <kernel/handle.h>
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_HANDLE_H */
 
-#ifdef CONFIG_USE_NEW_HANDMAN
+#ifndef CONFIG_USE_NEW_HANDMAN
+/* Forward compatibility */
+#define handman              handle_manager
+#define hm_maxhand           hm_cntlimit
+#define hm_maxfd             hm_maxlimit
+#define _handman_reap        _handle_manager_reap
+#define handman_reap         handle_manager_reap
+#define handman_mustreap     handle_manager_mustreap
+#define handman_write        handle_manager_write
+#define handman_write_nx     handle_manager_write_nx
+#define handman_trywrite     handle_manager_trywrite
+#define handman_endwrite     handle_manager_endwrite
+#define _handman_endwrite    _handle_manager_endwrite
+#define handman_read         handle_manager_read
+#define handman_read_nx      handle_manager_read_nx
+#define handman_tryread      handle_manager_tryread
+#define _handman_endread     _handle_manager_endread
+#define handman_endread      handle_manager_endread
+#define _handman_end         _handle_manager_end
+#define handman_end          handle_manager_end
+#define handman_upgrade      handle_manager_upgrade
+#define handman_upgrade_nx   handle_manager_upgrade_nx
+#define handman_tryupgrade   handle_manager_tryupgrade
+#define handman_downgrade    handle_manager_downgrade
+#define handman_reading      handle_manager_reading
+#define handman_writing      handle_manager_writing
+#define handman_canread      handle_manager_canread
+#define handman_canwrite     handle_manager_canwrite
+#define handman_waitread     handle_manager_waitread
+#define handman_waitwrite    handle_manager_waitwrite
+#define handman_waitread_nx  handle_manager_waitread_nx
+#define handman_waitwrite_nx handle_manager_waitwrite_nx
+#define handman_destroy      handle_manager_destroy
+#define handman_fork         handle_manager_clone
+#define handman_cloexec      handle_manager_cloexec
+#define handman_kernel       handle_manager_kernel
+#define this_handman         this_handle_manager
+#define THIS_HANDMAN         THIS_HANDLE_MANAGER
+#define task_gethandman      task_gethandlemanager
+#define task_sethandman      task_sethandlemanager
+#define task_sethandman_inherit(x) \
+	({ struct handman *__tsix = (x), *__tsiy = task_sethandlemanager(x); decref_nokill(x); __tsiy; })
+
+#define handman_install(self, hnd)                  ((fd_t)handle_install(self, hnd))
+#define handman_install_into(self, fd, hnd)         (handle_installinto(self, (unsigned int)(fd), hnd), fd)
+#define handman_install_into_simple(self, fd, hnd)  (handle_installinto(self, (unsigned int)(fd), hnd), fd)
+#define __handman_trylookup2(self, fd)              handle_trylookup(self, (unsigned int)(fd))
+#define __handman_trylookup3(self, fd, hand)        (*(hand) = __handman_trylookup2(self, fd), (hand))
+#define handman_trylookup(...)                      (__HYBRID_PP_VA_OVERLOAD(__handman_trylookup, (__VA_ARGS__))(__VA_ARGS__))
+#define __handman_lookup2(self, fd)                 handle_lookupin((unsigned int)(fd), self)
+#define __handman_lookup3(self, fd, hand)           (*(hand) = __handman_lookup2(self, fd), hand)
+#define handman_lookup(...)                         (__HYBRID_PP_VA_OVERLOAD(__handman_lookup, (__VA_ARGS__))(__VA_ARGS__))
+#define handman_sethandflags(self, fd, mask, value) handle_chflags(self, (unsigned int)(fd), mask, value)
+#define handman_gethandflags(self, fd)              handle_chflags(self, (unsigned int)(fd), (iomode_t)~0, 0)
+#define handles_install_openfd(hnd, data)           ((fd_t)handle_installopenfd(data, hnd))
+#define handles_install_into(fd, hnd)               (handle_installinto_sym((unsigned int)(fd), hnd), fd)
+#define handles_install_into_simple(fd, hnd)        (handle_installinto_sym((unsigned int)(fd), hnd), fd)
+#define handles_lookupobj(fd, wanted_type)          handle_getas((unsigned int)(fd), wanted_type)
+#define __handles_lookup1(fd)                       handle_lookup((unsigned int)(fd))
+#define __handles_lookup2(fd, hand)                 (*(hand) = __handles_lookup1(fd), hand)
+#define handles_lookup(...)                         (__HYBRID_PP_VA_OVERLOAD(__handles_lookup, (__VA_ARGS__))(__VA_ARGS__))
+#define __handles_lookup_nosym1(fd)                 handle_lookup_nosym((unsigned int)(fd))
+#define __handles_lookup_nosym2(fd, hand)           (*(hand) = __handles_lookup_nosym1(fd), hand)
+#define handles_lookup_nosym(...)                   (__HYBRID_PP_VA_OVERLOAD(__handles_lookup_nosym, (__VA_ARGS__))(__VA_ARGS__))
+#define handles_lookupfnode(fd)                     handle_get_fnode((unsigned int)(fd))
+#define handles_lookupfsuper_relatex(fd)            handle_get_fsuper_relaxed((unsigned int)(fd))
+#define handles_lookuptask(fd)                      handle_get_task((unsigned int)(fd))
+#define handles_lookupmfile(fd)                     ((REF struct mfile *)handles_lookupobj(fd, HANDLE_TYPE_MFILE))
+#define handles_lookupfdirent(fd)                   ((REF struct fdirent *)handles_lookupobj(fd, HANDLE_TYPE_DIRENT))
+#define handles_lookuppath(fd)                      ((REF struct path *)handles_lookupobj(fd, HANDLE_TYPE_PATH))
+#define handles_lookuppidfd(fd)                     ((REF struct taskpid *)handles_lookupobj(fd, HANDLE_TYPE_PIDFD))
+#define handles_lookuppipe(fd)                      ((REF struct pipe *)handles_lookupobj(fd, HANDLE_TYPE_PIPE))
+#define handles_lookupmodule(fd)                    ((REF struct driver *)handles_lookupobj(fd, HANDLE_TYPE_MODULE))
+#define handles_lookupsocket(fd)                    ((REF struct socket *)handles_lookupobj(fd, HANDLE_TYPE_SOCKET))
+#define handles_lookupepoll(fd)                     ((REF struct epoll_controller *)handles_lookupobj(fd, HANDLE_TYPE_EPOLL))
+#define handles_lookupsignalfd(fd)                  ((REF struct signalfd *)handles_lookupobj(fd, HANDLE_TYPE_SIGNALFD))
+#define handles_install(hand)                       ((fd_t)handle_install(THIS_HANDLE_MANAGER, hand))
+#else /* !CONFIG_USE_NEW_HANDMAN */
 #include <kernel/types.h>
 #include <sched/sig.h>
 
@@ -785,7 +862,7 @@ handman_install(struct handman *__restrict self,
 /************************************************************************/
 /* 2-STEP HANDLE INSTALLATION API                                       */
 /************************************************************************/
-struct handman_install_data {
+struct handle_install_data {
 	struct handman   *hid_man;   /* [1..1][const] Handle manager. */
 	struct handrange *hid_range; /* [1..1][const] Target range. */
 	union handslot   *hid_slot;  /* [1..1][const] Target slot. */
@@ -820,7 +897,7 @@ struct handman_install_data {
 #ifdef __INTELLISENSE__
 FUNDEF WUNUSED NONNULL((1, 2)) fd_t FCALL
 handman_install_begin(struct handman *__restrict self,
-                      struct handman_install_data *__restrict data,
+                      struct handle_install_data *__restrict data,
                       fd_t minfd DFL(0))
 		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
@@ -831,7 +908,7 @@ handman_install_begin(struct handman *__restrict self,
 	 _handman_install_begin(data, ##__VA_ARGS__))
 #endif /* !__INTELLISENSE__ */
 FUNDEF WUNUSED NONNULL((1)) fd_t FCALL
-_handman_install_begin(struct handman_install_data *__restrict data,
+_handman_install_begin(struct handle_install_data *__restrict data,
                        fd_t minfd DFL(0))
 		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
@@ -840,20 +917,26 @@ _handman_install_begin(struct handman_install_data *__restrict data,
 /* Commit installation of a handle (s.a. `_handslot_commit()') */
 #ifdef __INTELLISENSE__
 FUNDEF NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL handman_install_commit)(struct handman_install_data *__restrict self,
+NOTHROW(FCALL handman_install_commit)(struct handle_install_data *__restrict self,
                                       void *h_data, iomode_t h_mode, uintptr_half_t h_type);
 FUNDEF NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL handman_install_commit_inherit)(struct handman_install_data *__restrict self,
+NOTHROW(FCALL handman_install_commit_inherit)(struct handle_install_data *__restrict self,
                                               /*inherit(always)*/ REF void *h_data,
                                               iomode_t h_mode, uintptr_half_t h_type);
 #ifdef __cplusplus
 extern "C++" {
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL handman_install_commit)(struct handle_install_data *__restrict self,
+                                      struct handle const *__restrict hand);
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL handman_install_commit_inherit)(struct handle_install_data *__restrict self,
+                                              struct handle const *__restrict hand);
 #define __FOREACH_HANDLES_INSTALL_COMMIT(id, T)                                                 \
 	FUNDEF NOBLOCK NONNULL((1, 2)) void                                                         \
-	NOTHROW(FCALL handman_install_commit)(struct handman_install_data *__restrict self,         \
+	NOTHROW(FCALL handman_install_commit)(struct handle_install_data *__restrict self,         \
 	                                      T *h_data, iomode_t h_mode);                          \
 	FUNDEF NOBLOCK NONNULL((1, 2)) void                                                         \
-	NOTHROW(FCALL handman_install_commit_inherit)(struct handman_install_data *__restrict self, \
+	NOTHROW(FCALL handman_install_commit_inherit)(struct handle_install_data *__restrict self, \
 	                                              /*inherit(always)*/ REF T *h_data, iomode_t h_mode);
 HANDLE_FOREACH_TYPE(__FOREACH_HANDLES_INSTALL_COMMIT)
 #undef __FOREACH_HANDLES_INSTALL_COMMIT
@@ -866,20 +949,24 @@ HANDLE_FOREACH_TYPE(__FOREACH_HANDLES_INSTALL_COMMIT)
 #define __PRIVATE_handman_install_commit4(self, h_data, h_mode, h_type) \
 	((*handle_type_db.h_incref[h_type])(h_data),                        \
 	 __PRIVATE_handman_install_commit_inherit4(self, h_data, h_mode, h_type))
+#define __PRIVATE_handman_install_commit_inherit2(self, hand) \
+	__PRIVATE_handman_install_commit_inherit4(self, (hand)->h_data, (hand)->h_mode, (hand)->h_type)
 #define __PRIVATE_handman_install_commit_inherit3(self, h_data, h_mode) \
 	__PRIVATE_handman_install_commit_inherit4(self, h_data, h_mode, __handleidof(h_data))
+#define __PRIVATE_handman_install_commit2(self, hand) \
+	__PRIVATE_handman_install_commit4(self, (hand)->h_data, (hand)->h_mode, (hand)->h_type)
 #define __PRIVATE_handman_install_commit3(self, h_data, h_mode) \
 	__PRIVATE_handman_install_commit4(self, h_data, h_mode, __handleidof(h_data))
 #define handman_install_commit_inherit(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_handman_install_commit_inherit, (__VA_ARGS__))(__VA_ARGS__)
 #define handman_install_commit(...)         __HYBRID_PP_VA_OVERLOAD(__PRIVATE_handman_install_commit, (__VA_ARGS__))(__VA_ARGS__)
 #endif /* !__INTELLISENSE__ */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL _handman_install_commit_inherit)(struct handman_install_data *__restrict self,
+NOTHROW(FCALL _handman_install_commit_inherit)(struct handle_install_data *__restrict self,
                                                iomode_t h_mode, uintptr_half_t h_type);
 
 /* Abort installation of a handle (s.a. `_handslot_abort()') */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL handman_install_abort)(struct handman_install_data *__restrict self);
+NOTHROW(FCALL handman_install_abort)(struct handle_install_data *__restrict self);
 /************************************************************************/
 
 
@@ -904,6 +991,7 @@ handles_close(fd_t fd, /*out*/ REF struct handle *__restrict ohand)
 FUNDEF ATTR_RETNONNULL NONNULL((2)) REF struct handle *FCALL
 handles_lookup(fd_t fd, /*out*/ REF struct handle *__restrict hand)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
+#define handles_lookup_nosym(...) handman_lookup(THIS_HANDMAN, __VA_ARGS__)
 
 /* Same as `handles_lookup()', but require a specific handle type,
  * and return a reference to  the handle's `h_data' field,  rather
@@ -924,14 +1012,15 @@ handles_lookuptask(fd_t fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED);
 
-#define handles_lookupmfile(fd)   ((REF struct mfile *)handles_lookupobj(fd, HANDLE_TYPE_MFILE))
-#define handles_lookupfdirent(fd) ((REF struct fdirent *)handles_lookupobj(fd, HANDLE_TYPE_DIRENT))
-#define handles_lookuppath(fd)    ((REF struct path *)handles_lookupobj(fd, HANDLE_TYPE_PATH))
-#define handles_lookuppidfd(fd)   ((REF struct taskpid *)handles_lookupobj(fd, HANDLE_TYPE_PIDFD))
-#define handles_lookuppipe(fd)    ((REF struct pipe *)handles_lookupobj(fd, HANDLE_TYPE_PIPE))
-#define handles_lookupmodule(fd)  ((REF struct driver *)handles_lookupobj(fd, HANDLE_TYPE_MODULE))
-#define handles_lookupsocket(fd)  ((REF struct socket *)handles_lookupobj(fd, HANDLE_TYPE_SOCKET))
-#define handles_lookupepoll(fd)   ((REF struct epoll_controller *)handles_lookupobj(fd, HANDLE_TYPE_EPOLL))
+#define handles_lookupmfile(fd)    ((REF struct mfile *)handles_lookupobj(fd, HANDLE_TYPE_MFILE))
+#define handles_lookupfdirent(fd)  ((REF struct fdirent *)handles_lookupobj(fd, HANDLE_TYPE_DIRENT))
+#define handles_lookuppath(fd)     ((REF struct path *)handles_lookupobj(fd, HANDLE_TYPE_PATH))
+#define handles_lookuppidfd(fd)    ((REF struct taskpid *)handles_lookupobj(fd, HANDLE_TYPE_PIDFD))
+#define handles_lookuppipe(fd)     ((REF struct pipe *)handles_lookupobj(fd, HANDLE_TYPE_PIPE))
+#define handles_lookupmodule(fd)   ((REF struct driver *)handles_lookupobj(fd, HANDLE_TYPE_MODULE))
+#define handles_lookupsocket(fd)   ((REF struct socket *)handles_lookupobj(fd, HANDLE_TYPE_SOCKET))
+#define handles_lookupepoll(fd)    ((REF struct epoll_controller *)handles_lookupobj(fd, HANDLE_TYPE_EPOLL))
+#define handles_lookupsignalfd(fd) ((REF struct signalfd *)handles_lookupobj(fd, HANDLE_TYPE_SIGNALFD))
 
 /* Same as `handman_install_into()',  but also  accept
  * symbolic handles, and use `THIS_HANDMAN' otherwise. */
@@ -1019,30 +1108,58 @@ handles_install_openfd(struct handle const &__restrict hand,
 } /* extern "C++" */
 #endif /* __cplusplus */
 
+
+/* 2-step handle installation:
+ *
+ * >> fd_t resfd;
+ * >> REF struct kernel_object *kobj;
+ * >> struct handle_install_data install;
+ * >> resfd = handles_install_begin(&install);
+ * >> TRY {
+ * >>     kobj = CREATE_KERNEL_OBJECT();
+ * >> } EXCEPT {
+ * >>     handles_install_abort(&install);
+ * >>     RETHROW();
+ * >> }
+ * >> handles_install_commit_inherit(&install, kobj, IO_RDWR);
+ * >> return resfd;
+ *
+ * Because `handles_install_commit_inherit()' is NOBLOCK +  NOTHROW,
+ * this mechanism can be used  to safely construct globally  visible
+ * kernel objects,  without risking  scope  leakage in  those  cases
+ * where it's impossible to allocate  another handle (since in  this
+ * model, such an error happens _before_ the globally visible object
+ * actually gets created) */
 #ifdef __INTELLISENSE__
 FUNDEF WUNUSED NONNULL((1)) fd_t FCALL
-handles_install_begin(struct handman_install_data *__restrict data,
+handles_install_begin(struct handle_install_data *__restrict data,
                       fd_t minfd DFL(0))
 		THROWS(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK);
 FUNDEF NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL handles_install_commit)(struct handman_install_data *__restrict self,
+NOTHROW(FCALL handles_install_commit)(struct handle_install_data *__restrict self,
                                       void *h_data, iomode_t h_mode, uintptr_half_t h_type);
 FUNDEF NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL handles_install_commit_inherit)(struct handman_install_data *__restrict self,
+NOTHROW(FCALL handles_install_commit_inherit)(struct handle_install_data *__restrict self,
                                               /*inherit(always)*/ REF void *h_data,
                                               iomode_t h_mode, uintptr_half_t h_type);
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL handles_install_abort)(struct handman_install_data *__restrict self);
+NOTHROW(FCALL handles_install_abort)(struct handle_install_data *__restrict self);
 #ifdef __cplusplus
 extern "C++" {
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL handles_install_commit)(struct handle_install_data *__restrict self,
+                                      struct handle const *__restrict hand);
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL handles_install_commit_inherit)(struct handle_install_data *__restrict self,
+                                              struct handle const *__restrict hand);
 #define __FOREACH_HANDLES_INSTALL_COMMIT(id, T)                                                 \
 	FUNDEF NOBLOCK NONNULL((1, 2)) void                                                         \
-	NOTHROW(FCALL handles_install_commit)(struct handman_install_data *__restrict self,         \
+	NOTHROW(FCALL handles_install_commit)(struct handle_install_data *__restrict self,         \
 	                                      T *h_data, iomode_t h_mode);                          \
 	FUNDEF NOBLOCK NONNULL((1, 2)) void                                                         \
-	NOTHROW(FCALL handles_install_commit_inherit)(struct handman_install_data *__restrict self, \
+	NOTHROW(FCALL handles_install_commit_inherit)(struct handle_install_data *__restrict self, \
 	                                              /*inherit(always)*/ REF T *h_data, iomode_t h_mode);
 HANDLE_FOREACH_TYPE(__FOREACH_HANDLES_INSTALL_COMMIT)
 #undef __FOREACH_HANDLES_INSTALL_COMMIT

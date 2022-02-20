@@ -1888,8 +1888,7 @@ path_open_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 
 			/* Allocate the resulting file handle _before_ creating the file,
 			 * so  no file is created in the  event that the handle cannot be
-			 * allocated. (FIXME: this still leaves the case where we're  not
-			 * able to register the FD...) */
+			 * allocated. */
 			rhand = (REF struct filehandle *)kmalloc(sizeof(struct filehandle), GFP_NORMAL);
 			TRY {
 				unsigned int status;

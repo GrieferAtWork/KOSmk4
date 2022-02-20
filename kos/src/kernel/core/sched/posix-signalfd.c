@@ -26,7 +26,7 @@
 #include <kernel/aio.h>
 #include <kernel/except.h>
 #include <kernel/handle-proto.h>
-#include <kernel/handle.h>
+#include <kernel/handman.h>
 #include <kernel/iovec.h>
 #include <kernel/malloc.h>
 #include <kernel/syscall.h>
@@ -197,25 +197,13 @@ handle_signalfd_polltest(struct signalfd *__restrict self,
 #ifdef __ARCH_WANT_SYSCALL_SIGNALFD4
 
 PRIVATE ATTR_NOINLINE void KCALL
-update_signalfd(unsigned int fd,
+update_signalfd(fd_t fd,
                 USER CHECKED sigset_t const *sigmask,
                 size_t sigsetsize) {
-	struct signalfd *sfd;
 	sigset_t newmask;
-	struct handle hnd = handle_lookup(fd);
-	RAII_FINALLY { decref_unlikely(hnd); };
-
-	/* Make sure that it's a SIGNALFD handle. */
-	if unlikely(hnd.h_type != HANDLE_TYPE_SIGNALFD) {
-		THROW(E_INVALID_HANDLE_FILETYPE,
-		      /* fd:                 */ fd,
-		      /* needed_handle_type: */ HANDLE_TYPE_SIGNALFD,
-		      /* actual_handle_type: */ hnd.h_type,
-		      /* needed_handle_kind: */ handle_typekind(&hnd),
-		      /* actual_handle_kind: */ HANDLE_TYPEKIND_GENERIC);
-	}
-	sfd = (struct signalfd *)hnd.h_data;
-	COMPILER_BARRIER();
+	REF struct signalfd *sfd;
+	sfd = handles_lookupsignalfd(fd);
+	FINALLY_DECREF_UNLIKELY(sfd);
 	bzero(mempcpy(&newmask, sigmask, sigsetsize),
 	      sizeof(sigset_t) - sigsetsize);
 	COMPILER_BARRIER();
@@ -250,8 +238,7 @@ update_signalfd(unsigned int fd,
 DEFINE_SYSCALL4(fd_t, signalfd4, fd_t, fd,
                 USER UNCHECKED sigset_t const *, sigmask,
                 size_t, sigsetsize, syscall_ulong_t, flags) {
-	unsigned int result;
-	REF struct signalfd *sfd;
+	fd_t result;
 	/* NOTE: Yes, validate `flags' even in the `fd == -1' case
 	 *       when they're not even used. (linux does the same) */
 	VALIDATE_FLAGSET(flags,
@@ -262,9 +249,31 @@ DEFINE_SYSCALL4(fd_t, signalfd4, fd_t, fd,
 		sigsetsize = sizeof(sigset_t);
 	if (fd != -1) {
 		/* Update an existing signalfd descriptor. */
-		result = (unsigned int)fd;
+		result = fd;
 		update_signalfd(result, sigmask, sigsetsize);
 	} else {
+#ifdef CONFIG_USE_NEW_HANDMAN
+		iomode_t mode;
+		REF struct signalfd *sfd;
+		struct handle_install_data install;
+		result = handles_install_begin(&install);
+		TRY {
+			sfd = signalfd_create(sigmask, sigsetsize);
+		} EXCEPT {
+			handles_install_abort(&install);
+			RETHROW();
+		}
+
+		mode = IO_RDONLY; /* Write-access would just throw `E_FSERROR_UNSUPPORTED_OPERATION' regardlessly... */
+		if (flags & SFD_NONBLOCK)
+			mode |= IO_NONBLOCK;
+		if (flags & SFD_CLOEXEC)
+			mode |= IO_CLOEXEC;
+		if (flags & SFD_CLOFORK)
+			mode |= IO_CLOFORK;
+		handles_install_commit_inherit(&install, sfd, mode);
+#else /* CONFIG_USE_NEW_HANDMAN */
+		REF struct signalfd *sfd;
 		sfd = signalfd_create(sigmask, sigsetsize);
 		TRY {
 			struct handle hnd;
@@ -277,14 +286,15 @@ DEFINE_SYSCALL4(fd_t, signalfd4, fd_t, fd,
 				hnd.h_mode |= IO_CLOEXEC;
 			if (flags & SFD_CLOFORK)
 				hnd.h_mode |= IO_CLOFORK;
-			result = handle_install(THIS_HANDLE_MANAGER, hnd);
+			result = handles_install(hnd);
 		} EXCEPT {
 			destroy(sfd);
 			RETHROW();
 		}
 		decref_unlikely(sfd);
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 	}
-	return (fd_t)result;
+	return result;
 }
 #endif /* __ARCH_WANT_SYSCALL_SIGNALFD4 */
 

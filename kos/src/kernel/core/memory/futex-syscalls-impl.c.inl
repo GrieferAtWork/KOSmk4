@@ -348,7 +348,12 @@ DEFINE_SYSCALL5(errno_t, lfutexexpr,
 	/* Connect to the named futex. */
 	if (flags & (LFUTEX_FDBIT | LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL)) {
 		if (flags & LFUTEX_FDBIT) {
+#ifdef CONFIG_USE_NEW_HANDMAN
+			fd_t resfd;
+			struct handle_install_data install;
+#else /* CONFIG_USE_NEW_HANDMAN */
 			struct handle hand;
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 			REF struct mfutexfd *mfd;
 			if unlikely(timeout != NULL) {
 				THROW(E_INVALID_ARGUMENT_RESERVED_ARGUMENT,
@@ -358,18 +363,33 @@ DEFINE_SYSCALL5(errno_t, lfutexexpr,
 			                 E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP);
 
 			/* Create a new futex-fd object. */
+#ifdef CONFIG_USE_NEW_HANDMAN
+			resfd = handles_install_begin(&install);
+			TRY {
+#ifdef DEFINE_COMPAT_FUTEX
+				mfd = compat_mfutexfd_new(f, base, expr);
+#else  /* DEFINE_COMPAT_FUTEX */
+				mfd = mfutexfd_new(f, base, expr);
+#endif /* !DEFINE_COMPAT_FUTEX */
+			} EXCEPT {
+				handles_install_abort(&install);
+				RETHROW();
+			}
+			handles_install_commit_inherit(&install, mfd, IO_RDWR);
+			return resfd;
+#else /* CONFIG_USE_NEW_HANDMAN */
 #ifdef DEFINE_COMPAT_FUTEX
 			mfd = compat_mfutexfd_new(f, base, expr);
 #else /* DEFINE_COMPAT_FUTEX */
 			mfd = mfutexfd_new(f, base, expr);
 #endif /* !DEFINE_COMPAT_FUTEX */
 			FINALLY_DECREF_UNLIKELY(mfd);
-
 			/* Install a new handle for the futex fd. */
 			hand.h_type = HANDLE_TYPE_FUTEXFD;
 			hand.h_mode = IO_RDWR;
 			hand.h_data = mfd;
-			return handle_install(THIS_HANDLE_MANAGER, hand);
+			return handles_install(hand);
+#endif /* !CONFIG_USE_NEW_HANDMAN */
 		}
 		mfutex_connect_for_poll(f);
 	} else {

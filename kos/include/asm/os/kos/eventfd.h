@@ -31,7 +31,7 @@
 #define __EFD_NONBLOCK  0x0000800 /* Set the IO_NONBLOCK flag */
 #define __EFD_CLOEXEC   0x0080000 /* Set the IO_CLOEXEC flag */
 #ifdef __KOS__
-#define __EFD_CLOFORK   0x0100000 /* Set the IO_CLOFORK flag */
+#define __EFD_CLOFORK   0x1000000 /* Set the IO_CLOFORK flag */
 #endif /* __KOS__ */
 
 #endif /* !_ASM_OS_KOS_EVENTFD_H */

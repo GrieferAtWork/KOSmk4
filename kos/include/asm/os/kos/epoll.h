@@ -69,9 +69,9 @@
 
 
 /* Flags accepted by `epoll_create1(2)'. */
-#define __EPOLL_CLOEXEC 0x080000 /* Set the IO_CLOEXEC flag */
+#define __EPOLL_CLOEXEC 0x0080000 /* Set the IO_CLOEXEC flag */
 #ifdef __KOS__
-#define __EPOLL_CLOFORK 0x100000 /* Set the IO_CLOFORK flag */
+#define __EPOLL_CLOFORK 0x1000000 /* Set the IO_CLOFORK flag */
 #endif /* __KOS__ */
 
 #endif /* !_ASM_OS_KOS_EPOLL_H */
