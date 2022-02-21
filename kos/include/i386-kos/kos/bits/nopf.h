@@ -45,6 +45,7 @@ __DECL_BEGIN
 #define __X86_NOPF_CALLASM(name, argno) "call " #name
 #define __X86_NOPF_CALLARG(name)        /* nothing */
 #elif defined(__CRT_KOS) && defined(__BUILDING_LIBC)
+#define __X86_NOPF_AVAILABLE
 #define __X86_NOPF_CALLASM(name, argno) "call libc_" #name
 #define __X86_NOPF_CALLARG(name)        /* nothing */
 #elif defined(__pic__)
@@ -69,7 +70,7 @@ __DECL_BEGIN
 	"call 991f\n\t" /* XXX: CFI may break for 1 instr... */ \
 	"991: popl %%ebx\n\t"                                   \
 	"addl $(_GLOBAL_OFFSET_TABLE_ + (. - 991b)), %%ebx\n\t" \
-	"call %A" #argno
+	"call " #name "@PLT"
 #define __X86_NOPF_CALLARG(name) /* nothing */
 #define __X86_NOPF_CALLCLB  : "ebx"
 #define __X86_NOPF_CALLCLB_ : "ebx",

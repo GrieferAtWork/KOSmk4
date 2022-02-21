@@ -35,6 +35,7 @@
 #include <asm/signed-shift.h>
 #include <kos/bits/thread.h>
 #include <kos/except.h>
+#include <kos/nopf.h>
 #include <kos/types.h>
 #include <sys/param.h>
 
@@ -67,24 +68,21 @@
 #include <sched/task.h>  /* get_stack_avail() */
 #endif /* __KERNEL__ */
 
-
-/* In kernel-space, memory accesses can also cause E_WOULDBLOCK to be thrown
- * when  preemption is disabled.  - Handle that error  like we do SEGFAULTS. */
-#ifdef __KERNEL__
-#define WAS_SEGFAULT_THROWN() (was_thrown(E_SEGFAULT) || was_thrown(E_WOULDBLOCK))
-#else /* __KERNEL__ */
-#define WAS_SEGFAULT_THROWN() was_thrown(E_SEGFAULT)
-#endif /* !__KERNEL__ */
-
 DECL_BEGIN
 
 PRIVATE WUNUSED NONNULL((2)) bool
 NOTHROW(CC guarded_readb)(uint8_t *ptr, uintptr_t *__restrict result) {
 	uint8_t value;
-	NESTED_TRY {
-		value = *ptr;
-	} EXCEPT {
-		return false;
+	/* Attempt the read using *_nopf before doing a NESTED_TRY */
+#ifdef __readb_nopf_defined
+	if unlikely(!readb_nopf(ptr, &value))
+#endif /* __readb_nopf_defined */
+	{
+		NESTED_TRY {
+			value = *ptr;
+		} EXCEPT {
+			return false;
+		}
 	}
 	*result = (uintptr_t)value;
 	return true;
@@ -93,10 +91,16 @@ NOTHROW(CC guarded_readb)(uint8_t *ptr, uintptr_t *__restrict result) {
 PRIVATE WUNUSED NONNULL((2)) bool
 NOTHROW(CC guarded_readw)(uint16_t *ptr, uintptr_t *__restrict result) {
 	uint16_t value;
-	NESTED_TRY {
-		value = UNALIGNED_GET16(ptr);
-	} EXCEPT {
-		return false;
+	/* Attempt the read using *_nopf before doing a NESTED_TRY */
+#ifdef __readw_nopf_defined
+	if unlikely(!readw_nopf(ptr, &value))
+#endif /* __readw_nopf_defined */
+	{
+		NESTED_TRY {
+			value = UNALIGNED_GET16(ptr);
+		} EXCEPT {
+			return false;
+		}
 	}
 	*result = (uintptr_t)value;
 	return true;
@@ -105,38 +109,56 @@ NOTHROW(CC guarded_readw)(uint16_t *ptr, uintptr_t *__restrict result) {
 PRIVATE WUNUSED NONNULL((2)) bool
 NOTHROW(CC guarded_readl)(uint32_t *ptr, uintptr_t *__restrict result) {
 	uint32_t value;
-	NESTED_TRY {
-		value = UNALIGNED_GET32(ptr);
-	} EXCEPT {
-		return false;
+	/* Attempt the read using *_nopf before doing a NESTED_TRY */
+#ifdef __readl_nopf_defined
+	if unlikely(!readl_nopf(ptr, &value))
+#endif /* __readl_nopf_defined */
+	{
+		NESTED_TRY {
+			value = UNALIGNED_GET32(ptr);
+		} EXCEPT {
+			return false;
+		}
 	}
 	*result = (uintptr_t)value;
 	return true;
 }
 
-#if __SIZEOF_POINTER__ > 4
+#if __SIZEOF_POINTER__ >= 8
 PRIVATE WUNUSED NONNULL((2)) bool
 NOTHROW(CC guarded_readq)(uint64_t *ptr, uintptr_t *__restrict result) {
 	uint64_t value;
-	NESTED_TRY {
-		value = UNALIGNED_GET64(ptr);
-	} EXCEPT {
-		return false;
+	/* Attempt the read using *_nopf before doing a NESTED_TRY */
+#ifdef __readq_nopf_defined
+	if unlikely(!readq_nopf(ptr, &value))
+#endif /* __readq_nopf_defined */
+	{
+		NESTED_TRY {
+			value = UNALIGNED_GET64(ptr);
+		} EXCEPT {
+			return false;
+		}
 	}
 	*result = (uintptr_t)value;
 	return true;
 }
 #define guarded_readptr guarded_readq
-#else /* __SIZEOF_POINTER__ > 4 */
+#else /* __SIZEOF_POINTER__ >= 8 */
 #define guarded_readptr guarded_readl
-#endif /* __SIZEOF_POINTER__ <= 4 */
+#endif /* __SIZEOF_POINTER__ < 8 */
 
 INTERN WUNUSED bool
 NOTHROW(CC guarded_memcpy)(void *dst, void const *src, size_t num_bytes) {
-	NESTED_TRY {
-		memcpy(dst, src, num_bytes);
-	} EXCEPT {
-		return false;
+	/* Attempt the read using *_nopf before doing a NESTED_TRY */
+#ifdef __memcpy_nopf_defined
+	if unlikely(memcpy_nopf(dst, src, num_bytes) != 0)
+#endif /* __memcpy_nopf_defined */
+	{
+		NESTED_TRY {
+			memcpy(dst, src, num_bytes);
+		} EXCEPT {
+			return false;
+		}
 	}
 	return true;
 }
