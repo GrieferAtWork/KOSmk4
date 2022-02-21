@@ -79,10 +79,7 @@ shebang_exec(struct execargs *__restrict args) {
 	 *            Optional                       Mandatory            Optional
 	 *            whitespace                     whitespace           whitespace */
 	ext_header = NULL;
-	RAII_FINALLY {
-		if unlikely(ext_header != NULL)
-			kfree(ext_header);
-	};
+	RAII_FINALLY { kfree_unlikely(ext_header); };
 
 	/* Check for simple case: the linefeed is already apart of the pre-loaded `exec_header' */
 	execfile     = (char *)args->ea_header + 2;

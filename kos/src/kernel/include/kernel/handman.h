@@ -91,7 +91,7 @@
 #define __handles_lookup_nosym2(fd, hand)           (*(hand) = __handles_lookup_nosym1(fd), hand)
 #define handles_lookup_nosym(...)                   (__HYBRID_PP_VA_OVERLOAD(__handles_lookup_nosym, (__VA_ARGS__))(__VA_ARGS__))
 #define handles_lookupfnode(fd)                     handle_get_fnode((unsigned int)(fd))
-#define handles_lookupfsuper_relatex(fd)            handle_get_fsuper_relaxed((unsigned int)(fd))
+#define handles_lookupfsuper_relaxed(fd)            handle_get_fsuper_relaxed((unsigned int)(fd))
 #define handles_lookuptask(fd)                      handle_get_task((unsigned int)(fd))
 #define handles_lookupmfile(fd)                     ((REF struct mfile *)handles_lookupobj(fd, HANDLE_TYPE_MFILE))
 #define handles_lookupfdirent(fd)                   ((REF struct fdirent *)handles_lookupobj(fd, HANDLE_TYPE_DIRENT))
@@ -332,6 +332,7 @@ struct handrange {
 #define _handrange_realloc_nx(ptr, num_handles, gfp) ((struct handrange *)krealloc_nx(ptr, _handrange_sizeof(num_handles), gfp))
 #define _handrange_realloc(ptr, num_handles, gfp)    ((struct handrange *)krealloc(ptr, _handrange_sizeof(num_handles), gfp))
 #define _handrange_free(ptr)                         kfree(ptr)
+#define _handrange_free_unlikely(ptr)                kfree_unlikely(ptr)
 
 
 /* Check if reallocation of `self' is currently allowed.
@@ -686,7 +687,7 @@ handman_trylookup(struct handman *__restrict self, fd_t fd,
 
 #ifdef __cplusplus
 extern "C++" {
-FORCELOCAL WUNUSED NONNULL((1)) REF struct handle FCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct handle FCALL
 handman_lookup(struct handman *__restrict self, fd_t fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE) {
 	REF struct handle hand, *hptr;
@@ -695,7 +696,7 @@ handman_lookup(struct handman *__restrict self, fd_t fd)
 	(void)hptr;
 	return hand;
 }
-FORCELOCAL WUNUSED NONNULL((1)) REF struct handle FCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct handle FCALL
 handman_trylookup(struct handman *__restrict self, fd_t fd)
 		THROWS(E_WOULDBLOCK) {
 	REF struct handle hand, *hptr;
@@ -931,11 +932,11 @@ NOTHROW(FCALL handman_install_commit)(struct handle_install_data *__restrict sel
 FUNDEF NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL handman_install_commit_inherit)(struct handle_install_data *__restrict self,
                                               struct handle const *__restrict hand);
-#define __FOREACH_HANDLES_INSTALL_COMMIT(id, T)                                                 \
-	FUNDEF NOBLOCK NONNULL((1, 2)) void                                                         \
+#define __FOREACH_HANDLES_INSTALL_COMMIT(id, T)                                                \
+	FUNDEF NOBLOCK NONNULL((1, 2)) void                                                        \
 	NOTHROW(FCALL handman_install_commit)(struct handle_install_data *__restrict self,         \
-	                                      T *h_data, iomode_t h_mode);                          \
-	FUNDEF NOBLOCK NONNULL((1, 2)) void                                                         \
+	                                      T *h_data, iomode_t h_mode);                         \
+	FUNDEF NOBLOCK NONNULL((1, 2)) void                                                        \
 	NOTHROW(FCALL handman_install_commit_inherit)(struct handle_install_data *__restrict self, \
 	                                              /*inherit(always)*/ REF T *h_data, iomode_t h_mode);
 HANDLE_FOREACH_TYPE(__FOREACH_HANDLES_INSTALL_COMMIT)
@@ -1005,7 +1006,7 @@ FUNDEF ATTR_RETNONNULL WUNUSED REF struct fnode *FCALL
 handles_lookupfnode(fd_t fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE);
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct fsuper *FCALL
-handles_lookupfsuper_relatex(fd_t fd)
+handles_lookupfsuper_relaxed(fd_t fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE);
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct task *FCALL
 handles_lookuptask(fd_t fd)
@@ -1154,11 +1155,11 @@ NOTHROW(FCALL handles_install_commit)(struct handle_install_data *__restrict sel
 FUNDEF NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL handles_install_commit_inherit)(struct handle_install_data *__restrict self,
                                               struct handle const *__restrict hand);
-#define __FOREACH_HANDLES_INSTALL_COMMIT(id, T)                                                 \
-	FUNDEF NOBLOCK NONNULL((1, 2)) void                                                         \
+#define __FOREACH_HANDLES_INSTALL_COMMIT(id, T)                                                \
+	FUNDEF NOBLOCK NONNULL((1, 2)) void                                                        \
 	NOTHROW(FCALL handles_install_commit)(struct handle_install_data *__restrict self,         \
-	                                      T *h_data, iomode_t h_mode);                          \
-	FUNDEF NOBLOCK NONNULL((1, 2)) void                                                         \
+	                                      T *h_data, iomode_t h_mode);                         \
+	FUNDEF NOBLOCK NONNULL((1, 2)) void                                                        \
 	NOTHROW(FCALL handles_install_commit_inherit)(struct handle_install_data *__restrict self, \
 	                                              /*inherit(always)*/ REF T *h_data, iomode_t h_mode);
 HANDLE_FOREACH_TYPE(__FOREACH_HANDLES_INSTALL_COMMIT)
@@ -1180,7 +1181,7 @@ HANDLE_FOREACH_TYPE(__FOREACH_HANDLES_INSTALL_COMMIT)
 /* Helper wrappers */
 #ifdef __cplusplus
 extern "C++" {
-FORCELOCAL WUNUSED REF struct handle FCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED REF struct handle FCALL
 handles_close(fd_t fd) THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE) {
 	REF struct handle hand, *hptr;
 	hptr = handles_close(fd, &hand);
@@ -1188,7 +1189,7 @@ handles_close(fd_t fd) THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE) {
 	(void)hptr;
 	return hand;
 }
-FORCELOCAL WUNUSED REF struct handle FCALL
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED REF struct handle FCALL
 handles_lookup(fd_t fd) THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE) {
 	REF struct handle hand, *hptr;
 	hptr = handles_lookup(fd, &hand);

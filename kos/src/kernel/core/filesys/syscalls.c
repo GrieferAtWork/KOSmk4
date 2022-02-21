@@ -583,7 +583,7 @@ sys_linkat_impl(fd_t olddirfd, USER UNCHECKED char const *oldpath,
 		mkinfo.mkf_hash  = FLOOKUP_INFO_HASH_UNSET;
 		mkinfo.mkf_fmode = 0;
 		if ((mkinfo.mkf_flags & AT_EMPTY_PATH) && !*oldpath) {
-			mkinfo.mkf_hrdlnk.hl_node = handle_get_fnode((unsigned int)olddirfd);
+			mkinfo.mkf_hrdlnk.hl_node = handles_lookupfnode(olddirfd);
 		} else {
 			mkinfo.mkf_flags |= AT_SYMLINK_NOFOLLOW;
 			if (mkinfo.mkf_flags & AT_SYMLINK_FOLLOW)
@@ -1098,10 +1098,21 @@ sys_fchdir_impl(/*inherit(always)*/ REF struct path *__restrict newpath) {
 		decref_unlikely(newpath);
 		RETHROW();
 	}
-	/* TODO: Must update DOS drive CWDs when the drive of `newpath' differs from  `oldpath'
-	 *       In this case, `oldpath' must be saved as the new CWD for its associated drive. */
 	oldpath = myfs->fs_cwd; /* Inherit reference */
 	myfs->fs_cwd = newpath; /* Inherit reference */
+
+	/* Must update DOS drive CWDs when the drive of `newpath' differs from `oldpath'.
+	 * In this case, `oldpath' must be saved as the new CWD for its associated drive.
+	 *
+	 * Behavior:
+	 * >> chdir("C:\\foo\\bar");
+	 * >> chdir("D:\\biz\\buz");
+	 * >> chdir("C:");
+	 * >> printf("%s\n", getcwd(NULL, 0));  // "C:\\foo\\bar"
+	 *
+	 * NOTE: This special handling isn't done by `dup2()'-style fchdir() */
+	/* TODO */
+
 	fs_pathlock_endwrite(myfs);
 	decref(oldpath);
 	return -EOK;
@@ -1134,7 +1145,7 @@ DEFINE_SYSCALL3(errno_t, fchdirat, fd_t, dirfd,
 #ifdef __ARCH_WANT_SYSCALL_FCHDIR
 DEFINE_SYSCALL1(errno_t, fchdir, fd_t, fd) {
 	REF struct path *new_cwd;
-	new_cwd = handle_get_path((unsigned int)fd);
+	new_cwd = handles_lookuppath(fd);
 	return sys_fchdir_impl(new_cwd);
 }
 #endif /* __ARCH_WANT_SYSCALL_FCHDIR */
@@ -1229,7 +1240,7 @@ DEFINE_SYSCALL2(errno_t, fchmod, fd_t, fd, mode_t, mode) {
 	REF struct fnode *node;
 	if (has_personality(KP_CHMOD_CHECK_MODE))
 		VALIDATE_FLAGSET(mode, 07777, E_INVALID_ARGUMENT_CONTEXT_CHMOD_MODE);
-	node = handle_get_fnode((unsigned int)fd);
+	node = handles_lookupfnode(fd);
 	FINALLY_DECREF_UNLIKELY(node);
 	fnode_chmod(node, 0, mode & 07777);
 	return -EOK;
@@ -1276,7 +1287,7 @@ sys_fchownat_impl(fd_t dirfd, USER UNCHECKED char const *filename,
 PRIVATE errno_t KCALL
 sys_fchown_impl(fd_t fd, uid_t owner, gid_t group) {
 	REF struct fnode *node;
-	node = handle_get_fnode((unsigned int)fd);
+	node = handles_lookupfnode(fd);
 	FINALLY_DECREF_UNLIKELY(node);
 	fnode_chown(node, owner, group);
 	return -EOK;
@@ -1416,7 +1427,7 @@ DEFINE_SYSCALL0(errno_t, sync) {
 #ifdef __ARCH_WANT_SYSCALL_SYNCFS
 DEFINE_SYSCALL1(errno_t, syncfs, fd_t, fd) {
 	REF struct fsuper *super;
-	super = handle_get_fsuper_relaxed((unsigned int)fd);
+	super = handles_lookupfsuper_relaxed(fd);
 	FINALLY_DECREF_UNLIKELY(super);
 	fsuper_sync(super);
 	return -EOK;
@@ -1566,7 +1577,7 @@ DEFINE_SYSCALL4(ssize_t, frealpath4,
 		default:
 bad_handle_type:
 			THROW(E_INVALID_HANDLE_FILETYPE,
-			      /* fd:                 */ (unsigned int)fd,
+			      /* fd:                 */ (syscall_slong_t)fd,
 			      /* needed_handle_type: */ HANDLE_TYPE_PATH,
 			      /* actual_handle_type: */ hand.h_type,
 			      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
@@ -2491,8 +2502,8 @@ kernel_execveat(fd_t dirfd,
 	}
 	TRY {
 		/* In order to allow for execution, the file itself must support mmaping.
-		 * It's  not OK if the file can be mmap'd indirectly, or if mmap has been
-		 * disabled for the file. */
+		 * It's not OK if the file can be mmap'd indirectly (via an operator), or
+		 * if mmap has been disabled for the file. */
 		if unlikely(!mfile_hasrawio(args.ea_xfile))
 			THROW(E_NOT_EXECUTABLE_NOT_REGULAR);
 
@@ -2530,11 +2541,10 @@ kernel_execveat(fd_t dirfd,
 	{
 		struct kernel_exec_rpc_data *data;
 		struct task *proc;
+		bool rpc_ok;
 send_rpc_to_main_thread:
-		while ((proc = task_getproc()) == NULL) {
-			task_yield();
-			task_serve();
-		}
+		while ((proc = task_getproc()) == NULL)
+			task_waitfor();
 		TRY {
 			data = (struct kernel_exec_rpc_data *)kmalloc(sizeof(struct kernel_exec_rpc_data), GFP_LOCKED);
 		} EXCEPT {
@@ -2546,8 +2556,15 @@ send_rpc_to_main_thread:
 		data->er_refcnt = 2;
 		assert(!task_wasconnected());
 		task_connect(&data->er_error);
-		if unlikely(!task_rpc_exec(proc, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER | RPC_PRIORITY_F_HIGH,
-		                           &kernel_exec_rpc, data)) {
+		/* XXX: Instead of using a cookie object, inline the RPC and use `_RPC_CONTEXT_DONTFREE' */
+		TRY {
+			rpc_ok = task_rpc_exec(proc, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER | RPC_PRIORITY_F_HIGH,
+			                       &kernel_exec_rpc, data);
+		} EXCEPT {
+			kernel_exec_rpc_data_destroy(data);
+			RETHROW();
+		}
+		if unlikely(!rpc_ok) {
 			/* The main thread was already terminated. */
 			uint16_t status = FORTASK(caller, this_taskpid)->tp_status;
 			task_disconnectall();
@@ -2558,22 +2575,15 @@ send_rpc_to_main_thread:
 
 		/* Wait for the main thread to send back an error, or terminate  our
 		 * thread by use of an E_EXIT_THREAD-RPC (the later being the result
-		 * of a successful exec()) */
-
-		/* FIXME: What's supposed to happen if  our thread receives an  interrupt
-		 *        here? Currently, it'll cause us  to return back to  user-space,
-		 *        but when that happens the exec may still succeed asynchronously
-		 *        even though the system call returned with -EINTR...
+		 * of a successful exec())
 		 *
-		 * The best way to handle this would probably be by somehow sending another
-		 * RPC to the main thread that could then attempt to cancel the exec before
-		 * it can finish. */
+		 * NOTE: We block all signals except for `SIGKILL' and `SIGSTOP' */
 #ifdef NDEBUG
-		task_waitfor();
+		task_waitfor_with_sigmask(&sigmask_full);
 #else /* NDEBUG */
 		{
 			struct sig *recv;
-			recv = task_waitfor();
+			recv = task_waitfor_with_sigmask(&sigmask_full);
 			assert(recv == &data->er_error);
 		}
 #endif /* !NDEBUG */
@@ -2763,7 +2773,7 @@ DEFINE_SYSCALL2(errno_t, fstatfs, fd_t, fd,
 	struct statfs data;
 #endif /* !_STATFS_MATCHES_STATFS64 */
 	validate_writable(result, sizeof(*result));
-	super = handle_get_fsuper_relaxed((unsigned int)fd);
+	super = handles_lookupfsuper_relaxed(fd);
 	{
 		FINALLY_DECREF_UNLIKELY(super);
 #ifdef _STATFS_MATCHES_STATFS64
@@ -2786,7 +2796,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, fstatfs, fd_t, fd,
 	REF struct fsuper *super;
 	struct statfs data;
 	validate_writable(result, sizeof(*result));
-	super = handle_get_fsuper_relaxed((unsigned int)fd);
+	super = handles_lookupfsuper_relaxed(fd);
 	{
 		FINALLY_DECREF_UNLIKELY(super);
 		fsuper_statfs(super, &data);
@@ -2802,7 +2812,7 @@ DEFINE_SYSCALL2(errno_t, fstatfs64, fd_t, fd,
                 USER UNCHECKED struct_statfs64 *, result) {
 	REF struct fsuper *super;
 	validate_writable(result, sizeof(*result));
-	super = handle_get_fsuper_relaxed((unsigned int)fd);
+	super = handles_lookupfsuper_relaxed(fd);
 	{
 		FINALLY_DECREF_UNLIKELY(super);
 #ifdef __USE_FILE_OFFSET64
@@ -2825,7 +2835,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, fstatfs64, fd_t, fd,
 	REF struct fsuper *super;
 	struct statfs data;
 	validate_writable(result, sizeof(*result));
-	super = handle_get_fsuper_relaxed((unsigned int)fd);
+	super = handles_lookupfsuper_relaxed(fd);
 	{
 		FINALLY_DECREF_UNLIKELY(super);
 		fsuper_statfs(super, &data);
@@ -3240,9 +3250,9 @@ lookup_inode_for_futimesat(fd_t dirfd, USER UNCHECKED char const *filename) {
 	REF struct fnode *result;
 	if (filename) {
 		validate_readable(filename, 1);
-		result = path_traversefull(AT_FDCWD, filename, fs_atflags(0));
+		result = path_traversefull(dirfd, filename, fs_atflags(0));
 	} else {
-		result = handle_get_fnode((unsigned int)dirfd);
+		result = handles_lookupfnode(dirfd);
 	}
 	return result;
 }
@@ -3385,10 +3395,9 @@ lookup_inode_for_utimensat(fd_t dirfd, USER UNCHECKED char const *filename,
 		atflags = fs_atflags(atflags);
 		result  = path_traversefull(dirfd, filename, atflags);
 	} else {
-		VALIDATE_FLAGSET(atflags,
-		                 AT_CHANGE_CTIME,
+		VALIDATE_FLAGSET(atflags, AT_CHANGE_CTIME,
 		                 E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS_NOFILENAME);
-		result = handle_get_fnode((unsigned int)dirfd);
+		result = handles_lookupfnode(dirfd);
 	}
 	return result;
 }

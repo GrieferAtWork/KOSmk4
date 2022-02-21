@@ -1361,8 +1361,7 @@ NOTHROW(KCALL print_path_with_prefix)(pformatprinter printer, void *arg,
 }
 
 PRIVATE NONNULL((1, 4)) ssize_t
-NOTHROW(KCALL note_fd_t_value)(pformatprinter printer, void *arg,
-                               unsigned int fd,
+NOTHROW(KCALL note_fd_t_value)(pformatprinter printer, void *arg, fd_t fd,
                                unsigned int *__restrict pstatus) {
 	struct handle hand;
 	struct handle_manager *hman;
@@ -1372,7 +1371,7 @@ NOTHROW(KCALL note_fd_t_value)(pformatprinter printer, void *arg,
 		hman = FORTASK(dbg_current, this_handle_manager);
 		if (!hman || !ADDR_ISKERN(hman))
 			goto badobj;
-		if ((fd_t)fd < 0) {
+		if (fd < 0) {
 			/* Symbolic handles */
 			struct fs *curfs = FORTASK(dbg_current, this_fs);
 			struct vfs *curvfs;
@@ -1383,38 +1382,38 @@ NOTHROW(KCALL note_fd_t_value)(pformatprinter printer, void *arg,
 				goto badobj;
 			switch (fd) {
 
-			case (unsigned int)AT_FDCWD: {
+			case AT_FDCWD: {
 				struct path *p = curfs->fs_cwd;
 				if (!p || !ADDR_ISKERN(p))
 					goto badobj;
 				return print_path_with_prefix(printer, arg, p, pstatus, "AT_FDCWD:");
 			}	break;
 
-			case (unsigned int)AT_FDROOT: {
+			case AT_FDROOT: {
 				struct path *p = curfs->fs_root;
 				if (!p || !ADDR_ISKERN(p))
 					goto badobj;
 				return print_path_with_prefix(printer, arg, p, pstatus, "AT_FDROOT:");
 			}	break;
 
-			case (unsigned int)AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN) ... (unsigned int)AT_FDDRIVE_CWD(AT_DOS_DRIVEMAX):
-			case (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN) ... (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMAX): {
+			case (AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN))...(AT_FDDRIVE_CWD(AT_DOS_DRIVEMAX)):
+			case (AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN))...(AT_FDDRIVE_ROOT(AT_DOS_DRIVEMAX)): {
 				char prefixstr[COMPILER_LENOF("AT_FDDRIVE_ROOT('Z')")];
-				struct path *p = curfs->fs_dcwd[fd - (unsigned int)AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN)];
-				if (!p || (fd >= (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN) &&
-				           fd <= (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMAX)))
-					p = curvfs->vf_drives[fd - (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN)];
+				struct path *p = curfs->fs_dcwd[(unsigned int)fd - AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN)];
+				if (!p || (fd >= AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN) &&
+				           fd <= AT_FDDRIVE_ROOT(AT_DOS_DRIVEMAX)))
+					p = curvfs->vf_drives[(unsigned int)fd - AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN)];
 				if (!p || !ADDR_ISKERN(p))
 					goto badobj;
 				sprintf(prefixstr, "AT_FDDRIVE_%s('%c')",
-				        fd >= (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN) &&
-				        fd <= (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMAX)
+				        fd >= AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN) &&
+				        fd <= AT_FDDRIVE_ROOT(AT_DOS_DRIVEMAX)
 				        ? "ROOT"
 				        : "CWD",
-				        'A' + ((fd >= (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN) &&
-				                fd <= (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMAX))
-				               ? (fd - (unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN))
-				               : (fd - (unsigned int)AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN))));
+				        'A' + ((fd >= AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN) &&
+				                fd <= AT_FDDRIVE_ROOT(AT_DOS_DRIVEMAX))
+				               ? (fd - AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN))
+				               : (fd - AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN))));
 				return print_path_with_prefix(printer, arg, p, pstatus, prefixstr);
 			}	break;
 
@@ -1428,14 +1427,14 @@ NOTHROW(KCALL note_fd_t_value)(pformatprinter printer, void *arg,
 			unsigned int relfd;
 			if (!hman->hm_ranges || !ADDR_ISKERN(hman->hm_ranges))
 				goto badobj;
-			range = handman_ranges_locate(hman, fd);
+			range = handman_ranges_locate(hman, (unsigned int)fd);
 			if (!range || !ADDR_ISKERN(range))
 				goto badobj;
-			if (fd < range->hr_minfd)
+			if ((unsigned int)fd < range->hr_minfd)
 				goto badobj;
-			if (fd > range->hr_maxfd)
+			if ((unsigned int)fd > range->hr_maxfd)
 				goto badobj;
-			relfd = fd - range->hr_minfd;
+			relfd = (unsigned int)fd - range->hr_minfd;
 			if (!handrange_slotishand(range, relfd))
 				goto badobj;
 			hand = range->hr_hand[relfd].mh_hand;
@@ -1446,9 +1445,9 @@ NOTHROW(KCALL note_fd_t_value)(pformatprinter printer, void *arg,
 		case HANDLE_MANAGER_MODE_LINEAR:
 			if (!hman->hm_linear.hm_vector || !ADDR_ISKERN(hman->hm_linear.hm_vector))
 				goto badobj;
-			if (fd >= hman->hm_linear.hm_alloc)
+			if ((unsigned int)fd >= hman->hm_linear.hm_alloc)
 				goto badobj;
-			hand = hman->hm_linear.hm_vector[fd];
+			hand = hman->hm_linear.hm_vector[(unsigned int)fd];
 			break;
 
 		case HANDLE_MANAGER_MODE_HASHVECTOR: {
@@ -1457,7 +1456,7 @@ NOTHROW(KCALL note_fd_t_value)(pformatprinter printer, void *arg,
 				goto badobj;
 			if (hman->hm_count <= hman->hm_hashvector.hm_alloc)
 				goto badobj;
-			i = perturb = fd & hman->hm_hashvector.hm_hashmsk;
+			i = perturb = (unsigned int)fd & hman->hm_hashvector.hm_hashmsk;
 			count = 0;
 			for (;; handle_manager_hashnext(i, perturb)) {
 				struct handle_hashent *hashent;
@@ -1468,7 +1467,7 @@ NOTHROW(KCALL note_fd_t_value)(pformatprinter printer, void *arg,
 				hashent = &hman->hm_hashvector.hm_hashvec[i & hman->hm_hashvector.hm_hashmsk];
 				if (hashent->hh_handle_id == HANDLE_HASHENT_SENTINEL_ID)
 					goto badobj;
-				if (hashent->hh_handle_id != fd)
+				if (hashent->hh_handle_id != (unsigned int)fd)
 					continue; /* Some other handle. */
 				/* Found it! */
 				vecid = hashent->hh_vector_index;

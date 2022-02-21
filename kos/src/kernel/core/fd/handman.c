@@ -883,7 +883,7 @@ handman_fork(struct handman *__restrict self)
 		fdat.hfd_closemax = 0;
 
 		/* If a range ends up unused in the end, force-free it. */
-		RAII_FINALLY { _handrange_free(fdat.hfd_range); };
+		RAII_FINALLY { _handrange_free_unlikely(fdat.hfd_range); };
 
 		/* Actually clone handle ranges. */
 		do {
@@ -941,7 +941,7 @@ handman_fork_and_closerange(struct handman *__restrict self,
 		fdat.hfd_closemax = (unsigned int)maxfd;
 
 		/* If a range ends up unused in the end, force-free it. */
-		RAII_FINALLY { _handrange_free(fdat.hfd_range); };
+		RAII_FINALLY { _handrange_free_unlikely(fdat.hfd_range); };
 
 		/* Actually clone handle ranges. */
 		do {
@@ -1436,7 +1436,7 @@ again_handle_large_freecount:
 				for (i = rel_freemax + 1; i <= rel_freemax; ++i) {
 					if (_handslot_islop(&range->hr_hand[i])) {
 						handman_endwrite(self);
-						_handrange_free(newrange);
+						_handrange_free_unlikely(newrange);
 						return ohand;
 					}
 				}
@@ -1949,8 +1949,8 @@ try_expand_neighbor_downwards:
 			ATOMIC_ADD(range->hr_cexec, neighbor->hr_cexec);
 			ATOMIC_ADD(range->hr_cfork, neighbor->hr_cfork);
 			handman_ranges_insert(self, range);
-			kfree(*p_newrange);     /* Free any buffer previously allocated */
-			*p_newrange = neighbor; /* Gift the caller the old neighbor */
+			_handrange_free_unlikely(*p_newrange); /* Free any buffer previously allocated */
+			*p_newrange = neighbor;                /* Gift the caller the old neighbor */
 			return range;
 		} else {
 			unsigned int i, more, dst;
@@ -2179,7 +2179,7 @@ again_check_slot:
 again_extendrange:
 		range = handman_extendrange_or_unlock(self, (unsigned int)fd, &newrange);
 		if (range == HANDMAN_EXTENDRANGE_OR_UNLOCK_NORANGE) {
-			_handrange_free(newrange);
+			_handrange_free_unlikely(newrange);
 		} else if (range == HANDMAN_EXTENDRANGE_OR_UNLOCK_UNLOCKED) {
 			TRY {
 				handman_write(self);
@@ -2195,7 +2195,7 @@ again_extendrange:
 			assert((unsigned int)fd >= range->hr_minfd &&
 			       (unsigned int)fd <= range->hr_maxfd);
 free_newrange_and_insert_into_range:
-			_handrange_free(newrange);
+			_handrange_free_unlikely(newrange);
 			goto insert_into_range;
 		}
 	}
@@ -2212,7 +2212,7 @@ again_lock_for_newrange:
 		TRY {
 			handman_write(self);
 		} EXCEPT {
-			_handrange_free(nrange);
+			_handrange_free_unlikely(nrange);
 			_handrange_free(range);
 			RETHROW();
 		}
@@ -2220,6 +2220,7 @@ again_lock_for_newrange:
 		/* Re-check that there are no pre-existing ranges for the other cases above. */
 		xrange = handman_ranges_locate(self, (unsigned int)fd);
 		if unlikely(xrange != NULL) {
+			_handrange_free_unlikely(nrange);
 			_handrange_free(range);
 			range = xrange;
 			goto insert_into_range;
@@ -2232,12 +2233,12 @@ again_lock_for_newrange:
 				goto again_lock_for_newrange;
 			assert((unsigned int)fd >= range->hr_minfd &&
 			       (unsigned int)fd <= range->hr_maxfd);
-			_handrange_free(range);
 			_handrange_free(nrange);
+			_handrange_free(range);
 			range = xrange;
 			goto insert_into_range;
 		}
-		_handrange_free(nrange);
+		_handrange_free_unlikely(nrange);
 	}
 
 	/* Fill in the new, singular-element range. */
@@ -2457,7 +2458,7 @@ handman_lock_and_alloc_for_install(struct handman *__restrict self, fd_t minfd,
 	unsigned int relfd, count;
 	struct handrange *result, *next;
 	struct handrange *newrange = NULL;
-	RAII_FINALLY { _handrange_free(newrange); };
+	RAII_FINALLY { _handrange_free_unlikely(newrange); };
 
 again:
 	handman_write(self);

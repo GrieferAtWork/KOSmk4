@@ -230,13 +230,14 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		unsigned int insmod_flags;
 		validate_readwrite(arg, sizeof(struct ksysctl_driver_insmod));
 		data        = (struct ksysctl_driver_insmod *)arg;
-		struct_size = ATOMIC_READ(data->im_struct_size);
+		struct_size = data->im_struct_size;
+		COMPILER_READ_BARRIER();
 		if (struct_size != sizeof(struct ksysctl_driver_insmod))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct ksysctl_driver_insmod), struct_size);
-		COMPILER_BARRIER();
-		format       = ATOMIC_READ(data->im_format);
-		commandline  = ATOMIC_READ(data->im_cmdline);
-		insmod_flags = ATOMIC_READ(data->im_flags);
+		format       = data->im_format;
+		commandline  = data->im_cmdline;
+		insmod_flags = data->im_flags;
+		COMPILER_READ_BARRIER();
 		validate_readable_opt(commandline, 1);
 		VALIDATE_FLAGSET(insmod_flags,
 		                 KSYSCTL_DRIVER_INSMOD_FNORMAL |
@@ -247,8 +248,9 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		case KSYSCTL_DRIVER_FORMAT_BLOB: {
 			USER CHECKED void const *base;
 			size_t size;
-			base = ATOMIC_READ(data->im_blob.b_base);
-			size = ATOMIC_READ(data->im_blob.b_size);
+			base = data->im_blob.b_base;
+			size = data->im_blob.b_size;
+			COMPILER_READ_BARRIER();
 			validate_readable(base, size);
 			require(CAP_SYS_MODULE);
 			drv = insmod_flags & KSYSCTL_DRIVER_INSMOD_FNOINIT
@@ -256,17 +258,21 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 			      : driver_insmod((byte_t *)base, size, commandline, &new_driver_loaded);
 		}	break;
 
-		case KSYSCTL_DRIVER_FORMAT_FILE:
-			drv = load_driver_from_file_handles(ATOMIC_READ(data->im_file.f_node),
-			                                    ATOMIC_READ(data->im_file.f_path),
-			                                    ATOMIC_READ(data->im_file.f_dentry),
+		case KSYSCTL_DRIVER_FORMAT_FILE: {
+			fd_t fd_node, fd_path, fd_dent;
+			fd_node = data->im_file.f_node;
+			fd_path = data->im_file.f_path;
+			fd_dent = data->im_file.f_dentry;
+			COMPILER_READ_BARRIER();
+			drv = load_driver_from_file_handles(fd_node, fd_path, fd_dent,
 			                                    commandline, &new_driver_loaded,
 			                                    insmod_flags);
-			break;
+		}	break;
 
 		case KSYSCTL_DRIVER_FORMAT_NAME: {
 			USER CHECKED char const *name;
-			name = ATOMIC_READ(data->im_name);
+			name = data->im_name;
+			COMPILER_READ_BARRIER();
 			validate_readable(name, 1);
 			require(CAP_SYS_MODULE);
 			drv = insmod_flags & KSYSCTL_DRIVER_INSMOD_FNOINIT
@@ -283,7 +289,8 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		ATOMIC_WRITE(data->im_newdriver, new_driver_loaded ? 1 : 0);
 		{
 			struct openfd *drv_fd;
-			drv_fd = ATOMIC_READ(data->im_driver);
+			drv_fd = data->im_driver;
+			COMPILER_READ_BARRIER();
 			if (drv_fd) {
 				struct handle temp;
 				temp.h_type = HANDLE_TYPE_MODULE;
@@ -308,12 +315,13 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_INUSE == DRIVER_DELMOD_ST_INUSE);
 		validate_readwrite(arg, sizeof(struct ksysctl_driver_delmod));
 		data        = (struct ksysctl_driver_delmod *)arg;
-		struct_size = ATOMIC_READ(data->dm_struct_size);
+		struct_size = data->dm_struct_size;
+		COMPILER_READ_BARRIER();
 		if (struct_size != sizeof(struct ksysctl_driver_delmod))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct ksysctl_driver_delmod), struct_size);
-		COMPILER_BARRIER();
-		format       = ATOMIC_READ(data->dm_format);
-		delmod_flags = ATOMIC_READ(data->dm_flags);
+		format       = data->dm_format;
+		delmod_flags = data->dm_flags;
+		COMPILER_READ_BARRIER();
 		VALIDATE_FLAGSET(delmod_flags,
 		                 KSYSCTL_DRIVER_DELMOD_FNORMAL |
 		                 KSYSCTL_DRIVER_DELMOD_FNODEPEND |
@@ -324,7 +332,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 
 		case KSYSCTL_DRIVER_FORMAT_FILE: {
 			REF struct mfile *file;
-			file = handle_get_mfile((unsigned int)ATOMIC_READ(data->dm_file));
+			file = handles_lookupmfile(data->dm_file);
 			FINALLY_DECREF_UNLIKELY(file);
 			require(CAP_SYS_MODULE);
 			error = driver_delmod(file, delmod_flags);
@@ -332,7 +340,8 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 
 		case KSYSCTL_DRIVER_FORMAT_NAME: {
 			USER CHECKED char const *name;
-			name = ATOMIC_READ(data->dm_name);
+			name = data->dm_name;
+			COMPILER_READ_BARRIER();
 			validate_readable(name, 1);
 			require(CAP_SYS_MODULE);
 			error = driver_delmod(name, delmod_flags);
@@ -353,15 +362,16 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		REF struct driver *drv;
 		validate_readwrite(arg, sizeof(struct ksysctl_driver_getmod));
 		data        = (struct ksysctl_driver_getmod *)arg;
-		struct_size = ATOMIC_READ(data->gm_struct_size);
+		struct_size = data->gm_struct_size;
+		COMPILER_READ_BARRIER();
 		if (struct_size != sizeof(struct ksysctl_driver_getmod))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct ksysctl_driver_getmod), struct_size);
-		COMPILER_BARRIER();
-		format = ATOMIC_READ(data->gm_format);
+		format = data->gm_format;
+		COMPILER_READ_BARRIER();
 		switch (format) {
 
 		case KSYSCTL_DRIVER_FORMAT_BLOB: {
-			void *addr = ATOMIC_READ(data->gm_addr);
+			void *addr = data->gm_addr;
 			COMPILER_READ_BARRIER();
 			require(CAP_DRIVER_QUERY);
 			drv = driver_fromaddr(addr);
@@ -369,10 +379,9 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 
 		case KSYSCTL_DRIVER_FORMAT_FILE: {
 			REF struct mfile *file;
-			unsigned int fileno;
-			fileno = (unsigned int)ATOMIC_READ(data->gm_file);
+			fd_t fileno = data->gm_file;
 			COMPILER_READ_BARRIER();
-			file = handle_get_mfile(fileno);
+			file = handles_lookupmfile(fileno);
 			FINALLY_DECREF_UNLIKELY(file);
 			require(CAP_DRIVER_QUERY);
 			drv = driver_fromfile(file);
@@ -380,9 +389,9 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 
 		case KSYSCTL_DRIVER_FORMAT_NAME: {
 			USER CHECKED char const *name;
-			name = ATOMIC_READ(data->gm_name);
-			validate_readable(name, 1);
+			name = data->gm_name;
 			COMPILER_READ_BARRIER();
+			validate_readable(name, 1);
 			require(CAP_DRIVER_QUERY);
 			drv = driver_fromname(name);
 		}	break;
@@ -411,13 +420,13 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		REF struct driver_libpath_struct *libpath;
 		validate_readwrite(arg, sizeof(struct ksysctl_driver_get_library_path));
 		data        = (struct ksysctl_driver_get_library_path *)arg;
-		struct_size = ATOMIC_READ(data->glp_struct_size);
+		struct_size = data->glp_struct_size;
+		COMPILER_READ_BARRIER();
 		if (struct_size != sizeof(struct ksysctl_driver_get_library_path))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct ksysctl_driver_get_library_path), struct_size);
 		require(CAP_DRIVER_QUERY);
 
 		/* Read the user-space buffer address/size. */
-		COMPILER_READ_BARRIER();
 		buffer  = data->glp_buf;
 		bufsize = data->glp_size;
 		COMPILER_READ_BARRIER();
@@ -454,11 +463,11 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		size_t struct_size;
 		validate_readwrite(arg, sizeof(struct ksysctl_driver_set_library_path));
 		data        = (struct ksysctl_driver_set_library_path *)arg;
-		struct_size = ATOMIC_READ(data->slp_struct_size);
+		struct_size = data->slp_struct_size;
+		COMPILER_READ_BARRIER();
 		if (struct_size != sizeof(struct ksysctl_driver_set_library_path))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct ksysctl_driver_set_library_path), struct_size);
 		require(CAP_SYS_MODULE);
-		COMPILER_READ_BARRIER();
 		oldpath = data->slp_oldpath;
 		newpath = data->slp_newpath;
 		COMPILER_READ_BARRIER();
@@ -468,7 +477,6 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		} else {
 			size_t newpath_len;
 			validate_readable(newpath, 1);
-			COMPILER_BARRIER();
 			newpath_len = strlen(newpath);
 			COMPILER_READ_BARRIER();
 			newpath_string = (REF struct driver_libpath_struct *)kmalloc(offsetof(struct driver_libpath_struct, dlp_path) +
@@ -522,7 +530,7 @@ again_get_oldpath:
 		temp.h_type = HANDLE_TYPE_MODULE;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = &kernel_driver;
-		return handle_installopenfd((USER UNCHECKED struct openfd *)arg, temp);
+		return handles_install_openfd(temp, (USER UNCHECKED struct openfd *)arg);
 	}	break;
 
 	case KSYSCTL_OPEN_BOOT_TASK: {
@@ -531,7 +539,7 @@ again_get_oldpath:
 		temp.h_type = HANDLE_TYPE_PIDFD;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = FORTASK(&boottask, this_taskpid);
-		return handle_installopenfd((USER UNCHECKED struct openfd *)arg, temp);
+		return handles_install_openfd(temp, (USER UNCHECKED struct openfd *)arg);
 	}	break;
 
 #ifdef CONFIG_HAVE_HACKY_REBOOT
@@ -576,10 +584,7 @@ DEFINE_SYSCALL3(errno_t, finit_module, fd_t, fd,
 	REF struct driver *drv;
 	(void)flags; /* Ignored... (for now) */
 	validate_readable(uargs, 1);
-	drv = load_driver_from_file_handles((unsigned int)fd,
-	                                    (unsigned int)-1,
-	                                    (unsigned int)-1,
-	                                    uargs, NULL,
+	drv = load_driver_from_file_handles(fd, -1, -1, uargs, NULL,
 	                                    KSYSCTL_DRIVER_INSMOD_FNORMAL);
 	decref_unlikely(drv);
 	return -EOK;

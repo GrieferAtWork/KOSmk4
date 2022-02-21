@@ -198,7 +198,7 @@ struct ksysctl_driver_getmod /*[PREFIX(gm_)]*/ {
 	union {
 		void              *gm_addr;        /* [valid_if(im_format == KSYSCTL_DRIVER_FORMAT_BLOB)]
 		                                    * A pointer apart of the driver's static binary image. */
-		__uint32_t         gm_file;        /* [valid_if(im_format == KSYSCTL_DRIVER_FORMAT_FILE)]
+		__int32_t          gm_file;        /* [valid_if(im_format == KSYSCTL_DRIVER_FORMAT_FILE)]
 		                                    * Handle to an INode from which the driver should be loaded. */
 		char const        *gm_name;        /* [valid_if(im_format == KSYSCTL_DRIVER_FORMAT_NAME)]
 		                                    * [1..1] Name of the driver to lookup.

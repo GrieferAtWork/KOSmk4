@@ -1613,8 +1613,8 @@ done:
 
 
 
-/* Same as  `path_traverse_ex',  but  automatically keep  track  of  symlinks,
- * as well as pass `cwd = fd_cwd == AT_FDCWD ? NULL : handle_get_path(fd_cwd)' */
+/* Same as `path_traverse_ex',  but automatically keep  track of symlinks,  as
+ * well as pass `cwd = fd_cwd == AT_FDCWD ? NULL : handles_lookuppath(fd_cwd)' */
 PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED REF struct path *KCALL
 path_traverse(fd_t fd_cwd, USER CHECKED /*utf-8*/ char const *upath,
               /*out_opt*/ USER CHECKED /*utf-8*/ char const **plastseg,
@@ -1626,7 +1626,7 @@ path_traverse(fd_t fd_cwd, USER CHECKED /*utf-8*/ char const *upath,
 	u32 remaining_symlinks = ATOMIC_READ(THIS_FS->fs_lnkmax);
 	if likely(fd_cwd == AT_FDCWD)
 		return path_traverse_ex(NULL, &remaining_symlinks, upath, plastseg, plastlen, atflags);
-	used_cwd = handle_get_path(fd_cwd);
+	used_cwd = handles_lookuppath(fd_cwd);
 	FINALLY_DECREF_UNLIKELY(used_cwd);
 	return path_traverse_ex(used_cwd, &remaining_symlinks, upath, plastseg, plastlen, atflags);
 }
@@ -1686,7 +1686,7 @@ path_traversefull(fd_t fd_cwd, USER CHECKED /*utf-8*/ char const *upath, atflag_
 	u32 remaining_symlinks = ATOMIC_READ(THIS_FS->fs_lnkmax);
 	if likely(fd_cwd == AT_FDCWD)
 		return path_traversefull_ex(NULL, &remaining_symlinks, upath, atflags, presult_path, presult_dirent);
-	used_cwd = handle_get_path(fd_cwd);
+	used_cwd = handles_lookuppath(fd_cwd);
 	FINALLY_DECREF_UNLIKELY(used_cwd);
 	return path_traversefull_ex(used_cwd, &remaining_symlinks, upath, atflags, presult_path, presult_dirent);
 }
@@ -2169,7 +2169,7 @@ path_open(fd_t fd_cwd, USER CHECKED char const *filename,
 	u32 remaining_symlinks = ATOMIC_READ(THIS_FS->fs_lnkmax);
 	if likely(fd_cwd == AT_FDCWD)
 		return path_open_ex(NULL, &remaining_symlinks, filename, oflags, mode);
-	used_cwd = handle_get_path(fd_cwd);
+	used_cwd = handles_lookuppath(fd_cwd);
 	FINALLY_DECREF_UNLIKELY(used_cwd);
 	return path_open_ex(used_cwd, &remaining_symlinks, filename, oflags, mode);
 }

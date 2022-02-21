@@ -1960,7 +1960,7 @@ DEFINE_SYSCALL4(errno_t, epoll_ctl,
 	errno_t result = -EOK;
 	REF struct epoll_controller *self;
 	REF struct handle fd_handle;
-	self = handle_get_epoll_controller(epfd);
+	self = handles_lookupepoll(epfd);
 	FINALLY_DECREF_UNLIKELY(self);
 	fd_handle = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(fd_handle); };
@@ -2014,7 +2014,7 @@ DEFINE_SYSCALL4(ssize_t, epoll_wait,
 	size_t result;
 	REF struct epoll_controller *self;
 	validate_writablem(events, maxevents, sizeof(struct epoll_event));
-	self = handle_get_epoll_controller(epfd);
+	self = handles_lookupepoll(epfd);
 	FINALLY_DECREF_UNLIKELY(self);
 	if unlikely(maxevents <= 0) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
@@ -2075,7 +2075,7 @@ again:
 			/* We can only lookup `self' in here because there are code paths
 			 * where `userexcept_handler_with_sigmask()'  will directly  jump
 			 * back to user-space. */
-			self = handle_get_epoll_controller(epfd);
+			self = handles_lookupepoll(epfd);
 			FINALLY_DECREF_UNLIKELY(self);
 
 			if (timeout < 0) {

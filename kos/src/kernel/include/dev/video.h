@@ -487,7 +487,7 @@ struct viddev_ops {
 	/*NOTHROW*/ (FCALL *vdo_enterdbg)(struct viddev *__restrict self);
 
 	/* [0..1] Restore video registers as the result of exiting the builtin debugger.
-	 * - Called while the debugger is already active (dbg_active).
+	 * - Called while the debugger is still active (dbg_active).
 	 * - s.a. `vdo_enterdbg()'
 	 * - This function and `vdo_enterdbg()' are also used to implement the `screen' command */
 	NONNULL((1)) void

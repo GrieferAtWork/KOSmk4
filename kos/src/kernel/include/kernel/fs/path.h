@@ -531,8 +531,8 @@ path_traverse_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_FSERROR_NOT_A_DIRECTORY, E_IOERROR,
 		       E_BADALLOC, ...);
 
-/* Same as  `path_traverse_ex',  but  automatically keep  track  of  symlinks,
- * as well as pass `cwd = fd_cwd == AT_FDCWD ? NULL : handle_get_path(fd_cwd)' */
+/* Same as `path_traverse_ex',  but automatically keep  track of symlinks,  as
+ * well as pass `cwd = fd_cwd == AT_FDCWD ? NULL : handles_lookuppath(fd_cwd)' */
 FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct path *KCALL
 path_traverse(fd_t fd_cwd, /*utf-8*/ USER CHECKED char const *upath,
               /*out_opt*/ /*utf-8*/ USER CHECKED char const **plastseg DFL(__NULLPTR),

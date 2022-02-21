@@ -30,8 +30,6 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 
-#include <hybrid/atomic.h>
-
 #include <bits/os/iovec.h> /* struct iovec */
 #include <compat/config.h>
 #include <kos/except.h>
@@ -55,8 +53,7 @@ DEFINE_SYSCALL3(syscall_slong_t, lseek,
                 fd_t, fd, syscall_slong_t, offset,
                 syscall_ulong_t, whence) {
 	pos_t result;
-	struct handle hand;
-	hand = handles_lookup(fd);
+	struct handle hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	result = handle_seek(hand, (off_t)offset, whence);
 	return (syscall_slong_t)result;
@@ -68,8 +65,7 @@ DEFINE_SYSCALL3(int64_t, lseek64,
                 fd_t, fd, int64_t, offset,
                 syscall_ulong_t, whence) {
 	pos_t result;
-	struct handle hand;
-	hand = handles_lookup(fd);
+	struct handle hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	result = handle_seek(hand, (off_t)offset, whence);
 	return (int64_t)result;
@@ -81,7 +77,7 @@ DEFINE_SYSCALL4(errno_t, _llseek, fd_t, fd, int64_t, offset,
                 USER UNCHECKED uint64_t *, result,
                 syscall_ulong_t, whence) {
 	uint64_t retpos;
-	validate_writable(result, sizeof(uint64_t));
+	validate_writable(result, sizeof(*result));
 	retpos  = (uint64_t)sys_lseek64(fd, offset, whence);
 	*result = retpos;
 	return -EOK;
@@ -94,7 +90,7 @@ DEFINE_COMPAT_SYSCALL4(errno_t, _llseek,
                        USER UNCHECKED uint64_t *, result,
                        syscall_ulong_t, whence) {
 	uint64_t retpos;
-	compat_validate_writable(result, sizeof(uint64_t));
+	compat_validate_writable(result, sizeof(*result));
 #ifdef __ARCH_WANT_SYSCALL_LSEEK64
 	retpos  = (uint64_t)sys_lseek64(fd, offset, whence);
 #else /* __ARCH_WANT_SYSCALL_LSEEK64 */
@@ -117,11 +113,11 @@ DEFINE_SYSCALL3(ssize_t, read, fd_t, fd,
                 USER UNCHECKED void *, buf, size_t, bufsize) {
 	size_t result;
 	struct handle hand;
-	validate_writable(buf, bufsize);
 	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANREAD(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
+	buf    = validate_writable(buf, bufsize);
 	result = handle_read(hand, buf, bufsize);
 	return (ssize_t)result;
 }
@@ -132,11 +128,11 @@ DEFINE_SYSCALL3(ssize_t, write, fd_t, fd,
                 USER UNCHECKED void const *, buf, size_t, bufsize) {
 	size_t result;
 	struct handle hand;
-	validate_readable(buf, bufsize);
 	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANWRITE(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
+	buf    = validate_readable(buf, bufsize);
 	result = handle_write(hand, buf, bufsize);
 	return (ssize_t)result;
 }
@@ -151,11 +147,11 @@ DEFINE_SYSCALL4(ssize_t, readf,
 	VALIDATE_FLAGSET(mode,
 	                 IO_USERF_MASK,
 	                 E_INVALID_ARGUMENT_CONTEXT_READF_MODE);
-	validate_writable(buf, bufsize);
 	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANREAD(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
+	buf    = validate_writable(buf, bufsize);
 	result = handle_readf(hand, buf, bufsize,
 	                      (hand.h_mode & ~IO_USERF_MASK) | mode);
 	return (ssize_t)result;
@@ -171,11 +167,11 @@ DEFINE_SYSCALL4(ssize_t, writef,
 	VALIDATE_FLAGSET(mode,
 	                 IO_USERF_MASK,
 	                 E_INVALID_ARGUMENT_CONTEXT_WRITEF_MODE);
-	validate_readable(buf, bufsize);
 	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANWRITE(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
+	buf    = validate_readable(buf, bufsize);
 	result = handle_writef(hand, buf, bufsize,
 	                       (hand.h_mode & ~IO_USERF_MASK) | mode);
 	return (ssize_t)result;
@@ -195,11 +191,11 @@ DEFINE_SYSCALL4(ssize_t, pread64, fd_t, fd,
                 size_t, bufsize, uint64_t, offset) {
 	size_t result;
 	struct handle hand;
-	validate_writable(buf, bufsize);
 	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANREAD(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
+	buf    = validate_writable(buf, bufsize);
 	result = handle_pread(hand, buf, bufsize, (pos_t)offset);
 	return (ssize_t)result;
 }
@@ -211,11 +207,11 @@ DEFINE_SYSCALL4(ssize_t, pwrite64, fd_t, fd,
                 size_t, bufsize, uint64_t, offset) {
 	size_t result;
 	struct handle hand;
-	validate_readable(buf, bufsize);
 	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANWRITE(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
+	buf    = validate_readable(buf, bufsize);
 	result = handle_pwrite(hand, buf, bufsize, (pos_t)offset);
 	return (ssize_t)result;
 }
@@ -230,11 +226,11 @@ DEFINE_SYSCALL5(ssize_t, pread64f,
 	VALIDATE_FLAGSET(mode,
 	                 IO_USERF_MASK,
 	                 E_INVALID_ARGUMENT_CONTEXT_PREADF_MODE);
-	validate_writable(buf, bufsize);
 	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANREAD(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
+	buf    = validate_writable(buf, bufsize);
 	result = handle_preadf(hand, buf, bufsize, (pos_t)offset,
 	                       (hand.h_mode & ~IO_USERF_MASK) | mode);
 	return (ssize_t)result;
@@ -250,11 +246,11 @@ DEFINE_SYSCALL5(ssize_t, pwrite64f,
 	VALIDATE_FLAGSET(mode,
 	                 IO_USERF_MASK,
 	                 E_INVALID_ARGUMENT_CONTEXT_PWRITEF_MODE);
-	validate_readable(buf, bufsize);
 	hand = handles_lookup(fd);
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANWRITE(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
+	buf    = validate_readable(buf, bufsize);
 	result = handle_pwritef(hand, buf, bufsize, (pos_t)offset,
 	                        (hand.h_mode & ~IO_USERF_MASK) | mode);
 	return (ssize_t)result;
@@ -290,8 +286,9 @@ DEFINE_SYSCALL3(ssize_t, readv, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
-			entries[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+			entries[i].ive_base = (USER UNCHECKED byte_t *)iov[i].iov_base;
+			entries[i].ive_size = iov[i].iov_len;
+			COMPILER_READ_BARRIER();
 			validate_writable(entries[i].ive_base, entries[i].ive_size);
 			num_bytes += entries[i].ive_size;
 		}
@@ -327,8 +324,9 @@ DEFINE_SYSCALL3(ssize_t, writev, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
-			entries[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+			entries[i].ive_base = (USER UNCHECKED byte_t *)iov[i].iov_base;
+			entries[i].ive_size = iov[i].iov_len;
+			COMPILER_READ_BARRIER();
 			validate_readable(entries[i].ive_base, entries[i].ive_size);
 			num_bytes += entries[i].ive_size;
 		}
@@ -364,8 +362,9 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, readv, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t const *)&iov[i].iov_base);
-			entries[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+			entries[i].ive_base = (USER UNCHECKED byte_t *)(void *)(uintptr_t)(*(compat_uintptr_t const *)&iov[i].iov_base);
+			entries[i].ive_size = iov[i].iov_len;
+			COMPILER_READ_BARRIER();
 			compat_validate_writable(entries[i].ive_base, entries[i].ive_size);
 			num_bytes += entries[i].ive_size;
 		}
@@ -401,8 +400,9 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, writev, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
-			entries[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+			entries[i].ive_base = (USER UNCHECKED byte_t *)(void *)(uintptr_t)(*(compat_uintptr_t *)&iov[i].iov_base);
+			entries[i].ive_size = iov[i].iov_len;
+			COMPILER_READ_BARRIER();
 			compat_validate_readable(entries[i].ive_base, entries[i].ive_size);
 			num_bytes += entries[i].ive_size;
 		}
@@ -445,8 +445,9 @@ DEFINE_SYSCALL4(ssize_t, preadv, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
-			entries[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+			entries[i].ive_base = (USER UNCHECKED byte_t *)iov[i].iov_base;
+			entries[i].ive_size = iov[i].iov_len;
+			COMPILER_READ_BARRIER();
 			validate_writable(entries[i].ive_base, entries[i].ive_size);
 			num_bytes += entries[i].ive_size;
 		}
@@ -482,8 +483,9 @@ DEFINE_SYSCALL4(ssize_t, pwritev, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
-			entries[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+			entries[i].ive_base = (USER UNCHECKED byte_t *)iov[i].iov_base;
+			entries[i].ive_size = iov[i].iov_len;
+			COMPILER_READ_BARRIER();
 			validate_readable(entries[i].ive_base, entries[i].ive_size);
 			num_bytes += entries[i].ive_size;
 		}
@@ -519,8 +521,9 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, preadv, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
-			entries[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+			entries[i].ive_base = (USER UNCHECKED byte_t *)(void *)(uintptr_t)(*(compat_uintptr_t *)&iov[i].iov_base);
+			entries[i].ive_size = iov[i].iov_len;
+			COMPILER_READ_BARRIER();
 			compat_validate_writable(entries[i].ive_base, entries[i].ive_size);
 			num_bytes += entries[i].ive_size;
 		}
@@ -556,8 +559,9 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, pwritev, fd_t, fd,
 		dst.iv_entc = count;
 		dst.iv_entv = entries;
 		for (i = 0, num_bytes = 0; i < count; ++i) {
-			entries[i].ive_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t const *)&iov[i].iov_base);
-			entries[i].ive_size = ATOMIC_READ(iov[i].iov_len);
+			entries[i].ive_base = (USER UNCHECKED byte_t *)(void *)(uintptr_t)(*(compat_uintptr_t const *)&iov[i].iov_base);
+			entries[i].ive_size = iov[i].iov_len;
+			COMPILER_READ_BARRIER();
 			compat_validate_readable(entries[i].ive_base, entries[i].ive_size);
 			num_bytes += entries[i].ive_size;
 		}

@@ -242,7 +242,7 @@ NOTHROW(FCALL tsc_resync_interrupt)(ktime_t curr_ktime) {
 	 * and that solution works in that  the new value is closer  to
 	 * the actual truth than the previous one. However, this  leads
 	 * to a logarithmic approach of the actual correct value, where
-	 * we make ver smaller steps towards the proper goal.
+	 * we make very smaller steps towards the proper goal.
 	 *
 	 * To counteract this, we try to over-adjust our used HZ values
 	 * in order to reach the goal sooner.

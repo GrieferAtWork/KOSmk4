@@ -141,7 +141,7 @@ DEFINE_SYSCALL3(errno_t, bind, fd_t, sockfd,
                 socklen_t, addr_len) {
 	REF struct socket *sock;
 	validate_readable(addr, addr_len);
-	sock = handle_get_socket((unsigned int)sockfd);
+	sock = handles_lookupsocket(sockfd);
 	FINALLY_DECREF_UNLIKELY(sock);
 	socket_bind(sock, addr, addr_len);
 	return -EOK;
@@ -190,7 +190,7 @@ DEFINE_SYSCALL3(errno_t, connect, fd_t, sockfd,
 DEFINE_SYSCALL2(errno_t, listen, fd_t, sockfd,
                 syscall_ulong_t, max_backlog) {
 	REF struct socket *sock;
-	sock = handle_get_socket((unsigned int)sockfd);
+	sock = handles_lookupsocket(sockfd);
 	FINALLY_DECREF_UNLIKELY(sock);
 	socket_listen(sock, max_backlog);
 	return -EOK;
@@ -537,7 +537,7 @@ DEFINE_SYSCALL3(errno_t, getsockname, fd_t, sockfd,
 	COMPILER_READ_BARRIER();
 	validate_writable(addr, avail_addr_len);
 	/* Lookup the socket. */
-	sock = handle_get_socket((unsigned int)sockfd);
+	sock = handles_lookupsocket(sockfd);
 	{
 		FINALLY_DECREF_UNLIKELY(sock);
 		req_addr_len = socket_getsockname(sock, addr, avail_addr_len);
@@ -561,7 +561,7 @@ DEFINE_SYSCALL3(errno_t, getpeername, fd_t, sockfd,
 	COMPILER_READ_BARRIER();
 	validate_writable(addr, avail_addr_len);
 	/* Lookup the socket. */
-	sock = handle_get_socket((unsigned int)sockfd);
+	sock = handles_lookupsocket(sockfd);
 	{
 		FINALLY_DECREF_UNLIKELY(sock);
 		req_addr_len = socket_getpeername(sock, addr, avail_addr_len);

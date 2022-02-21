@@ -792,16 +792,6 @@ FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED REF struct task *FCALL
 handle_get_task(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE,
 		       E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED);
-
-#define handle_get_mfile(fd)            ((REF struct mfile *)handle_getas(fd, HANDLE_TYPE_MFILE))
-#define handle_get_fdirent(fd)          ((REF struct fdirent *)handle_getas(fd, HANDLE_TYPE_DIRENT))
-#define handle_get_path(fd)             ((REF struct path *)handle_getas(fd, HANDLE_TYPE_PATH))
-#define handle_get_taskpid(fd)          ((REF struct taskpid *)handle_getas(fd, HANDLE_TYPE_PIDFD))
-#define handle_get_pipe(fd)             ((REF struct pipe *)handle_getas(fd, HANDLE_TYPE_PIPE))
-#define handle_get_module(fd)           ((REF struct driver *)handle_getas(fd, HANDLE_TYPE_MODULE))
-#define handle_get_socket(fd)           ((REF struct socket *)handle_getas(fd, HANDLE_TYPE_SOCKET))
-#define handle_get_epoll_controller(fd) ((REF struct epoll_controller *)handle_getas(fd, HANDLE_TYPE_EPOLL))
-
 #endif /* __CC__ */
 #endif /* !CONFIG_USE_NEW_HANDMAN */
 
@@ -865,17 +855,6 @@ DECL_END
 #define handle_lookupin(fd, self)             handman_lookup(self, (fd_t)(fd))
 #define handle_lookup_nosym(fd)               handman_lookup(THIS_HANDMAN, (fd_t)(fd))
 #define handle_getas(fd, wanted_type)         handles_lookupobj((fd_t)(fd), wanted_type)
-#define handle_get_fnode(fd)                  handles_lookupfnode((fd_t)(fd))
-#define handle_get_fsuper_relaxed(fd)         handles_lookupfsuper_relatex((fd_t)(fd))
-#define handle_get_task(fd)                   handles_lookuptask((fd_t)(fd))
-#define handle_get_mfile(fd)                  handles_lookupmfile((fd_t)(fd))
-#define handle_get_fdirent(fd)                handles_lookupfdirent((fd_t)(fd))
-#define handle_get_path(fd)                   handles_lookuppath((fd_t)(fd))
-#define handle_get_taskpid(fd)                handles_lookuppidfd((fd_t)(fd))
-#define handle_get_pipe(fd)                   handles_lookuppipe((fd_t)(fd))
-#define handle_get_module(fd)                 handles_lookupmodule((fd_t)(fd))
-#define handle_get_socket(fd)                 handles_lookupsocket((fd_t)(fd))
-#define handle_get_epoll_controller(fd)       handles_lookupepoll((fd_t)(fd))
 #endif /* CONFIG_USE_NEW_HANDMAN */
 
 

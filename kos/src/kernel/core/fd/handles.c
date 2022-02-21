@@ -147,7 +147,7 @@ do_return_path:
 			return NULL;
 		goto do_return_path;
 	}	break;
-		
+
 	case AT_THIS_TASK:
 		hand->h_data = incref(task_gettaskpid());
 		goto do_return_pidfd;
@@ -196,7 +196,7 @@ handles_lookupobj_symbolic(fd_t fd, uintptr_half_t wanted_type) {
 			result = xincref(myvfs->vf_drives[fd - AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN)]);
 			vfs_driveslock_endread(myvfs);
 		}	break;
-		
+
 		case (AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN))...(AT_FDDRIVE_CWD(AT_DOS_DRIVEMAX)): {
 			fs_pathlock_read(myfs);
 			result = xincref(myfs->fs_dcwd[fd - AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN)]);
@@ -279,6 +279,11 @@ handles_install_symbolic(fd_t fd, struct handle const *__restrict nhand,
 		ohand->h_type = HANDLE_TYPE_PATH;
 		newpath       = (REF struct path *)handle_as_noinherit(nhand, HANDLE_TYPE_PATH);
 		TRY {
+			/* Require EXEC(traverse) and READ permissions for FS path  hooks.
+			 * For reference, this same check is also performed in `fchdir(2)' */
+			fnode_access(newpath->p_dir, X_OK | R_OK);
+
+			/* Bind the path to the specified `fd' */
 			switch (fd) {
 
 			case (AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN))...(AT_FDDRIVE_ROOT(AT_DOS_DRIVEMAX)): {
@@ -307,7 +312,7 @@ handles_install_symbolic(fd_t fd, struct handle const *__restrict nhand,
 				if (ohand->h_data == NULL)
 					ohand->h_type = HANDLE_TYPE_UNDEFINED;
 			}	break;
-			
+
 			case (AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN))...(AT_FDDRIVE_CWD(AT_DOS_DRIVEMAX)): {
 again_acquire_pathlock_for_drive_cwd:
 				fs_pathlock_write(myfs);
@@ -457,7 +462,7 @@ handles_lookupfnode(fd_t fd)
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED REF struct fsuper *FCALL
-handles_lookupfsuper_relatex(fd_t fd)
+handles_lookupfsuper_relaxed(fd_t fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE) {
 	REF struct fsuper *result;
 	REF struct fnode *fn;

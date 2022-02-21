@@ -253,6 +253,10 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 		__os_free(ptr);
 }
 
+/* Same as `kfree()', but use if it is unlikely that `ptr != NULL' */
+#define kfree_unlikely(ptr) kfree(ptr)
+
+
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
 NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 	if (__builtin_constant_p(flags) && !(flags & (GFP_CALLOC | GFP_NOTRIM))) {

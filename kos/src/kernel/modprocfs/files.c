@@ -320,6 +320,10 @@ procfs_uptime_printer(pformatprinter printer, void *arg,
 		struct cpu *c   = cpu_vector[i];
 		struct task *ci = &FORCPU(c, thiscpu_idle);
 		ktime_t ci_active;
+		/* FIXME: When `c' isn't currently online, its `this_activetime'
+		 *        won't be updated. -- iow: offline CPUs look like  they
+		 *        were active the entire time until they're brought back
+		 *        online and are able to update their activetime field. */
 #if __SIZEOF_POINTER__ >= __SIZEOF_KTIME_T__
 		ci_active = ATOMIC_READ(FORTASK(ci, this_activetime));
 #else /* __SIZEOF_POINTER__ >= __SIZEOF_KTIME_T__ */
@@ -349,8 +353,10 @@ procfs_uptime_printer(pformatprinter printer, void *arg,
 	/* Print information */
 	printf("%" PRIu64 ".%.2u "
 	       "%" PRIu64 ".%.2u\n",
-	       now / NSEC_PER_SEC, (now % NSEC_PER_SEC) / (NSEC_PER_SEC / 100),
-	       idle / NSEC_PER_SEC, (idle % NSEC_PER_SEC) / (NSEC_PER_SEC / 100));
+	       (uint64_t)(now / NSEC_PER_SEC),
+	       (unsigned int)((now % NSEC_PER_SEC) / (NSEC_PER_SEC / 100)),
+	       (uint64_t)(idle / NSEC_PER_SEC),
+	       (unsigned int)((idle % NSEC_PER_SEC) / (NSEC_PER_SEC / 100)));
 }
 
 
