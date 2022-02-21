@@ -17,11 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _ASM_POSIX_SPAWN_H
-#define _ASM_POSIX_SPAWN_H 1
+#ifndef _ASM_CRT_POSIX_SPAWN_H
+#define _ASM_CRT_POSIX_SPAWN_H 1
 
 #include <__crt.h>
-
 
 /* Figure out if we should use libc's implementation of posix_spawn()
  * If    not,   we   must    implement   _everything_   in   headers! */
@@ -96,4 +95,4 @@
 
 
 
-#endif /* !_ASM_POSIX_SPAWN_H */
+#endif /* !_ASM_CRT_POSIX_SPAWN_H */

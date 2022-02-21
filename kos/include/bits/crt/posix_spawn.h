@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_POSIX_SPAWN_H
-#define _BITS_POSIX_SPAWN_H 1
+#ifndef _BITS_CRT_POSIX_SPAWN_H
+#define _BITS_CRT_POSIX_SPAWN_H 1
 
 #include <__crt.h>
 #include <__stdinc.h>
@@ -28,7 +28,6 @@
 #include <bits/os/sched.h>  /* struct sched_param */
 #include <bits/os/sigset.h> /* struct __sigset_struct */
 #include <bits/types.h>
-
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -143,4 +142,4 @@ struct __posix_spawn_file_actions {
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_BITS_POSIX_SPAWN_H */
+#endif /* !_BITS_CRT_POSIX_SPAWN_H */
