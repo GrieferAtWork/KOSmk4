@@ -235,13 +235,67 @@ NOTHROW(FCALL tsc_resync_interrupt)(ktime_t curr_ktime) {
 	if (ktime_passed_cpu >= ktime_passed_min &&
 	    ktime_passed_cpu <= ktime_passed_max)
 		return;
-	/* Figure out the closest HZ value that would still be valid. */
-	if (hz < hz_min)
-		hz = hz_min;
-	else {
+
+	/* Figure out the closest HZ value that would still be valid.
+	 *
+	 * The naïve way of doing this would have us simply clamp `hz',
+	 * and that solution works in that  the new value is closer  to
+	 * the actual truth than the previous one. However, this  leads
+	 * to a logarithmic approach of the actual correct value, where
+	 * we make ver smaller steps towards the proper goal.
+	 *
+	 * To counteract this, we try to over-adjust our used HZ values
+	 * in order to reach the goal sooner.
+	 *
+	 * XXX: I think the below is better than what it was before, but
+	 *      it still exhibits the logarithmic approach of the actual
+	 *      correct value...
+	 * -> Is what I want even possible? I mean: I look at the log and see:
+	 * >> [2022-02-21T10:25:27.000703876:info  ][2][cpu#0][-] Adjust tsc hz 1001450000 -> 1001448840 (cpu clock was running too slow)
+	 * >> [2022-02-21T10:25:29.000037842:info  ][2][cpu#0][-] Adjust tsc hz 1001448840 -> 1001215336 (cpu clock was running too slow)
+	 * >> [2022-02-21T10:25:33.000036693:info  ][2][cpu#0][-] Adjust tsc hz 1001215336 -> 1001151454 (cpu clock was running too slow)
+	 * >> [2022-02-21T10:25:35.000055238:info  ][2][cpu#0][-] Adjust tsc hz 1001151454 -> 1001037852 (cpu clock was running too slow)
+	 * >> [2022-02-21T10:25:37.000039896:info  ][2][cpu#0][-] Adjust tsc hz 1001037852 -> 1000998540 (cpu clock was running too slow)
+	 * >> [2022-02-21T10:25:41.000037345:info  ][2][cpu#0][-] Adjust tsc hz 1000998540 -> 1000828966 (cpu clock was running too slow)
+	 * >> [2022-02-21T10:25:45.000037345:info  ][2][cpu#0][-] Adjust tsc hz 1000828966 -> 1000806968 (cpu clock was running too slow)
+	 * >> [2022-02-21T10:25:49.000037349:info  ][2][cpu#0][-] Adjust tsc hz 1000806968 -> 1000696922 (cpu clock was running too slow)
+	 * >> [2022-02-21T10:25:53.000036711:info  ][2][cpu#0][-] Adjust tsc hz 1000696922 -> 1000666854 (cpu clock was running too slow)
+	 * >> [2022-02-21T10:25:57.000037482:info  ][2][cpu#0][-] Adjust tsc hz 1000666854 -> 1000584490 (cpu clock was running too slow)
+	 * >> [2022-02-21T10:26:03.000036970:info  ][2][cpu#0][-] Adjust tsc hz 1000584490 -> 1000578246 (cpu clock was running too slow)
+	 * >> [2022-02-21T10:26:05.000040682:info  ][2][cpu#0][-] Adjust tsc hz 1000578246 -> 1000533402 (cpu clock was running too slow)
+	 * >> [2022-02-21T10:26:11.000036845:info  ][2][cpu#0][-] Adjust tsc hz 1000533402 -> 1000507104 (cpu clock was running too slow)
+	 * >> [2022-02-21T10:26:13.000037485:info  ][2][cpu#0][-] Adjust tsc hz 1000507104 -> 1000493590 (cpu clock was running too slow)
+	 * >> [2022-02-21T10:26:17.000037487:info  ][2][cpu#0][-] Adjust tsc hz 1000493590 -> 1000429258 (cpu clock was running too slow)
+	 * >> [2022-02-21T10:26:23.000040174:info  ][2][cpu#0][-] Adjust tsc hz 1000429258 -> 1000424760 (cpu clock was running too slow)
+	 * >> [2022-02-21T10:26:25.000038639:info  ][2][cpu#0][-] Adjust tsc hz 1000424760 -> 1000423844 (cpu clock was running too slow)
+	 * >> [2022-02-21T10:26:27.000036593:info  ][2][cpu#0][-] Adjust tsc hz 1000423844 -> 1000404150 (cpu clock was running too slow)
+	 * >> [2022-02-21T10:26:31.000106329:info  ][2][cpu#0][-] Adjust tsc hz 1000404150 -> 1000366498 (cpu clock was running too slow)
+	 * >> [2022-02-21T10:26:37.000039409:info  ][2][cpu#0][-] Adjust tsc hz 1000366498 -> 1000358204 (cpu clock was running too slow)
+	 * >> [2022-02-21T10:26:39.000096989:info  ][2][cpu#0][-] Adjust tsc hz 1000358204 -> 1000354240 (cpu clock was running too slow)
+	 * >> [2022-02-21T10:26:41.000038258:info  ][2][cpu#0][-] Adjust tsc hz 1000354240 -> 1000345588 (cpu clock was running too slow)
+	 * It should be obvious that the actual HZ under QEMU is `1000000000',
+	 * as also confirmed by looking at its source code. And our calculation
+	 * slowly  approaches that value,  but it never quite  gets there. -- I
+	 * feel like there must  be a way  to predict the  limit of those  data
+	 * points  when plotted  on a graph,  because it's that  limit which we
+	 * are actually after... */
+	if (hz < hz_min) {
+		tsc_hz_t delta, temp;
+		delta = (hz_min - hz);
+		temp  = (hz_max - hz_min) / 2;
+		if (delta > temp)
+			delta = temp;
+		hz = hz_min + delta;
+	} else {
+		tsc_hz_t delta, temp;
 		assert(hz > hz_max);
-		hz = hz_max;
+		delta = (hz - hz_max);
+		temp  = (hz_max - hz_min) / 2;
+		if (delta > temp)
+			delta = temp;
+		hz = hz_max - delta;
 	}
+
 	/* Our currently used HZ value wasn't correct.
 	 * We must clamp it to the nearest valid HZ value, and re-calculate `thiscpu_basetime'
 	 * to point to the nearest valid location on a line with an angle of the new HZ value,
