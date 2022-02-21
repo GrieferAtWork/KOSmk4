@@ -499,6 +499,10 @@ DEFINE_PUBLIC_ALIAS(x86_nopf_ret_stc, libc_x86_nopf_ret_stc);
 #ifdef __x86_64__
 DEFINE_PUBLIC_ALIAS(x86_nopf_movq_Pax_rax, libc_x86_nopf_movq_Pax_rax);
 DEFINE_PUBLIC_ALIAS(x86_nopf_movq_rax_Pcx, libc_x86_nopf_movq_rax_Pcx);
+DEFINE_PUBLIC_ALIAS(x86_nopf_movq_fsPax_rax, libc_x86_nopf_movq_fsPax_rax);
+DEFINE_PUBLIC_ALIAS(x86_nopf_movq_rax_fsPcx, libc_x86_nopf_movq_rax_fsPcx);
+DEFINE_PUBLIC_ALIAS(x86_nopf_movq_gsPax_rax, libc_x86_nopf_movq_gsPax_rax);
+DEFINE_PUBLIC_ALIAS(x86_nopf_movq_rax_gsPcx, libc_x86_nopf_movq_rax_gsPcx);
 DEFINE_PUBLIC_ALIAS(x86_nopf_lock_xchgq_rax_Pcx, libc_x86_nopf_lock_xchgq_rax_Pcx);
 DEFINE_PUBLIC_ALIAS(x86_nopf_lock_xaddq_rax_Pcx, libc_x86_nopf_lock_xaddq_rax_Pcx);
 DEFINE_PUBLIC_ALIAS(x86_nopf_lock_cmpxchgq_rdx_Pcx, libc_x86_nopf_lock_cmpxchgq_rdx_Pcx);

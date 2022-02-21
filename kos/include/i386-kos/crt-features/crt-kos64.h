@@ -5292,7 +5292,11 @@
 #define __CRT_HAVE_x86_nopf_movl_fsPax_eax
 #define __CRT_HAVE_x86_nopf_movl_gsPax_eax
 #define __CRT_HAVE_x86_nopf_movq_Pax_rax
+#define __CRT_HAVE_x86_nopf_movq_fsPax_rax
+#define __CRT_HAVE_x86_nopf_movq_gsPax_rax
 #define __CRT_HAVE_x86_nopf_movq_rax_Pcx
+#define __CRT_HAVE_x86_nopf_movq_rax_fsPcx
+#define __CRT_HAVE_x86_nopf_movq_rax_gsPcx
 #define __CRT_HAVE_x86_nopf_movw_Pax_ax
 #define __CRT_HAVE_x86_nopf_movw_ax_Pcx
 #define __CRT_HAVE_x86_nopf_movw_ax_fsPcx
