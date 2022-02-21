@@ -30,7 +30,6 @@
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
-#include <kernel/mman/nopf.h>
 #include <kernel/types.h>
 #include <kernel/x86/emulock.h>
 #include <sched/cpu.h>
@@ -42,6 +41,7 @@
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/nopf.h>
 
 #include <stdbool.h>
 #include <string.h>

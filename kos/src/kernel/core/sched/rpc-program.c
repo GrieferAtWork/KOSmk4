@@ -29,7 +29,6 @@
 #include <kernel/mman.h>
 #include <kernel/mman/fault.h>
 #include <kernel/mman/mpartmeta.h>
-#include <kernel/mman/nopf.h>
 #include <kernel/mman/rw.h>
 #include <kernel/rt/except-handler.h>
 #include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_USERPROCMASK */
@@ -55,6 +54,7 @@
 #include <kos/except/reason/inval.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/nopf.h>
 #include <kos/rpc.h>
 #include <sys/param.h>
 

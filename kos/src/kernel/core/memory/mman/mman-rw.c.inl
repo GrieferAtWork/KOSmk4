@@ -28,12 +28,12 @@
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/mman.h>
-#include <kernel/mman/nopf.h>
 #include <kernel/mman/rw.h>
 #include <sched/pertask.h>
 #include <sched/task.h>
 
 #include <kos/except.h>
+#include <kos/nopf.h>
 
 #include <alloca.h>
 #include <stdbool.h>

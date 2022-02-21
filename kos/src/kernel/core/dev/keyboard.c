@@ -29,7 +29,6 @@
 #include <dev/keyboard.h>
 #include <kernel/compat.h>
 #include <kernel/except.h>
-#include <kernel/mman/nopf.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/user.h>
@@ -41,6 +40,7 @@
 #include <kos/except/reason/inval.h>
 #include <kos/ioctl/kbd.h>
 #include <kos/kernel/handle.h>
+#include <kos/nopf.h>
 #include <linux/kd.h> /* Needed to emulate the linux keyboard interface */
 #include <sys/stat.h>
 

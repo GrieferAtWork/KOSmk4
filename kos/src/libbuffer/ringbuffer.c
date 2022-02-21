@@ -42,8 +42,8 @@
 #ifdef __KERNEL__
 #include <kernel/except.h>
 #include <kernel/heap.h>
-#include <kernel/mman/nopf.h>
 
+#include <kos/nopf.h>
 #include <sys/poll.h>
 #else /* __KERNEL__ */
 #include <kos/futexexpr.h>

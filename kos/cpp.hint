@@ -894,6 +894,7 @@
 #define __DEFINE_SYNC_MUTEX(...)
 #define __DEFINE_SYNC_SEMAPHORE(...)
 
+#define __ASMCALL
 #define ASMCALL
 
 #define DEFINE_SYSCALL0(return_type,name)                                     return_type sys_##name(void)

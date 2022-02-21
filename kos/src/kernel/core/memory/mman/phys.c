@@ -28,7 +28,6 @@
 
 #include <kernel/mman.h>
 #include <kernel/mman/mnode.h>
-#include <kernel/mman/nopf.h>
 #include <kernel/mman/phys-access.h>
 #include <kernel/mman/phys.h>
 #include <kernel/mman/unmapped.h> /* MAP_FAILED */
@@ -40,6 +39,7 @@
 #include <hybrid/unaligned.h>
 
 #include <kos/except.h>
+#include <kos/nopf.h>
 #include <sys/io.h>
 
 #include <alloca.h>

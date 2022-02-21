@@ -86,6 +86,14 @@ global final SIMPLE_ATTRIBUTE_ANNOTATIONS: {string: string} = {
 	"leaf"          : "ATTR_LEAF",
 };
 
+@@Same as @SIMPLE_ATTRIBUTE_ANNOTATIONS, but defines annotations from <kos/anno.h>
+global final SIMPLE_KOS_ATTRIBUTE_ANNOTATIONS: {string: string} = {
+	"noblock"   : "__NOBLOCK",
+	"user"      : "__USER",
+	"checked"   : "__CHECKED",
+	"unchecked" : "__UNCHECKED",
+};
+
 @@Same as @SIMPLE_ATTRIBUTE_ANNOTATIONS, but used to define @FunctionPrototype.nothrow
 global final SIMPLE_NOTHROW_ANNOTATIONS: {string: string} = {
 	"no_nothrow"        : "",
@@ -406,6 +414,15 @@ function parsePrototypeAnnotation(
 		local anno = SIMPLE_RETURN_TYPE_ATTRIBUTE_ANNOTATIONS.get(tok);
 		if (anno is none)
 			anno = SIMPLE_ATTRIBUTE_ANNOTATIONS.get(tok);
+		if (anno is none) {
+			anno = SIMPLE_KOS_ATTRIBUTE_ANNOTATIONS.get(tok);
+			if (anno !is none) {
+				if (prototype.declPrefix !is List)
+					prototype.declPrefix = List(prototype.declPrefix);
+				if (INCLUDE_KOS_ANNO !in prototype.declPrefix)
+					prototype.declPrefix.append(INCLUDE_KOS_ANNO);
+			}
+		}
 		if (anno !is none) {
 			if (anno)
 				attributeList.append(anno);
@@ -509,6 +526,15 @@ again_parse_arg_annotations:
 				case "[":
 					++numRBracket;
 					goto again_parse_arg_annotations;
+
+				case "user":
+				case "kernel":
+				case "checked":
+				case "unchecked":
+					/* TODO: Pointer annotations (from <kos/anno.h>)
+					 * Implement via `CType.commentBefore' (once added) */
+					tok = self.next();
+					break;
 
 				case "format_arg":
 					if (result.attributes === defaultAttributes)

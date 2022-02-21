@@ -27,7 +27,6 @@
 #include <kernel/except.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
-#include <kernel/mman/nopf.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/rt/except-handler.h>
@@ -49,6 +48,7 @@
 #include <compat/config.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <kos/nopf.h>
 #include <sys/param.h>
 
 #include <assert.h>

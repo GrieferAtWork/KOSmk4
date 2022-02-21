@@ -37,7 +37,6 @@
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
-#include <kernel/mman/nopf.h>
 #include <kernel/mman/phys.h>
 #include <kernel/mman/sync.h>
 #include <kernel/paging.h>
@@ -45,6 +44,7 @@
 #include <kernel/rt/except-handler.h>
 #include <kernel/x86/fault.h>
 #include <kernel/x86/idt.h> /* IDT_CONFIG_ISTRAP() */
+#include <kernel/x86/nopf.h>
 #include <kernel/x86/phys2virt64.h>
 #include <sched/cpu.h>
 #include <sched/group.h>
@@ -62,6 +62,7 @@
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/segment.h>
+#include <kos/nopf.h>
 
 #include <assert.h>
 #include <inttypes.h>
@@ -499,8 +500,8 @@ x86_handle_pagefault(struct icpustate *__restrict state,
 			}
 		}
 #endif /* !__x86_64__ */
-		if unlikely(memcpy_nopf(&mf.mfl_mman, &mythread->t_mman, sizeof(mf.mfl_mman)) != 0) {
-			assertf(memcpy_nopf(&mf.mfl_mman, &mythread->t_mman, sizeof(mf.mfl_mman)) == 0,
+		if unlikely(!read_nopf(&mythread->t_mman, &mf.mfl_mman)) {
+			assertf(read_nopf(&mythread->t_mman, &mf.mfl_mman),
 			        "Corrupt TLS base pointer: mythread = %p", mythread);
 			/* Allow the user to IGNORE the assertion check, in which case we'll
 			 * try to repair the damage... */

@@ -54,7 +54,6 @@
 #include <kernel/mman/module-section-cache.h>
 #include <kernel/mman/module.h>
 #include <kernel/mman/mpart.h>
-#include <kernel/mman/nopf.h>
 #include <kernel/mman/phys.h>
 #include <kernel/mman/rw.h>
 #include <kernel/mman/sync.h>
@@ -78,6 +77,7 @@
 
 #include <kos/except.h>
 #include <kos/except/reason/noexec.h>
+#include <kos/nopf.h>
 
 #include <alloca.h>
 #include <assert.h>

@@ -17,9 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_KERNEL_ARCH_MMAN_NOPF_H
-#define GUARD_KERNEL_INCLUDE_KERNEL_ARCH_MMAN_NOPF_H 1
+#ifndef _KOS_BITS_NOPF_H
+#define _KOS_BITS_NOPF_H 1
 
-#include <kernel/compiler.h>
+#include <__stdinc.h>
 
-#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_ARCH_MMAN_NOPF_H */
+/* To-be  overwritten by architectures to define arch-specific
+ * handling of *_nopf memory accesses. For an example of this,
+ * see <i386-kos/kos/bits/nopf.h> */
+
+#endif /* !_KOS_BITS_NOPF_H */

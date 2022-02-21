@@ -68,7 +68,6 @@ opt.append("-Os");
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/mman/nopf.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
 #include <kernel/mman.h>
@@ -89,6 +88,7 @@ opt.append("-Os");
 #include <kernel/x86/fault.h> /* x86_handle_stackfault(), x86_handle_gpf(), x86_handle_illegal_instruction() */
 #include <kernel/x86/gdt.h>
 #include <kernel/x86/idt.h> /* IDT_CONFIG_ISTRAP */
+#include <kernel/x86/nopf.h>
 #include <sched/cpu.h>
 #include <sched/group.h>
 #include <sched/rpc.h>

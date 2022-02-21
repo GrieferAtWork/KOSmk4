@@ -36,7 +36,6 @@
 #include <kernel/fs/node.h>
 #include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
-#include <kernel/mman/nopf.h>
 #include <sched/cred.h>
 #include <sched/task.h>
 
@@ -45,6 +44,7 @@
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
+#include <kos/nopf.h>
 
 #include <assert.h>
 #include <stdbool.h>

@@ -31,7 +31,6 @@
 #include <kernel/handle.h>
 #include <kernel/iovec.h>
 #include <kernel/malloc.h>
-#include <kernel/mman/nopf.h>
 #include <kernel/pipe.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
@@ -44,6 +43,7 @@
 
 #include <kos/except/reason/inval.h>
 #include <kos/ioctl/pipe.h>
+#include <kos/nopf.h>
 #include <kos/syscalls.h>
 #include <sys/stat.h>
 #include <sys/uio.h>

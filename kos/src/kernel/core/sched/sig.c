@@ -48,10 +48,9 @@
 #include <string.h>
 
 #if defined(__i386__) || defined(__x86_64__)
-#include <kernel/mman/nopf.h>
-
 #include <asm/intrin.h>
 #include <kos/kernel/segment.h>
+#include <kos/nopf.h>
 #endif /* __i386__ || __x86_64__ */
 
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)
@@ -151,8 +150,8 @@ NOTHROW(FCALL task_pushconnections)(struct task_connections *__restrict cons) {
 		}
 	}
 #endif /* !__x86_64__ */
-	if unlikely(memcpy_nopf(&oldcons, &FORTASK(mythread, this_connections), sizeof(oldcons)) != 0) {
-		assertf(memcpy_nopf(&oldcons, &FORTASK(mythread, this_connections), sizeof(oldcons)) == 0,
+	if unlikely(!read_nopf(&FORTASK(mythread, this_connections), &oldcons)) {
+		assertf(read_nopf(&FORTASK(mythread, this_connections), &oldcons),
 		        "Corrupt TLS base pointer: mythread = %p", mythread);
 		/* Allow the user to IGNORE the assertion check, in which case we'll
 		 * try to repair the damage... */

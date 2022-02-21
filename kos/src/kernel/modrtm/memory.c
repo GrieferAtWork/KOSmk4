@@ -33,7 +33,6 @@
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
-#include <kernel/mman/nopf.h>
 #include <kernel/paging.h> /* PAGESIZE */
 #include <kernel/printk.h>
 #include <kernel/syslog.h>
@@ -47,6 +46,7 @@
 #include <hybrid/sequence/bsearch.h>
 
 #include <kos/except/reason/inval.h>
+#include <kos/nopf.h>
 
 #include <assert.h>
 #include <stdbool.h>

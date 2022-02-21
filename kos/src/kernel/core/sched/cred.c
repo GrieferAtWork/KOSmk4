@@ -34,7 +34,6 @@
 #include <kernel/fs/super.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/mfile.h>
-#include <kernel/mman/nopf.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>

@@ -23,6 +23,8 @@
 #define DEFINE_task_clone_procpid
 #endif /* __INTELLISENSE__ */
 
+#include <kos/nopf.h>
+
 #if (defined(DEFINE_task_clone_thrdpid) + \
      defined(DEFINE_task_clone_procpid)) != 1
 #error "Must #define exactly one of these"
