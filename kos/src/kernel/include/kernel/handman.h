@@ -225,12 +225,12 @@ struct handrange {
 	                                    * locations within this structure may exist.
 	                                    * When  decremented to `0', you must try to join the range
 	                                    * with its neighbors. For this, you may use `_hr_joinlop'. */
-	/* NOTE: For the  following two:  less handles  with the  relevant flag  might exist,  but
-	 *       never more. In other words:  when either of these is  `0', it is guarantied  that
-	 *       no handles with the relevant flag exist in `hr_hand'. Furthermore, these counters
-	 *       can  only be incremented `hr_nlops != 0' (or when holding :hm_lock), meaning that
-	 *       if  you're holding said lock and ensure  `hr_nlops == 0', then these 2 values are
-	 *       [const] until you release your lock. */
+	/* NOTE: For the following two: less handles with  the relevant flag might exist, but  never
+	 *       more. In other words: when either of these is `0', it is guarantied that no handles
+	 *       with the relevant flag exist in `hr_hand'. Furthermore, these counters can only  be
+	 *       incremented if `hr_nlops != 0' (or when  holding :hm_lock), meaning that if  you're
+	 *       holding said lock and ensure `hr_nlops == 0', then these 2 values are [const] until
+	 *       you release your lock. */
 	unsigned int             hr_cexec; /* [lock(INC(:hm_lock || (hr_nlops != 0 && ATOMIC)), DEC(:hm_lock))]
 	                                    * Upper bound for # of handles with IO_CLOEXEC */
 	unsigned int             hr_cfork; /* [lock(INC(:hm_lock || (hr_nlops != 0 && ATOMIC)), DEC(:hm_lock))]

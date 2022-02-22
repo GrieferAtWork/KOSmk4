@@ -507,9 +507,25 @@ PUBLIC NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL handrange_dec_nlops_and_maybe_rejoin)(struct handrange *__restrict self,
                                                     struct handman *__restrict man,
                                                     bool try_truncate_self) {
+	/* Rejoin and all that stuff can only work if the _last_ LOP handle goes away.
+	 * For any recursive LOP handle, we don't even have to try and acquire a lock
+	 * to the handle manager. */
+	for (;;) {
+		unsigned int nlops;
+		nlops = ATOMIC_READ(self->hr_nlops);
+		assertf(nlops >= 1, "Only call this if _you_ are holding a LOP handle.");
+		if (nlops < 2)
+			break;
+		/* Set rejoin flags. */
+		if (try_truncate_self)
+			ATOMIC_OR(self->hr_flags, _HANDRANGE_F_TRUNC);
+		if (ATOMIC_CMPXCH_WEAK(self->hr_nlops, nlops, nlops - 1))
+			return;
+	}
 	if (handman_trywrite(man)) {
 		ATOMIC_DEC(self->hr_nlops);
-		if (try_truncate_self) {
+		if ((ATOMIC_FETCHAND(self->hr_flags, ~_HANDRANGE_F_TRUNC) & _HANDRANGE_F_TRUNC) ||
+		    (try_truncate_self)) {
 			if (!handrange_truncate_locked(self, man, true))
 				goto unlock_and_done;
 		}
