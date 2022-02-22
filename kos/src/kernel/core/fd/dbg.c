@@ -70,43 +70,21 @@ DBG_COMMAND(lsfd,
             "\t" AC_WHITE("f") ": The " AC_WITHFG(ANSITTY_CL_PURPLE, "CLOFORK") " flag is set\n"
             "\t" AC_WHITE("a") ": Writes append to the end of the file\n"
             "\t" AC_WHITE("n") ": Reading/writing does not block\n") {
-	struct handle_manager *self;
-	self = FORTASK(dbg_current, this_handle_manager);
+	struct handman *self;
+	struct handrange *range;
+	self = FORTASK(dbg_current, this_handman);
 	dbg_printf(DBGSTR("fd\tflags type             repr\n"));
-#ifdef CONFIG_USE_NEW_HANDMAN
-	{
-		struct handrange *range;
-		for (range = handman_ranges_first(self); range;
-		     range = handman_ranges_next(self, range)) {
-			unsigned int i, size;
-			size = handrange_count(range);
-			for (i = 0; i < size; ++i) {
-				if (!handrange_slotishand(range, i))
-					continue;
-				printhandle(range->hr_minfd + i,
-				            &range->hr_hand[i].mh_hand);
-			}
+	for (range = handman_ranges_first(self); range;
+	     range = handman_ranges_next(self, range)) {
+		unsigned int i, size;
+		size = handrange_count(range);
+		for (i = 0; i < size; ++i) {
+			if (!handrange_slotishand(range, i))
+				continue;
+			printhandle(range->hr_minfd + i,
+			            &range->hr_hand[i].mh_hand);
 		}
 	}
-#else /* CONFIG_USE_NEW_HANDMAN */
-	if (self->hm_mode == HANDLE_MANAGER_MODE_LINEAR) {
-		unsigned int i;
-		for (i = 0; i < self->hm_linear.hm_alloc; ++i)
-			printhandle(i, &self->hm_linear.hm_vector[i]);
-	} else {
-		unsigned int i;
-		for (i = 0; i <= self->hm_hashvector.hm_hashmsk; ++i) {
-			struct handle_hashent ent;
-			ent = self->hm_hashvector.hm_hashvec[i];
-			if (ent.hh_handle_id == HANDLE_HASHENT_SENTINEL_ID)
-				continue;
-			if (ent.hh_vector_index == (unsigned int)-1)
-				continue;
-			printhandle(ent.hh_handle_id,
-			            &self->hm_hashvector.hm_vector[ent.hh_vector_index]);
-		}
-	}
-#endif /* !CONFIG_USE_NEW_HANDMAN */
 	return 0;
 }
 

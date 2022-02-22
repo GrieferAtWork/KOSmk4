@@ -350,10 +350,6 @@
 #define E_INVALID_HANDLE_FILE_ILLEGAL_F_DUPFD  0x0004 /* Same as `E_INVALID_HANDLE_FILE_ILLEGAL', but context is `fcntl(F_DUPFD)'.
                                                        * -> Translated to EINVAL instead of EBADF for compatibility with linux. */
 #endif /* !E_INVALID_HANDLE_FILE_ILLEGAL_F_DUPFD */
-/* TODO: Remove `E_INVALID_HANDLE_FILE_UNALLOCATED' once `CONFIG_USE_NEW_HANDMAN' becomes mandatory */
-#ifndef E_INVALID_HANDLE_FILE_UNALLOCATED
-#define E_INVALID_HANDLE_FILE_UNALLOCATED      0x0005 /* The FD slot associated with the given number isn't allocated (`fd >= fd_max') */
-#endif /* !E_INVALID_HANDLE_FILE_UNALLOCATED */
 #ifndef E_INVALID_HANDLE_OPERATION_READ
 #define E_INVALID_HANDLE_OPERATION_READ        0x0001 /* Attempted to read() on a handle opened as IO_WRONLY */
 #endif /* !E_INVALID_HANDLE_OPERATION_READ */

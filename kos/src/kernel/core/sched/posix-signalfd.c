@@ -252,7 +252,6 @@ DEFINE_SYSCALL4(fd_t, signalfd4, fd_t, fd,
 		result = fd;
 		update_signalfd(result, sigmask, sigsetsize);
 	} else {
-#ifdef CONFIG_USE_NEW_HANDMAN
 		iomode_t mode;
 		REF struct signalfd *sfd;
 		struct handle_install_data install;
@@ -272,27 +271,6 @@ DEFINE_SYSCALL4(fd_t, signalfd4, fd_t, fd,
 		if (flags & SFD_CLOFORK)
 			mode |= IO_CLOFORK;
 		handles_install_commit_inherit(&install, sfd, mode);
-#else /* CONFIG_USE_NEW_HANDMAN */
-		REF struct signalfd *sfd;
-		sfd = signalfd_create(sigmask, sigsetsize);
-		TRY {
-			struct handle hnd;
-			hnd.h_data = sfd;
-			hnd.h_type = HANDLE_TYPE_SIGNALFD;
-			hnd.h_mode = IO_RDONLY; /* Write-access would just throw `E_FSERROR_UNSUPPORTED_OPERATION' regardlessly... */
-			if (flags & SFD_NONBLOCK)
-				hnd.h_mode |= IO_NONBLOCK;
-			if (flags & SFD_CLOEXEC)
-				hnd.h_mode |= IO_CLOEXEC;
-			if (flags & SFD_CLOFORK)
-				hnd.h_mode |= IO_CLOFORK;
-			result = handles_install(hnd);
-		} EXCEPT {
-			destroy(sfd);
-			RETHROW();
-		}
-		decref_unlikely(sfd);
-#endif /* !CONFIG_USE_NEW_HANDMAN */
 	}
 	return result;
 }

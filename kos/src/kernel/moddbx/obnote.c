@@ -1366,6 +1366,8 @@ NOTHROW(KCALL note_fd_t_value)(pformatprinter printer, void *arg, fd_t fd,
 	struct handle hand;
 	struct handle_manager *hman;
 	TRY {
+		struct handrange *range;
+		unsigned int relfd;
 		if (!dbg_current || !ADDR_ISKERN(dbg_current))
 			goto badobj;
 		hman = FORTASK(dbg_current, this_handle_manager);
@@ -1421,67 +1423,19 @@ NOTHROW(KCALL note_fd_t_value)(pformatprinter printer, void *arg, fd_t fd,
 				break;
 			}
 		}
-#ifdef CONFIG_USE_NEW_HANDMAN
-		{
-			struct handrange *range;
-			unsigned int relfd;
-			if (!hman->hm_ranges || !ADDR_ISKERN(hman->hm_ranges))
-				goto badobj;
-			range = handman_ranges_locate(hman, (unsigned int)fd);
-			if (!range || !ADDR_ISKERN(range))
-				goto badobj;
-			if ((unsigned int)fd < range->hr_minfd)
-				goto badobj;
-			if ((unsigned int)fd > range->hr_maxfd)
-				goto badobj;
-			relfd = (unsigned int)fd - range->hr_minfd;
-			if (!handrange_slotishand(range, relfd))
-				goto badobj;
-			hand = range->hr_hand[relfd].mh_hand;
-		}
-#else /* CONFIG_USE_NEW_HANDMAN */
-		switch (hman->hm_mode) {
-
-		case HANDLE_MANAGER_MODE_LINEAR:
-			if (!hman->hm_linear.hm_vector || !ADDR_ISKERN(hman->hm_linear.hm_vector))
-				goto badobj;
-			if ((unsigned int)fd >= hman->hm_linear.hm_alloc)
-				goto badobj;
-			hand = hman->hm_linear.hm_vector[(unsigned int)fd];
-			break;
-
-		case HANDLE_MANAGER_MODE_HASHVECTOR: {
-			unsigned int i, perturb, count;
-			if (!hman->hm_hashvector.hm_hashvec || !ADDR_ISKERN(hman->hm_hashvector.hm_hashvec))
-				goto badobj;
-			if (hman->hm_count <= hman->hm_hashvector.hm_alloc)
-				goto badobj;
-			i = perturb = (unsigned int)fd & hman->hm_hashvector.hm_hashmsk;
-			count = 0;
-			for (;; handle_manager_hashnext(i, perturb)) {
-				struct handle_hashent *hashent;
-				unsigned int vecid;
-				if (count >= hman->hm_count)
-					goto badobj;
-				++count;
-				hashent = &hman->hm_hashvector.hm_hashvec[i & hman->hm_hashvector.hm_hashmsk];
-				if (hashent->hh_handle_id == HANDLE_HASHENT_SENTINEL_ID)
-					goto badobj;
-				if (hashent->hh_handle_id != (unsigned int)fd)
-					continue; /* Some other handle. */
-				/* Found it! */
-				vecid = hashent->hh_vector_index;
-				if (vecid == (unsigned int)-1)
-					goto badobj;
-				hand = hman->hm_hashvector.hm_vector[vecid];
-				break;
-			}
-		}	break;
-
-		default:
+		if (!hman->hm_ranges || !ADDR_ISKERN(hman->hm_ranges))
 			goto badobj;
-		}
-#endif /* !CONFIG_USE_NEW_HANDMAN */
+		range = handman_ranges_locate(hman, (unsigned int)fd);
+		if (!range || !ADDR_ISKERN(range))
+			goto badobj;
+		if ((unsigned int)fd < range->hr_minfd)
+			goto badobj;
+		if ((unsigned int)fd > range->hr_maxfd)
+			goto badobj;
+		relfd = (unsigned int)fd - range->hr_minfd;
+		if (!handrange_slotishand(range, relfd))
+			goto badobj;
+		hand = range->hr_hand[relfd].mh_hand;
 		if (hand.h_type == HANDLE_TYPE_UNDEFINED)
 			goto badobj;
 	} EXCEPT {

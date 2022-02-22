@@ -662,38 +662,9 @@ NOTHROW(KCALL system_cc_handle)(uintptr_half_t handle_typ,
 	}
 }
 
-#ifdef CONFIG_USE_NEW_HANDMAN
 INTDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void /* From "fd/handman.c" */
 NOTHROW(KCALL system_cc_perhman)(struct handman *__restrict self,
                                  struct ccinfo *__restrict info);
-#else /* CONFIG_USE_NEW_HANDMAN */
-PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
-NOTHROW(KCALL system_cc_perhman)(struct handle_manager *__restrict self,
-                                 struct ccinfo *__restrict info) {
-	unsigned int fdno = 0;
-	for (;;) {
-		REF struct handle hand;
-		if (!handle_manager_tryread(self)) {
-			if (ccinfo_noblock(info))
-				return;
-			if (!handle_manager_read_nx(self))
-				return;
-		}
-		/* Find the first handle with an index >= fdno */
-		fdno = handle_trynextfd_locked(fdno, self, &hand);
-		if (fdno != (unsigned int)-1)
-			handle_incref(hand);
-		handle_manager_endread(self);
-		if (fdno == (unsigned int)-1)
-			break;
-		system_cc_handle(hand.h_type, hand.h_data, info);
-		handle_decref(hand);
-		if (ccinfo_isdone(info))
-			break;
-		++fdno;
-	}
-}
-#endif /* !CONFIG_USE_NEW_HANDMAN */
 
 
 

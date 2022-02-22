@@ -1791,7 +1791,6 @@ again:
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_EPOLL_CREATE1
 DEFINE_SYSCALL1(fd_t, epoll_create1, syscall_ulong_t, flags) {
-#ifdef CONFIG_USE_NEW_HANDMAN
 	fd_t resfd;
 	REF struct epoll_controller *epoll;
 	struct handle_install_data install;
@@ -1823,33 +1822,6 @@ DEFINE_SYSCALL1(fd_t, epoll_create1, syscall_ulong_t, flags) {
 #endif /* !... */
 	handles_install_commit_inherit(&install, epoll, mode);
 	return resfd;
-#else /* CONFIG_USE_NEW_HANDMAN */
-	unsigned int resfd;
-	struct handle hand;
-	VALIDATE_FLAGSET(flags, EPOLL_CLOEXEC | EPOLL_CLOFORK,
-	                 E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS);
-	hand.h_type = HANDLE_TYPE_EPOLL;
-	hand.h_mode = IO_RDWR;
-#define EPOLL_CREATE_FLAGS_IO_SHIFT 17
-#if ((EPOLL_CLOEXEC >> EPOLL_CREATE_FLAGS_IO_SHIFT) == IO_CLOEXEC && \
-     (EPOLL_CLOFORK >> EPOLL_CREATE_FLAGS_IO_SHIFT) == IO_CLOFORK)
-	hand.h_mode |= flags >> EPOLL_CREATE_FLAGS_IO_SHIFT;
-#else /* ... */
-	if (flags & EPOLL_CLOEXEC)
-		hand.h_mode |= IO_CLOEXEC;
-	if (flags & EPOLL_CLOFORK)
-		hand.h_mode |= IO_CLOFORK;
-#endif /* !... */
-
-	/* Create the actual epoll object. */
-	hand.h_data = epoll_controller_create();
-	{
-		FINALLY_DECREF_UNLIKELY((REF struct epoll_controller *)hand.h_data);
-		/* Register the handle. */
-		resfd = handles_install(hand);
-	}
-	return (fd_t)resfd;
-#endif /* !CONFIG_USE_NEW_HANDMAN */
 }
 #endif /* __ARCH_WANT_SYSCALL_EPOLL_CREATE1 */
 

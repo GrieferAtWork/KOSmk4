@@ -23,7 +23,6 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_USE_NEW_HANDMAN
 #include <kernel/handle.h>
 #include <kernel/handman.h>
 #include <kernel/malloc.h>
@@ -2769,9 +2768,6 @@ unlock_and_done:
 	}
 }
 
-
-
 DECL_END
-#endif /* CONFIG_USE_NEW_HANDMAN */
 
 #endif /* !GUARD_KERNEL_SRC_FD_HANDMAN_C */

@@ -24,7 +24,6 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_USE_NEW_HANDMAN
 #include <kernel/except.h>
 #include <kernel/fs/fifohandle.h>
 #include <kernel/fs/fifonode.h>
@@ -283,6 +282,5 @@ DEFINE_SYSCALL3(syscall_slong_t, fcntl, fd_t, fd,
 
 
 DECL_END
-#endif /* CONFIG_USE_NEW_HANDMAN */
 
 #endif /* !GUARD_KERNEL_SRC_FD_FCNTL_C */

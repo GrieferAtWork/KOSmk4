@@ -23,7 +23,6 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_USE_NEW_HANDMAN
 #include <kernel/except.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/fs.h>
@@ -601,6 +600,5 @@ handles_install_openfd(struct handle const *__restrict hand,
 
 
 DECL_END
-#endif /* CONFIG_USE_NEW_HANDMAN */
 
 #endif /* !GUARD_KERNEL_SRC_FD_HANDLES_C */

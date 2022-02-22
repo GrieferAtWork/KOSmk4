@@ -973,7 +973,6 @@ PUBLIC REF struct uvio *KCALL uvio_create(void) THROWS(E_BADALLOC) {
 DEFINE_SYSCALL2(fd_t, userviofd,
                 size_t, initial_size,
                 syscall_ulong_t, flags) {
-#ifdef CONFIG_USE_NEW_HANDMAN
 	fd_t resfd;
 	iomode_t mode;
 	REF struct uvio *vio;
@@ -998,30 +997,6 @@ DEFINE_SYSCALL2(fd_t, userviofd,
 	mode = IO_RDWR | IO_FROM_OPENFLAG(flags);
 	handles_install_commit_inherit(&install, vio, mode);
 	return (fd_t)resfd;
-#else /* CONFIG_USE_NEW_HANDMAN */
-	unsigned int resfd;
-	struct handle hand;
-	REF struct uvio *result_object;
-
-	VALIDATE_FLAGSET(flags,
-	                 O_NONBLOCK | O_CLOEXEC | O_CLOFORK,
-	                 E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS);
-
-	/* Construct the UVIO object. */
-	result_object = uvio_create();
-	atomic64_init(&result_object->mf_filesize, initial_size);
-	FINALLY_DECREF_UNLIKELY(result_object);
-
-	hand.h_type = HANDLE_TYPE_MFILE;
-	/* Need to be able to read & write to implement the server/client
-	 * architecture that  is  used  to  drive  the  UVIO  sub-system. */
-	hand.h_mode = IO_RDWR | (IO_FROM_OPENFLAG(flags) & ~IO_ACCMODE);
-	hand.h_data = result_object;
-
-	/* Install the handle to-be returned. */
-	resfd = handles_install(hand);
-	return (fd_t)resfd;
-#endif /* !CONFIG_USE_NEW_HANDMAN */
 }
 #endif /* __ARCH_WANT_SYSCALL_USERVIOFD */
 

@@ -178,7 +178,6 @@ memfd_new_with_filehandle(USER CHECKED char const *name)
 DEFINE_SYSCALL2(fd_t, memfd_create,
                 USER UNCHECKED char const *, name,
                 syscall_ulong_t, flags) {
-#ifdef CONFIG_USE_NEW_HANDMAN
 	fd_t resfd;
 	iomode_t mode;
 	struct handle_install_data install;
@@ -213,35 +212,6 @@ DEFINE_SYSCALL2(fd_t, memfd_create,
 	handles_install_commit_inherit(&install, hand, mode,
 	                               HANDLE_TYPE_TEMPHANDLE);
 	return resfd;
-#else /* CONFIG_USE_NEW_HANDMAN */
-	unsigned int resfd;
-	struct handle hand;
-
-	/* Validate arguments. */
-	validate_readable(name, 1);
-	VALIDATE_FLAGSET(flags,
-	                 MFD_CLOEXEC | MFD_ALLOW_SEALING |
-	                 MFD_HUGETLB | MFD_CLOFORK,
-	                 E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_FLAGS);
-
-	/* Construct the new mem-fd object. */
-
-	/* Use TEMPHANDLE, so the memfd is deleted during close()
-	 * If we used a normal FILEHANDLE, we'd get a reference leak:
-	 *       mpart_all_list->mpart->memfd */
-	hand.h_type = HANDLE_TYPE_TEMPHANDLE;
-	hand.h_mode = IO_RDWR;
-	if (flags & MFD_CLOEXEC)
-		hand.h_mode |= IO_CLOEXEC;
-	if (flags & MFD_CLOFORK)
-		hand.h_mode |= IO_CLOFORK;
-	hand.h_data = memfd_new_with_filehandle(name);
-	FINALLY_DECREF_UNLIKELY((REF struct mfile *)hand.h_data);
-
-	/* Install the new handle. */
-	resfd = handles_install(hand);
-	return (fd_t)resfd;
-#endif /* !CONFIG_USE_NEW_HANDMAN */
 }
 
 

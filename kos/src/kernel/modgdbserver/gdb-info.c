@@ -565,7 +565,6 @@ NOTHROW(FCALL GDBInfo_PrintFdList_Callback)(void *closure,
 	arg     = ((struct GDBInfo_PrintThreadList_Data *)closure)->ptld_arg;
 	pid     = task_getrootpid_of(thread);
 	hman    = task_gethandlemanager(thread);
-#ifdef CONFIG_USE_NEW_HANDMAN
 	if (!GDBThread_IsAllStopModeActive) {
 		/* FIXME: What  if one  of the suspended  threads is holding  the VM lock?
 		 *        We should have some kind of timeout here, and switch to all-stop
@@ -589,38 +588,6 @@ NOTHROW(FCALL GDBInfo_PrintFdList_Callback)(void *closure,
 	}
 	if (!GDBThread_IsAllStopModeActive)
 		handman_endread(hman);
-#else /* CONFIG_USE_NEW_HANDMAN */
-	if (!GDBThread_IsAllStopModeActive) {
-		/* FIXME: What  if one  of the suspended  threads is holding  the VM lock?
-		 *        We should have some kind of timeout here, and switch to all-stop
-		 *        mode if the timeout expires. */
-		sync_read(&hman->hm_lock);
-	}
-	if (hman->hm_mode == HANDLE_MANAGER_MODE_LINEAR) {
-		unsigned int i;
-		for (i = 0; i < hman->hm_linear.hm_alloc; ++i) {
-			if (hman->hm_linear.hm_vector[i].h_type == HANDLE_TYPE_UNDEFINED)
-				continue;
-			DO(GDBInfo_PrintFdListEntry(printer, arg, thread, pid, i,
-			                            &hman->hm_linear.hm_vector[i]));
-		}
-	} else {
-		unsigned int i;
-		for (i = 0; i <= hman->hm_hashvector.hm_hashmsk; ++i) {
-			unsigned int fd, index;
-			fd = hman->hm_hashvector.hm_hashvec[i].hh_handle_id;
-			if (fd == HANDLE_HASHENT_SENTINEL_ID)
-				continue; /* Unused / Sentinel */
-			index = hman->hm_hashvector.hm_hashvec[i].hh_vector_index;
-			if (index == (unsigned int)-1)
-				continue; /* Deleted */
-			DO(GDBInfo_PrintFdListEntry(printer, arg, thread, pid, fd,
-			                            &hman->hm_hashvector.hm_vector[index]));
-		}
-	}
-	if (!GDBThread_IsAllStopModeActive)
-		sync_endread(&hman->hm_lock);
-#endif /* !CONFIG_USE_NEW_HANDMAN */
 	decref_unlikely(hman);
 done:
 	return result;

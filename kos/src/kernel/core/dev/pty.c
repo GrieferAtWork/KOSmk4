@@ -535,7 +535,6 @@ DEFINE_SYSCALL5(errno_t, openpty,
                 USER UNCHECKED char *, name,
                 USER UNCHECKED struct termios const *, termp,
                 USER UNCHECKED struct winsize const *, winp) {
-#ifdef CONFIG_USE_NEW_HANDMAN
 	struct handle_install_data minstall;
 	struct handle_install_data sinstall;
 	fd_t mfd, sfd;
@@ -584,56 +583,6 @@ DEFINE_SYSCALL5(errno_t, openpty,
 		RETHROW();
 	}
 	return -EOK;
-#else /* CONFIG_USE_NEW_HANDMAN */
-	struct handle temp;
-	fd_t fdmaster, fdslave;
-	REF struct ptymaster *master;
-	REF struct ptyslave *slave;
-	validate_readable_opt(termp, sizeof(*termp));
-	validate_readable_opt(winp, sizeof(*winp));
-	validate_writable_opt(name, 1);
-	validate_writable(aslave, sizeof(*aslave));
-	validate_writable(amaster, sizeof(*amaster));
-	/* Allocate the PTY device pair. */
-	pty_alloc(&master, &slave, termp, winp);
-	FINALLY_DECREF_UNLIKELY(master);
-	FINALLY_DECREF_UNLIKELY(slave);
-	if (name) {
-		REF struct devdirent *devname;
-		device_getname_lock_acquire(master);
-		devname = incref(master->dv_dirent);
-		device_getname_lock_release(master);
-		FINALLY_DECREF_UNLIKELY(devname);
-		sprintf(name, "/dev/%s", devname->dd_dirent.fd_name);
-	}
-
-	temp.h_type = HANDLE_TYPE_MFILE;
-	temp.h_mode = IO_RDWR;
-	temp.h_data = master;
-	fdmaster    = handles_install(temp);
-	TRY {
-		temp.h_data = slave;
-		fdslave     = handles_install(temp);
-		TRY {
-			/* Save the master/slave handlers into their user-space pointers. */
-			ATOMIC_WRITE(*amaster, fdmaster);
-			ATOMIC_WRITE(*aslave, fdslave);
-		} EXCEPT {
-			{
-				NESTED_EXCEPTION;
-				handle_tryclose_nosym(fdslave, THIS_HANDLE_MANAGER);
-			}
-			RETHROW();
-		}
-	} EXCEPT {
-		{
-			NESTED_EXCEPTION;
-			handle_tryclose_nosym(fdmaster, THIS_HANDLE_MANAGER);
-		}
-		RETHROW();
-	}
-	return -EOK;
-#endif /* !CONFIG_USE_NEW_HANDMAN */
 }
 #endif /* __ARCH_WANT_SYSCALL_OPENPTY */
 

@@ -103,22 +103,6 @@ DEFINE_SYSCALL3(fd_t, dup3, fd_t, oldfd, fd_t, newfd, oflag_t, flags) {
 
 
 
-#ifndef CONFIG_USE_NEW_HANDMAN
-/************************************************************************/
-/* fcntl()                                                              */
-/************************************************************************/
-#ifdef __ARCH_WANT_SYSCALL_FCNTL
-DEFINE_SYSCALL3(syscall_slong_t, fcntl, fd_t, fd,
-                fcntl_t, command, UNCHECKED USER void *, arg) {
-	return handle_fcntl(THIS_HANDLE_MANAGER, fd, command, arg);
-}
-#endif /* __ARCH_WANT_SYSCALL_FCNTL */
-#endif /* !CONFIG_USE_NEW_HANDMAN */
-
-
-
-
-
 /************************************************************************/
 /* ftruncate(), ftruncate64()                                           */
 /************************************************************************/
@@ -183,20 +167,15 @@ DEFINE_SYSCALL4(errno_t, fallocate64,
 
 
 /************************************************************************/
-/* close()                                                              */
+/* close(), close_range()                                               */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_CLOSE
 DEFINE_SYSCALL1(errno_t, close, fd_t, fd) {
-#ifdef CONFIG_USE_NEW_HANDMAN
 	struct handle ohand;
 	decref(*handles_close(fd, &ohand));
-#else /* CONFIG_USE_NEW_HANDMAN */
-	handle_close((unsigned int)fd);
-#endif /* !CONFIG_USE_NEW_HANDMAN */
 	return 0;
 }
 #endif /* __ARCH_WANT_SYSCALL_CLOSE */
-#ifdef CONFIG_USE_NEW_HANDMAN
 #ifdef __ARCH_WANT_SYSCALL_CLOSE_RANGE
 DEFINE_SYSCALL3(errno_t, close_range,
                 unsigned int, minfd,
@@ -234,7 +213,6 @@ DEFINE_SYSCALL3(errno_t, close_range,
 	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_CLOSE_RANGE */
-#endif /* CONFIG_USE_NEW_HANDMAN */
 
 
 

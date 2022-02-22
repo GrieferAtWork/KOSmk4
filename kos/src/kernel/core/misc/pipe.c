@@ -567,7 +567,6 @@ STATIC_ASSERT(IO_NONBLOCK == IO_FROM_OPENFLAG(O_NONBLOCK));
      defined(__ARCH_WANT_COMPAT_SYSCALL_PIPE))
 PRIVATE errno_t KCALL
 sys_pipe2_impl(USER UNCHECKED fd_t *pipedes, oflag_t flags) {
-#ifdef CONFIG_USE_NEW_HANDMAN
 	struct handle_install_data rinstall;
 	struct handle_install_data winstall;
 	fd_t rfd, wfd;
@@ -616,47 +615,6 @@ sys_pipe2_impl(USER UNCHECKED fd_t *pipedes, oflag_t flags) {
 		RETHROW();
 	}
 	return -EOK;
-#else /* CONFIG_USE_NEW_HANDMAN */
-	REF struct pipe *p;
-	REF struct handle r;
-	REF struct handle w;
-	unsigned int rfd, wfd;
-	validate_writable(pipedes, 2 * sizeof(fd_t));
-	VALIDATE_FLAGSET(flags,
-	                 O_CLOEXEC | O_CLOFORK | O_NONBLOCK | O_DIRECT,
-	                 E_INVALID_ARGUMENT_CONTEXT_PIPE2_FLAGS);
-	if (flags & O_DIRECT)
-		THROW(E_NOT_IMPLEMENTED_TODO); /* Packet-mode pipe */
-	/* Create a new pipe, pipe-reader and pipe-writer */
-	p = pipe_create();
-	FINALLY_DECREF_UNLIKELY(p);
-	r.h_type = HANDLE_TYPE_PIPE_READER;
-	r.h_mode = IO_RDONLY | IO_FROM_OPENFLAG(flags & (O_CLOEXEC | O_CLOFORK | O_NONBLOCK));
-	r.h_data = pipe_reader_create(p);
-	FINALLY_DECREF_UNLIKELY((struct pipe_reader *)r.h_data);
-	w.h_type = HANDLE_TYPE_PIPE_WRITER;
-	w.h_mode = IO_WRONLY | IO_FROM_OPENFLAG(flags & (O_CLOEXEC | O_CLOFORK | O_NONBLOCK));
-	w.h_data = pipe_writer_create(p);
-	FINALLY_DECREF_UNLIKELY((struct pipe_writer *)w.h_data);
-	/* Install the reader/writer handlers. */
-	rfd = handles_install(r);
-	TRY {
-		wfd = handles_install(w);
-		TRY {
-			COMPILER_WRITE_BARRIER();
-			pipedes[0] = rfd;
-			pipedes[1] = wfd;
-			COMPILER_WRITE_BARRIER();
-		} EXCEPT {
-			handle_tryclose_nosym(wfd, THIS_HANDLE_MANAGER);
-			RETHROW();
-		}
-	} EXCEPT {
-		handle_tryclose_nosym(rfd, THIS_HANDLE_MANAGER);
-		RETHROW();
-	}
-	return -EOK;
-#endif /* !CONFIG_USE_NEW_HANDMAN */
 }
 #endif /* ... */
 

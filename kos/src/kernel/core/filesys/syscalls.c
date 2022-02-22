@@ -1447,7 +1447,6 @@ DEFINE_SYSCALL1(errno_t, syncfs, fd_t, fd) {
 PRIVATE fd_t KCALL
 sys_openat_impl(fd_t dirfd, USER UNCHECKED char const *filename,
                 oflag_t oflags, mode_t mode) {
-#ifdef CONFIG_USE_NEW_HANDMAN
 	fd_t result;
 	REF struct handle hand;
 	struct handle_install_data install;
@@ -1464,19 +1463,6 @@ sys_openat_impl(fd_t dirfd, USER UNCHECKED char const *filename,
 	/* Commit the new handle. */
 	handles_install_commit_inherit(&install, &hand);
 	return result;
-#else /* CONFIG_USE_NEW_HANDMAN */
-	unsigned int result_fd;
-	REF struct handle result;
-	validate_readable(filename, 1);
-
-	/* Do the open */
-	result = path_open(dirfd, filename, oflags, mode);
-	RAII_FINALLY { decref(result); };
-
-	/* Install the new handle. */
-	result_fd = handles_install(result);
-	return (fd_t)result_fd;
-#endif /* !CONFIG_USE_NEW_HANDMAN */
 }
 #endif /* open... */
 
