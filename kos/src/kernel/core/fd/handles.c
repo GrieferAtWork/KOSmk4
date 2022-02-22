@@ -179,7 +179,9 @@ handles_lookupobj_symbolic(fd_t fd, uintptr_half_t wanted_type) {
 	case (AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN))...(AT_FDDRIVE_ROOT(AT_DOS_DRIVEMAX)): {
 		REF struct path *result;
 		struct fs *myfs = THIS_FS;
-		if (wanted_type != HANDLE_TYPE_PATH) {
+		if (wanted_type != HANDLE_TYPE_PATH &&
+		    wanted_type != HANDLE_TYPE_MFILE &&
+		    wanted_type != HANDLE_TYPE_DIRENT) {
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      /* fd:                 */ (syscall_slong_t)fd,
 			      /* needed_handle_type: */ wanted_type,
@@ -223,7 +225,25 @@ handles_lookupobj_symbolic(fd_t fd, uintptr_half_t wanted_type) {
 		default: __builtin_unreachable();
 		}
 
-		return result;
+		/* Return the relevant element of `result' */
+		switch (wanted_type) {
+		case HANDLE_TYPE_PATH:
+			return result;
+		case HANDLE_TYPE_MFILE: {
+			REF struct mfile *r;
+			r = incref(result->p_dir);
+			decref_unlikely(result);
+			return r;
+		}	break;
+		case HANDLE_TYPE_DIRENT: {
+			REF struct fdirent *r;
+			r = incref(result->p_name);
+			decref_unlikely(result);
+			return r;
+		}	break;
+		default: __builtin_unreachable();
+		}
+		__builtin_unreachable();
 	}	break;
 
 	case AT_THIS_TASK:
@@ -406,7 +426,7 @@ handles_lookup(fd_t fd, /*out*/ REF struct handle *__restrict hand)
 
 /* Same as `handles_lookup()', but require a specific handle type,
  * and return a reference to  the handle's `h_data' field,  rather
- * than the handle itself. */
+ * than the handle itself (attempts to cast miss-matching  types). */
 PUBLIC ATTR_RETNONNULL WUNUSED REF void *FCALL
 handles_lookupobj(fd_t fd, uintptr_half_t wanted_type)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE) {
@@ -477,10 +497,10 @@ handles_lookuptask(fd_t fd)
 		       E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED) {
 	REF struct task *result;
 	REF struct taskpid *pid;
-#ifndef __OPTIMIZE_SIZE__
 	if (fd < 0) {
 		switch (fd) {
 
+#ifndef __OPTIMIZE_SIZE__
 		case AT_THIS_TASK:
 			return incref(THIS_TASK);
 
@@ -495,15 +515,24 @@ handles_lookuptask(fd_t fd)
 			}
 			return proc;
 		}	break;
+#endif /* !__OPTIMIZE_SIZE__ */
 
 		case AT_PARENT_PROCESS:
+			/* NOTE: This case right here is actually required for ABI  compliance.
+			 * Because  the parent process  might change, there  is always a chance
+			 * that doing taskpid_gettask(task_getparentprocesspid()) fails, simply
+			 * because the parent changed and died between loading its PID and then
+			 * loading its task.
+			 *
+			 * As such, we'd either have to  keep on re-trying loading the  parent
+			 * in that case, or simply _always_ skip the PID step (even when built
+			 * for __OPTIMIZE_SIZE__). */
 			return task_getparentprocess();
 
 		default:
 			break;
 		}
 	}
-#endif /* !__OPTIMIZE_SIZE__ */
 	/* Lookup a PIDFD */
 	pid = handles_lookuppidfd(fd);
 	FINALLY_DECREF_UNLIKELY(pid);

@@ -79,6 +79,7 @@
 DECL_BEGIN
 
 STATIC_ASSERT(HANDRANGE_FREESLOTS_SPLIT_THRESHOLD > HANDRANGE_FREESLOTS_TRUNC_THRESHOLD);
+STATIC_ASSERT(sizeof(union handslot) == sizeof(struct handle));
 
 
 /* Check if 2 given ranges overlap (that is: share at least 1 common address) */
@@ -2141,7 +2142,7 @@ again_check_slot:
 			}
 			handman_endwrite(self);
 
-			/* Wait for the handle to be installed proper */
+			/* Wait for the handle to be committed (or aborted) */
 			task_waitfor();
 			goto again_lock;
 		} else {
@@ -2663,7 +2664,7 @@ handman_install(struct handman *__restrict self,
 
 /* Preserve a file descriptor slot to which the caller may either
  * commit a kernel object, or  abort its installation in case  of
- * a error during the object's creation.
+ * an error during the object's creation.
  *
  * This 2-step process (including the ability of knowing what  will
  * eventually  become the object's  initial file descriptor number)
@@ -2678,7 +2679,7 @@ handman_install(struct handman *__restrict self,
  *                 - handman_install_abort()
  *                ... both of which are NOBLOCK+NOTHROW and may therefor
  *                be called after any other object-specific point-of-no-
- *                return control-flow positions.
+ *                return control-flow position.
  * @param: minfd: Lowest FD which may be returned (s.a. `fcntl(F_DUPFD)')
  * @return: * :   The file descriptor number that was allocated.
  * @throw: E_BADALLOC_INSUFFICIENT_HEAP_MEMORY:    Failed to allocate memory

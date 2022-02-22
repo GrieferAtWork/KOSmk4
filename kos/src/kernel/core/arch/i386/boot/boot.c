@@ -292,7 +292,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	x86_initialize_tsc_resync();
 
 	/* Do some more initialization of the scheduling system that can only
-	 * be done after everything SMP-related has already been  intialized. */
+	 * be done after everything SMP-related has already been initialized. */
 	kernel_initialize_scheduler_after_smp();
 
 	/* XXX: ioapic support (ioapic is the modern equivalent of the pic) */
@@ -567,8 +567,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *     it  behaves similar to  .eh_frame, but differs  in that it contains
 	 *     a lookup-table like:
 	 *         >> [{ pc_min: pointer, pc_max: pointer, eh_frame_data: pointer }...]
-	 *     I couldn't find documentation on  the actual format, but glibc  has
-	 *     a file that is used to parse this header, so it can tell how that's
+	 *     I  couldn't find documentation on the actual format, but glibc has
+	 *     a file that is used to parse this table, so it can tell how that's
 	 *     supposed to be done.
 	 */
 
@@ -640,8 +640,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       down to every  file-node of the  superblock (`MFILE_F_NOATIME'  and
 	 *       `MFILE_F_NOMTIME'),  which  may  only  be  done  (atomically) while
 	 *       enumerating the super's node-tree and holding `fsuper_nodes_read()' */
-
-	/* TODO: Use the general-purpose lockop system in `struct pidns' and replace `pn_dead' */
 
 	/* TODO: Re-write `struct heap' with lockop support */
 

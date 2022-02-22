@@ -73,17 +73,22 @@ struct signalfd;
 struct mfutexfd;
 struct refcountable;
 
+
+/* >> int __handleidof(T *expr)
+ * Returns the HANDLE_TYPE_* code for the kernel object type  "T".
+ * Causes a compiler error if "T" doesn't have a handle type code.
+ * NOTE: Sub-classes of types with codes are handled correctly. */
 #ifdef __cplusplus
 extern "C++" {
 struct __PRIVATE_handleidof_tag { };
 template<class T> struct __PRIVATE_handleidof { };
-#define __FOREACH_DEFINE_HANDLEIFOF(id, T)            \
+#define __FOREACH_DEFINE_HANDLEIDOF(id, T)            \
 	T operator,(T const &, __PRIVATE_handleidof_tag); \
 	template<> struct __PRIVATE_handleidof<T> {       \
 		enum { value = id };                          \
 	};
-HANDLE_FOREACH_TYPE(__FOREACH_DEFINE_HANDLEIFOF)
-#undef __FOREACH_DEFINE_HANDLEIFOF
+HANDLE_FOREACH_TYPE(__FOREACH_DEFINE_HANDLEIDOF)
+#undef __FOREACH_DEFINE_HANDLEIDOF
 #define __handleidof(expr) (::__PRIVATE_handleidof<decltype((*(expr), ::__PRIVATE_handleidof_tag()))>::value)
 } /* extern "C++" */
 #endif /* __cplusplus */
@@ -126,9 +131,10 @@ HANDLE_FOREACH_TYPE(__FOREACH_DEFINE_HANDLEIFOF)
 
 /* Special value for `mh_hand.h_type' that indicates a handle that has
  * been allocated, but not yet committed. It is possible to change the
- * type of a handle from this to the designed type without needing  to
+ * type  of a handle from this to  the desired type without needing to
  * acquire a lock to the handle manager.
- * Additionally, you must decrement `hr_nlops' when doing so! */
+ * However, `hr_nlops' must be used to track how many such handles are
+ * in some `struct handrange'. */
 #define _MANHANDLE_LOADMARKER ((uintptr_half_t)-1)
 
 #if HANDLE_TYPE_UNDEFINED == 0
@@ -144,13 +150,15 @@ union handslot {
 	void                  *_mh_words[2]; /* Raw data words. */
 };
 
-#define __handslot_makeword2(mode, type) \
-	((void *)((uintptr_t)(uintptr_half_t)(mode) | ((uintptr_t)(uintptr_half_t)(type) << (__SIZEOF_POINTER__ * 4))))
+#define __handslot_makeword2(h_mode, h_type)          \
+	((void *)(((uintptr_t)(uintptr_half_t)(h_mode)) | \
+	          ((uintptr_t)(uintptr_half_t)(h_type) << (__SIZEOF_POINTER__ * 4))))
 
 /* Determine the status of a given handle slot:
- *  - handrange_slotishand: h_type != HANDLE_TYPE_UNDEFINED && _handslot_ishand
- *  - handrange_slotisused: h_type != HANDLE_TYPE_UNDEFINED
- *  - handrange_slotisfree: h_type == HANDLE_TYPE_UNDEFINED */
+ *  - handslot_ishand: h_type != HANDLE_TYPE_UNDEFINED && _handslot_ishand
+ *  - handslot_isused: h_type != HANDLE_TYPE_UNDEFINED
+ *  - handslot_isfree: h_type == HANDLE_TYPE_UNDEFINED
+ *  - handslot_forked: handslot_ishand && !IO_CLOFORK  (should the slot be retained during fork()?) */
 #ifdef __handletype_ishand
 #define handslot_ishand(self) __handletype_ishand((self)->mh_hand.h_type)
 #else /* __handletype_ishand */
@@ -192,8 +200,8 @@ union handslot {
  * -> This also doesn't affect ranges that became fully empty. For such a range
  *    it doesn't matter if it has less than HANDRANGE_FREESLOTS_TRUNC_THRESHOLD
  *    leading/trailing free slots. -- It is always deleted.
- * -> This limit is also ignored by `system_cc()', which always trims _all_
- *    leading/trailing free slots.
+ * -> This limit is also ignored by `system_cc()', which (if it can) always
+ *    trims _all_ leading/trailing free slots.
  */
 #ifndef HANDRANGE_FREESLOTS_TRUNC_THRESHOLD
 #define HANDRANGE_FREESLOTS_TRUNC_THRESHOLD 2
@@ -265,7 +273,8 @@ struct handrange {
 /* Determine the status of a given handle slot:
  *  - handrange_slotishand: h_type != HANDLE_TYPE_UNDEFINED && _handslot_ishand
  *  - handrange_slotisused: h_type != HANDLE_TYPE_UNDEFINED
- *  - handrange_slotisfree: h_type == HANDLE_TYPE_UNDEFINED */
+ *  - handrange_slotisfree: h_type == HANDLE_TYPE_UNDEFINED
+ *  - handrange_slotforked: handrange_slotishand && !IO_CLOFORK  (should the slot be retained during fork()?) */
 #define handrange_slotishand(self, relative_fd) handslot_ishand(&(self)->hr_hand[relative_fd])
 #define handrange_slotisused(self, relative_fd) handslot_isused(&(self)->hr_hand[relative_fd])
 #define handrange_slotisfree(self, relative_fd) handslot_isfree(&(self)->hr_hand[relative_fd])
@@ -317,18 +326,18 @@ struct handrange {
 	 handrange_setclofork(self, relative_fd, (new_clo_flags)&IO_CLOFORK))
 
 
-/* Safely install data into a given `self', without ever blocking.
+/* Safely install data into a given `union handslot *self', without ever  blocking.
  * This is the sequence of events that must happen in order to commit a handle that
- * had previously been reserved/allocated  by a call to  `handman_install_begin()'.
+ * had previously been reserved/allocated by a call to `handman_install_begin()'.
  *
  * Note that the order in which we update stuff here is extremely important:
- *  - First,  we must update  the cexec/cfork fields, thus  ensuring that at no
- *    point in time will they be `0' when there is a non-zero amount of handles
- *    with the relevant flag.
- *  - Then,  we fill in the handle's data field. This could actually happen at any
+ *  - First, we fill in the handle's data field. This could actually happen at any
  *    point  before the commit, as this field  doesn't have any meaning in regards
  *    to data ordering. However, if it needs to hold some sort of value, this must
  *    happen _before_ we fill in the second data word.
+ *  - Then,  we must  update the cexec/cfork  fields, thus ensuring  that at no
+ *    point in time will they be `0' when there is a non-zero amount of handles
+ *    with the relevant flag.
  *  - The second data word contains the handle's type/mode. -- Only the type  is
  *    truly important here,  as it encodes  the fact that  the handle was  still
  *    marked  as `_MANHANDLE_LOADMARKER'. Once we write to this word, the handle
@@ -342,7 +351,10 @@ struct handrange {
  *    special operation, as the moment we do the decrement, `range' may be free'd
  *    or realloc'd by another thread. However,  for the sake of cache  reduction,
  *    we also have to try and re-join a handle region with its neighbors whenever
- *    doing so becomes  allowed. (s.a.  `handrange_dec_nlops_and_maybe_rejoin()') */
+ *    doing so becomes  allowed. (s.a.  `handrange_dec_nlops_and_maybe_rejoin()')
+ *  - And lastly, we signify that handles changed.  -- This may be used for  any
+ *    purpose what-so-ever, but the primary  consumer is `dup2()', which  blocks
+ *    if the target handle is used by a LOP handle (which we just stopped being) */
 #define _handslot_commit_inherit(man, range, self, data, mode, type)      \
 	(__hybrid_atomic_store((self)->_mh_words[0], data, __ATOMIC_RELEASE), \
 	 __handslot_commit_inherit(man, range, self, mode, type))
@@ -413,7 +425,7 @@ struct handman {
 	                                      * with negative numbers)  cannot be assigned,  though
 	                                      * some have symbolic meaning (e.g. AT_FDCWD)
 	                                      *
-	                                      * This field must not be set of a negative value! */
+	                                      * This field must not be greater than INT_MAX! */
 };
 
 /* Destroy the given handle manager. */
@@ -666,13 +678,15 @@ handman_setcloexec_range(struct handman *__restrict self,
  * @throw: E_INVALID_HANDLE_FILE:E_INVALID_HANDLE_FILE_ILLEGAL:  `fd > self->hm_maxfd'
  * @throw: E_INVALID_HANDLE_FILE:E_INVALID_HANDLE_FILE_NEGATIVE: `fd < 0' */
 FUNDEF WUNUSED NONNULL((1)) fd_t FCALL
-handman_findnext(struct handman *__restrict self, fd_t fd, void **p_data DFL(__NULLPTR))
+handman_findnext(struct handman *__restrict self,
+                 fd_t fd, void **p_data DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
 
 /* Find the next handrange_slotishand handle in a slot >= fd
  * @return: -1: One of the cases where `handman_findnext()' throws `E_INVALID_HANDLE_FILE' */
 FUNDEF WUNUSED NONNULL((1)) fd_t FCALL
-handman_tryfindnext(struct handman *__restrict self, fd_t fd, void **p_data DFL(__NULLPTR))
+handman_tryfindnext(struct handman *__restrict self,
+                    fd_t fd, void **p_data DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK);
 
 /* Install a given handle  under a specific handle  number.
@@ -790,7 +804,7 @@ struct handle_install_data {
 
 /* Preserve a file descriptor slot to which the caller may either
  * commit a kernel object, or  abort its installation in case  of
- * a error during the object's creation.
+ * an error during the object's creation.
  *
  * This 2-step process (including the ability of knowing what  will
  * eventually  become the object's  initial file descriptor number)
@@ -805,7 +819,7 @@ struct handle_install_data {
  *                 - handman_install_abort()
  *                ... both of which are NOBLOCK+NOTHROW and may therefor
  *                be called after any other object-specific point-of-no-
- *                return control-flow positions.
+ *                return control-flow position.
  * @param: minfd: Lowest FD which may be returned (s.a. `fcntl(F_DUPFD)')
  * @return: * :   The file descriptor number that was allocated.
  * @throw: E_BADALLOC_INSUFFICIENT_HEAP_MEMORY:    Failed to allocate memory
@@ -914,7 +928,7 @@ handles_lookup(fd_t fd, /*out*/ REF struct handle *__restrict hand)
 
 /* Same as `handles_lookup()', but require a specific handle type,
  * and return a reference to  the handle's `h_data' field,  rather
- * than the handle itself. */
+ * than the handle itself (attempts to cast miss-matching  types). */
 FUNDEF ATTR_RETNONNULL WUNUSED REF void *FCALL
 handles_lookupobj(fd_t fd, uintptr_half_t wanted_type)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE);
