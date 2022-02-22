@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfae6f98e */
+/* HASH CRC-32:0x40c11c16 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -617,7 +617,7 @@
 /* @param: swapflags: Set of `SWAP_FLAG_*' */
 #define SYS_swapon                 __NR_swapon                 /* errno_t swapon(char const *pathname, syscall_ulong_t swapflags) */
 #define SYS_swapoff                __NR_swapoff                /* errno_t swapoff(char const *pathname) */
-/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
+/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED' */
 #define SYS_mprotect               __NR_mprotect               /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 #define SYS_msync                  __NR_msync                  /* errno_t msync(void *addr, size_t len, syscall_ulong_t flags) */
 #define SYS_mlock                  __NR_mlock                  /* errno_t mlock(void const *addr, size_t len) */
@@ -789,7 +789,7 @@
 #define SYS_fstatfs                __NR_fstatfs                /* errno_t fstatfs(fd_t file, struct statfs *buf) */
 #define SYS_statfs                 __NR_statfs                 /* errno_t statfs(char const *file, struct statfs *buf) */
 #define SYS_lseek                  __NR_lseek                  /* syscall_slong_t lseek(fd_t fd, syscall_slong_t offset, syscall_ulong_t whence) */
-/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with  a  set of  `MAP_ANONYMOUS  | MAP_FIXED  |  MAP_GROWSDOWN |  MAP_LOCKED |
  *               MAP_NONBLOCK  |  MAP_NORESERVE  |  MAP_POPULATE  |  MAP_STACK  |  MAP_SYNC   |

@@ -35,6 +35,7 @@
 #define __PROT_GROWSDOWN 0x01000000 /* Same as `MAP_GROWSDOWN', but may be used with `mprotect()' */
 #define __PROT_GROWSUP   0x02000000 /* Same as `MAP_GROWSUP', but may be used with `mprotect()' */
 #ifdef __KOS__
+#if __KOS_VERSION__ < 400
 #if __KOS_VERSION__ >= 300
 #define __PROT_LOOSE     0x10 /* Unmap the region within the when cloning a VM (`CLONE_VM'). */
 #else /* __KOS_VERSION__ >= 300 */
@@ -42,6 +43,7 @@
                                * NOTE: Implicitly set for all system-allocated user stacks,
                                *       except for that of the calling thread. */
 #endif /* __KOS_VERSION__ < 300 */
+#endif /* __KOS_VERSION__ <= 400 */
 #define __PROT_SHARED    0x20 /* Changes are shared, even after the VM was cloned (`CLONE_VM').
                                * NOTE: Same as the `MAP_SHARED' map flag, but
                                *       can  be set like any other protection. */

@@ -33,9 +33,9 @@ DECL_BEGIN
 
 /* Mask of MNODE_F_* flags found in `struct mmapinfo::mmi_flags' */
 #define MMAPINFO_FLAGS_MASK                               \
-	(MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD |     \
-	 MNODE_F_SHARED | MNODE_F_MPREPARED | MNODE_F_MHINT | \
-	 MNODE_F_MLOCK | MNODE_F_NOSPLIT | MNODE_F_NOMERGE)
+	(MNODE_F_PMASK | MNODE_F_SHARED | MNODE_F_MPREPARED | \
+	 MNODE_F_MHINT | MNODE_F_MLOCK | MNODE_F_NOSPLIT |    \
+	 MNODE_F_NOMERGE)
 
 
 struct mmapinfo {

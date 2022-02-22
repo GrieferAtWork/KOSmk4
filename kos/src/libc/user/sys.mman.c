@@ -35,9 +35,9 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_mmap,hash:CRC-32=0x632fe961]]]*/
+/*[[[head:libc_mmap,hash:CRC-32=0xa206a637]]]*/
 /* >> mmap(2), mmap64(2)
- * @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+ * @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
@@ -62,8 +62,9 @@ NOTHROW_NCX(LIBCCALL libc_mmap)(void *addr,
 }
 /*[[[end:libc_mmap]]]*/
 
-/*[[[head:libc_munmap,hash:CRC-32=0x9a2a58aa]]]*/
-/* Unmap memory from `addr...+=len' */
+/*[[[head:libc_munmap,hash:CRC-32=0x36b776a1]]]*/
+/* >> munmap(2)
+ * Unmap memory from `addr...+=len' */
 INTERN ATTR_SECTION(".text.crt.heap.mman") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_munmap)(void *addr,
                                   size_t len)
@@ -75,10 +76,10 @@ NOTHROW_NCX(LIBCCALL libc_munmap)(void *addr,
 }
 /*[[[end:libc_munmap]]]*/
 
-/*[[[head:libc_mprotect,hash:CRC-32=0x6d731db2]]]*/
-/* @param prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE |
- *              PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED |
- *              PROT_GROWSUP | PROT_GROWSDOWN' */
+/*[[[head:libc_mprotect,hash:CRC-32=0x69e61441]]]*/
+/* >> mprotect(2)
+ * @param prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE |
+ *              PROT_READ | PROT_SEM | PROT_GROWSUP | PROT_GROWSDOWN' */
 INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_mprotect)(void *addr,
                                     size_t len,
@@ -91,8 +92,9 @@ NOTHROW_NCX(LIBCCALL libc_mprotect)(void *addr,
 }
 /*[[[end:libc_mprotect]]]*/
 
-/*[[[head:libc_msync,hash:CRC-32=0xfd7a4a5c]]]*/
-/* @param flags: Set of `MS_ASYNC | MS_INVALIDATE | MS_SYNC' */
+/*[[[head:libc_msync,hash:CRC-32=0x233e730b]]]*/
+/* >> msync(2)
+ * @param flags: Set of `MS_ASYNC | MS_INVALIDATE | MS_SYNC' */
 INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_msync)(void *addr,
                                  size_t len,
@@ -190,12 +192,12 @@ NOTHROW_NCX(LIBCCALL libc_mincore)(void *start,
 }
 /*[[[end:libc_mincore]]]*/
 
-/*[[[head:libc_mmap64,hash:CRC-32=0x9a1b2e5]]]*/
+/*[[[head:libc_mmap64,hash:CRC-32=0xce0cb5f9]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_mmap64, libc_mmap);
 #else /* MAGIC:alias */
 /* >> mmap(2), mmap64(2)
- * @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+ * @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |

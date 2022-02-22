@@ -158,7 +158,7 @@
                                                                         * [fld(num_bytes: size_t, "The number of bytes that could not be mapped")] */
 #endif /* !E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY */
 #ifndef E_BADALLOC_ADDRESS_ALREADY_EXISTS
-#define E_BADALLOC_ADDRESS_ALREADY_EXISTS         (E_BADALLOC, 0x0003) /* [msg("Virtual address already in use"), errno(EEXIST)]
+#define E_BADALLOC_ADDRESS_ALREADY_EXISTS         (E_BADALLOC, 0x0003) /* [errno(EEXIST), msg("Virtual address already in use")]
                                                                         * [fld(minaddr:       void *, "Lowest address that was requested")]
                                                                         * [fld(maxaddr:       void *, "Greatest address that was requested")]
                                                                         * [fld(inuse_minaddr: void *, "Lowest address already in use")]
@@ -324,7 +324,7 @@
                                                                               * [fld(actual_handle_kind: syscall_ulong_t, "The type-kind of handle that was found (One of `HANDLE_TYPEKIND_*' from <kos/kernel/handle.h>)")] */
 #endif /* !E_INVALID_HANDLE_FILETYPE */
 #ifndef E_INVALID_HANDLE_OPERATION
-#define E_INVALID_HANDLE_OPERATION                (E_INVALID_HANDLE, 0x0003) /* [errno(EINVAL), msg("Invalid handle operation")]
+#define E_INVALID_HANDLE_OPERATION                (E_INVALID_HANDLE, 0x0003) /* [errno($op == E_INVALID_HANDLE_OPERATION_MMAP ? EACCES : EINVAL), msg("Invalid handle operation")]
                                                                               * [fld(op: unsigned int, "One of `E_INVALID_HANDLE_OPERATION_*'")]
                                                                               * [fld(handle_mode: iomode_t, "The access permissions of the handle")] */
 #endif /* !E_INVALID_HANDLE_OPERATION */
@@ -359,6 +359,13 @@
 #ifndef E_INVALID_HANDLE_OPERATION_TRUNC
 #define E_INVALID_HANDLE_OPERATION_TRUNC       0x0003 /* Attempted to truncate() on a handle opened as IO_RDONLY */
 #endif /* !E_INVALID_HANDLE_OPERATION_TRUNC */
+#ifndef E_INVALID_HANDLE_OPERATION_MMAP
+#define E_INVALID_HANDLE_OPERATION_MMAP        0x0004 /* Attempted to:
+                                                       * - mmap() a handle opened as IO_WRONLY
+                                                       * - mmap(PROT_WRITE) a handle opened with IO_APPEND
+                                                       * - mmap(PROT_WRITE, MAP_SHARED) a handle not opened as IO_RDWR
+                                                       * - mprotect(PROT_WRITE) a MAP_SHARED mapping  created by a non-IO_RDWR  handle. */
+#endif /* !E_INVALID_HANDLE_OPERATION_MMAP */
 #ifndef E_INVALID_HANDLE_OPERATION_GETPROPERTY
 #define E_INVALID_HANDLE_OPERATION_GETPROPERTY 0x0011 /* Attempted to get some abstract property of a handle opened
                                                        * as IO_WRONLY. Note however that this depends on what  type

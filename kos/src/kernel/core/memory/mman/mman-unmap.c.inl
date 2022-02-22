@@ -37,6 +37,7 @@
 #include <hybrid/atomic.h>
 
 #include <kos/except.h>
+#include <kos/io.h>
 
 #include <assert.h>
 #include <stdbool.h>
@@ -193,6 +194,30 @@ again_acquire_lock:
 			(likely(!(node->mn_flags & MNODE_F_MPREPARED)) && \
 			 LOCAL_must_modify_node(node))
 #endif /* !DEFINE_mman_protect */
+
+			/* Don't allow `PROT_WRITE' to be set when `MNODE_F_PDENYWRITE' was set. */
+#ifdef DEFINE_mman_protect
+			if unlikely((mnode_flags_more & MNODE_F_PWRITE) &&
+			            (node->mn_flags & MNODE_F_PDENYWRITE)) {
+				struct mnode *iter;
+				/* Undo everything... */
+				for (iter = mima.mm_min; iter != node;
+				     iter = mnode_tree_nextnode(iter)) {
+					assert(iter);
+					if (LOCAL_must_prepare_node(iter)) {
+						pagedir_unprepare_p(self->mm_pagedir_p,
+						                    mnode_getaddr(iter),
+						                    mnode_getsize(iter));
+					}
+				}
+				mman_lock_release(self);
+				THROW(E_INVALID_HANDLE_OPERATION, -1, /* We no longer know the FD... */
+				      E_INVALID_HANDLE_OPERATION_MMAP,
+				      IO_RDONLY);
+			}
+#endif /* DEFINE_mman_protect */
+
+			/* If necessary, prepare the mem-node for remapping. */
 			if (LOCAL_must_prepare_node(node)) {
 				if unlikely(!pagedir_prepare_p(self->mm_pagedir_p,
 				                                mnode_getaddr(node),

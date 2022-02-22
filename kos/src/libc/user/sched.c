@@ -55,14 +55,14 @@ NOTHROW_NCX(VLIBDCALL libd_clone)(int (LIBDCALL *fn)(void *arg),
 #endif /* MAGIC:impl_if */
 /*[[[end:libd_clone]]]*/
 
-/*[[[head:libc_unshare,hash:CRC-32=0xf7fff3b0]]]*/
+/*[[[head:libc_unshare,hash:CRC-32=0x65b4e0cc]]]*/
 /* >> unshare(2)
- * Unshare  certain components of the calling thread  that may be shared with other
- * threads  or  processes,  such as  the  filesystem, or  opened  file descriptors.
- * When  being unshared, the  calling thread's descriptor  for a specific component
- * is replaced with a copy  of its previous contents at  that moment in time,  with
- * the notable  exception of  certain KOS-specific  extensions, where  specifically
- * marked   data   will   be   deleted   (s.a.   `O_CLOFORK'   and    `PROT_LOOSE')
+ * Unshare certain components of the calling thread that may be shared with other
+ * threads or  processes, such  as the  filesystem, or  opened file  descriptors.
+ * When  being unshared, the calling thread's descriptor for a specific component
+ * is  replaced with a copy of its previous contents at that moment in time, with
+ * the notable exception of  certain KOS-specific extensions, where  specifically
+ * marked data will be deleted (s.a. `O_CLOFORK')
  * The  behavior and  meaning of individual  bits in `flags'  matches their meaning
  * when passed to `clone()', except that for certain flags the meaning is reversed.
  * For example: Passing `CLONE_FILES' to `clone(2)' will cause handles to be shared,

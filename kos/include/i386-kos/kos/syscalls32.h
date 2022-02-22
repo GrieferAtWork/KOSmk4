@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ebcbee9 */
+/* HASH CRC-32:0xcf1dda0b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1267,7 +1267,7 @@ __CDECLARE_SC(,__errno_t,mlock2,(void const *__addr, __size_t __length, __syscal
 __CDECLARE_SC(,__errno_t,mlockall,(__syscall_ulong_t __flags),(__flags))
 #endif /* __CRT_HAVE_SC(mlockall) */
 #if __CRT_HAVE_SC(mmap)
-/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with  a  set of  `MAP_ANONYMOUS  | MAP_FIXED  |  MAP_GROWSDOWN |  MAP_LOCKED |
  *               MAP_NONBLOCK  |  MAP_NORESERVE  |  MAP_POPULATE  |  MAP_STACK  |  MAP_SYNC   |
@@ -1290,7 +1290,7 @@ __CDECLARE_SC(,__errno_t,move_mount,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__errno_t,move_pages,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(move_pages) */
 #if __CRT_HAVE_SC(mprotect)
-/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
+/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED' */
 __CDECLARE_SC(,__errno_t,mprotect,(void *__addr, __size_t __len, __syscall_ulong_t __prot),(__addr,__len,__prot))
 #endif /* __CRT_HAVE_SC(mprotect) */
 #if __CRT_HAVE_SC(mpx)
@@ -3758,7 +3758,7 @@ __CDECLARE_XSC(,__errno_t,mlock2,(void const *__addr, __size_t __length, __sysca
 __CDECLARE_XSC(,__errno_t,mlockall,(__syscall_ulong_t __flags),(__flags))
 #endif /* __CRT_HAVE_XSC(mlockall) */
 #if __CRT_HAVE_XSC(mmap)
-/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with  a  set of  `MAP_ANONYMOUS  | MAP_FIXED  |  MAP_GROWSDOWN |  MAP_LOCKED |
  *               MAP_NONBLOCK  |  MAP_NORESERVE  |  MAP_POPULATE  |  MAP_STACK  |  MAP_SYNC   |
@@ -3781,7 +3781,7 @@ __CDECLARE_XSC(,__errno_t,move_mount,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__errno_t,move_pages,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(move_pages) */
 #if __CRT_HAVE_XSC(mprotect)
-/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
+/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED' */
 __CDECLARE_XSC(,__errno_t,mprotect,(void *__addr, __size_t __len, __syscall_ulong_t __prot),(__addr,__len,__prot))
 #endif /* __CRT_HAVE_XSC(mprotect) */
 #if __CRT_HAVE_XSC(mpx)

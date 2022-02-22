@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1029e828 */
+/* HASH CRC-32:0xc2236c0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -332,7 +332,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lseek)
 	.cfi_endproc
 END(__x86_asm64_syscall_lseek)
 
-/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with  a  set of  `MAP_ANONYMOUS  | MAP_FIXED  |  MAP_GROWSDOWN |  MAP_LOCKED |
  *               MAP_NONBLOCK  |  MAP_NORESERVE  |  MAP_POPULATE  |  MAP_STACK  |  MAP_SYNC   |
@@ -368,7 +368,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mmap)
 	.cfi_endproc
 END(__x86_asm64_syscall_mmap)
 
-/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
+/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED' */
 /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 .section .text.x86.asm64_syscall.mprotect
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mprotect)
@@ -15188,7 +15188,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readdir)
 	.cfi_endproc
 END(__x86_asm32_int80_readdir)
 
-/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with  a  set of  `MAP_ANONYMOUS  | MAP_FIXED  |  MAP_GROWSDOWN |  MAP_LOCKED |
  *               MAP_NONBLOCK  |  MAP_NORESERVE  |  MAP_POPULATE  |  MAP_STACK  |  MAP_SYNC   |
@@ -16042,7 +16042,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_adjtimex)
 	.cfi_endproc
 END(__x86_asm32_int80_adjtimex)
 
-/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
+/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED' */
 /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 .section .text.x86.asm32_syscall_int80.mprotect
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_mprotect)
@@ -26524,7 +26524,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_reboot, __x86_asm32_int80_reboot)
 /* syscall_slong_t readdir(fd_t fd, struct old_linux_direntx32 *buf) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_readdir, __x86_asm32_int80_readdir)
 
-/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with  a  set of  `MAP_ANONYMOUS  | MAP_FIXED  |  MAP_GROWSDOWN |  MAP_LOCKED |
  *               MAP_NONBLOCK  |  MAP_NORESERVE  |  MAP_POPULATE  |  MAP_STACK  |  MAP_SYNC   |
@@ -26709,7 +26709,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_modify_ldt, __x86_asm32_int80_modi
 /* errno_t adjtimex(struct timex *ntx) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_adjtimex, __x86_asm32_int80_adjtimex)
 
-/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
+/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED' */
 /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mprotect, __x86_asm32_int80_mprotect)
 
@@ -31643,7 +31643,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_readdir)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_readdir)
 
-/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with  a  set of  `MAP_ANONYMOUS  | MAP_FIXED  |  MAP_GROWSDOWN |  MAP_LOCKED |
  *               MAP_NONBLOCK  |  MAP_NORESERVE  |  MAP_POPULATE  |  MAP_STACK  |  MAP_SYNC   |
@@ -32015,7 +32015,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_adjtimex)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_adjtimex)
 
-/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
+/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED' */
 /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 .section .text.x86.asm32_syscall_sysrun32.mprotect
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mprotect)

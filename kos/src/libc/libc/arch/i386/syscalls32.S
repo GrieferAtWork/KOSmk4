@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3c878ef */
+/* HASH CRC-32:0x10b21015 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -929,7 +929,7 @@ INTERN_FUNCTION(libc_sys_readdir)
 END(libc_sys_readdir)
 DEFINE_PUBLIC_ALIAS(sys_readdir, libc_sys_readdir)
 
-/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with  a  set of  `MAP_ANONYMOUS  | MAP_FIXED  |  MAP_GROWSDOWN |  MAP_LOCKED |
  *               MAP_NONBLOCK  |  MAP_NORESERVE  |  MAP_POPULATE  |  MAP_STACK  |  MAP_SYNC   |
@@ -1187,7 +1187,7 @@ INTERN_FUNCTION(libc_sys_adjtimex)
 END(libc_sys_adjtimex)
 DEFINE_PUBLIC_ALIAS(sys_adjtimex, libc_sys_adjtimex)
 
-/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
+/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED' */
 /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 INTERN_FUNCTION(libc_sys_mprotect)
 	movl   $(0x7d), %eax
@@ -5394,7 +5394,7 @@ INTERN_FUNCTION(libc_sys_Xreaddir)
 END(libc_sys_Xreaddir)
 DEFINE_PUBLIC_ALIAS(sys_Xreaddir, libc_sys_Xreaddir)
 
-/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with  a  set of  `MAP_ANONYMOUS  | MAP_FIXED  |  MAP_GROWSDOWN |  MAP_LOCKED |
  *               MAP_NONBLOCK  |  MAP_NORESERVE  |  MAP_POPULATE  |  MAP_STACK  |  MAP_SYNC   |
@@ -5645,7 +5645,7 @@ INTERN_FUNCTION(libc_sys_Xadjtimex)
 END(libc_sys_Xadjtimex)
 DEFINE_PUBLIC_ALIAS(sys_Xadjtimex, libc_sys_Xadjtimex)
 
-/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
+/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED' */
 /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 INTERN_FUNCTION(libc_sys_Xmprotect)
 	movl   $(0x7d), %eax

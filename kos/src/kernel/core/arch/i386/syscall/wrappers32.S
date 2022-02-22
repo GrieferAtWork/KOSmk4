@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3209086 */
+/* HASH CRC-32:0x9b95a39e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3415,7 +3415,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readdir)
 	.cfi_endproc
 END(__x86_asm32_int80_readdir)
 
-/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with  a  set of  `MAP_ANONYMOUS  | MAP_FIXED  |  MAP_GROWSDOWN |  MAP_LOCKED |
  *               MAP_NONBLOCK  |  MAP_NORESERVE  |  MAP_POPULATE  |  MAP_STACK  |  MAP_SYNC   |
@@ -4726,7 +4726,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_adjtimex)
 	.cfi_endproc
 END(__x86_asm32_int80_adjtimex)
 
-/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
+/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED' */
 /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 .section .text.x86.asm32_syscall_int80.mprotect
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_mprotect)
@@ -22875,7 +22875,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_readdir)
 	.cfi_endproc
 END(__x86_asm32_sysenter_readdir)
 
-/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with  a  set of  `MAP_ANONYMOUS  | MAP_FIXED  |  MAP_GROWSDOWN |  MAP_LOCKED |
  *               MAP_NONBLOCK  |  MAP_NORESERVE  |  MAP_POPULATE  |  MAP_STACK  |  MAP_SYNC   |
@@ -24190,7 +24190,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_adjtimex)
 	.cfi_endproc
 END(__x86_asm32_sysenter_adjtimex)
 
-/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
+/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED' */
 /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 .section .text.x86.asm32_syscall_sysenter.mprotect
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mprotect)

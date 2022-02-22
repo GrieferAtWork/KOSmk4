@@ -79,7 +79,7 @@
 
 
 #if defined(__KOS__) && defined(__USE_KOS)
-/* Unmap the region within the when cloning a VM (`CLONE_VM'). */
+/* Unmap the region within the when cloning a VM (`CLONE_VM'). (KOSmk3 only) */
 #if !defined(PROT_LOOSE) && defined(__PROT_LOOSE)
 #define PROT_LOOSE __PROT_LOOSE
 #endif /* !PROT_LOOSE && __PROT_LOOSE */
@@ -607,7 +607,7 @@ void *mmap32(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
              __STDC_INT_AS_UINT_T flags, $fd_t fd, $off32_t offset);
 
 @@>> mmap(2), mmap64(2)
-@@@param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+@@@param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
 @@@param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
 @@              with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
 @@              MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
@@ -626,19 +626,21 @@ void *mmap(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
 @@pp_endif@@
 }
 
+@@>> munmap(2)
 @@Unmap memory from `addr...+=len'
 [[section(".text.crt{|.dos}.heap.mman")]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[export_alias("__munmap", "__libc_munmap")]]
 int munmap([[nonnull]] void *addr, size_t len);
 
+@@>> mprotect(2)
 @@@param prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE |
-@@             PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED |
-@@             PROT_GROWSUP | PROT_GROWSDOWN'
+@@             PROT_READ | PROT_SEM | PROT_GROWSUP | PROT_GROWSDOWN'
 [[decl_include("<features.h>", "<hybrid/typecore.h>"), section(".text.crt{|.dos}.system.mman")]]
 [[export_alias("__mprotect", "__libc_mprotect")]]
 int mprotect([[nonnull]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot);
 
+@@>> msync(2)
 @@@param flags: Set of `MS_ASYNC | MS_INVALIDATE | MS_SYNC'
 [[cp, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[export_alias("__msync", "__libc_msync")]]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79c52d1d */
+/* HASH CRC-32:0xe23aeaf0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -614,7 +614,7 @@
 /* @param: swapflags: Set of `SWAP_FLAG_*' */
 #define __NR_swapon                 0xe0  /* errno_t swapon(char const *pathname, syscall_ulong_t swapflags) */
 #define __NR_swapoff                0xe1  /* errno_t swapoff(char const *pathname) */
-/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
+/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED' */
 #define __NR_mprotect               0xe2  /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 #define __NR_msync                  0xe3  /* errno_t msync(void *addr, size_t len, syscall_ulong_t flags) */
 #define __NR_mlock                  0xe4  /* errno_t mlock(void const *addr, size_t len) */
@@ -786,7 +786,7 @@
 #define __NR_fstatfs                0x41f /* errno_t fstatfs(fd_t file, struct statfs *buf) */
 #define __NR_statfs                 0x420 /* errno_t statfs(char const *file, struct statfs *buf) */
 #define __NR_lseek                  0x421 /* syscall_slong_t lseek(fd_t fd, syscall_slong_t offset, syscall_ulong_t whence) */
-/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with  a  set of  `MAP_ANONYMOUS  | MAP_FIXED  |  MAP_GROWSDOWN |  MAP_LOCKED |
  *               MAP_NONBLOCK  |  MAP_NORESERVE  |  MAP_POPULATE  |  MAP_STACK  |  MAP_SYNC   |

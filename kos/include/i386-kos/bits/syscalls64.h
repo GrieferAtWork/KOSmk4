@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53e21caf */
+/* HASH CRC-32:0x22b7526 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,13 +59,13 @@
 #define SYS_lstat                    __NR_lstat                    /* errno_t lstat(char const *filename, struct linux_statx64 *statbuf) */
 #define SYS_poll                     __NR_poll                     /* ssize_t poll(struct pollfd *fds, size_t nfds, syscall_slong_t timeout) */
 #define SYS_lseek                    __NR_lseek                    /* syscall_slong_t lseek(fd_t fd, syscall_slong_t offset, syscall_ulong_t whence) */
-/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with  a  set of  `MAP_ANONYMOUS  | MAP_FIXED  |  MAP_GROWSDOWN |  MAP_LOCKED |
  *               MAP_NONBLOCK  |  MAP_NORESERVE  |  MAP_POPULATE  |  MAP_STACK  |  MAP_SYNC   |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE | MAP_OFFSET64_POINTER' */
 #define SYS_mmap                     __NR_mmap                     /* void *mmap(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t offset) */
-/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
+/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED' */
 #define SYS_mprotect                 __NR_mprotect                 /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 #define SYS_munmap                   __NR_munmap                   /* errno_t munmap(void *addr, size_t len) */
 #define SYS_brk                      __NR_brk                      /* errno_t brk(void *addr) */

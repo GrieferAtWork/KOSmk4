@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfeb12f3c */
+/* HASH CRC-32:0x92de8acf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -208,7 +208,7 @@
  * @return: 1 : Read on directory entry
  * @return: 0 : End-of-directory */
 #define SYS_readdir                      __NR_readdir                      /* syscall_slong_t readdir(fd_t fd, struct old_linux_direntx32 *buf) */
-/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with  a  set of  `MAP_ANONYMOUS  | MAP_FIXED  |  MAP_GROWSDOWN |  MAP_LOCKED |
  *               MAP_NONBLOCK  |  MAP_NORESERVE  |  MAP_POPULATE  |  MAP_STACK  |  MAP_SYNC   |
@@ -256,7 +256,7 @@
 #define SYS_uname                        __NR_uname                        /* errno_t uname(struct utsname *name) */
 #define SYS_modify_ldt                   __NR_modify_ldt                   /* syscall_slong_t modify_ldt(syscall_ulong_t func, void *ptr, syscall_ulong_t bytecount) */
 #define SYS_adjtimex                     __NR_adjtimex                     /* errno_t adjtimex(struct timex *ntx) */
-/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
+/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED' */
 #define SYS_mprotect                     __NR_mprotect                     /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 #define SYS_sigprocmask                  __NR_sigprocmask                  /* errno_t sigprocmask(syscall_ulong_t how, struct __old_sigset_struct const *set, struct __old_sigset_struct *oset) */

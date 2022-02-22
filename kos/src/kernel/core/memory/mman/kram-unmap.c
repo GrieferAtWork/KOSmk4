@@ -1025,8 +1025,7 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	hinode->mn_minaddr = unmap_maxaddr + 1;
 	hinode->mn_maxaddr = lonode->mn_maxaddr;
 	lonode->mn_maxaddr = unmap_minaddr - 1;
-	hinode->mn_flags  |= lonode->mn_flags & (MNODE_F_PEXEC | MNODE_F_PWRITE |
-	                                         MNODE_F_PREAD | MNODE_F_SHARED |
+	hinode->mn_flags  |= lonode->mn_flags & (MNODE_F_PMASK | MNODE_F_SHARED |
 	                                         MNODE_F_MPREPARED | MNODE_F_MLOCK);
 	hinode->mn_part    = hipart; /* Inherit reference */
 	hinode->mn_fspath  = xincref(lonode->mn_fspath);

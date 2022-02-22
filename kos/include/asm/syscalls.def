@@ -772,7 +772,7 @@ userfaultfd:(syscall_ulong_t flags) -> fd_t; /* UNIMPLEMENTED */
 /************************************************************************/
 /* Memory functions                                                     */
 /************************************************************************/
-@@@param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+@@@param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
 @@@param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
 @@              with  a  set of  `MAP_ANONYMOUS  | MAP_FIXED  |  MAP_GROWSDOWN |  MAP_LOCKED |
 @@              MAP_NONBLOCK  |  MAP_NORESERVE  |  MAP_POPULATE  |  MAP_STACK  |  MAP_SYNC   |
@@ -787,7 +787,7 @@ mmap2:(void *addr, size_t len, [tostr(MMAP_PROT)] syscall_ulong_t prot,
 
 [restart(must)] munmap:(void *addr, size_t len) -> errno_t;
 
-@@@param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+@@@param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
 [restart(must)] mprotect:(void *addr, size_t len, [tostr(MMAP_PROT)] syscall_ulong_t prot) -> errno_t;
 
 %[startgroup]

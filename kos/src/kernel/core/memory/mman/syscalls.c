@@ -167,8 +167,8 @@ sys_mmap_impl(USER UNCHECKED void *addr, size_t length, syscall_ulong_t prot,
 	/* Make sure that no unknown protection flags have been set. */
 	VALIDATE_FLAGSET(prot,
 	                 (flags & MAP_TYPE) == MAP_AUTOMATIC
-	                 ? (PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED)
-	                 : (PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE),
+	                 ? (PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED)
+	                 : (PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM),
 	                 E_INVALID_ARGUMENT_CONTEXT_MMAP_PROT);
 
 	/* Handle MAP_SHARED via the associated protection flag. */
@@ -200,6 +200,39 @@ sys_mmap_impl(USER UNCHECKED void *addr, size_t length, syscall_ulong_t prot,
 		file.hmi_file = NULL;
 #endif /* !NDEBUG */
 		TRY {
+			if (((hand.h_mode & IO_ACCMODE) == IO_WRONLY) ||
+			    ((hand.h_mode & IO_APPEND) && (prot & PROT_WRITE))) {
+				/* File mappings always require files to be opened with at least read-access:
+				 * """
+				 * EACCES [...] a file mapping was requested, but fd is not open for reading. [...]
+				 * """
+				 *
+				 * Additionally,  a IO_APPEND  file must  not be  mapped with write-access.
+				 * I don't really understand why this shouldn't be allowed, but whatever...
+				 * """
+				 * EACCES [...] PROT_WRITE is set, but the file is append-only. [...]
+				 * """ */
+				THROW(E_INVALID_HANDLE_OPERATION, fd,
+				      E_INVALID_HANDLE_OPERATION_MMAP,
+				      hand.h_mode);
+			} else if ((hand.h_mode & IO_ACCMODE) != IO_RDWR && (prot & PROT_SHARED)) {
+				if (prot & PROT_WRITE) {
+					/* You're not allowed to create a WRITE+SHARED mapping using a
+					 * file  descriptor opened for anything other than read+write.
+					 *
+					 * """
+					 * EACCES [...] MAP_SHARED was requested and PROT_WRITE is set,
+					 *        but fd is not open in read/write (O_RDWR) mode. [...]
+					 * """ */
+					THROW(E_INVALID_HANDLE_OPERATION, fd,
+					      E_INVALID_HANDLE_OPERATION_MMAP,
+					      hand.h_mode);
+				}
+				/* Disallow use of mprotect() to gain write-access. */
+				prot |= PROT_DENYWRITE;
+			}
+
+
 			handle_mmap(hand, &file);
 #ifndef NDEBUG
 			assert(file.hmi_file != NULL);

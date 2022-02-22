@@ -291,7 +291,7 @@ DEFINE_COMPAT_SYSCALL5(void *, maplibrary,
 				node->mbn_minaddr = destaddr;
 				node->mbn_maxaddr = destaddr + PAGESIZE - 1;
 				node->mbn_flags   = mbnodeflags_from_mapflags_usronly(map_flags) |
-				                    mnodeflags_from_prot(map_prot);
+				                    mnodeflags_from_prot_noshared(map_prot);
 				node->mbn_part    = part; /* Inherit reference */
 				node->mbn_fspath  = xincref(file.hmi_fspath);
 				node->mbn_fsname  = xincref(file.hmi_fsname);

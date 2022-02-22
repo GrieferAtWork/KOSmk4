@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3bbb847 */
+/* HASH CRC-32:0x4417967b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -205,7 +205,7 @@
  * @return: 1 : Read on directory entry
  * @return: 0 : End-of-directory */
 #define __NR32_readdir                      0x59                   /* syscall_slong_t readdir(fd_t fd, struct old_linux_direntx32 *buf) */
-/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with  a  set of  `MAP_ANONYMOUS  | MAP_FIXED  |  MAP_GROWSDOWN |  MAP_LOCKED |
  *               MAP_NONBLOCK  |  MAP_NORESERVE  |  MAP_POPULATE  |  MAP_STACK  |  MAP_SYNC   |
@@ -253,7 +253,7 @@
 #define __NR32_uname                        0x7a                   /* errno_t uname(struct utsname *name) */
 #define __NR32_modify_ldt                   0x7b                   /* syscall_slong_t modify_ldt(syscall_ulong_t func, void *ptr, syscall_ulong_t bytecount) */
 #define __NR32_adjtimex                     0x7c                   /* errno_t adjtimex(struct timex *ntx) */
-/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
+/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED' */
 #define __NR32_mprotect                     0x7d                   /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 #define __NR32_sigprocmask                  0x7e                   /* errno_t sigprocmask(syscall_ulong_t how, struct __old_sigset_struct const *set, struct __old_sigset_struct *oset) */

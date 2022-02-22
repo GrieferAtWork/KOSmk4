@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c2e3692 */
+/* HASH CRC-32:0x9a70b25e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,12 +31,12 @@ DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unshare(2)
- * Unshare  certain components of the calling thread  that may be shared with other
- * threads  or  processes,  such as  the  filesystem, or  opened  file descriptors.
- * When  being unshared, the  calling thread's descriptor  for a specific component
- * is replaced with a copy  of its previous contents at  that moment in time,  with
- * the notable  exception of  certain KOS-specific  extensions, where  specifically
- * marked   data   will   be   deleted   (s.a.   `O_CLOFORK'   and    `PROT_LOOSE')
+ * Unshare certain components of the calling thread that may be shared with other
+ * threads or  processes, such  as the  filesystem, or  opened file  descriptors.
+ * When  being unshared, the calling thread's descriptor for a specific component
+ * is  replaced with a copy of its previous contents at that moment in time, with
+ * the notable exception of  certain KOS-specific extensions, where  specifically
+ * marked data will be deleted (s.a. `O_CLOFORK')
  * The  behavior and  meaning of individual  bits in `flags'  matches their meaning
  * when passed to `clone()', except that for certain flags the meaning is reversed.
  * For example: Passing `CLONE_FILES' to `clone(2)' will cause handles to be shared,

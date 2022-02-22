@@ -174,7 +174,7 @@ err_overlap:
 						/* Fill in remaining fields of `overlap_node' */
 						overlap_node->mbn_minaddr = bss_overlap_addr;
 						overlap_node->mbn_maxaddr = bss_overlap_addr + PAGESIZE - 1;
-						overlap_node->mbn_flags   = mnodeflags_from_prot(prot);
+						overlap_node->mbn_flags   = mnodeflags_from_prot_noshared(prot);
 						mbuilder_insert_fmnode(&builder, overlap_node);
 						fil_bytes += PAGESIZE; /* Adjust to not map the first (special) page of .bss */
 						if unlikely(fil_bytes >= mem_bytes)

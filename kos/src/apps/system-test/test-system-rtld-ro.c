@@ -117,6 +117,25 @@ DEFINE_TEST(system_rtld_ro) {
 	errno = 0;
 	EQd(-1, close(AT_FDSYSRTLD));
 	EQd(errno, EBADF); /* Cannot be closed */
+
+	/* Make sure that mmap(MAP_SHARED) on an IO_RDONLY handle works as expected.
+	 * In this case, the  expected exception is E_INVALID_HANDLE_OPERATION  with
+	 * op-code  `E_INVALID_HANDLE_OPERATION_MMAP_SHARED_RDWR',  which  is   then
+	 * translated to `EACCES' (matching posix behavior) */
+	errno = 0;
+	EQp(MAP_FAILED, (map = mmap(NULL, ps, PROT_READ | PROT_WRITE, MAP_SHARED, AT_FDSYSRTLD, 0)));
+	EQd(errno, EACCES);
+	NEp(MAP_FAILED, (map = mmap(NULL, ps, PROT_READ, MAP_SHARED, AT_FDSYSRTLD, 0)));
+
+	/* Try to mprotect() a memory mapping created by PROT_READ+MAP_SHARED of a  non-IO_RDWR
+	 * file descriptor must fail with EACCES. (E_INVALID_HANDLE_OPERATION_MMAP_SHARED_RDWR)
+	 *
+	 * s.a. kernel:MNODE_F_PDENYWRITE */
+	errno = 0;
+	EQd(-1, mprotect(map, ps, PROT_READ | PROT_WRITE));
+	EQd(errno, EACCES);
+	EQd(0, munmap(map, ps));
+
 }
 
 DECL_END

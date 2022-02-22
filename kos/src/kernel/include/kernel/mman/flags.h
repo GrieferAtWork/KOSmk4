@@ -31,6 +31,12 @@
 
 #include <elf.h> /* PF_* */
 
+/* Kernel-only flag: disallow use mprotect(2) to gain write access. Trying to do
+ * so  will  throw `E_INVALID_HANDLE_OPERATION:E_INVALID_HANDLE_OPERATION_MMAP'. */
+#ifndef PROT_DENYWRITE
+#define PROT_DENYWRITE 0x10
+#endif /* !PROT_DENYWRITE */
+
 #ifdef __CC__
 DECL_BEGIN
 
@@ -176,34 +182,40 @@ DECL_BEGIN
 
 /* >> uintptr_t mnodeflags_from_prot(unsigned int prot);
  * Convert `MAP_*' to `PROT_*':
- *   - PROT_NONE    ->  0
- *   - PROT_EXEC    ->  MNODE_F_PEXEC
- *   - PROT_WRITE   ->  MNODE_F_PWRITE
- *   - PROT_READ    ->  MNODE_F_PREAD
- *   - PROT_SHARED  ->  MNODE_F_SHARED
+ *   - PROT_NONE      ->  0
+ *   - PROT_EXEC      ->  MNODE_F_PEXEC
+ *   - PROT_WRITE     ->  MNODE_F_PWRITE
+ *   - PROT_READ      ->  MNODE_F_PREAD
+ *   - PROT_DENYWRITE ->  MNODE_F_PDENYWRITE   (Not in `mnodeflags_from_prot_noshared()')
+ *   - PROT_SHARED    ->  MNODE_F_SHARED       (Not in `mnodeflags_from_prot_noshared()')
  */
-#if (PROT_NONE == 0 &&               \
-     PROT_EXEC == MNODE_F_PEXEC &&   \
-     PROT_WRITE == MNODE_F_PWRITE && \
-     PROT_READ == MNODE_F_PREAD &&   \
-     PROT_SHARED == MNODE_F_SHARED)
+#if (PROT_NONE == 0 &&                \
+     PROT_EXEC == MNODE_F_PEXEC &&    \
+     PROT_WRITE == MNODE_F_PWRITE &&  \
+     PROT_READ == MNODE_F_PREAD &&    \
+     PROT_SHARED == MNODE_F_SHARED && \
+     PROT_DENYWRITE == MNODE_F_PDENYWRITE)
 #define mnodeflags_from_prot(prot)              \
 	((prot) & (MNODE_F_PEXEC | MNODE_F_PWRITE | \
-	           MNODE_F_PREAD | MNODE_F_SHARED))
-#define prot_from_mnodeflags(mnodeflags)      \
-	((mnodeflags) & (PROT_EXEC | PROT_WRITE | \
-	                 PROT_READ | PROT_SHARED))
+	           MNODE_F_PREAD | MNODE_F_SHARED | \
+	           MNODE_F_PDENYWRITE))
+#define prot_from_mnodeflags(mnodeflags)       \
+	((mnodeflags) & (PROT_EXEC | PROT_WRITE |  \
+	                 PROT_READ | PROT_SHARED | \
+	                 PROT_DENYWRITE))
 #else /* ... */
-#define mnodeflags_from_prot(prot)                \
-	((((prot)&PROT_EXEC) ? MNODE_F_PEXEC : 0) |   \
-	 (((prot)&PROT_WRITE) ? MNODE_F_PWRITE : 0) | \
-	 (((prot)&PROT_READ) ? MNODE_F_PREAD : 0) |   \
-	 (((prot)&PROT_SHARED) ? MNODE_F_SHARED : 0))
-#define prot_from_mnodeflags(mnodeflags)                \
-	((((mnodeflags)&MNODE_F_PEXEC) ? PROT_EXEC : 0) |   \
-	 (((mnodeflags)&MNODE_F_PWRITE) ? PROT_WRITE : 0) | \
-	 (((mnodeflags)&MNODE_F_PREAD) ? PROT_READ : 0) |   \
-	 (((mnodeflags)&MNODE_F_SHARED) ? PROT_SHARED : 0))
+#define mnodeflags_from_prot(prot)                 \
+	((((prot)&PROT_EXEC) ? MNODE_F_PEXEC : 0) |    \
+	 (((prot)&PROT_WRITE) ? MNODE_F_PWRITE : 0) |  \
+	 (((prot)&PROT_READ) ? MNODE_F_PREAD : 0) |    \
+	 (((prot)&PROT_SHARED) ? MNODE_F_SHARED : 0) | \
+	 (((prot)&PROT_DENYWRITE) ? MNODE_F_PDENYWRITE : 0))
+#define prot_from_mnodeflags(mnodeflags)                 \
+	((((mnodeflags)&MNODE_F_PEXEC) ? PROT_EXEC : 0) |    \
+	 (((mnodeflags)&MNODE_F_PWRITE) ? PROT_WRITE : 0) |  \
+	 (((mnodeflags)&MNODE_F_PREAD) ? PROT_READ : 0) |    \
+	 (((mnodeflags)&MNODE_F_SHARED) ? PROT_SHARED : 0) | \
+	 (((mnodeflags)&MNODE_F_PDENYWRITE) ? PROT_DENYWRITE : 0))
 #endif /* !... */
 #if (PROT_NONE == 0 &&               \
      PROT_EXEC == MNODE_F_PEXEC &&   \

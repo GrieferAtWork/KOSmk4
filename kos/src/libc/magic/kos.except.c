@@ -723,9 +723,9 @@ for (local name: classes.keys.sorted()) {
 			result = self->@e_args@.@e_invalid_handle@.@ih_filetype@.@f_needed_handle_type@ == @HANDLE_TYPE_SOCKET@ ? ENOTSOCK : EBADFD;
 			break;
 @@pp_endif@@
-@@pp_if defined(EINVAL)@@
+@@pp_if defined(EACCES) && defined(EINVAL)@@
 		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@E_INVALID_HANDLE_OPERATION@)):
-			result = EINVAL;
+			result = self->@e_args@.@e_invalid_handle@.@ih_operation@.@o_op@ == @E_INVALID_HANDLE_OPERATION_MMAP@ ? EACCES : EINVAL;
 			break;
 @@pp_endif@@
 @@pp_if defined(EOPNOTSUPP)@@

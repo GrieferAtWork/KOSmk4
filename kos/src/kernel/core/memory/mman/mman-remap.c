@@ -74,9 +74,8 @@ SLIST_HEAD(mnode_slist, mnode);
 #endif /* !__mnode_slist_defined */
 
 /* Set of relevant flags kept during mremap operations. */
-#define MREMAP_KEPT_MNODE_FLAGS                       \
-	(MNODE_F_PEXEC | MNODE_F_PWRITE | MNODE_F_PREAD | \
-	 MNODE_F_SHARED | MNODE_F_MLOCK)
+#define MREMAP_KEPT_MNODE_FLAGS \
+	(MNODE_F_PMASK | MNODE_F_SHARED | MNODE_F_MLOCK)
 
 
 /* Create a duplicate of a PROT_SHARED mapping. */

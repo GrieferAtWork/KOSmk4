@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8bb76e46 */
+/* HASH CRC-32:0x4ca9425b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -474,11 +474,11 @@ for (local name: classes.keys.sorted()) {
 			__result = __self->e_args.e_invalid_handle.ih_filetype.f_needed_handle_type == HANDLE_TYPE_SOCKET ? __ENOTSOCK : __EBADFD;
 			break;
 #endif /* __ENOTSOCK && __EBADFD */
-#ifdef __EINVAL
+#if defined(__EACCES) && defined(__EINVAL)
 		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_HANDLE_OPERATION)):
-			__result = __EINVAL;
+			__result = __self->e_args.e_invalid_handle.ih_operation.o_op == E_INVALID_HANDLE_OPERATION_MMAP ? __EACCES : __EINVAL;
 			break;
-#endif /* __EINVAL */
+#endif /* __EACCES && __EINVAL */
 #ifdef __EOPNOTSUPP
 		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(E_INVALID_HANDLE_NET_OPERATION)):
 			__result = __EOPNOTSUPP;

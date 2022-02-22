@@ -459,7 +459,7 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #define FD_CLOEXEC __FD_CLOEXEC /* FLAG: Close the descriptor on `exec()'. */
 #endif /* !FD_CLOEXEC && __FD_CLOEXEC */
 #if !defined(FD_CLOFORK) && defined(__FD_CLOFORK)
-#define FD_CLOFORK __FD_CLOFORK /* FLAG: Close the descriptor during unsharing after `fork()' (Similar to `PROT_LOOSE' for memory). */
+#define FD_CLOFORK __FD_CLOFORK /* FLAG: Close the descriptor during unsharing after `fork()'. */
 #endif /* !FD_CLOFORK && __FD_CLOFORK */
 
 

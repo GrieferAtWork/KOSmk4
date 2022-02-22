@@ -643,7 +643,7 @@ __SYSDECL_BEGIN
 #endif /* !FD_CLOEXEC && __FD_CLOEXEC */
 
 #ifdef __USE_KOS
-/* FLAG: Close the descriptor during unsharing after `fork()' (Similar to `PROT_LOOSE' for memory). */
+/* FLAG: Close the descriptor during unsharing after `fork()'. */
 #if !defined(FD_CLOFORK) && defined(__FD_CLOFORK)
 #define FD_CLOFORK __FD_CLOFORK
 #endif /* !FD_CLOFORK && __FD_CLOFORK */
