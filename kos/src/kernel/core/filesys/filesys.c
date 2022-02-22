@@ -489,8 +489,8 @@ err_cannot_open_file:
 		assertf(!(result->fs_root.mf_flags & ~(MFILE_F_READONLY | MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
 		                                       MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE |
 		                                       MFILE_F_NOATIME | MFILE_F_NOMTIME | MFILE_FN_NODIRATIME |
-		                                       MFILE_F_STRICTATIME | MFILE_F_LAZYTIME |
-		                                       MFILE_F_PERSISTENT | MFILE_FN_ATTRREADONLY)),
+		                                       MFILE_F_STRICTATIME | MFILE_F_LAZYTIME | MFILE_F_PERSISTENT |
+		                                       MFILE_FN_ATTRREADONLY | MFILE_F_ROFLAGS)),
 		        "Only flags from this set may be set by fs-specific superblock open functions");
 		assert(ADDR_ISKERN(result->fs_root.mf_ops->mo_destroy));
 		result->fs_root.mf_refcnt = 1;

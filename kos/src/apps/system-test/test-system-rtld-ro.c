@@ -26,7 +26,9 @@
 #include <hybrid/compiler.h>
 
 #include <kos/except.h>
+#include <kos/ioctl/file.h>
 #include <kos/types.h>
+#include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <system-test/ctest.h>
@@ -71,6 +73,39 @@ DEFINE_TEST(system_rtld_ro) {
 	EQd(0, fstat(sysrtld, &st));
 	assert(st.st_size > 0);
 	LEss(1, pread(sysrtld, buf, sizeof(buf), 0));
+
+	errno = 0;
+	EQss(-1, pwrite(sysrtld, buf, sizeof(buf), 0));
+	EQd(errno, EROFS); /* EROFS for `E_FSERROR_READONLY' (because writing isn't allowed) */
+
+	/* Make sure that we're not able to clear the `MFILE_F_READONLY' flag.
+	 * We should be prevented from doing  so because the system RTLD  uses
+	 * the `MFILE_F_ROFLAGS' flag to prevent `MFILE_F_READONLY' from being
+	 * changed. */
+	{
+		int ro = -1;
+		EQd(0, ioctl(sysrtld, FILE_IOC_GETRO, &ro));
+		EQd(ro, 1);
+
+		ro = 0;
+		errno = 0;
+		EQd(-1, ioctl(sysrtld, FILE_IOC_SETRO, &ro));
+		EQd(errno, EPERM); /* s.a. `E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS' */
+		errno = 0;
+	}
+
+	/* Also make sure that `FS_IOC_GETFLAGS' / `FS_IOC_SETFLAGS' can't be used to clear READONLY */
+	{
+		long flags = 0;
+		EQd(0, ioctl(sysrtld, FS_IOC_GETFLAGS, &flags));
+		assert(flags & FS_IMMUTABLE_FL);
+		flags &= ~FS_IMMUTABLE_FL;
+		EQd(-1, ioctl(sysrtld, FS_IOC_SETFLAGS, &flags));
+		EQd(errno, EPERM); /* s.a. `E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS' */
+		flags = 0;
+		EQd(-1, ioctl(sysrtld, FS_IOC_SETFLAGS, &flags));
+		EQd(errno, EPERM); /* s.a. `E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS' */
+	}
 
 	errno = 0;
 	EQss(-1, pwrite(sysrtld, buf, sizeof(buf), 0));

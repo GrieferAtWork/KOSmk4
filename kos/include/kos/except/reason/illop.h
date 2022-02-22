@@ -77,6 +77,7 @@ enum {
 	E_ILLEGAL_OPERATION_CONTEXT_MMAP_BEYOND_END_OF_FILE,               /* E_INVALID_OPERATION: [EINVAL] Attempted to access a mem-part beyond the end of its associated file. */
 	E_ILLEGAL_OPERATION_CONTEXT_SETPGID_NO_SUCH_GROUP,                 /* E_ILLEGAL_OPERATION: [EPERM] `pgid' doesn't indicate creation of a new process group, and no group with the given ID exists in the calling session. */
 	E_ILLEGAL_OPERATION_CONTEXT_SENDFILE_NO_FILE_POSITION,             /* E_INVALID_OPERATION: [EINVAL] Tried to use `sendfile(2)' with `pin_offset == NULL', and `infd' doesn't have a writable file position attribute. */
+	E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS,                   /* E_ILLEGAL_OPERATION: [EPERM] Attempted to change one of `_MFILE_F_ROFLAGSMASK' of a file marked as `MFILE_F_ROFLAGS' */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -129,6 +130,7 @@ enum {
 #define E_ILLEGAL_OPERATION_CONTEXT_MMAP_BEYOND_END_OF_FILE               E_ILLEGAL_OPERATION_CONTEXT_MMAP_BEYOND_END_OF_FILE               /* E_INVALID_OPERATION: [EINVAL] Attempted to access a mem-part beyond the end of its associated file. */
 #define E_ILLEGAL_OPERATION_CONTEXT_SETPGID_NO_SUCH_GROUP                 E_ILLEGAL_OPERATION_CONTEXT_SETPGID_NO_SUCH_GROUP                 /* E_ILLEGAL_OPERATION: [EPERM] `pgid' doesn't indicate creation of a new process group, and no group with the given ID exists in the calling session. */
 #define E_ILLEGAL_OPERATION_CONTEXT_SENDFILE_NO_FILE_POSITION             E_ILLEGAL_OPERATION_CONTEXT_SENDFILE_NO_FILE_POSITION             /* E_INVALID_OPERATION: [EINVAL] Tried to use `sendfile(2)' with `pin_offset == NULL', and `infd' doesn't have a writable file position attribute. */
+#define E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS                   E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS                   /* E_ILLEGAL_OPERATION: [EPERM] Attempted to change one of `_MFILE_F_ROFLAGSMASK' of a file marked as `MFILE_F_ROFLAGS' */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_ILLEGAL_OPERATION_CONTEXT_GENERIC                               0  /* Generic context */
 #define E_ILLEGAL_OPERATION_CONTEXT_OPEN_S_IFSOCK                         1  /* E_ILLEGAL_IO_OPERATION: Attempted to open(2) an `S_IFSOCK'-file */
@@ -178,6 +180,7 @@ enum {
 #define E_ILLEGAL_OPERATION_CONTEXT_MMAP_BEYOND_END_OF_FILE               45 /* E_INVALID_OPERATION: [EINVAL] Attempted to access a mem-part beyond the end of its associated file. */
 #define E_ILLEGAL_OPERATION_CONTEXT_SETPGID_NO_SUCH_GROUP                 46 /* E_ILLEGAL_OPERATION: [EPERM] `pgid' doesn't indicate creation of a new process group, and no group with the given ID exists in the calling session. */
 #define E_ILLEGAL_OPERATION_CONTEXT_SENDFILE_NO_FILE_POSITION             47 /* E_INVALID_OPERATION: [EINVAL] Tried to use `sendfile(2)' with `pin_offset == NULL', and `infd' doesn't have a writable file position attribute. */
+#define E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS                   48 /* E_ILLEGAL_OPERATION: [EPERM] Attempted to change one of `_MFILE_F_ROFLAGSMASK' of a file marked as `MFILE_F_ROFLAGS' */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

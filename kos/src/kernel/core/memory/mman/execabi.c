@@ -48,7 +48,8 @@ PUBLIC struct mramfile execabi_system_rtld_file = {
 		MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 		MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
 		                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
-		                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),
+		                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |
+		                    MFILE_F_ROFLAGS),
 		MFILE_INIT_mf_trunclock,
 		MFILE_INIT_mf_filesize_symbol(execabi_system_rtld_size),
 		MFILE_INIT_mf_atime(0, 0),
@@ -76,7 +77,8 @@ PUBLIC struct mramfile compat_execabi_system_rtld_file = {
 		MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
 		MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
 		                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
-		                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),
+		                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE |
+		                    MFILE_F_ROFLAGS),
 		MFILE_INIT_mf_trunclock,
 		MFILE_INIT_mf_filesize_symbol(compat_execabi_system_rtld_size),
 		MFILE_INIT_mf_atime(0, 0),

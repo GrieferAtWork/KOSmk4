@@ -132,7 +132,7 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		/* Other flags are ignored (for now...) */
 
 		/* Set new flags. */
-		mfile_chflags(self, mask, flag);
+		mfile_chflags(self, mask, flag, /*check_permissions:*/ true);
 		return 0;
 	}	break;
 
@@ -236,7 +236,7 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	 * on...) */
 	switch (_IO_WITHSIZE(cmd, 0)) {
 
-	case _IO_WITHSIZE(BLKROSET, 0): {
+	case _IO_WITHSIZE(BLKROSET, 0): { /* aka. `FILE_IOC_SETRO' */
 		/* NOTE: Permission checks are done inside of `mfile_chflags()'! */
 		uintptr_t newflags = ioctl_intarg_getbool(cmd, arg) ? MFILE_F_READONLY
 		                                                    : MFILE_F_NORMAL;
@@ -244,13 +244,13 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		return 0;
 	}	break;
 
-	case _IO_WITHSIZE(BLKROGET, 0):
+	case _IO_WITHSIZE(BLKROGET, 0): /* aka. `FILE_IOC_GETRO' */
 		return ioctl_intarg_setbool(cmd, arg, self->mf_flags & MFILE_F_READONLY ? 1 : 0);
 
-	case _IO_WITHSIZE(BLKGETSIZE, 0):
+	case _IO_WITHSIZE(BLKGETSIZE, 0): /* aka. `FILE_IOC_GETSIZE512' */
 		return ioctl_intarg_setsize(cmd, arg, (size_t)(mfile_getsize(self) / 512));
 
-	case _IO_WITHSIZE(BLKFLSBUF, 0):
+	case _IO_WITHSIZE(BLKFLSBUF, 0): /* aka. `FILE_IOC_FLSBUF' */
 		/*require(CAP_SYS_ADMIN);*/ /* Linux does this... Why? */
 		mfile_udatasync(self);
 		/* TODO: `BLKFLSBUF' also acts as a sort of minature system_cc() that will unload
@@ -272,13 +272,13 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		 * outdated part caches... */
 		return 0;
 
-	case _IO_WITHSIZE(BLKSSZGET, 0):
+	case _IO_WITHSIZE(BLKSSZGET, 0): /* aka. `_FILE_IOC_BLOCKSIZE' */
 		cmd = _IO_WITHSIZE(BLKBSZGET, sizeof(int)); /* Yes: sizeof(int) is correct here! */
 		ATTR_FALLTHROUGH
-	case _IO_WITHSIZE(BLKBSZGET, 0):
+	case _IO_WITHSIZE(BLKBSZGET, 0): /* aka. `FILE_IOC_BLOCKSIZE' */
 		return ioctl_intarg_setsize(cmd, arg, mfile_getblocksize(self));
 
-	case _IO_WITHSIZE(BLKGETSIZE64, 0):
+	case _IO_WITHSIZE(BLKGETSIZE64, 0): /* aka. `FILE_IOC_GETSIZE' */
 		cmd = _IO_WITHSIZE(BLKGETSIZE64, sizeof(u64)); /* The ioctl code of this one is screwed up... */
 		return ioctl_intarg_setu64(cmd, arg, (uint64_t)mfile_getsize(self));
 

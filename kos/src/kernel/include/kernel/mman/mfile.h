@@ -644,7 +644,23 @@ struct mfile_ops {
 #define MFILE_F_STRICTATIME     0x01000000 /* [lock(ATOMIC)] Strict last-accessed timestamps ??? */
 #define MFILE_F_LAZYTIME        0x02000000 /* [lock(ATOMIC)] Lazy timestamps ??? */
 /*efine MFILE_F_                0x04000000  * ... */
-/*efine MFILE_F_                0x08000000  * ... */
+#define MFILE_F_ROFLAGS         0x08000000 /* [lock(WRITE_ONCE)]
+                                            * The following flags may not be changed by user-space:
+                                            *  - MFILE_F_READONLY, MFILE_FN_ATTRREADONLY
+                                            *  - MFILE_F_NOUSRMMAP, MFILE_F_NOUSRIO
+                                            * The primary purpose of this flag is to be used for `mramfile'
+                                            * objects, such as `execabi_system_rtld_file', in order to stop
+                                            * user-space from being able to clear `MFILE_F_READONLY' and be
+                                            * able to modify the system RTLD. Try not to use this flag  too
+                                            * much (in most cases, there should be some way for programs to
+                                            * clear flags such as READONLY, even for FLEETING, or SINGLETON
+                                            * files).
+                                            * Trying  to modify  these flags  after this  one's been set
+                                            * causes `mfile_chflags()' to fail by throwing an exception:
+                                            * E_ILLEGAL_OPERATION:E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS */
+#define _MFILE_F_ROFLAGSMASK                                  \
+	(MFILE_F_ROFLAGS | MFILE_F_READONLY | MFILE_F_NOUSRMMAP | \
+	 MFILE_F_NOUSRIO | MFILE_FN_ATTRREADONLY)
 #define MFILE_FN_FLEETING       0x10000000 /* [const] When set for fdirnode-derived nodes, don't recent-cache `struct path'
                                             * objects created for the purpose of path  traversal. - This is used by  procfs
                                             * for  per-process directories in  order to prevent them  being cached, as such
@@ -1419,11 +1435,13 @@ mfile_parts_denywrite_or_unlock(struct mfile *__restrict self,
  *                        MFILE_F_RELATIME | MFILE_F_STRICTATIME |  MFILE_F_LAZYTIME'
  * @param: check_permissions: When true, ensure that the caller is allowed to alter
  *                            flags in the requested manner.
- * @return: * : The old set of file flags. */
+ * @return: * : The old set of file flags.
+ * @throw: E_ILLEGAL_OPERATION:E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS: [...] */
 FUNDEF NONNULL((1)) uintptr_t FCALL
 mfile_chflags(struct mfile *__restrict self, uintptr_t mask,
               uintptr_t flags, __BOOL check_permissions DFL(1))
-		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, E_INSUFFICIENT_RIGHTS);
+		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY,
+		       E_INSUFFICIENT_RIGHTS, E_ILLEGAL_OPERATION);
 
 
 /* Check if the file's raw I/O interface should be used by default.

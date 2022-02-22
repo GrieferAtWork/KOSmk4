@@ -22,9 +22,9 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/fs/ramfs.h>
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/node.h>
+#include <kernel/fs/ramfs.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
 #include <misc/unlockinfo.h>
@@ -33,6 +33,7 @@
 #include <hybrid/atomic.h>
 
 #include <kos/except.h>
+#include <kos/except/reason/illop.h>
 
 #include <assert.h>
 #include <stddef.h>
@@ -342,11 +343,13 @@ mfile_parts_denywrite_or_unlock(struct mfile *__restrict self,
  *                        MFILE_F_RELATIME | MFILE_F_STRICTATIME |  MFILE_F_LAZYTIME'
  * @param: check_permissions: When true, ensure that the caller is allowed to alter
  *                            flags in the requested manner.
- * @return: * : The old set of file flags. */
+ * @return: * : The old set of file flags.
+ * @throw: E_ILLEGAL_OPERATION:E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS: [...] */
 PUBLIC NONNULL((1)) uintptr_t FCALL
 mfile_chflags(struct mfile *__restrict self, uintptr_t mask,
               uintptr_t flags, bool check_permissions)
-		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, E_INSUFFICIENT_RIGHTS) {
+		THROWS(E_WOULDBLOCK, E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY,
+		       E_INSUFFICIENT_RIGHTS, E_ILLEGAL_OPERATION) {
 #define MODIFIABLE_FLAGS                                         \
 	(MFILE_F_READONLY | MFILE_F_NOATIME | MFILE_F_NOUSRMMAP |    \
 	 MFILE_F_NOUSRIO | MFILE_F_NOMTIME | MFILE_FN_ATTRREADONLY | \
@@ -361,6 +364,15 @@ again:
 		mfile_lock_write(self);
 		old_flags = ATOMIC_READ(self->mf_flags);
 		new_flags = (old_flags & mask) | flags;
+
+		/* Make sure that read-only flags aren't altered when ROFLAGS was set. */
+		if unlikely((old_flags & MFILE_F_ROFLAGS) &&
+		            (old_flags & _MFILE_F_ROFLAGSMASK) != (new_flags & _MFILE_F_ROFLAGSMASK)) {
+			mfile_lock_endwrite(self);
+			THROW(E_ILLEGAL_OPERATION,
+			      E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS,
+			      old_flags, new_flags);
+		}
 
 		/* Check if the READONLY flag changed state. */
 		if ((new_flags & MFILE_F_READONLY) != (old_flags & MFILE_F_READONLY)) {

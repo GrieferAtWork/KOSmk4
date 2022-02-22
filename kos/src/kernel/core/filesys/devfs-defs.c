@@ -86,61 +86,62 @@ INTERN struct fdirnode devfs_disk  = INIT_SPECIAL_DEVFS_SUBDIR(devfs_disk_ops, D
 
 /* Default rules for /dev/disk */
 INTDEF struct fdirnode_ops const _devdiskruledir_default_ops;
-#define DEFINE_DISKRULE(devdiskrule_name, name, ino, symbol_byname, symbol_toname, hash)             \
-	INTDEF WUNUSED NONNULL((1, 2)) REF struct blkdev *KCALL                                          \
-	symbol_byname(struct devdiskruledir *__restrict self,                                            \
-	              struct flookup_info *__restrict info);                                             \
-	INTDEF WUNUSED NONNULL((1, 2, 4)) ssize_t KCALL                                                  \
-	symbol_toname(struct devdiskruledir *__restrict self,                                            \
-	              __pformatprinter printer, void *arg,                                               \
-	              struct blkdev *__restrict dev,                                                     \
-	              uintptr_t variant);                                                                \
-	PRIVATE struct devdiskruledir _dir_##devdiskrule_name = {                                        \
-		.ddrd_dir = {                                                                                \
-			.dn_node = {                                                                             \
-				.fn_file = {                                                                         \
-					MFILE_INIT_mf_refcnt(1),                                                         \
-					MFILE_INIT_mf_ops(&_devdiskruledir_default_ops.dno_node.no_file),                \
-					MFILE_INIT_mf_lock,                                                              \
-					MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),                                      \
-					MFILE_INIT_mf_initdone,                                                          \
-					MFILE_INIT_mf_lockops,                                                           \
-					MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                                    \
-					MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),                                  \
-					MFILE_INIT_mf_flags(MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_NOATIME |      \
-					                    MFILE_F_NOMTIME | MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE), \
-					MFILE_INIT_mf_trunclock,                                                         \
-					MFILE_INIT_mf_filesize((uint64_t)-1),                                            \
-					MFILE_INIT_mf_atime(0, 0),                                                       \
-					MFILE_INIT_mf_mtime(0, 0),                                                       \
-					MFILE_INIT_mf_ctime(0, 0),                                                       \
-				},                                                                                   \
-				FNODE_INIT_fn_nlink(1),                                                              \
-				FNODE_INIT_fn_mode(S_IFDIR | 0555),                                                  \
-				FNODE_INIT_fn_uid(0), /* root */                                                     \
-				FNODE_INIT_fn_gid(0), /* root */                                                     \
-				FNODE_INIT_fn_ino(ino),                                                              \
-				FNODE_INIT_fn_super(&devfs.rs_sup),                                                  \
-				FNODE_INIT_fn_changed,                                                               \
-				FNODE_INIT_fn_supent,                                                                \
-				FNODE_INIT_fn_allnodes,                                                              \
-			},                                                                                       \
-		},                                                                                           \
-		._ddrd_prefix = "../../\0",                                                                  \
-		.ddrd_byname  = &symbol_byname,                                                              \
-		.ddrd_toname  = &symbol_toname,                                                              \
-		.ddrd_drv     = &drv_self,                                                                   \
-	};                                                                                               \
-	INTERN struct devdiskrule devdiskrule_name = {                                                   \
-		.ddre_rule  = &_dir_##devdiskrule_name,                                                      \
-		{ ._ddre_lop = { NULL, NULL } },                                                             \
-		.fd_refcnt  = 2,                                                                             \
-		.fd_ops     = &devdiskrule_ops,                                                              \
-		.fd_ino     = ino,                                                                           \
-		.fd_hash    = hash,                                                                          \
-		.fd_namelen = COMPILER_LENOF(name),                                                          \
-		.fd_type    = DT_DIR,                                                                        \
-		/* .fd_name = */ name                                                                        \
+#define DEFINE_DISKRULE(devdiskrule_name, name, ino, symbol_byname, symbol_toname, hash) \
+	INTDEF WUNUSED NONNULL((1, 2)) REF struct blkdev *KCALL                              \
+	symbol_byname(struct devdiskruledir *__restrict self,                                \
+	              struct flookup_info *__restrict info);                                 \
+	INTDEF WUNUSED NONNULL((1, 2, 4)) ssize_t KCALL                                      \
+	symbol_toname(struct devdiskruledir *__restrict self,                                \
+	              __pformatprinter printer, void *arg,                                   \
+	              struct blkdev *__restrict dev,                                         \
+	              uintptr_t variant);                                                    \
+	PRIVATE struct devdiskruledir _dir_##devdiskrule_name = {                            \
+		.ddrd_dir = {                                                                    \
+			.dn_node = {                                                                 \
+				.fn_file = {                                                             \
+					MFILE_INIT_mf_refcnt(1),                                             \
+					MFILE_INIT_mf_ops(&_devdiskruledir_default_ops.dno_node.no_file),    \
+					MFILE_INIT_mf_lock,                                                  \
+					MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),                          \
+					MFILE_INIT_mf_initdone,                                              \
+					MFILE_INIT_mf_lockops,                                               \
+					MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                        \
+					MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),                      \
+					MFILE_INIT_mf_flags(MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |            \
+					                    MFILE_F_NOATIME | MFILE_F_NOMTIME |              \
+					                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),       \
+					MFILE_INIT_mf_trunclock,                                             \
+					MFILE_INIT_mf_filesize((uint64_t)-1),                                \
+					MFILE_INIT_mf_atime(0, 0),                                           \
+					MFILE_INIT_mf_mtime(0, 0),                                           \
+					MFILE_INIT_mf_ctime(0, 0),                                           \
+				},                                                                       \
+				FNODE_INIT_fn_nlink(1),                                                  \
+				FNODE_INIT_fn_mode(S_IFDIR | 0555),                                      \
+				FNODE_INIT_fn_uid(0), /* root */                                         \
+				FNODE_INIT_fn_gid(0), /* root */                                         \
+				FNODE_INIT_fn_ino(ino),                                                  \
+				FNODE_INIT_fn_super(&devfs.rs_sup),                                      \
+				FNODE_INIT_fn_changed,                                                   \
+				FNODE_INIT_fn_supent,                                                    \
+				FNODE_INIT_fn_allnodes,                                                  \
+			},                                                                           \
+		},                                                                               \
+		._ddrd_prefix = "../../\0",                                                      \
+		.ddrd_byname  = &symbol_byname,                                                  \
+		.ddrd_toname  = &symbol_toname,                                                  \
+		.ddrd_drv     = &drv_self,                                                       \
+	};                                                                                   \
+	INTERN struct devdiskrule devdiskrule_name = {                                       \
+		.ddre_rule  = &_dir_##devdiskrule_name,                                          \
+		{ ._ddre_lop = { NULL, NULL } },                                                 \
+		.fd_refcnt  = 2,                                                                 \
+		.fd_ops     = &devdiskrule_ops,                                                  \
+		.fd_ino     = ino,                                                               \
+		.fd_hash    = hash,                                                              \
+		.fd_namelen = COMPILER_LENOF(name),                                              \
+		.fd_type    = DT_DIR,                                                            \
+		/* .fd_name = */ name                                                            \
 	}
 
 /* clang-format off */
