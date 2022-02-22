@@ -184,7 +184,8 @@ mpart_create_lockram(size_t num_pages) {
 	result->mp_flags  = (MPART_F_NOSPLIT | MPART_F_NOMERGE |
 	                     MPART_F_MLOCK_FROZEN | MPART_F_MLOCK);
 	result->mp_xflags = MPART_XF_NORMAL;
-	result->mp_file   = incref(&mfile_ndef);
+	result->mp_file   = &mfile_ndef;
+	++mfile_ndef.mf_refcnt;
 	LIST_INIT(&result->mp_copy);
 	/*LIST_INIT(&result->mp_share);*/ /* Initialized by our caller. */
 	SLIST_INIT(&result->mp_lockops);
@@ -647,8 +648,10 @@ i386_allocate_secondary_cores(void) {
 			mman_mappings_insert(&mman_kernel, &FORTASK(altidle, this_trampoline_node_));
 		}
 
-		FORTASK(altidle, this_fs)             = incref(&fs_kernel);
-		FORTASK(altidle, this_handle_manager) = incref(&handle_manager_kernel);
+		FORTASK(altidle, this_fs)      = &fs_kernel;
+		FORTASK(altidle, this_handman) = &handman_kernel;
+		++fs_kernel.fs_refcnt;
+		++handman_kernel.hm_refcnt;
 
 		/* Set up the boot-strap CPU state for the new CPU.
 		 * -> When a CPU  is started  by using  an INIT IPI,  it will  perform internal  setup

@@ -682,14 +682,15 @@ again_release_kernel_and_cc:
 
 		/* Clone the calling thread's open file descriptors */
 		{
-			struct handle_manager *result_hman;
-			result_hman = FORTASK(caller, this_handle_manager);
+			struct handman *result_handman;
+			result_handman = FORTASK(caller, this_handman);
 			if (clone_flags & CLONE_FILES) {
-				result_hman = incref(result_hman);
+				result_handman = incref(result_handman);
 			} else {
-				result_hman = handle_manager_clone(result_hman);
+				/* NOTE: `handman_fork()' automatically closes CLOFORK files. */
+				result_handman = handman_fork(result_handman);
 			}
-			FORTASK(result, this_handle_manager) = result_hman; /* Inherit reference */
+			FORTASK(result, this_handman) = result_handman; /* Inherit reference */
 		}
 
 		/* On x86, the ioperm() permissions bitmap is always inherited by child
@@ -751,7 +752,7 @@ again_release_kernel_and_cc:
 			decref_likely(FORTASK(result, this_x86_ioperm_bitmap));
 		}
 #endif /* __i386__ || __x86_64__ */
-		xdecref(FORTASK(result, this_handle_manager));
+		xdecref(FORTASK(result, this_handman));
 		xdecref(FORTASK(result, this_sighand_ptr));
 		xdecref(FORTASK(result, this_cred));
 		xdecref(FORTASK(result, this_fs));

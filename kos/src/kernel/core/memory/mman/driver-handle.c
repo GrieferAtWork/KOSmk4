@@ -222,7 +222,7 @@ handle_module_ioctl(struct module *__restrict self, ioctl_t cmd,
 		hand.h_type = HANDLE_TYPE_MODULE;
 		hand.h_mode = mode;
 		FINALLY_DECREF_UNLIKELY((struct driver *)hand.h_data);
-		return handle_installopenfd(&info->mo_result, hand);
+		return handles_install_openfd(hand, &info->mo_result);
 	}	break;
 
 	case MOD_IOC_GETSTRING: {
@@ -305,7 +305,7 @@ handle_driver_loadlist_ioctl(struct driver_loadlist *__restrict self, ioctl_t cm
 		hand.h_type = HANDLE_TYPE_MODULE;
 		hand.h_mode = mode;
 		FINALLY_DECREF_UNLIKELY((struct driver *)hand.h_data);
-		return handle_installopenfd(&info->mo_result, hand);
+		return handles_install_openfd(hand, &info->mo_result);
 	}	break;
 
 	case MOD_IOC_GETSTRING: {

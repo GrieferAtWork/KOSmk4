@@ -606,30 +606,25 @@ DEFINE_COMPAT_SYSCALL1(errno_t, sysinfo,
 PRIVATE void KCALL unshare_vm(void) {
 	struct mman *mymm = THIS_MMAN;
 	if (isshared(mymm)) {
-		REF struct mman *newmm;
-		newmm = mman_fork();
-		task_setmman_inherit(newmm);
+		mymm = mman_fork();         /* Inherit reference */
+		task_setmman_inherit(mymm); /* Inherit reference */
 	}
 }
 
 PRIVATE void KCALL unshare_fs(syscall_ulong_t what) {
 	struct fs *myfs = THIS_FS;
 	if (isshared(myfs)) {
-		REF struct fs *newfs;
-		newfs = fs_clone(myfs, (what & CLONE_NEWNS) != 0);
-		FINALLY_DECREF_UNLIKELY(newfs);
-		myfs = task_setfs(newfs);
+		myfs = fs_clone(myfs, (what & CLONE_NEWNS) != 0); /* Inherit reference */
+		myfs = task_setfs_inherit(myfs);                  /* Inherit reference */
 		decref_unlikely(myfs);
 	}
 }
 
 PRIVATE void KCALL unshare_files(void) {
-	struct handle_manager *myman = THIS_HANDLE_MANAGER;
+	struct handman *myman = THIS_HANDMAN;
 	if (isshared(myman)) {
-		REF struct handle_manager *newman;
-		newman = handle_manager_clone(myman);
-		FINALLY_DECREF_UNLIKELY(newman);
-		myman = task_sethandlemanager(newman);
+		myman = handman_fork(myman);            /* Inherit reference */
+		myman = task_sethandman_inherit(myman); /* Inherit reference */
 		decref_unlikely(myman);
 	}
 }
@@ -680,10 +675,8 @@ again_lock_myptr:
 PRIVATE void KCALL unshare_cred(void) {
 	struct cred *mycred = THIS_CRED;
 	if (isshared(mycred)) {
-		REF struct cred *newcred;
-		newcred = cred_clone(mycred);
-		FINALLY_DECREF_UNLIKELY(newcred);
-		mycred = task_setcred(newcred);
+		mycred = cred_clone(mycred);           /* Inherit reference */
+		mycred = task_setcred_inherit(mycred); /* Inherit reference */
 		decref_unlikely(mycred);
 	}
 }

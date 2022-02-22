@@ -1541,10 +1541,10 @@ procfs_pp_status_print(struct printnode *__restrict self,
                        pformatprinter printer, void *arg,
                        pos_t UNUSED(offset_hint)) {
 	REF struct task *thread;
-	REF struct mman *thread_mm             = NULL;
-	REF struct task *parent                = NULL;
-	REF struct cred *thread_cred           = NULL;
-	REF struct handle_manager *thread_hman = NULL;
+	REF struct mman *thread_mm      = NULL;
+	REF struct task *parent         = NULL;
+	REF struct cred *thread_cred    = NULL;
+	REF struct handman *thread_hman = NULL;
 	struct taskpid *tpid;
 	char const *state;
 	struct mman_statinfo mmstat;
@@ -1561,7 +1561,7 @@ procfs_pp_status_print(struct printnode *__restrict self,
 		thread_mm   = task_getmman(thread);
 		thread_cred = task_getcred(thread);
 		parent      = task_getparentprocess_of(thread);
-		thread_hman = task_gethandlemanager(thread);
+		thread_hman = task_gethandman(thread);
 	}
 	PRINT("Name:\t");
 	if (thread_mm) {
@@ -1623,7 +1623,7 @@ no_exec:
 	           thread_cred ? ATOMIC_READ(thread_cred->c_egid) : 0,
 	           thread_cred ? ATOMIC_READ(thread_cred->c_sgid) : 0,
 	           thread_cred ? ATOMIC_READ(thread_cred->c_fsgid) : 0,
-	           thread_hman ? ATOMIC_READ(thread_hman->hm_maxlimit) : 0,
+	           thread_hman ? ATOMIC_READ(thread_hman->hm_maxfd) : 0,
 	           thread_cred ? ATOMIC_READ(thread_cred->c_fsgid) : 0) < 0)
 		return;
 	if (thread_cred) {
@@ -2108,13 +2108,13 @@ procfs_perproc_fd_v_lookup(struct fdirnode *__restrict self,
                            struct flookup_info *__restrict info) {
 	struct taskpid *pid = self->fn_fsdata;
 	REF struct task *thread;
-	REF struct handle_manager *hm;
+	REF struct handman *hm;
 	char ch;
 
 	thread = taskpid_gettask(pid);
 	if (!thread)
 		return NULL;
-	hm = task_gethandlemanager(thread);
+	hm = task_gethandman(thread);
 	decref_unlikely(thread);
 	FINALLY_DECREF_UNLIKELY(hm);
 
@@ -2137,7 +2137,7 @@ procfs_perproc_fd_v_lookup(struct fdirnode *__restrict self,
 		}
 
 		/* Lookup the handle in question. */
-		hand = handle_trylookup(hm, fdno);
+		hand = handman_trylookup(hm, (fd_t)fdno);
 		if (hand.h_type == HANDLE_TYPE_UNDEFINED)
 			return NULL; /* No such handle */
 
@@ -2168,14 +2168,14 @@ notanfd:
 
 struct procfs_fd_enum
 #ifdef __cplusplus
-    : fdirenum                           /* Underlying enumerator */
+    : fdirenum                    /* Underlying enumerator */
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct fdirenum            pfe_enum; /* Underlying enumerator */
+	struct fdirenum     pfe_enum; /* Underlying enumerator */
 #endif /* !__cplusplus */
-	REF struct handle_manager *pfe_hman; /* [1..1][const] Handle manager being enumerated. */
-	unsigned int               pfe_fd;   /* Lower bound for next handle to enumerate. */
+	REF struct handman *pfe_hman; /* [1..1][const] Handle manager being enumerated. */
+	unsigned int        pfe_fd;   /* Lower bound for next handle to enumerate. */
 };
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -2288,7 +2288,7 @@ procfs_perproc_fd_v_enum(struct fdirenum *__restrict result) {
 		/* Thread has already terminated. -> Set-up an empty directory */
 		rt->de_ops = &fdirenum_empty_ops;
 	} else {
-		rt->pfe_hman = task_gethandlemanager(thread);
+		rt->pfe_hman = task_gethandman(thread);
 		decref_unlikely(thread);
 		rt->de_ops = &procfs_fd_enum_ops;
 		rt->pfe_fd = 0;
@@ -2596,13 +2596,13 @@ procfs_perproc_fdinfo_v_lookup(struct fdirnode *__restrict self,
                                struct flookup_info *__restrict info) {
 	struct taskpid *pid = self->fn_fsdata;
 	REF struct task *thread;
-	REF struct handle_manager *hm;
+	REF struct handman *hm;
 	char ch;
 
 	thread = taskpid_gettask(pid);
 	if (!thread)
 		return NULL;
-	hm = task_gethandlemanager(thread);
+	hm = task_gethandman(thread);
 	decref_unlikely(thread);
 	FINALLY_DECREF_UNLIKELY(hm);
 
@@ -2625,7 +2625,7 @@ procfs_perproc_fdinfo_v_lookup(struct fdirnode *__restrict self,
 		}
 
 		/* Lookup the handle in question. */
-		hand = handle_trylookup(hm, fdno);
+		hand = handman_trylookup(hm, (fd_t)fdno);
 		if (hand.h_type == HANDLE_TYPE_UNDEFINED)
 			return NULL; /* No such handle */
 
@@ -2707,7 +2707,7 @@ procfs_perproc_fdinfo_v_enum(struct fdirenum *__restrict result) {
 		/* Thread has already terminated. -> Set-up an empty directory */
 		rt->de_ops = &fdirenum_empty_ops;
 	} else {
-		rt->pfe_hman = task_gethandlemanager(thread);
+		rt->pfe_hman = task_gethandman(thread);
 		decref_unlikely(thread);
 		rt->de_ops = &procfs_fdinfo_enum_ops;
 		rt->pfe_fd = 0;

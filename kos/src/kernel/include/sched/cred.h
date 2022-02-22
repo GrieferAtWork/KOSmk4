@@ -393,7 +393,8 @@ NOTHROW(FCALL task_getcred)(struct task *__restrict thread);
 
 /* Exchange the credentials controller of the calling thread. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct cred *
-NOTHROW(FCALL task_setcred)(struct cred *__restrict newcred);
+NOTHROW(FCALL task_setcred_inherit)(/*inherit(always)*/ REF struct cred *__restrict newcred);
+#define task_setcred(newcred) task_setcred_inherit(incref(newcred))
 
 /* Generic kernel credentials / credentials for /bin/init */
 DATDEF struct cred cred_kernel;

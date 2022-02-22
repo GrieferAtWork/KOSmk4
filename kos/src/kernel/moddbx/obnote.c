@@ -1365,13 +1365,13 @@ PRIVATE NONNULL((1, 4)) ssize_t
 NOTHROW(KCALL note_fd_t_value)(pformatprinter printer, void *arg, fd_t fd,
                                unsigned int *__restrict pstatus) {
 	struct handle hand;
-	struct handle_manager *hman;
+	struct handman *hman;
 	TRY {
 		struct handrange *range;
 		unsigned int relfd;
 		if (!dbg_current || !ADDR_ISKERN(dbg_current))
 			goto badobj;
-		hman = FORTASK(dbg_current, this_handle_manager);
+		hman = FORTASK(dbg_current, this_handman);
 		if (!hman || !ADDR_ISKERN(hman))
 			goto badobj;
 		if (fd < 0) {

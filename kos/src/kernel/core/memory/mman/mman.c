@@ -118,8 +118,8 @@ extern permman_init_t __kernel_permman_init_end[];
 extern permman_fini_t __kernel_permman_fini_start[];
 extern permman_fini_t __kernel_permman_fini_end[];
 
-/* List of  callbacks  that  should be  invoked  after  mman_exec()
- * These are called alongside stuff like `handle_manager_cloexec()'
+/* List of callbacks that should be invoked after mman_exec()
+ * These  are called alongside stuff like `handman_cloexec()'
  * NOTE: The passed mman is always `THIS_MMAN', and is never `&mman_kernel' */
 PUBLIC CALLBACK_LIST(void KCALL(void)) mman_onexec_callbacks = CALLBACK_LIST_INIT;
 /* Mman initialization/finalization callbacks. */

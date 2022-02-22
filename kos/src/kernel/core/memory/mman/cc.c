@@ -745,7 +745,7 @@ NOTHROW(FCALL system_cc_pertask)(struct task *__restrict self,
 		return;
 
 	/* Clear per-fs caches. */
-	if (ATOMIC_READ(FORTASK(self, this_fs)) != NULL) { /* May be NULL for kernel threads... */
+	if (ATOMIC_READ(FORTASK(self, this_fs)) != NULL) { /* Should never be NULL (but lets be safe) */
 		REF struct fs *threadfs;
 		threadfs = task_getfs(self);
 		system_cc_perfs(threadfs, info);
@@ -758,19 +758,19 @@ NOTHROW(FCALL system_cc_pertask)(struct task *__restrict self,
 		return;
 
 	/* Clear per-handle-manager caches. */
-	if (ATOMIC_READ(FORTASK(self, this_handle_manager)) != NULL) { /* May be NULL for kernel threads... */
-		REF struct handle_manager *threadhm;
-		threadhm = task_gethandlemanager(self);
+	if (ATOMIC_READ(FORTASK(self, this_handman)) != NULL) { /* Should never be NULL (but lets be safe) */
+		REF struct handman *threadhm;
+		threadhm = task_gethandman(self);
 		system_cc_perhman(threadhm, info);
 		if (ATOMIC_DECFETCH(threadhm->hm_refcnt) == 0) {
-			ccinfo_account(info, sizeof(struct handle_manager));
-			handle_manager_destroy(threadhm);
+			ccinfo_account(info, sizeof(struct handman));
+			handman_destroy(threadhm);
 		}
 	}
 	if (ccinfo_isdone(info))
 		return;
 
-	/* TODO: There are probably more per-task things we could try to do. */
+	/* TODO: There are probably more per-task things we could try doing. */
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) ssize_t

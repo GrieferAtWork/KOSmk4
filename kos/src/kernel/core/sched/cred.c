@@ -244,7 +244,6 @@ PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct cred *
 NOTHROW(FCALL task_getcred)(struct task *__restrict thread) {
 	REF struct cred *result;
 	cred_change_lock_acquire();
-	assert(FORTASK(thread, this_cred));
 	result = incref(FORTASK(thread, this_cred));
 	cred_change_lock_release();
 	return result;
@@ -252,14 +251,12 @@ NOTHROW(FCALL task_getcred)(struct task *__restrict thread) {
 
 /* Exchange the credentials controller of the calling thread. */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct cred *
-NOTHROW(FCALL task_setcred)(struct cred *__restrict newcred) {
+NOTHROW(FCALL task_setcred_inherit)(/*inherit(always)*/ REF struct cred *__restrict newcred) {
 	REF struct cred *result;
-	incref(newcred);
 	cred_change_lock_acquire();
-	result = PERTASK_GET(this_cred);
-	PERTASK_SET(this_cred, newcred);
+	result = PERTASK_GET(this_cred); /* Inherit reference */
+	PERTASK_SET(this_cred, newcred); /* Inherit reference */
 	cred_change_lock_release();
-	assert(result);
 	return result;
 }
 

@@ -129,7 +129,7 @@ err_bad_handle_type:
 		RAII_FINALLY { handle_decref(newhand); };
 
 		/* Install the new handle. */
-		*result = handle_installopenfd(&cast->fc_resfd, newhand);
+		*result = handles_install_openfd(newhand, &cast->fc_resfd);
 		goto done;
 	}	break;
 

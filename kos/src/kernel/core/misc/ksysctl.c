@@ -218,7 +218,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		temp.h_mode = IO_RDWR;
 		temp.h_data = get_driver_loadlist();
 		FINALLY_DECREF_UNLIKELY((struct driver_loadlist *)temp.h_data);
-		return handle_installopenfd((USER UNCHECKED struct openfd *)arg, temp);
+		return handles_install_openfd(temp, (USER UNCHECKED struct openfd *)arg);
 	}	break;
 
 	case KSYSCTL_DRIVER_INSMOD: {
@@ -297,7 +297,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 				temp.h_type = HANDLE_TYPE_MODULE;
 				temp.h_mode = IO_RDWR;
 				temp.h_data = drv;
-				return handle_installopenfd(drv_fd, temp);
+				return handles_install_openfd(temp, drv_fd);
 			}
 		}
 	}	break;
@@ -410,7 +410,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 			temp.h_type = HANDLE_TYPE_MODULE;
 			temp.h_mode = IO_RDWR;
 			temp.h_data = drv;
-			return handle_installopenfd((struct openfd *)&data->gm_driver, temp);
+			return handles_install_openfd(temp, &data->gm_driver);
 		}
 	}	break;
 

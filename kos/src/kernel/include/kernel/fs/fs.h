@@ -128,7 +128,8 @@ NOTHROW(FCALL task_getvfs)(struct task *__restrict thread);
 
 /* Exchange the filesystem controller of the calling thread. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fs *
-NOTHROW(FCALL task_setfs)(struct fs *__restrict newfs);
+NOTHROW(FCALL task_setfs_inherit)(/*inherit(always)*/ REF struct fs *__restrict newfs);
+#define task_setfs(newfs) task_setfs_inherit(incref(newfs))
 
 /* Clone the given FS
  * @param: clone_vfs: When true, also clone the VFS, else share the same one. */

@@ -1065,7 +1065,7 @@ viddev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		hand.h_type = HANDLE_TYPE_MFILE;
 		hand.h_mode = IO_RDWR;
 		hand.h_data = lck;
-		return handle_installopenfd((USER UNCHECKED struct openfd *)arg, hand);
+		return handles_install_openfd(hand, (USER UNCHECKED struct openfd *)arg);
 	}	break;
 
 	default:

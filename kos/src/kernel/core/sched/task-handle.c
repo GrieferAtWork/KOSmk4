@@ -145,7 +145,7 @@ handle_pidfd_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
 		hand.h_mode = mode;
 		hand.h_data = taskpid_getprocpid(self);
 		require_pidfd_open((struct taskpid *)hand.h_data);
-		return handle_installopenfd((USER UNCHECKED struct openfd *)arg, hand);
+		return handles_install_openfd(hand, (USER UNCHECKED struct openfd *)arg);
 	}	break;
 
 	case PIDFD_IOC_OPENPPID: {
@@ -155,7 +155,7 @@ handle_pidfd_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
 		hand.h_data = taskpid_getparentprocesspid(self);
 		FINALLY_DECREF_UNLIKELY((struct taskpid *)hand.h_data);
 		require_pidfd_open((struct taskpid *)hand.h_data);
-		return handle_installopenfd((USER UNCHECKED struct openfd *)arg, hand);
+		return handles_install_openfd(hand, (USER UNCHECKED struct openfd *)arg);
 	}	break;
 
 	case PIDFD_IOC_EXITCODE: {
@@ -238,21 +238,21 @@ DEFINE_SYSCALL3(fd_t, pidfd_getfd,
                 syscall_ulong_t, flags) {
 	REF struct handle foreign_handle;
 	REF struct task *thread;
-	REF struct handle_manager *handman;
+	REF struct handman *thread_handman;
 	if unlikely(flags != 0) {
 		THROW(E_INVALID_ARGUMENT_RESERVED_ARGUMENT,
 		      E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS);
 	}
-	thread  = handles_lookuptask(pidfd);
-	handman = task_gethandman(thread);
+	thread         = handles_lookuptask(pidfd);
+	thread_handman = task_gethandman(thread);
 	decref_unlikely(thread);
 	{
-		FINALLY_DECREF_UNLIKELY(handman);
+		FINALLY_DECREF_UNLIKELY(thread_handman);
 		/* XXX: Support  for symbolic handles? It'd be kind-of
 		 *      neat to access, say, PWD of a process by doing
 		 *      `pidfd_getfd(pidfd_open(PID), AT_FDCWD)' as an
 		 *      alias for `open("/proc/[PID]/cwd")'... */
-		foreign_handle = handman_lookup(handman, foreign_fd);
+		foreign_handle = handman_lookup(thread_handman, foreign_fd);
 	}
 	RAII_FINALLY { decref_unlikely(foreign_handle); };
 	foreign_handle.h_mode &= ~IO_CLOFORK;

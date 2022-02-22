@@ -345,7 +345,7 @@ NOTHROW(FCALL sig_broadcast_as_for_fini_nopr)(struct sig *__restrict self,
  *          decref_unlikely(target_thread)  // This actually ends up destroying `target_thread'
  *      task_destroy()
  *      fini_this_handle_manager()
- *      handle_manager_destroy()
+ *      handman_destroy()
  *      handle_socket_decref()
  *      socket_destroy()
  *          decref_likely(self->sk_ncon.axr_obj)

@@ -219,11 +219,15 @@ NOTHROW(KCALL kernel_initialize_scheduler_after_smp)(void) {
 	assert(task_template->t_mman == &mman_kernel);
 	assert(FORTASK(task_template, this_kernel_stackpart_).mp_state = MPART_ST_MEM);
 	assert(FORTASK(task_template, this_fs) == &fs_kernel);
-	assert(FORTASK(task_template, this_handle_manager) == &handle_manager_kernel);
+	assert(FORTASK(task_template, this_handman) == &handman_kernel);
+
+	/* All of the following are set by task_clone(), which also expects
+	 * these pre-initializations (which matter when it comes to cleanup
+	 * of partially constructed tasks during errors) */
 	task_template->t_mman                                   = NULL;
 	FORTASK(task_template, this_kernel_stackpart_).mp_state = MPART_ST_VOID;
 	FORTASK(task_template, this_fs)                         = NULL;
-	FORTASK(task_template, this_handle_manager)             = NULL;
+	FORTASK(task_template, this_handman)                    = NULL;
 #ifndef CONFIG_EVERYONE_IS_ROOT
 	assert(FORTASK(task_template, this_cred) == &cred_kernel);
 	FORTASK(task_template, this_cred) = NULL;

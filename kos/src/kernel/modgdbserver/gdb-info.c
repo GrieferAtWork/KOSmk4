@@ -557,7 +557,7 @@ NOTHROW(FCALL GDBInfo_PrintFdList_Callback)(void *closure,
 	pid_t pid;
 	ssize_t temp, result = 0;
 	pformatprinter printer; void *arg;
-	REF struct handle_manager *hman;
+	REF struct handman *hman;
 	if (!task_isaprocess(thread))
 		goto done;
 	if (GDBThread_IsKernelThread(thread))
@@ -565,7 +565,7 @@ NOTHROW(FCALL GDBInfo_PrintFdList_Callback)(void *closure,
 	printer = ((struct GDBInfo_PrintThreadList_Data *)closure)->ptld_printer;
 	arg     = ((struct GDBInfo_PrintThreadList_Data *)closure)->ptld_arg;
 	pid     = task_getrootpid_of(thread);
-	hman    = task_gethandlemanager(thread);
+	hman    = task_gethandman(thread);
 	if (!GDBThread_IsAllStopModeActive) {
 		/* FIXME: What  if one  of the suspended  threads is holding  the VM lock?
 		 *        We should have some kind of timeout here, and switch to all-stop

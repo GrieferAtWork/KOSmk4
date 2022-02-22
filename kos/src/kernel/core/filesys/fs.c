@@ -128,12 +128,11 @@ NOTHROW(FCALL task_getvfs)(struct task *__restrict thread) {
 
 /* Exchange the handle manager of the calling thread. */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fs *
-NOTHROW(FCALL task_setfs)(struct fs *__restrict newfs) {
+NOTHROW(FCALL task_setfs_inherit)(/*inherit(always)*/ REF struct fs *__restrict newfs) {
 	REF struct fs *result;
 	this_fs_smplock_acquire();
-	result = PERTASK_GET(this_fs);
-	PERTASK_SET(this_fs, newfs);
-	incref(newfs);
+	result = PERTASK_GET(this_fs); /* Inherit reference */
+	PERTASK_SET(this_fs, newfs);   /* Inherit reference */
 	this_fs_smplock_release();
 	return result;
 }
