@@ -302,7 +302,7 @@ PRIVATE_FUNCTION(boot_warning_no_cmov)
 END(boot_warning_no_cmov)
 
 PRIVATE_FUNCTION(boot_warning_no_cx8)
-	DEFINE_PRIVATE_STRING(str_no_cx8, "The <cmpxchg8> instruction is not provided by the host")
+	DEFINE_PRIVATE_STRING(str_no_cx8, "The <cmpxchg8b> instruction is not provided by the host")
 	leal   SYM(str_no_cx8), %esi
 	jmp    boot_warning
 END(boot_warning_no_cx8)

@@ -38,6 +38,7 @@
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/host.h>
 #include <hybrid/overflow.h>
 
 #include <hw/video/vga.h>
@@ -55,6 +56,10 @@
 #include <string.h>
 
 #include <libsvgadrv/util/vgaio.h>
+
+#if defined(__i386__) || defined(__x86_64__)
+#include <kernel/x86/cpuid.h>
+#endif /* __i386__ || __x86_64__ */
 
 /**/
 #include "svga.h"
@@ -971,14 +976,24 @@ NOTHROW(FCALL dbg_save_vmem)(struct svga_ttyaccess *__restrict tty,
 	if (mode->smi_flags & SVGA_MODEINFO_F_TXT) {
 		uint8_t cmap;
 		size_t i;
-		byte_t *vmem;
 
 		/* Save the text-mode page. */
-		vmem = (byte_t *)mnode_getaddr(&tty->sta_vmem);
-		for (i = 0; i < tty->vta_resy; ++i) {
-			memcpy(buf, vmem, tty->vta_resx * 2);
-			vmem += mode->smi_scanline;
-			buf += tty->vta_resx * 2;
+#if defined(__i386__) || defined(__x86_64__)
+		if (sys86_isqemu_accel()) {
+			/* For some reason, accessing video memory here crashes QEMU:
+			 * >> vcpu run failed for vcpu  0
+			 */
+			bzero(buf, tty->vta_resy * tty->vta_resx, 2);
+		} else
+#endif /* __i386__ || __x86_64__ */
+		{
+			byte_t *vmem;
+			vmem = (byte_t *)mnode_getaddr(&tty->sta_vmem);
+			for (i = 0; i < tty->vta_resy; ++i) {
+				memcpy(buf, vmem, tty->vta_resx * 2);
+				vmem += mode->smi_scanline;
+				buf += tty->vta_resx * 2;
+			}
 		}
 
 		/* Save memory re-used for the text-mode font. */
@@ -1030,6 +1045,7 @@ NOTHROW(FCALL svgadev_v_enterdbg)(struct viddev *__restrict self) {
 	struct svga_ttyaccess *tty;
 	struct svgadev *me;
 	struct svga_dbgregs *sav;
+
 	me  = viddev_assvga(self);
 	tty = me->svd_dbgtty;
 	sav = me->svd_dbgsav;
