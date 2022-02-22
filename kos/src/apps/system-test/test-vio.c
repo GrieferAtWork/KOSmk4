@@ -39,6 +39,7 @@
 #include <dlfcn.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
@@ -164,40 +165,40 @@ DEFINE_TEST(vio) {
 		value.v32 = *(u32 volatile *)((byte_t volatile *)viobase - 1);
 		assertf(value.v8[0] == 0xff && value.v8[1] == 0x11 &&
 		        value.v8[2] == 0x22 && value.v8[3] == 0x33,
-		        "value = [%#I8x,%#I8x,%#I8x,%#I8x]",
+		        "value = [%#" PRIx8 ",%#" PRIx8 ",%#" PRIx8 ",%#" PRIx8 "]",
 		        value.v8[0], value.v8[1],
 		        value.v8[2], value.v8[3]);
 		assertf(num_vio_read == BETOH32(0x11223344) + 1,
-		        "num_vio_read = %#I32x (diff:%I32d)",
+		        "num_vio_read = %#" PRIx32 " (diff:%" PRId32 ")",
 		        num_vio_read, num_vio_read - BETOH32(0x11223344));
 
 		num_vio_read = BETOH32(0x11223344);
 		value.v32 = *(u32 volatile *)((byte_t volatile *)viobase - 2);
 		assertf(value.v8[0] == 0xff && value.v8[1] == 0xff &&
 		        value.v8[2] == 0x11 && value.v8[3] == 0x22,
-		        "value = [%#I8x,%#I8x,%#I8x,%#I8x]",
+		        "value = [%#" PRIx8 ",%#" PRIx8 ",%#" PRIx8 ",%#" PRIx8 "]",
 		        value.v8[0], value.v8[1],
 		        value.v8[2], value.v8[3]);
 		assertf(num_vio_read == BETOH32(0x11223344) + 1,
-		        "num_vio_read = %#I32x (diff:%I32d)",
+		        "num_vio_read = %#" PRIx32 " (diff:%" PRId32 ")",
 		        num_vio_read, num_vio_read - BETOH32(0x11223344));
 
 		num_vio_read = BETOH32(0x11223344);
 		value.v32 = *(u32 volatile *)((byte_t volatile *)viobase - 3);
 		assertf(value.v8[0] == 0xff && value.v8[1] == 0xff &&
 		        value.v8[2] == 0xff && value.v8[3] == 0x11,
-		        "value = %#I32x", value);
+		        "value = %#" PRIx32, value);
 		assertf(num_vio_read == BETOH32(0x11223344) + 1,
-		        "num_vio_read = %#I32x (diff:%I32d)",
+		        "num_vio_read = %#" PRIx32 " (diff:%" PRId32 ")",
 		        num_vio_read, num_vio_read - BETOH32(0x11223344));
 
 		num_vio_read = BETOH32(0x11223344);
 		value.v32 = *(u32 volatile *)((byte_t volatile *)viobase - 4);
 		assertf(value.v8[0] == 0xff && value.v8[1] == 0xff &&
 		        value.v8[2] == 0xff && value.v8[3] == 0xff,
-		        "value = %#I32x", value);
+		        "value = %#" PRIx32 "", value);
 		assertf(num_vio_read == BETOH32(0x11223344) + 0, /* Shouldn't have been incremented */
-		        "num_vio_read = %#I32x (diff:%I32d)",
+		        "num_vio_read = %#" PRIx32 " (diff:%" PRId32 ")",
 		        num_vio_read, num_vio_read - BETOH32(0x11223344));
 
 		/* Also assert the same kind of access behavior at the top of the VIO region. */
@@ -205,44 +206,44 @@ DEFINE_TEST(vio) {
 		value.v32 = *(u32 volatile *)((byte_t volatile *)viobase + ps - 3);
 		assertf(value.v8[0] == 0x66 && value.v8[1] == 0x77 &&
 		        value.v8[2] == 0x88 && value.v8[3] == 0xff,
-		        "value = [%#I8x,%#I8x,%#I8x,%#I8x]",
+		        "value = [%#" PRIx8 ",%#" PRIx8 ",%#" PRIx8 ",%#" PRIx8 "]",
 		        value.v8[0], value.v8[1],
 		        value.v8[2], value.v8[3]);
 		assertf(num_vio_read == BETOH32(0x55667788) + 1,
-		        "num_vio_read = %#I32x (diff:%I32d)",
+		        "num_vio_read = %#" PRIx32 " (diff:%" PRId32 ")",
 		        num_vio_read, num_vio_read - BETOH32(0x55667788));
 
 		num_vio_read = BETOH32(0x55667788);
 		value.v32 = *(u32 volatile *)((byte_t volatile *)viobase + ps - 2);
 		assertf(value.v8[0] == 0x77 && value.v8[1] == 0x88 &&
 		        value.v8[2] == 0xff && value.v8[3] == 0xff,
-		        "value = [%#I8x,%#I8x,%#I8x,%#I8x]",
+		        "value = [%#" PRIx8 ",%#" PRIx8 ",%#" PRIx8 ",%#" PRIx8 "]",
 		        value.v8[0], value.v8[1],
 		        value.v8[2], value.v8[3]);
 		assertf(num_vio_read == BETOH32(0x55667788) + 1,
-		        "num_vio_read = %#I32x (diff:%I32d)",
+		        "num_vio_read = %#" PRIx32 " (diff:%" PRId32 ")",
 		        num_vio_read, num_vio_read - BETOH32(0x55667788));
 
 		num_vio_read = BETOH32(0x55667788);
 		value.v32 = *(u32 volatile *)((byte_t volatile *)viobase + ps - 1);
 		assertf(value.v8[0] == 0x88 && value.v8[1] == 0xff &&
 		        value.v8[2] == 0xff && value.v8[3] == 0xff,
-		        "value = [%#I8x,%#I8x,%#I8x,%#I8x]",
+		        "value = [%#" PRIx8 ",%#" PRIx8 ",%#" PRIx8 ",%#" PRIx8 "]",
 		        value.v8[0], value.v8[1],
 		        value.v8[2], value.v8[3]);
 		assertf(num_vio_read == BETOH32(0x55667788) + 1,
-		        "num_vio_read = %#I32x (diff:%I32d)",
+		        "num_vio_read = %#" PRIx32 " (diff:%" PRId32 ")",
 		        num_vio_read, num_vio_read - BETOH32(0x55667788));
 
 		num_vio_read = BETOH32(0x55667788);
 		value.v32 = *(u32 volatile *)((byte_t volatile *)viobase + ps - 0);
 		assertf(value.v8[0] == 0xff && value.v8[1] == 0xff &&
 		        value.v8[2] == 0xff && value.v8[3] == 0xff,
-		        "value = [%#I8x,%#I8x,%#I8x,%#I8x]",
+		        "value = [%#" PRIx8 ",%#" PRIx8 ",%#" PRIx8 ",%#" PRIx8 "]",
 		        value.v8[0], value.v8[1],
 		        value.v8[2], value.v8[3]);
 		assertf(num_vio_read == BETOH32(0x55667788) + 0, /* Shouldn't have been incremented */
-		        "num_vio_read = %#I32x (diff:%I32d)",
+		        "num_vio_read = %#" PRIx32 " (diff:%" PRId32 ")",
 		        num_vio_read, num_vio_read - BETOH32(0x55667788));
 	}
 

@@ -31,6 +31,7 @@
 #include <err.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <inttypes.h>
 #include <pty.h>
 #include <stdlib.h>
 #include <string.h>
@@ -59,7 +60,7 @@ DEFINE_TEST(pty_works_correctly) {
 	cpid = fork();
 	if (cpid == 0) {
 		if ((error = write(slave, pty_child_data, sizeof(pty_child_data))) != sizeof(pty_child_data))
-			err(1, "Failed to write to slave (%Id)", error);
+			err(1, "Failed to write to slave (%" PRIdSIZ ")", error);
 		_Exit(0);
 	}
 	if (cpid < 0)
@@ -67,7 +68,7 @@ DEFINE_TEST(pty_works_correctly) {
 
 	/* Read the data that was written by the child process. */
 	if ((error = read(master, buf, sizeof(buf))) != sizeof(pty_child_data))
-		err(1, "Error, or unexpected amount of data read from master (%Id)", error);
+		err(1, "Error, or unexpected amount of data read from master (%" PRIdSIZ ")", error);
 	if (memcmp(buf, pty_child_data, sizeof(pty_child_data)) != 0)
 		err(1, "Wrong data read by master: %$q", sizeof(pty_child_data), buf);
 
@@ -90,7 +91,7 @@ DEFINE_TEST(pty_works_correctly) {
 	 *       written to `slave' */
 	close(slave);
 	if ((error = read(master, buf, sizeof(buf))) != 0)
-		err(1, "Expected EOF after slave was closed (%Id)", error);
+		err(1, "Expected EOF after slave was closed (%" PRIdSIZ ")", error);
 	close(master);
 
 	/* Make  sure that after both the master _and_ slave have been closed, the /dev/

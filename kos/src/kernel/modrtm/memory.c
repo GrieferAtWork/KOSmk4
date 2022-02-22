@@ -49,6 +49,7 @@
 #include <kos/nopf.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -81,8 +82,8 @@ INTERN size_t rtm_memory_limit = 4 * PAGESIZE;
 	        rtm_memory_region_getsize(self),              \
 	        "Allocated region size is too small:\n"       \
 	        "region: %p (%p..%p)\n"                       \
-	        "usable_size:   %Iu\n"                        \
-	        "required_size: %Iu\n",                       \
+	        "usable_size:   %" PRIuSIZ "\n"               \
+	        "required_size: %" PRIuSIZ "\n",              \
 	        self, (self)->mr_addrlo, (self)->mr_addrhi,   \
 	        kmalloc_usable_size(self),                    \
 	        offsetof(struct rtm_memory_region, mr_data) + \
@@ -114,8 +115,8 @@ NOTHROW(FCALL rtm_memory_truncate)(struct rtm_memory *__restrict self,
 		return false; /* Don't truncate this one! */
 	oldavl = kmalloc_usable_size(heap_pointer);
 	assertf(oldavl >= num_bytes,
-	        "oldavl    = %Iu\n"
-	        "num_bytes = %Iu\n",
+	        "oldavl    = %" PRIuSIZ "\n"
+	        "num_bytes = %" PRIuSIZ "\n",
 	        oldavl, num_bytes);
 	if (oldavl == num_bytes)
 		return false; /* Can't possibly be truncated! */
@@ -126,12 +127,12 @@ NOTHROW(FCALL rtm_memory_truncate)(struct rtm_memory *__restrict self,
 	*pheap_pointer = heap_pointer;
 	newavl = kmalloc_usable_size(heap_pointer);
 	assertf(newavl >= num_bytes,
-	        "newavl    = %Iu\n"
-	        "num_bytes = %Iu\n",
+	        "newavl    = %" PRIuSIZ "\n"
+	        "num_bytes = %" PRIuSIZ "\n",
 	        newavl, num_bytes);
 	assertf(newavl <= oldavl,
-	        "newavl = %Iu\n"
-	        "oldavl = %Iu\n",
+	        "newavl = %" PRIuSIZ "\n"
+	        "oldavl = %" PRIuSIZ "\n",
 	        newavl, oldavl);
 	if (newavl >= oldavl) /* Should actually be `newavl == oldavl'; is `>=' for safety */
 		return false; /* Nothing's changed */
@@ -962,8 +963,8 @@ again_lock_effective_mman:
 		 *       index. */
 		if (i >= self->rm_regionc) {
 			assertf(i == 0,
-			        "i                = %Iu\n"
-			        "self->rm_regionc = %Iu\n",
+			        "i                = %" PRIuSIZ "\n"
+			        "self->rm_regionc = %" PRIuSIZ "\n",
 			        i, self->rm_regionc);
 		} else {
 			struct rtm_memory_region *next_region;
@@ -1694,8 +1695,8 @@ again_acquire_region_locks_for_mman_lock:
 			        "region->mr_addrlo = %p\n"
 			        "region->mr_addrhi = %p\n"
 			        "region->mr_data   = %p\n"
-			        "SIZE(region)      = %Iu\n"
-			        "error             = %Iu\n",
+			        "SIZE(region)      = %" PRIuSIZ "\n"
+			        "error             = %" PRIuSIZ "\n",
 			        region->mr_addrlo,
 			        region->mr_addrhi,
 			        region->mr_data,

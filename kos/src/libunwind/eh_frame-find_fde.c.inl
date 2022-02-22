@@ -91,6 +91,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_scan)(byte_t const *__restrict reader,
 	uint8_t used_sizeof_address;
 	char const *cie_augstr;
 	struct CIE const *cie;
+
 	/* Must initialize the FBASE field. Otherwise, maliciously crafted  CFI
 	 * instrumentation could access the FBASE field before it is *normally*
 	 * initialized. */
@@ -127,6 +128,7 @@ again:
 	              (byte_t const *)cie < eh_frame_end))
 		ERRORF(err_noframe, "cie=%p, eh_frame_start=%p, eh_frame_end=%p\n",
 		       cie, eh_frame_start, eh_frame_end);
+
 	/* Load the augmentation string of the associated CIE. */
 	cie_reader = (byte_t const *)cie;
 	cie_reader += 4; /* cie_size */
@@ -148,6 +150,7 @@ again:
 		cie_reader += 1;                                    /* ... */
 		cie_reader += 1;                                    /* uint8_t cie_segsize */
 	}
+
 	/* Read code and data alignments. */
 	result->f_codealign = dwarf_decode_uleb128(&cie_reader); /* uleb128_t cie_codealign */
 	result->f_dataalign = dwarf_decode_sleb128(&cie_reader); /* uleb128_t cie_dataalign */
@@ -157,10 +160,12 @@ again:
 	} else {
 		result->f_retreg = (unwind_regno_t)dwarf_decode_uleb128(&cie_reader); /* cie_retreg */
 	}
+
 	/* Pointer encodings default to `DW_EH_PE_absptr'. */
 	result->f_ptrenc   = DW_EH_PE_absptr;
 	enclsda            = DW_EH_PE_absptr;
 	result->f_sigframe = 0;
+
 	/* No personality function by default. */
 	result->f_persofun = 0;
 	result->f_lsdaaddr = 0;
@@ -194,11 +199,13 @@ again:
 		/* `aug_end' now points at `c_initinstr' */
 		cie_reader = aug_end;
 	}
+
 	/* fde_funbase */
 	result->f_pcstart = dwarf_decode_pointer(&fde_reader,
 	                                         result->f_ptrenc,
 	                                         used_sizeof_address,
 	                                         &result->f_bases);
+
 	/* fde_funsize */
 	result->f_pcend = dwarf_decode_pointer(&fde_reader,
 	                                       DW_EH_PE_OFF(result->f_ptrenc),
@@ -208,28 +215,33 @@ again:
 	                  (uintptr_t)result->f_pcend,
 	                  (uintptr_t *)&result->f_pcend))
 		goto do_next_chunk;
+
+	/* Check if the CIE points to the proper bounds. */
 #ifdef FIND_SPECIFIC_ADDRESS
-	/* Check of the CIE points to the proper bounds. */
 	if (absolute_pc < result->f_pcstart)
 		goto do_next_chunk;
 	if (absolute_pc >= result->f_pcend)
 		goto do_next_chunk;
 #endif /* FIND_SPECIFIC_ADDRESS */
+
 	/* Found it! - Save the pointer to the initial instruction set. */
 	result->f_inittext = cie_reader; /* cie_inittxsiz */
+
 	/* Figure out the max length of that instruction set. */
 	cie_reader = (byte_t const *)cie;
 	length     = UNALIGNED_GET32((uint32_t const *)cie_reader); /* cie_inittxsiz */
 	cie_reader += 4;
+
 #if __SIZEOF_POINTER__ > 4
-	/* Above code already asserted that the length fits into 32 bits of the CIE. */
 	if unlikely((uint32_t)length == (uint32_t)-1) {
+		/* Above code already asserted that the length fits into 32 bits of the CIE. */
 		length = (size_t)(*(u64 const *)reader);
 		reader += 8;
 	}
 #endif /* __SIZEOF_POINTER__ > 4 */
 	cie_reader += length;
 	result->f_inittextend = cie_reader;
+
 	/* Parse augmentation data of the FDE. */
 	if (cie_augstr[0] == 'z') {
 		uintptr_t aug_length;

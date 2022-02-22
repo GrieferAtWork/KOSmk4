@@ -41,6 +41,7 @@
 
 #include <alloca.h>
 #include <assert.h>
+#include <inttypes.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -580,7 +581,7 @@ NOTHROW_NCX(CC libuw_unwind_ste_read)(unwind_ste_t const *__restrict self, uint8
 	}	break;
 
 	default:
-		ERRORF(err_illegal_instruction, "self->s_type = %I8u\n", self->s_type);
+		ERRORF(err_illegal_instruction, "self->s_type = %" PRIu8 "\n", self->s_type);
 	}
 	return UNWIND_SUCCESS;
 err_illegal_instruction:
@@ -1617,7 +1618,7 @@ do_read_bit_pieces:
 		}	break;
 
 		default:
-			ERRORF(err_unknown_instruction, "opcode = %#.2I8x (%p/%p/%p/%Iu)\n%$[hex]\n",
+			ERRORF(err_unknown_instruction, "opcode = %#.2" PRIx8 " (%p/%p/%p/%" PRIuSIZ ")\n%$[hex]\n",
 			       opcode, pc - 1, self->ue_pc_start, self->ue_pc_end,
 			       (size_t)(self->ue_pc_end - (pc - 1)),
 			       (size_t)(self->ue_pc_end - self->ue_pc_start),
@@ -2029,7 +2030,7 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
 				break; /* Location list end entry. */
 			range_start += cu_base;
 			range_end += cu_base;
-			TRACE("%p: RANGE(%p-%p) with %I16u\n",
+			TRACE("%p: RANGE(%p-%p) with %" PRIu16 "\n",
 			      reader - 2 * addrsize,
 			      range_start,
 			      range_end,

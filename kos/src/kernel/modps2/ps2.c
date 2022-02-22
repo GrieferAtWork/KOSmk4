@@ -33,6 +33,7 @@
 
 #include <hybrid/atomic.h>
 
+#include <inttypes.h>
 #include <string.h>
 #include <time.h>
 
@@ -55,7 +56,7 @@ PRIVATE NOBLOCK NOPREEMPT ATTR_FREETEXT void
 NOTHROW(FCALL ps2_probe_process_data)(struct ps2_probe_data *__restrict probe_data,
                                       ps2_portid_t portno, u8 data) {
 	struct ps2_probe_data &port = probe_data[portno];
-/*	printk(KERN_DEBUG "[ps2##%I8u] Received %#.2I8x\n", portno + 1, data);*/
+/*	printk(KERN_DEBUG "[ps2#%" PRIu8 "] Received %#.2I8x\n", portno + 1, data);*/
 	switch (port.pd_state) {
 
 	case PS2_PROBE_STATE_UNCONFIGURED:
@@ -66,7 +67,7 @@ handle_resend_or_other:
 			if (data == 0xfe) {
 				port.pd_status |= PS2_PROBE_STATUS_FRESEND;
 			} else {
-				printk(KERN_WARNING "[ps2##%I8u] Unexpected byte during probe %#.2I8x\n", portno + 1, data);
+				printk(KERN_WARNING "[ps2#%" PRIu8 "] Unexpected byte during probe %#.2I8x\n", portno + 1, data);
 			}
 		}
 		break;

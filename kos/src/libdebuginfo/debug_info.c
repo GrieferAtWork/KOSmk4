@@ -2421,7 +2421,7 @@ got_elem_count:
 		DO((*printer)(arg, "[", 1));
 		FORMAT(DEBUGINFO_PRINT_FORMAT_BRACKET_SUFFIX);
 		FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
-		DO(format_printf(printer, arg, "%Iu", elem_count));
+		DO(format_printf(printer, arg, "%" PRIuPTR, elem_count));
 		FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
 		FORMAT(DEBUGINFO_PRINT_FORMAT_BRACKET_PREFIX);
 		DO((*printer)(arg, "]", 1));

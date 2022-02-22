@@ -672,6 +672,7 @@ int main_vio(int argc, char *argv[], char *envp[]) {
 	u32 volatile *baseaddr;
 	(void)argc, (void)argv, (void)envp;
 
+	/* Load VIO library */
 	libvio = dlopen(LIBVIO_LIBRARY_NAME, RTLD_LOCAL);
 	if (!libvio)
 		err(1, "dlopen failed: %s", dlerror());
@@ -682,6 +683,7 @@ int main_vio(int argc, char *argv[], char *envp[]) {
 	if (!vio_destroy)
 		err(1, "dlsym failed: %s", dlerror());
 
+	/* Create VIO mapping */
 	uviofd = vio_create(&myvio_ops, NULL, 0x1000, O_CLOEXEC | O_CLOFORK);
 	if (uviofd < 0)
 		err(1, "vio_create failed");
@@ -692,18 +694,21 @@ int main_vio(int argc, char *argv[], char *envp[]) {
 	                                uviofd, 0);
 	if ((void *)baseaddr == MAP_FAILED)
 		err(1, "mmap failed");
+
+	/* Access VIO memory */
 	printf("Start reading from: %p\n", baseaddr);
 	viovalue = 42;
-	printf("read: %I32u\n", baseaddr[0]); /* 42 */
-	printf("read: %I32u\n", baseaddr[1]); /* 43 */
-	printf("read: %I32u\n", baseaddr[4]); /* 44 */
-	printf("read: %I32u\n", baseaddr[3]); /* 45 */
-	printf("read: %I32u\n", baseaddr[2]); /* 46 */
+	printf("read: %" PRIu32 "\n", baseaddr[0]); /* 42 */
+	printf("read: %" PRIu32 "\n", baseaddr[1]); /* 43 */
+	printf("read: %" PRIu32 "\n", baseaddr[4]); /* 44 */
+	printf("read: %" PRIu32 "\n", baseaddr[3]); /* 45 */
+	printf("read: %" PRIu32 "\n", baseaddr[2]); /* 46 */
 	viovalue = 7;
-	printf("read: %I32u\n", baseaddr[19]); /* 7 */
-	printf("read: %I32u\n", baseaddr[8]);  /* 8 */
-	printf("read: %I32u\n", baseaddr[0]);  /* 9 */
+	printf("read: %" PRIu32 "\n", baseaddr[19]); /* 7 */
+	printf("read: %" PRIu32 "\n", baseaddr[8]);  /* 8 */
+	printf("read: %" PRIu32 "\n", baseaddr[0]);  /* 9 */
 
+	/* Cleanup... */
 	munmap((void *)baseaddr, 0x1000);
 	vio_destroy(uviofd);
 	dlclose(libvio);

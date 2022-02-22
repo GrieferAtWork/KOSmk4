@@ -1224,7 +1224,7 @@ NOTHROW(FCALL cmodsymtab_addsymbol)(struct cmodsymtab *__restrict self,
 			while (hi < self->mst_symc - 1 &&
 			       strcmp(cmodsym_name(&self->mst_symv[hi + 1], mod), name) == 0)
 				++hi;
-			/* Check of one of the pre-existing symbols uses the same namespace as we do. */
+			/* Check if one of the pre-existing symbols uses the same namespace as we do. */
 			for (index = lo; index <= hi; ++index) {
 				sym = &self->mst_symv[index];
 				if (!same_namespace(sym->cms_dip, symbol_dip))
@@ -1526,7 +1526,7 @@ NOTHROW(FCALL cmodule_addsymbol)(struct cmodule *__restrict self,
 			while (hi < self->cm_symbols.mst_symc - 1 &&
 			       strcmp(cmodsym_name(&self->cm_symbols.mst_symv[hi + 1], self), name) == 0)
 				++hi;
-			/* Check of one of the pre-existing symbols uses the same namespace as we do. */
+			/* Check if one of the pre-existing symbols uses the same namespace as we do. */
 			for (index = lo; index <= hi; ++index) {
 				sym = &self->cm_symbols.mst_symv[index];
 				if (!same_namespace(sym->cms_dip, symbol_dip))

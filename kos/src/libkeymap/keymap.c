@@ -272,7 +272,7 @@ NOTHROW_NCX(CC libkeymap_translate)(struct keymap *__restrict self,
 				reg_key -= KEY(0, 1);
 				break;
 
-			CASEF(KMP_OP_SETENC, "enc=%I8u\n", *reader)
+			CASEF(KMP_OP_SETENC, "enc=%" PRIu8 "\n", *reader)
 				reg_enc = *reader++;
 				if unlikely(reg_enc > KMP_ENCODING_MAX)
 					ERROR(error);
@@ -282,7 +282,7 @@ NOTHROW_NCX(CC libkeymap_translate)(struct keymap *__restrict self,
 				reg_key = *reader++;
 				break;
 
-			CASEF(KMP_OP_DEFENC, "enc=%I8u\n", self->km_defencoding)
+			CASEF(KMP_OP_DEFENC, "enc=%" PRIu8 "\n", self->km_defencoding)
 				reg_enc = self->km_defencoding;
 				break;
 
@@ -291,7 +291,7 @@ NOTHROW_NCX(CC libkeymap_translate)(struct keymap *__restrict self,
 				reader += 2;
 				break;
 
-			CASEF(KMP_OP_SETKEYMOD2, "mask=%#.4I16x\n", UNALIGNED_GETLE16((u16 const *)reader)) {
+			CASEF(KMP_OP_SETKEYMOD2, "mask=%#.4" PRIx16 "\n", UNALIGNED_GETLE16((u16 const *)reader)) {
 				u16 mask;
 				mask = UNALIGNED_GETLE16((u16 const *)reader);
 				reader += 2;
@@ -300,7 +300,7 @@ NOTHROW_NCX(CC libkeymap_translate)(struct keymap *__restrict self,
 				goto skip_character;
 			}	break;
 
-			CASEF(KMP_OP_SETKEYMOD, "mask=%#.2I8x\n", *reader) {
+			CASEF(KMP_OP_SETKEYMOD, "mask=%#.2" PRIx8 "\n", *reader) {
 				u8 mask;
 				mask = *reader++;
 				if (reg_key == key && mod == mask)

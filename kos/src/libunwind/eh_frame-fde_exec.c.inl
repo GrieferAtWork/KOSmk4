@@ -333,7 +333,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t *__restrict self, 
 			TRACE("DW_CFA_advance_loc\n");
 			current_pc += (uintptr_t)operand * self->f_codealign;
 		} else if (opcode == DW_CFA_offset) {
-			TRACE("DW_CFA_offset(%I8u)\n", operand);
+			TRACE("DW_CFA_offset(%" PRIu8 ")\n", operand);
 			{
 #if (defined(EH_FRAME_FDE_EXEC_CFA_STATE) ||          \
      defined(EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE) || \
@@ -529,7 +529,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t *__restrict self, 
 				reg1 = (unwind_regno_t)dwarf_decode_uleb128((byte_t const **)&reader);
 				reg2 = dwarf_decode_uleb128((byte_t const **)&reader);
 				if unlikely(reg2 >= CFI_UNWIND_REGISTER_MAXCOUNT)
-					ERRORF(err_invalid_register, "regno=%Iu\n", reg2);
+					ERRORF(err_invalid_register, "regno=%" PRIuPTR "\n", reg2);
 				SET_REGISTER(reg1, {
 					rule->cr_rule  = DW_CFA_register_rule_register;
 					rule->cr_value = (intptr_t)reg2;
@@ -568,7 +568,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t *__restrict self, 
 					/* Check if we have enough stack space left to create a backup. */
 #ifdef __KERNEL__
 					if (get_stack_avail() < ((256 * sizeof(void *)) + sizeof(SYM(unwind_cfa_backup_state_t))))
-						ERRORF(err_nomem, "get_stack_avail()=%Iu", get_stack_avail());
+						ERRORF(err_nomem, "get_stack_avail()=%" PRIuSIZ "\n", get_stack_avail());
 					backup = (SYM(unwind_cfa_backup_state_t) *)alloca(sizeof(SYM(unwind_cfa_backup_state_t)));
 #else /* __KERNEL__ */
 					backup = (SYM(unwind_cfa_backup_state_t) *)malloc(sizeof(SYM(unwind_cfa_backup_state_t)));
@@ -611,7 +611,7 @@ skip_expression:
 				                          (uintptr_t *)(byte_t const **)&reader) ||
 				            reader > end) {
 					ERRORF(err_illegal_instruction,
-					       "reader=%p, expr_size=%Iu(%#Ix), end=%p",
+					       "reader=%p, expr_size=%" PRIuSIZ "(%#" PRIxSIZ "), end=%p\n",
 					       (uintptr_t)reader - expr_size,
 					       expr_size, expr_size, end);
 				}
@@ -645,7 +645,7 @@ skip_expression:
 				uintptr_t reg;
 				reg = dwarf_decode_uleb128((byte_t const **)&reader);
 				if unlikely(reg >= CFI_UNWIND_REGISTER_MAXCOUNT)
-					ERRORF(err_invalid_register, "regno=%Iu\n", reg);
+					ERRORF(err_invalid_register, "regno=%" PRIuPTR "\n", reg);
 				RESULT_CFA.cv_type = UNWIND_CFA_VALUE_REGISTER;
 				RESULT_CFA.cv_reg = (unwind_regno_t)reg;
 				RESULT_CFA.cv_value = (intptr_t)dwarf_decode_uleb128((byte_t const **)&reader);
@@ -655,7 +655,7 @@ skip_expression:
 				uintptr_t reg;
 				reg = dwarf_decode_uleb128((byte_t const **)&reader);
 				if unlikely(reg >= CFI_UNWIND_REGISTER_MAXCOUNT)
-					ERRORF(err_invalid_register, "regno=%Iu\n", reg);
+					ERRORF(err_invalid_register, "regno=%" PRIuPTR "\n", reg);
 				RESULT_CFA.cv_type = UNWIND_CFA_VALUE_REGISTER;
 				RESULT_CFA.cv_reg = (unwind_regno_t)reg;
 				RESULT_CFA.cv_value = (intptr_t)(dwarf_decode_sleb128((byte_t const **)&reader) * self->f_dataalign);
@@ -672,12 +672,12 @@ skip_expression:
 					} else
 #endif /* CONFIG_DW_RELAXED_CFA_INITIALIZATION_RULES */
 					{
-						ERRORF(err_illegal_instruction, "cv_type=%u", (unsigned int)RESULT_CFA.cv_type);
+						ERRORF(err_illegal_instruction, "cv_type=%u\n", (unsigned int)RESULT_CFA.cv_type);
 					}
 				}
 				reg = dwarf_decode_uleb128((byte_t const **)&reader);
 				if unlikely(reg >= CFI_UNWIND_REGISTER_MAXCOUNT)
-					ERRORF(err_invalid_register, "regno=%Iu\n", reg);
+					ERRORF(err_invalid_register, "regno=%" PRIuPTR "\n", reg);
 				RESULT_CFA.cv_reg = (unwind_regno_t)reg;
 				/*RESULT_CFA.cv_value = ...;*/ /* Keep the old offset */
 			}	break;
@@ -692,7 +692,7 @@ skip_expression:
 					} else
 #endif /* CONFIG_DW_RELAXED_CFA_INITIALIZATION_RULES */
 					{
-						ERRORF(err_illegal_instruction, "cv_type=%u", (unsigned int)RESULT_CFA.cv_type);
+						ERRORF(err_illegal_instruction, "cv_type=%u\n", (unsigned int)RESULT_CFA.cv_type);
 					}
 				}
 				RESULT_CFA.cv_value = (intptr_t)dwarf_decode_uleb128((byte_t const **)&reader);
@@ -708,7 +708,7 @@ skip_expression:
 					} else
 #endif /* CONFIG_DW_RELAXED_CFA_INITIALIZATION_RULES */
 					{
-						ERRORF(err_illegal_instruction, "cv_type=%u", (unsigned int)RESULT_CFA.cv_type);
+						ERRORF(err_illegal_instruction, "cv_type=%u\n", (unsigned int)RESULT_CFA.cv_type);
 					}
 				}
 				RESULT_CFA.cv_value = (intptr_t)(dwarf_decode_sleb128((byte_t const **)&reader) * self->f_dataalign);
@@ -724,7 +724,7 @@ skip_expression:
 				                          expr_size, (uintptr_t *)(byte_t const **)&reader) ||
 				            reader > end) {
 					ERRORF(err_illegal_instruction,
-					       "reader=%p, expr_size=%Iu(%#Ix), end=%p",
+					       "reader=%p, expr_size=%" PRIuSIZ "(%#" PRIxSIZ "), end=%p\n",
 					       (uintptr_t)reader - expr_size,
 					       expr_size, expr_size, end);
 				}
@@ -819,7 +819,7 @@ skip_expression:
 				break;
 
 			default:
-				ERRORF(err_unknown_instruction, "operand=%#.2I8x\n", operand);
+				ERRORF(err_unknown_instruction, "operand=%#.2" PRIx8 "\n", operand);
 			}
 		}
 	}

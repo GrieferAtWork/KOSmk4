@@ -30,6 +30,7 @@
 
 #include <assert.h>
 #include <dlfcn.h>
+#include <inttypes.h>
 #include <stdlib.h>
 
 #include <libinstrlen/instrlen.h>
@@ -51,12 +52,12 @@ DEFINE_TEST(instrlen_x86_prevent_jcc_regression) {
 	*(void **)&instruction_succ = dlsym(libinstrlen, "instruction_succ");
 	assertf(instruction_succ, "dlerror(): %s", dlerror());
 
-#define ASSERT_EQ(a, b)                           \
-	do {                                          \
-		void const *_a = (a), *_b = (b);          \
-		assertf(_a == _b, "%p(+%Iu) == %p(+%Iu)", \
-		        _a, (byte_t *)_a - code,          \
-		        _b, (byte_t *)_b - code);         \
+#define ASSERT_EQ(a, b)                                             \
+	do {                                                            \
+		void const *_a = (a), *_b = (b);                            \
+		assertf(_a == _b, "%p(+%" PRIuPTR ") == %p(+%" PRIuPTR ")", \
+		        _a, (byte_t *)_a - code,                            \
+		        _b, (byte_t *)_b - code);                           \
 	}	__WHILE0
 	ASSERT_EQ(instruction_succ(code + 0, INSTRLEN_ISA_I386), code + 2); /* je    . + 1 */
 	ASSERT_EQ(instruction_succ(code + 2, INSTRLEN_ISA_I386), code + 3); /* movsb */

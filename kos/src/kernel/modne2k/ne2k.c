@@ -701,7 +701,7 @@ tx_switch_to_idle:
 				      E_IOERROR_REASON_NE2K_PACKETSIZE,
 				      aligned_size);
 			}
-			NE2K_DEBUG("[ne2k:async] Upload packet (size=%Iu)\n", aligned_size);
+			NE2K_DEBUG("[ne2k:async] Upload packet (size=%" PRIuSIZ ")\n", aligned_size);
 
 			/* Perform a read-before-write. */
 			outb(E8390_CMD(me->nk_iobase), E8390_PAGE0 | E8390_RREAD | E8390_START);
@@ -763,7 +763,7 @@ tx_switch_to_idle:
 			goto again;
 		}
 
-		NE2K_DEBUG("[ne2k:async] Transmit packet (size=%Iu) and switch to TX_PKSEND\n", aligned_size);
+		NE2K_DEBUG("[ne2k:async] Transmit packet (size=%" PRIuSIZ ") and switch to TX_PKSEND\n", aligned_size);
 		/* Set-up transmission information. */
 		outb(E8390_CMD(me->nk_iobase), E8390_NODMA | E8390_START);
 		outb(EN0_TPSR(me->nk_iobase), me->nk_tx_start);
@@ -800,7 +800,7 @@ tx_switch_to_idle:
 			if unlikely(hdr.ph_count < sizeof(hdr) + ETH_ZLEN ||
 			            hdr.ph_count > sizeof(hdr) + (ETH_FRAME_LEN + ETH_FCS_LEN)) {
 				/* Header too small (shouldn't happen) */
-				printk(KERN_WARNING "[ne2k] Received packet has a bad size (%I16u bytes)\n",
+				printk(KERN_WARNING "[ne2k] Received packet has a bad size (%" PRIu16 " bytes)\n",
 				       hdr.ph_count);
 				++me->nd_stat.nds_rx_length_errors;
 				me->nk_rx_nxt = hdr.ph_next;

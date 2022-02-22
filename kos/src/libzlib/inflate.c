@@ -31,6 +31,7 @@
 #include <kos/types.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -275,7 +276,7 @@ NOTHROW_NCX(CC zlib_tree_construct)(struct zlib_tree *__restrict tree) {
  * for decoding the given compressed code. When NULL is returned, the  caller
  * should  either re-try  the find operation  with more bits  (so-long as the
  * given `compressed_bits' doesn't exceed `tree->zr_maxlen'), or give up once
- * the max number of addressible bits has been reached. (in which case a data
+ * the max number of addressable bits has been reached. (in which case a data
  * error should be reported) */
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) struct zlib_treeent *
 NOTHROW_NCX(CC zlib_tree_find_slow)(struct zlib_tree *__restrict tree,
@@ -284,16 +285,16 @@ NOTHROW_NCX(CC zlib_tree_find_slow)(struct zlib_tree *__restrict tree,
 	u16 i;
 	assertf(!(compressed_code & ~((1 << compressed_bits) - 1)),
 	        "compressed_code must be masked by the caller\n"
-	        "compressed_code = %#I16x\n"
-	        "compressed_bits = %I8ux",
+	        "compressed_code = %#" PRIx16 "\n"
+	        "compressed_bits = %" PRIu8,
 	        compressed_code,
 	        compressed_bits);
 	assertf(compressed_bits >= tree->zr_minlen &&
 	        compressed_bits <= tree->zr_maxlen,
 	        "compressed_bits must be within the limits of the table\n"
-	        "compressed_bits = %I8u\n"
-	        "tree->zr_minlen = %I8u\n"
-	        "tree->zr_maxlen = %I8u",
+	        "compressed_bits = %" PRIu8 "\n"
+	        "tree->zr_minlen = %" PRIu8 "\n"
+	        "tree->zr_maxlen = %" PRIu8,
 	        compressed_bits,
 	        tree->zr_minlen,
 	        tree->zr_maxlen);
@@ -776,8 +777,8 @@ save_distance_and_length_and_yield:
 					        "from, so to get an EOF by reading from an earlier position, "
 					        "there has to be some kind of inconsistency within the inflate "
 					        "reader itself\n"
-					        "result     = %Iu\n"
-					        "read_count = %Iu",
+					        "result     = %" PRIuSIZ "\n"
+					        "read_count = %" PRIuSIZ,
 					        result, read_count);
 					decompressed_bytes += read_count;
 					length             -= read_count;

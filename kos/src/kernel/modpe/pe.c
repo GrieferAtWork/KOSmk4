@@ -48,6 +48,7 @@
 
 #include <assert.h>
 #include <format-printer.h>
+#include <inttypes.h>
 #include <malloca.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -253,7 +254,7 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 			/* Map section */
 			sectaddr = loadaddr + section->VirtualAddress;
 			assert(IS_ALIGNED((uintptr_t)sectaddr, PAGESIZE));
-			printk(KERN_DEBUG "[pe] section[%Iu] = %q @ %p-%p (%c%c%c%c)\n",
+			printk(KERN_DEBUG "[pe] section[%" PRIuSIZ "] = %q @ %p-%p (%c%c%c%c)\n",
 			       i, section->Name, sectaddr, sectaddr + section->Misc.VirtualSize - 1,
 			       prot & PROT_READ ? 'r' : '-', prot & PROT_WRITE ? 'w' : '-',
 			       prot & PROT_EXEC ? 'x' : '-', prot & PROT_SHARED ? 's' : 'p');

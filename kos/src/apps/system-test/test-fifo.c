@@ -31,6 +31,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -70,14 +71,14 @@ DEFINE_TEST(fifo) {
 	assertf(wr != -1, "%m");
 
 	temp = write(wr, "foobar", 6);
-	assertf(temp == 6, "%Id\n%m", temp);
+	assertf(temp == 6, "%" PRIdSIZ "\n%m", temp);
 
 	temp = read(rd, buf, 3);
-	assertf(temp == 3, "%Id\n%m", temp);
+	assertf(temp == 3, "%" PRIdSIZ "\n%m", temp);
 	assertf(memcmp(buf, "foo", 3) == 0, "%$q", 3, buf);
 
 	temp = read(rd, buf, 3);
-	assertf(temp == 3, "%Id\n%m", temp);
+	assertf(temp == 3, "%" PRIdSIZ "\n%m", temp);
 	assertf(memcmp(buf, "bar", 3) == 0, "%$q", 3, buf);
 
 	/* The fifo should now be empty,  but because `wr' is still  opened,
@@ -92,7 +93,7 @@ DEFINE_TEST(fifo) {
 
 	/* Try to read from our reader-end now should indicate END-OF-FILE */
 	temp = read(rd, buf, 3);
-	assertf(temp == 0, "%Id\n%m", temp);
+	assertf(temp == 0, "%" PRIdSIZ "\n%m", temp);
 
 	/* Open the fifo for writing once again.
 	 * NOTE: Don't pass O_NONBLOCK this time around, since the presence
@@ -115,12 +116,12 @@ DEFINE_TEST(fifo) {
 	/* Also verify that readlink("/proc/self/fd") works with named pipes! */
 	sprintf(buf, "/proc/self/fd/%d", wr);
 	temp = readlink(buf, buf, sizeof(buf));
-	assertf((size_t)temp == strlen(FIFO_NAME), "%Id\n%m", temp);
+	assertf((size_t)temp == strlen(FIFO_NAME), "%" PRIdSIZ "\n%m", temp);
 	assertf(memcmp(buf, FIFO_NAME, (size_t)temp) == 0, "%$q", buf);
 
 	sprintf(buf, "/proc/self/fd/%d", rd);
 	temp = readlink(buf, buf, sizeof(buf));
-	assertf((size_t)temp == strlen(FIFO_NAME), "%Id\n%m", temp);
+	assertf((size_t)temp == strlen(FIFO_NAME), "%" PRIdSIZ "\n%m", temp);
 	assertf(memcmp(buf, FIFO_NAME, (size_t)temp) == 0, "%$q", buf);
 
 	/* Delete the FIFO */
@@ -133,10 +134,10 @@ DEFINE_TEST(fifo) {
 	assertf(errno == EWOULDBLOCK, "%m");
 
 	temp = write(wr, "foobar", 6);
-	assertf(temp == 6, "%Id\n%m", temp);
+	assertf(temp == 6, "%" PRIdSIZ "\n%m", temp);
 
 	temp = read(rd, buf, 64);
-	assertf(temp == 6, "%Id\n%m", temp);
+	assertf(temp == 6, "%" PRIdSIZ "\n%m", temp);
 	assertf(memcmp(buf, "foobar", 6) == 0, "%$q", 6, buf);
 
 	/* The fifo should now be empty, but still connected. */
@@ -149,7 +150,7 @@ DEFINE_TEST(fifo) {
 
 	/* With the writer gone, we should now be able to read EOF */
 	temp = read(rd, buf, 3);
-	assertf(temp == 0, "%Id\n%m", temp);
+	assertf(temp == 0, "%" PRIdSIZ "\n%m", temp);
 
 	/* Finally, close the reader as well. */
 	assertf(close(rd) == 0, "%m");

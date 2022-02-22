@@ -48,7 +48,7 @@ struct addr2line_buf {
  * >>     error = addr2line((uintptr_t)ptr, &info, level);
  * >>     if (error != DEBUG_INFO_ERROR_SUCCESS)
  * >>         break;
- * >>     printk("%s(%Iu) : %s : HERE\n",
+ * >>     printk("%s(%" PRIuPTR ") : %s : HERE\n",
  * >>            info.al_srcfile,
  * >>            info.al_srcline,
  * >>            info.al_name);

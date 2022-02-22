@@ -61,7 +61,7 @@ assertFileText_impl(fd_t dfd, char const *name,
 		ssize_t temp;
 		temp = read(fd, buf, sizeof(buf));
 		assertf(temp == (ssize_t)len,
-		        "%Id (%m)\n"
+		        "%" PRIdSIZ " (%m)\n"
 		        "line:%d",
 		        temp, line);
 		assertf(memcmp(buf, text, len) == 0,

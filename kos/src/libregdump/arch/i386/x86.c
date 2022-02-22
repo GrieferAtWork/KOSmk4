@@ -37,6 +37,7 @@
 #include <kos/types.h>
 
 #include <format-printer.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1176,7 +1177,7 @@ libregdump_do_ip_addr2line_info(struct regdump_printer *__restrict self,
 		format(REGDUMP_FORMAT_VALUE_SUFFIX);
 		PRINT("+");
 		format(REGDUMP_FORMAT_OFFSET_PREFIX);
-		printf("%Iu", (size_t)(relpc - info->al_symstart));
+		printf("%" PRIuSIZ, (size_t)(relpc - info->al_symstart));
 		format(REGDUMP_FORMAT_OFFSET_SUFFIX);
 		PRINT("]");
 	}
@@ -1194,12 +1195,12 @@ libregdump_do_ip_addr2line_info(struct regdump_printer *__restrict self,
 			PRINT(" ");
 		PRINT("[line=");
 		format(REGDUMP_FORMAT_VALUE_PREFIX);
-		printf("%Iu", info->al_srcline);
+		printf("%" PRIuPTR, info->al_srcline);
 		format(REGDUMP_FORMAT_VALUE_SUFFIX);
 		if (info->al_srccol) {
 			PRINT(",");
 			format(REGDUMP_FORMAT_VALUE_PREFIX);
-			printf("%Iu", info->al_srccol);
+			printf("%" PRIuPTR, info->al_srccol);
 			format(REGDUMP_FORMAT_VALUE_SUFFIX);
 		}
 		PRINT("]\n");
@@ -1302,7 +1303,7 @@ libregdump_gdt(struct regdump_printer *__restrict self,
 	format(REGDUMP_FORMAT_VALUE_SUFFIX);
 	PRINT("+");
 	format(REGDUMP_FORMAT_VALUE_PREFIX);
-	printf("%I16u", gdt->dt_limit);
+	printf("%" PRIu16, gdt->dt_limit);
 	format(REGDUMP_FORMAT_VALUE_SUFFIX);
 	PRINT("\n");
 	END;
@@ -1322,7 +1323,7 @@ libregdump_idt(struct regdump_printer *__restrict self,
 	format(REGDUMP_FORMAT_VALUE_SUFFIX);
 	PRINT("+");
 	format(REGDUMP_FORMAT_VALUE_PREFIX);
-	printf("%I16u", idt->dt_limit);
+	printf("%" PRIu16, idt->dt_limit);
 	format(REGDUMP_FORMAT_VALUE_SUFFIX);
 	PRINT("\n");
 	END;
