@@ -2663,7 +2663,11 @@ print_seek_whence(pformatprinter printer, void *arg,
 /*[[[deemon
 import * from deemon;
 import * from ...misc.libgen.strendN;
-local typ = getPrefixedMacrosFromFileAsMapping("../../include/asm/os/kos/fcntl.h", "__F_");
+local typ = getPrefixedMacrosFromFileAsMapping("../../include/asm/os/kos/fcntl.h", "__F_",
+	filter: [](x) -> x !in {
+		"__F_RDLCK", "__F_WRLCK", "__F_UNLCK", "__F_EXLCK", "__F_SHLCK",
+		"__F_OWNER_TID", "__F_OWNER_PID", "__F_OWNER_PGRP", "__F_OWNER_GID"
+	});
 printStrendNDatabase("FCNTL", typ);
 ]]]*/
 #define GETBASE_FCNTL(result, index) \
@@ -2671,9 +2675,9 @@ printStrendNDatabase("FCNTL", typ);
 	 ((index) >= 0x400 && (index) <= 0x40e) ? ((index) -= 0x400, (result) = repr_FCNTL_400h, true) : \
 	 ((index) >= 0x142b && (index) <= 0x1430) ? ((index) -= 0x142b, (result) = repr_FCNTL_142bh, true) : false)
 PRIVATE char const repr_FCNTL_0h[] =
-"DUPFD\0OWNER_PID\0OWNER_PGRP\0GETFL\0SETFL\0GETLK\0SETLK\0SETLKW\0SEAL_W"
-"RITE\0GETOWN\0SETSIG\0GETSIG\0GETLK64\0SETLK64\0SETLKW64\0SETOWN_EX\0GET"
-"OWN_EX\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0OFD_GETLK\0OFD_SETLK\0OFD_SETLKW";
+"DUPFD\0GETFD\0SEAL_SHRINK\0GETFL\0SETFL\0GETLK\0SETLK\0SETLKW\0SEAL_WRIT"
+"E\0GETOWN\0SETSIG\0GETSIG\0GETLK64\0SETLK64\0SETLKW64\0SETOWN_EX\0GETOWN"
+"_EX\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0OFD_GETLK\0OFD_SETLK\0OFD_SETLKW";
 PRIVATE char const repr_FCNTL_400h[] =
 "SETLEASE\0GETLEASE\0NOTIFY\0\0\0\0DUPFD_CLOEXEC\0SETPIPE_SZ\0GETPIPE_SZ\0"
 "ADD_SEALS\0GET_SEALS\0GET_RW_HINT\0SET_RW_HINT\0GET_FILE_RW_HINT\0SET"
@@ -2889,18 +2893,22 @@ print_fcntl_arg(pformatprinter printer, void *arg,
 	ssize_t result;
 	switch (cmd) {
 
-	case F_DUPFD:
 	case F_GETFD:
 	case F_GETFL:
 	case F_GETOWN:
 	case F_GETSIG:
 	case F_GETLEASE:
-	case F_DUPFD_CLOEXEC:
 	case F_GETPIPE_SZ:
 	case F_NEXT:
 	case F_CLOSEM:
 	case F_MAXFD:
 		result = (*printer)(arg, "(void)0", 7);
+		break;
+
+	case F_DUPFD:
+	case F_DUPFD_CLOEXEC:
+		result = format_printf(printer, arg, "%" PRIdN(__SIZEOF_FD_T__),
+		                       (fd_t)(uintptr_t)fcntl_arg);
 		break;
 
 	case F_SETFL:
