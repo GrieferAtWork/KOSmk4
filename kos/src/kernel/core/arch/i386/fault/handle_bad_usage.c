@@ -1140,6 +1140,8 @@ assert_canonical_address(struct icpustate *__restrict state,
 	assert(reading || writing);
 	if unlikely(ADDR_IS_NONCANON((byte_t *)addr) ||
 	            ADDR_IS_NONCANON((byte_t *)addr + num_bytes - 1)) {
+		uintptr_t flags;
+
 		/* Special handling for accesses made from `x86_nopf_check()' */
 		if (x86_nopf_check(instr_start_pc)) {
 			/* Override the return address. */
@@ -1150,14 +1152,25 @@ assert_canonical_address(struct icpustate *__restrict state,
 		printk(KERN_DEBUG "[segfault] Fault at %p [pc=%p,%s] [#GPF]\n",
 		       addr, icpustate_getpc(state),
 		       reading && writing ? "rw" : reading ? "ro" : "wo");
+		flags = E_SEGFAULT_CONTEXT_NONCANON;
+
 		/* NOTE: When reading+writing, then the read always comes first, so  even
 		 *       though the instruction  would have also  performed a write,  the
 		 *       read happening first means that we mustn't set the WRITING flag. */
-		THROW(E_SEGFAULT_UNMAPPED,
-		      addr,
-		      (writing && !reading)
-		      ? E_SEGFAULT_CONTEXT_NONCANON | E_SEGFAULT_CONTEXT_WRITING
-		      : E_SEGFAULT_CONTEXT_NONCANON);
+		if (writing && !reading)
+			flags |= E_SEGFAULT_CONTEXT_WRITING;
+
+		/* This can actually happen if `addr' itself isn't non-canon, but
+		 * `addr + ACCESS_SIZE - 1' is. The exact behavior depends on the
+		 * CPU, and whether or not such  an access triggers #PF or  #GPF.
+		 * But  for the sake of consistency, we want the thrown exception
+		 * to be the same in both cases (with E_SEGFAULT_CONTEXT_NONCANON
+		 * only being set in case the lowest address is non-canonical) */
+		if (!ADDR_IS_NONCANON(addr))
+			flags &= ~E_SEGFAULT_CONTEXT_NONCANON;
+
+		/* Throw the actual exception. */
+		THROW(E_SEGFAULT_UNMAPPED, addr, flags);
 	}
 }
 
