@@ -2188,10 +2188,18 @@ INTDEF kernel_permman_onexec_t __kernel_permman_onexec_start[];
 INTDEF kernel_permman_onexec_t __kernel_permman_onexec_end[];
 
 LOCAL void KCALL run_permman_onexec(void) {
-	kernel_permman_onexec_t *iter;
-	for (iter = __kernel_permman_onexec_start;
-	     iter < __kernel_permman_onexec_end; ++iter)
-		(**iter)();
+
+	/* Close file handles marked as IO_CLOEXEC */
+	handman_cloexec(THIS_HANDMAN);
+
+	/* Functions defined by `DEFINE_PERMMAN_ONEXEC()' (TODO: Inline direct calls to all of these) */
+	{
+		kernel_permman_onexec_t *iter;
+		for (iter = __kernel_permman_onexec_start;
+		     iter < __kernel_permman_onexec_end; ++iter)
+			(**iter)();
+	}
+
 	/* Invoke dynamic callbacks. */
 	mman_onexec_callbacks();
 }
