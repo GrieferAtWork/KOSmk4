@@ -53,8 +53,7 @@ DECL_BEGIN
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_DUP
 DEFINE_SYSCALL1(fd_t, dup, fd_t, fd) {
-	struct handle hand;
-	hand = handles_lookup(fd);
+	REF struct handle hand = handles_lookup(fd);
 	hand.h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
 	RAII_FINALLY { decref_unlikely(hand); };
 	return handles_install(hand);
@@ -64,8 +63,7 @@ DEFINE_SYSCALL1(fd_t, dup, fd_t, fd) {
 
 #ifdef __ARCH_WANT_SYSCALL_DUP2
 DEFINE_SYSCALL2(fd_t, dup2, fd_t, oldfd, fd_t, newfd) {
-	struct handle hand;
-	hand = handles_lookup(oldfd);
+	REF struct handle hand = handles_lookup(oldfd);
 	hand.h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
 	TRY {
 		newfd = handles_install_into(newfd, hand);

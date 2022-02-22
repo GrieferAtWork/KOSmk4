@@ -251,6 +251,8 @@ again:
 		newrange->hr_nlops = 0;
 		newrange->hr_cexec = 0;
 		newrange->hr_cfork = 0;
+		DBG_memset(&newrange->_hr_joinlop, 0xcc, sizeof(newrange->_hr_joinlop));
+		newrange->_hr_joinlop.olo_func = NULL; /* Mark as "inactive" */
 		assert(newrange->hr_minfd <= newrange->hr_maxfd);
 		assert(handrange_count(newrange) == hicount);
 		self->hr_maxfd = self->hr_minfd + rel_freemin - 1;
@@ -1824,6 +1826,7 @@ NOTHROW(FCALL handrange_install_handle)(struct handrange *__restrict self, unsig
 		ATOMIC_INC(self->hr_cfork);
 	if (nhand->h_mode & IO_CLOEXEC)
 		ATOMIC_INC(self->hr_cexec);
+	handle_incref(*nhand);
 }
 
 
@@ -2145,6 +2148,7 @@ again_check_slot:
 					ATOMIC_DEC(range->hr_cfork);
 				}
 			}
+			handle_incref(*nhand);
 			handman_endwrite(self);
 			sig_broadcast(&self->hm_changed);
 			return fd;
@@ -2254,6 +2258,7 @@ again_lock_for_newrange:
 
 	/* Install the initial handle. */
 	memcpy(&range->hr_hand[0].mh_hand, nhand, sizeof(struct handle));
+	handle_incref(*nhand);
 
 	/* Insert the new range into the manager's range-tree. */
 	handman_ranges_insert(self, range);

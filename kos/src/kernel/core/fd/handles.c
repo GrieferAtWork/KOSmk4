@@ -534,7 +534,7 @@ handles_install_into_simple(fd_t fd, struct handle const *__restrict nhand)
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_INVALID_HANDLE_FILE, E_WOULDBLOCK) {
 	fd_t result;
-	struct handle ohand;
+	REF struct handle ohand;
 	result = handles_install_into(fd, nhand, &ohand);
 	handle_decref(ohand); /* No-op if `HANDLE_TYPE_UNDEFINED' */
 	return result;
