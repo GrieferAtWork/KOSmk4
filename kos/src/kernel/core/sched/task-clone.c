@@ -738,7 +738,38 @@ again_release_kernel_and_cc:
 		 *    to die right  now, can we  say for certain  that we're allowed  to
 		 *    create  a  new  thread, rather  than  do something  else,  such as
 		 *    handling a signal. */
-		if (clone_flags & CLONE_THREAD) {
+		if unlikely(clone_flags & CLONE_PIDFD) {
+			fd_t pidfd;
+			struct handle_install_data install;
+			/* Support for PIDFDs */
+			pidfd = handles_install_begin(&install);
+			TRY {
+				/* Write the chosen FDNO to user-space. */
+				validate_and_write(args->tca_pidfd, pidfd);
+
+				/* Clone the thread/process PID. */
+				if (clone_flags & CLONE_THREAD) {
+					task_clone_thrdpid(result, caller, clone_flags, args->tca_parent_tid);
+				} else {
+					task_clone_procpid(result, caller, clone_flags, args->tca_parent_tid);
+				}
+			} EXCEPT {
+				handles_install_abort(&install);
+				RETHROW();
+			}
+			/* NOTE: From this point forth, normally nothing should be able to throw.
+			 *       The  exception to  this is  `CLONE_VFORK', though  even that one
+			 *       shouldn't be able  to fail, unless  the caller receives  SIGKILL
+			 *       (SIGSTOP would be handled without  unwinding), or has a  corrupt
+			 *       userprocmask. The later is userspace's fault, and the for former
+			 *       it doesn't matter if  we leak an FD,  since the process dies  no
+			 *       matter  what. (Though this might pose problems if the process is
+			 *       shared is FD-table  with another process...  -- No; it  doens't,
+			 *       because  if the SIGKILL was received after clone returned in the
+			 *       parent, then  they would  also die  with the  child pidfd  being
+			 *       shared with yet another process) */
+			handles_install_commit(&install, FORTASK(result, this_taskpid), IO_RDWR);
+		} else if (clone_flags & CLONE_THREAD) {
 			task_clone_thrdpid(result, caller, clone_flags, args->tca_parent_tid);
 		} else {
 			task_clone_procpid(result, caller, clone_flags, args->tca_parent_tid);
@@ -778,10 +809,10 @@ again_release_kernel_and_cc:
 	/* At this point the new thread is fully initialized and visible.
 	 * The  only thing that's still left to do is to start it (and in
 	 * the case of vfork(): wait for it to exit(2) or exec(2)). */
-	TRY {
 
-		/* Deal with vfork() */
-		if (clone_flags & CLONE_VFORK) {
+	/* Deal with vfork() */
+	if (clone_flags & CLONE_VFORK) {
+		TRY {
 #ifdef CONFIG_HAVE_USERPROCMASK
 			/* Special case for when the parent thread was using USERPROCMASK.
 			 * In this case we have to save+restore both the contents of--, as
@@ -832,13 +863,13 @@ again_release_kernel_and_cc:
 				/* Wait for the thread to clear its VFORK flag. */
 				waitfor_vfork_completion(result);
 			}
-		} else {
-			/* Simply start execution of the newly created thread. */
-			task_start(result);
+		} EXCEPT {
+			decref(result);
+			RETHROW();
 		}
-	} EXCEPT {
-		decref(result);
-		RETHROW();
+	} else {
+		/* Simply start execution of the newly created thread. */
+		task_start(result);
 	}
 	return result;
 }

@@ -253,6 +253,20 @@ EIDECLARE(, USER CHECKED void const *, , FCALL, validate_executable, (UNCHECKED 
 #endif /* __ARCH_HAVE_COMPAT */
 
 
+#define validate_and_read(ptr)                                                                               \
+	({                                                                                                       \
+		__auto_type __vr_res = *(USER CHECKED typeof(*(ptr)) const *)validate_readable(ptr, sizeof(*(ptr))); \
+		COMPILER_READ_BARRIER();                                                                             \
+		__vr_res;                                                                                            \
+	})
+#define validate_and_write(ptr, val)                                                    \
+	({                                                                                  \
+		*(USER CHECKED typeof(*(ptr)) *)validate_writable(ptr, sizeof(*(ptr))) = (val); \
+		COMPILER_WRITE_BARRIER();                                                       \
+		(void)0;                                                                        \
+	})
+
+
 /************************************************************************/
 /* Helper functions for interacting with ioctl() arguments.             */
 /************************************************************************/
