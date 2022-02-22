@@ -47,6 +47,7 @@
 #include <kernel/fs/ramfs.h>
 #include <kernel/fs/vfs.h>
 #include <kernel/handle.h>
+#include <kernel/handman.h>
 #include <kernel/heap.h>
 #include <kernel/mman.h>
 #include <kernel/mman/driver.h>

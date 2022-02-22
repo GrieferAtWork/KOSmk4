@@ -23,6 +23,8 @@
 //#define DEFINE_compat_sys_maplibrary
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/handle.h>
+#include <kernel/handman.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/flags.h>

@@ -25,6 +25,7 @@
 
 #include <kernel/except.h>
 #include <kernel/handle.h>
+#include <kernel/handman.h>
 #include <kernel/malloc.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
@@ -172,6 +173,8 @@ readdir_lock_acquire(void *h_data) {
 	 *       callback further down the path of execution will call
 	 *       back to one of these, mainly since directly  invoking
 	 *       system  calls while already  in kernel isn't allowed.
+	 *       (You  can only invoke syscalls _after_ having unwound
+	 *       any preceding system call)
 	 *
 	 * -> The  only  way that  a system  call can  invoke some  other system
 	 *    call is by sending an RPC to itself, and using `syscall_emulate()'

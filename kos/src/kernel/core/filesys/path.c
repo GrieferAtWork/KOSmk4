@@ -35,6 +35,7 @@
 #include <kernel/fs/super.h>
 #include <kernel/fs/vfs.h>
 #include <kernel/handle.h>
+#include <kernel/handman.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/driver.h>
 #include <kernel/personality.h>

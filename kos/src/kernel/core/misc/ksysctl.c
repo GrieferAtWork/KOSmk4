@@ -27,6 +27,7 @@
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/path.h>
 #include <kernel/handle.h>
+#include <kernel/handman.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>

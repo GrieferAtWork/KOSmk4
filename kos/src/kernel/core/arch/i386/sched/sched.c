@@ -25,7 +25,6 @@
 
 #include <kernel/except.h>
 #include <kernel/fs/fs.h>
-#include <kernel/handle.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
@@ -113,6 +112,7 @@ PUBLIC NOBLOCK ATTR_RETNONNULL ATTR_SENTINEL NONNULL((1, 2)) struct task *
 NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
                                  thread_main_t thread_main,
                                  size_t argc, ...) {
+	/* TODO: This function is completely broken! */
 #ifdef __x86_64__
 	struct scpustate *state;
 	va_list args; byte_t *dest;
@@ -183,8 +183,6 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
 	if (!FORTASK(thread, this_cred))
 		FORTASK(thread, this_cred) = incref(&cred_kernel);
 #endif /* !CONFIG_EVERYONE_IS_ROOT */
-	if (!FORTASK(thread, this_handle_manager))
-		FORTASK(thread, this_handle_manager) = incref(&handle_manager_kernel);
 	return thread;
 }
 

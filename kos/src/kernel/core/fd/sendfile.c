@@ -24,6 +24,7 @@
 
 #include <kernel/fs/filehandle.h>
 #include <kernel/handle.h>
+#include <kernel/handman.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/syscall.h>

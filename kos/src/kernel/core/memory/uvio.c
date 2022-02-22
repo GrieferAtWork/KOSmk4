@@ -28,6 +28,7 @@
 #ifdef LIBVIO_CONFIG_ENABLED
 #include <kernel/except.h>
 #include <kernel/handle.h>
+#include <kernel/handman.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/uvio.h>

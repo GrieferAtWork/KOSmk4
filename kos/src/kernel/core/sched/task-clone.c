@@ -24,7 +24,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/fs/fs.h>
-#include <kernel/handle.h>
+#include <kernel/handman.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>

@@ -28,6 +28,7 @@
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/filehandle.h>
 #include <kernel/handle.h>
+#include <kernel/handman.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/memfd.h>
 #include <kernel/mman/mpart.h>

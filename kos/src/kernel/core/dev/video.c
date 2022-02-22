@@ -27,6 +27,7 @@
 #include <dev/video.h>
 #include <kernel/driver.h>
 #include <kernel/handle.h>
+#include <kernel/handman.h>
 #include <kernel/user.h>
 #include <sched/async.h>
 #include <sched/cred.h>

@@ -30,6 +30,7 @@
 #include <kernel/fs/path.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
+#include <kernel/handman.h>
 #include <kernel/iovec.h>
 #include <kernel/mman.h>
 #include <kernel/mman/driver.h>

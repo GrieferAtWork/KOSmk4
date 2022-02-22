@@ -25,6 +25,7 @@
 
 #include <kernel/except.h>
 #include <kernel/handle.h>
+#include <kernel/handman.h>
 #include <kernel/iovec.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>

@@ -22,10 +22,7 @@
 
 #include <kernel/compiler.h>
 
-#ifndef GUARD_KERNEL_INCLUDE_KERNEL_HANDLE_H /* TODO: Remove this guard once we're no longer included by `<kernel/handle.h>' */
 #include <kernel/handle.h>
-#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_HANDLE_H */
-
 #include <kernel/types.h>
 #include <sched/sig.h>
 
@@ -1126,5 +1123,62 @@ handles_lookup(fd_t fd) THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE) {
 
 DECL_END
 #endif /* __CC__ */
+
+/* TODO: BEGIN DEPRECATED */
+/* Backwards compatibility */
+#define handle_manager              handman
+#define hm_cntlimit                 hm_maxhand
+#define hm_maxlimit                 hm_maxfd
+#define _handle_manager_reap        _handman_reap
+#define handle_manager_reap         handman_reap
+#define handle_manager_mustreap     handman_mustreap
+#define handle_manager_write        handman_write
+#define handle_manager_write_nx     handman_write_nx
+#define handle_manager_trywrite     handman_trywrite
+#define handle_manager_endwrite     handman_endwrite
+#define _handle_manager_endwrite    _handman_endwrite
+#define handle_manager_read         handman_read
+#define handle_manager_read_nx      handman_read_nx
+#define handle_manager_tryread      handman_tryread
+#define _handle_manager_endread     _handman_endread
+#define handle_manager_endread      handman_endread
+#define _handle_manager_end         _handman_end
+#define handle_manager_end          handman_end
+#define handle_manager_upgrade      handman_upgrade
+#define handle_manager_upgrade_nx   handman_upgrade_nx
+#define handle_manager_tryupgrade   handman_tryupgrade
+#define handle_manager_downgrade    handman_downgrade
+#define handle_manager_reading      handman_reading
+#define handle_manager_writing      handman_writing
+#define handle_manager_canread      handman_canread
+#define handle_manager_canwrite     handman_canwrite
+#define handle_manager_waitread     handman_waitread
+#define handle_manager_waitwrite    handman_waitwrite
+#define handle_manager_waitread_nx  handman_waitread_nx
+#define handle_manager_waitwrite_nx handman_waitwrite_nx
+#define handle_manager_destroy      handman_destroy
+#define handle_manager_clone        handman_fork
+#define handle_manager_kernel       handman_kernel
+#define this_handle_manager         this_handman
+#define THIS_HANDLE_MANAGER         THIS_HANDMAN
+#define task_gethandlemanager       task_gethandman
+#define task_sethandlemanager       task_sethandman
+#define handle_manager_cloexec      handman_cloexec
+
+#define handle_manager_assert_integrity(self) (void)0
+
+/* TODO: When eventually removing the following, make sure to get rid of `(unsigned int)' casts. */
+#define handle_install(self, hnd)             ((unsigned int)handman_install(self, hnd))
+#define handle_installat(self, hint, hnd)     ((unsigned int)handman_install(self, hnd, (fd_t)(hint)))
+#define handle_installinto(self, dst_fd, hnd) (void)handman_install_into_simple(self, (fd_t)(dst_fd), hnd)
+#define handle_installopenfd(data, hnd)       ((unsigned int)handles_install_openfd(hnd, data))
+#define handle_installinto_sym(dst_fd, hnd)   (void)handles_install_into_simple((fd_t)(dst_fd), hnd)
+#define handle_trylookup(self, fd)            handman_trylookup(self, (fd_t)(fd))
+#define handle_lookup(fd)                     handles_lookup((fd_t)(fd))
+#define handle_lookupin(fd, self)             handman_lookup(self, (fd_t)(fd))
+#define handle_lookup_nosym(fd)               handman_lookup(THIS_HANDMAN, (fd_t)(fd))
+#define handle_getas(fd, wanted_type)         handles_lookupobj((fd_t)(fd), wanted_type)
+/* TODO: END DEPRECATED */
+
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_HANDMAN_H */

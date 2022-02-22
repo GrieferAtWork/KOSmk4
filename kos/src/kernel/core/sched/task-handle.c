@@ -26,6 +26,7 @@
 #include <kernel/except.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
+#include <kernel/handman.h>
 #include <kernel/mman.h>
 #include <kernel/personality.h>
 #include <kernel/syscall.h>

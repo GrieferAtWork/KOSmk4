@@ -23,7 +23,6 @@
 #include <kernel/compiler.h>
 
 #include <kernel/handle-proto.h>
-#include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/futexfd.h>

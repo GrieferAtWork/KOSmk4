@@ -28,7 +28,6 @@
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/handle-proto.h>
-#include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/printk.h>

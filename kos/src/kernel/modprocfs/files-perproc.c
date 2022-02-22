@@ -46,6 +46,7 @@ DECL_END
 #include <kernel/fs/super.h>
 #include <kernel/fs/vfs.h>
 #include <kernel/handle.h>
+#include <kernel/handman.h>
 #include <kernel/mman.h>
 #include <kernel/mman/driver.h>
 #include <kernel/mman/enum.h>

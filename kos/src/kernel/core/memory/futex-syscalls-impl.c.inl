@@ -23,6 +23,7 @@
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/handle.h>
+#include <kernel/handman.h>
 #include <kernel/mman/futexfd.h>
 #include <sched/rpc.h>
 #include <sched/tsc.h>

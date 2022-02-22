@@ -38,7 +38,6 @@
 #include <kernel/fs/node.h>
 #include <kernel/fs/path.h>
 #include <kernel/fs/vfs.h>
-#include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/cc.h>
@@ -67,6 +66,7 @@
 
 #include <alloca.h>
 #include <assert.h>
+#include <dirent.h>
 #include <limits.h>
 #include <stddef.h>
 #include <string.h>

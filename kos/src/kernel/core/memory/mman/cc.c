@@ -45,6 +45,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/fs/path.h>
 #include <kernel/fs/super.h>
 #include <kernel/fs/vfs.h>
+#include <kernel/handle.h>
+#include <kernel/handman.h>
 #include <kernel/heap.h>
 #include <kernel/mman.h>
 #include <kernel/mman/cc.h>

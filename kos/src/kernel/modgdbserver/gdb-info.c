@@ -28,6 +28,7 @@
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/path.h>
 #include <kernel/handle.h>
+#include <kernel/handman.h>
 #include <kernel/mman.h>
 #include <kernel/mman/driver.h>
 #include <kernel/mman/execinfo.h>

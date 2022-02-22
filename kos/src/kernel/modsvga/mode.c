@@ -27,6 +27,7 @@
 #include <debugger/config.h>
 #include <kernel/driver.h>
 #include <kernel/handle.h>
+#include <kernel/handman.h>
 #include <kernel/malloc.h>
 #include <kernel/rt/except-handler.h> /* userexcept_sysret_inject_self() */
 #include <kernel/types.h>

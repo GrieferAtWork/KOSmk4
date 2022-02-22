@@ -27,6 +27,7 @@
 #include <kernel/except.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
+#include <kernel/handman.h>
 #include <kernel/malloc.h>
 #include <kernel/personality.h>
 #include <kernel/rt/except-handler.h>
