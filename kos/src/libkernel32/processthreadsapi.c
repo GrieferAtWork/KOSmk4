@@ -216,12 +216,12 @@ libk32_GetProcessHandleCount(HANDLE hProcess, PDWORD pdwHandleCount) {
 
 INTERN HANDLE WINAPI libk32_GetCurrentProcess(VOID) {
 	TRACE("GetCurrentProcess()");
-	return NTHANDLE_FROMFD(AT_THIS_PROCESS);
+	return NTHANDLE_FROMFD(AT_FDPROC);
 }
 
 INTERN HANDLE WINAPI libk32_GetCurrentThread(VOID) {
 	TRACE("GetCurrentThread()");
-	return NTHANDLE_FROMFD(AT_THIS_TASK);
+	return NTHANDLE_FROMFD(AT_FDTHRD);
 }
 
 
@@ -398,7 +398,7 @@ INTERN WINBOOL WINAPI
 libk32_FlushInstructionCache(HANDLE hProcess, LPCVOID lpBaseAddress, SIZE_T dwSize) {
 	TRACE("FlushInstructionCache(%p, %p, %#Ix)",
 	      hProcess, lpBaseAddress, dwSize);
-	if (hProcess != NTHANDLE_FROMFD(AT_THIS_PROCESS)) {
+	if (hProcess != NTHANDLE_FROMFD(AT_FDPROC)) {
 		errno = EACCES;
 		return FALSE;
 	}

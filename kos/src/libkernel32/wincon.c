@@ -75,9 +75,12 @@ DEFINE_PUBLIC_ALIAS(SetConsoleCP, libk32_SetConsoleCP);
 DEFINE_PUBLIC_ALIAS(GetConsoleOutputCP, libk32_GetConsoleOutputCP);
 DEFINE_PUBLIC_ALIAS(SetConsoleOutputCP, libk32_SetConsoleOutputCP);
 
-static fd_t ttyfd = -1;
+#ifdef AT_FDCTTY
+#define gettty() AT_FDCTTY
+#else /* AT_FDCTTY */
+static fd_t saved_ttyfd = -1;
 PRIVATE fd_t gettty(void) {
-	fd_t result = ttyfd;
+	fd_t result = saved_ttyfd;
 	if (result == -1) {
 		if (isatty(STDIN_FILENO))
 			result = STDIN_FILENO;
@@ -86,10 +89,11 @@ PRIVATE fd_t gettty(void) {
 			if (result < 0)
 				result = STDIN_FILENO; /* Shouldn't happen... */
 		}
-		ttyfd = result;
+		saved_ttyfd = result;
 	}
 	return result;
 }
+#endif /* !AT_FDCTTY */
 
 
 static WINBOOL cursor_visible  = TRUE;

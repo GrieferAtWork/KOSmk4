@@ -23,7 +23,9 @@
 
 #include <kernel/compiler.h>
 
+#include <dev/tty.h>
 #include <kernel/except.h>
+#include <kernel/execabi.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/fs.h>
 #include <kernel/fs/node.h>
@@ -33,6 +35,7 @@
 #include <kernel/handle.h>
 #include <kernel/handman.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/mman/ramfile.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
 #include <sched/group.h>
@@ -41,6 +44,7 @@
 
 #include <hybrid/atomic.h>
 
+#include <compat/config.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 #include <kos/ioctl/_openfd.h>
@@ -48,6 +52,10 @@
 #include <fcntl.h>
 #include <stddef.h>
 #include <string.h>
+
+#ifdef __ARCH_HAVE_COMPAT
+#include <kernel/compat.h>
+#endif /* __ARCH_HAVE_COMPAT */
 
 /************************************************************************/
 /* HIGH-LEVEL HANDLE OPERATIONS (FOR THE CALLING THREAD)                */
@@ -147,18 +155,43 @@ do_return_path:
 		goto do_return_path;
 	}	break;
 
-	case AT_THIS_TASK:
+	case AT_FDTHRD:
 		hand->h_data = incref(task_gettaskpid());
 		goto do_return_pidfd;
-	case AT_THIS_PROCESS:
+	case AT_FDPROC:
 		hand->h_data = incref(task_getprocpid());
 		goto do_return_pidfd;
-	case AT_PARENT_PROCESS:
+	case AT_FDPARPROC:
 		/* no incref(), because `task_getparentprocesspid()' already returns a reference! */
 		hand->h_data = task_getparentprocesspid();
 do_return_pidfd:
 		hand->h_mode = IO_RDONLY;
 		hand->h_type = HANDLE_TYPE_PIDFD;
+		return hand;
+
+	case AT_FDCTTY:
+		hand->h_data = task_getctty();
+		if unlikely(!hand->h_data)
+			break; /* No CTTY */
+		TRY {
+			fnode_access((REF struct ttydev *)hand->h_data, R_OK | W_OK);
+		} EXCEPT {
+			decref_unlikely((REF struct ttydev *)hand->h_data);
+			RETHROW();
+		}
+		hand->h_mode = IO_RDWR;
+		hand->h_type = HANDLE_TYPE_MFILE;
+		return hand;
+
+	case AT_FDSYSRTLD:
+		hand->h_data = &execabi_system_rtld_file.mrf_file;
+#ifdef __ARCH_HAVE_COMPAT
+		if (syscall_iscompat())
+			hand->h_data = &compat_execabi_system_rtld_file.mrf_file;
+#endif /* __ARCH_HAVE_COMPAT */
+		incref((struct mfile *)hand->h_data);
+		hand->h_mode = IO_RDONLY;
+		hand->h_type = HANDLE_TYPE_MFILE;
 		return hand;
 
 	default:
@@ -246,9 +279,9 @@ handles_lookupobj_symbolic(fd_t fd, uintptr_half_t wanted_type) {
 		__builtin_unreachable();
 	}	break;
 
-	case AT_THIS_TASK:
-	case AT_THIS_PROCESS:
-	case AT_PARENT_PROCESS:
+	case AT_FDTHRD:
+	case AT_FDPROC:
+	case AT_FDPARPROC:
 		if (wanted_type != HANDLE_TYPE_PIDFD) {
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      /* fd:                 */ (syscall_slong_t)fd,
@@ -258,16 +291,66 @@ handles_lookupobj_symbolic(fd_t fd, uintptr_half_t wanted_type) {
 			      /* actual_handle_kind: */ HANDLE_TYPEKIND_GENERIC);
 		}
 		switch (fd) {
-		case AT_THIS_TASK:
+		case AT_FDTHRD:
 			return incref(task_gettaskpid());
-		case AT_THIS_PROCESS:
+		case AT_FDPROC:
 			return incref(task_getprocpid());
-		case AT_PARENT_PROCESS:
+		case AT_FDPARPROC:
 			/* no incref(), because `task_getparentprocesspid()' already returns a reference! */
 			return task_getparentprocesspid();
 		default: __builtin_unreachable();
 		}
 		break;
+
+	case AT_FDCTTY: {
+		REF struct ttydev *tty;
+		REF void *result;
+		tty = task_getctty();
+		if unlikely(!tty)
+			break; /* No CTTY */
+		TRY {
+			fnode_access((REF struct ttydev *)tty, R_OK | W_OK);
+		} EXCEPT {
+			decref_unlikely((REF struct ttydev *)tty);
+			RETHROW();
+		}
+		if likely(wanted_type == HANDLE_TYPE_MFILE)
+			return tty;
+		TRY {
+			result = mfile_utryas(tty, wanted_type);
+		} EXCEPT {
+			decref_unlikely(tty);
+			RETHROW();
+		}
+		if unlikely(!result) {
+			uintptr_t kind;
+			kind = mfile_typekind(tty);
+			decref_unlikely(tty);
+			THROW(E_INVALID_HANDLE_FILETYPE,
+			      /* fd:                 */ (syscall_slong_t)fd,
+			      /* needed_handle_type: */ wanted_type,
+			      /* actual_handle_type: */ HANDLE_TYPE_MFILE,
+			      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+			      /* actual_handle_kind: */ kind);
+		}
+		decref_unlikely(tty);
+		return result;
+	}	break;
+
+	case AT_FDSYSRTLD:
+		if (wanted_type != HANDLE_TYPE_MFILE) {
+			THROW(E_INVALID_HANDLE_FILETYPE,
+			      /* fd:                 */ (syscall_slong_t)fd,
+			      /* needed_handle_type: */ wanted_type,
+			      /* actual_handle_type: */ HANDLE_TYPE_MFILE,
+			      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+			      /* actual_handle_kind: */ HANDLE_TYPEKIND_GENERIC);
+		}
+#ifdef __ARCH_HAVE_COMPAT
+		if (syscall_iscompat())
+			return incref(&compat_execabi_system_rtld_file.mrf_file);
+#endif /* __ARCH_HAVE_COMPAT */
+		return incref(&execabi_system_rtld_file.mrf_file);
 
 	default:
 		/* Unknown symbolic handle. */
@@ -358,7 +441,8 @@ again_acquire_pathlock_for_drive_cwd:
 					incref((struct path *)ohand->h_data);
 					vfs_driveslock_endread(myvfs);
 				}
-				/* XXX: Check that `newpath' is a sub-directory of the drive root? */
+				/* TODO: Check that `newpath' is a sub-directory of the drive root.
+				 *       -> If it isn't, must throw `E_FSERROR_CROSS_DEVICE_LINK' */
 				myfs->fs_dcwd[fd - AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN)] = newpath; /* Inherit reference */
 				fs_pathlock_endwrite(myfs);
 			}	break;
@@ -501,10 +585,10 @@ handles_lookuptask(fd_t fd)
 		switch (fd) {
 
 #ifndef __OPTIMIZE_SIZE__
-		case AT_THIS_TASK:
+		case AT_FDTHRD:
 			return incref(THIS_TASK);
 
-		case AT_THIS_PROCESS: {
+		case AT_FDPROC: {
 			REF struct task *proc;
 			while unlikely((proc = task_getproc()) == NULL) {
 				/* Sleep  without first connecting --> wait indefinitely
@@ -517,7 +601,7 @@ handles_lookuptask(fd_t fd)
 		}	break;
 #endif /* !__OPTIMIZE_SIZE__ */
 
-		case AT_PARENT_PROCESS:
+		case AT_FDPARPROC:
 			/* NOTE: This case right here is actually required for ABI  compliance.
 			 * Because  the parent process  might change, there  is always a chance
 			 * that doing taskpid_gettask(task_getparentprocesspid()) fails, simply

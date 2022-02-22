@@ -407,7 +407,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 	/* Push the arguments for the actual signal handler. */
 #ifdef DEFINE_x86_userexcept_callsignal64
 	/* SYSVABI specs require the stack pointer to be 16-byte aligned _BEFORE_ the call.
-	 * This way, after +8 for the return address and +8 for a potential `pushq %rbp',
+	 * This way, after +8 for the return  address and +8 for a potential  `pushq %rbp',
 	 * the stack will be 16-byte aligned once again. */
 	usp = (USER CHECKED byte_t *)FLOOR_ALIGN((uintptr_t)usp, 16);
 
@@ -444,7 +444,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 	 *   - %rbx == user_fpustate ?: NULL
 	 *   - %r12 == user_sigset ?: NULL
 	 *   - %r13 == user_sc_info ?: NULL
-	 * NOTE: This register state is what is expected by  `sys_sigreturn'
+	 * NOTE: This register state is what is expected by `sys_ksigreturn'
 	 *       Note also that  we can only  use callee-preserve  registers
 	 *       here, as all other registers may be clobbered by the signal
 	 *       handler itself. */
@@ -458,7 +458,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 	 *   - %ebx == user_fpustate ?: NULL
 	 *   - %esi == user_sigset ?: NULL
 	 *   - %edi == user_sc_info ?: NULL
-	 * NOTE: This register state is what is expected by  `sys_sigreturn'
+	 * NOTE: This register state is what is expected by `sys_ksigreturn'
 	 *       Note also that  we can only  use callee-preserve  registers
 	 *       here, as all other registers may be clobbered by the signal
 	 *       handler itself. */

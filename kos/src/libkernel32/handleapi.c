@@ -63,11 +63,11 @@ libk32_DuplicateHandle(HANDLE hSourceProcessHandle, HANDLE hSourceHandle,
 	      hSourceProcessHandle, hSourceHandle,
 	      hTargetProcessHandle, lpTargetHandle,
 	      dwDesiredAccess, bInheritHandle, dwOptions);
-	if (hTargetProcessHandle != NTHANDLE_FROMFD(AT_THIS_PROCESS)) {
+	if (hTargetProcessHandle != NTHANDLE_FROMFD(AT_FDPROC)) {
 		errno = EACCES;
 		return FALSE;
 	}
-	if (hSourceProcessHandle != NTHANDLE_FROMFD(AT_THIS_PROCESS)) {
+	if (hSourceProcessHandle != NTHANDLE_FROMFD(AT_FDPROC)) {
 		/* TODO: This can be done via `open("/proc/[pid]/fd/[fdno]")' */
 		errno = ENOTSUP;
 		return FALSE;

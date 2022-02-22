@@ -255,9 +255,8 @@ INTERN WUNUSED NONNULL((1)) fd_t
 NOTHROW_NCX(CC DlModule_GetFd)(USER DlModule *self)
 		THROWS(E_SEGFAULT) {
 	fd_t result = self->dm_file;
-	if (result < 0) {
+	if (result == -1) {
 		fd_t newresult;
-		assert(result == -1);
 		result = sys_open(self->dm_filename, O_RDONLY | O_CLOEXEC, 0);
 		if unlikely(E_ISERR(result))
 			goto err;

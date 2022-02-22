@@ -502,7 +502,7 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #define IO_USERF_MASK (IO_APPEND | IO_NONBLOCK | IO_DSYNC | IO_DIRECT | IO_NODATAZERO)
 
 /* Mask of flags modifiable via `F_SETFD' / `F_SETFL' */
-#define IO_SETFL_MASK (IO_APPEND | IO_NONBLOCK | IO_DSYNC | IO_ASYNC | IO_DIRECT | IO_NODATAZERO)
+#define IO_SETFL_MASK (IO_APPEND | IO_NONBLOCK | IO_DSYNC | IO_DIRECT | IO_ASYNC)
 
 /* Mask for handle flags (flags not inherited during `dup()'). */
 #define IO_SETFD_MASK (IO_CLOEXEC | IO_CLOFORK)

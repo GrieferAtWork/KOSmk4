@@ -63,9 +63,13 @@
 DECL_BEGIN
 
 /* Base address and size symbols for the system RTLD */
-#ifndef CONFIG_EXECABI_ARCH_HEADER_DEFINES_EXECABI_SYSTEM_RTLD
+#ifndef __execabi_system_rtld_defined
+#define __execabi_system_rtld_defined
 DATDEF byte_t execabi_system_rtld[];
+#endif /* !__execabi_system_rtld_defined */
 
+#ifndef __execabi_system_rtld_size_defined
+#define __execabi_system_rtld_size_defined
 #undef execabi_system_rtld_size
 #ifdef __INTELLISENSE__
 DATDEF size_t const execabi_system_rtld_size;
@@ -73,7 +77,7 @@ DATDEF size_t const execabi_system_rtld_size;
 DATDEF byte_t execabi_system_rtld_size[];
 #define execabi_system_rtld_size ((size_t)execabi_system_rtld_size)
 #endif /* !__INTELLISENSE__ */
-#endif /* !CONFIG_EXECABI_ARCH_HEADER_DEFINES_EXECABI_SYSTEM_RTLD */
+#endif /* !__execabi_system_rtld_size_defined */
 
 /* A static VM file blob  for the built-in RTLD user-space  program.
  * This is a raw ELF binary blob that is hard-linked into the kernel
@@ -81,15 +85,20 @@ DATDEF byte_t execabi_system_rtld_size[];
  * that requests the use of a dynamic linker
  * NOTE: The associated source code can be found in `/kos/src/libdl/...',  and
  *       the (unstripped) library file can be found on-disk as `/lib/libdl.so' */
-#ifndef CONFIG_EXECABI_ARCH_HEADER_DEFINES_EXECABI_SYSTEM_RTLD_FILE
+#ifndef __execabi_system_rtld_file_defined
+#define __execabi_system_rtld_file_defined
 DATDEF struct mramfile execabi_system_rtld_file;
-#endif /* !CONFIG_EXECABI_ARCH_HEADER_DEFINES_EXECABI_SYSTEM_RTLD_FILE */
+#endif /* !__execabi_system_rtld_file_defined */
 
 #ifdef __ARCH_HAVE_COMPAT
 /* Base address and size symbols for the system RTLD */
-#ifndef CONFIG_EXECABI_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_SYSTEM_RTLD
+#ifndef __compat_execabi_system_rtld_defined
+#define __compat_execabi_system_rtld_defined
 DATDEF byte_t compat_execabi_system_rtld[];
+#endif /* !__compat_execabi_system_rtld_defined */
 
+#ifndef __compat_execabi_system_rtld_size_defined
+#define __compat_execabi_system_rtld_size_defined
 #undef compat_execabi_system_rtld_size
 #ifdef __INTELLISENSE__
 DATDEF size_t const compat_execabi_system_rtld_size;
@@ -97,16 +106,17 @@ DATDEF size_t const compat_execabi_system_rtld_size;
 DATDEF byte_t compat_execabi_system_rtld_size[];
 #define compat_execabi_system_rtld_size  ((size_t)compat_execabi_system_rtld_size)
 #endif /* !__INTELLISENSE__ */
-#endif /* !CONFIG_EXECABI_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_SYSTEM_RTLD */
+#endif /* !__compat_execabi_system_rtld_size_defined */
 
 /* A static VM file blob  for the building RTLD user-space  program.
  * This is a raw ELF binary blob that is hard-linked into the kernel
  * core, and is mapped via copy-on-write into any user-space process
  * that requests the use of a dynamic linker
  * NOTE: The associated source code can be found in `/kos/src/libdl/...' */
-#ifndef CONFIG_EXECABI_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_SYSTEM_RTLD_FILE
+#ifndef __compat_execabi_system_rtld_file_defined
+#define __compat_execabi_system_rtld_file_defined
 DATDEF struct mramfile compat_execabi_system_rtld_file;
-#endif /* !CONFIG_EXECABI_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_SYSTEM_RTLD_FILE */
+#endif /* !__compat_execabi_system_rtld_file_defined */
 #endif /* __ARCH_HAVE_COMPAT */
 
 

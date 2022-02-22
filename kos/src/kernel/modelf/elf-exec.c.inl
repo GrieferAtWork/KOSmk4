@@ -204,6 +204,7 @@ done_PT_LOAD_bss:
 
 		/* If necessary, load the dynamic linker. */
 		if (need_dyn_linker) {
+			/* XXX: should probably map a little more restrictive than this... */
 			linker_base = mbuilder_map(/* self:        */ &builder,
 			                           /* hint:        */ MHINT_GETADDR(KERNEL_MHINT_USER_DYNLINK),
 			                           /* num_bytes:   */ LOCAL_FUNC(execabi_system_rtld_size),

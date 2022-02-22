@@ -683,10 +683,10 @@ NOTHROW(FCALL mfile_known_name)(struct mfile *__restrict self,
                                 char buf[64]) {
 	char const *result = NULL;
 	if (self == &execabi_system_rtld_file.mrf_file) {
-		result = RTLD_LIBDL;
+		result = "[" RTLD_LIBDL "]";
 #ifdef __ARCH_HAVE_COMPAT
 	} else if (self == &compat_execabi_system_rtld_file.mrf_file) {
-		result = COMPAT_RTLD_LIBDL;
+		result = "[" COMPAT_RTLD_LIBDL "]";
 #endif /* __ARCH_HAVE_COMPAT */
 #ifdef CONFIG_DEBUG_HEAP
 	} else if (self == &mfile_dbgheap) {

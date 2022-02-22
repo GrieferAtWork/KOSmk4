@@ -1925,6 +1925,8 @@ procfs_fd_lnknode_v_openlink(struct flnknode *__restrict self,
 	/* This is the function that implements the magic for open("/proc/[pid]/fd/[no]"),
 	 * such  that  such a  call  behaves as  a  dup(2), rather  than open(readlink())! */
 	me = (struct procfs_fd_lnknode *)mfile_aslnk(self);
+	/* XXX: Access checks? (currently, this method right here can be used to gain write
+	 *      access to arbitrary files) */
 	result->h_data = me->pfl_handdat;
 	result->h_type = me->pfl_handtyp;
 	(*handle_type_db.h_incref[result->h_type])(result->h_data);

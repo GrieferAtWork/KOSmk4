@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba419924 */
+/* HASH CRC-32:0x41bb1aef */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -395,7 +395,7 @@ __SYSDECL_BEGIN
 #endif /* !F_SETFD && __F_SETFD */
 
 /* [void arg] Get file status flags.
- * @return: * : Set of `O_*' */
+ * @return: * : Set of `O_APPEND | O_NONBLOCK | O_DSYNC | O_ASYNC | O_DIRECT' */
 #if !defined(F_GETFL) && defined(__F_GETFL)
 #define F_GETFL __F_GETFL
 #endif /* !F_GETFL && __F_GETFL */
@@ -1017,20 +1017,35 @@ enum __pid_type {
  * These descriptors cannot be overwritten,
  * and their  meaning is  context-sensible. */
 
-/* HANDLE_TYPE_PIDFD (writable, Equivalent of `pidfd_open(gettid())') */
-#if !defined(AT_THIS_TASK) && defined(__AT_THIS_TASK)
-#define AT_THIS_TASK __AT_THIS_TASK
-#endif /* !AT_THIS_TASK && __AT_THIS_TASK */
+/* HANDLE_TYPE_PIDFD (read-only; equivalent of `pidfd_open(gettid())') */
+#if !defined(AT_FDTHRD) && defined(__AT_FDTHRD)
+#define AT_FDTHRD __AT_FDTHRD
+#endif /* !AT_FDTHRD && __AT_FDTHRD */
 
-/* HANDLE_TYPE_PIDFD (writable, Equivalent of `pidfd_open(getpid())') */
-#if !defined(AT_THIS_PROCESS) && defined(__AT_THIS_PROCESS)
-#define AT_THIS_PROCESS __AT_THIS_PROCESS
-#endif /* !AT_THIS_PROCESS && __AT_THIS_PROCESS */
+/* HANDLE_TYPE_PIDFD (read-only; equivalent of `pidfd_open(getpid())') */
+#if !defined(AT_FDPROC) && defined(__AT_FDPROC)
+#define AT_FDPROC __AT_FDPROC
+#endif /* !AT_FDPROC && __AT_FDPROC */
 
-/* HANDLE_TYPE_PIDFD (writable, Equivalent of `pidfd_open(getppid())') */
-#if !defined(AT_PARENT_PROCESS) && defined(__AT_PARENT_PROCESS)
-#define AT_PARENT_PROCESS __AT_PARENT_PROCESS
-#endif /* !AT_PARENT_PROCESS && __AT_PARENT_PROCESS */
+/* HANDLE_TYPE_PIDFD (read-only; equivalent of `pidfd_open(getppid())') */
+#if !defined(AT_FDPARPROC) && defined(__AT_FDPARPROC)
+#define AT_FDPARPROC __AT_FDPARPROC
+#endif /* !AT_FDPARPROC && __AT_FDPARPROC */
+
+/* HANDLE_TYPE_MFILE (read-only; equivalent of `open("/dev/tty")') */
+#if !defined(AT_FDCTTY) && defined(__AT_FDCTTY)
+#define AT_FDCTTY __AT_FDCTTY
+#endif /* !AT_FDCTTY && __AT_FDCTTY */
+
+
+#ifdef __USE_KOS_KERNEL
+/* HANDLE_TYPE_MFILE (read-only; Handle for `execabi_system_rtld_file')
+ * Can be used to mmap() additional instances of the system RTLD, or to
+ * relocate the system RTLD to a different address. */
+#if !defined(AT_FDSYSRTLD) && defined(__AT_FDSYSRTLD)
+#define AT_FDSYSRTLD __AT_FDSYSRTLD
+#endif /* !AT_FDSYSRTLD && __AT_FDSYSRTLD */
+#endif /* __USE_KOS_KERNEL */
 
 
 /* DOS Drive root / current-working paths.
@@ -1054,7 +1069,7 @@ enum __pid_type {
  * >>
  * >> // Explicitly set the current-working directory of a specific drive.
  * >> // NOTE: Requires that the opened path be reachable from `AT_FDDRIVE_ROOT('E')'
- * >> //       If it isn't, an `ERROR_FS_CROSSDEVICE_LINK' error is thrown.
+ * >> //       If it isn't, an `E_FSERROR_CROSS_DEVICE_LINK' error is thrown.
  * >> dup2(open("/home/me/Downloads"), AT_FDDRIVE_CWD('E'));
  * >>
  * >> chdir("C:\\bin"); // AT_FDCWD = "/bin"; AT_FDDRIVE_CWD('C') = AT_FDCWD;

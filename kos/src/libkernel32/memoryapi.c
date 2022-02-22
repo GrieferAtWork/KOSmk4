@@ -93,7 +93,7 @@ libk32_VirtualProtectEx(HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize,
                         DWORD flNewProtect, PDWORD lpflOldProtect) {
 	TRACE("VirtualProtectEx(%p, %p, %#Ix, %#x, %p)",
 	      hProcess, lpAddress, dwSize, flNewProtect, lpflOldProtect);
-	if (hProcess != NTHANDLE_FROMFD(AT_THIS_PROCESS)) {
+	if (hProcess != NTHANDLE_FROMFD(AT_FDPROC)) {
 		errno = EACCES;
 		return FALSE;
 	}
@@ -163,7 +163,7 @@ libk32_VirtualUnlock(LPVOID lpAddress, SIZE_T dwSize) {
 INTERN WINBOOL WINAPI
 libk32_VirtualUnlockEx(HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize) {
 	TRACE("VirtualUnlockEx(%p, %p, %#Ix)",hProcess, lpAddress, dwSize);
-	if (hProcess != NTHANDLE_FROMFD(AT_THIS_PROCESS)) {
+	if (hProcess != NTHANDLE_FROMFD(AT_FDPROC)) {
 		errno = EACCES;
 		return FALSE;
 	}
@@ -216,7 +216,7 @@ libk32_VirtualAllocEx(HANDLE hProcess, LPVOID lpAddress,
                       SIZE_T dwSize, DWORD flAllocationType, DWORD flProtect) {
 	TRACE("VirtualAllocEx(%p, %p, %#Ix, %#x, %#x)",
 	      hProcess, lpAddress, dwSize, flAllocationType, flProtect);
-	if (hProcess != NTHANDLE_FROMFD(AT_THIS_PROCESS)) {
+	if (hProcess != NTHANDLE_FROMFD(AT_FDPROC)) {
 		errno = EACCES;
 		return FALSE;
 	}

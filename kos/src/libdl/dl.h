@@ -521,7 +521,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dladdr)(void const *address,
  *                       module's fd was already  closed will attempt to  re-close
  *                       that same fd, possibly closing  some other handle if  the
  *                       same slot was re-used in the mean time.
- * @return: * : Error (s.a. `dlerror()') */
+ * @return: -1: Error (s.a. `dlerror()') */
 INTDEF WUNUSED NONNULL((1)) fd_t
 NOTHROW_NCX(DLFCN_CC libdl_dlmodulefd)(USER DlModule *self) THROWS(E_SEGFAULT);
 

@@ -144,9 +144,9 @@ SECTIONS {
 		PROVIDE_HIDDEN(execabi_system_rtld_numpages    = ABSOLUTE(execabi_system_rtld_size) / PAGESIZE);
 #ifdef __x86_64__
 		/* Compatibility-mode libdl.so binary (32-bit application) */
-		KEEP(*(.rodata.execabi_system_rtld32))
-		PROVIDE_HIDDEN(execabi_system_rtld32_startpage_p = addr2pageptr_p(ABSOLUTE(execabi_system_rtld32)));
-		PROVIDE_HIDDEN(execabi_system_rtld32_numpages    = ABSOLUTE(execabi_system_rtld32_size) / PAGESIZE);
+		KEEP(*(.rodata.compat_execabi_system_rtld))
+		PROVIDE_HIDDEN(compat_execabi_system_rtld_startpage_p = addr2pageptr_p(ABSOLUTE(compat_execabi_system_rtld)));
+		PROVIDE_HIDDEN(compat_execabi_system_rtld_numpages    = ABSOLUTE(compat_execabi_system_rtld_size) / PAGESIZE);
 #endif /* __x86_64__ */
 		*(.rodata .rodata.kernel_symtab .rodata.cst*)
 		*(.rodata.str* .rodata.*.str* .rodata.kernel_strtab)

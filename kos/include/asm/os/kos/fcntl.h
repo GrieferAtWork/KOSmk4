@@ -30,8 +30,7 @@
 #define __F_GETFD             1    /* [void arg] Get file descriptor flags.
                                     * @return: * : Set of `FD_CLOEXEC | FD_CLOFORK' */
 #define __F_SETFD             2    /* [int arg = <set of `FD_CLOEXEC', `FD_CLOFORK'>] Set file descriptor flags. */
-#define __F_GETFL             3    /* [void arg] Get file status flags.
-                                    * @return: * : Set of `O_*' */
+#define __F_GETFL             3    /* [void arg] Get file status flags (set of `O_APPEND | O_NONBLOCK | O_DSYNC | O_ASYNC | O_DIRECT') */
 #define __F_SETFL             4    /* [oflag_t arg] Set file status flags. */
 #define __F_GETLK             5    /* [struct flock *arg] Get record locking info. */
 #define __F_SETLK             6    /* [struct flock const *arg] Set record locking info (non-blocking). */
@@ -160,13 +159,16 @@
 /* Special, symbolic file numbers.
  * These descriptors cannot be overwritten,
  * and their  meaning is  context-sensible. */
-#define __AT_THIS_TASK      (-180) /* HANDLE_TYPE_PIDFD (read-only, Equivalent of `pidfd_open(gettid())') */
+#define __AT_FDTHRD    (-180) /* HANDLE_TYPE_PIDFD (read-only; equivalent of `pidfd_open(gettid())') */
 #if __KOS_VERSION__ >= 400
-#define __AT_THIS_PROCESS   (-181) /* HANDLE_TYPE_PIDFD (read-only, Equivalent of `pidfd_open(getpid())') */
-#define __AT_PARENT_PROCESS (-182) /* HANDLE_TYPE_PIDFD (read-only, Equivalent of `pidfd_open(getppid())') */
+#define __AT_FDPROC    (-181) /* HANDLE_TYPE_PIDFD (read-only; equivalent of `pidfd_open(getpid())') */
+#define __AT_FDPARPROC (-182) /* HANDLE_TYPE_PIDFD (read-only; equivalent of `pidfd_open(getppid())') */
+#define __AT_FDCTTY    (-183) /* HANDLE_TYPE_MFILE (writable; equivalent of `open("/dev/tty")') */
+#define __AT_FDSYSRTLD (-184) /* HANDLE_TYPE_MFILE (read-only; handle for `execabi_system_rtld_file') */
 #endif /* __KOS_VERSION__ >= 400 */
 #if __KOS_VERSION__ >= 300
 #if __KOS_VERSION__ < 400
+#define __AT_THIS_TASK  __AT_FDTHRD
 #define __AT_THIS_MMAN  __AT_THIS_TASK
 #define __AT_THIS_STACK __AT_THIS_TASK
 #endif /* __KOS_VERSION__ < 400 */
@@ -191,7 +193,7 @@
  * >>
  * >> // Explicitly set the current-working directory of a specific drive.
  * >> // NOTE: Requires that the opened path be reachable from `AT_FDDRIVE_ROOT('E')'
- * >> //       If it isn't, an `ERROR_FS_CROSSDEVICE_LINK' error is thrown.
+ * >> //       If it isn't, an `E_FSERROR_CROSS_DEVICE_LINK' error is thrown.
  * >> dup2(open("/home/me/Downloads"), AT_FDDRIVE_CWD('E'));
  * >>
  * >> chdir("C:\\bin"); // AT_FDCWD = "/bin"; AT_FDDRIVE_CWD('C') = AT_FDCWD;

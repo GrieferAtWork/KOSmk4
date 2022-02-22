@@ -1384,11 +1384,13 @@ print_fd_t(pformatprinter printer, void *arg, fd_t fd) {
 	/* XXX: Don't use a switch() here? */
 	switch (fd) {
 		/* Deal with symbolic file handles. */
-	case AT_FDCWD:          name = "AT_FDCWD"; break;
-	case AT_FDROOT:         name = "AT_FDROOT"; break;
-	case AT_THIS_TASK:      name = "AT_THIS_TASK"; break;
-	case AT_THIS_PROCESS:   name = "AT_THIS_PROCESS"; break;
-	case AT_PARENT_PROCESS: name = "AT_PARENT_PROCESS"; break;
+	case AT_FDCWD:     name = "AT_FDCWD"; break;
+	case AT_FDROOT:    name = "AT_FDROOT"; break;
+	case AT_FDTHRD:    name = "AT_FDTHRD"; break;
+	case AT_FDPROC:    name = "AT_FDPROC"; break;
+	case AT_FDPARPROC: name = "AT_FDPARPROC"; break;
+	case AT_FDCTTY:    name = "AT_FDCTTY"; break;
+	case AT_FDSYSRTLD: name = "AT_FDSYSRTLD"; break;
 
 #if 1 /* <unistd.h> names for certain file handles. */
 	case STDIN_FILENO:  name = "STDIN_FILENO"; break;

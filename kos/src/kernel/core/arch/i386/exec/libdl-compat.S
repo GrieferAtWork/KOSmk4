@@ -20,16 +20,16 @@
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_EXEC_LIBDL_COMPAT_S
 #define GUARD_KERNEL_CORE_ARCH_I386_EXEC_LIBDL_COMPAT_S 1
 
-.section .rodata.execabi_system_rtld32
-	.global execabi_system_rtld32
-	.type   execabi_system_rtld32, @object
+.section .rodata.compat_execabi_system_rtld
+	.global compat_execabi_system_rtld
+	.type   compat_execabi_system_rtld, @object
 	.align  4096 /* PAGESIZE */
-execabi_system_rtld32:
+compat_execabi_system_rtld:
 	.incbin "bin/x86_64-kos/lib/libdl.rtld-flat.bin"
 	.align  4096 /* PAGESIZE */
-.global execabi_system_rtld32_size
-.type   execabi_system_rtld32_size, @object
-	execabi_system_rtld32_size = . - execabi_system_rtld32
-.size execabi_system_rtld32, . - execabi_system_rtld32
+.global compat_execabi_system_rtld_size
+.type   compat_execabi_system_rtld_size, @object
+	compat_execabi_system_rtld_size = . - compat_execabi_system_rtld
+.size compat_execabi_system_rtld, . - compat_execabi_system_rtld
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_EXEC_LIBDL_COMPAT_S */

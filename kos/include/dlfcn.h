@@ -436,7 +436,7 @@ __NOTHROW_NCX(__DLFCN_CC dlgetmodule)(char const *__name,
  *                       module's fd was already  closed will attempt to  re-close
  *                       that same fd, possibly closing  some other handle if  the
  *                       same slot was re-used in the mean time.
- * @return: * : Error (s.a. `dlerror()') */
+ * @return: -1: Error (s.a. `dlerror()') */
 #ifdef __CRT_HAVE_dlmodulefd
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 __NOTHROW_NCX(__DLFCN_CC dlmodulefd)(void *__handle);
