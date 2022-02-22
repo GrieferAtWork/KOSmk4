@@ -28,6 +28,8 @@
 #include <sched/sigmask.h>
 #include <sched/x86/eflags-mask.h>
 
+#include <hybrid/align.h>
+
 #if (defined(DEFINE_x86_userexcept_callsignal32) + \
      defined(DEFINE_x86_userexcept_callsignal64)) != 1
 #error "Must #define exactly one of these"
@@ -404,9 +406,16 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 
 	/* Push the arguments for the actual signal handler. */
 #ifdef DEFINE_x86_userexcept_callsignal64
+	/* SYSVABI specs require the stack pointer to be 16-byte aligned _BEFORE_ the call.
+	 * This way, after +8 for the return address and +8 for a potential `pushq %rbp',
+	 * the stack will be 16-byte aligned once again. */
+	usp = (USER CHECKED byte_t *)FLOOR_ALIGN((uintptr_t)usp, 16);
+
+	/* Push return address */
 	usp -= 8;
 	validate_writable(usp, 8);
-	((u64 *)usp)[0] = (u64)user_rstor;                               /* Return address */
+	((u64 *)usp)[0] = (u64)user_rstor;
+
 	gpregs_setpdi(&state->ics_gpregs, (uintptr_t)siginfo->si_signo); /* signo_t signo */
 	if (action->sa_flags & SA_SIGINFO) {
 		gpregs_setpsi(&state->ics_gpregs, (uintptr_t)user_siginfo);  /* siginfo64_t *info */

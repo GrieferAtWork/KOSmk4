@@ -287,6 +287,7 @@ INTERN_FUNCTION(libc_except_handler3)
 	.cfi_signal_frame
 	.cfi_def_cfa %rdi, SIZEOF_KCPUSTATE
 	ASM_CFI_REL_OFFSET_RESTORE_KCPUSTATE(0)
+	andq   $-16, %rsp /* Align stack to a 16-byte boundary */
 	movq   %rdi, %rbp /* Preserve `except_register_state_t *__restrict state' for unwinding. */
 	.cfi_def_cfa_register %rbp
 	INTERN(libc_except_handler3_impl)
@@ -302,6 +303,7 @@ INTERN_FUNCTION(libc_except_handler4)
 	.cfi_signal_frame
 	.cfi_def_cfa %rdi, SIZEOF_KCPUSTATE
 	ASM_CFI_REL_OFFSET_RESTORE_KCPUSTATE(0)
+	andq   $-16, %rsp /* Align stack to a 16-byte boundary */
 	movq   %rdi, %rbp /* Preserve `except_register_state_t *__restrict state' for unwinding. */
 	.cfi_def_cfa_register %rbp
 	INTERN(libc_except_handler4_impl)

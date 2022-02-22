@@ -1699,7 +1699,13 @@ libuw_unwind_emulator_exec_alloca_stack(unwind_emulator_t *__restrict self,
 #endif /* !__KERNEL__ */
 	if (pentry_stack_top) {
 		self->ue_stacksz = 1;
-		stack[0]         = *pentry_stack_top;
+#if 0 /* This  also  works,  but generates  FPU  instructions on
+       * x86_64 (which may fault if the kernel is out-of-memory) */
+		stack[0] = *pentry_stack_top;
+#else
+		memcpy(&stack[0], pentry_stack_top,
+		       sizeof(*pentry_stack_top));
+#endif
 	}
 	result = libuw_unwind_emulator_exec(self);
 	assert(self->ue_stacksz < self->ue_stackmax);
@@ -1778,7 +1784,13 @@ libuw_unwind_emulator_exec_autostack(unwind_emulator_t *__restrict self,
 			self->ue_stacksz = 0;
 			self->ue_stackmax = ALLOCA_STACK_SIZE;
 			if (pentry_stack_top) {
+#if 0 /* This  also  works,  but generates  FPU  instructions on
+       * x86_64 (which may fault if the kernel is out-of-memory) */
 				stack[0] = *pentry_stack_top;
+#else
+				memcpy(&stack[0], pentry_stack_top,
+				       sizeof(*pentry_stack_top));
+#endif
 				self->ue_stacksz = 1;
 			}
 			/* Execute the emulator again. */
