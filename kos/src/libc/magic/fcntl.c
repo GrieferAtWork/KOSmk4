@@ -417,7 +417,7 @@ __SYSDECL_BEGIN
 #endif /* !F_SETLKW64 && __F_SETLKW64 */
 #endif /* !__USE_LARGEFILE64 */
 
-/* [void arg] Duplicate and return file descriptor. (may be used to implement `dup(2)') */
+/* [fd_t minfd] Same as `dup(2)', but returned FD is guarantied `>= minfd' */
 #if !defined(F_DUPFD) && defined(__F_DUPFD)
 #define F_DUPFD __F_DUPFD
 #endif /* !F_DUPFD && __F_DUPFD */
@@ -558,8 +558,7 @@ __SYSDECL_BEGIN
 #endif /* __USE_GNU */
 
 #if defined(__USE_XOPEN2K8) || defined(__USE_NETBSD)
-/* [void arg] Duplicate file descriptor with close-on-exit set.
- * @[fd_t return]: * :  A new  FD for the  same kernel  object. */
+/* [fd_t minfd] Same as `F_DUPFD', but also set `FD_CLOEXEC' bit. */
 #if !defined(F_DUPFD_CLOEXEC) && defined(__F_DUPFD_CLOEXEC)
 #define F_DUPFD_CLOEXEC __F_DUPFD_CLOEXEC
 #endif /* !F_DUPFD_CLOEXEC && __F_DUPFD_CLOEXEC */

@@ -100,6 +100,17 @@ DEFINE_TEST(fd) {
 	EQd(0x1000, dup2(srcfd, 0x1000));
 	EQd(0, close(0x1000));
 
+	/* Also test `F_DUPFD' and `F_DUPFD_CLOEXEC' */
+	EQd(0x1000, fcntl(srcfd, F_DUPFD, 0x1000));
+	EQd(0x1001, fcntl(srcfd, F_DUPFD_CLOEXEC, 0x1000));
+	EQd(0x1002, fcntl(srcfd, F_DUPFD, 0x1000));
+	EQd(0x1003, fcntl(srcfd, F_DUPFD_CLOEXEC, 0x1000));
+	EQd(0, fcntl(0x1000, F_GETFD));
+	EQd(FD_CLOEXEC, fcntl(0x1001, F_GETFD));
+	EQd(0, fcntl(0x1002, F_GETFD));
+	EQd(FD_CLOEXEC, fcntl(0x1003, F_GETFD));
+	EQd(0, close_range(0x1000, 0x1003, 0));
+
 	/* Also test the case where we extend a range (but not by installing into an adjacent slot) */
 	EQd(0x1000, dup2(srcfd, 0x1000));
 	EQd(0x1003, dup2(srcfd, 0x1003));

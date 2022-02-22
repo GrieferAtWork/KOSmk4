@@ -26,7 +26,7 @@
 /* KOS/LINUX                                                            */
 /************************************************************************/
 
-#define __F_DUPFD             0    /* [void arg] Duplicate and return file descriptor. (may be used to implement `dup(2)') */
+#define __F_DUPFD             0    /* [fd_t minfd] Same as `dup(2)', but returned FD is guarantied `>= minfd' */
 #define __F_GETFD             1    /* [void arg] Get file descriptor flags.
                                     * @return: * : Set of `FD_CLOEXEC | FD_CLOFORK' */
 #define __F_SETFD             2    /* [int arg = <set of `FD_CLOEXEC', `FD_CLOFORK'>] Set file descriptor flags. */
@@ -58,8 +58,7 @@
 /*      __F_                  1027  * ... */
 /*      __F_                  1028  * ... */
 /*      __F_                  1029  * ... */
-#define __F_DUPFD_CLOEXEC     1030 /* [void arg] Duplicate file descriptor with close-on-exit set.
-                                    * @[fd_t return]: * :  A new  FD for the  same kernel  object. */
+#define __F_DUPFD_CLOEXEC     1030 /* [fd_t minfd] Same as `F_DUPFD', but also set `FD_CLOEXEC' bit. */
 #define __F_SETPIPE_SZ        1031 /* [unsigned int arg] Set pipe buffer size (in bytes). */
 #define __F_GETPIPE_SZ        1032 /* [void arg] Get pipe buffer size (in bytes).
                                     * @return: * : The buffer size (in bytes) */
