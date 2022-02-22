@@ -52,7 +52,6 @@ DEFINE_TEST(system_rtld_ro) {
 	byte_t buf[128];
 	void *map;
 	size_t ps;
-	sysrtld = AT_FDSYSRTLD;
 
 	/* Because the system might assign `IO_RDONLY' to `AT_FDSYSRTLD',  we
 	 * have to do some extra work to get around that fact and (hopefully)
@@ -60,14 +59,13 @@ DEFINE_TEST(system_rtld_ro) {
 	 *
 	 * For this, we use the reopen-via-procfs trick. */
 	{
-		fd_t newfd;
+		fd_t tempfd;
 		char name[sizeof("/proc/self/fd/" PRIMAXd)];
-		NEd(-1, (sysrtld = dup(sysrtld))); /* Make the FD appear in procfs */
-		sprintf(name, "/proc/self/fd/%d", sysrtld);
-		NEd(-1, (newfd = open(name, O_RDWR)));
-		EQd(0, close(sysrtld));
+		NEd(-1, (tempfd = dup(AT_FDSYSRTLD))); /* Make the FD appear in procfs */
+		sprintf(name, "/proc/self/fd/%d", tempfd);
+		NEd(-1, (sysrtld = open(name, O_RDWR)));
 		/* And with that, we should have a writable file descriptor! */
-		sysrtld = newfd;
+		EQd(0, close(tempfd));
 	}
 
 	EQd(0, fstat(sysrtld, &st));

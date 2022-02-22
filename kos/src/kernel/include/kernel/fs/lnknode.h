@@ -85,13 +85,18 @@ struct flnknode_ops {
 	 * and `lno_readlink' to do a normal filesystem path walk to follow the  link
 	 * contents.
 	 *
+	 * NOTE: The caller will initialize  `result->h_mode = IO_FROM_OPENFLAG(oflags)',
+	 *       though this function is still responsible for implementing access checks
+	 *       relative to `oflags & O_ACCMODE'.
+	 *
 	 * This operator is mainly needed to implement the special dup()-behavior
 	 * of `open("/proc/[pid]/fd/[no]")' */
 	BLOCKING WUNUSED NONNULL((1, 2, 3, 4)) __BOOL
 	(KCALL *lno_openlink)(struct flnknode *__restrict self,
 	                      struct handle *__restrict result,
 	                      struct path *__restrict access_path,
-	                      struct fdirent *__restrict access_dent)
+	                      struct fdirent *__restrict access_dent,
+	                      oflag_t oflags)
 			THROWS(E_IOERROR, E_BADALLOC, ...);
 
 	/* [0..1] Similar to `lno_openlink()', but represents an optional optimization

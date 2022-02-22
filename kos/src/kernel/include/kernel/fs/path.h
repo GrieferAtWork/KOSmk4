@@ -30,6 +30,7 @@
 #include <hybrid/sequence/list.h>
 
 #include <asm/os/fcntl.h>
+#include <asm/os/oflags.h>
 #include <bits/crt/format-printer.h>
 #include <kos/lockop.h>
 #include <kos/sched/shared-rwlock.h>
@@ -793,6 +794,9 @@ path_open_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 FUNDEF BLOCKING WUNUSED REF struct handle KCALL
 path_open(fd_t fd_cwd, USER CHECKED char const *filename,
           oflag_t oflags, mode_t mode DFL(0));
+
+/* Sets of `R_OK | W_OK' corresponding to the specified access-mode. */
+DATDEF unsigned int const fnode_access_accmode[__O_ACCMODE + 1];
 
 
 DECL_END

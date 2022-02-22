@@ -1789,6 +1789,14 @@ create_symlink_target(struct path *__restrict symlink_path,
 
 
 
+/* Sets of `R_OK | W_OK' corresponding to the specified access-mode. */
+PUBLIC_CONST unsigned int const fnode_access_accmode[O_ACCMODE + 1] = {
+	[O_RDONLY] = R_OK,
+	[O_WRONLY] = W_OK,
+	[O_RDWR]   = W_OK | R_OK,
+};
+
+
 /* Open (or create) a file, the same way user-space open(2) works. */
 PUBLIC BLOCKING WUNUSED NONNULL((2)) REF struct handle KCALL
 path_open_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
@@ -1807,6 +1815,7 @@ path_open_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 		/* Unconditionally mask mode flags. */
 		mode &= 07777;
 	}
+
 #ifdef __O_ACCMODE_INVALID
 	if ((oflags & O_ACCMODE) == __O_ACCMODE_INVALID) {
 		THROW(E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION,
@@ -1918,8 +1927,8 @@ again_deref_lnknode:
 							/* Check for `lno_openlink' support */
 							lnknode_ops = flnknode_getops(lnknode);
 							if (lnknode_ops->lno_openlink &&
-							    (*lnknode_ops->lno_openlink)(lnknode, &result,
-							                                 access_path, info.mkf_dent)) {
+							    (*lnknode_ops->lno_openlink)(lnknode, &result, access_path,
+							                                 info.mkf_dent, oflags)) {
 								decref_unlikely(access_path);
 								kfree(rhand);
 								result.h_mode = IO_FROM_OPENFLAG(oflags);
@@ -2089,8 +2098,8 @@ again_handle_traversed_file:
 			/* Check for `lno_openlink' support */
 			lnknode_ops = flnknode_getops(lnknode);
 			if (lnknode_ops->lno_openlink &&
-			    (*lnknode_ops->lno_openlink)(lnknode, &result,
-			                                 access_path, access_dent)) {
+			    (*lnknode_ops->lno_openlink)(lnknode, &result, access_path,
+			                                 access_dent, oflags)) {
 				result.h_mode = IO_FROM_OPENFLAG(oflags);
 				return result;
 			}
@@ -2138,6 +2147,9 @@ again_handle_traversed_file:
 		/* Deal with `O_DIRECTORY' */
 		if ((oflags & O_DIRECTORY) && !fnode_isdir(file))
 			THROW(E_FSERROR_NOT_A_DIRECTORY, E_FILESYSTEM_NOT_A_DIRECTORY_OPEN);
+
+		/* Verify that the caller is allowed to access this file. */
+		fnode_access(file, fnode_access_accmode[oflags & O_ACCMODE]);
 
 		/* Initialize result handle. */
 		result.h_mode = IO_FROM_OPENFLAG(oflags);

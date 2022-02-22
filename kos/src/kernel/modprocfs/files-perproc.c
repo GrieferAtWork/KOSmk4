@@ -1879,8 +1879,7 @@ procfs_pp_x86_iopl_write(struct mfile *__restrict self, USER CHECKED void const 
 /************************************************************************/
 
 struct procfs_fd_lnknode: flnknode {
-	REF void      *pfl_handdat; /* [1..1][const] Handle data pointer. */
-	uintptr_half_t pfl_handtyp; /* [const] Handle type (One of `HANDLE_TYPE_*') */
+	struct handle pfl_hand; /* [1..1][const] Handle. */
 };
 
 INTDEF NOBLOCK NONNULL((1)) void
@@ -1890,7 +1889,7 @@ NOTHROW(KCALL procfs_fd_lnknode_v_destroy)(struct mfile *__restrict self) {
 	assert(!LIST_ISBOUND(me, fn_allnodes));
 	assert(me->fn_supent.rb_rhs == FSUPER_NODES_DELETED);
 	assert(me->mf_parts == MFILE_PARTS_ANONYMOUS);
-	(*handle_type_db.h_decref[me->pfl_handtyp])(me->pfl_handdat);
+	handle_decref(me->pfl_hand);
 	decref_unlikely(me->fn_fsdata);
 	kfree(me);
 }
@@ -1910,25 +1909,81 @@ procfs_fd_lnknode_v_readlink(struct flnknode *__restrict self,
 	me = (struct procfs_fd_lnknode *)mfile_aslnk(self);
 	dat.sd_buffer = buf;
 	dat.sd_bufsiz = bufsize;
-	return (size_t)((*handle_type_db.h_printlink[me->pfl_handtyp])(me->pfl_handdat,
-	                                                               &format_snprintf_printer,
-	                                                               &dat));
+	return (size_t)handle_printlink(me->pfl_hand, &format_snprintf_printer, &dat);
 }
 
 PRIVATE WUNUSED NONNULL((1, 2, 3, 4)) bool KCALL
 procfs_fd_lnknode_v_openlink(struct flnknode *__restrict self,
                              struct handle *__restrict result,
                              struct path *__restrict UNUSED(access_path),
-                             struct fdirent *__restrict UNUSED(access_dent))
+                             struct fdirent *__restrict UNUSED(access_dent),
+                             oflag_t oflags)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	struct procfs_fd_lnknode *me;
+	unsigned int access_mode;
+	STATIC_ASSERT(O_RDONLY == IO_RDONLY);
+	STATIC_ASSERT(O_WRONLY == IO_WRONLY);
+	STATIC_ASSERT(O_RDWR == IO_RDWR);
+	STATIC_ASSERT(O_ACCMODE == IO_ACCMODE);
+
 	/* This is the function that implements the magic for open("/proc/[pid]/fd/[no]"),
 	 * such  that  such a  call  behaves as  a  dup(2), rather  than open(readlink())! */
 	me = (struct procfs_fd_lnknode *)mfile_aslnk(self);
-	/* XXX: Access checks? (currently, this method right here can be used to gain write
-	 *      access to arbitrary files) */
-	result->h_data = me->pfl_handdat;
-	result->h_type = me->pfl_handtyp;
+
+	/* Access checks */
+
+	/* Is caller allowed to access files of this process? */
+	if (me->fn_fsdata != task_gettaskpid())
+		fnode_access(self, R_OK);
+
+	/* Check if file-access-permissions got less restrictive.
+	 * -> If so, assert that the caller may open an underlying fnode.
+	 * -> If there is no underlying fnode, we also permit the reopen,
+	 *    since  this  appears to  be  some kind  of  special object. */
+	access_mode = fnode_access_accmode[oflags & O_ACCMODE];
+	if (access_mode & ~fnode_access_accmode[me->pfl_hand.h_mode & IO_ACCMODE]) {
+		switch (me->pfl_hand.h_type) {
+
+		case HANDLE_TYPE_MFILE: {
+			struct mfile *obj;
+			obj = (struct mfile *)me->pfl_hand.h_data;
+			if (mfile_isnode(obj))
+				fnode_access(mfile_asnode(obj), access_mode);
+		}	break;
+
+		case HANDLE_TYPE_PATH: {
+			struct path *obj;
+			obj = (struct path *)me->pfl_hand.h_data;
+			fnode_access(obj->p_dir, access_mode);
+		}	break;
+
+		case HANDLE_TYPE_FILEHANDLE:
+		case HANDLE_TYPE_TEMPHANDLE:
+		case HANDLE_TYPE_FIFOHANDLE: {
+			struct filehandle *obj;
+			STATIC_ASSERT(offsetof(struct filehandle, fh_path) == offsetof(struct fifohandle, fu_path));
+			STATIC_ASSERT(offsetof(struct filehandle, fh_dirent) == offsetof(struct fifohandle, fu_dirent));
+			STATIC_ASSERT(offsetof(struct filehandle, fh_file) == offsetof(struct fifohandle, fu_fifo));
+			obj = (struct filehandle *)me->pfl_hand.h_data;
+			if (mfile_isnode(obj->fh_file))
+				fnode_access(mfile_asnode(obj->fh_file), access_mode);
+		}	break;
+
+		case HANDLE_TYPE_DIRHANDLE: {
+			struct dirhandle *hand;
+			hand = (struct dirhandle *)me->pfl_hand.h_data;
+			fnode_access(hand->dh_enum.de_dir, access_mode);
+		}	break;
+
+		default:
+			break;
+		}
+	}
+
+	/* Permit the open, and re-return an exact duplicate of the old object.
+	 * NOTE: The caller will fill in `result->h_mode'. */
+	result->h_data = me->pfl_hand.h_data;
+	result->h_type = me->pfl_hand.h_type;
 	(*handle_type_db.h_incref[result->h_type])(result->h_data);
 	return true;
 }
@@ -1947,7 +2002,7 @@ procfs_fd_lnknode_v_expandlink(struct flnknode *__restrict self,
 
 	/* Certain handles  types  which  are  known  to
 	 * reference path+name+file triples are checked. */
-	switch (me->pfl_handtyp) {
+	switch (me->pfl_hand.h_type) {
 
 	case HANDLE_TYPE_FILEHANDLE:
 	case HANDLE_TYPE_TEMPHANDLE:
@@ -1955,7 +2010,8 @@ procfs_fd_lnknode_v_expandlink(struct flnknode *__restrict self,
 		struct filehandle *hand;
 		STATIC_ASSERT(offsetof(struct filehandle, fh_path) == offsetof(struct fifohandle, fu_path));
 		STATIC_ASSERT(offsetof(struct filehandle, fh_dirent) == offsetof(struct fifohandle, fu_dirent));
-		hand = (struct filehandle *)me->pfl_handdat;
+		STATIC_ASSERT(offsetof(struct filehandle, fh_file) == offsetof(struct fifohandle, fu_fifo));
+		hand = (struct filehandle *)me->pfl_hand.h_data;
 		if (hand->fh_path && hand->fh_dirent && mfile_isnode(hand->fh_file)) {
 			*presult_path   = incref(hand->fh_path);
 			*presult_dirent = incref(hand->fh_dirent);
@@ -1965,7 +2021,7 @@ procfs_fd_lnknode_v_expandlink(struct flnknode *__restrict self,
 
 	case HANDLE_TYPE_DIRHANDLE: {
 		struct dirhandle *hand;
-		hand = (struct dirhandle *)me->pfl_handdat;
+		hand = (struct dirhandle *)me->pfl_hand.h_data;
 		if (hand->dh_path && hand->dh_dirent) {
 			*presult_path   = incref(hand->dh_path);
 			*presult_dirent = incref(hand->dh_dirent);
@@ -1976,9 +2032,9 @@ procfs_fd_lnknode_v_expandlink(struct flnknode *__restrict self,
 	case HANDLE_TYPE_MFILE: {
 		/* Device handles are known  to be relative to  the
 		 * devfs root (so-long as they've not been deleted) */
-		if (mfile_isdevice((struct mfile *)me->pfl_handdat)) {
+		if (mfile_isdevice((struct mfile *)me->pfl_hand.h_data)) {
 			struct device *dev;
-			dev = mfile_asdevice((struct mfile *)me->pfl_handdat);
+			dev = mfile_asdevice((struct mfile *)me->pfl_hand.h_data);
 			devfs_byname_read();
 			if (dev->dv_byname_node.rb_lhs == DEVICE_BYNAME_DELETED) {
 				devfs_byname_endread();
@@ -2004,7 +2060,7 @@ procfs_fd_lnknode_v_expandlink(struct flnknode *__restrict self,
 	case HANDLE_TYPE_PATH: {
 		/* This case is somewhat special, in that we need to return information
 		 * about the path's parent+name+dir to  construct a valid data  triple. */
-		struct path *pth = (struct path *)me->pfl_handdat;
+		struct path *pth = (struct path *)me->pfl_hand.h_data;
 		if (!path_isroot(pth)) {
 			path_get_parent_and_name(pth, presult_path, presult_dirent);
 			return mfile_asnode(incref(pth->p_dir));
@@ -2025,8 +2081,8 @@ procfs_fd_lnknode_v_walklink(struct flnknode *__restrict self,
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	struct procfs_fd_lnknode *me;
 	me = (struct procfs_fd_lnknode *)mfile_aslnk(self);
-	if (me->pfl_handtyp == HANDLE_TYPE_PATH)
-		return incref((struct path *)me->pfl_handdat);
+	if (me->pfl_hand.h_type == HANDLE_TYPE_PATH)
+		return incref((struct path *)me->pfl_hand.h_data);
 	return NULL;
 }
 #endif /* !__OPTIMIZE_SIZE__ */
@@ -2059,10 +2115,9 @@ INTDEF struct flnknode const procfs_pp_fdlnk_template;
 
 
 struct procfs_fd_dirent {
-	REF struct taskpid *pfd_thread;  /* [1..1][const] The thread being accessed. */
-	REF void           *pfd_handptr; /* [1..1][const] Handle data pointer. */
-	uintptr_half_t      pfd_handtyp; /* [const] Handle type (One of `HANDLE_TYPE_*') */
-	struct fdirent      pfd_ent;     /* Underlying directory entry. */
+	REF struct taskpid *pfd_thread; /* [1..1][const] The thread being accessed. */
+	REF struct handle   pfd_handle; /* [1..1][const] Handle. */
+	struct fdirent      pfd_ent;    /* Underlying directory entry. */
 };
 #define fdirent_asfd(self) container_of(self, struct procfs_fd_dirent, pfd_ent)
 
@@ -2070,7 +2125,7 @@ struct procfs_fd_dirent {
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL procfs_fd_dirent_v_destroy)(struct fdirent *__restrict self) {
 	struct procfs_fd_dirent *me = fdirent_asfd(self);
-	(*handle_type_db.h_decref[me->pfd_handtyp])(me->pfd_handptr);
+	handle_decref(me->pfd_handle);
 	decref_unlikely(me->pfd_thread);
 	kfree(me);
 }
@@ -2082,11 +2137,10 @@ procfs_fd_dirent_v_opennode(struct fdirent *__restrict self,
 	REF struct procfs_fd_lnknode *result;
 	result = (REF struct procfs_fd_lnknode *)memcpy(kmalloc(sizeof(REF struct procfs_fd_lnknode), GFP_NORMAL),
 	                                                &procfs_pp_fdlnk_template, sizeof(struct flnknode));
-	result->pfl_handtyp = me->pfd_handtyp;
-	result->pfl_handdat = me->pfd_handptr;
-	result->fn_fsdata   = incref(me->pfd_thread);
-	result->fn_ino      = procfs_perproc_ino(me->pfd_handptr, &procfs_pp_fdlnk_ops);
-	(*handle_type_db.h_incref[me->pfd_handtyp])(me->pfd_handptr);
+	memcpy(&result->pfl_hand, &me->pfd_handle, sizeof(struct handle));
+	result->fn_fsdata = incref(me->pfd_thread);
+	result->fn_ino    = procfs_perproc_ino(me->pfd_handle.h_data, &procfs_pp_fdlnk_ops);
+	handle_incref(result->pfl_hand);
 	return result;
 }
 
@@ -2094,7 +2148,7 @@ PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) ino_t
 NOTHROW(FCALL procfs_fd_dirent_v_getino)(struct fdirent *__restrict self,
                                          struct fdirnode *__restrict UNUSED(dir)) {
 	struct procfs_fd_dirent *me = fdirent_asfd(self);
-	return procfs_perproc_ino(me->pfd_handptr, &procfs_pp_fdlnk_ops);
+	return procfs_perproc_ino(me->pfd_handle.h_data, &procfs_pp_fdlnk_ops);
 }
 
 PRIVATE struct fdirent_ops const procfs_fd_dirent_ops = {
@@ -2149,8 +2203,7 @@ procfs_perproc_fd_v_lookup(struct fdirnode *__restrict self,
 		                                                GFP_NORMAL);
 
 		/* Fill in the directory entry. */
-		result->pfd_handptr        = hand.h_data; /* Inherit reference */
-		result->pfd_handtyp        = hand.h_type;
+		memcpy(&result->pfd_handle, &hand, sizeof(struct handle));  /* Inherit reference */
 		result->pfd_thread         = incref(pid);
 		result->pfd_ent.fd_namelen = (u16)sprintf(result->pfd_ent.fd_name, "%u", fdno);
 		assert(result->pfd_ent.fd_namelen == info->flu_namelen);
