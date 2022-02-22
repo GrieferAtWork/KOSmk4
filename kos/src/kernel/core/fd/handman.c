@@ -394,6 +394,7 @@ NOTHROW(FCALL handrange_rejoin2)(struct handrange *lorange,
 			handman_ranges_insert(man, lorange);
 			return NULL;
 		}
+		lorange = newrange;
 		assert(kmalloc_usable_size(lorange) >= reqsize);
 	}
 
