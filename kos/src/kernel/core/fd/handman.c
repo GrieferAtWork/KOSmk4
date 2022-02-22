@@ -2494,7 +2494,8 @@ again:
 		if (result != HANDMAN_EXTENDRANGE_OR_UNLOCK_NORANGE)
 			goto handle_existing_range; /* Insert into newly expanded range! */
 
-create_new_range_for_minfd:
+		relfd = (unsigned int)minfd;
+create_new_range_for_relfd:
 		/* Allocate a new range. */
 		result = _handrange_alloc_nx(1, GFP_ATOMIC);
 		if (!result) {
@@ -2526,8 +2527,8 @@ create_new_range_for_minfd:
 
 		/* Fill in the new range. */
 		result->hr_flags = HANDRANGE_F_NORMAL;
-		result->hr_minfd = minfd;
-		result->hr_maxfd = minfd;
+		result->hr_minfd = relfd;
+		result->hr_maxfd = relfd;
 		result->hr_nhint = 1; /* First slot will be used */
 		result->hr_nlops = 0;
 		result->hr_cexec = 0;
@@ -2587,11 +2588,12 @@ insert_into_result:
 	}
 
 	/* Extend `result' (and possibly join it with `next') */
-	result = handman_extendrange_or_unlock(self, result->hr_maxfd + 1, &newrange);
+	relfd  = result->hr_maxfd + 1;
+	result = handman_extendrange_or_unlock(self, relfd, &newrange);
 	if (result == HANDMAN_EXTENDRANGE_OR_UNLOCK_UNLOCKED)
 		goto again; /* Lock was lost --> try again */
 	if (result == HANDMAN_EXTENDRANGE_OR_UNLOCK_NORANGE)
-		goto create_new_range_for_minfd; /* Cannot extend existing ranges --> create a new one */
+		goto create_new_range_for_relfd; /* Cannot extend existing ranges --> create a new one */
 
 	/* Was able to extend ranges, so now `result' should contain free slots.
 	 * -> Find those slots and use them. */
