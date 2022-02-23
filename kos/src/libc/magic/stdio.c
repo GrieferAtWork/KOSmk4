@@ -1929,7 +1929,180 @@ $FILE *fmemopen([[inoutp(len)]] void *mem, $size_t len,
 
 @@>> open_memstream(3)
 [[wunused, decl_include("<hybrid/typecore.h>")]]
-$FILE *open_memstream(char **bufloc, $size_t *sizeloc);
+[[requires($has_function(malloc, funopen2_64) && ($has_function(recalloc) || $has_function(realloc)))]]
+[[dependency(memcpy, bzero, malloc, realloc, recalloc, funopen2_64, free)]]
+[[impl_include("<hybrid/typecore.h>", "<libc/errno.h>")]]
+[[impl_include("<asm/os/stdio.h>", "<hybrid/__overflow.h>")]]
+[[impl_prefix(
+@@push_namespace(local)@@
+struct __memstream_file {
+	byte_t **mf_pbase; /* Pointer to the user-defined base field. */
+	size_t  *mf_psize; /* Pointer to the user-defined size field. */
+	byte_t  *mf_base;  /* [0..1][owned] Allocated base pointer. */
+	byte_t  *mf_ptr;   /* [0..1] Current read/write pointer (May be located beyond `mf_end'; allocated lazily during writes). */
+	byte_t  *mf_end;   /* [0..1] Allocated buffer end pointer. */
+};
+
+__LOCAL_LIBC(@memstream_read@) ssize_t LIBCCALL
+memstream_read(void *cookie, void *buf, size_t num_bytes) {
+	struct __memstream_file *me;
+	size_t maxread;
+	me = (struct __memstream_file *)cookie;
+	maxread = me->mf_end - me->mf_ptr;
+	if (maxread > num_bytes)
+		maxread = num_bytes;
+	memcpy(buf, me->mf_ptr, maxread);
+	me->mf_ptr += maxread;
+	return (ssize_t)maxread;
+}
+
+__LOCAL_LIBC(@memstream_write@) ssize_t LIBCCALL
+memstream_write(void *cookie, void const *buf, size_t num_bytes) {
+	struct __memstream_file *me;
+	size_t new_alloc, result = 0;
+	byte_t *new_buffer;
+	me = (struct __memstream_file *)cookie;
+	if likely(me->mf_ptr < me->mf_end) {
+		result = me->mf_end - me->mf_ptr;
+		if (result > num_bytes)
+			result = num_bytes;
+		memcpy(me->mf_ptr, buf, num_bytes);
+		me->mf_ptr += result;
+		buf = (byte_t const *)buf + result;
+		num_bytes -= result;
+	}
+	if (!num_bytes)
+		goto done;
+	/* Allocate more memory. */
+	new_alloc = (size_t)(me->mf_ptr - me->mf_base);
+	if unlikely(__hybrid_overflow_uadd(new_alloc, num_bytes, &new_alloc))
+		goto err_EOVERFLOW;
+@@pp_if $has_function(recalloc)@@
+	/* Try  to use  recalloc() to  do the  zero-initialization for us.
+	 * Since this is the only place where a buffer is ever  allocated,
+	 * this also means that any newly allocated buffer space is always
+	 * zero-initialized, and we  don't have to  worry about any  delta
+	 * between `end - base' and `malloc_usable_size()'. */
+	new_buffer = (byte_t *)recalloc(me->mf_base,
+	                                (new_alloc + 1) *
+	                                sizeof(char));
+	if unlikely(!new_buffer)
+		goto err;
+@@pp_else@@
+	new_buffer = (byte_t *)realloc(me->mf_base,
+	                               (new_alloc + 1) *
+	                               sizeof(char));
+	if unlikely(!new_buffer)
+		goto err;
+	{
+		/* Zero-initialize newly allocated memory (that won't be overwritten in a moment) */
+		size_t oldsiz, baspos;
+		oldsiz = (size_t)(me->mf_end - me->mf_base);
+		baspos = (size_t)(me->mf_ptr - me->mf_base);
+		if (baspos > oldsiz)
+			bzero(new_buffer + oldsiz, (baspos - oldsiz) * sizeof(char));
+	}
+@@pp_endif@@
+	me->mf_ptr  = new_buffer + (me->mf_ptr - me->mf_base);
+	me->mf_base = new_buffer;
+	me->mf_end  = new_buffer + new_alloc;
+	/* Copy data into the new portion of the buf. */
+	memcpy(me->mf_ptr, buf, num_bytes);
+	*me->mf_end = 0; /* NUL-termination. */
+	result += num_bytes;
+	/* Update the user-given pointer locations with buf parameters. */
+	*me->mf_pbase = me->mf_base;
+	*me->mf_psize = (size_t)(me->mf_end - me->mf_base);
+done:
+	return (ssize_t)result;
+err_EOVERFLOW:
+@@pp_ifdef EOVERFLOW@@
+	libc_seterrno(EOVERFLOW);
+@@pp_else@@
+	libc_seterrno(1);
+@@pp_endif@@
+err:
+	return -1;
+}
+
+__LOCAL_LIBC(@memstream_seek@) off64_t LIBCCALL
+memstream_seek(void *cookie, off64_t off, int whence) {
+	struct __memstream_file *me;
+	off64_t new_pos;
+	me = (struct __memstream_file *)cookie;
+	new_pos = (off64_t)(pos64_t)(size_t)(me->mf_ptr - me->mf_base);
+	switch (whence) {
+
+	case __SEEK_SET:
+		new_pos = off;
+		break;
+
+	case __SEEK_CUR:
+		new_pos += off;
+		break;
+
+	case __SEEK_END:
+		new_pos = (size_t)(me->mf_end - me->mf_base) + off;
+		break;
+
+	default:
+@@pp_ifdef EINVAL@@
+		return (off64_t)libc_seterrno(EINVAL);
+@@pp_else@@
+		return (off64_t)libc_seterrno(1);
+@@pp_endif@@
+	}
+	if unlikely(new_pos < 0)
+		goto err_EOVERFLOW;
+	/* Update the actual buffer read/write pointer. */
+	if unlikely(__hybrid_overflow_uadd((uintptr_t)me->mf_base,
+	                                   (pos64_t)new_pos,
+	                                   (uintptr_t *)&me->mf_ptr))
+		goto err_EOVERFLOW;
+	return (off64_t)new_pos;
+err_EOVERFLOW:
+@@pp_ifdef EOVERFLOW@@
+	return (off64_t)libc_seterrno(EOVERFLOW);
+@@pp_else@@
+	return (off64_t)libc_seterrno(1);
+@@pp_endif@@
+}
+
+__LOCAL_LIBC(@memstream_close@) int LIBCCALL
+memstream_close(void *cookie) {
+@@pp_if $has_function(free)@@
+	free(cookie);
+@@pp_endif@@
+	return 0;
+}
+
+@@pop_namespace@@
+)]]
+$FILE *open_memstream(char **bufloc, $size_t *sizeloc) {
+	FILE *result;
+	struct __NAMESPACE_LOCAL_SYM __memstream_file *magic;
+	magic = (struct __NAMESPACE_LOCAL_SYM __memstream_file *)malloc(sizeof(struct __NAMESPACE_LOCAL_SYM __memstream_file));
+	if unlikely(!magic)
+		return NULL;
+	magic->mf_pbase = (byte_t **)bufloc;
+	magic->mf_psize = sizeloc;
+	magic->mf_base  = NULL;
+	magic->mf_ptr   = NULL;
+	magic->mf_end   = NULL;
+	/* Open a custom file-stream. */
+	result = funopen2_64(magic,
+	                     &__NAMESPACE_LOCAL_SYM memstream_read,
+	                     &__NAMESPACE_LOCAL_SYM memstream_write,
+	                     &__NAMESPACE_LOCAL_SYM memstream_seek,
+	                     NULL,
+	                     &__NAMESPACE_LOCAL_SYM memstream_close);
+@@pp_if $has_function(free)@@
+	if unlikely(!result)
+		free(magic);
+@@pp_endif@@
+	return result;
+}
+
 
 %[default:section(".text.crt{|.dos}.FILE.locked.read.read")]
 %[insert:function(__getdelim = getdelim)]
@@ -4139,11 +4312,11 @@ DEFINE_FUNOPEN2_TO_FUNOPEN2_64_WRITEFN
 @@pp_endif@@
 )]]
 $FILE *funopen2_64(void const *cookie,
-                  ssize_t (LIBKCALL *readfn)(void *cookie, void *buf, size_t num_bytes),
-                  ssize_t (LIBKCALL *writefn)(void *cookie, void const *buf, size_t num_bytes),
-                  off64_t (LIBKCALL *seekfn)(void *cookie, off64_t off, int whence),
-                  int (LIBKCALL *flushfn)(void *cookie),
-                  int (LIBKCALL *closefn)(void *cookie)) {
+                   ssize_t (LIBKCALL *readfn)(void *cookie, void *buf, size_t num_bytes),
+                   ssize_t (LIBKCALL *writefn)(void *cookie, void const *buf, size_t num_bytes),
+                   off64_t (LIBKCALL *seekfn)(void *cookie, off64_t off, int whence),
+                   int (LIBKCALL *flushfn)(void *cookie),
+                   int (LIBKCALL *closefn)(void *cookie)) {
 	FILE *result;
 	struct __NAMESPACE_LOCAL_SYM __funopen2_64_holder *holder;
 	if (!seekfn)

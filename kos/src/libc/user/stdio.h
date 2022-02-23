@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x594cd078 */
+/* HASH CRC-32:0x7ee2c8a2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -159,8 +159,6 @@ INTDEF WUNUSED NONNULL((2)) FILE *NOTHROW_NCX(LIBCCALL libc_fdopen)(fd_t fd, cha
 INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBCCALL libc_fileno)(FILE *__restrict stream);
 /* >> fmemopen(3) */
 INTDEF WUNUSED NONNULL((1, 3)) FILE *NOTHROW_NCX(LIBCCALL libc_fmemopen)(void *mem, size_t len, char const *modes);
-/* >> open_memstream(3) */
-INTDEF WUNUSED FILE *NOTHROW_NCX(LIBCCALL libc_open_memstream)(char **bufloc, size_t *sizeloc);
 /* >> flockfile(3)
  * Acquire a lock to `stream' and block until doing so succeeds */
 INTDEF NONNULL((1)) void NOTHROW_RPC(LIBCCALL libc_flockfile)(FILE *__restrict stream);

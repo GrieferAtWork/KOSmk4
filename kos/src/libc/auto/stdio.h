@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5ebb57b */
+/* HASH CRC-32:0x477ee9e9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -422,6 +422,12 @@ INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBDCALL libd_fileno)(FILE *__restr
 INTDEF WUNUSED NONNULL((1, 3)) FILE *NOTHROW_NCX(LIBDCALL libd_fmemopen)(void *mem, size_t len, char const *modes);
 /* >> open_memstream(3) */
 INTDEF WUNUSED FILE *NOTHROW_NCX(LIBDCALL libd_open_memstream)(char **bufloc, size_t *sizeloc);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> open_memstream(3) */
+INTDEF WUNUSED FILE *NOTHROW_NCX(LIBCCALL libc_open_memstream)(char **bufloc, size_t *sizeloc);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getdelim(3) */
 INTDEF WUNUSED NONNULL((1, 2, 4)) ssize_t (LIBDCALL libd_getdelim)(char **__restrict lineptr, size_t *__restrict pcount, int delimiter, FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

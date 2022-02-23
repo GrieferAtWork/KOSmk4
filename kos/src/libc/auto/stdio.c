@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5e18c33 */
+/* HASH CRC-32:0x38eb794e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 #include <kos/types.h>
 #include "../user/stdio.h"
 #include "format-printer.h"
+#include "../user/malloc.h"
 #include "../user/stdlib.h"
 #include "../user/string.h"
 #include "../user/unicode.h"
@@ -722,6 +723,180 @@ NOTHROW_NCX(LIBCCALL libc_setbuffer)(FILE *__restrict stream,
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.utility") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_setlinebuf)(FILE *__restrict stream) {
 	libc_setvbuf(stream, NULL, _IOLBF, 0);
+}
+#include <hybrid/typecore.h>
+#include <libc/errno.h>
+#include <asm/os/stdio.h>
+#include <hybrid/__overflow.h>
+__NAMESPACE_LOCAL_BEGIN
+struct __memstream_file {
+	byte_t **mf_pbase; /* Pointer to the user-defined base field. */
+	size_t  *mf_psize; /* Pointer to the user-defined size field. */
+	byte_t  *mf_base;  /* [0..1][owned] Allocated base pointer. */
+	byte_t  *mf_ptr;   /* [0..1] Current read/write pointer (May be located beyond `mf_end'; allocated lazily during writes). */
+	byte_t  *mf_end;   /* [0..1] Allocated buffer end pointer. */
+};
+
+__LOCAL_LIBC(memstream_read) ssize_t LIBCCALL
+memstream_read(void *cookie, void *buf, size_t num_bytes) {
+	struct __memstream_file *me;
+	size_t maxread;
+	me = (struct __memstream_file *)cookie;
+	maxread = me->mf_end - me->mf_ptr;
+	if (maxread > num_bytes)
+		maxread = num_bytes;
+	libc_memcpy(buf, me->mf_ptr, maxread);
+	me->mf_ptr += maxread;
+	return (ssize_t)maxread;
+}
+
+__LOCAL_LIBC(memstream_write) ssize_t LIBCCALL
+memstream_write(void *cookie, void const *buf, size_t num_bytes) {
+	struct __memstream_file *me;
+	size_t new_alloc, result = 0;
+	byte_t *new_buffer;
+	me = (struct __memstream_file *)cookie;
+	if likely(me->mf_ptr < me->mf_end) {
+		result = me->mf_end - me->mf_ptr;
+		if (result > num_bytes)
+			result = num_bytes;
+		libc_memcpy(me->mf_ptr, buf, num_bytes);
+		me->mf_ptr += result;
+		buf = (byte_t const *)buf + result;
+		num_bytes -= result;
+	}
+	if (!num_bytes)
+		goto done;
+	/* Allocate more memory. */
+	new_alloc = (size_t)(me->mf_ptr - me->mf_base);
+	if unlikely(__hybrid_overflow_uadd(new_alloc, num_bytes, &new_alloc))
+		goto err_EOVERFLOW;
+#if defined(__CRT_HAVE_recalloc) || ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)))
+	/* Try  to use  recalloc() to  do the  zero-initialization for us.
+	 * Since this is the only place where a buffer is ever  allocated,
+	 * this also means that any newly allocated buffer space is always
+	 * zero-initialized, and we  don't have to  worry about any  delta
+	 * between `end - base' and `malloc_usable_size()'. */
+	new_buffer = (byte_t *)libc_recalloc(me->mf_base,
+	                                (new_alloc + 1) *
+	                                sizeof(char));
+	if unlikely(!new_buffer)
+		goto err;
+#else /* __CRT_HAVE_recalloc || ((__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) && (__CRT_HAVE_malloc_usable_size || __CRT_HAVE__msize)) */
+	new_buffer = (byte_t *)libc_realloc(me->mf_base,
+	                               (new_alloc + 1) *
+	                               sizeof(char));
+	if unlikely(!new_buffer)
+		goto err;
+	{
+		/* Zero-initialize newly allocated memory (that won't be overwritten in a moment) */
+		size_t oldsiz, baspos;
+		oldsiz = (size_t)(me->mf_end - me->mf_base);
+		baspos = (size_t)(me->mf_ptr - me->mf_base);
+		if (baspos > oldsiz)
+			libc_bzero(new_buffer + oldsiz, (baspos - oldsiz) * sizeof(char));
+	}
+#endif /* !__CRT_HAVE_recalloc && ((!__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc) || (!__CRT_HAVE_malloc_usable_size && !__CRT_HAVE__msize)) */
+	me->mf_ptr  = new_buffer + (me->mf_ptr - me->mf_base);
+	me->mf_base = new_buffer;
+	me->mf_end  = new_buffer + new_alloc;
+	/* Copy data into the new portion of the buf. */
+	libc_memcpy(me->mf_ptr, buf, num_bytes);
+	*me->mf_end = 0; /* NUL-termination. */
+	result += num_bytes;
+	/* Update the user-given pointer locations with buf parameters. */
+	*me->mf_pbase = me->mf_base;
+	*me->mf_psize = (size_t)(me->mf_end - me->mf_base);
+done:
+	return (ssize_t)result;
+err_EOVERFLOW:
+#ifdef EOVERFLOW
+	libc_seterrno(EOVERFLOW);
+#else /* EOVERFLOW */
+	libc_seterrno(1);
+#endif /* !EOVERFLOW */
+err:
+	return -1;
+}
+
+__LOCAL_LIBC(memstream_seek) off64_t LIBCCALL
+memstream_seek(void *cookie, off64_t off, int whence) {
+	struct __memstream_file *me;
+	off64_t new_pos;
+	me = (struct __memstream_file *)cookie;
+	new_pos = (off64_t)(pos64_t)(size_t)(me->mf_ptr - me->mf_base);
+	switch (whence) {
+
+	case __SEEK_SET:
+		new_pos = off;
+		break;
+
+	case __SEEK_CUR:
+		new_pos += off;
+		break;
+
+	case __SEEK_END:
+		new_pos = (size_t)(me->mf_end - me->mf_base) + off;
+		break;
+
+	default:
+#ifdef EINVAL
+		return (off64_t)libc_seterrno(EINVAL);
+#else /* EINVAL */
+		return (off64_t)libc_seterrno(1);
+#endif /* !EINVAL */
+	}
+	if unlikely(new_pos < 0)
+		goto err_EOVERFLOW;
+	/* Update the actual buffer read/write pointer. */
+	if unlikely(__hybrid_overflow_uadd((uintptr_t)me->mf_base,
+	                                   (pos64_t)new_pos,
+	                                   (uintptr_t *)&me->mf_ptr))
+		goto err_EOVERFLOW;
+	return (off64_t)new_pos;
+err_EOVERFLOW:
+#ifdef EOVERFLOW
+	return (off64_t)libc_seterrno(EOVERFLOW);
+#else /* EOVERFLOW */
+	return (off64_t)libc_seterrno(1);
+#endif /* !EOVERFLOW */
+}
+
+__LOCAL_LIBC(memstream_close) int LIBCCALL
+memstream_close(void *cookie) {
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	libc_free(cookie);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+	return 0;
+}
+
+__NAMESPACE_LOCAL_END
+/* >> open_memstream(3) */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED FILE *
+NOTHROW_NCX(LIBCCALL libc_open_memstream)(char **bufloc,
+                                          size_t *sizeloc) {
+	FILE *result;
+	struct __NAMESPACE_LOCAL_SYM __memstream_file *magic;
+	magic = (struct __NAMESPACE_LOCAL_SYM __memstream_file *)libc_malloc(sizeof(struct __NAMESPACE_LOCAL_SYM __memstream_file));
+	if unlikely(!magic)
+		return NULL;
+	magic->mf_pbase = (byte_t **)bufloc;
+	magic->mf_psize = sizeloc;
+	magic->mf_base  = NULL;
+	magic->mf_ptr   = NULL;
+	magic->mf_end   = NULL;
+	/* Open a custom file-stream. */
+	result = libc_funopen2_64(magic,
+	                     &__NAMESPACE_LOCAL_SYM memstream_read,
+	                     &__NAMESPACE_LOCAL_SYM memstream_write,
+	                     &__NAMESPACE_LOCAL_SYM memstream_seek,
+	                     NULL,
+	                     &__NAMESPACE_LOCAL_SYM memstream_close);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	if unlikely(!result)
+		libc_free(magic);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+	return result;
 }
 #include <asm/crt/stdio.h>
 #include <hybrid/__assert.h>
@@ -3999,6 +4174,7 @@ DEFINE_PUBLIC_ALIAS(removeat, libc_removeat);
 DEFINE_PUBLIC_ALIAS(_IO_setbuffer, libc_setbuffer);
 DEFINE_PUBLIC_ALIAS(setbuffer, libc_setbuffer);
 DEFINE_PUBLIC_ALIAS(setlinebuf, libc_setlinebuf);
+DEFINE_PUBLIC_ALIAS(open_memstream, libc_open_memstream);
 DEFINE_PUBLIC_ALIAS(__getdelim, libc_getdelim);
 DEFINE_PUBLIC_ALIAS(_IO_getdelim, libc_getdelim);
 DEFINE_PUBLIC_ALIAS(getdelim, libc_getdelim);

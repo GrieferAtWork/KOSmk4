@@ -276,7 +276,6 @@
 	CB(PREFIX.crt.FILE.unlocked.seek.pos PREFIX.crt.FILE.unlocked.seek.seek PREFIX.crt.FILE.unlocked.seek.utility) \
 	CB(PREFIX.crt.FILE.unlocked.utility) \
 	CB(PREFIX.crt.FILE.utility.memopen) \
-	CB(PREFIX.crt.FILE.utility.memstream) \
 	CB(PREFIX.crt.FILE.utility.ext) \
 	CB(PREFIX.crt.FILE.utility.popen) \
 	CB(PREFIX.crt.io.large.lock PREFIX.crt.io.large.seek PREFIX.crt.io.large.utility PREFIX.crt.io.lock PREFIX.crt.io.poll PREFIX.crt.io.seek PREFIX.crt.io.sync PREFIX.crt.io.utility) \

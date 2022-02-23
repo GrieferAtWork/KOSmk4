@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50a56983 */
+/* HASH CRC-32:0x4efa4a53 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2674,8 +2674,14 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,fileno,(__FI
 #ifdef __USE_XOPEN2K8
 /* >> fmemopen(3) */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__FILE *,__NOTHROW_NCX,fmemopen,(void *__mem, __SIZE_TYPE__ __len, char const *__modes),(__mem,__len,__modes))
+#ifdef __CRT_HAVE_open_memstream
 /* >> open_memstream(3) */
-__CDECLARE_OPT(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,open_memstream,(char **__bufloc, __SIZE_TYPE__ *__sizeloc),(__bufloc,__sizeloc))
+__CDECLARE(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,open_memstream,(char **__bufloc, __SIZE_TYPE__ *__sizeloc),(__bufloc,__sizeloc))
+#elif (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && ((defined(__CRT_HAVE_funopen2) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_funopen2_64) || defined(__CRT_HAVE_funopen2)) && (defined(__CRT_HAVE_recalloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
+#include <libc/local/stdio/open_memstream.h>
+/* >> open_memstream(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(open_memstream, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __FILE *__NOTHROW_NCX(__LIBCCALL open_memstream)(char **__bufloc, __SIZE_TYPE__ *__sizeloc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(open_memstream))(__bufloc, __sizeloc); })
+#endif /* ... */
 #if defined(__CRT_HAVE_getdelim_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* >> getdelim(3) */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__THROWING,__getdelim,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, int __delimiter, __FILE *__restrict __stream),getdelim_unlocked,(__lineptr,__pcount,__delimiter,__stream))
