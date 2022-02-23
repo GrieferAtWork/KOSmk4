@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x477ee9e9 */
+/* HASH CRC-32:0xcaa84975 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -373,6 +373,12 @@ INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_removeat)(fd_t dirfd, char con
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tmpnam(3), tmpnam_r(3) */
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_tmpnam_r)(char *buf);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> tmpnam(3), tmpnam_r(3) */
+INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_tmpnam_r)(char *buf);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> setbuffer(3)
  * Specify the location and size for the buffer to-be used by `stream' */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_setbuffer)(FILE *__restrict stream, char *buf, size_t bufsize);
@@ -420,6 +426,12 @@ INTDEF WUNUSED NONNULL((2)) FILE *NOTHROW_NCX(LIBDCALL libd_fdopen)(fd_t fd, cha
 INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBDCALL libd_fileno)(FILE *__restrict stream);
 /* >> fmemopen(3) */
 INTDEF WUNUSED NONNULL((1, 3)) FILE *NOTHROW_NCX(LIBDCALL libd_fmemopen)(void *mem, size_t len, char const *modes);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> fmemopen(3) */
+INTDEF WUNUSED NONNULL((1, 3)) FILE *NOTHROW_NCX(LIBCCALL libc_fmemopen)(void *mem, size_t len, char const *modes);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> open_memstream(3) */
 INTDEF WUNUSED FILE *NOTHROW_NCX(LIBDCALL libd_open_memstream)(char **bufloc, size_t *sizeloc);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

@@ -273,8 +273,7 @@ file_system_trunc(FILE *__restrict self, pos64_t new_size) {
 	int result;
 	if (self->if_flag & IO_HASVTAB) {
 		/* Not allowed for VTABLE files. */
-		libc_seterrno(EPERM);
-		result = -1;
+		result = (int)libc_seterrno(EPERM);
 	} else {
 		result = ftruncate64(self->if_fd, new_size);
 	}
@@ -294,7 +293,7 @@ file_determine_isatty(FILE *__restrict self) {
 			/* Preserve errno */
 			saved_errno = libc_geterrno();
 			is_a_tty    = isatty(self->if_fd);
-			libc_seterrno(saved_errno);
+			(void)libc_seterrno(saved_errno);
 			flags |= is_a_tty ? IO_ISATTY : IO_NOTATTY;
 		}
 		self->if_flag = flags;
@@ -426,7 +425,7 @@ done:
 	return 0;
 err_cannot_resize:
 	/* This can happen if the function is called from a FILE cookie. */
-	libc_seterrno(EWOULDBLOCK);
+	(void)libc_seterrno(EWOULDBLOCK);
 err:
 	return -1;
 }
@@ -530,7 +529,7 @@ file_destroy(FILE *__restrict self) {
 			errno_t saved_errno;
 			saved_errno = libc_geterrno_safe();
 			(*ex->io_closefn)(ex->io_cookie);
-			libc_seterrno(saved_errno);
+			(void)libc_seterrno(saved_errno);
 		}
 		atomic_owner_rwlock_endread(&ex->io_lock);
 		refcnt = ATOMIC_FETCHDEC(ex->io_refcnt);
@@ -934,8 +933,8 @@ file_writedata(FILE *__restrict self, void const *buf, size_t num_bytes) {
 	assert(ex);
 
 	/* Check to make sure that this file is writable. */
-	if (!(self->if_flag & IO_RW)) {
-		libc_seterrno(EPERM);
+	if unlikely(!(self->if_flag & IO_RW)) {
+		(void)libc_seterrno(EPERM);
 		goto err;
 	}
 	if (self->if_flag & IO_LNIFTYY)
@@ -1107,7 +1106,7 @@ file_seek(FILE *__restrict self, off64_t off, int whence) {
 		}
 		self->if_flag &= ~IO_EOF;
 		if unlikely(new_abspos >= INT64_MAX) {
-			libc_seterrno(EOVERFLOW);
+			(void)libc_seterrno(EOVERFLOW);
 			goto err;
 		}
 		if (new_abspos < old_abspos)
@@ -1202,7 +1201,7 @@ read_from_buffer:
 	/* The buffer is empty and must be re-filled. */
 	/* First off: Flush any changes that had been made. */
 	COMPILER_BARRIER();
-	if (file_sync(self))
+	if unlikely(file_sync(self) != 0)
 		goto err0;
 	COMPILER_BARRIER();
 	ex->io_chng = self->if_base;
@@ -1444,7 +1443,7 @@ file_truncate(FILE *__restrict self, pos64_t new_size) {
 	/* With  data flushed and the loaded buffer
 	 * truncated, truncate the underlying file. */
 	COMPILER_BARRIER();
-	if (file_system_trunc(self, new_size))
+	if unlikely(file_system_trunc(self, new_size))
 		goto err;
 	COMPILER_BARRIER();
 	return 0;
@@ -1665,7 +1664,7 @@ file_reopenfd(FILE *__restrict self, fd_t fd, uint32_t flags) {
 	struct iofile_data *ex;
 	if unlikely(self->if_flag & IO_READING) {
 		/* reopen() isn't allowed from within a cookie function. */
-		libc_seterrno(EPERM);
+		(void)libc_seterrno(EPERM);
 		return NULL;
 	}
 	if (file_sync(self))
@@ -1770,19 +1769,6 @@ NOTHROW_RPC(LIBCCALL libc_rename)(char const *oldname,
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_rename]]]*/
-
-/*[[[head:libd_tmpnam,hash:CRC-32=0x9ddb7cb7]]]*/
-/* >> tmpnam(3), tmpnam_r(3) */
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED NONNULL((1)) char *
-NOTHROW_NCX(LIBDCALL libd_tmpnam)(char *buf)
-/*[[[body:libd_tmpnam]]]*/
-/*AUTO*/{
-	(void)buf;
-	CRT_UNIMPLEMENTEDF("tmpnam(%q)", buf); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libd_tmpnam]]]*/
 
 /*[[[head:libd_renameat,hash:CRC-32=0x526adc86]]]*/
 /* >> renameat(2) */
@@ -1949,14 +1935,14 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 4)) s
 {
 	size_t result, total;
 	if unlikely(!stream) {
-		libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 		return 0;
 	}
 	if unlikely(!elemsize)
 		return 0;
 	stream = file_fromuser(stream);
 	if unlikely(OVERFLOW_UMUL(elemcount, elemsize, &total)) {
-		libc_seterrno(EOVERFLOW);
+		(void)libc_seterrno(EOVERFLOW);
 		FSETERROR(stream);
 		return 0;
 	}
@@ -1989,14 +1975,14 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 4))
 {
 	size_t result, total;
 	if unlikely(!stream) {
-		libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 		return 0;
 	}
 	if unlikely(!elemsize)
 		return 0;
 	stream = file_fromuser(stream);
 	if unlikely(OVERFLOW_UMUL(elemcount, elemsize, &total)) {
-		libc_seterrno(EOVERFLOW);
+		(void)libc_seterrno(EOVERFLOW);
 		FSETERROR(stream);
 		return 0;
 	}
@@ -2020,14 +2006,14 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1, 4)) size_t
 {
 	size_t result, total;
 	if unlikely(!stream) {
-		libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 		return 0;
 	}
 	if unlikely(!elemsize)
 		return 0;
 	stream = file_fromuser(stream);
 	if unlikely(OVERFLOW_UMUL(elemcount, elemsize, &total)) {
-		libc_seterrno(EOVERFLOW);
+		(void)libc_seterrno(EOVERFLOW);
 		FSETERROR(stream);
 		return 0;
 	}
@@ -2054,14 +2040,14 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") WUNUSED NONNULL((1, 4
 {
 	size_t result, total;
 	if unlikely(!stream) {
-		libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 		return 0;
 	}
 	if unlikely(!elemsize)
 		return 0;
 	stream = file_fromuser(stream);
 	if unlikely(OVERFLOW_UMUL(elemcount, elemsize, &total)) {
-		libc_seterrno(EOVERFLOW);
+		(void)libc_seterrno(EOVERFLOW);
 		FSETERROR(stream);
 		return 0;
 	}
@@ -2693,7 +2679,7 @@ NOTHROW_NCX(LIBCCALL libc_fgetln)(FILE *__restrict stream,
 	size_t i, bufsiz;
 	char *result;
 	if unlikely(!stream) {
-		libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 		return NULL;
 	}
 	stream = file_fromuser(stream);
@@ -3044,23 +3030,6 @@ NOTHROW_NCX(LIBCCALL libc_clearerr)(FILE *__restrict stream)
 }
 /*[[[end:libc_clearerr]]]*/
 
-/*[[[head:libc_tmpfile,hash:CRC-32=0xe9ec4ee6]]]*/
-/* >> tmpfile(3), tmpfile64(3)
- * Create and return a new file-stream for accessing a temporary file for reading/writing */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED FILE *
-NOTHROW_RPC(LIBCCALL libc_tmpfile)(void)
-/*[[[body:libc_tmpfile]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("tmpfile"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_tmpfile]]]*/
-
-/*[[[impl:libc_tmpfile64]]]*/
-DEFINE_INTERN_ALIAS(libc_tmpfile64, libc_tmpfile);
-
-
 /*[[[head:libd_fopen,hash:CRC-32=0x7d0a2ee4]]]*/
 /* >> fopen(3), fopen64(3)
  * Create and return a new file-stream for accessing `filename' */
@@ -3194,7 +3163,7 @@ NOTHROW_RPC(LIBCCALL libc_popen_impl)(char const *modes, unsigned int how, void 
 		 * with processes opened via popen(3)...
 		 *
 		 * Maybe one day this will be implemented as a KOS extension... */
-		libc_seterrno(EINVAL);
+		(void)libc_seterrno(EINVAL);
 		return NULL;
 	}
 
@@ -3485,17 +3454,6 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.getc") NONNULL((1)) int
 /*[[[end:libc_fgetc_unlocked]]]*/
 
 
-
-/*[[[head:libc_tmpnam_r,hash:CRC-32=0x6e2a6d14]]]*/
-/* >> tmpnam(3), tmpnam_r(3) */
-INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) char *
-NOTHROW_NCX(LIBCCALL libc_tmpnam_r)(char *buf)
-/*[[[body:libc_tmpnam_r]]]*/
-/*AUTO*/{
-	return buf ? tmpnam(buf) : NULL;
-}
-/*[[[end:libc_tmpnam_r]]]*/
-
 /*[[[head:libc_fcloseall,hash:CRC-32=0x35bbcabc]]]*/
 /* >> fcloseall(3)
  * Close all opened files */
@@ -3526,117 +3484,6 @@ again:
 /*[[[end:libc_fcloseall]]]*/
 
 
-struct memopen_cookie {
-	byte_t *moc_base; /* [1..1] Base-pointer */
-	byte_t *moc_cur;  /* [1..1] Current position */
-	byte_t *moc_end;  /* [1..1] End-pointer */
-};
-
-PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memopen") ssize_t LIBCCALL
-memopen_read(void *cookie, void *buf, size_t num_bytes) {
-	size_t maxlen;
-	struct memopen_cookie *me;
-	me = (struct memopen_cookie *)cookie;
-	maxlen = (size_t)(me->moc_end - me->moc_cur);
-	if (maxlen > num_bytes)
-		maxlen = num_bytes;
-	memcpy(buf, me->moc_cur, maxlen);
-	me->moc_cur += maxlen;
-	return (size_t)maxlen;
-}
-
-PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memopen") ssize_t LIBCCALL
-memopen_write(void *cookie, void const *buf, size_t num_bytes) {
-	size_t maxlen;
-	struct memopen_cookie *me;
-	me = (struct memopen_cookie *)cookie;
-	maxlen = (size_t)(me->moc_end - me->moc_cur);
-	if (maxlen > num_bytes)
-		maxlen = num_bytes;
-	memcpy(me->moc_cur, buf, maxlen);
-	me->moc_cur += maxlen;
-	return (size_t)maxlen;
-}
-
-PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memopen") off64_t LIBCCALL
-memopen_seek(void *cookie, off64_t off, int whence) {
-	pos64_t newpos;
-	struct memopen_cookie *me;
-	size_t maxlen;
-	me = (struct memopen_cookie *)cookie;
-	newpos = (pos64_t)off;
-	maxlen = (size_t)(me->moc_end - me->moc_cur);
-	switch (whence) {
-
-	case SEEK_SET:
-		break;
-
-	case SEEK_CUR:
-		newpos += (size_t)(me->moc_cur - me->moc_base);
-		if ((off64_t)newpos < 0)
-			goto err_EOVERFLOW;
-		break;
-
-	case SEEK_END:
-		newpos += maxlen;
-		if ((off64_t)newpos < 0)
-			goto err_EOVERFLOW;
-		break;
-
-	default:
-		return (off64_t)libc_seterrno(EINVAL);
-	}
-	if (newpos > maxlen)
-		newpos = maxlen;
-	me->moc_cur = me->moc_base + (size_t)newpos;
-	return (off64_t)newpos;
-err_EOVERFLOW:
-	return (off64_t)libc_seterrno(EOVERFLOW);
-}
-
-PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memopen") int LIBCCALL
-memopen_close(void *cookie) {
-	free(cookie);
-	return 0;
-}
-
-
-
-/*[[[head:libc_fmemopen,hash:CRC-32=0xd9a94561]]]*/
-/* >> fmemopen(3) */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED NONNULL((1, 3)) FILE *
-NOTHROW_NCX(LIBCCALL libc_fmemopen)(void *mem,
-                                    size_t len,
-                                    char const *modes)
-/*[[[body:libc_fmemopen]]]*/
-{
-	/* TODO: This function can be fully implemented via magic! */
-	FILE *result;
-	uint32_t flags;
-	struct memopen_cookie *magic;
-	magic = (struct memopen_cookie *)malloc(sizeof(struct memopen_cookie));
-	if unlikely(!magic)
-		return NULL;
-	magic->moc_base = (byte_t *)mem;
-	magic->moc_cur  = (byte_t *)mem;
-	magic->moc_end  = (byte_t *)mem + len;
-	/* Open a custom file-stream. */
-	flags  = file_evalmodes(modes, NULL);
-	result = funopen2_64(magic,
-	                     &memopen_read,
-	                     flags & IO_RW ? &memopen_write
-	                                   : NULL,
-	                     &memopen_seek,
-	                     NULL,
-	                     &memopen_close);
-	if unlikely(!result)
-		free(magic);
-	return result;
-}
-/*[[[end:libc_fmemopen]]]*/
-
-
-
 /*[[[impl:libc__filbuf]]]*/
 /*[[[impl:libc__flsbuf]]]*/
 DEFINE_INTERN_ALIAS(libc__filbuf, libc_fgetc_unlocked);
@@ -3656,6 +3503,19 @@ NOTHROW_NCX(LIBCCALL libc_tmpnam)(char *buf)
 }
 /*[[[end:libc_tmpnam]]]*/
 
+/*[[[head:libd_tmpnam,hash:CRC-32=0x9ddb7cb7]]]*/
+/* >> tmpnam(3), tmpnam_r(3) */
+INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED NONNULL((1)) char *
+NOTHROW_NCX(LIBDCALL libd_tmpnam)(char *buf)
+/*[[[body:libd_tmpnam]]]*/
+/*AUTO*/{
+	(void)buf;
+	CRT_UNIMPLEMENTEDF("tmpnam(%q)", buf); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:libd_tmpnam]]]*/
+
 /*[[[head:libc_tempnam,hash:CRC-32=0x898712d2]]]*/
 /* >> tempnam(3) */
 INTERN ATTR_SECTION(".text.crt.fs.utility") ATTR_MALLOC WUNUSED char *
@@ -3671,6 +3531,21 @@ NOTHROW_NCX(LIBCCALL libc_tempnam)(char const *dir,
 }
 /*[[[end:libc_tempnam]]]*/
 
+/*[[[head:libc_tmpfile,hash:CRC-32=0xe9ec4ee6]]]*/
+/* >> tmpfile(3), tmpfile64(3)
+ * Create and return a new file-stream for accessing a temporary file for reading/writing */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED FILE *
+NOTHROW_RPC(LIBCCALL libc_tmpfile)(void)
+/*[[[body:libc_tmpfile]]]*/
+/*AUTO*/{
+	CRT_UNIMPLEMENTED("tmpfile"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:libc_tmpfile]]]*/
+
+/*[[[impl:libc_tmpfile64]]]*/
+DEFINE_INTERN_ALIAS(libc_tmpfile64, libc_tmpfile);
 
 /*[[[head:libc__rmtmp,hash:CRC-32=0xbda88955]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") int
@@ -3700,7 +3575,6 @@ NOTHROW_NCX(LIBCCALL libc_obstack_vprintf)(struct obstack *__restrict obstack_,
 	return 0;
 }
 /*[[[end:libc_obstack_vprintf]]]*/
-
 
 /*[[[head:libc__get_output_format,hash:CRC-32=0x399b2fa1]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") WUNUSED uint32_t
@@ -3992,7 +3866,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x1f5824cb]]]*/
+/*[[[start:exports,hash:CRC-32=0x25afd884]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$__rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$rename, libd_rename);
@@ -4055,7 +3929,6 @@ DEFINE_PUBLIC_ALIAS(DOS$renameat, libd_renameat);
 DEFINE_PUBLIC_ALIAS(renameat, libc_renameat);
 DEFINE_PUBLIC_ALIAS(DOS$renameat2, libd_renameat2);
 DEFINE_PUBLIC_ALIAS(renameat2, libc_renameat2);
-DEFINE_PUBLIC_ALIAS(tmpnam_r, libc_tmpnam_r);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_fflush_nolock, libc_fflush_unlocked);
 #endif /* __LIBCCALL_IS_LIBDCALL */
@@ -4082,7 +3955,6 @@ DEFINE_PUBLIC_ALIAS(_fileno, libc_fileno);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(fileno_unlocked, libc_fileno);
 DEFINE_PUBLIC_ALIAS(fileno, libc_fileno);
-DEFINE_PUBLIC_ALIAS(fmemopen, libc_fmemopen);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_lock_file, libc_flockfile);
 #endif /* __LIBCCALL_IS_LIBDCALL */

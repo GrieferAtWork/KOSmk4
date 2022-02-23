@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ee2c8a2 */
+/* HASH CRC-32:0x9d4c57f3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -130,8 +130,6 @@ INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBDCALL libd_renameat2)(fd_t oldfd, char
  *   - `AT_RENAME_EXCHANGE'  --> `RENAME_EXCHANGE'
  *   - `AT_RENAME_WHITEOUT'  --> `RENAME_WHITEOUT' */
 INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBCCALL libc_renameat2)(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags);
-/* >> tmpnam(3), tmpnam_r(3) */
-INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_tmpnam_r)(char *buf);
 /* >> fflush_unlocked(3)
  * Same as `fflush()', but performs I/O without acquiring a lock to `stream' */
 INTDEF int (LIBCCALL libc_fflush_unlocked)(FILE *stream) THROWS(...);
@@ -157,8 +155,6 @@ INTDEF WUNUSED NONNULL((2)) FILE *NOTHROW_NCX(LIBCCALL libc_fdopen)(fd_t fd, cha
 /* >> fileno(3)
  * Return the underlying file descriptor number used by `stream' */
 INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBCCALL libc_fileno)(FILE *__restrict stream);
-/* >> fmemopen(3) */
-INTDEF WUNUSED NONNULL((1, 3)) FILE *NOTHROW_NCX(LIBCCALL libc_fmemopen)(void *mem, size_t len, char const *modes);
 /* >> flockfile(3)
  * Acquire a lock to `stream' and block until doing so succeeds */
 INTDEF NONNULL((1)) void NOTHROW_RPC(LIBCCALL libc_flockfile)(FILE *__restrict stream);

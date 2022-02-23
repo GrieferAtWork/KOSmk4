@@ -616,6 +616,7 @@ incdir("");
 #include <kos/bits/fastexcept.h>
 #include <kos/bits/futex-expr.h>
 #include <kos/bits/lockop.h>
+#include <kos/bits/nopf.h>
 #include <kos/bits/rtm.h>
 #include <kos/bits/shared-lock.h>
 #include <kos/bits/shared-rwlock.h>
@@ -686,6 +687,7 @@ incdir("");
 #include <kos/malloc.h>
 #include <kos/malloca.h>
 #include <kos/net/printf.h>
+#include <kos/nopf.h>
 #include <kos/parts/malloca.h>
 #include <kos/personality.h>
 #include <kos/refcnt-nonatomic.h>

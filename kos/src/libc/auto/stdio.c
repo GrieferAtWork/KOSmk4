@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38eb794e */
+/* HASH CRC-32:0x1a2dbbab */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -706,6 +706,11 @@ NOTHROW_RPC(LIBCCALL libc_removeat)(fd_t dirfd,
 	return result;
 #endif /* !__AT_REMOVEREG */
 }
+/* >> tmpnam(3), tmpnam_r(3) */
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) char *
+NOTHROW_NCX(LIBCCALL libc_tmpnam_r)(char *buf) {
+	return buf ? libc_tmpnam(buf) : NULL;
+}
 #include <asm/crt/stdio.h>
 /* >> setbuffer(3)
  * Specify the location and size for the buffer to-be used by `stream' */
@@ -726,6 +731,124 @@ NOTHROW_NCX(LIBCCALL libc_setlinebuf)(FILE *__restrict stream) {
 }
 #include <hybrid/typecore.h>
 #include <libc/errno.h>
+#include <asm/os/stdio.h>
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+struct __memopen_cookie {
+	byte_t *moc_base; /* [1..1] Base-pointer */
+	byte_t *moc_cur;  /* [1..1] Current position */
+	byte_t *moc_end;  /* [1..1] End-pointer */
+};
+
+__LOCAL_LIBC(memopen_read) ssize_t LIBCCALL
+memopen_read(void *cookie, void *buf, size_t num_bytes) {
+	size_t maxlen;
+	struct __memopen_cookie *me;
+	me = (struct __memopen_cookie *)cookie;
+	maxlen = (size_t)(me->moc_end - me->moc_cur);
+	if (maxlen > num_bytes)
+		maxlen = num_bytes;
+	libc_memcpy(buf, me->moc_cur, maxlen);
+	me->moc_cur += maxlen;
+	return (size_t)maxlen;
+}
+
+__LOCAL_LIBC(memopen_write) ssize_t LIBCCALL
+memopen_write(void *cookie, void const *buf, size_t num_bytes) {
+	size_t maxlen;
+	struct __memopen_cookie *me;
+	me = (struct __memopen_cookie *)cookie;
+	maxlen = (size_t)(me->moc_end - me->moc_cur);
+	if (maxlen > num_bytes)
+		maxlen = num_bytes;
+	libc_memcpy(me->moc_cur, buf, maxlen);
+	me->moc_cur += maxlen;
+	return (size_t)maxlen;
+}
+
+__LOCAL_LIBC(memopen_seek) off64_t LIBCCALL
+memopen_seek(void *cookie, off64_t off, int whence) {
+	pos64_t newpos;
+	struct __memopen_cookie *me;
+	size_t maxlen;
+	me = (struct __memopen_cookie *)cookie;
+	newpos = (pos64_t)off;
+	maxlen = (size_t)(me->moc_end - me->moc_cur);
+	switch (whence) {
+
+	case SEEK_SET:
+		break;
+
+	case SEEK_CUR:
+		newpos += (size_t)(me->moc_cur - me->moc_base);
+		if unlikely((off64_t)newpos < 0)
+			goto err_EOVERFLOW;
+		break;
+
+	case SEEK_END:
+		newpos += maxlen;
+		if unlikely((off64_t)newpos < 0)
+			goto err_EOVERFLOW;
+		break;
+
+	default:
+#ifdef EINVAL
+		return (off64_t)libc_seterrno(EINVAL);
+#else /* EINVAL */
+		return (off64_t)libc_seterrno(1);
+#endif /* !EINVAL */
+	}
+	if (newpos > maxlen)
+		newpos = maxlen;
+	me->moc_cur = me->moc_base + (size_t)newpos;
+	return (off64_t)newpos;
+err_EOVERFLOW:
+#ifdef EOVERFLOW
+	return (off64_t)libc_seterrno(EOVERFLOW);
+#else /* EOVERFLOW */
+	return (off64_t)libc_seterrno(1);
+#endif /* !EOVERFLOW */
+}
+
+__LOCAL_LIBC(memopen_close) int LIBCCALL
+memopen_close(void *cookie) {
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	libc_free(cookie);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+	return 0;
+}
+__NAMESPACE_LOCAL_END
+/* >> fmemopen(3) */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED NONNULL((1, 3)) FILE *
+NOTHROW_NCX(LIBCCALL libc_fmemopen)(void *mem,
+                                    size_t len,
+                                    char const *modes) {
+	FILE *result;
+	struct __NAMESPACE_LOCAL_SYM __memopen_cookie *magic;
+	magic = (struct __NAMESPACE_LOCAL_SYM __memopen_cookie *)libc_malloc(sizeof(struct __NAMESPACE_LOCAL_SYM __memopen_cookie));
+	if unlikely(!magic)
+		return NULL;
+	magic->moc_base = (byte_t *)mem;
+	magic->moc_cur  = (byte_t *)mem;
+	magic->moc_end  = (byte_t *)mem + len;
+	/* Open a custom file-stream. */
+	result = libc_funopen2_64(magic,
+	                     &__NAMESPACE_LOCAL_SYM memopen_read,
+	                     (libc_strchr(modes, 'w') || libc_strchr(modes, '+'))
+	                     ? &__NAMESPACE_LOCAL_SYM memopen_write
+	                     : NULL,
+	                     &__NAMESPACE_LOCAL_SYM memopen_seek,
+	                     NULL,
+	                     &__NAMESPACE_LOCAL_SYM memopen_close);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+	if unlikely(!result)
+		libc_free(magic);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+	return result;
+}
+#include <hybrid/typecore.h>
+#include <libc/errno.h>
+#include <bits/types.h>
 #include <asm/os/stdio.h>
 #include <hybrid/__overflow.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -4171,9 +4294,11 @@ DEFINE_PUBLIC_ALIAS(DOS$dprintf, libd_dprintf);
 DEFINE_PUBLIC_ALIAS(dprintf, libc_dprintf);
 DEFINE_PUBLIC_ALIAS(DOS$removeat, libd_removeat);
 DEFINE_PUBLIC_ALIAS(removeat, libc_removeat);
+DEFINE_PUBLIC_ALIAS(tmpnam_r, libc_tmpnam_r);
 DEFINE_PUBLIC_ALIAS(_IO_setbuffer, libc_setbuffer);
 DEFINE_PUBLIC_ALIAS(setbuffer, libc_setbuffer);
 DEFINE_PUBLIC_ALIAS(setlinebuf, libc_setlinebuf);
+DEFINE_PUBLIC_ALIAS(fmemopen, libc_fmemopen);
 DEFINE_PUBLIC_ALIAS(open_memstream, libc_open_memstream);
 DEFINE_PUBLIC_ALIAS(__getdelim, libc_getdelim);
 DEFINE_PUBLIC_ALIAS(_IO_getdelim, libc_getdelim);

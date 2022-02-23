@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4efa4a53 */
+/* HASH CRC-32:0x90a34b10 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2672,8 +2672,14 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,fileno,(__FI
 #endif /* __USE_POSIX || __USE_DOS */
 
 #ifdef __USE_XOPEN2K8
+#ifdef __CRT_HAVE_fmemopen
 /* >> fmemopen(3) */
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__FILE *,__NOTHROW_NCX,fmemopen,(void *__mem, __SIZE_TYPE__ __len, char const *__modes),(__mem,__len,__modes))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__FILE *,__NOTHROW_NCX,fmemopen,(void *__mem, __SIZE_TYPE__ __len, char const *__modes),(__mem,__len,__modes))
+#elif (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && ((defined(__CRT_HAVE_funopen2) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_funopen2_64) || defined(__CRT_HAVE_funopen2))
+#include <libc/local/stdio/fmemopen.h>
+/* >> fmemopen(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(fmemopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __FILE *__NOTHROW_NCX(__LIBCCALL fmemopen)(void *__mem, __SIZE_TYPE__ __len, char const *__modes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmemopen))(__mem, __len, __modes); })
+#endif /* ... */
 #ifdef __CRT_HAVE_open_memstream
 /* >> open_memstream(3) */
 __CDECLARE(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,open_memstream,(char **__bufloc, __SIZE_TYPE__ *__sizeloc),(__bufloc,__sizeloc))

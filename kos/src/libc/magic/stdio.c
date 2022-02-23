@@ -1741,7 +1741,7 @@ int renameat2($fd_t oldfd, [[nonnull]] char const *oldname,
 
 %
 %#ifdef __USE_MISC
-[[wunused, userimpl, requires_function(tmpnam)]]
+[[wunused, requires_function(tmpnam)]]
 [[section(".text.crt{|.dos}.fs.utility"), doc_alias("tmpnam")]]
 char *tmpnam_r([[nonnull]] char *buf) {
 	return buf ? tmpnam(buf) : NULL;
@@ -1923,15 +1923,129 @@ $fd_t fileno([[nonnull]] $FILE *__restrict stream);
 %[default:section(".text.crt{|.dos}.FILE.locked.access")]
 
 @@>> fmemopen(3)
+[[requires($has_function(malloc, funopen2_64))]]
+[[dependency(malloc, strchr, funopen2_64, memcpy)]]
 [[wunused, decl_include("<hybrid/typecore.h>")]]
+[[impl_include("<hybrid/typecore.h>", "<libc/errno.h>")]]
+[[impl_include("<asm/os/stdio.h>", "<bits/types.h>")]]
+[[impl_prefix(
+@@push_namespace(local)@@
+struct __memopen_cookie {
+	byte_t *moc_base; /* [1..1] Base-pointer */
+	byte_t *moc_cur;  /* [1..1] Current position */
+	byte_t *moc_end;  /* [1..1] End-pointer */
+};
+
+__LOCAL_LIBC(@memopen_read@) ssize_t LIBCCALL
+memopen_read(void *cookie, void *buf, size_t num_bytes) {
+	size_t maxlen;
+	struct __memopen_cookie *me;
+	me = (struct __memopen_cookie *)cookie;
+	maxlen = (size_t)(me->moc_end - me->moc_cur);
+	if (maxlen > num_bytes)
+		maxlen = num_bytes;
+	memcpy(buf, me->moc_cur, maxlen);
+	me->moc_cur += maxlen;
+	return (size_t)maxlen;
+}
+
+__LOCAL_LIBC(@memopen_write@) ssize_t LIBCCALL
+memopen_write(void *cookie, void const *buf, size_t num_bytes) {
+	size_t maxlen;
+	struct __memopen_cookie *me;
+	me = (struct __memopen_cookie *)cookie;
+	maxlen = (size_t)(me->moc_end - me->moc_cur);
+	if (maxlen > num_bytes)
+		maxlen = num_bytes;
+	memcpy(me->moc_cur, buf, maxlen);
+	me->moc_cur += maxlen;
+	return (size_t)maxlen;
+}
+
+__LOCAL_LIBC(@memopen_seek@) off64_t LIBCCALL
+memopen_seek(void *cookie, off64_t off, int whence) {
+	pos64_t newpos;
+	struct __memopen_cookie *me;
+	size_t maxlen;
+	me = (struct __memopen_cookie *)cookie;
+	newpos = (pos64_t)off;
+	maxlen = (size_t)(me->moc_end - me->moc_cur);
+	switch (whence) {
+
+	case SEEK_SET:
+		break;
+
+	case SEEK_CUR:
+		newpos += (size_t)(me->moc_cur - me->moc_base);
+		if unlikely((off64_t)newpos < 0)
+			goto err_EOVERFLOW;
+		break;
+
+	case SEEK_END:
+		newpos += maxlen;
+		if unlikely((off64_t)newpos < 0)
+			goto err_EOVERFLOW;
+		break;
+
+	default:
+@@pp_ifdef EINVAL@@
+		return (off64_t)libc_seterrno(EINVAL);
+@@pp_else@@
+		return (off64_t)libc_seterrno(1);
+@@pp_endif@@
+	}
+	if (newpos > maxlen)
+		newpos = maxlen;
+	me->moc_cur = me->moc_base + (size_t)newpos;
+	return (off64_t)newpos;
+err_EOVERFLOW:
+@@pp_ifdef EOVERFLOW@@
+	return (off64_t)libc_seterrno(EOVERFLOW);
+@@pp_else@@
+	return (off64_t)libc_seterrno(1);
+@@pp_endif@@
+}
+
+__LOCAL_LIBC(@memopen_close@) int LIBCCALL
+memopen_close(void *cookie) {
+@@pp_if $has_function(free)@@
+	free(cookie);
+@@pp_endif@@
+	return 0;
+}
+@@pop_namespace@@
+)]]
 $FILE *fmemopen([[inoutp(len)]] void *mem, $size_t len,
-                [[nonnull]] char const *modes);
+                [[nonnull]] char const *modes) {
+	FILE *result;
+	struct __NAMESPACE_LOCAL_SYM __memopen_cookie *magic;
+	magic = (struct __NAMESPACE_LOCAL_SYM __memopen_cookie *)malloc(sizeof(struct __NAMESPACE_LOCAL_SYM __memopen_cookie));
+	if unlikely(!magic)
+		return NULL;
+	magic->moc_base = (byte_t *)mem;
+	magic->moc_cur  = (byte_t *)mem;
+	magic->moc_end  = (byte_t *)mem + len;
+	/* Open a custom file-stream. */
+	result = funopen2_64(magic,
+	                     &__NAMESPACE_LOCAL_SYM memopen_read,
+	                     (strchr(modes, 'w') || strchr(modes, '+'))
+	                     ? &__NAMESPACE_LOCAL_SYM memopen_write
+	                     : NULL,
+	                     &__NAMESPACE_LOCAL_SYM memopen_seek,
+	                     NULL,
+	                     &__NAMESPACE_LOCAL_SYM memopen_close);
+@@pp_if $has_function(free)@@
+	if unlikely(!result)
+		free(magic);
+@@pp_endif@@
+	return result;
+}
 
 @@>> open_memstream(3)
 [[wunused, decl_include("<hybrid/typecore.h>")]]
 [[requires($has_function(malloc, funopen2_64) && ($has_function(recalloc) || $has_function(realloc)))]]
 [[dependency(memcpy, bzero, malloc, realloc, recalloc, funopen2_64, free)]]
-[[impl_include("<hybrid/typecore.h>", "<libc/errno.h>")]]
+[[impl_include("<hybrid/typecore.h>", "<libc/errno.h>", "<bits/types.h>")]]
 [[impl_include("<asm/os/stdio.h>", "<hybrid/__overflow.h>")]]
 [[impl_prefix(
 @@push_namespace(local)@@
