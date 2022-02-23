@@ -177,8 +177,8 @@ NOTHROW_NCX(LIBCCALL libc_uselocale)(locale_t dataset)
 }
 /*[[[end:libc_uselocale]]]*/
 
-/*[[[head:libc__lock_locales,hash:CRC-32=0x85869cb8]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") void
+/*[[[head:libc__lock_locales,hash:CRC-32=0xddd288bb]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.i18n") void
 NOTHROW_NCX(LIBCCALL libc__lock_locales)(void)
 /*[[[body:libc__lock_locales]]]*/
 /*AUTO*/{
@@ -187,8 +187,8 @@ NOTHROW_NCX(LIBCCALL libc__lock_locales)(void)
 }
 /*[[[end:libc__lock_locales]]]*/
 
-/*[[[head:libc__unlock_locales,hash:CRC-32=0x2085ad0f]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") void
+/*[[[head:libc__unlock_locales,hash:CRC-32=0x117272e5]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.i18n") void
 NOTHROW_NCX(LIBCCALL libc__unlock_locales)(void)
 /*[[[body:libc__unlock_locales]]]*/
 /*AUTO*/{
@@ -197,8 +197,8 @@ NOTHROW_NCX(LIBCCALL libc__unlock_locales)(void)
 }
 /*[[[end:libc__unlock_locales]]]*/
 
-/*[[[head:libc__configthreadlocale,hash:CRC-32=0x754bc758]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") int
+/*[[[head:libc__configthreadlocale,hash:CRC-32=0x83708372]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.i18n") int
 NOTHROW_NCX(LIBCCALL libc__configthreadlocale)(int flag)
 /*[[[body:libc__configthreadlocale]]]*/
 /*AUTO*/{
@@ -209,8 +209,8 @@ NOTHROW_NCX(LIBCCALL libc__configthreadlocale)(int flag)
 }
 /*[[[end:libc__configthreadlocale]]]*/
 
-/*[[[head:libc__get_current_locale,hash:CRC-32=0xbdf8ddd2]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") locale_t
+/*[[[head:libc__get_current_locale,hash:CRC-32=0x66b52f40]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.i18n") locale_t
 NOTHROW_NCX(LIBCCALL libc__get_current_locale)(void)
 /*[[[body:libc__get_current_locale]]]*/
 /*AUTO*/{
@@ -220,8 +220,8 @@ NOTHROW_NCX(LIBCCALL libc__get_current_locale)(void)
 }
 /*[[[end:libc__get_current_locale]]]*/
 
-/*[[[head:libc__create_locale,hash:CRC-32=0x7410c28a]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") locale_t
+/*[[[head:libc__create_locale,hash:CRC-32=0xb7dc98df]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.i18n") locale_t
 NOTHROW_NCX(LIBCCALL libc__create_locale)(int category,
                                           char const *locale)
 /*[[[body:libc__create_locale]]]*/
@@ -234,8 +234,8 @@ NOTHROW_NCX(LIBCCALL libc__create_locale)(int category,
 }
 /*[[[end:libc__create_locale]]]*/
 
-/*[[[head:libc__free_locale,hash:CRC-32=0xc5492888]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") void
+/*[[[head:libc__free_locale,hash:CRC-32=0x1e04da1a]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.i18n") void
 NOTHROW_NCX(LIBCCALL libc__free_locale)(locale_t locale)
 /*[[[body:libc__free_locale]]]*/
 /*AUTO*/{
@@ -259,8 +259,8 @@ NOTHROW_NCX(LIBDCALL libd__wsetlocale)(int category,
 }
 /*[[[end:libd__wsetlocale]]]*/
 
-/*[[[head:libc__wsetlocale,hash:CRC-32=0x8a15ef92]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") char32_t *
+/*[[[head:libc__wsetlocale,hash:CRC-32=0x49d9b5c7]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.i18n") char32_t *
 NOTHROW_NCX(LIBKCALL libc__wsetlocale)(int category,
                                        char32_t const *locale)
 /*[[[body:libc__wsetlocale]]]*/
@@ -287,8 +287,8 @@ NOTHROW_NCX(LIBDCALL libd__wcreate_locale)(int category,
 }
 /*[[[end:libd__wcreate_locale]]]*/
 
-/*[[[head:libc__wcreate_locale,hash:CRC-32=0x38ddf7e1]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") locale_t
+/*[[[head:libc__wcreate_locale,hash:CRC-32=0xb94fc068]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.i18n") locale_t
 NOTHROW_NCX(LIBKCALL libc__wcreate_locale)(int category,
                                            char32_t const *locale)
 /*[[[body:libc__wcreate_locale]]]*/
@@ -312,8 +312,8 @@ NOTHROW_NCX(LIBDCALL libd____lc_locale_name_func)(void)
 }
 /*[[[end:libd____lc_locale_name_func]]]*/
 
-/*[[[head:libc____lc_locale_name_func,hash:CRC-32=0x5c1f74fe]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") WUNUSED char32_t **
+/*[[[head:libc____lc_locale_name_func,hash:CRC-32=0xa0c056e4]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.i18n") WUNUSED char32_t **
 NOTHROW_NCX(LIBKCALL libc____lc_locale_name_func)(void)
 /*[[[body:libc____lc_locale_name_func]]]*/
 /*AUTO*/{
@@ -323,8 +323,8 @@ NOTHROW_NCX(LIBKCALL libc____lc_locale_name_func)(void)
 }
 /*[[[end:libc____lc_locale_name_func]]]*/
 
-/*[[[head:libc____lc_codepage_func,hash:CRC-32=0x8efeeef0]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") WUNUSED unsigned int
+/*[[[head:libc____lc_codepage_func,hash:CRC-32=0x22a37f2a]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.i18n") WUNUSED unsigned int
 NOTHROW_NCX(LIBCCALL libc____lc_codepage_func)(void)
 /*[[[body:libc____lc_codepage_func]]]*/
 {
@@ -336,30 +336,10 @@ NOTHROW_NCX(LIBCCALL libc____lc_codepage_func)(void)
 DEFINE_INTERN_ALIAS(libc____lc_collate_cp_func, libc____lc_codepage_func);
 /*[[[impl:libc____lc_collate_cp_func]]]*/
 
-/*[[[head:libc__Getdays,hash:CRC-32=0x95013a8b]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") WUNUSED char *
-NOTHROW_NCX(LIBCCALL libc__Getdays)(void)
-/*[[[body:libc__Getdays]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("_Getdays"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc__Getdays]]]*/
 
-/*[[[head:libc__Getmonths,hash:CRC-32=0x2ee2add9]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") WUNUSED char *
-NOTHROW_NCX(LIBCCALL libc__Getmonths)(void)
-/*[[[body:libc__Getmonths]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("_Getmonths"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc__Getmonths]]]*/
 
-/*[[[head:libc__Gettnames,hash:CRC-32=0x4358ee98]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") WUNUSED void *
+/*[[[head:libc__Gettnames,hash:CRC-32=0x29ddface]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.i18n") WUNUSED void *
 NOTHROW_NCX(LIBCCALL libc__Gettnames)(void)
 /*[[[body:libc__Gettnames]]]*/
 /*AUTO*/{
@@ -369,49 +349,9 @@ NOTHROW_NCX(LIBCCALL libc__Gettnames)(void)
 }
 /*[[[end:libc__Gettnames]]]*/
 
-/*[[[head:libd__W_Getdays,hash:CRC-32=0xbfe75543]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.i18n") WUNUSED char16_t *
-NOTHROW_NCX(LIBDCALL libd__W_Getdays)(void)
-/*[[[body:libd__W_Getdays]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("DOS$_W_Getdays"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libd__W_Getdays]]]*/
 
-/*[[[head:libc__W_Getdays,hash:CRC-32=0x2e980c35]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") WUNUSED char32_t *
-NOTHROW_NCX(LIBKCALL libc__W_Getdays)(void)
-/*[[[body:libc__W_Getdays]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("_W_Getdays"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc__W_Getdays]]]*/
 
-/*[[[head:libd__W_Getmonths,hash:CRC-32=0xf0cca6b0]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.i18n") WUNUSED char16_t *
-NOTHROW_NCX(LIBDCALL libd__W_Getmonths)(void)
-/*[[[body:libd__W_Getmonths]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("DOS$_W_Getmonths"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libd__W_Getmonths]]]*/
 
-/*[[[head:libc__W_Getmonths,hash:CRC-32=0x9b1e00ef]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") WUNUSED char32_t *
-NOTHROW_NCX(LIBKCALL libc__W_Getmonths)(void)
-/*[[[body:libc__W_Getmonths]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("_W_Getmonths"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc__W_Getmonths]]]*/
 
 /*[[[head:libd__W_Gettnames,hash:CRC-32=0x5626e8b7]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.i18n") WUNUSED void *
@@ -424,8 +364,8 @@ NOTHROW_NCX(LIBDCALL libd__W_Gettnames)(void)
 }
 /*[[[end:libd__W_Gettnames]]]*/
 
-/*[[[head:libc__W_Gettnames,hash:CRC-32=0x9a4c4e62]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") WUNUSED void *
+/*[[[head:libc__W_Gettnames,hash:CRC-32=0x6c770a48]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.i18n") WUNUSED void *
 NOTHROW_NCX(LIBKCALL libc__W_Gettnames)(void)
 /*[[[body:libc__W_Gettnames]]]*/
 /*AUTO*/{
@@ -435,8 +375,8 @@ NOTHROW_NCX(LIBKCALL libc__W_Gettnames)(void)
 }
 /*[[[end:libc__W_Gettnames]]]*/
 
-/*[[[head:libc__Strftime,hash:CRC-32=0x8c143096]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") NONNULL((3, 4)) size_t
+/*[[[head:libc__Strftime,hash:CRC-32=0x2cda4718]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.i18n") NONNULL((3, 4)) size_t
 NOTHROW_NCX(LIBCCALL libc__Strftime)(char *buf,
                                      size_t bufsize,
                                      char const *format,
@@ -475,8 +415,8 @@ NOTHROW_NCX(LIBDCALL libd__Wcsftime)(char16_t *buf,
 }
 /*[[[end:libd__Wcsftime]]]*/
 
-/*[[[head:libc__Wcsftime,hash:CRC-32=0x89dee8d4]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") NONNULL((3, 4)) size_t
+/*[[[head:libc__Wcsftime,hash:CRC-32=0xbd6571cb]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.i18n") NONNULL((3, 4)) size_t
 NOTHROW_NCX(LIBKCALL libc__Wcsftime)(char32_t *buf,
                                      size_t bufsize,
                                      char32_t const *format,
@@ -499,7 +439,7 @@ NOTHROW_NCX(LIBKCALL libc__Wcsftime)(char32_t *buf,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xa42cf58c]]]*/
+/*[[[start:exports,hash:CRC-32=0x8c949b1e]]]*/
 DEFINE_PUBLIC_ALIAS(setlocale, libc_setlocale);
 DEFINE_PUBLIC_ALIAS(localeconv, libc_localeconv);
 DEFINE_PUBLIC_ALIAS(__newlocale, libc_newlocale);
@@ -527,13 +467,7 @@ DEFINE_PUBLIC_ALIAS(DOS$___lc_locale_name_func, libd____lc_locale_name_func);
 DEFINE_PUBLIC_ALIAS(___lc_locale_name_func, libc____lc_locale_name_func);
 DEFINE_PUBLIC_ALIAS(___lc_codepage_func, libc____lc_codepage_func);
 DEFINE_PUBLIC_ALIAS(___lc_collate_cp_func, libc____lc_collate_cp_func);
-DEFINE_PUBLIC_ALIAS(_Getdays, libc__Getdays);
-DEFINE_PUBLIC_ALIAS(_Getmonths, libc__Getmonths);
 DEFINE_PUBLIC_ALIAS(_Gettnames, libc__Gettnames);
-DEFINE_PUBLIC_ALIAS(DOS$_W_Getdays, libd__W_Getdays);
-DEFINE_PUBLIC_ALIAS(_W_Getdays, libc__W_Getdays);
-DEFINE_PUBLIC_ALIAS(DOS$_W_Getmonths, libd__W_Getmonths);
-DEFINE_PUBLIC_ALIAS(_W_Getmonths, libc__W_Getmonths);
 DEFINE_PUBLIC_ALIAS(DOS$_W_Gettnames, libd__W_Gettnames);
 DEFINE_PUBLIC_ALIAS(_W_Gettnames, libc__W_Gettnames);
 DEFINE_PUBLIC_ALIAS(_Strftime, libc__Strftime);

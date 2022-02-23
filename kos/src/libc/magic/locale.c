@@ -251,6 +251,8 @@ $locale_t uselocale($locale_t dataset);
 #define _DISABLE_PER_THREAD_LOCALE_NEW    0x0200
 }
 
+%[default:section(".text.crt.dos.i18n")]
+
 void _lock_locales(void);
 void _unlock_locales(void);
 int _configthreadlocale(int flag);
@@ -270,11 +272,146 @@ void _free_locale($locale_t locale);
 [[wunused]] unsigned int ___lc_codepage_func(void);
 [[wunused]] unsigned int ___lc_collate_cp_func(void);
 
-[[wunused]] char *_Getdays(void);
-[[wunused]] char *_Getmonths(void);
+[[wunused, requires_function(nl_langinfo, malloc)]]
+[[impl_include("<asm/crt/langinfo.h>")]]
+char *_Getdays(void) {
+	/* Essentially, we do:
+	 * >> strdup(":Sun:Sunday:Mon:Monday:Tue:Tuesday:Wed:Wednesday:Thu:Thursday:Fri:Friday:Sat:Saturday") */
+	size_t len = 0;
+	unsigned int i;
+	char *result;
+	for (i = 0; i < 7; ++i) {
+		char const *p;
+		len += 2; /* 2x ':' */
+		if ((p = nl_langinfo(_NL_TIME_ABDAY_1 + i)) != NULL)
+			len += strlen(p);
+		if ((p = nl_langinfo(_NL_TIME_DAY_1 + i)) != NULL)
+			len += strlen(p);
+	}
+	result = (char *)malloc((len + 1) * sizeof(char));
+	if likely(result) {
+		char *dst = result;
+		for (i = 0; i < 7; ++i) {
+			char const *p;
+			*dst++ = ':';
+			if ((p = nl_langinfo(_NL_TIME_ABDAY_1 + i)) != NULL)
+				dst = stpcpy(dst, p);
+			*dst++ = ':';
+			if ((p = nl_langinfo(_NL_TIME_DAY_1 + i)) != NULL)
+				dst = stpcpy(dst, p);
+		}
+		*dst++ = '\0';
+	}
+	return result;
+}
+
+[[wunused, requires_function(nl_langinfo, malloc)]]
+[[wchar, impl_include("<asm/crt/langinfo.h>")]]
+$wchar_t *_W_Getdays(void) {
+	/* Essentially, we do:
+	 * >> wcsdup(L":Sun:Sunday:Mon:Monday:Tue:Tuesday:Wed:Wednesday:Thu:Thursday:Fri:Friday:Sat:Saturday") */
+	size_t len = 0;
+	unsigned int i;
+	$wchar_t *result;
+	for (i = 0; i < 7; ++i) {
+		char const *p;
+		len += 2; /* 2x ':' */
+		if ((p = nl_langinfo(_NL_TIME_ABDAY_1 + i)) != NULL)
+			len += strlen(p);
+		if ((p = nl_langinfo(_NL_TIME_DAY_1 + i)) != NULL)
+			len += strlen(p);
+	}
+	result = ($wchar_t *)malloc((len + 1) * sizeof($wchar_t));
+	if likely(result) {
+		$wchar_t *dst = result;
+		for (i = 0; i < 7; ++i) {
+			unsigned int id;
+			for (id = 0; id < 2; ++id) {
+				char const *p;
+				*dst++ = ':';
+				if ((p = nl_langinfo(id ? (_NL_TIME_DAY_1 + i)
+				                        : (_NL_TIME_ABDAY_1 + i))) != NULL) {
+					while (*p)
+						*dst++ = ($wchar_t)(unsigned char)*p++;
+				}
+			}
+		}
+		*dst++ = ($wchar_t)'\0';
+	}
+	return result;
+}
+
+[[wunused, requires_function(nl_langinfo, malloc)]]
+[[impl_include("<asm/crt/langinfo.h>")]]
+char *_Getmonths(void) {
+	/* Essentially, we do:
+	 * >> strdup(":Jan:January:Feb:February:Mar:March:Apr:April:May:May:Jun:June:Jul:July:Aug:August:Sep:September:Oct:October:Nov:November:Dec:December") */
+	size_t len = 0;
+	unsigned int i;
+	char *result;
+	for (i = 0; i < 12; ++i) {
+		char const *p;
+		len += 2; /* 2x ':' */
+		if ((p = nl_langinfo(_NL_TIME_ABMON_1 + i)) != NULL)
+			len += strlen(p);
+		if ((p = nl_langinfo(_NL_TIME_MON_1 + i)) != NULL)
+			len += strlen(p);
+	}
+	result = (char *)malloc((len + 1) * sizeof(char));
+	if likely(result) {
+		char *dst = result;
+		for (i = 0; i < 12; ++i) {
+			char const *p;
+			*dst++ = ':';
+			if ((p = nl_langinfo(_NL_TIME_ABMON_1 + i)) != NULL)
+				dst = stpcpy(dst, p);
+			*dst++ = ':';
+			if ((p = nl_langinfo(_NL_TIME_MON_1 + i)) != NULL)
+				dst = stpcpy(dst, p);
+		}
+		*dst++ = '\0';
+	}
+	return result;
+}
+
+[[wunused, requires_function(nl_langinfo, malloc)]]
+[[wchar, impl_include("<asm/crt/langinfo.h>")]]
+$wchar_t *_W_Getmonths(void) {
+	/* Essentially, we do:
+	 * >> wcsdup(L":Jan:January:Feb:February:Mar:March:Apr:April:May:May:Jun:June:Jul:July:Aug:August:Sep:September:Oct:October:Nov:November:Dec:December") */
+	size_t len = 0;
+	unsigned int i;
+	$wchar_t *result;
+	for (i = 0; i < 12; ++i) {
+		char const *p;
+		len += 2; /* 2x ':' */
+		if ((p = nl_langinfo(_NL_TIME_ABMON_1 + i)) != NULL)
+			len += strlen(p);
+		if ((p = nl_langinfo(_NL_TIME_MON_1 + i)) != NULL)
+			len += strlen(p);
+	}
+	result = ($wchar_t *)malloc((len + 1) * sizeof($wchar_t));
+	if likely(result) {
+		$wchar_t *dst = result;
+		for (i = 0; i < 12; ++i) {
+			unsigned int id;
+			for (id = 0; id < 2; ++id) {
+				char const *p;
+				*dst++ = ':';
+				if ((p = nl_langinfo(id ? (_NL_TIME_MON_1 + i)
+				                        : (_NL_TIME_ABMON_1 + i))) != NULL) {
+					while (*p)
+						*dst++ = ($wchar_t)(unsigned char)*p++;
+				}
+			}
+		}
+		*dst++ = ($wchar_t)'\0';
+	}
+	return result;
+}
+
+
 [[wunused]] void *_Gettnames(void);
-[[wchar, wunused]] $wchar_t *_W_Getdays(void);
-[[wchar, wunused]] $wchar_t *_W_Getmonths(void);
 [[wchar, wunused]] void *_W_Gettnames(void);
 
 $size_t _Strftime(char *buf, $size_t bufsize, [[nonnull]] char const *format,

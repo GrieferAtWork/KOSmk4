@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f098dd9 */
+/* HASH CRC-32:0xe84bb306 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,12 +33,8 @@
 #define __stub__CrtSetReportHook2
 #define __stub__CrtSetReportHookW2
 #define __stub__CrtSetReportMode
-#define __stub__Getdays
-#define __stub__Getmonths
 #define __stub__Gettnames
 #define __stub__Strftime
-#define __stub__W_Getdays
-#define __stub__W_Getmonths
 #define __stub__W_Gettnames
 #define __stub__Wcsftime
 #define __stub____lc_locale_name_func
@@ -742,8 +738,6 @@
 #define __stub_y1
 #define __stub___yn
 #define __stub_yn
-#define __stub_DOS$_W_Getdays
-#define __stub_DOS$_W_Getmonths
 #define __stub_DOS$_W_Gettnames
 #define __stub_DOS$_Wcsftime
 #define __stub_DOS$___lc_locale_name_func

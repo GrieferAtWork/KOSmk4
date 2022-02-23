@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x606740bd */
+/* HASH CRC-32:0xfaea4fa5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,13 +73,7 @@ INTDEF WUNUSED char16_t **NOTHROW_NCX(LIBDCALL libd____lc_locale_name_func)(void
 INTDEF WUNUSED char32_t **NOTHROW_NCX(LIBKCALL libc____lc_locale_name_func)(void);
 INTDEF WUNUSED unsigned int NOTHROW_NCX(LIBCCALL libc____lc_codepage_func)(void);
 INTDEF WUNUSED unsigned int NOTHROW_NCX(LIBCCALL libc____lc_collate_cp_func)(void);
-INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc__Getdays)(void);
-INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc__Getmonths)(void);
 INTDEF WUNUSED void *NOTHROW_NCX(LIBCCALL libc__Gettnames)(void);
-INTDEF WUNUSED char16_t *NOTHROW_NCX(LIBDCALL libd__W_Getdays)(void);
-INTDEF WUNUSED char32_t *NOTHROW_NCX(LIBKCALL libc__W_Getdays)(void);
-INTDEF WUNUSED char16_t *NOTHROW_NCX(LIBDCALL libd__W_Getmonths)(void);
-INTDEF WUNUSED char32_t *NOTHROW_NCX(LIBKCALL libc__W_Getmonths)(void);
 INTDEF WUNUSED void *NOTHROW_NCX(LIBDCALL libd__W_Gettnames)(void);
 INTDEF WUNUSED void *NOTHROW_NCX(LIBKCALL libc__W_Gettnames)(void);
 INTDEF NONNULL((3, 4)) size_t NOTHROW_NCX(LIBCCALL libc__Strftime)(char *buf, size_t bufsize, char const *format, struct tm const *tms, void *lc_time_arg);

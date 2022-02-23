@@ -850,7 +850,7 @@ struct environ_special_struct {
  *    when used as path separator in DOS paths)
  *  - When "/" isn't bound to a DOS drive, replace the leading
  *    "/" with "\\unix\", thus turning the entire path into  a
- *    universal unix path (s.a. `path_traverse_ex()')
+ *    universal unix path (s.a. kernel:`path_traverse_ex()')
  *
  * However, still need to ask the kernel for the DOS name of "/"
  */

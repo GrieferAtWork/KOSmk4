@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68f6fdad */
+/* HASH CRC-32:0x55cbbdf7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,6 +58,16 @@ INTDEF locale_t NOTHROW_NCX(LIBDCALL libd_uselocale)(locale_t dataset);
 INTDEF int NOTHROW_NCX(LIBDCALL libd__configthreadlocale)(int flag);
 INTDEF locale_t NOTHROW_NCX(LIBDCALL libd__create_locale)(int category, char const *locale);
 INTDEF void NOTHROW_NCX(LIBDCALL libd__free_locale)(locale_t locale);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc__Getdays)(void);
+INTDEF WUNUSED char16_t *NOTHROW_NCX(LIBDCALL libd__W_Getdays)(void);
+INTDEF WUNUSED char32_t *NOTHROW_NCX(LIBKCALL libc__W_Getdays)(void);
+INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc__Getmonths)(void);
+INTDEF WUNUSED char16_t *NOTHROW_NCX(LIBDCALL libd__W_Getmonths)(void);
+INTDEF WUNUSED char32_t *NOTHROW_NCX(LIBKCALL libc__W_Getmonths)(void);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((3, 4)) size_t NOTHROW_NCX(LIBDCALL libd__Strftime)(char *buf, size_t bufsize, char const *format, struct tm const *tms, void *lc_time_arg);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 

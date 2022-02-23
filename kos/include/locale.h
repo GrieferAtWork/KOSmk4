@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xece8f4e8 */
+/* HASH CRC-32:0xc2ced8ca */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -305,11 +305,31 @@ __CDECLARE_OPT(,__locale_t,__NOTHROW_NCX,_wcreate_locale,(int __category, __WCHA
 __CDECLARE_OPT(__ATTR_WUNUSED,__WCHAR_TYPE__ **,__NOTHROW_NCX,___lc_locale_name_func,(void),())
 __CDECLARE_OPT(__ATTR_WUNUSED,unsigned int,__NOTHROW_NCX,___lc_codepage_func,(void),())
 __CDECLARE_OPT(__ATTR_WUNUSED,unsigned int,__NOTHROW_NCX,___lc_collate_cp_func,(void),())
-__CDECLARE_OPT(__ATTR_WUNUSED,char *,__NOTHROW_NCX,_Getdays,(void),())
-__CDECLARE_OPT(__ATTR_WUNUSED,char *,__NOTHROW_NCX,_Getmonths,(void),())
+#ifdef __CRT_HAVE__Getdays
+__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,_Getdays,(void),())
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
+#include <libc/local/locale/_Getdays.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_Getdays, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL _Getdays)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_Getdays))(); })
+#endif /* ... */
+#ifdef __CRT_HAVE__W_Getdays
+__CDECLARE(__ATTR_WUNUSED,__WCHAR_TYPE__ *,__NOTHROW_NCX,_W_Getdays,(void),())
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
+#include <libc/local/locale/_W_Getdays.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_W_Getdays, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __WCHAR_TYPE__ *__NOTHROW_NCX(__LIBCCALL _W_Getdays)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_W_Getdays))(); })
+#endif /* ... */
+#ifdef __CRT_HAVE__Getmonths
+__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,_Getmonths,(void),())
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
+#include <libc/local/locale/_Getmonths.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_Getmonths, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL _Getmonths)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_Getmonths))(); })
+#endif /* ... */
+#ifdef __CRT_HAVE__W_Getmonths
+__CDECLARE(__ATTR_WUNUSED,__WCHAR_TYPE__ *,__NOTHROW_NCX,_W_Getmonths,(void),())
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
+#include <libc/local/locale/_W_Getmonths.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_W_Getmonths, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __WCHAR_TYPE__ *__NOTHROW_NCX(__LIBCCALL _W_Getmonths)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_W_Getmonths))(); })
+#endif /* ... */
 __CDECLARE_OPT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,_Gettnames,(void),())
-__CDECLARE_OPT(__ATTR_WUNUSED,__WCHAR_TYPE__ *,__NOTHROW_NCX,_W_Getdays,(void),())
-__CDECLARE_OPT(__ATTR_WUNUSED,__WCHAR_TYPE__ *,__NOTHROW_NCX,_W_Getmonths,(void),())
 __CDECLARE_OPT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,_W_Gettnames,(void),())
 __CDECLARE_OPT(__ATTR_NONNULL((3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,_Strftime,(char *__buf, __SIZE_TYPE__ __bufsize, char const *__format, struct tm const *__tms, void *__lc_time_arg),(__buf,__bufsize,__format,__tms,__lc_time_arg))
 __CDECLARE_OPT(__ATTR_NONNULL((3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,_Wcsftime,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __WCHAR_TYPE__ const *__format, struct tm const *__tms, void *__lc_time_arg),(__buf,__bufsize,__format,__tms,__lc_time_arg))
