@@ -151,27 +151,6 @@ task_alloc(struct mman *__restrict task_mman)
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL task_destroy)(struct task *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct task, t_refcnt, task_destroy)
-
-
-/* Generic prototype for the main-function of a kernel thread. */
-typedef void (KCALL *thread_main_t)();
-
-/* Setup  `thread'  to become  a  kernel-space thread
- * calling `thread_main' with the provided arguments.
- * TODO: Re-design this function so we don't leak uninitialized tasks through the mman
- * >> void KCALL kernel_main(char *a, char *b) {
- * >>      ....
- * >> }
- * >>
- * >> struct task *thread = task_alloc(&mman_kernel);
- * >> task_setup_kernel(thread, (thread_main_t)&kernel_main, "foo", "bar", NULL);
- * >> task_start(thread, TASK_START_FNORMAL);
- * >> decref(thread);
- * `thread_main' returning will automatically call `task_exit()' */
-FUNDEF NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct task *
-NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
-                                 thread_main_t thread_main,
-                                 size_t argc DFL(0), ...);
 #endif /* __CC__ */
 
 

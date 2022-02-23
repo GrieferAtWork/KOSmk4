@@ -117,22 +117,34 @@
                                                      * Note that during  an exec() credentials  are unshared  unconditionally. */
 #endif /* !CLONE_CRED && __CLONE_CRED */
 
+
 #ifdef __CC__
 DECL_BEGIN
 
+struct task_clone_kargs {
+	int             (*tck_main)(); /* [1..1] Thread main function (auto-calls `task_exit()' on return) */
+	size_t            tck_argc;    /* # of arguments taken by `tck_main' */
+	__builtin_va_list tck_args;    /* Arguments for `tck_main' */
+};
+
 struct task_clone_args {
-	uint64_t                    tca_flags;       /* Set of `CLONE_*' */
-	USER UNCHECKED fd_t        *tca_pidfd;       /* [valid_if(CLONE_PIDFD)] Where to store pidfd */
-	USER UNCHECKED pid_t       *tca_child_tid;   /* [valid_if(CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID)] Store child TID here in child memory */
-	USER UNCHECKED pid_t       *tca_parent_tid;  /* [valid_if(CLONE_PARENT_SETTID)] Store child TID here in parent memory */
-	signo_t                     tca_exit_signal; /* [type(signo_t)] Signal to send to parent on child exit */
-	USER UNCHECKED void        *tca_stack;       /* Child stack starting address */
-	USER UNCHECKED pid_t const *tca_set_tid;     /* [0..tca_set_tid] set-tid array base */
-	size_t                      tca_set_tid_siz; /* set-tid array length */
-	fd_t                        tca_cgroup;      /* [valid_if(CLONE_INTO_CGROUP)] cgroup file descriptor */
+	uint64_t                            tca_flags;       /* Set of `CLONE_*' */
+	signo_t                             tca_exit_signal; /* [type(signo_t)] Signal to send to parent on child exit */
+	union {
+		struct task_clone_kargs         tca_kthread;     /* [valid_if(init_state == NULL)] */
+		struct {
+			USER UNCHECKED fd_t        *tca_pidfd;       /* [valid_if(CLONE_PIDFD)] Where to store pidfd */
+			USER UNCHECKED pid_t       *tca_child_tid;   /* [valid_if(CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID)] Store child TID here in child memory */
+			USER UNCHECKED pid_t       *tca_parent_tid;  /* [valid_if(CLONE_PARENT_SETTID)] Store child TID here in parent memory */
+			USER UNCHECKED void        *tca_stack;       /* Child stack starting address */
+			USER UNCHECKED pid_t const *tca_set_tid;     /* [0..tca_set_tid] set-tid array base */
+			size_t                      tca_set_tid_siz; /* set-tid array length */
+			fd_t                        tca_cgroup;      /* [valid_if(CLONE_INTO_CGROUP)] cgroup file descriptor */
 #ifdef ARCH_HAVE_ARCH_TASK_CLONE_ARGS
-	struct arch_task_clone_args tca_arch;        /* Arch-specific */
+			struct arch_task_clone_args tca_arch;        /* Arch-specific */
 #endif /* ARCH_HAVE_ARCH_TASK_CLONE_ARGS */
+		};
+	};
 };
 
 #ifdef ARCH_HAVE_ARCH_TASK_CLONE_ARGS
@@ -151,17 +163,39 @@ struct task_clone_args {
 
 /* High-level implementation for the `clone(2)' system call.
  * @param: init_state: The CPU state of the thead that called `clone(2)'
- * @param: args:       Clone arguments.
- * @param: ARCH_CLONE__PARAMS: Additional, arch-specific parameters */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL
-task_clone(struct icpustate const *__restrict init_state,
-           struct task_clone_args const *__restrict args)
+ *                     Pass `NULL' to spawn a new kernel thread.
+ * @param: args:       Clone arguments. */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) REF struct task *FCALL
+task_clone(struct icpustate const *init_state,
+           struct task_clone_args *__restrict args)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+
+/* Create and start a new kernel thread.
+ * >> static int my_tmain(int a, int b) {
+ * >>     printk(KERN_TRACE "my_tmain(%d, %d)\n", a, b);
+ * >>     return 0;
+ * >> }
+ * >> void spawn_thread() {
+ * >>     decref(task_clone_kthread((int (*)())(void *)&my_tmain, 2, 10, 20));
+ * >> }
+ * @param: thread_main: thread entry point (`task_exit(return)' is called upon return)
+ * @param: argc:        # of arguments to pass to `thread_main' (via its stack)
+ * @param: ...:         Variable arguments for `thread_main' */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *VCALL
+task_clone_kthread(int (*thread_main)(), size_t argc, ...)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 
 
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
+
+/* Arch-specific function  to construct  the initial  scpustate
+ * that will execute the function descriptor encoded by `args'. */
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct scpustate *
+NOTHROW(FCALL task_clone_setup_kthread)(struct task *__restrict thread, void *ksp,
+                                        struct task_clone_kargs *__restrict args);
+
 
 /* Define a per-task relocation that must be initialized as:
  * >> struct task *thread = THREAD_TO_INITIALIZE;

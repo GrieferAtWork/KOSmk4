@@ -22,7 +22,4 @@
 
 #include <kernel/compiler.h>
 
-#define ARCH_CLONE__PARAMS /* No additional arguments */
-#define ARCH_CLONE__ARGS   /* No additional arguments */
-
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_ARCH_TASK_CLONE_H */

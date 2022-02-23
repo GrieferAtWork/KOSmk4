@@ -461,6 +461,20 @@ PUBLIC_FUNCTION(cpu_run_current_nopr)
 END(cpu_run_current_nopr)
 
 
+.section .text
+	.cfi_startproc
+	/* TODO: CFI annotation to say that there is no return address */
+	/* TODO: CFI annotation for custom catch-all-and-dump-to-syslog exception handler */
+	nop
+PUBLIC_FUNCTION(x86_kthread_exit)
+	movP   %Pax, %R_fcall0P
+	EXTERN(task_exit)
+	call   task_exit
+	nop
+END(x86_kthread_exit)
+	.cfi_endproc
+
+
 
 
 #ifndef CONFIG_NO_SMP

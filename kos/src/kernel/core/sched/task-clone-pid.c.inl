@@ -19,8 +19,8 @@
  */
 #ifdef __INTELLISENSE__
 #include "task-clone.c"
-//#define DEFINE_task_clone_thrdpid
-#define DEFINE_task_clone_procpid
+#define DEFINE_task_clone_thrdpid
+//#define DEFINE_task_clone_procpid
 #endif /* __INTELLISENSE__ */
 
 #include <kos/nopf.h>

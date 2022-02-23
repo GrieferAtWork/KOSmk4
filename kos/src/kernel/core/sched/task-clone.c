@@ -62,6 +62,7 @@
 
 #include <assert.h>
 #include <signal.h>
+#include <stdarg.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -406,16 +407,12 @@ DECL_BEGIN
 
 
 /* High-level implementation for the `clone(2)' system call.
- * @param: init_state:    The CPU state of the thead that called `clone(2)'
- * @param: clone_flags:   Set of `CLONE_*' (as defined in <sched.h>)
- * @param: parent_tidptr: [valid_if(CLONE_PARENT_SETTID)]
- *                        Store child TID here in parent process
- * @param: child_tidptr:  [valid_if(CLONE_CHILD_CLEARTID | CLONE_CHILD_SETTID)]
- *                        Store child TID here in child process
- * @param: ARCH_CLONE__PARAMS: Additional, arch-specific parameters */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *FCALL
-task_clone(struct icpustate const *__restrict init_state,
-           struct task_clone_args const *__restrict args)
+ * @param: init_state: The CPU state of the thead that called `clone(2)'
+ *                     Pass `NULL' to spawn a new kernel thread.
+ * @param: args:       Clone arguments. */
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((2)) REF struct task *FCALL
+task_clone(struct icpustate const *init_state,
+           struct task_clone_args *__restrict args)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	struct task *result;
 	struct task *caller = THIS_TASK;
@@ -448,20 +445,27 @@ task_clone(struct icpustate const *__restrict init_state,
 		/* Assign the thread's mman */
 		assert(result->t_mman == NULL);
 		if (clone_flags & (CLONE_VM | CLONE_VFORK)) {
-			if (!(clone_flags & CLONE_VM)) {
-				THROW(E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION,
-				      E_INVALID_ARGUMENT_CONTEXT_CLONE_VFORK_WITHOUT_VM,
-				      (syscall_ulong_t)clone_flags,
-				      CLONE_VM | CLONE_VFORK, CLONE_VFORK);
+			if unlikely(init_state == NULL) {
+				/* Since kernel threads are handled as children of /bin/init,
+				 * that's exactly who we act like being our parent thread. */
+				caller         = &boottask;
+				result->t_mman = incref(&mman_kernel);
+			} else {
+				if (!(clone_flags & CLONE_VM)) {
+					THROW(E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION,
+					      E_INVALID_ARGUMENT_CONTEXT_CLONE_VFORK_WITHOUT_VM,
+					      (syscall_ulong_t)clone_flags,
+					      CLONE_VM | CLONE_VFORK, CLONE_VFORK);
+				}
+				/* The mman is being shared */
+				result->t_mman = incref(caller->t_mman);
+				/* Set the VFORK flag to cause the thread to execute in VFORK-mode.
+				 * This must be done before we  start making the thread visible  to
+				 * other kernel components, since this also affects things such  as
+				 * the thread's effective signal mask. */
+				if (clone_flags & CLONE_VFORK)
+					result->t_flags |= TASK_FVFORK;
 			}
-			/* The mman is being shared */
-			result->t_mman = incref(caller->t_mman);
-			/* Set the VFORK flag to cause the thread to execute in VFORK-mode.
-			 * This must be done before we  start making the thread visible  to
-			 * other kernel components, since this also affects things such  as
-			 * the thread's effective signal mask. */
-			if (clone_flags & CLONE_VFORK)
-				result->t_flags |= TASK_FVFORK;
 		} else {
 			/* The new thread has its own mman */
 			result->t_mman = mman_fork();
@@ -577,6 +581,22 @@ again_release_kernel_and_cc:
 #else /* __ARCH_STACK_GROWS_DOWNWARDS */
 			kernel_stack = (KERNEL byte_t *)mnode_getaddr(&FORTASK(result, this_kernel_stacknode_));
 #endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
+
+			/* Handle special case of spawning a new kernel thread */
+			if unlikely(init_state == NULL) {
+				child_state = task_clone_setup_kthread(result, kernel_stack, &args->tca_kthread);
+				FORTASK(result, this_sstate) = child_state;
+				bzero(&FORTASK(result, this_user_except_handler),
+				      sizeof(struct user_except_handler));
+				FORTASK(result, this_fs)      = incref(&fs_kernel);
+				FORTASK(result, this_cred)    = incref(&cred_kernel);
+				FORTASK(result, this_handman) = incref(&handman_kernel);
+				sigfillset(&FORTASK(result, this_kernel_sigmask));
+				assert(FORTASK(result, this_sighand_ptr) == NULL);
+				assert(FORTASK(result, this_x86_ioperm_bitmap) == NULL);
+				result->t_flags |= TASK_FKERNTHREAD;
+				goto do_clone_pid;
+			}
 
 			/* Construct the initial scheduler CPU state from the caller-given `init_state' */
 #ifdef __x86_64__
@@ -738,6 +758,7 @@ again_release_kernel_and_cc:
 		 *    to die right  now, can we  say for certain  that we're allowed  to
 		 *    create  a  new  thread, rather  than  do something  else,  such as
 		 *    handling a signal. */
+do_clone_pid:
 		if unlikely(clone_flags & CLONE_PIDFD) {
 			fd_t pidfd;
 			struct handle_install_data install;
@@ -873,6 +894,36 @@ again_release_kernel_and_cc:
 	}
 	return result;
 }
+
+
+/* Create and start a new kernel thread.
+ * >> static int my_tmain(int a, int b) {
+ * >>     printk(KERN_TRACE "my_tmain(%d, %d)\n", a, b);
+ * >>     return 0;
+ * >> }
+ * >> void spawn_thread() {
+ * >>     decref(task_clone_kthread((int (*)())(void *)&my_tmain, 2, 10, 20));
+ * >> }
+ * @param: thread_main: thread entry point (`task_exit(return)' is called upon return)
+ * @param: argc:        # of arguments to pass to `thread_main' (via its stack)
+ * @param: ...:         Variable arguments for `thread_main' */
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct task *VCALL
+task_clone_kthread(int (*thread_main)(), size_t argc, ...)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	REF struct task *result;
+	struct task_clone_args cargs;
+	cargs.tca_flags            = CLONE_VM | CLONE_THREAD | CLONE_DETACHED;
+	cargs.tca_exit_signal      = SIGCHLD;
+	cargs.tca_kthread.tck_main = thread_main;
+	cargs.tca_kthread.tck_argc = argc;
+	va_start(cargs.tca_kthread.tck_args, argc);
+	RAII_FINALLY { va_end(cargs.tca_kthread.tck_args); };
+	result = task_clone(NULL, &cargs);
+	return result;
+}
+
+
+
 
 
 /* Per-task relocations */

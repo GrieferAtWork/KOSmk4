@@ -17,8 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_SCHED_CLONE_C
-#define GUARD_KERNEL_CORE_ARCH_I386_SCHED_CLONE_C 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_SCHED_TASK_CLONE_C
+#define GUARD_KERNEL_CORE_ARCH_I386_SCHED_TASK_CLONE_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -28,10 +29,12 @@
 #include <sched/task-clone.h>
 #include <sched/task.h>
 
+#include <asm/cpu-flags.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
 #include <signal.h>
+#include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -70,6 +73,88 @@ NOTHROW(KCALL x86_get_random_userkern_address32)(void) {
 }
 #endif /* __x86_64__ */
 #endif /* !CONFIG_NO_USERKERN_SEGMENT */
+
+
+DATDEF ATTR_PERTASK uintptr_t this_x86_kernel_psp0_ ASMNAME("this_x86_kernel_psp0");
+extern byte_t x86_kthread_exit[];
+
+
+/* Arch-specific function  to construct  the initial  scpustate
+ * that will execute the function descriptor encoded by `args'. */
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct scpustate *
+NOTHROW(FCALL task_clone_setup_kthread)(struct task *__restrict thread, void *ksp,
+                                        struct task_clone_kargs *__restrict args) {
+	struct scpustate *result;
+	FORTASK(thread, this_x86_kernel_psp0_) = (uintptr_t)ksp;
+
+#ifdef __x86_64__
+	/* Make space for arguments. */
+	if (args->tck_argc > 6)
+		ksp = (byte_t *)ksp - ((args->tck_argc - 6) * 8);
+
+	/* Push return address. */
+	ksp = (byte_t *)ksp - sizeof(u64);
+	*(u64 *)ksp = (u64)(void *)x86_kthread_exit;
+
+	result = (struct scpustate *)((byte_t *)ksp - SIZEOF_SCPUSTATE);
+
+	/* Initialize the thread's entry state. */
+	bzero(result, sizeof(*result));
+	result->scs_irregs.ir_cs     = SEGMENT_KERNEL_CODE;
+	result->scs_irregs.ir_ss     = SEGMENT_KERNEL_DATA0;
+	result->scs_irregs.ir_rsp    = (u64)ksp;
+	result->scs_irregs.ir_rflags = EFLAGS_IF;
+	result->scs_irregs.ir_rip    = (u64)(void *)args->tck_main;
+	result->scs_sgregs.sg_gs     = SEGMENT_USER_DATA_RPL; /* Doesn't really matter, but stick to the likely case of this being USER_GSBASE */
+	result->scs_sgregs.sg_fs     = SEGMENT_USER_DATA_RPL;
+	result->scs_sgregs.sg_es     = SEGMENT_USER_DATA_RPL;
+	result->scs_sgregs.sg_ds     = SEGMENT_USER_DATA_RPL;
+	result->scs_sgbase.sg_gsbase = (u64)thread;
+
+	/* Fill in arguments */
+	if (args->tck_argc >= 1)
+		result->scs_gpregs.gp_rdi = va_arg(args->tck_args, u64);
+	if (args->tck_argc >= 2)
+		result->scs_gpregs.gp_rsi = va_arg(args->tck_args, u64);
+	if (args->tck_argc >= 3)
+		result->scs_gpregs.gp_rdx = va_arg(args->tck_args, u64);
+	if (args->tck_argc >= 4)
+		result->scs_gpregs.gp_rcx = va_arg(args->tck_args, u64);
+	if (args->tck_argc >= 5)
+		result->scs_gpregs.gp_r8 = va_arg(args->tck_args, u64);
+	if (args->tck_argc >= 6)
+		result->scs_gpregs.gp_r9 = va_arg(args->tck_args, u64);
+	if (args->tck_argc > 6) {
+		size_t i;
+		for (i = 0; i < (args->tck_argc - 6); ++i)
+			((u64 *)ksp)[i] = va_arg(args->tck_args, u64);
+	}
+#else /* __x86_64__ */
+	/* Make space for arguments. */
+	ksp = (byte_t *)ksp - (args->tck_argc * 4);
+	ksp = memcpy(ksp, args->tck_args, args->tck_argc, 4);
+
+	/* Push return address. */
+	ksp = (byte_t *)ksp - sizeof(u32);
+	*(u32 *)ksp = (u32)(void *)x86_kthread_exit;
+
+	/* Allocate initial CPU state. */
+	ksp = (byte_t *)ksp - (OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL);
+	result = (struct scpustate *)ksp;
+	bzero(result, OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL);
+
+	/* Initialize the thread's entry state. */
+	result->scs_irregs_k.ir_cs     = SEGMENT_KERNEL_CODE;
+	result->scs_irregs_k.ir_eflags = EFLAGS_IF;
+	result->scs_irregs_k.ir_eip    = (u32)(void *)args->tck_main;
+	result->scs_sgregs.sg_gs       = SEGMENT_USER_GSBASE_RPL;
+	result->scs_sgregs.sg_fs       = SEGMENT_KERNEL_FSBASE;
+	result->scs_sgregs.sg_es       = SEGMENT_USER_DATA_RPL;
+	result->scs_sgregs.sg_ds       = SEGMENT_USER_DATA_RPL;
+#endif /* !__x86_64__ */
+	return result;
+}
+
 
 
 
@@ -171,4 +256,4 @@ DEFINE_SYSCALL32_5(pid_t, clone,
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_CLONE_C */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_TASK_CLONE_C */
