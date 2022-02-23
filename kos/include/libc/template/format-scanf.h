@@ -65,6 +65,7 @@ format_vscanf(__pformatgetc __FORMAT_PGETC,
 	__SSIZE_TYPE__ __temp = 0; /* XXX: Unused init! */
 	__BOOL __has_temp = 0;
 	__CHAR_TYPE __ch;
+	/* TODO: Support for positional arguments? */
 __next:
 	__ch = *__FORMAT_FORMAT++;
 	switch (__ch) {

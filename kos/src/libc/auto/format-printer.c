@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7fa76a3b */
+/* HASH CRC-32:0xbedca84d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,10 +38,14 @@ DECL_BEGIN
 #include "../libc/string.h"  /* Dependency of `#include <libc/template/format-printf.h>' */
 #include "../libc/unicode.h" /* Dependency of `#include <libc/template/format-scanf.h>' */
 /**/
+#include <hybrid/__assert.h> /* Dependency of `#include <libc/template/format-printf.h>' */
+#include <hybrid/__alloca.h> /* Dependency of `#include <libc/template/format-printf.h>' */
+
 #include <bits/math-constants.h>
+#include <bits/types.h> /* Dependency of `#include <libc/template/format-printf.h>' */
 
 #include <libc/template/itoa_digits.h> /* Dependency of `#include <libc/template/format-printf.h>' */
-#include <libdisasm/disassembler.h>
+#include <libdisasm/disassembler.h>    /* Dependency of `#include <libc/template/format-printf.h>' */
 #ifdef __KERNEL__
 #include <kernel/addr2line.h>
 #else /* __KERNEL__ */
@@ -565,6 +569,7 @@ err:
 	return temp;
 }
 #include <parts/printf-config.h>
+#include <bits/types.h>
 #include <libc/parts.uchar.string.h>
 #include <libc/errno.h>
 #include <hybrid/__assert.h>

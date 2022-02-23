@@ -36,15 +36,16 @@
 #define __LIBC __INTDEF
 
 /* Disable some format_printf() features that we're not using. */
-#define __NO_PRINTF_FLOATING_POINT 1 /* %f, %e, %g, %F, %E, %G */
-#define __NO_PRINTF_VINFO          1 /* %[vinfo] */
-#define __NO_PRINTF_GEN            1 /* %[gen] */
-#define __NO_PRINTF_DISASM         1 /* %[disasm] */
-#define __NO_PRINTF_HEX            1 /* %[hex] */
-#define __NO_PRINTF_UNICODE_CHARS  1 /* %I16c, %I32c, %Lc */
-#define __NO_PRINTF_UNICODE_STRING 1 /* %I16s, %I32s, %Ls */
-#define __NO_PRINTF_STRERROR       1 /* %m */
-#define __NO_SCANF_FLOATING_POINT  1 /* %f, %e, %g, %E, %a */
+#define __NO_PRINTF_FLOATING_POINT /* %f, %e, %g, %F, %E, %G */
+#define __NO_PRINTF_VINFO          /* %[vinfo] */
+#define __NO_PRINTF_GEN            /* %[gen] */
+#define __NO_PRINTF_DISASM         /* %[disasm] */
+#define __NO_PRINTF_HEX            /* %[hex] */
+#define __NO_PRINTF_UNICODE_CHARS  /* %I16c, %I32c, %Lc */
+#define __NO_PRINTF_UNICODE_STRING /* %I16s, %I32s, %Ls */
+#define __NO_PRINTF_STRERROR       /* %m */
+#define __NO_PRINTF_POSITIONAL     /* %1$s */
+#define __NO_SCANF_FLOATING_POINT  /* %f, %e, %g, %E, %a */
 
 /* Prevent the global variable  `__peb' from being defined  prematurely
  * (and breaking the visibility of us exporting that variable for real) */

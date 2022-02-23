@@ -25,38 +25,49 @@
 
 /* Disable unsupported/unwanted/unneeded printf() features */
 
-/* #define __NO_PRINTF_ESCAPE 1 */
-/* #define __NO_PRINTF_UNICODE_CHARS 1 */
-/* #define __NO_PRINTF_UNICODE_STRING 1 */
-/* #define __NO_PRINTF_STRERROR 1 */
-/* #define __NO_PRINTF_HEX 1 */
-/* #define __NO_PRINTF_GEN 1 */
-/* #define __NO_PRINTF_DISASM 1 */
-/* #define __NO_PRINTF_VINFO 1 */
-/* #define __NO_PRINTF_FLOATING_POINT 1 */
-/* #define __NO_SCANF_FLOATING_POINT 1 */
+/* #define __NO_PRINTF_ESCAPE         -- "%q" */
+/* #define __NO_PRINTF_UNICODE_CHARS  -- "%I16c", "%I32c" */
+/* #define __NO_PRINTF_UNICODE_STRING -- "%I16s", "%I32s" */
+/* #define __NO_PRINTF_STRERROR       -- "%m" */
+/* #define __NO_PRINTF_HEX            -- "%[hex]" */
+/* #define __NO_PRINTF_GEN            -- "%[gen]" */
+/* #define __NO_PRINTF_DISASM         -- "%[disasm]" */
+/* #define __NO_PRINTF_VINFO          -- "%[vinfo]" */
+/* #define __NO_PRINTF_FLOATING_POINT -- "%f" */
+/* #define __NO_PRINTF_POSITIONAL     -- "%1$s" */
+/* #define __NO_SCANF_FLOATING_POINT  -- "%f" */
 
 #if defined(__KOS__) && defined(__KERNEL__)
 #undef __NO_PRINTF_UNICODE_STRING
-#define __NO_PRINTF_UNICODE_STRING 1
+#define __NO_PRINTF_UNICODE_STRING
 #undef __NO_PRINTF_STRERROR
-#define __NO_PRINTF_STRERROR 1
+#define __NO_PRINTF_STRERROR
 #undef __NO_PRINTF_UNICODE_CHARS
-#define __NO_PRINTF_UNICODE_CHARS 1
+#define __NO_PRINTF_UNICODE_CHARS
 #undef __NO_PRINTF_DISASM
-#define __NO_PRINTF_DISASM 1
+#define __NO_PRINTF_DISASM
+//#undef __NO_PRINTF_POSITIONAL
+//#define __NO_PRINTF_POSITIONAL
 #elif !defined(__CRT_KOS) || !defined(__KOS__)
+#undef __NO_PRINTF_GEN
+#define __NO_PRINTF_GEN
 #undef __NO_PRINTF_DISASM
-#define __NO_PRINTF_DISASM 1
+#define __NO_PRINTF_DISASM
 #undef __NO_PRINTF_VINFO
-#define __NO_PRINTF_VINFO 1
+#define __NO_PRINTF_VINFO
+#undef __NO_PRINTF_HEX
+#define __NO_PRINTF_HEX
+#ifndef __CRT_GLC
+#undef __NO_PRINTF_POSITIONAL
+#define __NO_PRINTF_POSITIONAL
+#endif /* !__CRT_GLC */
 #endif /* !__CRT_KOS || !__KOS__ */
 
 #ifdef __NO_FPU
 #undef __NO_PRINTF_FLOATING_POINT
-#define __NO_PRINTF_FLOATING_POINT 1
+#define __NO_PRINTF_FLOATING_POINT
 #undef __NO_SCANF_FLOATING_POINT
-#define __NO_SCANF_FLOATING_POINT 1
+#define __NO_SCANF_FLOATING_POINT
 #endif /* __NO_FPU */
 
 

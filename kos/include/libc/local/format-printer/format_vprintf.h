@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34002559 */
+/* HASH CRC-32:0x14f2c61e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -280,11 +280,13 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_unicode_writeutf8_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/printf-config.h>
+#include <bits/types.h>
 #include <libc/template/itoa_digits.h>
 #include <libc/parts.uchar.string.h>
 #include <libc/string.h>
 #include <libc/errno.h>
 #include <hybrid/__assert.h>
+#include <hybrid/__alloca.h>
 #ifndef __NO_PRINTF_DISASM
 #if !defined(__KERNEL__) || !defined(__KOS__)
 #include <dlfcn.h>

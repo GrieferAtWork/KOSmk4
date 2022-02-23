@@ -33,7 +33,11 @@
 #define __COLL_WEIGHTS_MAX    255         /* The maximum number of weights that can be assigned to an entry of the LC_COLLATE `order' keyword in the locale definition file. */
 #define __CHARCLASS_NAME_MAX  2048        /* The maximum number of repeated occurrences of a regular expression permitted when using the interval notation `\{M,N\}'. */
 #define __RE_DUP_MAX          (-1)        /* The maximum number of bytes in a character class name. */
-#define __NL_ARGMAX           (-1)        /* Maximum number of positional arguments (e.g. "%1$d") in calls to `printf' or `scanf'. */
+#define __NL_ARGMAX           (-1)        /* <format-printf.h>: Maximum number of positional arguments (e.g. "%1$d") in calls to `printf' or `scanf'.
+                                           * Note that on KOS, we use  alloca() to allocate a sufficiently large  buffer (based on the greatest  used
+                                           * positional argument index). We don't  do additional validation here though,  meaning that in theory  you
+                                           * can use arbitrarily large positional argument indices, but if you go too over-board, you'll end up  with
+                                           * a stack overflow. */
 #define __NL_LANGMAX          (-1)        /* <libintl.h>: Maximum number of bytes in a `LANG' name. */
 #define __NL_MSGMAX           (-1)        /* Maximum message number. */
 #define __NL_NMAX             (-1)        /* Maximum number of bytes in N-to-1 collation mapping. */
