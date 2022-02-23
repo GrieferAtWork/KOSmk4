@@ -3731,7 +3731,7 @@ $FILE *funopen2_32(void const *cookie,
 @@push_namespace(local)@@
 #define ____funopen_holder_defined
 struct __funopen_holder {
-	void            *fh_cookie;                                                 /* [0..1] funopen readfn */
+	void            *fh_cookie;                                                 /* [?..?] funopen cookie */
 	int   (LIBKCALL *fh_readfn)(void *cookie, char *buf, int num_bytes);        /* [0..1] funopen readfn */
 	int   (LIBKCALL *fh_writefn)(void *cookie, char const *buf, int num_bytes); /* [0..1] funopen writefn */
 	off_t (LIBKCALL *fh_seekfn)(void *cookie, off_t off, int whence);           /* [0..1] funopen seekfn */

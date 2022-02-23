@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6555edb1 */
+/* HASH CRC-32:0x8ca43433 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -100,7 +100,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #define ____funopen_holder_defined
 struct __funopen_holder {
-	void            *__fh_cookie;                                                 /* [0..1] funopen readfn */
+	void            *__fh_cookie;                                                 /* [?..?] funopen cookie */
 	int   (__LIBKCALL *__fh_readfn)(void *__cookie, char *__buf, int __num_bytes);        /* [0..1] funopen readfn */
 	int   (__LIBKCALL *__fh_writefn)(void *__cookie, char const *__buf, int __num_bytes); /* [0..1] funopen writefn */
 	__FS_TYPE(off) (__LIBKCALL *__fh_seekfn)(void *__cookie, __FS_TYPE(off) __off, int __whence);           /* [0..1] funopen seekfn */

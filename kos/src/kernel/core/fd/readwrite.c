@@ -282,6 +282,7 @@ DEFINE_SYSCALL3(ssize_t, readv, fd_t, fd,
 	} else {
 		size_t i;
 		struct iov_entry *entries;
+		/* TODO: IOV_MAX limit (currently defined as "-1"; that should probably change...) */
 		entries = (struct iov_entry *)malloca(count, sizeof(struct iov_entry));
 		RAII_FINALLY { freea(entries); };
 		dst.iv_entc = count;
@@ -320,6 +321,7 @@ DEFINE_SYSCALL3(ssize_t, writev, fd_t, fd,
 	} else {
 		size_t i;
 		struct iov_entry *entries;
+		/* TODO: IOV_MAX limit (currently defined as "-1"; that should probably change...) */
 		entries = (struct iov_entry *)malloca(count, sizeof(struct iov_entry));
 		RAII_FINALLY { freea(entries); };
 		dst.iv_entc = count;
@@ -358,6 +360,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, readv, fd_t, fd,
 	else {
 		size_t i;
 		struct iov_entry *entries;
+		/* TODO: IOV_MAX limit (currently defined as "-1"; that should probably change...) */
 		entries = (struct iov_entry *)malloca(count, sizeof(struct iov_entry));
 		RAII_FINALLY { freea(entries); };
 		dst.iv_entc = count;
@@ -396,6 +399,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, writev, fd_t, fd,
 	} else {
 		size_t i;
 		struct iov_entry *entries;
+		/* TODO: IOV_MAX limit (currently defined as "-1"; that should probably change...) */
 		entries = (struct iov_entry *)malloca(count, sizeof(struct iov_entry));
 		RAII_FINALLY { freea(entries); };
 		dst.iv_entc = count;
@@ -441,6 +445,7 @@ DEFINE_SYSCALL4(ssize_t, preadv, fd_t, fd,
 	} else {
 		size_t i;
 		struct iov_entry *entries;
+		/* TODO: IOV_MAX limit (currently defined as "-1"; that should probably change...) */
 		entries = (struct iov_entry *)malloca(count, sizeof(struct iov_entry));
 		RAII_FINALLY { freea(entries); };
 		dst.iv_entc = count;
@@ -479,6 +484,7 @@ DEFINE_SYSCALL4(ssize_t, pwritev, fd_t, fd,
 	} else {
 		size_t i;
 		struct iov_entry *entries;
+		/* TODO: IOV_MAX limit (currently defined as "-1"; that should probably change...) */
 		entries = (struct iov_entry *)malloca(count, sizeof(struct iov_entry));
 		RAII_FINALLY { freea(entries); };
 		dst.iv_entc = count;
@@ -517,6 +523,7 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, preadv, fd_t, fd,
 	} else {
 		size_t i;
 		struct iov_entry *entries;
+		/* TODO: IOV_MAX limit (currently defined as "-1"; that should probably change...) */
 		entries = (struct iov_entry *)malloca(count, sizeof(struct iov_entry));
 		RAII_FINALLY { freea(entries); };
 		dst.iv_entc = count;
@@ -555,6 +562,7 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, pwritev, fd_t, fd,
 	} else {
 		size_t i;
 		struct iov_entry *entries;
+		/* TODO: IOV_MAX limit (currently defined as "-1"; that should probably change...) */
 		entries = (struct iov_entry *)malloca(count, sizeof(struct iov_entry));
 		RAII_FINALLY { freea(entries); };
 		dst.iv_entc = count;

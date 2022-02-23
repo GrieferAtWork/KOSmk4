@@ -249,20 +249,20 @@ local limits = {
 	(1, "NAME_MAX",                     "_POSIX_NAME_MAX",                     "14",       "Number of bytes in a filename."),
 	(1, "PATH_MAX",                     "_POSIX_PATH_MAX",                     "256",      "Number of bytes in a pathname."),
 	(0, "PIPE_BUF",                     "_POSIX_PIPE_BUF",                     "512",      "Number of bytes than can be written atomically to a pipe."),
-	(1, "RE_DUP_MAX",                   "_POSIX_RE_DUP_MAX",                   "255",      "The # of repeated occurrences of a BRE permitted by the REGEXEC and REGCOMP functions when using the interval notation."),
+	(1, "RE_DUP_MAX",                   "_POSIX_RE_DUP_MAX",                   "255",      "Max # of repeated occurrences of a BRE permitted by the REGEXEC and REGCOMP functions when using the interval notation."),
 	(1, "RTSIG_MAX",                    "_POSIX_RTSIG_MAX",                    "8",        "Minimal # of realtime signals reserved for the application."),
-	(0, "SEM_NSEMS_MAX",                "_POSIX_SEM_NSEMS_MAX",                "256",      "Number of semaphores a process can have."),
-	(0, "SEM_VALUE_MAX",                "_POSIX_SEM_VALUE_MAX",                "32767",    "Maximal value of a semaphore."),
+	(0, "SEM_NSEMS_MAX",                "_POSIX_SEM_NSEMS_MAX",                "256",      "<semaphore.h>: Number of semaphores a process can have."),
+	(0, "SEM_VALUE_MAX",                "_POSIX_SEM_VALUE_MAX",                "32767",    "<semaphore.h>: Maximal value of a semaphore."),
 	(0, "SIGQUEUE_MAX",                 "_POSIX_SIGQUEUE_MAX",                 "32",       "Number of pending realtime signals."),
-	(0, "STREAM_MAX",                   "_POSIX_STREAM_MAX",                   "8",        "Number of streams a process can have open at once."),
-	(0, "SYMLINK_MAX",                  "_POSIX_SYMLINK_MAX",                  "255",      "The # of bytes in a symbolic link."),
-	(1, "SYMLOOP_MAX",                  "_POSIX_SYMLOOP_MAX",                  "8",        "The # of symbolic links that can be traversed in the resolution of a pathname in the absence of a loop."),
+	(0, "STREAM_MAX",                   "_POSIX_STREAM_MAX",                   "8",        "<stdio.h>: Number of streams a process can have open at once."),
+	(0, "SYMLINK_MAX",                  "_POSIX_SYMLINK_MAX",                  "255",      "Max # of bytes in a symbolic link."),
+	(1, "SYMLOOP_MAX",                  "_POSIX_SYMLOOP_MAX",                  "8",        "Max # of symbolic links that can be traversed in the resolution of a pathname in the absence of a loop."),
 	(0, "TIMER_MAX",                    "_POSIX_TIMER_MAX",                    "32",       "Number of timer for a process."),
 	(0, "TTY_NAME_MAX",                 "_POSIX_TTY_NAME_MAX",                 "9",        "Maximum # of characters in a tty name."),
 	(0, "CLOCKRES_MIN",                 "_POSIX_CLOCKRES_MIN",                 "20000000", "Maximum clock resolution in nanoseconds."),
-	(0, "THREAD_KEYS_MAX",              "_POSIX_THREAD_KEYS_MAX",              "128",      "The # of data keys per process."),
-	(0, "THREAD_DESTRUCTOR_ITERATIONS", "_POSIX_THREAD_DESTRUCTOR_ITERATIONS", "4",        "Controlling the iterations of destructors for thread-specific data."),
-	(0, "THREAD_THREADS_MAX",           "_POSIX_THREAD_THREADS_MAX",           "64",       "The # of threads per process."),
+	(0, "THREAD_KEYS_MAX",              "_POSIX_THREAD_KEYS_MAX",              "128",      "<pthread.h>: Max # of data keys per process."),
+	(0, "THREAD_DESTRUCTOR_ITERATIONS", "_POSIX_THREAD_DESTRUCTOR_ITERATIONS", "4",        "<pthread.h>: Max # of iterations of destructors for thread-specific data."),
+	(0, "THREAD_THREADS_MAX",           "_POSIX_THREAD_THREADS_MAX",           "64",       "<pthread.h>: Max # of threads per process."),
 };
 
 local longestPosixNameLength    = limits.each[2].length > ...;
@@ -361,28 +361,28 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #define _POSIX_PIPE_BUF                     512      /* Number of bytes than can be written atomically to a pipe. */
 #endif /* !_POSIX_PIPE_BUF */
 #ifndef _POSIX_RE_DUP_MAX
-#define _POSIX_RE_DUP_MAX                   255      /* The # of repeated occurrences of a BRE permitted by the REGEXEC and REGCOMP functions when using the interval notation. */
+#define _POSIX_RE_DUP_MAX                   255      /* Max # of repeated occurrences of a BRE permitted by the REGEXEC and REGCOMP functions when using the interval notation. */
 #endif /* !_POSIX_RE_DUP_MAX */
 #ifndef _POSIX_RTSIG_MAX
 #define _POSIX_RTSIG_MAX                    8        /* Minimal # of realtime signals reserved for the application. */
 #endif /* !_POSIX_RTSIG_MAX */
 #ifndef _POSIX_SEM_NSEMS_MAX
-#define _POSIX_SEM_NSEMS_MAX                256      /* Number of semaphores a process can have. */
+#define _POSIX_SEM_NSEMS_MAX                256      /* <semaphore.h>: Number of semaphores a process can have. */
 #endif /* !_POSIX_SEM_NSEMS_MAX */
 #ifndef _POSIX_SEM_VALUE_MAX
-#define _POSIX_SEM_VALUE_MAX                32767    /* Maximal value of a semaphore. */
+#define _POSIX_SEM_VALUE_MAX                32767    /* <semaphore.h>: Maximal value of a semaphore. */
 #endif /* !_POSIX_SEM_VALUE_MAX */
 #ifndef _POSIX_SIGQUEUE_MAX
 #define _POSIX_SIGQUEUE_MAX                 32       /* Number of pending realtime signals. */
 #endif /* !_POSIX_SIGQUEUE_MAX */
 #ifndef _POSIX_STREAM_MAX
-#define _POSIX_STREAM_MAX                   8        /* Number of streams a process can have open at once. */
+#define _POSIX_STREAM_MAX                   8        /* <stdio.h>: Number of streams a process can have open at once. */
 #endif /* !_POSIX_STREAM_MAX */
 #ifndef _POSIX_SYMLINK_MAX
-#define _POSIX_SYMLINK_MAX                  255      /* The # of bytes in a symbolic link. */
+#define _POSIX_SYMLINK_MAX                  255      /* Max # of bytes in a symbolic link. */
 #endif /* !_POSIX_SYMLINK_MAX */
 #ifndef _POSIX_SYMLOOP_MAX
-#define _POSIX_SYMLOOP_MAX                  8        /* The # of symbolic links that can be traversed in the resolution of a pathname in the absence of a loop. */
+#define _POSIX_SYMLOOP_MAX                  8        /* Max # of symbolic links that can be traversed in the resolution of a pathname in the absence of a loop. */
 #endif /* !_POSIX_SYMLOOP_MAX */
 #ifndef _POSIX_TIMER_MAX
 #define _POSIX_TIMER_MAX                    32       /* Number of timer for a process. */
@@ -394,13 +394,13 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #define _POSIX_CLOCKRES_MIN                 20000000 /* Maximum clock resolution in nanoseconds. */
 #endif /* !_POSIX_CLOCKRES_MIN */
 #ifndef _POSIX_THREAD_KEYS_MAX
-#define _POSIX_THREAD_KEYS_MAX              128      /* The # of data keys per process. */
+#define _POSIX_THREAD_KEYS_MAX              128      /* <pthread.h>: Max # of data keys per process. */
 #endif /* !_POSIX_THREAD_KEYS_MAX */
 #ifndef _POSIX_THREAD_DESTRUCTOR_ITERATIONS
-#define _POSIX_THREAD_DESTRUCTOR_ITERATIONS 4        /* Controlling the iterations of destructors for thread-specific data. */
+#define _POSIX_THREAD_DESTRUCTOR_ITERATIONS 4        /* <pthread.h>: Max # of iterations of destructors for thread-specific data. */
 #endif /* !_POSIX_THREAD_DESTRUCTOR_ITERATIONS */
 #ifndef _POSIX_THREAD_THREADS_MAX
-#define _POSIX_THREAD_THREADS_MAX           64       /* The # of threads per process. */
+#define _POSIX_THREAD_THREADS_MAX           64       /* <pthread.h>: Max # of threads per process. */
 #endif /* !_POSIX_THREAD_THREADS_MAX */
 
 
@@ -460,28 +460,28 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #define __PIPE_BUF _POSIX_PIPE_BUF /* Number of bytes than can be written atomically to a pipe. */
 #endif /* !__PIPE_BUF */
 #ifndef __RE_DUP_MAX
-#define __RE_DUP_MAX _POSIX_RE_DUP_MAX /* The # of repeated occurrences of a BRE permitted by the REGEXEC and REGCOMP functions when using the interval notation. */
+#define __RE_DUP_MAX _POSIX_RE_DUP_MAX /* Max # of repeated occurrences of a BRE permitted by the REGEXEC and REGCOMP functions when using the interval notation. */
 #endif /* !__RE_DUP_MAX */
 #ifndef __RTSIG_MAX
 #define __RTSIG_MAX _POSIX_RTSIG_MAX /* Minimal # of realtime signals reserved for the application. */
 #endif /* !__RTSIG_MAX */
 #ifndef __SEM_NSEMS_MAX
-#define __SEM_NSEMS_MAX _POSIX_SEM_NSEMS_MAX /* Number of semaphores a process can have. */
+#define __SEM_NSEMS_MAX _POSIX_SEM_NSEMS_MAX /* <semaphore.h>: Number of semaphores a process can have. */
 #endif /* !__SEM_NSEMS_MAX */
 #ifndef __SEM_VALUE_MAX
-#define __SEM_VALUE_MAX _POSIX_SEM_VALUE_MAX /* Maximal value of a semaphore. */
+#define __SEM_VALUE_MAX _POSIX_SEM_VALUE_MAX /* <semaphore.h>: Maximal value of a semaphore. */
 #endif /* !__SEM_VALUE_MAX */
 #ifndef __SIGQUEUE_MAX
 #define __SIGQUEUE_MAX _POSIX_SIGQUEUE_MAX /* Number of pending realtime signals. */
 #endif /* !__SIGQUEUE_MAX */
 #ifndef __STREAM_MAX
-#define __STREAM_MAX _POSIX_STREAM_MAX /* Number of streams a process can have open at once. */
+#define __STREAM_MAX _POSIX_STREAM_MAX /* <stdio.h>: Number of streams a process can have open at once. */
 #endif /* !__STREAM_MAX */
 #ifndef __SYMLINK_MAX
-#define __SYMLINK_MAX _POSIX_SYMLINK_MAX /* The # of bytes in a symbolic link. */
+#define __SYMLINK_MAX _POSIX_SYMLINK_MAX /* Max # of bytes in a symbolic link. */
 #endif /* !__SYMLINK_MAX */
 #ifndef __SYMLOOP_MAX
-#define __SYMLOOP_MAX _POSIX_SYMLOOP_MAX /* The # of symbolic links that can be traversed in the resolution of a pathname in the absence of a loop. */
+#define __SYMLOOP_MAX _POSIX_SYMLOOP_MAX /* Max # of symbolic links that can be traversed in the resolution of a pathname in the absence of a loop. */
 #endif /* !__SYMLOOP_MAX */
 #ifndef __TIMER_MAX
 #define __TIMER_MAX _POSIX_TIMER_MAX /* Number of timer for a process. */
@@ -493,13 +493,13 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #define __CLOCKRES_MIN _POSIX_CLOCKRES_MIN /* Maximum clock resolution in nanoseconds. */
 #endif /* !__CLOCKRES_MIN */
 #ifndef __PTHREAD_KEYS_MAX
-#define __PTHREAD_KEYS_MAX _POSIX_THREAD_KEYS_MAX /* The # of data keys per process. */
+#define __PTHREAD_KEYS_MAX _POSIX_THREAD_KEYS_MAX /* <pthread.h>: Max # of data keys per process. */
 #endif /* !__PTHREAD_KEYS_MAX */
 #ifndef __PTHREAD_DESTRUCTOR_ITERATIONS
-#define __PTHREAD_DESTRUCTOR_ITERATIONS _POSIX_THREAD_DESTRUCTOR_ITERATIONS /* Controlling the iterations of destructors for thread-specific data. */
+#define __PTHREAD_DESTRUCTOR_ITERATIONS _POSIX_THREAD_DESTRUCTOR_ITERATIONS /* <pthread.h>: Max # of iterations of destructors for thread-specific data. */
 #endif /* !__PTHREAD_DESTRUCTOR_ITERATIONS */
 #ifndef __PTHREAD_THREADS_MAX
-#define __PTHREAD_THREADS_MAX _POSIX_THREAD_THREADS_MAX /* The # of threads per process. */
+#define __PTHREAD_THREADS_MAX _POSIX_THREAD_THREADS_MAX /* <pthread.h>: Max # of threads per process. */
 #endif /* !__PTHREAD_THREADS_MAX */
 
 
@@ -667,7 +667,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #endif /* ... */
 #endif /* !PIPE_BUF */
 
-/* The # of repeated occurrences of a BRE permitted by the REGEXEC and REGCOMP functions when using the interval notation. */
+/* Max # of repeated occurrences of a BRE permitted by the REGEXEC and REGCOMP functions when using the interval notation. */
 #ifndef RE_DUP_MAX
 #if defined(__RE_DUP_MAX) && __RE_DUP_MAX != -1
 #define RE_DUP_MAX __RE_DUP_MAX
@@ -685,7 +685,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #endif /* !__RTSIG_MAX || __RTSIG_MAX == -1 */
 #endif /* !RTSIG_MAX */
 
-/* Number of semaphores a process can have. */
+/* <semaphore.h>: Number of semaphores a process can have. */
 #ifndef SEM_NSEMS_MAX
 #if defined(__SEM_NSEMS_MAX) && __SEM_NSEMS_MAX != -1
 #define SEM_NSEMS_MAX __SEM_NSEMS_MAX
@@ -694,7 +694,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #endif /* ... */
 #endif /* !SEM_NSEMS_MAX */
 
-/* Maximal value of a semaphore. */
+/* <semaphore.h>: Maximal value of a semaphore. */
 #ifndef SEM_VALUE_MAX
 #if defined(__SEM_VALUE_MAX) && __SEM_VALUE_MAX != -1
 #define SEM_VALUE_MAX __SEM_VALUE_MAX
@@ -712,7 +712,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #endif /* ... */
 #endif /* !SIGQUEUE_MAX */
 
-/* Number of streams a process can have open at once. */
+/* <stdio.h>: Number of streams a process can have open at once. */
 #ifndef STREAM_MAX
 #if defined(__STREAM_MAX) && __STREAM_MAX != -1
 #define STREAM_MAX __STREAM_MAX
@@ -721,7 +721,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #endif /* ... */
 #endif /* !STREAM_MAX */
 
-/* The # of bytes in a symbolic link. */
+/* Max # of bytes in a symbolic link. */
 #ifndef SYMLINK_MAX
 #if defined(__SYMLINK_MAX) && __SYMLINK_MAX != -1
 #define SYMLINK_MAX __SYMLINK_MAX
@@ -730,7 +730,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #endif /* ... */
 #endif /* !SYMLINK_MAX */
 
-/* The # of symbolic links that can be traversed in the resolution of a pathname in the absence of a loop. */
+/* Max # of symbolic links that can be traversed in the resolution of a pathname in the absence of a loop. */
 #ifndef SYMLOOP_MAX
 #if defined(__SYMLOOP_MAX) && __SYMLOOP_MAX != -1
 #define SYMLOOP_MAX __SYMLOOP_MAX
@@ -766,7 +766,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #endif /* ... */
 #endif /* !CLOCKRES_MIN */
 
-/* The # of data keys per process. */
+/* <pthread.h>: Max # of data keys per process. */
 #ifndef THREAD_KEYS_MAX
 #if defined(__PTHREAD_KEYS_MAX) && __PTHREAD_KEYS_MAX != -1
 #define THREAD_KEYS_MAX __PTHREAD_KEYS_MAX
@@ -775,7 +775,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #endif /* ... */
 #endif /* !THREAD_KEYS_MAX */
 
-/* Controlling the iterations of destructors for thread-specific data. */
+/* <pthread.h>: Max # of iterations of destructors for thread-specific data. */
 #ifndef THREAD_DESTRUCTOR_ITERATIONS
 #if defined(__PTHREAD_DESTRUCTOR_ITERATIONS) && __PTHREAD_DESTRUCTOR_ITERATIONS != -1
 #define THREAD_DESTRUCTOR_ITERATIONS __PTHREAD_DESTRUCTOR_ITERATIONS
@@ -784,7 +784,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #endif /* ... */
 #endif /* !THREAD_DESTRUCTOR_ITERATIONS */
 
-/* The # of threads per process. */
+/* <pthread.h>: Max # of threads per process. */
 #ifndef THREAD_THREADS_MAX
 #if defined(__PTHREAD_THREADS_MAX) && __PTHREAD_THREADS_MAX != -1
 #define THREAD_THREADS_MAX __PTHREAD_THREADS_MAX
@@ -794,7 +794,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #endif /* !THREAD_THREADS_MAX */
 //[[[end]]]
 
-/* The # of data keys per process. */
+/* <pthread.h>: Max # of data keys per process. */
 #ifndef PTHREAD_KEYS_MAX
 #if __PTHREAD_KEYS_MAX != -1
 #define PTHREAD_KEYS_MAX __PTHREAD_KEYS_MAX
@@ -803,7 +803,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #endif /* ... */
 #endif /* !PTHREAD_KEYS_MAX */
 
-/* Minimum size for a thread. */
+/* <pthread.h>: Minimum size for a thread. */
 #ifndef PTHREAD_STACK_MIN
 #if __PTHREAD_STACK_MIN != -1
 #define PTHREAD_STACK_MIN __PTHREAD_STACK_MIN
@@ -812,7 +812,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #endif /* ... */
 #endif /* !PTHREAD_STACK_MIN */
 
-/* Number of iterations this implementation does. */
+/* <pthread.h>: Max # of iterations of destructors for thread-specific data. */
 #ifndef PTHREAD_DESTRUCTOR_ITERATIONS
 #if __PTHREAD_DESTRUCTOR_ITERATIONS != -1
 #define PTHREAD_DESTRUCTOR_ITERATIONS __PTHREAD_DESTRUCTOR_ITERATIONS
@@ -821,7 +821,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #endif /* ... */
 #endif /* !PTHREAD_DESTRUCTOR_ITERATIONS */
 
-/* The # of threads per process. */
+/* <pthread.h>: Max # of threads per process. */
 #ifndef PTHREAD_THREADS_MAX
 #if __PTHREAD_THREADS_MAX != -1
 #define PTHREAD_THREADS_MAX __PTHREAD_THREADS_MAX
@@ -1113,10 +1113,10 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #define __IOV_MAX _XOPEN_IOV_MAX /* [default:_POSIX_UIO_MAXIOV] Max # of elements in a `struct iovec' vector. */
 #endif /* !__IOV_MAX */
 #ifndef __NL_ARGMAX
-#define __NL_ARGMAX 4096 /* [default:_POSIX_ARG_MAX] Maximum value of `digit' in calls to the `printf' and `scanf' functions. */
+#define __NL_ARGMAX 4096 /* [default:_POSIX_ARG_MAX] Maximum number of positional arguments (e.g. "%1$d") in calls to `printf' or `scanf'. */
 #endif /* !__NL_ARGMAX */
 #ifndef __NL_LANGMAX
-#define __NL_LANGMAX 2048 /* [default:_POSIX2_LINE_MAX] Maximum number of bytes in a `LANG' name. */
+#define __NL_LANGMAX 2048 /* <libintl.h>: Maximum number of bytes in a `LANG' name. */
 #endif /* !__NL_LANGMAX */
 #ifndef __NL_MSGMAX
 #define __NL_MSGMAX __INT_MAX__ /* Maximum message number. */
@@ -1143,7 +1143,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #endif /* __IOV_MAX == -1 */
 #endif /* !IOV_MAX */
 
-/* [default:_POSIX_ARG_MAX] Maximum value of `digit' in calls to the `printf' and `scanf' functions. */
+/* [default:_POSIX_ARG_MAX] Maximum number of positional arguments (e.g. "%1$d") in calls to `printf' or `scanf'. */
 #ifndef NL_ARGMAX
 #if __NL_ARGMAX != -1
 #define NL_ARGMAX __NL_ARGMAX
@@ -1152,7 +1152,7 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #endif /* ... */
 #endif /* !NL_ARGMAX */
 
-/* [default:_POSIX2_LINE_MAX] Maximum number of bytes in a `LANG' name. */
+/* [default:_POSIX2_LINE_MAX] <libintl.h>: Maximum number of bytes in a `LANG' name. */
 #ifndef NL_LANGMAX
 #if __NL_LANGMAX != -1
 #define NL_LANGMAX __NL_LANGMAX

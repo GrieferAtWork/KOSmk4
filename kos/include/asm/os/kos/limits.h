@@ -32,13 +32,19 @@
 /*efine __HZ                 N/A         * Scheduler frequency (N/A because KOS's scheduler is TSC-based,
                                          * so HZ (and a resulting quantum length) can be anything) */
 #define __HOST_NAME_MAX      64         /* Max # of characters in a hostname (s.a. `sethostname(2)'). */
-#define __NGROUPS_MAX        (-1)       /* Max # of supplemental group IDs that may be set (s.a. `setgroups(2)') */
-#define __OPEN_MAX           (-1)       /* Max # of open files handles */
+#define __NGROUPS_MAX        (-1)       /* Max # of supplemental group IDs that may be set (s.a. `setgroups(2)')
+                                         * NOTE: You need `CAP_SETGID' to add join new groups; w/o, you can only
+                                         *       leave groups! */
+#define __OPEN_MAX           (-1)       /* Max # of open files handles
+                                         * NOTE: On KOS, there are actually 2 runtime-controllable limits here:
+                                         *  - Max usable `fd_t' number (THIS_HANDMAN->hm_maxfd)
+                                         *  - Max # of open fds (THIS_HANDMAN->hm_maxhand)
+                                         * Upon boot, /bin/init starts with both set to `INT_MAX' */
 #define __ARG_MAX            131072     /* Max # of bytes of args + environ for exec(); */
 #define __LINK_MAX           (-1)       /* Max # of links a file may have (fs-dependent) */
 #define __MAX_CANON          (-1)       /* Max size of the canonical input queue */
 #define __MAX_INPUT          (-1)       /* Max size of the type-ahead buffer */
-#define __NAME_MAX           65535      /* Max # of chars in a file name */
+#define __NAME_MAX           65535      /* Max # of chars in a file name (2^16) */
 #define __PATH_MAX           (-1)       /* Max # of chars in a path name including nul */
 #define __PIPE_BUF           4096       /* Max # of bytes in atomic write to a pipe (Default value, assuming that backing memory isn't VIO or re-mapped during a write) */
 #define __XATTR_NAME_MAX     255        /* Max # of chars in an extended attribute name */

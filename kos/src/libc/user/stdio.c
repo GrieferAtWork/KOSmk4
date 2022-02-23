@@ -934,7 +934,16 @@ file_writedata(FILE *__restrict self, void const *buf, size_t num_bytes) {
 
 	/* Check to make sure that this file is writable. */
 	if unlikely(!(self->if_flag & IO_RW)) {
-		(void)libc_seterrno(EPERM);
+		/* """
+		 * EBADF  The file descriptor underlying stream is not a valid file
+		 *        descriptor open for writing.
+		 * """
+		 *
+		 * ... Technically, using EBADF here is kind-of debatable, since  the
+		 * specs  seem to be  talking about the  underlying system FD, rather
+		 * than permissions associated with the actual STDIO stream, but this
+		 * still appears to be the error that's closest to this case. */
+		(void)libc_seterrno(EBADF);
 		goto err;
 	}
 	if (self->if_flag & IO_LNIFTYY)
@@ -2739,7 +2748,7 @@ NOTHROW_NCX(LIBCCALL libc_fgetln)(FILE *__restrict stream,
 
 	/* NUL-terminate line.
 	 * NOTE: This is actually a KOS extension, as BSD's fgetln()
-	 *       documents that it doesn't NUL-terminate the line! */
+	 *       documents that it  doesn't NUL-terminate the  line! */
 	result[i] = '\0';
 
 	/* KOS extension: we make the `lenp' argument optional. */
@@ -2795,14 +2804,20 @@ fp_funopen(void const *cookie,
 	assert(ex->io_zero == 0);
 	ex->io_refcnt = 1;
 
-	/* Initialize as read/write, not-a-tty and w/ a V-table. */
-	result->if_flag = IO_HASVTAB | IO_NOTATTY | IO_RW;
-	ex->io_readfn   = readfn;
-	ex->io_writefn  = writefn;
-	ex->io_seekfn   = seekfn;
-	ex->io_flushfn  = flushfn;
-	ex->io_closefn  = closefn;
-	ex->io_cookie   = (void *)cookie;
+	/* Initialize flags:
+	 *  - IO_HASVTAB: The most important flag: this is a V-table FILE.
+	 *  - IO_NOTATTY: Well... It's not a tty, isn't it?
+	 *  - IO_FSYNC:   Required so that `io_flushfn()' gets called during fflush(3)
+	 *  - IO_RW:      Indicative of `io_writefn()' being available. */
+	result->if_flag = IO_HASVTAB | IO_NOTATTY | IO_FSYNC;
+	if (writefn != NULL)
+		result->if_flag |= IO_RW;
+	ex->io_readfn  = readfn;
+	ex->io_writefn = writefn;
+	ex->io_seekfn  = seekfn;
+	ex->io_flushfn = flushfn;
+	ex->io_closefn = closefn;
+	ex->io_cookie  = (void *)cookie;
 
 	/* Insert the new file stream into the global list of them. */
 	allfiles_insert(result);
@@ -3029,6 +3044,29 @@ NOTHROW_NCX(LIBCCALL libc_clearerr)(FILE *__restrict stream)
 	}
 }
 /*[[[end:libc_clearerr]]]*/
+
+/*[[[head:libc_fileno,hash:CRC-32=0x1fa780d8]]]*/
+/* >> fileno(3)
+ * Return the underlying file descriptor number used by `stream' */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") WUNUSED NONNULL((1)) fd_t
+NOTHROW_NCX(LIBCCALL libc_fileno)(FILE *__restrict stream)
+/*[[[body:libc_fileno]]]*/
+{
+	if unlikely(!stream)
+		goto err_inval;
+	stream = file_fromuser(stream);
+	if unlikely(stream->if_flag & IO_HASVTAB)
+		goto err_nostream;
+	return ATOMIC_READ(stream->if_fd);
+err_nostream:
+	/* """
+	 * EBADF  The stream is not associated with a file.
+	 * """ */
+	return (fd_t)libc_seterrno(EBADF);
+err_inval:
+	return (fd_t)libc_seterrno(EINVAL);
+}
+/*[[[end:libc_fileno]]]*/
 
 /*[[[head:libd_fopen,hash:CRC-32=0x7d0a2ee4]]]*/
 /* >> fopen(3), fopen64(3)
@@ -3388,24 +3426,6 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.putc") NONNULL((2)) int
 	return fwrite_unlocked(&chr, sizeof(chr), 1, stream) ? ch : EOF;
 }
 /*[[[end:libc_fputc_unlocked]]]*/
-
-/*[[[head:libc_fileno,hash:CRC-32=0x1fa780d8]]]*/
-/* >> fileno(3)
- * Return the underlying file descriptor number used by `stream' */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") WUNUSED NONNULL((1)) fd_t
-NOTHROW_NCX(LIBCCALL libc_fileno)(FILE *__restrict stream)
-/*[[[body:libc_fileno]]]*/
-{
-	if unlikely(!stream)
-		goto err_inval;
-	stream = file_fromuser(stream);
-	if unlikely(stream->if_flag & IO_HASVTAB)
-		goto err_inval;
-	return ATOMIC_READ(stream->if_fd);
-err_inval:
-	return (fd_t)libc_seterrno(EINVAL);
-}
-/*[[[end:libc_fileno]]]*/
 
 
 

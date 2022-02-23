@@ -102,7 +102,7 @@ typedef struct __mbstate mbstate_t;
  *          FILE_BUFFER_FNOTATTY        <---> IO_NOTATTY
  *       Members re-appear using the following map:
  *          fb_lock        <---> if_exdata->io_lock
- *          fb_file        <---> IO_HASVTAB:  if_exdata->io_vtab + if_exdata->io_magi
+ *          fb_file        <---> IO_HASVTAB:  iofile_data::io_*fn + iofile_data::io_cookie
  *                               !IO_HASVTAB: if_fd
  *          fb_ptr         <---> if_ptr
  *          fb_cnt         <---> if_cnt

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a2dbbab */
+/* HASH CRC-32:0x88fb55ca */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1915,7 +1915,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCAN
 __NAMESPACE_LOCAL_BEGIN
 #define ____funopen_holder_defined
 struct __funopen_holder {
-	void            *fh_cookie;                                                 /* [0..1] funopen readfn */
+	void            *fh_cookie;                                                 /* [?..?] funopen cookie */
 	int   (LIBKCALL *fh_readfn)(void *cookie, char *buf, int num_bytes);        /* [0..1] funopen readfn */
 	int   (LIBKCALL *fh_writefn)(void *cookie, char const *buf, int num_bytes); /* [0..1] funopen writefn */
 	off_t (LIBKCALL *fh_seekfn)(void *cookie, off_t off, int whence);           /* [0..1] funopen seekfn */
@@ -2178,7 +2178,7 @@ DEFINE_INTERN_ALIAS(libc_funopen64, libc_funopen);
 __NAMESPACE_LOCAL_BEGIN
 #define ____funopen_holder_defined
 struct __funopen_holder {
-	void            *fh_cookie;                                                 /* [0..1] funopen readfn */
+	void            *fh_cookie;                                                 /* [?..?] funopen cookie */
 	int   (LIBKCALL *fh_readfn)(void *cookie, char *buf, int num_bytes);        /* [0..1] funopen readfn */
 	int   (LIBKCALL *fh_writefn)(void *cookie, char const *buf, int num_bytes); /* [0..1] funopen writefn */
 	off_t (LIBKCALL *fh_seekfn)(void *cookie, off_t off, int whence);           /* [0..1] funopen seekfn */
