@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84ecaccb */
+/* HASH CRC-32:0x61bb6ee5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -341,7 +341,7 @@
 #define __NR32AC_symlinkat                    3
 #define __NR32AC_readlinkat                   4
 #define __NR32AC_fchmodat                     4
-#define __NR32AC_faccessat                    4
+#define __NR32AC_faccessat                    3
 #define __NR32AC_pselect6                     6
 #define __NR32AC_ppoll                        5
 #define __NR32AC_unshare                      1
@@ -466,7 +466,7 @@
 #define __NR32AC_close_range                  3
 #define __NR32AC_openat2                      1
 #define __NR32AC_pidfd_getfd                  3
-#define __NR32AC_faccessat2                   1
+#define __NR32AC_faccessat2                   4
 #define __NR32AC_pwritevf                     5
 #define __NR32AC_preadvf                      5
 #define __NR32AC_fallocate64                  4
@@ -1640,7 +1640,6 @@
 #define __NR32AT0_faccessat                    (fd_t, __fd_t)
 #define __NR32AT1_faccessat                    (char const *, char const *)
 #define __NR32AT2_faccessat                    (syscall_ulong_t, __syscall_ulong_t)
-#define __NR32AT3_faccessat                    (atflag_t, __atflag_t)
 #define __NR32AT0_pselect6                     (size_t, __size_t)
 #define __NR32AT1_pselect6                     (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NR32AT2_pselect6                     (struct __fd_set_struct *, struct __fd_set_struct *)
@@ -1977,7 +1976,10 @@
 #define __NR32AT0_pidfd_getfd                  (fd_t, __fd_t)
 #define __NR32AT1_pidfd_getfd                  (fd_t, __fd_t)
 #define __NR32AT2_pidfd_getfd                  (syscall_ulong_t, __syscall_ulong_t)
-#define __NR32AT0_faccessat2                   (int, int)
+#define __NR32AT0_faccessat2                   (fd_t, __fd_t)
+#define __NR32AT1_faccessat2                   (char const *, char const *)
+#define __NR32AT2_faccessat2                   (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT3_faccessat2                   (atflag_t, __atflag_t)
 #define __NR32AT0_pwritevf                     (fd_t, __fd_t)
 #define __NR32AT1_pwritevf                     (struct iovecx32 const *, struct __iovecx32 const *)
 #define __NR32AT2_pwritevf                     (size_t, __size_t)
@@ -2481,7 +2483,7 @@
 #define __NR32AM_symlinkat(a, b, c, d, e, f)                    (char const *)a, (__fd_t)b, (char const *)c
 #define __NR32AM_readlinkat(a, b, c, d, e, f)                   (__fd_t)a, (char const *)b, (char *)c, (__size_t)d
 #define __NR32AM_fchmodat(a, b, c, d, e, f)                     (__fd_t)a, (char const *)b, (__mode_t)c, (__atflag_t)d
-#define __NR32AM_faccessat(a, b, c, d, e, f)                    (__fd_t)a, (char const *)b, (__syscall_ulong_t)c, (__atflag_t)d
+#define __NR32AM_faccessat(a, b, c, d, e, f)                    (__fd_t)a, (char const *)b, (__syscall_ulong_t)c
 #define __NR32AM_pselect6(a, b, c, d, e, f)                     (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct __timespecx32 const *)e, (struct __sigset_with_sizex32 const *)f
 #define __NR32AM_ppoll(a, b, c, d, e, f)                        (struct pollfd *)a, (__size_t)b, (struct __timespecx32 const *)c, (struct __sigset_struct const *)d, (__size_t)e
 #define __NR32AM_unshare(a, b, c, d, e, f)                      (__syscall_ulong_t)a
@@ -2606,7 +2608,7 @@
 #define __NR32AM_close_range(a, b, c, d, e, f)                  (unsigned int)a, (unsigned int)b, (unsigned int)c
 #define __NR32AM_openat2(a, b, c, d, e, f)                      (int)a
 #define __NR32AM_pidfd_getfd(a, b, c, d, e, f)                  (__fd_t)a, (__fd_t)b, (__syscall_ulong_t)c
-#define __NR32AM_faccessat2(a, b, c, d, e, f)                   (int)a
+#define __NR32AM_faccessat2(a, b, c, d, e, f)                   (__fd_t)a, (char const *)b, (__syscall_ulong_t)c, (__atflag_t)d
 #define __NR32AM_pwritevf(a, b, c, d, e, f)                     (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32), (__iomode_t)f
 #define __NR32AM_preadvf(a, b, c, d, e, f)                      (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32), (__iomode_t)f
 #define __NR32AM_fallocate64(a, b, c, d, e, f)                  (__fd_t)a, (__syscall_ulong_t)b, (__uint64_t)((__uint64_t)c | (__uint64_t)d << 32), (__uint64_t)((__uint64_t)e | (__uint64_t)f << 32)
@@ -2982,7 +2984,7 @@
 #define __NR32AP_symlinkat(a, b, c)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_readlinkat(a, b, c, d)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_fchmodat(a, b, c, d)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NR32AP_faccessat(a, b, c, d)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR32AP_faccessat(a, b, c)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_pselect6(a, b, c, d, e, f)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NR32AP_ppoll(a, b, c, d, e)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_unshare(a)                                     (__syscall_ulong_t)a
@@ -3107,7 +3109,7 @@
 #define __NR32AP_close_range(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_openat2(a)                                     (__syscall_ulong_t)a
 #define __NR32AP_pidfd_getfd(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NR32AP_faccessat2(a)                                  (__syscall_ulong_t)a
+#define __NR32AP_faccessat2(a, b, c, d)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_pwritevf(a, b, c, d, e)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)((__uint64_t)d >> 32), (__syscall_ulong_t)e
 #define __NR32AP_preadvf(a, b, c, d, e)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)((__uint64_t)d >> 32), (__syscall_ulong_t)e
 #define __NR32AP_fallocate64(a, b, c, d)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)((__uint64_t)c >> 32), (__syscall_ulong_t)d, (__syscall_ulong_t)((__uint64_t)d >> 32)

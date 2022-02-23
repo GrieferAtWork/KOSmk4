@@ -214,7 +214,7 @@ STATIC_ASSERT(IO_HANDLE_FFROM_OPENFLAG((-1 & ~(O_CLOEXEC | O_CLOFORK)) | O_CLOEX
 
 
 /************************************************************************/
-/* faccessat(), access()                                                */
+/* faccessat2(), faccessat(), access()                                  */
 /************************************************************************/
 #if (defined(__ARCH_WANT_SYSCALL_FACCESSAT) || defined(__ARCH_WANT_SYSCALL_ACCESS))
 PRIVATE errno_t KCALL
@@ -234,11 +234,19 @@ sys_faccessat_impl(fd_t dirfd, USER UNCHECKED char const *filename,
 }
 #endif /* __ARCH_WANT_SYSCALL_FACCESSAT || __ARCH_WANT_SYSCALL_ACCESS */
 
-#ifdef __ARCH_WANT_SYSCALL_FACCESSAT
-DEFINE_SYSCALL4(errno_t, faccessat,
+#ifdef __ARCH_WANT_SYSCALL_FACCESSAT2
+DEFINE_SYSCALL4(errno_t, faccessat2,
                 fd_t, dirfd, USER UNCHECKED char const *, filename,
                 syscall_ulong_t, type, atflag_t, atflags) {
 	return sys_faccessat_impl(dirfd, filename, type, atflags);
+}
+#endif /* __ARCH_WANT_SYSCALL_FACCESSAT2 */
+
+#ifdef __ARCH_WANT_SYSCALL_FACCESSAT
+DEFINE_SYSCALL3(errno_t, faccessat,
+                fd_t, dirfd, USER UNCHECKED char const *, filename,
+                syscall_ulong_t, type) {
+	return sys_faccessat_impl(dirfd, filename, type, 0);
 }
 #endif /* __ARCH_WANT_SYSCALL_FACCESSAT */
 

@@ -973,10 +973,14 @@ openat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, oflag_t oflags
              [tostr(ACCESS_TYPE)] syscall_ulong_t type) -> errno_t;
 
 @@@param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
-@@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH'
 [cp] faccessat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename,
-                [tostr(ACCESS_TYPE)] syscall_ulong_t type,
-                [tostr(ATFLAG__SYMLINK_NOFOLLOW__EACCESS__DOSPATH)] atflag_t flags) -> errno_t;
+                [tostr(ACCESS_TYPE)] syscall_ulong_t type) -> errno_t;
+
+@@@param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
+@@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH'
+faccessat2:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename,
+            [tostr(ACCESS_TYPE)] syscall_ulong_t type,
+            [tostr(ATFLAG__SYMLINK_NOFOLLOW__EACCESS__DOSPATH)] atflag_t flags) -> errno_t;
 
 [cp] symlink:(char const *link_text, [tostr(FILENAME)] char const *target_path) -> errno_t;
 [cp] symlinkat:([tostr(STRING)] char const *link_text, fd_t tofd,
@@ -2958,7 +2962,6 @@ fsconfig:(int TODO_PROTOTYPE) -> errno_t;
 fsmount:(int TODO_PROTOTYPE) -> errno_t;
 fspick:(int TODO_PROTOTYPE) -> errno_t;
 openat2:(int TODO_PROTOTYPE) -> errno_t;
-faccessat2:(int TODO_PROTOTYPE) -> errno_t;
 
 
 

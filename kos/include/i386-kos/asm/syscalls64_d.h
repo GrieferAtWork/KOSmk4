@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7518a15a */
+/* HASH CRC-32:0xf84f8288 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -743,9 +743,8 @@
 #define __NR64_readlinkat               0x10b                          /* ssize_t readlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define __NR64_fchmodat                 0x10c                          /* errno_t fchmodat(fd_t dirfd, char const *filename, mode_t mode, atflag_t flags) */
-/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
- * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
-#define __NR64_faccessat                0x10d                          /* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK' */
+#define __NR64_faccessat                0x10d                          /* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type) */
 #define __NR64_pselect6                 0x10e                          /* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx64 const *timeout, struct __sigset_with_sizex64 const *sigmask_sigset_with_size) */
 #define __NR64_ppoll                    0x10f                          /* ssize_t ppoll(struct pollfd *fds, size_t nfds, struct timespecx64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
 /* param: what: Set of `CLONE_*' */
@@ -966,7 +965,9 @@
  * @throw: E_INVALID_HANDLE_FILE:                                                             [...]
  * @throw: E_ILLEGAL_OPERATION:                                                               [...] */
 #define __NR64_pidfd_getfd              0x1b6                          /* fd_t pidfd_getfd(fd_t pidfd, fd_t foreign_fd, syscall_ulong_t flags) */
-#define __NR64_faccessat2               0x1b7                          /* errno_t faccessat2(int TODO_PROTOTYPE) */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
+ * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
+#define __NR64_faccessat2               0x1b7                          /* errno_t faccessat2(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
 /* Same as  `writev(2)', but  write data  to a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
@@ -2243,7 +2244,7 @@
 #define __NR64RC_symlinkat                3
 #define __NR64RC_readlinkat               4
 #define __NR64RC_fchmodat                 4
-#define __NR64RC_faccessat                4
+#define __NR64RC_faccessat                3
 #define __NR64RC_pselect6                 6
 #define __NR64RC_ppoll                    5
 #define __NR64RC_unshare                  1
@@ -2324,7 +2325,7 @@
 #define __NR64RC_close_range              3
 #define __NR64RC_openat2                  1
 #define __NR64RC_pidfd_getfd              3
-#define __NR64RC_faccessat2               1
+#define __NR64RC_faccessat2               4
 #define __NR64RC_pwritevf                 5
 #define __NR64RC_preadvf                  5
 #define __NR64RC_freadlinkat              5

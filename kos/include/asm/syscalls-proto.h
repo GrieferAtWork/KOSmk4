@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84f6bddd */
+/* HASH CRC-32:0x6ac7bbc9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,7 +81,7 @@
 #define __NRAC_pivot_root             1
 #define __NRAC_nfsservctl             1
 #define __NRAC_fallocate              4
-#define __NRAC_faccessat              4
+#define __NRAC_faccessat              3
 #define __NRAC_chdir                  1
 #define __NRAC_fchdir                 1
 #define __NRAC_chroot                 1
@@ -800,7 +800,6 @@
 #define __NRAT0_faccessat              (fd_t, __fd_t)
 #define __NRAT1_faccessat              (char const *, char const *)
 #define __NRAT2_faccessat              (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT3_faccessat              (atflag_t, __atflag_t)
 #define __NRAT0_chdir                  (char const *, char const *)
 #define __NRAT0_fchdir                 (fd_t, __fd_t)
 #define __NRAT0_chroot                 (char const *, char const *)
@@ -1474,7 +1473,7 @@
 #define __NRAM_pivot_root(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)             (int)a
 #define __NRAM_nfsservctl(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)             (int)a
 #define __NRAM_fallocate(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__fd_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAM_faccessat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__fd_t)a, (char const *)b, (__syscall_ulong_t)c, (__atflag_t)d
+#define __NRAM_faccessat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__fd_t)a, (char const *)b, (__syscall_ulong_t)c
 #define __NRAM_chdir(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (char const *)a
 #define __NRAM_fchdir(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (__fd_t)a
 #define __NRAM_chroot(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (char const *)a
@@ -1796,7 +1795,7 @@
 #define __NRAP_pivot_root(a)                                                                                        (__syscall_ulong_t)a
 #define __NRAP_nfsservctl(a)                                                                                        (__syscall_ulong_t)a
 #define __NRAP_fallocate(a, b, c, d)                                                                                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_faccessat(a, b, c, d)                                                                                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_faccessat(a, b, c)                                                                                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_chdir(a)                                                                                             (__syscall_ulong_t)a
 #define __NRAP_fchdir(a)                                                                                            (__syscall_ulong_t)a
 #define __NRAP_chroot(a)                                                                                            (__syscall_ulong_t)a

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe23aeaf0 */
+/* HASH CRC-32:0x5813b6df */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -112,9 +112,8 @@
 #define __NR_nfsservctl             0x2a  /* errno_t nfsservctl(int TODO_PROTOTYPE) */
 /* @param: mode: Set of `0 | FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_ZERO_RANGE' */
 #define __NR_fallocate              0x2f  /* errno_t fallocate(fd_t fd, syscall_ulong_t mode, syscall_ulong_t offset, syscall_ulong_t length) */
-/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
- * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
-#define __NR_faccessat              0x30  /* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK' */
+#define __NR_faccessat              0x30  /* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type) */
 #define __NR_chdir                  0x31  /* errno_t chdir(char const *path) */
 #define __NR_fchdir                 0x32  /* errno_t fchdir(fd_t fd) */
 #define __NR_chroot                 0x33  /* errno_t chroot(char const *path) */
@@ -1402,7 +1401,7 @@
 #define __NRRC_pivot_root             1
 #define __NRRC_nfsservctl             1
 #define __NRRC_fallocate              4
-#define __NRRC_faccessat              4
+#define __NRRC_faccessat              3
 #define __NRRC_chdir                  1
 #define __NRRC_fchdir                 1
 #define __NRRC_chroot                 1

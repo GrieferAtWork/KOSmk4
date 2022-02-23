@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2236c0 */
+/* HASH CRC-32:0x58383224 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -8603,9 +8603,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fchmodat)
 	.cfi_endproc
 END(__x86_asm64_syscall_fchmodat)
 
-/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
- * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
-/* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK' */
+/* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type) */
 .section .text.x86.asm64_syscall.faccessat
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_faccessat)
 	.cfi_startproc simple
@@ -8621,7 +8620,6 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_faccessat)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movq   %r10, %rcx
 	EXTERN(sys_faccessat)
 	call   sys_faccessat
 	popq_cfi_r %r11
@@ -11202,7 +11200,9 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pidfd_getfd)
 	.cfi_endproc
 END(__x86_asm64_syscall_pidfd_getfd)
 
-/* errno_t faccessat2(int TODO_PROTOTYPE) */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
+ * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
+/* errno_t faccessat2(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
 .section .text.x86.asm64_syscall.faccessat2
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_faccessat2)
 	.cfi_startproc simple
@@ -11218,6 +11218,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_faccessat2)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
+	movq   %r10, %rcx
 	EXTERN(sys_faccessat2)
 	call   sys_faccessat2
 	popq_cfi_r %r11
@@ -20665,9 +20666,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchmodat)
 	.cfi_endproc
 END(__x86_asm32_int80_fchmodat)
 
-/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
- * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
-/* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK' */
+/* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type) */
 .section .text.x86.asm32_syscall_int80.faccessat
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_faccessat)
 	.cfi_startproc simple
@@ -20680,10 +20680,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_faccessat)
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
 	movslq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_faccessat)
 	call   sys32_faccessat
 	popq_cfi_r %rdi
@@ -24107,7 +24105,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pidfd_getfd)
 	.cfi_endproc
 END(__x86_asm32_int80_pidfd_getfd)
 
-/* errno_t faccessat2(int TODO_PROTOTYPE) */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
+ * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
+/* errno_t faccessat2(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
 .section .text.x86.asm32_syscall_int80.faccessat2
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_faccessat2)
 	.cfi_startproc simple
@@ -24120,6 +24120,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_faccessat2)
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
 	movslq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_faccessat2)
 	call   sys32_faccessat2
 	popq_cfi_r %rdi
@@ -28066,9 +28070,8 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_readlinkat, __x86_asm32_int80_read
 /* errno_t fchmodat(fd_t dirfd, char const *filename, mode_t mode, atflag_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fchmodat, __x86_asm32_int80_fchmodat)
 
-/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
- * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
-/* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK' */
+/* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_faccessat, __x86_asm32_int80_faccessat)
 
 /* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32 const *timeout, struct __sigset_with_sizex32 const *sigmask_sigset_with_size) */
@@ -29548,7 +29551,9 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_openat2, __x86_asm32_int80_openat2
 /* fd_t pidfd_getfd(fd_t pidfd, fd_t foreign_fd, syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_pidfd_getfd, __x86_asm32_int80_pidfd_getfd)
 
-/* errno_t faccessat2(int TODO_PROTOTYPE) */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
+ * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
+/* errno_t faccessat2(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_faccessat2, __x86_asm32_int80_faccessat2)
 
 /* Same as  `writev(2)', but  write data  to a  file at  a
@@ -34192,13 +34197,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fchmodat)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_fchmodat)
 
-/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
- * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
-/* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK' */
+/* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type) */
 .section .text.x86.asm32_syscall_sysrun32.faccessat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_faccessat)
 	.cfi_startproc
-	movzlq 24(%rdi), %rcx
 	movzlq 16(%rdi), %rdx
 	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
@@ -35966,10 +35969,15 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pidfd_getfd)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_pidfd_getfd)
 
-/* errno_t faccessat2(int TODO_PROTOTYPE) */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
+ * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
+/* errno_t faccessat2(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.faccessat2
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_faccessat2)
 	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
 	EXTERN(sys32_faccessat2)
 	jmp    sys32_faccessat2

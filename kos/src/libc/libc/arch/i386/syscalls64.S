@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8331c1ef */
+/* HASH CRC-32:0x9236c6e9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2674,12 +2674,10 @@ INTERN_FUNCTION(libc_sys_fchmodat)
 END(libc_sys_fchmodat)
 DEFINE_PUBLIC_ALIAS(sys_fchmodat, libc_sys_fchmodat)
 
-/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
- * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
-/* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK' */
+/* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type) */
 INTERN_FUNCTION(libc_sys_faccessat)
 	movq   $(0x10d), %rax
-	movq   %rcx, %r10
 	syscall
 	ret
 END(libc_sys_faccessat)
@@ -3491,9 +3489,12 @@ INTERN_FUNCTION(libc_sys_pidfd_getfd)
 END(libc_sys_pidfd_getfd)
 DEFINE_PUBLIC_ALIAS(sys_pidfd_getfd, libc_sys_pidfd_getfd)
 
-/* errno_t faccessat2(int TODO_PROTOTYPE) */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
+ * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
+/* errno_t faccessat2(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
 INTERN_FUNCTION(libc_sys_faccessat2)
 	movq   $(0x1b7), %rax
+	movq   %rcx, %r10
 	syscall
 	ret
 END(libc_sys_faccessat2)
@@ -7427,12 +7428,10 @@ INTERN_FUNCTION(libc_sys_Xfchmodat)
 END(libc_sys_Xfchmodat)
 DEFINE_PUBLIC_ALIAS(sys_Xfchmodat, libc_sys_Xfchmodat)
 
-/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
- * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
-/* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK' */
+/* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type) */
 INTERN_FUNCTION(libc_sys_Xfaccessat)
 	movq   $(0x10d), %rax
-	movq   %rcx, %r10
 	std /* Enable exceptions */
 	syscall
 	cld /* Disable exceptions */
@@ -8406,9 +8405,12 @@ INTERN_FUNCTION(libc_sys_Xpidfd_getfd)
 END(libc_sys_Xpidfd_getfd)
 DEFINE_PUBLIC_ALIAS(sys_Xpidfd_getfd, libc_sys_Xpidfd_getfd)
 
-/* errno_t faccessat2(int TODO_PROTOTYPE) */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
+ * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
+/* errno_t faccessat2(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
 INTERN_FUNCTION(libc_sys_Xfaccessat2)
 	movq   $(0x1b7), %rax
+	movq   %rcx, %r10
 	std /* Enable exceptions */
 	syscall
 	cld /* Disable exceptions */

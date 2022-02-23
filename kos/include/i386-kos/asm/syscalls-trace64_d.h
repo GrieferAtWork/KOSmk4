@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c308e5 */
+/* HASH CRC-32:0xd4e8df12 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -607,7 +607,6 @@
 #define __NR64AN0_faccessat                dirfd
 #define __NR64AN1_faccessat                filename
 #define __NR64AN2_faccessat                type
-#define __NR64AN3_faccessat                flags
 #define __NR64AN0_pselect6                 nfds
 #define __NR64AN1_pselect6                 readfds
 #define __NR64AN2_pselect6                 writefds
@@ -809,7 +808,10 @@
 #define __NR64AN0_pidfd_getfd              pidfd
 #define __NR64AN1_pidfd_getfd              foreign_fd
 #define __NR64AN2_pidfd_getfd              flags
-#define __NR64AN0_faccessat2               TODO_PROTOTYPE
+#define __NR64AN0_faccessat2               dirfd
+#define __NR64AN1_faccessat2               filename
+#define __NR64AN2_faccessat2               type
+#define __NR64AN3_faccessat2               flags
 #define __NR64AN0_pwritevf                 fd
 #define __NR64AN1_pwritevf                 iovec
 #define __NR64AN2_pwritevf                 count
@@ -1870,7 +1872,6 @@
 #define __NR64ATR1_faccessat                SC_REPR_FILENAME                                                     /* filename */ 
 #define __NR64ATL1_faccessat                0                                                                    /* filename -> dirfd */ 
 #define __NR64ATR2_faccessat                SC_REPR_ACCESS_TYPE                                                  /* type */ 
-#define __NR64ATR3_faccessat                SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__EACCESS__DOSPATH                   /* flags */ 
 #define __NR64RTR_faccessat                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_pselect6                 SC_REPR_SIZE_T                                                       /* nfds */ 
 #define __NR64ATR1_pselect6                 SC_REPR_STRUCT_FDSET                                                 /* readfds */ 
@@ -2176,7 +2177,11 @@
 #define __NR64ATR1_pidfd_getfd              SC_REPR_FD_T                                                         /* foreign_fd */ 
 #define __NR64ATR2_pidfd_getfd              SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
 #define __NR64RTR_pidfd_getfd               SC_REPR_FD_T                                                         /* return */
-#define __NR64ATR0_faccessat2               SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR64ATR0_faccessat2               SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NR64ATR1_faccessat2               SC_REPR_FILENAME                                                     /* filename */ 
+#define __NR64ATL1_faccessat2               0                                                                    /* filename -> dirfd */ 
+#define __NR64ATR2_faccessat2               SC_REPR_ACCESS_TYPE                                                  /* type */ 
+#define __NR64ATR3_faccessat2               SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__EACCESS__DOSPATH                   /* flags */ 
 #define __NR64RTR_faccessat2                SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_pwritevf                 SC_REPR_FD_T                                                         /* fd */ 
 #define __NR64ATR1_pwritevf                 SC_REPR_STRUCT_IOVECX64_C                                            /* iovec */ 

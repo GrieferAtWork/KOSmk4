@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xffe142dc */
+/* HASH CRC-32:0x2830dc66 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -341,7 +341,7 @@
 #define __NRAC_symlinkat                    3
 #define __NRAC_readlinkat                   4
 #define __NRAC_fchmodat                     4
-#define __NRAC_faccessat                    4
+#define __NRAC_faccessat                    3
 #define __NRAC_pselect6                     6
 #define __NRAC_ppoll                        5
 #define __NRAC_unshare                      1
@@ -466,7 +466,7 @@
 #define __NRAC_close_range                  3
 #define __NRAC_openat2                      1
 #define __NRAC_pidfd_getfd                  3
-#define __NRAC_faccessat2                   1
+#define __NRAC_faccessat2                   4
 #define __NRAC_pwritevf                     5
 #define __NRAC_preadvf                      5
 #define __NRAC_fallocate64                  4
@@ -1640,7 +1640,6 @@
 #define __NRAT0_faccessat                    (fd_t, __fd_t)
 #define __NRAT1_faccessat                    (char const *, char const *)
 #define __NRAT2_faccessat                    (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT3_faccessat                    (atflag_t, __atflag_t)
 #define __NRAT0_pselect6                     (size_t, __size_t)
 #define __NRAT1_pselect6                     (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NRAT2_pselect6                     (struct __fd_set_struct *, struct __fd_set_struct *)
@@ -1977,7 +1976,10 @@
 #define __NRAT0_pidfd_getfd                  (fd_t, __fd_t)
 #define __NRAT1_pidfd_getfd                  (fd_t, __fd_t)
 #define __NRAT2_pidfd_getfd                  (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT0_faccessat2                   (int, int)
+#define __NRAT0_faccessat2                   (fd_t, __fd_t)
+#define __NRAT1_faccessat2                   (char const *, char const *)
+#define __NRAT2_faccessat2                   (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT3_faccessat2                   (atflag_t, __atflag_t)
 #define __NRAT0_pwritevf                     (fd_t, __fd_t)
 #define __NRAT1_pwritevf                     (struct iovecx32 const *, struct __iovecx32 const *)
 #define __NRAT2_pwritevf                     (size_t, __size_t)
@@ -2481,7 +2483,7 @@
 #define __NRAM_symlinkat(a, b, c, d, e, f)                    (char const *)a, (__fd_t)b, (char const *)c
 #define __NRAM_readlinkat(a, b, c, d, e, f)                   (__fd_t)a, (char const *)b, (char *)c, (__size_t)d
 #define __NRAM_fchmodat(a, b, c, d, e, f)                     (__fd_t)a, (char const *)b, (__mode_t)c, (__atflag_t)d
-#define __NRAM_faccessat(a, b, c, d, e, f)                    (__fd_t)a, (char const *)b, (__syscall_ulong_t)c, (__atflag_t)d
+#define __NRAM_faccessat(a, b, c, d, e, f)                    (__fd_t)a, (char const *)b, (__syscall_ulong_t)c
 #define __NRAM_pselect6(a, b, c, d, e, f)                     (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct __timespecx32 const *)e, (struct __sigset_with_sizex32 const *)f
 #define __NRAM_ppoll(a, b, c, d, e, f)                        (struct pollfd *)a, (__size_t)b, (struct __timespecx32 const *)c, (struct __sigset_struct const *)d, (__size_t)e
 #define __NRAM_unshare(a, b, c, d, e, f)                      (__syscall_ulong_t)a
@@ -2606,7 +2608,7 @@
 #define __NRAM_close_range(a, b, c, d, e, f)                  (unsigned int)a, (unsigned int)b, (unsigned int)c
 #define __NRAM_openat2(a, b, c, d, e, f)                      (int)a
 #define __NRAM_pidfd_getfd(a, b, c, d, e, f)                  (__fd_t)a, (__fd_t)b, (__syscall_ulong_t)c
-#define __NRAM_faccessat2(a, b, c, d, e, f)                   (int)a
+#define __NRAM_faccessat2(a, b, c, d, e, f)                   (__fd_t)a, (char const *)b, (__syscall_ulong_t)c, (__atflag_t)d
 #define __NRAM_pwritevf(a, b, c, d, e, f)                     (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32), (__iomode_t)f
 #define __NRAM_preadvf(a, b, c, d, e, f)                      (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32), (__iomode_t)f
 #define __NRAM_fallocate64(a, b, c, d, e, f)                  (__fd_t)a, (__syscall_ulong_t)b, (__uint64_t)((__uint64_t)c | (__uint64_t)d << 32), (__uint64_t)((__uint64_t)e | (__uint64_t)f << 32)
@@ -2982,7 +2984,7 @@
 #define __NRAP_symlinkat(a, b, c)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_readlinkat(a, b, c, d)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_fchmodat(a, b, c, d)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_faccessat(a, b, c, d)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_faccessat(a, b, c)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_pselect6(a, b, c, d, e, f)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NRAP_ppoll(a, b, c, d, e)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_unshare(a)                                     (__syscall_ulong_t)a
@@ -3107,7 +3109,7 @@
 #define __NRAP_close_range(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_openat2(a)                                     (__syscall_ulong_t)a
 #define __NRAP_pidfd_getfd(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NRAP_faccessat2(a)                                  (__syscall_ulong_t)a
+#define __NRAP_faccessat2(a, b, c, d)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_pwritevf(a, b, c, d, e)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)((__uint64_t)d >> 32), (__syscall_ulong_t)e
 #define __NRAP_preadvf(a, b, c, d, e)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)((__uint64_t)d >> 32), (__syscall_ulong_t)e
 #define __NRAP_fallocate64(a, b, c, d)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)((__uint64_t)c >> 32), (__syscall_ulong_t)d, (__syscall_ulong_t)((__uint64_t)d >> 32)

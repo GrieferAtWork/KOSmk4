@@ -1048,10 +1048,9 @@ NOTHROW_RPC(LIBCCALL libc_euidaccess)(char const *file,
 /*[[[body:libc_euidaccess]]]*/
 {
 	errno_t result;
-	result = sys_faccessat(AT_FDCWD,
-	                       file,
-	                       (syscall_ulong_t)(unsigned int)type,
-	                       AT_EACCESS);
+	result = sys_faccessat2(AT_FDCWD, file,
+	                        (syscall_ulong_t)(unsigned int)type,
+	                        AT_EACCESS);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_euidaccess]]]*/
@@ -1083,7 +1082,7 @@ NOTHROW_RPC(LIBCCALL libc_faccessat)(fd_t dfd,
 /*[[[body:libc_faccessat]]]*/
 {
 	errno_t result;
-	result = sys_faccessat(dfd, file, (syscall_ulong_t)(unsigned int)type, flags);
+	result = sys_faccessat2(dfd, file, (syscall_ulong_t)(unsigned int)type, flags);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_faccessat]]]*/

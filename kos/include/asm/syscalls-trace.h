@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4039642a */
+/* HASH CRC-32:0x1db30f82 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -144,7 +144,6 @@
 #define __NRAN0_faccessat              dirfd
 #define __NRAN1_faccessat              filename
 #define __NRAN2_faccessat              type
-#define __NRAN3_faccessat              flags
 #define __NRAN0_chdir                  path
 #define __NRAN0_fchdir                 fd
 #define __NRAN0_chroot                 path
@@ -956,7 +955,6 @@
 #define __NRATR1_faccessat              SC_REPR_FILENAME                                        /* filename */ 
 #define __NRATL1_faccessat              0                                                       /* filename -> dirfd */ 
 #define __NRATR2_faccessat              SC_REPR_ACCESS_TYPE                                     /* type */ 
-#define __NRATR3_faccessat              SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__EACCESS__DOSPATH      /* flags */ 
 #define __NRRTR_faccessat               SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_chdir                  SC_REPR_FILENAME                                        /* path */ 
 #define __NRRTR_chdir                   SC_REPR_ERRNO_T                                         /* return */

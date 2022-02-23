@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf1dda0b */
+/* HASH CRC-32:0x4d4160c6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -546,12 +546,13 @@ __CDECLARE_VOID_SC(__ATTR_NORETURN,exit,(__syscall_ulong_t __exit_code),(__exit_
 __CDECLARE_VOID_SC(__ATTR_NORETURN,exit_group,(__syscall_ulong_t __exit_code),(__exit_code))
 #endif /* __CRT_HAVE_SC(exit_group) */
 #if __CRT_HAVE_SC(faccessat)
-/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
- * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
-__CDECLARE_SC(,__errno_t,faccessat,(__fd_t __dirfd, char const *__filename, __syscall_ulong_t __type, __atflag_t __flags),(__dirfd,__filename,__type,__flags))
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK' */
+__CDECLARE_SC(,__errno_t,faccessat,(__fd_t __dirfd, char const *__filename, __syscall_ulong_t __type),(__dirfd,__filename,__type))
 #endif /* __CRT_HAVE_SC(faccessat) */
 #if __CRT_HAVE_SC(faccessat2)
-__CDECLARE_SC(,__errno_t,faccessat2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
+ * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
+__CDECLARE_SC(,__errno_t,faccessat2,(__fd_t __dirfd, char const *__filename, __syscall_ulong_t __type, __atflag_t __flags),(__dirfd,__filename,__type,__flags))
 #endif /* __CRT_HAVE_SC(faccessat2) */
 #if __CRT_HAVE_SC(fadvise64)
 __CDECLARE_SC(,__errno_t,fadvise64,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -3047,12 +3048,13 @@ __CDECLARE_VOID_XSC(__ATTR_NORETURN,exit,(__syscall_ulong_t __exit_code),(__exit
 __CDECLARE_VOID_XSC(__ATTR_NORETURN,exit_group,(__syscall_ulong_t __exit_code),(__exit_code))
 #endif /* __CRT_HAVE_XSC(exit_group) */
 #if __CRT_HAVE_XSC(faccessat)
-/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
- * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
-__CDECLARE_XSC(,__errno_t,faccessat,(__fd_t __dirfd, char const *__filename, __syscall_ulong_t __type, __atflag_t __flags),(__dirfd,__filename,__type,__flags))
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK' */
+__CDECLARE_XSC(,__errno_t,faccessat,(__fd_t __dirfd, char const *__filename, __syscall_ulong_t __type),(__dirfd,__filename,__type))
 #endif /* __CRT_HAVE_XSC(faccessat) */
 #if __CRT_HAVE_XSC(faccessat2)
-__CDECLARE_XSC(,__errno_t,faccessat2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
+ * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
+__CDECLARE_XSC(,__errno_t,faccessat2,(__fd_t __dirfd, char const *__filename, __syscall_ulong_t __type, __atflag_t __flags),(__dirfd,__filename,__type,__flags))
 #endif /* __CRT_HAVE_XSC(faccessat2) */
 #if __CRT_HAVE_XSC(fadvise64)
 __CDECLARE_XSC(,__errno_t,fadvise64,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))

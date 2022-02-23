@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b95a39e */
+/* HASH CRC-32:0x642743c9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11630,9 +11630,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchmodat)
 	.cfi_endproc
 END(__x86_asm32_int80_fchmodat)
 
-/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
- * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
-/* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK' */
+/* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type) */
 .section .text.x86.asm32_syscall_int80.faccessat
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_faccessat)
 	.cfi_startproc simple
@@ -11651,7 +11650,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_faccessat)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %esi  /* Arg #3 */
 	pushl_cfi_r %edx  /* Arg #2 */
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
@@ -11660,7 +11658,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_faccessat)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	popl_cfi_r %esi
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -16696,7 +16693,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pidfd_getfd)
 	.cfi_endproc
 END(__x86_asm32_int80_pidfd_getfd)
 
-/* errno_t faccessat2(int TODO_PROTOTYPE) */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
+ * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
+/* errno_t faccessat2(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
 .section .text.x86.asm32_syscall_int80.faccessat2
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_faccessat2)
 	.cfi_startproc simple
@@ -16715,14 +16714,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_faccessat2)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_faccessat2)
 	call   sys_faccessat2
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi_r %esi
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -31128,9 +31129,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fchmodat)
 	.cfi_endproc
 END(__x86_asm32_sysenter_fchmodat)
 
-/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
- * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
-/* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK' */
+/* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type) */
 .section .text.x86.asm32_syscall_sysenter.faccessat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_faccessat)
 	.cfi_startproc simple
@@ -31149,7 +31149,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_faccessat)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %esi  /* Arg #3 */
 	pushl_cfi_r %edx  /* Arg #2 */
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
@@ -31158,7 +31157,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_faccessat)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	popl_cfi_r %esi
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -36242,7 +36240,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pidfd_getfd)
 	.cfi_endproc
 END(__x86_asm32_sysenter_pidfd_getfd)
 
-/* errno_t faccessat2(int TODO_PROTOTYPE) */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
+ * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
+/* errno_t faccessat2(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
 .section .text.x86.asm32_syscall_sysenter.faccessat2
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_faccessat2)
 	.cfi_startproc simple
@@ -36261,14 +36261,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_faccessat2)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_faccessat2)
 	call   sys_faccessat2
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi_r %esi
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es

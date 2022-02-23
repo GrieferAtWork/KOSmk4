@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40c11c16 */
+/* HASH CRC-32:0x833f12fd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -115,9 +115,8 @@
 #define SYS_nfsservctl             __NR_nfsservctl             /* errno_t nfsservctl(int TODO_PROTOTYPE) */
 /* @param: mode: Set of `0 | FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_ZERO_RANGE' */
 #define SYS_fallocate              __NR_fallocate              /* errno_t fallocate(fd_t fd, syscall_ulong_t mode, syscall_ulong_t offset, syscall_ulong_t length) */
-/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK'
- * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
-#define SYS_faccessat              __NR_faccessat              /* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
+/* @param: type: Set of `R_OK | W_OK | X_OK' or `F_OK' */
+#define SYS_faccessat              __NR_faccessat              /* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type) */
 #define SYS_chdir                  __NR_chdir                  /* errno_t chdir(char const *path) */
 #define SYS_fchdir                 __NR_fchdir                 /* errno_t fchdir(fd_t fd) */
 #define SYS_chroot                 __NR_chroot                 /* errno_t chroot(char const *path) */
