@@ -28,11 +28,14 @@
 #ifdef __CC__
 DECL_BEGIN
 
-DATDEF __BYTE_TYPE__ const libc_x86_nopf_begin[];   /* Start address for NOPF memory access PC values */
-DATDEF __BYTE_TYPE__ const libc_x86_nopf_end_clc[]; /* End of NOPF handlers that should return to `libc_x86_nopf_ret_stc' */
-DATDEF __BYTE_TYPE__ const libc_x86_nopf_end[];     /* End address for NOPF memory access PC values */
-DATDEF __BYTE_TYPE__ const libc_x86_nopf_ret_stc[]; /* Set the carry bit and return to the caller */
-DATDEF __BYTE_TYPE__ const libc_x86_nopf_ret[];     /* Return PC for #PF with `libc_x86_nopf_check(pc) == true' */
+/* Must declare these symbols as ELF.HIDDEN (INTDEF) in order to prevent
+ * a relocation being generated during linking as the result of except.c
+ * otherwise not knowing that these symbols are defined by libc itself. */
+INTDEF __BYTE_TYPE__ const libc_x86_nopf_begin[];   /* Start address for NOPF memory access PC values */
+INTDEF __BYTE_TYPE__ const libc_x86_nopf_end_clc[]; /* End of NOPF handlers that should return to `libc_x86_nopf_ret_stc' */
+INTDEF __BYTE_TYPE__ const libc_x86_nopf_end[];     /* End address for NOPF memory access PC values */
+INTDEF __BYTE_TYPE__ const libc_x86_nopf_ret_stc[]; /* Set the carry bit and return to the caller */
+INTDEF __BYTE_TYPE__ const libc_x86_nopf_ret[];     /* Return PC for #PF with `libc_x86_nopf_check(pc) == true' */
 
 /* Return the #PF-execution-resume address for a #PF  that happened at `pc', where pc  is
  * apart of a libc_x86_nopf_* function, as indicated by `libc_x86_nopf_check(pc) == true' */
