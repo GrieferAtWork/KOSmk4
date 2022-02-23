@@ -27,7 +27,7 @@
 #include <asm/instr/compat.h>
 
 #ifdef __KERNEL__
-#define KERNEL_cld cld
+#define KERNEL_cld cld /* Because the kernel is built with -mcld */
 #else /* __KERNEL__ */
 #define KERNEL_cld /* nothing */
 #endif /* !__KERNEL__ */

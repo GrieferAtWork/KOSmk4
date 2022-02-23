@@ -656,8 +656,8 @@ NOTHROW(FCALL tsc_offset_to_ktime)(struct cpu const *__restrict me,
  * WARNING: The results of  this function may  be inconsistent when  called
  *          from different CPUs (CPU#2 may return a lower value after CPU#1
  *          already returned a greater value)
- *          If this  is  a  problem, you  should  instead  use  `ktime_stable()',
- *          but note that for timeouts and the like, the scheduler uses `ktime()'
+ *          If this is a problem, you should instead use `ktime_stable()', but
+ *          note  that for timeouts and the like, the scheduler uses `ktime()'
  * NOTE: This function is the same as doing `tsc_now_to_ktime(tsc_now())'
  *       while having preemption disabled. */
 PUBLIC NOBLOCK WUNUSED ktime_t
@@ -687,7 +687,6 @@ NOTHROW(KCALL ktime_stable)(void) {
 	 *   #1: The clock was changed externally
 	 *   #2: The TSC counter was suspended via external means (e.g. an attached debugger)
 	 *   #3: A minor discrepancy between the timestamps of different CPUs
-	 *       XXX: Research how an  OS can  minimize these  discrepancies!
 	 */
 	for (;;) {
 		u64 oldval;

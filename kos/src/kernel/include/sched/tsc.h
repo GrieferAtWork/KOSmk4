@@ -69,8 +69,8 @@ DECL_BEGIN
 typedef u64 tsc_t;
 #define TSC_MAX __UINT64_MAX__
 
-/* TODO: Intel manuals state  a minimum realtime  before rdtsc  overflows.
- *       Using this, once can calculate the max HZ with which rdtsc ticks.
+/* TODO: Intel manuals state a  minimum realtime before rdtsc  overflows.
+ *       Using this, one can calculate the max HZ with which rdtsc ticks.
  *       If this HZ fits into 32-bit, proceed as follows:
  *       Research the max HZ with which the LAPIC timer is allowed to tick.
  *       If this value also fits into 32-bit, then change `tsc_hz_t' to  be
@@ -209,8 +209,8 @@ NOTHROW(FCALL tsc_offset_to_ktime)(struct cpu const *__restrict me,
  * WARNING: The results of  this function may  be inconsistent when  called
  *          from different CPUs (CPU#2 may return a lower value after CPU#1
  *          already returned a greater value)
- *          If this  is  a  problem, you  should  instead  use  `ktime_stable()',
- *          but note that for timeouts and the like, the scheduler uses `ktime()'
+ *          If this is a problem, you should instead use `ktime_stable()', but
+ *          note  that for timeouts and the like, the scheduler uses `ktime()'
  * NOTE: This function is the same as doing `tsc_now_to_ktime(tsc_now())'
  *       while having preemption disabled. */
 FUNDEF NOBLOCK WUNUSED ktime_t NOTHROW(KCALL ktime)(void);
