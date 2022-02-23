@@ -101,7 +101,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL GDBServer_Init(void) {
 
 		/* Create the fallback-host thread. */
 		GDBServer_FallbackHost = task_alloc(&mman_kernel);
-		task_setup_kernel(GDBServer_FallbackHost, (thread_main_t)&GDBFallbackHost_Main, 0);
+//		task_setup_kernel(GDBServer_FallbackHost, (thread_main_t)&GDBFallbackHost_Main, 0); /* TODO */
 		/* Set the Stopped flag to that the fallback-host can't be stopped by GDB. */
 		ATOMIC_OR(GDBServer_FallbackHost->t_flags, TASK_FGDB_STOPPED);
 		task_start(GDBServer_FallbackHost, TASK_START_FNORMAL);
