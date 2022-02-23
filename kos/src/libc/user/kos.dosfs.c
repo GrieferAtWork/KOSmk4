@@ -51,7 +51,7 @@ NOTHROW(LIBCCALL libc_dosfs_getenabled)(void)
 }
 /*[[[end:libc_dosfs_getenabled]]]*/
 
-/*[[[head:libc_dosfs_setenabled,hash:CRC-32=0xf8154314]]]*/
+/*[[[head:libc_dosfs_setenabled,hash:CRC-32=0x8b2ce713]]]*/
 /* >> dosfs_setenabled(3)
  * Set the is-enabled  state for filesystem  emulation.
  * When enabled, all DOS$-prefixed filesystem functions
@@ -59,10 +59,10 @@ NOTHROW(LIBCCALL libc_dosfs_getenabled)(void)
  * calls,  meaning they accept/return DOS paths, rather
  * than unix paths.
  *
- * The default state of dosfs emultion depends on the
- * binary format of the main application. If the main
- * application is an ELF binary, the default state is
- * set to `DOSFS_DISABLED'.  When it's  a PE  binary,
+ * The default state of dosfs emulation depends on the
+ * binary format of the main application. If the  main
+ * application is an ELF binary, the default state  is
+ * set  to  `DOSFS_DISABLED'. When  it's a  PE binary,
  * the default state is `DOSFS_ENABLED'
  *
  * Note that this function does not affect programs  that

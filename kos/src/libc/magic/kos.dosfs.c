@@ -49,10 +49,10 @@ unsigned int dosfs_getenabled(void);
 @@calls,  meaning they accept/return DOS paths, rather
 @@than unix paths.
 @@
-@@The default state of dosfs emultion depends on the
-@@binary format of the main application. If the main
-@@application is an ELF binary, the default state is
-@@set to `DOSFS_DISABLED'.  When it's  a PE  binary,
+@@The default state of dosfs emulation depends on the
+@@binary format of the main application. If the  main
+@@application is an ELF binary, the default state  is
+@@set  to  `DOSFS_DISABLED'. When  it's a  PE binary,
 @@the default state is `DOSFS_ENABLED'
 @@
 @@Note that this function does not affect programs  that

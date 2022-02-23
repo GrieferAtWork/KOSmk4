@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd72f721b */
+/* HASH CRC-32:0xfb477d80 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,6 +77,10 @@ NOTHROW_RPC(LIBCCALL libc__chdrive)(int drive) {
 	return libc_fchdir(__AT_FDDRIVE_ROOT(drive));
 }
 INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
+NOTHROW_RPC(LIBDCALL libd__mkdir)(char const *path) {
+	return libd_mkdir(path, 0755);
+}
+INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc__mkdir)(char const *path) {
 	return libc_mkdir(path, 0755);
 }
@@ -88,6 +92,7 @@ DECL_END
 DEFINE_PUBLIC_ALIAS(DOS$_getdcwd, libd__getdcwd);
 DEFINE_PUBLIC_ALIAS(_getdcwd, libc__getdcwd);
 DEFINE_PUBLIC_ALIAS(_chdrive, libc__chdrive);
+DEFINE_PUBLIC_ALIAS(DOS$_mkdir, libd__mkdir);
 DEFINE_PUBLIC_ALIAS(_mkdir, libc__mkdir);
 #endif /* !__KERNEL__ */
 

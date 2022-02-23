@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f7a46ec */
+/* HASH CRC-32:0x5f0055de */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -380,9 +380,9 @@
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$_mbtowc_l
+#define __CRT_HAVE_DOS$_mkdir
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-#define __CRT_HAVE_DOS$_mkdir
 #define __CRT_HAVE_DOS$_mktemp_s
 #define __CRT_HAVE_DOS$_open_osfhandle
 #define __CRT_HAVE_DOS$_pipe

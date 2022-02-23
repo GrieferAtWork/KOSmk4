@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x678f0757 */
+/* HASH CRC-32:0xf424032e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,10 +51,10 @@ __CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED,unsigned int,__NOTHROW,dosfs_getenable
  * calls,  meaning they accept/return DOS paths, rather
  * than unix paths.
  *
- * The default state of dosfs emultion depends on the
- * binary format of the main application. If the main
- * application is an ELF binary, the default state is
- * set to `DOSFS_DISABLED'.  When it's  a PE  binary,
+ * The default state of dosfs emulation depends on the
+ * binary format of the main application. If the  main
+ * application is an ELF binary, the default state  is
+ * set  to  `DOSFS_DISABLED'. When  it's a  PE binary,
  * the default state is `DOSFS_ENABLED'
  *
  * Note that this function does not affect programs  that

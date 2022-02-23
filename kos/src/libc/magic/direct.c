@@ -106,7 +106,7 @@ unsigned int _getdiskfree(unsigned int drive, struct _diskfree_t *diskfree);
 %[define(DOS_MKDIR_ACCESS_MODE = 0755)]
 
 [[section(".text.crt.dos.fs.modify")]]
-[[cp, requires_function(mkdir)]]
+[[cp, crt_dos_variant, requires_function(mkdir)]]
 int _mkdir([[nonnull]] char const *path) {
 	return mkdir(path, DOS_MKDIR_ACCESS_MODE);
 }

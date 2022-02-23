@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe25ee5cd */
+/* HASH CRC-32:0x3a842d60 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,10 +44,10 @@ INTDEF ATTR_PURE WUNUSED unsigned int NOTHROW(LIBCCALL libc_dosfs_getenabled)(vo
  * calls,  meaning they accept/return DOS paths, rather
  * than unix paths.
  *
- * The default state of dosfs emultion depends on the
- * binary format of the main application. If the main
- * application is an ELF binary, the default state is
- * set to `DOSFS_DISABLED'.  When it's  a PE  binary,
+ * The default state of dosfs emulation depends on the
+ * binary format of the main application. If the  main
+ * application is an ELF binary, the default state  is
+ * set  to  `DOSFS_DISABLED'. When  it's a  PE binary,
  * the default state is `DOSFS_ENABLED'
  *
  * Note that this function does not affect programs  that

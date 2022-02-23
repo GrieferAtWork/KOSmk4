@@ -5912,6 +5912,7 @@
 #define __CRT_HAVE_KOS$_mbstowcs_s
 #define __CRT_HAVE_KOS$_mbstowcs_s_l
 #define __CRT_HAVE_KOS$_mbtowc_l
+#define __CRT_HAVE_KOS$_mkdir
 #define __CRT_HAVE_KOS$_open
 #define __CRT_HAVE_KOS$_pgmptr
 #define __CRT_HAVE_KOS$_putenv
@@ -6834,6 +6835,7 @@
 #define __CRT_HAVE_DOS$_mbstowcs_s
 #define __CRT_HAVE_DOS$_mbstowcs_s_l
 #define __CRT_HAVE_DOS$_mbtowc_l
+#define __CRT_HAVE_DOS$_mkdir
 #define __CRT_HAVE_DOS$_open
 #define __CRT_HAVE_DOS$_pgmptr
 #define __CRT_HAVE_DOS$_putenv

@@ -152,7 +152,7 @@ libpe_GetProcAddress(DlModule *self, char const *symbol_name) {
 	result = dlsym(self, symbol_name);
 	if (result) {
 		/* Clear the error message set by the initial failed `dlsym()' */
-		*dl.dl_error_message = NULL;
+		dl_error_message = NULL;
 	}
 	return result;
 }
@@ -384,11 +384,11 @@ libpe_LoadLibrary(char const *__restrict filename, unsigned int flags) {
 			goto done;
 	}
 
-	*dl.dl_error_message = NULL;
+	dl_error_message = NULL;
 err:
 	return NULL;
 done:
-	*dl.dl_error_message = NULL;
+	dl_error_message = NULL;
 	return result;
 }
 
@@ -425,7 +425,7 @@ DlModule_PeInitializeImportTable(DlModule *__restrict self) {
 			syslog(LOG_DEBUG, "[pe] import: %q\n", filename);
 			dependency = libpe_LoadLibrary(filename, dep_flags);
 			if (!dependency) {
-				if (ATOMIC_READ(*dl.dl_error_message) == NULL)
+				if (ATOMIC_READ(dl_error_message) == NULL)
 					dl.dl_seterrorf("Failed to load dependency %q of %q",
 					                filename, self->dm_filename);
 				goto err;
@@ -447,7 +447,7 @@ DlModule_PeInitializeImportTable(DlModule *__restrict self) {
 				syslog(LOG_DEBUG, "[pe] GetProcAddress(%q, %q)\n",
 				       dependency->dm_filename, ent->Name);
 				addr = libpe_GetProcAddress(dependency, ent->Name);
-				if (!addr && *dl.dl_error_message != NULL) {
+				if (!addr && dl_error_message != NULL) {
 					dl.dl_seterrorf("%q: Symbol %q missing from %q",
 					                self->dm_filename, ent->Name,
 					                dependency->dm_filename);

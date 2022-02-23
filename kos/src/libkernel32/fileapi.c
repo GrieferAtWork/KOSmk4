@@ -110,14 +110,15 @@ libk32_FindNextFileA(HANDLE hFindFile, LPWIN32_FIND_DATAA lpFindFileData) {
 	struct dirent *ent;
 	struct stat64 st;
 	TRACE("FindNextFileA(%p, %p)", hFindFile, lpFindFileData);
+again_readdir:
 	ent = __find_readdir((struct dfind *)hFindFile);
 	if (!ent) {
 		_nterrno = ERROR_NO_MORE_FILES;
 		return FALSE;
 	}
 	if (fstatat64(dirfd(((struct dfind *)hFindFile)->df_dir),
-	              ent->d_name, &st, AT_SYMLINK_NOFOLLOW))
-		return FALSE;
+	              ent->d_name, &st, AT_SYMLINK_NOFOLLOW) != 0)
+		goto again_readdir;
 	lpFindFileData->dwFileAttributes = libk32_FileAttributesFromStat(&st);
 	lpFindFileData->ftCreationTime   = libk32_TimeSpecToFileTime(&st.st_ctimespec);
 	lpFindFileData->ftLastAccessTime = libk32_TimeSpecToFileTime(&st.st_atimespec);
@@ -139,14 +140,15 @@ libk32_FindNextFileW(HANDLE hFindFile, LPWIN32_FIND_DATAW lpFindFileData) {
 	struct stat64 st;
 	char16_t *wname;
 	TRACE("FindNextFileW(%p, %p)", hFindFile, lpFindFileData);
+again_readdir:
 	ent = __find_readdir((struct dfind *)hFindFile);
 	if (!ent) {
 		_nterrno = ERROR_NO_MORE_FILES;
 		return FALSE;
 	}
 	if (fstatat64(dirfd(((struct dfind *)hFindFile)->df_dir),
-	              ent->d_name, &st, AT_SYMLINK_NOFOLLOW))
-		return FALSE;
+	              ent->d_name, &st, AT_SYMLINK_NOFOLLOW) != 0)
+		goto again_readdir;
 	lpFindFileData->dwFileAttributes = libk32_FileAttributesFromStat(&st);
 	lpFindFileData->ftCreationTime   = libk32_TimeSpecToFileTime(&st.st_ctimespec);
 	lpFindFileData->ftLastAccessTime = libk32_TimeSpecToFileTime(&st.st_atimespec);
@@ -221,12 +223,11 @@ libk32_GetLogicalDrives(VOID) {
 #define MAX_LOGICAL_DRIVE_STRINGS (((('Z' - 'A') + 1) * 4) + 1)
 INTERN DWORD WINAPI
 libk32_GetLogicalDriveStringsA(DWORD nBufferLength, LPSTR lpBuffer) {
-	DWORD result;
-	DWORD mask;
-	TRACE("GetLogicalDriveStringsA(%#x, %p)", nBufferLength, lpBuffer);
-	mask = libk32_GetLogicalDrives();
 	char buf[MAX_LOGICAL_DRIVE_STRINGS], *iter = buf;
 	unsigned char letter;
+	DWORD result, mask;
+	TRACE("GetLogicalDriveStringsA(%#x, %p)", nBufferLength, lpBuffer);
+	mask = libk32_GetLogicalDrives();
 	for (letter = 'A'; letter <= 'Z'; ++letter, mask >>= 1) {
 		if (!(mask & 1))
 			continue;
@@ -245,12 +246,11 @@ libk32_GetLogicalDriveStringsA(DWORD nBufferLength, LPSTR lpBuffer) {
 }
 INTERN DWORD WINAPI
 libk32_GetLogicalDriveStringsW(DWORD nBufferLength, LPWSTR lpBuffer) {
-	DWORD result;
-	DWORD mask;
-	TRACE("GetLogicalDriveStringsW(%#x, %p)", nBufferLength, lpBuffer);
-	mask = libk32_GetLogicalDrives();
 	char buf[MAX_LOGICAL_DRIVE_STRINGS], *iter = buf;
 	unsigned char letter;
+	DWORD result, mask;
+	TRACE("GetLogicalDriveStringsW(%#x, %p)", nBufferLength, lpBuffer);
+	mask = libk32_GetLogicalDrives();
 	for (letter = 'A'; letter <= 'Z'; ++letter, mask >>= 1) {
 		if (!(mask & 1))
 			continue;
