@@ -423,11 +423,7 @@ template<class __S> struct __loc_T { typedef __S __T; };
 
 /* Linkage for local function substitutions. */
 #ifndef __LOCAL_LIBC
-#ifdef __NO_INTERN_COMDAT
-#define __LOCAL_LIBC(name) __INTERN_COMDAT
-#else /* __NO_INTERN_COMDAT */
-#define __LOCAL_LIBC(name) __INTERN_COMDAT __ATTR_SECTION(".text.local." #name)
-#endif /* !__NO_INTERN_COMDAT */
+#define __LOCAL_LIBC(name) __INTERN_COMDAT_SECTION(".text.local", #name)
 #endif /* !__LOCAL_LIBC */
 
 #ifndef __NO_ATTR_SECTION

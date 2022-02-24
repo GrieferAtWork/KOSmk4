@@ -534,8 +534,6 @@
 #define __INTERN_CONST
 #define INTERN_COMDAT
 #define __INTERN_COMDAT
-#define PUBLIC_COMDAT
-#define __PUBLIC_COMDAT
 #define INTDEF
 #define __INTDEF
 #define PRIVATE

@@ -208,7 +208,6 @@
 #define PUBLIC_CONST       __PUBLIC_CONST
 #define INTERN_CONST       __INTERN_CONST
 #define INTERN_COMDAT      __INTERN_COMDAT
-#define PUBLIC_COMDAT      __PUBLIC_COMDAT
 #define PRIVATE            __PRIVATE
 #define LOCAL              __LOCAL
 #define FORCELOCAL         __FORCELOCAL

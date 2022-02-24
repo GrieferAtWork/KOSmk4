@@ -273,31 +273,35 @@
 #endif /* !__DEFINE_PUBLIC_ALIAS */
 
 #if !defined(__CC__)
-#define __IMPDEF        /* Nothing */
-#define __IMPDAT        /* Nothing */
-#define __EXPDEF        /* Nothing */
-#define __PUBDEF        /* Nothing */
-#define __PRIVATE       /* Nothing */
-#define __INTDEF        /* Nothing */
-#define __PUBLIC        /* Nothing */
-#define __INTERN        /* Nothing */
-#define __PUBLIC_CONST  /* Nothing */
-#define __INTERN_CONST  /* Nothing */
-#define __PUBLIC_COMDAT /* Nothing */
-#define __INTERN_COMDAT /* Nothing */
+#define __IMPDEF                               /* Nothing */
+#define __IMPDAT                               /* Nothing */
+#define __EXPDEF                               /* Nothing */
+#define __PUBDEF                               /* Nothing */
+#define __PRIVATE                              /* Nothing */
+#define __INTDEF                               /* Nothing */
+#define __PUBLIC                               /* Nothing */
+#define __INTERN                               /* Nothing */
+#define __PUBLIC_CONST                         /* Nothing */
+#define __INTERN_CONST                         /* Nothing */
+#define __INTERN_COMDAT(name)                  /* Nothing */
+#define __INTERN_COMDAT_SECTION(sectnam, name) /* Nothing */
+#define __INTERN_INLINE(name)                  /* Nothing */
+#define __INTERN_INLINE_SECTION(sectnam, name) /* Nothing */
 #elif defined(__INTELLISENSE__)
-#define __IMPDEF        extern
-#define __IMPDAT        extern
-#define __EXPDEF        extern
-#define __PUBDEF        extern
-#define __PRIVATE       static
-#define __INTDEF        extern
-#define __PUBLIC        /* Nothing */
-#define __INTERN        /* Nothing */
-#define __PUBLIC_CONST  /* Nothing */
-#define __INTERN_CONST  /* Nothing */
-#define __PUBLIC_COMDAT /* Nothing */
-#define __INTERN_COMDAT /* Nothing */
+#define __IMPDEF                               extern
+#define __IMPDAT                               extern
+#define __EXPDEF                               extern
+#define __PUBDEF                               extern
+#define __PRIVATE                              static
+#define __INTDEF                               extern
+#define __PUBLIC                               /* Nothing */
+#define __INTERN                               /* Nothing */
+#define __PUBLIC_CONST                         /* Nothing */
+#define __INTERN_CONST                         /* Nothing */
+#define __INTERN_COMDAT(name)                  /* Nothing */
+#define __INTERN_COMDAT_SECTION(sectnam, name) /* Nothing */
+#define __INTERN_INLINE(name)                  /* Nothing */
+#define __INTERN_INLINE_SECTION(sectnam, name) /* Nothing */
 #elif defined(__PE__)
 #define __IMPDEF        extern __ATTR_DLLIMPORT
 #define __IMPDAT        extern __ATTR_DLLIMPORT
@@ -377,52 +381,55 @@
 #endif /* __NO_ATTR_VISIBILITY */
 #endif /* !... */
 
-/* COMDAT function definitions:
- * When applied to  a function, an  attempt will  be made to  ensure that  multiple
- * instances of the same function, which  may exist in multiple compilation  units,
- * get merged into a single  instance at link-time. No  guaranty is made that  this
- * will actually be the case, meaning that as a fall-back, these macros are allowed
- * to  simply declare functions as static (with the exception of `__PUBLIC_COMDAT',
- * which will define  `__NO_PUBLIC_COMDAT' if  the function cannot  be provided  as
- * part of the containing programs export table)
- *   - __INTERN_COMDAT: Combination of  __PRIVATE, in  that  the symbol  is  only
- *                      guarantied to be visible within the declaring compilation
- *                      unit, but also similar to  `__INTERN', in that the  final
- *                      run-time address of the  symbol may be identical  between
- *                      multiple compilation units.
- *                      Note that unlike `__INTERN', declaration with this visibility
- *                      should  appear  in   headers,  rather   than  source   files!
- *   - __PUBLIC_COMDAT: An  optional extension to  `__INTERN_COMDAT' that exists mainly
- *                      in  c++, where  the annotated  function (may)  also be exported
- *                      from the associated program, and relocations (may) be generated
- *                      to  ensure that a  single, common address is  used in the event
- *                      that   other   linked  components   export  the   same  symbol.
- *                      If this macro is a simple alias for `__INTERN_COMDAT', then the
- *                      macro `__NO_PUBLIC_COMDAT' is defined to `1' */
+/* COMDAT function definitions
+ *
+ * - Only emit code if function is actually used
+ * - Try to use COMDAT symbols, meaning in case of multiple definitions in different
+ *   source  files, one is selected randomly that is then linked to all other source
+ *   files. (if this part isn't supported, define `__NO_INTERN_COMDAT')
+ * - Symbol visibility is either INTERN or PRIVATE (the later only in the  fallback
+ *   case where we're unable to declare COMDAT symbols, in which case we'll instead
+ *   declare them as PRIVATE)
+ *
+ * >> __INTERN_COMDAT("foo")                  void foo() { ... } // Normal comdat symbol; impl in ".text"
+ * >> __INTERN_COMDAT_SECTION(".text", "foo") void foo() { ... } // Normal comdat symbol; impl in custom section
+ * >> __INTERN_INLINE("foo")                  void foo() { ... } // Try to inline; non-inline impl in ".text"
+ * >> __INTERN_INLINE_SECTION(".text", "foo") void foo() { ... } // Try to inline; non-inline impl in custom section
+ */
 #ifndef __INTERN_COMDAT
+#if defined(__GNUC__) && defined(__ELF__) && 0 /* XXX: This method doesn't work with `*.constprop.0' functions... */
+#define __INTERN_COMDAT_SECTION(sectnam, name) static __attribute__((__unused__, __section__(sectnam "." name ",\"axG\",@progbits," name ",comdat;.weak " name ";.hidden " name "#")))
+#define __INTERN_COMDAT(name)                  static __attribute__((__unused__, __section__(".text." name ",\"axG\",@progbits," name ",comdat;.weak " name ";.hidden " name "#")))
 #ifdef __cplusplus
-#define __INTERN_COMDAT inline __ATTR_NOINLINE __ATTR_UNUSED __ATTR_VISIBILITY("hidden")
-#elif !defined(__NO_ATTR_SELECTANY) && 0 /* __ATTR_SELECTANY can only be used for data... :( */
-#define __INTERN_COMDAT extern __ATTR_UNUSED __ATTR_SELECTANY __ATTR_VISIBILITY("hidden")
-#elif !defined(__NO_ATTR_WEAK) && 0 /* weak causes functions to be defined, even if unused :( */
-#define __INTERN_COMDAT __ATTR_UNUSED __ATTR_WEAK __ATTR_VISIBILITY("hidden")
+#define __INTERN_INLINE_SECTION(sectnam, name) inline __attribute__((__unused__, __visibility__("hidden"), __section__(sectnam)))
+#define __INTERN_INLINE(name)                  inline __attribute__((__unused__, __visibility__("hidden")))
+#else /* __cplusplus */
+#define __INTERN_INLINE_SECTION(sectnam, name) static __inline__ __attribute__((__section__(sectnam "." name ",\"axG\",@progbits," name ",comdat;.weak " name ";.hidden " name "#")))
+#define __INTERN_INLINE(name)                  static __inline__ __attribute__((__section__(".text." name ",\"axG\",@progbits," name ",comdat;.weak " name ";.hidden " name "#")))
+#endif /* !__cplusplus */
+#elif defined(__cplusplus)
+/* C++ guaranties for "inline" functions match  comdat requirements. -- Only problem  is
+ * that using "inline" also requests that the compiler try to inline the function, which
+ * is  something we may not actually want. --  Sadly, there is no attribute to take back
+ * the inlining-part of "inline", without also telling the compiler to NEVER inline  the
+ * function. */
+#if defined(__GNUC__) && 0 /* Using NOINLINE generally degrades performance. -- The compiler already skips inline if functions get too large */
+#define __INTERN_COMDAT(sectnam, name)         inline __ATTR_NOINLINE __ATTR_UNUSED __ATTR_VISIBILITY("hidden")
+#define __INTERN_COMDAT_SECTION(sectnam, name) inline __ATTR_NOINLINE __ATTR_UNUSED __ATTR_VISIBILITY("hidden") __ATTR_SECTION(sectnam "." name)
+#else
+#define __INTERN_COMDAT(sectnam, name)         inline __ATTR_UNUSED __ATTR_VISIBILITY("hidden")
+#define __INTERN_COMDAT_SECTION(sectnam, name) inline __ATTR_UNUSED __ATTR_VISIBILITY("hidden") __ATTR_SECTION(sectnam "." name)
+#endif
+#define __INTERN_INLINE(sectnam, name)         inline __ATTR_UNUSED __ATTR_VISIBILITY("hidden")
+#define __INTERN_INLINE_SECTION(sectnam, name) inline __ATTR_UNUSED __ATTR_VISIBILITY("hidden") __ATTR_SECTION(sectnam "." name)
 #else /* ... */
-#define __NO_INTERN_COMDAT
-#define __INTERN_COMDAT static __ATTR_NOINLINE __ATTR_INLINE __ATTR_UNUSED
+#define __NO_INTERN_COMDAT /* In this fallback case, we don't actually have proper COMDAT functionality... */
+#define __INTERN_COMDAT(sectnam, name)         static __ATTR_UNUSED
+#define __INTERN_COMDAT_SECTION(sectnam, name) static __ATTR_UNUSED __ATTR_SECTION(sectnam)
+#define __INTERN_INLINE(sectnam, name)         __LOCAL
+#define __INTERN_INLINE_SECTION(sectnam, name) __LOCAL __ATTR_SECTION(sectnam)
 #endif /* !... */
 #endif /* !__INTERN_COMDAT */
-#ifndef __PUBLIC_COMDAT
-#ifdef __cplusplus
-#define __PUBLIC_COMDAT __PUBLIC inline __ATTR_NOINLINE
-#elif !defined(__NO_ATTR_SELECTANY) && 0 /* __ATTR_SELECTANY can only be used for data... */
-#define __PUBLIC_COMDAT extern __ATTR_SELECTANY __ATTR_VISIBILITY("default")
-#elif !defined(__NO_ATTR_WEAK)
-#define __PUBLIC_COMDAT __PUBLIC __ATTR_WEAK
-#else /* ... */
-#define __NO_PUBLIC_COMDAT
-#define __PUBLIC_COMDAT __INTERN_COMDAT
-#endif /* !... */
-#endif /* !__PUBLIC_COMDAT */
 
 
 
