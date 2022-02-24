@@ -111,9 +111,7 @@ DEFINE_TEST(system_rtld_ro) {
 
 	errno = 0, ps = getpagesize();
 	EQp(MAP_FAILED, (map = mmap(NULL, ps, PROT_READ | PROT_WRITE, MAP_SHARED, sysrtld, 0)));
-	assertf((errno == EACCES) || /* EACCES in case `sysrtld' is IO_RDONLY */
-	        (errno == EROFS),    /* EROFS for `E_FSERROR_READONLY' (because WRITE+SHARED aren't allowed) */
-	        "%d", errno);
+	EQd(EROFS, errno); /* EROFS for `E_FSERROR_READONLY' (because WRITE+SHARED aren't allowed) */
 
 	NEp(MAP_FAILED, (map = mmap(NULL, ps, PROT_READ | PROT_WRITE, MAP_PRIVATE, sysrtld, 0)));
 	if (ps > sizeof(buf))

@@ -73,15 +73,8 @@ DEFINE_TEST(dosabi) {
 	static char const ext[]   = ".txt";
 #define ASSERT_STRINGS_EQUAL(a, b) \
 	assertf(strcmp(a, b) == 0, "%q != %q", a, b)
-	errno_t e;
-	e = KOS__makepath_s(kos_fullpath,
-	                    sizeof(kos_fullpath),
-	                    drive, dir, file, ext);
-	assertf(e == 0, "%d", e);
-	e = DOS__makepath_s(dos_fullpath,
-	                    sizeof(dos_fullpath),
-	                    drive, dir, file, ext);
-	assertf(e == 0, "%d", e);
+	EQd(0, KOS__makepath_s(kos_fullpath, sizeof(kos_fullpath), drive, dir, file, ext));
+	EQd(0, DOS__makepath_s(dos_fullpath, sizeof(dos_fullpath), drive, dir, file, ext));
 	ASSERT_STRINGS_EQUAL(kos_fullpath, dos_fullpath);
 	ASSERT_STRINGS_EQUAL(kos_fullpath, "C:\\path\\to\\some\\file\\some_file.txt");
 	{
@@ -89,22 +82,20 @@ DEFINE_TEST(dosabi) {
 		char buf_dir[64];
 		char buf_file[64];
 		char buf_ext[64];
-		e = KOS__splitpath_s(kos_fullpath,
-		                     buf_drive, sizeof(buf_drive),
-		                     buf_dir, sizeof(buf_dir),
-		                     buf_file, sizeof(buf_file),
-		                     buf_ext, sizeof(buf_ext));
-		assertf(e == 0, "%d", e);
+		EQd(0, KOS__splitpath_s(kos_fullpath,
+		                        buf_drive, sizeof(buf_drive),
+		                        buf_dir, sizeof(buf_dir),
+		                        buf_file, sizeof(buf_file),
+		                        buf_ext, sizeof(buf_ext)));
 		ASSERT_STRINGS_EQUAL(buf_drive, drive);
 		ASSERT_STRINGS_EQUAL(buf_dir, dir);
 		ASSERT_STRINGS_EQUAL(buf_file, file);
 		ASSERT_STRINGS_EQUAL(buf_ext, ext);
-		e = DOS__splitpath_s(kos_fullpath,
-		                     buf_drive, sizeof(buf_drive),
-		                     buf_dir, sizeof(buf_dir),
-		                     buf_file, sizeof(buf_file),
-		                     buf_ext, sizeof(buf_ext));
-		assertf(e == 0, "%d", e);
+		EQd(0, DOS__splitpath_s(kos_fullpath,
+		                        buf_drive, sizeof(buf_drive),
+		                        buf_dir, sizeof(buf_dir),
+		                        buf_file, sizeof(buf_file),
+		                        buf_ext, sizeof(buf_ext)));
 		ASSERT_STRINGS_EQUAL(buf_drive, drive);
 		ASSERT_STRINGS_EQUAL(buf_dir, dir);
 		ASSERT_STRINGS_EQUAL(buf_file, file);

@@ -129,79 +129,68 @@ checkTestFiles_impl(char const *path,
 }
 
 PRIVATE void testPath(char const *path) {
-	ssize_t temp;
 	fd_t fd;
-	fd_t dfd = open(path, O_PATH | O_CLOEXEC);
-	int error;
+	fd_t dfd;
 	bool testHardLink;
 	/* Only test hardlinks if supported by the underlying filesystem. */
+	NEd(-1, (dfd = open(path, O_PATH | O_CLOEXEC)));
 	testHardLink = fpathconf(dfd, _PC_LINK_MAX) > 1;
 	ctest_substatf("path: %s%s\n", path, testHardLink ? " (w/ hardlink)" : "");
 
-	assertf(dfd != -1, "%m");
 	/* Cleanup artifacts from possibly failed prior tests... */
 	unlinkat(dfd, "test", 0);
 	unlinkat(dfd, "test2", 0);
 	checkTestFiles(path, false);
 
 	/* Create a previous non-existent file. */
-	fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644);
-	assertf(fd != -1, "%m");
-	temp = write(fd, "F1\n", 3);
-	assertf(temp == 3, "%m");
-	error = close(fd);
-	assertf(error == 0, "%m");
+	NEd(-1, (fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644)));
+	EQss(3, write(fd, "F1\n", 3));
+	EQd(0, close(fd));
 
 	/* At this point, the file should already exist */
-	fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644);
-	assertf(fd == -1, "%d", fd);
-	assertf(errno == EEXIST, "%m");
+	EQd(-1, (fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644)));
+	EQd(errno, EEXIST);
 
 	/* At this point, the file should already exist */
 	assertFileText(dfd, "test", "F1\n");
 
 	/* Now rename the file */
-	assertf(renameat2(dfd, "test", dfd, "test2", AT_RENAME_NOREPLACE) == 0, "%m");
+	EQd(0, renameat2(dfd, "test", dfd, "test2", AT_RENAME_NOREPLACE));
 
 	/* The open should now fail. */
-	fd = openat(dfd, "test", O_RDONLY);
-	assertf(fd == -1, "%d", fd);
-	assertf(errno == ENOENT, "%m");
+	EQd(-1, (fd = openat(dfd, "test", O_RDONLY)));
+	EQd(errno, ENOENT);
 
 	/* But an open with the new filename shouldn't */
 	assertFileText(dfd, "test2", "F1\n");
 
 	/* Now try to create a second file. */
-	fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644);
-	assertf(fd != -1, "%m");
-	temp = write(fd, "F2\n", 3);
-	assertf(temp == 3, "%m");
-	error = close(fd);
-	assertf(error == 0, "%m");
+	NEd(-1, (fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644)));
+	EQd(3, write(fd, "F2\n", 3));
+	EQd(0, close(fd));
 
 	/* Ensure that both file are still intact */
 	assertFileText(dfd, "test2", "F1\n");
 	assertFileText(dfd, "test", "F2\n");
 
 	/* At this point, a rename should fail with EEXIST */
-	assert(renameat2(dfd, "test", dfd, "test2", AT_RENAME_NOREPLACE) == -1);
-	assertf(errno == EEXIST, "%m");
-	assert(renameat2(dfd, "test2", dfd, "test", AT_RENAME_NOREPLACE) == -1);
-	assertf(errno == EEXIST, "%m");
+	EQd(-1, renameat2(dfd, "test", dfd, "test2", AT_RENAME_NOREPLACE));
+	EQd(errno, EEXIST);
+	EQd(-1, renameat2(dfd, "test2", dfd, "test", AT_RENAME_NOREPLACE));
+	EQd(errno, EEXIST);
 
 	/* Try to delete `test2' and re-attempt the rename */
-	assertf(unlinkat(dfd, "test2", 0) == 0, "%m");
+	EQd(0, unlinkat(dfd, "test2", 0));
 
 	/* The "test" file should still be intact */
 	assertFileText(dfd, "test", "F2\n");
 
 	/* But the test2 file should no longer exist. */
-	fd = openat(dfd, "test2", O_RDONLY);
-	assertf(fd == -1, "%d", fd);
-	assertf(errno == ENOENT, "%m");
+	EQd(-1, (fd = openat(dfd, "test2", O_RDONLY)));
+	EQd(errno, ENOENT);
 
 	/* Now try the rename once again */
-	assertf(renameat2(dfd, "test", dfd, "test2", AT_RENAME_NOREPLACE) == 0, "%m");
+	EQd(0, renameat2(dfd, "test", dfd, "test2", AT_RENAME_NOREPLACE));
 
 	/* Verify the contents of the "test2" file */
 	assertFileText(dfd, "test2", "F2\n");
@@ -210,12 +199,9 @@ PRIVATE void testPath(char const *path) {
 	 * Finally,  try to create  a new `test' file.
 	 * The important part here  is that a file  of
 	 * the same name already existed at one point! */
-	fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644);
-	assertf(fd != -1, "%m");
-	temp = write(fd, "F3\n", 3);
-	assertf(temp == 3, "%m");
-	error = close(fd);
-	assertf(error == 0, "%m");
+	NEd(-1, (fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644)));
+	EQss(3, write(fd, "F3\n", 3));
+	EQd(0, close(fd));
 
 	/* Verify file contents one last time. */
 	assertFileText(dfd, "test2", "F2\n");
@@ -225,8 +211,8 @@ PRIVATE void testPath(char const *path) {
 	checkTestFiles(path, true);
 
 	/* Finally, delete the two remaining test files. */
-	assertf(unlinkat(dfd, "test2", 0) == 0, "%m");
-	assertf(unlinkat(dfd, "test", 0) == 0, "%m");
+	EQd(0, unlinkat(dfd, "test2", 0));
+	EQd(0, unlinkat(dfd, "test", 0));
 
 	/* And after that, ensure that neither still shows up in `readdir()' */
 	checkTestFiles(path, false);
@@ -235,12 +221,9 @@ PRIVATE void testPath(char const *path) {
 		struct stat st1, st2;
 		char modestr[12];
 
-		fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644);
-		assertf(fd != -1, "%m");
-		temp = write(fd, "HL1", 3);
-		assertf(temp == 3, "%m");
-		error = close(fd);
-		assertf(error == 0, "%m");
+		NEd(-1, (fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644)));
+		EQss(3, write(fd, "HL1", 3));
+		EQd(0, close(fd));
 
 		/* Take away write-permissions from the file.
 		 * This verifies that it'll still be possible to unlink()
@@ -253,12 +236,10 @@ PRIVATE void testPath(char const *path) {
 		 *       are supposed to be tested, since currently all filesystems
 		 *       that are being  tested support  POSIX permissions  exactly
 		 *       when, and only when, hard-links are also supported. */
-		error = fchmodat(dfd, "test", 0444, 0);
-		assertf(error == 0, "%m");
+		EQd(0, fchmodat(dfd, "test", 0444, 0));
 
 		/* Use linkat() to test hard-links. */
-		error = linkat(dfd, "test", dfd, "test2", 0);
-		assertf(error == 0, "%m");
+		EQd(0, linkat(dfd, "test", dfd, "test2", 0));
 
 		/* Pre-init the stat structures to account for padding
 		 * fields (that aren't written  by the kernel) in  the
@@ -266,10 +247,8 @@ PRIVATE void testPath(char const *path) {
 		memset(&st1, 0xcc, sizeof(st1));
 		memset(&st2, 0xcc, sizeof(st2));
 
-		error = fstatat(dfd, "test", &st1, 0);
-		assertf(error == 0, "%m");
-		error = fstatat(dfd, "test2", &st2, 0);
-		assertf(error == 0, "%m");
+		EQd(0, fstatat(dfd, "test", &st1, 0));
+		EQd(0, fstatat(dfd, "test2", &st2, 0));
 
 		/* Should be the same file. */
 		assertf(memcmp(&st1, &st2, sizeof(struct stat)) == 0,
@@ -298,16 +277,15 @@ PRIVATE void testPath(char const *path) {
 		checkTestFiles(path, true);
 
 		/* And now to delete the files once again */
-		assertf(unlinkat(dfd, "test", 0) == 0, "%m");
-		assertf(unlinkat(dfd, "test2", 0) == 0, "%m");
+		EQd(0, unlinkat(dfd, "test", 0));
+		EQd(0, unlinkat(dfd, "test2", 0));
 
 		/* And after that, ensure that neither still shows up in `readdir()' */
 		checkTestFiles(path, false);
 	}
 
 	/* Finally, close our directory handle */
-	error = close(dfd);
-	assertf(error == 0, "%m");
+	EQd(0, close(dfd));
 }
 
 
@@ -316,7 +294,7 @@ DEFINE_TEST(fs) {
 	testPath("/tmp");
 
 	if (mkdir("/var", 755) == -1)
-		assertf(errno == EEXIST, "%m");
+		EQd(errno, EEXIST);
 	testPath("/var");
 
 	/* /dev is a slightly different filesystem type when compared to /tmp
