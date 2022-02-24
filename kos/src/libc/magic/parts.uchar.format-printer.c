@@ -95,10 +95,13 @@ format_c32printf(*) %{uchar32("format_wprintf")}
 %
 %
 %
-$ssize_t format_c16sprintf_printer(/*char16_t ***/ void *arg, char16_t const *__restrict data, $size_t datalen)
-	%{uchar16("format_wsprintf_printer")}
-$ssize_t format_c32sprintf_printer(/*char32_t ***/ void *arg, char32_t const *__restrict data, $size_t datalen)
-	%{uchar32("format_wsprintf_printer")}
+format_c16sprintf_printer(*) %{uchar16("format_wsprintf_printer")}
+format_c32sprintf_printer(*) %{uchar32("format_wsprintf_printer")}
+
+//$ssize_t format_c16sprintf_printer(/*char16_t ***/ void *arg, char16_t const *__restrict data, $size_t datalen)
+//	%{uchar16("format_wsprintf_printer")}
+//$ssize_t format_c32sprintf_printer(/*char32_t ***/ void *arg, char32_t const *__restrict data, $size_t datalen)
+//	%{uchar32("format_wsprintf_printer")}
 
 
 %{

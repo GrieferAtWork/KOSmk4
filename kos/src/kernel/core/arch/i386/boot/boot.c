@@ -651,28 +651,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       correctly  with all of  the special AT_RENAME_*  flags, since they were
 	 *       implemented before I learned about unix rename() semantics... */
 
-	/* TODO: `system_clearcache()' needs to be a blocking function (and can be
-	 *       as well, since it only  gets called automatically in the  context
-	 *       of allocating operations)
-	 * This sort of change is also needed in order to allow known-blocking  ops
-	 * that  need to happen inside, including the synchronous unloading of mem-
-	 * parts (which if you at it in an objective way, is the _main_ way through
-	 * which  an OS can reclaim memory, as  this includes the unloading of file
-	 * buffers)
-	 *
-	 * Solution: there are still situations where system_clearcache() _should_
-	 *           be  atomic. As such, it'd probably be  best to just add a new
-	 *           param: `gfp_t flags', which is allowed to include GFP_ATOMIC.
-	 *
-	 * It may also  be a  good idea  to add  2 more  arguments:
-	 * >> void (FCALL *retry_alloc)(void *cookie), void *cookie
-	 *
-	 * that represent a pair  of functions occasionally called  in-between
-	 * having done different things to free up memory. This function could
-	 * then  be used to stop the clearing  of caches as soon as sufficient
-	 * system resources have  become available to  satisfy the  allocation
-	 * attempted by the caller. */
-
 	/* TODO: `struct epoll_controller::ec_lock' must be an atomic lock.
 	 *       Otherwise, anything that wants to acquire this lock  would
 	 *       have to be marked as `BLOCKING' */
@@ -824,11 +802,11 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: According  to  this:  https://sourceware.org/bugzilla/show_bug.cgi?id=18228
 	 * The combination of O_PATH|O_NOFOLLOW can be used to directly open flnknode nodes,
-	 * similar to the (now abandoned  and now longer available) KOS-specific  O_SYMLINK. */
-
-	/* TODO: As per `man 2 open', O_PATH is also allowed to return regular files (in the
-	 *       case of KOS, that would be the raw `struct mfile' objects). Currently,  our
-	 *       implementation restricts O_PATH to only work for directories. */
+	 * similar to the (now abandoned  and now longer available) KOS-specific  O_SYMLINK.
+	 *
+	 * As per `man 2 open', O_PATH is also allowed to return regular files (in the
+	 * case of KOS, that would be the raw `struct mfile' objects). Currently,  our
+	 * implementation restricts O_PATH to only work for directories. */
 
 	/* TODO: Update the toolchain gcc to the latest version.
 	 *       Afterwards, add `__attribute__((access(...)))' support to magic:
@@ -848,7 +826,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       explicitly declared fields) */
 
 	/* TODO: When a thread changes CPUs, it must call `userexcept_sysret_inject_self()'
-	 *       s.a. explaination in `userexcept_sysret_inject_safe()' */
+	 *       s.a. explaination in `userexcept_sysret_inject_safe()' (NOTE: threads also
+	 *       need to check for pending RPCs in this scenario) */
 
 	/* TODO: Add futex support to pthread_once() (via an alternate [[userimpl]]) */
 

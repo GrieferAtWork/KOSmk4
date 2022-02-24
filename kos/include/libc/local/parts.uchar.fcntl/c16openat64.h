@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x699c5c80 */
+/* HASH CRC-32:0x13edc6b0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_c16openat64_defined
 #include <__crt.h>
 #include <asm/os/oflags.h>
-#if (defined(__CRT_HAVE_wopenat) && __SIZEOF_WCHAR_T__ == 2 && defined(__VLIBCCALL_IS_VLIBDCALL)) || ((defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)) && ((defined(__CRT_HAVE_convert_wcstombs) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$convert_wcstombs) || (defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
+#if (defined(__CRT_HAVE_wopenat) && __SIZEOF_WCHAR_T__ == 2 && defined(__VLIBCCALL_IS_VLIBDCALL)) || defined(__CRT_HAVE_DOS$wopenat) || ((defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)) && ((defined(__CRT_HAVE_convert_wcstombs) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$convert_wcstombs) || (defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c16openat_defined
@@ -32,14 +32,18 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_wopenat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE) && __SIZEOF_WCHAR_T__ == 2 && defined(__VLIBCCALL_IS_VLIBDCALL)
 __COMPILER_VREDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__VLIBDCALL,__localdep_c16openat,(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename, __oflag_t __oflags),wopenat,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE_DOS$wopenat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
+__CVREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__localdep_c16openat,(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename, __oflag_t __oflags),wopenat,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_wopenat64) && __SIZEOF_WCHAR_T__ == 2 && defined(__VLIBCCALL_IS_VLIBDCALL)
 __COMPILER_VREDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__VLIBDCALL,__localdep_c16openat,(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename, __oflag_t __oflags),wopenat64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE_DOS$wopenat64)
+__CVREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__localdep_c16openat,(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename, __oflag_t __oflags),wopenat64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_wopenat64) || defined(__CRT_HAVE_wopenat) || ((defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.fcntl/wopenat.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c16openat __NAMESPACE_LOCAL_TYPEHAX(__fd_t(__VLIBDCALL*)(__fd_t,__CHAR16_TYPE__ const *,__oflag_t,...),__fd_t(__VLIBDCALL&)(__fd_t,__CHAR16_TYPE__ const *,__oflag_t,...),wopenat)
-#elif (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)) && ((defined(__CRT_HAVE_convert_wcstombs) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$convert_wcstombs) || (defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
+#elif defined(__CRT_HAVE_DOS$wopenat) || ((defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)) && ((defined(__CRT_HAVE_convert_wcstombs) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$convert_wcstombs) || (defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.fcntl/c16openat.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -48,10 +52,16 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_c16openat_defined
 #endif /* !... */
 #endif /* !__local___localdep_c16openat_defined */
-#if !defined(__local___localdep_c16openat32_defined) && defined(__CRT_HAVE_wopenat) && __SIZEOF_WCHAR_T__ == 2 && defined(__VLIBCCALL_IS_VLIBDCALL)
+#ifndef __local___localdep_c16openat32_defined
 #define __local___localdep_c16openat32_defined
+#if defined(__CRT_HAVE_wopenat) && __SIZEOF_WCHAR_T__ == 2 && defined(__VLIBCCALL_IS_VLIBDCALL)
 __COMPILER_VREDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__VLIBDCALL,__localdep_c16openat32,(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename, __oflag_t __oflags),wopenat,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
-#endif /* !__local___localdep_c16openat32_defined && __CRT_HAVE_wopenat && __SIZEOF_WCHAR_T__ == 2 && __VLIBCCALL_IS_VLIBDCALL */
+#elif defined(__CRT_HAVE_DOS$wopenat)
+__CVREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__localdep_c16openat32,(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename, __oflag_t __oflags),wopenat,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
+#else /* ... */
+#undef __local___localdep_c16openat32_defined
+#endif /* !... */
+#endif /* !__local___localdep_c16openat32_defined */
 #ifndef __local___localdep_convert_c16tombs_defined
 #define __local___localdep_convert_c16tombs_defined
 #if defined(__CRT_HAVE_convert_wcstombs) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
@@ -120,13 +130,13 @@ __NOTHROW_RPC(__VLIBDCALL __LIBC_LOCAL_NAME(c16openat64))(__fd_t __dirfd, __CHAR
 	__builtin_va_end(__args);
 
 
-#if defined(__CRT_HAVE_wopenat) && __SIZEOF_WCHAR_T__ == 2 && defined(__VLIBCCALL_IS_VLIBDCALL)
+#if (defined(__CRT_HAVE_wopenat) && __SIZEOF_WCHAR_T__ == 2 && defined(__VLIBCCALL_IS_VLIBDCALL)) || defined(__CRT_HAVE_DOS$wopenat)
 #ifdef __O_LARGEFILE
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_c16openat32)(__dirfd, __filename, __oflags | __O_LARGEFILE, __mode);
 #else /* __O_LARGEFILE */
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_c16openat32)(__dirfd, __filename, __oflags, __mode);
 #endif /* !__O_LARGEFILE */
-#else /* __CRT_HAVE_wopenat && __SIZEOF_WCHAR_T__ == 2 && __VLIBCCALL_IS_VLIBDCALL */
+#else /* (__CRT_HAVE_wopenat && __SIZEOF_WCHAR_T__ == 2 && __VLIBCCALL_IS_VLIBDCALL) || __CRT_HAVE_DOS$wopenat */
 	{
 		char *__utf8_filename;
 		__utf8_filename = (__NAMESPACE_LOCAL_SYM __localdep_convert_c16tombs)(__filename);
@@ -137,7 +147,7 @@ __NOTHROW_RPC(__VLIBDCALL __LIBC_LOCAL_NAME(c16openat64))(__fd_t __dirfd, __CHAR
 		(__NAMESPACE_LOCAL_SYM __localdep_free)(__utf8_filename);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 	}
-#endif /* !__CRT_HAVE_wopenat || __SIZEOF_WCHAR_T__ != 2 || !__VLIBCCALL_IS_VLIBDCALL */
+#endif /* (!__CRT_HAVE_wopenat || __SIZEOF_WCHAR_T__ != 2 || !__VLIBCCALL_IS_VLIBDCALL) && !__CRT_HAVE_DOS$wopenat */
 	return __result;
 }
 __NAMESPACE_LOCAL_END
@@ -145,7 +155,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_c16openat64_defined
 #define __localdep_c16openat64 __LIBC_LOCAL_NAME(c16openat64)
 #endif /* !__local___localdep_c16openat64_defined */
-#else /* (__CRT_HAVE_wopenat && __SIZEOF_WCHAR_T__ == 2 && __VLIBCCALL_IS_VLIBDCALL) || ((__CRT_HAVE_openat64 || __CRT_HAVE_openat) && ((__CRT_HAVE_convert_wcstombs && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$convert_wcstombs || (__CRT_HAVE_convert_wcstombsn && __SIZEOF_WCHAR_T__ == 2) || __CRT_HAVE_DOS$convert_wcstombsn || __CRT_HAVE_format_aprintf_printer || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc)) */
+#else /* (__CRT_HAVE_wopenat && __SIZEOF_WCHAR_T__ == 2 && __VLIBCCALL_IS_VLIBDCALL) || __CRT_HAVE_DOS$wopenat || ((__CRT_HAVE_openat64 || __CRT_HAVE_openat) && ((__CRT_HAVE_convert_wcstombs && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$convert_wcstombs || (__CRT_HAVE_convert_wcstombsn && __SIZEOF_WCHAR_T__ == 2) || __CRT_HAVE_DOS$convert_wcstombsn || __CRT_HAVE_format_aprintf_printer || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc)) */
 #undef __local_c16openat64_defined
-#endif /* (!__CRT_HAVE_wopenat || __SIZEOF_WCHAR_T__ != 2 || !__VLIBCCALL_IS_VLIBDCALL) && ((!__CRT_HAVE_openat64 && !__CRT_HAVE_openat) || ((!__CRT_HAVE_convert_wcstombs || __SIZEOF_WCHAR_T__ != 2 || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$convert_wcstombs && (!__CRT_HAVE_convert_wcstombsn || __SIZEOF_WCHAR_T__ != 2) && !__CRT_HAVE_DOS$convert_wcstombsn && !__CRT_HAVE_format_aprintf_printer && !__CRT_HAVE_format_aprintf_alloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc)) */
+#endif /* (!__CRT_HAVE_wopenat || __SIZEOF_WCHAR_T__ != 2 || !__VLIBCCALL_IS_VLIBDCALL) && !__CRT_HAVE_DOS$wopenat && ((!__CRT_HAVE_openat64 && !__CRT_HAVE_openat) || ((!__CRT_HAVE_convert_wcstombs || __SIZEOF_WCHAR_T__ != 2 || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$convert_wcstombs && (!__CRT_HAVE_convert_wcstombsn || __SIZEOF_WCHAR_T__ != 2) && !__CRT_HAVE_DOS$convert_wcstombsn && !__CRT_HAVE_format_aprintf_printer && !__CRT_HAVE_format_aprintf_alloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc)) */
 #endif /* !__local_c16openat64_defined */

@@ -5453,7 +5453,7 @@ got_chkExpr:
 											for (local ppCond, protos: replacedPrototypes) {
 												local newProtos = [];
 												for (local p: protos) {
-													assert p.cc == replCC;
+													assert str(p.cc).lstrip("_") == replCC;
 													p = copy p;
 													p.cc = origCC;
 													newProtos.append(p);
@@ -5472,10 +5472,18 @@ got_chkExpr:
 										local wcBindingCrtHaveKey = keyCrtHave(wcBindingStr);
 										if (wcBindingCrtHaveKey in wc_bindCondSimplified) {
 											local ccSpecificPrefix = {
-												"LIBKCALL"   : "KOS$",
-												"LIBDCALL"   : "DOS$",
-												"__LIBKCALL" : "KOS$",
-												"__LIBDCALL" : "DOS$",
+												"LIBKCALL"              : "KOS$",
+												"VLIBKCALL"             : "KOS$",
+												"__LIBKCALL"            : "KOS$",
+												"__VLIBKCALL"           : "KOS$",
+												"C32FORMATPRINTER_CC"   : "KOS$",
+												"__C32FORMATPRINTER_CC" : "KOS$",
+												"LIBDCALL"              : "DOS$",
+												"VLIBDCALL"             : "DOS$",
+												"__LIBDCALL"            : "DOS$",
+												"__VLIBDCALL"           : "DOS$",
+												"C16FORMATPRINTER_CC"   : "DOS$",
+												"__C16FORMATPRINTER_CC" : "DOS$",
 											}.get(replCC);
 											if (ccSpecificPrefix is none)
 												goto wc_bind_continue_scan_bindings;
@@ -5484,6 +5492,62 @@ got_chkExpr:
 												ppCond:       wc_bindCondSimplified.replace(wcBindingCrtHaveKey, keyCrtHave(wcBindingStr)),
 												ppCondPrefix: replaceWcharTextArray(wc_bind.ppCondPrefix, mode),
 												prototypes:   replacedPrototypes,
+												binding:      wcBindingStr));
+										}
+									}
+									goto wc_bind_continue_scan_bindings;
+								} else {
+									basicBindings.append(FunctionBinding(
+										ppCond:       myCond,
+										ppCondPrefix: replaceWcharTextArray(wc_bind.ppCondPrefix, mode),
+										prototypes:   replacedPrototypes,
+										binding:      wcBinding));
+
+									/* Try to append a namespace-specific CRT binding */
+									local wcBindingStr = str(wcBinding);
+									if (!wcBindingStr.startswith("DOS$") && !wcBindingStr.startswith("KOS$")) {
+										local wcBindingCrtHaveKey = keyCrtHave(wcBindingStr);
+										if (wcBindingCrtHaveKey in wc_bindCondSimplified) {
+											local wcharSpecificPrefix = {
+												WCHAR_REPLACEMENT_CHAR16 : "DOS$",
+												WCHAR_REPLACEMENT_CHAR32 : "KOS$"
+											}[mode];
+											local wcharSpecificCC = {
+												WCHAR_REPLACEMENT_CHAR16 : "LIBDCALL",
+												WCHAR_REPLACEMENT_CHAR32 : "LIBKCALL"
+											}[mode];
+											wcBindingStr = wcharSpecificPrefix + wcBindingStr;
+											local cc1 = wcharSpecificCC;
+											local cc2 = replCC;
+											if (cc1 < cc2) {
+												local temp = cc2;
+												cc2 = cc1;
+												cc1 = temp;
+											}
+											/* Optimize `replacedPrototypes2' to use `wcharSpecificCC', thus allowing
+											* their eventual declaration to make use of __CDECLARE, rather than having
+											* to use __COMPILER_REDIRECT...
+											*
+											* We're allowed to do this because part of the ppCond we're assigning down
+											* below is something like "__LIBDCALL_IS_FORMATPRINTER_CC", meaning we're
+											* allowed to replace the caller's CC with one of the standard ones. */
+											local replacedPrototypes2 = [];
+											for (local ppCond, protos: replacedPrototypes) {
+												local newProtos = [];
+												for (local p: protos) {
+													assert str(p.cc).lstrip("_") == replCC;
+													p = copy p;
+													p.cc = wcharSpecificCC;
+													newProtos.append(p);
+												}
+												replacedPrototypes2.append((ppCond, newProtos));
+											}
+											basicBindings.append(FunctionBinding(
+												ppCond: "{} && defined(__{}_IS_{})".format({
+													wc_bindCondSimplified.replace(wcBindingCrtHaveKey, keyCrtHave(wcBindingStr)),
+													cc1, cc2 }),
+												ppCondPrefix: replaceWcharTextArray(wc_bind.ppCondPrefix, mode),
+												prototypes:   replacedPrototypes2,
 												binding:      wcBindingStr));
 										}
 									}

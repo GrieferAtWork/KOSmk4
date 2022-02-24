@@ -654,9 +654,16 @@ again_handle_col:
 		if (result !is none)
 			return result;
 		local simple_gcc_opt = List();
-		for (local x: gccOptions) {
-			if (!isUnrelatedGCCFlag(x))
-				simple_gcc_opt.append(x);
+		local indices = [:#gccOptions].operator iter();
+		foreach (local i: indices) {
+			local x = gccOptions[i];
+			if (isUnrelatedGCCFlag(x))
+				continue;
+			if (x == "--param") {
+				foreach (i: indices) break;
+				continue;
+			}
+			simple_gcc_opt.append(x);
 		}
 		local cacheKey = (language, Tuple(simple_gcc_opt));
 		local result = _stdlibCache.get(cacheKey);

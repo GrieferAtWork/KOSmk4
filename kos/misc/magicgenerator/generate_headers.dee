@@ -1140,6 +1140,27 @@ try {
 			fullPath, fs.fileof(filename)));
 	}
 
+//	waitTasks();
+//	local f = allFunctionsByName["format_8to16"];
+//	local fp = CWriter(File.stdout, ppAssume: ppAssumeHeaderFiles);
+//	f.cprintHeaderDeclaration(fp, ESCAPE_MODE_PART, printDoc: false);
+//	fp << "\n\n";
+//	for (local bind: f.functionBindings) {
+//		fp << "BIND: ppCond: " << repr bind.ppCond << "\n";
+//	}
+//	fp.flush();
+//	fp << "\n\n";
+//	local f = allFunctionsByName["format_8to32"];
+//	local fp = CWriter(File.stdout, ppAssume: ppAssumeHeaderFiles);
+//	f.cprintHeaderDeclaration(fp, ESCAPE_MODE_PART, printDoc: false);
+//	fp << "\n\n";
+//	for (local bind: f.functionBindings) {
+//		fp << "BIND: ppCond: " << repr bind.ppCond << "\n";
+//	}
+//	fp.flush();
+//	return;
+
+
 	/* Scan libc source files for additional section names. */
 	startTask(scanFileForSectionNames, ("src/libc/api.h",));
 	startScanSectionJobs("src/libc/hybrid/arch/i386/*.h");
