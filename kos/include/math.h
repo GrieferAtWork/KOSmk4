@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf37444d8 */
+/* HASH CRC-32:0x1a16e766 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,13 +44,13 @@
 #else /* __CXX_SYSTEM_HEADER */
 /* Import all symbols into the global namespace when re-including "math.h" after "cmath" */
 #ifndef __NO_FPU
-#if defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
+#include <ieee754.h>
+#if defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(acos)
-#endif /* __CRT_HAVE_acos || __CRT_HAVE___acos */
+#endif /* __CRT_HAVE_acos || __CRT_HAVE___acos || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
 __NAMESPACE_STD_USING(asin)
 #endif /* __CRT_HAVE_asin || __CRT_HAVE___asin */
-#include <ieee754.h>
 #if defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(atan)
 #endif /* __CRT_HAVE_atan || __CRT_HAVE___atan || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -66,9 +66,9 @@ __NAMESPACE_STD_USING(sin)
 #if defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
 __NAMESPACE_STD_USING(tan)
 #endif /* __CRT_HAVE_tan || __CRT_HAVE___tan */
-#if defined(__CRT_HAVE_acosf) || defined(__CRT_HAVE___acosf) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
+#if defined(__CRT_HAVE_acosf) || defined(__CRT_HAVE___acosf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(acosf)
-#endif /* __CRT_HAVE_acosf || __CRT_HAVE___acosf || __CRT_HAVE_acos || __CRT_HAVE___acos */
+#endif /* __CRT_HAVE_acosf || __CRT_HAVE___acosf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_acos || __CRT_HAVE___acos || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_asinf) || defined(__CRT_HAVE___asinf) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
 __NAMESPACE_STD_USING(asinf)
 #endif /* __CRT_HAVE_asinf || __CRT_HAVE___asinf || __CRT_HAVE_asin || __CRT_HAVE___asin */
@@ -88,9 +88,9 @@ __NAMESPACE_STD_USING(sinf)
 __NAMESPACE_STD_USING(tanf)
 #endif /* __CRT_HAVE_tanf || __CRT_HAVE___tanf || __CRT_HAVE_tan || __CRT_HAVE___tan */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-#if defined(__CRT_HAVE_acosl) || defined(__CRT_HAVE___acosl) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
+#if defined(__CRT_HAVE_acosl) || defined(__CRT_HAVE___acosl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(acosl)
-#endif /* __CRT_HAVE_acosl || __CRT_HAVE___acosl || __CRT_HAVE_acos || __CRT_HAVE___acos */
+#endif /* __CRT_HAVE_acosl || __CRT_HAVE___acosl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_acos || __CRT_HAVE___acos || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_asinl) || defined(__CRT_HAVE___asinl) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
 __NAMESPACE_STD_USING(asinl)
 #endif /* __CRT_HAVE_asinl || __CRT_HAVE___asinl || __CRT_HAVE_asin || __CRT_HAVE___asin */
@@ -697,6 +697,12 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,acos,(double __x),(__x))
 #elif defined(__CRT_HAVE___acos)
 /* Arc cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,acos,(double __x),__acos,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_STD_END
+#include <libc/local/math/acos.h>
+__NAMESPACE_STD_BEGIN
+/* Arc cosine of `x' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(acos, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL acos)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(acos))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_asin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asin)
 /* Arc sine of `x' */
@@ -779,7 +785,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,acosf,(float __x),(__x))
 #elif defined(__CRT_HAVE___acosf)
 /* Arc cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,acosf,(float __x),__acosf,(__x))
-#elif defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/acosf.h>
 __NAMESPACE_STD_BEGIN
@@ -892,7 +898,7 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acosl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___acosl)
 /* Arc cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acosl,(__LONGDOUBLE __x),__acosl,(__x))
-#elif defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/acosl.h>
 __NAMESPACE_STD_BEGIN
@@ -3631,7 +3637,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,acos,(float __x),acosf,(__x))
 #elif defined(__CRT_HAVE___acosf)
 /* Arc cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,acos,(float __x),__acosf,(__x))
-#elif defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/acosf.h>
@@ -4030,7 +4036,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acos,(__LONGDOUBLE __x),acosl,
 #elif defined(__CRT_HAVE___acosl)
 /* Arc cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acos,(__LONGDOUBLE __x),__acosl,(__x))
-#elif defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/acosl.h>
@@ -5839,9 +5845,9 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL 
 #endif /* __cplusplus && __CORRECT_ISO_CPP_MATH_H_PROTO */
 __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
-#if defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
+#if defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(acos)
-#endif /* __CRT_HAVE_acos || __CRT_HAVE___acos */
+#endif /* __CRT_HAVE_acos || __CRT_HAVE___acos || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
 __NAMESPACE_STD_USING(asin)
 #endif /* __CRT_HAVE_asin || __CRT_HAVE___asin */
@@ -5860,9 +5866,9 @@ __NAMESPACE_STD_USING(sin)
 #if defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
 __NAMESPACE_STD_USING(tan)
 #endif /* __CRT_HAVE_tan || __CRT_HAVE___tan */
-#if defined(__CRT_HAVE_acosf) || defined(__CRT_HAVE___acosf) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
+#if defined(__CRT_HAVE_acosf) || defined(__CRT_HAVE___acosf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(acosf)
-#endif /* __CRT_HAVE_acosf || __CRT_HAVE___acosf || __CRT_HAVE_acos || __CRT_HAVE___acos */
+#endif /* __CRT_HAVE_acosf || __CRT_HAVE___acosf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_acos || __CRT_HAVE___acos || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_asinf) || defined(__CRT_HAVE___asinf) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
 __NAMESPACE_STD_USING(asinf)
 #endif /* __CRT_HAVE_asinf || __CRT_HAVE___asinf || __CRT_HAVE_asin || __CRT_HAVE___asin */
@@ -5884,9 +5890,9 @@ __NAMESPACE_STD_USING(tanf)
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifndef __CXX_SYSTEM_HEADER
-#if defined(__CRT_HAVE_acosl) || defined(__CRT_HAVE___acosl) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
+#if defined(__CRT_HAVE_acosl) || defined(__CRT_HAVE___acosl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(acosl)
-#endif /* __CRT_HAVE_acosl || __CRT_HAVE___acosl || __CRT_HAVE_acos || __CRT_HAVE___acos */
+#endif /* __CRT_HAVE_acosl || __CRT_HAVE___acosl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_acos || __CRT_HAVE___acos || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_asinl) || defined(__CRT_HAVE___asinl) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
 __NAMESPACE_STD_USING(asinl)
 #endif /* __CRT_HAVE_asinl || __CRT_HAVE___asinl || __CRT_HAVE_asin || __CRT_HAVE___asin */
@@ -7167,6 +7173,10 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__acos,(double __x),acos,(__x))
 #elif defined(__CRT_HAVE___acos)
 /* Arc cosine of `x' */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__acos,(double __x),(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/acos.h>
+/* Arc cosine of `x' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __acos)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(acos))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_asin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asin)
 /* Arc sine of `x' */
@@ -7275,7 +7285,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__acosf,(float __x),acosf,(__x))
 #elif defined(__CRT_HAVE___acosf)
 /* Arc cosine of `x' */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__acosf,(float __x),(__x))
-#elif defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/acosf.h>
 /* Arc cosine of `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __acosf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(acosf))(__x); }
@@ -7416,7 +7426,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__acosl,(__LONGDOUBLE __x),aco
 #elif defined(__CRT_HAVE___acosl)
 /* Arc cosine of `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__acosl,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/acosl.h>
 /* Arc cosine of `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __acosl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(acosl))(__x); }

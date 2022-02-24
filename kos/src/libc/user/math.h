@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ef13545 */
+/* HASH CRC-32:0x58cad069 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,8 +31,6 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Arc cosine of `x' */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_acos)(double x);
 /* Arc sine of `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_asin)(double x);
 /* Cosine of `x' */

@@ -193,7 +193,21 @@ __SYSDECL_BEGIN
 
 @@Arc cosine of `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__acos")]]
-double acos(double x); /* TODO */
+[[impl_include("<libm/fcomp.h>", "<libm/fabs.h>", "<libm/matherr.h>")]]
+[[impl_include("<libm/nan.h>", "<libm/acos.h>", "<bits/crt/fenv.h>")]]
+[[requires_include("<ieee754.h>")]]
+[[requires($has_function(feraiseexcept) &&
+           (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))]]
+double acos(double x) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    __LIBM_MATHFUNI2(@isgreaterequal@, __LIBM_MATHFUN(@fabs@, x), 1.0)) {
+		feraiseexcept(@FE_INVALID@); /* acos(|x|>1) */
+		return __kernel_standard(x, x, __LIBM_MATHFUN1I(@nan@, ""), __LIBM_KMATHERRF_ACOS);
+	}
+	return __LIBM_MATHFUN(@acos@, x);
+}
 
 @@Arc sine of `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__asin")]]

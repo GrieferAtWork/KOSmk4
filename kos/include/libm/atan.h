@@ -78,7 +78,7 @@ __LIBM_LOCAL_DECLARE_ARRAY(__IEEE754_FLOAT_TYPE__, aTf, 11) {
 };
 #ifndef __libm_onef_defined
 #define __libm_onef_defined
-__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, onef, __IEEE754_FLOAT_C(1.0))
+__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, onef, __IEEE754_FLOAT_C(1.0000000000e+00)) /* 0x3F800000 */
 #endif /* !__libm_onef_defined */
 #ifndef __libm_hugef_defined
 #define __libm_hugef_defined
