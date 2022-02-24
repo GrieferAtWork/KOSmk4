@@ -84,12 +84,14 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((1, 2
 	if (env_path && *env_path) {
 		char *fullpath        = NULL;
 		size_t fullpath_alloc = 0;
-		int sep               = GET_PATHLIST_SEP();
 		for (;;) {
-			char *path_end  = strchrnul(env_path, sep);
+			/* NOTE: Because we're using the unix-style `getenv()' (as opposed
+			 *       to  `DOS$getenv()'), we're always working with unix paths
+			 *       in here! */
+			char *path_end  = strchrnul(env_path, ':');
 			size_t seg_len  = (size_t)(path_end - env_path);
 			size_t full_len = seg_len + taillen;
-			bool need_trail = !ISSEP(path_end[-1]);
+			bool need_trail = path_end[-1] != '/';
 			if (need_trail)
 				++full_len;
 			if (full_len > fullpath_alloc) {

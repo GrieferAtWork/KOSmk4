@@ -96,15 +96,6 @@
 
 #endif /* __KERNEL__ */
 
-/* Delete CRT features for stuff that we don't implement (yet)
- * TODO: Once we do  implement this stuff,  delete this  part! */
-#undef __CRT_HAVE___ctype_b_loc
-#undef __CRT_HAVE___ctype_tolower_loc
-#undef __CRT_HAVE___ctype_toupper_loc
-#undef __CRT_HAVE___locale_ctype_ptr
-#undef __CRT_HAVE___locale_ctype_ptr_l
-#undef __CRT_HAVE__isctype
-
 /* Do some quick probing if crt linkage was configured correctly */
 #ifndef __CRT_HAVE_memmove
 #error "Bad libc build environment"
@@ -189,10 +180,6 @@
 
 #include <errno.h>
 #include <libc/errno.h>
-
-#define ISSEP(x)           ((x) == '/') /* TODO: In DOS-mode, `\\' must also be accepted */
-#define GET_PATHLIST_SEP() ':'          /* TODO: In DOS-mode, `;' must be used */
-
 
 #define ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALL_DEFAULT_ALIGNED
 #define ATTR_MALL_PAGEALIGNED     __ATTR_MALL_PAGEALIGNED
