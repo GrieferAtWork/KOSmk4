@@ -31,18 +31,6 @@
 DECL_BEGIN
 
 
-/*[[[head:libc_asin,hash:CRC-32=0xff077015]]]*/
-/* Arc sine of `x' */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
-NOTHROW(LIBCCALL libc_asin)(double x)
-/*[[[body:libc_asin]]]*/
-/*AUTO*/{
-	(void)x;
-	CRT_UNIMPLEMENTEDF("asin(%f)", x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_asin]]]*/
 
 /*[[[head:libc_cos,hash:CRC-32=0x423dc7d6]]]*/
 /* Cosine of `x' */
@@ -412,9 +400,7 @@ NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x4a3cbf8d]]]*/
-DEFINE_PUBLIC_ALIAS(__asin, libc_asin);
-DEFINE_PUBLIC_ALIAS(asin, libc_asin);
+/*[[[start:exports,hash:CRC-32=0x82bbfe76]]]*/
 DEFINE_PUBLIC_ALIAS(__cos, libc_cos);
 DEFINE_PUBLIC_ALIAS(cos, libc_cos);
 DEFINE_PUBLIC_ALIAS(__sin, libc_sin);

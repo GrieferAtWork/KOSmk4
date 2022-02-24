@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64efe7fa */
+/* HASH CRC-32:0x82deb38d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,6 +40,12 @@ INTDEF WUNUSED double NOTHROW(LIBCCALL libc_acos)(double x);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Arc sine of `x' */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_asin)(double x);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Arc sine of `x' */
+INTDEF WUNUSED double NOTHROW(LIBCCALL libc_asin)(double x);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Arc tangent of `x' */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_atan)(double x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

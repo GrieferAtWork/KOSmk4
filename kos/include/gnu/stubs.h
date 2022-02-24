@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46d2a1cd */
+/* HASH CRC-32:0x1e0c4f11 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -120,8 +120,6 @@
 #define __stub_adjtimex
 #define __stub___adjtimex64
 #define __stub_adjtimex64
-#define __stub___asin
-#define __stub_asin
 #define __stub___asinh
 #define __stub_asinh
 #define __stub___atanh

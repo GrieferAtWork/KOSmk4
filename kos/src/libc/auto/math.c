@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0d27e2f */
+/* HASH CRC-32:0xb36276fe */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,6 +46,22 @@ NOTHROW(LIBCCALL libc_acos)(double x) {
 		return __kernel_standard(x, x, __LIBM_MATHFUN1I(nan, ""), __LIBM_KMATHERRF_ACOS);
 	}
 	return __LIBM_MATHFUN(acos, x);
+}
+#include <libm/fcomp.h>
+#include <libm/fabs.h>
+#include <libm/matherr.h>
+#include <libm/nan.h>
+#include <libm/asin.h>
+#include <bits/crt/fenv.h>
+/* Arc sine of `x' */
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
+NOTHROW(LIBCCALL libc_asin)(double x) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    __LIBM_MATHFUNI2(isgreaterequal, __LIBM_MATHFUN(fabs, x), 1.0)) {
+		libc_feraiseexcept(FE_INVALID); /* asin(|x|>1) */
+		return __kernel_standard(x, x, __LIBM_MATHFUN1I(nan, ""), __LIBM_KMATHERRF_ASIN);
+	}
+	return __LIBM_MATHFUN(asin, x);
 }
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
@@ -98,10 +114,28 @@ NOTHROW(LIBCCALL libc_acosf)(float x) {
 	return (float)libc_acos((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
+#include <libm/fcomp.h>
+#include <libm/fabs.h>
+#include <libm/matherr.h>
+#include <libm/nan.h>
+#include <libm/asin.h>
+#include <bits/crt/fenv.h>
 /* Arc sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_asinf)(float x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    __LIBM_MATHFUNI2F(isgreaterequal, __LIBM_MATHFUNF(fabs, x), 1.0f)) {
+		libc_feraiseexcept(FE_INVALID); /* asin(|x|>1) */
+		return __kernel_standard_f(x, x, __LIBM_MATHFUN1IF(nan, ""), __LIBM_KMATHERRF_ASIN);
+	}
+	return __LIBM_MATHFUNF(asin, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)libc_asin((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
@@ -181,10 +215,28 @@ NOTHROW(LIBCCALL libc_acosl)(__LONGDOUBLE x) {
 	return (__LONGDOUBLE)libc_acos((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
+#include <libm/fcomp.h>
+#include <libm/fabs.h>
+#include <libm/matherr.h>
+#include <libm/nan.h>
+#include <libm/asin.h>
+#include <bits/crt/fenv.h>
 /* Arc sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_asinl)(__LONGDOUBLE x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    __LIBM_MATHFUNI2L(isgreaterequal, __LIBM_MATHFUNL(fabs, x), 1.0L)) {
+		libc_feraiseexcept(FE_INVALID); /* asin(|x|>1) */
+		return __kernel_standard_l(x, x, __LIBM_MATHFUN1IL(nan, ""), __LIBM_KMATHERRF_ASIN);
+	}
+	return __LIBM_MATHFUNL(asin, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)libc_asin((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
@@ -2660,6 +2712,8 @@ DECL_END
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(__acos, libc_acos);
 DEFINE_PUBLIC_ALIAS(acos, libc_acos);
+DEFINE_PUBLIC_ALIAS(__asin, libc_asin);
+DEFINE_PUBLIC_ALIAS(asin, libc_asin);
 DEFINE_PUBLIC_ALIAS(__atan, libc_atan);
 DEFINE_PUBLIC_ALIAS(atan, libc_atan);
 DEFINE_PUBLIC_ALIAS(__atan2, libc_atan2);

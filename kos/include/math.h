@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a16e766 */
+/* HASH CRC-32:0xee616401 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,9 +48,9 @@
 #if defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(acos)
 #endif /* __CRT_HAVE_acos || __CRT_HAVE___acos || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
+#if defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(asin)
-#endif /* __CRT_HAVE_asin || __CRT_HAVE___asin */
+#endif /* __CRT_HAVE_asin || __CRT_HAVE___asin || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(atan)
 #endif /* __CRT_HAVE_atan || __CRT_HAVE___atan || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -69,9 +69,9 @@ __NAMESPACE_STD_USING(tan)
 #if defined(__CRT_HAVE_acosf) || defined(__CRT_HAVE___acosf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(acosf)
 #endif /* __CRT_HAVE_acosf || __CRT_HAVE___acosf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_acos || __CRT_HAVE___acos || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_asinf) || defined(__CRT_HAVE___asinf) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
+#if defined(__CRT_HAVE_asinf) || defined(__CRT_HAVE___asinf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(asinf)
-#endif /* __CRT_HAVE_asinf || __CRT_HAVE___asinf || __CRT_HAVE_asin || __CRT_HAVE___asin */
+#endif /* __CRT_HAVE_asinf || __CRT_HAVE___asinf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_asin || __CRT_HAVE___asin || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_atanf) || defined(__CRT_HAVE___atanf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(atanf)
 #endif /* __CRT_HAVE_atanf || __CRT_HAVE___atanf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_atan || __CRT_HAVE___atan || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -91,9 +91,9 @@ __NAMESPACE_STD_USING(tanf)
 #if defined(__CRT_HAVE_acosl) || defined(__CRT_HAVE___acosl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(acosl)
 #endif /* __CRT_HAVE_acosl || __CRT_HAVE___acosl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_acos || __CRT_HAVE___acos || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_asinl) || defined(__CRT_HAVE___asinl) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
+#if defined(__CRT_HAVE_asinl) || defined(__CRT_HAVE___asinl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(asinl)
-#endif /* __CRT_HAVE_asinl || __CRT_HAVE___asinl || __CRT_HAVE_asin || __CRT_HAVE___asin */
+#endif /* __CRT_HAVE_asinl || __CRT_HAVE___asinl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_asin || __CRT_HAVE___asin || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_atanl) || defined(__CRT_HAVE___atanl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(atanl)
 #endif /* __CRT_HAVE_atanl || __CRT_HAVE___atanl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_atan || __CRT_HAVE___atan || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -713,6 +713,12 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,asin,(double __x),(__x))
 #elif defined(__CRT_HAVE___asin)
 /* Arc sine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,asin,(double __x),__asin,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_STD_END
+#include <libc/local/math/asin.h>
+__NAMESPACE_STD_BEGIN
+/* Arc sine of `x' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(asin, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL asin)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asin))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_atan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan)
 /* Arc tangent of `x' */
@@ -801,7 +807,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,asinf,(float __x),(__x))
 #elif defined(__CRT_HAVE___asinf)
 /* Arc sine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,asinf,(float __x),__asinf,(__x))
-#elif defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/asinf.h>
 __NAMESPACE_STD_BEGIN
@@ -914,7 +920,7 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___asinl)
 /* Arc sine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinl,(__LONGDOUBLE __x),__asinl,(__x))
-#elif defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/asinl.h>
 __NAMESPACE_STD_BEGIN
@@ -3655,7 +3661,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,asin,(float __x),asinf,(__x))
 #elif defined(__CRT_HAVE___asinf)
 /* Arc sine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,asin,(float __x),__asinf,(__x))
-#elif defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/asinf.h>
@@ -4054,7 +4060,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asin,(__LONGDOUBLE __x),asinl,
 #elif defined(__CRT_HAVE___asinl)
 /* Arc sine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asin,(__LONGDOUBLE __x),__asinl,(__x))
-#elif defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/asinl.h>
@@ -5848,9 +5854,9 @@ __NAMESPACE_STD_END
 #if defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(acos)
 #endif /* __CRT_HAVE_acos || __CRT_HAVE___acos || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
+#if defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(asin)
-#endif /* __CRT_HAVE_asin || __CRT_HAVE___asin */
+#endif /* __CRT_HAVE_asin || __CRT_HAVE___asin || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(atan)
 #endif /* __CRT_HAVE_atan || __CRT_HAVE___atan || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -5869,9 +5875,9 @@ __NAMESPACE_STD_USING(tan)
 #if defined(__CRT_HAVE_acosf) || defined(__CRT_HAVE___acosf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(acosf)
 #endif /* __CRT_HAVE_acosf || __CRT_HAVE___acosf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_acos || __CRT_HAVE___acos || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_asinf) || defined(__CRT_HAVE___asinf) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
+#if defined(__CRT_HAVE_asinf) || defined(__CRT_HAVE___asinf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(asinf)
-#endif /* __CRT_HAVE_asinf || __CRT_HAVE___asinf || __CRT_HAVE_asin || __CRT_HAVE___asin */
+#endif /* __CRT_HAVE_asinf || __CRT_HAVE___asinf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_asin || __CRT_HAVE___asin || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_atanf) || defined(__CRT_HAVE___atanf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(atanf)
 #endif /* __CRT_HAVE_atanf || __CRT_HAVE___atanf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_atan || __CRT_HAVE___atan || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -5893,9 +5899,9 @@ __NAMESPACE_STD_USING(tanf)
 #if defined(__CRT_HAVE_acosl) || defined(__CRT_HAVE___acosl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(acosl)
 #endif /* __CRT_HAVE_acosl || __CRT_HAVE___acosl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_acos || __CRT_HAVE___acos || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_asinl) || defined(__CRT_HAVE___asinl) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
+#if defined(__CRT_HAVE_asinl) || defined(__CRT_HAVE___asinl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(asinl)
-#endif /* __CRT_HAVE_asinl || __CRT_HAVE___asinl || __CRT_HAVE_asin || __CRT_HAVE___asin */
+#endif /* __CRT_HAVE_asinl || __CRT_HAVE___asinl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_asin || __CRT_HAVE___asin || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_atanl) || defined(__CRT_HAVE___atanl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(atanl)
 #endif /* __CRT_HAVE_atanl || __CRT_HAVE___atanl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_atan || __CRT_HAVE___atan || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -7187,6 +7193,10 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__asin,(double __x),asin,(__x))
 #elif defined(__CRT_HAVE___asin)
 /* Arc sine of `x' */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__asin,(double __x),(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/asin.h>
+/* Arc sine of `x' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __asin)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asin))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_atan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan)
 /* Arc tangent of `x' */
@@ -7299,7 +7309,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__asinf,(float __x),asinf,(__x))
 #elif defined(__CRT_HAVE___asinf)
 /* Arc sine of `x' */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__asinf,(float __x),(__x))
-#elif defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/asinf.h>
 /* Arc sine of `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __asinf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinf))(__x); }
@@ -7440,7 +7450,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__asinl,(__LONGDOUBLE __x),asi
 #elif defined(__CRT_HAVE___asinl)
 /* Arc sine of `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__asinl,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/asinl.h>
 /* Arc sine of `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __asinl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinl))(__x); }

@@ -55,18 +55,18 @@ __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, onef, __IEEE754_FLOAT_C(1.000000000
 #define __libm_pif_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, pif, __IEEE754_FLOAT_C(3.1415927410e+00))     /* 0x40490fdb */
 #endif /* !__libm_pif_defined */
-__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, pio2_hif, __IEEE754_FLOAT_C(1.5707962513e+00)) /* 0x3fc90fda */
-__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, pio2_lof, __IEEE754_FLOAT_C(7.5497894159e-08)) /* 0x33a22168 */
-__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, pS0f, __IEEE754_FLOAT_C(1.6666667163e-01))     /* 0x3e2aaaab */
-__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, pS1f, __IEEE754_FLOAT_C(-3.2556581497e-01))    /* 0xbea6b090 */
-__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, pS2f, __IEEE754_FLOAT_C(2.0121252537e-01))     /* 0x3e4e0aa8 */
-__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, pS3f, __IEEE754_FLOAT_C(-4.0055535734e-02))    /* 0xbd241146 */
-__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, pS4f, __IEEE754_FLOAT_C(7.9153501429e-04))     /* 0x3a4f7f04 */
-__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, pS5f, __IEEE754_FLOAT_C(3.4793309169e-05))     /* 0x3811ef08 */
-__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, qS1f, __IEEE754_FLOAT_C(-2.4033949375e+00))    /* 0xc019d139 */
-__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, qS2f, __IEEE754_FLOAT_C(2.0209457874e+00))     /* 0x4001572d */
-__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, qS3f, __IEEE754_FLOAT_C(-6.8828397989e-01))    /* 0xbf303361 */
-__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, qS4f, __IEEE754_FLOAT_C(7.7038154006e-02))     /* 0x3d9dc62e */
+__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, acos_pio2_hif, __IEEE754_FLOAT_C(1.5707962513e+00)) /* 0x3fc90fda */
+__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, acos_pio2_lof, __IEEE754_FLOAT_C(7.5497894159e-08)) /* 0x33a22168 */
+__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, pS0f, __IEEE754_FLOAT_C(1.6666667163e-01))          /* 0x3e2aaaab */
+__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, pS1f, __IEEE754_FLOAT_C(-3.2556581497e-01))         /* 0xbea6b090 */
+__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, pS2f, __IEEE754_FLOAT_C(2.0121252537e-01))          /* 0x3e4e0aa8 */
+__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, pS3f, __IEEE754_FLOAT_C(-4.0055535734e-02))         /* 0xbd241146 */
+__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, pS4f, __IEEE754_FLOAT_C(7.9153501429e-04))          /* 0x3a4f7f04 */
+__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, pS5f, __IEEE754_FLOAT_C(3.4793309169e-05))          /* 0x3811ef08 */
+__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, qS1f, __IEEE754_FLOAT_C(-2.4033949375e+00))         /* 0xc019d139 */
+__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, qS2f, __IEEE754_FLOAT_C(2.0209457874e+00))          /* 0x4001572d */
+__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, qS3f, __IEEE754_FLOAT_C(-6.8828397989e-01))         /* 0xbf303361 */
+__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, qS4f, __IEEE754_FLOAT_C(7.7038154006e-02))          /* 0x3d9dc62e */
 __LIBM_LOCAL_DECLARE_END
 
 __LOCAL __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
@@ -82,14 +82,14 @@ __LOCAL __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
 		} else {
 			return __LIBM_LOCAL_VALUE(pif) +
 			       __IEEE754_FLOAT_C(2.0) *
-			       __LIBM_LOCAL_VALUE(pio2_lof); /* acos(-1)= pi */
+			       __LIBM_LOCAL_VALUE(acos_pio2_lof); /* acos(-1)= pi */
 		}
 	} else if (__ix > __INT32_C(0x3f800000)) { /* |x| >= 1 */
 		return (__x - __x) / (__x - __x);    /* acos(|x|>1) is NaN */
 	}
 	if (__ix < __INT32_C(0x3f000000)) { /* |x| < 0.5 */
 		if (__ix <= __INT32_C(0x32800000))
-			return __LIBM_LOCAL_VALUE(pio2_hif) + __LIBM_LOCAL_VALUE(pio2_lof); /*if|x|<=2**-26 */
+			return __LIBM_LOCAL_VALUE(acos_pio2_hif) + __LIBM_LOCAL_VALUE(acos_pio2_lof); /*if|x|<=2**-26 */
 		__z = __x * __x;
 		__p = __z * (__LIBM_LOCAL_VALUE(pS0f) +
 		             __z * (__LIBM_LOCAL_VALUE(pS1f) +
@@ -103,7 +103,7 @@ __LOCAL __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
 		                    __z * (__LIBM_LOCAL_VALUE(qS3f) +
 		                           __z * __LIBM_LOCAL_VALUE(qS4f))));
 		__r = __p / __q;
-		return __LIBM_LOCAL_VALUE(pio2_hif) - (__x - (__LIBM_LOCAL_VALUE(pio2_lof) - __x * __r));
+		return __LIBM_LOCAL_VALUE(acos_pio2_hif) - (__x - (__LIBM_LOCAL_VALUE(acos_pio2_lof) - __x * __r));
 	} else if (__hx < 0) { /* x < -0.5 */
 		__z = (__LIBM_LOCAL_VALUE(onef) + __x) * __IEEE754_FLOAT_C(0.5);
 		__p = __z * (__LIBM_LOCAL_VALUE(pS0f) +
@@ -119,7 +119,7 @@ __LOCAL __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
 		                           __z * __LIBM_LOCAL_VALUE(qS4f))));
 		__s = __ieee754_sqrtf(__z);
 		__r = __p / __q;
-		__w = __r * __s - __LIBM_LOCAL_VALUE(pio2_lof);
+		__w = __r * __s - __LIBM_LOCAL_VALUE(acos_pio2_lof);
 		return __LIBM_LOCAL_VALUE(pif) - __IEEE754_FLOAT_C(2.0) * (__s + __w);
 	} else { /* x > 0.5 */
 		__int32_t __idf;
@@ -168,18 +168,54 @@ __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, one, __IEEE754_DOUBLE_C(1.00000000
 #define __libm_pi_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, pi, __IEEE754_DOUBLE_C(3.1415926535897931160E+00))     /* 0x400921FB, 0x54442D18 */
 #endif /* !__libm_pi_defined */
+#ifndef __libm_pio2_hi_defined
+#define __libm_pio2_hi_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, pio2_hi, __IEEE754_DOUBLE_C(1.57079632679489655800e+00)) /* 0x3FF921FB, 0x54442D18 */
+#endif /* !__libm_pio2_hi_defined */
+#ifndef __libm_pio2_lo_defined
+#define __libm_pio2_lo_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, pio2_lo, __IEEE754_DOUBLE_C(6.12323399573676603587e-17)) /* 0x3C91A626, 0x33145C07 */
+#endif /* !__libm_pio2_lo_defined */
+#ifndef __libm_pS0_defined
+#define __libm_pS0_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, pS0, __IEEE754_DOUBLE_C(1.66666666666666657415e-01))     /* 0x3FC55555, 0x55555555 */
+#endif /* !__libm_pS0_defined */
+#ifndef __libm_pS1_defined
+#define __libm_pS1_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, pS1, __IEEE754_DOUBLE_C(-3.25565818622400915405e-01))    /* 0xBFD4D612, 0x03EB6F7D */
+#endif /* !__libm_pS1_defined */
+#ifndef __libm_pS2_defined
+#define __libm_pS2_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, pS2, __IEEE754_DOUBLE_C(2.01212532134862925881e-01))     /* 0x3FC9C155, 0x0E884455 */
+#endif /* !__libm_pS2_defined */
+#ifndef __libm_pS3_defined
+#define __libm_pS3_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, pS3, __IEEE754_DOUBLE_C(-4.00555345006794114027e-02))    /* 0xBFA48228, 0xB5688F3B */
+#endif /* !__libm_pS3_defined */
+#ifndef __libm_pS4_defined
+#define __libm_pS4_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, pS4, __IEEE754_DOUBLE_C(7.91534994289814532176e-04))     /* 0x3F49EFE0, 0x7501B288 */
+#endif /* !__libm_pS4_defined */
+#ifndef __libm_pS5_defined
+#define __libm_pS5_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, pS5, __IEEE754_DOUBLE_C(3.47933107596021167570e-05))     /* 0x3F023DE1, 0x0DFDF709 */
+#endif /* !__libm_pS5_defined */
+#ifndef __libm_qS1_defined
+#define __libm_qS1_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, qS1, __IEEE754_DOUBLE_C(-2.40339491173441421878e+00))    /* 0xC0033A27, 0x1C8A2D4B */
+#endif /* !__libm_qS1_defined */
+#ifndef __libm_qS2_defined
+#define __libm_qS2_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, qS2, __IEEE754_DOUBLE_C(2.02094576023350569471e+00))     /* 0x40002AE5, 0x9C598AC8 */
+#endif /* !__libm_qS2_defined */
+#ifndef __libm_qS3_defined
+#define __libm_qS3_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, qS3, __IEEE754_DOUBLE_C(-6.88283971605453293030e-01))    /* 0xBFE6066C, 0x1B8D0159 */
+#endif /* !__libm_qS3_defined */
+#ifndef __libm_qS4_defined
+#define __libm_qS4_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, qS4, __IEEE754_DOUBLE_C(7.70381505559019352791e-02))     /* 0x3FB3B8C5, 0xB12E9282 */
+#endif /* !__libm_qS4_defined */
 __LIBM_LOCAL_DECLARE_END
 
 __LOCAL __ATTR_WUNUSED __IEEE754_DOUBLE_TYPE__

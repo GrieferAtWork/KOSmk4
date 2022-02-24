@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2646eb6 */
+/* HASH CRC-32:0x7f7e910e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_asinl_defined
 #define __local_asinl_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_asin_defined
 #define __local___localdep_asin_defined
@@ -31,20 +32,59 @@ __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_asin,(double __x),asin,
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_asin,(double __x),asin,(__x))
 #elif defined(__CRT_HAVE___asin)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_asin,(double __x),__asin,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_END
+#include <libc/local/math/asin.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_asin __LIBC_LOCAL_NAME(asin)
 #else /* ... */
 #undef __local___localdep_asin_defined
 #endif /* !... */
 #endif /* !__local___localdep_asin_defined */
+#ifndef __local___localdep_feraiseexcept_defined
+#define __local___localdep_feraiseexcept_defined
+#ifdef __CRT_HAVE_feraiseexcept
+__NAMESPACE_LOCAL_END
+#include <kos/anno.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,int,__THROWING,__localdep_feraiseexcept,(int __excepts),feraiseexcept,(__excepts))
+#else /* __CRT_HAVE_feraiseexcept */
+__NAMESPACE_LOCAL_END
+#include <libc/local/fenv/feraiseexcept.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_feraiseexcept __LIBC_LOCAL_NAME(feraiseexcept)
+#endif /* !__CRT_HAVE_feraiseexcept */
+#endif /* !__local___localdep_feraiseexcept_defined */
+__NAMESPACE_LOCAL_END
+#include <libm/fcomp.h>
+#include <libm/fabs.h>
+#include <libm/matherr.h>
+#include <libm/nan.h>
+#include <libm/asin.h>
+#include <bits/crt/fenv.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(asinl) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(asinl))(__LONGDOUBLE __x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    __LIBM_MATHFUNI2L(isgreaterequal, __LIBM_MATHFUNL(fabs, __x), 1.0L)) {
+		(__NAMESPACE_LOCAL_SYM __localdep_feraiseexcept)(FE_INVALID); /* asin(|x|>1) */
+		return __kernel_standard_l(__x, __x, __LIBM_MATHFUN1IL(nan, ""), __LIBM_KMATHERRF_ASIN);
+	}
+	return __LIBM_MATHFUNL(asin, __x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)(__NAMESPACE_LOCAL_SYM __localdep_asin)((double)__x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_asinl_defined
 #define __local___localdep_asinl_defined
 #define __localdep_asinl __LIBC_LOCAL_NAME(asinl)
 #endif /* !__local___localdep_asinl_defined */
-#else /* __CRT_HAVE_asin || __CRT_HAVE___asin */
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_asin || __CRT_HAVE___asin || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #undef __local_asinl_defined
-#endif /* !__CRT_HAVE_asin && !__CRT_HAVE___asin */
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__CRT_HAVE_asin && !__CRT_HAVE___asin && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_asinl_defined */
