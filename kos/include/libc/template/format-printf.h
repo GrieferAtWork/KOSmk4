@@ -2138,8 +2138,8 @@ __again_posscan2_infmt:
 							 * this detail is neither officially documented, nor an intended feature. -- It's just
 							 * a consequence on how positional argument support was implemented.
 							 *
-							 * So  with all of that in mind: rather than simply skipping the current format token,
-							 * we skip the entire format word when the user attempts to mix varargs specifies with
+							 * So with all of that  in mind: rather than simply  skipping the current format  token,
+							 * we skip the entire format string when the user attempts to mix varargs specifies with
 							 * positional arguments. */
 							while (*__FORMAT_FORMAT++)
 								;

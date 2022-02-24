@@ -882,27 +882,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * binutils/i386-kos/opt/bsdgames/rain/rain.c(100,2) : 080487A6+5[/usr/bin/rain][main+182]
 	 */
 
-	/* TODO: Symlink creation on FAT appears broken:
-	 * $ cd /var
-	 * $ ln -s foo bar
-	 * $ ls -la
-	 * d-wxr----x    1 0        0              512 Feb 17 14:47 .
-	 * drwxrwxrwx    1 0        0              512 Feb 17 14:47 ..
-	 * lrwsr-sr-t    1 0        0                3 Feb 17 14:47 bar -> dm
-	 * drwxrwxrwx    1 0        0              512 Feb 17 14:33 games
-	 * $ sync
-	 * $ cc
-	 * $ ls -la
-	 * d-wxr----x    1 0        0              512 Feb 17 14:47 .
-	 * drwxrwxrwx    1 0        0              512 Feb 17 14:47 ..
-	 * lrwsr-sr-t    1 0        0                3 Feb 17 14:47 bar -> foo
-	 * drwxrwxrwx    1 0        0              512 Feb 17 14:33 games
-	 *
-	 * In other words: correct data gets written to disk, but the  initial
-	 * symlink object contains invalid data until it is evicted from cache
-	 * and re-loaded from disk (via sync+cc)
-	 */
-
 	return state;
 }
 

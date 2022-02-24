@@ -31,7 +31,9 @@
 #include <assert.h>
 #include <format-printer.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -107,6 +109,23 @@ PRIVATE void run_all_tests(void) {
 	}
 }
 
+PRIVATE bool run_specific_test(char const *name) {
+	struct testdecl *iter;
+	for (iter = __system_tests_begin; iter < __system_tests_end; ++iter) {
+		if (strcmp(iter->td_name, name) != 0)
+			continue;
+		ctest_current_test = iter;
+		syslog(LOG_DEBUG, "[test:%s] %s:%d\n",
+		       iter->td_name,
+		       iter->td_file,
+		       iter->td_line);
+		printf("test:%s" EL "\n", iter->td_name);
+		(*iter->td_func)();
+		return true;
+	}
+	return false;
+}
+
 int main(int argc, char *argv[], char *envp[]) {
 	/* A special application who's sole purpose is to perform a series of
 	 * automated system tests to ensure  that the various sub-systems  of
@@ -124,7 +143,17 @@ int main(int argc, char *argv[], char *envp[]) {
 	KSysctl(KSYSCTL_SYSTEM_CLEARCACHES);
 
 	/* Actually run all of the tests. */
-	run_all_tests();
+	if (argc <= 1) {
+		run_all_tests();
+	} else {
+		int i;
+		for (i = 1; i < argc; ++i) {
+			if (!run_specific_test(argv[i])) {
+				fprintf(stderr, "Unknown test: %q", argv[i]);
+				return EXIT_FAILURE;
+			}
+		}
+	}
 
 	/* Make sure that we didn't end up with any memory leaks. */
 	assertf(KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS) == 0,
@@ -140,7 +169,7 @@ int main(int argc, char *argv[], char *envp[]) {
 	        "Memory leaks detected (see system log)");
 
 	printf("All tests OK" EL "\n");
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 DECL_END

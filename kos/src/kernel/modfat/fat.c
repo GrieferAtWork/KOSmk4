@@ -873,25 +873,32 @@ fatlnk_v_readlink(struct flnknode *__restrict self,
 	result = FAT_SYMLINK_FILE_TEXTLEN(result);
 	if (bufsize > result)
 		bufsize = result;
+	filepos = (pos_t)FAT_SYMLINK_FILE_TEXTOFF;
 
 	/* Try to make use of the cache already loaded during `fatdir_v_readdir()'
 	 * As such, anything that falls into the first file sect we read  directly
-	 * from disk. */
+	 * from disk.
+	 *
+	 * NOTE: Must  _ONLY_ do so if the symlink content hasn't already been
+	 *       allocated within the unified I/O cache of the symlink itself.
+	 *       The  later would be the case for freshly created symlinks, as
+	 *       opposed to ones that were already present on-disk. */
 #if 1
-	filepos = (pos_t)FAT_SYMLINK_FILE_TEXTOFF;
-	if likely(mfile_getblocksize(me) >= FAT_SYMLINK_FILE_TEXTOFF) {
-		pos_t diskpos;
-		size_t disksiz;
-		diskpos = Fat_GetAbsDiskPos(self, filepos);
-		disksiz = mfile_getblocksize(me) - (size_t)filepos;
-		if (disksiz > bufsize)
-			disksiz = bufsize;
-		mfile_readall(me->fn_super->fs_dev, buf, disksiz, diskpos);
-		if likely(disksiz >= bufsize)
-			return result;
-		buf = (USER CHECKED char *)((byte_t *)buf + disksiz);
-		bufsize -= disksiz;
-		filepos += disksiz;
+	if (ATOMIC_READ(me->mf_parts) == NULL) {
+		if likely(mfile_getblocksize(me) >= FAT_SYMLINK_FILE_TEXTOFF) {
+			pos_t diskpos;
+			size_t disksiz;
+			diskpos = Fat_GetAbsDiskPos(self, filepos);
+			disksiz = mfile_getblocksize(me) - (size_t)filepos;
+			if (disksiz > bufsize)
+				disksiz = bufsize;
+			mfile_readall(me->fn_super->fs_dev, buf, disksiz, diskpos);
+			if likely(disksiz >= bufsize)
+				return result;
+			buf = (USER CHECKED char *)((byte_t *)buf + disksiz);
+			bufsize -= disksiz;
+			filepos += disksiz;
+		}
 	}
 #endif
 
@@ -1855,7 +1862,7 @@ fatdir_v_allocfile(struct flatdirnode *__restrict self,
 		hdr[1].f_ctime.fc_sectenth = hdr[0].f_ctime.fc_sectenth;
 
 		/* Write the directory header into the directory stream file. */
-		mfile_write(fdir, hdr, sizeof(hdr), 0);
+		mfile_writeall(fdir, hdr, sizeof(hdr), 0);
 
 		/* Remember offsets of "." and ".." */
 		ATOMIC_WRITE(fdir->fdn_1dot, 0 * sizeof(struct fat_dirent));
@@ -1865,11 +1872,11 @@ fatdir_v_allocfile(struct flatdirnode *__restrict self,
 	else if (fnode_islnk(file)) {
 		/* Write the link's file contents (the string from `info'). */
 		pos_t ptr = 0;
-		mfile_write(file, Fat_CygwinSymlinkMagic, sizeof(Fat_CygwinSymlinkMagic), ptr);
+		mfile_writeall(file, Fat_CygwinSymlinkMagic, sizeof(Fat_CygwinSymlinkMagic), ptr);
 		ptr += sizeof(Fat_CygwinSymlinkMagic);
-		mfile_write(file, info->mkf_creat.c_symlink.s_text, info->mkf_creat.c_symlink.s_size, ptr);
+		mfile_writeall(file, info->mkf_creat.c_symlink.s_text, info->mkf_creat.c_symlink.s_size, ptr);
 		ptr += info->mkf_creat.c_symlink.s_size;
-		mfile_write(file, "", 1, ptr); /* Trailing NUL */
+		mfile_writeall(file, "", 1, ptr); /* Trailing NUL */
 	}
 #endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
 }
