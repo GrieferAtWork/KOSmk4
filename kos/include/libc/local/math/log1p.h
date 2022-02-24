@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5f7b91a */
+/* HASH CRC-32:0x807e43c5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,23 +18,53 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_logb_defined
-#define __local_logb_defined
+#ifndef __local_log1p_defined
+#define __local_log1p_defined
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-#include <libm/logb.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(logb) __ATTR_CONST __ATTR_WUNUSED double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(logb))(double __x) {
-	return __LIBM_MATHFUN(logb, __x);
+#ifndef __local___localdep_feraiseexcept_defined
+#define __local___localdep_feraiseexcept_defined
+#ifdef __CRT_HAVE_feraiseexcept
+__NAMESPACE_LOCAL_END
+#include <kos/anno.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,int,__THROWING,__localdep_feraiseexcept,(int __excepts),feraiseexcept,(__excepts))
+#else /* __CRT_HAVE_feraiseexcept */
+__NAMESPACE_LOCAL_END
+#include <libc/local/fenv/feraiseexcept.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_feraiseexcept __LIBC_LOCAL_NAME(feraiseexcept)
+#endif /* !__CRT_HAVE_feraiseexcept */
+#endif /* !__local___localdep_feraiseexcept_defined */
+__NAMESPACE_LOCAL_END
+#include <bits/crt/fenv.h>
+#include <bits/math-constants.h>
+#include <libm/nan.h>
+#include <libm/log1p.h>
+#include <libm/fcomp.h>
+#include <libm/matherr.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(log1p) __ATTR_WUNUSED double
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(log1p))(double __x) {
+	if (__LIBM_MATHFUNI2(islessequal, __x, -1.0) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
+		if (__x == -1.0) {
+			(__NAMESPACE_LOCAL_SYM __localdep_feraiseexcept)(FE_DIVBYZERO);
+			return __kernel_standard(__x, __x, -__HUGE_VAL, __LIBM_KMATHERR_LOG_ZERO); /* log(0) */
+		} else {
+			(__NAMESPACE_LOCAL_SYM __localdep_feraiseexcept)(FE_INVALID);
+			return __kernel_standard(__x, __x, __LIBM_MATHFUN1I(nan, ""), __LIBM_KMATHERR_LOG_MINUS); /* log(x<0) */
+		}
+	}
+	return __LIBM_MATHFUN(log1p, __x);
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_logb_defined
-#define __local___localdep_logb_defined
-#define __localdep_logb __LIBC_LOCAL_NAME(logb)
-#endif /* !__local___localdep_logb_defined */
+#ifndef __local___localdep_log1p_defined
+#define __local___localdep_log1p_defined
+#define __localdep_log1p __LIBC_LOCAL_NAME(log1p)
+#endif /* !__local___localdep_log1p_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#undef __local_logb_defined
+#undef __local_log1p_defined
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#endif /* !__local_logb_defined */
+#endif /* !__local_log1p_defined */

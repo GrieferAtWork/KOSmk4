@@ -173,18 +173,6 @@ NOTHROW(LIBCCALL libc_atanh)(double x)
 }
 /*[[[end:libc_atanh]]]*/
 
-/*[[[head:libc_log,hash:CRC-32=0xfcd1b54a]]]*/
-/* Natural logarithm of `x' */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_log double
-NOTHROW(LIBCCALL libc_log)(double x)
-/*[[[body:libc_log]]]*/
-/*AUTO*/{
-	(void)x;
-	CRT_UNIMPLEMENTEDF("log(%f)", x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_log]]]*/
 
 /*[[[head:libc_log10,hash:CRC-32=0xf4920ff2]]]*/
 /* Base-ten logarithm of `x' */
@@ -199,18 +187,6 @@ NOTHROW(LIBCCALL libc_log10)(double x)
 }
 /*[[[end:libc_log10]]]*/
 
-/*[[[head:libc_log1p,hash:CRC-32=0x727cd93e]]]*/
-/* Return `log(1 + x)' */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
-NOTHROW(LIBCCALL libc_log1p)(double x)
-/*[[[body:libc_log1p]]]*/
-/*AUTO*/{
-	(void)x;
-	CRT_UNIMPLEMENTEDF("log1p(%f)", x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_log1p]]]*/
 
 
 /*[[[head:libc_exp2,hash:CRC-32=0xb4abe3cc]]]*/
@@ -448,7 +424,7 @@ NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xd90246c2]]]*/
+/*[[[start:exports,hash:CRC-32=0x8300fe46]]]*/
 DEFINE_PUBLIC_ALIAS(__acos, libc_acos);
 DEFINE_PUBLIC_ALIAS(acos, libc_acos);
 DEFINE_PUBLIC_ALIAS(__asin, libc_asin);
@@ -471,12 +447,8 @@ DEFINE_PUBLIC_ALIAS(__asinh, libc_asinh);
 DEFINE_PUBLIC_ALIAS(asinh, libc_asinh);
 DEFINE_PUBLIC_ALIAS(__atanh, libc_atanh);
 DEFINE_PUBLIC_ALIAS(atanh, libc_atanh);
-DEFINE_PUBLIC_ALIAS(__log, libc_log);
-DEFINE_PUBLIC_ALIAS(log, libc_log);
 DEFINE_PUBLIC_ALIAS(__log10, libc_log10);
 DEFINE_PUBLIC_ALIAS(log10, libc_log10);
-DEFINE_PUBLIC_ALIAS(__log1p, libc_log1p);
-DEFINE_PUBLIC_ALIAS(log1p, libc_log1p);
 DEFINE_PUBLIC_ALIAS(__exp2, libc_exp2);
 DEFINE_PUBLIC_ALIAS(exp2, libc_exp2);
 DEFINE_PUBLIC_ALIAS(__log2, libc_log2);

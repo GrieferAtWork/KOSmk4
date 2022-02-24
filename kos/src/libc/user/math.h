@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3fdd4 */
+/* HASH CRC-32:0x7ef13545 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,12 +53,8 @@ INTDEF WUNUSED double NOTHROW(LIBCCALL libc_acosh)(double x);
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_asinh)(double x);
 /* Hyperbolic arc tangent of `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_atanh)(double x);
-/* Natural logarithm of `x' */
-INTDEF WUNUSED __DECL_SIMD_log double NOTHROW(LIBCCALL libc_log)(double x);
 /* Base-ten logarithm of `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_log10)(double x);
-/* Return `log(1 + x)' */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_log1p)(double x);
 /* Compute base-2 exponential of `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_exp2)(double x);
 /* Compute base-2 logarithm of `x' */

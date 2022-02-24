@@ -381,7 +381,27 @@ double ldexp(double x, int exponent) {
 @@Natural logarithm of `x'
 [[attribute("__DECL_SIMD_log"), decl_include("<bits/crt/math-vector.h>")]]
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__log")]]
-double log(double x); /* TODO */
+[[requires_include("<ieee754.h>")]]
+[[requires($has_function(feraiseexcept) &&
+           (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))]]
+[[impl_include("<bits/crt/fenv.h>", "<bits/math-constants.h>", "<libm/nan.h>")]]
+[[impl_include("<libm/log.h>", "<libm/fcomp.h>", "<libm/matherr.h>")]]
+double log(double x) {
+	if (__LIBM_MATHFUNI2(@islessequal@, x, -1.0) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
+		if (x == -1.0) {
+			feraiseexcept(@FE_DIVBYZERO@);
+			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_LOG_ZERO); /* log(0) */
+		} else {
+			feraiseexcept(@FE_INVALID@);
+			return __kernel_standard(x, x, __LIBM_MATHFUN1I(@nan@, ""), __LIBM_KMATHERR_LOG_MINUS); /* log(x<0) */
+		}
+	}
+	return __LIBM_MATHFUN(@log@, x);
+}
+
+
 
 @@Base-ten logarithm of `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__log10")]]
@@ -445,10 +465,28 @@ double expm1(double x) {
 
 @@Return `log(1 + x)'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__log1p")]]
-double log1p(double x); /* TODO */
+[[requires_include("<ieee754.h>")]]
+[[requires($has_function(feraiseexcept) &&
+           (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))]]
+[[impl_include("<bits/crt/fenv.h>", "<bits/math-constants.h>", "<libm/nan.h>")]]
+[[impl_include("<libm/log1p.h>", "<libm/fcomp.h>", "<libm/matherr.h>")]]
+double log1p(double x) {
+	if (__LIBM_MATHFUNI2(@islessequal@, x, -1.0) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
+		if (x == -1.0) {
+			feraiseexcept(@FE_DIVBYZERO@);
+			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_LOG_ZERO); /* log(0) */
+		} else {
+			feraiseexcept(@FE_INVALID@);
+			return __kernel_standard(x, x, __LIBM_MATHFUN1I(@nan@, ""), __LIBM_KMATHERR_LOG_MINUS); /* log(x<0) */
+		}
+	}
+	return __LIBM_MATHFUN(@log1p@, x);
+}
 
 @@Return the base 2 signed integral exponent of `x'
-[[std, wunused, ATTR_MCONST, nothrow, crtbuiltin]]
+[[std, wunused, const, nothrow, crtbuiltin]]
 [[export_alias("__logb"), dos_only_export_alias("_logb")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/logb.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
