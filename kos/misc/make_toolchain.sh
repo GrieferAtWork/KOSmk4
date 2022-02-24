@@ -543,6 +543,20 @@ if ! [ -f "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" ] || \
    ! [ -f "$PREFIX/$TARGET/lib/libgcc_s.so.1" ]; then
 	echo "    Making crt0.o and crt0S.o for $GCC_VERSION:libgcc"
 	cmd cd "$KOS_ROOT"
+
+	# If this is the first time that "magic.dee" is being run after the git was cloned,
+	# we can make life a little bit easier for the user by skipping the step where we
+	# (re-)generate system headers. -- In this case doing so should be unnecessary, as
+	# (presumably) none of the related source files have yet to change.
+	# For this purpose, we touch the "*.latest" files that are used to keep track of
+	# the last-modified dates of the relevant component.
+	[ -f "kos/misc/magicgenerator/.generate_headers.dee.latest" ] || \
+		cmd touch "kos/misc/magicgenerator/.generate_headers.dee.latest"
+	[ -f "kos/misc/magicgenerator/.generate_syscalls.dee.latest" ] || \
+		cmd touch "kos/misc/magicgenerator/.generate_syscalls.dee.latest"
+	[ -f "kos/misc/magicgenerator/.generate_syscalls.dee.$TARGET_NAME.latest" ] || \
+		cmd touch "kos/misc/magicgenerator/.generate_syscalls.dee.$TARGET_NAME.latest"
+
 	cmd "$DEEMON" "magic.dee" \
 		"--gen=bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/crt0.o" \
 		"--gen=bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/crt0S.o" \
