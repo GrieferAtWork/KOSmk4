@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6557812b */
+/* HASH CRC-32:0x41e1a761 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -233,18 +233,18 @@ __NAMESPACE_STD_USING(expm1)
 #if defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
 __NAMESPACE_STD_USING(log1p)
 #endif /* __CRT_HAVE_log1p || __CRT_HAVE___log1p */
-#if defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
+#if defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(logb)
-#endif /* __CRT_HAVE_logb || __CRT_HAVE___logb || __CRT_HAVE__logb */
+#endif /* __CRT_HAVE_logb || __CRT_HAVE___logb || __CRT_HAVE__logb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_expm1f) || defined(__CRT_HAVE___expm1f) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(expm1f)
 #endif /* __CRT_HAVE_expm1f || __CRT_HAVE___expm1f || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_expm1 || __CRT_HAVE___expm1 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_log1pf) || defined(__CRT_HAVE___log1pf) || defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
 __NAMESPACE_STD_USING(log1pf)
 #endif /* __CRT_HAVE_log1pf || __CRT_HAVE___log1pf || __CRT_HAVE_log1p || __CRT_HAVE___log1p */
-#if defined(__CRT_HAVE_logbf) || defined(__CRT_HAVE___logbf) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
+#if defined(__CRT_HAVE_logbf) || defined(__CRT_HAVE___logbf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(logbf)
-#endif /* __CRT_HAVE_logbf || __CRT_HAVE___logbf || __CRT_HAVE_logb || __CRT_HAVE___logb || __CRT_HAVE__logb */
+#endif /* __CRT_HAVE_logbf || __CRT_HAVE___logbf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_logb || __CRT_HAVE___logb || __CRT_HAVE__logb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if defined(__CRT_HAVE_expm1l) || defined(__CRT_HAVE___expm1l) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(expm1l)
@@ -252,9 +252,9 @@ __NAMESPACE_STD_USING(expm1l)
 #if defined(__CRT_HAVE_log1pl) || defined(__CRT_HAVE___log1pl) || defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
 __NAMESPACE_STD_USING(log1pl)
 #endif /* __CRT_HAVE_log1pl || __CRT_HAVE___log1pl || __CRT_HAVE_log1p || __CRT_HAVE___log1p */
-#if defined(__CRT_HAVE_logbl) || defined(__CRT_HAVE___logbl) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
+#if defined(__CRT_HAVE_logbl) || defined(__CRT_HAVE___logbl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(logbl)
-#endif /* __CRT_HAVE_logbl || __CRT_HAVE___logbl || __CRT_HAVE_logb || __CRT_HAVE___logb || __CRT_HAVE__logb */
+#endif /* __CRT_HAVE_logbl || __CRT_HAVE___logbl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_logb || __CRT_HAVE___logb || __CRT_HAVE__logb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 #ifdef __USE_ISOC99
@@ -1577,6 +1577,12 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,logb,(double __x),__logb,(__x))
 #elif defined(__CRT_HAVE__logb)
 /* Return the base 2 signed integral exponent of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,logb,(double __x),_logb,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_STD_END
+#include <libc/local/math/logb.h>
+__NAMESPACE_STD_BEGIN
+/* Return the base 2 signed integral exponent of `x' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(logb, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL logb)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(logb))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_expm1f) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_expm1f)
 /* Return `exp(x) - 1' */
@@ -1619,7 +1625,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,logbf,(float __x),(__x))
 #elif defined(__CRT_HAVE___logbf)
 /* Return the base 2 signed integral exponent of `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,logbf,(float __x),__logbf,(__x))
-#elif defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/logbf.h>
 __NAMESPACE_STD_BEGIN
@@ -1668,7 +1674,7 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,logbl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___logbl)
 /* Return the base 2 signed integral exponent of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,logbl,(__LONGDOUBLE __x),__logbl,(__x))
-#elif defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/logbl.h>
 __NAMESPACE_STD_BEGIN
@@ -4502,7 +4508,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,logb,(float __x),logbf,(__x))
 #elif defined(__CRT_HAVE___logbf)
 /* Return the base 2 signed integral exponent of `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,logb,(float __x),__logbf,(__x))
-#elif defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/logbf.h>
@@ -4730,7 +4736,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,logb,(__LONGDOUBLE __x),logbl,
 #elif defined(__CRT_HAVE___logbl)
 /* Return the base 2 signed integral exponent of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,logb,(__LONGDOUBLE __x),__logbl,(__x))
-#elif defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/logbl.h>
@@ -6031,18 +6037,18 @@ __NAMESPACE_STD_USING(expm1)
 #if defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
 __NAMESPACE_STD_USING(log1p)
 #endif /* __CRT_HAVE_log1p || __CRT_HAVE___log1p */
-#if defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
+#if defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(logb)
-#endif /* __CRT_HAVE_logb || __CRT_HAVE___logb || __CRT_HAVE__logb */
+#endif /* __CRT_HAVE_logb || __CRT_HAVE___logb || __CRT_HAVE__logb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_expm1f) || defined(__CRT_HAVE___expm1f) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(expm1f)
 #endif /* __CRT_HAVE_expm1f || __CRT_HAVE___expm1f || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_expm1 || __CRT_HAVE___expm1 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_log1pf) || defined(__CRT_HAVE___log1pf) || defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
 __NAMESPACE_STD_USING(log1pf)
 #endif /* __CRT_HAVE_log1pf || __CRT_HAVE___log1pf || __CRT_HAVE_log1p || __CRT_HAVE___log1p */
-#if defined(__CRT_HAVE_logbf) || defined(__CRT_HAVE___logbf) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
+#if defined(__CRT_HAVE_logbf) || defined(__CRT_HAVE___logbf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(logbf)
-#endif /* __CRT_HAVE_logbf || __CRT_HAVE___logbf || __CRT_HAVE_logb || __CRT_HAVE___logb || __CRT_HAVE__logb */
+#endif /* __CRT_HAVE_logbf || __CRT_HAVE___logbf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_logb || __CRT_HAVE___logb || __CRT_HAVE__logb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifndef __CXX_SYSTEM_HEADER
@@ -6052,9 +6058,9 @@ __NAMESPACE_STD_USING(expm1l)
 #if defined(__CRT_HAVE_log1pl) || defined(__CRT_HAVE___log1pl) || defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
 __NAMESPACE_STD_USING(log1pl)
 #endif /* __CRT_HAVE_log1pl || __CRT_HAVE___log1pl || __CRT_HAVE_log1p || __CRT_HAVE___log1p */
-#if defined(__CRT_HAVE_logbl) || defined(__CRT_HAVE___logbl) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
+#if defined(__CRT_HAVE_logbl) || defined(__CRT_HAVE___logbl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(logbl)
-#endif /* __CRT_HAVE_logbl || __CRT_HAVE___logbl || __CRT_HAVE_logb || __CRT_HAVE___logb || __CRT_HAVE__logb */
+#endif /* __CRT_HAVE_logbl || __CRT_HAVE___logbl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_logb || __CRT_HAVE___logb || __CRT_HAVE__logb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__CXX_SYSTEM_HEADER */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
@@ -8065,6 +8071,10 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__logb,(double __x),(__x))
 #elif defined(__CRT_HAVE__logb)
 /* Return the base 2 signed integral exponent of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__logb,(double __x),_logb,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/logb.h>
+/* Return the base 2 signed integral exponent of `x' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __logb)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(logb))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_expm1f) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_expm1f)
 /* Return `exp(x) - 1' */
@@ -8103,7 +8113,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__logbf,(float __x),logbf,(__x))
 #elif defined(__CRT_HAVE___logbf)
 /* Return the base 2 signed integral exponent of `x' */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__logbf,(float __x),(__x))
-#elif defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/logbf.h>
 /* Return the base 2 signed integral exponent of `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __logbf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(logbf))(__x); }
@@ -8146,7 +8156,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__logbl,(__LONGDOUBLE __x),log
 #elif defined(__CRT_HAVE___logbl)
 /* Return the base 2 signed integral exponent of `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__logbl,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/logbl.h>
 /* Return the base 2 signed integral exponent of `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __logbl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(logbl))(__x); }

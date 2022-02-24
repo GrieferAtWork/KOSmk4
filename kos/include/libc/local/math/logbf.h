@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97636677 */
+/* HASH CRC-32:0x156b0f4e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_logbf_defined
 #define __local_logbf_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_logb_defined
 #define __local___localdep_logb_defined
@@ -33,20 +34,34 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_logb,(double __x),logb,(_
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_logb,(double __x),__logb,(__x))
 #elif defined(__CRT_HAVE__logb)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_logb,(double __x),_logb,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_END
+#include <libc/local/math/logb.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_logb __LIBC_LOCAL_NAME(logb)
 #else /* ... */
 #undef __local___localdep_logb_defined
 #endif /* !... */
 #endif /* !__local___localdep_logb_defined */
+__NAMESPACE_LOCAL_END
+#include <libm/logb.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(logbf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(logbf))(float __x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+	return __LIBM_MATHFUNF(logb, __x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)(__NAMESPACE_LOCAL_SYM __localdep_logb)((double)__x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_logbf_defined
 #define __local___localdep_logbf_defined
 #define __localdep_logbf __LIBC_LOCAL_NAME(logbf)
 #endif /* !__local___localdep_logbf_defined */
-#else /* __CRT_HAVE_logb || __CRT_HAVE___logb || __CRT_HAVE__logb */
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_logb || __CRT_HAVE___logb || __CRT_HAVE__logb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #undef __local_logbf_defined
-#endif /* !__CRT_HAVE_logb && !__CRT_HAVE___logb && !__CRT_HAVE__logb */
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ && !__CRT_HAVE_logb && !__CRT_HAVE___logb && !__CRT_HAVE__logb && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_logbf_defined */

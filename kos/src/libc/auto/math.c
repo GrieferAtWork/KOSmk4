@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc5beda8 */
+/* HASH CRC-32:0x22e2ac5b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -536,6 +536,12 @@ NOTHROW(LIBCCALL libc_expm1)(double x) {
 	}
 	return result;
 }
+#include <libm/logb.h>
+/* Return the base 2 signed integral exponent of `x' */
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
+NOTHROW(LIBCCALL libc_logb)(double x) {
+	return __LIBM_MATHFUN(logb, x);
+}
 #include <libm/matherr.h>
 #include <libm/signbit.h>
 #include <libm/finite.h>
@@ -565,10 +571,17 @@ INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_log1pf)(float x) {
 	return (float)libc_log1p((double)x);
 }
+#include <libm/logb.h>
 /* Return the base 2 signed integral exponent of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_logbf)(float x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+	return __LIBM_MATHFUNF(logb, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)libc_logb((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 #include <libm/matherr.h>
 #include <libm/signbit.h>
@@ -599,10 +612,17 @@ INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_log1pl)(__LONGDOUBLE x) {
 	return (__LONGDOUBLE)libc_log1p((double)x);
 }
+#include <libm/logb.h>
 /* Return the base 2 signed integral exponent of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_logbl)(__LONGDOUBLE x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+	return __LIBM_MATHFUNL(logb, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)libc_logb((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 /* Compute base-2 exponential of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
@@ -2547,6 +2567,11 @@ DEFINE_PUBLIC_ALIAS(__modfl, libc_modfl);
 DEFINE_PUBLIC_ALIAS(modfl, libc_modfl);
 DEFINE_PUBLIC_ALIAS(__expm1, libc_expm1);
 DEFINE_PUBLIC_ALIAS(expm1, libc_expm1);
+DEFINE_PUBLIC_ALIAS(__logb, libc_logb);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_logb, libc_logb);
+#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(logb, libc_logb);
 DEFINE_PUBLIC_ALIAS(__expm1f, libc_expm1f);
 DEFINE_PUBLIC_ALIAS(expm1f, libc_expm1f);
 DEFINE_PUBLIC_ALIAS(__log1pf, libc_log1pf);

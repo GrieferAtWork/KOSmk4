@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4630a05b */
+/* HASH CRC-32:0xf3fdd4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,8 +59,6 @@ INTDEF WUNUSED __DECL_SIMD_log double NOTHROW(LIBCCALL libc_log)(double x);
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_log10)(double x);
 /* Return `log(1 + x)' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_log1p)(double x);
-/* Return the base 2 signed integral exponent of `x' */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_logb)(double x);
 /* Compute base-2 exponential of `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_exp2)(double x);
 /* Compute base-2 logarithm of `x' */

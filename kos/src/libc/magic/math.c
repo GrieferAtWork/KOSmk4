@@ -193,11 +193,11 @@ __SYSDECL_BEGIN
 
 @@Arc cosine of `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__acos")]]
-double acos(double x);
+double acos(double x); /* TODO */
 
 @@Arc sine of `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__asin")]]
-double asin(double x);
+double asin(double x); /* TODO */
 
 @@Arc tangent of `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__atan")]]
@@ -225,7 +225,7 @@ double atan(double x) {
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
-double  atan2(double y, double x){
+double atan2(double y, double x){
 	if (__LIBM_LIB_VERSION == __LIBM_SVID && x == 0.0 && y == 0.0)
 		return __kernel_standard(y, x, __HUGE_VAL, __LIBM_KMATHERR_ATAN2); /* atan2(+-0,+-0) */
 	return __LIBM_MATHFUN2(@atan2@, y, x);
@@ -450,7 +450,13 @@ double log1p(double x); /* TODO */
 @@Return the base 2 signed integral exponent of `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin]]
 [[export_alias("__logb"), dos_only_export_alias("_logb")]]
-double logb(double x); /* TODO */
+[[requires_include("<ieee754.h>"), impl_include("<libm/logb.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+double logb(double x) {
+	return __LIBM_MATHFUN(@logb@, x);
+}
 
 
 [[std, crtbuiltin, export_alias("__expm1f")]] expm1f(*) %{generate(double2float("expm1"))}

@@ -33,6 +33,23 @@
 #ifdef __CC__
 __DECL_BEGIN
 
+/* For `union ieee754_float' */
+#define __LIBM_IEEE754_FLOAT_MAXEXP 0xff
+#define __LIBM_IEEE754_FLOAT_BIAS   0x7f /* Added to exponent. */
+#define __LIBM_IEEE754_FLOAT_SHIFT  23
+
+/* For `union ieee754_double' */
+#define __LIBM_IEEE754_DOUBLE_MAXEXP 0x7ff
+#define __LIBM_IEEE754_DOUBLE_BIAS   0x3ff /* Added to exponent. */
+#define __LIBM_IEEE754_DOUBLE_SHIFT  20
+
+/* For `union ieee854_long_double' */
+#define __LIBM_IEEE854_LONG_DOUBLE_MAXEXP 0x7fff
+#define __LIBM_IEEE854_LONG_DOUBLE_BIAS   0x3fff /* Added to exponent. */
+#define __LIBM_IEEE854_LONG_DOUBLE_SHIFT  0
+
+
+
 #define __LIBM_LOCAL_DECLARE_BEGIN             __NAMESPACE_LOCAL_BEGIN
 #define __LIBM_LOCAL_DECLARE_END               __NAMESPACE_LOCAL_END
 #define __LIBM_LOCAL_DECLARE(T, name, value)   __LOCAL_LIBC_CONST_DATA(libm_##name) T const __libm_##name = value;

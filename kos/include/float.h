@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x311e5bb3 */
+/* HASH CRC-32:0xec4166f0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -533,7 +533,14 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,_logb,(double __x),__logb,(__x))
 #elif defined(__CRT_HAVE__logb)
 /* Return the base 2 signed integral exponent of `x' */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,_logb,(double __x),(__x))
-#endif /* ... */
+#else /* ... */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/logb.h>
+/* Return the base 2 signed integral exponent of `x' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL _logb)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(logb))(__x); }
+#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#endif /* !... */
 #if __has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)
 /* Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_nextafter,(double __x, double __y),nextafter,{ return __builtin_nextafter(__x, __y); })

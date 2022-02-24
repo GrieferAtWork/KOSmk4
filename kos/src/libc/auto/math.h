@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7fd3f21 */
+/* HASH CRC-32:0x50e8f546 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -420,6 +420,12 @@ INTDEF WUNUSED double NOTHROW(LIBCCALL libc_expm1)(double x);
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_log1p)(double x);
 /* Return the base 2 signed integral exponent of `x' */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_logb)(double x);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Return the base 2 signed integral exponent of `x' */
+INTDEF WUNUSED double NOTHROW(LIBCCALL libc_logb)(double x);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Return `exp(x) - 1' */
 INTDEF WUNUSED float NOTHROW(LIBDCALL libd_expm1f)(float x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
