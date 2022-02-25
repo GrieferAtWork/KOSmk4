@@ -1017,6 +1017,7 @@
 #define __CRT_HAVE___sincos
 #define __CRT_HAVE___sincosf
 #define __CRT_HAVE___sincosl
+#define __CRT_HAVE___sincosl_table
 #define __CRT_HAVE___sinf
 #define __CRT_HAVE___sinh
 #define __CRT_HAVE___sinhf

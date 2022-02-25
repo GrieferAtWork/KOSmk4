@@ -34,19 +34,19 @@
 __DECL_BEGIN
 
 /* For `union ieee754_float' */
-#define __LIBM_IEEE754_FLOAT_MAXEXP 0xff
-#define __LIBM_IEEE754_FLOAT_BIAS   0x7f /* Added to exponent. */
-#define __LIBM_IEEE754_FLOAT_SHIFT  23
+#define __LIBM_IEEE754_FLOAT_MAXEXP IEEE754_FLOAT_MAXEXP
+#define __LIBM_IEEE754_FLOAT_BIAS   IEEE754_FLOAT_BIAS /* Added to exponent. */
+#define __LIBM_IEEE754_FLOAT_SHIFT  IEEE754_FLOAT_SHIFT
 
 /* For `union ieee754_double' */
-#define __LIBM_IEEE754_DOUBLE_MAXEXP 0x7ff
-#define __LIBM_IEEE754_DOUBLE_BIAS   0x3ff /* Added to exponent. */
-#define __LIBM_IEEE754_DOUBLE_SHIFT  20
+#define __LIBM_IEEE754_DOUBLE_MAXEXP IEEE754_DOUBLE_MAXEXP
+#define __LIBM_IEEE754_DOUBLE_BIAS   IEEE754_DOUBLE_BIAS /* Added to exponent. */
+#define __LIBM_IEEE754_DOUBLE_SHIFT  IEEE754_DOUBLE_SHIFT
 
 /* For `union ieee854_long_double' */
-#define __LIBM_IEEE854_LONG_DOUBLE_MAXEXP 0x7fff
-#define __LIBM_IEEE854_LONG_DOUBLE_BIAS   0x3fff /* Added to exponent. */
-#define __LIBM_IEEE854_LONG_DOUBLE_SHIFT  0
+#define __LIBM_IEEE854_LONG_DOUBLE_MAXEXP IEEE854_LONG_DOUBLE_MAXEXP
+#define __LIBM_IEEE854_LONG_DOUBLE_BIAS   IEEE854_LONG_DOUBLE_BIAS /* Added to exponent. */
+#define __LIBM_IEEE854_LONG_DOUBLE_SHIFT  IEEE854_LONG_DOUBLE_SHIFT
 
 
 
@@ -55,6 +55,7 @@ __DECL_BEGIN
 #define __LIBM_LOCAL_DECLARE(T, name, value)   __LOCAL_LIBC_CONST_DATA(libm_##name) T const __libm_##name = value;
 #define __LIBM_LOCAL_DECLARE_ARRAY(T, name, n) __LOCAL_LIBC_CONST_DATA(libm_##name) T const __libm_##name[n] =
 #define __LIBM_LOCAL_VALUE(name)               __NAMESPACE_LOCAL_SYM __libm_##name
+#define __LIBM_LOCAL_FUNC(name)                /* TODO: Replace all of the "__LOCAL" to using this. */
 
 /* NOTE: Heavy modifications were made to the original fdlibm! */
 /*
@@ -342,12 +343,13 @@ __DECL_END
 #define __LIBM_LOCAL_VALUE(name)               /* nothing */
 #endif /* !__CC__ */
 
-/* double __LIBM_MATHFUN(KEYWORD name, double x) */
-/* <any>  __LIBM_MATHFUNI(KEYWORD name, double x) */
-/* double __LIBM_MATHFUN2(KEYWORD name, double x, double y) */
-/* <any>  __LIBM_MATHFUNI2(KEYWORD name, double x, double y) */
-/* double __LIBM_MATHFUN1I(KEYWORD name, <any> x) */
-/* double __LIBM_MATHFUN0(KEYWORD name) */
+/* double  __LIBM_MATHFUN(KEYWORD name, double x) */
+/* <any>   __LIBM_MATHFUNI(KEYWORD name, double x) */
+/* double  __LIBM_MATHFUN2(KEYWORD name, double x, double y) */
+/* <any>   __LIBM_MATHFUNI2(KEYWORD name, double x, double y) */
+/* double  __LIBM_MATHFUN1I(KEYWORD name, <any> x) */
+/* double  __LIBM_MATHFUN0(KEYWORD name)
+/* KEYWORD __LIBM_MATHFUNX(KEYWORD name) */
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 #define __LIBM_MATHFUN(name, x)      __ieee754_##name(x)
 #define __LIBM_MATHFUNI(name, x)     __ieee754_##name(x)
@@ -355,6 +357,7 @@ __DECL_END
 #define __LIBM_MATHFUNI2(name, x, y) __ieee754_##name(x, y)
 #define __LIBM_MATHFUN1I(name, x)    __ieee754_##name(x)
 #define __LIBM_MATHFUN0(name)        __ieee754_##name()
+#define __LIBM_MATHFUNX(name)        __ieee754_##name
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 #define __LIBM_MATHFUN(name, x)      (double)__ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x))
 #define __LIBM_MATHFUNI(name, x)     __ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x))
@@ -362,6 +365,7 @@ __DECL_END
 #define __LIBM_MATHFUNI2(name, x, y) __ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x), (__IEEE754_FLOAT_TYPE__)(y))
 #define __LIBM_MATHFUN1I(name, x)    (double)__ieee754_##name##f(x)
 #define __LIBM_MATHFUN0(name)        (double)__ieee754_##name##f()
+#define __LIBM_MATHFUNX(name)        __ieee754_##name##f
 #elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #define __LIBM_MATHFUN(name, x)      (double)__ieee854_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x))
 #define __LIBM_MATHFUNI(name, x)     __ieee854_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x))
@@ -369,14 +373,16 @@ __DECL_END
 #define __LIBM_MATHFUNI2(name, x, y) __ieee854_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x), (__IEEE854_LONG_DOUBLE_TYPE__)(y))
 #define __LIBM_MATHFUN1I(name, x)    (double)__ieee854_##name##l(x)
 #define __LIBM_MATHFUN0(name)        (double)__ieee854_##name##l()
+#define __LIBM_MATHFUNX(name)        __ieee854_##name##l
 #endif /* !... */
 
-/* float __LIBM_MATHFUNF(KEYWORD name, float x) */
-/* <any> __LIBM_MATHFUNIF(KEYWORD name, float x) */
-/* float __LIBM_MATHFUN2F(KEYWORD name, float x, float y) */
-/* <any> __LIBM_MATHFUNI2F(KEYWORD name, float x, float y) */
-/* float __LIBM_MATHFUN1IF(KEYWORD name, <any> x) */
-/* float __LIBM_MATHFUN0F(KEYWORD name) */
+/* float   __LIBM_MATHFUNF(KEYWORD name, float x) */
+/* <any>   __LIBM_MATHFUNIF(KEYWORD name, float x) */
+/* float   __LIBM_MATHFUN2F(KEYWORD name, float x, float y) */
+/* <any>   __LIBM_MATHFUNI2F(KEYWORD name, float x, float y) */
+/* float   __LIBM_MATHFUN1IF(KEYWORD name, <any> x) */
+/* float   __LIBM_MATHFUN0F(KEYWORD name)
+/* KEYWORD __LIBM_MATHFUNXF(KEYWORD name) */
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 #define __LIBM_MATHFUNF(name, x)      __ieee754_##name##f(x)
 #define __LIBM_MATHFUNIF(name, x)     __ieee754_##name##f(x)
@@ -384,6 +390,7 @@ __DECL_END
 #define __LIBM_MATHFUNI2F(name, x, y) __ieee754_##name##f(x, y)
 #define __LIBM_MATHFUN1IF(name, x)    __ieee754_##name##f(x)
 #define __LIBM_MATHFUN0F(name)        __ieee754_##name##f()
+#define __LIBM_MATHFUNXF(name)        __ieee754_##name##f
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 #define __LIBM_MATHFUNF(name, x)      (float)__ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x))
 #define __LIBM_MATHFUNIF(name, x)     __ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x))
@@ -391,6 +398,7 @@ __DECL_END
 #define __LIBM_MATHFUNI2F(name, x, y) __ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x), (__IEEE754_DOUBLE_TYPE__)(y))
 #define __LIBM_MATHFUN1IF(name, x)    (float)__ieee754_##name(x)
 #define __LIBM_MATHFUN0F(name)        (float)__ieee754_##name()
+#define __LIBM_MATHFUNXF(name)        __ieee754_##name
 #elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 #define __LIBM_MATHFUNF(name, x)      (float)__ieee854_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x))
 #define __LIBM_MATHFUNIF(name, x)     __ieee854_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x))
@@ -398,6 +406,7 @@ __DECL_END
 #define __LIBM_MATHFUNI2F(name, x, y) __ieee854_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x), (__IEEE854_LONG_DOUBLE_TYPE__)(y))
 #define __LIBM_MATHFUN1IF(name, x)    (float)__ieee854_##name##l(x)
 #define __LIBM_MATHFUN0F(name)        (float)__ieee854_##name##l()
+#define __LIBM_MATHFUNXF(name)        __ieee854_##name##l
 #endif /* !... */
 
 /* long double __LIBM_MATHFUNL(KEYWORD name, long double x) */
@@ -405,7 +414,8 @@ __DECL_END
 /* long double __LIBM_MATHFUN2L(KEYWORD name, long double x, long double y) */
 /* <any>       __LIBM_MATHFUNI2L(KEYWORD name, long double x, long double y) */
 /* long double __LIBM_MATHFUN1IL(KEYWORD name, <any> x) */
-/* long double __LIBM_MATHFUN0L(KEYWORD name) */
+/* long double __LIBM_MATHFUN0L(KEYWORD name)
+/* KEYWORD     __LIBM_MATHFUNXL(KEYWORD name) */
 #if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 #define __LIBM_MATHFUNL(name, x)      __ieee854_##name##l(x)
 #define __LIBM_MATHFUNIL(name, x)     __ieee854_##name##l(x)
@@ -413,6 +423,7 @@ __DECL_END
 #define __LIBM_MATHFUNI2L(name, x, y) __ieee854_##name##l(x, y)
 #define __LIBM_MATHFUN1IL(name, x)    __ieee854_##name##l(x)
 #define __LIBM_MATHFUN0L(name)        __ieee854_##name##l()
+#define __LIBM_MATHFUNXL(name)        __ieee854_##name##l
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 #define __LIBM_MATHFUNL(name, x)      (__LONGDOUBLE)__ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x))
 #define __LIBM_MATHFUNIL(name, x)     __ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x))
@@ -420,6 +431,7 @@ __DECL_END
 #define __LIBM_MATHFUNI2L(name, x, y) __ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x), (__IEEE754_DOUBLE_TYPE__)(y))
 #define __LIBM_MATHFUN1IL(name, x)    (__LONGDOUBLE)__ieee754_##name(x)
 #define __LIBM_MATHFUN0L(name)        (__LONGDOUBLE)__ieee754_##name()
+#define __LIBM_MATHFUNXL(name)        __ieee754_##name
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 #define __LIBM_MATHFUNL(name, x)      (__LONGDOUBLE)__ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x))
 #define __LIBM_MATHFUNIL(name, x)     __ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x))
@@ -427,6 +439,7 @@ __DECL_END
 #define __LIBM_MATHFUNI2L(name, x, y) __ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x), (__IEEE754_FLOAT_TYPE__)(y))
 #define __LIBM_MATHFUN1IL(name, x)    (__LONGDOUBLE)__ieee754_##name##f(x)
 #define __LIBM_MATHFUN0L(name)        (__LONGDOUBLE)__ieee754_##name##f()
+#define __LIBM_MATHFUNXL(name)        __ieee754_##name##f
 #endif /* !... */
 
 

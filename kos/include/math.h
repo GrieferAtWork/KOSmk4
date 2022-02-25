@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee616401 */
+/* HASH CRC-32:0x675602db */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,12 +57,12 @@ __NAMESPACE_STD_USING(atan)
 #if defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(atan2)
 #endif /* __CRT_HAVE_atan2 || __CRT_HAVE___atan2 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
+#if defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(cos)
-#endif /* __CRT_HAVE_cos || __CRT_HAVE___cos */
-#if defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
+#endif /* __CRT_HAVE_cos || __CRT_HAVE___cos || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#if defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(sin)
-#endif /* __CRT_HAVE_sin || __CRT_HAVE___sin */
+#endif /* __CRT_HAVE_sin || __CRT_HAVE___sin || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
 __NAMESPACE_STD_USING(tan)
 #endif /* __CRT_HAVE_tan || __CRT_HAVE___tan */
@@ -78,12 +78,12 @@ __NAMESPACE_STD_USING(atanf)
 #if defined(__CRT_HAVE_atan2f) || defined(__CRT_HAVE___atan2f) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(atan2f)
 #endif /* __CRT_HAVE_atan2f || __CRT_HAVE___atan2f || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_atan2 || __CRT_HAVE___atan2 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_cosf) || defined(__CRT_HAVE___cosf) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
+#if defined(__CRT_HAVE_cosf) || defined(__CRT_HAVE___cosf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(cosf)
-#endif /* __CRT_HAVE_cosf || __CRT_HAVE___cosf || __CRT_HAVE_cos || __CRT_HAVE___cos */
-#if defined(__CRT_HAVE_sinf) || defined(__CRT_HAVE___sinf) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
+#endif /* __CRT_HAVE_cosf || __CRT_HAVE___cosf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_cos || __CRT_HAVE___cos || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#if defined(__CRT_HAVE_sinf) || defined(__CRT_HAVE___sinf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(sinf)
-#endif /* __CRT_HAVE_sinf || __CRT_HAVE___sinf || __CRT_HAVE_sin || __CRT_HAVE___sin */
+#endif /* __CRT_HAVE_sinf || __CRT_HAVE___sinf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_sin || __CRT_HAVE___sin || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_tanf) || defined(__CRT_HAVE___tanf) || defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
 __NAMESPACE_STD_USING(tanf)
 #endif /* __CRT_HAVE_tanf || __CRT_HAVE___tanf || __CRT_HAVE_tan || __CRT_HAVE___tan */
@@ -100,12 +100,12 @@ __NAMESPACE_STD_USING(atanl)
 #if defined(__CRT_HAVE_atan2l) || defined(__CRT_HAVE___atan2l) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(atan2l)
 #endif /* __CRT_HAVE_atan2l || __CRT_HAVE___atan2l || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_atan2 || __CRT_HAVE___atan2 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_cosl) || defined(__CRT_HAVE___cosl) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
+#if defined(__CRT_HAVE_cosl) || defined(__CRT_HAVE___cosl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(cosl)
-#endif /* __CRT_HAVE_cosl || __CRT_HAVE___cosl || __CRT_HAVE_cos || __CRT_HAVE___cos */
-#if defined(__CRT_HAVE_sinl) || defined(__CRT_HAVE___sinl) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
+#endif /* __CRT_HAVE_cosl || __CRT_HAVE___cosl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_cos || __CRT_HAVE___cos || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#if defined(__CRT_HAVE_sinl) || defined(__CRT_HAVE___sinl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(sinl)
-#endif /* __CRT_HAVE_sinl || __CRT_HAVE___sinl || __CRT_HAVE_sin || __CRT_HAVE___sin */
+#endif /* __CRT_HAVE_sinl || __CRT_HAVE___sinl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_sin || __CRT_HAVE___sin || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_tanl) || defined(__CRT_HAVE___tanl) || defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
 __NAMESPACE_STD_USING(tanl)
 #endif /* __CRT_HAVE_tanl || __CRT_HAVE___tanl || __CRT_HAVE_tan || __CRT_HAVE___tan */
@@ -761,6 +761,12 @@ __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_cos,double,__NOTHROW,cos,(double __x),(__x
 #elif defined(__CRT_HAVE___cos)
 /* Cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cos,double,__NOTHROW,cos,(double __x),__cos,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_STD_END
+#include <libc/local/math/cos.h>
+__NAMESPACE_STD_BEGIN
+/* Cosine of `x' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(cos, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __DECL_SIMD_cos double __NOTHROW(__LIBCCALL cos)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cos))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_sin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sin)
 /* Sine of `x' */
@@ -771,6 +777,12 @@ __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_sin,double,__NOTHROW,sin,(double __x),(__x
 #elif defined(__CRT_HAVE___sin)
 /* Sine of `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sin,double,__NOTHROW,sin,(double __x),__sin,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_STD_END
+#include <libc/local/math/sin.h>
+__NAMESPACE_STD_BEGIN
+/* Sine of `x' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(sin, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __DECL_SIMD_sin double __NOTHROW(__LIBCCALL sin)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sin))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_tan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tan)
 /* Tangent of `x' */
@@ -855,7 +867,7 @@ __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_cosf,float,__NOTHROW,cosf,(float __x),(__x
 #elif defined(__CRT_HAVE___cosf)
 /* Cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosf,float,__NOTHROW,cosf,(float __x),__cosf,(__x))
-#elif defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/cosf.h>
 __NAMESPACE_STD_BEGIN
@@ -871,7 +883,7 @@ __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_sinf,float,__NOTHROW,sinf,(float __x),(__x
 #elif defined(__CRT_HAVE___sinf)
 /* Sine of `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinf,float,__NOTHROW,sinf,(float __x),__sinf,(__x))
-#elif defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/sinf.h>
 __NAMESPACE_STD_BEGIN
@@ -968,7 +980,7 @@ __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,cosl,(__LONGDO
 #elif defined(__CRT_HAVE___cosl)
 /* Cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,cosl,(__LONGDOUBLE __x),__cosl,(__x))
-#elif defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/cosl.h>
 __NAMESPACE_STD_BEGIN
@@ -984,7 +996,7 @@ __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,sinl,(__LONGDO
 #elif defined(__CRT_HAVE___sinl)
 /* Sine of `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,sinl,(__LONGDOUBLE __x),__sinl,(__x))
-#elif defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/sinl.h>
 __NAMESPACE_STD_BEGIN
@@ -3715,7 +3727,7 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosf,float,__NOTHROW,cos,(float __x),cosf
 #elif defined(__CRT_HAVE___cosf)
 /* Cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosf,float,__NOTHROW,cos,(float __x),__cosf,(__x))
-#elif defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/cosf.h>
@@ -3733,7 +3745,7 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinf,float,__NOTHROW,sin,(float __x),sinf
 #elif defined(__CRT_HAVE___sinf)
 /* Sine of `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinf,float,__NOTHROW,sin,(float __x),__sinf,(__x))
-#elif defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/sinf.h>
@@ -4114,7 +4126,7 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,cos,(__LONGDO
 #elif defined(__CRT_HAVE___cosl)
 /* Cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,cos,(__LONGDOUBLE __x),__cosl,(__x))
-#elif defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/cosl.h>
@@ -4132,7 +4144,7 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,sin,(__LONGDO
 #elif defined(__CRT_HAVE___sinl)
 /* Sine of `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,sin,(__LONGDOUBLE __x),__sinl,(__x))
-#elif defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/sinl.h>
@@ -5863,12 +5875,12 @@ __NAMESPACE_STD_USING(atan)
 #if defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(atan2)
 #endif /* __CRT_HAVE_atan2 || __CRT_HAVE___atan2 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
+#if defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(cos)
-#endif /* __CRT_HAVE_cos || __CRT_HAVE___cos */
-#if defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
+#endif /* __CRT_HAVE_cos || __CRT_HAVE___cos || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#if defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(sin)
-#endif /* __CRT_HAVE_sin || __CRT_HAVE___sin */
+#endif /* __CRT_HAVE_sin || __CRT_HAVE___sin || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
 __NAMESPACE_STD_USING(tan)
 #endif /* __CRT_HAVE_tan || __CRT_HAVE___tan */
@@ -5884,12 +5896,12 @@ __NAMESPACE_STD_USING(atanf)
 #if defined(__CRT_HAVE_atan2f) || defined(__CRT_HAVE___atan2f) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(atan2f)
 #endif /* __CRT_HAVE_atan2f || __CRT_HAVE___atan2f || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_atan2 || __CRT_HAVE___atan2 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_cosf) || defined(__CRT_HAVE___cosf) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
+#if defined(__CRT_HAVE_cosf) || defined(__CRT_HAVE___cosf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(cosf)
-#endif /* __CRT_HAVE_cosf || __CRT_HAVE___cosf || __CRT_HAVE_cos || __CRT_HAVE___cos */
-#if defined(__CRT_HAVE_sinf) || defined(__CRT_HAVE___sinf) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
+#endif /* __CRT_HAVE_cosf || __CRT_HAVE___cosf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_cos || __CRT_HAVE___cos || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#if defined(__CRT_HAVE_sinf) || defined(__CRT_HAVE___sinf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(sinf)
-#endif /* __CRT_HAVE_sinf || __CRT_HAVE___sinf || __CRT_HAVE_sin || __CRT_HAVE___sin */
+#endif /* __CRT_HAVE_sinf || __CRT_HAVE___sinf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_sin || __CRT_HAVE___sin || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_tanf) || defined(__CRT_HAVE___tanf) || defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
 __NAMESPACE_STD_USING(tanf)
 #endif /* __CRT_HAVE_tanf || __CRT_HAVE___tanf || __CRT_HAVE_tan || __CRT_HAVE___tan */
@@ -5908,12 +5920,12 @@ __NAMESPACE_STD_USING(atanl)
 #if defined(__CRT_HAVE_atan2l) || defined(__CRT_HAVE___atan2l) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(atan2l)
 #endif /* __CRT_HAVE_atan2l || __CRT_HAVE___atan2l || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_atan2 || __CRT_HAVE___atan2 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_cosl) || defined(__CRT_HAVE___cosl) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
+#if defined(__CRT_HAVE_cosl) || defined(__CRT_HAVE___cosl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(cosl)
-#endif /* __CRT_HAVE_cosl || __CRT_HAVE___cosl || __CRT_HAVE_cos || __CRT_HAVE___cos */
-#if defined(__CRT_HAVE_sinl) || defined(__CRT_HAVE___sinl) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
+#endif /* __CRT_HAVE_cosl || __CRT_HAVE___cosl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_cos || __CRT_HAVE___cos || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#if defined(__CRT_HAVE_sinl) || defined(__CRT_HAVE___sinl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(sinl)
-#endif /* __CRT_HAVE_sinl || __CRT_HAVE___sinl || __CRT_HAVE_sin || __CRT_HAVE___sin */
+#endif /* __CRT_HAVE_sinl || __CRT_HAVE___sinl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_sin || __CRT_HAVE___sin || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_tanl) || defined(__CRT_HAVE___tanl) || defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
 __NAMESPACE_STD_USING(tanl)
 #endif /* __CRT_HAVE_tanl || __CRT_HAVE___tanl || __CRT_HAVE_tan || __CRT_HAVE___tan */
@@ -6432,6 +6444,10 @@ __CDECLARE_VOID(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),__NOTHROW,sincos,(doub
 #elif defined(__CRT_HAVE___sincos)
 /* Cosine and sine of `x' */
 __CREDIRECT_VOID(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),__NOTHROW,sincos,(double __x, double *__psinx, double *__pcosx),__sincos,(__x,__psinx,__pcosx))
+#elif ((defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)) && (defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos))) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/sincos.h>
+/* Cosine and sine of `x' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(sincos, __FORCELOCAL __ATTR_ARTIFICIAL __DECL_SIMD_sincos __ATTR_NONNULL((2, 3)) void __NOTHROW(__LIBCCALL sincos)(double __x, double *__psinx, double *__pcosx) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sincos))(__x, __psinx, __pcosx); })
 #endif /* ... */
 #if __has_builtin(__builtin_exp10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp10)
 /* A function missing in all standards: compute exponent to base ten */
@@ -6466,7 +6482,7 @@ __CDECLARE_VOID(__DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)),__NOTHROW,sincosf,(fl
 #elif defined(__CRT_HAVE___sincosf)
 /* Cosine and sine of `x' */
 __CREDIRECT_VOID(__DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)),__NOTHROW,sincosf,(float __x, float *__psinx, float *__pcosx),__sincosf,(__x,__psinx,__pcosx))
-#elif defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos)
+#elif defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos) || ((defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)) && (defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos))) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || ((defined(__CRT_HAVE_sinf) || defined(__CRT_HAVE___sinf) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)) && (defined(__CRT_HAVE_cosf) || defined(__CRT_HAVE___cosf) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos))) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 #include <libc/local/math/sincosf.h>
 /* Cosine and sine of `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sincosf, __FORCELOCAL __ATTR_ARTIFICIAL __DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)) void __NOTHROW(__LIBCCALL sincosf)(float __x, float *__psinx, float *__pcosx) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sincosf))(__x, __psinx, __pcosx); })
@@ -6515,7 +6531,7 @@ __CREDIRECT_VOID(__DECL_SIMD_sincosl __ATTR_NONNULL((2, 3)),__NOTHROW,sincosl,(_
 #elif defined(__CRT_HAVE_sincos) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 /* Cosine and sine of `x' */
 __CREDIRECT_VOID(__DECL_SIMD_sincosl __ATTR_NONNULL((2, 3)),__NOTHROW,sincosl,(__LONGDOUBLE __x, __LONGDOUBLE *__psinx, __LONGDOUBLE *__pcosx),sincos,(__x,__psinx,__pcosx))
-#elif defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos)
+#elif defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos) || ((defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)) && (defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos))) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || ((defined(__CRT_HAVE_sinl) || defined(__CRT_HAVE___sinl) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)) && (defined(__CRT_HAVE_cosl) || defined(__CRT_HAVE___cosl) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos))) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 #include <libc/local/math/sincosl.h>
 /* Cosine and sine of `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sincosl, __FORCELOCAL __ATTR_ARTIFICIAL __DECL_SIMD_sincosl __ATTR_NONNULL((2, 3)) void __NOTHROW(__LIBCCALL sincosl)(__LONGDOUBLE __x, __LONGDOUBLE *__psinx, __LONGDOUBLE *__pcosx) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sincosl))(__x, __psinx, __pcosx); })
@@ -7235,6 +7251,10 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cos,double,__NOTHROW,__cos,(double __x),c
 #elif defined(__CRT_HAVE___cos)
 /* Cosine of `x' */
 __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_cos,double,__NOTHROW,__cos,(double __x),(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/cos.h>
+/* Cosine of `x' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __DECL_SIMD_cos double __NOTHROW(__LIBCCALL __cos)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cos))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_sin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sin)
 /* Sine of `x' */
@@ -7245,6 +7265,10 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sin,double,__NOTHROW,__sin,(double __x),s
 #elif defined(__CRT_HAVE___sin)
 /* Sine of `x' */
 __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_sin,double,__NOTHROW,__sin,(double __x),(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/sin.h>
+/* Sine of `x' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __DECL_SIMD_sin double __NOTHROW(__LIBCCALL __sin)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sin))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_tan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tan)
 /* Tangent of `x' */
@@ -7351,7 +7375,7 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosf,float,__NOTHROW,__cosf,(float __x),c
 #elif defined(__CRT_HAVE___cosf)
 /* Cosine of `x' */
 __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_cosf,float,__NOTHROW,__cosf,(float __x),(__x))
-#elif defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/cosf.h>
 /* Cosine of `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __DECL_SIMD_cosf float __NOTHROW(__LIBCCALL __cosf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cosf))(__x); }
@@ -7365,7 +7389,7 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinf,float,__NOTHROW,__sinf,(float __x),s
 #elif defined(__CRT_HAVE___sinf)
 /* Sine of `x' */
 __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_sinf,float,__NOTHROW,__sinf,(float __x),(__x))
-#elif defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/sinf.h>
 /* Sine of `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __DECL_SIMD_sinf float __NOTHROW(__LIBCCALL __sinf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sinf))(__x); }
@@ -7492,7 +7516,7 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,__cosl,(__LON
 #elif defined(__CRT_HAVE___cosl)
 /* Cosine of `x' */
 __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,__cosl,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/cosl.h>
 /* Cosine of `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __DECL_SIMD_cosl __LONGDOUBLE __NOTHROW(__LIBCCALL __cosl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cosl))(__x); }
@@ -7506,7 +7530,7 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,__sinl,(__LON
 #elif defined(__CRT_HAVE___sinl)
 /* Sine of `x' */
 __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,__sinl,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/sinl.h>
 /* Sine of `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __DECL_SIMD_sinl __LONGDOUBLE __NOTHROW(__LIBCCALL __sinl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sinl))(__x); }
@@ -7578,6 +7602,10 @@ __CREDIRECT_VOID(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),__NOTHROW,__sincos,(d
 #elif defined(__CRT_HAVE___sincos)
 /* Cosine and sine of `x' */
 __CDECLARE_VOID(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),__NOTHROW,__sincos,(double __x, double *__psinx, double *__pcosx),(__x,__psinx,__pcosx))
+#elif ((defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)) && (defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos))) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/sincos.h>
+/* Cosine and sine of `x' */
+__FORCELOCAL __ATTR_ARTIFICIAL __DECL_SIMD_sincos __ATTR_NONNULL((2, 3)) void __NOTHROW(__LIBCCALL __sincos)(double __x, double *__psinx, double *__pcosx) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sincos))(__x, __psinx, __pcosx); }
 #endif /* ... */
 #if __has_builtin(__builtin_sincosf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sincosf)
 /* Cosine and sine of `x' */
@@ -7588,7 +7616,7 @@ __CREDIRECT_VOID(__DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)),__NOTHROW,__sincosf,
 #elif defined(__CRT_HAVE___sincosf)
 /* Cosine and sine of `x' */
 __CDECLARE_VOID(__DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)),__NOTHROW,__sincosf,(float __x, float *__psinx, float *__pcosx),(__x,__psinx,__pcosx))
-#elif defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos)
+#elif defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos) || ((defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)) && (defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos))) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || ((defined(__CRT_HAVE_sinf) || defined(__CRT_HAVE___sinf) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)) && (defined(__CRT_HAVE_cosf) || defined(__CRT_HAVE___cosf) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos))) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 #include <libc/local/math/sincosf.h>
 /* Cosine and sine of `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)) void __NOTHROW(__LIBCCALL __sincosf)(float __x, float *__psinx, float *__pcosx) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sincosf))(__x, __psinx, __pcosx); }
@@ -7609,7 +7637,7 @@ __CREDIRECT_VOID(__DECL_SIMD_sincosl __ATTR_NONNULL((2, 3)),__NOTHROW,__sincosl,
 #elif defined(__CRT_HAVE_sincos) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 /* Cosine and sine of `x' */
 __CREDIRECT_VOID(__DECL_SIMD_sincosl __ATTR_NONNULL((2, 3)),__NOTHROW,__sincosl,(__LONGDOUBLE __x, __LONGDOUBLE *__psinx, __LONGDOUBLE *__pcosx),sincos,(__x,__psinx,__pcosx))
-#elif defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos)
+#elif defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos) || ((defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)) && (defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos))) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || ((defined(__CRT_HAVE_sinl) || defined(__CRT_HAVE___sinl) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)) && (defined(__CRT_HAVE_cosl) || defined(__CRT_HAVE___cosl) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos))) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 #include <libc/local/math/sincosl.h>
 /* Cosine and sine of `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __DECL_SIMD_sincosl __ATTR_NONNULL((2, 3)) void __NOTHROW(__LIBCCALL __sincosl)(__LONGDOUBLE __x, __LONGDOUBLE *__psinx, __LONGDOUBLE *__pcosx) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sincosl))(__x, __psinx, __pcosx); }
@@ -10849,8 +10877,8 @@ typedef __double_t double_t;
 
 
 #ifdef __USE_ISOC99
-#if __has_builtin(__builtin_isunordered) && \
-   (!defined(__DOS_COMPAT__) || !defined(__OPTIMIZE_SIZE__))
+#if (__has_builtin(__builtin_isunordered) && \
+     (!defined(__DOS_COMPAT__) || !defined(__OPTIMIZE_SIZE__)))
 #define isunordered(u, v)    __builtin_isunordered(u, v)
 #define isgreater(x, y)      __builtin_isgreater(x, y)
 #define isgreaterequal(x, y) __builtin_isgreaterequal(x, y)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e0c4f11 */
+/* HASH CRC-32:0x1fda3e93 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -181,8 +181,6 @@
 #define __stub_conj
 #define __stub_conjf
 #define __stub_conjl
-#define __stub___cos
-#define __stub_cos
 #define __stub___cosh
 #define __stub_cosh
 #define __stub_cpow
@@ -669,10 +667,6 @@
 #define __stub_shmdt
 #define __stub_shmget
 #define __stub_sigreturn
-#define __stub___sin
-#define __stub_sin
-#define __stub___sincos
-#define __stub_sincos
 #define __stub___sinh
 #define __stub_sinh
 #define __stub_sradixsort

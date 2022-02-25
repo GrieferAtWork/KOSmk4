@@ -261,7 +261,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 							cmd cd "$SRCPATH"
 							cmd autoconf
 						fi
-						# Try to converse disk space by getting rid of cache files created by autoreconf.
+						# Try to conserve disk space by getting rid of cache files created by autoreconf.
 						rm -r "$SRCPATH/autom4te.cache" > /dev/null 2>&1
 					fi
 				fi
@@ -1488,13 +1488,13 @@ $1=$2"
 					# Some more found in misc programs
 
 					# nano
-					*gl_cv_func_printf_enomem*)
+					*gl_cv_func_printf_enomem*) # printf() still works are ENOMEM
 						_config_site_option "gl_cv_func_printf_enomem" "yes"; ;;
-					*gt_cv_func_printf_posix*)
+					*gt_cv_func_printf_posix*) # printf() is POSIX compliant
 						_config_site_option "gt_cv_func_printf_posix" "yes"; ;;
 					*gl_cv_func_gettimeofday_clobber*) # No, our gettimeofday() doesn't clobber localtime(3)'s buffer
 						_config_site_option "gl_cv_func_gettimeofday_clobber" "no"; ;;
-					*gt_cv_int_divbyzero_sigfpe*)
+					*gt_cv_int_divbyzero_sigfpe*) # integer divide-by-zero raises SIGFPE (as long as you don't do `catch(...)' w/o rethrow)
 						_config_site_option "gt_cv_int_divbyzero_sigfpe" "yes"; ;;
 
 					# Xorg
@@ -1513,7 +1513,7 @@ $1=$2"
 						_config_site_option "ac_cv_kpthread" "no"; ;;
 					*ac_cv_kthread*) # No, our gcc doesn't accept "-Kthread"
 						_config_site_option "ac_cv_kthread" "no"; ;;
-					*ac_cv_pthread_system_supported*) # pthread_attr_setscope(PTHREAD_SCOPE_SYSTEM) doesn't return an error (which it doesn't')
+					*ac_cv_pthread_system_supported*) # pthread_attr_setscope(PTHREAD_SCOPE_SYSTEM) doesn't return an error
 						_config_site_option "ac_cv_pthread_system_supported" "yes"; ;;
 					*ac_cv_have_chflags*) # As for right now, we don't have this function. But it may be added someday
 						_config_site_option "ac_cv_have_chflags" "no"; ;;
@@ -1567,7 +1567,7 @@ $1=$2"
 						if _test_links <<< "
 							#include <asm/signed-shift.h>
 							#ifndef __ARCH_SIGNED_SHIFT_IS_SDIV
-							#error coke me
+							#error choke me
 							#endif
 							int main() { return 0; }
 						"; then
@@ -1614,7 +1614,7 @@ $1=$2"
 						_config_site_option "gcc_cv_func_mbstowcs_works" "no"; ;;
 					*libgfor_cv_have_unlink_open_file*) # "...whether the target can unlink an open file"
 						_config_site_option "libgfor_cv_have_unlink_open_file" "yes"; ;;
-					*libgfor_cv_have_crlf*) # No, KOS likes to use "\n" (but we do accept "\r\n" in most places)
+					*libgfor_cv_have_crlf*) # No, KOS likes to use "\n" (but we do accept "\r\n" in most places, including `fgets(3)')
 						_config_site_option "libgfor_cv_have_crlf" "no"; ;;
 					*libgfor_cv_have_working_stat*)
 						_config_site_option "libgfor_cv_have_working_stat" "yes"; ;;

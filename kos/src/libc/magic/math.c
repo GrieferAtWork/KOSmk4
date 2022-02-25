@@ -46,6 +46,7 @@
 %[define_double_replacement(__LIBM_MATHFUNI2 = __LIBM_MATHFUNI2F, __LIBM_MATHFUNI2L)]
 %[define_double_replacement(__LIBM_MATHFUN1I = __LIBM_MATHFUN1IF, __LIBM_MATHFUN1IL)]
 %[define_double_replacement(__LIBM_MATHFUN0 = __LIBM_MATHFUN0F, __LIBM_MATHFUN0L)]
+%[define_double_replacement(__LIBM_MATHFUNX = __LIBM_MATHFUNXF, __LIBM_MATHFUNXL)]
 %[define_double_replacement(__kernel_standard = __kernel_standard_f, __kernel_standard_l)]
 %[define_double2float_replacement(__IEEE754_FLOAT_TYPE_IS_DOUBLE__ = __IEEE754_FLOAT_TYPE_IS_FLOAT__)]
 %[define_double2float_replacement(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ = __IEEE754_DOUBLE_TYPE_IS_FLOAT__)]
@@ -262,12 +263,32 @@ double atan2(double y, double x){
 @@Cosine of `x'
 [[attribute("__DECL_SIMD_cos"), decl_include("<bits/crt/math-vector.h>")]]
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__cos")]]
-double cos(double x); /* TODO */
+[[impl_include("<libm/isnan.h>", "<libm/cos.h>", "<libm/matherr.h>")]]
+[[requires_include("<ieee754.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+double cos(double x) {
+	double result = __LIBM_MATHFUN(@cos@, x);
+	if (__LIBM_MATHFUNI(@isnan@, result) && !__LIBM_MATHFUNI(@isnan@, x))
+		result = __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_COS_INF);
+	return result;
+}
 
 @@Sine of `x'
 [[attribute("__DECL_SIMD_sin"), decl_include("<bits/crt/math-vector.h>")]]
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__sin")]]
-double sin(double x); /* TODO */
+[[impl_include("<libm/isnan.h>", "<libm/sin.h>", "<libm/matherr.h>")]]
+[[requires_include("<ieee754.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+double sin(double x) {
+	double result = __LIBM_MATHFUN(@sin@, x);
+	if (__LIBM_MATHFUNI(@isnan@, result) && !__LIBM_MATHFUNI(@isnan@, x))
+		result = __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_SIN_INF);
+	return result;
+}
 
 @@Tangent of `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__tan")]]
@@ -1390,7 +1411,19 @@ __LONGLONG llroundl(__LONGDOUBLE x) %{generate(double2ldouble("llround"))}
 @@Cosine and sine of `x'
 [[nothrow, crtbuiltin, export_alias("__sincos")]]
 [[attribute("__DECL_SIMD_sincos"), decl_include("<bits/crt/math-vector.h>")]]
-void sincos(double x, [[nonnull]] double *psinx, [[nonnull]] double *pcosx); /* TODO */
+[[impl_include("<libm/sincos.h>"), requires_include("<ieee754.h>")]]
+[[requires(($has_function(sin) && $has_function(cos)) ||
+           defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+void sincos(double x, [[nonnull]] double *psinx, [[nonnull]] double *pcosx) {
+@@pp_if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)@@
+	__LIBM_MATHFUNX(@sincos@)(x, psinx, pcosx);
+@@pp_else@@
+	*psinx = sin(x);
+	*pcosx = cos(x);
+@@pp_endif@@
+}
 
 @@A function missing in all standards: compute exponent to base ten
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__exp10")]]
@@ -1405,12 +1438,23 @@ double pow10(double x) {
 
 [[crtbuiltin, export_alias("__sincosf"), nothrow, doc_alias("sincos")]]
 [[attribute("__DECL_SIMD_sincosf"), decl_include("<bits/crt/math-vector.h>")]]
-[[requires_function(sincos)]]
+[[impl_include("<libm/sincos.h>"), requires_include("<ieee754.h>")]]
+[[requires($has_function(sincos) || ($has_function(sinf) && $has_function(cosf)) ||
+           defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__))]]
 void sincosf(float x, [[nonnull]] float *psinx, [[nonnull]] float *pcosx) {
+@@pp_if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)@@
+	__LIBM_MATHFUNXF(@sincos@)(x, psinx, pcosx);
+@@pp_elif $has_function(sincos)@@
 	double sinx, cosx;
 	sincos((double)x, &sinx, &cosx);
 	*psinx = (float)sinx;
 	*pcosx = (float)cosx;
+@@pp_else@@
+	*psinx = sinf(x);
+	*pcosx = cosf(x);
+@@pp_endif@@
 }
 
 [[crtbuiltin, export_alias("__exp10f")]] exp10f(*) %{generate(double2float("exp10"))}
@@ -1420,12 +1464,23 @@ void sincosf(float x, [[nonnull]] float *psinx, [[nonnull]] float *pcosx) {
 [[nothrow, crtbuiltin, export_alias("__sincosl"), doc_alias("sincos")]]
 [[attribute("__DECL_SIMD_sincosl"), decl_include("<bits/crt/math-vector.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias("__sincos", "sincos")]]
-[[requires_function(sincos)]]
+[[impl_include("<libm/sincos.h>"), requires_include("<ieee754.h>")]]
+[[requires($has_function(sincos) || ($has_function(sinl) && $has_function(cosl)) ||
+           defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__))]]
 void sincosl(__LONGDOUBLE x, [[nonnull]] __LONGDOUBLE *psinx, [[nonnull]] __LONGDOUBLE *pcosx) {
+@@pp_if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)@@
+	__LIBM_MATHFUNXL(@sincos@)(x, psinx, pcosx);
+@@pp_elif $has_function(sincos)@@
 	double sinx, cosx;
 	sincos((double)x, &sinx, &cosx);
 	*psinx = (__LONGDOUBLE)sinx;
 	*pcosx = (__LONGDOUBLE)cosx;
+@@pp_else@@
+	*psinx = sinl(x);
+	*pcosx = cosl(x);
+@@pp_endif@@
 }
 
 [[crtbuiltin, export_alias("__exp10l")]] exp10l(*) %{generate(double2ldouble("exp10"))}
@@ -2121,6 +2176,7 @@ int _dpcomp(double x, double y) /* TODO */;
 %[insert:function(__dos_ldpcomp = _ldpcomp)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
+/* TODO: int *__signgam(void); */
 
 %
 %{
@@ -2356,8 +2412,8 @@ typedef __double_t double_t;
 
 
 #ifdef __USE_ISOC99
-#if __has_builtin(__builtin_isunordered) && \
-   (!defined(__DOS_COMPAT__) || !defined(__OPTIMIZE_SIZE__))
+#if (__has_builtin(__builtin_isunordered) && \
+     (!defined(__DOS_COMPAT__) || !defined(__OPTIMIZE_SIZE__)))
 #define isunordered(u, v)    __builtin_isunordered(u, v)
 #define isgreater(x, y)      __builtin_isgreater(x, y)
 #define isgreaterequal(x, y) __builtin_isgreaterequal(x, y)

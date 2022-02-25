@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb36276fe */
+/* HASH CRC-32:0x981dc056 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,6 +91,28 @@ NOTHROW(LIBCCALL libc_atan2)(double y,
 		return __kernel_standard(y, x, __HUGE_VAL, __LIBM_KMATHERR_ATAN2); /* atan2(+-0,+-0) */
 	return __LIBM_MATHFUN2(atan2, y, x);
 }
+#include <libm/isnan.h>
+#include <libm/cos.h>
+#include <libm/matherr.h>
+/* Cosine of `x' */
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_cos double
+NOTHROW(LIBCCALL libc_cos)(double x) {
+	double result = __LIBM_MATHFUN(cos, x);
+	if (__LIBM_MATHFUNI(isnan, result) && !__LIBM_MATHFUNI(isnan, x))
+		result = __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_COS_INF);
+	return result;
+}
+#include <libm/isnan.h>
+#include <libm/sin.h>
+#include <libm/matherr.h>
+/* Sine of `x' */
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_sin double
+NOTHROW(LIBCCALL libc_sin)(double x) {
+	double result = __LIBM_MATHFUN(sin, x);
+	if (__LIBM_MATHFUNI(isnan, result) && !__LIBM_MATHFUNI(isnan, x))
+		result = __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_SIN_INF);
+	return result;
+}
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
 #include <libm/matherr.h>
@@ -177,15 +199,39 @@ NOTHROW(LIBCCALL libc_atan2f)(float y,
 	return (float)libc_atan2((double)y, (double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
+#include <libm/isnan.h>
+#include <libm/cos.h>
+#include <libm/matherr.h>
 /* Cosine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_cosf float
 NOTHROW(LIBCCALL libc_cosf)(float x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+	float result = __LIBM_MATHFUNF(cos, x);
+	if (__LIBM_MATHFUNIF(isnan, result) && !__LIBM_MATHFUNIF(isnan, x))
+		result = __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_COS_INF);
+	return result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)libc_cos((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
+#include <libm/isnan.h>
+#include <libm/sin.h>
+#include <libm/matherr.h>
 /* Sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_sinf float
 NOTHROW(LIBCCALL libc_sinf)(float x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+	float result = __LIBM_MATHFUNF(sin, x);
+	if (__LIBM_MATHFUNIF(isnan, result) && !__LIBM_MATHFUNIF(isnan, x))
+		result = __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_SIN_INF);
+	return result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)libc_sin((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 /* Tangent of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
@@ -278,15 +324,39 @@ NOTHROW(LIBCCALL libc_atan2l)(__LONGDOUBLE y,
 	return (__LONGDOUBLE)libc_atan2((double)y, (double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
+#include <libm/isnan.h>
+#include <libm/cos.h>
+#include <libm/matherr.h>
 /* Cosine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_cosl __LONGDOUBLE
 NOTHROW(LIBCCALL libc_cosl)(__LONGDOUBLE x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+	__LONGDOUBLE result = __LIBM_MATHFUNL(cos, x);
+	if (__LIBM_MATHFUNIL(isnan, result) && !__LIBM_MATHFUNIL(isnan, x))
+		result = __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_COS_INF);
+	return result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)libc_cos((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
+#include <libm/isnan.h>
+#include <libm/sin.h>
+#include <libm/matherr.h>
 /* Sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_sinl __LONGDOUBLE
 NOTHROW(LIBCCALL libc_sinl)(__LONGDOUBLE x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+	__LONGDOUBLE result = __LIBM_MATHFUNL(sin, x);
+	if (__LIBM_MATHFUNIL(isnan, result) && !__LIBM_MATHFUNIL(isnan, x))
+		result = __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_SIN_INF);
+	return result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)libc_sin((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 /* Tangent of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
@@ -2098,20 +2168,41 @@ NOTHROW(LIBCCALL libc_llroundl)(__LONGDOUBLE x) {
 #endif /* !__LIBM_MATHFUNIL */
 }
 #endif /* __SIZEOF_LONG__ != __SIZEOF_LONG_LONG__ */
+#include <libm/sincos.h>
+/* Cosine and sine of `x' */
+INTERN ATTR_SECTION(".text.crt.math.math") __DECL_SIMD_sincos NONNULL((2, 3)) void
+NOTHROW(LIBCCALL libc_sincos)(double x,
+                              double *psinx,
+                              double *pcosx) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	__LIBM_MATHFUNX(sincos)(x, psinx, pcosx);
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+	*psinx = libc_sin(x);
+	*pcosx = libc_cos(x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+}
 /* Another name occasionally used */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_pow10)(double x) {
 	return libc_pow(10.0, x);
 }
+#include <libm/sincos.h>
 /* Cosine and sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") __DECL_SIMD_sincosf NONNULL((2, 3)) void
 NOTHROW(LIBCCALL libc_sincosf)(float x,
                                float *psinx,
                                float *pcosx) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	__LIBM_MATHFUNXF(sincos)(x, psinx, pcosx);
+#elif defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos) || ((defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)) && (defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos))) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 	double sinx, cosx;
 	libc_sincos((double)x, &sinx, &cosx);
 	*psinx = (float)sinx;
 	*pcosx = (float)cosx;
+#else /* ... */
+	*psinx = libc_sinf(x);
+	*pcosx = libc_cosf(x);
+#endif /* !... */
 }
 /* A function missing in all standards: compute exponent to base ten */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
@@ -2127,15 +2218,23 @@ NOTHROW(LIBCCALL libc_pow10f)(float x) {
 	return (float)libc_pow10((double)x);
 #endif /* !__CRT_HAVE_powf && !__CRT_HAVE___powf && !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ && !__CRT_HAVE_pow && !__CRT_HAVE___pow && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 }
+#include <libm/sincos.h>
 /* Cosine and sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") __DECL_SIMD_sincosl NONNULL((2, 3)) void
 NOTHROW(LIBCCALL libc_sincosl)(__LONGDOUBLE x,
                                __LONGDOUBLE *psinx,
                                __LONGDOUBLE *pcosx) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	__LIBM_MATHFUNXL(sincos)(x, psinx, pcosx);
+#elif defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos) || ((defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)) && (defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos))) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 	double sinx, cosx;
 	libc_sincos((double)x, &sinx, &cosx);
 	*psinx = (__LONGDOUBLE)sinx;
 	*pcosx = (__LONGDOUBLE)cosx;
+#else /* ... */
+	*psinx = libc_sinl(x);
+	*pcosx = libc_cosl(x);
+#endif /* !... */
 }
 /* A function missing in all standards: compute exponent to base ten */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
@@ -2718,6 +2817,10 @@ DEFINE_PUBLIC_ALIAS(__atan, libc_atan);
 DEFINE_PUBLIC_ALIAS(atan, libc_atan);
 DEFINE_PUBLIC_ALIAS(__atan2, libc_atan2);
 DEFINE_PUBLIC_ALIAS(atan2, libc_atan2);
+DEFINE_PUBLIC_ALIAS(__cos, libc_cos);
+DEFINE_PUBLIC_ALIAS(cos, libc_cos);
+DEFINE_PUBLIC_ALIAS(__sin, libc_sin);
+DEFINE_PUBLIC_ALIAS(sin, libc_sin);
 DEFINE_PUBLIC_ALIAS(__acosf, libc_acosf);
 DEFINE_PUBLIC_ALIAS(acosf, libc_acosf);
 DEFINE_PUBLIC_ALIAS(__asinf, libc_asinf);
@@ -3037,6 +3140,8 @@ DEFINE_PUBLIC_ALIAS(__llrintl, libc_llrintl);
 DEFINE_PUBLIC_ALIAS(llrintl, libc_llrintl);
 DEFINE_PUBLIC_ALIAS(__llroundl, libc_llroundl);
 DEFINE_PUBLIC_ALIAS(llroundl, libc_llroundl);
+DEFINE_PUBLIC_ALIAS(__sincos, libc_sincos);
+DEFINE_PUBLIC_ALIAS(sincos, libc_sincos);
 DEFINE_PUBLIC_ALIAS(__pow10, libc_pow10);
 DEFINE_PUBLIC_ALIAS(pow10, libc_pow10);
 DEFINE_PUBLIC_ALIAS(__sincosf, libc_sincosf);

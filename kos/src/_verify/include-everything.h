@@ -797,7 +797,9 @@ incdir("");
 #include <libjson/writer.h>
 #include <libkeymap/api.h>
 #include <libkeymap/keymap.h>
+#include <libm/acos.h>
 #include <libm/api.h>
+#include <libm/asin.h>
 #include <libm/asm/_builtin.h>
 #include <libm/asm/atan.h>
 #include <libm/asm/atan2.h>
@@ -822,6 +824,7 @@ incdir("");
 #include <libm/cbrt.h>
 #include <libm/ceil.h>
 #include <libm/copysign.h>
+#include <libm/cos.h>
 #include <libm/exp.h>
 #include <libm/expm1.h>
 #include <libm/fabs.h>
@@ -837,7 +840,13 @@ incdir("");
 #include <libm/isinf.h>
 #include <libm/isnan.h>
 #include <libm/issignaling.h>
+#include <libm/kernel_cos.h>
+#include <libm/kernel_rem_pio2.h>
+#include <libm/kernel_sin.h>
 #include <libm/ldexp.h>
+#include <libm/log.h>
+#include <libm/log1p.h>
+#include <libm/logb.h>
 #include <libm/lrint.h>
 #include <libm/lround.h>
 #include <libm/matherr.h>
@@ -846,6 +855,7 @@ incdir("");
 #include <libm/nextafter.h>
 #include <libm/nexttoward.h>
 #include <libm/pow.h>
+#include <libm/rem_pio2.h>
 #include <libm/remainder.h>
 #include <libm/rint.h>
 #include <libm/round.h>
@@ -853,6 +863,9 @@ incdir("");
 #include <libm/scalbn.h>
 #include <libm/signbit.h>
 #include <libm/significand.h>
+#include <libm/sin.h>
+#include <libm/sincos.h>
+#include <libm/sincos_table.h>
 #include <libm/sqrt.h>
 #include <libm/trunc.h>
 #include <libpciaccess/api.h>

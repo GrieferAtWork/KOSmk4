@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82deb38d */
+/* HASH CRC-32:0x35c31beb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,8 +64,20 @@ INTDEF WUNUSED double NOTHROW(LIBCCALL libc_atan2)(double y, double x);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Cosine of `x' */
 INTDEF WUNUSED __DECL_SIMD_cos double NOTHROW(LIBDCALL libd_cos)(double x);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Cosine of `x' */
+INTDEF WUNUSED __DECL_SIMD_cos double NOTHROW(LIBCCALL libc_cos)(double x);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Sine of `x' */
 INTDEF WUNUSED __DECL_SIMD_sin double NOTHROW(LIBDCALL libd_sin)(double x);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Sine of `x' */
+INTDEF WUNUSED __DECL_SIMD_sin double NOTHROW(LIBCCALL libc_sin)(double x);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Tangent of `x' */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_tan)(double x);
 /* Arc cosine of `x' */
@@ -1257,6 +1269,12 @@ INTDEF ATTR_CONST WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llroundl)(__LONGDOUBL
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Cosine and sine of `x' */
 INTDEF __DECL_SIMD_sincos NONNULL((2, 3)) void NOTHROW(LIBDCALL libd_sincos)(double x, double *psinx, double *pcosx);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Cosine and sine of `x' */
+INTDEF __DECL_SIMD_sincos NONNULL((2, 3)) void NOTHROW(LIBCCALL libc_sincos)(double x, double *psinx, double *pcosx);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* A function missing in all standards: compute exponent to base ten */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_exp10)(double x);
 /* Another name occasionally used */

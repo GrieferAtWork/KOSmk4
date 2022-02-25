@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa842894c */
+/* HASH CRC-32:0xcd519b54 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,6 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Cosine of `x' */
-INTDEF WUNUSED __DECL_SIMD_cos double NOTHROW(LIBCCALL libc_cos)(double x);
-/* Sine of `x' */
-INTDEF WUNUSED __DECL_SIMD_sin double NOTHROW(LIBCCALL libc_sin)(double x);
 /* Tangent of `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_tan)(double x);
 /* Hyperbolic cosine of `x' */
@@ -66,8 +62,6 @@ INTDEF WUNUSED double NOTHROW(LIBCCALL libc_tgamma)(double x);
  * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
  * of the integral quotient x/y, with n >= 3 */
 INTDEF WUNUSED NONNULL((3)) double NOTHROW(LIBCCALL libc_remquo)(double x, double y, int *pquo);
-/* Cosine and sine of `x' */
-INTDEF __DECL_SIMD_sincos NONNULL((2, 3)) void NOTHROW(LIBCCALL libc_sincos)(double x, double *psinx, double *pcosx);
 /* A function missing in all standards: compute exponent to base ten */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_exp10)(double x);
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_j0)(double x);

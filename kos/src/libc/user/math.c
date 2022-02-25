@@ -32,31 +32,7 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_cos,hash:CRC-32=0x423dc7d6]]]*/
-/* Cosine of `x' */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_cos double
-NOTHROW(LIBCCALL libc_cos)(double x)
-/*[[[body:libc_cos]]]*/
-/*AUTO*/{
-	(void)x;
-	CRT_UNIMPLEMENTEDF("cos(%f)", x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_cos]]]*/
 
-/*[[[head:libc_sin,hash:CRC-32=0x99c2e142]]]*/
-/* Sine of `x' */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_sin double
-NOTHROW(LIBCCALL libc_sin)(double x)
-/*[[[body:libc_sin]]]*/
-/*AUTO*/{
-	(void)x;
-	CRT_UNIMPLEMENTEDF("sin(%f)", x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_sin]]]*/
 
 /*[[[head:libc_tan,hash:CRC-32=0x482155e3]]]*/
 /* Tangent of `x' */
@@ -274,21 +250,6 @@ NOTHROW(LIBCCALL libc_remquo)(double x,
 }
 /*[[[end:libc_remquo]]]*/
 
-/*[[[head:libc_sincos,hash:CRC-32=0x4268bebd]]]*/
-/* Cosine and sine of `x' */
-INTERN ATTR_SECTION(".text.crt.math.math") __DECL_SIMD_sincos NONNULL((2, 3)) void
-NOTHROW(LIBCCALL libc_sincos)(double x,
-                              double *psinx,
-                              double *pcosx)
-/*[[[body:libc_sincos]]]*/
-/*AUTO*/{
-	(void)x;
-	(void)psinx;
-	(void)pcosx;
-	CRT_UNIMPLEMENTEDF("sincos(%f, %p, %p)", x, psinx, pcosx); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_sincos]]]*/
 
 /*[[[head:libc_exp10,hash:CRC-32=0x81e7bc56]]]*/
 /* A function missing in all standards: compute exponent to base ten */
@@ -400,11 +361,7 @@ NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x82bbfe76]]]*/
-DEFINE_PUBLIC_ALIAS(__cos, libc_cos);
-DEFINE_PUBLIC_ALIAS(cos, libc_cos);
-DEFINE_PUBLIC_ALIAS(__sin, libc_sin);
-DEFINE_PUBLIC_ALIAS(sin, libc_sin);
+/*[[[start:exports,hash:CRC-32=0xda9c1270]]]*/
 DEFINE_PUBLIC_ALIAS(__tan, libc_tan);
 DEFINE_PUBLIC_ALIAS(tan, libc_tan);
 DEFINE_PUBLIC_ALIAS(__cosh, libc_cosh);
@@ -439,8 +396,6 @@ DEFINE_PUBLIC_ALIAS(__tgamma, libc_tgamma);
 DEFINE_PUBLIC_ALIAS(tgamma, libc_tgamma);
 DEFINE_PUBLIC_ALIAS(__remquo, libc_remquo);
 DEFINE_PUBLIC_ALIAS(remquo, libc_remquo);
-DEFINE_PUBLIC_ALIAS(__sincos, libc_sincos);
-DEFINE_PUBLIC_ALIAS(sincos, libc_sincos);
 DEFINE_PUBLIC_ALIAS(__exp10, libc_exp10);
 DEFINE_PUBLIC_ALIAS(exp10, libc_exp10);
 DEFINE_PUBLIC_ALIAS(__j0, libc_j0);

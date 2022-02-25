@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe08077c */
+/* HASH CRC-32:0xfdb7ac21 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_cosl_defined
 #define __local_cosl_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_cos_defined
@@ -32,20 +33,39 @@ __CEIREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cos,double,__NOTHROW,__localdep_cos,(do
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cos,double,__NOTHROW,__localdep_cos,(double __x),cos,(__x))
 #elif defined(__CRT_HAVE___cos)
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cos,double,__NOTHROW,__localdep_cos,(double __x),__cos,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_END
+#include <libc/local/math/cos.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_cos __LIBC_LOCAL_NAME(cos)
 #else /* ... */
 #undef __local___localdep_cos_defined
 #endif /* !... */
 #endif /* !__local___localdep_cos_defined */
+__NAMESPACE_LOCAL_END
+#include <libm/isnan.h>
+#include <libm/cos.h>
+#include <libm/matherr.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(cosl) __ATTR_WUNUSED __DECL_SIMD_cosl __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(cosl))(__LONGDOUBLE __x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+	__LONGDOUBLE __result = __LIBM_MATHFUNL(cos, __x);
+	if (__LIBM_MATHFUNIL(isnan, __result) && !__LIBM_MATHFUNIL(isnan, __x))
+		__result = __kernel_standard_f(__x, __x, __result, __LIBM_KMATHERRF_COS_INF);
+	return __result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)(__NAMESPACE_LOCAL_SYM __localdep_cos)((double)__x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_cosl_defined
 #define __local___localdep_cosl_defined
 #define __localdep_cosl __LIBC_LOCAL_NAME(cosl)
 #endif /* !__local___localdep_cosl_defined */
-#else /* __CRT_HAVE_cos || __CRT_HAVE___cos */
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_cos || __CRT_HAVE___cos || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #undef __local_cosl_defined
-#endif /* !__CRT_HAVE_cos && !__CRT_HAVE___cos */
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__CRT_HAVE_cos && !__CRT_HAVE___cos && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_cosl_defined */
