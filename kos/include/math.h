@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ba5c35f */
+/* HASH CRC-32:0x290cd3ba */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -461,9 +461,9 @@ __NAMESPACE_STD_USING(nearbyint)
 #endif /* __CRT_HAVE_nearbyint || __CRT_HAVE___nearbyint || __CRT_HAVE_rint || __CRT_HAVE___rint || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 __NAMESPACE_STD_USING(round)
 __NAMESPACE_STD_USING(trunc)
-#if defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
+#if defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(remquo)
-#endif /* __CRT_HAVE_remquo || __CRT_HAVE___remquo */
+#endif /* __CRT_HAVE_remquo || __CRT_HAVE___remquo || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 __NAMESPACE_STD_USING(lrint)
 __NAMESPACE_STD_USING(lround)
 __NAMESPACE_STD_USING(fdim)
@@ -488,9 +488,9 @@ __NAMESPACE_STD_USING(nearbyintf)
 #endif /* __CRT_HAVE_nearbyintf || __CRT_HAVE___nearbyintf || __CRT_HAVE_rintf || __CRT_HAVE___rintf || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 __NAMESPACE_STD_USING(roundf)
 __NAMESPACE_STD_USING(truncf)
-#if defined(__CRT_HAVE_remquof) || defined(__CRT_HAVE___remquof) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
+#if defined(__CRT_HAVE_remquof) || defined(__CRT_HAVE___remquof) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(remquof)
-#endif /* __CRT_HAVE_remquof || __CRT_HAVE___remquof || __CRT_HAVE_remquo || __CRT_HAVE___remquo */
+#endif /* __CRT_HAVE_remquof || __CRT_HAVE___remquof || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_remquo || __CRT_HAVE___remquo || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 __NAMESPACE_STD_USING(lrintf)
 __NAMESPACE_STD_USING(lroundf)
 __NAMESPACE_STD_USING(fdimf)
@@ -516,9 +516,9 @@ __NAMESPACE_STD_USING(nearbyintl)
 #endif /* __CRT_HAVE_nearbyintl || __CRT_HAVE___nearbyintl || __CRT_HAVE_rintl || __CRT_HAVE___rintl || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ */
 __NAMESPACE_STD_USING(roundl)
 __NAMESPACE_STD_USING(truncl)
-#if defined(__CRT_HAVE_remquol) || defined(__CRT_HAVE___remquol) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
+#if defined(__CRT_HAVE_remquol) || defined(__CRT_HAVE___remquol) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(remquol)
-#endif /* __CRT_HAVE_remquol || __CRT_HAVE___remquol || __CRT_HAVE_remquo || __CRT_HAVE___remquo */
+#endif /* __CRT_HAVE_remquol || __CRT_HAVE___remquol || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_remquo || __CRT_HAVE___remquo || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 __NAMESPACE_STD_USING(lrintl)
 __NAMESPACE_STD_USING(lroundl)
 __NAMESPACE_STD_USING(fdiml)
@@ -2923,20 +2923,28 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(trunc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL trunc)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(trunc))(__x); })
 #endif /* !... */
 #if __has_builtin(__builtin_remquo) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquo)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CEIDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3)),double,__NOTHROW,remquo,(double __x, double __y, int *__pquo),{ return __builtin_remquo(__x, __y, __pquo); })
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CEIDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3)),double,__NOTHROW,remquo,(double __x, double __p, int *__pquo),{ return __builtin_remquo(__x, __p, __pquo); })
 #elif defined(__CRT_HAVE_remquo)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3)),double,__NOTHROW,remquo,(double __x, double __y, int *__pquo),(__x,__y,__pquo))
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3)),double,__NOTHROW,remquo,(double __x, double __p, int *__pquo),(__x,__p,__pquo))
 #elif defined(__CRT_HAVE___remquo)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),double,__NOTHROW,remquo,(double __x, double __y, int *__pquo),__remquo,(__x,__y,__pquo))
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),double,__NOTHROW,remquo,(double __x, double __p, int *__pquo),__remquo,(__x,__p,__pquo))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_STD_END
+#include <libc/local/math/remquo.h>
+__NAMESPACE_STD_BEGIN
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__NAMESPACE_LOCAL_USING_OR_IMPL(remquo, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) double __NOTHROW(__LIBCCALL remquo)(double __x, double __p, int *__pquo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remquo))(__x, __p, __pquo); })
 #endif /* ... */
 #if __has_builtin(__builtin_lrint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lrint)
 /* Round `x' to nearest integral value according to current rounding direction */
@@ -3201,28 +3209,28 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(truncf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL truncf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncf))(__x); })
 #endif /* !... */
 #if __has_builtin(__builtin_remquof) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquof)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CEIDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3)),float,__NOTHROW,remquof,(float __x, float __y, int *__pquo),{ return __builtin_remquof(__x, __y, __pquo); })
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CEIDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3)),float,__NOTHROW,remquof,(float __x, float __p, int *__pquo),{ return __builtin_remquof(__x, __p, __pquo); })
 #elif defined(__CRT_HAVE_remquof)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3)),float,__NOTHROW,remquof,(float __x, float __y, int *__pquo),(__x,__y,__pquo))
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3)),float,__NOTHROW,remquof,(float __x, float __p, int *__pquo),(__x,__p,__pquo))
 #elif defined(__CRT_HAVE___remquof)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),float,__NOTHROW,remquof,(float __x, float __y, int *__pquo),__remquof,(__x,__y,__pquo))
-#elif defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),float,__NOTHROW,remquof,(float __x, float __p, int *__pquo),__remquof,(__x,__p,__pquo))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/remquof.h>
 __NAMESPACE_STD_BEGIN
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__NAMESPACE_LOCAL_USING_OR_IMPL(remquof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) float __NOTHROW(__LIBCCALL remquof)(float __x, float __y, int *__pquo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remquof))(__x, __y, __pquo); })
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__NAMESPACE_LOCAL_USING_OR_IMPL(remquof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) float __NOTHROW(__LIBCCALL remquof)(float __x, float __p, int *__pquo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remquof))(__x, __p, __pquo); })
 #endif /* ... */
 #if __has_builtin(__builtin_lrintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lrintf)
 /* Round `x' to nearest integral value according to current rounding direction */
@@ -3513,28 +3521,28 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(truncl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL truncl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncl))(__x); })
 #endif /* !... */
 #if __has_builtin(__builtin_remquol) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquol)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CEIDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3)),__LONGDOUBLE,__NOTHROW,remquol,(__LONGDOUBLE __x, __LONGDOUBLE __y, int *__pquo),{ return __builtin_remquol(__x, __y, __pquo); })
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CEIDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3)),__LONGDOUBLE,__NOTHROW,remquol,(__LONGDOUBLE __x, __LONGDOUBLE __p, int *__pquo),{ return __builtin_remquol(__x, __p, __pquo); })
 #elif defined(__CRT_HAVE_remquol)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3)),__LONGDOUBLE,__NOTHROW,remquol,(__LONGDOUBLE __x, __LONGDOUBLE __y, int *__pquo),(__x,__y,__pquo))
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3)),__LONGDOUBLE,__NOTHROW,remquol,(__LONGDOUBLE __x, __LONGDOUBLE __p, int *__pquo),(__x,__p,__pquo))
 #elif defined(__CRT_HAVE___remquol)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),__LONGDOUBLE,__NOTHROW,remquol,(__LONGDOUBLE __x, __LONGDOUBLE __y, int *__pquo),__remquol,(__x,__y,__pquo))
-#elif defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),__LONGDOUBLE,__NOTHROW,remquol,(__LONGDOUBLE __x, __LONGDOUBLE __p, int *__pquo),__remquol,(__x,__p,__pquo))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/remquol.h>
 __NAMESPACE_STD_BEGIN
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__NAMESPACE_LOCAL_USING_OR_IMPL(remquol, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __LONGDOUBLE __NOTHROW(__LIBCCALL remquol)(__LONGDOUBLE __x, __LONGDOUBLE __y, int *__pquo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remquol))(__x, __y, __pquo); })
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__NAMESPACE_LOCAL_USING_OR_IMPL(remquol, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __LONGDOUBLE __NOTHROW(__LIBCCALL remquol)(__LONGDOUBLE __x, __LONGDOUBLE __p, int *__pquo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remquol))(__x, __p, __pquo); })
 #endif /* ... */
 #if __has_builtin(__builtin_lrintl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lrintl)
 /* Round `x' to nearest integral value according to current rounding direction */
@@ -5153,30 +5161,30 @@ extern "C++" {
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL trunc)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncf))(__x); }
 #endif /* !... */
 #if __has_builtin(__builtin_remquof) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquof)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),float,__NOTHROW,remquo,(float __x, float __y, int *__pquo),remquof,{ return __builtin_remquof(__x, __y, __pquo); })
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),float,__NOTHROW,remquo,(float __x, float __p, int *__pquo),remquof,{ return __builtin_remquof(__x, __p, __pquo); })
 #elif defined(__CRT_HAVE_remquof)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),float,__NOTHROW,remquo,(float __x, float __y, int *__pquo),remquof,(__x,__y,__pquo))
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),float,__NOTHROW,remquo,(float __x, float __p, int *__pquo),remquof,(__x,__p,__pquo))
 #elif defined(__CRT_HAVE___remquof)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),float,__NOTHROW,remquo,(float __x, float __y, int *__pquo),__remquof,(__x,__y,__pquo))
-#elif defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),float,__NOTHROW,remquo,(float __x, float __p, int *__pquo),__remquof,(__x,__p,__pquo))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/remquof.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) float __NOTHROW(__LIBCCALL remquo)(float __x, float __y, int *__pquo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remquof))(__x, __y, __pquo); }
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) float __NOTHROW(__LIBCCALL remquo)(float __x, float __p, int *__pquo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remquof))(__x, __p, __pquo); }
 #endif /* ... */
 #if __has_builtin(__builtin_lrintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lrintf)
 /* Round `x' to nearest integral value according to current rounding direction */
@@ -5568,30 +5576,30 @@ extern "C++" {
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL trunc)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncl))(__x); }
 #endif /* !... */
 #if __has_builtin(__builtin_remquol) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquol)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),__LONGDOUBLE,__NOTHROW,remquo,(__LONGDOUBLE __x, __LONGDOUBLE __y, int *__pquo),remquol,{ return __builtin_remquol(__x, __y, __pquo); })
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),__LONGDOUBLE,__NOTHROW,remquo,(__LONGDOUBLE __x, __LONGDOUBLE __p, int *__pquo),remquol,{ return __builtin_remquol(__x, __p, __pquo); })
 #elif defined(__CRT_HAVE_remquol)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),__LONGDOUBLE,__NOTHROW,remquo,(__LONGDOUBLE __x, __LONGDOUBLE __y, int *__pquo),remquol,(__x,__y,__pquo))
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),__LONGDOUBLE,__NOTHROW,remquo,(__LONGDOUBLE __x, __LONGDOUBLE __p, int *__pquo),remquol,(__x,__p,__pquo))
 #elif defined(__CRT_HAVE___remquol)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),__LONGDOUBLE,__NOTHROW,remquo,(__LONGDOUBLE __x, __LONGDOUBLE __y, int *__pquo),__remquol,(__x,__y,__pquo))
-#elif defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),__LONGDOUBLE,__NOTHROW,remquo,(__LONGDOUBLE __x, __LONGDOUBLE __p, int *__pquo),__remquol,(__x,__p,__pquo))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/remquol.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __LONGDOUBLE __NOTHROW(__LIBCCALL remquo)(__LONGDOUBLE __x, __LONGDOUBLE __y, int *__pquo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remquol))(__x, __y, __pquo); }
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __LONGDOUBLE __NOTHROW(__LIBCCALL remquo)(__LONGDOUBLE __x, __LONGDOUBLE __p, int *__pquo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remquol))(__x, __p, __pquo); }
 #endif /* ... */
 #if __has_builtin(__builtin_lrintl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lrintl)
 /* Round `x' to nearest integral value according to current rounding direction */
@@ -6400,9 +6408,9 @@ __NAMESPACE_STD_USING(nearbyint)
 #endif /* __CRT_HAVE_nearbyint || __CRT_HAVE___nearbyint || __CRT_HAVE_rint || __CRT_HAVE___rint || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 __NAMESPACE_STD_USING(round)
 __NAMESPACE_STD_USING(trunc)
-#if defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
+#if defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(remquo)
-#endif /* __CRT_HAVE_remquo || __CRT_HAVE___remquo */
+#endif /* __CRT_HAVE_remquo || __CRT_HAVE___remquo || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 __NAMESPACE_STD_USING(lrint)
 __NAMESPACE_STD_USING(lround)
 __NAMESPACE_STD_USING(fdim)
@@ -6431,9 +6439,9 @@ __NAMESPACE_STD_USING(nearbyintf)
 #endif /* __CRT_HAVE_nearbyintf || __CRT_HAVE___nearbyintf || __CRT_HAVE_rintf || __CRT_HAVE___rintf || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 __NAMESPACE_STD_USING(roundf)
 __NAMESPACE_STD_USING(truncf)
-#if defined(__CRT_HAVE_remquof) || defined(__CRT_HAVE___remquof) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
+#if defined(__CRT_HAVE_remquof) || defined(__CRT_HAVE___remquof) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(remquof)
-#endif /* __CRT_HAVE_remquof || __CRT_HAVE___remquof || __CRT_HAVE_remquo || __CRT_HAVE___remquo */
+#endif /* __CRT_HAVE_remquof || __CRT_HAVE___remquof || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_remquo || __CRT_HAVE___remquo || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 __NAMESPACE_STD_USING(lrintf)
 __NAMESPACE_STD_USING(lroundf)
 __NAMESPACE_STD_USING(fdimf)
@@ -6463,9 +6471,9 @@ __NAMESPACE_STD_USING(nearbyintl)
 #endif /* __CRT_HAVE_nearbyintl || __CRT_HAVE___nearbyintl || __CRT_HAVE_rintl || __CRT_HAVE___rintl || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ */
 __NAMESPACE_STD_USING(roundl)
 __NAMESPACE_STD_USING(truncl)
-#if defined(__CRT_HAVE_remquol) || defined(__CRT_HAVE___remquol) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
+#if defined(__CRT_HAVE_remquol) || defined(__CRT_HAVE___remquol) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(remquol)
-#endif /* __CRT_HAVE_remquol || __CRT_HAVE___remquol || __CRT_HAVE_remquo || __CRT_HAVE___remquo */
+#endif /* __CRT_HAVE_remquol || __CRT_HAVE___remquol || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_remquo || __CRT_HAVE___remquo || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 __NAMESPACE_STD_USING(lrintl)
 __NAMESPACE_STD_USING(lroundl)
 __NAMESPACE_STD_USING(fdiml)
@@ -9876,20 +9884,26 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__trunc,(double __x),(__
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __trunc)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(trunc))(__x); }
 #endif /* !... */
 #if __has_builtin(__builtin_remquo) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquo)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),double,__NOTHROW,__remquo,(double __x, double __y, int *__pquo),remquo,{ return __builtin_remquo(__x, __y, __pquo); })
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),double,__NOTHROW,__remquo,(double __x, double __p, int *__pquo),remquo,{ return __builtin_remquo(__x, __p, __pquo); })
 #elif defined(__CRT_HAVE_remquo)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),double,__NOTHROW,__remquo,(double __x, double __y, int *__pquo),remquo,(__x,__y,__pquo))
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),double,__NOTHROW,__remquo,(double __x, double __p, int *__pquo),remquo,(__x,__p,__pquo))
 #elif defined(__CRT_HAVE___remquo)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3)),double,__NOTHROW,__remquo,(double __x, double __y, int *__pquo),(__x,__y,__pquo))
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3)),double,__NOTHROW,__remquo,(double __x, double __p, int *__pquo),(__x,__p,__pquo))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/remquo.h>
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) double __NOTHROW(__LIBCCALL __remquo)(double __x, double __p, int *__pquo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remquo))(__x, __p, __pquo); }
 #endif /* ... */
 #if __has_builtin(__builtin_lrint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lrint)
 /* Round `x' to nearest integral value according to current rounding direction */
@@ -10087,26 +10101,26 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__truncf,(float __x),(__x
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __truncf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncf))(__x); }
 #endif /* !... */
 #if __has_builtin(__builtin_remquof) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquof)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),float,__NOTHROW,__remquof,(float __x, float __y, int *__pquo),remquof,{ return __builtin_remquof(__x, __y, __pquo); })
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),float,__NOTHROW,__remquof,(float __x, float __p, int *__pquo),remquof,{ return __builtin_remquof(__x, __p, __pquo); })
 #elif defined(__CRT_HAVE_remquof)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),float,__NOTHROW,__remquof,(float __x, float __y, int *__pquo),remquof,(__x,__y,__pquo))
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),float,__NOTHROW,__remquof,(float __x, float __p, int *__pquo),remquof,(__x,__p,__pquo))
 #elif defined(__CRT_HAVE___remquof)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3)),float,__NOTHROW,__remquof,(float __x, float __y, int *__pquo),(__x,__y,__pquo))
-#elif defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3)),float,__NOTHROW,__remquof,(float __x, float __p, int *__pquo),(__x,__p,__pquo))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/remquof.h>
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) float __NOTHROW(__LIBCCALL __remquof)(float __x, float __y, int *__pquo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remquof))(__x, __y, __pquo); }
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) float __NOTHROW(__LIBCCALL __remquof)(float __x, float __p, int *__pquo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remquof))(__x, __p, __pquo); }
 #endif /* ... */
 #if __has_builtin(__builtin_lrintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lrintf)
 /* Round `x' to nearest integral value according to current rounding direction */
@@ -10400,26 +10414,26 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__truncl,(__LONGDO
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __truncl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncl))(__x); }
 #endif /* !... */
 #if __has_builtin(__builtin_remquol) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquol)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),__LONGDOUBLE,__NOTHROW,__remquol,(__LONGDOUBLE __x, __LONGDOUBLE __y, int *__pquo),remquol,{ return __builtin_remquol(__x, __y, __pquo); })
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),__LONGDOUBLE,__NOTHROW,__remquol,(__LONGDOUBLE __x, __LONGDOUBLE __p, int *__pquo),remquol,{ return __builtin_remquol(__x, __p, __pquo); })
 #elif defined(__CRT_HAVE_remquol)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),__LONGDOUBLE,__NOTHROW,__remquol,(__LONGDOUBLE __x, __LONGDOUBLE __y, int *__pquo),remquol,(__x,__y,__pquo))
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),__LONGDOUBLE,__NOTHROW,__remquol,(__LONGDOUBLE __x, __LONGDOUBLE __p, int *__pquo),remquol,(__x,__p,__pquo))
 #elif defined(__CRT_HAVE___remquol)
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3)),__LONGDOUBLE,__NOTHROW,__remquol,(__LONGDOUBLE __x, __LONGDOUBLE __y, int *__pquo),(__x,__y,__pquo))
-#elif defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((3)),__LONGDOUBLE,__NOTHROW,__remquol,(__LONGDOUBLE __x, __LONGDOUBLE __p, int *__pquo),(__x,__p,__pquo))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/remquol.h>
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __LONGDOUBLE __NOTHROW(__LIBCCALL __remquol)(__LONGDOUBLE __x, __LONGDOUBLE __y, int *__pquo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remquol))(__x, __y, __pquo); }
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __LONGDOUBLE __NOTHROW(__LIBCCALL __remquol)(__LONGDOUBLE __x, __LONGDOUBLE __p, int *__pquo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remquol))(__x, __p, __pquo); }
 #endif /* ... */
 #if __has_builtin(__builtin_lrintl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lrintl)
 /* Round `x' to nearest integral value according to current rounding direction */

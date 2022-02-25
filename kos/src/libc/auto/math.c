@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x372c10d */
+/* HASH CRC-32:0xf6ae9f47 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2043,6 +2043,16 @@ NOTHROW(LIBCCALL libc_trunc)(double x) {
 	return (double)(__INTMAX_TYPE__)x;
 #endif /* !__LIBM_MATHFUN */
 }
+#include <libm/remquo.h>
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((3)) double
+NOTHROW(LIBCCALL libc_remquo)(double x,
+                              double p,
+                              int *pquo) {
+	return __LIBM_MATHFUN3I(remquo, x, p, pquo);
+}
 #include <hybrid/typecore.h>
 #include <libm/lrint.h>
 /* Round `x' to nearest integral value according to current rounding direction */
@@ -2216,14 +2226,21 @@ NOTHROW(LIBCCALL libc_truncf)(float x) {
 	return (float)(__INTMAX_TYPE__)x;
 #endif /* !__LIBM_MATHFUNF */
 }
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
+#include <libm/remquo.h>
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((3)) float
 NOTHROW(LIBCCALL libc_remquof)(float x,
-                               float y,
+                               float p,
                                int *pquo) {
-	return (float)libc_remquo((double)x, (double)y, pquo);
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+	return __LIBM_MATHFUN3IF(remquo, x, p, pquo);
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+	return (float)libc_remquo((double)x, (double)p, pquo);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 #include <hybrid/typecore.h>
 #include <libm/lrint.h>
@@ -2384,14 +2401,21 @@ NOTHROW(LIBCCALL libc_truncl)(__LONGDOUBLE x) {
 	return (__LONGDOUBLE)(__INTMAX_TYPE__)x;
 #endif /* !__LIBM_MATHFUNL */
 }
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
+#include <libm/remquo.h>
+/* Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((3)) __LONGDOUBLE
 NOTHROW(LIBCCALL libc_remquol)(__LONGDOUBLE x,
-                               __LONGDOUBLE y,
+                               __LONGDOUBLE p,
                                int *pquo) {
-	return (__LONGDOUBLE)libc_remquo((double)x, (double)y, pquo);
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+	return __LIBM_MATHFUN3IL(remquo, x, p, pquo);
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+	return (__LONGDOUBLE)libc_remquo((double)x, (double)p, pquo);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 #include <hybrid/typecore.h>
 #include <libm/lrint.h>
@@ -3392,6 +3416,8 @@ DEFINE_PUBLIC_ALIAS(__round, libc_round);
 DEFINE_PUBLIC_ALIAS(round, libc_round);
 DEFINE_PUBLIC_ALIAS(__trunc, libc_trunc);
 DEFINE_PUBLIC_ALIAS(trunc, libc_trunc);
+DEFINE_PUBLIC_ALIAS(__remquo, libc_remquo);
+DEFINE_PUBLIC_ALIAS(remquo, libc_remquo);
 DEFINE_PUBLIC_ALIAS(__lrint, libc_lrint);
 DEFINE_PUBLIC_ALIAS(lrint, libc_lrint);
 DEFINE_PUBLIC_ALIAS(__lround, libc_lround);

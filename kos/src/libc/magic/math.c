@@ -45,6 +45,7 @@
 %[define_double_replacement(__LIBM_MATHFUN2 = __LIBM_MATHFUN2F, __LIBM_MATHFUN2L)]
 %[define_double_replacement(__LIBM_MATHFUNI2 = __LIBM_MATHFUNI2F, __LIBM_MATHFUNI2L)]
 %[define_double_replacement(__LIBM_MATHFUN1I = __LIBM_MATHFUN1IF, __LIBM_MATHFUN1IL)]
+%[define_double_replacement(__LIBM_MATHFUN3I = __LIBM_MATHFUN3IF, __LIBM_MATHFUN3IL)]
 %[define_double_replacement(__LIBM_MATHFUN0 = __LIBM_MATHFUN0F, __LIBM_MATHFUN0L)]
 %[define_double_replacement(__LIBM_MATHFUNX = __LIBM_MATHFUNXF, __LIBM_MATHFUNXL)]
 %[define_double_replacement(__kernel_standard = __kernel_standard_f, __kernel_standard_l)]
@@ -1202,11 +1203,17 @@ double trunc(double x) {
 @@pp_endif@@
 }
 
-@@Compute remainder of `x' and `y' and put in `*pquo' a value with
-@@sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
-@@of the integral quotient x/y, with n >= 3
+@@Compute remainder of `x' and `p' and put in `*pquo' a value with
+@@sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+@@of the integral quotient x/p, with n >= 3
 [[std, wunused, nothrow, crtbuiltin, export_alias("__remquo")]]
-double remquo(double x, double y, [[nonnull]] int *pquo); /* TODO */
+[[requires_include("<ieee754.h>"), impl_include("<libm/remquo.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+double remquo(double x, double p, [[nonnull]] int *pquo) {
+	return __LIBM_MATHFUN3I(@remquo@, x, p, pquo);
+}
 
 @@Round `x' to nearest integral value according to current rounding direction
 [[std, const, wunused, nothrow, crtbuiltin, export_alias("__lrint")]]

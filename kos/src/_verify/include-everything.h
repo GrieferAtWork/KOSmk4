@@ -863,6 +863,7 @@ incdir("");
 #include <libm/pow.h>
 #include <libm/rem_pio2.h>
 #include <libm/remainder.h>
+#include <libm/remquo.h>
 #include <libm/rint.h>
 #include <libm/round.h>
 #include <libm/scalb.h>

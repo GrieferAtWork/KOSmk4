@@ -135,24 +135,6 @@ NOTHROW(LIBCCALL libc_tgamma)(double x)
 }
 /*[[[end:libc_tgamma]]]*/
 
-/*[[[head:libc_remquo,hash:CRC-32=0x33f77d4a]]]*/
-/* Compute remainder of `x' and `y' and put in `*pquo' a value with
- * sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
- * of the integral quotient x/y, with n >= 3 */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((3)) double
-NOTHROW(LIBCCALL libc_remquo)(double x,
-                              double y,
-                              int *pquo)
-/*[[[body:libc_remquo]]]*/
-/*AUTO*/{
-	(void)x;
-	(void)y;
-	(void)pquo;
-	CRT_UNIMPLEMENTEDF("remquo(%f, %f, %p)", x, y, pquo); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_remquo]]]*/
 
 
 /*[[[head:libc_exp10,hash:CRC-32=0x81e7bc56]]]*/
@@ -265,7 +247,7 @@ NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x4d8eb853]]]*/
+/*[[[start:exports,hash:CRC-32=0xa265211]]]*/
 DEFINE_PUBLIC_ALIAS(__exp2, libc_exp2);
 DEFINE_PUBLIC_ALIAS(exp2, libc_exp2);
 DEFINE_PUBLIC_ALIAS(__log2, libc_log2);
@@ -282,8 +264,6 @@ DEFINE_PUBLIC_ALIAS(__gamma, libc_lgamma);
 DEFINE_PUBLIC_ALIAS(lgamma, libc_lgamma);
 DEFINE_PUBLIC_ALIAS(__tgamma, libc_tgamma);
 DEFINE_PUBLIC_ALIAS(tgamma, libc_tgamma);
-DEFINE_PUBLIC_ALIAS(__remquo, libc_remquo);
-DEFINE_PUBLIC_ALIAS(remquo, libc_remquo);
 DEFINE_PUBLIC_ALIAS(__exp10, libc_exp10);
 DEFINE_PUBLIC_ALIAS(exp10, libc_exp10);
 DEFINE_PUBLIC_ALIAS(__j0, libc_j0);

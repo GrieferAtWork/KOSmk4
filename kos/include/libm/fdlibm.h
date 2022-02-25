@@ -348,32 +348,36 @@ __DECL_END
 /* double  __LIBM_MATHFUN2(KEYWORD name, double x, double y) */
 /* <any>   __LIBM_MATHFUNI2(KEYWORD name, double x, double y) */
 /* double  __LIBM_MATHFUN1I(KEYWORD name, <any> x) */
+/* double  __LIBM_MATHFUN3I(KEYWORD name, double x, double y, <any> z) */
 /* double  __LIBM_MATHFUN0(KEYWORD name)
 /* KEYWORD __LIBM_MATHFUNX(KEYWORD name) */
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-#define __LIBM_MATHFUN(name, x)      __ieee754_##name(x)
-#define __LIBM_MATHFUNI(name, x)     __ieee754_##name(x)
-#define __LIBM_MATHFUN2(name, x, y)  __ieee754_##name(x, y)
-#define __LIBM_MATHFUNI2(name, x, y) __ieee754_##name(x, y)
-#define __LIBM_MATHFUN1I(name, x)    __ieee754_##name(x)
-#define __LIBM_MATHFUN0(name)        __ieee754_##name()
-#define __LIBM_MATHFUNX(name)        __ieee754_##name
+#define __LIBM_MATHFUN(name, x)         __ieee754_##name(x)
+#define __LIBM_MATHFUNI(name, x)        __ieee754_##name(x)
+#define __LIBM_MATHFUN2(name, x, y)     __ieee754_##name(x, y)
+#define __LIBM_MATHFUNI2(name, x, y)    __ieee754_##name(x, y)
+#define __LIBM_MATHFUN1I(name, x)       __ieee754_##name(x)
+#define __LIBM_MATHFUN3I(name, x, y, z) __ieee754_##name(x, y, z)
+#define __LIBM_MATHFUN0(name)           __ieee754_##name()
+#define __LIBM_MATHFUNX(name)           __ieee754_##name
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-#define __LIBM_MATHFUN(name, x)      (double)__ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x))
-#define __LIBM_MATHFUNI(name, x)     __ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x))
-#define __LIBM_MATHFUN2(name, x, y)  (double)__ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x), (__IEEE754_FLOAT_TYPE__)(y))
-#define __LIBM_MATHFUNI2(name, x, y) __ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x), (__IEEE754_FLOAT_TYPE__)(y))
-#define __LIBM_MATHFUN1I(name, x)    (double)__ieee754_##name##f(x)
-#define __LIBM_MATHFUN0(name)        (double)__ieee754_##name##f()
-#define __LIBM_MATHFUNX(name)        __ieee754_##name##f
+#define __LIBM_MATHFUN(name, x)         (double)__ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x))
+#define __LIBM_MATHFUNI(name, x)        __ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x))
+#define __LIBM_MATHFUN2(name, x, y)     (double)__ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x), (__IEEE754_FLOAT_TYPE__)(y))
+#define __LIBM_MATHFUNI2(name, x, y)    __ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x), (__IEEE754_FLOAT_TYPE__)(y))
+#define __LIBM_MATHFUN1I(name, x)       (double)__ieee754_##name##f(x)
+#define __LIBM_MATHFUN3I(name, x, y, z) (double)__ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x), (__IEEE754_FLOAT_TYPE__)(y), z)
+#define __LIBM_MATHFUN0(name)           (double)__ieee754_##name##f()
+#define __LIBM_MATHFUNX(name)           __ieee754_##name##f
 #elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-#define __LIBM_MATHFUN(name, x)      (double)__ieee854_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x))
-#define __LIBM_MATHFUNI(name, x)     __ieee854_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x))
-#define __LIBM_MATHFUN2(name, x, y)  (double)__ieee854_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x), (__IEEE854_LONG_DOUBLE_TYPE__)(y))
-#define __LIBM_MATHFUNI2(name, x, y) __ieee854_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x), (__IEEE854_LONG_DOUBLE_TYPE__)(y))
-#define __LIBM_MATHFUN1I(name, x)    (double)__ieee854_##name##l(x)
-#define __LIBM_MATHFUN0(name)        (double)__ieee854_##name##l()
-#define __LIBM_MATHFUNX(name)        __ieee854_##name##l
+#define __LIBM_MATHFUN(name, x)         (double)__ieee854_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x))
+#define __LIBM_MATHFUNI(name, x)        __ieee854_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x))
+#define __LIBM_MATHFUN2(name, x, y)     (double)__ieee854_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x), (__IEEE854_LONG_DOUBLE_TYPE__)(y))
+#define __LIBM_MATHFUNI2(name, x, y)    __ieee854_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x), (__IEEE854_LONG_DOUBLE_TYPE__)(y))
+#define __LIBM_MATHFUN1I(name, x)       (double)__ieee854_##name##l(x)
+#define __LIBM_MATHFUN3I(name, x, y, z) (double)__ieee754_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x), (__IEEE854_LONG_DOUBLE_TYPE__)(y), z)
+#define __LIBM_MATHFUN0(name)           (double)__ieee854_##name##l()
+#define __LIBM_MATHFUNX(name)           __ieee854_##name##l
 #endif /* !... */
 
 /* float   __LIBM_MATHFUNF(KEYWORD name, float x) */
@@ -381,32 +385,36 @@ __DECL_END
 /* float   __LIBM_MATHFUN2F(KEYWORD name, float x, float y) */
 /* <any>   __LIBM_MATHFUNI2F(KEYWORD name, float x, float y) */
 /* float   __LIBM_MATHFUN1IF(KEYWORD name, <any> x) */
+/* float   __LIBM_MATHFUN3IF(KEYWORD name, float x, float y, <any> z) */
 /* float   __LIBM_MATHFUN0F(KEYWORD name)
 /* KEYWORD __LIBM_MATHFUNXF(KEYWORD name) */
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-#define __LIBM_MATHFUNF(name, x)      __ieee754_##name##f(x)
-#define __LIBM_MATHFUNIF(name, x)     __ieee754_##name##f(x)
-#define __LIBM_MATHFUN2F(name, x, y)  __ieee754_##name##f(x, y)
-#define __LIBM_MATHFUNI2F(name, x, y) __ieee754_##name##f(x, y)
-#define __LIBM_MATHFUN1IF(name, x)    __ieee754_##name##f(x)
-#define __LIBM_MATHFUN0F(name)        __ieee754_##name##f()
-#define __LIBM_MATHFUNXF(name)        __ieee754_##name##f
+#define __LIBM_MATHFUNF(name, x)         __ieee754_##name##f(x)
+#define __LIBM_MATHFUNIF(name, x)        __ieee754_##name##f(x)
+#define __LIBM_MATHFUN2F(name, x, y)     __ieee754_##name##f(x, y)
+#define __LIBM_MATHFUNI2F(name, x, y)    __ieee754_##name##f(x, y)
+#define __LIBM_MATHFUN1IF(name, x)       __ieee754_##name##f(x)
+#define __LIBM_MATHFUN3IF(name, x, y, z) __ieee754_##name##f(x, y, z)
+#define __LIBM_MATHFUN0F(name)           __ieee754_##name##f()
+#define __LIBM_MATHFUNXF(name)           __ieee754_##name##f
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
-#define __LIBM_MATHFUNF(name, x)      (float)__ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x))
-#define __LIBM_MATHFUNIF(name, x)     __ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x))
-#define __LIBM_MATHFUN2F(name, x, y)  (float)__ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x), (__IEEE754_DOUBLE_TYPE__)(y))
-#define __LIBM_MATHFUNI2F(name, x, y) __ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x), (__IEEE754_DOUBLE_TYPE__)(y))
-#define __LIBM_MATHFUN1IF(name, x)    (float)__ieee754_##name(x)
-#define __LIBM_MATHFUN0F(name)        (float)__ieee754_##name()
-#define __LIBM_MATHFUNXF(name)        __ieee754_##name
+#define __LIBM_MATHFUNF(name, x)         (float)__ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x))
+#define __LIBM_MATHFUNIF(name, x)        __ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x))
+#define __LIBM_MATHFUN2F(name, x, y)     (float)__ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x), (__IEEE754_DOUBLE_TYPE__)(y))
+#define __LIBM_MATHFUNI2F(name, x, y)    __ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x), (__IEEE754_DOUBLE_TYPE__)(y))
+#define __LIBM_MATHFUN1IF(name, x)       (float)__ieee754_##name(x)
+#define __LIBM_MATHFUN3IF(name, x, y, z) (float)__ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x), (__IEEE754_DOUBLE_TYPE__)(y), z)
+#define __LIBM_MATHFUN0F(name)           (float)__ieee754_##name()
+#define __LIBM_MATHFUNXF(name)           __ieee754_##name
 #elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-#define __LIBM_MATHFUNF(name, x)      (float)__ieee854_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x))
-#define __LIBM_MATHFUNIF(name, x)     __ieee854_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x))
-#define __LIBM_MATHFUN2F(name, x, y)  (float)__ieee854_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x), (__IEEE854_LONG_DOUBLE_TYPE__)(y))
-#define __LIBM_MATHFUNI2F(name, x, y) __ieee854_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x), (__IEEE854_LONG_DOUBLE_TYPE__)(y))
-#define __LIBM_MATHFUN1IF(name, x)    (float)__ieee854_##name##l(x)
-#define __LIBM_MATHFUN0F(name)        (float)__ieee854_##name##l()
-#define __LIBM_MATHFUNXF(name)        __ieee854_##name##l
+#define __LIBM_MATHFUNF(name, x)         (float)__ieee854_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x))
+#define __LIBM_MATHFUNIF(name, x)        __ieee854_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x))
+#define __LIBM_MATHFUN2F(name, x, y)     (float)__ieee854_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x), (__IEEE854_LONG_DOUBLE_TYPE__)(y))
+#define __LIBM_MATHFUNI2F(name, x, y)    __ieee854_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x), (__IEEE854_LONG_DOUBLE_TYPE__)(y))
+#define __LIBM_MATHFUN1IF(name, x)       (float)__ieee854_##name##l(x)
+#define __LIBM_MATHFUN3IF(name, x, y, z) (float)__ieee854_##name##l((__IEEE854_LONG_DOUBLE_TYPE__)(x), (__IEEE854_LONG_DOUBLE_TYPE__)(y), z)
+#define __LIBM_MATHFUN0F(name)           (float)__ieee854_##name##l()
+#define __LIBM_MATHFUNXF(name)           __ieee854_##name##l
 #endif /* !... */
 
 /* long double __LIBM_MATHFUNL(KEYWORD name, long double x) */
@@ -414,32 +422,36 @@ __DECL_END
 /* long double __LIBM_MATHFUN2L(KEYWORD name, long double x, long double y) */
 /* <any>       __LIBM_MATHFUNI2L(KEYWORD name, long double x, long double y) */
 /* long double __LIBM_MATHFUN1IL(KEYWORD name, <any> x) */
+/* long double __LIBM_MATHFUN3IL(KEYWORD name, long double x, long double y, <any> z) */
 /* long double __LIBM_MATHFUN0L(KEYWORD name)
 /* KEYWORD     __LIBM_MATHFUNXL(KEYWORD name) */
 #if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-#define __LIBM_MATHFUNL(name, x)      __ieee854_##name##l(x)
-#define __LIBM_MATHFUNIL(name, x)     __ieee854_##name##l(x)
-#define __LIBM_MATHFUN2L(name, x, y)  __ieee854_##name##l(x, y)
-#define __LIBM_MATHFUNI2L(name, x, y) __ieee854_##name##l(x, y)
-#define __LIBM_MATHFUN1IL(name, x)    __ieee854_##name##l(x)
-#define __LIBM_MATHFUN0L(name)        __ieee854_##name##l()
-#define __LIBM_MATHFUNXL(name)        __ieee854_##name##l
+#define __LIBM_MATHFUNL(name, x)         __ieee854_##name##l(x)
+#define __LIBM_MATHFUNIL(name, x)        __ieee854_##name##l(x)
+#define __LIBM_MATHFUN2L(name, x, y)     __ieee854_##name##l(x, y)
+#define __LIBM_MATHFUNI2L(name, x, y)    __ieee854_##name##l(x, y)
+#define __LIBM_MATHFUN1IL(name, x)       __ieee854_##name##l(x)
+#define __LIBM_MATHFUN3IL(name, x, y, z) __ieee854_##name##l(x, y, z)
+#define __LIBM_MATHFUN0L(name)           __ieee854_##name##l()
+#define __LIBM_MATHFUNXL(name)           __ieee854_##name##l
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-#define __LIBM_MATHFUNL(name, x)      (__LONGDOUBLE)__ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x))
-#define __LIBM_MATHFUNIL(name, x)     __ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x))
-#define __LIBM_MATHFUN2L(name, x, y)  (__LONGDOUBLE)__ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x), (__IEEE754_DOUBLE_TYPE__)(y))
-#define __LIBM_MATHFUNI2L(name, x, y) __ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x), (__IEEE754_DOUBLE_TYPE__)(y))
-#define __LIBM_MATHFUN1IL(name, x)    (__LONGDOUBLE)__ieee754_##name(x)
-#define __LIBM_MATHFUN0L(name)        (__LONGDOUBLE)__ieee754_##name()
-#define __LIBM_MATHFUNXL(name)        __ieee754_##name
+#define __LIBM_MATHFUNL(name, x)         (__LONGDOUBLE)__ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x))
+#define __LIBM_MATHFUNIL(name, x)        __ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x))
+#define __LIBM_MATHFUN2L(name, x, y)     (__LONGDOUBLE)__ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x), (__IEEE754_DOUBLE_TYPE__)(y))
+#define __LIBM_MATHFUNI2L(name, x, y)    __ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x), (__IEEE754_DOUBLE_TYPE__)(y))
+#define __LIBM_MATHFUN1IL(name, x)       (__LONGDOUBLE)__ieee754_##name(x)
+#define __LIBM_MATHFUN3IL(name, x, y, z) (__LONGDOUBLE)__ieee754_##name((__IEEE754_DOUBLE_TYPE__)(x), (__IEEE754_DOUBLE_TYPE__)(y), z)
+#define __LIBM_MATHFUN0L(name)           (__LONGDOUBLE)__ieee754_##name()
+#define __LIBM_MATHFUNXL(name)           __ieee754_##name
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-#define __LIBM_MATHFUNL(name, x)      (__LONGDOUBLE)__ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x))
-#define __LIBM_MATHFUNIL(name, x)     __ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x))
-#define __LIBM_MATHFUN2L(name, x, y)  (__LONGDOUBLE)__ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x), (__IEEE754_FLOAT_TYPE__)(y))
-#define __LIBM_MATHFUNI2L(name, x, y) __ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x), (__IEEE754_FLOAT_TYPE__)(y))
-#define __LIBM_MATHFUN1IL(name, x)    (__LONGDOUBLE)__ieee754_##name##f(x)
-#define __LIBM_MATHFUN0L(name)        (__LONGDOUBLE)__ieee754_##name##f()
-#define __LIBM_MATHFUNXL(name)        __ieee754_##name##f
+#define __LIBM_MATHFUNL(name, x)         (__LONGDOUBLE)__ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x))
+#define __LIBM_MATHFUNIL(name, x)        __ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x))
+#define __LIBM_MATHFUN2L(name, x, y)     (__LONGDOUBLE)__ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x), (__IEEE754_FLOAT_TYPE__)(y))
+#define __LIBM_MATHFUNI2L(name, x, y)    __ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x), (__IEEE754_FLOAT_TYPE__)(y))
+#define __LIBM_MATHFUN1IL(name, x)       (__LONGDOUBLE)__ieee754_##name##f(x)
+#define __LIBM_MATHFUN3IL(name, x, y, z) (__LONGDOUBLE)__ieee754_##name##f((__IEEE754_FLOAT_TYPE__)(x), (__IEEE754_FLOAT_TYPE__)(y), z)
+#define __LIBM_MATHFUN0L(name)           (__LONGDOUBLE)__ieee754_##name##f()
+#define __LIBM_MATHFUNXL(name)           __ieee754_##name##f
 #endif /* !... */
 
 
