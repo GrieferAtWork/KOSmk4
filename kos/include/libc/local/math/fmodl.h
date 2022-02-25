@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a1226b1 */
+/* HASH CRC-32:0x8971e799 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmodl))(__LONGDOUBLE __x, __LONGDOUBLE __
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    (__LIBM_MATHFUNL(isinf, __x) || __y == 0.0L) &&
 	    !__LIBM_MATHFUN2L(isunordered, __x, __y))
-		return __kernel_standard_l(__x, __y, __y, __LIBM_KMATHERR_FMOD); /* fmod(+-Inf,y) or fmod(x,0) */
+		return __kernel_standard_l(__x, __y, __y, __LIBM_KMATHERRL_FMOD); /* fmod(+-Inf,y) or fmod(x,0) */
 	return __LIBM_MATHFUN2L(fmod, __x, __y);
 #else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)(__NAMESPACE_LOCAL_SYM __localdep_fmod)((double)__x, (double)__y);

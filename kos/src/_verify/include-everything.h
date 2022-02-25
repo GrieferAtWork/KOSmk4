@@ -798,6 +798,7 @@ incdir("");
 #include <libkeymap/api.h>
 #include <libkeymap/keymap.h>
 #include <libm/acos.h>
+#include <libm/acosh.h>
 #include <libm/api.h>
 #include <libm/asin.h>
 #include <libm/asm/_builtin.h>

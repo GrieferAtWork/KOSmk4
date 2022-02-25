@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2569170 */
+/* HASH CRC-32:0x5117b4d5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,35 +18,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_expm1_defined
-#define __local_expm1_defined
+#ifndef __local_acosh_defined
+#define __local_acosh_defined
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libm/fcomp.h>
 #include <libm/matherr.h>
-#include <libm/signbit.h>
-#include <libm/finite.h>
-#include <libm/expm1.h>
+#include <libm/nan.h>
+#include <libm/acosh.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(expm1) __ATTR_WUNUSED double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(expm1))(double __x) {
-	double __result;
-	__result = __LIBM_MATHFUN(expm1, __x);
-	if ((!__LIBM_MATHFUN(finite, __result) || __result == -1.0) &&
-	    __LIBM_MATHFUN(finite , __x) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
-		return __kernel_standard(__x, __x, __result,
-		                         __LIBM_MATHFUN(signbit, __x)
-		                         ? __LIBM_KMATHERR_EXPM1_UNDERFLOW
-		                         : __LIBM_KMATHERR_EXPM1_OVERFLOW);
-	}
-	return __result;
+__LOCAL_LIBC(acosh) __ATTR_WUNUSED double
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(acosh))(double __x) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+		__LIBM_MATHFUNI2(isless, __x, 1.0)) /* acosh(x<1) */
+		return __kernel_standard(__x, __x, __LIBM_MATHFUN1I(nan, ""), __LIBM_KMATHERR_ACOSH);
+	return __LIBM_MATHFUN(acos, __x);
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_expm1_defined
-#define __local___localdep_expm1_defined
-#define __localdep_expm1 __LIBC_LOCAL_NAME(expm1)
-#endif /* !__local___localdep_expm1_defined */
+#ifndef __local___localdep_acosh_defined
+#define __local___localdep_acosh_defined
+#define __localdep_acosh __LIBC_LOCAL_NAME(acosh)
+#endif /* !__local___localdep_acosh_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#undef __local_expm1_defined
+#undef __local_acosh_defined
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#endif /* !__local_expm1_defined */
+#endif /* !__local_acosh_defined */

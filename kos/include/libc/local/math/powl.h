@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34b07c3d */
+/* HASH CRC-32:0x86c208e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,19 +70,19 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(powl))(__LONGDOUBLE __x, __LONGDOUBLE __y
 		} else if (__LIBM_LIB_VERSION != __LIBM_IEEE) {
 			if (__LIBM_MATHFUNIL(isnan, __x)) {
 				if (__y == 0.0L) /* pow(NaN,0.0) */
-					return __kernel_standard_l(__x, __y, __result, __LIBM_KMATHERR_POW_NAN);
+					return __kernel_standard_l(__x, __y, __result, __LIBM_KMATHERRL_POW_NAN);
 			} else if (__LIBM_MATHFUNIL(finite, __x) && __LIBM_MATHFUNIL(finite, __y)) {
 				if (__LIBM_MATHFUNIL(isnan, __result)) { /* pow neg**non-int */
-					return __kernel_standard_l(__x, __y, __result, __LIBM_KMATHERR_POW_NONINT);
+					return __kernel_standard_l(__x, __y, __result, __LIBM_KMATHERRL_POW_NONINT);
 				} else if (__x == 0.0L && __y < 0.0L) {
 					if (__LIBM_MATHFUNIL(signbit, __x) && __LIBM_MATHFUNIL(signbit, __result)) { /* pow(-0.0,negative) */
-						return __kernel_standard_l(__x, __y, __result, __LIBM_KMATHERR_POW_MINUS);
+						return __kernel_standard_l(__x, __y, __result, __LIBM_KMATHERRL_POW_MINUS);
 					} else { /* pow(+0.0,negative) */
-						return __kernel_standard_l(__x, __y, __result, __LIBM_KMATHERR_POW_ZEROMINUS);
+						return __kernel_standard_l(__x, __y, __result, __LIBM_KMATHERRL_POW_ZEROMINUS);
 					}
 				} else {
 					/* pow overflow */
-					return __kernel_standard_l(__x, __y, __result, __LIBM_KMATHERR_POW_OVERFLOW);
+					return __kernel_standard_l(__x, __y, __result, __LIBM_KMATHERRL_POW_OVERFLOW);
 				}
 			}
 		}
@@ -93,11 +93,11 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(powl))(__LONGDOUBLE __x, __LONGDOUBLE __y
 		if (__x == 0.0L) {
 			if (__y == 0.0L) {
 				/* pow(0.0, 0.0) */
-				return __kernel_standard_l(__x, __y, __result, __LIBM_KMATHERR_POW_ZERO);
+				return __kernel_standard_l(__x, __y, __result, __LIBM_KMATHERRL_POW_ZERO);
 			}
 		} else {
 			/* pow underflow */
-			return __kernel_standard_l(__x, __y, __result, __LIBM_KMATHERR_POW_UNDERFLOW);
+			return __kernel_standard_l(__x, __y, __result, __LIBM_KMATHERRL_POW_UNDERFLOW);
 		}
 	}
 	return __result;

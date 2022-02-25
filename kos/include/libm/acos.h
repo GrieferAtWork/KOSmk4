@@ -49,11 +49,11 @@ __DECL_BEGIN
 __LIBM_LOCAL_DECLARE_BEGIN
 #ifndef __libm_onef_defined
 #define __libm_onef_defined
-__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, onef, __IEEE754_FLOAT_C(1.0000000000e+00))     /* 0x3F800000 */
+__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, onef, __IEEE754_FLOAT_C(1.0000000000e+00)) /* 0x3F800000 */
 #endif /* !__libm_onef_defined */
 #ifndef __libm_pif_defined
 #define __libm_pif_defined
-__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, pif, __IEEE754_FLOAT_C(3.1415927410e+00))     /* 0x40490fdb */
+__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, pif, __IEEE754_FLOAT_C(3.1415927410e+00)) /* 0x40490fdb */
 #endif /* !__libm_pif_defined */
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, acos_pio2_hif, __IEEE754_FLOAT_C(1.5707962513e+00)) /* 0x3fc90fda */
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, acos_pio2_lof, __IEEE754_FLOAT_C(7.5497894159e-08)) /* 0x33a22168 */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed047a7d */
+/* HASH CRC-32:0x6fea307b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __LOCAL_LIBC(tan) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(tan))(double __x) {
 	double __result = __LIBM_MATHFUN(tan, __x);
 	if (__LIBM_MATHFUNI(isnan, __result) && __LIBM_MATHFUNI(isinf, __x))
-		__result = __kernel_standard(__x, __x, __result, __LIBM_KMATHERRF_TAN_INF);
+		__result = __kernel_standard(__x, __x, __result, __LIBM_KMATHERR_TAN_INF);
 	return __result;
 }
 __NAMESPACE_LOCAL_END

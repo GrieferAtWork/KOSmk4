@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfee6aec9 */
+/* HASH CRC-32:0x46f16fff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __LOCAL_LIBC(cos) __ATTR_WUNUSED __DECL_SIMD_cos double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(cos))(double __x) {
 	double __result = __LIBM_MATHFUN(cos, __x);
 	if (__LIBM_MATHFUNI(isnan, __result) && !__LIBM_MATHFUNI(isnan, __x))
-		__result = __kernel_standard(__x, __x, __result, __LIBM_KMATHERRF_COS_INF);
+		__result = __kernel_standard(__x, __x, __result, __LIBM_KMATHERR_COS_INF);
 	return __result;
 }
 __NAMESPACE_LOCAL_END

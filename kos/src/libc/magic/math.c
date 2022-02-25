@@ -65,6 +65,66 @@
 %[define_double_replacement(__INFINITY = __INFINITYF, __INFINITYL)]
 %[define_double_replacement(__NAN = __NANF, __NANL)]
 
+%[define_double_replacement(__LIBM_KMATHERR_ACOS = __LIBM_KMATHERRF_ACOS, __LIBM_KMATHERRL_ACOS)]
+%[define_double_replacement(__LIBM_KMATHERR_ASIN = __LIBM_KMATHERRF_ASIN, __LIBM_KMATHERRL_ASIN)]
+%[define_double_replacement(__LIBM_KMATHERR_ATAN2 = __LIBM_KMATHERRF_ATAN2, __LIBM_KMATHERRL_ATAN2)]
+%[define_double_replacement(__LIBM_KMATHERR_HYPOT = __LIBM_KMATHERRF_HYPOT, __LIBM_KMATHERRL_HYPOT)]
+%[define_double_replacement(__LIBM_KMATHERR_COSH = __LIBM_KMATHERRF_COSH, __LIBM_KMATHERRL_COSH)]
+%[define_double_replacement(__LIBM_KMATHERR_EXP_OVERFLOW = __LIBM_KMATHERRF_EXP_OVERFLOW, __LIBM_KMATHERRL_EXP_OVERFLOW)]
+%[define_double_replacement(__LIBM_KMATHERR_EXP_UNDERFLOW = __LIBM_KMATHERRF_EXP_UNDERFLOW, __LIBM_KMATHERRL_EXP_UNDERFLOW)]
+%[define_double_replacement(__LIBM_KMATHERR_Y0_ZERO = __LIBM_KMATHERRF_Y0_ZERO, __LIBM_KMATHERRL_Y0_ZERO)]
+%[define_double_replacement(__LIBM_KMATHERR_Y0_MINUS = __LIBM_KMATHERRF_Y0_MINUS, __LIBM_KMATHERRL_Y0_MINUS)]
+%[define_double_replacement(__LIBM_KMATHERR_Y1_ZERO = __LIBM_KMATHERRF_Y1_ZERO, __LIBM_KMATHERRL_Y1_ZERO)]
+%[define_double_replacement(__LIBM_KMATHERR_Y1_MINUS = __LIBM_KMATHERRF_Y1_MINUS, __LIBM_KMATHERRL_Y1_MINUS)]
+%[define_double_replacement(__LIBM_KMATHERR_YN_ZERO = __LIBM_KMATHERRF_YN_ZERO, __LIBM_KMATHERRL_YN_ZERO)]
+%[define_double_replacement(__LIBM_KMATHERR_YN_MINUS = __LIBM_KMATHERRF_YN_MINUS, __LIBM_KMATHERRL_YN_MINUS)]
+%[define_double_replacement(__LIBM_KMATHERR_LGAMMA_OVERFLOW = __LIBM_KMATHERRF_LGAMMA_OVERFLOW, __LIBM_KMATHERRL_LGAMMA_OVERFLOW)]
+%[define_double_replacement(__LIBM_KMATHERR_LGAMMA_MINUS = __LIBM_KMATHERRF_LGAMMA_MINUS, __LIBM_KMATHERRL_LGAMMA_MINUS)]
+%[define_double_replacement(__LIBM_KMATHERR_LOG_ZERO = __LIBM_KMATHERRF_LOG_ZERO, __LIBM_KMATHERRL_LOG_ZERO)]
+%[define_double_replacement(__LIBM_KMATHERR_LOG_MINUS = __LIBM_KMATHERRF_LOG_MINUS, __LIBM_KMATHERRL_LOG_MINUS)]
+%[define_double_replacement(__LIBM_KMATHERR_LOG10_ZERO = __LIBM_KMATHERRF_LOG10_ZERO, __LIBM_KMATHERRL_LOG10_ZERO)]
+%[define_double_replacement(__LIBM_KMATHERR_LOG10_MINUS = __LIBM_KMATHERRF_LOG10_MINUS, __LIBM_KMATHERRL_LOG10_MINUS)]
+%[define_double_replacement(__LIBM_KMATHERR_POW_ZERO = __LIBM_KMATHERRF_POW_ZERO, __LIBM_KMATHERRL_POW_ZERO)]
+%[define_double_replacement(__LIBM_KMATHERR_POW_OVERFLOW = __LIBM_KMATHERRF_POW_OVERFLOW, __LIBM_KMATHERRL_POW_OVERFLOW)]
+%[define_double_replacement(__LIBM_KMATHERR_POW_UNDERFLOW = __LIBM_KMATHERRF_POW_UNDERFLOW, __LIBM_KMATHERRL_POW_UNDERFLOW)]
+%[define_double_replacement(__LIBM_KMATHERR_POW_MINUS = __LIBM_KMATHERRF_POW_MINUS, __LIBM_KMATHERRL_POW_MINUS)]
+%[define_double_replacement(__LIBM_KMATHERR_POW_NONINT = __LIBM_KMATHERRF_POW_NONINT, __LIBM_KMATHERRL_POW_NONINT)]
+%[define_double_replacement(__LIBM_KMATHERR_SINH = __LIBM_KMATHERRF_SINH, __LIBM_KMATHERRL_SINH)]
+%[define_double_replacement(__LIBM_KMATHERR_SQRT = __LIBM_KMATHERRF_SQRT, __LIBM_KMATHERRL_SQRT)]
+%[define_double_replacement(__LIBM_KMATHERR_FMOD = __LIBM_KMATHERRF_FMOD, __LIBM_KMATHERRL_FMOD)]
+%[define_double_replacement(__LIBM_KMATHERR_REMAINDER = __LIBM_KMATHERRF_REMAINDER, __LIBM_KMATHERRL_REMAINDER)]
+%[define_double_replacement(__LIBM_KMATHERR_ACOSH = __LIBM_KMATHERRF_ACOSH, __LIBM_KMATHERRL_ACOSH)]
+%[define_double_replacement(__LIBM_KMATHERR_ATANH_PLUSONE = __LIBM_KMATHERRF_ATANH_PLUSONE, __LIBM_KMATHERRL_ATANH_PLUSONE)]
+%[define_double_replacement(__LIBM_KMATHERR_ATANH_ONE = __LIBM_KMATHERRF_ATANH_ONE, __LIBM_KMATHERRL_ATANH_ONE)]
+%[define_double_replacement(__LIBM_KMATHERR_SCALB_OVERFLOW = __LIBM_KMATHERRF_SCALB_OVERFLOW, __LIBM_KMATHERRL_SCALB_OVERFLOW)]
+%[define_double_replacement(__LIBM_KMATHERR_SCALB_UNDERFLOW = __LIBM_KMATHERRF_SCALB_UNDERFLOW, __LIBM_KMATHERRL_SCALB_UNDERFLOW)]
+%[define_double_replacement(__LIBM_KMATHERR_J0_TLOSS = __LIBM_KMATHERRF_J0_TLOSS, __LIBM_KMATHERRL_J0_TLOSS)]
+%[define_double_replacement(__LIBM_KMATHERR_Y0_TLOSS = __LIBM_KMATHERRF_Y0_TLOSS, __LIBM_KMATHERRL_Y0_TLOSS)]
+%[define_double_replacement(__LIBM_KMATHERR_J1_TLOSS = __LIBM_KMATHERRF_J1_TLOSS, __LIBM_KMATHERRL_J1_TLOSS)]
+%[define_double_replacement(__LIBM_KMATHERR_Y1_TLOSS = __LIBM_KMATHERRF_Y1_TLOSS, __LIBM_KMATHERRL_Y1_TLOSS)]
+%[define_double_replacement(__LIBM_KMATHERR_JN_TLOSS = __LIBM_KMATHERRF_JN_TLOSS, __LIBM_KMATHERRL_JN_TLOSS)]
+%[define_double_replacement(__LIBM_KMATHERR_YN_TLOSS = __LIBM_KMATHERRF_YN_TLOSS, __LIBM_KMATHERRL_YN_TLOSS)]
+%[define_double_replacement(__LIBM_KMATHERR_TGAMMA_OVERFLOW = __LIBM_KMATHERRF_TGAMMA_OVERFLOW, __LIBM_KMATHERRL_TGAMMA_OVERFLOW)]
+%[define_double_replacement(__LIBM_KMATHERR_TGAMMA_MINUS = __LIBM_KMATHERRF_TGAMMA_MINUS, __LIBM_KMATHERRL_TGAMMA_MINUS)]
+%[define_double_replacement(__LIBM_KMATHERR_POW_NAN = __LIBM_KMATHERRF_POW_NAN, __LIBM_KMATHERRL_POW_NAN)]
+%[define_double_replacement(__LIBM_KMATHERR_POW_ZEROMINUS = __LIBM_KMATHERRF_POW_ZEROMINUS, __LIBM_KMATHERRL_POW_ZEROMINUS)]
+%[define_double_replacement(__LIBM_KMATHERR_EXP2_OVERFLOW = __LIBM_KMATHERRF_EXP2_OVERFLOW, __LIBM_KMATHERRL_EXP2_OVERFLOW)]
+%[define_double_replacement(__LIBM_KMATHERR_EXP2_UNDERFLOW = __LIBM_KMATHERRF_EXP2_UNDERFLOW, __LIBM_KMATHERRL_EXP2_UNDERFLOW)]
+%[define_double_replacement(__LIBM_KMATHERR_EXP10_OVERFLOW = __LIBM_KMATHERRF_EXP10_OVERFLOW, __LIBM_KMATHERRL_EXP10_OVERFLOW)]
+%[define_double_replacement(__LIBM_KMATHERR_EXP10_UNDERFLOW = __LIBM_KMATHERRF_EXP10_UNDERFLOW, __LIBM_KMATHERRL_EXP10_UNDERFLOW)]
+%[define_double_replacement(__LIBM_KMATHERR_LOG2_ZERO = __LIBM_KMATHERRF_LOG2_ZERO, __LIBM_KMATHERRL_LOG2_ZERO)]
+%[define_double_replacement(__LIBM_KMATHERR_LOG2_MINUS = __LIBM_KMATHERRF_LOG2_MINUS, __LIBM_KMATHERRL_LOG2_MINUS)]
+%[define_double_replacement(__LIBM_KMATHERR_TGAMMA_ZERO = __LIBM_KMATHERRF_TGAMMA_ZERO, __LIBM_KMATHERRL_TGAMMA_ZERO)]
+%[define_double_replacement(__LIBM_KMATHERR_COS_INF = __LIBM_KMATHERRF_COS_INF, __LIBM_KMATHERRL_COS_INF)]
+%[define_double_replacement(__LIBM_KMATHERR_SIN_INF = __LIBM_KMATHERRF_SIN_INF, __LIBM_KMATHERRL_SIN_INF)]
+%[define_double_replacement(__LIBM_KMATHERR_TAN_INF = __LIBM_KMATHERRF_TAN_INF, __LIBM_KMATHERRL_TAN_INF)]
+%[define_double_replacement(__LIBM_KMATHERR_SCALB_INVALID = __LIBM_KMATHERRF_SCALB_INVALID, __LIBM_KMATHERRL_SCALB_INVALID)]
+%[define_double_replacement(__LIBM_KMATHERR_TGAMMA_UNDERFLOW = __LIBM_KMATHERRF_TGAMMA_UNDERFLOW, __LIBM_KMATHERRL_TGAMMA_UNDERFLOW)]
+%[define_double_replacement(__LIBM_KMATHERR_ILOGB = __LIBM_KMATHERRF_ILOGB, __LIBM_KMATHERRL_ILOGB)]
+%[define_double_replacement(__LIBM_KMATHERR_EXPM1_OVERFLOW = __LIBM_KMATHERRF_EXPM1_OVERFLOW, __LIBM_KMATHERRL_EXPM1_OVERFLOW)]
+%[define_double_replacement(__LIBM_KMATHERR_EXPM1_UNDERFLOW = __LIBM_KMATHERRF_EXPM1_UNDERFLOW, __LIBM_KMATHERRL_EXPM1_UNDERFLOW)]
+
+
 %(auto_source){
 #include "../libc/dos-compat.h"
 }
@@ -205,7 +265,7 @@ double acos(double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    __LIBM_MATHFUNI2(@isgreaterequal@, __LIBM_MATHFUN(@fabs@, x), 1.0)) {
 		feraiseexcept(@FE_INVALID@); /* acos(|x|>1) */
-		return __kernel_standard(x, x, __LIBM_MATHFUN1I(@nan@, ""), __LIBM_KMATHERRF_ACOS);
+		return __kernel_standard(x, x, __LIBM_MATHFUN1I(@nan@, ""), __LIBM_KMATHERR_ACOS);
 	}
 	return __LIBM_MATHFUN(@acos@, x);
 }
@@ -223,7 +283,7 @@ double asin(double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    __LIBM_MATHFUNI2(@isgreaterequal@, __LIBM_MATHFUN(@fabs@, x), 1.0)) {
 		feraiseexcept(@FE_INVALID@); /* asin(|x|>1) */
-		return __kernel_standard(x, x, __LIBM_MATHFUN1I(@nan@, ""), __LIBM_KMATHERRF_ASIN);
+		return __kernel_standard(x, x, __LIBM_MATHFUN1I(@nan@, ""), __LIBM_KMATHERR_ASIN);
 	}
 	return __LIBM_MATHFUN(@asin@, x);
 }
@@ -271,7 +331,7 @@ double atan2(double y, double x){
 double cos(double x) {
 	double result = __LIBM_MATHFUN(@cos@, x);
 	if (__LIBM_MATHFUNI(@isnan@, result) && !__LIBM_MATHFUNI(@isnan@, x))
-		result = __kernel_standard(x, x, result, __LIBM_KMATHERRF_COS_INF);
+		result = __kernel_standard(x, x, result, __LIBM_KMATHERR_COS_INF);
 	return result;
 }
 
@@ -286,7 +346,7 @@ double cos(double x) {
 double sin(double x) {
 	double result = __LIBM_MATHFUN(@sin@, x);
 	if (__LIBM_MATHFUNI(@isnan@, result) && !__LIBM_MATHFUNI(@isnan@, x))
-		result = __kernel_standard(x, x, result, __LIBM_KMATHERRF_SIN_INF);
+		result = __kernel_standard(x, x, result, __LIBM_KMATHERR_SIN_INF);
 	return result;
 }
 
@@ -300,7 +360,7 @@ double sin(double x) {
 double tan(double x) {
 	double result = __LIBM_MATHFUN(@tan@, x);
 	if (__LIBM_MATHFUNI(@isnan@, result) && __LIBM_MATHFUNI(@isinf@, x))
-		result = __kernel_standard(x, x, result, __LIBM_KMATHERRF_TAN_INF);
+		result = __kernel_standard(x, x, result, __LIBM_KMATHERR_TAN_INF);
 	return result;
 }
 
@@ -351,7 +411,18 @@ double tanh(double x); /* TODO */
 %(std, c, ccompat)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 @@Hyperbolic arc cosine of `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__acosh")]]
-double acosh(double x); /* TODO */
+[[impl_include("<libm/fcomp.h>", "<libm/matherr.h>")]]
+[[impl_include("<libm/nan.h>", "<libm/acosh.h>")]]
+[[requires_include("<ieee754.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+double acosh(double x) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+		__LIBM_MATHFUNI2(@isless@, x, 1.0)) /* acosh(x<1) */
+		return __kernel_standard(x, x, __LIBM_MATHFUN1I(@nan@, ""), __LIBM_KMATHERR_ACOSH);
+	return __LIBM_MATHFUN(@acos@, x);
+}
 
 @@Hyperbolic arc sine of `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__asinh")]]
@@ -516,8 +587,8 @@ double expm1(double x) {
 	    __LIBM_MATHFUN(@finite @, x) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
 		return __kernel_standard(x, x, result,
 		                         __LIBM_MATHFUN(@signbit@, x)
-		                         ? __LIBM_KMATHERRL_EXPM1_UNDERFLOW
-		                         : __LIBM_KMATHERRL_EXPM1_OVERFLOW);
+		                         ? __LIBM_KMATHERR_EXPM1_UNDERFLOW
+		                         : __LIBM_KMATHERR_EXPM1_OVERFLOW);
 	}
 	return result;
 }
@@ -914,7 +985,7 @@ int ilogb(double x) {
 	int result;
 	result = __LIBM_MATHFUNI(@ilogb@, x);
 	if (result == __FP_ILOGB0 || result == __FP_ILOGBNAN || result == INT_MAX)
-		__kernel_standard(x, x, x, __LIBM_KMATHERRF_ILOGB);
+		__kernel_standard(x, x, x, __LIBM_KMATHERR_ILOGB);
 	return result;
 }
 
