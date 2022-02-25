@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2888fd82 */
+/* HASH CRC-32:0x3bf0b4aa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -143,18 +143,18 @@ __NAMESPACE_STD_USING(tanhl)
 #if defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(acosh)
 #endif /* __CRT_HAVE_acosh || __CRT_HAVE___acosh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
+#if defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(asinh)
-#endif /* __CRT_HAVE_asinh || __CRT_HAVE___asinh */
+#endif /* __CRT_HAVE_asinh || __CRT_HAVE___asinh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
 __NAMESPACE_STD_USING(atanh)
 #endif /* __CRT_HAVE_atanh || __CRT_HAVE___atanh */
 #if defined(__CRT_HAVE_acoshf) || defined(__CRT_HAVE___acoshf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(acoshf)
 #endif /* __CRT_HAVE_acoshf || __CRT_HAVE___acoshf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_acosh || __CRT_HAVE___acosh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_asinhf) || defined(__CRT_HAVE___asinhf) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
+#if defined(__CRT_HAVE_asinhf) || defined(__CRT_HAVE___asinhf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(asinhf)
-#endif /* __CRT_HAVE_asinhf || __CRT_HAVE___asinhf || __CRT_HAVE_asinh || __CRT_HAVE___asinh */
+#endif /* __CRT_HAVE_asinhf || __CRT_HAVE___asinhf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_asinh || __CRT_HAVE___asinh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_atanhf) || defined(__CRT_HAVE___atanhf) || defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
 __NAMESPACE_STD_USING(atanhf)
 #endif /* __CRT_HAVE_atanhf || __CRT_HAVE___atanhf || __CRT_HAVE_atanh || __CRT_HAVE___atanh */
@@ -162,9 +162,9 @@ __NAMESPACE_STD_USING(atanhf)
 #if defined(__CRT_HAVE_acoshl) || defined(__CRT_HAVE___acoshl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(acoshl)
 #endif /* __CRT_HAVE_acoshl || __CRT_HAVE___acoshl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_acosh || __CRT_HAVE___acosh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_asinhl) || defined(__CRT_HAVE___asinhl) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
+#if defined(__CRT_HAVE_asinhl) || defined(__CRT_HAVE___asinhl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(asinhl)
-#endif /* __CRT_HAVE_asinhl || __CRT_HAVE___asinhl || __CRT_HAVE_asinh || __CRT_HAVE___asinh */
+#endif /* __CRT_HAVE_asinhl || __CRT_HAVE___asinhl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_asinh || __CRT_HAVE___asinh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_atanhl) || defined(__CRT_HAVE___atanhl) || defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
 __NAMESPACE_STD_USING(atanhl)
 #endif /* __CRT_HAVE_atanhl || __CRT_HAVE___atanhl || __CRT_HAVE_atanh || __CRT_HAVE___atanh */
@@ -1176,13 +1176,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(acosh, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUN
 #endif /* ... */
 #if __has_builtin(__builtin_asinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinh)
 /* Hyperbolic arc sine of `x' */
-__CEIDECLARE(__ATTR_WUNUSED,double,__NOTHROW,asinh,(double __x),{ return __builtin_asinh(__x); })
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,asinh,(double __x),{ return __builtin_asinh(__x); })
 #elif defined(__CRT_HAVE_asinh)
 /* Hyperbolic arc sine of `x' */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,asinh,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,asinh,(double __x),(__x))
 #elif defined(__CRT_HAVE___asinh)
 /* Hyperbolic arc sine of `x' */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,asinh,(double __x),__asinh,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,asinh,(double __x),__asinh,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_STD_END
+#include <libc/local/math/asinh.h>
+__NAMESPACE_STD_BEGIN
+/* Hyperbolic arc sine of `x' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(asinh, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL asinh)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinh))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_atanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanh)
 /* Hyperbolic arc tangent of `x' */
@@ -1212,19 +1218,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(acoshf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #endif /* ... */
 #if __has_builtin(__builtin_asinhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinhf)
 /* Hyperbolic arc sine of `x' */
-__CEIDECLARE(__ATTR_WUNUSED,float,__NOTHROW,asinhf,(float __x),{ return __builtin_asinhf(__x); })
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,asinhf,(float __x),{ return __builtin_asinhf(__x); })
 #elif defined(__CRT_HAVE_asinhf)
 /* Hyperbolic arc sine of `x' */
-__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,asinhf,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,asinhf,(float __x),(__x))
 #elif defined(__CRT_HAVE___asinhf)
 /* Hyperbolic arc sine of `x' */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,asinhf,(float __x),__asinhf,(__x))
-#elif defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,asinhf,(float __x),__asinhf,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/asinhf.h>
 __NAMESPACE_STD_BEGIN
 /* Hyperbolic arc sine of `x' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(asinhf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL asinhf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinhf))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(asinhf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL asinhf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinhf))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_atanhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanhf)
 /* Hyperbolic arc tangent of `x' */
@@ -1261,19 +1267,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(acoshl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #endif /* ... */
 #if __has_builtin(__builtin_asinhl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinhl)
 /* Hyperbolic arc sine of `x' */
-__CEIDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinhl,(__LONGDOUBLE __x),{ return __builtin_asinhl(__x); })
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinhl,(__LONGDOUBLE __x),{ return __builtin_asinhl(__x); })
 #elif defined(__CRT_HAVE_asinhl)
 /* Hyperbolic arc sine of `x' */
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinhl,(__LONGDOUBLE __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinhl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___asinhl)
 /* Hyperbolic arc sine of `x' */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinhl,(__LONGDOUBLE __x),__asinhl,(__x))
-#elif defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinhl,(__LONGDOUBLE __x),__asinhl,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/asinhl.h>
 __NAMESPACE_STD_BEGIN
 /* Hyperbolic arc sine of `x' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(asinhl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL asinhl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinhl))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(asinhl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL asinhl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinhl))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_atanhl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanhl)
 /* Hyperbolic arc tangent of `x' */
@@ -4477,21 +4483,21 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL acosh)(
 #endif /* ... */
 #if __has_builtin(__builtin_asinhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinhf)
 /* Hyperbolic arc sine of `x' */
-__CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,asinh,(float __x),asinhf,{ return __builtin_asinhf(__x); })
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,asinh,(float __x),asinhf,{ return __builtin_asinhf(__x); })
 #elif defined(__CRT_HAVE_asinhf)
 /* Hyperbolic arc sine of `x' */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,asinh,(float __x),asinhf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,asinh,(float __x),asinhf,(__x))
 #elif defined(__CRT_HAVE___asinhf)
 /* Hyperbolic arc sine of `x' */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,asinh,(float __x),__asinhf,(__x))
-#elif defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,asinh,(float __x),__asinhf,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/asinhf.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Hyperbolic arc sine of `x' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL asinh)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinhf))(__x); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL asinh)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinhf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_atanhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanhf)
 /* Hyperbolic arc tangent of `x' */
@@ -4705,21 +4711,21 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL 
 #endif /* ... */
 #if __has_builtin(__builtin_asinhl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinhl)
 /* Hyperbolic arc sine of `x' */
-__CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinh,(__LONGDOUBLE __x),asinhl,{ return __builtin_asinhl(__x); })
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinh,(__LONGDOUBLE __x),asinhl,{ return __builtin_asinhl(__x); })
 #elif defined(__CRT_HAVE_asinhl)
 /* Hyperbolic arc sine of `x' */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinh,(__LONGDOUBLE __x),asinhl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinh,(__LONGDOUBLE __x),asinhl,(__x))
 #elif defined(__CRT_HAVE___asinhl)
 /* Hyperbolic arc sine of `x' */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinh,(__LONGDOUBLE __x),__asinhl,(__x))
-#elif defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinh,(__LONGDOUBLE __x),__asinhl,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/asinhl.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Hyperbolic arc sine of `x' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL asinh)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinhl))(__x); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL asinh)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinhl))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_atanhl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanhl)
 /* Hyperbolic arc tangent of `x' */
@@ -5984,18 +5990,18 @@ __NAMESPACE_STD_USING(tanhl)
 #if defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(acosh)
 #endif /* __CRT_HAVE_acosh || __CRT_HAVE___acosh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
+#if defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(asinh)
-#endif /* __CRT_HAVE_asinh || __CRT_HAVE___asinh */
+#endif /* __CRT_HAVE_asinh || __CRT_HAVE___asinh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
 __NAMESPACE_STD_USING(atanh)
 #endif /* __CRT_HAVE_atanh || __CRT_HAVE___atanh */
 #if defined(__CRT_HAVE_acoshf) || defined(__CRT_HAVE___acoshf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(acoshf)
 #endif /* __CRT_HAVE_acoshf || __CRT_HAVE___acoshf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_acosh || __CRT_HAVE___acosh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_asinhf) || defined(__CRT_HAVE___asinhf) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
+#if defined(__CRT_HAVE_asinhf) || defined(__CRT_HAVE___asinhf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(asinhf)
-#endif /* __CRT_HAVE_asinhf || __CRT_HAVE___asinhf || __CRT_HAVE_asinh || __CRT_HAVE___asinh */
+#endif /* __CRT_HAVE_asinhf || __CRT_HAVE___asinhf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_asinh || __CRT_HAVE___asinh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_atanhf) || defined(__CRT_HAVE___atanhf) || defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
 __NAMESPACE_STD_USING(atanhf)
 #endif /* __CRT_HAVE_atanhf || __CRT_HAVE___atanhf || __CRT_HAVE_atanh || __CRT_HAVE___atanh */
@@ -6005,9 +6011,9 @@ __NAMESPACE_STD_USING(atanhf)
 #if defined(__CRT_HAVE_acoshl) || defined(__CRT_HAVE___acoshl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(acoshl)
 #endif /* __CRT_HAVE_acoshl || __CRT_HAVE___acoshl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_acosh || __CRT_HAVE___acosh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_asinhl) || defined(__CRT_HAVE___asinhl) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
+#if defined(__CRT_HAVE_asinhl) || defined(__CRT_HAVE___asinhl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(asinhl)
-#endif /* __CRT_HAVE_asinhl || __CRT_HAVE___asinhl || __CRT_HAVE_asinh || __CRT_HAVE___asinh */
+#endif /* __CRT_HAVE_asinhl || __CRT_HAVE___asinhl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_asinh || __CRT_HAVE___asinh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_atanhl) || defined(__CRT_HAVE___atanhl) || defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
 __NAMESPACE_STD_USING(atanhl)
 #endif /* __CRT_HAVE_atanhl || __CRT_HAVE___atanhl || __CRT_HAVE_atanh || __CRT_HAVE___atanh */
@@ -7677,13 +7683,17 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __acos
 #endif /* ... */
 #if __has_builtin(__builtin_asinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinh)
 /* Hyperbolic arc sine of `x' */
-__CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__asinh,(double __x),asinh,{ return __builtin_asinh(__x); })
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__asinh,(double __x),asinh,{ return __builtin_asinh(__x); })
 #elif defined(__CRT_HAVE_asinh)
 /* Hyperbolic arc sine of `x' */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__asinh,(double __x),asinh,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__asinh,(double __x),asinh,(__x))
 #elif defined(__CRT_HAVE___asinh)
 /* Hyperbolic arc sine of `x' */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__asinh,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__asinh,(double __x),(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/asinh.h>
+/* Hyperbolic arc sine of `x' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __asinh)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinh))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_atanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanh)
 /* Hyperbolic arc tangent of `x' */
@@ -7711,17 +7721,17 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __acosh
 #endif /* ... */
 #if __has_builtin(__builtin_asinhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinhf)
 /* Hyperbolic arc sine of `x' */
-__CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__asinhf,(float __x),asinhf,{ return __builtin_asinhf(__x); })
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__asinhf,(float __x),asinhf,{ return __builtin_asinhf(__x); })
 #elif defined(__CRT_HAVE_asinhf)
 /* Hyperbolic arc sine of `x' */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__asinhf,(float __x),asinhf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__asinhf,(float __x),asinhf,(__x))
 #elif defined(__CRT_HAVE___asinhf)
 /* Hyperbolic arc sine of `x' */
-__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__asinhf,(float __x),(__x))
-#elif defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__asinhf,(float __x),(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/asinhf.h>
 /* Hyperbolic arc sine of `x' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __asinhf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinhf))(__x); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __asinhf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinhf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_atanhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanhf)
 /* Hyperbolic arc tangent of `x' */
@@ -7754,17 +7764,17 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL 
 #endif /* ... */
 #if __has_builtin(__builtin_asinhl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinhl)
 /* Hyperbolic arc sine of `x' */
-__CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__asinhl,(__LONGDOUBLE __x),asinhl,{ return __builtin_asinhl(__x); })
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__asinhl,(__LONGDOUBLE __x),asinhl,{ return __builtin_asinhl(__x); })
 #elif defined(__CRT_HAVE_asinhl)
 /* Hyperbolic arc sine of `x' */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__asinhl,(__LONGDOUBLE __x),asinhl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__asinhl,(__LONGDOUBLE __x),asinhl,(__x))
 #elif defined(__CRT_HAVE___asinhl)
 /* Hyperbolic arc sine of `x' */
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__asinhl,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__asinhl,(__LONGDOUBLE __x),(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/asinhl.h>
 /* Hyperbolic arc sine of `x' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __asinhl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinhl))(__x); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __asinhl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinhl))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_atanhl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanhl)
 /* Hyperbolic arc tangent of `x' */

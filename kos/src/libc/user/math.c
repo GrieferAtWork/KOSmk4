@@ -75,18 +75,6 @@ NOTHROW(LIBCCALL libc_tanh)(double x)
 /*[[[end:libc_tanh]]]*/
 
 
-/*[[[head:libc_asinh,hash:CRC-32=0x64f7f8dc]]]*/
-/* Hyperbolic arc sine of `x' */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
-NOTHROW(LIBCCALL libc_asinh)(double x)
-/*[[[body:libc_asinh]]]*/
-/*AUTO*/{
-	(void)x;
-	CRT_UNIMPLEMENTEDF("asinh(%f)", x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_asinh]]]*/
 
 /*[[[head:libc_atanh,hash:CRC-32=0xe084030f]]]*/
 /* Hyperbolic arc tangent of `x' */
@@ -337,15 +325,13 @@ NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x9431d8b6]]]*/
+/*[[[start:exports,hash:CRC-32=0xe682c361]]]*/
 DEFINE_PUBLIC_ALIAS(__cosh, libc_cosh);
 DEFINE_PUBLIC_ALIAS(cosh, libc_cosh);
 DEFINE_PUBLIC_ALIAS(__sinh, libc_sinh);
 DEFINE_PUBLIC_ALIAS(sinh, libc_sinh);
 DEFINE_PUBLIC_ALIAS(__tanh, libc_tanh);
 DEFINE_PUBLIC_ALIAS(tanh, libc_tanh);
-DEFINE_PUBLIC_ALIAS(__asinh, libc_asinh);
-DEFINE_PUBLIC_ALIAS(asinh, libc_asinh);
 DEFINE_PUBLIC_ALIAS(__atanh, libc_atanh);
 DEFINE_PUBLIC_ALIAS(atanh, libc_atanh);
 DEFINE_PUBLIC_ALIAS(__log10, libc_log10);

@@ -801,6 +801,7 @@ incdir("");
 #include <libm/acosh.h>
 #include <libm/api.h>
 #include <libm/asin.h>
+#include <libm/asinh.h>
 #include <libm/asm/_builtin.h>
 #include <libm/asm/atan.h>
 #include <libm/asm/atan2.h>

@@ -421,12 +421,19 @@ double acosh(double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 		__LIBM_MATHFUNI2(@isless@, x, 1.0)) /* acosh(x<1) */
 		return __kernel_standard(x, x, __LIBM_MATHFUN1I(@nan@, ""), __LIBM_KMATHERR_ACOSH);
-	return __LIBM_MATHFUN(@acos@, x);
+	return __LIBM_MATHFUN(@acosh@, x);
 }
 
 @@Hyperbolic arc sine of `x'
-[[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__asinh")]]
-double asinh(double x); /* TODO */
+[[std, wunused, const, nothrow, crtbuiltin, export_alias("__asinh")]]
+[[impl_include("<libm/asinh.h>")]]
+[[requires_include("<ieee754.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+double asinh(double x) {
+	return __LIBM_MATHFUN(@asinh@, x);
+}
 
 @@Hyperbolic arc tangent of `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__atanh")]]

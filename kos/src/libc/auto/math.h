@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbac45bc3 */
+/* HASH CRC-32:0x98247a76 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -261,7 +261,13 @@ INTDEF WUNUSED double NOTHROW(LIBCCALL libc_acosh)(double x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Hyperbolic arc sine of `x' */
-INTDEF WUNUSED double NOTHROW(LIBDCALL libd_asinh)(double x);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBDCALL libd_asinh)(double x);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Hyperbolic arc sine of `x' */
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_asinh)(double x);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Hyperbolic arc tangent of `x' */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_atanh)(double x);
 /* Hyperbolic arc cosine of `x' */
@@ -273,11 +279,11 @@ INTDEF WUNUSED float NOTHROW(LIBCCALL libc_acoshf)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Hyperbolic arc sine of `x' */
-INTDEF WUNUSED float NOTHROW(LIBDCALL libd_asinhf)(float x);
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBDCALL libd_asinhf)(float x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Hyperbolic arc sine of `x' */
-INTDEF WUNUSED float NOTHROW(LIBCCALL libc_asinhf)(float x);
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_asinhf)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Hyperbolic arc tangent of `x' */
@@ -297,11 +303,11 @@ INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_acoshl)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Hyperbolic arc sine of `x' */
-INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_asinhl)(__LONGDOUBLE x);
+INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_asinhl)(__LONGDOUBLE x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Hyperbolic arc sine of `x' */
-INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_asinhl)(__LONGDOUBLE x);
+INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_asinhl)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Hyperbolic arc tangent of `x' */

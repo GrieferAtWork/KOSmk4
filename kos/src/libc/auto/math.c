@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ef4d5b */
+/* HASH CRC-32:0x241e54ca */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -441,7 +441,13 @@ NOTHROW(LIBCCALL libc_acosh)(double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 		__LIBM_MATHFUNI2(isless, x, 1.0)) /* acosh(x<1) */
 		return __kernel_standard(x, x, __LIBM_MATHFUN1I(nan, ""), __LIBM_KMATHERR_ACOSH);
-	return __LIBM_MATHFUN(acos, x);
+	return __LIBM_MATHFUN(acosh, x);
+}
+#include <libm/asinh.h>
+/* Hyperbolic arc sine of `x' */
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
+NOTHROW(LIBCCALL libc_asinh)(double x) {
+	return __LIBM_MATHFUN(asinh, x);
 }
 #include <libm/fcomp.h>
 #include <libm/matherr.h>
@@ -456,15 +462,22 @@ NOTHROW(LIBCCALL libc_acoshf)(float x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 		__LIBM_MATHFUNI2F(isless, x, 1.0f)) /* acosh(x<1) */
 		return __kernel_standard_f(x, x, __LIBM_MATHFUN1IF(nan, ""), __LIBM_KMATHERRF_ACOSH);
-	return __LIBM_MATHFUNF(acos, x);
+	return __LIBM_MATHFUNF(acosh, x);
 #else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)libc_acosh((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
+#include <libm/asinh.h>
 /* Hyperbolic arc sine of `x' */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_asinhf)(float x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+	return __LIBM_MATHFUNF(asinh, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)libc_asinh((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 /* Hyperbolic arc tangent of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
@@ -484,15 +497,22 @@ NOTHROW(LIBCCALL libc_acoshl)(__LONGDOUBLE x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 		__LIBM_MATHFUNI2L(isless, x, 1.0L)) /* acosh(x<1) */
 		return __kernel_standard_l(x, x, __LIBM_MATHFUN1IL(nan, ""), __LIBM_KMATHERRL_ACOSH);
-	return __LIBM_MATHFUNL(acos, x);
+	return __LIBM_MATHFUNL(acosh, x);
 #else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)libc_acosh((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
+#include <libm/asinh.h>
 /* Hyperbolic arc sine of `x' */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_asinhl)(__LONGDOUBLE x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+	return __LIBM_MATHFUNL(asinh, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)libc_asinh((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 /* Hyperbolic arc tangent of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
@@ -2941,6 +2961,8 @@ DEFINE_PUBLIC_ALIAS(__tanhl, libc_tanhl);
 DEFINE_PUBLIC_ALIAS(tanhl, libc_tanhl);
 DEFINE_PUBLIC_ALIAS(__acosh, libc_acosh);
 DEFINE_PUBLIC_ALIAS(acosh, libc_acosh);
+DEFINE_PUBLIC_ALIAS(__asinh, libc_asinh);
+DEFINE_PUBLIC_ALIAS(asinh, libc_asinh);
 DEFINE_PUBLIC_ALIAS(__acoshf, libc_acoshf);
 DEFINE_PUBLIC_ALIAS(acoshf, libc_acoshf);
 DEFINE_PUBLIC_ALIAS(__asinhf, libc_asinhf);

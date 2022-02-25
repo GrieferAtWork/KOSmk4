@@ -51,7 +51,10 @@ __LIBM_LOCAL_DECLARE_BEGIN
 #define __libm_onef_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, onef, __IEEE754_FLOAT_C(1.0000000000e+00))     /* 0x3F800000 */
 #endif /* !__libm_onef_defined */
-__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, hugevalf, __IEEE754_FLOAT_C(1.000e+30))
+#ifndef __libm_hugevalf_defined
+#define __libm_hugevalf_defined
+__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, hugevalf, __IEEE754_FLOAT_C(1.0000000000e+30))
+#endif /* !__libm_hugevalf_defined */
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, asin_pio2_hif, __IEEE754_FLOAT_C(1.57079637050628662109375))
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, asin_pio2_lof, __IEEE754_FLOAT_C(-4.37113900018624283e-8))
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, asin_pio4_hif, __IEEE754_FLOAT_C(0.785398185253143310546875))
@@ -132,7 +135,10 @@ __LIBM_LOCAL_DECLARE_BEGIN
 #define __libm_one_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, one, __IEEE754_DOUBLE_C(1.00000000000000000000e+00))     /* 0x3FF00000, 0x00000000 */
 #endif /* !__libm_one_defined */
-__LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, hugeval, __IEEE754_DOUBLE_C(1.000e+300))
+#ifndef __libm_hugeval_defined
+#define __libm_hugeval_defined
+__LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, hugeval, __IEEE754_DOUBLE_C(1.00000000000000000000e+300))
+#endif /* !__libm_hugeval_defined */
 #ifndef __libm_pio2_hi_defined
 #define __libm_pio2_hi_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, pio2_hi, __IEEE754_DOUBLE_C(1.57079632679489655800e+00)) /* 0x3FF921FB, 0x54442D18 */
