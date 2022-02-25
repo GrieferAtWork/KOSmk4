@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfee6aec9 */
+/* HASH CRC-32:0xed047a7d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,29 +18,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_cos_defined
-#define __local_cos_defined
+#ifndef __local_tan_defined
+#define __local_tan_defined
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-#include <bits/crt/math-vector.h>
 #include <libm/isnan.h>
-#include <libm/cos.h>
+#include <libm/isinf.h>
+#include <libm/tan.h>
 #include <libm/matherr.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(cos) __ATTR_WUNUSED __DECL_SIMD_cos double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(cos))(double __x) {
-	double __result = __LIBM_MATHFUN(cos, __x);
-	if (__LIBM_MATHFUNI(isnan, __result) && !__LIBM_MATHFUNI(isnan, __x))
-		__result = __kernel_standard(__x, __x, __result, __LIBM_KMATHERRF_COS_INF);
+__LOCAL_LIBC(tan) __ATTR_WUNUSED double
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(tan))(double __x) {
+	double __result = __LIBM_MATHFUN(tan, __x);
+	if (__LIBM_MATHFUNI(isnan, __result) && __LIBM_MATHFUNI(isinf, __x))
+		__result = __kernel_standard(__x, __x, __result, __LIBM_KMATHERRF_TAN_INF);
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_cos_defined
-#define __local___localdep_cos_defined
-#define __localdep_cos __LIBC_LOCAL_NAME(cos)
-#endif /* !__local___localdep_cos_defined */
+#ifndef __local___localdep_tan_defined
+#define __local___localdep_tan_defined
+#define __localdep_tan __LIBC_LOCAL_NAME(tan)
+#endif /* !__local___localdep_tan_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#undef __local_cos_defined
+#undef __local_tan_defined
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#endif /* !__local_cos_defined */
+#endif /* !__local_tan_defined */

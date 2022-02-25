@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x981dc056 */
+/* HASH CRC-32:0x4f2a9d7c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,7 +99,7 @@ INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_cos double
 NOTHROW(LIBCCALL libc_cos)(double x) {
 	double result = __LIBM_MATHFUN(cos, x);
 	if (__LIBM_MATHFUNI(isnan, result) && !__LIBM_MATHFUNI(isnan, x))
-		result = __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_COS_INF);
+		result = __kernel_standard(x, x, result, __LIBM_KMATHERRF_COS_INF);
 	return result;
 }
 #include <libm/isnan.h>
@@ -110,7 +110,19 @@ INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_sin double
 NOTHROW(LIBCCALL libc_sin)(double x) {
 	double result = __LIBM_MATHFUN(sin, x);
 	if (__LIBM_MATHFUNI(isnan, result) && !__LIBM_MATHFUNI(isnan, x))
-		result = __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_SIN_INF);
+		result = __kernel_standard(x, x, result, __LIBM_KMATHERRF_SIN_INF);
+	return result;
+}
+#include <libm/isnan.h>
+#include <libm/isinf.h>
+#include <libm/tan.h>
+#include <libm/matherr.h>
+/* Tangent of `x' */
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
+NOTHROW(LIBCCALL libc_tan)(double x) {
+	double result = __LIBM_MATHFUN(tan, x);
+	if (__LIBM_MATHFUNI(isnan, result) && __LIBM_MATHFUNI(isinf, x))
+		result = __kernel_standard(x, x, result, __LIBM_KMATHERRF_TAN_INF);
 	return result;
 }
 #include <libm/fcomp.h>
@@ -233,10 +245,23 @@ NOTHROW(LIBCCALL libc_sinf)(float x) {
 	return (float)libc_sin((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
+#include <libm/isnan.h>
+#include <libm/isinf.h>
+#include <libm/tan.h>
+#include <libm/matherr.h>
 /* Tangent of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_tanf)(float x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+	float result = __LIBM_MATHFUNF(tan, x);
+	if (__LIBM_MATHFUNIF(isnan, result) && __LIBM_MATHFUNIF(isinf, x))
+		result = __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_TAN_INF);
+	return result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)libc_tan((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
@@ -335,7 +360,7 @@ NOTHROW(LIBCCALL libc_cosl)(__LONGDOUBLE x) {
 
 	__LONGDOUBLE result = __LIBM_MATHFUNL(cos, x);
 	if (__LIBM_MATHFUNIL(isnan, result) && !__LIBM_MATHFUNIL(isnan, x))
-		result = __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_COS_INF);
+		result = __kernel_standard_l(x, x, result, __LIBM_KMATHERRF_COS_INF);
 	return result;
 #else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)libc_cos((double)x);
@@ -352,16 +377,29 @@ NOTHROW(LIBCCALL libc_sinl)(__LONGDOUBLE x) {
 
 	__LONGDOUBLE result = __LIBM_MATHFUNL(sin, x);
 	if (__LIBM_MATHFUNIL(isnan, result) && !__LIBM_MATHFUNIL(isnan, x))
-		result = __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_SIN_INF);
+		result = __kernel_standard_l(x, x, result, __LIBM_KMATHERRF_SIN_INF);
 	return result;
 #else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)libc_sin((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
+#include <libm/isnan.h>
+#include <libm/isinf.h>
+#include <libm/tan.h>
+#include <libm/matherr.h>
 /* Tangent of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_tanl)(__LONGDOUBLE x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+	__LONGDOUBLE result = __LIBM_MATHFUNL(tan, x);
+	if (__LIBM_MATHFUNIL(isnan, result) && __LIBM_MATHFUNIL(isinf, x))
+		result = __kernel_standard_l(x, x, result, __LIBM_KMATHERRF_TAN_INF);
+	return result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)libc_tan((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 /* Hyperbolic cosine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
@@ -2821,6 +2859,8 @@ DEFINE_PUBLIC_ALIAS(__cos, libc_cos);
 DEFINE_PUBLIC_ALIAS(cos, libc_cos);
 DEFINE_PUBLIC_ALIAS(__sin, libc_sin);
 DEFINE_PUBLIC_ALIAS(sin, libc_sin);
+DEFINE_PUBLIC_ALIAS(__tan, libc_tan);
+DEFINE_PUBLIC_ALIAS(tan, libc_tan);
 DEFINE_PUBLIC_ALIAS(__acosf, libc_acosf);
 DEFINE_PUBLIC_ALIAS(acosf, libc_acosf);
 DEFINE_PUBLIC_ALIAS(__asinf, libc_asinf);

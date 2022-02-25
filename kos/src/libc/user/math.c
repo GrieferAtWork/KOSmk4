@@ -34,18 +34,6 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_tan,hash:CRC-32=0x482155e3]]]*/
-/* Tangent of `x' */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
-NOTHROW(LIBCCALL libc_tan)(double x)
-/*[[[body:libc_tan]]]*/
-/*AUTO*/{
-	(void)x;
-	CRT_UNIMPLEMENTEDF("tan(%f)", x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_tan]]]*/
 
 /*[[[head:libc_cosh,hash:CRC-32=0x8896d0db]]]*/
 /* Hyperbolic cosine of `x' */
@@ -361,9 +349,7 @@ NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xda9c1270]]]*/
-DEFINE_PUBLIC_ALIAS(__tan, libc_tan);
-DEFINE_PUBLIC_ALIAS(tan, libc_tan);
+/*[[[start:exports,hash:CRC-32=0xd5fea780]]]*/
 DEFINE_PUBLIC_ALIAS(__cosh, libc_cosh);
 DEFINE_PUBLIC_ALIAS(cosh, libc_cosh);
 DEFINE_PUBLIC_ALIAS(__sinh, libc_sinh);

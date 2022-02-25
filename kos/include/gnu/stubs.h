@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1fda3e93 */
+/* HASH CRC-32:0x66ad839f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -683,8 +683,6 @@
 #define __stub_sym_ntos
 #define __stub___sym_ston
 #define __stub_sym_ston
-#define __stub___tan
-#define __stub_tan
 #define __stub___tanh
 #define __stub_tanh
 #ifdef __LIBCCALL_IS_LIBDCALL

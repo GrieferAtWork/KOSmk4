@@ -271,7 +271,7 @@ double atan2(double y, double x){
 double cos(double x) {
 	double result = __LIBM_MATHFUN(@cos@, x);
 	if (__LIBM_MATHFUNI(@isnan@, result) && !__LIBM_MATHFUNI(@isnan@, x))
-		result = __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_COS_INF);
+		result = __kernel_standard(x, x, result, __LIBM_KMATHERRF_COS_INF);
 	return result;
 }
 
@@ -286,13 +286,23 @@ double cos(double x) {
 double sin(double x) {
 	double result = __LIBM_MATHFUN(@sin@, x);
 	if (__LIBM_MATHFUNI(@isnan@, result) && !__LIBM_MATHFUNI(@isnan@, x))
-		result = __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_SIN_INF);
+		result = __kernel_standard(x, x, result, __LIBM_KMATHERRF_SIN_INF);
 	return result;
 }
 
 @@Tangent of `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__tan")]]
-double tan(double x); /* TODO */
+[[impl_include("<libm/isnan.h>", "<libm/isinf.h>", "<libm/tan.h>", "<libm/matherr.h>")]]
+[[requires_include("<ieee754.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+double tan(double x) {
+	double result = __LIBM_MATHFUN(@tan@, x);
+	if (__LIBM_MATHFUNI(@isnan@, result) && __LIBM_MATHFUNI(@isinf@, x))
+		result = __kernel_standard(x, x, result, __LIBM_KMATHERRF_TAN_INF);
+	return result;
+}
 
 
 [[std, crtbuiltin, export_alias("__acosf")]] acosf(*) %{generate(double2float("acos"))}

@@ -843,6 +843,7 @@ incdir("");
 #include <libm/kernel_cos.h>
 #include <libm/kernel_rem_pio2.h>
 #include <libm/kernel_sin.h>
+#include <libm/kernel_tan.h>
 #include <libm/ldexp.h>
 #include <libm/log.h>
 #include <libm/log1p.h>
@@ -867,6 +868,7 @@ incdir("");
 #include <libm/sincos.h>
 #include <libm/sincos_table.h>
 #include <libm/sqrt.h>
+#include <libm/tan.h>
 #include <libm/trunc.h>
 #include <libpciaccess/api.h>
 #include <libpciaccess/config.h>
