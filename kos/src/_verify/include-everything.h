@@ -874,6 +874,7 @@ incdir("");
 #include <libm/sinh.h>
 #include <libm/sqrt.h>
 #include <libm/tan.h>
+#include <libm/tanh.h>
 #include <libm/trunc.h>
 #include <libpciaccess/api.h>
 #include <libpciaccess/config.h>

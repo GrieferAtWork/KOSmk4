@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6d5886 */
+/* HASH CRC-32:0xa168781 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -116,18 +116,18 @@ __NAMESPACE_STD_USING(cosh)
 #if defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(sinh)
 #endif /* __CRT_HAVE_sinh || __CRT_HAVE___sinh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
+#if defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(tanh)
-#endif /* __CRT_HAVE_tanh || __CRT_HAVE___tanh */
+#endif /* __CRT_HAVE_tanh || __CRT_HAVE___tanh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_coshf) || defined(__CRT_HAVE___coshf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(coshf)
 #endif /* __CRT_HAVE_coshf || __CRT_HAVE___coshf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_cosh || __CRT_HAVE___cosh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_sinhf) || defined(__CRT_HAVE___sinhf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(sinhf)
 #endif /* __CRT_HAVE_sinhf || __CRT_HAVE___sinhf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_sinh || __CRT_HAVE___sinh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_tanhf) || defined(__CRT_HAVE___tanhf) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
+#if defined(__CRT_HAVE_tanhf) || defined(__CRT_HAVE___tanhf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(tanhf)
-#endif /* __CRT_HAVE_tanhf || __CRT_HAVE___tanhf || __CRT_HAVE_tanh || __CRT_HAVE___tanh */
+#endif /* __CRT_HAVE_tanhf || __CRT_HAVE___tanhf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_tanh || __CRT_HAVE___tanh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if defined(__CRT_HAVE_coshl) || defined(__CRT_HAVE___coshl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(coshl)
@@ -135,9 +135,9 @@ __NAMESPACE_STD_USING(coshl)
 #if defined(__CRT_HAVE_sinhl) || defined(__CRT_HAVE___sinhl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(sinhl)
 #endif /* __CRT_HAVE_sinhl || __CRT_HAVE___sinhl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_sinh || __CRT_HAVE___sinh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_tanhl) || defined(__CRT_HAVE___tanhl) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
+#if defined(__CRT_HAVE_tanhl) || defined(__CRT_HAVE___tanhl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(tanhl)
-#endif /* __CRT_HAVE_tanhl || __CRT_HAVE___tanhl || __CRT_HAVE_tanh || __CRT_HAVE___tanh */
+#endif /* __CRT_HAVE_tanhl || __CRT_HAVE___tanhl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_tanh || __CRT_HAVE___tanh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 #if defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
@@ -1062,13 +1062,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sinh, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNU
 #endif /* ... */
 #if __has_builtin(__builtin_tanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanh)
 /* Hyperbolic tangent of `x' */
-__CEIDECLARE(__ATTR_WUNUSED,double,__NOTHROW,tanh,(double __x),{ return __builtin_tanh(__x); })
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,tanh,(double __x),{ return __builtin_tanh(__x); })
 #elif defined(__CRT_HAVE_tanh)
 /* Hyperbolic tangent of `x' */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,tanh,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,tanh,(double __x),(__x))
 #elif defined(__CRT_HAVE___tanh)
 /* Hyperbolic tangent of `x' */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,tanh,(double __x),__tanh,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,tanh,(double __x),__tanh,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_STD_END
+#include <libc/local/math/tanh.h>
+__NAMESPACE_STD_BEGIN
+/* Hyperbolic tangent of `x' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(tanh, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL tanh)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanh))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_coshf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_coshf)
 /* Hyperbolic cosine of `x' */
@@ -1104,19 +1110,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sinhf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUN
 #endif /* ... */
 #if __has_builtin(__builtin_tanhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanhf)
 /* Hyperbolic tangent of `x' */
-__CEIDECLARE(__ATTR_WUNUSED,float,__NOTHROW,tanhf,(float __x),{ return __builtin_tanhf(__x); })
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,tanhf,(float __x),{ return __builtin_tanhf(__x); })
 #elif defined(__CRT_HAVE_tanhf)
 /* Hyperbolic tangent of `x' */
-__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,tanhf,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,tanhf,(float __x),(__x))
 #elif defined(__CRT_HAVE___tanhf)
 /* Hyperbolic tangent of `x' */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tanhf,(float __x),__tanhf,(__x))
-#elif defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,tanhf,(float __x),__tanhf,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/tanhf.h>
 __NAMESPACE_STD_BEGIN
 /* Hyperbolic tangent of `x' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(tanhf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL tanhf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhf))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(tanhf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL tanhf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhf))(__x); })
 #endif /* ... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_coshl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_coshl)
@@ -1153,19 +1159,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sinhl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUN
 #endif /* ... */
 #if __has_builtin(__builtin_tanhl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanhl)
 /* Hyperbolic tangent of `x' */
-__CEIDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanhl,(__LONGDOUBLE __x),{ return __builtin_tanhl(__x); })
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanhl,(__LONGDOUBLE __x),{ return __builtin_tanhl(__x); })
 #elif defined(__CRT_HAVE_tanhl)
 /* Hyperbolic tangent of `x' */
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanhl,(__LONGDOUBLE __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanhl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___tanhl)
 /* Hyperbolic tangent of `x' */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanhl,(__LONGDOUBLE __x),__tanhl,(__x))
-#elif defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanhl,(__LONGDOUBLE __x),__tanhl,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/tanhl.h>
 __NAMESPACE_STD_BEGIN
 /* Hyperbolic tangent of `x' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(tanhl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL tanhl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhl))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(tanhl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL tanhl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhl))(__x); })
 #endif /* ... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 
@@ -3846,21 +3852,21 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL sinh)(f
 #endif /* ... */
 #if __has_builtin(__builtin_tanhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanhf)
 /* Hyperbolic tangent of `x' */
-__CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tanh,(float __x),tanhf,{ return __builtin_tanhf(__x); })
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,tanh,(float __x),tanhf,{ return __builtin_tanhf(__x); })
 #elif defined(__CRT_HAVE_tanhf)
 /* Hyperbolic tangent of `x' */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tanh,(float __x),tanhf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,tanh,(float __x),tanhf,(__x))
 #elif defined(__CRT_HAVE___tanhf)
 /* Hyperbolic tangent of `x' */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tanh,(float __x),__tanhf,(__x))
-#elif defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,tanh,(float __x),__tanhf,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/tanhf.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Hyperbolic tangent of `x' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL tanh)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhf))(__x); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL tanh)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_expf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_expf)
 /* Exponential function of `x' */
@@ -4245,21 +4251,21 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL 
 #endif /* ... */
 #if __has_builtin(__builtin_tanhl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanhl)
 /* Hyperbolic tangent of `x' */
-__CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanh,(__LONGDOUBLE __x),tanhl,{ return __builtin_tanhl(__x); })
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanh,(__LONGDOUBLE __x),tanhl,{ return __builtin_tanhl(__x); })
 #elif defined(__CRT_HAVE_tanhl)
 /* Hyperbolic tangent of `x' */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanh,(__LONGDOUBLE __x),tanhl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanh,(__LONGDOUBLE __x),tanhl,(__x))
 #elif defined(__CRT_HAVE___tanhl)
 /* Hyperbolic tangent of `x' */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanh,(__LONGDOUBLE __x),__tanhl,(__x))
-#elif defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanh,(__LONGDOUBLE __x),__tanhl,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/tanhl.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Hyperbolic tangent of `x' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL tanh)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhl))(__x); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL tanh)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhl))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_expl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_expl)
 /* Exponential function of `x' */
@@ -5976,18 +5982,18 @@ __NAMESPACE_STD_USING(cosh)
 #if defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(sinh)
 #endif /* __CRT_HAVE_sinh || __CRT_HAVE___sinh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
+#if defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(tanh)
-#endif /* __CRT_HAVE_tanh || __CRT_HAVE___tanh */
+#endif /* __CRT_HAVE_tanh || __CRT_HAVE___tanh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_coshf) || defined(__CRT_HAVE___coshf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(coshf)
 #endif /* __CRT_HAVE_coshf || __CRT_HAVE___coshf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_cosh || __CRT_HAVE___cosh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_sinhf) || defined(__CRT_HAVE___sinhf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(sinhf)
 #endif /* __CRT_HAVE_sinhf || __CRT_HAVE___sinhf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_sinh || __CRT_HAVE___sinh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_tanhf) || defined(__CRT_HAVE___tanhf) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
+#if defined(__CRT_HAVE_tanhf) || defined(__CRT_HAVE___tanhf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(tanhf)
-#endif /* __CRT_HAVE_tanhf || __CRT_HAVE___tanhf || __CRT_HAVE_tanh || __CRT_HAVE___tanh */
+#endif /* __CRT_HAVE_tanhf || __CRT_HAVE___tanhf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_tanh || __CRT_HAVE___tanh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifndef __CXX_SYSTEM_HEADER
@@ -5997,9 +6003,9 @@ __NAMESPACE_STD_USING(coshl)
 #if defined(__CRT_HAVE_sinhl) || defined(__CRT_HAVE___sinhl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(sinhl)
 #endif /* __CRT_HAVE_sinhl || __CRT_HAVE___sinhl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_sinh || __CRT_HAVE___sinh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_tanhl) || defined(__CRT_HAVE___tanhl) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
+#if defined(__CRT_HAVE_tanhl) || defined(__CRT_HAVE___tanhl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(tanhl)
-#endif /* __CRT_HAVE_tanhl || __CRT_HAVE___tanhl || __CRT_HAVE_tanh || __CRT_HAVE___tanh */
+#endif /* __CRT_HAVE_tanhl || __CRT_HAVE___tanhl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_tanh || __CRT_HAVE___tanh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__CXX_SYSTEM_HEADER */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 
@@ -7350,13 +7356,17 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __sinh
 #endif /* ... */
 #if __has_builtin(__builtin_tanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanh)
 /* Hyperbolic tangent of `x' */
-__CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__tanh,(double __x),tanh,{ return __builtin_tanh(__x); })
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__tanh,(double __x),tanh,{ return __builtin_tanh(__x); })
 #elif defined(__CRT_HAVE_tanh)
 /* Hyperbolic tangent of `x' */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__tanh,(double __x),tanh,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__tanh,(double __x),tanh,(__x))
 #elif defined(__CRT_HAVE___tanh)
 /* Hyperbolic tangent of `x' */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__tanh,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__tanh,(double __x),(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/tanh.h>
+/* Hyperbolic tangent of `x' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __tanh)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanh))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_acosf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acosf)
 /* Arc cosine of `x' */
@@ -7486,17 +7496,17 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __sinhf
 #endif /* ... */
 #if __has_builtin(__builtin_tanhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanhf)
 /* Hyperbolic tangent of `x' */
-__CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__tanhf,(float __x),tanhf,{ return __builtin_tanhf(__x); })
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__tanhf,(float __x),tanhf,{ return __builtin_tanhf(__x); })
 #elif defined(__CRT_HAVE_tanhf)
 /* Hyperbolic tangent of `x' */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__tanhf,(float __x),tanhf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__tanhf,(float __x),tanhf,(__x))
 #elif defined(__CRT_HAVE___tanhf)
 /* Hyperbolic tangent of `x' */
-__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__tanhf,(float __x),(__x))
-#elif defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__tanhf,(float __x),(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/tanhf.h>
 /* Hyperbolic tangent of `x' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __tanhf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhf))(__x); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __tanhf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhf))(__x); }
 #endif /* ... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_acosl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acosl)
@@ -7627,17 +7637,17 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL 
 #endif /* ... */
 #if __has_builtin(__builtin_tanhl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanhl)
 /* Hyperbolic tangent of `x' */
-__CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__tanhl,(__LONGDOUBLE __x),tanhl,{ return __builtin_tanhl(__x); })
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__tanhl,(__LONGDOUBLE __x),tanhl,{ return __builtin_tanhl(__x); })
 #elif defined(__CRT_HAVE_tanhl)
 /* Hyperbolic tangent of `x' */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__tanhl,(__LONGDOUBLE __x),tanhl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__tanhl,(__LONGDOUBLE __x),tanhl,(__x))
 #elif defined(__CRT_HAVE___tanhl)
 /* Hyperbolic tangent of `x' */
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__tanhl,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__tanhl,(__LONGDOUBLE __x),(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/tanhl.h>
 /* Hyperbolic tangent of `x' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __tanhl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhl))(__x); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __tanhl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhl))(__x); }
 #endif /* ... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #ifdef __USE_GNU

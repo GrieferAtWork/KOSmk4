@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb3efa15 */
+/* HASH CRC-32:0x308e5eb2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -425,6 +425,12 @@ NOTHROW(LIBCCALL libc_sinh)(double x) {
 		result = __kernel_standard(x, x, result, __LIBM_KMATHERR_SINH);
 	return result;
 }
+#include <libm/tanh.h>
+/* Hyperbolic tangent of `x' */
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
+NOTHROW(LIBCCALL libc_tanh)(double x) {
+	return __LIBM_MATHFUN(tanh, x);
+}
 #include <libm/finite.h>
 #include <libm/cosh.h>
 #include <libm/matherr.h>
@@ -461,10 +467,17 @@ NOTHROW(LIBCCALL libc_sinhf)(float x) {
 	return (float)libc_sinh((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
+#include <libm/tanh.h>
 /* Hyperbolic tangent of `x' */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_tanhf)(float x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+	return __LIBM_MATHFUNF(tanh, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)libc_tanh((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 #include <libm/finite.h>
 #include <libm/cosh.h>
@@ -502,10 +515,17 @@ NOTHROW(LIBCCALL libc_sinhl)(__LONGDOUBLE x) {
 	return (__LONGDOUBLE)libc_sinh((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
+#include <libm/tanh.h>
 /* Hyperbolic tangent of `x' */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_tanhl)(__LONGDOUBLE x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+	return __LIBM_MATHFUNL(tanh, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)libc_tanh((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 #include <libm/fcomp.h>
 #include <libm/matherr.h>
@@ -3077,6 +3097,8 @@ DEFINE_PUBLIC_ALIAS(__cosh, libc_cosh);
 DEFINE_PUBLIC_ALIAS(cosh, libc_cosh);
 DEFINE_PUBLIC_ALIAS(__sinh, libc_sinh);
 DEFINE_PUBLIC_ALIAS(sinh, libc_sinh);
+DEFINE_PUBLIC_ALIAS(__tanh, libc_tanh);
+DEFINE_PUBLIC_ALIAS(tanh, libc_tanh);
 DEFINE_PUBLIC_ALIAS(__coshf, libc_coshf);
 DEFINE_PUBLIC_ALIAS(coshf, libc_coshf);
 DEFINE_PUBLIC_ALIAS(__sinhf, libc_sinhf);

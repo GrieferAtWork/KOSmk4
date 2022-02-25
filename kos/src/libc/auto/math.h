@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae5cf800 */
+/* HASH CRC-32:0xcce23784 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -215,7 +215,13 @@ INTDEF WUNUSED double NOTHROW(LIBCCALL libc_sinh)(double x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Hyperbolic tangent of `x' */
-INTDEF WUNUSED double NOTHROW(LIBDCALL libd_tanh)(double x);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBDCALL libd_tanh)(double x);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Hyperbolic tangent of `x' */
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_tanh)(double x);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Hyperbolic cosine of `x' */
 INTDEF WUNUSED float NOTHROW(LIBDCALL libd_coshf)(float x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -233,11 +239,11 @@ INTDEF WUNUSED float NOTHROW(LIBCCALL libc_sinhf)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Hyperbolic tangent of `x' */
-INTDEF WUNUSED float NOTHROW(LIBDCALL libd_tanhf)(float x);
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBDCALL libd_tanhf)(float x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Hyperbolic tangent of `x' */
-INTDEF WUNUSED float NOTHROW(LIBCCALL libc_tanhf)(float x);
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_tanhf)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Hyperbolic cosine of `x' */
@@ -257,11 +263,11 @@ INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_sinhl)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Hyperbolic tangent of `x' */
-INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_tanhl)(__LONGDOUBLE x);
+INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_tanhl)(__LONGDOUBLE x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Hyperbolic tangent of `x' */
-INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_tanhl)(__LONGDOUBLE x);
+INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_tanhl)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Hyperbolic arc cosine of `x' */

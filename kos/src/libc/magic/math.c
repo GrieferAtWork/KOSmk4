@@ -417,8 +417,15 @@ double sinh(double x) {
 }
 
 @@Hyperbolic tangent of `x'
-[[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__tanh")]]
-double tanh(double x); /* TODO */
+[[std, wunused, const, nothrow, crtbuiltin, export_alias("__tanh")]]
+[[impl_include("<libm/tanh.h>")]]
+[[requires_include("<ieee754.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+double tanh(double x) {
+	return __LIBM_MATHFUN(@tanh@, x);
+}
 
 [[std, crtbuiltin, export_alias("__coshf")]] coshf(*) %{generate(double2float("cosh"))}
 [[std, crtbuiltin, export_alias("__sinhf")]] sinhf(*) %{generate(double2float("sinh"))}

@@ -74,7 +74,10 @@ __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, zerof, __IEEE754_FLOAT_C(0.00000000
 #define __libm_onef_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, onef, __IEEE754_FLOAT_C(1.0))
 #endif /* !__libm_onef_defined */
+#ifndef __libm_twof_defined
+#define __libm_twof_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, twof, __IEEE754_FLOAT_C(2.0))
+#endif /* !__libm_twof_defined */
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, two24f, __IEEE754_FLOAT_C(16777216.0)) /* 0x4b800000 */
 #ifndef __libm_hugef_defined
 #define __libm_hugef_defined
@@ -384,7 +387,10 @@ __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, zero, __IEEE754_DOUBLE_C(0.0000000
 #define __libm_one_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, one, __IEEE754_DOUBLE_C(1.0))
 #endif /* !__libm_one_defined */
+#ifndef __libm_two_defined
+#define __libm_two_defined
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, two, __IEEE754_DOUBLE_C(2.0))
+#endif /* !__libm_two_defined */
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, two53, __IEEE754_DOUBLE_C(9007199254740992.0)) /* 0x43400000, 0x00000000 */
 #ifndef __libm_huge_defined
 #define __libm_huge_defined
