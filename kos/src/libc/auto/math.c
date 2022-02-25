@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a004b89 */
+/* HASH CRC-32:0x6e9f81f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -401,10 +401,35 @@ NOTHROW(LIBCCALL libc_tanl)(__LONGDOUBLE x) {
 	return (__LONGDOUBLE)libc_tan((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
+#include <libm/finite.h>
+#include <libm/cosh.h>
+#include <libm/matherr.h>
+/* Hyperbolic cosine of `x' */
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
+NOTHROW(LIBCCALL libc_cosh)(double x) {
+	double result = __LIBM_MATHFUN(cosh, x);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+		!__LIBM_MATHFUNI(finite, result) && __LIBM_MATHFUNI(finite, x))
+		result = __kernel_standard(x, x, result, __LIBM_KMATHERR_COSH);
+	return result;
+}
+#include <libm/finite.h>
+#include <libm/cosh.h>
+#include <libm/matherr.h>
 /* Hyperbolic cosine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_coshf)(float x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+	float result = __LIBM_MATHFUNF(cosh, x);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+		!__LIBM_MATHFUNIF(finite, result) && __LIBM_MATHFUNIF(finite, x))
+		result = __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_COSH);
+	return result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)libc_cosh((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 /* Hyperbolic sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
@@ -416,10 +441,23 @@ INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_tanhf)(float x) {
 	return (float)libc_tanh((double)x);
 }
+#include <libm/finite.h>
+#include <libm/cosh.h>
+#include <libm/matherr.h>
 /* Hyperbolic cosine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_coshl)(__LONGDOUBLE x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+	__LONGDOUBLE result = __LIBM_MATHFUNL(cosh, x);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+		!__LIBM_MATHFUNIL(finite, result) && __LIBM_MATHFUNIL(finite, x))
+		result = __kernel_standard_l(x, x, result, __LIBM_KMATHERRL_COSH);
+	return result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)libc_cosh((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 /* Hyperbolic sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
@@ -2997,6 +3035,8 @@ DEFINE_PUBLIC_ALIAS(__sinl, libc_sinl);
 DEFINE_PUBLIC_ALIAS(sinl, libc_sinl);
 DEFINE_PUBLIC_ALIAS(__tanl, libc_tanl);
 DEFINE_PUBLIC_ALIAS(tanl, libc_tanl);
+DEFINE_PUBLIC_ALIAS(__cosh, libc_cosh);
+DEFINE_PUBLIC_ALIAS(cosh, libc_cosh);
 DEFINE_PUBLIC_ALIAS(__coshf, libc_coshf);
 DEFINE_PUBLIC_ALIAS(coshf, libc_coshf);
 DEFINE_PUBLIC_ALIAS(__sinhf, libc_sinhf);

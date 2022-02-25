@@ -823,10 +823,12 @@ incdir("");
 #include <libm/asm/trunc.h>
 #include <libm/atan.h>
 #include <libm/atan2.h>
+#include <libm/atanh.h>
 #include <libm/cbrt.h>
 #include <libm/ceil.h>
 #include <libm/copysign.h>
 #include <libm/cos.h>
+#include <libm/cosh.h>
 #include <libm/exp.h>
 #include <libm/expm1.h>
 #include <libm/fabs.h>

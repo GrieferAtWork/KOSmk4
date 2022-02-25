@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69658f10 */
+/* HASH CRC-32:0x584d1d05 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_coshf_defined
 #define __local_coshf_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_cosh_defined
 #define __local___localdep_cosh_defined
@@ -31,20 +32,40 @@ __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_cosh,(double __x),cosh,
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_cosh,(double __x),cosh,(__x))
 #elif defined(__CRT_HAVE___cosh)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_cosh,(double __x),__cosh,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_END
+#include <libc/local/math/cosh.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_cosh __LIBC_LOCAL_NAME(cosh)
 #else /* ... */
 #undef __local___localdep_cosh_defined
 #endif /* !... */
 #endif /* !__local___localdep_cosh_defined */
+__NAMESPACE_LOCAL_END
+#include <libm/finite.h>
+#include <libm/cosh.h>
+#include <libm/matherr.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(coshf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(coshf))(float __x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+	float __result = __LIBM_MATHFUNF(cosh, __x);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+		!__LIBM_MATHFUNIF(finite, __result) && __LIBM_MATHFUNIF(finite, __x))
+		__result = __kernel_standard_f(__x, __x, __result, __LIBM_KMATHERRF_COSH);
+	return __result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)(__NAMESPACE_LOCAL_SYM __localdep_cosh)((double)__x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_coshf_defined
 #define __local___localdep_coshf_defined
 #define __localdep_coshf __LIBC_LOCAL_NAME(coshf)
 #endif /* !__local___localdep_coshf_defined */
-#else /* __CRT_HAVE_cosh || __CRT_HAVE___cosh */
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_cosh || __CRT_HAVE___cosh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #undef __local_coshf_defined
-#endif /* !__CRT_HAVE_cosh && !__CRT_HAVE___cosh */
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ && !__CRT_HAVE_cosh && !__CRT_HAVE___cosh && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_coshf_defined */

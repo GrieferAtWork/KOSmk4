@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11fa3afa */
+/* HASH CRC-32:0xe1748cdc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,8 +31,6 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Hyperbolic cosine of `x' */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_cosh)(double x);
 /* Hyperbolic sine of `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_sinh)(double x);
 /* Hyperbolic tangent of `x' */

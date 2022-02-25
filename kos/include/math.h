@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34d5e9ed */
+/* HASH CRC-32:0x1b341016 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -110,18 +110,18 @@ __NAMESPACE_STD_USING(sinl)
 __NAMESPACE_STD_USING(tanl)
 #endif /* __CRT_HAVE_tanl || __CRT_HAVE___tanl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_tan || __CRT_HAVE___tan || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
-#if defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
+#if defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(cosh)
-#endif /* __CRT_HAVE_cosh || __CRT_HAVE___cosh */
+#endif /* __CRT_HAVE_cosh || __CRT_HAVE___cosh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
 __NAMESPACE_STD_USING(sinh)
 #endif /* __CRT_HAVE_sinh || __CRT_HAVE___sinh */
 #if defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
 __NAMESPACE_STD_USING(tanh)
 #endif /* __CRT_HAVE_tanh || __CRT_HAVE___tanh */
-#if defined(__CRT_HAVE_coshf) || defined(__CRT_HAVE___coshf) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
+#if defined(__CRT_HAVE_coshf) || defined(__CRT_HAVE___coshf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(coshf)
-#endif /* __CRT_HAVE_coshf || __CRT_HAVE___coshf || __CRT_HAVE_cosh || __CRT_HAVE___cosh */
+#endif /* __CRT_HAVE_coshf || __CRT_HAVE___coshf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_cosh || __CRT_HAVE___cosh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_sinhf) || defined(__CRT_HAVE___sinhf) || defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
 __NAMESPACE_STD_USING(sinhf)
 #endif /* __CRT_HAVE_sinhf || __CRT_HAVE___sinhf || __CRT_HAVE_sinh || __CRT_HAVE___sinh */
@@ -129,9 +129,9 @@ __NAMESPACE_STD_USING(sinhf)
 __NAMESPACE_STD_USING(tanhf)
 #endif /* __CRT_HAVE_tanhf || __CRT_HAVE___tanhf || __CRT_HAVE_tanh || __CRT_HAVE___tanh */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-#if defined(__CRT_HAVE_coshl) || defined(__CRT_HAVE___coshl) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
+#if defined(__CRT_HAVE_coshl) || defined(__CRT_HAVE___coshl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(coshl)
-#endif /* __CRT_HAVE_coshl || __CRT_HAVE___coshl || __CRT_HAVE_cosh || __CRT_HAVE___cosh */
+#endif /* __CRT_HAVE_coshl || __CRT_HAVE___coshl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_cosh || __CRT_HAVE___cosh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_sinhl) || defined(__CRT_HAVE___sinhl) || defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
 __NAMESPACE_STD_USING(sinhl)
 #endif /* __CRT_HAVE_sinhl || __CRT_HAVE___sinhl || __CRT_HAVE_sinh || __CRT_HAVE___sinh */
@@ -1037,6 +1037,12 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,cosh,(double __x),(__x))
 #elif defined(__CRT_HAVE___cosh)
 /* Hyperbolic cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,cosh,(double __x),__cosh,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_STD_END
+#include <libc/local/math/cosh.h>
+__NAMESPACE_STD_BEGIN
+/* Hyperbolic cosine of `x' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(cosh, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL cosh)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cosh))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_sinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sinh)
 /* Hyperbolic sine of `x' */
@@ -1067,7 +1073,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,coshf,(float __x),(__x))
 #elif defined(__CRT_HAVE___coshf)
 /* Hyperbolic cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,coshf,(float __x),__coshf,(__x))
-#elif defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/coshf.h>
 __NAMESPACE_STD_BEGIN
@@ -1116,7 +1122,7 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,coshl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___coshl)
 /* Hyperbolic cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,coshl,(__LONGDOUBLE __x),__coshl,(__x))
-#elif defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/coshl.h>
 __NAMESPACE_STD_BEGIN
@@ -3805,7 +3811,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,cosh,(float __x),coshf,(__x))
 #elif defined(__CRT_HAVE___coshf)
 /* Hyperbolic cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,cosh,(float __x),__coshf,(__x))
-#elif defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/coshf.h>
@@ -4204,7 +4210,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cosh,(__LONGDOUBLE __x),coshl,
 #elif defined(__CRT_HAVE___coshl)
 /* Hyperbolic cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cosh,(__LONGDOUBLE __x),__coshl,(__x))
-#elif defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/coshl.h>
@@ -5958,18 +5964,18 @@ __NAMESPACE_STD_USING(tanl)
 
 /* Hyperbolic functions. */
 #ifndef __CXX_SYSTEM_HEADER
-#if defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
+#if defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(cosh)
-#endif /* __CRT_HAVE_cosh || __CRT_HAVE___cosh */
+#endif /* __CRT_HAVE_cosh || __CRT_HAVE___cosh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
 __NAMESPACE_STD_USING(sinh)
 #endif /* __CRT_HAVE_sinh || __CRT_HAVE___sinh */
 #if defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
 __NAMESPACE_STD_USING(tanh)
 #endif /* __CRT_HAVE_tanh || __CRT_HAVE___tanh */
-#if defined(__CRT_HAVE_coshf) || defined(__CRT_HAVE___coshf) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
+#if defined(__CRT_HAVE_coshf) || defined(__CRT_HAVE___coshf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(coshf)
-#endif /* __CRT_HAVE_coshf || __CRT_HAVE___coshf || __CRT_HAVE_cosh || __CRT_HAVE___cosh */
+#endif /* __CRT_HAVE_coshf || __CRT_HAVE___coshf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_cosh || __CRT_HAVE___cosh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_sinhf) || defined(__CRT_HAVE___sinhf) || defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
 __NAMESPACE_STD_USING(sinhf)
 #endif /* __CRT_HAVE_sinhf || __CRT_HAVE___sinhf || __CRT_HAVE_sinh || __CRT_HAVE___sinh */
@@ -5979,9 +5985,9 @@ __NAMESPACE_STD_USING(tanhf)
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifndef __CXX_SYSTEM_HEADER
-#if defined(__CRT_HAVE_coshl) || defined(__CRT_HAVE___coshl) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
+#if defined(__CRT_HAVE_coshl) || defined(__CRT_HAVE___coshl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(coshl)
-#endif /* __CRT_HAVE_coshl || __CRT_HAVE___coshl || __CRT_HAVE_cosh || __CRT_HAVE___cosh */
+#endif /* __CRT_HAVE_coshl || __CRT_HAVE___coshl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_cosh || __CRT_HAVE___cosh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_sinhl) || defined(__CRT_HAVE___sinhl) || defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
 __NAMESPACE_STD_USING(sinhl)
 #endif /* __CRT_HAVE_sinhl || __CRT_HAVE___sinhl || __CRT_HAVE_sinh || __CRT_HAVE___sinh */
@@ -7317,6 +7323,10 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__cosh,(double __x),cosh,(__x))
 #elif defined(__CRT_HAVE___cosh)
 /* Hyperbolic cosine of `x' */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__cosh,(double __x),(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/cosh.h>
+/* Hyperbolic cosine of `x' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __cosh)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cosh))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_sinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sinh)
 /* Hyperbolic sine of `x' */
@@ -7445,7 +7455,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__coshf,(float __x),coshf,(__x))
 #elif defined(__CRT_HAVE___coshf)
 /* Hyperbolic cosine of `x' */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__coshf,(float __x),(__x))
-#elif defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/coshf.h>
 /* Hyperbolic cosine of `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __coshf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(coshf))(__x); }
@@ -7586,7 +7596,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__coshl,(__LONGDOUBLE __x),cos
 #elif defined(__CRT_HAVE___coshl)
 /* Hyperbolic cosine of `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__coshl,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/coshl.h>
 /* Hyperbolic cosine of `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __coshl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(coshl))(__x); }

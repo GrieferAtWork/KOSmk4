@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x524d2b1e */
+/* HASH CRC-32:0x5f7f6879 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -175,8 +175,6 @@
 #define __stub_conj
 #define __stub_conjf
 #define __stub_conjl
-#define __stub___cosh
-#define __stub_cosh
 #define __stub_cpow
 #define __stub_cpowf
 #define __stub_cpowl
