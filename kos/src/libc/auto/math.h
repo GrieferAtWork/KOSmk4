@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcce23784 */
+/* HASH CRC-32:0x10cc8352 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -376,6 +376,12 @@ INTDEF WUNUSED __DECL_SIMD_log double NOTHROW(LIBCCALL libc_log)(double x);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Base-ten logarithm of `x' */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_log10)(double x);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Base-ten logarithm of `x' */
+INTDEF WUNUSED double NOTHROW(LIBCCALL libc_log10)(double x);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Break `value' into integral and fractional parts */
 INTDEF WUNUSED NONNULL((2)) double NOTHROW_NCX(LIBDCALL libd_modf)(double x, double *iptr);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

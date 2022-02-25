@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b5c68a5 */
+/* HASH CRC-32:0x55870cc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(logf))(float __x) {
 
 
 
-	if (__LIBM_MATHFUNI2F(islessequal, __x, -1.0f) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2F(islessequal, __x, -1.0f)) {
 		if (__x == -1.0f) {
 			(__NAMESPACE_LOCAL_SYM __localdep_feraiseexcept)(FE_DIVBYZERO);
 			return __kernel_standard_f(__x, __x, -__HUGE_VALF, __LIBM_KMATHERRF_LOG_ZERO); /* log(0) */

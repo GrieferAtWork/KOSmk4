@@ -42,18 +42,6 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_log10,hash:CRC-32=0xf4920ff2]]]*/
-/* Base-ten logarithm of `x' */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
-NOTHROW(LIBCCALL libc_log10)(double x)
-/*[[[body:libc_log10]]]*/
-/*AUTO*/{
-	(void)x;
-	CRT_UNIMPLEMENTEDF("log10(%f)", x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_log10]]]*/
 
 
 
@@ -277,9 +265,7 @@ NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x8c1e311e]]]*/
-DEFINE_PUBLIC_ALIAS(__log10, libc_log10);
-DEFINE_PUBLIC_ALIAS(log10, libc_log10);
+/*[[[start:exports,hash:CRC-32=0x4d8eb853]]]*/
 DEFINE_PUBLIC_ALIAS(__exp2, libc_exp2);
 DEFINE_PUBLIC_ALIAS(exp2, libc_exp2);
 DEFINE_PUBLIC_ALIAS(__log2, libc_log2);

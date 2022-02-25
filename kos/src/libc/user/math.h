@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4bf8b01 */
+/* HASH CRC-32:0xeec84f12 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,8 +31,6 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Base-ten logarithm of `x' */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_log10)(double x);
 /* Compute base-2 exponential of `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_exp2)(double x);
 /* Compute base-2 logarithm of `x' */

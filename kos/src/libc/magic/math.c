@@ -569,7 +569,7 @@ double ldexp(double x, int exponent) {
 [[impl_include("<bits/crt/fenv.h>", "<bits/math-constants.h>", "<libm/nan.h>")]]
 [[impl_include("<libm/log.h>", "<libm/fcomp.h>", "<libm/matherr.h>")]]
 double log(double x) {
-	if (__LIBM_MATHFUNI2(@islessequal@, x, -1.0) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2(@islessequal@, x, -1.0)) {
 		if (x == -1.0) {
 			feraiseexcept(@FE_DIVBYZERO@);
 			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_LOG_ZERO); /* log(0) */
@@ -585,7 +585,25 @@ double log(double x) {
 
 @@Base-ten logarithm of `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__log10")]]
-double log10(double x); /* TODO */
+[[requires_include("<ieee754.h>")]]
+[[requires($has_function(feraiseexcept) &&
+           (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))]]
+[[impl_include("<bits/crt/fenv.h>", "<bits/math-constants.h>", "<libm/nan.h>")]]
+[[impl_include("<libm/log10.h>", "<libm/fcomp.h>", "<libm/matherr.h>")]]
+double log10(double x) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2(@islessequal@, x, 0.0)) {
+		if (x == 0.0) {
+			feraiseexcept(@FE_DIVBYZERO@);
+			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_LOG10_ZERO); /* log10(0) */
+		} else {
+			feraiseexcept(@FE_INVALID@);
+			return __kernel_standard(x, x, __LIBM_MATHFUN1I(@nan@, ""), __LIBM_KMATHERR_LOG10_MINUS); /* log10(x<0) */
+		}
+	}
+	return __LIBM_MATHFUN(@log10@, x);
+}
 
 @@Break `value' into integral and fractional parts
 [[std, wunused, crtbuiltin, export_alias("__modf")]]

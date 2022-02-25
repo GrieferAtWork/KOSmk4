@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x308e5eb2 */
+/* HASH CRC-32:0x372c10d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -727,7 +727,7 @@ NOTHROW(LIBCCALL libc_ldexp)(double x,
 /* Natural logarithm of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_log double
 NOTHROW(LIBCCALL libc_log)(double x) {
-	if (__LIBM_MATHFUNI2(islessequal, x, -1.0) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2(islessequal, x, -1.0)) {
 		if (x == -1.0) {
 			libc_feraiseexcept(FE_DIVBYZERO);
 			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_LOG_ZERO); /* log(0) */
@@ -737,6 +737,26 @@ NOTHROW(LIBCCALL libc_log)(double x) {
 		}
 	}
 	return __LIBM_MATHFUN(log, x);
+}
+#include <bits/crt/fenv.h>
+#include <bits/math-constants.h>
+#include <libm/nan.h>
+#include <libm/log10.h>
+#include <libm/fcomp.h>
+#include <libm/matherr.h>
+/* Base-ten logarithm of `x' */
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
+NOTHROW(LIBCCALL libc_log10)(double x) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2(islessequal, x, 0.0)) {
+		if (x == 0.0) {
+			libc_feraiseexcept(FE_DIVBYZERO);
+			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_LOG10_ZERO); /* log10(0) */
+		} else {
+			libc_feraiseexcept(FE_INVALID);
+			return __kernel_standard(x, x, __LIBM_MATHFUN1I(nan, ""), __LIBM_KMATHERR_LOG10_MINUS); /* log10(x<0) */
+		}
+	}
+	return __LIBM_MATHFUN(log10, x);
 }
 #include <libm/modf.h>
 /* Break `value' into integral and fractional parts */
@@ -836,7 +856,7 @@ NOTHROW(LIBCCALL libc_logf)(float x) {
 
 
 
-	if (__LIBM_MATHFUNI2F(islessequal, x, -1.0f) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2F(islessequal, x, -1.0f)) {
 		if (x == -1.0f) {
 			libc_feraiseexcept(FE_DIVBYZERO);
 			return __kernel_standard_f(x, x, -__HUGE_VALF, __LIBM_KMATHERRF_LOG_ZERO); /* log(0) */
@@ -850,10 +870,32 @@ NOTHROW(LIBCCALL libc_logf)(float x) {
 	return (float)libc_log((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
+#include <bits/crt/fenv.h>
+#include <bits/math-constants.h>
+#include <libm/nan.h>
+#include <libm/log10.h>
+#include <libm/fcomp.h>
+#include <libm/matherr.h>
 /* Base-ten logarithm of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_log10f)(float x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2F(islessequal, x, 0.0f)) {
+		if (x == 0.0f) {
+			libc_feraiseexcept(FE_DIVBYZERO);
+			return __kernel_standard_f(x, x, -__HUGE_VALF, __LIBM_KMATHERRF_LOG10_ZERO); /* log10(0) */
+		} else {
+			libc_feraiseexcept(FE_INVALID);
+			return __kernel_standard_f(x, x, __LIBM_MATHFUN1IF(nan, ""), __LIBM_KMATHERRF_LOG10_MINUS); /* log10(x<0) */
+		}
+	}
+	return __LIBM_MATHFUNF(log10, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)libc_log10((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 #include <libm/modf.h>
 /* Break `value' into integral and fractional parts */
@@ -960,7 +1002,7 @@ NOTHROW(LIBCCALL libc_logl)(__LONGDOUBLE x) {
 
 
 
-	if (__LIBM_MATHFUNI2L(islessequal, x, -1.0L) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2L(islessequal, x, -1.0L)) {
 		if (x == -1.0L) {
 			libc_feraiseexcept(FE_DIVBYZERO);
 			return __kernel_standard_l(x, x, -__HUGE_VALL, __LIBM_KMATHERRL_LOG_ZERO); /* log(0) */
@@ -974,10 +1016,32 @@ NOTHROW(LIBCCALL libc_logl)(__LONGDOUBLE x) {
 	return (__LONGDOUBLE)libc_log((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
+#include <bits/crt/fenv.h>
+#include <bits/math-constants.h>
+#include <libm/nan.h>
+#include <libm/log10.h>
+#include <libm/fcomp.h>
+#include <libm/matherr.h>
 /* Base-ten logarithm of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_log10l)(__LONGDOUBLE x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2L(islessequal, x, 0.0L)) {
+		if (x == 0.0L) {
+			libc_feraiseexcept(FE_DIVBYZERO);
+			return __kernel_standard_l(x, x, -__HUGE_VALL, __LIBM_KMATHERRL_LOG10_ZERO); /* log10(0) */
+		} else {
+			libc_feraiseexcept(FE_INVALID);
+			return __kernel_standard_l(x, x, __LIBM_MATHFUN1IL(nan, ""), __LIBM_KMATHERRL_LOG10_MINUS); /* log10(x<0) */
+		}
+	}
+	return __LIBM_MATHFUNL(log10, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)libc_log10((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 #include <libm/modf.h>
 /* Break `value' into integral and fractional parts */
@@ -3137,6 +3201,8 @@ DEFINE_PUBLIC_ALIAS(__ldexp, libc_ldexp);
 DEFINE_PUBLIC_ALIAS(ldexp, libc_ldexp);
 DEFINE_PUBLIC_ALIAS(__log, libc_log);
 DEFINE_PUBLIC_ALIAS(log, libc_log);
+DEFINE_PUBLIC_ALIAS(__log10, libc_log10);
+DEFINE_PUBLIC_ALIAS(log10, libc_log10);
 DEFINE_PUBLIC_ALIAS(__modf, libc_modf);
 DEFINE_PUBLIC_ALIAS(modf, libc_modf);
 DEFINE_PUBLIC_ALIAS(__expf, libc_expf);

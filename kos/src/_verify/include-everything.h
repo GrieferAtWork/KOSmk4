@@ -850,6 +850,7 @@ incdir("");
 #include <libm/kernel_tan.h>
 #include <libm/ldexp.h>
 #include <libm/log.h>
+#include <libm/log10.h>
 #include <libm/log1p.h>
 #include <libm/logb.h>
 #include <libm/lrint.h>
