@@ -183,6 +183,7 @@
 #ifdef __USE_ISOC99
 #include <asm/crt/fp_type.h>  /* __FP_NAN, __FP_INFINITE, ... */
 #include <bits/crt/mathdef.h> /* __FLT_EVAL_METHOD__, __FP_ILOGB0, __FP_ILOGBNAN */
+#include <libm/fcomp.h>
 #endif /* __USE_ISOC99 */
 
 #ifdef __USE_MISC
@@ -2565,59 +2566,59 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__s
        !defined(__NO_builtin_types_compatible_p) && \
        defined(__COMPILER_HAVE_TYPEOF))
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-#define __FPFUNC(x, f, d, l)                                                                     \
-	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x) + (float)0), float), f(x), \
-	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x) + (double)0), double), d(x), l(x)))
-#define __FPFUNC2(x, y, f, d, l)                                                                          \
-	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x) + (y) + (float)0), float), f(x, y), \
-	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x) + (y) + (double)0), double), d(x, y), l(x, y)))
+#define __FPFUNC(x, f, d, l)                                                                 \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x) + 0.0f), float), f(x), \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x) + 0.0), double), d(x), l(x)))
+#define __FPFUNC2(x, y, f, d, l)                                                                      \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x) + (y) + 0.0f), float), f(x, y), \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x) + (y) + 0.0), double), d(x, y), l(x, y)))
 #else /* __COMPILER_HAVE_LONGDOUBLE */
 #define __FPFUNC(x, f, d, l) \
-	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x) + (float)0), float), f(x), d(x))
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x) + 0.0f), float), f(x), d(x))
 #define __FPFUNC2(x, y, f, d, l) \
-	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x) + (y) + (float)0), float), f(x, y), d(x, y))
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x) + (y) + 0.0f), float), f(x, y), d(x, y))
 #endif /* !__COMPILER_HAVE_LONGDOUBLE */
 #elif !defined(__NO_builtin_types_compatible_p) && defined(__COMPILER_HAVE_TYPEOF)
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-#define __FPFUNC(x, f, d, l)                                             \
-	(__builtin_types_compatible_p(__typeof__((x) + (float)0), float)     \
-	 ? f((float)(x))                                                     \
-	 : __builtin_types_compatible_p(__typeof__((x) + (double)0), double) \
-	   ? d((double)(x))                                                  \
+#define __FPFUNC(x, f, d, l)                                       \
+	(__builtin_types_compatible_p(__typeof__((x) + 0.0f), float)   \
+	 ? f((float)(x))                                               \
+	 : __builtin_types_compatible_p(__typeof__((x) + 0.0), double) \
+	   ? d((double)(x))                                            \
 	   : l((__LONGDOUBLE)(x)))
-#define __FPFUNC2(x, y, f, d, l)                                               \
-	(__builtin_types_compatible_p(__typeof__((x) + (y) + (float)0), float)     \
-	 ? f((float)(x), (float)(y))                                               \
-	 : __builtin_types_compatible_p(__typeof__((x) + (y) + (double)0), double) \
-	   ? d((double)(x), (double)(y))                                           \
+#define __FPFUNC2(x, y, f, d, l)                                         \
+	(__builtin_types_compatible_p(__typeof__((x) + (y) + 0.0f), float)   \
+	 ? f((float)(x), (float)(y))                                         \
+	 : __builtin_types_compatible_p(__typeof__((x) + (y) + 0.0), double) \
+	   ? d((double)(x), (double)(y))                                     \
 	   : l((__LONGDOUBLE)(x), (__LONGDOUBLE)(y)))
 #else /* __COMPILER_HAVE_LONGDOUBLE */
 #define __FPFUNC(x, f, d, l) \
-	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x) + (float)0), float), f(x), d(x))
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x) + 0.0f), float), f(x), d(x))
 #define __FPFUNC2(x, y, f, d, l) \
-	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x) + (y) + (float)0), float), f(x, y), d(x, y))
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x) + (y) + 0.0f), float), f(x, y), d(x, y))
 #endif /* !__COMPILER_HAVE_LONGDOUBLE */
 #elif defined(__COMPILER_HAVE_LONGDOUBLE)
-#define __FPFUNC(x, f, d, l)                     \
-	(sizeof((x) + (float)0) == sizeof(float)     \
-	 ? f((float)(x))                             \
-	 : sizeof((x) + (double)0) == sizeof(double) \
-	   ? d((double)(x))                          \
+#define __FPFUNC(x, f, d, l)               \
+	(sizeof((x) + 0.0f) == sizeof(float)   \
+	 ? f((float)(x))                       \
+	 : sizeof((x) + 0.0) == sizeof(double) \
+	   ? d((double)(x))                    \
 	   : l((__LONGDOUBLE)(x)))
-#define __FPFUNC2(x, y, f, d, l)                       \
-	(sizeof((x) + (y) + (float)0) == sizeof(float)     \
-	 ? f((float)(x), (float)(y))                       \
-	 : sizeof((x) + (y) + (double)0) == sizeof(double) \
-	   ? d((double)(x), (double)(y))                   \
+#define __FPFUNC2(x, y, f, d, l)                 \
+	(sizeof((x) + (y) + 0.0f) == sizeof(float)   \
+	 ? f((float)(x), (float)(y))                 \
+	 : sizeof((x) + (y) + 0.0) == sizeof(double) \
+	   ? d((double)(x), (double)(y))             \
 	   : l((__LONGDOUBLE)(x), (__LONGDOUBLE)(y)))
 #else /* ... */
-#define __FPFUNC(x, f, d, l)                 \
-	(sizeof((x) + (float)0) == sizeof(float) \
-	 ? f((float)(x))                         \
+#define __FPFUNC(x, f, d, l)             \
+	(sizeof((x) + 0.0f) == sizeof(float) \
+	 ? f((float)(x))                     \
 	 : d((double)(x)))
-#define __FPFUNC2(x, y, f, d, l)                   \
-	(sizeof((x) + (y) + (float)0) == sizeof(float) \
-	 ? f((float)(x), (float)(y))                   \
+#define __FPFUNC2(x, y, f, d, l)               \
+	(sizeof((x) + (y) + 0.0f) == sizeof(float) \
+	 ? f((float)(x), (float)(y))               \
 	 : d((double)(x), (double)(y)))
 #endif /* ... */
 
@@ -2774,74 +2775,104 @@ typedef __double_t double_t;
 #define isinf(x) __FPFUNC(x, __isinff, __isinf, __isinfl)
 #endif /* !isinf */
 
-
 #ifdef __USE_ISOC99
-#if (__has_builtin(__builtin_isunordered) && \
-     (!defined(__DOS_COMPAT__) || !defined(__OPTIMIZE_SIZE__)))
-#define isunordered(u, v)    __builtin_isunordered(u, v)
-#define isgreater(x, y)      __builtin_isgreater(x, y)
-#define isgreaterequal(x, y) __builtin_isgreaterequal(x, y)
-#define isless(x, y)         __builtin_isless(x, y)
-#define islessequal(x, y)    __builtin_islessequal(x, y)
-#define islessgreater(x, y)  __builtin_islessgreater(x, y)
-#elif defined(__CRT_HAVE__dpcomp)
+#if defined(__CRT_HAVE__dpcomp) && !defined(__stub__dpcomp)
 #define __DOS_FPCOMPARE(x, y) __FPFUNC2(x, y, __dos_fdpcomp, __dos_dpcomp, __dos_ldpcomp)
-#define isgreater(x, y)      ((__DOS_FPCOMPARE(x, y)&4) != 0)
-#define isgreaterequal(x, y) ((__DOS_FPCOMPARE(x, y)&6) != 0)
-#define isless(x, y)         ((__DOS_FPCOMPARE(x, y)&1) != 0)
-#define islessequal(x, y)    ((__DOS_FPCOMPARE(x, y)&3) != 0)
-#define islessgreater(x, y)  ((__DOS_FPCOMPARE(x, y)&5) != 0)
-#define isunordered(x, y)    (__DOS_FPCOMPARE(x, y) == 0)
-#endif /* ... */
-
+#endif /* __CRT_HAVE__dpcomp && !__stub__dpcomp */
 
 /* Generic... */
 #ifndef isunordered
-#if defined(fpclassify) && defined(__FP_NAN)
+#if __has_builtin(__builtin_isunordered) && !defined(__OPTIMIZE_SIZE__)
+#define isunordered(u, v) __builtin_isunordered(u, v)
+#elif defined(__LIBM_MATHFUNXF) && defined(__LIBM_MATHFUNX) && defined(__LIBM_MATHFUNXL)
+#define isunordered(u, v) __FPFUNC2(u, v, __LIBM_MATHFUNXF(isunordered), __LIBM_MATHFUNX(isunordered), __LIBM_MATHFUNXL(isunordered))
+#elif defined(__DOS_FPCOMPARE)
+#define isunordered(u, v) (__DOS_FPCOMPARE(u, v) == 0)
+#elif defined(fpclassify) && defined(__FP_NAN)
 #define isunordered(u, v) (fpclassify(u) == __FP_NAN || fpclassify(v) == __FP_NAN)
-#else /* fpclassify && __FP_NAN */
+#else /* ... */
 #define isunordered(u, v) 0
-#endif /* !fpclassify || !__FP_NAN */
+#endif /* !... */
 #endif /* !isunordered */
 
 #ifndef isgreater
-#if defined(__NO_XBLOCK) || !defined(__COMPILER_HAVE_TYPEOF)
-#define isgreater(x, y) (!isunordered(x, y) && (x) > (y))
-#else /* __NO_XBLOCK || !__COMPILER_HAVE_TYPEOF */
+#if __has_builtin(__builtin_isgreater) && !defined(__OPTIMIZE_SIZE__)
+#define isgreater(x, y) __builtin_isgreater(x, y)
+#elif defined(__LIBM_MATHFUNXF) && defined(__LIBM_MATHFUNX) && defined(__LIBM_MATHFUNXL)
+#define isgreater(x, y) __FPFUNC2(x, y, __LIBM_MATHFUNXF(isgreater), __LIBM_MATHFUNX(isgreater), __LIBM_MATHFUNXL(isgreater))
+#elif defined(__DOS_FPCOMPARE)
+#define isgreater(x, y) ((__DOS_FPCOMPARE(x, y)&4) != 0)
+#elif !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_AUTOTYPE)
+#define isgreater(x, y) __XBLOCK({ __auto_type __isg_x = (x); __auto_type __isg_y = (y); __XRETURN !isunordered(__isg_x, __isg_y) && __isg_x > __isg_y; })
+#elif !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF)
 #define isgreater(x, y) __XBLOCK({ __typeof__(x) __isg_x = (x); __typeof__(y) __isg_y = (y); __XRETURN !isunordered(__isg_x, __isg_y) && __isg_x > __isg_y; })
-#endif /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
+#else /* ... */
+#define isgreater(x, y) (!isunordered(x, y) && (x) > (y))
+#endif /* !... */
 #endif /* !isgreater */
 
 #ifndef isgreaterequal
-#if defined(__NO_XBLOCK) || !defined(__COMPILER_HAVE_TYPEOF)
-#define isgreaterequal(x, y) (!isunordered(x, y) && (x) >= (y))
-#else /* __NO_XBLOCK || !__COMPILER_HAVE_TYPEOF */
+#if __has_builtin(__builtin_isgreaterequal) && !defined(__OPTIMIZE_SIZE__)
+#define isgreaterequal(x, y) __builtin_isgreaterequal(x, y)
+#elif defined(__LIBM_MATHFUNXF) && defined(__LIBM_MATHFUNX) && defined(__LIBM_MATHFUNXL)
+#define isgreaterequal(x, y) __FPFUNC2(x, y, __LIBM_MATHFUNXF(isgreaterequal), __LIBM_MATHFUNX(isgreaterequal), __LIBM_MATHFUNXL(isgreaterequal))
+#elif defined(__DOS_FPCOMPARE)
+#define isgreaterequal(x, y) ((__DOS_FPCOMPARE(x, y)&6) != 0)
+#elif !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_AUTOTYPE)
+#define isgreaterequal(x, y) __XBLOCK({ __auto_type __isge_x = (x); __auto_type __isge_y = (y); __XRETURN !isunordered(__isge_x, __isge_y) && __isge_x >= __isge_y; })
+#elif !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF)
 #define isgreaterequal(x, y) __XBLOCK({ __typeof__(x) __isge_x = (x); __typeof__(y) __isge_y = (y); __XRETURN !isunordered(__isge_x, __isge_y) && __isge_x >= __isge_y; })
-#endif /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
+#else /* ... */
+#define isgreaterequal(x, y) (!isunordered(x, y) && (x) >= (y))
+#endif /* !... */
 #endif /* !isgreaterequal */
 
 #ifndef isless
-#if defined(__NO_XBLOCK) || !defined(__COMPILER_HAVE_TYPEOF)
-#define isless(x, y) (!isunordered(x, y) && (x) < (y))
-#else /* __NO_XBLOCK || !__COMPILER_HAVE_TYPEOF */
+#if __has_builtin(__builtin_isless) && !defined(__OPTIMIZE_SIZE__)
+#define isless(x, y) __builtin_isless(x, y)
+#elif defined(__LIBM_MATHFUNXF) && defined(__LIBM_MATHFUNX) && defined(__LIBM_MATHFUNXL)
+#define isless(x, y) __FPFUNC2(x, y, __LIBM_MATHFUNXF(isless), __LIBM_MATHFUNX(isless), __LIBM_MATHFUNXL(isless))
+#elif defined(__DOS_FPCOMPARE)
+#define isless(x, y) ((__DOS_FPCOMPARE(x, y)&1) != 0)
+#elif !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_AUTOTYPE)
+#define isless(x, y) __XBLOCK({ __auto_type __isl_x = (x); __auto_type __isl_y = (y); __XRETURN !isunordered(__isl_x, __isl_y) && __isl_x < __isl_y; })
+#elif !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF)
 #define isless(x, y) __XBLOCK({ __typeof__(x) __isl_x = (x); __typeof__(y) __isl_y = (y); __XRETURN !isunordered(__isl_x, __isl_y) && __isl_x < __isl_y; })
-#endif /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
+#else /* ... */
+#define isless(x, y) (!isunordered(x, y) && (x) < (y))
+#endif /* !... */
 #endif /* !isless */
 
 #ifndef islessequal
-#if defined(__NO_XBLOCK) || !defined(__COMPILER_HAVE_TYPEOF)
-#define islessequal(x, y) (!isunordered(x, y) && (x) <= (y))
-#else /* __NO_XBLOCK || !__COMPILER_HAVE_TYPEOF */
+#if __has_builtin(__builtin_islessequal) && !defined(__OPTIMIZE_SIZE__)
+#define islessequal(x, y) __builtin_islessequal(x, y)
+#elif defined(__LIBM_MATHFUNXF) && defined(__LIBM_MATHFUNX) && defined(__LIBM_MATHFUNXL)
+#define islessequal(x, y) __FPFUNC2(x, y, __LIBM_MATHFUNXF(islessequal), __LIBM_MATHFUNX(islessequal), __LIBM_MATHFUNXL(islessequal))
+#elif defined(__DOS_FPCOMPARE)
+#define islessequal(x, y) ((__DOS_FPCOMPARE(x, y)&3) != 0)
+#elif !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_AUTOTYPE)
+#define islessequal(x, y) __XBLOCK({ __auto_type __isle_x = (x); __auto_type __isle_y = (y); __XRETURN !isunordered(__isle_x, __isle_y) && __isle_x <= __isle_y; })
+#elif !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF)
 #define islessequal(x, y) __XBLOCK({ __typeof__(x) __isle_x = (x); __typeof__(y) __isle_y = (y); __XRETURN !isunordered(__isle_x, __isle_y) && __isle_x <= __isle_y; })
-#endif /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
+#else /* ... */
+#define islessequal(x, y) (!isunordered(x, y) && (x) <= (y))
+#endif /* !... */
 #endif /* !islessequal */
 
 #ifndef islessgreater
-#if defined(__NO_XBLOCK) || !defined(__COMPILER_HAVE_TYPEOF)
+#if __has_builtin(__builtin_islessgreater) && !defined(__OPTIMIZE_SIZE__)
+#define islessgreater(x, y) __builtin_islessgreater(x, y)
+#elif defined(__LIBM_MATHFUNXF) && defined(__LIBM_MATHFUNX) && defined(__LIBM_MATHFUNXL)
+#define islessgreater(x, y) __FPFUNC2(x, y, __LIBM_MATHFUNXF(islessgreater), __LIBM_MATHFUNX(islessgreater), __LIBM_MATHFUNXL(islessgreater))
+#elif defined(__DOS_FPCOMPARE)
+#define islessgreater(x, y) ((__DOS_FPCOMPARE(x, y)&5) != 0)
+#elif !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_AUTOTYPE)
+#define islessgreater(x, y) __XBLOCK({ __auto_type __islg_x = (x); __auto_type __islg_y = (y); __XRETURN !isunordered(__islg_x, __islg_y) && (__islg_x < __islg_y || __islg_y < __islg_x); })
+#elif !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF)
+#define islessgreater(x, y) __XBLOCK({ __typeof__(x) __islg_x = (x); __typeof__(y) __islg_y = (y); __XRETURN !isunordered(__islg_x, __islg_y) && (__islg_x < __islg_y || __islg_y < __islg_x); })
+#else /* ... */
 #define islessgreater(x, y) (!isunordered(x, y) && ((x) < (y) || (y) < (x)))
-#else /* __NO_XBLOCK || !__COMPILER_HAVE_TYPEOF */
-#define islessgreater(x, y) __XBLOCK({ __typeof__(x) __islg_x = (x); __typeof__(y) __islg_y = (y); __XRETURN !isunordered(__islg_x, __islg_y) && (__islg_x < __islg_y || __y < __x); })
-#endif /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
+#endif /* !... */
 #endif /* !islessgreater */
 #endif /* __USE_ISOC99 */
 

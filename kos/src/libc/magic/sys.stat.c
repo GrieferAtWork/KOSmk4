@@ -397,7 +397,7 @@ typedef __blksize_t blksize_t;
 
 /* Recognized & known stat() structures and assembly names.
  *
- * __CRT_KOS: (Used by default)
+ * __CRT_KOS:
  * >> int CDECL kfstat(fd_t fd, struct __kos_stat *buf);
  * >> int CDECL kfstat64(fd_t fd, struct __kos_stat *buf);
  * >> int CDECL kstat(char const *filename, struct __kos_stat *buf);
@@ -407,7 +407,7 @@ typedef __blksize_t blksize_t;
  * >> int CDECL klstat(char const *filename, struct __kos_stat *buf);
  * >> int CDECL klstat64(char const *filename, struct __kos_stat *buf);
  *
- * __CRT_GLC: (__GLC_COMPAT__)
+ * __CRT_GLC:
  * >> int CDECL fstat(fd_t fd, struct __glc_stat *buf);
  * >> int CDECL fstat64(fd_t fd, struct __glc_stat64 *buf);
  * >> int CDECL stat(char const *filename, struct __glc_stat *buf);
@@ -417,7 +417,7 @@ typedef __blksize_t blksize_t;
  * >> int CDECL lstat(char const *filename, struct __glc_stat *buf);
  * >> int CDECL lstat64(char const *filename, struct __glc_stat64 *buf);
  *
- * __CRT_DOS: (__DOS_COMPAT__)
+ * __CRT_DOS:
  * >> int CDECL [OLD: _fstat,    NEW:_fstat32] (fd_t fd, struct __dos_stat32 *buf);
  * >> int CDECL [OLD: _fstati64, NEW:_fstat32i64] (fd_t fd, struct __dos_stat32i64 *buf);
  * >> int CDECL [OLD: _stat,     NEW:_stat32] (char const *filename, struct __dos_stat32 *buf);
