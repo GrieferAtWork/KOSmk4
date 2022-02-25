@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8031423e */
+/* HASH CRC-32:0xf561a4dc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -368,18 +368,19 @@ __NAMESPACE_STD_USING(erf)
 #if defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
 __NAMESPACE_STD_USING(erfc)
 #endif /* __CRT_HAVE_erfc || __CRT_HAVE___erfc */
-#if defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma)
+#include <libc/template/signgam.h>
+#if defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || (defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)))
 __NAMESPACE_STD_USING(lgamma)
-#endif /* __CRT_HAVE_lgamma || __CRT_HAVE_gamma || __CRT_HAVE___lgamma || __CRT_HAVE___gamma */
+#endif /* __CRT_HAVE_lgamma || __CRT_HAVE_gamma || __CRT_HAVE___lgamma || __CRT_HAVE___gamma || (__LOCAL_signgam && (__CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r)) */
 #if defined(__CRT_HAVE_erff) || defined(__CRT_HAVE___erff) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
 __NAMESPACE_STD_USING(erff)
 #endif /* __CRT_HAVE_erff || __CRT_HAVE___erff || __CRT_HAVE_erf || __CRT_HAVE___erf */
 #if defined(__CRT_HAVE_erfcf) || defined(__CRT_HAVE___erfcf) || defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
 __NAMESPACE_STD_USING(erfcf)
 #endif /* __CRT_HAVE_erfcf || __CRT_HAVE___erfcf || __CRT_HAVE_erfc || __CRT_HAVE___erfc */
-#if defined(__CRT_HAVE_lgammaf) || defined(__CRT_HAVE_gammaf) || defined(__CRT_HAVE___lgammaf) || defined(__CRT_HAVE___gammaf) || defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma)
+#if defined(__CRT_HAVE_lgammaf) || defined(__CRT_HAVE_gammaf) || defined(__CRT_HAVE___lgammaf) || defined(__CRT_HAVE___gammaf) || (defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)))
 __NAMESPACE_STD_USING(lgammaf)
-#endif /* __CRT_HAVE_lgammaf || __CRT_HAVE_gammaf || __CRT_HAVE___lgammaf || __CRT_HAVE___gammaf || __CRT_HAVE_lgamma || __CRT_HAVE_gamma || __CRT_HAVE___lgamma || __CRT_HAVE___gamma */
+#endif /* __CRT_HAVE_lgammaf || __CRT_HAVE_gammaf || __CRT_HAVE___lgammaf || __CRT_HAVE___gammaf || (__LOCAL_signgam && (__CRT_HAVE_lgammaf_r || __CRT_HAVE___lgammaf_r || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r)) */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if defined(__CRT_HAVE_erfl) || defined(__CRT_HAVE___erfl) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
 __NAMESPACE_STD_USING(erfl)
@@ -387,9 +388,9 @@ __NAMESPACE_STD_USING(erfl)
 #if defined(__CRT_HAVE_erfcl) || defined(__CRT_HAVE___erfcl) || defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
 __NAMESPACE_STD_USING(erfcl)
 #endif /* __CRT_HAVE_erfcl || __CRT_HAVE___erfcl || __CRT_HAVE_erfc || __CRT_HAVE___erfc */
-#if defined(__CRT_HAVE_lgammal) || defined(__CRT_HAVE_gammal) || defined(__CRT_HAVE___lgammal) || defined(__CRT_HAVE___gammal) || defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma)
+#if defined(__CRT_HAVE_lgammal) || defined(__CRT_HAVE_gammal) || defined(__CRT_HAVE___lgammal) || defined(__CRT_HAVE___gammal) || (defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)))
 __NAMESPACE_STD_USING(lgammal)
-#endif /* __CRT_HAVE_lgammal || __CRT_HAVE_gammal || __CRT_HAVE___lgammal || __CRT_HAVE___gammal || __CRT_HAVE_lgamma || __CRT_HAVE_gamma || __CRT_HAVE___lgamma || __CRT_HAVE___gamma */
+#endif /* __CRT_HAVE_lgammal || __CRT_HAVE_gammal || __CRT_HAVE___lgammal || __CRT_HAVE___gammal || (__LOCAL_signgam && (__CRT_HAVE_lgammal_r || __CRT_HAVE___lgammal_r || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r)) */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_XOPEN || __USE_ISOC99 */
 #ifdef __USE_ISOC99
@@ -2391,7 +2392,17 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,lgamma,(double __x),gamma,(__x))
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,lgamma,(double __x),__lgamma,(__x))
 #elif defined(__CRT_HAVE___gamma)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,lgamma,(double __x),__gamma,(__x))
-#endif /* ... */
+#else /* ... */
+__NAMESPACE_STD_END
+#include <libc/template/signgam.h>
+__NAMESPACE_STD_BEGIN
+#if defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
+__NAMESPACE_STD_END
+#include <libc/local/math/lgamma.h>
+__NAMESPACE_STD_BEGIN
+__NAMESPACE_LOCAL_USING_OR_IMPL(lgamma, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL lgamma)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgamma))(__x); })
+#endif /* __LOCAL_signgam && (__CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r) */
+#endif /* !... */
 #if __has_builtin(__builtin_erff) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erff)
 __CEIDECLARE(__ATTR_WUNUSED,float,__NOTHROW,erff,(float __x),{ return __builtin_erff(__x); })
 #elif defined(__CRT_HAVE_erff)
@@ -2428,12 +2439,17 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,lgammaf,(float __x),gammaf,(__x))
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,lgammaf,(float __x),__lgammaf,(__x))
 #elif defined(__CRT_HAVE___gammaf)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,lgammaf,(float __x),__gammaf,(__x))
-#elif defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma)
+#else /* ... */
+__NAMESPACE_STD_END
+#include <libc/template/signgam.h>
+__NAMESPACE_STD_BEGIN
+#if defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
 __NAMESPACE_STD_END
 #include <libc/local/math/lgammaf.h>
 __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(lgammaf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL lgammaf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammaf))(__x); })
-#endif /* ... */
+#endif /* __LOCAL_signgam && (__CRT_HAVE_lgammaf_r || __CRT_HAVE___lgammaf_r || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r) */
+#endif /* !... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_erfl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfl)
 __CEIDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erfl,(__LONGDOUBLE __x),{ return __builtin_erfl(__x); })
@@ -2471,12 +2487,17 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,lgammal,(__LONGDOUBLE __x),gam
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,lgammal,(__LONGDOUBLE __x),__lgammal,(__x))
 #elif defined(__CRT_HAVE___gammal)
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,lgammal,(__LONGDOUBLE __x),__gammal,(__x))
-#elif defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma)
+#else /* ... */
+__NAMESPACE_STD_END
+#include <libc/template/signgam.h>
+__NAMESPACE_STD_BEGIN
+#if defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
 __NAMESPACE_STD_END
 #include <libc/local/math/lgammal.h>
 __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(lgammal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL lgammal)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammal))(__x); })
-#endif /* ... */
+#endif /* __LOCAL_signgam && (__CRT_HAVE_lgammal_r || __CRT_HAVE___lgammal_r || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r) */
+#endif /* !... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_XOPEN || __USE_ISOC99 */
 #ifdef __USE_ISOC99
@@ -5842,14 +5863,21 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,lgamma,(float __x),gammaf,(__x))
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,lgamma,(float __x),__lgammaf,(__x))
 #elif defined(__CRT_HAVE___gammaf)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,lgamma,(float __x),__gammaf,(__x))
-#elif defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma)
+#else /* ... */
+} /* extern "C++" */
+__NAMESPACE_STD_END
+#include <libc/template/signgam.h>
+__NAMESPACE_STD_BEGIN
+extern "C++" {
+#if defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/lgammaf.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL lgamma)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammaf))(__x); }
-#endif /* ... */
+#endif /* __LOCAL_signgam && (__CRT_HAVE_lgammaf_r || __CRT_HAVE___lgammaf_r || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r) */
+#endif /* !... */
 } /* extern "C++" */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 extern "C++" {
@@ -5911,14 +5939,21 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,lgamma,(__LONGDOUBLE __x),gamm
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,lgamma,(__LONGDOUBLE __x),__lgammal,(__x))
 #elif defined(__CRT_HAVE___gammal)
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,lgamma,(__LONGDOUBLE __x),__gammal,(__x))
-#elif defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma)
+#else /* ... */
+} /* extern "C++" */
+__NAMESPACE_STD_END
+#include <libc/template/signgam.h>
+__NAMESPACE_STD_BEGIN
+extern "C++" {
+#if defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/lgammal.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL lgamma)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammal))(__x); }
-#endif /* ... */
+#endif /* __LOCAL_signgam && (__CRT_HAVE_lgammal_r || __CRT_HAVE___lgammal_r || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r) */
+#endif /* !... */
 } /* extern "C++" */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_XOPEN || __USE_ISOC99 */
@@ -6308,18 +6343,19 @@ __NAMESPACE_STD_USING(erf)
 #if defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
 __NAMESPACE_STD_USING(erfc)
 #endif /* __CRT_HAVE_erfc || __CRT_HAVE___erfc */
-#if defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma)
+#include <libc/template/signgam.h>
+#if defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || (defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)))
 __NAMESPACE_STD_USING(lgamma)
-#endif /* __CRT_HAVE_lgamma || __CRT_HAVE_gamma || __CRT_HAVE___lgamma || __CRT_HAVE___gamma */
+#endif /* __CRT_HAVE_lgamma || __CRT_HAVE_gamma || __CRT_HAVE___lgamma || __CRT_HAVE___gamma || (__LOCAL_signgam && (__CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r)) */
 #if defined(__CRT_HAVE_erff) || defined(__CRT_HAVE___erff) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
 __NAMESPACE_STD_USING(erff)
 #endif /* __CRT_HAVE_erff || __CRT_HAVE___erff || __CRT_HAVE_erf || __CRT_HAVE___erf */
 #if defined(__CRT_HAVE_erfcf) || defined(__CRT_HAVE___erfcf) || defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
 __NAMESPACE_STD_USING(erfcf)
 #endif /* __CRT_HAVE_erfcf || __CRT_HAVE___erfcf || __CRT_HAVE_erfc || __CRT_HAVE___erfc */
-#if defined(__CRT_HAVE_lgammaf) || defined(__CRT_HAVE_gammaf) || defined(__CRT_HAVE___lgammaf) || defined(__CRT_HAVE___gammaf) || defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma)
+#if defined(__CRT_HAVE_lgammaf) || defined(__CRT_HAVE_gammaf) || defined(__CRT_HAVE___lgammaf) || defined(__CRT_HAVE___gammaf) || (defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)))
 __NAMESPACE_STD_USING(lgammaf)
-#endif /* __CRT_HAVE_lgammaf || __CRT_HAVE_gammaf || __CRT_HAVE___lgammaf || __CRT_HAVE___gammaf || __CRT_HAVE_lgamma || __CRT_HAVE_gamma || __CRT_HAVE___lgamma || __CRT_HAVE___gamma */
+#endif /* __CRT_HAVE_lgammaf || __CRT_HAVE_gammaf || __CRT_HAVE___lgammaf || __CRT_HAVE___gammaf || (__LOCAL_signgam && (__CRT_HAVE_lgammaf_r || __CRT_HAVE___lgammaf_r || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r)) */
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifndef __CXX_SYSTEM_HEADER
@@ -6329,9 +6365,9 @@ __NAMESPACE_STD_USING(erfl)
 #if defined(__CRT_HAVE_erfcl) || defined(__CRT_HAVE___erfcl) || defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
 __NAMESPACE_STD_USING(erfcl)
 #endif /* __CRT_HAVE_erfcl || __CRT_HAVE___erfcl || __CRT_HAVE_erfc || __CRT_HAVE___erfc */
-#if defined(__CRT_HAVE_lgammal) || defined(__CRT_HAVE_gammal) || defined(__CRT_HAVE___lgammal) || defined(__CRT_HAVE___gammal) || defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma)
+#if defined(__CRT_HAVE_lgammal) || defined(__CRT_HAVE_gammal) || defined(__CRT_HAVE___lgammal) || defined(__CRT_HAVE___gammal) || (defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)))
 __NAMESPACE_STD_USING(lgammal)
-#endif /* __CRT_HAVE_lgammal || __CRT_HAVE_gammal || __CRT_HAVE___lgammal || __CRT_HAVE___gammal || __CRT_HAVE_lgamma || __CRT_HAVE_gamma || __CRT_HAVE___lgamma || __CRT_HAVE___gamma */
+#endif /* __CRT_HAVE_lgammal || __CRT_HAVE_gammal || __CRT_HAVE___lgammal || __CRT_HAVE___gammal || (__LOCAL_signgam && (__CRT_HAVE_lgammal_r || __CRT_HAVE___lgammal_r || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r)) */
 #endif /* !__CXX_SYSTEM_HEADER */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_XOPEN || __USE_ISOC99 */
@@ -7071,6 +7107,10 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,gamma,(double __x),__lgamma,(__x))
 #elif defined(__CRT_HAVE___gamma)
 /* Obsolete export_alias for `lgamma' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,gamma,(double __x),__gamma,(__x))
+#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
+#include <libc/local/math/lgamma.h>
+/* Obsolete export_alias for `lgamma' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL gamma)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgamma))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_lgammaf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgammaf)
 /* Obsolete export_alias for `lgammaf' */
@@ -7090,7 +7130,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,gammaf,(float __x),__lgammaf,(__x))
 #elif defined(__CRT_HAVE___gammaf)
 /* Obsolete export_alias for `lgammaf' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,gammaf,(float __x),__gammaf,(__x))
-#elif defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma)
+#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
 #include <libc/local/math/lgammaf.h>
 /* Obsolete export_alias for `lgammaf' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL gammaf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammaf))(__x); }
@@ -7114,7 +7154,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,gammal,(__LONGDOUBLE __x),__lg
 #elif defined(__CRT_HAVE___gammal)
 /* Obsolete export_alias for `lgammal' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,gammal,(__LONGDOUBLE __x),__gammal,(__x))
-#elif defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma)
+#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
 #include <libc/local/math/lgammal.h>
 /* Obsolete export_alias for `lgammal' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL gammal)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammal))(__x); }
@@ -9288,6 +9328,9 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__lgamma,(double __x),gamma,(__x))
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__lgamma,(double __x),(__x))
 #elif defined(__CRT_HAVE___gamma)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__lgamma,(double __x),__gamma,(__x))
+#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
+#include <libc/local/math/lgamma.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __lgamma)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgamma))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_erff) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erff)
 __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__erff,(float __x),erff,{ return __builtin_erff(__x); })
@@ -9321,7 +9364,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__lgammaf,(float __x),gammaf,(__x))
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__lgammaf,(float __x),(__x))
 #elif defined(__CRT_HAVE___gammaf)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__lgammaf,(float __x),__gammaf,(__x))
-#elif defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma)
+#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
 #include <libc/local/math/lgammaf.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __lgammaf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammaf))(__x); }
 #endif /* ... */
@@ -9358,7 +9401,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__lgammal,(__LONGDOUBLE __x),g
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__lgammal,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___gammal)
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__lgammal,(__LONGDOUBLE __x),__gammal,(__x))
-#elif defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma)
+#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
 #include <libc/local/math/lgammal.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __lgammal)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammal))(__x); }
 #endif /* ... */
@@ -9421,6 +9464,9 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__gamma,(double __x),gamma,(__x))
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__gamma,(double __x),__lgamma,(__x))
 #elif defined(__CRT_HAVE___gamma)
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__gamma,(double __x),(__x))
+#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
+#include <libc/local/math/lgamma.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __gamma)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgamma))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_lgammaf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgammaf)
 __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__gammaf,(float __x),lgammaf,{ return __builtin_lgammaf(__x); })
@@ -9434,7 +9480,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__gammaf,(float __x),gammaf,(__x))
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__gammaf,(float __x),__lgammaf,(__x))
 #elif defined(__CRT_HAVE___gammaf)
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__gammaf,(float __x),(__x))
-#elif defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma)
+#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
 #include <libc/local/math/lgammaf.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __gammaf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammaf))(__x); }
 #endif /* ... */
@@ -9451,7 +9497,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__gammal,(__LONGDOUBLE __x),ga
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__gammal,(__LONGDOUBLE __x),__lgammal,(__x))
 #elif defined(__CRT_HAVE___gammal)
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__gammal,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma)
+#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
 #include <libc/local/math/lgammal.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __gammal)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammal))(__x); }
 #endif /* ... */
@@ -10743,11 +10789,21 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__L
 
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
-/* This variable is used by `gamma' and `lgamma'. */
+/* This variable is used by `gamma(3)' and `lgamma(3)'. */
+#ifndef signgam
 #ifdef __CRT_HAVE_signgam
-#undef signgam
-__LIBC int signgam;
+__LIBC int signgam __CASMNAME_SAME("signgam");
+#define signgam signgam
+#elif defined(__LOCAL_signgam)
+#define signgam __LOCAL_signgam
+#elif defined(__CRT_HAVE___signgam)
+#ifndef ____signgam_defined
+#define ____signgam_defined
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__signgam,(void),())
+#endif /* !____signgam_defined */
+#define signgam (*__signgam())
 #endif /* __CRT_HAVE_signgam */
+#endif /* !signgam */
 #endif /* __USE_MISC || __USE_XOPEN */
 
 #ifdef __COMPILER_HAVE_C11_GENERIC

@@ -211,6 +211,16 @@ DECLARE_NOREL_GLOBAL_META(int, optopt);
 DECLARE_NOREL_GLOBAL_META(int, _nl_msg_cat_cntr);
 #define _nl_msg_cat_cntr GET_NOREL_GLOBAL(_nl_msg_cat_cntr)
 
+
+/* <math.h> */
+#undef signgam
+#undef __signgam
+#undef __LOCAL_signgam
+DECLARE_NOREL_GLOBAL_META(int, signgam);
+#define signgam         GET_NOREL_GLOBAL(signgam)
+#define __LOCAL_signgam GET_NOREL_GLOBAL(signgam)
+#define __signgam()     (&signgam)
+
 #endif /* !__KERNEL__ */
 
 DECL_END

@@ -115,7 +115,9 @@ DEFINE_NOREL_GLOBAL_META(int, optopt, ".crt.application.options");
 #undef _nl_msg_cat_cntr
 DEFINE_NOREL_GLOBAL_META(int, _nl_msg_cat_cntr, ".crt.i18n");
 
-
+/* <math.h> */
+#undef signgam
+DEFINE_NOREL_GLOBAL_META(int, signgam, ".math.math");
 
 DECL_END
 

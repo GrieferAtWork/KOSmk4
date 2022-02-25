@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x582b94ee */
+/* HASH CRC-32:0x10e6a998 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,36 +21,36 @@
 #ifndef __local_lgammaf_defined
 #define __local_lgammaf_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma)
+#include <libc/template/signgam.h>
+#if defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_lgamma_defined
-#define __local___localdep_lgamma_defined
-#if __has_builtin(__builtin_lgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma)
-__CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_lgamma,(double __x),lgamma,{ return __builtin_lgamma(__x); })
-#elif __has_builtin(__builtin_gamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_gamma)
-__CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_lgamma,(double __x),gamma,{ return __builtin_gamma(__x); })
-#elif defined(__CRT_HAVE_lgamma)
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_lgamma,(double __x),lgamma,(__x))
-#elif defined(__CRT_HAVE_gamma)
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_lgamma,(double __x),gamma,(__x))
-#elif defined(__CRT_HAVE___lgamma)
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_lgamma,(double __x),__lgamma,(__x))
-#elif defined(__CRT_HAVE___gamma)
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_lgamma,(double __x),__gamma,(__x))
+#ifndef __local___localdep_lgammaf_r_defined
+#define __local___localdep_lgammaf_r_defined
+#if __has_builtin(__builtin_lgammaf_r) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgammaf_r)
+__CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW_NCX,__localdep_lgammaf_r,(float __x, int *__signgamp),lgammaf_r,{ return __builtin_lgammaf_r(__x, __signgamp); })
+#elif defined(__CRT_HAVE_lgammaf_r)
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW_NCX,__localdep_lgammaf_r,(float __x, int *__signgamp),lgammaf_r,(__x,__signgamp))
+#elif defined(__CRT_HAVE___lgammaf_r)
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW_NCX,__localdep_lgammaf_r,(float __x, int *__signgamp),__lgammaf_r,(__x,__signgamp))
+#elif defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)
+__NAMESPACE_LOCAL_END
+#include <libc/local/math/lgammaf_r.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_lgammaf_r __LIBC_LOCAL_NAME(lgammaf_r)
 #else /* ... */
-#undef __local___localdep_lgamma_defined
+#undef __local___localdep_lgammaf_r_defined
 #endif /* !... */
-#endif /* !__local___localdep_lgamma_defined */
+#endif /* !__local___localdep_lgammaf_r_defined */
 __LOCAL_LIBC(lgammaf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(lgammaf))(float __x) {
-	return (float)(__NAMESPACE_LOCAL_SYM __localdep_lgamma)((double)__x);
+	return (__NAMESPACE_LOCAL_SYM __localdep_lgammaf_r)(__x, &__LOCAL_signgam);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_lgammaf_defined
 #define __local___localdep_lgammaf_defined
 #define __localdep_lgammaf __LIBC_LOCAL_NAME(lgammaf)
 #endif /* !__local___localdep_lgammaf_defined */
-#else /* __CRT_HAVE_lgamma || __CRT_HAVE_gamma || __CRT_HAVE___lgamma || __CRT_HAVE___gamma */
+#else /* __LOCAL_signgam && (__CRT_HAVE_lgammaf_r || __CRT_HAVE___lgammaf_r || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r) */
 #undef __local_lgammaf_defined
-#endif /* !__CRT_HAVE_lgamma && !__CRT_HAVE_gamma && !__CRT_HAVE___lgamma && !__CRT_HAVE___gamma */
+#endif /* !__LOCAL_signgam || (!__CRT_HAVE_lgammaf_r && !__CRT_HAVE___lgammaf_r && !__CRT_HAVE_lgamma_r && !__CRT_HAVE___lgamma_r) */
 #endif /* !__local_lgammaf_defined */

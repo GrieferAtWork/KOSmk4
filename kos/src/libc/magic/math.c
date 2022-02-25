@@ -155,6 +155,7 @@
 
 
 %(auto_source){
+#include "../libc/globals.h"
 #include "../libc/dos-compat.h"
 }
 
@@ -1000,7 +1001,11 @@ double erfc(double x); /* TODO */
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("gamma", "__lgamma", "__gamma")]]
 [[if(__has_builtin(__builtin_gamma) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline("gamma", { return __builtin_gamma(x); })]]
-double lgamma(double x); /* TODO */
+[[requires_include("<libc/template/signgam.h>")]]
+[[requires(defined(__LOCAL_signgam) && $has_function(lgamma_r))]]
+double lgamma(double x) {
+	return lgamma_r(x, &__LOCAL_signgam);
+}
 
 
 [[std, crtbuiltin, export_alias("__erff")]]  erff(*)  %{generate(double2float("erf"))}
@@ -1009,7 +1014,11 @@ double lgamma(double x); /* TODO */
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("gammaf", "__lgammaf", "__gammaf")]]
 [[if(__has_builtin(__builtin_gammaf) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline("gammaf", { return __builtin_gammaf(x); })]]
-float lgammaf(float x) %{generate(double2float("lgamma"))}
+[[requires_include("<libc/template/signgam.h>")]]
+[[requires(defined(__LOCAL_signgam) && $has_function(lgammaf_r))]]
+float lgammaf(float x) {
+	return lgammaf_r(x, &__LOCAL_signgam);
+}
 
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -1019,7 +1028,11 @@ float lgammaf(float x) %{generate(double2float("lgamma"))}
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("gammal", "__lgammal", "__gammal")]]
 [[if(__has_builtin(__builtin_gammal) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline("gammal", { return __builtin_gammal(x); })]]
-__LONGDOUBLE lgammal(__LONGDOUBLE x) %{generate(double2ldouble("lgamma"))}
+[[requires_include("<libc/template/signgam.h>")]]
+[[requires(defined(__LOCAL_signgam) && $has_function(lgammal_r))]]
+__LONGDOUBLE lgammal(__LONGDOUBLE x) {
+	return lgammal_r(x, &__LOCAL_signgam);
+}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_XOPEN || __USE_ISOC99 */
 
@@ -2424,17 +2437,45 @@ int _dpcomp(double x, double y) /* TODO */;
 %[insert:function(__dos_ldpcomp = _ldpcomp)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
-/* TODO: int *__signgam(void); */
+
+%(auto_source){
+#ifndef __KERNEL__
+#undef signgam
+#undef __signgam
+INTERN ATTR_SECTION(".bss.crt.math.math") int libc_signgam = 0;
+DEFINE_PUBLIC_ALIAS(signgam, libc_signgam);
+DEFINE_PUBLIC_ALIAS(__signgam, libc___signgam);
+#define signgam     GET_NOREL_GLOBAL(signgam)
+#define __signgam() (&signgam)
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.math.math") int *
+NOTHROW(LIBCCALL libc___signgam)(void) {
+	return &signgam;
+}
+#endif /* !__KERNEL__ */
+}
+
+%[declare_user_export("signgam")]
+%[declare_user_export("__signgam")]
 
 %
 %{
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
-/* This variable is used by `gamma' and `lgamma'. */
+/* This variable is used by `gamma(3)' and `lgamma(3)'. */
+#ifndef signgam
 #ifdef __CRT_HAVE_signgam
-#undef signgam
-__LIBC int signgam;
+__LIBC int signgam __CASMNAME_SAME("signgam");
+#define signgam signgam
+#elif defined(__LOCAL_signgam)
+#define signgam __LOCAL_signgam
+#elif defined(__CRT_HAVE___signgam)
+#ifndef ____signgam_defined
+#define ____signgam_defined
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__signgam,(void),())
+#endif /* !____signgam_defined */
+#define signgam (*__signgam())
 #endif /* __CRT_HAVE_signgam */
+#endif /* !signgam */
 #endif /* __USE_MISC || __USE_XOPEN */
 
 #ifdef __COMPILER_HAVE_C11_GENERIC

@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x8999bc34 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,39 +17,38 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_MATH_H
-#define GUARD_LIBC_USER_MATH_H 1
-
-#include "../api.h"
-#include "../auto/math.h"
-
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <math.h>
-
-DECL_BEGIN
-
-#ifndef __KERNEL__
-/* Compute base-2 exponential of `x' */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_exp2)(double x);
-/* Compute base-2 logarithm of `x' */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_log2)(double x);
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_erf)(double x);
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_erfc)(double x);
-/* True gamma function */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_tgamma)(double x);
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_j0)(double x);
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_j1)(double x);
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_jn)(int n, double x);
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_y0)(double x);
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_y1)(double x);
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_yn)(int n, double x);
-/* Reentrant version of lgamma. This function uses the global variable
- * `signgam'. The reentrant version instead takes a pointer and stores
- * the value through it */
-INTDEF WUNUSED double NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x, int *signgamp);
-#endif /* !__KERNEL__ */
-
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_MATH_H */
+#ifndef __LOCAL_signgam
+#include <__crt.h>
+#ifndef __LOCAL_signgam
+#ifdef signgam
+#define __LOCAL_signgam signgam
+#elif defined(__CRT_HAVE_signgam)
+#ifndef __NO_ASMNAME
+#define __LOCAL_signgam __LOCAL_signgam
+#ifdef __CC__
+__DECL_BEGIN
+__LIBC int *__LOCAL_signgam __CASMNAME("signgam");
+__DECL_END
+#endif /* __CC__ */
+#else /* !__NO_ASMNAME */
+#define __LOCAL_signgam signgam
+#define signgam         signgam
+#ifdef __CC__
+__DECL_BEGIN
+__LIBC int *signgam;
+__DECL_END
+#endif /* __CC__ */
+#endif /* __NO_ASMNAME */
+#elif defined(__CRT_HAVE___signgam)
+#ifdef __CC__
+__DECL_BEGIN
+#ifndef ____signgam_defined
+#define ____signgam_defined
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__signgam,(void),())
+#endif /* !____signgam_defined */
+__DECL_END
+#endif /* __CC__ */
+#define __LOCAL_signgam (*__signgam())
+#endif /* ... */
+#endif /* !__LOCAL_signgam */
+#endif /* !__LOCAL_signgam */

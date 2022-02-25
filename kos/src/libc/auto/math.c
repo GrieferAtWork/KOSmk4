@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40e09b8f */
+/* HASH CRC-32:0x9c11393a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@
 
 DECL_BEGIN
 
+#include "../libc/globals.h"
 #include "../libc/dos-compat.h"
 #ifndef __KERNEL__
 #include <libm/fcomp.h>
@@ -1805,6 +1806,10 @@ NOTHROW(LIBCCALL libc_nanl)(char const *tagb) {
 	return (__LONGDOUBLE)libc_nan(tagb);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
+NOTHROW(LIBCCALL libc_lgamma)(double x) {
+	return libc_lgamma_r(x, &__LOCAL_signgam);
+}
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_erff)(float x) {
 	return (float)libc_erf((double)x);
@@ -1815,7 +1820,7 @@ NOTHROW(LIBCCALL libc_erfcf)(float x) {
 }
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_lgammaf)(float x) {
-	return (float)libc_lgamma((double)x);
+	return libc_lgammaf_r(x, &__LOCAL_signgam);
 }
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_erfl)(__LONGDOUBLE x) {
@@ -1827,7 +1832,7 @@ NOTHROW(LIBCCALL libc_erfcl)(__LONGDOUBLE x) {
 }
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_lgammal)(__LONGDOUBLE x) {
-	return (__LONGDOUBLE)libc_lgamma((double)x);
+	return libc_lgammal_r(x, &__LOCAL_signgam);
 }
 /* True gamma function */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
@@ -3193,6 +3198,21 @@ NOTHROW(LIBCCALL libc___issignalingl)(__LONGDOUBLE x) {
 	return libc___issignaling((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
+#endif /* !__KERNEL__ */
+#ifndef __KERNEL__
+#undef signgam
+#undef __signgam
+INTERN ATTR_SECTION(".bss.crt.math.math") int libc_signgam = 0;
+DEFINE_PUBLIC_ALIAS(signgam, libc_signgam);
+DEFINE_PUBLIC_ALIAS(__signgam, libc___signgam);
+#define signgam     GET_NOREL_GLOBAL(signgam)
+#define __signgam() (&signgam)
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.math.math") int *
+NOTHROW(LIBCCALL libc___signgam)(void) {
+	return &signgam;
+}
+#endif /* !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_PURE WUNUSED NONNULL((1)) short
 NOTHROW_NCX(LIBDCALL libd__dtest)(double __KOS_FIXED_CONST *px) {
 	return libd___fpclassify(*px);
@@ -3426,6 +3446,10 @@ DEFINE_PUBLIC_ALIAS(__copysignl, libc_copysignl);
 DEFINE_PUBLIC_ALIAS(copysignl, libc_copysignl);
 DEFINE_PUBLIC_ALIAS(__nanl, libc_nanl);
 DEFINE_PUBLIC_ALIAS(nanl, libc_nanl);
+DEFINE_PUBLIC_ALIAS(gamma, libc_lgamma);
+DEFINE_PUBLIC_ALIAS(__lgamma, libc_lgamma);
+DEFINE_PUBLIC_ALIAS(__gamma, libc_lgamma);
+DEFINE_PUBLIC_ALIAS(lgamma, libc_lgamma);
 DEFINE_PUBLIC_ALIAS(__erff, libc_erff);
 DEFINE_PUBLIC_ALIAS(erff, libc_erff);
 DEFINE_PUBLIC_ALIAS(__erfcf, libc_erfcf);

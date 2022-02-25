@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f0055de */
+/* HASH CRC-32:0x1c70590f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3752,6 +3752,7 @@
 #define __CRT_HAVE___signbit
 #define __CRT_HAVE___signbitf
 #define __CRT_HAVE___signbitl
+#define __CRT_HAVE___signgam
 #define __CRT_HAVE___solaris_sysinfo
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE___stack_chk_fail
@@ -6338,6 +6339,7 @@
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_signandset
 #ifndef __KERNEL__
+#define __CRT_HAVE_signgam
 #define __CRT_HAVE_significand
 #define __CRT_HAVE_significandf
 #define __CRT_HAVE_significandl

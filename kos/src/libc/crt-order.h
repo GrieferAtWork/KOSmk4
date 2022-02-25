@@ -225,6 +225,7 @@
 	.compat.linux.*  .compat.linux
 ]]]*/
 #define CRT_SECTIONS_LINKORDER(CB, PREFIX) \
+	CB(PREFIX.math.math) \
 	CB(PREFIX.crt.application.init) \
 	CB(PREFIX.crt.errno_access.core) \
 	CB(PREFIX.crt.errno_access) \

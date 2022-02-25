@@ -1005,6 +1005,7 @@
 #define __CRT_HAVE___signbit
 #define __CRT_HAVE___signbitf
 #define __CRT_HAVE___signbitl
+#define __CRT_HAVE___signgam
 #define __CRT_HAVE___significand
 #define __CRT_HAVE___significandf
 #define __CRT_HAVE___significandl
@@ -3943,6 +3944,7 @@
 #define __CRT_HAVE_signalnext
 #define __CRT_HAVE_signalnumber
 #define __CRT_HAVE_signandset
+#define __CRT_HAVE_signgam
 #define __CRT_HAVE_significand
 #define __CRT_HAVE_significandf
 #define __CRT_HAVE_significandl
