@@ -274,7 +274,7 @@ __LIBM_LOCAL_DECLARE_BEGIN
 #define __libm_onel_defined
 __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, onel, __IEEE854_LONG_DOUBLE_C(1.0))
 #endif /* !__libm_onel_defined */
-__LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, hugevall, __IEEE854_LONG_DOUBLE_C(1.0e+4932))
+__LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, asin_hugevall, __IEEE854_LONG_DOUBLE_C(1.0e+4932))
 __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, pio2_hil, __IEEE854_LONG_DOUBLE_C(0x1.921fb54442d1846ap+0))   /* pi/2 rounded to nearest to 64 bits.  */
 __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, pio2_lol, __IEEE854_LONG_DOUBLE_C(-0x7.6733ae8fe47c65d8p-68)) /* pi/2 - pio2_hi rounded to nearest to 64 bits.  */
 __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, pio4_hil, __IEEE854_LONG_DOUBLE_C(0xc.90fdaa22168c235p-4))    /* pi/4 rounded to nearest to 64 bits.  */
@@ -306,7 +306,7 @@ __LOCAL __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__
 		return (__x - __x) / (__x - __x);      /* asin(|x|>1) is NaN */
 	} else if (__ix < __INT32_C(0x3ffe8000)) { /* |x|<0.5 */
 		if (__ix < __INT32_C(0x3fde8000)) {    /* if |x| < 2**-33 */
-			if (__LIBM_LOCAL_VALUE(hugevall) + __x > __LIBM_LOCAL_VALUE(onel))
+			if (__LIBM_LOCAL_VALUE(asin_hugevall) + __x > __LIBM_LOCAL_VALUE(onel))
 				return __x; /* return x with inexact if x!=0 */
 		} else {
 			__t = __x * __x;

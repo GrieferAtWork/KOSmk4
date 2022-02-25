@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x241e54ca */
+/* HASH CRC-32:0x7a004b89 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -450,6 +450,22 @@ NOTHROW(LIBCCALL libc_asinh)(double x) {
 	return __LIBM_MATHFUN(asinh, x);
 }
 #include <libm/fcomp.h>
+#include <libm/fabs.h>
+#include <bits/math-constants.h>
+#include <libm/matherr.h>
+#include <libm/nan.h>
+#include <libm/atanh.h>
+/* Hyperbolic arc tangent of `x' */
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
+NOTHROW(LIBCCALL libc_atanh)(double x) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    __LIBM_MATHFUNI2(isgreaterequal, __LIBM_MATHFUN(fabs, x), 1.0))
+		return __kernel_standard(x, x, __HUGE_VAL,
+		                         __ieee754_fabsf(x) > 1.0 ? __LIBM_KMATHERR_ATANH_PLUSONE /* atanh(|x|>1) */
+		                                                  : __LIBM_KMATHERR_ATANH_ONE);   /* atanh(|x|==1) */
+	return __LIBM_MATHFUN(atanh, x);
+}
+#include <libm/fcomp.h>
 #include <libm/matherr.h>
 #include <libm/nan.h>
 #include <libm/acosh.h>
@@ -479,10 +495,27 @@ NOTHROW(LIBCCALL libc_asinhf)(float x) {
 	return (float)libc_asinh((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
+#include <libm/fcomp.h>
+#include <libm/fabs.h>
+#include <bits/math-constants.h>
+#include <libm/matherr.h>
+#include <libm/nan.h>
+#include <libm/atanh.h>
 /* Hyperbolic arc tangent of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_atanhf)(float x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    __LIBM_MATHFUNI2F(isgreaterequal, __LIBM_MATHFUNF(fabs, x), 1.0f))
+		return __kernel_standard_f(x, x, __HUGE_VALF,
+		                         __ieee754_fabsf(x) > 1.0f ? __LIBM_KMATHERRF_ATANH_PLUSONE /* atanh(|x|>1) */
+		                                                  : __LIBM_KMATHERRF_ATANH_ONE);   /* atanh(|x|==1) */
+	return __LIBM_MATHFUNF(atanh, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)libc_atanh((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 #include <libm/fcomp.h>
 #include <libm/matherr.h>
@@ -514,10 +547,27 @@ NOTHROW(LIBCCALL libc_asinhl)(__LONGDOUBLE x) {
 	return (__LONGDOUBLE)libc_asinh((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
+#include <libm/fcomp.h>
+#include <libm/fabs.h>
+#include <bits/math-constants.h>
+#include <libm/matherr.h>
+#include <libm/nan.h>
+#include <libm/atanh.h>
 /* Hyperbolic arc tangent of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_atanhl)(__LONGDOUBLE x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    __LIBM_MATHFUNI2L(isgreaterequal, __LIBM_MATHFUNL(fabs, x), 1.0L))
+		return __kernel_standard_l(x, x, __HUGE_VALL,
+		                         __ieee754_fabsf(x) > 1.0L ? __LIBM_KMATHERRL_ATANH_PLUSONE /* atanh(|x|>1) */
+		                                                  : __LIBM_KMATHERRL_ATANH_ONE);   /* atanh(|x|==1) */
+	return __LIBM_MATHFUNL(atanh, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)libc_atanh((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 #include <libm/signbit.h>
 #include <libm/finite.h>
@@ -2963,6 +3013,8 @@ DEFINE_PUBLIC_ALIAS(__acosh, libc_acosh);
 DEFINE_PUBLIC_ALIAS(acosh, libc_acosh);
 DEFINE_PUBLIC_ALIAS(__asinh, libc_asinh);
 DEFINE_PUBLIC_ALIAS(asinh, libc_asinh);
+DEFINE_PUBLIC_ALIAS(__atanh, libc_atanh);
+DEFINE_PUBLIC_ALIAS(atanh, libc_atanh);
 DEFINE_PUBLIC_ALIAS(__acoshf, libc_acoshf);
 DEFINE_PUBLIC_ALIAS(acoshf, libc_acoshf);
 DEFINE_PUBLIC_ALIAS(__asinhf, libc_asinhf);

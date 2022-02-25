@@ -172,7 +172,10 @@ __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, onel, __IEEE854_LONG_DOUBLE_C
 #define __libm_ln2l_defined
 __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, ln2l, __IEEE854_LONG_DOUBLE_C(6.931471805599453094287e-01)) /* 0x3FFE, 0xB17217F7, 0xD1CF79AC */
 #endif /* !__libm_ln2l_defined */
-__LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, asinh_hugevall, __IEEE854_LONG_DOUBLE_C(1.000000000000000000e+4900));
+#ifndef __libm_hugevall_defined
+#define __libm_hugevall_defined
+__LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, hugevall, __IEEE854_LONG_DOUBLE_C(1.000000000000000000e+4900));
+#endif /* !__libm_hugevall_defined */
 __LIBM_LOCAL_DECLARE_END
 
 __LOCAL __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__
@@ -182,7 +185,7 @@ __LOCAL __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__
 	__LIBM_GET_LDOUBLE_EXP(__hx, __x);
 	__ix = __hx & IEEE854_LONG_DOUBLE_MAXEXP;
 	if (__ix < 0x3fde) { /* |x|<2**-34 */
-		if (__LIBM_LOCAL_VALUE(asinh_hugevall) + __x > __LIBM_LOCAL_VALUE(onel))
+		if (__LIBM_LOCAL_VALUE(hugevall) + __x > __LIBM_LOCAL_VALUE(onel))
 			return __x; /* return x inexact except 0 */
 	}
 	if (__ix > 0x4020) { /* |x| > 2**34 */

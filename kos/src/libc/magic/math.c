@@ -437,7 +437,21 @@ double asinh(double x) {
 
 @@Hyperbolic arc tangent of `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__atanh")]]
-double atanh(double x); /* TODO */
+[[impl_include("<libm/fcomp.h>", "<libm/fabs.h>")]]
+[[impl_include("<bits/math-constants.h>", "<libm/matherr.h>")]]
+[[impl_include("<libm/nan.h>", "<libm/atanh.h>")]]
+[[requires_include("<ieee754.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+double atanh(double x) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    __LIBM_MATHFUNI2(@isgreaterequal@, __LIBM_MATHFUN(@fabs@, x), 1.0))
+		return __kernel_standard(x, x, __HUGE_VAL,
+		                         __ieee754_fabsf(x) > 1.0 ? __LIBM_KMATHERR_ATANH_PLUSONE /* atanh(|x|>1) */
+		                                                  : __LIBM_KMATHERR_ATANH_ONE);   /* atanh(|x|==1) */
+	return __LIBM_MATHFUN(@atanh@, x);
+}
 
 [[std, crtbuiltin, export_alias("__acoshf")]] acoshf(*) %{generate(double2float("acosh"))}
 [[std, crtbuiltin, export_alias("__asinhf")]] asinhf(*) %{generate(double2float("asinh"))}

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54825c32 */
+/* HASH CRC-32:0x4b1ce8b8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_atanhf_defined
 #define __local_atanhf_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_atanh_defined
 #define __local___localdep_atanh_defined
@@ -31,20 +32,44 @@ __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atanh,(double __x),atan
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atanh,(double __x),atanh,(__x))
 #elif defined(__CRT_HAVE___atanh)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atanh,(double __x),__atanh,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_END
+#include <libc/local/math/atanh.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_atanh __LIBC_LOCAL_NAME(atanh)
 #else /* ... */
 #undef __local___localdep_atanh_defined
 #endif /* !... */
 #endif /* !__local___localdep_atanh_defined */
+__NAMESPACE_LOCAL_END
+#include <libm/fcomp.h>
+#include <libm/fabs.h>
+#include <bits/math-constants.h>
+#include <libm/matherr.h>
+#include <libm/nan.h>
+#include <libm/atanh.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(atanhf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atanhf))(float __x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    __LIBM_MATHFUNI2F(isgreaterequal, __LIBM_MATHFUNF(fabs, __x), 1.0f))
+		return __kernel_standard_f(__x, __x, __HUGE_VALF,
+		                         __ieee754_fabsf(__x) > 1.0f ? __LIBM_KMATHERRF_ATANH_PLUSONE /* atanh(|x|>1) */
+		                                                  : __LIBM_KMATHERRF_ATANH_ONE);   /* atanh(|x|==1) */
+	return __LIBM_MATHFUNF(atanh, __x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)(__NAMESPACE_LOCAL_SYM __localdep_atanh)((double)__x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_atanhf_defined
 #define __local___localdep_atanhf_defined
 #define __localdep_atanhf __LIBC_LOCAL_NAME(atanhf)
 #endif /* !__local___localdep_atanhf_defined */
-#else /* __CRT_HAVE_atanh || __CRT_HAVE___atanh */
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_atanh || __CRT_HAVE___atanh || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #undef __local_atanhf_defined
-#endif /* !__CRT_HAVE_atanh && !__CRT_HAVE___atanh */
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ && !__CRT_HAVE_atanh && !__CRT_HAVE___atanh && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_atanhf_defined */
