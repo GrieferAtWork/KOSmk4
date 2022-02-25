@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4d9dbef */
+/* HASH CRC-32:0x3992c396 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -644,6 +644,12 @@ INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_sqrtl)(__LONGDOUBLE x);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Return `sqrt(x*x + y*y)' */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_hypot)(double x, double y);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Return `sqrt(x*x + y*y)' */
+INTDEF WUNUSED double NOTHROW(LIBCCALL libc_hypot)(double x, double y);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Return `sqrt(x*x + y*y)' */
 INTDEF WUNUSED float NOTHROW(LIBDCALL libd_hypotf)(float x, float y);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

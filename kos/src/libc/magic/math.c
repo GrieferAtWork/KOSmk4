@@ -841,7 +841,19 @@ double sqrt(double x) {
 %(std, c, ccompat)#if defined(__USE_XOPEN) || defined(__USE_ISOC99)
 @@Return `sqrt(x*x + y*y)'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__hypot")]]
-double hypot(double x, double y); /* TODO */
+[[impl_include("<libm/finite.h>", "<libm/matherr.h>")]]
+[[requires_include("<ieee754.h>"), impl_include("<libm/hypot.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+double hypot(double x, double y) {
+	double result = __LIBM_MATHFUN2(@hypot@, y, x);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && !__LIBM_MATHFUNI(@finite@, result) &&
+	    __LIBM_MATHFUNI(@finite@, x) && __LIBM_MATHFUNI(@finite@, y))
+		return __kernel_standard(x, y, result, __LIBM_KMATHERR_HYPOT); /* hypot overflow */
+	return result;
+}
+
 
 [[std, crtbuiltin, export_alias("__hypotf")]] hypotf(*) %{generate(double2float("hypot"))}
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE

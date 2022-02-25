@@ -839,6 +839,7 @@ incdir("");
 #include <libm/fmod.h>
 #include <libm/fpclassify.h>
 #include <libm/frexp.h>
+#include <libm/hypot.h>
 #include <libm/ilogb.h>
 #include <libm/inf.h>
 #include <libm/isinf.h>

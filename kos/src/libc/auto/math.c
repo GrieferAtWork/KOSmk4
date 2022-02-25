@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49da7054 */
+/* HASH CRC-32:0x40e09b8f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1481,17 +1481,56 @@ NOTHROW(LIBCCALL libc_sqrtl)(__LONGDOUBLE x) {
 	return (__LONGDOUBLE)libc_sqrt((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
+#include <libm/finite.h>
+#include <libm/matherr.h>
+#include <libm/hypot.h>
+/* Return `sqrt(x*x + y*y)' */
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
+NOTHROW(LIBCCALL libc_hypot)(double x,
+                             double y) {
+	double result = __LIBM_MATHFUN2(hypot, y, x);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && !__LIBM_MATHFUNI(finite, result) &&
+	    __LIBM_MATHFUNI(finite, x) && __LIBM_MATHFUNI(finite, y))
+		return __kernel_standard(x, y, result, __LIBM_KMATHERR_HYPOT); /* hypot overflow */
+	return result;
+}
+#include <libm/finite.h>
+#include <libm/matherr.h>
+#include <libm/hypot.h>
 /* Return `sqrt(x*x + y*y)' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_hypotf)(float x,
                               float y) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+	float result = __LIBM_MATHFUN2F(hypot, y, x);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && !__LIBM_MATHFUNIF(finite, result) &&
+	    __LIBM_MATHFUNIF(finite, x) && __LIBM_MATHFUNIF(finite, y))
+		return __kernel_standard_f(x, y, result, __LIBM_KMATHERRF_HYPOT); /* hypot overflow */
+	return result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)libc_hypot((double)x, (double)y);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
+#include <libm/finite.h>
+#include <libm/matherr.h>
+#include <libm/hypot.h>
 /* Return `sqrt(x*x + y*y)' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_hypotl)(__LONGDOUBLE x,
                               __LONGDOUBLE y) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+	__LONGDOUBLE result = __LIBM_MATHFUN2L(hypot, y, x);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && !__LIBM_MATHFUNIL(finite, result) &&
+	    __LIBM_MATHFUNIL(finite, x) && __LIBM_MATHFUNIL(finite, y))
+		return __kernel_standard_l(x, y, result, __LIBM_KMATHERRL_HYPOT); /* hypot overflow */
+	return result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)libc_hypot((double)x, (double)y);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 #include <libm/cbrt.h>
 /* Return the cube root of `x' */
@@ -3338,6 +3377,8 @@ DEFINE_PUBLIC_ALIAS(__powl, libc_powl);
 DEFINE_PUBLIC_ALIAS(powl, libc_powl);
 DEFINE_PUBLIC_ALIAS(__sqrtl, libc_sqrtl);
 DEFINE_PUBLIC_ALIAS(sqrtl, libc_sqrtl);
+DEFINE_PUBLIC_ALIAS(__hypot, libc_hypot);
+DEFINE_PUBLIC_ALIAS(hypot, libc_hypot);
 DEFINE_PUBLIC_ALIAS(__hypotf, libc_hypotf);
 DEFINE_PUBLIC_ALIAS(hypotf, libc_hypotf);
 DEFINE_PUBLIC_ALIAS(__hypotl, libc_hypotl);

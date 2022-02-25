@@ -71,20 +71,6 @@ NOTHROW(LIBCCALL libc_log2)(double x)
 }
 /*[[[end:libc_log2]]]*/
 
-/*[[[head:libc_hypot,hash:CRC-32=0x287788c0]]]*/
-/* Return `sqrt(x*x + y*y)' */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
-NOTHROW(LIBCCALL libc_hypot)(double x,
-                             double y)
-/*[[[body:libc_hypot]]]*/
-/*AUTO*/{
-	(void)x;
-	(void)y;
-	CRT_UNIMPLEMENTEDF("hypot(%f, %f)", x, y); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_hypot]]]*/
 
 /*[[[head:libc_erf,hash:CRC-32=0xb0818d9b]]]*/
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
@@ -235,13 +221,11 @@ NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x8f060aea]]]*/
+/*[[[start:exports,hash:CRC-32=0xe18ae9ed]]]*/
 DEFINE_PUBLIC_ALIAS(__exp2, libc_exp2);
 DEFINE_PUBLIC_ALIAS(exp2, libc_exp2);
 DEFINE_PUBLIC_ALIAS(__log2, libc_log2);
 DEFINE_PUBLIC_ALIAS(log2, libc_log2);
-DEFINE_PUBLIC_ALIAS(__hypot, libc_hypot);
-DEFINE_PUBLIC_ALIAS(hypot, libc_hypot);
 DEFINE_PUBLIC_ALIAS(__erf, libc_erf);
 DEFINE_PUBLIC_ALIAS(erf, libc_erf);
 DEFINE_PUBLIC_ALIAS(__erfc, libc_erfc);
