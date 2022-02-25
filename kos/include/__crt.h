@@ -414,9 +414,11 @@ template<class __S> struct __loc_T { typedef __S __T; };
 #ifndef __LIBC
 #if defined(__KOS__) && defined(__KERNEL__)
 #define __LIBC __PUBDEF
-#else /* __KOS__ && __KERNEL__ */
+#elif defined(__CRT_KOS) && defined(__BUILDING_LIBC)
+#define __LIBC __INTDEF
+#else /* ... */
 #define __LIBC __IMPDEF
-#endif /* !__KOS__ || !__KERNEL__ */
+#endif /* !... */
 #endif /* !__LIBC */
 
 
