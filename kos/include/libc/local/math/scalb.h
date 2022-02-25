@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf86283f1 */
+/* HASH CRC-32:0x1808e95c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,7 +65,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalb))(double __x, double __fn) {
 				if (!__LIBM_MATHFUN(isinf, __x) && !__LIBM_MATHFUN(isinf, __fn))
 					__result = __kernel_standard(__x, __fn, __result, __LIBM_KMATHERR_SCALB_OVERFLOW);
 			} else {
-				/* result == 0.  */
+				/* result == 0. */
 				if (__x != 0.0 && !__LIBM_MATHFUN(isinf, __fn))
 					__result = __kernel_standard(__x, __fn, __result, __LIBM_KMATHERR_SCALB_UNDERFLOW);
 			}

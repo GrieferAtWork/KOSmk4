@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfa67460 */
+/* HASH CRC-32:0x3a4374f4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,16 +26,16 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lgamma_r_defined
 #define __local___localdep_lgamma_r_defined
 #if __has_builtin(__builtin_lgamma_r) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma_r)
-__CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_lgamma_r,(double __x, int *__signgamp),lgamma_r,{ return __builtin_lgamma_r(__x, __signgamp); })
+__CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_lgamma_r,(double __x, int *__signgamp),lgamma_r,{ return __builtin_lgamma_r(__x, __signgamp); })
 #elif defined(__CRT_HAVE_lgamma_r)
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_lgamma_r,(double __x, int *__signgamp),lgamma_r,(__x,__signgamp))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_lgamma_r,(double __x, int *__signgamp),lgamma_r,(__x,__signgamp))
 #elif defined(__CRT_HAVE___lgamma_r)
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_lgamma_r,(double __x, int *__signgamp),__lgamma_r,(__x,__signgamp))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_lgamma_r,(double __x, int *__signgamp),__lgamma_r,(__x,__signgamp))
 #else /* ... */
 #undef __local___localdep_lgamma_r_defined
 #endif /* !... */
 #endif /* !__local___localdep_lgamma_r_defined */
-__LOCAL_LIBC(lgammaf_r) __ATTR_WUNUSED float
+__LOCAL_LIBC(lgammaf_r) __ATTR_WUNUSED __ATTR_NONNULL((2)) float
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lgammaf_r))(float __x, int *__signgamp) {
 	return (float)(__NAMESPACE_LOCAL_SYM __localdep_lgamma_r)((double)__x, __signgamp);
 }

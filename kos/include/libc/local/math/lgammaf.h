@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10e6a998 */
+/* HASH CRC-32:0x87a92d5a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,11 +27,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lgammaf_r_defined
 #define __local___localdep_lgammaf_r_defined
 #if __has_builtin(__builtin_lgammaf_r) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgammaf_r)
-__CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW_NCX,__localdep_lgammaf_r,(float __x, int *__signgamp),lgammaf_r,{ return __builtin_lgammaf_r(__x, __signgamp); })
+__CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,__localdep_lgammaf_r,(float __x, int *__signgamp),lgammaf_r,{ return __builtin_lgammaf_r(__x, __signgamp); })
 #elif defined(__CRT_HAVE_lgammaf_r)
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW_NCX,__localdep_lgammaf_r,(float __x, int *__signgamp),lgammaf_r,(__x,__signgamp))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,__localdep_lgammaf_r,(float __x, int *__signgamp),lgammaf_r,(__x,__signgamp))
 #elif defined(__CRT_HAVE___lgammaf_r)
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW_NCX,__localdep_lgammaf_r,(float __x, int *__signgamp),__lgammaf_r,(__x,__signgamp))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,__localdep_lgammaf_r,(float __x, int *__signgamp),__lgammaf_r,(__x,__signgamp))
 #elif defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/lgammaf_r.h>

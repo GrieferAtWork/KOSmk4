@@ -45,8 +45,9 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_exp2,hash:CRC-32=0xb4abe3cc]]]*/
-/* Compute base-2 exponential of `x' */
+/*[[[head:libc_exp2,hash:CRC-32=0x33a7512]]]*/
+/* >> exp2f(3), exp2(3), exp2l(3)
+ * Compute base-2 exponential of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_exp2)(double x)
 /*[[[body:libc_exp2]]]*/
@@ -58,8 +59,9 @@ NOTHROW(LIBCCALL libc_exp2)(double x)
 }
 /*[[[end:libc_exp2]]]*/
 
-/*[[[head:libc_log2,hash:CRC-32=0xb32e7b4d]]]*/
-/* Compute base-2 logarithm of `x' */
+/*[[[head:libc_log2,hash:CRC-32=0x73bb506f]]]*/
+/* >> log2f(3), log2(3), log2l(3)
+ * Compute base-2 logarithm of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_log2)(double x)
 /*[[[body:libc_log2]]]*/
@@ -72,7 +74,8 @@ NOTHROW(LIBCCALL libc_log2)(double x)
 /*[[[end:libc_log2]]]*/
 
 
-/*[[[head:libc_erf,hash:CRC-32=0xb0818d9b]]]*/
+/*[[[head:libc_erf,hash:CRC-32=0xd7c3b940]]]*/
+/* >> erff(3), erf(3), erfl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_erf)(double x)
 /*[[[body:libc_erf]]]*/
@@ -84,7 +87,8 @@ NOTHROW(LIBCCALL libc_erf)(double x)
 }
 /*[[[end:libc_erf]]]*/
 
-/*[[[head:libc_erfc,hash:CRC-32=0x18a21f35]]]*/
+/*[[[head:libc_erfc,hash:CRC-32=0xce96c7f8]]]*/
+/* >> erfcf(3), erfc(3), erfcl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_erfc)(double x)
 /*[[[body:libc_erfc]]]*/
@@ -97,8 +101,9 @@ NOTHROW(LIBCCALL libc_erfc)(double x)
 /*[[[end:libc_erfc]]]*/
 
 
-/*[[[head:libc_tgamma,hash:CRC-32=0xc880fc24]]]*/
-/* True gamma function */
+/*[[[head:libc_tgamma,hash:CRC-32=0x5809c86d]]]*/
+/* >> tgammaf(3), tgamma(3), tgammal(3)
+ * True gamma function */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_tgamma)(double x)
 /*[[[body:libc_tgamma]]]*/
@@ -113,7 +118,8 @@ NOTHROW(LIBCCALL libc_tgamma)(double x)
 
 
 
-/*[[[head:libc_j0,hash:CRC-32=0xe72a9130]]]*/
+/*[[[head:libc_j0,hash:CRC-32=0x11322994]]]*/
+/* >> j0f(3), j0(3), j0l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_j0)(double x)
 /*[[[body:libc_j0]]]*/
@@ -125,7 +131,8 @@ NOTHROW(LIBCCALL libc_j0)(double x)
 }
 /*[[[end:libc_j0]]]*/
 
-/*[[[head:libc_j1,hash:CRC-32=0x3abc48b5]]]*/
+/*[[[head:libc_j1,hash:CRC-32=0x4171b981]]]*/
+/* >> j1f(3), j1(3), j1l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_j1)(double x)
 /*[[[body:libc_j1]]]*/
@@ -137,7 +144,8 @@ NOTHROW(LIBCCALL libc_j1)(double x)
 }
 /*[[[end:libc_j1]]]*/
 
-/*[[[head:libc_jn,hash:CRC-32=0xd8adecab]]]*/
+/*[[[head:libc_jn,hash:CRC-32=0x70531502]]]*/
+/* >> jnf(3), jn(3), jnl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_jn)(int n,
                           double x)
@@ -151,7 +159,8 @@ NOTHROW(LIBCCALL libc_jn)(int n,
 }
 /*[[[end:libc_jn]]]*/
 
-/*[[[head:libc_y0,hash:CRC-32=0xfdf98887]]]*/
+/*[[[head:libc_y0,hash:CRC-32=0xc9cba8ec]]]*/
+/* >> y0f(3), y0(3), y0l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_y0)(double x)
 /*[[[body:libc_y0]]]*/
@@ -163,7 +172,8 @@ NOTHROW(LIBCCALL libc_y0)(double x)
 }
 /*[[[end:libc_y0]]]*/
 
-/*[[[head:libc_y1,hash:CRC-32=0x206f5102]]]*/
+/*[[[head:libc_y1,hash:CRC-32=0x998838f9]]]*/
+/* >> y1f(3), y1(3), y1l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_y1)(double x)
 /*[[[body:libc_y1]]]*/
@@ -175,7 +185,8 @@ NOTHROW(LIBCCALL libc_y1)(double x)
 }
 /*[[[end:libc_y1]]]*/
 
-/*[[[head:libc_yn,hash:CRC-32=0x42035811]]]*/
+/*[[[head:libc_yn,hash:CRC-32=0x879fa852]]]*/
+/* >> ynf(3), yn(3), ynl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_yn)(int n,
                           double x)
@@ -189,11 +200,10 @@ NOTHROW(LIBCCALL libc_yn)(int n,
 }
 /*[[[end:libc_yn]]]*/
 
-/*[[[head:libc_lgamma_r,hash:CRC-32=0x804e0019]]]*/
-/* Reentrant version of lgamma. This function uses the global variable
- * `signgam'. The reentrant version instead takes a pointer and stores
- * the value through it */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
+/*[[[head:libc_lgamma_r,hash:CRC-32=0x337180a4]]]*/
+/* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
+ * Reentrant version of `lgamma(3)' */
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((2)) double
 NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x,
                                     int *signgamp)
 /*[[[body:libc_lgamma_r]]]*/

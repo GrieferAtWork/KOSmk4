@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2e51e90 */
+/* HASH CRC-32:0xa7c2d88b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -95,7 +95,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(exp10f))(float __x) {
 	float __result;
 	__result = (float)(__NAMESPACE_LOCAL_SYM __localdep_exp)(2.30258509299404568402 * (double)__x);
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && !(__NAMESPACE_LOCAL_SYM __localdep_finitef)(__result) && (__NAMESPACE_LOCAL_SYM __localdep_finitef)(__x)) {
-		/* exp10 overflow (46) if x > 0, underflow (47) if x < 0.  */
+		/* exp10 overflow (46) if x > 0, underflow (47) if x < 0. */
 		return __kernel_standard_f(__x, __x, __result, (__NAMESPACE_LOCAL_SYM __localdep___signbitf)(__x)
 		                           ? __LIBM_KMATHERRF_EXP10_UNDERFLOW
 		                           : __LIBM_KMATHERRF_EXP10_OVERFLOW);

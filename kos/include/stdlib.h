@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc78619b4 */
+/* HASH CRC-32:0xa4dd1099 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -613,13 +613,16 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED struct __lldiv_struct
 #if defined(__CORRECT_ISO_CPP_MATH_H_PROTO) && !defined(__NO_FPU)
 extern "C++" {
 #if __has_builtin(__builtin_fabsf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabsf)
-/* Absolute value of `x' */
+/* >> fabsf(3), fabs(3), fabsl(3)
+ * Absolute value of `x' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,abs,(float __x),fabsf,{ return __builtin_fabsf(__x); })
 #elif defined(__CRT_HAVE_fabsf)
-/* Absolute value of `x' */
+/* >> fabsf(3), fabs(3), fabsl(3)
+ * Absolute value of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,abs,(float __x),fabsf,(__x))
 #elif defined(__CRT_HAVE___fabsf)
-/* Absolute value of `x' */
+/* >> fabsf(3), fabs(3), fabsl(3)
+ * Absolute value of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,abs,(float __x),__fabsf,(__x))
 #else /* ... */
 } /* extern "C++" */
@@ -627,17 +630,21 @@ __NAMESPACE_STD_END
 #include <libc/local/math/fabsf.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
-/* Absolute value of `x' */
+/* >> fabsf(3), fabs(3), fabsl(3)
+ * Absolute value of `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL abs)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsf))(__x); }
 #endif /* !... */
 #if __has_builtin(__builtin_fabs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabs)
-/* Absolute value of `x' */
+/* >> fabsf(3), fabs(3), fabsl(3)
+ * Absolute value of `x' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,abs,(double __x),fabs,{ return __builtin_fabs(__x); })
 #elif defined(__CRT_HAVE_fabs)
-/* Absolute value of `x' */
+/* >> fabsf(3), fabs(3), fabsl(3)
+ * Absolute value of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,abs,(double __x),fabs,(__x))
 #elif defined(__CRT_HAVE___fabs)
-/* Absolute value of `x' */
+/* >> fabsf(3), fabs(3), fabsl(3)
+ * Absolute value of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,abs,(double __x),__fabs,(__x))
 #else /* ... */
 } /* extern "C++" */
@@ -645,20 +652,24 @@ __NAMESPACE_STD_END
 #include <libc/local/math/fabs.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
-/* Absolute value of `x' */
+/* >> fabsf(3), fabs(3), fabsl(3)
+ * Absolute value of `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL abs)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabs))(__x); }
 #endif /* !... */
 } /* extern "C++" */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 extern "C++" {
 #if __has_builtin(__builtin_fabsl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabsl)
-/* Absolute value of `x' */
+/* >> fabsf(3), fabs(3), fabsl(3)
+ * Absolute value of `x' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,abs,(__LONGDOUBLE __x),fabsl,{ return __builtin_fabsl(__x); })
 #elif defined(__CRT_HAVE_fabsl)
-/* Absolute value of `x' */
+/* >> fabsf(3), fabs(3), fabsl(3)
+ * Absolute value of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,abs,(__LONGDOUBLE __x),fabsl,(__x))
 #elif defined(__CRT_HAVE___fabsl)
-/* Absolute value of `x' */
+/* >> fabsf(3), fabs(3), fabsl(3)
+ * Absolute value of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,abs,(__LONGDOUBLE __x),__fabsl,(__x))
 #else /* ... */
 } /* extern "C++" */
@@ -666,7 +677,8 @@ __NAMESPACE_STD_END
 #include <libc/local/math/fabsl.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
-/* Absolute value of `x' */
+/* >> fabsf(3), fabs(3), fabsl(3)
+ * Absolute value of `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL abs)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsl))(__x); }
 #endif /* !... */
 } /* extern "C++" */
