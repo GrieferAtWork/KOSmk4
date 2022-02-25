@@ -871,6 +871,7 @@ incdir("");
 #include <libm/sin.h>
 #include <libm/sincos.h>
 #include <libm/sincos_table.h>
+#include <libm/sinh.h>
 #include <libm/sqrt.h>
 #include <libm/tan.h>
 #include <libm/trunc.h>

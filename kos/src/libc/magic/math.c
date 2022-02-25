@@ -403,7 +403,18 @@ double cosh(double x) {
 
 @@Hyperbolic sine of `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__sinh")]]
-double sinh(double x); /* TODO */
+[[impl_include("<libm/finite.h>", "<libm/sinh.h>", "<libm/matherr.h>")]]
+[[requires_include("<ieee754.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+double sinh(double x) {
+	double result = __LIBM_MATHFUN(@sinh@, x);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+		!__LIBM_MATHFUNI(@finite@, result) && __LIBM_MATHFUNI(@finite@, x))
+		result = __kernel_standard(x, x, result, __LIBM_KMATHERR_SINH);
+	return result;
+}
 
 @@Hyperbolic tangent of `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__tanh")]]

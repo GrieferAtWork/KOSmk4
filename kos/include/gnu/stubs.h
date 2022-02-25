@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f7f6879 */
+/* HASH CRC-32:0xf2cc84b9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -659,8 +659,6 @@
 #define __stub_shmdt
 #define __stub_shmget
 #define __stub_sigreturn
-#define __stub___sinh
-#define __stub_sinh
 #define __stub_sradixsort
 #define __stub_srand48
 #define __stub_srand48_r

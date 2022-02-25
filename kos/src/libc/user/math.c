@@ -36,18 +36,6 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_sinh,hash:CRC-32=0x26b05af6]]]*/
-/* Hyperbolic sine of `x' */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
-NOTHROW(LIBCCALL libc_sinh)(double x)
-/*[[[body:libc_sinh]]]*/
-/*AUTO*/{
-	(void)x;
-	CRT_UNIMPLEMENTEDF("sinh(%f)", x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_sinh]]]*/
 
 /*[[[head:libc_tanh,hash:CRC-32=0x168c3e]]]*/
 /* Hyperbolic tangent of `x' */
@@ -301,9 +289,7 @@ NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x171ffcba]]]*/
-DEFINE_PUBLIC_ALIAS(__sinh, libc_sinh);
-DEFINE_PUBLIC_ALIAS(sinh, libc_sinh);
+/*[[[start:exports,hash:CRC-32=0x8b46b35f]]]*/
 DEFINE_PUBLIC_ALIAS(__tanh, libc_tanh);
 DEFINE_PUBLIC_ALIAS(tanh, libc_tanh);
 DEFINE_PUBLIC_ALIAS(__log10, libc_log10);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x270b69f1 */
+/* HASH CRC-32:0xae5cf800 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -208,6 +208,12 @@ INTDEF WUNUSED double NOTHROW(LIBCCALL libc_cosh)(double x);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Hyperbolic sine of `x' */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_sinh)(double x);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* Hyperbolic sine of `x' */
+INTDEF WUNUSED double NOTHROW(LIBCCALL libc_sinh)(double x);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Hyperbolic tangent of `x' */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_tanh)(double x);
 /* Hyperbolic cosine of `x' */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e9f81f */
+/* HASH CRC-32:0xcb3efa15 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -414,6 +414,18 @@ NOTHROW(LIBCCALL libc_cosh)(double x) {
 	return result;
 }
 #include <libm/finite.h>
+#include <libm/sinh.h>
+#include <libm/matherr.h>
+/* Hyperbolic sine of `x' */
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
+NOTHROW(LIBCCALL libc_sinh)(double x) {
+	double result = __LIBM_MATHFUN(sinh, x);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+		!__LIBM_MATHFUNI(finite, result) && __LIBM_MATHFUNI(finite, x))
+		result = __kernel_standard(x, x, result, __LIBM_KMATHERR_SINH);
+	return result;
+}
+#include <libm/finite.h>
 #include <libm/cosh.h>
 #include <libm/matherr.h>
 /* Hyperbolic cosine of `x' */
@@ -431,10 +443,23 @@ NOTHROW(LIBCCALL libc_coshf)(float x) {
 	return (float)libc_cosh((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
+#include <libm/finite.h>
+#include <libm/sinh.h>
+#include <libm/matherr.h>
 /* Hyperbolic sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_sinhf)(float x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+	float result = __LIBM_MATHFUNF(sinh, x);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+		!__LIBM_MATHFUNIF(finite, result) && __LIBM_MATHFUNIF(finite, x))
+		result = __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_SINH);
+	return result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)libc_sinh((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 /* Hyperbolic tangent of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
@@ -459,10 +484,23 @@ NOTHROW(LIBCCALL libc_coshl)(__LONGDOUBLE x) {
 	return (__LONGDOUBLE)libc_cosh((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
+#include <libm/finite.h>
+#include <libm/sinh.h>
+#include <libm/matherr.h>
 /* Hyperbolic sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_sinhl)(__LONGDOUBLE x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+	__LONGDOUBLE result = __LIBM_MATHFUNL(sinh, x);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+		!__LIBM_MATHFUNIL(finite, result) && __LIBM_MATHFUNIL(finite, x))
+		result = __kernel_standard_l(x, x, result, __LIBM_KMATHERRL_SINH);
+	return result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)libc_sinh((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 /* Hyperbolic tangent of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
@@ -3037,6 +3075,8 @@ DEFINE_PUBLIC_ALIAS(__tanl, libc_tanl);
 DEFINE_PUBLIC_ALIAS(tanl, libc_tanl);
 DEFINE_PUBLIC_ALIAS(__cosh, libc_cosh);
 DEFINE_PUBLIC_ALIAS(cosh, libc_cosh);
+DEFINE_PUBLIC_ALIAS(__sinh, libc_sinh);
+DEFINE_PUBLIC_ALIAS(sinh, libc_sinh);
 DEFINE_PUBLIC_ALIAS(__coshf, libc_coshf);
 DEFINE_PUBLIC_ALIAS(coshf, libc_coshf);
 DEFINE_PUBLIC_ALIAS(__sinhf, libc_sinhf);
