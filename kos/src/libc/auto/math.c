@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6ae9f47 */
+/* HASH CRC-32:0x49da7054 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2511,6 +2511,26 @@ NOTHROW(LIBCCALL libc_sincos)(double x,
 	*pcosx = libc_cos(x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 }
+#include <hybrid/floatcore.h>
+#include <bits/crt/fenv.h>
+#include <libm/matherr.h>
+/* A function missing in all standards: compute exponent to base ten */
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
+NOTHROW(LIBCCALL libc_exp10)(double x) {
+	double result;
+	if (libc_finite(x) && x < __DBL_MIN_10_EXP__ - __DBL_DIG__ - 10) {
+		libc_feraiseexcept(FE_UNDERFLOW);
+		return 0.0;
+	}
+	result = libc_exp(2.30258509299404568402 * x);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && !libc_finite(result) && libc_finite(x)) {
+		/* exp10 overflow (46) if x > 0, underflow (47) if x < 0.  */
+		return __kernel_standard(x, x, result, libc___signbit(x)
+		                         ? __LIBM_KMATHERR_EXP10_UNDERFLOW
+		                         : __LIBM_KMATHERR_EXP10_OVERFLOW);
+	}
+	return result;
+}
 /* Another name occasionally used */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_pow10)(double x) {
@@ -2534,10 +2554,20 @@ NOTHROW(LIBCCALL libc_sincosf)(float x,
 	*pcosx = libc_cosf(x);
 #endif /* !... */
 }
-/* A function missing in all standards: compute exponent to base ten */
+#include <hybrid/floatcore.h>
+#include <bits/crt/fenv.h>
+#include <libm/matherr.h>
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_exp10f)(float x) {
-	return (float)libc_exp10((double)x);
+	float result;
+	result = (float)libc_exp(2.30258509299404568402 * (double)x);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && !libc_finitef(result) && libc_finitef(x)) {
+		/* exp10 overflow (46) if x > 0, underflow (47) if x < 0.  */
+		return __kernel_standard_f(x, x, result, libc___signbitf(x)
+		                           ? __LIBM_KMATHERRF_EXP10_UNDERFLOW
+		                           : __LIBM_KMATHERRF_EXP10_OVERFLOW);
+	}
+	return result;
 }
 /* Another name occasionally used */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
@@ -2566,10 +2596,24 @@ NOTHROW(LIBCCALL libc_sincosl)(__LONGDOUBLE x,
 	*pcosx = libc_cosl(x);
 #endif /* !... */
 }
-/* A function missing in all standards: compute exponent to base ten */
+#include <hybrid/floatcore.h>
+#include <bits/crt/fenv.h>
+#include <libm/matherr.h>
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_exp10l)(__LONGDOUBLE x) {
-	return (__LONGDOUBLE)libc_exp10((double)x);
+	__LONGDOUBLE result;
+	if (libc_finitel(x) && x < __LDBL_MIN_10_EXP__ - __LDBL_DIG__ - 10) {
+		libc_feraiseexcept(FE_UNDERFLOW);
+		return 0.0L;
+	}
+	result = libc_expl(2.302585092994045684017991454684364208L * x);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && !libc_finitel(result) && libc_finitel(x)) {
+		/* exp10 overflow (46) if x > 0, underflow (47) if x < 0.  */
+		return __kernel_standard_l(x, x, result, libc___signbitl(x)
+		                           ? __LIBM_KMATHERRL_EXP10_UNDERFLOW
+		                           : __LIBM_KMATHERRL_EXP10_OVERFLOW);
+	}
+	return result;
 }
 /* Another name occasionally used */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
@@ -3490,6 +3534,8 @@ DEFINE_PUBLIC_ALIAS(__llroundl, libc_llroundl);
 DEFINE_PUBLIC_ALIAS(llroundl, libc_llroundl);
 DEFINE_PUBLIC_ALIAS(__sincos, libc_sincos);
 DEFINE_PUBLIC_ALIAS(sincos, libc_sincos);
+DEFINE_PUBLIC_ALIAS(__exp10, libc_exp10);
+DEFINE_PUBLIC_ALIAS(exp10, libc_exp10);
 DEFINE_PUBLIC_ALIAS(__pow10, libc_pow10);
 DEFINE_PUBLIC_ALIAS(pow10, libc_pow10);
 DEFINE_PUBLIC_ALIAS(__sincosf, libc_sincosf);

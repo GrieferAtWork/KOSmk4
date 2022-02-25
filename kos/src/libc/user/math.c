@@ -137,18 +137,6 @@ NOTHROW(LIBCCALL libc_tgamma)(double x)
 
 
 
-/*[[[head:libc_exp10,hash:CRC-32=0x81e7bc56]]]*/
-/* A function missing in all standards: compute exponent to base ten */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
-NOTHROW(LIBCCALL libc_exp10)(double x)
-/*[[[body:libc_exp10]]]*/
-/*AUTO*/{
-	(void)x;
-	CRT_UNIMPLEMENTEDF("exp10(%f)", x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_exp10]]]*/
 
 /*[[[head:libc_j0,hash:CRC-32=0xe72a9130]]]*/
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
@@ -247,7 +235,7 @@ NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xa265211]]]*/
+/*[[[start:exports,hash:CRC-32=0x8f060aea]]]*/
 DEFINE_PUBLIC_ALIAS(__exp2, libc_exp2);
 DEFINE_PUBLIC_ALIAS(exp2, libc_exp2);
 DEFINE_PUBLIC_ALIAS(__log2, libc_log2);
@@ -264,8 +252,6 @@ DEFINE_PUBLIC_ALIAS(__gamma, libc_lgamma);
 DEFINE_PUBLIC_ALIAS(lgamma, libc_lgamma);
 DEFINE_PUBLIC_ALIAS(__tgamma, libc_tgamma);
 DEFINE_PUBLIC_ALIAS(tgamma, libc_tgamma);
-DEFINE_PUBLIC_ALIAS(__exp10, libc_exp10);
-DEFINE_PUBLIC_ALIAS(exp10, libc_exp10);
 DEFINE_PUBLIC_ALIAS(__j0, libc_j0);
 DEFINE_PUBLIC_ALIAS(j0, libc_j0);
 DEFINE_PUBLIC_ALIAS(__j1, libc_j1);

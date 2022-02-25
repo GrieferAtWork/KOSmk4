@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32438d1 */
+/* HASH CRC-32:0x9df4d122 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,8 +42,6 @@ INTDEF WUNUSED double NOTHROW(LIBCCALL libc_erfc)(double x);
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_lgamma)(double x);
 /* True gamma function */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_tgamma)(double x);
-/* A function missing in all standards: compute exponent to base ten */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_exp10)(double x);
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_j0)(double x);
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_j1)(double x);
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_jn)(int n, double x);

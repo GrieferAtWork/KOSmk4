@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7912264 */
+/* HASH CRC-32:0xb4d9dbef */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1333,6 +1333,12 @@ INTDEF __DECL_SIMD_sincos NONNULL((2, 3)) void NOTHROW(LIBCCALL libc_sincos)(dou
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* A function missing in all standards: compute exponent to base ten */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_exp10)(double x);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* A function missing in all standards: compute exponent to base ten */
+INTDEF WUNUSED double NOTHROW(LIBCCALL libc_exp10)(double x);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Another name occasionally used */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_pow10)(double x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -1349,11 +1355,9 @@ INTDEF __DECL_SIMD_sincosf NONNULL((2, 3)) void NOTHROW(LIBDCALL libd_sincosf)(f
 INTDEF __DECL_SIMD_sincosf NONNULL((2, 3)) void NOTHROW(LIBCCALL libc_sincosf)(float x, float *psinx, float *pcosx);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* A function missing in all standards: compute exponent to base ten */
 INTDEF WUNUSED float NOTHROW(LIBDCALL libd_exp10f)(float x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* A function missing in all standards: compute exponent to base ten */
 INTDEF WUNUSED float NOTHROW(LIBCCALL libc_exp10f)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -1373,11 +1377,9 @@ INTDEF __DECL_SIMD_sincosl NONNULL((2, 3)) void NOTHROW(LIBDCALL libd_sincosl)(_
 INTDEF __DECL_SIMD_sincosl NONNULL((2, 3)) void NOTHROW(LIBCCALL libc_sincosl)(__LONGDOUBLE x, __LONGDOUBLE *psinx, __LONGDOUBLE *pcosx);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* A function missing in all standards: compute exponent to base ten */
 INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_exp10l)(__LONGDOUBLE x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* A function missing in all standards: compute exponent to base ten */
 INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_exp10l)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
