@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7747a69 */
+/* HASH CRC-32:0xeb6d86f8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3627,6 +3627,78 @@ NOTHROW(LIBCCALL libc___issignalingl)(__LONGDOUBLE x) {
 	return libc___issignaling((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
+#include <libm/fcomp.h>
+/* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
+INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__dpcomp)(double x,
+                                   double y) {
+	int result = 0;
+	if (!__LIBM_MATHFUN2(isunordered, x, y)) {
+		if (__LIBM_MATHFUN2(isgreater, x, y))
+			result |= 4;
+		if (__LIBM_MATHFUN2(isgreaterequal, x, y))
+			result |= 2 | 4;
+		if (__LIBM_MATHFUN2(isless, x, y))
+			result |= 1;
+		if (__LIBM_MATHFUN2(islessequal, x, y))
+			result |= 1 | 2;
+		if (__LIBM_MATHFUN2(islessgreater, x, y))
+			result |= 1 | 4;
+	}
+	return result;
+}
+#include <libm/fcomp.h>
+/* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
+INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__fdpcomp)(float x,
+                                    float y) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+	int result = 0;
+	if (!__LIBM_MATHFUN2F(isunordered, x, y)) {
+		if (__LIBM_MATHFUN2F(isgreater, x, y))
+			result |= 4;
+		if (__LIBM_MATHFUN2F(isgreaterequal, x, y))
+			result |= 2 | 4;
+		if (__LIBM_MATHFUN2F(isless, x, y))
+			result |= 1;
+		if (__LIBM_MATHFUN2F(islessequal, x, y))
+			result |= 1 | 2;
+		if (__LIBM_MATHFUN2F(islessgreater, x, y))
+			result |= 1 | 4;
+	}
+	return result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+	return libc__dpcomp((double)x, (double)y);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+}
+#include <libm/fcomp.h>
+/* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
+INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__ldpcomp)(__LONGDOUBLE x,
+                                    __LONGDOUBLE y) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+	int result = 0;
+	if (!__LIBM_MATHFUN2L(isunordered, x, y)) {
+		if (__LIBM_MATHFUN2L(isgreater, x, y))
+			result |= 4;
+		if (__LIBM_MATHFUN2L(isgreaterequal, x, y))
+			result |= 2 | 4;
+		if (__LIBM_MATHFUN2L(isless, x, y))
+			result |= 1;
+		if (__LIBM_MATHFUN2L(islessequal, x, y))
+			result |= 1 | 2;
+		if (__LIBM_MATHFUN2L(islessgreater, x, y))
+			result |= 1 | 4;
+	}
+	return result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+	return libc__dpcomp((double)x, (double)y);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+}
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 #undef signgam
@@ -4170,6 +4242,9 @@ DEFINE_PUBLIC_ALIAS(issignalingf, libc___issignalingf);
 DEFINE_PUBLIC_ALIAS(__issignalingf, libc___issignalingf);
 DEFINE_PUBLIC_ALIAS(issignalingl, libc___issignalingl);
 DEFINE_PUBLIC_ALIAS(__issignalingl, libc___issignalingl);
+DEFINE_PUBLIC_ALIAS(_dpcomp, libc__dpcomp);
+DEFINE_PUBLIC_ALIAS(_fdpcomp, libc__fdpcomp);
+DEFINE_PUBLIC_ALIAS(_ldpcomp, libc__ldpcomp);
 DEFINE_PUBLIC_ALIAS(DOS$_dtest, libd__dtest);
 DEFINE_PUBLIC_ALIAS(_dtest, libc__dtest);
 DEFINE_PUBLIC_ALIAS(DOS$_fdtest, libd__fdtest);

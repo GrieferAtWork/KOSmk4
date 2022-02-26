@@ -1254,6 +1254,7 @@
 #define __CRT_HAVE__dclass
 #define __CRT_HAVE__difftime64
 #define __CRT_HAVE__dosmaperr
+#define __CRT_HAVE__dpcomp
 #define __CRT_HAVE__dsign
 #define __CRT_HAVE__dtest
 #define __CRT_HAVE__dup
@@ -1288,6 +1289,7 @@
 #define __CRT_HAVE__fcvt_s
 #define __CRT_HAVE__fdclass
 #define __CRT_HAVE__fdopen
+#define __CRT_HAVE__fdpcomp
 #define __CRT_HAVE__fdsign
 #define __CRT_HAVE__fdtest
 #define __CRT_HAVE__fflush_nolock
@@ -1428,6 +1430,7 @@
 #define __CRT_HAVE__itow
 #define __CRT_HAVE__itow_s
 #define __CRT_HAVE__ldclass
+#define __CRT_HAVE__ldpcomp
 #define __CRT_HAVE__ldsign
 #define __CRT_HAVE__ldtest
 #define __CRT_HAVE__lfind

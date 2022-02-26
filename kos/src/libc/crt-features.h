@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c70590f */
+/* HASH CRC-32:0x46bd4510 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -244,6 +244,7 @@
 #define __CRT_HAVE_DOS$_controlfp
 #define __CRT_HAVE_DOS$_controlfp_s
 #define __CRT_HAVE_DOS$_create_locale
+#define __CRT_HAVE_DOS$_dpcomp
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$_dtest
@@ -256,6 +257,11 @@
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$_fcvt_s
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$_fdpcomp
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$_fdtest
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -340,6 +346,11 @@
 #define __CRT_HAVE_DOS$_itoa_s
 #define __CRT_HAVE_DOS$_itow
 #define __CRT_HAVE_DOS$_itow_s
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$_ldpcomp
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$_ldtest
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -3844,6 +3855,7 @@
 #define __CRT_HAVE__controlfp
 #define __CRT_HAVE__controlfp_s
 #define __CRT_HAVE__create_locale
+#define __CRT_HAVE__dpcomp
 #define __CRT_HAVE__dtest
 #define __CRT_HAVE__dupenv_s
 #define __CRT_HAVE__dupenv_s_dbg
@@ -3858,6 +3870,7 @@
 #ifndef __KERNEL__
 #define __CRT_HAVE__expand_dbg
 #define __CRT_HAVE__fcvt_s
+#define __CRT_HAVE__fdpcomp
 #define __CRT_HAVE__fdtest
 #define __CRT_HAVE__filbuf
 #define __CRT_HAVE__filelength
@@ -3939,6 +3952,7 @@
 #define __CRT_HAVE__itoa_upper_digits
 #define __CRT_HAVE__itow
 #define __CRT_HAVE__itow_s
+#define __CRT_HAVE__ldpcomp
 #define __CRT_HAVE__ldtest
 #define __CRT_HAVE__lfind_s
 #define __CRT_HAVE__loaddll

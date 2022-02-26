@@ -2567,18 +2567,33 @@ __issignalingl(*) %{generate(double2ldouble("__issignaling"))}
 %#endif /* __USE_GNU */
 
 @@>> _fdpcomp(3), _dpcomp(3), _ldpcomp(3)
-[[ignore, nocrt, alias("_dpcomp"), const, wunused]]
-int _dpcomp(double x, double y) /* TODO */;
+[[ignore, const, wunused]]
+[[section(".text.crt.dos.math.math")]]
+[[requires_include("<ieee754.h>"), impl_include("<libm/fcomp.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+int _dpcomp(double x, double y) {
+	int result = 0;
+	if (!__LIBM_MATHFUN2(@isunordered@, x, y)) {
+		if (__LIBM_MATHFUN2(@isgreater@, x, y))
+			result |= 4;
+		if (__LIBM_MATHFUN2(@isgreaterequal@, x, y))
+			result |= 2 | 4;
+		if (__LIBM_MATHFUN2(@isless@, x, y))
+			result |= 1;
+		if (__LIBM_MATHFUN2(@islessequal@, x, y))
+			result |= 1 | 2;
+		if (__LIBM_MATHFUN2(@islessgreater@, x, y))
+			result |= 1 | 4;
+	}
+	return result;
+}
 
-[[ignore, nocrt, alias("_fdpcomp")]] _fdpcomp(*) %{generate(double2float("_dpcomp"))}
-[[ignore, nocrt, alias("_ldpcomp")]] _ldpcomp(*) %{generate(double2ldouble("_dpcomp"))}
-
-%[insert:function(__dos_dpcomp = _dpcomp)]
-%[insert:function(__dos_fdpcomp = _fdpcomp)]
-%#ifdef __COMPILER_HAVE_LONGDOUBLE
-%[insert:function(__dos_ldpcomp = _ldpcomp)]
-%#endif /* __COMPILER_HAVE_LONGDOUBLE */
-
+[[section(".text.crt.dos.math.math")]]
+[[ignore]] _fdpcomp(*) %{generate(double2float("_dpcomp"))}
+[[section(".text.crt.dos.math.math")]]
+[[ignore]] _ldpcomp(*) %{generate(double2ldouble("_dpcomp"))}
 
 %(auto_source){
 #ifndef __KERNEL__
@@ -2842,18 +2857,25 @@ typedef __double_t double_t;
 #endif /* !isinf */
 
 #ifdef __USE_ISOC99
-#if defined(__CRT_HAVE__dpcomp) && !defined(__stub__dpcomp)
-#define __DOS_FPCOMPARE(x, y) __FPFUNC2(x, y, __dos_fdpcomp, __dos_dpcomp, __dos_ldpcomp)
-#endif /* __CRT_HAVE__dpcomp && !__stub__dpcomp */
+#if ((defined(__CRT_HAVE__dpcomp) && !defined(__stub__dpcomp)) &&    \
+     (defined(__CRT_HAVE__fdpcomp) && !defined(__stub__fdpcomp)) &&  \
+     ((defined(__CRT_HAVE__ldpcomp) && !defined(__stub__ldpcomp)) || \
+       defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)))
+#undef __PRIVATE_DOS_FPCOMPARE_USED /* vvv Only use if no alternative, or on WIN32 */
+#if (!defined(__LIBM_MATHFUNXF) || !defined(__LIBM_MATHFUNX) || !defined(__LIBM_MATHFUNXL) || defined(_WIN32))
+#define __PRIVATE_DOS_FPCOMPARE(x, y) __FPFUNC2(x, y, _fdpcomp, _dpcomp, _ldpcomp)
+#endif /* ... */
+#endif /* ... */
 
 /* Generic... */
 #ifndef isunordered
 #if __has_builtin(__builtin_isunordered) && !defined(__OPTIMIZE_SIZE__)
 #define isunordered(u, v) __builtin_isunordered(u, v)
+#elif defined(__PRIVATE_DOS_FPCOMPARE)
+#define __PRIVATE_DOS_FPCOMPARE_USED
+#define isunordered(u, v) (__PRIVATE_DOS_FPCOMPARE(u, v) == 0)
 #elif defined(__LIBM_MATHFUNXF) && defined(__LIBM_MATHFUNX) && defined(__LIBM_MATHFUNXL)
 #define isunordered(u, v) __FPFUNC2(u, v, __LIBM_MATHFUNXF(isunordered), __LIBM_MATHFUNX(isunordered), __LIBM_MATHFUNXL(isunordered))
-#elif defined(__DOS_FPCOMPARE)
-#define isunordered(u, v) (__DOS_FPCOMPARE(u, v) == 0)
 #elif defined(fpclassify) && defined(__FP_NAN)
 #define isunordered(u, v) (fpclassify(u) == __FP_NAN || fpclassify(v) == __FP_NAN)
 #else /* ... */
@@ -2864,10 +2886,11 @@ typedef __double_t double_t;
 #ifndef isgreater
 #if __has_builtin(__builtin_isgreater) && !defined(__OPTIMIZE_SIZE__)
 #define isgreater(x, y) __builtin_isgreater(x, y)
+#elif defined(__PRIVATE_DOS_FPCOMPARE)
+#define __PRIVATE_DOS_FPCOMPARE_USED
+#define isgreater(x, y) ((__PRIVATE_DOS_FPCOMPARE(x, y)&4) != 0)
 #elif defined(__LIBM_MATHFUNXF) && defined(__LIBM_MATHFUNX) && defined(__LIBM_MATHFUNXL)
 #define isgreater(x, y) __FPFUNC2(x, y, __LIBM_MATHFUNXF(isgreater), __LIBM_MATHFUNX(isgreater), __LIBM_MATHFUNXL(isgreater))
-#elif defined(__DOS_FPCOMPARE)
-#define isgreater(x, y) ((__DOS_FPCOMPARE(x, y)&4) != 0)
 #elif !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_AUTOTYPE)
 #define isgreater(x, y) __XBLOCK({ __auto_type __isg_x = (x); __auto_type __isg_y = (y); __XRETURN !isunordered(__isg_x, __isg_y) && __isg_x > __isg_y; })
 #elif !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF)
@@ -2880,10 +2903,11 @@ typedef __double_t double_t;
 #ifndef isgreaterequal
 #if __has_builtin(__builtin_isgreaterequal) && !defined(__OPTIMIZE_SIZE__)
 #define isgreaterequal(x, y) __builtin_isgreaterequal(x, y)
+#elif defined(__PRIVATE_DOS_FPCOMPARE)
+#define __PRIVATE_DOS_FPCOMPARE_USED
+#define isgreaterequal(x, y) ((__PRIVATE_DOS_FPCOMPARE(x, y)&6) != 0)
 #elif defined(__LIBM_MATHFUNXF) && defined(__LIBM_MATHFUNX) && defined(__LIBM_MATHFUNXL)
 #define isgreaterequal(x, y) __FPFUNC2(x, y, __LIBM_MATHFUNXF(isgreaterequal), __LIBM_MATHFUNX(isgreaterequal), __LIBM_MATHFUNXL(isgreaterequal))
-#elif defined(__DOS_FPCOMPARE)
-#define isgreaterequal(x, y) ((__DOS_FPCOMPARE(x, y)&6) != 0)
 #elif !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_AUTOTYPE)
 #define isgreaterequal(x, y) __XBLOCK({ __auto_type __isge_x = (x); __auto_type __isge_y = (y); __XRETURN !isunordered(__isge_x, __isge_y) && __isge_x >= __isge_y; })
 #elif !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF)
@@ -2896,10 +2920,11 @@ typedef __double_t double_t;
 #ifndef isless
 #if __has_builtin(__builtin_isless) && !defined(__OPTIMIZE_SIZE__)
 #define isless(x, y) __builtin_isless(x, y)
+#elif defined(__PRIVATE_DOS_FPCOMPARE)
+#define __PRIVATE_DOS_FPCOMPARE_USED
+#define isless(x, y) ((__PRIVATE_DOS_FPCOMPARE(x, y)&1) != 0)
 #elif defined(__LIBM_MATHFUNXF) && defined(__LIBM_MATHFUNX) && defined(__LIBM_MATHFUNXL)
 #define isless(x, y) __FPFUNC2(x, y, __LIBM_MATHFUNXF(isless), __LIBM_MATHFUNX(isless), __LIBM_MATHFUNXL(isless))
-#elif defined(__DOS_FPCOMPARE)
-#define isless(x, y) ((__DOS_FPCOMPARE(x, y)&1) != 0)
 #elif !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_AUTOTYPE)
 #define isless(x, y) __XBLOCK({ __auto_type __isl_x = (x); __auto_type __isl_y = (y); __XRETURN !isunordered(__isl_x, __isl_y) && __isl_x < __isl_y; })
 #elif !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF)
@@ -2912,10 +2937,11 @@ typedef __double_t double_t;
 #ifndef islessequal
 #if __has_builtin(__builtin_islessequal) && !defined(__OPTIMIZE_SIZE__)
 #define islessequal(x, y) __builtin_islessequal(x, y)
+#elif defined(__PRIVATE_DOS_FPCOMPARE)
+#define __PRIVATE_DOS_FPCOMPARE_USED
+#define islessequal(x, y) ((__PRIVATE_DOS_FPCOMPARE(x, y)&3) != 0)
 #elif defined(__LIBM_MATHFUNXF) && defined(__LIBM_MATHFUNX) && defined(__LIBM_MATHFUNXL)
 #define islessequal(x, y) __FPFUNC2(x, y, __LIBM_MATHFUNXF(islessequal), __LIBM_MATHFUNX(islessequal), __LIBM_MATHFUNXL(islessequal))
-#elif defined(__DOS_FPCOMPARE)
-#define islessequal(x, y) ((__DOS_FPCOMPARE(x, y)&3) != 0)
 #elif !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_AUTOTYPE)
 #define islessequal(x, y) __XBLOCK({ __auto_type __isle_x = (x); __auto_type __isle_y = (y); __XRETURN !isunordered(__isle_x, __isle_y) && __isle_x <= __isle_y; })
 #elif !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF)
@@ -2928,10 +2954,11 @@ typedef __double_t double_t;
 #ifndef islessgreater
 #if __has_builtin(__builtin_islessgreater) && !defined(__OPTIMIZE_SIZE__)
 #define islessgreater(x, y) __builtin_islessgreater(x, y)
+#elif defined(__PRIVATE_DOS_FPCOMPARE)
+#define __PRIVATE_DOS_FPCOMPARE_USED
+#define islessgreater(x, y) ((__PRIVATE_DOS_FPCOMPARE(x, y)&5) != 0)
 #elif defined(__LIBM_MATHFUNXF) && defined(__LIBM_MATHFUNX) && defined(__LIBM_MATHFUNXL)
 #define islessgreater(x, y) __FPFUNC2(x, y, __LIBM_MATHFUNXF(islessgreater), __LIBM_MATHFUNX(islessgreater), __LIBM_MATHFUNXL(islessgreater))
-#elif defined(__DOS_FPCOMPARE)
-#define islessgreater(x, y) ((__DOS_FPCOMPARE(x, y)&5) != 0)
 #elif !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_AUTOTYPE)
 #define islessgreater(x, y) __XBLOCK({ __auto_type __islg_x = (x); __auto_type __islg_y = (y); __XRETURN !isunordered(__islg_x, __islg_y) && (__islg_x < __islg_y || __islg_y < __islg_x); })
 #elif !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF)
@@ -2940,6 +2967,23 @@ typedef __double_t double_t;
 #define islessgreater(x, y) (!isunordered(x, y) && ((x) < (y) || (y) < (x)))
 #endif /* !... */
 #endif /* !islessgreater */
+
+#ifdef __PRIVATE_DOS_FPCOMPARE
+#ifdef __PRIVATE_DOS_FPCOMPARE_USED
+#undef __PRIVATE_DOS_FPCOMPARE_USED
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,_fdpcomp,(float __x, float __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,_dpcomp,(double __x, double __y),(__x,__y))
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,_ldpcomp,(__LONGDOUBLE __x, __LONGDOUBLE __y),_dpcomp,(__x,__y))
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,_ldpcomp,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#else /* __PRIVATE_DOS_FPCOMPARE_USED */
+#undef __PRIVATE_DOS_FPCOMPARE
+#endif /* !__PRIVATE_DOS_FPCOMPARE_USED */
+#endif /* __PRIVATE_DOS_FPCOMPARE */
 #endif /* __USE_ISOC99 */
 
 

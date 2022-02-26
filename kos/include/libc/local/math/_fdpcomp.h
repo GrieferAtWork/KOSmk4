@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ee2d32d */
+/* HASH CRC-32:0xa6d25b6c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,22 +21,54 @@
 #ifndef __local__fdpcomp_defined
 #define __local__fdpcomp_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__dpcomp
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE__dpcomp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__dpcomp_defined
 #define __local___localdep__dpcomp_defined
+#ifdef __CRT_HAVE__dpcomp
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__dpcomp,(double __x, double __y),_dpcomp,(__x,__y))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_END
+#include <libc/local/math/_dpcomp.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__dpcomp __LIBC_LOCAL_NAME(_dpcomp)
+#else /* ... */
+#undef __local___localdep__dpcomp_defined
+#endif /* !... */
 #endif /* !__local___localdep__dpcomp_defined */
+__NAMESPACE_LOCAL_END
+#include <libm/fcomp.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_fdpcomp) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_fdpcomp))(float __x, float __y) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+	int __result = 0;
+	if (!__LIBM_MATHFUN2F(isunordered, __x, __y)) {
+		if (__LIBM_MATHFUN2F(isgreater, __x, __y))
+			__result |= 4;
+		if (__LIBM_MATHFUN2F(isgreaterequal, __x, __y))
+			__result |= 2 | 4;
+		if (__LIBM_MATHFUN2F(isless, __x, __y))
+			__result |= 1;
+		if (__LIBM_MATHFUN2F(islessequal, __x, __y))
+			__result |= 1 | 2;
+		if (__LIBM_MATHFUN2F(islessgreater, __x, __y))
+			__result |= 1 | 4;
+	}
+	return __result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (__NAMESPACE_LOCAL_SYM __localdep__dpcomp)((double)__x, (double)__y);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__fdpcomp_defined
 #define __local___localdep__fdpcomp_defined
 #define __localdep__fdpcomp __LIBC_LOCAL_NAME(_fdpcomp)
 #endif /* !__local___localdep__fdpcomp_defined */
-#else /* __CRT_HAVE__dpcomp */
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE__dpcomp || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #undef __local__fdpcomp_defined
-#endif /* !__CRT_HAVE__dpcomp */
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ && !__CRT_HAVE__dpcomp && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local__fdpcomp_defined */

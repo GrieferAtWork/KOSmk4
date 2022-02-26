@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2362aa3a */
+/* HASH CRC-32:0x8afd5b3f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2125,6 +2125,30 @@ INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd___issignalingl)(__LONGDOUBLE
 #ifndef __KERNEL__
 /* >> issignaling(3), __issignalingf(3), __issignaling(3), __issignalingl(3) */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___issignalingl)(__LONGDOUBLE x);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd__dpcomp)(double x, double y);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc__dpcomp)(double x, double y);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd__fdpcomp)(float x, float y);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc__fdpcomp)(float x, float y);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd__ldpcomp)(__LONGDOUBLE x, __LONGDOUBLE y);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc__ldpcomp)(__LONGDOUBLE x, __LONGDOUBLE y);
 /* >> _fdtest(3), _dtest(3), _ldtest(3) */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) short NOTHROW_NCX(LIBDCALL libd__dtest)(double __KOS_FIXED_CONST *px);
 /* >> _fdtest(3), _dtest(3), _ldtest(3) */
