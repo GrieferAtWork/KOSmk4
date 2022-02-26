@@ -856,6 +856,7 @@ incdir("");
 #include <libm/log.h>
 #include <libm/log10.h>
 #include <libm/log1p.h>
+#include <libm/log2.h>
 #include <libm/logb.h>
 #include <libm/lrint.h>
 #include <libm/lround.h>

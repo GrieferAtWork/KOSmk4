@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f45b52 */
+/* HASH CRC-32:0xb8bc35a6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -423,8 +423,6 @@
 #define __stub___loc_ntoa
 #define __stub_loc_ntoa
 #define __stub_lockf64
-#define __stub___log2
-#define __stub_log2
 #define __stub_login
 #define __stub_logout
 #define __stub_logwtmp

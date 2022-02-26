@@ -566,7 +566,7 @@ __LOCAL __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__
 		       __LIBM_LOCAL_VALUE(onel) / __x; /* erf(+-inf)=+-1 */
 	}
 	__ix = (__ix << 16) | (__i0 >> 16);
-	if (__ix < __INT32_C(0x3ffed800)) { /* |x|<0.84375 */
+	if (__ix < __INT32_C(0x3ffed800)) {     /* |x|<0.84375 */
 		if (__ix < __INT32_C(0x3fde8000)) { /* |x|<2**-33 */
 			if (__ix < __INT32_C(0x00080000))
 				return __IEEE854_LONG_DOUBLE_C(0.125) * (__IEEE854_LONG_DOUBLE_C(8.0) * __x + __LIBM_LOCAL_VALUE(efx8l) * __x); /*avoid underflow */

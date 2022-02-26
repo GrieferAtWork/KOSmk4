@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5af9be56 */
+/* HASH CRC-32:0xd51d0ead */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,9 +34,6 @@ DECL_BEGIN
 /* >> exp2f(3), exp2(3), exp2l(3)
  * Compute base-2 exponential of `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_exp2)(double x);
-/* >> log2f(3), log2(3), log2l(3)
- * Compute base-2 logarithm of `x' */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_log2)(double x);
 /* >> tgammaf(3), tgamma(3), tgammal(3)
  * True gamma function */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_tgamma)(double x);

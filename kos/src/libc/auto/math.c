@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a99154c */
+/* HASH CRC-32:0xf21c80b1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1300,17 +1300,64 @@ NOTHROW(LIBCCALL libc_logbl)(__LONGDOUBLE x) {
 	return (__LONGDOUBLE)libc_logb((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
+#include <bits/crt/fenv.h>
+#include <bits/math-constants.h>
+#include <libm/nan.h>
+#include <libm/log2.h>
+#include <libm/fcomp.h>
+#include <libm/matherr.h>
+/* >> log2f(3), log2(3), log2l(3)
+ * Compute base-2 logarithm of `x' */
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
+NOTHROW(LIBCCALL libc_log2)(double x) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2(islessequal, x, 0.0)) {
+		if (x == 0.0) {
+			libc_feraiseexcept(FE_DIVBYZERO);
+			return __kernel_standard(x, x, -__HUGE_VAL,
+			                         __LIBM_KMATHERR_LOG2_ZERO); /* log2(0) */
+		} else {
+			libc_feraiseexcept(FE_INVALID);
+			return __kernel_standard(x, x, __LIBM_MATHFUN1I(nan, ""),
+			                         __LIBM_KMATHERR_LOG2_MINUS); /* log2(x<0) */
+		}
+	}
+	return __LIBM_MATHFUN(log2, x);
+}
 /* >> exp2f(3), exp2(3), exp2l(3)
  * Compute base-2 exponential of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_exp2f)(float x) {
 	return (float)libc_exp2((double)x);
 }
+#include <bits/crt/fenv.h>
+#include <bits/math-constants.h>
+#include <libm/nan.h>
+#include <libm/log2.h>
+#include <libm/fcomp.h>
+#include <libm/matherr.h>
 /* >> log2f(3), log2(3), log2l(3)
  * Compute base-2 logarithm of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_log2f)(float x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2F(islessequal, x, 0.0f)) {
+		if (x == 0.0f) {
+			libc_feraiseexcept(FE_DIVBYZERO);
+			return __kernel_standard_f(x, x, -__HUGE_VALF,
+			                         __LIBM_KMATHERRF_LOG2_ZERO); /* log2(0) */
+		} else {
+			libc_feraiseexcept(FE_INVALID);
+			return __kernel_standard_f(x, x, __LIBM_MATHFUN1IF(nan, ""),
+			                         __LIBM_KMATHERRF_LOG2_MINUS); /* log2(x<0) */
+		}
+	}
+	return __LIBM_MATHFUNF(log2, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)libc_log2((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 /* >> exp2f(3), exp2(3), exp2l(3)
  * Compute base-2 exponential of `x' */
@@ -1318,11 +1365,35 @@ INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_exp2l)(__LONGDOUBLE x) {
 	return (__LONGDOUBLE)libc_exp2((double)x);
 }
+#include <bits/crt/fenv.h>
+#include <bits/math-constants.h>
+#include <libm/nan.h>
+#include <libm/log2.h>
+#include <libm/fcomp.h>
+#include <libm/matherr.h>
 /* >> log2f(3), log2(3), log2l(3)
  * Compute base-2 logarithm of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_log2l)(__LONGDOUBLE x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2L(islessequal, x, 0.0L)) {
+		if (x == 0.0L) {
+			libc_feraiseexcept(FE_DIVBYZERO);
+			return __kernel_standard_l(x, x, -__HUGE_VALL,
+			                         __LIBM_KMATHERRL_LOG2_ZERO); /* log2(0) */
+		} else {
+			libc_feraiseexcept(FE_INVALID);
+			return __kernel_standard_l(x, x, __LIBM_MATHFUN1IL(nan, ""),
+			                         __LIBM_KMATHERRL_LOG2_MINUS); /* log2(x<0) */
+		}
+	}
+	return __LIBM_MATHFUNL(log2, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)libc_log2((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 #include <libm/finite.h>
 #include <libm/isnan.h>
@@ -3688,6 +3759,8 @@ DEFINE_PUBLIC_ALIAS(__log1pl, libc_log1pl);
 DEFINE_PUBLIC_ALIAS(log1pl, libc_log1pl);
 DEFINE_PUBLIC_ALIAS(__logbl, libc_logbl);
 DEFINE_PUBLIC_ALIAS(logbl, libc_logbl);
+DEFINE_PUBLIC_ALIAS(__log2, libc_log2);
+DEFINE_PUBLIC_ALIAS(log2, libc_log2);
 DEFINE_PUBLIC_ALIAS(__exp2f, libc_exp2f);
 DEFINE_PUBLIC_ALIAS(exp2f, libc_exp2f);
 DEFINE_PUBLIC_ALIAS(__log2f, libc_log2f);

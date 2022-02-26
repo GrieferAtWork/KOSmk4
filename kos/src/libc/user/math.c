@@ -59,19 +59,6 @@ NOTHROW(LIBCCALL libc_exp2)(double x)
 }
 /*[[[end:libc_exp2]]]*/
 
-/*[[[head:libc_log2,hash:CRC-32=0x73bb506f]]]*/
-/* >> log2f(3), log2(3), log2l(3)
- * Compute base-2 logarithm of `x' */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
-NOTHROW(LIBCCALL libc_log2)(double x)
-/*[[[body:libc_log2]]]*/
-/*AUTO*/{
-	(void)x;
-	CRT_UNIMPLEMENTEDF("log2(%f)", x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_log2]]]*/
 
 
 
@@ -181,11 +168,9 @@ NOTHROW(LIBCCALL libc_yn)(int n,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x52e12a27]]]*/
+/*[[[start:exports,hash:CRC-32=0x6c7fc94b]]]*/
 DEFINE_PUBLIC_ALIAS(__exp2, libc_exp2);
 DEFINE_PUBLIC_ALIAS(exp2, libc_exp2);
-DEFINE_PUBLIC_ALIAS(__log2, libc_log2);
-DEFINE_PUBLIC_ALIAS(log2, libc_log2);
 DEFINE_PUBLIC_ALIAS(__tgamma, libc_tgamma);
 DEFINE_PUBLIC_ALIAS(tgamma, libc_tgamma);
 DEFINE_PUBLIC_ALIAS(__j0, libc_j0);

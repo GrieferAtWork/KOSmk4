@@ -772,7 +772,28 @@ double exp2(double x); /* TODO */
 @@>> log2f(3), log2(3), log2l(3)
 @@Compute base-2 logarithm of `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__log2")]]
-double log2(double x); /* TODO */
+[[requires_include("<ieee754.h>")]]
+[[requires($has_function(feraiseexcept) &&
+           (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))]]
+[[impl_include("<bits/crt/fenv.h>", "<bits/math-constants.h>", "<libm/nan.h>")]]
+[[impl_include("<libm/log2.h>", "<libm/fcomp.h>", "<libm/matherr.h>")]]
+double log2(double x) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2(@islessequal@, x, 0.0)) {
+		if (x == 0.0) {
+			feraiseexcept(@FE_DIVBYZERO@);
+			return __kernel_standard(x, x, -__HUGE_VAL,
+			                         __LIBM_KMATHERR_LOG2_ZERO); /* log2(0) */
+		} else {
+			feraiseexcept(@FE_INVALID@);
+			return __kernel_standard(x, x, __LIBM_MATHFUN1I(@nan@, ""),
+			                         __LIBM_KMATHERR_LOG2_MINUS); /* log2(x<0) */
+		}
+	}
+	return __LIBM_MATHFUN(@log2@, x);
+}
+
 
 
 [[std, crtbuiltin, export_alias("__exp2f")]] exp2f(*) %{generate(double2float("exp2"))}
