@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x394e89f1 */
+/* HASH CRC-32:0x94b2ce1d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -258,22 +258,22 @@ __NAMESPACE_STD_USING(logbl)
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 #ifdef __USE_ISOC99
-#if defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
+#if defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(exp2)
-#endif /* __CRT_HAVE_exp2 || __CRT_HAVE___exp2 */
+#endif /* __CRT_HAVE_exp2 || __CRT_HAVE___exp2 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(log2)
 #endif /* __CRT_HAVE_log2 || __CRT_HAVE___log2 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_exp2f) || defined(__CRT_HAVE___exp2f) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
+#if defined(__CRT_HAVE_exp2f) || defined(__CRT_HAVE___exp2f) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(exp2f)
-#endif /* __CRT_HAVE_exp2f || __CRT_HAVE___exp2f || __CRT_HAVE_exp2 || __CRT_HAVE___exp2 */
+#endif /* __CRT_HAVE_exp2f || __CRT_HAVE___exp2f || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_exp2 || __CRT_HAVE___exp2 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_log2f) || defined(__CRT_HAVE___log2f) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(log2f)
 #endif /* __CRT_HAVE_log2f || __CRT_HAVE___log2f || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_log2 || __CRT_HAVE___log2 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-#if defined(__CRT_HAVE_exp2l) || defined(__CRT_HAVE___exp2l) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
+#if defined(__CRT_HAVE_exp2l) || defined(__CRT_HAVE___exp2l) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(exp2l)
-#endif /* __CRT_HAVE_exp2l || __CRT_HAVE___exp2l || __CRT_HAVE_exp2 || __CRT_HAVE___exp2 */
+#endif /* __CRT_HAVE_exp2l || __CRT_HAVE___exp2l || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_exp2 || __CRT_HAVE___exp2 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_log2l) || defined(__CRT_HAVE___log2l) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(log2l)
 #endif /* __CRT_HAVE_log2l || __CRT_HAVE___log2l || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_log2 || __CRT_HAVE___log2 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -2048,6 +2048,13 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,exp2,(double __x),(__x))
 /* >> exp2f(3), exp2(3), exp2l(3)
  * Compute base-2 exponential of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,exp2,(double __x),__exp2,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_STD_END
+#include <libc/local/math/exp2.h>
+__NAMESPACE_STD_BEGIN
+/* >> exp2f(3), exp2(3), exp2l(3)
+ * Compute base-2 exponential of `x' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(exp2, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL exp2)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(exp2))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_log2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log2)
 /* >> log2f(3), log2(3), log2l(3)
@@ -2081,7 +2088,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,exp2f,(float __x),(__x))
 /* >> exp2f(3), exp2(3), exp2l(3)
  * Compute base-2 exponential of `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,exp2f,(float __x),__exp2f,(__x))
-#elif defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/exp2f.h>
 __NAMESPACE_STD_BEGIN
@@ -2122,7 +2129,7 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp2l,(__LONGDOUBLE __x),(__x))
 /* >> exp2f(3), exp2(3), exp2l(3)
  * Compute base-2 exponential of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp2l,(__LONGDOUBLE __x),__exp2l,(__x))
-#elif defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/exp2l.h>
 __NAMESPACE_STD_BEGIN
@@ -6059,7 +6066,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,exp2,(float __x),exp2f,(__x))
 /* >> exp2f(3), exp2(3), exp2l(3)
  * Compute base-2 exponential of `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,exp2,(float __x),__exp2f,(__x))
-#elif defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/exp2f.h>
@@ -6552,7 +6559,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp2,(__LONGDOUBLE __x),exp2l,
 /* >> exp2f(3), exp2(3), exp2l(3)
  * Compute base-2 exponential of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp2,(__LONGDOUBLE __x),__exp2l,(__x))
-#elif defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/exp2l.h>
@@ -7484,24 +7491,24 @@ __NAMESPACE_STD_USING(logbl)
 
 #ifdef __USE_ISOC99
 #ifndef __CXX_SYSTEM_HEADER
-#if defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
+#if defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(exp2)
-#endif /* __CRT_HAVE_exp2 || __CRT_HAVE___exp2 */
+#endif /* __CRT_HAVE_exp2 || __CRT_HAVE___exp2 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(log2)
 #endif /* __CRT_HAVE_log2 || __CRT_HAVE___log2 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_exp2f) || defined(__CRT_HAVE___exp2f) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
+#if defined(__CRT_HAVE_exp2f) || defined(__CRT_HAVE___exp2f) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(exp2f)
-#endif /* __CRT_HAVE_exp2f || __CRT_HAVE___exp2f || __CRT_HAVE_exp2 || __CRT_HAVE___exp2 */
+#endif /* __CRT_HAVE_exp2f || __CRT_HAVE___exp2f || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_exp2 || __CRT_HAVE___exp2 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_log2f) || defined(__CRT_HAVE___log2f) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(log2f)
 #endif /* __CRT_HAVE_log2f || __CRT_HAVE___log2f || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_log2 || __CRT_HAVE___log2 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifndef __CXX_SYSTEM_HEADER
-#if defined(__CRT_HAVE_exp2l) || defined(__CRT_HAVE___exp2l) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
+#if defined(__CRT_HAVE_exp2l) || defined(__CRT_HAVE___exp2l) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(exp2l)
-#endif /* __CRT_HAVE_exp2l || __CRT_HAVE___exp2l || __CRT_HAVE_exp2 || __CRT_HAVE___exp2 */
+#endif /* __CRT_HAVE_exp2l || __CRT_HAVE___exp2l || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_exp2 || __CRT_HAVE___exp2 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_log2l) || defined(__CRT_HAVE___log2l) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(log2l)
 #endif /* __CRT_HAVE_log2l || __CRT_HAVE___log2l || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_log2 || __CRT_HAVE___log2 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -10157,6 +10164,11 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__exp2,(double __x),exp2,(__x))
 /* >> exp2f(3), exp2(3), exp2l(3)
  * Compute base-2 exponential of `x' */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__exp2,(double __x),(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/exp2.h>
+/* >> exp2f(3), exp2(3), exp2l(3)
+ * Compute base-2 exponential of `x' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __exp2)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(exp2))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_log2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log2)
 /* >> log2f(3), log2(3), log2l(3)
@@ -10188,7 +10200,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__exp2f,(float __x),exp2f,(__x))
 /* >> exp2f(3), exp2(3), exp2l(3)
  * Compute base-2 exponential of `x' */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__exp2f,(float __x),(__x))
-#elif defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/exp2f.h>
 /* >> exp2f(3), exp2(3), exp2l(3)
  * Compute base-2 exponential of `x' */
@@ -10225,7 +10237,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__exp2l,(__LONGDOUBLE __x),exp
 /* >> exp2f(3), exp2(3), exp2l(3)
  * Compute base-2 exponential of `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__exp2l,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/exp2l.h>
 /* >> exp2f(3), exp2(3), exp2l(3)
  * Compute base-2 exponential of `x' */

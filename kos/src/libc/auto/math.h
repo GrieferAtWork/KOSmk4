@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95abd5dc */
+/* HASH CRC-32:0x2362aa3a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -693,6 +693,13 @@ INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_logbl)(__LONGDOUBLE
 /* >> exp2f(3), exp2(3), exp2l(3)
  * Compute base-2 exponential of `x' */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_exp2)(double x);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> exp2f(3), exp2(3), exp2l(3)
+ * Compute base-2 exponential of `x' */
+INTDEF WUNUSED double NOTHROW(LIBCCALL libc_exp2)(double x);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> log2f(3), log2(3), log2l(3)
  * Compute base-2 logarithm of `x' */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_log2)(double x);

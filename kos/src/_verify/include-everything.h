@@ -832,6 +832,7 @@ incdir("");
 #include <libm/erf.h>
 #include <libm/erfc.h>
 #include <libm/exp.h>
+#include <libm/exp2.h>
 #include <libm/expm1.h>
 #include <libm/fabs.h>
 #include <libm/fcomp.h>

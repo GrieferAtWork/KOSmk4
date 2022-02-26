@@ -45,19 +45,6 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_exp2,hash:CRC-32=0x33a7512]]]*/
-/* >> exp2f(3), exp2(3), exp2l(3)
- * Compute base-2 exponential of `x' */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
-NOTHROW(LIBCCALL libc_exp2)(double x)
-/*[[[body:libc_exp2]]]*/
-/*AUTO*/{
-	(void)x;
-	CRT_UNIMPLEMENTEDF("exp2(%f)", x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_exp2]]]*/
 
 
 
@@ -168,9 +155,7 @@ NOTHROW(LIBCCALL libc_yn)(int n,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x6c7fc94b]]]*/
-DEFINE_PUBLIC_ALIAS(__exp2, libc_exp2);
-DEFINE_PUBLIC_ALIAS(exp2, libc_exp2);
+/*[[[start:exports,hash:CRC-32=0xf50f6daa]]]*/
 DEFINE_PUBLIC_ALIAS(__tgamma, libc_tgamma);
 DEFINE_PUBLIC_ALIAS(tgamma, libc_tgamma);
 DEFINE_PUBLIC_ALIAS(__j0, libc_j0);

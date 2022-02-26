@@ -767,7 +767,23 @@ double logb(double x) {
 @@>> exp2f(3), exp2(3), exp2l(3)
 @@Compute base-2 exponential of `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__exp2")]]
-double exp2(double x); /* TODO */
+[[requires_include("<ieee754.h>")]]
+[[requires($has_function(feraiseexcept) &&
+           (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))]]
+[[impl_include("<libm/exp2.h>", "<libm/matherr.h>")]]
+[[impl_include("<libm/finite.h>", "<libm/signbit.h>")]]
+double exp2(double x) {
+	double result = __LIBM_MATHFUN(@exp2@, x);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && !__LIBM_MATHFUNI(@finite@, result) && __LIBM_MATHFUNI(@finite@, x)) {
+		return __kernel_standard_f(x, x, result,
+		                           __LIBM_MATHFUNI(@signbit@, x)
+		                           ? __LIBM_KMATHERR_EXP2_UNDERFLOW
+		                           : __LIBM_KMATHERR_EXP2_OVERFLOW);
+	}
+	return result;
+}
 
 @@>> log2f(3), log2(3), log2l(3)
 @@Compute base-2 logarithm of `x'

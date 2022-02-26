@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64dcdeb4 */
+/* HASH CRC-32:0xacd8e430 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_exp2l_defined
 #define __local_exp2l_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_exp2_defined
 #define __local___localdep_exp2_defined
@@ -31,20 +32,45 @@ __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_exp2,(double __x),exp2,
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_exp2,(double __x),exp2,(__x))
 #elif defined(__CRT_HAVE___exp2)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_exp2,(double __x),__exp2,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_END
+#include <libc/local/math/exp2.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_exp2 __LIBC_LOCAL_NAME(exp2)
 #else /* ... */
 #undef __local___localdep_exp2_defined
 #endif /* !... */
 #endif /* !__local___localdep_exp2_defined */
+__NAMESPACE_LOCAL_END
+#include <libm/exp2.h>
+#include <libm/matherr.h>
+#include <libm/finite.h>
+#include <libm/signbit.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(exp2l) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(exp2l))(__LONGDOUBLE __x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+
+	__LONGDOUBLE __result = __LIBM_MATHFUNL(exp2, __x);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && !__LIBM_MATHFUNIL(finite, __result) && __LIBM_MATHFUNIL(finite, __x)) {
+		return __kernel_standard_f(__x, __x, __result,
+		                           __LIBM_MATHFUNIL(signbit, __x)
+		                           ? __LIBM_KMATHERRL_EXP2_UNDERFLOW
+		                           : __LIBM_KMATHERRL_EXP2_OVERFLOW);
+	}
+	return __result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)(__NAMESPACE_LOCAL_SYM __localdep_exp2)((double)__x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_exp2l_defined
 #define __local___localdep_exp2l_defined
 #define __localdep_exp2l __LIBC_LOCAL_NAME(exp2l)
 #endif /* !__local___localdep_exp2l_defined */
-#else /* __CRT_HAVE_exp2 || __CRT_HAVE___exp2 */
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_exp2 || __CRT_HAVE___exp2 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #undef __local_exp2l_defined
-#endif /* !__CRT_HAVE_exp2 && !__CRT_HAVE___exp2 */
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__CRT_HAVE_exp2 && !__CRT_HAVE___exp2 && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_exp2l_defined */
