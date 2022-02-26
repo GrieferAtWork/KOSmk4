@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7bb3b4 */
+/* HASH CRC-32:0x1730b4ce */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3259,6 +3259,18 @@ NOTHROW(LIBCCALL libc_j0)(double x) {
 		return __kernel_standard(x, x, 0.0, __LIBM_KMATHERR_J0_TLOSS); /* j0(|x|>X_TLOSS) */
 	return __LIBM_MATHFUN(j0, x);
 }
+#include <libm/j1.h>
+#include <libm/fcomp.h>
+#include <libm/matherr.h>
+#include <libm/fabs.h>
+/* >> j1f(3), j1(3), j1l(3) */
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
+NOTHROW(LIBCCALL libc_j1)(double x) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_LIB_VERSION != __LIBM_POSIX &&
+	    __LIBM_MATHFUNI2(isgreater, __LIBM_MATHFUN(fabs, x), 1.41484755040568800000e+16 /*X_TLOSS*/))
+		return __kernel_standard(x, x, 0.0, __LIBM_KMATHERR_J1_TLOSS); /* j1(|x|>X_TLOSS) */
+	return __LIBM_MATHFUN(j1, x);
+}
 #include <libm/fcomp.h>
 #include <bits/math-constants.h>
 #include <libm/matherr.h>
@@ -3299,10 +3311,23 @@ NOTHROW(LIBCCALL libc_j0f)(float x) {
 	return (float)libc_j0((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
+#include <libm/j1.h>
+#include <libm/fcomp.h>
+#include <libm/matherr.h>
+#include <libm/fabs.h>
 /* >> j1f(3), j1(3), j1l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_j1f)(float x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_LIB_VERSION != __LIBM_POSIX &&
+	    __LIBM_MATHFUNI2F(isgreater, __LIBM_MATHFUNF(fabs, x), 1.41484755040568800000e+16 /*X_TLOSS*/))
+		return __kernel_standard_f(x, x, 0.0f, __LIBM_KMATHERRF_J1_TLOSS); /* j1(|x|>X_TLOSS) */
+	return __LIBM_MATHFUNF(j1, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)libc_j1((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 /* >> jnf(3), jn(3), jnl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
@@ -3368,10 +3393,23 @@ NOTHROW(LIBCCALL libc_j0l)(__LONGDOUBLE x) {
 	return (__LONGDOUBLE)libc_j0((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
+#include <libm/j1.h>
+#include <libm/fcomp.h>
+#include <libm/matherr.h>
+#include <libm/fabs.h>
 /* >> j1f(3), j1(3), j1l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_j1l)(__LONGDOUBLE x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_LIB_VERSION != __LIBM_POSIX &&
+	    __LIBM_MATHFUNI2L(isgreater, __LIBM_MATHFUNL(fabs, x), 1.41484755040568800000e+16 /*X_TLOSS*/))
+		return __kernel_standard_l(x, x, 0.0L, __LIBM_KMATHERRL_J1_TLOSS); /* j1(|x|>X_TLOSS) */
+	return __LIBM_MATHFUNL(j1, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)libc_j1((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 /* >> jnf(3), jn(3), jnl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
@@ -4342,6 +4380,8 @@ DEFINE_PUBLIC_ALIAS(__isnanl, libc_isnanl);
 DEFINE_PUBLIC_ALIAS(isnanl, libc_isnanl);
 DEFINE_PUBLIC_ALIAS(__j0, libc_j0);
 DEFINE_PUBLIC_ALIAS(j0, libc_j0);
+DEFINE_PUBLIC_ALIAS(__j1, libc_j1);
+DEFINE_PUBLIC_ALIAS(j1, libc_j1);
 DEFINE_PUBLIC_ALIAS(__y0, libc_y0);
 DEFINE_PUBLIC_ALIAS(y0, libc_y0);
 DEFINE_PUBLIC_ALIAS(__j0f, libc_j0f);

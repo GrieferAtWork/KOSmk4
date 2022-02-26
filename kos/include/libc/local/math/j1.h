@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x952066d */
+/* HASH CRC-32:0xc245b642 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,27 +18,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_MATH_H
-#define GUARD_LIBC_USER_MATH_H 1
-
-#include "../api.h"
-#include "../auto/math.h"
-
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <math.h>
-
-DECL_BEGIN
-
-#ifndef __KERNEL__
-/* >> jnf(3), jn(3), jnl(3) */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_jn)(int n, double x);
-/* >> y1f(3), y1(3), y1l(3) */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_y1)(double x);
-/* >> ynf(3), yn(3), ynl(3) */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_yn)(int n, double x);
-#endif /* !__KERNEL__ */
-
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_MATH_H */
+#ifndef __local_j1_defined
+#define __local_j1_defined
+#include <__crt.h>
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libm/j1.h>
+#include <libm/fcomp.h>
+#include <libm/matherr.h>
+#include <libm/fabs.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(j1) __ATTR_WUNUSED double
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(j1))(double __x) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_LIB_VERSION != __LIBM_POSIX &&
+	    __LIBM_MATHFUNI2(isgreater, __LIBM_MATHFUN(fabs, __x), 1.41484755040568800000e+16 /*X_TLOSS*/))
+		return __kernel_standard(__x, __x, 0.0, __LIBM_KMATHERR_J1_TLOSS); /* j1(|x|>X_TLOSS) */
+	return __LIBM_MATHFUN(j1, __x);
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep_j1_defined
+#define __local___localdep_j1_defined
+#define __localdep_j1 __LIBC_LOCAL_NAME(j1)
+#endif /* !__local___localdep_j1_defined */
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#undef __local_j1_defined
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#endif /* !__local_j1_defined */

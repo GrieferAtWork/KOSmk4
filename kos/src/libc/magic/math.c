@@ -2008,7 +2008,17 @@ double j0(double x) {
 
 @@>> j1f(3), j1(3), j1l(3)
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__j1")]]
-double j1(double x); /* TODO */
+[[impl_include("<libm/j1.h>", "<libm/fcomp.h>", "<libm/matherr.h>", "<libm/fabs.h>")]]
+[[requires_include("<ieee754.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+double j1(double x) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_LIB_VERSION != __LIBM_POSIX &&
+	    __LIBM_MATHFUNI2(@isgreater@, __LIBM_MATHFUN(@fabs@, x), @1.41484755040568800000e+16@ /*X_TLOSS*/))
+		return __kernel_standard(x, x, 0.0, __LIBM_KMATHERR_J1_TLOSS); /* j1(|x|>X_TLOSS) */
+	return __LIBM_MATHFUN(@j1@, x);
+}
 
 @@>> jnf(3), jn(3), jnl(3)
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__jn")]]

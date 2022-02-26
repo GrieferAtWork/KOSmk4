@@ -849,6 +849,7 @@ incdir("");
 #include <libm/isnan.h>
 #include <libm/issignaling.h>
 #include <libm/j0.h>
+#include <libm/j1.h>
 #include <libm/kernel_cos.h>
 #include <libm/kernel_rem_pio2.h>
 #include <libm/kernel_sin.h>
@@ -867,6 +868,7 @@ incdir("");
 #include <libm/nan.h>
 #include <libm/nextafter.h>
 #include <libm/nexttoward.h>
+#include <libm/pone.h>
 #include <libm/pow.h>
 #include <libm/pzero.h>
 #include <libm/rem_pio2.h>

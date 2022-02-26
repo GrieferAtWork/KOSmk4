@@ -56,18 +56,6 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_j1,hash:CRC-32=0x4171b981]]]*/
-/* >> j1f(3), j1(3), j1l(3) */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
-NOTHROW(LIBCCALL libc_j1)(double x)
-/*[[[body:libc_j1]]]*/
-/*AUTO*/{
-	(void)x;
-	CRT_UNIMPLEMENTEDF("j1(%f)", x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_j1]]]*/
 
 /*[[[head:libc_jn,hash:CRC-32=0x70531502]]]*/
 /* >> jnf(3), jn(3), jnl(3) */
@@ -118,9 +106,7 @@ NOTHROW(LIBCCALL libc_yn)(int n,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xc5cfd36c]]]*/
-DEFINE_PUBLIC_ALIAS(__j1, libc_j1);
-DEFINE_PUBLIC_ALIAS(j1, libc_j1);
+/*[[[start:exports,hash:CRC-32=0xb4f36d36]]]*/
 DEFINE_PUBLIC_ALIAS(__jn, libc_jn);
 DEFINE_PUBLIC_ALIAS(jn, libc_jn);
 DEFINE_PUBLIC_ALIAS(__y1, libc_y1);
