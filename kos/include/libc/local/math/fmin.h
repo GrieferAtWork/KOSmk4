@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2758ab39 */
+/* HASH CRC-32:0xb811143b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,11 +21,22 @@
 #ifndef __local_fmin_defined
 #define __local_fmin_defined
 #include <__crt.h>
+#include <ieee754.h>
+#include <libm/fcomp.h>
+#include <libm/isnan.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fmin) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmin))(double __x, double __y) {
-	/* TODO: ieee754-specific function */
-	return __x < __y ? __x : __y;
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	if (__LIBM_MATHFUNI2(islessequal, __x, __y))
+		return __x;
+	if (__LIBM_MATHFUNI(isnan, __y))
+		return __x;
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+	if (__x <= __y)
+		return __x;
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+	return __y;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fmin_defined

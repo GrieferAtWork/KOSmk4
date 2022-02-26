@@ -1431,17 +1431,35 @@ double fdim(double x, double y) {
 @@>> fmaxf(3), fmax(3), fmaxl(3)
 @@Return maximum numeric value from `x' and `y'
 [[std, const, wunused, nothrow, crtbuiltin, export_alias("__fmax")]]
+[[impl_include("<ieee754.h>", "<libm/fcomp.h>", "<libm/isnan.h>")]]
 double fmax(double x, double y) {
-	/* TODO: ieee754-specific function */
-	return x < y ? y : x;
+@@pp_if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)@@
+	if (__LIBM_MATHFUNI2(@isgreaterequal@, x, y))
+		return x;
+	if (__LIBM_MATHFUNI(@isnan@, y))
+		return x;
+@@pp_else@@
+	if (x >= y)
+		return x;
+@@pp_endif@@
+	return y;
 }
 
 @@>> fminf(3), fmin(3), fminl(3)
 @@Return minimum numeric value from `x' and `y'
 [[std, const, wunused, nothrow, crtbuiltin, export_alias("__fmin")]]
+[[impl_include("<ieee754.h>", "<libm/fcomp.h>", "<libm/isnan.h>")]]
 double fmin(double x, double y) {
-	/* TODO: ieee754-specific function */
-	return x < y ? x : y;
+@@pp_if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)@@
+	if (__LIBM_MATHFUNI2(@islessequal@, x, y))
+		return x;
+	if (__LIBM_MATHFUNI(@isnan@, y))
+		return x;
+@@pp_else@@
+	if (x <= y)
+		return x;
+@@pp_endif@@
+	return y;
 }
 
 @@>> fmaf(3), fma(3), fmal(3)

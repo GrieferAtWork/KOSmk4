@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab5e362 */
+/* HASH CRC-32:0x3fac0b4f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,11 +21,22 @@
 #ifndef __local_fmax_defined
 #define __local_fmax_defined
 #include <__crt.h>
+#include <ieee754.h>
+#include <libm/fcomp.h>
+#include <libm/isnan.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fmax) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmax))(double __x, double __y) {
-	/* TODO: ieee754-specific function */
-	return __x < __y ? __y : __x;
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	if (__LIBM_MATHFUNI2(isgreaterequal, __x, __y))
+		return __x;
+	if (__LIBM_MATHFUNI(isnan, __y))
+		return __x;
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+	if (__x >= __y)
+		return __x;
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+	return __y;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fmax_defined

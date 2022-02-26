@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x347c5835 */
+/* HASH CRC-32:0x68d91632 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2492,21 +2492,43 @@ NOTHROW(LIBCCALL libc_fdim)(double x,
 	/* TODO: ieee754-specific function */
 	return libc_fabs(y - x);
 }
+#include <ieee754.h>
+#include <libm/fcomp.h>
+#include <libm/isnan.h>
 /* >> fmaxf(3), fmax(3), fmaxl(3)
  * Return maximum numeric value from `x' and `y' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_fmax)(double x,
                             double y) {
-	/* TODO: ieee754-specific function */
-	return x < y ? y : x;
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	if (__LIBM_MATHFUNI2(isgreaterequal, x, y))
+		return x;
+	if (__LIBM_MATHFUNI(isnan, y))
+		return x;
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+	if (x >= y)
+		return x;
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+	return y;
 }
+#include <ieee754.h>
+#include <libm/fcomp.h>
+#include <libm/isnan.h>
 /* >> fminf(3), fmin(3), fminl(3)
  * Return minimum numeric value from `x' and `y' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_fmin)(double x,
                             double y) {
-	/* TODO: ieee754-specific function */
-	return x < y ? x : y;
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	if (__LIBM_MATHFUNI2(islessequal, x, y))
+		return x;
+	if (__LIBM_MATHFUNI(isnan, y))
+		return x;
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+	if (x <= y)
+		return x;
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+	return y;
 }
 /* >> fmaf(3), fma(3), fmal(3)
  * Multiply-add function computed as a ternary operation */
@@ -2695,21 +2717,43 @@ NOTHROW(LIBCCALL libc_fdimf)(float x,
 	/* TODO: ieee754-specific function */
 	return libc_fabsf(y - x);
 }
+#include <ieee754.h>
+#include <libm/fcomp.h>
+#include <libm/isnan.h>
 /* >> fmaxf(3), fmax(3), fmaxl(3)
  * Return maximum numeric value from `x' and `y' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_fmaxf)(float x,
                              float y) {
-	/* TODO: ieee754-specific function */
-	return x < y ? y : x;
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	if (__LIBM_MATHFUNI2F(isgreaterequal, x, y))
+		return x;
+	if (__LIBM_MATHFUNIF(isnan, y))
+		return x;
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+	if (x >= y)
+		return x;
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+	return y;
 }
+#include <ieee754.h>
+#include <libm/fcomp.h>
+#include <libm/isnan.h>
 /* >> fminf(3), fmin(3), fminl(3)
  * Return minimum numeric value from `x' and `y' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_fminf)(float x,
                              float y) {
-	/* TODO: ieee754-specific function */
-	return x < y ? x : y;
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	if (__LIBM_MATHFUNI2F(islessequal, x, y))
+		return x;
+	if (__LIBM_MATHFUNIF(isnan, y))
+		return x;
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+	if (x <= y)
+		return x;
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+	return y;
 }
 /* >> fmaf(3), fma(3), fmal(3)
  * Multiply-add function computed as a ternary operation */
@@ -2883,21 +2927,43 @@ NOTHROW(LIBCCALL libc_fdiml)(__LONGDOUBLE x,
 	/* TODO: ieee754-specific function */
 	return libc_fabsl(y - x);
 }
+#include <ieee754.h>
+#include <libm/fcomp.h>
+#include <libm/isnan.h>
 /* >> fmaxf(3), fmax(3), fmaxl(3)
  * Return maximum numeric value from `x' and `y' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_fmaxl)(__LONGDOUBLE x,
                              __LONGDOUBLE y) {
-	/* TODO: ieee754-specific function */
-	return x < y ? y : x;
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	if (__LIBM_MATHFUNI2L(isgreaterequal, x, y))
+		return x;
+	if (__LIBM_MATHFUNIL(isnan, y))
+		return x;
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+	if (x >= y)
+		return x;
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+	return y;
 }
+#include <ieee754.h>
+#include <libm/fcomp.h>
+#include <libm/isnan.h>
 /* >> fminf(3), fmin(3), fminl(3)
  * Return minimum numeric value from `x' and `y' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_fminl)(__LONGDOUBLE x,
                              __LONGDOUBLE y) {
-	/* TODO: ieee754-specific function */
-	return x < y ? x : y;
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	if (__LIBM_MATHFUNI2L(islessequal, x, y))
+		return x;
+	if (__LIBM_MATHFUNIL(isnan, y))
+		return x;
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+	if (x <= y)
+		return x;
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+	return y;
 }
 /* >> fmaf(3), fma(3), fmal(3)
  * Multiply-add function computed as a ternary operation */
