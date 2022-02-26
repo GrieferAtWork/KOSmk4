@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47fbdc81 */
+/* HASH CRC-32:0x347c5835 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include "../api.h"
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include "../user/math.h"
+#include "math.h"
 #include "fenv.h"
 
 DECL_BEGIN
@@ -3328,6 +3328,29 @@ NOTHROW(LIBCCALL libc_y1)(double x) {
 	}
 	return __LIBM_MATHFUN(y1, x);
 }
+#include <libm/fcomp.h>
+#include <bits/math-constants.h>
+#include <libm/matherr.h>
+#include <libm/yn.h>
+#include <bits/crt/fenv.h>
+/* >> ynf(3), yn(3), ynl(3) */
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
+NOTHROW(LIBCCALL libc_yn)(int n,
+                          double x) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    (__LIBM_MATHFUNI2(islessequal, x, 0.0) ||
+	     __LIBM_MATHFUNI2(isgreater, x, 1.41484755040568800000e+16 /*X_TLOSS*/))) {
+		if (x < 0.0) {
+			libc_feraiseexcept(FE_INVALID);
+			return __kernel_standard(n, x, -__HUGE_VAL, __LIBM_KMATHERR_YN_MINUS);
+		} else if (x == 0.0) {
+			return __kernel_standard(n, x, -__HUGE_VAL, __LIBM_KMATHERR_YN_ZERO);
+		} else if (__LIBM_LIB_VERSION != __LIBM_POSIX) {
+			return __kernel_standard(n, x, 0.0f, __LIBM_KMATHERR_YN_TLOSS);
+		}
+	}
+	return __LIBM_MATHFUNIM(yn, n, x);
+}
 #include <libm/j0.h>
 #include <libm/fcomp.h>
 #include <libm/matherr.h>
@@ -3441,11 +3464,35 @@ NOTHROW(LIBCCALL libc_y1f)(float x) {
 	return (float)libc_y1((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
+#include <libm/fcomp.h>
+#include <bits/math-constants.h>
+#include <libm/matherr.h>
+#include <libm/yn.h>
+#include <bits/crt/fenv.h>
 /* >> ynf(3), yn(3), ynl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_ynf)(int n,
                            float x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    (__LIBM_MATHFUNI2F(islessequal, x, 0.0f) ||
+	     __LIBM_MATHFUNI2F(isgreater, x, 1.41484755040568800000e+16 /*X_TLOSS*/))) {
+		if (x < 0.0f) {
+			libc_feraiseexcept(FE_INVALID);
+			return __kernel_standard_f(n, x, -__HUGE_VALF, __LIBM_KMATHERRF_YN_MINUS);
+		} else if (x == 0.0f) {
+			return __kernel_standard_f(n, x, -__HUGE_VALF, __LIBM_KMATHERRF_YN_ZERO);
+		} else if (__LIBM_LIB_VERSION != __LIBM_POSIX) {
+			return __kernel_standard_f(n, x, 0.0f, __LIBM_KMATHERRF_YN_TLOSS);
+		}
+	}
+	return __LIBM_MATHFUNIMF(yn, n, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)libc_yn(n, (double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 #include <libm/j0.h>
 #include <libm/fcomp.h>
@@ -3560,11 +3607,35 @@ NOTHROW(LIBCCALL libc_y1l)(__LONGDOUBLE x) {
 	return (__LONGDOUBLE)libc_y1((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
+#include <libm/fcomp.h>
+#include <bits/math-constants.h>
+#include <libm/matherr.h>
+#include <libm/yn.h>
+#include <bits/crt/fenv.h>
 /* >> ynf(3), yn(3), ynl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_ynl)(int n,
                            __LONGDOUBLE x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    (__LIBM_MATHFUNI2L(islessequal, x, 0.0L) ||
+	     __LIBM_MATHFUNI2L(isgreater, x, 1.41484755040568800000e+16 /*X_TLOSS*/))) {
+		if (x < 0.0L) {
+			libc_feraiseexcept(FE_INVALID);
+			return __kernel_standard_l(n, x, -__HUGE_VALL, __LIBM_KMATHERRL_YN_MINUS);
+		} else if (x == 0.0L) {
+			return __kernel_standard_l(n, x, -__HUGE_VALL, __LIBM_KMATHERRL_YN_ZERO);
+		} else if (__LIBM_LIB_VERSION != __LIBM_POSIX) {
+			return __kernel_standard_l(n, x, 0.0f, __LIBM_KMATHERRL_YN_TLOSS);
+		}
+	}
+	return __LIBM_MATHFUNIML(yn, n, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)libc_yn(n, (double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 #include <libm/lgamma.h>
 #include <libm/matherr.h>
@@ -4497,6 +4568,8 @@ DEFINE_PUBLIC_ALIAS(__y0, libc_y0);
 DEFINE_PUBLIC_ALIAS(y0, libc_y0);
 DEFINE_PUBLIC_ALIAS(__y1, libc_y1);
 DEFINE_PUBLIC_ALIAS(y1, libc_y1);
+DEFINE_PUBLIC_ALIAS(__yn, libc_yn);
+DEFINE_PUBLIC_ALIAS(yn, libc_yn);
 DEFINE_PUBLIC_ALIAS(__j0f, libc_j0f);
 DEFINE_PUBLIC_ALIAS(j0f, libc_j0f);
 DEFINE_PUBLIC_ALIAS(__j1f, libc_j1f);

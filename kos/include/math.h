@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb605d001 */
+/* HASH CRC-32:0x2f81c4dd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -8416,6 +8416,10 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,yn,(int __n, double __x),(__n,__x))
 #elif defined(__CRT_HAVE___yn)
 /* >> ynf(3), yn(3), ynl(3) */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,yn,(int __n, double __x),__yn,(__n,__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/yn.h>
+/* >> ynf(3), yn(3), ynl(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(yn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL yn)(int __n, double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(yn))(__n, __x); })
 #endif /* ... */
 #if __has_builtin(__builtin_j0f) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_j0f)
 /* >> j0f(3), j0(3), j0l(3) */
@@ -8496,7 +8500,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,ynf,(int __n, float __x),(__n,__x))
 #elif defined(__CRT_HAVE___ynf)
 /* >> ynf(3), yn(3), ynl(3) */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,ynf,(int __n, float __x),__ynf,(__n,__x))
-#elif defined(__CRT_HAVE_yn) || defined(__CRT_HAVE___yn)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_yn) || defined(__CRT_HAVE___yn) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/ynf.h>
 /* >> ynf(3), yn(3), ynl(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ynf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL ynf)(int __n, float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ynf))(__n, __x); })
@@ -8581,7 +8585,7 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ynl,(int __n, __LONGDOUBLE __x)
 #elif defined(__CRT_HAVE___ynl)
 /* >> ynf(3), yn(3), ynl(3) */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ynl,(int __n, __LONGDOUBLE __x),__ynl,(__n,__x))
-#elif defined(__CRT_HAVE_yn) || defined(__CRT_HAVE___yn)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_yn) || defined(__CRT_HAVE___yn) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/ynl.h>
 /* >> ynf(3), yn(3), ynl(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ynl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL ynl)(int __n, __LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ynl))(__n, __x); })
@@ -11256,6 +11260,10 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__yn,(int __n, double __x),yn,(__n,_
 #elif defined(__CRT_HAVE___yn)
 /* >> ynf(3), yn(3), ynl(3) */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__yn,(int __n, double __x),(__n,__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/yn.h>
+/* >> ynf(3), yn(3), ynl(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __yn)(int __n, double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(yn))(__n, __x); }
 #endif /* ... */
 #endif /* __USE_MISC || __USE_XOPEN */
 #ifdef __USE_MISC
@@ -11338,7 +11346,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__ynf,(int __n, float __x),ynf,(__n,_
 #elif defined(__CRT_HAVE___ynf)
 /* >> ynf(3), yn(3), ynl(3) */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__ynf,(int __n, float __x),(__n,__x))
-#elif defined(__CRT_HAVE_yn) || defined(__CRT_HAVE___yn)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_yn) || defined(__CRT_HAVE___yn) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/ynf.h>
 /* >> ynf(3), yn(3), ynl(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __ynf)(int __n, float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ynf))(__n, __x); }
@@ -11423,7 +11431,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__ynl,(int __n, __LONGDOUBLE _
 #elif defined(__CRT_HAVE___ynl)
 /* >> ynf(3), yn(3), ynl(3) */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__ynl,(int __n, __LONGDOUBLE __x),(__n,__x))
-#elif defined(__CRT_HAVE_yn) || defined(__CRT_HAVE___yn)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_yn) || defined(__CRT_HAVE___yn) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/ynl.h>
 /* >> ynf(3), yn(3), ynl(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __ynl)(int __n, __LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ynl))(__n, __x); }

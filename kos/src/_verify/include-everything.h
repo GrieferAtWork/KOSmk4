@@ -892,6 +892,7 @@ incdir("");
 #include <libm/trunc.h>
 #include <libm/y0.h>
 #include <libm/y1.h>
+#include <libm/yn.h>
 #include <libpciaccess/api.h>
 #include <libpciaccess/config.h>
 #include <libpciaccess/paths.h>

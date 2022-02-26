@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe80e0b6 */
+/* HASH CRC-32:0x7e76b4b0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -669,8 +669,6 @@
 #define __stub_wcsnrtombs
 #define __stub_wfreadlinkat
 #define __stub_wttyname_r
-#define __stub___yn
-#define __stub_yn
 #define __stub_DOS$_W_Gettnames
 #define __stub_DOS$_Wcsftime
 #define __stub_DOS$___lc_locale_name_func
