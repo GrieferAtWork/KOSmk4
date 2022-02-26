@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ac45c05 */
+/* HASH CRC-32:0xce965cd8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1908,12 +1908,24 @@ INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_isnanl)(__LONGDOUBLE x);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> j0f(3), j0(3), j0l(3) */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_j0)(double x);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> j0f(3), j0(3), j0l(3) */
+INTDEF WUNUSED double NOTHROW(LIBCCALL libc_j0)(double x);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> j1f(3), j1(3), j1l(3) */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_j1)(double x);
 /* >> jnf(3), jn(3), jnl(3) */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_jn)(int n, double x);
 /* >> y0f(3), y0(3), y0l(3) */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_y0)(double x);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> y0f(3), y0(3), y0l(3) */
+INTDEF WUNUSED double NOTHROW(LIBCCALL libc_y0)(double x);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> y1f(3), y1(3), y1l(3) */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_y1)(double x);
 /* >> ynf(3), yn(3), ynl(3) */

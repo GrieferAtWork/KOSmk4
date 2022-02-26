@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39f635c8 */
+/* HASH CRC-32:0x28a0df53 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,33 +18,55 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_exp2_defined
-#define __local_exp2_defined
+#ifndef __local_y0_defined
+#define __local_y0_defined
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-#include <libm/exp2.h>
-#include <libm/matherr.h>
-#include <libm/finite.h>
-#include <libm/signbit.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(exp2) __ATTR_WUNUSED double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(exp2))(double __x) {
-	double __result = __LIBM_MATHFUN(exp2, __x);
-	if (__LIBM_LIB_VERSION != __LIBM_IEEE && !__LIBM_MATHFUNI(finite, __result) && __LIBM_MATHFUNI(finite, __x)) {
-		return __kernel_standard(__x, __x, __result,
-		                         __LIBM_MATHFUNI(signbit, __x)
-		                         ? __LIBM_KMATHERR_EXP2_UNDERFLOW
-		                         : __LIBM_KMATHERR_EXP2_OVERFLOW);
+#ifndef __local___localdep_feraiseexcept_defined
+#define __local___localdep_feraiseexcept_defined
+#ifdef __CRT_HAVE_feraiseexcept
+__NAMESPACE_LOCAL_END
+#include <kos/anno.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,int,__THROWING,__localdep_feraiseexcept,(int __excepts),feraiseexcept,(__excepts))
+#else /* __CRT_HAVE_feraiseexcept */
+__NAMESPACE_LOCAL_END
+#include <libc/local/fenv/feraiseexcept.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_feraiseexcept __LIBC_LOCAL_NAME(feraiseexcept)
+#endif /* !__CRT_HAVE_feraiseexcept */
+#endif /* !__local___localdep_feraiseexcept_defined */
+__NAMESPACE_LOCAL_END
+#include <libm/fcomp.h>
+#include <bits/math-constants.h>
+#include <libm/matherr.h>
+#include <libm/y0.h>
+#include <bits/crt/fenv.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(y0) __ATTR_WUNUSED double
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(y0))(double __x) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    (__LIBM_MATHFUNI2(islessequal, __x, 0.0) ||
+	     __LIBM_MATHFUNI2(isgreater, __x, 1.41484755040568800000e+16 /*X_TLOSS*/))) {
+		if (__x < 0.0) {
+			(__NAMESPACE_LOCAL_SYM __localdep_feraiseexcept)(FE_INVALID);
+			return __kernel_standard(__x, __x, -__HUGE_VAL, __LIBM_KMATHERR_Y0_MINUS);
+		} else if (__x == 0.0) {
+			return __kernel_standard(__x, __x, -__HUGE_VAL, __LIBM_KMATHERR_Y0_ZERO);
+		} else if (__LIBM_LIB_VERSION != __LIBM_POSIX) {
+			return __kernel_standard(__x, __x, 0.0f, __LIBM_KMATHERR_Y0_TLOSS);
+		}
 	}
-	return __result;
+	return __LIBM_MATHFUN(y0, __x);
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_exp2_defined
-#define __local___localdep_exp2_defined
-#define __localdep_exp2 __LIBC_LOCAL_NAME(exp2)
-#endif /* !__local___localdep_exp2_defined */
+#ifndef __local___localdep_y0_defined
+#define __local___localdep_y0_defined
+#define __localdep_y0 __LIBC_LOCAL_NAME(y0)
+#endif /* !__local___localdep_y0_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#undef __local_exp2_defined
+#undef __local_y0_defined
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#endif /* !__local_exp2_defined */
+#endif /* !__local_y0_defined */

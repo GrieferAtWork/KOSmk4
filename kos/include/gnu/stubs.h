@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13db85fb */
+/* HASH CRC-32:0x3f7f90b8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -403,8 +403,6 @@
 #define __stub_iruserok
 #define __stub_iruserok_af
 #define __stub_isastream
-#define __stub___j0
-#define __stub_j0
 #define __stub___j1
 #define __stub_j1
 #define __stub___jn
@@ -675,8 +673,6 @@
 #define __stub_wcsnrtombs
 #define __stub_wfreadlinkat
 #define __stub_wttyname_r
-#define __stub___y0
-#define __stub_y0
 #define __stub___y1
 #define __stub_y1
 #define __stub___yn

@@ -777,10 +777,10 @@ double logb(double x) {
 double exp2(double x) {
 	double result = __LIBM_MATHFUN(@exp2@, x);
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && !__LIBM_MATHFUNI(@finite@, result) && __LIBM_MATHFUNI(@finite@, x)) {
-		return __kernel_standard_f(x, x, result,
-		                           __LIBM_MATHFUNI(@signbit@, x)
-		                           ? __LIBM_KMATHERR_EXP2_UNDERFLOW
-		                           : __LIBM_KMATHERR_EXP2_OVERFLOW);
+		return __kernel_standard(x, x, result,
+		                         __LIBM_MATHFUNI(@signbit@, x)
+		                         ? __LIBM_KMATHERR_EXP2_UNDERFLOW
+		                         : __LIBM_KMATHERR_EXP2_OVERFLOW);
 	}
 	return result;
 }
@@ -1994,7 +1994,17 @@ isnanl(*) %{generate(double2ldouble("isnan"))}
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN) && __MATH_DECLARING_DOUBLE)
 @@>> j0f(3), j0(3), j0l(3)
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__j0")]]
-double j0(double x); /* TODO */
+[[impl_include("<libm/j0.h>", "<libm/fcomp.h>", "<libm/matherr.h>", "<libm/fabs.h>")]]
+[[requires_include("<ieee754.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+double j0(double x) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_LIB_VERSION != __LIBM_POSIX &&
+	    __LIBM_MATHFUNI2(@isgreater@, __LIBM_MATHFUN(@fabs@, x), @1.41484755040568800000e+16@ /*X_TLOSS*/))
+		return __kernel_standard(x, x, 0.0, __LIBM_KMATHERR_J0_TLOSS); /* j0(|x|>X_TLOSS) */
+	return __LIBM_MATHFUN(@j0@, x);
+}
 
 @@>> j1f(3), j1(3), j1l(3)
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__j1")]]
@@ -2006,7 +2016,28 @@ double jn(int n, double x); /* TODO */
 
 @@>> y0f(3), y0(3), y0l(3)
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__y0")]]
-double y0(double x); /* TODO */
+[[impl_include("<libm/fcomp.h>", "<bits/math-constants.h>")]]
+[[impl_include("<libm/matherr.h>", "<libm/y0.h>", "<bits/crt/fenv.h>")]]
+[[requires_include("<ieee754.h>")]]
+[[requires($has_function(feraiseexcept) &&
+           (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))]]
+double y0(double x) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    (__LIBM_MATHFUNI2(@islessequal@, x, 0.0) ||
+	     __LIBM_MATHFUNI2(@isgreater@, x, @1.41484755040568800000e+16@ /*X_TLOSS*/))) {
+		if (x < 0.0) {
+			feraiseexcept(@FE_INVALID@);
+			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_Y0_MINUS);
+		} else if (x == 0.0) {
+			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_Y0_ZERO);
+		} else if (__LIBM_LIB_VERSION != __LIBM_POSIX) {
+			return __kernel_standard(x, x, 0.0f, __LIBM_KMATHERR_Y0_TLOSS);
+		}
+	}
+	return __LIBM_MATHFUN(@y0@, x);
+}
 
 @@>> y1f(3), y1(3), y1l(3)
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__y1")]]

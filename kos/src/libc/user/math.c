@@ -55,18 +55,6 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_j0,hash:CRC-32=0x11322994]]]*/
-/* >> j0f(3), j0(3), j0l(3) */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
-NOTHROW(LIBCCALL libc_j0)(double x)
-/*[[[body:libc_j0]]]*/
-/*AUTO*/{
-	(void)x;
-	CRT_UNIMPLEMENTEDF("j0(%f)", x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_j0]]]*/
 
 /*[[[head:libc_j1,hash:CRC-32=0x4171b981]]]*/
 /* >> j1f(3), j1(3), j1l(3) */
@@ -96,18 +84,6 @@ NOTHROW(LIBCCALL libc_jn)(int n,
 }
 /*[[[end:libc_jn]]]*/
 
-/*[[[head:libc_y0,hash:CRC-32=0xc9cba8ec]]]*/
-/* >> y0f(3), y0(3), y0l(3) */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
-NOTHROW(LIBCCALL libc_y0)(double x)
-/*[[[body:libc_y0]]]*/
-/*AUTO*/{
-	(void)x;
-	CRT_UNIMPLEMENTEDF("y0(%f)", x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_y0]]]*/
 
 /*[[[head:libc_y1,hash:CRC-32=0x998838f9]]]*/
 /* >> y1f(3), y1(3), y1l(3) */
@@ -142,15 +118,11 @@ NOTHROW(LIBCCALL libc_yn)(int n,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x4fd47c61]]]*/
-DEFINE_PUBLIC_ALIAS(__j0, libc_j0);
-DEFINE_PUBLIC_ALIAS(j0, libc_j0);
+/*[[[start:exports,hash:CRC-32=0xc5cfd36c]]]*/
 DEFINE_PUBLIC_ALIAS(__j1, libc_j1);
 DEFINE_PUBLIC_ALIAS(j1, libc_j1);
 DEFINE_PUBLIC_ALIAS(__jn, libc_jn);
 DEFINE_PUBLIC_ALIAS(jn, libc_jn);
-DEFINE_PUBLIC_ALIAS(__y0, libc_y0);
-DEFINE_PUBLIC_ALIAS(y0, libc_y0);
 DEFINE_PUBLIC_ALIAS(__y1, libc_y1);
 DEFINE_PUBLIC_ALIAS(y1, libc_y1);
 DEFINE_PUBLIC_ALIAS(__yn, libc_yn);

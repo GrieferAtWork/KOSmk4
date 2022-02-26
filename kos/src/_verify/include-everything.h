@@ -848,6 +848,7 @@ incdir("");
 #include <libm/isinf.h>
 #include <libm/isnan.h>
 #include <libm/issignaling.h>
+#include <libm/j0.h>
 #include <libm/kernel_cos.h>
 #include <libm/kernel_rem_pio2.h>
 #include <libm/kernel_sin.h>
@@ -867,6 +868,7 @@ incdir("");
 #include <libm/nextafter.h>
 #include <libm/nexttoward.h>
 #include <libm/pow.h>
+#include <libm/pzero.h>
 #include <libm/rem_pio2.h>
 #include <libm/remainder.h>
 #include <libm/remquo.h>
@@ -885,6 +887,7 @@ incdir("");
 #include <libm/tanh.h>
 #include <libm/tgamma.h>
 #include <libm/trunc.h>
+#include <libm/y0.h>
 #include <libpciaccess/api.h>
 #include <libpciaccess/config.h>
 #include <libpciaccess/paths.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89929328 */
+/* HASH CRC-32:0xb7bb3b4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1310,10 +1310,10 @@ INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_exp2)(double x) {
 	double result = __LIBM_MATHFUN(exp2, x);
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && !__LIBM_MATHFUNI(finite, result) && __LIBM_MATHFUNI(finite, x)) {
-		return __kernel_standard_f(x, x, result,
-		                           __LIBM_MATHFUNI(signbit, x)
-		                           ? __LIBM_KMATHERR_EXP2_UNDERFLOW
-		                           : __LIBM_KMATHERR_EXP2_OVERFLOW);
+		return __kernel_standard(x, x, result,
+		                         __LIBM_MATHFUNI(signbit, x)
+		                         ? __LIBM_KMATHERR_EXP2_UNDERFLOW
+		                         : __LIBM_KMATHERR_EXP2_OVERFLOW);
 	}
 	return result;
 }
@@ -1355,9 +1355,9 @@ NOTHROW(LIBCCALL libc_exp2f)(float x) {
 	float result = __LIBM_MATHFUNF(exp2, x);
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && !__LIBM_MATHFUNIF(finite, result) && __LIBM_MATHFUNIF(finite, x)) {
 		return __kernel_standard_f(x, x, result,
-		                           __LIBM_MATHFUNIF(signbit, x)
-		                           ? __LIBM_KMATHERRF_EXP2_UNDERFLOW
-		                           : __LIBM_KMATHERRF_EXP2_OVERFLOW);
+		                         __LIBM_MATHFUNIF(signbit, x)
+		                         ? __LIBM_KMATHERRF_EXP2_UNDERFLOW
+		                         : __LIBM_KMATHERRF_EXP2_OVERFLOW);
 	}
 	return result;
 #else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
@@ -1408,10 +1408,10 @@ NOTHROW(LIBCCALL libc_exp2l)(__LONGDOUBLE x) {
 
 	__LONGDOUBLE result = __LIBM_MATHFUNL(exp2, x);
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && !__LIBM_MATHFUNIL(finite, result) && __LIBM_MATHFUNIL(finite, x)) {
-		return __kernel_standard_f(x, x, result,
-		                           __LIBM_MATHFUNIL(signbit, x)
-		                           ? __LIBM_KMATHERRL_EXP2_UNDERFLOW
-		                           : __LIBM_KMATHERRL_EXP2_OVERFLOW);
+		return __kernel_standard_l(x, x, result,
+		                         __LIBM_MATHFUNIL(signbit, x)
+		                         ? __LIBM_KMATHERRL_EXP2_UNDERFLOW
+		                         : __LIBM_KMATHERRL_EXP2_OVERFLOW);
 	}
 	return result;
 #else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
@@ -3247,10 +3247,57 @@ NOTHROW(LIBCCALL libc_isnanl)(__LONGDOUBLE x) {
 	return libc_isnan((double)x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
+#include <libm/j0.h>
+#include <libm/fcomp.h>
+#include <libm/matherr.h>
+#include <libm/fabs.h>
+/* >> j0f(3), j0(3), j0l(3) */
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
+NOTHROW(LIBCCALL libc_j0)(double x) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_LIB_VERSION != __LIBM_POSIX &&
+	    __LIBM_MATHFUNI2(isgreater, __LIBM_MATHFUN(fabs, x), 1.41484755040568800000e+16 /*X_TLOSS*/))
+		return __kernel_standard(x, x, 0.0, __LIBM_KMATHERR_J0_TLOSS); /* j0(|x|>X_TLOSS) */
+	return __LIBM_MATHFUN(j0, x);
+}
+#include <libm/fcomp.h>
+#include <bits/math-constants.h>
+#include <libm/matherr.h>
+#include <libm/y0.h>
+#include <bits/crt/fenv.h>
+/* >> y0f(3), y0(3), y0l(3) */
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
+NOTHROW(LIBCCALL libc_y0)(double x) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    (__LIBM_MATHFUNI2(islessequal, x, 0.0) ||
+	     __LIBM_MATHFUNI2(isgreater, x, 1.41484755040568800000e+16 /*X_TLOSS*/))) {
+		if (x < 0.0) {
+			libc_feraiseexcept(FE_INVALID);
+			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_Y0_MINUS);
+		} else if (x == 0.0) {
+			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_Y0_ZERO);
+		} else if (__LIBM_LIB_VERSION != __LIBM_POSIX) {
+			return __kernel_standard(x, x, 0.0f, __LIBM_KMATHERR_Y0_TLOSS);
+		}
+	}
+	return __LIBM_MATHFUN(y0, x);
+}
+#include <libm/j0.h>
+#include <libm/fcomp.h>
+#include <libm/matherr.h>
+#include <libm/fabs.h>
 /* >> j0f(3), j0(3), j0l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_j0f)(float x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_LIB_VERSION != __LIBM_POSIX &&
+	    __LIBM_MATHFUNI2F(isgreater, __LIBM_MATHFUNF(fabs, x), 1.41484755040568800000e+16 /*X_TLOSS*/))
+		return __kernel_standard_f(x, x, 0.0f, __LIBM_KMATHERRF_J0_TLOSS); /* j0(|x|>X_TLOSS) */
+	return __LIBM_MATHFUNF(j0, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)libc_j0((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 /* >> j1f(3), j1(3), j1l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
@@ -3263,10 +3310,34 @@ NOTHROW(LIBCCALL libc_jnf)(int n,
                            float x) {
 	return (float)libc_jn(n, (double)x);
 }
+#include <libm/fcomp.h>
+#include <bits/math-constants.h>
+#include <libm/matherr.h>
+#include <libm/y0.h>
+#include <bits/crt/fenv.h>
 /* >> y0f(3), y0(3), y0l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_y0f)(float x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    (__LIBM_MATHFUNI2F(islessequal, x, 0.0f) ||
+	     __LIBM_MATHFUNI2F(isgreater, x, 1.41484755040568800000e+16 /*X_TLOSS*/))) {
+		if (x < 0.0f) {
+			libc_feraiseexcept(FE_INVALID);
+			return __kernel_standard_f(x, x, -__HUGE_VALF, __LIBM_KMATHERRF_Y0_MINUS);
+		} else if (x == 0.0f) {
+			return __kernel_standard_f(x, x, -__HUGE_VALF, __LIBM_KMATHERRF_Y0_ZERO);
+		} else if (__LIBM_LIB_VERSION != __LIBM_POSIX) {
+			return __kernel_standard_f(x, x, 0.0f, __LIBM_KMATHERRF_Y0_TLOSS);
+		}
+	}
+	return __LIBM_MATHFUNF(y0, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)libc_y0((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 /* >> y1f(3), y1(3), y1l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
@@ -3279,10 +3350,23 @@ NOTHROW(LIBCCALL libc_ynf)(int n,
                            float x) {
 	return (float)libc_yn(n, (double)x);
 }
+#include <libm/j0.h>
+#include <libm/fcomp.h>
+#include <libm/matherr.h>
+#include <libm/fabs.h>
 /* >> j0f(3), j0(3), j0l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_j0l)(__LONGDOUBLE x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_LIB_VERSION != __LIBM_POSIX &&
+	    __LIBM_MATHFUNI2L(isgreater, __LIBM_MATHFUNL(fabs, x), 1.41484755040568800000e+16 /*X_TLOSS*/))
+		return __kernel_standard_l(x, x, 0.0L, __LIBM_KMATHERRL_J0_TLOSS); /* j0(|x|>X_TLOSS) */
+	return __LIBM_MATHFUNL(j0, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)libc_j0((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 /* >> j1f(3), j1(3), j1l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
@@ -3295,10 +3379,34 @@ NOTHROW(LIBCCALL libc_jnl)(int n,
                            __LONGDOUBLE x) {
 	return (__LONGDOUBLE)libc_jn(n, (double)x);
 }
+#include <libm/fcomp.h>
+#include <bits/math-constants.h>
+#include <libm/matherr.h>
+#include <libm/y0.h>
+#include <bits/crt/fenv.h>
 /* >> y0f(3), y0(3), y0l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_y0l)(__LONGDOUBLE x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    (__LIBM_MATHFUNI2L(islessequal, x, 0.0L) ||
+	     __LIBM_MATHFUNI2L(isgreater, x, 1.41484755040568800000e+16 /*X_TLOSS*/))) {
+		if (x < 0.0L) {
+			libc_feraiseexcept(FE_INVALID);
+			return __kernel_standard_l(x, x, -__HUGE_VALL, __LIBM_KMATHERRL_Y0_MINUS);
+		} else if (x == 0.0L) {
+			return __kernel_standard_l(x, x, -__HUGE_VALL, __LIBM_KMATHERRL_Y0_ZERO);
+		} else if (__LIBM_LIB_VERSION != __LIBM_POSIX) {
+			return __kernel_standard_l(x, x, 0.0f, __LIBM_KMATHERRL_Y0_TLOSS);
+		}
+	}
+	return __LIBM_MATHFUNL(y0, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)libc_y0((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 /* >> y1f(3), y1(3), y1l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
@@ -4232,6 +4340,10 @@ DEFINE_PUBLIC_ALIAS(__isnanf, libc_isnanf);
 DEFINE_PUBLIC_ALIAS(isnanf, libc_isnanf);
 DEFINE_PUBLIC_ALIAS(__isnanl, libc_isnanl);
 DEFINE_PUBLIC_ALIAS(isnanl, libc_isnanl);
+DEFINE_PUBLIC_ALIAS(__j0, libc_j0);
+DEFINE_PUBLIC_ALIAS(j0, libc_j0);
+DEFINE_PUBLIC_ALIAS(__y0, libc_y0);
+DEFINE_PUBLIC_ALIAS(y0, libc_y0);
 DEFINE_PUBLIC_ALIAS(__j0f, libc_j0f);
 DEFINE_PUBLIC_ALIAS(j0f, libc_j0f);
 DEFINE_PUBLIC_ALIAS(__j1f, libc_j1f);
