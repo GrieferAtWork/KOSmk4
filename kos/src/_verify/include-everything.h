@@ -890,6 +890,7 @@ incdir("");
 #include <libm/tgamma.h>
 #include <libm/trunc.h>
 #include <libm/y0.h>
+#include <libm/y1.h>
 #include <libpciaccess/api.h>
 #include <libpciaccess/config.h>
 #include <libpciaccess/paths.h>

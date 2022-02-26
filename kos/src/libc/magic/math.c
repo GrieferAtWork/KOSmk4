@@ -2051,7 +2051,28 @@ double y0(double x) {
 
 @@>> y1f(3), y1(3), y1l(3)
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__y1")]]
-double y1(double x); /* TODO */
+[[impl_include("<libm/fcomp.h>", "<bits/math-constants.h>")]]
+[[impl_include("<libm/matherr.h>", "<libm/y1.h>", "<bits/crt/fenv.h>")]]
+[[requires_include("<ieee754.h>")]]
+[[requires($has_function(feraiseexcept) &&
+           (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))]]
+double y1(double x) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    (__LIBM_MATHFUNI2(@islessequal@, x, 0.0) ||
+	     __LIBM_MATHFUNI2(@isgreater@, x, @1.41484755040568800000e+16@ /*X_TLOSS*/))) {
+		if (x < 0.0) {
+			feraiseexcept(@FE_INVALID@);
+			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_Y1_MINUS);
+		} else if (x == 0.0) {
+			return __kernel_standard(x, x, -__HUGE_VAL, __LIBM_KMATHERR_Y1_ZERO);
+		} else if (__LIBM_LIB_VERSION != __LIBM_POSIX) {
+			return __kernel_standard(x, x, 0.0f, __LIBM_KMATHERR_Y1_TLOSS);
+		}
+	}
+	return __LIBM_MATHFUN(@y1@, x);
+}
 
 @@>> ynf(3), yn(3), ynl(3)
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__yn")]]

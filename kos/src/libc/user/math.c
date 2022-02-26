@@ -73,18 +73,6 @@ NOTHROW(LIBCCALL libc_jn)(int n,
 /*[[[end:libc_jn]]]*/
 
 
-/*[[[head:libc_y1,hash:CRC-32=0x998838f9]]]*/
-/* >> y1f(3), y1(3), y1l(3) */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
-NOTHROW(LIBCCALL libc_y1)(double x)
-/*[[[body:libc_y1]]]*/
-/*AUTO*/{
-	(void)x;
-	CRT_UNIMPLEMENTEDF("y1(%f)", x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_y1]]]*/
 
 /*[[[head:libc_yn,hash:CRC-32=0x879fa852]]]*/
 /* >> ynf(3), yn(3), ynl(3) */
@@ -106,11 +94,9 @@ NOTHROW(LIBCCALL libc_yn)(int n,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xb4f36d36]]]*/
+/*[[[start:exports,hash:CRC-32=0x6f0b4033]]]*/
 DEFINE_PUBLIC_ALIAS(__jn, libc_jn);
 DEFINE_PUBLIC_ALIAS(jn, libc_jn);
-DEFINE_PUBLIC_ALIAS(__y1, libc_y1);
-DEFINE_PUBLIC_ALIAS(y1, libc_y1);
 DEFINE_PUBLIC_ALIAS(__yn, libc_yn);
 DEFINE_PUBLIC_ALIAS(yn, libc_yn);
 /*[[[end:exports]]]*/

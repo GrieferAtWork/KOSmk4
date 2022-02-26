@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x952066d */
+/* HASH CRC-32:0x11a13814 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,8 +33,6 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* >> jnf(3), jn(3), jnl(3) */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_jn)(int n, double x);
-/* >> y1f(3), y1(3), y1l(3) */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_y1)(double x);
 /* >> ynf(3), yn(3), ynl(3) */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_yn)(int n, double x);
 #endif /* !__KERNEL__ */
