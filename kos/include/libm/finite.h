@@ -44,7 +44,7 @@ __DECL_BEGIN
  * ====================================================
  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST int
+__LIBM_LOCAL_FUNC(finitef) __ATTR_WUNUSED __ATTR_CONST int
 (__LIBCCALL __ieee754_finitef)(__IEEE754_FLOAT_TYPE__ __x) {
 	__int32_t __ix;
 	__LIBM_GET_FLOAT_WORD(__ix, __x);
@@ -66,7 +66,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST int
  * ====================================================
  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST int
+__LIBM_LOCAL_FUNC(finite) __ATTR_WUNUSED __ATTR_CONST int
 (__LIBCCALL __ieee754_finite)(__IEEE754_DOUBLE_TYPE__ __x) {
 	__int32_t __hx;
 	__LIBM_GET_HIGH_WORD(__hx, __x);
@@ -87,7 +87,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST int
  * ====================================================
  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST int
+__LIBM_LOCAL_FUNC(finitel) __ATTR_WUNUSED __ATTR_CONST int
 (__LIBCCALL __ieee854_finitel)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	__uint32_t __exp;
 	__LIBM_GET_LDOUBLE_EXP(__exp, __x);

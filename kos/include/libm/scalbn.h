@@ -70,7 +70,7 @@ __LIBM_LOCAL_DECLARE_END
 #endif /* __INT_MAX__ <= 50000 */
 #endif /* !__LIBM_OVERFLOW_INT */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
+__LIBM_LOCAL_FUNC(scalbnf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_scalbnf)(__IEEE754_FLOAT_TYPE__ __x, int __n) {
 	__int32_t __k, __ix;
 	__uint32_t __hx;
@@ -110,7 +110,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	return __x * __LIBM_LOCAL_VALUE(twom25f);
 }
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
+__LIBM_LOCAL_FUNC(scalblnf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_scalblnf)(__IEEE754_FLOAT_TYPE__ __x, long int __n) {
 	__int32_t __k, __ix;
 	__LIBM_GET_FLOAT_WORD(__ix, __x);
@@ -173,7 +173,7 @@ __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, tiny, __IEEE754_DOUBLE_C(1.0e-300)
 #endif /* !__libm_tiny_defined */
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(scalbn) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_scalbn)(__IEEE754_DOUBLE_TYPE__ __x, int __n) {
 	__int32_t __k, __hx, __lx;
 	__LIBM_EXTRACT_WORDS(__hx, __lx, __x);
@@ -208,7 +208,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	return __x * __LIBM_LOCAL_VALUE(twom54);
 }
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(scalbln) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_scalbln)(__IEEE754_DOUBLE_TYPE__ __x, long int __n) {
 	__int32_t __k, __hx, __lx;
 	__LIBM_EXTRACT_WORDS(__hx, __lx, __x);
@@ -263,7 +263,7 @@ __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, tinyl, __IEEE854_LONG_DOUBLE_
 #endif /* !__libm_tinyl_defined */
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(scalbnl) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_scalbnl)(__IEEE854_LONG_DOUBLE_TYPE__ __x, int __n) {
 	__int32_t __k, __es, __hx, __lx;
 	__LIBM_GET_LDOUBLE_WORDS(__es, __hx, __lx, __x);
@@ -295,7 +295,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 	return __x * __LIBM_LOCAL_VALUE(twom64l);
 }
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(scalblnl) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_scalblnl)(__IEEE854_LONG_DOUBLE_TYPE__ x, long int n) {
 	__int32_t k, es, hx, lx;
 	__LIBM_GET_LDOUBLE_WORDS(es, hx, lx, x);

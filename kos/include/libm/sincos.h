@@ -40,7 +40,7 @@ __DECL_BEGIN
 
 #ifdef __IEEE754_FLOAT_TYPE__
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
-__LOCAL __ATTR_NONNULL((2, 3)) void
+__LIBM_LOCAL_FUNC(sincosf) __ATTR_NONNULL((2, 3)) void
 (__LIBCCALL __ieee754_sincosf)(__IEEE754_FLOAT_TYPE__ __x,
                                __IEEE754_FLOAT_TYPE__ *__psinx,
                                __IEEE754_FLOAT_TYPE__ *__pcosx) {
@@ -96,7 +96,7 @@ __LOCAL __ATTR_NONNULL((2, 3)) void
 
 #ifdef __IEEE754_DOUBLE_TYPE__
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
-__LOCAL __ATTR_NONNULL((2, 3)) void
+__LIBM_LOCAL_FUNC(sincos) __ATTR_NONNULL((2, 3)) void
 (__LIBCCALL __ieee754_sincos)(__IEEE754_DOUBLE_TYPE__ __x,
                               __IEEE754_DOUBLE_TYPE__ *__psinx,
                               __IEEE754_DOUBLE_TYPE__ *__pcosx) {
@@ -124,7 +124,7 @@ __LOCAL __ATTR_NONNULL((2, 3)) void
 
 #ifdef __IEEE854_LONG_DOUBLE_TYPE__
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
-__LOCAL __ATTR_NONNULL((2, 3)) void
+__LIBM_LOCAL_FUNC(sincosl) __ATTR_NONNULL((2, 3)) void
 (__LIBCCALL __ieee854_sincosl)(__IEEE854_LONG_DOUBLE_TYPE__ __x,
                                __IEEE854_LONG_DOUBLE_TYPE__ *__psinx,
                                __IEEE854_LONG_DOUBLE_TYPE__ *__pcosx) {

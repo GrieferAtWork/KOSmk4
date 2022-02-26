@@ -89,7 +89,7 @@ __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, zerof, __IEEE754_FLOAT_C(0.00000000
 #endif /* !__libm_zerof_defined */
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
+__LIBM_LOCAL_FUNC(log2f) __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_log2f)(__IEEE754_FLOAT_TYPE__ __x) {
 	__IEEE754_FLOAT_TYPE__ __hfsq, __f, __s, __z, __R, __w, __t1, __t2, __dk;
 	__int32_t __k, __ix, __i, __j;
@@ -197,7 +197,7 @@ __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, zero, __IEEE754_DOUBLE_C(0.0000000
 #endif /* !__libm_zero_defined */
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __IEEE754_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(log2) __ATTR_WUNUSED __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_log2)(__IEEE754_DOUBLE_TYPE__ __x) {
 	__IEEE754_DOUBLE_TYPE__ __hfsq, __f, __s, __z, __R, __w, __t1, __t2, __dk;
 	__int32_t __k, __hx, __i, __j;
@@ -269,7 +269,7 @@ __LOCAL __ATTR_WUNUSED __IEEE754_DOUBLE_TYPE__
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-__LOCAL __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(log2l) __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_log2l)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	/* Decompose x into 'x = 2^e * y' where e is an integer, '1/2 < y < 2'.
 	 * Then log2(x) = e + log2(y) = e + log(y)/log(2). */

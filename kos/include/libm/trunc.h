@@ -37,7 +37,7 @@ __DECL_BEGIN
 #ifndef __ieee754_truncf
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
+__LIBM_LOCAL_FUNC(truncf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_truncf)(__IEEE754_FLOAT_TYPE__ __x) {
 	__int32_t __i0, __j0;
 	__int32_t __sx;
@@ -66,7 +66,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 #ifndef __ieee754_trunc
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(trunc) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_trunc)(__IEEE754_DOUBLE_TYPE__ __x) {
 	__int32_t __i0, __j0;
 	__uint32_t __i1;
@@ -98,7 +98,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 #ifndef __ieee854_truncl
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(truncl) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_truncl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	__int32_t __i0, __j0;
 	__uint32_t __se, __i1;

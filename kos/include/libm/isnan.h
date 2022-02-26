@@ -44,7 +44,7 @@ __DECL_BEGIN
  * ====================================================
  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST int
+__LIBM_LOCAL_FUNC(isnanf) __ATTR_WUNUSED __ATTR_CONST int
 (__LIBCCALL __ieee754_isnanf)(__IEEE754_FLOAT_TYPE__ __x) {
 	__int32_t __ix;
 	__LIBM_GET_FLOAT_WORD(__ix, __x);
@@ -66,7 +66,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST int
  * ====================================================
  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST int
+__LIBM_LOCAL_FUNC(isnan) __ATTR_WUNUSED __ATTR_CONST int
 (__LIBCCALL __ieee754_isnan)(__IEEE754_DOUBLE_TYPE__ __x) {
 	__int32_t __hx, __lx;
 	__LIBM_EXTRACT_WORDS(__hx, __lx, __x);
@@ -81,7 +81,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST int
 #ifdef __IEEE854_LONG_DOUBLE_TYPE__
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST int
+__LIBM_LOCAL_FUNC(isnanl) __ATTR_WUNUSED __ATTR_CONST int
 (__LIBCCALL __ieee854_isnanl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	__int32_t __se, __hx, __lx;
 	__LIBM_GET_LDOUBLE_WORDS(__se, __hx, __lx, __x);

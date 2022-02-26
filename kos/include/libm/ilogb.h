@@ -45,7 +45,7 @@ __DECL_BEGIN
  * ====================================================
  */
 
-__LOCAL __ATTR_CONST __ATTR_WUNUSED int
+__LIBM_LOCAL_FUNC(ilogbf) __ATTR_CONST __ATTR_WUNUSED int
 (__LIBCCALL __ieee754_ilogbf)(__IEEE754_FLOAT_TYPE__ __x) {
 	__int32_t __hx, __ix;
 	__LIBM_GET_FLOAT_WORD(__hx, __x);
@@ -83,7 +83,7 @@ __LOCAL __ATTR_CONST __ATTR_WUNUSED int
  * ====================================================
  */
 
-__LOCAL __ATTR_CONST __ATTR_WUNUSED int
+__LIBM_LOCAL_FUNC(ilogb) __ATTR_CONST __ATTR_WUNUSED int
 (__LIBCCALL __ieee754_ilogb)(__IEEE754_DOUBLE_TYPE__ __x) {
 	__int32_t __hx, __lx, __ix;
 	__LIBM_GET_HIGH_WORD(__hx, __x);
@@ -127,7 +127,7 @@ __LOCAL __ATTR_CONST __ATTR_WUNUSED int
  * ====================================================
  */
 
-__LOCAL __ATTR_CONST __ATTR_WUNUSED int
+__LIBM_LOCAL_FUNC(ilogbl) __ATTR_CONST __ATTR_WUNUSED int
 (__LIBCCALL __ieee854_ilogbl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	__int32_t __es, __hx, __lx, __ix;
 	__LIBM_GET_LDOUBLE_EXP(__es, __x);

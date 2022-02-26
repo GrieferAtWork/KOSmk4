@@ -64,7 +64,7 @@ __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, twof, __IEEE754_FLOAT_C(2.0))
 #endif /* !__libm_twof_defined */
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
+__LIBM_LOCAL_FUNC(jnf) __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_jnf)(int __n, __IEEE754_FLOAT_TYPE__ __x) {
 	__int32_t __i, __hx, __ix;
 	__IEEE754_FLOAT_TYPE__ __a, __b, __temp, __di;
@@ -246,7 +246,7 @@ __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, two, __IEEE754_DOUBLE_C(2.0))
 #endif /* !__libm_two_defined */
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __IEEE754_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(jn) __ATTR_WUNUSED __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_jn)(int __n, __IEEE754_DOUBLE_TYPE__ __x) {
 	__IEEE754_DOUBLE_TYPE__ __a, __b, __temp, __di;
 	__IEEE754_DOUBLE_TYPE__ __z, __w;
@@ -463,7 +463,7 @@ __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, twol, __IEEE854_LONG_DOUBLE_C
 #endif /* !__libm_twol_defined */
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(jnl) __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_jnl)(int __n, __IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	__IEEE854_LONG_DOUBLE_TYPE__ __a, __b, __temp, __di;
 	__IEEE854_LONG_DOUBLE_TYPE__ __z, __w;

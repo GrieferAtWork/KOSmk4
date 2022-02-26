@@ -58,7 +58,7 @@ __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, log10_2hif, __IEEE754_FLOAT_C(3.010
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, log10_2lof, __IEEE754_FLOAT_C(7.9034151668e-07)) /* 0x355427db */
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
+__LIBM_LOCAL_FUNC(log10f) __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_log10f)(__IEEE754_FLOAT_TYPE__ __x) {
 	__IEEE754_FLOAT_TYPE__ __y, __z;
 	__int32_t __i, __k, __hx;
@@ -111,7 +111,7 @@ __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, log10_2hi, __IEEE754_DOUBLE_C(3.01
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, log10_2lo, __IEEE754_DOUBLE_C(3.69423907715893078616e-13)) /* 0x3D59FEF3, 0x11F12B36 */
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __IEEE754_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(log10) __ATTR_WUNUSED __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_log10)(__IEEE754_DOUBLE_TYPE__ __x) {
 	__IEEE754_DOUBLE_TYPE__ __y, __z;
 	__int32_t __i, __k, __hx;
@@ -229,9 +229,9 @@ __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, SQRTHl, __IEEE854_LONG_DOUBLE
 __LIBM_LOCAL_DECLARE_END
 
 /* Evaluate P[n] x^n  +  P[n-1] x^(n-1)  +  ...  +  P[0] */
-__LOCAL __ATTR_NONNULL((2)) __IEEE854_LONG_DOUBLE_TYPE__
-__libm_log10l_neval(__IEEE854_LONG_DOUBLE_TYPE__ __x,
-                    __IEEE854_LONG_DOUBLE_TYPE__ const *__p, int __n) {
+__LIBM_LOCAL_FUNC(log10l_neval) __ATTR_NONNULL((2)) __IEEE854_LONG_DOUBLE_TYPE__
+(__LIBCCALL __libm_log10l_neval)(__IEEE854_LONG_DOUBLE_TYPE__ __x,
+                                 __IEEE854_LONG_DOUBLE_TYPE__ const *__p, int __n) {
 	__IEEE854_LONG_DOUBLE_TYPE__ __y;
 	__p += __n;
 	__y = *__p--;
@@ -243,9 +243,9 @@ __libm_log10l_neval(__IEEE854_LONG_DOUBLE_TYPE__ __x,
 
 
 /* Evaluate x^n+1  +  P[n] x^(n)  +  P[n-1] x^(n-1)  +  ...  +  P[0] */
-__LOCAL __ATTR_NONNULL((2)) __IEEE854_LONG_DOUBLE_TYPE__
-__libm_log10l_deval(__IEEE854_LONG_DOUBLE_TYPE__ __x,
-                    __IEEE854_LONG_DOUBLE_TYPE__ const *__p, int __n) {
+__LIBM_LOCAL_FUNC(log10l_deval) __ATTR_NONNULL((2)) __IEEE854_LONG_DOUBLE_TYPE__
+(__LIBCCALL __libm_log10l_deval)(__IEEE854_LONG_DOUBLE_TYPE__ __x,
+                                 __IEEE854_LONG_DOUBLE_TYPE__ const *__p, int __n) {
 	__IEEE854_LONG_DOUBLE_TYPE__ __y;
 	__p += __n;
 	__y = __x + *__p--;
@@ -256,7 +256,7 @@ __libm_log10l_deval(__IEEE854_LONG_DOUBLE_TYPE__ __x,
 }
 
 
-__LOCAL __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(log10l) __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_log10l)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	__IEEE854_LONG_DOUBLE_TYPE__ __z;
 	__IEEE854_LONG_DOUBLE_TYPE__ __y;

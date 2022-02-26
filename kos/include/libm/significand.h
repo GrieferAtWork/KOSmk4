@@ -37,7 +37,7 @@ __DECL_BEGIN
 #ifndef __ieee754_significandf
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
+__LIBM_LOCAL_FUNC(significandf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_significandf)(__IEEE754_FLOAT_TYPE__ __x) {
 	__uint32_t __hx, __ix;
 	__LIBM_GET_FLOAT_WORD(__hx, __x);
@@ -65,7 +65,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
  * ====================================================
  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(significand) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_significand)(__IEEE754_DOUBLE_TYPE__ __x) {
 	__uint32_t __hx, __ix;
 	__LIBM_GET_HIGH_WORD(__hx, __x);
@@ -84,7 +84,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 #ifndef __ieee854_significandl
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(significandl) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_significandl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	__uint32_t __exp, __ix;
 	__LIBM_GET_LDOUBLE_EXP(__exp, __x);

@@ -37,7 +37,7 @@ __DECL_BEGIN
 #ifdef __IEEE754_FLOAT_TYPE__
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
+__LIBM_LOCAL_FUNC(ldexpf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_ldexpf)(__IEEE754_FLOAT_TYPE__ __x, int __exponent) {
 	if (!__ieee754_finitef(__x) || __x == __IEEE754_FLOAT_C(0.0))
 		return __x;
@@ -59,7 +59,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
  * ====================================================
  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(ldexp) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_ldexp)(__IEEE754_DOUBLE_TYPE__ __x, int __exponent) {
 	if (!__ieee754_finite(__x) || __x == __IEEE754_DOUBLE_C(0.0))
 		return __x;
@@ -72,7 +72,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 #ifdef __IEEE854_LONG_DOUBLE_TYPE__
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(ldexpl) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_ldexpl)(__IEEE854_LONG_DOUBLE_TYPE__ __x, int __exponent) {
 	if (!__ieee854_finitel(__x) || __x == 0.0)
 		return __x;

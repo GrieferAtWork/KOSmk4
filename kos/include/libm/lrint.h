@@ -40,7 +40,7 @@ __DECL_BEGIN
 #ifndef __ieee754_lrintf
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST long int
+__LIBM_LOCAL_FUNC(lrintf) __ATTR_WUNUSED __ATTR_CONST long int
 (__LIBCCALL __ieee754_lrintf)(__IEEE754_FLOAT_TYPE__ __x) {
 	__int32_t __j0;
 	__uint32_t __i0;
@@ -115,7 +115,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST long int
 
 #ifdef __COMPILER_HAVE_LONGLONG
 #ifndef __ieee754_llrintf
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
+__LIBM_LOCAL_FUNC(llrintf) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 (__LIBCCALL __ieee754_llrintf)(__IEEE754_FLOAT_TYPE__ __x) {
 	__int32_t __j0;
 	__uint32_t __i0;
@@ -195,7 +195,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 #ifndef __ieee754_lrint
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST long int
+__LIBM_LOCAL_FUNC(lrint) __ATTR_WUNUSED __ATTR_CONST long int
 (__LIBCCALL __ieee754_lrint)(__IEEE754_DOUBLE_TYPE__ __x) {
 	__int32_t __j0;
 	__uint32_t __i0, __i1;
@@ -331,7 +331,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST long int
 
 #ifdef __COMPILER_HAVE_LONGLONG
 #ifndef __ieee754_llrint
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
+__LIBM_LOCAL_FUNC(llrint) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 (__LIBCCALL __ieee754_llrint)(__IEEE754_DOUBLE_TYPE__ __x) {
 	__int32_t __j0;
 	__uint32_t __i0, __i1;
@@ -472,7 +472,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 #ifndef __ieee854_lrintl
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST long int
+__LIBM_LOCAL_FUNC(lrintl) __ATTR_WUNUSED __ATTR_CONST long int
 (__LIBCCALL __ieee854_lrintl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	__int32_t __se, __j0;
 	__uint32_t __i0, __i1;
@@ -627,7 +627,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST long int
 
 #ifdef __COMPILER_HAVE_LONGLONG
 #ifndef __ieee854_llrintl
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
+__LIBM_LOCAL_FUNC(llrintl) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 (__LIBCCALL __ieee854_llrintl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	__int32_t __se, __j0;
 	__uint32_t __i0, __i1;

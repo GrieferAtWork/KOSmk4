@@ -53,7 +53,7 @@ __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, zerof, __IEEE754_FLOAT_C(0.00000000
 #endif /* !__libm_zerof_defined */
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
+__LIBM_LOCAL_FUNC(remainderf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_remainderf)(__IEEE754_FLOAT_TYPE__ __x,
                                   __IEEE754_FLOAT_TYPE__ __p) {
 	__int32_t __hx, __hp;
@@ -116,7 +116,7 @@ __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, zero, __IEEE754_DOUBLE_C(0.0000000
 #endif /* !__libm_zero_defined */
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(remainder) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_remainder)(__IEEE754_DOUBLE_TYPE__ __x,
                                  __IEEE754_DOUBLE_TYPE__ __p) {
 	__int32_t __hx, __hp;
@@ -182,7 +182,7 @@ __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, zerol, __IEEE854_LONG_DOUBLE_
 #endif /* !__libm_zerol_defined */
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(remainderl) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_remainderl)(__IEEE854_LONG_DOUBLE_TYPE__ __x,
                                   __IEEE854_LONG_DOUBLE_TYPE__ __p) {
 	__uint32_t __sx, __sex, __sep, __x0, __x1, __p0, __p1;

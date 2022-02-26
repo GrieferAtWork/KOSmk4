@@ -44,7 +44,7 @@ __DECL_BEGIN
  * ====================================================
  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
+__LIBM_LOCAL_FUNC(copysignf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_copysignf)(__IEEE754_FLOAT_TYPE__ __num,
                                  __IEEE754_FLOAT_TYPE__ __sign) {
 	__uint32_t __ix, __iy;
@@ -69,7 +69,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
  * ====================================================
  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(copysign) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_copysign)(__IEEE754_DOUBLE_TYPE__ __num,
                                 __IEEE754_DOUBLE_TYPE__ __sign) {
 	__uint32_t __hx, __hy;
@@ -84,7 +84,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 #ifdef __IEEE854_LONG_DOUBLE_TYPE__
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(copysignl) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_copysignl)(__IEEE854_LONG_DOUBLE_TYPE__ __num,
                                  __IEEE854_LONG_DOUBLE_TYPE__ __sign) {
 	__uint32_t __es1, __es2;

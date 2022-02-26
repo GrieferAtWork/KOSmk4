@@ -47,7 +47,7 @@ __DECL_BEGIN
  * is preserved.
  * ====================================================
  */
-__LOCAL __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
+__LIBM_LOCAL_FUNC(sinf) __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_sinf)(__IEEE754_FLOAT_TYPE__ __x) {
 	__IEEE754_FLOAT_TYPE__ __y[2], __z = 0.0;
 	__int32_t __n, __ix;
@@ -88,7 +88,7 @@ __LOCAL __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
  * is preserved.
  * ====================================================
  */
-__LOCAL __ATTR_WUNUSED __IEEE754_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(sin) __ATTR_WUNUSED __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_sin)(__IEEE754_DOUBLE_TYPE__ __x) {
 	__IEEE754_DOUBLE_TYPE__ __y[2], __z = 0.0;
 	__int32_t __n, __ix;
@@ -132,7 +132,7 @@ __LOCAL __ATTR_WUNUSED __IEEE754_DOUBLE_TYPE__
  * is preserved.
  * ====================================================
  */
-__LOCAL __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(sinl) __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_sinl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	__IEEE854_LONG_DOUBLE_TYPE__ __y[2], __z = 0.0;
 	__int32_t __n, __se;

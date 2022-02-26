@@ -84,7 +84,7 @@ __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, pio2_3f, __IEEE754_FLOAT_C(6.077094
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, pio2_3tf, __IEEE754_FLOAT_C(6.1232342629e-17)) /* 0x248d3132 */
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __int32_t
+__LIBM_LOCAL_FUNC(rem_pio2f) __ATTR_WUNUSED __ATTR_NONNULL((2)) __int32_t
 (__LIBCCALL __ieee754_rem_pio2f)(__IEEE754_FLOAT_TYPE__ __x,
                                  __IEEE754_FLOAT_TYPE__ *__y) {
 	__IEEE754_FLOAT_TYPE__ __z, __w, __t, __r, __fn;
@@ -238,7 +238,7 @@ __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, pio2_3, __IEEE754_DOUBLE_C(2.02226
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, pio2_3t, __IEEE754_DOUBLE_C(8.47842766036889956997e-32)) /* 0x397B839A, 0x252049C1 */
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __int32_t
+__LIBM_LOCAL_FUNC(rem_pio2) __ATTR_WUNUSED __ATTR_NONNULL((2)) __int32_t
 (__LIBCCALL __ieee754_rem_pio2)(__IEEE754_DOUBLE_TYPE__ __x,
                                 __IEEE754_DOUBLE_TYPE__ *__y) {
 	__IEEE754_DOUBLE_TYPE__ __z, __w, __t, __r, __fn;
@@ -365,7 +365,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __int32_t
    You should have received a copy of the GNU Lesser General Public
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
-__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __int32_t
+__LIBM_LOCAL_FUNC(rem_pio2l) __ATTR_WUNUSED __ATTR_NONNULL((2)) __int32_t
 (__LIBCCALL __ieee854_rem_pio2l)(__IEEE854_LONG_DOUBLE_TYPE__ __x,
                                  __IEEE854_LONG_DOUBLE_TYPE__ *__y) {
 	__IEEE754_DOUBLE_TYPE__ __tx[3], __ty[3];

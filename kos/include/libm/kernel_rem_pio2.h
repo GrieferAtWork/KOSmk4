@@ -101,7 +101,7 @@ __LIBM_LOCAL_DECLARE_ARRAY(__uint8_t, two_over_pif, 198) {
 };
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __int32_t
+__LIBM_LOCAL_FUNC(kernel_rem_pio2f) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __int32_t
 (__LIBCCALL __ieee754_kernel_rem_pio2f)(__IEEE754_FLOAT_TYPE__ *__x, __IEEE754_FLOAT_TYPE__ *__y,
                                         __int32_t __e0, __int32_t __nx, int __prec) {
 	__int32_t __jz, __jx, __jv, __jp, __jk, __carry;
@@ -354,7 +354,7 @@ __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, twon24, __IEEE754_DOUBLE_C(5.96046
 #endif /* !__libm_twon24_defined */
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __int32_t
+__LIBM_LOCAL_FUNC(kernel_rem_pio2) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __int32_t
 (__LIBCCALL __ieee754_kernel_rem_pio2)(__IEEE754_DOUBLE_TYPE__ *__x, __IEEE754_DOUBLE_TYPE__ *__y,
                                        __int32_t __e0, __int32_t __nx, int __prec) {
 	__int32_t __jz, __jx, __jv, __jp, __jk, __carry;
@@ -750,7 +750,7 @@ __LIBM_LOCAL_DECLARE_ARRAY(__int32_t, two_over_pil, 938) {
 };
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __int32_t
+__LIBM_LOCAL_FUNC(kernel_rem_pio2l) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __int32_t
 (__LIBCCALL __ieee854_kernel_rem_pio2l)(__IEEE754_DOUBLE_TYPE__ *__x, __IEEE754_DOUBLE_TYPE__ *__y,
                                         __int32_t __e0, __int32_t __nx, int __prec) {
 	__int32_t __jz, __jx, __jv, __jp, __jk, __carry;

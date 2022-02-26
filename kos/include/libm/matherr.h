@@ -227,7 +227,7 @@ enum __libm_matherr {
 };
 
 
-__LOCAL double
+__LIBM_LOCAL_FUNC(kernel_standard) double
 (__LIBCCALL __kernel_standard)(double __arg1, double __arg2,
                                double __retval, enum __libm_matherr __type) {
 	__COMPILER_IMPURE();
@@ -239,7 +239,7 @@ __LOCAL double
 	return __retval;
 }
 
-__LOCAL float
+__LIBM_LOCAL_FUNC(kernel_standard_f) float
 (__LIBCCALL __kernel_standard_f)(float __arg1, float __arg2,
                                  float __retval, enum __libm_matherr __type) {
 	__COMPILER_IMPURE();
@@ -252,7 +252,7 @@ __LOCAL float
 }
 
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-__LOCAL __LONGDOUBLE
+__LIBM_LOCAL_FUNC(kernel_standard_l) __LONGDOUBLE
 (__LIBCCALL __kernel_standard_l)(__LONGDOUBLE __arg1, __LONGDOUBLE __arg2,
                                  __LONGDOUBLE __retval, enum __libm_matherr __type) {
 	__COMPILER_IMPURE();
@@ -275,7 +275,8 @@ typedef enum {
 } __LIBM_LIB_VERSION_TYPE;
 
 #define __LIBM_LIB_VERSION __LIBM_GET_LIB_VERSION()
-__LOCAL __LIBM_LIB_VERSION_TYPE __LIBM_GET_LIB_VERSION(void) {
+__LIBM_LOCAL_FUNC(_LIB_VERSION)
+__LIBM_LIB_VERSION_TYPE __LIBM_GET_LIB_VERSION(void) {
 	/* TODO */
 	__COMPILER_IMPURE();
 	return __LIBM_ISOC;

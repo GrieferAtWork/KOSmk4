@@ -35,7 +35,7 @@ __DECL_BEGIN
 #ifdef __IEEE754_FLOAT_TYPE__
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST int
+__LIBM_LOCAL_FUNC(issignalingf) __ATTR_WUNUSED __ATTR_CONST int
 (__LIBCCALL __ieee754_issignalingf)(__IEEE754_FLOAT_TYPE__ __x) {
 	__uint32_t __xi;
 	__LIBM_GET_FLOAT_WORD(__xi, __x);
@@ -60,7 +60,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST int
 #ifdef __IEEE754_DOUBLE_TYPE__
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST int
+__LIBM_LOCAL_FUNC(issignaling) __ATTR_WUNUSED __ATTR_CONST int
 (__LIBCCALL __ieee754_issignaling)(__IEEE754_DOUBLE_TYPE__ __x) {
 #ifdef __LIBM_HIGH_ORDER_BIT_IS_SET_FOR_SNAN
 	__uint32_t __hxi;
@@ -89,7 +89,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST int
 #ifdef __IEEE854_LONG_DOUBLE_TYPE__
 /* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST int
+__LIBM_LOCAL_FUNC(issignalingl) __ATTR_WUNUSED __ATTR_CONST int
 (__LIBCCALL __ieee854_issignalingl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	__uint32_t __exi, __hxi, __lxi;
 	__LIBM_GET_LDOUBLE_WORDS(__exi, __hxi, __lxi, __x);

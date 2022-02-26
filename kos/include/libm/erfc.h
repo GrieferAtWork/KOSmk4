@@ -130,7 +130,7 @@ __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, t_erf_sb7f, __IEEE754_FLOAT_C(-2.24
 #endif /* !__libm_t_erff_constants_defined */
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
+__LIBM_LOCAL_FUNC(erfcf) __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_erfcf)(__IEEE754_FLOAT_TYPE__ __x) {
 	__int32_t __hx, __ix;
 	__IEEE754_FLOAT_TYPE__ __R, __S, __P_, __Q, __s, __y, __z, __r;
@@ -343,7 +343,7 @@ __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, t_erf_sb7, __IEEE754_DOUBLE_C(-2.2
 #endif /* !__libm_t_erf_constants_defined */
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __IEEE754_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(erfc) __ATTR_WUNUSED __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_erfc)(__IEEE754_DOUBLE_TYPE__ __x) {
 	__int32_t __hx, __ix;
 	__IEEE754_DOUBLE_TYPE__ __R, __S, __P_, __Q, __s, __y, __z, __r;
@@ -571,7 +571,7 @@ __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, t_erf_sb6l, __IEEE854_LONG_DO
 #endif /* !__libm_t_erfl_constants_defined */
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(erfcl) __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_erfcl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	__IEEE854_LONG_DOUBLE_TYPE__ __R, __S, __P_, __Q, __s, __y, __z, __r;
 	__int32_t __hx, __ix;

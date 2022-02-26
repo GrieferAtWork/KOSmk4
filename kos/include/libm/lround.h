@@ -54,25 +54,25 @@ __DECL_BEGIN
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST long int
+__LIBM_LOCAL_FUNC(lroundf) __ATTR_WUNUSED __ATTR_CONST long int
 (__LIBCCALL __ieee754_lroundf)(__IEEE754_FLOAT_TYPE__ __x) {
 	__int32_t __j0;
 	__uint32_t __i;
 	long int __result;
 	__int32_t __sign;
 	__LIBM_GET_FLOAT_WORD(__i, __x);
-	__j0   = ((__i >> IEEE754_FLOAT_SHIFT) & IEEE754_FLOAT_MAXEXP) - IEEE754_FLOAT_BIAS;
+	__j0   = ((__i >> __LIBM_IEEE754_FLOAT_SHIFT) & __LIBM_IEEE754_FLOAT_MAXEXP) - __LIBM_IEEE754_FLOAT_BIAS;
 	__sign = (__i & __INT32_C(0x80000000)) != 0 ? -1 : 1;
 	__i &= __UINT32_C(0x7fffff);
 	__i |= __UINT32_C(0x800000);
 	if (__j0 < (__int32_t)(8 * sizeof(long int)) - 1) {
 		if (__j0 < 0) {
 			return __j0 < -1 ? 0 : __sign;
-		} else if (__j0 >= IEEE754_FLOAT_SHIFT) {
-			__result = (long int)__i << (__j0 - IEEE754_FLOAT_SHIFT);
+		} else if (__j0 >= __LIBM_IEEE754_FLOAT_SHIFT) {
+			__result = (long int)__i << (__j0 - __LIBM_IEEE754_FLOAT_SHIFT);
 		} else {
 			__i += __UINT32_C(0x400000) >> __j0;
-			__result = __i >> (IEEE754_FLOAT_SHIFT - __j0);
+			__result = __i >> (__LIBM_IEEE754_FLOAT_SHIFT - __j0);
 		}
 	} else {
 		/* The number is too large. It is left implementation defined what happens. */
@@ -86,25 +86,25 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST long int
 
 #ifdef __COMPILER_HAVE_LONGLONG
 #ifndef __ieee754_llroundf
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
+__LIBM_LOCAL_FUNC(llroundf) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 (__LIBCCALL __ieee754_llroundf)(__IEEE754_FLOAT_TYPE__ __x) {
 	__int32_t __j0;
 	__uint32_t __i;
 	__LONGLONG __result;
 	__int32_t __sign;
 	__LIBM_GET_FLOAT_WORD(__i, __x);
-	__j0   = ((__i >> IEEE754_FLOAT_SHIFT) & IEEE754_FLOAT_MAXEXP) - IEEE754_FLOAT_BIAS;
+	__j0   = ((__i >> __LIBM_IEEE754_FLOAT_SHIFT) & __LIBM_IEEE754_FLOAT_MAXEXP) - __LIBM_IEEE754_FLOAT_BIAS;
 	__sign = (__i & __INT32_C(0x80000000)) != 0 ? -1 : 1;
 	__i &= __UINT32_C(0x7fffff);
 	__i |= __UINT32_C(0x800000);
 	if (__j0 < (__int32_t)(8 * sizeof(__LONGLONG)) - 1) {
 		if (__j0 < 0) {
 			return __j0 < -1 ? 0 : __sign;
-		} else if (__j0 >= IEEE754_FLOAT_SHIFT) {
-			__result = (__LONGLONG)__i << (__j0 - IEEE754_FLOAT_SHIFT);
+		} else if (__j0 >= __LIBM_IEEE754_FLOAT_SHIFT) {
+			__result = (__LONGLONG)__i << (__j0 - __LIBM_IEEE754_FLOAT_SHIFT);
 		} else {
 			__i += __UINT32_C(0x400000) >> __j0;
-			__result = __i >> (IEEE754_FLOAT_SHIFT - __j0);
+			__result = __i >> (__LIBM_IEEE754_FLOAT_SHIFT - __j0);
 		}
 	} else {
 		/* The number is too large.
@@ -133,7 +133,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
  * ====================================================
  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST long int
+__LIBM_LOCAL_FUNC(lround) __ATTR_WUNUSED __ATTR_CONST long int
 (__LIBCCALL __ieee754_lround)(__IEEE754_DOUBLE_TYPE__ __x) {
 	__int32_t __j0;
 	__uint32_t __i1, __i0;
@@ -141,13 +141,13 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST long int
 	__int32_t __sign;
 	__LIBM_GET_DOUBLE_WORDS(__i0, __i1, __x);
 	/* Extract exponent field. */
-	__j0 = ((__i0 >> IEEE754_DOUBLE_SHIFT) & IEEE754_DOUBLE_MAXEXP) - IEEE754_DOUBLE_BIAS;
+	__j0 = ((__i0 >> __LIBM_IEEE754_DOUBLE_SHIFT) & __LIBM_IEEE754_DOUBLE_MAXEXP) - __LIBM_IEEE754_DOUBLE_BIAS;
 	/* Extract sign. */
 	__sign = (__i0 & __INT32_C(0x80000000)) != 0 ? -1 : 1;
 	__i0 &= __UINT32_C(0x000fffff);
 	__i0 |= __UINT32_C(0x00100000);
 	/* j0 in [-1023,1024] */
-	if (__j0 < IEEE754_DOUBLE_SHIFT) {
+	if (__j0 < __LIBM_IEEE754_DOUBLE_SHIFT) {
 		/* j0 in [-1023,19] */
 		if (__j0 < 0) {
 			return __j0 < -1 ? 0 : __sign;
@@ -156,7 +156,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST long int
 			/* shift amt in [0,19] */
 			__i0 += __UINT32_C(0x80000) >> __j0;
 			/* shift amt in [20,1] */
-			__result = __i0 >> (IEEE754_DOUBLE_SHIFT - __j0);
+			__result = __i0 >> (__LIBM_IEEE754_DOUBLE_SHIFT - __j0);
 		}
 	} else if (__j0 < (__int32_t)(8 * sizeof(long int)) - 1) {
 		/* 32bit long: j0 in [20,30] */
@@ -164,23 +164,23 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST long int
 		if (__j0 >= 52) {
 			/* 64bit long: j0 in [52,62] */
 			/* 64bit long: shift amt in [32,42] */
-			if ((__j0 - IEEE754_DOUBLE_SHIFT) >= (__int32_t)(8 * sizeof(long int))) {
+			if ((__j0 - __LIBM_IEEE754_DOUBLE_SHIFT) >= (__int32_t)(8 * sizeof(long int))) {
 				__result = 0;
 			} else {
-				__result = (long int)__i0 << (__j0 - IEEE754_DOUBLE_SHIFT);
+				__result = (long int)__i0 << (__j0 - __LIBM_IEEE754_DOUBLE_SHIFT);
 			}
 			if ((__j0 - 52) < 32)
 				__result |= (unsigned long int)__i1 << (__j0 - 52);
 		} else {
 			/* 32bit long: j0 in [20,30] */
 			/* 64bit long: j0 in [20,51] */
-			__uint32_t j = __i1 + (__UINT32_C(0x80000000) >> (__j0 - IEEE754_DOUBLE_SHIFT));
+			__uint32_t j = __i1 + (__UINT32_C(0x80000000) >> (__j0 - __LIBM_IEEE754_DOUBLE_SHIFT));
 			if (j < __i1)
 				++__i0;
-			if (__j0 == IEEE754_DOUBLE_SHIFT) {
+			if (__j0 == __LIBM_IEEE754_DOUBLE_SHIFT) {
 				__result = (long int)__i0;
 			} else {
-				__result = ((long int)__i0 << (__j0 - IEEE754_DOUBLE_SHIFT)) | (j >> (52 - __j0));
+				__result = ((long int)__i0 << (__j0 - __LIBM_IEEE754_DOUBLE_SHIFT)) | (j >> (52 - __j0));
 			}
 		}
 	} else {
@@ -196,7 +196,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST long int
 
 #ifdef __COMPILER_HAVE_LONGLONG
 #ifndef __ieee754_llround
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
+__LIBM_LOCAL_FUNC(llround) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 (__LIBCCALL __ieee754_llround)(__IEEE754_DOUBLE_TYPE__ __x) {
 	__int32_t __j0;
 	__uint32_t __i1, __i0;
@@ -204,13 +204,13 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 	__int32_t __sign;
 	__LIBM_GET_DOUBLE_WORDS(__i0, __i1, __x);
 	/* Extract exponent field. */
-	__j0 = ((__i0 >> IEEE754_DOUBLE_SHIFT) & IEEE754_DOUBLE_MAXEXP) - IEEE754_DOUBLE_BIAS;
+	__j0 = ((__i0 >> __LIBM_IEEE754_DOUBLE_SHIFT) & __LIBM_IEEE754_DOUBLE_MAXEXP) - __LIBM_IEEE754_DOUBLE_BIAS;
 	/* Extract sign. */
 	__sign = (__i0 & __INT32_C(0x80000000)) != 0 ? -1 : 1;
 	__i0 &= __UINT32_C(0x000fffff);
 	__i0 |= __UINT32_C(0x00100000);
 	/* j0 in [-1023,1024] */
-	if (__j0 < IEEE754_DOUBLE_SHIFT) {
+	if (__j0 < __LIBM_IEEE754_DOUBLE_SHIFT) {
 		/* j0 in [-1023,19] */
 		if (__j0 < 0) {
 			return __j0 < -1 ? 0 : __sign;
@@ -219,7 +219,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 			/* shift amt in [0,19] */
 			__i0 += __UINT32_C(0x80000) >> __j0;
 			/* shift amt in [20,1] */
-			__result = __i0 >> (IEEE754_DOUBLE_SHIFT - __j0);
+			__result = __i0 >> (__LIBM_IEEE754_DOUBLE_SHIFT - __j0);
 		}
 	} else if (__j0 < (__int32_t)(8 * sizeof(__LONGLONG)) - 1) {
 		/* 32bit long: j0 in [20,30] */
@@ -227,23 +227,23 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 		if (__j0 >= 52) {
 			/* 64bit long: j0 in [52,62] */
 			/* 64bit long: shift amt in [32,42] */
-			if ((__j0 - IEEE754_DOUBLE_SHIFT) >= (__int32_t)(8 * sizeof(__LONGLONG))) {
+			if ((__j0 - __LIBM_IEEE754_DOUBLE_SHIFT) >= (__int32_t)(8 * sizeof(__LONGLONG))) {
 				__result = 0;
 			} else {
-				__result = (__LONGLONG)__i0 << (__j0 - IEEE754_DOUBLE_SHIFT);
+				__result = (__LONGLONG)__i0 << (__j0 - __LIBM_IEEE754_DOUBLE_SHIFT);
 			}
 			if ((__j0 - 52) < 32)
 				__result |= (__ULONGLONG)__i1 << (__j0 - 52);
 		} else {
 			/* 32bit long: j0 in [20,30] */
 			/* 64bit long: j0 in [20,51] */
-			__uint32_t j = __i1 + (__UINT32_C(0x80000000) >> (__j0 - IEEE754_DOUBLE_SHIFT));
+			__uint32_t j = __i1 + (__UINT32_C(0x80000000) >> (__j0 - __LIBM_IEEE754_DOUBLE_SHIFT));
 			if (j < __i1)
 				++__i0;
-			if (__j0 == IEEE754_DOUBLE_SHIFT) {
+			if (__j0 == __LIBM_IEEE754_DOUBLE_SHIFT) {
 				__result = (__LONGLONG)__i0;
 			} else {
-				__result = ((__LONGLONG)__i0 << (__j0 - IEEE754_DOUBLE_SHIFT)) | (j >> (52 - __j0));
+				__result = ((__LONGLONG)__i0 << (__j0 - __LIBM_IEEE754_DOUBLE_SHIFT)) | (j >> (52 - __j0));
 			}
 		}
 	} else {
@@ -281,7 +281,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST long int
+__LIBM_LOCAL_FUNC(lroundl) __ATTR_WUNUSED __ATTR_CONST long int
 (__LIBCCALL __ieee854_lroundl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	__int32_t __j0;
 	__uint32_t __se, __i1, __i0;
@@ -330,7 +330,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST long int
 
 #ifdef __COMPILER_HAVE_LONGLONG
 #ifndef __ieee854_llroundl
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __LONGLONG
+__LIBM_LOCAL_FUNC(llroundl) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 (__LIBCCALL __ieee854_llroundl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	__int32_t __j0;
 	__uint32_t __se, __i1, __i0;

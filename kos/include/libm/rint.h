@@ -49,7 +49,7 @@ __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, hugef, __IEEE754_FLOAT_C(1.0e30))
 __LIBM_LOCAL_DECLARE_END
 #endif /* !__libm_hugef_defined */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
+__LIBM_LOCAL_FUNC(roundevenf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_roundevenf)(__IEEE754_FLOAT_TYPE__ __x) {
 	__int32_t __i0, __j0;
 	__LIBM_GET_FLOAT_WORD(__i0, __x);
@@ -87,7 +87,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	return __x;
 }
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
+__LIBM_LOCAL_FUNC(rintf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_rintf)(__IEEE754_FLOAT_TYPE__ __x) {
 	/* above code relies on a FPU doing the rounding,
 	 * and  using   round-to-even  for   FE_TONEAREST */
@@ -131,7 +131,7 @@ __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, huge, __IEEE754_DOUBLE_C(1.0e300))
 __LIBM_LOCAL_DECLARE_END
 #endif /* !__libm_huge_defined */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(roundeven) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_roundeven)(__IEEE754_DOUBLE_TYPE__ __x) {
 	__int32_t __i0, __j0;
 	__uint32_t __i1;
@@ -185,7 +185,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	return __x;
 }
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(rint) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_rint)(__IEEE754_DOUBLE_TYPE__ __x) {
 	/* above code relies on a FPU doing the rounding,
 	 * and  using   round-to-even  for   FE_TONEAREST */
@@ -219,7 +219,7 @@ __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, hugeval4930l, __IEEE854_LONG_
 __LIBM_LOCAL_DECLARE_END
 #endif /* !__libm_hugeval4930l_defined */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(roundevenl) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_roundevenl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	__int32_t __j0;
 	__uint32_t __se, __i1, __i0;
@@ -285,7 +285,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 	return __x;
 }
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(rintl) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_rintl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	/* above code relies on a FPU doing the rounding,
 	 * and  using   round-to-even  for   FE_TONEAREST */

@@ -51,7 +51,7 @@ __DECL_BEGIN
  * ====================================================
  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
+__LIBM_LOCAL_FUNC(scalbf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_scalbf)(__IEEE754_FLOAT_TYPE__ __x,
                               __IEEE754_FLOAT_TYPE__ __fn) {
 	if (__ieee754_isnanf(__x) || __ieee754_isnanf(__fn))
@@ -94,7 +94,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
  * ====================================================
  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(scalb) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_scalb)(__IEEE754_DOUBLE_TYPE__ __x,
                              __IEEE754_DOUBLE_TYPE__ __fn) {
 	if (__ieee754_isnan(__x) || __ieee754_isnan(__fn))
@@ -144,7 +144,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(scalbl) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_scalbl)(__IEEE854_LONG_DOUBLE_TYPE__ __x,
                               __IEEE854_LONG_DOUBLE_TYPE__ __fn) {
 	__int64_t __ifn;

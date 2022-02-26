@@ -47,7 +47,7 @@ __DECL_BEGIN
 
 #ifdef __IEEE754_FLOAT_TYPE__
 /* Written for KOS */
-__LOCAL __ATTR_WUNUSED __ATTR_CONST int
+__LIBM_LOCAL_FUNC(signbitf) __ATTR_WUNUSED __ATTR_CONST int
 (__LIBCCALL __ieee754_signbitf)(__IEEE754_FLOAT_TYPE__ __x) {
 	union ieee754_float __d;
 	__d.f = __x;
@@ -58,7 +58,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST int
 
 #ifdef __IEEE754_DOUBLE_TYPE__
 /* Written for KOS */
-__LOCAL __ATTR_WUNUSED __ATTR_CONST int
+__LIBM_LOCAL_FUNC(signbit) __ATTR_WUNUSED __ATTR_CONST int
 (__LIBCCALL __ieee754_signbit)(__IEEE754_DOUBLE_TYPE__ __x) {
 	union ieee754_double __d;
 	__d.d = __x;
@@ -69,7 +69,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST int
 
 #ifdef __IEEE854_LONG_DOUBLE_TYPE__
 /* Written for KOS */
-__LOCAL __ATTR_WUNUSED __ATTR_CONST int
+__LIBM_LOCAL_FUNC(signbitl) __ATTR_WUNUSED __ATTR_CONST int
 (__LIBCCALL __ieee854_signbitl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	union ieee854_long_double __d;
 	__d.d = __x;

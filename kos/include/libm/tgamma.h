@@ -78,10 +78,10 @@ __LIBM_LOCAL_DECLARE_ARRAY(__IEEE754_FLOAT_TYPE__, gamma_coefff, 3) {
 };
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __IEEE754_FLOAT_TYPE__
-__ieee754_gamma_productf(__IEEE754_FLOAT_TYPE__ __x,
-                         __IEEE754_FLOAT_TYPE__ __x_eps, int __n,
-                         __IEEE754_FLOAT_TYPE__ *__eps) {
+__LIBM_LOCAL_FUNC(gamma_productf) __IEEE754_FLOAT_TYPE__
+(__LIBCCALL __ieee754_gamma_productf)(__IEEE754_FLOAT_TYPE__ __x,
+                                      __IEEE754_FLOAT_TYPE__ __x_eps, int __n,
+                                      __IEEE754_FLOAT_TYPE__ *__eps) {
 	int __i;
 	__IEEE754_FLOAT_TYPE__ volatile __fret;
 	__IEEE754_DOUBLE_TYPE__ __x_full, __ret;
@@ -95,8 +95,8 @@ __ieee754_gamma_productf(__IEEE754_FLOAT_TYPE__ __x,
 	return __fret;
 }
 
-__LOCAL __IEEE754_FLOAT_TYPE__
-__ieee754_gammaf_positive(__IEEE754_FLOAT_TYPE__ __x, int *__exp2_adj) {
+__LIBM_LOCAL_FUNC(gammaf_positive) __IEEE754_FLOAT_TYPE__
+(__LIBCCALL __ieee754_gammaf_positive)(__IEEE754_FLOAT_TYPE__ __x, int *__exp2_adj) {
 	int __local_signgam;
 	if (__x < __IEEE754_FLOAT_C(0.5)) {
 		*__exp2_adj = 0;
@@ -153,7 +153,7 @@ __ieee754_gammaf_positive(__IEEE754_FLOAT_TYPE__ __x, int *__exp2_adj) {
 	}
 }
 
-__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE754_FLOAT_TYPE__
+__LIBM_LOCAL_FUNC(tgammaf_r) __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_tgammaf)(__IEEE754_FLOAT_TYPE__ __x, int *__signgamp) {
 	__int32_t __hx;
 	__IEEE754_FLOAT_TYPE__ volatile __ret;
@@ -281,11 +281,11 @@ __LIBM_LOCAL_DECLARE_ARRAY(__IEEE754_DOUBLE_TYPE__, gamma_coeff, 6) {
 };
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL void
-__ieee754_gamma_mul_split(__IEEE754_DOUBLE_TYPE__ *__hi,
-                          __IEEE754_DOUBLE_TYPE__ *__lo,
-                          __IEEE754_DOUBLE_TYPE__ __x,
-                          __IEEE754_DOUBLE_TYPE__ __y) {
+__LIBM_LOCAL_FUNC(gamma_mul_split) void
+(__LIBCCALL __ieee754_gamma_mul_split)(__IEEE754_DOUBLE_TYPE__ *__hi,
+                                       __IEEE754_DOUBLE_TYPE__ *__lo,
+                                       __IEEE754_DOUBLE_TYPE__ __x,
+                                       __IEEE754_DOUBLE_TYPE__ __y) {
 #if __has_builtin(__builtin_fma) && defined(__FP_FAST_FMA)
 	/* Fast built-in fused multiply-add. */
 	*__hi = __x * __y;
@@ -325,10 +325,10 @@ __ieee754_gamma_mul_split(__IEEE754_DOUBLE_TYPE__ *__hi,
 #endif /* !... */
 }
 
-__LOCAL __IEEE754_DOUBLE_TYPE__
-__ieee754_gamma_product(__IEEE754_DOUBLE_TYPE__ __x,
-                        __IEEE754_DOUBLE_TYPE__ __x_eps, int __n,
-                        __IEEE754_DOUBLE_TYPE__ *__eps) {
+__LIBM_LOCAL_FUNC(gamma_product) __IEEE754_DOUBLE_TYPE__
+(__LIBCCALL __ieee754_gamma_product)(__IEEE754_DOUBLE_TYPE__ __x,
+                                     __IEEE754_DOUBLE_TYPE__ __x_eps, int __n,
+                                     __IEEE754_DOUBLE_TYPE__ *__eps) {
 	__IEEE754_DOUBLE_TYPE__ __ret = __x;
 	int __i, __round;
 	__round = __libc_fegetround();
@@ -394,8 +394,8 @@ __ieee754_gamma_feholdexcept_setround_68k_prec(fpu_control_t __cw) {
 		__libc_fesetround(__round);
 #endif /* !... */
 
-__LOCAL __IEEE754_DOUBLE_TYPE__
-__ieee754_gamma_positive(__IEEE754_DOUBLE_TYPE__ __x, int *__exp2_adj) {
+__LIBM_LOCAL_FUNC(gamma_positive) __IEEE754_DOUBLE_TYPE__
+(__LIBCCALL __ieee754_gamma_positive)(__IEEE754_DOUBLE_TYPE__ __x, int *__exp2_adj) {
 	int __local_signgam;
 	if (__x < __IEEE754_DOUBLE_C(0.5)) {
 		*__exp2_adj = 0;
@@ -458,7 +458,7 @@ __ieee754_gamma_positive(__IEEE754_DOUBLE_TYPE__ __x, int *__exp2_adj) {
 	}
 }
 
-__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE754_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(tgamma_r) __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_tgamma)(__IEEE754_DOUBLE_TYPE__ __x, int *__signgamp) {
 	__int32_t __hx;
 	__uint32_t __lx;
@@ -584,11 +584,11 @@ __LIBM_LOCAL_DECLARE_ARRAY(__IEEE854_LONG_DOUBLE_TYPE__, gamma_coeffl, 8) {
 };
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL void
-__ieee854_gamma_mul_splitl(__IEEE854_LONG_DOUBLE_TYPE__ *__hi,
-                           __IEEE854_LONG_DOUBLE_TYPE__ *__lo,
-                           __IEEE854_LONG_DOUBLE_TYPE__ __x,
-                           __IEEE854_LONG_DOUBLE_TYPE__ __y) {
+__LIBM_LOCAL_FUNC(gamma_mul_splitl) void
+(__LIBCCALL __ieee854_gamma_mul_splitl)(__IEEE854_LONG_DOUBLE_TYPE__ *__hi,
+                                        __IEEE854_LONG_DOUBLE_TYPE__ *__lo,
+                                        __IEEE854_LONG_DOUBLE_TYPE__ __x,
+                                        __IEEE854_LONG_DOUBLE_TYPE__ __y) {
 #if __has_builtin(__builtin_fmal) && defined(__FP_FAST_FMAL)
 	*__hi = __x * __y;
 	*__lo = __builtin_fmal(__x, __y, -*__hi);
@@ -609,10 +609,10 @@ __ieee854_gamma_mul_splitl(__IEEE854_LONG_DOUBLE_TYPE__ *__hi,
 #endif /* !... */
 }
 
-__LOCAL __IEEE854_LONG_DOUBLE_TYPE__
-__ieee854_gamma_productl(__IEEE854_LONG_DOUBLE_TYPE__ __x,
-                         __IEEE854_LONG_DOUBLE_TYPE__ __x_eps, int __n,
-                         __IEEE854_LONG_DOUBLE_TYPE__ *__eps) {
+__LIBM_LOCAL_FUNC(gamma_productl) __IEEE854_LONG_DOUBLE_TYPE__
+(__LIBCCALL __ieee854_gamma_productl)(__IEEE854_LONG_DOUBLE_TYPE__ __x,
+                                      __IEEE854_LONG_DOUBLE_TYPE__ __x_eps, int __n,
+                                      __IEEE854_LONG_DOUBLE_TYPE__ *__eps) {
 	__IEEE854_LONG_DOUBLE_TYPE__ __ret = __x;
 	int __i, __round;
 	__round = __libc_fegetround();
@@ -630,8 +630,8 @@ __ieee854_gamma_productl(__IEEE854_LONG_DOUBLE_TYPE__ __x,
 	return __ret;
 }
 
-__LOCAL __IEEE854_LONG_DOUBLE_TYPE__
-__ieee854_gammal_positive(__IEEE854_LONG_DOUBLE_TYPE__ __x, int *__exp2_adj) {
+__LIBM_LOCAL_FUNC(gammal_positive) __IEEE854_LONG_DOUBLE_TYPE__
+(__LIBCCALL __ieee854_gammal_positive)(__IEEE854_LONG_DOUBLE_TYPE__ __x, int *__exp2_adj) {
 	int __local_signgam;
 	if (__x < __IEEE854_LONG_DOUBLE_C(0.5)) {
 		*__exp2_adj = 0;
@@ -688,7 +688,7 @@ __ieee854_gammal_positive(__IEEE854_LONG_DOUBLE_TYPE__ __x, int *__exp2_adj) {
 	}
 }
 
-__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE854_LONG_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(tgammal_r) __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_tgammal)(__IEEE854_LONG_DOUBLE_TYPE__ __x, int *__signgamp) {
 	__uint32_t __es, __hx, __lx;
 	__IEEE854_LONG_DOUBLE_TYPE__ __ret;

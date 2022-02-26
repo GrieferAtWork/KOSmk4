@@ -46,7 +46,7 @@ __DECL_BEGIN
  * ====================================================
  */
 
-__LOCAL __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
+__LIBM_LOCAL_FUNC(logbf) __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_logbf)(__IEEE754_FLOAT_TYPE__ __x) {
 	__int32_t __ix, __rix;
 	__LIBM_GET_FLOAT_WORD(__ix, __x);
@@ -75,7 +75,7 @@ __LOCAL __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
  * ====================================================
  */
 
-__LOCAL __ATTR_WUNUSED __IEEE754_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(logb) __ATTR_WUNUSED __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_logb)(__IEEE754_DOUBLE_TYPE__ __x) {
 	__int32_t __lx, __ix, __rix;
 	__LIBM_GET_DOUBLE_WORDS(__ix, __lx, __x);
@@ -110,7 +110,7 @@ __LOCAL __ATTR_WUNUSED __IEEE754_DOUBLE_TYPE__
  * ====================================================
  */
 
-__LOCAL __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(logbl) __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_logbl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	__int32_t __es, __lx, __ix;
 	__LIBM_GET_LDOUBLE_WORDS(__es, __ix, __lx, __x);

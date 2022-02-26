@@ -51,7 +51,7 @@ __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, onef, __IEEE754_FLOAT_C(1.0))
 #endif /* !__libm_onef_defined */
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE754_FLOAT_TYPE__
+__LIBM_LOCAL_FUNC(modff) __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_modff)(__IEEE754_FLOAT_TYPE__ __x,
                              __IEEE754_FLOAT_TYPE__ *__iptr) {
 	__int32_t __i0, __j0;
@@ -107,7 +107,7 @@ __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, one, __IEEE754_DOUBLE_C(1.0))
 #endif /* !__libm_one_defined */
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE754_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(modf) __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_modf)(__IEEE754_DOUBLE_TYPE__ __x,
                             __IEEE754_DOUBLE_TYPE__ *__iptr) {
 	__int32_t __i0, __i1, __j0;
@@ -171,7 +171,7 @@ __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, onel, __IEEE854_LONG_DOUBLE_C
 #endif /* !__libm_onel_defined */
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE854_LONG_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(modfl) __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_modfl)(__IEEE854_LONG_DOUBLE_TYPE__ __x,
                              __IEEE854_LONG_DOUBLE_TYPE__ *__iptr) {
 	__int32_t __i0, __i1, __j0;

@@ -55,7 +55,7 @@ __DECL_BEGIN
  * ====================================================
  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
+__LIBM_LOCAL_FUNC(nexttowardf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_nexttowardf)(__IEEE754_FLOAT_TYPE__ __x,
                                    __IEEE854_LONG_DOUBLE_TYPE__ __y) {
 	__int32_t __hx, __ix, __iy;
@@ -118,7 +118,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
  * ====================================================
  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(nexttoward) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_nexttoward)(__IEEE754_DOUBLE_TYPE__ __x,
                                   __IEEE854_LONG_DOUBLE_TYPE__ __y) {
 	__int32_t __hx, __ix, __iy;

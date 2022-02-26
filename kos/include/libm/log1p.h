@@ -94,7 +94,7 @@ __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, zerof, __IEEE754_FLOAT_C(0.00000000
 #endif /* !__libm_zerof_defined */
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
+__LIBM_LOCAL_FUNC(log1pf) __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_log1pf)(__IEEE754_FLOAT_TYPE__ __x) {
 	float __hfsq, __f, __c, __s, __z, __R, __u;
 	__int32_t __k, __hx, __hu, __ax;
@@ -247,7 +247,7 @@ __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, Lg7, __IEEE754_DOUBLE_C(1.47981986
 #endif /* !__libm_Lg7_defined */
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __IEEE754_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(log1p) __ATTR_WUNUSED __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_log1p)(__IEEE754_DOUBLE_TYPE__ __x) {
 	__IEEE754_DOUBLE_TYPE__ __hfsq, __f, __c, __s, __z, __R;
 	__IEEE754_DOUBLE_TYPE__ __u, __z2, __z4, __z6;
@@ -754,7 +754,7 @@ __LIBM_LOCAL_DECLARE_ARRAY(__IEEE854_LONG_DOUBLE_TYPE__, logl_table, 385) {
 };
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(log1pl) __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_log1pl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	if (__ieee854_isnanl(__x))
 		return __x;

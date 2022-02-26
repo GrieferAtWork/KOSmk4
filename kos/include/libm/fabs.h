@@ -46,7 +46,7 @@ __DECL_BEGIN
  * ====================================================
  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
+__LIBM_LOCAL_FUNC(fabsf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_fabsf)(__IEEE754_FLOAT_TYPE__ __x) {
 	__uint32_t __ix;
 	__LIBM_GET_FLOAT_WORD(__ix, __x);
@@ -70,7 +70,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
  * ====================================================
  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(fabs) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_fabs)(__IEEE754_DOUBLE_TYPE__ __x) {
 	__uint32_t __high;
 	__LIBM_GET_HIGH_WORD(__high, __x);
@@ -94,7 +94,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
  * ====================================================
  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(fabsl) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_fabsl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 #ifdef __mc68000__
 	__libm_ieee_long_double_shape_type *__sh_u = (__libm_ieee_long_double_shape_type *)&__x;

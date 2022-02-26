@@ -68,7 +68,7 @@ __LIBM_LOCAL_DECLARE_ARRAY(__IEEE754_FLOAT_TYPE__, zero2f, 2) {
 };
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
+__LIBM_LOCAL_FUNC(fmodf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_fmodf)(__IEEE754_FLOAT_TYPE__ __x,
                              __IEEE754_FLOAT_TYPE__ __y) {
 	__int32_t __n, __hx, __hy, __hz, __ix, __iy, __sx, __i;
@@ -196,7 +196,7 @@ __LIBM_LOCAL_DECLARE_ARRAY(__IEEE754_DOUBLE_TYPE__, zero2, 2) {
 __LIBM_LOCAL_DECLARE_END
 
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(fmod) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_fmod)(__IEEE754_DOUBLE_TYPE__ __x,
                             __IEEE754_DOUBLE_TYPE__ __y) {
 	__int32_t __n, __hx, __hy, __hz, __ix, __iy, __sx, __i;
@@ -340,7 +340,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
  * ====================================================
  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(fmodl) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_fmodl)(__IEEE854_LONG_DOUBLE_TYPE__ __x,
                              __IEEE854_LONG_DOUBLE_TYPE__ __y) {
 	__IEEE854_LONG_DOUBLE_TYPE__ __intpart;

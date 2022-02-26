@@ -40,7 +40,7 @@ __DECL_BEGIN
  * is freely granted, provided that this notice is preserved.
  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST int
+__LIBM_LOCAL_FUNC(fpclassifyf) __ATTR_WUNUSED __ATTR_CONST int
 (__LIBCCALL __ieee754_fpclassifyf)(__IEEE754_FLOAT_TYPE__ __x) {
 	int __retval = __FP_NORMAL;
 	__uint32_t __wx;
@@ -65,7 +65,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST int
  * is freely granted, provided that this notice is preserved.
  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST int
+__LIBM_LOCAL_FUNC(fpclassify) __ATTR_WUNUSED __ATTR_CONST int
 (__LIBCCALL __ieee754_fpclassify)(__IEEE754_DOUBLE_TYPE__ __x) {
 	int __retval = __FP_NORMAL;
 	__uint32_t __msw, __lsw;
@@ -91,7 +91,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST int
  * is freely granted, provided that this notice is preserved.
  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST int
+__LIBM_LOCAL_FUNC(fpclassifyl) __ATTR_WUNUSED __ATTR_CONST int
 (__LIBCCALL __ieee854_fpclassifyl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	int __retval = __FP_NORMAL;
 	__uint32_t __ex, __hx, __lx, __m;

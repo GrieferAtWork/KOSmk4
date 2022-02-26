@@ -38,42 +38,42 @@ __DECL_BEGIN
 __DECL_END
 #include <libm/isnan.h>
 __DECL_BEGIN
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL
+__LIBM_LOCAL_FUNC(isunorderedf) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee754_isunorderedf)(__IEEE754_FLOAT_TYPE__ __u,
                                     __IEEE754_FLOAT_TYPE__ __v) {
 	return __ieee754_isnanf(__u) || __ieee754_isnanf(__v);
 }
 #endif /* !__ieee754_isunorderedf */
 #ifndef __ieee754_isgreaterf
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL
+__LIBM_LOCAL_FUNC(isgreaterf) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee754_isgreaterf)(__IEEE754_FLOAT_TYPE__ __x,
                                   __IEEE754_FLOAT_TYPE__ __y) {
 	return !__ieee754_isunorderedf(__x, __y) && __x > __y;
 }
 #endif /* !__ieee754_isgreaterf */
 #ifndef __ieee754_isgreaterequalf
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL
+__LIBM_LOCAL_FUNC(isgreaterequalf) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee754_isgreaterequalf)(__IEEE754_FLOAT_TYPE__ __x,
                                        __IEEE754_FLOAT_TYPE__ __y) {
 	return !__ieee754_isunorderedf(__x, __y) && __x >= __y;
 }
 #endif /* !__ieee754_isgreaterequalf */
 #ifndef __ieee754_islessf
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL
+__LIBM_LOCAL_FUNC(islessf) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee754_islessf)(__IEEE754_FLOAT_TYPE__ __x,
                                __IEEE754_FLOAT_TYPE__ __y) {
 	return !__ieee754_isunorderedf(__x, __y) && __x < __y;
 }
 #endif /* !__ieee754_islessf */
 #ifndef __ieee754_islessequalf
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL
+__LIBM_LOCAL_FUNC(islessequalf) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee754_islessequalf)(__IEEE754_FLOAT_TYPE__ __x,
                                     __IEEE754_FLOAT_TYPE__ __y) {
 	return !__ieee754_isunorderedf(__x, __y) && __x <= __y;
 }
 #endif /* !__ieee754_islessequalf */
 #ifndef __ieee754_islessgreaterf
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL
+__LIBM_LOCAL_FUNC(islessgreaterf) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee754_islessgreaterf)(__IEEE754_FLOAT_TYPE__ __x,
                                       __IEEE754_FLOAT_TYPE__ __y) {
 	return !__ieee754_isunorderedf(__x, __y) && (__x < __y || __y < __x);
@@ -87,42 +87,42 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL
 __DECL_END
 #include <libm/isnan.h>
 __DECL_BEGIN
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL
+__LIBM_LOCAL_FUNC(isunordered) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee754_isunordered)(__IEEE754_DOUBLE_TYPE__ __u,
                                    __IEEE754_DOUBLE_TYPE__ __v) {
 	return __ieee754_isnan(__u) || __ieee754_isnan(__v);
 }
 #endif /* !__ieee754_isunordered */
 #ifndef __ieee754_isgreater
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL
+__LIBM_LOCAL_FUNC(isgreater) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee754_isgreater)(__IEEE754_DOUBLE_TYPE__ __x,
                                  __IEEE754_DOUBLE_TYPE__ __y) {
 	return !__ieee754_isunordered(__x, __y) && __x > __y;
 }
 #endif /* !__ieee754_isgreater */
 #ifndef __ieee754_isgreaterequal
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL
+__LIBM_LOCAL_FUNC(isgreaterequal) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee754_isgreaterequal)(__IEEE754_DOUBLE_TYPE__ __x,
                                       __IEEE754_DOUBLE_TYPE__ __y) {
 	return !__ieee754_isunordered(__x, __y) && __x >= __y;
 }
 #endif /* !__ieee754_isgreaterequal */
 #ifndef __ieee754_isless
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL
+__LIBM_LOCAL_FUNC(isless) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee754_isless)(__IEEE754_DOUBLE_TYPE__ __x,
                               __IEEE754_DOUBLE_TYPE__ __y) {
 	return !__ieee754_isunordered(__x, __y) && __x < __y;
 }
 #endif /* !__ieee754_isless */
 #ifndef __ieee754_islessequal
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL
+__LIBM_LOCAL_FUNC(islessequal) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee754_islessequal)(__IEEE754_DOUBLE_TYPE__ __x,
                                    __IEEE754_DOUBLE_TYPE__ __y) {
 	return !__ieee754_isunordered(__x, __y) && __x <= __y;
 }
 #endif /* !__ieee754_islessequal */
 #ifndef __ieee754_islessgreater
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL
+__LIBM_LOCAL_FUNC(islessgreater) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee754_islessgreater)(__IEEE754_DOUBLE_TYPE__ __x,
                                      __IEEE754_DOUBLE_TYPE__ __y) {
 	return !__ieee754_isunordered(__x, __y) && (__x < __y || __y < __x);
@@ -136,42 +136,42 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL
 __DECL_END
 #include <libm/isnan.h>
 __DECL_BEGIN
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL
+__LIBM_LOCAL_FUNC(isunorderedl) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee854_isunorderedl)(__IEEE854_LONG_DOUBLE_TYPE__ __u,
                                     __IEEE854_LONG_DOUBLE_TYPE__ __v) {
 	return __ieee854_isnanf(__u) || __ieee854_isnanf(__v);
 }
 #endif /* !__ieee854_isunorderedl */
 #ifndef __ieee854_isgreaterl
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL
+__LIBM_LOCAL_FUNC(isgreaterl) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee854_isgreaterl)(__IEEE854_LONG_DOUBLE_TYPE__ __x,
                                   __IEEE854_LONG_DOUBLE_TYPE__ __y) {
 	return !__ieee854_isunorderedf(__x, __y) && __x > __y;
 }
 #endif /* !__ieee854_isgreaterl */
 #ifndef __ieee854_isgreaterequall
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL
+__LIBM_LOCAL_FUNC(isgreaterequall) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee854_isgreaterequall)(__IEEE854_LONG_DOUBLE_TYPE__ __x,
                                        __IEEE854_LONG_DOUBLE_TYPE__ __y) {
 	return !__ieee854_isunorderedf(__x, __y) && __x >= __y;
 }
 #endif /* !__ieee854_isgreaterequall */
 #ifndef __ieee854_islessl
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL
+__LIBM_LOCAL_FUNC(islessl) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee854_islessl)(__IEEE854_LONG_DOUBLE_TYPE__ __x,
                                __IEEE854_LONG_DOUBLE_TYPE__ __y) {
 	return !__ieee854_isunorderedf(__x, __y) && __x < __y;
 }
 #endif /* !__ieee854_islessl */
 #ifndef __ieee854_islessequall
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL
+__LIBM_LOCAL_FUNC(islessequall) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee854_islessequall)(__IEEE854_LONG_DOUBLE_TYPE__ __x,
                                     __IEEE854_LONG_DOUBLE_TYPE__ __y) {
 	return !__ieee854_isunorderedf(__x, __y) && __x <= __y;
 }
 #endif /* !__ieee854_islessequall */
 #ifndef __ieee854_islessgreaterl
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL
+__LIBM_LOCAL_FUNC(islessgreaterl) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee854_islessgreaterl)(__IEEE854_LONG_DOUBLE_TYPE__ __x,
                                       __IEEE854_LONG_DOUBLE_TYPE__ __y) {
 	return !__ieee854_isunorderedf(__x, __y) && (__x < __y || __y < __x);

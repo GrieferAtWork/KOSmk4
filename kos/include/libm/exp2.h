@@ -412,7 +412,7 @@ __LIBM_LOCAL_DECLARE_ARRAY(__IEEE754_FLOAT_TYPE__, exp2f_atable, 256) {
 };
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
+__LIBM_LOCAL_FUNC(exp2f) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_exp2f)(__IEEE754_FLOAT_TYPE__ __x) {
 	/* Check for usual case.  */
 	if (__ieee754_islessf(__x, __LIBM_LOCAL_VALUE(exp2_himarkf)) &&
@@ -1077,7 +1077,7 @@ __LIBM_LOCAL_DECLARE_ARRAY(__IEEE754_DOUBLE_TYPE__, exp2_deltatable, 512)
 #undef __LIBM_EXP2S
 __LIBM_LOCAL_DECLARE_END
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(exp2) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_exp2)(__IEEE754_DOUBLE_TYPE__ __x) {
 	/* Check for usual case.  */
 	if (__ieee754_isless(__x, __LIBM_LOCAL_VALUE(exp2_himark))) {
@@ -1158,7 +1158,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+__LIBM_LOCAL_FUNC(exp2l) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_exp2l)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	if (__ieee854_islessl(__x, __IEEE854_LONG_DOUBLE_C(16384.0))) {              /* LDBL_MAX_EXP */
 		if (__ieee854_isgreaterequall(__x, __IEEE854_LONG_DOUBLE_C(-16446.0))) { /* LDBL_MIN_EXP - LDBL_MANT_DIG - 1 */

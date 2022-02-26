@@ -52,10 +52,16 @@ __DECL_BEGIN
 
 #define __LIBM_LOCAL_DECLARE_BEGIN             __NAMESPACE_LOCAL_BEGIN
 #define __LIBM_LOCAL_DECLARE_END               __NAMESPACE_LOCAL_END
+#define __LIBM_LOCAL_VALUE(name)               __NAMESPACE_LOCAL_SYM __libm_##name
+#ifdef __BUILDING_LIBC
+#define __LIBM_LOCAL_DECLARE(T, name, value)   __PRIVATE __ATTR_SECTION(".rodata.crt.math.math") T const __libm_##name = value;
+#define __LIBM_LOCAL_DECLARE_ARRAY(T, name, n) __PRIVATE __ATTR_SECTION(".rodata.crt.math.math") T const __libm_##name[n] =
+#define __LIBM_LOCAL_FUNC(name)                __PRIVATE __ATTR_SECTION(".text.crt.math.math")
+#else /* __BUILDING_LIBC */
 #define __LIBM_LOCAL_DECLARE(T, name, value)   __LOCAL_LIBC_CONST_DATA(libm_##name) T const __libm_##name = value;
 #define __LIBM_LOCAL_DECLARE_ARRAY(T, name, n) __LOCAL_LIBC_CONST_DATA(libm_##name) T const __libm_##name[n] =
-#define __LIBM_LOCAL_VALUE(name)               __NAMESPACE_LOCAL_SYM __libm_##name
-#define __LIBM_LOCAL_FUNC(name)                /* TODO: Replace all of the "__LOCAL" to using this. */
+#define __LIBM_LOCAL_FUNC(name)                __LOCAL_LIBC(libm_##name)
+#endif /* !__BUILDING_LIBC */
 
 /* NOTE: Heavy modifications were made to the original fdlibm! */
 /*
