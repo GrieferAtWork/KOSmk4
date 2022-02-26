@@ -45,6 +45,7 @@
 %[define_double_replacement(__LIBM_MATHFUN2 = __LIBM_MATHFUN2F, __LIBM_MATHFUN2L)]
 %[define_double_replacement(__LIBM_MATHFUNI2 = __LIBM_MATHFUNI2F, __LIBM_MATHFUNI2L)]
 %[define_double_replacement(__LIBM_MATHFUN1I = __LIBM_MATHFUN1IF, __LIBM_MATHFUN1IL)]
+%[define_double_replacement(__LIBM_MATHFUN2I = __LIBM_MATHFUN2IF, __LIBM_MATHFUN2IL)]
 %[define_double_replacement(__LIBM_MATHFUN3I = __LIBM_MATHFUN3IF, __LIBM_MATHFUN3IL)]
 %[define_double_replacement(__LIBM_MATHFUN0 = __LIBM_MATHFUN0F, __LIBM_MATHFUN0L)]
 %[define_double_replacement(__LIBM_MATHFUNX = __LIBM_MATHFUNXF, __LIBM_MATHFUNXL)]
@@ -555,10 +556,10 @@ double exp(double x) {
 	double result;
 	result = __LIBM_MATHFUN(@exp@, x);
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
-	    (!__LIBM_MATHFUN(@finite@, result) || result == 0.0) &&
-	    __LIBM_MATHFUN(@finite@, x)) {
+	    (!__LIBM_MATHFUNI(@finite@, result) || result == 0.0) &&
+	    __LIBM_MATHFUNI(@finite@, x)) {
 		return __kernel_standard(x, x, result,
-		                         __LIBM_MATHFUN(@signbit@, x)
+		                         __LIBM_MATHFUNI(@signbit@, x)
 		                         ? __LIBM_KMATHERR_EXP_UNDERFLOW
 		                         : __LIBM_KMATHERR_EXP_OVERFLOW);
 	}
@@ -600,7 +601,7 @@ double ldexp(double x, int exponent) {
 	result = (double)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
 @@pp_endif@@
 @@pp_ifdef ERANGE@@
-	if unlikely(!__LIBM_MATHFUN(@finite@, result) || result == 0.0)
+	if unlikely(!__LIBM_MATHFUNI(@finite@, result) || result == 0.0)
 		(void)libc_seterrno(ERANGE);
 @@pp_endif@@
 	return result;
@@ -704,10 +705,10 @@ double modf(double x, [[nonnull]] double *iptr) {
 double expm1(double x) {
 	double result;
 	result = __LIBM_MATHFUN(@expm1@, x);
-	if ((!__LIBM_MATHFUN(@finite@, result) || result == -1.0) &&
-	    __LIBM_MATHFUN(@finite @, x) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
+	if ((!__LIBM_MATHFUNI(@finite@, result) || result == -1.0) &&
+	    __LIBM_MATHFUNI(@finite @, x) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
 		return __kernel_standard(x, x, result,
-		                         __LIBM_MATHFUN(@signbit@, x)
+		                         __LIBM_MATHFUNI(@signbit@, x)
 		                         ? __LIBM_KMATHERR_EXPM1_UNDERFLOW
 		                         : __LIBM_KMATHERR_EXPM1_OVERFLOW);
 	}
@@ -974,7 +975,7 @@ double floor(double x) {
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
 double fmod(double x, double y) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
-	    (__LIBM_MATHFUN(@isinf@, x) || y == 0.0) &&
+	    (__LIBM_MATHFUNI(@isinf@, x) || y == 0.0) &&
 	    !__LIBM_MATHFUN2(@isunordered@, x, y))
 		return __kernel_standard(x, y, y, __LIBM_KMATHERR_FMOD); /* fmod(+-Inf,y) or fmod(x,0) */
 	return __LIBM_MATHFUN2(@fmod@, x, y);
@@ -1137,8 +1138,8 @@ double nextafter(double x, double y) {
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
 double remainder(double x, double p) {
-	if (((p == 0.0 && !__LIBM_MATHFUN(@isnan@, x)) ||
-	     (__LIBM_MATHFUN(@isinf@, x) && !__LIBM_MATHFUN(@isnan@, p))) &&
+	if (((p == 0.0 && !__LIBM_MATHFUNI(@isnan@, x)) ||
+	     (__LIBM_MATHFUNI(@isinf@, x) && !__LIBM_MATHFUNI(@isnan@, p))) &&
 	    __LIBM_LIB_VERSION != __LIBM_IEEE)
 		return __kernel_standard(x, p, p, __LIBM_KMATHERR_REMAINDER); /* remainder domain */
 	return __LIBM_MATHFUN2(@remainder@, x, p);
@@ -1982,7 +1983,23 @@ gammal(*) = lgammal;
 @@>> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
 @@Reentrant version of `lgamma(3)'
 [[wunused, crtbuiltin, export_alias("__lgamma_r")]]
-double lgamma_r(double x, [[nonnull]] int *signgamp); /* TODO */
+[[requires_include("<ieee754.h>"), impl_include("<libm/lgamma.h>")]]
+[[impl_include("<libm/matherr.h>", "<libm/finite.h>", "<libm/floor.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+double lgamma_r(double x, [[nonnull]] int *signgamp) {
+	double result = __LIBM_MATHFUN2I(@lgamma@, x, signgamp);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    !__LIBM_MATHFUNI(@finite@, result) && __LIBM_MATHFUNI(@finite@, x)) {
+		return __kernel_standard(x, x, result,
+		                         __LIBM_MATHFUN(@floor@, x) == x &&
+		                         x <= 0.0 ? __LIBM_KMATHERR_LGAMMA_MINUS      /* lgamma pole */
+		                                  : __LIBM_KMATHERR_LGAMMA_OVERFLOW); /* lgamma overflow */
+	}
+	return result;
+}
+
 
 [[crtbuiltin, export_alias("__lgammaf_r")]] lgammaf_r(*) %{generate(double2float("lgamma_r"))};
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -2016,8 +2033,8 @@ double scalb(double x, double fn) {
 	double result;
 	result = __LIBM_MATHFUN2(@scalb@, x, fn);
 	if (__LIBM_LIB_VERSION == __LIBM_SVID) {
-		if (__LIBM_MATHFUN(@isinf@, result)) {
-			if (__LIBM_MATHFUN(@finite@, x)) {
+		if (__LIBM_MATHFUNI(@isinf@, result)) {
+			if (__LIBM_MATHFUNI(@finite@, x)) {
 				return __kernel_standard(x, fn, result, __LIBM_KMATHERR_SCALB_OVERFLOW); /* scalb overflow */
 			} else {
 @@pp_ifdef ERANGE@@
@@ -2028,16 +2045,16 @@ double scalb(double x, double fn) {
 			return __kernel_standard(x, fn, result, __LIBM_KMATHERR_SCALB_UNDERFLOW); /* scalb underflow */
 		}
 	} else {
-		if (!__LIBM_MATHFUN(@finite@, result) || result == 0.0) {
-			if (__LIBM_MATHFUN(@isnan@, result)) {
-				if (!__LIBM_MATHFUN(@isnan@, x) && !__LIBM_MATHFUN(@isnan@, fn))
+		if (!__LIBM_MATHFUNI(@finite@, result) || result == 0.0) {
+			if (__LIBM_MATHFUNI(@isnan@, result)) {
+				if (!__LIBM_MATHFUNI(@isnan@, x) && !__LIBM_MATHFUNI(@isnan@, fn))
 					result = __kernel_standard(x, fn, result, __LIBM_KMATHERR_SCALB_INVALID);
-			} else if (__LIBM_MATHFUN(@isinf@, result)) {
-				if (!__LIBM_MATHFUN(@isinf@, x) && !__LIBM_MATHFUN(@isinf@, fn))
+			} else if (__LIBM_MATHFUNI(@isinf@, result)) {
+				if (!__LIBM_MATHFUNI(@isinf@, x) && !__LIBM_MATHFUNI(@isinf@, fn))
 					result = __kernel_standard(x, fn, result, __LIBM_KMATHERR_SCALB_OVERFLOW);
 			} else {
 				/* result == 0. */
-				if (x != 0.0 && !__LIBM_MATHFUN(@isinf@, fn))
+				if (x != 0.0 && !__LIBM_MATHFUNI(@isinf@, fn))
 					result = __kernel_standard(x, fn, result, __LIBM_KMATHERR_SCALB_UNDERFLOW);
 			}
 		}

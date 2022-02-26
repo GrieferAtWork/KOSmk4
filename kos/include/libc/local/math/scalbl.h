@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe55d53a3 */
+/* HASH CRC-32:0x9867603e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,8 +69,8 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalbl))(__LONGDOUBLE __x, __LONGDOUBLE _
 	__LONGDOUBLE __result;
 	__result = __LIBM_MATHFUN2L(scalb, __x, __fn);
 	if (__LIBM_LIB_VERSION == __LIBM_SVID) {
-		if (__LIBM_MATHFUNL(isinf, __result)) {
-			if (__LIBM_MATHFUNL(finite, __x)) {
+		if (__LIBM_MATHFUNIL(isinf, __result)) {
+			if (__LIBM_MATHFUNIL(finite, __x)) {
 				return __kernel_standard_l(__x, __fn, __result, __LIBM_KMATHERRL_SCALB_OVERFLOW); /* scalb overflow */
 			} else {
 #ifdef __ERANGE
@@ -81,16 +81,16 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalbl))(__LONGDOUBLE __x, __LONGDOUBLE _
 			return __kernel_standard_l(__x, __fn, __result, __LIBM_KMATHERRL_SCALB_UNDERFLOW); /* scalb underflow */
 		}
 	} else {
-		if (!__LIBM_MATHFUNL(finite, __result) || __result == 0.0L) {
-			if (__LIBM_MATHFUNL(isnan, __result)) {
-				if (!__LIBM_MATHFUNL(isnan, __x) && !__LIBM_MATHFUNL(isnan, __fn))
+		if (!__LIBM_MATHFUNIL(finite, __result) || __result == 0.0L) {
+			if (__LIBM_MATHFUNIL(isnan, __result)) {
+				if (!__LIBM_MATHFUNIL(isnan, __x) && !__LIBM_MATHFUNIL(isnan, __fn))
 					__result = __kernel_standard_l(__x, __fn, __result, __LIBM_KMATHERRL_SCALB_INVALID);
-			} else if (__LIBM_MATHFUNL(isinf, __result)) {
-				if (!__LIBM_MATHFUNL(isinf, __x) && !__LIBM_MATHFUNL(isinf, __fn))
+			} else if (__LIBM_MATHFUNIL(isinf, __result)) {
+				if (!__LIBM_MATHFUNIL(isinf, __x) && !__LIBM_MATHFUNIL(isinf, __fn))
 					__result = __kernel_standard_l(__x, __fn, __result, __LIBM_KMATHERRL_SCALB_OVERFLOW);
 			} else {
 				/* result == 0. */
-				if (__x != 0.0L && !__LIBM_MATHFUNL(isinf, __fn))
+				if (__x != 0.0L && !__LIBM_MATHFUNIL(isinf, __fn))
 					__result = __kernel_standard_l(__x, __fn, __result, __LIBM_KMATHERRL_SCALB_UNDERFLOW);
 			}
 		}

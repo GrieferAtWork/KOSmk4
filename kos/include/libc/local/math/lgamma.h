@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae152fff */
+/* HASH CRC-32:0x35061452 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,8 @@
 #define __local_lgamma_defined
 #include <__crt.h>
 #include <libc/template/signgam.h>
-#if defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
+#include <ieee754.h>
+#if defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lgamma_r_defined
 #define __local___localdep_lgamma_r_defined
@@ -32,6 +33,11 @@ __CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_lgamma_r,(double __x, int *__signgamp),lgamma_r,(__x,__signgamp))
 #elif defined(__CRT_HAVE___lgamma_r)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_lgamma_r,(double __x, int *__signgamp),__lgamma_r,(__x,__signgamp))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_END
+#include <libc/local/math/lgamma_r.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_lgamma_r __LIBC_LOCAL_NAME(lgamma_r)
 #else /* ... */
 #undef __local___localdep_lgamma_r_defined
 #endif /* !... */
@@ -45,7 +51,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_lgamma_defined
 #define __localdep_lgamma __LIBC_LOCAL_NAME(lgamma)
 #endif /* !__local___localdep_lgamma_defined */
-#else /* __LOCAL_signgam && (__CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r) */
+#else /* __LOCAL_signgam && (__CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) */
 #undef __local_lgamma_defined
-#endif /* !__LOCAL_signgam || (!__CRT_HAVE_lgamma_r && !__CRT_HAVE___lgamma_r) */
+#endif /* !__LOCAL_signgam || (!__CRT_HAVE_lgamma_r && !__CRT_HAVE___lgamma_r && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) */
 #endif /* !__local_lgamma_defined */

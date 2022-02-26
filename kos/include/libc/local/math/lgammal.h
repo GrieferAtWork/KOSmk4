@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e4eeeff */
+/* HASH CRC-32:0x6272eaac */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,8 @@
 #define __local_lgammal_defined
 #include <__crt.h>
 #include <libc/template/signgam.h>
-#if defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
+#include <ieee754.h>
+#if defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lgammal_r_defined
 #define __local___localdep_lgammal_r_defined
@@ -32,7 +33,7 @@ __CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,__lo
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,__localdep_lgammal_r,(__LONGDOUBLE __x, int *__signgamp),lgammal_r,(__x,__signgamp))
 #elif defined(__CRT_HAVE___lgammal_r)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,__localdep_lgammal_r,(__LONGDOUBLE __x, int *__signgamp),__lgammal_r,(__x,__signgamp))
-#elif defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/lgammal_r.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -50,7 +51,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_lgammal_defined
 #define __localdep_lgammal __LIBC_LOCAL_NAME(lgammal)
 #endif /* !__local___localdep_lgammal_defined */
-#else /* __LOCAL_signgam && (__CRT_HAVE_lgammal_r || __CRT_HAVE___lgammal_r || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r) */
+#else /* __LOCAL_signgam && (__CRT_HAVE_lgammal_r || __CRT_HAVE___lgammal_r || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) */
 #undef __local_lgammal_defined
-#endif /* !__LOCAL_signgam || (!__CRT_HAVE_lgammal_r && !__CRT_HAVE___lgammal_r && !__CRT_HAVE_lgamma_r && !__CRT_HAVE___lgamma_r) */
+#endif /* !__LOCAL_signgam || (!__CRT_HAVE_lgammal_r && !__CRT_HAVE___lgammal_r && !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__CRT_HAVE_lgamma_r && !__CRT_HAVE___lgamma_r && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) */
 #endif /* !__local_lgammal_defined */

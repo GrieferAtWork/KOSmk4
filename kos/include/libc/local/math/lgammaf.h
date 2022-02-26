@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87a92d5a */
+/* HASH CRC-32:0xd046600f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,8 @@
 #define __local_lgammaf_defined
 #include <__crt.h>
 #include <libc/template/signgam.h>
-#if defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
+#include <ieee754.h>
+#if defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lgammaf_r_defined
 #define __local___localdep_lgammaf_r_defined
@@ -32,7 +33,7 @@ __CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,__localdep_
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,__localdep_lgammaf_r,(float __x, int *__signgamp),lgammaf_r,(__x,__signgamp))
 #elif defined(__CRT_HAVE___lgammaf_r)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,__localdep_lgammaf_r,(float __x, int *__signgamp),__lgammaf_r,(__x,__signgamp))
-#elif defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/lgammaf_r.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -50,7 +51,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_lgammaf_defined
 #define __localdep_lgammaf __LIBC_LOCAL_NAME(lgammaf)
 #endif /* !__local___localdep_lgammaf_defined */
-#else /* __LOCAL_signgam && (__CRT_HAVE_lgammaf_r || __CRT_HAVE___lgammaf_r || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r) */
+#else /* __LOCAL_signgam && (__CRT_HAVE_lgammaf_r || __CRT_HAVE___lgammaf_r || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) */
 #undef __local_lgammaf_defined
-#endif /* !__LOCAL_signgam || (!__CRT_HAVE_lgammaf_r && !__CRT_HAVE___lgammaf_r && !__CRT_HAVE_lgamma_r && !__CRT_HAVE___lgamma_r) */
+#endif /* !__LOCAL_signgam || (!__CRT_HAVE_lgammaf_r && !__CRT_HAVE___lgammaf_r && !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ && !__CRT_HAVE_lgamma_r && !__CRT_HAVE___lgamma_r && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) */
 #endif /* !__local_lgammaf_defined */

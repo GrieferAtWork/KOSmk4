@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4fe963fd */
+/* HASH CRC-32:0x3480f8fb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,37 +18,34 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_exp_defined
-#define __local_exp_defined
+#ifndef __local_lgamma_r_defined
+#define __local_lgamma_r_defined
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-#include <bits/crt/math-vector.h>
-#include <libm/signbit.h>
-#include <libm/finite.h>
+#include <libm/lgamma.h>
 #include <libm/matherr.h>
-#include <libm/exp.h>
+#include <libm/finite.h>
+#include <libm/floor.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(exp) __ATTR_WUNUSED __DECL_SIMD_exp double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(exp))(double __x) {
-	double __result;
-	__result = __LIBM_MATHFUN(exp, __x);
+__LOCAL_LIBC(lgamma_r) __ATTR_WUNUSED __ATTR_NONNULL((2)) double
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lgamma_r))(double __x, int *__signgamp) {
+	double __result = __LIBM_MATHFUN2I(lgamma, __x, __signgamp);
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
-	    (!__LIBM_MATHFUNI(finite, __result) || __result == 0.0) &&
-	    __LIBM_MATHFUNI(finite, __x)) {
+	    !__LIBM_MATHFUNI(finite, __result) && __LIBM_MATHFUNI(finite, __x)) {
 		return __kernel_standard(__x, __x, __result,
-		                         __LIBM_MATHFUNI(signbit, __x)
-		                         ? __LIBM_KMATHERR_EXP_UNDERFLOW
-		                         : __LIBM_KMATHERR_EXP_OVERFLOW);
+		                         __LIBM_MATHFUN(floor, __x) == __x &&
+		                         __x <= 0.0 ? __LIBM_KMATHERR_LGAMMA_MINUS      /* lgamma pole */
+		                                  : __LIBM_KMATHERR_LGAMMA_OVERFLOW); /* lgamma overflow */
 	}
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_exp_defined
-#define __local___localdep_exp_defined
-#define __localdep_exp __LIBC_LOCAL_NAME(exp)
-#endif /* !__local___localdep_exp_defined */
+#ifndef __local___localdep_lgamma_r_defined
+#define __local___localdep_lgamma_r_defined
+#define __localdep_lgamma_r __LIBC_LOCAL_NAME(lgamma_r)
+#endif /* !__local___localdep_lgamma_r_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#undef __local_exp_defined
+#undef __local_lgamma_r_defined
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#endif /* !__local_exp_defined */
+#endif /* !__local_lgamma_r_defined */

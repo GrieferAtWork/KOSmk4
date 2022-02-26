@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x482bb354 */
+/* HASH CRC-32:0xae80671a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ldexp))(double __x, int __exponent) {
 	__result = (double)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)__x, __exponent);
 #endif /* !... */
 #ifdef __ERANGE
-	if __unlikely(!__LIBM_MATHFUN(finite, __result) || __result == 0.0)
+	if __unlikely(!__LIBM_MATHFUNI(finite, __result) || __result == 0.0)
 		(void)__libc_seterrno(__ERANGE);
 #endif /* __ERANGE */
 	return __result;

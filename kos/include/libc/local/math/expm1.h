@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2569170 */
+/* HASH CRC-32:0xb13b2880 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,10 +32,10 @@ __LOCAL_LIBC(expm1) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(expm1))(double __x) {
 	double __result;
 	__result = __LIBM_MATHFUN(expm1, __x);
-	if ((!__LIBM_MATHFUN(finite, __result) || __result == -1.0) &&
-	    __LIBM_MATHFUN(finite , __x) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
+	if ((!__LIBM_MATHFUNI(finite, __result) || __result == -1.0) &&
+	    __LIBM_MATHFUNI(finite , __x) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
 		return __kernel_standard(__x, __x, __result,
-		                         __LIBM_MATHFUN(signbit, __x)
+		                         __LIBM_MATHFUNI(signbit, __x)
 		                         ? __LIBM_KMATHERR_EXPM1_UNDERFLOW
 		                         : __LIBM_KMATHERR_EXPM1_OVERFLOW);
 	}

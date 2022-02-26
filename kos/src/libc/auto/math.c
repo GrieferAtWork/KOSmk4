@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9eaa1aa0 */
+/* HASH CRC-32:0x327adc04 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -716,10 +716,10 @@ NOTHROW(LIBCCALL libc_exp)(double x) {
 	double result;
 	result = __LIBM_MATHFUN(exp, x);
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
-	    (!__LIBM_MATHFUN(finite, result) || result == 0.0) &&
-	    __LIBM_MATHFUN(finite, x)) {
+	    (!__LIBM_MATHFUNI(finite, result) || result == 0.0) &&
+	    __LIBM_MATHFUNI(finite, x)) {
 		return __kernel_standard(x, x, result,
-		                         __LIBM_MATHFUN(signbit, x)
+		                         __LIBM_MATHFUNI(signbit, x)
 		                         ? __LIBM_KMATHERR_EXP_UNDERFLOW
 		                         : __LIBM_KMATHERR_EXP_OVERFLOW);
 	}
@@ -756,7 +756,7 @@ NOTHROW(LIBCCALL libc_ldexp)(double x,
 	result = (double)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
 #endif /* !... */
 #ifdef ERANGE
-	if unlikely(!__LIBM_MATHFUN(finite, result) || result == 0.0)
+	if unlikely(!__LIBM_MATHFUNI(finite, result) || result == 0.0)
 		(void)libc_seterrno(ERANGE);
 #endif /* ERANGE */
 	return result;
@@ -831,10 +831,10 @@ NOTHROW(LIBCCALL libc_expf)(float x) {
 	float result;
 	result = __LIBM_MATHFUNF(exp, x);
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
-	    (!__LIBM_MATHFUNF(finite, result) || result == 0.0f) &&
-	    __LIBM_MATHFUNF(finite, x)) {
+	    (!__LIBM_MATHFUNIF(finite, result) || result == 0.0f) &&
+	    __LIBM_MATHFUNIF(finite, x)) {
 		return __kernel_standard_f(x, x, result,
-		                         __LIBM_MATHFUNF(signbit, x)
+		                         __LIBM_MATHFUNIF(signbit, x)
 		                         ? __LIBM_KMATHERRF_EXP_UNDERFLOW
 		                         : __LIBM_KMATHERRF_EXP_OVERFLOW);
 	}
@@ -884,7 +884,7 @@ NOTHROW(LIBCCALL libc_ldexpf)(float x,
 	result = (float)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
 #endif /* !... */
 #ifdef ERANGE
-	if unlikely(!__LIBM_MATHFUNF(finite, result) || result == 0.0f)
+	if unlikely(!__LIBM_MATHFUNIF(finite, result) || result == 0.0f)
 		(void)libc_seterrno(ERANGE);
 #endif /* ERANGE */
 	return result;
@@ -983,10 +983,10 @@ NOTHROW(LIBCCALL libc_expl)(__LONGDOUBLE x) {
 	__LONGDOUBLE result;
 	result = __LIBM_MATHFUNL(exp, x);
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
-	    (!__LIBM_MATHFUNL(finite, result) || result == 0.0L) &&
-	    __LIBM_MATHFUNL(finite, x)) {
+	    (!__LIBM_MATHFUNIL(finite, result) || result == 0.0L) &&
+	    __LIBM_MATHFUNIL(finite, x)) {
 		return __kernel_standard_l(x, x, result,
-		                         __LIBM_MATHFUNL(signbit, x)
+		                         __LIBM_MATHFUNIL(signbit, x)
 		                         ? __LIBM_KMATHERRL_EXP_UNDERFLOW
 		                         : __LIBM_KMATHERRL_EXP_OVERFLOW);
 	}
@@ -1036,7 +1036,7 @@ NOTHROW(LIBCCALL libc_ldexpl)(__LONGDOUBLE x,
 	result = (__LONGDOUBLE)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
 #endif /* !... */
 #ifdef ERANGE
-	if unlikely(!__LIBM_MATHFUNL(finite, result) || result == 0.0L)
+	if unlikely(!__LIBM_MATHFUNIL(finite, result) || result == 0.0L)
 		(void)libc_seterrno(ERANGE);
 #endif /* ERANGE */
 	return result;
@@ -1131,10 +1131,10 @@ INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_expm1)(double x) {
 	double result;
 	result = __LIBM_MATHFUN(expm1, x);
-	if ((!__LIBM_MATHFUN(finite, result) || result == -1.0) &&
-	    __LIBM_MATHFUN(finite , x) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
+	if ((!__LIBM_MATHFUNI(finite, result) || result == -1.0) &&
+	    __LIBM_MATHFUNI(finite , x) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
 		return __kernel_standard(x, x, result,
-		                         __LIBM_MATHFUN(signbit, x)
+		                         __LIBM_MATHFUNI(signbit, x)
 		                         ? __LIBM_KMATHERR_EXPM1_UNDERFLOW
 		                         : __LIBM_KMATHERR_EXPM1_OVERFLOW);
 	}
@@ -1181,10 +1181,10 @@ NOTHROW(LIBCCALL libc_expm1f)(float x) {
 
 	float result;
 	result = __LIBM_MATHFUNF(expm1, x);
-	if ((!__LIBM_MATHFUNF(finite, result) || result == -1.0f) &&
-	    __LIBM_MATHFUNF(finite , x) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
+	if ((!__LIBM_MATHFUNIF(finite, result) || result == -1.0f) &&
+	    __LIBM_MATHFUNIF(finite , x) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
 		return __kernel_standard_f(x, x, result,
-		                         __LIBM_MATHFUNF(signbit, x)
+		                         __LIBM_MATHFUNIF(signbit, x)
 		                         ? __LIBM_KMATHERRF_EXPM1_UNDERFLOW
 		                         : __LIBM_KMATHERRF_EXPM1_OVERFLOW);
 	}
@@ -1247,10 +1247,10 @@ NOTHROW(LIBCCALL libc_expm1l)(__LONGDOUBLE x) {
 
 	__LONGDOUBLE result;
 	result = __LIBM_MATHFUNL(expm1, x);
-	if ((!__LIBM_MATHFUNL(finite, result) || result == -1.0L) &&
-	    __LIBM_MATHFUNL(finite , x) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
+	if ((!__LIBM_MATHFUNIL(finite, result) || result == -1.0L) &&
+	    __LIBM_MATHFUNIL(finite , x) && __LIBM_LIB_VERSION != __LIBM_IEEE) {
 		return __kernel_standard_l(x, x, result,
-		                         __LIBM_MATHFUNL(signbit, x)
+		                         __LIBM_MATHFUNIL(signbit, x)
 		                         ? __LIBM_KMATHERRL_EXPM1_UNDERFLOW
 		                         : __LIBM_KMATHERRL_EXPM1_OVERFLOW);
 	}
@@ -1698,7 +1698,7 @@ INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_fmod)(double x,
                             double y) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
-	    (__LIBM_MATHFUN(isinf, x) || y == 0.0) &&
+	    (__LIBM_MATHFUNI(isinf, x) || y == 0.0) &&
 	    !__LIBM_MATHFUN2(isunordered, x, y))
 		return __kernel_standard(x, y, y, __LIBM_KMATHERR_FMOD); /* fmod(+-Inf,y) or fmod(x,0) */
 	return __LIBM_MATHFUN2(fmod, x, y);
@@ -1759,7 +1759,7 @@ NOTHROW(LIBCCALL libc_fmodf)(float x,
 
 
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
-	    (__LIBM_MATHFUNF(isinf, x) || y == 0.0f) &&
+	    (__LIBM_MATHFUNIF(isinf, x) || y == 0.0f) &&
 	    !__LIBM_MATHFUN2F(isunordered, x, y))
 		return __kernel_standard_f(x, y, y, __LIBM_KMATHERRF_FMOD); /* fmod(+-Inf,y) or fmod(x,0) */
 	return __LIBM_MATHFUN2F(fmod, x, y);
@@ -1823,7 +1823,7 @@ NOTHROW(LIBCCALL libc_fmodl)(__LONGDOUBLE x,
 
 
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
-	    (__LIBM_MATHFUNL(isinf, x) || y == 0.0L) &&
+	    (__LIBM_MATHFUNIL(isinf, x) || y == 0.0L) &&
 	    !__LIBM_MATHFUN2L(isunordered, x, y))
 		return __kernel_standard_l(x, y, y, __LIBM_KMATHERRL_FMOD); /* fmod(+-Inf,y) or fmod(x,0) */
 	return __LIBM_MATHFUN2L(fmod, x, y);
@@ -1977,8 +1977,8 @@ NOTHROW(LIBCCALL libc_nextafter)(double x,
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_remainder)(double x,
                                  double p) {
-	if (((p == 0.0 && !__LIBM_MATHFUN(isnan, x)) ||
-	     (__LIBM_MATHFUN(isinf, x) && !__LIBM_MATHFUN(isnan, p))) &&
+	if (((p == 0.0 && !__LIBM_MATHFUNI(isnan, x)) ||
+	     (__LIBM_MATHFUNI(isinf, x) && !__LIBM_MATHFUNI(isnan, p))) &&
 	    __LIBM_LIB_VERSION != __LIBM_IEEE)
 		return __kernel_standard(x, p, p, __LIBM_KMATHERR_REMAINDER); /* remainder domain */
 	return __LIBM_MATHFUN2(remainder, x, p);
@@ -2035,8 +2035,8 @@ NOTHROW(LIBCCALL libc_remainderf)(float x,
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 
 
-	if (((p == 0.0f && !__LIBM_MATHFUNF(isnan, x)) ||
-	     (__LIBM_MATHFUNF(isinf, x) && !__LIBM_MATHFUNF(isnan, p))) &&
+	if (((p == 0.0f && !__LIBM_MATHFUNIF(isnan, x)) ||
+	     (__LIBM_MATHFUNIF(isinf, x) && !__LIBM_MATHFUNIF(isnan, p))) &&
 	    __LIBM_LIB_VERSION != __LIBM_IEEE)
 		return __kernel_standard_f(x, p, p, __LIBM_KMATHERRF_REMAINDER); /* remainder domain */
 	return __LIBM_MATHFUN2F(remainder, x, p);
@@ -2102,8 +2102,8 @@ NOTHROW(LIBCCALL libc_remainderl)(__LONGDOUBLE x,
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 
 
-	if (((p == 0.0L && !__LIBM_MATHFUNL(isnan, x)) ||
-	     (__LIBM_MATHFUNL(isinf, x) && !__LIBM_MATHFUNL(isnan, p))) &&
+	if (((p == 0.0L && !__LIBM_MATHFUNIL(isnan, x)) ||
+	     (__LIBM_MATHFUNIL(isinf, x) && !__LIBM_MATHFUNIL(isnan, p))) &&
 	    __LIBM_LIB_VERSION != __LIBM_IEEE)
 		return __kernel_standard_l(x, p, p, __LIBM_KMATHERRL_REMAINDER); /* remainder domain */
 	return __LIBM_MATHFUN2L(remainder, x, p);
@@ -3075,19 +3075,74 @@ NOTHROW(LIBCCALL libc_ynl)(int n,
                            __LONGDOUBLE x) {
 	return (__LONGDOUBLE)libc_yn(n, (double)x);
 }
+#include <libm/lgamma.h>
+#include <libm/matherr.h>
+#include <libm/finite.h>
+#include <libm/floor.h>
+/* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
+ * Reentrant version of `lgamma(3)' */
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((2)) double
+NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x,
+                                    int *signgamp) {
+	double result = __LIBM_MATHFUN2I(lgamma, x, signgamp);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    !__LIBM_MATHFUNI(finite, result) && __LIBM_MATHFUNI(finite, x)) {
+		return __kernel_standard(x, x, result,
+		                         __LIBM_MATHFUN(floor, x) == x &&
+		                         x <= 0.0 ? __LIBM_KMATHERR_LGAMMA_MINUS      /* lgamma pole */
+		                                  : __LIBM_KMATHERR_LGAMMA_OVERFLOW); /* lgamma overflow */
+	}
+	return result;
+}
+#include <libm/lgamma.h>
+#include <libm/matherr.h>
+#include <libm/finite.h>
+#include <libm/floor.h>
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant version of `lgamma(3)' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((2)) float
 NOTHROW_NCX(LIBCCALL libc_lgammaf_r)(float x,
                                      int *signgamp) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+	float result = __LIBM_MATHFUN2IF(lgamma, x, signgamp);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    !__LIBM_MATHFUNIF(finite, result) && __LIBM_MATHFUNIF(finite, x)) {
+		return __kernel_standard_f(x, x, result,
+		                         __LIBM_MATHFUNF(floor, x) == x &&
+		                         x <= 0.0f ? __LIBM_KMATHERRF_LGAMMA_MINUS      /* lgamma pole */
+		                                  : __LIBM_KMATHERRF_LGAMMA_OVERFLOW); /* lgamma overflow */
+	}
+	return result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)libc_lgamma_r((double)x, signgamp);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
+#include <libm/lgamma.h>
+#include <libm/matherr.h>
+#include <libm/finite.h>
+#include <libm/floor.h>
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant version of `lgamma(3)' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((2)) __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_lgammal_r)(__LONGDOUBLE x,
                                      int *signgamp) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+	__LONGDOUBLE result = __LIBM_MATHFUN2IL(lgamma, x, signgamp);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    !__LIBM_MATHFUNIL(finite, result) && __LIBM_MATHFUNIL(finite, x)) {
+		return __kernel_standard_l(x, x, result,
+		                         __LIBM_MATHFUNL(floor, x) == x &&
+		                         x <= 0.0L ? __LIBM_KMATHERRL_LGAMMA_MINUS      /* lgamma pole */
+		                                  : __LIBM_KMATHERRL_LGAMMA_OVERFLOW); /* lgamma overflow */
+	}
+	return result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)libc_lgamma_r((double)x, signgamp);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 #include <libm/isnan.h>
 #include <libm/finite.h>
@@ -3113,8 +3168,8 @@ NOTHROW(LIBCCALL libc_scalb)(double x,
 	double result;
 	result = __LIBM_MATHFUN2(scalb, x, fn);
 	if (__LIBM_LIB_VERSION == __LIBM_SVID) {
-		if (__LIBM_MATHFUN(isinf, result)) {
-			if (__LIBM_MATHFUN(finite, x)) {
+		if (__LIBM_MATHFUNI(isinf, result)) {
+			if (__LIBM_MATHFUNI(finite, x)) {
 				return __kernel_standard(x, fn, result, __LIBM_KMATHERR_SCALB_OVERFLOW); /* scalb overflow */
 			} else {
 #ifdef ERANGE
@@ -3125,16 +3180,16 @@ NOTHROW(LIBCCALL libc_scalb)(double x,
 			return __kernel_standard(x, fn, result, __LIBM_KMATHERR_SCALB_UNDERFLOW); /* scalb underflow */
 		}
 	} else {
-		if (!__LIBM_MATHFUN(finite, result) || result == 0.0) {
-			if (__LIBM_MATHFUN(isnan, result)) {
-				if (!__LIBM_MATHFUN(isnan, x) && !__LIBM_MATHFUN(isnan, fn))
+		if (!__LIBM_MATHFUNI(finite, result) || result == 0.0) {
+			if (__LIBM_MATHFUNI(isnan, result)) {
+				if (!__LIBM_MATHFUNI(isnan, x) && !__LIBM_MATHFUNI(isnan, fn))
 					result = __kernel_standard(x, fn, result, __LIBM_KMATHERR_SCALB_INVALID);
-			} else if (__LIBM_MATHFUN(isinf, result)) {
-				if (!__LIBM_MATHFUN(isinf, x) && !__LIBM_MATHFUN(isinf, fn))
+			} else if (__LIBM_MATHFUNI(isinf, result)) {
+				if (!__LIBM_MATHFUNI(isinf, x) && !__LIBM_MATHFUNI(isinf, fn))
 					result = __kernel_standard(x, fn, result, __LIBM_KMATHERR_SCALB_OVERFLOW);
 			} else {
 				/* result == 0. */
-				if (x != 0.0 && !__LIBM_MATHFUN(isinf, fn))
+				if (x != 0.0 && !__LIBM_MATHFUNI(isinf, fn))
 					result = __kernel_standard(x, fn, result, __LIBM_KMATHERR_SCALB_UNDERFLOW);
 			}
 		}
@@ -3168,8 +3223,8 @@ NOTHROW(LIBCCALL libc_scalbf)(float x,
 	float result;
 	result = __LIBM_MATHFUN2F(scalb, x, fn);
 	if (__LIBM_LIB_VERSION == __LIBM_SVID) {
-		if (__LIBM_MATHFUNF(isinf, result)) {
-			if (__LIBM_MATHFUNF(finite, x)) {
+		if (__LIBM_MATHFUNIF(isinf, result)) {
+			if (__LIBM_MATHFUNIF(finite, x)) {
 				return __kernel_standard_f(x, fn, result, __LIBM_KMATHERRF_SCALB_OVERFLOW); /* scalb overflow */
 			} else {
 #ifdef ERANGE
@@ -3180,16 +3235,16 @@ NOTHROW(LIBCCALL libc_scalbf)(float x,
 			return __kernel_standard_f(x, fn, result, __LIBM_KMATHERRF_SCALB_UNDERFLOW); /* scalb underflow */
 		}
 	} else {
-		if (!__LIBM_MATHFUNF(finite, result) || result == 0.0f) {
-			if (__LIBM_MATHFUNF(isnan, result)) {
-				if (!__LIBM_MATHFUNF(isnan, x) && !__LIBM_MATHFUNF(isnan, fn))
+		if (!__LIBM_MATHFUNIF(finite, result) || result == 0.0f) {
+			if (__LIBM_MATHFUNIF(isnan, result)) {
+				if (!__LIBM_MATHFUNIF(isnan, x) && !__LIBM_MATHFUNIF(isnan, fn))
 					result = __kernel_standard_f(x, fn, result, __LIBM_KMATHERRF_SCALB_INVALID);
-			} else if (__LIBM_MATHFUNF(isinf, result)) {
-				if (!__LIBM_MATHFUNF(isinf, x) && !__LIBM_MATHFUNF(isinf, fn))
+			} else if (__LIBM_MATHFUNIF(isinf, result)) {
+				if (!__LIBM_MATHFUNIF(isinf, x) && !__LIBM_MATHFUNIF(isinf, fn))
 					result = __kernel_standard_f(x, fn, result, __LIBM_KMATHERRF_SCALB_OVERFLOW);
 			} else {
 				/* result == 0. */
-				if (x != 0.0f && !__LIBM_MATHFUNF(isinf, fn))
+				if (x != 0.0f && !__LIBM_MATHFUNIF(isinf, fn))
 					result = __kernel_standard_f(x, fn, result, __LIBM_KMATHERRF_SCALB_UNDERFLOW);
 			}
 		}
@@ -3226,8 +3281,8 @@ NOTHROW(LIBCCALL libc_scalbl)(__LONGDOUBLE x,
 	__LONGDOUBLE result;
 	result = __LIBM_MATHFUN2L(scalb, x, fn);
 	if (__LIBM_LIB_VERSION == __LIBM_SVID) {
-		if (__LIBM_MATHFUNL(isinf, result)) {
-			if (__LIBM_MATHFUNL(finite, x)) {
+		if (__LIBM_MATHFUNIL(isinf, result)) {
+			if (__LIBM_MATHFUNIL(finite, x)) {
 				return __kernel_standard_l(x, fn, result, __LIBM_KMATHERRL_SCALB_OVERFLOW); /* scalb overflow */
 			} else {
 #ifdef ERANGE
@@ -3238,16 +3293,16 @@ NOTHROW(LIBCCALL libc_scalbl)(__LONGDOUBLE x,
 			return __kernel_standard_l(x, fn, result, __LIBM_KMATHERRL_SCALB_UNDERFLOW); /* scalb underflow */
 		}
 	} else {
-		if (!__LIBM_MATHFUNL(finite, result) || result == 0.0L) {
-			if (__LIBM_MATHFUNL(isnan, result)) {
-				if (!__LIBM_MATHFUNL(isnan, x) && !__LIBM_MATHFUNL(isnan, fn))
+		if (!__LIBM_MATHFUNIL(finite, result) || result == 0.0L) {
+			if (__LIBM_MATHFUNIL(isnan, result)) {
+				if (!__LIBM_MATHFUNIL(isnan, x) && !__LIBM_MATHFUNIL(isnan, fn))
 					result = __kernel_standard_l(x, fn, result, __LIBM_KMATHERRL_SCALB_INVALID);
-			} else if (__LIBM_MATHFUNL(isinf, result)) {
-				if (!__LIBM_MATHFUNL(isinf, x) && !__LIBM_MATHFUNL(isinf, fn))
+			} else if (__LIBM_MATHFUNIL(isinf, result)) {
+				if (!__LIBM_MATHFUNIL(isinf, x) && !__LIBM_MATHFUNIL(isinf, fn))
 					result = __kernel_standard_l(x, fn, result, __LIBM_KMATHERRL_SCALB_OVERFLOW);
 			} else {
 				/* result == 0. */
-				if (x != 0.0L && !__LIBM_MATHFUNL(isinf, fn))
+				if (x != 0.0L && !__LIBM_MATHFUNIL(isinf, fn))
 					result = __kernel_standard_l(x, fn, result, __LIBM_KMATHERRL_SCALB_UNDERFLOW);
 			}
 		}
@@ -3883,6 +3938,8 @@ DEFINE_PUBLIC_ALIAS(__y1l, libc_y1l);
 DEFINE_PUBLIC_ALIAS(y1l, libc_y1l);
 DEFINE_PUBLIC_ALIAS(__ynl, libc_ynl);
 DEFINE_PUBLIC_ALIAS(ynl, libc_ynl);
+DEFINE_PUBLIC_ALIAS(__lgamma_r, libc_lgamma_r);
+DEFINE_PUBLIC_ALIAS(lgamma_r, libc_lgamma_r);
 DEFINE_PUBLIC_ALIAS(__lgammaf_r, libc_lgammaf_r);
 DEFINE_PUBLIC_ALIAS(lgammaf_r, libc_lgammaf_r);
 DEFINE_PUBLIC_ALIAS(__lgammal_r, libc_lgammal_r);

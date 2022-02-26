@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9502a65 */
+/* HASH CRC-32:0xdc240fde */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -369,18 +369,18 @@ __NAMESPACE_STD_USING(erf)
 __NAMESPACE_STD_USING(erfc)
 #endif /* __CRT_HAVE_erfc || __CRT_HAVE___erfc */
 #include <libc/template/signgam.h>
-#if defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || (defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)))
+#if defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || (defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))
 __NAMESPACE_STD_USING(lgamma)
-#endif /* __CRT_HAVE_lgamma || __CRT_HAVE_gamma || __CRT_HAVE___lgamma || __CRT_HAVE___gamma || (__LOCAL_signgam && (__CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r)) */
+#endif /* __CRT_HAVE_lgamma || __CRT_HAVE_gamma || __CRT_HAVE___lgamma || __CRT_HAVE___gamma || (__LOCAL_signgam && (__CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)) */
 #if defined(__CRT_HAVE_erff) || defined(__CRT_HAVE___erff) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
 __NAMESPACE_STD_USING(erff)
 #endif /* __CRT_HAVE_erff || __CRT_HAVE___erff || __CRT_HAVE_erf || __CRT_HAVE___erf */
 #if defined(__CRT_HAVE_erfcf) || defined(__CRT_HAVE___erfcf) || defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
 __NAMESPACE_STD_USING(erfcf)
 #endif /* __CRT_HAVE_erfcf || __CRT_HAVE___erfcf || __CRT_HAVE_erfc || __CRT_HAVE___erfc */
-#if defined(__CRT_HAVE_lgammaf) || defined(__CRT_HAVE_gammaf) || defined(__CRT_HAVE___lgammaf) || defined(__CRT_HAVE___gammaf) || (defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)))
+#if defined(__CRT_HAVE_lgammaf) || defined(__CRT_HAVE_gammaf) || defined(__CRT_HAVE___lgammaf) || defined(__CRT_HAVE___gammaf) || (defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))
 __NAMESPACE_STD_USING(lgammaf)
-#endif /* __CRT_HAVE_lgammaf || __CRT_HAVE_gammaf || __CRT_HAVE___lgammaf || __CRT_HAVE___gammaf || (__LOCAL_signgam && (__CRT_HAVE_lgammaf_r || __CRT_HAVE___lgammaf_r || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r)) */
+#endif /* __CRT_HAVE_lgammaf || __CRT_HAVE_gammaf || __CRT_HAVE___lgammaf || __CRT_HAVE___gammaf || (__LOCAL_signgam && (__CRT_HAVE_lgammaf_r || __CRT_HAVE___lgammaf_r || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)) */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if defined(__CRT_HAVE_erfl) || defined(__CRT_HAVE___erfl) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
 __NAMESPACE_STD_USING(erfl)
@@ -388,9 +388,9 @@ __NAMESPACE_STD_USING(erfl)
 #if defined(__CRT_HAVE_erfcl) || defined(__CRT_HAVE___erfcl) || defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
 __NAMESPACE_STD_USING(erfcl)
 #endif /* __CRT_HAVE_erfcl || __CRT_HAVE___erfcl || __CRT_HAVE_erfc || __CRT_HAVE___erfc */
-#if defined(__CRT_HAVE_lgammal) || defined(__CRT_HAVE_gammal) || defined(__CRT_HAVE___lgammal) || defined(__CRT_HAVE___gammal) || (defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)))
+#if defined(__CRT_HAVE_lgammal) || defined(__CRT_HAVE_gammal) || defined(__CRT_HAVE___lgammal) || defined(__CRT_HAVE___gammal) || (defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))
 __NAMESPACE_STD_USING(lgammal)
-#endif /* __CRT_HAVE_lgammal || __CRT_HAVE_gammal || __CRT_HAVE___lgammal || __CRT_HAVE___gammal || (__LOCAL_signgam && (__CRT_HAVE_lgammal_r || __CRT_HAVE___lgammal_r || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r)) */
+#endif /* __CRT_HAVE_lgammal || __CRT_HAVE_gammal || __CRT_HAVE___lgammal || __CRT_HAVE___gammal || (__LOCAL_signgam && (__CRT_HAVE_lgammal_r || __CRT_HAVE___lgammal_r || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)) */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_XOPEN || __USE_ISOC99 */
 #ifdef __USE_ISOC99
@@ -2817,13 +2817,13 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,lgamma,(double __x),__gamma,(__x))
 __NAMESPACE_STD_END
 #include <libc/template/signgam.h>
 __NAMESPACE_STD_BEGIN
-#if defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
+#if defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))
 __NAMESPACE_STD_END
 #include <libc/local/math/lgamma.h>
 __NAMESPACE_STD_BEGIN
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(lgamma, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL lgamma)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgamma))(__x); })
-#endif /* __LOCAL_signgam && (__CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r) */
+#endif /* __LOCAL_signgam && (__CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) */
 #endif /* !... */
 #if __has_builtin(__builtin_erff) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erff)
 /* >> erff(3), erf(3), erfl(3) */
@@ -2879,13 +2879,13 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,lgammaf,(float __x),__gammaf,(__x))
 __NAMESPACE_STD_END
 #include <libc/template/signgam.h>
 __NAMESPACE_STD_BEGIN
-#if defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
+#if defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))
 __NAMESPACE_STD_END
 #include <libc/local/math/lgammaf.h>
 __NAMESPACE_STD_BEGIN
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(lgammaf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL lgammaf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammaf))(__x); })
-#endif /* __LOCAL_signgam && (__CRT_HAVE_lgammaf_r || __CRT_HAVE___lgammaf_r || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r) */
+#endif /* __LOCAL_signgam && (__CRT_HAVE_lgammaf_r || __CRT_HAVE___lgammaf_r || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) */
 #endif /* !... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_erfl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfl)
@@ -2942,13 +2942,13 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,lgammal,(__LONGDOUBLE __x),__g
 __NAMESPACE_STD_END
 #include <libc/template/signgam.h>
 __NAMESPACE_STD_BEGIN
-#if defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
+#if defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))
 __NAMESPACE_STD_END
 #include <libc/local/math/lgammal.h>
 __NAMESPACE_STD_BEGIN
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(lgammal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL lgammal)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammal))(__x); })
-#endif /* __LOCAL_signgam && (__CRT_HAVE_lgammal_r || __CRT_HAVE___lgammal_r || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r) */
+#endif /* __LOCAL_signgam && (__CRT_HAVE_lgammal_r || __CRT_HAVE___lgammal_r || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) */
 #endif /* !... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_XOPEN || __USE_ISOC99 */
@@ -7114,7 +7114,7 @@ __NAMESPACE_STD_END
 #include <libc/template/signgam.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
-#if defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
+#if defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/lgammaf.h>
@@ -7122,7 +7122,7 @@ __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL lgamma)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammaf))(__x); }
-#endif /* __LOCAL_signgam && (__CRT_HAVE_lgammaf_r || __CRT_HAVE___lgammaf_r || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r) */
+#endif /* __LOCAL_signgam && (__CRT_HAVE_lgammaf_r || __CRT_HAVE___lgammaf_r || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) */
 #endif /* !... */
 } /* extern "C++" */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -7209,7 +7209,7 @@ __NAMESPACE_STD_END
 #include <libc/template/signgam.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
-#if defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
+#if defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/lgammal.h>
@@ -7217,7 +7217,7 @@ __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL lgamma)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammal))(__x); }
-#endif /* __LOCAL_signgam && (__CRT_HAVE_lgammal_r || __CRT_HAVE___lgammal_r || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r) */
+#endif /* __LOCAL_signgam && (__CRT_HAVE_lgammal_r || __CRT_HAVE___lgammal_r || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) */
 #endif /* !... */
 } /* extern "C++" */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -7609,18 +7609,18 @@ __NAMESPACE_STD_USING(erf)
 __NAMESPACE_STD_USING(erfc)
 #endif /* __CRT_HAVE_erfc || __CRT_HAVE___erfc */
 #include <libc/template/signgam.h>
-#if defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || (defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)))
+#if defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || (defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))
 __NAMESPACE_STD_USING(lgamma)
-#endif /* __CRT_HAVE_lgamma || __CRT_HAVE_gamma || __CRT_HAVE___lgamma || __CRT_HAVE___gamma || (__LOCAL_signgam && (__CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r)) */
+#endif /* __CRT_HAVE_lgamma || __CRT_HAVE_gamma || __CRT_HAVE___lgamma || __CRT_HAVE___gamma || (__LOCAL_signgam && (__CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)) */
 #if defined(__CRT_HAVE_erff) || defined(__CRT_HAVE___erff) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
 __NAMESPACE_STD_USING(erff)
 #endif /* __CRT_HAVE_erff || __CRT_HAVE___erff || __CRT_HAVE_erf || __CRT_HAVE___erf */
 #if defined(__CRT_HAVE_erfcf) || defined(__CRT_HAVE___erfcf) || defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
 __NAMESPACE_STD_USING(erfcf)
 #endif /* __CRT_HAVE_erfcf || __CRT_HAVE___erfcf || __CRT_HAVE_erfc || __CRT_HAVE___erfc */
-#if defined(__CRT_HAVE_lgammaf) || defined(__CRT_HAVE_gammaf) || defined(__CRT_HAVE___lgammaf) || defined(__CRT_HAVE___gammaf) || (defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)))
+#if defined(__CRT_HAVE_lgammaf) || defined(__CRT_HAVE_gammaf) || defined(__CRT_HAVE___lgammaf) || defined(__CRT_HAVE___gammaf) || (defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))
 __NAMESPACE_STD_USING(lgammaf)
-#endif /* __CRT_HAVE_lgammaf || __CRT_HAVE_gammaf || __CRT_HAVE___lgammaf || __CRT_HAVE___gammaf || (__LOCAL_signgam && (__CRT_HAVE_lgammaf_r || __CRT_HAVE___lgammaf_r || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r)) */
+#endif /* __CRT_HAVE_lgammaf || __CRT_HAVE_gammaf || __CRT_HAVE___lgammaf || __CRT_HAVE___gammaf || (__LOCAL_signgam && (__CRT_HAVE_lgammaf_r || __CRT_HAVE___lgammaf_r || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)) */
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifndef __CXX_SYSTEM_HEADER
@@ -7630,9 +7630,9 @@ __NAMESPACE_STD_USING(erfl)
 #if defined(__CRT_HAVE_erfcl) || defined(__CRT_HAVE___erfcl) || defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
 __NAMESPACE_STD_USING(erfcl)
 #endif /* __CRT_HAVE_erfcl || __CRT_HAVE___erfcl || __CRT_HAVE_erfc || __CRT_HAVE___erfc */
-#if defined(__CRT_HAVE_lgammal) || defined(__CRT_HAVE_gammal) || defined(__CRT_HAVE___lgammal) || defined(__CRT_HAVE___gammal) || (defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)))
+#if defined(__CRT_HAVE_lgammal) || defined(__CRT_HAVE_gammal) || defined(__CRT_HAVE___lgammal) || defined(__CRT_HAVE___gammal) || (defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))
 __NAMESPACE_STD_USING(lgammal)
-#endif /* __CRT_HAVE_lgammal || __CRT_HAVE_gammal || __CRT_HAVE___lgammal || __CRT_HAVE___gammal || (__LOCAL_signgam && (__CRT_HAVE_lgammal_r || __CRT_HAVE___lgammal_r || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r)) */
+#endif /* __CRT_HAVE_lgammal || __CRT_HAVE_gammal || __CRT_HAVE___lgammal || __CRT_HAVE___gammal || (__LOCAL_signgam && (__CRT_HAVE_lgammal_r || __CRT_HAVE___lgammal_r || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)) */
 #endif /* !__CXX_SYSTEM_HEADER */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_XOPEN || __USE_ISOC99 */
@@ -8555,7 +8555,7 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,gamma,(double __x),__lgamma,(__x))
 #elif defined(__CRT_HAVE___gamma)
 /* Obsolete export_alias for `lgamma' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,gamma,(double __x),__gamma,(__x))
-#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
+#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))
 #include <libc/local/math/lgamma.h>
 /* Obsolete export_alias for `lgamma' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL gamma)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgamma))(__x); }
@@ -8578,7 +8578,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,gammaf,(float __x),__lgammaf,(__x))
 #elif defined(__CRT_HAVE___gammaf)
 /* Obsolete export_alias for `lgammaf' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,gammaf,(float __x),__gammaf,(__x))
-#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
+#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))
 #include <libc/local/math/lgammaf.h>
 /* Obsolete export_alias for `lgammaf' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL gammaf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammaf))(__x); }
@@ -8602,7 +8602,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,gammal,(__LONGDOUBLE __x),__lg
 #elif defined(__CRT_HAVE___gammal)
 /* Obsolete export_alias for `lgammal' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,gammal,(__LONGDOUBLE __x),__gammal,(__x))
-#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
+#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))
 #include <libc/local/math/lgammal.h>
 /* Obsolete export_alias for `lgammal' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL gammal)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammal))(__x); }
@@ -8622,6 +8622,11 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,lgamma_r,(dou
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant version of `lgamma(3)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,lgamma_r,(double __x, int *__signgamp),__lgamma_r,(__x,__signgamp))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/lgamma_r.h>
+/* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
+ * Reentrant version of `lgamma(3)' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(lgamma_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) double __NOTHROW_NCX(__LIBCCALL lgamma_r)(double __x, int *__signgamp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgamma_r))(__x, __signgamp); })
 #endif /* ... */
 #if __has_builtin(__builtin_lgammaf_r) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgammaf_r)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
@@ -8635,7 +8640,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,lgammaf_r,(flo
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant version of `lgamma(3)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,lgammaf_r,(float __x, int *__signgamp),__lgammaf_r,(__x,__signgamp))
-#elif defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/lgammaf_r.h>
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant version of `lgamma(3)' */
@@ -8654,7 +8659,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,lgammal
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant version of `lgamma(3)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,lgammal_r,(__LONGDOUBLE __x, int *__signgamp),__lgammal_r,(__x,__signgamp))
-#elif defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/lgammal_r.h>
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant version of `lgamma(3)' */
@@ -11382,7 +11387,7 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__lgamma,(double __x),(__x))
 #elif defined(__CRT_HAVE___gamma)
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__lgamma,(double __x),__gamma,(__x))
-#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
+#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))
 #include <libc/local/math/lgamma.h>
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __lgamma)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgamma))(__x); }
@@ -11433,7 +11438,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__lgammaf,(float __x),(__x))
 #elif defined(__CRT_HAVE___gammaf)
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__lgammaf,(float __x),__gammaf,(__x))
-#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
+#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))
 #include <libc/local/math/lgammaf.h>
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __lgammaf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammaf))(__x); }
@@ -11485,7 +11490,7 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__lgammal,(__LONGDOUBLE __x),(_
 #elif defined(__CRT_HAVE___gammal)
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__lgammal,(__LONGDOUBLE __x),__gammal,(__x))
-#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
+#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))
 #include <libc/local/math/lgammal.h>
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __lgammal)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammal))(__x); }
@@ -11566,7 +11571,7 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__gamma,(double __x),__lgamma,(__x))
 #elif defined(__CRT_HAVE___gamma)
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__gamma,(double __x),(__x))
-#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
+#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))
 #include <libc/local/math/lgamma.h>
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __gamma)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgamma))(__x); }
@@ -11589,7 +11594,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__gammaf,(float __x),__lgammaf,(__x))
 #elif defined(__CRT_HAVE___gammaf)
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__gammaf,(float __x),(__x))
-#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
+#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammaf_r) || defined(__CRT_HAVE___lgammaf_r) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))
 #include <libc/local/math/lgammaf.h>
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __gammaf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammaf))(__x); }
@@ -11613,7 +11618,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__gammal,(__LONGDOUBLE __x),__
 #elif defined(__CRT_HAVE___gammal)
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__gammal,(__LONGDOUBLE __x),(__x))
-#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
+#elif defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))
 #include <libc/local/math/lgammal.h>
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __gammal)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammal))(__x); }
@@ -11633,6 +11638,11 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__lgamma_r,(
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant version of `lgamma(3)' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__lgamma_r,(double __x, int *__signgamp),(__x,__signgamp))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/lgamma_r.h>
+/* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
+ * Reentrant version of `lgamma(3)' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) double __NOTHROW_NCX(__LIBCCALL __lgamma_r)(double __x, int *__signgamp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgamma_r))(__x, __signgamp); }
 #endif /* ... */
 #if __has_builtin(__builtin_lgammaf_r) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgammaf_r)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
@@ -11646,7 +11656,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,__lgammaf_r,(
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant version of `lgamma(3)' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,__lgammaf_r,(float __x, int *__signgamp),(__x,__signgamp))
-#elif defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/lgammaf_r.h>
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant version of `lgamma(3)' */
@@ -11665,7 +11675,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,__lgam
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant version of `lgamma(3)' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,__lgammal_r,(__LONGDOUBLE __x, int *__signgamp),(__x,__signgamp))
-#elif defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/lgammal_r.h>
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant version of `lgamma(3)' */

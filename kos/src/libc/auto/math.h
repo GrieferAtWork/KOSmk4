@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb662ec6d */
+/* HASH CRC-32:0xe30bd770 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1984,6 +1984,13 @@ INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_ynl)(int n, __LONGDOUBLE x);
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant version of `lgamma(3)' */
 INTDEF WUNUSED NONNULL((2)) double NOTHROW_NCX(LIBDCALL libd_lgamma_r)(double x, int *signgamp);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
+ * Reentrant version of `lgamma(3)' */
+INTDEF WUNUSED NONNULL((2)) double NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x, int *signgamp);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant version of `lgamma(3)' */
 INTDEF WUNUSED NONNULL((2)) float NOTHROW_NCX(LIBDCALL libd_lgammaf_r)(float x, int *signgamp);

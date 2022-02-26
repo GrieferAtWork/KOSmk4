@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0f78978 */
+/* HASH CRC-32:0x2c5456b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,8 +58,8 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remainderf))(float __x, float __p) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 
 
-	if (((__p == 0.0f && !__LIBM_MATHFUNF(isnan, __x)) ||
-	     (__LIBM_MATHFUNF(isinf, __x) && !__LIBM_MATHFUNF(isnan, __p))) &&
+	if (((__p == 0.0f && !__LIBM_MATHFUNIF(isnan, __x)) ||
+	     (__LIBM_MATHFUNIF(isinf, __x) && !__LIBM_MATHFUNIF(isnan, __p))) &&
 	    __LIBM_LIB_VERSION != __LIBM_IEEE)
 		return __kernel_standard_f(__x, __p, __p, __LIBM_KMATHERRF_REMAINDER); /* remainder domain */
 	return __LIBM_MATHFUN2F(remainder, __x, __p);

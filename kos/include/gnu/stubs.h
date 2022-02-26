@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61488f4e */
+/* HASH CRC-32:0x84909a1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -422,8 +422,6 @@
 #define __stub_lckpwdf
 #define __stub_lcong48
 #define __stub_lcong48_r
-#define __stub___lgamma_r
-#define __stub_lgamma_r
 #define __stub___loc_aton
 #define __stub_loc_aton
 #define __stub___loc_ntoa

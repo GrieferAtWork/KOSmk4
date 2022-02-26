@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca154ed1 */
+/* HASH CRC-32:0x906a6754 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_lgammal_r_defined
 #define __local_lgammal_r_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lgamma_r_defined
 #define __local___localdep_lgamma_r_defined
@@ -31,20 +32,45 @@ __CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_lgamma_r,(double __x, int *__signgamp),lgamma_r,(__x,__signgamp))
 #elif defined(__CRT_HAVE___lgamma_r)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_lgamma_r,(double __x, int *__signgamp),__lgamma_r,(__x,__signgamp))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_END
+#include <libc/local/math/lgamma_r.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_lgamma_r __LIBC_LOCAL_NAME(lgamma_r)
 #else /* ... */
 #undef __local___localdep_lgamma_r_defined
 #endif /* !... */
 #endif /* !__local___localdep_lgamma_r_defined */
+__NAMESPACE_LOCAL_END
+#include <libm/lgamma.h>
+#include <libm/matherr.h>
+#include <libm/finite.h>
+#include <libm/floor.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(lgammal_r) __ATTR_WUNUSED __ATTR_NONNULL((2)) __LONGDOUBLE
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lgammal_r))(__LONGDOUBLE __x, int *__signgamp) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+	__LONGDOUBLE __result = __LIBM_MATHFUN2IL(lgamma, __x, __signgamp);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
+	    !__LIBM_MATHFUNIL(finite, __result) && __LIBM_MATHFUNIL(finite, __x)) {
+		return __kernel_standard_l(__x, __x, __result,
+		                         __LIBM_MATHFUNL(floor, __x) == __x &&
+		                         __x <= 0.0L ? __LIBM_KMATHERRL_LGAMMA_MINUS      /* lgamma pole */
+		                                  : __LIBM_KMATHERRL_LGAMMA_OVERFLOW); /* lgamma overflow */
+	}
+	return __result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)(__NAMESPACE_LOCAL_SYM __localdep_lgamma_r)((double)__x, __signgamp);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_lgammal_r_defined
 #define __local___localdep_lgammal_r_defined
 #define __localdep_lgammal_r __LIBC_LOCAL_NAME(lgammal_r)
 #endif /* !__local___localdep_lgammal_r_defined */
-#else /* __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r */
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #undef __local_lgammal_r_defined
-#endif /* !__CRT_HAVE_lgamma_r && !__CRT_HAVE___lgamma_r */
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__CRT_HAVE_lgamma_r && !__CRT_HAVE___lgamma_r && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_lgammal_r_defined */

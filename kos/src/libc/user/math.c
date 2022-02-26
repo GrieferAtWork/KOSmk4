@@ -200,27 +200,12 @@ NOTHROW(LIBCCALL libc_yn)(int n,
 }
 /*[[[end:libc_yn]]]*/
 
-/*[[[head:libc_lgamma_r,hash:CRC-32=0x337180a4]]]*/
-/* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((2)) double
-NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x,
-                                    int *signgamp)
-/*[[[body:libc_lgamma_r]]]*/
-/*AUTO*/{
-	(void)x;
-	(void)signgamp;
-	CRT_UNIMPLEMENTEDF("lgamma_r(%f, %p)", x, signgamp); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_lgamma_r]]]*/
 
 
 
 
 
-/*[[[start:exports,hash:CRC-32=0x6fad315a]]]*/
+/*[[[start:exports,hash:CRC-32=0x505cd860]]]*/
 DEFINE_PUBLIC_ALIAS(__exp2, libc_exp2);
 DEFINE_PUBLIC_ALIAS(exp2, libc_exp2);
 DEFINE_PUBLIC_ALIAS(__log2, libc_log2);
@@ -243,8 +228,6 @@ DEFINE_PUBLIC_ALIAS(__y1, libc_y1);
 DEFINE_PUBLIC_ALIAS(y1, libc_y1);
 DEFINE_PUBLIC_ALIAS(__yn, libc_yn);
 DEFINE_PUBLIC_ALIAS(yn, libc_yn);
-DEFINE_PUBLIC_ALIAS(__lgamma_r, libc_lgamma_r);
-DEFINE_PUBLIC_ALIAS(lgamma_r, libc_lgamma_r);
 /*[[[end:exports]]]*/
 
 DECL_END

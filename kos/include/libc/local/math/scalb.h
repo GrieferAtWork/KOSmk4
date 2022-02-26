@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1808e95c */
+/* HASH CRC-32:0x8e8bbd8f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,8 +45,8 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalb))(double __x, double __fn) {
 	double __result;
 	__result = __LIBM_MATHFUN2(scalb, __x, __fn);
 	if (__LIBM_LIB_VERSION == __LIBM_SVID) {
-		if (__LIBM_MATHFUN(isinf, __result)) {
-			if (__LIBM_MATHFUN(finite, __x)) {
+		if (__LIBM_MATHFUNI(isinf, __result)) {
+			if (__LIBM_MATHFUNI(finite, __x)) {
 				return __kernel_standard(__x, __fn, __result, __LIBM_KMATHERR_SCALB_OVERFLOW); /* scalb overflow */
 			} else {
 #ifdef __ERANGE
@@ -57,16 +57,16 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalb))(double __x, double __fn) {
 			return __kernel_standard(__x, __fn, __result, __LIBM_KMATHERR_SCALB_UNDERFLOW); /* scalb underflow */
 		}
 	} else {
-		if (!__LIBM_MATHFUN(finite, __result) || __result == 0.0) {
-			if (__LIBM_MATHFUN(isnan, __result)) {
-				if (!__LIBM_MATHFUN(isnan, __x) && !__LIBM_MATHFUN(isnan, __fn))
+		if (!__LIBM_MATHFUNI(finite, __result) || __result == 0.0) {
+			if (__LIBM_MATHFUNI(isnan, __result)) {
+				if (!__LIBM_MATHFUNI(isnan, __x) && !__LIBM_MATHFUNI(isnan, __fn))
 					__result = __kernel_standard(__x, __fn, __result, __LIBM_KMATHERR_SCALB_INVALID);
-			} else if (__LIBM_MATHFUN(isinf, __result)) {
-				if (!__LIBM_MATHFUN(isinf, __x) && !__LIBM_MATHFUN(isinf, __fn))
+			} else if (__LIBM_MATHFUNI(isinf, __result)) {
+				if (!__LIBM_MATHFUNI(isinf, __x) && !__LIBM_MATHFUNI(isinf, __fn))
 					__result = __kernel_standard(__x, __fn, __result, __LIBM_KMATHERR_SCALB_OVERFLOW);
 			} else {
 				/* result == 0. */
-				if (__x != 0.0 && !__LIBM_MATHFUN(isinf, __fn))
+				if (__x != 0.0 && !__LIBM_MATHFUNI(isinf, __fn))
 					__result = __kernel_standard(__x, __fn, __result, __LIBM_KMATHERR_SCALB_UNDERFLOW);
 			}
 		}
