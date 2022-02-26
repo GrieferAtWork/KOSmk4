@@ -850,6 +850,7 @@ incdir("");
 #include <libm/issignaling.h>
 #include <libm/j0.h>
 #include <libm/j1.h>
+#include <libm/jn.h>
 #include <libm/kernel_cos.h>
 #include <libm/kernel_rem_pio2.h>
 #include <libm/kernel_sin.h>

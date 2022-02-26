@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf959a04 */
+/* HASH CRC-32:0x7cd561bb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1924,6 +1924,12 @@ INTDEF WUNUSED double NOTHROW(LIBCCALL libc_j1)(double x);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> jnf(3), jn(3), jnl(3) */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_jn)(int n, double x);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> jnf(3), jn(3), jnl(3) */
+INTDEF WUNUSED double NOTHROW(LIBCCALL libc_jn)(int n, double x);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> y0f(3), y0(3), y0l(3) */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_y0)(double x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

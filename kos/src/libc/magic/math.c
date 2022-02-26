@@ -47,6 +47,7 @@
 %[define_double_replacement(__LIBM_MATHFUN1I = __LIBM_MATHFUN1IF, __LIBM_MATHFUN1IL)]
 %[define_double_replacement(__LIBM_MATHFUN2I = __LIBM_MATHFUN2IF, __LIBM_MATHFUN2IL)]
 %[define_double_replacement(__LIBM_MATHFUN3I = __LIBM_MATHFUN3IF, __LIBM_MATHFUN3IL)]
+%[define_double_replacement(__LIBM_MATHFUNIM = __LIBM_MATHFUNIMF, __LIBM_MATHFUNIML)]
 %[define_double_replacement(__LIBM_MATHFUN0 = __LIBM_MATHFUN0F, __LIBM_MATHFUN0L)]
 %[define_double_replacement(__LIBM_MATHFUNX = __LIBM_MATHFUNXF, __LIBM_MATHFUNXL)]
 %[define_double_replacement(__kernel_standard = __kernel_standard_f, __kernel_standard_l)]
@@ -2022,7 +2023,17 @@ double j1(double x) {
 
 @@>> jnf(3), jn(3), jnl(3)
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__jn")]]
-double jn(int n, double x); /* TODO */
+[[impl_include("<libm/jn.h>", "<libm/fcomp.h>", "<libm/matherr.h>", "<libm/fabs.h>")]]
+[[requires_include("<ieee754.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+double jn(int n, double x) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_LIB_VERSION != __LIBM_POSIX &&
+	    __LIBM_MATHFUNI2(@isgreater@, __LIBM_MATHFUN(@fabs@, x), @1.41484755040568800000e+16@ /*X_TLOSS*/))
+		return __kernel_standard(n, x, 0.0, __LIBM_KMATHERR_JN_TLOSS); /* jn(n,|x|>X_TLOSS) */
+	return __LIBM_MATHFUNIM(@jn@, n, x);
+}
 
 @@>> y0f(3), y0(3), y0l(3)
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__y0")]]

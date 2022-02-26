@@ -1,3 +1,4 @@
+/* HASH CRC-32:0x8d5a9466 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,74 +18,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_MATH_C
-#define GUARD_LIBC_USER_MATH_C 1
-
-#include "../api.h"
-/**/
-
-#include <limits.h>
-#include <stdint.h>
-
-#include "math.h"
-
-DECL_BEGIN
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*[[[head:libc_yn,hash:CRC-32=0x879fa852]]]*/
-/* >> ynf(3), yn(3), ynl(3) */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
-NOTHROW(LIBCCALL libc_yn)(int n,
-                          double x)
-/*[[[body:libc_yn]]]*/
-/*AUTO*/{
-	(void)n;
-	(void)x;
-	CRT_UNIMPLEMENTEDF("yn(%x, %f)", n, x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+#ifndef __local_jn_defined
+#define __local_jn_defined
+#include <__crt.h>
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libm/jn.h>
+#include <libm/fcomp.h>
+#include <libm/matherr.h>
+#include <libm/fabs.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(jn) __ATTR_WUNUSED double
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(jn))(int __n, double __x) {
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_LIB_VERSION != __LIBM_POSIX &&
+	    __LIBM_MATHFUNI2(isgreater, __LIBM_MATHFUN(fabs, __x), 1.41484755040568800000e+16 /*X_TLOSS*/))
+		return __kernel_standard(__n, __x, 0.0, __LIBM_KMATHERR_JN_TLOSS); /* jn(n,|x|>X_TLOSS) */
+	return __LIBM_MATHFUNIM(jn, __n, __x);
 }
-/*[[[end:libc_yn]]]*/
-
-
-
-
-
-
-/*[[[start:exports,hash:CRC-32=0x7c25fa5f]]]*/
-DEFINE_PUBLIC_ALIAS(__yn, libc_yn);
-DEFINE_PUBLIC_ALIAS(yn, libc_yn);
-/*[[[end:exports]]]*/
-
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_MATH_C */
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep_jn_defined
+#define __local___localdep_jn_defined
+#define __localdep_jn __LIBC_LOCAL_NAME(jn)
+#endif /* !__local___localdep_jn_defined */
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#undef __local_jn_defined
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#endif /* !__local_jn_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39929e44 */
+/* HASH CRC-32:0xbe80e0b6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -403,8 +403,6 @@
 #define __stub_iruserok
 #define __stub_iruserok_af
 #define __stub_isastream
-#define __stub___jn
-#define __stub_jn
 #define __stub_jrand48
 #define __stub_jrand48_r
 #define __stub_klogctl
