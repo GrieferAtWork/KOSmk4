@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf4477eb */
+/* HASH CRC-32:0x680a417c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,10 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF char16_t *NOTHROW_NCX(LIBDCALL libd__wcserror)(int errno_value);
-INTDEF char32_t *NOTHROW_NCX(LIBKCALL libc__wcserror)(int errno_value);
-INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__wcserror_s)(char16_t *buf, size_t bufsize, int errno_value);
-INTDEF errno_t NOTHROW_NCX(LIBKCALL libc__wcserror_s)(char32_t *buf, size_t bufsize, int errno_value);
+INTDEF char16_t *NOTHROW_NCX(LIBDCALL libd__wcserror)(errno_t errno_value);
+INTDEF char32_t *NOTHROW_NCX(LIBKCALL libc__wcserror)(errno_t errno_value);
+INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__wcserror_s)(char16_t *buf, size_t bufsize, errno_t errno_value);
+INTDEF errno_t NOTHROW_NCX(LIBKCALL libc__wcserror_s)(char32_t *buf, size_t bufsize, errno_t errno_value);
 INTDEF char16_t *NOTHROW_NCX(LIBDCALL libd___wcserror)(char16_t const *message);
 INTDEF char32_t *NOTHROW_NCX(LIBKCALL libc___wcserror)(char32_t const *message);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd___wcserror_s)(char16_t *buf, size_t bufsize, char16_t const *message);

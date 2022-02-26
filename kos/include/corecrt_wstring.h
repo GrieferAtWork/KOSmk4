@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9a85c16 */
+/* HASH CRC-32:0x8bbbdf6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -841,8 +841,8 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2))
 
 
 /* DOS-specific functions */
-__CDECLARE_OPT(,wchar_t *,__NOTHROW_NCX,_wcserror,(int __errno_value),(__errno_value))
-__CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,_wcserror_s,(wchar_t *__buf, __SIZE_TYPE__ __bufsize, int __errno_value),(__buf,__bufsize,__errno_value))
+__CDECLARE_OPT(,wchar_t *,__NOTHROW_NCX,_wcserror,(__errno_t __errno_value),(__errno_value))
+__CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,_wcserror_s,(wchar_t *__buf, __SIZE_TYPE__ __bufsize, __errno_t __errno_value),(__buf,__bufsize,__errno_value))
 __CDECLARE_OPT(,wchar_t *,__NOTHROW_NCX,__wcserror,(wchar_t const *__message),(__message))
 __CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,__wcserror_s,(wchar_t *__buf, __SIZE_TYPE__ __bufsize, wchar_t const *__message),(__buf,__bufsize,__message))
 #ifdef __CRT_HAVE__wcsnset_s

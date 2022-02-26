@@ -19,17 +19,17 @@
  */
 %[default:section(".text.crt.dos.io.access")]
 
-%[insert:prefix(
-#include <bits/types.h>
-)]%{
-
-#ifdef __CC__
-__SYSDECL_BEGIN
+%{
 
 /* Possible values for `dosfs_(get|set)enabled(3)' */
 #define DOSFS_DISABLED 0 /* Disabled (default for ELF) */
 #define DOSFS_ENABLED  1 /* Enabled (default for PE; implicitly pass `O_DOSPATH'+
                           * `AT_DOSPATH' in  syscalls  made  by  DOS$-functions). */
+/* For `dosfs_setenabled(3)': only query the current mode; don't change it. */
+#define DOSFS_QUERY    (__CCAST(unsigned int)-1)
+
+#ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 

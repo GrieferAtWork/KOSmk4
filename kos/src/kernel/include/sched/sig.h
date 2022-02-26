@@ -465,22 +465,23 @@ struct task_connections {
 	WEAK struct task        *tcs_thread; /* [0..1][lock(PRIVATE(THIS_TASK))]
 	                                      * The thread to wake upon signal delivery. (may also be `NULL')
 	                                      * This  field  is  usually  `NULL'  for  all  connection   sets
-	                                      * `!= FORTASK(tcs_thread, this_connections)',   and   is    set
-	                                      * as  equal  to  `THIS_TASK'  for   `PERTASK(this_connections)'
-	                                      * Note that  it is  guarantied that  this task-pointer  remains
-	                                      * valid from the point of view of potentially attached  signal,
-	                                      * even after this  field may  be set to  NULL/non-NULL, for  as
-	                                      * long  as  the actual,  underlying  thread no  longer  has any
-	                                      * active connections. (i.e. has called  `task_disconnectall()') */
+	                                      * `!= FORTASK(tcs_thread, this_connections)',  and  is  set  as
+	                                      * equal  to  `THIS_TASK' for  `PERTASK(this_connections)'. Note
+	                                      * that it is  guarantied that this  task-pointer remains  valid
+	                                      * from the point of view  of potentially attached signal,  even
+	                                      * after this field may be set to NULL/non-NULL, for as long  as
+	                                      * the actual,  underlying  thread  no  longer  has  any  active
+	                                      * connections.   (i.e.   has   called   `task_disconnectall()') */
 	struct task_connection  *tcs_con;    /* [0..1][chain(->tc_connext)][lock(PRIVATE(THIS_TASK))]
 	                                      * Chain of active connections. */
 	struct sig              *tcs_dlvr;   /* [0..1][lock(WRITE_ONCE, CLEAR(PRIVATE))]
 	                                      * The first  signal  that  got  delivered. */
 	struct task_connection   tcs_static[CONFIG_TASK_STATIC_CONNECTIONS];
 	                                     /* [*.in_use_if(.tc_sig != NULL)][lock(PRIVATE(THIS_TASK))]
-	                                      * Statically  allocated  connections.  Any  connection  that  belongs to
-	                                      * this  connections set, but  points outside of  this array is allocated
-	                                      * dynamically using `kmalloc()', and as such, must be freed by `kfree()' */
+	                                      * Statically allocated connections. Any connection that belongs
+	                                      * to  this connections set, but points outside of this array is
+	                                      * allocated dynamically using `kmalloc()', and as such, must be
+	                                      * freed by `kfree()' */
 };
 
 /* Root connections set. */
@@ -549,7 +550,8 @@ NOTHROW(FCALL task_popconnections)(void);
  * @throw: E_BADALLOC: Insufficient  memory  (only  when there  are  at least
  *                     `CONFIG_TASK_STATIC_CONNECTIONS' connections already). */
 FUNDEF NONNULL((1)) void FCALL
-task_connect(struct sig *__restrict target) THROWS(E_BADALLOC);
+task_connect(struct sig *__restrict target)
+		THROWS(E_BADALLOC);
 
 /* Exactly the same as `task_connect()', however must be used when the connection
  * is  made for a poll-based operation that only wishes to wait for some event to
@@ -563,7 +565,7 @@ task_connect(struct sig *__restrict target) THROWS(E_BADALLOC);
  * thread that called  `task_connect()') then  decides not  to act  upon the  signal
  * in question, but rather to do something else, the original intent of `sig_send()'
  * will become lost, that intent  being for some (single)  thread to try to  acquire
- * an accompanying lock (for an example of this, see kernel header  <sched/mutex.h>)
+ * an accompanying lock (for example: `<kos/sched/shared-lock.h>')
  *
  * As  far as semantics go, a signal  connection established with this function will
  * never satisfy a call to `sig_send()', and will instead be skipped if  encountered
@@ -571,7 +573,7 @@ task_connect(struct sig *__restrict target) THROWS(E_BADALLOC);
  * only  be  acted upon  when  `sig_broadcast()' is  used).  However, if  a  call to
  * `sig_send()'  is unable to  find any non-poll-based  connections, it will proceed
  * to act like a call to `sig_broadcast()' and wake all polling threads, though will
- * still  end up  returning `false', indicative  of not having  woken any (properly)
+ * still  end up  returning `false', indicative  of not having  woken any (non-poll)
  * waiting thread.
  *
  * With all of  this in  mind, this  function can  also be  though of  as a  sort-of
@@ -596,7 +598,8 @@ task_connect(struct sig *__restrict target) THROWS(E_BADALLOC);
  *
  * s.a. The difference between `task_disconnectall()' and `task_receiveall()' */
 FUNDEF NONNULL((1)) void FCALL
-task_connect_for_poll(struct sig *__restrict target) THROWS(E_BADALLOC);
+task_connect_for_poll(struct sig *__restrict target)
+		THROWS(E_BADALLOC);
 
 
 /* Disconnect from a specific signal `target'
@@ -621,7 +624,17 @@ NOTHROW(FCALL task_disconnectall)(void);
  * of the signal that was received.
  * As such, the caller must properly pass on information about the
  * fact that a signal may have been received, as well as act  upon
- * this fact. */
+ * this fact.
+ *
+ * As such, this function is more closely related to `task_trywait()'
+ * than  `task_disconnectall()',  and implemented  to  atomically do:
+ * >> struct sig *result;
+ * >> result = task_trywait();
+ * >> if (result == NULL)
+ * >>     task_disconnectall(); // Nothing received --> still disconnect
+ * >> return result;
+ * @return: NULL: No signal was sent yet, and all connections were severed.
+ * @return: * :   The received signal (for `sig_altsend', the "sender" argument) */
 FUNDEF NOBLOCK WUNUSED struct sig *
 NOTHROW(FCALL task_receiveall)(void);
 
@@ -635,22 +648,23 @@ NOTHROW(FCALL task_receiveall)(void);
  *  - Called `task_disconnect()' on every connected signal
  *  - Called `task_disconnectall()'
  *  - Called `task_receiveall()'
- *  - Called `task_trywait()' (and a non-NULL value was returned)
- *  - Called `task_waitfor()'
- *  - Called `task_waitfor_nx()'
- *  - Called `task_waitfor_norpc()'
- *  - Called `task_waitfor_norpc_nx()' */
+ *  - Called `task_trywait()'          (with a non-NULL return value)
+ *  - Called `task_waitfor()'          (with a non-NULL return value)
+ *  - Called `task_waitfor_nx()'       (with a non-NULL return value)
+ *  - Called `task_waitfor_norpc()'    (with a non-NULL return value)
+ *  - Called `task_waitfor_norpc_nx()' (with a non-NULL return value) */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL
 NOTHROW(FCALL task_wasconnected)(void);
 
-/* Check if the calling thread was connected to the given signal. */
+/* Check if the calling thread was connected to the given signal.
+ * Always returns `false' when `target == NULL'. */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL
-NOTHROW(FCALL task_wasconnected_to)(struct sig const *__restrict target);
+NOTHROW(FCALL task_wasconnected_to)(struct sig const *target);
 
 #ifdef __cplusplus
 extern "C++" {
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL
-NOTHROW(FCALL task_wasconnected)(struct sig const *__restrict target)
+NOTHROW(FCALL task_wasconnected)(struct sig const *target)
 		ASMNAME("task_wasconnected_to");
 } /* extern "C++" */
 #endif /* __cplusplus */
@@ -660,7 +674,7 @@ NOTHROW(FCALL task_wasconnected)(struct sig const *__restrict target)
  * disconnecting all other  connected signals  if
  * this was the case.
  * @return: NULL: No signal is available.
- * @return: * :   The signal that was delivered. */
+ * @return: * :   The signal that was delivered (for `sig_altsend', the "sender" argument) */
 FUNDEF NOBLOCK struct sig *NOTHROW(FCALL task_trywait)(void);
 
 /* Wait for the first signal to be delivered, unconditionally
@@ -673,7 +687,7 @@ FUNDEF NOBLOCK struct sig *NOTHROW(FCALL task_trywait)(void);
  *                       NOTE: In this case, `task_disconnectall()' will have been called.
  * @return: NULL: No signal  has  become  available  (never  returned
  *                when `KTIME_INFINITE' is passed for `abs_timeout').
- * @return: * :   The signal that was delivered. */
+ * @return: * :   The signal that was delivered (for `sig_altsend', the "sender" argument) */
 FUNDEF BLOCKING struct sig *FCALL
 task_waitfor(ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...);

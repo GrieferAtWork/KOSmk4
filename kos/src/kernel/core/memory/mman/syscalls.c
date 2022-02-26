@@ -437,16 +437,17 @@ DEFINE_SYSCALL3(errno_t, mincore,
 		      addr, PAGEMASK);
 	}
 	if unlikely(OVERFLOW_UADD(len, PAGEMASK, &len)) {
-		if unlikely(!len)
-			return EOK; /* Special case (ignore empty length requests) */
 err_badlen:
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_MINCORE_SIZE,
 		      len);
 	}
 	len &= ~PAGEMASK;
-	if unlikely(OVERFLOW_UADD((uintptr_t)addr, len - 1, (uintptr_t *)&maxaddr))
+	if unlikely(OVERFLOW_UADD((uintptr_t)addr, len - 1, (uintptr_t *)&maxaddr)) {
+		if unlikely(!len)
+			return EOK; /* Special case (ignore empty length requests) */
 		goto err_badlen;
+	}
 	validate_writable(vec, (len / PAGESIZE) * sizeof(uint8_t));
 #ifdef USERSPACE_END
 	if (maxaddr >= (byte_t *)USERSPACE_END) {

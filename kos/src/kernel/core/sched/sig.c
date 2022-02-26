@@ -331,7 +331,7 @@ task_connect(struct sig *__restrict target) THROWS(E_BADALLOC) {
  * thread that called  `task_connect()') then  decides not  to act  upon the  signal
  * in question, but rather to do something else, the original intent of `sig_send()'
  * will become lost, that intent  being for some (single)  thread to try to  acquire
- * an accompanying lock (for an example of this, see kernel header  <sched/mutex.h>)
+ * an accompanying lock (for example: `<kos/sched/shared-lock.h>')
  *
  * As  far as semantics go, a signal  connection established with this function will
  * never satisfy a call to `sig_send()', and will instead be skipped if  encountered
@@ -339,7 +339,7 @@ task_connect(struct sig *__restrict target) THROWS(E_BADALLOC) {
  * only  be  acted upon  when  `sig_broadcast()' is  used).  However, if  a  call to
  * `sig_send()'  is unable to  find any non-poll-based  connections, it will proceed
  * to act like a call to `sig_broadcast()' and wake all polling threads, though will
- * still  end up  returning `false', indicative  of not having  woken any (properly)
+ * still  end up  returning `false', indicative  of not having  woken any (non-poll)
  * waiting thread.
  *
  * With all of  this in  mind, this  function can  also be  though of  as a  sort-of
@@ -1172,7 +1172,16 @@ done:
 
 /* Re-prime  the completion callback to be invoked once again the next time that the
  * attached signal is delivered. This function is a no-op if the caller's completion
- * function was invoked from `sig_broadcast_for_fini()'. */
+ * function was invoked from `sig_broadcast_for_fini()'.
+ *
+ * NOTE: If used, this  function must be  called from  `sig_completion_t()'.
+ *       It cannot be used from a phase-2 (post) signal-completion callback.
+ * WARNING: Call this function at most once from `sig_completion_t()'. Else,
+ *          you'll cause hard undefined behavior, that'll probably end in  a
+ *          system crash.
+ * @param: for_poll: True if the new connection should be poll-based (s.a. `task_connect_for_poll()')
+ * @return: true:  Re-priming was successful.
+ * @return: false: Re-priming failed because the sender used `sig_broadcast_for_fini()'. */
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) bool
 NOTHROW(KCALL sig_completion_reprime)(struct sig_completion *__restrict self,
                                       bool for_poll) {
@@ -1468,7 +1477,17 @@ NOTHROW(FCALL task_disconnectall)(void) {
  * of the signal that was received.
  * As such, the caller must properly pass on information about the
  * fact that a signal may have been received, as well as act  upon
- * this fact. */
+ * this fact.
+ *
+ * As such, this function is more closely related to `task_trywait()'
+ * than  `task_disconnectall()',  and implemented  to  atomically do:
+ * >> struct sig *result;
+ * >> result = task_trywait();
+ * >> if (result == NULL)
+ * >>     task_disconnectall(); // Nothing received --> still disconnect
+ * >> return result;
+ * @return: NULL: No signal was sent yet, and all connections were severed.
+ * @return: * :   The received signal (for `sig_altsend', the "sender" argument) */
 PUBLIC NOBLOCK WUNUSED struct sig *
 NOTHROW(FCALL task_receiveall)(void) {
 	struct task_connections *self;
@@ -1491,11 +1510,11 @@ NOTHROW(FCALL task_receiveall)(void) {
  *  - Called `task_disconnect()' on every connected signal
  *  - Called `task_disconnectall()'
  *  - Called `task_receiveall()'
- *  - Called `task_trywait()' (and a non-NULL value was returned)
- *  - Called `task_waitfor()'
- *  - Called `task_waitfor_nx()'
- *  - Called `task_waitfor_norpc()'
- *  - Called `task_waitfor_norpc_nx()' */
+ *  - Called `task_trywait()'          (with a non-NULL return value)
+ *  - Called `task_waitfor()'          (with a non-NULL return value)
+ *  - Called `task_waitfor_nx()'       (with a non-NULL return value)
+ *  - Called `task_waitfor_norpc()'    (with a non-NULL return value)
+ *  - Called `task_waitfor_norpc_nx()' (with a non-NULL return value) */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(FCALL task_wasconnected)(void) {
 	struct task_connections *self;
@@ -1505,9 +1524,10 @@ NOTHROW(FCALL task_wasconnected)(void) {
 	return self->tcs_con != NULL;
 }
 
-/* Check if the calling thread is connected to the given signal. */
+/* Check if the calling thread was connected to the given signal.
+ * Always returns `false' when `target == NULL'. */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED bool
-NOTHROW(FCALL task_wasconnected_to)(struct sig const *__restrict target) {
+NOTHROW(FCALL task_wasconnected_to)(struct sig const *target) {
 	struct task_connections *self;
 	struct task_connection *con;
 	self = THIS_CONNECTIONS;
@@ -1524,7 +1544,7 @@ NOTHROW(FCALL task_wasconnected_to)(struct sig const *__restrict target) {
  * disconnecting all other  connected signals  if
  * this was the case.
  * @return: NULL: No signal is available.
- * @return: * :   The signal that was delivered. */
+ * @return: * :   The signal that was delivered (for `sig_altsend', the "sender" argument) */
 PUBLIC NOBLOCK struct sig *NOTHROW(FCALL task_trywait)(void) {
 	struct task_connections *self;
 	struct sig *result;

@@ -44,6 +44,7 @@
 #define __unsigned__ unsigned
 #define __restrict restrict
 #define __restrict__ restrict
+#define __restrict_arr restrict
 #define asm(...)
 #define __asm(...)
 #define __asm__(...)
@@ -2205,3 +2206,10 @@
 #define __sa_family_t         sa_family_t
 #define __port_t              port_t
 #define __builtin_va_list     va_list
+#define __WAIT_STATUS         union wait *
+#define __mbstate             mbstate_t
+#define __wctype_t            wctype_t
+#define __wctrans_t           wctrans_t
+#define __shift_t             shift_t
+#define __SHIFT_TYPE__        shift_t
+

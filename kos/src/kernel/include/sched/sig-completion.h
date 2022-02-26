@@ -45,11 +45,11 @@ typedef NOBLOCK NONNULL((1)) void
                                           void *buf);
 
 struct sig_completion_context {
-	struct sig          *scc_sender; /* [1..1][const] The sender-signal (which may differ from `self->tc_sig')
-	                                  * when  the signal is being sent through a function like `sig_altsend()' */
-	struct task         *scc_caller; /* [1..1][const] The thread that (supposedly) is sending the signal.
-	                                  * In order to support functions like `sig_broadcast_as_nopr()', the
-	                                  * sig-completion callback  should not  make use  of THIS_TASK,  but
+	struct sig          *scc_sender; /* [1..1][const] The sender-signal (which may differ from `self->tc_sig'
+	                                  * when the signal is being sent through something like `sig_altsend()') */
+	struct task         *scc_caller; /* [1..1][const] The thread that (supposedly) is sending the  signal.
+	                                  * In  order to support functions like `sig_broadcast_as_nopr()', the
+	                                  * sig-post-completion callback should not make use of THIS_TASK, but
 	                                  * instead assume that `sender_thread' is the caller's thread. */
 	sig_postcompletion_t scc_post;   /* [0..1][out] When  non-NULL  upon  return  of  `sig_completion_t()',
 	                                  * this callback will be enqueued to-be executed with the buffer given
@@ -68,7 +68,8 @@ struct sig_completion_context {
 	                                  * callback to construct references to objects which are then written
 	                                  * back to the  shared buffer  and eventually inherited  by a  second
 	                                  * stage callback pointed to by this  field. For an example of  this,
-	                                  * look at the example code at the bottom of this file. */
+	                                  * take a look at  the `struct rising_edge_detector' example code  at
+	                                  * the bottom of this file. */
 };
 
 
@@ -99,7 +100,16 @@ typedef NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
 
 /* Re-prime  the completion callback to be invoked once again the next time that the
  * attached signal is delivered. This function is a no-op if the caller's completion
- * function was invoked from `sig_broadcast_for_fini()'. */
+ * function was invoked from `sig_broadcast_for_fini()'.
+ *
+ * NOTE: If used, this  function must be  called from  `sig_completion_t()'.
+ *       It cannot be used from a phase-2 (post) signal-completion callback.
+ * WARNING: Call this function at most once from `sig_completion_t()'. Else,
+ *          you'll cause hard undefined behavior, that'll probably end in  a
+ *          system crash.
+ * @param: for_poll: True if the new connection should be poll-based (s.a. `task_connect_for_poll()')
+ * @return: true:  Re-priming was successful.
+ * @return: false: Re-priming failed because the sender used `sig_broadcast_for_fini()'. */
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) __BOOL
 NOTHROW(KCALL sig_completion_reprime)(struct sig_completion *__restrict self,
                                       __BOOL for_poll);

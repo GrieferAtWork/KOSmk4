@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf424032e */
+/* HASH CRC-32:0xc39318fe */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,15 +28,16 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-#include <bits/types.h>
-
-#ifdef __CC__
-__SYSDECL_BEGIN
 
 /* Possible values for `dosfs_(get|set)enabled(3)' */
 #define DOSFS_DISABLED 0 /* Disabled (default for ELF) */
 #define DOSFS_ENABLED  1 /* Enabled (default for PE; implicitly pass `O_DOSPATH'+
                           * `AT_DOSPATH' in  syscalls  made  by  DOS$-functions). */
+/* For `dosfs_setenabled(3)': only query the current mode; don't change it. */
+#define DOSFS_QUERY    (__CCAST(unsigned int)-1)
+
+#ifdef __CC__
+__SYSDECL_BEGIN
 
 /* >> dosfs_getenabled(3)
  * Get the current dosfs-emulation mode, as used by

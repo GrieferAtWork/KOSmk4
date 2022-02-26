@@ -122,10 +122,10 @@ typedef __SIZE_TYPE__ rsize_t;
 %[default:section(".text.crt.dos.wchar.errno")];
 
 [[wchar, decl_include("<hybrid/typecore.h>")]]
-wchar_t *_wcserror(int errno_value);
+wchar_t *_wcserror($errno_t errno_value);
 
 [[wchar, decl_include("<bits/types.h>")]]
-$errno_t _wcserror_s(wchar_t *buf, $size_t bufsize, int errno_value);
+$errno_t _wcserror_s(wchar_t *buf, $size_t bufsize, $errno_t errno_value);
 
 [[wchar, decl_include("<hybrid/typecore.h>")]]
 wchar_t *__wcserror(wchar_t const *message);

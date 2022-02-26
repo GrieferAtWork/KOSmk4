@@ -27,56 +27,56 @@
 
 DECL_BEGIN
 
-/*[[[head:libd__wcserror,hash:CRC-32=0x8f600bcb]]]*/
+/*[[[head:libd__wcserror,hash:CRC-32=0x93a8bba0]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") char16_t *
-NOTHROW_NCX(LIBDCALL libd__wcserror)(int errno_value)
+NOTHROW_NCX(LIBDCALL libd__wcserror)(errno_t errno_value)
 /*[[[body:libd__wcserror]]]*/
 /*AUTO*/{
 	(void)errno_value;
-	CRT_UNIMPLEMENTEDF("DOS$_wcserror(%x)", errno_value); /* TODO */
+	CRT_UNIMPLEMENTEDF("DOS$_wcserror(%" PRIxN(__SIZEOF_ERRNO_T__) ")", errno_value); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
 /*[[[end:libd__wcserror]]]*/
 
-/*[[[head:libc__wcserror,hash:CRC-32=0x77616da6]]]*/
+/*[[[head:libc__wcserror,hash:CRC-32=0xbcc36883]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") char32_t *
-NOTHROW_NCX(LIBKCALL libc__wcserror)(int errno_value)
+NOTHROW_NCX(LIBKCALL libc__wcserror)(errno_t errno_value)
 /*[[[body:libc__wcserror]]]*/
 /*AUTO*/{
 	(void)errno_value;
-	CRT_UNIMPLEMENTEDF("_wcserror(%x)", errno_value); /* TODO */
+	CRT_UNIMPLEMENTEDF("_wcserror(%" PRIxN(__SIZEOF_ERRNO_T__) ")", errno_value); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
 /*[[[end:libc__wcserror]]]*/
 
-/*[[[head:libd__wcserror_s,hash:CRC-32=0x53717418]]]*/
+/*[[[head:libd__wcserror_s,hash:CRC-32=0x24583f55]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") errno_t
 NOTHROW_NCX(LIBDCALL libd__wcserror_s)(char16_t *buf,
                                        size_t bufsize,
-                                       int errno_value)
+                                       errno_t errno_value)
 /*[[[body:libd__wcserror_s]]]*/
 /*AUTO*/{
 	(void)buf;
 	(void)bufsize;
 	(void)errno_value;
-	CRT_UNIMPLEMENTEDF("DOS$_wcserror_s(%p, %Ix, %x)", buf, bufsize, errno_value); /* TODO */
+	CRT_UNIMPLEMENTEDF("DOS$_wcserror_s(%p, %Ix, %" PRIxN(__SIZEOF_ERRNO_T__) ")", buf, bufsize, errno_value); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libd__wcserror_s]]]*/
 
-/*[[[head:libc__wcserror_s,hash:CRC-32=0xa0cf5e1f]]]*/
+/*[[[head:libc__wcserror_s,hash:CRC-32=0xd2a7e44a]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") errno_t
 NOTHROW_NCX(LIBKCALL libc__wcserror_s)(char32_t *buf,
                                        size_t bufsize,
-                                       int errno_value)
+                                       errno_t errno_value)
 /*[[[body:libc__wcserror_s]]]*/
 /*AUTO*/{
 	(void)buf;
 	(void)bufsize;
 	(void)errno_value;
-	CRT_UNIMPLEMENTEDF("_wcserror_s(%p, %Ix, %x)", buf, bufsize, errno_value); /* TODO */
+	CRT_UNIMPLEMENTEDF("_wcserror_s(%p, %Ix, %" PRIxN(__SIZEOF_ERRNO_T__) ")", buf, bufsize, errno_value); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libc__wcserror_s]]]*/

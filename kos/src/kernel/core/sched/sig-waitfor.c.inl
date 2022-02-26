@@ -48,7 +48,7 @@ DECL_BEGIN
  *                       NOTE: In this case, `task_disconnectall()' will have been called.
  * @return: NULL: No signal  has  become  available  (never  returned
  *                when `KTIME_INFINITE' is passed for `abs_timeout').
- * @return: * :   The signal that was delivered. */
+ * @return: * :   The signal that was delivered (for `sig_altsend', the "sender" argument) */
 PUBLIC BLOCKING struct sig *FCALL
 task_waitfor(ktime_t abs_timeout)
 		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...)

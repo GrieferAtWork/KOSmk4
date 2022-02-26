@@ -44,7 +44,6 @@
 
 #include <libdl/asm/dlfcn.h> /* __CRT_HAVE_dl_iterate_phdr */
 
-
 #undef __ELF_NATIVE_CLASS
 #if ELF_ARCH_CLASS == ELFCLASS32
 #define __ELF_NATIVE_CLASS 32
@@ -100,7 +99,7 @@ typedef int (__DLFCN_CC *__dl_iterator_callback)(struct dl_phdr_info *__info,
  * be returned after all modules have been enumerated. */
 #ifdef __CRT_HAVE_dl_iterate_phdr
 __IMPDEF __ATTR_NONNULL((1)) int
-(__DLFCN_CC dl_iterate_phdr)(__dl_iterator_callback __callback,
+(__DLFCN_CC dl_iterate_phdr)(__dl_iterator_callback __cb,
                              void *__arg) /*__THROWS(...)*/;
 #endif /* __CRT_HAVE_dl_iterate_phdr */
 

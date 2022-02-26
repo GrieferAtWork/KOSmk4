@@ -49,6 +49,10 @@ DEFINE_TEST(mlock_and_mincore) {
 	/* Technically, mincore() is meant to be used for file mappings,
 	 * but it should  work for PRIVATE+ANON  mappings just as  well. */
 	incore[0] = 0xcc;
+	EQd(0, mincore(p, 0, incore)); /* No-op with zero-size argument. */
+	EQd(0xcc, incore[0]);
+
+	/* All right: let's do this properly... */
 	EQd(0, mincore(p, ps, incore));
 	EQu(0, incore[0]);
 	COMPILER_WRITE_BARRIER();

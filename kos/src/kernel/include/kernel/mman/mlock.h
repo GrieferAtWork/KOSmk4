@@ -42,7 +42,7 @@
 
 /* Delegate population of locked memory until the first access. */
 #ifndef MLOCK_ONFAULT
-#define MLOCK_ONFAULT  __MLOCK_ONFAULT
+#define MLOCK_ONFAULT __MLOCK_ONFAULT
 #endif /* !MLOCK_ONFAULT */
 
 /* Ignore (skip) unmapped parts of the given address range. */
