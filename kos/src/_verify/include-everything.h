@@ -829,6 +829,7 @@ incdir("");
 #include <libm/copysign.h>
 #include <libm/cos.h>
 #include <libm/cosh.h>
+#include <libm/erf.h>
 #include <libm/erfc.h>
 #include <libm/exp.h>
 #include <libm/expm1.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9ab8c6 */
+/* HASH CRC-32:0xb5a63f1a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -362,9 +362,9 @@ __NAMESPACE_STD_USING(nanl)
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_ISOC99 */
 #if defined(__USE_XOPEN) || defined(__USE_ISOC99)
-#if defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
+#if defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(erf)
-#endif /* __CRT_HAVE_erf || __CRT_HAVE___erf */
+#endif /* __CRT_HAVE_erf || __CRT_HAVE___erf || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(erfc)
 #endif /* __CRT_HAVE_erfc || __CRT_HAVE___erfc || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -372,9 +372,9 @@ __NAMESPACE_STD_USING(erfc)
 #if defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || (defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))
 __NAMESPACE_STD_USING(lgamma)
 #endif /* __CRT_HAVE_lgamma || __CRT_HAVE_gamma || __CRT_HAVE___lgamma || __CRT_HAVE___gamma || (__LOCAL_signgam && (__CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)) */
-#if defined(__CRT_HAVE_erff) || defined(__CRT_HAVE___erff) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
+#if defined(__CRT_HAVE_erff) || defined(__CRT_HAVE___erff) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(erff)
-#endif /* __CRT_HAVE_erff || __CRT_HAVE___erff || __CRT_HAVE_erf || __CRT_HAVE___erf */
+#endif /* __CRT_HAVE_erff || __CRT_HAVE___erff || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_erf || __CRT_HAVE___erf || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_erfcf) || defined(__CRT_HAVE___erfcf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(erfcf)
 #endif /* __CRT_HAVE_erfcf || __CRT_HAVE___erfcf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_erfc || __CRT_HAVE___erfc || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -382,9 +382,9 @@ __NAMESPACE_STD_USING(erfcf)
 __NAMESPACE_STD_USING(lgammaf)
 #endif /* __CRT_HAVE_lgammaf || __CRT_HAVE_gammaf || __CRT_HAVE___lgammaf || __CRT_HAVE___gammaf || (__LOCAL_signgam && (__CRT_HAVE_lgammaf_r || __CRT_HAVE___lgammaf_r || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)) */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-#if defined(__CRT_HAVE_erfl) || defined(__CRT_HAVE___erfl) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
+#if defined(__CRT_HAVE_erfl) || defined(__CRT_HAVE___erfl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(erfl)
-#endif /* __CRT_HAVE_erfl || __CRT_HAVE___erfl || __CRT_HAVE_erf || __CRT_HAVE___erf */
+#endif /* __CRT_HAVE_erfl || __CRT_HAVE___erfl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_erf || __CRT_HAVE___erf || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_erfcl) || defined(__CRT_HAVE___erfcl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(erfcl)
 #endif /* __CRT_HAVE_erfcl || __CRT_HAVE___erfcl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_erfc || __CRT_HAVE___erfc || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -2777,13 +2777,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(nanl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONS
 #if defined(__USE_XOPEN) || defined(__USE_ISOC99)
 #if __has_builtin(__builtin_erf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erf)
 /* >> erff(3), erf(3), erfl(3) */
-__CEIDECLARE(__ATTR_WUNUSED,double,__NOTHROW,erf,(double __x),{ return __builtin_erf(__x); })
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,erf,(double __x),{ return __builtin_erf(__x); })
 #elif defined(__CRT_HAVE_erf)
 /* >> erff(3), erf(3), erfl(3) */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,erf,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,erf,(double __x),(__x))
 #elif defined(__CRT_HAVE___erf)
 /* >> erff(3), erf(3), erfl(3) */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,erf,(double __x),__erf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,erf,(double __x),__erf,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_STD_END
+#include <libc/local/math/erf.h>
+__NAMESPACE_STD_BEGIN
+/* >> erff(3), erf(3), erfl(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(erf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL erf)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(erf))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_erfc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfc)
 /* >> erfcf(3), erfc(3), erfcl(3) */
@@ -2833,19 +2839,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lgamma, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #endif /* !... */
 #if __has_builtin(__builtin_erff) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erff)
 /* >> erff(3), erf(3), erfl(3) */
-__CEIDECLARE(__ATTR_WUNUSED,float,__NOTHROW,erff,(float __x),{ return __builtin_erff(__x); })
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,erff,(float __x),{ return __builtin_erff(__x); })
 #elif defined(__CRT_HAVE_erff)
 /* >> erff(3), erf(3), erfl(3) */
-__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,erff,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,erff,(float __x),(__x))
 #elif defined(__CRT_HAVE___erff)
 /* >> erff(3), erf(3), erfl(3) */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,erff,(float __x),__erff,(__x))
-#elif defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,erff,(float __x),__erff,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/erff.h>
 __NAMESPACE_STD_BEGIN
 /* >> erff(3), erf(3), erfl(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(erff, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL erff)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(erff))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(erff, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL erff)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(erff))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_erfcf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfcf)
 /* >> erfcf(3), erfc(3), erfcl(3) */
@@ -2896,19 +2902,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lgammaf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_erfl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfl)
 /* >> erff(3), erf(3), erfl(3) */
-__CEIDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erfl,(__LONGDOUBLE __x),{ return __builtin_erfl(__x); })
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erfl,(__LONGDOUBLE __x),{ return __builtin_erfl(__x); })
 #elif defined(__CRT_HAVE_erfl)
 /* >> erff(3), erf(3), erfl(3) */
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erfl,(__LONGDOUBLE __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erfl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___erfl)
 /* >> erff(3), erf(3), erfl(3) */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erfl,(__LONGDOUBLE __x),__erfl,(__x))
-#elif defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erfl,(__LONGDOUBLE __x),__erfl,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/erfl.h>
 __NAMESPACE_STD_BEGIN
 /* >> erff(3), erf(3), erfl(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(erfl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL erfl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(erfl))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(erfl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL erfl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(erfl))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_erfcl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfcl)
 /* >> erfcf(3), erfc(3), erfcl(3) */
@@ -7062,21 +7068,21 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL hypot)(
 #endif /* ... */
 #if __has_builtin(__builtin_erff) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erff)
 /* >> erff(3), erf(3), erfl(3) */
-__CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,erf,(float __x),erff,{ return __builtin_erff(__x); })
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,erf,(float __x),erff,{ return __builtin_erff(__x); })
 #elif defined(__CRT_HAVE_erff)
 /* >> erff(3), erf(3), erfl(3) */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,erf,(float __x),erff,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,erf,(float __x),erff,(__x))
 #elif defined(__CRT_HAVE___erff)
 /* >> erff(3), erf(3), erfl(3) */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,erf,(float __x),__erff,(__x))
-#elif defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,erf,(float __x),__erff,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/erff.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* >> erff(3), erf(3), erfl(3) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL erf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(erff))(__x); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL erf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(erff))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_erfcf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfcf)
 /* >> erfcf(3), erfc(3), erfcl(3) */
@@ -7157,21 +7163,21 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL 
 #endif /* ... */
 #if __has_builtin(__builtin_erfl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfl)
 /* >> erff(3), erf(3), erfl(3) */
-__CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erf,(__LONGDOUBLE __x),erfl,{ return __builtin_erfl(__x); })
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erf,(__LONGDOUBLE __x),erfl,{ return __builtin_erfl(__x); })
 #elif defined(__CRT_HAVE_erfl)
 /* >> erff(3), erf(3), erfl(3) */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erf,(__LONGDOUBLE __x),erfl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erf,(__LONGDOUBLE __x),erfl,(__x))
 #elif defined(__CRT_HAVE___erfl)
 /* >> erff(3), erf(3), erfl(3) */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erf,(__LONGDOUBLE __x),__erfl,(__x))
-#elif defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erf,(__LONGDOUBLE __x),__erfl,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/erfl.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* >> erff(3), erf(3), erfl(3) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL erf)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(erfl))(__x); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL erf)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(erfl))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_erfcl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfcl)
 /* >> erfcf(3), erfc(3), erfcl(3) */
@@ -7608,9 +7614,9 @@ __NAMESPACE_STD_USING(nanl)
 /* Error and gamma functions. */
 #if defined(__USE_XOPEN) || defined(__USE_ISOC99)
 #ifndef __CXX_SYSTEM_HEADER
-#if defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
+#if defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(erf)
-#endif /* __CRT_HAVE_erf || __CRT_HAVE___erf */
+#endif /* __CRT_HAVE_erf || __CRT_HAVE___erf || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(erfc)
 #endif /* __CRT_HAVE_erfc || __CRT_HAVE___erfc || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -7618,9 +7624,9 @@ __NAMESPACE_STD_USING(erfc)
 #if defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || (defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))
 __NAMESPACE_STD_USING(lgamma)
 #endif /* __CRT_HAVE_lgamma || __CRT_HAVE_gamma || __CRT_HAVE___lgamma || __CRT_HAVE___gamma || (__LOCAL_signgam && (__CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)) */
-#if defined(__CRT_HAVE_erff) || defined(__CRT_HAVE___erff) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
+#if defined(__CRT_HAVE_erff) || defined(__CRT_HAVE___erff) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(erff)
-#endif /* __CRT_HAVE_erff || __CRT_HAVE___erff || __CRT_HAVE_erf || __CRT_HAVE___erf */
+#endif /* __CRT_HAVE_erff || __CRT_HAVE___erff || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_erf || __CRT_HAVE___erf || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_erfcf) || defined(__CRT_HAVE___erfcf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(erfcf)
 #endif /* __CRT_HAVE_erfcf || __CRT_HAVE___erfcf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_erfc || __CRT_HAVE___erfc || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -7630,9 +7636,9 @@ __NAMESPACE_STD_USING(lgammaf)
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifndef __CXX_SYSTEM_HEADER
-#if defined(__CRT_HAVE_erfl) || defined(__CRT_HAVE___erfl) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
+#if defined(__CRT_HAVE_erfl) || defined(__CRT_HAVE___erfl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(erfl)
-#endif /* __CRT_HAVE_erfl || __CRT_HAVE___erfl || __CRT_HAVE_erf || __CRT_HAVE___erf */
+#endif /* __CRT_HAVE_erfl || __CRT_HAVE___erfl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_erf || __CRT_HAVE___erf || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_erfcl) || defined(__CRT_HAVE___erfcl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(erfcl)
 #endif /* __CRT_HAVE_erfcl || __CRT_HAVE___erfcl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_erfc || __CRT_HAVE___erfc || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -11357,13 +11363,17 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL 
 #if defined(__USE_XOPEN) || defined(__USE_ISOC99)
 #if __has_builtin(__builtin_erf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erf)
 /* >> erff(3), erf(3), erfl(3) */
-__CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__erf,(double __x),erf,{ return __builtin_erf(__x); })
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__erf,(double __x),erf,{ return __builtin_erf(__x); })
 #elif defined(__CRT_HAVE_erf)
 /* >> erff(3), erf(3), erfl(3) */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__erf,(double __x),erf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__erf,(double __x),erf,(__x))
 #elif defined(__CRT_HAVE___erf)
 /* >> erff(3), erf(3), erfl(3) */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__erf,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__erf,(double __x),(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/erf.h>
+/* >> erff(3), erf(3), erfl(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __erf)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(erf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_erfc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfc)
 /* >> erfcf(3), erfc(3), erfcl(3) */
@@ -11404,17 +11414,17 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __lgam
 #endif /* ... */
 #if __has_builtin(__builtin_erff) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erff)
 /* >> erff(3), erf(3), erfl(3) */
-__CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__erff,(float __x),erff,{ return __builtin_erff(__x); })
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__erff,(float __x),erff,{ return __builtin_erff(__x); })
 #elif defined(__CRT_HAVE_erff)
 /* >> erff(3), erf(3), erfl(3) */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__erff,(float __x),erff,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__erff,(float __x),erff,(__x))
 #elif defined(__CRT_HAVE___erff)
 /* >> erff(3), erf(3), erfl(3) */
-__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__erff,(float __x),(__x))
-#elif defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__erff,(float __x),(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/erff.h>
 /* >> erff(3), erf(3), erfl(3) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __erff)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(erff))(__x); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __erff)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(erff))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_erfcf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfcf)
 /* >> erfcf(3), erfc(3), erfcl(3) */
@@ -11456,17 +11466,17 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __lgamm
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_erfl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfl)
 /* >> erff(3), erf(3), erfl(3) */
-__CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__erfl,(__LONGDOUBLE __x),erfl,{ return __builtin_erfl(__x); })
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__erfl,(__LONGDOUBLE __x),erfl,{ return __builtin_erfl(__x); })
 #elif defined(__CRT_HAVE_erfl)
 /* >> erff(3), erf(3), erfl(3) */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__erfl,(__LONGDOUBLE __x),erfl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__erfl,(__LONGDOUBLE __x),erfl,(__x))
 #elif defined(__CRT_HAVE___erfl)
 /* >> erff(3), erf(3), erfl(3) */
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__erfl,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__erfl,(__LONGDOUBLE __x),(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/erfl.h>
 /* >> erff(3), erf(3), erfl(3) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __erfl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(erfl))(__x); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __erfl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(erfl))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_erfcl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfcl)
 /* >> erfcf(3), erfc(3), erfcl(3) */
