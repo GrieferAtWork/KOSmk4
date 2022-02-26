@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x327adc04 */
+/* HASH CRC-32:0xe8121cb0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1906,6 +1906,12 @@ NOTHROW(LIBCCALL libc_nanl)(char const *tagb) {
 	return (__LONGDOUBLE)libc_nan(tagb);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
+#include <libm/erfc.h>
+/* >> erfcf(3), erfc(3), erfcl(3) */
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
+NOTHROW(LIBCCALL libc_erfc)(double x) {
+	return __LIBM_MATHFUN(erfc, x);
+}
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_lgamma)(double x) {
@@ -1916,10 +1922,17 @@ INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_erff)(float x) {
 	return (float)libc_erf((double)x);
 }
+#include <libm/erfc.h>
 /* >> erfcf(3), erfc(3), erfcl(3) */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_erfcf)(float x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+	return __LIBM_MATHFUNF(erfc, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)libc_erfc((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
@@ -1931,10 +1944,17 @@ INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_erfl)(__LONGDOUBLE x) {
 	return (__LONGDOUBLE)libc_erf((double)x);
 }
+#include <libm/erfc.h>
 /* >> erfcf(3), erfc(3), erfcl(3) */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_erfcl)(__LONGDOUBLE x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+	return __LIBM_MATHFUNL(erfc, x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)libc_erfc((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
@@ -3717,6 +3737,8 @@ DEFINE_PUBLIC_ALIAS(__copysignl, libc_copysignl);
 DEFINE_PUBLIC_ALIAS(copysignl, libc_copysignl);
 DEFINE_PUBLIC_ALIAS(__nanl, libc_nanl);
 DEFINE_PUBLIC_ALIAS(nanl, libc_nanl);
+DEFINE_PUBLIC_ALIAS(__erfc, libc_erfc);
+DEFINE_PUBLIC_ALIAS(erfc, libc_erfc);
 DEFINE_PUBLIC_ALIAS(gamma, libc_lgamma);
 DEFINE_PUBLIC_ALIAS(__lgamma, libc_lgamma);
 DEFINE_PUBLIC_ALIAS(__gamma, libc_lgamma);

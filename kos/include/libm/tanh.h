@@ -185,7 +185,10 @@ __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, onel, __IEEE854_LONG_DOUBLE_C
 #define __libm_tinyl_defined
 __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, tinyl, __IEEE854_LONG_DOUBLE_C(1.0e-4900))
 #endif /* !__libm_tinyl_defined */
+#ifndef __libm_twol_defined
+#define __libm_twol_defined
 __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, twol, __IEEE854_LONG_DOUBLE_C(2.0))
+#endif /* !__libm_twol_defined */
 __LIBM_LOCAL_DECLARE_END
 
 __LOCAL __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__

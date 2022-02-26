@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe30bd770 */
+/* HASH CRC-32:0xea48461f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1039,7 +1039,13 @@ INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_nanl)(char const *t
 /* >> erff(3), erf(3), erfl(3) */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_erf)(double x);
 /* >> erfcf(3), erfc(3), erfcl(3) */
-INTDEF WUNUSED double NOTHROW(LIBDCALL libd_erfc)(double x);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBDCALL libd_erfc)(double x);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> erfcf(3), erfc(3), erfcl(3) */
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_erfc)(double x);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_lgamma)(double x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -1057,11 +1063,11 @@ INTDEF WUNUSED float NOTHROW(LIBCCALL libc_erff)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> erfcf(3), erfc(3), erfcl(3) */
-INTDEF WUNUSED float NOTHROW(LIBDCALL libd_erfcf)(float x);
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBDCALL libd_erfcf)(float x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> erfcf(3), erfc(3), erfcl(3) */
-INTDEF WUNUSED float NOTHROW(LIBCCALL libc_erfcf)(float x);
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_erfcf)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
@@ -1081,11 +1087,11 @@ INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_erfl)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> erfcf(3), erfc(3), erfcl(3) */
-INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_erfcl)(__LONGDOUBLE x);
+INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_erfcl)(__LONGDOUBLE x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> erfcf(3), erfc(3), erfcl(3) */
-INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_erfcl)(__LONGDOUBLE x);
+INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_erfcl)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> lgammaf(3), lgamma(3), lgammal(3) */

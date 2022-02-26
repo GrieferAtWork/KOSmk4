@@ -829,6 +829,7 @@ incdir("");
 #include <libm/copysign.h>
 #include <libm/cos.h>
 #include <libm/cosh.h>
+#include <libm/erfc.h>
 #include <libm/exp.h>
 #include <libm/expm1.h>
 #include <libm/fabs.h>
@@ -850,6 +851,7 @@ incdir("");
 #include <libm/kernel_sin.h>
 #include <libm/kernel_tan.h>
 #include <libm/ldexp.h>
+#include <libm/lgamma.h>
 #include <libm/log.h>
 #include <libm/log10.h>
 #include <libm/log1p.h>

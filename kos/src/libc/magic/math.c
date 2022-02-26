@@ -1039,8 +1039,14 @@ double nan(char const *tagb) {
 double erf(double x); /* TODO */
 
 @@>> erfcf(3), erfc(3), erfcl(3)
-[[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__erfc")]]
-double erfc(double x); /* TODO */
+[[std, wunused, const, nothrow, crtbuiltin, export_alias("__erfc")]]
+[[requires_include("<ieee754.h>"), impl_include("<libm/erfc.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+double erfc(double x) {
+	return __LIBM_MATHFUN(@erfc@, x);
+}
 
 @@>> lgammaf(3), lgamma(3), lgammal(3)
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("gamma", "__lgamma", "__gamma")]]

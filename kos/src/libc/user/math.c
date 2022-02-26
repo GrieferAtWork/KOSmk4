@@ -87,18 +87,6 @@ NOTHROW(LIBCCALL libc_erf)(double x)
 }
 /*[[[end:libc_erf]]]*/
 
-/*[[[head:libc_erfc,hash:CRC-32=0xce96c7f8]]]*/
-/* >> erfcf(3), erfc(3), erfcl(3) */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
-NOTHROW(LIBCCALL libc_erfc)(double x)
-/*[[[body:libc_erfc]]]*/
-/*AUTO*/{
-	(void)x;
-	CRT_UNIMPLEMENTEDF("erfc(%f)", x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_erfc]]]*/
 
 
 /*[[[head:libc_tgamma,hash:CRC-32=0x5809c86d]]]*/
@@ -205,15 +193,13 @@ NOTHROW(LIBCCALL libc_yn)(int n,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x505cd860]]]*/
+/*[[[start:exports,hash:CRC-32=0xc9e083e8]]]*/
 DEFINE_PUBLIC_ALIAS(__exp2, libc_exp2);
 DEFINE_PUBLIC_ALIAS(exp2, libc_exp2);
 DEFINE_PUBLIC_ALIAS(__log2, libc_log2);
 DEFINE_PUBLIC_ALIAS(log2, libc_log2);
 DEFINE_PUBLIC_ALIAS(__erf, libc_erf);
 DEFINE_PUBLIC_ALIAS(erf, libc_erf);
-DEFINE_PUBLIC_ALIAS(__erfc, libc_erfc);
-DEFINE_PUBLIC_ALIAS(erfc, libc_erfc);
 DEFINE_PUBLIC_ALIAS(__tgamma, libc_tgamma);
 DEFINE_PUBLIC_ALIAS(tgamma, libc_tgamma);
 DEFINE_PUBLIC_ALIAS(__j0, libc_j0);

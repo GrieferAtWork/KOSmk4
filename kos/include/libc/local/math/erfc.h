@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24bd3b66 */
+/* HASH CRC-32:0x8bad7218 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,44 +18,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_MATH_H
-#define GUARD_LIBC_USER_MATH_H 1
-
-#include "../api.h"
-#include "../auto/math.h"
-
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <math.h>
-
-DECL_BEGIN
-
-#ifndef __KERNEL__
-/* >> exp2f(3), exp2(3), exp2l(3)
- * Compute base-2 exponential of `x' */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_exp2)(double x);
-/* >> log2f(3), log2(3), log2l(3)
- * Compute base-2 logarithm of `x' */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_log2)(double x);
-/* >> erff(3), erf(3), erfl(3) */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_erf)(double x);
-/* >> tgammaf(3), tgamma(3), tgammal(3)
- * True gamma function */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_tgamma)(double x);
-/* >> j0f(3), j0(3), j0l(3) */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_j0)(double x);
-/* >> j1f(3), j1(3), j1l(3) */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_j1)(double x);
-/* >> jnf(3), jn(3), jnl(3) */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_jn)(int n, double x);
-/* >> y0f(3), y0(3), y0l(3) */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_y0)(double x);
-/* >> y1f(3), y1(3), y1l(3) */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_y1)(double x);
-/* >> ynf(3), yn(3), ynl(3) */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_yn)(int n, double x);
-#endif /* !__KERNEL__ */
-
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_MATH_H */
+#ifndef __local_erfc_defined
+#define __local_erfc_defined
+#include <__crt.h>
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libm/erfc.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(erfc) __ATTR_CONST __ATTR_WUNUSED double
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(erfc))(double __x) {
+	return __LIBM_MATHFUN(erfc, __x);
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep_erfc_defined
+#define __local___localdep_erfc_defined
+#define __localdep_erfc __LIBC_LOCAL_NAME(erfc)
+#endif /* !__local___localdep_erfc_defined */
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#undef __local_erfc_defined
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#endif /* !__local_erfc_defined */
