@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb6d86f8 */
+/* HASH CRC-32:0x89929328 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2105,17 +2105,89 @@ INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_lgammal)(__LONGDOUBLE x) {
 	return libc_lgammal_r(x, &__LOCAL_signgam);
 }
+#include <libm/fcomp.h>
+#include <libm/isinf.h>
+#include <libm/finite.h>
+#include <libm/matherr.h>
+#include <libm/tgamma.h>
+#include <libm/floor.h>
+/* >> tgammaf(3), tgamma(3), tgammal(3)
+ * True gamma function */
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
+NOTHROW(LIBCCALL libc_tgamma)(double x) {
+	int my_signgam;
+	double result = __LIBM_MATHFUN2I(tgamma, x, &my_signgam);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && !__LIBM_MATHFUN1I(finite, result) &&
+	    (__LIBM_MATHFUN1I(finite, x) || __LIBM_MATHFUN1I(isinf, x) < 0)) {
+		if (x == 0.0)
+			return __kernel_standard(x, x, result, __LIBM_KMATHERR_TGAMMA_ZERO); /* tgamma pole */
+		if (__LIBM_MATHFUN(floor, x) == x && x < 0.0)
+			return __kernel_standard(x, x, result, __LIBM_KMATHERR_TGAMMA_MINUS); /* tgamma domain */
+		if (result == 0.0)
+			return __kernel_standard(x, x, result, __LIBM_KMATHERR_TGAMMA_UNDERFLOW); /* tgamma underflow */
+		return __kernel_standard(x, x, result, __LIBM_KMATHERR_TGAMMA_OVERFLOW);      /* tgamma overflow */
+	}
+	return my_signgam < 0 ? -result : result;
+}
+#include <libm/fcomp.h>
+#include <libm/isinf.h>
+#include <libm/finite.h>
+#include <libm/matherr.h>
+#include <libm/tgamma.h>
+#include <libm/floor.h>
 /* >> tgammaf(3), tgamma(3), tgammal(3)
  * True gamma function */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_tgammaf)(float x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+	int my_signgam;
+	float result = __LIBM_MATHFUN2IF(tgamma, x, &my_signgam);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && !__LIBM_MATHFUN1IF(finite, result) &&
+	    (__LIBM_MATHFUN1IF(finite, x) || __LIBM_MATHFUN1IF(isinf, x) < 0)) {
+		if (x == 0.0f)
+			return __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_TGAMMA_ZERO); /* tgamma pole */
+		if (__LIBM_MATHFUNF(floor, x) == x && x < 0.0f)
+			return __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_TGAMMA_MINUS); /* tgamma domain */
+		if (result == 0.0f)
+			return __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_TGAMMA_UNDERFLOW); /* tgamma underflow */
+		return __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_TGAMMA_OVERFLOW);      /* tgamma overflow */
+	}
+	return my_signgam < 0 ? -result : result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)libc_tgamma((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
+#include <libm/fcomp.h>
+#include <libm/isinf.h>
+#include <libm/finite.h>
+#include <libm/matherr.h>
+#include <libm/tgamma.h>
+#include <libm/floor.h>
 /* >> tgammaf(3), tgamma(3), tgammal(3)
  * True gamma function */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_tgammal)(__LONGDOUBLE x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+	int my_signgam;
+	__LONGDOUBLE result = __LIBM_MATHFUN2IL(tgamma, x, &my_signgam);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && !__LIBM_MATHFUN1IL(finite, result) &&
+	    (__LIBM_MATHFUN1IL(finite, x) || __LIBM_MATHFUN1IL(isinf, x) < 0)) {
+		if (x == 0.0L)
+			return __kernel_standard_l(x, x, result, __LIBM_KMATHERRL_TGAMMA_ZERO); /* tgamma pole */
+		if (__LIBM_MATHFUNL(floor, x) == x && x < 0.0L)
+			return __kernel_standard_l(x, x, result, __LIBM_KMATHERRL_TGAMMA_MINUS); /* tgamma domain */
+		if (result == 0.0L)
+			return __kernel_standard_l(x, x, result, __LIBM_KMATHERRL_TGAMMA_UNDERFLOW); /* tgamma underflow */
+		return __kernel_standard_l(x, x, result, __LIBM_KMATHERRL_TGAMMA_OVERFLOW);      /* tgamma overflow */
+	}
+	return my_signgam < 0 ? -result : result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)libc_tgamma((double)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 #include <libm/rint.h>
 /* >> rintf(3), rint(3), rintl(3)
@@ -3981,6 +4053,8 @@ DEFINE_PUBLIC_ALIAS(gammal, libc_lgammal);
 DEFINE_PUBLIC_ALIAS(__lgammal, libc_lgammal);
 DEFINE_PUBLIC_ALIAS(__gammal, libc_lgammal);
 DEFINE_PUBLIC_ALIAS(lgammal, libc_lgammal);
+DEFINE_PUBLIC_ALIAS(__tgamma, libc_tgamma);
+DEFINE_PUBLIC_ALIAS(tgamma, libc_tgamma);
 DEFINE_PUBLIC_ALIAS(__tgammaf, libc_tgammaf);
 DEFINE_PUBLIC_ALIAS(tgammaf, libc_tgammaf);
 DEFINE_PUBLIC_ALIAS(__tgammal, libc_tgammal);

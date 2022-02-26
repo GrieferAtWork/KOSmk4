@@ -51,19 +51,6 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_tgamma,hash:CRC-32=0x5809c86d]]]*/
-/* >> tgammaf(3), tgamma(3), tgammal(3)
- * True gamma function */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
-NOTHROW(LIBCCALL libc_tgamma)(double x)
-/*[[[body:libc_tgamma]]]*/
-/*AUTO*/{
-	(void)x;
-	CRT_UNIMPLEMENTEDF("tgamma(%f)", x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_tgamma]]]*/
 
 
 
@@ -155,9 +142,7 @@ NOTHROW(LIBCCALL libc_yn)(int n,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xf50f6daa]]]*/
-DEFINE_PUBLIC_ALIAS(__tgamma, libc_tgamma);
-DEFINE_PUBLIC_ALIAS(tgamma, libc_tgamma);
+/*[[[start:exports,hash:CRC-32=0x4fd47c61]]]*/
 DEFINE_PUBLIC_ALIAS(__j0, libc_j0);
 DEFINE_PUBLIC_ALIAS(j0, libc_j0);
 DEFINE_PUBLIC_ALIAS(__j1, libc_j1);

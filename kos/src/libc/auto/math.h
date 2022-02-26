@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8afd5b3f */
+/* HASH CRC-32:0x6ac45c05 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1125,6 +1125,13 @@ INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_lgammal)(__LONGDOUBLE x);
 /* >> tgammaf(3), tgamma(3), tgammal(3)
  * True gamma function */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_tgamma)(double x);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> tgammaf(3), tgamma(3), tgammal(3)
+ * True gamma function */
+INTDEF WUNUSED double NOTHROW(LIBCCALL libc_tgamma)(double x);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tgammaf(3), tgamma(3), tgammal(3)
  * True gamma function */
 INTDEF WUNUSED float NOTHROW(LIBDCALL libd_tgammaf)(float x);

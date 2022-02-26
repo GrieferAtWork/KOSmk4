@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe28f46a9 */
+/* HASH CRC-32:0xa6050a7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_tgammal_defined
 #define __local_tgammal_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_tgamma_defined
 #define __local___localdep_tgamma_defined
@@ -31,20 +32,51 @@ __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_tgamma,(double __x),tga
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_tgamma,(double __x),tgamma,(__x))
 #elif defined(__CRT_HAVE___tgamma)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_tgamma,(double __x),__tgamma,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_END
+#include <libc/local/math/tgamma.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_tgamma __LIBC_LOCAL_NAME(tgamma)
 #else /* ... */
 #undef __local___localdep_tgamma_defined
 #endif /* !... */
 #endif /* !__local___localdep_tgamma_defined */
+__NAMESPACE_LOCAL_END
+#include <libm/fcomp.h>
+#include <libm/isinf.h>
+#include <libm/finite.h>
+#include <libm/matherr.h>
+#include <libm/tgamma.h>
+#include <libm/floor.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(tgammal) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(tgammal))(__LONGDOUBLE __x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+	int __my_signgam;
+	__LONGDOUBLE __result = __LIBM_MATHFUN2IL(tgamma, __x, &__my_signgam);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && !__LIBM_MATHFUN1IL(finite, __result) &&
+	    (__LIBM_MATHFUN1IL(finite, __x) || __LIBM_MATHFUN1IL(isinf, __x) < 0)) {
+		if (__x == 0.0L)
+			return __kernel_standard_l(__x, __x, __result, __LIBM_KMATHERRL_TGAMMA_ZERO); /* tgamma pole */
+		if (__LIBM_MATHFUNL(floor, __x) == __x && __x < 0.0L)
+			return __kernel_standard_l(__x, __x, __result, __LIBM_KMATHERRL_TGAMMA_MINUS); /* tgamma domain */
+		if (__result == 0.0L)
+			return __kernel_standard_l(__x, __x, __result, __LIBM_KMATHERRL_TGAMMA_UNDERFLOW); /* tgamma underflow */
+		return __kernel_standard_l(__x, __x, __result, __LIBM_KMATHERRL_TGAMMA_OVERFLOW);      /* tgamma overflow */
+	}
+	return __my_signgam < 0 ? -__result : __result;
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)(__NAMESPACE_LOCAL_SYM __localdep_tgamma)((double)__x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_tgammal_defined
 #define __local___localdep_tgammal_defined
 #define __localdep_tgammal __LIBC_LOCAL_NAME(tgammal)
 #endif /* !__local___localdep_tgammal_defined */
-#else /* __CRT_HAVE_tgamma || __CRT_HAVE___tgamma */
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_tgamma || __CRT_HAVE___tgamma || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #undef __local_tgammal_defined
-#endif /* !__CRT_HAVE_tgamma && !__CRT_HAVE___tgamma */
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__CRT_HAVE_tgamma && !__CRT_HAVE___tgamma && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_tgammal_defined */

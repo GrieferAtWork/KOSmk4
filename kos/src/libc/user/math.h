@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28f10eea */
+/* HASH CRC-32:0x2768406f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,9 +31,6 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* >> tgammaf(3), tgamma(3), tgammal(3)
- * True gamma function */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_tgamma)(double x);
 /* >> j0f(3), j0(3), j0l(3) */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_j0)(double x);
 /* >> j1f(3), j1(3), j1l(3) */

@@ -1134,7 +1134,27 @@ __LONGDOUBLE lgammal(__LONGDOUBLE x) {
 @@>> tgammaf(3), tgamma(3), tgammal(3)
 @@True gamma function
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__tgamma")]]
-double tgamma(double x); /* TODO */
+[[impl_include("<libm/fcomp.h>", "<libm/isinf.h>", "<libm/finite.h>")]]
+[[impl_include("<libm/matherr.h>", "<libm/tgamma.h>", "<libm/floor.h>")]]
+[[requires_include("<ieee754.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+double tgamma(double x) {
+	int my_signgam;
+	double result = __LIBM_MATHFUN2I(@tgamma@, x, &my_signgam);
+	if (__LIBM_LIB_VERSION != __LIBM_IEEE && !__LIBM_MATHFUN1I(@finite@, result) &&
+	    (__LIBM_MATHFUN1I(@finite@, x) || __LIBM_MATHFUN1I(@isinf@, x) < 0)) {
+		if (x == 0.0)
+			return __kernel_standard(x, x, result, __LIBM_KMATHERR_TGAMMA_ZERO); /* tgamma pole */
+		if (__LIBM_MATHFUN(@floor@, x) == x && x < 0.0)
+			return __kernel_standard(x, x, result, __LIBM_KMATHERR_TGAMMA_MINUS); /* tgamma domain */
+		if (result == 0.0)
+			return __kernel_standard(x, x, result, __LIBM_KMATHERR_TGAMMA_UNDERFLOW); /* tgamma underflow */
+		return __kernel_standard(x, x, result, __LIBM_KMATHERR_TGAMMA_OVERFLOW);      /* tgamma overflow */
+	}
+	return my_signgam < 0 ? -result : result;
+}
 
 [[std, crtbuiltin, export_alias("__tgammaf")]] tgammaf(*) %{generate(double2float("tgamma"))}
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE

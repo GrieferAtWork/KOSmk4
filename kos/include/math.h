@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7645443 */
+/* HASH CRC-32:0xbfca644c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -394,16 +394,16 @@ __NAMESPACE_STD_USING(lgammal)
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_XOPEN || __USE_ISOC99 */
 #ifdef __USE_ISOC99
-#if defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
+#if defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(tgamma)
-#endif /* __CRT_HAVE_tgamma || __CRT_HAVE___tgamma */
-#if defined(__CRT_HAVE_tgammaf) || defined(__CRT_HAVE___tgammaf) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
+#endif /* __CRT_HAVE_tgamma || __CRT_HAVE___tgamma || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#if defined(__CRT_HAVE_tgammaf) || defined(__CRT_HAVE___tgammaf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(tgammaf)
-#endif /* __CRT_HAVE_tgammaf || __CRT_HAVE___tgammaf || __CRT_HAVE_tgamma || __CRT_HAVE___tgamma */
+#endif /* __CRT_HAVE_tgammaf || __CRT_HAVE___tgammaf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_tgamma || __CRT_HAVE___tgamma || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-#if defined(__CRT_HAVE_tgammal) || defined(__CRT_HAVE___tgammal) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
+#if defined(__CRT_HAVE_tgammal) || defined(__CRT_HAVE___tgammal) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(tgammal)
-#endif /* __CRT_HAVE_tgammal || __CRT_HAVE___tgammal || __CRT_HAVE_tgamma || __CRT_HAVE___tgamma */
+#endif /* __CRT_HAVE_tgammal || __CRT_HAVE___tgammal || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_tgamma || __CRT_HAVE___tgamma || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_ISOC99 */
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
@@ -2991,6 +2991,13 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,tgamma,(double __x),(__x))
 /* >> tgammaf(3), tgamma(3), tgammal(3)
  * True gamma function */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,tgamma,(double __x),__tgamma,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_STD_END
+#include <libc/local/math/tgamma.h>
+__NAMESPACE_STD_BEGIN
+/* >> tgammaf(3), tgamma(3), tgammal(3)
+ * True gamma function */
+__NAMESPACE_LOCAL_USING_OR_IMPL(tgamma, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL tgamma)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tgamma))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_tgammaf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tgammaf)
 /* >> tgammaf(3), tgamma(3), tgammal(3)
@@ -3004,7 +3011,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,tgammaf,(float __x),(__x))
 /* >> tgammaf(3), tgamma(3), tgammal(3)
  * True gamma function */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tgammaf,(float __x),__tgammaf,(__x))
-#elif defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/tgammaf.h>
 __NAMESPACE_STD_BEGIN
@@ -3025,7 +3032,7 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tgammal,(__LONGDOUBLE __x),(__x
 /* >> tgammaf(3), tgamma(3), tgammal(3)
  * True gamma function */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tgammal,(__LONGDOUBLE __x),__tgammal,(__x))
-#elif defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/tgammal.h>
 __NAMESPACE_STD_BEGIN
@@ -6132,7 +6139,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tgamma,(float __x),tgammaf,(__x))
 /* >> tgammaf(3), tgamma(3), tgammal(3)
  * True gamma function */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tgamma,(float __x),__tgammaf,(__x))
-#elif defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/tgammaf.h>
@@ -6625,7 +6632,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tgamma,(__LONGDOUBLE __x),tgam
 /* >> tgammaf(3), tgamma(3), tgammal(3)
  * True gamma function */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tgamma,(__LONGDOUBLE __x),__tgammal,(__x))
-#elif defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/tgammal.h>
@@ -7664,18 +7671,18 @@ __NAMESPACE_STD_USING(lgammal)
 #endif /* __USE_XOPEN || __USE_ISOC99 */
 #ifdef __USE_ISOC99
 #ifndef __CXX_SYSTEM_HEADER
-#if defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
+#if defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(tgamma)
-#endif /* __CRT_HAVE_tgamma || __CRT_HAVE___tgamma */
-#if defined(__CRT_HAVE_tgammaf) || defined(__CRT_HAVE___tgammaf) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
+#endif /* __CRT_HAVE_tgamma || __CRT_HAVE___tgamma || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#if defined(__CRT_HAVE_tgammaf) || defined(__CRT_HAVE___tgammaf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(tgammaf)
-#endif /* __CRT_HAVE_tgammaf || __CRT_HAVE___tgammaf || __CRT_HAVE_tgamma || __CRT_HAVE___tgamma */
+#endif /* __CRT_HAVE_tgammaf || __CRT_HAVE___tgammaf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_tgamma || __CRT_HAVE___tgamma || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifndef __CXX_SYSTEM_HEADER
-#if defined(__CRT_HAVE_tgammal) || defined(__CRT_HAVE___tgammal) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
+#if defined(__CRT_HAVE_tgammal) || defined(__CRT_HAVE___tgammal) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(tgammal)
-#endif /* __CRT_HAVE_tgammal || __CRT_HAVE___tgammal || __CRT_HAVE_tgamma || __CRT_HAVE___tgamma */
+#endif /* __CRT_HAVE_tgammal || __CRT_HAVE___tgammal || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_tgamma || __CRT_HAVE___tgamma || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__CXX_SYSTEM_HEADER */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_ISOC99 */
@@ -11555,6 +11562,11 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__tgamma,(double __x),tgamma,(__x))
 /* >> tgammaf(3), tgamma(3), tgammal(3)
  * True gamma function */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__tgamma,(double __x),(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/tgamma.h>
+/* >> tgammaf(3), tgamma(3), tgammal(3)
+ * True gamma function */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __tgamma)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tgamma))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_tgammaf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tgammaf)
 /* >> tgammaf(3), tgamma(3), tgammal(3)
@@ -11568,7 +11580,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__tgammaf,(float __x),tgammaf,(__x))
 /* >> tgammaf(3), tgamma(3), tgammal(3)
  * True gamma function */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__tgammaf,(float __x),(__x))
-#elif defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/tgammaf.h>
 /* >> tgammaf(3), tgamma(3), tgammal(3)
  * True gamma function */
@@ -11587,7 +11599,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__tgammal,(__LONGDOUBLE __x),t
 /* >> tgammaf(3), tgamma(3), tgammal(3)
  * True gamma function */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__tgammal,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/tgammal.h>
 /* >> tgammaf(3), tgamma(3), tgammal(3)
  * True gamma function */
