@@ -77,11 +77,18 @@ DEFINE_NOREL_GLOBAL_META(_LIB_VERSION_TYPE, _LIB_VERSION, ".math.math");
 /* IMPORTANT: WEAK, so the main program's override has higher priority! */
 DEFINE_PUBLIC_WEAK_ALIAS(matherr, libc_matherr);
 INTERN ATTR_SECTION(".text.crt.math.math")
-int LIBCCALL libc_matherr(STRUCT_EXCEPTION *exc) {
+int LIBKCALL libc_matherr(STRUCT_EXCEPTION *exc) {
 	COMPILER_IMPURE();
 	(void)exc;
 	return 0;
 }
+
+
+/* If non-NULL, the currently used `matherr(3)' handler in  "libc/matherr.c"
+ * When `NULL', lazily load the matherr handler via `dlsym()', and fall back
+ * to a no-op handler when no override was defined. */
+typedef int (LIBKCALL *LPMATHERR)(STRUCT_EXCEPTION *exc);
+INTERN ATTR_SECTION(".bss.crt.math.math") LPMATHERR libc_pdyn_matherr = NULL;
 
 /* Retrieve the global override function pointer for `matherr(3)'
  *
@@ -95,8 +102,6 @@ int LIBCCALL libc_matherr(STRUCT_EXCEPTION *exc) {
  * "matherr", but  doing that  would result  in an  unnecessary
  * runtime relocation (and KOS's  libc is designed to  minimize
  * all such relocations to their bare minima) */
-typedef int (LIBCCALL *LPMATHERR)(STRUCT_EXCEPTION *exc);
-INTERN ATTR_SECTION(".bss.crt.math.math") LPMATHERR libc_pdyn_matherr = NULL;
 PRIVATE ATTR_SECTION(".rodata.crt.math.math") char const name_matherr[] = "matherr";
 PRIVATE ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.math.math")
 LPMATHERR NOTHROW(LIBCCALL libc_get_matherr)(void) {

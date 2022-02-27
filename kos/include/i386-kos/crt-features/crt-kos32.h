@@ -995,6 +995,7 @@
 #define __CRT_HAVE___setstate
 #define __CRT_HAVE___settimeofday
 #define __CRT_HAVE___setuid
+#define __CRT_HAVE___setusermatherr
 #define __CRT_HAVE___shtab
 #define __CRT_HAVE___sigaction
 #define __CRT_HAVE___sigaddset
@@ -5777,7 +5778,6 @@
 #define __CRT_HAVE_KOS$__secure_getenv
 #define __CRT_HAVE___set_app_type
 #define __CRT_HAVE_KOS$__setmntent
-#define __CRT_HAVE___setusermatherr
 #define __CRT_HAVE_KOS$__stdio_common_vfwprintf
 #define __CRT_HAVE_KOS$__stdio_common_vfwprintf_p
 #define __CRT_HAVE_KOS$__stdio_common_vfwprintf_s
@@ -6700,7 +6700,6 @@
 #define __CRT_HAVE_DOS$__secure_getenv
 #define __CRT_HAVE_DOS$__set_app_type
 #define __CRT_HAVE_DOS$__setmntent
-#define __CRT_HAVE_DOS$__setusermatherr
 #define __CRT_HAVE_DOS$__stdio_common_vfwprintf
 #define __CRT_HAVE_DOS$__stdio_common_vfwprintf_p
 #define __CRT_HAVE_DOS$__stdio_common_vfwprintf_s

@@ -43,6 +43,7 @@
 
 #include <elf.h>
 #include <format-printer.h>
+#include <math.h>
 #include <stdlib.h> /* exit() */
 #include <string.h>
 #include <syscall.h>
@@ -758,6 +759,7 @@ DECL_END
 /************************************************************************/
 /* <fpu_control.h>                                                      */
 /************************************************************************/
+#ifndef __NO_FPU
 #include <fpu_control.h>
 #ifdef _FPU_GETCW
 
@@ -800,6 +802,7 @@ NOTHROW_NCX(LIBCCALL libc___setfpucw)(fpu_control_t ctrl) {
 
 DECL_END
 #endif /* _FPU_GETCW */
+#endif /* !__NO_FPU */
 
 
 
@@ -1029,14 +1032,96 @@ libd____mb_cur_max_l_func(locale_t locale) {
 /************************************************************************/
 /* _setusermatherr()                                                    */
 /************************************************************************/
-struct _exception;
-typedef int (LIBDCALL *_UserMathErrorFunctionPointer)(struct _exception *);
+#ifndef __NO_FPU
+#ifdef __cplusplus
+struct __exception;
+#define STRUCT_EXCEPTION struct __exception
+#else /* __cplusplus */
+struct exception;
+#define STRUCT_EXCEPTION struct exception
+#endif /* !__cplusplus */
+
+struct _exception {
+	int type;
+	char *name;
+	double arg1;
+	double arg2;
+	double retval;
+};
+#define _DOMAIN    1
+#define _SING      2
+#define _OVERFLOW  3
+#define _UNDERFLOW 4
+#define _TLOSS     5
+#define _PLOSS     6
+
+/* Assert that DOS's `struct _exception' is ABI-compatible with ours (which it should be) */
+STATIC_ASSERT(offsetof(struct _exception, type) == offsetof(STRUCT_EXCEPTION, type));
+STATIC_ASSERT(offsetafter(struct _exception, type) == offsetafter(STRUCT_EXCEPTION, type));
+STATIC_ASSERT(offsetof(struct _exception, name) == offsetof(STRUCT_EXCEPTION, name));
+STATIC_ASSERT(offsetafter(struct _exception, name) == offsetafter(STRUCT_EXCEPTION, name));
+STATIC_ASSERT(offsetof(struct _exception, arg1) == offsetof(STRUCT_EXCEPTION, arg1));
+STATIC_ASSERT(offsetafter(struct _exception, arg1) == offsetafter(STRUCT_EXCEPTION, arg1));
+STATIC_ASSERT(offsetof(struct _exception, arg2) == offsetof(STRUCT_EXCEPTION, arg2));
+STATIC_ASSERT(offsetafter(struct _exception, arg2) == offsetafter(STRUCT_EXCEPTION, arg2));
+STATIC_ASSERT(offsetof(struct _exception, retval) == offsetof(STRUCT_EXCEPTION, retval));
+STATIC_ASSERT(offsetafter(struct _exception, retval) == offsetafter(STRUCT_EXCEPTION, retval));
+STATIC_ASSERT(_DOMAIN == __MATH_EXCEPT_DOMAIN);
+STATIC_ASSERT(_SING == __MATH_EXCEPT_SING);
+STATIC_ASSERT(_OVERFLOW == __MATH_EXCEPT_OVERFLOW);
+STATIC_ASSERT(_UNDERFLOW == __MATH_EXCEPT_UNDERFLOW);
+STATIC_ASSERT(_TLOSS == __MATH_EXCEPT_TLOSS);
+STATIC_ASSERT(_PLOSS == __MATH_EXCEPT_PLOSS);
+
+/* If non-NULL, the currently used `matherr(3)' handler in  "libc/matherr.c"
+ * When `NULL', lazily load the matherr handler via `dlsym()', and fall back
+ * to a no-op handler when no override was defined.
+ *
+ * To facilitate DOS's `__setusermatherr(3)', we simply re-assign this pointer
+ * with  another function that  will invoke the  DOS-given math error handler. */
+typedef int (LIBKCALL *LPMATHERR)(STRUCT_EXCEPTION *exc);
+INTDEF LPMATHERR libc_pdyn_matherr;
+
+
+DEFINE_PUBLIC_ALIAS(__setusermatherr, libc___setusermatherr);
+INTERN ATTR_SECTION(".text.crt.dos.application.init") void LIBDCALL
+libc___setusermatherr(int (LIBKCALL *fptr)(struct _exception *)) {
+	/* We've already asserted  that DOS's `struct _exception'  and
+	 * our `STRUCT_EXCEPTION'  are  binary  compatible  (s.a.  the
+	 * static asserts above), so  if the calling conventions  also
+	 * match, then we can simply cast+assign the function pointer. */
+	libc_pdyn_matherr = (LPMATHERR)fptr;
+}
+
+#ifndef __LIBDCALL_IS_LIBKCALL
+/* When calling conventions don't match, then we need to do some extra
+ * work  in order to  set-up a wrapper that  calls DOS's error handler
+ * using the proper calling convention. */
+INTERN ATTR_SECTION(".bss.crt.dos.application.init")
+int (LIBDCALL *libd_usermatherr_fptr)(struct _exception *) = NULL;
+INTERN ATTR_SECTION(".text.crt.dos.application.init") int LIBKCALL
+libd_usermatherr_wrapper(STRUCT_EXCEPTION *exc) {
+	/* Even when calling conventions don't match, we still know that
+	 * our `STRUCT_EXCEPTION' matches DOS's `struct _exception',  so
+	 * no need to do some extra conversion in here.
+	 *
+	 * If they didn't match, this compat function could still  be
+	 * provided, only that we'd need to do some extra fiddling in
+	 * order to achive ABI compatibility. */
+	return (*libd_usermatherr_fptr)((struct _exception *)exc);
+}
+
 DEFINE_PUBLIC_ALIAS(DOS$__setusermatherr, libd___setusermatherr);
 INTERN ATTR_SECTION(".text.crt.dos.application.init") void LIBDCALL
-libd___setusermatherr(_UserMathErrorFunctionPointer func) {
-	/* TODO: Integrate into `INTDEF LPMATHERR libc_pdyn_matherr;' */
-	CRT_UNIMPLEMENTEDF("DOS$__setusermatherr(%p)\n", func);
+libd___setusermatherr(int (LIBDCALL *fptr)(struct _exception *)) {
+	/* Assign the function pointer to-be called by the wrapper. */
+	libd_usermatherr_fptr = fptr;
+
+	/* Assign the wrapper to-be called as `matherr(3)' handler. */
+	libc_pdyn_matherr = &libd_usermatherr_wrapper;
 }
+#endif /* !__LIBDCALL_IS_LIBKCALL */
+#endif /* !__NO_FPU */
 
 
 

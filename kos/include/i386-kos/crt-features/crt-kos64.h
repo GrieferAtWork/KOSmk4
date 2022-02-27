@@ -990,6 +990,7 @@
 #define __CRT_HAVE___setstate
 #define __CRT_HAVE___settimeofday
 #define __CRT_HAVE___setuid
+#define __CRT_HAVE___setusermatherr
 #define __CRT_HAVE___shtab
 #define __CRT_HAVE___sigaction
 #define __CRT_HAVE___sigaddset
@@ -5997,7 +5998,7 @@
 #define __CRT_HAVE_KOS$__setstate
 #define __CRT_HAVE_KOS$__settimeofday
 #define __CRT_HAVE_KOS$__setuid
-#define __CRT_HAVE___setusermatherr
+#define __CRT_HAVE_KOS$__setusermatherr
 #define __CRT_HAVE_KOS$__sigaction
 #define __CRT_HAVE_KOS$__sigaddset
 #define __CRT_HAVE_KOS$__sigblock
