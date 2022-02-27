@@ -38,6 +38,7 @@
 #include <unistd.h>
 
 #include "../libc/compat.h"
+#include "../libc/globals.h"
 #include "../libc/tls.h"
 #include "signal.h"
 #include "string.h"
@@ -213,9 +214,13 @@ NOTHROW_NCX(LIBCCALL libc_sigreturn)(struct sigcontext const *scp)
 /*[[[end:libc_sigreturn]]]*/
 
 
+/* NOTE: libc4/5 exports this symbol as "_sigintr", so we do the same. */
+#undef _sigintr
+DEFINE_PUBLIC_ALIAS(_sigintr, libc__sigintr);
+INTERN ATTR_SECTION(".bss.crt.sched.signal")
+sigset_t libc__sigintr = SIGSET_INIT_EMPTY;
+#define _sigintr GET_NOREL_GLOBAL(_sigintr)
 
-
-PRIVATE ATTR_SECTION(".bss.crt.sched.signal") sigset_t __sigintr;
 
 /*[[[head:libc_bsd_signal,hash:CRC-32=0x8c366111]]]*/
 /* >> bsd_signal(3)
@@ -251,7 +256,7 @@ NOTHROW_NCX(LIBCCALL libc_bsd_signal)(signo_t signo,
 		act.sa_handler = handler;
 		libc_sigemptyset(&act.sa_mask);
 		libc_sigaddset(&act.sa_mask, signo);
-		act.sa_flags = libc_sigismember(&__sigintr, signo) ? 0 : SA_RESTART;
+		act.sa_flags = libc_sigismember(&_sigintr, signo) ? 0 : SA_RESTART;
 		SET_SIGRESTORE(act);
 		if unlikely(libc_sigaction(signo, &act, &oact) < 0)
 			oact.sa_handler = SIG_ERR;
@@ -1029,13 +1034,15 @@ NOTHROW_NCX(LIBCCALL libc_siginterrupt)(signo_t signo,
 /*[[[body:libc_siginterrupt]]]*/
 {
 	struct sigaction action;
+	sigset_t *sigintr;
 	if (libc_sigaction(signo, (struct sigaction *)NULL, &action) < 0)
 		goto err;
+	sigintr = &_sigintr;
 	if (interrupt) {
-		libc_sigaddset(&__sigintr, signo);
+		libc_sigaddset(sigintr, signo);
 		action.sa_flags &= ~SA_RESTART;
 	} else {
-		libc_sigdelset(&__sigintr, signo);
+		libc_sigdelset(sigintr, signo);
 		action.sa_flags |= SA_RESTART;
 	}
 	if (libc_sigaction(signo, &action, (struct sigaction *)NULL) < 0)

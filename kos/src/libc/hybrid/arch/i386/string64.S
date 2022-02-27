@@ -54,6 +54,7 @@
 
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(__bzero, libc_bzero)
+DEFINE_PUBLIC_ALIAS(__gcc_bcmp, libc_memcmp)
 DEFINE_PUBLIC_ALIAS(explicit_bzero, libc_bzero)
 DEFINE_PUBLIC_ALIAS(explicit_memset, libc_memset)
 

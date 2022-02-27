@@ -236,6 +236,24 @@ libc_unimplementedf(char const *__restrict format, ...) {
 #endif /* CONFIG_LOG_LIBC_UNIMPLEMENTED */
 
 
+#ifndef __KERNEL__
+PRIVATE ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN ATTR_SECTION(".text.crt.glibc.assert") NONNULL((1)) void
+NOTHROW(VLIBCCALL libc_assertion_failure_perrorf)(struct assert_args *__restrict args, ...) {
+	va_start(args->aa_args, args);
+	args->aa_format = "Unexpected error: %s (%s)";
+	args->aa_expr   = NULL;
+	libc_assertion_failure_core(args);
+}
+INTERN ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN ATTR_SECTION(".text.crt.glibc.assert") NONNULL((1)) void
+NOTHROW(FCALL libc_assertion_failure_perror)(struct assert_args *__restrict args) {
+	errno_t eno = args->aa_errno;
+	libc_assertion_failure_perrorf(args,
+	                               strerrordesc_np(eno),
+	                               strerrorname_np(eno));
+}
+#endif /* !__KERNEL__ */
+
+
 /************************************************************************/
 /* Compat wrappers for DOS'S `_wassert()' function                      */
 /************************************************************************/

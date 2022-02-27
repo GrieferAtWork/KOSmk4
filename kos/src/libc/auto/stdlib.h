@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xacaf5eb5 */
+/* HASH CRC-32:0xfc9fb6c6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1002,8 +1002,10 @@ INTDEF WUNUSED NONNULL((1, 4)) __LONGLONG NOTHROW_NCX(LIBDCALL libd_strtonum)(ch
 INTDEF WUNUSED NONNULL((1, 4)) __LONGLONG NOTHROW_NCX(LIBCCALL libc_strtonum)(char const *nptr, __LONGLONG lo, __LONGLONG hi, char const **p_errstr);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> qsort_r(3) */
 INTDEF NONNULL((1, 4)) void (LIBDCALL libd_qsort_r)(void *pbase, size_t item_count, size_t item_size, int (LIBDCALL *compar)(void const *a, void const *b, void *arg), void *arg) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+/* >> qsort_r(3) */
 INTDEF NONNULL((1, 4)) void (LIBCCALL libc_qsort_r)(void *pbase, size_t item_count, size_t item_size, int (LIBCCALL *compar)(void const *a, void const *b, void *arg), void *arg) THROWS(...);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> mkostemp(3), mkostemp64(3)

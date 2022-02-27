@@ -150,6 +150,9 @@ struct utmp *getutline([[nonnull]] struct utmp const *line);
 
 @@>> pututline(3)
 [[cp_kos, decl_include("<bits/crt/db/utmp.h>")]]
+/* NOTE: Historically, `_pututline()' returned `struct utmp *', and
+ *       `pututline()' returned `void'  (in some  implementations). */
+[[export_alias("_pututline")]]
 struct utmp *pututline([[nonnull]] struct utmp const *utmp_ptr);
 
 %

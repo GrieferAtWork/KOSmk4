@@ -356,7 +356,9 @@ DEFINE_PUBLIC_IDATA_G(_IO_stderr_, linux_stdio_get_stderr, SIZEOF_IO_FILE_84);
 typedef void (LIBCCALL *PNEW_HANDLER)(void);
 PRIVATE ATTR_SECTION(".rodata.crt.compat.linux.heap") char const
 default_new_handler_message[] = "Virtual memory exceeded in `new'\n";
-PRIVATE ATTR_SECTION(".text.crt.compat.linux.heap") void LIBCCALL
+
+DEFINE_PUBLIC_ALIAS(__default_new_handler, libc_default_new_handler);
+INTERN ATTR_SECTION(".text.crt.compat.linux.heap") void LIBCCALL
 libc_default_new_handler(void) {
 	/* Yes: old-style c++ dynamic memory functions didn't raise exceptions
 	 *      on  out-of-memory,  but  simply  terminated  the  application! */
@@ -441,6 +443,25 @@ libc___builtin_vec_new(void *ptr, size_t maxindex, size_t size,
 	}
 	return ptr;
 }
+
+DEFINE_PUBLIC_ALIAS(__throw_type_match, libc___throw_type_match);
+INTERN ATTR_PURE ATTR_SECTION(".text.crt.compat.linux.except") void *LIBCCALL
+libc___throw_type_match(void const *catch_type,
+                        void const *throw_type, void *obj) {
+	if (strcmp((char const *)catch_type, (char const *)throw_type) == 0)
+		return obj;
+	return NULL;
+}
+
+DEFINE_PUBLIC_ALIAS(__cyg_profile_func_enter, libc___cyg_profile_func_enter);
+DEFINE_PUBLIC_ALIAS(__cyg_profile_func_exit, libc___cyg_profile_func_enter);
+INTERN ATTR_SECTION(".text.crt.compat.linux.misc") void LIBCCALL
+libc___cyg_profile_func_enter(void *this_fn, void *call_site) {
+	COMPILER_IMPURE();
+	(void)this_fn;
+	(void)call_site;
+}
+
 
 
 
@@ -761,9 +782,10 @@ DECL_END
 /************************************************************************/
 #ifndef __NO_FPU
 #include <fpu_control.h>
-#ifdef _FPU_GETCW
 
 DECL_BEGIN
+
+#ifdef _FPU_GETCW
 
 #ifndef _FPU_DEFAULT
 #ifndef _FPU_IEEE
@@ -784,6 +806,14 @@ INTERN ATTR_SECTION(".data.crt.math.float") fpu_control_t libc___fpu_control = _
 #endif /* _FPU_DEFAULT != 0 */
 DEFINE_PUBLIC_ALIAS(__fpu_control, libc___fpu_control);
 
+DEFINE_PUBLIC_ALIAS(__getfpucw, libc___getfpucw);
+INTERN ATTR_CONST ATTR_SECTION(".text.crt.math.float") fpu_control_t
+NOTHROW_NCX(LIBCCALL libc___getfpucw)(void) {
+	fpu_control_t word;
+	_FPU_GETCW(word);
+	return word;
+}
+
 /* >> __setfpucw(3)
  * Function called by old linux applications to set `__fpu_control()'. */
 DEFINE_PUBLIC_ALIAS(__setfpucw, libc___setfpucw);
@@ -799,9 +829,21 @@ NOTHROW_NCX(LIBCCALL libc___setfpucw)(fpu_control_t ctrl) {
 	_FPU_SETCW(ctrl);
 #endif /* _FPU_RESERVED == 0 */
 }
+#endif /* _FPU_GETCW */
+
+/* s.a. `__ieee754_inf()' in `<libm/inf.h>'
+ *
+ * User-programs would actually link against this symbol like:
+ * >> extern double __huge_val;
+ * (Assuming `double' is `__IEEE754_DOUBLE_TYPE__') */
+DEFINE_PUBLIC_ALIAS(__huge_val, libc___huge_val);
+INTERN_CONST ATTR_SECTION(".rodata.crt.math.float")
+uint32_t const libc___huge_val[2] = {
+	UINT32_C(0x7FF00000),
+	UINT32_C(0x00000000)
+};
 
 DECL_END
-#endif /* _FPU_GETCW */
 #endif /* !__NO_FPU */
 
 

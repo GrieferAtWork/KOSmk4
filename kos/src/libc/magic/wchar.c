@@ -325,6 +325,7 @@ size_t mbrtowc([[nullable]] wchar_t *pwc,
 	size_t error;
 	wchar_t fallback_wc;
 	if (mbs == NULL) {
+		/* TODO: For whatever reason, libc4/5 exported this `mbrtowc_ps' as `_mb_shift' */
 		static mbstate_t mbrtowc_ps = __MBSTATE_INIT;
 		mbs = &mbrtowc_ps;
 	}

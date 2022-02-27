@@ -1445,7 +1445,8 @@ int siggetmask(void) {
 
 @@>> __old_sigpause(3)
 @@For historical reasons, this is the ABI `sigpause(3)' function...
-[[hidden, requires($has_function(sigsuspend)), crt_name("sigpause")]]
+[[hidden, requires($has_function(sigsuspend))]]
+[[crt_name("sigpause"), export_alias("__sigpause")]]
 [[impl_include("<asm/os/signal.h>", "<bits/os/sigset.h>", "<hybrid/typecore.h>")]]
 int __old_sigpause(int sigmask0) {
 	sigset_t sigset;

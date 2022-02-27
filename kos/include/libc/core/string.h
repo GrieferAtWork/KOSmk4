@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f8742de */
+/* HASH CRC-32:0x2d299d00 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,7 +76,15 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_N
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
  * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcmp,(__s1,__s2,__n_bytes))
-#else /* __CRT_HAVE_memcmp */
+#elif defined(__CRT_HAVE___gcc_bcmp)
+#include <hybrid/typecore.h>
+/* >> memcmp(3)
+ * Compare memory buffers and return the difference of the first non-matching byte
+ * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),__gcc_bcmp,(__s1,__s2,__n_bytes))
+#else /* ... */
 #include <libc/local/string/memcmp.h>
 /* >> memcmp(3)
  * Compare memory buffers and return the difference of the first non-matching byte
@@ -84,7 +92,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
  * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 #define __libc_core_memcmp __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmp)
-#endif /* !__CRT_HAVE_memcmp */
+#endif /* !... */
 #ifdef __CRT_HAVE_memchr
 #include <hybrid/typecore.h>
 /* >> memchr(3)

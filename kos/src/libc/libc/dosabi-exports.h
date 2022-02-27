@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcda3d061 */
+/* HASH CRC-32:0x73272102 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1529,6 +1529,7 @@ DEFINE_PUBLIC_ALIAS(DOS$__sigblock, libd_sigblock);
 DEFINE_PUBLIC_ALIAS(DOS$sigblock, libd_sigblock);
 DEFINE_PUBLIC_ALIAS(DOS$__sigsetmask, libd_sigsetmask);
 DEFINE_PUBLIC_ALIAS(DOS$sigsetmask, libd_sigsetmask);
+DEFINE_PUBLIC_ALIAS(DOS$__sigpause, libd_sigpause);
 DEFINE_PUBLIC_ALIAS(DOS$sigpause, libd_sigpause);
 DEFINE_PUBLIC_ALIAS(DOS$sigreturn, libd_sigreturn);
 DEFINE_PUBLIC_ALIAS(DOS$__xpg_sigpause, libd___xpg_sigpause);
@@ -1845,6 +1846,7 @@ DEFINE_PUBLIC_ALIAS(DOS$funopen2, libd_funopen2);
 DEFINE_PUBLIC_ALIAS(DOS$funopen64, libd_funopen64);
 DEFINE_PUBLIC_ALIAS(DOS$funopen2_64, libd_funopen2_64);
 DEFINE_PUBLIC_ALIAS(DOS$__uflow, libd__filbuf);
+DEFINE_PUBLIC_ALIAS(DOS$__underflow, libd__filbuf);
 DEFINE_PUBLIC_ALIAS(DOS$_filbuf, libd__filbuf);
 DEFINE_PUBLIC_ALIAS(DOS$_flsbuf, libd__flsbuf);
 DEFINE_PUBLIC_ALIAS(DOS$_setmaxstdio, libd__setmaxstdio);
@@ -2145,6 +2147,7 @@ DEFINE_PUBLIC_ALIAS(DOS$onexit, libd_onexit);
 DEFINE_PUBLIC_ALIAS(DOS$memcpy, libd_memcpy);
 DEFINE_PUBLIC_ALIAS(DOS$memmove, libd_memmove);
 DEFINE_PUBLIC_ALIAS(DOS$memset, libd_memset);
+DEFINE_PUBLIC_ALIAS(DOS$__gcc_bcmp, libd_memcmp);
 DEFINE_PUBLIC_ALIAS(DOS$memcmp, libd_memcmp);
 DEFINE_PUBLIC_ALIAS(DOS$memchr, libd_memchr);
 DEFINE_PUBLIC_ALIAS(DOS$strlen, libd_strlen);
@@ -3138,6 +3141,7 @@ DEFINE_PUBLIC_ALIAS(DOS$__libc_fchdir, libd_fchdir);
 DEFINE_PUBLIC_ALIAS(DOS$fchdir, libd_fchdir);
 DEFINE_PUBLIC_ALIAS(DOS$__getpgid, libd_getpgid);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_getpgid, libd_getpgid);
+DEFINE_PUBLIC_ALIAS(DOS$__bsd_getpgrp, libd_getpgid);
 DEFINE_PUBLIC_ALIAS(DOS$getpgid, libd_getpgid);
 DEFINE_PUBLIC_ALIAS(DOS$__getsid, libd_getsid);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_getsid, libd_getsid);
@@ -3228,6 +3232,7 @@ DEFINE_PUBLIC_ALIAS(DOS$updwtmp, libd_updwtmp);
 DEFINE_PUBLIC_ALIAS(DOS$utmpname, libd_utmpname);
 DEFINE_PUBLIC_ALIAS(DOS$getutid, libd_getutid);
 DEFINE_PUBLIC_ALIAS(DOS$getutline, libd_getutline);
+DEFINE_PUBLIC_ALIAS(DOS$_pututline, libd_pututline);
 DEFINE_PUBLIC_ALIAS(DOS$pututline, libd_pututline);
 DEFINE_PUBLIC_ALIAS(DOS$getutent_r, libd_getutent_r);
 DEFINE_PUBLIC_ALIAS(DOS$getutid_r, libd_getutid_r);

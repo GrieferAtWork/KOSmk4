@@ -4618,7 +4618,7 @@ int _flushall() {
 
 %
 [[cp_stdio, section(".text.crt.dos.FILE.locked.read.read")]]
-[[export_alias("__uflow")]]
+[[export_alias("__uflow", "__underflow")]]
 int _filbuf([[nonnull]] $FILE *__restrict stream);
 
 [[cp_stdio, section(".text.crt.dos.FILE.locked.write.write")]]

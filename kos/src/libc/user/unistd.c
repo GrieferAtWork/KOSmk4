@@ -2235,6 +2235,7 @@ byte_t *brk_curr = NULL;
 
 /* For compatibility with old linux programs: the current program break address. */
 DEFINE_PUBLIC_IDATA_G(___brk_addr, libc_brk_addr_cb, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA_G(__curbrk, libc_brk_addr_cb, __SIZEOF_POINTER__);
 INTERN ATTR_SECTION(".text.crt.compat.linux.heap") byte_t **LIBCCALL
 libc_brk_addr_cb(void) {
 	if (brk_curr == NULL)
@@ -3988,7 +3989,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xd05edeff]]]*/
+/*[[[start:exports,hash:CRC-32=0x9a1abbe4]]]*/
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_execve, libc_execve);
 #endif /* __LIBCCALL_IS_LIBDCALL */
@@ -4223,6 +4224,7 @@ DEFINE_PUBLIC_ALIAS(__libc_fchdir, libc_fchdir);
 DEFINE_PUBLIC_ALIAS(fchdir, libc_fchdir);
 DEFINE_PUBLIC_ALIAS(__getpgid, libc_getpgid);
 DEFINE_PUBLIC_ALIAS(__libc_getpgid, libc_getpgid);
+DEFINE_PUBLIC_ALIAS(__bsd_getpgrp, libc_getpgid);
 DEFINE_PUBLIC_ALIAS(getpgid, libc_getpgid);
 DEFINE_PUBLIC_ALIAS(__getsid, libc_getsid);
 DEFINE_PUBLIC_ALIAS(__libc_getsid, libc_getsid);

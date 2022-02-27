@@ -158,9 +158,7 @@ size_t __fpending([[nonnull]] $FILE __KOS_FIXED_CONST *stream);
 
 @@>> _flushlbf(3)
 @@Flush all line-buffered files
-/* NOTE: I feel like this is a typo, but that's
- *       the  symbol that also exists in GLibC! */
-[[cp_stdio, export_alias("_IO_flush_all_linebuffere")]]
+[[cp_stdio, export_alias("_IO_flush_all_linebuffered")]]
 void _flushlbf();
 
 @@>> __fsetlocking(3)

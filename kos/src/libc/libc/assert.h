@@ -42,7 +42,14 @@ DECL_BEGIN
 struct assert_args {
 	va_list          aa_args;    /* Variable arguments for `aa_format' */
 	struct kcpustate aa_state;   /* CPU state pointing after the call to an assertion handler function */
+#ifdef __KERNEL__
 	char const      *aa_expr;    /* [0..1] Faulting expression */
+#else /* __KERNEL__ */
+	union {
+		char const  *aa_expr;    /* [0..1] Faulting expression */
+		errno_t      aa_errno;   /* Error number. (libc_assertion_failure_perror) */
+	};
+#endif /* !__KERNEL__ */
 	char const      *aa_file;    /* [0..1] Faulting file name */
 	unsigned int     aa_line;    /* Faulting line number */
 	char const      *aa_func;    /* [0..1] Faulting function name */
@@ -58,6 +65,7 @@ INTDEF ABNORMAL_RETURN ATTR_COLD ATTR_RETNONNULL WUNUSED NONNULL((1)) struct kcp
 #else /* __KERNEL__ */
 INTDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL libc_assertion_failure_core_c16)(struct assert_args *__restrict args);
 INTDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL libc_assertion_failure_core_c32)(struct assert_args *__restrict args);
+INTDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL libc_assertion_failure_perror)(struct assert_args *__restrict args);
 #endif /* !__KERNEL__ */
 
 

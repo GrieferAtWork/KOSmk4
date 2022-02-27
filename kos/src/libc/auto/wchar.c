@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb75f5b64 */
+/* HASH CRC-32:0x8454196e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -150,6 +150,7 @@ NOTHROW_NCX(LIBDCALL libd_mbrtowc)(char16_t *pwc,
 	size_t error;
 	char16_t fallback_wc;
 	if (mbs == NULL) {
+		/* TODO: For whatever reason, libc4/5 exported this `mbrtowc_ps' as `_mb_shift' */
 		static mbstate_t mbrtowc_ps = __MBSTATE_INIT;
 		mbs = &mbrtowc_ps;
 	}
@@ -182,6 +183,7 @@ NOTHROW_NCX(LIBKCALL libc_mbrtowc)(char32_t *pwc,
 	size_t error;
 	char32_t fallback_wc;
 	if (mbs == NULL) {
+		/* TODO: For whatever reason, libc4/5 exported this `mbrtowc_ps' as `_mb_shift' */
 		static mbstate_t mbrtowc_ps = __MBSTATE_INIT;
 		mbs = &mbrtowc_ps;
 	}

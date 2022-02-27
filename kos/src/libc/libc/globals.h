@@ -221,6 +221,17 @@ DECLARE_NOREL_GLOBAL_META(int, signgam);
 #define __LOCAL_signgam GET_NOREL_GLOBAL(signgam)
 #define __signgam()     (&signgam)
 
+
+/* <signal.h> */
+#ifndef __sigset_t_defined
+#define __sigset_t_defined
+struct __sigset_struct;
+typedef struct __sigset_struct sigset_t;
+#endif /* !__sigset_t_defined */
+#undef _sigintr
+DECLARE_NOREL_GLOBAL_META(sigset_t, _sigintr);
+#define _sigintr GET_NOREL_GLOBAL(_sigintr)
+
 #endif /* !__KERNEL__ */
 
 DECL_END

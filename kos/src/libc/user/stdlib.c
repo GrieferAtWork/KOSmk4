@@ -139,7 +139,9 @@ environ_remove_heapstring_locked(struct environ_heapstr *ptr) {
 
 
 /* TODO: Add support for: __cxa_thread_atexit */
-/* TODO: Add support for: __cxa_thread_atexit_impl  */
+/* TODO: Add support for: __cxa_thread_atexit_impl */
+/* TODO: Add support for: __cxa_at_quick_exit */
+/* TODO: Add support for: __cxa_finalize */
 DEFINE_PUBLIC_ALIAS(__cxa_atexit, libc___cxa_atexit);
 
 INTERN ATTR_SECTION(".text.crt.sched.process") int

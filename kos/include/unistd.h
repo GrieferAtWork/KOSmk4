@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1e360cc */
+/* HASH CRC-32:0xd82b17ff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -781,6 +781,13 @@ __CDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__getpgid,(__pid_t __pid),(__pid
  * THREAD[PID]->LEADER->GROUP_LEADER->PID
  * When `pid' is ZERO(0), use `gettid()' for it instead */
 __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__getpgid,(__pid_t __pid),__libc_getpgid,(__pid))
+#elif defined(__CRT_HAVE___bsd_getpgrp)
+/* >> getpgid(2)
+ * Return  the ID of  the process group  associated with `pid's process.
+ * (That is the TID of the leader of the process group of `pid's leader)
+ * THREAD[PID]->LEADER->GROUP_LEADER->PID
+ * When `pid' is ZERO(0), use `gettid()' for it instead */
+__CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__getpgid,(__pid_t __pid),__bsd_getpgrp,(__pid))
 #endif /* ... */
 #ifdef __CRT_HAVE_setpgid
 /* >> setpgid(2)
@@ -2100,17 +2107,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(usleep, __FORCELOCAL __ATTR_ARTIFICIAL int __NOT
 #endif /* ... */
 #ifdef __CRT_HAVE_getwd
 /* >> getwd(3)
- * Deprecated, alternate variant of `getcwd()'. It
+ * Deprecated, alternate variant  of `getcwd()'.  It
  * should be obvious why you shouldn't use this one.
- * And if it isn't, take a look at the arguments of
+ * And  if it isn't, take a look at the arguments of
  * this function, compared to `getcwd()' */
 __CDECLARE(__ATTR_DEPRECATED("Use getcwd()") __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getwd,(char *__buf),(__buf))
 #elif defined(__CRT_HAVE_getcwd) || defined(__CRT_HAVE__getcwd)
 #include <libc/local/unistd/getwd.h>
 /* >> getwd(3)
- * Deprecated, alternate variant of `getcwd()'. It
+ * Deprecated, alternate variant  of `getcwd()'.  It
  * should be obvious why you shouldn't use this one.
- * And if it isn't, take a look at the arguments of
+ * And  if it isn't, take a look at the arguments of
  * this function, compared to `getcwd()' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getwd, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Use getcwd()") __ATTR_NONNULL((1)) char *__NOTHROW_RPC(__LIBCCALL getwd)(char *__buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getwd))(__buf); })
 #endif /* ... */
@@ -2233,6 +2240,13 @@ __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getpgid,(__pid_t __pid),__getpg
  * THREAD[PID]->LEADER->GROUP_LEADER->PID
  * When `pid' is ZERO(0), use `gettid()' for it instead */
 __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getpgid,(__pid_t __pid),__libc_getpgid,(__pid))
+#elif defined(__CRT_HAVE___bsd_getpgrp)
+/* >> getpgid(2)
+ * Return  the ID of  the process group  associated with `pid's process.
+ * (That is the TID of the leader of the process group of `pid's leader)
+ * THREAD[PID]->LEADER->GROUP_LEADER->PID
+ * When `pid' is ZERO(0), use `gettid()' for it instead */
+__CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getpgid,(__pid_t __pid),__bsd_getpgrp,(__pid))
 #endif /* ... */
 #ifdef __CRT_HAVE_getsid
 /* >> getsid(2)

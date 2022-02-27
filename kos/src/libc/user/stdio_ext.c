@@ -222,7 +222,7 @@ NOTHROW_NCX(LIBCCALL libc___fseterr)(FILE *stream)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xc6d4ade5]]]*/
+/*[[[start:exports,hash:CRC-32=0xe6a2f628]]]*/
 DEFINE_PUBLIC_ALIAS(__fbufsize, libc___fbufsize);
 DEFINE_PUBLIC_ALIAS(__freading, libc___freading);
 DEFINE_PUBLIC_ALIAS(__fwriting, libc___fwriting);
@@ -232,7 +232,7 @@ DEFINE_PUBLIC_ALIAS(__flbf, libc___flbf);
 DEFINE_PUBLIC_ALIAS(fpurge, libc___fpurge);
 DEFINE_PUBLIC_ALIAS(__fpurge, libc___fpurge);
 DEFINE_PUBLIC_ALIAS(__fpending, libc___fpending);
-DEFINE_PUBLIC_ALIAS(_IO_flush_all_linebuffere, libc__flushlbf);
+DEFINE_PUBLIC_ALIAS(_IO_flush_all_linebuffered, libc__flushlbf);
 DEFINE_PUBLIC_ALIAS(_flushlbf, libc__flushlbf);
 DEFINE_PUBLIC_ALIAS(__fsetlocking, libc___fsetlocking);
 DEFINE_PUBLIC_ALIAS(__fseterr, libc___fseterr);

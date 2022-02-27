@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4dd1099 */
+/* HASH CRC-32:0x8d010229 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3803,11 +3803,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtonum, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
 #ifdef __CRT_HAVE_qsort_r
+/* >> qsort_r(3) */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 4)),__THROWING,qsort_r,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),(__pbase,__item_count,__item_size,__compar,__arg))
-#else /* __CRT_HAVE_qsort_r */
+#elif defined(__CRT_HAVE__quicksort)
+/* >> qsort_r(3) */
+__CREDIRECT_VOID(__ATTR_NONNULL((1, 4)),__THROWING,qsort_r,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),_quicksort,(__pbase,__item_count,__item_size,__compar,__arg))
+#else /* ... */
 #include <libc/local/stdlib/qsort_r.h>
+/* >> qsort_r(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(qsort_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) void (__LIBCCALL qsort_r)(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qsort_r))(__pbase, __item_count, __item_size, __compar, __arg); })
-#endif /* !__CRT_HAVE_qsort_r */
+#endif /* !... */
 #if defined(__CRT_HAVE_mkostemp) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> mkostemp(3), mkostemp64(3)
  * Replace  the  last 6  characters of  `template_' (which  are followed  by exactly

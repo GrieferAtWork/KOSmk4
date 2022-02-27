@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e76b4b0 */
+/* HASH CRC-32:0x65b2f451 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -522,6 +522,7 @@
 #define __stub___putshort
 #define __stub_putshort
 #define __stub_putspent
+#define __stub__pututline
 #define __stub_pututline
 #define __stub_pututxline
 #define __stub_radixsort

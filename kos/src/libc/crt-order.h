@@ -342,13 +342,13 @@
 	CB(PREFIX.crt.system.configuration) \
 	CB(PREFIX.crt.system.random) \
 	CB(PREFIX.crt.cpu.ucontext) \
-	CB(PREFIX.crt.glibc.application.init PREFIX.crt.glibc.fs.stat) \
+	CB(PREFIX.crt.glibc.application.init PREFIX.crt.glibc.assert PREFIX.crt.glibc.fs.stat) \
 	CB(PREFIX.crt.bsd.stringlist) \
 	CB(PREFIX.crt.bsd.io.access PREFIX.crt.bsd.strstat PREFIX.crt.bsd) \
 	CB(PREFIX.crt.solaris) \
 	CB(PREFIX.crt.unsorted) \
 	CB(PREFIX.crt.compat.dos.msabi64.msabi64_RRRR PREFIX.crt.compat.dos.msabi64.msabi64_RRRRR PREFIX.crt.compat.dos.msabi64.msabi64_RRRRRRn) \
-	CB(PREFIX.crt.compat.linux.__register_frame PREFIX.crt.compat.linux.dirent PREFIX.crt.compat.linux.heap PREFIX.crt.compat.linux.init PREFIX.crt.compat.linux.misc PREFIX.crt.compat.linux.stdio) \
+	CB(PREFIX.crt.compat.linux.__register_frame PREFIX.crt.compat.linux.dirent PREFIX.crt.compat.linux.except PREFIX.crt.compat.linux.heap PREFIX.crt.compat.linux.init PREFIX.crt.compat.linux.misc PREFIX.crt.compat.linux.stdio) \
 	CB(PREFIX.crt.wchar.fs.exec.exec) \
 	CB(PREFIX.crt.wchar.heap.strdup) \
 	CB(PREFIX.crt.wchar.FILE.locked.access) \

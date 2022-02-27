@@ -3886,7 +3886,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x25afd884]]]*/
+/*[[[start:exports,hash:CRC-32=0x237ca88c]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$__rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$rename, libd_rename);
@@ -4061,6 +4061,7 @@ DEFINE_PUBLIC_ALIAS(_flushall, libc__flushall);
 DEFINE_PUBLIC_ALIAS(_IO_flush_all, libc__flushall);
 DEFINE_PUBLIC_ALIAS(_rmtmp, libc__rmtmp);
 DEFINE_PUBLIC_ALIAS(__uflow, libc__filbuf);
+DEFINE_PUBLIC_ALIAS(__underflow, libc__filbuf);
 DEFINE_PUBLIC_ALIAS(_filbuf, libc__filbuf);
 DEFINE_PUBLIC_ALIAS(_flsbuf, libc__flsbuf);
 DEFINE_PUBLIC_ALIAS(_getmaxstdio, libc__getmaxstdio);

@@ -219,7 +219,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getutline_r)(struct utmp const *line,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x254d0c4b]]]*/
+/*[[[start:exports,hash:CRC-32=0x33f34018]]]*/
 DEFINE_PUBLIC_ALIAS(login, libc_login);
 DEFINE_PUBLIC_ALIAS(logout, libc_logout);
 DEFINE_PUBLIC_ALIAS(logwtmp, libc_logwtmp);
@@ -230,6 +230,7 @@ DEFINE_PUBLIC_ALIAS(setutent, libc_setutent);
 DEFINE_PUBLIC_ALIAS(endutent, libc_endutent);
 DEFINE_PUBLIC_ALIAS(getutid, libc_getutid);
 DEFINE_PUBLIC_ALIAS(getutline, libc_getutline);
+DEFINE_PUBLIC_ALIAS(_pututline, libc_pututline);
 DEFINE_PUBLIC_ALIAS(pututline, libc_pututline);
 DEFINE_PUBLIC_ALIAS(getutent_r, libc_getutent_r);
 DEFINE_PUBLIC_ALIAS(getutid_r, libc_getutid_r);

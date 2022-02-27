@@ -238,7 +238,7 @@
 #define __CRT_HAVE__IO_fgets
 #define __CRT_HAVE__IO_flockfile
 #define __CRT_HAVE__IO_flush_all
-#define __CRT_HAVE__IO_flush_all_linebuffere
+#define __CRT_HAVE__IO_flush_all_linebuffered
 #define __CRT_HAVE__IO_fopen
 #define __CRT_HAVE__IO_fprintf
 #define __CRT_HAVE__IO_fputs
@@ -339,6 +339,7 @@
 #define __CRT_HAVE___assert
 #define __CRT_HAVE___assert_fail
 #define __CRT_HAVE___assert_func
+#define __CRT_HAVE___assert_perror_fail
 #define __CRT_HAVE___assertfail
 #define __CRT_HAVE___atan
 #define __CRT_HAVE___atan2
@@ -354,6 +355,7 @@
 #define __CRT_HAVE___backtrace_symbols_fd
 #define __CRT_HAVE___basename
 #define __CRT_HAVE___brk
+#define __CRT_HAVE___bsd_getpgrp
 #define __CRT_HAVE___bsd_signal
 #define __CRT_HAVE___bss_start
 #define __CRT_HAVE___builtin_delete
@@ -403,13 +405,17 @@
 #define __CRT_HAVE___ctype_tolower_loc
 #define __CRT_HAVE___ctype_toupper
 #define __CRT_HAVE___ctype_toupper_loc
+#define __CRT_HAVE___curbrk
 #define __CRT_HAVE___cxa_atexit
 #define __CRT_HAVE___cxa_begin_catch
 #define __CRT_HAVE___cxa_end_catch
 #define __CRT_HAVE___cxa_rethrow
+#define __CRT_HAVE___cyg_profile_func_enter
+#define __CRT_HAVE___cyg_profile_func_exit
 #define __CRT_HAVE___cygerrno_location
 #define __CRT_HAVE___daylight
 #define __CRT_HAVE___dcgettext
+#define __CRT_HAVE___default_new_handler
 #define __CRT_HAVE___deregister_frame
 #define __CRT_HAVE___deregister_frame_info
 #define __CRT_HAVE___deregister_frame_info_bases
@@ -513,6 +519,7 @@
 #define __CRT_HAVE___gamma
 #define __CRT_HAVE___gammaf
 #define __CRT_HAVE___gammal
+#define __CRT_HAVE___gcc_bcmp
 #define __CRT_HAVE___gcc_personality_v0
 #define __CRT_HAVE___get_current_locale
 #define __CRT_HAVE___get_cygerrno
@@ -526,6 +533,7 @@
 #define __CRT_HAVE___getdtablesize
 #define __CRT_HAVE___getegid
 #define __CRT_HAVE___geteuid
+#define __CRT_HAVE___getfpucw
 #define __CRT_HAVE___getgid
 #define __CRT_HAVE___getgroups
 #define __CRT_HAVE___gethostname
@@ -550,6 +558,7 @@
 #define __CRT_HAVE___h_errno_location
 #define __CRT_HAVE___htonl
 #define __CRT_HAVE___htons
+#define __CRT_HAVE___huge_val
 #define __CRT_HAVE___hypot
 #define __CRT_HAVE___hypotf
 #define __CRT_HAVE___hypotl
@@ -1011,6 +1020,7 @@
 #define __CRT_HAVE___significand
 #define __CRT_HAVE___significandf
 #define __CRT_HAVE___significandl
+#define __CRT_HAVE___sigpause
 #define __CRT_HAVE___sigpending
 #define __CRT_HAVE___sigprocmask
 #define __CRT_HAVE___sigsetjmp
@@ -1111,6 +1121,7 @@
 #define __CRT_HAVE___tgammaf
 #define __CRT_HAVE___tgammal
 #define __CRT_HAVE___threadid
+#define __CRT_HAVE___throw_type_match
 #define __CRT_HAVE___time
 #define __CRT_HAVE___times
 #define __CRT_HAVE___timezone
@@ -1134,6 +1145,7 @@
 #define __CRT_HAVE___umask
 #define __CRT_HAVE___umount
 #define __CRT_HAVE___uname
+#define __CRT_HAVE___underflow
 #define __CRT_HAVE___unicode_descriptor
 #define __CRT_HAVE___unicode_descriptor_digit
 #define __CRT_HAVE___unicode_descriptor_digit64
@@ -1494,10 +1506,12 @@
 #define __CRT_HAVE__printf_s_l
 #define __CRT_HAVE__putenv
 #define __CRT_HAVE__putenv_s
+#define __CRT_HAVE__pututline
 #define __CRT_HAVE__putw
 #define __CRT_HAVE__putws
 #define __CRT_HAVE__query_new_handler
 #define __CRT_HAVE__query_new_mode
+#define __CRT_HAVE__quicksort
 #define __CRT_HAVE__read
 #define __CRT_HAVE__realloc_dbg
 #define __CRT_HAVE__recalloc
@@ -1541,6 +1555,7 @@
 #define __CRT_HAVE__setjmpex
 #define __CRT_HAVE__setmaxstdio
 #define __CRT_HAVE__setmode
+#define __CRT_HAVE__sigintr
 #define __CRT_HAVE__snprintf
 #define __CRT_HAVE__snprintf_c
 #define __CRT_HAVE__snprintf_c_l

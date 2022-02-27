@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94f3793d */
+/* HASH CRC-32:0x6ef0d02d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,12 +30,17 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 4)),__THROWING,__localdep_qsort_r,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),qsort_r,(__pbase,__item_count,__item_size,__compar,__arg))
-#else /* __CRT_HAVE_qsort_r */
+#elif defined(__CRT_HAVE__quicksort)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT_VOID(__ATTR_NONNULL((1, 4)),__THROWING,__localdep_qsort_r,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),_quicksort,(__pbase,__item_count,__item_size,__compar,__arg))
+#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/qsort_r.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_qsort_r __LIBC_LOCAL_NAME(qsort_r)
-#endif /* !__CRT_HAVE_qsort_r */
+#endif /* !... */
 #endif /* !__local___localdep_qsort_r_defined */
 __NAMESPACE_LOCAL_END
 #ifndef ____invoke_compare_helper_s_defined

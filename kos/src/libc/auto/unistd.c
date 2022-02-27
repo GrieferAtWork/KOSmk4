@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd792618 */
+/* HASH CRC-32:0x11eb2ded */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -401,18 +401,18 @@ NOTHROW_RPC(LIBCCALL libc_usleep)(useconds_t useconds) {
 #endif /* !__CRT_HAVE_nanosleep64 && !__CRT_HAVE_nanosleep && !__CRT_HAVE___nanosleep && !__CRT_HAVE___libc_nanosleep */
 }
 /* >> getwd(3)
- * Deprecated, alternate variant of `getcwd()'. It
+ * Deprecated, alternate variant  of `getcwd()'.  It
  * should be obvious why you shouldn't use this one.
- * And if it isn't, take a look at the arguments of
+ * And  if it isn't, take a look at the arguments of
  * this function, compared to `getcwd()' */
 INTERN ATTR_SECTION(".text.crt.dos.fs.basic_property") ATTR_DEPRECATED("Use getcwd()") NONNULL((1)) char *
 NOTHROW_RPC(LIBDCALL libd_getwd)(char *buf) {
 	return libd_getcwd(buf, (size_t)-1);
 }
 /* >> getwd(3)
- * Deprecated, alternate variant of `getcwd()'. It
+ * Deprecated, alternate variant  of `getcwd()'.  It
  * should be obvious why you shouldn't use this one.
- * And if it isn't, take a look at the arguments of
+ * And  if it isn't, take a look at the arguments of
  * this function, compared to `getcwd()' */
 INTERN ATTR_SECTION(".text.crt.fs.basic_property") ATTR_DEPRECATED("Use getcwd()") NONNULL((1)) char *
 NOTHROW_RPC(LIBCCALL libc_getwd)(char *buf) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2e7cd18 */
+/* HASH CRC-32:0xbfbe8d5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2527,6 +2527,7 @@ PRIVATE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
 	return (*c->compar)(a, b, c->arg);
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined */
+/* >> qsort_r(3) */
 INTERN ATTR_SECTION(".text.crt.dos.utility.stdlib") NONNULL((1, 4)) void
 (LIBDCALL libd_qsort_r)(void *pbase,
                         size_t item_count,
@@ -2539,6 +2540,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility.stdlib") NONNULL((1, 4)) void
 	libc_qsort_r(pbase, item_count, item_size, (int (LIBCCALL *)(void const *, void const *, void *))&_dwrap_sTPTP_TDTPTPTP_c0A0A1c1, &libd_qsort_r_cookie);
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+/* >> qsort_r(3) */
 INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
 (LIBCCALL libc_qsort_r)(void *pbase,
                         size_t item_count,
@@ -4419,8 +4421,12 @@ DEFINE_PUBLIC_ALIAS(mergesort, libc_mergesort);
 DEFINE_PUBLIC_ALIAS(strtonum, libc_strtonum);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_quicksort, libd_qsort_r);
 DEFINE_PUBLIC_ALIAS(DOS$qsort_r, libd_qsort_r);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(_quicksort, libc_qsort_r);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(qsort_r, libc_qsort_r);
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(mkostemp, libc_mkostemp);

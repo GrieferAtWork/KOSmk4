@@ -595,6 +595,8 @@ typedef __size_t rsize_t;
 [[decl_include("<hybrid/typecore.h>")]]
 [[preferred_fastbind, std, libc, kernel, pure, wunused]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCMP))]]
+[[alias("__gcc_bcmp")]]
+[[if(!defined(__KERNEL__)), export_as("__gcc_bcmp")]]
 int memcmp([[nonnull]] void const *s1,
            [[nonnull]] void const *s2, $size_t n_bytes) {
 	byte_t *p1 = (byte_t *)s1;

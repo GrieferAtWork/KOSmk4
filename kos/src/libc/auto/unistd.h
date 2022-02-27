@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74d9ce60 */
+/* HASH CRC-32:0x21706cc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -374,15 +374,15 @@ INTDEF int NOTHROW_RPC(LIBDCALL libd_usleep)(useconds_t useconds);
  * Sleep for `useconds' microseconds (1/1.000.000 seconds) */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_usleep)(useconds_t useconds);
 /* >> getwd(3)
- * Deprecated, alternate variant of `getcwd()'. It
+ * Deprecated, alternate variant  of `getcwd()'.  It
  * should be obvious why you shouldn't use this one.
- * And if it isn't, take a look at the arguments of
+ * And  if it isn't, take a look at the arguments of
  * this function, compared to `getcwd()' */
 INTDEF ATTR_DEPRECATED("Use getcwd()") NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_getwd)(char *buf);
 /* >> getwd(3)
- * Deprecated, alternate variant of `getcwd()'. It
+ * Deprecated, alternate variant  of `getcwd()'.  It
  * should be obvious why you shouldn't use this one.
- * And if it isn't, take a look at the arguments of
+ * And  if it isn't, take a look at the arguments of
  * this function, compared to `getcwd()' */
 INTDEF ATTR_DEPRECATED("Use getcwd()") NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_getwd)(char *buf);
 #endif /* !__KERNEL__ */

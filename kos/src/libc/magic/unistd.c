@@ -1673,7 +1673,7 @@ int fchdir($fd_t fd);
 @@THREAD[PID]->LEADER->GROUP_LEADER->PID
 @@When `pid' is ZERO(0), use `gettid()' for it instead
 [[wunused, decl_include("<bits/types.h>")]]
-[[export_alias("__getpgid", "__libc_getpgid")]]
+[[export_alias("__getpgid", "__libc_getpgid", "__bsd_getpgrp")]]
 [[section(".text.crt{|.dos}.sched.user")]]
 $pid_t getpgid($pid_t pid);
 

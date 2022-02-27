@@ -3570,8 +3570,11 @@ typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void
 }
 
 
-[[decl_include("<hybrid/typecore.h>")]]
+
+@@>> qsort_r(3)
+[[decl_include("<hybrid/typecore.h>"), alias("_quicksort")]]
 [[throws, kernel, section(".text.crt{|.dos}.utility.stdlib")]]
+[[if(!defined(__KERNEL__)), export_as("_quicksort")]] /* NOTE: `_quicksort' is the old libc4/5 name of this function. */
 [[throws, crt_dos_variant(callback(
 	cook: struct { auto compar = compar; auto arg = arg; },
 	wrap: (void const *a, void const *b, $cook *c): int { return (*c->compar)(a, b, c->arg); },

@@ -583,6 +583,51 @@ INTERN_FUNCTION(libd__wassert)
 END(libd__wassert)
 DEFINE_PUBLIC_ALIAS(DOS$_wassert, libd__wassert)
 
+
+
+.section ".text.crt.glibc.assert"
+INTERN_FUNCTION(libc___assert_perror_fail)
+	/* >> void __assert_perror_fail(int errnum, char const *file,
+	 * >>                           unsigned int line, char const *func) */
+	.cfi_startproc
+#ifdef __x86_64__
+	/* %R_sysvabi0P: int errnum
+	 * %R_sysvabi1P: char const *file
+	 * %R_sysvabi2P: unsigned int line
+	 * %R_sysvabi3P: char const *func */
+	pushP_cfi $(0)         /* aa_format */
+	pushP_cfi %R_sysvabi3P /* aa_func */
+	pushP_cfi %R_sysvabi2P /* aa_line */
+	pushP_cfi %R_sysvabi1P /* aa_file */
+	pushP_cfi %R_sysvabi0P /* aa_expr */
+	pushP_cfi Pn(5)(%Psp)  /* aa_state.kcs_rip */
+	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R_EX2(%Pax, Pn(6)) /* 6 = # of preceding `pushP_cfi' */
+	subP_imm_cfi SIZEOF_X86_64_VA_LIST_STRUCT, %Psp /* aa_args */
+#else /* __x86_64__ */
+	/* int errnum, char const *file, unsigned int line, char const *func */
+	pushP_cfi 0(%Psp)  /* RETURN_PC */
+	.cfi_rel_offset %Pip, 0
+	ASM_PUSH_KCPUSTATE_AFTER_PIP_CFI_R_EX(SIZEOF_POINTER)
+	movP   (SIZEOF_KCPUSTATE + Pn(1))(%Psp), %Pax /* char const *expr */
+	movP   %Pax, (SIZEOF_KCPUSTATE + Pn(0))(%Psp) /* aa_expr */
+	movP   (SIZEOF_KCPUSTATE + Pn(2))(%Psp), %Pax /* char const *file */
+	movP   %Pax, (SIZEOF_KCPUSTATE + Pn(1))(%Psp) /* aa_file */
+	movP   (SIZEOF_KCPUSTATE + Pn(3))(%Psp), %Pax /* unsigned int line */
+	movP   %Pax, (SIZEOF_KCPUSTATE + Pn(2))(%Psp) /* aa_line */
+	movP   (SIZEOF_KCPUSTATE + Pn(4))(%Psp), %Pax /* char const *func */
+	movP   %Pax, (SIZEOF_KCPUSTATE + Pn(3))(%Psp) /* aa_func */
+	movP   $(0), (SIZEOF_KCPUSTATE + Pn(4))(%Psp) /* aa_format */
+	pushP_cfi $(0)                                /* aa_args */
+#endif /* !__x86_64__ */
+
+	/* Call the high-level handler */
+	movP   %Psp, %R_fcall0P
+	INTERN(libc_assertion_failure_perror)
+	call   libc_assertion_failure_perror
+	.cfi_endproc
+END(libc___assert_perror_fail)
+DEFINE_PUBLIC_ALIAS(__assert_perror_fail, libc___assert_perror_fail)
+
 #endif /* !__KERNEL__ || __INTELLISENSE__ */
 
 #endif /* !GUARD_LIBC_HYBRID_ARCH_I386_ASSERT_S */

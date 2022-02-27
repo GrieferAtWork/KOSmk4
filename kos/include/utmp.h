@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5858b382 */
+/* HASH CRC-32:0xfae15e83 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -112,8 +112,13 @@ __CDECLARE_VOID_OPT(,__NOTHROW_NCX,endutent,(void),())
 __CDECLARE_OPT(__ATTR_NONNULL((1)),struct utmp *,__NOTHROW_RPC_KOS,getutid,(struct utmp const *__id),(__id))
 /* >> getutline(3), getutline_r(3) */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),struct utmp *,__NOTHROW_RPC_KOS,getutline,(struct utmp const *__line),(__line))
+#ifdef __CRT_HAVE_pututline
 /* >> pututline(3) */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),struct utmp *,__NOTHROW_RPC_KOS,pututline,(struct utmp const *__utmp_ptr),(__utmp_ptr))
+__CDECLARE(__ATTR_NONNULL((1)),struct utmp *,__NOTHROW_RPC_KOS,pututline,(struct utmp const *__utmp_ptr),(__utmp_ptr))
+#elif defined(__CRT_HAVE__pututline)
+/* >> pututline(3) */
+__CREDIRECT(__ATTR_NONNULL((1)),struct utmp *,__NOTHROW_RPC_KOS,pututline,(struct utmp const *__utmp_ptr),_pututline,(__utmp_ptr))
+#endif /* ... */
 
 #ifdef __USE_MISC
 /* >> getutent(3), getutent_r(3) */

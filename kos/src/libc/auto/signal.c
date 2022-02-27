@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4872e24 */
+/* HASH CRC-32:0x4e91a864 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -979,6 +979,7 @@ DEFINE_PUBLIC_ALIAS(__sigsetmask, libc_sigsetmask);
 DEFINE_PUBLIC_ALIAS(sigsetmask, libc_sigsetmask);
 DEFINE_PUBLIC_ALIAS(__siggetmask, libc_siggetmask);
 DEFINE_PUBLIC_ALIAS(siggetmask, libc_siggetmask);
+DEFINE_PUBLIC_ALIAS(__sigpause, libc_sigpause);
 DEFINE_PUBLIC_ALIAS(sigpause, libc_sigpause);
 DEFINE_PUBLIC_ALIAS(__xpg_sigpause, libc___xpg_sigpause);
 #endif /* !__KERNEL__ */
