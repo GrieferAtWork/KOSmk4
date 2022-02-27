@@ -25,6 +25,8 @@
 #ifndef __NO_FPU
 #include <hybrid/typecore.h>
 
+#include <asm/crt/math-libc_version.h>
+
 #include <libm/fdlibm.h>
 
 #ifdef __CC__
@@ -226,12 +228,40 @@ enum __libm_matherr {
 	__LIBM_KMATHERRL_EXPM1_UNDERFLOW  = __LIBM_KMATHERR_EXPM1_UNDERFLOW + __LIBM_KMATHERRL_FIRST
 };
 
+#ifndef ___IEEE_
+#define ___IEEE_  (-1) /* According to IEEE 754/IEEE 854. */
+#define ___SVID_  0    /* According to System V, release 4. */
+#define ___XOPEN_ 1    /* Nowadays also Unix98. */
+#define ___POSIX_ 2    /* ... */
+#define ___ISOC_  3    /* Actually this is ISO C99. */
+#endif /* !___IEEE_ */
+typedef enum {
+	__LIBM_IEEE  = ___IEEE_,  /* According to IEEE 754/IEEE 854. */
+	__LIBM_SVID  = ___SVID_,  /* According to System V, release 4. */
+	__LIBM_XOPEN = ___XOPEN_, /* Nowadays also Unix98. */
+	__LIBM_POSIX = ___POSIX_,
+	__LIBM_ISOC  = ___ISOC_, /* Actually this is ISO C99. */
+} __LIBM_LIB_VERSION_TYPE;
 
+
+
+#if defined(__CRT_KOS) && defined(__BUILDING_LIBC)
+#define __kernel_standard   libc___kernel_standard
+#define __kernel_standard_f libc___kernel_standard_f
+__INTDEF double __LIBCCALL libc___kernel_standard(double __arg1, double __arg2, double __retval, enum __libm_matherr __type);
+__INTDEF float __LIBCCALL libc___kernel_standard_f(float __arg1, float __arg2, float __retval, enum __libm_matherr __type);
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+#define __kernel_standard_l libc___kernel_standard_l
+__INTDEF __LONGDOUBLE __LIBCCALL libc___kernel_standard_l(__LONGDOUBLE __arg1, __LONGDOUBLE __arg2, __LONGDOUBLE __retval, enum __libm_matherr __type);
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#define __LIBM_LIB_VERSION libc___LIBM_GET_LIB_VERSION()
+__INTDEF __LIBM_LIB_VERSION_TYPE libc___LIBM_GET_LIB_VERSION(void);
+#else /* __CRT_KOS && __BUILDING_LIBC */
 __LIBM_LOCAL_FUNC(kernel_standard) double
 (__LIBCCALL __kernel_standard)(double __arg1, double __arg2,
                                double __retval, enum __libm_matherr __type) {
 	__COMPILER_IMPURE();
-	/* TODO */
+	/* Sorry, but we only implement `matherr(3)' handling in libc. */
 	(void)__arg1;
 	(void)__arg2;
 	(void)__retval;
@@ -243,7 +273,7 @@ __LIBM_LOCAL_FUNC(kernel_standard_f) float
 (__LIBCCALL __kernel_standard_f)(float __arg1, float __arg2,
                                  float __retval, enum __libm_matherr __type) {
 	__COMPILER_IMPURE();
-	/* TODO */
+	/* Sorry, but we only implement `matherr(3)' handling in libc. */
 	(void)__arg1;
 	(void)__arg2;
 	(void)__retval;
@@ -256,7 +286,7 @@ __LIBM_LOCAL_FUNC(kernel_standard_l) __LONGDOUBLE
 (__LIBCCALL __kernel_standard_l)(__LONGDOUBLE __arg1, __LONGDOUBLE __arg2,
                                  __LONGDOUBLE __retval, enum __libm_matherr __type) {
 	__COMPILER_IMPURE();
-	/* TODO */
+	/* Sorry, but we only implement `matherr(3)' handling in libc. */
 	(void)__arg1;
 	(void)__arg2;
 	(void)__retval;
@@ -265,22 +295,24 @@ __LIBM_LOCAL_FUNC(kernel_standard_l) __LONGDOUBLE
 }
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 
+#ifdef _LIB_VERSION
+/* User-provided override */
+#define __LIBM_LIB_VERSION _LIB_VERSION
+#elif defined(__CRT_HAVE__LIB_VERSION)
+/* Use libc configuration */
+__LIBC _LIB_VERSION_TYPE _LIB_VERSION;
+#define _LIB_VERSION       _LIB_VERSION
+#define __LIBM_LIB_VERSION _LIB_VERSION
+#else /* __CRT_HAVE__LIB_VERSION */
+/* Fallback: select most appropriate for caller's system. */
+#if defined(__unix__)
+#define __LIBM_LIB_VERSION __LIBM_POSIX
+#else /* ... */
+#define __LIBM_LIB_VERSION __LIBM_ISOC
+#endif /* !... */
+#endif /* __CRT_HAVE__LIB_VERSION */
 
-typedef enum {
-	__LIBM_IEEE  = -1, /* According to IEEE 754/IEEE 854. */
-	__LIBM_SVID  = 0,  /* According to System V, release 4. */
-	__LIBM_XOPEN = 1,  /* Nowadays also Unix98. */
-	__LIBM_POSIX = 2,
-	__LIBM_ISOC  = 3   /* Actually this is ISO C99. */
-} __LIBM_LIB_VERSION_TYPE;
-
-#define __LIBM_LIB_VERSION __LIBM_GET_LIB_VERSION()
-__LIBM_LOCAL_FUNC(_LIB_VERSION)
-__LIBM_LIB_VERSION_TYPE __LIBM_GET_LIB_VERSION(void) {
-	/* TODO */
-	__COMPILER_IMPURE();
-	return __LIBM_ISOC;
-}
+#endif /* !__CRT_KOS || !__BUILDING_LIBC */
 
 
 __DECL_END

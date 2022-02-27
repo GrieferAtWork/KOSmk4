@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f18e947 */
+/* HASH CRC-32:0x9e9b5b65 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -241,12 +241,12 @@ INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_tanl)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_cosh)(double x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_cosh)(double x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -261,22 +261,22 @@ INTDEF WUNUSED double NOTHROW(LIBCCALL libc_sinh)(double x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBDCALL libd_tanh)(double x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_tanh)(double x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 INTDEF WUNUSED float NOTHROW(LIBDCALL libd_coshf)(float x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 INTDEF WUNUSED float NOTHROW(LIBCCALL libc_coshf)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -291,22 +291,22 @@ INTDEF WUNUSED float NOTHROW(LIBCCALL libc_sinhf)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBDCALL libd_tanhf)(float x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_tanhf)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_coshl)(__LONGDOUBLE x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_coshl)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -321,102 +321,102 @@ INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_sinhl)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_tanhl)(__LONGDOUBLE x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_tanhl)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_acosh)(double x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_acosh)(double x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBDCALL libd_asinh)(double x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_asinh)(double x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_atanh)(double x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_atanh)(double x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 INTDEF WUNUSED float NOTHROW(LIBDCALL libd_acoshf)(float x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 INTDEF WUNUSED float NOTHROW(LIBCCALL libc_acoshf)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBDCALL libd_asinhf)(float x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_asinhf)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 INTDEF WUNUSED float NOTHROW(LIBDCALL libd_atanhf)(float x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 INTDEF WUNUSED float NOTHROW(LIBCCALL libc_atanhf)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_acoshl)(__LONGDOUBLE x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_acoshl)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_asinhl)(__LONGDOUBLE x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_asinhl)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_atanhl)(__LONGDOUBLE x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_atanhl)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -451,22 +451,22 @@ INTDEF WUNUSED double NOTHROW(LIBCCALL libc_ldexp)(double x, int exponent);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 INTDEF WUNUSED __DECL_SIMD_log double NOTHROW(LIBDCALL libd_log)(double x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 INTDEF WUNUSED __DECL_SIMD_log double NOTHROW(LIBCCALL libc_log)(double x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_log10)(double x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_log10)(double x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -511,22 +511,22 @@ INTDEF WUNUSED float NOTHROW(LIBCCALL libc_ldexpf)(float x, int exponent);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 INTDEF WUNUSED __DECL_SIMD_logf float NOTHROW(LIBDCALL libd_logf)(float x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 INTDEF WUNUSED __DECL_SIMD_logf float NOTHROW(LIBCCALL libc_logf)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 INTDEF WUNUSED float NOTHROW(LIBDCALL libd_log10f)(float x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 INTDEF WUNUSED float NOTHROW(LIBCCALL libc_log10f)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -571,22 +571,22 @@ INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_ldexpl)(__LONGDOUBLE x, int ex
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 INTDEF WUNUSED __DECL_SIMD_logl __LONGDOUBLE NOTHROW(LIBDCALL libd_logl)(__LONGDOUBLE x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 INTDEF WUNUSED __DECL_SIMD_logl __LONGDOUBLE NOTHROW(LIBCCALL libc_logl)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_log10l)(__LONGDOUBLE x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_log10l)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -761,12 +761,12 @@ INTDEF WUNUSED __DECL_SIMD_pow double NOTHROW(LIBCCALL libc_pow)(double x, doubl
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_sqrt)(double x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_sqrt)(double x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -781,12 +781,12 @@ INTDEF WUNUSED __DECL_SIMD_powf float NOTHROW(LIBCCALL libc_powf)(float x, float
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 INTDEF WUNUSED float NOTHROW(LIBDCALL libd_sqrtf)(float x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 INTDEF WUNUSED float NOTHROW(LIBCCALL libc_sqrtf)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -801,12 +801,12 @@ INTDEF WUNUSED __DECL_SIMD_powl __LONGDOUBLE NOTHROW(LIBCCALL libc_powl)(__LONGD
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_sqrtl)(__LONGDOUBLE x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_sqrtl)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -841,32 +841,32 @@ INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_hypotl)(__LONGDOUBLE x, __LONG
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBDCALL libd_cbrt)(double x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_cbrt)(double x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBDCALL libd_cbrtf)(float x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_cbrtf)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_cbrtl)(__LONGDOUBLE x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_cbrtl)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -1717,12 +1717,12 @@ INTDEF WUNUSED double NOTHROW(LIBCCALL libc_exp10)(double x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 INTDEF WUNUSED double NOTHROW(LIBDCALL libd_pow10)(double x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_pow10)(double x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -1747,12 +1747,12 @@ INTDEF WUNUSED float NOTHROW(LIBCCALL libc_exp10f)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 INTDEF WUNUSED float NOTHROW(LIBDCALL libd_pow10f)(float x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 INTDEF WUNUSED float NOTHROW(LIBCCALL libc_pow10f)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -1777,12 +1777,12 @@ INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_exp10l)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd_pow10l)(__LONGDOUBLE x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_pow10l)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -2051,32 +2051,32 @@ INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_ynl)(int n, __LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 INTDEF WUNUSED NONNULL((2)) double NOTHROW_NCX(LIBDCALL libd_lgamma_r)(double x, int *signgamp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 INTDEF WUNUSED NONNULL((2)) double NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x, int *signgamp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 INTDEF WUNUSED NONNULL((2)) float NOTHROW_NCX(LIBDCALL libd_lgammaf_r)(float x, int *signgamp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 INTDEF WUNUSED NONNULL((2)) float NOTHROW_NCX(LIBCCALL libc_lgammaf_r)(float x, int *signgamp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 INTDEF WUNUSED NONNULL((2)) __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_lgammal_r)(__LONGDOUBLE x, int *signgamp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 INTDEF WUNUSED NONNULL((2)) __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_lgammal_r)(__LONGDOUBLE x, int *signgamp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

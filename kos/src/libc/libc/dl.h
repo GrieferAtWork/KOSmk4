@@ -68,7 +68,7 @@ DECL_BEGIN
  * `dlsym(RTLD_DEFAULT, "dlsym")' to get dlsym itself, which obviously
  * wouldn't work)
  *
- * However, in practice these are still some other relocations that we
+ * However, in practice there are still some other relocations that we
  * can't easily get rid of, since those are made by compiler-generated
  * function calls:
  *   - __stack_chk_guard  (complete waste: Defined by libc.so itself; !!!Not even a lazy relocation!!!)
@@ -95,6 +95,7 @@ DECL_BEGIN
 #define LIBC_DLTLSADDR2_SECTION    ".crt.sched.pthread" /* Used by pthread */
 #define LIBC_DLTLSALLOC_SECTION    ".crt.sched.pthread" /* Used by pthread */
 #define LIBC_DLTLSFREE_SECTION     ".crt.sched.pthread" /* Used by pthread */
+#define LIBC_DLADDR_SECTION        ".crt.math.math"     /* Used for <math.h> -- `struct exception::name' */
 
 typedef WUNUSED void *(__DLFCN_CC *PDLOPEN)(char const *filename, int mode) /*THROWS(...)*/;
 typedef NONNULL((1)) int (__DLFCN_CC *PDLCLOSE)(void *handle) /*THROWS(...)*/;
@@ -116,7 +117,7 @@ typedef WUNUSED void * /*NOTHROW*/ (__DLFCN_CC *PDLTLSALLOC)(size_t num_bytes, s
                                                              void (LIBCCALL *perthread_fini)(void *arg, void *base),
                                                              void *perthread_callback_arg);
 typedef NONNULL((1)) int (__DLFCN_CC *PDLTLSFREE)(void *tls_handle) /*THROWS(...)*/;
-
+typedef NONNULL((2)) int /*NOTHROW_NCX*/(__DLFCN_CC *PDLADDR)(void const *address, Dl_info *info);
 
 
 INTDEF ATTR_RETNONNULL WUNUSED PDLOPEN NOTHROW_NCX(LIBCCALL libc_get_dlopen)(void);
@@ -135,6 +136,7 @@ INTDEF ATTR_RETNONNULL WUNUSED PDLTLSADDR NOTHROW_NCX(LIBCCALL libc_get_dltlsadd
 INTDEF ATTR_RETNONNULL WUNUSED PDLTLSADDR2 NOTHROW_NCX(LIBCCALL libc_get_dltlsaddr2)(void);
 INTDEF ATTR_RETNONNULL WUNUSED PDLTLSALLOC NOTHROW_NCX(LIBCCALL libc_get_dltlsalloc)(void);
 INTDEF ATTR_RETNONNULL WUNUSED PDLTLSFREE NOTHROW_NCX(LIBCCALL libc_get_dltlsfree)(void);
+INTDEF ATTR_RETNONNULL WUNUSED PDLADDR NOTHROW_NCX(LIBCCALL libc_get_dladdr)(void);
 
 #define dlopen(filename, mode)              (*libc_get_dlopen())(filename, mode)
 #define dlclose(handle)                     (*libc_get_dlclose())(handle)
@@ -152,6 +154,7 @@ INTDEF ATTR_RETNONNULL WUNUSED PDLTLSFREE NOTHROW_NCX(LIBCCALL libc_get_dltlsfre
 #define dltlsaddr2(tls_handle, tls_segment) (*libc_get_dltlsaddr2())(tls_handle, tls_segment)
 #define dltlsalloc(...)                     (*libc_get_dltlsalloc())(__VA_ARGS__)
 #define dltlsfree(tls_handle)               (*libc_get_dltlsfree())(tls_handle)
+#define dladdr(address, info)               (*libc_get_dladdr())(address, info)
 #endif /* HAVE_LAZY_LIBDL_RELOCATIONS */
 
 #endif /* __CC__ */

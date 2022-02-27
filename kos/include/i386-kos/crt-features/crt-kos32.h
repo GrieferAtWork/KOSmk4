@@ -272,6 +272,7 @@
 #define __CRT_HAVE__IO_vfscanf
 #define __CRT_HAVE__IO_vsprintf
 #define __CRT_HAVE__IO_vsscanf
+#define __CRT_HAVE__LIB_VERSION
 #define __CRT_HAVE__Strftime
 #define __CRT_HAVE__Unwind_Backtrace
 #define __CRT_HAVE__Unwind_DeleteException
@@ -3045,6 +3046,7 @@
 #define __CRT_HAVE_malloc_trim
 #define __CRT_HAVE_malloc_usable_size
 #define __CRT_HAVE_mallopt
+#define __CRT_HAVE_matherr
 #define __CRT_HAVE_mblen
 #define __CRT_HAVE_mbrlen
 #define __CRT_HAVE_mbrtoc16

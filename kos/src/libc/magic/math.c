@@ -427,7 +427,7 @@ double tan(double x) {
 %(std, c)/* Hyperbolic functions. */
 
 @@>> coshf(3), cosh(3), coshl(3)
-@@Hyperbolic cosine of `x'
+@@Hyperbolic   cosine   of   `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__cosh")]]
 [[impl_include("<libm/finite.h>", "<libm/cosh.h>", "<libm/matherr.h>")]]
 [[requires_include("<ieee754.h>")]]
@@ -459,7 +459,7 @@ double sinh(double x) {
 }
 
 @@>> tanhf(3), tanh(3), tanhl(3)
-@@Hyperbolic tangent of `x'
+@@Hyperbolic   tangent   of  `x'
 [[std, wunused, const, nothrow, crtbuiltin, export_alias("__tanh")]]
 [[impl_include("<libm/tanh.h>")]]
 [[requires_include("<ieee754.h>")]]
@@ -483,7 +483,7 @@ double tanh(double x) {
 %(std, c, ccompat)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 
 @@>> acoshf(3), acosh(3), acoshl(3)
-@@Hyperbolic arc cosine of `x'
+@@Hyperbolic  arc  cosine  of   `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__acosh")]]
 [[impl_include("<libm/fcomp.h>", "<libm/matherr.h>")]]
 [[impl_include("<libm/nan.h>", "<libm/acosh.h>")]]
@@ -499,7 +499,7 @@ double acosh(double x) {
 }
 
 @@>> asinhf(3), asinh(3), asinhl(3)
-@@Hyperbolic arc sine of `x'
+@@Hyperbolic  arc   sine   of   `x'
 [[std, wunused, const, nothrow, crtbuiltin, export_alias("__asinh")]]
 [[impl_include("<libm/asinh.h>")]]
 [[requires_include("<ieee754.h>")]]
@@ -511,7 +511,7 @@ double asinh(double x) {
 }
 
 @@>> atanhf(3), atanh(3), atanhl(3)
-@@Hyperbolic arc tangent of `x'
+@@Hyperbolic  arc  tangent  of  `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__atanh")]]
 [[impl_include("<libm/fcomp.h>", "<libm/fabs.h>")]]
 [[impl_include("<bits/math-constants.h>", "<libm/matherr.h>")]]
@@ -609,7 +609,7 @@ double ldexp(double x, int exponent) {
 }
 
 @@>> logf(3), log(3), logl(3)
-@@Natural logarithm of `x'
+@@Natural  logarithm  of  `x'
 [[attribute("__DECL_SIMD_log"), decl_include("<bits/crt/math-vector.h>")]]
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__log")]]
 [[requires_include("<ieee754.h>")]]
@@ -635,7 +635,7 @@ double log(double x) {
 
 
 @@>> log10f(3), log10(3), log10l(3)
-@@Base-ten logarithm of `x'
+@@Base-ten    logarithm    of   `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__log10")]]
 [[requires_include("<ieee754.h>")]]
 [[requires($has_function(feraiseexcept) &&
@@ -886,7 +886,7 @@ double pow(double x, double y) {
 
 
 @@>> sqrtf(3), sqrt(3), sqrtl(3)
-@@Return the square root of `x'
+@@Return the square root of  `x'
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__sqrt")]]
 [[impl_include("<libm/fcomp.h>", "<libm/nan.h>")]]
 [[impl_include("<libm/matherr.h>", "<libm/sqrt.h>")]]
@@ -938,7 +938,7 @@ double hypot(double x, double y) {
 %(std, c, ccompat)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 
 @@>> cbrtf(3), cbrt(3), cbrtl(3)
-@@Return the cube root of `x'
+@@Return  the  cube root  of `x'
 [[std, const, wunused, nothrow, crtbuiltin, export_alias("__cbrt")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/cbrt.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
@@ -1810,7 +1810,7 @@ double exp10(double x) {
 }
 
 @@>> pow10f(3), pow10(3), pow10l(3)
-@@Another name occasionally used
+@@Another  name  occasionally  used
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__pow10")]]
 [[requires_function(pow)]]
 double pow10(double x) {
@@ -2162,7 +2162,7 @@ gammal(*) = lgammal;
 
 %#ifdef __USE_MISC
 @@>> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
-@@Reentrant version of `lgamma(3)'
+@@Reentrant    version    of     `lgamma(3)'
 [[wunused, crtbuiltin, export_alias("__lgamma_r")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/lgamma.h>")]]
 [[impl_include("<libm/matherr.h>", "<libm/finite.h>", "<libm/floor.h>")]]
@@ -3349,15 +3349,22 @@ typedef enum {
 }%[pop_macro]%{
 
 /* One of `_LIB_VERSION_TYPE': The current math error behavior */
+#ifndef _LIB_VERSION
 #ifdef __CRT_HAVE__LIB_VERSION
-}%[push_macro @undef { _LIB_VERSION }]%{
 __LIBC _LIB_VERSION_TYPE _LIB_VERSION;
-}%[pop_macro]%{
+#define _LIB_VERSION _LIB_VERSION
 #endif /* __CRT_HAVE__LIB_VERSION */
+#endif /* !_LIB_VERSION */
 #endif /* ... */
 
 
-/* With SVID error handling, `matherr(3)' gets called with struct on error */
+/* With SVID error handling, `matherr(3)' gets called with this struct on error:
+ * >> int matherr(struct exception *exc) {
+ * >>     ...
+ * >> }
+ * Yes: programs must simply define this function (with PUBLIC visibility), and
+ * libc  will detect that  override and call their  function to facilitate math
+ * error handling. */
 #ifdef __cplusplus
 struct __exception
 #else /* __cplusplus */
@@ -3366,14 +3373,14 @@ struct exception
 #endif /* !__cplusplus */
 }%[push_macro @undef { type name arg1 arg2 retval err }]%{
 {
-	int    type;
-	char  *name;
-	double arg1;
-	double arg2;
-	double retval;
-	int    err;
+	int                     type;   /* Exception type (one of `__MATH_EXCEPT_*'; s.a. the unescaped macros below) */
+	char __KOS_FIXED_CONST *name;   /* [1..1] Math function name (e.g. "powf") */
+	double                  arg1;   /* First argument */
+	double                  arg2;   /* Second argument */
+	double                  retval; /* [in|out] Return value */
+	__errno_t               err;    /* [out] If non-zero, set as errno when `matherr(3)' returns `0' */
 #ifdef __CRT_DOS
-	int    __pad;
+	int                   __pad;    /* ... */
 #endif /* __CRT_DOS */
 };
 }%[pop_macro]%{

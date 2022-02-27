@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68d91632 */
+/* HASH CRC-32:0x716fefaf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -427,7 +427,7 @@ NOTHROW(LIBCCALL libc_tanl)(__LONGDOUBLE x) {
 #include <libm/cosh.h>
 #include <libm/matherr.h>
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_cosh)(double x) {
 	double result = __LIBM_MATHFUN(cosh, x);
@@ -451,7 +451,7 @@ NOTHROW(LIBCCALL libc_sinh)(double x) {
 }
 #include <libm/tanh.h>
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_tanh)(double x) {
 	return __LIBM_MATHFUN(tanh, x);
@@ -460,7 +460,7 @@ NOTHROW(LIBCCALL libc_tanh)(double x) {
 #include <libm/cosh.h>
 #include <libm/matherr.h>
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_coshf)(float x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
@@ -496,7 +496,7 @@ NOTHROW(LIBCCALL libc_sinhf)(float x) {
 }
 #include <libm/tanh.h>
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_tanhf)(float x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
@@ -511,7 +511,7 @@ NOTHROW(LIBCCALL libc_tanhf)(float x) {
 #include <libm/cosh.h>
 #include <libm/matherr.h>
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_coshl)(__LONGDOUBLE x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
@@ -547,7 +547,7 @@ NOTHROW(LIBCCALL libc_sinhl)(__LONGDOUBLE x) {
 }
 #include <libm/tanh.h>
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_tanhl)(__LONGDOUBLE x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
@@ -563,7 +563,7 @@ NOTHROW(LIBCCALL libc_tanhl)(__LONGDOUBLE x) {
 #include <libm/nan.h>
 #include <libm/acosh.h>
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_acosh)(double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
@@ -573,7 +573,7 @@ NOTHROW(LIBCCALL libc_acosh)(double x) {
 }
 #include <libm/asinh.h>
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_asinh)(double x) {
 	return __LIBM_MATHFUN(asinh, x);
@@ -585,7 +585,7 @@ NOTHROW(LIBCCALL libc_asinh)(double x) {
 #include <libm/nan.h>
 #include <libm/atanh.h>
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_atanh)(double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
@@ -600,7 +600,7 @@ NOTHROW(LIBCCALL libc_atanh)(double x) {
 #include <libm/nan.h>
 #include <libm/acosh.h>
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_acoshf)(float x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
@@ -616,7 +616,7 @@ NOTHROW(LIBCCALL libc_acoshf)(float x) {
 }
 #include <libm/asinh.h>
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_asinhf)(float x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
@@ -634,7 +634,7 @@ NOTHROW(LIBCCALL libc_asinhf)(float x) {
 #include <libm/nan.h>
 #include <libm/atanh.h>
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_atanhf)(float x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
@@ -655,7 +655,7 @@ NOTHROW(LIBCCALL libc_atanhf)(float x) {
 #include <libm/nan.h>
 #include <libm/acosh.h>
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_acoshl)(__LONGDOUBLE x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
@@ -671,7 +671,7 @@ NOTHROW(LIBCCALL libc_acoshl)(__LONGDOUBLE x) {
 }
 #include <libm/asinh.h>
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_asinhl)(__LONGDOUBLE x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
@@ -689,7 +689,7 @@ NOTHROW(LIBCCALL libc_asinhl)(__LONGDOUBLE x) {
 #include <libm/nan.h>
 #include <libm/atanh.h>
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_atanhl)(__LONGDOUBLE x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
@@ -768,7 +768,7 @@ NOTHROW(LIBCCALL libc_ldexp)(double x,
 #include <libm/fcomp.h>
 #include <libm/matherr.h>
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_log double
 NOTHROW(LIBCCALL libc_log)(double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2(islessequal, x, -1.0)) {
@@ -789,7 +789,7 @@ NOTHROW(LIBCCALL libc_log)(double x) {
 #include <libm/fcomp.h>
 #include <libm/matherr.h>
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_log10)(double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2(islessequal, x, 0.0)) {
@@ -899,7 +899,7 @@ NOTHROW(LIBCCALL libc_ldexpf)(float x,
 #include <libm/fcomp.h>
 #include <libm/matherr.h>
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_logf float
 NOTHROW(LIBCCALL libc_logf)(float x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
@@ -927,7 +927,7 @@ NOTHROW(LIBCCALL libc_logf)(float x) {
 #include <libm/fcomp.h>
 #include <libm/matherr.h>
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_log10f)(float x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
@@ -1051,7 +1051,7 @@ NOTHROW(LIBCCALL libc_ldexpl)(__LONGDOUBLE x,
 #include <libm/fcomp.h>
 #include <libm/matherr.h>
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_logl __LONGDOUBLE
 NOTHROW(LIBCCALL libc_logl)(__LONGDOUBLE x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
@@ -1079,7 +1079,7 @@ NOTHROW(LIBCCALL libc_logl)(__LONGDOUBLE x) {
 #include <libm/fcomp.h>
 #include <libm/matherr.h>
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_log10l)(__LONGDOUBLE x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
@@ -1511,7 +1511,7 @@ NOTHROW(LIBCCALL libc_pow)(double x,
 #include <libm/matherr.h>
 #include <libm/sqrt.h>
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_sqrt)(double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2(isless, x, 0.0))
@@ -1587,7 +1587,7 @@ NOTHROW(LIBCCALL libc_powf)(float x,
 #include <libm/matherr.h>
 #include <libm/sqrt.h>
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_sqrtf)(float x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
@@ -1669,7 +1669,7 @@ NOTHROW(LIBCCALL libc_powl)(__LONGDOUBLE x,
 #include <libm/matherr.h>
 #include <libm/sqrt.h>
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_sqrtl)(__LONGDOUBLE x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
@@ -1738,14 +1738,14 @@ NOTHROW(LIBCCALL libc_hypotl)(__LONGDOUBLE x,
 }
 #include <libm/cbrt.h>
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_cbrt)(double x) {
 	return __LIBM_MATHFUN(cbrt, x);
 }
 #include <libm/cbrt.h>
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_cbrtf)(float x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
@@ -1758,7 +1758,7 @@ NOTHROW(LIBCCALL libc_cbrtf)(float x) {
 }
 #include <libm/cbrt.h>
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_cbrtl)(__LONGDOUBLE x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
@@ -3042,7 +3042,7 @@ NOTHROW(LIBCCALL libc_exp10)(double x) {
 	return result;
 }
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_pow10)(double x) {
 	return libc_pow(10.0, x);
@@ -3084,7 +3084,7 @@ NOTHROW(LIBCCALL libc_exp10f)(float x) {
 	return result;
 }
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_pow10f)(float x) {
 #if defined(__CRT_HAVE_powf) || defined(__CRT_HAVE___powf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
@@ -3134,7 +3134,7 @@ NOTHROW(LIBCCALL libc_exp10l)(__LONGDOUBLE x) {
 	return result;
 }
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_pow10l)(__LONGDOUBLE x) {
 #if defined(__CRT_HAVE_powl) || defined(__CRT_HAVE___powl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
@@ -3708,7 +3708,7 @@ NOTHROW(LIBCCALL libc_ynl)(int n,
 #include <libm/finite.h>
 #include <libm/floor.h>
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((2)) double
 NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x,
                                     int *signgamp) {
@@ -3727,7 +3727,7 @@ NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x,
 #include <libm/finite.h>
 #include <libm/floor.h>
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((2)) float
 NOTHROW_NCX(LIBCCALL libc_lgammaf_r)(float x,
                                      int *signgamp) {
@@ -3752,7 +3752,7 @@ NOTHROW_NCX(LIBCCALL libc_lgammaf_r)(float x,
 #include <libm/finite.h>
 #include <libm/floor.h>
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((2)) __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_lgammal_r)(__LONGDOUBLE x,
                                      int *signgamp) {

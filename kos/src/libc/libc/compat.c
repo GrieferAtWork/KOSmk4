@@ -1030,10 +1030,11 @@ libd____mb_cur_max_l_func(locale_t locale) {
 /* _setusermatherr()                                                    */
 /************************************************************************/
 struct _exception;
-typedef int(LIBDCALL *_UserMathErrorFunctionPointer)(struct _exception *);
+typedef int (LIBDCALL *_UserMathErrorFunctionPointer)(struct _exception *);
 DEFINE_PUBLIC_ALIAS(DOS$__setusermatherr, libd___setusermatherr);
 INTERN ATTR_SECTION(".text.crt.dos.application.init") void LIBDCALL
 libd___setusermatherr(_UserMathErrorFunctionPointer func) {
+	/* TODO: Integrate into `INTDEF LPMATHERR libc_pdyn_matherr;' */
 	CRT_UNIMPLEMENTEDF("DOS$__setusermatherr(%p)\n", func);
 }
 

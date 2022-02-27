@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f81c4dd */
+/* HASH CRC-32:0x4c3b219e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1116,22 +1116,22 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(tanl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNU
 /* Hyperbolic functions. */
 #if __has_builtin(__builtin_cosh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cosh)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CEIDECLARE(__ATTR_WUNUSED,double,__NOTHROW,cosh,(double __x),{ return __builtin_cosh(__x); })
 #elif defined(__CRT_HAVE_cosh)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,cosh,(double __x),(__x))
 #elif defined(__CRT_HAVE___cosh)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,cosh,(double __x),__cosh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/cosh.h>
 __NAMESPACE_STD_BEGIN
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cosh, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL cosh)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cosh))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_sinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sinh)
@@ -1156,42 +1156,42 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sinh, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNU
 #endif /* ... */
 #if __has_builtin(__builtin_tanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanh)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,tanh,(double __x),{ return __builtin_tanh(__x); })
 #elif defined(__CRT_HAVE_tanh)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,tanh,(double __x),(__x))
 #elif defined(__CRT_HAVE___tanh)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,tanh,(double __x),__tanh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/tanh.h>
 __NAMESPACE_STD_BEGIN
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tanh, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL tanh)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanh))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_coshf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_coshf)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CEIDECLARE(__ATTR_WUNUSED,float,__NOTHROW,coshf,(float __x),{ return __builtin_coshf(__x); })
 #elif defined(__CRT_HAVE_coshf)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,coshf,(float __x),(__x))
 #elif defined(__CRT_HAVE___coshf)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,coshf,(float __x),__coshf,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/coshf.h>
 __NAMESPACE_STD_BEGIN
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(coshf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL coshf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(coshf))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_sinhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sinhf)
@@ -1216,43 +1216,43 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sinhf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUN
 #endif /* ... */
 #if __has_builtin(__builtin_tanhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanhf)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,tanhf,(float __x),{ return __builtin_tanhf(__x); })
 #elif defined(__CRT_HAVE_tanhf)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,tanhf,(float __x),(__x))
 #elif defined(__CRT_HAVE___tanhf)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,tanhf,(float __x),__tanhf,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/tanhf.h>
 __NAMESPACE_STD_BEGIN
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tanhf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL tanhf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhf))(__x); })
 #endif /* ... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_coshl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_coshl)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CEIDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,coshl,(__LONGDOUBLE __x),{ return __builtin_coshl(__x); })
 #elif defined(__CRT_HAVE_coshl)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,coshl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___coshl)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,coshl,(__LONGDOUBLE __x),__coshl,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/coshl.h>
 __NAMESPACE_STD_BEGIN
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(coshl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL coshl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(coshl))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_sinhl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sinhl)
@@ -1277,22 +1277,22 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sinhl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUN
 #endif /* ... */
 #if __has_builtin(__builtin_tanhl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanhl)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanhl,(__LONGDOUBLE __x),{ return __builtin_tanhl(__x); })
 #elif defined(__CRT_HAVE_tanhl)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanhl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___tanhl)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanhl,(__LONGDOUBLE __x),__tanhl,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/tanhl.h>
 __NAMESPACE_STD_BEGIN
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tanhl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL tanhl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhl))(__x); })
 #endif /* ... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -1300,183 +1300,183 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(tanhl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CON
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 #if __has_builtin(__builtin_acosh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acosh)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CEIDECLARE(__ATTR_WUNUSED,double,__NOTHROW,acosh,(double __x),{ return __builtin_acosh(__x); })
 #elif defined(__CRT_HAVE_acosh)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,acosh,(double __x),(__x))
 #elif defined(__CRT_HAVE___acosh)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,acosh,(double __x),__acosh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/acosh.h>
 __NAMESPACE_STD_BEGIN
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(acosh, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL acosh)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(acosh))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_asinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinh)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,asinh,(double __x),{ return __builtin_asinh(__x); })
 #elif defined(__CRT_HAVE_asinh)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,asinh,(double __x),(__x))
 #elif defined(__CRT_HAVE___asinh)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,asinh,(double __x),__asinh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/asinh.h>
 __NAMESPACE_STD_BEGIN
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(asinh, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL asinh)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinh))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_atanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanh)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CEIDECLARE(__ATTR_WUNUSED,double,__NOTHROW,atanh,(double __x),{ return __builtin_atanh(__x); })
 #elif defined(__CRT_HAVE_atanh)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,atanh,(double __x),(__x))
 #elif defined(__CRT_HAVE___atanh)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,atanh,(double __x),__atanh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/atanh.h>
 __NAMESPACE_STD_BEGIN
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(atanh, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL atanh)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanh))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_acoshf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acoshf)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CEIDECLARE(__ATTR_WUNUSED,float,__NOTHROW,acoshf,(float __x),{ return __builtin_acoshf(__x); })
 #elif defined(__CRT_HAVE_acoshf)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,acoshf,(float __x),(__x))
 #elif defined(__CRT_HAVE___acoshf)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,acoshf,(float __x),__acoshf,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/acoshf.h>
 __NAMESPACE_STD_BEGIN
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(acoshf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL acoshf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(acoshf))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_asinhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinhf)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,asinhf,(float __x),{ return __builtin_asinhf(__x); })
 #elif defined(__CRT_HAVE_asinhf)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,asinhf,(float __x),(__x))
 #elif defined(__CRT_HAVE___asinhf)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,asinhf,(float __x),__asinhf,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/asinhf.h>
 __NAMESPACE_STD_BEGIN
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(asinhf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL asinhf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinhf))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_atanhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanhf)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CEIDECLARE(__ATTR_WUNUSED,float,__NOTHROW,atanhf,(float __x),{ return __builtin_atanhf(__x); })
 #elif defined(__CRT_HAVE_atanhf)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,atanhf,(float __x),(__x))
 #elif defined(__CRT_HAVE___atanhf)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atanhf,(float __x),__atanhf,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/atanhf.h>
 __NAMESPACE_STD_BEGIN
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(atanhf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL atanhf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanhf))(__x); })
 #endif /* ... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_acoshl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acoshl)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CEIDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acoshl,(__LONGDOUBLE __x),{ return __builtin_acoshl(__x); })
 #elif defined(__CRT_HAVE_acoshl)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acoshl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___acoshl)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acoshl,(__LONGDOUBLE __x),__acoshl,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/acoshl.h>
 __NAMESPACE_STD_BEGIN
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(acoshl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL acoshl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(acoshl))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_asinhl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinhl)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinhl,(__LONGDOUBLE __x),{ return __builtin_asinhl(__x); })
 #elif defined(__CRT_HAVE_asinhl)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinhl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___asinhl)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinhl,(__LONGDOUBLE __x),__asinhl,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/asinhl.h>
 __NAMESPACE_STD_BEGIN
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(asinhl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL asinhl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinhl))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_atanhl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanhl)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CEIDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanhl,(__LONGDOUBLE __x),{ return __builtin_atanhl(__x); })
 #elif defined(__CRT_HAVE_atanhl)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanhl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___atanhl)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanhl,(__LONGDOUBLE __x),__atanhl,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/atanhl.h>
 __NAMESPACE_STD_BEGIN
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(atanhl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL atanhl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanhl))(__x); })
 #endif /* ... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -1545,42 +1545,42 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ldexp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUN
 #endif /* ... */
 #if __has_builtin(__builtin_log) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CEIDECLARE(__ATTR_WUNUSED __DECL_SIMD_log,double,__NOTHROW,log,(double __x),{ return __builtin_log(__x); })
 #elif defined(__CRT_HAVE_log)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_log,double,__NOTHROW,log,(double __x),(__x))
 #elif defined(__CRT_HAVE___log)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_log,double,__NOTHROW,log,(double __x),__log,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/log.h>
 __NAMESPACE_STD_BEGIN
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(log, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __DECL_SIMD_log double __NOTHROW(__LIBCCALL log)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(log))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_log10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log10)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CEIDECLARE(__ATTR_WUNUSED,double,__NOTHROW,log10,(double __x),{ return __builtin_log10(__x); })
 #elif defined(__CRT_HAVE_log10)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,log10,(double __x),(__x))
 #elif defined(__CRT_HAVE___log10)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,log10,(double __x),__log10,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/log10.h>
 __NAMESPACE_STD_BEGIN
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(log10, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL log10)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(log10))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_modf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_modf)
@@ -1665,42 +1665,42 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ldexpf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #endif /* ... */
 #if __has_builtin(__builtin_logf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_logf)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CEIDECLARE(__ATTR_WUNUSED __DECL_SIMD_logf,float,__NOTHROW,logf,(float __x),{ return __builtin_logf(__x); })
 #elif defined(__CRT_HAVE_logf)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_logf,float,__NOTHROW,logf,(float __x),(__x))
 #elif defined(__CRT_HAVE___logf)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logf,float,__NOTHROW,logf,(float __x),__logf,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/logf.h>
 __NAMESPACE_STD_BEGIN
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(logf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __DECL_SIMD_logf float __NOTHROW(__LIBCCALL logf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(logf))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_log10f) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log10f)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CEIDECLARE(__ATTR_WUNUSED,float,__NOTHROW,log10f,(float __x),{ return __builtin_log10f(__x); })
 #elif defined(__CRT_HAVE_log10f)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,log10f,(float __x),(__x))
 #elif defined(__CRT_HAVE___log10f)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,log10f,(float __x),__log10f,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/log10f.h>
 __NAMESPACE_STD_BEGIN
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(log10f, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL log10f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(log10f))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_modff) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_modff)
@@ -1786,42 +1786,42 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ldexpl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #endif /* ... */
 #if __has_builtin(__builtin_logl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_logl)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CEIDECLARE(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,logl,(__LONGDOUBLE __x),{ return __builtin_logl(__x); })
 #elif defined(__CRT_HAVE_logl)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,logl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___logl)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,logl,(__LONGDOUBLE __x),__logl,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/logl.h>
 __NAMESPACE_STD_BEGIN
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(logl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __DECL_SIMD_logl __LONGDOUBLE __NOTHROW(__LIBCCALL logl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(logl))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_log10l) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log10l)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CEIDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log10l,(__LONGDOUBLE __x),{ return __builtin_log10l(__x); })
 #elif defined(__CRT_HAVE_log10l)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log10l,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___log10l)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log10l,(__LONGDOUBLE __x),__log10l,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/log10l.h>
 __NAMESPACE_STD_BEGIN
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(log10l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL log10l)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(log10l))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_modfl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_modfl)
@@ -2183,22 +2183,22 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pow, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUS
 #endif /* ... */
 #if __has_builtin(__builtin_sqrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sqrt)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CEIDECLARE(__ATTR_WUNUSED,double,__NOTHROW,sqrt,(double __x),{ return __builtin_sqrt(__x); })
 #elif defined(__CRT_HAVE_sqrt)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,sqrt,(double __x),(__x))
 #elif defined(__CRT_HAVE___sqrt)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,sqrt,(double __x),__sqrt,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/sqrt.h>
 __NAMESPACE_STD_BEGIN
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sqrt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL sqrt)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sqrt))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_powf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_powf)
@@ -2223,22 +2223,22 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(powf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNU
 #endif /* ... */
 #if __has_builtin(__builtin_sqrtf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sqrtf)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CEIDECLARE(__ATTR_WUNUSED,float,__NOTHROW,sqrtf,(float __x),{ return __builtin_sqrtf(__x); })
 #elif defined(__CRT_HAVE_sqrtf)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,sqrtf,(float __x),(__x))
 #elif defined(__CRT_HAVE___sqrtf)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,sqrtf,(float __x),__sqrtf,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/sqrtf.h>
 __NAMESPACE_STD_BEGIN
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sqrtf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL sqrtf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sqrtf))(__x); })
 #endif /* ... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -2264,22 +2264,22 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(powl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNU
 #endif /* ... */
 #if __has_builtin(__builtin_sqrtl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sqrtl)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CEIDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sqrtl,(__LONGDOUBLE __x),{ return __builtin_sqrtl(__x); })
 #elif defined(__CRT_HAVE_sqrtl)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sqrtl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___sqrtl)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sqrtl,(__LONGDOUBLE __x),__sqrtl,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/sqrtl.h>
 __NAMESPACE_STD_BEGIN
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sqrtl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL sqrtl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sqrtl))(__x); })
 #endif /* ... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -2352,63 +2352,63 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(hypotl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 #if __has_builtin(__builtin_cbrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cbrt)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,cbrt,(double __x),{ return __builtin_cbrt(__x); })
 #elif defined(__CRT_HAVE_cbrt)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,cbrt,(double __x),(__x))
 #elif defined(__CRT_HAVE___cbrt)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,cbrt,(double __x),__cbrt,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/cbrt.h>
 __NAMESPACE_STD_BEGIN
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cbrt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL cbrt)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cbrt))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_cbrtf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cbrtf)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,cbrtf,(float __x),{ return __builtin_cbrtf(__x); })
 #elif defined(__CRT_HAVE_cbrtf)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,cbrtf,(float __x),(__x))
 #elif defined(__CRT_HAVE___cbrtf)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,cbrtf,(float __x),__cbrtf,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/cbrtf.h>
 __NAMESPACE_STD_BEGIN
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cbrtf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL cbrtf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cbrtf))(__x); })
 #endif /* ... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_cbrtl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cbrtl)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrtl,(__LONGDOUBLE __x),{ return __builtin_cbrtl(__x); })
 #elif defined(__CRT_HAVE_cbrtl)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrtl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___cbrtl)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrtl,(__LONGDOUBLE __x),__cbrtl,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/cbrtl.h>
 __NAMESPACE_STD_BEGIN
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cbrtl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL cbrtl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cbrtl))(__x); })
 #endif /* ... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -4678,15 +4678,15 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL tan)(fl
 #endif /* ... */
 #if __has_builtin(__builtin_coshf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_coshf)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,cosh,(float __x),coshf,{ return __builtin_coshf(__x); })
 #elif defined(__CRT_HAVE_coshf)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,cosh,(float __x),coshf,(__x))
 #elif defined(__CRT_HAVE___coshf)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,cosh,(float __x),__coshf,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
@@ -4695,7 +4695,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL cosh)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(coshf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_sinhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sinhf)
@@ -4722,15 +4722,15 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL sinh)(f
 #endif /* ... */
 #if __has_builtin(__builtin_tanhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanhf)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,tanh,(float __x),tanhf,{ return __builtin_tanhf(__x); })
 #elif defined(__CRT_HAVE_tanhf)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,tanh,(float __x),tanhf,(__x))
 #elif defined(__CRT_HAVE___tanhf)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,tanh,(float __x),__tanhf,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
@@ -4739,7 +4739,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL tanh)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_expf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_expf)
@@ -4810,15 +4810,15 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL ldexp)(
 #endif /* ... */
 #if __has_builtin(__builtin_logf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_logf)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CEIREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logf,float,__NOTHROW,log,(float __x),logf,{ return __builtin_logf(__x); })
 #elif defined(__CRT_HAVE_logf)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logf,float,__NOTHROW,log,(float __x),logf,(__x))
 #elif defined(__CRT_HAVE___logf)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logf,float,__NOTHROW,log,(float __x),__logf,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
@@ -4827,20 +4827,20 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __DECL_SIMD_logf float __NOTHROW(__LIBCCALL log)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(logf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_log10f) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log10f)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,log10,(float __x),log10f,{ return __builtin_log10f(__x); })
 #elif defined(__CRT_HAVE_log10f)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,log10,(float __x),log10f,(__x))
 #elif defined(__CRT_HAVE___log10f)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,log10,(float __x),__log10f,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
@@ -4849,7 +4849,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL log10)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(log10f))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_modff) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_modff)
@@ -4898,15 +4898,15 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __DECL_SIMD_powf float __NOTHROW(_
 #endif /* ... */
 #if __has_builtin(__builtin_sqrtf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sqrtf)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,sqrt,(float __x),sqrtf,{ return __builtin_sqrtf(__x); })
 #elif defined(__CRT_HAVE_sqrtf)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,sqrt,(float __x),sqrtf,(__x))
 #elif defined(__CRT_HAVE___sqrtf)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,sqrt,(float __x),__sqrtf,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
@@ -4915,7 +4915,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL sqrt)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sqrtf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_ceilf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ceilf)
@@ -5165,15 +5165,15 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL 
 #endif /* ... */
 #if __has_builtin(__builtin_coshl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_coshl)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cosh,(__LONGDOUBLE __x),coshl,{ return __builtin_coshl(__x); })
 #elif defined(__CRT_HAVE_coshl)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cosh,(__LONGDOUBLE __x),coshl,(__x))
 #elif defined(__CRT_HAVE___coshl)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cosh,(__LONGDOUBLE __x),__coshl,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
@@ -5182,7 +5182,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL cosh)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(coshl))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_sinhl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sinhl)
@@ -5209,15 +5209,15 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL 
 #endif /* ... */
 #if __has_builtin(__builtin_tanhl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanhl)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanh,(__LONGDOUBLE __x),tanhl,{ return __builtin_tanhl(__x); })
 #elif defined(__CRT_HAVE_tanhl)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanh,(__LONGDOUBLE __x),tanhl,(__x))
 #elif defined(__CRT_HAVE___tanhl)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanh,(__LONGDOUBLE __x),__tanhl,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
@@ -5226,7 +5226,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL tanh)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhl))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_expl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_expl)
@@ -5297,15 +5297,15 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL 
 #endif /* ... */
 #if __has_builtin(__builtin_logl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_logl)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CEIREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,log,(__LONGDOUBLE __x),logl,{ return __builtin_logl(__x); })
 #elif defined(__CRT_HAVE_logl)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,log,(__LONGDOUBLE __x),logl,(__x))
 #elif defined(__CRT_HAVE___logl)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,log,(__LONGDOUBLE __x),__logl,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
@@ -5314,20 +5314,20 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __DECL_SIMD_logl __LONGDOUBLE __NOTHROW(__LIBCCALL log)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(logl))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_log10l) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log10l)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log10,(__LONGDOUBLE __x),log10l,{ return __builtin_log10l(__x); })
 #elif defined(__CRT_HAVE_log10l)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log10,(__LONGDOUBLE __x),log10l,(__x))
 #elif defined(__CRT_HAVE___log10l)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log10,(__LONGDOUBLE __x),__log10l,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
@@ -5336,7 +5336,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL log10)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(log10l))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_modfl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_modfl)
@@ -5385,15 +5385,15 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __DECL_SIMD_powl __LONGDOUBLE __NO
 #endif /* ... */
 #if __has_builtin(__builtin_sqrtl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sqrtl)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sqrt,(__LONGDOUBLE __x),sqrtl,{ return __builtin_sqrtl(__x); })
 #elif defined(__CRT_HAVE_sqrtl)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sqrt,(__LONGDOUBLE __x),sqrtl,(__x))
 #elif defined(__CRT_HAVE___sqrtl)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sqrt,(__LONGDOUBLE __x),__sqrtl,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
@@ -5402,7 +5402,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL sqrt)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sqrtl))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_ceill) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ceill)
@@ -5499,15 +5499,15 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL 
 extern "C++" {
 #if __has_builtin(__builtin_acoshf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acoshf)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,acosh,(float __x),acoshf,{ return __builtin_acoshf(__x); })
 #elif defined(__CRT_HAVE_acoshf)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,acosh,(float __x),acoshf,(__x))
 #elif defined(__CRT_HAVE___acoshf)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,acosh,(float __x),__acoshf,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
@@ -5516,20 +5516,20 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL acosh)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(acoshf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_asinhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinhf)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,asinh,(float __x),asinhf,{ return __builtin_asinhf(__x); })
 #elif defined(__CRT_HAVE_asinhf)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,asinh,(float __x),asinhf,(__x))
 #elif defined(__CRT_HAVE___asinhf)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,asinh,(float __x),__asinhf,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
@@ -5538,20 +5538,20 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL asinh)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinhf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_atanhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanhf)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atanh,(float __x),atanhf,{ return __builtin_atanhf(__x); })
 #elif defined(__CRT_HAVE_atanhf)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atanh,(float __x),atanhf,(__x))
 #elif defined(__CRT_HAVE___atanhf)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atanh,(float __x),__atanhf,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
@@ -5560,7 +5560,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL atanh)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanhf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_expm1f) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_expm1f)
@@ -5631,15 +5631,15 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIB
 #endif /* ... */
 #if __has_builtin(__builtin_cbrtf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cbrtf)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,cbrt,(float __x),cbrtf,{ return __builtin_cbrtf(__x); })
 #elif defined(__CRT_HAVE_cbrtf)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,cbrt,(float __x),cbrtf,(__x))
 #elif defined(__CRT_HAVE___cbrtf)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,cbrt,(float __x),__cbrtf,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
@@ -5648,7 +5648,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL cbrt)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cbrtf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_rintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rintf)
@@ -5780,15 +5780,15 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED int __NOTHROW(__LIBCCALL ilogb)(fl
 extern "C++" {
 #if __has_builtin(__builtin_acoshl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acoshl)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acosh,(__LONGDOUBLE __x),acoshl,{ return __builtin_acoshl(__x); })
 #elif defined(__CRT_HAVE_acoshl)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acosh,(__LONGDOUBLE __x),acoshl,(__x))
 #elif defined(__CRT_HAVE___acoshl)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acosh,(__LONGDOUBLE __x),__acoshl,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
@@ -5797,20 +5797,20 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL acosh)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(acoshl))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_asinhl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinhl)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinh,(__LONGDOUBLE __x),asinhl,{ return __builtin_asinhl(__x); })
 #elif defined(__CRT_HAVE_asinhl)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinh,(__LONGDOUBLE __x),asinhl,(__x))
 #elif defined(__CRT_HAVE___asinhl)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinh,(__LONGDOUBLE __x),__asinhl,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
@@ -5819,20 +5819,20 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL asinh)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinhl))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_atanhl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanhl)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanh,(__LONGDOUBLE __x),atanhl,{ return __builtin_atanhl(__x); })
 #elif defined(__CRT_HAVE_atanhl)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanh,(__LONGDOUBLE __x),atanhl,(__x))
 #elif defined(__CRT_HAVE___atanhl)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanh,(__LONGDOUBLE __x),__atanhl,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
@@ -5841,7 +5841,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL atanh)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanhl))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_expm1l) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_expm1l)
@@ -5912,15 +5912,15 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHRO
 #endif /* ... */
 #if __has_builtin(__builtin_cbrtl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cbrtl)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrt,(__LONGDOUBLE __x),cbrtl,{ return __builtin_cbrtl(__x); })
 #elif defined(__CRT_HAVE_cbrtl)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrt,(__LONGDOUBLE __x),cbrtl,(__x))
 #elif defined(__CRT_HAVE___cbrtl)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrt,(__LONGDOUBLE __x),__cbrtl,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
@@ -5929,7 +5929,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL cbrt)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cbrtl))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_rintl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rintl)
@@ -7869,20 +7869,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(exp10, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUN
 #endif /* ... */
 #if __has_builtin(__builtin_pow10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow10)
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __CEIDECLARE(__ATTR_WUNUSED,double,__NOTHROW,pow10,(double __x),{ return __builtin_pow10(__x); })
 #elif defined(__CRT_HAVE_pow10)
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,pow10,(double __x),(__x))
 #elif defined(__CRT_HAVE___pow10)
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,pow10,(double __x),__pow10,(__x))
 #elif defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/pow10.h>
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pow10, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL pow10)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pow10))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_sincosf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sincosf)
@@ -7923,20 +7923,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(exp10f, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #endif /* ... */
 #if __has_builtin(__builtin_pow10f) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow10f)
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __CEIDECLARE(__ATTR_WUNUSED,float,__NOTHROW,pow10f,(float __x),{ return __builtin_pow10f(__x); })
 #elif defined(__CRT_HAVE_pow10f)
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,pow10f,(float __x),(__x))
 #elif defined(__CRT_HAVE___pow10f)
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,pow10f,(float __x),__pow10f,(__x))
 #elif defined(__CRT_HAVE_powf) || defined(__CRT_HAVE___powf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/pow10f.h>
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pow10f, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL pow10f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pow10f))(__x); })
 #endif /* ... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -7986,20 +7986,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(exp10l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #endif /* ... */
 #if __has_builtin(__builtin_pow10l) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow10l)
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __CEIDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,pow10l,(__LONGDOUBLE __x),{ return __builtin_pow10l(__x); })
 #elif defined(__CRT_HAVE_pow10l)
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,pow10l,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___pow10l)
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,pow10l,(__LONGDOUBLE __x),__pow10l,(__x))
 #elif defined(__CRT_HAVE_powl) || defined(__CRT_HAVE___powl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/pow10l.h>
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pow10l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL pow10l)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pow10l))(__x); })
 #endif /* ... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -8669,57 +8669,57 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL 
 #ifdef __USE_MISC
 #if __has_builtin(__builtin_lgamma_r) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma_r)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __CEIDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,lgamma_r,(double __x, int *__signgamp),{ return __builtin_lgamma_r(__x, __signgamp); })
 #elif defined(__CRT_HAVE_lgamma_r)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,lgamma_r,(double __x, int *__signgamp),(__x,__signgamp))
 #elif defined(__CRT_HAVE___lgamma_r)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,lgamma_r,(double __x, int *__signgamp),__lgamma_r,(__x,__signgamp))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/lgamma_r.h>
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(lgamma_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) double __NOTHROW_NCX(__LIBCCALL lgamma_r)(double __x, int *__signgamp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgamma_r))(__x, __signgamp); })
 #endif /* ... */
 #if __has_builtin(__builtin_lgammaf_r) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgammaf_r)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __CEIDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,lgammaf_r,(float __x, int *__signgamp),{ return __builtin_lgammaf_r(__x, __signgamp); })
 #elif defined(__CRT_HAVE_lgammaf_r)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,lgammaf_r,(float __x, int *__signgamp),(__x,__signgamp))
 #elif defined(__CRT_HAVE___lgammaf_r)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,lgammaf_r,(float __x, int *__signgamp),__lgammaf_r,(__x,__signgamp))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/lgammaf_r.h>
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(lgammaf_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) float __NOTHROW_NCX(__LIBCCALL lgammaf_r)(float __x, int *__signgamp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammaf_r))(__x, __signgamp); })
 #endif /* ... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_lgammal_r) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgammal_r)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __CEIDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,lgammal_r,(__LONGDOUBLE __x, int *__signgamp),{ return __builtin_lgammal_r(__x, __signgamp); })
 #elif defined(__CRT_HAVE_lgammal_r)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,lgammal_r,(__LONGDOUBLE __x, int *__signgamp),(__x,__signgamp))
 #elif defined(__CRT_HAVE___lgammal_r)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,lgammal_r,(__LONGDOUBLE __x, int *__signgamp),__lgammal_r,(__x,__signgamp))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/lgammal_r.h>
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(lgammal_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL lgammal_r)(__LONGDOUBLE __x, int *__signgamp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammal_r))(__x, __signgamp); })
 #endif /* ... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -8925,20 +8925,20 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __tan)
 #endif /* ... */
 #if __has_builtin(__builtin_cosh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cosh)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__cosh,(double __x),cosh,{ return __builtin_cosh(__x); })
 #elif defined(__CRT_HAVE_cosh)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__cosh,(double __x),cosh,(__x))
 #elif defined(__CRT_HAVE___cosh)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__cosh,(double __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/cosh.h>
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __cosh)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cosh))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_sinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sinh)
@@ -8961,20 +8961,20 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __sinh
 #endif /* ... */
 #if __has_builtin(__builtin_tanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanh)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__tanh,(double __x),tanh,{ return __builtin_tanh(__x); })
 #elif defined(__CRT_HAVE_tanh)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__tanh,(double __x),tanh,(__x))
 #elif defined(__CRT_HAVE___tanh)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__tanh,(double __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/tanh.h>
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __tanh)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanh))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_acosf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acosf)
@@ -9105,20 +9105,20 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __tanf)
 #endif /* ... */
 #if __has_builtin(__builtin_coshf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_coshf)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__coshf,(float __x),coshf,{ return __builtin_coshf(__x); })
 #elif defined(__CRT_HAVE_coshf)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__coshf,(float __x),coshf,(__x))
 #elif defined(__CRT_HAVE___coshf)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__coshf,(float __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/coshf.h>
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __coshf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(coshf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_sinhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sinhf)
@@ -9141,20 +9141,20 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __sinhf
 #endif /* ... */
 #if __has_builtin(__builtin_tanhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanhf)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__tanhf,(float __x),tanhf,{ return __builtin_tanhf(__x); })
 #elif defined(__CRT_HAVE_tanhf)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__tanhf,(float __x),tanhf,(__x))
 #elif defined(__CRT_HAVE___tanhf)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__tanhf,(float __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/tanhf.h>
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __tanhf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhf))(__x); }
 #endif /* ... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -9286,20 +9286,20 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL 
 #endif /* ... */
 #if __has_builtin(__builtin_coshl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_coshl)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__coshl,(__LONGDOUBLE __x),coshl,{ return __builtin_coshl(__x); })
 #elif defined(__CRT_HAVE_coshl)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__coshl,(__LONGDOUBLE __x),coshl,(__x))
 #elif defined(__CRT_HAVE___coshl)
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__coshl,(__LONGDOUBLE __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/coshl.h>
 /* >> coshf(3), cosh(3), coshl(3)
- * Hyperbolic cosine of `x' */
+ * Hyperbolic   cosine   of   `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __coshl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(coshl))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_sinhl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sinhl)
@@ -9322,20 +9322,20 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL 
 #endif /* ... */
 #if __has_builtin(__builtin_tanhl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanhl)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__tanhl,(__LONGDOUBLE __x),tanhl,{ return __builtin_tanhl(__x); })
 #elif defined(__CRT_HAVE_tanhl)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__tanhl,(__LONGDOUBLE __x),tanhl,(__x))
 #elif defined(__CRT_HAVE___tanhl)
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__tanhl,(__LONGDOUBLE __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/tanhl.h>
 /* >> tanhf(3), tanh(3), tanhl(3)
- * Hyperbolic tangent of `x' */
+ * Hyperbolic   tangent   of  `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __tanhl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhl))(__x); }
 #endif /* ... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -9408,165 +9408,165 @@ __FORCELOCAL __ATTR_ARTIFICIAL __DECL_SIMD_sincosl __ATTR_NONNULL((2, 3)) void _
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 #if __has_builtin(__builtin_acosh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acosh)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__acosh,(double __x),acosh,{ return __builtin_acosh(__x); })
 #elif defined(__CRT_HAVE_acosh)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__acosh,(double __x),acosh,(__x))
 #elif defined(__CRT_HAVE___acosh)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__acosh,(double __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/acosh.h>
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __acosh)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(acosh))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_asinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinh)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__asinh,(double __x),asinh,{ return __builtin_asinh(__x); })
 #elif defined(__CRT_HAVE_asinh)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__asinh,(double __x),asinh,(__x))
 #elif defined(__CRT_HAVE___asinh)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__asinh,(double __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/asinh.h>
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __asinh)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinh))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_atanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanh)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__atanh,(double __x),atanh,{ return __builtin_atanh(__x); })
 #elif defined(__CRT_HAVE_atanh)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__atanh,(double __x),atanh,(__x))
 #elif defined(__CRT_HAVE___atanh)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__atanh,(double __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/atanh.h>
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __atanh)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanh))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_acoshf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acoshf)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__acoshf,(float __x),acoshf,{ return __builtin_acoshf(__x); })
 #elif defined(__CRT_HAVE_acoshf)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__acoshf,(float __x),acoshf,(__x))
 #elif defined(__CRT_HAVE___acoshf)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__acoshf,(float __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/acoshf.h>
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __acoshf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(acoshf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_asinhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinhf)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__asinhf,(float __x),asinhf,{ return __builtin_asinhf(__x); })
 #elif defined(__CRT_HAVE_asinhf)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__asinhf,(float __x),asinhf,(__x))
 #elif defined(__CRT_HAVE___asinhf)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__asinhf,(float __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/asinhf.h>
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __asinhf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinhf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_atanhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanhf)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__atanhf,(float __x),atanhf,{ return __builtin_atanhf(__x); })
 #elif defined(__CRT_HAVE_atanhf)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__atanhf,(float __x),atanhf,(__x))
 #elif defined(__CRT_HAVE___atanhf)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__atanhf,(float __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/atanhf.h>
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __atanhf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanhf))(__x); }
 #endif /* ... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_acoshl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acoshl)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__acoshl,(__LONGDOUBLE __x),acoshl,{ return __builtin_acoshl(__x); })
 #elif defined(__CRT_HAVE_acoshl)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__acoshl,(__LONGDOUBLE __x),acoshl,(__x))
 #elif defined(__CRT_HAVE___acoshl)
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__acoshl,(__LONGDOUBLE __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/acoshl.h>
 /* >> acoshf(3), acosh(3), acoshl(3)
- * Hyperbolic arc cosine of `x' */
+ * Hyperbolic  arc  cosine  of   `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __acoshl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(acoshl))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_asinhl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinhl)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__asinhl,(__LONGDOUBLE __x),asinhl,{ return __builtin_asinhl(__x); })
 #elif defined(__CRT_HAVE_asinhl)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__asinhl,(__LONGDOUBLE __x),asinhl,(__x))
 #elif defined(__CRT_HAVE___asinhl)
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__asinhl,(__LONGDOUBLE __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/asinhl.h>
 /* >> asinhf(3), asinh(3), asinhl(3)
- * Hyperbolic arc sine of `x' */
+ * Hyperbolic  arc   sine   of   `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __asinhl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinhl))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_atanhl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanhl)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atanhl,(__LONGDOUBLE __x),atanhl,{ return __builtin_atanhl(__x); })
 #elif defined(__CRT_HAVE_atanhl)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atanhl,(__LONGDOUBLE __x),atanhl,(__x))
 #elif defined(__CRT_HAVE___atanhl)
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atanhl,(__LONGDOUBLE __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/atanhl.h>
 /* >> atanhf(3), atanh(3), atanhl(3)
- * Hyperbolic arc tangent of `x' */
+ * Hyperbolic  arc  tangent  of  `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __atanhl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanhl))(__x); }
 #endif /* ... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -9627,38 +9627,38 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __ldex
 #endif /* ... */
 #if __has_builtin(__builtin_log) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CEIREDIRECT(__ATTR_WUNUSED __DECL_SIMD_log,double,__NOTHROW,__log,(double __x),log,{ return __builtin_log(__x); })
 #elif defined(__CRT_HAVE_log)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_log,double,__NOTHROW,__log,(double __x),log,(__x))
 #elif defined(__CRT_HAVE___log)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_log,double,__NOTHROW,__log,(double __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/log.h>
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __DECL_SIMD_log double __NOTHROW(__LIBCCALL __log)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(log))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_log10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log10)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__log10,(double __x),log10,{ return __builtin_log10(__x); })
 #elif defined(__CRT_HAVE_log10)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__log10,(double __x),log10,(__x))
 #elif defined(__CRT_HAVE___log10)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__log10,(double __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/log10.h>
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __log10)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(log10))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_modf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_modf)
@@ -9735,38 +9735,38 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __ldexp
 #endif /* ... */
 #if __has_builtin(__builtin_logf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_logf)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CEIREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logf,float,__NOTHROW,__logf,(float __x),logf,{ return __builtin_logf(__x); })
 #elif defined(__CRT_HAVE_logf)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logf,float,__NOTHROW,__logf,(float __x),logf,(__x))
 #elif defined(__CRT_HAVE___logf)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_logf,float,__NOTHROW,__logf,(float __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/logf.h>
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __DECL_SIMD_logf float __NOTHROW(__LIBCCALL __logf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(logf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_log10f) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log10f)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__log10f,(float __x),log10f,{ return __builtin_log10f(__x); })
 #elif defined(__CRT_HAVE_log10f)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__log10f,(float __x),log10f,(__x))
 #elif defined(__CRT_HAVE___log10f)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__log10f,(float __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/log10f.h>
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __log10f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(log10f))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_modff) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_modff)
@@ -9844,38 +9844,38 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL 
 #endif /* ... */
 #if __has_builtin(__builtin_logl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_logl)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CEIREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,__logl,(__LONGDOUBLE __x),logl,{ return __builtin_logl(__x); })
 #elif defined(__CRT_HAVE_logl)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,__logl,(__LONGDOUBLE __x),logl,(__x))
 #elif defined(__CRT_HAVE___logl)
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,__logl,(__LONGDOUBLE __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/logl.h>
 /* >> logf(3), log(3), logl(3)
- * Natural logarithm of `x' */
+ * Natural  logarithm  of  `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __DECL_SIMD_logl __LONGDOUBLE __NOTHROW(__LIBCCALL __logl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(logl))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_log10l) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log10l)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__log10l,(__LONGDOUBLE __x),log10l,{ return __builtin_log10l(__x); })
 #elif defined(__CRT_HAVE_log10l)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__log10l,(__LONGDOUBLE __x),log10l,(__x))
 #elif defined(__CRT_HAVE___log10l)
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__log10l,(__LONGDOUBLE __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/log10l.h>
 /* >> log10f(3), log10(3), log10l(3)
- * Base-ten logarithm of `x' */
+ * Base-ten    logarithm    of   `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __log10l)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(log10l))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_modfl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_modfl)
@@ -9919,20 +9919,20 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __exp1
 #endif /* ... */
 #if __has_builtin(__builtin_pow10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow10)
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__pow10,(double __x),pow10,{ return __builtin_pow10(__x); })
 #elif defined(__CRT_HAVE_pow10)
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__pow10,(double __x),pow10,(__x))
 #elif defined(__CRT_HAVE___pow10)
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__pow10,(double __x),(__x))
 #elif defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/pow10.h>
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __pow10)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pow10))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_exp10f) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp10f)
@@ -9955,20 +9955,20 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __exp10
 #endif /* ... */
 #if __has_builtin(__builtin_pow10f) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow10f)
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__pow10f,(float __x),pow10f,{ return __builtin_pow10f(__x); })
 #elif defined(__CRT_HAVE_pow10f)
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__pow10f,(float __x),pow10f,(__x))
 #elif defined(__CRT_HAVE___pow10f)
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__pow10f,(float __x),(__x))
 #elif defined(__CRT_HAVE_powf) || defined(__CRT_HAVE___powf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/pow10f.h>
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __pow10f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pow10f))(__x); }
 #endif /* ... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -9992,20 +9992,20 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL 
 #endif /* ... */
 #if __has_builtin(__builtin_pow10l) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow10l)
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__pow10l,(__LONGDOUBLE __x),pow10l,{ return __builtin_pow10l(__x); })
 #elif defined(__CRT_HAVE_pow10l)
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__pow10l,(__LONGDOUBLE __x),pow10l,(__x))
 #elif defined(__CRT_HAVE___pow10l)
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__pow10l,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE_powl) || defined(__CRT_HAVE___powl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/pow10l.h>
 /* >> pow10f(3), pow10(3), pow10l(3)
- * Another name occasionally used */
+ * Another  name  occasionally  used */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __pow10l)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pow10l))(__x); }
 #endif /* ... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -10314,20 +10314,20 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __DECL_SIMD_pow double __NOTHROW(_
 #endif /* ... */
 #if __has_builtin(__builtin_sqrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sqrt)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__sqrt,(double __x),sqrt,{ return __builtin_sqrt(__x); })
 #elif defined(__CRT_HAVE_sqrt)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__sqrt,(double __x),sqrt,(__x))
 #elif defined(__CRT_HAVE___sqrt)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__sqrt,(double __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/sqrt.h>
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __sqrt)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sqrt))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_powf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_powf)
@@ -10350,20 +10350,20 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __DECL_SIMD_powf float __NOTHROW(_
 #endif /* ... */
 #if __has_builtin(__builtin_sqrtf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sqrtf)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__sqrtf,(float __x),sqrtf,{ return __builtin_sqrtf(__x); })
 #elif defined(__CRT_HAVE_sqrtf)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__sqrtf,(float __x),sqrtf,(__x))
 #elif defined(__CRT_HAVE___sqrtf)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__sqrtf,(float __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/sqrtf.h>
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __sqrtf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sqrtf))(__x); }
 #endif /* ... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -10387,20 +10387,20 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __DECL_SIMD_powl __LONGDOUBLE __NO
 #endif /* ... */
 #if __has_builtin(__builtin_sqrtl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sqrtl)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__sqrtl,(__LONGDOUBLE __x),sqrtl,{ return __builtin_sqrtl(__x); })
 #elif defined(__CRT_HAVE_sqrtl)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__sqrtl,(__LONGDOUBLE __x),sqrtl,(__x))
 #elif defined(__CRT_HAVE___sqrtl)
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__sqrtl,(__LONGDOUBLE __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/sqrtl.h>
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
- * Return the square root of `x' */
+ * Return the square root of  `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __sqrtl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sqrtl))(__x); }
 #endif /* ... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -10467,57 +10467,57 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 #if __has_builtin(__builtin_cbrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cbrt)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__cbrt,(double __x),cbrt,{ return __builtin_cbrt(__x); })
 #elif defined(__CRT_HAVE_cbrt)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__cbrt,(double __x),cbrt,(__x))
 #elif defined(__CRT_HAVE___cbrt)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__cbrt,(double __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/cbrt.h>
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __cbrt)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cbrt))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_cbrtf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cbrtf)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__cbrtf,(float __x),cbrtf,{ return __builtin_cbrtf(__x); })
 #elif defined(__CRT_HAVE_cbrtf)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__cbrtf,(float __x),cbrtf,(__x))
 #elif defined(__CRT_HAVE___cbrtf)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__cbrtf,(float __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/cbrtf.h>
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __cbrtf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cbrtf))(__x); }
 #endif /* ... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_cbrtl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cbrtl)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__cbrtl,(__LONGDOUBLE __x),cbrtl,{ return __builtin_cbrtl(__x); })
 #elif defined(__CRT_HAVE_cbrtl)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__cbrtl,(__LONGDOUBLE __x),cbrtl,(__x))
 #elif defined(__CRT_HAVE___cbrtl)
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__cbrtl,(__LONGDOUBLE __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/cbrtl.h>
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
- * Return the cube root of `x' */
+ * Return  the  cube root  of `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __cbrtl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cbrtl))(__x); }
 #endif /* ... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -11732,57 +11732,57 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL 
 #ifdef __USE_MISC
 #if __has_builtin(__builtin_lgamma_r) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma_r)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__lgamma_r,(double __x, int *__signgamp),lgamma_r,{ return __builtin_lgamma_r(__x, __signgamp); })
 #elif defined(__CRT_HAVE_lgamma_r)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__lgamma_r,(double __x, int *__signgamp),lgamma_r,(__x,__signgamp))
 #elif defined(__CRT_HAVE___lgamma_r)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__lgamma_r,(double __x, int *__signgamp),(__x,__signgamp))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/lgamma_r.h>
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) double __NOTHROW_NCX(__LIBCCALL __lgamma_r)(double __x, int *__signgamp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgamma_r))(__x, __signgamp); }
 #endif /* ... */
 #if __has_builtin(__builtin_lgammaf_r) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgammaf_r)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,__lgammaf_r,(float __x, int *__signgamp),lgammaf_r,{ return __builtin_lgammaf_r(__x, __signgamp); })
 #elif defined(__CRT_HAVE_lgammaf_r)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,__lgammaf_r,(float __x, int *__signgamp),lgammaf_r,(__x,__signgamp))
 #elif defined(__CRT_HAVE___lgammaf_r)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,__lgammaf_r,(float __x, int *__signgamp),(__x,__signgamp))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/lgammaf_r.h>
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) float __NOTHROW_NCX(__LIBCCALL __lgammaf_r)(float __x, int *__signgamp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammaf_r))(__x, __signgamp); }
 #endif /* ... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_lgammal_r) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgammal_r)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,__lgammal_r,(__LONGDOUBLE __x, int *__signgamp),lgammal_r,{ return __builtin_lgammal_r(__x, __signgamp); })
 #elif defined(__CRT_HAVE_lgammal_r)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,__lgammal_r,(__LONGDOUBLE __x, int *__signgamp),lgammal_r,(__x,__signgamp))
 #elif defined(__CRT_HAVE___lgammal_r)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,__lgammal_r,(__LONGDOUBLE __x, int *__signgamp),(__x,__signgamp))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/lgammal_r.h>
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
- * Reentrant version of `lgamma(3)' */
+ * Reentrant    version    of     `lgamma(3)' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL __lgammal_r)(__LONGDOUBLE __x, int *__signgamp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammal_r))(__x, __signgamp); }
 #endif /* ... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -13950,20 +13950,22 @@ typedef enum {
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 /* One of `_LIB_VERSION_TYPE': The current math error behavior */
+#ifndef _LIB_VERSION
 #ifdef __CRT_HAVE__LIB_VERSION
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("_LIB_VERSION")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef _LIB_VERSION
 __LIBC _LIB_VERSION_TYPE _LIB_VERSION;
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("_LIB_VERSION")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#define _LIB_VERSION _LIB_VERSION
 #endif /* __CRT_HAVE__LIB_VERSION */
+#endif /* !_LIB_VERSION */
 #endif /* ... */
 
 
-/* With SVID error handling, `matherr(3)' gets called with struct on error */
+/* With SVID error handling, `matherr(3)' gets called with this struct on error:
+ * >> int matherr(struct exception *exc) {
+ * >>     ...
+ * >> }
+ * Yes: programs must simply define this function (with PUBLIC visibility), and
+ * libc  will detect that  override and call their  function to facilitate math
+ * error handling. */
 #ifdef __cplusplus
 struct __exception
 #else /* __cplusplus */
@@ -13988,14 +13990,14 @@ struct exception
 #undef retval
 #undef err
 {
-	int    type;
-	char  *name;
-	double arg1;
-	double arg2;
-	double retval;
-	int    err;
+	int                     type;   /* Exception type (one of `__MATH_EXCEPT_*'; s.a. the unescaped macros below) */
+	char __KOS_FIXED_CONST *name;   /* [1..1] Math function name (e.g. "powf") */
+	double                  arg1;   /* First argument */
+	double                  arg2;   /* Second argument */
+	double                  retval; /* [in|out] Return value */
+	__errno_t               err;    /* [out] If non-zero, set as errno when `matherr(3)' returns `0' */
 #ifdef __CRT_DOS
-	int    __pad;
+	int                   __pad;    /* ... */
 #endif /* __CRT_DOS */
 };
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
