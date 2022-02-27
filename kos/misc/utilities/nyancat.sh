@@ -40,4 +40,3 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/nyancat" ]; then
 fi
 
 install_file /bin/nyancat "$OPTPATH/nyancat"
-

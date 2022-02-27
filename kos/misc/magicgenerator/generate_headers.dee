@@ -1142,7 +1142,7 @@ try {
 
 //	waitTasks();
 //	local f = allFunctionsByName["format_8to16"];
-//	local fp = CWriter(File.stdout, ppAssume: ppAssumeHeaderFiles);
+//	local fp =  CWriter(File.stdout, ppAssume:  ppAssumeHeaderFiles);
 //	f.cprintHeaderDeclaration(fp, ESCAPE_MODE_PART, printDoc: false);
 //	fp << "\n\n";
 //	for (local bind: f.functionBindings) {
@@ -1151,7 +1151,7 @@ try {
 //	fp.flush();
 //	fp << "\n\n";
 //	local f = allFunctionsByName["format_8to32"];
-//	local fp = CWriter(File.stdout, ppAssume: ppAssumeHeaderFiles);
+//	local fp =  CWriter(File.stdout, ppAssume:  ppAssumeHeaderFiles);
 //	f.cprintHeaderDeclaration(fp, ESCAPE_MODE_PART, printDoc: false);
 //	fp << "\n\n";
 //	for (local bind: f.functionBindings) {

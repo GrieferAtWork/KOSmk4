@@ -447,7 +447,7 @@ DEFINE_SYSCALL1(errno_t, set_userprocmask_address,
 		}
 
 		/* Initialize the user's initial signal mask with
-		 * what was their thread's signal mask before. */
+		 * what was  their thread's  signal mask  before. */
 		{
 			sigset_t const *kmask = &THIS_KERNEL_SIGMASK;
 			memset(mempcpy(new_sigset, kmask, sigsetsize),
@@ -469,7 +469,7 @@ DEFINE_SYSCALL1(errno_t, set_userprocmask_address,
 		if (!sigisemptyset(&initial_pending))
 			initial_flags |= USERPROCMASK_FLAG_HASPENDING;
 
-		/* Populate user-space with information
+		/* Populate   user-space   with  information
 		 * about the initial set of pending signals. */
 		bzero(mempcpy(&ctl->pm_pending,
 		              &initial_pending,

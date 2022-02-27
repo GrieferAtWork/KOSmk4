@@ -31,8 +31,7 @@
 #define CONFIG_EMULOCK_HAVE_CMPXCHW 1
 #define CONFIG_EMULOCK_HAVE_CMPXCHL 1
 #define CONFIG_EMULOCK_HAVE_CMPXCHQ 1
-/* No 16-bit atomic instruction is defined
- * for  i386,  so no  need to  emulate it! */
+/* No 16-byte atomic instruction exists on i386, so no need to emulate one! */
 #endif /* !__x86_64__ */
 
 
@@ -49,10 +48,10 @@
 #include <int128.h>
 #endif /* CONFIG_EMULOCK_HAVE_CMPXCHX */
 
-
+#ifdef __CC__
+#ifdef CONFIG_HAVE_EMULOCK
 DECL_BEGIN
 
-#ifdef __CC__
 /* Definitions for emulating lock-prefixed instructions in software
  * Mainly intended to be used  when the hardware doesn't lock  some
  * specific lock instruction, at which  point we'll try to  emulate
@@ -62,7 +61,6 @@ DECL_BEGIN
  *       a VIO operation, as well as a descriptor for figuring out how
  *       exactly an E_SEGFAULT exception should be thrown (if any) */
 
-#ifdef CONFIG_HAVE_EMULOCK
 struct icpustate;
 
 #ifdef CONFIG_EMULOCK_HAVE_CMPXCHB
@@ -96,10 +94,9 @@ x86_emulock_cmpxchx(struct icpustate **__restrict pstate,
                     uint128_t oldval,
                     uint128_t newval);
 #endif /* CONFIG_EMULOCK_HAVE_CMPXCHX */
-#endif /* CONFIG_HAVE_EMULOCK */
-
-#endif /* __CC__ */
 
 DECL_END
+#endif /* CONFIG_HAVE_EMULOCK */
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_EMULOCK_H */

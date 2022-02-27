@@ -52,7 +52,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 PRIVATE void *libunwind = NULL;
-INTERN WUNUSED void *CC dlopen_libunwind(void) {
+PRIVATE WUNUSED void *CC dlopen_libunwind(void) {
 	void *lu = ATOMIC_READ(libunwind);
 	if (!lu) {
 		void *real_lu;
@@ -156,7 +156,7 @@ struct cfientry {
 	                                * values as they'd appear at the  position where the request is  made
 	                                * from.  This function is then used internally to perform the initial
 	                                * step  of unwinding  to the  current function's  call-site, at which
-	                                * point libcfientry(3) will make  an attempt to reverse-engineer  the
+	                                * point libdebuginfo(3) will make an attempt to reverse-engineer  the
 	                                * values of requested registers. */
 	union {
 		void const *ce_regget_arg;  /* [?..?][const] Argument passed to `ce_regget'. */
@@ -283,11 +283,11 @@ INTDEF char const secname_eh_frame[];
 INTDEF char const secname_debug_frame[];
 INTDEF char const secname_debug_addr[];
 
-#define LOAD_SECTION(sect, lv_start, lv_end)                                         \
-	do {                                                                             \
-		size_t size;                                                                 \
-		(lv_start) = (byte_t const *)module_section_getaddr_inflate_nx(sect, &size); \
-		(lv_end)   = (lv_start) + size;                                              \
+#define LOAD_SECTION(sect, lv_start, lv_end)                                          \
+	do {                                                                              \
+		size_t size;                                                                  \
+		*(lv_start) = (byte_t const *)module_section_getaddr_inflate_nx(sect, &size); \
+		*(lv_end)   = *(lv_start) + size;                                             \
 	}	__WHILE0
 
 
@@ -304,8 +304,8 @@ NOTHROW_NCX(CC cfientry_bind_debug_ranges)(struct cfientry *__restrict self) {
 		return;
 	}
 	LOAD_SECTION(self->ce_s_debug_ranges,
-	             self->ce_sections.ds_debug_ranges_start,
-	             self->ce_sections.ds_debug_ranges_end);
+	             &self->ce_sections.ds_debug_ranges_start,
+	             &self->ce_sections.ds_debug_ranges_end);
 }
 
 /* Parse attributes of `self' in order to fill in  `range'
@@ -532,15 +532,15 @@ NOTHROW_NCX(CC cfientry_loadmodule)(struct cfientry *__restrict self) {
 	/* Bind sections. */
 	if (self->ce_s_debug_aranges) {
 		LOAD_SECTION(self->ce_s_debug_aranges,
-		             self->ce_sections.ds_debug_aranges_start,
-		             self->ce_sections.ds_debug_aranges_end);
+		             &self->ce_sections.ds_debug_aranges_start,
+		             &self->ce_sections.ds_debug_aranges_end);
 	}
 	LOAD_SECTION(self->ce_s_debug_abbrev,
-	             self->ce_sections.ds_debug_abbrev_start,
-	             self->ce_sections.ds_debug_abbrev_end);
+	             &self->ce_sections.ds_debug_abbrev_start,
+	             &self->ce_sections.ds_debug_abbrev_end);
 	LOAD_SECTION(self->ce_s_debug_info,
-	             self->ce_sections.ds_debug_info_start,
-	             self->ce_sections.ds_debug_info_end);
+	             &self->ce_sections.ds_debug_info_start,
+	             &self->ce_sections.ds_debug_info_end);
 
 	/* Find the proper compilation-unit for `self->ce_modrelpc' */
 	{
@@ -768,40 +768,40 @@ again_runexpr:
 			self->ce_s_debug_addr   = locksection(secname_debug_addr);
 			self->ce_s_debug_loc    = locksection(secname_debug_loc);
 #undef locksection
-			if (!self->ce_s_eh_frame_hdr)
+			if (!self->ce_s_eh_frame_hdr) {
 				self->ce_s_eh_frame_hdr = (REF module_section_t *)-1;
-			else {
+			} else {
 				LOAD_SECTION(self->ce_s_eh_frame_hdr,
-				             self->ce_sections.ds_eh_frame_hdr_start,
-				             self->ce_sections.ds_eh_frame_hdr_end);
+				             &self->ce_sections.ds_eh_frame_hdr_start,
+				             &self->ce_sections.ds_eh_frame_hdr_end);
 			}
-			if (!self->ce_s_eh_frame)
+			if (!self->ce_s_eh_frame) {
 				self->ce_s_eh_frame = (REF module_section_t *)-1;
-			else {
+			} else {
 				LOAD_SECTION(self->ce_s_eh_frame,
-				             self->ce_sections.ds_eh_frame_start,
-				             self->ce_sections.ds_eh_frame_end);
+				             &self->ce_sections.ds_eh_frame_start,
+				             &self->ce_sections.ds_eh_frame_end);
 			}
-			if (!self->ce_s_debug_frame)
+			if (!self->ce_s_debug_frame) {
 				self->ce_s_debug_frame = (REF module_section_t *)-1;
-			else {
+			} else {
 				LOAD_SECTION(self->ce_s_debug_frame,
-				             self->ce_sections.ds_debug_frame_start,
-				             self->ce_sections.ds_debug_frame_end);
+				             &self->ce_sections.ds_debug_frame_start,
+				             &self->ce_sections.ds_debug_frame_end);
 			}
-			if (!self->ce_s_debug_addr)
+			if (!self->ce_s_debug_addr) {
 				self->ce_s_debug_addr = (REF module_section_t *)-1;
-			else {
+			} else {
 				LOAD_SECTION(self->ce_s_debug_addr,
-				             self->ce_sections.ds_debug_addr_start,
-				             self->ce_sections.ds_debug_addr_end);
+				             &self->ce_sections.ds_debug_addr_start,
+				             &self->ce_sections.ds_debug_addr_end);
 			}
-			if (!self->ce_s_debug_loc)
+			if (!self->ce_s_debug_loc) {
 				self->ce_s_debug_loc = (REF module_section_t *)-1;
-			else {
+			} else {
 				LOAD_SECTION(self->ce_s_debug_loc,
-				             self->ce_sections.ds_debug_loc_start,
-				             self->ce_sections.ds_debug_loc_end);
+				             &self->ce_sections.ds_debug_loc_start,
+				             &self->ce_sections.ds_debug_loc_end);
 			}
 			goto again_runexpr;
 		}
@@ -1011,6 +1011,7 @@ NOTHROW_NCX(CC cfientry_init)(struct cfientry *__restrict self,
 		byte_t buf[CFI_REGISTER_MAXSIZE];
 		void *pc;
 	} pc_buf;
+
 	/* Lookup the origin PC (which we need for unwinding to the call-site) */
 	result = (*regget)(regget_arg, CFI_UNWIND_REGISTER_PC(self->ce_emulator->ue_addrsize), pc_buf.buf);
 	if likely(result == UNWIND_SUCCESS) {
@@ -1027,7 +1028,7 @@ NOTHROW_NCX(CC cfientry_init)(struct cfientry *__restrict self,
 /* Worker-function for emulating instruction in entry-value context.
  * @param: unwind_rega:      The # of slots to allocate for unwind register overrides.
  * @param: preq_unwind_rega: When `_UNWIND_TOO_FEW_UNWIND_REGISTER_OVERRIDE_SLOTS' is
- *                           returned, write-back the #  of required into this  slot. */
+ *                           returned, store the # of required slots at this address. */
 PRIVATE WUNUSED ATTR_NOINLINE NONNULL((1)) unsigned int
 NOTHROW_NCX(CC run_entry_value_emulator)(unwind_emulator_t *__restrict self,
                                          size_t unwind_rega,
@@ -1108,7 +1109,7 @@ done:
  *       ... before returning, regardless of what ends up being returned.
  *
  * @return: UNWIND_SUCCESS:          ...
- * @return: UNWIND_INVALID_REGISTER: ... (May also be returned if a register counter not be reversed)
+ * @return: UNWIND_INVALID_REGISTER: ... (May also be returned if a register cannot not be reversed)
  * @return: UNWIND_SEGFAULT:         ...
  * @return: UNWIND_BADALLOC:         ...
  * @return: UNWIND_EMULATOR_*:       ... */

@@ -163,14 +163,14 @@ struct task_clone_args {
 
 /* High-level implementation for the `clone(2)' system call.
  * @param: init_state: The CPU state of the thead that called `clone(2)'
- *                     Pass `NULL' to spawn a new kernel thread.
+ *                     Pass   `NULL'  to  spawn  a  new  kernel  thread.
  * @param: args:       Clone arguments. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) REF struct task *FCALL
 task_clone(struct icpustate const *init_state,
            struct task_clone_args *__restrict args)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 
-/* Create and start a new kernel thread.
+/* Create  and start a new kernel thread.
  * >> static int my_tmain(int a, int b) {
  * >>     printk(KERN_TRACE "my_tmain(%d, %d)\n", a, b);
  * >>     return 0;

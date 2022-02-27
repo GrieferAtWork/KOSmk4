@@ -28,7 +28,7 @@
 #define LIBDL_SO                        LD_LINUX_SO
 #define LIBGCC_S_SO                     "libgcc_s.so.1"
 //#define LIBMVEC_SO                    "libmvec.so"
-#define LIBM_SO                         "libm.so"
+#define LIBM_SO                         "libc.so" /* Integrated into libc (but also exists as an empty library) */
 //#define LIBNSL_SO                     "libnsl.so"
 //#define LIBNSS_COMPAT_SO              "libnss_compat.so"
 //#define LIBNSS_DB_SO                  "libnss_db.so"

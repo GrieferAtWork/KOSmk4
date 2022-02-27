@@ -485,7 +485,7 @@ DEFINE_SYSCALL4(fd_t, mktty,
 				THROW(E_INVALID_HANDLE_OPERATION, (syscall_slong_t)display,
 				      E_INVALID_HANDLE_OPERATION_WRITE, hdisplay.h_mode);
 			}
-	
+
 			/* Construct the new TTY device. */
 			tty = mkttydev_new(hkeyboard.h_type, hkeyboard.h_data,
 			                   hdisplay.h_type, hdisplay.h_data,

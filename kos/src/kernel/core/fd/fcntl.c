@@ -191,7 +191,7 @@ sys_fcntl_impl(fd_t fd, fcntl_t command,
 		__builtin_assume(hand == &buf);
 		RAII_FINALLY { decref_unlikely(*hand); };
 
-		/* Switch on the handle type (this fcntl() code
+		/* Switch  on  the  handle  type  (this  fcntl() code
 		 * should have really been an ioctl if you ask me...) */
 		switch (hand->h_type) {
 

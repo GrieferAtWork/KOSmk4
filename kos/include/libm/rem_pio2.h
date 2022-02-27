@@ -47,7 +47,7 @@ __DECL_BEGIN
  */
 __LIBM_LOCAL_DECLARE_BEGIN
 /* This array is like the one in e_rem_pio2.c, but the numbers are
- * single precision and the last 8 bits are forced to 0.  */
+ * single  precision  and  the  last  8  bits  are  forced  to  0. */
 __LIBM_LOCAL_DECLARE_ARRAY(__int32_t, npio2_hwf, 32) {
 	__INT32_C(0x3fc90f00), __INT32_C(0x40490f00), __INT32_C(0x4096cb00), __INT32_C(0x40c90f00), __INT32_C(0x40fb5300), __INT32_C(0x4116cb00),
 	__INT32_C(0x412fed00), __INT32_C(0x41490f00), __INT32_C(0x41623100), __INT32_C(0x417b5300), __INT32_C(0x418a3a00), __INT32_C(0x4196cb00),
@@ -390,14 +390,14 @@ __LIBM_LOCAL_FUNC(rem_pio2l) __ATTR_WUNUSED __ATTR_NONNULL((2)) __int32_t
 	}
 
 	/* Split the 64 bits of the mantissa into three 24-bit integers
-	 * stored in a __IEEE754_DOUBLE_TYPE__ array.  */
+	 * stored in a __IEEE754_DOUBLE_TYPE__ array. */
 	__exp   = __j0 - 23;
 	__tx[0] = (__IEEE754_DOUBLE_TYPE__)(__i0 >> 8);
 	__tx[1] = (__IEEE754_DOUBLE_TYPE__)(((__i0 << 16) | (__i1 >> 16)) & __INT32_C(0xffffff));
 	__tx[2] = (__IEEE754_DOUBLE_TYPE__)((__i1 << 8) & __INT32_C(0xffffff));
 	__n     = __ieee854_kernel_rem_pio2l(__tx, __ty, __exp, 3, 2);
 	/* The result is now stored in two __IEEE754_DOUBLE_TYPE__ values, we need to convert
-	 * it into two __IEEE854_LONG_DOUBLE_TYPE__ values.  */
+	 * it into two __IEEE854_LONG_DOUBLE_TYPE__ values. */
 	if (__sx == 0) {
 		__y[0] = (__IEEE854_LONG_DOUBLE_TYPE__)__ty[0] + (__IEEE854_LONG_DOUBLE_TYPE__)__ty[1];
 		__y[1] = __ty[1] - (__y[0] - __ty[0]);

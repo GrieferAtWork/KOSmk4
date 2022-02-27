@@ -195,4 +195,3 @@ install_rawfile_stdin "$KOS_ROOT/kos/include/python2.7/pyconfig.h" <<EOF
 #include <python2.7/pyconfig.h>
 #endif /* !_KOS_PYTHON27_PYCONFIG_H */
 EOF
-

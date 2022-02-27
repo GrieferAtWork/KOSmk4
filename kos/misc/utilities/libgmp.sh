@@ -31,4 +31,3 @@ CONFIGURE=(
 
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"
-

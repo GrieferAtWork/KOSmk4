@@ -94,7 +94,26 @@
  * kind of interrupt, we need to check if the interrupt originated from
  * user-space,  and if it  did, need to  invoke `swapgs', which would't
  * work properly if another interrupt could happen before then,  making
- * us think that `swapgs' was  already invoked when it actually  wasn't */
+ * us think that `swapgs' was  already invoked when it actually  wasn't
+ *
+ * Thus, the only safe way to do a TRAP interrupt becomes:
+ * >> entry:
+ * >>     testb  $3, OFFSET_IRREGS_CS(%rsp)
+ * >>     jz     1f
+ * >>     swapgs
+ * >> 1:  testb  $EFLAGS_IF, OFFSET_IRREGS_EFLAGS(%rsp)
+ * >>     jz     1f
+ * >>     sti
+ * >> 1:
+ * >>
+ * >>     ...    # Actual interrupt handler
+ * >>
+ * >>
+ * >>     testb  $3, OFFSET_IRREGS_CS(%rsp)
+ * >>     jz     1f
+ * >>     swapgs
+ * >> 1:  iret
+ */
 #undef TRAP
 #undef GATE
 #define TRAP(id) DEFINE_INTRGATE(id, SEGMENT_DESCRIPTOR_TYPE_INTRGATE)

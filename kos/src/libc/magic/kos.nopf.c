@@ -103,7 +103,7 @@ $size_t memset_nopf([[user, checked]] void *dst,
 [[noblock, wunused, nothrow, doc_alias("atomic_xchb_nopf")]] bool atomic_xchq_nopf([[user, checked]] void const *addr, $uint64_t newval, [[nonnull]] $uint64_t *poldval);
 
 @@>> atomic_fetchadd[bwlq]_nopf(3)
-@@Try to ATOMIC_FETCHADD  at a possibly  faulty `addr', storing  the
+@@Try to ATOMIC_FETCHADD at a possibly faulty `addr', storing  the
 @@old value in `*poldval', and adding `newval' onto the stored val
 @@Return `true' on success, `false' on fault
 [[noblock, wunused, nothrow]] bool atomic_fetchaddb_nopf([[user, checked]] void const *addr, $uint8_t addend, [[nonnull]] $uint8_t *poldval);

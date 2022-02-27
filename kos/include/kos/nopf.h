@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e545b02 */
+/* HASH CRC-32:0x42e9486b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -161,7 +161,7 @@ __CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_NONNULL((3)),__BOOL,__NOTHROW,atomic_
 #if !defined(__atomic_fetchaddb_nopf_defined) && defined(__CRT_HAVE_atomic_fetchaddb_nopf)
 #define __atomic_fetchaddb_nopf_defined
 /* >> atomic_fetchadd[bwlq]_nopf(3)
- * Try to ATOMIC_FETCHADD  at a possibly  faulty `addr', storing  the
+ * Try to ATOMIC_FETCHADD at a possibly faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored val
  * Return `true' on success, `false' on fault */
 __CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_NONNULL((3)),__BOOL,__NOTHROW,atomic_fetchaddb_nopf,(void const *__addr, __UINT8_TYPE__ __addend, __UINT8_TYPE__ *__poldval),(__addr,__addend,__poldval))
@@ -169,7 +169,7 @@ __CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_NONNULL((3)),__BOOL,__NOTHROW,atomic_
 #if !defined(__atomic_fetchaddw_nopf_defined) && defined(__CRT_HAVE_atomic_fetchaddw_nopf)
 #define __atomic_fetchaddw_nopf_defined
 /* >> atomic_fetchadd[bwlq]_nopf(3)
- * Try to ATOMIC_FETCHADD  at a possibly  faulty `addr', storing  the
+ * Try to ATOMIC_FETCHADD at a possibly faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored val
  * Return `true' on success, `false' on fault */
 __CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_NONNULL((3)),__BOOL,__NOTHROW,atomic_fetchaddw_nopf,(void const *__addr, __UINT16_TYPE__ __addend, __UINT16_TYPE__ *__poldval),(__addr,__addend,__poldval))
@@ -177,7 +177,7 @@ __CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_NONNULL((3)),__BOOL,__NOTHROW,atomic_
 #if !defined(__atomic_fetchaddl_nopf_defined) && defined(__CRT_HAVE_atomic_fetchaddl_nopf)
 #define __atomic_fetchaddl_nopf_defined
 /* >> atomic_fetchadd[bwlq]_nopf(3)
- * Try to ATOMIC_FETCHADD  at a possibly  faulty `addr', storing  the
+ * Try to ATOMIC_FETCHADD at a possibly faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored val
  * Return `true' on success, `false' on fault */
 __CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_NONNULL((3)),__BOOL,__NOTHROW,atomic_fetchaddl_nopf,(void const *__addr, __UINT32_TYPE__ __addend, __UINT32_TYPE__ *__poldval),(__addr,__addend,__poldval))
@@ -185,7 +185,7 @@ __CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_NONNULL((3)),__BOOL,__NOTHROW,atomic_
 #if !defined(__atomic_fetchaddq_nopf_defined) && defined(__CRT_HAVE_atomic_fetchaddq_nopf)
 #define __atomic_fetchaddq_nopf_defined
 /* >> atomic_fetchadd[bwlq]_nopf(3)
- * Try to ATOMIC_FETCHADD  at a possibly  faulty `addr', storing  the
+ * Try to ATOMIC_FETCHADD at a possibly faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored val
  * Return `true' on success, `false' on fault */
 __CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_NONNULL((3)),__BOOL,__NOTHROW,atomic_fetchaddq_nopf,(void const *__addr, __UINT64_TYPE__ __addend, __UINT64_TYPE__ *__poldval),(__addr,__addend,__poldval))

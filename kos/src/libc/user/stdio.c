@@ -3060,7 +3060,7 @@ NOTHROW_NCX(LIBCCALL libc_fileno)(FILE *__restrict stream)
 	return ATOMIC_READ(stream->if_fd);
 err_nostream:
 	/* """
-	 * EBADF  The stream is not associated with a file.
+	 * EBADF The stream is not associated with a file.
 	 * """ */
 	return (fd_t)libc_seterrno(EBADF);
 err_inval:

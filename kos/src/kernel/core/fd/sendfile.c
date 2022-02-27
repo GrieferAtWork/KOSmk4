@@ -82,7 +82,7 @@ sys_sendfile_impl(fd_t outfd, fd_t infd,
 	RAII_FINALLY { if (!uses_stack) kfree(buffer); };
 
 	if (pin_offset) {
-		/* In the presence of a user-provided file offset, we can always
+		/* In  the presence of a user-provided file offset, we can always
 		 * just dispatch via the standard pread() and pwrite() operators. */
 		while (result < num_bytes) {
 			size_t part;

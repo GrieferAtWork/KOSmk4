@@ -76,7 +76,7 @@ BEGIN GROUP("apps.system-test") { COMPILE, LINK, MCOPY };
 	SET_OUTPUT("/bin/system-test")
 
 	/* Because libstdc++'s override for __gcc_personality_v0 makes it really
-	 * hard to debug exception-related problems, exclude it from the link. */
+	 * hard to debug exception-related problems,  exclude it from the  link. */
 	SET_NOSTDLIB()
 	USELIB("libc")
 	STATIC_USELIBGCC()

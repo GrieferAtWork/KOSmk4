@@ -49,7 +49,7 @@ assert_printf_equals(char const *expected,
 }
 
 DEFINE_TEST(positional_printf) {
-	/* Do some sanity checking on printf (though if this breaks, it's
+	/* Do some sanity checking on  printf (though if this breaks,  it's
 	 * actually a wonder that the system was able to get to this point) */
 	assert_printf_equals("42", "%d", 42);
 	assert_printf_equals("-42", "%d", -42);

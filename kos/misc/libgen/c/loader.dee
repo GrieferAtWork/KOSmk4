@@ -531,7 +531,7 @@ again_parse_arg_annotations:
 				case "kernel":
 				case "checked":
 				case "unchecked":
-					/* TODO: Pointer annotations (from <kos/anno.h>)
+					/* TODO: Pointer  annotations  (from  <kos/anno.h>)
 					 * Implement via `CType.commentBefore' (once added) */
 					tok = self.next();
 					break;

@@ -46,7 +46,7 @@
 #define __NO_PRINTF_UNICODE_CHARS
 #undef __NO_PRINTF_DISASM
 #define __NO_PRINTF_DISASM
-//#undef __NO_PRINTF_POSITIONAL
+//#undef  __NO_PRINTF_POSITIONAL
 //#define __NO_PRINTF_POSITIONAL
 #elif !defined(__CRT_KOS) || !defined(__KOS__)
 #undef __NO_PRINTF_GEN

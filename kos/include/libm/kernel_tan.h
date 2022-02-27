@@ -99,7 +99,7 @@ __LIBM_LOCAL_FUNC(kernel_tanf) __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
 	__z = __x * __x;
 	__w = __z * __z;
 	/* Break x^5*(T[1]+x^2*T[2]+...) into
-	 *    x^5(T[1]+x^4*T[3]+...+x^20*T[11]) +
+	 *    x^5(T[1]+x^4*T[3]+...+x^20*T[11])     +
 	 *    x^5(x^2*(T[2]+x^4*T[4]+...+x^22*[T12]))
 	 */
 	__r = __LIBM_LOCAL_VALUE(T1f) +
@@ -146,9 +146,9 @@ __LIBM_LOCAL_FUNC(kernel_tanf) __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
 #ifdef __IEEE754_DOUBLE_TYPE__
 /*
  * ====================================================
- * Copyright 2004 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2004 Sun Microsystems, Inc. All Rights Reserved.
  *
- * Permission to use, copy, modify, and distribute this
+ * Permission  to use, copy, modify, and distribute this
  * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
@@ -206,8 +206,8 @@ __LIBM_LOCAL_FUNC(kernel_tan) __ATTR_WUNUSED __IEEE754_DOUBLE_TYPE__
 	__z = __x * __x;
 	__w = __z * __z;
 	/*
-	 * Break x^5*(T[1]+x^2*T[2]+...) into
-	 * x^5(T[1]+x^4*T[3]+...+x^20*T[11]) +
+	 * Break   x^5*(T[1]+x^2*T[2]+...)    into
+	 * x^5(T[1]+x^4*T[3]+...+x^20*T[11])     +
 	 * x^5(x^2*(T[2]+x^4*T[4]+...+x^22*[T12]))
 	 */
 	__r = __LIBM_LOCAL_VALUE(T1) +

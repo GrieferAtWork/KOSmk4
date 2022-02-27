@@ -33,7 +33,7 @@
 #define __IO_FILE_IOMALLBUF __UINT32_C(0x00000008) /* The buffer was allocated internally. */
 #define __IO_FILE_IOEOF     __UINT32_C(0x00000010) /* Set when the file pointed to by 'if_fd' has been exhausted. */
 #define __IO_FILE_IOERR     __UINT32_C(0x00000020) /* Set when an I/O error occurred. */
-#define __IO_FILE_IONOFD    __UINT32_C(0x00000040) /* The file acts as output to buffer only. - 'if_fd' is not valid.
+#define __IO_FILE_IONOFD    __UINT32_C(0x00000040) /* The file acts as output to buffer only. - 'if_fd' is not  valid.
                                                     * Under KOS this flag is used to indicate the use of file cookies;
                                                     * s.a. `fopencookie(3)', `funopen(3)', `funopen64(3)', `funopen2(3)', `funopen2_64(3)' */
 #define __IO_FILE_IORW      __UINT32_C(0x00000080) /* The file was opened for read+write permissions ('+' flag) */

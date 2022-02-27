@@ -531,10 +531,10 @@ __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, onel, __IEEE854_LONG_DOUBLE_C
  *    1 + 15/128 s^2 - 4725/2^15 s^4 - ...,    where s = 1/x.
  * We approximate pone by
  *    pone(x) = 1 + (R/S) */
-/* J1(x) cosX + Y1(x) sinX  =  sqrt( 2/(pi x)) P1(x)
+/* J1(x) cosX + Y1(x) sinX = sqrt( 2/(pi x)) P1(x)
  * P1(x) = 1 + z^2 R(z^2), z=1/x
- * 8 <= x <= inf  (0 <= z <= 0.125)
- * Peak relative error 5.2e-22  */
+ * 8 <= x <= inf (0 <= z <= 0.125)
+ * Peak  relative  error   5.2e-22 */
 __LIBM_LOCAL_DECLARE_ARRAY(__IEEE854_LONG_DOUBLE_TYPE__, pone_pr8l, 7) {
 	__IEEE854_LONG_DOUBLE_C(8.402048819032978959298664869941375143163E-9),
 	__IEEE854_LONG_DOUBLE_C(1.813743245316438056192649247507255996036E-6),
@@ -553,10 +553,10 @@ __LIBM_LOCAL_DECLARE_ARRAY(__IEEE854_LONG_DOUBLE_TYPE__, pone_ps8l, 6) {
 	__IEEE854_LONG_DOUBLE_C(1.253830208588979001991901126393231302559E0)
 	/* __IEEE854_LONG_DOUBLE_C(1.000000000000000000000000000000000000000E0), */
 };
-/* J1(x) cosX + Y1(x) sinX  =  sqrt( 2/(pi x)) P1(x)
+/* J1(x) cosX + Y1(x) sinX = sqrt( 2/(pi x)) P1(x)
  * P1(x) = 1 + z^2 R(z^2), z=1/x
- * 4.54541015625 <= x <= 8
- * Peak relative error 7.7e-22  */
+ * 4.54541015625  <=  x  <=  8
+ * Peak relative error 7.7e-22 */
 __LIBM_LOCAL_DECLARE_ARRAY(__IEEE854_LONG_DOUBLE_TYPE__, pone_pr5l, 7) {
 	__IEEE854_LONG_DOUBLE_C(4.318486887948814529950980396300969247900E-7),
 	__IEEE854_LONG_DOUBLE_C(4.715341880798817230333360497524173929315E-5),
@@ -575,10 +575,10 @@ __LIBM_LOCAL_DECLARE_ARRAY(__IEEE854_LONG_DOUBLE_TYPE__, pone_ps5l, 6) {
 	__IEEE854_LONG_DOUBLE_C(2.274776933457009446573027260373361586841E0)
 	/* __IEEE854_LONG_DOUBLE_C( 1.000000000000000000000000000000000000000E0), */
 };
-/* J1(x) cosX + Y1(x) sinX  =  sqrt( 2/(pi x)) P1(x)
+/* J1(x) cosX + Y1(x) sinX = sqrt( 2/(pi x)) P1(x)
  * P1(x) = 1 + z^2 R(z^2), z=1/x
  * 2.85711669921875 <= x <= 4.54541015625
- * Peak relative error 6.5e-21  */
+ * Peak relative error 6.5e-21 */
 __LIBM_LOCAL_DECLARE_ARRAY(__IEEE854_LONG_DOUBLE_TYPE__, pone_pr3l, 7) {
 	__IEEE854_LONG_DOUBLE_C(1.265251153957366716825382654273326407972E-5),
 	__IEEE854_LONG_DOUBLE_C(8.031057269201324914127680782288352574567E-4),
@@ -597,10 +597,10 @@ __LIBM_LOCAL_DECLARE_ARRAY(__IEEE854_LONG_DOUBLE_TYPE__, pone_ps3l, 6) {
 	__IEEE854_LONG_DOUBLE_C(3.990702269032018282145100741746633960737E0)
 	/* __IEEE854_LONG_DOUBLE_C(1.000000000000000000000000000000000000000E0), */
 };
-/* J1(x) cosX + Y1(x) sinX  =  sqrt( 2/(pi x)) P1(x)
+/* J1(x) cosX + Y1(x) sinX = sqrt( 2/(pi x)) P1(x)
  * P1(x) = 1 + z^2 R(z^2), z=1/x
- * 2 <= x <= 2.85711669921875
- * Peak relative error 3.5e-21  */
+ * 2 <= x <=  2.85711669921875
+ * Peak relative error 3.5e-21 */
 __LIBM_LOCAL_DECLARE_ARRAY(__IEEE854_LONG_DOUBLE_TYPE__, pone_pr2l, 7) {
 	__IEEE854_LONG_DOUBLE_C(2.795623248568412225239401141338714516445E-4),
 	__IEEE854_LONG_DOUBLE_C(1.092578168441856711925254839815430061135E-2),
@@ -624,7 +624,7 @@ __LIBM_LOCAL_DECLARE_ARRAY(__IEEE854_LONG_DOUBLE_TYPE__, pone_ps2l, 6) {
  * We approximate qone by
  *    qone(x) = s*(0.375 + (R/S)) */
 /* Y1(x)cosX - J1(x)sinX = sqrt( 2/(pi x)) Q1(x),
- * Q1(x) = z(.375 + z^2 R(z^2)), z=1/x
+ * Q1(x)  =   z(.375   +   z^2   R(z^2)),   z=1/x
  * 8 <= x <= inf
  * Peak relative error 8.3e-22 */
 __LIBM_LOCAL_DECLARE_ARRAY(__IEEE854_LONG_DOUBLE_TYPE__, pone_qr8l, 7) {
@@ -647,7 +647,7 @@ __LIBM_LOCAL_DECLARE_ARRAY(__IEEE854_LONG_DOUBLE_TYPE__, pone_qs8l, 7) {
 	/* __IEEE854_LONG_DOUBLE_C(1.000000000000000000000000000000000000000E0), */
 };
 /* Y1(x)cosX - J1(x)sinX = sqrt( 2/(pi x)) Q1(x),
- * Q1(x) = z(.375 + z^2 R(z^2)), z=1/x
+ * Q1(x)  =   z(.375   +   z^2   R(z^2)),   z=1/x
  * 4.54541015625 <= x <= 8
  * Peak relative error 4.1e-22 */
 __LIBM_LOCAL_DECLARE_ARRAY(__IEEE854_LONG_DOUBLE_TYPE__, pone_qr5l, 7) {
@@ -670,8 +670,8 @@ __LIBM_LOCAL_DECLARE_ARRAY(__IEEE854_LONG_DOUBLE_TYPE__, pone_qs5l, 7) {
 	/* __IEEE854_LONG_DOUBLE_C(1.000000000000000000000000000000000000000E0), */
 };
 /* Y1(x)cosX - J1(x)sinX = sqrt( 2/(pi x)) Q1(x),
- * Q1(x) = z(.375 + z^2 R(z^2)), z=1/x
- * 2.85711669921875 <= x <= 4.54541015625
+ * Q1(x)  =   z(.375   +   z^2   R(z^2)),   z=1/x
+ * 2.85711669921875   <=   x   <=   4.54541015625
  * Peak relative error 2.2e-21 */
 __LIBM_LOCAL_DECLARE_ARRAY(__IEEE854_LONG_DOUBLE_TYPE__, pone_qr3l, 7) {
 	__IEEE854_LONG_DOUBLE_C(-3.618746299358445926506719188614570588404E-6),
@@ -693,7 +693,7 @@ __LIBM_LOCAL_DECLARE_ARRAY(__IEEE854_LONG_DOUBLE_TYPE__, pone_qs3l, 7) {
 	/* __IEEE854_LONG_DOUBLE_C(1.000000000000000000000000000000000000000E0), */
 };
 /* Y1(x)cosX - J1(x)sinX = sqrt( 2/(pi x)) Q1(x),
- * Q1(x) = z(.375 + z^2 R(z^2)), z=1/x
+ * Q1(x)  =   z(.375   +   z^2   R(z^2)),   z=1/x
  * 2 <= x <= 2.85711669921875
  * Peak relative error 6.9e-22 */
 __LIBM_LOCAL_DECLARE_ARRAY(__IEEE854_LONG_DOUBLE_TYPE__, pone_qr2l, 7) {
@@ -750,8 +750,8 @@ __LIBM_LOCAL_FUNC(j1_y1_ponel) __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__
 __LIBM_LOCAL_FUNC(j1_y1_qonel) __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__
 (__LIBCCALL __ieee854_j1_y1_qonel)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
 	__IEEE854_LONG_DOUBLE_TYPE__ const *__p, *__q;
-	/* XXX: These 3 were "static" -- I think that was a typo...
-	 * s.a. https://github.com/freemint/fdlibm/issues/5  (Reported as a bug) */
+	/* XXX: These  3  were  "static"  --   I  think  that  was  a   typo...
+	 * s.a. https://github.com/freemint/fdlibm/issues/5 (Reported as a bug) */
 	__IEEE854_LONG_DOUBLE_TYPE__ __s, __r, __z;
 	__int32_t __ix;
 	__uint32_t __se, __i0, __i1;

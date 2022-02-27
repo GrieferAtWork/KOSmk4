@@ -1591,9 +1591,9 @@ int usleep($useconds_t useconds) {
 }
 
 @@>> getwd(3)
-@@Deprecated, alternate variant of `getcwd()'. It
+@@Deprecated, alternate variant  of `getcwd()'.  It
 @@should be obvious why you shouldn't use this one.
-@@And if it isn't, take a look at the arguments of
+@@And  if it isn't, take a look at the arguments of
 @@this function, compared to `getcwd()'
 [[crt_dos_variant, cp, deprecated("Use getcwd()")]]
 [[section(".text.crt{|.dos}.fs.basic_property")]]

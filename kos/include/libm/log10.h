@@ -164,7 +164,7 @@ __LIBM_LOCAL_DECLARE_BEGIN
 /* Coefficients for ln(1+x) = x - x**2/2 + x**3 P(x)/Q(x)
  * 1/sqrt(2) <= x < sqrt(2)
  * Theoretical peak relative error = 5.3e-37,
- * relative peak error spread = 2.3e-14 */
+ * relative  peak  error  spread  =   2.3e-14 */
 __LIBM_LOCAL_DECLARE_ARRAY(__IEEE854_LONG_DOUBLE_TYPE__, log10Pl, 13) {
 	__IEEE854_LONG_DOUBLE_C(1.313572404063446165910279910527789794488E4),
 	__IEEE854_LONG_DOUBLE_C(7.771154681358524243729929227226708890930E4),
@@ -200,7 +200,7 @@ __LIBM_LOCAL_DECLARE_ARRAY(__IEEE854_LONG_DOUBLE_TYPE__, log10Ql, 12) {
  * where z = 2(x-1)/(x+1)
  * 1/sqrt(2) <= x < sqrt(2)
  * Theoretical peak relative error = 1.1e-35,
- * relative peak error spread 1.1e-9 */
+ * relative   peak   error   spread    1.1e-9 */
 __LIBM_LOCAL_DECLARE_ARRAY(__IEEE854_LONG_DOUBLE_TYPE__, log10Rl, 6) {
 	__IEEE854_LONG_DOUBLE_C(1.418134209872192732479751274970992665513E5),
 	__IEEE854_LONG_DOUBLE_C(-8.977257995689735303686582344659576526998E4),

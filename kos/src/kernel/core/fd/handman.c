@@ -509,7 +509,7 @@ NOTHROW(FCALL handrange_dec_nlops_and_maybe_rejoin)(struct handrange *__restrict
                                                     struct handman *__restrict man,
                                                     bool try_truncate_self) {
 	/* Rejoin and all that stuff can only work if the _last_ LOP handle goes away.
-	 * For any recursive LOP handle, we don't even have to try and acquire a lock
+	 * For  any recursive LOP handle, we don't even have to try and acquire a lock
 	 * to the handle manager. */
 	for (;;) {
 		unsigned int nlops;

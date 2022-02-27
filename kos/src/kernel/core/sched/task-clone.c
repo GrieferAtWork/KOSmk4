@@ -408,7 +408,7 @@ DECL_BEGIN
 
 /* High-level implementation for the `clone(2)' system call.
  * @param: init_state: The CPU state of the thead that called `clone(2)'
- *                     Pass `NULL' to spawn a new kernel thread.
+ *                     Pass   `NULL'  to  spawn  a  new  kernel  thread.
  * @param: args:       Clone arguments. */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((2)) REF struct task *FCALL
 task_clone(struct icpustate const *init_state,
@@ -447,7 +447,7 @@ task_clone(struct icpustate const *init_state,
 		if (clone_flags & (CLONE_VM | CLONE_VFORK)) {
 			if unlikely(init_state == NULL) {
 				/* Since kernel threads are handled as children of /bin/init,
-				 * that's exactly who we act like being our parent thread. */
+				 * that's exactly who  we act like  being our parent  thread. */
 				caller         = &boottask;
 				result->t_mman = incref(&mman_kernel);
 			} else {
@@ -896,7 +896,7 @@ do_clone_pid:
 }
 
 
-/* Create and start a new kernel thread.
+/* Create  and start a new kernel thread.
  * >> static int my_tmain(int a, int b) {
  * >>     printk(KERN_TRACE "my_tmain(%d, %d)\n", a, b);
  * >>     return 0;

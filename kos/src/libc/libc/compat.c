@@ -1284,7 +1284,7 @@ libd__except1(int unknown_flags, int fpu_opcode, double arg1, double result, uin
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos") double LIBCCALL
 libd__except2(int unknown_flags, int fpu_opcode, double arg1, double arg2, double result, uintptr_t fpu_cw) {
 	/* This function seems related to DOS math error handling... */
-	CRT_UNIMPLEMENTEDF("DOS$_except1(%d,%d,%f,%f,%f,%p)",
+	CRT_UNIMPLEMENTEDF("DOS$_except2(%d,%d,%f,%f,%f,%p)",
 	                   unknown_flags, fpu_opcode, arg1, arg2, result, fpu_cw);
 	return result;
 }

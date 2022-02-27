@@ -148,7 +148,7 @@ struct __sigset_structx32 {
 #endif /* !____sigsetx32_t_defined */
 
 /* Structure describing the action to be taken when a signal arrives.
- * WARNING: on i386, the kernel system call `sys_rt_sigaction()' uses a
+ * WARNING: on i386, the kernel system call `sys_rt_sigaction()' uses  a
  *          binary incompatible structure `struct __kernel_sigactionx32'
  *          instead of this one! */
 struct __ATTR_ALIGNED(__ALIGNOF_SIGACTIONX32) __sigactionx32 /*[NAME(sigactionx32)][PREFIX(sa_)]*/ {

@@ -24,8 +24,6 @@
 
 #include <kernel/types.h>
 
-DECL_BEGIN
-
 /* Makeup of `ecode' passed to `x86_handle_pagefault()' */
 #define X86_PAGEFAULT_ECODE_PRESENT     0x0001 /* FLAG: The accessed page is present (Check for LOA) */
 #define X86_PAGEFAULT_ECODE_WRITING     0x0002 /* FLAG: The fault happened as a result of a memory write (Check for COW) */
@@ -37,9 +35,10 @@ DECL_BEGIN
                                                 *       by comparing `%eip' with `%cr2' */
 
 #ifdef __CC__
+#ifdef CONFIG_BUILDING_KERNEL_CORE
+DECL_BEGIN
 
 /* Helpers and prototypes for c-level hardware fault handlers. */
-#ifdef CONFIG_BUILDING_KERNEL_CORE
 struct icpustate;
 struct df_cpustate;
 
@@ -100,9 +99,8 @@ INTDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FC
 INTDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL x86_handle_2eh(struct icpustate *__restrict state);
 INTDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL x86_handle_2fh(struct icpustate *__restrict state);
 
+DECL_END
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 #endif /* __CC__ */
-
-DECL_END
 
 #endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_FAULT_H */
