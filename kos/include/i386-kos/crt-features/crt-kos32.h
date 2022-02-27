@@ -5247,6 +5247,7 @@
 #define __CRT_HAVE_time64
 #define __CRT_HAVE_timegm
 #define __CRT_HAVE_timegm64
+#define __CRT_HAVE_timelocal
 #define __CRT_HAVE_timelocal64
 #define __CRT_HAVE_timer_create
 #define __CRT_HAVE_timer_delete

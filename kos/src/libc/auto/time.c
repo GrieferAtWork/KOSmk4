@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b3d3bc3 */
+/* HASH CRC-32:0xee9b120a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -676,6 +676,7 @@ DECL_END
 
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(difftime, libc_difftime);
+DEFINE_PUBLIC_ALIAS(timelocal, libc_mktime);
 DEFINE_PUBLIC_ALIAS(mktime, libc_mktime);
 DEFINE_PUBLIC_ALIAS(ctime, libc_ctime);
 DEFINE_PUBLIC_ALIAS(gmtime, libc_gmtime);

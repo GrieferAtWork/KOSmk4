@@ -584,7 +584,7 @@ double difftime(time_t time1, time_t time0) {
 [[pure, wunused, std, decl_include("<features.h>", "<bits/types.h>", "<bits/crt/tm.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("mktime64", "_mktime64", "timelocal64")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("mktime", "_mktime32", "timelocal")]]
-[[impl_prefix(DEFINE_YEARSTODAYS)]]
+[[impl_prefix(DEFINE_YEARSTODAYS), export_as("timelocal")]]
 time_t mktime([[nonnull]] struct tm __KOS_FIXED_CONST *tp) {
 @@pp_if $has_function(mktime64) && !defined(__BUILDING_LIBC)@@
 	return (time_t)mktime64(tp);

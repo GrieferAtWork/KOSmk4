@@ -4875,6 +4875,7 @@
 #define __CRT_HAVE_time64
 #define __CRT_HAVE_timegm
 #define __CRT_HAVE_timegm64
+#define __CRT_HAVE_timelocal
 #define __CRT_HAVE_timelocal64
 #define __CRT_HAVE_timer_create
 #define __CRT_HAVE_timer_delete
@@ -8959,6 +8960,7 @@
 #define __CRT_HAVE_KOS$time64
 #define __CRT_HAVE_KOS$timegm
 #define __CRT_HAVE_KOS$timegm64
+#define __CRT_HAVE_KOS$timelocal
 #define __CRT_HAVE_KOS$timelocal64
 #define __CRT_HAVE_KOS$timer_create
 #define __CRT_HAVE_KOS$timer_delete
@@ -12970,6 +12972,7 @@
 #define __CRT_HAVE_DOS$time64
 #define __CRT_HAVE_DOS$timegm
 #define __CRT_HAVE_DOS$timegm64
+#define __CRT_HAVE_DOS$timelocal
 #define __CRT_HAVE_DOS$timelocal64
 #define __CRT_HAVE_DOS$timer_create
 #define __CRT_HAVE_DOS$timer_delete
