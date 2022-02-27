@@ -44,6 +44,7 @@
 #include <elf.h>
 #include <format-printer.h>
 #include <math.h>
+#include <signal.h>
 #include <stdlib.h> /* exit() */
 #include <string.h>
 #include <syscall.h>
@@ -460,6 +461,55 @@ libc___cyg_profile_func_enter(void *this_fn, void *call_site) {
 	COMPILER_IMPURE();
 	(void)this_fn;
 	(void)call_site;
+}
+
+
+
+
+
+
+/************************************************************************/
+/* sigvec(3)                                                            */
+/************************************************************************/
+struct sigvec {
+	__sighandler_t sv_handler; /* Signal handler. */
+	int            sv_mask;    /* (too small) signal mask. */
+	int            sv_flags;   /* Set of `SV_*' */
+};
+#define SV_ONSTACK   0x0001 /* s.a. `SA_ONSTACK' */
+#define SV_INTERRUPT 0x0002 /* inverse of `SA_RESTART' */
+#define SV_RESETHAND 0x0004 /* s.a. `SA_RESETHAND' */
+
+DEFINE_PUBLIC_ALIAS(sigvec, libc_sigvec);
+INTERN ATTR_SECTION(".text.crt.compat.linux.signal") int LIBCCALL
+libc_sigvec(signo_t sig, struct sigvec const *nvec, struct sigvec *ovec) {
+	int result;
+	struct sigaction nsa, osa;
+	if (nvec) {
+		bzero(&nsa, sizeof(nsa));
+		sigfillset(&nsa.sa_mask);
+		nsa.sa_handler = nvec->sv_handler;
+		memcpy(&nsa.sa_mask, &nvec->sv_mask, sizeof(int));
+		if (nvec->sv_flags & SV_ONSTACK)
+			nsa.sa_flags |= SA_ONSTACK;
+		if (!(nvec->sv_flags & SV_INTERRUPT))
+			nsa.sa_flags |= SA_RESTART;
+		if (nvec->sv_flags & SV_RESETHAND)
+			nsa.sa_flags |= SA_RESETHAND;
+	}
+	result = sigaction(sig, nvec ? &nsa : NULL, ovec ? &osa : NULL);
+	if (result == 0 && ovec) {
+		ovec->sv_handler = osa.sa_handler;
+		memcpy(&ovec->sv_mask, &osa.sa_mask, sizeof(int));
+		ovec->sv_flags = 0;
+		if (osa.sa_flags & SA_ONSTACK)
+			ovec->sv_flags |= SV_ONSTACK;
+		if (!(osa.sa_flags & SA_RESTART))
+			ovec->sv_flags |= SV_INTERRUPT;
+		if (osa.sa_flags & SA_RESETHAND)
+			ovec->sv_flags |= SV_RESETHAND;
+	}
+	return result;
 }
 
 

@@ -3984,6 +3984,7 @@
 #define __CRT_HAVE_sigsuspend
 #define __CRT_HAVE_sigtimedwait
 #define __CRT_HAVE_sigtimedwait64
+#define __CRT_HAVE_sigvec
 #define __CRT_HAVE_sigwait
 #define __CRT_HAVE_sigwaitinfo
 #define __CRT_HAVE_sin
