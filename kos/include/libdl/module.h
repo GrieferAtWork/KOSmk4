@@ -260,6 +260,14 @@ struct dlmodule {
 	/* --- End of `struct link_map' emulation --- */
 
 	/* TLS variables (PT_TLS). */
+	/* TODO: Get  rid of  `dm_tlsoff', and  make `dm_tlsinit'  not be lazy-init.
+	 *       The current implementation is a result  of me for the longest  time
+	 *       not realizing that ELF .tdata and .tbss are SUPPOSED TO BE PT_LOAD.
+	 * This doesn't actually change anything about ABI compat, and as a  matter
+	 * of fact: the current implementation is more lenient than it needs to be,
+	 * and accepts actually  non-confirming programs (in  addition of  actually
+	 * confirming  ones). But as  a result, it's also  more complicated than it
+	 * needs to be. */
 	ElfW(Off)                 dm_tlsoff;     /* [valid_if(dm_tlsfsize != 0)] File offset to the TLS template. */
 	byte_t const             *dm_tlsinit;    /* [valid_if(dm_tlsfsize != 0)][0..dm_tlsfsize][lock(WRITE_ONCE)][owned] Non-BSS TLS template data. */
 	size_t                    dm_tlsfsize;   /* [<= dm_tlsmsize] In-file size of this module's TLS template image. */

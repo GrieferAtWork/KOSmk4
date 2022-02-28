@@ -545,9 +545,9 @@ INTERN_FUNCTION(libd__wassert)
 #ifdef __x86_64__
 	/* NOTE: Because we're NORETURN, no need to do `MSABI_SAVEZONE_PUSH()'! */
 
-	/* %R_sysvabi0P: char16_t const *expr
-	 * %R_sysvabi1P: char16_t const *file
-	 * %R_sysvabi2P: unsigned int line */
+	/* %R_msabi0P: char16_t const *expr
+	 * %R_msabi1P: char16_t const *file
+	 * %R_msabi2P: unsigned int line */
 	pushP_cfi $(0)        /* aa_format */
 	pushP_cfi $(0)        /* aa_func */
 	pushP_cfi %R_msabi2P  /* aa_line */

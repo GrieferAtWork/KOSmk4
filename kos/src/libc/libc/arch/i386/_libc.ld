@@ -159,15 +159,6 @@ SECTIONS {
 	} PHDR(rodata)
 #endif /* !__x86_64__ */
 
-	.tdata : {
-		*(.tdata .tdata.* .gnu.linkonce.td.*)
-	} PHDR(tls)
-
-	.tbss : {
-		*(.tbss .tbss.* .gnu.linkonce.tb.*)
-		*(.tcommon)
-	} PHDR(tls)
-
 	. = ALIGN(__ARCH_PAGESIZE);
 	.dynamic : {
 		*(.dynamic)
@@ -199,10 +190,19 @@ SECTIONS {
 	.fini_array : {
 		KEEP(*(SORT_BY_INIT_PRIORITY(.fini_array*) SORT_BY_INIT_PRIORITY(.dtors.*)))
 	} PHDR(data)
+
+	.tdata : {
+		*(.tdata .tdata.* .gnu.linkonce.td.*)
+	} PHDR(tls) PHDR(data)
 	_edata = .;
 
 //	. = ALIGN(__ARCH_PAGESIZE);
 	__bss_start = .;
+	.tbss : {
+		*(.tbss .tbss.* .gnu.linkonce.tb.*)
+		*(.tcommon)
+	} PHDR(tls) PHDR(data)
+
 	.bss : {
 		ENUMERATE_SECTIONS(.bss)
 		*(.bss.local.*)
