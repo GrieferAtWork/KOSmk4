@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfbe8d5 */
+/* HASH CRC-32:0xba4db29b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -834,6 +834,21 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
 		}
 	}
 	if unlikely(num_iter == num_start) {
+		/* Check for special case: `0xGARBAGE'.
+		 * -> In this case, return `0' and set `endptr' to `x' */
+		if ((base == 16 || base == 2) && num_start > nptr) {
+			char const *nptr_ps = nptr;
+			while (libc_isspace(*nptr_ps))
+				++nptr_ps;
+			if (num_start > nptr_ps && *nptr_ps == '0') {
+				if (endptr)
+					*endptr = (char *)nptr_ps + 1;
+				if (error)
+					*error = 0;
+				return 0;
+			}
+		}
+
 		/* Empty number... */
 		if (error) {
 #ifdef __ECANCELED
@@ -978,6 +993,21 @@ handle_overflow:
 			goto handle_overflow; /* Overflow... */
 	}
 	if unlikely(num_iter == num_start) {
+		/* Check for special case: `0xGARBAGE'.
+		 * -> In this case, return `0' and set `endptr' to `x' */
+		if ((base == 16 || base == 2) && num_start > nptr) {
+			char const *nptr_ps = nptr;
+			while (libc_isspace(*nptr_ps))
+				++nptr_ps;
+			if (num_start > nptr_ps && *nptr_ps == '0') {
+				if (endptr)
+					*endptr = (char *)nptr_ps + 1;
+				if (error)
+					*error = 0;
+				return 0;
+			}
+		}
+
 		/* Empty number... */
 		if (error) {
 #ifdef __ECANCELED
@@ -1108,6 +1138,21 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
 		}
 	}
 	if unlikely(num_iter == num_start) {
+		/* Check for special case: `0xGARBAGE'.
+		 * -> In this case, return `0' and set `endptr' to `x' */
+		if ((base == 16 || base == 2) && num_start > nptr) {
+			char const *nptr_ps = nptr;
+			while (libc_isspace(*nptr_ps))
+				++nptr_ps;
+			if (num_start > nptr_ps && *nptr_ps == '0') {
+				if (endptr)
+					*endptr = (char *)nptr_ps + 1;
+				if (error)
+					*error = 0;
+				return 0;
+			}
+		}
+
 		/* Empty number... */
 		if (error) {
 #ifdef __ECANCELED
@@ -1251,6 +1296,21 @@ handle_overflow:
 			goto handle_overflow; /* Overflow... */
 	}
 	if unlikely(num_iter == num_start) {
+		/* Check for special case: `0xGARBAGE'.
+		 * -> In this case, return `0' and set `endptr' to `x' */
+		if ((base == 16 || base == 2) && num_start > nptr) {
+			char const *nptr_ps = nptr;
+			while (libc_isspace(*nptr_ps))
+				++nptr_ps;
+			if (num_start > nptr_ps && *nptr_ps == '0') {
+				if (endptr)
+					*endptr = (char *)nptr_ps + 1;
+				if (error)
+					*error = 0;
+				return 0;
+			}
+		}
+
 		/* Empty number... */
 		if (error) {
 #ifdef __ECANCELED

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8454196e */
+/* HASH CRC-32:0xa18662ef */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2665,6 +2665,21 @@ handle_overflow:
 			goto handle_overflow; /* Overflow... */
 	}
 	if unlikely(num_iter == num_start) {
+		/* Check for special case: `0xGARBAGE'.
+		 * -> In this case, return `0' and set `endptr' to `x' */
+		if ((base == 16 || base == 2) && num_start > nptr) {
+			char16_t const *nptr_ps = nptr;
+			while (libd_iswspace(*nptr_ps))
+				++nptr_ps;
+			if (num_start > nptr_ps && *nptr_ps == '0') {
+				if (endptr)
+					*endptr = (char16_t *)nptr_ps + 1;
+				if (error)
+					*error = 0;
+				return 0;
+			}
+		}
+
 		/* Empty number... */
 		if (error) {
 #ifdef __ECANCELED
@@ -2796,6 +2811,21 @@ handle_overflow:
 			goto handle_overflow; /* Overflow... */
 	}
 	if unlikely(num_iter == num_start) {
+		/* Check for special case: `0xGARBAGE'.
+		 * -> In this case, return `0' and set `endptr' to `x' */
+		if ((base == 16 || base == 2) && num_start > nptr) {
+			char32_t const *nptr_ps = nptr;
+			while (libc_iswspace(*nptr_ps))
+				++nptr_ps;
+			if (num_start > nptr_ps && *nptr_ps == '0') {
+				if (endptr)
+					*endptr = (char32_t *)nptr_ps + 1;
+				if (error)
+					*error = 0;
+				return 0;
+			}
+		}
+
 		/* Empty number... */
 		if (error) {
 #ifdef __ECANCELED
@@ -2913,6 +2943,21 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
 		}
 	}
 	if unlikely(num_iter == num_start) {
+		/* Check for special case: `0xGARBAGE'.
+		 * -> In this case, return `0' and set `endptr' to `x' */
+		if ((base == 16 || base == 2) && num_start > nptr) {
+			char16_t const *nptr_ps = nptr;
+			while (libd_iswspace(*nptr_ps))
+				++nptr_ps;
+			if (num_start > nptr_ps && *nptr_ps == '0') {
+				if (endptr)
+					*endptr = (char16_t *)nptr_ps + 1;
+				if (error)
+					*error = 0;
+				return 0;
+			}
+		}
+
 		/* Empty number... */
 		if (error) {
 #ifdef __ECANCELED
@@ -3030,6 +3075,21 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
 		}
 	}
 	if unlikely(num_iter == num_start) {
+		/* Check for special case: `0xGARBAGE'.
+		 * -> In this case, return `0' and set `endptr' to `x' */
+		if ((base == 16 || base == 2) && num_start > nptr) {
+			char32_t const *nptr_ps = nptr;
+			while (libc_iswspace(*nptr_ps))
+				++nptr_ps;
+			if (num_start > nptr_ps && *nptr_ps == '0') {
+				if (endptr)
+					*endptr = (char32_t *)nptr_ps + 1;
+				if (error)
+					*error = 0;
+				return 0;
+			}
+		}
+
 		/* Empty number... */
 		if (error) {
 #ifdef __ECANCELED
@@ -3229,6 +3289,21 @@ handle_overflow:
 			goto handle_overflow; /* Overflow... */
 	}
 	if unlikely(num_iter == num_start) {
+		/* Check for special case: `0xGARBAGE'.
+		 * -> In this case, return `0' and set `endptr' to `x' */
+		if ((base == 16 || base == 2) && num_start > nptr) {
+			char16_t const *nptr_ps = nptr;
+			while (libd_iswspace(*nptr_ps))
+				++nptr_ps;
+			if (num_start > nptr_ps && *nptr_ps == '0') {
+				if (endptr)
+					*endptr = (char16_t *)nptr_ps + 1;
+				if (error)
+					*error = 0;
+				return 0;
+			}
+		}
+
 		/* Empty number... */
 		if (error) {
 #ifdef __ECANCELED
@@ -3360,6 +3435,21 @@ handle_overflow:
 			goto handle_overflow; /* Overflow... */
 	}
 	if unlikely(num_iter == num_start) {
+		/* Check for special case: `0xGARBAGE'.
+		 * -> In this case, return `0' and set `endptr' to `x' */
+		if ((base == 16 || base == 2) && num_start > nptr) {
+			char32_t const *nptr_ps = nptr;
+			while (libc_iswspace(*nptr_ps))
+				++nptr_ps;
+			if (num_start > nptr_ps && *nptr_ps == '0') {
+				if (endptr)
+					*endptr = (char32_t *)nptr_ps + 1;
+				if (error)
+					*error = 0;
+				return 0;
+			}
+		}
+
 		/* Empty number... */
 		if (error) {
 #ifdef __ECANCELED
@@ -3477,6 +3567,21 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
 		}
 	}
 	if unlikely(num_iter == num_start) {
+		/* Check for special case: `0xGARBAGE'.
+		 * -> In this case, return `0' and set `endptr' to `x' */
+		if ((base == 16 || base == 2) && num_start > nptr) {
+			char16_t const *nptr_ps = nptr;
+			while (libd_iswspace(*nptr_ps))
+				++nptr_ps;
+			if (num_start > nptr_ps && *nptr_ps == '0') {
+				if (endptr)
+					*endptr = (char16_t *)nptr_ps + 1;
+				if (error)
+					*error = 0;
+				return 0;
+			}
+		}
+
 		/* Empty number... */
 		if (error) {
 #ifdef __ECANCELED
@@ -3594,6 +3699,21 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
 		}
 	}
 	if unlikely(num_iter == num_start) {
+		/* Check for special case: `0xGARBAGE'.
+		 * -> In this case, return `0' and set `endptr' to `x' */
+		if ((base == 16 || base == 2) && num_start > nptr) {
+			char32_t const *nptr_ps = nptr;
+			while (libc_iswspace(*nptr_ps))
+				++nptr_ps;
+			if (num_start > nptr_ps && *nptr_ps == '0') {
+				if (endptr)
+					*endptr = (char32_t *)nptr_ps + 1;
+				if (error)
+					*error = 0;
+				return 0;
+			}
+		}
+
 		/* Empty number... */
 		if (error) {
 #ifdef __ECANCELED

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3bde4efb */
+/* HASH CRC-32:0x492599f0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -147,6 +147,21 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16stou32_r))(__CHAR16_TYPE__ const *
 		}
 	}
 	if __unlikely(__num_iter == __num_start) {
+		/* Check for special case: `0xGARBAGE'.
+		 * -> In this case, return `0' and set `endptr' to `x' */
+		if ((__base == 16 || __base == 2) && __num_start > __nptr) {
+			__CHAR16_TYPE__ const *__nptr_ps = __nptr;
+			while ((__NAMESPACE_LOCAL_SYM __localdep_isspace16)(*__nptr_ps))
+				++__nptr_ps;
+			if (__num_start > __nptr_ps && *__nptr_ps == '0') {
+				if (__endptr)
+					*__endptr = (__CHAR16_TYPE__ *)__nptr_ps + 1;
+				if (__error)
+					*__error = 0;
+				return 0;
+			}
+		}
+
 		/* Empty number... */
 		if (__error) {
 #ifdef __ECANCELED

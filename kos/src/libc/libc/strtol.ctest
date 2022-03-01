@@ -1,0 +1,104 @@
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_LIBC_LIBC_STRTOL_CTEST
+#define GUARD_LIBC_LIBC_STRTOL_CTEST 1
+#undef NDEBUG
+#define _KOS_SOURCE 1
+
+/**/
+#include <hybrid/compiler.h>
+
+#include <kos/types.h>
+#include <system-test/ctest.h>
+
+#include <assert.h>
+#include <errno.h>
+#include <stdlib.h>
+
+DECL_BEGIN
+
+PRIVATE void to_test(int variant) {
+	errno_t error;
+	int64_t value;
+	char const *str, *endp;
+	errno = 0;
+#define DO_STRTOI(str, endp, radix, p_error)                                                     \
+	(variant == 0                                                                                \
+	 ? (int64_t)strto32_r(str, endp, radix, p_error)                                             \
+	 : variant == 1                                                                              \
+	   ? (int64_t)strto64_r(str, endp, radix, p_error)                                           \
+	   : variant == 2                                                                            \
+	     ? (int64_t)strtou32_r(str, endp, radix, p_error)                                        \
+	     : variant == 3                                                                          \
+	       ? (int64_t)strtou64_r(str, endp, radix, p_error)                                      \
+	       : variant == 4                                                                        \
+	         ? ({ int64_t _v = (int64_t)strto32(str, endp, radix); *p_error = errno; _v; })      \
+	         : variant == 5                                                                      \
+	           ? ({ int64_t _v = (int64_t)strto64(str, endp, radix); *p_error = errno; _v; })    \
+	           : variant == 6                                                                    \
+	             ? ({ int64_t _v = (int64_t)strtou32(str, endp, radix); *p_error = errno; _v; }) \
+	             : ({ int64_t _v = (int64_t)strtou64(str, endp, radix); *p_error = errno; _v; }))
+#define DO_TEST(string, radix, ival, endp_offset)          \
+	str   = string;                                        \
+	value = DO_STRTOI(str, (char **)&endp, radix, &error); \
+	EQd64(ival, value);                                    \
+	EQd(0, error);                                         \
+	EQp(str + endp_offset, endp);
+
+	DO_TEST("42", 0, 42, 2);
+	DO_TEST("0x42", 0, 0x42, 4);
+	DO_TEST("42", 16, 0x42, 2);
+	DO_TEST("0x1s", 0, 0x1, 3);
+	DO_TEST("0x1s", 16, 0, 1);
+	DO_TEST("0xg", 0, 0, 1);
+	DO_TEST("0xg", 16, 0, 1);
+	DO_TEST("0bg", 0, 0, 1);
+	DO_TEST("0bg", 2, 0, 1);
+	DO_TEST("0b1g", 0, 1, 3);
+	DO_TEST("0b1g", 2, 0, 1);
+	DO_TEST("    42", 0, 42, 4 + 2);
+	DO_TEST("    0x42", 0, 0x42, 4 + 4);
+	DO_TEST("    42", 16, 0x42, 4 + 2);
+	DO_TEST("    0x1s", 0, 0x1, 4 + 3);
+	DO_TEST("    0x1s", 16, 0, 4 + 1);
+	DO_TEST("    0xg", 0, 0, 4 + 1);
+	DO_TEST("    0xg", 16, 0, 4 + 1);
+	DO_TEST("    0bg", 0, 0, 4 + 1);
+	DO_TEST("    0bg", 2, 0, 4 + 1);
+	DO_TEST("    0b1g", 0, 1, 4 + 3);
+	DO_TEST("    0b1g", 2, 0, 4 + 1);
+#undef DO_TEST
+#undef DO_STRTOI
+}
+
+DEFINE_TEST(strtol) {
+	to_test(0);
+	to_test(1);
+	to_test(2);
+	to_test(3);
+	to_test(4);
+	to_test(5);
+	to_test(6);
+	to_test(7);
+}
+
+DECL_END
+
+#endif /* !GUARD_LIBC_LIBC_STRTOL_CTEST */

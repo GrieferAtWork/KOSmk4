@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7626f4a */
+/* HASH CRC-32:0xc0c6e13 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -139,6 +139,21 @@ __handle_overflow:
 			goto __handle_overflow; /* Overflow... */
 	}
 	if __unlikely(__num_iter == __num_start) {
+		/* Check for special case: `0xGARBAGE'.
+		 * -> In this case, return `0' and set `endptr' to `x' */
+		if ((__base == 16 || __base == 2) && __num_start > __nptr) {
+			char const *__nptr_ps = __nptr;
+			while ((__NAMESPACE_LOCAL_SYM __localdep_isspace)(*__nptr_ps))
+				++__nptr_ps;
+			if (__num_start > __nptr_ps && *__nptr_ps == '0') {
+				if (__endptr)
+					*__endptr = (char *)__nptr_ps + 1;
+				if (__error)
+					*__error = 0;
+				return 0;
+			}
+		}
+
 		/* Empty number... */
 		if (__error) {
 #ifdef __ECANCELED
