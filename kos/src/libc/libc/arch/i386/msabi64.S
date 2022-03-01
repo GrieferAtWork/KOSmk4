@@ -82,7 +82,7 @@
 
 
 /* Floating point argument passing is identical between msabi and sysvabi,
- * with the exception that msabi requires a buch of fpu registers to  stay
+ * with the exception that msabi requires a bunch of fpu registers to stay
  * preserved upon return. */
 #define libd_msabi64_F      libd_msabi64_R
 #define libd_msabi64_FF     libd_msabi64_R
@@ -116,8 +116,8 @@
 #define DFUN(sectionName, libd_name, libc_name, returnType, argc, ...)              \
 	INTERN_FUNCTION(libd_name);                                                     \
 		INTERN(libc_name);                                                          \
-		/* movzlq $((libc_name - .) - 10), %rax */                                  \
-		/* HINT: 10 == . - END(libd_name) */                                        \
+		/* movl $((libc_name - .) - 10), %eax */                                    \
+		/* HINT: 10 == END(libd_name) - . */                                        \
 		.byte  0xb8;                                                                \
 		.reloc ., R_X86_64_PC32, libc_name - 9; /* 10-1=9, where 1=sizeof(.byte) */ \
 		.int   0;                                                                   \

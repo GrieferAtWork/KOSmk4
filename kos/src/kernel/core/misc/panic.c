@@ -562,10 +562,12 @@ panic_genfail_dbg_main(/*char const **/ void *message) {
 /* The `__stack_chk_guard' global is read _very_ often,
  * so   place   in   in   the   COMPACT_DATA   segment. */
 #ifndef NDEBUG
-PUBLIC ATTR_READMOSTLY uintptr_t __stack_chk_guard = 0x123baf37;
+INTERN ATTR_READMOSTLY uintptr_t libc_stack_chk_guard = 0x123baf37;
 #else /* !NDEBUG */
-PUBLIC ATTR_COLDDATA uintptr_t __stack_chk_guard = 0x123baf37;
+INTERN ATTR_COLDDATA uintptr_t libc_stack_chk_guard = 0x123baf37;
 #endif /* NDEBUG */
+DEFINE_PUBLIC_ALIAS(__stack_chk_guard, libc_stack_chk_guard);
+
 
 INTERN ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN void
 NOTHROW(FCALL libc_stack_failure_core)(struct kcpustate *__restrict state) {

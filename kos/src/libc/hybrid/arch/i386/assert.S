@@ -47,9 +47,9 @@
 #endif /* !__KERNEL__ */
 
 /* >> PUBLIC ATTR_NORETURN void LIBCCALL __stack_chk_fail(void);
- * >> INTERN ATTR_NORETURN void LIBCCALL __stack_chk_fail_local(void); */
+ * >> PUBLIC ATTR_NORETURN void LIBCCALL __stack_chk_fail_local(void); */
 .section ASSERTION_SECTION
-PUBLIC_FUNCTION(__stack_chk_fail)
+INTERN_FUNCTION(libc_stack_chk_fail)
 	.cfi_startproc
 	/* Generate a full `struct kcpustate' */
 	ASM_PUSH_KCPUSTATE_AFTER_PIP_CFI_R
@@ -59,8 +59,9 @@ PUBLIC_FUNCTION(__stack_chk_fail)
 	EXTERN(libc_stack_failure_core)
 	call   libc_stack_failure_core
 	.cfi_endproc
-END(__stack_chk_fail)
-DEFINE_INTERN_ALIAS(__stack_chk_fail_local, __stack_chk_fail)
+END(libc_stack_chk_fail)
+DEFINE_PUBLIC_ALIAS(__stack_chk_fail, libc_stack_chk_fail)
+DEFINE_PUBLIC_ALIAS(__stack_chk_fail_local, libc_stack_chk_fail)
 
 
 /* >> PUBLIC ATTR_NORETURN void LIBCCALL abort(void); */

@@ -71,7 +71,8 @@ INTDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL l
 
 DATDEF uintptr_t __stack_chk_guard;
 FUNDEF ATTR_NORETURN void __stack_chk_fail(void);
-INTDEF ATTR_NORETURN void __stack_chk_fail_local(void);
+FUNDEF ATTR_NORETURN void __stack_chk_fail_local(void);
+INTDEF ATTR_NORETURN void libc_stack_chk_fail(void);
 
 
 DECL_END

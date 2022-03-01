@@ -1327,10 +1327,11 @@ NOTHROW(FCALL except_throw_current_at_icpustate)(struct icpustate *__restrict st
 
 /* This  function  is hooked  by CFI  under `struct unwind_fde_struct::f_persofun'
  * It's exact prototype and behavior are therefor not mandated by how GCC uses it. */
-DEFINE_PUBLIC_ALIAS(__gcc_personality_v0, __gxx_personality_v0);
-PUBLIC WUNUSED NONNULL((1, 2)) unsigned int
-NOTHROW(EXCEPT_PERSONALITY_CC __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
-                                                    struct kcpustate *__restrict state) {
+DEFINE_PUBLIC_ALIAS(__gcc_personality_v0, libc_gxx_personality_v0);
+DEFINE_PUBLIC_ALIAS(__gxx_personality_v0, libc_gxx_personality_v0);
+INTERN WUNUSED NONNULL((1, 2)) unsigned int
+NOTHROW(EXCEPT_PERSONALITY_CC libc_gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
+                                                       struct kcpustate *__restrict state) {
 	u8 temp, callsite_encoding;
 	byte_t const *reader;
 	byte_t const *landingpad;

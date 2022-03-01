@@ -36,28 +36,24 @@ KOS's libc is designed and optimized to minimize the number of relocations that 
 Running `readelf -rW bin/i386-kos-OD/lib/libc.so` yields:
 
 ```
-Relocation section '.rel.dyn' at offset 0x113c88 contains 9 entries:
+Relocation section '.rel.dyn' at offset 0x13cb98 contains 8 entries:
  Offset     Info    Type                Sym. Value  Symbol's Name
-0011415c  00000008 R_386_RELATIVE
-001141bc  00000008 R_386_RELATIVE
-0011421c  00000008 R_386_RELATIVE
-00114220  00000008 R_386_RELATIVE
-00114224  00000008 R_386_RELATIVE
-00114228  00000008 R_386_RELATIVE
-001140c8  0014fd06 R_386_GLOB_DAT         001140e4   __stack_chk_guard
-001140cc  00000023 R_386_TLS_DTPMOD32
-001142dc  00101201 R_386_32               000482c3   __gxx_personality_v0
+0013d1bc  00000008 R_386_RELATIVE
+0013d1dc  00000008 R_386_RELATIVE
+0013d1fc  00000008 R_386_RELATIVE
+0013d304  00000008 R_386_RELATIVE
+0013d308  00000008 R_386_RELATIVE
+0013d30c  00000008 R_386_RELATIVE
+0013d0bc  00000023 R_386_TLS_DTPMOD32
+0013d3a8  00132501 R_386_32               0002ba80   __gxx_personality_v0
 
-Relocation section '.rel.plt' at offset 0x113cd0 contains 5 entries:
+Relocation section '.rel.plt' at offset 0x13cbd8 contains 2 entries:
  Offset     Info    Type                Sym. Value  Symbol's Name
-001140b4  00016707 R_386_JUMP_SLOT        00047a07   __cxa_end_catch
-001140b8  00000107 R_386_JUMP_SLOT        00000000   ___tls_get_addr
-001140bc  00094507 R_386_JUMP_SLOT        00047977   __cxa_begin_catch
-001140c0  00000207 R_386_JUMP_SLOT        00000000   dlsym
-001140c4  000e2707 R_386_JUMP_SLOT        00047745   _Unwind_Resume
+0013d0b4  00000107 R_386_JUMP_SLOT        00000000   ___tls_get_addr
+0013d0b8  00000207 R_386_JUMP_SLOT        00000000   dlsym
 ```
 
-Other architectures display the same set of relocations with slight deviations as the result of different names for individual relocations. Though the total number of relocations should not deviate from the above base-line.
+Other architectures display the same set of 10 relocations with slight deviations as the result of different names for individual relocations. Though the total number of relocations (10) must not deviate from the above base-line.
 
 In the following, each of these relocations will be rationalized:
 
@@ -79,22 +75,26 @@ In the following, each of these relocations will be rationalized:
 	PUBLIC FILE *g_stderr = &default_stderr; /* !Relocation: &default_stderr */
 	```
 
-- The `R_386_GLOB_DAT` relocation against `__stack_chk_guard`:
-	- A possible candidate for future removal, this relocation is the result of libc being compiled with `-fstack-protector-strong`. A global variable `extern uintptr_t __stack_chk_guard;` is defined that contains a random™ value which is used to detect stack corruption as the result of buffer overruns.  
-	  Optimization potential exists because on KOS it is actually libc itself which defines this global variable, such that differently generated code could already resolve it at link-time (rather than run-time).  
-	  A proposed solution to rid of this relocation would be to read GCC's source code and see if there is a way to alter the name of the symbol used and have it point at an `INTERN` alias of `__stack_chk_guard`. If this is not possible, an alternate solution might be to modify libc's assembly to hard-change the symbol's name prior to final assembly (similar to what `libdl.so` does to prevent relocations against `__gxx_personality_v0`; s.a. `COMPILE_WITH_ASM_FILTER from kos.misc.libmagic.steps.c`), though due to the large number of source files that partake in the creation of libc, this might add too much overhead to the build process, with too little gain in return. Further investigation might be warranted.
 - The `R_386_TLS_DTPMOD32` relocation:
 	- In order to facility `<pthread.h>` and a thread-local `errno`, libc includes a TLS section which contains 1 variable `current`. This variable holds everything needed for TLS and cannot be removed or circumvented without making pretty much everything about libc thread-unsafe. Working around this relocation would force libc to stray away from standard ELF thread-location variables support, which would be a bad idea due to the ease in implementation, integration with `libdl.so`, and interoperability with third-party libraries due to its standardization originating from outside the bounds of KOS development (going as far as GCC support).  
 	  Removal of this relocation is out of the question, and the only feasible approach would be to move all of libc's TLS stuff into `libdl.so`, which is also a bad idea since `libdl.so` is meant to be unconscious and entirely disconnected of which libc is used (if any) and what libc does.
 - The `R_386_32` relocation against `__gxx_personality_v0`:
-	- This one is the result of `.data.rel.local.DW.ref.__gxx_personality_v0`, which is required to allow exceptions to be propagated through functions from within libc. the `__gxx_personality_v0` symbol, while already defined within `libc.so`, may actually be overwritten by `libstdc++` (if loaded), as the one provided by libc itself lacks support for c++ exceptions (and only supports KOS kernel exceptions).
-- Jump relocations against symbols:
-	- `__cxa_begin_catch`, `__cxa_end_catch`, `_Unwind_Resume`  
-	  All of these symbols relate to c++ exception handling (which is used by libc to integrate into the KOS kernel exception system; s.a. exception-enabled system calls and CamelCase variants of standard functions found in `<kos/...>` headers, such as `Malloc` in `<kos/malloc.h>`)  
-	  It stands to reason that these functions fall under the same category as `__stack_chk_guard`, in that their presence need not be necessary, and should the use of `COMPILE_WITH_ASM_FILTER` prove feasible for compiling libc, these relocations will surely be gotten rid of as well. But again: they bring along the same problems as `__stack_chk_guard`, in that they cannot be gotten rid of without somehow convincing gcc of using different names for the symbols apart of its internal ABI. Because just like with `__stack_chk_guard`, it is once again libc itself who exports these symbols for public used by other libraries, meaning they cannot safely be declared as `.hidden`, without simultaneously ridding the export table of their presence (which would break the ABI in a way that makes the system impossible to build).  
-	  As such, the proposed solution is the same as with `__stack_chk_guard`, and these relocations might go away one day. But for the time being, they will stay.
+	- This one is the result of `.data.rel.local.DW.ref.__gxx_personality_v0`, which is required to allow exceptions to be propagated through functions from within libc.  
+	  We are actually able to replace this relocation to simply become yet another `R_386_RELATIVE` by redirecting all of GCC's uses of `__gxx_personality_v0` to use `libc_gxx_personality_v0` instead. However, like I just said: it wouldn't actually get rid of the relocation, but simply replace it with a different one.
+	  The only way I can currently think of solving this issue would be the same way libdl solves it, which is to pipe all GCC-generated assembly through a filter that edits its `.cfi_personality` directives such that they don't do indirect symbol referencing. This is what GCC does and also what causes `.data.rel.local.DW.ref.__gxx_personality_v0` to appear, which is a small section that essentially looks like this:
+
+	  ```asm
+	  .section ".data.rel.local.DW.ref.__gxx_personality_v0", "aw"
+	  __CFI_IND__gxx_personality_v0:  # This symbol doesn't actually have a name, but it is what would be referenced by `.cfi_personality'
+	      .wordptr __gxx_personality_v0   # And this causes the `R_386_32' relocation
+	  ```
+
+	  If we generate all code with `__asm__("__gxx_personality_v0 = libc_gxx_personality_v0")`, then the above would simply reference an `INTERN` symbol instead, but we'd still have a .data section object doing an absolute symbol reference. And since the pointed-to symbol is defined by the same module (i.e. library; i.e. libc), and because that definition has `INTERN` visibility, `ld(1)` replaces it a `R_386_RELATIVE` relocation.  
+	  It sure is a dilemma, but if I find a way to reg rid of this relocation without modifying gcc or piping all of libc assembly through a filter, I'll be certain to apply that solution here, especially since this **really** is a suitable candidate for lazy symbol resolution.
+
 - Jump relocations to `___tls_get_addr` (on other arches, this is `__tls_get_addr` instead):
 	- This relocation does (and must) exist for the same reason as `R_386_TLS_DTPMOD32`. In order to facility support for both static and dynamic TLS variables (which are implemented and handled by `libdl.so`), a function needs to exist to load the effective runtime address of a TLS variable when the associated library was loaded using the dynamic TLS model. This is that function. It is part of the ABI (being defined in `libdl.so`), and cannot (and should not) be removed.
+	  The relocation itself could theoretically be gotten rid of by redirecting it to a libc-internal symbol like we do for `__cxa_begin_catch()`, `_Unwind_Resume()` and `__gxx_personality_v0()` (to only name a few), but given how deeply ingrained use of TLS variables is (don't forget: `errno` is TLS and part of `current`), and given that `___tls_get_addr` itself also makes use of a custom calling convention (meaning the lazy-symbol-resolve function would need to be implemented via non-portable, custom assembly), this would only serve to slow down uses of TLS variables, especially since pretty much every program would still have to perform this symbol lookup.
 - Jump relocation against `dlsym`:
 	- You may have already noticed that many other important function exported by `libdl.so` are missing, such as `dlopen` or `dltlsallocseg` (which surely is used by libc's pthread implementation, which yes: it is being used for that). The presences of one single remaining relocation against `dlsym` might give a hint as to how this is accomplished, and should that not be enough of a hint, an example `*(void **)&pdyn_dltlsallocseg = dlsym(NULL, "dltlsallocseg");` might...  
 	  Sufficed to say, `dlsym` cannot be loaded in the same lazy (and relocation-less) manner, given that it is the `dlsym` function which is used to load other functions that would otherwise appear as jump relocations themselves. As such, this is another relocation that cannot be gotten rid of without deviating from standards going against my wishes to keep `libdl.so` blissfully unaware of the internal workings of `libc.so` (if not for this, it would be possible to have `libdl.so` pass knowledge regarding the address of `dlsym` to libc in some other manner).  
@@ -105,3 +105,92 @@ In the following, each of these relocations will be rationalized:
 
 
 If relocations exist in libc that are not rationalized by in this document, their presence may be considered a bug and be treated as such, either (preferably) by working around the need of such a relocation, or (in the case such a work-around would yield no advantage over simply ignoring it), by documenting its presence in this file.
+
+
+### Relocation tricks
+
+- The "redirect-to-INTERN" trick:
+	- For reference, see file `/kos/src/libc/api.h`
+	- Example:
+
+	  ```c
+	  __asm__("__stack_chk_fail = libc_stack_chk_fail");
+	  ```
+
+	- By inserting the above piece of code at the start of every file compiled to be part of libc (simply do this by inserting it into "api.h", which is included by all files in libc), we're able to define per-complication unit symbol replacements to-be performed by GNU as
+	- Essentially, the above example causes `as(1)` to replace all references to `__stack_chk_fail`, to instead reference `libc_stack_chk_fail`. However, it does NOT encode any sort of information in regards to the visibility of `libc_stack_chk_fail` or `__stack_chk_fail`. As a matter of fact: `__stack_chk_fail` isn't referenced by the produced `*.o` file at all (keep this in mind).
+	- We now add a new source file to `libc.so` that either (intentionally) doesn't include `api.h`, or makes it so that `api.h` doesn't do the above mentioned symbol replacement for that file in particular (this later option being what existing users of this trick do). Then, inside of this file, we define symbols `INTERN void libc_stack_chk_fail() { ... }` and `DEFINE_PUBLIC_ALIAS(__stack_chk_fail, libc_stack_chk_fail);`. Because no other object file makes mention of `__stack_chk_fail`, this will be the first (and only) time that the linker gets to see references to `__stack_chk_fail`, which all other source files instead directly referencing `libc_stack_chk_fail`, which is now revealed to be INTERN, meaning that `ld(1)` is able to remove all related relocations.
+
+
+- The `STT_KOS_IDATA`-trick:
+	- libc is expected to export certain data symbols whose initialization would normally require use of relocations. Examples of this include `sys_errlist` and `stdout` (though we intentionally don't use this trick for the later; see the rationale for this above).
+	- By declaring symbols of type `STT_KOS_IDATA`, it becomes possible to associate a lazy initializer (actually: a function that returns the pointer that should become the symbol's runtime address) with a symbol. This function can now be written to do what would have normally been done in regards to initialization of the data symbol via relocations, only that using this trick, this becomes possible without the need of **any** relocations.
+	- Note that depending on when programs are expected to link against a symbol such as this, and because the resolver function may be invoked multiple times, it is important to ensure that the resolver function checks if it has already initialized the global data object. -- Since its use is related to preventing relocations, it should be easy to facilitate this by simply checking if pointers that would normally become `R_386_RELATIVE` relocations are still set to `NULL`.
+		- But do consider of a user-program might have reason to modify pointers within the thus-initialized data-blob, including the case where your was-already-initialized marker gets reset back to its not-yet-initialized state.
+		- In the even that this is a reasonable use case, you should make use of `pthread_once_t` in order to ensure that lazy initialization happens exactly once. (though generally, the additional thread-safety accompanied by using this construct isn't necessary, since symbol resolution usually happens before a program gets a chance to spawn additional threads, and even in the event of use of `dlsym(3)` to do symbol resolution at a later point in time, it's unlikely that this would be done by multiple threads at the same time, for the same symbol; yet if this can be expected to happen, then yes: you'd absolutely **need** to make use of `pthread_once_t`)
+	- See file [/kos/src/libdl/README.md](../libdl/README.md) for more information on `STT_KOS_IDATA` relocations
+
+- The "always-use-INTERN-functions" trick:
+	- This one is pretty much done automatically for you. If you look at pretty much any of libc's source files, you'll see lots of `libc_*` (and sometimes `libd_*`) symbols that eventually appear in `DEFINE_PUBLIC_ALIAS(foo, libc_foo);` statements.
+	- When a piece of code compiled as part of libc makes a function call, it will always call the libc-internal variant of that symbol (system headers, magic, and the `__CDECLARE` macro are designed to automatically redirect calls to e.g. `strlen()` made from inside of libc to the libc-internal symbol `libc_strlen()`)
+	- This in turn makes it rather difficult (read: impossible) for programs to use the (badly designed and stupid if you ask me) ELF feature of overwriting library functions by simply declaring them yourself in your own program (I personally find the idea OK, but it shouldn't be the default; if you ask me: only `__attribute__((weak))` symbols should be subjugated to this special treatment). Anyways: I believe that this is a reasonable sacrifice, especially since practically no programs actually use this.
+	- However, for those cases where symbols being overridable is actually important/necessary (e.g. `matherr(3)`), additional care must be taken, which brings me to the next trick...
+
+- Use `dlsym(3)` to access global data objects, and overridable symbols.
+	- This might seem strange at first, but do make sure **not** to use the preceding `INTERN`-trick for PUBLIC data symbols. Because of COPY relocations (s.a. `R_386_COPY`), it is necessary to allow programs to essentially re-define these symbols to have new addresses that lie outside of libc (in particular: become part of the main program).
+	- Conceptually, you can think of `R_386_COPY` to do the following:  
+
+	  ```c
+	  extern char *environ[];
+	  int main() {
+	      printf("%p\n", environ);
+	  }
+	  ```
+
+	  The linker essentially links this as follows (NOTE: this only happens during linking; this isn't yet visible in `*.o` or `*.S` files, so take this with a gain of salt)
+
+	  ```asm
+	  .section .got
+	  environ:
+	     .skip   ((Elf32_Sym *)GET_EXTERNAL_ELFSYM("libc.so", "environ"))->st_size
+
+	  .section .rel.got
+	     .long  MODULE_RELATIVE(environ)                                             # r_offset
+	     .long  ELF32_R_INFO(R_386_COPY, GET_EXTERNAL_ELFSYM("libc.so", "environ"))  # r_info
+
+	  .section .text
+	  main:
+	     ...
+	     pushl  $environ    # This actually becomes a link-time constant w/o DT_TEXTREL.
+	                        # the address printed isn't the address of libc's environ,
+	                        # but rather that of the main program's copy of said symbol.
+	                        # However, this also means that whenever libc wants to access
+	                        # `environ', it needs to know the address of the main
+	                        # program's override for said symbol, such that it can make
+	                        # use of the same memory location and stay informed about any
+	                        # potential alterations made by the main program.
+	     pushl  $"%p\n"
+	     call   printf
+	     ...
+	  ```
+
+	  It should be obvious from the comments next to `pushl $environ`: because the main program essentially "re-defines" the effective runtime address of `environ` (and instructs `libdl` to initialize it using memcpy to essentially copy the contents of what libc's version of the symbol holds at the time), any further modifications made by the main program (or libc, or any other library for that matter), but all now reference the address of the main program's override, even though the original symbol that was copied still exists in memory and (probably) still contains whatever it did at the time of the copy being made.
+
+	  And because copy relocations might be created for **any** PUBLIC data symbols (and are actually rather helpful since it allows `gcc(1)` and `ld(1)` to essentially know the runtime address of a library symbol, thus allowing them to generate more efficient assembly), we also have to deal with the possibility of **any** PUBLIC data symbol essentially being overwritten, meaning that when wanting to access them, we **have** to use `dlsym`
+
+	  ```c
+	  #if 0 /* <<< DON'T DO THIS. -- IT WON'T WORK FOR COPY RELOCATIONS */
+	  INTERN int libc_mysymbol = 42;
+	  DEFINE_PUBLIC_ALIAS(mysymbol, libc_mysymbol);
+	  #else
+	  PUBLIC int mysymbol = 42;
+	  /* NOTE: This is essentially how every access must go, however you are allowed to
+	   * cache the return value of `dlsym()'. -- s.a. `/kos/src/libc/libc/globals.h' */
+	  #define libc_mysymbol  (*(int **)dlsym(RTLD_DEFAULT, "mysymbol"))
+	  #endif
+	  ```
+
+	- This way of accessing global symbols is simplified via the macros in `/kos/src/libc/libc/globals.h`, which you are encouraged to use, knowing that they will do their best to give you the most performance in terms of safely (and without relocations) accessing global data objects.
+	- The same work-around also needs to be used to determine the final address of functions with programs may reasonably be expected to override (such as `matherr(3)`)
+
+

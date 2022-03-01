@@ -77,6 +77,38 @@
 #undef _STRUCT64_MACRO_SOURCE
 #define _STRUCT64_MACRO_SOURCE 1
 
+#include <__stdinc.h>
+
+/* Do some assembler trickery to prevent some unnecessary relocations. */
+#ifdef __CC__
+#ifndef GUARD_LIBC_LIBC_SSP_C
+__asm__("__stack_chk_guard = libc_stack_chk_guard");
+__asm__("__stack_chk_fail = libc_stack_chk_fail");
+__asm__("__stack_chk_fail_local = libc_stack_chk_fail");
+#endif /* !GUARD_LIBC_LIBC_SSP_C */
+
+/* NOTE: Even though some of the following functions can (and are) overwritten
+ *       by libstdc++, even in the event of that happening, we (libc) can still
+ *       continue to use our own, original variants, since while ours are unable
+ *       to properly catch non-KOS exceptions (like `throw std::exception'),
+ *       they're fully still capable of re-throwing them (in case they were
+ *       thrown by user-provided callbacks to functions like `qsort(3)', as well
+ *       as being able to handle KOS exceptions (s.a. `<kos/except.h>') */
+#ifndef GUARD_LIBC_HYBRID_EXCEPT_C
+__asm__("__cxa_end_catch = libc_cxa_end_catch");
+__asm__("__cxa_begin_catch = libc_cxa_begin_catch");
+__asm__("_Unwind_Resume = libc_Unwind_Resume");
+#endif /* !GUARD_LIBC_HYBRID_EXCEPT_C */
+/* TODO: Because of how GCC generates code, even if we were to prevent  it
+ *       from  generating relocations against  these symbols, we'd instead
+ *       end  up with a  `R_386_RELATIVE' relocation, as  gcc places a ref
+ *       to these symbols in ".data.rel.local.DW.ref.__gxx_personality_v0" */
+//#ifndef GUARD_LIBC_LIBC_EXCEPT_PERSONALITY_C
+//__asm__("__gcc_personality_v0 = libc_gxx_personality_v0");
+//__asm__("__gxx_personality_v0 = libc_gxx_personality_v0");
+//#endif /* !GUARD_LIBC_LIBC_EXCEPT_PERSONALITY_C */
+#endif /* __CC__ */
+
 #include <__crt.h>
 
 /* Pull in CRT feature definitions */

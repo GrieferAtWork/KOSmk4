@@ -189,13 +189,14 @@ DEFINE_PUBLIC_WEAK_ALIAS(__cxa_rethrow, libc_except_rethrow)
  *       simply handle it the same way we handle rethrow, except that we mustn't
  *       set the `EXCEPT_FRETHROW' flag. */
 .section .text
-PUBLIC_FUNCTION(_Unwind_Resume)
+INTERN_FUNCTION(libc_Unwind_Resume)
 	.cfi_startproc
 	.cfi_signal_frame
 	ASM_PUSH_KCPUSTATE_AFTER_RIP_CFI_R
 	goto_Ldo_unwind_rsp
 	.cfi_endproc
-END(_Unwind_Resume)
+END(libc_Unwind_Resume)
+DEFINE_PUBLIC_ALIAS(_Unwind_Resume, libc_Unwind_Resume)
 
 #else /* __KERNEL__ */
 

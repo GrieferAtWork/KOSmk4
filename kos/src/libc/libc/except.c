@@ -248,20 +248,6 @@ libc_get_kos_unwind_exception(void) {
 
 
 
-/* NOTE: These functions _have_ to be exported weakly!
- *       Otherwise, they might accidentally override the same functions
- *       exported from `libstdc++.so'
- *       The idea in  exporting these  from libc.so  as well  is that  libc.so
- *       should provide a minimal, self-contained implementation of everything
- *       that is required to get the KOS-specific exception handling  provided
- *       by the <kos/except.h> header working.
- *       Additionally, then  libstdc++.so is  loaded,  we must  remain  compatible
- *       with its API, in that kos exceptions should show up as foreign exceptions
- *       when interfaced with the standard c++ API (which they do) */
-DEFINE_PUBLIC_WEAK_ALIAS(__gxx_personality_v0, libc_gxx_personality_v0);
-DEFINE_PUBLIC_WEAK_ALIAS(__gcc_personality_v0, libc_gxx_personality_v0);
-
-
 INTERN SECTION_EXCEPT_TEXT _Unwind_Reason_Code LIBCCALL
 libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool phase_2) {
 	u8 temp, callsite_encoding;
@@ -322,24 +308,14 @@ libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool
 	return _URC_END_OF_STACK;
 }
 
-INTERN SECTION_EXCEPT_TEXT _Unwind_Reason_Code LIBCCALL
+
+/* Defined in "libc/except-personality.c" */
+INTDEF _Unwind_Reason_Code LIBCCALL
 libc_gxx_personality_v0(int version /* = 1 */,
                         _Unwind_Action actions,
                         _Unwind_Exception_Class exception_class,
                         struct _Unwind_Exception *ue_header,
-                        struct _Unwind_Context *context) {
-	if unlikely(version != 1)
-		return _URC_FATAL_PHASE1_ERROR;
-	if likely(exception_class == _UEC_KERNKOS)
-		return libc_gxx_personality_kernexcept(context, (actions & _UA_FORCE_UNWIND) != 0);
-	/* This implementation only support KOS exceptions.
-	 * When linking against libstdc++.so, this function gets overridden by its implementation. */
-	(void)actions;
-	(void)exception_class;
-	(void)ue_header;
-	(void)context;
-	return _URC_FATAL_PHASE1_ERROR;
-}
+                        struct _Unwind_Context *context);
 
 
 PRIVATE SECTION_EXCEPT_TEXT unsigned int __EXCEPT_UNWIND_CC
