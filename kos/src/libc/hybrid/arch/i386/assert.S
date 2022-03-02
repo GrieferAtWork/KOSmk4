@@ -87,6 +87,7 @@ DEFINE_PUBLIC_ALIAS(_ZSt9terminatev, libc_abort) /* std::terminate(void) */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(terminate, libc_abort)           /* std::terminate(void) */
 DEFINE_PUBLIC_ALIAS("?terminate@@YAXXZ", libc_abort) /* std::terminate(void) */
+DEFINE_PUBLIC_ALIAS(__chk_fail, libc_abort)
 #endif /* !__KERNEL__ */
 
 

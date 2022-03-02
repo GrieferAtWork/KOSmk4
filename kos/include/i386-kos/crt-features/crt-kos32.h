@@ -370,6 +370,7 @@
 #define __CRT_HAVE___ceilf
 #define __CRT_HAVE___ceill
 #define __CRT_HAVE___chdir
+#define __CRT_HAVE___chk_fail
 #define __CRT_HAVE___chmod
 #define __CRT_HAVE___chown
 #define __CRT_HAVE___chroot
@@ -516,6 +517,8 @@
 #define __CRT_HAVE___fwriting
 #define __CRT_HAVE___fxstat
 #define __CRT_HAVE___fxstat64
+#define __CRT_HAVE___fxstatat
+#define __CRT_HAVE___fxstatat64
 #define __CRT_HAVE___gamma
 #define __CRT_HAVE___gammaf
 #define __CRT_HAVE___gammal

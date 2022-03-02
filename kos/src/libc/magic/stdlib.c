@@ -703,7 +703,7 @@ int system([[nullable]] char const *command) {
 
 [[std, guard, crtbuiltin, noreturn, throws]]
 [[section(".text.crt{|.dos}.application.exit")]]
-[[export_alias("_ZSt9terminatev", "terminate")]]
+[[export_alias("_ZSt9terminatev", "terminate", "__chk_fail")]]
 [[dos_only_export_alias("?terminate@@YAXXZ")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_ABORT))]]
 [[requires_function(_Exit), impl_include("<asm/os/stdlib.h>")]]

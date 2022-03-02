@@ -69,6 +69,13 @@ INTERN char *dl_library_path = NULL;
  * primary program's main()  function, only that  these are expected  to
  * return without doing the program's main task! */
 typedef void (*elf_init_t)(int argc, char *argv[], char *envp[]) THROWS(...);
+
+/* Apparently,  global  initializer  functions   take
+ * the same arguments as  are also passed to  main():
+ * >> void (*)(int argc, char *argv[], char *envp[]);
+ *
+ * As  such, call them like that, rather than without any arguments!
+ * HINT: We can take all of the required information from `root_peb' */
 #define CALLINIT(funptr)                        \
 	((*(elf_init_t)(funptr))(root_peb->pp_argc, \
 	                         root_peb->pp_argv, \
@@ -118,12 +125,6 @@ DlModule_ElfRunInitializers(DlModule *__restrict self) THROWS(...) {
 		}
 	}
 done_dyntag:
-	/* Apparently,  global  initializer  functions   take
-	 * the same arguments as  are also passed to  main():
-	 * >> void (*)(int argc, char *argv[], char *envp[]);
-	 *
-	 * As  such, call them like that, rather than without any arguments!
-	 * HINT: We can take all of the required information from `root_peb' */
 	for (i = 0; i < preinit_array_size; ++i)
 		CALLINIT(preinit_array_base[i] /* + self->dm_loadaddr*/);
 
@@ -151,13 +152,7 @@ INTERN void CC DlModule_RunAllStaticInitializers(void) THROWS(...) {
 	incref(primary);
 again_search_noinit:
 	DlModule_GlobalLock_Read();
-	/* XXX: >> last = LIST_LAST(&DlModule_GlobalList);
-	 *      Change this  code if  we  ever change  the  list
-	 *      type used by `DlModule_GlobalList' to  something
-	 *      that allows for O(1) lookup of the last element. */
-	last = LIST_FIRST(&DlModule_GlobalList);
-	while (LIST_NEXT(last, dm_globals) != NULL)
-		last = LIST_NEXT(last, dm_globals);
+	last = LIST_LAST(&DlModule_GlobalList, dm_globals);
 	while (!(last->dm_flags & RTLD_NOINIT)) {
 		if (last == primary) {
 			DlModule_GlobalLock_EndRead();

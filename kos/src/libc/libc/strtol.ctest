@@ -97,6 +97,8 @@ DEFINE_TEST(strtol) {
 	to_test(5);
 	to_test(6);
 	to_test(7);
+
+	/* TODO: strtol(ltoa(LONG_MIN)) -- This currently fails with ERANGE, but shouldn't */
 }
 
 DECL_END

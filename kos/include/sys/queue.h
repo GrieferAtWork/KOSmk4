@@ -41,10 +41,7 @@
 #define __HYBRID_LIST_RESTRICT_API
 #endif /* !__USE_KOS && !__USE_KOS_KERNEL */
 
-#undef __HYBRID_LIST_WITHOUT_DEPRECATED
-#define __HYBRID_LIST_WITHOUT_DEPRECATED
 #include <hybrid/sequence/list.h>
-#undef __HYBRID_LIST_WITHOUT_DEPRECATED
 
 /* If API access was restricted, allow <hybrid/sequence/list.h> to be re-included
  * directly in  order  to  unlock  all  APIs  that  haven't  been  exposed,  yet. */

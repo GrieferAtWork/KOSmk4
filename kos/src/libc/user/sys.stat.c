@@ -605,6 +605,32 @@ NOTHROW_RPC(LIBCCALL libc___xstat64)(int vers, char const *filename, void *__res
 	return libc_seterrno_syserr(error);
 }
 
+DEFINE_PUBLIC_ALIAS(__fxstatat, libc___fxstatat);
+INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((3, 4)) int
+NOTHROW_RPC(LIBCCALL libc___fxstatat)(int vers, fd_t dfd,
+                                      char const *filename,
+                                      void *__restrict buf,
+                                      atflag_t flags) {
+	struct stat info;
+	errno_t error = sys_kfstatat(dfd, filename, &info, flags);
+	if (error == -EOK)
+		error = stat_conv(vers, &info, buf);
+	return libc_seterrno_syserr(error);
+}
+
+DEFINE_PUBLIC_ALIAS(__fxstatat64, libc___fxstatat64);
+INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((3, 4)) int
+NOTHROW_RPC(LIBCCALL libc___fxstatat64)(int vers, fd_t dfd,
+                                        char const *filename,
+                                        void *__restrict buf,
+                                        atflag_t flags) {
+	struct stat info;
+	errno_t error = sys_kfstatat(dfd, filename, &info, flags);
+	if (error == -EOK)
+		error = stat_conv(vers | STAT_CONV_F_64, &info, buf);
+	return libc_seterrno_syserr(error);
+}
+
 DEFINE_PUBLIC_ALIAS(__lxstat, libc___lxstat);
 DEFINE_PUBLIC_ALIAS(_lxstat, libc___lxstat);
 INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((2, 3)) int

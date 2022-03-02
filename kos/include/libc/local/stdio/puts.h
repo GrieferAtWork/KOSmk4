@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfff7cc1f */
+/* HASH CRC-32:0xef81885a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,10 +78,11 @@ __LOCAL_LIBC(puts) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_fputs)(__string, __LOCAL_stdout);
 	if (__result >= 0) {
 		__temp = (__NAMESPACE_LOCAL_SYM __localdep_fputc)('\n', __LOCAL_stdout);
-		if (__temp <= 0)
+		if (__temp <= 0) {
 			__result = __temp;
-		else
+		} else {
 			__result += __temp;
+		}
 	}
 	return __result;
 }

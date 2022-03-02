@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d010229 */
+/* HASH CRC-32:0x3534cf2d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -785,6 +785,8 @@ __CDECLARE_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,abort,(void),())
 __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,abort,(void),_ZSt9terminatev,())
 #elif defined(__CRT_HAVE_terminate)
 __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,abort,(void),terminate,())
+#elif defined(__CRT_HAVE___chk_fail)
+__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,abort,(void),__chk_fail,())
 #elif defined(__CRT_HAVE_$Qterminate$A$AYAXXZ)
 __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,abort,(void),?terminate@@YAXXZ,())
 #elif defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)

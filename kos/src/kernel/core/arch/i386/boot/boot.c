@@ -861,6 +861,15 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * binutils/i386-kos/opt/bsdgames/rain/rain.c(100,2) : 080487A6+5[/usr/bin/rain][main+182]
 	 */
 
+	/* TODO: Change `struct __kos_stat' by appending a field `st_btime' (birth time)
+	 *       You might see where this is going. -- What we currently use  `st_ctime'
+	 *       for (creating time) should become "changed time" (different from mtime,
+	 *       which only represents file data,  while ctime represents file data  and
+	 *       file attributes)
+	 *
+	 * Big hurdle: this'll break KOS's ABI (since our `struct stat' is exposed to
+	 * user-space  and also used by lots of  3rd party programs compiled for KOS) */
+
 	return state;
 }
 

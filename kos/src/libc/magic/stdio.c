@@ -1008,10 +1008,11 @@ __STDC_INT_AS_SSIZE_T puts([[nonnull]] char const *__restrict string) {
 	result = fputs(string, stdout);
 	if (result >= 0) {
 		temp = fputc('\n', stdout);
-		if (temp <= 0)
+		if (temp <= 0) {
 			result = temp;
-		else
+		} else {
 			result += temp;
+		}
 	}
 	return result;
 }
