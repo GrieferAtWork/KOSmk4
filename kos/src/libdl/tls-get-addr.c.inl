@@ -146,7 +146,7 @@ err_nomem:
 err:
 #ifdef FAIL_ON_ERROR
 	syslog(LOG_ERR, "[rtld] Failed to allocate TLS segment for %q: %s\n",
-	       self->dm_filename, dl_error_message);
+	       self->dm_filename, dl_globals.dg_errmsg);
 	sys_exit_group(EXIT_FAILURE);
 #else /* FAIL_ON_ERROR */
 	return NULL;

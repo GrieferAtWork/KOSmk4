@@ -152,7 +152,7 @@ libpe_GetProcAddress(DlModule *self, char const *symbol_name) {
 	result = dlsym(self, symbol_name);
 	if (result) {
 		/* Clear the error message set by the initial failed `dlsym()' */
-		dl_error_message = NULL;
+		dl_globals.dg_errmsg = NULL;
 	}
 	return result;
 }
@@ -340,7 +340,7 @@ libpe_LoadLibrary(char const *__restrict filename, unsigned int flags) {
 	/* The library search order on NT works as follows:
 	 * #1: `dirname $(dlmodulename(dlopen(NULL, 0)))` -- The directory from which the application loaded.
 	 * #2: `pwd`                                      -- The current directory.
-	 * #3: GetSystemDirectory             (we use `dl_library_path' in place of this)
+	 * #3: GetSystemDirectory             (we use `dl_globals.dg_libpath' in place of this)
 	 * #4: <The 16-bit system directory>  (we skip this one)
 	 * #5: GetWindowsDirectory            (we skip this one)
 	 * #6: $PATH
@@ -359,9 +359,8 @@ libpe_LoadLibrary(char const *__restrict filename, unsigned int flags) {
 	/* #1: Search dirname of the base application. */
 	{
 		char *appname;
-		appname = dl.DlModule_GlobalList->lh_first->dm_filename;
-		result = libpe_LoadLibraryInPath(appname, strroff(appname, '/'),
-		                                 filename, flags);
+		appname = dl_globals.dg_globallist.lh_first->dm_filename;
+		result  = libpe_LoadLibraryInPath(appname, strroff(appname, '/'), filename, flags);
 		if (result)
 			goto done;
 	}
@@ -371,8 +370,8 @@ libpe_LoadLibrary(char const *__restrict filename, unsigned int flags) {
 	if (result)
 		goto done;
 
-	/* #3: Search `dl_library_path' */
-	result = libpe_LoadLibraryInPathList(*dl.dl_library_path, filename, flags);
+	/* #3: Search `dl_globals.dg_libpath' */
+	result = libpe_LoadLibraryInPathList(dl_globals.dg_libpath, filename, flags);
 	if (result)
 		goto done;
 
@@ -384,11 +383,11 @@ libpe_LoadLibrary(char const *__restrict filename, unsigned int flags) {
 			goto done;
 	}
 
-	dl_error_message = NULL;
+	dl_globals.dg_errmsg = NULL;
 err:
 	return NULL;
 done:
-	dl_error_message = NULL;
+	dl_globals.dg_errmsg = NULL;
 	return result;
 }
 
@@ -425,7 +424,7 @@ DlModule_PeInitializeImportTable(DlModule *__restrict self) {
 			syslog(LOG_DEBUG, "[pe] import: %q\n", filename);
 			dependency = libpe_LoadLibrary(filename, dep_flags);
 			if (!dependency) {
-				if (ATOMIC_READ(dl_error_message) == NULL)
+				if (ATOMIC_READ(dl_globals.dg_errmsg) == NULL)
 					dl.dl_seterrorf("Failed to load dependency %q of %q",
 					                filename, self->dm_filename);
 				goto err;
@@ -447,7 +446,7 @@ DlModule_PeInitializeImportTable(DlModule *__restrict self) {
 				syslog(LOG_DEBUG, "[pe] GetProcAddress(%q, %q)\n",
 				       dependency->dm_filename, ent->Name);
 				addr = libpe_GetProcAddress(dependency, ent->Name);
-				if (!addr && dl_error_message != NULL) {
+				if (!addr && dl_globals.dg_errmsg != NULL) {
 					dl.dl_seterrorf("%q: Symbol %q missing from %q",
 					                self->dm_filename, ent->Name,
 					                dependency->dm_filename);
@@ -605,8 +604,8 @@ PRIVATE void **CC PeTls_AllocVector(bool forme) {
 	result = (void **)calloc(count, sizeof(void *));
 	if (!result)
 		return NULL;
-	atomic_rwlock_read(dl.DlModule_AllLock);
-	DLIST_FOREACH (iter, dl.DlModule_AllList, dm_modules) {
+	atomic_rwlock_read(&dl_globals.dg_alllock);
+	DLIST_FOREACH (iter, &dl_globals.dg_alllist, dm_modules) {
 		void *block;
 		if (iter->dm_ops != &libpe_fmt)
 			continue;
@@ -626,10 +625,10 @@ PRIVATE void **CC PeTls_AllocVector(bool forme) {
 			}
 		}
 	}
-	atomic_rwlock_endread(dl.DlModule_AllLock);
+	atomic_rwlock_endread(&dl_globals.dg_alllock);
 	return result;
 err:
-	DLIST_FOREACH (iter, dl.DlModule_AllList, dm_modules) {
+	DLIST_FOREACH (iter, &dl_globals.dg_alllist, dm_modules) {
 		void *block;
 		if (iter->dm_ops != &libpe_fmt)
 			continue;
@@ -649,7 +648,7 @@ err:
 		}
 		free(block);
 	}
-	atomic_rwlock_endread(dl.DlModule_AllLock);
+	atomic_rwlock_endread(&dl_globals.dg_alllock);
 	free(result);
 	return NULL;
 }
@@ -1072,8 +1071,8 @@ libpe_linker_main(struct peexec_info *__restrict info,
 	}
 
 	/* Hook the newly created module. */
-	DLIST_INSERT_AFTER(dl.dl_rtld_module, mod, dm_modules);    /* NOTE: _MUST_ insert after builtin DL module! */
-	LIST_INSERT_HEAD(dl.DlModule_GlobalList, mod, dm_globals); /* NOTE: _MUST_ insert at head! */
+	DLIST_INSERT_AFTER(dl.dl_rtld_module, mod, dm_modules);       /* NOTE: _MUST_ insert after builtin DL module! */
+	LIST_INSERT_HEAD(&dl_globals.dg_globallist, mod, dm_globals); /* NOTE: _MUST_ insert at head! */
 
 	/* Initialize the PE module. */
 	if (DlModule_PeInitialize(mod) != 0)

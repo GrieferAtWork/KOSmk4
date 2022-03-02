@@ -308,18 +308,6 @@ err_nomem:
 
 #endif /* CONFIG_DLOPEN_LIBSERVICE_SUPPORT */
 
-
-
-/* [1..1] Global chain of loaded modules.
- * WARNING: Contained modules may have a reference counter of ZERO(0)! */
-INTERN struct dlmodule_list DlModule_GlobalList = LIST_HEAD_INITIALIZER(DlModule_GlobalList);
-INTERN struct atomic_rwlock DlModule_GlobalLock = ATOMIC_RWLOCK_INIT;
-
-/* [1..1] List of all loaded modules. */
-INTERN struct dlmodule_dlist DlModule_AllList = DLIST_HEAD_INITIALIZER(DlModule_AllList);
-INTERN struct atomic_rwlock DlModule_AllLock  = ATOMIC_RWLOCK_INIT;
-
-
 INTERN WUNUSED fd_t NOTHROW_RPC(CC reopen_bigfd)(fd_t fd) {
 	enum { MAX_RESERVED_FD = MAX_C(STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO) };
 	if unlikely((unsigned int)fd <= (unsigned int)MAX_RESERVED_FD) {
@@ -523,15 +511,15 @@ NOTHROW_NCX(CC DlModule_FindFilenameInPathListFromAll)(USER char const *filename
 		THROWS(E_SEGFAULT) {
 	REF DlModule *result;
 	char const *sep;
-	char const *path   = dl_library_path;
-	size_t filenamelen = strlen(filename);
+	char const *path;
+	size_t filenamelen;
+	path        = dl_globals.dg_libpath;
+	filenamelen = strlen(filename);
 	for (;;) {
 		sep    = strchrnul(path, ':');
-		result = DlModule_FindFilenameInPathFromAll(path,
-		                                            (size_t)(sep - path),
-		                                            filename,
-		                                            filenamelen);
-		if (result || dl_error_message != NULL)
+		result = DlModule_FindFilenameInPathFromAll(path, (size_t)(sep - path),
+		                                            filename, filenamelen);
+		if (result || dl_globals.dg_errmsg != NULL)
 			break;
 		if (!*sep)
 			break;
@@ -575,7 +563,7 @@ again:
 		                                     filename,
 		                                     filenamelen,
 		                                     mode);
-		if (result || dl_error_message != NULL)
+		if (result || dl_globals.dg_errmsg != NULL)
 			goto done;
 		if (!ch)
 			break;

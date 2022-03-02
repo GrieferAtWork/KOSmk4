@@ -144,10 +144,6 @@ INTERN ATTR_COLD ATTR_NORETURN void
 
 
 
-/* DL error handling. */
-INTERN char dl_error_buffer[128];
-INTERN char *dl_error_message = NULL;
-
 /* Return  and clear the  current libdl error message  string, such that for
  * any error that occurs, this function will only returns non-NULL once. The
  * returned string has a human-readable format and is generated dynamically,
@@ -165,7 +161,7 @@ INTERN char *dl_error_message = NULL;
  *                exported from libdl.
  * @return: NULL: No error happened, or the last error has already been consumed. */
 INTERN char *NOTHROW(DLFCN_CC libdl_dlerror)(void) {
-	return ATOMIC_XCH(dl_error_message, NULL);
+	return ATOMIC_XCH(dl_globals.dg_errmsg, NULL);
 }
 
 
@@ -267,8 +263,8 @@ NOTHROW_NCX(CC dl_seterr_section_index_mmap_failed)(USER DlModule const *self,
 
 PRIVATE char const message_nomem[] = "Insufficient memory";
 INTERN ATTR_COLD int NOTHROW(CC dl_seterror_nomem)(void) {
-	memcpy(dl_error_buffer, message_nomem, sizeof(message_nomem));
-	ATOMIC_WRITE(dl_error_message, (char *)dl_error_buffer);
+	memcpy(dl_globals.dg_errbuf, message_nomem, sizeof(message_nomem));
+	ATOMIC_WRITE(dl_globals.dg_errmsg, (char *)dl_globals.dg_errbuf);
 	return -1;
 }
 
@@ -286,12 +282,8 @@ NOTHROW_NCX(VCC dl_seterrorf)(char const *__restrict format, ...)
 INTERN ATTR_COLD NONNULL((1)) int
 NOTHROW_NCX(CC dl_vseterrorf)(char const *__restrict format, va_list args)
 		THROWS(E_SEGFAULT) {
-	vsnprintf(dl_error_buffer,
-	          sizeof(dl_error_buffer),
-	          format,
-	          args);
-	ATOMIC_WRITE(dl_error_message,
-	             (char *)dl_error_buffer);
+	vsnprintf(dl_globals.dg_errbuf, sizeof(dl_globals.dg_errbuf), format, args);
+	ATOMIC_WRITE(dl_globals.dg_errmsg, (char *)dl_globals.dg_errbuf);
 	return -1;
 }
 
@@ -300,7 +292,7 @@ NOTHROW_NCX(CC dl_vseterrorf)(char const *__restrict format, va_list args)
 /* Lock used to ensure that only a single thread can ever load modules
  * at the same time (used to prevent potential race conditions arising
  * from the fact that various components must be accessed globally). */
-INTERN struct atomic_owner_rwlock DlModule_LoadLock = ATOMIC_OWNER_RWLOCK_INIT;
+PRIVATE struct atomic_owner_rwlock DlModule_LoadLock = ATOMIC_OWNER_RWLOCK_INIT;
 
 INTERN NONNULL((1)) void
 NOTHROW(CC DlModule_UpdateFlags)(DlModule *__restrict self, int mode) {
@@ -368,7 +360,7 @@ again:
 		if (strchr(filename, '/')) {
 			result = DlModule_FindFromFilename(filename);
 		} else {
-			ATOMIC_WRITE(dl_error_message, NULL);
+			ATOMIC_WRITE(dl_globals.dg_errmsg, NULL);
 			result = DlModule_FindFilenameInPathListFromAll(filename);
 		}
 		if likely(result)
@@ -379,14 +371,13 @@ again:
 			result = DlModule_OpenFilename(filename, mode);
 		} else {
 			/* Load a module using the LD-library path List */
-			ATOMIC_WRITE(dl_error_message, NULL);
-			result = DlModule_OpenFilenameInPathList(dl_library_path,
-			                                         filename,
-			                                         mode);
+			ATOMIC_WRITE(dl_globals.dg_errmsg, NULL);
+			result = DlModule_OpenFilenameInPathList(dl_globals.dg_libpath,
+			                                         filename, mode);
 		}
 	}
 	if unlikely(!result) {
-		if (!ATOMIC_READ(dl_error_message))
+		if (!ATOMIC_READ(dl_globals.dg_errmsg))
 			dl_seterror_dlopen_failed(filename);
 	} else {
 		while unlikely(result->dm_flags & RTLD_LOADING) {
@@ -3258,8 +3249,8 @@ PRIVATE char *dl_program_invocation_short_name = NULL;
 PRIVATE WUNUSED char **
 NOTHROW_NCX(FCALL dlget_p_program_invocation_short_name)(void) THROWS(E_SEGFAULT) {
 	if (!dl_program_invocation_short_name) {
-		char *progname = root_peb->pp_argv
-		                 ? root_peb->pp_argv[0]
+		char *progname = dl_globals.dg_peb->pp_argv
+		                 ? dl_globals.dg_peb->pp_argv[0]
 		                 : NULL;
 		if (progname) {
 			char *end;
@@ -3326,13 +3317,13 @@ NOTHROW_NCX(CC dlsym_builtin)(USER char const *name) THROWS(E_SEGFAULT) {
 					break;
 				if (*name == 'c') { /* int __argc */
 #if __SIZEOF_INT__ == __SIZEOF_SIZE_T__
-					return &root_peb->pp_argc;
+					return &dl_globals.dg_peb->pp_argc;
 #elif __SIZEOF_INT__ < __SIZEOF_SIZE_T__
 					/* Must return a pointer to the least significant bits */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-					return &root_peb->pp_argc;
+					return &dl_globals.dg_peb->pp_argc;
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-					return (byte_t *)&root_peb->pp_argc + (__SIZEOF_SIZE_T__ -
+					return (byte_t *)&dl_globals.dg_peb->pp_argc + (__SIZEOF_SIZE_T__ -
 					                                       __SIZEOF_INT__);
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 #else /* __SIZEOF_INT__ <= __SIZEOF_SIZE_T__ */
@@ -3340,7 +3331,7 @@ NOTHROW_NCX(CC dlsym_builtin)(USER char const *name) THROWS(E_SEGFAULT) {
 #endif /* __SIZEOF_INT__ > __SIZEOF_SIZE_T__ */
 				}
 				if (*name == 'v') /* char **__argv */
-					return &root_peb->pp_argv;
+					return &dl_globals.dg_peb->pp_argv;
 				break;
 
 			case 'p':
@@ -3351,7 +3342,7 @@ NOTHROW_NCX(CC dlsym_builtin)(USER char const *name) THROWS(E_SEGFAULT) {
 					if (strcmp(name, "_full") == 0) /* char *__progname_full */
 						goto return_program_invocation_name;
 				} else if (strcmp(name, "eb") == 0) { /* struct process_peb __peb */
-					return root_peb;
+					return dl_globals.dg_peb;
 				}
 				break;
 
@@ -3368,7 +3359,7 @@ NOTHROW_NCX(CC dlsym_builtin)(USER char const *name) THROWS(E_SEGFAULT) {
 	case 'e':
 check_environ:
 		if (strcmp(name, "nviron") == 0) /* char **environ */
-			return &root_peb->pp_envp;
+			return &dl_globals.dg_peb->pp_envp;
 		break;
 
 	case 'p':
@@ -3376,7 +3367,7 @@ check_environ:
 			name += 18;
 			if (strcmp(name, "name") == 0) { /* char *program_invocation_name */
 return_program_invocation_name:
-				return &root_peb->pp_argv[0];
+				return &dl_globals.dg_peb->pp_argv[0];
 			}
 			if (strcmp(name, "short_name") == 0) { /* char *program_invocation_short_name */
 return_program_invocation_short_name:
@@ -3570,7 +3561,7 @@ NOTHROW(FCALL dl_require_global)(char const *__restrict name) {
 	if unlikely(!result) {
 		struct debugtrap_reason r;
 		syslog(LOG_ERR, "[rtld] Required function %q not found (%q)\n",
-		       name, dl_error_message);
+		       name, dl_globals.dg_errmsg);
 		r.dtr_signo  = SIGABRT;
 		r.dtr_reason = DEBUGTRAP_REASON_NONE;
 		sys_debugtrap(NULL, &r);

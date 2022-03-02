@@ -355,7 +355,7 @@ err:
 }
 
 /* Lazily allocate if necessary, and return the section header string table for `self'
- * @return: NULL: Error (s.a. dl_error_message) */
+ * @return: NULL: Error (s.a. dlerror()) */
 INTERN WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(CC DlModule_ElfGetShstrtab)(DlModule *self)
 		THROWS(E_SEGFAULT) {

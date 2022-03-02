@@ -61,9 +61,6 @@ again_old_flags:
 }
 
 
-/* [1..1][const] The library path set when the program was started */
-INTERN char *dl_library_path = NULL;
-
 /* This is the prototype by which ELF initializer callbacks are invoked.
  * For this purpose, calling them is essentially the same as calling the
  * primary program's main()  function, only that  these are expected  to
@@ -75,11 +72,11 @@ typedef void (*elf_init_t)(int argc, char *argv[], char *envp[]) THROWS(...);
  * >> void (*)(int argc, char *argv[], char *envp[]);
  *
  * As  such, call them like that, rather than without any arguments!
- * HINT: We can take all of the required information from `root_peb' */
-#define CALLINIT(funptr)                        \
-	((*(elf_init_t)(funptr))(root_peb->pp_argc, \
-	                         root_peb->pp_argv, \
-	                         root_peb->pp_envp))
+ * HINT: We can take all of the required information from `dl_globals.dg_peb' */
+#define CALLINIT(funptr)                                 \
+	((*(elf_init_t)(funptr))(dl_globals.dg_peb->pp_argc, \
+	                         dl_globals.dg_peb->pp_argv, \
+	                         dl_globals.dg_peb->pp_envp))
 
 
 /* Run library initializers for `self' */
@@ -267,39 +264,37 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags)
 			assert(self->dm_depcnt < count);
 			filename = self->dm_elf.de_dynstr + self->dm_dynhdr[i].d_un.d_ptr;
 			/* Load the dependent library. */
-			ATOMIC_WRITE(dl_error_message, NULL);
+			ATOMIC_WRITE(dl_globals.dg_errmsg, NULL);
 			if (self->dm_elf.de_runpath) {
 				dependency = DlModule_OpenFilenameInPathList(self->dm_elf.de_runpath,
 				                                             filename,
 				                                             dep_flags);
-				if (!dependency && ATOMIC_READ(dl_error_message) == NULL) {
-					/* Before doing more open() system calls, check to see if we've
-					 * already   loaded  a  matching  candidate  of  this  library!
-					 * We  can  do  this because  `dl_library_path'  never changes. */
+				if (!dependency && ATOMIC_READ(dl_globals.dg_errmsg) == NULL) {
+					/* Before  doing more open() system calls, check to see if we've
+					 * already   loaded  a  matching   candidate  of  this  library!
+					 * We can do this because `dl_globals.dg_libpath' never changes. */
 					dependency = DlModule_FindFilenameInPathListFromAll(filename);
 					if (dependency) {
 						try_add2global(dependency);
-					} else if (ATOMIC_READ(dl_error_message) == NULL) {
-						dependency = DlModule_OpenFilenameInPathList(dl_library_path,
-						                                             filename,
-						                                             dep_flags);
+					} else if (ATOMIC_READ(dl_globals.dg_errmsg) == NULL) {
+						dependency = DlModule_OpenFilenameInPathList(dl_globals.dg_libpath,
+						                                             filename, dep_flags);
 					}
 				}
 			} else {
-				/* Before doing more open() system calls, check to see if we've
-				 * already   loaded  a  matching  candidate  of  this  library!
-				 * We  can  do  this because  `dl_library_path'  never changes. */
+				/* Before  doing more open() system calls, check to see if we've
+				 * already   loaded  a  matching   candidate  of  this  library!
+				 * We can do this because `dl_globals.dg_libpath' never changes. */
 				dependency = DlModule_FindFilenameInPathListFromAll(filename);
 				if (dependency) {
 					try_add2global(dependency);
-				} else if (ATOMIC_READ(dl_error_message) == NULL) {
-					dependency = DlModule_OpenFilenameInPathList(dl_library_path,
-					                                             filename,
-					                                             dep_flags);
+				} else if (ATOMIC_READ(dl_globals.dg_errmsg) == NULL) {
+					dependency = DlModule_OpenFilenameInPathList(dl_globals.dg_libpath,
+					                                             filename, dep_flags);
 				}
 			}
 			if (!dependency) {
-				if (ATOMIC_READ(dl_error_message) == NULL)
+				if (ATOMIC_READ(dl_globals.dg_errmsg) == NULL)
 					dl_seterrorf("Failed to load dependency %q of %q",
 					             filename, self->dm_filename);
 				goto err;
@@ -401,7 +396,7 @@ done_dynamic:
 	/* Enable direct binding when `LD_BIND_NOW' is defined as non-empty */
 	{
 		char *ld_bind_now;
-		ld_bind_now = process_peb_getenv(root_peb, "LD_BIND_NOW");
+		ld_bind_now = process_peb_getenv(dl_globals.dg_peb, "LD_BIND_NOW");
 		if (ld_bind_now && *ld_bind_now)
 			flags |= DL_MODULE_ELF_INITIALIZE_FBINDNOW;
 	}

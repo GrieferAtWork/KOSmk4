@@ -108,71 +108,63 @@ INTDEF NONNULL((1)) void CC
 dlmodule_finalizers_run(struct dlmodule_finalizers *__restrict self)
 		THROWS(...);
 
-/* [1..1] List of global modules / pointer to the root binary. */
-#ifndef __dlmodule_list_defined
-#define __dlmodule_list_defined
-LIST_HEAD(dlmodule_list, dlmodule);
-#endif /* !__dlmodule_list_defined */
-INTDEF struct dlmodule_list DlModule_GlobalList;
-INTDEF struct atomic_rwlock DlModule_GlobalLock;
+/* libdl global variables (as also shared with extension drivers) */
+INTDEF struct dlglobals dl_globals;
 
-/* Helper macros for `DlModule_GlobalLock' */
-#define DlModule_GlobalLock_MustReap()   0
-#define DlModule_GlobalLock_Reap()       (void)0
-#define _DlModule_GlobalLock_Reap()      (void)0
-#define DlModule_GlobalLock_Write()      atomic_rwlock_write(&DlModule_GlobalLock)
-#define DlModule_GlobalLock_TryWrite()   atomic_rwlock_trywrite(&DlModule_GlobalLock)
-#define DlModule_GlobalLock_EndWrite()   (atomic_rwlock_endwrite(&DlModule_GlobalLock), DlModule_GlobalLock_Reap())
-#define _DlModule_GlobalLock_EndWrite()  atomic_rwlock_endwrite(&DlModule_GlobalLock)
-#define DlModule_GlobalLock_Read()       atomic_rwlock_read(&DlModule_GlobalLock)
-#define DlModule_GlobalLock_Tryread()    atomic_rwlock_tryread(&DlModule_GlobalLock)
-#define _DlModule_GlobalLock_EndRead()   atomic_rwlock_endread(&DlModule_GlobalLock)
-#define DlModule_GlobalLock_EndRead()    (void)(atomic_rwlock_endread(&DlModule_GlobalLock) && (DlModule_GlobalLock_Reap(), 0))
-#define _DlModule_GlobalLock_End()       atomic_rwlock_end(&DlModule_GlobalLock)
-#define DlModule_GlobalLock_End()        (void)(atomic_rwlock_end(&DlModule_GlobalLock) && (DlModule_GlobalLock_Reap(), 0))
-#define DlModule_GlobalLock_Upgrade()    atomic_rwlock_upgrade(&DlModule_GlobalLock)
-#define DlModule_GlobalLock_TryUpgrade() atomic_rwlock_tryupgrade(&DlModule_GlobalLock)
-#define DlModule_GlobalLock_Downgrade()  atomic_rwlock_downgrade(&DlModule_GlobalLock)
-#define DlModule_GlobalLock_Reading()    atomic_rwlock_reading(&DlModule_GlobalLock)
-#define DlModule_GlobalLock_Writing()    atomic_rwlock_writing(&DlModule_GlobalLock)
-#define DlModule_GlobalLock_CanRead()    atomic_rwlock_canread(&DlModule_GlobalLock)
-#define DlModule_GlobalLock_CanWrite()   atomic_rwlock_canwrite(&DlModule_GlobalLock)
-#define DlModule_GlobalLock_WaitRead()   atomic_rwlock_waitread(&DlModule_GlobalLock)
-#define DlModule_GlobalLock_WaitWrite()  atomic_rwlock_waitwrite(&DlModule_GlobalLock)
+/* [1..N] List of global modules / pointer to the root binary. */
+#define DlModule_GlobalList dl_globals.dg_globallist
 
-#ifndef __dlmodule_dlist_defined
-#define __dlmodule_dlist_defined
-DLIST_HEAD(dlmodule_dlist, dlmodule);
-#endif /* !__dlmodule_dlist_defined */
+/* Helper macros for `dl_globals.dg_globallock' */
+#define DlModule_GlobalLock_MustReap()   dlglobals_globallock_mustreap(&dl_globals)
+#define DlModule_GlobalLock_Reap()       dlglobals_globallock_reap(&dl_globals)
+#define _DlModule_GlobalLock_Reap()      _dlglobals_globallock_reap(&dl_globals)
+#define DlModule_GlobalLock_Write()      dlglobals_globallock_write(&dl_globals)
+#define DlModule_GlobalLock_TryWrite()   dlglobals_globallock_trywrite(&dl_globals)
+#define DlModule_GlobalLock_EndWrite()   dlglobals_globallock_endwrite(&dl_globals)
+#define _DlModule_GlobalLock_EndWrite()  _dlglobals_globallock_endwrite(&dl_globals)
+#define DlModule_GlobalLock_Read()       dlglobals_globallock_read(&dl_globals)
+#define DlModule_GlobalLock_Tryread()    dlglobals_globallock_tryread(&dl_globals)
+#define _DlModule_GlobalLock_EndRead()   _dlglobals_globallock_endread(&dl_globals)
+#define DlModule_GlobalLock_EndRead()    dlglobals_globallock_endread(&dl_globals)
+#define _DlModule_GlobalLock_End()       _dlglobals_globallock_end(&dl_globals)
+#define DlModule_GlobalLock_End()        dlglobals_globallock_end(&dl_globals)
+#define DlModule_GlobalLock_Upgrade()    dlglobals_globallock_upgrade(&dl_globals)
+#define DlModule_GlobalLock_TryUpgrade() dlglobals_globallock_tryupgrade(&dl_globals)
+#define DlModule_GlobalLock_Downgrade()  dlglobals_globallock_downgrade(&dl_globals)
+#define DlModule_GlobalLock_Reading()    dlglobals_globallock_reading(&dl_globals)
+#define DlModule_GlobalLock_Writing()    dlglobals_globallock_writing(&dl_globals)
+#define DlModule_GlobalLock_CanRead()    dlglobals_globallock_canread(&dl_globals)
+#define DlModule_GlobalLock_CanWrite()   dlglobals_globallock_canwrite(&dl_globals)
+#define DlModule_GlobalLock_WaitRead()   dlglobals_globallock_waitread(&dl_globals)
+#define DlModule_GlobalLock_WaitWrite()  dlglobals_globallock_waitwrite(&dl_globals)
 
 /* [1..1] List of all loaded modules. */
-INTDEF struct dlmodule_dlist DlModule_AllList;
-INTDEF struct atomic_rwlock DlModule_AllLock;
+#define DlModule_AllList dl_globals.dg_alllist
+#define DlModule_AllLock dl_globals.dg_alllock
 
 /* Helper macros for `DlModule_AllLock' */
-#define DlModule_AllLock_MustReap()   0
-#define DlModule_AllLock_Reap()       (void)0
-#define _DlModule_AllLock_Reap()      (void)0
-#define DlModule_AllLock_Write()      atomic_rwlock_write(&DlModule_AllLock)
-#define DlModule_AllLock_TryWrite()   atomic_rwlock_trywrite(&DlModule_AllLock)
-#define DlModule_AllLock_EndWrite()   (atomic_rwlock_endwrite(&DlModule_AllLock), DlModule_AllLock_Reap())
-#define _DlModule_AllLock_EndWrite()  atomic_rwlock_endwrite(&DlModule_AllLock)
-#define DlModule_AllLock_Read()       atomic_rwlock_read(&DlModule_AllLock)
-#define DlModule_AllLock_Tryread()    atomic_rwlock_tryread(&DlModule_AllLock)
-#define _DlModule_AllLock_EndRead()   atomic_rwlock_endread(&DlModule_AllLock)
-#define DlModule_AllLock_EndRead()    (void)(atomic_rwlock_endread(&DlModule_AllLock) && (DlModule_AllLock_Reap(), 0))
-#define _DlModule_AllLock_End()       atomic_rwlock_end(&DlModule_AllLock)
-#define DlModule_AllLock_End()        (void)(atomic_rwlock_end(&DlModule_AllLock) && (DlModule_AllLock_Reap(), 0))
-#define DlModule_AllLock_Upgrade()    atomic_rwlock_upgrade(&DlModule_AllLock)
-#define DlModule_AllLock_TryUpgrade() atomic_rwlock_tryupgrade(&DlModule_AllLock)
-#define DlModule_AllLock_Downgrade()  atomic_rwlock_downgrade(&DlModule_AllLock)
-#define DlModule_AllLock_Reading()    atomic_rwlock_reading(&DlModule_AllLock)
-#define DlModule_AllLock_Writing()    atomic_rwlock_writing(&DlModule_AllLock)
-#define DlModule_AllLock_CanRead()    atomic_rwlock_canread(&DlModule_AllLock)
-#define DlModule_AllLock_CanWrite()   atomic_rwlock_canwrite(&DlModule_AllLock)
-#define DlModule_AllLock_WaitRead()   atomic_rwlock_waitread(&DlModule_AllLock)
-#define DlModule_AllLock_WaitWrite()  atomic_rwlock_waitwrite(&DlModule_AllLock)
-
+#define DlModule_AllLock_MustReap()   dlglobals_alllock_mustreap(&dl_globals)
+#define DlModule_AllLock_Reap()       dlglobals_alllock_reap(&dl_globals)
+#define _DlModule_AllLock_Reap()      _dlglobals_alllock_reap(&dl_globals)
+#define DlModule_AllLock_Write()      dlglobals_alllock_write(&dl_globals)
+#define DlModule_AllLock_TryWrite()   dlglobals_alllock_trywrite(&dl_globals)
+#define DlModule_AllLock_EndWrite()   dlglobals_alllock_endwrite(&dl_globals)
+#define _DlModule_AllLock_EndWrite()  _dlglobals_alllock_endwrite(&dl_globals)
+#define DlModule_AllLock_Read()       dlglobals_alllock_read(&dl_globals)
+#define DlModule_AllLock_Tryread()    dlglobals_alllock_tryread(&dl_globals)
+#define _DlModule_AllLock_EndRead()   _dlglobals_alllock_endread(&dl_globals)
+#define DlModule_AllLock_EndRead()    dlglobals_alllock_endread(&dl_globals)
+#define _DlModule_AllLock_End()       _dlglobals_alllock_end(&dl_globals)
+#define DlModule_AllLock_End()        dlglobals_alllock_end(&dl_globals)
+#define DlModule_AllLock_Upgrade()    dlglobals_alllock_upgrade(&dl_globals)
+#define DlModule_AllLock_TryUpgrade() dlglobals_alllock_tryupgrade(&dl_globals)
+#define DlModule_AllLock_Downgrade()  dlglobals_alllock_downgrade(&dl_globals)
+#define DlModule_AllLock_Reading()    dlglobals_alllock_reading(&dl_globals)
+#define DlModule_AllLock_Writing()    dlglobals_alllock_writing(&dl_globals)
+#define DlModule_AllLock_CanRead()    dlglobals_alllock_canread(&dl_globals)
+#define DlModule_AllLock_CanWrite()   dlglobals_alllock_canwrite(&dl_globals)
+#define DlModule_AllLock_WaitRead()   dlglobals_alllock_waitread(&dl_globals)
+#define DlModule_AllLock_WaitWrite()  dlglobals_alllock_waitwrite(&dl_globals)
 
 #define DlModule_GlobalList_FOREACH(mod) \
 	LIST_FOREACH (mod, &DlModule_GlobalList, dm_globals)
@@ -204,15 +196,6 @@ NOTHROW_NCX(CC DlModule_RemoveFromAll)(USER DlModule *self) THROWS(E_SEGFAULT) {
 	assert(DLIST_PREV(self, dm_modules) != NULL);
 	DLIST_REMOVE(&DlModule_AllList, self, dm_modules);
 }
-
-
-/* Lock used to ensure that only a single thread can ever load modules
- * at the same time (used to prevent potential race conditions arising
- * from the fact that various components must be accessed globally). */
-INTDEF struct atomic_owner_rwlock DlModule_LoadLock;
-
-/* [1..1][const] The library path set when the program was started (initenv:$LD_LIBRARY_PATH) */
-INTDEF char *dl_library_path;
 
 /* Open a DL Module.
  * @return: NULL: Failed to open the module.  (no error is set if  the file could not be  found
@@ -296,7 +279,7 @@ NOTHROW(CC DlModule_UpdateFlags)(DlModule *__restrict self, int mode);
 
 
 /* Lazily allocate if necessary, and return the file descriptor for `self'
- * @return: -1: Error (s.a. dl_error_message) */
+ * @return: -1: Error (s.a. dlerror()) */
 INTDEF WUNUSED NONNULL((1)) fd_t
 NOTHROW_NCX(CC DlModule_GetFd)(USER DlModule *self)
 		THROWS(E_SEGFAULT);
@@ -307,13 +290,13 @@ NOTHROW_NCX(CC DlModule_GetFd)(USER DlModule *self)
  *  - self->dm_elf.de_shoff
  *  - self->dm_elf.de_shstrndx
  *  - self->dm_elf.de_shdr
- * @return: NULL: Error (s.a. dl_error_message) */
+ * @return: NULL: Error (s.a. dlerror()) */
 INTDEF WUNUSED NONNULL((1)) ElfW(Shdr) *
 NOTHROW_NCX(CC DlModule_ElfGetShdrs)(USER DlModule *self)
 		THROWS(E_SEGFAULT);
 
 /* Lazily allocate if necessary, and return the section header string table for `self'
- * @return: NULL: Error (s.a. dl_error_message) */
+ * @return: NULL: Error (s.a. dlerror()) */
 INTDEF WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(CC DlModule_ElfGetShstrtab)(USER DlModule *self)
 		THROWS(E_SEGFAULT);
@@ -823,11 +806,6 @@ dl_bind_lazy_relocation(DlModule *__restrict self,
 		THROWS(...);
 #endif /* ELF_ARCH_IS_R_JMP_SLOT */
 
-/* PEB for the main executable. */
-INTDEF struct process_peb *root_peb;
-
-INTDEF char dl_error_buffer[128];
-INTDEF char *dl_error_message; /* [0..1] The current DL error message */
 INTDEF ATTR_COLD int NOTHROW(CC dl_seterror_badptr)(USER void *ptr);
 INTDEF ATTR_COLD int NOTHROW(CC dl_seterror_badmodule)(USER void *modptr);
 INTDEF ATTR_COLD int NOTHROW(CC dl_seterror_badsection)(USER void *sectptr);

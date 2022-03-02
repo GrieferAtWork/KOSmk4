@@ -87,8 +87,8 @@ DECL_END
 DECL_BEGIN
 
 /* DL core operator table. */
-#define dl               (*libpe_fmt.df_core)
-#define dl_error_message (*dl.dl_error_message)
+#define dl         (*libpe_fmt.df_core)
+#define dl_globals (*dl.dl_globals)
 
 /* Even though we could, we don't want to use heap functions from libc. If we
  * did, corruption of allocations made by the hosted program would result  in

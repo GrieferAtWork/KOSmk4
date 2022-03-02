@@ -38,24 +38,8 @@ DL_COREOP(WUNUSED ATTR_PURE_P NONNULL((1)), DlSection *, __FCALL, dlsec_builtin,
 DL_COREOP(WUNUSED ATTR_CONST_P, DlSection *, __FCALL, dlsec_builtin_index, (size_t sect_index))
 DL_COREOP(WUNUSED ATTR_CONST_P, char const *, __FCALL, dlsec_builtin_name, (size_t sect_index))
 
-/* [1..1][const] The library path set when the program was started (initenv:$LD_LIBRARY_PATH) */
-DL_COREFIELD(char *, dl_library_path)
-
-/* [0..1] The current DL error message */
-DL_COREFIELD(char *, dl_error_message)
-
-/* NOTE: Put all global variables into a singular structure.
- *       That way, libdl only needs to put a pointer to that
- *       structure into `struct dlcore_ops', rather than put
- *       many pointers to singular data items! */
-
-/* [1..1] List of global modules / pointer to the root binary. */
-DL_COREFIELD(struct dlmodule_list,  DlModule_GlobalList)
-DL_COREFIELD(struct atomic_rwlock,  DlModule_GlobalLock)
-
-/* [1..1] List of all loaded modules. */
-DL_COREFIELD(struct dlmodule_dlist, DlModule_AllList)
-DL_COREFIELD(struct atomic_rwlock,  DlModule_AllLock)
+/* [1..1][const] Global variables */
+DL_COREFIELD(struct dlglobals, dl_globals)
 
 /* The module describing the RTLD library itself. */
 DL_COREFIELD(DlModule, dl_rtld_module)

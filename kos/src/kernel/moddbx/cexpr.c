@@ -3002,9 +3002,12 @@ NOTHROW(FCALL cexpr_load_special_libdl_symbol)(char const *__restrict name) {
 		result = cexpr_pop();
 		if unlikely(result != DBX_EOK)
 			goto done;
-		/* All of the special symbols somehow interact with "root_peb",
-		 * which should be an INTERN-visibility symbol from `libdl.so'! */
-		result = cexpr_pushsymbol_byname("root_peb", 8);
+		/* All of the special symbols somehow interact with "dl_globals",
+		 * which  should be an  INTERN-visibility symbol from `libdl.so'! */
+		result = cexpr_pushsymbol_byname("dl_globals", 8);
+		if unlikely(result != DBX_EOK)
+			goto done;
+		result = cexpr_field("dg_peb", 6);
 		if unlikely(result != DBX_EOK)
 			goto done;
 		result = cexpr_deref();
@@ -3013,26 +3016,26 @@ NOTHROW(FCALL cexpr_load_special_libdl_symbol)(char const *__restrict name) {
 		switch (varid) {
 
 		case LIBDL_VAR___peb:
-			/* &__peb == root_peb */
+			/* &__peb == dl_globals.dg_peb */
 			break;
 
 		case LIBDL_VAR_environ:
-			/* &environ == &root_peb->pp_envp */
+			/* &environ == &dl_globals.dg_peb->pp_envp */
 			result = cexpr_field("pp_envp", 7);
 			break;
 
 		case LIBDL_VAR___argc:
-			/* &__argc == &root_peb->pp_argc */
+			/* &__argc == &dl_globals.dg_peb->pp_argc */
 			result = cexpr_field("pp_argc", 7);
 			break;
 
 		case LIBDL_VAR___argv:
-			/* &__argv == &root_peb->pp_argv */
+			/* &__argv == &dl_globals.dg_peb->pp_argv */
 			result = cexpr_field("pp_argv", 7);
 			break;
 
 		case LIBDL_VAR_program_invocation_name:
-			/* &program_invocation_name == &root_peb->pp_argv[0] */
+			/* &program_invocation_name == &dl_globals.dg_peb->pp_argv[0] */
 			result = cexpr_field("pp_argv", 7);
 			if likely(result == 0)
 				result = cexpr_deref();
@@ -3092,15 +3095,15 @@ push_normal_dl_program_invocation_short_name:
 			result = cexpr_deref();
 			if unlikely(result != DBX_EOK)
 				goto done;
-			/* Right now, the top of  the stack points at  `*root_peb->pp_argv[0]',
-			 * which contains the address that we want to write back to the program
-			 * invocation short name symbol. */
+			/* Right now, the top of the stack points at `*dl_globals.dg_peb->pp_argv[0]', which
+			 * contains the address that we want to  write back to the program invocation  short
+			 * name symbol. */
 			result = cexpr_getdata((byte_t **)&argv0);
 			if unlikely(result != DBX_EOK)
 				goto done;
 			if (!argv0 || !ADDR_ISUSER(argv0))
 				goto push_normal_dl_program_invocation_short_name;
-			/* Pop the root_peb-based expression off of the stack! */
+			/* Pop the dl_globals.dg_peb-based expression off of the stack! */
 			result = cexpr_pop();
 			if unlikely(result != DBX_EOK)
 				goto done;
@@ -3298,24 +3301,25 @@ got_symbol_type:
 			                        0);
 
 			if likely(result == DBX_EOK) {
-				/* Special  handling for ".fakedata" symbols exported by `libdl.so'.
-				 * Libdl claims to export these symbols like any others are, however
-				 * in actuality, their address/size aren't resolved to the suggested
-				 * locations, but rather to custom locations relative to `root_peb'.
+				/* Special handling for ".fakedata" symbols exported by `libdl.so'.
+				 *
+				 * Libdl claims to  export these  symbols like  any others  are, however  in
+				 * actuality, their address/size aren't resolved to the suggested locations,
+				 * but rather to custom locations relative to `dl_globals.dg_peb'.
 				 *
 				 * As such, and because there really are some rather important symbols
 				 * in  here, we have  to do some special  filtering to duplicate those
 				 * custom routers, as already seen in `dlsym_builtin()':
 				 *
-				 *    &__peb                         == root_peb;
-				 *    &environ                       == &root_peb->pp_envp;
-				 *    &_environ                      == &root_peb->pp_envp;
-				 *    &__environ                     == &root_peb->pp_envp;
-				 *    &__argc                        == &root_peb->pp_argc;
-				 *    &__argv                        == &root_peb->pp_argv;
-				 *    &_pgmptr                       == &root_peb->pp_argv[0];
-				 *    &__progname_full               == &root_peb->pp_argv[0];
-				 *    &program_invocation_name       == &root_peb->pp_argv[0];
+				 *    &__peb                         == dl_globals.dg_peb;
+				 *    &environ                       == &dl_globals.dg_peb->pp_envp;
+				 *    &_environ                      == &dl_globals.dg_peb->pp_envp;
+				 *    &__environ                     == &dl_globals.dg_peb->pp_envp;
+				 *    &__argc                        == &dl_globals.dg_peb->pp_argc;
+				 *    &__argv                        == &dl_globals.dg_peb->pp_argv;
+				 *    &_pgmptr                       == &dl_globals.dg_peb->pp_argv[0];
+				 *    &__progname_full               == &dl_globals.dg_peb->pp_argv[0];
+				 *    &program_invocation_name       == &dl_globals.dg_peb->pp_argv[0];
 				 *    &__progname                    == dlget_p_program_invocation_short_name();
 				 *    &program_invocation_short_name == dlget_p_program_invocation_short_name();
 				 *

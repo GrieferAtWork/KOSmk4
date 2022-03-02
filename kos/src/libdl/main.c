@@ -118,8 +118,16 @@ INTERN DlModule dl_rtld_module = {
 };
 
 
-PRIVATE char const ld_rtld_module_filename[] = RTLD_LIBDL;
-INTERN struct process_peb *root_peb = NULL;
+/* libdl global variables (as also shared with extension drivers) */
+INTERN struct dlglobals dl_globals = {
+	.dg_peb         = NULL, /* Initialized in `linker_main()' */
+	.dg_libpath     = NULL, /* Initialized in `linker_main()' */
+	.dg_errmsg      = NULL,
+	.dg_globallist  = LIST_HEAD_INITIALIZER(dl_globals.dg_globallist),
+	.dg_globallock  = ATOMIC_RWLOCK_INIT,
+	.dg_alllist     = DLIST_HEAD_INITIALIZER(dl_globals.dg_alllist),
+	.dg_alllock     = ATOMIC_RWLOCK_INIT,
+};
 
 /* Set to true if the sys_debugtrap() system call is disabled. */
 INTERN bool sys_debugtrap_disabled = false;
@@ -141,8 +149,8 @@ linker_main(struct elfexec_info *__restrict info,
 	size_t rtld_size = __rtld_end - __rtld_start;
 
 	/* Initialize globals (not done statically because we can't have relocations). */
-	root_peb                    = peb;
-	dl_rtld_module.dm_filename  = (char *)ld_rtld_module_filename;
+	dl_globals.dg_peb           = peb;
+	dl_rtld_module.dm_filename  = (char *)RTLD_LIBDL;
 	dl_rtld_module.dm_loadaddr  = info->ei_rtldaddr;
 	dl_rtld_module.dm_loadstart = info->ei_rtldaddr;
 	dl_rtld_module.dm_loadend   = (uintptr_t)rtld_size;
@@ -152,9 +160,9 @@ linker_main(struct elfexec_info *__restrict info,
 	DlModule_AllList.dlh_first = &dl_rtld_module;
 
 	/* Check for LD-specific environment variables. */
-	dl_library_path = process_peb_getenv(peb, "LD_LIBRARY_PATH");
-	if (!dl_library_path)
-		dl_library_path = (char *)RTLD_LIBRARY_PATH;
+	dl_globals.dg_libpath = process_peb_getenv(peb, "LD_LIBRARY_PATH");
+	if (dl_globals.dg_libpath == NULL)
+		dl_globals.dg_libpath = (char *)RTLD_LIBRARY_PATH;
 
 	/* Support for executable formats other than ELF */
 	if (elfexec_info_usesinterpreter(info)) {
@@ -182,7 +190,7 @@ linker_main(struct elfexec_info *__restrict info,
 		base_module = LIST_FIRST(&DlModule_GlobalList);
 		if unlikely(result == NULL || base_module == NULL ||
 		            base_module->dm_ops == NULL) {
-			if (!dl_error_message) {
+			if (dl_globals.dg_errmsg == NULL) {
 				dl_seterrorf("Cannot load application with %q",
 				             int_lib->dm_filename);
 			}
