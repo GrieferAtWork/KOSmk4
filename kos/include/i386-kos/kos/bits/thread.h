@@ -40,10 +40,10 @@
 #include <kos/syscalls.h>
 #if __CRT_HAVE_XSC(arch_prctl)
 #ifdef ARCH_GET_FS
-#define __x86_fast_rdfsbase(r) (void)sys_Xarch_prctl(ARCH_GET_FS, (uintptr_t *)(r))
+#define __x86_fast_rdfsbase(r) (void)sys_Xarch_prctl(ARCH_GET_FS, (uintptr_t *)&(r))
 #endif /* ARCH_GET_FS */
 #ifdef ARCH_SET_FS
-#define __x86_fast_wrfsbase(v) (void)sys_Xarch_prctl(ARCH_SET_FS, (uintptr_t *)&(v))
+#define __x86_fast_wrfsbase(v) (void)sys_Xarch_prctl(ARCH_SET_FS, (uintptr_t *)(v))
 #endif /* ARCH_SET_FS */
 #ifdef ARCH_GET_GS
 #define __x86_fast_rdgsbase(r) (void)sys_Xarch_prctl(ARCH_GET_GS, (uintptr_t *)&(r))
