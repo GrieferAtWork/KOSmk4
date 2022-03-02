@@ -926,7 +926,7 @@ DEFINE_PUBLIC_ALIAS(DOS$__C_specific_handler, libd__except_handler4);
 
 INTERN ATTR_SECTION(".text.crt.dos.application.init") void LIBDCALL
 libd___lconv_init(void) {
-	CRT_UNIMPLEMENTED("__lconv_init()");
+	CRT_UNIMPLEMENTED("__lconv_init");
 }
 
 INTERN ATTR_SECTION(".text.crt.dos.application.init") int LIBDCALL

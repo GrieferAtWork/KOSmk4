@@ -38,7 +38,7 @@ NOTHROW_NCX(VLIBDCALL libd_semctl)(int semid,
 	(void)semid;
 	(void)semnum;
 	(void)cmd;
-	CRT_UNIMPLEMENTED("semctl"); /* TODO */
+	CRT_UNIMPLEMENTEDF("semctl(%x, %x, %x, ...)", semid, semnum, cmd); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -57,7 +57,7 @@ NOTHROW_NCX(VLIBCCALL libc_semctl)(int semid,
 	(void)semid;
 	(void)semnum;
 	(void)cmd;
-	CRT_UNIMPLEMENTED("semctl"); /* TODO */
+	CRT_UNIMPLEMENTEDF("semctl(%x, %x, %x, ...)", semid, semnum, cmd); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }

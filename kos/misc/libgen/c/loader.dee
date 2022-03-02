@@ -1595,10 +1595,15 @@ generic_unimplemented:
 	} else {
 		local priArgs = [];
 		for (local a: prototype.argv) {
-			if (!a.name)
-				goto generic_unimplemented;
 			local ct = a.ctype;
 			local effectiveBeforeName = str(ct.beforeName).strip();
+			if (!a.name) {
+				if (effectiveBeforeName == "..." && a === prototype.argv.last) {
+					priArgs.append("...");
+					break;
+				}
+				goto generic_unimplemented;
+			}
 			if (ct.afterName)
 				effectiveBeforeName += " *";
 			effectiveBeforeName = effectiveBeforeName
@@ -1631,7 +1636,7 @@ generic_unimplemented:
 				effectiveBeforeName = newEffectiveBeforeName;
 			}
 			local pri = {
-				"char*" : "q",
+				"char*" : "%q",
 			}.get(effectiveBeforeName);
 			if (pri !is none) {
 				priArgs.append(pri);
@@ -1645,27 +1650,27 @@ generic_unimplemented:
 			if (tc.startswith("TS("))
 				goto generic_unimplemented;
 			local pri = {
-				"THH"  : "hhx",
-				"TH"   : "hx",
-				"TD"   : "x",
-				"TL"   : "lx",
-				"TLL"  : "llx",
-				"TF"   : "f",
-				"TFD"  : "f",
-				"TFL"  : "lf",
-				"TP"   : "p",
-				"TI"   : "Ix",
-				"TI8"  : "\" PRIx8 \"",
-				"TI16" : "\" PRIx16 \"",
-				"TI32" : "\" PRIx32 \"",
-				"TI64" : "\" PRIx64 \"",
+				"THH"  : "%hhx",
+				"TH"   : "%hx",
+				"TD"   : "%x",
+				"TL"   : "%lx",
+				"TLL"  : "%llx",
+				"TF"   : "%f",
+				"TFD"  : "%f",
+				"TFL"  : "%lf",
+				"TP"   : "%p",
+				"TI"   : "%Ix",
+				"TI8"  : "%\" PRIx8 \"",
+				"TI16" : "%\" PRIx16 \"",
+				"TI32" : "%\" PRIx32 \"",
+				"TI64" : "%\" PRIx64 \"",
 			}.get(tc);
 			if (pri !is none) {
 				priArgs.append(pri);
 				continue;
 			}
 			if (tc.startswith("TIn(")) {
-				priArgs.append("\" PRIxN(" + tc[4:] + " \"");
+				priArgs.append("%\" PRIxN(" + tc[4:] + " \"");
 				continue;
 			}
 			goto generic_unimplemented;
@@ -1678,11 +1683,16 @@ generic_unimplemented:
 			if (!isFirst)
 				fp << ", ";
 			isFirst = false;
-			fp << "%" << p;
+			fp << p;
 		}
 		fp << ")\"";
-		for (local a: prototype.argv)
-			fp << ", " << a.name;
+		local i = 0;
+		for (local fmt: priArgs) {
+			if (fmt.startswith("%")) {
+				fp << ", " << prototype.argv[i].name;
+				++i;
+			}
+		}
 		fp << "); /* TO" "DO */\n";
 	}
 #endif /* DELAY_printDefaultLibraryImplementationForPrototype */

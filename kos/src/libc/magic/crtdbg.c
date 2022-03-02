@@ -307,6 +307,8 @@ int _CrtSetDbgFlag(int new_flag) {
 	return result;
 }
 
+%[define_replacement(_HFILE = "void *")]
+
 
 [[crt_dos_only]] int _CrtSetReportMode(int report_type, int report_mode);
 [[crt_dos_only]] _HFILE _CrtSetReportFile(int report_type, _HFILE report_file);

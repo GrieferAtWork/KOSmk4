@@ -191,7 +191,7 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetReportFile)(int report_type,
 /*AUTO*/{
 	(void)report_type;
 	(void)report_file;
-	CRT_UNIMPLEMENTED("_CrtSetReportFile"); /* TODO */
+	CRT_UNIMPLEMENTEDF("_CrtSetReportFile(%x, %p)", report_type, report_file); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -212,7 +212,7 @@ NOTHROW_NCX(VLIBDCALL libc__CrtDbgReport)(int report_type,
 	(void)line;
 	(void)module_name;
 	(void)format;
-	CRT_UNIMPLEMENTED("_CrtDbgReport"); /* TODO */
+	CRT_UNIMPLEMENTEDF("_CrtDbgReport(%x, %q, %x, %q, %q, ...)", report_type, filename, line, module_name, format); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -247,7 +247,7 @@ NOTHROW_NCX(VLIBDCALL libc__CrtDbgReportW)(int report_type,
 	(void)line;
 	(void)module_name;
 	(void)format;
-	CRT_UNIMPLEMENTED("_CrtDbgReportW"); /* TODO */
+	CRT_UNIMPLEMENTEDF("_CrtDbgReportW(%x, %p, %x, %p, %p, ...)", report_type, filename, line, module_name, format); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }

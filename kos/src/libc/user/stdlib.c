@@ -3098,7 +3098,7 @@ NOTHROW_NCX(VLIBDCALL libd_setproctitle)(char const *format,
 /*[[[body:libd_setproctitle]]]*/
 /*AUTO*/{
 	(void)format;
-	CRT_UNIMPLEMENTED("setproctitle"); /* TODO */
+	CRT_UNIMPLEMENTEDF("setproctitle(%q, ...)", format); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 #endif /* MAGIC:impl_if */
@@ -3112,7 +3112,7 @@ NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format,
 /*[[[body:libc_setproctitle]]]*/
 /*AUTO*/{
 	(void)format;
-	CRT_UNIMPLEMENTED("setproctitle"); /* TODO */
+	CRT_UNIMPLEMENTEDF("setproctitle(%q, ...)", format); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_setproctitle]]]*/
