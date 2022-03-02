@@ -158,12 +158,27 @@ libk32_FreeLibraryAndExitThread(HMODULE hLibModule, DWORD dwExitCode) {
 
 DEFINE_PUBLIC_ALIAS(GetModuleFileNameA, libk32_GetModuleFileNameA);
 DEFINE_PUBLIC_ALIAS(GetModuleFileNameW, libk32_GetModuleFileNameW);
+
+__LIBC WUNUSED NONNULL((1)) char *LIBDCALL DOS$realpath(char const *filename, char *resolved);
+
+/* Return the DOS-name for the module name of a given handle.
+ * NOTE: The returned pointer is freshly malloc'd! */
+PRIVATE char *CC get_dos_dlmodulename(void *handle) {
+	char *result;
+	result = (char *)dlmodulename(handle);
+	if likely(result != NULL)
+		result = DOS$realpath(result, NULL);
+	return result;
+}
+
 INTERN DWORD WINAPI
 libk32_GetModuleFileNameA(HMODULE hModule, LPSTR lpFilename, DWORD nSize) {
-	char const *modname;
+	char *modname;
 	size_t len;
-	TRACE("GetModuleFileNameA(%p, %p, %#x)", hModule, lpFilename, nSize);
-	modname = dlmodulename(hModule);
+	if (!hModule)
+		hModule = (HMODULE)dlopen(NULL, 0);
+	modname = get_dos_dlmodulename(hModule);
+	TRACE("GetModuleFileNameA(%p, %p, %#x) -> %q", hModule, lpFilename, nSize, modname);
 	if (!modname)
 		return 0;
 	len = strlen(modname) + 1;
@@ -172,23 +187,25 @@ libk32_GetModuleFileNameA(HMODULE hModule, LPSTR lpFilename, DWORD nSize) {
 		len      = nSize;
 	}
 	memcpy(lpFilename, modname, len, sizeof(CHAR));
+	free(modname);
 	return len - 1;
 }
 
 INTERN DWORD WINAPI
 libk32_GetModuleFileNameW(HMODULE hModule, LPWSTR lpFilename, DWORD nSize) {
-	char const *modname;
+	char *modname;
 	char16_t *wmodname;
 	size_t len;
-	TRACE("GetModuleFileNameW(%p, %p, %#x)", hModule, lpFilename, nSize);
 	if (!hModule)
 		hModule = (HMODULE)dlopen(NULL, 0);
-	modname = dlmodulename(hModule);
+	modname = get_dos_dlmodulename(hModule);
+	TRACE("GetModuleFileNameW(%p, %p, %#x) -> %q", hModule, lpFilename, nSize, modname);
 	if (!modname)
 		return 0;
 	wmodname = convert_mbstoc16(modname);
 	if (!wmodname)
 		return 0;
+	free(modname);
 	len = c16len(wmodname) + 1;
 	if (len > nSize) {
 		_nterrno = ERROR_INSUFFICIENT_BUFFER;
