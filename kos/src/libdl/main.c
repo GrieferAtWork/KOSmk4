@@ -62,7 +62,7 @@ INTERN DlModule dl_rtld_module = {
 	.dm_tls_init      = NULL,
 	.dm_tls_fini      = NULL,
 	.dm_tls_arg       = NULL,
-	.dm_refcnt        = 2, /* dl_rtld_module, DlModule_GlobalList */
+	.dm_refcnt        = 2, /* dl_rtld_module, dl_globals.dg_globallist */
 	.dm_weakrefcnt    = 1,
 	.dm_globals       = LIST_ENTRY_UNBOUND_INITIALIZER,
 	.dm_file          = -1,
@@ -155,10 +155,10 @@ linker_main(struct elfexec_info *__restrict info,
 	dl_rtld_module.dm_loadaddr        = info->ei_rtldaddr;
 	dl_rtld_module.dm_loadstart       = info->ei_rtldaddr;
 	dl_rtld_module.dm_loadend         = (uintptr_t)rtld_size;
+	dl_globals.dg_alllist.dlh_first   = &dl_rtld_module;
 	dl_rtld_module.dm_loadend += info->ei_rtldaddr;
 	dl_rtld_module.dm_elf.de_phdr[0].p_filesz = (ElfW(Word))rtld_size;
 	dl_rtld_module.dm_elf.de_phdr[0].p_memsz  = (ElfW(Word))rtld_size;
-	DlModule_AllList.dlh_first = &dl_rtld_module;
 
 	/* Check for LD-specific environment variables. */
 	dl_globals.dg_libpath = process_peb_getenv(peb, "LD_LIBRARY_PATH");
@@ -188,7 +188,7 @@ linker_main(struct elfexec_info *__restrict info,
 		 * actually load anything, and if it also  didn't set a dlerror, then we  will
 		 * set a fallback error indicating that the extension couldn't load the  base-
 		 * application given by the kernel. */
-		base_module = TAILQ_FIRST(&DlModule_GlobalList);
+		base_module = dlglobals_mainapp(&dl_globals);
 		if unlikely(result == NULL || base_module == NULL ||
 		            base_module->dm_ops == NULL) {
 			if (dl_globals.dg_errmsg == NULL) {
@@ -229,10 +229,7 @@ linker_main(struct elfexec_info *__restrict info,
 			goto err;
 		WR_TLS_BASE_REGISTER(tls);
 	}
-	assert(TAILQ_FIRST(&DlModule_GlobalList) == base_module);
-	assert(DLIST_FIRST(&DlModule_AllList) == &dl_rtld_module);
-	assert(DLIST_NEXT(&dl_rtld_module, dm_modules) == base_module);
-
+	assert(dlglobals_mainapp(&dl_globals) == base_module);
 	/*decref(base_module);*/ /* Intentionally left dangling! */
 
 	return result;

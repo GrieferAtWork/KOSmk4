@@ -111,86 +111,8 @@ dlmodule_finalizers_run(struct dlmodule_finalizers *__restrict self)
 /* libdl global variables (as also shared with extension drivers) */
 INTDEF struct dlglobals dl_globals;
 
-/* [1..N] List of global modules / pointer to the root binary. */
-#define DlModule_GlobalList dl_globals.dg_globallist
-
-/* Helper macros for `dl_globals.dg_globallock' */
-#define DlModule_GlobalLock_MustReap()   dlglobals_globallock_mustreap(&dl_globals)
-#define DlModule_GlobalLock_Reap()       dlglobals_globallock_reap(&dl_globals)
-#define _DlModule_GlobalLock_Reap()      _dlglobals_globallock_reap(&dl_globals)
-#define DlModule_GlobalLock_Write()      dlglobals_globallock_write(&dl_globals)
-#define DlModule_GlobalLock_TryWrite()   dlglobals_globallock_trywrite(&dl_globals)
-#define DlModule_GlobalLock_EndWrite()   dlglobals_globallock_endwrite(&dl_globals)
-#define _DlModule_GlobalLock_EndWrite()  _dlglobals_globallock_endwrite(&dl_globals)
-#define DlModule_GlobalLock_Read()       dlglobals_globallock_read(&dl_globals)
-#define DlModule_GlobalLock_Tryread()    dlglobals_globallock_tryread(&dl_globals)
-#define _DlModule_GlobalLock_EndRead()   _dlglobals_globallock_endread(&dl_globals)
-#define DlModule_GlobalLock_EndRead()    dlglobals_globallock_endread(&dl_globals)
-#define _DlModule_GlobalLock_End()       _dlglobals_globallock_end(&dl_globals)
-#define DlModule_GlobalLock_End()        dlglobals_globallock_end(&dl_globals)
-#define DlModule_GlobalLock_Upgrade()    dlglobals_globallock_upgrade(&dl_globals)
-#define DlModule_GlobalLock_TryUpgrade() dlglobals_globallock_tryupgrade(&dl_globals)
-#define DlModule_GlobalLock_Downgrade()  dlglobals_globallock_downgrade(&dl_globals)
-#define DlModule_GlobalLock_Reading()    dlglobals_globallock_reading(&dl_globals)
-#define DlModule_GlobalLock_Writing()    dlglobals_globallock_writing(&dl_globals)
-#define DlModule_GlobalLock_CanRead()    dlglobals_globallock_canread(&dl_globals)
-#define DlModule_GlobalLock_CanWrite()   dlglobals_globallock_canwrite(&dl_globals)
-#define DlModule_GlobalLock_WaitRead()   dlglobals_globallock_waitread(&dl_globals)
-#define DlModule_GlobalLock_WaitWrite()  dlglobals_globallock_waitwrite(&dl_globals)
-
-/* [1..1] List of all loaded modules. */
-#define DlModule_AllList dl_globals.dg_alllist
-#define DlModule_AllLock dl_globals.dg_alllock
-
-/* Helper macros for `DlModule_AllLock' */
-#define DlModule_AllLock_MustReap()   dlglobals_alllock_mustreap(&dl_globals)
-#define DlModule_AllLock_Reap()       dlglobals_alllock_reap(&dl_globals)
-#define _DlModule_AllLock_Reap()      _dlglobals_alllock_reap(&dl_globals)
-#define DlModule_AllLock_Write()      dlglobals_alllock_write(&dl_globals)
-#define DlModule_AllLock_TryWrite()   dlglobals_alllock_trywrite(&dl_globals)
-#define DlModule_AllLock_EndWrite()   dlglobals_alllock_endwrite(&dl_globals)
-#define _DlModule_AllLock_EndWrite()  _dlglobals_alllock_endwrite(&dl_globals)
-#define DlModule_AllLock_Read()       dlglobals_alllock_read(&dl_globals)
-#define DlModule_AllLock_Tryread()    dlglobals_alllock_tryread(&dl_globals)
-#define _DlModule_AllLock_EndRead()   _dlglobals_alllock_endread(&dl_globals)
-#define DlModule_AllLock_EndRead()    dlglobals_alllock_endread(&dl_globals)
-#define _DlModule_AllLock_End()       _dlglobals_alllock_end(&dl_globals)
-#define DlModule_AllLock_End()        dlglobals_alllock_end(&dl_globals)
-#define DlModule_AllLock_Upgrade()    dlglobals_alllock_upgrade(&dl_globals)
-#define DlModule_AllLock_TryUpgrade() dlglobals_alllock_tryupgrade(&dl_globals)
-#define DlModule_AllLock_Downgrade()  dlglobals_alllock_downgrade(&dl_globals)
-#define DlModule_AllLock_Reading()    dlglobals_alllock_reading(&dl_globals)
-#define DlModule_AllLock_Writing()    dlglobals_alllock_writing(&dl_globals)
-#define DlModule_AllLock_CanRead()    dlglobals_alllock_canread(&dl_globals)
-#define DlModule_AllLock_CanWrite()   dlglobals_alllock_canwrite(&dl_globals)
-#define DlModule_AllLock_WaitRead()   dlglobals_alllock_waitread(&dl_globals)
-#define DlModule_AllLock_WaitWrite()  dlglobals_alllock_waitwrite(&dl_globals)
-
-#define DlModule_GlobalList_FOREACH(mod) \
-	TAILQ_FOREACH (mod, &DlModule_GlobalList, dm_globals)
-#define DlModule_AllList_FOREACH(mod) \
-	DLIST_FOREACH (mod, &DlModule_AllList, dm_modules)
-
 /* The module describing the RTLD library itself. */
 INTDEF DlModule dl_rtld_module;
-
-LOCAL NONNULL((1)) void
-NOTHROW_NCX(CC DlModule_AddToGlobals)(USER DlModule *self) THROWS(E_SEGFAULT) {
-	TAILQ_INSERT_TAIL(&DlModule_GlobalList, self, dm_globals);
-}
-
-LOCAL NONNULL((1)) void
-NOTHROW_NCX(CC DlModule_AddToAll)(USER DlModule *self) THROWS(E_SEGFAULT) {
-	assert(!DLIST_EMPTY(&DlModule_AllList));
-	DLIST_INSERT_TAIL(&DlModule_AllList, self, dm_modules);
-}
-
-LOCAL NONNULL((1)) void
-NOTHROW_NCX(CC DlModule_RemoveFromAll)(USER DlModule *self) THROWS(E_SEGFAULT) {
-	assert(self != &dl_rtld_module);
-	assert(DLIST_PREV(self, dm_modules) != NULL);
-	DLIST_REMOVE(&DlModule_AllList, self, dm_modules);
-}
 
 /* Open a DL Module.
  * @return: NULL: Failed to open the module.  (no error is set if  the file could not be  found
@@ -769,7 +691,7 @@ libdl_iterate_phdr(USER __dl_iterator_callback callback, USER void *arg)
  * This is called late during  initial module startup once the  initial
  * set of  libraries,  +  the initial  application  have  been  loaded.
  * Note that initializers are invoked in reverse order of those modules
- * appearing   within  `DlModule_AllList',  meaning  that  the  primary
+ * appearing within `dl_globals.dg_alllist',  meaning that the  primary
  * application's  __attribute__((constructor))  functions  are  invoked
  * _AFTER_ those from (e.g.) libc. */
 INTDEF void CC DlModule_RunAllStaticInitializers(void) THROWS(...);

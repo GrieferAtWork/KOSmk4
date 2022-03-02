@@ -396,53 +396,62 @@ struct dlglobals {
 	char                  dg_errbuf[128];   /* Default buffer area for error messages. */
 };
 
+/* Return a pointer to the `struct dlmodule' for the main application. */
+#define dlglobals_mainapp(self) TAILQ_FIRST(&(self)->dg_globallist)
+
+/* Add/Remove elements for the RTLD_GLOBAL/all module lists. */
+#define dlglobals_global_add(self, mod) TAILQ_INSERT_TAIL(&(self)->dg_globallist, mod, dm_globals)
+#define dlglobals_global_del(self, mod) TAILQ_REMOVE(&(self)->dg_globallist, mod, dm_globals)
+#define dlglobals_all_add(self, mod)    DLIST_INSERT_HEAD(&(self)->dg_alllist, mod, dm_modules)
+#define dlglobals_all_del(self, mod)    DLIST_REMOVE(&(self)->dg_alllist, mod, dm_modules)
+
 /* Helper macros for `struct dlglobals::dg_globallock' */
-#define dlglobals_globallock_mustreap(self)   0
-#define dlglobals_globallock_reap(self)       (void)0
-#define _dlglobals_globallock_reap(self)      (void)0
-#define dlglobals_globallock_write(self)      atomic_rwlock_write(&(self)->dg_globallock)
-#define dlglobals_globallock_trywrite(self)   atomic_rwlock_trywrite(&(self)->dg_globallock)
-#define dlglobals_globallock_endwrite(self)   (atomic_rwlock_endwrite(&(self)->dg_globallock), dlglobals_globallock_reap(self))
-#define _dlglobals_globallock_endwrite(self)  atomic_rwlock_endwrite(&(self)->dg_globallock)
-#define dlglobals_globallock_read(self)       atomic_rwlock_read(&(self)->dg_globallock)
-#define dlglobals_globallock_tryread(self)    atomic_rwlock_tryread(&(self)->dg_globallock)
-#define _dlglobals_globallock_endread(self)   atomic_rwlock_endread(&(self)->dg_globallock)
-#define dlglobals_globallock_endread(self)    (void)(atomic_rwlock_endread(&(self)->dg_globallock) && (dlglobals_globallock_reap(self), 0))
-#define _dlglobals_globallock_end(self)       atomic_rwlock_end(&(self)->dg_globallock)
-#define dlglobals_globallock_end(self)        (void)(atomic_rwlock_end(&(self)->dg_globallock) && (dlglobals_globallock_reap(self), 0))
-#define dlglobals_globallock_upgrade(self)    atomic_rwlock_upgrade(&(self)->dg_globallock)
-#define dlglobals_globallock_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->dg_globallock)
-#define dlglobals_globallock_downgrade(self)  atomic_rwlock_downgrade(&(self)->dg_globallock)
-#define dlglobals_globallock_reading(self)    atomic_rwlock_reading(&(self)->dg_globallock)
-#define dlglobals_globallock_writing(self)    atomic_rwlock_writing(&(self)->dg_globallock)
-#define dlglobals_globallock_canread(self)    atomic_rwlock_canread(&(self)->dg_globallock)
-#define dlglobals_globallock_canwrite(self)   atomic_rwlock_canwrite(&(self)->dg_globallock)
-#define dlglobals_globallock_waitread(self)   atomic_rwlock_waitread(&(self)->dg_globallock)
-#define dlglobals_globallock_waitwrite(self)  atomic_rwlock_waitwrite(&(self)->dg_globallock)
+#define dlglobals_global_mustreap(self)   0
+#define dlglobals_global_reap(self)       (void)0
+#define _dlglobals_global_reap(self)      (void)0
+#define dlglobals_global_write(self)      atomic_rwlock_write(&(self)->dg_globallock)
+#define dlglobals_global_trywrite(self)   atomic_rwlock_trywrite(&(self)->dg_globallock)
+#define dlglobals_global_endwrite(self)   (atomic_rwlock_endwrite(&(self)->dg_globallock), dlglobals_global_reap(self))
+#define _dlglobals_global_endwrite(self)  atomic_rwlock_endwrite(&(self)->dg_globallock)
+#define dlglobals_global_read(self)       atomic_rwlock_read(&(self)->dg_globallock)
+#define dlglobals_global_tryread(self)    atomic_rwlock_tryread(&(self)->dg_globallock)
+#define _dlglobals_global_endread(self)   atomic_rwlock_endread(&(self)->dg_globallock)
+#define dlglobals_global_endread(self)    (void)(atomic_rwlock_endread(&(self)->dg_globallock) && (dlglobals_global_reap(self), 0))
+#define _dlglobals_global_end(self)       atomic_rwlock_end(&(self)->dg_globallock)
+#define dlglobals_global_end(self)        (void)(atomic_rwlock_end(&(self)->dg_globallock) && (dlglobals_global_reap(self), 0))
+#define dlglobals_global_upgrade(self)    atomic_rwlock_upgrade(&(self)->dg_globallock)
+#define dlglobals_global_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->dg_globallock)
+#define dlglobals_global_downgrade(self)  atomic_rwlock_downgrade(&(self)->dg_globallock)
+#define dlglobals_global_reading(self)    atomic_rwlock_reading(&(self)->dg_globallock)
+#define dlglobals_global_writing(self)    atomic_rwlock_writing(&(self)->dg_globallock)
+#define dlglobals_global_canread(self)    atomic_rwlock_canread(&(self)->dg_globallock)
+#define dlglobals_global_canwrite(self)   atomic_rwlock_canwrite(&(self)->dg_globallock)
+#define dlglobals_global_waitread(self)   atomic_rwlock_waitread(&(self)->dg_globallock)
+#define dlglobals_global_waitwrite(self)  atomic_rwlock_waitwrite(&(self)->dg_globallock)
 
 /* Helper macros for `struct dlglobals::dg_alllock' */
-#define dlglobals_alllock_mustreap(self)   0
-#define dlglobals_alllock_reap(self)       (void)0
-#define _dlglobals_alllock_reap(self)      (void)0
-#define dlglobals_alllock_write(self)      atomic_rwlock_write(&(self)->dg_alllock)
-#define dlglobals_alllock_trywrite(self)   atomic_rwlock_trywrite(&(self)->dg_alllock)
-#define dlglobals_alllock_endwrite(self)   (atomic_rwlock_endwrite(&(self)->dg_alllock), dlglobals_alllock_reap(self))
-#define _dlglobals_alllock_endwrite(self)  atomic_rwlock_endwrite(&(self)->dg_alllock)
-#define dlglobals_alllock_read(self)       atomic_rwlock_read(&(self)->dg_alllock)
-#define dlglobals_alllock_tryread(self)    atomic_rwlock_tryread(&(self)->dg_alllock)
-#define _dlglobals_alllock_endread(self)   atomic_rwlock_endread(&(self)->dg_alllock)
-#define dlglobals_alllock_endread(self)    (void)(atomic_rwlock_endread(&(self)->dg_alllock) && (dlglobals_alllock_reap(self), 0))
-#define _dlglobals_alllock_end(self)       atomic_rwlock_end(&(self)->dg_alllock)
-#define dlglobals_alllock_end(self)        (void)(atomic_rwlock_end(&(self)->dg_alllock) && (dlglobals_alllock_reap(self), 0))
-#define dlglobals_alllock_upgrade(self)    atomic_rwlock_upgrade(&(self)->dg_alllock)
-#define dlglobals_alllock_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->dg_alllock)
-#define dlglobals_alllock_downgrade(self)  atomic_rwlock_downgrade(&(self)->dg_alllock)
-#define dlglobals_alllock_reading(self)    atomic_rwlock_reading(&(self)->dg_alllock)
-#define dlglobals_alllock_writing(self)    atomic_rwlock_writing(&(self)->dg_alllock)
-#define dlglobals_alllock_canread(self)    atomic_rwlock_canread(&(self)->dg_alllock)
-#define dlglobals_alllock_canwrite(self)   atomic_rwlock_canwrite(&(self)->dg_alllock)
-#define dlglobals_alllock_waitread(self)   atomic_rwlock_waitread(&(self)->dg_alllock)
-#define dlglobals_alllock_waitwrite(self)  atomic_rwlock_waitwrite(&(self)->dg_alllock)
+#define dlglobals_all_mustreap(self)   0
+#define dlglobals_all_reap(self)       (void)0
+#define _dlglobals_all_reap(self)      (void)0
+#define dlglobals_all_write(self)      atomic_rwlock_write(&(self)->dg_alllock)
+#define dlglobals_all_trywrite(self)   atomic_rwlock_trywrite(&(self)->dg_alllock)
+#define dlglobals_all_endwrite(self)   (atomic_rwlock_endwrite(&(self)->dg_alllock), dlglobals_all_reap(self))
+#define _dlglobals_all_endwrite(self)  atomic_rwlock_endwrite(&(self)->dg_alllock)
+#define dlglobals_all_read(self)       atomic_rwlock_read(&(self)->dg_alllock)
+#define dlglobals_all_tryread(self)    atomic_rwlock_tryread(&(self)->dg_alllock)
+#define _dlglobals_all_endread(self)   atomic_rwlock_endread(&(self)->dg_alllock)
+#define dlglobals_all_endread(self)    (void)(atomic_rwlock_endread(&(self)->dg_alllock) && (dlglobals_all_reap(self), 0))
+#define _dlglobals_all_end(self)       atomic_rwlock_end(&(self)->dg_alllock)
+#define dlglobals_all_end(self)        (void)(atomic_rwlock_end(&(self)->dg_alllock) && (dlglobals_all_reap(self), 0))
+#define dlglobals_all_upgrade(self)    atomic_rwlock_upgrade(&(self)->dg_alllock)
+#define dlglobals_all_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->dg_alllock)
+#define dlglobals_all_downgrade(self)  atomic_rwlock_downgrade(&(self)->dg_alllock)
+#define dlglobals_all_reading(self)    atomic_rwlock_reading(&(self)->dg_alllock)
+#define dlglobals_all_writing(self)    atomic_rwlock_writing(&(self)->dg_alllock)
+#define dlglobals_all_canread(self)    atomic_rwlock_canread(&(self)->dg_alllock)
+#define dlglobals_all_canwrite(self)   atomic_rwlock_canwrite(&(self)->dg_alllock)
+#define dlglobals_all_waitread(self)   atomic_rwlock_waitread(&(self)->dg_alllock)
+#define dlglobals_all_waitwrite(self)  atomic_rwlock_waitwrite(&(self)->dg_alllock)
 
 
 DECL_END

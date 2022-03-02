@@ -301,16 +301,15 @@ again_old_flags:
 	old_flags = ATOMIC_READ(self->dm_flags);
 	if ((mode & RTLD_GLOBAL) && !(old_flags & RTLD_GLOBAL)) {
 		/* Make the module global. */
-		DlModule_GlobalLock_Write();
+		dlglobals_global_write(&dl_globals);
 		if (!ATOMIC_CMPXCH_WEAK(self->dm_flags, old_flags,
 		                        old_flags | RTLD_GLOBAL)) {
-			DlModule_GlobalLock_EndWrite();
+			dlglobals_global_endwrite(&dl_globals);
 			goto again_old_flags;
 		}
 		assert(!TAILQ_ISBOUND(self, dm_globals));
-		DlModule_AddToGlobals(self);
-		assert(TAILQ_ISBOUND(self, dm_globals));
-		DlModule_GlobalLock_EndWrite();
+		dlglobals_global_add(&dl_globals, self);
+		dlglobals_global_endwrite(&dl_globals);
 	}
 }
 
@@ -344,7 +343,7 @@ libdl_dlopen(USER char const *filename, int mode)
 	REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *result;
 	if unlikely(!filename) {
 		/* ... If filename is NULL, then the returned handle is for the main program... */
-		result = TAILQ_FIRST(&DlModule_GlobalList);
+		result = dlglobals_mainapp(&dl_globals);
 		assert(result);
 		assert(result->dm_flags & RTLD_NODELETE);
 		/* Don't incref() the returned module for this case:
@@ -607,20 +606,20 @@ libdl_dlsym(USER DlModule *self, USER char const *name)
 	weak_symbol.ds_mod  = NULL;
 	if (self == RTLD_DEFAULT) {
 		/* Search all modules in order of being loaded. */
-		DlModule_GlobalLock_Read();
-		symbol.ds_mod = TAILQ_FIRST(&DlModule_GlobalList);
+		dlglobals_global_read(&dl_globals);
+		symbol.ds_mod = TAILQ_FIRST(&dl_globals.dg_globallist);
 		assert(symbol.ds_mod);
 		for (;;) {
 			if unlikely(!tryincref(symbol.ds_mod)) {
 again_search_globals_next_noref:
 				symbol.ds_mod = TAILQ_NEXT(symbol.ds_mod, dm_globals);
 				if unlikely(!symbol.ds_mod) {
-					DlModule_GlobalLock_EndRead();
+					dlglobals_global_endread(&dl_globals);
 					break;
 				}
 				continue;
 			}
-			DlModule_GlobalLock_EndRead();
+			dlglobals_global_endread(&dl_globals);
 again_search_globals_module:
 			/* Search this module. */
 			if (symbol.ds_mod == &dl_rtld_module) {
@@ -693,11 +692,11 @@ again_search_globals_module:
 					}
 				}
 			}
-			DlModule_GlobalLock_Read();
+			dlglobals_global_read(&dl_globals);
 			next_module = TAILQ_NEXT(symbol.ds_mod, dm_globals);
 			while (likely(next_module) && unlikely(!tryincref(next_module)))
 				next_module = TAILQ_NEXT(next_module, dm_globals);
-			DlModule_GlobalLock_EndRead();
+			dlglobals_global_endread(&dl_globals);
 			decref(symbol.ds_mod);
 			if unlikely(!next_module)
 				break;
@@ -746,7 +745,7 @@ again_search_globals_module:
 		/* Search modules loaded after `symbol.ds_mod' */
 		if unlikely(!symbol.ds_mod)
 			goto err_rtld_next_no_base;
-		DlModule_GlobalLock_Read();
+		dlglobals_global_read(&dl_globals);
 		goto again_search_globals_next_noref;
 	} else {
 		if unlikely(self == &dl_rtld_module) {
@@ -895,8 +894,8 @@ NOTHROW(DLFCN_CC libdl_dlgethandle)(void const *static_pointer, unsigned int fla
 		dl_seterrorf("Invalid flags %#x passed to `dlgethandle()'", flags);
 		goto err;
 	}
-	DlModule_AllLock_Read();
-	DlModule_AllList_FOREACH(result) {
+	dlglobals_all_read(&dl_globals);
+	DLIST_FOREACH (result, &dl_globals.dg_alllist, dm_modules) {
 		uint16_t i;
 		if ((uintptr_t)static_pointer < result->dm_loadstart)
 			continue;
@@ -923,7 +922,7 @@ NOTHROW(DLFCN_CC libdl_dlgethandle)(void const *static_pointer, unsigned int fla
 			goto got_result;
 		}
 	}
-	DlModule_AllLock_EndRead();
+	dlglobals_all_endread(&dl_globals);
 	dl_seterror_no_mod_at_addr(static_pointer);
 err:
 	return NULL;
@@ -932,7 +931,7 @@ got_result:
 	if ((flags & DLGETHANDLE_FINCREF) &&
 	    !(result->dm_flags & RTLD_NODELETE))
 		incref(result);
-	DlModule_AllLock_EndRead();
+	dlglobals_all_endread(&dl_globals);
 	return result;
 }
 
@@ -962,19 +961,19 @@ NOTHROW_NCX(DLFCN_CC libdl_dlgetmodule)(USER char const *name, unsigned int flag
 		dl_seterrorf("Invalid flags %#x passed to `dlgetmodule()'", flags);
 		goto err;
 	}
-	DlModule_AllLock_Read();
-	DlModule_AllList_FOREACH(result) {
+	dlglobals_all_read(&dl_globals);
+	DLIST_FOREACH (result, &dl_globals.dg_alllist, dm_modules) {
 		if (strcmp(result->dm_filename, name) == 0)
 			goto got_result;
 	}
-	DlModule_AllList_FOREACH(result) {
+	DLIST_FOREACH (result, &dl_globals.dg_alllist, dm_modules) {
 		char *sep = strrchr(result->dm_filename, '/');
 		if (!sep)
 			continue;
 		if (strcmp(sep + 1, name) == 0)
 			goto got_result;
 	}
-	DlModule_AllList_FOREACH(result) {
+	DLIST_FOREACH (result, &dl_globals.dg_alllist, dm_modules) {
 		char *sep = strrchr(result->dm_filename, '/');
 		char *col;
 		size_t namelen;
@@ -989,7 +988,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dlgetmodule)(USER char const *name, unsigned int flag
 		    name[namelen] == '\0')
 			goto got_result;
 	}
-	DlModule_AllList_FOREACH(result) {
+	DLIST_FOREACH (result, &dl_globals.dg_alllist, dm_modules) {
 		char *sep = strrchr(result->dm_filename, '/');
 		char *col;
 		size_t namelen;
@@ -1007,18 +1006,18 @@ NOTHROW_NCX(DLFCN_CC libdl_dlgetmodule)(USER char const *name, unsigned int flag
 			goto got_result;
 	}
 	if (flags & DLGETHANDLE_FNOCASE) {
-		DlModule_AllList_FOREACH(result) {
+		DLIST_FOREACH (result, &dl_globals.dg_alllist, dm_modules) {
 			if (strcasecmp(result->dm_filename, name) == 0)
 				goto got_result;
 		}
-		DlModule_AllList_FOREACH(result) {
+		DLIST_FOREACH (result, &dl_globals.dg_alllist, dm_modules) {
 			char *sep = strrchr(result->dm_filename, '/');
 			if (!sep)
 				continue;
 			if (strcasecmp(sep + 1, name) == 0)
 				goto got_result;
 		}
-		DlModule_AllList_FOREACH(result) {
+		DLIST_FOREACH (result, &dl_globals.dg_alllist, dm_modules) {
 			char *sep = strrchr(result->dm_filename, '/');
 			char *col;
 			size_t namelen;
@@ -1033,7 +1032,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dlgetmodule)(USER char const *name, unsigned int flag
 			    name[namelen] == '\0')
 				goto got_result;
 		}
-		DlModule_AllList_FOREACH(result) {
+		DLIST_FOREACH (result, &dl_globals.dg_alllist, dm_modules) {
 			char *sep = strrchr(result->dm_filename, '/');
 			char *col;
 			size_t namelen;
@@ -1051,7 +1050,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dlgetmodule)(USER char const *name, unsigned int flag
 				goto got_result;
 		}
 	}
-	DlModule_AllLock_EndRead();
+	dlglobals_all_endread(&dl_globals);
 	dl_seterrorf("Unknown module %q", name);
 err:
 	return NULL;
@@ -1059,7 +1058,7 @@ got_result:
 	if ((flags & DLGETHANDLE_FINCREF) &&
 	    !(result->dm_flags & RTLD_NODELETE))
 		incref(result);
-	DlModule_AllLock_EndRead();
+	dlglobals_all_endread(&dl_globals);
 	return result;
 }
 
@@ -2469,12 +2468,12 @@ INTERN int DLFCN_CC libdl_dlclearcaches(void) THROWS(...) {
 	{
 		DlModule *module_iter;
 again_clear_modules:
-		DlModule_AllLock_Read();
-		DlModule_AllList_FOREACH(module_iter) {
+		dlglobals_all_read(&dl_globals);
+		DLIST_FOREACH (module_iter, &dl_globals.dg_alllist, dm_modules) {
 			refcnt_t refcnt;
 			if (!tryincref(module_iter))
 				continue;
-			DlModule_AllLock_EndRead();
+			dlglobals_all_endread(&dl_globals);
 			if (DlModule_InvokeDlCacheFunctions(module_iter))
 				result = 1;
 again_try_descref_module_iter:
@@ -2483,27 +2482,27 @@ again_try_descref_module_iter:
 				decref(module_iter);
 				goto again_clear_modules;
 			}
-			DlModule_AllLock_Read();
+			dlglobals_all_read(&dl_globals);
 			if (!ATOMIC_CMPXCH_WEAK(module_iter->dm_refcnt, refcnt, refcnt - 1)) {
-				DlModule_AllLock_EndRead();
+				dlglobals_all_endread(&dl_globals);
 				goto again_try_descref_module_iter;
 			}
 		}
-		DlModule_AllLock_EndRead();
+		dlglobals_all_endread(&dl_globals);
 	}
 	{
 		DlModule *module_iter;
 		/* Delete dangling sections. */
 again_lock_global:
-		DlModule_AllLock_Read();
-		DlModule_AllList_FOREACH(module_iter) {
+		dlglobals_all_read(&dl_globals);
+		DLIST_FOREACH (module_iter, &dl_globals.dg_alllist, dm_modules) {
 			REF DlSection *temp;
 			if (!ATOMIC_READ(module_iter->dm_sections_dangling))
 				continue;
 			if (!DlModule_SectionsTryWrite(module_iter)) {
 				bool hasref;
 				hasref = tryincref(module_iter);
-				DlModule_AllLock_EndRead();
+				dlglobals_all_endread(&dl_globals);
 				if (hasref) {
 					DlModule_SectionsWaitWrite(module_iter);
 					decref(module_iter);
@@ -2517,7 +2516,7 @@ again_lock_global:
 				module_iter->dm_sections_dangling = temp->ds_dangling;
 				temp->ds_dangling                 = (REF DlSection *)-1;
 				DlModule_SectionsEndWrite(module_iter);
-				DlModule_AllLock_EndRead();
+				dlglobals_all_endread(&dl_globals);
 				/* Drop this reference. */
 				DlSection_Decref(temp);
 				result = 1;
@@ -2525,7 +2524,7 @@ again_lock_global:
 			}
 			DlModule_SectionsEndWrite(module_iter);
 		}
-		DlModule_AllLock_EndRead();
+		dlglobals_all_endread(&dl_globals);
 	}
 	/* Also trim malloc memory from our heap implementation. */
 	if (malloc_trim(0))
@@ -2539,8 +2538,8 @@ DlModule_RunAllModuleFinalizers(void)
 		THROWS(...) {
 	DlModule *mod;
 again:
-	DlModule_AllLock_Read();
-	DlModule_AllList_FOREACH(mod) {
+	dlglobals_all_read(&dl_globals);
+	DLIST_FOREACH (mod, &dl_globals.dg_alllist, dm_modules) {
 		size_t i, fini_array_size;
 		uintptr_t fini_func;
 		uintptr_t *fini_array_base;
@@ -2550,7 +2549,7 @@ again:
 			continue;
 		if unlikely(!tryincref(mod))
 			continue;
-		DlModule_AllLock_EndRead();
+		dlglobals_all_endread(&dl_globals);
 		/* Invoke dynamically regsitered module finalizers (s.a. `__cxa_atexit()') */
 		if (mod->dm_finalize)
 			dlmodule_finalizers_run(mod->dm_finalize);
@@ -2607,7 +2606,7 @@ decref_module_and_continue:
 		decref(mod);
 		goto again;
 	}
-	DlModule_AllLock_EndRead();
+	dlglobals_all_endread(&dl_globals);
 }
 
 
@@ -2643,7 +2642,7 @@ libdl_dlauxctrl(USER DlModule *self, unsigned int cmd, ...)
 		break;
 	}
 	if (!self) {
-		self = TAILQ_FIRST(&DlModule_GlobalList);
+		self = dlglobals_mainapp(&dl_globals);
 		assert(self);
 	} else if unlikely(!DL_VERIFY_MODULE_HANDLE(self)) {
 		dl_seterror_badmodule(self);
@@ -2988,14 +2987,14 @@ libdl_iterate_phdr(USER __dl_iterator_callback callback, USER void *arg)
 		THROWS(E_SEGFAULT, ...) {
 	int result = 0;
 	REF DlModule *current, *next;
-	DlModule_AllLock_Read();
-	current = DLIST_FIRST(&DlModule_AllList);
+	dlglobals_all_read(&dl_globals);
+	current = DLIST_FIRST(&dl_globals.dg_alllist);
 	while (current) {
 		if (!tryincref(current)) {
 			current = DLIST_NEXT(current, dm_modules);
 			continue;
 		}
-		DlModule_AllLock_EndRead();
+		dlglobals_all_endread(&dl_globals);
 got_current:
 		TRY {
 			result = DlModule_IteratePhdr(current, callback, arg);
@@ -3008,11 +3007,11 @@ got_current:
 			goto done;
 		}
 		/* Try to lock the next module. */
-		DlModule_AllLock_Read();
+		dlglobals_all_read(&dl_globals);
 		next = DLIST_NEXT(current, dm_modules);
 		while (next && !tryincref(next))
 			next = DLIST_NEXT(next, dm_modules);
-		DlModule_AllLock_EndRead();
+		dlglobals_all_endread(&dl_globals);
 		/* Continue enumerating the next module. */
 		decref_unlikely(current);
 		if (!next)
@@ -3020,7 +3019,7 @@ got_current:
 		current = next;
 		goto got_current;
 	}
-	DlModule_AllLock_EndRead();
+	dlglobals_all_endread(&dl_globals);
 done:
 	return result;
 }

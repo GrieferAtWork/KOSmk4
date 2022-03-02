@@ -88,9 +88,12 @@ DlModule_Destroy(USER DlModule *self)
 		THROWS(E_SEGFAULT, ...) {
 
 	/* Unbind the module from the list of all modules. */
-	DlModule_AllLock_Write();
-	DlModule_RemoveFromAll(self);
-	DlModule_AllLock_EndWrite();
+	dlglobals_all_write(&dl_globals);
+	dlglobals_all_del(&dl_globals, self);
+	assertf(!DLIST_EMPTY(&dl_globals.dg_alllist),
+	        "The all-modules list should never become empty (libdl "
+	        "module and main program should never disappear)");
+	dlglobals_all_endwrite(&dl_globals);
 
 	/* Trigger the trap informing a debugger of the change in loaded libraries. */
 	if (!sys_debugtrap_disabled) {
@@ -105,9 +108,11 @@ DlModule_Destroy(USER DlModule *self)
 	assert(TAILQ_ISBOUND(self, dm_globals) ==
 	       ((self->dm_flags & RTLD_GLOBAL) != 0));
 	if (TAILQ_ISBOUND(self, dm_globals)) {
-		DlModule_GlobalLock_Write();
-		TAILQ_UNBIND(&DlModule_GlobalList, self, dm_globals);
-		DlModule_GlobalLock_EndWrite();
+		dlglobals_global_write(&dl_globals);
+		COMPILER_READ_BARRIER();
+		if (TAILQ_ISBOUND(self, dm_globals))
+			dlglobals_global_del(&dl_globals, self);
+		dlglobals_global_endwrite(&dl_globals);
 	}
 
 	/* Invoke dynamically regsitered module finalizers (s.a. `__cxa_atexit()') */

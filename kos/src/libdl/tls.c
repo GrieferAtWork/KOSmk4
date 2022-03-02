@@ -204,7 +204,7 @@ NOTHROW_RPC(CC DlModule_InitStaticTLSBindings)(void) {
 	 * NOTE: Since we've yet to invoke a  user-defined code (other than IFUNC  selectors),
 	 *       we are allowed to assume that no threads other than the calling (main) thread
 	 *       are currently running, meaning we don't have to do any sort of lock for this! */
-	DlModule_AllList_FOREACH(iter) {
+	DLIST_FOREACH (iter, &dl_globals.dg_alllist, dm_modules) {
 		if (!iter->dm_tlsmsize)
 			continue;
 		if (iter->dm_ops)
@@ -221,7 +221,7 @@ NOTHROW_RPC(CC DlModule_InitStaticTLSBindings)(void) {
 		goto err_nomem;
 
 	/* Load static TLS template data */
-	DlModule_AllList_FOREACH(iter) {
+	DLIST_FOREACH (iter, &dl_globals.dg_alllist, dm_modules) {
 		byte_t *dst;
 		if (!iter->dm_tlsmsize)
 			continue;

@@ -1381,8 +1381,6 @@
 #define LOCAL_NOTHROW(x) x
 #define __NRFEAT_SYSCALL_TABLE_FOREACH(cb) cb(0) cb(1)
 #define DEFINE_LIBRARY_OPEN(open_libname, ...) void *open_libname(void);
-#define DlModule_GlobalList_FOREACH(...) for(;;)
-#define DlModule_AllList_FOREACH(...) for(;;)
 #define BUILTIN_GLOBALS_ENUMERATE(cb) cb(__gxx_personality_v0) cb(__cxa_begin_catch) cb(__cxa_end_catch) cb(__cxa_rethrow) cb(_Unwind_Resume)
 #define POINTER_SET_FOREACH(...) for(;;)
 #define PAGEDIR_P_BEGINUSE(...)

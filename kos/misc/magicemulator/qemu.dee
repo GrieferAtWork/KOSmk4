@@ -189,6 +189,7 @@ did_update_x86_64_kernel:
 			continue;
 		l = l.decode("utf-8");
 		local cmd, none, arg = l.partition("=")...;
+		print repr cmd, repr arg;
 		switch (cmd) {
 		case "accel":
 			/* "-accel hax" breaks qemu's builtin GDB stub. :(
@@ -219,7 +220,6 @@ did_update_x86_64_kernel:
 			throw Error("Unknown qemu conf option: {!r}".format({ cmd }));
 			break;
 		}
-		break;
 	}
 	qemuArgs.extend({
 		"-kernel", KERNEL,

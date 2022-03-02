@@ -293,13 +293,13 @@ DlModule_OpenService(USER char const *filename, unsigned int mode) THROWS(E_SEGF
 
 	/* Make the module visible. */
 	if (mode & RTLD_GLOBAL) {
-		DlModule_GlobalLock_Write();
-		DlModule_AddToGlobals(mod);
-		DlModule_GlobalLock_EndWrite();
+		dlglobals_global_write(&dl_globals);
+		dlglobals_global_add(&dl_globals, mod);
+		dlglobals_global_endwrite(&dl_globals);
 	}
-	DlModule_GlobalLock_Write();
-	DlModule_AddToAll(mod);
-	DlModule_GlobalLock_EndWrite();
+	dlglobals_all_write(&dl_globals);
+	dlglobals_all_add(&dl_globals, mod);
+	dlglobals_all_endwrite(&dl_globals);
 	return mod;
 err_nomem:
 	dl_seterror_nomem();
@@ -699,19 +699,18 @@ DlModule_ElfLoadLoadedProgramHeaders(DlModule *__restrict self)
 
 	/* Register the module as globally loaded (if RTLD_GLOBAL is set). */
 	if (self->dm_flags & RTLD_GLOBAL) {
-		DlModule_GlobalLock_Write();
+		dlglobals_global_write(&dl_globals);
 		if (!TAILQ_ISBOUND(self, dm_globals))
-			DlModule_AddToGlobals(self);
-		DlModule_GlobalLock_EndWrite();
+			dlglobals_global_add(&dl_globals, self);
+		dlglobals_global_endwrite(&dl_globals);
 	}
 
 	if (!DLIST_PREV(self, dm_modules)) {
-		DlModule_GlobalLock_Write();
+		dlglobals_all_write(&dl_globals);
 		COMPILER_READ_BARRIER();
 		if likely(!DLIST_PREV(self, dm_modules))
-			DlModule_AddToAll(self);
-		COMPILER_READ_BARRIER();
-		DlModule_GlobalLock_EndWrite();
+			dlglobals_all_add(&dl_globals, self);
+		dlglobals_all_endwrite(&dl_globals);
 	}
 
 	/* Apply relocations and invoke module initializers. */
@@ -971,15 +970,15 @@ INTERN WUNUSED NONNULL((1)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule
 NOTHROW_NCX(CC DlModule_FindFromFilename)(USER char const *filename)
 		THROWS(E_SEGFAULT) {
 	REF DlModule *result;
-	DlModule_AllLock_Read();
-	DlModule_AllList_FOREACH(result) {
+	dlglobals_all_read(&dl_globals);
+	DLIST_FOREACH (result, &dl_globals.dg_alllist, dm_modules) {
 		if (strcmp(result->dm_filename, filename) != 0)
 			continue;
 		if (!(result->dm_flags & RTLD_NODELETE))
 			incref(result);
 		break;
 	}
-	DlModule_AllLock_EndRead();
+	dlglobals_all_endread(&dl_globals);
 	return result;
 }
 

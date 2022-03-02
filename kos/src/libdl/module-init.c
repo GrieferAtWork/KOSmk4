@@ -47,16 +47,15 @@ again_old_flags:
 	old_flags = ATOMIC_READ(self->dm_flags);
 	if (!(old_flags & RTLD_GLOBAL)) {
 		/* Make the module global. */
-		DlModule_GlobalLock_Write();
+		dlglobals_global_write(&dl_globals);
 		if (!ATOMIC_CMPXCH_WEAK(self->dm_flags, old_flags,
 		                        old_flags | RTLD_GLOBAL)) {
-			DlModule_GlobalLock_EndWrite();
+			dlglobals_global_endwrite(&dl_globals);
 			goto again_old_flags;
 		}
 		assert(!TAILQ_ISBOUND(self, dm_globals));
-		DlModule_AddToGlobals(self);
-		assert(TAILQ_ISBOUND(self, dm_globals));
-		DlModule_GlobalLock_EndWrite();
+		dlglobals_global_add(&dl_globals, self);
+		dlglobals_global_endwrite(&dl_globals);
 	}
 }
 
@@ -138,21 +137,21 @@ done_dyntag:
  * This is called late during  initial module startup once the  initial
  * set of  libraries,  +  the initial  application  have  been  loaded.
  * Note that initializers are invoked in reverse order of those modules
- * appearing   within  `DlModule_AllList',  meaning  that  the  primary
+ * appearing within `dl_globals.dg_alllist',  meaning that the  primary
  * application's  __attribute__((constructor))  functions  are  invoked
  * _AFTER_ those from (e.g.) libc. */
 INTERN void CC DlModule_RunAllStaticInitializers(void) THROWS(...) {
 	REF DlModule *primary;
 	DlModule *last;
-	primary = TAILQ_FIRST(&DlModule_GlobalList);
+	primary = TAILQ_FIRST(&dl_globals.dg_globallist);
 	assert(primary != &dl_rtld_module);
 	incref(primary);
 again_search_noinit:
-	DlModule_GlobalLock_Read();
-	last = TAILQ_LAST(&DlModule_GlobalList);
+	dlglobals_global_read(&dl_globals);
+	last = TAILQ_LAST(&dl_globals.dg_globallist);
 	while (!(last->dm_flags & RTLD_NOINIT)) {
 		if (last == primary) {
-			DlModule_GlobalLock_EndRead();
+			dlglobals_global_endread(&dl_globals);
 			goto done;
 		}
 		last = TAILQ_PREV(last, dm_globals);
@@ -160,7 +159,7 @@ again_search_noinit:
 	assert(last != &dl_rtld_module);
 	last->dm_flags &= ~RTLD_NOINIT;
 	incref(last);
-	DlModule_GlobalLock_EndRead();
+	dlglobals_global_endread(&dl_globals);
 
 	/* Support for formats other than ELF. */
 	if (last->dm_ops) {
@@ -356,11 +355,11 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags)
 				flags |= DL_MODULE_ELF_INITIALIZE_FBINDNOW;
 			if (tag.d_un.d_val & DF_1_GLOBAL) {
 				if (!(self->dm_flags & RTLD_GLOBAL)) {
-					DlModule_GlobalLock_Write();
+					dlglobals_global_write(&dl_globals);
 					self->dm_flags |= RTLD_GLOBAL;
 					if (!TAILQ_ISBOUND(self, dm_globals))
-						DlModule_AddToGlobals(self);
-					DlModule_GlobalLock_EndWrite();
+						dlglobals_global_add(&dl_globals, self);
+					dlglobals_global_endwrite(&dl_globals);
 				}
 			}
 			if (tag.d_un.d_val & DF_1_NODELETE)

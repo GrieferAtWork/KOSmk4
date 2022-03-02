@@ -359,7 +359,7 @@ libpe_LoadLibrary(char const *__restrict filename, unsigned int flags) {
 	/* #1: Search dirname of the base application. */
 	{
 		char *appname;
-		appname = TAILQ_FIRST(&dl_globals.dg_globallist)->dm_filename;
+		appname = dlglobals_mainapp(&dl_globals)->dm_filename;
 		result  = libpe_LoadLibraryInPath(appname, strroff(appname, '/'), filename, flags);
 		if (result)
 			goto done;
@@ -1098,7 +1098,7 @@ libpe_linker_main(struct peexec_info *__restrict info,
 		 *       thread.
 		 * >> struct tls_segment *me;
 		 * >> RD_TLS_BASE_REGISTER(*(void **)&me);
-		 * >> FOREACH (pemod: dl.DlModule_AllList) {
+		 * >> FOREACH (pemod: dl_globals.dg_alllist) {
 		 * >>     if (!HAS_TLS(pemod))
 		 * >>         continue;
 		 * >>     struct dtls_extension *node = malloc();
