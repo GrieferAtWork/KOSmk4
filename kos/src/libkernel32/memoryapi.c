@@ -184,8 +184,6 @@ libk32_VirtualAlloc(LPVOID lpAddress, SIZE_T dwSize,
                     DWORD flAllocationType, DWORD flProtect) {
 	void *result;
 	int prot, flags;
-	TRACE("VirtualAlloc(%p, %#Ix, %#x, %#x)",
-	      lpAddress, dwSize, flAllocationType, flProtect);
 	(void)flAllocationType;
 	prot  = libk32_MmanProtFromNtProt(flProtect);
 	flags = MAP_PRIVATE | MAP_ANON;
@@ -199,6 +197,8 @@ libk32_VirtualAlloc(LPVOID lpAddress, SIZE_T dwSize,
 	result = mmap(lpAddress, dwSize, prot, flags, -1, 0);
 	if (result == MAP_FAILED)
 		result = NULL;
+	TRACE("VirtualAlloc(%p, %#Ix, %#x, %#x): %p",
+	      lpAddress, dwSize, flAllocationType, flProtect, result);
 	return result;
 }
 
@@ -218,7 +218,7 @@ libk32_VirtualAllocEx(HANDLE hProcess, LPVOID lpAddress,
 	      hProcess, lpAddress, dwSize, flAllocationType, flProtect);
 	if (hProcess != NTHANDLE_FROMFD(AT_FDPROC)) {
 		errno = EACCES;
-		return FALSE;
+		return NULL;
 	}
 	return libk32_VirtualAlloc(lpAddress, dwSize, flAllocationType, flProtect);
 }

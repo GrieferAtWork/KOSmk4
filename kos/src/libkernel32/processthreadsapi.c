@@ -353,8 +353,9 @@ libk32_SwitchToThread(VOID) {
 
 INTERN DWORD WINAPI
 libk32_GetCurrentProcessorNumber(VOID) {
-	TRACE("GetCurrentProcessorNumber()");
-	return sched_getcpu();
+	int result = sched_getcpu();
+	TRACE("GetCurrentProcessorNumber(): %d", result);
+	return result;
 }
 
 INTERN WINBOOL WINAPI
@@ -370,14 +371,16 @@ libk32_ProcessIdToSessionId(DWORD dwProcessId, DWORD *pSessionId) {
 
 INTERN DWORD WINAPI
 libk32_GetCurrentProcessId(VOID) {
-	TRACE("GetCurrentProcessId()");
-	return getpid();
+	pid_t result = getpid();
+	TRACE("GetCurrentProcessId(): %d", result);
+	return result;
 }
 
 INTERN DWORD WINAPI
 libk32_GetCurrentThreadId(VOID) {
-	TRACE("GetCurrentThreadId()");
-	return gettid();
+	pid_t result = gettid();
+	TRACE("GetCurrentThreadId(): %d", result);
+	return result;
 }
 
 INTERN WINBOOL WINAPI

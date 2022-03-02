@@ -70,8 +70,8 @@ INTERN DWORD WINAPI
 libk32_GetCurrentDirectoryA(DWORD nBufferLength, LPSTR lpBuffer) {
 	char *wd;
 	size_t len;
-	TRACE("GetCurrentDirectoryA(%#x, %p)", nBufferLength, lpBuffer);
 	wd = DOS$_getcwd(NULL, 0);
+	TRACE("GetCurrentDirectoryA(%#x, %p): %q", nBufferLength, lpBuffer, wd);
 	if (!wd)
 		return 0;
 	len = strlen(wd) + 1;
@@ -87,8 +87,8 @@ INTERN DWORD WINAPI
 libk32_GetCurrentDirectoryW(DWORD nBufferLength, LPWSTR lpBuffer) {
 	char16_t *wd;
 	size_t len;
-	TRACE("GetCurrentDirectoryW(%#x, %p)", nBufferLength, lpBuffer);
 	wd = DOS$_wgetcwd(NULL, 0);
+	TRACE("GetCurrentDirectoryW(%#x, %p): %I16q", nBufferLength, lpBuffer, wd);
 	if (!wd)
 		return 0;
 	len = c16len(wd) + 1;
@@ -268,9 +268,8 @@ INTERN DWORD WINAPI
 libk32_GetEnvironmentVariableA(LPCSTR lpName, LPSTR lpBuffer, DWORD nSize) {
 	size_t len;
 	char *value;
-	TRACE("GetEnvironmentVariableA(%q, %p, %#x)",
-	      lpName, lpBuffer, nSize);
 	value = DOS$getenv(lpName);
+	TRACE("GetEnvironmentVariableA(%q, %p, %#x): %q", lpName, lpBuffer, nSize, value);
 	if (!value) {
 		_nterrno = ERROR_ENVVAR_NOT_FOUND;
 		return 0;
@@ -289,12 +288,13 @@ libk32_GetEnvironmentVariableW(LPCWSTR lpName, LPWSTR lpBuffer, DWORD nSize) {
 	char *utf8_name;
 	char *utf8_value;
 	char16_t *value;
-	TRACE("GetEnvironmentVariableW(%I16q, %p, %#x)",
-	      lpName, lpBuffer, nSize);
 	utf8_name = convert_c16tombs(lpName);
-	if (!utf8_name)
+	if (!utf8_name) {
+		TRACE("GetEnvironmentVariableW(%I16q, %p, %#x): %q", lpName, lpBuffer, nSize, (char *)NULL);
 		return 0;
+	}
 	utf8_value = DOS$getenv(utf8_name);
+	TRACE("GetEnvironmentVariableW(%I16q, %p, %#x): %q", lpName, lpBuffer, nSize, utf8_value);
 	free(utf8_name);
 	if (!utf8_value) {
 		_nterrno = ERROR_ENVVAR_NOT_FOUND;
@@ -384,8 +384,8 @@ INTERN DWORD WINAPI
 libk32_ExpandEnvironmentStringsA(LPCSTR lpSrc, LPSTR lpDst, DWORD nSize) {
 	size_t len;
 	char *str;
-	TRACE("ExpandEnvironmentStringsA(%q, %p, %#x)", lpSrc, lpDst, nSize);
 	str = libk32_ExpandEnvironmentStringsAImpl(lpSrc);
+	TRACE("ExpandEnvironmentStringsA(%q, %p, %#x): %q", lpSrc, lpDst, nSize, str);
 	if (!str)
 		return 0;
 	len = strlen(str) + 1;
@@ -401,11 +401,13 @@ libk32_ExpandEnvironmentStringsW(LPCWSTR lpSrc, LPWSTR lpDst, DWORD nSize) {
 	char16_t *str;
 	char *utf8_str;
 	char *utf8_src;
-	TRACE("ExpandEnvironmentStringsW(%I16q, %p, %#x)", lpSrc, lpDst, nSize);
 	utf8_src = convert_c16tombs(lpSrc);
-	if (!utf8_src)
+	if (!utf8_src) {
+		TRACE("ExpandEnvironmentStringsW(%I16q, %p, %#x): %q", lpSrc, lpDst, nSize, (char *)NULL);
 		return 0;
+	}
 	utf8_str = libk32_ExpandEnvironmentStringsAImpl(utf8_src);
+	TRACE("ExpandEnvironmentStringsW(%I16q, %p, %#x): %q", lpSrc, lpDst, nSize, utf8_str);
 	free(utf8_src);
 	if (!utf8_str)
 		return 0;

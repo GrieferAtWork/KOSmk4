@@ -60,13 +60,17 @@ DEFINE_PUBLIC_ALIAS(LoadLibraryW, libk32_LoadLibraryW);
 DEFINE_PUBLIC_ALIAS(FreeLibrary, libk32_FreeLibrary);
 DEFINE_PUBLIC_ALIAS(FreeLibraryAndExitThread, libk32_FreeLibraryAndExitThread);
 
+#ifndef LOADLIBRARY_DLOPEN_FLAGS
+#define LOADLIBRARY_DLOPEN_FLAGS (RTLD_LAZY | RTLD_GLOBAL)
+#endif /* !LOADLIBRARY_DLOPEN_FLAGS */
+
 INTERN HMODULE WINAPI
 libk32_LoadLibraryExA(LPCSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
 	TRACE("LoadLibraryExA(%q, %p, %#x)", lpLibFileName, hFile, dwFlags);
 	(void)dwFlags;
 	if (lpLibFileName == NULL)
-		return (HMODULE)fdlopen(NTHANDLE_ASFD(hFile), RTLD_LAZY | RTLD_GLOBAL);
-	return (HMODULE)PeLoadLibrary(lpLibFileName, RTLD_LAZY | RTLD_GLOBAL);
+		return (HMODULE)fdlopen(NTHANDLE_ASFD(hFile), LOADLIBRARY_DLOPEN_FLAGS);
+	return (HMODULE)PeLoadLibrary(lpLibFileName, LOADLIBRARY_DLOPEN_FLAGS);
 }
 
 INTERN HMODULE WINAPI
@@ -76,7 +80,7 @@ libk32_LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
 	TRACE("LoadLibraryExW(%I16q, %p, %#x)", lpLibFileName, hFile, dwFlags);
 	(void)dwFlags;
 	if (lpLibFileName == NULL)
-		return (HMODULE)fdlopen(NTHANDLE_ASFD(hFile), RTLD_LAZY | RTLD_GLOBAL);
+		return (HMODULE)fdlopen(NTHANDLE_ASFD(hFile), LOADLIBRARY_DLOPEN_FLAGS);
 	utf8 = convert_c16tombs(lpLibFileName);
 	if unlikely(!utf8)
 		return NULL;
@@ -93,6 +97,8 @@ libk32_GetModuleHandleExA(DWORD dwFlags, LPCSTR lpModuleName, HMODULE *phModule)
 		dlflags |= DLGETHANDLE_FINCREF;
 	if (dwFlags & GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS)
 		return (*phModule = (HMODULE)dlgethandle(lpModuleName, dlflags)) != NULL;
+	if (!lpModuleName)
+		return (*phModule = (HMODULE)dlopen(NULL, 0)) != NULL;
 	return (*phModule = (HMODULE)dlgetmodule(lpModuleName, dlflags | DLGETHANDLE_FNOCASE)) != NULL;
 }
 
@@ -102,31 +108,46 @@ libk32_GetModuleHandleExW(DWORD dwFlags, LPCWSTR lpModuleName, HMODULE *phModule
 	char *utf8;
 	TRACE("GetModuleHandleExW(%#x, %I16q, %p)", dwFlags, lpModuleName, phModule);
 	if (dwFlags & GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS)
-		return GetModuleHandleExA(dwFlags, (LPCSTR)lpModuleName, phModule);
-	utf8 = convert_c16tombs(lpModuleName);
-	if unlikely(!utf8)
-		return FALSE;
-	result = libk32_GetModuleHandleExA(dwFlags, utf8, phModule);
-	free(utf8);
+		return libk32_GetModuleHandleExA(dwFlags, (LPCSTR)lpModuleName, phModule);
+	if (!lpModuleName) {
+		result = (*phModule = (HMODULE)dlopen(NULL, 0)) != NULL;
+	} else {
+		utf8 = convert_c16tombs(lpModuleName);
+		if unlikely(!utf8)
+			return FALSE;
+		result = libk32_GetModuleHandleExA(dwFlags, utf8, phModule);
+		free(utf8);
+	}
 	return result;
 }
 
 INTERN HMODULE WINAPI
 libk32_GetModuleHandleA(LPCSTR lpModuleName) {
-	TRACE("GetModuleHandleA(%q)", lpModuleName);
-	return (HMODULE)dlgetmodule(lpModuleName, DLGETHANDLE_FNOCASE);
+	HMODULE result;
+	if (!lpModuleName) {
+		result = (HMODULE)dlopen(NULL, 0);
+	} else {
+		result = (HMODULE)dlgetmodule(lpModuleName, DLGETHANDLE_FNOCASE);
+	}
+	TRACE("GetModuleHandleA(%q): %p", lpModuleName, result);
+	return result;
 }
 
 INTERN HMODULE WINAPI
 libk32_GetModuleHandleW(LPCWSTR lpModuleName) {
 	HMODULE result;
-	char *utf8;
-	TRACE("GetModuleHandleW(%I16q)", lpModuleName);
-	utf8 = convert_c16tombs(lpModuleName);
-	if unlikely(!utf8)
-		return NULL;
-	result = libk32_GetModuleHandleA(utf8);
-	free(utf8);
+	if (!lpModuleName) {
+		result = (HMODULE)dlopen(NULL, 0);
+	} else {
+		char *utf8;
+		utf8 = convert_c16tombs(lpModuleName);
+		if unlikely(!utf8) {
+			result = NULL;
+		}
+		result = libk32_GetModuleHandleA(utf8);
+		free(utf8);
+	}
+	TRACE("GetModuleHandleW(%I16q): %p", lpModuleName, result);
 	return result;
 }
 
@@ -178,7 +199,7 @@ libk32_GetModuleFileNameA(HMODULE hModule, LPSTR lpFilename, DWORD nSize) {
 	if (!hModule)
 		hModule = (HMODULE)dlopen(NULL, 0);
 	modname = get_dos_dlmodulename(hModule);
-	TRACE("GetModuleFileNameA(%p, %p, %#x) -> %q", hModule, lpFilename, nSize, modname);
+	TRACE("GetModuleFileNameA(%p, %p, %#x): %q", hModule, lpFilename, nSize, modname);
 	if (!modname)
 		return 0;
 	len = strlen(modname) + 1;
@@ -199,7 +220,7 @@ libk32_GetModuleFileNameW(HMODULE hModule, LPWSTR lpFilename, DWORD nSize) {
 	if (!hModule)
 		hModule = (HMODULE)dlopen(NULL, 0);
 	modname = get_dos_dlmodulename(hModule);
-	TRACE("GetModuleFileNameW(%p, %p, %#x) -> %q", hModule, lpFilename, nSize, modname);
+	TRACE("GetModuleFileNameW(%p, %p, %#x): %q", hModule, lpFilename, nSize, modname);
 	if (!modname)
 		return 0;
 	wmodname = convert_mbstoc16(modname);
