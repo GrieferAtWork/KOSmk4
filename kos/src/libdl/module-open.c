@@ -700,7 +700,7 @@ DlModule_ElfLoadLoadedProgramHeaders(DlModule *__restrict self)
 	/* Register the module as globally loaded (if RTLD_GLOBAL is set). */
 	if (self->dm_flags & RTLD_GLOBAL) {
 		DlModule_GlobalLock_Write();
-		if (!LIST_ISBOUND(self, dm_globals))
+		if (!TAILQ_ISBOUND(self, dm_globals))
 			DlModule_AddToGlobals(self);
 		DlModule_GlobalLock_EndWrite();
 	}

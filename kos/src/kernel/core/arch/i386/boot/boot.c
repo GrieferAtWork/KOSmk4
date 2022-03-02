@@ -344,8 +344,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	__hybrid_assert(!kmalloc_leaks());
 
-	decref(driver_insmod("sctrace"));
-
 	/* Update the given initial user-state to start
 	 * executing /bin/init (or whatever was passed as `init=...') */
 	state = kernel_initialize_exec_init(state);

@@ -102,11 +102,11 @@ DlModule_Destroy(USER DlModule *self)
 	}
 
 	/* Unbind the module from the global symbol table. */
-	assert(LIST_ISBOUND(self, dm_globals) ==
+	assert(TAILQ_ISBOUND(self, dm_globals) ==
 	       ((self->dm_flags & RTLD_GLOBAL) != 0));
-	if (LIST_ISBOUND(self, dm_globals)) {
+	if (TAILQ_ISBOUND(self, dm_globals)) {
 		DlModule_GlobalLock_Write();
-		LIST_UNBIND(self, dm_globals);
+		TAILQ_UNBIND(&DlModule_GlobalList, self, dm_globals);
 		DlModule_GlobalLock_EndWrite();
 	}
 

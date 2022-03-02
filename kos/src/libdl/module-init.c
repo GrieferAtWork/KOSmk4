@@ -53,9 +53,9 @@ again_old_flags:
 			DlModule_GlobalLock_EndWrite();
 			goto again_old_flags;
 		}
-		assert(!LIST_ISBOUND(self, dm_globals));
+		assert(!TAILQ_ISBOUND(self, dm_globals));
 		DlModule_AddToGlobals(self);
-		assert(LIST_ISBOUND(self, dm_globals));
+		assert(TAILQ_ISBOUND(self, dm_globals));
 		DlModule_GlobalLock_EndWrite();
 	}
 }
@@ -144,18 +144,18 @@ done_dyntag:
 INTERN void CC DlModule_RunAllStaticInitializers(void) THROWS(...) {
 	REF DlModule *primary;
 	DlModule *last;
-	primary = LIST_FIRST(&DlModule_GlobalList);
+	primary = TAILQ_FIRST(&DlModule_GlobalList);
 	assert(primary != &dl_rtld_module);
 	incref(primary);
 again_search_noinit:
 	DlModule_GlobalLock_Read();
-	last = LIST_LAST(&DlModule_GlobalList, dm_globals);
+	last = TAILQ_LAST(&DlModule_GlobalList);
 	while (!(last->dm_flags & RTLD_NOINIT)) {
 		if (last == primary) {
 			DlModule_GlobalLock_EndRead();
 			goto done;
 		}
-		last = LIST_PREV_UNSAFE(last, dm_globals);
+		last = TAILQ_PREV(last, dm_globals);
 	}
 	assert(last != &dl_rtld_module);
 	last->dm_flags &= ~RTLD_NOINIT;
@@ -358,7 +358,7 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags)
 				if (!(self->dm_flags & RTLD_GLOBAL)) {
 					DlModule_GlobalLock_Write();
 					self->dm_flags |= RTLD_GLOBAL;
-					if (!LIST_ISBOUND(self, dm_globals))
+					if (!TAILQ_ISBOUND(self, dm_globals))
 						DlModule_AddToGlobals(self);
 					DlModule_GlobalLock_EndWrite();
 				}

@@ -288,7 +288,7 @@ struct dlmodule {
 	__WEAK refcnt_t           dm_weakrefcnt; /* Weak reference counter. */
 
 	/* Module global binding. */
-	LIST_ENTRY(__WEAK dlmodule) dm_globals;  /* [lock(dl_globals.dg_globallock)][valid_if(dm_flags & RTLD_GLOBAL)]
+	TAILQ_ENTRY(__WEAK dlmodule) dm_globals; /* [lock(dl_globals.dg_globallock)][valid_if(dm_flags & RTLD_GLOBAL)]
 	                                          * Link entry in the chain of global modules. */
 
 	/* Module identification / data accessor. */
@@ -373,10 +373,10 @@ __DEFINE_REFCOUNT_FUNCTIONS(DlModule, dm_refcnt, DlModule_Destroy)
 __DEFINE_WEAKREFCOUNT_FUNCTIONS(DlModule, dm_weakrefcnt, DlModule_Free)
 
 
-#ifndef __dlmodule_list_defined
-#define __dlmodule_list_defined
-LIST_HEAD(dlmodule_list, dlmodule);
-#endif /* !__dlmodule_list_defined */
+#ifndef __dlmodule_tailq_defined
+#define __dlmodule_tailq_defined
+TAILQ_HEAD(dlmodule_tailq, dlmodule);
+#endif /* !__dlmodule_tailq_defined */
 
 #ifndef __dlmodule_dlist_defined
 #define __dlmodule_dlist_defined
@@ -389,7 +389,7 @@ struct dlglobals {
 	struct process_peb   *dg_peb;           /* [1..1][const] Process environment block (The `__peb' symbol resolves to the address of this struct member) */
 	char                 *dg_libpath;       /* [1..1][const] The library path set when the program was started (initenv:$LD_LIBRARY_PATH) */
 	char                 *dg_errmsg;        /* [0..1] The current DL error message */
-	struct dlmodule_list  dg_globallist;    /* [1..N][lock(dg_globallock)] List of RTLD_GLOBAL modules (first element is main program). */
+	struct dlmodule_tailq dg_globallist;    /* [1..N][lock(dg_globallock)] List of RTLD_GLOBAL modules (first element is main program). */
 	struct atomic_rwlock  dg_globallock;    /* Lock for `dg_globallist' */
 	struct dlmodule_dlist dg_alllist;       /* [1..N][lock(dg_alllock)] List of all loaded modules. */
 	struct atomic_rwlock  dg_alllock;       /* Lock for `dg_alllist' */

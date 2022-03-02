@@ -123,7 +123,7 @@ INTERN struct dlglobals dl_globals = {
 	.dg_peb         = NULL, /* Initialized in `linker_main()' */
 	.dg_libpath     = NULL, /* Initialized in `linker_main()' */
 	.dg_errmsg      = NULL,
-	.dg_globallist  = LIST_HEAD_INITIALIZER(dl_globals.dg_globallist),
+	.dg_globallist  = { NULL, NULL }, /* Manually initialized (would otherwise need relocations) */
 	.dg_globallock  = ATOMIC_RWLOCK_INIT,
 	.dg_alllist     = DLIST_HEAD_INITIALIZER(dl_globals.dg_alllist),
 	.dg_alllock     = ATOMIC_RWLOCK_INIT,
@@ -149,12 +149,13 @@ linker_main(struct elfexec_info *__restrict info,
 	size_t rtld_size = __rtld_end - __rtld_start;
 
 	/* Initialize globals (not done statically because we can't have relocations). */
-	dl_globals.dg_peb           = peb;
-	dl_rtld_module.dm_filename  = (char *)RTLD_LIBDL;
-	dl_rtld_module.dm_loadaddr  = info->ei_rtldaddr;
-	dl_rtld_module.dm_loadstart = info->ei_rtldaddr;
-	dl_rtld_module.dm_loadend   = (uintptr_t)rtld_size;
-	dl_rtld_module.dm_loadend  += info->ei_rtldaddr;
+	dl_globals.dg_peb                 = peb;
+	dl_globals.dg_globallist.tqh_last = &dl_globals.dg_globallist.tqh_first; /* Initialize global list. */
+	dl_rtld_module.dm_filename        = (char *)RTLD_LIBDL;
+	dl_rtld_module.dm_loadaddr        = info->ei_rtldaddr;
+	dl_rtld_module.dm_loadstart       = info->ei_rtldaddr;
+	dl_rtld_module.dm_loadend         = (uintptr_t)rtld_size;
+	dl_rtld_module.dm_loadend += info->ei_rtldaddr;
 	dl_rtld_module.dm_elf.de_phdr[0].p_filesz = (ElfW(Word))rtld_size;
 	dl_rtld_module.dm_elf.de_phdr[0].p_memsz  = (ElfW(Word))rtld_size;
 	DlModule_AllList.dlh_first = &dl_rtld_module;
@@ -187,7 +188,7 @@ linker_main(struct elfexec_info *__restrict info,
 		 * actually load anything, and if it also  didn't set a dlerror, then we  will
 		 * set a fallback error indicating that the extension couldn't load the  base-
 		 * application given by the kernel. */
-		base_module = LIST_FIRST(&DlModule_GlobalList);
+		base_module = TAILQ_FIRST(&DlModule_GlobalList);
 		if unlikely(result == NULL || base_module == NULL ||
 		            base_module->dm_ops == NULL) {
 			if (dl_globals.dg_errmsg == NULL) {
@@ -228,7 +229,7 @@ linker_main(struct elfexec_info *__restrict info,
 			goto err;
 		WR_TLS_BASE_REGISTER(tls);
 	}
-	assert(LIST_FIRST(&DlModule_GlobalList) == base_module);
+	assert(TAILQ_FIRST(&DlModule_GlobalList) == base_module);
 	assert(DLIST_FIRST(&DlModule_AllList) == &dl_rtld_module);
 	assert(DLIST_NEXT(&dl_rtld_module, dm_modules) == base_module);
 

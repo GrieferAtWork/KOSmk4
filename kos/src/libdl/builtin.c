@@ -307,9 +307,9 @@ again_old_flags:
 			DlModule_GlobalLock_EndWrite();
 			goto again_old_flags;
 		}
-		assert(!LIST_ISBOUND(self, dm_globals));
+		assert(!TAILQ_ISBOUND(self, dm_globals));
 		DlModule_AddToGlobals(self);
-		assert(LIST_ISBOUND(self, dm_globals));
+		assert(TAILQ_ISBOUND(self, dm_globals));
 		DlModule_GlobalLock_EndWrite();
 	}
 }
@@ -344,7 +344,7 @@ libdl_dlopen(USER char const *filename, int mode)
 	REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *result;
 	if unlikely(!filename) {
 		/* ... If filename is NULL, then the returned handle is for the main program... */
-		result = LIST_FIRST(&DlModule_GlobalList);
+		result = TAILQ_FIRST(&DlModule_GlobalList);
 		assert(result);
 		assert(result->dm_flags & RTLD_NODELETE);
 		/* Don't incref() the returned module for this case:
@@ -608,12 +608,12 @@ libdl_dlsym(USER DlModule *self, USER char const *name)
 	if (self == RTLD_DEFAULT) {
 		/* Search all modules in order of being loaded. */
 		DlModule_GlobalLock_Read();
-		symbol.ds_mod = LIST_FIRST(&DlModule_GlobalList);
+		symbol.ds_mod = TAILQ_FIRST(&DlModule_GlobalList);
 		assert(symbol.ds_mod);
 		for (;;) {
 			if unlikely(!tryincref(symbol.ds_mod)) {
 again_search_globals_next_noref:
-				symbol.ds_mod = LIST_NEXT(symbol.ds_mod, dm_globals);
+				symbol.ds_mod = TAILQ_NEXT(symbol.ds_mod, dm_globals);
 				if unlikely(!symbol.ds_mod) {
 					DlModule_GlobalLock_EndRead();
 					break;
@@ -694,9 +694,9 @@ again_search_globals_module:
 				}
 			}
 			DlModule_GlobalLock_Read();
-			next_module = LIST_NEXT(symbol.ds_mod, dm_globals);
+			next_module = TAILQ_NEXT(symbol.ds_mod, dm_globals);
 			while (likely(next_module) && unlikely(!tryincref(next_module)))
-				next_module = LIST_NEXT(next_module, dm_globals);
+				next_module = TAILQ_NEXT(next_module, dm_globals);
 			DlModule_GlobalLock_EndRead();
 			decref(symbol.ds_mod);
 			if unlikely(!next_module)
@@ -2643,7 +2643,7 @@ libdl_dlauxctrl(USER DlModule *self, unsigned int cmd, ...)
 		break;
 	}
 	if (!self) {
-		self = LIST_FIRST(&DlModule_GlobalList);
+		self = TAILQ_FIRST(&DlModule_GlobalList);
 		assert(self);
 	} else if unlikely(!DL_VERIFY_MODULE_HANDLE(self)) {
 		dl_seterror_badmodule(self);

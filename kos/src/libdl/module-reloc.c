@@ -233,7 +233,7 @@ got_local_symbol:
 		TRACE_RESOLVE_FOR_RELOC(name, addr, symbol->st_size,
 		                        self->dm_filename);
 		if (ELFW(ST_BIND)(symbol->st_info) != STB_WEAK && !(self->dm_flags & RTLD_DEEPBIND) &&
-		    self == LIST_FIRST(&DlModule_GlobalList)) {
+		    self == TAILQ_FIRST(&DlModule_GlobalList)) {
 			/* Log a warning when a non-weak symbol from the main
 			 * app isn't overwritten  but linked against  itself. */
 			syslog(LOG_WARN, "[rtld] Symbol %q at %p+%" PRIuSIZ " linked against itself in %q\n",
@@ -252,12 +252,12 @@ search_external_symbol:
 		/* Search the symbol tables of already loaded modules. */
 		hash_elf = hash_gnu = DLMODULE_GETLOCALSYMBOL_HASH_UNSET;
 		DlModule_GlobalLock_Read();
-		iter = LIST_FIRST(&DlModule_GlobalList);
+		iter = TAILQ_FIRST(&DlModule_GlobalList);
 		for (;;) {
 again_search_globals_next:
 			assert(iter);
 			if (iter == self || unlikely(!tryincref(iter))) {
-				iter = LIST_NEXT(iter, dm_globals);
+				iter = TAILQ_NEXT(iter, dm_globals);
 				if unlikely(!iter) {
 					DlModule_GlobalLock_EndRead();
 					break;
@@ -294,7 +294,7 @@ again_search_globals_module:
 							weak_symbol.ds_sym = (ElfW(Sym) const *)symbol_addr;
 							weak_symbol.ds_siz = symbol_size;
 							DlModule_GlobalLock_Read();
-							iter = LIST_NEXT(iter, dm_globals);
+							iter = TAILQ_NEXT(iter, dm_globals);
 							if unlikely(!iter) {
 								DlModule_GlobalLock_EndRead();
 								break;
@@ -327,7 +327,7 @@ again_search_globals_module:
 							weak_symbol.ds_mod = iter; /* Inherit reference */
 							weak_symbol.ds_sym = symbol;
 							DlModule_GlobalLock_Read();
-							iter = LIST_NEXT(iter, dm_globals);
+							iter = TAILQ_NEXT(iter, dm_globals);
 							if unlikely(!iter) {
 								DlModule_GlobalLock_EndRead();
 								break;
@@ -362,9 +362,9 @@ again_search_globals_module:
 				}
 			}
 			DlModule_GlobalLock_Read();
-			next = LIST_NEXT(iter, dm_globals);
+			next = TAILQ_NEXT(iter, dm_globals);
 			while (likely(next) && (next == self || unlikely(!tryincref(next))))
-				next = LIST_NEXT(next, dm_globals);
+				next = TAILQ_NEXT(next, dm_globals);
 			DlModule_GlobalLock_EndRead();
 			decref(iter);
 			if unlikely(!next)

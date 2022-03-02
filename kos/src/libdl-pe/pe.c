@@ -359,7 +359,7 @@ libpe_LoadLibrary(char const *__restrict filename, unsigned int flags) {
 	/* #1: Search dirname of the base application. */
 	{
 		char *appname;
-		appname = dl_globals.dg_globallist.lh_first->dm_filename;
+		appname = TAILQ_FIRST(&dl_globals.dg_globallist)->dm_filename;
 		result  = libpe_LoadLibraryInPath(appname, strroff(appname, '/'), filename, flags);
 		if (result)
 			goto done;
@@ -1071,8 +1071,8 @@ libpe_linker_main(struct peexec_info *__restrict info,
 	}
 
 	/* Hook the newly created module. */
-	DLIST_INSERT_AFTER(dl.dl_rtld_module, mod, dm_modules);       /* NOTE: _MUST_ insert after builtin DL module! */
-	LIST_INSERT_HEAD(&dl_globals.dg_globallist, mod, dm_globals); /* NOTE: _MUST_ insert at head! */
+	DLIST_INSERT_AFTER(dl.dl_rtld_module, mod, dm_modules);        /* NOTE: _MUST_ insert after builtin DL module! */
+	TAILQ_INSERT_HEAD(&dl_globals.dg_globallist, mod, dm_globals); /* NOTE: _MUST_ insert at head! */
 
 	/* Initialize the PE module. */
 	if (DlModule_PeInitialize(mod) != 0)

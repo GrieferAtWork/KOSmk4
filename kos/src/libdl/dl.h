@@ -167,7 +167,7 @@ INTDEF struct dlglobals dl_globals;
 #define DlModule_AllLock_WaitWrite()  dlglobals_alllock_waitwrite(&dl_globals)
 
 #define DlModule_GlobalList_FOREACH(mod) \
-	LIST_FOREACH (mod, &DlModule_GlobalList, dm_globals)
+	TAILQ_FOREACH (mod, &DlModule_GlobalList, dm_globals)
 #define DlModule_AllList_FOREACH(mod) \
 	DLIST_FOREACH (mod, &DlModule_AllList, dm_modules)
 
@@ -176,12 +176,7 @@ INTDEF DlModule dl_rtld_module;
 
 LOCAL NONNULL((1)) void
 NOTHROW_NCX(CC DlModule_AddToGlobals)(USER DlModule *self) THROWS(E_SEGFAULT) {
-	/* XXX: This right here is a O(n) operation for something  that
-	 *      could also be done in O(1) when using other list types.
-	 *      However, all list types currently defined in <hybrid/sequence/list.h>
-	 *      that offer O(1) INSERT_TAIL, would also require a static  initializer
-	 *      that contains a relocation... */
-	LIST_INSERT_TAIL(&DlModule_GlobalList, self, dm_globals);
+	TAILQ_INSERT_TAIL(&DlModule_GlobalList, self, dm_globals);
 }
 
 LOCAL NONNULL((1)) void
