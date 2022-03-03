@@ -3004,7 +3004,7 @@ NOTHROW(FCALL cexpr_load_special_libdl_symbol)(char const *__restrict name) {
 			goto done;
 		/* All of the special symbols somehow interact with "dl_globals",
 		 * which  should be an  INTERN-visibility symbol from `libdl.so'! */
-		result = cexpr_pushsymbol_byname("dl_globals", 8);
+		result = cexpr_pushsymbol_byname("dl_globals", 10);
 		if unlikely(result != DBX_EOK)
 			goto done;
 		result = cexpr_field("dg_peb", 6);
