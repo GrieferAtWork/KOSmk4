@@ -410,7 +410,7 @@ int iswblank(wint_t wc) {
 [[impl_include("<bits/crt/unicode.h>")]]
 wctrans_t wctrans([[nonnull]] char const *prop) {
 	struct wctrans_entry {
-		char     we_name[8]; /* Name (with leading 'to' stripped) */
+		char     we_name[8]; /* Name (including the leading "to") */
 		uint16_t we_offset;  /* Offset to `int32_t' field in `struct __unitraits' */
 	};
 	static struct wctrans_entry const entries[] = {
@@ -442,7 +442,7 @@ wint_t towctrans(wint_t wc, wctrans_t desc) {
 [[impl_include("<bits/crt/unicode.h>")]]
 wctype_t wctype([[nonnull]] char const *prop) {
 	struct wctype_entry {
-		char     we_name[8]; /* Name (with leading 'to' stripped) */
+		char     we_name[8]; /* Name (with leading "is" stripped) */
 		uint16_t we_flags;   /* Flags that must be set. */
 	};
 	static struct wctype_entry const entries[] = {

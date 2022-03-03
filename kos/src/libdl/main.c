@@ -174,6 +174,16 @@ linker_main(struct elfexec_info *__restrict info,
 		int_lib  = DlModule_OpenFilename(int_name, RTLD_LAZY | RTLD_NODELETE);
 		if unlikely(!int_lib)
 			goto err;
+
+		/* Custom interpreters are regular, old (ELF) libraries that  are
+		 * expected to export  a symbol `__linker_main()'.  Additionally,
+		 * such a library may define an INIT function which it can use to
+		 * register a libdl extension.
+		 *
+		 * Unlike the core libdl, custom interpreters are allowed to have
+		 * relocations and further dependencies, such as by using `libc'.
+		 *
+		 * For an example of such a library, see `/kos/src/libdl-pe' */
 		*(void **)&int_main = libdl_dlsym(int_lib, "__linker_main");
 		if unlikely(!int_main)
 			goto err;
@@ -215,8 +225,10 @@ linker_main(struct elfexec_info *__restrict info,
 	assert(base_module->dm_flags & RTLD_NOINIT);
 
 	/* User-level initializers must be run _after_ we've initialized static TLS!
-	 * NOTE: this is done in `_start32.S' by manually calling `DlModule_RunAllStaticInitializers'
-	 *       just   prior   to  jumping   to   the  primary   application's   _start()  function. */
+	 * NOTE: this  is done in  `_start32.S' by manually calling
+	 *       `DlModule_RunAllStaticInitializers()'  just  prior
+	 *       to jumping to the primary application's `_start()'
+	 *       function. */
 
 	/* Initialize the static TLS table. */
 	if unlikely(DlModule_InitStaticTLSBindings())

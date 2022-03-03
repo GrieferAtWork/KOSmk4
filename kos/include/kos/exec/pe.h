@@ -35,9 +35,9 @@ struct peexec_data {
 	__UINTPTR_TYPE__                                pd_loadmin; /* First (absolute) address mapped by the sections of this binary */
 	__UINTPTR_TYPE__                                pd_loadmax; /* Last (absolute) address mapped by the sections of this binary */
 	IMAGE_NT_HEADERS                                pd_nt;      /* NT header. (actual field size is `offsetof(IMAGE_NT_HEADERS, OptionalHeader) + pd_nt.FileHeader.SizeOfOptionalHeader'). */
-/*	__COMPILER_FLEXIBLE_ARRAY(byte_t,              _pd_pad1);    * Pad to multiple of `sizeof(void *)' */
+/*	__COMPILER_FLEXIBLE_ARRAY(byte_t,              _pd_pad1);    * Pad to multiples of `sizeof(void *)' */
 /*	__COMPILER_FLEXIBLE_ARRAY(IMAGE_SECTION_HEADER, pd_sect);    * Section headers (length is `pd_nt.FileHeader.NumberOfSections') */
-/*	__COMPILER_FLEXIBLE_ARRAY(char,                 pd_name);    * NUL-termianted, absolute filename of primary executable (e.g. `/bin/program.exe') */
+/*	__COMPILER_FLEXIBLE_ARRAY(char,                 pd_name);    * NUL-termianted, absolute filename of primary executable in unix notation (e.g. `/bin/program.exe') */
 /*	__COMPILER_FLEXIBLE_ARRAY(byte_t,              _pd_pad2);    * Pad to multiples of `sizeof(void *)' */
 };
 
@@ -54,7 +54,7 @@ struct peexec_info /*[PREFIX(ei_)]*/ {
 	__UINTPTR_TYPE__                pi_rtldaddr;   /* Load address of the RTLD itself. */
 	__UINT16_TYPE__                 pi_pnum;       /* [const] == (ElfW(Half))-1  (indicator for libdl to use an interpreter library) */
 	__COMPILER_FLEXIBLE_ARRAY(char, pi_libdl_pe);  /* [const] Filename of PE interpreter library (usually "/lib/libdl-pe.so" or "/lib64/libdl-pe.so") */
-/*	__BYTE_TYPE__                  _pi_pad[];       * Pad to multiple of `sizeof(void *)' */
+/*	__BYTE_TYPE__                  _pi_pad[];       * Pad to multiples of `sizeof(void *)' */
 /*	struct peexec_data              pi_pe;          * PE execution information  */
 //	void                           *pi_entry;      /* The final entry point for the program. */
 //	byte_t                          pi_entry_sp[]; /* Entry stack address (set the address of this field as

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba196b15 */
+/* HASH CRC-32:0x6bff19b5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -350,7 +350,7 @@ NOTHROW_NCX(LIBKCALL libc_towctrans)(wint32_t wc,
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_PURE WUNUSED NONNULL((1)) wctype_t
 NOTHROW_NCX(LIBCCALL libc_wctype)(char const *prop) {
 	struct wctype_entry {
-		char     we_name[8]; /* Name (with leading 'to' stripped) */
+		char     we_name[8]; /* Name (with leading 'is' stripped) */
 		uint16_t we_flags;   /* Flags that must be set. */
 	};
 	static struct wctype_entry const entries[] = {

@@ -559,13 +559,13 @@ dlmodule_search_symbol_in_dependencies(DlModule *__restrict self,
 }
 
 /* Lookup the load address of a symbol within a shared library  `handle',
- * given its `SYMBOL_NAME'. If no such symbol exists, `NULL' is returned,
+ * given its `symbol_name'. If no such symbol exists, `NULL' is returned,
  * and `dlerror()' is modified to return a human-readable error message.
  * WARNING: If  the actual address of the symbol is `NULL', then this
  *          function will still return `NULL', though will not modify
  *          the return value of `dlerror()'.
  *          In normal applications, this would  normally never be the  case,
- *          as libdl, as  well as  `ld' will take  care not  to link  object
+ *          as libdl, as  well as `ld',  will take care  not to link  object
  *          files such that  symbols could end  up overlapping with  `NULL'.
  *          However,  with  the  existence  of  `STT_GNU_IFUNC'  (as  usable
  *          via `__attribute__((ifunc("resolver")))'), it is easily possible
@@ -576,18 +576,18 @@ dlmodule_search_symbol_in_dependencies(DlModule *__restrict self,
  *          guaranty that the symbol really doesn't exist. To be absolutely
  *          certain  that  NULL  would  be  correct,  use  the   following:
  *          >> void *result;
- *          >> dlerror();
+ *          >> dlerror(); // Clear preceding error
  *          >> result = dlsym(handle, symbol_name);
  *          >> if (result == NULL) {
  *          >>     char *message = dlerror();
  *          >>     if (message != NULL) // Symbol lookup really failed.
  *          >>         fprintf(stderr, "dlerror: %s\n", message);
  *          >> }
- * @param: handle: The dynamic  library handle  of the  library which  should  be
- *                 search  for  the  specified  `SYMBOL_NAME',  before  moving on
- *                 to also  search all  of that  libraries dependencies  for  the
- *                 same `SYMBOL_NAME', and  moving on to  search those  libraries
- *                 dependencies,  following  a  breadth-first  search   approach.
+ * @param: handle: The dynamic library handle of  the library which should  be
+ *                 searched  for the specified `symbol_name', before moving on
+ *                 to also search all of those libraries' dependencies for the
+ *                 same `symbol_name', and  so on,  following a  breadth-first
+ *                 search approach.
  *                 Alternatively, you may also pass `RTLD_DEFAULT' or `RTLD_NEXT'
  *                 to make use  of special symbol  lookup resolutions  documented
  *                 more extensively alongside these constants.
@@ -595,7 +595,7 @@ dlmodule_search_symbol_in_dependencies(DlModule *__restrict self,
  * @return: NULL:  No  such symbol (dlerror()  != NULL), or  the symbol has been
  *                 linked to be loaded at the address `NULL' (dlerror() == NULL) */
 INTERN WUNUSED NONNULL((2)) void *DLFCN_CC
-libdl_dlsym(USER DlModule *self, USER char const *name)
+libdl_dlsym(USER DlModule *self, USER char const *symbol_name)
 		THROWS(E_SEGFAULT, ...) {
 	ElfW(Addr) result;
 	uintptr_t hash_elf, hash_gnu;
@@ -623,14 +623,14 @@ again_search_globals_next_noref:
 again_search_globals_module:
 			/* Search this module. */
 			if (symbol.ds_mod == &dl_rtld_module) {
-				result = (ElfW(Addr))dlsym_builtin(name);
+				result = (ElfW(Addr))dlsym_builtin(symbol_name);
 				if (result) {
 					decref_nokill(symbol.ds_mod);
 					goto done;
 				}
 			} else if (symbol.ds_mod->dm_ops) {
 				int error;
-				error = (*symbol.ds_mod->dm_ops->df_dlsym)(symbol.ds_mod, name,
+				error = (*symbol.ds_mod->dm_ops->df_dlsym)(symbol.ds_mod, symbol_name,
 				                                           (void **)&symbol.ds_sym, NULL);
 				if (error >= 0) {
 					if (error > 0) {
@@ -651,7 +651,7 @@ again_search_globals_module:
 				}
 			} else {
 				symbol.ds_sym = DlModule_ElfGetLocalSymbol(symbol.ds_mod,
-				                                           name,
+				                                           symbol_name,
 				                                           &hash_elf,
 				                                           &hash_gnu);
 				if (symbol.ds_sym &&
@@ -736,9 +736,9 @@ again_search_globals_module:
 			symbol.ds_mod = libdl_dlgethandle(__builtin_return_address(0), DLGETHANDLE_FNORMAL);
 			if unlikely(!symbol.ds_mod)
 				goto err_rtld_next_no_base;
-			dl_seterror_nosym_next(symbol.ds_mod, name);
+			dl_seterror_nosym_next(symbol.ds_mod, symbol_name);
 		} else {
-			dl_seterror_nosym_global(name);
+			dl_seterror_nosym_global(symbol_name);
 		}
 	} else if (self == RTLD_NEXT) {
 		symbol.ds_mod = libdl_dlgethandle(__builtin_return_address(0), DLGETHANDLE_FNORMAL);
@@ -749,7 +749,7 @@ again_search_globals_module:
 		goto again_search_globals_next_noref;
 	} else {
 		if unlikely(self == &dl_rtld_module) {
-			result = (ElfW(Addr))dlsym_builtin(name);
+			result = (ElfW(Addr))dlsym_builtin(symbol_name);
 			if likely(result)
 				goto done;
 		} else {
@@ -776,7 +776,7 @@ again_search_globals_module:
 			if unlikely(self->dm_ops) {
 				/* Scan the given module itself */
 				int error;
-				error = (*self->dm_ops->df_dlsym)(self, name, (void **)&symbol.ds_sym, NULL);
+				error = (*self->dm_ops->df_dlsym)(self, symbol_name, (void **)&symbol.ds_sym, NULL);
 				/* Most likely case: The symbol is already apart of the specified module! */
 				if likely(error >= 0) {
 					if (error > 0) {
@@ -790,7 +790,7 @@ again_search_globals_module:
 			} else {
 				/* Scan the given module itself */
 				symbol.ds_sym = DlModule_ElfGetLocalSymbol(self,
-				                                           name,
+				                                           symbol_name,
 				                                           &hash_elf,
 				                                           &hash_gnu);
 				/* Most likely case: The symbol is already apart of the specified module! */
@@ -826,7 +826,7 @@ done:
 				for (;; ++depth) {
 					/* Breadth-first search using a depth counter. */
 					error = dlmodule_search_symbol_in_dependencies(self,
-					                                               name,
+					                                               symbol_name,
 					                                               &hash_elf,
 					                                               &hash_gnu,
 					                                               &result,
@@ -864,7 +864,7 @@ done:
 			}
 		}
 		/* Missing symbol... */
-		dl_seterror_nosym_in(self, name);
+		dl_seterror_nosym_in(self, symbol_name);
 	}
 err:
 	return NULL;
@@ -875,7 +875,7 @@ err_weak_symbol_mod:
 	decref(weak_symbol.ds_mod);
 	goto err;
 err_rtld_next_no_base:
-	dl_seterror_nosym_next_badcaller(name);
+	dl_seterror_nosym_next_badcaller(symbol_name);
 	goto err;
 err_bad_module:
 	dl_seterror_badmodule(self);
@@ -3322,8 +3322,7 @@ NOTHROW_NCX(CC dlsym_builtin)(USER char const *name) THROWS(E_SEGFAULT) {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 					return &dl_globals.dg_peb->pp_argc;
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-					return (byte_t *)&dl_globals.dg_peb->pp_argc + (__SIZEOF_SIZE_T__ -
-					                                       __SIZEOF_INT__);
+					return (byte_t *)&dl_globals.dg_peb->pp_argc + (__SIZEOF_SIZE_T__ - __SIZEOF_INT__);
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 #else /* __SIZEOF_INT__ <= __SIZEOF_SIZE_T__ */
 #error "Unsupported configuration: `int' doesn't fit into `size_t'"

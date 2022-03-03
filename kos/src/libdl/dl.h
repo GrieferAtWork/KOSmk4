@@ -311,13 +311,13 @@ libdl_dlclose(USER REF_IF(!(self->dm_flags & RTLD_NODELETE)) DlModule *handle)
 		THROWS(E_SEGFAULT, ...);
 
 /* Lookup the load address of a symbol within a shared library  `handle',
- * given its `SYMBOL_NAME'. If no such symbol exists, `NULL' is returned,
+ * given its `symbol_name'. If no such symbol exists, `NULL' is returned,
  * and `dlerror()' is modified to return a human-readable error message.
  * WARNING: If  the actual address of the symbol is `NULL', then this
  *          function will still return `NULL', though will not modify
  *          the return value of `dlerror()'.
  *          In normal applications, this would  normally never be the  case,
- *          as libdl, as  well as  `ld' will take  care not  to link  object
+ *          as libdl, as  well as `ld',  will take care  not to link  object
  *          files such that  symbols could end  up overlapping with  `NULL'.
  *          However,  with  the  existence  of  `STT_GNU_IFUNC'  (as  usable
  *          via `__attribute__((ifunc("resolver")))'), it is easily possible
@@ -328,18 +328,18 @@ libdl_dlclose(USER REF_IF(!(self->dm_flags & RTLD_NODELETE)) DlModule *handle)
  *          guaranty that the symbol really doesn't exist. To be absolutely
  *          certain  that  NULL  would  be  correct,  use  the   following:
  *          >> void *result;
- *          >> dlerror();
+ *          >> dlerror(); // Clear preceding error
  *          >> result = dlsym(handle, symbol_name);
  *          >> if (result == NULL) {
  *          >>     char *message = dlerror();
  *          >>     if (message != NULL) // Symbol lookup really failed.
  *          >>         fprintf(stderr, "dlerror: %s\n", message);
  *          >> }
- * @param: handle: The dynamic  library handle  of the  library which  should  be
- *                 search  for  the  specified  `SYMBOL_NAME',  before  moving on
- *                 to also  search all  of that  libraries dependencies  for  the
- *                 same `SYMBOL_NAME', and  moving on to  search those  libraries
- *                 dependencies,  following  a  breadth-first  search   approach.
+ * @param: handle: The dynamic library handle of  the library which should  be
+ *                 searched  for the specified `symbol_name', before moving on
+ *                 to also search all of those libraries' dependencies for the
+ *                 same `symbol_name', and  so on,  following a  breadth-first
+ *                 search approach.
  *                 Alternatively, you may also pass `RTLD_DEFAULT' or `RTLD_NEXT'
  *                 to make use  of special symbol  lookup resolutions  documented
  *                 more extensively alongside these constants.
@@ -347,7 +347,7 @@ libdl_dlclose(USER REF_IF(!(self->dm_flags & RTLD_NODELETE)) DlModule *handle)
  * @return: NULL:  No  such symbol (dlerror()  != NULL), or  the symbol has been
  *                 linked to be loaded at the address `NULL' (dlerror() == NULL) */
 INTDEF WUNUSED NONNULL((2)) void *DLFCN_CC
-libdl_dlsym(USER DlModule *handle, USER char const *name)
+libdl_dlsym(USER DlModule *handle, USER char const *symbol_name)
 		THROWS(E_SEGFAULT, ...);
 
 /* Return  and clear the  current libdl error message  string, such that for

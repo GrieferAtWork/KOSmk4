@@ -65,9 +65,12 @@ INTDEF NONNULL((1)) void CC
 dlmodule_finalizers_run(struct dlmodule_finalizers *__restrict self)
 		THROWS(...) {
 	size_t count;
-	/* Ensure that only a single thread may invoke finalizers.
-	 * NOTE: Yes this lock being left dangling is intentional! */
+
+	/* Prevent new finalizers from being registered.
+	 * Yes: we intentionally leave this lock dangling! */
 	atomic_rwlock_read(&self->df_lock);
+
+	/* Ensure that only a single thread may invoke finalizers. */
 	count = ATOMIC_XCH(self->df_size, 0);
 	if (count) {
 		RAII_FINALLY { free(self->df_list); };

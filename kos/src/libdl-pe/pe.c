@@ -292,8 +292,9 @@ libpe_LoadLibraryInPath(char const *__restrict path, size_t pathlen,
 				continue;
 			strcpy(usedname, lib_replacements[i].lr_repl);
 			result = (REF DlModule *)dlopen(fullname, flags);
-			if (result)
-				return result;
+			/* Don't keep trying after the first match. -- We  can
+			 * assume that there would be at most 1 match anyways. */
+			return result;
 		}
 	}
 	/* No replacement for this -- maybe it can be found in another folder? */
@@ -340,7 +341,7 @@ libpe_LoadLibrary(char const *__restrict filename, unsigned int flags) {
 	/* The library search order on NT works as follows:
 	 * #1: `dirname $(dlmodulename(dlopen(NULL, 0)))` -- The directory from which the application loaded.
 	 * #2: `pwd`                                      -- The current directory.
-	 * #3: GetSystemDirectory             (we use `dl_globals.dg_libpath' in place of this)
+	 * #3: GetSystemDirectory             (we use `dl_globals.dg_libpath' ($LD_LIBRARY_PATH) in place of this)
 	 * #4: <The 16-bit system directory>  (we skip this one)
 	 * #5: GetWindowsDirectory            (we skip this one)
 	 * #6: $PATH
@@ -370,7 +371,7 @@ libpe_LoadLibrary(char const *__restrict filename, unsigned int flags) {
 	if (result)
 		goto done;
 
-	/* #3: Search `dl_globals.dg_libpath' */
+	/* #3: Search `dl_globals.dg_libpath' ($LD_LIBRARY_PATH) */
 	result = libpe_LoadLibraryInPathList(dl_globals.dg_libpath, filename, flags);
 	if (result)
 		goto done;

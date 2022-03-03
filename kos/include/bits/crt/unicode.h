@@ -26,11 +26,9 @@
 #include <hybrid/typecore.h>
 
 #ifdef __CC__
+#ifdef __CRT_KOS
 __DECL_BEGIN
 
-struct __unitraits;
-
-#ifdef __CRT_KOS
 #define __UNICODE_ISCNTRL  0x0001                                  /* iscntrl: 00-1F, 7F */
 #define __UNICODE_ISCTAB   0x0002                                  /*          09 */
 #define __UNICODE_ISXTAB   0x0004                                  /*          0B-0C */
@@ -72,9 +70,9 @@ struct __unitraits {
 	__INT32_TYPE__  const __ut_upper;     /* Delta added to the character to convert it to uppercase, or 0. */
 	__INT32_TYPE__  const __ut_title;     /* Delta added to the character to convert it to titlecase, or 0. */
 };
-#endif /* __CRT_KOS */
 
 __DECL_END
+#endif /* __CRT_KOS */
 #endif /* __CC__ */
 
 #endif /* !_BITS_CRT_UNICODE_H */
