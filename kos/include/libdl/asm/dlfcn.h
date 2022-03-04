@@ -90,6 +90,7 @@ __DECL_BEGIN
 /* Stuff from GLibc that also exist under KOS */
 #define __CRT_HAVE_dladdr
 #define __CRT_HAVE_dl_iterate_phdr
+#define __CRT_HAVE_dlinfo
 
 /* Stuff from GLibc that doesn't exist under KOS (for now...) */
 #if !defined(__KOS__) && !defined(__CRT_KOS)
@@ -99,22 +100,21 @@ __DECL_BEGIN
 #define __CRT_HAVE_dlmopen
 #define __CRT_HAVE_dlvsym
 #define __CRT_HAVE_dladdr1
-#define __CRT_HAVE_dlinfo
 #define __CRT_HAVE__dl_mcount_wrapper_check
 #endif /* !__KOS__ && !__CRT_KOS */
 
 
 #ifdef __CRT_HAVE_dlinfo
-#define __RTLD_DI_LMID        1
-#define __RTLD_DI_LINKMAP     2
-#define __RTLD_DI_CONFIGADDR  3
-#define __RTLD_DI_SERINFO     4
-#define __RTLD_DI_SERINFOSIZE 5
-#define __RTLD_DI_ORIGIN      6
-#define __RTLD_DI_PROFILENAME 7
-#define __RTLD_DI_PROFILEOUT  8
-#define __RTLD_DI_TLS_MODID   9
-#define __RTLD_DI_TLS_DATA    10
+#define __RTLD_DI_LMID        1  /* Unsupported on KOS */
+#define __RTLD_DI_LINKMAP     2  /* [struct link_map **arg] -- *arg = GET_LINK_MAP_FOR(handle) (on KOS: this is the same as `handle') */
+#define __RTLD_DI_CONFIGADDR  3  /* Unsupported on KOS (and neither supported by gLibc) */
+#define __RTLD_DI_SERINFO     4  /* [Dl_serinfo *arg] Return search path information */
+#define __RTLD_DI_SERINFOSIZE 5  /* [Dl_serinfo *arg] Like `__RTLD_DI_SERINFO', but only fill in `dls_size' and `dls_cnt' */
+#define __RTLD_DI_ORIGIN      6  /* [char *arg] strcpy() the `$ORIGIN' of this module (WARNING: UNBOUNDED BUFFER COPY) */
+#define __RTLD_DI_PROFILENAME 7  /* Unsupported on KOS (and neither supported by gLibc) */
+#define __RTLD_DI_PROFILEOUT  8  /* Unsupported on KOS (and neither supported by gLibc) */
+#define __RTLD_DI_TLS_MODID   9  /* [size_t *arg] Store TLS module id (on KOS: this is the same as `handle') */
+#define __RTLD_DI_TLS_DATA    10 /* [void **arg] Same as `dltlsaddr(3)', but don't allocate TLS if not already done -- Writes NULL if not allocated or no PT_TLS segment */
 #define __RTLD_DI_MAX         10
 #endif /* __CRT_HAVE_dlinfo */
 

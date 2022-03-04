@@ -803,49 +803,61 @@ __IMPDEF void *(__DLFCN_VCC dlauxctrl)(void *__handle,
 typedef struct __dl_info_struct Dl_info;
 #endif /* !__Dl_info_defined */
 
+/* >> dladdr(3)
+ * Query information on the symbol/module associated with a given `address'
+ * @param: address: The address to query information about.
+ * @param: info:    Output buffer for where to put information.
+ * @return: 0 : Success.
+ * @return: -1: Error (s.a. `dlerror()') */
 __IMPDEF __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__DLFCN_CC dladdr)(void const *__address,
                                  Dl_info *__info);
 #endif /* __CRT_HAVE_dladdr */
 
 #ifdef __CRT_HAVE_dlinfo
-#ifdef __RTLD_DI_LMID
-#define RTLD_DI_LMID        __RTLD_DI_LMID
-#endif /* __RTLD_DI_LMID */
-#ifdef __RTLD_DI_LINKMAP
-#define RTLD_DI_LINKMAP     __RTLD_DI_LINKMAP
-#endif /* __RTLD_DI_LINKMAP */
-#ifdef __RTLD_DI_CONFIGADDR
-#define RTLD_DI_CONFIGADDR  __RTLD_DI_CONFIGADDR
-#endif /* __RTLD_DI_CONFIGADDR */
-#ifdef __RTLD_DI_SERINFO
-#define RTLD_DI_SERINFO     __RTLD_DI_SERINFO
-#endif /* __RTLD_DI_SERINFO */
-#ifdef __RTLD_DI_SERINFOSIZE
-#define RTLD_DI_SERINFOSIZE __RTLD_DI_SERINFOSIZE
-#endif /* __RTLD_DI_SERINFOSIZE */
-#ifdef __RTLD_DI_ORIGIN
-#define RTLD_DI_ORIGIN      __RTLD_DI_ORIGIN
-#endif /* __RTLD_DI_ORIGIN */
-#ifdef __RTLD_DI_PROFILENAME
-#define RTLD_DI_PROFILENAME __RTLD_DI_PROFILENAME
-#endif /* __RTLD_DI_PROFILENAME */
-#ifdef __RTLD_DI_PROFILEOUT
-#define RTLD_DI_PROFILEOUT  __RTLD_DI_PROFILEOUT
-#endif /* __RTLD_DI_PROFILEOUT */
-#ifdef __RTLD_DI_TLS_MODID
-#define RTLD_DI_TLS_MODID   __RTLD_DI_TLS_MODID
-#endif /* __RTLD_DI_TLS_MODID */
-#ifdef __RTLD_DI_TLS_DATA
-#define RTLD_DI_TLS_DATA    __RTLD_DI_TLS_DATA
-#endif /* __RTLD_DI_TLS_DATA */
-#ifdef __RTLD_DI_MAX
+#if !defined(RTLD_DI_LMID) && defined(__RTLD_DI_LMID)
+#define RTLD_DI_LMID        __RTLD_DI_LMID        /* Unsupported on KOS */
+#endif /* !RTLD_DI_LMID && __RTLD_DI_LMID */
+#if !defined(RTLD_DI_LINKMAP) && defined(__RTLD_DI_LINKMAP)
+#define RTLD_DI_LINKMAP     __RTLD_DI_LINKMAP     /* [struct link_map **arg] -- *arg = GET_LINK_MAP_FOR(handle) (on KOS: this is the same as `handle') */
+#endif /* !RTLD_DI_LINKMAP && __RTLD_DI_LINKMAP */
+#if !defined(RTLD_DI_CONFIGADDR) && defined(__RTLD_DI_CONFIGADDR)
+#define RTLD_DI_CONFIGADDR  __RTLD_DI_CONFIGADDR  /* Unsupported on KOS (and neither supported by gLibc) */
+#endif /* !RTLD_DI_CONFIGADDR && __RTLD_DI_CONFIGADDR */
+#if !defined(RTLD_DI_SERINFO) && defined(__RTLD_DI_SERINFO)
+#define RTLD_DI_SERINFO     __RTLD_DI_SERINFO     /* [Dl_serinfo *arg] Return search path information */
+#endif /* !RTLD_DI_SERINFO && __RTLD_DI_SERINFO */
+#if !defined(RTLD_DI_SERINFOSIZE) && defined(__RTLD_DI_SERINFOSIZE)
+#define RTLD_DI_SERINFOSIZE __RTLD_DI_SERINFOSIZE /* [Dl_serinfo *arg] Like `__RTLD_DI_SERINFO', but only fill in `dls_size' and `dls_cnt' */
+#endif /* !RTLD_DI_SERINFOSIZE && __RTLD_DI_SERINFOSIZE */
+#if !defined(RTLD_DI_ORIGIN) && defined(__RTLD_DI_ORIGIN)
+#define RTLD_DI_ORIGIN      __RTLD_DI_ORIGIN      /* [char *arg] strcpy() the `$ORIGIN' of this module (WARNING: UNBOUNDED BUFFER COPY) */
+#endif /* !RTLD_DI_ORIGIN && __RTLD_DI_ORIGIN */
+#if !defined(RTLD_DI_PROFILENAME) && defined(__RTLD_DI_PROFILENAME)
+#define RTLD_DI_PROFILENAME __RTLD_DI_PROFILENAME /* Unsupported on KOS (and neither supported by gLibc) */
+#endif /* !RTLD_DI_PROFILENAME && __RTLD_DI_PROFILENAME */
+#if !defined(RTLD_DI_PROFILEOUT) && defined(__RTLD_DI_PROFILEOUT)
+#define RTLD_DI_PROFILEOUT  __RTLD_DI_PROFILEOUT  /* Unsupported on KOS (and neither supported by gLibc) */
+#endif /* !RTLD_DI_PROFILEOUT && __RTLD_DI_PROFILEOUT */
+#if !defined(RTLD_DI_TLS_MODID) && defined(__RTLD_DI_TLS_MODID)
+#define RTLD_DI_TLS_MODID   __RTLD_DI_TLS_MODID   /* [size_t *arg] Store TLS module id (on KOS: this is the same as `handle') */
+#endif /* !RTLD_DI_TLS_MODID && __RTLD_DI_TLS_MODID */
+#if !defined(RTLD_DI_TLS_DATA) && defined(__RTLD_DI_TLS_DATA)
+#define RTLD_DI_TLS_DATA    __RTLD_DI_TLS_DATA    /* [void **arg] Same as `dltlsaddr(3)', but don't allocate TLS if not already done -- Writes NULL if not allocated or no PT_TLS segment */
+#endif /* !RTLD_DI_TLS_DATA && __RTLD_DI_TLS_DATA */
+#if !defined(RTLD_DI_MAX) && defined(__RTLD_DI_MAX)
 #define RTLD_DI_MAX         __RTLD_DI_MAX
-#endif /* __RTLD_DI_MAX */
+#endif /* !RTLD_DI_MAX && __RTLD_DI_MAX */
 
 typedef struct __Dl_serpath Dl_serpath;
 typedef struct __Dl_serinfo Dl_serinfo;
 
+/* >> dlinfo(3)
+ * Query auxiliary information on `handle', according to `request'
+ * @param: request: One of `RTLD_DI_*'.
+ * @param: arg:     Request-specific data (see docs of `RTLD_DI_*' codes).
+ * @return: 0 : Success.
+ * @return: -1: Error (s.a. `dlerror()') */
 __IMPDEF __ATTR_NONNULL((1, 3)) int
 __NOTHROW_NCX(__DLFCN_CC dlinfo)(void *__restrict __handle,
                                  int __request,

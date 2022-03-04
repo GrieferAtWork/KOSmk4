@@ -645,6 +645,21 @@ libdl_dltlsaddr(USER DlModule *self) THROWS(E_SEGFAULT, ...) {
 	return result;
 }
 
+INTERN WUNUSED void *__DLFCN_DLTLSADDR2_CC
+libdl_dltlsaddr2_noinit(DlModule *__restrict self,
+                        USER struct tls_segment *seg) {
+	struct dtls_extension *extab;
+	/* Simple case: Static TLS, and special case: Empty TLS */
+	if (self->dm_tlsstoff || unlikely(!self->dm_tlsmsize))
+		return (byte_t *)seg + self->dm_tlsstoff;
+	tls_segment_ex_read(seg);
+	extab = dtls_extension_tree_locate(seg->ts_extree, self);
+	tls_segment_ex_endread(seg);
+	if (extab)
+		return extab->te_data;
+	return NULL;
+}
+
 
 DECL_END
 

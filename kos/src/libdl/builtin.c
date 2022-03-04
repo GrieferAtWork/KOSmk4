@@ -21,6 +21,7 @@
 #define GUARD_LIBDL_BUILTIN_C 1
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
+#define _KOS_ALTERATIONS_SOURCE 1
 
 /* Keep this one the first */
 #include "dl.h"
@@ -41,6 +42,7 @@
 #include <malloc.h>
 #include <sched.h>
 #include <signal.h> /* SIGABRT */
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1063,6 +1065,12 @@ got_result:
 }
 
 
+/* >> dladdr(3)
+ * Query information on the symbol/module associated with a given `address'
+ * @param: address: The address to query information about.
+ * @param: info:    Output buffer for where to put information.
+ * @return: 0 : Success.
+ * @return: -1: Error (s.a. `dlerror()') */
 INTERN NONNULL((2)) int
 NOTHROW_NCX(DLFCN_CC libdl_dladdr)(void const *address,
                                    USER Dl_info *info)
@@ -1122,6 +1130,97 @@ done:
 err:
 	return -1;
 }
+
+
+/* >> dlinfo(3)
+ * Query auxiliary information on `handle', according to `request'
+ * @param: request: One of `RTLD_DI_*'.
+ * @param: arg:     Request-specific data (see docs of `RTLD_DI_*' codes).
+ * @return: 0 : Success.
+ * @return: -1: Error (s.a. `dlerror()') */
+INTERN NONNULL((1)) int
+NOTHROW_NCX(DLFCN_CC libdl_dlinfo)(USER DlModule *self, int request,
+                                   USER void *arg) {
+	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
+		goto err_bad_module;
+	switch (request) {
+
+	case RTLD_DI_LINKMAP:   /* On KOS, our handles are designed to be castable to `struct link_map' */
+	case RTLD_DI_TLS_MODID: /* On KOS, we simply use module pointers as TLS IDs. */
+		*(void **)arg = self;
+		break;
+
+	case RTLD_DI_SERINFO:
+	case RTLD_DI_SERINFOSIZE: {
+		size_t pathcount, pathlen;
+		char const *libpath, *iter;
+		char *sbuf;
+		Dl_serinfo *info = (Dl_serinfo *)arg;
+		if (self->dm_ops != NULL) {
+			/* TODO: Support for formats other than ELF? */
+			libpath = NULL;
+		} else {
+			libpath = self->dm_elf.de_runpath;
+		}
+		if (libpath == NULL)
+			libpath = dl_globals.dg_libpath;
+		for (iter = libpath, pathcount = 0, pathlen = 0;;) {
+			size_t partlen = stroff(iter, ':');
+			pathcount += 1;
+			pathlen += partlen;
+			iter += partlen;
+			if (!*iter)
+				break;
+			++iter; /* Skip ':' */
+		}
+		info->dls_cnt  = (unsigned int)pathcount;
+		info->dls_size = offsetof(Dl_serinfo, dls_serpath) +
+		                 pathcount * sizeof(Dl_serpath) +
+		                 (pathlen + pathcount) * sizeof(char);
+		if (request == RTLD_DI_SERINFOSIZE)
+			break; /* Only supposed to fill in `dls_cnt' and `dls_size' */
+		sbuf = (char *)((byte_t *)info +
+		                offsetof(Dl_serinfo, dls_serpath) +
+		                pathcount * sizeof(Dl_serpath));
+		for (iter = libpath, pathcount = 0;; ++pathcount) {
+			size_t partlen = stroff(iter, ':');
+			/* Fill in pointers. */
+			info->dls_serpath[pathcount].dls_name  = sbuf;
+			info->dls_serpath[pathcount].dls_flags = 0; /* ??? */
+			/* Copy string */
+			sbuf = (char *)mempcpy(sbuf, iter, partlen, sizeof(char));
+			*sbuf++ = '\0';
+			iter += partlen;
+			if (!*iter)
+				break;
+			++iter; /* Skip ':' */
+		}
+	}	break;
+
+	case RTLD_DI_ORIGIN: {
+		/* Copy the origin path (without a trailing '/')
+		 * XXX: I think gLibc also doesn't include the '/', but I haven't checked... */
+		size_t dirlen;
+		dirlen = strroff(self->dm_filename, '/');
+		if (dirlen != (size_t)-1)
+			arg = mempcpy(arg, self->dm_filename, dirlen, sizeof(char));
+		*(char *)arg = '\0';
+	}	break;
+
+	case RTLD_DI_TLS_DATA: {
+		struct tls_segment *seg;
+		RD_TLS_BASE_REGISTER(*(void **)&seg);
+		*(void **)arg = libdl_dltlsaddr2_noinit(self, seg);
+	}	break;
+
+	default:
+		return dl_seterrorf("dlinfo: unknown request: %d", request);
+	}
+	return 0;
+err_bad_module:
+	return dl_seterror_badmodule(self);
+}
+
 
 /* Return the internally used file descriptor for the given module `handle'
  * Note  however that this  descriptor is usually  only opened for reading!
@@ -3049,6 +3148,7 @@ DEFINE_PUBLIC_ALIAS(dlinflatesection, libdl_dlinflatesection);
 DEFINE_PUBLIC_ALIAS(dlclearcaches, libdl_dlclearcaches);
 DEFINE_PUBLIC_ALIAS(dlauxctrl, libdl_dlauxctrl);
 DEFINE_PUBLIC_ALIAS(dl_iterate_phdr, libdl_iterate_phdr);
+DEFINE_PUBLIC_ALIAS(dlinfo, libdl_dlinfo);
 
 
 
@@ -3086,6 +3186,7 @@ local BUILTIN_SYMBOLS = {
 	"dltlsaddr2"       : "libdl_dltlsaddr2",
 	"dlauxctrl"        : "libdl_dlauxctrl",
 	"dl_iterate_phdr"  : "libdl_iterate_phdr",
+	"dlinfo"           : "libdl_dlinfo",
 };
 local names = BUILTIN_SYMBOLS.keys.sorted();
 function printDb(longestNameLen: int) {
@@ -3147,7 +3248,7 @@ print("__ASM_L(.size dlsym_builtin_table, . - dlsym_builtin_table)");
 print("__ASM_L(.popsection)");
 print("__ASM_END");
 ]]]*/
-enum { DLSYM_BUILTIN_COUNT = 28
+enum { DLSYM_BUILTIN_COUNT = 29
 #if defined(__i386__) && !defined(__x86_64__)
                              + 1
 #endif /* ... */
@@ -3174,6 +3275,7 @@ __ASM_L(.ascii "dlfopen\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlfopen)
 __ASM_L(.ascii "dlgethandle\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlgethandle)
 __ASM_L(.ascii "dlgetmodule\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlgetmodule)
 __ASM_L(.ascii "dlinflatesection\0\0\0\0"; .wordrel libdl_dlinflatesection)
+__ASM_L(.ascii "dlinfo\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlinfo)
 __ASM_L(.ascii "dllocksection\0\0\0\0\0\0\0"; .wordrel libdl_dllocksection)
 __ASM_L(.ascii "dlmodulebase\0\0\0\0\0\0\0\0"; .wordrel libdl_dlmodulebase)
 __ASM_L(.ascii "dlmodulefd\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlmodulefd)
@@ -3207,6 +3309,7 @@ __ASM_L(.ascii "dlfopen\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlfop
 __ASM_L(.ascii "dlgethandle\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlgethandle)
 __ASM_L(.ascii "dlgetmodule\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlgetmodule)
 __ASM_L(.ascii "dlinflatesection\0\0\0\0\0\0\0\0"; .wordrel libdl_dlinflatesection)
+__ASM_L(.ascii "dlinfo\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlinfo)
 __ASM_L(.ascii "dllocksection\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dllocksection)
 __ASM_L(.ascii "dlmodulebase\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlmodulebase)
 __ASM_L(.ascii "dlmodulefd\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlmodulefd)

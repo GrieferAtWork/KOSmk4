@@ -466,7 +466,7 @@ DlModule_OpenFilenameInPath(char const *__restrict path, size_t pathlen,
 	while (pathlen && path[pathlen - 1] == '/')
 		--pathlen;
 	/* TODO: The specs state that we must expand special tokens within library paths:
-	 *        - $ORIGIN / ${ORIGIN}:     DIRECTORY_WITHOUT_TRAILING_SLASH_OF(BASE_APPLICATION)
+	 *        - $ORIGIN / ${ORIGIN}:     DIRECTORY_WITHOUT_TRAILING_SLASH_OF(CALLING_MODULE)
 	 *        - $LIB / ${LIB}:           Expand to `RTLD_LIB'
 	 *        - $PLATFORM / ${PLATFORM}: Expand to `RTLD_PLATFORM'
 	 */

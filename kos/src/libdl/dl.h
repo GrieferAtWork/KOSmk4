@@ -406,10 +406,27 @@ NOTHROW(DLFCN_CC libdl_dlgethandle)(void const *static_pointer, unsigned int fla
 INTDEF WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE) && (flags & DLGETHANDLE_FINCREF)) DlModule *
 NOTHROW_NCX(DLFCN_CC libdl_dlgetmodule)(USER char const *name, unsigned int flags) THROWS(E_SEGFAULT);
 
+/* >> dladdr(3)
+ * Query information on the symbol/module associated with a given `address'
+ * @param: address: The address to query information about.
+ * @param: info:    Output buffer for where to put information.
+ * @return: 0 : Success.
+ * @return: -1: Error (s.a. `dlerror()') */
 INTDEF NONNULL((2)) int
 NOTHROW_NCX(DLFCN_CC libdl_dladdr)(void const *address,
                                    USER Dl_info *info)
 		THROWS(E_SEGFAULT);
+
+/* >> dlinfo(3)
+ * Query auxiliary information on `handle', according to `request'
+ * @param: request: One of `RTLD_DI_*'.
+ * @param: arg:     Request-specific data (see docs of `RTLD_DI_*' codes).
+ * @return: 0 : Success.
+ * @return: -1: Error (s.a. `dlerror()') */
+INTDEF NONNULL((1)) int
+NOTHROW_NCX(DLFCN_CC libdl_dlinfo)(USER DlModule *self, int request,
+                                   USER void *arg);
+
 
 /* Return the internally used file descriptor for the given module `handle'
  * Note  however that this  descriptor is usually  only opened for reading!
@@ -673,6 +690,9 @@ libdl_dltlsaddr(USER DlModule *self)
 INTDEF WUNUSED void *__DLFCN_DLTLSADDR2_CC
 libdl_dltlsaddr2(USER DlModule *self, USER struct tls_segment *seg)
 		THROWS(E_SEGFAULT, ...);
+INTDEF WUNUSED void *__DLFCN_DLTLSADDR2_CC
+libdl_dltlsaddr2_noinit(DlModule *__restrict self,
+                        USER struct tls_segment *seg);
 
 /* Similar to `libdl_dltlsaddr()', but do no lazy allocation
  * and return NULL if the module doesn't have a TLS segment. */

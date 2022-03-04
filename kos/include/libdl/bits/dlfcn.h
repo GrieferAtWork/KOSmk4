@@ -51,14 +51,19 @@ struct __dl_info_struct {
 
 #ifdef __CRT_HAVE_dlinfo
 struct __Dl_serpath {
-	char        *dls_name;
-	unsigned int dls_flags;
+	char        *dls_name;   /* [1..1] Search path directory */
+	unsigned int dls_flags;  /* ??? */
 };
 
 struct __Dl_serinfo {
-	__size_t            dls_size;
-	unsigned int        dls_cnt;
-	struct __Dl_serpath dls_serpath[1];
+	__size_t            dls_size;       /* [out] Required buffer size (in bytes) */
+	unsigned int        dls_cnt;        /* [out] # of entries in `dls_serpath' */
+#ifdef __USE_KOS_ALTERATIONS
+	__COMPILER_FLEXIBLE_ARRAY(struct __Dl_serpath, dls_serpath); /* [dls_cnt] Array of search path. */
+#else /* __USE_KOS_ALTERATIONS */
+	struct __Dl_serpath dls_serpath[1]; /* [dls_cnt] Array of search path. */
+#endif /* !__USE_KOS_ALTERATIONS */
+	/* The buffer for `dls_name' strings goes here. */
 };
 #endif /* __CRT_HAVE_dlinfo */
 

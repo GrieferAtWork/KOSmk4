@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bff19b5 */
+/* HASH CRC-32:0xedb0fe99 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -317,7 +317,7 @@ NOTHROW(LIBKCALL libc_iswblank)(wint32_t wc) {
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_PURE WUNUSED NONNULL((1)) wctrans_t
 NOTHROW_NCX(LIBCCALL libc_wctrans)(char const *prop) {
 	struct wctrans_entry {
-		char     we_name[8]; /* Name (with leading 'to' stripped) */
+		char     we_name[8]; /* Name (including the leading "to") */
 		uint16_t we_offset;  /* Offset to `int32_t' field in `struct __unitraits' */
 	};
 	static struct wctrans_entry const entries[] = {
@@ -350,7 +350,7 @@ NOTHROW_NCX(LIBKCALL libc_towctrans)(wint32_t wc,
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_PURE WUNUSED NONNULL((1)) wctype_t
 NOTHROW_NCX(LIBCCALL libc_wctype)(char const *prop) {
 	struct wctype_entry {
-		char     we_name[8]; /* Name (with leading 'is' stripped) */
+		char     we_name[8]; /* Name (with leading "is" stripped) */
 		uint16_t we_flags;   /* Flags that must be set. */
 	};
 	static struct wctype_entry const entries[] = {
