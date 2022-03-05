@@ -115,7 +115,7 @@ DECL_BEGIN
  * file-handle in order to acquire a (waitable) lock during every linux-emulated readdir
  * operation.
  * But note that this only guards against parallel calls to linux's readdir API. When
- * this  is also mixed with KOS's readdir API,  you will once again run into the data
+ * this  is also mixed with KOS's kreaddir API, you will once again run into the data
  * race described above.
  */
 
@@ -126,11 +126,12 @@ DECL_BEGIN
  *       performance. (since this whole file is only meant for binary linux
  *       compatibility) */
 #ifndef CONFIG_READDIR_LOCK_COUNT
-#define CONFIG_READDIR_LOCK_COUNT 1024
+#define CONFIG_READDIR_LOCK_COUNT 512
 #endif /* !CONFIG_READDIR_LOCK_COUNT */
 
 /* Bitset of linux readdir lock-bits. */
-PRIVATE uintptr_t readdir_lockbits[CONFIG_READDIR_LOCK_COUNT / BITSOF(uintptr_t)];
+PRIVATE uintptr_t readdir_lockbits[CONFIG_READDIR_LOCK_COUNT / BITSOF(uintptr_t)] = { 0, };
+
 /* Signal broadcast whenever one of `readdir_lockbits' is cleared. */
 PRIVATE struct sig readdir_locksig = SIG_INIT;
 
@@ -167,6 +168,7 @@ readdir_lock_acquire(void *h_data) {
 	index = readdir_lock_index(h_data);
 	word  = readdir_lockbits_word(index);
 	mask  = readdir_lockbits_mask(index);
+
 	/* NOTE: No need  to worry  about re-entrancy  for this  lock!
 	 *       This lock is only acquired from the syscall  wrappers
 	 *       in  this file, and  there is no  way that some kernel
@@ -176,13 +178,12 @@ readdir_lock_acquire(void *h_data) {
 	 *       (You  can only invoke syscalls _after_ having unwound
 	 *       any preceding system call)
 	 *
-	 * -> The  only  way that  a system  call can  invoke some  other system
-	 *    call is by sending an RPC to itself, and using `syscall_emulate()'
-	 *    alongside  the   register  state   given  to   the  RPC   handler.
-	 *    And  in  this  scenario,  the  RPC  delivery  mechanism  will have
-	 *    already  unwound our  stack, at  which we'd  have already released
-	 *    the readdir lock, so no dead-lock is possible.
-	 */
+	 * -> The  only way one system call can invoke another system call,
+	 *    is by sending an RPC to itself, and using `syscall_emulate()'
+	 *    alongside the register state given to the RPC handler. And in
+	 *    this scenario, the RPC  delivery mechanism will have  already
+	 *    unwound our stack,  at which we'd  have already released  the
+	 *    readdir lock, so no dead-lock is possible. */
 	for (;;) {
 		if ((ATOMIC_FETCHOR(readdir_lockbits[word], mask) & mask) == 0)
 			break;
@@ -191,6 +192,7 @@ readdir_lock_acquire(void *h_data) {
 			task_disconnectall();
 			break;
 		}
+		/* Wait for the lock bit to become available. */
 		task_waitfor();
 	}
 }
@@ -221,7 +223,7 @@ struct readdir_buffer {
 PRIVATE NONNULL((1)) void KCALL
 readdir_buffer_init(struct readdir_buffer *__restrict self, fd_t fd) {
 	/* Lookup the given file and set-up the initial, static buffer. */
-	self->rb_file   = handles_lookup(fd);
+	handles_lookup(fd, &self->rb_file);
 	self->rb_buflen = sizeof(self->rb_sbuf);
 	self->rb_buf    = (struct dirent *)self->rb_sbuf;
 	/* Acquire the readdir lock for the file's backing object. */
@@ -238,6 +240,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL readdir_buffer_fini)(struct readdir_buffer *__restrict self) {
 	/* Release the readdir lock for the file's backing object. */
 	readdir_lock_release(self->rb_file.h_data);
+
 	/* Free a potentially dynamic-allocated intermediate buffer. */
 	if (self->rb_buf != (struct dirent *)self->rb_sbuf)
 		kfree(self->rb_buf);
@@ -327,7 +330,7 @@ DEFINE_SYSCALL2(syscall_slong_t, readdir, fd_t, fd,
 	 * WARNING: This copy has no buffer  bounds, and there is no  way
 	 *          for user-space to limit how much data is copied here.
 	 *          Furthermore, on KOS  the max  *possible* name  length
-	 *          copied here is 65535! */
+	 *          copied here is 65535 (2^16)! */
 	memcpy(buf->d_name, ent->d_name,
 	       ent->d_namlen + 1,
 	       sizeof(char));
@@ -367,7 +370,7 @@ DEFINE_COMPAT_SYSCALL2(syscall_slong_t, readdir, fd_t, fd,
 	 * WARNING: This copy has no buffer  bounds, and there is no  way
 	 *          for user-space to limit how much data is copied here.
 	 *          Furthermore, on KOS  the max  *possible* name  length
-	 *          copied here is 65535! */
+	 *          copied here is 65535 (2^16)! */
 	memcpy(buf->d_name, ent->d_name,
 	       ent->d_namlen + 1,
 	       sizeof(char));

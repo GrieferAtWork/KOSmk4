@@ -1146,7 +1146,49 @@ DEFINE_INTERN_ALIAS(libd_gsignal, libd_raise);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x22591e1b]]]*/
+/* Currently free range of real-time signals. */
+PRIVATE ATTR_SECTION(".data.crt.sched.signal")
+signo_t libc_free_sigrtmin = __SIGRTMIN;
+PRIVATE ATTR_SECTION(".data.crt.sched.signal")
+signo_t libc_free_sigrtmax = __SIGRTMAX;
+
+/*[[[head:libc___libc_allocate_rtsig,hash:CRC-32=0x822ca9f4]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.signal") WUNUSED signo_t
+NOTHROW_NCX(LIBCCALL libc___libc_allocate_rtsig)(int high)
+/*[[[body:libc___libc_allocate_rtsig]]]*/
+{
+	if (!(libc_free_sigrtmin <= libc_free_sigrtmax))
+		return -1; /* All allocated :( */
+	if (high) {
+		/* You'd think `high != 0' allocated from the top, but it doesn't... */
+		return libc_free_sigrtmin++;
+	}
+	return libc_free_sigrtmax++;
+}
+/*[[[end:libc___libc_allocate_rtsig]]]*/
+
+/*[[[head:libc___libc_current_sigrtmin,hash:CRC-32=0x81e51c4a]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED signo_t
+NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmin)(void)
+/*[[[body:libc___libc_current_sigrtmin]]]*/
+{
+	return libc_free_sigrtmin;
+}
+/*[[[end:libc___libc_current_sigrtmin]]]*/
+
+/*[[[head:libc___libc_current_sigrtmax,hash:CRC-32=0x4de86745]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED signo_t
+NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmax)(void)
+/*[[[body:libc___libc_current_sigrtmax]]]*/
+{
+	return libc_free_sigrtmax;
+}
+/*[[[end:libc___libc_current_sigrtmax]]]*/
+
+
+
+
+/*[[[start:exports,hash:CRC-32=0xf86ffb2d]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$raise, libd_raise);
 DEFINE_PUBLIC_ALIAS(raise, libc_raise);
 DEFINE_PUBLIC_ALIAS(DOS$__sysv_signal, libd_sysv_signal);
@@ -1197,6 +1239,12 @@ DEFINE_PUBLIC_ALIAS(sigqueueinfo, libc_sigqueueinfo);
 DEFINE_PUBLIC_ALIAS(tgsigqueueinfo, libc_tgsigqueueinfo);
 DEFINE_PUBLIC_ALIAS(siginterrupt, libc_siginterrupt);
 DEFINE_PUBLIC_ALIAS(sigaltstack, libc_sigaltstack);
+DEFINE_PUBLIC_ALIAS(__libc_allocate_rtsig_private, libc___libc_allocate_rtsig);
+DEFINE_PUBLIC_ALIAS(__libc_allocate_rtsig, libc___libc_allocate_rtsig);
+DEFINE_PUBLIC_ALIAS(__libc_current_sigrtmin_private, libc___libc_current_sigrtmin);
+DEFINE_PUBLIC_ALIAS(__libc_current_sigrtmin, libc___libc_current_sigrtmin);
+DEFINE_PUBLIC_ALIAS(__libc_current_sigrtmax_private, libc___libc_current_sigrtmax);
+DEFINE_PUBLIC_ALIAS(__libc_current_sigrtmax, libc___libc_current_sigrtmax);
 DEFINE_PUBLIC_ALIAS(thr_kill, libc_pthread_kill);
 DEFINE_PUBLIC_ALIAS(pthread_kill, libc_pthread_kill);
 DEFINE_PUBLIC_ALIAS(pthread_sigqueue, libc_pthread_sigqueue);

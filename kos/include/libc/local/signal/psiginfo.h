@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc36a3e86 */
+/* HASH CRC-32:0x949f4c00 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,48 +26,6 @@
 #if defined(__LOCAL_stderr) && (defined(__CRT_HAVE_fprintf) || defined(__CRT_HAVE__IO_fprintf) || defined(__CRT_HAVE_fprintf_s) || defined(__CRT_HAVE_fprintf_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock))
 #include <bits/os/siginfo.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep___libc_current_sigrtmax_defined
-#define __local___localdep___libc_current_sigrtmax_defined
-#ifdef __CRT_HAVE___libc_current_sigrtmax
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,__localdep___libc_current_sigrtmax,(void),__libc_current_sigrtmax,())
-#else /* __CRT_HAVE___libc_current_sigrtmax */
-__NAMESPACE_LOCAL_END
-#include <asm/os/signal.h>
-__NAMESPACE_LOCAL_BEGIN
-#ifdef __SIGRTMAX
-__NAMESPACE_LOCAL_END
-#include <libc/local/signal/__libc_current_sigrtmax.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep___libc_current_sigrtmax __LIBC_LOCAL_NAME(__libc_current_sigrtmax)
-#else /* __SIGRTMAX */
-#undef __local___localdep___libc_current_sigrtmax_defined
-#endif /* !__SIGRTMAX */
-#endif /* !__CRT_HAVE___libc_current_sigrtmax */
-#endif /* !__local___localdep___libc_current_sigrtmax_defined */
-#ifndef __local___localdep___libc_current_sigrtmin_defined
-#define __local___localdep___libc_current_sigrtmin_defined
-#ifdef __CRT_HAVE___libc_current_sigrtmin
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,__localdep___libc_current_sigrtmin,(void),__libc_current_sigrtmin,())
-#else /* __CRT_HAVE___libc_current_sigrtmin */
-__NAMESPACE_LOCAL_END
-#include <asm/os/signal.h>
-__NAMESPACE_LOCAL_BEGIN
-#ifdef __SIGRTMIN
-__NAMESPACE_LOCAL_END
-#include <libc/local/signal/__libc_current_sigrtmin.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep___libc_current_sigrtmin __LIBC_LOCAL_NAME(__libc_current_sigrtmin)
-#else /* __SIGRTMIN */
-#undef __local___localdep___libc_current_sigrtmin_defined
-#endif /* !__SIGRTMIN */
-#endif /* !__CRT_HAVE___libc_current_sigrtmin */
-#endif /* !__local___localdep___libc_current_sigrtmin_defined */
 #ifndef __local___localdep_fprintf_defined
 #define __local___localdep_fprintf_defined
 #if __has_builtin(__builtin_fprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fprintf) && __has_builtin(__builtin_va_arg_pack)
@@ -140,6 +98,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strsigcode_s */
 #endif /* !__local___localdep_strsigcode_s_defined */
 __NAMESPACE_LOCAL_END
+#include <asm/os/signal.h>
 #include <bits/crt/inttypes.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -151,17 +110,17 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(psiginfo))(struct __siginfo_struct co
 		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "%s: ", __s);
 	if (__text) {
 		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "SIG%s (", __text);
-#if (defined(__CRT_HAVE___libc_current_sigrtmin) || defined(__SIGRTMIN)) && (defined(__CRT_HAVE___libc_current_sigrtmax) || defined(__SIGRTMAX))
-	} else if (__pinfo->si_signo >= (__NAMESPACE_LOCAL_SYM __localdep___libc_current_sigrtmin)() &&
-	           __pinfo->si_signo <= (__NAMESPACE_LOCAL_SYM __localdep___libc_current_sigrtmax)()) {
+#if defined(__SIGRTMIN) && defined(__SIGRTMAX)
+	} else if (__pinfo->si_signo >= __SIGRTMIN &&
+	           __pinfo->si_signo <= __SIGRTMAX) {
 		unsigned int __offset;
-		__offset = (unsigned int)(__pinfo->si_signo - (__NAMESPACE_LOCAL_SYM __localdep___libc_current_sigrtmin)());
+		__offset = (unsigned int)(__pinfo->si_signo - __SIGRTMIN);
 		if (__offset != 0) {
 			(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "SIGRTMIN+%u (", __offset);
 		} else {
 			(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "SIGRTMIN (");
 		}
-#endif /* (__CRT_HAVE___libc_current_sigrtmin || __SIGRTMIN) && (__CRT_HAVE___libc_current_sigrtmax || __SIGRTMAX) */
+#endif /* __SIGRTMIN && __SIGRTMAX */
 	} else {
 		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "Unknown signal %d (", __pinfo->si_signo);
 	}

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46bd4510 */
+/* HASH CRC-32:0x2a0bd546 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,6 +77,7 @@
 #define __CRT_HAVE_DOS$__iswcsymf
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$__libc_allocate_rtsig
 #define __CRT_HAVE_DOS$__locale_ctype_ptr_l
 #define __CRT_HAVE_DOS$__lock_fhandle
 #define __CRT_HAVE_DOS$__memcpy_chk
@@ -3682,6 +3683,7 @@
 #define __CRT_HAVE___issignalingl
 #define __CRT_HAVE___iswcsym
 #define __CRT_HAVE___iswcsymf
+#define __CRT_HAVE___libc_allocate_rtsig
 #define __CRT_HAVE___libc_current_sigrtmax
 #define __CRT_HAVE___libc_current_sigrtmin
 #define __CRT_HAVE___locale_ctype_ptr

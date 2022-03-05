@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e91a864 */
+/* HASH CRC-32:0xe9599ca7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -313,17 +313,17 @@ NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
 		libc_fprintf(stderr, "%s: ", s);
 	if (text) {
 		libc_fprintf(stderr, "SIG%s (", text);
-#if (defined(__CRT_HAVE___libc_current_sigrtmin) || defined(__SIGRTMIN)) && (defined(__CRT_HAVE___libc_current_sigrtmax) || defined(__SIGRTMAX))
-	} else if (pinfo->si_signo >= libc___libc_current_sigrtmin() &&
-	           pinfo->si_signo <= libc___libc_current_sigrtmax()) {
+#if defined(__SIGRTMIN) && defined(__SIGRTMAX)
+	} else if (pinfo->si_signo >= __SIGRTMIN &&
+	           pinfo->si_signo <= __SIGRTMAX) {
 		unsigned int offset;
-		offset = (unsigned int)(pinfo->si_signo - libc___libc_current_sigrtmin());
+		offset = (unsigned int)(pinfo->si_signo - __SIGRTMIN);
 		if (offset != 0) {
 			libc_fprintf(stderr, "SIGRTMIN+%u (", offset);
 		} else {
 			libc_fprintf(stderr, "SIGRTMIN (");
 		}
-#endif /* (__CRT_HAVE___libc_current_sigrtmin || __SIGRTMIN) && (__CRT_HAVE___libc_current_sigrtmax || __SIGRTMAX) */
+#endif /* __SIGRTMIN && __SIGRTMAX */
 	} else {
 		libc_fprintf(stderr, "Unknown signal %d (", pinfo->si_signo);
 	}
@@ -925,14 +925,6 @@ err_inval:
 err:
 	return (sighandler_t)__SIG_ERR;
 }
-INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED signo_t
-NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmin)(void) {
-	return __SIGRTMIN;
-}
-INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED signo_t
-NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmax)(void) {
-	return __SIGRTMAX;
-}
 /* >> signalnumber(3)
  * Similar to `strtosigno(3)', however ignore any leading `SIG*'
  * prefix of `name', and  do a case-insensitive compare  between
@@ -965,10 +957,6 @@ NOTHROW_NCX(LIBCCALL libc_signalnext)(signo_t signo) {
 	return signo + 1;
 }
 #endif /* !__KERNEL__ */
-#undef __libc_current_sigrtmin
-#undef __libc_current_sigrtmax
-#undef libc___libc_current_sigrtmin
-#undef libc___libc_current_sigrtmax
 
 DECL_END
 
@@ -1011,8 +999,6 @@ DEFINE_PUBLIC_ALIAS(sighold, libc_sighold);
 DEFINE_PUBLIC_ALIAS(sigrelse, libc_sigrelse);
 DEFINE_PUBLIC_ALIAS(sigignore, libc_sigignore);
 DEFINE_PUBLIC_ALIAS(sigset, libc_sigset);
-DEFINE_PUBLIC_ALIAS(__libc_current_sigrtmin, libc___libc_current_sigrtmin);
-DEFINE_PUBLIC_ALIAS(__libc_current_sigrtmax, libc___libc_current_sigrtmax);
 DEFINE_PUBLIC_ALIAS(signalnumber, libc_signalnumber);
 DEFINE_PUBLIC_ALIAS(signalnext, libc_signalnext);
 #endif /* !__KERNEL__ */

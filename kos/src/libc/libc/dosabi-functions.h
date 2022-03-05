@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce08470c */
+/* HASH CRC-32:0xc75690fa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1232,6 +1232,7 @@ DFUN(".text.crt.dos.sched.signal", libd_sighold, libc_sighold, TD, 1, TIn(__SIZE
 DFUN(".text.crt.dos.sched.signal", libd_sigrelse, libc_sigrelse, TD, 1, TIn(__SIZEOF_SIGNO_T__))
 DFUN(".text.crt.dos.sched.signal", libd_sigignore, libc_sigignore, TD, 1, TIn(__SIZEOF_SIGNO_T__))
 DFUN(".text.crt.dos.sched.signal", libd_sigset, libc_sigset, TP, 2, TIn(__SIZEOF_SIGNO_T__), TP)
+DFUN(".text.crt.dos.sched.signal", libd___libc_allocate_rtsig, libc___libc_allocate_rtsig, TIn(__SIZEOF_SIGNO_T__), 1, TD)
 DFUN(".text.crt.dos.sched.signal", libd_pthread_kill, libc_pthread_kill, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_PTHREAD_T), TIn(__SIZEOF_SIGNO_T__))
 DFUN(".text.crt.dos.sched.signal", libd_pthread_sigqueue, libc_pthread_sigqueue, TIn(__SIZEOF_ERRNO_T__), 3, TIn(__SIZEOF_PTHREAD_T), TIn(__SIZEOF_SIGNO_T__), TS(__SIZEOF_SIGVAL CONST))
 DFUN(".text.crt.dos.sched.signal", libd_signalnumber, libc_signalnumber, TIn(__SIZEOF_SIGNO_T__), 1, TP)

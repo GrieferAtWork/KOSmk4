@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c522474 */
+/* HASH CRC-32:0xe6ea3279 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2295,12 +2295,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sigset, __FORCELOCAL __ATTR_ARTIFICIAL __sighand
 
 #ifdef __CRT_HAVE___libc_current_sigrtmin
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,__libc_current_sigrtmin,(void),())
+#elif defined(__CRT_HAVE___libc_current_sigrtmin_private)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,__libc_current_sigrtmin,(void),__libc_current_sigrtmin_private,())
 #elif defined(__SIGRTMIN)
 #include <libc/local/signal/__libc_current_sigrtmin.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmin, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __signo_t __NOTHROW_NCX(__LIBCCALL __libc_current_sigrtmin)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__libc_current_sigrtmin))(); })
 #endif /* ... */
 #ifdef __CRT_HAVE___libc_current_sigrtmax
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,__libc_current_sigrtmax,(void),())
+#elif defined(__CRT_HAVE___libc_current_sigrtmax_private)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,__libc_current_sigrtmax,(void),__libc_current_sigrtmax_private,())
 #elif defined(__SIGRTMAX)
 #include <libc/local/signal/__libc_current_sigrtmax.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmax, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __signo_t __NOTHROW_NCX(__LIBCCALL __libc_current_sigrtmax)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__libc_current_sigrtmax))(); })

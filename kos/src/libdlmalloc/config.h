@@ -238,6 +238,7 @@ DEFINE_DL_EXPORT_ALIAS(mallinfo, dlmallinfo);
 DEFINE_DL_EXPORT_ALIAS(independent_calloc, dlindependent_calloc);
 DEFINE_DL_EXPORT_ALIAS(independent_comalloc, dlindependent_comalloc);
 DEFINE_DL_EXPORT_ALIAS(bulk_free, dlbulk_free);
+DEFINE_DL_EXPORT_ALIAS(__libc_pvalloc, dlpvalloc);
 DEFINE_DL_EXPORT_ALIAS(pvalloc, dlpvalloc);
 DEFINE_DL_EXPORT_ALIAS(malloc_trim, dlmalloc_trim);
 DEFINE_DL_EXPORT_ALIAS(malloc_usable_size, dlmalloc_usable_size);

@@ -42,7 +42,7 @@
 #undef __assertf          /* Assert + printf-like message */
 #undef __assert_assume    /* Assert + assume */
 #undef __assert_assumef   /* Assert + assume + printf-like message */
-#undef __assert_noreturn  /* Same as `assert', but noreturn when condition fails */
+#undef __assert_noreturn  /* Same as `assert', but noreturn when condition fails (same as `assert()' when assertion checks ("retry" / "ignore") aren't supported) */
 #undef __assert_noreturnf /* Same as `__assertf', but noreturn when condition fails */
 #ifdef __USE_KOS
 #undef assertf          /* Alias for `__assertf' */
@@ -50,7 +50,7 @@
 #undef assert_assumef   /* Alias for `__assert_assumef' */
 #undef assert_noreturn  /* Alias for `__assert_noreturn' */
 #undef assert_noreturnf /* Alias for `__assert_noreturnf' */
-#undef assert_failed
+#undef assert_failed    /* Assertion failure with printf-like message: `assert_failed(char const *format, ...)' */
 #endif /* __USE_KOS */
 
 #ifdef __INTELLISENSE__

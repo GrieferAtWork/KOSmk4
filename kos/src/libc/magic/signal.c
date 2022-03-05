@@ -58,14 +58,6 @@
 
 %(auto_header){
 #include <pthread.h>
-#ifdef __SIGRTMIN
-#define __libc_current_sigrtmin()      __SIGRTMIN
-#define libc___libc_current_sigrtmin() __SIGRTMIN
-#endif /* __SIGRTMIN */
-#ifdef __SIGRTMAX
-#define __libc_current_sigrtmax()      __SIGRTMAX
-#define libc___libc_current_sigrtmax() __SIGRTMAX
-#endif /* __SIGRTMAX */
 }
 
 %(auto_source){
@@ -2003,6 +1995,7 @@ void psignal($signo_t signo, [[nullable]] char const *s) {
 @@>> psiginfo(3)
 @@Similar to `psignal(3)', but instead print extended signal information from `*pinfo'
 [[decl_include("<bits/os/siginfo.h>")]]
+[[impl_include("<asm/os/signal.h>")]]
 [[impl_include("<bits/crt/inttypes.h>")]]
 [[impl_include("<bits/types.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
@@ -2015,11 +2008,11 @@ void psiginfo([[nonnull]] siginfo_t const *pinfo,
 		fprintf(stderr, "%s: ", s);
 	if (text) {
 		fprintf(stderr, "SIG%s (", text);
-@@pp_if $has_function(__libc_current_sigrtmin) && $has_function(__libc_current_sigrtmax)@@
-	} else if (pinfo->@si_signo@ >= __libc_current_sigrtmin() &&
-	           pinfo->@si_signo@ <= __libc_current_sigrtmax()) {
+@@pp_if defined(__SIGRTMIN) && defined(__SIGRTMAX)@@
+	} else if (pinfo->@si_signo@ >= __SIGRTMIN &&
+	           pinfo->@si_signo@ <= __SIGRTMAX) {
 		unsigned int offset;
-		offset = (unsigned int)(pinfo->@si_signo@ - __libc_current_sigrtmin());
+		offset = (unsigned int)(pinfo->@si_signo@ - __SIGRTMIN);
 		if (offset != 0) {
 			fprintf(stderr, "SIGRTMIN+%u (", offset);
 		} else {
@@ -2682,16 +2675,22 @@ err:
 %
 
 
+[[hidden, wunused, decl_include("<bits/types.h>")]]
+[[export_alias("__libc_allocate_rtsig_private")]]
+$signo_t __libc_allocate_rtsig(int high);
+
 [[const, wunused, decl_include("<bits/types.h>")]]
 [[requires_include("<asm/os/signal.h>")]]
-[[requires(defined(__SIGRTMIN))]]
+[[export_alias("__libc_current_sigrtmin_private")]]
+[[userimpl, requires(defined(__SIGRTMIN))]]
 $signo_t __libc_current_sigrtmin() {
 	return __SIGRTMIN;
 }
 
 [[const, wunused, decl_include("<bits/types.h>")]]
 [[requires_include("<asm/os/signal.h>")]]
-[[requires(defined(__SIGRTMAX))]]
+[[userimpl, requires(defined(__SIGRTMAX))]]
+[[export_alias("__libc_current_sigrtmax_private")]]
 $signo_t __libc_current_sigrtmax() {
 	return __SIGRTMAX;
 }
@@ -2840,11 +2839,4 @@ $signo_t signalnext($signo_t signo) {
 
 __SYSDECL_END
 
-}
-
-%(auto_source){
-#undef __libc_current_sigrtmin
-#undef __libc_current_sigrtmax
-#undef libc___libc_current_sigrtmin
-#undef libc___libc_current_sigrtmax
 }

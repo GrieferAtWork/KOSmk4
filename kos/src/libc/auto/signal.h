@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a05bbf3 */
+/* HASH CRC-32:0x72885aca */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,14 +30,6 @@
 DECL_BEGIN
 
 #include <pthread.h>
-#ifdef __SIGRTMIN
-#define __libc_current_sigrtmin()      __SIGRTMIN
-#define libc___libc_current_sigrtmin() __SIGRTMIN
-#endif /* __SIGRTMIN */
-#ifdef __SIGRTMAX
-#define __libc_current_sigrtmax()      __SIGRTMAX
-#define libc___libc_current_sigrtmax() __SIGRTMAX
-#endif /* __SIGRTMAX */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigblock(3)
  * Deprecated  method  of  SIG_BLOCK-ing  a  given  set  of
@@ -513,10 +505,9 @@ INTDEF sighandler_t NOTHROW_NCX(LIBDCALL libd_sigset)(signo_t signo, sighandler_
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
 INTDEF sighandler_t NOTHROW_NCX(LIBCCALL libc_sigset)(signo_t signo, sighandler_t disp);
-INTDEF ATTR_CONST WUNUSED signo_t NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmin)(void);
-INTDEF ATTR_CONST WUNUSED signo_t NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmax)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF WUNUSED signo_t NOTHROW_NCX(LIBDCALL libd___libc_allocate_rtsig)(int high);
 /* >> pthread_kill(3)
  * Portable function for sending a signal to a specific `pthread' within one's own process.
  * @return: EOK:    Success

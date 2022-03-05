@@ -638,6 +638,8 @@
 #define __CRT_HAVE___libc_acct
 #define __CRT_HAVE___libc_adjtimex
 #define __CRT_HAVE___libc_alarm
+#define __CRT_HAVE___libc_allocate_rtsig
+#define __CRT_HAVE___libc_allocate_rtsig_private
 #define __CRT_HAVE___libc_calloc
 #define __CRT_HAVE___libc_chdir
 #define __CRT_HAVE___libc_chmod
@@ -647,7 +649,12 @@
 #define __CRT_HAVE___libc_closedir
 #define __CRT_HAVE___libc_creat
 #define __CRT_HAVE___libc_current_sigrtmax
+#define __CRT_HAVE___libc_current_sigrtmax_private
 #define __CRT_HAVE___libc_current_sigrtmin
+#define __CRT_HAVE___libc_current_sigrtmin_private
+#define __CRT_HAVE___libc_dlclose
+#define __CRT_HAVE___libc_dlopen_mode
+#define __CRT_HAVE___libc_dlsym
 #define __CRT_HAVE___libc_dup
 #define __CRT_HAVE___libc_dup2
 #define __CRT_HAVE___libc_execve
@@ -702,6 +709,7 @@
 #define __CRT_HAVE___libc_opendir
 #define __CRT_HAVE___libc_pause
 #define __CRT_HAVE___libc_pipe
+#define __CRT_HAVE___libc_pvalloc
 #define __CRT_HAVE___libc_read
 #define __CRT_HAVE___libc_readdir
 #define __CRT_HAVE___libc_readdir_r
@@ -5679,6 +5687,8 @@
 #define __CRT_HAVE_KOS$__libc_acct
 #define __CRT_HAVE_KOS$__libc_adjtimex
 #define __CRT_HAVE_KOS$__libc_alarm
+#define __CRT_HAVE_KOS$__libc_allocate_rtsig
+#define __CRT_HAVE_KOS$__libc_allocate_rtsig_private
 #define __CRT_HAVE_KOS$__libc_calloc
 #define __CRT_HAVE_KOS$__libc_chdir
 #define __CRT_HAVE_KOS$__libc_chmod
@@ -9691,6 +9701,8 @@
 #define __CRT_HAVE_DOS$__libc_acct
 #define __CRT_HAVE_DOS$__libc_adjtimex
 #define __CRT_HAVE_DOS$__libc_alarm
+#define __CRT_HAVE_DOS$__libc_allocate_rtsig
+#define __CRT_HAVE_DOS$__libc_allocate_rtsig_private
 #define __CRT_HAVE_DOS$__libc_calloc
 #define __CRT_HAVE_DOS$__libc_chdir
 #define __CRT_HAVE_DOS$__libc_chmod

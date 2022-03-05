@@ -26,6 +26,8 @@
 
 #include <hybrid/atomic.h>
 
+#include <kos/exec/ifunc.h>
+
 #include <dlfcn.h>
 #include <stdlib.h>
 
@@ -34,19 +36,19 @@
 DECL_BEGIN
 
 #ifdef HAVE_LAZY_LIBDL_RELOCATIONS
-#define DEFINE_LAZY_LIBDL_RELOCATION(section, Ptype, name)                      \
-	PRIVATE ATTR_SECTION(".bss" section) Ptype pdyn_##name           = NULL;    \
-	PRIVATE ATTR_SECTION(".rodata" section) char const name_##name[] = #name;   \
-	INTERN ATTR_SECTION(".text" section)                                        \
-	ATTR_RETNONNULL WUNUSED Ptype NOTHROW_NCX(LIBCCALL libc_get_##name)(void) { \
-		if (!pdyn_##name) {                                                     \
-			Ptype pfun;                                                         \
-			*(void **)&pfun = dlsym(RTLD_DEFAULT, name_##name);                 \
-			if unlikely(!pfun)                                                  \
-				abort();                                                        \
-			ATOMIC_WRITE(pdyn_##name, pfun);                                    \
-		}                                                                       \
-		return pdyn_##name;                                                     \
+#define DEFINE_LAZY_LIBDL_RELOCATION(section, Ptype, name)                    \
+	PRIVATE ATTR_SECTION(".bss" section) Ptype pdyn_##name           = NULL;  \
+	PRIVATE ATTR_SECTION(".rodata" section) char const name_##name[] = #name; \
+	INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text" section)   \
+	Ptype NOTHROW_NCX(LIBCCALL libc_get_##name)(void) {                       \
+		if (!pdyn_##name) {                                                   \
+			Ptype pfun;                                                       \
+			*(void **)&pfun = dlsym(RTLD_DEFAULT, name_##name);               \
+			if unlikely(!pfun)                                                \
+				abort();                                                      \
+			ATOMIC_WRITE(pdyn_##name, pfun);                                  \
+		}                                                                     \
+		return pdyn_##name;                                                   \
 	}
 DEFINE_LAZY_LIBDL_RELOCATION(LIBC_DLOPEN_SECTION, PDLOPEN, dlopen)
 DEFINE_LAZY_LIBDL_RELOCATION(LIBC_DLCLOSE_SECTION, PDLCLOSE, dlclose)
@@ -67,6 +69,29 @@ DEFINE_LAZY_LIBDL_RELOCATION(LIBC_DLTLSFREE_SECTION, PDLTLSFREE, dltlsfree)
 DEFINE_LAZY_LIBDL_RELOCATION(LIBC_DLADDR_SECTION, PDLADDR, dladdr)
 #undef DEFINE_LAZY_LIBDL_RELOCATION
 #endif /* HAVE_LAZY_LIBDL_RELOCATIONS */
+
+
+
+
+
+
+/************************************************************************/
+/* __libc_dl*(3) (libc-exported aliases for libdl functions)            */
+/************************************************************************/
+DEFINE_PUBLIC_IFUNC(__libc_dlclose, libc_get_dlclose);
+DEFINE_PUBLIC_IFUNC(__libc_dlopen_mode, libc_get_dlopen);
+DEFINE_PUBLIC_IFUNC(__libc_dlsym, libc_get_dlsym);
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.glibc") PDLSYM
+NOTHROW_NCX(LIBCCALL libc_get_dlsym)(void) {
+	/* `dlsym(3)' is special, in that we obviously can't do `dlsym(RTLD_DEFAULT, "dlsym")'
+	 * in  order to load its address, so instead it's one of the very few relocations that
+	 * our libc is allowed to have. -- This getter function for it only needs to exist  so
+	 * we have a way by which to export `__libc_dlsym()' (here, we do so by binding it  as
+	 * an  IFUNC that resolves to the actual libdl address at runtime, meaning that in the
+	 * end, `dlsym(libc, "__libc_dlsym") == dlsym(libdl, "libdl")') */
+	return &dlsym;
+}
+
 
 DECL_END
 

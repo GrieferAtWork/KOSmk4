@@ -118,25 +118,26 @@ typedef WUNUSED void * /*NOTHROW*/ (__DLFCN_CC *PDLTLSALLOC)(size_t num_bytes, s
                                                              void *perthread_callback_arg);
 typedef NONNULL((1)) int (__DLFCN_CC *PDLTLSFREE)(void *tls_handle) /*THROWS(...)*/;
 typedef NONNULL((2)) int /*NOTHROW_NCX*/(__DLFCN_CC *PDLADDR)(void const *address, Dl_info *info);
+typedef WUNUSED NONNULL((2)) void * /*NOTHROW_NCX*/(__DLFCN_CC *PDLSYM)(void *handle, char const *symbol_name);
 
-
-INTDEF ATTR_RETNONNULL WUNUSED PDLOPEN NOTHROW_NCX(LIBCCALL libc_get_dlopen)(void);
-INTDEF ATTR_RETNONNULL WUNUSED PDLCLOSE NOTHROW_NCX(LIBCCALL libc_get_dlclose)(void);
-INTDEF ATTR_RETNONNULL WUNUSED PDLTLSALLOCSEG NOTHROW_NCX(LIBCCALL libc_get_dltlsallocseg)(void);
-INTDEF ATTR_RETNONNULL WUNUSED PDLTLSFREESEG NOTHROW_NCX(LIBCCALL libc_get_dltlsfreeseg)(void);
-INTDEF ATTR_RETNONNULL WUNUSED PDLGETHANDLE NOTHROW_NCX(LIBCCALL libc_get_dlgethandle)(void);
-INTDEF ATTR_RETNONNULL WUNUSED PDLGETMODULE NOTHROW_NCX(LIBCCALL libc_get_dlgetmodule)(void);
-INTDEF ATTR_RETNONNULL WUNUSED PDLMODULEFD NOTHROW_NCX(LIBCCALL libc_get_dlmodulefd)(void);
-INTDEF ATTR_RETNONNULL WUNUSED PDLMODULENAME NOTHROW_NCX(LIBCCALL libc_get_dlmodulename)(void);
-INTDEF ATTR_RETNONNULL WUNUSED PDLAUXCTRL NOTHROW_NCX(LIBCCALL libc_get_dlauxctrl)(void);
-INTDEF ATTR_RETNONNULL WUNUSED PDLERROR NOTHROW_NCX(LIBCCALL libc_get_dlerror)(void);
-INTDEF ATTR_RETNONNULL WUNUSED PDLMODULEBASE NOTHROW_NCX(LIBCCALL libc_get_dlmodulebase)(void);
-INTDEF ATTR_RETNONNULL WUNUSED PDLEXCEPTAWARE NOTHROW_NCX(LIBCCALL libc_get_dlexceptaware)(void);
-INTDEF ATTR_RETNONNULL WUNUSED PDLTLSADDR NOTHROW_NCX(LIBCCALL libc_get_dltlsaddr)(void);
-INTDEF ATTR_RETNONNULL WUNUSED PDLTLSADDR2 NOTHROW_NCX(LIBCCALL libc_get_dltlsaddr2)(void);
-INTDEF ATTR_RETNONNULL WUNUSED PDLTLSALLOC NOTHROW_NCX(LIBCCALL libc_get_dltlsalloc)(void);
-INTDEF ATTR_RETNONNULL WUNUSED PDLTLSFREE NOTHROW_NCX(LIBCCALL libc_get_dltlsfree)(void);
-INTDEF ATTR_RETNONNULL WUNUSED PDLADDR NOTHROW_NCX(LIBCCALL libc_get_dladdr)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLOPEN NOTHROW_NCX(LIBCCALL libc_get_dlopen)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLCLOSE NOTHROW_NCX(LIBCCALL libc_get_dlclose)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLTLSALLOCSEG NOTHROW_NCX(LIBCCALL libc_get_dltlsallocseg)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLTLSFREESEG NOTHROW_NCX(LIBCCALL libc_get_dltlsfreeseg)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLGETHANDLE NOTHROW_NCX(LIBCCALL libc_get_dlgethandle)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLGETMODULE NOTHROW_NCX(LIBCCALL libc_get_dlgetmodule)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLMODULEFD NOTHROW_NCX(LIBCCALL libc_get_dlmodulefd)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLMODULENAME NOTHROW_NCX(LIBCCALL libc_get_dlmodulename)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLAUXCTRL NOTHROW_NCX(LIBCCALL libc_get_dlauxctrl)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLERROR NOTHROW_NCX(LIBCCALL libc_get_dlerror)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLMODULEBASE NOTHROW_NCX(LIBCCALL libc_get_dlmodulebase)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLEXCEPTAWARE NOTHROW_NCX(LIBCCALL libc_get_dlexceptaware)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLTLSADDR NOTHROW_NCX(LIBCCALL libc_get_dltlsaddr)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLTLSADDR2 NOTHROW_NCX(LIBCCALL libc_get_dltlsaddr2)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLTLSALLOC NOTHROW_NCX(LIBCCALL libc_get_dltlsalloc)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLTLSFREE NOTHROW_NCX(LIBCCALL libc_get_dltlsfree)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLADDR NOTHROW_NCX(LIBCCALL libc_get_dladdr)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLSYM NOTHROW_NCX(LIBCCALL libc_get_dlsym)(void); /* Only here as export for `__libc_dlsym(3)' */
 
 #define dlopen(filename, mode)              (*libc_get_dlopen())(filename, mode)
 #define dlclose(handle)                     (*libc_get_dlclose())(handle)
@@ -155,6 +156,9 @@ INTDEF ATTR_RETNONNULL WUNUSED PDLADDR NOTHROW_NCX(LIBCCALL libc_get_dladdr)(voi
 #define dltlsalloc(...)                     (*libc_get_dltlsalloc())(__VA_ARGS__)
 #define dltlsfree(tls_handle)               (*libc_get_dltlsfree())(tls_handle)
 #define dladdr(address, info)               (*libc_get_dladdr())(address, info)
+#if 0 /* Don't do this. -- `dlsym(3)' is one of the few symbol we're allowed to have relocations against! */
+#define dlsym(handle, symbol_name)          (*libc_get_dlsym())(handle, symbol_name)
+#endif
 #endif /* HAVE_LAZY_LIBDL_RELOCATIONS */
 
 #endif /* __CC__ */
