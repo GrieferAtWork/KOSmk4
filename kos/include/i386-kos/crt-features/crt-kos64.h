@@ -1106,6 +1106,7 @@
 #define __CRT_HAVE___strxfrm_l
 #define __CRT_HAVE___swapoff
 #define __CRT_HAVE___swapon
+#define __CRT_HAVE___swbuf
 #define __CRT_HAVE___swprintf_l
 #define __CRT_HAVE___symlink
 #define __CRT_HAVE___sync
@@ -6117,6 +6118,7 @@
 #define __CRT_HAVE_KOS$__strxfrm_l
 #define __CRT_HAVE_KOS$__swapoff
 #define __CRT_HAVE_KOS$__swapon
+#define __CRT_HAVE_KOS$__swbuf
 #define __CRT_HAVE_KOS$__swprintf_l
 #define __CRT_HAVE___sym_ntop
 #define __CRT_HAVE___sym_ntos
@@ -10131,6 +10133,7 @@
 #define __CRT_HAVE_DOS$__strxfrm_l
 #define __CRT_HAVE_DOS$__swapoff
 #define __CRT_HAVE_DOS$__swapon
+#define __CRT_HAVE_DOS$__swbuf
 #define __CRT_HAVE_DOS$__swprintf_l
 #define __CRT_HAVE_DOS$__sym_ntop
 #define __CRT_HAVE_DOS$__sym_ntos

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a0bd546 */
+/* HASH CRC-32:0x57c64768 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3848,6 +3848,9 @@
 #define __CRT_HAVE__byteswap_ushort
 #define __CRT_HAVE__c_exit
 #define __CRT_HAVE__calloc_dbg
+#define __CRT_HAVE__cchsh
+#define __CRT_HAVE__cchshf
+#define __CRT_HAVE__cchshl
 #define __CRT_HAVE__cexit
 #define __CRT_HAVE__chdrive
 #define __CRT_HAVE__chgsign
@@ -3857,6 +3860,9 @@
 #define __CRT_HAVE__controlfp
 #define __CRT_HAVE__controlfp_s
 #define __CRT_HAVE__create_locale
+#define __CRT_HAVE__ctans
+#define __CRT_HAVE__ctansf
+#define __CRT_HAVE__ctansl
 #define __CRT_HAVE__dpcomp
 #define __CRT_HAVE__dtest
 #define __CRT_HAVE__dupenv_s
@@ -3993,6 +3999,9 @@
 #define __CRT_HAVE__query_new_mode
 #define __CRT_HAVE__realloc_dbg
 #define __CRT_HAVE__recalloc_dbg
+#define __CRT_HAVE__redupi
+#define __CRT_HAVE__redupif
+#define __CRT_HAVE__redupil
 #define __CRT_HAVE__register_thread_local_exe_atexit_callback
 #define __CRT_HAVE__rmtmp
 #define __CRT_HAVE__rotl

@@ -231,6 +231,7 @@ incdir("");
 #include <bits/crt/_diskfree_t.h>
 #include <bits/crt/aiocb.h>
 #include <bits/crt/aioinit.h>
+#include <bits/crt/complex.h>
 #include <bits/crt/crypt_data.h>
 #include <bits/crt/ctype.h>
 #include <bits/crt/db/aliases.h>

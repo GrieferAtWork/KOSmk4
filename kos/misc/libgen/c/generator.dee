@@ -436,6 +436,7 @@ function math_replaceText(
 	for (;;) {
 		local repl;
 		local tok = self.next();
+do_handle_tok:
 		switch (tok) {
 
 		case "":
@@ -457,6 +458,35 @@ function math_replaceText(
 				self.tokEnd = headerEnd;
 			}
 			continue;
+
+		case "double":
+			if (mode != MATH_REPLACEMENT_MODE_LDBL)
+				break;
+			if (flushStart < self.tokStart)
+				fp << self.text[flushStart:self.tokStart];
+			flushStart = self.tokEnd;
+			tok = self.next();
+			if (tok != "_Complex") {
+				fp << math_replaceWord("double", mode);
+				goto do_handle_tok;
+			} else {
+				flushStart = self.tokEnd;
+				fp << "long double _Complex";
+				continue;
+			}
+			break;
+
+		case "__MAGIC_FLOAT_TYPE_IS_DOUBLE":
+			repl = "0";
+			goto do_insert_repl;
+
+		case "__MAGIC_FLOAT_TYPE_IS_FLOAT":
+			repl = { MATH_REPLACEMENT_MODE_FLOAT: "1", MATH_REPLACEMENT_MODE_LDBL: "0" }[mode];
+			goto do_insert_repl;
+
+		case "__MAGIC_FLOAT_TYPE_IS_LONG_DOUBLE":
+			repl = { MATH_REPLACEMENT_MODE_FLOAT: "0", MATH_REPLACEMENT_MODE_LDBL: "1" }[mode];
+			goto do_insert_repl;
 
 		default:
 			if (!tok.issymbol()) {

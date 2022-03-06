@@ -1207,11 +1207,9 @@ NOTHROW_NCX(DLFCN_CC libdl_dlinfo)(USER DlModule *self, int request,
 		*(char *)arg = '\0';
 	}	break;
 
-	case RTLD_DI_TLS_DATA: {
-		struct tls_segment *seg;
-		RD_TLS_BASE_REGISTER(*(void **)&seg);
-		*(void **)arg = libdl_dltlsaddr2_noinit(self, seg);
-	}	break;
+	case RTLD_DI_TLS_DATA:
+		*(void **)arg = DlModule_TryGetTLSAddr(self);
+		break;
 
 	default:
 		return dl_seterrorf("dlinfo: unknown request: %d", request);
@@ -3050,7 +3048,7 @@ DlModule_IteratePhdr(DlModule *__restrict self,
 	info.dlpi_name      = self->dm_filename;
 	info.dlpi_adds      = 0; /* ??? */
 	info.dlpi_subs      = 0; /* ??? */
-	info.dlpi_tls_modid = (size_t)(uintptr_t)self;
+	info.dlpi_tls_modid = self->dm_tlsmsize ? (size_t)(uintptr_t)self : 0;
 	info.dlpi_tls_data  = DlModule_TryGetTLSAddr(self);
 	if likely(!self->dm_ops) {
 		info.dlpi_phdr  = self->dm_elf.de_phdr;

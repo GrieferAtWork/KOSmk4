@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63db4f58 */
+/* HASH CRC-32:0x5e05d3f5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_putw_unlocked_defined
 #include <__crt.h>
 #include <features.h>
-#if (defined(__CRT_HAVE_putw_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_putw) || defined(__CRT_HAVE__putw) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
+#if (defined(__CRT_HAVE_putw_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_putw) || defined(__CRT_HAVE__putw) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fwrite_unlocked_defined
@@ -73,7 +73,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_putw_unlocked_defined
 #define __localdep_putw_unlocked __LIBC_LOCAL_NAME(putw_unlocked)
 #endif /* !__local___localdep_putw_unlocked_defined */
-#else /* (__CRT_HAVE_putw_unlocked && __USE_STDIO_UNLOCKED) || __CRT_HAVE_putw || __CRT_HAVE__putw || __CRT_HAVE_fputc || __CRT_HAVE_putc || __CRT_HAVE__IO_putc || __CRT_HAVE_fputc_unlocked || __CRT_HAVE_putc_unlocked || (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock */
+#else /* (__CRT_HAVE_putw_unlocked && __USE_STDIO_UNLOCKED) || __CRT_HAVE_putw || __CRT_HAVE__putw || __CRT_HAVE_fputc || __CRT_HAVE_putc || __CRT_HAVE__IO_putc || __CRT_HAVE_fputc_unlocked || __CRT_HAVE_putc_unlocked || (__CRT_DOS && (__CRT_HAVE__flsbuf || __CRT_HAVE___swbuf)) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock */
 #undef __local_putw_unlocked_defined
-#endif /* (!__CRT_HAVE_putw_unlocked || !__USE_STDIO_UNLOCKED) && !__CRT_HAVE_putw && !__CRT_HAVE__putw && !__CRT_HAVE_fputc && !__CRT_HAVE_putc && !__CRT_HAVE__IO_putc && !__CRT_HAVE_fputc_unlocked && !__CRT_HAVE_putc_unlocked && (!__CRT_DOS || !__CRT_HAVE__flsbuf) && !__CRT_HAVE_fwrite && !__CRT_HAVE__IO_fwrite && !__CRT_HAVE_fwrite_s && !__CRT_HAVE_fwrite_unlocked && !__CRT_HAVE__fwrite_nolock */
+#endif /* (!__CRT_HAVE_putw_unlocked || !__USE_STDIO_UNLOCKED) && !__CRT_HAVE_putw && !__CRT_HAVE__putw && !__CRT_HAVE_fputc && !__CRT_HAVE_putc && !__CRT_HAVE__IO_putc && !__CRT_HAVE_fputc_unlocked && !__CRT_HAVE_putc_unlocked && (!__CRT_DOS || (!__CRT_HAVE__flsbuf && !__CRT_HAVE___swbuf)) && !__CRT_HAVE_fwrite && !__CRT_HAVE__IO_fwrite && !__CRT_HAVE_fwrite_s && !__CRT_HAVE_fwrite_unlocked && !__CRT_HAVE__fwrite_nolock */
 #endif /* !__local_putw_unlocked_defined */

@@ -1766,6 +1766,7 @@ __LONGLONG llroundl(__LONGDOUBLE x) %{generate(double2ldouble("llround"))}
 
 
 
+%[define_double_replacement(sincos = sincosf, sincosl)]
 
 %
 %#ifdef __USE_GNU

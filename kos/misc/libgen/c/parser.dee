@@ -311,6 +311,12 @@ done:
 				/* Integer constant / float */
 				while (i < end && (text.issymcont(i) || text[i] in "."))
 					++i;
+				if (i < end && text[i] in "-+" && text[i-1] in "eE" && "." in text[start:i]) {
+					/* Floating point exponent */
+					do {
+						++i;
+					} while (i < end && text.issymcont(i));
+				}
 				goto done;
 			}
 			if (i < end) {

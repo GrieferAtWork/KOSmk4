@@ -697,7 +697,8 @@ libdl_dltlsaddr2_noinit(DlModule *__restrict self,
 /* Similar to `libdl_dltlsaddr()', but do no lazy allocation
  * and return NULL if the module doesn't have a TLS segment. */
 INTDEF WUNUSED NONNULL((1)) void *
-NOTHROW(CC DlModule_TryGetTLSAddr)(DlModule *__restrict self);
+NOTHROW_NCX(CC DlModule_TryGetTLSAddr)(USER DlModule *self)
+		THROWS(E_SEGFAULT);
 
 /* Enumerate all loaded modules, as  well as information about  them.
  * Enumeration stops when `*callback' returns a non-zero value, which

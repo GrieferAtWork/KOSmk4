@@ -616,7 +616,8 @@ DEFINE_PUBLIC_ALIAS(dltlsaddr2, libdl_dltlsaddr2);
 /* Similar to `libdl_dltlsaddr()', but do no lazy allocation
  * and return NULL if the module doesn't have a TLS segment. */
 INTERN WUNUSED NONNULL((1)) void *
-NOTHROW(CC DlModule_TryGetTLSAddr)(DlModule *__restrict self) {
+NOTHROW_NCX(CC DlModule_TryGetTLSAddr)(USER DlModule *self)
+		THROWS(E_SEGFAULT) {
 	byte_t *result;
 	struct tls_segment *tls;
 	struct dtls_extension *extab;
@@ -643,21 +644,6 @@ libdl_dltlsaddr(USER DlModule *self) THROWS(E_SEGFAULT, ...) {
 	RD_TLS_BASE_REGISTER(*(void **)&seg);
 	result = libdl_dltlsaddr2(self, seg);
 	return result;
-}
-
-INTERN WUNUSED void *__DLFCN_DLTLSADDR2_CC
-libdl_dltlsaddr2_noinit(DlModule *__restrict self,
-                        USER struct tls_segment *seg) {
-	struct dtls_extension *extab;
-	/* Simple case: Static TLS, and special case: Empty TLS */
-	if (self->dm_tlsstoff || unlikely(!self->dm_tlsmsize))
-		return (byte_t *)seg + self->dm_tlsstoff;
-	tls_segment_ex_read(seg);
-	extab = dtls_extension_tree_locate(seg->ts_extree, self);
-	tls_segment_ex_endread(seg);
-	if (extab)
-		return extab->te_data;
-	return NULL;
 }
 
 

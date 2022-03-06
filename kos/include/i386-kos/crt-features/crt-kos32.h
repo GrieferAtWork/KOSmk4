@@ -1111,6 +1111,7 @@
 #define __CRT_HAVE___strxfrm_l
 #define __CRT_HAVE___swapoff
 #define __CRT_HAVE___swapon
+#define __CRT_HAVE___swbuf
 #define __CRT_HAVE___swprintf_l
 #define __CRT_HAVE___symlink
 #define __CRT_HAVE___sync

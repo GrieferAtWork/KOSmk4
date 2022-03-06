@@ -4623,6 +4623,7 @@ int _flushall() {
 int _filbuf([[nonnull]] $FILE *__restrict stream);
 
 [[cp_stdio, section(".text.crt.dos.FILE.locked.write.write")]]
+[[export_alias("__swbuf")]] /* __swbuf() is the cygwin name for this function */
 int _flsbuf(int ch, [[nonnull]] $FILE *__restrict stream);
 
 %
