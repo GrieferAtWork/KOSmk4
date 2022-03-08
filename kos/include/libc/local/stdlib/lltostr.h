@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x751d579 */
+/* HASH CRC-32:0xb385a464 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ulltostr_defined
 #define __local___localdep_ulltostr_defined
 #ifdef __CRT_HAVE_ulltostr
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,__localdep_ulltostr,(__ULONGLONG __value, char *__buf),ulltostr,(__value,__buf))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,__localdep_ulltostr,(__ULONGLONG ___value, char *__buf),ulltostr,(___value,__buf))
 #else /* __CRT_HAVE_ulltostr */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/ulltostr.h>
@@ -34,13 +34,13 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_ulltostr */
 #endif /* !__local___localdep_ulltostr_defined */
 __LOCAL_LIBC(lltostr) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lltostr))(__LONGLONG __value, char *__buf) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lltostr))(__LONGLONG ___value, char *__buf) {
 	char *__result;
-	if (__value < 0) {
-		__result    = (__NAMESPACE_LOCAL_SYM __localdep_ulltostr)((__ULONGLONG)0 - __value, __buf);
+	if (___value < 0) {
+		__result    = (__NAMESPACE_LOCAL_SYM __localdep_ulltostr)((__ULONGLONG)0 - ___value, __buf);
 		*--__result = '-';
 	} else {
-		__result = (__NAMESPACE_LOCAL_SYM __localdep_ulltostr)((__ULONGLONG)__value, __buf);
+		__result = (__NAMESPACE_LOCAL_SYM __localdep_ulltostr)((__ULONGLONG)___value, __buf);
 	}
 	return __result;
 }

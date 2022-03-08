@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8cbb354f */
+/* HASH CRC-32:0xf5f0446c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,10 +59,10 @@ __NAMESPACE_LOCAL_END
 #include <bits/os/itimerval.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ualarm) __useconds_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ualarm))(__useconds_t __value, __useconds_t __interval) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ualarm))(__useconds_t ___value, __useconds_t __interval) {
 	struct itimerval __timer, __otimer;
-	__timer.it_value.tv_sec     = __value / 1000000;
-	__timer.it_value.tv_usec    = __value % 1000000;
+	__timer.it_value.tv_sec     = ___value / 1000000;
+	__timer.it_value.tv_usec    = ___value % 1000000;
 	__timer.it_interval.tv_sec  = __interval / 1000000;
 	__timer.it_interval.tv_usec = __interval % 1000000;
 	if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_setitimer)((int)__ITIMER_REAL, &__timer, &__otimer) < 0)

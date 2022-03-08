@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ff9f550 */
+/* HASH CRC-32:0x85e05f8e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,7 +84,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vlimit) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vlimit))(int __resource, int __value) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vlimit))(int __resource, int ___value) {
 	struct rlimit __rlim;
 	int __rlimit_resource, __result;
 #ifdef __LIM_TO_RLIMIT
@@ -134,7 +134,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vlimit))(int __resource, int __value)
 	if __likely(__result == 0) {
 		__rlim.rlim_cur = (__FS_TYPE(rlim))                       /* Cast to correct type. */
 		                  (__CRT_PRIVATE_SINT(__FS_SIZEOF(RLIM))) /* Sign expansion... */
-		                  (int)__value;
+		                  (int)___value;
 		__result = (__NAMESPACE_LOCAL_SYM __localdep_setrlimit)((int)__rlimit_resource, &__rlim);
 	}
 	return __result;

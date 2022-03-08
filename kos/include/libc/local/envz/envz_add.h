@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3b077b6 */
+/* HASH CRC-32:0x8c2a7d4c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,15 +92,15 @@ __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(envz_add) __ATTR_NONNULL((1, 2, 3)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_add))(char **__restrict __penvz, __SIZE_TYPE__ *__restrict __penvz_len, char const *__restrict __name, char const *__value) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_add))(char **__restrict __penvz, __SIZE_TYPE__ *__restrict __penvz_len, char const *__restrict __name, char const *___value) {
 	char *__new_envz;
 	__SIZE_TYPE__ __namelen, __valuelen, __morelen;
 	(__NAMESPACE_LOCAL_SYM __localdep_envz_remove)(__penvz, __penvz_len, __name);
-	if (!__value)
+	if (!___value)
 		return (__NAMESPACE_LOCAL_SYM __localdep_argz_add)(__penvz, __penvz_len, __name);
 	/* Append a new string `name=value\0' */
 	__namelen  = (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__name);
-	__valuelen = (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__value);
+	__valuelen = (__NAMESPACE_LOCAL_SYM __localdep_strlen)(___value);
 	__morelen  = __namelen + 1 + __valuelen + 1;
 	__new_envz = (char *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(*__penvz, (*__penvz_len + __morelen) * sizeof(char));
 	if __unlikely(!__new_envz) {
@@ -115,7 +115,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_add))(char **__restrict __penvz,
 	*__penvz_len += __morelen;
 	__new_envz = (char *)(__NAMESPACE_LOCAL_SYM __localdep_mempcpyc)(__new_envz, __name, __namelen, sizeof(char));
 	*__new_envz++ = '=';
-	__new_envz = (char *)(__NAMESPACE_LOCAL_SYM __localdep_mempcpyc)(__new_envz, __value, __valuelen, sizeof(char));
+	__new_envz = (char *)(__NAMESPACE_LOCAL_SYM __localdep_mempcpyc)(__new_envz, ___value, __valuelen, sizeof(char));
 	*__new_envz = '\0';
 	return 0;
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59b78508 */
+/* HASH CRC-32:0x4f42e3ca */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,7 +74,7 @@ typedef __sem_t sem_t;
  *                  HINT: Never returned `#if SEM_VALUE_MAX >= UINT_MAX'
  * @return: -1:     [errno=ENOSYS] `pshared != 0', but inter-process semaphores aren't supported
  *                  HINT: Never returned `#ifdef __ARCH_HAVE_INTERPROCESS_SEMAPHORES' */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_init,(sem_t *__sem, int __pshared, unsigned int __value),(__sem,__pshared,__value))
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_init,(sem_t *__sem, int __pshared, unsigned int ___value),(__sem,__pshared,___value))
 /* >> sem_destroy(3)
  * Destroy a semaphore previously initialized by `sem_init(3)'
  * @return: 0: Success */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a8b5854 */
+/* HASH CRC-32:0xd2840b7d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2122,12 +2122,12 @@ __CDECLARE(__ATTR_DEPRECATED("Use getcwd()") __ATTR_NONNULL((1)),char *,__NOTHRO
 __NAMESPACE_LOCAL_USING_OR_IMPL(getwd, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Use getcwd()") __ATTR_NONNULL((1)) char *__NOTHROW_RPC(__LIBCCALL getwd)(char *__buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getwd))(__buf); })
 #endif /* ... */
 #ifdef __CRT_HAVE_ualarm
-__CDECLARE(,__useconds_t,__NOTHROW_NCX,ualarm,(__useconds_t __value, __useconds_t __interval),(__value,__interval))
+__CDECLARE(,__useconds_t,__NOTHROW_NCX,ualarm,(__useconds_t ___value, __useconds_t __interval),(___value,__interval))
 #else /* __CRT_HAVE_ualarm */
 #include <asm/os/itimer.h>
 #if defined(__ITIMER_REAL) && (defined(__CRT_HAVE_setitimer64) || defined(__CRT_HAVE_setitimer) || defined(__CRT_HAVE___setitimer) || defined(__CRT_HAVE___libc_setitimer))
 #include <libc/local/unistd/ualarm.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ualarm, __FORCELOCAL __ATTR_ARTIFICIAL __useconds_t __NOTHROW_NCX(__LIBCCALL ualarm)(__useconds_t __value, __useconds_t __interval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ualarm))(__value, __interval); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ualarm, __FORCELOCAL __ATTR_ARTIFICIAL __useconds_t __NOTHROW_NCX(__LIBCCALL ualarm)(__useconds_t ___value, __useconds_t __interval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ualarm))(___value, __interval); })
 #endif /* __ITIMER_REAL && (__CRT_HAVE_setitimer64 || __CRT_HAVE_setitimer || __CRT_HAVE___setitimer || __CRT_HAVE___libc_setitimer) */
 #endif /* !__CRT_HAVE_ualarm */
 #ifndef __vfork_defined

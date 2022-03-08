@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf22e7ab */
+/* HASH CRC-32:0xc297690c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_twalk_r_defined
 #define __local___localdep_twalk_r_defined
 #ifdef __CRT_HAVE_twalk_r
-__CREDIRECT_VOID(,__THROWING,__localdep_twalk_r,(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT __value, int __level, void *__arg), void *__arg),twalk_r,(__root,__action,__arg))
+__CREDIRECT_VOID(,__THROWING,__localdep_twalk_r,(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT ___value, int __level, void *__arg), void *__arg),twalk_r,(__root,__action,__arg))
 #else /* __CRT_HAVE_twalk_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/search/twalk_r.h>
@@ -49,15 +49,15 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #define ____invoke_twalk_action_helper_defined
 __LOCAL_LIBC(__invoke_twalk_action_helper) void
-(__LIBCCALL __invoke_twalk_action_helper)(void const *__nodep, VISIT __value, int __level, void *__arg) {
-	(*(void (__LIBCCALL *)(void const *, VISIT, int))__arg)(__nodep, __value, __level);
+(__LIBCCALL __invoke_twalk_action_helper)(void const *__nodep, VISIT ___value, int __level, void *__arg) {
+	(*(void (__LIBCCALL *)(void const *, VISIT, int))__arg)(__nodep, ___value, __level);
 }
 __NAMESPACE_LOCAL_END
 #endif /* !____invoke_twalk_action_helper_defined */
 #endif /* !__LIBCCALL_CALLER_CLEANUP */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(twalk) void
-(__LIBCCALL __LIBC_LOCAL_NAME(twalk))(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT __value, int __level)) __THROWS(...) {
+(__LIBCCALL __LIBC_LOCAL_NAME(twalk))(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT ___value, int __level)) __THROWS(...) {
 #ifdef __LIBCCALL_CALLER_CLEANUP
 	(__NAMESPACE_LOCAL_SYM __localdep_twalk_r)(__root, (void (__LIBCCALL *)(void const *, VISIT, int, void *))(void *)__action, __NULLPTR);
 #else /* __LIBCCALL_CALLER_CLEANUP */

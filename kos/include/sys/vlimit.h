@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf564e44 */
+/* HASH CRC-32:0x2d75f135 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,7 +75,7 @@ __SYSDECL_BEGIN
  * @param: value:    Value to assign to `resource'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-__CDECLARE(,int,__NOTHROW_NCX,vlimit,(int __resource, int __value),(__resource,__value))
+__CDECLARE(,int,__NOTHROW_NCX,vlimit,(int __resource, int ___value),(__resource,___value))
 #else /* __CRT_HAVE_vlimit */
 #include <asm/os/resource.h>
 #include <bits/types.h>
@@ -87,7 +87,7 @@ __CDECLARE(,int,__NOTHROW_NCX,vlimit,(int __resource, int __value),(__resource,_
  * @param: value:    Value to assign to `resource'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(vlimit, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL vlimit)(int __resource, int __value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vlimit))(__resource, __value); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(vlimit, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL vlimit)(int __resource, int ___value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vlimit))(__resource, ___value); })
 #endif /* ((__CRT_HAVE_getrlimit && (!__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (__CRT_HAVE___getrlimit && (!__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (__CRT_HAVE___libc_getrlimit && (!__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (__CRT_HAVE_getrlimit64 && (__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__))) && ((__CRT_HAVE_setrlimit && (!__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (__CRT_HAVE___setrlimit && (!__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (__CRT_HAVE___libc_setrlimit && (!__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (__CRT_HAVE_setrlimit64 && (__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__))) */
 #endif /* !__CRT_HAVE_vlimit */
 

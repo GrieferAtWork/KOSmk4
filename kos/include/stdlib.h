@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d0267f9 */
+/* HASH CRC-32:0x5cf5e791 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3612,16 +3612,16 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_RPC(__LIBCCALL get
 #endif /* !... */
 #ifdef __LONGLONG
 #ifdef __CRT_HAVE_lltostr
-__CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,lltostr,(__LONGLONG __value, char *__buf),(__value,__buf))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,lltostr,(__LONGLONG ___value, char *__buf),(___value,__buf))
 #else /* __CRT_HAVE_lltostr */
 #include <libc/local/stdlib/lltostr.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(lltostr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL lltostr)(__LONGLONG __value, char *__buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lltostr))(__value, __buf); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lltostr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL lltostr)(__LONGLONG ___value, char *__buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lltostr))(___value, __buf); })
 #endif /* !__CRT_HAVE_lltostr */
 #ifdef __CRT_HAVE_ulltostr
-__CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,ulltostr,(__ULONGLONG __value, char *__buf),(__value,__buf))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,ulltostr,(__ULONGLONG ___value, char *__buf),(___value,__buf))
 #else /* __CRT_HAVE_ulltostr */
 #include <libc/local/stdlib/ulltostr.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ulltostr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL ulltostr)(__ULONGLONG __value, char *__buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ulltostr))(__value, __buf); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ulltostr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL ulltostr)(__ULONGLONG ___value, char *__buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ulltostr))(___value, __buf); })
 #endif /* !__CRT_HAVE_ulltostr */
 #endif /* __LONGLONG */
 #endif /* __USE_SOLARIS */

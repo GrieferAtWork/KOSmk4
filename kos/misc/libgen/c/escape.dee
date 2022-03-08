@@ -498,9 +498,10 @@ global final keywordMacros: {string: string | Callable with (CParser, File | CWr
 
 @@Keywords that may look escaped, but must be escaped again
 global final special_escapes: {string...} = {
-	"__used",
-	"__unused",
-	"__packed",
+	"__used",   /* Macro in <sys/cdefs.h> */
+	"__unused", /* Macro in <sys/cdefs.h> */
+	"__packed", /* Macro in <sys/cdefs.h> */
+	"__value",  /* Compiler keyword in MSVC */
 };
 
 

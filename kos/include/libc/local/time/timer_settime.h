@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1203df1 */
+/* HASH CRC-32:0xe69467ef */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,14 +28,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_timer_settime32_defined) && defined(__CRT_HAVE_timer_settime)
 #define __local___localdep_timer_settime32_defined
-__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_timer_settime32,(__timer_t __timerid, __STDC_INT_AS_UINT_T __flags, struct __itimerspec32 const *__restrict __value, struct __itimerspec32 *__ovalue),timer_settime,(__timerid,__flags,__value,__ovalue))
+__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_timer_settime32,(__timer_t __timerid, __STDC_INT_AS_UINT_T __flags, struct __itimerspec32 const *__restrict ___value, struct __itimerspec32 *__ovalue),timer_settime,(__timerid,__flags,___value,__ovalue))
 #endif /* !__local___localdep_timer_settime32_defined && __CRT_HAVE_timer_settime */
 #ifndef __local___localdep_timer_settime64_defined
 #define __local___localdep_timer_settime64_defined
 #if defined(__CRT_HAVE_timer_settime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_timer_settime64,(__timer_t __timerid, __STDC_INT_AS_UINT_T __flags, struct __itimerspec64 const *__restrict __value, struct __itimerspec64 *__restrict __ovalue),timer_settime,(__timerid,__flags,__value,__ovalue))
+__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_timer_settime64,(__timer_t __timerid, __STDC_INT_AS_UINT_T __flags, struct __itimerspec64 const *__restrict ___value, struct __itimerspec64 *__restrict __ovalue),timer_settime,(__timerid,__flags,___value,__ovalue))
 #elif defined(__CRT_HAVE_timer_settime64)
-__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_timer_settime64,(__timer_t __timerid, __STDC_INT_AS_UINT_T __flags, struct __itimerspec64 const *__restrict __value, struct __itimerspec64 *__restrict __ovalue),timer_settime64,(__timerid,__flags,__value,__ovalue))
+__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_timer_settime64,(__timer_t __timerid, __STDC_INT_AS_UINT_T __flags, struct __itimerspec64 const *__restrict ___value, struct __itimerspec64 *__restrict __ovalue),timer_settime64,(__timerid,__flags,___value,__ovalue))
 #elif defined(__CRT_HAVE_timer_settime)
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/timer_settime64.h>
@@ -46,14 +46,14 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_timer_settime64_defined */
 __LOCAL_LIBC(timer_settime) __ATTR_NONNULL((3)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timer_settime))(__timer_t __timerid, __STDC_INT_AS_UINT_T __flags, struct itimerspec const *__restrict __value, struct itimerspec *__restrict __ovalue) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timer_settime))(__timer_t __timerid, __STDC_INT_AS_UINT_T __flags, struct itimerspec const *__restrict ___value, struct itimerspec *__restrict __ovalue) {
 #ifdef __CRT_HAVE_timer_settime
 	int __result;
 	struct __itimerspec32 __value32, __ovalue32;
-	__value32.__it_interval.tv_sec  = (__time32_t)__value->__it_interval.tv_sec;
-	__value32.__it_interval.tv_nsec = __value->__it_interval.tv_nsec;
-	__value32.__it_value.tv_sec     = (__time32_t)__value->__it_value.tv_sec;
-	__value32.__it_value.tv_nsec    = __value->__it_value.tv_nsec;
+	__value32.__it_interval.tv_sec  = (__time32_t)___value->__it_interval.tv_sec;
+	__value32.__it_interval.tv_nsec = ___value->__it_interval.tv_nsec;
+	__value32.__it_value.tv_sec     = (__time32_t)___value->__it_value.tv_sec;
+	__value32.__it_value.tv_nsec    = ___value->__it_value.tv_nsec;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_timer_settime32)(__timerid, __flags, &__value32, __ovalue ? &__ovalue32 : __NULLPTR);
 	if (!__result && __ovalue) {
 		__ovalue->__it_interval.tv_sec  = (__time64_t)__ovalue32.__it_interval.tv_sec;
@@ -65,10 +65,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timer_settime))(__timer_t __timerid, 
 #else /* __CRT_HAVE_timer_settime */
 	int __result;
 	struct __itimerspec64 __value64, __ovalue64;
-	__value64.__it_interval.tv_sec  = (__time64_t)__value->__it_interval.tv_sec;
-	__value64.__it_interval.tv_nsec = __value->__it_interval.tv_nsec;
-	__value64.__it_value.tv_sec     = (__time64_t)__value->__it_value.tv_sec;
-	__value64.__it_value.tv_nsec    = __value->__it_value.tv_nsec;
+	__value64.__it_interval.tv_sec  = (__time64_t)___value->__it_interval.tv_sec;
+	__value64.__it_interval.tv_nsec = ___value->__it_interval.tv_nsec;
+	__value64.__it_value.tv_sec     = (__time64_t)___value->__it_value.tv_sec;
+	__value64.__it_value.tv_nsec    = ___value->__it_value.tv_nsec;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_timer_settime64)(__timerid, __flags, &__value64, __ovalue ? &__ovalue64 : __NULLPTR);
 	if (!__result && __ovalue) {
 		__ovalue->__it_interval.tv_sec  = (__time32_t)__ovalue64.__it_interval.tv_sec;

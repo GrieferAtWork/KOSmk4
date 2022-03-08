@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x814d6903 */
+/* HASH CRC-32:0x6362df27 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,15 +84,15 @@ __LOCAL_LIBC(format_c32hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 		(1 + (sizeof(void *) * 2) + 1) < 17 ? 17 :
 		(1 + (sizeof(void *) * 2) + 1)], *__dst;
 	__SSIZE_TYPE__ __temp, __result = 0;
-	unsigned int __i; __UINTPTR_TYPE__ __value;
+	unsigned int __i; __UINTPTR_TYPE__ ___value;
 	unsigned int __offset_digits = 0;
 	if (!__size) goto __done;
 	if (!__linesize) __linesize = 16;
 	if (__flags & 0x0004) {
-		__value = __size;
+		___value = __size;
 		do {
 			++__offset_digits;
-		} while ((__value >>= 4) != 0);
+		} while ((___value >>= 4) != 0);
 	}
 	__line_data = (__BYTE_TYPE__ const *)__data;
 	for (;;) {
@@ -100,12 +100,12 @@ __LOCAL_LIBC(format_c32hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 		if (__line_len > __size)
 			__line_len = __size;
 		if (!(__flags & 0x0002)) {
-			__value = (__UINTPTR_TYPE__)__line_data;
+			___value = (__UINTPTR_TYPE__)__line_data;
 			__dst = __buffer + sizeof(void *) * 2;
 			*__dst = ' ';
 			while (__dst > __buffer) {
-				*--__dst = __LOCAL_itoa_digit(!(__flags & 0x0001), __value & 0xf);
-				__value >>= 4;
+				*--__dst = __LOCAL_itoa_digit(!(__flags & 0x0001), ___value & 0xf);
+				___value >>= 4;
 			}
 			__temp = (*__printer)(__arg, __buffer, (sizeof(void *) * 2) + 1);
 			if __unlikely(__temp < 0)
@@ -115,10 +115,10 @@ __LOCAL_LIBC(format_c32hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 		if (__flags & 0x0004) {
 			__dst = __buffer + 1 + __offset_digits;
 			*__dst = ' ';
-			__value = (__line_data - (__BYTE_TYPE__ const *)__data);
+			___value = (__line_data - (__BYTE_TYPE__ const *)__data);
 			while (__dst > __buffer + 1) {
-				*--__dst = __LOCAL_itoa_digit(!(__flags & 0x0001), __value & 0xf);
-				__value >>= 4;
+				*--__dst = __LOCAL_itoa_digit(!(__flags & 0x0001), ___value & 0xf);
+				___value >>= 4;
 			}
 			__buffer[0] = '+';
 			__temp = (*__printer)(__arg, __buffer, (__SIZE_TYPE__)2 + __offset_digits);

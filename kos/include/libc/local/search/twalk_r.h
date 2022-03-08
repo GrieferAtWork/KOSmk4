@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e7cd3fc */
+/* HASH CRC-32:0x1712466 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
  * called at each node. `level'  is the level of  `root' in the whole  tree */
 __LOCAL_LIBC(__trecurse) __ATTR_NONNULL((1, 2)) void
 (__LIBC_LOCAL_NAME(__trecurse))(void const *__root,
-                              void (__LIBCCALL *__action)(void const *__nodep, VISIT __value, int __level, void *__arg),
+                              void (__LIBCCALL *__action)(void const *__nodep, VISIT ___value, int __level, void *__arg),
                               void *__arg, int __level) {
 	void *__l, *__r;
 	__l = ((void **)__root)[1];
@@ -57,7 +57,7 @@ __LOCAL_LIBC(__trecurse) __ATTR_NONNULL((1, 2)) void
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(twalk_r) void
-(__LIBCCALL __LIBC_LOCAL_NAME(twalk_r))(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT __value, int __level, void *__arg), void *__arg) __THROWS(...) {
+(__LIBCCALL __LIBC_LOCAL_NAME(twalk_r))(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT ___value, int __level, void *__arg), void *__arg) __THROWS(...) {
 	if (__root && __action)
 		(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__trecurse))(__root, __action, __arg, 0);
 }
