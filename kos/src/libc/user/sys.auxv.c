@@ -24,18 +24,22 @@
 #include "../api.h"
 /**/
 
-#include <asm/pagesize.h>  /* __ARCH_PAGESIZE */
-#include <kos/exec/elf.h>  /* ELF_ARCH_DATA */
+#include <asm/pagesize.h> /* __ARCH_PAGESIZE */
+#include <kos/exec/elf.h> /* ELF_ARCH_DATA */
+#include <kos/exec/idata.h>
 #include <kos/exec/rtld.h> /* RTLD_PLATFORM */
+#include <kos/syscalls.h>
 
 #include <fcntl.h>
 #include <pthread.h>
 #include <stddef.h> /* offsetafter */
 #include <stdlib.h>
+#include <syscall.h>
 #include <time.h>   /* CLK_TCK */
 #include <unistd.h> /* preadall */
 
 #include "../libc/dl.h"
+#include "../libc/globals.h"
 #include "sys.auxv.h"
 
 #if defined(__i386__) && !defined(__x86_64__)
@@ -44,6 +48,48 @@
 
 #include <string.h> /* preadall */
 #endif /* __i386__ && !__x86_64__ */
+
+#ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES
+#undef __WANT_SYSCALL_ARGUMENT_TYPES
+#define __WANT_SYSCALL_ARGUMENT_TYPES
+#include <asm/syscalls-proto.h>
+#endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES */
+
+#define SYSCALL_ARG_TYPE_OF3(a, b)      b
+#define SYSCALL_ARG_TYPE_OF2(x)         SYSCALL_ARG_TYPE_OF3 x
+#define SYSCALL_ARG_TYPE_OF(name, argi) SYSCALL_ARG_TYPE_OF2(__NRAT##argi##_##name)
+
+#if __SIZEOF_UID_T__ != 4
+#ifdef SYS_getuid
+#undef SYS_getuid32
+#endif /* SYS_getuid */
+#ifdef SYS_geteuid
+#undef SYS_geteuid32
+#endif /* SYS_geteuid */
+#ifdef SYS_getresuid
+#undef SYS_getresuid32
+#endif /* SYS_getresuid */
+#endif /* __SIZEOF_UID_T__ != 4 */
+
+#ifdef SYS_getuid32
+#define _sys_getuid() (uid_t)sys_getuid32()
+#else /* SYS_getuid32 */
+#define _sys_getuid() (uid_t)sys_getuid()
+#endif /* SYS_getuid32 */
+#ifdef SYS_geteuid32
+#define _sys_geteuid() (uid_t)sys_geteuid32()
+#else /* SYS_geteuid32 */
+#define _sys_geteuid() (uid_t)sys_geteuid()
+#endif /* !SYS_geteuid32 */
+#ifdef SYS_getresuid32
+#define _sys_getresuid(ruid, euid, suid) \
+	sys_getresuid32((uint32_t *)(ruid), (uint32_t *)(euid), (uint32_t *)(suid))
+#else /* SYS_getresuid32 */
+#define _sys_getresuid(ruid, euid, suid)                     \
+	sys_getresuid((SYSCALL_ARG_TYPE_OF(getresuid, 0))(ruid), \
+	              (SYSCALL_ARG_TYPE_OF(getresuid, 1))(euid), \
+	              (SYSCALL_ARG_TYPE_OF(getresuid, 2))(suid))
+#endif /* !SYS_getresuid32 */
 
 DECL_BEGIN
 
@@ -94,6 +140,47 @@ fallback:
 	if (read_status != 16)
 		goto fallback;
 }
+
+
+/* gLibc exports a symbol:
+ * >> extern int __libc_enable_secure;
+ *
+ * That is non-zero  if the program  was launched under  `AT_SECURE'
+ * mode. In practice, this value is equal to `getauxval(AT_SECURE)',
+ * so we use an IDATA symbol to emulate that exact behavior! */
+PRIVATE ATTR_SECTION(".bss.crt.compat.glibc") int libc_saved_AT_SECURE = 0;
+PRIVATE ATTR_SECTION(".bss.crt.compat.glibc")
+pthread_once_t libc_saved_AT_SECURE_didinit = PTHREAD_ONCE_INIT;
+PRIVATE ATTR_SECTION(".text.crt.compat.glibc") void
+NOTHROW(LIBCCALL libc_saved_AT_SECURE_init)(void) {
+#ifdef SYS_getresuid
+	uid_t ruid, euid;
+	errno_t error;
+	/* Try to use `sys_getresuid(2)', so we only need 1 system call! */
+	error = _sys_getresuid(&ruid, &euid, NULL);
+	if likely(E_ISOK(error)) { /* Should never fail... */
+		libc_saved_AT_SECURE = (ruid != euid);
+	} else
+#endif /* SYS_getresuid */
+	{
+		libc_saved_AT_SECURE = (_sys_geteuid() != _sys_getuid());
+	}
+}
+
+PRIVATE ATTR_SECTION(".text.crt.compat.glibc") void
+NOTHROW(LIBCCALL libc_saved_AT_SECURE_ensure_init)(void) {
+	pthread_once(&libc_saved_AT_SECURE_didinit, &libc_saved_AT_SECURE_init);
+}
+
+#undef __libc_enable_secure
+DEFINE_PUBLIC_IDATA_G(__libc_enable_secure, libc___p___libc_enable_secure, __SIZEOF_INT__);
+#define __libc_enable_secure GET_NOREL_GLOBAL(__libc_enable_secure)
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.glibc") int *
+NOTHROW(LIBCCALL libc___p___libc_enable_secure)(void) {
+	libc_saved_AT_SECURE_ensure_init();
+	return &libc_saved_AT_SECURE;
+}
+
 
 
 
@@ -237,6 +324,14 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 		result = (ulongptr_t)(uintptr_t)&random_bytes[0];
 		break;
 
+	case AT_SECURE: {
+#if 0 /* Implicitly done the first time the IDATA symbol is accessed, which we do next. */
+		/* Ensure that `__libc_enable_secure' has been initialized. */
+		libc_saved_AT_SECURE_ensure_init();
+#endif
+		return __libc_enable_secure;
+	}	break;
+
 	default:
 not_found:
 		libc_seterrno(ENOENT);
@@ -246,9 +341,6 @@ not_found:
 	return result;
 }
 /*[[[end:libc_getauxval]]]*/
-
-
-
 
 
 /*[[[start:exports,hash:CRC-32=0x9d59b425]]]*/

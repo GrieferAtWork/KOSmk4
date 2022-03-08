@@ -68,7 +68,7 @@
 #undef __WANT_SYSCALL_ARGUMENT_TYPES
 #define __WANT_SYSCALL_ARGUMENT_TYPES
 #include <asm/syscalls-proto.h>
-#endif
+#endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES */
 
 #define SYSCALL_ARG_TYPE_OF3(a, b)      b
 #define SYSCALL_ARG_TYPE_OF2(x)         SYSCALL_ARG_TYPE_OF3 x

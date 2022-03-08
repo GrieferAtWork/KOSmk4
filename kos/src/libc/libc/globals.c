@@ -117,11 +117,15 @@ DEFINE_NOREL_GLOBAL_META(int, _nl_msg_cat_cntr, ".crt.i18n");
 
 /* <math.h> */
 #undef signgam
-DEFINE_NOREL_GLOBAL_META(int, signgam, ".math.math");
+DEFINE_NOREL_GLOBAL_META(int, signgam, ".crt.math.math");
 
 /* <signal.h> */
 #undef _sigintr
 DEFINE_NOREL_GLOBAL_META(sigset_t, _sigintr, ".crt.sched.signal");
+
+/* Misc... */
+#undef __libc_enable_secure
+DEFINE_NOREL_GLOBAL_META(int, __libc_enable_secure, ".crt.compat.glibc");
 
 DECL_END
 

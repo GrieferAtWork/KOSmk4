@@ -232,6 +232,12 @@ typedef struct __sigset_struct sigset_t;
 DECLARE_NOREL_GLOBAL_META(sigset_t, _sigintr);
 #define _sigintr GET_NOREL_GLOBAL(_sigintr)
 
+
+/* Misc... */
+#undef __libc_enable_secure
+DECLARE_NOREL_GLOBAL_META(int, __libc_enable_secure);
+#define __libc_enable_secure GET_NOREL_GLOBAL(__libc_enable_secure)
+
 #endif /* !__KERNEL__ */
 
 DECL_END

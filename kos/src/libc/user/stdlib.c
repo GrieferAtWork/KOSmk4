@@ -647,7 +647,7 @@ INTERN ATTR_SECTION(".text.crt.fs.environ") WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_secure_getenv)(char const *varname)
 /*[[[body:libc_secure_getenv]]]*/
 {
-	if (getauxval(AT_SECURE))
+	if (__libc_enable_secure)
 		return NULL; /* Unconditionally return `NULL' for setuid() programs */
 	return libc_getenv(varname);
 }
@@ -1482,7 +1482,7 @@ INTERN ATTR_SECTION(".text.crt.dos.fs.environ") WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBDCALL libd_secure_getenv)(char const *varname)
 /*[[[body:libd_secure_getenv]]]*/
 {
-	if (getauxval(AT_SECURE))
+	if (__libc_enable_secure)
 		return NULL; /* Unconditionally return `NULL' for setuid() programs */
 	return libd_getenv(varname);
 }

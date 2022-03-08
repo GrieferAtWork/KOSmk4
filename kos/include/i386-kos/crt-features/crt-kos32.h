@@ -673,6 +673,7 @@
 #define __CRT_HAVE___libc_dlsym
 #define __CRT_HAVE___libc_dup
 #define __CRT_HAVE___libc_dup2
+#define __CRT_HAVE___libc_enable_secure
 #define __CRT_HAVE___libc_execve
 #define __CRT_HAVE___libc_fchdir
 #define __CRT_HAVE___libc_fchmod
