@@ -27,55 +27,9 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_ns_get16,hash:CRC-32=0x563a2086]]]*/
-INTERN ATTR_SECTION(".text.crt.net.nameser") u_int
-NOTHROW_NCX(LIBCCALL libc_ns_get16)(u_char const *a)
-/*[[[body:libc_ns_get16]]]*/
-/*AUTO*/{
-	(void)a;
-	CRT_UNIMPLEMENTEDF("ns_get16(%p)", a); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_ns_get16]]]*/
 
-/*[[[head:libc_ns_get32,hash:CRC-32=0xdadb3352]]]*/
-INTERN ATTR_SECTION(".text.crt.net.nameser") u_long
-NOTHROW_NCX(LIBCCALL libc_ns_get32)(u_char const *a)
-/*[[[body:libc_ns_get32]]]*/
-/*AUTO*/{
-	(void)a;
-	CRT_UNIMPLEMENTEDF("ns_get32(%p)", a); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_ns_get32]]]*/
 
-/*[[[head:libc_ns_put16,hash:CRC-32=0x5177977]]]*/
-INTERN ATTR_SECTION(".text.crt.net.nameser") void
-NOTHROW_NCX(LIBCCALL libc_ns_put16)(u_int a,
-                                    u_char *b)
-/*[[[body:libc_ns_put16]]]*/
-/*AUTO*/{
-	(void)a;
-	(void)b;
-	CRT_UNIMPLEMENTEDF("ns_put16(%x, %p)", a, b); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_ns_put16]]]*/
 
-/*[[[head:libc_ns_put32,hash:CRC-32=0x42fc47d7]]]*/
-INTERN ATTR_SECTION(".text.crt.net.nameser") void
-NOTHROW_NCX(LIBCCALL libc_ns_put32)(u_long a,
-                                    u_char *b)
-/*[[[body:libc_ns_put32]]]*/
-/*AUTO*/{
-	(void)a;
-	(void)b;
-	CRT_UNIMPLEMENTEDF("ns_put32(%lx, %p)", a, b); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_ns_put32]]]*/
 
 /*[[[head:libc_ns_initparse,hash:CRC-32=0x4c977503]]]*/
 INTERN ATTR_SECTION(".text.crt.net.nameser") int
@@ -336,35 +290,16 @@ NOTHROW_NCX(LIBCCALL libc_ns_name_uncompress)(u_char const *a,
 }
 /*[[[end:libc_ns_name_uncompress]]]*/
 
-/*[[[head:libc_ns_name_compress,hash:CRC-32=0x98e8026d]]]*/
-INTERN ATTR_SECTION(".text.crt.net.nameser") int
-NOTHROW_NCX(LIBCCALL libc_ns_name_compress)(char const *a,
-                                            u_char *b,
-                                            size_t c,
-                                            u_char const **d,
-                                            u_char const **e)
-/*[[[body:libc_ns_name_compress]]]*/
-/*AUTO*/{
-	(void)a;
-	(void)b;
-	(void)c;
-	(void)d;
-	(void)e;
-	CRT_UNIMPLEMENTEDF("ns_name_compress(%q, %p, %Ix, %p, %p)", a, b, c, d, e); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_ns_name_compress]]]*/
 
-/*[[[head:libc_ns_name_skip,hash:CRC-32=0xcf0ab1aa]]]*/
-INTERN ATTR_SECTION(".text.crt.net.nameser") int
-NOTHROW_NCX(LIBCCALL libc_ns_name_skip)(u_char const **a,
-                                        u_char const *b)
+/*[[[head:libc_ns_name_skip,hash:CRC-32=0x68843838]]]*/
+INTERN ATTR_SECTION(".text.crt.net.nameser") NONNULL((1, 2)) int
+NOTHROW_NCX(LIBCCALL libc_ns_name_skip)(u_char const **p_msg_ptr,
+                                        u_char const *msg_end)
 /*[[[body:libc_ns_name_skip]]]*/
 /*AUTO*/{
-	(void)a;
-	(void)b;
-	CRT_UNIMPLEMENTEDF("ns_name_skip(%p, %p)", a, b); /* TODO */
+	(void)p_msg_ptr;
+	(void)msg_end;
+	CRT_UNIMPLEMENTEDF("ns_name_skip(%p, %p)", p_msg_ptr, msg_end); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -651,11 +586,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_samename)(char const *a,
 }
 /*[[[end:libc_ns_samename]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x591f771b]]]*/
-DEFINE_PUBLIC_ALIAS(ns_get16, libc_ns_get16);
-DEFINE_PUBLIC_ALIAS(ns_get32, libc_ns_get32);
-DEFINE_PUBLIC_ALIAS(ns_put16, libc_ns_put16);
-DEFINE_PUBLIC_ALIAS(ns_put32, libc_ns_put32);
+/*[[[start:exports,hash:CRC-32=0x871e2899]]]*/
 DEFINE_PUBLIC_ALIAS(ns_initparse, libc_ns_initparse);
 DEFINE_PUBLIC_ALIAS(ns_skiprr, libc_ns_skiprr);
 DEFINE_PUBLIC_ALIAS(ns_parserr, libc_ns_parserr);
@@ -670,7 +601,6 @@ DEFINE_PUBLIC_ALIAS(ns_name_pton, libc_ns_name_pton);
 DEFINE_PUBLIC_ALIAS(ns_name_unpack, libc_ns_name_unpack);
 DEFINE_PUBLIC_ALIAS(ns_name_pack, libc_ns_name_pack);
 DEFINE_PUBLIC_ALIAS(ns_name_uncompress, libc_ns_name_uncompress);
-DEFINE_PUBLIC_ALIAS(ns_name_compress, libc_ns_name_compress);
 DEFINE_PUBLIC_ALIAS(ns_name_skip, libc_ns_name_skip);
 DEFINE_PUBLIC_ALIAS(ns_name_rollback, libc_ns_name_rollback);
 DEFINE_PUBLIC_ALIAS(ns_sign, libc_ns_sign);

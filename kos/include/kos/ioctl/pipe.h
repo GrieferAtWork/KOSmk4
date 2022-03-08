@@ -35,7 +35,7 @@
 /* Ioctl codes.
  * NOTE: [r] codes  require `IO_CANREAD', [w] codes require `IO_CANWRITE'.
  *       If not possible -> `E_INVALID_HANDLE_OPERATION_(GET|SET)PROPERTY' */
-#define PIPE_IOC_CLOSED   _IOR_KOS('P', 0x00, int)              /*     Check if the pipe has been closed (reading yield remaining data before returning `0'; writing is no longer possible)  */
+#define PIPE_IOC_CLOSED   _IOR_KOS('P', 0x00, int)              /*     Check if the pipe has been closed (reading yield remaining data before returning `0'; writing is no longer possible) */
 #define PIPE_IOC_READABLE _IOR_KOS('P', 0x01, __size_t)         /* [r] Return the # of bytes available for reading (or peeking; `== OUT(pipe_peek::pp_bufsz)'). */
 #define PIPE_IOC_PEEK    _IOWR_KOS('P', 0x08, struct pipe_peek) /* [r] Peek pending data (read w/o consume). */
 #define PIPE_IOC_DISCARD _IOWR_KOS('P', 0x09, __size_t)         /* [r] Discard up to IN:ARG byts of data, and set OUT:ARG to the actual amount discarded */

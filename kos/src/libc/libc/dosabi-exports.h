@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6d69613 */
+/* HASH CRC-32:0x7539796d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -95,7 +95,11 @@ DEFINE_PUBLIC_ALIAS(DOS$inet_ntop, libd_inet_ntop);
 /* arpa.nameser */
 DEFINE_PUBLIC_ALIAS(DOS$ns_get16, libd_ns_get16);
 DEFINE_PUBLIC_ALIAS(DOS$ns_get32, libd_ns_get32);
+DEFINE_PUBLIC_ALIAS(DOS$putshort, libd_ns_put16);
+DEFINE_PUBLIC_ALIAS(DOS$__putshort, libd_ns_put16);
 DEFINE_PUBLIC_ALIAS(DOS$ns_put16, libd_ns_put16);
+DEFINE_PUBLIC_ALIAS(DOS$putlong, libd_ns_put32);
+DEFINE_PUBLIC_ALIAS(DOS$__putlong, libd_ns_put32);
 DEFINE_PUBLIC_ALIAS(DOS$ns_put32, libd_ns_put32);
 DEFINE_PUBLIC_ALIAS(DOS$ns_initparse, libd_ns_initparse);
 DEFINE_PUBLIC_ALIAS(DOS$ns_skiprr, libd_ns_skiprr);
@@ -127,6 +131,8 @@ DEFINE_PUBLIC_ALIAS(DOS$ns_samedomain, libd_ns_samedomain);
 DEFINE_PUBLIC_ALIAS(DOS$ns_subdomain, libd_ns_subdomain);
 DEFINE_PUBLIC_ALIAS(DOS$ns_makecanon, libd_ns_makecanon);
 DEFINE_PUBLIC_ALIAS(DOS$ns_samename, libd_ns_samename);
+DEFINE_PUBLIC_ALIAS(DOS$__dn_comp, libd_dn_comp);
+DEFINE_PUBLIC_ALIAS(DOS$dn_comp, libd_dn_comp);
 
 /* complex */
 DEFINE_PUBLIC_ALIAS(DOS$cabsf, libd_cabsf);
@@ -1391,10 +1397,6 @@ DEFINE_PUBLIC_ALIAS(DOS$__loc_ntoa, libd_loc_ntoa);
 DEFINE_PUBLIC_ALIAS(DOS$loc_ntoa, libd_loc_ntoa);
 DEFINE_PUBLIC_ALIAS(DOS$__dn_skipname, libd_dn_skipname);
 DEFINE_PUBLIC_ALIAS(DOS$dn_skipname, libd_dn_skipname);
-DEFINE_PUBLIC_ALIAS(DOS$__putlong, libd_putlong);
-DEFINE_PUBLIC_ALIAS(DOS$putlong, libd_putlong);
-DEFINE_PUBLIC_ALIAS(DOS$__putshort, libd_putshort);
-DEFINE_PUBLIC_ALIAS(DOS$putshort, libd_putshort);
 DEFINE_PUBLIC_ALIAS(DOS$__p_class, libd_p_class);
 DEFINE_PUBLIC_ALIAS(DOS$p_class, libd_p_class);
 DEFINE_PUBLIC_ALIAS(DOS$__p_time, libd_p_time);
@@ -1417,8 +1419,6 @@ DEFINE_PUBLIC_ALIAS(DOS$__p_secstodate, libd_p_secstodate);
 DEFINE_PUBLIC_ALIAS(DOS$p_secstodate, libd_p_secstodate);
 DEFINE_PUBLIC_ALIAS(DOS$__dn_count_labels, libd_dn_count_labels);
 DEFINE_PUBLIC_ALIAS(DOS$dn_count_labels, libd_dn_count_labels);
-DEFINE_PUBLIC_ALIAS(DOS$__dn_comp, libd_dn_comp);
-DEFINE_PUBLIC_ALIAS(DOS$dn_comp, libd_dn_comp);
 DEFINE_PUBLIC_ALIAS(DOS$__dn_expand, libd_dn_expand);
 DEFINE_PUBLIC_ALIAS(DOS$dn_expand, libd_dn_expand);
 DEFINE_PUBLIC_ALIAS(DOS$__res_nameinquery, libd_res_nameinquery);

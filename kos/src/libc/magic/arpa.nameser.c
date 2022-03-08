@@ -728,10 +728,30 @@ typedef enum __ns_cert_types {
 /* TODO: Figure out what these functions do and (try to) implement them */
 
 //int ns_msg_getflag(ns_msg a, int b);
-$u_int ns_get16($u_char const *a);
-$u_long ns_get32($u_char const *a);
-void ns_put16($u_int a, $u_char *b);
-void ns_put32($u_long a, $u_char *b);
+[[wunused, pure]]
+[[impl_include("<hybrid/__byteswap.h>", "<hybrid/__unaligned.h>")]]
+$u_int ns_get16([[nonnull]] $u_char const *srcptr) {
+	return __hybrid_unaligned_getbe16(srcptr);
+}
+
+[[wunused, pure]]
+[[impl_include("<hybrid/__byteswap.h>", "<hybrid/__unaligned.h>")]]
+$u_long ns_get32([[nonnull]] $u_char const *srcptr) {
+	return __hybrid_unaligned_getbe32(srcptr);
+}
+
+[[export_alias("putshort", "__putshort")]]
+[[impl_include("<hybrid/__byteswap.h>", "<hybrid/__unaligned.h>")]]
+void ns_put16($u_int val, [[nonnull]] $u_char *destptr) {
+	__hybrid_unaligned_setbe16(destptr, val);
+}
+
+[[export_alias("putlong", "__putlong")]]
+[[impl_include("<hybrid/__byteswap.h>", "<hybrid/__unaligned.h>")]]
+void ns_put32($u_long val, [[nonnull]] $u_char *destptr) {
+	__hybrid_unaligned_setbe32(destptr, val);
+}
+
 int ns_initparse($u_char const *a, int b, ns_msg *c);
 int ns_skiprr($u_char const *a, $u_char const *b, ns_sect c, int d);
 int ns_parserr(ns_msg *a, ns_sect b, int c, ns_rr *d);
@@ -746,8 +766,21 @@ int ns_name_pton(char const *a, $u_char *b, size_t c);
 int ns_name_unpack($u_char const *a, $u_char const *b, $u_char const *c, $u_char *d, size_t e);
 int ns_name_pack($u_char const *a, $u_char *b, int c, $u_char const **d, $u_char const **e);
 int ns_name_uncompress($u_char const *a, $u_char const *b, $u_char const *c, char *d, size_t e);
-int ns_name_compress(char const *a, $u_char *b, size_t c, $u_char const **d, $u_char const **e);
-int ns_name_skip($u_char const **a, $u_char const *b);
+
+[[if(__SIZEOF_INT__ == __SIZEOF_SIZE_T__), alias("dn_comp", "__dn_comp")]]
+int ns_name_compress(char const *srcbuf, $u_char *dstbuf, size_t dstbufsize,
+                     $u_char const **d, $u_char const **e) {
+	COMPILER_IMPURE();
+	(void)srcbuf;
+	(void)dstbuf;
+	(void)dstbufsize;
+	(void)d;
+	(void)e;
+	/* TODO */
+	return 0;
+}
+
+int ns_name_skip([[nonnull]] $u_char const **p_msg_ptr, [[nonnull]] $u_char const *msg_end);
 void ns_name_rollback($u_char const *a, $u_char const **b, $u_char const **c);
 int ns_sign($u_char *a, int *b, int c, int d, void *e, $u_char const *f, int g, $u_char *h, int *i, time_t j);
 int ns_sign2($u_char *a, int *b, int c, int d, void *e, $u_char const *f, int g, $u_char *h, int *i, time_t j, $u_char **k, $u_char **l);
@@ -762,6 +795,16 @@ int ns_samedomain(char const *a, char const *b);
 int ns_subdomain(char const *a, char const *b);
 int ns_makecanon(char const *a, char *b, size_t c);
 int ns_samename(char const *a, char const *b);
+
+/* From <resolv.h> */
+[[hidden, export_alias("__dn_comp")]]
+[[if(__SIZEOF_INT__ == __SIZEOF_SIZE_T__), alias("ns_name_compress")]]
+[[if(__SIZEOF_INT__ == __SIZEOF_SIZE_T__), crt_intern_alias("ns_name_compress")]]
+int dn_comp(char const *srcbuf, $u_char *dstbuf, int dstbufsize, $u_char **d, $u_char **e) {
+	return ns_name_compress(srcbuf, dstbuf, (size_t)dstbufsize, (u_char const **)d, (u_char const **)e);
+}
+
+
 
 %{
 #endif /* __CC__ */

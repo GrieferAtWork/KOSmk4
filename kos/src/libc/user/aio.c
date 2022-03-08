@@ -57,6 +57,10 @@ DECL_BEGIN
 #define sys_futex_time64 sys_futex
 #endif /* !SYS_futex_time64 */
 
+#ifndef WEAK
+#define WEAK __WEAK
+#endif /* !WEAK */
+
 #ifndef REF
 #define REF __REF
 #endif /* !REF */
@@ -119,6 +123,7 @@ NOTHROW_NCX(LIBCCALL sigevent_notify)(struct sigevent const *__restrict self) {
 			}
 			attr = &_attr;
 		}
+
 		/* Because sizeof(sigval_t) == sizeof(void *), and because the thread spawned
 		 * here doesn't care about whatever its callback might return, we can  simply
 		 * use the signal event function directly, even though it returns `void'! */
@@ -158,12 +163,12 @@ NOTHROW_NCX(LIBCCALL sigevent_notify)(struct sigevent const *__restrict self) {
 
 
 struct aio_set_completion {
-	refcnt_t        asc_refcnt; /* Reference counter. */
+	WEAK refcnt_t   asc_refcnt; /* Reference counter. */
 	struct sigevent asc_event;  /* [const] Event triggered once `asc_refcnt' reaches `0' */
 };
 
 PRIVATE NONNULL((1)) void
-NOTHROW_NCX(LIBCCALL aio_set_completion_descref)(struct aio_set_completion *__restrict self) {
+NOTHROW_NCX(LIBCCALL aio_set_completion_decref)(struct aio_set_completion *__restrict self) {
 	if (ATOMIC_DECFETCH(self->asc_refcnt) != 0)
 		return;
 	sigevent_notify(&self->asc_event);
@@ -268,7 +273,7 @@ struct aio {
 	REF struct aio_set_completion
 	                *aio_set;        /* [0..1][const] Associated AIO set.
 	                                  * Must be decref'd just after a `TERMINAL STATE' is set. */
-	pid_t            aio_threadpid;  /* PID of the thread that is servicing this descriptor. */
+	pid_t            aio_threadtid;  /* TID of the thread that is servicing this descriptor. */
 };
 
 #define SAME_FIELD(a, b)                                               \
@@ -392,7 +397,7 @@ NOTHROW_NCX(LIBCCALL aio_on_completion)(struct aio *__restrict self,
 	/* Trigger post-completion events. */
 	sigevent_notify(&completion);
 	if (set != NULL)
-		aio_set_completion_descref(set);
+		aio_set_completion_decref(set);
 }
 
 
@@ -438,7 +443,7 @@ again:
 	--aio_pending_count;
 
 	/* Set our TID as the one responsible for this descriptor. */
-	self->aio_threadpid = mytid;
+	self->aio_threadtid = mytid;
 
 	/* Try to start serving this descriptor. */
 	if (!ATOMIC_CMPXCH(self->aio_status.as_status,
@@ -468,13 +473,6 @@ again_operation:
 		if (result == -ESPIPE) /* pwrite not supported by this file... */
 			result = sys_write(self->aio_fildes, self->aio_buf, self->aio_nbytes);
 		break;
-
-#ifndef __OPTIMIZE_SIZE__
-	case LIO_NOP:
-		/* NOP should never appear here, but better be safe and handle it as well. */
-		result = -EOK;
-		break;
-#endif /* !__OPTIMIZE_SIZE__ */
 
 	case LIO_FSYNC:
 		result = sys_fsync(self->aio_fildes);
@@ -678,7 +676,7 @@ NOTHROW_NCX(LIBCCALL interrupt_aio_thread)(struct aio *__restrict self) {
 	/* Use `RPC_PRIORITY_HIGH', thus  trying to  do
 	 * an implicit yield to the thread in question. */
 	errno_t saved = libc_geterrno();
-	rpc_interrupt(self->aio_threadpid, RPC_SYNCMODE_CP | RPC_PRIORITY_HIGH);
+	rpc_interrupt(self->aio_threadtid, RPC_SYNCMODE_CP | RPC_PRIORITY_HIGH);
 	libc_seterrno(saved);
 }
 

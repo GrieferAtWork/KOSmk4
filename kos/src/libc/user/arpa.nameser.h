@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae1b6197 */
+/* HASH CRC-32:0xd12cb30a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,6 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF u_int NOTHROW_NCX(LIBCCALL libc_ns_get16)(u_char const *a);
-INTDEF u_long NOTHROW_NCX(LIBCCALL libc_ns_get32)(u_char const *a);
-INTDEF void NOTHROW_NCX(LIBCCALL libc_ns_put16)(u_int a, u_char *b);
-INTDEF void NOTHROW_NCX(LIBCCALL libc_ns_put32)(u_long a, u_char *b);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_ns_initparse)(u_char const *a, int b, ns_msg *c);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_ns_skiprr)(u_char const *a, u_char const *b, ns_sect c, int d);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_ns_parserr)(ns_msg *a, ns_sect b, int c, ns_rr *d);
@@ -49,8 +45,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_ns_name_pton)(char const *a, u_char *b, siz
 INTDEF int NOTHROW_NCX(LIBCCALL libc_ns_name_unpack)(u_char const *a, u_char const *b, u_char const *c, u_char *d, size_t e);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_ns_name_pack)(u_char const *a, u_char *b, int c, u_char const **d, u_char const **e);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_ns_name_uncompress)(u_char const *a, u_char const *b, u_char const *c, char *d, size_t e);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_ns_name_compress)(char const *a, u_char *b, size_t c, u_char const **d, u_char const **e);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_ns_name_skip)(u_char const **a, u_char const *b);
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_ns_name_skip)(u_char const **p_msg_ptr, u_char const *msg_end);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_ns_name_rollback)(u_char const *a, u_char const **b, u_char const **c);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_ns_sign)(u_char *a, int *b, int c, int d, void *e, u_char const *f, int g, u_char *h, int *i, time_t j);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_ns_sign2)(u_char *a, int *b, int c, int d, void *e, u_char const *f, int g, u_char *h, int *i, time_t j, u_char **k, u_char **l);

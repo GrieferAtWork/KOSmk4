@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde2a1e0e */
+/* HASH CRC-32:0xdb917616 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -752,10 +752,38 @@ typedef enum __ns_cert_types {
 
 #ifdef __CC__
 
-__CDECLARE_OPT(,unsigned int,__NOTHROW_NCX,ns_get16,(unsigned char const *__a),(__a))
-__CDECLARE_OPT(,unsigned long,__NOTHROW_NCX,ns_get32,(unsigned char const *__a),(__a))
-__CDECLARE_VOID_OPT(,__NOTHROW_NCX,ns_put16,(unsigned int __a, unsigned char *__b),(__a,__b))
-__CDECLARE_VOID_OPT(,__NOTHROW_NCX,ns_put32,(unsigned long __a, unsigned char *__b),(__a,__b))
+#ifdef __CRT_HAVE_ns_get16
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),unsigned int,__NOTHROW_NCX,ns_get16,(unsigned char const *__srcptr),(__srcptr))
+#else /* __CRT_HAVE_ns_get16 */
+#include <libc/local/arpa.nameser/ns_get16.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(ns_get16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) unsigned int __NOTHROW_NCX(__LIBCCALL ns_get16)(unsigned char const *__srcptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ns_get16))(__srcptr); })
+#endif /* !__CRT_HAVE_ns_get16 */
+#ifdef __CRT_HAVE_ns_get32
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,ns_get32,(unsigned char const *__srcptr),(__srcptr))
+#else /* __CRT_HAVE_ns_get32 */
+#include <libc/local/arpa.nameser/ns_get32.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(ns_get32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL ns_get32)(unsigned char const *__srcptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ns_get32))(__srcptr); })
+#endif /* !__CRT_HAVE_ns_get32 */
+#ifdef __CRT_HAVE_ns_put16
+__CDECLARE_VOID(__ATTR_NONNULL((2)),__NOTHROW_NCX,ns_put16,(unsigned int __val, unsigned char *__destptr),(__val,__destptr))
+#elif defined(__CRT_HAVE_putshort)
+__CREDIRECT_VOID(__ATTR_NONNULL((2)),__NOTHROW_NCX,ns_put16,(unsigned int __val, unsigned char *__destptr),putshort,(__val,__destptr))
+#elif defined(__CRT_HAVE___putshort)
+__CREDIRECT_VOID(__ATTR_NONNULL((2)),__NOTHROW_NCX,ns_put16,(unsigned int __val, unsigned char *__destptr),__putshort,(__val,__destptr))
+#else /* ... */
+#include <libc/local/arpa.nameser/ns_put16.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(ns_put16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void __NOTHROW_NCX(__LIBCCALL ns_put16)(unsigned int __val, unsigned char *__destptr) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ns_put16))(__val, __destptr); })
+#endif /* !... */
+#ifdef __CRT_HAVE_ns_put32
+__CDECLARE_VOID(__ATTR_NONNULL((2)),__NOTHROW_NCX,ns_put32,(unsigned long __val, unsigned char *__destptr),(__val,__destptr))
+#elif defined(__CRT_HAVE_putlong)
+__CREDIRECT_VOID(__ATTR_NONNULL((2)),__NOTHROW_NCX,ns_put32,(unsigned long __val, unsigned char *__destptr),putlong,(__val,__destptr))
+#elif defined(__CRT_HAVE___putlong)
+__CREDIRECT_VOID(__ATTR_NONNULL((2)),__NOTHROW_NCX,ns_put32,(unsigned long __val, unsigned char *__destptr),__putlong,(__val,__destptr))
+#else /* ... */
+#include <libc/local/arpa.nameser/ns_put32.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(ns_put32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void __NOTHROW_NCX(__LIBCCALL ns_put32)(unsigned long __val, unsigned char *__destptr) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ns_put32))(__val, __destptr); })
+#endif /* !... */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,ns_initparse,(unsigned char const *__a, int __b, ns_msg *__c),(__a,__b,__c))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,ns_skiprr,(unsigned char const *__a, unsigned char const *__b, ns_sect __c, int __d),(__a,__b,__c,__d))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,ns_parserr,(ns_msg *__a, ns_sect __b, int __c, ns_rr *__d),(__a,__b,__c,__d))
@@ -770,8 +798,17 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,ns_name_pton,(char const *__a, unsigned char *
 __CDECLARE_OPT(,int,__NOTHROW_NCX,ns_name_unpack,(unsigned char const *__a, unsigned char const *__b, unsigned char const *__c, unsigned char *__d, size_t __e),(__a,__b,__c,__d,__e))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,ns_name_pack,(unsigned char const *__a, unsigned char *__b, int __c, unsigned char const **__d, unsigned char const **__e),(__a,__b,__c,__d,__e))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,ns_name_uncompress,(unsigned char const *__a, unsigned char const *__b, unsigned char const *__c, char *__d, size_t __e),(__a,__b,__c,__d,__e))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_name_compress,(char const *__a, unsigned char *__b, size_t __c, unsigned char const **__d, unsigned char const **__e),(__a,__b,__c,__d,__e))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,ns_name_skip,(unsigned char const **__a, unsigned char const *__b),(__a,__b))
+#ifdef __CRT_HAVE_ns_name_compress
+__CDECLARE(,int,__NOTHROW_NCX,ns_name_compress,(char const *__srcbuf, unsigned char *__dstbuf, size_t __dstbufsize, unsigned char const **__d, unsigned char const **__e),(__srcbuf,__dstbuf,__dstbufsize,__d,__e))
+#elif defined(__CRT_HAVE_dn_comp) && __SIZEOF_INT__ == __SIZEOF_SIZE_T__
+__CREDIRECT(,int,__NOTHROW_NCX,ns_name_compress,(char const *__srcbuf, unsigned char *__dstbuf, size_t __dstbufsize, unsigned char const **__d, unsigned char const **__e),dn_comp,(__srcbuf,__dstbuf,__dstbufsize,__d,__e))
+#elif defined(__CRT_HAVE___dn_comp) && __SIZEOF_INT__ == __SIZEOF_SIZE_T__
+__CREDIRECT(,int,__NOTHROW_NCX,ns_name_compress,(char const *__srcbuf, unsigned char *__dstbuf, size_t __dstbufsize, unsigned char const **__d, unsigned char const **__e),__dn_comp,(__srcbuf,__dstbuf,__dstbufsize,__d,__e))
+#else /* ... */
+#include <libc/local/arpa.nameser/ns_name_compress.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(ns_name_compress, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL ns_name_compress)(char const *__srcbuf, unsigned char *__dstbuf, size_t __dstbufsize, unsigned char const **__d, unsigned char const **__e) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ns_name_compress))(__srcbuf, __dstbuf, __dstbufsize, __d, __e); })
+#endif /* !... */
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,ns_name_skip,(unsigned char const **__p_msg_ptr, unsigned char const *__msg_end),(__p_msg_ptr,__msg_end))
 __CDECLARE_VOID_OPT(,__NOTHROW_NCX,ns_name_rollback,(unsigned char const *__a, unsigned char const **__b, unsigned char const **__c),(__a,__b,__c))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,ns_sign,(unsigned char *__a, int *__b, int __c, int __d, void *__e, unsigned char const *__f, int __g, unsigned char *__h, int *__i, time_t __j),(__a,__b,__c,__d,__e,__f,__g,__h,__i,__j))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,ns_sign2,(unsigned char *__a, int *__b, int __c, int __d, void *__e, unsigned char const *__f, int __g, unsigned char *__h, int *__i, time_t __j, unsigned char **__k, unsigned char **__l),(__a,__b,__c,__d,__e,__f,__g,__h,__i,__j,__k,__l))

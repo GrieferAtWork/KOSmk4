@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70fb8890 */
+/* HASH CRC-32:0xe26231c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,16 +48,10 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_res_hnok)(char const *a);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_res_ownok)(char const *a);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_res_mailok)(char const *a);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_res_dnok)(char const *a);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_sym_ston)(struct res_sym const *a, char const *b, int *c);
-INTDEF char const *NOTHROW_NCX(LIBCCALL libc_sym_ntos)(struct res_sym const *a, int b, int *c);
-INTDEF char const *NOTHROW_NCX(LIBCCALL libc_sym_ntop)(struct res_sym const *a, int b, int *c);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_b64_ntop)(u_char const *a, size_t b, char *c, size_t d);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_b64_pton)(char const *a, u_char *b, size_t c);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_loc_aton)(char const *a, u_char *b);
 INTDEF char const *NOTHROW_NCX(LIBCCALL libc_loc_ntoa)(u_char const *a, char *b);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_dn_skipname)(u_char const *a, u_char const *b);
-INTDEF void NOTHROW_NCX(LIBCCALL libc_putlong)(u_int32_t a, u_char *b);
-INTDEF void NOTHROW_NCX(LIBCCALL libc_putshort)(u_int16_t a, u_char *b);
 INTDEF char const *NOTHROW_NCX(LIBCCALL libc_p_class)(int a);
 INTDEF char const *NOTHROW_NCX(LIBCCALL libc_p_time)(u_int32_t a);
 INTDEF char const *NOTHROW_NCX(LIBCCALL libc_p_type)(int a);
@@ -69,8 +63,6 @@ INTDEF u_char const *NOTHROW_NCX(LIBCCALL libc_p_fqname)(u_char const *a, u_char
 INTDEF char const *NOTHROW_NCX(LIBCCALL libc_p_option)(u_long a);
 INTDEF char *NOTHROW_NCX(LIBCCALL libc_p_secstodate)(u_long a);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_dn_count_labels)(char const *a);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_dn_comp)(char const *a, u_char *b, int c, u_char **d, u_char **e);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_dn_expand)(u_char const *a, u_char const *b, u_char const *c, char *d, int e);
 INTDEF u_int NOTHROW_NCX(LIBCCALL libc_res_randomid)(void);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_res_nameinquery)(char const *a, int b, int c, u_char const *d, u_char const *e);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_res_queriesmatch)(u_char const *a, u_char const *b, u_char const *c, u_char const *d);

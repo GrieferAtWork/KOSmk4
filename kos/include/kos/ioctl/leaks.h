@@ -50,7 +50,7 @@
 #define LEAK_ATTR_USERSIZE 6 /* Total user-data area size (in bytes; w/o `CONFIG_MALL_HEAD_SIZE' or `CONFIG_MALL_TAIL_SIZE') */
 #define LEAK_ATTR_TID      7 /* Root-namespace TID of the original allocator thread. */
 #define LEAK_ATTR_TBSIZE   8 /* # of addresses within the traceback (enumerate through `LEAKS_IOC_LEAKTB') */
-#define LEAK_ATTR_NOWALK   9 /* Returns non-NULL if `GFP_NOWALK' was set during the original allocation. */
+#define LEAK_ATTR_NOWALK   9 /* Returns non-zero if `GFP_NOWALK' was set during the original allocation. */
 
 #ifdef __CC__
 __DECL_BEGIN

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63ebdd80 */
+/* HASH CRC-32:0x3a2d2dc8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -137,14 +137,8 @@
 #define __stub_crypt_r
 #define __stub_dehumanize_number
 #define __stub_devname_r
-#define __stub___dn_comp
-#define __stub_dn_comp
 #define __stub___dn_count_labels
 #define __stub_dn_count_labels
-#define __stub___dn_expand
-#define __stub_dn_expand
-#define __stub___dn_skipname
-#define __stub_dn_skipname
 #define __stub_drand48
 #define __stub_drand48_r
 #define __stub___duplocale
@@ -370,11 +364,8 @@
 #define __stub_ns_datetosecs
 #define __stub_ns_find_tsig
 #define __stub_ns_format_ttl
-#define __stub_ns_get16
-#define __stub_ns_get32
 #define __stub_ns_initparse
 #define __stub_ns_makecanon
-#define __stub_ns_name_compress
 #define __stub_ns_name_ntol
 #define __stub_ns_name_ntop
 #define __stub_ns_name_pack
@@ -385,8 +376,6 @@
 #define __stub_ns_name_unpack
 #define __stub_ns_parse_ttl
 #define __stub_ns_parserr
-#define __stub_ns_put16
-#define __stub_ns_put32
 #define __stub_ns_samedomain
 #define __stub_ns_samename
 #define __stub_ns_sign
@@ -449,12 +438,8 @@
 #define __stub_pthread_setcanceltype
 #define __stub_ptsname_r
 #define __stub_putgrent
-#define __stub___putlong
-#define __stub_putlong
 #define __stub_putmsg
 #define __stub_putpmsg
-#define __stub___putshort
-#define __stub_putshort
 #define __stub_putspent
 #define __stub__pututline
 #define __stub_pututline
@@ -574,12 +559,6 @@
 #define __stub___strfmon_l
 #define __stub_strfmon_l
 #define __stub_stty
-#define __stub___sym_ntop
-#define __stub_sym_ntop
-#define __stub___sym_ntos
-#define __stub_sym_ntos
-#define __stub___sym_ston
-#define __stub_sym_ston
 #ifdef __LIBCCALL_IS_LIBDCALL
 #define __stub__tempnam
 #endif /* __LIBCCALL_IS_LIBDCALL */

@@ -278,53 +278,8 @@ NOTHROW_NCX(LIBCCALL libc_res_dnok)(char const *a)
 }
 /*[[[end:libc_res_dnok]]]*/
 
-/*[[[head:libc_sym_ston,hash:CRC-32=0xf233295c]]]*/
-INTERN ATTR_SECTION(".text.crt.net.nameser") int
-NOTHROW_NCX(LIBCCALL libc_sym_ston)(struct res_sym const *a,
-                                    char const *b,
-                                    int *c)
-/*[[[body:libc_sym_ston]]]*/
-/*AUTO*/{
-	(void)a;
-	(void)b;
-	(void)c;
-	CRT_UNIMPLEMENTEDF("sym_ston(%p, %q, %p)", a, b, c); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_sym_ston]]]*/
 
-/*[[[head:libc_sym_ntos,hash:CRC-32=0x7928b4a9]]]*/
-INTERN ATTR_SECTION(".text.crt.net.nameser") char const *
-NOTHROW_NCX(LIBCCALL libc_sym_ntos)(struct res_sym const *a,
-                                    int b,
-                                    int *c)
-/*[[[body:libc_sym_ntos]]]*/
-/*AUTO*/{
-	(void)a;
-	(void)b;
-	(void)c;
-	CRT_UNIMPLEMENTEDF("sym_ntos(%p, %x, %p)", a, b, c); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_sym_ntos]]]*/
 
-/*[[[head:libc_sym_ntop,hash:CRC-32=0xbc10866a]]]*/
-INTERN ATTR_SECTION(".text.crt.net.nameser") char const *
-NOTHROW_NCX(LIBCCALL libc_sym_ntop)(struct res_sym const *a,
-                                    int b,
-                                    int *c)
-/*[[[body:libc_sym_ntop]]]*/
-/*AUTO*/{
-	(void)a;
-	(void)b;
-	(void)c;
-	CRT_UNIMPLEMENTEDF("sym_ntop(%p, %x, %p)", a, b, c); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_sym_ntop]]]*/
 
 /*[[[head:libc_b64_ntop,hash:CRC-32=0xe00d0a02]]]*/
 INTERN ATTR_SECTION(".text.crt.net.nameser") int
@@ -388,45 +343,8 @@ NOTHROW_NCX(LIBCCALL libc_loc_ntoa)(u_char const *a,
 }
 /*[[[end:libc_loc_ntoa]]]*/
 
-/*[[[head:libc_dn_skipname,hash:CRC-32=0x16815cb8]]]*/
-INTERN ATTR_SECTION(".text.crt.net.nameser") int
-NOTHROW_NCX(LIBCCALL libc_dn_skipname)(u_char const *a,
-                                       u_char const *b)
-/*[[[body:libc_dn_skipname]]]*/
-/*AUTO*/{
-	(void)a;
-	(void)b;
-	CRT_UNIMPLEMENTEDF("dn_skipname(%p, %p)", a, b); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_dn_skipname]]]*/
 
-/*[[[head:libc_putlong,hash:CRC-32=0xa873753c]]]*/
-INTERN ATTR_SECTION(".text.crt.net.nameser") void
-NOTHROW_NCX(LIBCCALL libc_putlong)(u_int32_t a,
-                                   u_char *b)
-/*[[[body:libc_putlong]]]*/
-/*AUTO*/{
-	(void)a;
-	(void)b;
-	CRT_UNIMPLEMENTEDF("putlong(%" PRIx32 ", %p)", a, b); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_putlong]]]*/
 
-/*[[[head:libc_putshort,hash:CRC-32=0x4a21a74b]]]*/
-INTERN ATTR_SECTION(".text.crt.net.nameser") void
-NOTHROW_NCX(LIBCCALL libc_putshort)(u_int16_t a,
-                                    u_char *b)
-/*[[[body:libc_putshort]]]*/
-/*AUTO*/{
-	(void)a;
-	(void)b;
-	CRT_UNIMPLEMENTEDF("putshort(%" PRIx16 ", %p)", a, b); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_putshort]]]*/
 
 /*[[[head:libc_p_class,hash:CRC-32=0x44130675]]]*/
 INTERN ATTR_SECTION(".text.crt.net.nameser") char const *
@@ -582,45 +500,7 @@ NOTHROW_NCX(LIBCCALL libc_dn_count_labels)(char const *a)
 }
 /*[[[end:libc_dn_count_labels]]]*/
 
-/*[[[head:libc_dn_comp,hash:CRC-32=0xc2a81403]]]*/
-INTERN ATTR_SECTION(".text.crt.net.nameser") int
-NOTHROW_NCX(LIBCCALL libc_dn_comp)(char const *a,
-                                   u_char *b,
-                                   int c,
-                                   u_char **d,
-                                   u_char **e)
-/*[[[body:libc_dn_comp]]]*/
-/*AUTO*/{
-	(void)a;
-	(void)b;
-	(void)c;
-	(void)d;
-	(void)e;
-	CRT_UNIMPLEMENTEDF("dn_comp(%q, %p, %x, %p, %p)", a, b, c, d, e); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_dn_comp]]]*/
 
-/*[[[head:libc_dn_expand,hash:CRC-32=0x912f47b6]]]*/
-INTERN ATTR_SECTION(".text.crt.net.nameser") int
-NOTHROW_NCX(LIBCCALL libc_dn_expand)(u_char const *a,
-                                     u_char const *b,
-                                     u_char const *c,
-                                     char *d,
-                                     int e)
-/*[[[body:libc_dn_expand]]]*/
-/*AUTO*/{
-	(void)a;
-	(void)b;
-	(void)c;
-	(void)d;
-	(void)e;
-	CRT_UNIMPLEMENTEDF("dn_expand(%p, %p, %p, %q, %x)", a, b, c, d, e); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_dn_expand]]]*/
 
 /*[[[head:libc_res_randomid,hash:CRC-32=0xd0aa2c8b]]]*/
 INTERN ATTR_SECTION(".text.crt.net.nameser") u_int
@@ -888,7 +768,7 @@ NOTHROW_NCX(LIBCCALL libc_res_nclose)(res_state a)
 }
 /*[[[end:libc_res_nclose]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x2f0e8a9d]]]*/
+/*[[[start:exports,hash:CRC-32=0x153c5c7d]]]*/
 DEFINE_PUBLIC_ALIAS(__res_state, libc___res_state);
 DEFINE_PUBLIC_ALIAS(__fp_nquery, libc_fp_nquery);
 DEFINE_PUBLIC_ALIAS(fp_nquery, libc_fp_nquery);
@@ -922,12 +802,6 @@ DEFINE_PUBLIC_ALIAS(__res_mailok, libc_res_mailok);
 DEFINE_PUBLIC_ALIAS(res_mailok, libc_res_mailok);
 DEFINE_PUBLIC_ALIAS(__res_dnok, libc_res_dnok);
 DEFINE_PUBLIC_ALIAS(res_dnok, libc_res_dnok);
-DEFINE_PUBLIC_ALIAS(__sym_ston, libc_sym_ston);
-DEFINE_PUBLIC_ALIAS(sym_ston, libc_sym_ston);
-DEFINE_PUBLIC_ALIAS(__sym_ntos, libc_sym_ntos);
-DEFINE_PUBLIC_ALIAS(sym_ntos, libc_sym_ntos);
-DEFINE_PUBLIC_ALIAS(__sym_ntop, libc_sym_ntop);
-DEFINE_PUBLIC_ALIAS(sym_ntop, libc_sym_ntop);
 DEFINE_PUBLIC_ALIAS(__b64_ntop, libc_b64_ntop);
 DEFINE_PUBLIC_ALIAS(b64_ntop, libc_b64_ntop);
 DEFINE_PUBLIC_ALIAS(__b64_pton, libc_b64_pton);
@@ -936,12 +810,6 @@ DEFINE_PUBLIC_ALIAS(__loc_aton, libc_loc_aton);
 DEFINE_PUBLIC_ALIAS(loc_aton, libc_loc_aton);
 DEFINE_PUBLIC_ALIAS(__loc_ntoa, libc_loc_ntoa);
 DEFINE_PUBLIC_ALIAS(loc_ntoa, libc_loc_ntoa);
-DEFINE_PUBLIC_ALIAS(__dn_skipname, libc_dn_skipname);
-DEFINE_PUBLIC_ALIAS(dn_skipname, libc_dn_skipname);
-DEFINE_PUBLIC_ALIAS(__putlong, libc_putlong);
-DEFINE_PUBLIC_ALIAS(putlong, libc_putlong);
-DEFINE_PUBLIC_ALIAS(__putshort, libc_putshort);
-DEFINE_PUBLIC_ALIAS(putshort, libc_putshort);
 DEFINE_PUBLIC_ALIAS(__p_class, libc_p_class);
 DEFINE_PUBLIC_ALIAS(p_class, libc_p_class);
 DEFINE_PUBLIC_ALIAS(__p_time, libc_p_time);
@@ -964,10 +832,6 @@ DEFINE_PUBLIC_ALIAS(__p_secstodate, libc_p_secstodate);
 DEFINE_PUBLIC_ALIAS(p_secstodate, libc_p_secstodate);
 DEFINE_PUBLIC_ALIAS(__dn_count_labels, libc_dn_count_labels);
 DEFINE_PUBLIC_ALIAS(dn_count_labels, libc_dn_count_labels);
-DEFINE_PUBLIC_ALIAS(__dn_comp, libc_dn_comp);
-DEFINE_PUBLIC_ALIAS(dn_comp, libc_dn_comp);
-DEFINE_PUBLIC_ALIAS(__dn_expand, libc_dn_expand);
-DEFINE_PUBLIC_ALIAS(dn_expand, libc_dn_expand);
 DEFINE_PUBLIC_ALIAS(__res_randomid, libc_res_randomid);
 DEFINE_PUBLIC_ALIAS(res_randomid, libc_res_randomid);
 DEFINE_PUBLIC_ALIAS(__res_nameinquery, libc_res_nameinquery);

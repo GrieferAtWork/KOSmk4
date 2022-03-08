@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc75690fa */
+/* HASH CRC-32:0xa509e9e3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -149,6 +149,11 @@ DFUN(".text.crt.dos.net.nameser", libd_ns_samedomain, libc_ns_samedomain, TD, 2,
 DFUN(".text.crt.dos.net.nameser", libd_ns_subdomain, libc_ns_subdomain, TD, 2, TP, TP)
 DFUN(".text.crt.dos.net.nameser", libd_ns_makecanon, libc_ns_makecanon, TD, 3, TP, TP, TI)
 DFUN(".text.crt.dos.net.nameser", libd_ns_samename, libc_ns_samename, TD, 2, TP, TP)
+#if __SIZEOF_INT__ == __SIZEOF_SIZE_T__
+DEFINE_INTERN_ALIAS(libd_dn_comp, libd_ns_name_compress);
+#else /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */
+DFUN(".text.crt.dos.net.nameser", libd_dn_comp, libc_dn_comp, TD, 5, TP, TP, TD, TP, TP)
+#endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
 
 /* complex */
 DFUN(".text.crt.dos.math.complex", libd_cabsf, libc_cabsf, TF, 1, TCF)
@@ -1104,8 +1109,6 @@ DFUN(".text.crt.dos.net.nameser", libd_b64_pton, libc_b64_pton, TD, 3, TP, TP, T
 DFUN(".text.crt.dos.net.nameser", libd_loc_aton, libc_loc_aton, TD, 2, TP, TP)
 DFUN(".text.crt.dos.net.nameser", libd_loc_ntoa, libc_loc_ntoa, TP, 2, TP, TP)
 DFUN(".text.crt.dos.net.nameser", libd_dn_skipname, libc_dn_skipname, TD, 2, TP, TP)
-DFUN(".text.crt.dos.net.nameser", libd_putlong, libc_putlong, TV, 2, TI32, TP)
-DFUN(".text.crt.dos.net.nameser", libd_putshort, libc_putshort, TV, 2, TI16, TP)
 DFUN(".text.crt.dos.net.nameser", libd_p_class, libc_p_class, TP, 1, TD)
 DFUN(".text.crt.dos.net.nameser", libd_p_time, libc_p_time, TP, 1, TI32)
 DFUN(".text.crt.dos.net.nameser", libd_p_type, libc_p_type, TP, 1, TD)
@@ -1117,7 +1120,6 @@ DFUN(".text.crt.dos.net.nameser", libd_p_fqname, libc_p_fqname, TP, 3, TP, TP, T
 DFUN(".text.crt.dos.net.nameser", libd_p_option, libc_p_option, TP, 1, TL)
 DFUN(".text.crt.dos.net.nameser", libd_p_secstodate, libc_p_secstodate, TP, 1, TL)
 DFUN(".text.crt.dos.net.nameser", libd_dn_count_labels, libc_dn_count_labels, TD, 1, TP)
-DFUN(".text.crt.dos.net.nameser", libd_dn_comp, libc_dn_comp, TD, 5, TP, TP, TD, TP, TP)
 DFUN(".text.crt.dos.net.nameser", libd_dn_expand, libc_dn_expand, TD, 5, TP, TP, TP, TP, TD)
 DFUN(".text.crt.dos.net.nameser", libd_res_nameinquery, libc_res_nameinquery, TD, 5, TP, TD, TD, TP, TP)
 DFUN(".text.crt.dos.net.nameser", libd_res_queriesmatch, libc_res_queriesmatch, TD, 4, TP, TP, TP, TP)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57c64768 */
+/* HASH CRC-32:0x972336fe */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2321,13 +2321,11 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$putgrent
-#define __CRT_HAVE_DOS$putlong
 #define __CRT_HAVE_DOS$putmsg
 #define __CRT_HAVE_DOS$putpmsg
 #define __CRT_HAVE_DOS$putpwent
 #define __CRT_HAVE_DOS$puts
 #define __CRT_HAVE_DOS$puts_unlocked
-#define __CRT_HAVE_DOS$putshort
 #define __CRT_HAVE_DOS$putspent
 #define __CRT_HAVE_DOS$pututline
 #define __CRT_HAVE_DOS$pututxline
@@ -5948,13 +5946,11 @@
 #define __CRT_HAVE_putchar_unlocked
 #define __CRT_HAVE_putenv
 #define __CRT_HAVE_putgrent
-#define __CRT_HAVE_putlong
 #define __CRT_HAVE_putmsg
 #define __CRT_HAVE_putpmsg
 #define __CRT_HAVE_putpwent
 #define __CRT_HAVE_puts
 #define __CRT_HAVE_puts_unlocked
-#define __CRT_HAVE_putshort
 #define __CRT_HAVE_putspent
 #define __CRT_HAVE_pututline
 #define __CRT_HAVE_pututxline

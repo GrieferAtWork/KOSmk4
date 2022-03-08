@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3421556 */
+/* HASH CRC-32:0x677962e0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,6 +40,8 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+#include <asm/crt/resolv.h>
+#include <bits/crt/resolv.h>
 
 #include <arpa/nameser.h>
 #include <netinet/in.h>
@@ -50,263 +52,80 @@
 #include <stdio.h>
 
 /* ??? */
-#define MAXNS            3 /* ??? */
-#define MAXDFLSRCH       3 /* ??? */
-#define MAXDNSRCH        6 /* ??? */
-#define LOCALDOMAINPARTS 2 /* ??? */
+#define MAXNS            __MAXNS            /* ??? */
+#define MAXDFLSRCH       __MAXDFLSRCH       /* ??? */
+#define MAXDNSRCH        __MAXDNSRCH        /* ??? */
+#define LOCALDOMAINPARTS __LOCALDOMAINPARTS /* ??? */
 
 /* ??? */
-#define RES_TIMEOUT    5     /* ??? */
-#define MAXRESOLVSORT  10    /* ??? */
-#define RES_MAXNDOTS   15    /* ??? */
-#define RES_MAXRETRANS 30    /* ??? */
-#define RES_MAXRETRY   5     /* ??? */
-#define RES_DFLRETRY   2     /* ??? */
-#define RES_MAXTIME    65535 /* ??? */
-
-/* ??? */
-#define __RES 19991006
+#define RES_TIMEOUT    __RES_TIMEOUT    /* ??? */
+#define MAXRESOLVSORT  __MAXRESOLVSORT  /* ??? */
+#define RES_MAXNDOTS   __RES_MAXNDOTS   /* ??? */
+#define RES_MAXRETRANS __RES_MAXRETRANS /* ??? */
+#define RES_MAXRETRY   __RES_MAXRETRY   /* ??? */
+#define RES_DFLRETRY   __RES_DFLRETRY   /* ??? */
+#define RES_MAXTIME    __RES_MAXTIME    /* ??? */
 
 /* ??? */
 #ifndef _PATH_RESCONF
-#define _PATH_RESCONF "/etc/resolv.conf"
+#define _PATH_RESCONF __PATH_RESCONF
 #endif /* !_PATH_RESCONF */
 
 /* ??? */
-#define RES_F_VC       0x00000001 /* socket is TCP */
-#define RES_F_CONN     0x00000002 /* socket is connected */
-#define RES_F_EDNS0ERR 0x00000004 /* EDNS0 caused errors */
+#define RES_F_VC       __RES_F_VC       /* socket is TCP */
+#define RES_F_CONN     __RES_F_CONN     /* socket is connected */
+#define RES_F_EDNS0ERR __RES_F_EDNS0ERR /* EDNS0 caused errors */
 
 /* ??? */
-#define RES_EXHAUSTIVE 0x00000001 /* always do all queries */
+#define RES_EXHAUSTIVE __RES_EXHAUSTIVE /* always do all queries */
 
 /* ??? */
-#define RES_INIT        0x00000001 /* address initialized */
-#define RES_DEBUG       0x00000002 /* print debug messages */
-#define RES_AAONLY      0x00000004 /* authoritative answers only (!IMPL)*/
-#define RES_USEVC       0x00000008 /* use virtual circuit */
-#define RES_PRIMARY     0x00000010 /* query primary server only (!IMPL) */
-#define RES_IGNTC       0x00000020 /* ignore trucation errors */
-#define RES_RECURSE     0x00000040 /* recursion desired */
-#define RES_DEFNAMES    0x00000080 /* use default domain name */
-#define RES_STAYOPEN    0x00000100 /* Keep TCP socket open */
-#define RES_DNSRCH      0x00000200 /* search up local domain tree */
-#define RES_INSECURE1   0x00000400 /* type 1 security disabled */
-#define RES_INSECURE2   0x00000800 /* type 2 security disabled */
-#define RES_NOALIASES   0x00001000 /* shuts off HOSTALIASES feature */
-#define RES_USE_INET6   0x00002000 /* use/map IPv6 in gethostbyname() */
-#define RES_ROTATE      0x00004000 /* rotate ns list after each query */
-#define RES_NOCHECKNAME 0x00008000 /* do not check names for sanity (!IMPL) */
-#define RES_KEEPTSIG    0x00010000 /* do not strip TSIG records */
-#define RES_BLAST       0x00020000 /* blast all recursive servers */
-#define RES_USEBSTRING  0x00040000 /* IPv6 reverse lookup with byte strings */
-#define RES_NOIP6DOTINT 0x00080000 /* Do not use .ip6.int in IPv6 reverse lookup */
-#define RES_USE_EDNS0   0x00100000 /* Use EDNS0.  */
-#define RES_SNGLKUP     0x00200000 /* one outstanding request at a time */
-#define RES_SNGLKUPREOP 0x00400000 /* -"-, but open new socket for each request */
-#define RES_USE_DNSSEC 0x00800000  /* use DNSSEC using OK bit in OPT */
-#define RES_NOTLDQUERY 0x01000000  /* Do not look up unqualified name as a TLD.  */
-#define RES_DEFAULT     (RES_RECURSE | RES_DEFNAMES | RES_DNSRCH | RES_NOIP6DOTINT)
+#define RES_INIT        __RES_INIT        /* address initialized */
+#define RES_DEBUG       __RES_DEBUG       /* print debug messages */
+#define RES_AAONLY      __RES_AAONLY      /* authoritative answers only (!IMPL)*/
+#define RES_USEVC       __RES_USEVC       /* use virtual circuit */
+#define RES_PRIMARY     __RES_PRIMARY     /* query primary server only (!IMPL) */
+#define RES_IGNTC       __RES_IGNTC       /* ignore truncation errors */
+#define RES_RECURSE     __RES_RECURSE     /* recursion desired */
+#define RES_DEFNAMES    __RES_DEFNAMES    /* use default domain name */
+#define RES_STAYOPEN    __RES_STAYOPEN    /* Keep TCP socket open */
+#define RES_DNSRCH      __RES_DNSRCH      /* search up local domain tree */
+#define RES_INSECURE1   __RES_INSECURE1   /* type 1 security disabled */
+#define RES_INSECURE2   __RES_INSECURE2   /* type 2 security disabled */
+#define RES_NOALIASES   __RES_NOALIASES   /* shuts off HOSTALIASES feature */
+#define RES_USE_INET6   __RES_USE_INET6   /* use/map IPv6 in gethostbyname() */
+#define RES_ROTATE      __RES_ROTATE      /* rotate ns list after each query */
+#define RES_NOCHECKNAME __RES_NOCHECKNAME /* do not check names for sanity (!IMPL) */
+#define RES_KEEPTSIG    __RES_KEEPTSIG    /* do not strip TSIG records */
+#define RES_BLAST       __RES_BLAST       /* blast all recursive servers */
+#define RES_USEBSTRING  __RES_USEBSTRING  /* IPv6 reverse lookup with byte strings */
+#define RES_NOIP6DOTINT __RES_NOIP6DOTINT /* Do not use .ip6.int in IPv6 reverse lookup */
+#define RES_USE_EDNS0   __RES_USE_EDNS0   /* Use EDNS0.  */
+#define RES_SNGLKUP     __RES_SNGLKUP     /* one outstanding request at a time */
+#define RES_SNGLKUPREOP __RES_SNGLKUPREOP /* -"-, but open new socket for each request */
+#define RES_USE_DNSSEC  __RES_USE_DNSSEC  /* use DNSSEC using OK bit in OPT */
+#define RES_NOTLDQUERY  __RES_NOTLDQUERY  /* Do not look up unqualified name as a TLD.  */
+#define RES_DEFAULT     __RES_DEFAULT
 
 /* ??? */
-#define RES_PRF_STATS  0x00000001
-#define RES_PRF_UPDATE 0x00000002
-#define RES_PRF_CLASS  0x00000004
-#define RES_PRF_CMD    0x00000008
-#define RES_PRF_QUES   0x00000010
-#define RES_PRF_ANS    0x00000020
-#define RES_PRF_AUTH   0x00000040
-#define RES_PRF_ADD    0x00000080
-#define RES_PRF_HEAD1  0x00000100
-#define RES_PRF_HEAD2  0x00000200
-#define RES_PRF_TTLID  0x00000400
-#define RES_PRF_HEADX  0x00000800
-#define RES_PRF_QUERY  0x00001000
-#define RES_PRF_REPLY  0x00002000
-#define RES_PRF_INIT   0x00004000
+#define RES_PRF_STATS  __RES_PRF_STATS
+#define RES_PRF_UPDATE __RES_PRF_UPDATE
+#define RES_PRF_CLASS  __RES_PRF_CLASS
+#define RES_PRF_CMD    __RES_PRF_CMD
+#define RES_PRF_QUES   __RES_PRF_QUES
+#define RES_PRF_ANS    __RES_PRF_ANS
+#define RES_PRF_AUTH   __RES_PRF_AUTH
+#define RES_PRF_ADD    __RES_PRF_ADD
+#define RES_PRF_HEAD1  __RES_PRF_HEAD1
+#define RES_PRF_HEAD2  __RES_PRF_HEAD2
+#define RES_PRF_TTLID  __RES_PRF_TTLID
+#define RES_PRF_HEADX  __RES_PRF_HEADX
+#define RES_PRF_QUERY  __RES_PRF_QUERY
+#define RES_PRF_REPLY  __RES_PRF_REPLY
+#define RES_PRF_INIT   __RES_PRF_INIT
 
 #ifdef __CC__
 __SYSDECL_BEGIN
-
-#ifndef __res_state_defined
-#define __res_state_defined
-typedef enum {
-	res_goahead,
-	res_nextns,
-	res_modified,
-	res_done,
-	res_error
-} res_sendhookact;
-typedef res_sendhookact
-(__LIBKCALL *res_send_qhook)(struct sockaddr_in *const *__ns,
-                             __u_char const **__query, int *__querylen,
-                             __u_char *__ans, int __anssiz, int *__resplen);
-typedef res_sendhookact
-(__LIBKCALL *res_send_rhook)(struct sockaddr_in const *__ns,
-                             __u_char const *__query, int __querylen,
-                             __u_char *__ans, int __anssiz, int *__resplen);
-
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("name")
-#pragma push_macro("type")
-#pragma push_macro("rr_class")
-#pragma push_macro("ttl")
-#pragma push_macro("rdlength")
-#pragma push_macro("rdata")
-#pragma push_macro("retrans")
-#pragma push_macro("retry")
-#pragma push_macro("options")
-#pragma push_macro("nscount")
-#pragma push_macro("nsaddr_list")
-#pragma push_macro("id")
-#pragma push_macro("dnsrch")
-#pragma push_macro("defdname")
-#pragma push_macro("pfcode")
-#pragma push_macro("ndots")
-#pragma push_macro("nsort")
-#pragma push_macro("ipv6_unavail")
-#pragma push_macro("unused")
-#pragma push_macro("addr")
-#pragma push_macro("mask")
-#pragma push_macro("sort_list")
-#pragma push_macro("qhook")
-#pragma push_macro("rhook")
-#pragma push_macro("res_h_errno")
-#pragma push_macro("pad")
-#pragma push_macro("nsmap")
-#pragma push_macro("nssocks")
-#pragma push_macro("nscount6")
-#pragma push_macro("nsinit")
-#pragma push_macro("nsaddrs")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef name
-#undef type
-#undef rr_class
-#undef ttl
-#undef rdlength
-#undef rdata
-#undef retrans
-#undef retry
-#undef options
-#undef nscount
-#undef nsaddr_list
-#undef id
-#undef dnsrch
-#undef defdname
-#undef pfcode
-#undef ndots
-#undef nsort
-#undef ipv6_unavail
-#undef unused
-#undef addr
-#undef mask
-#undef sort_list
-#undef qhook
-#undef rhook
-#undef res_h_errno
-#undef pad
-#undef nsmap
-#undef nssocks
-#undef nscount6
-#undef nsinit
-#undef nsaddrs
-typedef struct __res_state {
-	int                retrans;               /* ??? */
-	int                retry;                 /* ??? */
-	__u_long           options;               /* ??? */
-	int                nscount;               /* ??? */
-	struct sockaddr_in nsaddr_list[MAXNS];    /* ??? */
-#define nsaddr         nsaddr_list[0]         /* ??? */
-	__u_short          id;                    /* ??? */
-	__byte_t         __rs_pad1[2];            /* ... */
-	char              *dnsrch[MAXDNSRCH + 1]; /* ??? */
-	char               defdname[256];         /* ??? */
-	__u_long           pfcode;                /* ??? */
-	unsigned int       ndots : 4;             /* ??? */
-	unsigned int       nsort : 4;             /* ??? */
-	unsigned int       ipv6_unavail : 1;      /* ??? */
-	unsigned int       unused : 23;           /* ??? */
-	struct {
-		struct in_addr addr;                  /* ??? */
-		__uint32_t     mask;                  /* ??? */
-	} sort_list[MAXRESOLVSORT];               /* ??? */
-#if __SIZEOF_POINTER__ >= 8
-	__byte_t         __rs_pad2[4];            /* ... */
-#endif /* __SIZEOF_POINTER__ >= 8 */
-	res_send_qhook     qhook;                 /* ??? */
-	res_send_rhook     rhook;                 /* ??? */
-	int                res_h_errno;           /* ??? */
-	int               _vcsock;                /* ??? */
-	__u_int           _flags;                 /* ??? */
-#if __SIZEOF_POINTER__ >= 8
-	__byte_t         __rs_pad3[4];            /* ... */
-#endif /* __SIZEOF_POINTER__ >= 8 */
-	union {
-		char           pad[52]; /* ... */
-		struct {
-			__uint16_t           nscount;        /* ??? */
-			__uint16_t           nsmap[MAXNS];   /* ??? */
-			int                  nssocks[MAXNS]; /* ??? */
-			__uint16_t           nscount6;       /* ??? */
-			__uint16_t           nsinit;         /* ??? */
-			struct sockaddr_in6 *nsaddrs[MAXNS]; /* ??? */
-			__UINT32_TYPE__     _initstamp[2];   /* ??? */
-		} _ext;
-	} _u;
-} *res_state;
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("nsaddrs")
-#pragma pop_macro("nsinit")
-#pragma pop_macro("nscount6")
-#pragma pop_macro("nssocks")
-#pragma pop_macro("nsmap")
-#pragma pop_macro("pad")
-#pragma pop_macro("res_h_errno")
-#pragma pop_macro("rhook")
-#pragma pop_macro("qhook")
-#pragma pop_macro("sort_list")
-#pragma pop_macro("mask")
-#pragma pop_macro("addr")
-#pragma pop_macro("unused")
-#pragma pop_macro("ipv6_unavail")
-#pragma pop_macro("nsort")
-#pragma pop_macro("ndots")
-#pragma pop_macro("pfcode")
-#pragma pop_macro("defdname")
-#pragma pop_macro("dnsrch")
-#pragma pop_macro("id")
-#pragma pop_macro("nsaddr_list")
-#pragma pop_macro("nscount")
-#pragma pop_macro("options")
-#pragma pop_macro("retry")
-#pragma pop_macro("retrans")
-#pragma pop_macro("rdata")
-#pragma pop_macro("rdlength")
-#pragma pop_macro("ttl")
-#pragma pop_macro("rr_class")
-#pragma pop_macro("type")
-#pragma pop_macro("name")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#endif /* !__res_state_defined */
-
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("number")
-#pragma push_macro("name")
-#pragma push_macro("humanname")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef number
-#undef name
-#undef humanname
-struct res_sym {
-	int   number;    /* ??? */
-	char *name;      /* ??? */
-	char *humanname; /* ??? */
-};
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("humanname")
-#pragma pop_macro("name")
-#pragma pop_macro("number")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 __CDECLARE_OPT(__ATTR_CONST,struct __res_state *,__NOTHROW_NCX,__res_state,(void),())
 #ifdef __CRT_HAVE___res_state
@@ -396,20 +215,29 @@ __CDECLARE(,int,__NOTHROW_NCX,res_dnok,(char const *__a),(__a))
 __CREDIRECT(,int,__NOTHROW_NCX,res_dnok,(char const *__a),__res_dnok,(__a))
 #endif /* ... */
 #ifdef __CRT_HAVE_sym_ston
-__CDECLARE(,int,__NOTHROW_NCX,sym_ston,(struct res_sym const *__a, char const *__b, int *__c),(__a,__b,__c))
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,sym_ston,(struct res_sym const *__symbols, char const *__wanted_name, int *__p_success),(__symbols,__wanted_name,__p_success))
 #elif defined(__CRT_HAVE___sym_ston)
-__CREDIRECT(,int,__NOTHROW_NCX,sym_ston,(struct res_sym const *__a, char const *__b, int *__c),__sym_ston,(__a,__b,__c))
-#endif /* ... */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,sym_ston,(struct res_sym const *__symbols, char const *__wanted_name, int *__p_success),__sym_ston,(__symbols,__wanted_name,__p_success))
+#else /* ... */
+#include <libc/local/resolv/sym_ston.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(sym_ston, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL sym_ston)(struct res_sym const *__symbols, char const *__wanted_name, int *__p_success) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sym_ston))(__symbols, __wanted_name, __p_success); })
+#endif /* !... */
 #ifdef __CRT_HAVE_sym_ntos
-__CDECLARE(,char const *,__NOTHROW_NCX,sym_ntos,(struct res_sym const *__a, int __b, int *__c),(__a,__b,__c))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char const *,__NOTHROW_NCX,sym_ntos,(struct res_sym const *__symbols, int __wanted_number, int *__p_success),(__symbols,__wanted_number,__p_success))
 #elif defined(__CRT_HAVE___sym_ntos)
-__CREDIRECT(,char const *,__NOTHROW_NCX,sym_ntos,(struct res_sym const *__a, int __b, int *__c),__sym_ntos,(__a,__b,__c))
-#endif /* ... */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char const *,__NOTHROW_NCX,sym_ntos,(struct res_sym const *__symbols, int __wanted_number, int *__p_success),__sym_ntos,(__symbols,__wanted_number,__p_success))
+#else /* ... */
+#include <libc/local/resolv/sym_ntos.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(sym_ntos, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char const *__NOTHROW_NCX(__LIBCCALL sym_ntos)(struct res_sym const *__symbols, int __wanted_number, int *__p_success) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sym_ntos))(__symbols, __wanted_number, __p_success); })
+#endif /* !... */
 #ifdef __CRT_HAVE_sym_ntop
-__CDECLARE(,char const *,__NOTHROW_NCX,sym_ntop,(struct res_sym const *__a, int __b, int *__c),(__a,__b,__c))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char const *,__NOTHROW_NCX,sym_ntop,(struct res_sym const *__symbols, int __wanted_number, int *__p_success),(__symbols,__wanted_number,__p_success))
 #elif defined(__CRT_HAVE___sym_ntop)
-__CREDIRECT(,char const *,__NOTHROW_NCX,sym_ntop,(struct res_sym const *__a, int __b, int *__c),__sym_ntop,(__a,__b,__c))
-#endif /* ... */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char const *,__NOTHROW_NCX,sym_ntop,(struct res_sym const *__symbols, int __wanted_number, int *__p_success),__sym_ntop,(__symbols,__wanted_number,__p_success))
+#else /* ... */
+#include <libc/local/resolv/sym_ntop.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(sym_ntop, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char const *__NOTHROW_NCX(__LIBCCALL sym_ntop)(struct res_sym const *__symbols, int __wanted_number, int *__p_success) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sym_ntop))(__symbols, __wanted_number, __p_success); })
+#endif /* !... */
 #ifdef __CRT_HAVE_b64_ntop
 __CDECLARE(,int,__NOTHROW_NCX,b64_ntop,(unsigned char const *__a, size_t __b, char *__c, size_t __d),(__a,__b,__c,__d))
 #elif defined(__CRT_HAVE___b64_ntop)
@@ -431,20 +259,33 @@ __CDECLARE(,char const *,__NOTHROW_NCX,loc_ntoa,(unsigned char const *__a, char 
 __CREDIRECT(,char const *,__NOTHROW_NCX,loc_ntoa,(unsigned char const *__a, char *__b),__loc_ntoa,(__a,__b))
 #endif /* ... */
 #ifdef __CRT_HAVE_dn_skipname
-__CDECLARE(,int,__NOTHROW_NCX,dn_skipname,(unsigned char const *__a, unsigned char const *__b),(__a,__b))
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,dn_skipname,(unsigned char const *__msg_ptr, unsigned char const *__end_of_msg),(__msg_ptr,__end_of_msg))
 #elif defined(__CRT_HAVE___dn_skipname)
-__CREDIRECT(,int,__NOTHROW_NCX,dn_skipname,(unsigned char const *__a, unsigned char const *__b),__dn_skipname,(__a,__b))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,dn_skipname,(unsigned char const *__msg_ptr, unsigned char const *__end_of_msg),__dn_skipname,(__msg_ptr,__end_of_msg))
+#elif defined(__CRT_HAVE_ns_name_skip)
+#include <libc/local/resolv/dn_skipname.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(dn_skipname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL dn_skipname)(unsigned char const *__msg_ptr, unsigned char const *__end_of_msg) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dn_skipname))(__msg_ptr, __end_of_msg); })
 #endif /* ... */
-#ifdef __CRT_HAVE_putlong
+#ifdef __CRT_HAVE_ns_put32
+__CREDIRECT_VOID(,__NOTHROW_NCX,putlong,(__UINT32_TYPE__ __a, unsigned char *__b),ns_put32,(__a,__b))
+#elif defined(__CRT_HAVE_putlong)
 __CDECLARE_VOID(,__NOTHROW_NCX,putlong,(__UINT32_TYPE__ __a, unsigned char *__b),(__a,__b))
 #elif defined(__CRT_HAVE___putlong)
 __CREDIRECT_VOID(,__NOTHROW_NCX,putlong,(__UINT32_TYPE__ __a, unsigned char *__b),__putlong,(__a,__b))
-#endif /* ... */
-#ifdef __CRT_HAVE_putshort
+#else /* ... */
+#include <libc/local/arpa.nameser/ns_put32.h>
+__FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL putlong)(__UINT32_TYPE__ __a, unsigned char *__b) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ns_put32))((unsigned long)__a, __b); }
+#endif /* !... */
+#ifdef __CRT_HAVE_ns_put16
+__CREDIRECT_VOID(,__NOTHROW_NCX,putshort,(__UINT16_TYPE__ __a, unsigned char *__b),ns_put16,(__a,__b))
+#elif defined(__CRT_HAVE_putshort)
 __CDECLARE_VOID(,__NOTHROW_NCX,putshort,(__UINT16_TYPE__ __a, unsigned char *__b),(__a,__b))
 #elif defined(__CRT_HAVE___putshort)
 __CREDIRECT_VOID(,__NOTHROW_NCX,putshort,(__UINT16_TYPE__ __a, unsigned char *__b),__putshort,(__a,__b))
-#endif /* ... */
+#else /* ... */
+#include <libc/local/arpa.nameser/ns_put16.h>
+__FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL putshort)(__UINT16_TYPE__ __a, unsigned char *__b) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ns_put16))((unsigned int)__a, __b); }
+#endif /* !... */
 #ifdef __CRT_HAVE_p_class
 __CDECLARE(,char const *,__NOTHROW_NCX,p_class,(int __a),(__a))
 #elif defined(__CRT_HAVE___p_class)
@@ -501,14 +342,22 @@ __CDECLARE(,int,__NOTHROW_NCX,dn_count_labels,(char const *__a),(__a))
 __CREDIRECT(,int,__NOTHROW_NCX,dn_count_labels,(char const *__a),__dn_count_labels,(__a))
 #endif /* ... */
 #ifdef __CRT_HAVE_dn_comp
-__CDECLARE(,int,__NOTHROW_NCX,dn_comp,(char const *__a, unsigned char *__b, int __c, unsigned char **__d, unsigned char **__e),(__a,__b,__c,__d,__e))
+__CDECLARE(,int,__NOTHROW_NCX,dn_comp,(char const *__srcbuf, unsigned char *__dstbuf, int __dstbufsize, unsigned char **__d, unsigned char **__e),(__srcbuf,__dstbuf,__dstbufsize,__d,__e))
 #elif defined(__CRT_HAVE___dn_comp)
-__CREDIRECT(,int,__NOTHROW_NCX,dn_comp,(char const *__a, unsigned char *__b, int __c, unsigned char **__d, unsigned char **__e),__dn_comp,(__a,__b,__c,__d,__e))
-#endif /* ... */
+__CREDIRECT(,int,__NOTHROW_NCX,dn_comp,(char const *__srcbuf, unsigned char *__dstbuf, int __dstbufsize, unsigned char **__d, unsigned char **__e),__dn_comp,(__srcbuf,__dstbuf,__dstbufsize,__d,__e))
+#elif defined(__CRT_HAVE_ns_name_compress) && __SIZEOF_INT__ == __SIZEOF_SIZE_T__
+__CREDIRECT(,int,__NOTHROW_NCX,dn_comp,(char const *__srcbuf, unsigned char *__dstbuf, int __dstbufsize, unsigned char **__d, unsigned char **__e),ns_name_compress,(__srcbuf,__dstbuf,__dstbufsize,__d,__e))
+#else /* ... */
+#include <libc/local/arpa.nameser/dn_comp.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(dn_comp, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL dn_comp)(char const *__srcbuf, unsigned char *__dstbuf, int __dstbufsize, unsigned char **__d, unsigned char **__e) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dn_comp))(__srcbuf, __dstbuf, __dstbufsize, __d, __e); })
+#endif /* !... */
 #ifdef __CRT_HAVE_dn_expand
-__CDECLARE(,int,__NOTHROW_NCX,dn_expand,(unsigned char const *__a, unsigned char const *__b, unsigned char const *__c, char *__d, int __e),(__a,__b,__c,__d,__e))
+__CDECLARE(,int,__NOTHROW_NCX,dn_expand,(unsigned char const *__msg_ptr, unsigned char const *__end_of_msg, unsigned char const *__srcbuf, char *__dstbuf, int __dstbufsize),(__msg_ptr,__end_of_msg,__srcbuf,__dstbuf,__dstbufsize))
 #elif defined(__CRT_HAVE___dn_expand)
-__CREDIRECT(,int,__NOTHROW_NCX,dn_expand,(unsigned char const *__a, unsigned char const *__b, unsigned char const *__c, char *__d, int __e),__dn_expand,(__a,__b,__c,__d,__e))
+__CREDIRECT(,int,__NOTHROW_NCX,dn_expand,(unsigned char const *__msg_ptr, unsigned char const *__end_of_msg, unsigned char const *__srcbuf, char *__dstbuf, int __dstbufsize),__dn_expand,(__msg_ptr,__end_of_msg,__srcbuf,__dstbuf,__dstbufsize))
+#elif defined(__CRT_HAVE_ns_name_uncompress)
+#include <libc/local/resolv/dn_expand.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(dn_expand, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL dn_expand)(unsigned char const *__msg_ptr, unsigned char const *__end_of_msg, unsigned char const *__srcbuf, char *__dstbuf, int __dstbufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dn_expand))(__msg_ptr, __end_of_msg, __srcbuf, __dstbuf, __dstbufsize); })
 #endif /* ... */
 #ifdef __CRT_HAVE_res_randomid
 __CDECLARE(,unsigned int,__NOTHROW_NCX,res_randomid,(void),())
@@ -631,18 +480,16 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,res_nclose,(res_state __a),__res_nclose,(__a))
 #if defined(__CRT_HAVE_b64_pton) || defined(__CRT_HAVE___b64_pton)
 #define __b64_pton b64_pton
 #endif /* __CRT_HAVE_b64_pton || __CRT_HAVE___b64_pton */
-#if defined(__CRT_HAVE_dn_comp) || defined(__CRT_HAVE___dn_comp)
 #define __dn_comp dn_comp
-#endif /* __CRT_HAVE_dn_comp || __CRT_HAVE___dn_comp */
 #if defined(__CRT_HAVE_dn_count_labels) || defined(__CRT_HAVE___dn_count_labels)
 #define __dn_count_labels dn_count_labels
 #endif /* __CRT_HAVE_dn_count_labels || __CRT_HAVE___dn_count_labels */
-#if defined(__CRT_HAVE_dn_expand) || defined(__CRT_HAVE___dn_expand)
+#if defined(__CRT_HAVE_dn_expand) || defined(__CRT_HAVE___dn_expand) || defined(__CRT_HAVE_ns_name_uncompress)
 #define __dn_expand dn_expand
-#endif /* __CRT_HAVE_dn_expand || __CRT_HAVE___dn_expand */
-#if defined(__CRT_HAVE_dn_skipname) || defined(__CRT_HAVE___dn_skipname)
+#endif /* __CRT_HAVE_dn_expand || __CRT_HAVE___dn_expand || __CRT_HAVE_ns_name_uncompress */
+#if defined(__CRT_HAVE_dn_skipname) || defined(__CRT_HAVE___dn_skipname) || defined(__CRT_HAVE_ns_name_skip)
 #define __dn_skipname dn_skipname
-#endif /* __CRT_HAVE_dn_skipname || __CRT_HAVE___dn_skipname */
+#endif /* __CRT_HAVE_dn_skipname || __CRT_HAVE___dn_skipname || __CRT_HAVE_ns_name_skip */
 #if defined(__CRT_HAVE_fp_resstat) || defined(__CRT_HAVE___fp_resstat)
 #define __fp_resstat fp_resstat
 #endif /* __CRT_HAVE_fp_resstat || __CRT_HAVE___fp_resstat */
@@ -685,12 +532,8 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,res_nclose,(res_state __a),__res_nclose,(__a))
 #if defined(__CRT_HAVE_p_rcode) || defined(__CRT_HAVE___p_rcode)
 #define __p_rcode p_rcode
 #endif /* __CRT_HAVE_p_rcode || __CRT_HAVE___p_rcode */
-#if defined(__CRT_HAVE_putlong) || defined(__CRT_HAVE___putlong)
 #define __putlong putlong
-#endif /* __CRT_HAVE_putlong || __CRT_HAVE___putlong */
-#if defined(__CRT_HAVE_putshort) || defined(__CRT_HAVE___putshort)
 #define __putshort putshort
-#endif /* __CRT_HAVE_putshort || __CRT_HAVE___putshort */
 #if defined(__CRT_HAVE_res_dnok) || defined(__CRT_HAVE___res_dnok)
 #define __res_dnok res_dnok
 #endif /* __CRT_HAVE_res_dnok || __CRT_HAVE___res_dnok */
@@ -742,15 +585,9 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,res_nclose,(res_state __a),__res_nclose,(__a))
 #if defined(__CRT_HAVE_res_randomid) || defined(__CRT_HAVE___res_randomid)
 #define __res_randomid res_randomid
 #endif /* __CRT_HAVE_res_randomid || __CRT_HAVE___res_randomid */
-#if defined(__CRT_HAVE_sym_ntop) || defined(__CRT_HAVE___sym_ntop)
 #define __sym_ntop sym_ntop
-#endif /* __CRT_HAVE_sym_ntop || __CRT_HAVE___sym_ntop */
-#if defined(__CRT_HAVE_sym_ntos) || defined(__CRT_HAVE___sym_ntos)
 #define __sym_ntos sym_ntos
-#endif /* __CRT_HAVE_sym_ntos || __CRT_HAVE___sym_ntos */
-#if defined(__CRT_HAVE_sym_ston) || defined(__CRT_HAVE___sym_ston)
 #define __sym_ston sym_ston
-#endif /* __CRT_HAVE_sym_ston || __CRT_HAVE___sym_ston */
 
 __SYSDECL_END
 #endif /* __CC__ */

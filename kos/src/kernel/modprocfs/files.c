@@ -1787,6 +1787,7 @@ memleaks_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	switch (cmd) {
 
 	case LEAKS_IOC_GETONCLOSE: {
+		/* TODO: Use `ioctl_intarg_*' */
 		uint32_t mode;
 		validate_writable(arg, sizeof(uint32_t));
 		mode = encode_release_mode(me->ml_relmode);
@@ -1794,6 +1795,7 @@ memleaks_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	}	break;
 
 	case LEAKS_IOC_SETONCLOSE: {
+		/* TODO: Use `ioctl_intarg_*' */
 		uint32_t mode;
 		validate_readable(arg, sizeof(uint32_t));
 		mode           = UNALIGNED_GET32((USER CHECKED uint32_t const *)arg);
@@ -1801,6 +1803,7 @@ memleaks_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	}	break;
 
 	case LEAKS_IOC_GETCOUNT: {
+		/* TODO: Use `ioctl_intarg_*' */
 		size_t count;
 		validate_writable(arg, sizeof(uint64_t));
 		count = kmalloc_leaks_count(me->ml_leaks);

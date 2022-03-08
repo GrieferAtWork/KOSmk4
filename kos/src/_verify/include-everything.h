@@ -153,6 +153,7 @@ incdir("");
 #include <asm/crt/process.h>
 #include <asm/crt/pthreadvalues.h>
 #include <asm/crt/readpassphrase.h>
+#include <asm/crt/resolv.h>
 #include <asm/crt/semaphore.h>
 #include <asm/crt/stdio.h>
 #include <asm/crt/stdio_ext.h>
@@ -263,6 +264,7 @@ incdir("");
 #include <bits/crt/posix_spawn.h>
 #include <bits/crt/pthreadtypes.h>
 #include <bits/crt/pthreadtypesizes.h>
+#include <bits/crt/resolv.h>
 #include <bits/crt/semaphore.h>
 #include <bits/crt/setjmp.h>
 #include <bits/crt/stdio.h>

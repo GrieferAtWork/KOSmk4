@@ -36,6 +36,10 @@
 
 %[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
+#include <asm/crt/resolv.h>
+)]%[insert:prefix(
+#include <bits/crt/resolv.h>
 )]%{
 
 #include <arpa/nameser.h>
@@ -47,164 +51,80 @@
 #include <stdio.h>
 
 /* ??? */
-#define MAXNS            3 /* ??? */
-#define MAXDFLSRCH       3 /* ??? */
-#define MAXDNSRCH        6 /* ??? */
-#define LOCALDOMAINPARTS 2 /* ??? */
+#define MAXNS            __MAXNS            /* ??? */
+#define MAXDFLSRCH       __MAXDFLSRCH       /* ??? */
+#define MAXDNSRCH        __MAXDNSRCH        /* ??? */
+#define LOCALDOMAINPARTS __LOCALDOMAINPARTS /* ??? */
 
 /* ??? */
-#define RES_TIMEOUT    5     /* ??? */
-#define MAXRESOLVSORT  10    /* ??? */
-#define RES_MAXNDOTS   15    /* ??? */
-#define RES_MAXRETRANS 30    /* ??? */
-#define RES_MAXRETRY   5     /* ??? */
-#define RES_DFLRETRY   2     /* ??? */
-#define RES_MAXTIME    65535 /* ??? */
-
-/* ??? */
-#define __RES 19991006
+#define RES_TIMEOUT    __RES_TIMEOUT    /* ??? */
+#define MAXRESOLVSORT  __MAXRESOLVSORT  /* ??? */
+#define RES_MAXNDOTS   __RES_MAXNDOTS   /* ??? */
+#define RES_MAXRETRANS __RES_MAXRETRANS /* ??? */
+#define RES_MAXRETRY   __RES_MAXRETRY   /* ??? */
+#define RES_DFLRETRY   __RES_DFLRETRY   /* ??? */
+#define RES_MAXTIME    __RES_MAXTIME    /* ??? */
 
 /* ??? */
 #ifndef _PATH_RESCONF
-#define _PATH_RESCONF "/etc/resolv.conf"
+#define _PATH_RESCONF __PATH_RESCONF
 #endif /* !_PATH_RESCONF */
 
 /* ??? */
-#define RES_F_VC       0x00000001 /* socket is TCP */
-#define RES_F_CONN     0x00000002 /* socket is connected */
-#define RES_F_EDNS0ERR 0x00000004 /* EDNS0 caused errors */
+#define RES_F_VC       __RES_F_VC       /* socket is TCP */
+#define RES_F_CONN     __RES_F_CONN     /* socket is connected */
+#define RES_F_EDNS0ERR __RES_F_EDNS0ERR /* EDNS0 caused errors */
 
 /* ??? */
-#define RES_EXHAUSTIVE 0x00000001 /* always do all queries */
+#define RES_EXHAUSTIVE __RES_EXHAUSTIVE /* always do all queries */
 
 /* ??? */
-#define RES_INIT        0x00000001 /* address initialized */
-#define RES_DEBUG       0x00000002 /* print debug messages */
-#define RES_AAONLY      0x00000004 /* authoritative answers only (!IMPL)*/
-#define RES_USEVC       0x00000008 /* use virtual circuit */
-#define RES_PRIMARY     0x00000010 /* query primary server only (!IMPL) */
-#define RES_IGNTC       0x00000020 /* ignore trucation errors */
-#define RES_RECURSE     0x00000040 /* recursion desired */
-#define RES_DEFNAMES    0x00000080 /* use default domain name */
-#define RES_STAYOPEN    0x00000100 /* Keep TCP socket open */
-#define RES_DNSRCH      0x00000200 /* search up local domain tree */
-#define RES_INSECURE1   0x00000400 /* type 1 security disabled */
-#define RES_INSECURE2   0x00000800 /* type 2 security disabled */
-#define RES_NOALIASES   0x00001000 /* shuts off HOSTALIASES feature */
-#define RES_USE_INET6   0x00002000 /* use/map IPv6 in gethostbyname() */
-#define RES_ROTATE      0x00004000 /* rotate ns list after each query */
-#define RES_NOCHECKNAME 0x00008000 /* do not check names for sanity (!IMPL) */
-#define RES_KEEPTSIG    0x00010000 /* do not strip TSIG records */
-#define RES_BLAST       0x00020000 /* blast all recursive servers */
-#define RES_USEBSTRING  0x00040000 /* IPv6 reverse lookup with byte strings */
-#define RES_NOIP6DOTINT 0x00080000 /* Do not use .ip6.int in IPv6 reverse lookup */
-#define RES_USE_EDNS0   0x00100000 /* Use EDNS0.  */
-#define RES_SNGLKUP     0x00200000 /* one outstanding request at a time */
-#define RES_SNGLKUPREOP 0x00400000 /* -"-, but open new socket for each request */
-#define RES_USE_DNSSEC 0x00800000  /* use DNSSEC using OK bit in OPT */
-#define RES_NOTLDQUERY 0x01000000  /* Do not look up unqualified name as a TLD.  */
-#define RES_DEFAULT     (RES_RECURSE | RES_DEFNAMES | RES_DNSRCH | RES_NOIP6DOTINT)
+#define RES_INIT        __RES_INIT        /* address initialized */
+#define RES_DEBUG       __RES_DEBUG       /* print debug messages */
+#define RES_AAONLY      __RES_AAONLY      /* authoritative answers only (!IMPL)*/
+#define RES_USEVC       __RES_USEVC       /* use virtual circuit */
+#define RES_PRIMARY     __RES_PRIMARY     /* query primary server only (!IMPL) */
+#define RES_IGNTC       __RES_IGNTC       /* ignore truncation errors */
+#define RES_RECURSE     __RES_RECURSE     /* recursion desired */
+#define RES_DEFNAMES    __RES_DEFNAMES    /* use default domain name */
+#define RES_STAYOPEN    __RES_STAYOPEN    /* Keep TCP socket open */
+#define RES_DNSRCH      __RES_DNSRCH      /* search up local domain tree */
+#define RES_INSECURE1   __RES_INSECURE1   /* type 1 security disabled */
+#define RES_INSECURE2   __RES_INSECURE2   /* type 2 security disabled */
+#define RES_NOALIASES   __RES_NOALIASES   /* shuts off HOSTALIASES feature */
+#define RES_USE_INET6   __RES_USE_INET6   /* use/map IPv6 in gethostbyname() */
+#define RES_ROTATE      __RES_ROTATE      /* rotate ns list after each query */
+#define RES_NOCHECKNAME __RES_NOCHECKNAME /* do not check names for sanity (!IMPL) */
+#define RES_KEEPTSIG    __RES_KEEPTSIG    /* do not strip TSIG records */
+#define RES_BLAST       __RES_BLAST       /* blast all recursive servers */
+#define RES_USEBSTRING  __RES_USEBSTRING  /* IPv6 reverse lookup with byte strings */
+#define RES_NOIP6DOTINT __RES_NOIP6DOTINT /* Do not use .ip6.int in IPv6 reverse lookup */
+#define RES_USE_EDNS0   __RES_USE_EDNS0   /* Use EDNS0.  */
+#define RES_SNGLKUP     __RES_SNGLKUP     /* one outstanding request at a time */
+#define RES_SNGLKUPREOP __RES_SNGLKUPREOP /* -"-, but open new socket for each request */
+#define RES_USE_DNSSEC  __RES_USE_DNSSEC  /* use DNSSEC using OK bit in OPT */
+#define RES_NOTLDQUERY  __RES_NOTLDQUERY  /* Do not look up unqualified name as a TLD.  */
+#define RES_DEFAULT     __RES_DEFAULT
 
 /* ??? */
-#define RES_PRF_STATS  0x00000001
-#define RES_PRF_UPDATE 0x00000002
-#define RES_PRF_CLASS  0x00000004
-#define RES_PRF_CMD    0x00000008
-#define RES_PRF_QUES   0x00000010
-#define RES_PRF_ANS    0x00000020
-#define RES_PRF_AUTH   0x00000040
-#define RES_PRF_ADD    0x00000080
-#define RES_PRF_HEAD1  0x00000100
-#define RES_PRF_HEAD2  0x00000200
-#define RES_PRF_TTLID  0x00000400
-#define RES_PRF_HEADX  0x00000800
-#define RES_PRF_QUERY  0x00001000
-#define RES_PRF_REPLY  0x00002000
-#define RES_PRF_INIT   0x00004000
+#define RES_PRF_STATS  __RES_PRF_STATS
+#define RES_PRF_UPDATE __RES_PRF_UPDATE
+#define RES_PRF_CLASS  __RES_PRF_CLASS
+#define RES_PRF_CMD    __RES_PRF_CMD
+#define RES_PRF_QUES   __RES_PRF_QUES
+#define RES_PRF_ANS    __RES_PRF_ANS
+#define RES_PRF_AUTH   __RES_PRF_AUTH
+#define RES_PRF_ADD    __RES_PRF_ADD
+#define RES_PRF_HEAD1  __RES_PRF_HEAD1
+#define RES_PRF_HEAD2  __RES_PRF_HEAD2
+#define RES_PRF_TTLID  __RES_PRF_TTLID
+#define RES_PRF_HEADX  __RES_PRF_HEADX
+#define RES_PRF_QUERY  __RES_PRF_QUERY
+#define RES_PRF_REPLY  __RES_PRF_REPLY
+#define RES_PRF_INIT   __RES_PRF_INIT
 
 #ifdef __CC__
 __SYSDECL_BEGIN
-
-#ifndef __res_state_defined
-#define __res_state_defined
-typedef enum {
-	res_goahead,
-	res_nextns,
-	res_modified,
-	res_done,
-	res_error
-} res_sendhookact;
-typedef res_sendhookact
-(__LIBKCALL *res_send_qhook)(struct sockaddr_in *const *__ns,
-                             __u_char const **__query, int *__querylen,
-                             __u_char *__ans, int __anssiz, int *__resplen);
-typedef res_sendhookact
-(__LIBKCALL *res_send_rhook)(struct sockaddr_in const *__ns,
-                             __u_char const *__query, int __querylen,
-                             __u_char *__ans, int __anssiz, int *__resplen);
-
-}%[push_macro @undef {
-	name, type, rr_class, ttl, rdlength, rdata,
-	retrans, retry, options, nscount, nsaddr_list,
-	id, dnsrch, defdname, pfcode, ndots, nsort,
-	ipv6_unavail, unused, addr, mask, sort_list,
-	qhook, rhook, res_h_errno, pad, nsmap, nssocks,
-	nscount6, nsinit, nsaddrs
-}]%{
-typedef struct __res_state {
-	int                retrans;               /* ??? */
-	int                retry;                 /* ??? */
-	__u_long           options;               /* ??? */
-	int                nscount;               /* ??? */
-	struct sockaddr_in nsaddr_list[MAXNS];    /* ??? */
-#define nsaddr         nsaddr_list[0]         /* ??? */
-	__u_short          id;                    /* ??? */
-	__byte_t         __rs_pad1[2];            /* ... */
-	char              *dnsrch[MAXDNSRCH + 1]; /* ??? */
-	char               defdname[256];         /* ??? */
-	__u_long           pfcode;                /* ??? */
-	unsigned int       ndots : 4;             /* ??? */
-	unsigned int       nsort : 4;             /* ??? */
-	unsigned int       ipv6_unavail : 1;      /* ??? */
-	unsigned int       unused : 23;           /* ??? */
-	struct {
-		struct in_addr addr;                  /* ??? */
-		__uint32_t     mask;                  /* ??? */
-	} sort_list[MAXRESOLVSORT];               /* ??? */
-#if __SIZEOF_POINTER__ >= 8
-	__byte_t         __rs_pad2[4];            /* ... */
-#endif /* __SIZEOF_POINTER__ >= 8 */
-	res_send_qhook     qhook;                 /* ??? */
-	res_send_rhook     rhook;                 /* ??? */
-	int                res_h_errno;           /* ??? */
-	int               _vcsock;                /* ??? */
-	__u_int           _flags;                 /* ??? */
-#if __SIZEOF_POINTER__ >= 8
-	__byte_t         __rs_pad3[4];            /* ... */
-#endif /* __SIZEOF_POINTER__ >= 8 */
-	union {
-		char           pad[52]; /* ... */
-		struct {
-			__uint16_t           nscount;        /* ??? */
-			__uint16_t           nsmap[MAXNS];   /* ??? */
-			int                  nssocks[MAXNS]; /* ??? */
-			__uint16_t           nscount6;       /* ??? */
-			__uint16_t           nsinit;         /* ??? */
-			struct sockaddr_in6 *nsaddrs[MAXNS]; /* ??? */
-			__UINT32_TYPE__     _initstamp[2];   /* ??? */
-		} _ext;
-	} _u;
-} *res_state;
-}%[pop_macro]%{
-#endif /* !__res_state_defined */
-
-}%[push_macro @undef { number, name, humanname }]%{
-struct res_sym {
-	int   number;    /* ??? */
-	char *name;      /* ??? */
-	char *humanname; /* ??? */
-};
-}%[pop_macro]%{
 
 }
 
@@ -216,6 +136,8 @@ struct res_sym {
 %[define_type_class(res_state = "TP")]
 %[define_replacement(res_state = "struct __res_state *")]
 
+/* TODO: Figure out what these functions do and (try to) implement them */
+
 
 [[const]] struct __res_state *__res_state(void);
 %[insert:pp_if($has_function(__res_state))]
@@ -224,62 +146,243 @@ struct res_sym {
 
 %
 %#ifndef __BIND_NOSTATIC
-[[export_alias("__fp_nquery")]] void fp_nquery($u_char const *a, int b, $FILE *c);
-[[export_alias("__fp_query")]] void fp_query($u_char const *a, $FILE *b);
-[[export_alias("__hostalias")]] char const *hostalias(char const *a);
-[[export_alias("__p_query")]] void p_query($u_char const *a);
-[[export_alias("__res_close")]] void res_close(void);
-[[export_alias("__res_init")]] int res_init(void);
-[[export_alias("__res_isourserver")]] int res_isourserver(struct sockaddr_in const *a);
-[[export_alias("__res_mkquery")]] int res_mkquery(int a, char const *b, int c, int d, $u_char const *e, int f, $u_char const *g, $u_char *h, int i);
-[[export_alias("__res_query")]] int res_query(char const *a, int b, int c, $u_char *d, int e);
-[[export_alias("__res_querydomain")]] int res_querydomain(char const *a, char const *b, int c, int d, $u_char *e, int f);
-[[export_alias("__res_search")]] int res_search(char const *a, int b, int c, $u_char *d, int e);
-[[export_alias("__res_send")]] int res_send($u_char const *a, int b, $u_char *c, int d);
+[[export_alias("__fp_nquery")]]
+void fp_nquery($u_char const *a, int b, $FILE *c);
+
+[[export_alias("__fp_query")]]
+void fp_query($u_char const *a, $FILE *b);
+
+[[export_alias("__hostalias")]]
+char const *hostalias(char const *a);
+
+[[export_alias("__p_query")]]
+void p_query($u_char const *a);
+
+[[export_alias("__res_close")]]
+void res_close(void);
+
+[[export_alias("__res_init")]]
+int res_init(void);
+
+[[export_alias("__res_isourserver")]]
+int res_isourserver(struct sockaddr_in const *a);
+
+[[export_alias("__res_mkquery")]]
+int res_mkquery(int a, char const *b, int c, int d, $u_char const *e, int f, $u_char const *g, $u_char *h, int i);
+
+[[export_alias("__res_query")]]
+int res_query(char const *a, int b, int c, $u_char *d, int e);
+
+[[export_alias("__res_querydomain")]]
+int res_querydomain(char const *a, char const *b, int c, int d, $u_char *e, int f);
+
+[[export_alias("__res_search")]]
+int res_search(char const *a, int b, int c, $u_char *d, int e);
+
+[[export_alias("__res_send")]]
+int res_send($u_char const *a, int b, $u_char *c, int d);
 %#endif /* !__BIND_NOSTATIC */
 
-[[export_alias("__res_hnok")]] int res_hnok(char const *a);
-[[export_alias("__res_ownok")]] int res_ownok(char const *a);
-[[export_alias("__res_mailok")]] int res_mailok(char const *a);
-[[export_alias("__res_dnok")]] int res_dnok(char const *a);
-[[export_alias("__sym_ston")]] int sym_ston(struct res_sym const *a, char const *b, int *c);
-[[export_alias("__sym_ntos")]] char const *sym_ntos(struct res_sym const *a, int b, int *c);
-[[export_alias("__sym_ntop")]] char const *sym_ntop(struct res_sym const *a, int b, int *c);
-[[export_alias("__b64_ntop")]] int b64_ntop($u_char const *a, size_t b, char *c, size_t d);
-[[export_alias("__b64_pton")]] int b64_pton(char const *a, $u_char *b, size_t c);
-[[export_alias("__loc_aton")]] int loc_aton(char const *a, $u_char *b);
-[[export_alias("__loc_ntoa")]] char const *loc_ntoa($u_char const *a, char *b);
-[[export_alias("__dn_skipname")]] int dn_skipname($u_char const *a, $u_char const *b);
-[[export_alias("__putlong")]] void putlong($u_int32_t a, $u_char *b);
-[[export_alias("__putshort")]] void putshort($u_int16_t a, $u_char *b);
-[[export_alias("__p_class")]] char const *p_class(int a);
-[[export_alias("__p_time")]] char const *p_time($u_int32_t a);
-[[export_alias("__p_type")]] char const *p_type(int a);
-[[export_alias("__p_rcode")]] char const *p_rcode(int a);
-[[export_alias("__p_cdnname")]] $u_char const *p_cdnname($u_char const *a, $u_char const *b, int c, $FILE *d);
-[[export_alias("__p_cdname")]] $u_char const *p_cdname($u_char const *a, $u_char const *b, $FILE *c);
-[[export_alias("__p_fqnname")]] $u_char const *p_fqnname($u_char const *a, $u_char const *b, int c, char *d, int e);
-[[export_alias("__p_fqname")]] $u_char const *p_fqname($u_char const *a, $u_char const *b, $FILE *c);
-[[export_alias("__p_option")]] char const *p_option($u_long a);
-[[export_alias("__p_secstodate")]] char *p_secstodate($u_long a);
-[[export_alias("__dn_count_labels")]] int dn_count_labels(char const *a);
-[[export_alias("__dn_comp")]] int dn_comp(char const *a, $u_char *b, int c, $u_char **d, $u_char **e);
-[[export_alias("__dn_expand")]] int dn_expand($u_char const *a, $u_char const *b, $u_char const *c, char *d, int e);
-[[export_alias("__res_randomid")]] $u_int res_randomid(void);
-[[export_alias("__res_nameinquery")]] int res_nameinquery(char const *a, int b, int c, $u_char const *d, $u_char const *e);
-[[export_alias("__res_queriesmatch")]] int res_queriesmatch($u_char const *a, $u_char const *b, $u_char const *c, $u_char const *d);
-[[export_alias("__p_section")]] char const *p_section(int a, int b);
-[[export_alias("__res_ninit")]] int res_ninit(res_state a);
-[[export_alias("__res_nisourserver")]] int res_nisourserver(res_state a, struct sockaddr_in const *b);
-[[export_alias("__fp_resstat")]] void fp_resstat(res_state a, $FILE *b);
-[[export_alias("__res_npquery")]] void res_npquery(res_state a, $u_char const *b, int c, $FILE *d);
-[[export_alias("__res_hostalias")]] char const *res_hostalias(res_state a, char const *b, char *c, size_t d);
-[[export_alias("__res_nquery")]] int res_nquery(res_state a, char const *b, int c, int d, $u_char *e, int f);
-[[export_alias("__res_nsearch")]] int res_nsearch(res_state a, char const *b, int c, int d, $u_char *e, int f);
-[[export_alias("__res_nquerydomain")]] int res_nquerydomain(res_state a, char const *b, char const *c, int d, int e, $u_char *f, int g);
-[[export_alias("__res_nmkquery")]] int res_nmkquery(res_state a, int b, char const *c, int d, int e, $u_char const *f, int g, $u_char const *h, $u_char *i, int j);
-[[export_alias("__res_nsend")]] int res_nsend(res_state a, $u_char const *b, int c, $u_char *d, int e);
-[[export_alias("__res_nclose")]] void res_nclose(res_state a);
+
+[[export_alias("__res_hnok")]]
+int res_hnok(char const *a);
+
+[[export_alias("__res_ownok")]]
+int res_ownok(char const *a);
+
+[[export_alias("__res_mailok")]]
+int res_mailok(char const *a);
+
+[[export_alias("__res_dnok")]]
+int res_dnok(char const *a);
+
+[[export_alias("__sym_ston")]]
+[[decl_include("<bits/crt/resolv.h>")]]
+[[impl_include("<bits/crt/resolv.h>")]]
+int sym_ston([[nonnull]] struct res_sym const *symbols,
+             [[nonnull]] char const *wanted_name,
+             [[nullable]] int *p_success) {
+	while (symbols->@name@ != NULL) {
+		if (strcasecmp(symbols->@name@, wanted_name) == 0) {
+			if (p_success != NULL)
+				*p_success = 1;
+			goto done;
+		}
+		++symbols;
+	}
+	if (p_success != NULL)
+		*p_success = 0;
+done:
+	return symbols->@number@;
+}
+
+[[export_alias("__sym_ntos")]]
+[[decl_include("<bits/crt/resolv.h>")]]
+[[impl_include("<bits/crt/resolv.h>")]]
+[[impl_include("<hybrid/typecore.h>")]]
+[[nonnull]] char const *sym_ntos([[nonnull]] struct res_sym const *symbols,
+                                 int wanted_number,
+                                 [[nullable]] int *p_success) {
+@@pp_if __SIZEOF_INT__ == 4@@
+	static char fallback_namebuf[COMPILER_LENOF("-2147483648")];
+@@pp_elif __SIZEOF_INT__ == 8@@
+	static char fallback_namebuf[COMPILER_LENOF("-9223372036854775808")];
+@@pp_elif __SIZEOF_INT__ == 2@@
+	static char fallback_namebuf[COMPILER_LENOF("-32768")];
+@@pp_elif __SIZEOF_INT__ == 1@@
+	static char fallback_namebuf[COMPILER_LENOF("-128")];
+@@pp_else@@
+#error "Unsupported sizeof(int)"
+@@pp_endif@@
+	while (symbols->@name@ != NULL) {
+		if (symbols->@number@ == wanted_number) {
+			if (p_success)
+				*p_success = 1;
+			return symbols->@name@;
+		}
+		++symbols;
+	}
+	if (p_success)
+		*p_success = 0;
+	sprintf(fallback_namebuf, "%d", wanted_number);
+	return fallback_namebuf;
+}
+
+[[export_alias("__sym_ntop")]]
+[[decl_include("<bits/crt/resolv.h>")]]
+[[impl_include("<bits/crt/resolv.h>")]]
+[[nonnull]] char const *sym_ntop([[nonnull]] struct res_sym const *symbols,
+                                 int wanted_number,
+                                 [[nullable]] int *p_success) {
+	while (symbols->@name@ != NULL) {
+		if (symbols->@number@ == wanted_number) {
+			if (p_success)
+				*p_success = 1;
+			return symbols->@humanname@;
+		}
+		++symbols;
+	}
+	/* Re-use the fallback path of `sym_ntos(3)' */
+	return sym_ntos(symbols, wanted_number, p_success);
+}
+
+[[export_alias("__b64_ntop")]]
+int b64_ntop($u_char const *a, size_t b, char *c, size_t d);
+
+[[export_alias("__b64_pton")]]
+int b64_pton(char const *a, $u_char *b, size_t c);
+
+[[export_alias("__loc_aton")]]
+int loc_aton(char const *a, $u_char *b);
+
+[[export_alias("__loc_ntoa")]]
+char const *loc_ntoa($u_char const *a, char *b);
+
+[[export_alias("__dn_skipname")]]
+[[decl_include("<bits/types.h>")]]
+[[impl_include("<hybrid/typecore.h>")]]
+[[requires_function(ns_name_skip)]]
+int dn_skipname([[nonnull]] $u_char const *msg_ptr,
+                [[nonnull]] $u_char const *end_of_msg) {
+	u_char const *orig_msg_ptr = msg_ptr;
+	if (ns_name_skip(&msg_ptr, end_of_msg) == -1)
+		return -1;
+	return (int)(unsigned int)(size_t)(msg_ptr - orig_msg_ptr);
+}
+
+void putlong($u_int32_t a, $u_char *b) = ns_put32;
+void putshort($u_int16_t a, $u_char *b) = ns_put16;
+
+[[export_alias("__p_class")]]
+char const *p_class(int a);
+
+[[export_alias("__p_time")]]
+char const *p_time($u_int32_t a);
+
+[[export_alias("__p_type")]]
+char const *p_type(int a);
+
+[[export_alias("__p_rcode")]]
+char const *p_rcode(int a);
+
+[[export_alias("__p_cdnname")]]
+$u_char const *p_cdnname($u_char const *a, $u_char const *b, int c, $FILE *d);
+
+[[export_alias("__p_cdname")]]
+$u_char const *p_cdname($u_char const *a, $u_char const *b, $FILE *c);
+
+[[export_alias("__p_fqnname")]]
+$u_char const *p_fqnname($u_char const *a, $u_char const *b, int c, char *d, int e);
+
+[[export_alias("__p_fqname")]]
+$u_char const *p_fqname($u_char const *a, $u_char const *b, $FILE *c);
+
+[[export_alias("__p_option")]]
+char const *p_option($u_long a);
+
+[[export_alias("__p_secstodate")]]
+char *p_secstodate($u_long a);
+
+[[export_alias("__dn_count_labels")]]
+int dn_count_labels(char const *a);
+
+%[insert:function(dn_comp = dn_comp)] /* Implemented in "arpa.nameser.c" */
+
+[[decl_include("<bits/types.h>"), impl_include("<hybrid/typecore.h>")]]
+[[export_alias("__dn_expand"), requires_function(ns_name_uncompress)]]
+int dn_expand($u_char const *msg_ptr, $u_char const *end_of_msg,
+              $u_char const *srcbuf, char *dstbuf, int dstbufsize) {
+	int n = ns_name_uncompress(msg_ptr, end_of_msg, srcbuf,
+	                           dstbuf, (size_t)dstbufsize);
+	if (n > 0 && dstbuf[0] == '.')
+		dstbuf[0] = '\0';
+	return n;
+}
+
+[[export_alias("__res_randomid")]]
+$u_int res_randomid(void);
+
+[[export_alias("__res_nameinquery")]]
+int res_nameinquery(char const *a, int b, int c, $u_char const *d, $u_char const *e);
+
+[[export_alias("__res_queriesmatch")]]
+int res_queriesmatch($u_char const *a, $u_char const *b, $u_char const *c, $u_char const *d);
+
+[[export_alias("__p_section")]]
+char const *p_section(int a, int b);
+
+[[export_alias("__res_ninit"), decl_include("<bits/crt/resolv.h>")]]
+int res_ninit(res_state a);
+
+[[export_alias("__res_nisourserver"), decl_include("<bits/crt/resolv.h>")]]
+int res_nisourserver(res_state a, struct sockaddr_in const *b);
+
+[[export_alias("__fp_resstat"), decl_include("<bits/crt/resolv.h>")]]
+void fp_resstat(res_state a, $FILE *b);
+
+[[export_alias("__res_npquery"), decl_include("<bits/crt/resolv.h>")]]
+void res_npquery(res_state a, $u_char const *b, int c, $FILE *d);
+
+[[export_alias("__res_hostalias"), decl_include("<bits/crt/resolv.h>")]]
+char const *res_hostalias(res_state a, char const *b, char *c, size_t d);
+
+[[export_alias("__res_nquery"), decl_include("<bits/crt/resolv.h>")]]
+int res_nquery(res_state a, char const *b, int c, int d, $u_char *e, int f);
+
+[[export_alias("__res_nsearch"), decl_include("<bits/crt/resolv.h>")]]
+int res_nsearch(res_state a, char const *b, int c, int d, $u_char *e, int f);
+
+[[export_alias("__res_nquerydomain"), decl_include("<bits/crt/resolv.h>")]]
+int res_nquerydomain(res_state a, char const *b, char const *c, int d, int e, $u_char *f, int g);
+
+[[export_alias("__res_nmkquery"), decl_include("<bits/crt/resolv.h>")]]
+int res_nmkquery(res_state a, int b, char const *c, int d, int e, $u_char const *f, int g, $u_char const *h, $u_char *i, int j);
+
+[[export_alias("__res_nsend"), decl_include("<bits/crt/resolv.h>")]]
+int res_nsend(res_state a, $u_char const *b, int c, $u_char *d, int e);
+
+[[export_alias("__res_nclose"), decl_include("<bits/crt/resolv.h>")]]
+void res_nclose(res_state a);
 
 
 %
@@ -448,6 +551,64 @@ struct res_sym {
 %[insert:pp_if($has_function(sym_ston))]
 %#define __sym_ston sym_ston
 %[insert:pp_endif]
+
+%(auto_header){
+#undef __fp_nquery
+#undef __fp_query
+#undef __hostalias
+#undef __p_query
+#undef __res_close
+#undef __res_init
+#undef __res_isourserver
+#undef __res_mkquery
+#undef __res_query
+#undef __res_querydomain
+#undef __res_search
+#undef __res_send
+#undef __b64_ntop
+#undef __b64_pton
+#undef __dn_comp
+#undef __dn_count_labels
+#undef __dn_expand
+#undef __dn_skipname
+#undef __fp_resstat
+#undef __loc_aton
+#undef __loc_ntoa
+#undef __p_cdname
+#undef __p_cdnname
+#undef __p_class
+#undef __p_fqname
+#undef __p_fqnname
+#undef __p_option
+#undef __p_secstodate
+#undef __p_section
+#undef __p_time
+#undef __p_type
+#undef __p_rcode
+#undef __putlong
+#undef __putshort
+#undef __res_dnok
+#undef __res_hnok
+#undef __res_hostalias
+#undef __res_mailok
+#undef __res_nameinquery
+#undef __res_nclose
+#undef __res_ninit
+#undef __res_nmkquery
+#undef __res_npquery
+#undef __res_nquery
+#undef __res_nquerydomain
+#undef __res_nsearch
+#undef __res_nsend
+#undef __res_nisourserver
+#undef __res_ownok
+#undef __res_queriesmatch
+#undef __res_randomid
+#undef __sym_ntop
+#undef __sym_ntos
+#undef __sym_ston
+}
+
 %{
 
 __SYSDECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8e2d446 */
+/* HASH CRC-32:0x33d9df2e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,16 +44,34 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_res_hnok)(char const *a);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_res_ownok)(char const *a);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_res_mailok)(char const *a);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_res_dnok)(char const *a);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_sym_ston)(struct res_sym const *a, char const *b, int *c);
-INTDEF char const *NOTHROW_NCX(LIBDCALL libd_sym_ntos)(struct res_sym const *a, int b, int *c);
-INTDEF char const *NOTHROW_NCX(LIBDCALL libd_sym_ntop)(struct res_sym const *a, int b, int *c);
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_sym_ston)(struct res_sym const *symbols, char const *wanted_name, int *p_success);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_sym_ston)(struct res_sym const *symbols, char const *wanted_name, int *p_success);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_RETNONNULL NONNULL((1)) char const *NOTHROW_NCX(LIBDCALL libd_sym_ntos)(struct res_sym const *symbols, int wanted_number, int *p_success);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_RETNONNULL NONNULL((1)) char const *NOTHROW_NCX(LIBCCALL libc_sym_ntos)(struct res_sym const *symbols, int wanted_number, int *p_success);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_RETNONNULL NONNULL((1)) char const *NOTHROW_NCX(LIBDCALL libd_sym_ntop)(struct res_sym const *symbols, int wanted_number, int *p_success);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_RETNONNULL NONNULL((1)) char const *NOTHROW_NCX(LIBCCALL libc_sym_ntop)(struct res_sym const *symbols, int wanted_number, int *p_success);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF int NOTHROW_NCX(LIBDCALL libd_b64_ntop)(u_char const *a, size_t b, char *c, size_t d);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_b64_pton)(char const *a, u_char *b, size_t c);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_loc_aton)(char const *a, u_char *b);
 INTDEF char const *NOTHROW_NCX(LIBDCALL libd_loc_ntoa)(u_char const *a, char *b);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_dn_skipname)(u_char const *a, u_char const *b);
-INTDEF void NOTHROW_NCX(LIBDCALL libd_putlong)(u_int32_t a, u_char *b);
-INTDEF void NOTHROW_NCX(LIBDCALL libd_putshort)(u_int16_t a, u_char *b);
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_dn_skipname)(u_char const *msg_ptr, u_char const *end_of_msg);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_dn_skipname)(u_char const *msg_ptr, u_char const *end_of_msg);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF char const *NOTHROW_NCX(LIBDCALL libd_p_class)(int a);
 INTDEF char const *NOTHROW_NCX(LIBDCALL libd_p_time)(u_int32_t a);
 INTDEF char const *NOTHROW_NCX(LIBDCALL libd_p_type)(int a);
@@ -65,8 +83,12 @@ INTDEF u_char const *NOTHROW_NCX(LIBDCALL libd_p_fqname)(u_char const *a, u_char
 INTDEF char const *NOTHROW_NCX(LIBDCALL libd_p_option)(u_long a);
 INTDEF char *NOTHROW_NCX(LIBDCALL libd_p_secstodate)(u_long a);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_dn_count_labels)(char const *a);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_dn_comp)(char const *a, u_char *b, int c, u_char **d, u_char **e);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_dn_expand)(u_char const *a, u_char const *b, u_char const *c, char *d, int e);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_dn_expand)(u_char const *msg_ptr, u_char const *end_of_msg, u_char const *srcbuf, char *dstbuf, int dstbufsize);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF int NOTHROW_NCX(LIBCCALL libc_dn_expand)(u_char const *msg_ptr, u_char const *end_of_msg, u_char const *srcbuf, char *dstbuf, int dstbufsize);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF int NOTHROW_NCX(LIBDCALL libd_res_nameinquery)(char const *a, int b, int c, u_char const *d, u_char const *e);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_res_queriesmatch)(u_char const *a, u_char const *b, u_char const *c, u_char const *d);
 INTDEF char const *NOTHROW_NCX(LIBDCALL libd_p_section)(int a, int b);
@@ -82,6 +104,60 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_res_nmkquery)(res_state a, int b, char cons
 INTDEF int NOTHROW_NCX(LIBDCALL libd_res_nsend)(res_state a, u_char const *b, int c, u_char *d, int e);
 INTDEF void NOTHROW_NCX(LIBDCALL libd_res_nclose)(res_state a);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#undef __fp_nquery
+#undef __fp_query
+#undef __hostalias
+#undef __p_query
+#undef __res_close
+#undef __res_init
+#undef __res_isourserver
+#undef __res_mkquery
+#undef __res_query
+#undef __res_querydomain
+#undef __res_search
+#undef __res_send
+#undef __b64_ntop
+#undef __b64_pton
+#undef __dn_comp
+#undef __dn_count_labels
+#undef __dn_expand
+#undef __dn_skipname
+#undef __fp_resstat
+#undef __loc_aton
+#undef __loc_ntoa
+#undef __p_cdname
+#undef __p_cdnname
+#undef __p_class
+#undef __p_fqname
+#undef __p_fqnname
+#undef __p_option
+#undef __p_secstodate
+#undef __p_section
+#undef __p_time
+#undef __p_type
+#undef __p_rcode
+#undef __putlong
+#undef __putshort
+#undef __res_dnok
+#undef __res_hnok
+#undef __res_hostalias
+#undef __res_mailok
+#undef __res_nameinquery
+#undef __res_nclose
+#undef __res_ninit
+#undef __res_nmkquery
+#undef __res_npquery
+#undef __res_nquery
+#undef __res_nquerydomain
+#undef __res_nsearch
+#undef __res_nsend
+#undef __res_nisourserver
+#undef __res_ownok
+#undef __res_queriesmatch
+#undef __res_randomid
+#undef __sym_ntop
+#undef __sym_ntos
+#undef __sym_ston
 
 DECL_END
 
