@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8cbfd248 */
+/* HASH CRC-32:0x5373f950 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2075,6 +2075,7 @@ DFUN(".text.crt.dos.sched.resource", libd_getrlimit64, libc_getrlimit64, TD, 2, 
 DFUN(".text.crt.dos.sched.resource", libd_setrlimit64, libc_setrlimit64, TD, 2, TD, TP)
 
 /* sys.select */
+DFUN(".text.crt.dos.io.poll", libd___fdelt_chk, libc___fdelt_chk, TP, 1, TP)
 DFUN(".text.crt.dos.io.poll", libd_select, libc_select, TD, 5, TD, TP, TP, TP, TP)
 DFUN(".text.crt.dos.io.poll", libd_pselect, libc_pselect, TD, 6, TD, TP, TP, TP, TP, TP)
 DFUN(".text.crt.dos.io.poll", libd_select64, libc_select64, TD, 5, TD, TP, TP, TP, TP)

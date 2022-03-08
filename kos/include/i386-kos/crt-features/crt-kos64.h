@@ -471,6 +471,8 @@
 #define __CRT_HAVE___fchown
 #define __CRT_HAVE___fcntl
 #define __CRT_HAVE___fdatasync
+#define __CRT_HAVE___fdelt_chk
+#define __CRT_HAVE___fdelt_warn
 #define __CRT_HAVE___fdim
 #define __CRT_HAVE___fdimf
 #define __CRT_HAVE___fdiml
@@ -5598,6 +5600,8 @@
 #define __CRT_HAVE_KOS$__fchown
 #define __CRT_HAVE_KOS$__fcntl
 #define __CRT_HAVE_KOS$__fdatasync
+#define __CRT_HAVE_KOS$__fdelt_chk
+#define __CRT_HAVE_KOS$__fdelt_warn
 #define __CRT_HAVE_KOS$__fdim
 #define __CRT_HAVE_KOS$__fdimf
 #define __CRT_HAVE_KOS$__fdiml
@@ -9615,6 +9619,8 @@
 #define __CRT_HAVE_DOS$__fchown
 #define __CRT_HAVE_DOS$__fcntl
 #define __CRT_HAVE_DOS$__fdatasync
+#define __CRT_HAVE_DOS$__fdelt_chk
+#define __CRT_HAVE_DOS$__fdelt_warn
 #define __CRT_HAVE_DOS$__fdim
 #define __CRT_HAVE_DOS$__fdimf
 #define __CRT_HAVE_DOS$__fdiml

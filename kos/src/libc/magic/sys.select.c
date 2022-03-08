@@ -101,7 +101,9 @@ typedef __fd_mask fd_mask;
 #define NFDBITS __NFDBITS
 #endif /* __USE_MISC */
 
-#ifdef __INTELLISENSE__
+}
+%#ifdef __INTELLISENSE__
+%{
 __ATTR_NONNULL((2)) void (FD_SET)(__fd_t __fd, fd_set *__fdsetp);
 __ATTR_NONNULL((2)) void (FD_CLR)(__fd_t __fd, fd_set *__fdsetp);
 __ATTR_NONNULL((2)) __BOOL (FD_ISSET)(__fd_t __fd, fd_set const *__fdsetp);
@@ -114,7 +116,47 @@ __ATTR_NONNULL((1)) void (FD_ZERO)(fd_set *__fdsetp);
 __ATTR_NONNULL((1)) void (FD_COPY)(fd_set const *__src, fd_set *__dst);
 #define FD_COPY  FD_COPY
 #endif /* __USE_NETBSD */
-#else /* __INTELLISENSE__ */
+}
+%#else /* __INTELLISENSE__ */
+%{
+#if (!defined(NDEBUG) && !defined(NDEBUG_BOUNDS) && \
+     !defined(NDEBUG_FDELT) && !defined(__OPTIMIZE_SIZE__))
+}
+
+[[decl_include("<bits/types.h>"), export_alias("__fdelt_warn")]]
+[[impl_include("<asm/os/fd_set.h>", "<bits/os/fd_set.h>")]]
+[[wunused, const, impl_include("<hybrid/__assert.h>")]]
+$longptr_t __fdelt_chk($longptr_t fd) {
+	__hybrid_assertf(fd >= 0 && fd < __FD_SETSIZE,
+	                 "fd %ld cannot be used with `fd_set'",
+	                 (long int)fd);
+	return fd / __NFDBITS;
+}
+
+%{
+
+/* Override `__FD_ELT()' with an argument-checking variant. */
+#undef __FD_ELT
+#ifdef __NO_builtin_constant_p
+#define __FD_ELT __fdelt_chk
+#elif !defined(__NO_ATTR_WARNING) && (defined(__CRT_HAVE___fdelt_chk) || defined(__CRT_HAVE___fdelt_warn))
+#ifdef __CRT_HAVE___fdelt_chk
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED __ATTR_WARNING("fd number cannot be used with `fd_set'"),__LONGPTR_TYPE__,__NOTHROW_NCX,__fdelt_warn,(__LONGPTR_TYPE__ __fd),__fdelt_chk,(__fd))
+#else /* __CRT_HAVE___fdelt_chk */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_WARNING("fd number cannot be used with `fd_set'"),__LONGPTR_TYPE__,__NOTHROW_NCX,__fdelt_warn,(__LONGPTR_TYPE__ __fd),(__fd))
+#endif /* !__CRT_HAVE___fdelt_chk */
+#define __FD_ELT(fd)                                                      \
+	(__builtin_constant_p(fd)                                             \
+	 ? ((__ULONGPTR_TYPE__)(fd) < __FD_SETSIZE ? (fd) : __fdelt_warn(fd)) \
+	 : __fdelt_chk(fd))
+#else /* __NO_builtin_constant_p */
+#define __FD_ELT(fd) \
+	((__builtin_constant_p(fd) && (__ULONGPTR_TYPE__)(fd) < __FD_SETSIZE) ? (fd) : __fdelt_chk(fd))
+#endif /* !__NO_builtin_constant_p */
+}
+%{
+#endif /* !NDEBUG && !NDEBUG_BOUNDS && !NDEBUG_FDELT && !__OPTIMIZE_SIZE__ */
+
 #define FD_SET(fd, fdsetp)   (void)(__FDS_BITS(fdsetp)[__FD_ELT(fd)] |= __FD_MASK(fd))
 #define FD_CLR(fd, fdsetp)   (void)(__FDS_BITS(fdsetp)[__FD_ELT(fd)] &= ~__FD_MASK(fd))
 #define FD_ISSET(fd, fdsetp) ((__FDS_BITS(fdsetp)[__FD_ELT(fd)] & __FD_MASK(fd)) != 0)
@@ -122,7 +164,9 @@ __ATTR_NONNULL((1)) void (FD_COPY)(fd_set const *__src, fd_set *__dst);
 #ifdef __USE_NETBSD
 #define FD_COPY(src, dst) (void)__libc_memcpy(dst, src, __SIZEOF_FD_SET)
 #endif /* __USE_NETBSD */
-#endif /* !__INTELLISENSE__ */
+}
+%#endif /* !__INTELLISENSE__ */
+%{
 
 }
 

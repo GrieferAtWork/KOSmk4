@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4def89cf */
+/* HASH CRC-32:0x2b3c219e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -95,6 +95,37 @@ __ATTR_NONNULL((1)) void (FD_COPY)(fd_set const *__src, fd_set *__dst);
 #define FD_COPY  FD_COPY
 #endif /* __USE_NETBSD */
 #else /* __INTELLISENSE__ */
+#if (!defined(NDEBUG) && !defined(NDEBUG_BOUNDS) && \
+     !defined(NDEBUG_FDELT) && !defined(__OPTIMIZE_SIZE__))
+#ifdef __CRT_HAVE___fdelt_chk
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_NCX,__fdelt_chk,(__LONGPTR_TYPE__ __fd),(__fd))
+#elif defined(__CRT_HAVE___fdelt_warn)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_NCX,__fdelt_chk,(__LONGPTR_TYPE__ __fd),__fdelt_warn,(__fd))
+#else /* ... */
+#include <libc/local/sys.select/__fdelt_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__fdelt_chk, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGPTR_TYPE__ __NOTHROW_NCX(__LIBCCALL __fdelt_chk)(__LONGPTR_TYPE__ __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fdelt_chk))(__fd); })
+#endif /* !... */
+
+/* Override `__FD_ELT()' with an argument-checking variant. */
+#undef __FD_ELT
+#ifdef __NO_builtin_constant_p
+#define __FD_ELT __fdelt_chk
+#elif !defined(__NO_ATTR_WARNING) && (defined(__CRT_HAVE___fdelt_chk) || defined(__CRT_HAVE___fdelt_warn))
+#ifdef __CRT_HAVE___fdelt_chk
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED __ATTR_WARNING("fd number cannot be used with `fd_set'"),__LONGPTR_TYPE__,__NOTHROW_NCX,__fdelt_warn,(__LONGPTR_TYPE__ __fd),__fdelt_chk,(__fd))
+#else /* __CRT_HAVE___fdelt_chk */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_WARNING("fd number cannot be used with `fd_set'"),__LONGPTR_TYPE__,__NOTHROW_NCX,__fdelt_warn,(__LONGPTR_TYPE__ __fd),(__fd))
+#endif /* !__CRT_HAVE___fdelt_chk */
+#define __FD_ELT(fd)                                                      \
+	(__builtin_constant_p(fd)                                             \
+	 ? ((__ULONGPTR_TYPE__)(fd) < __FD_SETSIZE ? (fd) : __fdelt_warn(fd)) \
+	 : __fdelt_chk(fd))
+#else /* __NO_builtin_constant_p */
+#define __FD_ELT(fd) \
+	((__builtin_constant_p(fd) && (__ULONGPTR_TYPE__)(fd) < __FD_SETSIZE) ? (fd) : __fdelt_chk(fd))
+#endif /* !__NO_builtin_constant_p */
+#endif /* !NDEBUG && !NDEBUG_BOUNDS && !NDEBUG_FDELT && !__OPTIMIZE_SIZE__ */
+
 #define FD_SET(fd, fdsetp)   (void)(__FDS_BITS(fdsetp)[__FD_ELT(fd)] |= __FD_MASK(fd))
 #define FD_CLR(fd, fdsetp)   (void)(__FDS_BITS(fdsetp)[__FD_ELT(fd)] &= ~__FD_MASK(fd))
 #define FD_ISSET(fd, fdsetp) ((__FDS_BITS(fdsetp)[__FD_ELT(fd)] & __FD_MASK(fd)) != 0)

@@ -471,6 +471,8 @@
 #define __CRT_HAVE___fchown
 #define __CRT_HAVE___fcntl
 #define __CRT_HAVE___fdatasync
+#define __CRT_HAVE___fdelt_chk
+#define __CRT_HAVE___fdelt_warn
 #define __CRT_HAVE___fdim
 #define __CRT_HAVE___fdimf
 #define __CRT_HAVE___fdiml

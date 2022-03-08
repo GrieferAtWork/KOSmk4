@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91a8e318 */
+/* HASH CRC-32:0x74978e15 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,6 +30,12 @@
 DECL_BEGIN
 
 #include <signal.h>
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_CONST WUNUSED longptr_t NOTHROW_NCX(LIBDCALL libd___fdelt_chk)(longptr_t fd);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_CONST WUNUSED longptr_t NOTHROW_NCX(LIBCCALL libc___fdelt_chk)(longptr_t fd);
+#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)

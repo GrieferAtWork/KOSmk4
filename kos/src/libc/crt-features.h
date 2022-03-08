@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c85e88c */
+/* HASH CRC-32:0xfdca9605 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,6 +50,7 @@
 #define __CRT_HAVE_DOS$__cmsg_nxthdr
 #define __CRT_HAVE_DOS$__control87_2
 #define __CRT_HAVE_DOS$__fbufsize
+#define __CRT_HAVE_DOS$__fdelt_chk
 #define __CRT_HAVE_DOS$__flbf
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -3657,6 +3658,7 @@
 #define __CRT_HAVE___environ
 #define __CRT_HAVE___errno_location
 #define __CRT_HAVE___fbufsize
+#define __CRT_HAVE___fdelt_chk
 #define __CRT_HAVE___flbf
 #define __CRT_HAVE___fpclassify
 #define __CRT_HAVE___fpclassifyf
