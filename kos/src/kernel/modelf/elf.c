@@ -64,6 +64,10 @@ DECL_BEGIN
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
+/* Check if a given `Elfxx_Ehdr::e_type' can be exec'd */
+#define ELF_ISEXECTYPE(e_type) \
+	(likely((e_type) == ET_EXEC) || unlikely((e_type) == ET_DYN))
+
 LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(KCALL elf_validate_ehdr)(ElfW(Ehdr) const *__restrict ehdr) {
 	uintptr_t result;
@@ -80,7 +84,7 @@ NOTHROW(KCALL elf_validate_ehdr)(ElfW(Ehdr) const *__restrict ehdr) {
 	if unlikely(ehdr->e_version != EV_CURRENT)
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADTYPE;
-	if unlikely(ehdr->e_type != ET_EXEC)
+	if unlikely(!ELF_ISEXECTYPE(ehdr->e_type))
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADMACH;
 	if unlikely(ehdr->e_machine != ELF_ARCH_MACHINE)
@@ -119,7 +123,7 @@ NOTHROW(KCALL compat_elf_validate_ehdr)(COMPAT_ElfW(Ehdr) const *__restrict ehdr
 	if unlikely(ehdr->e_version != EV_CURRENT)
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADTYPE;
-	if unlikely(ehdr->e_type != ET_EXEC)
+	if unlikely(!ELF_ISEXECTYPE(ehdr->e_type))
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADMACH;
 	if unlikely(ehdr->e_machine != COMPAT_ELF_ARCH_MACHINE)
