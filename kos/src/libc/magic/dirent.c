@@ -399,7 +399,7 @@ __STDC_INT_AS_SSIZE_T scandir([[nonnull]] char const *__restrict dir,
 
 @@>> alphasort(3), alphasort64(3)
 @@Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would
-[[pure, decl_include("<bits/os/dirent.h>"), impl_include("<bits/os/dirent.h>"), no_crt_self_import, crt_name("alphasortk")]]
+[[userimpl, pure, decl_include("<bits/os/dirent.h>"), impl_include("<bits/os/dirent.h>"), no_crt_self_import, crt_name("alphasortk")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>") defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("alphasortk")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>") defined(__CRT_KOS) && ( defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("alphasortk64")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("alphasort")]]
@@ -411,7 +411,7 @@ int alphasort([[nonnull]] struct dirent const **e1,
 
 %
 %#ifdef __USE_LARGEFILE64
-[[pure, decl_include("<bits/os/dirent.h>"), impl_include("<bits/os/dirent.h>")]]
+[[userimpl, pure, decl_include("<bits/os/dirent.h>"), impl_include("<bits/os/dirent.h>")]]
 [[no_crt_self_import, crt_name("alphasortk64"), doc_alias("alphasort")]]
 [[if($extended_include_prefix("<bits/os/dirent.h>") defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)), alias("alphasortk")]]
 [[if(                                               defined(__CRT_KOS)                                     ), alias("alphasortk64")]]
@@ -496,7 +496,7 @@ $ssize_t getdirentries64($fd_t fd, [[nonnull]] char *__restrict buf, size_t nbyt
 %#ifdef __USE_GNU
 @@>> versionsort(3), versionsort64(3)
 @@Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would.
-[[pure, decl_include("<bits/os/dirent.h>"), impl_include("<bits/os/dirent.h>"), no_crt_self_import, crt_name("versionsortk")]]
+[[userimpl, pure, decl_include("<bits/os/dirent.h>"), impl_include("<bits/os/dirent.h>"), no_crt_self_import, crt_name("versionsortk")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>") defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("versionsortk")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>") defined(__CRT_KOS) && ( defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("versionsortk64")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("versionsort")]]
@@ -506,7 +506,7 @@ int versionsort([[nonnull]] struct dirent const **e1,
 	return strverscmp((*e1)->@d_name@, (*e2)->@d_name@);
 }
 %#ifdef __USE_LARGEFILE64
-[[pure, decl_include("<bits/os/dirent.h>"), impl_include("<bits/os/dirent.h>")]]
+[[userimpl, pure, decl_include("<bits/os/dirent.h>"), impl_include("<bits/os/dirent.h>")]]
 [[no_crt_self_import, crt_name("versionsortk64"), doc_alias("versionsort")]]
 [[if($extended_include_prefix("<bits/os/dirent.h>") defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)), alias("versionsortk")]]
 [[if(                                               defined(__CRT_KOS)                                     ), alias("versionsortk64")]]

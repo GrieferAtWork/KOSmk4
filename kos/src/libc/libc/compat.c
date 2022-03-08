@@ -54,12 +54,17 @@
 #include <unistd.h>
 
 #include <libcmdline/encode.h>
+#include <libiconv/api.h>
 
 #include "../user/stdio-api.h"
 #include "../user/stdlib.h"
 #include "compat.h"
 #include "dl.h"
 #include "globals.h"
+
+#ifndef FCALL
+#define FCALL __FCALL
+#endif /* !FCALL */
 
 DECL_BEGIN
 
@@ -898,6 +903,135 @@ uint32_t const libc___huge_val[2] = {
 DECL_END
 #endif /* !__NO_FPU */
 DECL_BEGIN
+
+
+
+
+/************************************************************************/
+/* Misc gLibc functions that don't appear in headers                    */
+/************************************************************************/
+DEFINE_PUBLIC_ALIAS(create_module, libc_create_module);
+INTERN ATTR_SECTION(".text.crt.compat.glibc") caddr_t
+NOTHROW_NCX(LIBCCALL libc_create_module)(char const *name, size_t size) {
+	/* Not implemented on KOS (and won't be because not implemented on (modern) linux, either) */
+	(void)name;
+	(void)size;
+	return (caddr_t)libc_seterrno(ENOSYS);
+}
+
+DEFINE_PUBLIC_ALIAS(delete_module, libc_delete_module);
+INTERN ATTR_SECTION(".text.crt.compat.glibc") int
+NOTHROW_NCX(LIBCCALL libc_delete_module)(char const *name, oflag_t flags) {
+	errno_t error = sys_delete_module(name, flags);
+	return libc_seterrno_syserr(error);
+}
+
+struct kernel_sym;
+DEFINE_PUBLIC_ALIAS(get_kernel_syms, libc_get_kernel_syms);
+INTERN ATTR_SECTION(".text.crt.compat.glibc") int
+NOTHROW_NCX(LIBCCALL libc_get_kernel_syms)(struct kernel_sym *table) {
+	/* Not implemented on KOS (and won't be because not implemented on (modern) linux, either) */
+	(void)table;
+	return libc_seterrno(ENOSYS);
+}
+
+DEFINE_PUBLIC_ALIAS(init_module, libc_init_module);
+INTERN ATTR_SECTION(".text.crt.compat.glibc") int
+NOTHROW_NCX(LIBCCALL libc_init_module)(void const *module_image,
+                                       size_t len, char const *uargs) {
+	errno_t error = sys_init_module(module_image, len, uargs);
+	return libc_seterrno_syserr(error);
+}
+
+DEFINE_PUBLIC_ALIAS(query_module, libc_query_module);
+INTERN ATTR_SECTION(".text.crt.compat.glibc") int
+NOTHROW_NCX(LIBCCALL libc_query_module)(char const *name, int which, void *buf,
+                                        size_t bufsize, size_t *ret) {
+	/* Not implemented on KOS (and won't be because not implemented on (modern) linux, either) */
+	(void)name;
+	(void)which;
+	(void)buf;
+	(void)bufsize;
+	(void)ret;
+	return libc_seterrno(ENOSYS);
+}
+
+
+
+
+/* At  least that's the  one I've been  using for ABI reference.
+ * Note however that KOS's libc _is_ providing various functions
+ * that have since been removed from gLibc, meaning that this is
+ * really kind-of meaningless in terms of information... */
+PRIVATE ATTR_SECTION(".rodata.crt.compat.glibc")
+char const libc_gnu_libc_version[] = "2.32";
+PRIVATE ATTR_SECTION(".rodata.crt.compat.glibc")
+char const libc_gnu_libc_release[] = "KOS";
+
+DEFINE_PUBLIC_ALIAS(gnu_get_libc_version, libc_gnu_get_libc_version);
+DEFINE_PUBLIC_ALIAS(gnu_get_libc_release, libc_gnu_get_libc_release);
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.glibc") char const *
+NOTHROW_NCX(LIBCCALL libc_gnu_get_libc_version)(void) {
+	return libc_gnu_libc_version;
+}
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.glibc") char const *
+NOTHROW_NCX(LIBCCALL libc_gnu_get_libc_release)(void) {
+	return libc_gnu_libc_release;
+}
+
+/* Glibc contains exports `iconv()', `iconv_open()' and `iconv_close()'.
+ * On  KOS, these functions are normally exported by `libiconv', but for
+ * binary compatibility, libc  also exports them  as IFUNC symbols  that
+ * lazily load+resolve-to the symbols from libiconv at runtime. */
+PRIVATE ATTR_SECTION(".bss.crt.compat.glibc") void *libc_libiconv = NULL;
+PRIVATE ATTR_SECTION(".rodata.crt.compat.glibc")
+char const libc_init_libiconv_failed_msg[] = "Failed to load libiconv: %s\n";
+PRIVATE ATTR_NORETURN ATTR_SECTION(".text.crt.compat.glibc")
+void LIBCCALL libc_init_libiconv_failed(void) {
+	syslog(LOG_ERR, libc_init_libiconv_failed_msg, dlerror());
+	exit(EXIT_FAILURE);
+}
+PRIVATE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.glibc") void *
+NOTHROW_NCX(LIBCCALL libc_get_libiconv)(void) {
+	void *result = libc_libiconv;
+	if (!result) {
+		result = dlopen(LIBICONV_LIBRARY_NAME, RTLD_LAZY | RTLD_LOCAL);
+		if unlikely(!result)
+			libc_init_libiconv_failed();
+		if (!ATOMIC_CMPXCH(libc_libiconv, NULL, result)) {
+			dlclose(result);
+			result = libc_libiconv;
+		}
+	}
+	return result;
+}
+PRIVATE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.glibc") NONNULL((1)) void *
+NOTHROW_NCX(FCALL libc_get_libiconv_symbol)(char const *__restrict name) {
+	void *lib, *res;
+	lib = libc_get_libiconv();
+	res = dlsym(lib, name);
+	if unlikely(!res)
+		libc_init_libiconv_failed();
+	return res;
+}
+
+#define DEFINE_LIBICONV_AUTORESOLVE_SYMBOL(symbol_name)                       \
+	DEFINE_PUBLIC_IFUNC(symbol_name, libc_resolve_libiconv_##symbol_name);    \
+	PRIVATE ATTR_SECTION(".rodata.crt.compat.glibc") char const               \
+	libc_libiconv_symname_##symbol_name[] = #symbol_name;                     \
+	INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.glibc")     \
+	void *LIBCCALL libc_resolve_libiconv_##symbol_name(void) {                \
+		return libc_get_libiconv_symbol(libc_libiconv_symname_##symbol_name); \
+	}
+DEFINE_LIBICONV_AUTORESOLVE_SYMBOL(iconv)
+DEFINE_LIBICONV_AUTORESOLVE_SYMBOL(iconv_open)
+DEFINE_LIBICONV_AUTORESOLVE_SYMBOL(iconv_close)
+#undef DEFINE_LIBICONV_AUTORESOLVE_SYMBOL
+
+
+
+
+
 
 
 

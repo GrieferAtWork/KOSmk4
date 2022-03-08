@@ -1787,6 +1787,8 @@
 #define __CRT_HAVE_alarm
 #define __CRT_HAVE_aligned_alloc
 #define __CRT_HAVE_alloca
+#define __CRT_HAVE_alphasort
+#define __CRT_HAVE_alphasort64
 #define __CRT_HAVE_alphasortk
 #define __CRT_HAVE_alphasortk64
 #define __CRT_HAVE_argz_add
@@ -1987,6 +1989,7 @@
 #define __CRT_HAVE_creall
 #define __CRT_HAVE_creat
 #define __CRT_HAVE_creat64
+#define __CRT_HAVE_create_module
 #define __CRT_HAVE_crypt
 #define __CRT_HAVE_crypt_r
 #define __CRT_HAVE_csin
@@ -2018,6 +2021,7 @@
 #define __CRT_HAVE_dcngettext
 #define __CRT_HAVE_dehumanize_number
 #define __CRT_HAVE_delay
+#define __CRT_HAVE_delete_module
 #define __CRT_HAVE_detach
 #define __CRT_HAVE_devname
 #define __CRT_HAVE_devname_r
@@ -2505,6 +2509,7 @@
 #define __CRT_HAVE_get_avphys_pages
 #define __CRT_HAVE_get_current_dir_name
 #define __CRT_HAVE_get_exception_handler
+#define __CRT_HAVE_get_kernel_syms
 #define __CRT_HAVE_get_nprocs
 #define __CRT_HAVE_get_nprocs_conf
 #define __CRT_HAVE_get_phys_pages
@@ -2678,6 +2683,8 @@
 #define __CRT_HAVE_gnu_dev_major
 #define __CRT_HAVE_gnu_dev_makedev
 #define __CRT_HAVE_gnu_dev_minor
+#define __CRT_HAVE_gnu_get_libc_release
+#define __CRT_HAVE_gnu_get_libc_version
 #define __CRT_HAVE_grantpt
 #define __CRT_HAVE_group_member
 #define __CRT_HAVE_gsignal
@@ -2701,6 +2708,9 @@
 #define __CRT_HAVE_hypot
 #define __CRT_HAVE_hypotf
 #define __CRT_HAVE_hypotl
+#define __CRT_HAVE_iconv
+#define __CRT_HAVE_iconv_close
+#define __CRT_HAVE_iconv_open
 #define __CRT_HAVE_if_freenameindex
 #define __CRT_HAVE_if_indextoname
 #define __CRT_HAVE_if_nameindex
@@ -2750,6 +2760,7 @@
 #define __CRT_HAVE_inet_ntop
 #define __CRT_HAVE_inet_paton
 #define __CRT_HAVE_inet_pton
+#define __CRT_HAVE_init_module
 #define __CRT_HAVE_initgroups
 #define __CRT_HAVE_initstate
 #define __CRT_HAVE_initstate_r
@@ -3506,6 +3517,7 @@
 #define __CRT_HAVE_putw
 #define __CRT_HAVE_putw_unlocked
 #define __CRT_HAVE_putwc
+#define __CRT_HAVE_putwc_unlocked
 #define __CRT_HAVE_putwchar
 #define __CRT_HAVE_putwchar_unlocked
 #define __CRT_HAVE_pvalloc
@@ -3525,6 +3537,7 @@
 #define __CRT_HAVE_qsort
 #define __CRT_HAVE_qsort_r
 #define __CRT_HAVE_qsort_s
+#define __CRT_HAVE_query_module
 #define __CRT_HAVE_quick_exit
 #define __CRT_HAVE_radixsort
 #define __CRT_HAVE_raise
@@ -5075,6 +5088,8 @@
 #define __CRT_HAVE_verr
 #define __CRT_HAVE_verrc
 #define __CRT_HAVE_verrx
+#define __CRT_HAVE_versionsort
+#define __CRT_HAVE_versionsort64
 #define __CRT_HAVE_versionsortk
 #define __CRT_HAVE_versionsortk64
 #define __CRT_HAVE_vfork
@@ -8483,6 +8498,7 @@
 #define __CRT_HAVE_KOS$putw
 #define __CRT_HAVE_KOS$putw_unlocked
 #define __CRT_HAVE_KOS$putwc
+#define __CRT_HAVE_KOS$putwc_unlocked
 #define __CRT_HAVE_KOS$putwchar
 #define __CRT_HAVE_KOS$putwchar_unlocked
 #define __CRT_HAVE_KOS$pvalloc
@@ -12507,6 +12523,7 @@
 #define __CRT_HAVE_DOS$putw
 #define __CRT_HAVE_DOS$putw_unlocked
 #define __CRT_HAVE_DOS$putwc
+#define __CRT_HAVE_DOS$putwc_unlocked
 #define __CRT_HAVE_DOS$putwchar
 #define __CRT_HAVE_DOS$putwchar_unlocked
 #define __CRT_HAVE_DOS$pvalloc

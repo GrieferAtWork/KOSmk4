@@ -477,7 +477,7 @@ NOTHROW_RPC(LIBCCALL libc_readdirk_r)(DIR *__restrict dirp,
 	struct dirent *ent;
 	old_error = libc_geterrno();
 	libc_seterrno(EOK);
-	ent = readdir(dirp);
+	ent = libc_readdirk(dirp);
 	if (!ent) {
 		errno_t error;
 		error = libc_geterrno();
@@ -673,6 +673,12 @@ struct glibc_dirent64 {
 #undef SIZEOF_GLIBC_DIRENT32_MATCHES_KOS_DIRENT
 #undef SIZEOF_GLIBC_DIRENT32_MATCHES_GLIBC_DIRENT64
 #if __SIZEOF_POINTER__ == 4
+/* Well... Not really so much "matches", and more so much "same-sized" and  "same-field-offsets"
+ * The difference is that KOS's `struct dirent' doesn't have a `d_off' field, and always defines
+ * its `d_ino' field as 64-bit, meaning that the user  will read `d_off' as the high 32 bits  of
+ * the INO field, which probably won't make much sense. But then again: what would you even want
+ * to  use the `d_off' for anyways? -- seekdir(3) maybe? Because that's already kind-of iffy, as
+ * `d_off' and `seekdir(3)'s argument don't even have the same typing... */
 #define SIZEOF_GLIBC_DIRENT32_MATCHES_KOS_DIRENT
 #else /* __SIZEOF_POINTER__ == 4 */
 #define SIZEOF_GLIBC_DIRENT32_MATCHES_GLIBC_DIRENT64
@@ -916,7 +922,7 @@ NOTHROW_RPC(LIBCCALL libc_readdir64_r)(DIR *__restrict dirp,
 	struct glibc_dirent64 *ent;
 	old_error = libc_geterrno();
 	libc_seterrno(EOK);
-	kos_ent = readdir(dirp);
+	kos_ent = libc_readdirk(dirp);
 	if (!kos_ent) {
 		errno_t error;
 		error = libc_geterrno();
@@ -1069,6 +1075,78 @@ NOTHROW_RPC(LIBCCALL libc_scandir64)(char const *__restrict dir,
 
 
 
+/*[[[head:libc_alphasortk,hash:CRC-32=0x16da007]]]*/
+/* >> alphasort(3), alphasort64(3)
+ * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
+NOTHROW_NCX(LIBCCALL libc_alphasortk)(struct dirent const **e1,
+                                      struct dirent const **e2)
+/*[[[body:libc_alphasortk]]]*/
+/*AUTO*/{
+	return strcoll((*e1)->d_name, (*e2)->d_name);
+}
+/*[[[end:libc_alphasortk]]]*/
+
+/*[[[head:libc_alphasortk64,hash:CRC-32=0x51c96c94]]]*/
+#ifdef _DIRENT_MATCHES_DIRENT64
+DEFINE_INTERN_ALIAS(libc_alphasortk64, libc_alphasortk);
+#else /* MAGIC:alias */
+/* >> alphasort(3), alphasort64(3)
+ * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
+NOTHROW_NCX(LIBCCALL libc_alphasortk64)(struct dirent64 const **e1,
+                                        struct dirent64 const **e2)
+/*[[[body:libc_alphasortk64]]]*/
+/*AUTO*/{
+	return strcoll((*e1)->d_name, (*e2)->d_name);
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_alphasortk64]]]*/
+
+/*[[[head:libc_versionsortk,hash:CRC-32=0x8871c651]]]*/
+/* >> versionsort(3), versionsort64(3)
+ * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
+NOTHROW_NCX(LIBCCALL libc_versionsortk)(struct dirent const **e1,
+                                        struct dirent const **e2)
+/*[[[body:libc_versionsortk]]]*/
+/*AUTO*/{
+	return strverscmp((*e1)->d_name, (*e2)->d_name);
+}
+/*[[[end:libc_versionsortk]]]*/
+
+/*[[[head:libc_versionsortk64,hash:CRC-32=0x50a26008]]]*/
+#ifdef _DIRENT_MATCHES_DIRENT64
+DEFINE_INTERN_ALIAS(libc_versionsortk64, libc_versionsortk);
+#else /* MAGIC:alias */
+/* >> versionsort(3), versionsort64(3)
+ * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
+NOTHROW_NCX(LIBCCALL libc_versionsortk64)(struct dirent64 const **e1,
+                                          struct dirent64 const **e2)
+/*[[[body:libc_versionsortk64]]]*/
+/*AUTO*/{
+	return strverscmp((*e1)->d_name, (*e2)->d_name);
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_versionsortk64]]]*/
+
+
+STATIC_ASSERT_MSG(offsetof(struct glibc_dirent64, d_name) != offsetof(struct dirent64, d_name),
+                  "If this fails, then there is either ");
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
+NOTHROW_NCX(LIBCCALL libc_alphasort64)(struct glibc_dirent64 const **e1,
+                                       struct glibc_dirent64 const **e2) {
+	return strcoll((*e1)->d_name, (*e2)->d_name);
+}
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
+NOTHROW_NCX(LIBCCALL libc_versionsort64)(struct glibc_dirent64 const **e1,
+                                         struct glibc_dirent64 const **e2) {
+	return strverscmp((*e1)->d_name, (*e2)->d_name);
+}
+
+
+
 /* Export compatibility mode symbols. */
 #ifdef SIZEOF_GLIBC_DIRENT32_MATCHES_KOS_DIRENT
 DEFINE_PUBLIC_ALIAS(__libc_readdir, libc_readdir);
@@ -1077,6 +1155,8 @@ DEFINE_PUBLIC_ALIAS(readdir, libc_readdir);
 DEFINE_PUBLIC_ALIAS(readdir_r, libc_readdir_r);
 DEFINE_PUBLIC_ALIAS(scandir, libc_scandir);
 DEFINE_PUBLIC_ALIAS(scandirat, libc_scandirat);
+DEFINE_PUBLIC_ALIAS(alphasort, libc_alphasortk);
+DEFINE_PUBLIC_ALIAS(versionsort, libc_versionsortk);
 #elif defined(SIZEOF_GLIBC_DIRENT32_MATCHES_GLIBC_DIRENT64)
 DEFINE_PUBLIC_IFUNC(__libc_readdir, libc_get_readdir64);
 DEFINE_PUBLIC_IFUNC(__libc_readdir_r, libc_get_readdir64_r);
@@ -1084,6 +1164,8 @@ DEFINE_PUBLIC_IFUNC(readdir, libc_get_readdir64);
 DEFINE_PUBLIC_IFUNC(readdir_r, libc_get_readdir64_r);
 DEFINE_PUBLIC_IFUNC(scandir, libc_get_scandir64);
 DEFINE_PUBLIC_IFUNC(scandirat, libc_get_scandirat64);
+DEFINE_PUBLIC_IFUNC(alphasort, libc_get_alphasort64);
+DEFINE_PUBLIC_IFUNC(versionsort, libc_get_versionsort64);
 #else /* ... */
 #error "Invalid configuration"
 #endif /* !... */
@@ -1102,6 +1184,8 @@ DEFINE_PUBLIC_IFUNC(readdir64, libc_get_readdir64);
 DEFINE_PUBLIC_IFUNC(readdir64_r, libc_get_readdir64_r);
 DEFINE_PUBLIC_IFUNC(scandir64, libc_get_scandir64);
 DEFINE_PUBLIC_IFUNC(scandirat64, libc_get_scandirat64);
+DEFINE_PUBLIC_IFUNC(alphasort64, libc_get_alphasort64);
+DEFINE_PUBLIC_IFUNC(versionsort64, libc_get_versionsort64);
 INTERN ATTR_SECTION(".text.crt.compat.linux.dirent") void *
 NOTHROW(LIBCCALL libc_get_readdir64)(void) {
 	enable_glibc_dirent64_compat();
@@ -1126,11 +1210,23 @@ NOTHROW(LIBCCALL libc_get_scandirat64)(void) {
 	return (void *)&libc_scandirat64;
 }
 
+INTERN ATTR_SECTION(".text.crt.compat.linux.dirent") void *
+NOTHROW(LIBCCALL libc_get_alphasort64)(void) {
+	enable_glibc_dirent64_compat();
+	return (void *)&libc_alphasort64;
+}
+
+INTERN ATTR_SECTION(".text.crt.compat.linux.dirent") void *
+NOTHROW(LIBCCALL libc_get_versionsort64)(void) {
+	enable_glibc_dirent64_compat();
+	return (void *)&libc_versionsort64;
+}
 
 
 
 
-/*[[[start:exports,hash:CRC-32=0x4b86272f]]]*/
+
+/*[[[start:exports,hash:CRC-32=0xba18a3a9]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$__libc_opendir, libd_opendir);
 DEFINE_PUBLIC_ALIAS(DOS$opendir, libd_opendir);
 DEFINE_PUBLIC_ALIAS(__libc_opendir, libc_opendir);
@@ -1155,6 +1251,8 @@ DEFINE_PUBLIC_ALIAS(__libc_telldir, libc_telldir);
 DEFINE_PUBLIC_ALIAS(telldir, libc_telldir);
 DEFINE_PUBLIC_ALIAS(dirfd, libc_dirfd);
 DEFINE_PUBLIC_ALIAS(scandirk, libc_scandirk);
+DEFINE_PUBLIC_ALIAS(alphasortk, libc_alphasortk);
+DEFINE_PUBLIC_ALIAS(alphasortk64, libc_alphasortk64);
 DEFINE_PUBLIC_ALIAS(scandiratk, libc_scandiratk);
 DEFINE_PUBLIC_ALIAS(scandirk64, libc_scandirk64);
 DEFINE_PUBLIC_ALIAS(scandiratk64, libc_scandiratk64);
@@ -1162,6 +1260,8 @@ DEFINE_PUBLIC_ALIAS(__getdirentries, libc_getdirentries);
 DEFINE_PUBLIC_ALIAS(__libc_getdirentries, libc_getdirentries);
 DEFINE_PUBLIC_ALIAS(getdirentries, libc_getdirentries);
 DEFINE_PUBLIC_ALIAS(getdirentries64, libc_getdirentries64);
+DEFINE_PUBLIC_ALIAS(versionsortk, libc_versionsortk);
+DEFINE_PUBLIC_ALIAS(versionsortk64, libc_versionsortk64);
 DEFINE_PUBLIC_ALIAS(kreaddir, libc_kreaddir);
 DEFINE_PUBLIC_ALIAS(kreaddirf, libc_kreaddirf);
 DEFINE_PUBLIC_ALIAS(kreaddir64, libc_kreaddir64);

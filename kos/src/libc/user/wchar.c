@@ -736,7 +736,7 @@ NOTHROW_NCX(LIBDCALL libd_mbsnrtowcs)(char16_t *dst,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x80505f8c]]]*/
+/*[[[start:exports,hash:CRC-32=0xe34d860c]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$getwc, libd_fgetwc);
 DEFINE_PUBLIC_ALIAS(DOS$fgetwc, libd_fgetwc);
 DEFINE_PUBLIC_ALIAS(getwc, libc_fgetwc);
@@ -758,8 +758,10 @@ DEFINE_PUBLIC_ALIAS(open_wmemstream, libc_open_wmemstream);
 DEFINE_PUBLIC_ALIAS(DOS$_fgetwc_nolock, libd_fgetwc_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$fgetwc_unlocked, libd_fgetwc_unlocked);
 DEFINE_PUBLIC_ALIAS(fgetwc_unlocked, libc_fgetwc_unlocked);
+DEFINE_PUBLIC_ALIAS(DOS$putwc_unlocked, libd_fputwc_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$_fputwc_nolock, libd_fputwc_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$fputwc_unlocked, libd_fputwc_unlocked);
+DEFINE_PUBLIC_ALIAS(putwc_unlocked, libc_fputwc_unlocked);
 DEFINE_PUBLIC_ALIAS(fputwc_unlocked, libc_fputwc_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$file_wprinter, libd_file_wprinter);
 DEFINE_PUBLIC_ALIAS(file_wprinter, libc_file_wprinter);

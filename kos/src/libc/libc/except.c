@@ -173,7 +173,7 @@ void LIBCCALL libunwind_init_failed(void) {
 INTERN SECTION_EXCEPT_TEXT ATTR_NOINLINE
 void LIBCCALL initialize_libunwind(void) {
 	void *handle;
-	handle = dlopen(name_libunwind_so, RTLD_LOCAL);
+	handle = dlopen(name_libunwind_so, RTLD_LAZY | RTLD_LOCAL);
 	if unlikely(!handle)
 		goto err_init_failed;
 	/* Dynamically bind functions. */

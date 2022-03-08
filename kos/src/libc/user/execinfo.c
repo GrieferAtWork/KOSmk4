@@ -95,7 +95,7 @@ again:
 	if (result == (void *)-1)
 		return NULL;
 	if (!result) {
-		result = dlopen(LIBDEBUGINFO_LIBRARY_NAME, RTLD_LOCAL);
+		result = dlopen(LIBDEBUGINFO_LIBRARY_NAME, RTLD_LAZY | RTLD_LOCAL);
 		if (!result)
 			result = (void *)-1;
 		if (!ATOMIC_CMPXCH(pdyn_libdebuginfo, NULL, result)) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x222f4fba */
+/* HASH CRC-32:0x7030aaf9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,6 +93,12 @@ INTDEF ATTR_PURE NONNULL((1)) fd_t NOTHROW_NCX(LIBCCALL libc_dirfd)(DIR __KOS_FI
 /* >> scandir(3), scandir64(3)
  * Scan a directory `dir' for all contained directory entries */
 INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_scandirk)(char const *__restrict dir, struct dirent ***__restrict namelist, int (LIBKCALL *selector)(struct dirent const *entry), int (LIBKCALL *cmp)(struct dirent const **a, struct dirent const **b));
+/* >> alphasort(3), alphasort64(3)
+ * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
+INTDEF ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_alphasortk)(struct dirent const **e1, struct dirent const **e2);
+/* >> alphasort(3), alphasort64(3)
+ * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
+INTDEF ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_alphasortk64)(struct dirent64 const **e1, struct dirent64 const **e2);
 /* >> scandirat(3), scandirat64(3)
  * Scan a directory `dirfd:dir' for all contained directory entries */
 INTDEF NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_scandiratk)(fd_t dirfd, char const *__restrict dir, struct dirent ***__restrict namelist, int (LIBKCALL *selector)(struct dirent const *entry), int (LIBKCALL *cmp)(struct dirent const **a, struct dirent const **b));
@@ -108,6 +114,12 @@ INTDEF NONNULL((2, 4)) ssize_t NOTHROW_RPC(LIBCCALL libc_getdirentries)(fd_t fd,
 /* >> getdirentries(2), getdirentries64(2)
  * Linux's underlying system call for reading the entries of a directory */
 INTDEF NONNULL((2, 4)) ssize_t NOTHROW_RPC(LIBCCALL libc_getdirentries64)(fd_t fd, char *__restrict buf, size_t nbytes, off64_t *__restrict basep);
+/* >> versionsort(3), versionsort64(3)
+ * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
+INTDEF ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_versionsortk)(struct dirent const **e1, struct dirent const **e2);
+/* >> versionsort(3), versionsort64(3)
+ * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
+INTDEF ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_versionsortk64)(struct dirent64 const **e1, struct dirent64 const **e2);
 /* >> kreaddir(2), kreaddirf(2), kreaddir64(2), kreaddirf64(2)
  * The KOS-specific system call for reading a single directory entry
  * from  a file  descriptor referring  to an  open directory stream.

@@ -1316,7 +1316,7 @@ $wint_t putwchar_unlocked(wchar_t wc) {
 $wint_t fgetwc_unlocked([[nonnull]] $FILE *__restrict stream);
 
 @@>> putwc_unlocked(3), fputwc_unlocked(3)
-[[decl_include("<hybrid/typecore.h>")]]
+[[decl_include("<hybrid/typecore.h>"), export_alias("putwc_unlocked")]]
 [[cp_stdio, wchar, dos_export_alias("_fputwc_nolock")]]
 [[section(".text.crt{|.dos}.wchar.FILE.unlocked.write.putc")]]
 $wint_t fputwc_unlocked(wchar_t wc, [[nonnull]] $FILE *__restrict stream);
