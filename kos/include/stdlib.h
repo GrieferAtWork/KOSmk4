@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e34eda */
+/* HASH CRC-32:0x8457f413 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3491,13 +3491,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getpass, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 #ifndef __getpw_defined
 #define __getpw_defined
 #ifdef __CRT_HAVE_getpw
-/* Re-construct the password-file line for the given uid in the
+/* >> getpw(3)
+ * Re-construct the password-file line for the given uid in the
  * given  buffer. This  knows the  format that  the caller will
  * expect, but this need not be the format of the password file */
 __CDECLARE(,int,__NOTHROW_RPC,getpw,(__uid_t __uid, char *__buffer),(__uid,__buffer))
 #elif defined(__CRT_HAVE_getpwuid)
 #include <libc/local/pwd/getpw.h>
-/* Re-construct the password-file line for the given uid in the
+/* >> getpw(3)
+ * Re-construct the password-file line for the given uid in the
  * given  buffer. This  knows the  format that  the caller will
  * expect, but this need not be the format of the password file */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getpw, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL getpw)(__uid_t __uid, char *__buffer) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpw))(__uid, __buffer); })

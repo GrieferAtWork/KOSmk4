@@ -45,8 +45,11 @@ NOTHROW_RPC(LIBCCALL libc_flock)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xb2cfa05c]]]*/
+/*[[[start:exports,hash:CRC-32=0x3f6187e5]]]*/
 DEFINE_PUBLIC_ALIAS(__flock, libc_flock);
+DEFINE_PUBLIC_ALIAS(syscall_flock, libc_flock);
+DEFINE_PUBLIC_ALIAS(__syscall_flock, libc_flock);
+DEFINE_PUBLIC_ALIAS(__libc_syscall_flock, libc_flock);
 DEFINE_PUBLIC_ALIAS(flock, libc_flock);
 /*[[[end:exports]]]*/
 

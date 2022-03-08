@@ -45,6 +45,9 @@ __SYSDECL_BEGIN
 
 @@>> ustat(2)
 [[decl_include("<bits/os/ustat.h>", "<bits/types.h>")]]
+/* The following are libc4/5 aliases. -- We only export under these names.
+ * We  don't import simply because these names feel really weird... °~°... */
+[[export_as("prev_ustat", "__prev_ustat", "__libc_prev_ustat")]]
 int ustat($dev_t dev, [[nonnull]] struct ustat *ubuf);
 
 %{

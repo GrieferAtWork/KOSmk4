@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5117d1f */
+/* HASH CRC-32:0xa72a7521 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1323,8 +1323,11 @@ DEFINE_PUBLIC_ALIAS(DOS$openpty, libd_openpty);
 DEFINE_PUBLIC_ALIAS(DOS$forkpty, libd_forkpty);
 
 /* pwd */
+DEFINE_PUBLIC_ALIAS(DOS$_getpwuid, libd_getpwuid);
 DEFINE_PUBLIC_ALIAS(DOS$getpwuid, libd_getpwuid);
+DEFINE_PUBLIC_ALIAS(DOS$_getpwnam, libd_getpwnam);
 DEFINE_PUBLIC_ALIAS(DOS$getpwnam, libd_getpwnam);
+DEFINE_PUBLIC_ALIAS(DOS$_fgetpwent, libd_fgetpwent);
 DEFINE_PUBLIC_ALIAS(DOS$fgetpwent, libd_fgetpwent);
 DEFINE_PUBLIC_ALIAS(DOS$putpwent, libd_putpwent);
 DEFINE_PUBLIC_ALIAS(DOS$getpwuid_r, libd_getpwuid_r);
@@ -1334,6 +1337,8 @@ DEFINE_PUBLIC_ALIAS(DOS$fgetpwent_r, libd_fgetpwent_r);
 DEFINE_PUBLIC_ALIAS(DOS$fgetpwuid_r, libd_fgetpwuid_r);
 DEFINE_PUBLIC_ALIAS(DOS$fgetpwnam_r, libd_fgetpwnam_r);
 DEFINE_PUBLIC_ALIAS(DOS$getpw, libd_getpw);
+DEFINE_PUBLIC_ALIAS(DOS$_sgetpwent, libd_sgetpwent);
+DEFINE_PUBLIC_ALIAS(DOS$sgetpwent, libd_sgetpwent);
 
 /* readpassphrase */
 DEFINE_PUBLIC_ALIAS(DOS$readpassphrase, libd_readpassphrase);
@@ -2528,6 +2533,9 @@ DEFINE_PUBLIC_ALIAS(DOS$eventfd_write, libd_eventfd_write);
 
 /* sys.file */
 DEFINE_PUBLIC_ALIAS(DOS$__flock, libd_flock);
+DEFINE_PUBLIC_ALIAS(DOS$syscall_flock, libd_flock);
+DEFINE_PUBLIC_ALIAS(DOS$__syscall_flock, libd_flock);
+DEFINE_PUBLIC_ALIAS(DOS$__libc_syscall_flock, libd_flock);
 DEFINE_PUBLIC_ALIAS(DOS$flock, libd_flock);
 
 /* sys.fsuid */
@@ -2835,8 +2843,14 @@ DEFINE_PUBLIC_ALIAS(DOS$ntp_gettimex64, libd_ntp_gettimex64);
 DEFINE_PUBLIC_ALIAS(DOS$process_vm_readv, libd_process_vm_readv);
 DEFINE_PUBLIC_ALIAS(DOS$process_vm_writev, libd_process_vm_writev);
 DEFINE_PUBLIC_ALIAS(DOS$__readv, libd_readv);
+DEFINE_PUBLIC_ALIAS(DOS$syscall_readv, libd_readv);
+DEFINE_PUBLIC_ALIAS(DOS$__syscall_readv, libd_readv);
+DEFINE_PUBLIC_ALIAS(DOS$__libc_syscall_readv, libd_readv);
 DEFINE_PUBLIC_ALIAS(DOS$readv, libd_readv);
 DEFINE_PUBLIC_ALIAS(DOS$__writev, libd_writev);
+DEFINE_PUBLIC_ALIAS(DOS$syscall_writev, libd_writev);
+DEFINE_PUBLIC_ALIAS(DOS$__syscall_writev, libd_writev);
+DEFINE_PUBLIC_ALIAS(DOS$__libc_syscall_writev, libd_writev);
 DEFINE_PUBLIC_ALIAS(DOS$writev, libd_writev);
 DEFINE_PUBLIC_ALIAS(DOS$preadv, libd_preadv);
 DEFINE_PUBLIC_ALIAS(DOS$pwritev, libd_pwritev);
@@ -2844,6 +2858,9 @@ DEFINE_PUBLIC_ALIAS(DOS$preadv64, libd_preadv64);
 DEFINE_PUBLIC_ALIAS(DOS$pwritev64, libd_pwritev64);
 
 /* sys.ustat */
+DEFINE_PUBLIC_ALIAS(DOS$prev_ustat, libd_ustat);
+DEFINE_PUBLIC_ALIAS(DOS$__prev_ustat, libd_ustat);
+DEFINE_PUBLIC_ALIAS(DOS$__libc_prev_ustat, libd_ustat);
 DEFINE_PUBLIC_ALIAS(DOS$ustat, libd_ustat);
 
 /* sys.utsname */

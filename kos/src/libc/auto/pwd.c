@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5d8ac23 */
+/* HASH CRC-32:0xdc7be495 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,8 @@ INTERN ATTR_SECTION(".text.crt.database.pwd") NONNULL((1, 2)) int
 	                ent->pw_shell);
 	return likely(error >= 0) ? 0 : -1;
 }
-/* Read an entry from `stream'. This function is not standardized and probably never will be.
+/* >> fgetpwent_r(3)
+ * Read an entry from `stream'. This function is not standardized and probably never will be.
  * @return: 0 :     Success (`*result' is made to point at `resultbuf')
  * @return: ENOENT: The last entry has already been read (use `rewind(stream)' to rewind the database)
  * @return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
@@ -72,7 +73,8 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwent_r)(FILE *__restrict stream,
 	                        result, (uid_t)-1, NULL);
 }
 #include <libc/errno.h>
-/* Search for an entry with a matching user ID
+/* >> fgetpwuid_r(3)
+ * Search for an entry with a matching user ID
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `uid'
  * @return: * : Error (one of `E*' from `<errno.h>') */
@@ -93,7 +95,8 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwuid_r)(FILE *__restrict stream,
 	return error;
 }
 #include <libc/errno.h>
-/* Search for an entry with a matching username
+/* >> fgetpwnam_r(3)
+ * Search for an entry with a matching username
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `name'
  * @return: * : Error (one of `E*' from `<errno.h>') */
@@ -116,7 +119,8 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwnam_r)(FILE *__restrict stream,
 #include <libc/errno.h>
 #include <hybrid/typecore.h>
 #include <asm/os/syslog.h>
-/* Filtered read from `stream'
+/* >> fgetpwfiltered_r(3)
+ * Filtered read from `stream'
  * @param: filtered_uid:  When not equal to `(uid_t)-1', require this UID
  * @param: filtered_name: When not `NULL', require this username
  * @return: 0 :     Success (`*result' is made to point at `resultbuf')
@@ -304,7 +308,8 @@ nextline:
 }
 #include <bits/types.h>
 #include <bits/crt/inttypes.h>
-/* Re-construct the password-file line for the given uid in the
+/* >> getpw(3)
+ * Re-construct the password-file line for the given uid in the
  * given  buffer. This  knows the  format that  the caller will
  * expect, but this need not be the format of the password file */
 INTERN ATTR_SECTION(".text.crt.database.pwd") int
@@ -330,6 +335,21 @@ NOTHROW_RPC(LIBCCALL libc_getpw)(uid_t uid,
 err:
 	return -1;
 }
+/* >> sgetpwent(3)
+ * Old libc4/5 function (only here for compat) */
+INTERN ATTR_SECTION(".text.crt.compat.linux") struct passwd *
+NOTHROW_NCX(LIBCCALL libc_sgetpwent)(char const *line) {
+	struct passwd *result = NULL;
+	FILE *tempfp;
+	tempfp = libc_fmemopen((void *)line, libc_strlen(line) * sizeof(char), "r");
+	if likely(tempfp) {
+		result = libc_fgetpwent(tempfp);
+#if defined(__CRT_HAVE_fclose) || defined(__CRT_HAVE__fclose_nolock) || defined(__CRT_HAVE__IO_fclose)
+		libc_fclose(tempfp);
+#endif /* __CRT_HAVE_fclose || __CRT_HAVE__fclose_nolock || __CRT_HAVE__IO_fclose */
+	}
+	return result;
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -340,6 +360,8 @@ DEFINE_PUBLIC_ALIAS(fgetpwent_r, libc_fgetpwent_r);
 DEFINE_PUBLIC_ALIAS(fgetpwuid_r, libc_fgetpwuid_r);
 DEFINE_PUBLIC_ALIAS(fgetpwnam_r, libc_fgetpwnam_r);
 DEFINE_PUBLIC_ALIAS(getpw, libc_getpw);
+DEFINE_PUBLIC_ALIAS(_sgetpwent, libc_sgetpwent);
+DEFINE_PUBLIC_ALIAS(sgetpwent, libc_sgetpwent);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PWD_C */

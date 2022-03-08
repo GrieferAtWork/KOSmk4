@@ -43,7 +43,25 @@ NOTHROW_NCX(LIBCCALL libc_ustat)(dev_t dev,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x61eff38c]]]*/
+#ifndef LINUX_USTAT_VERSION
+#define LINUX_USTAT_VERSION 1 /* SVr4 */
+#endif /* !LINUX_USTAT_VERSION */
+
+DEFINE_PUBLIC_ALIAS(_xustat, libc__xustat); /* libc4/5 function */
+INTERN ATTR_SECTION(".text.crt.compat.linux") NONNULL((3)) int
+NOTHROW_NCX(LIBCCALL libc__xustat)(int version, dev_t dev, struct ustat *ubuf) {
+	if (version != LINUX_USTAT_VERSION)
+		return libc_seterrno(EINVAL);
+	return libc_ustat(dev, ubuf);
+}
+
+
+
+
+/*[[[start:exports,hash:CRC-32=0xbd0b2e3c]]]*/
+DEFINE_PUBLIC_ALIAS(prev_ustat, libc_ustat);
+DEFINE_PUBLIC_ALIAS(__prev_ustat, libc_ustat);
+DEFINE_PUBLIC_ALIAS(__libc_prev_ustat, libc_ustat);
 DEFINE_PUBLIC_ALIAS(ustat, libc_ustat);
 /*[[[end:exports]]]*/
 

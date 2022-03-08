@@ -216,10 +216,19 @@ NOTHROW_RPC(LIBCCALL libc_cyg_fstatat)(fd_t dirfd,
 
 /* GLIBC stat() emulation */
 DEFINE_PUBLIC_ALIAS(stat, libc_glc_stat);
+DEFINE_PUBLIC_ALIAS(prev_stat, libc_glc_stat);        /* libc4/5 alias */
+DEFINE_PUBLIC_ALIAS(__prev_stat, libc_glc_stat);      /* libc4/5 alias */
+DEFINE_PUBLIC_ALIAS(__libc_prev_stat, libc_glc_stat); /* libc4/5 alias */
 DEFINE_PUBLIC_ALIAS(stat64, libc_glc_stat64);
 DEFINE_PUBLIC_ALIAS(lstat, libc_glc_lstat);
+DEFINE_PUBLIC_ALIAS(prev_lstat, libc_glc_lstat);        /* libc4/5 alias */
+DEFINE_PUBLIC_ALIAS(__prev_lstat, libc_glc_lstat);      /* libc4/5 alias */
+DEFINE_PUBLIC_ALIAS(__libc_prev_lstat, libc_glc_lstat); /* libc4/5 alias */
 DEFINE_PUBLIC_ALIAS(lstat64, libc_glc_lstat64);
 DEFINE_PUBLIC_ALIAS(fstat, libc_glc_fstat);
+DEFINE_PUBLIC_ALIAS(prev_fstat, libc_glc_fstat);        /* libc4/5 alias */
+DEFINE_PUBLIC_ALIAS(__prev_fstat, libc_glc_fstat);      /* libc4/5 alias */
+DEFINE_PUBLIC_ALIAS(__libc_prev_fstat, libc_glc_fstat); /* libc4/5 alias */
 DEFINE_PUBLIC_ALIAS(fstat64, libc_glc_fstat64);
 DEFINE_PUBLIC_ALIAS(fstatat, libc_glc_fstatat);
 DEFINE_PUBLIC_ALIAS(fstatat64, libc_glc_fstatat64);
@@ -1375,7 +1384,7 @@ NOTHROW_NCX(LIBDCALL libd__wstat32)(char16_t const *filename,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x4d44fc43]]]*/
+/*[[[start:exports,hash:CRC-32=0x68844a86]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$__mkdir, libd_mkdir);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_mkdir, libd_mkdir);
 DEFINE_PUBLIC_ALIAS(DOS$mkdir, libd_mkdir);
@@ -1412,7 +1421,13 @@ DEFINE_PUBLIC_ALIAS(mkdirat, libc_mkdirat);
 DEFINE_PUBLIC_ALIAS(__fchmod, libc_fchmod);
 DEFINE_PUBLIC_ALIAS(__libc_fchmod, libc_fchmod);
 DEFINE_PUBLIC_ALIAS(fchmod, libc_fchmod);
+DEFINE_PUBLIC_ALIAS(DOS$prev_mknod, libd_mknod);
+DEFINE_PUBLIC_ALIAS(DOS$__prev_mknod, libd_mknod);
+DEFINE_PUBLIC_ALIAS(DOS$__libc_prev_mknod, libd_mknod);
 DEFINE_PUBLIC_ALIAS(DOS$mknod, libd_mknod);
+DEFINE_PUBLIC_ALIAS(prev_mknod, libc_mknod);
+DEFINE_PUBLIC_ALIAS(__prev_mknod, libc_mknod);
+DEFINE_PUBLIC_ALIAS(__libc_prev_mknod, libc_mknod);
 DEFINE_PUBLIC_ALIAS(mknod, libc_mknod);
 DEFINE_PUBLIC_ALIAS(DOS$mknodat, libd_mknodat);
 DEFINE_PUBLIC_ALIAS(mknodat, libc_mknodat);

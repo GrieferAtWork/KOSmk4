@@ -114,6 +114,10 @@ __SYSDECL_BEGIN
 @@Apply or remove an advisory lock, according to `operation', on the file `fd' refers to
 [[cp, decl_include("<features.h>", "<bits/types.h>")]]
 [[export_alias("__flock")]]
+/* The following as libc4/5 aliases, though behave slightly different.
+ * These won't try to emulate the system call if -ENOSYS is  returned.
+ * As such, only export with these aliases, but don't import! */
+[[export_as("syscall_flock", "__syscall_flock", "__libc_syscall_flock")]]
 int flock($fd_t fd, __STDC_INT_AS_UINT_T operation);
 
 %{

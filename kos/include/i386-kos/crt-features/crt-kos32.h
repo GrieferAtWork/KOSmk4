@@ -544,6 +544,7 @@
 #define __CRT_HAVE___get_nterrno
 #define __CRT_HAVE___getauxval
 #define __CRT_HAVE___getdelim
+#define __CRT_HAVE___getdents
 #define __CRT_HAVE___getdirentries
 #define __CRT_HAVE___getdtablesize
 #define __CRT_HAVE___getegid
@@ -685,6 +686,7 @@
 #define __CRT_HAVE___libc_fstatfs
 #define __CRT_HAVE___libc_fsync
 #define __CRT_HAVE___libc_ftruncate
+#define __CRT_HAVE___libc_getdents
 #define __CRT_HAVE___libc_getdirentries
 #define __CRT_HAVE___libc_getegid
 #define __CRT_HAVE___libc_geteuid
@@ -731,6 +733,11 @@
 #define __CRT_HAVE___libc_pause
 #define __CRT_HAVE___libc_pipe
 #define __CRT_HAVE___libc_pread
+#define __CRT_HAVE___libc_prev_fstat
+#define __CRT_HAVE___libc_prev_lstat
+#define __CRT_HAVE___libc_prev_mknod
+#define __CRT_HAVE___libc_prev_stat
+#define __CRT_HAVE___libc_prev_ustat
 #define __CRT_HAVE___libc_pvalloc
 #define __CRT_HAVE___libc_pwrite
 #define __CRT_HAVE___libc_read
@@ -778,6 +785,9 @@
 #define __CRT_HAVE___libc_swapon
 #define __CRT_HAVE___libc_symlink
 #define __CRT_HAVE___libc_sync
+#define __CRT_HAVE___libc_syscall_flock
+#define __CRT_HAVE___libc_syscall_readv
+#define __CRT_HAVE___libc_syscall_writev
 #define __CRT_HAVE___libc_sysinfo
 #define __CRT_HAVE___libc_system
 #define __CRT_HAVE___libc_telldir
@@ -794,6 +804,7 @@
 #define __CRT_HAVE___libc_wait4
 #define __CRT_HAVE___libc_write
 #define __CRT_HAVE___link
+#define __CRT_HAVE___linux_C_lib_version
 #define __CRT_HAVE___llrint
 #define __CRT_HAVE___llrintf
 #define __CRT_HAVE___llrintl
@@ -967,6 +978,11 @@
 #define __CRT_HAVE___powf
 #define __CRT_HAVE___powl
 #define __CRT_HAVE___pread64
+#define __CRT_HAVE___prev_fstat
+#define __CRT_HAVE___prev_lstat
+#define __CRT_HAVE___prev_mknod
+#define __CRT_HAVE___prev_stat
+#define __CRT_HAVE___prev_ustat
 #define __CRT_HAVE___progname
 #define __CRT_HAVE___progname_full
 #define __CRT_HAVE___pthread_cleanup_routine
@@ -1184,6 +1200,9 @@
 #define __CRT_HAVE___sys_errlist
 #define __CRT_HAVE___sys_nerr
 #define __CRT_HAVE___syscall
+#define __CRT_HAVE___syscall_flock
+#define __CRT_HAVE___syscall_readv
+#define __CRT_HAVE___syscall_writev
 #define __CRT_HAVE___sysconf
 #define __CRT_HAVE___sysinfo
 #define __CRT_HAVE___sysv_signal
@@ -1358,6 +1377,7 @@
 #define __CRT_HAVE__ecvt_s
 #define __CRT_HAVE__edata
 #define __CRT_HAVE__end
+#define __CRT_HAVE__endpwent
 #define __CRT_HAVE__endthread
 #define __CRT_HAVE__endthreadex
 #define __CRT_HAVE__environ
@@ -1387,6 +1407,7 @@
 #define __CRT_HAVE__fdtest
 #define __CRT_HAVE__fflush_nolock
 #define __CRT_HAVE__fgetchar
+#define __CRT_HAVE__fgetpwent
 #define __CRT_HAVE__filbuf
 #define __CRT_HAVE__filelength
 #define __CRT_HAVE__filelengthi64
@@ -1475,6 +1496,9 @@
 #define __CRT_HAVE__getdrives
 #define __CRT_HAVE__getmaxstdio
 #define __CRT_HAVE__getpid
+#define __CRT_HAVE__getpwent
+#define __CRT_HAVE__getpwnam
+#define __CRT_HAVE__getpwuid
 #define __CRT_HAVE__getw
 #define __CRT_HAVE__getws_s
 #define __CRT_HAVE__gmtime64
@@ -1634,6 +1658,8 @@
 #define __CRT_HAVE__setjmpex
 #define __CRT_HAVE__setmaxstdio
 #define __CRT_HAVE__setmode
+#define __CRT_HAVE__setpwent
+#define __CRT_HAVE__sgetpwent
 #define __CRT_HAVE__sigintr
 #define __CRT_HAVE__snprintf
 #define __CRT_HAVE__snprintf_c
@@ -1932,6 +1958,7 @@
 #define __CRT_HAVE__xmknodat
 #define __CRT_HAVE__xstat
 #define __CRT_HAVE__xstat64
+#define __CRT_HAVE__xustat
 #define __CRT_HAVE_a64l
 #define __CRT_HAVE_abort
 #define __CRT_HAVE_abs
@@ -2714,6 +2741,7 @@
 #define __CRT_HAVE_getdate_r
 #define __CRT_HAVE_getdelim
 #define __CRT_HAVE_getdelim_unlocked
+#define __CRT_HAVE_getdents
 #define __CRT_HAVE_getdirentries
 #define __CRT_HAVE_getdirentries64
 #define __CRT_HAVE_getdomainname
@@ -3519,6 +3547,11 @@
 #define __CRT_HAVE_preadall64
 #define __CRT_HAVE_preadv
 #define __CRT_HAVE_preadv64
+#define __CRT_HAVE_prev_fstat
+#define __CRT_HAVE_prev_lstat
+#define __CRT_HAVE_prev_mknod
+#define __CRT_HAVE_prev_stat
+#define __CRT_HAVE_prev_ustat
 #define __CRT_HAVE_printf
 #define __CRT_HAVE_printf_s
 #define __CRT_HAVE_printf_unlocked
@@ -3973,6 +4006,7 @@
 #define __CRT_HAVE_setprogname
 #define __CRT_HAVE_setprotoent
 #define __CRT_HAVE_setpwent
+#define __CRT_HAVE_setpwfile
 #define __CRT_HAVE_setregid
 #define __CRT_HAVE_setresgid
 #define __CRT_HAVE_setresuid
@@ -3999,6 +4033,7 @@
 #define __CRT_HAVE_setvbuf
 #define __CRT_HAVE_setvbuf_unlocked
 #define __CRT_HAVE_setxattr
+#define __CRT_HAVE_sgetpwent
 #define __CRT_HAVE_sgetspent
 #define __CRT_HAVE_sgetspent_r
 #define __CRT_HAVE_shared_lock_acquire
@@ -5270,6 +5305,9 @@
 #define __CRT_HAVE_sys_writevf
 #define __CRT_HAVE_syscall
 #define __CRT_HAVE_syscall64
+#define __CRT_HAVE_syscall_flock
+#define __CRT_HAVE_syscall_readv
+#define __CRT_HAVE_syscall_writev
 #define __CRT_HAVE_sysconf
 #define __CRT_HAVE_sysinfo
 #define __CRT_HAVE_syslog
@@ -5861,6 +5899,7 @@
 #define __CRT_HAVE_KOS$__libc_mkdir
 #define __CRT_HAVE_KOS$__libc_open
 #define __CRT_HAVE_KOS$__libc_opendir
+#define __CRT_HAVE_KOS$__libc_prev_mknod
 #define __CRT_HAVE_KOS$__libc_readlink
 #define __CRT_HAVE_KOS$__libc_rename
 #define __CRT_HAVE_KOS$__libc_rmdir
@@ -5886,6 +5925,7 @@
 #define __CRT_HAVE_KOS$__p__wenviron
 #define __CRT_HAVE_KOS$__p__wpgmptr
 #define __CRT_HAVE_KOS$__pathconf
+#define __CRT_HAVE_KOS$__prev_mknod
 #define __CRT_HAVE_KOS$__readlink
 #define __CRT_HAVE_KOS$__rename
 #define __CRT_HAVE_KOS$__rmdir
@@ -6432,6 +6472,7 @@
 #define __CRT_HAVE_KOS$opendir
 #define __CRT_HAVE_KOS$opendirat
 #define __CRT_HAVE_KOS$pathconf
+#define __CRT_HAVE_KOS$prev_mknod
 #define __CRT_HAVE_KOS$ptsname
 #define __CRT_HAVE_KOS$ptsname_r
 #define __CRT_HAVE_KOS$putenv
@@ -6784,6 +6825,7 @@
 #define __CRT_HAVE_DOS$__libc_mkdir
 #define __CRT_HAVE_DOS$__libc_open
 #define __CRT_HAVE_DOS$__libc_opendir
+#define __CRT_HAVE_DOS$__libc_prev_mknod
 #define __CRT_HAVE_DOS$__libc_readlink
 #define __CRT_HAVE_DOS$__libc_rename
 #define __CRT_HAVE_DOS$__libc_rmdir
@@ -6809,6 +6851,7 @@
 #define __CRT_HAVE_DOS$__p__wenviron
 #define __CRT_HAVE_DOS$__p__wpgmptr
 #define __CRT_HAVE_DOS$__pathconf
+#define __CRT_HAVE_DOS$__prev_mknod
 #define __CRT_HAVE_DOS$__readlink
 #define __CRT_HAVE_DOS$__rename
 #define __CRT_HAVE_DOS$__rmdir
@@ -7355,6 +7398,7 @@
 #define __CRT_HAVE_DOS$opendir
 #define __CRT_HAVE_DOS$opendirat
 #define __CRT_HAVE_DOS$pathconf
+#define __CRT_HAVE_DOS$prev_mknod
 #define __CRT_HAVE_DOS$ptsname
 #define __CRT_HAVE_DOS$ptsname_r
 #define __CRT_HAVE_DOS$putenv

@@ -67,10 +67,32 @@ NOTHROW_RPC(LIBCCALL passwd_opendb)(void) {
 }
 
 
+/* libc4/5 compatibility function */
+DEFINE_PUBLIC_ALIAS(setpwfile, libc_setpwfile);
+INTERN ATTR_SECTION(".text.crt.compat.linux") int
+NOTHROW_RPC(LIBCCALL libc_setpwfile)(char const *filename) {
+	/* NOTE: The  original version of  this function didn't actually
+	 *       open the file. -- It  merely set the internal  filename
+	 *       field to `filename',  and close the  PW database if  it
+	 *       was already opened. -- Only the next PW database access
+	 *       would then actually open the new file... */
+	FILE *nstream, *ostream;
+	if (filename == NULL)
+		filename = _PATH_PASSWD;
+	nstream = fopen(filename, "r");
+	if unlikely(!nstream)
+		return -1; /* XXX: Original function didn't have error-case */
+	ostream = ATOMIC_XCH(passwd_database, nstream);
+	if (ostream)
+		fclose(ostream);
+	return 0;
+}
 
 
-/*[[[head:libc_setpwent,hash:CRC-32=0x48c06094]]]*/
-/* Rewind the password-file stream */
+
+/*[[[head:libc_setpwent,hash:CRC-32=0x29c5c3b]]]*/
+/* >> setpwent(3)
+ * Rewind the password-file stream */
 INTERN ATTR_SECTION(".text.crt.database.pwd") void
 NOTHROW_RPC(LIBCCALL libc_setpwent)(void)
 /*[[[body:libc_setpwent]]]*/
@@ -81,8 +103,9 @@ NOTHROW_RPC(LIBCCALL libc_setpwent)(void)
 }
 /*[[[end:libc_setpwent]]]*/
 
-/*[[[head:libc_endpwent,hash:CRC-32=0xe5d5a03]]]*/
-/* Close the password-file stream */
+/*[[[head:libc_endpwent,hash:CRC-32=0xa51792a4]]]*/
+/* >> endpwent(3)
+ * Close the password-file stream */
 INTERN ATTR_SECTION(".text.crt.database.pwd") void
 NOTHROW_RPC_NOKOS(LIBCCALL libc_endpwent)(void)
 /*[[[body:libc_endpwent]]]*/
@@ -166,8 +189,9 @@ err:
 }
 
 
-/*[[[head:libc_fgetpwent,hash:CRC-32=0xf5bee682]]]*/
-/* Read an entry from `stream'
+/*[[[head:libc_fgetpwent,hash:CRC-32=0x9217021c]]]*/
+/* >> fgetpwent(3)
+ * Read an entry from `stream'
  * return: * :                         A pointer to the read password entry
  * return: NULL: (errno = <unchanged>) The last entry has already been read
  *                                     (use `rewind(stream)' to rewind the database)
@@ -180,8 +204,9 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwent)(FILE *__restrict stream)
 }
 /*[[[end:libc_fgetpwent]]]*/
 
-/*[[[head:libc_getpwuid,hash:CRC-32=0x411859eb]]]*/
-/* Search for an entry with a matching user ID
+/*[[[head:libc_getpwuid,hash:CRC-32=0xb6d3df2]]]*/
+/* >> getpwuid(3)
+ * Search for an entry with a matching user ID
  * return: * :                         A pointer to the read password entry
  * return: NULL: (errno = <unchanged>) No entry for `uid' exists
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
@@ -199,8 +224,9 @@ NOTHROW_RPC(LIBCCALL libc_getpwuid)(uid_t uid)
 }
 /*[[[end:libc_getpwuid]]]*/
 
-/*[[[head:libc_getpwnam,hash:CRC-32=0xc3bb093b]]]*/
-/* Search for an entry with a matching username
+/*[[[head:libc_getpwnam,hash:CRC-32=0xdfa3c83a]]]*/
+/* >> getpwnam(3)
+ * Search for an entry with a matching username
  * return: * :                         A pointer to the read password entry
  * return: NULL: (errno = <unchanged>) No entry for `name' exists
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
@@ -218,8 +244,9 @@ NOTHROW_RPC(LIBCCALL libc_getpwnam)(const char *name)
 }
 /*[[[end:libc_getpwnam]]]*/
 
-/*[[[head:libc_getpwent,hash:CRC-32=0xd5c9e913]]]*/
-/* Read an entry from the password-file stream, opening it if necessary
+/*[[[head:libc_getpwent,hash:CRC-32=0x68f5cca7]]]*/
+/* >> getpwent(3)
+ * Read an entry from the password-file stream, opening it if necessary
  * return: * :                         A pointer to the read password entry
  * return: NULL: (errno = <unchanged>) The last  entry  has  already  been  read
  *                                     (use `setpwent()' to rewind the database)
@@ -238,8 +265,9 @@ NOTHROW_RPC(LIBCCALL libc_getpwent)(void)
 }
 /*[[[end:libc_getpwent]]]*/
 
-/*[[[head:libc_getpwuid_r,hash:CRC-32=0x1e71b12c]]]*/
-/* Search for an entry with a matching user ID
+/*[[[head:libc_getpwuid_r,hash:CRC-32=0x4e1458f2]]]*/
+/* >> getpwuid_r(3)
+ * Search for an entry with a matching user ID
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `uid'
  * @return: * : Error (one of `E*' from `<errno.h>') */
@@ -266,8 +294,9 @@ NOTHROW_RPC(LIBCCALL libc_getpwuid_r)(uid_t uid,
 }
 /*[[[end:libc_getpwuid_r]]]*/
 
-/*[[[head:libc_getpwnam_r,hash:CRC-32=0xcb4cf2d0]]]*/
-/* Search for an entry with a matching username
+/*[[[head:libc_getpwnam_r,hash:CRC-32=0xb784609d]]]*/
+/* >> getpwnam_r(3)
+ * Search for an entry with a matching username
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `name'
  * @return: * : Error (one of `E*' from `<errno.h>') */
@@ -294,8 +323,9 @@ NOTHROW_RPC(LIBCCALL libc_getpwnam_r)(const char *__restrict name,
 }
 /*[[[end:libc_getpwnam_r]]]*/
 
-/*[[[head:libc_getpwent_r,hash:CRC-32=0xfdecbb84]]]*/
-/* Read an entry from the password-file stream, opening it if necessary.
+/*[[[head:libc_getpwent_r,hash:CRC-32=0x2775cbcf]]]*/
+/* >> getpwent_r(3)
+ * Read an entry from the password-file stream, opening it if necessary.
  * @return: 0 :     Success (`*result' is made to point at `resultbuf')
  * @return: ENOENT: The last entry has already been read (use `setpwent()' to rewind the database)
  * @return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
@@ -322,12 +352,18 @@ NOTHROW_RPC(LIBCCALL libc_getpwent_r)(struct passwd *__restrict resultbuf,
 /*[[[end:libc_getpwent_r]]]*/
 
 
-/*[[[start:exports,hash:CRC-32=0x2a2c5bfc]]]*/
+/*[[[start:exports,hash:CRC-32=0x23b54fb]]]*/
+DEFINE_PUBLIC_ALIAS(_setpwent, libc_setpwent);
 DEFINE_PUBLIC_ALIAS(setpwent, libc_setpwent);
+DEFINE_PUBLIC_ALIAS(_endpwent, libc_endpwent);
 DEFINE_PUBLIC_ALIAS(endpwent, libc_endpwent);
+DEFINE_PUBLIC_ALIAS(_getpwent, libc_getpwent);
 DEFINE_PUBLIC_ALIAS(getpwent, libc_getpwent);
+DEFINE_PUBLIC_ALIAS(_getpwuid, libc_getpwuid);
 DEFINE_PUBLIC_ALIAS(getpwuid, libc_getpwuid);
+DEFINE_PUBLIC_ALIAS(_getpwnam, libc_getpwnam);
 DEFINE_PUBLIC_ALIAS(getpwnam, libc_getpwnam);
+DEFINE_PUBLIC_ALIAS(_fgetpwent, libc_fgetpwent);
 DEFINE_PUBLIC_ALIAS(fgetpwent, libc_fgetpwent);
 DEFINE_PUBLIC_ALIAS(getpwuid_r, libc_getpwuid_r);
 DEFINE_PUBLIC_ALIAS(getpwnam_r, libc_getpwnam_r);

@@ -959,6 +959,23 @@ NOTHROW_NCX(LIBCCALL libc_query_module)(char const *name, int which, void *buf,
 
 
 
+/************************************************************************/
+/* Misc libc4/5 functions that don't appear in headers                  */
+/************************************************************************/
+DEFINE_PUBLIC_ALIAS(getdents, libc_getdents);
+DEFINE_PUBLIC_ALIAS(__getdents, libc_getdents);
+DEFINE_PUBLIC_ALIAS(__libc_getdents, libc_getdents);
+INTERN ATTR_SECTION(".text.crt.compat.linux") ssize_t
+NOTHROW_NCX(LIBCCALL libc_getdents)(fd_t fd, struct linux_dirent *buf, size_t count) {
+	ssize_t error = sys_getdents(fd, buf, count);
+	return libc_seterrno_syserr(error);
+}
+
+
+
+
+
+
 /* At  least that's the  one I've been  using for ABI reference.
  * Note however that KOS's libc _is_ providing various functions
  * that have since been removed from gLibc, meaning that this is
@@ -978,6 +995,28 @@ INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.glibc")
 NOTHROW_NCX(LIBCCALL libc_gnu_get_libc_release)(void) {
 	return libc_gnu_libc_release;
 }
+
+/* String stolen from the shared `libc.so.5' file I'm using as reference.
+ * If there's one version which KOS's emulation of linux libc tries to
+ * follow in terms of ABI specs, it's this one.
+ *
+ * Oh: and this string is exported as:
+ * >> extern char const *__linux_C_lib_version; */
+PRIVATE ATTR_SECTION(".rodata.crt.compat.linux") char const
+libc_linux_C_lib_version_string[] = "@(#) The Linux C library 5.3.12";
+PRIVATE ATTR_SECTION(".bss.crt.compat.linux") char const *
+libc___linux_C_lib_version = NULL;
+
+DEFINE_PUBLIC_IDATA_G(__linux_C_lib_version, libc___p___linux_C_lib_version, __SIZEOF_POINTER__);
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux") char const **
+NOTHROW_NCX(LIBCCALL libc___p___linux_C_lib_version)(void) {
+	if (libc___linux_C_lib_version == NULL)
+		libc___linux_C_lib_version = libc_linux_C_lib_version_string;
+	return &libc___linux_C_lib_version;
+}
+
+
+
 
 /* Glibc contains exports `iconv()', `iconv_open()' and `iconv_close()'.
  * On  KOS, these functions are normally exported by `libiconv', but for

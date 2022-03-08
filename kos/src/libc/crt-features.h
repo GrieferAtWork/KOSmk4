@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfdca9605 */
+/* HASH CRC-32:0xcfa41e47 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2628,6 +2628,7 @@
 #define __CRT_HAVE_DOS$setvbuf
 #define __CRT_HAVE_DOS$setvbuf_unlocked
 #define __CRT_HAVE_DOS$setxattr
+#define __CRT_HAVE_DOS$sgetpwent
 #define __CRT_HAVE_DOS$sgetspent
 #define __CRT_HAVE_DOS$sgetspent_r
 #define __CRT_HAVE_DOS$shexec
@@ -6246,6 +6247,7 @@
 #define __CRT_HAVE_setvbuf
 #define __CRT_HAVE_setvbuf_unlocked
 #define __CRT_HAVE_setxattr
+#define __CRT_HAVE_sgetpwent
 #define __CRT_HAVE_sgetspent
 #define __CRT_HAVE_sgetspent_r
 #endif /* !__KERNEL__ */

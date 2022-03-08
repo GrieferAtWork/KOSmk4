@@ -770,6 +770,9 @@ int fchmod($fd_t fd, $mode_t mode);
 [[crt_dos_variant, cp, decl_include("<bits/types.h>"), userimpl]]
 [[requires_include("<asm/os/fcntl.h>"), impl_include("<asm/os/fcntl.h>")]]
 [[requires($has_function(mknodat) && defined(__AT_FDCWD))]]
+/* The following are libc4/5 aliases. -- We only export under these names.
+ * We  don't import simply because these names feel really weird... °~°... */
+[[export_as("prev_mknod", "__prev_mknod", "__libc_prev_mknod")]]
 int mknod([[nonnull]] char const *nodename, $mode_t mode, $dev_t dev) {
 	return mknodat(__AT_FDCWD, nodename, mode, dev);
 }

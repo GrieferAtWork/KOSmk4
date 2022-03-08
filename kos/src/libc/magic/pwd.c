@@ -96,47 +96,75 @@ __NAMESPACE_STD_USING(FILE)
 
 }
 
+/* NOTE: All the `[[export_as()]]' below must only be export names,  but
+ *       not  import aliases.  The names  stem from  libc4/5, where e.g.
+ *       `_setpwent' is variant-specific, whereas `setpwent' is generic.
+ * libc4/5:
+ * >> void setpwent() {
+ * >>     switch (VARIANT) {
+ * >>     case 1:
+ * >>         return _setpwent();
+ * >>     case 2:
+ * >>         return _yp_setpwent();
+ * >>     case 3:
+ * >>         return _nis_setpwent();
+ * >>     case 4:
+ * >>         return _dns_setpwent();
+ * >>     case 5:
+ * >>         return _compat_setpwent();
+ * >>     }
+ * >> }
+ *
+ * I  honestly don't know  what all those  other variants are all
+ * about, so for now we simply act as though they didn't exist... */
+
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
+@@>> setpwent(3)
 @@Rewind the password-file stream
-[[cp]]
+[[cp, export_as("_setpwent")]]
 void setpwent();
 
+@@>> endpwent(3)
 @@Close the password-file stream
-[[cp_nokos]]
+[[cp_nokos, export_as("_endpwent")]]
 void endpwent();
 
+@@>> getpwent(3)
 @@Read an entry from the password-file stream, opening it if necessary
 @@return: * :                         A pointer to the read password entry
 @@return: NULL: (errno = <unchanged>) The last  entry  has  already  been  read
 @@                                    (use `setpwent()' to rewind the database)
 @@return: NULL: (errno = <changed>)   Error (s.a. `errno')
-[[cp, decl_include("<bits/crt/db/passwd.h>")]]
+[[cp, decl_include("<bits/crt/db/passwd.h>"), export_as("_getpwent")]]
 struct passwd *getpwent();
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 
+@@>> getpwuid(3)
 @@Search for an entry with a matching user ID
 @@return: * :                         A pointer to the read password entry
 @@return: NULL: (errno = <unchanged>) No entry for `uid' exists
 @@return: NULL: (errno = <changed>)   Error (s.a. `errno')
-[[cp, decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>")]]
+[[cp, decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>"), export_as("_getpwuid")]]
 struct passwd *getpwuid($uid_t uid);
 
+@@>> getpwnam(3)
 @@Search for an entry with a matching username
 @@return: * :                         A pointer to the read password entry
 @@return: NULL: (errno = <unchanged>) No entry for `name' exists
 @@return: NULL: (errno = <changed>)   Error (s.a. `errno')
-[[cp, decl_include("<bits/crt/db/passwd.h>")]]
+[[cp, decl_include("<bits/crt/db/passwd.h>"), export_as("_getpwnam")]]
 struct passwd *getpwnam([[nonnull]] const char *name);
 
 %
 %#ifdef __USE_MISC
+@@>> fgetpwent(3)
 @@Read an entry from `stream'
 @@return: * :                         A pointer to the read password entry
 @@return: NULL: (errno = <unchanged>) The last entry has already been read
 @@                                    (use `rewind(stream)' to rewind the database)
 @@return: NULL: (errno = <changed>)   Error (s.a. `errno')
-[[cp, decl_include("<bits/crt/db/passwd.h>")]]
+[[cp, decl_include("<bits/crt/db/passwd.h>"), export_as("_fgetpwent")]]
 struct passwd *fgetpwent([[nonnull]] $FILE *__restrict stream);
 
 @@>> putpwent(3)
@@ -166,6 +194,7 @@ int putpwent([[nonnull]] struct passwd const *__restrict ent,
 
 %
 %#ifdef __USE_POSIX
+@@>> getpwuid_r(3)
 @@Search for an entry with a matching user ID
 @@@return: 0 : (*result != NULL) Success
 @@@return: 0 : (*result == NULL) No entry for `uid'
@@ -176,6 +205,7 @@ $errno_t getpwuid_r($uid_t uid,
                     [[outp(buflen)]] char *__restrict buffer, size_t buflen,
                     [[nonnull]] struct passwd **__restrict result);
 
+@@>> getpwnam_r(3)
 @@Search for an entry with a matching username
 @@@return: 0 : (*result != NULL) Success
 @@@return: 0 : (*result == NULL) No entry for `name'
@@ -187,6 +217,7 @@ $errno_t getpwnam_r([[nonnull]] const char *__restrict name,
                     [[nonnull]] struct passwd **__restrict result);
 
 %#ifdef __USE_MISC
+@@>> getpwent_r(3)
 @@Read an entry from the password-file stream, opening it if necessary.
 @@@return: 0 :     Success (`*result' is made to point at `resultbuf')
 @@@return: ENOENT: The last entry has already been read (use `setpwent()' to rewind the database)
@@ -197,6 +228,7 @@ $errno_t getpwent_r([[nonnull]] struct passwd *__restrict resultbuf,
                     [[outp(buflen)]] char *__restrict buffer, size_t buflen,
                     [[nonnull]] struct passwd **__restrict result);
 
+@@>> fgetpwent_r(3)
 @@Read an entry from `stream'. This function is not standardized and probably never will be.
 @@@return: 0 :     Success (`*result' is made to point at `resultbuf')
 @@@return: ENOENT: The last entry has already been read (use `rewind(stream)' to rewind the database)
@@ -213,6 +245,7 @@ $errno_t fgetpwent_r([[nonnull]] $FILE *__restrict stream,
 }
 
 %#ifdef __USE_KOS
+@@>> fgetpwuid_r(3)
 @@Search for an entry with a matching user ID
 @@@return: 0 : (*result != NULL) Success
 @@@return: 0 : (*result == NULL) No entry for `uid'
@@ -233,6 +266,7 @@ $errno_t fgetpwuid_r([[nonnull]] $FILE *__restrict stream, $uid_t uid,
 	return error;
 }
 
+@@>> fgetpwnam_r(3)
 @@Search for an entry with a matching username
 @@@return: 0 : (*result != NULL) Success
 @@@return: 0 : (*result == NULL) No entry for `name'
@@ -255,6 +289,7 @@ $errno_t fgetpwnam_r([[nonnull]] $FILE *__restrict stream,
 }
 %#endif /* __USE_KOS */
 
+@@>> fgetpwfiltered_r(3)
 @@Filtered read from `stream'
 @@@param: filtered_uid:  When not equal to `(uid_t)-1', require this UID
 @@@param: filtered_name: When not `NULL', require this username
@@ -446,6 +481,7 @@ nextline:
 %#endif	/* __USE_POSIX */
 
 %#ifdef __USE_GNU
+@@>> getpw(3)
 @@Re-construct the password-file line for the given uid in the
 @@given  buffer. This  knows the  format that  the caller will
 @@expect, but this need not be the format of the password file
@@ -474,6 +510,35 @@ err:
 	return -1;
 }
 %#endif /* __USE_GNU */
+
+
+@@>> sgetpwent(3)
+@@Old libc4/5 function (only here for compat)
+[[hidden, section(".text.crt.compat.linux")]]
+[[requires_function(fmemopen, fgetpwent)]]
+/* NOTE: `_sgetpwent()' behaves slightly different:
+ * >> struct passwd *sgetpwent(char *line);
+ * As you can see, the `line' argument is non-const, which is to say that
+ * the function is allowed to modify the contents of the string,  whereas
+ * this variant right here isn't.
+ *
+ * Because we only implement it for compat, we go the simple route and
+ * implement both functions as no modifying their argument, however we
+ * still mustn't import `sgetpwent' as `_sgetpwent' because that would
+ * break the ABI. */
+[[export_as("_sgetpwent")]]
+struct passwd *sgetpwent(char const *line) {
+	struct passwd *result = NULL;
+	FILE *tempfp;
+	tempfp = fmemopen((void *)line, strlen(line) * sizeof(char), "r");
+	if likely(tempfp) {
+		result = fgetpwent(tempfp);
+@@pp_if $has_function(fclose)@@
+		fclose(tempfp);
+@@pp_endif@@
+	}
+	return result;
+}
 
 
 %{

@@ -109,6 +109,14 @@ ssize_t process_vm_writev($pid_t pid,
 @@@return: 0                     : EOF
 [[cp, wunused, decl_include("<bits/os/iovec.h>", "<features.h>", "<bits/types.h>")]]
 [[export_alias("__readv")]]
+/* The following as libc4/5 aliases, though behave slightly different.
+ * In libc4/5, `readv()' tries to emulate the system call if it's  not
+ * supported by the kernel,  but `syscall_readv()' doesn't. Yet  since
+ * on  KOS `readv(2)' always works as a  system call, we don't have to
+ * worry about that. -- However, for the sake of consistency we  still
+ * don't  import this function under these aliases. The same also goes
+ * for `writev()' below! */
+[[export_as("syscall_readv", "__syscall_readv", "__libc_syscall_readv")]]
 ssize_t readv($fd_t fd, [[inp(count)]] struct iovec const *iov, __STDC_INT_AS_SIZE_T count);
 
 @@>> writev(2)
@@ -122,6 +130,7 @@ ssize_t readv($fd_t fd, [[inp(count)]] struct iovec const *iov, __STDC_INT_AS_SI
 @@@return: 0                     : No more data can be written
 [[cp, decl_include("<bits/os/iovec.h>", "<features.h>", "<bits/types.h>")]]
 [[export_alias("__writev")]]
+[[export_as("syscall_writev", "__syscall_writev", "__libc_syscall_writev")]]
 ssize_t writev($fd_t fd, [[inp(count)]] struct iovec const *iov, __STDC_INT_AS_SIZE_T count);
 
 
