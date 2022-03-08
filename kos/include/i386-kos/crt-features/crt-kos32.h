@@ -5450,6 +5450,7 @@
 #define __CRT_HAVE_vfwscanf_s
 #define __CRT_HAVE_vfwscanf_unlocked
 #define __CRT_HAVE_vhangup
+#define __CRT_HAVE_vlimit
 #define __CRT_HAVE_vmsplice
 #define __CRT_HAVE_vprintf
 #define __CRT_HAVE_vprintf_s

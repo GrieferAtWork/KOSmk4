@@ -213,6 +213,7 @@ incdir("");
 #include <asm/os/ulimit.h>
 #include <asm/os/utsname.h>
 #include <asm/os/vfork.h>
+#include <asm/os/vlimit.h>
 #include <asm/os/wait.h>
 #include <asm/os/xattr.h>
 #include <asm/page.h>
@@ -273,6 +274,7 @@ incdir("");
 #include <bits/crt/tm.h>
 #include <bits/crt/uformat-printer.h>
 #include <bits/crt/unicode.h>
+#include <bits/crt/vtimes.h>
 #include <bits/crt/wctype.h>
 #include <bits/crt/wformat-printer.h>
 #include <bits/elf-types.h>
@@ -1287,7 +1289,9 @@ incdir("");
 #include <sys/utime.h>
 #include <sys/utsname.h>
 #include <sys/vfs.h>
+#include <sys/vlimit.h>
 #include <sys/vt.h>
+#include <sys/vtimes.h>
 #include <sys/wait.h>
 #include <sys/xattr.h>
 #include <syscall.h>

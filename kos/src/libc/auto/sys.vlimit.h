@@ -1,3 +1,4 @@
+/* HASH CRC-32:0xfe76010f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,30 +18,36 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_OS_KOS_RLIMIT_H
-#define _BITS_OS_KOS_RLIMIT_H 1
+#ifndef GUARD_LIBC_AUTO_SYS_VLIMIT_H
+#define GUARD_LIBC_AUTO_SYS_VLIMIT_H 1
 
-#include <__stdinc.h>
-#include <features.h>
+#include "../api.h"
 
-#include <bits/types.h>
+#include <hybrid/typecore.h>
+#include <kos/types.h>
+#include <sys/vlimit.h>
 
-#ifdef __CC__
-__DECL_BEGIN
+DECL_BEGIN
 
-struct rlimit {
-	__FS_TYPE(rlim) rlim_cur; /* The current (soft) limit. */
-	__FS_TYPE(rlim) rlim_max; /* The hard limit. */
-};
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> vlimit(3)
+ * Ancient wrapper for `setrlimit(2)' (s.a. `struct rlimit::rlim_cur')
+ * @param: resource: One of `LIM_*' (see above)
+ * @param: value:    Value to assign to `resource'
+ * @return: 0:  Success
+ * @return: -1: Error (s.a. `errno') */
+INTDEF int NOTHROW_NCX(LIBDCALL libd_vlimit)(int resource, int value);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> vlimit(3)
+ * Ancient wrapper for `setrlimit(2)' (s.a. `struct rlimit::rlim_cur')
+ * @param: resource: One of `LIM_*' (see above)
+ * @param: value:    Value to assign to `resource'
+ * @return: 0:  Success
+ * @return: -1: Error (s.a. `errno') */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_vlimit)(int resource, int value);
+#endif /* !__KERNEL__ */
 
-#ifdef __USE_LARGEFILE64
-struct rlimit64 {
-	__rlim64_t rlim_cur; /* The current (soft) limit. */
-	__rlim64_t rlim_max; /* The hard limit. */
-};
-#endif /* __USE_LARGEFILE64 */
+DECL_END
 
-__DECL_END
-#endif /* __CC__ */
-
-#endif /* !_BITS_OS_KOS_RLIMIT_H */
+#endif /* !GUARD_LIBC_AUTO_SYS_VLIMIT_H */

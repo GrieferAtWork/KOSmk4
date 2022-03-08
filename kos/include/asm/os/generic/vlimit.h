@@ -17,30 +17,45 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_OS_KOS_RLIMIT_H
-#define _BITS_OS_KOS_RLIMIT_H 1
+#ifndef _ASM_OS_GENERIC_VLIMIT_H
+#define _ASM_OS_GENERIC_VLIMIT_H 1
 
 #include <__stdinc.h>
-#include <features.h>
 
-#include <bits/types.h>
+#include <asm/os/resource.h>
 
-#ifdef __CC__
-__DECL_BEGIN
+#define __LIM_NORAISE 0 /* Unsupported */
+#define __LIM_TO_RLIMIT(x)   ((x) - 1)
+#define __LIM_FROM_RLIMIT(x) ((x) + 1)
 
-struct rlimit {
-	__FS_TYPE(rlim) rlim_cur; /* The current (soft) limit. */
-	__FS_TYPE(rlim) rlim_max; /* The hard limit. */
-};
+#ifdef __RLIMIT_CPU
+#define __LIM_CPU __LIM_FROM_RLIMIT(__RLIMIT_CPU) /* s.a. `RLIMIT_CPU' */
+#endif /* __RLIMIT_CPU */
+#ifdef __RLIMIT_FSIZE
+#define __LIM_FSIZE __LIM_FROM_RLIMIT(__RLIMIT_FSIZE) /* s.a. `RLIMIT_FSIZE' */
+#endif /* __RLIMIT_FSIZE */
+#ifdef __RLIMIT_DATA
+#define __LIM_DATA __LIM_FROM_RLIMIT(__RLIMIT_DATA) /* s.a. `RLIMIT_DATA' */
+#endif /* __RLIMIT_DATA */
+#ifdef __RLIMIT_STACK
+#define __LIM_STACK __LIM_FROM_RLIMIT(__RLIMIT_STACK) /* s.a. `RLIMIT_STACK' */
+#endif /* __RLIMIT_STACK */
+#ifdef __RLIMIT_CORE
+#define __LIM_CORE __LIM_FROM_RLIMIT(__RLIMIT_CORE) /* s.a. `RLIMIT_CORE' */
+#endif /* __RLIMIT_CORE */
+#ifdef __RLIMIT_RSS
+#define __LIM_MAXRSS __LIM_FROM_RLIMIT(__RLIMIT_RSS) /* s.a. `RLIMIT_RSS' */
+#endif /* __RLIMIT_RSS */
 
-#ifdef __USE_LARGEFILE64
-struct rlimit64 {
-	__rlim64_t rlim_cur; /* The current (soft) limit. */
-	__rlim64_t rlim_max; /* The hard limit. */
-};
-#endif /* __USE_LARGEFILE64 */
+#if 1
+/* This is what gLibc defines for this constant... */
+#define __VLIMIT_INFINITY 0x7fffffff
+#else
+/* ... But given the implementation being a wrapper for `setrlimit(2)',
+ * which uses `RLIM_INFINITY == (rlim_t)-1' for this meaning, it stands
+ * to reason to that _this_ would be the correct value... */
+#define __VLIMIT_INFINITY (-1)
+#endif
 
-__DECL_END
-#endif /* __CC__ */
 
-#endif /* !_BITS_OS_KOS_RLIMIT_H */
+#endif /* !_ASM_OS_GENERIC_VLIMIT_H */

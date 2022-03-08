@@ -17,30 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_OS_KOS_RLIMIT_H
-#define _BITS_OS_KOS_RLIMIT_H 1
+#ifndef _ASM_OS_VLIMIT_H
+#define _ASM_OS_VLIMIT_H 1
 
-#include <__stdinc.h>
-#include <features.h>
+#include <asm/os/generic/vlimit.h>
 
-#include <bits/types.h>
-
-#ifdef __CC__
-__DECL_BEGIN
-
-struct rlimit {
-	__FS_TYPE(rlim) rlim_cur; /* The current (soft) limit. */
-	__FS_TYPE(rlim) rlim_max; /* The hard limit. */
-};
-
-#ifdef __USE_LARGEFILE64
-struct rlimit64 {
-	__rlim64_t rlim_cur; /* The current (soft) limit. */
-	__rlim64_t rlim_max; /* The hard limit. */
-};
-#endif /* __USE_LARGEFILE64 */
-
-__DECL_END
-#endif /* __CC__ */
-
-#endif /* !_BITS_OS_KOS_RLIMIT_H */
+#endif /* !_ASM_OS_VLIMIT_H */

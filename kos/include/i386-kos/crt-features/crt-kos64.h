@@ -5078,6 +5078,7 @@
 #define __CRT_HAVE_vfwscanf_s
 #define __CRT_HAVE_vfwscanf_unlocked
 #define __CRT_HAVE_vhangup
+#define __CRT_HAVE_vlimit
 #define __CRT_HAVE_vmsplice
 #define __CRT_HAVE_vprintf
 #define __CRT_HAVE_vprintf_s
@@ -9157,6 +9158,7 @@
 #define __CRT_HAVE_KOS$vfwscanf
 #define __CRT_HAVE_KOS$vfwscanf_s
 #define __CRT_HAVE_KOS$vfwscanf_unlocked
+#define __CRT_HAVE_KOS$vlimit
 #define __CRT_HAVE_KOS$vmsplice
 #define __CRT_HAVE_KOS$vprintf
 #define __CRT_HAVE_KOS$vprintf_s
@@ -13173,6 +13175,7 @@
 #define __CRT_HAVE_DOS$vfwscanf
 #define __CRT_HAVE_DOS$vfwscanf_s
 #define __CRT_HAVE_DOS$vfwscanf_unlocked
+#define __CRT_HAVE_DOS$vlimit
 #define __CRT_HAVE_DOS$vmsplice
 #define __CRT_HAVE_DOS$vprintf
 #define __CRT_HAVE_DOS$vprintf_s

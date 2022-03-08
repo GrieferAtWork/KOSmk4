@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70300855 */
+/* HASH CRC-32:0x5c85e88c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3128,6 +3128,7 @@
 #define __CRT_HAVE_DOS$vfwscanf_unlocked
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$vlimit
 #define __CRT_HAVE_DOS$vmsplice
 #define __CRT_HAVE_DOS$vprintf
 #define __CRT_HAVE_DOS$vprintf_s
@@ -6802,6 +6803,7 @@
 #define __CRT_HAVE_vfwscanf_s
 #define __CRT_HAVE_vfwscanf_unlocked
 #define __CRT_HAVE_vhangup
+#define __CRT_HAVE_vlimit
 #define __CRT_HAVE_vmsplice
 #define __CRT_HAVE_vprintf
 #define __CRT_HAVE_vprintf_s

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf18ff21e */
+/* HASH CRC-32:0xa0fb45d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: uClibc        (/include/sys/utsname.h) */
+/* (#) Portability: GNU C Library (/resource/sys/vtimes.h) */
 #ifndef _SYS_VTIMES_H
 #define _SYS_VTIMES_H 1
 
