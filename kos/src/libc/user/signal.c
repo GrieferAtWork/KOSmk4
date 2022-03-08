@@ -201,7 +201,7 @@ NOTHROW(LIBCCALL libc___p_sys_siglist)(void)
 /*[[[end:libc___p_sys_siglist]]]*/
 
 
-/* Not (currently) exposed in headers, but here for compatibility with gLibc:
+/* Not (currently) exposed in headers,  but here for compatibility with  gLibc:
  * This is an array of strings that is similar to `sys_siglist', only that this
  * one points to the strings returned by `sigabbrev_np(3)'.
  *
@@ -211,6 +211,29 @@ NOTHROW(LIBCCALL libc___p_sys_siglist)(void)
 #undef sys_sigabbrev
 PRIVATE ATTR_SECTION(".bss.crt.errno.sys_siglist") char const *libc_sys_sigabbrev[NSIG] = { NULL };
 DEFINE_PUBLIC_IDATA_G(sys_sigabbrev, libc___p_sys_sigabbrev, NSIG * __SIZEOF_POINTER__);
+
+
+/* Weird function exported by  gLibc that's a (kind-of)  wrapper
+ * around `sys_rt_sigqueueinfo(2)'. Seems related to <resolv.h>? */
+DEFINE_PUBLIC_ALIAS(__gai_sigqueue, libc___gai_sigqueue);
+INTERN ATTR_SECTION(".text.crt.compat.glibc") int
+NOTHROW_NCX(LIBCCALL libc___gai_sigqueue)(signo_t signo,
+                                          union sigval const value,
+                                          pid_t target_pid) {
+	errno_t error;
+	siginfo_t info;
+	bzero(&info, sizeof(info));
+	info.si_signo = signo;
+	info.si_code  = SI_ASYNCNL;
+	info.si_pid   = target_pid;
+	info.si_uid   = getuid();
+	info.si_value = value;
+	/* Do the system call. */
+	error = sys_rt_sigqueueinfo(target_pid, signo, &info);
+	return libc_seterrno_syserr(error);
+}
+
+
 
 INTERN ATTR_SECTION(".text.crt.errno.sys_siglist")
 ATTR_CONST ATTR_RETNONNULL WUNUSED char const *const *

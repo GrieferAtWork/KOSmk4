@@ -530,6 +530,7 @@
 #define __CRT_HAVE___fxstat64
 #define __CRT_HAVE___fxstatat
 #define __CRT_HAVE___fxstatat64
+#define __CRT_HAVE___gai_sigqueue
 #define __CRT_HAVE___gamma
 #define __CRT_HAVE___gammaf
 #define __CRT_HAVE___gammal
