@@ -109,36 +109,6 @@ handle_pidfd_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
                    USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	switch (cmd) {
 
-	case PIDFD_IOC_GETTID: {
-		validate_writable(arg, sizeof(pid_t));
-		*(USER CHECKED pid_t *)arg = taskpid_gettid_s(self);
-		return 0;
-	}	break;
-
-	case PIDFD_IOC_GETPID: {
-		validate_writable(arg, sizeof(pid_t));
-		*(USER CHECKED pid_t *)arg = taskpid_getpid_s(self);
-		return 0;
-	}	break;
-
-	case PIDFD_IOC_GETPPID: {
-		validate_writable(arg, sizeof(pid_t));
-		*(USER CHECKED pid_t *)arg = taskpid_getppid_s(self);
-		return 0;
-	}	break;
-
-	case PIDFD_IOC_GETPGID: {
-		validate_writable(arg, sizeof(pid_t));
-		*(USER CHECKED pid_t *)arg = taskpid_getpgid_s(self);
-		return 0;
-	}	break;
-
-	case PIDFD_IOC_GETSID: {
-		validate_writable(arg, sizeof(pid_t));
-		*(USER CHECKED pid_t *)arg = taskpid_getsid_s(self);
-		return 0;
-	}	break;
-
 	case PIDFD_IOC_OPENPID: {
 		struct handle hand;
 		hand.h_type = HANDLE_TYPE_PIDFD;
@@ -179,6 +149,25 @@ handle_pidfd_ioctl(struct taskpid *__restrict self, ioctl_t cmd,
 
 	default:
 		break;
+	}
+	switch (_IO_WITHSIZE(cmd, 0)) {
+
+	case _IO_WITHSIZE(PIDFD_IOC_GETTID, 0):
+		return ioctl_intarg_setpid(cmd, arg, taskpid_gettid_s(self));
+
+	case _IO_WITHSIZE(PIDFD_IOC_GETPID, 0):
+		return ioctl_intarg_setpid(cmd, arg, taskpid_getpid_s(self));
+
+	case _IO_WITHSIZE(PIDFD_IOC_GETPPID, 0):
+		return ioctl_intarg_setpid(cmd, arg, taskpid_getppid_s(self));
+
+	case _IO_WITHSIZE(PIDFD_IOC_GETPGID, 0):
+		return ioctl_intarg_setpid(cmd, arg, taskpid_getpgid_s(self));
+
+	case _IO_WITHSIZE(PIDFD_IOC_GETSID, 0):
+		return ioctl_intarg_setpid(cmd, arg, taskpid_getsid_s(self));
+
+	default: break;
 	}
 	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 	      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,

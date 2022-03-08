@@ -76,7 +76,7 @@
 	- `<ssp/sys/socket.h>`:
 		- `__recv_chk()`
 		- `__recvfrom_chk()`
-	- `<ssp/stdlib.h>`:
+	- `<stdlib.h>`:
 		- `__strtod_internal()`
 		- `__strtof_internal()`
 		- `__strtol_internal()`

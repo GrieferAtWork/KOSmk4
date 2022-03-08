@@ -47,7 +47,7 @@
 /************************************************************************/
 /* Actually KOS-specific ioctls.                                        */
 /************************************************************************/
-#define FILE_IOC_DELETED   _IOR_KOS('F', 0x00, int)                  /* Check if the file deleted (as per `unlink(2)') */
+#define FILE_IOC_DELETED   _IOR_KOS('F', 0x00, int)                  /* Check if the file was deleted (as per `unlink(2)') */
 #define FILE_IOC_HASRAWIO  _IOR_KOS('F', 0x01, int)                  /* Check if the file supports "raw io" (s.a. `mfile_hasrawio()') */
 #define FILE_IOC_DCHANGED  _IOR_KOS('F', 0x02, int)                  /* Check if data of the file has changed (s.a. `fdatasync(2)', `mfile_haschanged()') */
 #define FILE_IOC_CHANGED   _IOR_KOS('F', 0x03, int)                  /* Check if attributes or data have changed (s.a. `fsync(2)', `MFILE_F_CHANGED | MFILE_F_ATTRCHANGED') */

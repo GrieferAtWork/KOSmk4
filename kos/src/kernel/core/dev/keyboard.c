@@ -972,7 +972,7 @@ linux_keyboard_getmode(struct kbddev *__restrict self) {
 	return ATOMIC_READ(self->kd_flags) & KEYBOARD_DEVICE_FLAG_RDMODE;
 }
 
-LOCAL void KCALL
+LOCAL syscall_slong_t KCALL
 linux_keyboard_setmode(struct kbddev *__restrict self,
                        unsigned int mode) {
 	if (mode >= K_RAW && mode <= K_OFF) {
@@ -986,6 +986,7 @@ linux_keyboard_setmode(struct kbddev *__restrict self,
 		      E_INVALID_ARGUMENT_CONTEXT_GENERIC,
 		      mode);
 	}
+	return 0;
 }
 
 LOCAL unsigned int KCALL
@@ -994,7 +995,7 @@ linux_keyboard_getmeta(struct kbddev *__restrict self) {
 	return K_ESCPREFIX;
 }
 
-LOCAL void KCALL
+LOCAL syscall_slong_t KCALL
 linux_keyboard_setmeta(struct kbddev *__restrict self,
                        unsigned int mode) {
 	(void)self;
@@ -1009,6 +1010,7 @@ linux_keyboard_setmeta(struct kbddev *__restrict self,
 		      E_INVALID_ARGUMENT_CONTEXT_GENERIC,
 		      mode);
 	}
+	return 0;
 }
 
 
@@ -1030,6 +1032,7 @@ kbddev_v_ioctl(struct mfile *__restrict self,
 		COMPILER_WRITE_BARRIER();
 		memcpy(arg, &key, sizeof(struct kbd_packet));
 		COMPILER_WRITE_BARRIER();
+		return 0;
 	}	break;
 
 	case KBD_IOC_GETKEY: {
@@ -1039,33 +1042,7 @@ kbddev_v_ioctl(struct mfile *__restrict self,
 		COMPILER_WRITE_BARRIER();
 		memcpy(arg, &key, sizeof(struct kbd_packet));
 		COMPILER_WRITE_BARRIER();
-	}	break;
-
-	case KBD_IOC_GETLED: {
-		uintptr_t leds;
-		validate_writable(arg, sizeof(__uint32_t));
-		leds = ATOMIC_READ(me->kd_leds);
-		COMPILER_WRITE_BARRIER();
-		*(u32 *)arg = (u32)leds;
-		COMPILER_WRITE_BARRIER();
-	}	break;
-
-	case KBD_IOC_SETLED: {
-		uintptr_t new_mods;
-		validate_readable(arg, sizeof(__uint32_t));
-		COMPILER_READ_BARRIER();
-		new_mods = *(u32 const *)arg;
-		COMPILER_READ_BARRIER();
-		kbddev_leds_acquire(me);
-		RAII_FINALLY { kbddev_leds_release(me); };
-		if (me->kd_leds != new_mods) {
-			struct kbddev_ops const *ops;
-			ops = kbddev_getops(me);
-			if (ops->ko_setleds) {
-				(*ops->ko_setleds)(me, new_mods);
-			}
-			me->kd_leds = new_mods;
-		}
+		return 0;
 	}	break;
 
 	case KBD_IOC_MASKLED: {
@@ -1097,24 +1074,7 @@ kbddev_v_ioctl(struct mfile *__restrict self,
 		data->lm_oldled = old_leds;
 		data->lm_newled = new_mods;
 		COMPILER_WRITE_BARRIER();
-	}	break;
-
-	case KBD_IOC_GETMOD: {
-		uintptr_t mods;
-		validate_writable(arg, sizeof(__uint32_t));
-		mods = ATOMIC_READ(me->kd_mods);
-		COMPILER_WRITE_BARRIER();
-		*(USER CHECKED u32 *)arg = (u32)mods;
-		COMPILER_WRITE_BARRIER();
-	}	break;
-
-	case KBD_IOC_SETMOD: {
-		uintptr_t new_mods;
-		validate_readable(arg, sizeof(__uint32_t));
-		COMPILER_READ_BARRIER();
-		new_mods = *(USER CHECKED u32 const *)arg;
-		COMPILER_READ_BARRIER();
-		ATOMIC_WRITE(me->kd_mods, new_mods);
+		return 0;
 	}	break;
 
 	case KBD_IOC_MASKMOD: {
@@ -1136,6 +1096,7 @@ kbddev_v_ioctl(struct mfile *__restrict self,
 		data->lm_oldled = old_mods;
 		data->lm_newled = new_mods;
 		COMPILER_WRITE_BARRIER();
+		return 0;
 	}	break;
 
 	case KBD_IOC_GETKEYMAP: {
@@ -1183,6 +1144,7 @@ continue_copy_keymap:
 		((struct kbd_keymap *)arg)->km_mapsize = mapsize;
 		((struct kbd_keymap *)arg)->km_defenc  = default_encoding;
 		COMPILER_WRITE_BARRIER();
+		return 0;
 	}	break;
 
 	case KBD_IOC_SETKEYMAP: {
@@ -1230,6 +1192,7 @@ continue_copy_keymap:
 		bzero(&me->kd_map.km_basic, sizeof(me->kd_map.km_basic));
 		kbddev_map_endwrite(me);
 		kfree(old_map);
+		return 0;
 	}	break;
 
 	case KBD_IOC_RESETKEYMAP: {
@@ -1239,6 +1202,7 @@ continue_copy_keymap:
 		keymap_init_en_US(&me->kd_map);
 		kbddev_map_endwrite(me);
 		kfree(old_map);
+		return 0;
 	}	break;
 
 	case KBD_IOC_FLUSHPENDING: {
@@ -1249,6 +1213,7 @@ continue_copy_keymap:
 				break; /* Buffer became empty. */
 		}
 		ATOMIC_WRITE(me->kd_pendsz, 0);
+		return 0;
 	}	break;
 
 	case KBD_IOC_PUTCHAR: {
@@ -1267,6 +1232,7 @@ continue_copy_keymap:
 			return 1;
 		}
 		kbddev_map_endwrite(me);
+		return 0;
 	}	break;
 
 	case KBD_IOC_PUTSTR: {
@@ -1303,23 +1269,60 @@ continue_copy_keymap:
 		return kbddev_putkey(me, key);
 	}	break;
 
-	case KBD_IOC_GETDBGF12: {
-		validate_writable(arg, sizeof(int));
-		COMPILER_WRITE_BARRIER();
-#ifdef KEYBOARD_DEVICE_FLAG_DBGF12
-		*(int *)arg = (ATOMIC_READ(me->kd_flags) & KEYBOARD_DEVICE_FLAG_DBGF12) ? 1 : 0;
-#else /* KEYBOARD_DEVICE_FLAG_DBGF12 */
-		*(int *)arg = 0;
-#endif /* !KEYBOARD_DEVICE_FLAG_DBGF12 */
-		COMPILER_WRITE_BARRIER();
+	/* TODO: Add an ioctl() to pre-calculate _all_ possible ASCII keymap keys.
+	 *       This  could be useful  to improve security  at a password prompt,
+	 *       since a  not-very-nice person  could  determine which  keys  were
+	 *       pressed  since  initialization by  enumerating all  possible keys
+	 *       and  using  a timing  side-channel  to determine  which  keys had
+	 *       already  been  cached (the  ones  that were  pressed),  and which
+	 *       had to be freshly cached then (the ones that weren't) */
+
+	default:
+		break;
+	}
+	switch (_IO_WITHSIZE(cmd, 0)) {
+
+	case _IO_WITHSIZE(KBD_IOC_GETLED, 0):
+		return ioctl_intarg_setu32(cmd, arg, (uint32_t)ATOMIC_READ(me->kd_leds));
+
+	case _IO_WITHSIZE(KBD_IOC_SETLED, 0): {
+		uintptr_t new_mods;
+		new_mods = ioctl_intarg_getu32(cmd, arg);
+		kbddev_leds_acquire(me);
+		RAII_FINALLY { kbddev_leds_release(me); };
+		if (me->kd_leds != new_mods) {
+			struct kbddev_ops const *ops;
+			ops = kbddev_getops(me);
+			if (ops->ko_setleds) {
+				(*ops->ko_setleds)(me, new_mods);
+			}
+			me->kd_leds = new_mods;
+		}
+		return 0;
 	}	break;
 
-	case KBD_IOC_SETDBGF12: {
-		int f12_mode;
-		validate_readable(arg, sizeof(int));
-		COMPILER_READ_BARRIER();
-		f12_mode = *(int const *)arg;
-		COMPILER_READ_BARRIER();
+	case _IO_WITHSIZE(KBD_IOC_GETMOD, 0):
+		return ioctl_intarg_setu32(cmd, arg, (uint32_t)ATOMIC_READ(me->kd_mods));
+
+	case _IO_WITHSIZE(KBD_IOC_SETMOD, 0): {
+		uintptr_t new_mods;
+		new_mods = ioctl_intarg_getu32(cmd, arg);
+		ATOMIC_WRITE(me->kd_mods, new_mods);
+		return 0;
+	}	break;
+
+	case _IO_WITHSIZE(KBD_IOC_GETDBGF12, 0): {
+		bool enabled;
+#ifdef KEYBOARD_DEVICE_FLAG_DBGF12
+		enabled = (ATOMIC_READ(me->kd_flags) & KEYBOARD_DEVICE_FLAG_DBGF12) != 0;
+#else /* KEYBOARD_DEVICE_FLAG_DBGF12 */
+		enabled = false;
+#endif /* !KEYBOARD_DEVICE_FLAG_DBGF12 */
+		return ioctl_intarg_setbool(cmd, arg, enabled);
+	}	break;
+
+	case _IO_WITHSIZE(KBD_IOC_SETDBGF12, 0): {
+		int f12_mode = ioctl_intarg_getint(cmd, arg);
 		if (f12_mode == 0) {
 #ifdef KEYBOARD_DEVICE_FLAG_DBGF12
 			ATOMIC_AND(me->kd_flags, ~(KEYBOARD_DEVICE_FLAG_DBGF12 |
@@ -1332,27 +1335,23 @@ continue_copy_keymap:
 			      E_INVALID_ARGUMENT_CONTEXT_KBD_IOC_SETDBGF12_BADDMODE,
 			      f12_mode);
 		}
+		return 0;
 	}	break;
 
-	case KDGETLED:
-	case _IO_WITHTYPE(KDGETLED, char): {
+	case _IO_WITHSIZE(KDGETLED, 0):
+	case _IO_WITHSIZE(KDGETLED, 0) | _IOC_OUT: {
 		uintptr_t leds;
 		STATIC_ASSERT(KEYBOARD_LED_SCROLLLOCK >> 8 == LED_SCR);
-		STATIC_ASSERT(KEYBOARD_LED_NUMLOCK    >> 8 == LED_NUM);
-		STATIC_ASSERT(KEYBOARD_LED_CAPSLOCK   >> 8 == LED_CAP);
-		validate_writable(arg, sizeof(char));
+		STATIC_ASSERT(KEYBOARD_LED_NUMLOCK >> 8 == LED_NUM);
+		STATIC_ASSERT(KEYBOARD_LED_CAPSLOCK >> 8 == LED_CAP);
 		leds = ATOMIC_READ(me->kd_leds);
-		COMPILER_WRITE_BARRIER();
-		*(char *)arg = (char)((leds >> 8) & (LED_SCR | LED_NUM | LED_CAP));
-		COMPILER_WRITE_BARRIER();
+		return ioctl_intarg_setu8(cmd, arg, (u8)((leds >> 8) & (LED_SCR | LED_NUM | LED_CAP)));
 	}	break;
 
-	case KDSETLED:
-	case _IO_WITHTYPE(KDSETLED, char): {
+	case _IO_WITHSIZE(KDSETLED, 0):
+	case _IO_WITHSIZE(KDSETLED, 0) | _IOC_IN: {
 		uintptr_t new_leds;
-		validate_readable(arg, sizeof(char));
-		COMPILER_READ_BARRIER();
-		new_leds = (uintptr_t)(*(char *)arg << 8);
+		new_leds = (uintptr_t)ioctl_intarg_getu8(cmd, arg) << 8;
 		COMPILER_READ_BARRIER();
 		if unlikely(new_leds & ~((K_SCROLLLOCK | K_NUMLOCK | K_CAPSLOCK) << 8))
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
@@ -1367,86 +1366,61 @@ continue_copy_keymap:
 				(*ops->ko_setleds)(me, new_leds);
 			me->kd_leds = new_leds;
 		}
+		return 0;
 	}	break;
 
-	case KDGKBTYPE:
-	case _IO_WITHTYPE(KDGKBTYPE, unsigned int):
-		validate_writable(arg, sizeof(unsigned int));
-		*(unsigned int *)arg = KB_101;
-		break;
+	case _IO_WITHSIZE(KDGKBTYPE, 0):
+	case _IO_WITHSIZE(KDGKBTYPE, 0) | _IOC_OUT:
+		return ioctl_intarg_setuint(cmd, arg, KB_101);
 
-	case KDGKBMODE:
-	case _IO_WITHTYPE(KDGKBMODE, unsigned int):
-		validate_writable(arg, sizeof(unsigned int));
-		*(unsigned int *)arg = linux_keyboard_getmode(me);
-		break;
+	case _IO_WITHSIZE(KDGKBMODE, 0):
+	case _IO_WITHSIZE(KDGKBMODE, 0) | _IOC_OUT:
+		return ioctl_intarg_setuint(cmd, arg, linux_keyboard_getmode(me));
 
-	case KDSKBMODE:
-	case _IO_WITHTYPE(KDSKBMODE, unsigned int):
-		if ((uintptr_t)arg < PAGESIZE) {
-			/* Compatibility with linux. */
-			linux_keyboard_setmode(me, (unsigned int)(uintptr_t)arg);
-		} else {
-			validate_readable(arg, sizeof(unsigned int));
-			linux_keyboard_setmode(me, *(unsigned int *)arg);
-		}
-		break;
+	case _IO_WITHSIZE(KDSKBMODE, 0):
+	case _IO_WITHSIZE(KDSKBMODE, 0) | _IOC_IN:
+		if ((uintptr_t)arg < PAGESIZE) /* Compatibility with linux. */
+			return linux_keyboard_setmode(me, (unsigned int)(uintptr_t)arg);
+		return linux_keyboard_setmode(me, ioctl_intarg_getuint(cmd, arg));
 
-	case KDGKBMETA:
-	case _IO_WITHTYPE(KDGKBMETA, unsigned int):
-		validate_writable(arg, sizeof(unsigned int));
-		*(unsigned int *)arg = linux_keyboard_getmeta(me);
-		break;
+	case _IO_WITHSIZE(KDGKBMETA, 0):
+	case _IO_WITHSIZE(KDGKBMETA, 0) | _IOC_OUT:
+		return ioctl_intarg_setuint(cmd, arg, linux_keyboard_getmeta(me));
 
-	case KDSKBMETA:
-	case _IO_WITHTYPE(KDSKBMETA, unsigned int):
-		validate_readable(arg, sizeof(unsigned int));
-		linux_keyboard_setmeta(me, *(unsigned int *)arg);
-		break;
+	case _IO_WITHSIZE(KDSKBMETA, 0):
+	case _IO_WITHSIZE(KDSKBMETA, 0) | _IOC_IN:
+		return linux_keyboard_setmeta(me, ioctl_intarg_getuint(cmd, arg));
 
-
-	case KDGKBLED:
-	case _IO_WITHTYPE(KDGKBLED, char): {
+	case _IO_WITHSIZE(KDGKBLED, 0):
+	case _IO_WITHSIZE(KDGKBLED, 0) | _IOC_OUT: {
 		uintptr_t mods;
 		STATIC_ASSERT(KEYMOD_SCROLLLOCK >> 8 == K_SCROLLLOCK);
 		STATIC_ASSERT(KEYMOD_NUMLOCK >> 8 == K_NUMLOCK);
 		STATIC_ASSERT(KEYMOD_CAPSLOCK >> 8 == K_CAPSLOCK);
-		validate_writable(arg, sizeof(char));
 		mods = ATOMIC_READ(me->kd_mods);
-		COMPILER_WRITE_BARRIER();
-		*(char *)arg = (char)((mods >> 8) & (K_SCROLLLOCK | K_NUMLOCK | K_CAPSLOCK));
-		COMPILER_WRITE_BARRIER();
+		return ioctl_intarg_setu8(cmd, arg, (u8)((mods >> 8) & (K_SCROLLLOCK | K_NUMLOCK | K_CAPSLOCK)));
 	}	break;
 
-	case KDSKBLED:
-	case _IO_WITHTYPE(KDSKBLED, char): {
+	case _IO_WITHSIZE(KDSKBLED, 0):
+	case _IO_WITHSIZE(KDSKBLED, 0) | _IOC_IN: {
 		uintptr_t old_mods, new_mask, new_mods;
-		validate_readable(arg, sizeof(char));
-		COMPILER_READ_BARRIER();
-		new_mask = (uintptr_t)(*(char *)arg << 8);
-		COMPILER_READ_BARRIER();
-		if unlikely(new_mask & ~((K_SCROLLLOCK | K_NUMLOCK | K_CAPSLOCK) << 8))
+		new_mask = (uintptr_t)ioctl_intarg_getu8(cmd, arg) << 8;
+		if unlikely(new_mask & ~((K_SCROLLLOCK | K_NUMLOCK | K_CAPSLOCK) << 8)) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_GENERIC, new_mask >> 8);
+			      E_INVALID_ARGUMENT_CONTEXT_GENERIC,
+			      new_mask >> 8);
+		}
 		do {
 			old_mods = ATOMIC_READ(me->kd_mods);
 			new_mods = (old_mods & ~((K_SCROLLLOCK | K_NUMLOCK | K_CAPSLOCK) << 8)) | new_mask;
 		} while (!ATOMIC_CMPXCH(me->kd_mods, old_mods, new_mods));
+		return 0;
 	}	break;
 
-	/* TODO: Add an ioctl() to pre-calculate _all_ possible ASCII keymap keys.
-	 *       This  could be useful  to improve security  at a password prompt,
-	 *       since a  not-very-nice person  could  determine which  keys  were
-	 *       pressed  since  initialization by  enumerating all  possible keys
-	 *       and  using  a timing  side-channel  to determine  which  keys had
-	 *       already  been  cached (the  ones  that were  pressed),  and which
-	 *       had to be freshly cached then (the ones that weren't) */
-
 	default:
-		return chrdev_v_ioctl(me, cmd, arg, mode);
 		break;
 	}
-	return 0;
+	return chrdev_v_ioctl(me, cmd, arg, mode);
 }
 
 

@@ -418,73 +418,79 @@ _ttydev_tryioctl(struct mfile *__restrict self, ioctl_t cmd,
 	switch (cmd) {
 
 	case TCGETS:
-	case _IOR(_IOC_TYPE(TCGETS), _IOC_NR(TCGETS), struct termio):
+	case TCGETS | _IOC_OUT:
+	case _IO_WITHTYPE(TCGETS, struct termio):
+	case _IO_WITHTYPE(TCGETS, struct termio) | _IOC_OUT:
 		validate_writable(arg, sizeof(struct termio));
 		COMPILER_WRITE_BARRIER();
 		termios_to_termio((USER CHECKED struct termio *)arg, &me->t_term.t_ios);
-		break;
+		return 0;
 
-	case _IOW(_IOC_TYPE(TCSETS), _IOC_NR(TCSETS), struct termio):
-		cmd = TCSETS;
-		goto do_TCSETS;
-	case _IOW(_IOC_TYPE(TCSETSW), _IOC_NR(TCSETSW), struct termio):
-		cmd = TCSETSW;
-		goto do_TCSETS;
-	case _IOW(_IOC_TYPE(TCSETSF), _IOC_NR(TCSETSF), struct termio):
-		cmd = TCSETSF;
-		goto do_TCSETS;
 	case TCSETS:
 	case TCSETSW:
 	case TCSETSF:
-do_TCSETS: {
+	case TCSETS | _IOC_IN:
+	case TCSETSW | _IOC_IN:
+	case TCSETSF | _IOC_IN:
+	case _IO_WITHTYPE(TCSETS, struct termio):
+	case _IO_WITHTYPE(TCSETSW, struct termio):
+	case _IO_WITHTYPE(TCSETSF, struct termio):
+	case _IO_WITHTYPE(TCSETS, struct termio) | _IOC_IN:
+	case _IO_WITHTYPE(TCSETSW, struct termio) | _IOC_IN:
+	case _IO_WITHTYPE(TCSETSF, struct termio) | _IOC_IN: {
 		struct termios new_io;
 		validate_readable(arg, sizeof(struct termio));
 		COMPILER_READ_BARRIER();
 		termio_to_termios(&new_io, (USER CHECKED struct termio *)arg);
 		COMPILER_READ_BARRIER();
 		/* DRIVER: if (cmd != TCSETS) WAIT_FOR_UNWRITTEN_DATA_TO_BE_TRANSMITTED(); */
-		if (cmd == TCSETSW) /* Clear the input buffer */
+		if (_IOC_NR(cmd) == _IOC_NR(TCSETSW)) /* Clear the input buffer */
 			ringbuffer_setwritten(&me->t_term.t_ibuf, 0);
 		terminal_setios(&me->t_term, &new_io, NULL);
+		return 0;
 	}	break;
 
 	case TCGETA:
-	case _IOR(_IOC_TYPE(TCGETA), _IOC_NR(TCGETA), struct termios):
+	case TCGETA | _IOC_OUT:
+	case _IO_WITHTYPE(TCGETA, struct termios):
+	case _IO_WITHTYPE(TCGETA, struct termios) | _IOC_OUT: {
 		validate_writable(arg, sizeof(struct termios));
 		COMPILER_WRITE_BARRIER();
 		memcpy(arg, &me->t_term.t_ios, sizeof(struct termios));
-		break;
+		return 0;
+	}	break;
 
-	case _IOW(_IOC_TYPE(TCSETA), _IOC_NR(TCSETA), struct termios):
-		cmd = TCSETA;
-		goto do_TCSETA;
-	case _IOW(_IOC_TYPE(TCSETAW), _IOC_NR(TCSETAW), struct termios):
-		cmd = TCSETAW;
-		goto do_TCSETA;
-	case _IOW(_IOC_TYPE(TCSETAF), _IOC_NR(TCSETAF), struct termios):
-		cmd = TCSETAF;
-		goto do_TCSETA;
 	case TCSETA:
 	case TCSETAW:
 	case TCSETAF:
-do_TCSETA: {
+	case TCSETA | _IOC_IN:
+	case TCSETAW | _IOC_IN:
+	case TCSETAF | _IOC_IN:
+	case _IO_WITHTYPE(TCSETA, struct termios):
+	case _IO_WITHTYPE(TCSETAW, struct termios):
+	case _IO_WITHTYPE(TCSETAF, struct termios):
+	case _IO_WITHTYPE(TCSETA, struct termios) | _IOC_IN:
+	case _IO_WITHTYPE(TCSETAW, struct termios) | _IOC_IN:
+	case _IO_WITHTYPE(TCSETAF, struct termios) | _IOC_IN: {
 		struct termios new_io;
 		validate_readable(arg, sizeof(struct termios));
 		COMPILER_READ_BARRIER();
 		memcpy(&new_io, arg, sizeof(struct termios));
 		COMPILER_READ_BARRIER();
 		/* DRIVER: if (cmd != TCSETA) WAIT_FOR_UNWRITTEN_DATA_TO_BE_TRANSMITTED(); */
-		if (cmd == TCSETAW) /* Clear the input buffer */
+		if (_IOC_NR(cmd) == _IOC_NR(TCSETAW)) /* Clear the input buffer */
 			ringbuffer_setwritten(&me->t_term.t_ibuf, 0);
 		terminal_setios(&me->t_term, &new_io, NULL);
+		return 0;
 	}	break;
 
 
-	case TCGETS2:
+	case TCGETS2: {
 		validate_writable(arg, sizeof(struct termios2));
 		COMPILER_WRITE_BARRIER();
 		termios_to_termios2((USER CHECKED struct termios2 *)arg, &me->t_term.t_ios);
-		break;
+		return 0;
+	}	break;
 
 	case TCSETS2:
 	case TCSETSW2:
@@ -498,9 +504,10 @@ do_TCSETA: {
 		if (cmd == TCSETSW2) /* Clear the input buffer */
 			ringbuffer_setwritten(&me->t_term.t_ibuf, 0);
 		terminal_setios(&me->t_term, &new_io, NULL);
+		return 0;
 	}	break;
 
-	case TCFLSH:
+	case TCFLSH: {
 		/* Discard data received, but not read (aka. what the driver send) */
 		switch ((uintptr_t)arg) {
 
@@ -527,136 +534,25 @@ do_TCSETA: {
 			      (uintptr_t)arg);
 			break;
 		}
-		break;
-
-	case TIOCSPGRP:
-	case _IOW(_IOC_TYPE(TIOCSPGRP), _IOC_NR(TIOCSPGRP), pid_t): {
-		pid_t pid;
-		struct taskpid *mypid;
-		REF struct procgrp *grp;
-		TRY {
-			kernel_terminal_check_sigtty(me, SIGTTOU);
-		} EXCEPT {
-			if (was_thrown(E_IOERROR_NODATA)) {
-				struct exception_data *dat = except_data();
-				bzero(&dat->e_args, sizeof(dat->e_args));
-				dat->e_code                               = EXCEPT_CODEOF(E_ILLEGAL_BECAUSE_GROUPING);
-				dat->e_args.e_invalid_argument.ia_context = E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCSPGRP_SIGTTOU;
-			}
-			RETHROW();
-		}
-		validate_readable(arg, sizeof(pid_t));
-		COMPILER_READ_BARRIER();
-		pid = *(USER CHECKED pid_t const *)arg;
-		COMPILER_READ_BARRIER();
-		mypid = task_gettaskpid();
-		{
-			REF struct procgrp *mygrp;
-			mygrp = taskpid_getprocgrp(mypid);
-			FINALLY_DECREF_UNLIKELY(mygrp);
-			if (mygrp->pgr_sleader != awref_ptr(&me->t_cproc)) {
-				THROW(E_ILLEGAL_BECAUSE_GROUPING,
-				      E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCSPGRP_NOT_CALLER_SESSION);
-			}
-		}
-		if (pid == 0) {
-			/* KOS extension: we accept `0' as alias for "current process group" */
-			grp = taskpid_getprocgrp(mypid);
-		} else {
-			grp = pidns_grplookup_srch(mypid->tp_ns, pid);
-		}
-		FINALLY_DECREF_UNLIKELY(grp);
-		if (grp->pgr_sleader != awref_ptr(&me->t_cproc)) {
-			THROW(E_ILLEGAL_BECAUSE_GROUPING,
-			      E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCSPGRP_DIFFERENT_SESSION);
-		}
-
-		/* Always assign the taskpid of a process group leader! */
-		device_getname_lock_acquire(me);
-		printk(KERN_TRACE "[tty:%q] Set foreground process group to "
-		                  "[pgid:%" PRIuN(__SIZEOF_PID_T__) ",sid:%" PRIuN(__SIZEOF_PID_T__) "]\n",
-		       device_getname(me), procgrp_getrootpgid(grp), procgrp_getrootsid(grp));
-		device_getname_lock_release(me);
-
-		/* Set `grp' as the foreground process group.
-		 * FIXME: Race condition when the session leader relinquishes CTTY control. */
-		awref_set(&me->t_fproc, grp);
+		return 0;
 	}	break;
-
-	case TIOCGPGRP:
-	case _IOR(_IOC_TYPE(TIOCGPGRP), _IOC_NR(TIOCGPGRP), pid_t): {
-		pid_t respid;
-		REF struct procgrp *grp;
-		grp = task_getprocgrp();
-		if (grp->pgr_sleader != awref_ptr(&me->t_cproc)) {
-			decref_unlikely(grp);
-			THROW(E_ILLEGAL_BECAUSE_GROUPING,
-			      E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCGPGRP_NOT_CALLER_SESSION);
-		}
-		decref_unlikely(grp);
-		respid = 0;
-		grp    = awref_get(&me->t_fproc);
-		if (grp) {
-			respid = procgrp_getpgid_s(grp);
-			decref_unlikely(grp);
-		}
-		validate_writable(arg, sizeof(pid_t));
-		COMPILER_WRITE_BARRIER();
-		*(USER CHECKED pid_t *)arg = respid;
-	}	break;
-
-	case TIOCGSID:
-	case _IOR(_IOC_TYPE(TIOCGSID), _IOC_NR(TIOCGSID), pid_t): {
-		pid_t respid;
-		REF struct procgrp *grp;
-		grp = task_getprocgrp();
-		if (grp->pgr_sleader != awref_ptr(&me->t_cproc)) {
-			decref_unlikely(grp);
-			THROW(E_ILLEGAL_BECAUSE_GROUPING,
-			      E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCGSID_NOT_CALLER_SESSION);
-		}
-		respid = procgrp_getsid_s(grp);
-		decref_unlikely(grp);
-		validate_writable(arg, sizeof(pid_t));
-		COMPILER_WRITE_BARRIER();
-		*(USER CHECKED pid_t *)arg = respid;
-	}	break;
-
-	case TIOCSETD:
-	case _IOW(_IOC_TYPE(TIOCSETD), _IOC_NR(TIOCSETD), int):
-	case _IOW(_IOC_TYPE(TIOCSETD), _IOC_NR(TIOCSETD), cc_t):
-		validate_readable(arg, sizeof(cc_t));
-		ATOMIC_WRITE(me->t_term.t_ios.c_line, *(cc_t *)arg);
-		/* DRIVER: UPDATE_LINE_DISCIPLINE(); */
-		break;
-
-	case TIOCGETD:
-	case _IOR(_IOC_TYPE(TIOCGETD), _IOC_NR(TIOCGETD), int):
-		validate_writable(arg, sizeof(int));
-		*(USER CHECKED int *)arg = ATOMIC_READ(me->t_term.t_ios.c_line);
-		break;
-
-	case _IOR(_IOC_TYPE(TIOCGETD), _IOC_NR(TIOCGETD), cc_t):
-		validate_writable(arg, sizeof(cc_t));
-		*(USER CHECKED cc_t *)arg = ATOMIC_READ(me->t_term.t_ios.c_line);
-		break;
 
 	case TCSBRK:
 		if (arg) {
 			/* DRIVER: WAIT_FOR_UNWRITTEN_DATA_TO_BE_TRANSMITTED() */
-			break;
+			return 0;
 		}
 		ATTR_FALLTHROUGH
 	case TCSBRKP:
 		/* DRIVER: SEND_BREAK_CHARACTER() */
-		break;
+		return 0;
 
 	case TIOCSBRK:
 	case TIOCCBRK:
 		/* DRIVER: TURN_BREAK_CHARACTERS_ON_OR_OFF() */
-		break;
+		return 0;
 
-	case TCXONC:
+	case TCXONC: {
 		switch ((uintptr_t)arg) {
 
 		case TCOOFF:
@@ -683,65 +579,16 @@ do_TCSETA: {
 			      (uintptr_t)arg);
 			break;
 		}
-		break;
-
-	case FIONREAD:
-	case _IOR(_IOC_TYPE(FIONREAD), _IOC_NR(FIONREAD), unsigned int):
-		validate_writable(arg, sizeof(unsigned int));
-		*(USER CHECKED unsigned int *)arg = (unsigned int)ATOMIC_READ(me->t_term.t_ibuf.rb_avail);
-		break;
-#if __SIZEOF_SIZE_T__ != __SIZEOF_INT__
-	case _IOR(_IOC_TYPE(FIONREAD), _IOC_NR(FIONREAD), size_t):
-		validate_writable(arg, sizeof(size_t));
-		*(USER CHECKED size_t *)arg = ATOMIC_READ(me->t_term.t_ibuf.rb_avail);
-		break;
-#endif /* __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
-
-	case TIOCOUTQ:
-	case _IOR(_IOC_TYPE(TIOCOUTQ), _IOC_NR(TIOCOUTQ), int):
-		validate_writable(arg, sizeof(unsigned int));
-		*(USER CHECKED unsigned int *)arg = (unsigned int)ATOMIC_READ(me->t_term.t_opend.lb_line.lc_size);
-		break;
-#if __SIZEOF_SIZE_T__ != __SIZEOF_INT__
-	case _IOR(_IOC_TYPE(TIOCOUTQ), _IOC_NR(TIOCOUTQ), size_t):
-		validate_writable(arg, sizeof(size_t));
-		*(USER CHECKED size_t *)arg = ATOMIC_READ(me->t_term.t_opend.lb_line.lc_size);
-		break;
-#endif /* __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
-
-	case FIOQSIZE:
-	case _IOR(_IOC_TYPE(FIOQSIZE), _IOC_NR(FIOQSIZE), loff_t):
-		validate_writable(arg, sizeof(loff_t));
-		*(USER CHECKED loff_t *)arg = ATOMIC_READ(me->t_term.t_ibuf.rb_avail) +
-		                              ATOMIC_READ(me->t_term.t_ipend.lb_line.lc_size) +
-		                              ATOMIC_READ(me->t_term.t_canon.lb_line.lc_size);
-		break;
-
-	case TIOCSTI:
-	case _IOW(_IOC_TYPE(TIOCSTI), _IOC_NR(TIOCSTI), char):
-		validate_readable(arg, sizeof(byte_t));
-		ringbuffer_write(&me->t_term.t_ibuf, arg, 1);
-		break;
-
-	case TIOCGSOFTCAR:
-	case _IOR(_IOC_TYPE(TIOCGSOFTCAR), _IOC_NR(TIOCGSOFTCAR), int):
-		validate_writable(arg, sizeof(int));
-		*(USER CHECKED int *)arg = ATOMIC_READ(me->t_term.t_ios.c_cflag) & CLOCAL ? 1 : 0;
-		break;
-
-	case TIOCSSOFTCAR:
-	case _IOW(_IOC_TYPE(TIOCSSOFTCAR), _IOC_NR(TIOCSSOFTCAR), int): {
-		int lcmode;
-		validate_writable(arg, sizeof(int));
-		COMPILER_READ_BARRIER();
-		lcmode = *(USER CHECKED int *)arg;
-		COMPILER_READ_BARRIER();
-		if (lcmode) {
-			ATOMIC_OR(me->t_term.t_ios.c_cflag, CLOCAL);
-		} else {
-			ATOMIC_AND(me->t_term.t_ios.c_cflag, ~CLOCAL);
-		}
+		return 0;
 	}	break;
+
+	case _IO_WITHSIZE(TIOCSTI, 0):
+	case _IO_WITHTYPE(TIOCSTI, char):
+	case _IO_WITHSIZE(TIOCSTI, 0) | _IOC_IN:
+	case _IO_WITHTYPE(TIOCSTI, char) | _IOC_IN:
+		validate_readable(arg, sizeof(char));
+		ringbuffer_write(&me->t_term.t_ibuf, arg, sizeof(char));
+		return 0;
 
 	/* XXX: Exclusive terminal mode enabled with `TIOCEXCL' */
 	/* XXX: Exclusive terminal mode disabled with `TIOCNXCL' */
@@ -757,7 +604,7 @@ again_TIOCSCTTY:
 		oldtty = axref_ptr(&mygrp->pgr_session->ps_ctty);
 		if (oldtty != NULL) {
 			if (oldtty == me)
-				break; /* No-op. -- This is allowed */
+				return 0; /* No-op. -- This is allowed */
 			THROW(E_ILLEGAL_BECAUSE_GROUPING,
 			      E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCSCTTY_ALREADY_HAVE_CTTY);
 		}
@@ -794,6 +641,7 @@ again_TIOCSCTTY:
 		}
 		awref_set(&me->t_fproc, mygrp);
 		ttydev_log_setsession(me, mygrp);
+		return 0;
 	}	break;
 
 	case TIOCNOTTY: {
@@ -820,6 +668,7 @@ again_TIOCNOTTY:
 				break;
 		}
 		ttydev_log_delsession(me, mygrp);
+		return 0;
 	}	break;
 
 	/* XXX: TIOCMGET: Modem bits? */
@@ -830,70 +679,189 @@ again_TIOCNOTTY:
 	/* XXX: TIOCCONS: Set this tty as the one bound to /dev/console (and /dev/tty0) */
 
 	case TCGETX:
-	case _IOR(_IOC_TYPE(TCGETX), _IOC_NR(TCGETX), struct termiox):
+	case TCGETX | _IOC_OUT:
+	case _IO_WITHTYPE(TCGETX, struct termiox):
+	case _IO_WITHTYPE(TCGETX, struct termiox) | _IOC_OUT:
 		validate_writable(arg, sizeof(struct termiox));
 		COMPILER_WRITE_BARRIER();
 		termios_to_termiox((USER CHECKED struct termiox *)arg, &me->t_term.t_ios);
-		break;
+		return 0;
 
-	case _IOW(_IOC_TYPE(TCSETX), _IOC_NR(TCSETX), struct termiox):
-		cmd = TCSETX;
-		goto do_TCSETX;
-	case _IOW(_IOC_TYPE(TCSETXF), _IOC_NR(TCSETXF), struct termiox):
-		cmd = TCSETXF;
-		goto do_TCSETX;
-	case _IOW(_IOC_TYPE(TCSETXW), _IOC_NR(TCSETXW), struct termiox):
-		cmd = TCSETXW;
-		goto do_TCSETX;
 	case TCSETX:
 	case TCSETXF:
-	case TCSETXW: {
+	case TCSETXW:
+	case TCSETX | _IOC_IN:
+	case TCSETXF | _IOC_IN:
+	case TCSETXW | _IOC_IN:
+	case _IO_WITHTYPE(TCSETX, struct termiox):
+	case _IO_WITHTYPE(TCSETXF, struct termiox):
+	case _IO_WITHTYPE(TCSETXW, struct termiox):
+	case _IO_WITHTYPE(TCSETX, struct termiox) | _IOC_IN:
+	case _IO_WITHTYPE(TCSETXF, struct termiox) | _IOC_IN:
+	case _IO_WITHTYPE(TCSETXW, struct termiox) | _IOC_IN: {
 		struct termios new_io;
-do_TCSETX:
 		validate_readable(arg, sizeof(struct termiox));
 		COMPILER_READ_BARRIER();
 		termiox_to_termios(&new_io, (USER CHECKED struct termiox *)arg);
 		COMPILER_READ_BARRIER();
 		/* DRIVER: if (cmd != TCSETS) WAIT_FOR_UNWRITTEN_DATA_TO_BE_TRANSMITTED(); */
-		if (cmd == TCSETXF) /* Clear the input buffer */
+		if (_IOC_NR(cmd) == _IOC_NR(TCSETXF)) /* Clear the input buffer */
 			ringbuffer_setwritten(&me->t_term.t_ibuf, 0);
 		terminal_setios(&me->t_term, &new_io, NULL);
+		return 0;
 	}	break;
 
-	case TIOCSIG: {
+	/* XXX: TIOCVHANGUP? */
+
+	default:
+		break;
+	}
+	switch (_IO_WITHSIZE(cmd, 0)) {
+
+	case _IO_WITHSIZE(TIOCSPGRP, 0):
+	case _IO_WITHSIZE(TIOCSPGRP, 0) | _IOC_IN: {
+		pid_t pid;
+		struct taskpid *mypid;
+		REF struct procgrp *grp;
+		TRY {
+			kernel_terminal_check_sigtty(me, SIGTTOU);
+		} EXCEPT {
+			if (was_thrown(E_IOERROR_NODATA)) {
+				struct exception_data *dat = except_data();
+				bzero(&dat->e_args, sizeof(dat->e_args));
+				dat->e_code                               = EXCEPT_CODEOF(E_ILLEGAL_BECAUSE_GROUPING);
+				dat->e_args.e_invalid_argument.ia_context = E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCSPGRP_SIGTTOU;
+			}
+			RETHROW();
+		}
+		pid   = ioctl_intarg_getpid(cmd, arg);
+		mypid = task_gettaskpid();
+		{
+			REF struct procgrp *mygrp;
+			mygrp = taskpid_getprocgrp(mypid);
+			FINALLY_DECREF_UNLIKELY(mygrp);
+			if (mygrp->pgr_sleader != awref_ptr(&me->t_cproc)) {
+				THROW(E_ILLEGAL_BECAUSE_GROUPING,
+				      E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCSPGRP_NOT_CALLER_SESSION);
+			}
+		}
+		if (pid == 0) {
+			/* KOS extension: we accept `0' as alias for "current process group" */
+			grp = taskpid_getprocgrp(mypid);
+		} else {
+			grp = pidns_grplookup_srch(mypid->tp_ns, pid);
+		}
+		FINALLY_DECREF_UNLIKELY(grp);
+		if (grp->pgr_sleader != awref_ptr(&me->t_cproc)) {
+			THROW(E_ILLEGAL_BECAUSE_GROUPING,
+			      E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCSPGRP_DIFFERENT_SESSION);
+		}
+
+		/* Always assign the taskpid of a process group leader! */
+		device_getname_lock_acquire(me);
+		printk(KERN_TRACE "[tty:%q] Set foreground process group to "
+		                  "[pgid:%" PRIuN(__SIZEOF_PID_T__) ",sid:%" PRIuN(__SIZEOF_PID_T__) "]\n",
+		       device_getname(me), procgrp_getrootpgid(grp), procgrp_getrootsid(grp));
+		device_getname_lock_release(me);
+
+		/* Set `grp' as the foreground process group.
+		 * FIXME: Race condition when the session leader relinquishes CTTY control. */
+		awref_set(&me->t_fproc, grp);
+		return 0;
+	}	break;
+
+	case _IO_WITHSIZE(TIOCGPGRP, 0):
+	case _IO_WITHSIZE(TIOCGPGRP, 0) | _IOC_OUT: {
+		pid_t respid;
+		REF struct procgrp *grp;
+		grp = task_getprocgrp();
+		if (grp->pgr_sleader != awref_ptr(&me->t_cproc)) {
+			decref_unlikely(grp);
+			THROW(E_ILLEGAL_BECAUSE_GROUPING,
+			      E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCGPGRP_NOT_CALLER_SESSION);
+		}
+		decref_unlikely(grp);
+		respid = 0;
+		grp    = awref_get(&me->t_fproc);
+		if (grp) {
+			respid = procgrp_getpgid_s(grp);
+			decref_unlikely(grp);
+		}
+		return ioctl_intarg_setpid(cmd, arg, respid);
+	}	break;
+
+	case _IO_WITHSIZE(TIOCGSID, 0):
+	case _IO_WITHSIZE(TIOCGSID, 0) | _IOC_OUT: {
+		pid_t respid;
+		REF struct procgrp *grp;
+		grp = task_getprocgrp();
+		if (grp->pgr_sleader != awref_ptr(&me->t_cproc)) {
+			decref_unlikely(grp);
+			THROW(E_ILLEGAL_BECAUSE_GROUPING,
+			      E_ILLEGAL_OPERATION_CONTEXT_TTY_TIOCGSID_NOT_CALLER_SESSION);
+		}
+		respid = procgrp_getsid_s(grp);
+		decref_unlikely(grp);
+		return ioctl_intarg_setpid(cmd, arg, respid);
+	}	break;
+
+	case _IO_WITHSIZE(TIOCSETD, 0):
+	case _IO_WITHSIZE(TIOCSETD, 0) | _IOC_IN:
+		ATOMIC_WRITE(me->t_term.t_ios.c_line, ioctl_intarg_getuint(cmd, arg) & 0xff);
+		/* DRIVER: UPDATE_LINE_DISCIPLINE(); */
+		return 0;
+
+	case _IO_WITHSIZE(TIOCGETD, 0):
+	case _IO_WITHSIZE(TIOCGETD, 0) | _IOC_OUT:
+		return ioctl_intarg_setuint(cmd, arg, (unsigned int)ATOMIC_READ(me->t_term.t_ios.c_line));
+
+	case _IO_WITHSIZE(FIONREAD, 0):
+	case _IO_WITHSIZE(FIONREAD, 0) | _IOC_OUT:
+		return ioctl_intarg_setuint(cmd, arg, (unsigned int)ATOMIC_READ(me->t_term.t_ibuf.rb_avail));
+
+	case _IO_WITHSIZE(TIOCOUTQ, 0):
+	case _IO_WITHSIZE(TIOCOUTQ, 0) | _IOC_OUT:
+		return ioctl_intarg_setuint(cmd, arg, (unsigned int)ATOMIC_READ(me->t_term.t_opend.lb_line.lc_size));
+
+	case _IO_WITHSIZE(FIOQSIZE, 0):
+	case _IO_WITHSIZE(FIOQSIZE, 0) | _IOC_OUT:
+		return ioctl_intarg_setloff(cmd, arg,
+		                            ATOMIC_READ(me->t_term.t_ibuf.rb_avail) +
+		                            ATOMIC_READ(me->t_term.t_ipend.lb_line.lc_size) +
+		                            ATOMIC_READ(me->t_term.t_canon.lb_line.lc_size));
+
+	case _IO_WITHSIZE(TIOCGSOFTCAR, 0):
+	case _IO_WITHSIZE(TIOCGSOFTCAR, 0) | _IOC_OUT:
+		return ioctl_intarg_setbool(cmd, arg, (ATOMIC_READ(me->t_term.t_ios.c_cflag) & CLOCAL) != 0);
+
+	case _IO_WITHSIZE(TIOCSSOFTCAR, 0):
+	case _IO_WITHSIZE(TIOCSSOFTCAR, 0) | _IOC_IN:
+		if (ioctl_intarg_getbool(cmd, arg)) {
+			ATOMIC_OR(me->t_term.t_ios.c_cflag, CLOCAL);
+		} else {
+			ATOMIC_AND(me->t_term.t_ios.c_cflag, ~CLOCAL);
+		}
+		return 0;
+
+	case _IO_WITHSIZE(TIOCSIG, 0):
+	/*case _IO_WITHSIZE(TIOCSIG, 0) | _IOC_IN:*/ {
 		signo_t signo;
-		validate_readable(arg, sizeof(signo_t));
-		COMPILER_READ_BARRIER();
-		signo = *(USER CHECKED signo_t *)arg;
-		COMPILER_READ_BARRIER();
+		signo = ioctl_intarg_getsigno(cmd, arg);
 		if unlikely(signo <= 0 || signo >= NSIG) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 			      signo);
 		}
 		ttydev_v_raise(&me->t_term, signo);
+		return 0;
 	}	break;
 
-	/* XXX: TIOCVHANGUP? */
-
 	/* KOS-specific tty ioctl commands */
-	case TTYIO_IBUF_GETLIMIT:
-	case TTYIO_CANON_GETLIMIT:
-	case TTYIO_OPEND_GETLIMIT:
-	case TTYIO_IPEND_GETLIMIT:
-#if defined(__ARCH_HAVE_COMPAT) && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T
-	case _IO_WITHTYPE(TTYIO_IBUF_GETLIMIT, compat_size_t):
-	case _IO_WITHTYPE(TTYIO_CANON_GETLIMIT, compat_size_t):
-	case _IO_WITHTYPE(TTYIO_OPEND_GETLIMIT, compat_size_t):
-	case _IO_WITHTYPE(TTYIO_IPEND_GETLIMIT, compat_size_t):
-#endif /* __ARCH_HAVE_COMPAT && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T */
-	{
+	case _IO_WITHSIZE(TTYIO_IBUF_GETLIMIT, 0):
+	case _IO_WITHSIZE(TTYIO_CANON_GETLIMIT, 0):
+	case _IO_WITHSIZE(TTYIO_OPEND_GETLIMIT, 0):
+	case _IO_WITHSIZE(TTYIO_IPEND_GETLIMIT, 0): {
 		size_t value;
-#if defined(__ARCH_HAVE_COMPAT) && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T
-		validate_writable(arg, _IOC_SIZE(cmd));
-#else /* __ARCH_HAVE_COMPAT && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T */
-		validate_writable(arg, sizeof(size_t));
-#endif /* !__ARCH_HAVE_COMPAT || __SIZEOF_SIZE_T__ == __ARCH_COMPAT_SIZEOF_SIZE_T */
 		switch (_IOC_NR(cmd)) {
 
 		case _IOC_NR(TTYIO_IBUF_GETLIMIT):
@@ -914,43 +882,17 @@ do_TCSETX:
 
 		default: __builtin_unreachable();
 		}
-		COMPILER_WRITE_BARRIER();
-#if defined(__ARCH_HAVE_COMPAT) && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T
-		if (_IOC_SIZE(cmd) == sizeof(compat_size_t)) {
-			*(USER CHECKED compat_size_t *)arg = (compat_size_t)value;
-		} else
-#endif /* defined(__ARCH_HAVE_COMPAT) && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T */
-		{
-			*(USER CHECKED size_t *)arg = (size_t)value;
-		}
+		return ioctl_intarg_setsize(cmd, arg, value);
 	}	break;
 
-	case TTYIO_IBUF_SETLIMIT:
-	case TTYIO_CANON_SETLIMIT:
-	case TTYIO_OPEND_SETLIMIT:
-	case TTYIO_IPEND_SETLIMIT:
-#if defined(__ARCH_HAVE_COMPAT) && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T
-	case _IO_WITHTYPE(TTYIO_IBUF_SETLIMIT, compat_size_t):
-	case _IO_WITHTYPE(TTYIO_CANON_SETLIMIT, compat_size_t):
-	case _IO_WITHTYPE(TTYIO_OPEND_SETLIMIT, compat_size_t):
-	case _IO_WITHTYPE(TTYIO_IPEND_SETLIMIT, compat_size_t):
-#endif /* __ARCH_HAVE_COMPAT && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T */
-	{
+	case _IO_WITHSIZE(TTYIO_IBUF_SETLIMIT, 0):
+	case _IO_WITHSIZE(TTYIO_CANON_SETLIMIT, 0):
+	case _IO_WITHSIZE(TTYIO_OPEND_SETLIMIT, 0):
+	case _IO_WITHSIZE(TTYIO_IPEND_SETLIMIT, 0): {
 		size_t value;
 		struct linebuffer *lnbuf;
 		require(CAP_SET_TTY_BUFFER_SIZES);
-		COMPILER_READ_BARRIER();
-#if defined(__ARCH_HAVE_COMPAT) && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T
-		if (_IOC_SIZE(cmd) == sizeof(compat_size_t)) {
-			validate_readable(arg, sizeof(compat_size_t));
-			value = *(USER CHECKED compat_size_t *)arg;
-		} else
-#endif /* __ARCH_HAVE_COMPAT && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T */
-		{
-			validate_readable(arg, sizeof(size_t));
-			value = *(USER CHECKED size_t *)arg;
-		}
-		COMPILER_READ_BARRIER();
+		value = ioctl_intarg_getsize(cmd, arg);
 		switch (_IOC_NR(cmd)) {
 
 		case _IOC_NR(TTYIO_IBUF_SETLIMIT):
@@ -959,7 +901,7 @@ do_TCSETX:
 			} else {
 				ATOMIC_WRITE(me->t_term.t_ibuf.rb_limit, value);
 			}
-			goto done;
+			return 0;
 
 		case _IOC_NR(TTYIO_CANON_SETLIMIT):
 			lnbuf = &me->t_term.t_canon;
@@ -980,13 +922,13 @@ do_TCSETX:
 		} else {
 			ATOMIC_WRITE(lnbuf->lb_limt, value);
 		}
+		return 0;
 	}	break;
 
 	default:
-		return -EINVAL;
+		break;
 	}
-done:
-	return 0;
+	return -EINVAL;
 }
 
 

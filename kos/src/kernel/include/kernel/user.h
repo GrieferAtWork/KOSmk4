@@ -287,6 +287,12 @@ ioctl_intarg_setbool(ioctl_t cmd, USER UNCHECKED void *arg, __BOOL value)
 FUNDEF WUNUSED u32 FCALL
 ioctl_intarg_getu32(ioctl_t cmd, USER UNCHECKED void *arg)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
+FUNDEF WUNUSED u16 FCALL
+ioctl_intarg_getu16(ioctl_t cmd, USER UNCHECKED void *arg)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
+FUNDEF WUNUSED u8 FCALL
+ioctl_intarg_getu8(ioctl_t cmd, USER UNCHECKED void *arg)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 
 /* Read a 64-bit-value from a a variable-sized (but defaulting to 8) buffer `arg'
  * - When an invalid size is encoded in `cmd', throw `E_INVALID_ARGUMENT_UNKNOWN_COMMAND' */
@@ -299,24 +305,67 @@ ioctl_intarg_getu64(ioctl_t cmd, USER UNCHECKED void *arg)
 FUNDEF syscall_slong_t FCALL
 ioctl_intarg_setu32(ioctl_t cmd, USER UNCHECKED void *arg, u32 value)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
+FUNDEF syscall_slong_t FCALL
+ioctl_intarg_sets32(ioctl_t cmd, USER UNCHECKED void *arg, s32 value)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
+FUNDEF syscall_slong_t FCALL
+ioctl_intarg_setu16(ioctl_t cmd, USER UNCHECKED void *arg, u16 value)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
+FUNDEF syscall_slong_t FCALL
+ioctl_intarg_sets16(ioctl_t cmd, USER UNCHECKED void *arg, s16 value)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
+FUNDEF syscall_slong_t FCALL
+ioctl_intarg_setu8(ioctl_t cmd, USER UNCHECKED void *arg, u8 value)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
+FUNDEF syscall_slong_t FCALL
+ioctl_intarg_sets8(ioctl_t cmd, USER UNCHECKED void *arg, s8 value)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 
-/* Write a 75-bit-value into a variable-sized (but defaulting to 8) buffer `arg'
+/* Write a 64-bit-value into a variable-sized (but defaulting to 8) buffer `arg'
  * @return: 0 : Always returns `0' */
 FUNDEF syscall_slong_t FCALL
 ioctl_intarg_setu64(ioctl_t cmd, USER UNCHECKED void *arg, u64 value)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
+FUNDEF syscall_slong_t FCALL
+ioctl_intarg_sets64(ioctl_t cmd, USER UNCHECKED void *arg, s64 value)
+		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 
-#if __SIZEOF_INT__ >= 8
-#define ioctl_intarg_getint                   (int)(unsigned int)ioctl_intarg_getu64
-#define ioctl_intarg_getuint                  (unsigned int)ioctl_intarg_getu64
-#define ioctl_intarg_setuint(cmd, arg, value) ioctl_intarg_setu64(cmd, arg, (u64)(value))
-#else /* __SIZEOF_INT__ >= 8 */
-#define ioctl_intarg_getint                   (int)(unsigned int)ioctl_intarg_getu32
-#define ioctl_intarg_getuint                  (unsigned int)ioctl_intarg_getu32
-#define ioctl_intarg_setuint(cmd, arg, value) ioctl_intarg_setu32(cmd, arg, (u32)(value))
-#endif /* __SIZEOF_INT__ <= 8 */
-#define ioctl_intarg_setint(cmd, arg, value) ioctl_intarg_setu64(cmd, arg, (u64)(s64)(int)(value))
+#define __IOCTL_INTARG_GETS1 (s8)ioctl_intarg_getu8
+#define __IOCTL_INTARG_GETS2 (s16)ioctl_intarg_getu16
+#define __IOCTL_INTARG_GETS4 (s32)ioctl_intarg_getu32
+#define __IOCTL_INTARG_GETS8 (s64)ioctl_intarg_getu64
+#define __IOCTL_INTARG_GETU1 ioctl_intarg_getu8
+#define __IOCTL_INTARG_GETU2 ioctl_intarg_getu16
+#define __IOCTL_INTARG_GETU4 ioctl_intarg_getu32
+#define __IOCTL_INTARG_GETU8 ioctl_intarg_getu64
+#define __IOCTL_INTARG_SETS1 ioctl_intarg_sets8
+#define __IOCTL_INTARG_SETS2 ioctl_intarg_sets16
+#define __IOCTL_INTARG_SETS4 ioctl_intarg_sets32
+#define __IOCTL_INTARG_SETS8 ioctl_intarg_sets64
+#define __IOCTL_INTARG_SETU1 ioctl_intarg_setu8
+#define __IOCTL_INTARG_SETU2 ioctl_intarg_setu16
+#define __IOCTL_INTARG_SETU4 ioctl_intarg_setu32
+#define __IOCTL_INTARG_SETU8 ioctl_intarg_setu64
 
+#define __IOCTL_INTARG_GETU_(sizeof) __IOCTL_INTARG_GETU##sizeof
+#define __IOCTL_INTARG_GETS_(sizeof) __IOCTL_INTARG_GETS##sizeof
+#define __IOCTL_INTARG_SETU_(sizeof) __IOCTL_INTARG_SETU##sizeof
+#define __IOCTL_INTARG_SETS_(sizeof) __IOCTL_INTARG_SETS##sizeof
+#define __IOCTL_INTARG_GETU(sizeof)  __IOCTL_INTARG_GETU_(sizeof)
+#define __IOCTL_INTARG_GETS(sizeof)  __IOCTL_INTARG_GETS_(sizeof)
+#define __IOCTL_INTARG_SETU(sizeof)  __IOCTL_INTARG_SETU_(sizeof)
+#define __IOCTL_INTARG_SETS(sizeof)  __IOCTL_INTARG_SETS_(sizeof)
+
+#define ioctl_intarg_getint   __IOCTL_INTARG_GETS(__SIZEOF_INT__)
+#define ioctl_intarg_setint   __IOCTL_INTARG_SETS(__SIZEOF_INT__)
+#define ioctl_intarg_getuint  __IOCTL_INTARG_GETU(__SIZEOF_INT__)
+#define ioctl_intarg_setuint  __IOCTL_INTARG_SETU(__SIZEOF_INT__)
+#define ioctl_intarg_getpid   __IOCTL_INTARG_GETS(__SIZEOF_PID_T__)
+#define ioctl_intarg_setpid   __IOCTL_INTARG_SETS(__SIZEOF_PID_T__)
+#define ioctl_intarg_getsigno __IOCTL_INTARG_GETS(__SIZEOF_SIGNO_T__)
+#define ioctl_intarg_setsigno __IOCTL_INTARG_SETS(__SIZEOF_SIGNO_T__)
+#define ioctl_intarg_getloff  __IOCTL_INTARG_GETS(__SIZEOF_LOFF_T__)
+#define ioctl_intarg_setloff  __IOCTL_INTARG_SETS(__SIZEOF_LOFF_T__)
 
 /* Read a size_t-value from a a variable-sized (but defaulting to sizeof(size_t)) buffer `arg'
  * - This function includes special handling for compatibility (if present and necessary)

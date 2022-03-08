@@ -1786,30 +1786,6 @@ memleaks_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	struct memleaks *me = (struct memleaks *)mfile_asprintnode(self);
 	switch (cmd) {
 
-	case LEAKS_IOC_GETONCLOSE: {
-		/* TODO: Use `ioctl_intarg_*' */
-		uint32_t mode;
-		validate_writable(arg, sizeof(uint32_t));
-		mode = encode_release_mode(me->ml_relmode);
-		UNALIGNED_SET32((USER CHECKED uint32_t *)arg, mode);
-	}	break;
-
-	case LEAKS_IOC_SETONCLOSE: {
-		/* TODO: Use `ioctl_intarg_*' */
-		uint32_t mode;
-		validate_readable(arg, sizeof(uint32_t));
-		mode           = UNALIGNED_GET32((USER CHECKED uint32_t const *)arg);
-		me->ml_relmode = decode_release_mode(mode);
-	}	break;
-
-	case LEAKS_IOC_GETCOUNT: {
-		/* TODO: Use `ioctl_intarg_*' */
-		size_t count;
-		validate_writable(arg, sizeof(uint64_t));
-		count = kmalloc_leaks_count(me->ml_leaks);
-		UNALIGNED_SET64((USER CHECKED uint64_t *)arg, count);
-	}	break;
-
 	case LEAKS_IOC_LEAKATTR: {
 		memleak_t leak;
 		uintptr_t attr, aval;
@@ -1822,6 +1798,7 @@ memleaks_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 
 		/* Write-back the attribute value. */
 		info->la_value = (uint64_t)aval;
+		return 0;
 	}	break;
 
 	case LEAKS_IOC_LEAKTB: {
@@ -1842,6 +1819,7 @@ memleaks_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 			req = count;
 		for (i = 0; i < req; ++i)
 			uvec[i] = (uint64_t)(uintptr_t)memleak_getattr(leak, MEMLEAK_ATTR_TBADDR(i));
+		return 0;
 	}	break;
 
 	case LEAKS_IOC_READLEAKMEM:
@@ -1879,12 +1857,34 @@ memleaks_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		/* Copy leaked data into userspace. */
 		validate_writable(ubuf, size);
 		memcpy(ubuf, leak_addr, size);
+		return 0;
 	}	break;
 
 	default:
-		return printnode_v_ioctl(self, cmd, arg, mode);
+		break;
 	}
-	return 0;
+	switch (_IO_WITHSIZE(cmd, 0)) {
+
+	case _IO_WITHSIZE(LEAKS_IOC_GETONCLOSE, 0): {
+		uint32_t onclose = encode_release_mode(me->ml_relmode);
+		return ioctl_intarg_setu32(cmd, arg, onclose);
+	}	break;
+
+	case _IO_WITHSIZE(LEAKS_IOC_SETONCLOSE, 0): {
+		uint32_t onclose = ioctl_intarg_getu32(cmd, arg);
+		me->ml_relmode   = decode_release_mode(onclose);
+		return 0;
+	}	break;
+
+	case _IO_WITHSIZE(LEAKS_IOC_GETCOUNT, 0): {
+		size_t count = kmalloc_leaks_count(me->ml_leaks);
+		return ioctl_intarg_setu64(cmd, arg, count);
+	}	break;
+
+	default:
+		break;
+	}
+	return printnode_v_ioctl(self, cmd, arg, mode);
 }
 
 
