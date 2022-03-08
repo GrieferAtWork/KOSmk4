@@ -5469,6 +5469,7 @@
 #define __CRT_HAVE_vswscanf
 #define __CRT_HAVE_vswscanf_s
 #define __CRT_HAVE_vsyslog
+#define __CRT_HAVE_vtimes
 #define __CRT_HAVE_vwarn
 #define __CRT_HAVE_vwarnc
 #define __CRT_HAVE_vwarnx

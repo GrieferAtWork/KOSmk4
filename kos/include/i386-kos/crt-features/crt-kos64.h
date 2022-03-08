@@ -5097,6 +5097,7 @@
 #define __CRT_HAVE_vswscanf
 #define __CRT_HAVE_vswscanf_s
 #define __CRT_HAVE_vsyslog
+#define __CRT_HAVE_vtimes
 #define __CRT_HAVE_vwarn
 #define __CRT_HAVE_vwarnc
 #define __CRT_HAVE_vwarnx
@@ -9175,6 +9176,7 @@
 #define __CRT_HAVE_KOS$vswscanf
 #define __CRT_HAVE_KOS$vswscanf_s
 #define __CRT_HAVE_KOS$vsyslog
+#define __CRT_HAVE_KOS$vtimes
 #define __CRT_HAVE_KOS$vwarn
 #define __CRT_HAVE_KOS$vwarnc
 #define __CRT_HAVE_KOS$vwarnx
@@ -13190,6 +13192,7 @@
 #define __CRT_HAVE_DOS$vswscanf
 #define __CRT_HAVE_DOS$vswscanf_s
 #define __CRT_HAVE_DOS$vsyslog
+#define __CRT_HAVE_DOS$vtimes
 #define __CRT_HAVE_DOS$vwarn
 #define __CRT_HAVE_DOS$vwarnc
 #define __CRT_HAVE_DOS$vwarnx

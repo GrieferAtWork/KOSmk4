@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x972336fe */
+/* HASH CRC-32:0x70300855 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3151,6 +3151,7 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$vsyslog
+#define __CRT_HAVE_DOS$vtimes
 #define __CRT_HAVE_DOS$vwarn
 #define __CRT_HAVE_DOS$vwarnc
 #define __CRT_HAVE_DOS$vwarnx
@@ -6824,6 +6825,7 @@
 #define __CRT_HAVE_vswscanf
 #define __CRT_HAVE_vswscanf_s
 #define __CRT_HAVE_vsyslog
+#define __CRT_HAVE_vtimes
 #define __CRT_HAVE_vwarn
 #define __CRT_HAVE_vwarnc
 #define __CRT_HAVE_vwarnx
