@@ -200,6 +200,8 @@ NOTHROW(LIBCCALL libc_sigabbrev_np)(signo_t signum)
 		return NULL;
 	result = (char const *)((byte_t const *)&strsignal_names_db +
 	                        strsignal_offsets_db[(unsigned int)signum]);
+	if unlikely(!*result)
+		result = NULL;
 	return result;
 }
 /*[[[end:libc_sigabbrev_np]]]*/

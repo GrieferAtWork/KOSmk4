@@ -1459,6 +1459,7 @@ int __old_sigpause(int sigmask0) {
 #else /* _sys_siglist */
 }
 [[guard, const, wunused, nothrow, nonnull]]
+[[section(".text.crt.errno.sys_siglist")]]
 char const *const *__p_sys_siglist();
 %{
 #ifdef ____p_sys_siglist_defined

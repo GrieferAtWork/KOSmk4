@@ -5155,6 +5155,7 @@
 #define __CRT_HAVE_sys_shmdt
 #define __CRT_HAVE_sys_shmget
 #define __CRT_HAVE_sys_shutdown
+#define __CRT_HAVE_sys_sigabbrev
 #define __CRT_HAVE_sys_sigaction
 #define __CRT_HAVE_sys_sigaltstack
 #define __CRT_HAVE_sys_siglist

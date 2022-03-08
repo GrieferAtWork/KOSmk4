@@ -179,19 +179,19 @@ libc_sys_siglist[NSIG] = { NULL };
 DEFINE_PUBLIC_IDATA_G(sys_siglist, libc___p_sys_siglist, NSIG * __SIZEOF_POINTER__);
 DEFINE_PUBLIC_IDATA_G(_sys_siglist, libc___p_sys_siglist, NSIG * __SIZEOF_POINTER__);
 
-/*[[[head:libc___p_sys_siglist,hash:CRC-32=0xa33e9b16]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST ATTR_RETNONNULL WUNUSED char const *const *
+/*[[[head:libc___p_sys_siglist,hash:CRC-32=0x7263abdb]]]*/
+INTERN ATTR_SECTION(".text.crt.errno.sys_siglist") ATTR_CONST ATTR_RETNONNULL WUNUSED char const *const *
 NOTHROW(LIBCCALL libc___p_sys_siglist)(void)
 /*[[[body:libc___p_sys_siglist]]]*/
 {
 	char const **result = libc_sys_siglist;
-	if (!result[0]) {
+	if (!result[1]) { /* Signal `0' is undefined */
 		unsigned int i = NSIG;
 		/* Lazily initialize */
 		for (;;) {
 			result[i] = libc_sigdescr_np(i);
 			COMPILER_WRITE_BARRIER();
-			if (!i)
+			if (i == 1)
 				break;
 			--i;
 		}
@@ -199,6 +199,38 @@ NOTHROW(LIBCCALL libc___p_sys_siglist)(void)
 	return result;
 }
 /*[[[end:libc___p_sys_siglist]]]*/
+
+
+/* Not (currently) exposed in headers, but here for compatibility with gLibc:
+ * This is an array of strings that is similar to `sys_siglist', only that this
+ * one points to the strings returned by `sigabbrev_np(3)'.
+ *
+ * e.g.:
+ * >> printf("%s\n", sigabbrev_np(SIGINT));  // "INT\n"
+ * >> printf("%s\n", sys_sigabbrev[SIGINT]); // "INT\n" */
+#undef sys_sigabbrev
+PRIVATE ATTR_SECTION(".bss.crt.errno.sys_siglist") char const *libc_sys_sigabbrev[NSIG] = { NULL };
+DEFINE_PUBLIC_IDATA_G(sys_sigabbrev, libc___p_sys_sigabbrev, NSIG * __SIZEOF_POINTER__);
+
+INTERN ATTR_SECTION(".text.crt.errno.sys_siglist")
+ATTR_CONST ATTR_RETNONNULL WUNUSED char const *const *
+NOTHROW(LIBCCALL libc___p_sys_sigabbrev)(void) {
+	char const **result = libc_sys_sigabbrev;
+	if (!result[1]) { /* Signal `0' is undefined */
+		unsigned int i = NSIG;
+		/* Lazily initialize */
+		for (;;) {
+			result[i] = libc_sigabbrev_np(i);
+			COMPILER_WRITE_BARRIER();
+			if (i == 1)
+				break;
+			--i;
+		}
+	}
+	return result;
+}
+
+
 
 /*[[[head:libc_sigreturn,hash:CRC-32=0x5194db98]]]*/
 /* Don't  call directly. Used internally to resume
