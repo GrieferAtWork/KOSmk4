@@ -40,11 +40,14 @@ BEGIN
 		"-fno-delete-null-pointer-checks",
 	})
 
-	/* Bind DT_INIT / DT_FINI */
 	LD_FLAGS({
+		/* Bind DT_INIT / DT_FINI */
 		"-init=libc_init",
 		"-fini=libc_fini",
 		"--hash-style=gnu",
+
+		/* Set program entry when libc gets exec'd */
+		"-e", "libc_exec_main",
 	})
 
 	DEFINE({ "__BUILDING_LIBC" : "1" })

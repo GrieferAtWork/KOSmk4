@@ -274,7 +274,7 @@ NOTHROW(CC linux_stdio_init)(bool is_2_1) {
 	libc_compat |= is_2_1 ? COMPAT_FLAG_LINKED_IO_FILE_84_2_1
 	                      : COMPAT_FLAG_LINKED_IO_FILE_84;
 
-	/* TODO: Figure out what's supposed to be different when `is_2_1 == true' */
+	/* XXX: Figure out what's supposed to be different when `is_2_1 == true' */
 
 	/* NOTE: Intentional crash if this Calloc() fails */
 	result = (struct linux_default_stdio_file *)Calloc(3, sizeof(struct linux_default_stdio_file));
@@ -897,6 +897,45 @@ uint32_t const libc___huge_val[2] = {
 
 DECL_END
 #endif /* !__NO_FPU */
+DECL_BEGIN
+
+
+
+
+/************************************************************************/
+/* Libc `_start()' function handling.                                   */
+/************************************************************************/
+PRIVATE ATTR_SECTION(".rodata.crt.compat.glibc") char const libc_banner[] =
+"==========================================================================\n"
+"KOS System C Library.\n"
+"==========================================================================\n"
+"Copyright (c) 2019-2022 Griefer@Work\n"
+"\n"
+"This software is provided 'as-is', without any express or implied\n"
+"warranty. In no event will the authors be held liable for any damages\n"
+"arising from the use of this software.\n"
+"\n"
+"Permission is granted to anyone to use this software for any purpose,\n"
+"including commercial applications, and to alter it and redistribute it\n"
+"freely, subject to the following restrictions:\n"
+"\n"
+"1. The origin of this software must not be misrepresented; you must not\n"
+"   claim that you wrote the original software. If you use this software\n"
+"   in a product, an acknowledgement (see the following) in the product\n"
+"   documentation is required:\n"
+"   Portions Copyright (c) 2019-2022 Griefer@Work\n"
+"2. Altered source versions must be plainly marked as such, and must not be\n"
+"   misrepresented as being the original software.\n"
+"3. This notice may not be removed or altered from any source distribution.\n"
+"==========================================================================\n"
+;
+
+/* Program entry point for when you do `exec("/lib/libc.so")' */
+INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.compat.glibc")
+void libc_exec_main(void) {
+	sys_write(STDOUT_FILENO, libc_banner, sizeof(libc_banner) - sizeof(char));
+	sys_exit_group(0);
+}
 
 
 
@@ -904,7 +943,6 @@ DECL_END
 /************************************************************************/
 /* Misc MSVCRT functions                                                */
 /************************************************************************/
-DECL_BEGIN
 
 typedef struct {
 	int newmode;
