@@ -3989,7 +3989,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x9a1abbe4]]]*/
+/*[[[start:exports,hash:CRC-32=0x8154fd3]]]*/
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_execve, libc_execve);
 #endif /* __LIBCCALL_IS_LIBDCALL */
@@ -4198,7 +4198,9 @@ DEFINE_PUBLIC_ALIAS(_lseeki64, libc_lseek64);
 DEFINE_PUBLIC_ALIAS(llseek, libc_lseek64);
 DEFINE_PUBLIC_ALIAS(__llseek, libc_lseek64);
 DEFINE_PUBLIC_ALIAS(lseek64, libc_lseek64);
+DEFINE_PUBLIC_ALIAS(__libc_pread, libc_pread);
 DEFINE_PUBLIC_ALIAS(pread, libc_pread);
+DEFINE_PUBLIC_ALIAS(__libc_pwrite, libc_pwrite);
 DEFINE_PUBLIC_ALIAS(pwrite, libc_pwrite);
 DEFINE_PUBLIC_ALIAS(preadall, libc_preadall);
 DEFINE_PUBLIC_ALIAS(pwriteall, libc_pwriteall);

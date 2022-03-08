@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x547a9f90 */
+/* HASH CRC-32:0xeea1148 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -313,11 +313,11 @@ INTERN ATTR_SECTION(".text.crt.fs.exec.system") int
 NOTHROW_RPC(LIBCCALL libc_system)(char const *command) {
 	int status;
 	pid_t cpid, error;
-#if defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork)
+#if defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork) || defined(__CRT_HAVE___libc_vfork)
 	cpid = libc_vfork();
-#else /* __CRT_HAVE_vfork || __CRT_HAVE___vfork */
+#else /* __CRT_HAVE_vfork || __CRT_HAVE___vfork || __CRT_HAVE___libc_vfork */
 	cpid = libc_fork();
-#endif /* !__CRT_HAVE_vfork && !__CRT_HAVE___vfork */
+#endif /* !__CRT_HAVE_vfork && !__CRT_HAVE___vfork && !__CRT_HAVE___libc_vfork */
 	if (cpid == 0) {
 		libc_shexec(command);
 		/* NOTE: system() must return ZERO(0) if no command processor is available. */
@@ -4330,6 +4330,7 @@ DEFINE_PUBLIC_ALIAS(DOS$mbstowcs, libd_mbstowcs);
 DEFINE_PUBLIC_ALIAS(mbstowcs, libc_mbstowcs);
 DEFINE_PUBLIC_ALIAS(DOS$wcstombs, libd_wcstombs);
 DEFINE_PUBLIC_ALIAS(wcstombs, libc_wcstombs);
+DEFINE_PUBLIC_ALIAS(__libc_system, libc_system);
 DEFINE_PUBLIC_ALIAS(system, libc_system);
 #endif /* !__KERNEL__ */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_ABORT)

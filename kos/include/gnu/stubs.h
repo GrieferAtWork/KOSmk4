@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a2d2dc8 */
+/* HASH CRC-32:0xf6fb9b00 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -353,7 +353,9 @@
 #define __stub_mrand48_r
 #define __stub_msgctl
 #define __stub_msgget
+#define __stub___libc_msgrcv
 #define __stub_msgrcv
+#define __stub___libc_msgsnd
 #define __stub_msgsnd
 #define __stub___newlocale
 #define __stub_newlocale

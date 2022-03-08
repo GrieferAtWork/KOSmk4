@@ -92,6 +92,7 @@ END(libc_longjmp)
 DEFINE_PUBLIC_ALIAS(longjmp, libc_longjmp)
 DEFINE_PUBLIC_ALIAS(_longjmp, libc_longjmp)
 DEFINE_PUBLIC_ALIAS(__longjmp, libc_longjmp)
+DEFINE_PUBLIC_ALIAS(__libc_longjmp, libc_longjmp)
 DEFINE_PUBLIC_ALIAS(__fast_longjmp, libc___fast_longjmp)
 
 
@@ -138,6 +139,7 @@ END(libc__setjmpex)
 DEFINE_PUBLIC_ALIAS(_setjmpex, libc__setjmpex)
 DEFINE_PUBLIC_ALIAS(sigsetjmp, libc_sigsetjmp)
 DEFINE_PUBLIC_ALIAS(__sigsetjmp, libc_sigsetjmp)
+DEFINE_PUBLIC_ALIAS(__libc_siglongjmp, libc_sigsetjmp)
 
 .section .text.crt.utility.setjmp
 INTERN_FUNCTION(libc_siglongjmp)

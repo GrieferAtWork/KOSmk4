@@ -657,7 +657,7 @@ size_t wcstombs([[nonnull]] char *__restrict dst,
 @@When `command' is `NULL' only check if a system interpreter is available.
 @@When  no   system   interpreter   is  available,   `127'   is   returned.
 [[cp, std, guard, section(".text.crt{|.dos}.fs.exec.system")]]
-[[impl_include("<asm/os/wait.h>")]]
+[[impl_include("<asm/os/wait.h>"), export_alias("__libc_system")]]
 [[requires($has_function(shexec) && $has_function(_Exit) &&
            $has_function(waitpid) &&
            ($has_function(vfork) || $has_function(fork)))]]

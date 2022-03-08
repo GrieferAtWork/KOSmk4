@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x558e44fa */
+/* HASH CRC-32:0xd5117d1f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1933,6 +1933,7 @@ DEFINE_PUBLIC_ALIAS(DOS$qdiv, libd_lldiv);
 DEFINE_PUBLIC_ALIAS(DOS$abs, libd_abs);
 DEFINE_PUBLIC_ALIAS(DOS$div, libd_div);
 DEFINE_PUBLIC_ALIAS(DOS$mblen, libd_mblen);
+DEFINE_PUBLIC_ALIAS(DOS$__libc_system, libd_system);
 DEFINE_PUBLIC_ALIAS(DOS$system, libd_system);
 DEFINE_PUBLIC_ALIAS(DOS$exit, libd_exit);
 DEFINE_PUBLIC_ALIAS(DOS$_crt_atexit, libd_atexit);
@@ -2602,7 +2603,9 @@ DEFINE_PUBLIC_ALIAS(DOS$umount2, libd_umount2);
 /* sys.msg */
 DEFINE_PUBLIC_ALIAS(DOS$msgctl, libd_msgctl);
 DEFINE_PUBLIC_ALIAS(DOS$msgget, libd_msgget);
+DEFINE_PUBLIC_ALIAS(DOS$__libc_msgrcv, libd_msgrcv);
 DEFINE_PUBLIC_ALIAS(DOS$msgrcv, libd_msgrcv);
+DEFINE_PUBLIC_ALIAS(DOS$__libc_msgsnd, libd_msgsnd);
 DEFINE_PUBLIC_ALIAS(DOS$msgsnd, libd_msgsnd);
 
 /* sys.perm */
@@ -3126,7 +3129,9 @@ DEFINE_PUBLIC_ALIAS(DOS$_lseeki64, libd_lseek64);
 DEFINE_PUBLIC_ALIAS(DOS$llseek, libd_lseek64);
 DEFINE_PUBLIC_ALIAS(DOS$__llseek, libd_lseek64);
 DEFINE_PUBLIC_ALIAS(DOS$lseek64, libd_lseek64);
+DEFINE_PUBLIC_ALIAS(DOS$__libc_pread, libd_pread);
 DEFINE_PUBLIC_ALIAS(DOS$pread, libd_pread);
+DEFINE_PUBLIC_ALIAS(DOS$__libc_pwrite, libd_pwrite);
 DEFINE_PUBLIC_ALIAS(DOS$pwrite, libd_pwrite);
 DEFINE_PUBLIC_ALIAS(DOS$preadall, libd_preadall);
 DEFINE_PUBLIC_ALIAS(DOS$pwriteall, libd_pwriteall);

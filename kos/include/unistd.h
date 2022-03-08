@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2840b7d */
+/* HASH CRC-32:0x520768aa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1810,6 +1810,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lseek64, __FORCELOCAL __ATTR_ARTIFICIAL __off64_
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pread,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),(__fd,__buf,__bufsize,__offset))
+#elif defined(__CRT_HAVE___libc_pread) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+/* >> pread(2), pread64(2)
+ * Read data from a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of read bytes */
+__CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pread,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),__libc_pread,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pread64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
@@ -1832,6 +1837,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pread, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NON
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwrite,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),(__fd,__buf,__bufsize,__offset))
+#elif defined(__CRT_HAVE___libc_pwrite) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+/* >> pwrite(2), pwrite64(2)
+ * Write data to a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of written bytes */
+__CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwrite,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),__libc_pwrite,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pwrite64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
@@ -2188,6 +2198,34 @@ __CDECLARE(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,vfork,(void
  * which  case the parent process will not  actually get suspended until the child
  * process performs any of the actions above. */
 __CREDIRECT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,vfork,(void),__vfork,())
+#elif defined(__CRT_HAVE___libc_vfork)
+/* >> vfork(2)
+ * Same as `fork(2)', but the child process may be executed within in the same VM
+ * as the parent process, with the  parent process remaining suspended until  the
+ * child process invokes one of the following system calls:
+ *   - `_exit(2)'  Terminate the child process. Be sure to use `_exit' (or `_Exit')
+ *                 instead of the regular `exit(3)', since the later would  include
+ *                 the invocation of `atexit(3)' handlers, which would then run  in
+ *                 the context of a VM that isn't actually about to be destroyed.
+ *   - `execve(2)' Create a new VM that is populated with the specified process
+ *                 image. The parent process will  only be resumed in case  the
+ *                 new  program image could  be loaded successfully. Otherwise,
+ *                 the call  to  `execve(2)'  returns normally  in  the  child.
+ *                 Other functions from the exec()-family behave the same
+ *
+ * Care  must be taken when using this system call, since you have to make sure that
+ * the  child process doesn't clobber any part of its (shared) stack that may be re-
+ * used once execution resumes in  the parent process. The  same also goes for  heap
+ * functions,  but generally speaking:  you really shouldn't  do anything that isn't
+ * reentrant after calling any one of the fork() functions (since anything but would
+ * rely on underlying implementations making proper use of pthread_atfork(3),  which
+ * is something that KOS intentionally doesn't do,  since I feel like doing so  only
+ * adds unnecessary bloat to code that doesn't rely on this)
+ *
+ * Additionally, this system call may be implemented as an alias for `fork(2)', in
+ * which  case the parent process will not  actually get suspended until the child
+ * process performs any of the actions above. */
+__CREDIRECT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,vfork,(void),__libc_vfork,())
 #else /* ... */
 #undef __vfork_defined
 #endif /* !... */

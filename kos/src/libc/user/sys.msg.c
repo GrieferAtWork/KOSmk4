@@ -97,10 +97,12 @@ NOTHROW_RPC(LIBCCALL libc_msgsnd)(int msqid,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x5e2c04b0]]]*/
+/*[[[start:exports,hash:CRC-32=0x7f590877]]]*/
 DEFINE_PUBLIC_ALIAS(msgctl, libc_msgctl);
 DEFINE_PUBLIC_ALIAS(msgget, libc_msgget);
+DEFINE_PUBLIC_ALIAS(__libc_msgrcv, libc_msgrcv);
 DEFINE_PUBLIC_ALIAS(msgrcv, libc_msgrcv);
+DEFINE_PUBLIC_ALIAS(__libc_msgsnd, libc_msgsnd);
 DEFINE_PUBLIC_ALIAS(msgsnd, libc_msgsnd);
 /*[[[end:exports]]]*/
 

@@ -51,6 +51,7 @@ DEFINE_PUBLIC_ALIAS(__bzero, libc_bzero)
 DEFINE_PUBLIC_ALIAS(__gcc_bcmp, libc_memcmp)
 DEFINE_PUBLIC_ALIAS(explicit_bzero, libc_bzero)
 DEFINE_PUBLIC_ALIAS(explicit_memset, libc_memset)
+DEFINE_PUBLIC_ALIAS(__mempcpy, libc_mempcpy)
 
 /* Implement a couple of wchar functions */
 DEFINE_PUBLIC_ALIAS(wmemcmp, libc_memcmpl)

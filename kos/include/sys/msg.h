@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x694f34b1 */
+/* HASH CRC-32:0xf0d85caa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,8 +77,16 @@ typedef __key_t key_t;
 
 __CDECLARE_OPT(,int,__NOTHROW_NCX,msgctl,(int __msqid, __STDC_INT_AS_UINT_T __cmd, struct msqid_ds *__buf),(__msqid,__cmd,__buf))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,msgget,(key_t __key, __STDC_INT_AS_UINT_T __msgflg),(__key,__msgflg))
-__CDECLARE_OPT(,ssize_t,__NOTHROW_RPC,msgrcv,(int __msqid, void *__msgp, size_t __msgsz, __LONGPTR_TYPE__ __msgtyp, __STDC_INT_AS_UINT_T __msgflg),(__msqid,__msgp,__msgsz,__msgtyp,__msgflg))
-__CDECLARE_OPT(,int,__NOTHROW_RPC,msgsnd,(int __msqid, const void *__msgp, size_t __msgsz, __STDC_INT_AS_UINT_T __msgflg),(__msqid,__msgp,__msgsz,__msgflg))
+#ifdef __CRT_HAVE_msgrcv
+__CDECLARE(,ssize_t,__NOTHROW_RPC,msgrcv,(int __msqid, void *__msgp, size_t __msgsz, __LONGPTR_TYPE__ __msgtyp, __STDC_INT_AS_UINT_T __msgflg),(__msqid,__msgp,__msgsz,__msgtyp,__msgflg))
+#elif defined(__CRT_HAVE___libc_msgrcv)
+__CREDIRECT(,ssize_t,__NOTHROW_RPC,msgrcv,(int __msqid, void *__msgp, size_t __msgsz, __LONGPTR_TYPE__ __msgtyp, __STDC_INT_AS_UINT_T __msgflg),__libc_msgrcv,(__msqid,__msgp,__msgsz,__msgtyp,__msgflg))
+#endif /* ... */
+#ifdef __CRT_HAVE_msgsnd
+__CDECLARE(,int,__NOTHROW_RPC,msgsnd,(int __msqid, const void *__msgp, size_t __msgsz, __STDC_INT_AS_UINT_T __msgflg),(__msqid,__msgp,__msgsz,__msgflg))
+#elif defined(__CRT_HAVE___libc_msgsnd)
+__CREDIRECT(,int,__NOTHROW_RPC,msgsnd,(int __msqid, const void *__msgp, size_t __msgsz, __STDC_INT_AS_UINT_T __msgflg),__libc_msgsnd,(__msqid,__msgp,__msgsz,__msgflg))
+#endif /* ... */
 
 __SYSDECL_END
 #endif /* __CC__ */

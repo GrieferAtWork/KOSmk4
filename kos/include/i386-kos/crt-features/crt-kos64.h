@@ -702,6 +702,7 @@
 #define __CRT_HAVE___libc_iopl
 #define __CRT_HAVE___libc_kill
 #define __CRT_HAVE___libc_link
+#define __CRT_HAVE___libc_longjmp
 #define __CRT_HAVE___libc_lseek
 #define __CRT_HAVE___libc_mallinfo
 #define __CRT_HAVE___libc_malloc
@@ -713,6 +714,8 @@
 #define __CRT_HAVE___libc_mount
 #define __CRT_HAVE___libc_mprotect
 #define __CRT_HAVE___libc_mremap
+#define __CRT_HAVE___libc_msgrcv
+#define __CRT_HAVE___libc_msgsnd
 #define __CRT_HAVE___libc_msync
 #define __CRT_HAVE___libc_munlock
 #define __CRT_HAVE___libc_munlockall
@@ -723,7 +726,9 @@
 #define __CRT_HAVE___libc_opendir
 #define __CRT_HAVE___libc_pause
 #define __CRT_HAVE___libc_pipe
+#define __CRT_HAVE___libc_pread
 #define __CRT_HAVE___libc_pvalloc
+#define __CRT_HAVE___libc_pwrite
 #define __CRT_HAVE___libc_read
 #define __CRT_HAVE___libc_readdir
 #define __CRT_HAVE___libc_readdir_r
@@ -758,6 +763,7 @@
 #define __CRT_HAVE___libc_setsid
 #define __CRT_HAVE___libc_settimeofday
 #define __CRT_HAVE___libc_setuid
+#define __CRT_HAVE___libc_siglongjmp
 #define __CRT_HAVE___libc_sigpending
 #define __CRT_HAVE___libc_sigprocmask
 #define __CRT_HAVE___libc_socketcall
@@ -769,6 +775,7 @@
 #define __CRT_HAVE___libc_symlink
 #define __CRT_HAVE___libc_sync
 #define __CRT_HAVE___libc_sysinfo
+#define __CRT_HAVE___libc_system
 #define __CRT_HAVE___libc_telldir
 #define __CRT_HAVE___libc_time
 #define __CRT_HAVE___libc_times
@@ -847,6 +854,7 @@
 #define __CRT_HAVE___memmoveupq_chk
 #define __CRT_HAVE___memmoveupw_chk
 #define __CRT_HAVE___memmovew_chk
+#define __CRT_HAVE___mempcpy
 #define __CRT_HAVE___mempcpy_chk
 #define __CRT_HAVE___mempcpyc_chk
 #define __CRT_HAVE___mempcpyl_chk
@@ -5795,6 +5803,8 @@
 #define __CRT_HAVE_KOS$__libc_mount
 #define __CRT_HAVE_KOS$__libc_mprotect
 #define __CRT_HAVE_KOS$__libc_mremap
+#define __CRT_HAVE_KOS$__libc_msgrcv
+#define __CRT_HAVE_KOS$__libc_msgsnd
 #define __CRT_HAVE_KOS$__libc_msync
 #define __CRT_HAVE_KOS$__libc_munlock
 #define __CRT_HAVE_KOS$__libc_munmap
@@ -5803,6 +5813,8 @@
 #define __CRT_HAVE_KOS$__libc_open
 #define __CRT_HAVE_KOS$__libc_opendir
 #define __CRT_HAVE_KOS$__libc_pipe
+#define __CRT_HAVE_KOS$__libc_pread
+#define __CRT_HAVE_KOS$__libc_pwrite
 #define __CRT_HAVE_KOS$__libc_read
 #define __CRT_HAVE_KOS$__libc_readlink
 #define __CRT_HAVE_KOS$__libc_realloc
@@ -5841,6 +5853,7 @@
 #define __CRT_HAVE_KOS$__libc_swapon
 #define __CRT_HAVE_KOS$__libc_symlink
 #define __CRT_HAVE_KOS$__libc_sysinfo
+#define __CRT_HAVE_KOS$__libc_system
 #define __CRT_HAVE_KOS$__libc_telldir
 #define __CRT_HAVE_KOS$__libc_time
 #define __CRT_HAVE_KOS$__libc_times
@@ -9814,6 +9827,8 @@
 #define __CRT_HAVE_DOS$__libc_mount
 #define __CRT_HAVE_DOS$__libc_mprotect
 #define __CRT_HAVE_DOS$__libc_mremap
+#define __CRT_HAVE_DOS$__libc_msgrcv
+#define __CRT_HAVE_DOS$__libc_msgsnd
 #define __CRT_HAVE_DOS$__libc_msync
 #define __CRT_HAVE_DOS$__libc_munlock
 #define __CRT_HAVE_DOS$__libc_munmap
@@ -9822,6 +9837,8 @@
 #define __CRT_HAVE_DOS$__libc_open
 #define __CRT_HAVE_DOS$__libc_opendir
 #define __CRT_HAVE_DOS$__libc_pipe
+#define __CRT_HAVE_DOS$__libc_pread
+#define __CRT_HAVE_DOS$__libc_pwrite
 #define __CRT_HAVE_DOS$__libc_read
 #define __CRT_HAVE_DOS$__libc_readlink
 #define __CRT_HAVE_DOS$__libc_realloc
@@ -9860,6 +9877,7 @@
 #define __CRT_HAVE_DOS$__libc_swapon
 #define __CRT_HAVE_DOS$__libc_symlink
 #define __CRT_HAVE_DOS$__libc_sysinfo
+#define __CRT_HAVE_DOS$__libc_system
 #define __CRT_HAVE_DOS$__libc_telldir
 #define __CRT_HAVE_DOS$__libc_time
 #define __CRT_HAVE_DOS$__libc_times

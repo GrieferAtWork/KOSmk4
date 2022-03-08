@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40adbf8 */
+/* HASH CRC-32:0x543e8bf2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -274,42 +274,42 @@ NOTHROW_RPC(LIBCCALL libc_fspawnve)(__STDC_INT_AS_UINT_T mode,
                                     __TARGV,
                                     __TENVP) {
 	int status;
-#if !defined(__ARCH_HAVE_SHARED_VM_VFORK) || (!defined(__CRT_HAVE_vfork) && !defined(__CRT_HAVE___vfork))
+#if !defined(__ARCH_HAVE_SHARED_VM_VFORK) || (!defined(__CRT_HAVE_vfork) && !defined(__CRT_HAVE___vfork) && !defined(__CRT_HAVE___libc_vfork))
 	fd_t pipes[2];
 	errno_t error;
 	ssize_t temp;
-#else /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork) */
+#else /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork && !__CRT_HAVE___libc_vfork) */
 	errno_t old_errno;
-#endif /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
+#endif /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork || __CRT_HAVE___libc_vfork) */
 	pid_t child;
 	if (mode == P_OVERLAY)
 		return libc_fexecve(execfd, ___argv, ___envp);
-#if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
+#if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork) || defined(__CRT_HAVE___libc_vfork))
 	old_errno = libc_geterrno_or(0);
 	(void)libc_seterrno(0);
-#endif /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
-#if !defined(__ARCH_HAVE_SHARED_VM_VFORK) || (!defined(__CRT_HAVE_vfork) && !defined(__CRT_HAVE___vfork))
+#endif /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork || __CRT_HAVE___libc_vfork) */
+#if !defined(__ARCH_HAVE_SHARED_VM_VFORK) || (!defined(__CRT_HAVE_vfork) && !defined(__CRT_HAVE___vfork) && !defined(__CRT_HAVE___libc_vfork))
 	/* Create a pair of pipes for temporary communication. */
 	if (libc_pipe2(pipes, O_CLOEXEC))
 		goto err;
-#endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork) */
+#endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork && !__CRT_HAVE___libc_vfork) */
 	if (mode == P_DETACH) {
 		/* Daemonize (detach) the process using detach(2), or double-fork. */
-#if defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork)
+#if defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork) || defined(__CRT_HAVE___libc_vfork)
 		if (libc_vfork() == 0)
-#else /* __CRT_HAVE_vfork || __CRT_HAVE___vfork */
+#else /* __CRT_HAVE_vfork || __CRT_HAVE___vfork || __CRT_HAVE___libc_vfork */
 		if (libc_fork() == 0)
-#endif /* !__CRT_HAVE_vfork && !__CRT_HAVE___vfork */
+#endif /* !__CRT_HAVE_vfork && !__CRT_HAVE___vfork && !__CRT_HAVE___libc_vfork */
 		{
 #ifdef __CRT_HAVE_detach
 			libc_detach(0); /* Detach myself from my parent. */
 			goto do_exec;
 #else /* __CRT_HAVE_detach */
-#if defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork)
+#if defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork) || defined(__CRT_HAVE___libc_vfork)
 			if (libc_vfork() == 0)
-#else /* __CRT_HAVE_vfork || __CRT_HAVE___vfork */
+#else /* __CRT_HAVE_vfork || __CRT_HAVE___vfork || __CRT_HAVE___libc_vfork */
 			if (libc_fork() == 0)
-#endif /* !__CRT_HAVE_vfork && !__CRT_HAVE___vfork */
+#endif /* !__CRT_HAVE_vfork && !__CRT_HAVE___vfork && !__CRT_HAVE___libc_vfork */
 				goto do_exec;
 			libc__Exit(0); /* Just terminate the intermediate process. */
 #endif /* !__CRT_HAVE_detach */
@@ -319,16 +319,16 @@ NOTHROW_RPC(LIBCCALL libc_fspawnve)(__STDC_INT_AS_UINT_T mode,
 	}
 	if (mode == P_WAIT) {
 		/* Spawn and join the process */
-#if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
+#if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork) || defined(__CRT_HAVE___libc_vfork))
 		child = libc_vfork();
-#else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
+#else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork || __CRT_HAVE___libc_vfork) */
 		child = libc_fork();
-#endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork) */
+#endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork && !__CRT_HAVE___libc_vfork) */
 		if (child == 0)
 			goto do_exec;
 		if (child < 0)
 			goto err;
-#if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
+#if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork) || defined(__CRT_HAVE___libc_vfork))
 		/* Check for errors that may have happened in  the
 		 * child process _after_ we did the vfork() above. */
 		if (libc_geterrno_or(0) != 0)
@@ -336,7 +336,7 @@ NOTHROW_RPC(LIBCCALL libc_fspawnve)(__STDC_INT_AS_UINT_T mode,
 		/* Success (but still restore the old errno
 		 * since  we  overwrote it  to be  0 above) */
 		(void)libc_seterrno(old_errno);
-#else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
+#else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork || __CRT_HAVE___libc_vfork) */
 		libc_close(pipes[1]); /* Close the writer. */
 		temp = libc_read(pipes[0], &error, sizeof(error));
 		libc_close(pipes[0]); /* Close the reader. */
@@ -347,7 +347,7 @@ NOTHROW_RPC(LIBCCALL libc_fspawnve)(__STDC_INT_AS_UINT_T mode,
 			(void)libc_seterrno(error);
 			goto err;
 		}
-#endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork) */
+#endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork && !__CRT_HAVE___libc_vfork) */
 		/* Join the child. */
 		while (libc_waitpid(child, &status, 0) < 0) {
 #ifdef EINTR
@@ -360,15 +360,15 @@ NOTHROW_RPC(LIBCCALL libc_fspawnve)(__STDC_INT_AS_UINT_T mode,
 	}
 
 	/* Spawn asynchronously. */
-#if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
+#if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork) || defined(__CRT_HAVE___libc_vfork))
 	child = libc_vfork();
-#else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
+#else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork || __CRT_HAVE___libc_vfork) */
 	child = libc_fork();
-#endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork) */
+#endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork && !__CRT_HAVE___libc_vfork) */
 	if (child == 0)
 		goto do_exec;
 read_child_errors:
-#if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
+#if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork) || defined(__CRT_HAVE___libc_vfork))
 	/* Check if the vfork() from  the child returned success, but  left
 	 * our (vm-shared) errno as non-zero (which would indicate that the
 	 * child encountered an error at  some point after vfork()  already
@@ -380,7 +380,7 @@ read_child_errors:
 	(void)libc_seterrno(old_errno);
 	/* Return the child's PID */
 	return child;
-#else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
+#else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork || __CRT_HAVE___libc_vfork) */
 	/* Read from the communication pipe
 	 * (NOTE: If exec() succeeds, the pipe will be
 	 *        closed and  read() returns  ZERO(0)) */
@@ -394,7 +394,7 @@ read_child_errors:
 		return child;
 	/* If something was read, then it is the errno value that caused the failure. */
 	(void)libc_seterrno(error);
-#endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork) */
+#endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork && !__CRT_HAVE___libc_vfork) */
 err_join_zombie_child:
 	if (mode != P_DETACH) {
 		/* Unless the child was already spawned as detached,
@@ -413,12 +413,12 @@ do_exec:
 	/* When the exec succeeds, the pipe is auto-
 	 * closed because it's marked as  O_CLOEXEC! */
 	libc_fexecve(execfd, ___argv, ___envp);
-#if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
+#if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork) || defined(__CRT_HAVE___libc_vfork))
 	/* If the exec fails, it will have modified `errno' to indicate this fact.
 	 * And since we're sharing VMs with  our parent process, the error  reason
 	 * will have already  been written  back to  our parent's  VM, so  there's
 	 * actually nothing left for us to do, but to simply exit! */
-#else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
+#else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork || __CRT_HAVE___libc_vfork) */
 	/* Write the exec-error back to our parent. */
 #ifdef ENOENT
 	error = libc_geterrno_or(ENOENT);
@@ -428,7 +428,7 @@ do_exec:
 	/* Communicate back why this failed. */
 	libc_write(pipes[1], &error, sizeof(error));
 	/* No need to close the pipe, it's auto-closed by the kernel! */
-#endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork) */
+#endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork && !__CRT_HAVE___libc_vfork) */
 	libc__Exit(127);
 }
 #endif /* !__KERNEL__ */
