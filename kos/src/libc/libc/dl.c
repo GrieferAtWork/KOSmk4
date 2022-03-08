@@ -83,13 +83,42 @@ DEFINE_PUBLIC_IFUNC(__libc_dlopen_mode, libc_get_dlopen);
 DEFINE_PUBLIC_IFUNC(__libc_dlsym, libc_get_dlsym);
 INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.glibc") PDLSYM
 NOTHROW_NCX(LIBCCALL libc_get_dlsym)(void) {
-	/* `dlsym(3)' is special, in that we obviously can't do `dlsym(RTLD_DEFAULT, "dlsym")'
-	 * in  order to load its address, so instead it's one of the very few relocations that
-	 * our libc is allowed to have. -- This getter function for it only needs to exist  so
-	 * we have a way by which to export `__libc_dlsym()' (here, we do so by binding it  as
-	 * an  IFUNC that resolves to the actual libdl address at runtime, meaning that in the
-	 * end, `dlsym(libc, "__libc_dlsym") == dlsym(libdl, "libdl")') */
+	/* `dlsym(3)'  is special, in  that we obviously  can't do `dlsym(RTLD_DEFAULT, "dlsym")' in
+	 * order to load its address  and thus prevent any  relocations against `dlsym'. So  instead
+	 * it's one of the  very few relocations that  our libc is allowed  to have. -- This  getter
+	 * function for it only needs to exist so we have a way by which to export  `__libc_dlsym()'
+	 * (here, we do so by binding  it as an IFUNC that resolves  to the actual libdl address  at
+	 * runtime, meaning that in the end, `dlsym(libc, "__libc_dlsym") == dlsym(libdl, "dlsym")') */
+
+#if 1
+	/* This right here might look stupid, but it actually _does_ serve a purpose:
+	 * If we were to directly access `&dlsym', we'd also get the correct address,
+	 * but if we did that, then `dlsym' could no longer be lazily resolved.
+	 *
+	 * Think about it: lazy resolve works by redirecting the initial call to some
+	 * external function to a special wrapper (`dl_load_lazy_relocation') that is
+	 * found in libdl. That wrapper will  resolve the symbol, write its  absolute
+	 * address into the calling module's GOT, and then process to call the symbol
+	 * with the register state at the time of the original call.
+	 *
+	 * But if we did `&dlsym', there wouldn't be any call to trigger lazy symbol
+	 * binding. And indeed: doing `&dlsym' causes a `R_386_GLOB_DAT'  relocation
+	 * to `dlsym' in order to resolve its address in the GOT during module load.
+	 *
+	 * However: `R_386_GLOB_DAT' obviously can't  use lazy relocations,  meaning
+	 * if we directly took the address of `dlsym', then libdl would no longer be
+	 * able  to lazily resolve libc's (our) use  of `dlsym', and would be forced
+	 * to  resolve the symbol as soon as our library gets loaded, which would be
+	 * a tiny bit slower than doing so lazily.
+	 *
+	 * As such, the seemingly non-sensical construct you're seeing below  does
+	 * actually serve a purpose, that purpose being to speed up initialization
+	 * of libc! */
+	return (PDLSYM)dlsym(RTLD_DEFAULT, "dlsym");
+#else
+	/* TLDR: this would also work, but would also prevent lazy (RTLD_LAZY) symbol binding. */
 	return &dlsym;
+#endif
 }
 
 
