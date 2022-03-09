@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec37706a */
+/* HASH CRC-32:0xe5d6cf08 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -209,6 +209,7 @@
 #define __NR3264COMPAT_pread64                  1(pread64)
 #define __NR3264COMPAT_pread64f                 1(pread64f)
 #define __NR3264COMPAT_preadv2                  1(preadv2)
+#define __NR3264COMPAT_prlimit64                1(prlimit64)
 #define __NR3264COMPAT_ptrace                   1(ptrace)
 #define __NR3264COMPAT_putpmsg                  1(putpmsg)
 #define __NR3264COMPAT_pwrite64                 1(pwrite64)

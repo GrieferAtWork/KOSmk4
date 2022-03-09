@@ -33,8 +33,7 @@
 #define __RLIMIT_CORE       4  /* ??? */
 #define __RLIMIT_RSS        5  /* ??? */
 #define __RLIMIT_NPROC      6  /* ??? */
-#define __RLIMIT_NOFILE     7  /* ??? */
-#define __RLIMIT_OFILE      7  /* ??? */
+#define __RLIMIT_NOFILE     7  /* Max # of open file descriptors (total; does not affect greatest usable FD number) */
 #define __RLIMIT_MEMLOCK    8  /* ??? */
 #define __RLIMIT_AS         9  /* ??? */
 #define __RLIMIT_LOCKS      10 /* ??? */
@@ -43,8 +42,11 @@
 #define __RLIMIT_NICE       13 /* ??? */
 #define __RLIMIT_RTPRIO     14 /* ??? */
 #define __RLIMIT_RTTIME     15 /* ??? */
-#define __RLIMIT_NLIMITS    16
-#define __RLIM_NLIMITS      16
+#define __RLIMIT_NLIMITS    16 /* Total # of (standard) resource limits */
+
+#ifdef __KOS__
+#define __RLIMIT_MAXFILE 1024 /* greatest usable FD number */
+#endif /* __KOS__ */
 
 /* ??? */
 #define __PRIO_PROCESS 0 /* ??? */

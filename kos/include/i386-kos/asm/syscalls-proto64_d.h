@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4f14ab8 */
+/* HASH CRC-32:0xd7f8486 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1083,7 +1083,7 @@
 #define __NR64AT0_gettimeofday             (struct timevalx64 *, struct __timevalx64 *)
 #define __NR64AT1_gettimeofday             (struct timezone *, struct timezone *)
 #define __NR64AT0_getrlimit                (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT1_getrlimit                (struct rlimit *, struct rlimit *)
+#define __NR64AT1_getrlimit                (struct rlimitx64 *, struct __rlimitx64 *)
 #define __NR64AT0_getrusage                (syscall_slong_t, __syscall_slong_t)
 #define __NR64AT1_getrusage                (struct rusagex64 *, struct __rusagex64 *)
 #define __NR64AT0_sysinfo                  (struct __sysinfox64 *, struct __sysinfox64 *)
@@ -1188,7 +1188,7 @@
 #define __NR64AT1_arch_prctl               (uint64_t *, __uint64_t *)
 #define __NR64AT0_adjtimex                 (struct timex *, struct timex *)
 #define __NR64AT0_setrlimit                (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT1_setrlimit                (struct rlimit const *, struct rlimit const *)
+#define __NR64AT1_setrlimit                (struct rlimitx64 const *, struct __rlimitx64 const *)
 #define __NR64AT0_chroot                   (char const *, char const *)
 #define __NR64AT0_acct                     (char const *, char const *)
 #define __NR64AT0_settimeofday             (struct timevalx64 const *, struct __timevalx64 const *)
@@ -1529,8 +1529,8 @@
 #define __NR64AT0_fanotify_mark            (int, int)
 #define __NR64AT0_prlimit64                (pid_t, __pid_t)
 #define __NR64AT1_prlimit64                (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT2_prlimit64                (struct rlimit64 const *, struct rlimit64 const *)
-#define __NR64AT3_prlimit64                (struct rlimit64 *, struct rlimit64 *)
+#define __NR64AT2_prlimit64                (struct rlimitx64 const *, struct __rlimitx64 const *)
+#define __NR64AT3_prlimit64                (struct rlimitx64 *, struct __rlimitx64 *)
 #define __NR64AT0_name_to_handle_at        (fd_t, __fd_t)
 #define __NR64AT1_name_to_handle_at        (char const *, char const *)
 #define __NR64AT2_name_to_handle_at        (struct file_handle *, struct file_handle *)
@@ -1883,7 +1883,7 @@
 #define __NR64AM_lchown(a, b, c, d, e, f)                   (char const *)a, (__uid_t)b, (__gid_t)c
 #define __NR64AM_umask(a, b, c, d, e, f)                    (__mode_t)a
 #define __NR64AM_gettimeofday(a, b, c, d, e, f)             (struct __timevalx64 *)a, (struct timezone *)b
-#define __NR64AM_getrlimit(a, b, c, d, e, f)                (__syscall_ulong_t)a, (struct rlimit *)b
+#define __NR64AM_getrlimit(a, b, c, d, e, f)                (__syscall_ulong_t)a, (struct __rlimitx64 *)b
 #define __NR64AM_getrusage(a, b, c, d, e, f)                (__syscall_slong_t)a, (struct __rusagex64 *)b
 #define __NR64AM_sysinfo(a, b, c, d, e, f)                  (struct __sysinfox64 *)a
 #define __NR64AM_times(a, b, c, d, e, f)                    (struct __tmsx64 *)a
@@ -1946,7 +1946,7 @@
 #define __NR64AM_prctl(a, b, c, d, e, f)                    (unsigned int)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR64AM_arch_prctl(a, b, c, d, e, f)               (unsigned int)a, (__uint64_t *)b
 #define __NR64AM_adjtimex(a, b, c, d, e, f)                 (struct timex *)a
-#define __NR64AM_setrlimit(a, b, c, d, e, f)                (__syscall_ulong_t)a, (struct rlimit const *)b
+#define __NR64AM_setrlimit(a, b, c, d, e, f)                (__syscall_ulong_t)a, (struct __rlimitx64 const *)b
 #define __NR64AM_chroot(a, b, c, d, e, f)                   (char const *)a
 #define __NR64AM_sync(a, b, c, d, e, f)                     /* nothing */
 #define __NR64AM_acct(a, b, c, d, e, f)                     (char const *)a
@@ -2088,7 +2088,7 @@
 #define __NR64AM_recvmmsg(a, b, c, d, e, f)                 (__fd_t)a, (struct __mmsghdrx64 *)b, (__size_t)c, (__syscall_ulong_t)d, (struct __timespecx64 const *)e
 #define __NR64AM_fanotify_init(a, b, c, d, e, f)            (int)a
 #define __NR64AM_fanotify_mark(a, b, c, d, e, f)            (int)a
-#define __NR64AM_prlimit64(a, b, c, d, e, f)                (__pid_t)a, (__syscall_ulong_t)b, (struct rlimit64 const *)c, (struct rlimit64 *)d
+#define __NR64AM_prlimit64(a, b, c, d, e, f)                (__pid_t)a, (__syscall_ulong_t)b, (struct __rlimitx64 const *)c, (struct __rlimitx64 *)d
 #define __NR64AM_name_to_handle_at(a, b, c, d, e, f)        (__fd_t)a, (char const *)b, (struct file_handle *)c, (__int32_t *)d, (__atflag_t)e
 #define __NR64AM_open_by_handle_at(a, b, c, d, e, f)        (__fd_t)a, (struct file_handle const *)b, (__oflag_t)c
 #define __NR64AM_clock_adjtime(a, b, c, d, e, f)            (int)a

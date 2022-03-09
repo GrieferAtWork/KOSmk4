@@ -98,12 +98,8 @@ INTERN ATTR_SECTION(".text.crt.sched.resource") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_getrlimit64)(__rlimit_resource_t resource,
                                        struct rlimit64 *rlimits)
 /*[[[body:libc_getrlimit64]]]*/
-/*AUTO*/{
-	(void)resource;
-	(void)rlimits;
-	CRT_UNIMPLEMENTEDF("getrlimit64(%x, %p)", resource, rlimits); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+{
+	return libc_prlimit64(0, resource, NULL, rlimits);
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_getrlimit64]]]*/
@@ -128,12 +124,8 @@ INTERN ATTR_SECTION(".text.crt.sched.resource") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_setrlimit64)(__rlimit_resource_t resource,
                                        struct rlimit64 const *rlimits)
 /*[[[body:libc_setrlimit64]]]*/
-/*AUTO*/{
-	(void)resource;
-	(void)rlimits;
-	CRT_UNIMPLEMENTEDF("setrlimit64(%x, %p)", resource, rlimits); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+{
+	return libc_prlimit64(0, resource, rlimits, NULL);
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_setrlimit64]]]*/
@@ -158,12 +150,10 @@ INTERN ATTR_SECTION(".text.crt.sched.resource") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_getrusage64)(__rusage_who_t who,
                                        struct rusage64 *usage)
 /*[[[body:libc_getrusage64]]]*/
-/*AUTO*/{
-	(void)who;
-	(void)usage;
-	CRT_UNIMPLEMENTEDF("getrusage64(%x, %p)", who, usage); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+{
+	errno_t error;
+	error = sys_getrusage64((syscall_slong_t)who, usage);
+	return libc_seterrno_syserr(error);
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_getrusage64]]]*/

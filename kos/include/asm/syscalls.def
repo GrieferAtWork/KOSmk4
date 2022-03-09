@@ -117,6 +117,9 @@
 %[typeorg(<bits/os/rusage.h>: rusage, __rusage32, __rusage64)]
 %[typeorg(<bits/os/kos/rusage32.h>: rusagex32, __rusagex32, rusagex32_64, __rusagex32_64)]
 %[typeorg(<bits/os/kos/rusage64.h>: rusagex64, __rusagex64)]
+%[typeorg(<bits/os/rlimit.h>: rlimit, __rlimit32, __rlimit64)]
+%[typeorg(<bits/os/kos/rlimit32.h>: rlimitx32, __rlimitx32, rlimitx32_64, __rlimitx32_64)]
+%[typeorg(<bits/os/kos/rlimit64.h>: rlimitx64, __rlimitx64)]
 %[typeorg(<bits/os/kos/stat.h>: __kos_stat)]
 %[typeorg(<bits/os/kos/stat32.h>: __kos_statx32)]
 %[typeorg(<bits/os/kos/stat64.h>: __kos_statx64)]
@@ -181,6 +184,8 @@
 %[struct_escape(itimerspec64 = __itimerspec64, itimerspecx64 = __itimerspecx64)]
 %[struct_escape(rusage32 = __rusage32, rusagex32 = __rusagex32, rusagex32_64 = __rusagex32_64)]
 %[struct_escape(rusage64 = __rusage64, rusagex64 = __rusagex64)]
+%[struct_escape(rlimit32 = __rlimit32, rlimitx32 = __rlimitx32, rlimitx32_64 = __rlimitx32_64)]
+%[struct_escape(rlimit64 = __rlimit64, rlimitx64 = __rlimitx64)]
 %[struct_escape(timeb32 = __timeb32, timebx32 = __timebx32, timebx32_64 = __timebx32_64)]
 %[struct_escape(timeb64 = __timeb64, timebx64 = __timebx64)]
 %[struct_escape(tmsx32 = __tmsx32, tmsx64 = __tmsx64)]
@@ -2221,18 +2226,35 @@ mq_getsetattr:(fd_t mqdes, [tostr(STRUCT_MQ_ATTR)] struct mq_attr const *newattr
 /************************************************************************/
 /* Resource/Premission control                                          */
 /************************************************************************/
+%[startgroup]
 @@@param: resource: One of `RLIMIT_*' from <sys/resource.h>
-getrlimit:([tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource,
-           [tostr(out:STRUCT_RLIMIT)] struct rlimit *rlimits) -> errno_t; /* UNIMPLEMENTED! */
+getrlimit:([tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource, [tostr(out:STRUCT_RLIMIT)] struct rlimit *rlimits) -> errno_t;
+[doc_alias(getrlimit)] getrlimit32:([tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource, [tostr(out:STRUCT_RLIMIT32)] struct rlimit32 *rlimits) -> errno_t;
+[doc_alias(getrlimit)] getrlimit64:([tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource, [tostr(out:STRUCT_RLIMIT64)] struct rlimit64 *rlimits) -> errno_t;
+[doc_alias(getrlimit)] getrlimitx32:([tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource, [tostr(out:STRUCT_RLIMITX32)] struct rlimitx32 *rlimits) -> errno_t;
+[doc_alias(getrlimit)] getrlimitx32_64:([tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource, [tostr(out:STRUCT_RLIMITX32_64)] struct rlimitx32_64 *rlimits) -> errno_t;
+[doc_alias(getrlimit)] getrlimitx64:([tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource, [tostr(out:STRUCT_RLIMITX64)] struct rlimitx64 *rlimits) -> errno_t;
+%[endgroup]
 
+%[startgroup]
 @@@param: resource: One of `RLIMIT_*' from <sys/resource.h>
-setrlimit:([tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource,
-           [tostr(STRUCT_RLIMIT)] struct rlimit const *rlimits) -> errno_t; /* UNIMPLEMENTED! */
+setrlimit:([tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource, [tostr(STRUCT_RLIMIT)] struct rlimit const *rlimits) -> errno_t;
+[doc_alias(setrlimit)] setrlimit32:([tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource, [tostr(STRUCT_RLIMIT32)] struct rlimit32 const *rlimits) -> errno_t;
+[doc_alias(setrlimit)] setrlimit64:([tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource, [tostr(STRUCT_RLIMIT64)] struct rlimit64 const *rlimits) -> errno_t;
+[doc_alias(setrlimit)] setrlimitx32:([tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource, [tostr(STRUCT_RLIMITX32)] struct rlimitx32 const *rlimits) -> errno_t;
+[doc_alias(setrlimit)] setrlimitx32_64:([tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource, [tostr(STRUCT_RLIMITX32_64)] struct rlimitx32_64 const *rlimits) -> errno_t;
+[doc_alias(setrlimit)] setrlimitx64:([tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource, [tostr(STRUCT_RLIMITX64)] struct rlimitx64 const *rlimits) -> errno_t;
+%[endgroup]
 
+%[startgroup]
 @@@param: resource: One of `RLIMIT_*' from <sys/resource.h>
-prlimit64:(pid_t pid, [tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource,
-           [tostr(STRUCT_RLIMIT64)] struct rlimit64 const *new_limit,
-           [tostr(out:STRUCT_RLIMIT64)] struct rlimit64 *old_limit) -> errno_t; /* UNIMPLEMENTED! */
+prlimit:(pid_t pid, [tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource, [tostr(STRUCT_RLIMIT)] struct rlimit const *new_limit, [tostr(out:STRUCT_RLIMIT64)] struct rlimit64 *old_limit) -> errno_t;
+[doc_alias(prlimit)] prlimit32:(pid_t pid, [tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource, [tostr(STRUCT_RLIMIT32)] struct rlimit32 const *new_limit, [tostr(out:STRUCT_RLIMIT32)] struct rlimit32 *old_limit) -> errno_t;
+[doc_alias(prlimit)] prlimit64:(pid_t pid, [tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource, [tostr(STRUCT_RLIMIT64)] struct rlimit64 const *new_limit, [tostr(out:STRUCT_RLIMIT64)] struct rlimit64 *old_limit) -> errno_t;
+[doc_alias(prlimit)] prlimitx32:(pid_t pid, [tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource, [tostr(STRUCT_RLIMITX32)] struct rlimitx32 const *new_limit, [tostr(out:STRUCT_RLIMITX32)] struct rlimitx32 *old_limit) -> errno_t;
+[doc_alias(prlimit)] prlimitx32_64:(pid_t pid, [tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource, [tostr(STRUCT_RLIMITX32_64)] struct rlimitx32_64 const *new_limit, [tostr(out:STRUCT_RLIMITX32_64)] struct rlimitx32_64 *old_limit) -> errno_t;
+[doc_alias(prlimit)] prlimitx64:(pid_t pid, [tostr(RLIMIT_RESOURCE)] syscall_ulong_t resource, [tostr(STRUCT_RLIMITX64)] struct rlimitx64 const *new_limit, [tostr(out:STRUCT_RLIMITX64)] struct rlimitx64 *old_limit) -> errno_t;
+%[endgroup]
 
 @@NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)
 @@@param: who: One of `IOPRIO_WHO_PROCESS', `IOPRIO_WHO_PGRP' or `IOPRIO_WHO_USER'

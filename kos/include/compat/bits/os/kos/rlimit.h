@@ -17,16 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _COMPAT_BITS_OS_GENERIC_RUSAGE_H
-#define _COMPAT_BITS_OS_GENERIC_RUSAGE_H 1
+#ifndef _COMPAT_BITS_OS_KOS_RLIMIT_H
+#define _COMPAT_BITS_OS_KOS_RLIMIT_H 1
 
-#include <compat/config.h>
-#ifdef __ARCH_HAVE_COMPAT
-#include <bits/os/rusage.h>
-#define compat_rusage rusage
-#ifdef __USE_TIME64
-#define compat_rusage64 rusage64
-#endif /* __USE_TIME64 */
-#endif /* __ARCH_HAVE_COMPAT */
+#include <compat/bits/os/generic/rlimit.h>
 
-#endif /* !_COMPAT_BITS_OS_GENERIC_RUSAGE_H */
+#endif /* !_COMPAT_BITS_OS_KOS_RLIMIT_H */

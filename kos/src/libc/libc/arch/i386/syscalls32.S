@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc910366d */
+/* HASH CRC-32:0xf8c734af */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -811,7 +811,7 @@ END(libc_sys_sethostname)
 DEFINE_PUBLIC_ALIAS(sys_sethostname, libc_sys_sethostname)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
+/* errno_t setrlimit(syscall_ulong_t resource, struct rlimitx32 const *rlimits) */
 INTERN_FUNCTION(libc_sys_setrlimit)
 	movl   $(0x4b), %eax
 	jmp    libc_x86_exec_syscall2
@@ -819,7 +819,7 @@ END(libc_sys_setrlimit)
 DEFINE_PUBLIC_ALIAS(sys_setrlimit, libc_sys_setrlimit)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
+/* errno_t getrlimit(syscall_ulong_t resource, struct rlimitx32 *rlimits) */
 INTERN_FUNCTION(libc_sys_getrlimit)
 	movl   $(0x4c), %eax
 	jmp    libc_x86_exec_syscall2
@@ -2982,7 +2982,7 @@ END(libc_sys_fanotify_mark)
 DEFINE_PUBLIC_ALIAS(sys_fanotify_mark, libc_sys_fanotify_mark)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit) */
+/* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimitx32_64 const *new_limit, struct rlimitx32_64 *old_limit) */
 INTERN_FUNCTION(libc_sys_prlimit64)
 	movl   $(0x154), %eax
 	jmp    libc_x86_exec_syscall4
@@ -5277,7 +5277,7 @@ END(libc_sys_Xsethostname)
 DEFINE_PUBLIC_ALIAS(sys_Xsethostname, libc_sys_Xsethostname)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
+/* errno_t setrlimit(syscall_ulong_t resource, struct rlimitx32 const *rlimits) */
 INTERN_FUNCTION(libc_sys_Xsetrlimit)
 	movl   $(0x4b), %eax
 	jmp    libc_x86_exec_Xsyscall2
@@ -5285,7 +5285,7 @@ END(libc_sys_Xsetrlimit)
 DEFINE_PUBLIC_ALIAS(sys_Xsetrlimit, libc_sys_Xsetrlimit)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
+/* errno_t getrlimit(syscall_ulong_t resource, struct rlimitx32 *rlimits) */
 INTERN_FUNCTION(libc_sys_Xgetrlimit)
 	movl   $(0x4c), %eax
 	jmp    libc_x86_exec_Xsyscall2
@@ -7434,7 +7434,7 @@ END(libc_sys_Xfanotify_mark)
 DEFINE_PUBLIC_ALIAS(sys_Xfanotify_mark, libc_sys_Xfanotify_mark)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit) */
+/* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimitx32_64 const *new_limit, struct rlimitx32_64 *old_limit) */
 INTERN_FUNCTION(libc_sys_Xprlimit64)
 	movl   $(0x154), %eax
 	jmp    libc_x86_exec_Xsyscall4

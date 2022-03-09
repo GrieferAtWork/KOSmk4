@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ac7bbc9 */
+/* HASH CRC-32:0xb3b7400d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1239,8 +1239,8 @@
 #define __NRAT3_wait4                  (struct rusage *, struct rusage *)
 #define __NRAT0_prlimit64              (pid_t, __pid_t)
 #define __NRAT1_prlimit64              (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT2_prlimit64              (struct rlimit64 const *, struct rlimit64 const *)
-#define __NRAT3_prlimit64              (struct rlimit64 *, struct rlimit64 *)
+#define __NRAT2_prlimit64              (struct rlimit64 const *, struct __rlimit64 const *)
+#define __NRAT3_prlimit64              (struct rlimit64 *, struct __rlimit64 *)
 #define __NRAT0_fanotify_init          (int, int)
 #define __NRAT0_fanotify_mark          (int, int)
 #define __NRAT0_name_to_handle_at      (fd_t, __fd_t)
@@ -1664,7 +1664,7 @@
 #define __NRAM_accept4(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                (__fd_t)a, (struct sockaddr *)b, (__socklen_t *)c, (__syscall_ulong_t)d
 #define __NRAM_recvmmsg(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__fd_t)a, (struct mmsghdr *)b, (__size_t)c, (__syscall_ulong_t)d, (struct timespec const *)e
 #define __NRAM_wait4(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__pid_t)a, (__int32_t *)b, (__syscall_ulong_t)c, (struct rusage *)d
-#define __NRAM_prlimit64(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__pid_t)a, (__syscall_ulong_t)b, (struct rlimit64 const *)c, (struct rlimit64 *)d
+#define __NRAM_prlimit64(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__pid_t)a, (__syscall_ulong_t)b, (struct __rlimit64 const *)c, (struct __rlimit64 *)d
 #define __NRAM_fanotify_init(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (int)a
 #define __NRAM_fanotify_mark(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (int)a
 #define __NRAM_name_to_handle_at(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)      (__fd_t)a, (char const *)b, (struct file_handle *)c, (__int32_t *)d, (__atflag_t)e

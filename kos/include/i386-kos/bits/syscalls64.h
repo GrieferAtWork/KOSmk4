@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57b49288 */
+/* HASH CRC-32:0xe5cc9ea4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -377,7 +377,7 @@
 #define SYS_umask                    __NR_umask                    /* mode_t umask(mode_t mode) */
 #define SYS_gettimeofday             __NR_gettimeofday             /* errno_t gettimeofday(struct timevalx64 *tv, struct timezone *tz) */
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-#define SYS_getrlimit                __NR_getrlimit                /* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
+#define SYS_getrlimit                __NR_getrlimit                /* errno_t getrlimit(syscall_ulong_t resource, struct rlimitx64 *rlimits) */
 /* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
 #define SYS_getrusage                __NR_getrusage                /* errno_t getrusage(syscall_slong_t who, struct rusagex64 *tv) */
 #define SYS_sysinfo                  __NR_sysinfo                  /* errno_t sysinfo(struct __sysinfox64 *info) */
@@ -530,7 +530,7 @@
 #define SYS_arch_prctl               __NR_arch_prctl               /* syscall_slong_t arch_prctl(unsigned int command, uint64_t *addr) */
 #define SYS_adjtimex                 __NR_adjtimex                 /* errno_t adjtimex(struct timex *ntx) */
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-#define SYS_setrlimit                __NR_setrlimit                /* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
+#define SYS_setrlimit                __NR_setrlimit                /* errno_t setrlimit(syscall_ulong_t resource, struct rlimitx64 const *rlimits) */
 #define SYS_chroot                   __NR_chroot                   /* errno_t chroot(char const *path) */
 #define SYS_sync                     __NR_sync                     /* errno_t sync(void) */
 #define SYS_acct                     __NR_acct                     /* errno_t acct(char const *filename) */
@@ -857,7 +857,7 @@
 #define SYS_fanotify_init            __NR_fanotify_init            /* errno_t fanotify_init(int TODO_PROTOTYPE) */
 #define SYS_fanotify_mark            __NR_fanotify_mark            /* errno_t fanotify_mark(int TODO_PROTOTYPE) */
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-#define SYS_prlimit64                __NR_prlimit64                /* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit) */
+#define SYS_prlimit64                __NR_prlimit64                /* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimitx64 const *new_limit, struct rlimitx64 *old_limit) */
 /* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_FOLLOW | AT_DOSPATH' */
 #define SYS_name_to_handle_at        __NR_name_to_handle_at        /* errno_t name_to_handle_at(fd_t dirfd, char const *filename, struct file_handle *handle, int32_t *mnt_id, atflag_t flags) */
 #define SYS_open_by_handle_at        __NR_open_by_handle_at        /* fd_t open_by_handle_at(fd_t mountdirfd, struct file_handle const *handle, oflag_t flags) */

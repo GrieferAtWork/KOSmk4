@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61bb6ee5 */
+/* HASH CRC-32:0xf5123dcc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1143,9 +1143,9 @@
 #define __NR32AT0_sethostname                  (char const *, char const *)
 #define __NR32AT1_sethostname                  (size_t, __size_t)
 #define __NR32AT0_setrlimit                    (syscall_ulong_t, __syscall_ulong_t)
-#define __NR32AT1_setrlimit                    (struct rlimit const *, struct rlimit const *)
+#define __NR32AT1_setrlimit                    (struct rlimitx32 const *, struct __rlimitx32 const *)
 #define __NR32AT0_getrlimit                    (syscall_ulong_t, __syscall_ulong_t)
-#define __NR32AT1_getrlimit                    (struct rlimit *, struct rlimit *)
+#define __NR32AT1_getrlimit                    (struct rlimitx32 *, struct __rlimitx32 *)
 #define __NR32AT0_getrusage                    (syscall_slong_t, __syscall_slong_t)
 #define __NR32AT1_getrusage                    (struct rusagex32 *, struct __rusagex32 *)
 #define __NR32AT0_gettimeofday                 (struct timevalx32 *, struct __timevalx32 *)
@@ -1737,8 +1737,8 @@
 #define __NR32AT0_fanotify_mark                (int, int)
 #define __NR32AT0_prlimit64                    (pid_t, __pid_t)
 #define __NR32AT1_prlimit64                    (syscall_ulong_t, __syscall_ulong_t)
-#define __NR32AT2_prlimit64                    (struct rlimit64 const *, struct rlimit64 const *)
-#define __NR32AT3_prlimit64                    (struct rlimit64 *, struct rlimit64 *)
+#define __NR32AT2_prlimit64                    (struct rlimitx32_64 const *, struct __rlimitx32_64 const *)
+#define __NR32AT3_prlimit64                    (struct rlimitx32_64 *, struct __rlimitx32_64 *)
 #define __NR32AT0_name_to_handle_at            (fd_t, __fd_t)
 #define __NR32AT1_name_to_handle_at            (char const *, char const *)
 #define __NR32AT2_name_to_handle_at            (struct file_handle *, struct file_handle *)
@@ -2255,8 +2255,8 @@
 #define __NR32AM_sigsuspend(a, b, c, d, e, f)                   (struct __old_sigset_struct const *)a
 #define __NR32AM_sigpending(a, b, c, d, e, f)                   (struct __old_sigset_struct *)a
 #define __NR32AM_sethostname(a, b, c, d, e, f)                  (char const *)a, (__size_t)b
-#define __NR32AM_setrlimit(a, b, c, d, e, f)                    (__syscall_ulong_t)a, (struct rlimit const *)b
-#define __NR32AM_getrlimit(a, b, c, d, e, f)                    (__syscall_ulong_t)a, (struct rlimit *)b
+#define __NR32AM_setrlimit(a, b, c, d, e, f)                    (__syscall_ulong_t)a, (struct __rlimitx32 const *)b
+#define __NR32AM_getrlimit(a, b, c, d, e, f)                    (__syscall_ulong_t)a, (struct __rlimitx32 *)b
 #define __NR32AM_getrusage(a, b, c, d, e, f)                    (__syscall_slong_t)a, (struct __rusagex32 *)b
 #define __NR32AM_gettimeofday(a, b, c, d, e, f)                 (struct __timevalx32 *)a, (struct timezone *)b
 #define __NR32AM_settimeofday(a, b, c, d, e, f)                 (struct __timevalx32 const *)a, (struct timezone const *)b
@@ -2516,7 +2516,7 @@
 #define __NR32AM_recvmmsg(a, b, c, d, e, f)                     (__fd_t)a, (struct __mmsghdrx32 *)b, (__size_t)c, (__syscall_ulong_t)d, (struct __timespecx32 const *)e
 #define __NR32AM_fanotify_init(a, b, c, d, e, f)                (int)a
 #define __NR32AM_fanotify_mark(a, b, c, d, e, f)                (int)a
-#define __NR32AM_prlimit64(a, b, c, d, e, f)                    (__pid_t)a, (__syscall_ulong_t)b, (struct rlimit64 const *)c, (struct rlimit64 *)d
+#define __NR32AM_prlimit64(a, b, c, d, e, f)                    (__pid_t)a, (__syscall_ulong_t)b, (struct __rlimitx32_64 const *)c, (struct __rlimitx32_64 *)d
 #define __NR32AM_name_to_handle_at(a, b, c, d, e, f)            (__fd_t)a, (char const *)b, (struct file_handle *)c, (__int32_t *)d, (__atflag_t)e
 #define __NR32AM_open_by_handle_at(a, b, c, d, e, f)            (__fd_t)a, (struct file_handle const *)b, (__oflag_t)c
 #define __NR32AM_clock_adjtime(a, b, c, d, e, f)                (int)a

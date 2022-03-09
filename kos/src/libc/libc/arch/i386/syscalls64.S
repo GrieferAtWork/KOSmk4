@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9236c6e9 */
+/* HASH CRC-32:0x50ad5b3a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1072,7 +1072,7 @@ END(libc_sys_gettimeofday)
 DEFINE_PUBLIC_ALIAS(sys_gettimeofday, libc_sys_gettimeofday)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
+/* errno_t getrlimit(syscall_ulong_t resource, struct rlimitx64 *rlimits) */
 INTERN_FUNCTION(libc_sys_getrlimit)
 	movq   $(0x61), %rax
 	syscall
@@ -1669,7 +1669,7 @@ END(libc_sys_adjtimex)
 DEFINE_PUBLIC_ALIAS(sys_adjtimex, libc_sys_adjtimex)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
+/* errno_t setrlimit(syscall_ulong_t resource, struct rlimitx64 const *rlimits) */
 INTERN_FUNCTION(libc_sys_setrlimit)
 	movq   $(0xa0), %rax
 	syscall
@@ -3032,7 +3032,7 @@ END(libc_sys_fanotify_mark)
 DEFINE_PUBLIC_ALIAS(sys_fanotify_mark, libc_sys_fanotify_mark)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit) */
+/* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimitx64 const *new_limit, struct rlimitx64 *old_limit) */
 INTERN_FUNCTION(libc_sys_prlimit64)
 	movq   $(0x12e), %rax
 	movq   %rcx, %r10
@@ -5482,7 +5482,7 @@ END(libc_sys_Xgettimeofday)
 DEFINE_PUBLIC_ALIAS(sys_Xgettimeofday, libc_sys_Xgettimeofday)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
+/* errno_t getrlimit(syscall_ulong_t resource, struct rlimitx64 *rlimits) */
 INTERN_FUNCTION(libc_sys_Xgetrlimit)
 	movq   $(0x61), %rax
 	std /* Enable exceptions */
@@ -6205,7 +6205,7 @@ END(libc_sys_Xadjtimex)
 DEFINE_PUBLIC_ALIAS(sys_Xadjtimex, libc_sys_Xadjtimex)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
+/* errno_t setrlimit(syscall_ulong_t resource, struct rlimitx64 const *rlimits) */
 INTERN_FUNCTION(libc_sys_Xsetrlimit)
 	movq   $(0xa0), %rax
 	std /* Enable exceptions */
@@ -7852,7 +7852,7 @@ END(libc_sys_Xfanotify_mark)
 DEFINE_PUBLIC_ALIAS(sys_Xfanotify_mark, libc_sys_Xfanotify_mark)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit) */
+/* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimitx64 const *new_limit, struct rlimitx64 *old_limit) */
 INTERN_FUNCTION(libc_sys_Xprlimit64)
 	movq   $(0x12e), %rax
 	movq   %rcx, %r10

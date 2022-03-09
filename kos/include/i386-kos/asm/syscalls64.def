@@ -49,6 +49,7 @@
 %[typecompat(x86_64:[timeb,timebx64,__timebx64] = i386:[timebx32_64,__timebx32_64])]
 %[typecompat(x86_64:[utimbuf,utimbufx64,__utimbufx64] = i386:[utimbufx32_64,__utimbufx32_64])]
 %[typecompat(x86_64:[userprocmask] = i386:[userprocmask])]
+%[typecompat(x86_64:[rlimitx64] = i386:[rlimitx32_64])]
 
 
 
@@ -97,6 +98,9 @@ kstat = kstatx64;
 maplibrary = maplibraryx64;
 sigaltstack = sigaltstackx64;
 getrusage = getrusagex64;
+getrlimit = getrlimitx64;
+setrlimit = setrlimitx64;
+prlimit64 = prlimitx64;
 wait4 = wait4_x64;
 waitid = waitidx64;
 rt_sigaction = rt_sigactionx64;

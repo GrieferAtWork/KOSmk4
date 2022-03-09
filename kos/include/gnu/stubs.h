@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf7f1d912 */
+/* HASH CRC-32:0x8eb971ef */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -248,14 +248,12 @@
 #define __stub_getprotoent
 #define __stub_getprotoent_r
 #define __stub_getpt
-#define __stub_getrlimit64
 #define __stub_getrpcbyname
 #define __stub_getrpcbyname_r
 #define __stub_getrpcbynumber
 #define __stub_getrpcbynumber_r
 #define __stub_getrpcent
 #define __stub_getrpcent_r
-#define __stub_getrusage64
 #define __stub_getservbyname
 #define __stub_getservbyname_r
 #define __stub_getservbyport
@@ -531,7 +529,6 @@
 #define __stub_setnetgrent
 #define __stub_setproctitle
 #define __stub_setprotoent
-#define __stub_setrlimit64
 #define __stub_setrpcent
 #define __stub_setservent
 #define __stub_setsourcefilter

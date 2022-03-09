@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7de38bb */
+/* HASH CRC-32:0xdc685185 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,16 +52,15 @@
 
 __SYSDECL_BEGIN
 
-#if (defined(__RLIMIT_CPU) || defined(__RLIMIT_FSIZE) ||           \
-     defined(__RLIMIT_DATA) || defined(__RLIMIT_STACK) ||          \
-     defined(__RLIMIT_CORE) || defined(__RLIMIT_RSS) ||            \
-     defined(__RLIMIT_NPROC) || defined(__RLIMIT_NOFILE) ||        \
-     defined(__RLIMIT_OFILE) || defined(__RLIMIT_MEMLOCK) ||       \
-     defined(__RLIMIT_AS) || defined(__RLIMIT_LOCKS) ||            \
-     defined(__RLIMIT_SIGPENDING) || defined(__RLIMIT_MSGQUEUE) || \
-     defined(__RLIMIT_NICE) || defined(__RLIMIT_RTPRIO) ||         \
-     defined(__RLIMIT_RTTIME) || defined(__RLIMIT_NLIMITS) ||      \
-     defined(__RLIM_NLIMITS))
+#if (defined(__RLIMIT_CPU) || defined(__RLIMIT_FSIZE) ||        \
+     defined(__RLIMIT_DATA) || defined(__RLIMIT_STACK) ||       \
+     defined(__RLIMIT_CORE) || defined(__RLIMIT_RSS) ||         \
+     defined(__RLIMIT_NPROC) || defined(__RLIMIT_NOFILE) ||     \
+     defined(__RLIMIT_MEMLOCK) || defined(__RLIMIT_AS) ||       \
+     defined(__RLIMIT_LOCKS) || defined(__RLIMIT_SIGPENDING) || \
+     defined(__RLIMIT_MSGQUEUE) || defined(__RLIMIT_NICE) ||    \
+     defined(__RLIMIT_RTPRIO) || defined(__RLIMIT_RTTIME) ||    \
+     defined(__RLIMIT_NLIMITS) || (defined(__USE_KOS) && defined(__RLIMIT_MAXFILE)))
 /* Kinds of resource limit. */
 /*[[[enum]]]*/
 #ifdef __CC__
@@ -88,11 +87,11 @@ enum __rlimit_resource {
 	RLIMIT_NPROC      = __RLIMIT_NPROC,      /* ??? */
 #endif /* __RLIMIT_NPROC */
 #ifdef __RLIMIT_NOFILE
-	RLIMIT_NOFILE     = __RLIMIT_NOFILE,     /* ??? */
+	RLIMIT_NOFILE     = __RLIMIT_NOFILE,     /* Max # of open file descriptors (total; does not affect greatest usable FD number) */
 #endif /* __RLIMIT_NOFILE */
-#ifdef __RLIMIT_OFILE
-	RLIMIT_OFILE      = __RLIMIT_OFILE,      /* ??? */
-#endif /* __RLIMIT_OFILE */
+#ifdef __RLIMIT_NOFILE
+	RLIMIT_OFILE      = __RLIMIT_NOFILE,     /* Max # of open file descriptors (total; does not affect greatest usable FD number) */
+#endif /* __RLIMIT_NOFILE */
 #ifdef __RLIMIT_MEMLOCK
 	RLIMIT_MEMLOCK    = __RLIMIT_MEMLOCK,    /* ??? */
 #endif /* __RLIMIT_MEMLOCK */
@@ -118,11 +117,16 @@ enum __rlimit_resource {
 	RLIMIT_RTTIME     = __RLIMIT_RTTIME,     /* ??? */
 #endif /* __RLIMIT_RTTIME */
 #ifdef __RLIMIT_NLIMITS
-	RLIMIT_NLIMITS    = __RLIMIT_NLIMITS,
+	RLIMIT_NLIMITS    = __RLIMIT_NLIMITS,    /* Total # of (standard) resource limits */
 #endif /* __RLIMIT_NLIMITS */
-#ifdef __RLIM_NLIMITS
-	RLIM_NLIMITS      = __RLIM_NLIMITS,
-#endif /* __RLIM_NLIMITS */
+#ifdef __RLIMIT_NLIMITS
+	RLIM_NLIMITS      = __RLIMIT_NLIMITS,    /* Total # of (standard) resource limits */
+#endif /* __RLIMIT_NLIMITS */
+
+	/* Extended resource limits (OS-specific) */
+#if defined(__USE_KOS) && defined(__RLIMIT_MAXFILE)
+	RLIMIT_MAXFILE    = __RLIMIT_MAXFILE,    /* greatest usable FD number */
+#endif /* __USE_KOS && __RLIMIT_MAXFILE */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -149,11 +153,11 @@ enum __rlimit_resource {
 #define RLIMIT_NPROC      RLIMIT_NPROC      /* ??? */
 #endif /* __RLIMIT_NPROC */
 #ifdef __RLIMIT_NOFILE
-#define RLIMIT_NOFILE     RLIMIT_NOFILE     /* ??? */
+#define RLIMIT_NOFILE     RLIMIT_NOFILE     /* Max # of open file descriptors (total; does not affect greatest usable FD number) */
 #endif /* __RLIMIT_NOFILE */
-#ifdef __RLIMIT_OFILE
-#define RLIMIT_OFILE      RLIMIT_OFILE      /* ??? */
-#endif /* __RLIMIT_OFILE */
+#ifdef __RLIMIT_NOFILE
+#define RLIMIT_OFILE      RLIMIT_OFILE      /* Max # of open file descriptors (total; does not affect greatest usable FD number) */
+#endif /* __RLIMIT_NOFILE */
 #ifdef __RLIMIT_MEMLOCK
 #define RLIMIT_MEMLOCK    RLIMIT_MEMLOCK    /* ??? */
 #endif /* __RLIMIT_MEMLOCK */
@@ -179,11 +183,16 @@ enum __rlimit_resource {
 #define RLIMIT_RTTIME     RLIMIT_RTTIME     /* ??? */
 #endif /* __RLIMIT_RTTIME */
 #ifdef __RLIMIT_NLIMITS
-#define RLIMIT_NLIMITS    RLIMIT_NLIMITS
+#define RLIMIT_NLIMITS    RLIMIT_NLIMITS    /* Total # of (standard) resource limits */
 #endif /* __RLIMIT_NLIMITS */
-#ifdef __RLIM_NLIMITS
-#define RLIM_NLIMITS      RLIM_NLIMITS
-#endif /* __RLIM_NLIMITS */
+#ifdef __RLIMIT_NLIMITS
+#define RLIM_NLIMITS      RLIM_NLIMITS      /* Total # of (standard) resource limits */
+#endif /* __RLIMIT_NLIMITS */
+
+	/* Extended resource limits (os-specific) */
+#if defined(__USE_KOS) && defined(__RLIMIT_MAXFILE)
+#define RLIMIT_MAXFILE    RLIMIT_MAXFILE    /* greatest usable FD number */
+#endif /* __USE_KOS && __RLIMIT_MAXFILE */
 #else /* __COMPILER_PREFERR_ENUMS */
 #ifdef __RLIMIT_CPU
 #define RLIMIT_CPU        __RLIMIT_CPU        /* ??? */
@@ -207,11 +216,11 @@ enum __rlimit_resource {
 #define RLIMIT_NPROC      __RLIMIT_NPROC      /* ??? */
 #endif /* __RLIMIT_NPROC */
 #ifdef __RLIMIT_NOFILE
-#define RLIMIT_NOFILE     __RLIMIT_NOFILE     /* ??? */
+#define RLIMIT_NOFILE     __RLIMIT_NOFILE     /* Max # of open file descriptors (total; does not affect greatest usable FD number) */
 #endif /* __RLIMIT_NOFILE */
-#ifdef __RLIMIT_OFILE
-#define RLIMIT_OFILE      __RLIMIT_OFILE      /* ??? */
-#endif /* __RLIMIT_OFILE */
+#ifdef __RLIMIT_NOFILE
+#define RLIMIT_OFILE      __RLIMIT_NOFILE     /* Max # of open file descriptors (total; does not affect greatest usable FD number) */
+#endif /* __RLIMIT_NOFILE */
 #ifdef __RLIMIT_MEMLOCK
 #define RLIMIT_MEMLOCK    __RLIMIT_MEMLOCK    /* ??? */
 #endif /* __RLIMIT_MEMLOCK */
@@ -237,11 +246,16 @@ enum __rlimit_resource {
 #define RLIMIT_RTTIME     __RLIMIT_RTTIME     /* ??? */
 #endif /* __RLIMIT_RTTIME */
 #ifdef __RLIMIT_NLIMITS
-#define RLIMIT_NLIMITS    __RLIMIT_NLIMITS
+#define RLIMIT_NLIMITS    __RLIMIT_NLIMITS    /* Total # of (standard) resource limits */
 #endif /* __RLIMIT_NLIMITS */
-#ifdef __RLIM_NLIMITS
-#define RLIM_NLIMITS      __RLIM_NLIMITS
-#endif /* __RLIM_NLIMITS */
+#ifdef __RLIMIT_NLIMITS
+#define RLIM_NLIMITS      __RLIMIT_NLIMITS    /* Total # of (standard) resource limits */
+#endif /* __RLIMIT_NLIMITS */
+
+	/* Extended resource limits (os-specific) */
+#if defined(__USE_KOS) && defined(__RLIMIT_MAXFILE)
+#define RLIMIT_MAXFILE    __RLIMIT_MAXFILE    /* greatest usable FD number */
+#endif /* __USE_KOS && __RLIMIT_MAXFILE */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* ... */

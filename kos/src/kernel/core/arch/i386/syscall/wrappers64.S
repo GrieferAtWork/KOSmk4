@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58383224 */
+/* HASH CRC-32:0x8843504b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3217,7 +3217,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_gettimeofday)
 END(__x86_asm64_syscall_gettimeofday)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
+/* errno_t getrlimit(syscall_ulong_t resource, struct rlimitx64 *rlimits) */
 .section .text.x86.asm64_syscall.getrlimit
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getrlimit)
 	.cfi_startproc simple
@@ -5200,7 +5200,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_adjtimex)
 END(__x86_asm64_syscall_adjtimex)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
+/* errno_t setrlimit(syscall_ulong_t resource, struct rlimitx64 const *rlimits) */
 .section .text.x86.asm64_syscall.setrlimit
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setrlimit)
 	.cfi_startproc simple
@@ -9687,7 +9687,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fanotify_mark)
 END(__x86_asm64_syscall_fanotify_mark)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit) */
+/* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimitx64 const *new_limit, struct rlimitx64 *old_limit) */
 .section .text.x86.asm64_syscall.prlimit64
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_prlimit64)
 	.cfi_startproc simple
@@ -14818,7 +14818,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sethostname)
 END(__x86_asm32_int80_sethostname)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
+/* errno_t setrlimit(syscall_ulong_t resource, struct rlimitx32 const *rlimits) */
 .section .text.x86.asm32_syscall_int80.setrlimit
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setrlimit)
 	.cfi_startproc simple
@@ -14843,7 +14843,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setrlimit)
 END(__x86_asm32_int80_setrlimit)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
+/* errno_t getrlimit(syscall_ulong_t resource, struct rlimitx32 *rlimits) */
 .section .text.x86.asm32_syscall_int80.getrlimit
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrlimit)
 	.cfi_startproc simple
@@ -21581,7 +21581,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fanotify_mark)
 END(__x86_asm32_int80_fanotify_mark)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit) */
+/* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimitx32_64 const *new_limit, struct rlimitx32_64 *old_limit) */
 .section .text.x86.asm32_syscall_int80.prlimit64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_prlimit64)
 	.cfi_startproc simple
@@ -26470,11 +26470,11 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sigpending, __x86_asm32_int80_sigp
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sethostname, __x86_asm32_int80_sethostname)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
+/* errno_t setrlimit(syscall_ulong_t resource, struct rlimitx32 const *rlimits) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setrlimit, __x86_asm32_int80_setrlimit)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
+/* errno_t getrlimit(syscall_ulong_t resource, struct rlimitx32 *rlimits) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getrlimit, __x86_asm32_int80_getrlimit)
 
 /* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
@@ -28509,7 +28509,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fanotify_init, __x86_asm32_int80_f
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fanotify_mark, __x86_asm32_int80_fanotify_mark)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit) */
+/* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimitx32_64 const *new_limit, struct rlimitx32_64 *old_limit) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_prlimit64, __x86_asm32_int80_prlimit64)
 
 /* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_FOLLOW | AT_DOSPATH' */
@@ -31472,7 +31472,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sethostname)
 END(__x86_asm32_sysrun32_sethostname)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
+/* errno_t setrlimit(syscall_ulong_t resource, struct rlimitx32 const *rlimits) */
 .section .text.x86.asm32_syscall_sysrun32.setrlimit
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setrlimit)
 	.cfi_startproc
@@ -31484,7 +31484,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setrlimit)
 END(__x86_asm32_sysrun32_setrlimit)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
+/* errno_t getrlimit(syscall_ulong_t resource, struct rlimitx32 *rlimits) */
 .section .text.x86.asm32_syscall_sysrun32.getrlimit
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getrlimit)
 	.cfi_startproc
@@ -34668,7 +34668,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fanotify_mark)
 END(__x86_asm32_sysrun32_fanotify_mark)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit) */
+/* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimitx32_64 const *new_limit, struct rlimitx32_64 *old_limit) */
 .section .text.x86.asm32_syscall_sysrun32.prlimit64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_prlimit64)
 	.cfi_startproc

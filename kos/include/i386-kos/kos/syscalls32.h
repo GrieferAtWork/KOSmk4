@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d4160c6 */
+/* HASH CRC-32:0xa7e5c7cf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,6 +33,7 @@
 #include <bits/os/generic/timeval32.h>
 #include <bits/os/kos/mmsghdr32.h>
 #include <bits/os/kos/msghdr32.h>
+#include <bits/os/kos/rlimit32.h>
 #include <bits/os/kos/rusage32.h>
 #include <bits/os/kos/sigaction32.h>
 #include <bits/os/kos/siginfo32.h>
@@ -117,6 +118,8 @@ struct __mmsghdrx32;
 struct __msghdrx32;
 struct __old_kernel_sigactionx32;
 struct __old_sigset_struct;
+struct __rlimitx32;
+struct __rlimitx32_64;
 struct __rusagex32;
 struct __rusagex32_64;
 struct __sigaltstackx32;
@@ -154,8 +157,6 @@ struct linux_statx32_64;
 struct mq_attr;
 struct old_linux_direntx32;
 struct pollfd;
-struct rlimit;
-struct rlimit64;
 struct rpc_syscall_info32;
 struct sched_param;
 struct sel_arg_structx32;
@@ -904,7 +905,7 @@ __CDECLARE_SC(,__errno_t,getresuid32,(__uint32_t *__ruid, __uint32_t *__euid, __
 #endif /* __CRT_HAVE_SC(getresuid32) */
 #if __CRT_HAVE_SC(getrlimit)
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-__CDECLARE_SC(,__errno_t,getrlimit,(__syscall_ulong_t __resource, struct rlimit *__rlimits),(__resource,__rlimits))
+__CDECLARE_SC(,__errno_t,getrlimit,(__syscall_ulong_t __resource, struct __rlimitx32 *__rlimits),(__resource,__rlimits))
 #endif /* __CRT_HAVE_SC(getrlimit) */
 #if __CRT_HAVE_SC(getrusage)
 /* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
@@ -1535,7 +1536,7 @@ __CDECLARE_SC(,__ssize_t,preadvf,(__fd_t __fd, struct __iovecx32 const *__iovec,
 #endif /* __CRT_HAVE_SC(preadvf) */
 #if __CRT_HAVE_SC(prlimit64)
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-__CDECLARE_SC(,__errno_t,prlimit64,(__pid_t __pid, __syscall_ulong_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
+__CDECLARE_SC(,__errno_t,prlimit64,(__pid_t __pid, __syscall_ulong_t __resource, struct __rlimitx32_64 const *__new_limit, struct __rlimitx32_64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
 #endif /* __CRT_HAVE_SC(prlimit64) */
 #if __CRT_HAVE_SC(process_vm_readv)
 /* Read memory from another process's VM
@@ -2212,7 +2213,7 @@ __CDECLARE_SC(,__errno_t,setreuid32,(__uint32_t __ruid, __uint32_t __euid),(__ru
 #endif /* __CRT_HAVE_SC(setreuid32) */
 #if __CRT_HAVE_SC(setrlimit)
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-__CDECLARE_SC(,__errno_t,setrlimit,(__syscall_ulong_t __resource, struct rlimit const *__rlimits),(__resource,__rlimits))
+__CDECLARE_SC(,__errno_t,setrlimit,(__syscall_ulong_t __resource, struct __rlimitx32 const *__rlimits),(__resource,__rlimits))
 #endif /* __CRT_HAVE_SC(setrlimit) */
 #if __CRT_HAVE_SC(setsid)
 __CDECLARE_SC(,__pid_t,setsid,(void),())
@@ -3406,7 +3407,7 @@ __CDECLARE_XSC(,__errno_t,getresuid32,(__uint32_t *__ruid, __uint32_t *__euid, _
 #endif /* __CRT_HAVE_XSC(getresuid32) */
 #if __CRT_HAVE_XSC(getrlimit)
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-__CDECLARE_XSC(,__errno_t,getrlimit,(__syscall_ulong_t __resource, struct rlimit *__rlimits),(__resource,__rlimits))
+__CDECLARE_XSC(,__errno_t,getrlimit,(__syscall_ulong_t __resource, struct __rlimitx32 *__rlimits),(__resource,__rlimits))
 #endif /* __CRT_HAVE_XSC(getrlimit) */
 #if __CRT_HAVE_XSC(getrusage)
 /* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
@@ -4027,7 +4028,7 @@ __CDECLARE_XSC(,__ssize_t,preadvf,(__fd_t __fd, struct __iovecx32 const *__iovec
 #endif /* __CRT_HAVE_XSC(preadvf) */
 #if __CRT_HAVE_XSC(prlimit64)
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-__CDECLARE_XSC(,__errno_t,prlimit64,(__pid_t __pid, __syscall_ulong_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
+__CDECLARE_XSC(,__errno_t,prlimit64,(__pid_t __pid, __syscall_ulong_t __resource, struct __rlimitx32_64 const *__new_limit, struct __rlimitx32_64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
 #endif /* __CRT_HAVE_XSC(prlimit64) */
 #if __CRT_HAVE_XSC(process_vm_readv)
 /* Read memory from another process's VM
@@ -4701,7 +4702,7 @@ __CDECLARE_XSC(,__errno_t,setreuid32,(__uint32_t __ruid, __uint32_t __euid),(__r
 #endif /* __CRT_HAVE_XSC(setreuid32) */
 #if __CRT_HAVE_XSC(setrlimit)
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-__CDECLARE_XSC(,__errno_t,setrlimit,(__syscall_ulong_t __resource, struct rlimit const *__rlimits),(__resource,__rlimits))
+__CDECLARE_XSC(,__errno_t,setrlimit,(__syscall_ulong_t __resource, struct __rlimitx32 const *__rlimits),(__resource,__rlimits))
 #endif /* __CRT_HAVE_XSC(setrlimit) */
 #if __CRT_HAVE_XSC(setsid)
 __CDECLARE_XSC(,__pid_t,setsid,(void),())

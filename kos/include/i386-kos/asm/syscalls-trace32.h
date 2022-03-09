@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc72c51fc */
+/* HASH CRC-32:0xd66bf74c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1353,7 +1353,7 @@
 #define __NRATR1_sethostname                  SC_REPR_SIZE_T                                                       /* len */ 
 #define __NRRTR_sethostname                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_setrlimit                    SC_REPR_RLIMIT_RESOURCE                                              /* resource */ 
-#define __NRATR1_setrlimit                    SC_REPR_STRUCT_RLIMIT                                                /* rlimits */ 
+#define __NRATR1_setrlimit                    SC_REPR_STRUCT_RLIMITX32                                             /* rlimits */ 
 #define __NRRTR_setrlimit                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_getrlimit                    SC_REPR_RLIMIT_RESOURCE                                              /* resource */ 
 #define __NRATR1_getrlimit                    SC_REPR_POINTER                                                      /* rlimits */ 
@@ -2265,7 +2265,7 @@
 #define __NRRTR_fanotify_mark                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_prlimit64                    SC_REPR_PID_T                                                        /* pid */ 
 #define __NRATR1_prlimit64                    SC_REPR_RLIMIT_RESOURCE                                              /* resource */ 
-#define __NRATR2_prlimit64                    SC_REPR_STRUCT_RLIMIT64                                              /* new_limit */ 
+#define __NRATR2_prlimit64                    SC_REPR_STRUCT_RLIMITX32_64                                          /* new_limit */ 
 #define __NRATR3_prlimit64                    SC_REPR_POINTER                                                      /* old_limit */ 
 #define __NRRTR_prlimit64                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_name_to_handle_at            SC_REPR_FD_T                                                         /* dirfd */ 

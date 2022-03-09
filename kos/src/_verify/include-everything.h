@@ -424,6 +424,7 @@ incdir("");
 #include <compat/bits/os/mcontext.h>
 #include <compat/bits/os/mmsghdr.h>
 #include <compat/bits/os/msghdr.h>
+#include <compat/bits/os/rlimit.h>
 #include <compat/bits/os/rusage-convert.h>
 #include <compat/bits/os/rusage.h>
 #include <compat/bits/os/sigaction.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe8480f6 */
+/* HASH CRC-32:0xf3fbd1f7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1353,7 +1353,7 @@
 #define __NR32ATR1_sethostname                  SC_REPR_SIZE_T                                                       /* len */ 
 #define __NR32RTR_sethostname                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_setrlimit                    SC_REPR_RLIMIT_RESOURCE                                              /* resource */ 
-#define __NR32ATR1_setrlimit                    SC_REPR_STRUCT_RLIMIT                                                /* rlimits */ 
+#define __NR32ATR1_setrlimit                    SC_REPR_STRUCT_RLIMITX32                                             /* rlimits */ 
 #define __NR32RTR_setrlimit                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_getrlimit                    SC_REPR_RLIMIT_RESOURCE                                              /* resource */ 
 #define __NR32ATR1_getrlimit                    SC_REPR_POINTER                                                      /* rlimits */ 
@@ -2265,7 +2265,7 @@
 #define __NR32RTR_fanotify_mark                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_prlimit64                    SC_REPR_PID_T                                                        /* pid */ 
 #define __NR32ATR1_prlimit64                    SC_REPR_RLIMIT_RESOURCE                                              /* resource */ 
-#define __NR32ATR2_prlimit64                    SC_REPR_STRUCT_RLIMIT64                                              /* new_limit */ 
+#define __NR32ATR2_prlimit64                    SC_REPR_STRUCT_RLIMITX32_64                                          /* new_limit */ 
 #define __NR32ATR3_prlimit64                    SC_REPR_POINTER                                                      /* old_limit */ 
 #define __NR32RTR_prlimit64                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_name_to_handle_at            SC_REPR_FD_T                                                         /* dirfd */ 

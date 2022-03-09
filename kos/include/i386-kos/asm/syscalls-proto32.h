@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2830dc66 */
+/* HASH CRC-32:0x60d322b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1143,9 +1143,9 @@
 #define __NRAT0_sethostname                  (char const *, char const *)
 #define __NRAT1_sethostname                  (size_t, __size_t)
 #define __NRAT0_setrlimit                    (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT1_setrlimit                    (struct rlimit const *, struct rlimit const *)
+#define __NRAT1_setrlimit                    (struct rlimitx32 const *, struct __rlimitx32 const *)
 #define __NRAT0_getrlimit                    (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT1_getrlimit                    (struct rlimit *, struct rlimit *)
+#define __NRAT1_getrlimit                    (struct rlimitx32 *, struct __rlimitx32 *)
 #define __NRAT0_getrusage                    (syscall_slong_t, __syscall_slong_t)
 #define __NRAT1_getrusage                    (struct rusagex32 *, struct __rusagex32 *)
 #define __NRAT0_gettimeofday                 (struct timevalx32 *, struct __timevalx32 *)
@@ -1737,8 +1737,8 @@
 #define __NRAT0_fanotify_mark                (int, int)
 #define __NRAT0_prlimit64                    (pid_t, __pid_t)
 #define __NRAT1_prlimit64                    (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT2_prlimit64                    (struct rlimit64 const *, struct rlimit64 const *)
-#define __NRAT3_prlimit64                    (struct rlimit64 *, struct rlimit64 *)
+#define __NRAT2_prlimit64                    (struct rlimitx32_64 const *, struct __rlimitx32_64 const *)
+#define __NRAT3_prlimit64                    (struct rlimitx32_64 *, struct __rlimitx32_64 *)
 #define __NRAT0_name_to_handle_at            (fd_t, __fd_t)
 #define __NRAT1_name_to_handle_at            (char const *, char const *)
 #define __NRAT2_name_to_handle_at            (struct file_handle *, struct file_handle *)
@@ -2255,8 +2255,8 @@
 #define __NRAM_sigsuspend(a, b, c, d, e, f)                   (struct __old_sigset_struct const *)a
 #define __NRAM_sigpending(a, b, c, d, e, f)                   (struct __old_sigset_struct *)a
 #define __NRAM_sethostname(a, b, c, d, e, f)                  (char const *)a, (__size_t)b
-#define __NRAM_setrlimit(a, b, c, d, e, f)                    (__syscall_ulong_t)a, (struct rlimit const *)b
-#define __NRAM_getrlimit(a, b, c, d, e, f)                    (__syscall_ulong_t)a, (struct rlimit *)b
+#define __NRAM_setrlimit(a, b, c, d, e, f)                    (__syscall_ulong_t)a, (struct __rlimitx32 const *)b
+#define __NRAM_getrlimit(a, b, c, d, e, f)                    (__syscall_ulong_t)a, (struct __rlimitx32 *)b
 #define __NRAM_getrusage(a, b, c, d, e, f)                    (__syscall_slong_t)a, (struct __rusagex32 *)b
 #define __NRAM_gettimeofday(a, b, c, d, e, f)                 (struct __timevalx32 *)a, (struct timezone *)b
 #define __NRAM_settimeofday(a, b, c, d, e, f)                 (struct __timevalx32 const *)a, (struct timezone const *)b
@@ -2516,7 +2516,7 @@
 #define __NRAM_recvmmsg(a, b, c, d, e, f)                     (__fd_t)a, (struct __mmsghdrx32 *)b, (__size_t)c, (__syscall_ulong_t)d, (struct __timespecx32 const *)e
 #define __NRAM_fanotify_init(a, b, c, d, e, f)                (int)a
 #define __NRAM_fanotify_mark(a, b, c, d, e, f)                (int)a
-#define __NRAM_prlimit64(a, b, c, d, e, f)                    (__pid_t)a, (__syscall_ulong_t)b, (struct rlimit64 const *)c, (struct rlimit64 *)d
+#define __NRAM_prlimit64(a, b, c, d, e, f)                    (__pid_t)a, (__syscall_ulong_t)b, (struct __rlimitx32_64 const *)c, (struct __rlimitx32_64 *)d
 #define __NRAM_name_to_handle_at(a, b, c, d, e, f)            (__fd_t)a, (char const *)b, (struct file_handle *)c, (__int32_t *)d, (__atflag_t)e
 #define __NRAM_open_by_handle_at(a, b, c, d, e, f)            (__fd_t)a, (struct file_handle const *)b, (__oflag_t)c
 #define __NRAM_clock_adjtime(a, b, c, d, e, f)                (int)a

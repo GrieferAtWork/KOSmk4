@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x280172c1 */
+/* HASH CRC-32:0x59f2f529 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,7 @@
 #include <bits/os/mqueue.h>
 #include <bits/os/msghdr.h>
 #include <bits/os/pollfd.h>
+#include <bits/os/rlimit.h>
 #include <bits/os/rusage.h>
 #include <bits/os/sigaction.h>
 #include <bits/os/sigevent.h>
@@ -87,6 +88,7 @@ __SYSDECL_BEGIN
 struct __cpu_set_struct;
 struct __fd_set_struct;
 struct __kernel_sigaction;
+struct __rlimit64;
 struct __siginfo_struct;
 struct __sigset_struct;
 struct epoll_event;
@@ -104,7 +106,6 @@ struct mq_attr;
 struct msghdr;
 struct pollfd;
 struct rlimit;
-struct rlimit64;
 struct rusage;
 struct sched_param;
 struct shmid_ds;
@@ -925,7 +926,7 @@ __CDECLARE_SC(,__ssize_t,preadv,(__fd_t __fd, struct iovec const *__iovec, __siz
 #endif /* __CRT_HAVE_SC(preadv) */
 #if __CRT_HAVE_SC(prlimit64)
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-__CDECLARE_SC(,__errno_t,prlimit64,(__pid_t __pid, __syscall_ulong_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
+__CDECLARE_SC(,__errno_t,prlimit64,(__pid_t __pid, __syscall_ulong_t __resource, struct __rlimit64 const *__new_limit, struct __rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
 #endif /* __CRT_HAVE_SC(prlimit64) */
 #if __CRT_HAVE_SC(process_vm_readv)
 /* Read memory from another process's VM
@@ -2402,7 +2403,7 @@ __CDECLARE_XSC(,__ssize_t,preadv,(__fd_t __fd, struct iovec const *__iovec, __si
 #endif /* __CRT_HAVE_XSC(preadv) */
 #if __CRT_HAVE_XSC(prlimit64)
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-__CDECLARE_XSC(,__errno_t,prlimit64,(__pid_t __pid, __syscall_ulong_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
+__CDECLARE_XSC(,__errno_t,prlimit64,(__pid_t __pid, __syscall_ulong_t __resource, struct __rlimit64 const *__new_limit, struct __rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
 #endif /* __CRT_HAVE_XSC(prlimit64) */
 #if __CRT_HAVE_XSC(process_vm_readv)
 /* Read memory from another process's VM
