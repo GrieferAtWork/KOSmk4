@@ -89,7 +89,7 @@ NOTHROW(FCALL procgrp_remove_from_namespaces_and_free)(struct procgrp *__restric
 
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(LOCKOP_CC pidns_removepid_postlop)(Tobpostlockop(pidns) *__restrict self,
+NOTHROW(LOCKOP_CC pidns_removegrp_postlop)(Tobpostlockop(pidns) *__restrict self,
                                            struct pidns *__restrict obj) {
 	struct procgrp *me;
 	me = container_of(self, struct procgrp, _pgr_plop);
@@ -102,12 +102,12 @@ NOTHROW(LOCKOP_CC pidns_removepid_postlop)(Tobpostlockop(pidns) *__restrict self
 		procgrp_remove_from_namespaces_and_free(me);
 	} else {
 		/* Free the procgrp descriptor. */
-		_procgrp_free(self);
+		_procgrp_free(me);
 	}
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(pidns) *
-NOTHROW(LOCKOP_CC pidns_removepid_lop)(Toblockop(pidns) *__restrict self,
+NOTHROW(LOCKOP_CC pidns_removegrp_lop)(Toblockop(pidns) *__restrict self,
                                        struct pidns *__restrict obj) {
 	struct procgrp *me;
 	me = container_of(self, struct procgrp, _pgr_lop);
@@ -117,7 +117,7 @@ NOTHROW(LOCKOP_CC pidns_removepid_lop)(Toblockop(pidns) *__restrict self,
 	procgrp_remove_from_ns(me, obj);
 
 	/* Do the rest of the accounting work in a post-lockop */
-	me->_pgr_plop.oplo_func = &pidns_removepid_postlop;
+	me->_pgr_plop.oplo_func = &pidns_removegrp_postlop;
 	return &me->_pgr_plop;
 }
 
@@ -136,7 +136,7 @@ again_lock_ns:
 		pidns_endwrite(ns);
 	} else {
 		/* Must use a lock-op */
-		self->_pgr_lop.olo_func = &pidns_removepid_lop;
+		self->_pgr_lop.olo_func = &pidns_removegrp_lop;
 		incref(ns);
 		oblockop_enqueue(&ns->pn_lops, &self->_pgr_lop);
 		_pidns_reap(ns);
