@@ -3873,7 +3873,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x5e9bdc25]]]*/
+/*[[[start:exports,hash:CRC-32=0x2f62cca7]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$__rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$rename, libd_rename);
@@ -3984,9 +3984,7 @@ DEFINE_PUBLIC_ALIAS(_pclose, libc_pclose);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(pclose, libc_pclose);
 DEFINE_PUBLIC_ALIAS(popenve, libc_popenve);
-#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_fcloseall, libc_fcloseall);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(fcloseall, libc_fcloseall);
 DEFINE_PUBLIC_ALIAS(obstack_vprintf, libc_obstack_vprintf);
 DEFINE_PUBLIC_ALIAS(fseeko, libc_fseeko);

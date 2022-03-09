@@ -19,6 +19,7 @@
  */
 
 
+#define __CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ
 #define __CRT_HAVE_$Q_CrtDbgReportW$A$AYAHHPBGH00ZZ
 #define __CRT_HAVE_$Qterminate$A$AYAXXZ
 #define __CRT_HAVE_Accept
@@ -1213,6 +1214,7 @@
 #define __CRT_HAVE___tgamma
 #define __CRT_HAVE___tgammaf
 #define __CRT_HAVE___tgammal
+#define __CRT_HAVE___threadid
 #define __CRT_HAVE___throw_type_match
 #define __CRT_HAVE___time
 #define __CRT_HAVE___times
@@ -1362,9 +1364,11 @@
 #define __CRT_HAVE__except_check_no_nesting
 #define __CRT_HAVE__exit
 #define __CRT_HAVE__expand_dbg
+#define __CRT_HAVE__fcloseall
 #define __CRT_HAVE__fcvt_s
 #define __CRT_HAVE__fdpcomp
 #define __CRT_HAVE__fdtest
+#define __CRT_HAVE__fgetchar
 #define __CRT_HAVE__fgetpwent
 #define __CRT_HAVE__filbuf
 #define __CRT_HAVE__filelength
@@ -1388,6 +1392,7 @@
 #define __CRT_HAVE__flushlbf
 #define __CRT_HAVE__fmode
 #define __CRT_HAVE__fpclass
+#define __CRT_HAVE__fpreset
 #define __CRT_HAVE__fprintf_l
 #define __CRT_HAVE__fprintf_p
 #define __CRT_HAVE__fprintf_p_l
@@ -1446,6 +1451,7 @@
 #define __CRT_HAVE__getdrive
 #define __CRT_HAVE__getdrives
 #define __CRT_HAVE__getmaxstdio
+#define __CRT_HAVE__getpid
 #define __CRT_HAVE__getpwent
 #define __CRT_HAVE__getpwnam
 #define __CRT_HAVE__getpwuid

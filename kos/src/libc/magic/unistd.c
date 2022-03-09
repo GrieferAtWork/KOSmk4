@@ -519,7 +519,7 @@ $pid_t getpid();
 @@THIS_THREAD->PID
 [[guard, const, wunused, nothrow]]
 [[section(".text.crt{|.dos}.sched.thread")]]
-[[dos_only_export_alias("__threadid")]]
+[[dos_only_export_alias("__threadid", "?GetCurrentThreadId@platform@details@Concurrency@@YAJXZ")]]
 $pid_t gettid();
 %#endif /* __USE_KOS */
 

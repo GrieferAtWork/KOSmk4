@@ -19,6 +19,7 @@
  */
 
 
+#define __CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ
 #define __CRT_HAVE_$Q_CrtDbgReportW$A$AYAHHPBGH00ZZ
 #define __CRT_HAVE_$Qterminate$A$AYAXXZ
 #define __CRT_HAVE_Accept

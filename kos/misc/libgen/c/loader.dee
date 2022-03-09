@@ -6047,8 +6047,19 @@ again_lookup_wcsCurrent:
 							/* XXX: This assumes that LIBDCALL functions that take no
 							 *      arguments behave identical to LIBKCALL functions,
 							 *      and as such don't require a wrapper. */
-							if (!kosProto.argv)
+							if (!kosProto.argv) {
+								/* Deal with [[dos_only_export_alias()]] annotations, which are normally
+								 * generated to only link the DOS symbol name against the libc variant
+								 * when `__LIBCCALL_IS_LIBDCALL' is defined.
+								 *
+								 * Because we're assuming that zero-argments implies `__LIBCCALL_IS_LIBDCALL',
+								 * we have to adjust `currentKosLibraryFunction.exportSymbolNames' in order to
+								 * replace `defined(__LIBCCALL_IS_LIBDCALL)' with `1' */
+								currentKosLibraryFunction.exportSymbolNames = List(
+									for (local cond, name: currentKosLibraryFunction.exportSymbolNames)
+										(cond.replace("defined(__LIBCCALL_IS_LIBDCALL)", "1"), name));
 								goto continue_without_dosabi_wrapper;
+							}
 						}
 						/* dosabi-generated functions? */
 						if (currentDosLibraryFunction is none)

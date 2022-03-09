@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80b2d791 */
+/* HASH CRC-32:0xff2af179 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,6 +68,8 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_getpid,(voi
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_gettid,(void),gettid,())
 #elif defined(__CRT_HAVE___threadid)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_gettid,(void),__threadid,())
+#elif defined(__CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_gettid,(void),?GetCurrentThreadId@platform@details@Concurrency@@YAJXZ,())
 #else /* ... */
 #undef __local___localdep_gettid_defined
 #endif /* !... */
@@ -407,7 +409,7 @@ __again:
 #undef __LIBC_RAND_MAX
 		}
 	}
-#if defined(__CRT_HAVE_gettid) || defined(__CRT_HAVE___threadid)
+#if defined(__CRT_HAVE_gettid) || defined(__CRT_HAVE___threadid) || defined(__CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ)
 	__seed ^= (__NAMESPACE_LOCAL_SYM __localdep_gettid)();
 #elif defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)
 	__seed ^= (__NAMESPACE_LOCAL_SYM __localdep_getpid)();

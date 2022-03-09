@@ -3989,22 +3989,19 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x8154fd3]]]*/
+/*[[[start:exports,hash:CRC-32=0x71534a56]]]*/
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_execve, libc_execve);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__execve, libc_execve);
 DEFINE_PUBLIC_ALIAS(__libc_execve, libc_execve);
 DEFINE_PUBLIC_ALIAS(execve, libc_execve);
-#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_getpid, libc_getpid);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__getpid, libc_getpid);
 DEFINE_PUBLIC_ALIAS(__libc_getpid, libc_getpid);
 DEFINE_PUBLIC_ALIAS(getpid, libc_getpid);
-#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(__threadid, libc_gettid);
-#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS("?GetCurrentThreadId@platform@details@Concurrency@@YAJXZ", libc_gettid);
 DEFINE_PUBLIC_ALIAS(gettid, libc_gettid);
 DEFINE_PUBLIC_ALIAS(__pipe, libc_pipe);
 DEFINE_PUBLIC_ALIAS(__libc_pipe, libc_pipe);

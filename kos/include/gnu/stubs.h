@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd36e2431 */
+/* HASH CRC-32:0x4fe907a6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -173,9 +173,7 @@
 #define __stub_fp_query
 #define __stub___fp_resstat
 #define __stub_fp_resstat
-#ifdef __LIBCCALL_IS_LIBDCALL
 #define __stub__fpreset
-#endif /* __LIBCCALL_IS_LIBDCALL */
 #define __stub_fpreset
 #define __stub_freeaddrinfo
 #define __stub_freeifaddrs

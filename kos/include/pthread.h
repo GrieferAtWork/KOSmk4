@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74ba216e */
+/* HASH CRC-32:0x8607ebd2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2567,7 +2567,7 @@ __CDECLARE(__ATTR_CONST,int,__NOTHROW,pthread_main_np,(void),())
  * if the  calling  thread  "hasn't been initialized",  though  this
  * isn't a case that can actually happen under KOS's implementation. */
 __CREDIRECT(__ATTR_CONST,int,__NOTHROW,pthread_main_np,(void),thr_main,())
-#elif (defined(__CRT_HAVE_gettid) || defined(__CRT_HAVE___threadid)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid))
+#elif (defined(__CRT_HAVE_gettid) || defined(__CRT_HAVE___threadid) || defined(__CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid))
 #include <libc/local/pthread/pthread_main_np.h>
 /* >> pthread_main_np(3)
  * Returns  1 if the  calling thread is the  main() thread (i.e. the

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9947be87 */
+/* HASH CRC-32:0xe5c8817b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -688,7 +688,7 @@ __CREDIRECT(__ATTR_CONST,int,__NOTHROW,thr_main,(void),pthread_main_np,())
  * Internally,  this is  the return value  if the caller  doesn't have a
  * proper pthread-controller attached. */
 __CDECLARE(__ATTR_CONST,int,__NOTHROW,thr_main,(void),())
-#elif (defined(__CRT_HAVE_gettid) || defined(__CRT_HAVE___threadid)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid))
+#elif (defined(__CRT_HAVE_gettid) || defined(__CRT_HAVE___threadid) || defined(__CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid))
 #include <libc/local/pthread/pthread_main_np.h>
 /* >> thr_main(3)
  * Another  one of these non-restricted, but solaris-specific functions:

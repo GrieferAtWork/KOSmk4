@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeea1148 */
+/* HASH CRC-32:0xccb2a1be */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2136,7 +2136,7 @@ again:
 #undef LIBC_RAND_MAX
 		}
 	}
-#if defined(__CRT_HAVE_gettid) || defined(__CRT_HAVE___threadid)
+#if defined(__CRT_HAVE_gettid) || defined(__CRT_HAVE___threadid) || defined(__CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ)
 	seed ^= libc_gettid();
 #elif defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)
 	seed ^= libc_getpid();
@@ -4337,9 +4337,7 @@ DEFINE_PUBLIC_ALIAS(system, libc_system);
 DEFINE_PUBLIC_ALIAS(_ZSt9terminatev, libc_abort);
 DEFINE_PUBLIC_ALIAS(terminate, libc_abort);
 DEFINE_PUBLIC_ALIAS(__chk_fail, libc_abort);
-#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS("?terminate@@YAXXZ", libc_abort);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(abort, libc_abort);
 #endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_ABORT */
 #ifndef __KERNEL__
