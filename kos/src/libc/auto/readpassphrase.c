@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1798352 */
+/* HASH CRC-32:0xaf586e4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -100,16 +100,16 @@ NOTHROW_NCX(LIBCCALL libc_readpassphrase)(char const *prompt,
                                           char *buf,
                                           size_t bufsize,
                                           __STDC_INT_AS_UINT_T flags) {
-#if defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction)
+
 	bool must_restart;
-#endif /* __CRT_HAVE_sigaction || __CRT_HAVE___sigaction */
+
 	fd_t infd, outfd;
-#if (defined(__CRT_HAVE_tcgetattr) || defined(__CRT_HAVE___tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl))
+
 	struct termios old_ios, new_ios;
-#endif /* (__CRT_HAVE_tcgetattr || __CRT_HAVE___tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) */
-#if defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction)
+
+
 	struct sigaction old_sact[__COMPILER_LENOF(__NAMESPACE_LOCAL_SYM rpp_signals)];
-#endif /* __CRT_HAVE_sigaction || __CRT_HAVE___sigaction */
+
 
 	/* Validate input arguments. */
 	if unlikely(buf == NULL || bufsize < sizeof(char)) {
@@ -122,15 +122,15 @@ NOTHROW_NCX(LIBCCALL libc_readpassphrase)(char const *prompt,
 	}
 
 again:
-#if defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction)
+
 	must_restart = false;
-#endif /* __CRT_HAVE_sigaction || __CRT_HAVE___sigaction */
+
 	infd  = __STDIN_FILENO;
 	outfd = __STDIN_FILENO;
 
 	/* Open the relevant output stream. */
 	if (!(flags & __RPP_STDIN)) {
-#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+
 #ifdef _PATH_TTY
 #ifdef __O_RDWR
 		infd = libc_open(_PATH_TTY, __O_RDWR);
@@ -152,20 +152,20 @@ again:
 			goto err;
 		}
 		outfd = infd;
-#else /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
-#if defined(ENOTTY) && defined(ENOENT)
-		(void)libc_seterrno(flags & __RPP_REQUIRE_TTY ? ENOTTY : ENOENT);
-#elif defined(ENOENT)
-		(void)libc_seterrno(ENOENT);
-#else /* ... */
-		(void)libc_seterrno(1);
-#endif /* !... */
-		goto err;
-#endif /* !__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && !__CRT_HAVE___libc_open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat)) */
+
+
+
+
+
+
+
+
+
+
 	}
 
 	/* Update terminal IOS mode to our liking. */
-#if (defined(__CRT_HAVE_tcgetattr) || defined(__CRT_HAVE___tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl))
+
 	if (libc_tcgetattr(infd, &old_ios) != 0) {
 		if (flags & RPP_REQUIRE_TTY) {
 #ifdef ENOTTY
@@ -209,7 +209,7 @@ again:
 		new_ios.c_lflag = __ECHO;
 #endif /* __ECHO */
 	}
-#endif /* (__CRT_HAVE_tcgetattr || __CRT_HAVE___tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) */
+
 
 	/* Switch out signal handlers
 	 * WARNING: The fact that we need to  do this has the (unintended)  side-effect
@@ -217,7 +217,7 @@ again:
 	 *          within the original  source material, this  function also  modifies
 	 *          the process's signal handlers, meaning that the original  reference
 	 *          for this function also isn't thread-safe! */
-#if defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction)
+
 	{
 		unsigned int i;
 		struct sigaction newact;
@@ -235,12 +235,12 @@ again:
 			}
 		}
 	}
-#endif /* __CRT_HAVE_sigaction || __CRT_HAVE___sigaction */
+
 
 
 	/* Write the given `prompt' (if given and possible to write) */
 	(void)prompt;
-#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)
+
 	/* XXX: I don't really understand why the prompt is only printed
 	 *      when using /dev/tty as output,  but that's how BSD  does
 	 *      this, too... */
@@ -248,7 +248,7 @@ again:
 		if (libc_write(outfd, prompt, libc_strlen(prompt)) == -1)
 			goto err_infd_oldsact_oldios;
 	}
-#endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write */
+
 
 	/* Read the actual password from input. */
 	{
@@ -281,22 +281,22 @@ again:
 	}
 
 	/* Write a trailing \n-character if echo was disabled. */
-#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)
-#if (defined(__CRT_HAVE_tcgetattr) || defined(__CRT_HAVE___tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl))
+
+
 	if (!(new_ios.c_lflag & __ECHO))
-#else /* (__CRT_HAVE_tcgetattr || __CRT_HAVE___tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) */
-	if (!(flags & __RPP_ECHO_ON))
-#endif /* (!__CRT_HAVE_tcgetattr && !__CRT_HAVE___tcgetattr && ((!__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl) || !__TCGETA)) || (!__CRT_HAVE_tcsetattr && !__CRT_HAVE_ioctl && !__CRT_HAVE___ioctl && !__CRT_HAVE___libc_ioctl) */
+
+
+
 	{
 		if (libc_write(outfd, "\n", 1) == -1)
 			goto err_infd_oldsact_oldios;
 	}
-#endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write */
+
 
 
 	/* Restore terminal IOS configuration */
 done_infd_oldsact_oldios:
-#if (defined(__CRT_HAVE_tcgetattr) || defined(__CRT_HAVE___tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl))
+
 	if (libc_memcmp(&old_ios, &new_ios, sizeof(struct termios)) != 0) {
 #if defined(__TCSAFLUSH) && defined(__TCSASOFT)
 		(void)libc_tcsetattr(infd, __TCSAFLUSH | __TCSASOFT, &old_ios);
@@ -306,38 +306,38 @@ done_infd_oldsact_oldios:
 		(void)libc_tcsetattr(infd, 0, &old_ios);
 #endif /* !... */
 	}
-#endif /* (__CRT_HAVE_tcgetattr || __CRT_HAVE___tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) */
+
 
 	/* Restore signal handlers. */
-#if defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction)
+
 	{
 		unsigned int i;
 		for (i = 0; i < __COMPILER_LENOF(__NAMESPACE_LOCAL_SYM rpp_signals); ++i)
 			(void)libc_sigaction(__NAMESPACE_LOCAL_SYM rpp_signals[i], &old_sact[i], NULL);
 	}
-#endif /* __CRT_HAVE_sigaction || __CRT_HAVE___sigaction */
+
 
 	/* Close the input file handle if we've manually opened `/dev/tty' above. */
 #ifdef __PRIVATE_WANT_err_infd
 done_infd:
 #endif /* __PRIVATE_WANT_err_infd */
-#if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close) || defined(__CRT_HAVE___libc_close)
+
 	if (infd != __STDIN_FILENO)
 		libc_close(infd);
-#endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close || __CRT_HAVE___libc_close */
+
 
 	/* Re-throw signals that arrived in the mean time. */
-#if defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction)
+
 	{
 		unsigned int i;
 		for (i = 0; i < __COMPILER_LENOF(__NAMESPACE_LOCAL_SYM rpp_signals); ++i) {
 			if (!__NAMESPACE_LOCAL_SYM rpp_arrived[i])
 				continue;
-#if (defined(__CRT_HAVE_kill) || defined(__CRT_HAVE___kill) || defined(__CRT_HAVE___libc_kill)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid))
+
 			libc_kill(libc_getpid(), __NAMESPACE_LOCAL_SYM rpp_signals[i]);
-#elif defined(__CRT_HAVE_raise) || ((defined(__CRT_HAVE_pthread_kill) || defined(__CRT_HAVE_thr_kill)) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self)))
-			libc_raise(__NAMESPACE_LOCAL_SYM rpp_signals[i]);
-#endif /* ... */
+
+
+
 
 			/* Handle signals for which we must start over when they're received. */
 #if defined(__SIGTSTP) || defined(__SIGTTIN) || defined(__SIGTTOU)
@@ -357,13 +357,13 @@ done_infd:
 
 		}
 	}
-#endif /* __CRT_HAVE_sigaction || __CRT_HAVE___sigaction */
+
 
 	/* Check if we have to start over (due to having received certain signals) */
-#if defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction)
+
 	if (must_restart && buf != NULL)
 		goto again;
-#endif /* __CRT_HAVE_sigaction || __CRT_HAVE___sigaction */
+
 
 	/* Done! */
 	return buf;
@@ -376,7 +376,7 @@ err_infd_oldsact_oldios:
 #undef __PRIVATE_WANT_err_infd_oldios
 err_infd_oldios:
 	/* Restore terminal IOS configuration */
-#if (defined(__CRT_HAVE_tcgetattr) || defined(__CRT_HAVE___tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl))
+
 	if (libc_memcmp(&old_ios, &new_ios, sizeof(struct termios)) != 0) {
 #if defined(__TCSAFLUSH) && defined(__TCSASOFT)
 		(void)libc_tcsetattr(infd, __TCSAFLUSH | __TCSASOFT, &old_ios);
@@ -386,7 +386,7 @@ err_infd_oldios:
 		(void)libc_tcsetattr(infd, 0, &old_ios);
 #endif /* !... */
 	}
-#endif /* (__CRT_HAVE_tcgetattr || __CRT_HAVE___tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) */
+
 	buf = NULL;
 	goto done_infd;
 #endif /* __PRIVATE_WANT_err_infd_oldios */

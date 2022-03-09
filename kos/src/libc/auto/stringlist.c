@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5456bd9 */
+/* HASH CRC-32:0xdb36ea18 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -124,9 +124,9 @@ NOTHROW_NCX(LIBCCALL libc_sl_delete)(struct _stringlist *sl,
 		             count - i,
 		             sizeof(char *));
 		if (freeit) {
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 			libc_free(s);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 		}
 		return 0;
 	}

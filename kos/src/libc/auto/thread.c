@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70c543a8 */
+/* HASH CRC-32:0xd5b92fbb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,29 +42,29 @@ NOTHROW_NCX(LIBCCALL libc_thr_create)(void *stack_base,
                                       thread_t *newthread) {
 	errno_t result;
 	if (flags || stack_base || stack_size) {
-#ifndef __CRT_HAVE_pthread_attr_init
-#ifdef ENOSYS
-		return ENOSYS;
-#else /* ENOSYS */
-		return 1;
-#endif /* !ENOSYS */
-#else /* !__CRT_HAVE_pthread_attr_init */
+
+
+
+
+
+
+
 		pthread_attr_t attr;
 		if (flags & ~(0 |
-#if defined(__CRT_HAVE_pthread_attr_setscope) && defined(__PTHREAD_SCOPE_SYSTEM)
+#ifdef __PTHREAD_SCOPE_SYSTEM
 		              0x00000001 |
-#endif /* __CRT_HAVE_pthread_attr_setscope && __PTHREAD_SCOPE_SYSTEM */
-#if defined(__CRT_HAVE_pthread_attr_setdetachstate) && defined(__PTHREAD_CREATE_DETACHED)
+#endif /* __PTHREAD_SCOPE_SYSTEM */
+#ifdef __PTHREAD_CREATE_DETACHED
 		              0x00000040 |
-#endif /* __CRT_HAVE_pthread_attr_setdetachstate && __PTHREAD_CREATE_DETACHED */
+#endif /* __PTHREAD_CREATE_DETACHED */
 		              0)
-#if !defined(__CRT_HAVE_pthread_attr_setstack) && !defined(__CRT_HAVE_pthread_attr_setstacksize)
-		    || stack_base || stack_size
-#elif !defined(__CRT_HAVE_pthread_attr_setstack) && (!defined(__CRT_HAVE_pthread_attr_setstackaddr) || !defined(__CRT_HAVE_pthread_attr_setstacksize))
-		    || stack_base
-#elif !defined(__CRT_HAVE_pthread_attr_setstacksize) && ((!defined(__CRT_HAVE_pthread_attr_getstack) && (!defined(__CRT_HAVE_pthread_attr_getstackaddr) || !defined(__CRT_HAVE_pthread_attr_getstacksize))) || !defined(__CRT_HAVE_pthread_attr_setstack))
-		    || (!stack_base && stack_size)
-#endif /* ... */
+
+
+
+
+
+
+
 		    )
 		{
 #ifdef ENOSYS
@@ -76,34 +76,34 @@ NOTHROW_NCX(LIBCCALL libc_thr_create)(void *stack_base,
 		result = libc_pthread_attr_init(&attr);
 		if unlikely(result != 0)
 			return result;
-#if defined(__CRT_HAVE_pthread_attr_setscope) && defined(__PTHREAD_SCOPE_SYSTEM)
+#ifdef __PTHREAD_SCOPE_SYSTEM
 		if (flags & 0x00000001) {
 			result = libc_pthread_attr_setscope(&attr, __PTHREAD_SCOPE_SYSTEM);
 			if unlikely(result != 0)
 				goto done_attr;
 		}
-#endif /* __CRT_HAVE_pthread_attr_setscope && __PTHREAD_SCOPE_SYSTEM */
-#if defined(__CRT_HAVE_pthread_attr_setdetachstate) && defined(__PTHREAD_CREATE_DETACHED)
+#endif /* __PTHREAD_SCOPE_SYSTEM */
+#ifdef __PTHREAD_CREATE_DETACHED
 		if (flags & 0x00000040) {
 			result = libc_pthread_attr_setdetachstate(&attr, __PTHREAD_CREATE_DETACHED);
 			if unlikely(result != 0)
 				goto done_attr;
 		}
-#endif /* __CRT_HAVE_pthread_attr_setdetachstate && __PTHREAD_CREATE_DETACHED */
-#if defined(__CRT_HAVE_pthread_attr_setstack) || (defined(__CRT_HAVE_pthread_attr_setstackaddr) && defined(__CRT_HAVE_pthread_attr_setstacksize))
+#endif /* __PTHREAD_CREATE_DETACHED */
+
 		if (stack_base) {
 			result = libc_pthread_attr_setstack(&attr, stack_base, stack_size);
 			if unlikely(result != 0)
 				goto done_attr;
 		} else
-#endif /* __CRT_HAVE_pthread_attr_setstack || (__CRT_HAVE_pthread_attr_setstackaddr && __CRT_HAVE_pthread_attr_setstacksize) */
-#if defined(__CRT_HAVE_pthread_attr_setstacksize) || ((defined(__CRT_HAVE_pthread_attr_getstack) || (defined(__CRT_HAVE_pthread_attr_getstackaddr) && defined(__CRT_HAVE_pthread_attr_getstacksize))) && defined(__CRT_HAVE_pthread_attr_setstack))
+
+
 		if (stack_size) {
 			result = libc_pthread_attr_setstacksize(&attr, stack_size);
 			if unlikely(result != 0)
 				goto done_attr;
 		} else
-#endif /* __CRT_HAVE_pthread_attr_setstacksize || ((__CRT_HAVE_pthread_attr_getstack || (__CRT_HAVE_pthread_attr_getstackaddr && __CRT_HAVE_pthread_attr_getstacksize)) && __CRT_HAVE_pthread_attr_setstack) */
+
 		{
 		}
 
@@ -111,10 +111,10 @@ NOTHROW_NCX(LIBCCALL libc_thr_create)(void *stack_base,
 		result = libc_pthread_create(newthread, &attr, start_routine, arg);
 		goto done_attr; /* Suppress warnings if not otherwise used. */
 done_attr:;
-#ifdef __CRT_HAVE_pthread_attr_destroy
+
 		libc_pthread_attr_destroy(&attr);
-#endif /* __CRT_HAVE_pthread_attr_destroy */
-#endif /* __CRT_HAVE_pthread_attr_init */
+
+
 	} else {
 		/* Create new thread with default attributes. */
 		result = libc_pthread_create(newthread, NULL, start_routine, arg);

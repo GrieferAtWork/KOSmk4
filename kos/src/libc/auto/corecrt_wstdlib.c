@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbe10b89 */
+/* HASH CRC-32:0xb2a9364f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -586,24 +586,24 @@ NOTHROW_NCX(LIBDCALL libd__wfullpath)(char16_t *buf,
 	if unlikely(!utf8_path)
 		return NULL;
 	utf8_realpath = libd__fullpath(NULL, utf8_path, 0);
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(utf8_path);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 	if unlikely(!utf8_realpath)
 		return NULL;
 	wcs_realpath = libd_convert_mbstowcs(utf8_realpath);
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(utf8_realpath);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 	if unlikely(!wcs_realpath)
 		return NULL;
 	if (!buf)
 		return wcs_realpath;
 	reqlen = libd_wcslen(wcs_realpath) + 1;
 	if (reqlen > buflen) {
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 		libc_free(wcs_realpath);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 #ifdef ERANGE
 		(void)libc_seterrno(ERANGE);
 #else /* ERANGE */
@@ -612,9 +612,9 @@ NOTHROW_NCX(LIBDCALL libd__wfullpath)(char16_t *buf,
 		return NULL;
 	}
 	(char16_t *)libc_memcpyw(buf, wcs_realpath, reqlen);
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(wcs_realpath);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 	return buf;
 }
 #include <libc/errno.h>
@@ -630,24 +630,24 @@ NOTHROW_NCX(LIBKCALL libc__wfullpath)(char32_t *buf,
 	if unlikely(!utf8_path)
 		return NULL;
 	utf8_realpath = libc__fullpath(NULL, utf8_path, 0);
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(utf8_path);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 	if unlikely(!utf8_realpath)
 		return NULL;
 	wcs_realpath = libc_convert_mbstowcs(utf8_realpath);
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(utf8_realpath);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 	if unlikely(!wcs_realpath)
 		return NULL;
 	if (!buf)
 		return wcs_realpath;
 	reqlen = libc_wcslen(wcs_realpath) + 1;
 	if (reqlen > buflen) {
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 		libc_free(wcs_realpath);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 #ifdef ERANGE
 		(void)libc_seterrno(ERANGE);
 #else /* ERANGE */
@@ -656,9 +656,9 @@ NOTHROW_NCX(LIBKCALL libc__wfullpath)(char32_t *buf,
 		return NULL;
 	}
 	(char32_t *)libc_memcpyl(buf, wcs_realpath, reqlen);
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(wcs_realpath);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 	return buf;
 }
 #include <libc/errno.h>

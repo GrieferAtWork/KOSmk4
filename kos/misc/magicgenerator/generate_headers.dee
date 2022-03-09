@@ -40,6 +40,46 @@ fs.chdir(fs.headof(__FILE__) + "/../../");
 
 final global HASH_FUNCTION = "CRC-32";
 
+@@Names of all of the functions unconditionally defined
+@@via `__CRT_HAVE_*` in "/kos/src/libc/crt-features.h".
+global knownUserspaceCrtFeaturesAlways: {string...} = HashSet();
+
+@@Similar to @knownUserspaceCrtFeaturesAlways, but these
+@@are the conditionally available functions.
+global knownUserspaceCrtFeaturesConditionally: {string...} = HashSet();
+
+class AutoFilePPAssume: PPAssume {
+	this = super;
+
+	@@Return the known value of a macro
+	public function getMacro(name: string): int | bool | none {
+		local result = this.macros.get(name);
+		/* Optimization: __CRT_HAVE_* macros have  */
+		if (result is none && name.startswith("__CRT_HAVE_") &&
+		    this.isMacroDefined("__KERNEL__") === false) {
+			local symname = name[#"__CRT_HAVE_":];
+			if (symname in knownUserspaceCrtFeaturesAlways)
+				return true; /* Symbol is always available */
+			if (symname !in knownUserspaceCrtFeaturesConditionally)
+				return false; /* Symbol isn't conditionally available (--> not available at all) */
+		}
+		return result;
+	}
+
+	@@Return a copy of @this @PPAssume with the given assumption
+	public function withAssumption(branch: PPBranch, value: int | bool = true): PPAssume {
+		local result = AutoFilePPAssume(macros: this.macros);
+		result.assumptions = copy this.assumptions;
+		result.addAssumption(branch, value);
+		return result;
+	}
+}
+
+function createAutoFilePPAssume(macros: {string: (int | bool)} = none): PPAssume {
+	return AutoFilePPAssume(macros: macros, assumptions: Dict());
+}
+
+
 @@Macro   definition  assumptions  that  may  be  made
 @@in headers and <libc/local/...> implementation files
 final global ppAssumeHeaderFiles: PPAssume = createPPAssume({
@@ -48,7 +88,7 @@ final global ppAssumeHeaderFiles: PPAssume = createPPAssume({
 });
 
 @@Macro definition assumptions that may be made inside of libc
-final global ppAssumeSourceFiles: PPAssume = createPPAssume({
+final global ppAssumeSourceFiles: PPAssume = createAutoFilePPAssume({
 	"__BUILDING_LIBC" : 1,
 	"__SIZEOF_CHAR__" : 1,
 	"__KOS__"         : 1,
@@ -402,10 +442,11 @@ function customDirectivesParser(context: LoaderContext): bool {
 	}	break;
 
 	case "declare_user_export":
+	case "declare_user_import":
 	case "declare_kernel_export":
 	case "declare_kernel_only_export":
 	case "declare_known_section_class": {
-		local s = tok == "declare_user_export"
+		local s = (tok == "declare_user_export" || tok == "declare_user_import")
 			? knownUserExports
 			: tok == "declare_kernel_export"
 			? knownKernelExports
@@ -499,14 +540,14 @@ function doPrint_src_libc_crtFeatures(fp: File) {
 	local wrt = CWriter(fp);
 	for (local name: crtFeatureConditions.keys.sorted()) {
 		local cond = crtFeatureConditions[name];
-		if (cond == "1") {
-			/* Speed up file printing in this simple case */
-			wrt << "#define __CRT_HAVE_" << name << "\n";
+		if (cond in ["1", "!defined(__KERNEL__)"]) {
+			knownUserspaceCrtFeaturesAlways.insert(name);
 		} else {
-			CWriter_ppIfEscaped(wrt, cond, ESCAPE_MODE_NONE);
-			wrt << "#define __CRT_HAVE_" << name << "\n";
-			wrt.ppEndif();
+			knownUserspaceCrtFeaturesConditionally.insert(name);
 		}
+		CWriter_ppIfEscaped(wrt, cond, ESCAPE_MODE_NONE);
+		wrt << "#define __CRT_HAVE_" << name << "\n";
+		wrt.ppEndif();
 	}
 	wrt.flush();
 }
@@ -1120,7 +1161,7 @@ function startScanSectionJobs(filenamePattern: string) {
 
 try {
 
-	messagePrefix = "1/3";
+	messagePrefix = "1/4";
 	/* Load all the definitions files */
 	local LIBC_PATH = "src/libc/magic";
 	for (local filename: fs.query(LIBC_PATH + "/*.c")) {
@@ -1176,7 +1217,7 @@ try {
 	startScanSectionJobs("src/libc/user/*.c");
 	waitTasks();
 
-	messagePrefix = "2/3";
+	messagePrefix = "2/4";
 
 	/* Define some special files */
 	startTask(updateHashedFile, ("include/crt-features/crt-kos-kernel.h", doPrint_include_crtFeatures_crtKosKernel));
@@ -1218,6 +1259,11 @@ try {
 				cWriter.flush();
 			}));
 	}
+
+	/* Need another barrier here because assumptions
+	 * gathered in `doPrint_src_libc_crtFeatures' */
+	waitTasks();
+	messagePrefix = "3/4";
 
 	/* TODO: When generating libc auto/user implementations, the keyword "static"
 	 *       should be escaped by being suffixed by
@@ -1267,7 +1313,7 @@ try {
 	}
 
 	waitTasks();
-	messagePrefix = "3/3";
+	messagePrefix = "4/4";
 
 	startTask(updateHashedFile, ("include/gnu/stubs.h", doPrint_include_gnu_stubs));
 

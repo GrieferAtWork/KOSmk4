@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x349c8394 */
+/* HASH CRC-32:0xb20933a7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -306,9 +306,9 @@ NOTHROW_NCX(LIBCCALL libc_hdestroy_r)(struct hsearch_data *htab) {
 #endif /* EINVAL */
 		return;
 	}
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(htab->table);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 	htab->table = NULL;
 }
 #endif /* !__KERNEL__ */
@@ -727,9 +727,9 @@ INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
 		if (r != NULL)
 			r->is_red = 0;
 	}
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(unchained);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 done:
 	__freea(nodestack);
 	return retval;
@@ -835,9 +835,9 @@ again:
 		l = ((void **)root)[1];
 		r = ((void **)root)[2];
 		(*freefct)(((void **)root)[0], arg);
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 		libc_free(root);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 		if (l) {
 			libc_tdestroy_r(r, freefct, arg);
 			root = l;

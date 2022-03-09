@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe306eb62 */
+/* HASH CRC-32:0xb65dbfd4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,17 +43,17 @@ NOTHROW_RPC_NOKOS(LIBCCALL libc_endmntent)(FILE *stream) {
 /* >> getmntent(3), getmntent_r(3) */
 INTERN ATTR_SECTION(".text.crt.database.mntent") NONNULL((1)) struct mntent *
 NOTHROW_RPC(LIBCCALL libc_getmntent)(FILE *stream) {
-#if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
+
 	static struct mntent *ent = NULL;
 	static char *buf          = NULL;
 	if (!ent && (ent = (struct mntent *)libc_malloc(sizeof(struct mntent))) == NULL)
 		return NULL;
 	if (!buf && (buf = (char *)libc_malloc(512 * sizeof(char))) == NULL)
 		return NULL;
-#else /* __CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign */
-	static struct mntent ent[1];
-	static char buf[512];
-#endif /* !__CRT_HAVE_malloc && !__CRT_HAVE___libc_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE___libc_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE___libc_memalign && !__CRT_HAVE_posix_memalign */
+
+
+
+
 	return libc_getmntent_r(stream, ent, buf, 512);
 }
 /* >> getmntent(3), getmntent_r(3) */

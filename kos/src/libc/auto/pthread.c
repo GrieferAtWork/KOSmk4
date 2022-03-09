@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1f49257 */
+/* HASH CRC-32:0x5c2b4fa3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,11 +72,11 @@ again:
 			__hybrid_atomic_store(*once_control,
 			                      __PTHREAD_ONCE_INIT,
 			                      __ATOMIC_RELEASE);
-#ifdef __CRT_HAVE_except_rethrow
+
 			libc_except_rethrow();
-#else /* __CRT_HAVE_except_rethrow */
-			throw;
-#endif /* !__CRT_HAVE_except_rethrow */
+
+
+
 		}
 #else /* __cplusplus */
 		(*init_routine)();
@@ -227,9 +227,9 @@ again:
 		/* Someone else was faster. - Destroy our version of the key,  and
 		 * try again in order to use the other key that was created in the
 		 * mean time. */
-#if defined(__CRT_HAVE_pthread_key_delete) || defined(__CRT_HAVE_tss_delete)
+
 		libc_pthread_key_delete(kv);
-#endif /* __CRT_HAVE_pthread_key_delete || __CRT_HAVE_tss_delete */
+
 		goto again;
 	}
 	return 0;

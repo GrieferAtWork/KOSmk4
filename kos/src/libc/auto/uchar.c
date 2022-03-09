@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15a19974 */
+/* HASH CRC-32:0x7967ffd8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -102,9 +102,9 @@ NOTHROW_NCX(LIBDCALL libd_convert_wcstombsn)(char16_t const *__restrict str,
 	convert_data.fd_surrogate = 0;
 
 	if unlikely(libd_format_wto8(&convert_data, str, len) < 0) {
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 		libc_free(printer_data.ap_base);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 		return NULL;
 	}
 	return libc_format_aprintf_pack((struct format_aprintf_data *)&printer_data, preslen);
@@ -135,9 +135,9 @@ NOTHROW_NCX(LIBKCALL libc_convert_wcstombsn)(char32_t const *__restrict str,
 
 
 	if unlikely(libc_format_wto8(&convert_data, str, len) < 0) {
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 		libc_free(printer_data.ap_base);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 		return NULL;
 	}
 	return libc_format_aprintf_pack((struct format_aprintf_data *)&printer_data, preslen);
@@ -189,11 +189,11 @@ NOTHROW_NCX(LIBDCALL libd_convert_wcstombsvn)(char16_t const *const *__restrict 
 	}
 	return result;
 err:
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	while (i--)
 		libc_free(result[i]);
 	libc_free(result);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 	return NULL;
 }
 #include <libc/errno.h>
@@ -215,11 +215,11 @@ NOTHROW_NCX(LIBKCALL libc_convert_wcstombsvn)(char32_t const *const *__restrict 
 	}
 	return result;
 err:
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	while (i--)
 		libc_free(result[i]);
 	libc_free(result);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 	return NULL;
 }
 #include <libc/errno.h>
@@ -266,9 +266,9 @@ NOTHROW_NCX(LIBDCALL libd_convert_mbstowcsn)(char const *__restrict str,
 	convert_data.fd_arg        = &printer_data;
 	convert_data.fd_incomplete = 0;
 	if unlikely(libd_format_8tow(&convert_data, str, len) < 0) {
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 		libc_free(printer_data.ap_base);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 		return NULL;
 	}
 	return libd_format_waprintf_pack((struct format_c16aprintf_data *)&printer_data, preslen);
@@ -295,9 +295,9 @@ NOTHROW_NCX(LIBKCALL libc_convert_mbstowcsn)(char const *__restrict str,
 	convert_data.fd_arg        = &printer_data;
 	convert_data.fd_incomplete = 0;
 	if unlikely(libc_format_8tow(&convert_data, str, len) < 0) {
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 		libc_free(printer_data.ap_base);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 		return NULL;
 	}
 	return libc_format_waprintf_pack((struct format_c32aprintf_data *)&printer_data, preslen);
@@ -349,11 +349,11 @@ NOTHROW_NCX(LIBDCALL libd_convert_mbstowcsvn)(char const *const *__restrict vect
 	}
 	return result;
 err:
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	while (i--)
 		libc_free(result[i]);
 	libc_free(result);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 	return NULL;
 }
 #include <libc/errno.h>
@@ -375,11 +375,11 @@ NOTHROW_NCX(LIBKCALL libc_convert_mbstowcsvn)(char const *const *__restrict vect
 	}
 	return result;
 err:
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	while (i--)
 		libc_free(result[i]);
 	libc_free(result);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 	return NULL;
 }
 #endif /* !__KERNEL__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96178681 */
+/* HASH CRC-32:0x66526ddf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -253,19 +253,19 @@ got_result:
 			linebuf_ptr  = NULL;
 			/*linebuf_alloc = 0;*/ /* Not needed */
 		} else {
-#if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
+
 			result = (char *)libc_malloc(sizeof(char));
-#else /* __CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign */
-			result = (char *)libc_realloc(NULL, sizeof(char));
-#endif /* !__CRT_HAVE_malloc && !__CRT_HAVE___libc_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE___libc_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE___libc_memalign && !__CRT_HAVE_posix_memalign */
+
+
+
 			if unlikely(!result)
 				goto done;
 			result_alloc = 1;
 		}
 	}
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(linebuf_ptr);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 	/* Trim a potential trailing line-feed */
 	if (result_length && result[result_length - 1] == '\n')
 		--result_length;
@@ -286,10 +286,10 @@ got_result:
 done:
 	return result;
 err:
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(linebuf_ptr);
 	libc_free(result);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 	return NULL;
 }
 #endif /* !__KERNEL__ */

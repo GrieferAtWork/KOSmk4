@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad15ec1 */
+/* HASH CRC-32:0x46c09bf9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -97,9 +97,9 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(2, 0) void
 (LIBCCALL libc_vwarnc)(errno_t used_errno,
                        char const *format,
                        va_list args) THROWS(...) {
-#if (defined(__CRT_HAVE_flockfile) || defined(__CRT_HAVE__lock_file) || defined(__CRT_HAVE__IO_flockfile)) && (defined(__CRT_HAVE_funlockfile) || defined(__CRT_HAVE__unlock_file) || defined(__CRT_HAVE__IO_funlockfile))
+
 	libc_flockfile(stderr);
-#endif /* (__CRT_HAVE_flockfile || __CRT_HAVE__lock_file || __CRT_HAVE__IO_flockfile) && (__CRT_HAVE_funlockfile || __CRT_HAVE__unlock_file || __CRT_HAVE__IO_funlockfile) */
+
 	libc_fprintf(stderr, "%s: ", program_invocation_short_name);
 	if (format) {
 		libc_vfprintf(stderr, format, args);
@@ -107,9 +107,9 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(2, 0) void
 	} else {
 		libc_fprintf(stderr, "%s\n", libc_strerror(used_errno));
 	}
-#if (defined(__CRT_HAVE_flockfile) || defined(__CRT_HAVE__lock_file) || defined(__CRT_HAVE__IO_flockfile)) && (defined(__CRT_HAVE_funlockfile) || defined(__CRT_HAVE__unlock_file) || defined(__CRT_HAVE__IO_funlockfile))
+
 	libc_funlockfile(stderr);
-#endif /* (__CRT_HAVE_flockfile || __CRT_HAVE__lock_file || __CRT_HAVE__IO_flockfile) && (__CRT_HAVE_funlockfile || __CRT_HAVE__unlock_file || __CRT_HAVE__IO_funlockfile) */
+
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -142,16 +142,16 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 2) void
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 0) void
 (LIBCCALL libc_vwarnx)(char const *format,
                        va_list args) THROWS(...) {
-#if (defined(__CRT_HAVE_flockfile) || defined(__CRT_HAVE__lock_file) || defined(__CRT_HAVE__IO_flockfile)) && (defined(__CRT_HAVE_funlockfile) || defined(__CRT_HAVE__unlock_file) || defined(__CRT_HAVE__IO_funlockfile))
+
 	libc_flockfile(stderr);
-#endif /* (__CRT_HAVE_flockfile || __CRT_HAVE__lock_file || __CRT_HAVE__IO_flockfile) && (__CRT_HAVE_funlockfile || __CRT_HAVE__unlock_file || __CRT_HAVE__IO_funlockfile) */
+
 	libc_fprintf(stderr, "%s: ", program_invocation_short_name);
 	if (format)
 		libc_vfprintf(stderr, format, args);
 	libc_fputc('\n', stderr);
-#if (defined(__CRT_HAVE_flockfile) || defined(__CRT_HAVE__lock_file) || defined(__CRT_HAVE__IO_flockfile)) && (defined(__CRT_HAVE_funlockfile) || defined(__CRT_HAVE__unlock_file) || defined(__CRT_HAVE__IO_funlockfile))
+
 	libc_funlockfile(stderr);
-#endif /* (__CRT_HAVE_flockfile || __CRT_HAVE__lock_file || __CRT_HAVE__IO_flockfile) && (__CRT_HAVE_funlockfile || __CRT_HAVE__unlock_file || __CRT_HAVE__IO_funlockfile) */
+
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

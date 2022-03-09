@@ -125,6 +125,25 @@ class PPAssume {
 	@@Branch value assumptions that may be made
 	public member assumptions: {PPBranch: int | bool};
 
+	@@Return the known value of a macro
+	public function getMacro(name: string): int | bool | none {
+		return macros.get(name);
+	}
+
+	@@Check if you're (currently) allowed to assume that "defined({name})"
+	@@@return: true:  Macro is known to be defined
+	@@@return: false: Macro is known not to be defined
+	@@@return: none:  Macro may or may not be defined
+	public function isMacroDefined(name: string): bool | none {
+		local res = getMacro(name);
+		if (res !is none)
+			return res !== false;
+		res = assumptions.get(PPBranch(BRT_DEFINED, name));
+		if (res is int)
+			res = !!res;
+		return res;
+	}
+
 	@@Return a copy of @this @PPAssume with the given assumption
 	public function withAssumption(branch: PPBranch, value: int | bool = true): PPAssume {
 		local result = PPAssume(macros: macros);
@@ -590,7 +609,7 @@ again_switch_typ:
 		case BRT_UNDEF: {
 			/* Check if there's a known-macro-expression for this value */
 			ASSERT(data is string);
-			repl = assume.macros.get(data);
+			repl = assume.getMacro(data);
 			if (repl is int) {
 				typ  = BRT_CONST;
 				data = repl;
@@ -705,7 +724,7 @@ again_switch_typ:
 
 		case BRT_DEFINED:
 			ASSERT(data is string);
-			repl = assume.macros.get(data);
+			repl = assume.getMacro(data);
 			if (repl !is none) {
 				typ  = BRT_CONST;
 				data = repl === false ? 0 : 1;

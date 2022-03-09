@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbee3f95 */
+/* HASH CRC-32:0x367689bb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -107,13 +107,13 @@ NOTHROW_NCX(LIBDCALL libd__wfsopen)(char16_t const *filename,
 	if unlikely(!utf8_mode)
 		goto done_filename;
 	result = libd__fsopen(utf8_filename, utf8_mode, sh_flag);
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(utf8_mode);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 done_filename:
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(utf8_filename);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 done:
 	return result;
 }
@@ -131,13 +131,13 @@ NOTHROW_NCX(LIBKCALL libc__wfsopen)(char32_t const *filename,
 	if unlikely(!utf8_mode)
 		goto done_filename;
 	result = libc__fsopen(utf8_filename, utf8_mode, sh_flag);
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(utf8_mode);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 done_filename:
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(utf8_filename);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 done:
 	return result;
 }
@@ -150,9 +150,9 @@ NOTHROW_NCX(LIBDCALL libd__wfdopen)(fd_t fd,
 	if unlikely(!utf8_mode)
 		goto done;
 	result = libc_fdopen(fd, utf8_mode);
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(utf8_mode);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 done:
 	return result;
 }
@@ -165,9 +165,9 @@ NOTHROW_NCX(LIBKCALL libc__wfdopen)(fd_t fd,
 	if unlikely(!utf8_mode)
 		goto done;
 	result = libc_fdopen(fd, utf8_mode);
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(utf8_mode);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 done:
 	return result;
 }
@@ -186,15 +186,15 @@ NOTHROW_NCX(LIBDCALL libd__wfopen_s)(FILE **pstream,
 	if unlikely(!utf8_mode)
 		goto err_badalloc_filename;
 	result = libd_fopen_s(pstream, utf8_filename, utf8_mode);
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(utf8_mode);
 	libc_free(utf8_filename);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 	return result;
 err_badalloc_filename:
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(utf8_filename);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 err_badalloc:
 #ifdef ENOMEM
 	return __libc_geterrno_or(ENOMEM);
@@ -217,15 +217,15 @@ NOTHROW_NCX(LIBKCALL libc__wfopen_s)(FILE **pstream,
 	if unlikely(!utf8_mode)
 		goto err_badalloc_filename;
 	result = libc_fopen_s(pstream, utf8_filename, utf8_mode);
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(utf8_mode);
 	libc_free(utf8_filename);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 	return result;
 err_badalloc_filename:
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(utf8_filename);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 err_badalloc:
 #ifdef ENOMEM
 	return __libc_geterrno_or(ENOMEM);
@@ -249,15 +249,15 @@ NOTHROW_NCX(LIBDCALL libd__wfreopen_s)(FILE **pstream,
 	if unlikely(!utf8_mode)
 		goto err_badalloc_filename;
 	result = libd_freopen_s(pstream, utf8_filename, utf8_mode, stream);
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(utf8_mode);
 	libc_free(utf8_filename);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 	return result;
 err_badalloc_filename:
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(utf8_filename);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 err_badalloc:
 #ifdef ENOMEM
 	return __libc_geterrno_or(ENOMEM);
@@ -281,15 +281,15 @@ NOTHROW_NCX(LIBKCALL libc__wfreopen_s)(FILE **pstream,
 	if unlikely(!utf8_mode)
 		goto err_badalloc_filename;
 	result = libc_freopen_s(pstream, utf8_filename, utf8_mode, stream);
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(utf8_mode);
 	libc_free(utf8_filename);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 	return result;
 err_badalloc_filename:
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+
 	libc_free(utf8_filename);
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+
 err_badalloc:
 #ifdef ENOMEM
 	return __libc_geterrno_or(ENOMEM);

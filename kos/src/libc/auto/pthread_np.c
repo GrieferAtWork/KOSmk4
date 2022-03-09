@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x684268fd */
+/* HASH CRC-32:0x1693d36c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,9 +47,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_stackseg_np)(pthread_t pthread,
 			sinfo->ss_size  = stacksize;
 			sinfo->ss_flags = 0;
 		}
-#ifdef __CRT_HAVE_pthread_attr_destroy
+
 		libc_pthread_attr_destroy(&attr);
-#endif /* __CRT_HAVE_pthread_attr_destroy */
+
 	}
 	return result;
 }

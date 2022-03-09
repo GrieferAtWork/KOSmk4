@@ -162,25 +162,25 @@ __DECL_BEGIN
 /* These functions exist by default, unless explicitly defined as not existing! */
 #ifndef __CRT_HAVE_dlopen
 #define __CRT_HAVE_dlopen
-#elif (__CRT_HAVE_dlopen + 0) == 0
+#elif (-__CRT_HAVE_dlopen - 1) == -1
 #undef __CRT_HAVE_dlopen
 #endif /* !__CRT_HAVE_dlopen */
 
 #ifndef __CRT_HAVE_dlclose
 #define __CRT_HAVE_dlclose
-#elif (__CRT_HAVE_dlclose + 0) == 0
+#elif (-__CRT_HAVE_dlclose - 1) == -1
 #undef __CRT_HAVE_dlclose
 #endif /* !__CRT_HAVE_dlclose */
 
 #ifndef __CRT_HAVE_dlsym
 #define __CRT_HAVE_dlsym
-#elif (__CRT_HAVE_dlsym + 0) == 0
+#elif (-__CRT_HAVE_dlsym - 1) == -1
 #undef __CRT_HAVE_dlsym
 #endif /* !__CRT_HAVE_dlsym */
 
 #ifndef __CRT_HAVE_dlerror
 #define __CRT_HAVE_dlerror
-#elif (__CRT_HAVE_dlerror + 0) == 0
+#elif (-__CRT_HAVE_dlerror - 1) == -1
 #undef __CRT_HAVE_dlerror
 #endif /* !__CRT_HAVE_dlerror */
 

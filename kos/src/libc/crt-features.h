@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2fcd642f */
+/* HASH CRC-32:0xb8e55c3f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4506,6 +4506,24 @@
 #define __CRT_HAVE_dirfd
 #define __CRT_HAVE_dirname
 #define __CRT_HAVE_div
+#define __CRT_HAVE_dladdr
+#define __CRT_HAVE_dlauxctrl
+#define __CRT_HAVE_dlclose
+#define __CRT_HAVE_dlerror
+#define __CRT_HAVE_dlexceptaware
+#define __CRT_HAVE_dlgethandle
+#define __CRT_HAVE_dlgetmodule
+#define __CRT_HAVE_dlmodulebase
+#define __CRT_HAVE_dlmodulefd
+#define __CRT_HAVE_dlmodulename
+#define __CRT_HAVE_dlopen
+#define __CRT_HAVE_dlsym
+#define __CRT_HAVE_dltlsaddr
+#define __CRT_HAVE_dltlsaddr2
+#define __CRT_HAVE_dltlsalloc
+#define __CRT_HAVE_dltlsallocseg
+#define __CRT_HAVE_dltlsfree
+#define __CRT_HAVE_dltlsfreeseg
 #define __CRT_HAVE_dn_comp
 #define __CRT_HAVE_dn_count_labels
 #define __CRT_HAVE_dn_expand

@@ -40,6 +40,18 @@
 %[define_replacement(sigset_t = "struct __sigset_struct")]
 %[default:section(".text.crt{|.dos}.database.aliases")]
 
+/* Tell magic about known "imports" (symbols from libdl)
+ *
+ * These are required for __CRT_HAVE_* optimizations that
+ * are done to expression in in "/kos/src/libc/auto/*.c". */
+%[declare_user_import(
+	"dlopen", "dlclose", "dltlsallocseg", "dltlsfreeseg", "dlgethandle",
+	"dlgetmodule", "dlmodulefd", "dlmodulename", "dlauxctrl", "dlerror",
+	"dlmodulebase", "dlexceptaware", "dltlsaddr", "dltlsaddr2", "dltlsalloc",
+	"dltlsfree", "dladdr", "dlsym",
+)]
+
+
 %[insert:prefix(
 #include <features.h>
 )]%{

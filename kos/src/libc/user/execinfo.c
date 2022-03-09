@@ -29,6 +29,7 @@
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
+#include <dlfcn.h>
 #include <format-printer.h>
 #include <stdbool.h>
 #include <string.h>

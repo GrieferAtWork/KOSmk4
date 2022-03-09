@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbedca84d */
+/* HASH CRC-32:0x3d313b2c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1134,19 +1134,19 @@ NOTHROW_NCX(LIBCCALL libc_format_aprintf_pack)(struct format_aprintf_data *__res
 	/* Free unused buffer memory. */
 	char *result;
 	if (self->ap_avail != 0) {
-#if defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
+
 		char *newbuf;
 		newbuf = (char *)libc_realloc(self->ap_base,
 		                         (self->ap_used + 1) *
 		                         sizeof(char));
 		if likely(newbuf)
 			self->ap_base = newbuf;
-#endif /* __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc */
+
 	} else {
 		if unlikely(!self->ap_used) {
 			/* Special case: Nothing was printed. */
 			__hybrid_assert(!self->ap_base);
-#if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
+
 			self->ap_base = (char *)libc_malloc(1 * sizeof(char));
 			if unlikely(!self->ap_base)
 				return NULL;
@@ -1154,9 +1154,9 @@ NOTHROW_NCX(LIBCCALL libc_format_aprintf_pack)(struct format_aprintf_data *__res
 
 
 
-#else /* __CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign */
-			return NULL;
-#endif /* !__CRT_HAVE_malloc && !__CRT_HAVE___libc_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE___libc_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE___libc_memalign && !__CRT_HAVE_posix_memalign */
+
+
+
 		}
 	}
 	result = self->ap_base;
