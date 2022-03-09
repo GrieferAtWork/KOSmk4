@@ -224,7 +224,7 @@ DEFINE_SYSCALL4(errno_t, prlimit64,
 
 #ifdef __ARCH_WANT_SYSCALL_GETRLIMIT
 DEFINE_SYSCALL2(errno_t, getrlimit, syscall_ulong_t, resource,
-                USER UNCHECKED struct rlimit *, old_rlim) {
+                USER UNCHECKED struct rlimit32 *, old_rlim) {
 	errno_t result;
 	struct rlimit64 koldlim;
 	validate_writable(old_rlim, sizeof(*old_rlim));
@@ -238,7 +238,7 @@ DEFINE_SYSCALL2(errno_t, getrlimit, syscall_ulong_t, resource,
 
 #ifdef __ARCH_WANT_SYSCALL_SETRLIMIT
 DEFINE_SYSCALL2(errno_t, setrlimit, syscall_ulong_t, resource,
-                USER UNCHECKED struct rlimit const *, new_rlim) {
+                USER UNCHECKED struct rlimit32 const *, new_rlim) {
 	errno_t result;
 	struct rlimit64 knewlim;
 	validate_readable(new_rlim, sizeof(*new_rlim));
