@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f2771b2 */
+/* HASH CRC-32:0xe51a197d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -133,9 +133,9 @@ __LOCAL_LIBC(__spawnvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((2, 4, 6, 7)) pid_t
 #endif /* !_WIN32 */
 	fullpath = (char *)__hybrid_alloca((path_len + 1 + file_len + 1) *
 	                                   sizeof(char));
-	dst = (char *)mempcpyc(fullpath, path, path_len, sizeof(char));
+	dst = (char *)libc_mempcpyc(fullpath, path, path_len, sizeof(char));
 	*dst++ = '/';
-	dst = (char *)mempcpyc(dst, file, file_len, sizeof(char));
+	dst = (char *)libc_mempcpyc(dst, file, file_len, sizeof(char));
 	*dst = '\0';
 	return libc_spawnve(mode, fullpath, ___argv, ___envp);
 }

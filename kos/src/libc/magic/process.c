@@ -517,6 +517,7 @@ $pid_t spawnve(__STDC_INT_AS_UINT_T mode,
 [[decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_TARGV)]]
 [[requires_include("<hybrid/__alloca.h>")]]
 [[requires($has_function(getenv) && $has_function(spawnve) && defined(__hybrid_alloca))]]
+[[dependency(mempcpyc, spawnve)]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[impl_include("<libc/errno.h>")]]
 [[impl_prefix(

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c060f5f */
+/* HASH CRC-32:0xab33c299 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,6 +52,20 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_getenv_defined
 #endif /* !... */
 #endif /* !__local___localdep_getenv_defined */
+#ifndef __local___localdep_mempcpyc_defined
+#define __local___localdep_mempcpyc_defined
+#ifdef __CRT_HAVE_mempcpyc
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempcpyc,(__dst,__src,__elem_count,__elem_size))
+#else /* __CRT_HAVE_mempcpyc */
+__NAMESPACE_LOCAL_END
+#include <libc/local/string/mempcpyc.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_mempcpyc __LIBC_LOCAL_NAME(mempcpyc)
+#endif /* !__CRT_HAVE_mempcpyc */
+#endif /* !__local___localdep_mempcpyc_defined */
 #ifndef __local___localdep_spawnve_defined
 #define __local___localdep_spawnve_defined
 #ifdef __CRT_HAVE_spawnve
@@ -129,9 +143,9 @@ __LOCAL_LIBC(__spawnvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((2, 4, 6, 7)) __pid
 #endif /* !_WIN32 */
 	__fullpath = (char *)__hybrid_alloca((__path_len + 1 + __file_len + 1) *
 	                                   sizeof(char));
-	__dst = (char *)__mempcpyc(__fullpath, __path, __path_len, sizeof(char));
+	__dst = (char *)(__NAMESPACE_LOCAL_SYM __localdep_mempcpyc)(__fullpath, __path, __path_len, sizeof(char));
 	*__dst++ = '/';
-	__dst = (char *)__mempcpyc(__dst, __file, __file_len, sizeof(char));
+	__dst = (char *)(__NAMESPACE_LOCAL_SYM __localdep_mempcpyc)(__dst, __file, __file_len, sizeof(char));
 	*__dst = '\0';
 	return (__NAMESPACE_LOCAL_SYM __localdep_spawnve)(__mode, __fullpath, ___argv, ___envp);
 }
