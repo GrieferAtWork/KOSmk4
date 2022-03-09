@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5fb5b522 */
+/* HASH CRC-32:0x52e56628 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1186,33 +1186,63 @@ NOTHROW_NCX(VLIBKCALL libc_swscanf)(char32_t const *__restrict src,
 	va_end(args);
 	return result;
 }
+#ifndef ____format_c16snprintf_data_defined
+#define ____format_c16snprintf_data_defined
+struct __format_c16snprintf_data {
+	char16_t      *__sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
+	__SIZE_TYPE__ __sd_bufsiz; /* Remaining buffer size. */
+};
+#endif /* !____format_c16snprintf_data_defined */
 /* >> vswprintf(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C16PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBDCALL libd_vswprintf)(char16_t *__restrict buf,
                                      size_t buflen,
                                      char16_t const *__restrict format,
                                      va_list args) {
-	COMPILER_IMPURE();
-	if (buflen)
-		*buf = 0;
-	/* TODO: format_wprintf() */
-	(void)format;
-	(void)args;
-	return 0;
+	struct __format_c16snprintf_data data;
+	__STDC_INT_AS_SSIZE_T result;
+	data.__sd_buffer = buf;
+	data.__sd_bufsiz = buflen;
+	result = (__STDC_INT_AS_SSIZE_T)libd_format_vwprintf(&libd_format_wsnprintf_printer,
+	                                                (void *)&data, format, args);
+	if (result >= 0) {
+		if (data.__sd_bufsiz != 0) {
+			*data.__sd_buffer = (char16_t)'\0';
+		} else {
+			if (buflen != 0)
+				buf[buflen - 1] = (char16_t)'\0';
+		}
+	}
+	return result;
 }
+#ifndef ____format_c32snprintf_data_defined
+#define ____format_c32snprintf_data_defined
+struct __format_c32snprintf_data {
+	char32_t      *__sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
+	__SIZE_TYPE__ __sd_bufsiz; /* Remaining buffer size. */
+};
+#endif /* !____format_c32snprintf_data_defined */
 /* >> vswprintf(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.format.printf") ATTR_LIBC_C32PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBKCALL libc_vswprintf)(char32_t *__restrict buf,
                                      size_t buflen,
                                      char32_t const *__restrict format,
                                      va_list args) {
-	COMPILER_IMPURE();
-	if (buflen)
-		*buf = 0;
-	/* TODO: format_wprintf() */
-	(void)format;
-	(void)args;
-	return 0;
+	struct __format_c32snprintf_data data;
+	__STDC_INT_AS_SSIZE_T result;
+	data.__sd_buffer = buf;
+	data.__sd_bufsiz = buflen;
+	result = (__STDC_INT_AS_SSIZE_T)libc_format_vwprintf(&libc_format_wsnprintf_printer,
+	                                                (void *)&data, format, args);
+	if (result >= 0) {
+		if (data.__sd_bufsiz != 0) {
+			*data.__sd_buffer = (char32_t)'\0';
+		} else {
+			if (buflen != 0)
+				buf[buflen - 1] = (char32_t)'\0';
+		}
+	}
+	return result;
 }
 /* >> swprintf(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C16PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T

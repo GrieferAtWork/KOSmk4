@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x838ce5c */
+/* HASH CRC-32:0x308986a2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -549,9 +549,9 @@ NOTHROW_NCX(LIBCCALL libc_vsnprintf)(char *__restrict buf,
 	result = (__STDC_INT_AS_SSIZE_T)libc_format_vprintf(&libc_format_snprintf_printer,
 	                                               (void *)&data, format, args);
 	if (result >= 0) {
-		if (data.__sd_bufsiz != 0)
+		if (data.__sd_bufsiz != 0) {
 			*data.__sd_buffer = '\0';
-		else {
+		} else {
 			/* Special handling for when the buffer was truncated.
 			 *
 			 * This part right here isn't mandated by any of the specs and wasn't

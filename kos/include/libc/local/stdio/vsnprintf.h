@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a657cfc */
+/* HASH CRC-32:0x8a7dc720 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,9 +71,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vsnprintf))(char *__restrict __buf, _
 	__result = (__STDC_INT_AS_SSIZE_T)(__NAMESPACE_LOCAL_SYM __localdep_format_vprintf)(&(__NAMESPACE_LOCAL_SYM __localdep_format_snprintf_printer),
 	                                               (void *)&__data, __format, __args);
 	if (__result >= 0) {
-		if (__data.__sd_bufsiz != 0)
+		if (__data.__sd_bufsiz != 0) {
 			*__data.__sd_buffer = '\0';
-		else {
+		} else {
 			/* Special handling for when the buffer was truncated.
 			 *
 			 * This part right here isn't mandated by any of the specs and wasn't

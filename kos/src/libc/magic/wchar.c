@@ -930,20 +930,40 @@ __STDC_INT_AS_SIZE_T swscanf([[nonnull]] wchar_t const *__restrict src,
                              [[nonnull, format]] wchar_t const *__restrict format, ...)
 	%{printf("vswscanf")}
 
+%[define_wchar_replacement(____format_wsnprintf_data_defined = ____format_c16snprintf_data_defined, ____format_c32snprintf_data_defined)]
+%[define_wchar_replacement(__format_wsnprintf_data = __format_c16snprintf_data, __format_c32snprintf_data)]
+
 @@>> vswprintf(3)
 [[std, guard, wchar]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.format.printf")]]
 [[export_as("_vswprintf_p")]] /* Normal wprintf already supports positional arguments! */
+[[impl_prefix(
+@@pp_ifndef ____format_wsnprintf_data_defined@@
+@#define@ ____format_wsnprintf_data_defined
+struct __format_wsnprintf_data {
+	wchar_t      *__sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
+	__SIZE_TYPE__ __sd_bufsiz; /* Remaining buffer size. */
+};
+@@pp_endif@@
+), dependency(format_wsnprintf_printer)]]
 __STDC_INT_AS_SIZE_T vswprintf([[outp_opt(min(return + 1, buflen))]] wchar_t *__restrict buf, size_t buflen,
                                [[nonnull, format]] wchar_t const *__restrict format, $va_list args) {
-	COMPILER_IMPURE();
-	if (buflen)
-		*buf = 0;
-	/* TODO: format_wprintf() */
-	(void)format;
-	(void)args;
-	return 0;
+	struct __format_wsnprintf_data data;
+	__STDC_INT_AS_SSIZE_T result;
+	data.__sd_buffer = buf;
+	data.__sd_bufsiz = buflen;
+	result = (__STDC_INT_AS_SSIZE_T)format_vwprintf(&format_wsnprintf_printer,
+	                                                (void *)&data, format, args);
+	if (result >= 0) {
+		if (data.__sd_bufsiz != 0) {
+			*data.__sd_buffer = (wchar_t)'\0';
+		} else {
+			if (buflen != 0)
+				buf[buflen - 1] = (wchar_t)'\0';
+		}
+	}
+	return result;
 }
 
 @@>> swprintf(3)

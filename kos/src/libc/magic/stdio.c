@@ -1613,9 +1613,9 @@ __STDC_INT_AS_SIZE_T vsnprintf([[outp_opt(min(return, buflen))]] char *__restric
 	result = (__STDC_INT_AS_SSIZE_T)format_vprintf(&format_snprintf_printer,
 	                                               (void *)&data, format, args);
 	if (result >= 0) {
-		if (data.__sd_bufsiz != 0)
+		if (data.__sd_bufsiz != 0) {
 			*data.__sd_buffer = '\0';
-		else {
+		} else {
 			/* Special handling for when the buffer was truncated.
 			 *
 			 * This part right here isn't mandated by any of the specs and wasn't
