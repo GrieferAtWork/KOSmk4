@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5febac03 */
+/* HASH CRC-32:0xf42c8b5d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,141 +93,141 @@ INTERN_CONST ATTR_SECTION(".rodata.crt.unicode.static.ctype") __INT8_TYPE__ cons
 /* >> iscntrl(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_iscntrl)(int ch) {
-#ifdef __crt_iscntrl
+
 	return __crt_iscntrl(ch);
-#else /* __crt_iscntrl */
-	return __ascii_iscntrl(ch);
-#endif /* !__crt_iscntrl */
+
+
+
 }
 #include <bits/crt/ctype.h>
 /* >> isspace(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_isspace)(int ch) {
-#ifdef __crt_isspace
+
 	return __crt_isspace(ch);
-#else /* __crt_isspace */
-	return __ascii_isspace(ch);
-#endif /* !__crt_isspace */
+
+
+
 }
 #include <bits/crt/ctype.h>
 /* >> isupper(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_isupper)(int ch) {
-#ifdef __crt_isupper
+
 	return __crt_isupper(ch);
-#else /* __crt_isupper */
-	return __ascii_isupper(ch);
-#endif /* !__crt_isupper */
+
+
+
 }
 #include <bits/crt/ctype.h>
 /* >> islower(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_islower)(int ch) {
-#ifdef __crt_islower
+
 	return __crt_islower(ch);
-#else /* __crt_islower */
-	return __ascii_islower(ch);
-#endif /* !__crt_islower */
+
+
+
 }
 #include <bits/crt/ctype.h>
 /* >> isalpha(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_isalpha)(int ch) {
-#ifdef __crt_isalpha
+
 	return __crt_isalpha(ch);
-#else /* __crt_isalpha */
-	return __ascii_isalpha(ch);
-#endif /* !__crt_isalpha */
+
+
+
 }
 #include <bits/crt/ctype.h>
 /* >> isdigit(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_isdigit)(int ch) {
-#ifdef __crt_isdigit
+
 	return __crt_isdigit(ch);
-#else /* __crt_isdigit */
-	return __ascii_isdigit(ch);
-#endif /* !__crt_isdigit */
+
+
+
 }
 #include <bits/crt/ctype.h>
 /* >> isxdigit(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_isxdigit)(int ch) {
-#ifdef __crt_isxdigit
+
 	return __crt_isxdigit(ch);
-#else /* __crt_isxdigit */
-	return __ascii_isxdigit(ch);
-#endif /* !__crt_isxdigit */
+
+
+
 }
 #include <bits/crt/ctype.h>
 /* >> isalnum(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_isalnum)(int ch) {
-#ifdef __crt_isalnum
+
 	return __crt_isalnum(ch);
-#else /* __crt_isalnum */
-	return __ascii_isalnum(ch);
-#endif /* !__crt_isalnum */
+
+
+
 }
 #include <bits/crt/ctype.h>
 /* >> ispunct(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_ispunct)(int ch) {
-#ifdef __crt_ispunct
+
 	return __crt_ispunct(ch);
-#else /* __crt_ispunct */
-	return __ascii_ispunct(ch);
-#endif /* !__crt_ispunct */
+
+
+
 }
 #include <bits/crt/ctype.h>
 /* >> isgraph(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_isgraph)(int ch) {
-#ifdef __crt_isgraph
+
 	return __crt_isgraph(ch);
-#else /* __crt_isgraph */
-	return __ascii_isgraph(ch);
-#endif /* !__crt_isgraph */
+
+
+
 }
 #include <bits/crt/ctype.h>
 /* >> isprint(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_isprint)(int ch) {
-#ifdef __crt_isprint
+
 	return __crt_isprint(ch);
-#else /* __crt_isprint */
-	return __ascii_isprint(ch);
-#endif /* !__crt_isprint */
+
+
+
 }
 #include <bits/crt/ctype.h>
 /* >> tolower(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_tolower)(int ch) {
-#ifdef __crt_tolower
+
 	return __crt_tolower(ch);
-#else /* __crt_tolower */
-	return __ascii_tolower(ch);
-#endif /* !__crt_tolower */
+
+
+
 }
 #include <bits/crt/ctype.h>
 /* >> toupper(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_toupper)(int ch) {
-#ifdef __crt_toupper
+
 	return __crt_toupper(ch);
-#else /* __crt_toupper */
-	return __ascii_toupper(ch);
-#endif /* !__crt_toupper */
+
+
+
 }
 #include <bits/crt/ctype.h>
 /* >> isblank(3) */
 INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_isblank)(int ch) {
-#ifdef __crt_isblank
+
 	return __crt_isblank(ch);
-#else /* __crt_isblank */
-	return __ascii_isblank(ch);
-#endif /* !__crt_isblank */
+
+
+
 }
 #ifdef __LIBKCALL_CALLER_CLEANUP
 DEFINE_INTERN_ALIAS(libc_iscntrl_l, libc_iscntrl);

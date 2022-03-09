@@ -37,6 +37,14 @@
 #include "../libc/globals.h" /* For norel access to global variables */
 }
 
+/* All of these get defined in "libc/globals.h" */
+%[assume_defined_in_kos_userspace(__LOCAL_error_print_progname)]
+%[assume_defined_in_kos_userspace(__LOCAL_error_message_count)]
+%[assume_defined_in_kos_userspace(__LOCAL_error_one_per_line)]
+%[assume_defined_in_kos_userspace(error_print_progname)]
+%[assume_defined_in_kos_userspace(error_message_count)]
+%[assume_defined_in_kos_userspace(error_one_per_line)]
+
 %[insert:prefix(
 #include <bits/types.h>
 )]%[insert:prefix(

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a5e74b7 */
+/* HASH CRC-32:0xbf3296eb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,11 +81,11 @@ NOTHROW_NCX(LIBCCALL libc_vlimit)(int resource,
 #endif /* __LIM_MAXRSS && __RLIMIT_RSS */
 
 	default:
-#ifdef EINVAL
+
 		return __libc_seterrno(EINVAL);
-#else /* EINVAL */
-		return __libc_seterrno(1);
-#endif /* !EINVAL */
+
+
+
 	}
 #endif /* !__LIM_TO_RLIMIT */
 	result = libc_getrlimit((__rlimit_resource_t)rlimit_resource, &rlim);

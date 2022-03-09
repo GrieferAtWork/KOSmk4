@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52e56628 */
+/* HASH CRC-32:0xd6ff7f65 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -167,10 +167,10 @@ NOTHROW_NCX(LIBDCALL libd_mbrtowc)(char16_t *pwc,
 
 
 
-#ifdef EILSEQ
+
 	if (error == (size_t)-1)
 		(void)libc_seterrno(EILSEQ);
-#endif /* EILSEQ */
+
 	return error;
 }
 #include <libc/errno.h>
@@ -200,10 +200,10 @@ NOTHROW_NCX(LIBKCALL libc_mbrtowc)(char32_t *pwc,
 
 	error = libc_unicode_c8toc32((char32_t *)pwc, str, maxlen, mbs);
 
-#ifdef EILSEQ
+
 	if (error == (size_t)-1)
 		(void)libc_seterrno(EILSEQ);
-#endif /* EILSEQ */
+
 	return error;
 }
 #include <libc/errno.h>
@@ -230,9 +230,9 @@ NOTHROW_NCX(LIBDCALL libd_wcrtomb)(char *__restrict str,
 		if unlikely(!((u16)wc >= 0xdc00 &&
 		              (u16)wc <= 0xdfff)) {
 			/* Expected low surrogate */
-#ifdef EILSEQ
+
 			(void)libc_seterrno(EILSEQ);
-#endif /* EILSEQ */
+
 			return (size_t)-1;
 		}
 		ch32 = ((mbs->__mb_word & 0x000003ff) << 10) +
@@ -685,9 +685,9 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.read") WUNUSED NONNULL
 	size_t n;
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
-#ifdef ERANGE
+
 		(void)libc_seterrno(ERANGE);
-#endif /* ERANGE */
+
 		return NULL;
 	}
 	for (n = 0; n < bufsize - 1; ++n) {
@@ -728,9 +728,9 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.read") WUNUSED NONNULL((1,
 	size_t n;
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
-#ifdef ERANGE
+
 		(void)libc_seterrno(ERANGE);
-#endif /* ERANGE */
+
 		return NULL;
 	}
 	for (n = 0; n < bufsize - 1; ++n) {
@@ -2308,9 +2308,9 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.read") NONNULL((1, 3
 	size_t n;
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
-#ifdef ERANGE
+
 		(void)libc_seterrno(ERANGE);
-#endif /* ERANGE */
+
 		return NULL;
 	}
 	for (n = 0; n < bufsize - 1; ++n) {
@@ -2351,9 +2351,9 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.read") NONNULL((1, 3)) c
 	size_t n;
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
-#ifdef ERANGE
+
 		(void)libc_seterrno(ERANGE);
-#endif /* ERANGE */
+
 		return NULL;
 	}
 	for (n = 0; n < bufsize - 1; ++n) {
@@ -2660,11 +2660,11 @@ NOTHROW_NCX(LIBDCALL libd_wcsto32_r)(char16_t const *__restrict nptr,
 handle_overflow:
 			/* Integer overflow. */
 			if (error) {
-#ifdef __ERANGE
-				*error = __ERANGE;
-#else /* __ERANGE */
-				*error = 1;
-#endif /* !__ERANGE */
+
+				*error = ERANGE;
+
+
+
 			}
 			if (endptr) {
 				for (;;) {
@@ -2712,11 +2712,11 @@ handle_overflow:
 
 		/* Empty number... */
 		if (error) {
-#ifdef __ECANCELED
-			*error = __ECANCELED;
-#else /* __ECANCELED */
-			*error = 1;
-#endif /* !__ECANCELED */
+
+			*error = ECANCELED;
+
+
+
 		}
 		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
 		if (endptr)
@@ -2733,11 +2733,11 @@ handle_overflow:
 				while (libd_iswspace(*num_iter))
 					++num_iter;
 				if (*num_iter) {
-#ifdef __EINVAL
-					*error = __EINVAL;
-#else /* __EINVAL */
-					*error = 1;
-#endif /* !__EINVAL */
+
+					*error = EINVAL;
+
+
+
 				}
 			}
 		}
@@ -2806,11 +2806,11 @@ NOTHROW_NCX(LIBKCALL libc_wcsto32_r)(char32_t const *__restrict nptr,
 handle_overflow:
 			/* Integer overflow. */
 			if (error) {
-#ifdef __ERANGE
-				*error = __ERANGE;
-#else /* __ERANGE */
-				*error = 1;
-#endif /* !__ERANGE */
+
+				*error = ERANGE;
+
+
+
 			}
 			if (endptr) {
 				for (;;) {
@@ -2858,11 +2858,11 @@ handle_overflow:
 
 		/* Empty number... */
 		if (error) {
-#ifdef __ECANCELED
-			*error = __ECANCELED;
-#else /* __ECANCELED */
-			*error = 1;
-#endif /* !__ECANCELED */
+
+			*error = ECANCELED;
+
+
+
 		}
 		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
 		if (endptr)
@@ -2879,11 +2879,11 @@ handle_overflow:
 				while (libc_iswspace(*num_iter))
 					++num_iter;
 				if (*num_iter) {
-#ifdef __EINVAL
-					*error = __EINVAL;
-#else /* __EINVAL */
-					*error = 1;
-#endif /* !__EINVAL */
+
+					*error = EINVAL;
+
+
+
 				}
 			}
 		}
@@ -2945,11 +2945,11 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
 		            __hybrid_overflow_uadd(result, digit, &result)) {
 			/* Integer overflow. */
 			if (error) {
-#ifdef __ERANGE
-				*error = __ERANGE;
-#else /* __ERANGE */
-				*error = 1;
-#endif /* !__ERANGE */
+
+				*error = ERANGE;
+
+
+
 			}
 			if (endptr) {
 				for (;;) {
@@ -2990,11 +2990,11 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
 
 		/* Empty number... */
 		if (error) {
-#ifdef __ECANCELED
-			*error = __ECANCELED;
-#else /* __ECANCELED */
-			*error = 1;
-#endif /* !__ECANCELED */
+
+			*error = ECANCELED;
+
+
+
 		}
 		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
 		if (endptr)
@@ -3011,11 +3011,11 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
 				while (libd_iswspace(*num_iter))
 					++num_iter;
 				if (*num_iter) {
-#ifdef __EINVAL
-					*error = __EINVAL;
-#else /* __EINVAL */
-					*error = 1;
-#endif /* !__EINVAL */
+
+					*error = EINVAL;
+
+
+
 				}
 			}
 		}
@@ -3077,11 +3077,11 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
 		            __hybrid_overflow_uadd(result, digit, &result)) {
 			/* Integer overflow. */
 			if (error) {
-#ifdef __ERANGE
-				*error = __ERANGE;
-#else /* __ERANGE */
-				*error = 1;
-#endif /* !__ERANGE */
+
+				*error = ERANGE;
+
+
+
 			}
 			if (endptr) {
 				for (;;) {
@@ -3122,11 +3122,11 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
 
 		/* Empty number... */
 		if (error) {
-#ifdef __ECANCELED
-			*error = __ECANCELED;
-#else /* __ECANCELED */
-			*error = 1;
-#endif /* !__ECANCELED */
+
+			*error = ECANCELED;
+
+
+
 		}
 		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
 		if (endptr)
@@ -3143,11 +3143,11 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
 				while (libc_iswspace(*num_iter))
 					++num_iter;
 				if (*num_iter) {
-#ifdef __EINVAL
-					*error = __EINVAL;
-#else /* __EINVAL */
-					*error = 1;
-#endif /* !__EINVAL */
+
+					*error = EINVAL;
+
+
+
 				}
 			}
 		}
@@ -3160,16 +3160,16 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONN
 NOTHROW_NCX(LIBDCALL libd_wcsto32)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
                                    __STDC_INT_AS_UINT_T base) {
-#if defined(__libc_geterrno) && defined(ERANGE)
+
 	int32_t result;
 	errno_t error;
 	result = libd_wcsto32_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
 		(void)libc_seterrno(ERANGE);
 	return result;
-#else /* __libc_geterrno && ERANGE */
-	return libd_wcsto32_r(nptr, endptr, base, NULL);
-#endif /* !__libc_geterrno || !ERANGE */
+
+
+
 }
 #include <libc/errno.h>
 /* >> wcsto32(3) */
@@ -3177,16 +3177,16 @@ INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL(
 NOTHROW_NCX(LIBKCALL libc_wcsto32)(char32_t const *__restrict nptr,
                                    char32_t **endptr,
                                    __STDC_INT_AS_UINT_T base) {
-#if defined(__libc_geterrno) && defined(ERANGE)
+
 	int32_t result;
 	errno_t error;
 	result = libc_wcsto32_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
 		(void)libc_seterrno(ERANGE);
 	return result;
-#else /* __libc_geterrno && ERANGE */
-	return libc_wcsto32_r(nptr, endptr, base, NULL);
-#endif /* !__libc_geterrno || !ERANGE */
+
+
+
 }
 #include <libc/errno.h>
 /* >> wcstou32(3) */
@@ -3194,16 +3194,16 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONN
 NOTHROW_NCX(LIBDCALL libd_wcstou32)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
                                     __STDC_INT_AS_UINT_T base) {
-#if defined(__libc_geterrno) && defined(ERANGE)
+
 	uint32_t result;
 	errno_t error;
 	result = libd_wcstou32_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
 		(void)libc_seterrno(ERANGE);
 	return result;
-#else /* __libc_geterrno && ERANGE */
-	return libd_wcstou32_r(nptr, endptr, base, NULL);
-#endif /* !__libc_geterrno || !ERANGE */
+
+
+
 }
 #include <libc/errno.h>
 /* >> wcstou32(3) */
@@ -3211,16 +3211,16 @@ INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL(
 NOTHROW_NCX(LIBKCALL libc_wcstou32)(char32_t const *__restrict nptr,
                                     char32_t **endptr,
                                     __STDC_INT_AS_UINT_T base) {
-#if defined(__libc_geterrno) && defined(ERANGE)
+
 	uint32_t result;
 	errno_t error;
 	result = libc_wcstou32_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
 		(void)libc_seterrno(ERANGE);
 	return result;
-#else /* __libc_geterrno && ERANGE */
-	return libc_wcstou32_r(nptr, endptr, base, NULL);
-#endif /* !__libc_geterrno || !ERANGE */
+
+
+
 }
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
@@ -3284,11 +3284,11 @@ NOTHROW_NCX(LIBDCALL libd_wcsto64_r)(char16_t const *__restrict nptr,
 handle_overflow:
 			/* Integer overflow. */
 			if (error) {
-#ifdef __ERANGE
-				*error = __ERANGE;
-#else /* __ERANGE */
-				*error = 1;
-#endif /* !__ERANGE */
+
+				*error = ERANGE;
+
+
+
 			}
 			if (endptr) {
 				for (;;) {
@@ -3336,11 +3336,11 @@ handle_overflow:
 
 		/* Empty number... */
 		if (error) {
-#ifdef __ECANCELED
-			*error = __ECANCELED;
-#else /* __ECANCELED */
-			*error = 1;
-#endif /* !__ECANCELED */
+
+			*error = ECANCELED;
+
+
+
 		}
 		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
 		if (endptr)
@@ -3357,11 +3357,11 @@ handle_overflow:
 				while (libd_iswspace(*num_iter))
 					++num_iter;
 				if (*num_iter) {
-#ifdef __EINVAL
-					*error = __EINVAL;
-#else /* __EINVAL */
-					*error = 1;
-#endif /* !__EINVAL */
+
+					*error = EINVAL;
+
+
+
 				}
 			}
 		}
@@ -3430,11 +3430,11 @@ NOTHROW_NCX(LIBKCALL libc_wcsto64_r)(char32_t const *__restrict nptr,
 handle_overflow:
 			/* Integer overflow. */
 			if (error) {
-#ifdef __ERANGE
-				*error = __ERANGE;
-#else /* __ERANGE */
-				*error = 1;
-#endif /* !__ERANGE */
+
+				*error = ERANGE;
+
+
+
 			}
 			if (endptr) {
 				for (;;) {
@@ -3482,11 +3482,11 @@ handle_overflow:
 
 		/* Empty number... */
 		if (error) {
-#ifdef __ECANCELED
-			*error = __ECANCELED;
-#else /* __ECANCELED */
-			*error = 1;
-#endif /* !__ECANCELED */
+
+			*error = ECANCELED;
+
+
+
 		}
 		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
 		if (endptr)
@@ -3503,11 +3503,11 @@ handle_overflow:
 				while (libc_iswspace(*num_iter))
 					++num_iter;
 				if (*num_iter) {
-#ifdef __EINVAL
-					*error = __EINVAL;
-#else /* __EINVAL */
-					*error = 1;
-#endif /* !__EINVAL */
+
+					*error = EINVAL;
+
+
+
 				}
 			}
 		}
@@ -3569,11 +3569,11 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
 		            __hybrid_overflow_uadd(result, digit, &result)) {
 			/* Integer overflow. */
 			if (error) {
-#ifdef __ERANGE
-				*error = __ERANGE;
-#else /* __ERANGE */
-				*error = 1;
-#endif /* !__ERANGE */
+
+				*error = ERANGE;
+
+
+
 			}
 			if (endptr) {
 				for (;;) {
@@ -3614,11 +3614,11 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
 
 		/* Empty number... */
 		if (error) {
-#ifdef __ECANCELED
-			*error = __ECANCELED;
-#else /* __ECANCELED */
-			*error = 1;
-#endif /* !__ECANCELED */
+
+			*error = ECANCELED;
+
+
+
 		}
 		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
 		if (endptr)
@@ -3635,11 +3635,11 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
 				while (libd_iswspace(*num_iter))
 					++num_iter;
 				if (*num_iter) {
-#ifdef __EINVAL
-					*error = __EINVAL;
-#else /* __EINVAL */
-					*error = 1;
-#endif /* !__EINVAL */
+
+					*error = EINVAL;
+
+
+
 				}
 			}
 		}
@@ -3701,11 +3701,11 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
 		            __hybrid_overflow_uadd(result, digit, &result)) {
 			/* Integer overflow. */
 			if (error) {
-#ifdef __ERANGE
-				*error = __ERANGE;
-#else /* __ERANGE */
-				*error = 1;
-#endif /* !__ERANGE */
+
+				*error = ERANGE;
+
+
+
 			}
 			if (endptr) {
 				for (;;) {
@@ -3746,11 +3746,11 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
 
 		/* Empty number... */
 		if (error) {
-#ifdef __ECANCELED
-			*error = __ECANCELED;
-#else /* __ECANCELED */
-			*error = 1;
-#endif /* !__ECANCELED */
+
+			*error = ECANCELED;
+
+
+
 		}
 		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
 		if (endptr)
@@ -3767,11 +3767,11 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
 				while (libc_iswspace(*num_iter))
 					++num_iter;
 				if (*num_iter) {
-#ifdef __EINVAL
-					*error = __EINVAL;
-#else /* __EINVAL */
-					*error = 1;
-#endif /* !__EINVAL */
+
+					*error = EINVAL;
+
+
+
 				}
 			}
 		}
@@ -3784,16 +3784,16 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONN
 NOTHROW_NCX(LIBDCALL libd_wcstou64)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
                                     __STDC_INT_AS_UINT_T base) {
-#if defined(__libc_geterrno) && defined(ERANGE)
+
 	uint64_t result;
 	errno_t error;
 	result = libd_wcstou64_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
 		(void)libc_seterrno(ERANGE);
 	return result;
-#else /* __libc_geterrno && ERANGE */
-	return libd_wcstou64_r(nptr, endptr, base, NULL);
-#endif /* !__libc_geterrno || !ERANGE */
+
+
+
 }
 #include <libc/errno.h>
 /* >> wcstou64(3) */
@@ -3801,16 +3801,16 @@ INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL(
 NOTHROW_NCX(LIBKCALL libc_wcstou64)(char32_t const *__restrict nptr,
                                     char32_t **endptr,
                                     __STDC_INT_AS_UINT_T base) {
-#if defined(__libc_geterrno) && defined(ERANGE)
+
 	uint64_t result;
 	errno_t error;
 	result = libc_wcstou64_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
 		(void)libc_seterrno(ERANGE);
 	return result;
-#else /* __libc_geterrno && ERANGE */
-	return libc_wcstou64_r(nptr, endptr, base, NULL);
-#endif /* !__libc_geterrno || !ERANGE */
+
+
+
 }
 #include <libc/errno.h>
 /* >> wcsto64(3) */
@@ -3818,16 +3818,16 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONN
 NOTHROW_NCX(LIBDCALL libd_wcsto64)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
                                    __STDC_INT_AS_UINT_T base) {
-#if defined(__libc_geterrno) && defined(ERANGE)
+
 	int64_t result;
 	errno_t error;
 	result = libd_wcsto64_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
 		(void)libc_seterrno(ERANGE);
 	return result;
-#else /* __libc_geterrno && ERANGE */
-	return libd_wcsto64_r(nptr, endptr, base, NULL);
-#endif /* !__libc_geterrno || !ERANGE */
+
+
+
 }
 #include <libc/errno.h>
 /* >> wcsto64(3) */
@@ -3835,16 +3835,16 @@ INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL(
 NOTHROW_NCX(LIBKCALL libc_wcsto64)(char32_t const *__restrict nptr,
                                    char32_t **endptr,
                                    __STDC_INT_AS_UINT_T base) {
-#if defined(__libc_geterrno) && defined(ERANGE)
+
 	int64_t result;
 	errno_t error;
 	result = libc_wcsto64_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
 		(void)libc_seterrno(ERANGE);
 	return result;
-#else /* __libc_geterrno && ERANGE */
-	return libc_wcsto64_r(nptr, endptr, base, NULL);
-#endif /* !__libc_geterrno || !ERANGE */
+
+
+
 }
 /* >> wcsto32_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) int32_t

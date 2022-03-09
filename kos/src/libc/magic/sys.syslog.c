@@ -33,6 +33,16 @@
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.system.syslog")]
 
+%[assume_defined_in_kos(LOG_EMERG, __LOG_EMERG)]
+%[assume_defined_in_kos(LOG_ALERT, __LOG_ALERT)]
+%[assume_defined_in_kos(LOG_CRIT, __LOG_CRIT)]
+%[assume_defined_in_kos(LOG_ERR, __LOG_ERR)]
+%[assume_defined_in_kos(LOG_WARNING, __LOG_WARNING)]
+%[assume_defined_in_kos(LOG_NOTICE, __LOG_NOTICE)]
+%[assume_defined_in_kos(LOG_INFO, __LOG_INFO)]
+%[assume_defined_in_kos(LOG_DEBUG, __LOG_DEBUG)]
+%[assume_defined_in_kos(LOG_PRIMASK, __LOG_PRIMASK)]
+
 %[insert:prefix(
 #include <features.h>
 )]%{

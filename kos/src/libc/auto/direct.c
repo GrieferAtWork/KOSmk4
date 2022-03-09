@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb477d80 */
+/* HASH CRC-32:0x11d1060b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,11 +39,11 @@ NOTHROW_RPC(LIBDCALL libd__getdcwd)(int drive,
                                     char *buf,
                                     size_t size) {
 	if unlikely(drive < __AT_DOS_DRIVEMIN || drive > __AT_DOS_DRIVEMAX) {
-#ifdef EINVAL
+
 		(void)libc_seterrno(EINVAL);
-#else /* EINVAL */
-		(void)libc_seterrno(1);
-#endif /* !EINVAL */
+
+
+
 		return NULL;
 	}
 	return libd_frealpath4(__AT_FDDRIVE_CWD(drive), buf, size, 0);
@@ -54,11 +54,11 @@ NOTHROW_RPC(LIBCCALL libc__getdcwd)(int drive,
                                     char *buf,
                                     size_t size) {
 	if unlikely(drive < __AT_DOS_DRIVEMIN || drive > __AT_DOS_DRIVEMAX) {
-#ifdef EINVAL
+
 		(void)libc_seterrno(EINVAL);
-#else /* EINVAL */
-		(void)libc_seterrno(1);
-#endif /* !EINVAL */
+
+
+
 		return NULL;
 	}
 	return libc_frealpath4(__AT_FDDRIVE_CWD(drive), buf, size, 0);
@@ -68,11 +68,11 @@ INTERN ATTR_SECTION(".text.crt.dos.fs.property") int
 NOTHROW_RPC(LIBCCALL libc__chdrive)(int drive) {
 	drive = libc_toupper((unsigned char)drive);
 	if unlikely(drive < __AT_DOS_DRIVEMIN || drive > __AT_DOS_DRIVEMAX) {
-#ifdef EINVAL
+
 		return libc_seterrno(EINVAL);
-#else /* EINVAL */
-		return libc_seterrno(1);
-#endif /* !EINVAL */
+
+
+
 	}
 	return libc_fchdir(__AT_FDDRIVE_ROOT(drive));
 }

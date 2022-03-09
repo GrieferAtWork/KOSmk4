@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xadf7ac05 */
+/* HASH CRC-32:0xbbe9fb55 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,11 +76,11 @@ INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(3, 4) void
                        errno_t errnum,
                        const char *format,
                        ...) THROWS(...) {
-#ifdef __LOCAL_error_print_progname
+
 	if (__LOCAL_error_print_progname) {
 		(*__LOCAL_error_print_progname)();
 	} else
-#endif /* __LOCAL_error_print_progname */
+
 	{
 		libc_fflush(stdout);
 		libc_fprintf(stderr, "%s: ", program_invocation_short_name);
@@ -91,9 +91,9 @@ INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(3, 4) void
 		libc_vfprintf(stderr, format, args);
 		va_end(args);
 	}
-#ifdef __LOCAL_error_message_count
+
 	++__LOCAL_error_message_count;
-#endif /* __LOCAL_error_message_count */
+
 	if (errnum != 0)
 		libc_fprintf(stderr, ": %s", libc_strerror(errnum));
 	libc_fputc('\n', stderr);
@@ -140,11 +140,11 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(3, 4) void
                        errno_t errnum,
                        const char *format,
                        ...) THROWS(...) {
-#ifdef __LOCAL_error_print_progname
+
 	if (__LOCAL_error_print_progname) {
 		(*__LOCAL_error_print_progname)();
 	} else
-#endif /* __LOCAL_error_print_progname */
+
 	{
 		libc_fflush(stdout);
 		libc_fprintf(stderr, "%s: ", program_invocation_short_name);
@@ -155,9 +155,9 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(3, 4) void
 		libc_vfprintf(stderr, format, args);
 		va_end(args);
 	}
-#ifdef __LOCAL_error_message_count
+
 	++__LOCAL_error_message_count;
-#endif /* __LOCAL_error_message_count */
+
 	if (errnum != 0)
 		libc_fprintf(stderr, ": %s", libc_strerror(errnum));
 	libc_fputc('\n', stderr);
@@ -219,7 +219,7 @@ INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(5, 6) void
                                unsigned int line,
                                char const *format,
                                ...) THROWS(...) {
-#ifdef __LOCAL_error_one_per_line
+
 	static char const *last_filename = NULL;
 	static unsigned int last_line = 0;
 	if (__LOCAL_error_one_per_line != 0 &&
@@ -227,17 +227,17 @@ INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(5, 6) void
 	    (filename == last_filename || libc_strcmp(filename, last_filename) == 0)) {
 		/* Don't print the same error more than once */
 	} else
-#endif /* __LOCAL_error_one_per_line */
+
 	{
-#ifdef __LOCAL_error_one_per_line
+
 		filename = last_filename;
 		line     = last_line;
-#endif /* __LOCAL_error_one_per_line */
-#ifdef __LOCAL_error_print_progname
+
+
 		if (__LOCAL_error_print_progname) {
 			(*__LOCAL_error_print_progname)();
 		} else
-#endif /* __LOCAL_error_print_progname */
+
 		{
 			libc_fflush(stdout);
 			libc_fprintf(stderr, "%s:", program_invocation_short_name);
@@ -249,9 +249,9 @@ INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(5, 6) void
 			libc_vfprintf(stderr, format, args);
 			va_end(args);
 		}
-#ifdef __LOCAL_error_message_count
+
 		++__LOCAL_error_message_count;
-#endif /* __LOCAL_error_message_count */
+
 		if (errnum != 0)
 			libc_fprintf(stderr, ": %s", libc_strerror(errnum));
 		libc_fputc('\n', stderr);
@@ -316,7 +316,7 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(5, 6) void
                                unsigned int line,
                                char const *format,
                                ...) THROWS(...) {
-#ifdef __LOCAL_error_one_per_line
+
 	static char const *last_filename = NULL;
 	static unsigned int last_line = 0;
 	if (__LOCAL_error_one_per_line != 0 &&
@@ -324,17 +324,17 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(5, 6) void
 	    (filename == last_filename || libc_strcmp(filename, last_filename) == 0)) {
 		/* Don't print the same error more than once */
 	} else
-#endif /* __LOCAL_error_one_per_line */
+
 	{
-#ifdef __LOCAL_error_one_per_line
+
 		filename = last_filename;
 		line     = last_line;
-#endif /* __LOCAL_error_one_per_line */
-#ifdef __LOCAL_error_print_progname
+
+
 		if (__LOCAL_error_print_progname) {
 			(*__LOCAL_error_print_progname)();
 		} else
-#endif /* __LOCAL_error_print_progname */
+
 		{
 			libc_fflush(stdout);
 			libc_fprintf(stderr, "%s:", program_invocation_short_name);
@@ -346,9 +346,9 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(5, 6) void
 			libc_vfprintf(stderr, format, args);
 			va_end(args);
 		}
-#ifdef __LOCAL_error_message_count
+
 		++__LOCAL_error_message_count;
-#endif /* __LOCAL_error_message_count */
+
 		if (errnum != 0)
 			libc_fprintf(stderr, ": %s", libc_strerror(errnum));
 		libc_fputc('\n', stderr);

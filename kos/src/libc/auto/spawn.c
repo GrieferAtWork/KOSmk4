@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79137e46 */
+/* HASH CRC-32:0xb005dfa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,20 +72,20 @@ NOTHROW_RPC(LIBCCALL libc_posix_fspawn_np)(pid_t *__restrict pid,
                                            posix_spawnattr_t const *attrp,
                                            __TARGV,
                                            __TENVP) {
-#if defined(__POSIX_SPAWN_USE_KOS) && (defined(__ARCH_HAVE_SHARED_VM_VFORK) || defined(O_CLOEXEC))
+
 
 
 
 
 	int status;
-#ifndef __ARCH_HAVE_SHARED_VM_VFORK
-	fd_t pipes[2];
-	ssize_t temp;
-#endif /* !__ARCH_HAVE_SHARED_VM_VFORK */
+
+
+
+
 	errno_t result, old_errno;
 	pid_t child;
 	old_errno = __libc_geterrno_or(0);
-#ifdef __ARCH_HAVE_SHARED_VM_VFORK
+
 	(void)libc_seterrno(0);
 	child = libc_vfork();
 	if (child == 0)
@@ -109,43 +109,43 @@ NOTHROW_RPC(LIBCCALL libc_posix_fspawn_np)(pid_t *__restrict pid,
 	/* Write back the child's PID */
 	*pid = child;
 	return result;
-#else /* __ARCH_HAVE_SHARED_VM_VFORK */
-	/* Create a pair of pipes for temporary communication. */
-	if (libc_pipe2(pipes, O_CLOEXEC)) {
-err_without_child:
-		result = __libc_geterrno_or(0);
-		(void)libc_seterrno(old_errno);
-		return result;
-	}
-	child = libc_fork();
-	if (child == 0)
-		goto do_exec;
-	if (child < 0)
-		goto err_without_child; /* The fork() itself failed. */
-	/* Read from the communication pipe
-	 * (NOTE: If exec() succeeds, the pipe will be
-	 *        closed and  read() returns  ZERO(0)) */
-	libc_close(pipes[1]); /* Close the writer. */
-	temp = libc_read(pipes[0], &result, sizeof(result));
-	libc_close(pipes[0]); /* Close the reader. */
-	if (temp < 0)
-		goto err_join_zombie_child;
-	/* This means that `fexecve()' below closed the pipe during a successful exec(). */
-	if (temp != sizeof(result)) {
-		*pid = child;
-		(void)libc_seterrno(old_errno);
-		return 0;
-	}
-#endif /* !__ARCH_HAVE_SHARED_VM_VFORK */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 err_join_zombie_child:
 	/* Unless the child was already spawned as detached,
 	 * we still have to re-join  it, or else it will  be
 	 * left dangling as a zombie process! */
 	if (libc_waitpid(child, &status, 0) < 0) {
-#ifdef EINTR
+
 		if (__libc_geterrno() == EINTR)
 			goto err_join_zombie_child;
-#endif /* EINTR */
+
 	}
 	(void)libc_seterrno(old_errno);
 	return result;
@@ -234,7 +234,7 @@ do_exec:
 
 
 
-#ifdef __POSIX_SPAWN_ACTION_TCSETPGRP
+
 
 
 
@@ -244,10 +244,10 @@ do_exec:
 					goto child_error;
 				break;
 
-#endif /* __POSIX_SPAWN_ACTION_TCSETPGRP */
 
 
-#ifdef __POSIX_SPAWN_ACTION_CLOSEFROM
+
+
 
 
 
@@ -255,19 +255,19 @@ do_exec:
 				libc_closefrom(act->__sa_action.__sa_closefrom_action.__sa_fd);
 				break;
 
-#endif /* __POSIX_SPAWN_ACTION_CLOSEFROM */
+
 
 
 #ifdef __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION
 #undef __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION
 			default:
-#ifdef ENOSYS
+
 				(void)libc_seterrno(ENOSYS);
-#elif defined(EPERM)
-				(void)libc_seterrno(EPERM);
-#else /* ... */
-				(void)libc_seterrno(1);
-#endif /* !... */
+
+
+
+
+
 				goto child_error;
 #else /* __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION */
 			default:
@@ -319,7 +319,7 @@ do_exec:
 
 		}
 		if (attrp->__flags & __POSIX_SPAWN_SETSIGDEF) {
-#ifdef __SIG_DFL
+
 			signo_t i;
 			struct sigaction sa;
 			sa.sa_handler = (__sighandler_t)__SIG_DFL;
@@ -331,31 +331,31 @@ do_exec:
 				if unlikely(libc_sigaction(i, &sa, NULL))
 					goto child_error;
 			}
-#else /* __SIG_DFL */
-#ifdef ENOSYS
-			(void)libc_seterrno(ENOSYS);
-#elif defined(EPERM)
-			(void)libc_seterrno(EPERM);
-#else /* ... */
-			(void)libc_seterrno(1);
-#endif /* !... */
-			goto child_error;
-#endif /* !__SIG_DFL */
+
+
+
+
+
+
+
+
+
+
 		}
 		if (attrp->__flags & __POSIX_SPAWN_SETSIGMASK) {
-#ifdef __SIG_SETMASK
+
 			if unlikely(libc_sigprocmask(__SIG_SETMASK, &attrp->__ss, NULL))
 				goto child_error;
-#else /* __SIG_SETMASK */
-#ifdef ENOSYS
-			(void)libc_seterrno(ENOSYS);
-#elif defined(EPERM)
-			(void)libc_seterrno(EPERM);
-#else /* ... */
-			(void)libc_seterrno(1);
-#endif /* !... */
-			goto child_error;
-#endif /* !__SIG_SETMASK */
+
+
+
+
+
+
+
+
+
+
 		}
 		if (attrp->__flags & (__POSIX_SPAWN_SETSCHEDPARAM | __POSIX_SPAWN_SETSCHEDULER)) {
 
@@ -388,40 +388,40 @@ do_exec:
 	/* When the exec succeeds, the pipe is auto-
 	 * closed because it's marked as  O_CLOEXEC! */
 	libc_fexecve(execfd, ___argv, ___envp);
-#ifdef __POSIX_SPAWN_NOEXECERR
+
 	if (attrp && attrp->__flags & __POSIX_SPAWN_NOEXECERR) {
 		/* Suppress the exec error. */
-#ifdef __ARCH_HAVE_SHARED_VM_VFORK
+
 		(void)libc_seterrno(0);
-#endif /* __ARCH_HAVE_SHARED_VM_VFORK */
+
 	} else
-#endif /* __POSIX_SPAWN_NOEXECERR */
+
 	{
 child_error:
-#ifdef __ARCH_HAVE_SHARED_VM_VFORK
+
 		/* If the exec fails, it will have modified `errno' to indicate this fact.
 		 * And since we're sharing VMs with  our parent process, the error  reason
 		 * will have already  been written  back to  our parent's  VM, so  there's
 		 * actually nothing left for us to do, but to simply exit! */
 		;
-#else /* __ARCH_HAVE_SHARED_VM_VFORK */
-		/* Write the exec-error back to our parent. */
-#ifdef ENOENT
-		error = __libc_geterrno_or(ENOENT);
-#else /* ENOENT */
-		error = __libc_geterrno_or(1);
-#endif /* !ENOENT */
-		/* Communicate back why this failed. */
-		libc_write(pipes[1], &error, sizeof(error));
-		/* No need to close the pipe, it's auto-closed by the kernel! */
-#endif /* !__ARCH_HAVE_SHARED_VM_VFORK */
+
+
+
+
+
+
+
+
+
+
+
 	}
 	libc__Exit(127);
-#else /* __POSIX_SPAWN_USE_KOS && (__ARCH_HAVE_SHARED_VM_VFORK || O_CLOEXEC) */
-	char buf[32];
-	libc_sprintf(buf, "/proc/self/fd/%d", execfd);
-	return crt_posix_spawn(pid, buf, file_actions, attrp, ___argv, ___envp);
-#endif /* !__POSIX_SPAWN_USE_KOS || (!__ARCH_HAVE_SHARED_VM_VFORK && !O_CLOEXEC) */
+
+
+
+
+
 }
 #include <asm/os/oflags.h>
 /* >> posix_spawn(3)
@@ -456,13 +456,13 @@ NOTHROW_RPC(LIBCCALL libc_posix_spawn)(pid_t *__restrict pid,
                                        __TENVP) {
 	fd_t fd;
 	pid_t result = -1;
-#if defined(O_RDONLY) && defined(O_CLOEXEC)
+
 	fd = libc_open(path, O_RDONLY | O_CLOEXEC);
-#elif defined(O_RDONLY)
-	fd = libc_open(path, O_RDONLY);
-#else /* ... */
-	fd = libc_open(path, 0);
-#endif /* !... */
+
+
+
+
+
 	if likely(fd >= 0) {
 		result = libc_posix_fspawn_np(pid, fd, file_actions, attrp, ___argv, ___envp);
 
@@ -518,30 +518,30 @@ NOTHROW_RPC(LIBCCALL libc_posix_spawnp)(pid_t *__restrict pid,
 	 * then $PATH is ignored, and the file at the  specified
 	 * pathname is executed.
 	 * [...] */
-#ifdef _WIN32
-	if (libc_strchr(file, '/') || libc_strchr(file, '\\'))
-#else /* _WIN32 */
+
+
+
 	if (libc_strchr(file, '/'))
-#endif /* !_WIN32 */
+
 	{
 		return libc_posix_spawn(pid, file, file_actions, attrp, ___argv, ___envp);
 	}
 	env_path = libc_getenv("PATH");
-#ifdef ENOENT
+
 	result = ENOENT;
-#else /* ENOENT */
-	result = 1;
-#endif /* !ENOENT */
+
+
+
 	if (env_path && *env_path) {
 		size_t filelen;
 		filelen  = libc_strlen(file);
 		for (;;) {
 			char *path_end;
-#ifdef _WIN32
-			path_end = libc_strchrnul(env_path, ';');
-#else /* _WIN32 */
+
+
+
 			path_end = libc_strchrnul(env_path, ':');
-#endif /* !_WIN32 */
+
 			result = (__NAMESPACE_LOCAL_SYM __posix_spawnp_impl)(pid, env_path, (size_t)(path_end - env_path),
 			                                                     file, filelen, file_actions, attrp,
 			                                                     ___argv, ___envp);
@@ -813,11 +813,11 @@ err_path:
 	libc_free((char *)path);
 
 err:
-#ifdef ENOMEM
+
 	return ENOMEM;
-#else /* ENOMEM */
-	return 1;
-#endif /* !ENOMEM */
+
+
+
 }
 /* >> posix_spawn_file_actions_addclose(3)
  * Enqueue a call `close(fd)' to be performed by the child process
@@ -835,11 +835,11 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addclose)(posix_spawn_file_ac
 	action->__sa_action.__sa_close_action.__sa_fd = fd;
 	return 0;
 err:
-#ifdef ENOMEM
+
 	return ENOMEM;
-#else /* ENOMEM */
-	return 1;
-#endif /* !ENOMEM */
+
+
+
 }
 /* >> posix_spawn_file_actions_adddup2(3)
  * Enqueue a call `dup2(oldfd, newfd)' to be performed by the child process
@@ -859,11 +859,11 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_adddup2)(posix_spawn_file_act
 	action->__sa_action.__sa_dup2_action.__sa_newfd = newfd;
 	return 0;
 err:
-#ifdef ENOMEM
+
 	return ENOMEM;
-#else /* ENOMEM */
-	return 1;
-#endif /* !ENOMEM */
+
+
+
 }
 /* >> posix_spawn_file_actions_addtcsetpgrp_np(3)
  * Enqueue a call `tcsetpgrp(fd, getpid())' to be performed by the child process
@@ -881,11 +881,11 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addtcsetpgrp_np)(posix_spawn_
 	action->__sa_action.__sa_tcsetpgrp_action.__sa_fd = fd;
 	return 0;
 err:
-#ifdef ENOMEM
+
 	return ENOMEM;
-#else /* ENOMEM */
-	return 1;
-#endif /* !ENOMEM */
+
+
+
 }
 /* >> posix_spawn_file_actions_addclosefrom_np(3)
  * Enqueue a call `closefrom(lowfd)' to be performed by the child process
@@ -903,11 +903,11 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addclosefrom_np)(posix_spawn_
 	action->__sa_action.__sa_closefrom_action.__sa_fd = lowfd;
 	return 0;
 err:
-#ifdef ENOMEM
+
 	return ENOMEM;
-#else /* ENOMEM */
-	return 1;
-#endif /* !ENOMEM */
+
+
+
 }
 /* >> posix_spawn_file_actions_addchdir_np(3)
  * Enqueue a call `chdir(path)' to be performed by the child process
@@ -931,11 +931,11 @@ err_path:
 	libc_free((char *)path);
 
 err:
-#ifdef ENOMEM
+
 	return ENOMEM;
-#else /* ENOMEM */
-	return 1;
-#endif /* !ENOMEM */
+
+
+
 }
 /* >> posix_spawn_file_actions_addfchdir_np(3)
  * Enqueue a call `fchdir(dfd)' to be performed by the child process
@@ -953,11 +953,11 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addfchdir_np)(posix_spawn_fil
 	action->__sa_action.__sa_fchdir_action.__sa_fd = dfd;
 	return 0;
 err:
-#ifdef ENOMEM
+
 	return ENOMEM;
-#else /* ENOMEM */
-	return 1;
-#endif /* !ENOMEM */
+
+
+
 }
 #endif /* !__KERNEL__ */
 

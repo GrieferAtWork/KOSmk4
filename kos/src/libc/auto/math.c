@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x569d4fd1 */
+/* HASH CRC-32:0xb21107f7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -143,7 +143,7 @@ NOTHROW(LIBCCALL libc_tan)(double x) {
  * Arc cosine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_acosf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 
@@ -153,9 +153,9 @@ NOTHROW(LIBCCALL libc_acosf)(float x) {
 		return __kernel_standard_f(x, x, __LIBM_MATHFUN1IF(nan, ""), __LIBM_KMATHERRF_ACOS);
 	}
 	return __LIBM_MATHFUNF(acos, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_acos((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
@@ -167,7 +167,7 @@ NOTHROW(LIBCCALL libc_acosf)(float x) {
  * Arc sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_asinf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 
@@ -177,9 +177,9 @@ NOTHROW(LIBCCALL libc_asinf)(float x) {
 		return __kernel_standard_f(x, x, __LIBM_MATHFUN1IF(nan, ""), __LIBM_KMATHERRF_ASIN);
 	}
 	return __LIBM_MATHFUNF(asin, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_asin((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
@@ -190,7 +190,7 @@ NOTHROW(LIBCCALL libc_asinf)(float x) {
  * Arc tangent of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_atanf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
@@ -201,9 +201,9 @@ NOTHROW(LIBCCALL libc_atanf)(float x) {
 		                         : __LIBM_KMATHERRF_ATANH_ONE);   /* atanh(|x|==1) */
 	}
 	return __LIBM_MATHFUNF(atan, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_atan((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <bits/math-constants.h>
 #include <libm/matherr.h>
@@ -213,15 +213,15 @@ NOTHROW(LIBCCALL libc_atanf)(float x) {
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_atan2f)(float y,
                               float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	if (__LIBM_LIB_VERSION == __LIBM_SVID && x == 0.0f && y == 0.0f)
 		return __kernel_standard_f(y, x, __HUGE_VALF, __LIBM_KMATHERRF_ATAN2); /* atan2(+-0,+-0) */
 	return __LIBM_MATHFUN2F(atan2, y, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_atan2((double)y, (double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/isnan.h>
 #include <libm/cos.h>
@@ -230,16 +230,16 @@ NOTHROW(LIBCCALL libc_atan2f)(float y,
  * Cosine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_cosf float
 NOTHROW(LIBCCALL libc_cosf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	float result = __LIBM_MATHFUNF(cos, x);
 	if (__LIBM_MATHFUNIF(isnan, result) && !__LIBM_MATHFUNIF(isnan, x))
 		result = __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_COS_INF);
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_cos((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/isnan.h>
 #include <libm/sin.h>
@@ -248,16 +248,16 @@ NOTHROW(LIBCCALL libc_cosf)(float x) {
  * Sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_sinf float
 NOTHROW(LIBCCALL libc_sinf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	float result = __LIBM_MATHFUNF(sin, x);
 	if (__LIBM_MATHFUNIF(isnan, result) && !__LIBM_MATHFUNIF(isnan, x))
 		result = __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_SIN_INF);
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_sin((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/isnan.h>
 #include <libm/isinf.h>
@@ -267,16 +267,16 @@ NOTHROW(LIBCCALL libc_sinf)(float x) {
  * Tangent of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_tanf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	float result = __LIBM_MATHFUNF(tan, x);
 	if (__LIBM_MATHFUNIF(isnan, result) && __LIBM_MATHFUNIF(isinf, x))
 		result = __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_TAN_INF);
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_tan((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
@@ -288,7 +288,7 @@ NOTHROW(LIBCCALL libc_tanf)(float x) {
  * Arc cosine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_acosl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 
@@ -298,9 +298,9 @@ NOTHROW(LIBCCALL libc_acosl)(__LONGDOUBLE x) {
 		return __kernel_standard_l(x, x, __LIBM_MATHFUN1IL(nan, ""), __LIBM_KMATHERRL_ACOS);
 	}
 	return __LIBM_MATHFUNL(acos, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_acos((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
@@ -312,7 +312,7 @@ NOTHROW(LIBCCALL libc_acosl)(__LONGDOUBLE x) {
  * Arc sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_asinl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 
@@ -322,9 +322,9 @@ NOTHROW(LIBCCALL libc_asinl)(__LONGDOUBLE x) {
 		return __kernel_standard_l(x, x, __LIBM_MATHFUN1IL(nan, ""), __LIBM_KMATHERRL_ASIN);
 	}
 	return __LIBM_MATHFUNL(asin, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_asin((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
@@ -335,7 +335,7 @@ NOTHROW(LIBCCALL libc_asinl)(__LONGDOUBLE x) {
  * Arc tangent of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_atanl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
@@ -346,9 +346,9 @@ NOTHROW(LIBCCALL libc_atanl)(__LONGDOUBLE x) {
 		                         : __LIBM_KMATHERRL_ATANH_ONE);   /* atanh(|x|==1) */
 	}
 	return __LIBM_MATHFUNL(atan, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_atan((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <bits/math-constants.h>
 #include <libm/matherr.h>
@@ -358,15 +358,15 @@ NOTHROW(LIBCCALL libc_atanl)(__LONGDOUBLE x) {
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_atan2l)(__LONGDOUBLE y,
                               __LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	if (__LIBM_LIB_VERSION == __LIBM_SVID && x == 0.0L && y == 0.0L)
 		return __kernel_standard_l(y, x, __HUGE_VALL, __LIBM_KMATHERRL_ATAN2); /* atan2(+-0,+-0) */
 	return __LIBM_MATHFUN2L(atan2, y, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_atan2((double)y, (double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/isnan.h>
 #include <libm/cos.h>
@@ -375,16 +375,16 @@ NOTHROW(LIBCCALL libc_atan2l)(__LONGDOUBLE y,
  * Cosine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_cosl __LONGDOUBLE
 NOTHROW(LIBCCALL libc_cosl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	__LONGDOUBLE result = __LIBM_MATHFUNL(cos, x);
 	if (__LIBM_MATHFUNIL(isnan, result) && !__LIBM_MATHFUNIL(isnan, x))
 		result = __kernel_standard_l(x, x, result, __LIBM_KMATHERRL_COS_INF);
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_cos((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/isnan.h>
 #include <libm/sin.h>
@@ -393,16 +393,16 @@ NOTHROW(LIBCCALL libc_cosl)(__LONGDOUBLE x) {
  * Sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_sinl __LONGDOUBLE
 NOTHROW(LIBCCALL libc_sinl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	__LONGDOUBLE result = __LIBM_MATHFUNL(sin, x);
 	if (__LIBM_MATHFUNIL(isnan, result) && !__LIBM_MATHFUNIL(isnan, x))
 		result = __kernel_standard_l(x, x, result, __LIBM_KMATHERRL_SIN_INF);
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_sin((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/isnan.h>
 #include <libm/isinf.h>
@@ -412,16 +412,16 @@ NOTHROW(LIBCCALL libc_sinl)(__LONGDOUBLE x) {
  * Tangent of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_tanl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	__LONGDOUBLE result = __LIBM_MATHFUNL(tan, x);
 	if (__LIBM_MATHFUNIL(isnan, result) && __LIBM_MATHFUNIL(isinf, x))
 		result = __kernel_standard_l(x, x, result, __LIBM_KMATHERRL_TAN_INF);
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_tan((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/finite.h>
 #include <libm/cosh.h>
@@ -463,7 +463,7 @@ NOTHROW(LIBCCALL libc_tanh)(double x) {
  * Hyperbolic   cosine   of   `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_coshf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	float result = __LIBM_MATHFUNF(cosh, x);
@@ -471,9 +471,9 @@ NOTHROW(LIBCCALL libc_coshf)(float x) {
 		!__LIBM_MATHFUNIF(finite, result) && __LIBM_MATHFUNIF(finite, x))
 		result = __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_COSH);
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_cosh((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/finite.h>
 #include <libm/sinh.h>
@@ -482,7 +482,7 @@ NOTHROW(LIBCCALL libc_coshf)(float x) {
  * Hyperbolic sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_sinhf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	float result = __LIBM_MATHFUNF(sinh, x);
@@ -490,22 +490,22 @@ NOTHROW(LIBCCALL libc_sinhf)(float x) {
 		!__LIBM_MATHFUNIF(finite, result) && __LIBM_MATHFUNIF(finite, x))
 		result = __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_SINH);
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_sinh((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/tanh.h>
 /* >> tanhf(3), tanh(3), tanhl(3)
  * Hyperbolic   tangent   of  `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_tanhf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	return __LIBM_MATHFUNF(tanh, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_tanh((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/finite.h>
 #include <libm/cosh.h>
@@ -514,7 +514,7 @@ NOTHROW(LIBCCALL libc_tanhf)(float x) {
  * Hyperbolic   cosine   of   `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_coshl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	__LONGDOUBLE result = __LIBM_MATHFUNL(cosh, x);
@@ -522,9 +522,9 @@ NOTHROW(LIBCCALL libc_coshl)(__LONGDOUBLE x) {
 		!__LIBM_MATHFUNIL(finite, result) && __LIBM_MATHFUNIL(finite, x))
 		result = __kernel_standard_l(x, x, result, __LIBM_KMATHERRL_COSH);
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_cosh((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/finite.h>
 #include <libm/sinh.h>
@@ -533,7 +533,7 @@ NOTHROW(LIBCCALL libc_coshl)(__LONGDOUBLE x) {
  * Hyperbolic sine of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_sinhl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	__LONGDOUBLE result = __LIBM_MATHFUNL(sinh, x);
@@ -541,22 +541,22 @@ NOTHROW(LIBCCALL libc_sinhl)(__LONGDOUBLE x) {
 		!__LIBM_MATHFUNIL(finite, result) && __LIBM_MATHFUNIL(finite, x))
 		result = __kernel_standard_l(x, x, result, __LIBM_KMATHERRL_SINH);
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_sinh((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/tanh.h>
 /* >> tanhf(3), tanh(3), tanhl(3)
  * Hyperbolic   tangent   of  `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_tanhl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	return __LIBM_MATHFUNL(tanh, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_tanh((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/fcomp.h>
 #include <libm/matherr.h>
@@ -603,29 +603,29 @@ NOTHROW(LIBCCALL libc_atanh)(double x) {
  * Hyperbolic  arc  cosine  of   `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_acoshf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 		__LIBM_MATHFUNI2F(isless, x, 1.0f)) /* acosh(x<1) */
 		return __kernel_standard_f(x, x, __LIBM_MATHFUN1IF(nan, ""), __LIBM_KMATHERRF_ACOSH);
 	return __LIBM_MATHFUNF(acosh, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_acosh((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/asinh.h>
 /* >> asinhf(3), asinh(3), asinhl(3)
  * Hyperbolic  arc   sine   of   `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_asinhf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	return __LIBM_MATHFUNF(asinh, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_asinh((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
@@ -637,7 +637,7 @@ NOTHROW(LIBCCALL libc_asinhf)(float x) {
  * Hyperbolic  arc  tangent  of  `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_atanhf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
@@ -646,9 +646,9 @@ NOTHROW(LIBCCALL libc_atanhf)(float x) {
 		                         __ieee754_fabsf(x) > 1.0f ? __LIBM_KMATHERRF_ATANH_PLUSONE /* atanh(|x|>1) */
 		                                                  : __LIBM_KMATHERRF_ATANH_ONE);   /* atanh(|x|==1) */
 	return __LIBM_MATHFUNF(atanh, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_atanh((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/fcomp.h>
 #include <libm/matherr.h>
@@ -658,29 +658,29 @@ NOTHROW(LIBCCALL libc_atanhf)(float x) {
  * Hyperbolic  arc  cosine  of   `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_acoshl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 		__LIBM_MATHFUNI2L(isless, x, 1.0L)) /* acosh(x<1) */
 		return __kernel_standard_l(x, x, __LIBM_MATHFUN1IL(nan, ""), __LIBM_KMATHERRL_ACOSH);
 	return __LIBM_MATHFUNL(acosh, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_acosh((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/asinh.h>
 /* >> asinhf(3), asinh(3), asinhl(3)
  * Hyperbolic  arc   sine   of   `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_asinhl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	return __LIBM_MATHFUNL(asinh, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_asinh((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
@@ -692,7 +692,7 @@ NOTHROW(LIBCCALL libc_asinhl)(__LONGDOUBLE x) {
  * Hyperbolic  arc  tangent  of  `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_atanhl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
@@ -701,9 +701,9 @@ NOTHROW(LIBCCALL libc_atanhl)(__LONGDOUBLE x) {
 		                         __ieee754_fabsf(x) > 1.0L ? __LIBM_KMATHERRL_ATANH_PLUSONE /* atanh(|x|>1) */
 		                                                  : __LIBM_KMATHERRL_ATANH_ONE);   /* atanh(|x|==1) */
 	return __LIBM_MATHFUNL(atanh, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_atanh((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/signbit.h>
 #include <libm/finite.h>
@@ -731,13 +731,13 @@ NOTHROW(LIBCCALL libc_exp)(double x) {
 INTERN ATTR_SECTION(".text.crt.math.math") NONNULL((2)) double
 NOTHROW_NCX(LIBCCALL libc_frexp)(double x,
                                  int *pexponent) {
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+
 	return (double)__ieee754_frexp((__IEEE754_DOUBLE_TYPE__)x, pexponent);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return (double)__ieee754_frexpf((__IEEE754_FLOAT_TYPE__)x, pexponent);
-#else /* ... */
-	return (double)__ieee854_frexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, pexponent);
-#endif /* !... */
+
+
+
+
+
 }
 #include <libc/errno.h>
 #include <libm/finite.h>
@@ -748,17 +748,17 @@ INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_ldexp)(double x,
                              int exponent) {
 	double result;
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+
 	result = (double)__ieee754_ldexp((__IEEE754_DOUBLE_TYPE__)x, exponent);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	result = (double)__ieee754_ldexpf((__IEEE754_FLOAT_TYPE__)x, exponent);
-#else /* ... */
-	result = (double)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
-#endif /* !... */
-#ifdef ERANGE
+
+
+
+
+
+
 	if unlikely(!__LIBM_MATHFUNI(finite, result) || result == 0.0)
 		(void)libc_seterrno(ERANGE);
-#endif /* ERANGE */
+
 	return result;
 }
 #include <bits/crt/fenv.h>
@@ -809,13 +809,13 @@ NOTHROW(LIBCCALL libc_log10)(double x) {
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((2)) double
 NOTHROW_NCX(LIBCCALL libc_modf)(double x,
                                 double *iptr) {
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+
 	return (double)__ieee754_modf((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__ *)iptr);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return (double)__ieee754_modff((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__ *)iptr);
-#else /* ... */
-	return (double)__ieee854_modfl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__ *)iptr);
-#endif /* !... */
+
+
+
+
+
 }
 #include <libm/signbit.h>
 #include <libm/finite.h>
@@ -825,7 +825,7 @@ NOTHROW_NCX(LIBCCALL libc_modf)(double x,
  * Exponential function of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_expf float
 NOTHROW(LIBCCALL libc_expf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	float result;
@@ -839,9 +839,9 @@ NOTHROW(LIBCCALL libc_expf)(float x) {
 		                         : __LIBM_KMATHERRF_EXP_OVERFLOW);
 	}
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_exp((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/frexp.h>
 /* >> frexpf(3), frexp(3), frexpl(3)
@@ -849,20 +849,19 @@ NOTHROW(LIBCCALL libc_expf)(float x) {
 INTERN ATTR_SECTION(".text.crt.math.math") NONNULL((2)) float
 NOTHROW_NCX(LIBCCALL libc_frexpf)(float x,
                                   int *pexponent) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	
-#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
-	return (float)__ieee754_frexp((__IEEE754_DOUBLE_TYPE__)x, pexponent);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+
+
 	return (float)__ieee754_frexpf((__IEEE754_FLOAT_TYPE__)x, pexponent);
-#else /* ... */
-	return (float)__ieee854_frexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, pexponent);
-#endif /* !... */
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_frexp((double)x, pexponent);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
+
+
+
 }
 #include <libc/errno.h>
 #include <libm/finite.h>
@@ -872,25 +871,25 @@ NOTHROW_NCX(LIBCCALL libc_frexpf)(float x,
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_ldexpf)(float x,
                               int exponent) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	float result;
-#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
-	result = (float)__ieee754_ldexp((__IEEE754_DOUBLE_TYPE__)x, exponent);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+
+
+
 	result = (float)__ieee754_ldexpf((__IEEE754_FLOAT_TYPE__)x, exponent);
-#else /* ... */
-	result = (float)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
-#endif /* !... */
-#ifdef ERANGE
+
+
+
+
 	if unlikely(!__LIBM_MATHFUNIF(finite, result) || result == 0.0f)
 		(void)libc_seterrno(ERANGE);
-#endif /* ERANGE */
+
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_ldexp((double)x, exponent);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <bits/crt/fenv.h>
 #include <bits/math-constants.h>
@@ -902,7 +901,7 @@ NOTHROW(LIBCCALL libc_ldexpf)(float x,
  * Natural  logarithm  of  `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_logf float
 NOTHROW(LIBCCALL libc_logf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 
@@ -916,9 +915,9 @@ NOTHROW(LIBCCALL libc_logf)(float x) {
 		}
 	}
 	return __LIBM_MATHFUNF(log, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_log((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <bits/crt/fenv.h>
 #include <bits/math-constants.h>
@@ -930,7 +929,7 @@ NOTHROW(LIBCCALL libc_logf)(float x) {
  * Base-ten    logarithm    of   `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_log10f)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 
@@ -944,9 +943,9 @@ NOTHROW(LIBCCALL libc_log10f)(float x) {
 		}
 	}
 	return __LIBM_MATHFUNF(log10, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_log10((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/modf.h>
 /* >> modff(3), modf(3), modfl(3)
@@ -954,20 +953,19 @@ NOTHROW(LIBCCALL libc_log10f)(float x) {
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((2)) float
 NOTHROW_NCX(LIBCCALL libc_modff)(float x,
                                  float *iptr) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	
-#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
-	return (float)__ieee754_modf((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__ *)iptr);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+
+
 	return (float)__ieee754_modff((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__ *)iptr);
-#else /* ... */
-	return (float)__ieee854_modfl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__ *)iptr);
-#endif /* !... */
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_modf((double)x, (double *)iptr);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
+
+
+
 }
 #include <libm/signbit.h>
 #include <libm/finite.h>
@@ -977,7 +975,7 @@ NOTHROW_NCX(LIBCCALL libc_modff)(float x,
  * Exponential function of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_expl __LONGDOUBLE
 NOTHROW(LIBCCALL libc_expl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	__LONGDOUBLE result;
@@ -991,9 +989,9 @@ NOTHROW(LIBCCALL libc_expl)(__LONGDOUBLE x) {
 		                         : __LIBM_KMATHERRL_EXP_OVERFLOW);
 	}
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_exp((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/frexp.h>
 /* >> frexpf(3), frexp(3), frexpl(3)
@@ -1001,20 +999,19 @@ NOTHROW(LIBCCALL libc_expl)(__LONGDOUBLE x) {
 INTERN ATTR_SECTION(".text.crt.math.math") NONNULL((2)) __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_frexpl)(__LONGDOUBLE x,
                                   int *pexponent) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	
-#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee754_frexp((__IEEE754_DOUBLE_TYPE__)x, pexponent);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_frexpf((__IEEE754_FLOAT_TYPE__)x, pexponent);
-#else /* ... */
+
+
+
+
 	return (__LONGDOUBLE)__ieee854_frexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, pexponent);
-#endif /* !... */
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_frexp((double)x, pexponent);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
+
 }
 #include <libc/errno.h>
 #include <libm/finite.h>
@@ -1024,25 +1021,25 @@ NOTHROW_NCX(LIBCCALL libc_frexpl)(__LONGDOUBLE x,
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_ldexpl)(__LONGDOUBLE x,
                               int exponent) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	__LONGDOUBLE result;
-#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	result = (__LONGDOUBLE)__ieee754_ldexp((__IEEE754_DOUBLE_TYPE__)x, exponent);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	result = (__LONGDOUBLE)__ieee754_ldexpf((__IEEE754_FLOAT_TYPE__)x, exponent);
-#else /* ... */
+
+
+
+
+
 	result = (__LONGDOUBLE)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
-#endif /* !... */
-#ifdef ERANGE
+
+
 	if unlikely(!__LIBM_MATHFUNIL(finite, result) || result == 0.0L)
 		(void)libc_seterrno(ERANGE);
-#endif /* ERANGE */
+
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_ldexp((double)x, exponent);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <bits/crt/fenv.h>
 #include <bits/math-constants.h>
@@ -1054,7 +1051,7 @@ NOTHROW(LIBCCALL libc_ldexpl)(__LONGDOUBLE x,
  * Natural  logarithm  of  `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_logl __LONGDOUBLE
 NOTHROW(LIBCCALL libc_logl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 
@@ -1068,9 +1065,9 @@ NOTHROW(LIBCCALL libc_logl)(__LONGDOUBLE x) {
 		}
 	}
 	return __LIBM_MATHFUNL(log, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_log((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <bits/crt/fenv.h>
 #include <bits/math-constants.h>
@@ -1082,7 +1079,7 @@ NOTHROW(LIBCCALL libc_logl)(__LONGDOUBLE x) {
  * Base-ten    logarithm    of   `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_log10l)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 
@@ -1096,9 +1093,9 @@ NOTHROW(LIBCCALL libc_log10l)(__LONGDOUBLE x) {
 		}
 	}
 	return __LIBM_MATHFUNL(log10, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_log10((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/modf.h>
 /* >> modff(3), modf(3), modfl(3)
@@ -1106,20 +1103,19 @@ NOTHROW(LIBCCALL libc_log10l)(__LONGDOUBLE x) {
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((2)) __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_modfl)(__LONGDOUBLE x,
                                  __LONGDOUBLE *iptr) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	
-#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee754_modf((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__ *)iptr);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_modff((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__ *)iptr);
-#else /* ... */
+
+
+
+
 	return (__LONGDOUBLE)__ieee854_modfl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__ *)iptr);
-#endif /* !... */
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_modf((double)x, (double *)iptr);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
+
 }
 #include <libm/matherr.h>
 #include <libm/signbit.h>
@@ -1176,7 +1172,7 @@ NOTHROW(LIBCCALL libc_logb)(double x) {
  * Return `exp(x) - 1' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_expm1f)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	float result;
@@ -1189,9 +1185,9 @@ NOTHROW(LIBCCALL libc_expm1f)(float x) {
 		                         : __LIBM_KMATHERRF_EXPM1_OVERFLOW);
 	}
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_expm1((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <bits/crt/fenv.h>
 #include <bits/math-constants.h>
@@ -1203,7 +1199,7 @@ NOTHROW(LIBCCALL libc_expm1f)(float x) {
  * Return `log(1 + x)' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_log1pf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 
@@ -1217,22 +1213,22 @@ NOTHROW(LIBCCALL libc_log1pf)(float x) {
 		}
 	}
 	return __LIBM_MATHFUNF(log1p, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_log1p((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/logb.h>
 /* >> logbf(3), logb(3), logbl(3)
  * Return the base 2 signed integral exponent of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_logbf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	return __LIBM_MATHFUNF(logb, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_logb((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/matherr.h>
 #include <libm/signbit.h>
@@ -1242,7 +1238,7 @@ NOTHROW(LIBCCALL libc_logbf)(float x) {
  * Return `exp(x) - 1' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_expm1l)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	__LONGDOUBLE result;
@@ -1255,9 +1251,9 @@ NOTHROW(LIBCCALL libc_expm1l)(__LONGDOUBLE x) {
 		                         : __LIBM_KMATHERRL_EXPM1_OVERFLOW);
 	}
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_expm1((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <bits/crt/fenv.h>
 #include <bits/math-constants.h>
@@ -1269,7 +1265,7 @@ NOTHROW(LIBCCALL libc_expm1l)(__LONGDOUBLE x) {
  * Return `log(1 + x)' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_log1pl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 
@@ -1283,22 +1279,22 @@ NOTHROW(LIBCCALL libc_log1pl)(__LONGDOUBLE x) {
 		}
 	}
 	return __LIBM_MATHFUNL(log1p, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_log1p((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/logb.h>
 /* >> logbf(3), logb(3), logbl(3)
  * Return the base 2 signed integral exponent of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_logbl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	return __LIBM_MATHFUNL(logb, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_logb((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/exp2.h>
 #include <libm/matherr.h>
@@ -1348,7 +1344,7 @@ NOTHROW(LIBCCALL libc_log2)(double x) {
  * Compute base-2 exponential of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_exp2f)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 
@@ -1360,9 +1356,9 @@ NOTHROW(LIBCCALL libc_exp2f)(float x) {
 		                         : __LIBM_KMATHERRF_EXP2_OVERFLOW);
 	}
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_exp2((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <bits/crt/fenv.h>
 #include <bits/math-constants.h>
@@ -1374,7 +1370,7 @@ NOTHROW(LIBCCALL libc_exp2f)(float x) {
  * Compute base-2 logarithm of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_log2f)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 
@@ -1390,9 +1386,9 @@ NOTHROW(LIBCCALL libc_log2f)(float x) {
 		}
 	}
 	return __LIBM_MATHFUNF(log2, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_log2((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/exp2.h>
 #include <libm/matherr.h>
@@ -1402,7 +1398,7 @@ NOTHROW(LIBCCALL libc_log2f)(float x) {
  * Compute base-2 exponential of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_exp2l)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 
@@ -1414,9 +1410,9 @@ NOTHROW(LIBCCALL libc_exp2l)(__LONGDOUBLE x) {
 		                         : __LIBM_KMATHERRL_EXP2_OVERFLOW);
 	}
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_exp2((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <bits/crt/fenv.h>
 #include <bits/math-constants.h>
@@ -1428,7 +1424,7 @@ NOTHROW(LIBCCALL libc_exp2l)(__LONGDOUBLE x) {
  * Compute base-2 logarithm of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_log2l)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 
@@ -1444,9 +1440,9 @@ NOTHROW(LIBCCALL libc_log2l)(__LONGDOUBLE x) {
 		}
 	}
 	return __LIBM_MATHFUNL(log2, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_log2((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/finite.h>
 #include <libm/isnan.h>
@@ -1527,7 +1523,7 @@ NOTHROW(LIBCCALL libc_sqrt)(double x) {
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_powf float
 NOTHROW(LIBCCALL libc_powf)(float x,
                             float y) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	float result;
@@ -1578,9 +1574,9 @@ NOTHROW(LIBCCALL libc_powf)(float x,
 		}
 	}
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_pow((double)x, (double)y);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/fcomp.h>
 #include <libm/nan.h>
@@ -1590,15 +1586,15 @@ NOTHROW(LIBCCALL libc_powf)(float x,
  * Return the square root of  `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_sqrtf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2F(isless, x, 0.0f))
 		return __kernel_standard_f(x, x, __LIBM_MATHFUN1IF(nan, ""), __LIBM_KMATHERRF_SQRT); /* sqrt(negative) */
 	return __LIBM_MATHFUNF(sqrt, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_sqrt((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/finite.h>
 #include <libm/isnan.h>
@@ -1609,7 +1605,7 @@ NOTHROW(LIBCCALL libc_sqrtf)(float x) {
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_powl __LONGDOUBLE
 NOTHROW(LIBCCALL libc_powl)(__LONGDOUBLE x,
                             __LONGDOUBLE y) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	__LONGDOUBLE result;
@@ -1660,9 +1656,9 @@ NOTHROW(LIBCCALL libc_powl)(__LONGDOUBLE x,
 		}
 	}
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_pow((double)x, (double)y);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/fcomp.h>
 #include <libm/nan.h>
@@ -1672,15 +1668,15 @@ NOTHROW(LIBCCALL libc_powl)(__LONGDOUBLE x,
  * Return the square root of  `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_sqrtl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_MATHFUNI2L(isless, x, 0.0L))
 		return __kernel_standard_l(x, x, __LIBM_MATHFUN1IL(nan, ""), __LIBM_KMATHERRL_SQRT); /* sqrt(negative) */
 	return __LIBM_MATHFUNL(sqrt, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_sqrt((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/finite.h>
 #include <libm/matherr.h>
@@ -1704,7 +1700,7 @@ NOTHROW(LIBCCALL libc_hypot)(double x,
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_hypotf)(float x,
                               float y) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	float result = __LIBM_MATHFUN2F(hypot, y, x);
@@ -1712,9 +1708,9 @@ NOTHROW(LIBCCALL libc_hypotf)(float x,
 	    __LIBM_MATHFUNIF(finite, x) && __LIBM_MATHFUNIF(finite, y))
 		return __kernel_standard_f(x, y, result, __LIBM_KMATHERRF_HYPOT); /* hypot overflow */
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_hypot((double)x, (double)y);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/finite.h>
 #include <libm/matherr.h>
@@ -1724,7 +1720,7 @@ NOTHROW(LIBCCALL libc_hypotf)(float x,
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_hypotl)(__LONGDOUBLE x,
                               __LONGDOUBLE y) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	__LONGDOUBLE result = __LIBM_MATHFUN2L(hypot, y, x);
@@ -1732,9 +1728,9 @@ NOTHROW(LIBCCALL libc_hypotl)(__LONGDOUBLE x,
 	    __LIBM_MATHFUNIL(finite, x) && __LIBM_MATHFUNIL(finite, y))
 		return __kernel_standard_l(x, y, result, __LIBM_KMATHERRL_HYPOT); /* hypot overflow */
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_hypot((double)x, (double)y);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/cbrt.h>
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
@@ -1748,26 +1744,26 @@ NOTHROW(LIBCCALL libc_cbrt)(double x) {
  * Return  the  cube root  of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_cbrtf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	return __LIBM_MATHFUNF(cbrt, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_cbrt((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/cbrt.h>
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
  * Return  the  cube root  of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_cbrtl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	return __LIBM_MATHFUNL(cbrt, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_cbrt((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <hybrid/typecore.h>
 #include <libm/ceil.h>
@@ -1775,26 +1771,26 @@ NOTHROW(LIBCCALL libc_cbrtl)(__LONGDOUBLE x) {
  * Smallest integral value not less than `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_ceil)(double x) {
-#ifdef __LIBM_MATHFUN
+
 	return __LIBM_MATHFUN(ceil, x);
-#else /* __LIBM_MATHFUN */
-	double result;
-	result = (double)(__INTMAX_TYPE__)x; /* Round towards 0 */
-	if (result < x)
-		result += 1.0;
-	return result;
-#endif /* !__LIBM_MATHFUN */
+
+
+
+
+
+
+
 }
 #include <libm/fabs.h>
 /* >> fabsf(3), fabs(3), fabsl(3)
  * Absolute value of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_fabs)(double x) {
-#ifdef __LIBM_MATHFUN
+
 	return __LIBM_MATHFUN(fabs, x);
-#else /* __LIBM_MATHFUN */
-	return x < 0.0 ? -x : x;
-#endif /* !__LIBM_MATHFUN */
+
+
+
 }
 #include <hybrid/typecore.h>
 #include <libm/floor.h>
@@ -1802,15 +1798,15 @@ NOTHROW(LIBCCALL libc_fabs)(double x) {
  * Largest integer not greater than `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_floor)(double x) {
-#ifdef __LIBM_MATHFUN
+
 	return __LIBM_MATHFUN(floor, x);
-#else /* __LIBM_MATHFUN */
-	double result;
-	result = (double)(__INTMAX_TYPE__)x; /* Round towards 0 */
-	if (result > x)
-		result -= 1.0;
-	return result;
-#endif /* !__LIBM_MATHFUN */
+
+
+
+
+
+
+
 }
 #include <libm/isinf.h>
 #include <libm/fcomp.h>
@@ -1833,26 +1829,26 @@ NOTHROW(LIBCCALL libc_fmod)(double x,
  * Smallest integral value not less than `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_ceilf)(float x) {
-#ifdef __LIBM_MATHFUNF
+
 	return __LIBM_MATHFUNF(ceil, x);
-#else /* __LIBM_MATHFUNF */
-	float result;
-	result = (float)(__INTMAX_TYPE__)x; /* Round towards 0 */
-	if (result < x)
-		result += 1.0f;
-	return result;
-#endif /* !__LIBM_MATHFUNF */
+
+
+
+
+
+
+
 }
 #include <libm/fabs.h>
 /* >> fabsf(3), fabs(3), fabsl(3)
  * Absolute value of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_fabsf)(float x) {
-#ifdef __LIBM_MATHFUNF
+
 	return __LIBM_MATHFUNF(fabs, x);
-#else /* __LIBM_MATHFUNF */
-	return x < 0.0f ? -x : x;
-#endif /* !__LIBM_MATHFUNF */
+
+
+
 }
 #include <hybrid/typecore.h>
 #include <libm/floor.h>
@@ -1860,15 +1856,15 @@ NOTHROW(LIBCCALL libc_fabsf)(float x) {
  * Largest integer not greater than `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_floorf)(float x) {
-#ifdef __LIBM_MATHFUNF
+
 	return __LIBM_MATHFUNF(floor, x);
-#else /* __LIBM_MATHFUNF */
-	float result;
-	result = (float)(__INTMAX_TYPE__)x; /* Round towards 0 */
-	if (result > x)
-		result -= 1.0f;
-	return result;
-#endif /* !__LIBM_MATHFUNF */
+
+
+
+
+
+
+
 }
 #include <libm/isinf.h>
 #include <libm/fcomp.h>
@@ -1879,7 +1875,7 @@ NOTHROW(LIBCCALL libc_floorf)(float x) {
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_fmodf)(float x,
                              float y) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
@@ -1887,9 +1883,9 @@ NOTHROW(LIBCCALL libc_fmodf)(float x,
 	    !__LIBM_MATHFUN2F(isunordered, x, y))
 		return __kernel_standard_f(x, y, y, __LIBM_KMATHERRF_FMOD); /* fmod(+-Inf,y) or fmod(x,0) */
 	return __LIBM_MATHFUN2F(fmod, x, y);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_fmod((double)x, (double)y);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <hybrid/typecore.h>
 #include <libm/ceil.h>
@@ -1897,26 +1893,26 @@ NOTHROW(LIBCCALL libc_fmodf)(float x,
  * Smallest integral value not less than `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_ceill)(__LONGDOUBLE x) {
-#ifdef __LIBM_MATHFUNL
+
 	return __LIBM_MATHFUNL(ceil, x);
-#else /* __LIBM_MATHFUNL */
-	__LONGDOUBLE result;
-	result = (__LONGDOUBLE)(__INTMAX_TYPE__)x; /* Round towards 0 */
-	if (result < x)
-		result += 1.0L;
-	return result;
-#endif /* !__LIBM_MATHFUNL */
+
+
+
+
+
+
+
 }
 #include <libm/fabs.h>
 /* >> fabsf(3), fabs(3), fabsl(3)
  * Absolute value of `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_fabsl)(__LONGDOUBLE x) {
-#ifdef __LIBM_MATHFUNL
+
 	return __LIBM_MATHFUNL(fabs, x);
-#else /* __LIBM_MATHFUNL */
-	return x < 0.0L ? -x : x;
-#endif /* !__LIBM_MATHFUNL */
+
+
+
 }
 #include <hybrid/typecore.h>
 #include <libm/floor.h>
@@ -1924,15 +1920,15 @@ NOTHROW(LIBCCALL libc_fabsl)(__LONGDOUBLE x) {
  * Largest integer not greater than `x' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_floorl)(__LONGDOUBLE x) {
-#ifdef __LIBM_MATHFUNL
+
 	return __LIBM_MATHFUNL(floor, x);
-#else /* __LIBM_MATHFUNL */
-	__LONGDOUBLE result;
-	result = (__LONGDOUBLE)(__INTMAX_TYPE__)x; /* Round towards 0 */
-	if (result > x)
-		result -= 1.0L;
-	return result;
-#endif /* !__LIBM_MATHFUNL */
+
+
+
+
+
+
+
 }
 #include <libm/isinf.h>
 #include <libm/fcomp.h>
@@ -1943,7 +1939,7 @@ NOTHROW(LIBCCALL libc_floorl)(__LONGDOUBLE x) {
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_fmodl)(__LONGDOUBLE x,
                              __LONGDOUBLE y) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
@@ -1951,9 +1947,9 @@ NOTHROW(LIBCCALL libc_fmodl)(__LONGDOUBLE x,
 	    !__LIBM_MATHFUN2L(isunordered, x, y))
 		return __kernel_standard_l(x, y, y, __LIBM_KMATHERRL_FMOD); /* fmod(+-Inf,y) or fmod(x,0) */
 	return __LIBM_MATHFUN2L(fmod, x, y);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_fmod((double)x, (double)y);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/copysign.h>
 /* >> copysignf(3), copysign(3), copysignl(3)
@@ -1961,13 +1957,13 @@ NOTHROW(LIBCCALL libc_fmodl)(__LONGDOUBLE x,
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_copysign)(double num,
                                 double sign) {
-#ifdef __LIBM_MATHFUN2
+
 	return __LIBM_MATHFUN2(copysign, num, sign);
-#else /* __LIBM_MATHFUN2 */
-	if ((num < 0.0) != (sign < 0.0))
-		num = -num;
-	return num;
-#endif /* !__LIBM_MATHFUN2 */
+
+
+
+
+
 }
 #include <libm/nan.h>
 /* >> nanf(3), nan(3), nanl(3)
@@ -1982,26 +1978,26 @@ NOTHROW(LIBCCALL libc_nan)(char const *tagb) {
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_copysignf)(float num,
                                  float sign) {
-#ifdef __LIBM_MATHFUN2F
+
 	return __LIBM_MATHFUN2F(copysign, num, sign);
-#else /* __LIBM_MATHFUN2F */
-	if ((num < 0.0f) != (sign < 0.0f))
-		num = -num;
-	return num;
-#endif /* !__LIBM_MATHFUN2F */
+
+
+
+
+
 }
 #include <libm/nan.h>
 /* >> nanf(3), nan(3), nanl(3)
  * Return representation of qNaN for double type */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_nanf)(char const *tagb) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	return __LIBM_MATHFUN1IF(nan, tagb);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_nan(tagb);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/copysign.h>
 /* >> copysignf(3), copysign(3), copysignl(3)
@@ -2009,26 +2005,26 @@ NOTHROW(LIBCCALL libc_nanf)(char const *tagb) {
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_copysignl)(__LONGDOUBLE num,
                                  __LONGDOUBLE sign) {
-#ifdef __LIBM_MATHFUN2L
+
 	return __LIBM_MATHFUN2L(copysign, num, sign);
-#else /* __LIBM_MATHFUN2L */
-	if ((num < 0.0L) != (sign < 0.0L))
-		num = -num;
-	return num;
-#endif /* !__LIBM_MATHFUN2L */
+
+
+
+
+
 }
 #include <libm/nan.h>
 /* >> nanf(3), nan(3), nanl(3)
  * Return representation of qNaN for double type */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_nanl)(char const *tagb) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	return __LIBM_MATHFUN1IL(nan, tagb);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_nan(tagb);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/erf.h>
 /* >> erff(3), erf(3), erfl(3) */
@@ -2051,25 +2047,25 @@ NOTHROW(LIBCCALL libc_lgamma)(double x) {
 /* >> erff(3), erf(3), erfl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_erff)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	return __LIBM_MATHFUNF(erf, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_erf((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/erfc.h>
 /* >> erfcf(3), erfc(3), erfcl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_erfcf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	return __LIBM_MATHFUNF(erfc, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_erfc((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
@@ -2080,25 +2076,25 @@ NOTHROW(LIBCCALL libc_lgammaf)(float x) {
 /* >> erff(3), erf(3), erfl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_erfl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	return __LIBM_MATHFUNL(erf, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_erf((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/erfc.h>
 /* >> erfcf(3), erfc(3), erfcl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_erfcl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	return __LIBM_MATHFUNL(erfc, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_erfc((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
@@ -2139,7 +2135,7 @@ NOTHROW(LIBCCALL libc_tgamma)(double x) {
  * True gamma function */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_tgammaf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	int my_signgam;
@@ -2155,9 +2151,9 @@ NOTHROW(LIBCCALL libc_tgammaf)(float x) {
 		return __kernel_standard_f(x, x, result, __LIBM_KMATHERRF_TGAMMA_OVERFLOW);      /* tgamma overflow */
 	}
 	return my_signgam < 0 ? -result : result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_tgamma((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/fcomp.h>
 #include <libm/isinf.h>
@@ -2169,7 +2165,7 @@ NOTHROW(LIBCCALL libc_tgammaf)(float x) {
  * True gamma function */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_tgammal)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	int my_signgam;
@@ -2185,9 +2181,9 @@ NOTHROW(LIBCCALL libc_tgammal)(__LONGDOUBLE x) {
 		return __kernel_standard_l(x, x, result, __LIBM_KMATHERRL_TGAMMA_OVERFLOW);      /* tgamma overflow */
 	}
 	return my_signgam < 0 ? -result : result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_tgamma((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/rint.h>
 /* >> rintf(3), rint(3), rintl(3)
@@ -2237,13 +2233,13 @@ NOTHROW(LIBCCALL libc_ilogb)(double x) {
  * Return the integer nearest `x' in the direction of the prevailing rounding mode */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_rintf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	return __LIBM_MATHFUNF(rint, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_rint((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/nextafter.h>
 /* >> nextafterf(3), nextafter(3), nextafterl(3)
@@ -2251,13 +2247,13 @@ NOTHROW(LIBCCALL libc_rintf)(float x) {
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_nextafterf)(float x,
                                   float y) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	return __LIBM_MATHFUN2F(nextafter, x, y);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_nextafter((double)x, (double)y);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/matherr.h>
 #include <libm/isnan.h>
@@ -2268,7 +2264,7 @@ NOTHROW(LIBCCALL libc_nextafterf)(float x,
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_remainderf)(float x,
                                   float p) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	if (((p == 0.0f && !__LIBM_MATHFUNIF(isnan, x)) ||
@@ -2276,9 +2272,9 @@ NOTHROW(LIBCCALL libc_remainderf)(float x,
 	    __LIBM_LIB_VERSION != __LIBM_IEEE)
 		return __kernel_standard_f(x, p, p, __LIBM_KMATHERRF_REMAINDER); /* remainder domain */
 	return __LIBM_MATHFUN2F(remainder, x, p);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_remainder((double)x, (double)p);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/ilogb.h>
 #include <libm/matherr.h>
@@ -2287,7 +2283,7 @@ NOTHROW(LIBCCALL libc_remainderf)(float x,
  * Return the binary exponent of `x', which must be nonzero */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED int
 NOTHROW(LIBCCALL libc_ilogbf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+
 
 
 	int result;
@@ -2295,22 +2291,22 @@ NOTHROW(LIBCCALL libc_ilogbf)(float x) {
 	if (result == __FP_ILOGB0 || result == __FP_ILOGBNAN || result == INT_MAX)
 		__kernel_standard_f(x, x, x, __LIBM_KMATHERRF_ILOGB);
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
-	return libc_ilogb((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/rint.h>
 /* >> rintf(3), rint(3), rintl(3)
  * Return the integer nearest `x' in the direction of the prevailing rounding mode */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_rintl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	return __LIBM_MATHFUNL(rint, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_rint((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/nextafter.h>
 /* >> nextafterf(3), nextafter(3), nextafterl(3)
@@ -2318,13 +2314,13 @@ NOTHROW(LIBCCALL libc_rintl)(__LONGDOUBLE x) {
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_nextafterl)(__LONGDOUBLE x,
                                   __LONGDOUBLE y) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	return __LIBM_MATHFUN2L(nextafter, x, y);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_nextafter((double)x, (double)y);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/matherr.h>
 #include <libm/isnan.h>
@@ -2335,7 +2331,7 @@ NOTHROW(LIBCCALL libc_nextafterl)(__LONGDOUBLE x,
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_remainderl)(__LONGDOUBLE x,
                                   __LONGDOUBLE p) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	if (((p == 0.0L && !__LIBM_MATHFUNIL(isnan, x)) ||
@@ -2343,9 +2339,9 @@ NOTHROW(LIBCCALL libc_remainderl)(__LONGDOUBLE x,
 	    __LIBM_LIB_VERSION != __LIBM_IEEE)
 		return __kernel_standard_l(x, p, p, __LIBM_KMATHERRL_REMAINDER); /* remainder domain */
 	return __LIBM_MATHFUN2L(remainder, x, p);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_remainder((double)x, (double)p);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/ilogb.h>
 #include <libm/matherr.h>
@@ -2354,7 +2350,7 @@ NOTHROW(LIBCCALL libc_remainderl)(__LONGDOUBLE x,
  * Return the binary exponent of `x', which must be nonzero */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED int
 NOTHROW(LIBCCALL libc_ilogbl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	int result;
@@ -2362,24 +2358,24 @@ NOTHROW(LIBCCALL libc_ilogbl)(__LONGDOUBLE x) {
 	if (result == __FP_ILOGB0 || result == __FP_ILOGBNAN || result == INT_MAX)
 		__kernel_standard_l(x, x, x, __LIBM_KMATHERRL_ILOGB);
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ */
-	return libc_ilogb((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/nexttoward.h>
 /* >> nexttowardf(3), nexttoward(3), nexttowardl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_nexttoward)(double x,
                                   __LONGDOUBLE y) {
-#ifdef __IEEE854_LONG_DOUBLE_TYPE__
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+
+
 	return (double)__ieee754_nexttoward((__IEEE754_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
-#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
-	return (double)__ieee754_nexttowardf((__IEEE754_FLOAT_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
-#else /* __IEEE854_LONG_DOUBLE_TYPE__ */
-	return (double)libc_nextafterl((__LONGDOUBLE)x, y);
-#endif /* !__IEEE854_LONG_DOUBLE_TYPE__ */
+
+
+
+
+
+
 }
 #include <libm/scalbn.h>
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
@@ -2387,13 +2383,13 @@ NOTHROW(LIBCCALL libc_nexttoward)(double x,
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_scalbn)(double x,
                               int n) {
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+
 	return (double)__ieee754_scalbn((__IEEE754_DOUBLE_TYPE__)x, n);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return (double)__ieee754_scalbnf((__IEEE754_FLOAT_TYPE__)x, n);
-#else /* ... */
-	return (double)__ieee854_scalbnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
-#endif /* !... */
+
+
+
+
+
 }
 #if __SIZEOF_INT__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libc_scalbln, libc_scalbn);
@@ -2404,13 +2400,13 @@ DEFINE_INTERN_ALIAS(libc_scalbln, libc_scalbn);
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_scalbln)(double x,
                                long int n) {
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+
 	return (double)__ieee754_scalbln((__IEEE754_DOUBLE_TYPE__)x, n);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return (double)__ieee754_scalblnf((__IEEE754_FLOAT_TYPE__)x, n);
-#else /* ... */
-	return (double)__ieee854_scalblnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
-#endif /* !... */
+
+
+
+
+
 }
 #endif /* __SIZEOF_INT__ != __SIZEOF_LONG__ */
 #include <hybrid/typecore.h>
@@ -2419,22 +2415,22 @@ NOTHROW(LIBCCALL libc_scalbln)(double x,
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_round)(double x) {
-#ifdef __LIBM_MATHFUN
+
 	return (double)__LIBM_MATHFUN(round, x);
-#else /* __LIBM_MATHFUN */
-	double result;
-	result = (double)(__INTMAX_TYPE__)x;
-	if (x < 0.0) {
-		/* result >= x */
-		if ((result - x) >= 0.5)
-			result -= 1.0;
-	} else {
-		/* result <= x */
-		if ((x - result) >= 0.5)
-			result += 1.0;
-	}
-	return result;
-#endif /* !__LIBM_MATHFUN */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 #include <hybrid/typecore.h>
 #include <libm/trunc.h>
@@ -2443,11 +2439,11 @@ NOTHROW(LIBCCALL libc_round)(double x) {
  * format   nearest  but  not  larger  in  magnitude */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_trunc)(double x) {
-#ifdef __LIBM_MATHFUN
+
 	return __LIBM_MATHFUN(trunc, x);
-#else /* __LIBM_MATHFUN */
-	return (double)(__INTMAX_TYPE__)x;
-#endif /* !__LIBM_MATHFUN */
+
+
+
 }
 #include <libm/remquo.h>
 /* >> remquof(3), remquo(3), remquol(3)
@@ -2466,11 +2462,11 @@ NOTHROW(LIBCCALL libc_remquo)(double x,
  * Round `x' to nearest integral value according to current rounding direction */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED long int
 NOTHROW(LIBCCALL libc_lrint)(double x) {
-#ifdef __LIBM_MATHFUNI
+
 	return __LIBM_MATHFUNI(lrint, x);
-#else /* __LIBM_MATHFUNI */
-	return (long int)libc_rint(x);
-#endif /* !__LIBM_MATHFUNI */
+
+
+
 }
 #include <hybrid/typecore.h>
 #include <libm/lround.h>
@@ -2478,11 +2474,11 @@ NOTHROW(LIBCCALL libc_lrint)(double x) {
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED long int
 NOTHROW(LIBCCALL libc_lround)(double x) {
-#ifdef __LIBM_MATHFUNI
+
 	return __LIBM_MATHFUNI(lround, x);
-#else /* __LIBM_MATHFUNI */
-	return (long int)libc_round(x);
-#endif /* !__LIBM_MATHFUNI */
+
+
+
 }
 /* >> fdimf(3), fdim(3), fdiml(3)
  * Return positive difference between `x' and `y' */
@@ -2500,15 +2496,15 @@ NOTHROW(LIBCCALL libc_fdim)(double x,
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_fmax)(double x,
                             double y) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+
 	if (__LIBM_MATHFUNI2(isgreaterequal, x, y))
 		return x;
 	if (__LIBM_MATHFUNI(isnan, y))
 		return x;
-#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-	if (x >= y)
-		return x;
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+
+
+
+
 	return y;
 }
 #include <ieee754.h>
@@ -2519,15 +2515,15 @@ NOTHROW(LIBCCALL libc_fmax)(double x,
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_fmin)(double x,
                             double y) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+
 	if (__LIBM_MATHFUNI2(islessequal, x, y))
 		return x;
 	if (__LIBM_MATHFUNI(isnan, y))
 		return x;
-#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-	if (x <= y)
-		return x;
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+
+
+
+
 	return y;
 }
 /* >> fmaf(3), fma(3), fmal(3)
@@ -2548,11 +2544,11 @@ DEFINE_INTERN_ALIAS(libc_llrint, libc_lrint);
  * Round `x' to nearest integral value according to current rounding direction */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGLONG
 NOTHROW(LIBCCALL libc_llrint)(double x) {
-#ifdef __LIBM_MATHFUNI
+
 	return __LIBM_MATHFUNI(llrint, x);
-#else /* __LIBM_MATHFUNI */
-	return (__LONGLONG)libc_rint(x);
-#endif /* !__LIBM_MATHFUNI */
+
+
+
 }
 #endif /* __SIZEOF_LONG__ != __SIZEOF_LONG_LONG__ */
 #if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
@@ -2564,11 +2560,11 @@ DEFINE_INTERN_ALIAS(libc_llround, libc_lround);
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGLONG
 NOTHROW(LIBCCALL libc_llround)(double x) {
-#ifdef __LIBM_MATHFUNI
+
 	return __LIBM_MATHFUNI(llround, x);
-#else /* __LIBM_MATHFUNI */
-	return (__LONGLONG)libc_round(x);
-#endif /* !__LIBM_MATHFUNI */
+
+
+
 }
 #endif /* __SIZEOF_LONG__ != __SIZEOF_LONG_LONG__ */
 #include <libm/nexttoward.h>
@@ -2576,15 +2572,15 @@ NOTHROW(LIBCCALL libc_llround)(double x) {
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_nexttowardf)(float x,
                                    __LONGDOUBLE y) {
-#ifdef __IEEE854_LONG_DOUBLE_TYPE__
-#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+
+
 	return (float)__ieee754_nexttowardf((__IEEE754_FLOAT_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
-#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
-	return (float)__ieee754_nexttoward((__IEEE754_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
-#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
-#else /* __IEEE854_LONG_DOUBLE_TYPE__ */
-	return (float)libc_nextafterl((__LONGDOUBLE)x, y);
-#endif /* !__IEEE854_LONG_DOUBLE_TYPE__ */
+
+
+
+
+
+
 }
 #include <libm/scalbn.h>
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
@@ -2592,20 +2588,19 @@ NOTHROW(LIBCCALL libc_nexttowardf)(float x,
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_scalbnf)(float x,
                                int n) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	
-#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
-	return (float)__ieee754_scalbn((__IEEE754_DOUBLE_TYPE__)x, n);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+
+
 	return (float)__ieee754_scalbnf((__IEEE754_FLOAT_TYPE__)x, n);
-#else /* ... */
-	return (float)__ieee854_scalbnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
-#endif /* !... */
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_scalbn((double)x, n);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
+
+
+
 }
 #if __SIZEOF_INT__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libc_scalblnf, libc_scalbnf);
@@ -2616,20 +2611,19 @@ DEFINE_INTERN_ALIAS(libc_scalblnf, libc_scalbnf);
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_scalblnf)(float x,
                                 long int n) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	
-#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
-	return (float)__ieee754_scalbln((__IEEE754_DOUBLE_TYPE__)x, n);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+
+
 	return (float)__ieee754_scalblnf((__IEEE754_FLOAT_TYPE__)x, n);
-#else /* ... */
-	return (float)__ieee854_scalblnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
-#endif /* !... */
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_scalbln((double)x, n);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
+
+
+
 }
 #endif /* __SIZEOF_INT__ != __SIZEOF_LONG__ */
 #include <hybrid/typecore.h>
@@ -2638,22 +2632,22 @@ NOTHROW(LIBCCALL libc_scalblnf)(float x,
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_roundf)(float x) {
-#ifdef __LIBM_MATHFUNF
+
 	return (float)__LIBM_MATHFUNF(round, x);
-#else /* __LIBM_MATHFUNF */
-	float result;
-	result = (float)(__INTMAX_TYPE__)x;
-	if (x < 0.0f) {
-		/* result >= x */
-		if ((result - x) >= 0.5f)
-			result -= 1.0f;
-	} else {
-		/* result <= x */
-		if ((x - result) >= 0.5f)
-			result += 1.0f;
-	}
-	return result;
-#endif /* !__LIBM_MATHFUNF */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 #include <hybrid/typecore.h>
 #include <libm/trunc.h>
@@ -2662,11 +2656,11 @@ NOTHROW(LIBCCALL libc_roundf)(float x) {
  * format   nearest  but  not  larger  in  magnitude */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_truncf)(float x) {
-#ifdef __LIBM_MATHFUNF
+
 	return __LIBM_MATHFUNF(trunc, x);
-#else /* __LIBM_MATHFUNF */
-	return (float)(__INTMAX_TYPE__)x;
-#endif /* !__LIBM_MATHFUNF */
+
+
+
 }
 #include <libm/remquo.h>
 /* >> remquof(3), remquo(3), remquol(3)
@@ -2677,13 +2671,13 @@ INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((3)) float
 NOTHROW(LIBCCALL libc_remquof)(float x,
                                float p,
                                int *pquo) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	return __LIBM_MATHFUN3IF(remquo, x, p, pquo);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_remquo((double)x, (double)p, pquo);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <hybrid/typecore.h>
 #include <libm/lrint.h>
@@ -2691,11 +2685,11 @@ NOTHROW(LIBCCALL libc_remquof)(float x,
  * Round `x' to nearest integral value according to current rounding direction */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED long int
 NOTHROW(LIBCCALL libc_lrintf)(float x) {
-#ifdef __LIBM_MATHFUNIF
+
 	return __LIBM_MATHFUNIF(lrint, x);
-#else /* __LIBM_MATHFUNIF */
-	return (long int)libc_rintf(x);
-#endif /* !__LIBM_MATHFUNIF */
+
+
+
 }
 #include <hybrid/typecore.h>
 #include <libm/lround.h>
@@ -2703,11 +2697,11 @@ NOTHROW(LIBCCALL libc_lrintf)(float x) {
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED long int
 NOTHROW(LIBCCALL libc_lroundf)(float x) {
-#ifdef __LIBM_MATHFUNIF
+
 	return __LIBM_MATHFUNIF(lround, x);
-#else /* __LIBM_MATHFUNIF */
-	return (long int)libc_roundf(x);
-#endif /* !__LIBM_MATHFUNIF */
+
+
+
 }
 /* >> fdimf(3), fdim(3), fdiml(3)
  * Return positive difference between `x' and `y' */
@@ -2725,15 +2719,15 @@ NOTHROW(LIBCCALL libc_fdimf)(float x,
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_fmaxf)(float x,
                              float y) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 	if (__LIBM_MATHFUNI2F(isgreaterequal, x, y))
 		return x;
 	if (__LIBM_MATHFUNIF(isnan, y))
 		return x;
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	if (x >= y)
-		return x;
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
+
 	return y;
 }
 #include <ieee754.h>
@@ -2744,15 +2738,15 @@ NOTHROW(LIBCCALL libc_fmaxf)(float x,
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_fminf)(float x,
                              float y) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 	if (__LIBM_MATHFUNI2F(islessequal, x, y))
 		return x;
 	if (__LIBM_MATHFUNIF(isnan, y))
 		return x;
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	if (x <= y)
-		return x;
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
+
 	return y;
 }
 /* >> fmaf(3), fma(3), fmal(3)
@@ -2773,11 +2767,11 @@ DEFINE_INTERN_ALIAS(libc_llrintf, libc_lrintf);
  * Round `x' to nearest integral value according to current rounding direction */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGLONG
 NOTHROW(LIBCCALL libc_llrintf)(float x) {
-#ifdef __LIBM_MATHFUNIF
+
 	return __LIBM_MATHFUNIF(llrint, x);
-#else /* __LIBM_MATHFUNIF */
-	return (__LONGLONG)libc_rintf(x);
-#endif /* !__LIBM_MATHFUNIF */
+
+
+
 }
 #endif /* __SIZEOF_LONG__ != __SIZEOF_LONG_LONG__ */
 #if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
@@ -2789,11 +2783,11 @@ DEFINE_INTERN_ALIAS(libc_llroundf, libc_lroundf);
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGLONG
 NOTHROW(LIBCCALL libc_llroundf)(float x) {
-#ifdef __LIBM_MATHFUNIF
+
 	return __LIBM_MATHFUNIF(llround, x);
-#else /* __LIBM_MATHFUNIF */
-	return (__LONGLONG)libc_roundf(x);
-#endif /* !__LIBM_MATHFUNIF */
+
+
+
 }
 #endif /* __SIZEOF_LONG__ != __SIZEOF_LONG_LONG__ */
 #include <libm/scalbn.h>
@@ -2802,20 +2796,19 @@ NOTHROW(LIBCCALL libc_llroundf)(float x) {
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_scalbnl)(__LONGDOUBLE x,
                                int n) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	
-#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee754_scalbn((__IEEE754_DOUBLE_TYPE__)x, n);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_scalbnf((__IEEE754_FLOAT_TYPE__)x, n);
-#else /* ... */
+
+
+
+
 	return (__LONGDOUBLE)__ieee854_scalbnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
-#endif /* !... */
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_scalbn((double)x, n);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
+
 }
 #if __SIZEOF_INT__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libc_scalblnl, libc_scalbnl);
@@ -2826,20 +2819,19 @@ DEFINE_INTERN_ALIAS(libc_scalblnl, libc_scalbnl);
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_scalblnl)(__LONGDOUBLE x,
                                 long int n) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	
-#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee754_scalbln((__IEEE754_DOUBLE_TYPE__)x, n);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_scalblnf((__IEEE754_FLOAT_TYPE__)x, n);
-#else /* ... */
+
+
+
+
 	return (__LONGDOUBLE)__ieee854_scalblnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
-#endif /* !... */
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_scalbln((double)x, n);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
+
 }
 #endif /* __SIZEOF_INT__ != __SIZEOF_LONG__ */
 #include <hybrid/typecore.h>
@@ -2848,22 +2840,22 @@ NOTHROW(LIBCCALL libc_scalblnl)(__LONGDOUBLE x,
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_roundl)(__LONGDOUBLE x) {
-#ifdef __LIBM_MATHFUNL
+
 	return (__LONGDOUBLE)__LIBM_MATHFUNL(round, x);
-#else /* __LIBM_MATHFUNL */
-	__LONGDOUBLE result;
-	result = (__LONGDOUBLE)(__INTMAX_TYPE__)x;
-	if (x < 0.0L) {
-		/* result >= x */
-		if ((result - x) >= 0.5L)
-			result -= 1.0L;
-	} else {
-		/* result <= x */
-		if ((x - result) >= 0.5L)
-			result += 1.0L;
-	}
-	return result;
-#endif /* !__LIBM_MATHFUNL */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 #include <hybrid/typecore.h>
 #include <libm/trunc.h>
@@ -2872,11 +2864,11 @@ NOTHROW(LIBCCALL libc_roundl)(__LONGDOUBLE x) {
  * format   nearest  but  not  larger  in  magnitude */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_truncl)(__LONGDOUBLE x) {
-#ifdef __LIBM_MATHFUNL
+
 	return __LIBM_MATHFUNL(trunc, x);
-#else /* __LIBM_MATHFUNL */
-	return (__LONGDOUBLE)(__INTMAX_TYPE__)x;
-#endif /* !__LIBM_MATHFUNL */
+
+
+
 }
 #include <libm/remquo.h>
 /* >> remquof(3), remquo(3), remquol(3)
@@ -2887,13 +2879,13 @@ INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((3)) __LONGDOUBLE
 NOTHROW(LIBCCALL libc_remquol)(__LONGDOUBLE x,
                                __LONGDOUBLE p,
                                int *pquo) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	return __LIBM_MATHFUN3IL(remquo, x, p, pquo);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_remquo((double)x, (double)p, pquo);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <hybrid/typecore.h>
 #include <libm/lrint.h>
@@ -2901,11 +2893,11 @@ NOTHROW(LIBCCALL libc_remquol)(__LONGDOUBLE x,
  * Round `x' to nearest integral value according to current rounding direction */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED long int
 NOTHROW(LIBCCALL libc_lrintl)(__LONGDOUBLE x) {
-#ifdef __LIBM_MATHFUNIL
+
 	return __LIBM_MATHFUNIL(lrint, x);
-#else /* __LIBM_MATHFUNIL */
-	return (long int)libc_rintl(x);
-#endif /* !__LIBM_MATHFUNIL */
+
+
+
 }
 #include <hybrid/typecore.h>
 #include <libm/lround.h>
@@ -2913,11 +2905,11 @@ NOTHROW(LIBCCALL libc_lrintl)(__LONGDOUBLE x) {
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED long int
 NOTHROW(LIBCCALL libc_lroundl)(__LONGDOUBLE x) {
-#ifdef __LIBM_MATHFUNIL
+
 	return __LIBM_MATHFUNIL(lround, x);
-#else /* __LIBM_MATHFUNIL */
-	return (long int)libc_roundl(x);
-#endif /* !__LIBM_MATHFUNIL */
+
+
+
 }
 /* >> fdimf(3), fdim(3), fdiml(3)
  * Return positive difference between `x' and `y' */
@@ -2935,15 +2927,15 @@ NOTHROW(LIBCCALL libc_fdiml)(__LONGDOUBLE x,
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_fmaxl)(__LONGDOUBLE x,
                              __LONGDOUBLE y) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 	if (__LIBM_MATHFUNI2L(isgreaterequal, x, y))
 		return x;
 	if (__LIBM_MATHFUNIL(isnan, y))
 		return x;
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	if (x >= y)
-		return x;
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
+
 	return y;
 }
 #include <ieee754.h>
@@ -2954,15 +2946,15 @@ NOTHROW(LIBCCALL libc_fmaxl)(__LONGDOUBLE x,
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_fminl)(__LONGDOUBLE x,
                              __LONGDOUBLE y) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 	if (__LIBM_MATHFUNI2L(islessequal, x, y))
 		return x;
 	if (__LIBM_MATHFUNIL(isnan, y))
 		return x;
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	if (x <= y)
-		return x;
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
+
 	return y;
 }
 /* >> fmaf(3), fma(3), fmal(3)
@@ -2983,11 +2975,11 @@ DEFINE_INTERN_ALIAS(libc_llrintl, libc_lrintl);
  * Round `x' to nearest integral value according to current rounding direction */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGLONG
 NOTHROW(LIBCCALL libc_llrintl)(__LONGDOUBLE x) {
-#ifdef __LIBM_MATHFUNIL
+
 	return __LIBM_MATHFUNIL(llrint, x);
-#else /* __LIBM_MATHFUNIL */
-	return (__LONGLONG)libc_rintl(x);
-#endif /* !__LIBM_MATHFUNIL */
+
+
+
 }
 #endif /* __SIZEOF_LONG__ != __SIZEOF_LONG_LONG__ */
 #if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
@@ -2999,11 +2991,11 @@ DEFINE_INTERN_ALIAS(libc_llroundl, libc_lroundl);
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGLONG
 NOTHROW(LIBCCALL libc_llroundl)(__LONGDOUBLE x) {
-#ifdef __LIBM_MATHFUNIL
+
 	return __LIBM_MATHFUNIL(llround, x);
-#else /* __LIBM_MATHFUNIL */
-	return (__LONGLONG)libc_roundl(x);
-#endif /* !__LIBM_MATHFUNIL */
+
+
+
 }
 #endif /* __SIZEOF_LONG__ != __SIZEOF_LONG_LONG__ */
 #include <libm/sincos.h>
@@ -3013,12 +3005,12 @@ INTERN ATTR_SECTION(".text.crt.math.math") __DECL_SIMD_sincos NONNULL((2, 3)) vo
 NOTHROW(LIBCCALL libc_sincos)(double x,
                               double *psinx,
                               double *pcosx) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+
 	__LIBM_MATHFUNX(sincos)(x, psinx, pcosx);
-#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-	*psinx = libc_sin(x);
-	*pcosx = libc_cos(x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+
+
+
+
 }
 #include <hybrid/floatcore.h>
 #include <bits/crt/fenv.h>
@@ -3054,17 +3046,17 @@ INTERN ATTR_SECTION(".text.crt.math.math") __DECL_SIMD_sincosf NONNULL((2, 3)) v
 NOTHROW(LIBCCALL libc_sincosf)(float x,
                                float *psinx,
                                float *pcosx) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 	__LIBM_MATHFUNXF(sincos)(x, psinx, pcosx);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	double sinx, cosx;
-	libc_sincos((double)x, &sinx, &cosx);
-	*psinx = (float)sinx;
-	*pcosx = (float)cosx;
 
 
 
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
+
+
+
 }
 #include <hybrid/floatcore.h>
 #include <bits/crt/fenv.h>
@@ -3100,17 +3092,17 @@ INTERN ATTR_SECTION(".text.crt.math.math") __DECL_SIMD_sincosl NONNULL((2, 3)) v
 NOTHROW(LIBCCALL libc_sincosl)(__LONGDOUBLE x,
                                __LONGDOUBLE *psinx,
                                __LONGDOUBLE *pcosx) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 	__LIBM_MATHFUNXL(sincos)(x, psinx, pcosx);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	double sinx, cosx;
-	libc_sincos((double)x, &sinx, &cosx);
-	*psinx = (__LONGDOUBLE)sinx;
-	*pcosx = (__LONGDOUBLE)cosx;
 
 
 
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
+
+
+
 }
 #include <hybrid/floatcore.h>
 #include <bits/crt/fenv.h>
@@ -3148,66 +3140,64 @@ NOTHROW(LIBCCALL libc_pow10l)(__LONGDOUBLE x) {
  * Return 0 if `value' is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_isinf)(double x) {
-#ifdef __LIBM_MATHFUNI
+
 	return __LIBM_MATHFUNI(isinf, x);
-#elif defined(__INFINITY)
-	return x == __INFINITY;
-#else /* ... */
-	return x == __HUGE_VAL;
-#endif /* !... */
+
+
+
+
+
 }
 #include <libm/isinf.h>
 /* >> isinff(3), isinf(3), isinfl(3)
  * Return 0 if `value' is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_isinff)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__INFINITYF) || defined(__HUGE_VALF)
+
 
 
 
 	
-#ifdef __LIBM_MATHFUNIF
 	return __LIBM_MATHFUNIF(isinf, x);
-#elif defined(__INFINITYF)
-	return x == __INFINITYF;
-#else /* ... */
-	return x == __HUGE_VALF;
-#endif /* !... */
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __INFINITYF || __HUGE_VALF */
-	return libc_isinf((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ && !__INFINITYF && !__HUGE_VALF */
+
+
+
+
+
+
+
+
 }
 #include <libm/isinf.h>
 /* >> isinff(3), isinf(3), isinfl(3)
  * Return 0 if `value' is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_isinfl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__INFINITYL) || defined(__HUGE_VALL)
+
 
 
 
 	
-#ifdef __LIBM_MATHFUNIL
 	return __LIBM_MATHFUNIL(isinf, x);
-#elif defined(__INFINITYL)
-	return x == __INFINITYL;
-#else /* ... */
-	return x == __HUGE_VALL;
-#endif /* !... */
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __INFINITYL || __HUGE_VALL */
-	return libc_isinf((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__INFINITYL && !__HUGE_VALL */
+
+
+
+
+
+
+
+
 }
 #include <libm/finite.h>
 /* >> finitef(3), finite(3), finitel(3)
  * Return nonzero if `value' is finite and not NaN */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_finite)(double x) {
-#ifdef __LIBM_MATHFUNI
+
 	return __LIBM_MATHFUNI(finite, x);
-#else /* __LIBM_MATHFUNI */
-	return !libc_isinf(x) && !libc_isnan(x);
-#endif /* !__LIBM_MATHFUNI */
+
+
+
 }
 #include <libm/significand.h>
 /* >> significandf(3), significand(3), significandl(3)
@@ -3226,11 +3216,10 @@ NOTHROW(LIBCCALL libc_finitef)(float x) {
 
 
 	
-#ifdef __LIBM_MATHFUNIF
 	return __LIBM_MATHFUNIF(finite, x);
-#else /* __LIBM_MATHFUNIF */
-	return !libc_isinff(x) && !libc_isnanf(x);
-#endif /* !__LIBM_MATHFUNIF */
+
+
+
 
 
 
@@ -3240,13 +3229,13 @@ NOTHROW(LIBCCALL libc_finitef)(float x) {
  * Return the fractional part of `x' after dividing out `ilogb(x)' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_significandf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	return __LIBM_MATHFUNF(significand, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_significand((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/finite.h>
 /* >> finitef(3), finite(3), finitel(3)
@@ -3258,11 +3247,10 @@ NOTHROW(LIBCCALL libc_finitel)(__LONGDOUBLE x) {
 
 
 	
-#ifdef __LIBM_MATHFUNIL
 	return __LIBM_MATHFUNIL(finite, x);
-#else /* __LIBM_MATHFUNIL */
-	return !libc_isinfl(x) && !libc_isnanl(x);
-#endif /* !__LIBM_MATHFUNIL */
+
+
+
 
 
 
@@ -3272,13 +3260,13 @@ NOTHROW(LIBCCALL libc_finitel)(__LONGDOUBLE x) {
  * Return the fractional part of `x' after dividing out `ilogb(x)' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_significandl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	return __LIBM_MATHFUNL(significand, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_significand((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/isnan.h>
 /* >> isnanf(3), isnan(3), isnanl(3)
@@ -3292,26 +3280,26 @@ NOTHROW(LIBCCALL libc_isnan)(double x) {
  * Return nonzero if `value' is not a number */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_isnanf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	return __LIBM_MATHFUNIF(isnan, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return libc_isnan((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/isnan.h>
 /* >> isnanf(3), isnan(3), isnanl(3)
  * Return nonzero if `value' is not a number */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_isnanl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	return __LIBM_MATHFUNIL(isnan, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return libc_isnan((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/j0.h>
 #include <libm/fcomp.h>
@@ -3424,16 +3412,16 @@ NOTHROW(LIBCCALL libc_yn)(int n,
 /* >> j0f(3), j0(3), j0l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_j0f)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_LIB_VERSION != __LIBM_POSIX &&
 	    __LIBM_MATHFUNI2F(isgreater, __LIBM_MATHFUNF(fabs, x), 1.41484755040568800000e+16 /*X_TLOSS*/))
 		return __kernel_standard_f(x, x, 0.0f, __LIBM_KMATHERRF_J0_TLOSS); /* j0(|x|>X_TLOSS) */
 	return __LIBM_MATHFUNF(j0, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_j0((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/j1.h>
 #include <libm/fcomp.h>
@@ -3442,16 +3430,16 @@ NOTHROW(LIBCCALL libc_j0f)(float x) {
 /* >> j1f(3), j1(3), j1l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_j1f)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_LIB_VERSION != __LIBM_POSIX &&
 	    __LIBM_MATHFUNI2F(isgreater, __LIBM_MATHFUNF(fabs, x), 1.41484755040568800000e+16 /*X_TLOSS*/))
 		return __kernel_standard_f(x, x, 0.0f, __LIBM_KMATHERRF_J1_TLOSS); /* j1(|x|>X_TLOSS) */
 	return __LIBM_MATHFUNF(j1, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_j1((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/jn.h>
 #include <libm/fcomp.h>
@@ -3461,16 +3449,16 @@ NOTHROW(LIBCCALL libc_j1f)(float x) {
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_jnf)(int n,
                            float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_LIB_VERSION != __LIBM_POSIX &&
 	    __LIBM_MATHFUNI2F(isgreater, __LIBM_MATHFUNF(fabs, x), 1.41484755040568800000e+16 /*X_TLOSS*/))
 		return __kernel_standard_f(n, x, 0.0f, __LIBM_KMATHERRF_JN_TLOSS); /* jn(n,|x|>X_TLOSS) */
 	return __LIBM_MATHFUNIMF(jn, n, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_jn(n, (double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/fcomp.h>
 #include <bits/math-constants.h>
@@ -3480,7 +3468,7 @@ NOTHROW(LIBCCALL libc_jnf)(int n,
 /* >> y0f(3), y0(3), y0l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_y0f)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 
@@ -3497,9 +3485,9 @@ NOTHROW(LIBCCALL libc_y0f)(float x) {
 		}
 	}
 	return __LIBM_MATHFUNF(y0, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_y0((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/fcomp.h>
 #include <bits/math-constants.h>
@@ -3509,7 +3497,7 @@ NOTHROW(LIBCCALL libc_y0f)(float x) {
 /* >> y1f(3), y1(3), y1l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_y1f)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 
@@ -3526,9 +3514,9 @@ NOTHROW(LIBCCALL libc_y1f)(float x) {
 		}
 	}
 	return __LIBM_MATHFUNF(y1, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_y1((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/fcomp.h>
 #include <bits/math-constants.h>
@@ -3539,7 +3527,7 @@ NOTHROW(LIBCCALL libc_y1f)(float x) {
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_ynf)(int n,
                            float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 
@@ -3556,9 +3544,9 @@ NOTHROW(LIBCCALL libc_ynf)(int n,
 		}
 	}
 	return __LIBM_MATHFUNIMF(yn, n, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_yn(n, (double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/j0.h>
 #include <libm/fcomp.h>
@@ -3567,16 +3555,16 @@ NOTHROW(LIBCCALL libc_ynf)(int n,
 /* >> j0f(3), j0(3), j0l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_j0l)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_LIB_VERSION != __LIBM_POSIX &&
 	    __LIBM_MATHFUNI2L(isgreater, __LIBM_MATHFUNL(fabs, x), 1.41484755040568800000e+16 /*X_TLOSS*/))
 		return __kernel_standard_l(x, x, 0.0L, __LIBM_KMATHERRL_J0_TLOSS); /* j0(|x|>X_TLOSS) */
 	return __LIBM_MATHFUNL(j0, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_j0((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/j1.h>
 #include <libm/fcomp.h>
@@ -3585,16 +3573,16 @@ NOTHROW(LIBCCALL libc_j0l)(__LONGDOUBLE x) {
 /* >> j1f(3), j1(3), j1l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_j1l)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_LIB_VERSION != __LIBM_POSIX &&
 	    __LIBM_MATHFUNI2L(isgreater, __LIBM_MATHFUNL(fabs, x), 1.41484755040568800000e+16 /*X_TLOSS*/))
 		return __kernel_standard_l(x, x, 0.0L, __LIBM_KMATHERRL_J1_TLOSS); /* j1(|x|>X_TLOSS) */
 	return __LIBM_MATHFUNL(j1, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_j1((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/jn.h>
 #include <libm/fcomp.h>
@@ -3604,16 +3592,16 @@ NOTHROW(LIBCCALL libc_j1l)(__LONGDOUBLE x) {
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_jnl)(int n,
                            __LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE && __LIBM_LIB_VERSION != __LIBM_POSIX &&
 	    __LIBM_MATHFUNI2L(isgreater, __LIBM_MATHFUNL(fabs, x), 1.41484755040568800000e+16 /*X_TLOSS*/))
 		return __kernel_standard_l(n, x, 0.0L, __LIBM_KMATHERRL_JN_TLOSS); /* jn(n,|x|>X_TLOSS) */
 	return __LIBM_MATHFUNIML(jn, n, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_jn(n, (double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/fcomp.h>
 #include <bits/math-constants.h>
@@ -3623,7 +3611,7 @@ NOTHROW(LIBCCALL libc_jnl)(int n,
 /* >> y0f(3), y0(3), y0l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_y0l)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 
@@ -3640,9 +3628,9 @@ NOTHROW(LIBCCALL libc_y0l)(__LONGDOUBLE x) {
 		}
 	}
 	return __LIBM_MATHFUNL(y0, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_y0((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/fcomp.h>
 #include <bits/math-constants.h>
@@ -3652,7 +3640,7 @@ NOTHROW(LIBCCALL libc_y0l)(__LONGDOUBLE x) {
 /* >> y1f(3), y1(3), y1l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_y1l)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 
@@ -3669,9 +3657,9 @@ NOTHROW(LIBCCALL libc_y1l)(__LONGDOUBLE x) {
 		}
 	}
 	return __LIBM_MATHFUNL(y1, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_y1((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/fcomp.h>
 #include <bits/math-constants.h>
@@ -3682,7 +3670,7 @@ NOTHROW(LIBCCALL libc_y1l)(__LONGDOUBLE x) {
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_ynl)(int n,
                            __LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 
@@ -3699,9 +3687,9 @@ NOTHROW(LIBCCALL libc_ynl)(int n,
 		}
 	}
 	return __LIBM_MATHFUNIML(yn, n, x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_yn(n, (double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/lgamma.h>
 #include <libm/matherr.h>
@@ -3731,7 +3719,7 @@ NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x,
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((2)) float
 NOTHROW_NCX(LIBCCALL libc_lgammaf_r)(float x,
                                      int *signgamp) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	float result = __LIBM_MATHFUN2IF(lgamma, x, signgamp);
@@ -3743,9 +3731,9 @@ NOTHROW_NCX(LIBCCALL libc_lgammaf_r)(float x,
 		                                  : __LIBM_KMATHERRF_LGAMMA_OVERFLOW); /* lgamma overflow */
 	}
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_lgamma_r((double)x, signgamp);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/lgamma.h>
 #include <libm/matherr.h>
@@ -3756,7 +3744,7 @@ NOTHROW_NCX(LIBCCALL libc_lgammaf_r)(float x,
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((2)) __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_lgammal_r)(__LONGDOUBLE x,
                                      int *signgamp) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	__LONGDOUBLE result = __LIBM_MATHFUN2IL(lgamma, x, signgamp);
@@ -3768,9 +3756,9 @@ NOTHROW_NCX(LIBCCALL libc_lgammal_r)(__LONGDOUBLE x,
 		                                  : __LIBM_KMATHERRL_LGAMMA_OVERFLOW); /* lgamma overflow */
 	}
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_lgamma_r((double)x, signgamp);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #include <libm/isnan.h>
 #include <libm/finite.h>
@@ -3800,9 +3788,9 @@ NOTHROW(LIBCCALL libc_scalb)(double x,
 			if (__LIBM_MATHFUNI(finite, x)) {
 				return __kernel_standard(x, fn, result, __LIBM_KMATHERR_SCALB_OVERFLOW); /* scalb overflow */
 			} else {
-#ifdef ERANGE
+
 				(void)libc_seterrno(ERANGE);
-#endif /* ERANGE */
+
 			}
 		} else if (result == 0.0 && result != x) {
 			return __kernel_standard(x, fn, result, __LIBM_KMATHERR_SCALB_UNDERFLOW); /* scalb underflow */
@@ -3835,7 +3823,7 @@ NOTHROW(LIBCCALL libc_scalb)(double x,
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_scalbf)(float x,
                               float fn) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	/*
@@ -3855,9 +3843,9 @@ NOTHROW(LIBCCALL libc_scalbf)(float x,
 			if (__LIBM_MATHFUNIF(finite, x)) {
 				return __kernel_standard_f(x, fn, result, __LIBM_KMATHERRF_SCALB_OVERFLOW); /* scalb overflow */
 			} else {
-#ifdef ERANGE
+
 				(void)libc_seterrno(ERANGE);
-#endif /* ERANGE */
+
 			}
 		} else if (result == 0.0f && result != x) {
 			return __kernel_standard_f(x, fn, result, __LIBM_KMATHERRF_SCALB_UNDERFLOW); /* scalb underflow */
@@ -3878,9 +3866,9 @@ NOTHROW(LIBCCALL libc_scalbf)(float x,
 		}
 	}
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return (float)libc_scalb((double)x, (double)fn);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/isnan.h>
 #include <libm/finite.h>
@@ -3893,7 +3881,7 @@ NOTHROW(LIBCCALL libc_scalbf)(float x,
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_scalbl)(__LONGDOUBLE x,
                               __LONGDOUBLE fn) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	/*
@@ -3913,9 +3901,9 @@ NOTHROW(LIBCCALL libc_scalbl)(__LONGDOUBLE x,
 			if (__LIBM_MATHFUNIL(finite, x)) {
 				return __kernel_standard_l(x, fn, result, __LIBM_KMATHERRL_SCALB_OVERFLOW); /* scalb overflow */
 			} else {
-#ifdef ERANGE
+
 				(void)libc_seterrno(ERANGE);
-#endif /* ERANGE */
+
 			}
 		} else if (result == 0.0L && result != x) {
 			return __kernel_standard_l(x, fn, result, __LIBM_KMATHERRL_SCALB_UNDERFLOW); /* scalb underflow */
@@ -3936,9 +3924,9 @@ NOTHROW(LIBCCALL libc_scalbl)(__LONGDOUBLE x,
 		}
 	}
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return (__LONGDOUBLE)libc_scalb((double)x, (double)fn);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 /* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
 INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
@@ -3947,27 +3935,27 @@ NOTHROW(LIBDCALL libd___fpclassify)(double x) { return fptype_kos2dos(libc___fpc
 /* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc___fpclassify)(double x) {
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+
 	return __ieee754_fpclassify((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return __ieee754_fpclassifyf((__IEEE754_FLOAT_TYPE__)x);
-#else /* ... */
-	return __ieee854_fpclassifyl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#endif /* !... */
+
+
+
+
+
 }
 #include <libm/signbit.h>
 /* >> signbit(3), __signbitf(3), __signbit(3), __signbitl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc___signbit)(double x) {
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+
 	return __ieee754_signbit((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return __ieee754_signbitf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-	return __ieee854_signbitl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
-	return x < 0.0;
-#endif /* !... */
+
+
+
+
+
+
+
 }
 /* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
 INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
@@ -3976,34 +3964,33 @@ NOTHROW(LIBDCALL libd___fpclassifyf)(float x) { return fptype_kos2dos(libc___fpc
 /* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc___fpclassifyf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	
-#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
-	return __ieee754_fpclassify((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+
+
 	return __ieee754_fpclassifyf((__IEEE754_FLOAT_TYPE__)x);
-#else /* ... */
-	return __ieee854_fpclassifyl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#endif /* !... */
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return libc___fpclassify((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
+
+
+
 }
 #include <libm/signbit.h>
 /* >> signbit(3), __signbitf(3), __signbit(3), __signbitl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc___signbitf)(float x) {
-#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
-	return __ieee754_signbit((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+
+
+
 	return __ieee754_signbitf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-	return __ieee854_signbitl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
-	return x < 0.0f;
-#endif /* !... */
+
+
+
+
+
 }
 /* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
 INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
@@ -4012,84 +3999,81 @@ NOTHROW(LIBDCALL libd___fpclassifyl)(__LONGDOUBLE x) { return fptype_kos2dos(lib
 /* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc___fpclassifyl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	
-#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return __ieee754_fpclassify((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_fpclassifyf((__IEEE754_FLOAT_TYPE__)x);
-#else /* ... */
+
+
+
+
 	return __ieee854_fpclassifyl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#endif /* !... */
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return libc___fpclassify((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
+
 }
 #include <libm/signbit.h>
 /* >> signbit(3), __signbitf(3), __signbit(3), __signbitl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc___signbitl)(__LONGDOUBLE x) {
-#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return __ieee754_signbit((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_signbitf((__IEEE754_FLOAT_TYPE__)x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+
+
+
 	return __ieee854_signbitl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#else /* ... */
-	return x < 0.0L;
-#endif /* !... */
+
+
+
 }
 #include <libm/issignaling.h>
 /* >> issignaling(3), __issignalingf(3), __issignaling(3), __issignalingl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc___issignaling)(double x) {
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+
 	return __ieee754_issignaling((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return __ieee754_issignalingf((__IEEE754_FLOAT_TYPE__)x);
-#else /* ... */
-	return __ieee854_issignalingl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#endif /* !... */
+
+
+
+
+
 }
 #include <libm/issignaling.h>
 /* >> issignaling(3), __issignalingf(3), __issignaling(3), __issignalingl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc___issignalingf)(float x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	
-#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
-	return __ieee754_issignaling((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+
+
 	return __ieee754_issignalingf((__IEEE754_FLOAT_TYPE__)x);
-#else /* ... */
-	return __ieee854_issignalingl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#endif /* !... */
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return libc___issignaling((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
+
+
+
 }
 #include <libm/issignaling.h>
 /* >> issignaling(3), __issignalingf(3), __issignaling(3), __issignalingl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc___issignalingl)(__LONGDOUBLE x) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	
-#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return __ieee754_issignaling((__IEEE754_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_issignalingf((__IEEE754_FLOAT_TYPE__)x);
-#else /* ... */
+
+
+
+
 	return __ieee854_issignalingl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#endif /* !... */
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return libc___issignaling((double)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
+
 }
 #include <libm/fcomp.h>
 /* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
@@ -4116,7 +4100,7 @@ NOTHROW_NCX(LIBCCALL libc__dpcomp)(double x,
 INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__fdpcomp)(float x,
                                     float y) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
 
 
 	int result = 0;
@@ -4133,16 +4117,16 @@ NOTHROW_NCX(LIBCCALL libc__fdpcomp)(float x,
 			result |= 1 | 4;
 	}
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
-	return libc__dpcomp((double)x, (double)y);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+
+
+
 }
 #include <libm/fcomp.h>
 /* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
 INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ldpcomp)(__LONGDOUBLE x,
                                     __LONGDOUBLE y) {
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
 
 
 	int result = 0;
@@ -4159,9 +4143,9 @@ NOTHROW_NCX(LIBCCALL libc__ldpcomp)(__LONGDOUBLE x,
 			result |= 1 | 4;
 	}
 	return result;
-#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
-	return libc__dpcomp((double)x, (double)y);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+
+
+
 }
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__

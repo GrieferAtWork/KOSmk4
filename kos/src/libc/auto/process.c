@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe51a197d */
+/* HASH CRC-32:0x472fc2ca */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,13 +99,13 @@ NOTHROW_RPC(LIBCCALL libc_spawnve)(__STDC_INT_AS_UINT_T mode,
                                    __TENVP) {
 	fd_t fd;
 	pid_t result = -1;
-#if defined(O_RDONLY) && defined(O_CLOEXEC)
+
 	fd = libc_open(path, O_RDONLY | O_CLOEXEC);
-#elif defined(O_RDONLY)
-	fd = libc_open(path, O_RDONLY);
-#else /* ... */
-	fd = libc_open(path, 0);
-#endif /* !... */
+
+
+
+
+
 	if likely(fd >= 0) {
 		result = libc_fspawnve(mode, fd, ___argv, ___envp);
 
@@ -151,13 +151,13 @@ NOTHROW_RPC(LIBCCALL libc_spawnvpe)(__STDC_INT_AS_UINT_T mode,
 	 * then $PATH is ignored, and the file at the  specified
 	 * pathname is executed.
 	 * [...] */
-#ifdef _WIN32
-	if (libc_strchr(file, '/') || libc_strchr(file, '\\'))
-		return libc_spawnve(mode, file, ___argv, ___envp);
-#else /* _WIN32 */
+
+
+
+
 	if (libc_strchr(file, '/'))
 		return libc_spawnve(mode, file, ___argv, ___envp);
-#endif /* !_WIN32 */
+
 	env_path = libc_getenv("PATH");
 	if (env_path && *env_path) {
 		size_t filelen;
@@ -165,11 +165,11 @@ NOTHROW_RPC(LIBCCALL libc_spawnvpe)(__STDC_INT_AS_UINT_T mode,
 		for (;;) {
 			pid_t result;
 			char *path_end;
-#ifdef _WIN32
-			path_end = libc_strchrnul(env_path, ';');
-#else /* _WIN32 */
+
+
+
 			path_end = libc_strchrnul(env_path, ':');
-#endif /* !_WIN32 */
+
 			result = (__NAMESPACE_LOCAL_SYM __spawnvpe_impl)(mode, env_path, (size_t)(path_end - env_path),
 			                                                 file, filelen, ___argv, ___envp);
 			if (result >= 0)
@@ -179,9 +179,9 @@ NOTHROW_RPC(LIBCCALL libc_spawnvpe)(__STDC_INT_AS_UINT_T mode,
 			env_path = path_end + 1;
 		}
 	} else {
-#ifdef ENOENT
+
 		(void)libc_seterrno(ENOENT);
-#endif /* ENOENT */
+
 	}
 	return -1;
 }
@@ -274,25 +274,25 @@ NOTHROW_RPC(LIBCCALL libc_fspawnve)(__STDC_INT_AS_UINT_T mode,
                                     __TARGV,
                                     __TENVP) {
 	int status;
-#ifndef __ARCH_HAVE_SHARED_VM_VFORK
-	fd_t pipes[2];
-	errno_t error;
-	ssize_t temp;
-#else /* !__ARCH_HAVE_SHARED_VM_VFORK */
+
+
+
+
+
 	errno_t old_errno;
-#endif /* __ARCH_HAVE_SHARED_VM_VFORK */
+
 	pid_t child;
 	if (mode == P_OVERLAY)
 		return libc_fexecve(execfd, ___argv, ___envp);
-#ifdef __ARCH_HAVE_SHARED_VM_VFORK
+
 	old_errno = libc_geterrno_or(0);
 	(void)libc_seterrno(0);
-#endif /* __ARCH_HAVE_SHARED_VM_VFORK */
-#ifndef __ARCH_HAVE_SHARED_VM_VFORK
-	/* Create a pair of pipes for temporary communication. */
-	if (libc_pipe2(pipes, O_CLOEXEC))
-		goto err;
-#endif /* !__ARCH_HAVE_SHARED_VM_VFORK */
+
+
+
+
+
+
 	if (mode == P_DETACH) {
 		/* Daemonize (detach) the process using detach(2), or double-fork. */
 
@@ -319,16 +319,16 @@ NOTHROW_RPC(LIBCCALL libc_fspawnve)(__STDC_INT_AS_UINT_T mode,
 	}
 	if (mode == P_WAIT) {
 		/* Spawn and join the process */
-#ifdef __ARCH_HAVE_SHARED_VM_VFORK
+
 		child = libc_vfork();
-#else /* __ARCH_HAVE_SHARED_VM_VFORK */
-		child = libc_fork();
-#endif /* !__ARCH_HAVE_SHARED_VM_VFORK */
+
+
+
 		if (child == 0)
 			goto do_exec;
 		if (child < 0)
 			goto err;
-#ifdef __ARCH_HAVE_SHARED_VM_VFORK
+
 		/* Check for errors that may have happened in  the
 		 * child process _after_ we did the vfork() above. */
 		if (libc_geterrno_or(0) != 0)
@@ -336,39 +336,39 @@ NOTHROW_RPC(LIBCCALL libc_fspawnve)(__STDC_INT_AS_UINT_T mode,
 		/* Success (but still restore the old errno
 		 * since  we  overwrote it  to be  0 above) */
 		(void)libc_seterrno(old_errno);
-#else /* __ARCH_HAVE_SHARED_VM_VFORK */
-		libc_close(pipes[1]); /* Close the writer. */
-		temp = libc_read(pipes[0], &error, sizeof(error));
-		libc_close(pipes[0]); /* Close the reader. */
-		if (temp < 0)
-			goto err_join_zombie_child;
-		if (temp == sizeof(error)) {
-			/* If something was read, then it is the errno value that caused the failure. */
-			(void)libc_seterrno(error);
-			goto err;
-		}
-#endif /* !__ARCH_HAVE_SHARED_VM_VFORK */
+
+
+
+
+
+
+
+
+
+
+
+
 		/* Join the child. */
 		while (libc_waitpid(child, &status, 0) < 0) {
-#ifdef EINTR
+
 			if (__libc_geterrno() == EINTR)
 				continue;
-#endif /* EINTR */
+
 			goto err;
 		}
 		return (pid_t)(int)(unsigned int)WEXITSTATUS(status);
 	}
 
 	/* Spawn asynchronously. */
-#ifdef __ARCH_HAVE_SHARED_VM_VFORK
+
 	child = libc_vfork();
-#else /* __ARCH_HAVE_SHARED_VM_VFORK */
-	child = libc_fork();
-#endif /* !__ARCH_HAVE_SHARED_VM_VFORK */
+
+
+
 	if (child == 0)
 		goto do_exec;
 read_child_errors:
-#ifdef __ARCH_HAVE_SHARED_VM_VFORK
+
 	/* Check if the vfork() from  the child returned success, but  left
 	 * our (vm-shared) errno as non-zero (which would indicate that the
 	 * child encountered an error at  some point after vfork()  already
@@ -380,31 +380,31 @@ read_child_errors:
 	(void)libc_seterrno(old_errno);
 	/* Return the child's PID */
 	return child;
-#else /* __ARCH_HAVE_SHARED_VM_VFORK */
-	/* Read from the communication pipe
-	 * (NOTE: If exec() succeeds, the pipe will be
-	 *        closed and  read() returns  ZERO(0)) */
-	libc_close(pipes[1]); /* Close the writer. */
-	temp = libc_read(pipes[0], &error, sizeof(error));
-	libc_close(pipes[0]); /* Close the reader. */
-	if (temp < 0)
-		goto err_join_zombie_child;
-	/* This means that `fexecve()' below closed the pipe during a successful exec(). */
-	if (temp != sizeof(error))
-		return child;
-	/* If something was read, then it is the errno value that caused the failure. */
-	(void)libc_seterrno(error);
-#endif /* !__ARCH_HAVE_SHARED_VM_VFORK */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 err_join_zombie_child:
 	if (mode != P_DETACH) {
 		/* Unless the child was already spawned as detached,
 		 * we still have to re-join  it, or else it will  be
 		 * left dangling as a zombie process! */
 		if (libc_waitpid(child, &status, 0) < 0) {
-#ifdef EINTR
+
 			if (__libc_geterrno() == EINTR)
 				goto err_join_zombie_child;
-#endif /* EINTR */
+
 		}
 	}
 err:
@@ -413,22 +413,22 @@ do_exec:
 	/* When the exec succeeds, the pipe is auto-
 	 * closed because it's marked as  O_CLOEXEC! */
 	libc_fexecve(execfd, ___argv, ___envp);
-#ifdef __ARCH_HAVE_SHARED_VM_VFORK
+
 	/* If the exec fails, it will have modified `errno' to indicate this fact.
 	 * And since we're sharing VMs with  our parent process, the error  reason
 	 * will have already  been written  back to  our parent's  VM, so  there's
 	 * actually nothing left for us to do, but to simply exit! */
-#else /* __ARCH_HAVE_SHARED_VM_VFORK */
-	/* Write the exec-error back to our parent. */
-#ifdef ENOENT
-	error = libc_geterrno_or(ENOENT);
-#else /* ENOENT */
-	error = libc_geterrno_or(1);
-#endif /* !ENOENT */
-	/* Communicate back why this failed. */
-	libc_write(pipes[1], &error, sizeof(error));
-	/* No need to close the pipe, it's auto-closed by the kernel! */
-#endif /* !__ARCH_HAVE_SHARED_VM_VFORK */
+
+
+
+
+
+
+
+
+
+
+
 	libc__Exit(127);
 }
 #endif /* !__KERNEL__ */

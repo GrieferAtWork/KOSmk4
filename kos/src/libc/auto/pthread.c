@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c2b4fa3 */
+/* HASH CRC-32:0xe2eddb25 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -95,11 +95,11 @@ again:
 			 * error.
 			 * """
 			 */
-#ifdef EINVAL
+
 			return EINVAL;
-#else /* EINVAL */
-			return 1;
-#endif /* !EINVAL */
+
+
+
 		}
 
 		/* Wait for some other thread to finish init_routine() */
@@ -165,15 +165,15 @@ INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_trylock)(pthread_spinlock_t *lock) {
 	if (__hybrid_atomic_xch(*lock, 1, __ATOMIC_ACQUIRE) == 0)
 		return 0;
-#ifdef EBUSY
+
 	return EBUSY;
-#elif defined(EWOULDBLOCK)
-	return EWOULDBLOCK;
-#elif defined(EAGAIN)
-	return EAGAIN;
-#else /* ... */
-	return 1;
-#endif /* !... */
+
+
+
+
+
+
+
 }
 #include <hybrid/__atomic.h>
 /* >> pthread_spin_unlock(3)
@@ -256,11 +256,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_set_num_processors_np)(int n) {
 	int i, result;
 	cpu_set_t cset;
 	if (n < 1) {
-#ifdef EINVAL
+
 		return EINVAL;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	__CPU_ZERO_S(sizeof(cset), &cset);
 	for (i = 0; i < n; ++i) {

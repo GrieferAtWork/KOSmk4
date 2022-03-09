@@ -58,6 +58,26 @@
 %[define_dos_replacement(EOK = 0)]
 
 
+%[assume_defined_in_kos_userspace(errno)]
+%[assume_defined_in_kos_userspace(__errno)]
+%[assume_defined_in_kos_userspace(__libc_errno)]
+%[assume_defined_in_kos_userspace(__libc_geterrno)]
+%[assume_defined_in_kos_userspace(__libd_errno)]
+%[assume_defined_in_kos_userspace(__libd_geterrno)]
+%[assume_defined_in_kos_userspace(____errno_location_defined)]
+%[assume_defined_in_kos_userspace(__errno_location)]
+%[assume_defined_in_kos_userspace(libc_seterrno_syserr)]
+%[assume_defined_in_kos_userspace(libc_seterrno_syserr2)]
+%[assume_defined_in_kos(__libc_geterrno_or)]
+%[assume_defined_in_kos(__libc_seterrno)]
+%[assume_defined_in_kos(__libd_geterrno_or)]
+%[assume_defined_in_kos(__libd_seterrno)]
+%[assume_defined_in_kos(libc_geterrno_or)]
+%[assume_defined_in_kos(libc_seterrno)]
+%[assume_defined_in_kos(libd_geterrno_or)]
+%[assume_defined_in_kos(libd_seterrno)]
+
+
 /* Explicit errno code substitutions */
 /* Errno codes from emulated libcs */
 /*[[[deemon
@@ -438,6 +458,7 @@ for (local contextName: printed_contexts) {
 import * from deemon;
 import fs;
 local errnoNames: {string: string} = Dict();
+local knownKosErrnoNames: {string...} = HashSet();
 for (local context: fs.dir("../../../include/asm/os"))
 with (local fp = try File.open("../../../include/asm/os/" + context + "/errno.h") catch (...) none) {
 	for (local l: fp) {
@@ -465,6 +486,8 @@ with (local fp = try File.open("../../../include/asm/os/" + context + "/errno.h"
 			comment = "??" "?";
 		if (name !in errnoNames || errnoNames[name] == "??" "?")
 			errnoNames[name] = comment;
+		if (context == "kos")
+			knownKosErrnoNames.insert(name);
 	}
 }
 
@@ -476,6 +499,10 @@ for (local name: errnoNames.keys.sorted()) {
 		name, (" " * (longestNameLen - #name)), " = __",
 		name, ")]", (" " * (longestNameLen - #name)),
 		"/" "* ", errnoNames[name], " *" "/");
+}
+
+for (local name: knownKosErrnoNames.sorted()) {
+	print("%[assume_defined_in_kos(", name, ", __", name, ")]");
 }
 
 print("%{");
@@ -648,6 +675,140 @@ print("}");
 %[define_replacement(EXDEV           = __EXDEV)]          /* Cross-device link */
 %[define_replacement(EXFULL          = __EXFULL)]         /* Exchange full */
 %[define_replacement(STRUNCATE       = __STRUNCATE)]      /* Truncated */
+%[assume_defined_in_kos(E2BIG, __E2BIG)]
+%[assume_defined_in_kos(EACCES, __EACCES)]
+%[assume_defined_in_kos(EADDRINUSE, __EADDRINUSE)]
+%[assume_defined_in_kos(EADDRNOTAVAIL, __EADDRNOTAVAIL)]
+%[assume_defined_in_kos(EADV, __EADV)]
+%[assume_defined_in_kos(EAFNOSUPPORT, __EAFNOSUPPORT)]
+%[assume_defined_in_kos(EAGAIN, __EAGAIN)]
+%[assume_defined_in_kos(EALREADY, __EALREADY)]
+%[assume_defined_in_kos(EBADE, __EBADE)]
+%[assume_defined_in_kos(EBADF, __EBADF)]
+%[assume_defined_in_kos(EBADFD, __EBADFD)]
+%[assume_defined_in_kos(EBADMSG, __EBADMSG)]
+%[assume_defined_in_kos(EBADR, __EBADR)]
+%[assume_defined_in_kos(EBADRQC, __EBADRQC)]
+%[assume_defined_in_kos(EBADSLT, __EBADSLT)]
+%[assume_defined_in_kos(EBFONT, __EBFONT)]
+%[assume_defined_in_kos(EBUSY, __EBUSY)]
+%[assume_defined_in_kos(ECANCELED, __ECANCELED)]
+%[assume_defined_in_kos(ECHILD, __ECHILD)]
+%[assume_defined_in_kos(ECHRNG, __ECHRNG)]
+%[assume_defined_in_kos(ECOMM, __ECOMM)]
+%[assume_defined_in_kos(ECONNABORTED, __ECONNABORTED)]
+%[assume_defined_in_kos(ECONNREFUSED, __ECONNREFUSED)]
+%[assume_defined_in_kos(ECONNRESET, __ECONNRESET)]
+%[assume_defined_in_kos(ECOUNT, __ECOUNT)]
+%[assume_defined_in_kos(EDEADLK, __EDEADLK)]
+%[assume_defined_in_kos(EDESTADDRREQ, __EDESTADDRREQ)]
+%[assume_defined_in_kos(EDOM, __EDOM)]
+%[assume_defined_in_kos(EDOTDOT, __EDOTDOT)]
+%[assume_defined_in_kos(EDQUOT, __EDQUOT)]
+%[assume_defined_in_kos(EEXIST, __EEXIST)]
+%[assume_defined_in_kos(EFAULT, __EFAULT)]
+%[assume_defined_in_kos(EFBIG, __EFBIG)]
+%[assume_defined_in_kos(EHOSTDOWN, __EHOSTDOWN)]
+%[assume_defined_in_kos(EHOSTUNREACH, __EHOSTUNREACH)]
+%[assume_defined_in_kos(EHWPOISON, __EHWPOISON)]
+%[assume_defined_in_kos(EIDRM, __EIDRM)]
+%[assume_defined_in_kos(EILSEQ, __EILSEQ)]
+%[assume_defined_in_kos(EINPROGRESS, __EINPROGRESS)]
+%[assume_defined_in_kos(EINTR, __EINTR)]
+%[assume_defined_in_kos(EINVAL, __EINVAL)]
+%[assume_defined_in_kos(EIO, __EIO)]
+%[assume_defined_in_kos(EISCONN, __EISCONN)]
+%[assume_defined_in_kos(EISDIR, __EISDIR)]
+%[assume_defined_in_kos(EISNAM, __EISNAM)]
+%[assume_defined_in_kos(EKEYEXPIRED, __EKEYEXPIRED)]
+%[assume_defined_in_kos(EKEYREJECTED, __EKEYREJECTED)]
+%[assume_defined_in_kos(EKEYREVOKED, __EKEYREVOKED)]
+%[assume_defined_in_kos(EL2HLT, __EL2HLT)]
+%[assume_defined_in_kos(EL2NSYNC, __EL2NSYNC)]
+%[assume_defined_in_kos(EL3HLT, __EL3HLT)]
+%[assume_defined_in_kos(EL3RST, __EL3RST)]
+%[assume_defined_in_kos(ELIBACC, __ELIBACC)]
+%[assume_defined_in_kos(ELIBBAD, __ELIBBAD)]
+%[assume_defined_in_kos(ELIBEXEC, __ELIBEXEC)]
+%[assume_defined_in_kos(ELIBMAX, __ELIBMAX)]
+%[assume_defined_in_kos(ELIBSCN, __ELIBSCN)]
+%[assume_defined_in_kos(ELIMIT, __ELIMIT)]
+%[assume_defined_in_kos(ELNRNG, __ELNRNG)]
+%[assume_defined_in_kos(ELOOP, __ELOOP)]
+%[assume_defined_in_kos(EMAX, __EMAX)]
+%[assume_defined_in_kos(EMEDIUMTYPE, __EMEDIUMTYPE)]
+%[assume_defined_in_kos(EMFILE, __EMFILE)]
+%[assume_defined_in_kos(EMLINK, __EMLINK)]
+%[assume_defined_in_kos(EMSGSIZE, __EMSGSIZE)]
+%[assume_defined_in_kos(EMULTIHOP, __EMULTIHOP)]
+%[assume_defined_in_kos(ENAMETOOLONG, __ENAMETOOLONG)]
+%[assume_defined_in_kos(ENAVAIL, __ENAVAIL)]
+%[assume_defined_in_kos(ENETDOWN, __ENETDOWN)]
+%[assume_defined_in_kos(ENETRESET, __ENETRESET)]
+%[assume_defined_in_kos(ENETUNREACH, __ENETUNREACH)]
+%[assume_defined_in_kos(ENFILE, __ENFILE)]
+%[assume_defined_in_kos(ENOANO, __ENOANO)]
+%[assume_defined_in_kos(ENOBUFS, __ENOBUFS)]
+%[assume_defined_in_kos(ENOCSI, __ENOCSI)]
+%[assume_defined_in_kos(ENODATA, __ENODATA)]
+%[assume_defined_in_kos(ENODEV, __ENODEV)]
+%[assume_defined_in_kos(ENOENT, __ENOENT)]
+%[assume_defined_in_kos(ENOEXEC, __ENOEXEC)]
+%[assume_defined_in_kos(ENOKEY, __ENOKEY)]
+%[assume_defined_in_kos(ENOLCK, __ENOLCK)]
+%[assume_defined_in_kos(ENOLINK, __ENOLINK)]
+%[assume_defined_in_kos(ENOMEDIUM, __ENOMEDIUM)]
+%[assume_defined_in_kos(ENOMEM, __ENOMEM)]
+%[assume_defined_in_kos(ENOMSG, __ENOMSG)]
+%[assume_defined_in_kos(ENONET, __ENONET)]
+%[assume_defined_in_kos(ENOPKG, __ENOPKG)]
+%[assume_defined_in_kos(ENOPROTOOPT, __ENOPROTOOPT)]
+%[assume_defined_in_kos(ENOSPC, __ENOSPC)]
+%[assume_defined_in_kos(ENOSR, __ENOSR)]
+%[assume_defined_in_kos(ENOSTR, __ENOSTR)]
+%[assume_defined_in_kos(ENOSYS, __ENOSYS)]
+%[assume_defined_in_kos(ENOTBLK, __ENOTBLK)]
+%[assume_defined_in_kos(ENOTCONN, __ENOTCONN)]
+%[assume_defined_in_kos(ENOTDIR, __ENOTDIR)]
+%[assume_defined_in_kos(ENOTEMPTY, __ENOTEMPTY)]
+%[assume_defined_in_kos(ENOTNAM, __ENOTNAM)]
+%[assume_defined_in_kos(ENOTRECOVERABLE, __ENOTRECOVERABLE)]
+%[assume_defined_in_kos(ENOTSOCK, __ENOTSOCK)]
+%[assume_defined_in_kos(ENOTTY, __ENOTTY)]
+%[assume_defined_in_kos(ENOTUNIQ, __ENOTUNIQ)]
+%[assume_defined_in_kos(ENXIO, __ENXIO)]
+%[assume_defined_in_kos(EOPNOTSUPP, __EOPNOTSUPP)]
+%[assume_defined_in_kos(EOVERFLOW, __EOVERFLOW)]
+%[assume_defined_in_kos(EOWNERDEAD, __EOWNERDEAD)]
+%[assume_defined_in_kos(EPERM, __EPERM)]
+%[assume_defined_in_kos(EPFNOSUPPORT, __EPFNOSUPPORT)]
+%[assume_defined_in_kos(EPIPE, __EPIPE)]
+%[assume_defined_in_kos(EPROTO, __EPROTO)]
+%[assume_defined_in_kos(EPROTONOSUPPORT, __EPROTONOSUPPORT)]
+%[assume_defined_in_kos(EPROTOTYPE, __EPROTOTYPE)]
+%[assume_defined_in_kos(ERANGE, __ERANGE)]
+%[assume_defined_in_kos(EREMCHG, __EREMCHG)]
+%[assume_defined_in_kos(EREMOTE, __EREMOTE)]
+%[assume_defined_in_kos(EREMOTEIO, __EREMOTEIO)]
+%[assume_defined_in_kos(ERESTART, __ERESTART)]
+%[assume_defined_in_kos(ERFKILL, __ERFKILL)]
+%[assume_defined_in_kos(EROFS, __EROFS)]
+%[assume_defined_in_kos(ESHUTDOWN, __ESHUTDOWN)]
+%[assume_defined_in_kos(ESOCKTNOSUPPORT, __ESOCKTNOSUPPORT)]
+%[assume_defined_in_kos(ESPIPE, __ESPIPE)]
+%[assume_defined_in_kos(ESRCH, __ESRCH)]
+%[assume_defined_in_kos(ESRMNT, __ESRMNT)]
+%[assume_defined_in_kos(ESTALE, __ESTALE)]
+%[assume_defined_in_kos(ESTRPIPE, __ESTRPIPE)]
+%[assume_defined_in_kos(ETIME, __ETIME)]
+%[assume_defined_in_kos(ETIMEDOUT, __ETIMEDOUT)]
+%[assume_defined_in_kos(ETOOMANYREFS, __ETOOMANYREFS)]
+%[assume_defined_in_kos(ETXTBSY, __ETXTBSY)]
+%[assume_defined_in_kos(EUCLEAN, __EUCLEAN)]
+%[assume_defined_in_kos(EUNATCH, __EUNATCH)]
+%[assume_defined_in_kos(EUSERS, __EUSERS)]
+%[assume_defined_in_kos(EXDEV, __EXDEV)]
+%[assume_defined_in_kos(EXFULL, __EXFULL)]
 %{
 #ifdef __E2BIG
 #define E2BIG           __E2BIG           /* Argument list too long */
@@ -1107,6 +1268,9 @@ print("}");
 #endif /* __STRUNCATE */
 }
 /*[[[end]]]*/
+%[assume_defined_in_kos(EWOULDBLOCK, __EWOULDBLOCK)]
+%[assume_defined_in_kos(EDEADLOCK, __EDEADLOCK)]
+%[assume_defined_in_kos(ENOTSUP, __ENOTSUP)]
 %{
 
 

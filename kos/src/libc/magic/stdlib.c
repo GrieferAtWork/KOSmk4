@@ -70,6 +70,12 @@
 %[define_type_class(__compar_fn_t      = "TP")]
 %[define_type_class(__compar_d_fn_t    = "TP")]
 
+%[assume_defined_in_kos(NAME_MAX = "65535")]
+%[assume_defined_in_kos(__NAME_MAX = "65535")]
+%[assume_defined_in_kos(PATH_MAX = "-1")]
+%[assume_defined_in_kos(__PATH_MAX = "-1")]
+
+
 %(auto_source){
 #include "../libc/globals.h"
 #include <strings.h>
@@ -835,7 +841,7 @@ long atol([[nonnull]] char const *__restrict nptr) {
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__, atoi)]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__, atol)]]
 __LONGLONG atoll([[nonnull]] char const *__restrict nptr) {
-@@pp_if __SIZEOF_LONG_LONG__@@
+@@pp_if __SIZEOF_LONG_LONG__ <= 4@@
 	return (__LONGLONG)strto32(nptr, NULL, 10);
 @@pp_else@@
 	return (__LONGLONG)strto64(nptr, NULL, 10);
@@ -1131,8 +1137,8 @@ $uint32_t strtou32_r([[nonnull]] char const *__restrict nptr,
 		            __hybrid_overflow_uadd(result, digit, &result)) {
 			/* Integer overflow. */
 			if (error) {
-@@pp_ifdef __ERANGE@@
-				*error = __ERANGE;
+@@pp_ifdef ERANGE@@
+				*error = ERANGE;
 @@pp_else@@
 				*error = 1;
 @@pp_endif@@
@@ -1176,8 +1182,8 @@ $uint32_t strtou32_r([[nonnull]] char const *__restrict nptr,
 
 		/* Empty number... */
 		if (error) {
-@@pp_ifdef __ECANCELED@@
-			*error = __ECANCELED;
+@@pp_ifdef ECANCELED@@
+			*error = ECANCELED;
 @@pp_else@@
 			*error = 1;
 @@pp_endif@@
@@ -1197,8 +1203,8 @@ $uint32_t strtou32_r([[nonnull]] char const *__restrict nptr,
 				while (isspace(*num_iter))
 					++num_iter;
 				if (*num_iter) {
-@@pp_ifdef __EINVAL@@
-					*error = __EINVAL;
+@@pp_ifdef EINVAL@@
+					*error = EINVAL;
 @@pp_else@@
 					*error = 1;
 @@pp_endif@@
@@ -1270,8 +1276,8 @@ $int32_t strto32_r([[nonnull]] char const *__restrict nptr,
 handle_overflow:
 			/* Integer overflow. */
 			if (error) {
-@@pp_ifdef __ERANGE@@
-				*error = __ERANGE;
+@@pp_ifdef ERANGE@@
+				*error = ERANGE;
 @@pp_else@@
 				*error = 1;
 @@pp_endif@@
@@ -1322,8 +1328,8 @@ handle_overflow:
 
 		/* Empty number... */
 		if (error) {
-@@pp_ifdef __ECANCELED@@
-			*error = __ECANCELED;
+@@pp_ifdef ECANCELED@@
+			*error = ECANCELED;
 @@pp_else@@
 			*error = 1;
 @@pp_endif@@
@@ -1343,8 +1349,8 @@ handle_overflow:
 				while (isspace(*num_iter))
 					++num_iter;
 				if (*num_iter) {
-@@pp_ifdef __EINVAL@@
-					*error = __EINVAL;
+@@pp_ifdef EINVAL@@
+					*error = EINVAL;
 @@pp_else@@
 					*error = 1;
 @@pp_endif@@
@@ -1412,8 +1418,8 @@ $uint64_t strtou64_r([[nonnull]] char const *__restrict nptr,
 		            __hybrid_overflow_uadd(result, digit, &result)) {
 			/* Integer overflow. */
 			if (error) {
-@@pp_ifdef __ERANGE@@
-				*error = __ERANGE;
+@@pp_ifdef ERANGE@@
+				*error = ERANGE;
 @@pp_else@@
 				*error = 1;
 @@pp_endif@@
@@ -1457,8 +1463,8 @@ $uint64_t strtou64_r([[nonnull]] char const *__restrict nptr,
 
 		/* Empty number... */
 		if (error) {
-@@pp_ifdef __ECANCELED@@
-			*error = __ECANCELED;
+@@pp_ifdef ECANCELED@@
+			*error = ECANCELED;
 @@pp_else@@
 			*error = 1;
 @@pp_endif@@
@@ -1478,8 +1484,8 @@ $uint64_t strtou64_r([[nonnull]] char const *__restrict nptr,
 				while (isspace(*num_iter))
 					++num_iter;
 				if (*num_iter) {
-@@pp_ifdef __EINVAL@@
-					*error = __EINVAL;
+@@pp_ifdef EINVAL@@
+					*error = EINVAL;
 @@pp_else@@
 					*error = 1;
 @@pp_endif@@
@@ -1551,8 +1557,8 @@ $int64_t strto64_r([[nonnull]] char const *__restrict nptr,
 handle_overflow:
 			/* Integer overflow. */
 			if (error) {
-@@pp_ifdef __ERANGE@@
-				*error = __ERANGE;
+@@pp_ifdef ERANGE@@
+				*error = ERANGE;
 @@pp_else@@
 				*error = 1;
 @@pp_endif@@
@@ -1603,8 +1609,8 @@ handle_overflow:
 
 		/* Empty number... */
 		if (error) {
-@@pp_ifdef __ECANCELED@@
-			*error = __ECANCELED;
+@@pp_ifdef ECANCELED@@
+			*error = ECANCELED;
 @@pp_else@@
 			*error = 1;
 @@pp_endif@@
@@ -1624,8 +1630,8 @@ handle_overflow:
 				while (isspace(*num_iter))
 					++num_iter;
 				if (*num_iter) {
-@@pp_ifdef __EINVAL@@
-					*error = __EINVAL;
+@@pp_ifdef EINVAL@@
+					*error = EINVAL;
 @@pp_else@@
 					*error = 1;
 @@pp_endif@@
@@ -1658,8 +1664,8 @@ long strtol_r([[nonnull]] char const *__restrict nptr,
 	s32 result = strto32_r(nptr, endptr, base, error);
 	if (result > __LONG_MAX__) {
 		if (error) {
-@@pp_ifdef __ERANGE@@
-			*error = __ERANGE;
+@@pp_ifdef ERANGE@@
+			*error = ERANGE;
 @@pp_else@@
 			*error = 1;
 @@pp_endif@@
@@ -1667,8 +1673,8 @@ long strtol_r([[nonnull]] char const *__restrict nptr,
 		result = __LONG_MAX__;
 	} else if (result < __LONG_MIN__) {
 		if (error) {
-@@pp_ifdef __ERANGE@@
-			*error = __ERANGE;
+@@pp_ifdef ERANGE@@
+			*error = ERANGE;
 @@pp_else@@
 			*error = 1;
 @@pp_endif@@
@@ -1696,8 +1702,8 @@ unsigned long strtoul_r([[nonnull]] char const *__restrict nptr,
 	u32 result = strtou32_r(nptr, endptr, base, error);
 	if (result > __ULONG_MAX__) {
 		if (error) {
-@@pp_ifdef __ERANGE@@
-			*error = __ERANGE;
+@@pp_ifdef ERANGE@@
+			*error = ERANGE;
 @@pp_else@@
 			*error = 1;
 @@pp_endif@@
@@ -1726,8 +1732,8 @@ __LONGLONG strtoll_r([[nonnull]] char const *__restrict nptr,
 	s32 result = strto32_r(nptr, endptr, base, error);
 	if (result > __LONG_LONG_MAX__) {
 		if (error) {
-@@pp_ifdef __ERANGE@@
-			*error = __ERANGE;
+@@pp_ifdef ERANGE@@
+			*error = ERANGE;
 @@pp_else@@
 			*error = 1;
 @@pp_endif@@
@@ -1735,8 +1741,8 @@ __LONGLONG strtoll_r([[nonnull]] char const *__restrict nptr,
 		result = __LONG_LONG_MAX__;
 	} else if (result < __LONG_LONG_MIN__) {
 		if (error) {
-@@pp_ifdef __ERANGE@@
-			*error = __ERANGE;
+@@pp_ifdef ERANGE@@
+			*error = ERANGE;
 @@pp_else@@
 			*error = 1;
 @@pp_endif@@
@@ -1764,8 +1770,8 @@ __ULONGLONG strtoull_r([[nonnull]] char const *__restrict nptr,
 	u32 result = strtou32_r(nptr, endptr, base, error);
 	if (result > __ULONG_LONG_MAX__) {
 		if (error) {
-@@pp_ifdef __ERANGE@@
-			*error = __ERANGE;
+@@pp_ifdef ERANGE@@
+			*error = ERANGE;
 @@pp_else@@
 			*error = 1;
 @@pp_endif@@

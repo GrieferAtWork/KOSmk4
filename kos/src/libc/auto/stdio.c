@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9317cb0b */
+/* HASH CRC-32:0xcd639a72 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,20 +43,20 @@ DECL_BEGIN
  * Remove a file or directory `filename' */
 INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_remove)(char const *filename) {
-#ifdef __AT_FDCWD
+
 	return libd_removeat(__AT_FDCWD, filename);
-#else /* __AT_FDCWD */
-	int result;
-	for (;;) {
-		result = libd_unlink(filename);
-		if (result == 0 || __libc_geterrno_or(0) != __EISDIR)
-			break;
-		result = libd_rmdir(filename);
-		if (result == 0 || __libc_geterrno_or(0) != __ENOTDIR)
-			break;
-	}
-	return result;
-#endif /* !__AT_FDCWD */
+
+
+
+
+
+
+
+
+
+
+
+
 }
 #include <asm/os/fcntl.h>
 #include <libc/errno.h>
@@ -64,20 +64,20 @@ NOTHROW_RPC(LIBDCALL libd_remove)(char const *filename) {
  * Remove a file or directory `filename' */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_remove)(char const *filename) {
-#ifdef __AT_FDCWD
+
 	return libc_removeat(__AT_FDCWD, filename);
-#else /* __AT_FDCWD */
-	int result;
-	for (;;) {
-		result = libc_unlink(filename);
-		if (result == 0 || __libc_geterrno_or(0) != __EISDIR)
-			break;
-		result = libc_rmdir(filename);
-		if (result == 0 || __libc_geterrno_or(0) != __ENOTDIR)
-			break;
-	}
-	return result;
-#endif /* !__AT_FDCWD */
+
+
+
+
+
+
+
+
+
+
+
+
 }
 #include <asm/crt/stdio.h>
 /* >> setbuf(3)
@@ -116,9 +116,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 3)) c
 	size_t n;
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
-#ifdef ERANGE
+
 		(void)libc_seterrno(ERANGE);
-#endif /* ERANGE */
+
 		return NULL;
 	}
 	for (n = 0; n < bufsize - 1; ++n) {
@@ -196,23 +196,23 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1)) __STDC_INT
  * >> } */
 INTERN ATTR_SECTION(".text.crt.errno.utility") void
 NOTHROW_RPC(LIBCCALL libc_perror)(char const *message) {
-#ifdef __NO_PRINTF_STRERROR
-	char const *enodesc;
-	enodesc = libc_strerror(__libc_geterrno());
-	if (message) {
-		libc_fprintf(stderr, "%s: %s\n",
-		        message, enodesc);
-	} else {
-		libc_fprintf(stderr, "%s\n",
-		        enodesc);
-	}
-#else /* __NO_PRINTF_STRERROR */
+
+
+
+
+
+
+
+
+
+
+
 	if (message) {
 		libc_fprintf(stderr, "%s: %m\n", message);
 	} else {
 		libc_fprintf(stderr, "%m\n");
 	}
-#endif /* !__NO_PRINTF_STRERROR */
+
 }
 /* >> fprintf(3), vfprintf(3)
  * Print  data  to  `stream',  following  `format'
@@ -671,20 +671,20 @@ NOTHROW_RPC(VLIBCCALL libc_dprintf)(fd_t fd,
 INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2)) int
 NOTHROW_RPC(LIBDCALL libd_removeat)(fd_t dirfd,
                                     char const *filename) {
-#ifdef __AT_REMOVEREG
+
 	return libd_unlinkat(dirfd, filename, __AT_REMOVEREG | __AT_REMOVEDIR);
-#else /* __AT_REMOVEREG */
-	int result;
-	for (;;) {
-		result = libd_unlinkat(dirfd, filename, 0);
-		if (result == 0 || __libc_geterrno_or(0) != __EISDIR)
-			break;
-		result = libd_unlinkat(dirfd, filename, __AT_REMOVEDIR);
-		if (result == 0 || __libc_geterrno_or(0) != __ENOTDIR)
-			break;
-	}
-	return result;
-#endif /* !__AT_REMOVEREG */
+
+
+
+
+
+
+
+
+
+
+
+
 }
 #include <asm/os/fcntl.h>
 #include <libc/errno.h>
@@ -693,20 +693,20 @@ NOTHROW_RPC(LIBDCALL libd_removeat)(fd_t dirfd,
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_removeat)(fd_t dirfd,
                                     char const *filename) {
-#ifdef __AT_REMOVEREG
+
 	return libc_unlinkat(dirfd, filename, __AT_REMOVEREG | __AT_REMOVEDIR);
-#else /* __AT_REMOVEREG */
-	int result;
-	for (;;) {
-		result = libc_unlinkat(dirfd, filename, 0);
-		if (result == 0 || __libc_geterrno_or(0) != __EISDIR)
-			break;
-		result = libc_unlinkat(dirfd, filename, __AT_REMOVEDIR);
-		if (result == 0 || __libc_geterrno_or(0) != __ENOTDIR)
-			break;
-	}
-	return result;
-#endif /* !__AT_REMOVEREG */
+
+
+
+
+
+
+
+
+
+
+
+
 }
 /* >> tmpnam(3), tmpnam_r(3) */
 INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) char *
@@ -1529,9 +1529,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 3))
 	size_t n;
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
-#ifdef ERANGE
+
 		(void)libc_seterrno(ERANGE);
-#endif /* ERANGE */
+
 		return NULL;
 	}
 	for (n = 0; n < bufsize - 1; ++n) {
@@ -2583,19 +2583,19 @@ NOTHROW_RPC(LIBDCALL libd_fopen_s)(FILE **pstream,
                                    char const *modes) {
 	FILE *result;
 	if unlikely(!pstream || !filename || !modes) {
-#ifdef EINVAL
+
 		return EINVAL;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	result = libd_fopen64(filename, modes);
 	if unlikely(!result) {
-#ifdef ENOMEM
+
 		return __libc_geterrno_or(ENOMEM);
-#else /* ENOMEM */
-		return 1;
-#endif /* !ENOMEM */
+
+
+
 	}
 	*pstream = result;
 	return EOK;
@@ -2607,19 +2607,19 @@ NOTHROW_RPC(LIBCCALL libc_fopen_s)(FILE **pstream,
                                    char const *modes) {
 	FILE *result;
 	if unlikely(!pstream || !filename || !modes) {
-#ifdef EINVAL
+
 		return EINVAL;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	result = libc_fopen64(filename, modes);
 	if unlikely(!result) {
-#ifdef ENOMEM
+
 		return __libc_geterrno_or(ENOMEM);
-#else /* ENOMEM */
-		return 1;
-#endif /* !ENOMEM */
+
+
+
 	}
 	*pstream = result;
 	return EOK;
@@ -2631,19 +2631,19 @@ NOTHROW_RPC(LIBDCALL libd_freopen_s)(FILE **pstream,
                                      char const *modes,
                                      FILE *oldstream) {
 	if unlikely(!pstream || !filename || !modes || !oldstream) {
-#ifdef EINVAL
+
 		return EINVAL;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	oldstream = libd_freopen(filename, modes, oldstream);
 	if unlikely(!oldstream) {
-#ifdef __libc_geterrno
+
 		return __libc_geterrno();
-#else /* __libc_geterrno */
-		return 1;
-#endif /* !__libc_geterrno */
+
+
+
 	}
 	*pstream = oldstream;
 	return EOK;
@@ -2655,19 +2655,19 @@ NOTHROW_RPC(LIBCCALL libc_freopen_s)(FILE **pstream,
                                      char const *modes,
                                      FILE *oldstream) {
 	if unlikely(!pstream || !filename || !modes || !oldstream) {
-#ifdef EINVAL
+
 		return EINVAL;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	oldstream = libc_freopen(filename, modes, oldstream);
 	if unlikely(!oldstream) {
-#ifdef __libc_geterrno
+
 		return __libc_geterrno();
-#else /* __libc_geterrno */
-		return 1;
-#endif /* !__libc_geterrno */
+
+
+
 	}
 	*pstream = oldstream;
 	return EOK;
@@ -2677,25 +2677,25 @@ INTERN ATTR_SECTION(".text.crt.dos.fs.utility") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_tmpnam_s)(char *__restrict buf,
                                     rsize_t bufsize) {
 	if unlikely(!buf) {
-#ifdef EINVAL
+
 		return EINVAL;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	if unlikely(bufsize < L_tmpnam) {
-#ifdef ERANGE
+
 		return ERANGE; /* XXX: Is this what dos does? */
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
+
+
+
 	}
 	if unlikely(!libc_tmpnam(buf)) {
-#ifdef __libc_geterrno
+
 		return __libc_geterrno();
-#else /* __libc_geterrno */
-		return 1;
-#endif /* !__libc_geterrno */
+
+
+
 	}
 	return EOK;
 }
@@ -2703,11 +2703,11 @@ NOTHROW_NCX(LIBCCALL libc_tmpnam_s)(char *__restrict buf,
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.utility") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_clearerr_s)(FILE *__restrict stream) {
 	if (!stream) {
-#ifdef EINVAL
+
 		return EINVAL;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	libc_clearerr(stream);
 	return 0;
@@ -2716,19 +2716,19 @@ NOTHROW_NCX(LIBCCALL libc_clearerr_s)(FILE *__restrict stream) {
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.access") NONNULL((1)) errno_t
 NOTHROW_RPC(LIBCCALL libc_tmpfile_s)(FILE **pstream) {
 	if (!pstream) {
-#ifdef EINVAL
+
 		return EINVAL;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	*pstream = libc_tmpfile64();
 	if (!*pstream) {
-#ifdef ENOMEM
+
 		return __libc_geterrno_or(ENOMEM);
-#else /* ENOMEM */
-		return __libc_geterrno_or(1);
-#endif /* !ENOMEM */
+
+
+
 	}
 	return 0;
 }
@@ -2743,15 +2743,15 @@ NOTHROW_RPC(LIBCCALL libc_fread_s)(void *__restrict buf,
 	size_t reqbuf;
 	if (__hybrid_overflow_umul(elemsize, elemcount, &reqbuf) ||
 	    reqbuf > bufsize) {
-#ifdef ERANGE
+
 		(void)libc_seterrno(ERANGE);
-#endif /* ERANGE */
+
 		return 0;
 	}
 	if unlikely(!stream || !buf) {
-#ifdef EINVAL
+
 		(void)libc_seterrno(EINVAL);
-#endif /* EINVAL */
+
 		return 0;
 	}
 	return libc_fread(buf, elemsize, elemcount, stream);
@@ -2762,9 +2762,9 @@ INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.read") WUNUSED NONNULL((1)) 
 NOTHROW_RPC(LIBCCALL libc_gets_s)(char *__restrict buf,
                                   rsize_t bufsize) {
 	if unlikely(!buf) {
-#ifdef EINVAL
+
 		(void)libc_seterrno(EINVAL);
-#endif /* EINVAL */
+
 		return NULL;
 	}
 	return libc_fgets(buf, (__STDC_INT_AS_SIZE_T)(unsigned int)bufsize, stdin);

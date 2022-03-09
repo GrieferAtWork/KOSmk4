@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82150e21 */
+/* HASH CRC-32:0x6c2df7a4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -95,11 +95,11 @@ NOTHROW_NCX(LIBCCALL libc_tcsetattr)(fd_t fd,
 #endif /* __TCSAFLUSH && __TCSETAF */
 
 	default:
-#ifdef EINVAL
+
 		return libc_seterrno(EINVAL);
-#else /* EINVAL */
-		return libc_seterrno(1);
-#endif /* !EINVAL */
+
+
+
 	}
 	return (int)libc_ioctl(fd, cmd, termios_p);
 }
@@ -143,11 +143,11 @@ NOTHROW_NCX(LIBCCALL libc_tcsetsid)(fd_t fd,
                                     pid_t pid) {
 	int result;
 	if unlikely(pid != libc_getsid(0)) {
-#ifdef EINVAL
+
 		result = libc_seterrno(EINVAL);
-#else /* EINVAL */
-		result = libc_seterrno(1);
-#endif /* !EINVAL */
+
+
+
 	} else {
 		result = libc_ioctl(fd, __TIOCSCTTY, NULL);
 	}

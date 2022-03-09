@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5b92fbb */
+/* HASH CRC-32:0xd3c9c0e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,11 +67,11 @@ NOTHROW_NCX(LIBCCALL libc_thr_create)(void *stack_base,
 
 		    )
 		{
-#ifdef ENOSYS
+
 			return ENOSYS;
-#else /* ENOSYS */
-			return 1;
-#endif /* !ENOSYS */
+
+
+
 		}
 		result = libc_pthread_attr_init(&attr);
 		if unlikely(result != 0)

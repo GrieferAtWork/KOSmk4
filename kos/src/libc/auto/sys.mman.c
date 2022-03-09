@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96dcbe9b */
+/* HASH CRC-32:0x5bab789b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ NOTHROW_RPC(LIBCCALL libc_shm_open)(char const *name,
 	fd_t result;
 	char *fullname;
 	size_t namelen;
-#ifdef O_DOSPATH
+
 	if (oflags & O_DOSPATH) {
 		while (*name == '/' || *name == '\\')
 			++name;
@@ -54,13 +54,13 @@ NOTHROW_RPC(LIBCCALL libc_shm_open)(char const *name,
 		while (*name == '/')
 			++name;
 	}
-#elif defined(_WIN32)
-	while (*name == '/' || *name == '\\')
-		++name;
-#else /* ... */
-	while (*name == '/')
-		++name;
-#endif /* !... */
+
+
+
+
+
+
+
 	namelen  = libc_strlen(name);
 	fullname = (char *)__malloca((__COMPILER_STRLEN(__PATH_SHM) + 1 +
 	                              namelen + 1) *
@@ -74,14 +74,14 @@ NOTHROW_RPC(LIBCCALL libc_shm_open)(char const *name,
 	       (namelen + 1) *
 	       sizeof(char));
 	result = libc_open(fullname, oflags, mode);
-#if defined(ENOENT) && defined(O_CREAT)
+
 	if (result < 0 && (oflags & O_CREAT) != 0 && __libc_geterrno_or(ENOENT) == ENOENT) {
 		/* Lazily create the SHM directory (/dev/shm), if it hadn't been created already.
 		 * XXX:   This    assumes    that    `headof(__PATH_SHM)'    already    exists... */
 		libc_mkdir(__PATH_SHM, 0777);
 		result = libc_open(fullname, oflags, mode);
 	}
-#endif /* ENOENT && O_CREAT */
+
 	__freea(fullname);
 	return result;
 }
@@ -94,13 +94,13 @@ NOTHROW_RPC(LIBCCALL libc_shm_unlink)(char const *name) {
 	int result;
 	char *fullname;
 	size_t namelen;
-#ifdef _WIN32
-	while (*name == '/' || *name == '\\')
-		++name;
-#else /* _WIN32 */
+
+
+
+
 	while (*name == '/')
 		++name;
-#endif /* !_WIN32 */
+
 	namelen  = libc_strlen(name);
 	fullname = (char *)__malloca((__COMPILER_STRLEN(__PATH_SHM) + 1 +
 	                              namelen + 1) *
@@ -131,11 +131,11 @@ NOTHROW_NCX(LIBCCALL libc_pkey_set)(int pkey,
 	__arch_pkey_set(pkey, access_rights);
 	return 0;
 badkey_or_rights:
-#ifdef EINVAL
+
 	return libc_seterrno(EINVAL);
-#else /* EINVAL */
-	return -1;
-#endif /* !EINVAL */
+
+
+
 }
 #include <libc/errno.h>
 /* >> pkey_get(3) */
@@ -145,11 +145,11 @@ NOTHROW_NCX(LIBCCALL libc_pkey_get)(int pkey) {
 		goto badkey;
 	return __arch_pkey_get(pkey);
 badkey:
-#ifdef EINVAL
+
 	return libc_seterrno(EINVAL);
-#else /* EINVAL */
-	return -1;
-#endif /* !EINVAL */
+
+
+
 }
 #endif /* !__KERNEL__ && __ARCH_HAVE_PKEY */
 

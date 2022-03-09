@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9599ca7 */
+/* HASH CRC-32:0x6758a658 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,13 +79,13 @@ NOTHROW_NCX(LIBCCALL libc_sigsetmask)(int mask) {
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_DEPRECATED("Using `sigprocmask()\' instead") int
 NOTHROW_NCX(LIBCCALL libc_siggetmask)(void) {
 	sigset_t sigset;
-#ifdef __SIG_SETMASK
+
 	if (libc_sigprocmask(__SIG_SETMASK, NULL, &sigset))
 		return -1;
-#else /* __SIG_SETMASK */
-	if (libc_sigprocmask(0, NULL, &sigset))
-		return -1;
-#endif /* !__SIG_SETMASK */
+
+
+
+
 	return (int)(unsigned int)sigset.__val[0];
 }
 #include <asm/os/signal.h>
@@ -313,7 +313,7 @@ NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
 		libc_fprintf(stderr, "%s: ", s);
 	if (text) {
 		libc_fprintf(stderr, "SIG%s (", text);
-#if defined(__SIGRTMIN) && defined(__SIGRTMAX)
+
 	} else if (pinfo->si_signo >= __SIGRTMIN &&
 	           pinfo->si_signo <= __SIGRTMAX) {
 		unsigned int offset;
@@ -323,7 +323,7 @@ NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
 		} else {
 			libc_fprintf(stderr, "SIGRTMIN (");
 		}
-#endif /* __SIGRTMIN && __SIGRTMAX */
+
 	} else {
 		libc_fprintf(stderr, "Unknown signal %d (", pinfo->si_signo);
 	}
@@ -333,25 +333,25 @@ NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
 	} else {
 		libc_fprintf(stderr, "%u ", (unsigned int)pinfo->si_code);
 	}
-#if defined(__SIGILL) || defined(__SIGFPE) || defined(__SIGSEGV) || defined(__SIGBUS)
+
 	if (0
-#ifdef __SIGILL
+
 	    || pinfo->si_signo == __SIGILL
-#endif /* __SIGILL */
-#ifdef __SIGFPE
+
+
 	    || pinfo->si_signo == __SIGFPE
-#endif /* __SIGFPE */
-#ifdef __SIGSEGV
+
+
 	    || pinfo->si_signo == __SIGSEGV
-#endif /* __SIGSEGV */
-#ifdef __SIGBUS
+
+
 	    || pinfo->si_signo == __SIGBUS
-#endif /* __SIGBUS */
+
 	    ) {
 		libc_fprintf(stderr, "[%p])\n", pinfo->si_addr);
 	} else
-#endif /* __SIGILL || __SIGFPE || __SIGSEGV || __SIGBUS */
-#ifdef __SIGCHLD
+
+
 	if (pinfo->si_signo == __SIGCHLD) {
 		libc_fprintf(stderr,
 		        "%" __PRIN_PREFIX(__SIZEOF_PID_T__) "d %d "
@@ -360,13 +360,13 @@ NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
 		        (int)pinfo->si_status,
 		        (uid_t)pinfo->si_uid);
 	} else
-#endif /* __SIGCHLD */
-#ifdef __SIGPOLL
+
+
 	if (pinfo->si_signo == __SIGPOLL) {
 		libc_fprintf(stderr, "%" __PRIN_PREFIX(__SIZEOF_POINTER__) "d)\n",
 		        (longptr_t)pinfo->si_band);
 	} else
-#endif /* __SIGPOLL */
+
 	{
 		libc_fprintf(stderr,
 		        "%" __PRIN_PREFIX(__SIZEOF_PID_T__) "d "
@@ -917,11 +917,11 @@ NOTHROW_NCX(LIBCCALL libc_sigset)(signo_t signo,
 	       ? (sighandler_t)__SIG_HOLD
 	       : oact.sa_handler;
 err_inval:
-#ifdef EINVAL
+
 	(void)libc_seterrno(EINVAL);
-#else /* EINVAL */
-	(void)libc_seterrno(1);
-#endif /* !EINVAL */
+
+
+
 err:
 	return (sighandler_t)__SIG_ERR;
 }

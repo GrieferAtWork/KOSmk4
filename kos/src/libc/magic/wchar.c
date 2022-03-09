@@ -56,6 +56,10 @@
 %[define_wchar_replacement(WEOF = __WEOF16, __WEOF32)]
 %[define_wchar_replacement(__WEOF = __WEOF16, __WEOF32)]
 
+%[assume_defined_in_kos(__SIZEOF_WINT_T__ = "4")]
+%[assume_defined_in_kos(__SIZEOF_WCHAR_T__ = "4")]
+
+
 %[define_replacement(rsize_t  = __SIZE_TYPE__)]
 
 %(auto_source){

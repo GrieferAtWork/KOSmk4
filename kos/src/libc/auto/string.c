@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63d64aae */
+/* HASH CRC-32:0xf4590069 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -671,11 +671,11 @@ NOTHROW_NCX(LIBCCALL libc_basename)(char const *filename) {
 	char *iter   = (char *)filename;
 	for (;;) {
 		char ch = *iter++;
-#ifdef _WIN32
-		if (ch == '/' || ch == '\\')
-#else /* _WIN32 */
+
+
+
 		if (ch == '/')
-#endif /* !_WIN32 */
+
 		{
 			result = iter;
 		}
@@ -2118,20 +2118,20 @@ NOTHROW_NCX(LIBCCALL libc___xpg_strerror_r)(errno_t errnum,
 	if (!buf)
 		buflen = 0;
 	if (!string) {
-#ifdef EINVAL
+
 		return EINVAL;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	/* Copy the descriptor text. */
 	msg_len = libc_strlen(string) + 1;
 	if (msg_len > buflen) {
-#ifdef ERANGE
+
 		return ERANGE;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
+
+
+
 	}
 	libc_memcpyc(buf, string, msg_len, sizeof(char));
 	return EOK;
@@ -5788,38 +5788,38 @@ NOTHROW_NCX(LIBCCALL libc_strmode)(mode_t mode,
 
 	/* First character: File type */
 	ch = '?';
-#ifdef S_IFMT
+
 	switch (mode & S_IFMT) {
-#ifdef S_IFDIR
+
 	case S_IFDIR:  ch = 'd'; break;
-#endif /* S_IFDIR */
-#ifdef S_IFCHR
+
+
 	case S_IFCHR:  ch = 'c'; break;
-#endif /* S_IFCHR */
-#ifdef S_IFBLK
+
+
 	case S_IFBLK:  ch = 'b'; break;
-#endif /* S_IFBLK */
-#ifdef S_IFREG
+
+
 	case S_IFREG:  ch = '-'; break;
-#endif /* S_IFREG */
-#ifdef S_IFLNK
+
+
 	case S_IFLNK:  ch = 'l'; break;
-#endif /* S_IFLNK */
-#ifdef S_IFSOCK
+
+
 	case S_IFSOCK: ch = 's'; break;
-#endif /* S_IFSOCK */
-#ifdef S_IFIFO
+
+
 	case S_IFIFO:  ch = 'p'; break; /* p=pipe */
-#endif /* S_IFIFO */
+
 	default: break;
 	}
-#endif /* S_IFMT */
+
 	*p++ = ch;
 
 	*p++ = mode & S_IRUSR ? 'r' : '-';
 	*p++ = mode & S_IWUSR ? 'w' : '-';
 
-#ifdef S_ISUID
+
 	switch (mode & (S_IXUSR | S_ISUID)) {
 	case 0:                 ch = '-'; break;
 	case S_IXUSR:           ch = 'x'; break;
@@ -5827,15 +5827,15 @@ NOTHROW_NCX(LIBCCALL libc_strmode)(mode_t mode,
 	case S_IXUSR | S_ISUID: ch = 's'; break;
 	default: __builtin_unreachable();
 	}
-#else /* S_ISUID */
-	ch = mode & S_IXUSR ? 'x' : '-';
-#endif /* !S_ISUID */
+
+
+
 	*p++ = ch;
 
 	*p++ = mode & S_IRGRP ? 'r' : '-';
 	*p++ = mode & S_IWGRP ? 'w' : '-';
 
-#ifdef S_ISGID
+
 	switch (mode & (S_IXGRP | S_ISGID)) {
 	case 0:                 ch = '-'; break;
 	case S_IXGRP:           ch = 'x'; break;
@@ -5843,15 +5843,15 @@ NOTHROW_NCX(LIBCCALL libc_strmode)(mode_t mode,
 	case S_IXGRP | S_ISGID: ch = 's'; break;
 	default: __builtin_unreachable();
 	}
-#else /* S_ISGID */
-	ch = mode & S_IXGRP ? 'x' : '-';
-#endif /* !S_ISGID */
+
+
+
 	*p++ = ch;
 
 	*p++ = mode & S_IROTH ? 'r' : '-';
 	*p++ = mode & S_IWOTH ? 'w' : '-';
 
-#ifdef S_ISVTX
+
 	switch (mode & (S_IXOTH | S_ISVTX)) {
 	case 0:                 ch = '-'; break;
 	case S_IXOTH:           ch = 'x'; break;
@@ -5859,9 +5859,9 @@ NOTHROW_NCX(LIBCCALL libc_strmode)(mode_t mode,
 	case S_IXOTH | S_ISVTX: ch = 't'; break;
 	default: __builtin_unreachable();
 	}
-#else /* S_ISVTX */
-	ch = mode & S_IXOTH ? 'x' : '-';
-#endif /* !S_ISVTX */
+
+
+
 	*p++ = ch;
 
 	/* Always space in this implementation */

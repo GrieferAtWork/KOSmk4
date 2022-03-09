@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1bd5421 */
+/* HASH CRC-32:0x5eff8cce */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ INTERN ATTR_SECTION(".text.crt.except.system.mman") NONNULL((1)) fd_t
 	fd_t result;
 	char *fullname;
 	size_t namelen;
-#ifdef O_DOSPATH
+
 	if (oflags & O_DOSPATH) {
 		while (*name == '/' || *name == '\\')
 			++name;
@@ -54,13 +54,13 @@ INTERN ATTR_SECTION(".text.crt.except.system.mman") NONNULL((1)) fd_t
 		while (*name == '/')
 			++name;
 	}
-#elif defined(_WIN32)
-	while (*name == '/' || *name == '\\')
-		++name;
-#else /* ... */
-	while (*name == '/')
-		++name;
-#endif /* !... */
+
+
+
+
+
+
+
 	namelen  = libc_strlen(name);
 	fullname = (char *)__Malloca((__COMPILER_STRLEN(__PATH_SHM) + 1 +
 	                              namelen + 1) *
@@ -72,14 +72,14 @@ INTERN ATTR_SECTION(".text.crt.except.system.mman") NONNULL((1)) fd_t
 	       (namelen + 1) *
 	       sizeof(char));
 	result = libc_Open(fullname, oflags, mode);
-#if defined(ENOENT) && defined(O_CREAT)
+
 	if (result < 0 && (oflags & O_CREAT) != 0 && __libc_geterrno_or(ENOENT) == ENOENT) {
 		/* Lazily create the SHM directory (/dev/shm), if it hadn't been created already.
 		 * XXX:   This    assumes    that    `headof(__PATH_SHM)'    already    exists... */
 		libc_Mkdir(__PATH_SHM, 0777);
 		result = libc_Open(fullname, oflags, mode);
 	}
-#endif /* ENOENT && O_CREAT */
+
 	__freea(fullname);
 	return result;
 }
@@ -90,13 +90,13 @@ INTERN ATTR_SECTION(".text.crt.except.system.mman") NONNULL((1)) void
 (LIBCCALL libc_ShmUnlink)(char const *name) THROWS(...) {
 	char *fullname;
 	size_t namelen;
-#ifdef _WIN32
-	while (*name == '/' || *name == '\\')
-		++name;
-#else /* _WIN32 */
+
+
+
+
 	while (*name == '/')
 		++name;
-#endif /* !_WIN32 */
+
 	namelen  = libc_strlen(name);
 	fullname = (char *)__Malloca((__COMPILER_STRLEN(__PATH_SHM) + 1 +
 	                              namelen + 1) *

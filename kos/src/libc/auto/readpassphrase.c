@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf586e4 */
+/* HASH CRC-32:0xf564d34e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -113,11 +113,11 @@ NOTHROW_NCX(LIBCCALL libc_readpassphrase)(char const *prompt,
 
 	/* Validate input arguments. */
 	if unlikely(buf == NULL || bufsize < sizeof(char)) {
-#ifdef EINVAL
+
 		(void)libc_seterrno(EINVAL);
-#else /* EINVAL */
-		(void)libc_seterrno(1);
-#endif /* !EINVAL */
+
+
+
 		goto err;
 	}
 
@@ -132,23 +132,23 @@ again:
 	if (!(flags & __RPP_STDIN)) {
 
 #ifdef _PATH_TTY
-#ifdef __O_RDWR
+
 		infd = libc_open(_PATH_TTY, __O_RDWR);
-#else /* __O_RDWR */
-		infd = libc_open(_PATH_TTY, 0);
-#endif /* !__O_RDWR */
+
+
+
 #else /* _PATH_TTY */
-#ifdef __O_RDWR
+
 		infd = libc_open("/dev/tty", __O_RDWR);
-#else /* __O_RDWR */
-		infd = libc_open("/dev/tty", 0);
-#endif /* !__O_RDWR */
+
+
+
 #endif /* !_PATH_TTY */
 		if unlikely(infd == -1) {
-#ifdef ENOTTY
+
 			if (flags & __RPP_REQUIRE_TTY)
 				(void)libc_seterrno(ENOTTY);
-#endif /* ENOTTY */
+
 			goto err;
 		}
 		outfd = infd;
@@ -168,9 +168,9 @@ again:
 
 	if (libc_tcgetattr(infd, &old_ios) != 0) {
 		if (flags & RPP_REQUIRE_TTY) {
-#ifdef ENOTTY
+
 			(void)libc_seterrno(ENOTTY);
-#endif /* ENOTTY */
+
 			goto err_infd;
 #define __PRIVATE_WANT_err_infd
 		}
@@ -340,20 +340,20 @@ done_infd:
 
 
 			/* Handle signals for which we must start over when they're received. */
-#if defined(__SIGTSTP) || defined(__SIGTTIN) || defined(__SIGTTOU)
+
 			if (0
-#ifdef __SIGTSTP
+
 			    || __NAMESPACE_LOCAL_SYM rpp_signals[i] == __SIGTSTP
-#endif /* __SIGTSTP */
-#ifdef __SIGTTIN
+
+
 			    || __NAMESPACE_LOCAL_SYM rpp_signals[i] == __SIGTTIN
-#endif /* __SIGTTIN */
-#ifdef __SIGTTOU
+
+
 			    || __NAMESPACE_LOCAL_SYM rpp_signals[i] == __SIGTTOU
-#endif /* __SIGTTOU */
+
 			    )
 				must_restart = true;
-#endif /* __SIGTSTP || __SIGTTIN || __SIGTTOU */
+
 
 		}
 	}

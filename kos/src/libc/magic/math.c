@@ -155,6 +155,26 @@
 %[define(M_SQRT1_2l = 0.707106781186547524400844362104849039L)] /* 1/sqrt(2) */
 
 
+/* NOTE: These assumptions are correct for all currently targeted platforms,
+ *       but by making them we can get rid of a significant portion of libc
+ *       code. If we ever target a platform where these aren't correct, then
+ *       you should simply delete them from here! */
+%[assume_defined_in_kos(__IEEE754_FLOAT_TYPE_IS_FLOAT__)]
+%[assume_undefined_in_kos(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)]
+%[assume_undefined_in_kos(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)]
+%[assume_undefined_in_kos(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)]
+%[assume_defined_in_kos(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__)]
+%[assume_undefined_in_kos(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)]
+%[assume_undefined_in_kos(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)]
+%[assume_undefined_in_kos(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)]
+%[assume_defined_in_kos(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)]
+%[assume_defined_in_kos(__LIBM_MATHFUN, __LIBM_MATHFUNI, __LIBM_MATHFUN2, __LIBM_MATHFUNI2, __LIBM_MATHFUN1I, __LIBM_MATHFUN2I, __LIBM_MATHFUN3I, __LIBM_MATHFUNIM, __LIBM_MATHFUN0, __LIBM_MATHFUNX)]
+%[assume_defined_in_kos(__LIBM_MATHFUNF, __LIBM_MATHFUNIF, __LIBM_MATHFUN2F, __LIBM_MATHFUNI2F, __LIBM_MATHFUN1IF, __LIBM_MATHFUN2IF, __LIBM_MATHFUN3IF, __LIBM_MATHFUNIMF, __LIBM_MATHFUN0F, __LIBM_MATHFUNXF)]
+%[assume_defined_in_kos(__LIBM_MATHFUNL, __LIBM_MATHFUNIL, __LIBM_MATHFUN2L, __LIBM_MATHFUNI2L, __LIBM_MATHFUN1IL, __LIBM_MATHFUN2IL, __LIBM_MATHFUN3IL, __LIBM_MATHFUNIML, __LIBM_MATHFUN0L, __LIBM_MATHFUNXL)]
+%[assume_defined_in_kos(__IEEE754_FLOAT_TYPE__)]
+%[assume_defined_in_kos(__IEEE754_DOUBLE_TYPE__)]
+%[assume_defined_in_kos(__IEEE854_LONG_DOUBLE_TYPE__)]
+/**/
 
 %(auto_source){
 #include "../libc/globals.h"

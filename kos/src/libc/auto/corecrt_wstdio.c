@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x367689bb */
+/* HASH CRC-32:0x5014582c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,19 +40,19 @@ DECL_BEGIN
 #include <parts/printf-config.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.errno.utility") ATTR_COLD void
 (LIBDCALL libd__wperror)(char16_t const *__restrict message) THROWS(...) {
-#ifdef __NO_PRINTF_STRERROR
-	char const *enodesc;
-	enodesc = libd_strerror(__libc_geterrno());
-	if (message) {
-
-		libc_fprintf(stderr, "%I16s: %I8s\n", message, enodesc);
 
 
 
-	} else {
-		libc_fprintf(stderr, "%I8s\n", enodesc);
-	}
-#else /* __NO_PRINTF_STRERROR */
+
+
+
+
+
+
+
+
+
+
 	if (message) {
 
 		libc_fprintf(stderr, "%I16s: %m\n", message);
@@ -62,26 +62,26 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.errno.utility") ATTR_COLD void
 	} else {
 		libc_fprintf(stderr, "%m\n");
 	}
-#endif /* !__NO_PRINTF_STRERROR */
+
 }
 #include <libc/template/stdstreams.h>
 #include <libc/errno.h>
 #include <parts/printf-config.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.errno.utility") ATTR_COLD void
 (LIBKCALL libc__wperror)(char32_t const *__restrict message) THROWS(...) {
-#ifdef __NO_PRINTF_STRERROR
-	char const *enodesc;
-	enodesc = libc_strerror(__libc_geterrno());
-	if (message) {
 
 
 
-		libc_fprintf(stderr, "%I32s: %I8s\n", message, enodesc);
 
-	} else {
-		libc_fprintf(stderr, "%I8s\n", enodesc);
-	}
-#else /* __NO_PRINTF_STRERROR */
+
+
+
+
+
+
+
+
+
 	if (message) {
 
 
@@ -91,7 +91,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.errno.utility") ATTR_COLD void
 	} else {
 		libc_fprintf(stderr, "%m\n");
 	}
-#endif /* !__NO_PRINTF_STRERROR */
+
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
 NOTHROW_NCX(LIBDCALL libd__wfsopen)(char16_t const *filename,
@@ -196,11 +196,11 @@ err_badalloc_filename:
 	libc_free(utf8_filename);
 
 err_badalloc:
-#ifdef ENOMEM
+
 	return __libc_geterrno_or(ENOMEM);
-#else /* ENOMEM */
-	return __libc_geterrno_or(1);
-#endif /* !ENOMEM */
+
+
+
 }
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") NONNULL((1, 2, 3)) errno_t
@@ -227,11 +227,11 @@ err_badalloc_filename:
 	libc_free(utf8_filename);
 
 err_badalloc:
-#ifdef ENOMEM
+
 	return __libc_geterrno_or(ENOMEM);
-#else /* ENOMEM */
-	return __libc_geterrno_or(1);
-#endif /* !ENOMEM */
+
+
+
 }
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") NONNULL((1, 2, 3)) errno_t
@@ -259,11 +259,11 @@ err_badalloc_filename:
 	libc_free(utf8_filename);
 
 err_badalloc:
-#ifdef ENOMEM
+
 	return __libc_geterrno_or(ENOMEM);
-#else /* ENOMEM */
-	return __libc_geterrno_or(1);
-#endif /* !ENOMEM */
+
+
+
 }
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") NONNULL((1, 2, 3)) errno_t
@@ -291,11 +291,11 @@ err_badalloc_filename:
 	libc_free(utf8_filename);
 
 err_badalloc:
-#ifdef ENOMEM
+
 	return __libc_geterrno_or(ENOMEM);
-#else /* ENOMEM */
-	return __libc_geterrno_or(1);
-#endif /* !ENOMEM */
+
+
+
 }
 #include <libc/template/stdstreams.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.read") char16_t *

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xafe7645c */
+/* HASH CRC-32:0xb757de10 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,11 +37,11 @@ NOTHROW_RPC(LIBDCALL libd__wgetdcwd)(int drive,
                                      char16_t *buf,
                                      size_t size) {
 	if unlikely(drive < __AT_DOS_DRIVEMIN || drive > __AT_DOS_DRIVEMAX) {
-#ifdef EINVAL
+
 		(void)libc_seterrno(EINVAL);
-#else /* EINVAL */
-		(void)libc_seterrno(1);
-#endif /* !EINVAL */
+
+
+
 		return NULL;
 	}
 	return libd_wfrealpath4(__AT_FDDRIVE_CWD(drive), buf, size, 0);
@@ -52,11 +52,11 @@ NOTHROW_RPC(LIBKCALL libc__wgetdcwd)(int drive,
                                      char32_t *buf,
                                      size_t size) {
 	if unlikely(drive < __AT_DOS_DRIVEMIN || drive > __AT_DOS_DRIVEMAX) {
-#ifdef EINVAL
+
 		(void)libc_seterrno(EINVAL);
-#else /* EINVAL */
-		(void)libc_seterrno(1);
-#endif /* !EINVAL */
+
+
+
 		return NULL;
 	}
 	return libc_wfrealpath4(__AT_FDDRIVE_CWD(drive), buf, size, 0);

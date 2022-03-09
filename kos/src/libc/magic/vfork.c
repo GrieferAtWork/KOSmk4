@@ -36,6 +36,9 @@ __SYSDECL_BEGIN
 
 }
 
+%[assume_defined_in_kos(__ARCH_HAVE_SHARED_VM_VFORK)]
+%[assume_defined_in_kos(__ARCH_HAVE_SIGBLOCK_VFORK)]
+
 %[insert:extern(vfork)]
 
 %{

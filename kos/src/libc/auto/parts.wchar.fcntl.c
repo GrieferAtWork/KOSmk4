@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1eccd7 */
+/* HASH CRC-32:0xe3a5c69c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,22 +42,22 @@ NOTHROW_RPC(VLIBDCALL libd_wopen)(char16_t const *filename,
 	va_start(args, oflags);
 	mode = va_arg(args, mode_t);
 	va_end(args);
-#ifdef __AT_FDCWD
+
 	result = libd_wopenat(__AT_FDCWD, filename, oflags, mode);
 
 
-#else /* __AT_FDCWD */
-	{
-		char *utf8_filename;
-		utf8_filename = libd_convert_wcstombs(filename);
-		if unlikely(!utf8_filename)
-			return -1;
-		result = libd_open(utf8_filename, oflags, mode);
 
-		libc_free(utf8_filename);
 
-	}
-#endif /* !__AT_FDCWD */
+
+
+
+
+
+
+
+
+
+
 	return result;
 }
 INTERN ATTR_SECTION(".text.crt.wchar.io.utility") WUNUSED NONNULL((1)) fd_t
@@ -70,61 +70,61 @@ NOTHROW_RPC(VLIBKCALL libc_wopen)(char32_t const *filename,
 	va_start(args, oflags);
 	mode = va_arg(args, mode_t);
 	va_end(args);
-#ifdef __AT_FDCWD
+
 	result = libc_wopenat(__AT_FDCWD, filename, oflags, mode);
 
 
-#else /* __AT_FDCWD */
-	{
-		char *utf8_filename;
-		utf8_filename = libc_convert_wcstombs(filename);
-		if unlikely(!utf8_filename)
-			return -1;
-		result = libc_open(utf8_filename, oflags, mode);
 
-		libc_free(utf8_filename);
 
-	}
-#endif /* !__AT_FDCWD */
+
+
+
+
+
+
+
+
+
+
 	return result;
 }
 #include <asm/os/fcntl.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.io.utility") WUNUSED NONNULL((1)) fd_t
 NOTHROW_RPC(LIBDCALL libd_wcreat)(char16_t const *filename,
                                   mode_t mode) {
-#if defined(__O_CREAT) && defined(__O_WRONLY) && defined(__O_TRUNC)
+
 	return libd_wopen(filename, __O_CREAT | __O_WRONLY | __O_TRUNC, mode);
-#else /* __O_CREAT && __O_WRONLY && __O_TRUNC */
-	fd_t result;
-	char *utf8_filename;
-	utf8_filename = libd_convert_wcstombs(filename);
-	if unlikely(!utf8_filename)
-		return -1;
-	result = libd_creat(utf8_filename, mode);
 
-	libc_free(utf8_filename);
 
-	return result;
-#endif /* !__O_CREAT || !__O_WRONLY || !__O_TRUNC */
+
+
+
+
+
+
+
+
+
+
 }
 #include <asm/os/fcntl.h>
 INTERN ATTR_SECTION(".text.crt.wchar.io.utility") WUNUSED NONNULL((1)) fd_t
 NOTHROW_RPC(LIBKCALL libc_wcreat)(char32_t const *filename,
                                   mode_t mode) {
-#if defined(__O_CREAT) && defined(__O_WRONLY) && defined(__O_TRUNC)
+
 	return libc_wopen(filename, __O_CREAT | __O_WRONLY | __O_TRUNC, mode);
-#else /* __O_CREAT && __O_WRONLY && __O_TRUNC */
-	fd_t result;
-	char *utf8_filename;
-	utf8_filename = libc_convert_wcstombs(filename);
-	if unlikely(!utf8_filename)
-		return -1;
-	result = libc_creat(utf8_filename, mode);
 
-	libc_free(utf8_filename);
 
-	return result;
-#endif /* !__O_CREAT || !__O_WRONLY || !__O_TRUNC */
+
+
+
+
+
+
+
+
+
+
 }
 #include <asm/os/oflags.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.io.utility") WUNUSED NONNULL((1)) fd_t
@@ -160,9 +160,9 @@ NOTHROW_RPC(VLIBDCALL libd_wopen64)(char16_t const *filename,
 	return result;
 }
 #include <asm/os/oflags.h>
-#if !defined(__O_LARGEFILE) || !__O_LARGEFILE
+#if !__O_LARGEFILE
 DEFINE_INTERN_ALIAS(libc_wopen64, libc_wopen);
-#else /* !__O_LARGEFILE || !__O_LARGEFILE */
+#else /* !__O_LARGEFILE */
 INTERN ATTR_SECTION(".text.crt.wchar.io.utility") WUNUSED NONNULL((1)) fd_t
 NOTHROW_RPC(VLIBKCALL libc_wopen64)(char32_t const *filename,
                                     oflag_t oflags,
@@ -195,49 +195,49 @@ NOTHROW_RPC(VLIBKCALL libc_wopen64)(char32_t const *filename,
 
 	return result;
 }
-#endif /* __O_LARGEFILE && __O_LARGEFILE */
+#endif /* __O_LARGEFILE */
 #include <asm/os/oflags.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.io.utility") WUNUSED NONNULL((1)) fd_t
 NOTHROW_RPC(LIBDCALL libd_wcreat64)(char16_t const *filename,
                                     mode_t mode) {
-#if defined(__O_CREAT) && defined(__O_WRONLY) && defined(__O_TRUNC)
+
 	return libd_wopen64(filename, __O_CREAT | __O_WRONLY | __O_TRUNC, mode);
-#else /* __O_CREAT && __O_WRONLY && __O_TRUNC */
-	fd_t result;
-	char *utf8_filename;
-	utf8_filename = libd_convert_wcstombs(filename);
-	if unlikely(!utf8_filename)
-		return -1;
-	result = libd_creat64(utf8_filename, mode);
 
-	libc_free(utf8_filename);
 
-	return result;
-#endif /* !__O_CREAT || !__O_WRONLY || !__O_TRUNC */
+
+
+
+
+
+
+
+
+
+
 }
 #include <asm/os/oflags.h>
-#if !defined(__O_LARGEFILE) || !__O_LARGEFILE
+#if !__O_LARGEFILE
 DEFINE_INTERN_ALIAS(libc_wcreat64, libc_wcreat);
-#else /* !__O_LARGEFILE || !__O_LARGEFILE */
+#else /* !__O_LARGEFILE */
 INTERN ATTR_SECTION(".text.crt.wchar.io.utility") WUNUSED NONNULL((1)) fd_t
 NOTHROW_RPC(LIBKCALL libc_wcreat64)(char32_t const *filename,
                                     mode_t mode) {
-#if defined(__O_CREAT) && defined(__O_WRONLY) && defined(__O_TRUNC)
+
 	return libc_wopen64(filename, __O_CREAT | __O_WRONLY | __O_TRUNC, mode);
-#else /* __O_CREAT && __O_WRONLY && __O_TRUNC */
-	fd_t result;
-	char *utf8_filename;
-	utf8_filename = libc_convert_wcstombs(filename);
-	if unlikely(!utf8_filename)
-		return -1;
-	result = libc_creat64(utf8_filename, mode);
 
-	libc_free(utf8_filename);
 
-	return result;
-#endif /* !__O_CREAT || !__O_WRONLY || !__O_TRUNC */
+
+
+
+
+
+
+
+
+
+
 }
-#endif /* __O_LARGEFILE && __O_LARGEFILE */
+#endif /* __O_LARGEFILE */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.io.utility") WUNUSED NONNULL((2)) fd_t
 NOTHROW_RPC(VLIBDCALL libd_wopenat)(fd_t dirfd,
                                     char16_t const *filename,
@@ -326,9 +326,9 @@ NOTHROW_RPC(VLIBDCALL libd_wopenat64)(fd_t dirfd,
 	return result;
 }
 #include <asm/os/oflags.h>
-#if !defined(__O_LARGEFILE) || !__O_LARGEFILE
+#if !__O_LARGEFILE
 DEFINE_INTERN_ALIAS(libc_wopenat64, libc_wopenat);
-#else /* !__O_LARGEFILE || !__O_LARGEFILE */
+#else /* !__O_LARGEFILE */
 INTERN ATTR_SECTION(".text.crt.wchar.io.utility") WUNUSED NONNULL((2)) fd_t
 NOTHROW_RPC(VLIBKCALL libc_wopenat64)(fd_t dirfd,
                                       char32_t const *filename,
@@ -362,7 +362,7 @@ NOTHROW_RPC(VLIBKCALL libc_wopenat64)(fd_t dirfd,
 
 	return result;
 }
-#endif /* __O_LARGEFILE && __O_LARGEFILE */
+#endif /* __O_LARGEFILE */
 #endif /* !__KERNEL__ */
 
 DECL_END

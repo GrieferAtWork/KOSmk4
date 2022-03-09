@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c673e2a */
+/* HASH CRC-32:0xb58f0f80 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,39 +59,39 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_wchown)(char16_t const *file,
                                   uid_t owner,
                                   gid_t group) {
-#ifdef __AT_FDCWD
+
 	return libd_wfchownat(__AT_FDCWD, file, owner, group, 0);
-#else /* __AT_FDCWD */
-	longptr_t result;
-	char *utf8_file;
-	utf8_file = libd_convert_wcstombs(file);
-	if unlikely(!utf8_file)
-		return -1;
-	result = libd_chown(utf8_file, owner, group);
 
-	libc_free(utf8_file);
 
-	return result;
-#endif /* !__AT_FDCWD */
+
+
+
+
+
+
+
+
+
+
 }
 INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBKCALL libc_wchown)(char32_t const *file,
                                   uid_t owner,
                                   gid_t group) {
-#ifdef __AT_FDCWD
+
 	return libc_wfchownat(__AT_FDCWD, file, owner, group, 0);
-#else /* __AT_FDCWD */
-	longptr_t result;
-	char *utf8_file;
-	utf8_file = libc_convert_wcstombs(file);
-	if unlikely(!utf8_file)
-		return -1;
-	result = libc_chown(utf8_file, owner, group);
 
-	libc_free(utf8_file);
 
-	return result;
-#endif /* !__AT_FDCWD */
+
+
+
+
+
+
+
+
+
+
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.property") NONNULL((1)) longptr_t
 NOTHROW_RPC(LIBDCALL libd_wpathconf)(char16_t const *path,
@@ -125,91 +125,91 @@ NOTHROW_RPC(LIBKCALL libc_wpathconf)(char32_t const *path,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBDCALL libd_wlink)(char16_t const *from,
                                  char16_t const *to) {
-#ifdef __AT_FDCWD
+
 	return libd_wlinkat(__AT_FDCWD, from, __AT_FDCWD, to, 0);
-#else /* __AT_FDCWD */
-	int result = -1;
-	char *utf8_from, *utf8_to;
-	utf8_from = libd_convert_wcstombs(from);
-	if unlikely(!utf8_from)
-		goto done;
-	utf8_to = libd_convert_wcstombs(to);
-	if unlikely(!utf8_to)
-		goto done_from;
-	result = libd_link(utf8_from, utf8_to);
 
-	libc_free(utf8_to);
 
-done_from:
 
-	libc_free(utf8_from);
 
-done:
-	return result;
-#endif /* !__AT_FDCWD */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 #include <asm/os/fcntl.h>
 INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBKCALL libc_wlink)(char32_t const *from,
                                  char32_t const *to) {
-#ifdef __AT_FDCWD
+
 	return libc_wlinkat(__AT_FDCWD, from, __AT_FDCWD, to, 0);
-#else /* __AT_FDCWD */
-	int result = -1;
-	char *utf8_from, *utf8_to;
-	utf8_from = libc_convert_wcstombs(from);
-	if unlikely(!utf8_from)
-		goto done;
-	utf8_to = libc_convert_wcstombs(to);
-	if unlikely(!utf8_to)
-		goto done_from;
-	result = libc_link(utf8_from, utf8_to);
 
-	libc_free(utf8_to);
 
-done_from:
 
-	libc_free(utf8_from);
 
-done:
-	return result;
-#endif /* !__AT_FDCWD */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.property") WUNUSED NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_waccess)(char16_t const *file,
                                    __STDC_INT_AS_UINT_T type) {
-#ifdef __AT_FDCWD
+
 	return libd_wfaccessat(__AT_FDCWD, file, type, 0);
-#else /* __AT_FDCWD */
-	longptr_t result;
-	char *utf8_file;
-	utf8_file = libd_convert_wcstombs(file);
-	if unlikely(!utf8_file)
-		return -1;
-	result = libd_access(utf8_file, type);
 
-	libc_free(utf8_file);
 
-	return result;
-#endif /* !__AT_FDCWD */
+
+
+
+
+
+
+
+
+
+
 }
 INTERN ATTR_SECTION(".text.crt.wchar.fs.property") WUNUSED NONNULL((1)) int
 NOTHROW_RPC(LIBKCALL libc_waccess)(char32_t const *file,
                                    __STDC_INT_AS_UINT_T type) {
-#ifdef __AT_FDCWD
+
 	return libc_wfaccessat(__AT_FDCWD, file, type, 0);
-#else /* __AT_FDCWD */
-	longptr_t result;
-	char *utf8_file;
-	utf8_file = libc_convert_wcstombs(file);
-	if unlikely(!utf8_file)
-		return -1;
-	result = libc_access(utf8_file, type);
 
-	libc_free(utf8_file);
 
-	return result;
-#endif /* !__AT_FDCWD */
+
+
+
+
+
+
+
+
+
+
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.basic_property") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_wchdir)(char16_t const *path) {
@@ -258,11 +258,11 @@ NOTHROW_RPC(LIBDCALL libd_wgetcwd)(char16_t *buf,
 		if (!bufsize)
 			return result;
 		if (bufsize < result_len) {
-#ifdef ERANGE
+
 			(void)libc_seterrno(ERANGE);
-#else /* ERANGE */
-			(void)libc_seterrno(1);
-#endif /* !ERANGE */
+
+
+
 			buf = NULL;
 			goto done;
 		}
@@ -278,11 +278,11 @@ NOTHROW_RPC(LIBDCALL libd_wgetcwd)(char16_t *buf,
 		return new_result;
 	}
 	if (bufsize < result_len) {
-#ifdef ERANGE
+
 		(void)libc_seterrno(ERANGE);
-#else /* ERANGE */
-		(void)libc_seterrno(1);
-#endif /* !ERANGE */
+
+
+
 		buf = NULL;
 		goto done;
 	}
@@ -314,11 +314,11 @@ NOTHROW_RPC(LIBKCALL libc_wgetcwd)(char32_t *buf,
 		if (!bufsize)
 			return result;
 		if (bufsize < result_len) {
-#ifdef ERANGE
+
 			(void)libc_seterrno(ERANGE);
-#else /* ERANGE */
-			(void)libc_seterrno(1);
-#endif /* !ERANGE */
+
+
+
 			buf = NULL;
 			goto done;
 		}
@@ -334,11 +334,11 @@ NOTHROW_RPC(LIBKCALL libc_wgetcwd)(char32_t *buf,
 		return new_result;
 	}
 	if (bufsize < result_len) {
-#ifdef ERANGE
+
 		(void)libc_seterrno(ERANGE);
-#else /* ERANGE */
-		(void)libc_seterrno(1);
-#endif /* !ERANGE */
+
+
+
 		buf = NULL;
 		goto done;
 	}
@@ -351,107 +351,107 @@ done:
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_wunlink)(char16_t const *file) {
-#ifdef __AT_FDCWD
+
 	return libd_wunlinkat(__AT_FDCWD, file, 0);
-#else /* __AT_FDCWD */
-	longptr_t result;
-	char *utf8_file;
-	utf8_file = libd_convert_wcstombs(file);
-	if unlikely(!utf8_file)
-		return -1;
-	result = libd_unlink(utf8_file);
 
-	libc_free(utf8_file);
 
-	return result;
-#endif /* !__AT_FDCWD */
+
+
+
+
+
+
+
+
+
+
 }
 INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBKCALL libc_wunlink)(char32_t const *file) {
-#ifdef __AT_FDCWD
+
 	return libc_wunlinkat(__AT_FDCWD, file, 0);
-#else /* __AT_FDCWD */
-	longptr_t result;
-	char *utf8_file;
-	utf8_file = libc_convert_wcstombs(file);
-	if unlikely(!utf8_file)
-		return -1;
-	result = libc_unlink(utf8_file);
 
-	libc_free(utf8_file);
 
-	return result;
-#endif /* !__AT_FDCWD */
+
+
+
+
+
+
+
+
+
+
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_wrmdir)(char16_t const *path) {
-#if defined(__AT_FDCWD) && defined(__AT_REMOVEDIR)
+
 	return libd_wunlinkat(__AT_FDCWD, path, __AT_REMOVEDIR);
-#else /* __AT_FDCWD && __AT_REMOVEDIR */
-	longptr_t result;
-	char *utf8_path;
-	utf8_path = libd_convert_wcstombs(path);
-	if unlikely(!utf8_path)
-		return -1;
-	result = libd_rmdir(utf8_path);
 
-	libc_free(utf8_path);
 
-	return result;
-#endif /* !__AT_FDCWD || !__AT_REMOVEDIR */
+
+
+
+
+
+
+
+
+
+
 }
 INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBKCALL libc_wrmdir)(char32_t const *path) {
-#if defined(__AT_FDCWD) && defined(__AT_REMOVEDIR)
+
 	return libc_wunlinkat(__AT_FDCWD, path, __AT_REMOVEDIR);
-#else /* __AT_FDCWD && __AT_REMOVEDIR */
-	longptr_t result;
-	char *utf8_path;
-	utf8_path = libc_convert_wcstombs(path);
-	if unlikely(!utf8_path)
-		return -1;
-	result = libc_rmdir(utf8_path);
 
-	libc_free(utf8_path);
 
-	return result;
-#endif /* !__AT_FDCWD || !__AT_REMOVEDIR */
+
+
+
+
+
+
+
+
+
+
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.property") WUNUSED NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_weuidaccess)(char16_t const *file,
                                        __STDC_INT_AS_UINT_T type) {
-#if defined(__AT_FDCWD) && defined(__AT_EACCESS)
+
 	return libd_wfaccessat(__AT_FDCWD, file, type, __AT_EACCESS);
-#else /* __AT_FDCWD && __AT_EACCESS */
-	int result;
-	char *utf8_file;
-	utf8_file = libd_convert_wcstombs(file);
-	if unlikely(!utf8_file)
-		return -1;
-	result = libd_euidaccess(utf8_file, type);
 
-	libc_free(utf8_file);
 
-	return result;
-#endif /* !__AT_FDCWD || !__AT_EACCESS */
+
+
+
+
+
+
+
+
+
+
 }
 INTERN ATTR_SECTION(".text.crt.wchar.fs.property") WUNUSED NONNULL((1)) int
 NOTHROW_RPC(LIBKCALL libc_weuidaccess)(char32_t const *file,
                                        __STDC_INT_AS_UINT_T type) {
-#if defined(__AT_FDCWD) && defined(__AT_EACCESS)
+
 	return libc_wfaccessat(__AT_FDCWD, file, type, __AT_EACCESS);
-#else /* __AT_FDCWD && __AT_EACCESS */
-	int result;
-	char *utf8_file;
-	utf8_file = libc_convert_wcstombs(file);
-	if unlikely(!utf8_file)
-		return -1;
-	result = libc_euidaccess(utf8_file, type);
 
-	libc_free(utf8_file);
 
-	return result;
-#endif /* !__AT_FDCWD || !__AT_EACCESS */
+
+
+
+
+
+
+
+
+
+
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.basic_property") ATTR_MALLOC WUNUSED char16_t *
 NOTHROW_RPC(LIBDCALL libd_wget_current_dir_name)(void) {
@@ -732,40 +732,40 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_wlchown)(char16_t const *file,
                                    uid_t owner,
                                    gid_t group) {
-#if defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW)
+
 	return libd_wfchownat(__AT_FDCWD, file, owner, group, __AT_SYMLINK_NOFOLLOW);
-#else /* __AT_FDCWD && __AT_SYMLINK_NOFOLLOW */
-	int result;
-	char *utf8_file;
-	utf8_file = libd_convert_wcstombs(file);
-	if unlikely(!utf8_file)
-		return -1;
-	result = libd_lchown(utf8_file, owner, group);
 
-	libc_free(utf8_file);
 
-	return result;
-#endif /* !__AT_FDCWD || !__AT_SYMLINK_NOFOLLOW */
+
+
+
+
+
+
+
+
+
+
 }
 #include <asm/os/fcntl.h>
 INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBKCALL libc_wlchown)(char32_t const *file,
                                    uid_t owner,
                                    gid_t group) {
-#if defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW)
+
 	return libc_wfchownat(__AT_FDCWD, file, owner, group, __AT_SYMLINK_NOFOLLOW);
-#else /* __AT_FDCWD && __AT_SYMLINK_NOFOLLOW */
-	int result;
-	char *utf8_file;
-	utf8_file = libc_convert_wcstombs(file);
-	if unlikely(!utf8_file)
-		return -1;
-	result = libc_lchown(utf8_file, owner, group);
 
-	libc_free(utf8_file);
 
-	return result;
-#endif /* !__AT_FDCWD || !__AT_SYMLINK_NOFOLLOW */
+
+
+
+
+
+
+
+
+
+
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1)) int
 NOTHROW_NCX(LIBDCALL libd_wtruncate)(char16_t const *file,
@@ -792,9 +792,9 @@ NOTHROW_NCX(LIBKCALL libc_wtruncate)(char32_t const *file,
                                      __PIO_OFFSET length) {
 
 
-#if __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL) && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__
+#if defined(__LIBCCALL_IS_LIBKCALL) && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__
 	return libc_wtruncate64(file, (__PIO_OFFSET64)length);
-#else /* __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__ */
+#else /* __LIBCCALL_IS_LIBKCALL && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__ */
 	int result;
 	char *utf8_file;
 	utf8_file = libc_convert_wcstombs(file);
@@ -805,7 +805,7 @@ NOTHROW_NCX(LIBKCALL libc_wtruncate)(char32_t const *file,
 	libc_free(utf8_file);
 
 	return result;
-#endif /* __SIZEOF_WCHAR_T__ != 4 || !__LIBCCALL_IS_LIBKCALL || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
+#endif /* !__LIBCCALL_IS_LIBKCALL || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
 }
 #include <bits/types.h>
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
@@ -876,58 +876,58 @@ NOTHROW_NCX(LIBKCALL libc_wtruncate64)(char32_t const *file,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBDCALL libd_wsymlink)(char16_t const *link_text,
                                     char16_t const *target_path) {
-#ifdef __AT_FDCWD
+
 	return libd_wfsymlinkat(link_text, __AT_FDCWD, target_path, 0);
 
 
-#else /* __AT_FDCWD */
-	int result = -1;
-	char *utf8_link_text, *utf8_target_path;
-	utf8_link_text = libd_convert_wcstombs(link_text);
-	if unlikely(!utf8_link_text)
-		goto done;
-	utf8_target_path = libd_convert_wcstombs(target_path);
-	if unlikely(!utf8_target_path)
-		goto done_from;
-	result = libd_symlink(utf8_link_text, utf8_target_path);
 
-	libc_free(utf8_target_path);
 
-done_from:
 
-	libc_free(utf8_link_text);
 
-done:
-	return result;
-#endif /* !__AT_FDCWD */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBKCALL libc_wsymlink)(char32_t const *link_text,
                                     char32_t const *target_path) {
-#ifdef __AT_FDCWD
+
 	return libc_wfsymlinkat(link_text, __AT_FDCWD, target_path, 0);
 
 
-#else /* __AT_FDCWD */
-	int result = -1;
-	char *utf8_link_text, *utf8_target_path;
-	utf8_link_text = libc_convert_wcstombs(link_text);
-	if unlikely(!utf8_link_text)
-		goto done;
-	utf8_target_path = libc_convert_wcstombs(target_path);
-	if unlikely(!utf8_target_path)
-		goto done_from;
-	result = libc_symlink(utf8_link_text, utf8_target_path);
 
-	libc_free(utf8_target_path);
 
-done_from:
 
-	libc_free(utf8_link_text);
 
-done:
-	return result;
-#endif /* !__AT_FDCWD */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 #include <bits/crt/uformat-printer.h>
 #include <bits/crt/mbstate.h>
@@ -960,11 +960,11 @@ NOTHROW_NCX(LIBDCALL libd_wgethostname)(char16_t *name,
 		if unlikely(width < 0)
 			return -1;
 		if ((size_t)width >= buflen) {
-#ifdef ERANGE
+
 			return libc_seterrno(ERANGE);
-#else /* ERANGE */
-			return libc_seterrno(1);
-#endif /* !ERANGE */
+
+
+
 		}
 		*printer_data.sd_buffer = '\0'; /* NUL-terminate */
 	}
@@ -1001,11 +1001,11 @@ NOTHROW_NCX(LIBKCALL libc_wgethostname)(char32_t *name,
 		if unlikely(width < 0)
 			return -1;
 		if ((size_t)width >= buflen) {
-#ifdef ERANGE
+
 			return libc_seterrno(ERANGE);
-#else /* ERANGE */
-			return libc_seterrno(1);
-#endif /* !ERANGE */
+
+
+
 		}
 		*printer_data.sd_buffer = '\0'; /* NUL-terminate */
 	}
@@ -1098,11 +1098,11 @@ NOTHROW_NCX(LIBDCALL libd_wgetdomainname)(char16_t *name,
 		if unlikely(width < 0)
 			return -1;
 		if ((size_t)width >= buflen) {
-#ifdef ERANGE
+
 			return libc_seterrno(ERANGE);
-#else /* ERANGE */
-			return libc_seterrno(1);
-#endif /* !ERANGE */
+
+
+
 		}
 		*printer_data.sd_buffer = '\0'; /* NUL-terminate */
 	}
@@ -1139,11 +1139,11 @@ NOTHROW_NCX(LIBKCALL libc_wgetdomainname)(char32_t *name,
 		if unlikely(width < 0)
 			return -1;
 		if ((size_t)width >= buflen) {
-#ifdef ERANGE
+
 			return libc_seterrno(ERANGE);
-#else /* ERANGE */
-			return libc_seterrno(1);
-#endif /* !ERANGE */
+
+
+
 		}
 		*printer_data.sd_buffer = '\0'; /* NUL-terminate */
 	}

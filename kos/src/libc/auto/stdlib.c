@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7211d7e8 */
+/* HASH CRC-32:0x2e8977ef */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -331,12 +331,12 @@ NOTHROW_RPC(LIBCCALL libc_system)(char const *command) {
 			break;
 		if (error >= 0)
 			continue;
-#if defined(__libc_geterrno) && defined(__EINTR)
+
 		if (__libc_geterrno() != __EINTR)
 			return -1;
-#else /* __libc_geterrno && __EINTR */
-		return -1;
-#endif /* !__libc_geterrno || !__EINTR */
+
+
+
 	}
 #ifdef __WIFEXITED
 	if (!__WIFEXITED(status))
@@ -382,11 +382,11 @@ DEFINE_INTERN_ALIAS(libc_atoll, libc_atol);
 #else /* ... */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG
 NOTHROW_NCX(LIBCCALL libc_atoll)(char const *__restrict nptr) {
-#if __SIZEOF_LONG_LONG__
+#if __SIZEOF_LONG_LONG__ <= 4
 	return (__LONGLONG)libc_strto32(nptr, NULL, 10);
-#else /* __SIZEOF_LONG_LONG__ */
+#else /* __SIZEOF_LONG_LONG__ <= 4 */
 	return (__LONGLONG)libc_strto64(nptr, NULL, 10);
-#endif /* !__SIZEOF_LONG_LONG__ */
+#endif /* __SIZEOF_LONG_LONG__ > 4 */
 }
 #endif /* !... */
 #if __SIZEOF_LONG__ == 4
@@ -806,11 +806,11 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
 		            __hybrid_overflow_uadd(result, digit, &result)) {
 			/* Integer overflow. */
 			if (error) {
-#ifdef __ERANGE
-				*error = __ERANGE;
-#else /* __ERANGE */
+#ifdef ERANGE
+				*error = ERANGE;
+#else /* ERANGE */
 				*error = 1;
-#endif /* !__ERANGE */
+#endif /* !ERANGE */
 			}
 			if (endptr) {
 				for (;;) {
@@ -851,11 +851,11 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
 
 		/* Empty number... */
 		if (error) {
-#ifdef __ECANCELED
-			*error = __ECANCELED;
-#else /* __ECANCELED */
+#ifdef ECANCELED
+			*error = ECANCELED;
+#else /* ECANCELED */
 			*error = 1;
-#endif /* !__ECANCELED */
+#endif /* !ECANCELED */
 		}
 		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
 		if (endptr)
@@ -872,11 +872,11 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
 				while (libc_isspace(*num_iter))
 					++num_iter;
 				if (*num_iter) {
-#ifdef __EINVAL
-					*error = __EINVAL;
-#else /* __EINVAL */
+#ifdef EINVAL
+					*error = EINVAL;
+#else /* EINVAL */
 					*error = 1;
-#endif /* !__EINVAL */
+#endif /* !EINVAL */
 				}
 			}
 		}
@@ -958,11 +958,11 @@ NOTHROW_NCX(LIBCCALL libc_strto32_r)(char const *__restrict nptr,
 handle_overflow:
 			/* Integer overflow. */
 			if (error) {
-#ifdef __ERANGE
-				*error = __ERANGE;
-#else /* __ERANGE */
+#ifdef ERANGE
+				*error = ERANGE;
+#else /* ERANGE */
 				*error = 1;
-#endif /* !__ERANGE */
+#endif /* !ERANGE */
 			}
 			if (endptr) {
 				for (;;) {
@@ -1010,11 +1010,11 @@ handle_overflow:
 
 		/* Empty number... */
 		if (error) {
-#ifdef __ECANCELED
-			*error = __ECANCELED;
-#else /* __ECANCELED */
+#ifdef ECANCELED
+			*error = ECANCELED;
+#else /* ECANCELED */
 			*error = 1;
-#endif /* !__ECANCELED */
+#endif /* !ECANCELED */
 		}
 		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
 		if (endptr)
@@ -1031,11 +1031,11 @@ handle_overflow:
 				while (libc_isspace(*num_iter))
 					++num_iter;
 				if (*num_iter) {
-#ifdef __EINVAL
-					*error = __EINVAL;
-#else /* __EINVAL */
+#ifdef EINVAL
+					*error = EINVAL;
+#else /* EINVAL */
 					*error = 1;
-#endif /* !__EINVAL */
+#endif /* !EINVAL */
 				}
 			}
 		}
@@ -1110,11 +1110,11 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
 		            __hybrid_overflow_uadd(result, digit, &result)) {
 			/* Integer overflow. */
 			if (error) {
-#ifdef __ERANGE
-				*error = __ERANGE;
-#else /* __ERANGE */
+#ifdef ERANGE
+				*error = ERANGE;
+#else /* ERANGE */
 				*error = 1;
-#endif /* !__ERANGE */
+#endif /* !ERANGE */
 			}
 			if (endptr) {
 				for (;;) {
@@ -1155,11 +1155,11 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
 
 		/* Empty number... */
 		if (error) {
-#ifdef __ECANCELED
-			*error = __ECANCELED;
-#else /* __ECANCELED */
+#ifdef ECANCELED
+			*error = ECANCELED;
+#else /* ECANCELED */
 			*error = 1;
-#endif /* !__ECANCELED */
+#endif /* !ECANCELED */
 		}
 		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
 		if (endptr)
@@ -1176,11 +1176,11 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
 				while (libc_isspace(*num_iter))
 					++num_iter;
 				if (*num_iter) {
-#ifdef __EINVAL
-					*error = __EINVAL;
-#else /* __EINVAL */
+#ifdef EINVAL
+					*error = EINVAL;
+#else /* EINVAL */
 					*error = 1;
-#endif /* !__EINVAL */
+#endif /* !EINVAL */
 				}
 			}
 		}
@@ -1261,11 +1261,11 @@ NOTHROW_NCX(LIBCCALL libc_strto64_r)(char const *__restrict nptr,
 handle_overflow:
 			/* Integer overflow. */
 			if (error) {
-#ifdef __ERANGE
-				*error = __ERANGE;
-#else /* __ERANGE */
+#ifdef ERANGE
+				*error = ERANGE;
+#else /* ERANGE */
 				*error = 1;
-#endif /* !__ERANGE */
+#endif /* !ERANGE */
 			}
 			if (endptr) {
 				for (;;) {
@@ -1313,11 +1313,11 @@ handle_overflow:
 
 		/* Empty number... */
 		if (error) {
-#ifdef __ECANCELED
-			*error = __ECANCELED;
-#else /* __ECANCELED */
+#ifdef ECANCELED
+			*error = ECANCELED;
+#else /* ECANCELED */
 			*error = 1;
-#endif /* !__ECANCELED */
+#endif /* !ECANCELED */
 		}
 		/* Set endptr to the original `nptr' (_before_ leading spaces were skipped) */
 		if (endptr)
@@ -1334,11 +1334,11 @@ handle_overflow:
 				while (libc_isspace(*num_iter))
 					++num_iter;
 				if (*num_iter) {
-#ifdef __EINVAL
-					*error = __EINVAL;
-#else /* __EINVAL */
+#ifdef EINVAL
+					*error = EINVAL;
+#else /* EINVAL */
 					*error = 1;
-#endif /* !__EINVAL */
+#endif /* !EINVAL */
 				}
 			}
 		}
@@ -1710,9 +1710,9 @@ NOTHROW_NCX(LIBCCALL libc_rpmatch)(char const *response) {
 	return -1;
 }
 #include <asm/os/oflags.h>
-#if !defined(__O_LARGEFILE) || !__O_LARGEFILE
+#if !__O_LARGEFILE
 DEFINE_INTERN_ALIAS(libc_mkstemps64, libc_mkstemps);
-#else /* !__O_LARGEFILE || !__O_LARGEFILE */
+#else /* !__O_LARGEFILE */
 /* >> mkstemps(3), mkstemps64(3)
  * Replace the last 6 characters of `template_' (which are followed by exactly
  * `suffixlen' more characters that are left alone), which must be filled with
@@ -1727,7 +1727,7 @@ NOTHROW_RPC(LIBCCALL libc_mkstemps64)(char *template_,
                                       __STDC_INT_AS_SIZE_T suffixlen) {
 	return libc_mkostemps64(template_, suffixlen, 0);
 }
-#endif /* __O_LARGEFILE && __O_LARGEFILE */
+#endif /* __O_LARGEFILE */
 #include <hybrid/typecore.h>
 /* >> l64a(3), a64l(3)
  * Convert between `long' and base-64 encoded integer strings. */
@@ -1777,11 +1777,11 @@ NOTHROW_NCX(LIBCCALL libc_a64l)(char const *s) {
 INTERN ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED NONNULL((1)) char *
 NOTHROW_RPC(LIBDCALL libd_realpath)(char const *filename,
                                     char *resolved) {
-#if defined(__PATH_MAX) && __PATH_MAX != -1
-	return libd_frealpathat(__AT_FDCWD, filename, resolved, resolved ? __PATH_MAX : 0, 0);
-#else /* __PATH_MAX && __PATH_MAX != -1 */
+
+
+
 	return libd_frealpathat(__AT_FDCWD, filename, resolved, resolved ? 256 : 0, 0);
-#endif /* !__PATH_MAX || __PATH_MAX == -1 */
+
 }
 #include <asm/os/fcntl.h>
 #include <asm/os/limits.h>
@@ -1795,11 +1795,11 @@ NOTHROW_RPC(LIBDCALL libd_realpath)(char const *filename,
 INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED NONNULL((1)) char *
 NOTHROW_RPC(LIBCCALL libc_realpath)(char const *filename,
                                     char *resolved) {
-#if defined(__PATH_MAX) && __PATH_MAX != -1
-	return libc_frealpathat(__AT_FDCWD, filename, resolved, resolved ? __PATH_MAX : 0, 0);
-#else /* __PATH_MAX && __PATH_MAX != -1 */
+
+
+
 	return libc_frealpathat(__AT_FDCWD, filename, resolved, resolved ? 256 : 0, 0);
-#endif /* !__PATH_MAX || __PATH_MAX == -1 */
+
 }
 /* >> frealpath(3)
  * Load the filesystem location of a given file handle.
@@ -1913,9 +1913,9 @@ NOTHROW_RPC(LIBCCALL libc_mkstemp)(char *template_) {
 	return libc_mkstemps(template_, 0);
 }
 #include <asm/os/oflags.h>
-#if !defined(__O_LARGEFILE) || !__O_LARGEFILE
+#if !__O_LARGEFILE
 DEFINE_INTERN_ALIAS(libc_mkstemp64, libc_mkstemp);
-#else /* !__O_LARGEFILE || !__O_LARGEFILE */
+#else /* !__O_LARGEFILE */
 /* >> mkstemp(3), mkstemp64(3)
  * Replace the last 6 characters of  `template_', which must be filled  with
  * all  'X'-characters  before the  call  (else errno=EINVAL  +  return -1),
@@ -1926,7 +1926,7 @@ INTERN ATTR_SECTION(".text.crt.unsorted") WUNUSED NONNULL((1)) fd_t
 NOTHROW_RPC(LIBCCALL libc_mkstemp64)(char *template_) {
 	return libc_mkstemps64(template_, 0);
 }
-#endif /* __O_LARGEFILE && __O_LARGEFILE */
+#endif /* __O_LARGEFILE */
 /* >> mkdtemp(3)
  * Replace the last 6 characters of `template_', which must be filled with
  * all  'X'-characters before  the call  (else errno=EINVAL  + return -1),
@@ -2084,11 +2084,11 @@ NOTHROW_RPC(LIBCCALL libc_system_mktemp)(unsigned int what,
 
 	/* Verify the validity of the input template. */
 	if unlikely(xloc < template_ || libc_memcmp(xloc, "XXXXXX", 6 * sizeof(char)) != 0) {
-#ifdef EINVAL
+
 		return libc_seterrno(EINVAL);
-#else /* EINVAL */
-		return libc_seterrno(1);
-#endif /* !EINVAL */
+
+
+
 	}
 
 	/* Calculate an  initial,  random  seed.
@@ -2175,18 +2175,18 @@ again:
 
 
 	case 0: {
-#ifdef O_RDWR
-#ifdef O_ACCMODE
+
+
 		flags &= ~O_ACCMODE;
-#endif /* O_ACCMODE */
+
 		flags |= O_RDWR;
-#endif /* O_RDWR */
-#ifdef O_CREAT
+
+
 		flags |= O_CREAT;
-#endif /* O_CREAT */
-#ifdef O_EXCL
+
+
 		flags |= O_EXCL;
-#endif /* O_EXCL */
+
 		result = libc_open(template_, flags, 0600);
 	}	break;
 
@@ -2224,11 +2224,11 @@ again:
 
 
 
-#ifdef EEXIST
+
 			result = libc_seterrno(EEXIST);
-#else /* EEXIST */
-			result = libc_seterrno(1);
-#endif /* !EEXIST */
+
+
+
 #define NEED_do_try_again
 			goto do_try_again;
 		}
@@ -2239,9 +2239,9 @@ again:
 	}
 	if (result == -1) {
 		/* Only re-attempt if the error was that the file already existed. */
-#if defined(__libc_geterrno) && defined(EEXIST)
+
 		if (__libc_geterrno() == EEXIST)
-#endif /* __libc_geterrno && EEXIST */
+
 		{
 #ifdef NEED_do_try_again
 #undef NEED_do_try_again
@@ -2349,21 +2349,21 @@ INTERN ATTR_SECTION(".text.crt.solaris") NONNULL((1)) int
                        void *arg) THROWS(...) {
 	/* TODO: Implementation alternative using `opendir("/proc/self/fd")' */
 	int result = 0;
-#ifdef __libc_geterrno
+
 	errno_t saved_err;
-#endif /* __libc_geterrno */
+
 	fd_t fd = 0;
 	for (;;) {
-#ifdef __libc_geterrno
+
 		saved_err = __libc_geterrno();
-#endif /* __libc_geterrno */
+
 		/* fcntl(F_NEXT) returns the next valid  (i.e.
 		 * currently open) fd that is >= the given fd. */
 		fd = libc_fcntl(fd, __F_NEXT);
 		if (fd < 0) {
-#ifdef __libc_geterrno
+
 			(void)libc_seterrno(saved_err);
-#endif /* __libc_geterrno */
+
 			break;
 		}
 		result = (*walk)(arg, fd);
@@ -2562,13 +2562,13 @@ NOTHROW_NCX(LIBCCALL libc_strtonum)(char const *nptr,
 	}
 	if (p_errstr) {
 		*p_errstr = "invalid";
-#ifdef ERANGE
+
 		if (error == ERANGE) {
 			*p_errstr = "too large";
 			if (result == lo)
 				*p_errstr = "too small";
 		}
-#endif /* ERANGE */
+
 	}
 	return 0;
 }
@@ -2680,9 +2680,9 @@ NOTHROW_NCX(LIBCCALL libc_mkostemps)(char *template_,
 	return libc_system_mktemp(0, template_, suffixlen, flags);
 }
 #include <asm/os/oflags.h>
-#if !defined(__O_LARGEFILE) || !__O_LARGEFILE
+#if !__O_LARGEFILE
 DEFINE_INTERN_ALIAS(libc_mkostemp64, libc_mkostemp);
-#else /* !__O_LARGEFILE || !__O_LARGEFILE */
+#else /* !__O_LARGEFILE */
 /* >> mkostemp(3), mkostemp64(3)
  * Replace  the  last 6  characters of  `template_' (which  are followed  by exactly
  * `suffixlen'  more  characters that  are left  alone), which  must be  filled with
@@ -2697,22 +2697,22 @@ NOTHROW_NCX(LIBCCALL libc_mkostemp64)(char *template_,
                                       oflag_t flags) {
 	return libc_mkostemps64(template_, 0, flags);
 }
-#endif /* __O_LARGEFILE && __O_LARGEFILE */
+#endif /* __O_LARGEFILE */
 #include <asm/os/oflags.h>
-#if !defined(__O_LARGEFILE) || !__O_LARGEFILE
+#if !__O_LARGEFILE
 DEFINE_INTERN_ALIAS(libc_mkostemps64, libc_mkostemps);
-#else /* !__O_LARGEFILE || !__O_LARGEFILE */
+#else /* !__O_LARGEFILE */
 INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED NONNULL((1)) fd_t
 NOTHROW_NCX(LIBCCALL libc_mkostemps64)(char *template_,
                                        __STDC_INT_AS_SIZE_T suffixlen,
                                        oflag_t flags) {
-#ifdef O_LARGEFILE
+
 	return libc_system_mktemp(0, template_, suffixlen, flags | O_LARGEFILE);
-#else /* O_LARGEFILE */
-	return libc_system_mktemp(0, template_, suffixlen, flags);
-#endif /* !O_LARGEFILE */
+
+
+
 }
-#endif /* __O_LARGEFILE && __O_LARGEFILE */
+#endif /* __O_LARGEFILE */
 /* >> devname(3), devname_r(3) */
 INTERN ATTR_SECTION(".text.crt.bsd") ATTR_CONST char *
 NOTHROW_NCX(LIBCCALL libc_devname)(dev_t dev,
@@ -2966,11 +2966,11 @@ NOTHROW_NCX(LIBDCALL libd_getenv_s)(size_t *preqsize,
 	if (preqsize)
 		*preqsize = reqsize;
 	if (reqsize > bufsize) {
-#ifdef ERANGE
+
 		return ERANGE;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
+
+
+
 	}
 	libc_memcpy(buf, name, reqsize);
 	return EOK;
@@ -2991,11 +2991,11 @@ NOTHROW_NCX(LIBCCALL libc_getenv_s)(size_t *preqsize,
 	if (preqsize)
 		*preqsize = reqsize;
 	if (reqsize > bufsize) {
-#ifdef ERANGE
+
 		return ERANGE;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
+
+
+
 	}
 	libc_memcpy(buf, name, reqsize);
 	return EOK;
@@ -3012,11 +3012,11 @@ NOTHROW_NCX(LIBDCALL libd__dupenv_s)(char **__restrict pbuf,
 	}
 	name = libc_strdup(name);
 	if (!name) {
-#ifdef ENOMEM
+
 		return 12;
-#else /* ENOMEM */
-		return 1;
-#endif /* !ENOMEM */
+
+
+
 	}
 	*pbuf    = name;
 	*pbuflen = (libc_strlen(name) + 1) * sizeof(char);
@@ -3034,11 +3034,11 @@ NOTHROW_NCX(LIBCCALL libc__dupenv_s)(char **__restrict pbuf,
 	}
 	name = libc_strdup(name);
 	if (!name) {
-#ifdef ENOMEM
+
 		return ENOMEM;
-#else /* ENOMEM */
-		return 1;
-#endif /* !ENOMEM */
+
+
+
 	}
 	*pbuf    = name;
 	*pbuflen = (libc_strlen(name) + 1) * sizeof(char);
@@ -3066,11 +3066,11 @@ NOTHROW_NCX(LIBCCALL libc__itoa_s)(int val,
 	p = buf;
 	if (val < 0) {
 		if (!buflen--) {
-#ifdef ERANGE
+
 			return ERANGE;
-#else /* ERANGE */
-			return 1;
-#endif /* !ERANGE */
+
+
+
 		}
 		*p++ = '-';
 		val = -val;
@@ -3080,11 +3080,11 @@ NOTHROW_NCX(LIBCCALL libc__itoa_s)(int val,
 		++p;
 	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
-#ifdef ERANGE
+
 		return ERANGE;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
+
+
+
 	}
 	temp = val;
 	*p = '\0';
@@ -3111,11 +3111,11 @@ NOTHROW_NCX(LIBCCALL libc__ltoa_s)(long val,
 	p = buf;
 	if (val < 0) {
 		if (!buflen--) {
-#ifdef ERANGE
+
 			return ERANGE;
-#else /* ERANGE */
-			return 1;
-#endif /* !ERANGE */
+
+
+
 		}
 		*p++ = '-';
 		val = -val;
@@ -3125,11 +3125,11 @@ NOTHROW_NCX(LIBCCALL libc__ltoa_s)(long val,
 		++p;
 	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
-#ifdef ERANGE
+
 		return ERANGE;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
+
+
+
 	}
 	temp = val;
 	*p = '\0';
@@ -3164,11 +3164,11 @@ NOTHROW_NCX(LIBCCALL libc__ultoa_s)(unsigned long val,
 		++p;
 	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
-#ifdef ERANGE
+
 		return ERANGE;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
+
+
+
 	}
 	temp = val;
 	*p = '\0';
@@ -3228,11 +3228,11 @@ NOTHROW_NCX(LIBCCALL libc__i64toa_s)(s64 val,
 	p = buf;
 	if (val < 0) {
 		if (!buflen--) {
-#ifdef ERANGE
+
 			return ERANGE;
-#else /* ERANGE */
-			return 1;
-#endif /* !ERANGE */
+
+
+
 		}
 		*p++ = '-';
 		val = -val;
@@ -3242,11 +3242,11 @@ NOTHROW_NCX(LIBCCALL libc__i64toa_s)(s64 val,
 		++p;
 	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
-#ifdef ERANGE
+
 		return ERANGE;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
+
+
+
 	}
 	temp = val;
 	*p = '\0';
@@ -3284,11 +3284,11 @@ NOTHROW_NCX(LIBCCALL libc__ui64toa_s)(u64 val,
 		++p;
 	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
-#ifdef ERANGE
+
 		return ERANGE;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
+
+
+
 	}
 	temp = val;
 	*p = '\0';
@@ -3406,10 +3406,10 @@ NOTHROW_NCX(LIBDCALL libd__mbstowcs_s)(size_t *presult,
 	error = libd_mbstowcs(dst, src, dstlen);
 	if (presult)
 		*presult = error;
-#ifdef EILSEQ
+
 	if (error == (size_t)-1)
 		return 42;
-#endif /* EILSEQ */
+
 	return 0;
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") errno_t
@@ -3427,10 +3427,10 @@ NOTHROW_NCX(LIBKCALL libc__mbstowcs_s)(size_t *presult,
 	error = libc_mbstowcs(dst, src, dstlen);
 	if (presult)
 		*presult = error;
-#ifdef EILSEQ
+
 	if (error == (size_t)-1)
 		return EILSEQ;
-#endif /* EILSEQ */
+
 	return EOK;
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") errno_t
@@ -3448,10 +3448,10 @@ NOTHROW_NCX(LIBDCALL libd_mbstowcs_s)(size_t *presult,
 	error = libd_mbstowcs(dst, src, dstlen);
 	if (presult)
 		*presult = error;
-#ifdef EILSEQ
+
 	if (error == (size_t)-1)
 		return 42;
-#endif /* EILSEQ */
+
 	return 0;
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") errno_t
@@ -3469,10 +3469,10 @@ NOTHROW_NCX(LIBKCALL libc_mbstowcs_s)(size_t *presult,
 	error = libc_mbstowcs(dst, src, dstlen);
 	if (presult)
 		*presult = error;
-#ifdef EILSEQ
+
 	if (error == (size_t)-1)
 		return EILSEQ;
-#endif /* EILSEQ */
+
 	return EOK;
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") errno_t
@@ -3491,10 +3491,10 @@ NOTHROW_NCX(LIBDCALL libd__mbstowcs_s_l)(size_t *presult,
 	error = libd__mbstowcs_l(dst, src, dstlen, locale);
 	if (presult)
 		*presult = error;
-#ifdef EILSEQ
+
 	if (error == (size_t)-1)
 		return 42;
-#endif /* EILSEQ */
+
 	return 0;
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") errno_t
@@ -3513,10 +3513,10 @@ NOTHROW_NCX(LIBKCALL libc__mbstowcs_s_l)(size_t *presult,
 	error = libc__mbstowcs_l(dst, src, dstlen, locale);
 	if (presult)
 		*presult = error;
-#ifdef EILSEQ
+
 	if (error == (size_t)-1)
 		return EILSEQ;
-#endif /* EILSEQ */
+
 	return EOK;
 }
 INTERN ATTR_SECTION(".text.crt.dos.random") NONNULL((1)) errno_t
@@ -3526,11 +3526,11 @@ NOTHROW_NCX(LIBDCALL libd_rand_s)(unsigned int *__restrict randval) {
 INTERN ATTR_SECTION(".text.crt.dos.random") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_rand_s)(unsigned int *__restrict randval) {
 	if (!randval) {
-#ifdef EINVAL
+
 		return EINVAL;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	*randval = libc_rand();
 	return EOK;
@@ -3555,18 +3555,18 @@ NOTHROW_NCX(LIBDCALL libd_wctomb_s)(int *presult,
                                     rsize_t buflen,
                                     char16_t wc) {
 	if (!presult || !buf) {
-#ifdef EINVAL
+
 		return 22;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	if (buflen < MB_CUR_MAX) {
-#ifdef ERANGE
+
 		return 34;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
+
+
+
 	}
 	*presult = libd_wctomb(buf, wc);
 	return 0;
@@ -3577,18 +3577,18 @@ NOTHROW_NCX(LIBKCALL libc_wctomb_s)(int *presult,
                                     rsize_t buflen,
                                     char32_t wc) {
 	if (!presult || !buf) {
-#ifdef EINVAL
+
 		return EINVAL;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	if (buflen < MB_CUR_MAX) {
-#ifdef ERANGE
+
 		return ERANGE;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
+
+
+
 	}
 	*presult = libc_wctomb(buf, wc);
 	return EOK;
@@ -3654,11 +3654,11 @@ NOTHROW_NCX(LIBDCALL libd_wcstombs_s)(size_t *presult,
                                       char16_t const *src,
                                       size_t maxlen) {
 	if (!presult || !buf || !src) {
-#ifdef EINVAL
+
 		return 22;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	if (buflen > maxlen)
 		buflen = maxlen;
@@ -3673,11 +3673,11 @@ NOTHROW_NCX(LIBKCALL libc_wcstombs_s)(size_t *presult,
                                       char32_t const *src,
                                       size_t maxlen) {
 	if (!presult || !buf || !src) {
-#ifdef EINVAL
+
 		return EINVAL;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	if (buflen > maxlen)
 		buflen = maxlen;
@@ -3830,11 +3830,11 @@ NOTHROW_NCX(LIBCCALL libc__ecvt_s)(char *buf,
                                    int *__restrict decptr,
                                    int *__restrict sign) {
 	if (!buf || !decptr || !sign) {
-#ifdef EINVAL
+
 		return EINVAL;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	libc_ecvt_r(val, ndigit, decptr, sign, buf, buflen);
 	return EOK;
@@ -3856,11 +3856,11 @@ NOTHROW_NCX(LIBCCALL libc__fcvt_s)(char *buf,
                                    int *__restrict decptr,
                                    int *__restrict sign) {
 	if (!buf || !decptr || !sign) {
-#ifdef EINVAL
+
 		return EINVAL;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	libc_fcvt_r(val, ndigit, decptr, sign, buf, buflen);
 	return EOK;
@@ -3879,11 +3879,11 @@ NOTHROW_NCX(LIBCCALL libc__gcvt_s)(char *buf,
                                    int ndigit) {
 	int a, b;
 	if (!buf) {
-#ifdef EINVAL
+
 		return EINVAL;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	libc_ecvt_r(val, ndigit, &a, &b, buf, buflen);
 	return EOK;
@@ -3967,22 +3967,22 @@ INTERN ATTR_SECTION(".text.crt.dos.fs.environ") errno_t
 NOTHROW_NCX(LIBDCALL libd__putenv_s)(char const *varname,
                                      char const *val) {
 	return libd_setenv(varname, val, 1)
-#ifdef EINVAL
+
 	       ? __libc_geterrno_or(22)
-#else /* EINVAL */
-	       ? __libc_geterrno_or(1)
-#endif /* !EINVAL */
+
+
+
 	       : 0;
 }
 INTERN ATTR_SECTION(".text.crt.dos.fs.environ") errno_t
 NOTHROW_NCX(LIBCCALL libc__putenv_s)(char const *varname,
                                      char const *val) {
 	return libc_setenv(varname, val, 1)
-#ifdef EINVAL
+
 	       ? __libc_geterrno_or(EINVAL)
-#else /* EINVAL */
-	       ? __libc_geterrno_or(1)
-#endif /* !EINVAL */
+
+
+
 	       : 0;
 }
 INTERN ATTR_SECTION(".text.crt.dos.fs.utility") NONNULL((1, 2, 3)) void
@@ -4062,11 +4062,11 @@ NOTHROW_NCX(LIBCCALL libc__makepath_s)(char *buf,
 	path_putc('\0');
 	return 0;
 err_buflen:
-#ifdef EINVAL
+
 	return EINVAL;
-#else /* EINVAL */
-	return 1;
-#endif /* !EINVAL */
+
+
+
 #undef path_putn
 #undef path_putc
 }
@@ -4162,18 +4162,18 @@ got_drive:
 	}
 	return 0;
 err_inval:
-#ifdef EINVAL
+
 	return EINVAL;
-#else /* EINVAL */
-	return 1;
-#endif /* !EINVAL */
+
+
+
 err_range:
-#ifdef ERANGE
+
 	(void)libc_seterrno(ERANGE);
 	return ERANGE;
-#else /* ERANGE */
-	return 1;
-#endif /* !ERANGE */
+
+
+
 }
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((2)) char *
 NOTHROW_NCX(LIBCCALL libc_itoa)(int val,
@@ -4216,11 +4216,11 @@ NOTHROW_NCX(LIBDCALL libd__wgetenv_s)(size_t *preqsize,
 	if (preqsize)
 		*preqsize = reqsize;
 	if (reqsize > bufsize) {
-#ifdef ERANGE
+
 		return ERANGE;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
+
+
+
 	}
 	libc_memcpy(buf, name, reqsize);
 	return EOK;
@@ -4241,11 +4241,11 @@ NOTHROW_NCX(LIBKCALL libc__wgetenv_s)(size_t *preqsize,
 	if (preqsize)
 		*preqsize = reqsize;
 	if (reqsize > bufsize) {
-#ifdef ERANGE
+
 		return ERANGE;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
+
+
+
 	}
 	libc_memcpy(buf, name, reqsize);
 	return EOK;
@@ -4262,11 +4262,11 @@ NOTHROW_NCX(LIBDCALL libd__wdupenv_s)(char16_t **__restrict pbuf,
 	}
 	name = libd_wcsdup(name);
 	if (!name) {
-#ifdef ENOMEM
+
 		return 12;
-#else /* ENOMEM */
-		return 1;
-#endif /* !ENOMEM */
+
+
+
 	}
 	*pbuf    = name;
 	*pbuflen = (libd_wcslen(name) + 1) * sizeof(char16_t);
@@ -4284,11 +4284,11 @@ NOTHROW_NCX(LIBKCALL libc__wdupenv_s)(char32_t **__restrict pbuf,
 	}
 	name = libc_wcsdup(name);
 	if (!name) {
-#ifdef ENOMEM
+
 		return ENOMEM;
-#else /* ENOMEM */
-		return 1;
-#endif /* !ENOMEM */
+
+
+
 	}
 	*pbuf    = name;
 	*pbuflen = (libc_wcslen(name) + 1) * sizeof(char32_t);

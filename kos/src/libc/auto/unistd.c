@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a94f081 */
+/* HASH CRC-32:0x63d352b8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -173,24 +173,24 @@ NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__restrict file,
 	 * then $PATH is ignored, and the file at the  specified
 	 * pathname is executed.
 	 * [...] */
-#ifdef _WIN32
-	if (libc_strchr(file, '/') || libc_strchr(file, '\\'))
-		return libc_execve(file, ___argv, ___envp);
-#else /* _WIN32 */
+
+
+
+
 	if (libc_strchr(file, '/'))
 		return libc_execve(file, ___argv, ___envp);
-#endif /* !_WIN32 */
+
 	env_path = libc_getenv("PATH");
 	if (env_path && *env_path) {
 		size_t filelen;
 		filelen = libc_strlen(file);
 		for (;;) {
 			char *path_end;
-#ifdef _WIN32
-			path_end = libc_strchrnul(env_path, ';');
-#else /* _WIN32 */
+
+
+
 			path_end = libc_strchrnul(env_path, ':');
-#endif /* !_WIN32 */
+
 			(__NAMESPACE_LOCAL_SYM __execvpe_impl)(env_path, (size_t)(path_end - env_path),
 			                                       file, filelen, ___argv, ___envp);
 			if (!*path_end)
@@ -198,9 +198,9 @@ NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__restrict file,
 			env_path = path_end + 1;
 		}
 	} else {
-#ifdef ENOENT
+
 		(void)libc_seterrno(ENOENT);
-#endif /* ENOENT */
+
 	}
 	return -1;
 }
@@ -645,9 +645,9 @@ NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt,
 
 	if (buflen < 1) {
 		/* Invalid buffer length */
-#ifdef EINVAL
+
 		(void)libc_seterrno(EINVAL);
-#endif /* EINVAL */
+
 		goto out;
 	}
 
@@ -670,11 +670,11 @@ NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt,
 #else /* __O_RDWR */
 #define __PRIVATE_GETPASSFD_O_RDWR 0
 #endif /* !__O_RDWR */
-#ifdef __O_NONBLOCK
+
 #define __PRIVATE_GETPASSFD_O_NONBLOCK __O_NONBLOCK
-#else /* __O_NONBLOCK */
-#define __PRIVATE_GETPASSFD_O_NONBLOCK 0
-#endif /* !__O_NONBLOCK */
+
+
+
 #ifdef _PATH_TTY
 #define __PRIVATE_GETPASSFD_PATH_TTY _PATH_TTY
 #else /* _PATH_TTY */
@@ -798,11 +798,11 @@ NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt,
 				if unlikely(status == -1)
 					goto out; /* Error... */
 				if unlikely(status == 0) {
-#ifdef ETIMEDOUT
+
 					(void)libc_seterrno(ETIMEDOUT);
-#else /* ETIMEDOUT */
-					(void)libc_seterrno(1);
-#endif /* !ETIMEDOUT */
+
+
+
 					goto out; /* Timeout... */
 				}
 				/* Assume that data can be read now! */
@@ -823,9 +823,9 @@ handle_eof:
 #endif /* __VEOF */
 					if (flags & __GETPASS_FAIL_EOF) {
 						/* Error out on regular, old EOF */
-#ifdef ENODATA
+
 						(void)libc_seterrno(ENODATA);
-#endif /* ENODATA */
+
 						goto out;
 					}
 					break;
@@ -918,21 +918,21 @@ handle_eof:
 #endif /* __VEOF */
 
 				/* Check for TTY signal characters. */
-#if defined(__VINTR) && defined(__SIGINT)
+#ifdef __VINTR
 				if (ch == __PRIVATE_GETPASSFD_CTRL(__VINTR, 'C')) {
 					interrupt_signo = __SIGINT;
 					goto out;
 				}
-#endif /* __VINTR && __SIGINT */
+#endif /* __VINTR */
 
-#if defined(__VQUIT) && defined(__SIGQUIT)
+#ifdef __VQUIT
 				if (ch == __PRIVATE_GETPASSFD_CTRL(__VQUIT, '\\')) {
 					interrupt_signo = __SIGQUIT;
 					goto out;
 				}
-#endif /* __VQUIT && __SIGQUIT */
+#endif /* __VQUIT */
 
-#if (defined(__VSUSP) || defined(__VDSUSP)) && defined(__SIGTSTP)
+#if defined(__VSUSP) || defined(__VDSUSP)
 				if (
 #ifdef __VSUSP
 				    ch == __PRIVATE_GETPASSFD_CTRL(__VSUSP, 'Z')
@@ -947,7 +947,7 @@ handle_eof:
 					interrupt_signo = __SIGTSTP;
 					goto out;
 				}
-#endif /* (__VSUSP || __VDSUSP) && __SIGTSTP */
+#endif /* __VSUSP || __VDSUSP */
 
 				/* Check for custom newline characters. */
 #ifdef __VEOL
@@ -1131,9 +1131,9 @@ out:
 			if (!(flags & __GETPASS_NO_SIGNAL))
 				(void)libc_raise(interrupt_signo);
 
-#ifdef EINTR
+
 			(void)libc_seterrno(EINTR);
-#endif /* EINTR */
+
 		}
 	}
 	return result;
@@ -1180,11 +1180,11 @@ NOTHROW_NCX(LIBCCALL libc_getpeereid)(fd_t sockfd,
 		           __COMPILER_OFFSETAFTER(struct ucred, gid)
 		           ? __COMPILER_OFFSETAFTER(struct ucred, uid)
 		           : __COMPILER_OFFSETAFTER(struct ucred, gid))) {
-#ifdef ENOPROTOOPT
+
 			result = libc_seterrno(ENOPROTOOPT);
-#else /* ENOPROTOOPT */
-			result = libc_seterrno(1);
-#endif /* !ENOPROTOOPT */
+
+
+
 		} else {
 			*euid = cred.uid;
 			*egid = cred.gid;
@@ -1196,11 +1196,11 @@ NOTHROW_NCX(LIBCCALL libc_getpeereid)(fd_t sockfd,
  * Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
 INTERN ATTR_SECTION(".text.crt.bsd.io.access") void
 NOTHROW_NCX(LIBCCALL libc_closefrom)(fd_t lowfd) {
-#ifdef __F_CLOSEM
+
 	libc_fcntl(lowfd, __F_CLOSEM);
-#else /* __F_CLOSEM */
-	libc_close_range((unsigned int)lowfd, (unsigned int)-1, 0);
-#endif /* !__F_CLOSEM */
+
+
+
 }
 #include <asm/os/fcntl.h>
 /* >> fchroot(2)

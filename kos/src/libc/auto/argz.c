@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb112f9cb */
+/* HASH CRC-32:0x7e071ad2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,11 +70,11 @@ NOTHROW_NCX(LIBCCALL libc_argz_create)(char *const argv[],
 		if unlikely(!argz_string) {
 			*pargz = NULL;
 			*pargz_len  = 0;
-#ifdef ENOMEM
+
 			return ENOMEM;
-#else /* ENOMEM */
-			return 1;
-#endif /* !ENOMEM */
+
+
+
 		}
 		*pargz = argz_string;
 		for (i = 0; i < argc; ++i) {
@@ -116,11 +116,11 @@ empty_argz:
 	*pargz = result_string;
 	if unlikely(!result_string) {
 		*pargz_len = 0;
-#ifdef ENOMEM
+
 		return ENOMEM;
-#else /* ENOMEM */
-		return 1;
-#endif /* !ENOMEM */
+
+
+
 	}
 	dst = result_string;
 	for (;;) {
@@ -231,11 +231,11 @@ NOTHROW_NCX(LIBCCALL libc_argz_append)(char **__restrict pargz,
 	size_t newlen = oldlen + buf_len;
 	char *newargz = (char *)libc_realloc(*pargz, newlen * sizeof(char));
 	if unlikely(!newargz) {
-#ifdef ENOMEM
+
 		return ENOMEM;
-#else /* ENOMEM */
-		return 1;
-#endif /* !ENOMEM */
+
+
+
 	}
 	libc_memcpyc(newargz + oldlen, buf, buf_len, sizeof(char));
 	*pargz     = newargz;
@@ -292,11 +292,11 @@ NOTHROW_NCX(LIBCCALL libc_argz_add_sep)(char **__restrict pargz,
 	 */
 	result_string = (char *)libc_realloc(*pargz, (oldlen + (slen + 1)) * sizeof(char));
 	if unlikely(!result_string) {
-#ifdef ENOMEM
+
 		return ENOMEM;
-#else /* ENOMEM */
-		return 1;
-#endif /* !ENOMEM */
+
+
+
 	}
 	*pargz = result_string;
 	dst    = result_string + oldlen;
@@ -383,11 +383,11 @@ NOTHROW_NCX(LIBCCALL libc_argz_insert)(char **__restrict pargz,
 	argz     = *pargz;
 	argz_len = *pargz_len;
 	if (before < argz || before >= argz + argz_len) {
-#ifdef EINVAL
+
 		return EINVAL;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	/* Adjust  `before'  to  point  to  the  start  of  an  entry
 	 * Note that GLibc has a bug here that causes it to  accessed
@@ -408,11 +408,11 @@ NOTHROW_NCX(LIBCCALL libc_argz_insert)(char **__restrict pargz,
 	insert_offset = (size_t)(before - argz);
 	argz = (char *)libc_realloc(argz, argz_len * sizeof(char));
 	if unlikely(!argz) {
-#ifdef ENOMEM
+
 		return ENOMEM;
-#else /* ENOMEM */
-		return 1;
-#endif /* !ENOMEM */
+
+
+
 	}
 	/* Update argz-pointers. */
 	*pargz     = argz;
@@ -499,11 +499,11 @@ NOTHROW_NCX(LIBCCALL libc_argz_replace)(char **__restrict pargz,
 			old_argz = *pargz;
 			new_argz = (char *)libc_realloc(old_argz, new_argzlen * sizeof(char));
 			if unlikely(!new_argz) {
-#ifdef ENOMEM
+
 				return ENOMEM;
-#else /* ENOMEM */
-				return 1;
-#endif /* !ENOMEM */
+
+
+
 			}
 			pos = new_argz + (pos - old_argz);
 			/* Make space for extra data */

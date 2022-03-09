@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e1ffd03 */
+/* HASH CRC-32:0xe64c1806 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -177,26 +177,26 @@ NOTHROW_NCX(LIBCCALL libc_strtoi)(char const *__restrict nptr,
 		*endptr = used_endptr;
 	if (rstatus && *rstatus == 0) {
 		if (*used_endptr != '\0') {
-#ifdef ENOTSUP
+
 			*rstatus = ENOTSUP;
-#elif defined(EINVAL)
-			*rstatus = EINVAL;
-#else /* ... */
-			*rstatus = 1;
-#endif /* !... */
+
+
+
+
+
 		} else if (result < lo) {
-#ifdef ERANGE
+
 			*rstatus = ERANGE;
-#else /* ERANGE */
-			*rstatus = 1;
-#endif /* !ERANGE */
+
+
+
 			result = lo;
 		} else if (result > hi) {
-#ifdef ERANGE
+
 			*rstatus = ERANGE;
-#else /* ERANGE */
-			*rstatus = 1;
-#endif /* !ERANGE */
+
+
+
 			result = hi;
 		} else {
 			*rstatus = 0;
@@ -236,26 +236,26 @@ NOTHROW_NCX(LIBCCALL libc_strtou)(char const *__restrict nptr,
 		*endptr = used_endptr;
 	if (rstatus && *rstatus == 0) {
 		if (*used_endptr != '\0') {
-#ifdef ENOTSUP
+
 			*rstatus = ENOTSUP;
-#elif defined(EINVAL)
-			*rstatus = EINVAL;
-#else /* ... */
-			*rstatus = 1;
-#endif /* !... */
+
+
+
+
+
 		} else if (result < lo) {
-#ifdef ERANGE
+
 			*rstatus = ERANGE;
-#else /* ERANGE */
-			*rstatus = 1;
-#endif /* !ERANGE */
+
+
+
 			result = lo;
 		} else if (result > hi) {
-#ifdef ERANGE
+
 			*rstatus = ERANGE;
-#else /* ERANGE */
-			*rstatus = 1;
-#endif /* !ERANGE */
+
+
+
 			result = hi;
 		} else {
 			*rstatus = 0;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x974bf74a */
+/* HASH CRC-32:0xad1b9963 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,11 +56,11 @@ NOTHROW_RPC(LIBDCALL libd__wsopen_s)(fd_t *fd,
                                      mode_t mode) {
 	fd_t result;
 	if (!fd) {
-#ifdef EINVAL
+
 		return 22;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	result = libd__wsopen(filename, oflags, sflags, mode);
 	if (result < 0)
@@ -77,11 +77,11 @@ NOTHROW_RPC(LIBKCALL libc__wsopen_s)(fd_t *fd,
                                      mode_t mode) {
 	fd_t result;
 	if (!fd) {
-#ifdef EINVAL
+
 		return EINVAL;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	result = libc__wsopen(filename, oflags, sflags, mode);
 	if (result < 0)

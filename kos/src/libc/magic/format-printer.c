@@ -55,6 +55,21 @@
 %[define_str2wcs_header_replacement("<format-printer.h>"          = "<parts/wchar/format-printer.h>")]
 %[define_str2wcs_header_replacement("<bits/crt/format-printer.h>" = "<bits/crt/wformat-printer.h>")]
 
+
+%[assume_undefined_in_kos_userspace(__NO_PRINTF_ESCAPE)]
+%[assume_undefined_in_kos_userspace(__NO_PRINTF_UNICODE_CHARS)]
+%[assume_undefined_in_kos_userspace(__NO_PRINTF_UNICODE_STRING)]
+%[assume_undefined_in_kos_userspace(__NO_PRINTF_STRERROR)]
+%[assume_undefined_in_kos_userspace(__NO_PRINTF_HEX)]
+%[assume_undefined_in_kos_userspace(__NO_PRINTF_GEN)]
+%[assume_undefined_in_kos_userspace(__NO_PRINTF_DISASM)]
+%[assume_undefined_in_kos_userspace(__NO_PRINTF_VINFO)]
+%[assume_undefined_in_kos_userspace(__NO_PRINTF_FLOATING_POINT)]
+%[assume_undefined_in_kos_userspace(__NO_PRINTF_POSITIONAL)]
+%[assume_undefined_in_kos_userspace(__NO_PRINTF_PERCENT_N)]
+%[assume_undefined_in_kos_userspace(__NO_SCANF_FLOATING_POINT)]
+
+
 %(auto_source){
 #include "../libc/dl.h"      /* Use libc's relocation-optimized dl* functions. */
 #include "../libc/string.h"  /* Dependency of `#include <libc/template/format-printf.h>' */
@@ -809,20 +824,20 @@ err:
 [[impl_include("<libc/string.h>", "<libc/errno.h>")]]
 [[impl_include("<hybrid/__assert.h>", "<hybrid/__alloca.h>")]]
 [[impl_prefix(
-#ifndef __NO_PRINTF_DISASM
-#if !defined(__KERNEL__) || !defined(__KOS__)
+@@pp_ifndef __NO_PRINTF_DISASM@@
+@@pp_if !defined(__KERNEL__) || !defined(__KOS__)@@
 #include <dlfcn.h>
-#endif /* !__KERNEL__ || !__KOS__ */
+@@pp_endif@@
 #include <libdisasm/disassembler.h>
-#endif /* !__NO_PRINTF_DISASM */
-#ifndef __NO_PRINTF_VINFO
-#if !defined(__KERNEL__) || !defined(__KOS__)
+@@pp_endif@@
+@@pp_ifndef __NO_PRINTF_VINFO@@
+@@pp_if !defined(__KERNEL__) || !defined(__KOS__)@@
 #include <dlfcn.h>
 #include <libdebuginfo/addr2line.h>
-#else /* !__KERNEL__ || !__KOS__ */
+@@pp_else@@
 #include <kernel/addr2line.h>
-#endif /* __KERNEL__ && __KOS__ */
-#endif /* !__NO_PRINTF_VINFO */
+@@pp_endif@@
+@@pp_endif@@
 )]]
 $ssize_t format_vprintf([[nonnull]] pformatprinter printer, void *arg,
                         [[nonnull, format]] char const *__restrict format,

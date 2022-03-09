@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed644084 */
+/* HASH CRC-32:0x14dd58c6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,91 +35,91 @@ DECL_BEGIN
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_wremove)(char16_t const *filename) {
-#ifdef __AT_FDCWD
+
 	return libd_wremoveat(__AT_FDCWD, filename);
-#else /* __AT_FDCWD */
-	char *utf8_filename;
-	int result;
-	utf8_filename = libd_convert_wcstombs(filename);
-	if unlikely(!utf8_filename)
-		return -1;
-	result = libd_remove(utf8_filename);
 
-	libc_free(utf8_filename);
 
-	return result;
-#endif /* !__AT_FDCWD */
+
+
+
+
+
+
+
+
+
+
 }
 INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBKCALL libc_wremove)(char32_t const *filename) {
-#ifdef __AT_FDCWD
+
 	return libc_wremoveat(__AT_FDCWD, filename);
-#else /* __AT_FDCWD */
-	char *utf8_filename;
-	int result;
-	utf8_filename = libc_convert_wcstombs(filename);
-	if unlikely(!utf8_filename)
-		return -1;
-	result = libc_remove(utf8_filename);
 
-	libc_free(utf8_filename);
 
-	return result;
-#endif /* !__AT_FDCWD */
+
+
+
+
+
+
+
+
+
+
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBDCALL libd_wrename)(char16_t const *oldname,
                                    char16_t const *newname_or_path) {
-#ifdef __AT_FDCWD
+
 	return libd_wrenameat(__AT_FDCWD, oldname, __AT_FDCWD, newname_or_path);
-#else /* __AT_FDCWD */
-	char *utf8_oldname;
-	char *utf8_newname_or_path;
-	int result;
-	utf8_oldname = libd_convert_wcstombs(oldname);
-	if unlikely(!utf8_oldname)
-		return -1;
-	utf8_newname_or_path = libd_convert_wcstombs(newname_or_path);
-	if unlikely(!utf8_newname_or_path) {
 
-		libc_free(utf8_oldname);
 
-		return -1;
-	}
-	result = libd_rename(utf8_oldname, utf8_newname_or_path);
 
-	libc_free(utf8_newname_or_path);
-	libc_free(utf8_oldname);
 
-	return result;
-#endif /* !__AT_FDCWD */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBKCALL libc_wrename)(char32_t const *oldname,
                                    char32_t const *newname_or_path) {
-#ifdef __AT_FDCWD
+
 	return libc_wrenameat(__AT_FDCWD, oldname, __AT_FDCWD, newname_or_path);
-#else /* __AT_FDCWD */
-	char *utf8_oldname;
-	char *utf8_newname_or_path;
-	int result;
-	utf8_oldname = libc_convert_wcstombs(oldname);
-	if unlikely(!utf8_oldname)
-		return -1;
-	utf8_newname_or_path = libc_convert_wcstombs(newname_or_path);
-	if unlikely(!utf8_newname_or_path) {
 
-		libc_free(utf8_oldname);
 
-		return -1;
-	}
-	result = libc_rename(utf8_oldname, utf8_newname_or_path);
 
-	libc_free(utf8_newname_or_path);
-	libc_free(utf8_oldname);
 
-	return result;
-#endif /* !__AT_FDCWD */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((2, 4)) int
 NOTHROW_RPC(LIBDCALL libd_wrenameat)(fd_t oldfd,
@@ -183,39 +183,39 @@ NOTHROW_RPC(LIBKCALL libc_wrenameat)(fd_t oldfd,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((2)) int
 NOTHROW_RPC(LIBDCALL libd_wremoveat)(fd_t dirfd,
                                      char16_t const *filename) {
-#if defined(__AT_REMOVEREG) && defined(__AT_REMOVEDIR)
+
 	return libd_wunlinkat(dirfd, filename, __AT_REMOVEREG | __AT_REMOVEDIR);
-#else /* __AT_REMOVEREG && __AT_REMOVEDIR */
-	char *utf8_filename;
-	int result;
-	utf8_filename = libd_convert_wcstombs(filename);
-	if unlikely(!utf8_filename)
-		return -1;
-	result = libd_removeat(dirfd, utf8_filename);
 
-	libc_free(utf8_filename);
 
-	return result;
-#endif /* !__AT_REMOVEREG || !__AT_REMOVEDIR */
+
+
+
+
+
+
+
+
+
+
 }
 #include <asm/os/fcntl.h>
 INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((2)) int
 NOTHROW_RPC(LIBKCALL libc_wremoveat)(fd_t dirfd,
                                      char32_t const *filename) {
-#if defined(__AT_REMOVEREG) && defined(__AT_REMOVEDIR)
+
 	return libc_wunlinkat(dirfd, filename, __AT_REMOVEREG | __AT_REMOVEDIR);
-#else /* __AT_REMOVEREG && __AT_REMOVEDIR */
-	char *utf8_filename;
-	int result;
-	utf8_filename = libc_convert_wcstombs(filename);
-	if unlikely(!utf8_filename)
-		return -1;
-	result = libc_removeat(dirfd, utf8_filename);
 
-	libc_free(utf8_filename);
 
-	return result;
-#endif /* !__AT_REMOVEREG || !__AT_REMOVEDIR */
+
+
+
+
+
+
+
+
+
+
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((2, 4)) int
 NOTHROW_RPC(LIBDCALL libd_wrenameat2)(fd_t oldfd,

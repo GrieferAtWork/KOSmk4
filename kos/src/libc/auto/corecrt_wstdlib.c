@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2a9364f */
+/* HASH CRC-32:0x6fea3da7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -137,11 +137,11 @@ NOTHROW_NCX(LIBDCALL libd__itow_s)(int val,
 	p = buf;
 	if (val < 0) {
 		if (!buflen--) {
-#ifdef ERANGE
+
 			return 34;
-#else /* ERANGE */
-			return 1;
-#endif /* !ERANGE */
+
+
+
 		}
 		*p++ = '-';
 		val = -val;
@@ -151,11 +151,11 @@ NOTHROW_NCX(LIBDCALL libd__itow_s)(int val,
 		++p;
 	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
-#ifdef ERANGE
+
 		return 34;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
+
+
+
 	}
 	temp = val;
 	*p = '\0';
@@ -180,11 +180,11 @@ NOTHROW_NCX(LIBKCALL libc__itow_s)(int val,
 	p = buf;
 	if (val < 0) {
 		if (!buflen--) {
-#ifdef ERANGE
+
 			return ERANGE;
-#else /* ERANGE */
-			return 1;
-#endif /* !ERANGE */
+
+
+
 		}
 		*p++ = '-';
 		val = -val;
@@ -194,11 +194,11 @@ NOTHROW_NCX(LIBKCALL libc__itow_s)(int val,
 		++p;
 	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
-#ifdef ERANGE
+
 		return ERANGE;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
+
+
+
 	}
 	temp = val;
 	*p = '\0';
@@ -223,11 +223,11 @@ NOTHROW_NCX(LIBDCALL libd__ltow_s)(long val,
 	p = buf;
 	if (val < 0) {
 		if (!buflen--) {
-#ifdef ERANGE
+
 			return 34;
-#else /* ERANGE */
-			return 1;
-#endif /* !ERANGE */
+
+
+
 		}
 		*p++ = '-';
 		val = -val;
@@ -237,11 +237,11 @@ NOTHROW_NCX(LIBDCALL libd__ltow_s)(long val,
 		++p;
 	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
-#ifdef ERANGE
+
 		return 34;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
+
+
+
 	}
 	temp = val;
 	*p = '\0';
@@ -266,11 +266,11 @@ NOTHROW_NCX(LIBKCALL libc__ltow_s)(long val,
 	p = buf;
 	if (val < 0) {
 		if (!buflen--) {
-#ifdef ERANGE
+
 			return ERANGE;
-#else /* ERANGE */
-			return 1;
-#endif /* !ERANGE */
+
+
+
 		}
 		*p++ = '-';
 		val = -val;
@@ -280,11 +280,11 @@ NOTHROW_NCX(LIBKCALL libc__ltow_s)(long val,
 		++p;
 	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
-#ifdef ERANGE
+
 		return ERANGE;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
+
+
+
 	}
 	temp = val;
 	*p = '\0';
@@ -312,11 +312,11 @@ NOTHROW_NCX(LIBDCALL libd__ultow_s)(unsigned long val,
 		++p;
 	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
-#ifdef ERANGE
+
 		return 34;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
+
+
+
 	}
 	temp = val;
 	*p = '\0';
@@ -344,11 +344,11 @@ NOTHROW_NCX(LIBKCALL libc__ultow_s)(unsigned long val,
 		++p;
 	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
-#ifdef ERANGE
+
 		return ERANGE;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
+
+
+
 	}
 	temp = val;
 	*p = '\0';
@@ -373,11 +373,11 @@ NOTHROW_NCX(LIBDCALL libd__i64tow_s)(s64 val,
 	p = buf;
 	if (val < 0) {
 		if (!buflen--) {
-#ifdef ERANGE
+
 			return 34;
-#else /* ERANGE */
-			return 1;
-#endif /* !ERANGE */
+
+
+
 		}
 		*p++ = '-';
 		val = -val;
@@ -387,11 +387,11 @@ NOTHROW_NCX(LIBDCALL libd__i64tow_s)(s64 val,
 		++p;
 	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
-#ifdef ERANGE
+
 		return 34;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
+
+
+
 	}
 	temp = val;
 	*p = '\0';
@@ -416,11 +416,11 @@ NOTHROW_NCX(LIBKCALL libc__i64tow_s)(s64 val,
 	p = buf;
 	if (val < 0) {
 		if (!buflen--) {
-#ifdef ERANGE
+
 			return ERANGE;
-#else /* ERANGE */
-			return 1;
-#endif /* !ERANGE */
+
+
+
 		}
 		*p++ = '-';
 		val = -val;
@@ -430,11 +430,11 @@ NOTHROW_NCX(LIBKCALL libc__i64tow_s)(s64 val,
 		++p;
 	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
-#ifdef ERANGE
+
 		return ERANGE;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
+
+
+
 	}
 	temp = val;
 	*p = '\0';
@@ -462,11 +462,11 @@ NOTHROW_NCX(LIBDCALL libd__ui64tow_s)(u64 val,
 		++p;
 	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
-#ifdef ERANGE
+
 		return ERANGE;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
+
+
+
 	}
 	temp = val;
 	*p = '\0';
@@ -494,11 +494,11 @@ NOTHROW_NCX(LIBKCALL libc__ui64tow_s)(u64 val,
 		++p;
 	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
-#ifdef ERANGE
+
 		return ERANGE;
-#else /* ERANGE */
-		return 1;
-#endif /* !ERANGE */
+
+
+
 	}
 	temp = val;
 	*p = '\0';
@@ -604,11 +604,11 @@ NOTHROW_NCX(LIBDCALL libd__wfullpath)(char16_t *buf,
 
 		libc_free(wcs_realpath);
 
-#ifdef ERANGE
+
 		(void)libc_seterrno(ERANGE);
-#else /* ERANGE */
-		(void)libc_seterrno(1);
-#endif /* !ERANGE */
+
+
+
 		return NULL;
 	}
 	(char16_t *)libc_memcpyw(buf, wcs_realpath, reqlen);
@@ -648,11 +648,11 @@ NOTHROW_NCX(LIBKCALL libc__wfullpath)(char32_t *buf,
 
 		libc_free(wcs_realpath);
 
-#ifdef ERANGE
+
 		(void)libc_seterrno(ERANGE);
-#else /* ERANGE */
-		(void)libc_seterrno(1);
-#endif /* !ERANGE */
+
+
+
 		return NULL;
 	}
 	(char32_t *)libc_memcpyl(buf, wcs_realpath, reqlen);
@@ -704,11 +704,11 @@ NOTHROW_NCX(LIBDCALL libd__wmakepath_s)(char16_t *buf,
 	path_putc('\0');
 	return 0;
 err_buflen:
-#ifdef EINVAL
+
 	return 22;
-#else /* EINVAL */
-	return 1;
-#endif /* !EINVAL */
+
+
+
 #undef path_putn
 #undef path_putc
 }
@@ -755,11 +755,11 @@ NOTHROW_NCX(LIBKCALL libc__wmakepath_s)(char32_t *buf,
 	path_putc('\0');
 	return 0;
 err_buflen:
-#ifdef EINVAL
+
 	return EINVAL;
-#else /* EINVAL */
-	return 1;
-#endif /* !EINVAL */
+
+
+
 #undef path_putn
 #undef path_putc
 }
@@ -896,18 +896,18 @@ got_drive:
 	}
 	return 0;
 err_inval:
-#ifdef EINVAL
+
 	return 22;
-#else /* EINVAL */
-	return 1;
-#endif /* !EINVAL */
+
+
+
 err_range:
-#ifdef ERANGE
+
 	(void)libc_seterrno(ERANGE);
 	return 34;
-#else /* ERANGE */
-	return 1;
-#endif /* !ERANGE */
+
+
+
 }
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1)) errno_t
@@ -990,18 +990,18 @@ got_drive:
 	}
 	return 0;
 err_inval:
-#ifdef EINVAL
+
 	return EINVAL;
-#else /* EINVAL */
-	return 1;
-#endif /* !EINVAL */
+
+
+
 err_range:
-#ifdef ERANGE
+
 	(void)libc_seterrno(ERANGE);
 	return ERANGE;
-#else /* ERANGE */
-	return 1;
-#endif /* !ERANGE */
+
+
+
 }
 #endif /* !__KERNEL__ */
 

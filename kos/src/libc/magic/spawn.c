@@ -37,6 +37,23 @@
 %[define_replacement(posix_spawn_file_actions_t = "struct __posix_spawn_file_actions")]
 %[default:section(".text.crt{|.dos}.fs.exec.posix_spawn")]
 
+%[assume_defined_in_kos_userspace(__POSIX_SPAWN_USE_KOS)]
+%[assume_defined_in_kos_userspace(__POSIX_SPAWN_ACTION_CLOSE)]
+%[assume_defined_in_kos_userspace(__POSIX_SPAWN_ACTION_DUP2)]
+%[assume_defined_in_kos_userspace(__POSIX_SPAWN_ACTION_OPEN)]
+%[assume_defined_in_kos_userspace(__POSIX_SPAWN_ACTION_CHDIR)]
+%[assume_defined_in_kos_userspace(__POSIX_SPAWN_ACTION_FCHDIR)]
+%[assume_defined_in_kos_userspace(__POSIX_SPAWN_ACTION_TCSETPGRP)]
+%[assume_defined_in_kos_userspace(__POSIX_SPAWN_ACTION_CLOSEFROM)]
+%[assume_defined_in_kos_userspace(__POSIX_SPAWN_RESETIDS)]
+%[assume_defined_in_kos_userspace(__POSIX_SPAWN_SETPGROUP)]
+%[assume_defined_in_kos_userspace(__POSIX_SPAWN_SETSIGDEF)]
+%[assume_defined_in_kos_userspace(__POSIX_SPAWN_SETSIGMASK)]
+%[assume_defined_in_kos_userspace(__POSIX_SPAWN_SETSCHEDPARAM)]
+%[assume_defined_in_kos_userspace(__POSIX_SPAWN_SETSCHEDULER)]
+%[assume_defined_in_kos_userspace(__POSIX_SPAWN_USEVFORK)]
+%[assume_defined_in_kos_userspace(__POSIX_SPAWN_NOEXECERR)]
+
 
 %[insert:prefix(
 #include <features.h>

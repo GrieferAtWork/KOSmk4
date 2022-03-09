@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e74d229 */
+/* HASH CRC-32:0xb398f44f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,15 +51,15 @@ NOTHROW_RPC(LIBCCALL libc__access_s)(char const *filename,
 INTERN ATTR_SECTION(".text.crt.unsorted") oflag_t
 NOTHROW_NCX(LIBCCALL libc__setmode)(fd_t fd,
                                     oflag_t mode) {
-#ifdef __F_SETFL_XCH
+
 	return libc_fcntl(fd, __F_SETFL_XCH, mode);
-#else /* __F_SETFL_XCH */
-	oflag_t result;
-	result = libc_fcntl(fd, __F_GETFL);
-	if unlikely(result < 0)
-		return -1;
-	return libc_fcntl(fd, __F_SETFL, mode);
-#endif /* !__F_SETFL_XCH */
+
+
+
+
+
+
+
 }
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.fs.io") NONNULL((1, 2)) errno_t
@@ -70,11 +70,11 @@ NOTHROW_RPC(LIBDCALL libd__sopen_s)(fd_t *fd,
                                     mode_t mode) {
 	fd_t result;
 	if (!fd) {
-#ifdef EINVAL
+
 		return 22;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	result = libd_sopen(filename, oflags, sflags, mode);
 	if (result < 0)
@@ -91,11 +91,11 @@ NOTHROW_RPC(LIBCCALL libc__sopen_s)(fd_t *fd,
                                     mode_t mode) {
 	fd_t result;
 	if (!fd) {
-#ifdef EINVAL
+
 		return EINVAL;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	result = libc_sopen(filename, oflags, sflags, mode);
 	if (result < 0)
@@ -147,11 +147,11 @@ INTERN ATTR_SECTION(".text.crt.dos.fs.basic_property") errno_t
 NOTHROW_NCX(LIBDCALL libd_umask_s)(mode_t newmode,
                                    mode_t *oldmode) {
 	if (!oldmode) {
-#ifdef EINVAL
+
 		return 22;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	*oldmode = libc_umask(newmode);
 	return 0;
@@ -161,11 +161,11 @@ INTERN ATTR_SECTION(".text.crt.dos.fs.basic_property") errno_t
 NOTHROW_NCX(LIBCCALL libc_umask_s)(mode_t newmode,
                                    mode_t *oldmode) {
 	if (!oldmode) {
-#ifdef EINVAL
+
 		return EINVAL;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
+
+
+
 	}
 	*oldmode = libc_umask(newmode);
 	return 0;

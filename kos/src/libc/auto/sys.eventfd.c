@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcdc7b72c */
+/* HASH CRC-32:0x6f81d64d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,10 +40,10 @@ NOTHROW_RPC(LIBCCALL libc_eventfd_read)(fd_t fd,
 	error = libc_read(fd, value, sizeof(eventfd_t));
 	if (error == sizeof(eventfd_t))
 		return 0;
-#ifdef EINVAL
+
 	if (error >= 0)
 		(void)libc_seterrno(EINVAL);
-#endif /* EINVAL */
+
 	return -1;
 }
 #include <libc/errno.h>
@@ -56,10 +56,10 @@ NOTHROW_RPC(LIBCCALL libc_eventfd_write)(fd_t fd,
 	error = libc_write(fd, &value, sizeof(eventfd_t));
 	if (error == sizeof(eventfd_t))
 		return 0;
-#ifdef EINVAL
+
 	if (error >= 0)
 		(void)libc_seterrno(EINVAL);
-#endif /* EINVAL */
+
 	return -1;
 }
 #endif /* !__KERNEL__ */

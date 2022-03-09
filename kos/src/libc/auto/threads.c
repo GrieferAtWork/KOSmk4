@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba995f94 */
+/* HASH CRC-32:0xa78ddc82 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,10 +70,10 @@ NOTHROW_NCX(LIBCCALL libc_thrd_create)(thrd_t *thr,
 	                       arg);
 	if likely(!error)
 		return thrd_success;
-#if defined(thrd_nomem) && defined(ENOMEM)
+#ifdef thrd_nomem
 	if (error == ENOMEM)
 		return thrd_nomem;
-#endif /* thrd_nomem && ENOMEM */
+#endif /* thrd_nomem */
 	return thrd_error;
 }
 /* >> thrd_exit(3)
@@ -178,10 +178,10 @@ NOTHROW_RPC(LIBCCALL libc_mtx_timedlock)(mtx_t *__restrict mutex,
 	error = libc_pthread_mutex_timedlock((pthread_mutex_t *)mutex, time_point);
 	if likely(!error)
 		return thrd_success;
-#ifdef ETIMEDOUT
+
 	if (error == ETIMEDOUT)
 		return thrd_timedout;
-#endif /* ETIMEDOUT */
+
 	return thrd_error;
 }
 #include <bits/types.h>
@@ -203,10 +203,10 @@ NOTHROW_RPC(LIBCCALL libc_mtx_timedlock64)(mtx_t *__restrict mutex,
 	error = libc_pthread_mutex_timedlock64((pthread_mutex_t *)mutex, time_point);
 	if likely(!error)
 		return thrd_success;
-#ifdef ETIMEDOUT
+
 	if (error == ETIMEDOUT)
 		return thrd_timedout;
-#endif /* ETIMEDOUT */
+
 	return thrd_error;
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
@@ -224,10 +224,10 @@ NOTHROW_NCX(LIBCCALL libc_mtx_trylock)(mtx_t *__restrict mutex) {
 	error = libc_pthread_mutex_trylock((pthread_mutex_t *)mutex);
 	if likely(!error)
 		return thrd_success;
-#if defined(thrd_busy) && defined(EBUSY)
+#ifdef thrd_busy
 	if likely(error == EBUSY)
 		return thrd_busy;
-#endif /* thrd_busy && EBUSY */
+#endif /* thrd_busy */
 	return thrd_error;
 }
 #include <asm/crt/threads.h>
@@ -322,10 +322,10 @@ NOTHROW_RPC(LIBCCALL libc_cnd_timedwait)(cnd_t *__restrict cond,
 	                               time_point);
 	if likely(!error)
 		return thrd_success;
-#ifdef ETIMEDOUT
+
 	if (error == ETIMEDOUT)
 		return thrd_timedout;
-#endif /* ETIMEDOUT */
+
 	return thrd_error;
 }
 #include <bits/types.h>
@@ -350,10 +350,10 @@ NOTHROW_RPC(LIBCCALL libc_cnd_timedwait64)(cnd_t *__restrict cond,
 	                                 time_point);
 	if likely(!error)
 		return thrd_success;
-#ifdef ETIMEDOUT
+
 	if (error == ETIMEDOUT)
 		return thrd_timedout;
-#endif /* ETIMEDOUT */
+
 	return thrd_error;
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */

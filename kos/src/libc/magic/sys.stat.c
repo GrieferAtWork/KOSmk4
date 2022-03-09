@@ -106,6 +106,20 @@
 %[declare_user_export("_stat64i32")]
 
 
+%[assume_defined_in_kos(S_ISVTX, __S_ISVTX)]
+%[assume_defined_in_kos(S_ISGID, __S_ISGID)]
+%[assume_defined_in_kos(S_ISUID, __S_ISUID)]
+%[assume_defined_in_kos(S_IFIFO, __S_IFIFO)]
+%[assume_defined_in_kos(S_IFCHR, __S_IFCHR)]
+%[assume_defined_in_kos(S_IFDIR, __S_IFDIR)]
+%[assume_defined_in_kos(S_IFBLK, __S_IFBLK)]
+%[assume_defined_in_kos(S_IFREG, __S_IFREG)]
+%[assume_defined_in_kos(S_IFLNK, __S_IFLNK)]
+%[assume_defined_in_kos(S_IFSOCK, __S_IFSOCK)]
+%[assume_defined_in_kos(S_IFMT, __S_IFMT)]
+%[assume_defined_in_kos(UTIME_NOW, __UTIME_NOW)]
+%[assume_defined_in_kos(UTIME_OMIT, __UTIME_OMIT)]
+
 
 %[insert:prefix(
 #include <features.h>

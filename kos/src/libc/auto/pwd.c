@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x348302c0 */
+/* HASH CRC-32:0x528162de */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,10 +88,10 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwuid_r)(FILE *__restrict stream,
 	errno_t error;
 	error = libc_fgetpwfiltered_r(stream, resultbuf, buffer, buflen,
 	                         result, uid, NULL);
-#ifdef ENOENT
+
 	if (error == ENOENT)
 		error = 0;
-#endif /* ENOENT */
+
 	return error;
 }
 #include <libc/errno.h>
@@ -110,10 +110,10 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwnam_r)(FILE *__restrict stream,
 	errno_t error;
 	error = libc_fgetpwfiltered_r(stream, resultbuf, buffer, buflen,
 	                         result, (uid_t)-1, name);
-#ifdef ENOENT
+
 	if (error == ENOENT)
 		error = 0;
-#endif /* ENOENT */
+
 	return error;
 }
 #include <libc/errno.h>
@@ -163,11 +163,11 @@ again_parseln:
 		}
 eof:
 		/* End-of-file */
-#ifdef ENOENT
+
 		retval = ENOENT;
-#else /* ENOENT */
-		retval = 1;
-#endif /* !ENOENT */
+
+
+
 		goto done_free_dbline;
 	}
 	/* Accepted formats:
@@ -274,9 +274,9 @@ done_free_dbline:
 	return retval;
 
 err_ERANGE:
-#ifdef ERANGE
+
 	(void)libc_seterrno(ERANGE);
-#endif /* ERANGE */
+
 	/* FALLTHRU */
 err_restore:
 	retval = __libc_geterrno_or(1);
@@ -292,9 +292,9 @@ err:
 	goto done_free_dbline;
 
 badline:
-#ifdef LOG_ERR
+
 	libc_syslog(LOG_ERR, "[passwd] Bad password line %q\n", dbline);
-#endif /* LOG_ERR */
+
 	/* FALLTHRU */
 nextline:
 

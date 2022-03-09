@@ -46,9 +46,9 @@ __SYSDECL_BEGIN
 }
 
 %[define(DEFINE_FALLBACK___LC_MESSAGES =
-#ifndef __LC_MESSAGES
+@@pp_ifndef __LC_MESSAGES@@
 #define __LC_MESSAGES 0
-#endif /* !__LC_MESSAGES */
+@@pp_endif@@
 )]
 
 %[insert:prefix(DEFINE_FALLBACK___LC_MESSAGES)]

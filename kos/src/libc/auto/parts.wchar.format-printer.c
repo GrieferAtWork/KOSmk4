@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13f6c99d */
+/* HASH CRC-32:0x4b5147a3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,7 +63,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
                                char16_t ch,
                                size_t num_repetitions) THROWS(...) {
 	ssize_t result, temp;
-#ifdef __hybrid_alloca
+
 	char16_t *buffer;
 	if likely(num_repetitions <= 64) {
 		buffer = (char16_t *)__hybrid_alloca(num_repetitions);
@@ -72,14 +72,14 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 	}
 	buffer = (char16_t *)__hybrid_alloca(64);
 	__libc_memsetc(buffer, ch, 64, 2);
-#else /* __hybrid_alloca */
-	char16_t buffer[64];
-	if likely(num_repetitions <= 64) {
-		__libc_memsetc(buffer, ch, num_repetitions, 2);
-		return (*printer)(arg, buffer, num_repetitions);
-	}
-	__libc_memsetc(buffer, ch, 64, 2);
-#endif /* !__hybrid_alloca */
+
+
+
+
+
+
+
+
 	result = (*printer)(arg, buffer, 64);
 	if unlikely(result < 0)
 		goto done;
@@ -115,7 +115,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
                                char32_t ch,
                                size_t num_repetitions) THROWS(...) {
 	ssize_t result, temp;
-#ifdef __hybrid_alloca
+
 	char32_t *buffer;
 	if likely(num_repetitions <= 64) {
 		buffer = (char32_t *)__hybrid_alloca(num_repetitions);
@@ -124,14 +124,14 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 	}
 	buffer = (char32_t *)__hybrid_alloca(64);
 	__libc_memsetc(buffer, ch, 64, 4);
-#else /* __hybrid_alloca */
-	char32_t buffer[64];
-	if likely(num_repetitions <= 64) {
-		__libc_memsetc(buffer, ch, num_repetitions, 4);
-		return (*printer)(arg, buffer, num_repetitions);
-	}
-	__libc_memsetc(buffer, ch, 64, 4);
-#endif /* !__hybrid_alloca */
+
+
+
+
+
+
+
+
 	result = (*printer)(arg, buffer, 64);
 	if unlikely(result < 0)
 		goto done;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a2c4962 */
+/* HASH CRC-32:0x81093d6e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,56 +73,56 @@ NOTHROW_RPC(LIBKCALL libc_wsystem)(char32_t const *cmd) {
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.property") WUNUSED NONNULL((1)) char16_t *
 NOTHROW_RPC(LIBDCALL libd_wrealpath)(char16_t const *filename,
                                      char16_t *resolved) {
-#ifdef __AT_FDCWD
-#if defined(__PATH_MAX) && __PATH_MAX != -1
-	return libd_wfrealpathat(__AT_FDCWD, filename, resolved, resolved ? __PATH_MAX : 0, 0);
-#else /* __PATH_MAX && __PATH_MAX != -1 */
+
+
+
+
 	return libd_wfrealpathat(__AT_FDCWD, filename, resolved, resolved ? 256 : 0, 0);
-#endif /* !__PATH_MAX || __PATH_MAX == -1 */
-#else /* __AT_FDCWD */
-	char *utf8_filename, *utf8_resolved;
-	char16_t *wcs_resolved;
-	size_t resolved_length;
-	utf8_filename = libd_convert_wcstombs(filename);
-	if unlikely(!utf8_filename)
-		return NULL;
-	utf8_resolved = libd_realpath(utf8_filename, NULL);
 
-	libc_free(utf8_filename);
 
-	if unlikely(!utf8_resolved)
-		return NULL;
-	wcs_resolved = libd_convert_mbstowcs(utf8_resolved);
 
-	libc_free(utf8_resolved);
 
-	if unlikely(!wcs_resolved)
-		return NULL;
-	if (!resolved)
-		return wcs_resolved;
-	resolved_length = libd_wcslen(wcs_resolved) + 1;
-#if defined(__PATH_MAX) && __PATH_MAX != -1
-	if (resolved_length > __PATH_MAX)
-#else /* __PATH_MAX && __PATH_MAX != -1 */
-	if (resolved_length > 256)
-#endif /* !__PATH_MAX || __PATH_MAX == -1 */
-	{
 
-		libc_free(wcs_resolved);
 
-#ifdef ERANGE
-		(void)libc_seterrno(ERANGE);
-#else /* ERANGE */
-		(void)libc_seterrno(1);
-#endif /* !ERANGE */
-		return NULL;
-	}
-	(char16_t *)libc_memcpyw(resolved, wcs_resolved, resolved_length);
 
-	libc_free(wcs_resolved);
 
-	return resolved;
-#endif /* !__AT_FDCWD */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 #include <asm/os/fcntl.h>
 #include <asm/os/limits.h>
@@ -130,56 +130,56 @@ NOTHROW_RPC(LIBDCALL libd_wrealpath)(char16_t const *filename,
 INTERN ATTR_SECTION(".text.crt.wchar.fs.property") WUNUSED NONNULL((1)) char32_t *
 NOTHROW_RPC(LIBKCALL libc_wrealpath)(char32_t const *filename,
                                      char32_t *resolved) {
-#ifdef __AT_FDCWD
-#if defined(__PATH_MAX) && __PATH_MAX != -1
-	return libc_wfrealpathat(__AT_FDCWD, filename, resolved, resolved ? __PATH_MAX : 0, 0);
-#else /* __PATH_MAX && __PATH_MAX != -1 */
+
+
+
+
 	return libc_wfrealpathat(__AT_FDCWD, filename, resolved, resolved ? 256 : 0, 0);
-#endif /* !__PATH_MAX || __PATH_MAX == -1 */
-#else /* __AT_FDCWD */
-	char *utf8_filename, *utf8_resolved;
-	char32_t *wcs_resolved;
-	size_t resolved_length;
-	utf8_filename = libc_convert_wcstombs(filename);
-	if unlikely(!utf8_filename)
-		return NULL;
-	utf8_resolved = libc_realpath(utf8_filename, NULL);
 
-	libc_free(utf8_filename);
 
-	if unlikely(!utf8_resolved)
-		return NULL;
-	wcs_resolved = libc_convert_mbstowcs(utf8_resolved);
 
-	libc_free(utf8_resolved);
 
-	if unlikely(!wcs_resolved)
-		return NULL;
-	if (!resolved)
-		return wcs_resolved;
-	resolved_length = libc_wcslen(wcs_resolved) + 1;
-#if defined(__PATH_MAX) && __PATH_MAX != -1
-	if (resolved_length > __PATH_MAX)
-#else /* __PATH_MAX && __PATH_MAX != -1 */
-	if (resolved_length > 256)
-#endif /* !__PATH_MAX || __PATH_MAX == -1 */
-	{
 
-		libc_free(wcs_resolved);
 
-#ifdef ERANGE
-		(void)libc_seterrno(ERANGE);
-#else /* ERANGE */
-		(void)libc_seterrno(1);
-#endif /* !ERANGE */
-		return NULL;
-	}
-	(char32_t *)libc_memcpyl(resolved, wcs_resolved, resolved_length);
 
-	libc_free(wcs_resolved);
 
-	return resolved;
-#endif /* !__AT_FDCWD */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.property") WUNUSED char16_t *
 NOTHROW_RPC(LIBDCALL libd_wfrealpath)(fd_t fd,
@@ -285,11 +285,11 @@ NOTHROW_RPC(LIBDCALL libd_wfrealpath4)(fd_t fd,
 
 		libc_free(wcs_resolved);
 
-#ifdef ERANGE
+
 		(void)libc_seterrno(ERANGE);
-#else /* ERANGE */
-		(void)libc_seterrno(1);
-#endif /* !ERANGE */
+
+
+
 		return NULL;
 	}
 	(char16_t *)libc_memcpyw(resolved, wcs_resolved, resolved_length);
@@ -322,11 +322,11 @@ NOTHROW_RPC(LIBKCALL libc_wfrealpath4)(fd_t fd,
 
 		libc_free(wcs_resolved);
 
-#ifdef ERANGE
+
 		(void)libc_seterrno(ERANGE);
-#else /* ERANGE */
-		(void)libc_seterrno(1);
-#endif /* !ERANGE */
+
+
+
 		return NULL;
 	}
 	(char32_t *)libc_memcpyl(resolved, wcs_resolved, resolved_length);
@@ -366,11 +366,11 @@ NOTHROW_RPC(LIBDCALL libd_wfrealpathat)(fd_t dirfd,
 
 		libc_free(wcs_resolved);
 
-#ifdef ERANGE
+
 		(void)libc_seterrno(ERANGE);
-#else /* ERANGE */
-		(void)libc_seterrno(1);
-#endif /* !ERANGE */
+
+
+
 		return NULL;
 	}
 	(char16_t *)libc_memcpyw(resolved, wcs_resolved, resolved_length);
@@ -410,11 +410,11 @@ NOTHROW_RPC(LIBKCALL libc_wfrealpathat)(fd_t dirfd,
 
 		libc_free(wcs_resolved);
 
-#ifdef ERANGE
+
 		(void)libc_seterrno(ERANGE);
-#else /* ERANGE */
-		(void)libc_seterrno(1);
-#endif /* !ERANGE */
+
+
+
 		return NULL;
 	}
 	(char32_t *)libc_memcpyl(resolved, wcs_resolved, resolved_length);
@@ -461,11 +461,11 @@ NOTHROW_NCX(LIBKCALL libc_wtol)(char32_t const *nptr) {
 #endif /* __SIZEOF_LONG__ != __SIZEOF_INT__ */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG
 NOTHROW_NCX(LIBDCALL libd_wtoll)(char16_t const *nptr) {
-#if __SIZEOF_LONG_LONG__
+#if __SIZEOF_LONG_LONG__ <= 4
 	return (__LONGLONG)libd_wcsto32(nptr, NULL, 10);
-#else /* __SIZEOF_LONG_LONG__ */
+#else /* __SIZEOF_LONG_LONG__ <= 4 */
 	return (__LONGLONG)libd_wcsto64(nptr, NULL, 10);
-#endif /* !__SIZEOF_LONG_LONG__ */
+#endif /* __SIZEOF_LONG_LONG__ > 4 */
 }
 #if __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc_wtoll, libc_wtoi);
@@ -474,11 +474,11 @@ DEFINE_INTERN_ALIAS(libc_wtoll, libc_wtol);
 #else /* ... */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG
 NOTHROW_NCX(LIBKCALL libc_wtoll)(char32_t const *nptr) {
-#if __SIZEOF_LONG_LONG__
+#if __SIZEOF_LONG_LONG__ <= 4
 	return (__LONGLONG)libc_wcsto32(nptr, NULL, 10);
-#else /* __SIZEOF_LONG_LONG__ */
+#else /* __SIZEOF_LONG_LONG__ <= 4 */
 	return (__LONGLONG)libc_wcsto64(nptr, NULL, 10);
-#endif /* !__SIZEOF_LONG_LONG__ */
+#endif /* __SIZEOF_LONG_LONG__ > 4 */
 }
 #endif /* !... */
 #endif /* !__KERNEL__ */

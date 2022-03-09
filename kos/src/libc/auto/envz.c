@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd46fa716 */
+/* HASH CRC-32:0x1c60ae36 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,11 +90,11 @@ NOTHROW_NCX(LIBCCALL libc_envz_add)(char **__restrict penvz,
 	morelen  = namelen + 1 + valuelen + 1;
 	new_envz = (char *)libc_realloc(*penvz, (*penvz_len + morelen) * sizeof(char));
 	if unlikely(!new_envz) {
-#ifdef ENOMEM
+
 		return ENOMEM;
-#else /* ENOMEM */
-		return 1;
-#endif /* !ENOMEM */
+
+
+
 	}
 	*penvz = new_envz;
 	new_envz += *penvz_len;

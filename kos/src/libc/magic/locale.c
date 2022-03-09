@@ -42,6 +42,20 @@
 %[define_replacement(locale_t = __locale_t)]
 %[default:section(".text.crt{|.dos}.i18n")]
 
+%[assume_defined_in_kos_userspace(LC_CTYPE, __LC_CTYPE)]
+%[assume_defined_in_kos_userspace(LC_NUMERIC, __LC_NUMERIC)]
+%[assume_defined_in_kos_userspace(LC_TIME, __LC_TIME)]
+%[assume_defined_in_kos_userspace(LC_COLLATE, __LC_COLLATE)]
+%[assume_defined_in_kos_userspace(LC_MONETARY, __LC_MONETARY)]
+%[assume_defined_in_kos_userspace(LC_MESSAGES, __LC_MESSAGES)]
+%[assume_defined_in_kos_userspace(LC_ALL, __LC_ALL)]
+%[assume_defined_in_kos_userspace(LC_PAPER, __LC_PAPER)]
+%[assume_defined_in_kos_userspace(LC_NAME, __LC_NAME)]
+%[assume_defined_in_kos_userspace(LC_ADDRESS, __LC_ADDRESS)]
+%[assume_defined_in_kos_userspace(LC_TELEPHONE, __LC_TELEPHONE)]
+%[assume_defined_in_kos_userspace(LC_MEASUREMENT, __LC_MEASUREMENT)]
+%[assume_defined_in_kos_userspace(LC_IDENTIFICATION, __LC_IDENTIFICATION)]
+
 %[insert:prefix(
 #include <features.h>
 )]%[insert:prefix(

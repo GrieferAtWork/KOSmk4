@@ -75,6 +75,21 @@
 %[declare_kernel_export("__ctype_C_tolower")]
 %[declare_kernel_export("__ctype_C_toupper")]
 
+%[assume_defined_in_kos_userspace(__crt_iscntrl)]
+%[assume_defined_in_kos_userspace(__crt_isspace)]
+%[assume_defined_in_kos_userspace(__crt_islower)]
+%[assume_defined_in_kos_userspace(__crt_isupper)]
+%[assume_defined_in_kos_userspace(__crt_isalpha)]
+%[assume_defined_in_kos_userspace(__crt_isdigit)]
+%[assume_defined_in_kos_userspace(__crt_isxdigit)]
+%[assume_defined_in_kos_userspace(__crt_isalnum)]
+%[assume_defined_in_kos_userspace(__crt_ispunct)]
+%[assume_defined_in_kos_userspace(__crt_isgraph)]
+%[assume_defined_in_kos_userspace(__crt_isprint)]
+%[assume_defined_in_kos_userspace(__crt_isblank)]
+%[assume_defined_in_kos_userspace(__crt_tolower)]
+%[assume_defined_in_kos_userspace(__crt_toupper)]
+
 
 /* Because KOS uses UTF-8 through, functions from <ctype.h> must
  * operate on only those characters which can be represented  in

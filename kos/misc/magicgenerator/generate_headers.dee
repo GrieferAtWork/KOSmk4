@@ -48,20 +48,46 @@ global knownUserspaceCrtFeaturesAlways: {string...} = HashSet();
 @@are the conditionally available functions.
 global knownUserspaceCrtFeaturesConditionally: {string...} = HashSet();
 
+@@Set of macro assumptions for KOS user-space.
+global knownUserspaceMacroReplacements: {string: int | bool} = Dict({
+	"__CRT_DOS" : true, /* Emulated by KOS, so defined */
+	"__CRT_DOS_PRIMARY" : false,
+	"__CRT_GLC" : true, /* Emulated by KOS, so defined */
+	"__CRT_GLC_PRIMARY" : false,
+	"__CRT_KOS" : true,
+	"__CRT_KOS_PRIMARY" : true,
+	"__CRT_CYG" : false,
+	"__CRT_CYG_PRIMARY" : false,
+	"__CRT_GENERIC" : false,
+	"__CRT_KOS_KERNEL" : false, /* Only defined in kernel-space */
+	"__CRT_FREESTANDING" : false,
+	"__LIBC_BIND_CRTBUILTINS" : false,
+	"_WIN32" : false,
+
+	/* We're building with gcc, so these are always available */
+	"alloca" : true,
+	"__hybrid_alloca" : true,
+	"__COMPILER_HAVE_PRAGMA_PUSHMACRO" : true,
+});
+
 class AutoFilePPAssume: PPAssume {
 	this = super;
 
 	@@Return the known value of a macro
 	public function getMacro(name: string): int | bool | none {
 		local result = this.macros.get(name);
-		/* Optimization: __CRT_HAVE_* macros have  */
-		if (result is none && name.startswith("__CRT_HAVE_") &&
+		if (result is none && name != "__KERNEL__" &&
 		    this.isMacroDefined("__KERNEL__") === false) {
-			local symname = name[#"__CRT_HAVE_":];
-			if (symname in knownUserspaceCrtFeaturesAlways)
-				return true; /* Symbol is always available */
-			if (symname !in knownUserspaceCrtFeaturesConditionally)
-				return false; /* Symbol isn't conditionally available (--> not available at all) */
+			/* Optimization: __CRT_HAVE_* macros have  */
+			if (name.startswith("__CRT_HAVE_")) {
+				local symname = name[#"__CRT_HAVE_":];
+				if (symname in knownUserspaceCrtFeaturesAlways)
+					return true; /* Symbol is always available */
+				if (symname !in knownUserspaceCrtFeaturesConditionally)
+					return false; /* Symbol isn't conditionally available (--> not available at all) */
+			}
+			/* The macro may be known-defined in KOS user-space! */
+			result = knownUserspaceMacroReplacements.get(name);
 		}
 		return result;
 	}
@@ -441,6 +467,40 @@ function customDirectivesParser(context: LoaderContext): bool {
 		context.insertText_c(fp.string);
 	}	break;
 
+	case "assume_undefined_in_kos": /* TODO: Stuff defined with this can also be assumed in KOS kernel-space! */
+	case "assume_undefined_in_kos_userspace":
+		self.next();
+		tok = self.skip("(");
+		while (tok !in ["", ")"]) {
+			local name = str self.parseCStringOrFunctionLikeExpression();
+			knownUserspaceMacroReplacements[name] = false;
+			if (self.tok != ",")
+				break;
+			tok = self.next();
+		}
+		self.skip(")");
+		break;
+
+	case "assume_defined_in_kos": /* TODO: Stuff defined with this can also be assumed in KOS kernel-space! */
+	case "assume_defined_in_kos_userspace":
+		self.next();
+		tok = self.skip("(");
+		while (tok !in ["", ")"]) {
+			local name = str self.parseCStringOrFunctionLikeExpression();
+			local value = true;
+			if (self.tok == "=") {
+				self.next();
+				value = str self.parseCStringOrFunctionLikeExpression();
+				value = try int(value) catch (...) true;
+			}
+			knownUserspaceMacroReplacements[name] = value;
+			if (self.tok != ",")
+				break;
+			tok = self.next();
+		}
+		self.skip(")");
+		break;
+
 	case "declare_user_export":
 	case "declare_user_import":
 	case "declare_kernel_export":
@@ -456,7 +516,7 @@ function customDirectivesParser(context: LoaderContext): bool {
 		self.next();
 		tok = self.skip("(");
 		while (tok !in ["", ")"]) {
-			local name = self.parseCStringOrFunctionLikeExpression();
+			local name = str self.parseCStringOrFunctionLikeExpression();
 			s.insert(name);
 			if (self.tok != ",")
 				break;

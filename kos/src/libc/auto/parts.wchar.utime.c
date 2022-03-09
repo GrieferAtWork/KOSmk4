@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37a6a2ac */
+/* HASH CRC-32:0x2e4a211b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,14 +88,14 @@ NOTHROW_RPC(LIBKCALL libc_wutime)(char32_t const *file,
 
 
 
-#if __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL) && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+#if defined(__LIBCCALL_IS_LIBKCALL) && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 	struct utimbuf64 buf64;
 	if (!file_times)
 		return libc_wutime64(file, NULL);
 	buf64.actime  = (time64_t)file_times->actime;
 	buf64.modtime = (time64_t)file_times->modtime;
 	return libc_wutime64(file, &buf64);
-#else /* __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#else /* __LIBCCALL_IS_LIBKCALL && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 	int result;
 	char *utf8_file;
 	utf8_file = libc_convert_wcstombs(file);
@@ -106,7 +106,7 @@ NOTHROW_RPC(LIBKCALL libc_wutime)(char32_t const *file,
 	libc_free(utf8_file);
 
 	return result;
-#endif /* __SIZEOF_WCHAR_T__ != 4 || !__LIBCCALL_IS_LIBKCALL || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+#endif /* !__LIBCCALL_IS_LIBKCALL || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("modtime")
 #pragma pop_macro("actime")
