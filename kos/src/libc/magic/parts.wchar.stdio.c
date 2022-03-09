@@ -129,7 +129,11 @@ int wrenameat($fd_t oldfd, [[nonnull]] wchar_t const *oldname,
 %
 %#ifdef __USE_KOS
 [[wchar, cp, requires_function(removeat, convert_wcstombs)]]
+[[impl_include("<asm/os/fcntl.h>")]]
 int wremoveat($fd_t dirfd, [[nonnull]] wchar_t const *filename) {
+@@pp_if $has_function(wunlinkat) && defined(__AT_REMOVEREG) && defined(__AT_REMOVEDIR)@@
+	return wunlinkat(dirfd, filename, __AT_REMOVEREG | __AT_REMOVEDIR);
+@@pp_else@@
 	char *utf8_filename;
 	int result;
 	utf8_filename = convert_wcstombs(filename);
@@ -140,6 +144,7 @@ int wremoveat($fd_t dirfd, [[nonnull]] wchar_t const *filename) {
 	free(utf8_filename);
 @@pp_endif@@
 	return result;
+@@pp_endif@@
 }
 %#endif /* __USE_KOS */
 %#endif /* __USE_ATFILE */

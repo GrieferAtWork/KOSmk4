@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x308986a2 */
+/* HASH CRC-32:0xb78620e9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,9 +43,9 @@ DECL_BEGIN
  * Remove a file or directory `filename' */
 INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_remove)(char const *filename) {
-#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_removeat) || (defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_unlinkat)))
+#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_removeat) || (defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_unlinkat) && (defined(__AT_REMOVEREG) || (defined(__EISDIR) && defined(__ENOTDIR)))))
 	return libd_removeat(__AT_FDCWD, filename);
-#else /* __AT_FDCWD && (__CRT_HAVE_removeat || (__AT_REMOVEDIR && __CRT_HAVE_unlinkat)) */
+#else /* __AT_FDCWD && (__CRT_HAVE_removeat || (__AT_REMOVEDIR && __CRT_HAVE_unlinkat && (__AT_REMOVEREG || (__EISDIR && __ENOTDIR)))) */
 	int result;
 	for (;;) {
 		result = libd_unlink(filename);
@@ -56,7 +56,7 @@ NOTHROW_RPC(LIBDCALL libd_remove)(char const *filename) {
 			break;
 	}
 	return result;
-#endif /* !__AT_FDCWD || (!__CRT_HAVE_removeat && (!__AT_REMOVEDIR || !__CRT_HAVE_unlinkat)) */
+#endif /* !__AT_FDCWD || (!__CRT_HAVE_removeat && (!__AT_REMOVEDIR || !__CRT_HAVE_unlinkat || (!__AT_REMOVEREG && (!__EISDIR || !__ENOTDIR)))) */
 }
 #include <asm/os/fcntl.h>
 #include <libc/errno.h>
@@ -64,9 +64,9 @@ NOTHROW_RPC(LIBDCALL libd_remove)(char const *filename) {
  * Remove a file or directory `filename' */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_remove)(char const *filename) {
-#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_removeat) || (defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_unlinkat)))
+#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_removeat) || (defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_unlinkat) && (defined(__AT_REMOVEREG) || (defined(__EISDIR) && defined(__ENOTDIR)))))
 	return libc_removeat(__AT_FDCWD, filename);
-#else /* __AT_FDCWD && (__CRT_HAVE_removeat || (__AT_REMOVEDIR && __CRT_HAVE_unlinkat)) */
+#else /* __AT_FDCWD && (__CRT_HAVE_removeat || (__AT_REMOVEDIR && __CRT_HAVE_unlinkat && (__AT_REMOVEREG || (__EISDIR && __ENOTDIR)))) */
 	int result;
 	for (;;) {
 		result = libc_unlink(filename);
@@ -77,7 +77,7 @@ NOTHROW_RPC(LIBCCALL libc_remove)(char const *filename) {
 			break;
 	}
 	return result;
-#endif /* !__AT_FDCWD || (!__CRT_HAVE_removeat && (!__AT_REMOVEDIR || !__CRT_HAVE_unlinkat)) */
+#endif /* !__AT_FDCWD || (!__CRT_HAVE_removeat && (!__AT_REMOVEDIR || !__CRT_HAVE_unlinkat || (!__AT_REMOVEREG && (!__EISDIR || !__ENOTDIR)))) */
 }
 #include <asm/crt/stdio.h>
 /* >> setbuf(3)

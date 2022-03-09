@@ -1701,7 +1701,7 @@ int renameat($fd_t oldfd, [[nonnull]] char const *oldname,
 [[crt_dos_variant, cp, section(".text.crt{|.dos}.fs.modify")]]
 [[requires_include("<asm/os/fcntl.h>", "<asm/os/errno.h>")]]
 [[requires(defined(__AT_REMOVEDIR) && $has_function(unlinkat) &&
-           (defined(__AT_REMOVEDIR) || (defined(__EISDIR) && defined(__ENOTDIR))))]]
+           (defined(__AT_REMOVEREG) || (defined(__EISDIR) && defined(__ENOTDIR))))]]
 [[impl_include("<asm/os/fcntl.h>", "<libc/errno.h>")]]
 int removeat($fd_t dirfd, [[nonnull]] char const *filename) {
 @@pp_ifdef __AT_REMOVEREG@@
