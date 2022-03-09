@@ -4487,24 +4487,15 @@ $FILE *funopen2_64(void const *cookie,
 /************************************************************************/
 
 
+%
+%#endif /* __CC__ */
 
 
-%{
-
-#endif /* __CC__ */
-
-__SYSDECL_END
-
-}
-
-
-
-%{
-
-
-
-
-}
+%
+%
+%
+%
+%
 %#ifdef __USE_DOS
 %{
 #define _NFILE          512
@@ -5290,6 +5281,8 @@ __STDC_INT_AS_SSIZE_T vsscanf_s([[nonnull]] char const *buf, [[nonnull, format]]
 
 
 %{
+
+__SYSDECL_END
 
 #ifdef __USE_DOS
 #include <corecrt_wstdio.h>

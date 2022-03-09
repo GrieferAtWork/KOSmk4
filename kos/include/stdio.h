@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0a0eb88 */
+/* HASH CRC-32:0x6eca9b30 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4608,8 +4608,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(funopen2_64, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 
 #endif /* __CC__ */
 
-__SYSDECL_END
-
 
 
 
@@ -6243,6 +6241,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sscanf_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* __CC__ */
 #endif /* __USE_DOS */
 
+
+__SYSDECL_END
 
 #ifdef __USE_DOS
 #include <corecrt_wstdio.h>
