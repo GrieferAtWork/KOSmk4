@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcfa41e47 */
+/* HASH CRC-32:0x2fcd642f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -304,7 +304,6 @@
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$_fullpath
 #define __CRT_HAVE_DOS$_fwprintf_l
-#define __CRT_HAVE_DOS$_fwprintf_p
 #define __CRT_HAVE_DOS$_fwprintf_p_l
 #define __CRT_HAVE_DOS$_fwprintf_s_l
 #define __CRT_HAVE_DOS$_fwscanf_l
@@ -496,7 +495,6 @@
 #define __CRT_HAVE_DOS$_swprintf
 #define __CRT_HAVE_DOS$_swprintf_c
 #define __CRT_HAVE_DOS$_swprintf_c_l
-#define __CRT_HAVE_DOS$_swprintf_p
 #define __CRT_HAVE_DOS$_swprintf_p_l
 #define __CRT_HAVE_DOS$_swprintf_s_l
 #define __CRT_HAVE_DOS$_swscanf_l
@@ -527,7 +525,6 @@
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$_vfwprintf_l
-#define __CRT_HAVE_DOS$_vfwprintf_p
 #define __CRT_HAVE_DOS$_vfwprintf_p_l
 #define __CRT_HAVE_DOS$_vfwprintf_s_l
 #define __CRT_HAVE_DOS$_vfwscanf_l
@@ -585,13 +582,11 @@
 #define __CRT_HAVE_DOS$_vswprintf
 #define __CRT_HAVE_DOS$_vswprintf_c
 #define __CRT_HAVE_DOS$_vswprintf_c_l
-#define __CRT_HAVE_DOS$_vswprintf_p
 #define __CRT_HAVE_DOS$_vswprintf_p_l
 #define __CRT_HAVE_DOS$_vswprintf_s_l
 #define __CRT_HAVE_DOS$_vswscanf_l
 #define __CRT_HAVE_DOS$_vswscanf_s_l
 #define __CRT_HAVE_DOS$_vwprintf_l
-#define __CRT_HAVE_DOS$_vwprintf_p
 #define __CRT_HAVE_DOS$_vwprintf_p_l
 #define __CRT_HAVE_DOS$_vwprintf_s_l
 #define __CRT_HAVE_DOS$_vwscanf_l
@@ -632,7 +627,6 @@
 #define __CRT_HAVE_DOS$_wmktemp_s
 #define __CRT_HAVE_DOS$_wperror
 #define __CRT_HAVE_DOS$_wprintf_l
-#define __CRT_HAVE_DOS$_wprintf_p
 #define __CRT_HAVE_DOS$_wprintf_p_l
 #define __CRT_HAVE_DOS$_wprintf_s_l
 #define __CRT_HAVE_DOS$_wputenv
@@ -3920,7 +3914,6 @@
 #define __CRT_HAVE__fullpath
 #define __CRT_HAVE__fullpath_dbg
 #define __CRT_HAVE__fwprintf_l
-#define __CRT_HAVE__fwprintf_p
 #define __CRT_HAVE__fwprintf_p_l
 #define __CRT_HAVE__fwprintf_s_l
 #define __CRT_HAVE__fwscanf_l
@@ -4086,7 +4079,6 @@
 #define __CRT_HAVE__swprintf
 #define __CRT_HAVE__swprintf_c
 #define __CRT_HAVE__swprintf_c_l
-#define __CRT_HAVE__swprintf_p
 #define __CRT_HAVE__swprintf_p_l
 #define __CRT_HAVE__swprintf_s_l
 #define __CRT_HAVE__swscanf_l
@@ -4111,7 +4103,6 @@
 #define __CRT_HAVE__vfscanf_l
 #define __CRT_HAVE__vfscanf_s_l
 #define __CRT_HAVE__vfwprintf_l
-#define __CRT_HAVE__vfwprintf_p
 #define __CRT_HAVE__vfwprintf_p_l
 #define __CRT_HAVE__vfwprintf_s_l
 #define __CRT_HAVE__vfwscanf_l
@@ -4157,13 +4148,11 @@
 #define __CRT_HAVE__vswprintf
 #define __CRT_HAVE__vswprintf_c
 #define __CRT_HAVE__vswprintf_c_l
-#define __CRT_HAVE__vswprintf_p
 #define __CRT_HAVE__vswprintf_p_l
 #define __CRT_HAVE__vswprintf_s_l
 #define __CRT_HAVE__vswscanf_l
 #define __CRT_HAVE__vswscanf_s_l
 #define __CRT_HAVE__vwprintf_l
-#define __CRT_HAVE__vwprintf_p
 #define __CRT_HAVE__vwprintf_p_l
 #define __CRT_HAVE__vwprintf_s_l
 #define __CRT_HAVE__vwscanf_l
@@ -4209,7 +4198,6 @@
 #define __CRT_HAVE__wmktemp_s
 #define __CRT_HAVE__wperror
 #define __CRT_HAVE__wprintf_l
-#define __CRT_HAVE__wprintf_p
 #define __CRT_HAVE__wprintf_p_l
 #define __CRT_HAVE__wprintf_s_l
 #define __CRT_HAVE__wputenv

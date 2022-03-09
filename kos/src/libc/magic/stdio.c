@@ -4899,10 +4899,12 @@ __STDC_INT_AS_SSIZE_T __stdio_common_vfprintf_s($uint64_t options, [[nonnull]] $
 }
 
 [[decl_include("<hybrid/typecore.h>"), requires_function(vfprintf)]]
+[[crt_intern_alias("__stdio_common_vfprintf")]] /* Normal printf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T __stdio_common_vfprintf_p($uint64_t options, [[nonnull]] $FILE *stream,
                                                 [[nonnull, format]] char const *format,
                                                 $locale_t locale, $va_list args) {
-	/* TODO: Support for positional arguments */
+	/* NOTE: DOS positional arguments work the same as gLibc's, only that
+	 *       glibc and KOS  already bake them  into the normal  `printf'. */
 	(void)locale;
 	(void)options;
 	return vfprintf(stream, format, args);
@@ -4941,12 +4943,14 @@ __STDC_INT_AS_SSIZE_T __stdio_common_vsnprintf_s($uint64_t options, char *buf, $
 }
 
 [[decl_include("<hybrid/typecore.h>")]]
+[[crt_intern_alias("__stdio_common_vsprintf")]] /* Normal printf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T __stdio_common_vsprintf_p($uint64_t options, char *buf, $size_t bufsize,
                                                 [[nonnull, format]] char const *format,
                                                 $locale_t locale, $va_list args) {
 	__STDC_INT_AS_SSIZE_T result;
 	(void)locale;
-	/* TODO: Support for positional arguments */
+	/* NOTE: DOS positional arguments work the same as gLibc's, only that
+	 *       glibc and KOS  already bake them  into the normal  `printf'. */
 	result = vsnprintf(buf, bufsize, format, args);
 	if (!(options & _CRT_INTERNAL_PRINTF_STANDARD_SNPRINTF_BEHAVIOR) && (size_t)result > bufsize)
 		result = bufsize;
@@ -5016,6 +5020,7 @@ __STDC_INT_AS_SSIZE_T _vsprintf_s_l(char *buf, $size_t bufsize, [[nonnull, forma
 	return result < 0 ? -1 : result;
 }
 [[decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__stdio_common_vsprintf_p)]]
+[[crt_intern_alias("_vsnprintf_l")]] /* Normal printf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T _vsprintf_p_l(char *buf, $size_t bufsize, [[nonnull, format]] char const *format, $locale_t locale, $va_list args) {
 	__STDC_INT_AS_SSIZE_T result = __stdio_common_vsprintf_p(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, buf, bufsize, format, locale, args);
 	return result < 0 ? -1 : result;
@@ -5026,6 +5031,7 @@ __STDC_INT_AS_SSIZE_T _vscprintf_l([[nonnull, format]] char const *format, $loca
 	return result < 0 ? -1 : result;
 }
 [[decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__stdio_common_vsprintf_p)]]
+[[crt_intern_alias("_vscprintf_l")]] /* Normal printf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T _vscprintf_p_l([[nonnull, format]] char const *format, $locale_t locale, $va_list args) {
 	__STDC_INT_AS_SSIZE_T result = __stdio_common_vsprintf_p(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS | _CRT_INTERNAL_PRINTF_STANDARD_SNPRINTF_BEHAVIOR, NULL, 0, format, locale, args);
 	return result < 0 ? -1 : result;
@@ -5045,6 +5051,7 @@ __STDC_INT_AS_SSIZE_T _vfprintf_s_l([[nonnull]] $FILE *stream, [[nonnull, format
 	return __stdio_common_vfprintf_s(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, stream, format, locale, args);
 }
 [[decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__stdio_common_vfprintf_p)]]
+[[crt_intern_alias("_vfprintf_l")]] /* Normal printf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T _vfprintf_p_l([[nonnull]] $FILE *stream, [[nonnull, format]] char const *format, $locale_t locale, $va_list args) {
 	return __stdio_common_vfprintf_p(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, stream, format, locale, args);
 }
@@ -5098,10 +5105,12 @@ __STDC_INT_AS_SSIZE_T _vsprintf_l([[nonnull]] char *buf, [[nonnull, format]] cha
 /************************************************************************/
 %[default:section(".text.crt.dos.unicode.static.format.printf")];
 [[decl_include("<features.h>"), requires_function(_vfprintf_p_l)]]
+[[crt_intern_alias("vfprintf")]] /* Normal printf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T _vfprintf_p([[nonnull]] $FILE *stream, [[nonnull, format]] char const *format, $va_list args) {
 	return _vfprintf_p_l(stream, format, NULL, args);
 }
 [[decl_include("<features.h>"), requires_function(_vprintf_p_l)]]
+[[crt_intern_alias("vprintf")]] /* Normal printf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T _vprintf_p([[nonnull, format]] char const *format, $va_list args) {
 	return _vprintf_p_l(format, NULL, args);
 }
@@ -5111,6 +5120,7 @@ __STDC_INT_AS_SSIZE_T _vsnprintf(char *buf, $size_t bufsize, [[nonnull, format]]
 	return _vsnprintf_l(buf, bufsize, format, NULL, args);
 }
 [[decl_include("<features.h>", "<hybrid/typecore.h>"), requires_function(_vsprintf_p_l)]]
+[[crt_intern_alias("vsnprintf")]] /* Normal printf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T _vsprintf_p(char *buf, $size_t bufsize, [[nonnull, format]] char const *format, $va_list args) {
 	return _vsprintf_p_l(buf, bufsize, format, NULL, args);
 }
@@ -5123,6 +5133,7 @@ __STDC_INT_AS_SSIZE_T _vscprintf([[nonnull, format]] char const *format, $va_lis
 	return _vscprintf_l(format, NULL, args);
 }
 [[decl_include("<features.h>"), requires_function(_vscprintf_p_l), wunused]]
+[[crt_intern_alias("_vscprintf")]] /* Normal printf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T _vscprintf_p([[nonnull, format]] char const *format, $va_list args) {
 	return _vscprintf_p_l(format, NULL, args);
 }
@@ -5164,6 +5175,7 @@ __STDC_INT_AS_SSIZE_T _vprintf_s_l([[nonnull, format]] char const *format, $loca
 [[decl_include("<features.h>"), impl_include("<libc/template/stdstreams.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stdout) && $has_function(_vfprintf_p_l))]]
+[[crt_intern_alias("_vprintf_l")]] /* Normal printf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T _vprintf_p_l([[nonnull, format]] char const *format, $locale_t locale, $va_list args) {
 	return _vfprintf_p_l(stdout, format, locale, args);
 }
@@ -5183,19 +5195,25 @@ __STDC_INT_AS_SSIZE_T _vscanf_s_l([[nonnull, format]] char const *format, $local
 [[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _fprintf_l([[nonnull]] $FILE *stream, [[nonnull, format]] char const *format, $locale_t locale, ...) %{printf("_vfprintf_l")}
 [[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _fprintf_s_l([[nonnull]] $FILE *stream, [[nonnull, format]] char const *format, $locale_t locale, ...) %{printf("_vfprintf_s_l")}
 %[default:section(".text.crt.dos.unicode.static.format.printf")];
+[[crt_intern_alias("fprintf")]] /* Normal printf already supports positional arguments! */
 [[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _fprintf_p([[nonnull]] $FILE *stream, [[nonnull, format]] char const *format, ...) %{printf("_vfprintf_p")}
 %[default:section(".text.crt.dos.unicode.locale.format.printf")];
+[[crt_intern_alias("_fprintf_l")]] /* Normal printf already supports positional arguments! */
 [[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _fprintf_p_l([[nonnull]] $FILE *stream, [[nonnull, format]] char const *format, $locale_t locale, ...) %{printf("_vfprintf_p_l")}
 [[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _printf_l([[nonnull, format]] char const *format, $locale_t locale, ...) %{printf("_vprintf_l")}
 [[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _printf_s_l([[nonnull, format]] char const *format, $locale_t locale, ...) %{printf("_vprintf_s_l")}
 %[default:section(".text.crt.dos.unicode.static.format.printf")];
+[[crt_intern_alias("printf")]] /* Normal printf already supports positional arguments! */
 [[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _printf_p([[nonnull, format]] char const *format, ...) %{printf("_vprintf_p")}
 %[default:section(".text.crt.dos.unicode.locale.format.printf")];
+[[crt_intern_alias("_printf_l")]] /* Normal printf already supports positional arguments! */
 [[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _printf_p_l([[nonnull, format]] char const *format, $locale_t locale, ...) %{printf("_vprintf_p_l")}
 [[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _sprintf_l([[nonnull]] char *buf, [[nonnull, format]] char const *format, $locale_t locale, ...) %{printf("_vsprintf_l")}
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _sprintf_s_l(char *buf, $size_t bufsize, [[nonnull, format]] char const *format, $locale_t locale, ...) %{printf("_vsprintf_s_l")}
+[[crt_intern_alias("_sprintf_l")]] /* Normal printf already supports positional arguments! */
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _sprintf_p_l(char *buf, $size_t bufsize, [[nonnull, format]] char const *format, $locale_t locale, ...) %{printf("_vsprintf_p_l")}
 %[default:section(".text.crt.dos.unicode.static.format.printf")];
+[[crt_intern_alias("snprintf")]] /* Normal printf already supports positional arguments! */
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _sprintf_p(char *buf, $size_t bufsize, [[nonnull, format]] char const *format, ...) %{printf("_vsprintf_p")}
 %[default:section(".text.crt.dos.unicode.locale.format.printf")];
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _snprintf_l(char *buf, $size_t bufsize, [[nonnull, format]] char const *format, $locale_t locale, ...) %{printf("_vsnprintf_l")}
@@ -5214,8 +5232,10 @@ __STDC_INT_AS_SSIZE_T _vscanf_s_l([[nonnull, format]] char const *format, $local
 %[default:section(".text.crt.dos.unicode.static.format.printf")];
 [[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _scprintf([[nonnull, format]] char const *format, ...) %{printf("_vscprintf")}
 %[default:section(".text.crt.dos.unicode.locale.format.printf")];
+[[crt_intern_alias("_scprintf_l")]] /* Normal printf already supports positional arguments! */
 [[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _scprintf_p_l([[nonnull, format]] char const *format, $locale_t locale, ...) %{printf("_vscprintf_p_l")}
 %[default:section(".text.crt.dos.unicode.static.format.printf")];
+[[crt_intern_alias("_scprintf")]] /* Normal printf already supports positional arguments! */
 [[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _scprintf_p([[nonnull, format]] char const *format, ...) %{printf("_vscprintf_p")}
 %[default:section(".text.crt.dos.FILE.locked.read.scanf")];
 [[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _fscanf_l([[nonnull]] $FILE *stream, [[nonnull, format]] char const *format, $locale_t locale, ...) %{printf("_vfscanf_l")}

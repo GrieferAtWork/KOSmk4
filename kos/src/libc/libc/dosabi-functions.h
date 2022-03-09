@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c43b155 */
+/* HASH CRC-32:0x8d6e977e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1441,22 +1441,22 @@ DFUN(".text.crt.dos.FILE.locked.read.read", libd_gets_s, libc_gets_s, TP, 2, TP,
 DFUN(".text.crt.dos.FILE.unlocked.read.read", libd__fread_nolock_s, libc__fread_nolock_s, TI, 5, TP, TI, TI, TI, TP)
 DFUN(".text.crt.dos.unicode.locale.format.printf", libd___stdio_common_vfprintf, libc___stdio_common_vfprintf, TD, 5, TI64, TP, TP, TP, TP)
 DEFINE_INTERN_ALIAS(libd___stdio_common_vfprintf_s, libd___stdio_common_vfprintf);
-DFUN(".text.crt.dos.unicode.locale.format.printf", libd___stdio_common_vfprintf_p, libc___stdio_common_vfprintf_p, TD, 5, TI64, TP, TP, TP, TP)
+DEFINE_INTERN_ALIAS(libd___stdio_common_vfprintf_p, libd___stdio_common_vfprintf);
 DFUN(".text.crt.dos.unicode.locale.format.printf", libd___stdio_common_vsprintf, libc___stdio_common_vsprintf, TD, 6, TI64, TP, TI, TP, TP, TP)
 DFUN(".text.crt.dos.unicode.locale.format.printf", libd___stdio_common_vsprintf_s, libc___stdio_common_vsprintf_s, TD, 6, TI64, TP, TI, TP, TP, TP)
 DFUN(".text.crt.dos.unicode.locale.format.printf", libd___stdio_common_vsnprintf_s, libc___stdio_common_vsnprintf_s, TD, 7, TI64, TP, TI, TI, TP, TP, TP)
-DFUN(".text.crt.dos.unicode.locale.format.printf", libd___stdio_common_vsprintf_p, libc___stdio_common_vsprintf_p, TD, 6, TI64, TP, TI, TP, TP, TP)
+DEFINE_INTERN_ALIAS(libd___stdio_common_vsprintf_p, libd___stdio_common_vsprintf);
 DFUN(".text.crt.dos.FILE.locked.read.scanf", libd___stdio_common_vfscanf, libc___stdio_common_vfscanf, TD, 5, TI64, TP, TP, TP, TP)
 DFUN(".text.crt.dos.FILE.locked.read.scanf", libd___stdio_common_vsscanf, libc___stdio_common_vsscanf, TD, 6, TI64, TP, TI, TP, TP, TP)
 DFUN(".text.crt.dos.unicode.locale.format.printf", libd__vsnprintf_l, libc__vsnprintf_l, TD, 5, TP, TI, TP, TP, TP)
 DFUN(".text.crt.dos.unicode.locale.format.printf", libd__vsprintf_s_l, libc__vsprintf_s_l, TD, 5, TP, TI, TP, TP, TP)
-DFUN(".text.crt.dos.unicode.locale.format.printf", libd__vsprintf_p_l, libc__vsprintf_p_l, TD, 5, TP, TI, TP, TP, TP)
+DEFINE_INTERN_ALIAS(libd__vsprintf_p_l, libd__vsnprintf_l);
 DFUN(".text.crt.dos.unicode.locale.format.printf", libd__vscprintf_l, libc__vscprintf_l, TD, 3, TP, TP, TP)
-DFUN(".text.crt.dos.unicode.locale.format.printf", libd__vscprintf_p_l, libc__vscprintf_p_l, TD, 3, TP, TP, TP)
+DEFINE_INTERN_ALIAS(libd__vscprintf_p_l, libd__vscprintf_l);
 DFUN(".text.crt.dos.unicode.locale.format.printf", libd__vsnprintf_c_l, libc__vsnprintf_c_l, TD, 5, TP, TI, TP, TP, TP)
 DFUN(".text.crt.dos.unicode.locale.format.printf", libd__vsnprintf_s_l, libc__vsnprintf_s_l, TD, 6, TP, TI, TI, TP, TP, TP)
 DFUN(".text.crt.dos.unicode.locale.format.printf", libd__vfprintf_s_l, libc__vfprintf_s_l, TD, 4, TP, TP, TP, TP)
-DFUN(".text.crt.dos.unicode.locale.format.printf", libd__vfprintf_p_l, libc__vfprintf_p_l, TD, 4, TP, TP, TP, TP)
+DEFINE_INTERN_ALIAS(libd__vfprintf_p_l, libd__vfprintf_l);
 DFUN(".text.crt.dos.FILE.locked.read.scanf", libd__vfscanf_l, libc__vfscanf_l, TD, 4, TP, TP, TP, TP)
 DEFINE_INTERN_ALIAS(libd__vfscanf_s_l, libd__vfscanf_l);
 DFUN(".text.crt.dos.FILE.locked.read.scanf", libd__vsnscanf_l, libc__vsnscanf_l, TD, 5, TP, TI, TP, TP, TP)
@@ -1465,20 +1465,20 @@ DFUN(".text.crt.dos.unicode.locale.format.printf", libd__vprintf_l, libc__vprint
 DFUN(".text.crt.dos.unicode.locale.format.printf", libd__vfprintf_l, libc__vfprintf_l, TD, 4, TP, TP, TP, TP)
 DFUN(".text.crt.dos.unicode.locale.format.printf", libd__vscanf_l, libc__vscanf_l, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.unicode.locale.format.printf", libd__vsprintf_l, libc__vsprintf_l, TD, 4, TP, TP, TP, TP)
-DFUN(".text.crt.dos.unicode.static.format.printf", libd__vfprintf_p, libc__vfprintf_p, TD, 3, TP, TP, TP)
-DFUN(".text.crt.dos.unicode.static.format.printf", libd__vprintf_p, libc__vprintf_p, TD, 2, TP, TP)
+DEFINE_INTERN_ALIAS(libd__vfprintf_p, libd_vfprintf);
+DEFINE_INTERN_ALIAS(libd__vprintf_p, libd_vprintf);
 DFUN(".text.crt.dos.unicode.static.format.printf", libd__vsnprintf, libc__vsnprintf, TD, 4, TP, TI, TP, TP)
-DFUN(".text.crt.dos.unicode.static.format.printf", libd__vsprintf_p, libc__vsprintf_p, TD, 4, TP, TI, TP, TP)
+DEFINE_INTERN_ALIAS(libd__vsprintf_p, libd_vsnprintf);
 DFUN(".text.crt.dos.unicode.static.format.printf", libd__vsnprintf_s, libc__vsnprintf_s, TD, 5, TP, TI, TI, TP, TP)
 DFUN(".text.crt.dos.unicode.static.format.printf", libd__vscprintf, libc__vscprintf, TD, 2, TP, TP)
-DFUN(".text.crt.dos.unicode.static.format.printf", libd__vscprintf_p, libc__vscprintf_p, TD, 2, TP, TP)
+DEFINE_INTERN_ALIAS(libd__vscprintf_p, libd__vscprintf);
 DFUN(".text.crt.dos.unicode.static.format.printf", libd__vsnprintf_c, libc__vsnprintf_c, TD, 4, TP, TI, TP, TP)
 DFUN(".text.crt.dos.FILE.locked.read.scanf", libd__vsscanf_l, libc__vsscanf_l, TD, 4, TP, TP, TP, TP)
 DEFINE_INTERN_ALIAS(libd__vsscanf_s_l, libd__vsscanf_l);
 DFUN(".text.crt.dos.FILE.locked.read.scanf", libd__vsnscanf, libc__vsnscanf, TD, 4, TP, TI, TP, TP)
 DEFINE_INTERN_ALIAS(libd__vsnscanf_s, libd__vsnscanf);
 DFUN(".text.crt.dos.unicode.locale.format.printf", libd__vprintf_s_l, libc__vprintf_s_l, TD, 3, TP, TP, TP)
-DFUN(".text.crt.dos.unicode.locale.format.printf", libd__vprintf_p_l, libc__vprintf_p_l, TD, 3, TP, TP, TP)
+DEFINE_INTERN_ALIAS(libd__vprintf_p_l, libd__vprintf_l);
 DFUN(".text.crt.dos.FILE.locked.read.scanf", libd__vscanf_s_l, libc__vscanf_s_l, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.unicode.static.format.printf", libd_vfprintf_s, libc_vfprintf_s, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.unicode.static.format.printf", libd_vprintf_s, libc_vprintf_s, TD, 2, TP, TP)

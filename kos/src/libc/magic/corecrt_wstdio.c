@@ -330,10 +330,12 @@ __STDC_INT_AS_SSIZE_T __stdio_common_vfwprintf_s($uint64_t options, [[nonnull]] 
 }
 
 [[wchar, decl_include("<hybrid/typecore.h>"), requires_function(vfwprintf)]]
+[[crt_intern_alias("__stdio_common_vfwprintf")]] /* Normal wprintf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T __stdio_common_vfwprintf_p($uint64_t options, [[nonnull]] FILE *stream,
                                                  [[nonnull, format]] wchar_t const *format,
                                                  $locale_t locale, $va_list args) {
-	/* TODO: Support for positional arguments */
+	/* NOTE: DOS positional arguments work the same as gLibc's, only that
+	 *       glibc and KOS already bake  them into the normal  `wprintf'. */
 	(void)locale;
 	(void)options;
 	return vfwprintf(stream, format, args);
@@ -367,12 +369,14 @@ __STDC_INT_AS_SSIZE_T __stdio_common_vsnwprintf_s($uint64_t options, wchar_t *bu
 }
 
 [[wchar, decl_include("<hybrid/typecore.h>")]]
+[[crt_intern_alias("__stdio_common_vswprintf")]] /* Normal wprintf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T __stdio_common_vswprintf_p($uint64_t options, wchar_t *buf, size_t bufsize,
                                                  [[nonnull, format]] wchar_t const *format,
                                                  $locale_t locale, $va_list args) {
 	__STDC_INT_AS_SSIZE_T result;
 	(void)locale;
-	/* TODO: Support for positional arguments */
+	/* NOTE: DOS positional arguments work the same as gLibc's, only that
+	 *       glibc and KOS already bake  them into the normal  `wprintf'. */
 	result = vswprintf(buf, bufsize, format, args);
 	if (!(options & _CRT_INTERNAL_PRINTF_STANDARD_SNPRINTF_BEHAVIOR) && (size_t)result > bufsize)
 		result = bufsize;
@@ -428,6 +432,7 @@ __STDC_INT_AS_SSIZE_T _vswprintf_s_l(wchar_t *buf, size_t bufsize, [[nonnull, fo
 	return result < 0 ? -1 : result;
 }
 [[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__stdio_common_vswprintf_p)]]
+[[crt_intern_alias("_vswprintf_c_l")]] /* _vswprintf_l */ /* Normal wprintf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T _vswprintf_p_l(wchar_t *buf, size_t bufsize, [[nonnull, format]] wchar_t const *format, $locale_t locale, $va_list args) {
 	int result = __stdio_common_vswprintf_p(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, buf, bufsize, format, locale, args);
 	return result < 0 ? -1 : result;
@@ -438,6 +443,7 @@ __STDC_INT_AS_SSIZE_T _vscwprintf_l([[nonnull, format]] wchar_t const *format, $
 	return result < 0 ? -1 : result;
 }
 [[wchar, decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__stdio_common_vswprintf_p)]]
+[[crt_intern_alias("_vscwprintf_l")]] /* Normal wprintf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T _vscwprintf_p_l([[nonnull, format]] wchar_t const *format, $locale_t locale, $va_list args) {
 	int result = __stdio_common_vswprintf_p(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS | _CRT_INTERNAL_PRINTF_STANDARD_SNPRINTF_BEHAVIOR, NULL, 0, format, locale, args);
 	return result < 0 ? -1 : result;
@@ -458,6 +464,7 @@ __STDC_INT_AS_SSIZE_T _vfwprintf_s_l([[nonnull]] FILE *stream, [[nonnull, format
 	return __stdio_common_vfwprintf_s(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, stream, format, locale, args);
 }
 [[wchar, decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__stdio_common_vfwprintf_p)]]
+[[crt_intern_alias("_vfwprintf_l")]] /* Normal wprintf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T _vfwprintf_p_l([[nonnull]] FILE *stream, [[nonnull, format]] wchar_t const *format, $locale_t locale, $va_list args) {
 	return __stdio_common_vfwprintf_p(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, stream, format, locale, args);
 }
@@ -514,6 +521,7 @@ __STDC_INT_AS_SSIZE_T _vwscanf_l([[nonnull, format]] wchar_t const *format, $loc
 %[default:section(".text.crt.dos.wchar.unicode.locale.format.printf")];
 %[insert:function(_vswprintf_l = _vswprintf_c_l)];
 [[wchar, decl_include("<features.h>"), requires_function(_vfwprintf_p_l)]]
+[[no_crt_impl]] /* This symbol gets defined by `vfwprintf()' in "wchar.c" */
 __STDC_INT_AS_SSIZE_T _vfwprintf_p([[nonnull]] FILE *stream, [[nonnull, format]] wchar_t const *format, $va_list args) {
 	return _vfwprintf_p_l(stream, format, NULL, args);
 }
@@ -535,10 +543,12 @@ __STDC_INT_AS_SSIZE_T _vswprintf([[nonnull]] wchar_t *buf, [[nonnull, format]] w
 	return _vswprintf_c_l(buf, (size_t)-1, format, NULL, args); /* _vswprintf_l */
 }
 [[wchar, decl_include("<features.h>"), requires_function(_vwprintf_p_l)]]
+[[no_crt_impl]] /* This symbol gets defined by `wprintf()' in "wchar.c" */
 __STDC_INT_AS_SSIZE_T _vwprintf_p([[nonnull, format]] wchar_t const *format, $va_list args) {
 	return _vwprintf_p_l(format, NULL, args);
 }
 [[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), requires_function(_vswprintf_p_l)]]
+[[no_crt_impl]] /* This symbol gets defined by `vswprintf()' in "wchar.c" */
 __STDC_INT_AS_SSIZE_T _vswprintf_p(wchar_t *buf, size_t bufsize, [[nonnull, format]] wchar_t const *format, $va_list args) {
 	return _vswprintf_p_l(buf, bufsize, format, NULL, args);
 }
@@ -547,6 +557,7 @@ __STDC_INT_AS_SSIZE_T _vscwprintf([[nonnull, format]] wchar_t const *format, $va
 	return _vscwprintf_l(format, NULL, args);
 }
 [[wchar, decl_include("<features.h>"), requires_function(_vscwprintf_p_l)]]
+[[crt_intern_alias("_vscwprintf")]] /* Normal wprintf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T _vscwprintf_p([[nonnull, format]] wchar_t const *format, $va_list args) {
 	return _vscwprintf_p_l(format, NULL, args);
 }
@@ -585,6 +596,7 @@ __STDC_INT_AS_SSIZE_T _vwprintf_s_l([[nonnull, format]] wchar_t const *format, $
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stdout) && $has_function(_vfwprintf_p_l))]]
 [[impl_include("<libc/template/stdstreams.h>")]]
+[[crt_intern_alias("_vwprintf_l")]] /* Normal wprintf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T _vwprintf_p_l([[nonnull, format]] wchar_t const *format, $locale_t locale, $va_list args) {
 	return _vfwprintf_p_l(stdout, format, locale, args);
 }
@@ -604,25 +616,31 @@ __STDC_INT_AS_SSIZE_T _vwscanf_s_l([[nonnull, format]] wchar_t const *format, $l
 %[default:section(".text.crt.dos.wchar.unicode.locale.format.printf")];
 [[wchar, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _fwprintf_l([[nonnull]] FILE *stream, [[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("_vfwprintf_l")}
 [[wchar, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _fwprintf_s_l([[nonnull]] FILE *stream, [[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("_vfwprintf_s_l")}
+[[crt_intern_alias("_fwprintf_l")]] /* Normal wprintf already supports positional arguments! */
 [[wchar, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _fwprintf_p_l([[nonnull]] FILE *stream, [[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("_vfwprintf_p_l")}
 [[wchar, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _wprintf_l([[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("_vwprintf_l")}
 [[wchar, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _wprintf_s_l([[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("_vwprintf_s_l")}
+[[crt_intern_alias("_wprintf_l")]] /* Normal wprintf already supports positional arguments! */
 [[wchar, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _wprintf_p_l([[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("_vwprintf_p_l")}
 [[wchar, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T __swprintf_l([[nonnull]] wchar_t *buf, [[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("__vswprintf_l")}
 %[default:section(".text.crt.dos.wchar.unicode.static.format.printf")];
+[[no_crt_impl]] /* This symbol gets defined by `fwprintf()' in "wchar.c" */
 [[wchar, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _fwprintf_p([[nonnull]] FILE *stream, [[nonnull, format]] wchar_t const *format, ...) %{printf("_vfwprintf_p")}
+[[no_crt_impl]] /* This symbol gets defined by `wprintf()' in "wchar.c" */
 [[wchar, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _wprintf_p([[nonnull, format]] wchar_t const *format, ...) %{printf("_vwprintf_p")}
 [[wchar, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _swprintf([[nonnull]] wchar_t *buf, [[nonnull, format]] wchar_t const *format, ...) %{printf("_vswprintf")}
 
 %[default:section(".text.crt.dos.wchar.unicode.locale.format.printf")];
 %[insert:function(_swprintf_l = _swprintf_c_l)];
 [[wchar, decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _swprintf_s_l(wchar_t *buf, size_t bufsize, [[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("_vswprintf_s_l")}
+[[crt_intern_alias("_swprintf_c_l")]] /* _swprintf_l */ /* Normal wprintf already supports positional arguments! */
 [[wchar, decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _swprintf_p_l(wchar_t *buf, size_t bufsize, [[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("_vswprintf_p_l")}
 [[preferred_export_alias("_swprintf_l")]]
 [[wchar, decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _swprintf_c_l(wchar_t *buf, size_t bufsize, [[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("_vswprintf_c_l")}
 [[wchar, decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _snwprintf_l(wchar_t *buf, size_t bufsize, [[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("_vsnwprintf_l")}
 [[wchar, decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _snwprintf_s_l(wchar_t *buf, size_t bufsize, size_t maxsize, [[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("_vsnwprintf_s_l")}
 %[default:section(".text.crt.dos.wchar.unicode.static.format.printf")];
+[[no_crt_impl]] /* This symbol gets defined by `swprintf()' in "wchar.c" */
 [[wchar, decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _swprintf_p(wchar_t *buf, size_t bufsize, [[nonnull, format]] wchar_t const *format, ...) %{printf("_vswprintf_p")}
 [[wchar, decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _swprintf_c(wchar_t *buf, size_t bufsize, [[nonnull, format]] wchar_t const *format, ...) %{printf("_vswprintf_c")}
 [[wchar, decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _snwprintf(wchar_t *buf, size_t bufsize, [[nonnull, format]] wchar_t const *format, ...) %{printf("_vsnwprintf")}
@@ -630,9 +648,11 @@ __STDC_INT_AS_SSIZE_T _vwscanf_s_l([[nonnull, format]] wchar_t const *format, $l
 
 %[default:section(".text.crt.dos.wchar.unicode.locale.format.printf")];
 [[wchar, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _scwprintf_l([[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("_vscwprintf_l")}
+[[crt_intern_alias("_scwprintf_l")]] /* Normal wprintf already supports positional arguments! */
 [[wchar, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _scwprintf_p_l([[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("_vscwprintf_p_l")}
 %[default:section(".text.crt.dos.wchar.unicode.static.format.printf")];
 [[wchar, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _scwprintf([[nonnull, format]] wchar_t const *format, ...) %{printf("_vscwprintf")}
+[[crt_intern_alias("_scwprintf")]] /* Normal wprintf already supports positional arguments! */
 [[wchar, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _scwprintf_p([[nonnull, format]] wchar_t const *format, ...) %{printf("_vscwprintf_p")}
 
 %[default:section(".text.crt.dos.wchar.FILE.locked.read.scanf")];

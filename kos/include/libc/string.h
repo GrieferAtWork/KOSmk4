@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2c26510 */
+/* HASH CRC-32:0x1caab0a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -516,154 +516,199 @@
 #define __libc_rawmemrlenq __libc_core_rawmemrlenq
 #endif /* !__fast_rawmemrlenq_defined */
 #ifdef __fast_memmoveup_defined
-/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !n_bytes')
+/* >> memmoveup(3)
+ * Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !n_bytes')
  * @return: * : Always re-returns `dst' */
 #define __libc_memmoveup (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveup))
 #else /* __fast_memmoveup_defined */
-/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !n_bytes')
+/* >> memmoveup(3)
+ * Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !n_bytes')
  * @return: * : Always re-returns `dst' */
 #define __libc_memmoveup __libc_core_memmoveup
 #endif /* !__fast_memmoveup_defined */
 #ifdef __fast_memmovedown_defined
-/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !n_bytes')
+/* >> memmovedown(3)
+ * Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !n_bytes')
  * @return: * : Always re-returns `dst' */
 #define __libc_memmovedown (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedown))
 #else /* __fast_memmovedown_defined */
-/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !n_bytes')
+/* >> memmovedown(3)
+ * Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !n_bytes')
  * @return: * : Always re-returns `dst' */
 #define __libc_memmovedown __libc_core_memmovedown
 #endif /* !__fast_memmovedown_defined */
 #ifdef __fast_memcpyc_defined
-/* Copy memory between non-overlapping memory blocks.
+/* >> memcpyc(3)
+ * Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __libc_memcpyc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyc))
 #else /* __fast_memcpyc_defined */
-/* Copy memory between non-overlapping memory blocks.
+/* >> memcpyc(3)
+ * Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __libc_memcpyc __libc_core_memcpyc
 #endif /* !__fast_memcpyc_defined */
 #ifdef __fast_mempcpyc_defined
-/* Same as `memcpyc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
+/* >> mempcpyc(3)
+ * Same as `memcpyc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 #define __libc_mempcpyc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpyc))
 #else /* __fast_mempcpyc_defined */
-/* Same as `memcpyc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
+/* >> mempcpyc(3)
+ * Same as `memcpyc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 #define __libc_mempcpyc __libc_core_mempcpyc
 #endif /* !__fast_mempcpyc_defined */
 #ifdef __fast_memmovec_defined
-/* Move memory between potentially overlapping memory blocks
+/* >> memmovec(3)
+ * Move memory between potentially overlapping memory blocks
  * @return: * : Always re-returns `dst' */
 #define __libc_memmovec (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovec))
 #else /* __fast_memmovec_defined */
-/* Move memory between potentially overlapping memory blocks
+/* >> memmovec(3)
+ * Move memory between potentially overlapping memory blocks
  * @return: * : Always re-returns `dst' */
 #define __libc_memmovec __libc_core_memmovec
 #endif /* !__fast_memmovec_defined */
 #ifdef __fast_mempmovec_defined
-/* Same as `memmovec', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
+/* >> mempmovec(3)
+ * Same as `memmovec', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 #define __libc_mempmovec (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovec))
 #else /* __fast_mempmovec_defined */
-/* Same as `memmovec', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
+/* >> mempmovec(3)
+ * Same as `memmovec', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 #define __libc_mempmovec __libc_core_mempmovec
 #endif /* !__fast_mempmovec_defined */
 #ifdef __fast_memmoveupc_defined
-/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE')
+/* >> memmoveupc(3)
+ * Move memory between potentially overlapping memory
+ * blocks (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 #define __libc_memmoveupc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveupc))
 #else /* __fast_memmoveupc_defined */
-/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE')
+/* >> memmoveupc(3)
+ * Move memory between potentially overlapping memory
+ * blocks (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 #define __libc_memmoveupc __libc_core_memmoveupc
 #endif /* !__fast_memmoveupc_defined */
 #ifdef __fast_mempmoveupc_defined
-/* Same   as   `memmoveupc',  but   return  `dst + (ELEM_COUNT * ELEM_SIZE)',
+/* >> mempmoveupc(3)
+ * Same   as   `memmoveupc',  but   return  `dst + (ELEM_COUNT * ELEM_SIZE)',
  * rather than `dst' (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE') */
 #define __libc_mempmoveupc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupc))
 #else /* __fast_mempmoveupc_defined */
-/* Same   as   `memmoveupc',  but   return  `dst + (ELEM_COUNT * ELEM_SIZE)',
+/* >> mempmoveupc(3)
+ * Same   as   `memmoveupc',  but   return  `dst + (ELEM_COUNT * ELEM_SIZE)',
  * rather than `dst' (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE') */
 #define __libc_mempmoveupc __libc_core_mempmoveupc
 #endif /* !__fast_mempmoveupc_defined */
 #ifdef __fast_memmovedownc_defined
-/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE')
+/* >> memmovedownc(3)
+ * Move memory between potentially overlapping memory
+ * blocks (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 #define __libc_memmovedownc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedownc))
 #else /* __fast_memmovedownc_defined */
-/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE')
+/* >> memmovedownc(3)
+ * Move memory between potentially overlapping memory
+ * blocks (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 #define __libc_memmovedownc __libc_core_memmovedownc
 #endif /* !__fast_memmovedownc_defined */
 #ifdef __fast_mempmovedownc_defined
-/* Same as `memmovedownc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE') */
+/* >> mempmovedownc(3)
+ * Same  as  `memmovedownc',  but  return   `dst + (ELEM_COUNT * ELEM_SIZE)',
+ * rather than `dst' (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE') */
 #define __libc_mempmovedownc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedownc))
 #else /* __fast_mempmovedownc_defined */
-/* Same as `memmovedownc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE') */
+/* >> mempmovedownc(3)
+ * Same  as  `memmovedownc',  but  return   `dst + (ELEM_COUNT * ELEM_SIZE)',
+ * rather than `dst' (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE') */
 #define __libc_mempmovedownc __libc_core_mempmovedownc
 #endif /* !__fast_mempmovedownc_defined */
-/* Same as `str + strlen(str)' */
+/* >> strend(3)
+ * Same as `str + strlen(str)' */
 #define __libc_strend __libc_core_strend
-/* Same as `str + strnlen(str, max_chars)' */
+/* >> strnend(3)
+ * Same as `str + strnlen(str, max_chars)' */
 #define __libc_strnend __libc_core_strnend
 #ifdef __fast_mempset_defined
-/* Same as `memset', but return `dst + n_bytes', rather than `dst' */
+/* >> mempset(3)
+ * Same as `memset', but return `dst + n_bytes', rather than `dst' */
 #define __libc_mempset (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempset))
 #else /* __fast_mempset_defined */
-/* Same as `memset', but return `dst + n_bytes', rather than `dst' */
+/* >> mempset(3)
+ * Same as `memset', but return `dst + n_bytes', rather than `dst' */
 #define __libc_mempset __libc_core_mempset
 #endif /* !__fast_mempset_defined */
 #ifdef __fast_mempmove_defined
-/* Same as `memmove', but return `dst + n_bytes', rather than `dst' */
+/* >> mempmove(3)
+ * Same as `memmove', but return `dst + n_bytes', rather than `dst' */
 #define __libc_mempmove (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmove))
 #else /* __fast_mempmove_defined */
-/* Same as `memmove', but return `dst + n_bytes', rather than `dst' */
+/* >> mempmove(3)
+ * Same as `memmove', but return `dst + n_bytes', rather than `dst' */
 #define __libc_mempmove __libc_core_mempmove
 #endif /* !__fast_mempmove_defined */
 #ifdef __fast_mempmoveup_defined
-/* Same as `memmoveup', but return `dst + n_bytes', rather than `dst' (assumes that `dst >= src || !n_bytes') */
+/* >> mempmoveup(3)
+ * Same as `memmoveup', but return `dst + n_bytes', rather than `dst' (assumes that `dst >= src || !n_bytes') */
 #define __libc_mempmoveup (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveup))
 #else /* __fast_mempmoveup_defined */
-/* Same as `memmoveup', but return `dst + n_bytes', rather than `dst' (assumes that `dst >= src || !n_bytes') */
+/* >> mempmoveup(3)
+ * Same as `memmoveup', but return `dst + n_bytes', rather than `dst' (assumes that `dst >= src || !n_bytes') */
 #define __libc_mempmoveup __libc_core_mempmoveup
 #endif /* !__fast_mempmoveup_defined */
 #ifdef __fast_mempmovedown_defined
-/* Same as `memmovedown', but return `dst + n_bytes', rather than `dst' (assumes that `dst <= src || !n_bytes') */
+/* >> mempmovedown(3)
+ * Same as `memmovedown', but return `dst + n_bytes', rather than `dst' (assumes that `dst <= src || !n_bytes') */
 #define __libc_mempmovedown (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedown))
 #else /* __fast_mempmovedown_defined */
-/* Same as `memmovedown', but return `dst + n_bytes', rather than `dst' (assumes that `dst <= src || !n_bytes') */
+/* >> mempmovedown(3)
+ * Same as `memmovedown', but return `dst + n_bytes', rather than `dst' (assumes that `dst <= src || !n_bytes') */
 #define __libc_mempmovedown __libc_core_mempmovedown
 #endif /* !__fast_mempmovedown_defined */
 #ifdef __fast_memend_defined
-/* Same as `memchr', but return `haystack + n_bytes', rather than `NULL' if `needle' wasn't found. */
+/* >> memend(3)
+ * Same as `memchr', but return `haystack + n_bytes', rather than `NULL' if `needle' wasn't found. */
 #define __libc_memend (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memend))
 #else /* __fast_memend_defined */
-/* Same as `memchr', but return `haystack + n_bytes', rather than `NULL' if `needle' wasn't found. */
+/* >> memend(3)
+ * Same as `memchr', but return `haystack + n_bytes', rather than `NULL' if `needle' wasn't found. */
 #define __libc_memend __libc_core_memend
 #endif /* !__fast_memend_defined */
 #ifdef __fast_memrend_defined
-/* Same as `memrchr', but return `haystack - 1', rather than `NULL' if `needle' wasn't found. */
+/* >> memrend(3)
+ * Same as `memrchr', but return `haystack - 1', rather than `NULL' if `needle' wasn't found. */
 #define __libc_memrend (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrend))
 #else /* __fast_memrend_defined */
-/* Same as `memrchr', but return `haystack - 1', rather than `NULL' if `needle' wasn't found. */
+/* >> memrend(3)
+ * Same as `memrchr', but return `haystack - 1', rather than `NULL' if `needle' wasn't found. */
 #define __libc_memrend __libc_core_memrend
 #endif /* !__fast_memrend_defined */
 #ifdef __fast_memlen_defined
-/* Same as `memend', but return the offset from `haystack', rather than the actual address.
+/* >> memlen(3)
+ * Same as `memend', but return the offset from `haystack', rather than the actual address.
  * Returns `n_bytes' if the given `needle' wasn't found */
 #define __libc_memlen (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memlen))
 #else /* __fast_memlen_defined */
-/* Same as `memend', but return the offset from `haystack', rather than the actual address.
+/* >> memlen(3)
+ * Same as `memend', but return the offset from `haystack', rather than the actual address.
  * Returns `n_bytes' if the given `needle' wasn't found */
 #define __libc_memlen __libc_core_memlen
 #endif /* !__fast_memlen_defined */
 #ifdef __fast_memrlen_defined
-/* Same as `memrend', but return the offset from `haystack', rather than the actual address.
+/* >> memrlen(3)
+ * Same as `memrend', but return the offset from `haystack', rather than the actual address.
  * Returns `(size_t)-1' if the given `needle' wasn't found */
 #define __libc_memrlen (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrlen))
 #else /* __fast_memrlen_defined */
-/* Same as `memrend', but return the offset from `haystack', rather than the actual address.
+/* >> memrlen(3)
+ * Same as `memrend', but return the offset from `haystack', rather than the actual address.
  * Returns `(size_t)-1' if the given `needle' wasn't found */
 #define __libc_memrlen __libc_core_memrlen
 #endif /* !__fast_memrlen_defined */
-/* Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+/* >> memrmem(3)
+ * Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -672,24 +717,30 @@
  * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 #define __libc_memrmem __libc_core_memrmem
 #ifdef __fast_mempatw_defined
-/* Same as `memsetw', but repeat a 2-byte pattern on aligned addresses. */
+/* >> mempatw(3)
+ * Same as `memsetw', but repeat a 2-byte pattern on aligned addresses. */
 #define __libc_mempatw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempatw))
 #else /* __fast_mempatw_defined */
-/* Same as `memsetw', but repeat a 2-byte pattern on aligned addresses. */
+/* >> mempatw(3)
+ * Same as `memsetw', but repeat a 2-byte pattern on aligned addresses. */
 #define __libc_mempatw __libc_core_mempatw
 #endif /* !__fast_mempatw_defined */
 #ifdef __fast_mempatl_defined
-/* Same as `memsetl', but repeat a 4-byte pattern on aligned addresses. */
+/* >> mempatl(3)
+ * Same as `memsetl', but repeat a 4-byte pattern on aligned addresses. */
 #define __libc_mempatl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempatl))
 #else /* __fast_mempatl_defined */
-/* Same as `memsetl', but repeat a 4-byte pattern on aligned addresses. */
+/* >> mempatl(3)
+ * Same as `memsetl', but repeat a 4-byte pattern on aligned addresses. */
 #define __libc_mempatl __libc_core_mempatl
 #endif /* !__fast_mempatl_defined */
 #ifdef __fast_mempatq_defined
-/* Same as `memsetq', but repeat an 8-byte pattern on aligned addresses. */
+/* >> mempatq(3)
+ * Same as `memsetq', but repeat an 8-byte pattern on aligned addresses. */
 #define __libc_mempatq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempatq))
 #else /* __fast_mempatq_defined */
-/* Same as `memsetq', but repeat an 8-byte pattern on aligned addresses. */
+/* >> mempatq(3)
+ * Same as `memsetq', but repeat an 8-byte pattern on aligned addresses. */
 #define __libc_mempatq __libc_core_mempatq
 #endif /* !__fast_mempatq_defined */
 #define __libc_PRIVATE_memset1 __libc_memset

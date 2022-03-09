@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa18662ef */
+/* HASH CRC-32:0x5fb5b522 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5429,13 +5429,21 @@ DEFINE_PUBLIC_ALIAS(DOS$wcsstr, libd_wcsstr);
 DEFINE_PUBLIC_ALIAS(wcswcs, libc_wcsstr);
 DEFINE_PUBLIC_ALIAS(wcsstr, libc_wcsstr);
 DEFINE_PUBLIC_ALIAS(fwide, libc_fwide);
+DEFINE_PUBLIC_ALIAS(DOS$_fwprintf_p, libd_fwprintf);
 DEFINE_PUBLIC_ALIAS(DOS$fwprintf, libd_fwprintf);
+DEFINE_PUBLIC_ALIAS(_fwprintf_p, libc_fwprintf);
 DEFINE_PUBLIC_ALIAS(fwprintf, libc_fwprintf);
+DEFINE_PUBLIC_ALIAS(DOS$_vfwprintf_p, libd_vfwprintf);
 DEFINE_PUBLIC_ALIAS(DOS$vfwprintf, libd_vfwprintf);
+DEFINE_PUBLIC_ALIAS(_vfwprintf_p, libc_vfwprintf);
 DEFINE_PUBLIC_ALIAS(vfwprintf, libc_vfwprintf);
+DEFINE_PUBLIC_ALIAS(DOS$_wprintf_p, libd_wprintf);
 DEFINE_PUBLIC_ALIAS(DOS$wprintf, libd_wprintf);
+DEFINE_PUBLIC_ALIAS(_wprintf_p, libc_wprintf);
 DEFINE_PUBLIC_ALIAS(wprintf, libc_wprintf);
+DEFINE_PUBLIC_ALIAS(DOS$_vwprintf_p, libd_vwprintf);
 DEFINE_PUBLIC_ALIAS(DOS$vwprintf, libd_vwprintf);
+DEFINE_PUBLIC_ALIAS(_vwprintf_p, libc_vwprintf);
 DEFINE_PUBLIC_ALIAS(vwprintf, libc_vwprintf);
 DEFINE_PUBLIC_ALIAS(DOS$fwscanf, libd_fwscanf);
 DEFINE_PUBLIC_ALIAS(fwscanf, libc_fwscanf);
@@ -5443,9 +5451,13 @@ DEFINE_PUBLIC_ALIAS(DOS$wscanf, libd_wscanf);
 DEFINE_PUBLIC_ALIAS(wscanf, libc_wscanf);
 DEFINE_PUBLIC_ALIAS(DOS$swscanf, libd_swscanf);
 DEFINE_PUBLIC_ALIAS(swscanf, libc_swscanf);
+DEFINE_PUBLIC_ALIAS(DOS$_vswprintf_p, libd_vswprintf);
 DEFINE_PUBLIC_ALIAS(DOS$vswprintf, libd_vswprintf);
+DEFINE_PUBLIC_ALIAS(_vswprintf_p, libc_vswprintf);
 DEFINE_PUBLIC_ALIAS(vswprintf, libc_vswprintf);
+DEFINE_PUBLIC_ALIAS(DOS$_swprintf_p, libd_swprintf);
 DEFINE_PUBLIC_ALIAS(DOS$swprintf, libd_swprintf);
+DEFINE_PUBLIC_ALIAS(_swprintf_p, libc_swprintf);
 DEFINE_PUBLIC_ALIAS(swprintf, libc_swprintf);
 DEFINE_PUBLIC_ALIAS(DOS$wcstod, libd_wcstod);
 DEFINE_PUBLIC_ALIAS(wcstod, libc_wcstod);

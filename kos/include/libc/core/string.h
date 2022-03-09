@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d299d00 */
+/* HASH CRC-32:0x32552ff7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -989,222 +989,273 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 #endif /* !__CRT_HAVE_rawmemrlenq */
 #ifdef __CRT_HAVE_memmoveup
 #include <hybrid/typecore.h>
-/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !n_bytes')
+/* >> memmoveup(3)
+ * Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !n_bytes')
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_memmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmoveup,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE_memmove)
 #include <hybrid/typecore.h>
-/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !n_bytes')
+/* >> memmoveup(3)
+ * Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !n_bytes')
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_memmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmove,(__dst,__src,__n_bytes))
 #else /* ... */
 #include <libc/local/string/memmoveup.h>
-/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !n_bytes')
+/* >> memmoveup(3)
+ * Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !n_bytes')
  * @return: * : Always re-returns `dst' */
 #define __libc_core_memmoveup __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveup)
 #endif /* !... */
 #ifdef __CRT_HAVE_memmovedown
 #include <hybrid/typecore.h>
-/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !n_bytes')
+/* >> memmovedown(3)
+ * Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !n_bytes')
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_memmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmovedown,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE_memmove)
 #include <hybrid/typecore.h>
-/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !n_bytes')
+/* >> memmovedown(3)
+ * Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !n_bytes')
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_memmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmove,(__dst,__src,__n_bytes))
 #else /* ... */
 #include <libc/local/string/memmovedown.h>
-/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !n_bytes')
+/* >> memmovedown(3)
+ * Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !n_bytes')
  * @return: * : Always re-returns `dst' */
 #define __libc_core_memmovedown __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedown)
 #endif /* !... */
 #ifdef __CRT_HAVE_memcpyc
 #include <hybrid/typecore.h>
-/* Copy memory between non-overlapping memory blocks.
+/* >> memcpyc(3)
+ * Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memcpyc */
 #include <libc/local/string/memcpyc.h>
-/* Copy memory between non-overlapping memory blocks.
+/* >> memcpyc(3)
+ * Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __libc_core_memcpyc __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyc)
 #endif /* !__CRT_HAVE_memcpyc */
 #ifdef __CRT_HAVE_mempcpyc
 #include <hybrid/typecore.h>
-/* Same as `memcpyc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
+/* >> mempcpyc(3)
+ * Same as `memcpyc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_mempcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_mempcpyc */
 #include <libc/local/string/mempcpyc.h>
-/* Same as `memcpyc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
+/* >> mempcpyc(3)
+ * Same as `memcpyc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 #define __libc_core_mempcpyc __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpyc)
 #endif /* !__CRT_HAVE_mempcpyc */
 #ifdef __CRT_HAVE_memmovec
 #include <hybrid/typecore.h>
-/* Move memory between potentially overlapping memory blocks
+/* >> memmovec(3)
+ * Move memory between potentially overlapping memory blocks
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_memmovec,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmovec,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memmovec */
 #include <libc/local/string/memmovec.h>
-/* Move memory between potentially overlapping memory blocks
+/* >> memmovec(3)
+ * Move memory between potentially overlapping memory blocks
  * @return: * : Always re-returns `dst' */
 #define __libc_core_memmovec __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovec)
 #endif /* !__CRT_HAVE_memmovec */
 #ifdef __CRT_HAVE_mempmovec
 #include <hybrid/typecore.h>
-/* Same as `memmovec', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
+/* >> mempmovec(3)
+ * Same as `memmovec', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_mempmovec,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempmovec,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_mempmovec */
 #include <libc/local/string/mempmovec.h>
-/* Same as `memmovec', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
+/* >> mempmovec(3)
+ * Same as `memmovec', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 #define __libc_core_mempmovec __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovec)
 #endif /* !__CRT_HAVE_mempmovec */
 #ifdef __CRT_HAVE_memmoveupc
 #include <hybrid/typecore.h>
-/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE')
+/* >> memmoveupc(3)
+ * Move memory between potentially overlapping memory
+ * blocks (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_memmoveupc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmoveupc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memmoveupc */
 #include <libc/local/string/memmoveupc.h>
-/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE')
+/* >> memmoveupc(3)
+ * Move memory between potentially overlapping memory
+ * blocks (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 #define __libc_core_memmoveupc __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveupc)
 #endif /* !__CRT_HAVE_memmoveupc */
 #ifdef __CRT_HAVE_mempmoveupc
 #include <hybrid/typecore.h>
-/* Same   as   `memmoveupc',  but   return  `dst + (ELEM_COUNT * ELEM_SIZE)',
+/* >> mempmoveupc(3)
+ * Same   as   `memmoveupc',  but   return  `dst + (ELEM_COUNT * ELEM_SIZE)',
  * rather than `dst' (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_mempmoveupc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempmoveupc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_mempmoveupc */
 #include <libc/local/string/mempmoveupc.h>
-/* Same   as   `memmoveupc',  but   return  `dst + (ELEM_COUNT * ELEM_SIZE)',
+/* >> mempmoveupc(3)
+ * Same   as   `memmoveupc',  but   return  `dst + (ELEM_COUNT * ELEM_SIZE)',
  * rather than `dst' (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE') */
 #define __libc_core_mempmoveupc __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveupc)
 #endif /* !__CRT_HAVE_mempmoveupc */
 #ifdef __CRT_HAVE_memmovedownc
 #include <hybrid/typecore.h>
-/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE')
+/* >> memmovedownc(3)
+ * Move memory between potentially overlapping memory
+ * blocks (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_memmovedownc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmovedownc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memmovedownc */
 #include <libc/local/string/memmovedownc.h>
-/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE')
+/* >> memmovedownc(3)
+ * Move memory between potentially overlapping memory
+ * blocks (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 #define __libc_core_memmovedownc __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedownc)
 #endif /* !__CRT_HAVE_memmovedownc */
 #ifdef __CRT_HAVE_mempmovedownc
 #include <hybrid/typecore.h>
-/* Same as `memmovedownc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE') */
+/* >> mempmovedownc(3)
+ * Same  as  `memmovedownc',  but  return   `dst + (ELEM_COUNT * ELEM_SIZE)',
+ * rather than `dst' (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_mempmovedownc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempmovedownc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_mempmovedownc */
 #include <libc/local/string/mempmovedownc.h>
-/* Same as `memmovedownc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE') */
+/* >> mempmovedownc(3)
+ * Same  as  `memmovedownc',  but  return   `dst + (ELEM_COUNT * ELEM_SIZE)',
+ * rather than `dst' (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE') */
 #define __libc_core_mempmovedownc __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovedownc)
 #endif /* !__CRT_HAVE_mempmovedownc */
 #ifdef __CRT_HAVE_strend
-/* Same as `str + strlen(str)' */
+/* >> strend(3)
+ * Same as `str + strlen(str)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__libc_core_strend,(char const *__restrict __str),strend,(__str))
 #else /* __CRT_HAVE_strend */
 #include <libc/local/string/strend.h>
-/* Same as `str + strlen(str)' */
+/* >> strend(3)
+ * Same as `str + strlen(str)' */
 #define __libc_core_strend __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strend)
 #endif /* !__CRT_HAVE_strend */
 #ifdef __CRT_HAVE_strnend
 #include <hybrid/typecore.h>
-/* Same as `str + strnlen(str, max_chars)' */
+/* >> strnend(3)
+ * Same as `str + strnlen(str, max_chars)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__libc_core_strnend,(char const *__restrict __str, __SIZE_TYPE__ __maxlen),strnend,(__str,__maxlen))
 #else /* __CRT_HAVE_strnend */
 #include <libc/local/string/strnend.h>
-/* Same as `str + strnlen(str, max_chars)' */
+/* >> strnend(3)
+ * Same as `str + strnlen(str, max_chars)' */
 #define __libc_core_strnend __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnend)
 #endif /* !__CRT_HAVE_strnend */
 #ifdef __CRT_HAVE_mempset
 #include <hybrid/typecore.h>
-/* Same as `memset', but return `dst + n_bytes', rather than `dst' */
+/* >> mempset(3)
+ * Same as `memset', but return `dst + n_bytes', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__libc_core_mempset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),mempset,(__dst,__byte,__n_bytes))
 #else /* __CRT_HAVE_mempset */
 #include <libc/local/string/mempset.h>
-/* Same as `memset', but return `dst + n_bytes', rather than `dst' */
+/* >> mempset(3)
+ * Same as `memset', but return `dst + n_bytes', rather than `dst' */
 #define __libc_core_mempset __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempset)
 #endif /* !__CRT_HAVE_mempset */
 #ifdef __CRT_HAVE_mempmove
 #include <hybrid/typecore.h>
-/* Same as `memmove', but return `dst + n_bytes', rather than `dst' */
+/* >> mempmove(3)
+ * Same as `memmove', but return `dst + n_bytes', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_mempmove,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmove,(__dst,__src,__n_bytes))
 #else /* __CRT_HAVE_mempmove */
 #include <libc/local/string/mempmove.h>
-/* Same as `memmove', but return `dst + n_bytes', rather than `dst' */
+/* >> mempmove(3)
+ * Same as `memmove', but return `dst + n_bytes', rather than `dst' */
 #define __libc_core_mempmove __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmove)
 #endif /* !__CRT_HAVE_mempmove */
 #ifdef __CRT_HAVE_mempmoveup
 #include <hybrid/typecore.h>
-/* Same as `memmoveup', but return `dst + n_bytes', rather than `dst' (assumes that `dst >= src || !n_bytes') */
+/* >> mempmoveup(3)
+ * Same as `memmoveup', but return `dst + n_bytes', rather than `dst' (assumes that `dst >= src || !n_bytes') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_mempmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmoveup,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE_mempmove)
 #include <hybrid/typecore.h>
-/* Same as `memmoveup', but return `dst + n_bytes', rather than `dst' (assumes that `dst >= src || !n_bytes') */
+/* >> mempmoveup(3)
+ * Same as `memmoveup', but return `dst + n_bytes', rather than `dst' (assumes that `dst >= src || !n_bytes') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_mempmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmove,(__dst,__src,__n_bytes))
 #else /* ... */
 #include <libc/local/string/mempmoveup.h>
-/* Same as `memmoveup', but return `dst + n_bytes', rather than `dst' (assumes that `dst >= src || !n_bytes') */
+/* >> mempmoveup(3)
+ * Same as `memmoveup', but return `dst + n_bytes', rather than `dst' (assumes that `dst >= src || !n_bytes') */
 #define __libc_core_mempmoveup __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveup)
 #endif /* !... */
 #ifdef __CRT_HAVE_mempmovedown
 #include <hybrid/typecore.h>
-/* Same as `memmovedown', but return `dst + n_bytes', rather than `dst' (assumes that `dst <= src || !n_bytes') */
+/* >> mempmovedown(3)
+ * Same as `memmovedown', but return `dst + n_bytes', rather than `dst' (assumes that `dst <= src || !n_bytes') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_mempmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmovedown,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE_mempmove)
 #include <hybrid/typecore.h>
-/* Same as `memmovedown', but return `dst + n_bytes', rather than `dst' (assumes that `dst <= src || !n_bytes') */
+/* >> mempmovedown(3)
+ * Same as `memmovedown', but return `dst + n_bytes', rather than `dst' (assumes that `dst <= src || !n_bytes') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_mempmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmove,(__dst,__src,__n_bytes))
 #else /* ... */
 #include <libc/local/string/mempmovedown.h>
-/* Same as `memmovedown', but return `dst + n_bytes', rather than `dst' (assumes that `dst <= src || !n_bytes') */
+/* >> mempmovedown(3)
+ * Same as `memmovedown', but return `dst + n_bytes', rather than `dst' (assumes that `dst <= src || !n_bytes') */
 #define __libc_core_mempmovedown __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovedown)
 #endif /* !... */
 #ifdef __CRT_HAVE_memend
 #include <hybrid/typecore.h>
-/* Same as `memchr', but return `haystack + n_bytes', rather than `NULL' if `needle' wasn't found. */
+/* >> memend(3)
+ * Same as `memchr', but return `haystack + n_bytes', rather than `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__libc_core_memend,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memend,(__haystack,__needle,__n_bytes))
 #else /* __CRT_HAVE_memend */
 #include <libc/local/string/memend.h>
-/* Same as `memchr', but return `haystack + n_bytes', rather than `NULL' if `needle' wasn't found. */
+/* >> memend(3)
+ * Same as `memchr', but return `haystack + n_bytes', rather than `NULL' if `needle' wasn't found. */
 #define __libc_core_memend __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memend)
 #endif /* !__CRT_HAVE_memend */
 #ifdef __CRT_HAVE_memrend
 #include <hybrid/typecore.h>
-/* Same as `memrchr', but return `haystack - 1', rather than `NULL' if `needle' wasn't found. */
+/* >> memrend(3)
+ * Same as `memrchr', but return `haystack - 1', rather than `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__libc_core_memrend,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memrend,(__haystack,__needle,__n_bytes))
 #else /* __CRT_HAVE_memrend */
 #include <libc/local/string/memrend.h>
-/* Same as `memrchr', but return `haystack - 1', rather than `NULL' if `needle' wasn't found. */
+/* >> memrend(3)
+ * Same as `memrchr', but return `haystack - 1', rather than `NULL' if `needle' wasn't found. */
 #define __libc_core_memrend __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrend)
 #endif /* !__CRT_HAVE_memrend */
 #ifdef __CRT_HAVE_memlen
 #include <hybrid/typecore.h>
-/* Same as `memend', but return the offset from `haystack', rather than the actual address.
+/* >> memlen(3)
+ * Same as `memend', but return the offset from `haystack', rather than the actual address.
  * Returns `n_bytes' if the given `needle' wasn't found */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_memlen,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memlen,(__haystack,__needle,__n_bytes))
 #else /* __CRT_HAVE_memlen */
 #include <libc/local/string/memlen.h>
-/* Same as `memend', but return the offset from `haystack', rather than the actual address.
+/* >> memlen(3)
+ * Same as `memend', but return the offset from `haystack', rather than the actual address.
  * Returns `n_bytes' if the given `needle' wasn't found */
 #define __libc_core_memlen __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memlen)
 #endif /* !__CRT_HAVE_memlen */
 #ifdef __CRT_HAVE_memrlen
 #include <hybrid/typecore.h>
-/* Same as `memrend', but return the offset from `haystack', rather than the actual address.
+/* >> memrlen(3)
+ * Same as `memrend', but return the offset from `haystack', rather than the actual address.
  * Returns `(size_t)-1' if the given `needle' wasn't found */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_memrlen,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memrlen,(__haystack,__needle,__n_bytes))
 #else /* __CRT_HAVE_memrlen */
 #include <libc/local/string/memrlen.h>
-/* Same as `memrend', but return the offset from `haystack', rather than the actual address.
+/* >> memrlen(3)
+ * Same as `memrend', but return the offset from `haystack', rather than the actual address.
  * Returns `(size_t)-1' if the given `needle' wasn't found */
 #define __libc_core_memrlen __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrlen)
 #endif /* !__CRT_HAVE_memrlen */
 #if defined(__CRT_HAVE_memrmem0) && defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
 #include <hybrid/typecore.h>
-/* Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+/* >> memrmem(3)
+ * Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -1214,7 +1265,8 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void *,__NOTHROW_NCX,__libc_core_memrmem,(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen),memrmem0,(__haystack,__haystacklen,__needle,__needlelen))
 #elif defined(__CRT_HAVE_memrmem) && !defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
 #include <hybrid/typecore.h>
-/* Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+/* >> memrmem(3)
+ * Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -1224,7 +1276,8 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void *,__NOTHROW_N
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void *,__NOTHROW_NCX,__libc_core_memrmem,(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen),memrmem,(__haystack,__haystacklen,__needle,__needlelen))
 #else /* ... */
 #include <libc/local/string/memrmem.h>
-/* Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+/* >> memrmem(3)
+ * Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -1235,29 +1288,35 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void *,__NOTHROW_N
 #endif /* !... */
 #ifdef __CRT_HAVE_mempatw
 #include <hybrid/typecore.h>
-/* Same as `memsetw', but repeat a 2-byte pattern on aligned addresses. */
+/* >> mempatw(3)
+ * Same as `memsetw', but repeat a 2-byte pattern on aligned addresses. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__libc_core_mempatw,(void *__restrict __dst, __UINT16_TYPE__ __pattern, __SIZE_TYPE__ __n_bytes),mempatw,(__dst,__pattern,__n_bytes))
 #else /* __CRT_HAVE_mempatw */
 #include <libc/local/string/mempatw.h>
-/* Same as `memsetw', but repeat a 2-byte pattern on aligned addresses. */
+/* >> mempatw(3)
+ * Same as `memsetw', but repeat a 2-byte pattern on aligned addresses. */
 #define __libc_core_mempatw __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempatw)
 #endif /* !__CRT_HAVE_mempatw */
 #ifdef __CRT_HAVE_mempatl
 #include <hybrid/typecore.h>
-/* Same as `memsetl', but repeat a 4-byte pattern on aligned addresses. */
+/* >> mempatl(3)
+ * Same as `memsetl', but repeat a 4-byte pattern on aligned addresses. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__libc_core_mempatl,(void *__restrict __dst, __UINT32_TYPE__ __pattern, __SIZE_TYPE__ __n_bytes),mempatl,(__dst,__pattern,__n_bytes))
 #else /* __CRT_HAVE_mempatl */
 #include <libc/local/string/mempatl.h>
-/* Same as `memsetl', but repeat a 4-byte pattern on aligned addresses. */
+/* >> mempatl(3)
+ * Same as `memsetl', but repeat a 4-byte pattern on aligned addresses. */
 #define __libc_core_mempatl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempatl)
 #endif /* !__CRT_HAVE_mempatl */
 #ifdef __CRT_HAVE_mempatq
 #include <hybrid/typecore.h>
-/* Same as `memsetq', but repeat an 8-byte pattern on aligned addresses. */
+/* >> mempatq(3)
+ * Same as `memsetq', but repeat an 8-byte pattern on aligned addresses. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__libc_core_mempatq,(void *__restrict __dst, __UINT64_TYPE__ __pattern, __SIZE_TYPE__ __n_bytes),mempatq,(__dst,__pattern,__n_bytes))
 #else /* __CRT_HAVE_mempatq */
 #include <libc/local/string/mempatq.h>
-/* Same as `memsetq', but repeat an 8-byte pattern on aligned addresses. */
+/* >> mempatq(3)
+ * Same as `memsetq', but repeat an 8-byte pattern on aligned addresses. */
 #define __libc_core_mempatq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempatq)
 #endif /* !__CRT_HAVE_mempatq */
 

@@ -870,6 +870,7 @@ int fwide([[nonnull]] FILE *fp, int mode) {
 [[cp_stdio, std, guard, wchar]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.write.printf")]]
+[[export_as("_fwprintf_p")]] /* Normal wprintf already supports positional arguments! */
 __STDC_INT_AS_SIZE_T fwprintf([[nonnull]] FILE *__restrict stream,
                               [[nonnull, format]] wchar_t const *__restrict format, ...)
 	%{printf("vfwprintf")}
@@ -879,6 +880,7 @@ __STDC_INT_AS_SIZE_T fwprintf([[nonnull]] FILE *__restrict stream,
 [[cp_stdio, std, guard, wchar]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.write.printf")]]
+[[export_as("_vfwprintf_p")]] /* Normal wprintf already supports positional arguments! */
 __STDC_INT_AS_SIZE_T vfwprintf([[nonnull]] FILE *__restrict stream,
                                [[nonnull, format]] wchar_t const *__restrict format,
                                $va_list args) {
@@ -889,6 +891,7 @@ __STDC_INT_AS_SIZE_T vfwprintf([[nonnull]] FILE *__restrict stream,
 [[cp_stdio, std, guard, wchar]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.write.printf")]]
+[[export_as("_wprintf_p")]] /* Normal wprintf already supports positional arguments! */
 __STDC_INT_AS_SIZE_T wprintf([[nonnull, format]] wchar_t const *__restrict format, ...)
 	%{printf("vwprintf")}
 
@@ -899,6 +902,7 @@ __STDC_INT_AS_SIZE_T wprintf([[nonnull, format]] wchar_t const *__restrict forma
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stdout) && $has_function(vfwprintf))]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.write.printf")]]
+[[export_as("_vwprintf_p")]] /* Normal wprintf already supports positional arguments! */
 __STDC_INT_AS_SIZE_T vwprintf([[nonnull, format]] wchar_t const *__restrict format, $va_list args) {
 	return vfwprintf(stdout, format, args);
 }
@@ -930,6 +934,7 @@ __STDC_INT_AS_SIZE_T swscanf([[nonnull]] wchar_t const *__restrict src,
 [[std, guard, wchar]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.format.printf")]]
+[[export_as("_vswprintf_p")]] /* Normal wprintf already supports positional arguments! */
 __STDC_INT_AS_SIZE_T vswprintf([[outp_opt(min(return + 1, buflen))]] wchar_t *__restrict buf, size_t buflen,
                                [[nonnull, format]] wchar_t const *__restrict format, $va_list args) {
 	COMPILER_IMPURE();
@@ -945,6 +950,7 @@ __STDC_INT_AS_SIZE_T vswprintf([[outp_opt(min(return + 1, buflen))]] wchar_t *__
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[std, guard, wchar]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.format.printf")]]
+[[export_as("_swprintf_p")]] /* Normal wprintf already supports positional arguments! */
 __STDC_INT_AS_SIZE_T swprintf([[outp_opt(min(return + 1, buflen))]] wchar_t *__restrict buf, size_t buflen,
                               [[nonnull, format]] wchar_t const *__restrict format, ...)
 	%{printf("vswprintf")}

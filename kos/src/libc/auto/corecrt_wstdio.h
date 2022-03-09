@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa951356e */
+/* HASH CRC-32:0xff159653 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -96,8 +96,6 @@ INTDEF ATTR_LIBC_C16PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_N
 INTDEF ATTR_LIBC_C32PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBKCALL libc___vswprintf_l)(char32_t *buf, char32_t const *format, locale_t locale, va_list args);
 INTDEF WUNUSED ATTR_LIBC_C16SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vwscanf_l)(char16_t const *format, locale_t locale, va_list args);
 INTDEF WUNUSED ATTR_LIBC_C32SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBKCALL libc__vwscanf_l)(char32_t const *format, locale_t locale, va_list args);
-INTDEF ATTR_LIBC_C16PRINTF_P(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vfwprintf_p)(FILE *stream, char16_t const *format, va_list args);
-INTDEF ATTR_LIBC_C32PRINTF_P(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBKCALL libc__vfwprintf_p)(FILE *stream, char32_t const *format, va_list args);
 INTDEF ATTR_LIBC_C16PRINTF(4, 0) NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnwprintf_s)(char16_t *buf, size_t bufsize, size_t maxsize, char16_t const *format, va_list args);
 INTDEF ATTR_LIBC_C32PRINTF(4, 0) NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBKCALL libc__vsnwprintf_s)(char32_t *buf, size_t bufsize, size_t maxsize, char32_t const *format, va_list args);
 INTDEF ATTR_LIBC_C16PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnwprintf)(char16_t *buf, size_t bufsize, char16_t const *format, va_list args);
@@ -106,10 +104,6 @@ INTDEF ATTR_LIBC_C16PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(
 INTDEF ATTR_LIBC_C32PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBKCALL libc__vswprintf_c)(char32_t *buf, size_t bufsize, char32_t const *format, va_list args);
 INTDEF ATTR_LIBC_C16PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vswprintf)(char16_t *buf, char16_t const *format, va_list args);
 INTDEF ATTR_LIBC_C32PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBKCALL libc__vswprintf)(char32_t *buf, char32_t const *format, va_list args);
-INTDEF ATTR_LIBC_C16PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vwprintf_p)(char16_t const *format, va_list args);
-INTDEF ATTR_LIBC_C32PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBKCALL libc__vwprintf_p)(char32_t const *format, va_list args);
-INTDEF ATTR_LIBC_C16PRINTF_P(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vswprintf_p)(char16_t *buf, size_t bufsize, char16_t const *format, va_list args);
-INTDEF ATTR_LIBC_C32PRINTF_P(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBKCALL libc__vswprintf_p)(char32_t *buf, size_t bufsize, char32_t const *format, va_list args);
 INTDEF ATTR_LIBC_C16PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vscwprintf)(char16_t const *format, va_list args);
 INTDEF ATTR_LIBC_C32PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBKCALL libc__vscwprintf)(char32_t const *format, va_list args);
 INTDEF ATTR_LIBC_C16PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vscwprintf_p)(char16_t const *format, va_list args);
@@ -142,10 +136,6 @@ INTDEF ATTR_LIBC_C16PRINTF_P(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NC
 INTDEF ATTR_LIBC_C32PRINTF_P(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBKCALL libc__wprintf_p_l)(char32_t const *format, locale_t locale, ...);
 INTDEF ATTR_LIBC_C16PRINTF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd___swprintf_l)(char16_t *buf, char16_t const *format, locale_t locale, ...);
 INTDEF ATTR_LIBC_C32PRINTF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBKCALL libc___swprintf_l)(char32_t *buf, char32_t const *format, locale_t locale, ...);
-INTDEF ATTR_LIBC_C16PRINTF_P(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__fwprintf_p)(FILE *stream, char16_t const *format, ...);
-INTDEF ATTR_LIBC_C32PRINTF_P(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBKCALL libc__fwprintf_p)(FILE *stream, char32_t const *format, ...);
-INTDEF ATTR_LIBC_C16PRINTF_P(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__wprintf_p)(char16_t const *format, ...);
-INTDEF ATTR_LIBC_C32PRINTF_P(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBKCALL libc__wprintf_p)(char32_t const *format, ...);
 INTDEF ATTR_LIBC_C16PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__swprintf)(char16_t *buf, char16_t const *format, ...);
 INTDEF ATTR_LIBC_C32PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBKCALL libc__swprintf)(char32_t *buf, char32_t const *format, ...);
 INTDEF ATTR_LIBC_C16PRINTF(3, 5) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__swprintf_s_l)(char16_t *buf, size_t bufsize, char16_t const *format, locale_t locale, ...);
@@ -158,8 +148,6 @@ INTDEF ATTR_LIBC_C16PRINTF(3, 5) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(
 INTDEF ATTR_LIBC_C32PRINTF(3, 5) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBKCALL libc__snwprintf_l)(char32_t *buf, size_t bufsize, char32_t const *format, locale_t locale, ...);
 INTDEF ATTR_LIBC_C16PRINTF(4, 6) NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__snwprintf_s_l)(char16_t *buf, size_t bufsize, size_t maxsize, char16_t const *format, locale_t locale, ...);
 INTDEF ATTR_LIBC_C32PRINTF(4, 6) NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBKCALL libc__snwprintf_s_l)(char32_t *buf, size_t bufsize, size_t maxsize, char32_t const *format, locale_t locale, ...);
-INTDEF ATTR_LIBC_C16PRINTF_P(3, 4) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__swprintf_p)(char16_t *buf, size_t bufsize, char16_t const *format, ...);
-INTDEF ATTR_LIBC_C32PRINTF_P(3, 4) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBKCALL libc__swprintf_p)(char32_t *buf, size_t bufsize, char32_t const *format, ...);
 INTDEF ATTR_LIBC_C16PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__swprintf_c)(char16_t *buf, size_t bufsize, char16_t const *format, ...);
 INTDEF ATTR_LIBC_C32PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBKCALL libc__swprintf_c)(char32_t *buf, size_t bufsize, char32_t const *format, ...);
 INTDEF ATTR_LIBC_C16PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__snwprintf)(char16_t *buf, size_t bufsize, char16_t const *format, ...);
