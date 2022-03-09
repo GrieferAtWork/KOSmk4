@@ -4658,8 +4658,11 @@ err:
 	return (int)rlim.@rlim_cur@;
 }
 
-[[wunused]]
+@@>> _get_printf_count_output(3), _set_printf_count_output(3)
+@@Enable or disable use of '%n' in printf-style format strings.
+[[pure, wunused]]
 int _get_printf_count_output(void);
+[[doc_alias("_get_printf_count_output")]]
 int _set_printf_count_output(int val);
 
 [[wunused]]

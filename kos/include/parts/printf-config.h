@@ -35,6 +35,7 @@
 /* #define __NO_PRINTF_VINFO          -- "%[vinfo]" */
 /* #define __NO_PRINTF_FLOATING_POINT -- "%f" */
 /* #define __NO_PRINTF_POSITIONAL     -- "%1$s" */
+/* #define __NO_PRINTF_PERCENT_N      -- "%n" */
 /* #define __NO_SCANF_FLOATING_POINT  -- "%f" */
 
 #if defined(__KOS__) && defined(__KERNEL__)
@@ -46,6 +47,8 @@
 #define __NO_PRINTF_UNICODE_CHARS
 #undef __NO_PRINTF_DISASM
 #define __NO_PRINTF_DISASM
+#undef __NO_PRINTF_PERCENT_N
+#define __NO_PRINTF_PERCENT_N
 //#undef  __NO_PRINTF_POSITIONAL
 //#define __NO_PRINTF_POSITIONAL
 #elif !defined(__CRT_KOS) || !defined(__KOS__)
@@ -61,7 +64,14 @@
 #undef __NO_PRINTF_POSITIONAL
 #define __NO_PRINTF_POSITIONAL
 #endif /* !__CRT_GLC */
-#endif /* !__CRT_KOS || !__KOS__ */
+#elif defined(__CRT_KOS) && defined(__BUILDING_LIBC)
+/* For compatibility with `_set_printf_count_output(3)',  '%n'
+ * can be disabled at runtime  inside of KOS's libc. For  this
+ * purpose, the libc-internal `libc_printf_percent_n_disabled'
+ * symbol is used. */
+__INTDEF __BOOL libc_printf_percent_n_disabled;
+#define __NO_PRINTF_PERCENT_N_OPT() (libc_printf_percent_n_disabled)
+#endif /* ... */
 
 #ifdef __NO_FPU
 #undef __NO_PRINTF_FLOATING_POINT

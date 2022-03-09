@@ -3623,28 +3623,36 @@ NOTHROW_NCX(LIBCCALL libc__set_output_format)(uint32_t format)
 
 
 
+/* When set to `true', '%n' cannot be used in format strings.
+ *
+ * NOTE: DOS specs state that  '%n' be disabled by  default.
+ *       However, since KOS is primarly a unix OS, we enable
+ *       is by default. But note that the PE loader will set
+ *       it to disabled for the sake of compatibility! */
+INTERN ATTR_SECTION(".bss.crt.dos.FILE.utility")
+bool libc_printf_percent_n_disabled = false;
 
-
-/*[[[head:libc__get_printf_count_output,hash:CRC-32=0xdf7a21d2]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") WUNUSED int
+/*[[[head:libc__get_printf_count_output,hash:CRC-32=0x4adc1a8]]]*/
+/* >> _get_printf_count_output(3), _set_printf_count_output(3)
+ * Enable or disable use of '%n' in printf-style format strings. */
+INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__get_printf_count_output)(void)
 /*[[[body:libc__get_printf_count_output]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("_get_printf_count_output"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+{
+	return ATOMIC_READ(libc_printf_percent_n_disabled) ? 0 : 1;
 }
 /*[[[end:libc__get_printf_count_output]]]*/
 
-/*[[[head:libc__set_printf_count_output,hash:CRC-32=0xc343e2a2]]]*/
+/*[[[head:libc__set_printf_count_output,hash:CRC-32=0x35aa644e]]]*/
+/* >> _get_printf_count_output(3), _set_printf_count_output(3)
+ * Enable or disable use of '%n' in printf-style format strings. */
 INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") int
 NOTHROW_NCX(LIBCCALL libc__set_printf_count_output)(int val)
 /*[[[body:libc__set_printf_count_output]]]*/
-/*AUTO*/{
-	(void)val;
-	CRT_UNIMPLEMENTEDF("_set_printf_count_output(%x)", val); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+{
+	bool old_enabled;
+	old_enabled = ATOMIC_XCH(libc_printf_percent_n_disabled, val == 0);
+	return old_enabled;
 }
 /*[[[end:libc__set_printf_count_output]]]*/
 

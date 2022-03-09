@@ -23,6 +23,7 @@
 #define _KOS_KERNEL_SOURCE 1
 #define _KOS_ALTERATIONS_SOURCE 1
 #define _GNU_SOURCE 1
+#define _DOS_SOURCE 1
 
 #include "api.h"
 /**/
@@ -54,6 +55,7 @@
 #include <link.h>
 #include <malloca.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
@@ -934,6 +936,9 @@ libpe_linker_main(struct peexec_info *__restrict info,
 
 	/* Turn on dosfs emulation for `DOS$'-prefixed functions in libc. */
 	dosfs_setenabled(DOSFS_ENABLED);
+
+	/* Another dos compatibility detail: support for '%n' in format strings is disabled by default. */
+	_set_printf_count_output(0);
 
 #if 0
 	/* Dump some information to the system log. */

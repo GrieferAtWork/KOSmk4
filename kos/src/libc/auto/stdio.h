@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f7c9871 */
+/* HASH CRC-32:0x2dde0454 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -791,6 +791,8 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd__setmaxstdio)(int newmaxval);
 INTDEF int NOTHROW_NCX(LIBCCALL libc__setmaxstdio)(int newmaxval);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> _get_printf_count_output(3), _set_printf_count_output(3)
+ * Enable or disable use of '%n' in printf-style format strings. */
 INTDEF int NOTHROW_NCX(LIBDCALL libd__set_printf_count_output)(int val);
 INTDEF uint32_t NOTHROW_NCX(LIBDCALL libd__set_output_format)(uint32_t format);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

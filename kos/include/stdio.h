@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbcb2369 */
+/* HASH CRC-32:0xf0a0eb88 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5108,7 +5108,11 @@ __CDECLARE(,int,__NOTHROW_NCX,_setmaxstdio,(int __newmaxval),(__newmaxval))
 __NAMESPACE_LOCAL_USING_OR_IMPL(_setmaxstdio, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL _setmaxstdio)(int __newmaxval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_setmaxstdio))(__newmaxval); })
 #endif /* __RLIMIT_NOFILE && ((__CRT_HAVE_getrlimit && (!__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (__CRT_HAVE___getrlimit && (!__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (__CRT_HAVE___libc_getrlimit && (!__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (__CRT_HAVE_getrlimit64 && (__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__))) && ((__CRT_HAVE_setrlimit && (!__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (__CRT_HAVE___setrlimit && (!__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (__CRT_HAVE___libc_setrlimit && (!__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (__CRT_HAVE_setrlimit64 && (__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__))) */
 #endif /* !__CRT_HAVE__setmaxstdio */
-__CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,_get_printf_count_output,(void),())
+/* >> _get_printf_count_output(3), _set_printf_count_output(3)
+ * Enable or disable use of '%n' in printf-style format strings. */
+__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_get_printf_count_output,(void),())
+/* >> _get_printf_count_output(3), _set_printf_count_output(3)
+ * Enable or disable use of '%n' in printf-style format strings. */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,_set_printf_count_output,(int __val),(__val))
 __CDECLARE_OPT(__ATTR_WUNUSED,__UINT32_TYPE__,__NOTHROW_NCX,_get_output_format,(void),())
 __CDECLARE_OPT(,__UINT32_TYPE__,__NOTHROW_NCX,_set_output_format,(__UINT32_TYPE__ __format),(__format))

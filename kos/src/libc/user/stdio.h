@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25b9b2c8 */
+/* HASH CRC-32:0xdd73dbdf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -303,7 +303,11 @@ INTDEF int (LIBCCALL libc__flushall)(void) THROWS(...);
 INTDEF int NOTHROW_RPC(LIBCCALL libc__rmtmp)(void);
 INTDEF NONNULL((1)) int (LIBCCALL libc__filbuf)(FILE *__restrict stream) THROWS(...);
 INTDEF NONNULL((2)) int (LIBCCALL libc__flsbuf)(int ch, FILE *__restrict stream) THROWS(...);
-INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc__get_printf_count_output)(void);
+/* >> _get_printf_count_output(3), _set_printf_count_output(3)
+ * Enable or disable use of '%n' in printf-style format strings. */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc__get_printf_count_output)(void);
+/* >> _get_printf_count_output(3), _set_printf_count_output(3)
+ * Enable or disable use of '%n' in printf-style format strings. */
 INTDEF int NOTHROW_NCX(LIBCCALL libc__set_printf_count_output)(int val);
 INTDEF WUNUSED uint32_t NOTHROW_NCX(LIBCCALL libc__get_output_format)(void);
 INTDEF uint32_t NOTHROW_NCX(LIBCCALL libc__set_output_format)(uint32_t format);

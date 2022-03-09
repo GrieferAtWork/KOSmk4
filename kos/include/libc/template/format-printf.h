@@ -1847,6 +1847,74 @@ __do_float_normal_width:
 #endif /* !__NO_PRINTF_FLOATING_POINT && !__NO_FPU */
 
 
+	/************************************************************************/
+	/* '%n'                                                                 */
+	/************************************************************************/
+#ifndef __NO_PRINTF_PERCENT_N
+	case 'n':
+#ifdef __NO_PRINTF_PERCENT_N_OPT
+		if (!__NO_PRINTF_PERCENT_N_OPT())
+#endif /* __NO_PRINTF_PERCENT_N_OPT */
+		{
+			void *__parg = __PRINTF_VARGPTR();
+
+			/* NOTE: We  (slightly) deviate from the norm by writing `__result' to the
+			 *       user-given pointer. Specs  say we're  to write the  # of  already
+			 *       generated characters. -- Normally, that's exactly what `__result'
+			 *       is, however that is only the case when `__FORMAT_PRINTER' behaves
+			 *       such that it re-returns its  `datalen' argument. Most printer  do
+			 *       this  (including `sprintf(3)'s or  `printf(3)'s), but this detail
+			 *       isn't a requirement. */
+			switch (__length) {
+
+#ifdef __UINT64_TYPE__
+#if __SIZEOF_INT__ == 8
+			default:
+#else /* __SIZEOF_INT__ == 8 */
+			case __PRINTF_LENGTH_I64:
+#endif /* __SIZEOF_INT__ != 8 */
+				*(__UINT64_TYPE__ *)__parg = (__UINT64_TYPE__)(__SIZE_TYPE__)__result;
+				break;
+#endif /* __UINT64_TYPE__ */
+
+#if __SIZEOF_INT__ == 4
+			default:
+#else /* __SIZEOF_INT__ == 4 */
+			case __PRINTF_LENGTH_I32:
+#endif /* __SIZEOF_INT__ != 4 */
+				*(__UINT32_TYPE__ *)__parg = (__UINT32_TYPE__)(__SIZE_TYPE__)__result;
+				break;
+
+#if __SIZEOF_INT__ == 2
+			default:
+#else /* __SIZEOF_INT__ == 2 */
+			case __PRINTF_LENGTH_I16:
+#endif /* __SIZEOF_INT__ != 2 */
+				*(__UINT16_TYPE__ *)__parg = (__UINT16_TYPE__)(__SIZE_TYPE__)__result;
+				break;
+
+#if __SIZEOF_INT__ == 1
+			default:
+#else /* __SIZEOF_INT__ == 1 */
+			case __PRINTF_LENGTH_I8:
+#endif /* __SIZEOF_INT__ != 1 */
+				*(__UINT8_TYPE__ *)__parg = (__UINT8_TYPE__)(__SIZE_TYPE__)__result;
+				break;
+
+#if __SIZEOF_INT__ != 1 && __SIZEOF_INT__ != 2 && __SIZEOF_INT__ != 4 && __SIZEOF_INT__ != 8
+			default:
+				*(unsigned int *)__parg = (unsigned int)(__SIZE_TYPE__)__result;
+				break;
+#endif /* __SIZEOF_INT__ != 1 && __SIZEOF_INT__ != 2 && __SIZEOF_INT__ != 4 && __SIZEOF_INT__ != 8 */
+			}
+			break;
+		}
+#ifdef __NO_PRINTF_PERCENT_N_OPT
+		__ATTR_FALLTHROUGH
+#endif /* __NO_PRINTF_PERCENT_N_OPT */
+#endif /* !__NO_PRINTF_PERCENT_N */
+
+
 	default:
 		if (__ch >= '0' && __ch <= '9') {
 #ifdef __NO_PRINTF_POSITIONAL
@@ -2093,7 +2161,7 @@ __again_posscan2_infmt:
 										break;
 								}
 							}
-						}	ATTR_FALLTHROUGH
+						}	__ATTR_FALLTHROUGH
 #endif /* __PRINTF_HAVE_LBRACKET */
 #ifndef __NO_PRINTF_ESCAPE
 						case 'q':
@@ -2116,6 +2184,20 @@ __again_posscan2_infmt:
 							}
 							break;
 #endif /* !__NO_PRINTF_FLOATING_POINT && !__NO_FPU */
+
+#ifndef __NO_PRINTF_PERCENT_N
+						case 'n':
+#ifdef __NO_PRINTF_PERCENT_N_OPT
+							if (!__NO_PRINTF_PERCENT_N_OPT())
+#endif /* __NO_PRINTF_PERCENT_N_OPT */
+							{
+								__type_length = __PRINTF_LENGTH_SIZE;
+								break;
+							}
+#ifdef __NO_PRINTF_PERCENT_N_OPT
+							__ATTR_FALLTHROUGH
+#endif /* __NO_PRINTF_PERCENT_N_OPT */
+#endif /* !__NO_PRINTF_PERCENT_N */
 
 						default:
 							if (!(__ch >= '0' && __ch <= '9'))
