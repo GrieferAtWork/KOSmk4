@@ -480,6 +480,7 @@
 #define __CRT_HAVE___ffs
 #define __CRT_HAVE___find_open
 #define __CRT_HAVE___find_readdir
+#define __CRT_HAVE___find_wopen
 #define __CRT_HAVE___finite
 #define __CRT_HAVE___finitef
 #define __CRT_HAVE___finitel
@@ -5675,6 +5676,7 @@
 #define __CRT_HAVE_KOS$__fdimf
 #define __CRT_HAVE_KOS$__fdiml
 #define __CRT_HAVE_KOS$__ffs
+#define __CRT_HAVE_KOS$__find_wopen
 #define __CRT_HAVE_KOS$__finite
 #define __CRT_HAVE_KOS$__finitef
 #define __CRT_HAVE_KOS$__finitel
@@ -9720,6 +9722,7 @@
 #define __CRT_HAVE_DOS$__fdimf
 #define __CRT_HAVE_DOS$__fdiml
 #define __CRT_HAVE_DOS$__ffs
+#define __CRT_HAVE_DOS$__find_wopen
 #define __CRT_HAVE_DOS$__finite
 #define __CRT_HAVE_DOS$__finitef
 #define __CRT_HAVE_DOS$__finitel

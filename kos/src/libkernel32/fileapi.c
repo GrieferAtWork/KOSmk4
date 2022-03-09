@@ -102,6 +102,7 @@ struct dfind {
 
 #define DFIND_INVALID ((struct dfind *)-1) /* INVALID_HANDLE_VALUE */
 __LIBC WUNUSED struct dfind *LIBCCALL __find_open(char const *__restrict filename, oflag_t oflags);
+__LIBC WUNUSED struct dfind *LIBCCALL DOS$__find_wopen(char16_t const *__restrict filename, oflag_t oflags);
 __LIBC WUNUSED struct dirent *LIBCCALL __find_readdir(struct dfind *__restrict self);
 __LIBC int LIBCCALL __find_close(struct dfind *__restrict self) ASMNAME("_findclose");
 
@@ -195,13 +196,8 @@ libk32_FindFirstFileA(LPCSTR lpFileName, LPWIN32_FIND_DATAA lpFindFileData) {
 INTERN HANDLE WINAPI
 libk32_FindFirstFileW(LPCWSTR lpFileName, LPWIN32_FIND_DATAW lpFindFileData) {
 	struct dfind *find;
-	char *utf8;
 	TRACE("FindFirstFileW(%I16q, %p)", lpFileName, lpFindFileData);
-	utf8 = convert_c16tombs(lpFileName);
-	if (!utf8)
-		return INVALID_HANDLE_VALUE;
-	find = __find_open(utf8, O_DOSPATH);
-	free(utf8);
+	find = DOS$__find_wopen(lpFileName, O_DOSPATH);
 	if (find != DFIND_INVALID) {
 		if (!libk32_FindNextFileW((HANDLE)find, lpFindFileData)) {
 			if (_nterrno == ERROR_NO_MORE_FILES)

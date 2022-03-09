@@ -50,9 +50,9 @@ struct dfind {
 
 #define DFIND_INVALID ((struct dfind *)-1)
 
-DEFINE_PUBLIC_ALIAS(__find_open, dfind_open);
+DEFINE_PUBLIC_ALIAS(__find_open, libc_dfind_open);
 INTERN WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir") struct dfind *LIBCCALL
-dfind_open(char const *__restrict filename, oflag_t oflags) {
+libc_dfind_open(char const *__restrict filename, oflag_t oflags) {
 	char const *pathend;
 	struct dfind *result;
 	result = (struct dfind *)malloc(sizeof(struct dfind));
@@ -91,16 +91,16 @@ err:
 	goto done;
 }
 
-PRIVATE ATTR_SECTION(".text.crt.dos.fs.dir") void LIBCCALL
-dfind_close(struct dfind *__restrict self) {
+INTERN ATTR_SECTION(".text.crt.dos.fs.dir") void LIBCCALL
+libc_dfind_close(struct dfind *__restrict self) {
 	closedir(self->df_dir);
 	free(self->df_query);
 	free(self);
 }
 
-DEFINE_PUBLIC_ALIAS(__find_readdir, dfind_readdir);
+DEFINE_PUBLIC_ALIAS(__find_readdir, libc_dfind_readdir);
 INTERN WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir") struct dirent *LIBCCALL
-dfind_readdir(struct dfind *__restrict self) {
+libc_dfind_readdir(struct dfind *__restrict self) {
 	struct dirent *result;
 	while ((result = readdir(self->df_dir)) != NULL) {
 		if (wildstrcasecmp(self->df_query, result->d_name) == 0)
@@ -109,22 +109,22 @@ dfind_readdir(struct dfind *__restrict self) {
 	return result;
 }
 
-#define dfind_attrib(ent, st)                            \
+#define libc_dfind_attrib(ent, st)                       \
 	(((ent)->d_type == DT_DIR ? _A_SUBDIR : _A_NORMAL) | \
 	 (((st)->st_mode & 0222) ? 0 : _A_RDONLY) |          \
 	 ((ent)->d_name[0] == '.' ? _A_HIDDEN : 0))
 
 PRIVATE WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir") int LIBCCALL
-dfind_read32(struct dfind *__restrict self,
-             struct _finddata32_t *__restrict finddata) {
+libc_dfind_read32(struct dfind *__restrict self,
+                  struct _finddata32_t *__restrict finddata) {
 	struct stat st;
 	struct dirent *ent;
-	ent = dfind_readdir(self);
+	ent = libc_dfind_readdir(self);
 	if (!ent)
 		goto err;
 	if (fstatat(dirfd(self->df_dir), ent->d_name, &st, AT_SYMLINK_NOFOLLOW))
 		goto err;
-	finddata->attrib      = dfind_attrib(ent, &st);
+	finddata->attrib      = libc_dfind_attrib(ent, &st);
 	finddata->time_create = (s32)st.st_ctime32;
 	finddata->time_access = (s32)st.st_atime32;
 	finddata->time_write  = (s32)st.st_mtime32;
@@ -139,17 +139,17 @@ err:
 }
 
 PRIVATE WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir") int LIBCCALL
-dfind_read32i64(struct dfind *__restrict self,
-                struct _finddata32i64_t *__restrict finddata) {
+libc_dfind_read32i64(struct dfind *__restrict self,
+                     struct _finddata32i64_t *__restrict finddata) {
 	struct stat st;
 	struct dirent *ent;
-	ent = dfind_readdir(self);
+	ent = libc_dfind_readdir(self);
 	if (!ent)
 		goto err;
 	if (fstatat(dirfd(self->df_dir), ent->d_name, &st,
 	            AT_SYMLINK_NOFOLLOW))
 		goto err;
-	finddata->attrib      = dfind_attrib(ent, &st);
+	finddata->attrib      = libc_dfind_attrib(ent, &st);
 	finddata->time_create = (s32)st.st_ctime32;
 	finddata->time_access = (s32)st.st_atime32;
 	finddata->time_write  = (s32)st.st_mtime32;
@@ -164,17 +164,17 @@ err:
 }
 
 PRIVATE WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir") int LIBCCALL
-dfind_read64(struct dfind *__restrict self,
-             struct __finddata64_t *__restrict finddata) {
+libc_dfind_read64(struct dfind *__restrict self,
+                  struct __finddata64_t *__restrict finddata) {
 	struct stat st;
 	struct dirent *ent;
-	ent = dfind_readdir(self);
+	ent = libc_dfind_readdir(self);
 	if (!ent)
 		goto err;
 	if (fstatat(dirfd(self->df_dir), ent->d_name, &st,
 	            AT_SYMLINK_NOFOLLOW))
 		goto err;
-	finddata->attrib      = dfind_attrib(ent, &st);
+	finddata->attrib      = libc_dfind_attrib(ent, &st);
 	finddata->time_create = (s64)st.st_ctime64;
 	finddata->time_access = (s64)st.st_atime64;
 	finddata->time_write  = (s64)st.st_mtime64;
@@ -198,7 +198,7 @@ NOTHROW_NCX(LIBCCALL libc__findclose)(intptr_t findfd)
 	f = (struct dfind *)(uintptr_t)findfd;
 	if unlikely(f == DFIND_INVALID)
 		return libd_seterrno(DOS_EINVAL);
-	dfind_close(f);
+	libc_dfind_close(f);
 	return 0;
 }
 /*[[[end:libc__findclose]]]*/
@@ -208,10 +208,10 @@ NOTHROW_RPC(LIBCCALL libc__findfirst32_impl)(char const *__restrict filename,
                                              struct _finddata32_t *__restrict finddata,
                                              oflag_t oflags) {
 	struct dfind *result;
-	result = dfind_open(filename, oflags);
+	result = libc_dfind_open(filename, oflags);
 	if likely(result != DFIND_INVALID) {
-		if (dfind_read32(result, finddata) != 0) {
-			dfind_close(result);
+		if (libc_dfind_read32(result, finddata) != 0) {
+			libc_dfind_close(result);
 			result = DFIND_INVALID;
 		}
 	}
@@ -224,7 +224,7 @@ NOTHROW_RPC(LIBDCALL libd__findfirst32)(char const *__restrict filename,
                                         struct _finddata32_t *__restrict finddata)
 /*[[[body:libd__findfirst32]]]*/
 {
-	return libc__findfirst32_impl(filename, finddata, O_DOSPATH);
+	return libc__findfirst32_impl(filename, finddata, libd_O_DOSPATH);
 }
 /*[[[end:libd__findfirst32]]]*/
 
@@ -244,10 +244,10 @@ NOTHROW_RPC(LIBCCALL libc__findfirst32i64_impl)(char const *__restrict filename,
                                                 struct _finddata32i64_t *__restrict finddata,
                                                 oflag_t oflags) {
 	struct dfind *result;
-	result = dfind_open(filename, oflags);
+	result = libc_dfind_open(filename, oflags);
 	if likely(result != DFIND_INVALID) {
-		if (dfind_read32i64(result, finddata) != 0) {
-			dfind_close(result);
+		if (libc_dfind_read32i64(result, finddata) != 0) {
+			libc_dfind_close(result);
 			result = DFIND_INVALID;
 		}
 	}
@@ -280,10 +280,10 @@ NOTHROW_RPC(LIBCCALL libc__findfirst64_impl)(char const *__restrict filename,
                                              struct __finddata64_t *__restrict finddata,
                                              oflag_t oflags) {
 	struct dfind *result;
-	result = dfind_open(filename, oflags);
+	result = libc_dfind_open(filename, oflags);
 	if likely(result != DFIND_INVALID) {
-		if (dfind_read64(result, finddata) != 0) {
-			dfind_close(result);
+		if (libc_dfind_read64(result, finddata) != 0) {
+			libc_dfind_close(result);
 			result = DFIND_INVALID;
 		}
 	}
@@ -317,13 +317,10 @@ NOTHROW_RPC(LIBCCALL libc__findnext32)(intptr_t findfd,
                                        struct _finddata32_t *__restrict finddata)
 /*[[[body:libc__findnext32]]]*/
 {
-	int result;
-	struct dfind *f;
-	f = (struct dfind *)(uintptr_t)findfd;
+	struct dfind *f = (struct dfind *)(uintptr_t)findfd;
 	if unlikely(f == DFIND_INVALID)
 		return libd_seterrno(DOS_EINVAL);
-	result = dfind_read32(f, finddata);
-	return result;
+	return libc_dfind_read32(f, finddata);
 }
 /*[[[end:libc__findnext32]]]*/
 
@@ -333,13 +330,10 @@ NOTHROW_RPC(LIBCCALL libc__findnext32i64)(intptr_t findfd,
                                           struct _finddata32i64_t *__restrict finddata)
 /*[[[body:libc__findnext32i64]]]*/
 {
-	int result;
-	struct dfind *f;
-	f = (struct dfind *)(uintptr_t)findfd;
+	struct dfind *f = (struct dfind *)(uintptr_t)findfd;
 	if unlikely(f == DFIND_INVALID)
 		return libd_seterrno(DOS_EINVAL);
-	result = dfind_read32i64(f, finddata);
-	return result;
+	return libc_dfind_read32i64(f, finddata);
 }
 /*[[[end:libc__findnext32i64]]]*/
 
@@ -349,13 +343,10 @@ NOTHROW_RPC(LIBCCALL libc__findnext64)(intptr_t findfd,
                                        struct __finddata64_t *__restrict finddata)
 /*[[[body:libc__findnext64]]]*/
 {
-	int result;
-	struct dfind *f;
-	f = (struct dfind *)(uintptr_t)findfd;
+	struct dfind *f = (struct dfind *)(uintptr_t)findfd;
 	if unlikely(f == DFIND_INVALID)
 		return libd_seterrno(DOS_EINVAL);
-	result = dfind_read64(f, finddata);
-	return result;
+	return libc_dfind_read64(f, finddata);
 }
 /*[[[end:libc__findnext64]]]*/
 

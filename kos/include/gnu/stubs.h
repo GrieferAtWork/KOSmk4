@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4fe907a6 */
+/* HASH CRC-32:0xf58d1bef */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,18 +90,6 @@
 #define __stub__wcreate_locale
 #define __stub__wcserror
 #define __stub__wcserror_s
-#define __stub__wfindfirst
-#define __stub__wfindfirst32
-#define __stub__wfindfirsti64
-#define __stub__wfindfirst32i64
-#define __stub__wfindfirst64i32
-#define __stub__wfindfirst64
-#define __stub__wfindnext
-#define __stub__wfindnext32
-#define __stub__wfindnexti64
-#define __stub__wfindnext32i64
-#define __stub__wfindnext64i32
-#define __stub__wfindnext64
 #define __stub__wmktemp
 #define __stub__wmktemp_s
 #define __stub__wsearchenv_s
@@ -584,18 +572,6 @@
 #define __stub_DOS$_wcreate_locale
 #define __stub_DOS$_wcserror
 #define __stub_DOS$_wcserror_s
-#define __stub_DOS$_wfindfirst
-#define __stub_DOS$_wfindfirst32
-#define __stub_DOS$_wfindfirsti64
-#define __stub_DOS$_wfindfirst32i64
-#define __stub_DOS$_wfindfirst64i32
-#define __stub_DOS$_wfindfirst64
-#define __stub_DOS$_wfindnext
-#define __stub_DOS$_wfindnext32
-#define __stub_DOS$_wfindnexti64
-#define __stub_DOS$_wfindnext32i64
-#define __stub_DOS$_wfindnext64i32
-#define __stub_DOS$_wfindnext64
 #define __stub_DOS$_wmktemp
 #define __stub_DOS$_wmktemp_s
 #define __stub_DOS$_wsearchenv_s
