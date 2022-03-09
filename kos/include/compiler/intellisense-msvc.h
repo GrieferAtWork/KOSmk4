@@ -69,8 +69,6 @@
 #define __STDC__ 1
 #ifdef __KOS__
 /* Hosted KOS development mode. */
-#   define __kos      1
-#   define __kos__    1
 #   define __unix     1
 #   define __unix__   1
 #   define __ELF__    1

@@ -23,6 +23,10 @@
 #include <__stdinc.h>
 #include <hybrid/typecore.h>
 
+#if !defined(__KOS__)
+#error "This header requires support for `STT_KOS_IDATA', which only exists on KOS. -- ~Sorry~"
+#endif /* !__KOS__ */
+
 /* Helpers for KOS's ELF extension: STT_KOS_IDATA
  *
  *

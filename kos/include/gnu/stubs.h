@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6fb9b00 */
+/* HASH CRC-32:0xf7f1d912 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,6 @@
 #define __stub__get_printf_count_output
 #define __stub__get_purecall_handler
 #define __stub__getdiskfree
-#define __stub__getmaxstdio
 #define __stub__lock_locales
 #define __stub__mktemp_s
 #define __stub__query_new_handler
@@ -87,7 +86,6 @@
 #define __stub__set_printf_count_output
 #define __stub__set_purecall_handler
 #define __stub__seterrormode
-#define __stub__setmaxstdio
 #define __stub__statusfp
 #define __stub__statusfp2
 #define __stub__unlock_locales

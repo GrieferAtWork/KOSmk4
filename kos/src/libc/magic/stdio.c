@@ -4630,8 +4630,33 @@ int _flsbuf(int ch, [[nonnull]] $FILE *__restrict stream);
 %[default:section(".text.crt.dos.FILE.utility")];
 
 [[wunused]]
-int _getmaxstdio();
-int _setmaxstdio(int val);
+[[impl_include("<asm/os/resource.h>")]]
+[[impl_include("<bits/os/rlimit.h>")]]
+[[requires_include("<asm/os/resource.h>")]]
+[[requires(defined(__RLIMIT_NOFILE) && $has_function(getrlimit))]]
+int _getmaxstdio() {
+	struct rlimit rlim;
+	if unlikely(getrlimit((__rlimit_resource_t)__RLIMIT_NOFILE, &rlim) != 0)
+		rlim.@rlim_cur@ = (__FS_TYPE(@rlim@))-1;
+	return (int)rlim.@rlim_cur@;
+}
+
+
+[[impl_include("<asm/os/resource.h>")]]
+[[impl_include("<bits/os/rlimit.h>")]]
+[[requires_include("<asm/os/resource.h>")]]
+[[requires(defined(__RLIMIT_NOFILE) && $has_function(getrlimit, setrlimit))]]
+int _setmaxstdio(int newmaxval) {
+	struct rlimit rlim;
+	if unlikely(getrlimit((__rlimit_resource_t)__RLIMIT_NOFILE, &rlim) != 0)
+		goto err;
+	rlim.@rlim_cur@ = (__FS_TYPE(@rlim@))newmaxval;
+	if unlikely(setrlimit((__rlimit_resource_t)__RLIMIT_NOFILE, &rlim) != 0) {
+err:
+		rlim.@rlim_cur@ = (__FS_TYPE(@rlim@))-1;
+	}
+	return (int)rlim.@rlim_cur@;
+}
 
 [[wunused]]
 int _get_printf_count_output(void);

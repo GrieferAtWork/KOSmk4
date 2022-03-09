@@ -3623,28 +3623,7 @@ NOTHROW_NCX(LIBCCALL libc__set_output_format)(uint32_t format)
 
 
 
-/*[[[head:libc__getmaxstdio,hash:CRC-32=0x4a8b137e]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") WUNUSED int
-NOTHROW_NCX(LIBCCALL libc__getmaxstdio)(void)
-/*[[[body:libc__getmaxstdio]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("_getmaxstdio"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc__getmaxstdio]]]*/
 
-/*[[[head:libc__setmaxstdio,hash:CRC-32=0x4dd0b5c5]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") int
-NOTHROW_NCX(LIBCCALL libc__setmaxstdio)(int val)
-/*[[[body:libc__setmaxstdio]]]*/
-/*AUTO*/{
-	(void)val;
-	CRT_UNIMPLEMENTEDF("_setmaxstdio(%x)", val); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc__setmaxstdio]]]*/
 
 /*[[[head:libc__get_printf_count_output,hash:CRC-32=0xdf7a21d2]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") WUNUSED int
@@ -3886,7 +3865,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x88796b1f]]]*/
+/*[[[start:exports,hash:CRC-32=0x5e9bdc25]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$__rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$rename, libd_rename);
@@ -4065,8 +4044,6 @@ DEFINE_PUBLIC_ALIAS(__underflow, libc__filbuf);
 DEFINE_PUBLIC_ALIAS(_filbuf, libc__filbuf);
 DEFINE_PUBLIC_ALIAS(__swbuf, libc__flsbuf);
 DEFINE_PUBLIC_ALIAS(_flsbuf, libc__flsbuf);
-DEFINE_PUBLIC_ALIAS(_getmaxstdio, libc__getmaxstdio);
-DEFINE_PUBLIC_ALIAS(_setmaxstdio, libc__setmaxstdio);
 DEFINE_PUBLIC_ALIAS(_get_printf_count_output, libc__get_printf_count_output);
 DEFINE_PUBLIC_ALIAS(_set_printf_count_output, libc__set_printf_count_output);
 DEFINE_PUBLIC_ALIAS(_get_output_format, libc__get_output_format);

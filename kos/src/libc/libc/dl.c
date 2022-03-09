@@ -98,11 +98,11 @@ NOTHROW_NCX(LIBCCALL libc_get_dlsym)(void) {
 	 * Think about it: lazy resolve works by redirecting the initial call to some
 	 * external function to a special wrapper (`dl_load_lazy_relocation') that is
 	 * found in libdl. That wrapper will  resolve the symbol, write its  absolute
-	 * address into the calling module's GOT, and then process to call the symbol
+	 * address into the calling module's GOT, and then proceed to call the symbol
 	 * with the register state at the time of the original call.
 	 *
 	 * But if we did `&dlsym', there wouldn't be any call to trigger lazy symbol
-	 * binding. And indeed: doing `&dlsym' causes a `R_386_GLOB_DAT'  relocation
+	 * binding. And indeed: doing `&dlsym' causes an `R_386_GLOB_DAT' relocation
 	 * to `dlsym' in order to resolve its address in the GOT during module load.
 	 *
 	 * However: `R_386_GLOB_DAT' obviously can't  use lazy relocations,  meaning
@@ -111,9 +111,9 @@ NOTHROW_NCX(LIBCCALL libc_get_dlsym)(void) {
 	 * to  resolve the symbol as soon as our library gets loaded, which would be
 	 * a tiny bit slower than doing so lazily.
 	 *
-	 * As such, the seemingly non-sensical construct you're seeing below  does
-	 * actually serve a purpose, that purpose being to speed up initialization
-	 * of libc! */
+	 * As  such, the  seemingly non-sensical  construct you're  seeing below does
+	 * actually serve a purpose, that purpose being to speed up initialization of
+	 * libc! */
 	return (PDLSYM)dlsym(RTLD_DEFAULT, "dlsym");
 #else
 	/* TLDR: this would also work, but would also prevent lazy (RTLD_LAZY) symbol binding. */

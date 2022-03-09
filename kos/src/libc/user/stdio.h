@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d4c57f3 */
+/* HASH CRC-32:0x25b9b2c8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -303,8 +303,6 @@ INTDEF int (LIBCCALL libc__flushall)(void) THROWS(...);
 INTDEF int NOTHROW_RPC(LIBCCALL libc__rmtmp)(void);
 INTDEF NONNULL((1)) int (LIBCCALL libc__filbuf)(FILE *__restrict stream) THROWS(...);
 INTDEF NONNULL((2)) int (LIBCCALL libc__flsbuf)(int ch, FILE *__restrict stream) THROWS(...);
-INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc__getmaxstdio)(void);
-INTDEF int NOTHROW_NCX(LIBCCALL libc__setmaxstdio)(int val);
 INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc__get_printf_count_output)(void);
 INTDEF int NOTHROW_NCX(LIBCCALL libc__set_printf_count_output)(int val);
 INTDEF WUNUSED uint32_t NOTHROW_NCX(LIBCCALL libc__get_output_format)(void);

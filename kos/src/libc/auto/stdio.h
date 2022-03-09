@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcaa84975 */
+/* HASH CRC-32:0x1f7c9871 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -780,7 +780,17 @@ INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBCCALL libc__fsopen)(char con
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((1)) int (LIBDCALL libd__filbuf)(FILE *__restrict stream) THROWS(...);
 INTDEF NONNULL((2)) int (LIBDCALL libd__flsbuf)(int ch, FILE *__restrict stream) THROWS(...);
-INTDEF int NOTHROW_NCX(LIBDCALL libd__setmaxstdio)(int val);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc__getmaxstdio)(void);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF int NOTHROW_NCX(LIBDCALL libd__setmaxstdio)(int newmaxval);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF int NOTHROW_NCX(LIBCCALL libc__setmaxstdio)(int newmaxval);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF int NOTHROW_NCX(LIBDCALL libd__set_printf_count_output)(int val);
 INTDEF uint32_t NOTHROW_NCX(LIBDCALL libd__set_output_format)(uint32_t format);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

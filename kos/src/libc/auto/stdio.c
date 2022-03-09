@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d5108f1 */
+/* HASH CRC-32:0xfc9bdb5e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@
 #include "../user/malloc.h"
 #include "../user/stdlib.h"
 #include "../user/string.h"
+#include "../user/sys.resource.h"
 #include "../user/unicode.h"
 #include "../user/unistd.h"
 
@@ -2552,6 +2553,29 @@ NOTHROW_RPC(LIBCCALL libc__fsopen)(char const *filename,
 	(void)sflag;
 	return libc_fopen(filename, modes);
 }
+#include <asm/os/resource.h>
+#include <bits/os/rlimit.h>
+INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__getmaxstdio)(void) {
+	struct rlimit rlim;
+	if unlikely(libc_getrlimit((__rlimit_resource_t)__RLIMIT_NOFILE, &rlim) != 0)
+		rlim.rlim_cur = (__FS_TYPE(rlim))-1;
+	return (int)rlim.rlim_cur;
+}
+#include <asm/os/resource.h>
+#include <bits/os/rlimit.h>
+INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") int
+NOTHROW_NCX(LIBCCALL libc__setmaxstdio)(int newmaxval) {
+	struct rlimit rlim;
+	if unlikely(libc_getrlimit((__rlimit_resource_t)__RLIMIT_NOFILE, &rlim) != 0)
+		goto err;
+	rlim.rlim_cur = (__FS_TYPE(rlim))newmaxval;
+	if unlikely(libc_setrlimit((__rlimit_resource_t)__RLIMIT_NOFILE, &rlim) != 0) {
+err:
+		rlim.rlim_cur = (__FS_TYPE(rlim))-1;
+	}
+	return (int)rlim.rlim_cur;
+}
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.access") NONNULL((1, 2, 3)) errno_t
 NOTHROW_RPC(LIBDCALL libd_fopen_s)(FILE **pstream,
@@ -4384,6 +4408,8 @@ DEFINE_PUBLIC_ALIAS(funopen, libc_funopen);
 DEFINE_PUBLIC_ALIAS(funopen64, libc_funopen64);
 DEFINE_PUBLIC_ALIAS(DOS$_fsopen, libd__fsopen);
 DEFINE_PUBLIC_ALIAS(_fsopen, libc__fsopen);
+DEFINE_PUBLIC_ALIAS(_getmaxstdio, libc__getmaxstdio);
+DEFINE_PUBLIC_ALIAS(_setmaxstdio, libc__setmaxstdio);
 DEFINE_PUBLIC_ALIAS(DOS$fopen_s, libd_fopen_s);
 DEFINE_PUBLIC_ALIAS(fopen_s, libc_fopen_s);
 DEFINE_PUBLIC_ALIAS(DOS$freopen_s, libd_freopen_s);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a2a852e */
+/* HASH CRC-32:0xcbcb2369 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5090,8 +5090,24 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__THROWING,_flsbuf,(int __ch, __FILE *__restr
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,_flsbuf,(int __ch, __FILE *__restrict __stream),__swbuf,(__ch,__stream))
 #endif /* ... */
 
-__CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,_getmaxstdio,(void),())
-__CDECLARE_OPT(,int,__NOTHROW_NCX,_setmaxstdio,(int __val),(__val))
+#ifdef __CRT_HAVE__getmaxstdio
+__CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,_getmaxstdio,(void),())
+#else /* __CRT_HAVE__getmaxstdio */
+#include <asm/os/resource.h>
+#if defined(__RLIMIT_NOFILE) && ((defined(__CRT_HAVE_getrlimit) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (defined(__CRT_HAVE___getrlimit) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (defined(__CRT_HAVE___libc_getrlimit) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (defined(__CRT_HAVE_getrlimit64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)))
+#include <libc/local/stdio/_getmaxstdio.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_getmaxstdio, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _getmaxstdio)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getmaxstdio))(); })
+#endif /* __RLIMIT_NOFILE && ((__CRT_HAVE_getrlimit && (!__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (__CRT_HAVE___getrlimit && (!__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (__CRT_HAVE___libc_getrlimit && (!__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (__CRT_HAVE_getrlimit64 && (__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__))) */
+#endif /* !__CRT_HAVE__getmaxstdio */
+#ifdef __CRT_HAVE__setmaxstdio
+__CDECLARE(,int,__NOTHROW_NCX,_setmaxstdio,(int __newmaxval),(__newmaxval))
+#else /* __CRT_HAVE__setmaxstdio */
+#include <asm/os/resource.h>
+#if defined(__RLIMIT_NOFILE) && ((defined(__CRT_HAVE_getrlimit) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (defined(__CRT_HAVE___getrlimit) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (defined(__CRT_HAVE___libc_getrlimit) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (defined(__CRT_HAVE_getrlimit64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__))) && ((defined(__CRT_HAVE_setrlimit) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (defined(__CRT_HAVE___setrlimit) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (defined(__CRT_HAVE___libc_setrlimit) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (defined(__CRT_HAVE_setrlimit64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)))
+#include <libc/local/stdio/_setmaxstdio.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_setmaxstdio, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL _setmaxstdio)(int __newmaxval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_setmaxstdio))(__newmaxval); })
+#endif /* __RLIMIT_NOFILE && ((__CRT_HAVE_getrlimit && (!__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (__CRT_HAVE___getrlimit && (!__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (__CRT_HAVE___libc_getrlimit && (!__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (__CRT_HAVE_getrlimit64 && (__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__))) && ((__CRT_HAVE_setrlimit && (!__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (__CRT_HAVE___setrlimit && (!__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (__CRT_HAVE___libc_setrlimit && (!__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)) || (__CRT_HAVE_setrlimit64 && (__USE_FILE_OFFSET64 || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__))) */
+#endif /* !__CRT_HAVE__setmaxstdio */
 __CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,_get_printf_count_output,(void),())
 __CDECLARE_OPT(,int,__NOTHROW_NCX,_set_printf_count_output,(int __val),(__val))
 __CDECLARE_OPT(__ATTR_WUNUSED,__UINT32_TYPE__,__NOTHROW_NCX,_get_output_format,(void),())
