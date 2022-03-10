@@ -256,11 +256,11 @@ int inet_paton([[nonnull]] char const **__restrict pcp,
 					uint8_t digit;
 					ch = *cp;
 					if (ch >= '0' && ch <= '9') {
-						digit = ch - '0';
+						digit = (uint8_t)(ch - '0');
 					} else if (ch >= 'a' && ch <= 'f') {
-						digit = 10 + ch - 'a';
+						digit = (uint8_t)(10 + ch - 'a');
 					} else if (ch >= 'A' && ch <= 'F') {
-						digit = 10 + ch - 'A';
+						digit = (uint8_t)(10 + ch - 'A');
 					} else {
 						break;
 					}

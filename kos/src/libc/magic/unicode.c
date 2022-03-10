@@ -755,40 +755,40 @@ char32_t unicode_readutf16_swap_rev_n([[nonnull]] /*utf-16*/ char16_t const **__
 [[kernel, libc, nonnull]]
 char *unicode_writeutf8([[nonnull]] /*utf-8*/ char *__restrict dst, char32_t ch) {
 	if likely(ch <= UTF8_1BYTE_MAX) {
-		*dst++ = (char)(u8)ch;
+		*dst++ = (char)(unsigned char)ch;
 	} else if (ch <= UTF8_2BYTE_MAX) {
-		*dst++ = (char)(0xc0 | (u8)((ch >> 6)/* & 0x1f*/));
-		*dst++ = (char)(0x80 | (u8)((ch) & 0x3f));
+		*dst++ = (char)(unsigned char)(0xc0 | (u8)((ch >> 6)/* & 0x1f*/));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch) & 0x3f));
 	} else if (ch <= UTF8_3BYTE_MAX) {
-		*dst++ = (char)(0xe0 | (u8)((ch >> 12)/* & 0x0f*/));
-		*dst++ = (char)(0x80 | (u8)((ch >> 6) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch) & 0x3f));
+		*dst++ = (char)(unsigned char)(0xe0 | (u8)((ch >> 12)/* & 0x0f*/));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 6) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch) & 0x3f));
 	} else if (ch <= UTF8_4BYTE_MAX) {
-		*dst++ = (char)(0xf0 | (u8)((ch >> 18)/* & 0x07*/));
-		*dst++ = (char)(0x80 | (u8)((ch >> 12) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch >> 6) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch) & 0x3f));
+		*dst++ = (char)(unsigned char)(0xf0 | (u8)((ch >> 18)/* & 0x07*/));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 12) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 6) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch) & 0x3f));
 	} else if (ch <= UTF8_5BYTE_MAX) {
-		*dst++ = (char)(0xf8 | (u8)((ch >> 24)/* & 0x03*/));
-		*dst++ = (char)(0x80 | (u8)((ch >> 18) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch >> 12) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch >> 6) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch) & 0x3f));
+		*dst++ = (char)(unsigned char)(0xf8 | (u8)((ch >> 24)/* & 0x03*/));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 18) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 12) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 6) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch) & 0x3f));
 	} else if (ch <= UTF8_6BYTE_MAX) {
-		*dst++ = (char)(0xfc | (u8)((ch >> 30)/* & 0x01*/));
-		*dst++ = (char)(0x80 | (u8)((ch >> 24) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch >> 18) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch >> 12) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch >> 6) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch) & 0x3f));
+		*dst++ = (char)(unsigned char)(0xfc | (u8)((ch >> 30)/* & 0x01*/));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 24) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 18) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 12) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 6) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch) & 0x3f));
 	} else {
-		*dst++ = (char)(0xfe);
-		*dst++ = (char)(0x80 | (u8)((ch >> 30) & 0x03/* & 0x3f*/));
-		*dst++ = (char)(0x80 | (u8)((ch >> 24) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch >> 18) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch >> 12) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch >> 6) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch) & 0x3f));
+		*dst++ = (char)(unsigned char)(0xfe);
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 30) & 0x03/* & 0x3f*/));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 24) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 18) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 12) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 6) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch) & 0x3f));
 	}
 	return dst;
 }
@@ -2384,27 +2384,27 @@ __NOTHROW_NCX(__libc_unicode_asdigit)(__CHAR32_TYPE__ ch, __UINT8_TYPE__ radix,
 	     : 0)
 #endif /* !__INTELLISENSE__ */
 
-#define __libc_unicode_getnumeric(ch)  \
-	((ch) >= 0x30 && (ch) <= 0x39     \
-	 ? (ch)-0x30                      \
-	 : (ch) >= 0x41 && (ch) <= 0x46   \
-	   ? (ch)-0x37                    \
-	   : (ch) >= 0x61 && (ch) <= 0x66 \
-	     ? (ch)-0x57                  \
+#define ____libc_unicode_getnumeric(ch) \
+	((ch) >= 0x30 && (ch) <= 0x39       \
+	 ? (ch)-0x30                        \
+	 : (ch) >= 0x41 && (ch) <= 0x46     \
+	   ? (ch)-0x37                      \
+	   : (ch) >= 0x61 && (ch) <= 0x66   \
+	     ? (ch)-0x57                    \
 	     : 0)
 
 /* >> unicode_getnumeric(3), unicode_getnumeric64(3), unicode_getnumericdbl(3), unicode_getnumericldbl(3)
  * Return  the numerical  variable for which  `ch' is representative  (s.a. `unicode_isnumeric(3)'). When
  * `ch' doesn't represent  a numerical character,  return `0'.  Note that this  function also  recognizes
  * 'a'-'f' and 'A'-'F' as numeric characters (representing their hex values) */
-#define __libc_unicode_getnumeric(ch) ((__UINT8_TYPE__)__libc_unicode_getnumeric(ch))
+#define __libc_unicode_getnumeric(ch) ((__UINT8_TYPE__)____libc_unicode_getnumeric(ch))
 
 #ifdef __UINT64_TYPE__
 /* >> unicode_getnumeric(3), unicode_getnumeric64(3), unicode_getnumericdbl(3), unicode_getnumericldbl(3)
  * Return  the numerical  variable for which  `ch' is representative  (s.a. `unicode_isnumeric(3)'). When
  * `ch' doesn't represent  a numerical character,  return `0'.  Note that this  function also  recognizes
  * 'a'-'f' and 'A'-'F' as numeric characters (representing their hex values) */
-#define __libc_unicode_getnumeric64(ch) ((__UINT64_TYPE__)__libc_unicode_getnumeric(ch))
+#define __libc_unicode_getnumeric64(ch) ((__UINT64_TYPE__)____libc_unicode_getnumeric(ch))
 #endif /* __UINT64_TYPE__ */
 
 #ifndef __NO_FPU
@@ -2412,14 +2412,14 @@ __NOTHROW_NCX(__libc_unicode_asdigit)(__CHAR32_TYPE__ ch, __UINT8_TYPE__ radix,
  * Return  the numerical  variable for which  `ch' is representative  (s.a. `unicode_isnumeric(3)'). When
  * `ch' doesn't represent  a numerical character,  return `0'.  Note that this  function also  recognizes
  * 'a'-'f' and 'A'-'F' as numeric characters (representing their hex values) */
-#define __libc_unicode_getnumericdbl(ch) ((double)__libc_unicode_getnumeric(ch))
+#define __libc_unicode_getnumericdbl(ch) ((double)____libc_unicode_getnumeric(ch))
 
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 /* >> unicode_getnumeric(3), unicode_getnumeric64(3), unicode_getnumericdbl(3), unicode_getnumericldbl(3)
  * Return  the numerical  variable for which  `ch' is representative  (s.a. `unicode_isnumeric(3)'). When
  * `ch' doesn't represent  a numerical character,  return `0'.  Note that this  function also  recognizes
  * 'a'-'f' and 'A'-'F' as numeric characters (representing their hex values) */
-#define __libc_unicode_getnumericldbl(ch) ((__LONGDOUBLE)__libc_unicode_getnumeric(ch))
+#define __libc_unicode_getnumericldbl(ch) ((__LONGDOUBLE)____libc_unicode_getnumeric(ch))
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__NO_FPU */
 #endif /* !____libc___unicode_descriptor_defined */

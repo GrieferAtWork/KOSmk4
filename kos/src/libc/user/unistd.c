@@ -3813,7 +3813,7 @@ NOTHROW_RPC(LIBCCALL libc_pwriteall)(fd_t fd,
 }
 /*[[[end:libc_pwriteall]]]*/
 
-/*[[[head:libc_pwriteall64,hash:CRC-32=0xce88eb77]]]*/
+/*[[[head:libc_pwriteall64,hash:CRC-32=0x48da2533]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_pwriteall64, libc_pwriteall);
 #else /* MAGIC:alias */
@@ -3821,7 +3821,7 @@ DEFINE_INTERN_ALIAS(libc_pwriteall64, libc_pwriteall);
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
 INTERN ATTR_SECTION(".text.crt.io.large.write") NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_pwriteall64)(fd_t fd,
-                                       void *buf,
+                                       void const *buf,
                                        size_t bufsize,
                                        __PIO_OFFSET64 offset)
 /*[[[body:libc_pwriteall64]]]*/

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x140c0c0b */
+/* HASH CRC-32:0xb88fe72a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -133,23 +133,23 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(psiginfo))(struct __siginfo_struct co
 #if defined(__SIGILL) || defined(__SIGFPE) || defined(__SIGSEGV) || defined(__SIGBUS)
 	if (0
 #ifdef __SIGILL
-	    || __pinfo->__si_signo == __SIGILL
+	    || __pinfo->si_signo == __SIGILL
 #endif /* __SIGILL */
 #ifdef __SIGFPE
-	    || __pinfo->__si_signo == __SIGFPE
+	    || __pinfo->si_signo == __SIGFPE
 #endif /* __SIGFPE */
 #ifdef __SIGSEGV
-	    || __pinfo->__si_signo == __SIGSEGV
+	    || __pinfo->si_signo == __SIGSEGV
 #endif /* __SIGSEGV */
 #ifdef __SIGBUS
-	    || __pinfo->__si_signo == __SIGBUS
+	    || __pinfo->si_signo == __SIGBUS
 #endif /* __SIGBUS */
 	    ) {
 		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "[%p])\n", __pinfo->si_addr);
 	} else
 #endif /* __SIGILL || __SIGFPE || __SIGSEGV || __SIGBUS */
 #ifdef __SIGCHLD
-	if (__pinfo->__si_signo == __SIGCHLD) {
+	if (__pinfo->si_signo == __SIGCHLD) {
 		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr,
 		        "%" __PRIN_PREFIX(__SIZEOF_PID_T__) "d %d "
 		        "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "d)\n",
@@ -159,7 +159,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(psiginfo))(struct __siginfo_struct co
 	} else
 #endif /* __SIGCHLD */
 #ifdef __SIGPOLL
-	if (__pinfo->__si_signo == __SIGPOLL) {
+	if (__pinfo->si_signo == __SIGPOLL) {
 		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "%" __PRIN_PREFIX(__SIZEOF_POINTER__) "d)\n",
 		        (__LONGPTR_TYPE__)__pinfo->si_band);
 	} else

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d0287b */
+/* HASH CRC-32:0xfbd090ac */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,14 +77,14 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_pwrite64_defined */
 __LOCAL_LIBC(pwriteall64) __ATTR_NONNULL((2)) __SSIZE_TYPE__
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pwriteall64))(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET64 __offset) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pwriteall64))(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET64 __offset) {
 	__SSIZE_TYPE__ __result, __temp;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_pwrite64)(__fd, __buf, __bufsize, __offset);
 	if (__result > 0 && (__SIZE_TYPE__)__result < __bufsize) {
 		/* Keep on writing */
 		for (;;) {
 			__temp = (__NAMESPACE_LOCAL_SYM __localdep_pwrite64)(__fd,
-			                (__BYTE_TYPE__ *)__buf + (__SIZE_TYPE__)__result,
+			                (__BYTE_TYPE__ const *)__buf + (__SIZE_TYPE__)__result,
 			                __bufsize - (__SIZE_TYPE__)__result,
 			                __offset + (__SIZE_TYPE__)__result);
 			if (__temp <= 0) {

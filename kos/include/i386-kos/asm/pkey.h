@@ -20,6 +20,8 @@
 #ifndef _I386_KOS_ASM_PKEY_H
 #define _I386_KOS_ASM_PKEY_H 1
 
+#include <__stdinc.h>
+
 #include <hybrid/host.h>
 
 /*
@@ -39,6 +41,7 @@
  * >> #define __arch_pkey_set(pkey, access_rights)     <VOID_EXPRESSION>
  */
 
+#if !defined(__CC__) || defined(__COMPILER_HAVE_GCC_ASM)
 #define __ARCH_HAVE_PKEY
 
 #define __arch_pkey_verify_key(pkey)             (__CCAST(unsigned int)(pkey) < 16)
@@ -54,5 +57,6 @@
 	__wrpkru((__rdpkru() & ~__arch_pkey_x86_mask(pkey)) | \
 	         ((__UINT32_TYPE__)(access_rights) << __arch_pkey_x86_shft(pkey)))
 #endif /* __CC__ */
+#endif /* !__CC__ || __COMPILER_HAVE_GCC_ASM */
 
 #endif /* !_I386_KOS_ASM_PKEY_H */

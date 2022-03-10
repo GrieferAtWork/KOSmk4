@@ -150,8 +150,8 @@ char *readpassphrase([[nullable]] char const *prompt,
 		goto err;
 	}
 
-again:
 @@pp_if $has_function(sigaction)@@
+again:
 	must_restart = false;
 @@pp_endif@@
 	infd  = __STDIN_FILENO;

@@ -46,11 +46,11 @@ struct nothrow_t {};
 __NAMESPACE_STD_END
 
 #if defined(__KOS__) && defined(__KERNEL__)
-__CXX_FORCEINLINE __ATTR_WUNUSED __ATTR_MALLOC __ATTR_ALLOC_SIZE((1)) __ATTR_RETNONNULL void *
+__CXX_FORCEINLINE __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_ALLOC_SIZE((1)) void *
 __KCALL operator new(__size_t __num_bytes) __THROWS(E_BADALLOC) {
 	return kmalloc(__num_bytes, GFP_NORMAL);
 }
-__CXX_FORCEINLINE __ATTR_WUNUSED __ATTR_MALLOC __ATTR_ALLOC_SIZE((1)) __ATTR_RETNONNULL void *
+__CXX_FORCEINLINE __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_ALLOC_SIZE((1)) void *
 __KCALL operator new[](__size_t __num_bytes) __THROWS(E_BADALLOC) {
 	return kmalloc(__num_bytes, GFP_NORMAL);
 }
@@ -79,8 +79,8 @@ operator delete[](void *__heap_ptr, std::nothrow_t const &) __CXX_NOEXCEPT {
 	kfree(__heap_ptr);
 }
 #else /* __KOS__ && __KERNEL__ */
-extern __ATTR_EXTERNALLY_VISIBLE __ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_ALLOC_SIZE((1)) __ATTR_RETNONNULL void *__LIBCCALL operator new(__size_t __num_bytes) /*throw(std::bad_alloc)*/;
-extern __ATTR_EXTERNALLY_VISIBLE __ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_ALLOC_SIZE((1)) __ATTR_RETNONNULL void *__LIBCCALL operator new[](__size_t __num_bytes) /*throw(std::bad_alloc)*/;
+extern __ATTR_EXTERNALLY_VISIBLE __ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_ALLOC_SIZE((1)) void *__LIBCCALL operator new(__size_t __num_bytes) /*throw(std::bad_alloc)*/;
+extern __ATTR_EXTERNALLY_VISIBLE __ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_ALLOC_SIZE((1)) void *__LIBCCALL operator new[](__size_t __num_bytes) /*throw(std::bad_alloc)*/;
 extern __ATTR_EXTERNALLY_VISIBLE void __LIBCCALL operator delete(void *__heap_ptr) __CXX_NOEXCEPT;
 extern __ATTR_EXTERNALLY_VISIBLE void __LIBCCALL operator delete[](void *__heap_ptr) __CXX_NOEXCEPT;
 extern __ATTR_EXTERNALLY_VISIBLE __ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_ALLOC_SIZE((1)) void *__LIBCCALL operator new(__size_t __num_bytes, std::nothrow_t const &) __CXX_NOEXCEPT;
@@ -123,11 +123,11 @@ enum align_val_t {};
 __NAMESPACE_STD_END
 #endif /* !__std_align_val_t_defined */
 #if defined(__KOS__) && defined(__KERNEL__)
-__CXX_FORCEINLINE __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) __ATTR_ALLOC_ALIGN(2) __ATTR_RETNONNULL void *__KCALL
+__CXX_FORCEINLINE __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)) __ATTR_RETNONNULL void *__KCALL
 operator new(__size_t __num_bytes, std::align_val_t __min_alignment) __THROWS(E_BADALLOC) {
 	return kmemalign((__size_t)__min_alignment, __num_bytes, GFP_NORMAL);
 }
-__CXX_FORCEINLINE __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) __ATTR_ALLOC_ALIGN(2) void *__KCALL
+__CXX_FORCEINLINE __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)) void *__KCALL
 operator new(__size_t __num_bytes, std::align_val_t __min_alignment, std::nothrow_t const &) __CXX_NOEXCEPT {
 	return kmemalign_nx((__size_t)__min_alignment, __num_bytes, GFP_NORMAL);
 }
@@ -139,11 +139,11 @@ __CXX_FORCEINLINE void __KCALL
 operator delete(void *__heap_ptr, std::align_val_t __UNUSED(__min_alignment), std::nothrow_t const &) __CXX_NOEXCEPT {
 	kfree(__heap_ptr);
 }
-__CXX_FORCEINLINE __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) __ATTR_ALLOC_ALIGN(2) __ATTR_RETNONNULL void *__KCALL
+__CXX_FORCEINLINE __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)) __ATTR_RETNONNULL void *__KCALL
 operator new[](__size_t __num_bytes, std::align_val_t __min_alignment) __THROWS(E_BADALLOC) {
 	return kmemalign((__size_t)__min_alignment, __num_bytes, GFP_NORMAL);
 }
-__CXX_FORCEINLINE __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) __ATTR_ALLOC_ALIGN(2) void *__KCALL
+__CXX_FORCEINLINE __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)) void *__KCALL
 operator new[](__size_t __num_bytes, std::align_val_t __min_alignment, std::nothrow_t const &) __CXX_NOEXCEPT {
 	return kmemalign_nx((__size_t)__min_alignment, __num_bytes, GFP_NORMAL);
 }
@@ -166,12 +166,12 @@ operator delete[](void *__heap_ptr, std::size_t __UNUSED(__num_bytes), std::alig
 }
 #endif /* __cpp_sized_deallocation */
 #else /* __KOS__ && __KERNEL__ */
-extern __ATTR_EXTERNALLY_VISIBLE __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) __ATTR_ALLOC_ALIGN(2) __ATTR_RETNONNULL void *__LIBCCALL operator new(__size_t __num_bytes, std::align_val_t __min_alignment) /*throw(std::bad_alloc)*/;
-extern __ATTR_EXTERNALLY_VISIBLE __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) __ATTR_ALLOC_ALIGN(2) void *__LIBCCALL operator new(__size_t __num_bytes, std::align_val_t __min_alignment, std::nothrow_t const &) __CXX_NOEXCEPT;
+extern __ATTR_EXTERNALLY_VISIBLE __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)) __ATTR_RETNONNULL void *__LIBCCALL operator new(__size_t __num_bytes, std::align_val_t __min_alignment) /*throw(std::bad_alloc)*/;
+extern __ATTR_EXTERNALLY_VISIBLE __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)) void *__LIBCCALL operator new(__size_t __num_bytes, std::align_val_t __min_alignment, std::nothrow_t const &) __CXX_NOEXCEPT;
 extern __ATTR_EXTERNALLY_VISIBLE void __LIBCCALL operator delete(void *__heap_ptr, std::align_val_t __min_alignment) __CXX_NOEXCEPT;
 extern __ATTR_EXTERNALLY_VISIBLE void __LIBCCALL operator delete(void *__heap_ptr, std::align_val_t __min_alignment, std::nothrow_t const &) __CXX_NOEXCEPT;
-extern __ATTR_EXTERNALLY_VISIBLE __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) __ATTR_ALLOC_ALIGN(2) __ATTR_RETNONNULL void *__LIBCCALL operator new[](__size_t __num_bytes, std::align_val_t __min_alignment) /*throw(std::bad_alloc)*/;
-extern __ATTR_EXTERNALLY_VISIBLE __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) __ATTR_ALLOC_ALIGN(2) void *__LIBCCALL operator new[](__size_t __num_bytes, std::align_val_t __min_alignment, std::nothrow_t const &) __CXX_NOEXCEPT;
+extern __ATTR_EXTERNALLY_VISIBLE __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)) __ATTR_RETNONNULL void *__LIBCCALL operator new[](__size_t __num_bytes, std::align_val_t __min_alignment) /*throw(std::bad_alloc)*/;
+extern __ATTR_EXTERNALLY_VISIBLE __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)) void *__LIBCCALL operator new[](__size_t __num_bytes, std::align_val_t __min_alignment, std::nothrow_t const &) __CXX_NOEXCEPT;
 extern __ATTR_EXTERNALLY_VISIBLE void __LIBCCALL operator delete[](void *__heap_ptr, std::align_val_t __min_alignment) __CXX_NOEXCEPT;
 extern __ATTR_EXTERNALLY_VISIBLE void __LIBCCALL operator delete[](void *__heap_ptr, std::align_val_t __min_alignment, std::nothrow_t const &) __CXX_NOEXCEPT;
 #if defined(__cpp_sized_deallocation) && (__cpp_sized_deallocation+0)

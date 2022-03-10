@@ -965,7 +965,7 @@ __fp_no_exp_addend:
 					/* >> result = __val / (__fp_basef ^ __exp_power) */
 					__exp_abs = (__UINTMAX_TYPE__)__exp_power;
 					if (__exp_power < 0)
-						__exp_abs = (__UINTMAX_TYPE__)-__exp_abs;
+						__exp_abs = (__UINTMAX_TYPE__)0 - __exp_abs;
 					while (__exp_abs) {
 						if (__exp_abs & 1) {
 							if (__exp_power < 0) {

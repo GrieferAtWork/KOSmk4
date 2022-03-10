@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e8977ef */
+/* HASH CRC-32:0x793d8829 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -791,11 +791,11 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
 		uint8_t digit;
 		char ch = *num_iter;
 		if (ch >= '0' && ch <= '9')
-			digit = ch - '0';
+			digit = (uint8_t)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			digit = 10 + (ch - 'a');
+			digit = (uint8_t)(10 + ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			digit = 10 + (ch - 'A');
+			digit = (uint8_t)(10 + ch - 'A');
 		else {
 			break;
 		}
@@ -816,11 +816,11 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
 				for (;;) {
 					ch = *num_iter;
 					if (ch >= '0' && ch <= '9')
-						digit = ch - '0';
+						digit = (uint8_t)(ch - '0');
 					else if (ch >= 'a' && ch <= 'z')
-						digit = 10 + (ch - 'a');
+						digit = (uint8_t)(10 + ch - 'a');
 					else if (ch >= 'A' && ch <= 'Z')
-						digit = 10 + (ch - 'A');
+						digit = (uint8_t)(10 + ch - 'A');
 					else {
 						break;
 					}
@@ -942,11 +942,11 @@ NOTHROW_NCX(LIBCCALL libc_strto32_r)(char const *__restrict nptr,
 		char ch;
 		ch = *num_iter;
 		if (ch >= '0' && ch <= '9')
-			digit = ch - '0';
+			digit = (uint8_t)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			digit = 10 + (ch - 'a');
+			digit = (uint8_t)(10 + ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			digit = 10 + (ch - 'A');
+			digit = (uint8_t)(10 + ch - 'A');
 		else {
 			break;
 		}
@@ -968,11 +968,11 @@ handle_overflow:
 				for (;;) {
 					ch = *num_iter;
 					if (ch >= '0' && ch <= '9')
-						digit = ch - '0';
+						digit = (uint8_t)(ch - '0');
 					else if (ch >= 'a' && ch <= 'z')
-						digit = 10 + (ch - 'a');
+						digit = (uint8_t)(10 + ch - 'a');
 					else if (ch >= 'A' && ch <= 'Z')
-						digit = 10 + (ch - 'A');
+						digit = (uint8_t)(10 + ch - 'A');
 					else {
 						break;
 					}
@@ -1095,11 +1095,11 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
 		uint8_t digit;
 		char ch = *num_iter;
 		if (ch >= '0' && ch <= '9')
-			digit = ch - '0';
+			digit = (uint8_t)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			digit = 10 + (ch - 'a');
+			digit = (uint8_t)(10 + ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			digit = 10 + (ch - 'A');
+			digit = (uint8_t)(10 + ch - 'A');
 		else {
 			break;
 		}
@@ -1120,11 +1120,11 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
 				for (;;) {
 					ch = *num_iter;
 					if (ch >= '0' && ch <= '9')
-						digit = ch - '0';
+						digit = (uint8_t)(ch - '0');
 					else if (ch >= 'a' && ch <= 'z')
-						digit = 10 + (ch - 'a');
+						digit = (uint8_t)(10 + ch - 'a');
 					else if (ch >= 'A' && ch <= 'Z')
-						digit = 10 + (ch - 'A');
+						digit = (uint8_t)(10 + ch - 'A');
 					else {
 						break;
 					}
@@ -1245,11 +1245,11 @@ NOTHROW_NCX(LIBCCALL libc_strto64_r)(char const *__restrict nptr,
 		char ch;
 		ch = *num_iter;
 		if (ch >= '0' && ch <= '9')
-			digit = ch - '0';
+			digit = (uint8_t)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			digit = 10 + (ch - 'a');
+			digit = (uint8_t)(10 + ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			digit = 10 + (ch - 'A');
+			digit = (uint8_t)(10 + ch - 'A');
 		else {
 			break;
 		}
@@ -1271,11 +1271,11 @@ handle_overflow:
 				for (;;) {
 					ch = *num_iter;
 					if (ch >= '0' && ch <= '9')
-						digit = ch - '0';
+						digit = (uint8_t)(ch - '0');
 					else if (ch >= 'a' && ch <= 'z')
-						digit = 10 + (ch - 'a');
+						digit = (uint8_t)(10 + ch - 'a');
 					else if (ch >= 'A' && ch <= 'Z')
-						digit = 10 + (ch - 'A');
+						digit = (uint8_t)(10 + ch - 'A');
 					else {
 						break;
 					}

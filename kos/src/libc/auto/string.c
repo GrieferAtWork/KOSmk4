@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4590069 */
+/* HASH CRC-32:0x5329219e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2075,7 +2075,7 @@ NOTHROW_NCX(LIBDCALL libd_strerror_r)(errno_t errnum,
 			goto fallback;
 		libc_memcpyc(buf, string, msg_len, sizeof(char));
 	} else {
-		if (libc_snprintf(buf, buflen, "Unknown error %d", errnum) >= buflen)
+		if ((size_t)libc_snprintf(buf, buflen, "Unknown error %d", errnum) >= buflen)
 			goto fallback;
 	}
 	return buf;
@@ -2100,7 +2100,7 @@ NOTHROW_NCX(LIBCCALL libc_strerror_r)(errno_t errnum,
 			goto fallback;
 		libc_memcpyc(buf, string, msg_len, sizeof(char));
 	} else {
-		if (libc_snprintf(buf, buflen, "Unknown error %d", errnum) >= buflen)
+		if ((size_t)libc_snprintf(buf, buflen, "Unknown error %d", errnum) >= buflen)
 			goto fallback;
 	}
 	return buf;
@@ -4481,12 +4481,12 @@ NOTHROW_NCX(LIBCCALL libc_memcasemem_l)(void const *haystack,
 		return NULL;
 #endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
 	haystacklen -= (needlelen - 1);
-	marker       = libc_tolower_l(*(byte_t *)needle, locale);
+	marker       = (byte_t)libc_tolower_l(*(byte_t *)needle, locale);
 	hayend       = (byte_t *)haystack + haystacklen;
 	for (;;) {
 		for (candidate = (byte_t *)haystack; candidate < hayend; ++candidate) {
 			byte_t b = *candidate;
-			if (b == marker || libc_tolower_l(b, locale) == marker)
+			if (b == marker || (byte_t)libc_tolower_l(b, locale) == marker)
 				goto got_candidate;
 		}
 		break;
@@ -4827,10 +4827,10 @@ NOTHROW_NCX(LIBCCALL libc_wildstrcasecmp_l)(char const *pattern,
 				return 0; /* Pattern ends with '*' (matches everything) */
 			if (card_post == '?')
 				goto next; /* Match any --> already found */
-			card_post = libc_tolower_l(card_post, locale);
+			card_post = (char)libc_tolower_l(card_post, locale);
 			for (;;) {
 				char ch = *string++;
-				if (card_post == ch || card_post == libc_tolower_l(ch, locale)) {
+				if (card_post == ch || card_post == (char)libc_tolower_l(ch, locale)) {
 					/* Recursively check if the rest of the string and pattern match */
 					if (!libc_strcasecmp_l(string, pattern, locale))
 						return 0;
@@ -4842,8 +4842,8 @@ NOTHROW_NCX(LIBCCALL libc_wildstrcasecmp_l)(char const *pattern,
 		pattern_ch = *pattern;
 		string_ch = *string;
 		if (pattern_ch == string_ch || pattern_ch == '?' ||
-		    (pattern_ch = libc_tolower_l(pattern_ch, locale),
-		     string_ch = libc_tolower_l(string_ch, locale),
+		    (pattern_ch = (char)libc_tolower_l((unsigned char)pattern_ch, locale),
+		     string_ch = (char)libc_tolower_l((unsigned char)string_ch, locale),
 		     pattern_ch == string_ch)) {
 next:
 			++string;
@@ -4898,7 +4898,8 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcasecmp_l)(void const *s1,
 		for (j = 0; j < s2_bytes; j++) {
 			byte_t c1 = ((byte_t *)s1)[i];
 			byte_t c2 = ((byte_t *)s2)[j];
-			cost  = c1 != c2 && libc_tolower_l(c1, locale) != libc_tolower_l(c2, locale);
+			cost  = c1 != c2 && (libc_tolower_l((unsigned char)c1, locale) !=
+			                     libc_tolower_l((unsigned char)c2, locale));
 			cost += v0[j];
 			temp  = v1[j] + 1;
 			if (cost > temp)
@@ -5154,7 +5155,7 @@ NOTHROW_NCX(LIBCCALL libc_strlwr_l)(char *__restrict str,
                                     locale_t locale) {
 	char *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
-		*iter = libc_tolower_l(ch, locale);
+		*iter = (char)libc_tolower_l((unsigned char)ch, locale);
 	return str;
 }
 INTERN ATTR_SECTION(".text.crt.unicode.locale.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char *
@@ -5162,7 +5163,7 @@ NOTHROW_NCX(LIBCCALL libc_strupr_l)(char *__restrict str,
                                     locale_t locale) {
 	char *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
-		*iter = libc_toupper_l(ch, locale);
+		*iter = (char)libc_toupper_l((unsigned char)ch, locale);
 	return str;
 }
 INTERN ATTR_SECTION(".text.crt.unicode.locale.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char *
@@ -5171,7 +5172,7 @@ NOTHROW_NCX(LIBCCALL libc_strnlwr_l)(char *__restrict str,
                                      locale_t locale) {
 	char *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
-		*iter = libc_tolower_l(ch, locale);
+		*iter = (char)libc_tolower_l((unsigned char)ch, locale);
 	return str;
 }
 INTERN ATTR_SECTION(".text.crt.unicode.locale.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char *
@@ -5180,7 +5181,7 @@ NOTHROW_NCX(LIBCCALL libc_strnupr_l)(char *__restrict str,
                                      locale_t locale) {
 	char *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
-		*iter = libc_toupper_l(ch, locale);
+		*iter = (char)libc_toupper_l((unsigned char)ch, locale);
 	return str;
 }
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) void *
@@ -5333,16 +5334,16 @@ NOTHROW_NCX(LIBCCALL libc_bitcpy)(void *__restrict dst_base,
 		byte_t remaining, src_value, remaining_temp;
 		src_base = (byte_t const *)src_base + (src_bit_offset / __CHAR_BIT__);
 		src_bit_offset %= __CHAR_BIT__;
-		remaining = __CHAR_BIT__ - src_bit_offset;
-		if (remaining > num_bits)
-			remaining = num_bits;
+		remaining = (byte_t)(__CHAR_BIT__ - src_bit_offset);
+		if ((size_t)remaining > num_bits)
+			remaining = (byte_t)num_bits;
 		src_value      = *(byte_t const *)src_base >> src_bit_offset;
 		remaining_temp = remaining;
 		while (remaining_temp) {
 			byte_t avail, dst_value;
 			dst_base = (byte_t *)dst_base + (dst_bit_offset / __CHAR_BIT__);
 			dst_bit_offset %= __CHAR_BIT__;
-			avail = __CHAR_BIT__ - dst_bit_offset;
+			avail = (byte_t)(__CHAR_BIT__ - dst_bit_offset);
 			if (avail > remaining_temp)
 				avail = remaining_temp;
 			dst_value = *(byte_t *)dst_base;

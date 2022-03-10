@@ -127,7 +127,7 @@ __NOTHROW(atomic_rwlock_end)(struct atomic_rwlock *__restrict __self) {
 	return 1;
 }
 
-__LOCAL __ATTR_NONNULL((1)) __ATTR_WUNUSED __BOOL
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
 __NOTHROW(atomic_rwlock_tryread)(struct atomic_rwlock *__restrict __self) {
 	__UINTPTR_TYPE__ __temp;
 	do {
@@ -141,7 +141,7 @@ __NOTHROW(atomic_rwlock_tryread)(struct atomic_rwlock *__restrict __self) {
 	return 1;
 }
 
-__LOCAL __ATTR_NONNULL((1)) __ATTR_WUNUSED __BOOL
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
 __NOTHROW(atomic_rwlock_trywrite)(struct atomic_rwlock *__restrict __self) {
 	if __untraced(!__hybrid_atomic_cmpxch(__self->arw_lock, 0, (__UINTPTR_TYPE__)-1,
 	                                      __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))

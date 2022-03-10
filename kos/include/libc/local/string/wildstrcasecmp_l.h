@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabedc251 */
+/* HASH CRC-32:0xeece484b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,10 +83,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildstrcasecmp_l))(char const *__patt
 				return 0; /* Pattern ends with '*' (matches everything) */
 			if (__card_post == '?')
 				goto __next; /* Match any --> already found */
-			__card_post = (__NAMESPACE_LOCAL_SYM __localdep_tolower_l)(__card_post, __locale);
+			__card_post = (char)(__NAMESPACE_LOCAL_SYM __localdep_tolower_l)(__card_post, __locale);
 			for (;;) {
 				char __ch = *__string++;
-				if (__card_post == __ch || __card_post == (__NAMESPACE_LOCAL_SYM __localdep_tolower_l)(__ch, __locale)) {
+				if (__card_post == __ch || __card_post == (char)(__NAMESPACE_LOCAL_SYM __localdep_tolower_l)(__ch, __locale)) {
 					/* Recursively check if the rest of the string and pattern match */
 					if (!(__NAMESPACE_LOCAL_SYM __localdep_strcasecmp_l)(__string, __pattern, __locale))
 						return 0;
@@ -98,8 +98,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildstrcasecmp_l))(char const *__patt
 		__pattern_ch = *__pattern;
 		__string_ch = *__string;
 		if (__pattern_ch == __string_ch || __pattern_ch == '?' ||
-		    (__pattern_ch = (__NAMESPACE_LOCAL_SYM __localdep_tolower_l)(__pattern_ch, __locale),
-		     __string_ch = (__NAMESPACE_LOCAL_SYM __localdep_tolower_l)(__string_ch, __locale),
+		    (__pattern_ch = (char)(__NAMESPACE_LOCAL_SYM __localdep_tolower_l)((unsigned char)__pattern_ch, __locale),
+		     __string_ch = (char)(__NAMESPACE_LOCAL_SYM __localdep_tolower_l)((unsigned char)__string_ch, __locale),
 		     __pattern_ch == __string_ch)) {
 __next:
 			++__string;

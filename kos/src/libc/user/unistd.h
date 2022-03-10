@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe107507e */
+/* HASH CRC-32:0x77d0749b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -362,7 +362,7 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_pwrite64)(fd_t fd, void co
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_preadall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_pwriteall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
+INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_pwriteall64)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset);
 INTDEF fd_t NOTHROW_NCX(LIBDCALL libd_dup3)(fd_t oldfd, fd_t newfd, oflag_t flags);
 INTDEF fd_t NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd, fd_t newfd, oflag_t flags);
 /* >> pipe2(2)

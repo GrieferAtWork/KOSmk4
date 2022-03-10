@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8457f413 */
+/* HASH CRC-32:0xd3e68d0f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2181,7 +2181,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strto64_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 /* >> char itoa_decimal(uint8_t digit);
  * Same as `itoa_digit()', but weak undefined behavior when `digit >= 10' */
 #define itoa_decimal(digit) \
-	('0' + (digit))
+	(char)('0' + (digit))
 
 /* >> char const _itoa_digits[101] =
  * >> "0123456789abcdefghijklmnopqrstuvwxyz\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"

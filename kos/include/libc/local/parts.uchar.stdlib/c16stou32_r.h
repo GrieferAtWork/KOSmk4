@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x492599f0 */
+/* HASH CRC-32:0x3d6e33d7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -104,11 +104,11 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16stou32_r))(__CHAR16_TYPE__ const *
 		__UINT8_TYPE__ __digit;
 		__CHAR16_TYPE__ __ch = *__num_iter;
 		if (__ch >= '0' && __ch <= '9')
-			__digit = __ch - '0';
+			__digit = (__UINT8_TYPE__)(__ch - '0');
 		else if (__ch >= 'a' && __ch <= 'z')
-			__digit = 10 + (__ch - 'a');
+			__digit = (__UINT8_TYPE__)(10 + __ch - 'a');
 		else if (__ch >= 'A' && __ch <= 'Z')
-			__digit = 10 + (__ch - 'A');
+			__digit = (__UINT8_TYPE__)(10 + __ch - 'A');
 		else {
 			break;
 		}
@@ -129,11 +129,11 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16stou32_r))(__CHAR16_TYPE__ const *
 				for (;;) {
 					__ch = *__num_iter;
 					if (__ch >= '0' && __ch <= '9')
-						__digit = __ch - '0';
+						__digit = (__UINT8_TYPE__)(__ch - '0');
 					else if (__ch >= 'a' && __ch <= 'z')
-						__digit = 10 + (__ch - 'a');
+						__digit = (__UINT8_TYPE__)(10 + __ch - 'a');
 					else if (__ch >= 'A' && __ch <= 'Z')
-						__digit = 10 + (__ch - 'A');
+						__digit = (__UINT8_TYPE__)(10 + __ch - 'A');
 					else {
 						break;
 					}

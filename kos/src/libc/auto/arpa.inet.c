@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x711a761 */
+/* HASH CRC-32:0x5bfdd07c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -216,11 +216,11 @@ NOTHROW_NCX(LIBCCALL libc_inet_paton)(char const **__restrict pcp,
 					uint8_t digit;
 					ch = *cp;
 					if (ch >= '0' && ch <= '9') {
-						digit = ch - '0';
+						digit = (uint8_t)(ch - '0');
 					} else if (ch >= 'a' && ch <= 'f') {
-						digit = 10 + ch - 'a';
+						digit = (uint8_t)(10 + ch - 'a');
 					} else if (ch >= 'A' && ch <= 'F') {
-						digit = 10 + ch - 'A';
+						digit = (uint8_t)(10 + ch - 'A');
 					} else {
 						break;
 					}

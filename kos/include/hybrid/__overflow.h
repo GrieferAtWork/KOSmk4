@@ -204,7 +204,7 @@ extern "C++" {
 #endif /* __cplusplus */
 
 #define __IMPL_HYBRID_DEFINE_PROMOTION_MATH(opn, n, opn_x2)                                           \
-	__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __ATTR_PURE __BOOL                                     \
+	__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL                               \
 	__NOTHROW_NCX(__IMPL_HYBRID_OVERFLOW_NAME(__impl_hybrid_overflow_uadd, opn, n))                   \
 	(__UINT##opn##_TYPE__ __x, __UINT##opn##_TYPE__ __y, __UINT##n##_TYPE__ *__restrict __res) {      \
 		__UINT##opn_x2##_TYPE__ __true_res = (__UINT##opn_x2##_TYPE__)((__UINT##opn_x2##_TYPE__)__x + \
@@ -215,7 +215,7 @@ extern "C++" {
 			return 1;                                                                                 \
 		return 0;                                                                                     \
 	}                                                                                                 \
-	__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __ATTR_PURE __BOOL                                     \
+	__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL                               \
 	__NOTHROW_NCX(__IMPL_HYBRID_OVERFLOW_NAME(__impl_hybrid_overflow_sadd, opn, n))                   \
 	(__INT##opn##_TYPE__ __x, __INT##opn##_TYPE__ __y, __INT##n##_TYPE__ *__restrict __res) {         \
 		__INT##opn_x2##_TYPE__ __true_res = (__INT##opn_x2##_TYPE__)((__INT##opn_x2##_TYPE__)__x +    \
@@ -226,7 +226,7 @@ extern "C++" {
 			return 1;                                                                                 \
 		return 0;                                                                                     \
 	}                                                                                                 \
-	__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __ATTR_PURE __BOOL                                     \
+	__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL                               \
 	__NOTHROW_NCX(__IMPL_HYBRID_OVERFLOW_NAME(__impl_hybrid_overflow_usub, opn, n))                   \
 	(__UINT##opn##_TYPE__ __x, __UINT##opn##_TYPE__ __y, __UINT##n##_TYPE__ *__restrict __res) {      \
 		*__res = (__UINT##n##_TYPE__)(__x - __y);                                                     \
@@ -234,7 +234,7 @@ extern "C++" {
 			return 1;                                                                                 \
 		return 0;                                                                                     \
 	}                                                                                                 \
-	__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __ATTR_PURE __BOOL                                     \
+	__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL                               \
 	__NOTHROW_NCX(__IMPL_HYBRID_OVERFLOW_NAME(__impl_hybrid_overflow_ssub, opn, n))                   \
 	(__INT##opn##_TYPE__ __x, __INT##opn##_TYPE__ __y, __INT##n##_TYPE__ *__restrict __res) {         \
 		__INT##opn_x2##_TYPE__ __true_res = (__INT##opn_x2##_TYPE__)((__INT##opn_x2##_TYPE__)__x -    \
@@ -245,7 +245,7 @@ extern "C++" {
 			return 1;                                                                                 \
 		return 0;                                                                                     \
 	}                                                                                                 \
-	__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __ATTR_PURE __BOOL                                     \
+	__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL                               \
 	__NOTHROW_NCX(__IMPL_HYBRID_OVERFLOW_NAME(__impl_hybrid_overflow_umul, opn, n))                   \
 	(__UINT##opn##_TYPE__ __x, __UINT##opn##_TYPE__ __y, __UINT##n##_TYPE__ *__restrict __res) {      \
 		__UINT##opn_x2##_TYPE__ __true_res = (__UINT##opn_x2##_TYPE__)((__UINT##opn_x2##_TYPE__)__x * \
@@ -256,7 +256,7 @@ extern "C++" {
 			return 1;                                                                                 \
 		return 0;                                                                                     \
 	}                                                                                                 \
-	__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __ATTR_PURE __BOOL                                     \
+	__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL                               \
 	__NOTHROW_NCX(__IMPL_HYBRID_OVERFLOW_NAME(__impl_hybrid_overflow_smul, opn, n))                   \
 	(__INT##opn##_TYPE__ __x, __INT##opn##_TYPE__ __y, __INT##n##_TYPE__ *__restrict __res) {         \
 		__INT##opn_x2##_TYPE__ __true_res = (__INT##opn_x2##_TYPE__)((__INT##opn_x2##_TYPE__)__x *    \
@@ -269,7 +269,7 @@ extern "C++" {
 	}
 
 #define __IMPL_HYBRID_DEFINE_OVERFLOW_MATH(opn, n)                                               \
-	__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __ATTR_PURE __BOOL                                \
+	__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL                          \
 	__NOTHROW_NCX(__IMPL_HYBRID_OVERFLOW_NAME(__impl_hybrid_overflow_uadd, opn, n))              \
 	(__UINT##opn##_TYPE__ __x, __UINT##opn##_TYPE__ __y, __UINT##n##_TYPE__ *__restrict __res) { \
 		*__res = (__UINT##n##_TYPE__)(__x + __y);                                                \
@@ -277,7 +277,7 @@ extern "C++" {
 			return 1;                                                                            \
 		return 0;                                                                                \
 	}                                                                                            \
-	__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __ATTR_PURE __BOOL                                \
+	__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL                          \
 	__NOTHROW_NCX(__IMPL_HYBRID_OVERFLOW_NAME(__impl_hybrid_overflow_sadd, opn, n))              \
 	(__INT##opn##_TYPE__ __x, __INT##opn##_TYPE__ __y, __INT##n##_TYPE__ *__restrict __res) {    \
 		*__res = (__INT##n##_TYPE__)(__x + __y);                                                 \
@@ -286,7 +286,7 @@ extern "C++" {
 			return 1;                                                                            \
 		return 0;                                                                                \
 	}                                                                                            \
-	__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __ATTR_PURE __BOOL                                \
+	__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL                          \
 	__NOTHROW_NCX(__IMPL_HYBRID_OVERFLOW_NAME(__impl_hybrid_overflow_usub, opn, n))              \
 	(__UINT##opn##_TYPE__ __x, __UINT##opn##_TYPE__ __y, __UINT##n##_TYPE__ *__restrict __res) { \
 		*__res = (__UINT##n##_TYPE__)(__x - __y);                                                \
@@ -294,7 +294,7 @@ extern "C++" {
 			return 1;                                                                            \
 		return 0;                                                                                \
 	}                                                                                            \
-	__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __ATTR_PURE __BOOL                                \
+	__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL                          \
 	__NOTHROW_NCX(__IMPL_HYBRID_OVERFLOW_NAME(__impl_hybrid_overflow_ssub, opn, n))              \
 	(__INT##opn##_TYPE__ __x, __INT##opn##_TYPE__ __y, __INT##n##_TYPE__ *__restrict __res) {    \
 		*__res = (__INT##n##_TYPE__)(__x - __y);                                                 \
@@ -303,7 +303,7 @@ extern "C++" {
 			return 1;                                                                            \
 		return 0;                                                                                \
 	}                                                                                            \
-	__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __ATTR_PURE __BOOL                                \
+	__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL                          \
 	__NOTHROW_NCX(__IMPL_HYBRID_OVERFLOW_NAME(__impl_hybrid_overflow_umul, opn, n))              \
 	(__UINT##opn##_TYPE__ __x, __UINT##opn##_TYPE__ __y, __UINT##n##_TYPE__ *__restrict __res) { \
 		*__res = (__UINT##n##_TYPE__)(__x * __y);                                                \
@@ -311,7 +311,7 @@ extern "C++" {
 			return 1;                                                                            \
 		return 0;                                                                                \
 	}                                                                                            \
-	__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __ATTR_PURE __BOOL                                \
+	__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL                          \
 	__NOTHROW_NCX(__IMPL_HYBRID_OVERFLOW_NAME(__impl_hybrid_overflow_smul, opn, n))              \
 	(__INT##opn##_TYPE__ __x, __INT##opn##_TYPE__ __y, __INT##n##_TYPE__ *__restrict __res) {    \
 		*__res = (__INT##n##_TYPE__)(__x * __y);                                                 \
@@ -383,8 +383,26 @@ __IMPL_HYBRID_DEFINE_OVERFLOW_MATH(128, 128)
 #undef __IMPL_HYBRID_DEFINE_PROMOTION_MATH
 
 #ifdef __cplusplus
+#ifdef __UFIFTHINT_TYPE__
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL __NOTHROW_NCX(__impl_hybrid_overflow_uadd)(__UFIFTHINT_TYPE__ __x, __UFIFTHINT_TYPE__ __y, __UFIFTHINT_TYPE__ *__restrict __res) { return __impl_hybrid_overflow_uadd((__UFIFTHINT_ALIAS_TYPE__)__x, (__UFIFTHINT_ALIAS_TYPE__)__y, (__UFIFTHINT_ALIAS_TYPE__ *)__res); }
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL __NOTHROW_NCX(__impl_hybrid_overflow_sadd)(__FIFTHINT_TYPE__ __x, __FIFTHINT_TYPE__ __y, __FIFTHINT_TYPE__ *__restrict __res) { return __impl_hybrid_overflow_sadd((__FIFTHINT_ALIAS_TYPE__)__x, (__FIFTHINT_ALIAS_TYPE__)__y, (__FIFTHINT_ALIAS_TYPE__ *)__res); }
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL __NOTHROW_NCX(__impl_hybrid_overflow_uadd)(__UFIFTHINT_TYPE__ __x, __UFIFTHINT_TYPE__ __y, __UINT8_TYPE__ *__restrict __res) { return __impl_hybrid_overflow_uadd((__UFIFTHINT_ALIAS_TYPE__)__x, (__UFIFTHINT_ALIAS_TYPE__)__y, __res); }
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL __NOTHROW_NCX(__impl_hybrid_overflow_sadd)(__FIFTHINT_TYPE__ __x, __FIFTHINT_TYPE__ __y, __INT8_TYPE__ *__restrict __res) { return __impl_hybrid_overflow_sadd((__FIFTHINT_ALIAS_TYPE__)__x, (__FIFTHINT_ALIAS_TYPE__)__y, __res); }
+#if __SIZEOF_FIFTHINT__ >= 2
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL __NOTHROW_NCX(__impl_hybrid_overflow_uadd)(__UFIFTHINT_TYPE__ __x, __UFIFTHINT_TYPE__ __y, __UINT16_TYPE__ *__restrict __res) { return __impl_hybrid_overflow_uadd((__UFIFTHINT_ALIAS_TYPE__)__x, (__UFIFTHINT_ALIAS_TYPE__)__y, __res); }
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL __NOTHROW_NCX(__impl_hybrid_overflow_sadd)(__FIFTHINT_TYPE__ __x, __FIFTHINT_TYPE__ __y, __INT16_TYPE__ *__restrict __res) { return __impl_hybrid_overflow_sadd((__FIFTHINT_ALIAS_TYPE__)__x, (__FIFTHINT_ALIAS_TYPE__)__y, __res); }
+#endif /* __SIZEOF_FIFTHINT__ >= 2 */
+#if __SIZEOF_FIFTHINT__ >= 4
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL __NOTHROW_NCX(__impl_hybrid_overflow_uadd)(__UFIFTHINT_TYPE__ __x, __UFIFTHINT_TYPE__ __y, __UINT32_TYPE__ *__restrict __res) { return __impl_hybrid_overflow_uadd((__UFIFTHINT_ALIAS_TYPE__)__x, (__UFIFTHINT_ALIAS_TYPE__)__y, __res); }
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL __NOTHROW_NCX(__impl_hybrid_overflow_sadd)(__FIFTHINT_TYPE__ __x, __FIFTHINT_TYPE__ __y, __INT32_TYPE__ *__restrict __res) { return __impl_hybrid_overflow_sadd((__FIFTHINT_ALIAS_TYPE__)__x, (__FIFTHINT_ALIAS_TYPE__)__y, __res); }
+#endif /* __SIZEOF_FIFTHINT__ >= 4 */
+#if __SIZEOF_FIFTHINT__ >= 8
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL __NOTHROW_NCX(__impl_hybrid_overflow_uadd)(__UFIFTHINT_TYPE__ __x, __UFIFTHINT_TYPE__ __y, __UINT64_TYPE__ *__restrict __res) { return __impl_hybrid_overflow_uadd((__UFIFTHINT_ALIAS_TYPE__)__x, (__UFIFTHINT_ALIAS_TYPE__)__y, __res); }
+__LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL __NOTHROW_NCX(__impl_hybrid_overflow_sadd)(__FIFTHINT_TYPE__ __x, __FIFTHINT_TYPE__ __y, __INT64_TYPE__ *__restrict __res) { return __impl_hybrid_overflow_sadd((__FIFTHINT_ALIAS_TYPE__)__x, (__FIFTHINT_ALIAS_TYPE__)__y, __res); }
+#endif /* __SIZEOF_FIFTHINT__ >= 8 */
+#endif /* __UFIFTHINT_TYPE__ */
 #undef __IMPL_HYBRID_OVERFLOW_NAME
-}
+} /* extern "C++" */
 #endif /* __cplusplus */
 
 /* @return: true:  Overflow  occurred (unlikely; `*res' contains the truncated result)

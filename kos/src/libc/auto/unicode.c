@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4aab2888 */
+/* HASH CRC-32:0x80980080 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -543,40 +543,40 @@ INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_unicode_writeutf8)(char *__restrict dst,
                                              char32_t ch) {
 	if likely(ch <= ((uint32_t)1 << 7)-1) {
-		*dst++ = (char)(u8)ch;
+		*dst++ = (char)(unsigned char)ch;
 	} else if (ch <= ((uint32_t)1 << 11)-1) {
-		*dst++ = (char)(0xc0 | (u8)((ch >> 6)/* & 0x1f*/));
-		*dst++ = (char)(0x80 | (u8)((ch) & 0x3f));
+		*dst++ = (char)(unsigned char)(0xc0 | (u8)((ch >> 6)/* & 0x1f*/));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch) & 0x3f));
 	} else if (ch <= ((uint32_t)1 << 16)-1) {
-		*dst++ = (char)(0xe0 | (u8)((ch >> 12)/* & 0x0f*/));
-		*dst++ = (char)(0x80 | (u8)((ch >> 6) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch) & 0x3f));
+		*dst++ = (char)(unsigned char)(0xe0 | (u8)((ch >> 12)/* & 0x0f*/));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 6) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch) & 0x3f));
 	} else if (ch <= ((uint32_t)1 << 21)-1) {
-		*dst++ = (char)(0xf0 | (u8)((ch >> 18)/* & 0x07*/));
-		*dst++ = (char)(0x80 | (u8)((ch >> 12) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch >> 6) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch) & 0x3f));
+		*dst++ = (char)(unsigned char)(0xf0 | (u8)((ch >> 18)/* & 0x07*/));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 12) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 6) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch) & 0x3f));
 	} else if (ch <= ((uint32_t)1 << 26)-1) {
-		*dst++ = (char)(0xf8 | (u8)((ch >> 24)/* & 0x03*/));
-		*dst++ = (char)(0x80 | (u8)((ch >> 18) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch >> 12) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch >> 6) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch) & 0x3f));
+		*dst++ = (char)(unsigned char)(0xf8 | (u8)((ch >> 24)/* & 0x03*/));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 18) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 12) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 6) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch) & 0x3f));
 	} else if (ch <= ((uint32_t)1 << 31)-1) {
-		*dst++ = (char)(0xfc | (u8)((ch >> 30)/* & 0x01*/));
-		*dst++ = (char)(0x80 | (u8)((ch >> 24) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch >> 18) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch >> 12) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch >> 6) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch) & 0x3f));
+		*dst++ = (char)(unsigned char)(0xfc | (u8)((ch >> 30)/* & 0x01*/));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 24) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 18) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 12) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 6) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch) & 0x3f));
 	} else {
-		*dst++ = (char)(0xfe);
-		*dst++ = (char)(0x80 | (u8)((ch >> 30) & 0x03/* & 0x3f*/));
-		*dst++ = (char)(0x80 | (u8)((ch >> 24) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch >> 18) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch >> 12) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch >> 6) & 0x3f));
-		*dst++ = (char)(0x80 | (u8)((ch) & 0x3f));
+		*dst++ = (char)(unsigned char)(0xfe);
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 30) & 0x03/* & 0x3f*/));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 24) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 18) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 12) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 6) & 0x3f));
+		*dst++ = (char)(unsigned char)(0x80 | (u8)((ch) & 0x3f));
 	}
 	return dst;
 }

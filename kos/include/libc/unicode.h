@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x508b07f2 */
+/* HASH CRC-32:0xda0e517a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -278,27 +278,27 @@ __NOTHROW_NCX(__libc_unicode_asdigit)(__CHAR32_TYPE__ ch, __UINT8_TYPE__ radix,
 	     : 0)
 #endif /* !__INTELLISENSE__ */
 
-#define __libc_unicode_getnumeric(ch)  \
-	((ch) >= 0x30 && (ch) <= 0x39     \
-	 ? (ch)-0x30                      \
-	 : (ch) >= 0x41 && (ch) <= 0x46   \
-	   ? (ch)-0x37                    \
-	   : (ch) >= 0x61 && (ch) <= 0x66 \
-	     ? (ch)-0x57                  \
+#define ____libc_unicode_getnumeric(ch) \
+	((ch) >= 0x30 && (ch) <= 0x39       \
+	 ? (ch)-0x30                        \
+	 : (ch) >= 0x41 && (ch) <= 0x46     \
+	   ? (ch)-0x37                      \
+	   : (ch) >= 0x61 && (ch) <= 0x66   \
+	     ? (ch)-0x57                    \
 	     : 0)
 
 /* >> unicode_getnumeric(3), unicode_getnumeric64(3), unicode_getnumericdbl(3), unicode_getnumericldbl(3)
  * Return  the numerical  variable for which  `ch' is representative  (s.a. `unicode_isnumeric(3)'). When
  * `ch' doesn't represent  a numerical character,  return `0'.  Note that this  function also  recognizes
  * 'a'-'f' and 'A'-'F' as numeric characters (representing their hex values) */
-#define __libc_unicode_getnumeric(ch) ((__UINT8_TYPE__)__libc_unicode_getnumeric(ch))
+#define __libc_unicode_getnumeric(ch) ((__UINT8_TYPE__)____libc_unicode_getnumeric(ch))
 
 #ifdef __UINT64_TYPE__
 /* >> unicode_getnumeric(3), unicode_getnumeric64(3), unicode_getnumericdbl(3), unicode_getnumericldbl(3)
  * Return  the numerical  variable for which  `ch' is representative  (s.a. `unicode_isnumeric(3)'). When
  * `ch' doesn't represent  a numerical character,  return `0'.  Note that this  function also  recognizes
  * 'a'-'f' and 'A'-'F' as numeric characters (representing their hex values) */
-#define __libc_unicode_getnumeric64(ch) ((__UINT64_TYPE__)__libc_unicode_getnumeric(ch))
+#define __libc_unicode_getnumeric64(ch) ((__UINT64_TYPE__)____libc_unicode_getnumeric(ch))
 #endif /* __UINT64_TYPE__ */
 
 #ifndef __NO_FPU
@@ -306,14 +306,14 @@ __NOTHROW_NCX(__libc_unicode_asdigit)(__CHAR32_TYPE__ ch, __UINT8_TYPE__ radix,
  * Return  the numerical  variable for which  `ch' is representative  (s.a. `unicode_isnumeric(3)'). When
  * `ch' doesn't represent  a numerical character,  return `0'.  Note that this  function also  recognizes
  * 'a'-'f' and 'A'-'F' as numeric characters (representing their hex values) */
-#define __libc_unicode_getnumericdbl(ch) ((double)__libc_unicode_getnumeric(ch))
+#define __libc_unicode_getnumericdbl(ch) ((double)____libc_unicode_getnumeric(ch))
 
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 /* >> unicode_getnumeric(3), unicode_getnumeric64(3), unicode_getnumericdbl(3), unicode_getnumericldbl(3)
  * Return  the numerical  variable for which  `ch' is representative  (s.a. `unicode_isnumeric(3)'). When
  * `ch' doesn't represent  a numerical character,  return `0'.  Note that this  function also  recognizes
  * 'a'-'f' and 'A'-'F' as numeric characters (representing their hex values) */
-#define __libc_unicode_getnumericldbl(ch) ((__LONGDOUBLE)__libc_unicode_getnumeric(ch))
+#define __libc_unicode_getnumericldbl(ch) ((__LONGDOUBLE)____libc_unicode_getnumeric(ch))
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__NO_FPU */
 #endif /* !____libc___unicode_descriptor_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7df1f06f */
+/* HASH CRC-32:0x39aa1b8d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7093,8 +7093,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strdupf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_M
 #define mstrndupa mstrndupa
 extern __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(mstrdupa)(char const *__restrict __string);
+#if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 extern __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(mstrndupa)(char const *__restrict __string, __size_t __maxlen);
+#endif /* __USE_XOPEN2K8 || __USE_DOS */
 #elif defined(__NO_XBLOCK)
 __FORCELOCAL __ATTR_WUNUSED __ATTR_MALLOC __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__mstrdupa_init)(void *__buf, char const *__restrict __string) {
@@ -7106,13 +7108,14 @@ __NOTHROW_NCX(__mstrdupa_init)(void *__buf, char const *__restrict __string) {
 	}
 	return (char *)__buf;
 }
+#if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 __FORCELOCAL __ATTR_WUNUSED __ATTR_MALLOC __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__mstrndupa_init)(void *__buf, char const *__restrict __string, __size_t __maxlen) {
 #ifdef __malloca_mayfail
 	if __likely(__buf)
 #endif /* __malloca_mayfail */
 	{
-		__size_t __buflen = __NAMESPACE_STD_SYM strnlen(__string, __maxlen) * sizeof(char);
+		__size_t __buflen = strnlen(__string, __maxlen) * sizeof(char);
 #ifdef __mempcpy_defined
 		*(char *)mempcpy(__buf, __string, __buflen) = 0;
 #else /* __mempcpy_defined */
@@ -7121,11 +7124,14 @@ __NOTHROW_NCX(__mstrndupa_init)(void *__buf, char const *__restrict __string, __
 	}
 	return (char *)__buf;
 }
+#endif /* __USE_XOPEN2K8 || __USE_DOS */
 /* Without X-blocks, it's impossible to prevent multiple evaluations of the `str' argument... */
 #define mstrdupa(str) \
 	__mstrdupa_init(__malloca((__NAMESPACE_STD_SYM strlen(str) + 1) * sizeof(char)), str)
+#if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 #define mstrndupa(str, maxlen) \
-	__mstrndupa_init(__malloca((__NAMESPACE_STD_SYM strnlen(str, maxlen) + 1) * sizeof(char)), str, maxlen)
+	__mstrndupa_init(__malloca((strnlen(str, maxlen) + 1) * sizeof(char)), str, maxlen)
+#endif /* __USE_XOPEN2K8 || __USE_DOS */
 #else /* __NO_XBLOCK */
 #ifdef __malloca_mayfail
 #define mstrdupa(str)                                                                     \
@@ -7137,17 +7143,19 @@ __NOTHROW_NCX(__mstrndupa_init)(void *__buf, char const *__restrict __string, __
 		          ? (char *)__NAMESPACE_STD_SYM memcpy(__copy_s, __orig_s, __orig_len)    \
 		          : __copy_s;                                                             \
 	})
-#define mstrndupa(str, maxlen)                                                      \
-	__XBLOCK({                                                                      \
-		char const *__orig_s = (str);                                               \
-		__size_t __orig_len  = __NAMESPACE_STD_SYM strlen(__orig_s) * sizeof(char); \
-		char *__copy_s       = (char *)__malloca(__orig_len + sizeof(char));        \
-		if __likely(__copy_s) {                                                     \
-			__copy_s[__orig_len / sizeof(char)] = 0;                                \
-			__NAMESPACE_STD_SYM memcpy(__copy_s, __orig_s, __orig_len);             \
-		}                                                                           \
-		__XRETURN __copy_s;                                                         \
+#if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
+#define mstrndupa(str, maxlen)                                               \
+	__XBLOCK({                                                               \
+		char const *__orig_s = (str);                                        \
+		__size_t __orig_len  = strnlen(__orig_s, maxlen) * sizeof(char);     \
+		char *__copy_s       = (char *)__malloca(__orig_len + sizeof(char)); \
+		if __likely(__copy_s) {                                              \
+			__copy_s[__orig_len / sizeof(char)] = 0;                         \
+			__NAMESPACE_STD_SYM memcpy(__copy_s, __orig_s, __orig_len);      \
+		}                                                                    \
+		__XRETURN __copy_s;                                                  \
 	})
+#endif /* __USE_XOPEN2K8 || __USE_DOS */
 #else /* __malloca_mayfail */
 #define mstrdupa(str)                                                                     \
 	__XBLOCK({                                                                            \
@@ -7156,14 +7164,16 @@ __NOTHROW_NCX(__mstrndupa_init)(void *__buf, char const *__restrict __string, __
 		char *__copy_s       = (char *)__malloca(__orig_len);                             \
 		__XRETURN (char *)__NAMESPACE_STD_SYM memcpy(__copy_s, __orig_s, __orig_len);     \
 	})
+#if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 #define mstrndupa(str, maxlen)                                                        \
 	__XBLOCK({                                                                        \
 		char const *__orig_s = (str);                                                 \
-		__size_t __orig_len  = __NAMESPACE_STD_SYM strlen(__orig_s) * sizeof(char);   \
+		__size_t __orig_len  = strnlen(__orig_s, maxlen) * sizeof(char);              \
 		char *__copy_s = (char *)__malloca(__orig_len + sizeof(char));                \
 		__copy_s[__orig_len / sizeof(char)] = 0;                                      \
 		__XRETURN (char *)__NAMESPACE_STD_SYM memcpy(__copy_s, __orig_s, __orig_len); \
 	})
+#endif /* __USE_XOPEN2K8 || __USE_DOS */
 #endif /* !__malloca_mayfail */
 #endif /* !__NO_XBLOCK */
 #ifdef __CRT_HAVE_wildstrcmp
@@ -8103,11 +8113,14 @@ __NAMESPACE_LOCAL_END
 #define strdupa  strdupa
 #define strndupa strndupa
 extern __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(strdupa)(char const *__restrict __string);
+#if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 extern __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(strndupa)(char const *__restrict __string, __size_t __maxlen);
+#endif /* __USE_XOPEN2K8 || __USE_DOS */
 #elif defined(__NO_XBLOCK)
+#if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 __FORCELOCAL __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__strndupa_init)(void *__restrict __buf, char const *__restrict __string, __size_t __maxlen) {
-	__size_t __buflen = __NAMESPACE_STD_SYM strnlen(__string, __maxlen) * sizeof(char);
+	__size_t __buflen = strnlen(__string, __maxlen) * sizeof(char);
 #ifdef __mempcpy_defined
 	*(char *)mempcpy(__buf, __string, __buflen) = 0;
 #else /* __mempcpy_defined */
@@ -8115,11 +8128,14 @@ __NOTHROW_NCX(__strndupa_init)(void *__restrict __buf, char const *__restrict __
 #endif /* !__mempcpy_defined */
 	return (char *)__buf;
 }
+#endif /* __USE_XOPEN2K8 || __USE_DOS */
 /* Without X-blocks, it's impossible to prevent multiple evaluations of the `str' argument... */
 #define strdupa(str) \
 	(__NAMESPACE_STD_SYM strcpy((char *)__hybrid_alloca((__NAMESPACE_STD_SYM strlen(str) + 1) * sizeof(char)), str))
+#if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 #define strndupa(str, maxlen) \
-	__strndupa_init(__hybrid_alloca((__NAMESPACE_STD_SYM strnlen(str, maxlen) + 1) * sizeof(char)), str, maxlen)
+	__strndupa_init(__hybrid_alloca((strnlen(str, maxlen) + 1) * sizeof(char)), str, maxlen)
+#endif /* __USE_XOPEN2K8 || __USE_DOS */
 #else /* __NO_XBLOCK */
 #define strdupa(str)                                                                      \
 	__XBLOCK({                                                                            \
@@ -8128,14 +8144,16 @@ __NOTHROW_NCX(__strndupa_init)(void *__restrict __buf, char const *__restrict __
 		__XRETURN (char *)__NAMESPACE_STD_SYM memcpy(__hybrid_alloca(__orig_len),         \
 		                                             __orig_s, __orig_len);               \
 	})
+#if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 #define strndupa(str, maxlen)                                                         \
 	__XBLOCK({                                                                        \
 		char const *__orig_s = (str);                                                 \
-		__size_t __orig_len  = __NAMESPACE_STD_SYM strlen(__orig_s) * sizeof(char);   \
+		__size_t __orig_len  = strnlen(__orig_s, maxlen) * sizeof(char);              \
 		char *__copy_s = (char *)__hybrid_alloca(__orig_len + sizeof(char));          \
 		__copy_s[__orig_len / sizeof(char)] = 0;                                      \
 		__XRETURN (char *)__NAMESPACE_STD_SYM memcpy(__copy_s, __orig_s, __orig_len); \
 	})
+#endif /* __USE_XOPEN2K8 || __USE_DOS */
 #endif /* !__NO_XBLOCK */
 #endif /* __USE_GNU && __hybrid_alloca */
 

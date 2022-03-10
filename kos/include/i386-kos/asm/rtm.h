@@ -53,6 +53,7 @@ __DECL_BEGIN
 #pragma GCC target("rtm")
 #endif /* ... */
 
+#if __has_builtin(__builtin_ia32_xbegin) || defined(__COMPILER_HAVE_GCC_ASM)
 /* Start a transaction (s.a. `rtm_begin()')
  * @return: _XBEGIN_STARTED: Transaction started.
  * @return: _XABORT_* :      Transaction failed. */
@@ -68,8 +69,10 @@ __FORCELOCAL __ATTR_ARTIFICIAL __UINT32_TYPE__(__xbegin)(void) {
 	return __result;
 #endif /* !__has_builtin(__builtin_ia32_xbegin) */
 }
+#endif /* __has_builtin(__builtin_ia32_xbegin) || __COMPILER_HAVE_GCC_ASM */
 
 
+#if __has_builtin(__builtin_ia32_xend) || defined(__COMPILER_HAVE_GCC_ASM)
 /* End a transaction (s.a. `rtm_end()')
  * If  the  transaction   was  successful,  return   normally.
  * If the transaction failed, `__xbegin()' returns `_XABORT_*'
@@ -82,6 +85,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL void(__xend)(void) {
 	__asm__ __volatile__("xend" : : : "memory");
 #endif /* !__has_builtin(__builtin_ia32_xend) */
 }
+#endif /* __has_builtin(__builtin_ia32_xend) || __COMPILER_HAVE_GCC_ASM */
 
 
 /* Abort the current transaction by having `__xbegin()'
@@ -89,16 +93,17 @@ __FORCELOCAL __ATTR_ARTIFICIAL void(__xend)(void) {
  * If no transaction was in progress, behave as a no-op (s.a. `rtm_abort()') */
 #if __has_builtin(__builtin_ia32_xabort)
 #define __xabort(code) __builtin_ia32_xabort(code)
-#elif !defined(__NO_XBLOCK)
+#elif !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_GCC_ASM)
 #define __xabort(code) __XBLOCK({ __asm__ __volatile__("xabort %0" : : "N" (code)); (void)0; })
-#else /* ... */
+#elif defined(__COMPILER_HAVE_GCC_ASM)
 #define __xabort(code) __asm__ __volatile__("xabort %0" : : "N" (code))
-#endif /* !... */
+#endif /* ... */
 
 
 /* Check if a transaction is currently in progress (s.a. `rtm_test()')
  * @return: true:  Inside of RTM mode
  * @return: false: Outside of RTM mode */
+#if __has_builtin(__builtin_ia32_xtest) || defined(__COMPILER_HAVE_GCC_ASM)
 #ifdef __KOS__ /* Always available under KOS */
 __FORCELOCAL __ATTR_ARTIFICIAL __BOOL __NOTHROW(__xtest)(void)
 #else /* __KOS__ */
@@ -114,6 +119,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __BOOL(__xtest)(void)
 	return __result;
 #endif /* !__has_builtin(__builtin_ia32_xtest) */
 }
+#endif /* __has_builtin(__builtin_ia32_xtest) || __COMPILER_HAVE_GCC_ASM */
 
 #if ((__has_builtin(__builtin_ia32_xbegin) || __has_builtin(__builtin_ia32_xend) ||   \
       __has_builtin(__builtin_ia32_xabort) || __has_builtin(__builtin_ia32_xtest)) && \

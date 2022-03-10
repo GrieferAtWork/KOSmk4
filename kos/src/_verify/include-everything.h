@@ -1321,6 +1321,7 @@ incdir("");
 #include <utmpx.h>
 #include <vadefs.h>
 #include <values.h>
+#include <vcruntime.h>
 #include <vcruntime_string.h>
 #include <vfork.h>
 #include <wait.h>

@@ -591,7 +591,7 @@ struct __ATTR_PACKED segment {
 	};
 };
 
-__LOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __ATTR_WUNUSED __UINT32_TYPE__
+__LOCAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__
 __NOTHROW_NCX(segment_rdbase)(struct segment *__restrict __self) {
 	__UINT32_TYPE__ __result;
 	__result  = (__UINT32_TYPE__)__self->s_descriptor.d_base0;
@@ -610,7 +610,7 @@ __NOTHROW_NCX(segment_wrbase)(struct segment *__restrict __self,
 
 
 #ifdef __x86_64__
-__LOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __ATTR_WUNUSED __UINT64_TYPE__
+__LOCAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__
 __NOTHROW_NCX(segment_rdbaseX)(struct segment *__restrict __self) {
 	__UINT64_TYPE__ __result;
 	__result = segment_rdbase(__self);
@@ -633,7 +633,7 @@ __NOTHROW_NCX(segment_wrbaseX)(struct segment *__restrict __self,
 
 
 
-__LOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __ATTR_WUNUSED __UINT32_TYPE__
+__LOCAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__
 __NOTHROW_NCX(segment_rdlimit)(struct segment *__restrict __self) {
 	__UINT32_TYPE__ __result;
 	__result  = __self->s_descriptor.d_limit0;

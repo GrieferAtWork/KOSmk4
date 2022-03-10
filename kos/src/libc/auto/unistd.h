@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21706cc */
+/* HASH CRC-32:0xf1109289 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -297,7 +297,7 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_pwrite64)(fd_t fd, void co
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_preadall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_pwriteall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
+INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_pwriteall64)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset);
 /* >> pipe2(2)
  * Construct a [reader,writer]-pair of pipes
  * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer

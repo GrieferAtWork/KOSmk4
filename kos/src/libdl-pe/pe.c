@@ -607,7 +607,7 @@ PRIVATE void **CC PeTls_AllocVector(bool forme) {
 	result = (void **)calloc(count, sizeof(void *));
 	if (!result)
 		return NULL;
-	atomic_rwlock_read(&dl_globals.dg_alllock);
+	dlglobals_all_read(&dl_globals);
 	DLIST_FOREACH (iter, &dl_globals.dg_alllist, dm_modules) {
 		void *block;
 		if (iter->dm_ops != &libpe_fmt)
@@ -628,7 +628,7 @@ PRIVATE void **CC PeTls_AllocVector(bool forme) {
 			}
 		}
 	}
-	atomic_rwlock_endread(&dl_globals.dg_alllock);
+	dlglobals_all_endread(&dl_globals);
 	return result;
 err:
 	DLIST_FOREACH (iter, &dl_globals.dg_alllist, dm_modules) {
@@ -651,7 +651,7 @@ err:
 		}
 		free(block);
 	}
-	atomic_rwlock_endread(&dl_globals.dg_alllock);
+	dlglobals_all_endread(&dl_globals);
 	free(result);
 	return NULL;
 }
@@ -937,7 +937,10 @@ libpe_linker_main(struct peexec_info *__restrict info,
 	/* Turn on dosfs emulation for `DOS$'-prefixed functions in libc. */
 	dosfs_setenabled(DOSFS_ENABLED);
 
-	/* Another dos compatibility detail: support for '%n' in format strings is disabled by default. */
+	/* Another dos compatibility detail:  support for '%n' in  format
+	 * strings is disabled by default. (Supposedly for security,  but
+	 * we both know it's to make it harder to write portable programs
+	 * using msvc) */
 	_set_printf_count_output(0);
 
 #if 0

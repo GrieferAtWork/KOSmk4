@@ -1122,11 +1122,11 @@ $uint32_t strtou32_r([[nonnull]] char const *__restrict nptr,
 		uint8_t digit;
 		char ch = *num_iter;
 		if (ch >= '0' && ch <= '9')
-			digit = ch - '0';
+			digit = (uint8_t)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			digit = 10 + (ch - 'a');
+			digit = (uint8_t)(10 + ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			digit = 10 + (ch - 'A');
+			digit = (uint8_t)(10 + ch - 'A');
 		else {
 			break;
 		}
@@ -1147,11 +1147,11 @@ $uint32_t strtou32_r([[nonnull]] char const *__restrict nptr,
 				for (;;) {
 					ch = *num_iter;
 					if (ch >= '0' && ch <= '9')
-						digit = ch - '0';
+						digit = (uint8_t)(ch - '0');
 					else if (ch >= 'a' && ch <= 'z')
-						digit = 10 + (ch - 'a');
+						digit = (uint8_t)(10 + ch - 'a');
 					else if (ch >= 'A' && ch <= 'Z')
-						digit = 10 + (ch - 'A');
+						digit = (uint8_t)(10 + ch - 'A');
 					else {
 						break;
 					}
@@ -1260,11 +1260,11 @@ $int32_t strto32_r([[nonnull]] char const *__restrict nptr,
 		char ch;
 		ch = *num_iter;
 		if (ch >= '0' && ch <= '9')
-			digit = ch - '0';
+			digit = (uint8_t)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			digit = 10 + (ch - 'a');
+			digit = (uint8_t)(10 + ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			digit = 10 + (ch - 'A');
+			digit = (uint8_t)(10 + ch - 'A');
 		else {
 			break;
 		}
@@ -1286,11 +1286,11 @@ handle_overflow:
 				for (;;) {
 					ch = *num_iter;
 					if (ch >= '0' && ch <= '9')
-						digit = ch - '0';
+						digit = (uint8_t)(ch - '0');
 					else if (ch >= 'a' && ch <= 'z')
-						digit = 10 + (ch - 'a');
+						digit = (uint8_t)(10 + ch - 'a');
 					else if (ch >= 'A' && ch <= 'Z')
-						digit = 10 + (ch - 'A');
+						digit = (uint8_t)(10 + ch - 'A');
 					else {
 						break;
 					}
@@ -1403,11 +1403,11 @@ $uint64_t strtou64_r([[nonnull]] char const *__restrict nptr,
 		uint8_t digit;
 		char ch = *num_iter;
 		if (ch >= '0' && ch <= '9')
-			digit = ch - '0';
+			digit = (uint8_t)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			digit = 10 + (ch - 'a');
+			digit = (uint8_t)(10 + ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			digit = 10 + (ch - 'A');
+			digit = (uint8_t)(10 + ch - 'A');
 		else {
 			break;
 		}
@@ -1428,11 +1428,11 @@ $uint64_t strtou64_r([[nonnull]] char const *__restrict nptr,
 				for (;;) {
 					ch = *num_iter;
 					if (ch >= '0' && ch <= '9')
-						digit = ch - '0';
+						digit = (uint8_t)(ch - '0');
 					else if (ch >= 'a' && ch <= 'z')
-						digit = 10 + (ch - 'a');
+						digit = (uint8_t)(10 + ch - 'a');
 					else if (ch >= 'A' && ch <= 'Z')
-						digit = 10 + (ch - 'A');
+						digit = (uint8_t)(10 + ch - 'A');
 					else {
 						break;
 					}
@@ -1541,11 +1541,11 @@ $int64_t strto64_r([[nonnull]] char const *__restrict nptr,
 		char ch;
 		ch = *num_iter;
 		if (ch >= '0' && ch <= '9')
-			digit = ch - '0';
+			digit = (uint8_t)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			digit = 10 + (ch - 'a');
+			digit = (uint8_t)(10 + ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			digit = 10 + (ch - 'A');
+			digit = (uint8_t)(10 + ch - 'A');
 		else {
 			break;
 		}
@@ -1567,11 +1567,11 @@ handle_overflow:
 				for (;;) {
 					ch = *num_iter;
 					if (ch >= '0' && ch <= '9')
-						digit = ch - '0';
+						digit = (uint8_t)(ch - '0');
 					else if (ch >= 'a' && ch <= 'z')
-						digit = 10 + (ch - 'a');
+						digit = (uint8_t)(10 + ch - 'a');
 					else if (ch >= 'A' && ch <= 'Z')
-						digit = 10 + (ch - 'A');
+						digit = (uint8_t)(10 + ch - 'A');
 					else {
 						break;
 					}
@@ -1985,7 +1985,7 @@ DEFINE_PUBLIC_ALIAS(_itoa_upper_digits, libc__itoa_upper_digits);
 /* >> char itoa_decimal(uint8_t digit);
  * Same as `itoa_digit()', but weak undefined behavior when `digit >= 10' */
 #define itoa_decimal(digit) \
-	('0' + (digit))
+	(char)('0' + (digit))
 
 /* >> char const _itoa_digits[101] =
  * >> "0123456789abcdefghijklmnopqrstuvwxyz\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"

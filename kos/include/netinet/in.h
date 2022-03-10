@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1d38a04 */
+/* HASH CRC-32:0x7bce153b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -448,7 +448,7 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_opt_get_val,(void *__databuf, int __
 __CDECLARE_OPT(,socklen_t,__NOTHROW_RPC_KOS,inet6_rth_space,(int __type, int __segments),(__type,__segments))
 __CDECLARE_OPT(,void *,__NOTHROW_RPC_KOS,inet6_rth_init,(void *__bp, socklen_t __bp_len, int __type, int __segments),(__bp,__bp_len,__type,__segments))
 __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_rth_add,(void *__bp, struct in6_addr const *__addr),(__bp,__addr))
-__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_rth_reverse,(void const *__in, void *__out),(__in,__out))
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_rth_reverse,(void const *___in, void *___out),(___in,___out))
 __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_rth_segments,(void const *__bp),(__bp))
 __CDECLARE_OPT(,struct in6_addr *,__NOTHROW_RPC_KOS,inet6_rth_getaddr,(void const *__bp, int __index),(__bp,__index))
 __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,getipv4sourcefilter,(__fd_t __sockfd, struct in_addr __interface_addr, struct in_addr __group, __UINT32_TYPE__ *__fmode, __UINT32_TYPE__ *__numsrc, struct in_addr *__slist),(__sockfd,__interface_addr,__group,__fmode,__numsrc,__slist))

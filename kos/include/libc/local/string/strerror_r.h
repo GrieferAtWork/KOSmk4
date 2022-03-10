@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe030b1f */
+/* HASH CRC-32:0xe564aa08 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -112,7 +112,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror_r))(__errno_t __errnum, char
 			goto __fallback;
 		(__NAMESPACE_LOCAL_SYM __localdep_memcpyc)(__buf, __string, __msg_len, sizeof(char));
 	} else {
-		if ((__NAMESPACE_LOCAL_SYM __localdep_snprintf)(__buf, __buflen, "Unknown error %d", __errnum) >= __buflen)
+		if ((__SIZE_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_snprintf)(__buf, __buflen, "Unknown error %d", __errnum) >= __buflen)
 			goto __fallback;
 	}
 	return __buf;

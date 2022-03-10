@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf564d34e */
+/* HASH CRC-32:0xf2bebf79 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -121,8 +121,8 @@ NOTHROW_NCX(LIBCCALL libc_readpassphrase)(char const *prompt,
 		goto err;
 	}
 
-again:
 
+again:
 	must_restart = false;
 
 	infd  = __STDIN_FILENO;

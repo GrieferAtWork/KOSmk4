@@ -27,7 +27,7 @@
 /* >> char __LOCAL_itoa_decimal(uint8_t digit);
  * Same as `__LOCAL_itoa_digit()', but weak undefined behavior when `digit >= 10' */
 #define __LOCAL_itoa_decimal(digit) \
-	('0' + (digit))
+	(char)('0' + (digit))
 
 /* >> char const __LOCAL_itoa_digits[101] =
  * >> "0123456789abcdefghijklmnopqrstuvwxyz\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"

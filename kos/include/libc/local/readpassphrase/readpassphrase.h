@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0628432 */
+/* HASH CRC-32:0x9716943d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -454,8 +454,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(readpassphrase))(char const *__prompt
 		goto __err;
 	}
 
-__again:
 #if defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction)
+__again:
 	__must_restart = 0;
 #endif /* __CRT_HAVE_sigaction || __CRT_HAVE___sigaction */
 	__infd  = __STDIN_FILENO;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a1c8479 */
+/* HASH CRC-32:0x5427bad */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,40 +25,40 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(unicode_writeutf8) __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_writeutf8))(char *__restrict __dst, __CHAR32_TYPE__ __ch) {
 	if __likely(__ch <= ((__UINT32_TYPE__)1 << 7)-1) {
-		*__dst++ = (char)(__UINT8_TYPE__)__ch;
+		*__dst++ = (char)(unsigned char)__ch;
 	} else if (__ch <= ((__UINT32_TYPE__)1 << 11)-1) {
-		*__dst++ = (char)(0xc0 | (__UINT8_TYPE__)((__ch >> 6)/* & 0x1f*/));
-		*__dst++ = (char)(0x80 | (__UINT8_TYPE__)((__ch) & 0x3f));
+		*__dst++ = (char)(unsigned char)(0xc0 | (__UINT8_TYPE__)((__ch >> 6)/* & 0x1f*/));
+		*__dst++ = (char)(unsigned char)(0x80 | (__UINT8_TYPE__)((__ch) & 0x3f));
 	} else if (__ch <= ((__UINT32_TYPE__)1 << 16)-1) {
-		*__dst++ = (char)(0xe0 | (__UINT8_TYPE__)((__ch >> 12)/* & 0x0f*/));
-		*__dst++ = (char)(0x80 | (__UINT8_TYPE__)((__ch >> 6) & 0x3f));
-		*__dst++ = (char)(0x80 | (__UINT8_TYPE__)((__ch) & 0x3f));
+		*__dst++ = (char)(unsigned char)(0xe0 | (__UINT8_TYPE__)((__ch >> 12)/* & 0x0f*/));
+		*__dst++ = (char)(unsigned char)(0x80 | (__UINT8_TYPE__)((__ch >> 6) & 0x3f));
+		*__dst++ = (char)(unsigned char)(0x80 | (__UINT8_TYPE__)((__ch) & 0x3f));
 	} else if (__ch <= ((__UINT32_TYPE__)1 << 21)-1) {
-		*__dst++ = (char)(0xf0 | (__UINT8_TYPE__)((__ch >> 18)/* & 0x07*/));
-		*__dst++ = (char)(0x80 | (__UINT8_TYPE__)((__ch >> 12) & 0x3f));
-		*__dst++ = (char)(0x80 | (__UINT8_TYPE__)((__ch >> 6) & 0x3f));
-		*__dst++ = (char)(0x80 | (__UINT8_TYPE__)((__ch) & 0x3f));
+		*__dst++ = (char)(unsigned char)(0xf0 | (__UINT8_TYPE__)((__ch >> 18)/* & 0x07*/));
+		*__dst++ = (char)(unsigned char)(0x80 | (__UINT8_TYPE__)((__ch >> 12) & 0x3f));
+		*__dst++ = (char)(unsigned char)(0x80 | (__UINT8_TYPE__)((__ch >> 6) & 0x3f));
+		*__dst++ = (char)(unsigned char)(0x80 | (__UINT8_TYPE__)((__ch) & 0x3f));
 	} else if (__ch <= ((__UINT32_TYPE__)1 << 26)-1) {
-		*__dst++ = (char)(0xf8 | (__UINT8_TYPE__)((__ch >> 24)/* & 0x03*/));
-		*__dst++ = (char)(0x80 | (__UINT8_TYPE__)((__ch >> 18) & 0x3f));
-		*__dst++ = (char)(0x80 | (__UINT8_TYPE__)((__ch >> 12) & 0x3f));
-		*__dst++ = (char)(0x80 | (__UINT8_TYPE__)((__ch >> 6) & 0x3f));
-		*__dst++ = (char)(0x80 | (__UINT8_TYPE__)((__ch) & 0x3f));
+		*__dst++ = (char)(unsigned char)(0xf8 | (__UINT8_TYPE__)((__ch >> 24)/* & 0x03*/));
+		*__dst++ = (char)(unsigned char)(0x80 | (__UINT8_TYPE__)((__ch >> 18) & 0x3f));
+		*__dst++ = (char)(unsigned char)(0x80 | (__UINT8_TYPE__)((__ch >> 12) & 0x3f));
+		*__dst++ = (char)(unsigned char)(0x80 | (__UINT8_TYPE__)((__ch >> 6) & 0x3f));
+		*__dst++ = (char)(unsigned char)(0x80 | (__UINT8_TYPE__)((__ch) & 0x3f));
 	} else if (__ch <= ((__UINT32_TYPE__)1 << 31)-1) {
-		*__dst++ = (char)(0xfc | (__UINT8_TYPE__)((__ch >> 30)/* & 0x01*/));
-		*__dst++ = (char)(0x80 | (__UINT8_TYPE__)((__ch >> 24) & 0x3f));
-		*__dst++ = (char)(0x80 | (__UINT8_TYPE__)((__ch >> 18) & 0x3f));
-		*__dst++ = (char)(0x80 | (__UINT8_TYPE__)((__ch >> 12) & 0x3f));
-		*__dst++ = (char)(0x80 | (__UINT8_TYPE__)((__ch >> 6) & 0x3f));
-		*__dst++ = (char)(0x80 | (__UINT8_TYPE__)((__ch) & 0x3f));
+		*__dst++ = (char)(unsigned char)(0xfc | (__UINT8_TYPE__)((__ch >> 30)/* & 0x01*/));
+		*__dst++ = (char)(unsigned char)(0x80 | (__UINT8_TYPE__)((__ch >> 24) & 0x3f));
+		*__dst++ = (char)(unsigned char)(0x80 | (__UINT8_TYPE__)((__ch >> 18) & 0x3f));
+		*__dst++ = (char)(unsigned char)(0x80 | (__UINT8_TYPE__)((__ch >> 12) & 0x3f));
+		*__dst++ = (char)(unsigned char)(0x80 | (__UINT8_TYPE__)((__ch >> 6) & 0x3f));
+		*__dst++ = (char)(unsigned char)(0x80 | (__UINT8_TYPE__)((__ch) & 0x3f));
 	} else {
-		*__dst++ = (char)(0xfe);
-		*__dst++ = (char)(0x80 | (__UINT8_TYPE__)((__ch >> 30) & 0x03/* & 0x3f*/));
-		*__dst++ = (char)(0x80 | (__UINT8_TYPE__)((__ch >> 24) & 0x3f));
-		*__dst++ = (char)(0x80 | (__UINT8_TYPE__)((__ch >> 18) & 0x3f));
-		*__dst++ = (char)(0x80 | (__UINT8_TYPE__)((__ch >> 12) & 0x3f));
-		*__dst++ = (char)(0x80 | (__UINT8_TYPE__)((__ch >> 6) & 0x3f));
-		*__dst++ = (char)(0x80 | (__UINT8_TYPE__)((__ch) & 0x3f));
+		*__dst++ = (char)(unsigned char)(0xfe);
+		*__dst++ = (char)(unsigned char)(0x80 | (__UINT8_TYPE__)((__ch >> 30) & 0x03/* & 0x3f*/));
+		*__dst++ = (char)(unsigned char)(0x80 | (__UINT8_TYPE__)((__ch >> 24) & 0x3f));
+		*__dst++ = (char)(unsigned char)(0x80 | (__UINT8_TYPE__)((__ch >> 18) & 0x3f));
+		*__dst++ = (char)(unsigned char)(0x80 | (__UINT8_TYPE__)((__ch >> 12) & 0x3f));
+		*__dst++ = (char)(unsigned char)(0x80 | (__UINT8_TYPE__)((__ch >> 6) & 0x3f));
+		*__dst++ = (char)(unsigned char)(0x80 | (__UINT8_TYPE__)((__ch) & 0x3f));
 	}
 	return __dst;
 }

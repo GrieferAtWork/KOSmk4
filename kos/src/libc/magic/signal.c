@@ -2153,23 +2153,23 @@ void psiginfo([[nonnull]] siginfo_t const *pinfo,
 @@pp_if defined(__SIGILL) || defined(__SIGFPE) || defined(__SIGSEGV) || defined(__SIGBUS)@@
 	if (0
 @@pp_ifdef __SIGILL@@
-	    || pinfo->si_signo == __SIGILL
+	    || pinfo->@si_signo@ == __SIGILL
 @@pp_endif@@
 @@pp_ifdef __SIGFPE@@
-	    || pinfo->si_signo == __SIGFPE
+	    || pinfo->@si_signo@ == __SIGFPE
 @@pp_endif@@
 @@pp_ifdef __SIGSEGV@@
-	    || pinfo->si_signo == __SIGSEGV
+	    || pinfo->@si_signo@ == __SIGSEGV
 @@pp_endif@@
 @@pp_ifdef __SIGBUS@@
-	    || pinfo->si_signo == __SIGBUS
+	    || pinfo->@si_signo@ == __SIGBUS
 @@pp_endif@@
 	    ) {
 		fprintf(stderr, "[%p])\n", pinfo->@si_addr@);
 	} else
 @@pp_endif@@
 @@pp_ifdef __SIGCHLD@@
-	if (pinfo->si_signo == __SIGCHLD) {
+	if (pinfo->@si_signo@ == __SIGCHLD) {
 		fprintf(stderr,
 		        "%" __PRIN_PREFIX(__SIZEOF_PID_T__) "d %d "
 		        "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "d)\n",
@@ -2179,7 +2179,7 @@ void psiginfo([[nonnull]] siginfo_t const *pinfo,
 	} else
 @@pp_endif@@
 @@pp_ifdef __SIGPOLL@@
-	if (pinfo->si_signo == __SIGPOLL) {
+	if (pinfo->@si_signo@ == __SIGPOLL) {
 		fprintf(stderr, "%" __PRIN_PREFIX(__SIZEOF_POINTER__) "d)\n",
 		        (longptr_t)pinfo->@si_band@);
 	} else

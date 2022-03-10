@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb73d3688 */
+/* HASH CRC-32:0x151feab3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,12 +79,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcasemem_l))(void const *__haystack
 		return __NULLPTR;
 #endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
 	__haystacklen -= (__needlelen - 1);
-	__marker       = (__NAMESPACE_LOCAL_SYM __localdep_tolower_l)(*(__BYTE_TYPE__ *)__needle, __locale);
+	__marker       = (__BYTE_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_tolower_l)(*(__BYTE_TYPE__ *)__needle, __locale);
 	__hayend       = (__BYTE_TYPE__ *)__haystack + __haystacklen;
 	for (;;) {
 		for (__candidate = (__BYTE_TYPE__ *)__haystack; __candidate < __hayend; ++__candidate) {
 			__BYTE_TYPE__ __b = *__candidate;
-			if (__b == __marker || (__NAMESPACE_LOCAL_SYM __localdep_tolower_l)(__b, __locale) == __marker)
+			if (__b == __marker || (__BYTE_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_tolower_l)(__b, __locale) == __marker)
 				goto __got_candidate;
 		}
 		break;

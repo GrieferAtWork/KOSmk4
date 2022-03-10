@@ -386,10 +386,10 @@ typedef __time64_t time_t;
 
 #ifndef _CONST_RETURN
 #ifdef __cplusplus
-#define _CONST_RETURN  const
+#define _CONST_RETURN const
 #define _CRT_CONST_CORRECT_OVERLOADS 1
 #else /* __cplusplus */
-#define _CONST_RETURN  /* nothing */
+#define _CONST_RETURN /* nothing */
 #endif /* !__cplusplus */
 #endif /* !_CONST_RETURN */
 

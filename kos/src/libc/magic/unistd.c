@@ -1349,14 +1349,14 @@ ssize_t preadall64($fd_t fd, [[inp(bufsize)]] void *buf,
 [[cp, preferred_off64_variant_of(pwriteall), doc_alias("pwriteall")]]
 [[section(".text.crt{|.dos}.io.large.write")]]
 [[userimpl, requires_function(pwrite64), decl_include("<bits/types.h>")]]
-ssize_t pwriteall64($fd_t fd, [[inp(bufsize)]] void *buf, size_t bufsize, __PIO_OFFSET64 offset) {
+ssize_t pwriteall64($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, __PIO_OFFSET64 offset) {
 	ssize_t result, temp;
 	result = pwrite64(fd, buf, bufsize, offset);
 	if (result > 0 && (size_t)result < bufsize) {
 		/* Keep on writing */
 		for (;;) {
 			temp = pwrite64(fd,
-			                (byte_t *)buf + (size_t)result,
+			                (byte_t const *)buf + (size_t)result,
 			                bufsize - (size_t)result,
 			                offset + (size_t)result);
 			if (temp <= 0) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d89b2a9 */
+/* HASH CRC-32:0x688b80f6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,16 +29,16 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bitcpy))(void *__restrict __dst_base,
 		__BYTE_TYPE__ __remaining, __src_value, __remaining_temp;
 		__src_base = (__BYTE_TYPE__ const *)__src_base + (__src_bit_offset / __CHAR_BIT__);
 		__src_bit_offset %= __CHAR_BIT__;
-		__remaining = __CHAR_BIT__ - __src_bit_offset;
-		if (__remaining > __num_bits)
-			__remaining = __num_bits;
+		__remaining = (__BYTE_TYPE__)(__CHAR_BIT__ - __src_bit_offset);
+		if ((__SIZE_TYPE__)__remaining > __num_bits)
+			__remaining = (__BYTE_TYPE__)__num_bits;
 		__src_value      = *(__BYTE_TYPE__ const *)__src_base >> __src_bit_offset;
 		__remaining_temp = __remaining;
 		while (__remaining_temp) {
 			__BYTE_TYPE__ __avail, __dst_value;
 			__dst_base = (__BYTE_TYPE__ *)__dst_base + (__dst_bit_offset / __CHAR_BIT__);
 			__dst_bit_offset %= __CHAR_BIT__;
-			__avail = __CHAR_BIT__ - __dst_bit_offset;
+			__avail = (__BYTE_TYPE__)(__CHAR_BIT__ - __dst_bit_offset);
 			if (__avail > __remaining_temp)
 				__avail = __remaining_temp;
 			__dst_value = *(__BYTE_TYPE__ *)__dst_base;

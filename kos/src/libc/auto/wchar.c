@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd6ff7f65 */
+/* HASH CRC-32:0xe0987fec */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2644,11 +2644,11 @@ NOTHROW_NCX(LIBDCALL libd_wcsto32_r)(char16_t const *__restrict nptr,
 		char16_t ch;
 		ch = *num_iter;
 		if (ch >= '0' && ch <= '9')
-			digit = ch - '0';
+			digit = (uint8_t)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			digit = 10 + (ch - 'a');
+			digit = (uint8_t)(10 + ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			digit = 10 + (ch - 'A');
+			digit = (uint8_t)(10 + ch - 'A');
 		else {
 			break;
 		}
@@ -2670,11 +2670,11 @@ handle_overflow:
 				for (;;) {
 					ch = *num_iter;
 					if (ch >= '0' && ch <= '9')
-						digit = ch - '0';
+						digit = (uint8_t)(ch - '0');
 					else if (ch >= 'a' && ch <= 'z')
-						digit = 10 + (ch - 'a');
+						digit = (uint8_t)(10 + ch - 'a');
 					else if (ch >= 'A' && ch <= 'Z')
-						digit = 10 + (ch - 'A');
+						digit = (uint8_t)(10 + ch - 'A');
 					else {
 						break;
 					}
@@ -2790,11 +2790,11 @@ NOTHROW_NCX(LIBKCALL libc_wcsto32_r)(char32_t const *__restrict nptr,
 		char32_t ch;
 		ch = *num_iter;
 		if (ch >= '0' && ch <= '9')
-			digit = ch - '0';
+			digit = (uint8_t)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			digit = 10 + (ch - 'a');
+			digit = (uint8_t)(10 + ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			digit = 10 + (ch - 'A');
+			digit = (uint8_t)(10 + ch - 'A');
 		else {
 			break;
 		}
@@ -2816,11 +2816,11 @@ handle_overflow:
 				for (;;) {
 					ch = *num_iter;
 					if (ch >= '0' && ch <= '9')
-						digit = ch - '0';
+						digit = (uint8_t)(ch - '0');
 					else if (ch >= 'a' && ch <= 'z')
-						digit = 10 + (ch - 'a');
+						digit = (uint8_t)(10 + ch - 'a');
 					else if (ch >= 'A' && ch <= 'Z')
-						digit = 10 + (ch - 'A');
+						digit = (uint8_t)(10 + ch - 'A');
 					else {
 						break;
 					}
@@ -2930,11 +2930,11 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
 		uint8_t digit;
 		char16_t ch = *num_iter;
 		if (ch >= '0' && ch <= '9')
-			digit = ch - '0';
+			digit = (uint8_t)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			digit = 10 + (ch - 'a');
+			digit = (uint8_t)(10 + ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			digit = 10 + (ch - 'A');
+			digit = (uint8_t)(10 + ch - 'A');
 		else {
 			break;
 		}
@@ -2955,11 +2955,11 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
 				for (;;) {
 					ch = *num_iter;
 					if (ch >= '0' && ch <= '9')
-						digit = ch - '0';
+						digit = (uint8_t)(ch - '0');
 					else if (ch >= 'a' && ch <= 'z')
-						digit = 10 + (ch - 'a');
+						digit = (uint8_t)(10 + ch - 'a');
 					else if (ch >= 'A' && ch <= 'Z')
-						digit = 10 + (ch - 'A');
+						digit = (uint8_t)(10 + ch - 'A');
 					else {
 						break;
 					}
@@ -3062,11 +3062,11 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
 		uint8_t digit;
 		char32_t ch = *num_iter;
 		if (ch >= '0' && ch <= '9')
-			digit = ch - '0';
+			digit = (uint8_t)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			digit = 10 + (ch - 'a');
+			digit = (uint8_t)(10 + ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			digit = 10 + (ch - 'A');
+			digit = (uint8_t)(10 + ch - 'A');
 		else {
 			break;
 		}
@@ -3087,11 +3087,11 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
 				for (;;) {
 					ch = *num_iter;
 					if (ch >= '0' && ch <= '9')
-						digit = ch - '0';
+						digit = (uint8_t)(ch - '0');
 					else if (ch >= 'a' && ch <= 'z')
-						digit = 10 + (ch - 'a');
+						digit = (uint8_t)(10 + ch - 'a');
 					else if (ch >= 'A' && ch <= 'Z')
-						digit = 10 + (ch - 'A');
+						digit = (uint8_t)(10 + ch - 'A');
 					else {
 						break;
 					}
@@ -3268,11 +3268,11 @@ NOTHROW_NCX(LIBDCALL libd_wcsto64_r)(char16_t const *__restrict nptr,
 		char16_t ch;
 		ch = *num_iter;
 		if (ch >= '0' && ch <= '9')
-			digit = ch - '0';
+			digit = (uint8_t)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			digit = 10 + (ch - 'a');
+			digit = (uint8_t)(10 + ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			digit = 10 + (ch - 'A');
+			digit = (uint8_t)(10 + ch - 'A');
 		else {
 			break;
 		}
@@ -3294,11 +3294,11 @@ handle_overflow:
 				for (;;) {
 					ch = *num_iter;
 					if (ch >= '0' && ch <= '9')
-						digit = ch - '0';
+						digit = (uint8_t)(ch - '0');
 					else if (ch >= 'a' && ch <= 'z')
-						digit = 10 + (ch - 'a');
+						digit = (uint8_t)(10 + ch - 'a');
 					else if (ch >= 'A' && ch <= 'Z')
-						digit = 10 + (ch - 'A');
+						digit = (uint8_t)(10 + ch - 'A');
 					else {
 						break;
 					}
@@ -3414,11 +3414,11 @@ NOTHROW_NCX(LIBKCALL libc_wcsto64_r)(char32_t const *__restrict nptr,
 		char32_t ch;
 		ch = *num_iter;
 		if (ch >= '0' && ch <= '9')
-			digit = ch - '0';
+			digit = (uint8_t)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			digit = 10 + (ch - 'a');
+			digit = (uint8_t)(10 + ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			digit = 10 + (ch - 'A');
+			digit = (uint8_t)(10 + ch - 'A');
 		else {
 			break;
 		}
@@ -3440,11 +3440,11 @@ handle_overflow:
 				for (;;) {
 					ch = *num_iter;
 					if (ch >= '0' && ch <= '9')
-						digit = ch - '0';
+						digit = (uint8_t)(ch - '0');
 					else if (ch >= 'a' && ch <= 'z')
-						digit = 10 + (ch - 'a');
+						digit = (uint8_t)(10 + ch - 'a');
 					else if (ch >= 'A' && ch <= 'Z')
-						digit = 10 + (ch - 'A');
+						digit = (uint8_t)(10 + ch - 'A');
 					else {
 						break;
 					}
@@ -3554,11 +3554,11 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
 		uint8_t digit;
 		char16_t ch = *num_iter;
 		if (ch >= '0' && ch <= '9')
-			digit = ch - '0';
+			digit = (uint8_t)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			digit = 10 + (ch - 'a');
+			digit = (uint8_t)(10 + ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			digit = 10 + (ch - 'A');
+			digit = (uint8_t)(10 + ch - 'A');
 		else {
 			break;
 		}
@@ -3579,11 +3579,11 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
 				for (;;) {
 					ch = *num_iter;
 					if (ch >= '0' && ch <= '9')
-						digit = ch - '0';
+						digit = (uint8_t)(ch - '0');
 					else if (ch >= 'a' && ch <= 'z')
-						digit = 10 + (ch - 'a');
+						digit = (uint8_t)(10 + ch - 'a');
 					else if (ch >= 'A' && ch <= 'Z')
-						digit = 10 + (ch - 'A');
+						digit = (uint8_t)(10 + ch - 'A');
 					else {
 						break;
 					}
@@ -3686,11 +3686,11 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
 		uint8_t digit;
 		char32_t ch = *num_iter;
 		if (ch >= '0' && ch <= '9')
-			digit = ch - '0';
+			digit = (uint8_t)(ch - '0');
 		else if (ch >= 'a' && ch <= 'z')
-			digit = 10 + (ch - 'a');
+			digit = (uint8_t)(10 + ch - 'a');
 		else if (ch >= 'A' && ch <= 'Z')
-			digit = 10 + (ch - 'A');
+			digit = (uint8_t)(10 + ch - 'A');
 		else {
 			break;
 		}
@@ -3711,11 +3711,11 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
 				for (;;) {
 					ch = *num_iter;
 					if (ch >= '0' && ch <= '9')
-						digit = ch - '0';
+						digit = (uint8_t)(ch - '0');
 					else if (ch >= 'a' && ch <= 'z')
-						digit = 10 + (ch - 'a');
+						digit = (uint8_t)(10 + ch - 'a');
 					else if (ch >= 'A' && ch <= 'Z')
-						digit = 10 + (ch - 'A');
+						digit = (uint8_t)(10 + ch - 'A');
 					else {
 						break;
 					}
@@ -4866,7 +4866,7 @@ NOTHROW_NCX(LIBDCALL libd_wcslwr_l)(char16_t *__restrict str,
                                     locale_t locale) {
 	char16_t *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
-		*iter = libd_towlower_l(ch, locale);
+		*iter = (char16_t)libd_towlower_l((char16_t)ch, locale);
 	return str;
 }
 /* >> wcslwr_l(3) */
@@ -4875,7 +4875,7 @@ NOTHROW_NCX(LIBKCALL libc_wcslwr_l)(char32_t *__restrict str,
                                     locale_t locale) {
 	char32_t *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
-		*iter = libc_towlower_l(ch, locale);
+		*iter = (char32_t)libc_towlower_l((char32_t)ch, locale);
 	return str;
 }
 /* >> wcsupr_l(3) */
@@ -4884,7 +4884,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsupr_l)(char16_t *__restrict str,
                                     locale_t locale) {
 	char16_t *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
-		*iter = libd_towupper_l(ch, locale);
+		*iter = (char16_t)libd_towupper_l((char16_t)ch, locale);
 	return str;
 }
 /* >> wcsupr_l(3) */
@@ -4893,7 +4893,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsupr_l)(char32_t *__restrict str,
                                     locale_t locale) {
 	char32_t *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
-		*iter = libc_towupper_l(ch, locale);
+		*iter = (char32_t)libc_towupper_l((char32_t)ch, locale);
 	return str;
 }
 /* >> wcsnlwr_l(3) */
@@ -4903,7 +4903,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsnlwr_l)(char16_t *__restrict str,
                                      locale_t locale) {
 	char16_t *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
-		*iter = libd_towlower_l(ch, locale);
+		*iter = (char16_t)libd_towlower_l((char16_t)ch, locale);
 	return str;
 }
 /* >> wcsnlwr_l(3) */
@@ -4913,7 +4913,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnlwr_l)(char32_t *__restrict str,
                                      locale_t locale) {
 	char32_t *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
-		*iter = libc_towlower_l(ch, locale);
+		*iter = (char32_t)libc_towlower_l((char32_t)ch, locale);
 	return str;
 }
 /* >> wcsnupr_l(3) */
@@ -4923,7 +4923,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsnupr_l)(char16_t *__restrict str,
                                      locale_t locale) {
 	char16_t *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
-		*iter = libd_towupper_l(ch, locale);
+		*iter = (char16_t)libd_towupper_l((char16_t)ch, locale);
 	return str;
 }
 /* >> wcsnupr_l(3) */
@@ -4933,7 +4933,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnupr_l)(char32_t *__restrict str,
                                      locale_t locale) {
 	char32_t *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
-		*iter = libc_towupper_l(ch, locale);
+		*iter = (char32_t)libc_towupper_l((char32_t)ch, locale);
 	return str;
 }
 /* >> wcscasestr_l(3) */
@@ -5003,7 +5003,8 @@ NOTHROW_NCX(LIBDCALL libd_fuzzy_wmemcasecmp_l)(char16_t const *s1,
 		for (j = 0; j < s2_bytes; j++) {
 			byte_t c1 = ((byte_t *)s1)[i];
 			byte_t c2 = ((byte_t *)s2)[j];
-			cost  = c1 != c2 && libd_towlower_l(c1, locale) != libd_towlower_l(c2, locale);
+			cost  = c1 != c2 && (libd_towlower_l((char16_t)c1, locale) !=
+			                     libd_towlower_l((char16_t)c2, locale));
 			cost += v0[j];
 			temp  = v1[j] + 1;
 			if (cost > temp)
@@ -5065,7 +5066,8 @@ NOTHROW_NCX(LIBKCALL libc_fuzzy_wmemcasecmp_l)(char32_t const *s1,
 		for (j = 0; j < s2_bytes; j++) {
 			byte_t c1 = ((byte_t *)s1)[i];
 			byte_t c2 = ((byte_t *)s2)[j];
-			cost  = c1 != c2 && libc_towlower_l(c1, locale) != libc_towlower_l(c2, locale);
+			cost  = c1 != c2 && (libc_towlower_l((char32_t)c1, locale) !=
+			                     libc_towlower_l((char32_t)c2, locale));
 			cost += v0[j];
 			temp  = v1[j] + 1;
 			if (cost > temp)
@@ -5137,10 +5139,10 @@ NOTHROW_NCX(LIBDCALL libd_wildwcscasecmp_l)(char16_t const *pattern,
 				return 0; /* Pattern ends with '*' (matches everything) */
 			if (card_post == '?')
 				goto next; /* Match any --> already found */
-			card_post = libd_towlower_l(card_post, locale);
+			card_post = (char16_t)libd_towlower_l(card_post, locale);
 			for (;;) {
 				char16_t ch = *string++;
-				if (card_post == ch || card_post == libd_towlower_l(ch, locale)) {
+				if (card_post == ch || card_post == (char16_t)libd_towlower_l(ch, locale)) {
 					/* Recursively check if the rest of the string and pattern match */
 					if (!libd_wcscasecmp_l(string, pattern, locale))
 						return 0;
@@ -5152,8 +5154,8 @@ NOTHROW_NCX(LIBDCALL libd_wildwcscasecmp_l)(char16_t const *pattern,
 		pattern_ch = *pattern;
 		wcsing_ch = *string;
 		if (pattern_ch == wcsing_ch || pattern_ch == '?' ||
-		    (pattern_ch = libd_towlower_l(pattern_ch, locale),
-		     wcsing_ch = libd_towlower_l(wcsing_ch, locale),
+		    (pattern_ch = (char16_t)libd_towlower_l((char16_t)pattern_ch, locale),
+		     wcsing_ch = (char16_t)libd_towlower_l((char16_t)wcsing_ch, locale),
 		     pattern_ch == wcsing_ch)) {
 next:
 			++string;
@@ -5187,10 +5189,10 @@ NOTHROW_NCX(LIBKCALL libc_wildwcscasecmp_l)(char32_t const *pattern,
 				return 0; /* Pattern ends with '*' (matches everything) */
 			if (card_post == '?')
 				goto next; /* Match any --> already found */
-			card_post = libc_towlower_l(card_post, locale);
+			card_post = (char32_t)libc_towlower_l(card_post, locale);
 			for (;;) {
 				char32_t ch = *string++;
-				if (card_post == ch || card_post == libc_towlower_l(ch, locale)) {
+				if (card_post == ch || card_post == (char32_t)libc_towlower_l(ch, locale)) {
 					/* Recursively check if the rest of the string and pattern match */
 					if (!libc_wcscasecmp_l(string, pattern, locale))
 						return 0;
@@ -5202,8 +5204,8 @@ NOTHROW_NCX(LIBKCALL libc_wildwcscasecmp_l)(char32_t const *pattern,
 		pattern_ch = *pattern;
 		wcsing_ch = *string;
 		if (pattern_ch == wcsing_ch || pattern_ch == '?' ||
-		    (pattern_ch = libc_towlower_l(pattern_ch, locale),
-		     wcsing_ch = libc_towlower_l(wcsing_ch, locale),
+		    (pattern_ch = (char32_t)libc_towlower_l((char32_t)pattern_ch, locale),
+		     wcsing_ch = (char32_t)libc_towlower_l((char32_t)wcsing_ch, locale),
 		     pattern_ch == wcsing_ch)) {
 next:
 			++string;

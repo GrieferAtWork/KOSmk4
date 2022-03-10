@@ -680,9 +680,11 @@ __nextfmt:
 #if __CHAR_SIZE == 4
 		__given_char[0] = __ch32;
 		__string_length = 1;
-#else /* __CHAR_SIZE == 4 */
+#elif __CHAR_SIZE == 2
+		__string_length = (__size_t)(__FORMAT_UNICODE_WRITECHAR((__CHAR16_TYPE__ *)__given_char, __ch32) - (__CHAR16_TYPE__ *)__given_char);
+#else /* __CHAR_SIZE == ... */
 		__string_length = (__size_t)(__FORMAT_UNICODE_WRITECHAR(__given_char, __ch32) - __given_char);
-#endif /* __CHAR_SIZE != 4 */
+#endif /* __CHAR_SIZE != ... */
 #endif /* !__NO_PRINTF_UNICODE_CHARS */
 		goto print_string;
 #ifndef __NO_PRINTF_ESCAPE
