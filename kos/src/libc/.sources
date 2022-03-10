@@ -110,37 +110,65 @@ BEGIN
 					updateFileContents(self.group.fixFilename(LIBC_FEATURES_HEADER), [](fp: File){
 						fp << COPYRIGHT << "\n\n\n";
 						if (!TARGET.DL_HAVE_PE_COMPAT) {
-							for (local x: symbols_set.sorted())
+							local dollarSymbols = [];
+							for (local x: symbols_set.sorted()) {
+								if ("$" in x) {
+									dollarSymbols.append(x);
+									continue;
+								}
 								fp << "#define __CRT_HAVE_" << x << "\n";
+							}
+							if (dollarSymbols) {
+								fp << "#ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL\n";
+								for (local x: dollarSymbols)
+									fp << "#define __CRT_HAVE_" << x << "\n";
+								fp << "#endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */\n";
+							}
 						} else {
-							local dosSymbols     = HashSet(); /* Symbols exposed with a DOS$ prefix */
+							local dosSymbols = HashSet(); /* Symbols exposed with a DOS$ prefix */
+							local dollarSymbols = [];
 							for (local x: symbols_set.sorted()) {
 								if (x.startswith("?")) {
-									fp << "#define __CRT_HAVE_"
-										<< x.replace("?", "$Q").replace("@", "$A")
-										<< "\n";
+									dollarSymbols.append(x.replace("?", "$Q").replace("@", "$A"));
 								} else if (x.startswith("DOS$")) {
 									dosSymbols.insert(x[4:]);
+								} else if ("$" in x) {
+									dollarSymbols.append(x);
 								} else {
 									fp << "#define __CRT_HAVE_" << x << "\n";
 								}
 							}
+							if (dollarSymbols) {
+								fp << "#ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL\n";
+								for (local x: dollarSymbols)
+									fp << "#define __CRT_HAVE_" << x << "\n";
+								fp << "#endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */\n";
+							}
 							if (dosSymbols) {
 								dosSymbols = dosSymbols.sorted();
 								fp << "#ifdef __PE__\n";
+								dollarSymbols = [];
 								for (local x: dosSymbols) {
 									/* Functions that only exist in DOS */
 									if (x in symbols_set) {
 										/* Hybrid symbol */
-										fp << "#define __CRT_HAVE_KOS$" << x << "\n";
+										dollarSymbols.append(x);
 									} else {
 										/* DOS-only symbol symbol */
 										fp << "#define __CRT_HAVE_" << x << "\n";
 									}
 								}
+								if (dollarSymbols) {
+									fp << "#ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL\n";
+									for (local x: dollarSymbols)
+										fp << "#define __CRT_HAVE_KOS$" << x << "\n";
+									fp << "#endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */\n";
+								}
 								fp << "#else /* __PE__ */\n";
+								fp << "#ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL\n";
 								for (local x: dosSymbols)
 									fp << "#define __CRT_HAVE_DOS$" << x << "\n";
+								fp << "#endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */\n";
 								fp << "#endif /* !__PE__ */\n";
 							}
 						}

@@ -19,6 +19,7 @@
  */
 
 /* Symbols exported from `msvcr120d.dll' */
+#ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __CRT_HAVE_$I10_OUTPUT
 #define __CRT_HAVE_$Q$Q0$Q$_SpinWait$A$00$Adetails$AConcurrency$A$AQAE$AP6AXXZ$AZ
 #define __CRT_HAVE_$Q$Q0$Q$_SpinWait$A$0A$A$Adetails$AConcurrency$A$AQAE$AP6AXXZ$AZ
@@ -343,6 +344,7 @@
 #define __CRT_HAVE_$Qwait_for$A_Condition_variable$Adetails$AConcurrency$A$AQAE_NAAVcritical_section$A3$AI$AZ
 #define __CRT_HAVE_$Qwait_for_multiple$Aevent$AConcurrency$A$ASAIPAPAV12$AI_NI$AZ
 #define __CRT_HAVE_$Qwhat$Aexception$Astd$A$AUBEPBDXZ
+#endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
 #define __CRT_HAVE__CIacos
 #define __CRT_HAVE__CIasin
 #define __CRT_HAVE__CIatan
@@ -1982,8 +1984,10 @@
 
 /* A small hand full of functions is only available in debug-/release-mode */
 #ifdef _DEBUG
+#ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __CRT_HAVE_$Q_CrtDbgReportW$A$AYAHHPBGH00ZZ
 #define __CRT_HAVE_$QcommonFlags$A$Q1$Q$Q_control87$A$A9$A9
+#endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
 #define __CRT_HAVE__CrtCheckMemory
 #define __CRT_HAVE__CrtDbgBreak
 #define __CRT_HAVE__CrtDbgReport

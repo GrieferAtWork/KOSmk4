@@ -152,6 +152,13 @@
 #define __COMPILER_HAVE_AUTOTYPE
 #endif /* ... */
 
+/* Check if  the hosting  preprocessor  supports '$'  in  identifiers.
+ * If they aren't accepted, `#define __COMPILER_NO_DOLLAR_IN_SYMBOL $' */
+#define __COMPILER_NO_DOLLAR_IN_SYMBOL$
+#ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
+#undef __COMPILER_NO_DOLLAR_IN_SYMBOL$
+#endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
+
 #if defined(__DCC_VERSION__) || defined(__TINYC__)
 #define __COMPILER_HAVE_TYPEOF
 #endif /* __DCC_VERSION__ || __TINYC__ */
@@ -643,12 +650,9 @@
 #define __ATTR_FORMAT_STRFTIME(fmt, args) /* Nothing */
 #endif /* !__ATTR_FORMAT_STRFTIME */
 
-#if __has_attribute(__dllimport__)
+#if __has_attribute(__dllimport__) || (defined(__TINYC__) && defined(__PE__))
 #define __ATTR_DLLIMPORT __attribute__((__dllimport__))
 #define __ATTR_DLLEXPORT __attribute__((__dllexport__))
-#elif defined(__TINYC__)
-#define __ATTR_DLLIMPORT __attribute__((dllimport))
-#define __ATTR_DLLEXPORT __attribute__((dllexport))
 #elif __has_declspec_attribute(dllimport) || defined(__PE__) || defined(_WIN32)
 #define __ATTR_DLLIMPORT __declspec(dllimport)
 #define __ATTR_DLLEXPORT __declspec(dllexport)
@@ -743,7 +747,7 @@
 #endif
 #endif /* ... */
 
-#if !__has_builtin(__builtin_unreachable) && !defined(__TINYC__)
+#if !__has_builtin(__builtin_unreachable) /*|| defined(__TINYC__)*/
 #define __NO_builtin_unreachable
 #define __builtin_unreachable() do;while(1)
 #endif /* ... */
