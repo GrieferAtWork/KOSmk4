@@ -48,6 +48,7 @@
  * known early on during assembly
  */
 
+#ifndef __COMPILER_NO_GCC_ASM_MACROS
 __ASM_BEGIN
 __ASM_L(.macro jmp8   sym:req; .byte 0xeb; .byte __ASM_ARG(\sym) - (.+1); .endm)
 __ASM_L(.macro jo8    sym:req; .byte 0x70; .byte __ASM_ARG(\sym) - (.+1); .endm)
@@ -117,5 +118,6 @@ __ASM_L(.macro jng32   sym:req; .byte 0x0f, 0x8e; .long __ASM_ARG(\sym) - (.+4);
 __ASM_L(.macro jg32    sym:req; .byte 0x0f, 0x8f; .long __ASM_ARG(\sym) - (.+4); .endm)
 __ASM_L(.macro jnle32  sym:req; .byte 0x0f, 0x8f; .long __ASM_ARG(\sym) - (.+4); .endm)
 __ASM_END
+#endif /* !__COMPILER_NO_GCC_ASM_MACROS */
 
 #endif /* !_I386_KOS_ASM_INSTR_JCCN_H */

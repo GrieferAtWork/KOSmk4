@@ -21,6 +21,7 @@
 #define __GUARD_HYBRID_LIMITCORE_H 1
 
 #include <__stdinc.h>
+
 #include "typecore.h"
 
 #define __PRIVATE_MINMAX1 1
@@ -37,15 +38,15 @@
 #define __PRIVATE_MINMAX16 0
 #endif /* !__PRIVATE_MAX_U16 */
 #define __PRIVATE_MINMAXQ(s) __PRIVATE_MINMAX##s
-#define __PRIVATE_MIN2_S(s) __PRIVATE_MIN_S##s
-#define __PRIVATE_MAX2_S(s) __PRIVATE_MAX_S##s
-#define __PRIVATE_MIN2_U(s) __PRIVATE_MIN_U##s
-#define __PRIVATE_MAX2_U(s) __PRIVATE_MAX_U##s
+#define __PRIVATE_MIN2_S(s)  __PRIVATE_MIN_S##s
+#define __PRIVATE_MAX2_S(s)  __PRIVATE_MAX_S##s
+#define __PRIVATE_MIN2_U(s)  __PRIVATE_MIN_U##s
+#define __PRIVATE_MAX2_U(s)  __PRIVATE_MAX_U##s
 #define __PRIVATE_MINMAX(s)  __PRIVATE_MINMAXQ(s)
-#define __PRIVATE_MIN_S(s)  __PRIVATE_MIN2_S(s)
-#define __PRIVATE_MAX_S(s)  __PRIVATE_MAX2_S(s)
-#define __PRIVATE_MIN_U(s)  __PRIVATE_MIN2_U(s)
-#define __PRIVATE_MAX_U(s)  __PRIVATE_MAX2_U(s)
+#define __PRIVATE_MIN_S(s)   __PRIVATE_MIN2_S(s)
+#define __PRIVATE_MAX_S(s)   __PRIVATE_MAX2_S(s)
+#define __PRIVATE_MIN_U(s)   __PRIVATE_MIN2_U(s)
+#define __PRIVATE_MAX_U(s)   __PRIVATE_MAX2_U(s)
 
 #ifdef __CHAR_MIN__
 #if __CHAR_MIN__ == 0 && !defined(__CHAR_UNSIGNED__)
@@ -68,11 +69,11 @@
 #endif /* !__UCHAR_MAX__ */
 #ifndef __CHAR_MIN__
 #ifdef __CHAR_UNSIGNED__
-#   define __CHAR_MIN__ __PRIVATE_MIN_U(__SIZEOF_CHAR__)
-#   define __CHAR_MAX__ __PRIVATE_MAX_U(__SIZEOF_CHAR__)
+#define __CHAR_MIN__ __PRIVATE_MIN_U(__SIZEOF_CHAR__)
+#define __CHAR_MAX__ __PRIVATE_MAX_U(__SIZEOF_CHAR__)
 #else /* __CHAR_UNSIGNED__ */
-#   define __CHAR_MIN__ __PRIVATE_MIN_S(__SIZEOF_CHAR__)
-#   define __CHAR_MAX__ __PRIVATE_MAX_S(__SIZEOF_CHAR__)
+#define __CHAR_MIN__ __PRIVATE_MIN_S(__SIZEOF_CHAR__)
+#define __CHAR_MAX__ __PRIVATE_MAX_S(__SIZEOF_CHAR__)
 #endif /* !__CHAR_UNSIGNED__ */
 #endif /* !__CHAR_MIN__ */
 #ifndef __SHRT_MIN__
@@ -139,79 +140,79 @@
 #endif /* !__UINTMAX_MAX__ */
 
 #ifndef __INT8_MIN__
-#define __INT8_MIN__         __PRIVATE_MIN_S1
+#define __INT8_MIN__ __PRIVATE_MIN_S1
 #endif /* !__INT8_MIN__ */
 #ifndef __INT16_MIN__
-#define __INT16_MIN__        __PRIVATE_MIN_S2
+#define __INT16_MIN__ __PRIVATE_MIN_S2
 #endif /* !__INT16_MIN__ */
 #ifndef __INT32_MIN__
-#define __INT32_MIN__        __PRIVATE_MIN_S4
+#define __INT32_MIN__ __PRIVATE_MIN_S4
 #endif /* !__INT32_MIN__ */
 #ifndef __INT8_MAX__
-#define __INT8_MAX__         __PRIVATE_MAX_S1
+#define __INT8_MAX__ __PRIVATE_MAX_S1
 #endif /* !__INT8_MAX__ */
 #ifndef __INT16_MAX__
-#define __INT16_MAX__        __PRIVATE_MAX_S2
+#define __INT16_MAX__ __PRIVATE_MAX_S2
 #endif /* !__INT16_MAX__ */
 #ifndef __INT32_MAX__
-#define __INT32_MAX__        __PRIVATE_MAX_S4
+#define __INT32_MAX__ __PRIVATE_MAX_S4
 #endif /* !__INT32_MAX__ */
 #ifndef __UINT8_MAX__
-#define __UINT8_MAX__        __PRIVATE_MAX_U1
+#define __UINT8_MAX__ __PRIVATE_MAX_U1
 #endif /* !__UINT8_MAX__ */
 #ifndef __UINT16_MAX__
-#define __UINT16_MAX__       __PRIVATE_MAX_U2
+#define __UINT16_MAX__ __PRIVATE_MAX_U2
 #endif /* !__UINT16_MAX__ */
 #ifndef __UINT32_MAX__
-#define __UINT32_MAX__       __PRIVATE_MAX_U4
+#define __UINT32_MAX__ __PRIVATE_MAX_U4
 #endif /* !__UINT32_MAX__ */
 
 #ifdef __PRIVATE_MAX_U8
 #ifndef __INT64_MIN__
-#define __INT64_MIN__        __PRIVATE_MIN_S8
+#define __INT64_MIN__ __PRIVATE_MIN_S8
 #endif /* !__INT64_MIN__ */
 #ifndef __INT64_MAX__
-#define __INT64_MAX__        __PRIVATE_MAX_S8
+#define __INT64_MAX__ __PRIVATE_MAX_S8
 #endif /* !__INT64_MAX__ */
 #ifndef __UINT64_MAX__
-#define __UINT64_MAX__       __PRIVATE_MAX_U8
+#define __UINT64_MAX__ __PRIVATE_MAX_U8
 #endif /* !__UINT64_MAX__ */
 #endif /* __PRIVATE_MAX_U8 */
 
 #ifdef __PRIVATE_MIN_S16
 #ifndef __INT128_MIN__
-#define __INT128_MIN__       __PRIVATE_MIN_S16
+#define __INT128_MIN__ __PRIVATE_MIN_S16
 #endif /* !__INT128_MIN__ */
 #ifndef __INT128_MAX__
-#define __INT128_MAX__       __PRIVATE_MAX_S16
+#define __INT128_MAX__ __PRIVATE_MAX_S16
 #endif /* !__INT128_MAX__ */
 #ifndef __UINT128_MAX__
-#define __UINT128_MAX__      __PRIVATE_MAX_U16
+#define __UINT128_MAX__ __PRIVATE_MAX_U16
 #endif /* !__UINT128_MAX__ */
 #endif /* __PRIVATE_MIN_S16 */
 
 
 
 #ifndef __INT_LEAST8_MIN__
-#define __INT_LEAST8_MIN__   __PRIVATE_MIN_S(__SIZEOF_INT_LEAST8_T__)
+#define __INT_LEAST8_MIN__ __PRIVATE_MIN_S(__SIZEOF_INT_LEAST8_T__)
 #endif /* !__INT_LEAST8_MIN__ */
 #ifndef __INT_LEAST16_MIN__
-#define __INT_LEAST16_MIN__  __PRIVATE_MIN_S(__SIZEOF_INT_LEAST16_T__)
+#define __INT_LEAST16_MIN__ __PRIVATE_MIN_S(__SIZEOF_INT_LEAST16_T__)
 #endif /* !__INT_LEAST16_MIN__ */
 #ifndef __INT_LEAST32_MIN__
-#define __INT_LEAST32_MIN__  __PRIVATE_MIN_S(__SIZEOF_INT_LEAST32_T__)
+#define __INT_LEAST32_MIN__ __PRIVATE_MIN_S(__SIZEOF_INT_LEAST32_T__)
 #endif /* !__INT_LEAST32_MIN__ */
 #ifndef __INT_LEAST8_MAX__
-#define __INT_LEAST8_MAX__   __PRIVATE_MAX_S(__SIZEOF_INT_LEAST8_T__)
+#define __INT_LEAST8_MAX__ __PRIVATE_MAX_S(__SIZEOF_INT_LEAST8_T__)
 #endif /* !__INT_LEAST8_MAX__ */
 #ifndef __INT_LEAST16_MAX__
-#define __INT_LEAST16_MAX__  __PRIVATE_MAX_S(__SIZEOF_INT_LEAST16_T__)
+#define __INT_LEAST16_MAX__ __PRIVATE_MAX_S(__SIZEOF_INT_LEAST16_T__)
 #endif /* !__INT_LEAST16_MAX__ */
 #ifndef __INT_LEAST32_MAX__
-#define __INT_LEAST32_MAX__  __PRIVATE_MAX_S(__SIZEOF_INT_LEAST32_T__)
+#define __INT_LEAST32_MAX__ __PRIVATE_MAX_S(__SIZEOF_INT_LEAST32_T__)
 #endif /* !__INT_LEAST32_MAX__ */
 #ifndef __UINT_LEAST8_MAX__
-#define __UINT_LEAST8_MAX__  __PRIVATE_MAX_U(__SIZEOF_INT_LEAST8_T__)
+#define __UINT_LEAST8_MAX__ __PRIVATE_MAX_U(__SIZEOF_INT_LEAST8_T__)
 #endif /* !__UINT_LEAST8_MAX__ */
 #ifndef __UINT_LEAST16_MAX__
 #define __UINT_LEAST16_MAX__ __PRIVATE_MAX_U(__SIZEOF_INT_LEAST16_T__)
@@ -222,10 +223,10 @@
 
 #if __PRIVATE_MINMAX(__SIZEOF_INT_LEAST64_T__)
 #ifndef __INT_LEAST64_MIN__
-#define __INT_LEAST64_MIN__  __PRIVATE_MIN_S(__SIZEOF_INT_LEAST64_T__)
+#define __INT_LEAST64_MIN__ __PRIVATE_MIN_S(__SIZEOF_INT_LEAST64_T__)
 #endif /* !__INT_LEAST64_MIN__ */
 #ifndef __INT_LEAST64_MAX__
-#define __INT_LEAST64_MAX__  __PRIVATE_MAX_S(__SIZEOF_INT_LEAST64_T__)
+#define __INT_LEAST64_MAX__ __PRIVATE_MAX_S(__SIZEOF_INT_LEAST64_T__)
 #endif /* !__INT_LEAST64_MAX__ */
 #ifndef __UINT_LEAST64_MAX__
 #define __UINT_LEAST64_MAX__ __PRIVATE_MAX_U(__SIZEOF_INT_LEAST64_T__)
@@ -233,42 +234,42 @@
 #endif /* __PRIVATE_MINMAX(__SIZEOF_INT_LEAST64_T__) */
 
 #ifndef __INT_FAST8_MIN__
-#define __INT_FAST8_MIN__    __PRIVATE_MIN_S(__SIZEOF_INT_FAST8_T__)
+#define __INT_FAST8_MIN__ __PRIVATE_MIN_S(__SIZEOF_INT_FAST8_T__)
 #endif /* !__INT_FAST8_MIN__ */
 #ifndef __INT_FAST16_MIN__
-#define __INT_FAST16_MIN__   __PRIVATE_MIN_S(__SIZEOF_INT_FAST16_T__)
+#define __INT_FAST16_MIN__ __PRIVATE_MIN_S(__SIZEOF_INT_FAST16_T__)
 #endif /* !__INT_FAST16_MIN__ */
 #ifndef __INT_FAST32_MIN__
-#define __INT_FAST32_MIN__   __PRIVATE_MIN_S(__SIZEOF_INT_FAST32_T__)
+#define __INT_FAST32_MIN__ __PRIVATE_MIN_S(__SIZEOF_INT_FAST32_T__)
 #endif /* !__INT_FAST32_MIN__ */
 #ifndef __INT_FAST8_MAX__
-#define __INT_FAST8_MAX__    __PRIVATE_MAX_S(__SIZEOF_INT_FAST8_T__)
+#define __INT_FAST8_MAX__ __PRIVATE_MAX_S(__SIZEOF_INT_FAST8_T__)
 #endif /* !__INT_FAST8_MAX__ */
 #ifndef __INT_FAST16_MAX__
-#define __INT_FAST16_MAX__   __PRIVATE_MAX_S(__SIZEOF_INT_FAST16_T__)
+#define __INT_FAST16_MAX__ __PRIVATE_MAX_S(__SIZEOF_INT_FAST16_T__)
 #endif /* !__INT_FAST16_MAX__ */
 #ifndef __INT_FAST32_MAX__
-#define __INT_FAST32_MAX__   __PRIVATE_MAX_S(__SIZEOF_INT_FAST32_T__)
+#define __INT_FAST32_MAX__ __PRIVATE_MAX_S(__SIZEOF_INT_FAST32_T__)
 #endif /* !__INT_FAST32_MAX__ */
 #ifndef __UINT_FAST8_MAX__
-#define __UINT_FAST8_MAX__   __PRIVATE_MAX_U(__SIZEOF_INT_FAST8_T__)
+#define __UINT_FAST8_MAX__ __PRIVATE_MAX_U(__SIZEOF_INT_FAST8_T__)
 #endif /* !__UINT_FAST8_MAX__ */
 #ifndef __UINT_FAST16_MAX__
-#define __UINT_FAST16_MAX__  __PRIVATE_MAX_U(__SIZEOF_INT_FAST16_T__)
+#define __UINT_FAST16_MAX__ __PRIVATE_MAX_U(__SIZEOF_INT_FAST16_T__)
 #endif /* !__UINT_FAST16_MAX__ */
 #ifndef __UINT_FAST32_MAX__
-#define __UINT_FAST32_MAX__  __PRIVATE_MAX_U(__SIZEOF_INT_FAST32_T__)
+#define __UINT_FAST32_MAX__ __PRIVATE_MAX_U(__SIZEOF_INT_FAST32_T__)
 #endif /* !__UINT_FAST32_MAX__ */
 
 #if __PRIVATE_MINMAX(__SIZEOF_INT_FAST64_T__)
 #ifndef __INT_FAST64_MIN__
-#define __INT_FAST64_MIN__   __PRIVATE_MIN_S(__SIZEOF_INT_FAST64_T__)
+#define __INT_FAST64_MIN__ __PRIVATE_MIN_S(__SIZEOF_INT_FAST64_T__)
 #endif /* !__INT_FAST64_MIN__ */
 #ifndef __INT_FAST64_MAX__
-#define __INT_FAST64_MAX__   __PRIVATE_MAX_S(__SIZEOF_INT_FAST64_T__)
+#define __INT_FAST64_MAX__ __PRIVATE_MAX_S(__SIZEOF_INT_FAST64_T__)
 #endif /* !__INT_FAST64_MAX__ */
 #ifndef __UINT_FAST64_MAX__
-#define __UINT_FAST64_MAX__  __PRIVATE_MAX_U(__SIZEOF_INT_FAST64_T__)
+#define __UINT_FAST64_MAX__ __PRIVATE_MAX_U(__SIZEOF_INT_FAST64_T__)
 #endif /* !__UINT_FAST64_MAX__ */
 #endif /* __PRIVATE_MINMAX(__SIZEOF_INT_FAST64_T__) */
 

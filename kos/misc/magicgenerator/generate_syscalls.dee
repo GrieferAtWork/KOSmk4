@@ -1830,8 +1830,12 @@ function generateKosSyscallHeader(
 	fp << "#define __PRIVATE_CRT_HAVE_ARG_IMPL(x, val, ...) val\n";
 	fp << "#define __PRIVATE_CRT_HAVE_ARG(x)  __PRIVATE_CRT_HAVE_ARG_IMPL x\n";
 	fp << "#define __PRIVATE_CRT_HAVE3(...)   __PRIVATE_CRT_HAVE_ARG((__VA_ARGS__ 1,0))\n";
+	fp << "#ifdef __TINYC__\n";
+	fp << "#define __PRIVATE_CRT_ISDEFINED(x) __PRIVATE_CRT_HAVE3(__PRIVATE_CRT_HAVE_PLACEHOLDER_##x)\n";
+	fp << "#else /* __TINYC__ */\n";
 	fp << "#define __PRIVATE_CRT_HAVE2(x)     __PRIVATE_CRT_HAVE3(__PRIVATE_CRT_HAVE_PLACEHOLDER_##x)\n";
 	fp << "#define __PRIVATE_CRT_ISDEFINED(x) __PRIVATE_CRT_HAVE2(x)\n";
+	fp << "#endif /* !__TINYC__ */\n";
 	fp << "#define __CRT_HAVE_SC(name)        __PRIVATE_CRT_ISDEFINED(__CRT_HAVE_sys_##name)\n";
 	fp << "#define __CRT_HAVE_XSC(name)       __PRIVATE_CRT_ISDEFINED(__CRT_HAVE_sys_X##name)\n";
 	fp << "#endif /* !__LCLINT__ */\n";

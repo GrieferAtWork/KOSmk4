@@ -23,8 +23,29 @@
 #include "../__stdinc.h"
 
 
-#if defined(__CC__) && defined(__COMPILER_HAVE_GCC_ASM) && \
-   !defined(__INTELLISENSE__)
+#ifdef __ASSEMBLER__
+#define __ASM_BEGIN      /* nothing */
+#define __ASM_END        /* nothing */
+#define __ASM_ARG(x)     x
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define __ASM_L(...)     __VA_ARGS__ ;
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __ASM_L(line...) line ;
+#else /* __PREPROCESSOR_HAVE_VA_ARGS */
+#define __ASM_L(line)    line ;
+#endif /* !__PREPROCESSOR_HAVE_VA_ARGS */
+#elif !defined(__CC__) || defined(__INTELLISENSE__)
+#define __ASM_BEGIN      /* nothing */
+#define __ASM_END        /* nothing */
+#define __ASM_ARG(x)     /* nothing */
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define __ASM_L(...)     /* nothing */
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __ASM_L(line...) /* nothing */
+#else /* __PREPROCESSOR_HAVE_VA_ARGS */
+#define __ASM_L(line)    /* nothing */
+#endif /* !__PREPROCESSOR_HAVE_VA_ARGS */
+#elif defined(__COMPILER_HAVE_GCC_ASM) && !defined(__TINYC__)
 #define __ASM_BEGIN      __asm__(
 #define __ASM_END        );
 #if defined(__TPP_VERSION__)
@@ -57,22 +78,6 @@
 #endif /* !__PREPROCESSOR_HAVE_STR */
 #define __ASM_L(line)     __ASM_LINE2(line)
 #endif /* !... */
-#elif defined(__INTELLISENSE__)
-#define __ASM_BEGIN      /* nothing */
-#define __ASM_END        /* nothing */
-#define __ASM_ARG(x)     /* nothing */
-#define __ASM_L(...)     /* nothing */
-#elif defined(__ASSEMBLER__)
-#define __ASM_BEGIN      /* nothing */
-#define __ASM_END        /* nothing */
-#define __ASM_ARG(x)     x
-#ifdef __PREPROCESSOR_HAVE_VA_ARGS
-#define __ASM_L(...)     __VA_ARGS__ ;
-#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
-#define __ASM_L(line...) line ;
-#else /* __PREPROCESSOR_HAVE_VA_ARGS */
-#define __ASM_L(line)    line ;
-#endif /* !__PREPROCESSOR_HAVE_VA_ARGS */
 #else /* ... */
 #define __ASM_BEGIN      /* nothing */
 #define __ASM_END        /* nothing */

@@ -75,6 +75,11 @@ local badFiles = List({
 	"crt-features",
 	"libdl/module.h",
 	"system-test/ctest.h",
+	"nt/pshpack1.h",
+	"nt/pshpack2.h",
+	"nt/pshpack4.h",
+	"nt/pshpack8.h",
+	"nt/poppack.h",
 });
 
 // Include everything from the .gitignore
@@ -588,7 +593,6 @@ incdir("");
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
 #include <hybrid/sequence/vector.h>
-#include <hybrid/struct.h>
 #include <hybrid/sync/atomic-lock.h>
 #include <hybrid/sync/atomic-once.h>
 #include <hybrid/sync/atomic-owner-rwlock.h>
@@ -1057,14 +1061,9 @@ incdir("");
 #include <nt/messages.h>
 #include <nt/namedpipeapi.h>
 #include <nt/pe.h>
-#include <nt/poppack.h>
 #include <nt/processenv.h>
 #include <nt/processthreadsapi.h>
 #include <nt/profileapi.h>
-#include <nt/pshpack1.h>
-#include <nt/pshpack2.h>
-#include <nt/pshpack4.h>
-#include <nt/pshpack8.h>
 #include <nt/startup.h>
 #include <nt/stringapiset.h>
 #include <nt/synchapi.h>

@@ -28,7 +28,7 @@
 /* Helper assembler macros for encoding fixed-width data words in
  * text,  as  well as  module-relative  (non-relocated) pointers. */
 
-
+#ifndef __COMPILER_NO_GCC_ASM_MACROS
 __ASM_BEGIN
 
 /* Emit an 8-bit word */
@@ -73,5 +73,6 @@ __ASM_L(	.error "Not implemented for this architecture")
 __ASM_L(.endm)
 
 __ASM_END
+#endif /* !__COMPILER_NO_GCC_ASM_MACROS */
 
 #endif /* !_ASM_ASMWORD_H */

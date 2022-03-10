@@ -28,11 +28,11 @@
 #define SEGSIZE 512 /* ??? */
 
 /* ??? */
-#define RRQ   01 /* ??? */
-#define WRQ   02 /* ??? */
-#define DATA  03 /* ??? */
-#define ACK   04 /* ??? */
-#define ERROR 05 /* ??? */
+#define RRQ   1 /* ??? */
+#define WRQ   2 /* ??? */
+#define DATA  3 /* ??? */
+#define ACK   4 /* ??? */
+#define ERROR 5 /* ??? */
 
 #ifdef __CC__
 __DECL_BEGIN

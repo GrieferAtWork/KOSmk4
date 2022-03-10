@@ -34,10 +34,12 @@
 #include <hybrid/limitcore.h>
 #include <hybrid/typecore.h>
 
+#include <kos/kernel/types.h>
 #include <kos/types.h>
 #include <sys/types.h>
 
 #include <assert.h> /* static_assert() */
+#include <signal.h>
 #include <stdalign.h>
 #include <stddef.h>
 
@@ -47,22 +49,19 @@ static_assert((char)-1 > 0);
 #else /* __CHAR_UNSIGNED__ */
 static_assert((char)-1 < 0);
 #endif /* !__CHAR_UNSIGNED__ */
-#ifdef __WCHAR_UNSIGNED__
-static_assert((wchar_t)-1 > 0);
-#else /* __WCHAR_UNSIGNED__ */
-static_assert((wchar_t)-1 < 0);
-#endif /* !__WCHAR_UNSIGNED__ */
 #ifdef __WINT_UNSIGNED__
 static_assert((wint_t)-1 > 0);
 #else /* __WINT_UNSIGNED__ */
 static_assert((wint_t)-1 < 0);
 #endif /* !__WINT_UNSIGNED__ */
 #ifdef __SIG_ATOMIC_UNSIGNED__
-static_assert((__SIG_ATOMIC_TYPE__)-1 > 0);
+static_assert((sig_atomic_t)-1 > 0);
 #else /* __SIG_ATOMIC_UNSIGNED__ */
-static_assert((__SIG_ATOMIC_TYPE__)-1 < 0);
+static_assert((sig_atomic_t)-1 < 0);
 #endif /* !__SIG_ATOMIC_UNSIGNED__ */
 
+static_assert(__builtin_types_compatible_p(wint_t, __WINT_TYPE__));
+static_assert(__builtin_types_compatible_p(sig_atomic_t, __SIG_ATOMIC_TYPE__));
 
 static_assert(sizeof(char) == __SIZEOF_CHAR__);
 static_assert(sizeof(signed char) == __SIZEOF_CHAR__);
@@ -110,16 +109,51 @@ static_assert(alignof(__LONGDOUBLE) == __ALIGNOF_LONG_DOUBLE__);
 #endif /* !__NO_FPU */
 
 #ifdef __native_wchar_t_defined
+static_assert(__builtin_types_compatible_p(wchar_t, __WCHAR_TYPE__));
 static_assert(sizeof(wchar_t) == __SIZEOF_WCHAR_T__);
 static_assert(alignof(wchar_t) == __ALIGNOF_WCHAR_T__);
+#ifdef __WCHAR_UNSIGNED__
+static_assert((wchar_t)-1 > 0);
+#else /* __WCHAR_UNSIGNED__ */
+static_assert((wchar_t)-1 < 0);
+#endif /* !__WCHAR_UNSIGNED__ */
 #endif /* __native_wchar_t_defined */
 
 #ifdef __native_char16_t_defined
+static_assert(__builtin_types_compatible_p(char16_t, __CHAR16_TYPE__));
+static_assert(__builtin_types_compatible_p(char32_t, __CHAR32_TYPE__));
 static_assert(sizeof(char16_t) == 2);
 static_assert(sizeof(char32_t) == 4);
 static_assert(alignof(char16_t) == __ALIGNOF_INT16__);
 static_assert(alignof(char32_t) == __ALIGNOF_INT32__);
 #endif /* __native_char16_t_defined */
+
+static_assert(__builtin_types_compatible_p(int8_t, __INT8_TYPE__));
+static_assert(__builtin_types_compatible_p(uint8_t, __UINT8_TYPE__));
+static_assert(__builtin_types_compatible_p(__int8_t, __INT8_TYPE__));
+static_assert(__builtin_types_compatible_p(__uint8_t, __UINT8_TYPE__));
+static_assert(__builtin_types_compatible_p(__s8, __INT8_TYPE__));
+static_assert(__builtin_types_compatible_p(__u8, __UINT8_TYPE__));
+static_assert(__builtin_types_compatible_p(s8, __INT8_TYPE__));
+static_assert(__builtin_types_compatible_p(u8, __UINT8_TYPE__));
+
+static_assert(__builtin_types_compatible_p(int16_t, __INT16_TYPE__));
+static_assert(__builtin_types_compatible_p(uint16_t, __UINT16_TYPE__));
+static_assert(__builtin_types_compatible_p(__int16_t, __INT16_TYPE__));
+static_assert(__builtin_types_compatible_p(__uint16_t, __UINT16_TYPE__));
+static_assert(__builtin_types_compatible_p(__s16, __INT16_TYPE__));
+static_assert(__builtin_types_compatible_p(__u16, __UINT16_TYPE__));
+static_assert(__builtin_types_compatible_p(s16, __INT16_TYPE__));
+static_assert(__builtin_types_compatible_p(u16, __UINT16_TYPE__));
+
+static_assert(__builtin_types_compatible_p(int32_t, __INT32_TYPE__));
+static_assert(__builtin_types_compatible_p(uint32_t, __UINT32_TYPE__));
+static_assert(__builtin_types_compatible_p(__int32_t, __INT32_TYPE__));
+static_assert(__builtin_types_compatible_p(__uint32_t, __UINT32_TYPE__));
+static_assert(__builtin_types_compatible_p(__s32, __INT32_TYPE__));
+static_assert(__builtin_types_compatible_p(__u32, __UINT32_TYPE__));
+static_assert(__builtin_types_compatible_p(s32, __INT32_TYPE__));
+static_assert(__builtin_types_compatible_p(u32, __UINT32_TYPE__));
 
 static_assert(sizeof(__INT8_TYPE__) == 1);
 static_assert(sizeof(__UINT8_TYPE__) == 1);
@@ -137,6 +171,15 @@ static_assert(alignof(__INT32_TYPE__) == __ALIGNOF_INT32__);
 static_assert(alignof(__UINT32_TYPE__) == __ALIGNOF_INT32__);
 
 #ifdef __UINT64_TYPE__
+static_assert(__builtin_types_compatible_p(int64_t, __INT64_TYPE__));
+static_assert(__builtin_types_compatible_p(uint64_t, __UINT64_TYPE__));
+static_assert(__builtin_types_compatible_p(__int64_t, __INT64_TYPE__));
+static_assert(__builtin_types_compatible_p(__uint64_t, __UINT64_TYPE__));
+static_assert(__builtin_types_compatible_p(__s64, __INT64_TYPE__));
+static_assert(__builtin_types_compatible_p(__u64, __UINT64_TYPE__));
+static_assert(__builtin_types_compatible_p(s64, __INT64_TYPE__));
+static_assert(__builtin_types_compatible_p(u64, __UINT64_TYPE__));
+
 static_assert(sizeof(__INT64_TYPE__) == 8);
 static_assert(sizeof(__UINT64_TYPE__) == 8);
 static_assert(alignof(__INT64_TYPE__) == __ALIGNOF_INT64__);
@@ -144,6 +187,10 @@ static_assert(alignof(__UINT64_TYPE__) == __ALIGNOF_INT64__);
 #endif /* __UINT64_TYPE__ */
 
 #ifdef __UINT128_TYPE__
+#include <int128.h>
+static_assert(__builtin_types_compatible_p(int128_t, __INT128_TYPE__));
+static_assert(__builtin_types_compatible_p(uint128_t, __UINT128_TYPE__));
+
 static_assert(sizeof(__INT128_TYPE__) == 16);
 static_assert(sizeof(__UINT128_TYPE__) == 16);
 static_assert(alignof(__INT128_TYPE__) == __ALIGNOF_INT128__);

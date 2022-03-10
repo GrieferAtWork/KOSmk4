@@ -32,6 +32,7 @@
  * by using assembly macros.
  * It is the purpose of this file to define these macros. */
 
+#ifndef __COMPILER_NO_GCC_ASM_MACROS
 #ifdef __x86_64__
 __ASM_BEGIN
 __ASM_L(.macro __call_with_32bit_register func:req, src:req, dst:req)
@@ -77,5 +78,6 @@ __ASM_END
 #define movzlP movzlq
 #endif /* __ASSEMBLER__ && _I386_KOS_ASM_INSTR_COMPAT_H */
 #endif /* __x86_64__ */
+#endif /* !__COMPILER_NO_GCC_ASM_MACROS */
 
 #endif /* !_I386_KOS_ASM_INSTR_MOVZXQ_H */

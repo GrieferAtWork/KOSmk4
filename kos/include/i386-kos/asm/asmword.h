@@ -28,6 +28,7 @@
  * text,  as  well as  module-relative  (non-relocated) pointers. */
 
 
+#ifndef __COMPILER_NO_GCC_ASM_MACROS
 __ASM_BEGIN
 
 /* Emit an 8-bit word */
@@ -91,5 +92,6 @@ __ASM_L(	.long __ASM_ARG(\offset))
 __ASM_L(.endm)
 
 __ASM_END
+#endif /* !__COMPILER_NO_GCC_ASM_MACROS */
 
 #endif /* !_I386_KOS_ASM_ASMWORD_H */

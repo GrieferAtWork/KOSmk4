@@ -1523,7 +1523,6 @@ typedef struct _ImageArchitectureEntry {
 	DWORD FixupInstRVA;
 	DWORD NewInst;
 } IMAGE_ARCHITECTURE_ENTRY, *PIMAGE_ARCHITECTURE_ENTRY;
-#include "poppack.h"
 
 #define IMPORT_OBJECT_HDR_SIG2 0xffff
 

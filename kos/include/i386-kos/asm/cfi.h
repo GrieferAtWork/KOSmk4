@@ -44,7 +44,41 @@
  * >> }
  */
 
+#ifndef __COMPILER_NO_GCC_ASM_MACROS
 __ASM_BEGIN
+
+#if defined(__GNUC__) && defined(__KOS__)
+#ifndef __GCC_HAVE_DWARF2_CFI_ASM
+#define __GCC_HAVE_DWARF2_CFI_ASM
+#endif /* !__GCC_HAVE_DWARF2_CFI_ASM */
+#elif !defined(__GCC_HAVE_DWARF2_CFI_ASM)
+__ASM_L(.macro .cfi_sections args:vararg; .endm)
+__ASM_L(.macro .cfi_startproc args:vararg; .endm)
+__ASM_L(.macro .cfi_endproc args:vararg; .endm)
+__ASM_L(.macro .cfi_personality args:vararg; .endm)
+__ASM_L(.macro .cfi_personality_id args:vararg; .endm)
+__ASM_L(.macro .cfi_fde_data args:vararg; .endm)
+__ASM_L(.macro .cfi_lsda args:vararg; .endm)
+__ASM_L(.macro .cfi_inline_lsda args:vararg; .endm)
+__ASM_L(.macro .cfi_def_cfa args:vararg; .endm)
+__ASM_L(.macro .cfi_def_cfa_register args:vararg; .endm)
+__ASM_L(.macro .cfi_def_cfa_offset args:vararg; .endm)
+__ASM_L(.macro .cfi_adjust_cfa_offset args:vararg; .endm)
+__ASM_L(.macro .cfi_offset args:vararg; .endm)
+__ASM_L(.macro .cfi_val_offset args:vararg; .endm)
+__ASM_L(.macro .cfi_rel_offset args:vararg; .endm)
+__ASM_L(.macro .cfi_register args:vararg; .endm)
+__ASM_L(.macro .cfi_restore args:vararg; .endm)
+__ASM_L(.macro .cfi_undefined args:vararg; .endm)
+__ASM_L(.macro .cfi_same_value args:vararg; .endm)
+__ASM_L(.macro .cfi_remember_state args:vararg; .endm)
+__ASM_L(.macro .cfi_restore_state args:vararg; .endm)
+__ASM_L(.macro .cfi_return_column args:vararg; .endm)
+__ASM_L(.macro .cfi_signal_frame args:vararg; .endm)
+__ASM_L(.macro .cfi_window_save args:vararg; .endm)
+__ASM_L(.macro .cfi_escape args:vararg; .endm)
+__ASM_L(.macro .cfi_val_encoded_addr args:vararg; .endm)
+#endif /* __GCC_HAVE_DWARF2_CFI_ASM */
 
 /* NOTE: CFI capsules are currently restricted to KOS+!KERNEL.
  *       s.a.          `LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES' */
@@ -1475,5 +1509,6 @@ __ASM_L(.endm)
 #endif /* !__x86_64__ */
 
 __ASM_END
+#endif /* !__COMPILER_NO_GCC_ASM_MACROS */
 
 #endif /* !_I386_KOS_ASM_CFI_H */

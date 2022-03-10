@@ -33,6 +33,7 @@
  * used to push/pop that register instead, meaning that they're very
  * useful  when  it  comes to  constructing  `scpustate' structures. */
 
+#ifndef __COMPILER_NO_GCC_ASM_MACROS
 #ifdef __x86_64__
 __ASM_BEGIN
 
@@ -208,10 +209,8 @@ __ASM_L(	addq   $(8), %rsp)
 __ASM_L(	.cfi_adjust_cfa_offset -8)
 __ASM_L(.endm)
 
-
-
-
 __ASM_END
 #endif /* __x86_64__ */
+#endif /* !__COMPILER_NO_GCC_ASM_MACROS */
 
 #endif /* !_I386_KOS_ASM_INSTR_KGSBASE_H */

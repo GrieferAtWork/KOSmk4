@@ -79,7 +79,9 @@
  */
 
 
+#ifndef __COMPILER_NO_GCC_ASM_MACROS
 __ASM_BEGIN
+
 /* ttest with register operand in `regname+regkind',
  * which is one of a,c,d,b:
  *    regkind=0: b,d,c,a
@@ -300,7 +302,8 @@ __ASM_L(.endif;.endif;.endif;.endif;.endif;.endif;.endif;.endif;.endif)
 __ASM_L(.endif;.endif;.endif;.endif;.endif;.endif;.endif;.endif)
 #endif /* __x86_64__ */
 __ASM_L(.endm)
-__ASM_END
 
+__ASM_END
+#endif /* !__COMPILER_NO_GCC_ASM_MACROS */
 
 #endif /* !_I386_KOS_ASM_INSTR_TTEST_H */

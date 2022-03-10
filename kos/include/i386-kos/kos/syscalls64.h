@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82432999 */
+/* HASH CRC-32:0x18311e05 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,8 +83,12 @@
 #define __PRIVATE_CRT_HAVE_ARG_IMPL(x, val, ...) val
 #define __PRIVATE_CRT_HAVE_ARG(x)  __PRIVATE_CRT_HAVE_ARG_IMPL x
 #define __PRIVATE_CRT_HAVE3(...)   __PRIVATE_CRT_HAVE_ARG((__VA_ARGS__ 1,0))
+#ifdef __TINYC__
+#define __PRIVATE_CRT_ISDEFINED(x) __PRIVATE_CRT_HAVE3(__PRIVATE_CRT_HAVE_PLACEHOLDER_##x)
+#else /* __TINYC__ */
 #define __PRIVATE_CRT_HAVE2(x)     __PRIVATE_CRT_HAVE3(__PRIVATE_CRT_HAVE_PLACEHOLDER_##x)
 #define __PRIVATE_CRT_ISDEFINED(x) __PRIVATE_CRT_HAVE2(x)
+#endif /* !__TINYC__ */
 #define __CRT_HAVE_SC(name)        __PRIVATE_CRT_ISDEFINED(__CRT_HAVE_sys_##name)
 #define __CRT_HAVE_XSC(name)       __PRIVATE_CRT_ISDEFINED(__CRT_HAVE_sys_X##name)
 #endif /* !__LCLINT__ */

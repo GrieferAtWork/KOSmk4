@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf58d1bef */
+/* HASH CRC-32:0x3af82d90 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,9 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #define __stub__CrtDbgReport
+#ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __stub_$Q_CrtDbgReportW$A$AYAHHPBGH00ZZ
+#endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
 #define __stub__CrtDbgReportW
 #define __stub__CrtGetAllocHook
 #define __stub__CrtGetDumpClient
@@ -564,6 +566,7 @@
 #define __stub_wcsnrtombs
 #define __stub_wfreadlinkat
 #define __stub_wttyname_r
+#ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __stub_DOS$_W_Gettnames
 #define __stub_DOS$_Wcsftime
 #define __stub_DOS$___lc_locale_name_func
@@ -579,24 +582,33 @@
 #define __stub_DOS$_wtempnam
 #define __stub_DOS$_wtmpnam
 #define __stub_DOS$_wtmpnam_s
+#endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
 #ifndef __LIBCCALL_IS_LIBDCALL
+#ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __stub_DOS$__clone
 #define __stub_DOS$clone
+#endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
 #endif /* !__LIBCCALL_IS_LIBDCALL */
+#ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __stub_DOS$fgetwln
 #define __stub_DOS$mbsnrtowcs
 #define __stub_DOS$open_wmemstream
 #define __stub_DOS$ptsname_r
+#endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
 #ifndef __LIBCCALL_IS_LIBDCALL
+#ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __stub_DOS$semctl
 #define __stub_DOS$setproctitle
 #define __stub_DOS$strfmon
 #define __stub_DOS$__strfmon_l
 #define __stub_DOS$strfmon_l
+#endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
 #endif /* !__LIBCCALL_IS_LIBDCALL */
+#ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __stub_DOS$tmpnam
 #define __stub_DOS$vfwscanf
 #define __stub_DOS$vfwscanf_unlocked
 #define __stub_DOS$wcsnrtombs
 #define __stub_DOS$wfreadlinkat
 #define __stub_DOS$wttyname_r
+#endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */

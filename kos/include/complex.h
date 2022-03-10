@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeee3ddfe */
+/* HASH CRC-32:0x65c3d152 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,10 +49,9 @@
 
 #include <features.h>
 
-#ifndef __NO_FPU
+#if !defined(__NO_FPU) && defined(_Complex_I)
 #ifdef __CC__
 
-#ifdef _Complex_I
 #undef I
 #undef complex
 #define I _Complex_I
@@ -61,17 +60,12 @@
  * header,  which also defines a type `template<class T> class complex;' */
 #define complex _Complex
 #endif /* !_GLIBCXX_COMPLEX */
-#endif /* _Complex_I */
 
 #if (defined(__cplusplus) && defined(__USE_ISOCXX11) && \
      defined(__STRICT_ANSI__) && __has_include(<complex>))
 /* Replace <complex.h> with the libstdc++ <complex> header */
 #include <complex>
 #else /* Replace with <complex>... */
-
-#ifndef _Complex_I
-#error "No compiler support for complex numbers"
-#endif /* !_Complex_I */
 
 #ifdef __USE_ISOC11
 #include <bits/crt/complex.h>
@@ -1454,7 +1448,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED long double _Complex __NOTHROW_NCX
 __SYSDECL_END
 #endif /* Don't replace with <complex>... */
 #endif /* __CC__ */
-#endif /* !__NO_FPU */
+#endif /* !__NO_FPU && _Complex_I */
 
 #ifdef __CXX_SYSTEM_HEADER
 #define _CXX_STDONLY_CCOMPLEX

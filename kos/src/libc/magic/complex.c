@@ -38,10 +38,9 @@
 #include <features.h>
 )]%{
 
-#ifndef __NO_FPU
+#if !defined(__NO_FPU) && defined(_Complex_I)
 #ifdef __CC__
 
-#ifdef _Complex_I
 #undef I
 #undef complex
 #define I _Complex_I
@@ -50,17 +49,12 @@
  * header,  which also defines a type `template<class T> class complex;' */
 #define complex _Complex
 #endif /* !_GLIBCXX_COMPLEX */
-#endif /* _Complex_I */
 
 #if (defined(__cplusplus) && defined(__USE_ISOCXX11) && \
      defined(__STRICT_ANSI__) && __has_include(<complex>))
 /* Replace <complex.h> with the libstdc++ <complex> header */
 #include <complex>
 #else /* Replace with <complex>... */
-
-#ifndef _Complex_I
-#error "No compiler support for complex numbers"
-#endif /* !_Complex_I */
 
 #ifdef __USE_ISOC11
 }%[insert:prefix(
@@ -795,6 +789,6 @@ cprojl(*) %{generate(double2ldouble("cproj"))}
 __SYSDECL_END
 #endif /* Don't replace with <complex>... */
 #endif /* __CC__ */
-#endif /* !__NO_FPU */
+#endif /* !__NO_FPU && _Complex_I */
 
 }

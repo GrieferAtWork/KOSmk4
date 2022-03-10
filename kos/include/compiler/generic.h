@@ -159,6 +159,10 @@
 #undef __COMPILER_NO_DOLLAR_IN_SYMBOL$
 #endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
 
+#ifdef __TINYC__
+#define __COMPILER_NO_GCC_ASM_MACROS
+#endif /* __TINYC__ */
+
 #if defined(__DCC_VERSION__) || defined(__TINYC__)
 #define __COMPILER_HAVE_TYPEOF
 #endif /* __DCC_VERSION__ || __TINYC__ */

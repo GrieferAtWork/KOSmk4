@@ -1029,9 +1029,13 @@ function doPrint_include_gnu_stubs(fp: File) {
 		local f = stubsByName[name];
 		CWriter_ppIfEscaped(cWriter, f.implementationPpCond, ESCAPE_MODE_FULL);
 		for (local ppCond, symbolName: f.exportSymbolNames) {
-			CWriter_ppIfEscaped(cWriter, ppCond, ESCAPE_MODE_FULL);
 			if (symbolName.startswith("?"))
 				symbolName = symbolName.replace("?", "$Q").replace("@", "$A");
+			if ("$" in symbolName) {
+				ppCond = "({})&&!defined(__COMPILER_NO_DOLLAR_IN_SYMBOL)"
+					.format({ ppCond });
+			}
+			CWriter_ppIfEscaped(cWriter, ppCond, ESCAPE_MODE_FULL);
 			cWriter << "#define __stub_" << symbolName << "\n";
 			cWriter.ppEndif();
 		}

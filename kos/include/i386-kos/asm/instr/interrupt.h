@@ -42,6 +42,7 @@
  * >> END(my_interrupt_handler)
  */
 
+#ifndef __COMPILER_NO_GCC_ASM_MACROS
 #ifdef __x86_64__
 __ASM_BEGIN
 __ASM_L(.macro swapgs_if_user_iret)
@@ -87,5 +88,6 @@ __ASM_L(	iretq)
 __ASM_L(.endm)
 __ASM_END
 #endif /* __x86_64__ */
+#endif /* !__COMPILER_NO_GCC_ASM_MACROS */
 
 #endif /* !_I386_KOS_ASM_INSTR_INTERRUPT_H */
