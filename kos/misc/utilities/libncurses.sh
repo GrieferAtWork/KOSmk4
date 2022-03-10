@@ -19,8 +19,8 @@
 # 3. This notice may not be removed or altered from any source distribution.
 
 
-PACKAGE_NAME=libncurses-6.1
-PACKAGE_URL="ftp://ftp.gnu.org/gnu/ncurses/ncurses-6.1.tar.gz"
+PACKAGE_NAME=libncurses-6.3
+PACKAGE_URL="https://invisible-mirror.net/archives/ncurses/ncurses-6.3.tar.gz"
 
 CONFIGURE=(
 	"--without-ada"
@@ -58,10 +58,25 @@ CONFIGURE=(
 	"--enable-widec"
 )
 
+case "$(uname -o)" in
+cygwin)
+	# Work-around build bug if cygwin:
+	# >> In file included from .../binutils/src/libncurses-6.3/ncurses/tinfo/make_keys.c:45:
+	# >> ../ncurses/names.c:354:5: error: variable 'boolnames' definition is marked dllimport
+	# >>   354 | DCL(boolnames) = {
+	# >>       |     ^~~~~~~~~
+	# >> ...
+	CONFIGURE+=("--with-build-cflags=-DBUILDING_NCURSES")
+	;;
+
+**) ;;
+esac
+
 INSTALL_SKIP="
 /bin/ncurses6-config
 /bin/ncursesw6-config
 "
+
 
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"

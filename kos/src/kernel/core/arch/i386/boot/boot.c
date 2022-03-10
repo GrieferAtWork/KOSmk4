@@ -837,28 +837,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       change ioctlf() to use the RWF_* flags, rather than `iomode_t'
 	 * Also: When offset=(pos_t)-1 should behave like read(2) / write(2) */
 
-	/* TODO: Calls to `initscr(3)' (from libncurses) after `unset TERM' crash:
-	 * $ unset TERM
-	 * $ /usr/bin/rain
-	 * Coredump /usr/bin/rain tid:15
-	 * assert.expr: "abort()"
-	 * assert.file: "kos/src/libc/libc/../../libdlmalloc/dlmalloc.c"
-	 * assert.line: 4785
-	 * assert.func: "dlfree"
-	 * kos/src/libdlmalloc/dlmalloc.c(4723,17) : 0E061D51+4[/lib/libc.so][dlfree+1937] [orig_ustate]
-	 * > trace
-	 * kos/src/libdlmalloc/dlmalloc.c(4759,15) : 0E061D4C+5[/lib/libc.so][dlfree+1932]
-	 * binutils/src/libncurses-6.1/ncurses/tinfo/free_ttype.c(55,5) : 0E0315D2+5[/lib/libncursesw.so.6][really_free_termtype+78]
-	 * binutils/src/libncurses-6.1/ncurses/tinfo/free_ttype.c(74,5) : 0E031659+5[/lib/libncursesw.so.6][_nc_free_termtype+24]
-	 * binutils/src/libncurses-6.1/ncurses/tinfo/lib_cur_term.c(150,2) : 0E0321EB+5[/lib/libncursesw.so.6][del_curterm_sp+49]
-	 * binutils/src/libncurses-6.1/ncurses/tinfo/lib_cur_term.c(182,10) : 0E03226C+5[/lib/libncursesw.so.6][del_curterm+34]
-	 * binutils/src/libncurses-6.1/ncurses/tinfo/lib_setup.c(812,6) : 0E0349D9+5[/lib/libncursesw.so.6][_nc_setupterm+1186]
-	 * binutils/src/libncurses-6.1/ncurses/base/lib_newterm.c(200,5) : 0E01B1DD+5[/lib/libncursesw.so.6][newterm_sp+149]
-	 * binutils/src/libncurses-6.1/ncurses/base/lib_newterm.c(355,10) : 0E01B616+5[/lib/libncursesw.so.6][newterm+71]
-	 * binutils/src/libncurses-6.1/ncurses/base/lib_initscr.c(89,6) : 0E016C8E+5[/lib/libncursesw.so.6][initscr+119]
-	 * binutils/i386-kos/opt/bsdgames/rain/rain.c(100,2) : 080487A6+5[/usr/bin/rain][main+182]
-	 */
-
 	/* TODO: Change `struct __kos_stat' by appending a field `st_btime' (birth time)
 	 *       You might see where this is going. -- What we currently use  `st_ctime'
 	 *       for (creating time) should become "changed time" (different from mtime,

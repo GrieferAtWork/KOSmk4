@@ -155,7 +155,7 @@ $scan
 				fi
 				;;
 
-			*/pkgconfig/*.pc)
+			*/pkgconfig/*.pc | */pkg_config/*.pc)
 				pc_filename="${line##*/}"
 				dst_filename="$PKG_CONFIG_PATH/$pc_filename"
 				if test x"$MODE_DRYRUN" != xno; then
