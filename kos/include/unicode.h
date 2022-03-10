@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5fa92d5 */
+/* HASH CRC-32:0x88bd5d56 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,24 +80,24 @@ __LIBC __uint8_t const unicode_utf8seqlen[256] __CASMNAME_SAME("unicode_utf8seql
 #endif /* !__unicode_utf8seqlen_defined */
 
 /* The max length of any UTF-8 byte sequence describing a single unicode character. */
-#define UNICODE_UTF8_MAXLEN   8   /* == unicode_utf8seqlen[0xff] */
+#define UNICODE_UTF8_MAXLEN  8 /* == unicode_utf8seqlen[0xff] */
 
 /* The current length of any UTF-8 byte sequence produced by any 32-bit unicode character.
  * While `UNICODE_UTF8_MAXLEN'  is the  theoretical limit,  it allows  for up  to 42  bits
- * of character digits,  while `7'  allows for  up to `36'  bits (`6'  would allow  `30').
+ * of  character digits, while `7' allows for up to `36' bits (`6' would only allow `30').
  * As a consequence, the max number of bytes which may be written by `unicode_writeutf8()'
  * is `UNICODE_UTF8_CURLEN', as it takes a 32-bit unicode character.
  * >> char buf[UNICODE_UTF8_CURLEN];
  * >> size_t buflen = (size_t)(unicode_writeutf8(buf, ch) - buf); */
-#define UNICODE_UTF8_CURLEN   7
+#define UNICODE_UTF8_CURLEN  7
 
 /* The max length of any UTF-16 word sequence describing a single unicode character. */
-#define UNICODE_UTF16_MAXLEN  2
-#define UNICODE_UTF16_CURLEN  2
+#define UNICODE_UTF16_MAXLEN 2
+#define UNICODE_UTF16_CURLEN 2
 
 /* The max length of any UTF-32 word sequence describing a single unicode character. */
-#define UNICODE_UTF32_MAXLEN  1
-#define UNICODE_UTF32_CURLEN  1
+#define UNICODE_UTF32_MAXLEN 1
+#define UNICODE_UTF32_CURLEN 1
 
 /* UTF-16 surrogate ranges. */
 #define UTF16_HIGH_SURROGATE_MIN 0xd800  /* High surrogate (aka. first byte) */
@@ -550,26 +550,26 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_readutf16_swap_rev_n, __FORCELOCAL __ATT
 #endif /* !__CRT_HAVE_unicode_readutf16_swap_rev_n */
 #ifdef __CRT_HAVE_unicode_writeutf8
 /* >> unicode_writeutf8(3)
- * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This   function   will   write   at   most   `UNICODE_UTF8_CURLEN'   bytes   to   `dst' */
+ * Write  a given Unicode character `ch' to `dst'  and return a pointer to its end
+ * location. This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,unicode_writeutf8,(char *__restrict __dst, char32_t __ch),(__dst,__ch))
 #else /* __CRT_HAVE_unicode_writeutf8 */
 #include <libc/local/unicode/unicode_writeutf8.h>
 /* >> unicode_writeutf8(3)
- * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This   function   will   write   at   most   `UNICODE_UTF8_CURLEN'   bytes   to   `dst' */
+ * Write  a given Unicode character `ch' to `dst'  and return a pointer to its end
+ * location. This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_writeutf8, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL unicode_writeutf8)(char *__restrict __dst, char32_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_writeutf8))(__dst, __ch); })
 #endif /* !__CRT_HAVE_unicode_writeutf8 */
 #ifdef __CRT_HAVE_unicode_writeutf16
 /* >> unicode_writeutf16(3)
- * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This   function   will   write   at   most   `UNICODE_UTF16_CURLEN'   words   to  `dst' */
+ * Write a given Unicode character  `ch' to `dst' and return  a pointer to its  end
+ * location. This function will write at most `UNICODE_UTF16_CURLEN' words to `dst' */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,unicode_writeutf16,(char16_t *__restrict __dst, char32_t __ch),(__dst,__ch))
 #else /* __CRT_HAVE_unicode_writeutf16 */
 #include <libc/local/unicode/unicode_writeutf16.h>
 /* >> unicode_writeutf16(3)
- * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This   function   will   write   at   most   `UNICODE_UTF16_CURLEN'   words   to  `dst' */
+ * Write a given Unicode character  `ch' to `dst' and return  a pointer to its  end
+ * location. This function will write at most `UNICODE_UTF16_CURLEN' words to `dst' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_writeutf16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char16_t *__NOTHROW_NCX(__LIBCCALL unicode_writeutf16)(char16_t *__restrict __dst, char32_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_writeutf16))(__dst, __ch); })
 #endif /* !__CRT_HAVE_unicode_writeutf16 */
 #ifdef __CRT_HAVE_unicode_writeutf16_chk

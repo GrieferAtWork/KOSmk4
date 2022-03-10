@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x578b6ab9 */
+/* HASH CRC-32:0x33456f9b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -146,23 +146,23 @@ INTDEF NONNULL((1, 2)) char32_t NOTHROW_NCX(LIBDCALL libd_unicode_readutf16_swap
 INTDEF NONNULL((1, 2)) char32_t NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_rev_n)(char16_t const **__restrict ptext, char16_t const *text_start);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unicode_writeutf8(3)
- * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This   function   will   write   at   most   `UNICODE_UTF8_CURLEN'   bytes   to   `dst' */
+ * Write  a given Unicode character `ch' to `dst'  and return a pointer to its end
+ * location. This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
 INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_unicode_writeutf8)(char *__restrict dst, char32_t ch);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> unicode_writeutf8(3)
- * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This   function   will   write   at   most   `UNICODE_UTF8_CURLEN'   bytes   to   `dst' */
+ * Write  a given Unicode character `ch' to `dst'  and return a pointer to its end
+ * location. This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
 INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_unicode_writeutf8)(char *__restrict dst, char32_t ch);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unicode_writeutf16(3)
- * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This   function   will   write   at   most   `UNICODE_UTF16_CURLEN'   words   to  `dst' */
+ * Write a given Unicode character  `ch' to `dst' and return  a pointer to its  end
+ * location. This function will write at most `UNICODE_UTF16_CURLEN' words to `dst' */
 INTDEF ATTR_RETNONNULL NONNULL((1)) char16_t *NOTHROW_NCX(LIBDCALL libd_unicode_writeutf16)(char16_t *__restrict dst, char32_t ch);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> unicode_writeutf16(3)
- * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This   function   will   write   at   most   `UNICODE_UTF16_CURLEN'   words   to  `dst' */
+ * Write a given Unicode character  `ch' to `dst' and return  a pointer to its  end
+ * location. This function will write at most `UNICODE_UTF16_CURLEN' words to `dst' */
 INTDEF ATTR_RETNONNULL NONNULL((1)) char16_t *NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16)(char16_t *__restrict dst, char32_t ch);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unicode_writeutf16_chk(3)

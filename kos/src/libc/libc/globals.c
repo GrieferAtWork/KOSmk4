@@ -57,7 +57,7 @@ DEFINE_NOREL_GLOBAL_META(char32_t **, _wenviron, ".crt.dos.wchar.fs.environ");
 DEFINE_NOREL_GLOBAL_META(FILE *, stdin, ".crt.FILE.locked.read.read");
 DEFINE_NOREL_GLOBAL_META(FILE *, stdout, ".crt.FILE.locked.write.write");
 DEFINE_NOREL_GLOBAL_META(FILE *, stderr, ".crt.FILE.locked.write.write");
-/* HINT: The actual std* symbols are  exported from "user/stdio.c", since  they
+/* HINT: The actual std* symbols are exported from "libc/compat.c", since  they
  *       require special initialization based on symbols that only exist within
  *       that specific source file */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x709218be */
+/* HASH CRC-32:0x508b07f2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,12 +42,12 @@
  * Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
 #define __libc_unicode_readutf8_rev_n __libc_core_unicode_readutf8_rev_n
 /* >> unicode_writeutf8(3)
- * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This   function   will   write   at   most   `UNICODE_UTF8_CURLEN'   bytes   to   `dst' */
+ * Write  a given Unicode character `ch' to `dst'  and return a pointer to its end
+ * location. This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
 #define __libc_unicode_writeutf8 __libc_core_unicode_writeutf8
 /* >> unicode_writeutf16(3)
- * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This   function   will   write   at   most   `UNICODE_UTF16_CURLEN'   words   to  `dst' */
+ * Write a given Unicode character  `ch' to `dst' and return  a pointer to its  end
+ * location. This function will write at most `UNICODE_UTF16_CURLEN' words to `dst' */
 #define __libc_unicode_writeutf16 __libc_core_unicode_writeutf16
 #if !defined(____libc___unicode_descriptor_defined) && defined(____libc_core___unicode_descriptor_defined)
 #define ____libc___unicode_descriptor_defined

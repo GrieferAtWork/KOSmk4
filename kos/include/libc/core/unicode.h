@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x895bf65d */
+/* HASH CRC-32:0x6562d2c9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,26 +75,26 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_uni
 #endif /* !__CRT_HAVE_unicode_readutf8_rev_n */
 #ifdef __CRT_HAVE_unicode_writeutf8
 /* >> unicode_writeutf8(3)
- * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This   function   will   write   at   most   `UNICODE_UTF8_CURLEN'   bytes   to   `dst' */
+ * Write  a given Unicode character `ch' to `dst'  and return a pointer to its end
+ * location. This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__libc_core_unicode_writeutf8,(char *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf8,(__dst,__ch))
 #else /* __CRT_HAVE_unicode_writeutf8 */
 #include <libc/local/unicode/unicode_writeutf8.h>
 /* >> unicode_writeutf8(3)
- * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This   function   will   write   at   most   `UNICODE_UTF8_CURLEN'   bytes   to   `dst' */
+ * Write  a given Unicode character `ch' to `dst'  and return a pointer to its end
+ * location. This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
 #define __libc_core_unicode_writeutf8 __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_writeutf8)
 #endif /* !__CRT_HAVE_unicode_writeutf8 */
 #ifdef __CRT_HAVE_unicode_writeutf16
 /* >> unicode_writeutf16(3)
- * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This   function   will   write   at   most   `UNICODE_UTF16_CURLEN'   words   to  `dst' */
+ * Write a given Unicode character  `ch' to `dst' and return  a pointer to its  end
+ * location. This function will write at most `UNICODE_UTF16_CURLEN' words to `dst' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__libc_core_unicode_writeutf16,(__CHAR16_TYPE__ *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf16,(__dst,__ch))
 #else /* __CRT_HAVE_unicode_writeutf16 */
 #include <libc/local/unicode/unicode_writeutf16.h>
 /* >> unicode_writeutf16(3)
- * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This   function   will   write   at   most   `UNICODE_UTF16_CURLEN'   words   to  `dst' */
+ * Write a given Unicode character  `ch' to `dst' and return  a pointer to its  end
+ * location. This function will write at most `UNICODE_UTF16_CURLEN' words to `dst' */
 #define __libc_core_unicode_writeutf16 __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_writeutf16)
 #endif /* !__CRT_HAVE_unicode_writeutf16 */
 #if !defined(____libc_core___unicode_descriptor_defined) && defined(__CRT_HAVE___unicode_descriptor)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ddbf2b9 */
+/* HASH CRC-32:0x3ac4581f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,19 +33,33 @@ DECL_BEGIN
  * functions to make direct use of unicode data. */
 #ifndef __KERNEL__
 #define libc_iswcntrl(ch)  __crt_iswcntrl(ch)
+#define libd_iswcntrl(ch)  ((wint16_t)__crt_iswcntrl(ch))
 #define libc_iswspace(ch)  __crt_iswspace(ch)
+#define libd_iswspace(ch)  ((wint16_t)__crt_iswspace(ch))
 #define libc_iswupper(ch)  __crt_iswupper(ch)
+#define libd_iswupper(ch)  ((wint16_t)__crt_iswupper(ch))
 #define libc_iswlower(ch)  __crt_iswlower(ch)
+#define libd_iswlower(ch)  ((wint16_t)__crt_iswlower(ch))
 #define libc_iswalpha(ch)  __crt_iswalpha(ch)
+#define libd_iswalpha(ch)  ((wint16_t)__crt_iswalpha(ch))
 #define libc_iswdigit(ch)  __crt_iswdigit(ch)
+#define libd_iswdigit(ch)  ((wint16_t)__crt_iswdigit(ch))
 #define libc_iswxdigit(ch) __crt_iswxdigit(ch)
+#define libd_iswxdigit(ch) ((wint16_t)__crt_iswxdigit(ch))
 #define libc_iswalnum(ch)  __crt_iswalnum(ch)
+#define libd_iswalnum(ch)  ((wint16_t)__crt_iswalnum(ch))
 #define libc_iswpunct(ch)  __crt_iswpunct(ch)
+#define libd_iswpunct(ch)  ((wint16_t)__crt_iswpunct(ch))
 #define libc_iswgraph(ch)  __crt_iswgraph(ch)
+#define libd_iswgraph(ch)  ((wint16_t)__crt_iswgraph(ch))
 #define libc_iswprint(ch)  __crt_iswprint(ch)
+#define libd_iswprint(ch)  ((wint16_t)__crt_iswprint(ch))
 #define libc_iswblank(ch)  __crt_iswblank(ch)
+#define libd_iswblank(ch)  ((wint16_t)__crt_iswblank(ch))
 #define libc_towlower(ch)  __crt_towlower(ch)
+#define libd_towlower(ch)  ((wint16_t)__crt_towlower(ch))
 #define libc_towupper(ch)  __crt_towupper(ch)
+#define libd_towupper(ch)  ((wint16_t)__crt_towupper(ch))
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> iswcntrl(3) */

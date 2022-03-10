@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15db9c9e */
+/* HASH CRC-32:0x6b391db8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,281 +37,281 @@ DECL_BEGIN
 /* >> iswcntrl(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswcntrl)(wint16_t wc) {
-#ifdef __crt_iswcntrl
+
 	return __crt_iswcntrl(wc);
-#else /* __crt_iswcntrl */
-	return libc_iscntrl(libd_wctob(wc));
-#endif /* !__crt_iswcntrl */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> iswcntrl(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBKCALL libc_iswcntrl)(wint32_t wc) {
-#ifdef __crt_iswcntrl
+
 	return __crt_iswcntrl(wc);
-#else /* __crt_iswcntrl */
-	return libc_iscntrl(libc_wctob(wc));
-#endif /* !__crt_iswcntrl */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> iswspace(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswspace)(wint16_t wc) {
-#ifdef __crt_iswspace
+
 	return __crt_iswspace(wc);
-#else /* __crt_iswspace */
-	return libc_isspace(libd_wctob(wc));
-#endif /* !__crt_iswspace */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> iswspace(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBKCALL libc_iswspace)(wint32_t wc) {
-#ifdef __crt_iswspace
+
 	return __crt_iswspace(wc);
-#else /* __crt_iswspace */
-	return libc_isspace(libc_wctob(wc));
-#endif /* !__crt_iswspace */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> iswupper(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswupper)(wint16_t wc) {
-#ifdef __crt_iswupper
+
 	return __crt_iswupper(wc);
-#else /* __crt_iswupper */
-	return libc_isupper(libd_wctob(wc));
-#endif /* !__crt_iswupper */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> iswupper(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBKCALL libc_iswupper)(wint32_t wc) {
-#ifdef __crt_iswupper
+
 	return __crt_iswupper(wc);
-#else /* __crt_iswupper */
-	return libc_isupper(libc_wctob(wc));
-#endif /* !__crt_iswupper */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> iswlower(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswlower)(wint16_t wc) {
-#ifdef __crt_iswlower
+
 	return __crt_iswlower(wc);
-#else /* __crt_iswlower */
-	return libc_islower(libd_wctob(wc));
-#endif /* !__crt_iswlower */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> iswlower(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBKCALL libc_iswlower)(wint32_t wc) {
-#ifdef __crt_iswlower
+
 	return __crt_iswlower(wc);
-#else /* __crt_iswlower */
-	return libc_islower(libc_wctob(wc));
-#endif /* !__crt_iswlower */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> iswalpha(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswalpha)(wint16_t wc) {
-#ifdef __crt_iswalpha
+
 	return __crt_iswalpha(wc);
-#else /* __crt_iswalpha */
-	return libc_isalpha(libd_wctob(wc));
-#endif /* !__crt_iswalpha */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> iswalpha(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBKCALL libc_iswalpha)(wint32_t wc) {
-#ifdef __crt_iswalpha
+
 	return __crt_iswalpha(wc);
-#else /* __crt_iswalpha */
-	return libc_isalpha(libc_wctob(wc));
-#endif /* !__crt_iswalpha */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> iswdigit(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswdigit)(wint16_t wc) {
-#ifdef __crt_iswdigit
+
 	return __crt_iswdigit(wc);
-#else /* __crt_iswdigit */
-	return libc_isdigit(libd_wctob(wc));
-#endif /* !__crt_iswdigit */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> iswdigit(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBKCALL libc_iswdigit)(wint32_t wc) {
-#ifdef __crt_iswdigit
+
 	return __crt_iswdigit(wc);
-#else /* __crt_iswdigit */
-	return libc_isdigit(libc_wctob(wc));
-#endif /* !__crt_iswdigit */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> iswxdigit(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswxdigit)(wint16_t wc) {
-#ifdef __crt_iswxdigit
+
 	return __crt_iswxdigit(wc);
-#else /* __crt_iswxdigit */
-	return libc_isxdigit(libd_wctob(wc));
-#endif /* !__crt_iswxdigit */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> iswxdigit(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBKCALL libc_iswxdigit)(wint32_t wc) {
-#ifdef __crt_iswxdigit
+
 	return __crt_iswxdigit(wc);
-#else /* __crt_iswxdigit */
-	return libc_isxdigit(libc_wctob(wc));
-#endif /* !__crt_iswxdigit */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> iswalnum(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswalnum)(wint16_t wc) {
-#ifdef __crt_iswalnum
+
 	return __crt_iswalnum(wc);
-#else /* __crt_iswalnum */
-	return libc_isalnum(libd_wctob(wc));
-#endif /* !__crt_iswalnum */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> iswalnum(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBKCALL libc_iswalnum)(wint32_t wc) {
-#ifdef __crt_iswalnum
+
 	return __crt_iswalnum(wc);
-#else /* __crt_iswalnum */
-	return libc_isalnum(libc_wctob(wc));
-#endif /* !__crt_iswalnum */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> iswpunct(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswpunct)(wint16_t wc) {
-#ifdef __crt_iswpunct
+
 	return __crt_iswpunct(wc);
-#else /* __crt_iswpunct */
-	return libc_ispunct(libd_wctob(wc));
-#endif /* !__crt_iswpunct */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> iswpunct(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBKCALL libc_iswpunct)(wint32_t wc) {
-#ifdef __crt_iswpunct
+
 	return __crt_iswpunct(wc);
-#else /* __crt_iswpunct */
-	return libc_ispunct(libc_wctob(wc));
-#endif /* !__crt_iswpunct */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> iswgraph(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswgraph)(wint16_t wc) {
-#ifdef __crt_iswgraph
+
 	return __crt_iswgraph(wc);
-#else /* __crt_iswgraph */
-	return libc_isgraph(libd_wctob(wc));
-#endif /* !__crt_iswgraph */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> iswgraph(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBKCALL libc_iswgraph)(wint32_t wc) {
-#ifdef __crt_iswgraph
+
 	return __crt_iswgraph(wc);
-#else /* __crt_iswgraph */
-	return libc_isgraph(libc_wctob(wc));
-#endif /* !__crt_iswgraph */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> iswprint(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswprint)(wint16_t wc) {
-#ifdef __crt_iswprint
+
 	return __crt_iswprint(wc);
-#else /* __crt_iswprint */
-	return libc_isprint(libd_wctob(wc));
-#endif /* !__crt_iswprint */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> iswprint(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBKCALL libc_iswprint)(wint32_t wc) {
-#ifdef __crt_iswprint
+
 	return __crt_iswprint(wc);
-#else /* __crt_iswprint */
-	return libc_isprint(libc_wctob(wc));
-#endif /* !__crt_iswprint */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> towlower(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED wint16_t
 NOTHROW(LIBDCALL libd_towlower)(wint16_t wc) {
-#ifdef __crt_towlower
+
 	return __crt_towlower(wc);
-#else /* __crt_towlower */
-	return libd_btowc(libc_tolower(libd_wctob(wc)));
-#endif /* !__crt_towlower */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> towlower(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED wint32_t
 NOTHROW(LIBKCALL libc_towlower)(wint32_t wc) {
-#ifdef __crt_towlower
+
 	return __crt_towlower(wc);
-#else /* __crt_towlower */
-	return libc_btowc(libc_tolower(libc_wctob(wc)));
-#endif /* !__crt_towlower */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> towupper(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED wint16_t
 NOTHROW(LIBDCALL libd_towupper)(wint16_t wc) {
-#ifdef __crt_towupper
+
 	return __crt_towupper(wc);
-#else /* __crt_towupper */
-	return libd_btowc(libc_toupper(libd_wctob(wc)));
-#endif /* !__crt_towupper */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> towupper(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED wint32_t
 NOTHROW(LIBKCALL libc_towupper)(wint32_t wc) {
-#ifdef __crt_towupper
+
 	return __crt_towupper(wc);
-#else /* __crt_towupper */
-	return libc_btowc(libc_toupper(libc_wctob(wc)));
-#endif /* !__crt_towupper */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> iswblank(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswblank)(wint16_t wc) {
-#ifdef __crt_iswblank
+
 	return __crt_iswblank(wc);
-#else /* __crt_iswblank */
-	return libc_isblank(libd_wctob(wc));
-#endif /* !__crt_iswblank */
+
+
+
 }
 #include <bits/crt/wctype.h>
 /* >> iswblank(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBKCALL libc_iswblank)(wint32_t wc) {
-#ifdef __crt_iswblank
+
 	return __crt_iswblank(wc);
-#else /* __crt_iswblank */
-	return libc_isblank(libc_wctob(wc));
-#endif /* !__crt_iswblank */
+
+
+
 }
 #include <bits/crt/unicode.h>
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_PURE WUNUSED NONNULL((1)) wctrans_t

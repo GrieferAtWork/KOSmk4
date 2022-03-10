@@ -27,16 +27,9 @@
 #include <kos/types.h>
 
 #ifdef __CC__
+#ifndef __KERNEL__
 DECL_BEGIN
 
-#ifndef __KERNEL__
-
-#if defined(__OPTIMIZE_SIZE__) && 0 /* -Os is a per-file option, so don't do global config based on it! */
-/* Disable norel access. */
-#define GET_NOREL_GLOBAL(name)             __bind_##name
-#define DECLARE_NOREL_GLOBAL_META(T, name) DATDEF T __bind_##name ASMNAME(#name)
-#define DEFINE_NOREL_GLOBAL_META(T, name)  DATDEF T __bind_##name ASMNAME(#name)
-#else /* __OPTIMIZE_SIZE__ */
 #define GET_NOREL_GLOBAL(name) (*(__pdyn_##name ? __pdyn_##name : __##name##_impl()))
 #define DECLARE_NOREL_GLOBAL_META(T, name) \
 	INTDEF T *__pdyn_##name;               \
@@ -61,7 +54,6 @@ DECL_BEGIN
 		return ptr;                                                                       \
 	}
 #endif /* !__INTELLISENSE__ */
-#endif /* !__OPTIMIZE_SIZE__ */
 
 
 /* Globals defined by libdl.so */
@@ -82,7 +74,6 @@ DECL_BEGIN
 #undef __LOCAL_environ
 #undef __environ
 #undef _environ
-#undef _wenviron
 #undef environ
 struct process_peb;
 DECLARE_NOREL_GLOBAL_META(struct process_peb, __peb);
@@ -91,7 +82,6 @@ DECLARE_NOREL_GLOBAL_META(char **, __argv);
 DECLARE_NOREL_GLOBAL_META(char *, _pgmptr);    /* aka. `program_invocation_name', `__progname_full' */
 DECLARE_NOREL_GLOBAL_META(char *, __progname); /* aka. `program_invocation_short_name' */
 DECLARE_NOREL_GLOBAL_META(char **, environ);   /* aka. `_environ', `__environ' */
-DECLARE_NOREL_GLOBAL_META(char32_t **, _wenviron);
 #define __peb                                   GET_NOREL_GLOBAL(__peb)
 #define __argc                                  GET_NOREL_GLOBAL(__argc)
 #define __argv                                  GET_NOREL_GLOBAL(__argv)
@@ -108,8 +98,12 @@ DECLARE_NOREL_GLOBAL_META(char32_t **, _wenviron);
 #define __environ                               GET_NOREL_GLOBAL(environ)
 #define _environ                                GET_NOREL_GLOBAL(environ)
 #define environ                                 GET_NOREL_GLOBAL(environ)
-#define _wenviron                               GET_NOREL_GLOBAL(_wenviron)
 
+
+/* <stdlib.h> */
+#undef _wenviron
+DECLARE_NOREL_GLOBAL_META(char32_t **, _wenviron);
+#define _wenviron GET_NOREL_GLOBAL(_wenviron)
 
 
 /* <stdio.h> */
@@ -238,9 +232,8 @@ DECLARE_NOREL_GLOBAL_META(sigset_t, _sigintr);
 DECLARE_NOREL_GLOBAL_META(int, __libc_enable_secure);
 #define __libc_enable_secure GET_NOREL_GLOBAL(__libc_enable_secure)
 
-#endif /* !__KERNEL__ */
-
 DECL_END
+#endif /* !__KERNEL__ */
 #endif /* __CC__ */
 
 #endif /* !GUARD_LIBC_LIBC_GLOBALS_H */

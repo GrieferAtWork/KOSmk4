@@ -112,24 +112,24 @@ __LIBC __uint8_t const unicode_utf8seqlen[256] __CASMNAME_SAME("unicode_utf8seql
 #endif /* !__unicode_utf8seqlen_defined */
 
 /* The max length of any UTF-8 byte sequence describing a single unicode character. */
-#define UNICODE_UTF8_MAXLEN   8   /* == unicode_utf8seqlen[0xff] */
+#define UNICODE_UTF8_MAXLEN  8 /* == unicode_utf8seqlen[0xff] */
 
 /* The current length of any UTF-8 byte sequence produced by any 32-bit unicode character.
  * While `UNICODE_UTF8_MAXLEN'  is the  theoretical limit,  it allows  for up  to 42  bits
- * of character digits,  while `7'  allows for  up to `36'  bits (`6'  would allow  `30').
+ * of  character digits, while `7' allows for up to `36' bits (`6' would only allow `30').
  * As a consequence, the max number of bytes which may be written by `unicode_writeutf8()'
  * is `UNICODE_UTF8_CURLEN', as it takes a 32-bit unicode character.
  * >> char buf[UNICODE_UTF8_CURLEN];
  * >> size_t buflen = (size_t)(unicode_writeutf8(buf, ch) - buf); */
-#define UNICODE_UTF8_CURLEN   7
+#define UNICODE_UTF8_CURLEN  7
 
 /* The max length of any UTF-16 word sequence describing a single unicode character. */
-#define UNICODE_UTF16_MAXLEN  2
-#define UNICODE_UTF16_CURLEN  2
+#define UNICODE_UTF16_MAXLEN 2
+#define UNICODE_UTF16_CURLEN 2
 
 /* The max length of any UTF-32 word sequence describing a single unicode character. */
-#define UNICODE_UTF32_MAXLEN  1
-#define UNICODE_UTF32_CURLEN  1
+#define UNICODE_UTF32_MAXLEN 1
+#define UNICODE_UTF32_CURLEN 1
 
 /* UTF-16 surrogate ranges. */
 #define UTF16_HIGH_SURROGATE_MIN 0xd800  /* High surrogate (aka. first byte) */
@@ -750,8 +750,8 @@ char32_t unicode_readutf16_swap_rev_n([[nonnull]] /*utf-16*/ char16_t const **__
 %[define(UTF8_6BYTE_MAX = ((uint32_t)1 << 31)-1)]
 
 @@>> unicode_writeutf8(3)
-@@Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
-@@This   function   will   write   at   most   `UNICODE_UTF8_CURLEN'   bytes   to   `dst'
+@@Write  a given Unicode character `ch' to `dst'  and return a pointer to its end
+@@location. This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst'
 [[kernel, libc, nonnull]]
 char *unicode_writeutf8([[nonnull]] /*utf-8*/ char *__restrict dst, char32_t ch) {
 	if likely(ch <= UTF8_1BYTE_MAX) {
@@ -794,8 +794,8 @@ char *unicode_writeutf8([[nonnull]] /*utf-8*/ char *__restrict dst, char32_t ch)
 }
 
 @@>> unicode_writeutf16(3)
-@@Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
-@@This   function   will   write   at   most   `UNICODE_UTF16_CURLEN'   words   to  `dst'
+@@Write a given Unicode character  `ch' to `dst' and return  a pointer to its  end
+@@location. This function will write at most `UNICODE_UTF16_CURLEN' words to `dst'
 [[kernel, libc, nonnull]]
 char16_t *unicode_writeutf16([[nonnull]] /*utf-16*/ char16_t *__restrict dst, char32_t ch) {
 	if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
@@ -814,7 +814,9 @@ char16_t *unicode_writeutf16([[nonnull]] /*utf-16*/ char16_t *__restrict dst, ch
 char16_t *unicode_writeutf16_chk([[nonnull]] /*utf-16*/ char16_t *__restrict dst, char32_t ch) {
 	if unlikely(ch > UNICODE_MAXCHAR)
 		return NULL;
-	if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
+	if likely(ch <= 0xffff) {
+		if unlikely(ch >= 0xd800 && ch <= 0xdfff)
+			return NULL;
 		*dst++ = (char16_t)ch;
 	} else {
 		ch -= UTF16_SURROGATE_SHIFT;

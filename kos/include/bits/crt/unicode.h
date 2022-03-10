@@ -55,6 +55,7 @@ __DECL_BEGIN
 #define __UNICODE_ISNUMERIC  (__UNICODE_ISDIGIT | __UNICODE_ISXNUMERIC) /* All numeric characters */
 #define __UNICODE_ISSYMSTRT  0x2000 /* Symbol start character */
 #define __UNICODE_ISSYMCONT  0x4000 /* Symbol continue character */
+/*efine __UNICODE_IS         0x8000  * ... */
 
 /* When `__ut_digit_idx <= __UNICODE_DIGIT_IDENTITY_MAX', then the associated unicode
  * character has a digit value equal to `__ut_digit_idx' (iow: the digit decode  step

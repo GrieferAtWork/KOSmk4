@@ -77,7 +77,8 @@ PRIVATE uint16_t const unicode_tab2[42];
 #include "unicode/db.dat"
 #endif /* !__INTELLISENSE__ */
 
-STATIC_ASSERT_MSG(UNICODE_FOLD_MAXLEN <= UNICODE_FOLDED_MAX, "UNICODE_FOLDED_MAX must be increased!");
+STATIC_ASSERT_MSG(UNICODE_FOLD_MAXLEN <= UNICODE_FOLDED_MAX,
+                  "UNICODE_FOLDED_MAX must be increased!");
 
 /*[[[head:libc___unicode_descriptor,hash:CRC-32=0x5884f74e]]]*/
 /* >> __unicode_descriptor(3)

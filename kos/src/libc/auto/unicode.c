@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6708496d */
+/* HASH CRC-32:0x4aab2888 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -537,8 +537,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_rev_n)(char16_t const **__restr
 	return result;
 }
 /* >> unicode_writeutf8(3)
- * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This   function   will   write   at   most   `UNICODE_UTF8_CURLEN'   bytes   to   `dst' */
+ * Write  a given Unicode character `ch' to `dst'  and return a pointer to its end
+ * location. This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_unicode_writeutf8)(char *__restrict dst,
                                              char32_t ch) {
@@ -581,8 +581,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_writeutf8)(char *__restrict dst,
 	return dst;
 }
 /* >> unicode_writeutf16(3)
- * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This   function   will   write   at   most   `UNICODE_UTF16_CURLEN'   words   to  `dst' */
+ * Write a given Unicode character  `ch' to `dst' and return  a pointer to its  end
+ * location. This function will write at most `UNICODE_UTF16_CURLEN' words to `dst' */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16)(char16_t *__restrict dst,
                                               char32_t ch) {
@@ -602,7 +602,9 @@ NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16_chk)(char16_t *__restrict dst,
                                                   char32_t ch) {
 	if unlikely(ch > 0x10ffff)
 		return NULL;
-	if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
+	if likely(ch <= 0xffff) {
+		if unlikely(ch >= 0xd800 && ch <= 0xdfff)
+			return NULL;
 		*dst++ = (char16_t)ch;
 	} else {
 		ch -= 0x10000;
