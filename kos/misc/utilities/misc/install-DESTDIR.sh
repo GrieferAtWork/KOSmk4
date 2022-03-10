@@ -188,6 +188,13 @@ $scan
 								-I\${includedir}/*)
 									arg="-I$KOS_ROOT/kos/include/${arg:16}"
 									;;
+								"-I${KOS_ROOT}/*")
+									# This is allowed
+									;;
+								-I/*)
+									# Don't point at build system paths
+									arg=""
+									;;
 								*)
 									;;
 								esac
@@ -204,6 +211,13 @@ $scan
 							for arg in $pc_line; do
 								case "$arg" in
 								-L\${libdir})
+									arg=""
+									;;
+								"-L${KOS_ROOT}/*")
+									# This is allowed
+									;;
+								-L/*)
+									# Don't point at build system paths (I'm looking at you, *ncurses*...)
 									arg=""
 									;;
 								*)

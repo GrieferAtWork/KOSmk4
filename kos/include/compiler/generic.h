@@ -242,6 +242,7 @@
 #define __ATTR_NORETURN _Noreturn
 #elif __has_cpp_attribute(noreturn)
 #undef noreturn
+#define __ATTR_NORETURN_IS_LB_LB_NORETURN_RB_RB
 #define __ATTR_NORETURN [[noreturn]]
 #elif defined(noreturn)
 #define __ATTR_NORETURN_IS_NORETURN

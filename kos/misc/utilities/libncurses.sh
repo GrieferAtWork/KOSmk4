@@ -49,17 +49,23 @@ CONFIGURE=(
 	"--disable-no-padding"
 	"--enable-sigwinch"
 	"--disable-tcap-names"
-	"--without-pthread"
-	"--disable-pthreads-eintr"
-	"--disable-weak-symbols"
-	"--disable-reentrant"
-	"--disable-stripping"
+
+	"--without-pthread"              # No need for thread-safety
+	"--disable-pthreads-eintr"       # No need for thread-safety
+	"--disable-reentrant"            # No need for thread-safety
+	"--disable-weak-symbols"         # If you can do without weak symbols, that'd be poggers.
+	"--disable-stripping"            # Retain debug info; it can be used by the builtin debugger
+	"--enable-widec"                 # Wide-character support? -- Yes, please!
+
 #	"--enable-assertions"
-	"--enable-widec"
+
+	"--disable-safe-sprintf"         # Enabling this causes curses to implement its own `sprintf(3)'. -- Just use the system one ;)
+	"--enable-stdnoreturn"           # It's there if you want to use it...
+
 )
 
 case "$(uname -o)" in
-cygwin)
+Cygwin)
 	# Work-around build bug if cygwin:
 	# >> In file included from .../binutils/src/libncurses-6.3/ncurses/tinfo/make_keys.c:45:
 	# >> ../ncurses/names.c:354:5: error: variable 'boolnames' definition is marked dllimport
@@ -85,8 +91,8 @@ INSTALL_SKIP="
 # Note that the wide-enabled libraries still contain all of the functions that
 # are exposed by system headers, and are expected by non-wide-enabled programs.
 # Binary compatibility between the wide-enabled and non-wide-enabled libncurses
-# doesn't matter here, because we never build the non-wide-enabled one, and
-# link everything against the one with wide-character support built-in
+# doesn't matter here, because we never build the non-wide-enabled ones, and
+# link everything against the ones with wide-character support built-in
 for name in form menu ncurses++ ncurses panel; do
 	install_symlink_nodisk /$TARGET_LIBPATH/lib${name}.a      lib${name}w.a
 	install_symlink_nodisk /$TARGET_LIBPATH/lib${name}.so     lib${name}w.so
