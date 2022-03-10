@@ -19,10 +19,40 @@
  */
 
 /* i386, KOS, user-space */
-
-#include "kos.h"
-#include "gcc.h"
 #include "i386-gcc.h"
+#include "kos-userspace.h"
 
 #undef __CRT_HAVE_*
 #include <i386-kos/crt-features/crt-kos32.h>
+
+#define __SIZEOF_SOCKLEN_T__        4
+#define __SIZEOF_OFF32_T__          __SIZEOF_SYSCALL_LONG_T__
+#define __SIZEOF_BLKCNT32_T__       __SIZEOF_SYSCALL_LONG_T__
+#define __SIZEOF_FSBLKCNT32_T__     __SIZEOF_SYSCALL_LONG_T__
+#define __SIZEOF_FSFILCNT32_T__     __SIZEOF_SYSCALL_LONG_T__
+#define __SIZEOF_INO32_T__          __SIZEOF_SYSCALL_LONG_T__
+#define __SIZEOF_RLIM32_T__         __SIZEOF_SYSCALL_LONG_T__
+#define __SIZEOF_TIME32_T__         __SIZEOF_SYSCALL_LONG_T__
+#define __SIZEOF_USECONDS_T__       4
+#define __SIZEOF_SUSECONDS_T__      __SIZEOF_SYSCALL_LONG_T__
+#define __SIZEOF_CLOCKID_T__        4
+#define __SIZEOF_CLOCK_T__          __SIZEOF_SYSCALL_LONG_T__
+#ifdef __x86_64__
+#define __SIZEOF_IOMODE_T__         4
+#else /* __x86_64__ */
+#define __SIZEOF_IOMODE_T__         2
+#endif /* !__x86_64__ */
+#define __SIZEOF_PORT_T__ 2
+#ifdef __x86_64__
+#define __SIZEOF_PHYSPAGE_T__ 8
+#define __SIZEOF_PHYSADDR_T__ 8
+#else /* __x86_64__ */
+#define __SIZEOF_PHYSPAGE_T__ 4
+#define __SIZEOF_PHYSADDR_T__ 8
+#endif /* !__x86_64__ */
+
+
+
+
+
+#include "generic.h"

@@ -279,7 +279,7 @@ class CParser {
 again:
 			if (i >= end) {
 				this.tokEnd = i;
-				this.tok = "";
+				this.tokStart = i;
 				return this.tok = "";
 			}
 			local start = i;

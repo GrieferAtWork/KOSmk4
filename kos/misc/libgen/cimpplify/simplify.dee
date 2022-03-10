@@ -42,14 +42,76 @@ class SimpFunctionMacro {
 
 	@@Expand arguments and generate a proper body using the given @args
 	function expandWithArguments(args: {UserString | string...}): string {
-		/* TODO */
-		return body;
+		local fp = File.Writer();
+		local parser = CParser(this.body);
+		local tok = parser.next();
+		local text = parser.text;
+		local flushStart = parser.tokStart;
+		function getArgumentByName(name: string): string | none {
+			if (name == "__VA_ARGS__")
+				name = "...";
+			local index = this.argv.find(name);
+			if (index < 0)
+				return none;
+			if (index >= #args)
+				return "";
+			if (name == "...")
+				return ",".join(args[index:]);
+			return args[index];
+		}
+		while (tok) {
+			if (tok.issymbol()) {
+				local repl = getArgumentByName(tok);
+				if (repl !is none) {
+					fp << text[flushStart:parser.tokStart] << repl;
+					flushStart = parser.tokEnd;
+				}
+			} else {
+				switch (tok) {
+				case "#":
+					if (text.startswith("##", parser.tokStart)) {
+						/* Concat */
+						local flushEnd = parser.tokStart;
+						while (flushEnd > flushStart && text.isspace(flushEnd - 1))
+							--flushEnd;
+						fp << text[flushStart:flushEnd];
+						parser.tokEnd = flushEnd + 2;
+						tok = parser.next();
+						flushStart = parser.tokStart;
+						continue;
+					} else {
+						/* Stringify */
+						local flushEnd = parser.tokStart;
+						tok = parser.next();
+						if (!tok.issymbol())
+							continue;
+						local repl = getArgumentByName(tok);
+						if (repl is none)
+							continue;
+						fp << text[flushStart:flushEnd] << repr(repl);
+						tok = parser.next();
+						flushStart = parser.tokStart;
+						continue;
+					}
+					break;
+				default:
+					break;
+				}
+			}
+			tok = parser.next();
+		}
+		if (flushStart < parser.end)
+			fp << text[flushStart:parser.end];
+		return fp.string;
 	}
 
 }
 
 class SimpConfig {
 	this = default;
+
+	@@Used internally to prevent infinite macro expansion
+	public member _activeMacroExpansions: {string...} = HashSet();
 
 	@@Set to @true to  remove comments, and unnecessary  whitespace.
 	@@However, do keep line-feeds, so-long as they appear right next
@@ -759,6 +821,12 @@ parse_if_expression:
 				local tail = CParser_SkipPPBlock(text, directiveEnd);
 				if (tail == "else") {
 					/* Fallthru to push an active #if-block */
+					ifdefBlocks.append(true);
+					directiveStart = text.tokEnd;
+					directiveEnd = textText.find("\n", directiveStart, text.end);
+					if (directiveEnd < 0)
+						directiveEnd = text.end;
+					goto next_directive;
 				} else if (tail == "elif") {
 					/* Parse this expression instead. */
 					directiveStart = text.tokEnd;
@@ -859,7 +927,8 @@ parse_if_expression:
 			}
 		}	break;
 
-		case "define": {
+		case "define":
+		case "xdefine": {
 			if (directiveArgsStart >= directiveEnd ||
 			    !textText.issymstrt(directiveArgsStart)) {
 				text.errAt(directiveArgsStart,
@@ -872,18 +941,27 @@ parse_if_expression:
 				++macNameEnd;
 			local macName = textText[directiveArgsStart:macNameEnd];
 			local macBodyStart = macNameEnd;
-			while (macBodyStart < directiveEnd &&
-			       textText.isspace(macBodyStart))
+			while (macBodyStart < directiveEnd && textText.isspace(macBodyStart))
 				++macBodyStart;
 			local macDef;
 			if (macNameEnd >= directiveEnd) {
 				/* `#define foo' */
 				macDef = "";
-			} else if (macBodyStart == macNameEnd &&
-			           textText[macBodyStart] == "(") {
+			} else if (macBodyStart == macNameEnd && textText[macBodyStart] == "(") {
 				/* Function-like macro */
-				macDef = false;
-				/* TODO */
+				local macArgvEnd = textText.find(")", macBodyStart, directiveEnd);
+				if (macArgvEnd < 0) {
+					text.errAt(macBodyStart, "Missing `)' after `#define {}(..."
+						.format({ macName }));
+				}
+				local macroArgv = Tuple(textText[macBodyStart+1:macArgvEnd]
+					.split(",").each.strip());
+				++macArgvEnd;
+				while (macArgvEnd < directiveEnd && textText.isspace(macArgvEnd))
+					++macArgvEnd;
+				macDef = SimpFunctionMacro(
+					argv: macroArgv,
+					body: textText[macArgvEnd:directiveEnd]);
 			} else {
 				/* Normal macro */
 				macDef = text.getUserString(macBodyStart, directiveEnd);
@@ -895,6 +973,8 @@ parse_if_expression:
 				/* Don't warn if the old definition was that it was defined  as
 				 * ~something~, when we now know exactly what it is defined as! */
 				if (oldDef !== true) {
+					if (directiveName == "xdefine")
+						break; /* Ignore re-definition */
 					text.warnAt(directiveArgsStart,
 						"Macro {!r} re-definition (old: {}, new: {})"
 						.format({ macName, oldDef, macDef }));
@@ -998,13 +1078,95 @@ function findNonEscapedEOL(text: string, start: int, end: int): int {
 	return -1;
 }
 
-function simpParseCFile_impl(input: CParser): {SimpPPElem...} {
+global simpParseCFile_impl;
+function simpParseCFile_impl2(input: CParser, config: SimpConfig): {SimpPPElem...} {
+	local prevItem = none;
+	/* Join adjacent string items */
+	for (local item: simpParseCFile_impl(input, config)) {
+		if (item is string) {
+			if (prevItem is none) {
+				prevItem = item;
+			} else {
+				prevItem += item;
+			}
+			continue;
+		}
+		if (prevItem !is none) {
+			yield prevItem;
+			prevItem = none;
+		}
+		yield item;
+	}
+	if (prevItem !is none)
+		yield prevItem;
+}
+
+function simpParseCFile_impl(input: CParser, config: SimpConfig): {SimpPPElem...} {
 	local flushStart = input.tokStart;
 	local inputText = input.text;
 	local tok = input.tok;
 	while (tok) {
 		if (tok.issymbol()) {
-			/* TODO: Lookup+expand known macros. */
+			if (tok !in config._activeMacroExpansions) {
+				/* Lookup+expand known macros. */
+				local macro = config.macros.get(tok);
+				if (macro is string || macro is UserString) {
+					if (flushStart < input.tokStart)
+						yield inputText[flushStart:input.tokStart].replace("\\\n", "");
+					config._activeMacroExpansions.insert(tok);
+					local expandParser = CParser(macro);
+					expandParser.next();
+					yield simpParseCFile_impl(expandParser, config)...;
+					if (expandParser.tok)
+						expandParser.err("Unmatched #else, #endif or #elif");
+					config._activeMacroExpansions.remove(tok);
+					flushStart = input.tokEnd;
+					tok = input.next();
+					continue;
+				}
+				if (macro is SimpFunctionMacro) {
+					local macroName = tok;
+					local macNameStart = input.tokStart;
+					tok = input.next();
+					if (tok != "(")
+						continue;
+					if (flushStart < macNameStart)
+						yield inputText[flushStart:macNameStart].replace("\\\n", "");
+					local macroArgv = [];
+do_next_function_macro_argument:
+					tok = input.next();
+					local currentArgumentStart = input.tokStart;
+					local currentArgumentEnd = currentArgumentStart;
+					while (tok != ")") {
+						if (tok in "([{<") {
+							input.skipPair();
+							currentArgumentEnd = input.tokEnd;
+							tok = input.next();
+							continue;
+						}
+						if (!tok)
+							input.errAt(macNameStart, "Macro parameter list not closed");
+						if (tok == ",") {
+							macroArgv.append(inputText[currentArgumentStart:currentArgumentEnd]);
+							goto do_next_function_macro_argument;
+						}
+						currentArgumentEnd = input.tokEnd;
+						tok = input.next();
+					}
+					macroArgv.append(inputText[currentArgumentStart:currentArgumentEnd]);
+					macro = macro.expandWithArguments(macroArgv);
+					config._activeMacroExpansions.insert(macroName);
+					local expandParser = CParser(macro);
+					expandParser.next();
+					yield simpParseCFile_impl(expandParser, config)...;
+					if (expandParser.tok)
+						expandParser.err("Unmatched #else, #endif or #elif");
+					config._activeMacroExpansions.remove(macroName);
+					flushStart = input.tokEnd;
+					tok = input.next();
+					continue;
+				}
+			}
 			tok = input.next();
 			continue;
 		}
@@ -1054,7 +1216,7 @@ function simpParseCFile_impl(input: CParser): {SimpPPElem...} {
 parse_ppif_body:
 			input.tokEnd = directiveEnd;
 			input.next();
-			lastCapsule.tt = List(simpParseCFile_impl(input));
+			lastCapsule.tt = List(simpParseCFile_impl2(input, config));
 			if (input.tok != "#")
 				input.errAt(directiveStart, "Unmatched #if");
 			directiveStart = input.tokEnd;
@@ -1085,7 +1247,7 @@ parse_ppif_body:
 			case "else":
 				input.tokEnd = directiveEnd;
 				input.next();
-				lastCapsule.ff = List(simpParseCFile_impl(input));
+				lastCapsule.ff = List(simpParseCFile_impl2(input, config));
 				if (input.tok != "#")
 					input.errAt(directiveStart, "Unmatched #else");
 				directiveStart = input.tokEnd;
@@ -1140,120 +1302,134 @@ done:
 		yield inputText[flushStart:input.tokStart].replace("\\\n", "");
 }
 
-function simpParseCFile(input: CParser): {SimpPPElem...} {
-	local result = List(simpParseCFile_impl(input));
+function simpParseCFile(input: CParser, config: SimpConfig): {SimpPPElem...} {
+	local result = List(simpParseCFile_impl2(input, config));
 	if (input.tok)
 		input.err("Unmatched #else, #endif or #elif");
 	return result;
 }
 
+function needSpaceBetween(tok1: string, tok2: string): bool {
+	local tok1_issym = tok1.issymbol() || tok1.isalnum();
+	local tok2_issym = tok2.issymbol() || tok2.isalnum();
+	if (tok1_issym) {
+		if (!tok2_issym && tok2.first !in "\"\'")
+			return false;
+	} else {
+		if (tok2_issym) {
+			if (tok1 != ")")
+				return false;
+		} else {
+			if (tok1.first in "\"\'" && tok2.first in "\"\'")
+				return true;
+			return false;
+		}
+	}
+	return true;
+}
 
 class SimpOutputPrinter {
 	this = default;
 	public member output: File;
 	public member config: SimpConfig;
-	public member pendingSpace: string = "";
-	public member didWriteSomething: bool = false;
+	public member lastWasLf: bool = false;
 
 	public function finish() {
-		if (didWriteSomething)
+		if (!lastWasLf) {
 			output.write("\n");
+			lastWasLf = true;
+		}
+	}
+
+	public function writeTruncated(text: string, start: int = 0, end: int = -1) {
+		local parser = CParser(text, start: start, end: end);
+		local spaceStart = start;
+		local prevTok = none;
+		local tok = parser.next();
+		if (parser.tokEnd <= spaceStart)
+			return; /* Empty input */
+		for (;;) {
+			local tokStart = parser.tokStart;
+			if (tokStart > spaceStart && !lastWasLf) {
+				if (text.contains("\n", spaceStart, tokStart)) {
+					output.write("\n");
+					lastWasLf = true;
+				} else if (prevTok && tok && needSpaceBetween(prevTok, tok)) {
+					output.write(" ");
+				}
+			}
+			spaceStart = parser.tokEnd;
+			switch (tok) {
+
+			case "":
+				return;
+
+			case "__attribute__": {
+				/* Optimize:
+				 * >> __attribute__((foo)) __attribute__((bar))
+				 * Into:
+				 * >> __attribute__((foo, bar)) */
+				output.write(tok);
+				output.write("((");
+join_attribute_annotations:
+				parser.next();
+				parser.skip("(");
+				tok = parser.skip("(");
+				local ind = 0;
+				prevTok = "(";
+				while (tok) {
+					if (tok == "(") {
+						++ind;
+					} else if (tok == ")") {
+						if (!ind)
+							break;
+						--ind;
+					}
+					if (needSpaceBetween(prevTok, tok))
+						output.write(" ");
+					output.write(tok);
+					prevTok = tok;
+					tok = parser.next();
+				}
+				tok = parser.skip(")");
+				tok = parser.skip(")");
+				if (tok == "__attribute__") {
+					output.write(",");
+					goto join_attribute_annotations;
+				}
+				output.write("))");
+				lastWasLf = false;
+				continue;
+			}	break;
+
+			default:
+				if (tok.startswith("\"")) {
+handle_string_token:
+					local nextTok = parser.next();
+					if (nextTok.startswith("\"")) {
+						tok = tok[:-1] + nextTok[1:];
+						goto handle_string_token;
+					}
+					output.write(tok);
+					lastWasLf = false;
+					prevTok = tok;
+					tok = nextTok;
+					continue;
+				}
+				break;
+			}
+			output.write(tok);
+			lastWasLf = false;
+			prevTok = tok;
+			tok = parser.next();
+		}
 	}
 
 	public function write(text: string, start: int = 0, end: int = -1) {
 		if (end < 0)
 			end = #text;
-		/* TODO: Optimize:
-		 * >> __attribute__((foo)) __attribute__((bar))
-		 * Into:
-		 * >> __attribute__((foo, bar))
-		 */
 		if (config.truncateOutput) {
-			local flushStart = start;
-			while (start < end) {
-				local ch = text[start];
-				if (ch.isspace()) { /* also includes islf() */
-					local origSpaceWasLf = ch.islf();
-					if (flushStart < start) {
-						if (didWriteSomething)
-							output.write(pendingSpace);
-						output.write(text[flushStart:start]);
-						didWriteSomething = true;
-					}
-					pendingSpace = ch;
-					++start;
-					/* Skip additional (unnecessary) whitespace.
-					 * Unless the original space character was a line-feed,
-					 * don't  skip  additional  line-feeds  here,   though! */
-					while (start < end && (
-							text.isspace(start) && (origSpaceWasLf || !text.islf(start))))
-						++start;
-					flushStart = start;
-					continue;
-				}
-				/* Copy String/Character sequences as-is */
-				if (ch in "\"\'") {
-					++start;
-					while (start < end) {
-						local nextCh = text[start];
-						if (nextCh == ch) {
-							++start;
-							break;
-						}
-						if (nextCh == "\\")
-							++start;
-						++start;
-					}
-					continue;
-				}
-				/* Skip C/C++ comments. */
-				if (ch == "/" && (start + 1) < end) {
-					ch = text[start + 1];
-					if (ch == "/") {
-						if (flushStart < start) {
-							if (didWriteSomething)
-								output.write(pendingSpace);
-							output.write(text[flushStart:end]);
-							didWriteSomething = true;
-						}
-						start = text.find("\n", start, end);
-						if (start < 0)
-							start = end;
-						else {
-							++start;
-						}
-						pendingSpace = "\n";
-						flushStart   = start;
-						continue;
-					}
-					if (ch == "*") {
-						if (flushStart < start) {
-							if (didWriteSomething)
-								output.write(pendingSpace);
-							output.write(text[flushStart:end]);
-							didWriteSomething = true;
-						}
-						start = text.find("*/", start, end);
-						if (start < 0)
-							start = end;
-						else {
-							start += 2;
-						}
-						pendingSpace = " ";
-						flushStart   = start;
-						continue;
-					}
-					++start;
-					continue;
-				}
-				++start;
-			}
-			if (flushStart < end) {
-				if (didWriteSomething)
-					output.write(pendingSpace);
-				output.write(text[flushStart:end]);
-				didWriteSomething = true;
-			}
+			return writeTruncated(text, start, end);
 		} else {
 			output.write(text[start:end]);
 		}
@@ -1488,7 +1664,7 @@ function simplifyCFile(
 		input = CParser(input);
 		input.next();
 	}
-	local tree = simpParseCFile(input);
+	local tree = simpParseCFile(input, config);
 	local tree = simpOptimizeElems(config, createPPAssume(), tree);
 //	simpPrintTree(tree);
 	local out = SimpOutputPrinter(output, config);

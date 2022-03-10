@@ -32,6 +32,60 @@
 #undef __NO_KOS_SYSTEM_HEADERS__
 #define __KOS_SYSTEM_HEADERS__
 
+#define __LIBCCALL_IS_LIBKCALL
+
 #define __KOS_VERSION__ 400
 #undef __PE__
 #define __ELF__ 1
+
+#pragma defined __O_ACCMODE
+#pragma defined __O_RDONLY
+#pragma defined __O_WRONLY
+#pragma defined __O_RDWR
+#pragma defined __O_ACCMODE_INVALID
+#pragma defined __O_CREAT
+#pragma defined __O_EXCL
+#pragma defined __O_NOCTTY
+#pragma defined __O_TRUNC
+#pragma defined __O_APPEND
+#pragma defined __O_NONBLOCK
+#pragma defined __O_SYNC
+#pragma defined __O_DSYNC
+#pragma defined __O_ASYNC
+#pragma defined __O_DIRECT
+#pragma defined __O_LARGEFILE
+#pragma defined __O_DIRECTORY
+#pragma defined __O_NOFOLLOW
+#pragma defined __O_NOATIME
+#pragma defined __O_CLOEXEC
+#pragma defined __O_PATH
+#pragma defined __O_TMPFILE
+#pragma defined __O_CLOFORK
+#pragma defined __O_DOSPATH
+
+
+#pragma defined ___IOFBF
+#pragma defined ___IOLBF
+#pragma defined ___IONBF
+#pragma defined __BUFSIZ
+#pragma defined __EOF
+#pragma defined __WEOF16
+#pragma defined __WEOF32
+#pragma defined __WEOF
+#pragma defined __L_tmpnam
+#pragma defined __FILENAME_MAX
+#pragma defined __TMP_MAX
+#pragma defined __FOPEN_MAX
+#pragma defined __L_ctermid
+#pragma defined __L_cuserid
+
+#pragma defined __SEEK_SET
+#pragma defined __SEEK_CUR
+#pragma defined __SEEK_END
+#pragma defined __SEEK_DATA
+#pragma defined __SEEK_HOLE
+#pragma defined __RENAME_NOREPLACE
+#pragma defined __RENAME_EXCHANGE
+#pragma defined __RENAME_WHITEOUT
+#pragma defined __RENAME_MOVETODIR
+

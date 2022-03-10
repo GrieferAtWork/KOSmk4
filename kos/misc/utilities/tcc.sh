@@ -50,9 +50,11 @@ if [ "$MODE_FORCE_MAKE" == yes ] || \
 		--crtprefix="/usr/$TARGET_LIBPATH" \
 		--elfinterp="/$TARGET_LIBPATH/libdl.so" \
 		--config-mingw32=no
-	echo 'NATIVE_DEFINES+=-DTCC_TARGET_KOS="1"' >> config.mak
-	echo "NATIVE_DEFINES+=-DCONFIG_TCCDIR=\"\\\"/usr/$TARGET_LIBPATH\\\"\"" >> config.mak
-	echo "NATIVE_DEFINES+=-DCONFIG_LDDIR=\"\\\"$TARGET_LIBPATH\\\"\"" >> config.mak
+	cat > config-extra.mak <<EOF
+NATIVE_DEFINES += -DTCC_TARGET_KOS
+NATIVE_DEFINES += -DCONFIG_TCCDIR="\\"/usr/$TARGET_LIBPATH\\""
+NATIVE_DEFINES += -DCONFIG_LDDIR="\\"$TARGET_LIBPATH\\""
+EOF
 	cmd make cross-$TARGET_NAME $TARGET_NAME-libtcc1-usegcc=yes
 	cat > "$OPTPATH/hello-world.c" <<EOF
 /* A simple hello-world example which you can compile & run from inside of KOS:

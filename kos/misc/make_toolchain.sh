@@ -504,8 +504,7 @@ remove_fixinclude() {
 	echo "Checking for $1"
 	if [ -f "$1" ]; then
 		echo "    Removing fixinclude header file $1"
-		rm "$1.nope" > /dev/null 2>&1
-		cmd mv "$1" "$1.nope"
+		cmd unlink "$1"
 #	else
 #		echo "    Already deleted"
 	fi
@@ -816,6 +815,16 @@ symlink_binutil readelf
 symlink_binutil size
 symlink_binutil strings
 symlink_binutil strip
+
+# Create a symlink:
+#   from: "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include-fixed"
+#   to:   "$PREFIX/cimpplify-include"
+echo "Creating for cimpplify-include redirection"
+unlink "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include-fixed" > /dev/null 2>&1
+cmd rm -rf "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include-fixed"
+do_mkdir "$PREFIX/cimpplify-include"
+cmd ln -s "../../../../cimpplify-include" "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include-fixed"
+
 
 install_cat_file() {
 	echo "Checking for $1"

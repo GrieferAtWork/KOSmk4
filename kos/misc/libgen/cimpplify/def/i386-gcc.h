@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#include "gcc.h"
 
 #undef _LP64
 #undef __LP64__
@@ -38,7 +39,7 @@
 #define __ATOMIC_SEQ_CST 5
 #define __BIGGEST_ALIGNMENT__ 16
 #define __BYTE_ORDER__ __ORDER_LITTLE_ENDIAN__
-#define __CHAR16_TYPE__ short unsigned int
+#define __CHAR16_TYPE__ unsigned short
 #define __CHAR32_TYPE__ unsigned int
 #define __CHAR_BIT__ 8
 #define __DBL_DECIMAL_DIG__ 17
@@ -195,19 +196,19 @@
 #define __HAVE_SPECULATION_SAFE_VALUE 1
 #define __INT16_C(c) c
 #define __INT16_MAX__ 0x7fff
-#define __INT16_TYPE__ short int
+#define __INT16_TYPE__ short
 #define __INT32_C(c) c
 #define __INT32_MAX__ 0x7fffffff
 #define __INT32_TYPE__ int
 #define __INT64_C(c) c##LL
 #define __INT64_MAX__ 0x7fffffffffffffffLL
-#define __INT64_TYPE__ long long int
+#define __INT64_TYPE__ long long
 #define __INT8_C(c) c
 #define __INT8_MAX__ 0x7f
 #define __INT8_TYPE__ signed char
 #define __INTMAX_C(c) c##LL
 #define __INTMAX_MAX__ 0x7fffffffffffffffLL
-#define __INTMAX_TYPE__ long long int
+#define __INTMAX_TYPE__ long long
 #define __INTMAX_WIDTH__ 64
 #define __INTPTR_MAX__ 0x7fffffff
 #define __INTPTR_TYPE__ int
@@ -219,19 +220,19 @@
 #define __INT_FAST32_TYPE__ int
 #define __INT_FAST32_WIDTH__ 32
 #define __INT_FAST64_MAX__ 0x7fffffffffffffffLL
-#define __INT_FAST64_TYPE__ long long int
+#define __INT_FAST64_TYPE__ long long
 #define __INT_FAST64_WIDTH__ 64
 #define __INT_FAST8_MAX__ 0x7f
 #define __INT_FAST8_TYPE__ signed char
 #define __INT_FAST8_WIDTH__ 8
 #define __INT_LEAST16_MAX__ 0x7fff
-#define __INT_LEAST16_TYPE__ short int
+#define __INT_LEAST16_TYPE__ short
 #define __INT_LEAST16_WIDTH__ 16
 #define __INT_LEAST32_MAX__ 0x7fffffff
 #define __INT_LEAST32_TYPE__ int
 #define __INT_LEAST32_WIDTH__ 32
 #define __INT_LEAST64_MAX__ 0x7fffffffffffffffLL
-#define __INT_LEAST64_TYPE__ long long int
+#define __INT_LEAST64_TYPE__ long long
 #define __INT_LEAST64_WIDTH__ 64
 #define __INT_LEAST8_MAX__ 0x7f
 #define __INT_LEAST8_TYPE__ signed char
@@ -262,7 +263,7 @@
 #define __ORDER_PDP_ENDIAN__ 3412
 #define __PRAGMA_REDEFINE_EXTNAME 1
 #define __PTRDIFF_MAX__ 0x7fffffffL
-#define __PTRDIFF_TYPE__ long int
+#define __PTRDIFF_TYPE__ long
 #define __PTRDIFF_WIDTH__ 32
 #define __REGISTER_PREFIX__
 #define __SCHAR_MAX__ 0x7f
@@ -290,7 +291,7 @@
 #define __SIZEOF_WCHAR_T__ 4
 #define __SIZEOF_WINT_T__ 4
 #define __SIZE_MAX__ 0xffffffffUL
-#define __SIZE_TYPE__ long unsigned int
+#define __SIZE_TYPE__ unsigned long
 #define __SIZE_WIDTH__ 32
 #define __STDC_HOSTED__ 1
 #define __STDC_UTF_16__ 1
@@ -299,19 +300,19 @@
 #define __STDC__ 1
 #define __UINT16_C(c) c
 #define __UINT16_MAX__ 0xffff
-#define __UINT16_TYPE__ short unsigned int
+#define __UINT16_TYPE__ unsigned short
 #define __UINT32_C(c) c##U
 #define __UINT32_MAX__ 0xffffffffU
 #define __UINT32_TYPE__ unsigned int
 #define __UINT64_C(c) c##ULL
 #define __UINT64_MAX__ 0xffffffffffffffffULL
-#define __UINT64_TYPE__ long long unsigned int
+#define __UINT64_TYPE__ unsigned long long
 #define __UINT8_C(c) c
 #define __UINT8_MAX__ 0xff
 #define __UINT8_TYPE__ unsigned char
 #define __UINTMAX_C(c) c##ULL
 #define __UINTMAX_MAX__ 0xffffffffffffffffULL
-#define __UINTMAX_TYPE__ long long unsigned int
+#define __UINTMAX_TYPE__ unsigned long long
 #define __UINTPTR_MAX__ 0xffffffffU
 #define __UINTPTR_TYPE__ unsigned int
 #define __UINT_FAST16_MAX__ 0xffffffffU
@@ -319,15 +320,15 @@
 #define __UINT_FAST32_MAX__ 0xffffffffU
 #define __UINT_FAST32_TYPE__ unsigned int
 #define __UINT_FAST64_MAX__ 0xffffffffffffffffULL
-#define __UINT_FAST64_TYPE__ long long unsigned int
+#define __UINT_FAST64_TYPE__ unsigned long long
 #define __UINT_FAST8_MAX__ 0xff
 #define __UINT_FAST8_TYPE__ unsigned char
 #define __UINT_LEAST16_MAX__ 0xffff
-#define __UINT_LEAST16_TYPE__ short unsigned int
+#define __UINT_LEAST16_TYPE__ unsigned short
 #define __UINT_LEAST32_MAX__ 0xffffffffU
 #define __UINT_LEAST32_TYPE__ unsigned int
 #define __UINT_LEAST64_MAX__ 0xffffffffffffffffULL
-#define __UINT_LEAST64_TYPE__ long long unsigned int
+#define __UINT_LEAST64_TYPE__ unsigned long long
 #define __UINT_LEAST8_MAX__ 0xff
 #define __UINT_LEAST8_TYPE__ unsigned char
 #define __USER_LABEL_PREFIX__
