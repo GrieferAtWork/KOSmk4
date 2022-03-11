@@ -202,6 +202,24 @@
 #endif /* !... */
 
 #if defined(__DCC_VERSION__) || defined(__TINYC__)
+#ifdef __TINYC__
+/* TCC ignores `__asm__()' the first time some symbol is declared.
+ * For reference, see its `external_sym' function:
+ * >> static Sym *external_sym(int v, CType *type, int r, AttributeDef *ad) {
+ * >>     Sym *s = sym_find(v);
+ * >>     if (!s) {
+ * >>         s = sym_push(v, type, r | VT_CONST | VT_SYM, 0);
+ * >>         ...
+ * >>     } else {
+ * >>         ...
+ * >>         patch_storage(s, ad, type);  // <<<< This right here applies our `__ASMNAME',
+ * >>                                      //      but this only happens if the symbol already
+ * >>                                      //      existed previously.
+ * >>     }
+ * >>     return s;
+ * >> } */
+#define __COMPILER_ASMNAME_ON_SECOND_DECL
+#endif /* __TINYC__ */
 #define __ASMNAME(x) __asm__(x)
 #else /* __DCC_VERSION__ || __TINYC__ */
 #define __NO_ASMNAME

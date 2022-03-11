@@ -759,11 +759,23 @@ struct __locale_struct;
 #endif /* !... */
 #else /* __NO_ASMNAME */
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#ifdef __COMPILER_ASMNAME_ON_SECOND_DECL
+#define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,...) __LIBC attr Treturn nothrow(__LIBCCALL name) param; __LIBC attr Treturn nothrow(__LIBCCALL name) param __ASMNAME(#asmname);
+#else /* __COMPILER_ASMNAME_ON_SECOND_DECL */
 #define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,...) __LIBC attr Treturn nothrow(__LIBCCALL name) param __ASMNAME(#asmname);
+#endif /* !__COMPILER_ASMNAME_ON_SECOND_DECL */
 #elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#ifdef __COMPILER_ASMNAME_ON_SECOND_DECL
+#define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,inline_impl...) __LIBC attr Treturn nothrow(__LIBCCALL name) param; __LIBC attr Treturn nothrow(__LIBCCALL name) param __ASMNAME(#asmname);
+#else /* __COMPILER_ASMNAME_ON_SECOND_DECL */
 #define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,inline_impl...) __LIBC attr Treturn nothrow(__LIBCCALL name) param __ASMNAME(#asmname);
+#endif /* !__COMPILER_ASMNAME_ON_SECOND_DECL */
 #else /* ... */
+#ifdef __COMPILER_ASMNAME_ON_SECOND_DECL
+#define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,inline_impl) __LIBC attr Treturn nothrow(__LIBCCALL name) param; __LIBC attr Treturn nothrow(__LIBCCALL name) param __ASMNAME(#asmname);
+#else /* __COMPILER_ASMNAME_ON_SECOND_DECL */
 #define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,inline_impl) __LIBC attr Treturn nothrow(__LIBCCALL name) param __ASMNAME(#asmname);
+#endif /* !__COMPILER_ASMNAME_ON_SECOND_DECL */
 #endif /* !... */
 #endif /* !__NO_ASMNAME */
 #else /* __NO_INLINE__ */
@@ -803,17 +815,35 @@ struct __locale_struct;
 #endif /* !... */
 #else /* __NO_ASMNAME */
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#ifdef __COMPILER_ASMNAME_ON_SECOND_DECL
+#define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,...)          __LIBC attr Treturn nothrow(__LIBKCALL name) param; __LIBC attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("KOS$" #name);
+#define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...) __LIBC attr Treturn nothrow(__LIBDCALL name) param; __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME(#asmname);
+#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,...) __LIBC attr Treturn nothrow(__LIBKCALL name) param; __LIBC attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("KOS$" #asmname);
+#else /* __COMPILER_ASMNAME_ON_SECOND_DECL */
 #define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,...)          __LIBC attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("KOS$" #name);
 #define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...) __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME(#asmname);
 #define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,...) __LIBC attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("KOS$" #asmname);
+#endif /* !__COMPILER_ASMNAME_ON_SECOND_DECL */
 #elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#ifdef __COMPILER_ASMNAME_ON_SECOND_DECL
+#define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,inline_impl...)          __LIBC attr Treturn nothrow(__LIBKCALL name) param; __LIBC attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("KOS$" #name);
+#define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,inline_impl...) __LIBC attr Treturn nothrow(__LIBDCALL name) param; __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME(#asmname);
+#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,inline_impl...) __LIBC attr Treturn nothrow(__LIBKCALL name) param; __LIBC attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("KOS$" #asmname);
+#else /* __COMPILER_ASMNAME_ON_SECOND_DECL */
 #define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,inline_impl...)          __LIBC attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("KOS$" #name);
 #define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,inline_impl...) __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME(#asmname);
 #define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,inline_impl...) __LIBC attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("KOS$" #asmname);
+#endif /* !__COMPILER_ASMNAME_ON_SECOND_DECL */
 #else /* ... */
+#ifdef __COMPILER_ASMNAME_ON_SECOND_DECL
+#define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,inline_impl)          __LIBC attr Treturn nothrow(__LIBKCALL name) param; __LIBC attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("KOS$" #name);
+#define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,inline_impl) __LIBC attr Treturn nothrow(__LIBDCALL name) param; __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME(#asmname);
+#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,inline_impl) __LIBC attr Treturn nothrow(__LIBKCALL name) param; __LIBC attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("KOS$" #asmname);
+#else /* __COMPILER_ASMNAME_ON_SECOND_DECL */
 #define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,inline_impl)          __LIBC attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("KOS$" #name);
 #define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,inline_impl) __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME(#asmname);
 #define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,inline_impl) __LIBC attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("KOS$" #asmname);
+#endif /* !__COMPILER_ASMNAME_ON_SECOND_DECL */
 #endif /* !... */
 #endif /* !__NO_ASMNAME */
 #else /* __NO_INLINE__ */
@@ -859,17 +889,35 @@ struct __locale_struct;
 #endif /* !... */
 #else /* __NO_ASMNAME */
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#ifdef __COMPILER_ASMNAME_ON_SECOND_DECL
+#define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,...)          __LIBC attr Treturn nothrow(__LIBDCALL name) param; __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("DOS$" #name);
+#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,...) __LIBC attr Treturn nothrow(__LIBKCALL name) param; __LIBC attr Treturn nothrow(__LIBKCALL name) param __ASMNAME(#asmname);
+#define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...) __LIBC attr Treturn nothrow(__LIBDCALL name) param; __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("DOS$" #asmname);
+#else /* __COMPILER_ASMNAME_ON_SECOND_DECL */
 #define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,...)          __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("DOS$" #name);
 #define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,...) __LIBC attr Treturn nothrow(__LIBKCALL name) param __ASMNAME(#asmname);
 #define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...) __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("DOS$" #asmname);
+#endif /* !__COMPILER_ASMNAME_ON_SECOND_DECL */
 #elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#ifdef __COMPILER_ASMNAME_ON_SECOND_DECL
+#define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,inline_impl...)          __LIBC attr Treturn nothrow(__LIBDCALL name) param; __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("DOS$" #name);
+#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,inline_impl...) __LIBC attr Treturn nothrow(__LIBKCALL name) param; __LIBC attr Treturn nothrow(__LIBKCALL name) param __ASMNAME(#asmname);
+#define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,inline_impl...) __LIBC attr Treturn nothrow(__LIBDCALL name) param; __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("DOS$" #asmname);
+#else /* __COMPILER_ASMNAME_ON_SECOND_DECL */
 #define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,inline_impl...)          __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("DOS$" #name);
 #define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,inline_impl...) __LIBC attr Treturn nothrow(__LIBKCALL name) param __ASMNAME(#asmname);
 #define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,inline_impl...) __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("DOS$" #asmname);
+#endif /* !__COMPILER_ASMNAME_ON_SECOND_DECL */
 #else /* ... */
+#ifdef __COMPILER_ASMNAME_ON_SECOND_DECL
+#define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,inline_impl)          __LIBC attr Treturn nothrow(__LIBDCALL name) param; __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("DOS$" #name);
+#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,inline_impl) __LIBC attr Treturn nothrow(__LIBKCALL name) param; __LIBC attr Treturn nothrow(__LIBKCALL name) param __ASMNAME(#asmname);
+#define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,inline_impl) __LIBC attr Treturn nothrow(__LIBDCALL name) param; __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("DOS$" #asmname);
+#else /* __COMPILER_ASMNAME_ON_SECOND_DECL */
 #define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,inline_impl)          __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("DOS$" #name);
 #define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,inline_impl) __LIBC attr Treturn nothrow(__LIBKCALL name) param __ASMNAME(#asmname);
 #define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,inline_impl) __LIBC attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("DOS$" #asmname);
+#endif /* !__COMPILER_ASMNAME_ON_SECOND_DECL */
 #endif /* !... */
 #endif /* !__NO_ASMNAME */
 #else /* __NO_INLINE__ */
