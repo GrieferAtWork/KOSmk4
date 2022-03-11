@@ -1,7 +1,19 @@
 diff -Naur tcc-0.9.27-orig/libtcc.c tcc-0.9.27/libtcc.c
 --- tcc-0.9.27-orig/libtcc.c	2017-12-17 09:27:05.000000000 +0100
-+++ tcc-0.9.27/libtcc.c	2022-03-11 12:45:52.141009200 +0100
-@@ -817,6 +817,9 @@
++++ tcc-0.9.27/libtcc.c	2022-03-11 13:43:27.492354500 +0100
+@@ -737,6 +737,11 @@
+     s->nocommon = 1;
+     s->warn_implicit_function_declaration = 1;
+     s->ms_extensions = 1;
++#ifdef TCC_TARGET_KOS
++    /* KOS works best if system headers can use '$' characters.
++     * As such, allow them to appear in identifiers by default. */
++    s->dollars_in_identifiers = 1;
++#endif
+ 
+ #ifdef CHAR_IS_UNSIGNED
+     s->char_is_unsigned = 1;
+@@ -817,6 +822,9 @@
      tcc_define_symbol(s, "__unix__", NULL);
      tcc_define_symbol(s, "__unix", NULL);
      tcc_define_symbol(s, "unix", NULL);
@@ -11,7 +23,7 @@ diff -Naur tcc-0.9.27-orig/libtcc.c tcc-0.9.27/libtcc.c
  # if defined(__linux__)
      tcc_define_symbol(s, "__linux__", NULL);
      tcc_define_symbol(s, "__linux", NULL);
-@@ -835,6 +838,7 @@
+@@ -835,6 +843,7 @@
  # if defined(__OpenBSD__)
      tcc_define_symbol(s, "__OpenBSD__", "__OpenBSD__");
  # endif
@@ -19,7 +31,7 @@ diff -Naur tcc-0.9.27-orig/libtcc.c tcc-0.9.27/libtcc.c
  #endif
  
      /* TinyCC & gcc defines */
-@@ -974,9 +978,17 @@
+@@ -974,9 +983,17 @@
      /* add libc crt1/crti objects */
      if ((output_type == TCC_OUTPUT_EXE || output_type == TCC_OUTPUT_DLL) &&
          !s->nostdlib) {
