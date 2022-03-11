@@ -655,27 +655,28 @@ __nextfmt:
 		/* `%I16c' --> print utf-16 character (not surrogate support...) */
 		/* `%I32c' --> print utf-32 character */
 		/* `%lc'   --> print utf-16/32 character (same width as `wchar_t') */
-		if (!__length)
+		if (!__length) {
 			__ch32 = __PRINTF_VARG(unsigned) & 0x7f;
+		}
 #if __VA_SIZE >= 4
 		else {
 			__ch32 = (__CHAR32_TYPE__)__PRINTF_VARG(__uint32_t);
 		}
 #elif __VA_SIZE >= 2
-		else if __likely((__length & 0xf) == __PRINTF_LENGTH_R32)
+		else if __likely((__length & 0xf) == __PRINTF_LENGTH_R32) {
 			__ch32 = (__CHAR32_TYPE__)__PRINTF_VARG(__uint32_t);
-		else {
+		} else {
 			__ch32 = (__CHAR32_TYPE__)(__CHAR16_TYPE__)__PRINTF_VARG(__uint16_t);
 		}
-#else
-		else if __likely((__length & 0xf) == __PRINTF_LENGTH_R32)
+#else /* __VA_SIZE >= ... */
+		else if __likely((__length & 0xf) == __PRINTF_LENGTH_R32) {
 			__ch32 = (__CHAR32_TYPE__)__PRINTF_VARG(__uint32_t);
-		else if __likely((__length & 0xf) == __PRINTF_LENGTH_R16)
+		} else if __likely((__length & 0xf) == __PRINTF_LENGTH_R16) {
 			__ch32 = (__CHAR32_TYPE__)(__CHAR16_TYPE__)__PRINTF_VARG(__uint16_t);
-		else {
+		} else {
 			__ch32 = (__CHAR32_TYPE__)__PRINTF_VARG(__uint8_t);
 		}
-#endif
+#endif /* __VA_SIZE < ... */
 		__string = __given_char;
 #if __CHAR_SIZE == 4
 		__given_char[0] = __ch32;

@@ -110,6 +110,158 @@
 #include <kos/anno.h>
 )]%{
 
+/*
+ * ===================================================================
+ *   format-printer overview
+ * ===================================================================
+ *
+ * The  format-printer system is the low-level, general-purpose, fits-
+ * all base  for everything  that  is printf  (printf(3),  sprintf(3),
+ * snprintf(3), dprintf(3), asprintf(3), ...).  At its core, the  idea
+ * is to define so-called `pformatprinter'-compatible functions, which
+ * look like this:
+ *
+ * >> PRIVATE ssize_t FORMATPRINTER_CC
+ * >> my_printer(void *arg, char const *__restrict data, size_t datalen) {
+ * >>     ...
+ * >> }
+ *
+ * These functions are used to process incoming strings one chunk at  a
+ * time, that chunk being the string `[data, data + datalen - 1]'. They
+ * then return a printer-specific value with the following semantics:
+ *  - return < 0:  An error occurred during printing. In this case, the
+ *                 caller will trying  to feed more  chunks and  simply
+ *                 return itself with the same (negative) return value.
+ *  - return >= 0: The caller will add this  value to an internal sum  of
+ *                 return  values from printer functions. Once everything
+ *                 has been  printed (and  the printer  never returned  a
+ *                 negative value), the caller will return with this sum.
+ *
+ * The  `arg'  argument passed  to printers  is an  opaque pointer  that is
+ * passed alongside the `pformatprinter printer' argument to format-printer
+ * functions (like  `format_printf()'). It  can be  used to  keep track  of
+ * meta-data used by the printer function, meaning that it's actual meaning
+ * and contents are dependent on the printer being used. Examples might be:
+ *  - `void *arg' is `char **p_buf':            `sprintf(3)'
+ *  - `void *arg' is `{ char *p; size_t n; }*': `snprintf(3)'
+ *  - `void *arg' is `fd_t':                    `dprintf(3)'
+ *  - `void *arg' is `FILE *':                  `fprintf(3)'
+ *
+ * Since chunks are variable-sized, and are always fed to printer functions
+ * in  the order in which they should  be concatenated in the final output,
+ * all  details regarding what should happen to generated data are entirely
+ * left to the  printer functions, including  when/how to indicate  errors,
+ * and how to keep track of how much data was already printed, etc...
+ *
+ *
+ *
+ * ===================================================================
+ *   format_printf() features / extensions
+ * ===================================================================
+ *
+ * The most notable format-printer is `format_printf()' itself, since this
+ * is the format-printer that implements "%s"-like format strings. On KOS,
+ * we support the following features / extensions:
+ *
+ *  - All STDC-mandated features:
+ *    - "%%": simply output a singular "%"
+ *    - Field width:     "%42", "%*"
+ *    - Field precision: "%.42", "%.*"
+ *    - Flags:           "%#", "%-", "%+", "% ", "%0"
+ *    - Width modifiers: "%hh", "%h", "%l", "l%l", "%L", "%z", "%t", "%j"
+ *    - Output codes:    "%d", "%i", "%u", "%x", "%X", "%o", "%s", "%p",
+ *                       "%c",  "%n", "%f", "%F", "%e", "%E", "%g", "%G"
+ *
+ *  - MSVC-style fixed-length integer width modifiers: "%I", "%I8", "%I16", "%I32", "%I64"
+ *
+ *  - MSVC-style control for "%n" (s.a. `_set_printf_count_output(3)'; defaults to enabled)
+ *
+ *  - gLibc-style "%m" (print string returned by `strerror(errno)')
+ *
+ *  - Positional arguments: printf("<%4$d %3$d %2$d %1$d>", 10, 20, 30, 40); // "<40 30 20 10>"
+ *    Including support for using them as flexible width/precision:
+ *    >> printf("%1$*3$.*2$d", 10, 20, 30);  // decimal=10; width=30; precision=20
+ *
+ *  - KOS-specific extensions:
+ *    - "%?" can be used to specify a size_t-sized width field (rather than int-sized "%*")
+ *    - "%.?" can be used to specify a size_t-sized precision field (rather than int-sized "%.*")
+ *    - fixed-precision: when used for "%s", specifies  the exact length of  the
+ *      string to be printed, rather than the upper limit of a `strnlen()' call.
+ *      Using this, you can print "\0" characters from strings.
+ *      - "%:" can be used in place of "%." to introduce a fixed-precision field
+ *      - "%$" can be used as an alias for "%:?"
+ *    - "%q" can be used similar to "\"%s\"", only that control characters are escaped:
+ *      >> printf("%q", "Hello\nWorld"); // "\"Hello\\nWorld\""
+ *      "%#q" does the same, but omits include leading/trailing "-characters
+ *    - "%b": like "%o", but print in base-2
+ *    - "%Q": to "%c" what "%q" is to "%s" (print an escaped, single character)
+ *    - "%I8s":  print a utf-8 string (`char const *')
+ *    - "%I16s": print a utf-16 string (`char16_t const *')
+ *    - "%I32s": print a utf-32 string (`char32_t const *')
+ *    - "%I8c":  print a utf-8 character (`char'; s.a. `PRIc8')
+ *    - "%I16c": print a utf-16 character (`char16_t'; s.a. `PRIc16')
+ *    - "%I32c": print a utf-32 character (`char32_t'; s.a. `PRIc32')
+ *    - "%[command]", "%[command:options]": Extended printf requests
+ *      - "%$[hex]" / "%$[hex:lLoOpPaAhH]"
+ *        - Invoke `format_hexdump(..., va_arg(args, void *))'
+ *        - Integer-length (`%$I32[hex]') flags affect `FORMAT_HEXDUMP_(BYTES|WORDS|DWORDS|QWORDS)'
+ *        - The argument string affect flags (defaults to `FORMAT_HEXDUMP_FNORMAL')
+ *           - `FORMAT_HEXDUMP_FHEXLOWER':  yes:l, no:L
+ *           - `FORMAT_HEXDUMP_FOFFSETS':   yes:o, no:O
+ *           - `FORMAT_HEXDUMP_FNOADDRESS': yes:P, no:p
+ *           - `FORMAT_HEXDUMP_FNOASCII':   yes:A, no:a
+ *           - `FORMAT_HEXDUMP_FNOHEX':     yes:H, no:h
+ *      - `%[gen]'
+ *          - Invoke a custom format printer function pointer passed through args
+ *            >> typedef ssize_t (*PGEN)(pformatprinter printer, void *arg);
+ *            >> PGEN g = va_arg(args, PGEN);
+ *            >> DO((*g)(printer, arg));
+ *      - `%[gen:c]'
+ *          - Same as `%[gen]', but insert an additional argument `T' that depends
+ *            on the integer size prefix (`%I32[gen:c]') and defaults to  `void *'
+ *            >> typedef ssize_t (*PGEN)(T a, pformatprinter printer, void *arg);
+ *            >> PGEN g = va_arg(args, PGEN);
+ *            >> T    a = va_arg(args, T);
+ *            >> DO((*g)(a, printer, arg));
+ *      - `%[disasm]' / `%$[disasm]'
+ *          - Print the  mnemonic and  operands of  a single  native  assembly
+ *            instruction given via `va_arg(args, void *)' (using `libdisasm')
+ *            s.a. `disasm_single()'
+ *          - When the second form (with  a fixed buffer size)  is used, do a  full
+ *            disassembly of that number of bytes, following `DISASSEMBLER_FNORMAL'
+ *            s.a. `disasm()'
+ *      - `%[vinfo]' / `%[vinfo:%f(%l,%c) : %n]'
+ *          - Print addr2line information for a text address given via `va_arg(args, void *)'
+ *          - The given `format' string is a special printf-like format declaration
+ *            that accepts the following substitutions:
+ *            - `%%'   Print a single `%'-character (used for escaping `%')
+ *            - `%p'   Output the queried text address the same way `format_printf(..., "%q", addr)' would (as `sizeof(void *) * 2' uppercase hex characters)
+ *            - `%n'   Symbol name of the surrounding symbol (managed), or `???'   `di_debug_addr2line_t::al_name'
+ *            - `%N'   Raw name of the surrounding symbol, or `???'                `di_debug_addr2line_t::al_rawname'
+ *            - `%l'   Source line number (1-based; 0 if unknown)                  `di_debug_addr2line_t::al_srcline'
+ *            - `%c'   Source column number (1-based; 0 if unknown)                `di_debug_addr2line_t::al_srccol'
+ *            - `%f'   Source filename (with path prefix)                          `di_debug_addr2line_t::(al_cubase|al_srcpath|al_srcfile)'
+ *            - `%Rf'  Source filename (without path prefix)                       `di_debug_addr2line_t::al_srcfile'
+ *            - `%<'   Absolute starting address of the associated source location `di_debug_addr2line_t::al_linestart'
+ *            - `%>'   Absolute end address of the associated source location      `di_debug_addr2line_t::al_lineend'
+ *            - `%1>'  Absolute end address of the associated source location - 1  `di_debug_addr2line_t::al_lineend'
+ *            - `%S'   Absolute starting address of the surrounding symbol         `di_debug_addr2line_t::al_symstart'
+ *            - `%E'   Absolute end address of the surrounding symbol              `di_debug_addr2line_t::al_symend'
+ *            - `%1E'  Absolute end address of the surrounding symbol - 1          `di_debug_addr2line_t::al_symend'
+ *            - `%Dl'  Declaration line number (1-based; 0 if unknown)             `di_debug_addr2line_t::al_dclline'
+ *            - `%Dc'  Declaration column number (1-based; 0 if unknown)           `di_debug_addr2line_t::al_dclcol'
+ *            - `%Df'  Declaration filename (with path prefix)                     `di_debug_addr2line_t::(al_cubase|al_dclpath|al_dclfile)'
+ *            - `%RDf' Declaration filename (without path prefix)                  `di_debug_addr2line_t::al_dclfile'
+ *            - Any other character[-sequence] is forwarded as-is
+ *      - `%[...]' Other sequences are reserved for future usage
+ *
+ *  - Our format_printf()  implementation treats  all  invalid uses  as  weak
+ *    undefined behavior. This means that when facing invalid printf  control
+ *    sequences, it will never produce  any errors (return a negative  value)
+ *    on its own, meaning the only reason `format_printf()' might ever return
+ *    a  negative value,  is because a  call to its  given `printer' returned
+ *    that same negative value.
+ */
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -727,93 +879,15 @@ err:
 
 
 @@>> format_printf(3), format_vprintf(3)
-@@Generic     printf      implementation
-@@Taking a  regular printf-style  format  string and  arguments,  these
-@@functions will call the given `printer' callback with various strings
-@@that, when put together, result in the desired formated text.
+@@Generic printf implementation. Taking a regular printf-style format string and arguments,
+@@this  function will call the given `printer' callback with various strings that, when put
+@@together, result in the desired formated text.
 @@ - `printer' obviously is called with the text parts in their correct order
 @@ - If `printer' returns '<  0', the function returns  immediately,
 @@   yielding that same value. Otherwise, `format_printf(3)' returns
 @@   the sum of all return values from `printer'.
 @@ - The strings passed to `printer'  may not necessarily be zero-terminated,  and
 @@   a second argument is passed that indicates the absolute length in characters.
-@@Supported extensions:
-@@ - `%q'-format mode: Semantics equivalent to `%s', this modifier escapes the string using
-@@                       - `format_escape' with flags set of 'FORMAT_ESCAPE_FNONE', or
-@@                       - `PRINTF_FLAG_PREFIX' when the '#' flag was used (e.g.: `%#q').
-@@ - `%.*s'   Instead of reading an `int' and dealing with undefined behavior when negative, an `unsigned int' is read.
-@@ - `%.?s'   Similar to `%.*s', but takes a `size_t' from the argument list instead of an `unsigned int', as well as define
-@@            a fixed-length buffer size for string/quote formats (thus allowing you to print '\0' characters after quoting)
-@@ - `%$s'    Same as `%.?s'
-@@ - `%q'     Print an escaped string. (format_printf(..., "a%qb", "foo\nbar")) --> "a\"foo\\nbar\"b"
-@@ - `%#q'    Same as %q, without quotes. (format_printf(..., "a%#qb", "foo\nbar")) --> "afoo\\nbarb"
-@@ - `%Q'     Print an escaped character. (format_printf(..., "a%Qb", '\n')) --> "a\'\\n\'b"
-@@ - `%#Q'    Same as %Q, without quotes. (format_printf(..., "a%#Qb", '\n')) --> "a\\nb"
-@@ - `%I'     length modifier: Integral length equivalent to sizeof(size_t)/sizeof(uintptr_t).
-@@ - `%I8'    length modifier: Integral length equivalent to sizeof(int8_t).
-@@ - `%I16'   length modifier: Integral length equivalent to sizeof(int16_t).
-@@ - `%I32'   length modifier: Integral length equivalent to sizeof(int32_t).
-@@ - `%I64'   length modifier: Integral length equivalent to sizeof(int64_t).
-@@ - `%[...]' Extended formating options, allowing for additional formating options:
-@@            - `%$[hex]' / `%$[hex:lLoOpPaAhH]'
-@@                - Invoke `format_hexdump(..., va_arg(args, void *))'
-@@                - Integer-length (`%$I32[hex]') flags affect `FORMAT_HEXDUMP_(BYTES|WORDS|DWORDS|QWORDS)'
-@@                - The argument string affect flags (defaults to `FORMAT_HEXDUMP_FNORMAL')
-@@                   - `FORMAT_HEXDUMP_FHEXLOWER':  yes:l, no:L
-@@                   - `FORMAT_HEXDUMP_FOFFSETS':   yes:o, no:O
-@@                   - `FORMAT_HEXDUMP_FNOADDRESS': yes:P, no:p
-@@                   - `FORMAT_HEXDUMP_FNOASCII':   yes:A, no:a
-@@                   - `FORMAT_HEXDUMP_FNOHEX':     yes:H, no:h
-@@            - `%[gen]'
-@@                - Invoke a custom format printer function pointer passed through args
-@@                  >> typedef ssize_t (*PGEN)(pformatprinter printer, void *arg);
-@@                  >> PGEN g = va_arg(args, PGEN);
-@@                  >> DO((*g)(printer, arg));
-@@            - `%[gen:c]'
-@@                - Same as `%[gen]', but insert an additional argument `T' that depends
-@@                  on the integer size prefix (`%I32[gen:c]') and defaults to  `void *'
-@@                  >> typedef ssize_t (*PGEN)(T a, pformatprinter printer, void *arg);
-@@                  >> PGEN g = va_arg(args, PGEN);
-@@                  >> T    a = va_arg(args, T);
-@@                  >> DO((*g)(a, printer, arg));
-@@            - `%[disasm]' / `%$[disasm]'
-@@                - Print the  mnemonic and  operands of  a single  native  assembly
-@@                  instruction read from `va_arg(args, void *)' (using `libdisasm')
-@@                  s.a. `disasm_single()'
-@@                - When the second form (with  a fixed buffer size)  is used, do a  full
-@@                  disassembly of that number of bytes, following `DISASSEMBLER_FNORMAL'
-@@                  s.a. `disasm()'
-@@            - `%[vinfo]' / `%[vinfo:<format=%f(%l,%c) : %n>]'
-@@                - Print addr2line information for a text address read from `va_arg(args, void *)'
-@@                - The given `format' string is a special printf-like format declaration
-@@                  that accepts the following substitutions:
-@@                  - `%%'   Print a single `%'-character (used for escaping `%')
-@@                  - `%p'   Output the queried text address the same way `format_printf(..., "%q", addr)' would (as `sizeof(void *) * 2' uppercase hex characters)
-@@                  - `%n'   Symbol name of the surrounding symbol (managed), or `???'   `di_debug_addr2line_t::al_name'
-@@                  - `%N'   Raw name of the surrounding symbol, or `???'                `di_debug_addr2line_t::al_rawname'
-@@                  - `%l'   Source line number (1-based; 0 if unknown)                  `di_debug_addr2line_t::al_srcline'
-@@                  - `%c'   Source column number (1-based; 0 if unknown)                `di_debug_addr2line_t::al_srccol'
-@@                  - `%f'   Source filename (with path prefix)                          `di_debug_addr2line_t::(al_cubase|al_srcpath|al_srcfile)'
-@@                  - `%Rf'  Source filename (without path prefix)                       `di_debug_addr2line_t::al_srcfile'
-@@                  - `%<'   Absolute starting address of the associated source location `di_debug_addr2line_t::al_linestart'
-@@                  - `%>'   Absolute end address of the associated source location      `di_debug_addr2line_t::al_lineend'
-@@                  - `%1>'  Absolute end address of the associated source location - 1  `di_debug_addr2line_t::al_lineend'
-@@                  - `%S'   Absolute starting address of the surrounding symbol         `di_debug_addr2line_t::al_symstart'
-@@                  - `%E'   Absolute end address of the surrounding symbol              `di_debug_addr2line_t::al_symend'
-@@                  - `%1E'  Absolute end address of the surrounding symbol - 1          `di_debug_addr2line_t::al_symend'
-@@                  - `%Dl'  Declaration line number (1-based; 0 if unknown)             `di_debug_addr2line_t::al_dclline'
-@@                  - `%Dc'  Declaration column number (1-based; 0 if unknown)           `di_debug_addr2line_t::al_dclcol'
-@@                  - `%Df'  Declaration filename (with path prefix)                     `di_debug_addr2line_t::(al_cubase|al_dclpath|al_dclfile)'
-@@                  - `%RDf' Declaration filename (without path prefix)                  `di_debug_addr2line_t::al_dclfile'
-@@                  - Any other character[-sequence] is forwarded as-is
-@@            - `%[...]' Other sequences are resered for future usage
-@@>>> Possible (and actual) uses:
-@@ - printf:           Unbuffered output into any kind of stream/file.
-@@ - sprintf/snprintf: Unsafe/Counted string formatting into a user-supplied buffer.
-@@ - strdupf:          Output  into  dynamically   allocated  heap   memory,
-@@                     increasing the buffer when it gets filled completely.
-@@ - syslog:           Unbuffered system-log output.
-@@ - ...               There are a _lot_ more...
 @@@return: >= 0: The sum of all values returned by `printer'
 @@@return: < 0:  The first negative value ever returned by `printer' (if any)
 [[kernel, throws]]
