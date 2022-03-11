@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf8478d1 */
+/* HASH CRC-32:0x1a773b64 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,29 +57,29 @@
  * These functions are used to process incoming strings one chunk at  a
  * time, that chunk being the string `[data, data + datalen - 1]'. They
  * then return a printer-specific value with the following semantics:
- *  - return < 0:  An error occurred during printing. In this case, the
- *                 caller will trying  to feed more  chunks and  simply
- *                 return itself with the same (negative) return value.
- *  - return >= 0: The caller will add this  value to an internal sum  of
- *                 return  values from printer functions. Once everything
- *                 has been  printed (and  the printer  never returned  a
- *                 negative value), the caller will return with this sum.
+ *  - return < 0:  An error occurred during printing. In this case,  the
+ *                 caller won't be trying to feed more chunks and simply
+ *                 return too, using the same (negative) return value.
+ *  - return >= 0: The  caller will add  this value to  an internal sum of
+ *                 return  values from previous calls. Once everything has
+ *                 been printed (and the printer never returned a negative
+ *                 value), the caller returns this sum.
  *
  * The  `arg'  argument passed  to printers  is an  opaque pointer  that is
  * passed alongside the `pformatprinter printer' argument to format-printer
  * functions (like  `format_printf()'). It  can be  used to  keep track  of
  * meta-data used by the printer function, meaning that it's actual meaning
  * and contents are dependent on the printer being used. Examples might be:
- *  - `void *arg' is `char **p_buf':            `sprintf(3)'
- *  - `void *arg' is `{ char *p; size_t n; }*': `snprintf(3)'
- *  - `void *arg' is `fd_t':                    `dprintf(3)'
- *  - `void *arg' is `FILE *':                  `fprintf(3)'
+ *  - `arg' is `char **':                 `sprintf(3)'
+ *  - `arg' is `{ char *p; size_t n; }*': `snprintf(3)'
+ *  - `arg' is `fd_t':                    `dprintf(3)'
+ *  - `arg' is `FILE *':                  `fprintf(3)'
  *
  * Since chunks are variable-sized, and are always fed to printer functions
  * in  the order in which they should  be concatenated in the final output,
  * all  details regarding what should happen to generated data are entirely
  * left to the  printer functions, including  when/how to indicate  errors,
- * and how to keep track of how much data was already printed, etc...
+ * how to keep track of how much data was already printed, etc...
  *
  *
  *
@@ -101,6 +101,7 @@
  *                       "%c",  "%n", "%f", "%F", "%e", "%E", "%g", "%G"
  *
  *  - MSVC-style fixed-length integer width modifiers: "%I", "%I8", "%I16", "%I32", "%I64"
+ *    (Note that "%I8", "%I16" are KOS extensions)
  *
  *  - MSVC-style control for "%n" (s.a. `_set_printf_count_output(3)'; defaults to enabled)
  *
@@ -109,6 +110,8 @@
  *  - Positional arguments: printf("<%4$d %3$d %2$d %1$d>", 10, 20, 30, 40); // "<40 30 20 10>"
  *    Including support for using them as flexible width/precision:
  *    >> printf("%1$*3$.*2$d", 10, 20, 30);  // decimal=10; width=30; precision=20
+ *    >> printf("%*.*d", 30, 20, 10);        // decimal=10; width=30; precision=20
+ *    Note that we impose no upper limit on how many arguments be used like this.
  *
  *  - KOS-specific extensions:
  *    - "%?" can be used to specify a size_t-sized width field (rather than int-sized "%*")
