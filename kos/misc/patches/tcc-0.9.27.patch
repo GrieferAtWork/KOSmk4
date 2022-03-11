@@ -1,7 +1,25 @@
 diff -Naur tcc-0.9.27-orig/libtcc.c tcc-0.9.27/libtcc.c
 --- tcc-0.9.27-orig/libtcc.c	2017-12-17 09:27:05.000000000 +0100
-+++ tcc-0.9.27/libtcc.c	2020-04-30 13:36:40.243380700 +0200
-@@ -974,9 +974,17 @@
++++ tcc-0.9.27/libtcc.c	2022-03-11 12:45:52.141009200 +0100
+@@ -817,6 +817,9 @@
+     tcc_define_symbol(s, "__unix__", NULL);
+     tcc_define_symbol(s, "__unix", NULL);
+     tcc_define_symbol(s, "unix", NULL);
++# ifdef TCC_TARGET_KOS
++    tcc_define_symbol(s, "__KOS__", NULL);
++# else
+ # if defined(__linux__)
+     tcc_define_symbol(s, "__linux__", NULL);
+     tcc_define_symbol(s, "__linux", NULL);
+@@ -835,6 +838,7 @@
+ # if defined(__OpenBSD__)
+     tcc_define_symbol(s, "__OpenBSD__", "__OpenBSD__");
+ # endif
++# endif
+ #endif
+ 
+     /* TinyCC & gcc defines */
+@@ -974,9 +978,17 @@
      /* add libc crt1/crti objects */
      if ((output_type == TCC_OUTPUT_EXE || output_type == TCC_OUTPUT_DLL) &&
          !s->nostdlib) {
@@ -46,18 +64,18 @@ diff -Naur tcc-0.9.27-orig/tccelf.c tcc-0.9.27/tccelf.c
  
 diff -Naur tcc-0.9.27-orig/tccrun.c tcc-0.9.27/tccrun.c
 --- tcc-0.9.27-orig/tccrun.c	2017-12-17 09:27:05.000000000 +0100
-+++ tcc-0.9.27/tccrun.c	2020-05-04 21:26:01.555775300 +0200
++++ tcc-0.9.27/tccrun.c	2022-03-11 12:47:40.108619300 +0100
 @@ -69,6 +69,13 @@
          return -1;
  
  #ifdef HAVE_SELINUX
-+#ifdef __stub_mkstemp
++#ifdef __KOS__
 +    /* Using mmap instead of malloc */
 +    ptr = mmap (NULL, size, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_ANONYMOUS, -1, 0);
 +    if (ptr == MAP_FAILED)
 +        tcc_error("tccrun: could not map memory");
 +    dynarray_add(&s1->runtime_mem, &s1->nb_runtime_mem, (void*)(addr_t)size);
-+#else /* __stub_mkstemp */
++#else /* __KOS__ */
  {
      /* Using mmap instead of malloc */
      void *prx;
@@ -65,7 +83,7 @@ diff -Naur tcc-0.9.27-orig/tccrun.c tcc-0.9.27/tccrun.c
      dynarray_add(&s1->runtime_mem, &s1->nb_runtime_mem, prx);
      ptr_diff = (char*)prx - (char*)ptr;
  }
-+#endif /* !__stub_mkstemp */
++#endif /* !__KOS__ */
  #else
      ptr = tcc_malloc(size);
  #endif
@@ -73,9 +91,9 @@ diff -Naur tcc-0.9.27-orig/tccrun.c tcc-0.9.27/tccrun.c
      for (i = 0; i < s1->nb_runtime_mem; ++i) {
  #ifdef HAVE_SELINUX
          unsigned size = (unsigned)(addr_t)s1->runtime_mem[i++];
-+#ifndef __stub_mkstemp
++#ifndef __KOS__
          munmap(s1->runtime_mem[i++], size);
-+#endif /* !__stub_mkstemp */
++#endif /* !__KOS__ */
          munmap(s1->runtime_mem[i], size);
  #else
  #ifdef _WIN64
