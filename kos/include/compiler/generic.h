@@ -161,6 +161,7 @@
 
 #ifdef __TINYC__
 #define __COMPILER_NO_GCC_ASM_MACROS
+#define __COMPILER_NO_GCC_ASM_FLOAT_CONSTRAINTS
 #endif /* __TINYC__ */
 
 #if defined(__DCC_VERSION__) || defined(__TINYC__)

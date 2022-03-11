@@ -24,7 +24,8 @@
 
 #include <libm/asm/builtin.h>
 
-#if !defined(__NO_FPU) && defined(__COMPILER_HAVE_GCC_ASM)
+#if (!defined(__NO_FPU) && defined(__COMPILER_HAVE_GCC_ASM) && \
+     !defined(__COMPILER_NO_GCC_ASM_FLOAT_CONSTRAINTS))
 #include <__crt.h>
 
 #include <libm/fdlibm.h>
@@ -75,6 +76,6 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 
 __DECL_END
 #endif /* __CC__ */
-#endif /* !__NO_FPU && __COMPILER_HAVE_GCC_ASM */
+#endif /* !__NO_FPU && __COMPILER_HAVE_GCC_ASM && !__COMPILER_NO_GCC_ASM_FLOAT_CONSTRAINTS */
 
 #endif /* !_I386_KOS_LIBM_ASM_ATAN2_H */

@@ -24,7 +24,8 @@
 
 #include <libm/asm/builtin.h>
 
-#if !defined(__NO_FPU) && defined(__COMPILER_HAVE_GCC_ASM)
+#if (!defined(__NO_FPU) && defined(__COMPILER_HAVE_GCC_ASM) && \
+     !defined(__COMPILER_NO_GCC_ASM_FLOAT_CONSTRAINTS))
 #include <__crt.h>
 
 #include <libm/fdlibm.h>
@@ -32,9 +33,9 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-/* NOTE: We    manually    encode    `fld1'    because    having    gcc   fill
- *       in  that  register  for  us  produces  sub-optimal  text  on  x86_64:
- *       >> __asm__("fpatan" : "=t" (__res) : "u" (__x), "0" (1.0) : "st(1)");
+/* NOTE: We manually encode `fld1' because having gcc fill in that
+ *       register  for  us  produces sub-optimal  text  on x86_64:
+ * >> __asm__("fpatan" : "=t" (__res) : "u" (__x), "0" (1.0) : "st(1)");
  * x86_64:
  *     movsd  CSWTCH.3+0xae0, %xmm1   # Loads 1.0 into %xmm1
  *     movsd  %xmm1, -0x10(%rsp)      # Convert %xmm1 (1.0) into float register
@@ -108,6 +109,6 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 
 __DECL_END
 #endif /* __CC__ */
-#endif /* !__NO_FPU && __COMPILER_HAVE_GCC_ASM */
+#endif /* !__NO_FPU && __COMPILER_HAVE_GCC_ASM && !__COMPILER_NO_GCC_ASM_FLOAT_CONSTRAINTS */
 
 #endif /* !_I386_KOS_LIBM_ASM_ATAN_H */

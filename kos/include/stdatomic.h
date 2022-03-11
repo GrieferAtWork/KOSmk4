@@ -167,11 +167,24 @@ typedef enum {
 	memory_order_seq_cst = __ATOMIC_SEQ_CST
 } memory_order;
 
-#if 1 /* ??? */
+#if __has_feature(c_atomic) || __has_extension(c_atomic)
+/* #undef __COMPILER_NO_STDC_ATOMICS */ /* Supported! */
+#elif defined(__NO_has_feature) || defined(__NO_has_extension)
+#define __COMPILER_NO_STDC_ATOMICS /* Compiler has feature test macros, but they didn't indicate support */
+#elif !defined(__STDC_VERSION__) || __STDC_VERSION__ < 201112
+#define __COMPILER_NO_STDC_ATOMICS /* STDC version too old --> Not supported */
+#elif defined(__STDC_NO_ATOMICS__)
+#define __COMPILER_NO_STDC_ATOMICS /* Explicitly marked as not supported */
+#else /* ... */
+/* #undef __COMPILER_NO_STDC_ATOMICS */ /* Nothing seemings to indicate a lack of support... */
+#endif /* !... */
+
+
+#ifndef __COMPILER_NO_STDC_ATOMICS
 #define __atomic_var_field(x)   *(x)
 #define ATOMIC_VAR_INIT(x)      (x)
 #define __COMPILER_ATOMIC(T)    _Atomic(T)
-#elif 0
+#elif 1
 #define __atomic_var_field(x)   (x)->__std_atom
 #define ATOMIC_VAR_INIT(x)      { x }
 #define __COMPILER_ATOMIC(T)    struct { T __std_atom; }

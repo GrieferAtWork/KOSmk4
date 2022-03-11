@@ -139,42 +139,42 @@ __DECL_BEGIN
 __LIBM_LOCAL_FUNC(isunorderedl) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee854_isunorderedl)(__IEEE854_LONG_DOUBLE_TYPE__ __u,
                                     __IEEE854_LONG_DOUBLE_TYPE__ __v) {
-	return __ieee854_isnanf(__u) || __ieee854_isnanf(__v);
+	return __ieee854_isnanl(__u) || __ieee854_isnanl(__v);
 }
 #endif /* !__ieee854_isunorderedl */
 #ifndef __ieee854_isgreaterl
 __LIBM_LOCAL_FUNC(isgreaterl) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee854_isgreaterl)(__IEEE854_LONG_DOUBLE_TYPE__ __x,
                                   __IEEE854_LONG_DOUBLE_TYPE__ __y) {
-	return !__ieee854_isunorderedf(__x, __y) && __x > __y;
+	return !__ieee854_isunorderedl(__x, __y) && __x > __y;
 }
 #endif /* !__ieee854_isgreaterl */
 #ifndef __ieee854_isgreaterequall
 __LIBM_LOCAL_FUNC(isgreaterequall) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee854_isgreaterequall)(__IEEE854_LONG_DOUBLE_TYPE__ __x,
                                        __IEEE854_LONG_DOUBLE_TYPE__ __y) {
-	return !__ieee854_isunorderedf(__x, __y) && __x >= __y;
+	return !__ieee854_isunorderedl(__x, __y) && __x >= __y;
 }
 #endif /* !__ieee854_isgreaterequall */
 #ifndef __ieee854_islessl
 __LIBM_LOCAL_FUNC(islessl) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee854_islessl)(__IEEE854_LONG_DOUBLE_TYPE__ __x,
                                __IEEE854_LONG_DOUBLE_TYPE__ __y) {
-	return !__ieee854_isunorderedf(__x, __y) && __x < __y;
+	return !__ieee854_isunorderedl(__x, __y) && __x < __y;
 }
 #endif /* !__ieee854_islessl */
 #ifndef __ieee854_islessequall
 __LIBM_LOCAL_FUNC(islessequall) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee854_islessequall)(__IEEE854_LONG_DOUBLE_TYPE__ __x,
                                     __IEEE854_LONG_DOUBLE_TYPE__ __y) {
-	return !__ieee854_isunorderedf(__x, __y) && __x <= __y;
+	return !__ieee854_isunorderedl(__x, __y) && __x <= __y;
 }
 #endif /* !__ieee854_islessequall */
 #ifndef __ieee854_islessgreaterl
 __LIBM_LOCAL_FUNC(islessgreaterl) __ATTR_WUNUSED __ATTR_CONST __BOOL
 (__LIBCCALL __ieee854_islessgreaterl)(__IEEE854_LONG_DOUBLE_TYPE__ __x,
                                       __IEEE854_LONG_DOUBLE_TYPE__ __y) {
-	return !__ieee854_isunorderedf(__x, __y) && (__x < __y || __y < __x);
+	return !__ieee854_isunorderedl(__x, __y) && (__x < __y || __y < __x);
 }
 #endif /* !__ieee854_islessgreaterl */
 #endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
