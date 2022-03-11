@@ -153,15 +153,15 @@ function getPpCondForArchVersions(vers: {int...}): string {
 		if (max == KNOWN_VERSION_MAX) {
 			if (min == KNOWN_VERSION_MIN)
 				return "1";
-			return "__MSCVCRT_VERSION__ >= {}".format({ min });
+			return "__MSVCRT_VERSION__ >= {}".format({ min });
 		}
 		if (min == max)
-			return "__MSCVCRT_VERSION__ == {}".format({ min });
-		return "__MSCVCRT_VERSION__ >= {} && __MSCVCRT_VERSION__ <= {}"
+			return "__MSVCRT_VERSION__ == {}".format({ min });
+		return "__MSVCRT_VERSION__ >= {} && __MSVCRT_VERSION__ <= {}"
 			.format({ min, max });
 	}
 	return " || ".join(for (local ver: vers)
-		"__MSCVCRT_VERSION__ {} {}".format({ ver == KNOWN_VERSION_MAX ? ">=" : "==", ver }));
+		"__MSVCRT_VERSION__ {} {}".format({ ver == KNOWN_VERSION_MAX ? ">=" : "==", ver }));
 }
 
 function mergeConditions(bIf: string, aCond: string, bCond: string): string {
@@ -272,21 +272,21 @@ print("\
  * XXX: The `_MSC_VER'-based checks have not really been tested/confirmed
  * XXX: I was unable to find the x64 \"msvcr100d.dll\", so below acts like
  *      that file was  exporting the  same symbols as  the x32  variant. */
-#ifndef __MSCVCRT_VERSION__
+#ifndef __MSVCRT_VERSION__
 #ifdef __TINYC__
-#define __MSCVCRT_VERSION__ 0   /* msvcrt.dll */
+#define __MSVCRT_VERSION__ 0   /* msvcrt.dll */
 #elif !defined(_MSC_VER)
-#define __MSCVCRT_VERSION__ 0   /* msvcrt.dll */
+#define __MSVCRT_VERSION__ 0   /* msvcrt.dll */
 #elif _MSC_VER >= 1900
-#define __MSCVCRT_VERSION__ 140 /* ucrtbase.dll, vcruntime140.dll  (VS 2015) */
+#define __MSVCRT_VERSION__ 140 /* ucrtbase.dll, vcruntime140.dll  (VS 2015) */
 #elif _MSC_VER >= 1800
-#define __MSCVCRT_VERSION__ 120 /* msvcr120.dll  (VS 2013) */
+#define __MSVCRT_VERSION__ 120 /* msvcr120.dll  (VS 2013) */
 #elif _MSC_VER >= 1600
-#define __MSCVCRT_VERSION__ 100 /* msvcr100.dll  (VS 2010) */
+#define __MSVCRT_VERSION__ 100 /* msvcr100.dll  (VS 2010) */
 #else /* ... */
-#define __MSCVCRT_VERSION__ 0   /* msvcrt.dll */
+#define __MSVCRT_VERSION__ 0   /* msvcrt.dll */
 #endif /* !... */
-#endif /* !__MSCVCRT_VERSION__ */
+#endif /* !__MSVCRT_VERSION__ */
 
 /************************************************************************/");
 
