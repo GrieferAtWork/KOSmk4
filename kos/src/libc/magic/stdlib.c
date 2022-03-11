@@ -1065,6 +1065,27 @@ __LONGDOUBLE strtold([[nonnull]] char const *__restrict nptr,
 
 
 %
+%#if !defined(__NO_FPU) && (defined(__USE_GNU) || defined(__STDC_WANT_IEC_60559_BFP_EXT__))
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
+__STDC_INT32_AS_SIZE_T strfromd([[outp_opt(min(return, buflen))]] char *__restrict buf, $size_t buflen,
+                                [[nonnull]] char const *__restrict format, double fp);
+/* TODO: Implement as inline */
+
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
+__STDC_INT32_AS_SIZE_T strfromf([[outp_opt(min(return, buflen))]] char *__restrict buf, $size_t buflen,
+                                [[nonnull]] char const *__restrict format, float fp);
+/* TODO: Implement as inline */
+
+%#ifdef __COMPILER_HAVE_LONGDOUBLE
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
+__STDC_INT32_AS_SIZE_T strfroml([[outp_opt(min(return, buflen))]] char *__restrict buf, $size_t buflen,
+                                [[nonnull]] char const *__restrict format, __LONGDOUBLE fp);
+/* TODO: Implement as inline */
+%#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%#endif /* !__NO_FPU  && (__USE_GNU || __STDC_WANT_IEC_60559_BFP_EXT__)*/
+
+
+%
 %#ifdef __USE_KOS
 
 @@>> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)

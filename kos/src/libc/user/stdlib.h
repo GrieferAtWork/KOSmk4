@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3339de95 */
+/* HASH CRC-32:0x1c0afd34 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,6 +44,9 @@ INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(
 INTDEF void NOTHROW_NCX(LIBCCALL libc_free)(void *mallptr);
 INTDEF void NOTHROW(LIBCCALL libc_srand)(long seed);
 INTDEF int NOTHROW(LIBCCALL libc_rand)(void);
+INTDEF NONNULL((3)) __STDC_INT32_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_strfromd)(char *__restrict buf, size_t buflen, char const *__restrict format, double fp);
+INTDEF NONNULL((3)) __STDC_INT32_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_strfromf)(char *__restrict buf, size_t buflen, char const *__restrict format, float fp);
+INTDEF NONNULL((3)) __STDC_INT32_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_strfroml)(char *__restrict buf, size_t buflen, char const *__restrict format, __LONGDOUBLE fp);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_rand_r)(unsigned int *__restrict pseed);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_drand48_r)(struct drand48_data *__restrict buffer, double *__restrict result);
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBCCALL libc_erand48_r)(unsigned short xsubi[3], struct drand48_data *__restrict buffer, double *__restrict result);

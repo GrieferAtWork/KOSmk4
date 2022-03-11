@@ -92,6 +92,7 @@
 #define libd_msabi64_FR     libd_msabi64_R
 #define libd_msabi64_FRR    libd_msabi64_RR
 #define libd_msabi64_FRRR   libd_msabi64_RRR
+#define libd_msabi64_RRRF   libd_msabi64_RRR
 #define libd_msabi64_FRRRRR libd_msabi64_RRRRR
 #define libd_msabi64_RF     libd_msabi64_R
 #define libd_msabi64_RRFR   libd_msabi64_RRR

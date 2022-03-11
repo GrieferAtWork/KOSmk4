@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8e55c3f */
+/* HASH CRC-32:0xbddc5cba */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -778,11 +778,14 @@
 #define __CRT_HAVE_DOS$cacoshl
 #define __CRT_HAVE_DOS$cacosl
 #define __CRT_HAVE_DOS$calloc
+#define __CRT_HAVE_DOS$canonicalize
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$canonicalize_file_name
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$canonicalizef
+#define __CRT_HAVE_DOS$canonicalizel
 #define __CRT_HAVE_DOS$carg
 #define __CRT_HAVE_DOS$cargf
 #define __CRT_HAVE_DOS$cargl
@@ -1078,14 +1081,18 @@
 #define __CRT_HAVE_DOS$feenableexcept
 #define __CRT_HAVE_DOS$fegetenv
 #define __CRT_HAVE_DOS$fegetexceptflag
+#define __CRT_HAVE_DOS$fegetmode
 #define __CRT_HAVE_DOS$feholdexcept
 #define __CRT_HAVE_DOS$feof
 #define __CRT_HAVE_DOS$feraiseexcept
 #define __CRT_HAVE_DOS$ferror
 #define __CRT_HAVE_DOS$fesetenv
+#define __CRT_HAVE_DOS$fesetexcept
 #define __CRT_HAVE_DOS$fesetexceptflag
+#define __CRT_HAVE_DOS$fesetmode
 #define __CRT_HAVE_DOS$fesetround
 #define __CRT_HAVE_DOS$fetestexcept
+#define __CRT_HAVE_DOS$fetestexceptflag
 #define __CRT_HAVE_DOS$feupdateenv
 #define __CRT_HAVE_DOS$fexecve
 #define __CRT_HAVE_DOS$fflush
@@ -1147,10 +1154,16 @@
 #define __CRT_HAVE_DOS$fmax
 #define __CRT_HAVE_DOS$fmaxf
 #define __CRT_HAVE_DOS$fmaxl
+#define __CRT_HAVE_DOS$fmaxmag
+#define __CRT_HAVE_DOS$fmaxmagf
+#define __CRT_HAVE_DOS$fmaxmagl
 #define __CRT_HAVE_DOS$fmemopen
 #define __CRT_HAVE_DOS$fmin
 #define __CRT_HAVE_DOS$fminf
 #define __CRT_HAVE_DOS$fminl
+#define __CRT_HAVE_DOS$fminmag
+#define __CRT_HAVE_DOS$fminmagf
+#define __CRT_HAVE_DOS$fminmagl
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$fmkdirat
@@ -1257,6 +1270,12 @@
 #define __CRT_HAVE_DOS$frexp
 #define __CRT_HAVE_DOS$frexpf
 #define __CRT_HAVE_DOS$frexpl
+#define __CRT_HAVE_DOS$fromfp
+#define __CRT_HAVE_DOS$fromfpf
+#define __CRT_HAVE_DOS$fromfpl
+#define __CRT_HAVE_DOS$fromfpx
+#define __CRT_HAVE_DOS$fromfpxf
+#define __CRT_HAVE_DOS$fromfpxl
 #define __CRT_HAVE_DOS$fscanf
 #define __CRT_HAVE_DOS$fscanf_s
 #define __CRT_HAVE_DOS$fscanf_unlocked
@@ -1716,6 +1735,9 @@
 #define __CRT_HAVE_DOS$llabs
 #define __CRT_HAVE_DOS$lldiv
 #define __CRT_HAVE_DOS$llistxattr
+#define __CRT_HAVE_DOS$llogb
+#define __CRT_HAVE_DOS$llogbf
+#define __CRT_HAVE_DOS$llogbl
 #define __CRT_HAVE_DOS$llrint
 #define __CRT_HAVE_DOS$llrintf
 #define __CRT_HAVE_DOS$llrintl
@@ -1989,8 +2011,14 @@
 #define __CRT_HAVE_DOS$nextafter
 #define __CRT_HAVE_DOS$nextafterf
 #define __CRT_HAVE_DOS$nextafterl
+#define __CRT_HAVE_DOS$nextdown
+#define __CRT_HAVE_DOS$nextdownf
+#define __CRT_HAVE_DOS$nextdownl
 #define __CRT_HAVE_DOS$nexttoward
 #define __CRT_HAVE_DOS$nexttowardf
+#define __CRT_HAVE_DOS$nextup
+#define __CRT_HAVE_DOS$nextupf
+#define __CRT_HAVE_DOS$nextupl
 #define __CRT_HAVE_DOS$ngettext
 #define __CRT_HAVE_DOS$nice
 #define __CRT_HAVE_DOS$nl_langinfo
@@ -2504,6 +2532,9 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$round
+#define __CRT_HAVE_DOS$roundeven
+#define __CRT_HAVE_DOS$roundevenf
+#define __CRT_HAVE_DOS$roundevenl
 #define __CRT_HAVE_DOS$roundf
 #define __CRT_HAVE_DOS$roundl
 #define __CRT_HAVE_DOS$rpc_exec
@@ -2780,6 +2811,9 @@
 #define __CRT_HAVE_DOS$stresep
 #define __CRT_HAVE_DOS$strfmon
 #define __CRT_HAVE_DOS$strfmon_l
+#define __CRT_HAVE_DOS$strfromd
+#define __CRT_HAVE_DOS$strfromf
+#define __CRT_HAVE_DOS$strfroml
 #define __CRT_HAVE_DOS$strfry
 #define __CRT_HAVE_DOS$strftime
 #define __CRT_HAVE_DOS$strftime_l
@@ -3024,6 +3058,12 @@
 #define __CRT_HAVE_DOS$twalk
 #define __CRT_HAVE_DOS$twalk_r
 #define __CRT_HAVE_DOS$ualarm
+#define __CRT_HAVE_DOS$ufromfp
+#define __CRT_HAVE_DOS$ufromfpf
+#define __CRT_HAVE_DOS$ufromfpl
+#define __CRT_HAVE_DOS$ufromfpx
+#define __CRT_HAVE_DOS$ufromfpxf
+#define __CRT_HAVE_DOS$ufromfpxl
 #define __CRT_HAVE_DOS$ulimit
 #define __CRT_HAVE_DOS$ulltostr
 #define __CRT_HAVE_DOS$ultoa
@@ -4346,7 +4386,10 @@
 #define __CRT_HAVE_cacoshl
 #define __CRT_HAVE_cacosl
 #define __CRT_HAVE_calloc
+#define __CRT_HAVE_canonicalize
 #define __CRT_HAVE_canonicalize_file_name
+#define __CRT_HAVE_canonicalizef
+#define __CRT_HAVE_canonicalizel
 #define __CRT_HAVE_carg
 #define __CRT_HAVE_cargf
 #define __CRT_HAVE_cargl
@@ -4678,15 +4721,19 @@
 #define __CRT_HAVE_fegetenv
 #define __CRT_HAVE_fegetexcept
 #define __CRT_HAVE_fegetexceptflag
+#define __CRT_HAVE_fegetmode
 #define __CRT_HAVE_fegetround
 #define __CRT_HAVE_feholdexcept
 #define __CRT_HAVE_feof
 #define __CRT_HAVE_feraiseexcept
 #define __CRT_HAVE_ferror
 #define __CRT_HAVE_fesetenv
+#define __CRT_HAVE_fesetexcept
 #define __CRT_HAVE_fesetexceptflag
+#define __CRT_HAVE_fesetmode
 #define __CRT_HAVE_fesetround
 #define __CRT_HAVE_fetestexcept
+#define __CRT_HAVE_fetestexceptflag
 #define __CRT_HAVE_feupdateenv
 #define __CRT_HAVE_fexecve
 #define __CRT_HAVE_fflush
@@ -4744,10 +4791,16 @@
 #define __CRT_HAVE_fmax
 #define __CRT_HAVE_fmaxf
 #define __CRT_HAVE_fmaxl
+#define __CRT_HAVE_fmaxmag
+#define __CRT_HAVE_fmaxmagf
+#define __CRT_HAVE_fmaxmagl
 #define __CRT_HAVE_fmemopen
 #define __CRT_HAVE_fmin
 #define __CRT_HAVE_fminf
 #define __CRT_HAVE_fminl
+#define __CRT_HAVE_fminmag
+#define __CRT_HAVE_fminmagf
+#define __CRT_HAVE_fminmagl
 #define __CRT_HAVE_fmkdirat
 #define __CRT_HAVE_fmknodat
 #define __CRT_HAVE_fmod
@@ -4832,6 +4885,12 @@
 #define __CRT_HAVE_frexp
 #define __CRT_HAVE_frexpf
 #define __CRT_HAVE_frexpl
+#define __CRT_HAVE_fromfp
+#define __CRT_HAVE_fromfpf
+#define __CRT_HAVE_fromfpl
+#define __CRT_HAVE_fromfpx
+#define __CRT_HAVE_fromfpxf
+#define __CRT_HAVE_fromfpxl
 #define __CRT_HAVE_fscanf
 #define __CRT_HAVE_fscanf_s
 #define __CRT_HAVE_fscanf_unlocked
@@ -5346,6 +5405,9 @@
 #define __CRT_HAVE_llabs
 #define __CRT_HAVE_lldiv
 #define __CRT_HAVE_llistxattr
+#define __CRT_HAVE_llogb
+#define __CRT_HAVE_llogbf
+#define __CRT_HAVE_llogbl
 #define __CRT_HAVE_llrint
 #define __CRT_HAVE_llrintf
 #define __CRT_HAVE_llrintl
@@ -5642,8 +5704,14 @@
 #define __CRT_HAVE_nextafter
 #define __CRT_HAVE_nextafterf
 #define __CRT_HAVE_nextafterl
+#define __CRT_HAVE_nextdown
+#define __CRT_HAVE_nextdownf
+#define __CRT_HAVE_nextdownl
 #define __CRT_HAVE_nexttoward
 #define __CRT_HAVE_nexttowardf
+#define __CRT_HAVE_nextup
+#define __CRT_HAVE_nextupf
+#define __CRT_HAVE_nextupl
 #define __CRT_HAVE_nftw
 #define __CRT_HAVE_nftw64
 #define __CRT_HAVE_ngettext
@@ -6118,6 +6186,9 @@
 #define __CRT_HAVE_rintl
 #define __CRT_HAVE_rmdir
 #define __CRT_HAVE_round
+#define __CRT_HAVE_roundeven
+#define __CRT_HAVE_roundevenf
+#define __CRT_HAVE_roundevenl
 #define __CRT_HAVE_roundf
 #define __CRT_HAVE_roundl
 #define __CRT_HAVE_rpc_exec
@@ -6485,6 +6556,9 @@
 #define __CRT_HAVE_stresep
 #define __CRT_HAVE_strfmon
 #define __CRT_HAVE_strfmon_l
+#define __CRT_HAVE_strfromd
+#define __CRT_HAVE_strfromf
+#define __CRT_HAVE_strfroml
 #define __CRT_HAVE_strfry
 #define __CRT_HAVE_strftime
 #define __CRT_HAVE_strftime_l
@@ -6727,6 +6801,12 @@
 #define __CRT_HAVE_twalk_r
 #define __CRT_HAVE_tzset
 #define __CRT_HAVE_ualarm
+#define __CRT_HAVE_ufromfp
+#define __CRT_HAVE_ufromfpf
+#define __CRT_HAVE_ufromfpl
+#define __CRT_HAVE_ufromfpx
+#define __CRT_HAVE_ufromfpxf
+#define __CRT_HAVE_ufromfpxl
 #define __CRT_HAVE_ulckpwdf
 #define __CRT_HAVE_ulimit
 #define __CRT_HAVE_ulltostr

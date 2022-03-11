@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc9fb6c6 */
+/* HASH CRC-32:0xe1223e24 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -189,6 +189,9 @@ INTDEF ATTR_LEAF NONNULL((1)) __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_strtold)(ch
 INTDEF ATTR_LEAF NONNULL((1)) __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_strtold)(char const *__restrict nptr, char **endptr);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF NONNULL((3)) __STDC_INT32_AS_SIZE_T NOTHROW_NCX(LIBDCALL libd_strfromd)(char *__restrict buf, size_t buflen, char const *__restrict format, double fp);
+INTDEF NONNULL((3)) __STDC_INT32_AS_SIZE_T NOTHROW_NCX(LIBDCALL libd_strfromf)(char *__restrict buf, size_t buflen, char const *__restrict format, float fp);
+INTDEF NONNULL((3)) __STDC_INT32_AS_SIZE_T NOTHROW_NCX(LIBDCALL libd_strfroml)(char *__restrict buf, size_t buflen, char const *__restrict format, __LONGDOUBLE fp);
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
  * errors in `*error' (if non-NULL).  The following errors are  defined:

@@ -214,6 +214,27 @@ int fegetexcept() {
 
 %#endif /* __USE_GNU */
 
+%
+%#if defined(__USE_GNU) || defined(__STDC_WANT_IEC_60559_BFP_EXT__)
+/* TODO: These 2 need to got into <bits/crt/fenv.h> */
+%{
+typedef unsigned int femode_t;
+#define FE_DFL_MODE ((femode_t const *)-1)
+}
+%[define_replacement(femode_t = "unsigned int")]
+
+int fesetexcept(int excepts);
+int fetestexceptflag(fexcept_t const *flagp, int excepts);
+int fegetmode(femode_t *modep);
+int fesetmode(femode_t const *modep);
+
+%{
+#if defined(FE_INVALID) && defined(__SUPPORT_SNAN__)
+#define FE_SNANS_ALWAYS_SIGNAL 1
+#endif /* FE_INVALID && __SUPPORT_SNAN__ */
+}
+%#endif /* __USE_GNU || __STDC_WANT_IEC_60559_BFP_EXT__ */
+
 %{
 
 __SYSDECL_END

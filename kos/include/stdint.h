@@ -493,6 +493,120 @@ __DECL_END
 #endif /* !UINTPTR_C */
 #endif /* __USE_KOS */
 
+
+#if defined(__USE_GNU) || defined(__STDC_WANT_IEC_60559_BFP_EXT__) || 1
+#ifndef INT8_WIDTH
+#define INT8_WIDTH 8
+#endif /* !INT8_WIDTH */
+#ifndef UINT8_WIDTH
+#define UINT8_WIDTH 8
+#endif /* !UINT8_WIDTH */
+#ifndef INT16_WIDTH
+#define INT16_WIDTH 16
+#endif /* !INT16_WIDTH */
+#ifndef UINT16_WIDTH
+#define UINT16_WIDTH 16
+#endif /* !UINT16_WIDTH */
+#ifndef INT32_WIDTH
+#define INT32_WIDTH 32
+#endif /* !INT32_WIDTH */
+#ifndef UINT32_WIDTH
+#define UINT32_WIDTH 32
+#endif /* !UINT32_WIDTH */
+#ifdef __INT64_TYPE__
+#ifndef INT64_WIDTH
+#define INT64_WIDTH 64
+#endif /* !INT64_WIDTH */
+#ifndef UINT64_WIDTH
+#define UINT64_WIDTH 64
+#endif /* !UINT64_WIDTH */
+#endif /* __INT64_TYPE__ */
+
+#ifndef INT_LEAST8_WIDTH
+#define INT_LEAST8_WIDTH __INT_LEAST8_WIDTH__
+#endif /* !INT_LEAST8_WIDTH */
+#ifndef UINT_LEAST8_WIDTH
+#define UINT_LEAST8_WIDTH __INT_LEAST8_WIDTH__
+#endif /* !UINT_LEAST8_WIDTH */
+#ifndef INT_LEAST16_WIDTH
+#define INT_LEAST16_WIDTH __INT_LEAST16_WIDTH__
+#endif /* !INT_LEAST16_WIDTH */
+#ifndef UINT_LEAST16_WIDTH
+#define UINT_LEAST16_WIDTH __INT_LEAST16_WIDTH__
+#endif /* !UINT_LEAST16_WIDTH */
+#ifndef INT_LEAST32_WIDTH
+#define INT_LEAST32_WIDTH __INT_LEAST32_WIDTH__
+#endif /* !INT_LEAST32_WIDTH */
+#ifndef UINT_LEAST32_WIDTH
+#define UINT_LEAST32_WIDTH __INT_LEAST32_WIDTH__
+#endif /* !UINT_LEAST32_WIDTH */
+#ifdef __INT_LEAST64_WIDTH__
+#ifndef INT_LEAST64_WIDTH
+#define INT_LEAST64_WIDTH __INT_LEAST64_WIDTH__
+#endif /* !INT_LEAST64_WIDTH */
+#ifndef UINT_LEAST64_WIDTH
+#define UINT_LEAST64_WIDTH __INT_LEAST64_WIDTH__
+#endif /* !UINT_LEAST64_WIDTH */
+#endif /* __INT_LEAST64_WIDTH__ */
+
+#ifndef INT_FAST8_WIDTH
+#define INT_FAST8_WIDTH __INT_FAST8_WIDTH__
+#endif /* !INT_FAST8_WIDTH */
+#ifndef UINT_FAST8_WIDTH
+#define UINT_FAST8_WIDTH __INT_FAST8_WIDTH__
+#endif /* !UINT_FAST8_WIDTH */
+#ifndef INT_FAST16_WIDTH
+#define INT_FAST16_WIDTH __INT_FAST16_WIDTH__
+#endif /* !INT_FAST16_WIDTH */
+#ifndef UINT_FAST16_WIDTH
+#define UINT_FAST16_WIDTH __INT_FAST16_WIDTH__
+#endif /* !UINT_FAST16_WIDTH */
+#ifndef INT_FAST32_WIDTH
+#define INT_FAST32_WIDTH __INT_FAST32_WIDTH__
+#endif /* !INT_FAST32_WIDTH */
+#ifndef UINT_FAST32_WIDTH
+#define UINT_FAST32_WIDTH __INT_FAST32_WIDTH__
+#endif /* !UINT_FAST32_WIDTH */
+#ifdef __INT_FAST64_WIDTH__
+#ifndef INT_FAST64_WIDTH
+#define INT_FAST64_WIDTH __INT_FAST64_WIDTH__
+#endif /* !INT_FAST64_WIDTH */
+#ifndef UINT_FAST64_WIDTH
+#define UINT_FAST64_WIDTH __INT_FAST64_WIDTH__
+#endif /* !UINT_FAST64_WIDTH */
+#endif /* __INT_FAST64_WIDTH__ */
+
+#ifndef INTPTR_WIDTH
+#define INTPTR_WIDTH __INTPTR_WIDTH__
+#endif /* !INTPTR_WIDTH */
+#ifndef UINTPTR_WIDTH
+#define UINTPTR_WIDTH __INTPTR_WIDTH__
+#endif /* !UINTPTR_WIDTH */
+
+#ifndef INTMAX_WIDTH
+#define INTMAX_WIDTH __INTMAX_WIDTH__
+#endif /* !INTMAX_WIDTH */
+#ifndef UINTMAX_WIDTH
+#define UINTMAX_WIDTH __INTMAX_WIDTH__
+#endif /* !UINTMAX_WIDTH */
+
+#ifndef PTRDIFF_WIDTH
+#define PTRDIFF_WIDTH __PTRDIFF_WIDTH__
+#endif /* !PTRDIFF_WIDTH */
+#ifndef SIG_ATOMIC_WIDTH
+#define SIG_ATOMIC_WIDTH __SIG_ATOMIC_WIDTH__
+#endif /* !SIG_ATOMIC_WIDTH */
+#ifndef SIZE_WIDTH
+#define SIZE_WIDTH __SIZE_WIDTH__
+#endif /* !SIZE_WIDTH */
+#ifndef WCHAR_WIDTH
+#define WCHAR_WIDTH __WCHAR_WIDTH__
+#endif /* !WCHAR_WIDTH */
+#ifndef WINT_WIDTH
+#define WINT_WIDTH __WINT_WIDTH__
+#endif /* !WINT_WIDTH */
+#endif /* __USE_GNU || __STDC_WANT_IEC_60559_BFP_EXT__ */
+
 #ifdef __CXX_SYSTEM_HEADER
 #define _CXX_STDONLY_CSTDINT
 #undef _STDINT_H

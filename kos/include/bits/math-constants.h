@@ -148,6 +148,26 @@
 #endif /* !__has_builtin(__builtin_nanl) */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 
+#if __has_builtin(__builtin_nansf)
+#define __SNANF __builtin_nansf("")
+#else /* __has_builtin(__builtin_nansf) */
+/* TODO */
+#endif /* !__has_builtin(__builtin_nansf) */
+
+#if __has_builtin(__builtin_nans)
+#define __SNAN __builtin_nans("")
+#else /* __has_builtin(__builtin_nans) */
+/* TODO */
+#endif /* !__has_builtin(__builtin_nans) */
+
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+#if __has_builtin(__builtin_nansl)
+#define __SNANL __builtin_nansl("")
+#else /* __has_builtin(__builtin_nansl) */
+/* TODO */
+#endif /* !__has_builtin(__builtin_nansl) */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+
 #endif /* !__NO_FPU */
 #endif /* __CC__ */
 

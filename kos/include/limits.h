@@ -41,6 +41,7 @@
 #include <features.h>
 
 #include <hybrid/limitcore.h>
+#include <hybrid/typecore.h>
 
 #include <asm/crt/limits.h>
 #include <asm/os/limits.h>
@@ -128,6 +129,43 @@
 #endif /* !ULONG_LONG_MAX && __ULONG_LONG_MAX__ */
 #endif /* __USE_GNU */
 
+#if defined(__USE_GNU) || defined(__STDC_WANT_IEC_60559_BFP_EXT__)
+#ifndef CHAR_WIDTH
+#define CHAR_WIDTH __SCHAR_WIDTH__
+#endif /* !CHAR_WIDTH */
+#ifndef SCHAR_WIDTH
+#define SCHAR_WIDTH __SCHAR_WIDTH__
+#endif /* !SCHAR_WIDTH */
+#ifndef UCHAR_WIDTH
+#define UCHAR_WIDTH __SCHAR_WIDTH__
+#endif /* !UCHAR_WIDTH */
+#ifndef SHRT_WIDTH
+#define SHRT_WIDTH __SHRT_WIDTH__
+#endif /* !SHRT_WIDTH */
+#ifndef USHRT_WIDTH
+#define USHRT_WIDTH __SHRT_WIDTH__
+#endif /* !USHRT_WIDTH */
+#ifndef INT_WIDTH
+#define INT_WIDTH __INT_WIDTH__
+#endif /* !INT_WIDTH */
+#ifndef UINT_WIDTH
+#define UINT_WIDTH __INT_WIDTH__
+#endif /* !UINT_WIDTH */
+#ifndef LONG_WIDTH
+#define LONG_WIDTH __LONG_WIDTH__
+#endif /* !LONG_WIDTH */
+#ifndef ULONG_WIDTH
+#define ULONG_WIDTH __LONG_WIDTH__
+#endif /* !ULONG_WIDTH */
+#ifndef LLONG_WIDTH
+#define LLONG_WIDTH __LONG_LONG_WIDTH__
+#endif /* !LLONG_WIDTH */
+#ifndef ULLONG_WIDTH
+#define ULLONG_WIDTH __LONG_LONG_WIDTH__
+#endif /* !ULLONG_WIDTH */
+#endif /* __USE_GNU || __STDC_WANT_IEC_60559_BFP_EXT__ */
+
+
 #ifdef __USE_DOS
 #define _I8_MIN     __PRIVATE_MIN_S1
 #define _I8_MAX     __PRIVATE_MAX_S1
@@ -159,9 +197,7 @@
 #define RSIZE_MAX __SSIZE_MAX__
 #endif /* RSIZE_MAX */
 #endif /* __USE_DOS_SLIB */
-
 #endif /* __USE_DOS */
-
 
 #undef __USE_ALL_LIMITS
 #if defined(_ALL_LIMITS_SOURCE)

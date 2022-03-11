@@ -59,6 +59,11 @@
 	         float:        mathf(x),          \
 	         __LONGDOUBLE: mathl(x),          \
 	         default:      math(x))
+#define __PRIVATE_TGF3xxi(x, y, z, mathf, math, mathl) \
+	_Generic(x,                                        \
+	         float:        mathf(x, y, z),             \
+	         __LONGDOUBLE: mathl(x, y, z),             \
+	         default:      math(x, y, z))
 #define __PRIVATE_TGF2(x, y, mathf, math, mathl) \
 	_Generic(__PRIVATE_TG_COMMON(x, y),          \
 	         float:        mathf(x, y),          \
@@ -79,6 +84,10 @@
 	_Generic(x,                               \
 	         float:   mathf(x),               \
 	         default: math(x))
+#define __PRIVATE_TGF3xxi(x, y, z, mathf, math, mathl) \
+	_Generic(x,                                        \
+	         float:   mathf(x, y, z),                  \
+	         default: math(x, y, z))
 #define __PRIVATE_TGF2(x, y, mathf, math, mathl) \
 	_Generic(__PRIVATE_TG_COMMON(x, y),          \
 	         float:   mathf(x, y),               \
@@ -98,6 +107,10 @@
 	__builtin_choose_expr(__PRIVATE_TG_ISTYPE(x, float),        mathf(x), \
 	__builtin_choose_expr(__PRIVATE_TG_ISTYPE(x, __LONGDOUBLE), mathl(x), \
 	                                                            math(x)))
+#define __PRIVATE_TGF3xxi(x, y, z, mathf, math, mathl)                          \
+	__builtin_choose_expr(__PRIVATE_TG_ISTYPE(x, float),        mathf(x, y, z), \
+	__builtin_choose_expr(__PRIVATE_TG_ISTYPE(x, __LONGDOUBLE), mathl(x, y, z), \
+	                                                            math(x, y, z)))
 #define __PRIVATE_TGF2(x, y, mathf, math, mathl)                                 \
 	__builtin_choose_expr(__PRIVATE_TG_ISTYPE2(x, y, float),        mathf(x, y), \
 	__builtin_choose_expr(__PRIVATE_TG_ISTYPE2(x, y, __LONGDOUBLE), mathl(x, y), \
@@ -113,6 +126,8 @@
 #else /* __COMPILER_HAVE_LONGDOUBLE */
 #define __PRIVATE_TGF1(x, mathf, math, mathl) \
 	__builtin_choose_expr(__PRIVATE_TG_ISTYPE(x, float), mathf(x), math(x))
+#define __PRIVATE_TGF3xxi(x, y, z, mathf, math, mathl) \
+	__builtin_choose_expr(__PRIVATE_TG_ISTYPE(x, float), mathf(x, y, z), math(x, y, z))
 #define __PRIVATE_TGF2(x, y, mathf, math, mathl) \
 	__builtin_choose_expr(__PRIVATE_TG_ISTYPE2(x, y, float), mathf(x, y), math(x, y))
 #define __PRIVATE_TGF3(x, y, z, mathf, math, mathl) \
@@ -126,6 +141,14 @@
 	(__PRIVATE_TG_ISTYPE(x, float)        ? (__typeof__(x))mathf((float)(x)) :        \
 	 __PRIVATE_TG_ISTYPE(x, __LONGDOUBLE) ? (__typeof__(x))mathl((__LONGDOUBLE)(x)) : \
 	                                        (__typeof__(x))math((double)(x)))
+#define __PRIVATE_TGF1i(x, mathf, math, mathl)                         \
+	(__PRIVATE_TG_ISTYPE(x, float)        ? mathf((float)(x)) :        \
+	 __PRIVATE_TG_ISTYPE(x, __LONGDOUBLE) ? mathl((__LONGDOUBLE)(x)) : \
+	                                        math((double)(x)))
+#define __PRIVATE_TGF3xxi(x, y, z, mathf, math, mathl)                       \
+	(__PRIVATE_TG_ISTYPE(x, float)        ? mathf((float)(x), y, z) :        \
+	 __PRIVATE_TG_ISTYPE(x, __LONGDOUBLE) ? mathl((__LONGDOUBLE)(x), y, z) : \
+	                                        math((double)(x), y, z))
 #define __PRIVATE_TGF2(x, y, mathf, math, mathl)                                                                                     \
 	(__PRIVATE_TG_ISTYPE2(x, y, float)        ? (__typeof__(__PRIVATE_TG_COMMON(x, y)))mathf((float)(x), (float)(y)) :               \
 	 __PRIVATE_TG_ISTYPE2(x, y, __LONGDOUBLE) ? (__typeof__(__PRIVATE_TG_COMMON(x, y)))mathl((__LONGDOUBLE)(x), (__LONGDOUBLE)(y)) : \
@@ -143,6 +166,14 @@
 	(__PRIVATE_TG_ISTYPE(x, float)            \
 	 ? (__typeof__(x))mathf((float)(x))       \
 	 : (__typeof__(x))math((double)(x)))
+#define __PRIVATE_TGF1i(x, mathf, math, mathl) \
+	(__PRIVATE_TG_ISTYPE(x, float)             \
+	 ? mathf((float)(x))                       \
+	 : math((double)(x)))
+#define __PRIVATE_TGF3xxi(x, y, z, mathf, math, mathl) \
+	(__PRIVATE_TG_ISTYPE(x, float)                     \
+	 ? mathf((float)(x), y, z)                         \
+	 : math((double)(x), y, z))
 #define __PRIVATE_TGF2(x, y, mathf, math, mathl)                            \
 	(__PRIVATE_TG_ISTYPE2(x, y, float)                                      \
 	 ? (__typeof__(__PRIVATE_TG_COMMON(x, y)))mathf((float)(x), (float)(y)) \
@@ -162,6 +193,10 @@
 	(__PRIVATE_TG_ISTYPE(x, float)        ? mathf((float)(x)) :        \
 	 __PRIVATE_TG_ISTYPE(x, __LONGDOUBLE) ? mathl((__LONGDOUBLE)(x)) : \
 	                                        math((double)(x)))
+#define __PRIVATE_TGF3xxi(x, mathf, math, mathl)                             \
+	(__PRIVATE_TG_ISTYPE(x, float)        ? mathf((float)(x), y, z) :        \
+	 __PRIVATE_TG_ISTYPE(x, __LONGDOUBLE) ? mathl((__LONGDOUBLE)(x), y, z) : \
+	                                        math((double)(x), y, z))
 #define __PRIVATE_TGF2(x, y, mathf, math, mathl)                                              \
 	(__PRIVATE_TG_ISTYPE2(x, y, float)        ? mathf((float)(x), (float)(y)) :               \
 	 __PRIVATE_TG_ISTYPE2(x, y, __LONGDOUBLE) ? mathl((__LONGDOUBLE)(x), (__LONGDOUBLE)(y)) : \
@@ -177,6 +212,8 @@
 #else /* __COMPILER_HAVE_LONGDOUBLE */
 #define __PRIVATE_TGF1(x, mathf, math, mathl) \
 	(__PRIVATE_TG_ISTYPE(x, float) ? mathf((float)(x)) : math((double)(x)))
+#define __PRIVATE_TGF3xxi(x, y, z, mathf, math, mathl) \
+	(__PRIVATE_TG_ISTYPE(x, float) ? mathf((float)(x), y, z) : math((double)(x), y, z))
 #define __PRIVATE_TGF2(x, y, mathf, math, mathl) \
 	(__PRIVATE_TG_ISTYPE2(x, y, float) ? mathf((float)(x), (float)(y)) : math((double)(x), (double)(y)))
 #define __PRIVATE_TGF3(x, y, z, mathf, math, mathl) \
@@ -185,6 +222,11 @@
 	(__PRIVATE_TG_ISTYPE2(x, y, float) ? mathf((float)(x), (float)(y), arg3) : math((double)(x), (double)(y), arg3))
 #endif /* !__COMPILER_HAVE_LONGDOUBLE */
 #endif /* !... */
+
+
+#ifndef __PRIVATE_TGF1i
+#define __PRIVATE_TGF1i __PRIVATE_TGF1
+#endif /* !__PRIVATE_TGF1i */
 
 
 /* (optional) integration of <complex.h> functions (if supposed by the compiler). */
@@ -400,17 +442,17 @@
 #define fmod(x, y)          __PRIVATE_TGF2(x, y, fmodf, fmod, fmodl)
 #define frexp(x)            __PRIVATE_TGF1(x, frexpf, frexp, frexpl)
 #define hypot(x, y)         __PRIVATE_TGF2(x, y, hypotf, hypot, hypotl)
-#define ilogb(x)            __PRIVATE_TGF1(x, ilogbf, ilogb, ilogbl)
+#define ilogb(x)            __PRIVATE_TGF1i(x, ilogbf, ilogb, ilogbl)
 #define ldexp(x)            __PRIVATE_TGF1(x, ldexpf, ldexp, ldexpl)
 #define lgamma(x)           __PRIVATE_TGF1(x, lgammaf, lgamma, lgammal)
-#define llrint(x)           __PRIVATE_TGF1(x, llrintf, llrint, llrintl)
-#define llround(x)          __PRIVATE_TGF1(x, llroundf, llround, llroundl)
+#define llrint(x)           __PRIVATE_TGF1i(x, llrintf, llrint, llrintl)
+#define llround(x)          __PRIVATE_TGF1i(x, llroundf, llround, llroundl)
 #define log10(x)            __PRIVATE_TGF1(x, log10f, log10, log10l)
 #define log1p(x)            __PRIVATE_TGF1(x, log1pf, log1p, log1pl)
 #define log2(x)             __PRIVATE_TGF1(x, log2f, log2, log2l)
 #define logb(x)             __PRIVATE_TGF1(x, logbf, logb, logbl)
-#define lrint(x)            __PRIVATE_TGF1(x, lrintf, lrint, lrintl)
-#define lround(x)           __PRIVATE_TGF1(x, lroundf, lround, lroundl)
+#define lrint(x)            __PRIVATE_TGF1i(x, lrintf, lrint, lrintl)
+#define lround(x)           __PRIVATE_TGF1i(x, lroundf, lround, lroundl)
 #define nearbyint(x)        __PRIVATE_TGF1(x, nearbyintf, nearbyint, nearbyintl)
 #define nextafter(x, y)     __PRIVATE_TGF2(x, y, nextafterf, nextafter, nextafterl)
 #define nexttoward(x, y)    __PRIVATE_TGF2(x, y, nexttowardf, nexttoward, nexttowardl)
@@ -418,10 +460,39 @@
 #define remquo(x, y, pquo)  __PRIVATE_TGF2x(x, y, pquo, remquof, remquo, remquol)
 #define rint(x)             __PRIVATE_TGF1(x, rintf, rint, rintl)
 #define round(x)            __PRIVATE_TGF1(x, roundf, round, roundl)
-#define scalbln(x)          __PRIVATE_TGF1(x, scalblnf, scalbln, scalblnl)
-#define scalbn(x)           __PRIVATE_TGF1(x, scalbnf, scalbn, scalbnl)
+#define scalbln(x, y)       __PRIVATE_TGF2x(x, y, scalblnf, scalbln, scalblnl)
+#define scalbn(x, y)        __PRIVATE_TGF2x(x, y, scalbnf, scalbn, scalbnl)
 #define tgamma(x)           __PRIVATE_TGF1(x, tgammaf, tgamma, tgammal)
 #define trunc(x)            __PRIVATE_TGF1(x, truncf, trunc, truncl)
+
+#if defined(__USE_GNU) || defined(__STDC_WANT_IEC_60559_BFP_EXT__)
+#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
+#define nextdown(x)               __PRIVATE_TGF1(x, nextdownf, nextdown, nextdownl)
+#define nextup(x)                 __PRIVATE_TGF1(x, nextupf, nextup, nextupl)
+#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
+#define roundeven(x)              __PRIVATE_TGF1(x, roundevenf, roundeven, roundevenl)
+#define llogb(x)                  __PRIVATE_TGF1i(x, llogbf, llogb, llogbl)
+#define fmaxmag(x, y)             __PRIVATE_TGF2(x, y, fmaxmagf, fmaxmag, fmaxmagl)
+#define fminmag(x, y)             __PRIVATE_TGF2(x, y, fminmagf, fminmag, fminmagl)
+#define fromfp(x, round, width)   __PRIVATE_TGF3xxi(x, round, width, fromfpf, fromfp, fromfpl)
+#define ufromfp(x, round, width)  __PRIVATE_TGF3xxi(x, round, width, ufromfpf, ufromfp, ufromfpl)
+#define fromfpx(x, round, width)  __PRIVATE_TGF3xxi(x, round, width, fromfpxf, fromfpx, fromfpxl)
+#define ufromfpx(x, round, width) __PRIVATE_TGF3xxi(x, round, width, ufromfpxf, ufromfpx, ufromfpxl)
+
+#define __PRIVATE_TGdlF2(x, y, math, mathl)        \
+	(__PRIVATE_TG_ISTYPE2(x, y, __LONGDOUBLE)      \
+	 ? mathl((__LONGDOUBLE)(x), (__LONGDOUBLE)(y)) \
+	 : math((double)(x), (double)(y)))
+#define fadd(x, y) __PRIVATE_TGdlF2(x, y, fadd, faddl)
+#define dadd(x, y) daddl(x, y)
+#define fdiv(x, y) __PRIVATE_TGdlF2(x, y, fdiv, fdivl)
+#define ddiv(x, y) ddivl(x, y)
+#define fmul(x, y) __PRIVATE_TGdlF2(x, y, fmul, fmull)
+#define dmul(x, y) dmull(x, y)
+#define fsub(x, y) __PRIVATE_TGdlF2(x, y, fsub, fsubl)
+#define dsub(x, y) dsubl(x, y)
+#endif /* __USE_GNU || __STDC_WANT_IEC_60559_BFP_EXT__ */
+
 #endif /* !__cplusplus */
 
 #endif /* !_TGMATH_H */

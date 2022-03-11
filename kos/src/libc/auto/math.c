@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb21107f7 */
+/* HASH CRC-32:0xbedffa02 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,8 +24,8 @@
 #include "../api.h"
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include "math.h"
-#include "fenv.h"
+#include "../user/math.h"
+#include "../user/fenv.h"
 
 DECL_BEGIN
 
@@ -4075,6 +4075,116 @@ NOTHROW(LIBCCALL libc___issignalingl)(__LONGDOUBLE x) {
 
 
 }
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
+NOTHROW_NCX(LIBCCALL libc_nextdownf)(float x) {
+	return (float)libc_nextdown((double)x);
+}
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
+NOTHROW_NCX(LIBCCALL libc_nextupf)(float x) {
+	return (float)libc_nextup((double)x);
+}
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
+NOTHROW_NCX(LIBCCALL libc_nextdownl)(__LONGDOUBLE x) {
+	return (__LONGDOUBLE)libc_nextdown((double)x);
+}
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
+NOTHROW_NCX(LIBCCALL libc_nextupl)(__LONGDOUBLE x) {
+	return (__LONGDOUBLE)libc_nextup((double)x);
+}
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED long int
+NOTHROW_NCX(LIBCCALL libc_llogbf)(float x) {
+	return libc_llogb((double)x);
+}
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
+NOTHROW_NCX(LIBCCALL libc_roundevenf)(float x) {
+	return (float)libc_roundeven((double)x);
+}
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED intmax_t
+NOTHROW_NCX(LIBCCALL libc_fromfpf)(float x,
+                                   int roundf,
+                                   unsigned int width) {
+	return libc_fromfp((double)x, roundf, width);
+}
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED uintmax_t
+NOTHROW_NCX(LIBCCALL libc_ufromfpf)(float x,
+                                    int roundf,
+                                    unsigned int width) {
+	return libc_ufromfp((double)x, roundf, width);
+}
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED intmax_t
+NOTHROW_NCX(LIBCCALL libc_fromfpxf)(float x,
+                                    int roundf,
+                                    unsigned int width) {
+	return libc_fromfpx((double)x, roundf, width);
+}
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED uintmax_t
+NOTHROW_NCX(LIBCCALL libc_ufromfpxf)(float x,
+                                     int roundf,
+                                     unsigned int width) {
+	return libc_ufromfpx((double)x, roundf, width);
+}
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
+NOTHROW_NCX(LIBCCALL libc_fmaxmagf)(float x,
+                                    float y) {
+	return (float)libc_fmaxmag((double)x, (double)y);
+}
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
+NOTHROW_NCX(LIBCCALL libc_fminmagf)(float x,
+                                    float y) {
+	return (float)libc_fminmag((double)x, (double)y);
+}
+INTERN ATTR_SECTION(".text.crt.math.math") int
+NOTHROW_NCX(LIBCCALL libc_canonicalizef)(float *cx,
+                                         float const *x) {
+	return libc_canonicalize((double *)cx, (double const *)x);
+}
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED long int
+NOTHROW_NCX(LIBCCALL libc_llogbl)(__LONGDOUBLE x) {
+	return libc_llogb((double)x);
+}
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
+NOTHROW_NCX(LIBCCALL libc_roundevenl)(__LONGDOUBLE x) {
+	return (__LONGDOUBLE)libc_roundeven((double)x);
+}
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED intmax_t
+NOTHROW_NCX(LIBCCALL libc_fromfpl)(__LONGDOUBLE x,
+                                   int roundl,
+                                   unsigned int width) {
+	return libc_fromfp((double)x, roundl, width);
+}
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED uintmax_t
+NOTHROW_NCX(LIBCCALL libc_ufromfpl)(__LONGDOUBLE x,
+                                    int roundl,
+                                    unsigned int width) {
+	return libc_ufromfp((double)x, roundl, width);
+}
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED intmax_t
+NOTHROW_NCX(LIBCCALL libc_fromfpxl)(__LONGDOUBLE x,
+                                    int roundl,
+                                    unsigned int width) {
+	return libc_fromfpx((double)x, roundl, width);
+}
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED uintmax_t
+NOTHROW_NCX(LIBCCALL libc_ufromfpxl)(__LONGDOUBLE x,
+                                     int roundl,
+                                     unsigned int width) {
+	return libc_ufromfpx((double)x, roundl, width);
+}
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
+NOTHROW_NCX(LIBCCALL libc_fmaxmagl)(__LONGDOUBLE x,
+                                    __LONGDOUBLE y) {
+	return (__LONGDOUBLE)libc_fmaxmag((double)x, (double)y);
+}
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
+NOTHROW_NCX(LIBCCALL libc_fminmagl)(__LONGDOUBLE x,
+                                    __LONGDOUBLE y) {
+	return (__LONGDOUBLE)libc_fminmag((double)x, (double)y);
+}
+INTERN ATTR_SECTION(".text.crt.math.math") int
+NOTHROW_NCX(LIBCCALL libc_canonicalizel)(__LONGDOUBLE *cx,
+                                         __LONGDOUBLE const *x) {
+	return libc_canonicalize((double *)cx, (double const *)x);
+}
 #include <libm/fcomp.h>
 /* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
 INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
@@ -4704,6 +4814,28 @@ DEFINE_PUBLIC_ALIAS(issignalingf, libc___issignalingf);
 DEFINE_PUBLIC_ALIAS(__issignalingf, libc___issignalingf);
 DEFINE_PUBLIC_ALIAS(issignalingl, libc___issignalingl);
 DEFINE_PUBLIC_ALIAS(__issignalingl, libc___issignalingl);
+DEFINE_PUBLIC_ALIAS(nextdownf, libc_nextdownf);
+DEFINE_PUBLIC_ALIAS(nextupf, libc_nextupf);
+DEFINE_PUBLIC_ALIAS(nextdownl, libc_nextdownl);
+DEFINE_PUBLIC_ALIAS(nextupl, libc_nextupl);
+DEFINE_PUBLIC_ALIAS(llogbf, libc_llogbf);
+DEFINE_PUBLIC_ALIAS(roundevenf, libc_roundevenf);
+DEFINE_PUBLIC_ALIAS(fromfpf, libc_fromfpf);
+DEFINE_PUBLIC_ALIAS(ufromfpf, libc_ufromfpf);
+DEFINE_PUBLIC_ALIAS(fromfpxf, libc_fromfpxf);
+DEFINE_PUBLIC_ALIAS(ufromfpxf, libc_ufromfpxf);
+DEFINE_PUBLIC_ALIAS(fmaxmagf, libc_fmaxmagf);
+DEFINE_PUBLIC_ALIAS(fminmagf, libc_fminmagf);
+DEFINE_PUBLIC_ALIAS(canonicalizef, libc_canonicalizef);
+DEFINE_PUBLIC_ALIAS(llogbl, libc_llogbl);
+DEFINE_PUBLIC_ALIAS(roundevenl, libc_roundevenl);
+DEFINE_PUBLIC_ALIAS(fromfpl, libc_fromfpl);
+DEFINE_PUBLIC_ALIAS(ufromfpl, libc_ufromfpl);
+DEFINE_PUBLIC_ALIAS(fromfpxl, libc_fromfpxl);
+DEFINE_PUBLIC_ALIAS(ufromfpxl, libc_ufromfpxl);
+DEFINE_PUBLIC_ALIAS(fmaxmagl, libc_fmaxmagl);
+DEFINE_PUBLIC_ALIAS(fminmagl, libc_fminmagl);
+DEFINE_PUBLIC_ALIAS(canonicalizel, libc_canonicalizel);
 DEFINE_PUBLIC_ALIAS(_dpcomp, libc__dpcomp);
 DEFINE_PUBLIC_ALIAS(_fdpcomp, libc__fdpcomp);
 DEFINE_PUBLIC_ALIAS(_ldpcomp, libc__ldpcomp);

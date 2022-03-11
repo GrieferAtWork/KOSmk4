@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa72a7521 */
+/* HASH CRC-32:0xdf349e9a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -374,6 +374,10 @@ DEFINE_PUBLIC_ALIAS(DOS$fesetenv, libd_fesetenv);
 DEFINE_PUBLIC_ALIAS(DOS$feupdateenv, libd_feupdateenv);
 DEFINE_PUBLIC_ALIAS(DOS$feenableexcept, libd_feenableexcept);
 DEFINE_PUBLIC_ALIAS(DOS$fedisableexcept, libd_fedisableexcept);
+DEFINE_PUBLIC_ALIAS(DOS$fesetexcept, libd_fesetexcept);
+DEFINE_PUBLIC_ALIAS(DOS$fetestexceptflag, libd_fetestexceptflag);
+DEFINE_PUBLIC_ALIAS(DOS$fegetmode, libd_fegetmode);
+DEFINE_PUBLIC_ALIAS(DOS$fesetmode, libd_fesetmode);
 
 /* float */
 DEFINE_PUBLIC_ALIAS(DOS$_controlfp, libd__controlfp);
@@ -1011,6 +1015,39 @@ DEFINE_PUBLIC_ALIAS(DOS$issignalingf, libd___issignalingf);
 DEFINE_PUBLIC_ALIAS(DOS$__issignalingf, libd___issignalingf);
 DEFINE_PUBLIC_ALIAS(DOS$issignalingl, libd___issignalingl);
 DEFINE_PUBLIC_ALIAS(DOS$__issignalingl, libd___issignalingl);
+DEFINE_PUBLIC_ALIAS(DOS$nextdown, libd_nextdown);
+DEFINE_PUBLIC_ALIAS(DOS$nextup, libd_nextup);
+DEFINE_PUBLIC_ALIAS(DOS$nextdownf, libd_nextdownf);
+DEFINE_PUBLIC_ALIAS(DOS$nextupf, libd_nextupf);
+DEFINE_PUBLIC_ALIAS(DOS$nextdownl, libd_nextdownl);
+DEFINE_PUBLIC_ALIAS(DOS$nextupl, libd_nextupl);
+DEFINE_PUBLIC_ALIAS(DOS$llogb, libd_llogb);
+DEFINE_PUBLIC_ALIAS(DOS$roundeven, libd_roundeven);
+DEFINE_PUBLIC_ALIAS(DOS$fromfp, libd_fromfp);
+DEFINE_PUBLIC_ALIAS(DOS$ufromfp, libd_ufromfp);
+DEFINE_PUBLIC_ALIAS(DOS$fromfpx, libd_fromfpx);
+DEFINE_PUBLIC_ALIAS(DOS$ufromfpx, libd_ufromfpx);
+DEFINE_PUBLIC_ALIAS(DOS$fmaxmag, libd_fmaxmag);
+DEFINE_PUBLIC_ALIAS(DOS$fminmag, libd_fminmag);
+DEFINE_PUBLIC_ALIAS(DOS$canonicalize, libd_canonicalize);
+DEFINE_PUBLIC_ALIAS(DOS$llogbf, libd_llogbf);
+DEFINE_PUBLIC_ALIAS(DOS$roundevenf, libd_roundevenf);
+DEFINE_PUBLIC_ALIAS(DOS$fromfpf, libd_fromfpf);
+DEFINE_PUBLIC_ALIAS(DOS$ufromfpf, libd_ufromfpf);
+DEFINE_PUBLIC_ALIAS(DOS$fromfpxf, libd_fromfpxf);
+DEFINE_PUBLIC_ALIAS(DOS$ufromfpxf, libd_ufromfpxf);
+DEFINE_PUBLIC_ALIAS(DOS$fmaxmagf, libd_fmaxmagf);
+DEFINE_PUBLIC_ALIAS(DOS$fminmagf, libd_fminmagf);
+DEFINE_PUBLIC_ALIAS(DOS$canonicalizef, libd_canonicalizef);
+DEFINE_PUBLIC_ALIAS(DOS$llogbl, libd_llogbl);
+DEFINE_PUBLIC_ALIAS(DOS$roundevenl, libd_roundevenl);
+DEFINE_PUBLIC_ALIAS(DOS$fromfpl, libd_fromfpl);
+DEFINE_PUBLIC_ALIAS(DOS$ufromfpl, libd_ufromfpl);
+DEFINE_PUBLIC_ALIAS(DOS$fromfpxl, libd_fromfpxl);
+DEFINE_PUBLIC_ALIAS(DOS$ufromfpxl, libd_ufromfpxl);
+DEFINE_PUBLIC_ALIAS(DOS$fmaxmagl, libd_fmaxmagl);
+DEFINE_PUBLIC_ALIAS(DOS$fminmagl, libd_fminmagl);
+DEFINE_PUBLIC_ALIAS(DOS$canonicalizel, libd_canonicalizel);
 DEFINE_PUBLIC_ALIAS(DOS$_dpcomp, libd__dpcomp);
 DEFINE_PUBLIC_ALIAS(DOS$_fdpcomp, libd__fdpcomp);
 DEFINE_PUBLIC_ALIAS(DOS$_ldpcomp, libd__ldpcomp);
@@ -1975,6 +2012,9 @@ DEFINE_PUBLIC_ALIAS(DOS$__strtof, libd_strtof);
 DEFINE_PUBLIC_ALIAS(DOS$strtof, libd_strtof);
 DEFINE_PUBLIC_ALIAS(DOS$__strtold, libd_strtold);
 DEFINE_PUBLIC_ALIAS(DOS$strtold, libd_strtold);
+DEFINE_PUBLIC_ALIAS(DOS$strfromd, libd_strfromd);
+DEFINE_PUBLIC_ALIAS(DOS$strfromf, libd_strfromf);
+DEFINE_PUBLIC_ALIAS(DOS$strfroml, libd_strfroml);
 DEFINE_PUBLIC_ALIAS(DOS$strtou32_r, libd_strtou32_r);
 DEFINE_PUBLIC_ALIAS(DOS$strto32_r, libd_strto32_r);
 DEFINE_PUBLIC_ALIAS(DOS$strtou64_r, libd_strtou64_r);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ed40246 */
+/* HASH CRC-32:0x29831a43 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -151,6 +151,12 @@ INTDEF int NOTHROW(LIBCCALL libc_fedisableexcept)(int excepts);
 /* >> fegetexcept(3) */
 INTDEF ATTR_PURE WUNUSED int NOTHROW(LIBCCALL libc_fegetexcept)(void);
 #endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF int NOTHROW_NCX(LIBDCALL libd_fesetexcept)(int excepts);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_fetestexceptflag)(fexcept_t const *flagp, int excepts);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_fegetmode)(femode_t *modep);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_fesetmode)(femode_t const *modep);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END
 

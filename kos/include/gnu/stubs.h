@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3af82d90 */
+/* HASH CRC-32:0x13747628 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -110,6 +110,7 @@
 #define __stub_b64_pton
 #define __stub_bindresvport
 #define __stub_bindresvport6
+#define __stub_canonicalize
 #define __stub_catclose
 #define __stub_catgets
 #define __stub_catopen
@@ -151,11 +152,17 @@
 #define __stub_ether_ntohost
 #define __stub_fattach
 #define __stub_fdetach
+#define __stub_fegetmode
+#define __stub_fesetexcept
+#define __stub_fesetmode
+#define __stub_fetestexceptflag
 #define __stub_fgetgrent
 #define __stub_fgetgrent_r
 #define __stub_fgetspent
 #define __stub_fgetspent_r
 #define __stub_fgetwln
+#define __stub_fmaxmag
+#define __stub_fminmag
 #define __stub_fmtcheck
 #define __stub___fp_nquery
 #define __stub_fp_nquery
@@ -169,6 +176,8 @@
 #define __stub_freeifaddrs
 #define __stub___freelocale
 #define __stub_freelocale
+#define __stub_fromfp
+#define __stub_fromfpx
 #define __stub_ftok
 #define __stub_fts64_children
 #define __stub_fts64_close
@@ -320,6 +329,7 @@
 #define __stub_lckpwdf
 #define __stub_lcong48
 #define __stub_lcong48_r
+#define __stub_llogb
 #define __stub___loc_aton
 #define __stub_loc_aton
 #define __stub___loc_ntoa
@@ -341,6 +351,8 @@
 #define __stub_msgsnd
 #define __stub___newlocale
 #define __stub_newlocale
+#define __stub_nextdown
+#define __stub_nextup
 #define __stub_nftw
 #define __stub_nftw64
 #define __stub_nrand48
@@ -492,6 +504,7 @@
 #define __stub_revoke
 #define __stub_rexec
 #define __stub_rexec_af
+#define __stub_roundeven
 #define __stub_rresvport
 #define __stub_rresvport_af
 #define __stub_ruserok
@@ -541,6 +554,9 @@
 #define __stub_strfmon
 #define __stub___strfmon_l
 #define __stub_strfmon_l
+#define __stub_strfromd
+#define __stub_strfromf
+#define __stub_strfroml
 #define __stub_stty
 #ifdef __LIBCCALL_IS_LIBDCALL
 #define __stub__tempnam
@@ -550,6 +566,8 @@
 #define __stub_tmpnam
 #define __stub_ttyslot
 #define __stub_tzset
+#define __stub_ufromfp
+#define __stub_ufromfpx
 #define __stub___ulckpwdf
 #define __stub_ulckpwdf
 #define __stub_updwtmp

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3e68d0f */
+/* HASH CRC-32:0x2cae0ed1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1326,6 +1326,14 @@ __NAMESPACE_STD_USING(strtold)
 #endif /* !__strtold_defined && __std_strtold_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 #endif /* !__NO_FPU */
+
+#if !defined(__NO_FPU) && (defined(__USE_GNU) || defined(__STDC_WANT_IEC_60559_BFP_EXT__))
+__CDECLARE_OPT(__ATTR_NONNULL((3)),__STDC_INT32_AS_SIZE_T,__NOTHROW_NCX,strfromd,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, double __fp),(__buf,__buflen,__format,__fp))
+__CDECLARE_OPT(__ATTR_NONNULL((3)),__STDC_INT32_AS_SIZE_T,__NOTHROW_NCX,strfromf,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, float __fp),(__buf,__buflen,__format,__fp))
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+__CDECLARE_OPT(__ATTR_NONNULL((3)),__STDC_INT32_AS_SIZE_T,__NOTHROW_NCX,strfroml,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, __LONGDOUBLE __fp),(__buf,__buflen,__format,__fp))
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* !__NO_FPU  && (__USE_GNU || __STDC_WANT_IEC_60559_BFP_EXT__)*/
 
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE_strtou32_r

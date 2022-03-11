@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f6fb96b */
+/* HASH CRC-32:0xc5b66855 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include "../api.h"
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include "fenv.h"
+#include "../user/fenv.h"
 
 DECL_BEGIN
 

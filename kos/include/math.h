@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c3b219e */
+/* HASH CRC-32:0x2818cd16 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -592,9 +592,11 @@ __NAMESPACE_STD_USING(islessgreater)
 
 #ifdef __USE_ISOC99
 #include <asm/crt/fp_type.h>  /* __FP_NAN, __FP_INFINITE, ... */
-#include <bits/crt/mathdef.h> /* __FLT_EVAL_METHOD__, __FP_ILOGB0, __FP_ILOGBNAN */
 #include <libm/fcomp.h>
 #endif /* __USE_ISOC99 */
+#if defined(__USE_ISOC99) || defined(__USE_GNU) || defined(__STDC_WANT_IEC_60559_BFP_EXT__)
+#include <bits/crt/mathdef.h> /* __FLT_EVAL_METHOD__, __FP_ILOGB0, __FP_ILOGBNAN */
+#endif /* __USE_ISOC99 || __USE_GNU || __STDC_WANT_IEC_60559_BFP_EXT__ */
 
 #ifdef __USE_MISC
 #include <asm/crt/math-exception.h>
@@ -685,6 +687,36 @@ __NAMESPACE_STD_USING(islessgreater)
 
 #endif /* __USE_ISOC99 */
 
+#if defined(__USE_GNU) || defined(__STDC_WANT_IEC_60559_BFP_EXT__)
+#if !defined(SNANF) && defined(__SNANF)
+#define SNANF __SNANF
+#endif /* !SNANF && __SNANF */
+#if !defined(SNAN) && defined(__SNAN)
+#define SNAN  __SNAN
+#endif /* !SNAN && __SNAN */
+#if !defined(SNANL) && defined(__SNANL)
+#define SNANL __SNANL
+#endif /* !SNANL && __SNANL */
+/* TODO: Define `__FP_LOGB0_IS_MIN' in `<bits/crt/mathdef.h>' */
+#ifdef __FP_LOGB0_IS_MIN
+#define FP_LLOGB0 (-__LONG_MAX__ - 1)
+#else /* __FP_LOGB0_IS_MIN */
+#define FP_LLOGB0 (-__LONG_MAX__)
+#endif /* !__FP_LOGB0_IS_MIN */
+/* TODO: Define `__FP_LOGBNAN_IS_MIN' in `<bits/crt/mathdef.h>' */
+#ifdef __FP_LOGBNAN_IS_MIN
+#define FP_LLOGBNAN (-__LONG_MAX__ - 1)
+#else /* __FP_LOGBNAN_IS_MIN */
+#define FP_LLOGBNAN __LONG_MAX__
+#endif /* !__FP_LOGBNAN_IS_MIN */
+
+/* Possible values for `round' argument of `fromfp(3)' and friends. */
+#define FP_INT_UPWARD            0
+#define FP_INT_DOWNWARD          1
+#define FP_INT_TOWARDZERO        2
+#define FP_INT_TONEARESTFROMZERO 3
+#define FP_INT_TONEAREST         4
+#endif /* __USE_GNU || __STDC_WANT_IEC_60559_BFP_EXT__ */
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -13296,7 +13328,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__signbitl, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_ISOC99 */
 
-#ifdef __USE_GNU
+#if defined(__USE_GNU) || defined(__STDC_WANT_IEC_60559_BFP_EXT__)
 #ifdef __CRT_HAVE_issignaling
 /* >> issignaling(3), __issignalingf(3), __issignaling(3), __issignalingl(3) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignaling,(double __x),issignaling,(__x))
@@ -13332,7 +13364,157 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignalingl,(__LONGDOUBL
 __NAMESPACE_LOCAL_USING_OR_IMPL(__issignalingl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __issignalingl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__issignalingl))(__x); })
 #endif /* ... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
-#endif /* __USE_GNU */
+
+#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
+__CDECLARE_OPT(__ATTR_WUNUSED,double,__NOTHROW_NCX,nextdown,(double __x),(__x))
+__CDECLARE_OPT(__ATTR_WUNUSED,double,__NOTHROW_NCX,nextup,(double __x),(__x))
+#ifdef __CRT_HAVE_nextdownf
+__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW_NCX,nextdownf,(float __x),(__x))
+#elif defined(__CRT_HAVE_nextdown)
+#include <libc/local/math/nextdownf.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(nextdownf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL nextdownf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextdownf))(__x); })
+#endif /* ... */
+#ifdef __CRT_HAVE_nextupf
+__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW_NCX,nextupf,(float __x),(__x))
+#elif defined(__CRT_HAVE_nextup)
+#include <libc/local/math/nextupf.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(nextupf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL nextupf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextupf))(__x); })
+#endif /* ... */
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+#ifdef __CRT_HAVE_nextdownl
+__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,nextdownl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_nextdown)
+#include <libc/local/math/nextdownl.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(nextdownl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL nextdownl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextdownl))(__x); })
+#endif /* ... */
+#ifdef __CRT_HAVE_nextupl
+__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,nextupl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_nextup)
+#include <libc/local/math/nextupl.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(nextupl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL nextupl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextupl))(__x); })
+#endif /* ... */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
+__CDECLARE_OPT(__ATTR_WUNUSED,long int,__NOTHROW_NCX,llogb,(double __x),(__x))
+__CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,roundeven,(double __x),(__x))
+__CDECLARE_OPT(__ATTR_WUNUSED,__INTMAX_TYPE__,__NOTHROW_NCX,fromfp,(double __x, int __round, unsigned int __width),(__x,__round,__width))
+__CDECLARE_OPT(__ATTR_WUNUSED,__UINTMAX_TYPE__,__NOTHROW_NCX,ufromfp,(double __x, int __round, unsigned int __width),(__x,__round,__width))
+__CDECLARE_OPT(__ATTR_WUNUSED,__INTMAX_TYPE__,__NOTHROW_NCX,fromfpx,(double __x, int __round, unsigned int __width),(__x,__round,__width))
+__CDECLARE_OPT(__ATTR_WUNUSED,__UINTMAX_TYPE__,__NOTHROW_NCX,ufromfpx,(double __x, int __round, unsigned int __width),(__x,__round,__width))
+__CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,fmaxmag,(double __x, double __y),(__x,__y))
+__CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,fminmag,(double __x, double __y),(__x,__y))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,canonicalize,(double *__cx, double const *__x),(__cx,__x))
+#ifdef __CRT_HAVE_llogbf
+__CDECLARE(__ATTR_WUNUSED,long int,__NOTHROW_NCX,llogbf,(float __x),(__x))
+#elif defined(__CRT_HAVE_llogb)
+#include <libc/local/math/llogbf.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(llogbf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED long int __NOTHROW_NCX(__LIBCCALL llogbf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llogbf))(__x); })
+#endif /* ... */
+#ifdef __CRT_HAVE_roundevenf
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW_NCX,roundevenf,(float __x),(__x))
+#elif defined(__CRT_HAVE_roundeven)
+#include <libc/local/math/roundevenf.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(roundevenf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL roundevenf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundevenf))(__x); })
+#endif /* ... */
+#ifdef __CRT_HAVE_fromfpf
+__CDECLARE(__ATTR_WUNUSED,__INTMAX_TYPE__,__NOTHROW_NCX,fromfpf,(float __x, int __roundf, unsigned int __width),(__x,__roundf,__width))
+#elif defined(__CRT_HAVE_fromfp)
+#include <libc/local/math/fromfpf.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(fromfpf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __INTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL fromfpf)(float __x, int __roundf, unsigned int __width) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fromfpf))(__x, __roundf, __width); })
+#endif /* ... */
+#ifdef __CRT_HAVE_ufromfpf
+__CDECLARE(__ATTR_WUNUSED,__UINTMAX_TYPE__,__NOTHROW_NCX,ufromfpf,(float __x, int __roundf, unsigned int __width),(__x,__roundf,__width))
+#elif defined(__CRT_HAVE_ufromfp)
+#include <libc/local/math/ufromfpf.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(ufromfpf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL ufromfpf)(float __x, int __roundf, unsigned int __width) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ufromfpf))(__x, __roundf, __width); })
+#endif /* ... */
+#ifdef __CRT_HAVE_fromfpxf
+__CDECLARE(__ATTR_WUNUSED,__INTMAX_TYPE__,__NOTHROW_NCX,fromfpxf,(float __x, int __roundf, unsigned int __width),(__x,__roundf,__width))
+#elif defined(__CRT_HAVE_fromfpx)
+#include <libc/local/math/fromfpxf.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(fromfpxf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __INTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL fromfpxf)(float __x, int __roundf, unsigned int __width) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fromfpxf))(__x, __roundf, __width); })
+#endif /* ... */
+#ifdef __CRT_HAVE_ufromfpxf
+__CDECLARE(__ATTR_WUNUSED,__UINTMAX_TYPE__,__NOTHROW_NCX,ufromfpxf,(float __x, int __roundf, unsigned int __width),(__x,__roundf,__width))
+#elif defined(__CRT_HAVE_ufromfpx)
+#include <libc/local/math/ufromfpxf.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(ufromfpxf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL ufromfpxf)(float __x, int __roundf, unsigned int __width) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ufromfpxf))(__x, __roundf, __width); })
+#endif /* ... */
+#ifdef __CRT_HAVE_fmaxmagf
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW_NCX,fmaxmagf,(float __x, float __y),(__x,__y))
+#elif defined(__CRT_HAVE_fmaxmag)
+#include <libc/local/math/fmaxmagf.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(fmaxmagf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL fmaxmagf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaxmagf))(__x, __y); })
+#endif /* ... */
+#ifdef __CRT_HAVE_fminmagf
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW_NCX,fminmagf,(float __x, float __y),(__x,__y))
+#elif defined(__CRT_HAVE_fminmag)
+#include <libc/local/math/fminmagf.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(fminmagf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL fminmagf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fminmagf))(__x, __y); })
+#endif /* ... */
+#ifdef __CRT_HAVE_canonicalizef
+__CDECLARE(,int,__NOTHROW_NCX,canonicalizef,(float *__cx, float const *__x),(__cx,__x))
+#elif defined(__CRT_HAVE_canonicalize)
+#include <libc/local/math/canonicalizef.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(canonicalizef, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL canonicalizef)(float *__cx, float const *__x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(canonicalizef))(__cx, __x); })
+#endif /* ... */
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+#ifdef __CRT_HAVE_llogbl
+__CDECLARE(__ATTR_WUNUSED,long int,__NOTHROW_NCX,llogbl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_llogb)
+#include <libc/local/math/llogbl.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(llogbl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED long int __NOTHROW_NCX(__LIBCCALL llogbl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llogbl))(__x); })
+#endif /* ... */
+#ifdef __CRT_HAVE_roundevenl
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,roundevenl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_roundeven)
+#include <libc/local/math/roundevenl.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(roundevenl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL roundevenl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundevenl))(__x); })
+#endif /* ... */
+#ifdef __CRT_HAVE_fromfpl
+__CDECLARE(__ATTR_WUNUSED,__INTMAX_TYPE__,__NOTHROW_NCX,fromfpl,(__LONGDOUBLE __x, int __roundl, unsigned int __width),(__x,__roundl,__width))
+#elif defined(__CRT_HAVE_fromfp)
+#include <libc/local/math/fromfpl.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(fromfpl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __INTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL fromfpl)(__LONGDOUBLE __x, int __roundl, unsigned int __width) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fromfpl))(__x, __roundl, __width); })
+#endif /* ... */
+#ifdef __CRT_HAVE_ufromfpl
+__CDECLARE(__ATTR_WUNUSED,__UINTMAX_TYPE__,__NOTHROW_NCX,ufromfpl,(__LONGDOUBLE __x, int __roundl, unsigned int __width),(__x,__roundl,__width))
+#elif defined(__CRT_HAVE_ufromfp)
+#include <libc/local/math/ufromfpl.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(ufromfpl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL ufromfpl)(__LONGDOUBLE __x, int __roundl, unsigned int __width) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ufromfpl))(__x, __roundl, __width); })
+#endif /* ... */
+#ifdef __CRT_HAVE_fromfpxl
+__CDECLARE(__ATTR_WUNUSED,__INTMAX_TYPE__,__NOTHROW_NCX,fromfpxl,(__LONGDOUBLE __x, int __roundl, unsigned int __width),(__x,__roundl,__width))
+#elif defined(__CRT_HAVE_fromfpx)
+#include <libc/local/math/fromfpxl.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(fromfpxl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __INTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL fromfpxl)(__LONGDOUBLE __x, int __roundl, unsigned int __width) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fromfpxl))(__x, __roundl, __width); })
+#endif /* ... */
+#ifdef __CRT_HAVE_ufromfpxl
+__CDECLARE(__ATTR_WUNUSED,__UINTMAX_TYPE__,__NOTHROW_NCX,ufromfpxl,(__LONGDOUBLE __x, int __roundl, unsigned int __width),(__x,__roundl,__width))
+#elif defined(__CRT_HAVE_ufromfpx)
+#include <libc/local/math/ufromfpxl.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(ufromfpxl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL ufromfpxl)(__LONGDOUBLE __x, int __roundl, unsigned int __width) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ufromfpxl))(__x, __roundl, __width); })
+#endif /* ... */
+#ifdef __CRT_HAVE_fmaxmagl
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,fmaxmagl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
+#elif defined(__CRT_HAVE_fmaxmag)
+#include <libc/local/math/fmaxmagl.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(fmaxmagl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL fmaxmagl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaxmagl))(__x, __y); })
+#endif /* ... */
+#ifdef __CRT_HAVE_fminmagl
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,fminmagl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
+#elif defined(__CRT_HAVE_fminmag)
+#include <libc/local/math/fminmagl.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(fminmagl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL fminmagl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fminmagl))(__x, __y); })
+#endif /* ... */
+#ifdef __CRT_HAVE_canonicalizel
+__CDECLARE(,int,__NOTHROW_NCX,canonicalizel,(__LONGDOUBLE *__cx, __LONGDOUBLE const *__x),(__cx,__x))
+#elif defined(__CRT_HAVE_canonicalize)
+#include <libc/local/math/canonicalizel.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(canonicalizel, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL canonicalizel)(__LONGDOUBLE *__cx, __LONGDOUBLE const *__x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(canonicalizel))(__cx, __x); })
+#endif /* ... */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* __USE_GNU || __STDC_WANT_IEC_60559_BFP_EXT__ */
 
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
@@ -13900,11 +14082,41 @@ __NAMESPACE_STD_USING(islessgreater)
 #endif /* __USE_ISOC99 */
 
 
-#ifdef __USE_GNU
+#if defined(__USE_GNU) || defined(__STDC_WANT_IEC_60559_BFP_EXT__)
 #ifndef issignaling
 #define issignaling(x) __FPFUNC(x, __issignalingf, __issignaling, __issignalingl)
 #endif /* !issignaling */
-#endif /* __USE_GNU */
+
+#if !defined(issubnormal) && defined(__FP_SUBNORMAL)
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP11_MATH_H_PROTO_FP)
+#define issubnormal(x) (std::fpclassify(x) == __FP_SUBNORMAL)
+#else /* __cplusplus && __CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
+#define issubnormal(x) (fpclassify(x) == __FP_SUBNORMAL)
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
+#endif /* !issubnormal && __FP_SUBNORMAL */
+
+#ifndef iszero
+#ifdef __SUPPORT_SNAN__
+#ifdef __FP_ZERO
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP11_MATH_H_PROTO_FP)
+#define iszero(x) (std::fpclassify(x) == __FP_ZERO)
+#else /* __cplusplus && __CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
+#define iszero(x) (fpclassify(x) == __FP_ZERO)
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
+#endif /* __FP_ZERO */
+#else /* __SUPPORT_SNAN__ */
+#ifdef __COMPILER_HAVE_TYPEOF
+#define iszero(x) (((__typeof__(x))(x)) == 0)
+#else /* __COMPILER_HAVE_TYPEOF */
+#define iszero(x) ((x) == 0)
+#endif /* !__COMPILER_HAVE_TYPEOF */
+#endif /* !__SUPPORT_SNAN__ */
+#endif /* !iszero */
+
+#ifndef iseqsig
+#define iseqsig(x, y) __FPFUNC2(x, y, __iseqsigf, __iseqsig, __iseqsigl)
+#endif /* !iseqsig */
+#endif /* __USE_GNU || __STDC_WANT_IEC_60559_BFP_EXT__ */
 
 
 #ifdef __USE_MISC

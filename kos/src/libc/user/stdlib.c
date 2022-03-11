@@ -224,6 +224,60 @@ NOTHROW(LIBCCALL libc_rand)(void)
 }
 /*[[[end:libc_rand]]]*/
 
+/*[[[head:libc_strfromd,hash:CRC-32=0xb6e8d74]]]*/
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((3)) __STDC_INT32_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc_strfromd)(char *__restrict buf,
+                                    size_t buflen,
+                                    char const *__restrict format,
+                                    double fp)
+/*[[[body:libc_strfromd]]]*/
+/*AUTO*/{
+	(void)buf;
+	(void)buflen;
+	(void)format;
+	(void)fp;
+	CRT_UNIMPLEMENTEDF("strfromd(%q, %Ix, %q, %f)", buf, buflen, format, fp); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:libc_strfromd]]]*/
+
+/*[[[head:libc_strfromf,hash:CRC-32=0x78dd512c]]]*/
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((3)) __STDC_INT32_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc_strfromf)(char *__restrict buf,
+                                    size_t buflen,
+                                    char const *__restrict format,
+                                    float fp)
+/*[[[body:libc_strfromf]]]*/
+/*AUTO*/{
+	(void)buf;
+	(void)buflen;
+	(void)format;
+	(void)fp;
+	CRT_UNIMPLEMENTEDF("strfromf(%q, %Ix, %q, %f)", buf, buflen, format, fp); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:libc_strfromf]]]*/
+
+/*[[[head:libc_strfroml,hash:CRC-32=0xedf4516d]]]*/
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((3)) __STDC_INT32_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc_strfroml)(char *__restrict buf,
+                                    size_t buflen,
+                                    char const *__restrict format,
+                                    __LONGDOUBLE fp)
+/*[[[body:libc_strfroml]]]*/
+/*AUTO*/{
+	(void)buf;
+	(void)buflen;
+	(void)format;
+	(void)fp;
+	CRT_UNIMPLEMENTEDF("strfroml(%q, %Ix, %q, %lf)", buf, buflen, format, fp); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:libc_strfroml]]]*/
+
 /*[[[head:libc_rand_r,hash:CRC-32=0x50bd9f7e]]]*/
 INTERN ATTR_SECTION(".text.crt.random") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_rand_r)(unsigned int *__restrict pseed)
@@ -3121,7 +3175,7 @@ NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x26d3077e]]]*/
+/*[[[start:exports,hash:CRC-32=0x27e23229]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$getenv, libd_getenv);
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
@@ -3138,6 +3192,9 @@ DEFINE_PUBLIC_ALIAS(_exit, libc__Exit);
 DEFINE_PUBLIC_ALIAS(_Exit, libc__Exit);
 DEFINE_PUBLIC_ALIAS(srand, libc_srand);
 DEFINE_PUBLIC_ALIAS(rand, libc_rand);
+DEFINE_PUBLIC_ALIAS(strfromd, libc_strfromd);
+DEFINE_PUBLIC_ALIAS(strfromf, libc_strfromf);
+DEFINE_PUBLIC_ALIAS(strfroml, libc_strfroml);
 DEFINE_PUBLIC_ALIAS(rand_r, libc_rand_r);
 DEFINE_PUBLIC_ALIAS(drand48_r, libc_drand48_r);
 DEFINE_PUBLIC_ALIAS(erand48_r, libc_erand48_r);

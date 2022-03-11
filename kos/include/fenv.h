@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32f38e74 */
+/* HASH CRC-32:0x2ca9214a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -397,6 +397,18 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,fegetexcept,(void),())
 __NAMESPACE_LOCAL_USING_OR_IMPL(fegetexcept, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW(__LIBCCALL fegetexcept)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fegetexcept))(); })
 #endif /* !... */
 #endif /* __USE_GNU */
+
+#if defined(__USE_GNU) || defined(__STDC_WANT_IEC_60559_BFP_EXT__)
+typedef unsigned int femode_t;
+#define FE_DFL_MODE ((femode_t const *)-1)
+__CDECLARE_OPT(,int,__NOTHROW_NCX,fesetexcept,(int __excepts),(__excepts))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,fetestexceptflag,(fexcept_t const *__flagp, int __excepts),(__flagp,__excepts))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,fegetmode,(femode_t *__modep),(__modep))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,fesetmode,(femode_t const *__modep),(__modep))
+#if defined(FE_INVALID) && defined(__SUPPORT_SNAN__)
+#define FE_SNANS_ALWAYS_SIGNAL 1
+#endif /* FE_INVALID && __SUPPORT_SNAN__ */
+#endif /* __USE_GNU || __STDC_WANT_IEC_60559_BFP_EXT__ */
 
 __SYSDECL_END
 #endif /* __CC__ */

@@ -204,9 +204,11 @@
 
 #ifdef __USE_ISOC99
 #include <asm/crt/fp_type.h>  /* __FP_NAN, __FP_INFINITE, ... */
-#include <bits/crt/mathdef.h> /* __FLT_EVAL_METHOD__, __FP_ILOGB0, __FP_ILOGBNAN */
 #include <libm/fcomp.h>
 #endif /* __USE_ISOC99 */
+#if defined(__USE_ISOC99) || defined(__USE_GNU) || defined(__STDC_WANT_IEC_60559_BFP_EXT__)
+#include <bits/crt/mathdef.h> /* __FLT_EVAL_METHOD__, __FP_ILOGB0, __FP_ILOGBNAN */
+#endif /* __USE_ISOC99 || __USE_GNU || __STDC_WANT_IEC_60559_BFP_EXT__ */
 
 #ifdef __USE_MISC
 #include <asm/crt/math-exception.h>
@@ -297,6 +299,36 @@
 
 #endif /* __USE_ISOC99 */
 
+#if defined(__USE_GNU) || defined(__STDC_WANT_IEC_60559_BFP_EXT__)
+#if !defined(SNANF) && defined(__SNANF)
+#define SNANF __SNANF
+#endif /* !SNANF && __SNANF */
+#if !defined(SNAN) && defined(__SNAN)
+#define SNAN  __SNAN
+#endif /* !SNAN && __SNAN */
+#if !defined(SNANL) && defined(__SNANL)
+#define SNANL __SNANL
+#endif /* !SNANL && __SNANL */
+/* TODO: Define `__FP_LOGB0_IS_MIN' in `<bits/crt/mathdef.h>' */
+#ifdef __FP_LOGB0_IS_MIN
+#define FP_LLOGB0 (-__LONG_MAX__ - 1)
+#else /* __FP_LOGB0_IS_MIN */
+#define FP_LLOGB0 (-__LONG_MAX__)
+#endif /* !__FP_LOGB0_IS_MIN */
+/* TODO: Define `__FP_LOGBNAN_IS_MIN' in `<bits/crt/mathdef.h>' */
+#ifdef __FP_LOGBNAN_IS_MIN
+#define FP_LLOGBNAN (-__LONG_MAX__ - 1)
+#else /* __FP_LOGBNAN_IS_MIN */
+#define FP_LLOGBNAN __LONG_MAX__
+#endif /* !__FP_LOGBNAN_IS_MIN */
+
+/* Possible values for `round' argument of `fromfp(3)' and friends. */
+#define FP_INT_UPWARD            0
+#define FP_INT_DOWNWARD          1
+#define FP_INT_TOWARDZERO        2
+#define FP_INT_TONEARESTFROMZERO 3
+#define FP_INT_TONEAREST         4
+#endif /* __USE_GNU || __STDC_WANT_IEC_60559_BFP_EXT__ */
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -2693,7 +2725,7 @@ __signbitl(*) %{generate(double2ldouble("__signbit"))}
 %#endif /* __USE_ISOC99 */
 
 %
-%#ifdef __USE_GNU
+%#if defined(__USE_GNU) || defined(__STDC_WANT_IEC_60559_BFP_EXT__)
 @@>> issignaling(3), __issignalingf(3), __issignaling(3), __issignalingl(3)
 [[const, wunused, nothrow, preferred_export_alias("issignaling")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/issignaling.h>")]]
@@ -2717,7 +2749,68 @@ __issignalingf(*) %{generate(double2float("__issignaling"))}
 [[preferred_export_alias("issignalingl")]]
 __issignalingl(*) %{generate(double2ldouble("__issignaling"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%#endif /* __USE_GNU */
+
+
+%
+%#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
+[[wunused]] double nextdown(double x); /* TODO */
+
+[[wunused]] double nextup(double x); /* TODO */
+
+nextdownf(*) %{generate(double2float("nextdown"))}
+nextupf(*) %{generate(double2float("nextup"))}
+%#ifdef __COMPILER_HAVE_LONGDOUBLE
+nextdownl(*) %{generate(double2ldouble("nextdown"))}
+nextupl(*) %{generate(double2ldouble("nextup"))}
+%#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
+
+[[wunused]] long int llogb(double x); /* TODO */
+
+[[const, wunused]] double roundeven(double x); /* TODO */
+
+[[wunused, decl_include("<hybrid/typecore.h>")]]
+$intmax_t fromfp(double x, int round, unsigned int width); /* TODO */
+
+[[wunused, decl_include("<hybrid/typecore.h>")]]
+$uintmax_t ufromfp(double x, int round, unsigned int width); /* TODO */
+
+[[wunused, decl_include("<hybrid/typecore.h>")]]
+$intmax_t fromfpx(double x, int round, unsigned int width); /* TODO */
+
+[[wunused, decl_include("<hybrid/typecore.h>")]]
+$uintmax_t ufromfpx(double x, int round, unsigned int width); /* TODO */
+
+[[const, wunused]] double fmaxmag(double x, double y); /* TODO */
+
+[[const, wunused]] double fminmag(double x, double y); /* TODO */
+
+int canonicalize(double *cx, double const *x); /* TODO */
+
+llogbf(*) %{generate(double2float("llogb"))}
+roundevenf(*) %{generate(double2float("roundeven"))}
+fromfpf(*) %{generate(double2float("fromfp"))}
+ufromfpf(*) %{generate(double2float("ufromfp"))}
+fromfpxf(*) %{generate(double2float("fromfpx"))}
+ufromfpxf(*) %{generate(double2float("ufromfpx"))}
+fmaxmagf(*) %{generate(double2float("fmaxmag"))}
+fminmagf(*) %{generate(double2float("fminmag"))}
+canonicalizef(*) %{generate(double2float("canonicalize"))}
+%#ifdef __COMPILER_HAVE_LONGDOUBLE
+llogbl(*) %{generate(double2ldouble("llogb"))}
+roundevenl(*) %{generate(double2ldouble("roundeven"))}
+fromfpl(*) %{generate(double2ldouble("fromfp"))}
+ufromfpl(*) %{generate(double2ldouble("ufromfp"))}
+fromfpxl(*) %{generate(double2ldouble("fromfpx"))}
+ufromfpxl(*) %{generate(double2ldouble("ufromfpx"))}
+fmaxmagl(*) %{generate(double2ldouble("fmaxmag"))}
+fminmagl(*) %{generate(double2ldouble("fminmag"))}
+canonicalizel(*) %{generate(double2ldouble("canonicalize"))}
+%#endif /* __COMPILER_HAVE_LONGDOUBLE */
+
+
+
+%#endif /* __USE_GNU || __STDC_WANT_IEC_60559_BFP_EXT__ */
 
 @@>> _fdpcomp(3), _dpcomp(3), _ldpcomp(3)
 [[ignore, const, wunused]]
@@ -3337,11 +3430,41 @@ __NAMESPACE_STD_USING(islessgreater)
 #endif /* __USE_ISOC99 */
 
 
-#ifdef __USE_GNU
+#if defined(__USE_GNU) || defined(__STDC_WANT_IEC_60559_BFP_EXT__)
 #ifndef issignaling
 #define issignaling(x) __FPFUNC(x, __issignalingf, __issignaling, __issignalingl)
 #endif /* !issignaling */
-#endif /* __USE_GNU */
+
+#if !defined(issubnormal) && defined(__FP_SUBNORMAL)
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP11_MATH_H_PROTO_FP)
+#define issubnormal(x) (std::fpclassify(x) == __FP_SUBNORMAL)
+#else /* __cplusplus && __CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
+#define issubnormal(x) (fpclassify(x) == __FP_SUBNORMAL)
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
+#endif /* !issubnormal && __FP_SUBNORMAL */
+
+#ifndef iszero
+#ifdef __SUPPORT_SNAN__
+#ifdef __FP_ZERO
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP11_MATH_H_PROTO_FP)
+#define iszero(x) (std::fpclassify(x) == __FP_ZERO)
+#else /* __cplusplus && __CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
+#define iszero(x) (fpclassify(x) == __FP_ZERO)
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
+#endif /* __FP_ZERO */
+#else /* __SUPPORT_SNAN__ */
+#ifdef __COMPILER_HAVE_TYPEOF
+#define iszero(x) (((__typeof__(x))(x)) == 0)
+#else /* __COMPILER_HAVE_TYPEOF */
+#define iszero(x) ((x) == 0)
+#endif /* !__COMPILER_HAVE_TYPEOF */
+#endif /* !__SUPPORT_SNAN__ */
+#endif /* !iszero */
+
+#ifndef iseqsig
+#define iseqsig(x, y) __FPFUNC2(x, y, __iseqsigf, __iseqsig, __iseqsigl)
+#endif /* !iseqsig */
+#endif /* __USE_GNU || __STDC_WANT_IEC_60559_BFP_EXT__ */
 
 
 #ifdef __USE_MISC
