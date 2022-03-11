@@ -1,0 +1,304 @@
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import ipc;
+import optimizeForIfdef, optimizeForEndif from ....misc.libgen.c.ppexpr;
+
+function loadSymbolsFromFile(filename: string | {string...}): {string...} {
+	if (filename !is string) {
+		local result = none;
+		for (local file: filename) {
+			local syms = loadSymbolsFromFile(file);
+			if (result is none)
+				result = syms;
+			else {
+				for (local sym: syms)
+					result.insert(sym);
+			}
+		}
+		if (result is none)
+			result = HashSet();
+		return result;
+	}
+	print File.stderr: "Scanning file:", repr filename;
+	local proc = ipc.Process("cmd", ["/c", "dumpbin /EXPORTS " + filename]);
+	local r, w = ipc.Pipe.new()...;
+	proc.stdout = w;
+	proc.start();
+	w.close();
+	local text = r.read();
+	while (local part = r.read())
+		text += part;
+	r.close();
+	local ecode = proc.join();
+	if (ecode != 0)
+		throw Error("dumpbin failed with " + ecode);
+	local symbols = HashSet();
+	final local START_MARKER = "ordinal hint RVA      name";
+	local start = text.index(START_MARKER) + #START_MARKER;
+	for (local line: text[start:].splitlines(false)) {
+		local name;
+		try {
+			none, none, none, name = line.scanf(" %[^ ] %[^ ] %[^ ] %[^]")...;
+		} catch (...) {
+			continue;
+		}
+		name = name.strip();
+		if (name.startswith("_o_")) {
+			/* Ignore these symbols.
+			 * They appear in ucrtbase and there's like a million of them.
+			 * -> I think these are internal overrides for profiling?
+			 * Whatever... */
+			continue;
+		}
+		symbols.insert(name);
+	}
+	return symbols;
+}
+
+global final MSVCRT_VERSION_FILES: {int: string} = {
+	0x03000000 + 0   : "C:\\Windows\\SysWOW64\\msvcrt.dll",
+	0x83000000 + 0   : "C:\\Windows\\System32\\msvcrt.dll",
+	0x01000000 + 100 : "C:\\Windows\\SysWOW64\\msvcr100.dll",
+	0x81000000 + 100 : "C:\\Windows\\System32\\msvcr100.dll",
+	0x02000000 + 100 : "E:\\c\\msvcr\\x32\\msvcr100d.dll",
+	0x82000000 + 100 : "E:\\c\\msvcr\\x64\\msvcr100d.dll",
+	0x01000000 + 120 : "C:\\Windows\\SysWOW64\\msvcr120.dll",
+	0x81000000 + 120 : "C:\\Windows\\System32\\msvcr120.dll",
+	0x02000000 + 120 : "E:\\c\\msvcr\\x32\\msvcr120d.dll",
+	0x82000000 + 120 : "E:\\c\\msvcr\\x64\\msvcr120d.dll",
+	0x01000000 + 140 : {
+		"C:\\Windows\\System32\\ucrtbase.dll",
+		"C:\\Windows\\System32\\vcruntime140.dll",
+	},
+	0x81000000 + 140 : {
+		"C:\\Windows\\SysWOW64\\ucrtbase.dll",
+		"C:\\Windows\\SysWOW64\\vcruntime140.dll",
+	},
+	0x02000000 + 140 : {
+		"C:\\Windows\\System32\\ucrtbased.dll",
+		"C:\\Windows\\System32\\vcruntime140d.dll",
+	},
+	0x82000000 + 140 : {
+		"C:\\Windows\\SysWOW64\\ucrtbased.dll",
+		"C:\\Windows\\SysWOW64\\vcruntime140d.dll",
+	},
+};
+global final KNOWN_VERSION = (for (local v: MSVCRT_VERSION_FILES.keys) v & 0xffff).sorted();
+global final KNOWN_VERSION_MIN = KNOWN_VERSION < ...;
+global final KNOWN_VERSION_MAX = KNOWN_VERSION > ...;
+
+local symbolsByVersion: {int: HashSet with string} = Dict(
+	for (local ver, filename: MSVCRT_VERSION_FILES)
+		(ver, loadSymbolsFromFile(filename)));
+
+local symbolsAndVersions: {string: {int...}} = Dict();
+for (local ver, symbols: symbolsByVersion) {
+	for (local sym: symbols) {
+		local vers = symbolsAndVersions.get(sym);
+		if (vers is none)
+			symbolsAndVersions[sym] = vers = HashSet();
+		vers.insert(ver);
+	}
+}
+
+@@Return the min/max version for which @vers is valid.
+@@If @vers is more complicated than that, return @none
+function getMinMaxVersionFor(vers: {int...}): (int, int) | none {
+	local minVer = none;
+	local maxVer = none;
+	local didFindGapAfterMinVer = false;
+	for (local ver: KNOWN_VERSION) {
+		if (ver in vers) {
+			if (didFindGapAfterMinVer)
+				return none; /* Too complicated. */
+			if (minVer is none)
+				minVer = ver;
+			maxVer = ver;
+		} else {
+			if (minVer !is none)
+				didFindGapAfterMinVer = true;
+		}
+	}
+	if (minVer is none)
+		return none;
+	return (minVer, maxVer);
+}
+
+function getPpCondForArchVersions(vers: {int...}): string {
+	if (!vers)
+		return "0";
+	if (#vers == #KNOWN_VERSION)
+		return "1";
+	local min, max = getMinMaxVersionFor(vers)...;
+	if (min !is none) {
+		if (max == KNOWN_VERSION_MAX) {
+			if (min == KNOWN_VERSION_MIN)
+				return "1";
+			return "__MSCVCRT_VERSION__ >= {}".format({ min });
+		}
+		if (min == max)
+			return "__MSCVCRT_VERSION__ == {}".format({ min });
+		return "__MSCVCRT_VERSION__ >= {} && __MSCVCRT_VERSION__ <= {}"
+			.format({ min, max });
+	}
+	return " || ".join(for (local ver: vers)
+		"__MSCVCRT_VERSION__ {} {}".format({ ver == KNOWN_VERSION_MAX ? ">=" : "==", ver }));
+}
+
+function mergeConditions(bIf: string, aCond: string, bCond: string): string {
+	if (aCond == bCond)
+		return aCond;
+	if (aCond == "0") {
+		if (bCond == "1")
+			return bIf;
+		return "({}) && ({})".format({ bIf, bCond });
+	}
+	if (bCond == "0") {
+		if (aCond == "1")
+			return "!({})".format({ bIf });
+		return "!({}) && ({})".format({ bIf, aCond });
+	}
+	if (aCond == "1")
+		return "!({}) || ({})".format({ bIf, bCond });
+	if (bCond == "1")
+		return "({}) || ({})".format({ bIf, aCond });
+	return "(({}) ? ({}) : ({}))" .format({ bIf, bCond, aCond });
+}
+
+function getPpCondForVersions(vers: {int...}): string {
+	local x32r_versions = List(for (local v: vers) if ((v & 0x81000000) == 0x01000000) v & 0xffff);
+	local x32d_versions = List(for (local v: vers) if ((v & 0x82000000) == 0x02000000) v & 0xffff);
+	local x64r_versions = List(for (local v: vers) if ((v & 0x81000000) == 0x81000000) v & 0xffff);
+	local x64d_versions = List(for (local v: vers) if ((v & 0x82000000) == 0x82000000) v & 0xffff);
+	x32r_versions.sort();
+	x32d_versions.sort();
+	x64r_versions.sort();
+	x64d_versions.sort();
+	local x32r_cond = getPpCondForArchVersions(x32r_versions);
+	local x32d_cond = getPpCondForArchVersions(x32d_versions);
+	local x64r_cond = getPpCondForArchVersions(x64r_versions);
+	local x64d_cond = getPpCondForArchVersions(x64d_versions);
+	local x32_cond = mergeConditions("defined(_DEBUG)", x32r_cond, x32d_cond);
+	local x64_cond = mergeConditions("defined(_DEBUG)", x64r_cond, x64d_cond);
+	return mergeConditions("defined(__x86_64__)", x32_cond, x64_cond);
+}
+
+function escapeSymbolName(name: string): string {
+	return name.replace("?", "$Q").replace("@", "$A");
+}
+
+
+@@Mapping from symbol names to preprocessor conditions
+local symbolsByPpCond: {string: {string...}} = Dict();
+for (local sym, vers: symbolsAndVersions) {
+	local cond = getPpCondForVersions(vers);
+	local set = symbolsByPpCond.get(cond);
+	if (set is none)
+		symbolsByPpCond[cond] = set = HashSet();
+	set.insert(escapeSymbolName(sym));
+}
+
+function printSymbolSet(symbols: {string...}) {
+	symbols = symbols.sorted();
+	local dollarSymbols = [];
+	for (local sym: symbols) {
+		if ("$" in sym) {
+			dollarSymbols.append(sym);
+		} else {
+			print("#define __CRT_HAVE_", sym);
+		}
+	}
+	if (dollarSymbols) {
+		print("#ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL");
+		for (local sym: dollarSymbols)
+			print("#define __CRT_HAVE_", sym);
+		print("#endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */");
+	}
+}
+
+print("\
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+#include <hybrid/host.h> /* For `__x86_64__' */
+
+/*
+ * Select VCRT version.
+ *
+ * VCRT version:
+ *         _DEBUG                             _RELEASE
+ *    0:   msvcrt.dll                         -
+ *    100: msvcr100.dll                       msvcr100d.dll
+ *    120: msvcr120.dll                       msvcr120d.dll
+ *    140: ucrtbase.dll, vcruntime140.dll     ucrtbased.dll, vcruntime140d.dll
+ *
+ * TODO: There are some missing versions between 0 and 100
+ * XXX: The `_MSC_VER'-based checks have not really been tested/confirmed
+ * XXX: I was unable to find the x64 \"msvcr100d.dll\", so below acts like
+ *      that file was  exporting the  same symbols as  the x32  variant. */
+#ifndef __MSCVCRT_VERSION__
+#ifdef __TINYC__
+#define __MSCVCRT_VERSION__ 0   /* msvcrt.dll */
+#elif !defined(_MSC_VER)
+#define __MSCVCRT_VERSION__ 0   /* msvcrt.dll */
+#elif _MSC_VER >= 1900
+#define __MSCVCRT_VERSION__ 140 /* ucrtbase.dll, vcruntime140.dll  (VS 2015) */
+#elif _MSC_VER >= 1800
+#define __MSCVCRT_VERSION__ 120 /* msvcr120.dll  (VS 2013) */
+#elif _MSC_VER >= 1600
+#define __MSCVCRT_VERSION__ 100 /* msvcr100.dll  (VS 2010) */
+#else /* ... */
+#define __MSCVCRT_VERSION__ 0   /* msvcrt.dll */
+#endif /* !... */
+#endif /* !__MSCVCRT_VERSION__ */
+
+/************************************************************************/");
+
+/* Print condition tables based on version */
+printSymbolSet(symbolsByPpCond.get("1", {}));
+
+/* Print All of the other tables */
+for (local ppCond: symbolsByPpCond.keys.sorted()) {
+	if (ppCond == "1")
+		continue; /* Already printed. */
+	print(optimizeForIfdef(ppCond)),;
+	printSymbolSet(symbolsByPpCond[ppCond]);
+	print(optimizeForEndif(ppCond)),;
+}
+

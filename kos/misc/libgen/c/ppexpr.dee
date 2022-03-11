@@ -1576,11 +1576,17 @@ function optimize(expr: string, assumedExpr: string = none): string {
 function optimizeForIfdef(expr: string): string {
 	local result = optimize(expr);
 	if (result.startswith("defined(") && result.endswith(")") &&
-	    result.findmatch("(", ")", 8) == #result - 1)
-		return "#ifdef {}\n".format({ result[8:-1].strip() });
+	    result.findmatch("(", ")", 8) == #result - 1) {
+		local definedName = result[8:-1].strip();
+		if (definedName.issymbol())
+			return "#ifdef {}\n".format({  });
+	}
 	if (expr.startswith("!defined(") && expr.endswith(")") &&
-	    expr.findmatch("(", ")", 9) == #expr - 1)
-		return "#ifndef {}\n".format({ result[8:-1].strip() });
+	    expr.findmatch("(", ")", 9) == #expr - 1) {
+		local definedName = result[9:-1].strip();
+		if (definedName.issymbol())
+			return "#ifndef {}\n".format({ definedName });
+	}
 	return "#if {}\n".format({ result });
 }
 
