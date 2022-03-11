@@ -371,7 +371,7 @@ void _lockop_reap_ex([[nonnull]] struct lockop_slist *__restrict self,
 #undef __LOCAL_obj
 #define __LOCAL_trylock() (*trylock)(cookie)
 #define __LOCAL_unlock()  (*unlock)(cookie)
-#include <libc/template/lockop.h>
+@#include <libc/template/lockop.h>@
 #endif /* !__INTELLISENSE__ */
 }
 
@@ -390,7 +390,7 @@ void _oblockop_reap_ex([[nonnull]] struct oblockop_slist *__restrict self,
 #define __LOCAL_obj       obj
 #define __LOCAL_trylock() (*trylock)(cookie)
 #define __LOCAL_unlock()  (*unlock)(cookie)
-#include <libc/template/lockop.h>
+@#include <libc/template/lockop.h>@
 #endif /* !__INTELLISENSE__ */
 }
 
@@ -442,7 +442,7 @@ void _lockop_reap_atomic_lock([[nonnull]] struct lockop_slist *__restrict self,
 #undef __LOCAL_obj
 #define __LOCAL_trylock() @atomic_lock_tryacquire@(lock)
 #define __LOCAL_unlock()  @atomic_lock_release@(lock)
-#include <libc/template/lockop.h>
+@#include <libc/template/lockop.h>@
 #endif /* !__INTELLISENSE__ */
 }
 
@@ -461,7 +461,7 @@ void _oblockop_reap_atomic_lock([[nonnull]] struct oblockop_slist *__restrict se
 #define __LOCAL_obj       obj
 #define __LOCAL_trylock() @atomic_lock_tryacquire@(lock)
 #define __LOCAL_unlock()  @atomic_lock_release@(lock)
-#include <libc/template/lockop.h>
+@#include <libc/template/lockop.h>@
 #endif /* !__INTELLISENSE__ */
 }
 
@@ -480,7 +480,7 @@ void _lockop_reap_atomic_rwlock([[nonnull]] struct lockop_slist *__restrict self
 #undef __LOCAL_obj
 #define __LOCAL_trylock() @atomic_rwlock_trywrite@(lock)
 #define __LOCAL_unlock()  @atomic_rwlock_endwrite@(lock)
-#include <libc/template/lockop.h>
+@#include <libc/template/lockop.h>@
 #endif /* !__INTELLISENSE__ */
 }
 
@@ -499,7 +499,7 @@ void _oblockop_reap_atomic_rwlock([[nonnull]] struct oblockop_slist *__restrict 
 #define __LOCAL_obj       obj
 #define __LOCAL_trylock() @atomic_rwlock_trywrite@(lock)
 #define __LOCAL_unlock()  @atomic_rwlock_endwrite@(lock)
-#include <libc/template/lockop.h>
+@#include <libc/template/lockop.h>@
 #endif /* !__INTELLISENSE__ */
 }
 
@@ -519,7 +519,7 @@ void _lockop_reap_shared_lock([[nonnull]] struct lockop_slist *__restrict self,
 #undef __LOCAL_obj
 #define __LOCAL_trylock() @shared_lock_tryacquire@(lock)
 #define __LOCAL_unlock()  @shared_lock_release@(lock)
-#include <libc/template/lockop.h>
+@#include <libc/template/lockop.h>@
 #endif /* !__INTELLISENSE__ */
 }
 
@@ -539,7 +539,7 @@ void _oblockop_reap_shared_lock([[nonnull]] struct oblockop_slist *__restrict se
 #define __LOCAL_obj       obj
 #define __LOCAL_trylock() @shared_lock_tryacquire@(lock)
 #define __LOCAL_unlock()  @shared_lock_release@(lock)
-#include <libc/template/lockop.h>
+@#include <libc/template/lockop.h>@
 #endif /* !__INTELLISENSE__ */
 }
 
@@ -558,7 +558,7 @@ void _lockop_reap_shared_rwlock([[nonnull]] struct lockop_slist *__restrict self
 #undef __LOCAL_obj
 #define __LOCAL_trylock() shared_rwlock_trywrite(lock)
 #define __LOCAL_unlock()  shared_rwlock_endwrite(lock)
-#include <libc/template/lockop.h>
+@#include <libc/template/lockop.h>@
 #endif /* !__INTELLISENSE__ */
 }
 
@@ -577,7 +577,7 @@ void _oblockop_reap_shared_rwlock([[nonnull]] struct oblockop_slist *__restrict 
 #define __LOCAL_obj       obj
 #define __LOCAL_trylock() shared_rwlock_trywrite(lock)
 #define __LOCAL_unlock()  shared_rwlock_endwrite(lock)
-#include <libc/template/lockop.h>
+@#include <libc/template/lockop.h>@
 #endif /* !__INTELLISENSE__ */
 }
 

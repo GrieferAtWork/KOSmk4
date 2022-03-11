@@ -22,6 +22,7 @@
 
 #include <__stdinc.h>
 
+#ifndef __NO_FPU
 #include <hybrid/__assert.h>
 #include <hybrid/typecore.h>
 
@@ -31,22 +32,33 @@
 #include <bits/crt/fenv.h>
 #include <kos/kernel/fpu-sstate.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 __LOCAL void (__x86_raise_fpu_invalid)(void) {
 	/* 0.0 / 0.0 */
+#ifdef __TINYC__
+	__asm__ __volatile__("fldz\n\t" /* push {0.0} */
+	                     "fdiv %st(0), %st(0)\n\t"
+	                     "fwait");
+#else /* __TINYC__ */
 	double __temp; /* Needed to force register allocation */
 	__asm__ __volatile__("fldz\n\t" /* push {0.0} */
 	                     "fdiv %%st(0), %%st(0)\n\t"
 	                     "fwait"
 	                     : "=t" (__temp));
 	(void)__temp;
+#endif /* !__TINYC__ */
 }
 
 __LOCAL void (__x86_raise_fpu_divbyzero)(void) {
 	/* 1.0 / 0.0 */
+#ifdef __TINYC__
+	__asm__ __volatile__("fldz\n\t" /* push {0.0} */
+	                     "fld1\n\t" /* push {1.0} */
+	                     "fdiv %st(0), %st(1)\n\t"
+	                     "fwait");
+#else /* __TINYC__ */
 	double __temp; /* Needed to force register allocation */
 	__asm__ __volatile__("fldz\n\t" /* push {0.0} */
 	                     "fld1\n\t" /* push {1.0} */
@@ -54,6 +66,7 @@ __LOCAL void (__x86_raise_fpu_divbyzero)(void) {
 	                     "fwait"
 	                     : "=t" (__temp));
 	(void)__temp;
+#endif /* !__TINYC__ */
 }
 
 __LOCAL void (__x86_raise_fpu_mask)(__UINT16_TYPE__ __mask) {
@@ -77,6 +90,7 @@ __LOCAL void (__x86_raise_fpu_inexact)(void) {
 }
 
 /* @param: EXCEPTS: Set of `FE_*' */
+#define __inline_feraiseexcept __inline_feraiseexcept
 __LOCAL void (__inline_feraiseexcept)(int __excepts) {
 	/* NOTE: The order here is important! */
 	if ((__excepts & FE_INVALID) != 0)
@@ -92,6 +106,7 @@ __LOCAL void (__inline_feraiseexcept)(int __excepts) {
 }
 
 /* @param: EXCEPTS: Set of `FE_*' */
+#define __inline_feclearexcept __inline_feclearexcept
 __LOCAL void __NOTHROW(__inline_feclearexcept)(int __excepts) {
 	struct sfpuenv __env;
 	__excepts &= FE_ALL_EXCEPT;
@@ -106,6 +121,7 @@ __LOCAL void __NOTHROW(__inline_feclearexcept)(int __excepts) {
 	}
 }
 
+#define __inline_fegetenv __inline_fegetenv
 __LOCAL __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__inline_fegetenv)(struct __fenv_struct *__restrict __envp) {
 	__fnstenv((struct sfpuenv *)__envp);
@@ -119,12 +135,14 @@ __NOTHROW_NCX(__inline_fegetenv)(struct __fenv_struct *__restrict __envp) {
 	}
 }
 
+#define __inline_fegetexcept __inline_fegetexcept
 __LOCAL __ATTR_PURE __ATTR_WUNUSED __UINT16_TYPE__
 __NOTHROW(__inline_fegetexcept)(void) {
 	return __fstcw() & FE_ALL_EXCEPT;
 }
 
 /* @return: * : The old set of enabled exceptions. */
+#define __inline_feenableexcept __inline_feenableexcept
 __LOCAL int
 __NOTHROW(__inline_feenableexcept)(int __excepts) {
 	__UINT16_TYPE__ __fcw, __res;
@@ -144,6 +162,7 @@ __NOTHROW(__inline_feenableexcept)(int __excepts) {
 }
 
 /* @return: * : The old set of enabled exceptions. */
+#define __inline_fedisableexcept __inline_fedisableexcept
 __LOCAL int
 __NOTHROW(__inline_fedisableexcept)(int __excepts) {
 	__UINT16_TYPE__ __fcw, __res;
@@ -163,6 +182,7 @@ __NOTHROW(__inline_fedisableexcept)(int __excepts) {
 }
 
 /* @return: * : One of `FE_TONEAREST', `FE_DOWNWARD', `FE_UPWARD', `FE_TOWARDZERO'. */
+#define __inline_fegetround __inline_fegetround
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW(__inline_fegetround)(void) {
 	return __fnstcw() & FCW_RC;
@@ -172,6 +192,7 @@ __NOTHROW(__inline_fegetround)(void) {
 /* @param: ROUNDING_DIRECTION: One of `FE_TONEAREST', `FE_DOWNWARD', `FE_UPWARD', `FE_TOWARDZERO'.
  * @return: 0 : Success
  * @return: 1 : `ROUNDING_DIRECTION' was invalid. */
+#define __inline_fesetround __inline_fesetround
 __LOCAL int
 __NOTHROW(__inline_fesetround)(int __rounding_direction) {
 	__UINT16_TYPE__ __fcw;
@@ -194,6 +215,7 @@ __NOTHROW(__inline_fesetround)(int __rounding_direction) {
 
 /* @param: EXCEPTS: Set of `FE_*'
  * @return: * : Set of `FE_*' */
+#define __inline_fetestexcept __inline_fetestexcept
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW(__inline_fetestexcept)(int __excepts) {
 	__UINT16_TYPE__ __fsw;
@@ -207,6 +229,7 @@ __NOTHROW(__inline_fetestexcept)(int __excepts) {
 	return __fsw & __excepts;
 }
 
+#define __inline_feholdexcept __inline_feholdexcept
 __LOCAL __ATTR_NONNULL((1)) void
 __NOTHROW(__inline_feholdexcept)(struct __fenv_struct *__restrict __envp) {
 	__fnstenv((struct sfpuenv *)__envp);
@@ -225,6 +248,7 @@ __NOTHROW(__inline_feholdexcept)(struct __fenv_struct *__restrict __envp) {
 	}
 }
 
+#define __inline_fesetenv __inline_fesetenv
 __LOCAL __ATTR_NONNULL((1)) void
 __NOTHROW(__inline_fesetenv)(struct __fenv_struct const *__restrict __envp) {
 	struct sfpuenv __temp;
@@ -271,6 +295,7 @@ __NOTHROW(__inline_fesetenv)(struct __fenv_struct const *__restrict __envp) {
 }
 
 
+#define __inline_feupdateenv __inline_feupdateenv
 __LOCAL __ATTR_NONNULL((1)) void
 __NOTHROW(__inline_feupdateenv)(struct __fenv_struct const *__restrict __envp) {
 	__UINT16_TYPE__ __fsw;
@@ -286,10 +311,10 @@ __NOTHROW(__inline_feupdateenv)(struct __fenv_struct const *__restrict __envp) {
 	__inline_feraiseexcept(__fsw);
 }
 
-
-
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
+#endif /* !__NO_FPU */
+
+#include "../../../bits/crt/fenv-inline.h"
 
 #endif /* !_I386_KOS_BITS_CRT_FENV_INLINE_H */

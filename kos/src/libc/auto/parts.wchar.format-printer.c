@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b5147a3 */
+/* HASH CRC-32:0x29717fa3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,6 @@
 #include <kos/types.h>
 #include "parts.wchar.format-printer.h"
 #include "format-printer.h"
-#include "../user/stdio.h"
 #include "../user/stdlib.h"
 #include "../user/string.h"
 #include "../user/unicode.h"

@@ -52,18 +52,11 @@
 //#undef  __NO_PRINTF_POSITIONAL
 //#define __NO_PRINTF_POSITIONAL
 #elif !defined(__CRT_KOS) || !defined(__KOS__)
-#undef __NO_PRINTF_GEN
-#define __NO_PRINTF_GEN
+/* Only disable stuff that would require KOS-specific system interfaces. */
 #undef __NO_PRINTF_DISASM
 #define __NO_PRINTF_DISASM
 #undef __NO_PRINTF_VINFO
 #define __NO_PRINTF_VINFO
-#undef __NO_PRINTF_HEX
-#define __NO_PRINTF_HEX
-#ifndef __CRT_GLC
-#undef __NO_PRINTF_POSITIONAL
-#define __NO_PRINTF_POSITIONAL
-#endif /* !__CRT_GLC */
 #elif defined(__CRT_KOS) && defined(__BUILDING_LIBC)
 /* For compatibility with `_set_printf_count_output(3)',  '%n'
  * can be disabled at runtime  inside of KOS's libc. For  this

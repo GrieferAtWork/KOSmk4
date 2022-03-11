@@ -96,7 +96,8 @@
 #include <crt-features/crt-kos.h>
 #endif /* !__CRT_KOS_KERNEL */
 #endif /* !__BUILDING_LIBC */
-#elif defined(__CRT_CYG_PRIMARY)
+#else /* __CRT_KOS_PRIMARY */
+#if defined(__CRT_CYG_PRIMARY)
 #include <crt-features/crt-cyg.h>
 #elif defined(__CRT_GLC_PRIMARY)
 #include <crt-features/crt-glc.h>
@@ -105,6 +106,10 @@
 #elif defined(__CRT_GENERIC)
 #include <crt-features/generic.h>
 #endif /* ... */
+#ifdef __WANT_KOS_PRINTF
+#include <crt-features/delete-printf.h>
+#endif /* __WANT_KOS_PRINTF */
+#endif /* !__CRT_KOS_PRIMARY */
 
 
 #define __ATTR_LIBC_PRINTF(a, b)      /* nothing */

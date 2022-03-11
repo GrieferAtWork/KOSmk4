@@ -99,8 +99,44 @@ __FORCELOCAL void (__fxrstor)(struct xfpustate const *__restrict __src) { __asm_
 #endif /* !__x86_64__ */
 
 /* Floating point intrinsics. */
-__FORCELOCAL void (__ldmxcsr)(__UINT32_TYPE__ __val) { __asm__ __volatile__("ldmxcsr %0" : : "m" (__val)); }
-__FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__stmxcsr)(void) { __UINT32_TYPE__ __result; __asm__ __volatile__("stmxcsr %0" : "=m" (__result)); return __result; }
+__FORCELOCAL void (__ldmxcsr)(__UINT32_TYPE__ __val) {
+#ifdef __TINYC__
+#ifdef __x86_64__
+	__asm__ __volatile__("pushq %%rax\n"
+	                     ".byte 0x0f, 0xae, 0x14, 0x24\n" /* ldmxcsr 0(%rsp) */
+	                     "popq %%rax\n"
+	                     :
+	                     : "a" (__val));
+#else /* __x86_64__ */
+	__asm__ __volatile__("pushl %%eax\n"
+	                     ".byte 0x0f, 0xae, 0x14, 0x24\n" /* ldmxcsr 0(%esp) */
+	                     "popl %%eax\n"
+	                     :
+	                     : "a" (__val));
+#endif /* !__x86_64__ */
+#else /* __TINYC__ */
+	__asm__ __volatile__("ldmxcsr %0" : : "m"(__val));
+#endif /* !__TINYC__ */
+}
+__FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__stmxcsr)(void) {
+	__UINT32_TYPE__ __result;
+#ifdef __TINYC__
+#ifdef __x86_64__
+	__asm__ __volatile__("pushq %%rax\n"
+	                     ".byte 0x0f, 0xae, 0x1c, 0x24\n" /* stmxcsr 0(%rsp) */
+	                     "popq %%rax\n"
+	                     : "=a" (__result));
+#else /* __x86_64__ */
+	__asm__ __volatile__("pushl %%eax\n"
+	                     ".byte 0x0f, 0xae, 0x1c, 0x24\n" /* stmxcsr 0(%rsp) */
+	                     "popl %%eax\n"
+	                     : "=a" (__result));
+#endif /* !__x86_64__ */
+#else /* __TINYC__ */
+	__asm__ __volatile__("stmxcsr %0" : "=m"(__result));
+#endif /* !__TINYC__ */
+	return __result;
+}
 __FORCELOCAL void (__clts)(void) { __asm__ __volatile__("clts"); }
 __FORCELOCAL void (__fwait)(void) { __asm__ __volatile__("fwait" : : : "memory"); }
 

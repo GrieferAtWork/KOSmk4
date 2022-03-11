@@ -141,20 +141,20 @@ $ssize_t format_wrepeat([[nonnull]] pwformatprinter printer, void *arg,
 [[impl_include("<libc/string.h>", "<libc/errno.h>")]]
 [[impl_include("<hybrid/__assert.h>", "<hybrid/__alloca.h>")]]
 [[impl_prefix(
-#ifndef __NO_PRINTF_DISASM
-#if !defined(__KERNEL__) || !defined(__KOS__)
-#include <dlfcn.h>
-#endif /* !__KERNEL__ || !__KOS__ */
-#include <libdisasm/disassembler.h>
-#endif /* !__NO_PRINTF_DISASM */
-#ifndef __NO_PRINTF_VINFO
-#if !defined(__KERNEL__) || !defined(__KOS__)
-#include <dlfcn.h>
-#include <libdebuginfo/addr2line.h>
-#else /* !__KERNEL__ || !__KOS__ */
-#include <kernel/addr2line.h>
-#endif /* __KERNEL__ && __KOS__ */
-#endif /* !__NO_PRINTF_VINFO */
+@@pp_ifndef __NO_PRINTF_DISASM@@
+@@pp_if !defined(__KERNEL__) || !defined(__KOS__)@@
+@#include <dlfcn.h>@
+@@pp_endif@@
+@#include <libdisasm/disassembler.h>@
+@@pp_endif@@
+@@pp_ifndef __NO_PRINTF_VINFO@@
+@@pp_if !defined(__KERNEL__) || !defined(__KOS__)@@
+@#include <dlfcn.h>@
+@#include <libdebuginfo/addr2line.h>@
+@@pp_else@@
+@#include <kernel/addr2line.h>@
+@@pp_endif@@
+@@pp_endif@@
 )]]
 $ssize_t format_vwprintf([[nonnull]] pwformatprinter printer, void *arg,
                          [[nonnull, format]] wchar_t const *__restrict format,
@@ -185,7 +185,7 @@ $ssize_t format_vwprintf([[nonnull]] pwformatprinter printer, void *arg,
 #define __FORMAT_UNICODE_WRITECHAR(dst, ch) ((dst)[0] = (ch), (dst) + 1)
 #define __FORMAT_UNICODE_FORMAT16   format_16to32
 @@pp_endif@@
-#include <libc/template/format-printf.h>
+@#include <libc/template/format-printf.h>@
 #endif /* !__INTELLISENSE__ */
 }
 

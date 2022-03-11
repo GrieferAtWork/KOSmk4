@@ -673,7 +673,11 @@
 #define __ATTR_FORMAT_STRFTIME(fmt, args) /* Nothing */
 #endif /* !__ATTR_FORMAT_STRFTIME */
 
-#if __has_attribute(__dllimport__) || (defined(__TINYC__) && defined(__PE__))
+#if defined(__TINYC__) && defined(__PE__)
+/* TCC doesn't understand if we write `__attribute__((__dllimport__))' */
+#define __ATTR_DLLIMPORT __attribute__((dllimport))
+#define __ATTR_DLLEXPORT __attribute__((dllexport))
+#elif __has_attribute(__dllimport__)
 #define __ATTR_DLLIMPORT __attribute__((__dllimport__))
 #define __ATTR_DLLEXPORT __attribute__((__dllexport__))
 #elif __has_declspec_attribute(dllimport) || defined(__PE__) || defined(_WIN32)

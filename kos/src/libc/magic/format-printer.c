@@ -826,16 +826,16 @@ err:
 [[impl_prefix(
 @@pp_ifndef __NO_PRINTF_DISASM@@
 @@pp_if !defined(__KERNEL__) || !defined(__KOS__)@@
-#include <dlfcn.h>
+@#include <dlfcn.h>@
 @@pp_endif@@
-#include <libdisasm/disassembler.h>
+@#include <libdisasm/disassembler.h>@
 @@pp_endif@@
 @@pp_ifndef __NO_PRINTF_VINFO@@
 @@pp_if !defined(__KERNEL__) || !defined(__KOS__)@@
-#include <dlfcn.h>
-#include <libdebuginfo/addr2line.h>
+@#include <dlfcn.h>@
+@#include <libdebuginfo/addr2line.h>@
 @@pp_else@@
-#include <kernel/addr2line.h>
+@#include <kernel/addr2line.h>@
 @@pp_endif@@
 @@pp_endif@@
 )]]
@@ -861,7 +861,7 @@ $ssize_t format_vprintf([[nonnull]] pformatprinter printer, void *arg,
 #define __FORMAT_UNICODE_WRITECHAR unicode_writeutf8
 #define __FORMAT_UNICODE_FORMAT16  format_16to8
 #define __FORMAT_UNICODE_FORMAT32  format_32to8
-#include <libc/template/format-printf.h>
+@#include <libc/template/format-printf.h>@
 #endif /* !__INTELLISENSE__ */
 }
 
@@ -921,7 +921,7 @@ $ssize_t format_vscanf([[nonnull]] pformatgetc pgetc,
 #define __FORMAT_ARG     arg
 #define __FORMAT_FORMAT  format
 #define __FORMAT_ARGS    args
-#include <libc/template/format-scanf.h>
+@#include <libc/template/format-scanf.h>@
 #endif /* !__INTELLISENSE__ */
 }
 

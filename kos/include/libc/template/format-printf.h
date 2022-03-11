@@ -817,11 +817,11 @@ __do_wchar:;
 				__format_data.__fd_surrogate = 0;
 				if __unlikely(!__string)
 					__string = (__CHAR_TYPE *)__null_str16;
-				if (__flags & __PRINTF_F_FIXBUF)
+				if (__flags & __PRINTF_F_FIXBUF) {
 					__string_length = __precision;
-				else if (__flags & __PRINTF_F_HASPREC)
+				} else if (__flags & __PRINTF_F_HASPREC) {
 					__string_length = __libc_c16nlen((__CHAR16_TYPE__ const *)__string, __precision);
-				else {
+				} else {
 					__string_length = __libc_c16len((__CHAR16_TYPE__ const *)__string);
 				}
 				__string_width = __string_length;
@@ -849,15 +849,15 @@ __do_wchar:;
 				}
 #ifndef __NO_PRINTF_ESCAPE
 				if (__ch == 'q') {
-					__temp = __FORMAT_ESCAPE16(&__FORMAT_UNICODE_FORMAT16, &__format_data,
-					                           (__CHAR16_TYPE__ const *)__string, __string_length,
-					                           __FORMAT_ESCAPE_FLAGS);
+					__temp = (__SSIZE_TYPE__)__FORMAT_ESCAPE16(&__FORMAT_UNICODE_FORMAT16, &__format_data,
+					                                           (__CHAR16_TYPE__ const *)__string, __string_length,
+					                                           __FORMAT_ESCAPE_FLAGS);
 				} else
 #endif /* !__NO_PRINTF_ESCAPE */
 				{
-					__temp = __FORMAT_UNICODE_FORMAT16(&__format_data,
-					                                   (__CHAR16_TYPE__ const *)__string,
-					                                   __string_length);
+					__temp = (__SSIZE_TYPE__)__FORMAT_UNICODE_FORMAT16(&__format_data,
+					                                                   (__CHAR16_TYPE__ const *)__string,
+					                                                   __string_length);
 				}
 			}
 			goto __check_string_error_and_print_tail;
@@ -893,11 +893,11 @@ __do_wchar:;
 				__format_data.__fd_incomplete = 0;
 				if __unlikely(!__string)
 					__string = (__CHAR_TYPE *)__null_str8;
-				if (__flags & __PRINTF_F_FIXBUF)
+				if (__flags & __PRINTF_F_FIXBUF) {
 					__string_length = __precision;
-				else if (__flags & __PRINTF_F_HASPREC)
+				} else if (__flags & __PRINTF_F_HASPREC) {
 					__string_length = __libc_strnlen((char const *)__string, __precision);
-				else {
+				} else {
 					__string_length = __libc_strlen((char const *)__string);
 				}
 				__string_width = __string_length;
@@ -961,35 +961,36 @@ __do_wchar:;
 			__string = __null_str;
 		}
 #endif /* __CHAR_SIZE != __SIZEOF_CHAR__ */
-		if (__flags & __PRINTF_F_FIXBUF)
+		if (__flags & __PRINTF_F_FIXBUF) {
 			__string_length = __precision;
+		}
 #if __CHAR_SIZE == __SIZEOF_CHAR__
-		else if (__flags & __PRINTF_F_HASPREC)
+		else if (__flags & __PRINTF_F_HASPREC) {
 			__string_length = __libc_strnlen(__string, __precision);
-		else {
+		} else {
 			__string_length = __libc_strlen(__string);
 		}
 #elif __CHAR_SIZE == 2
-		else if (__flags & __PRINTF_F_HASPREC)
+		else if (__flags & __PRINTF_F_HASPREC) {
 			__string_length = __libc_c16nlen((__CHAR16_TYPE__ *)__string, __precision);
-		else {
+		} else {
 			__string_length = __libc_c16len((__CHAR16_TYPE__ *)__string);
 		}
-#else
-		else if (__flags & __PRINTF_F_HASPREC)
+#else /* __CHAR_SIZE == ... */
+		else if (__flags & __PRINTF_F_HASPREC) {
 			__string_length = __libc_c32nlen((__CHAR32_TYPE__ *)__string, __precision);
-		else {
+		} else {
 			__string_length = __libc_c32len((__CHAR32_TYPE__ *)__string);
 		}
-#endif
+#endif /* __CHAR_SIZE != ... */
 print_string:
 		__string_width = __string_length;
 		if (__width != 0) {
 #ifndef __NO_PRINTF_ESCAPE
 			if (__ch == 'q') {
 				__string_width = (__size_t)__FORMAT_ESCAPE(&__FORMAT_WIDTH, __NULLPTR,
-				                                                __string, __string_length,
-				                                                __FORMAT_ESCAPE_FLAGS);
+				                                           __string, __string_length,
+				                                           __FORMAT_ESCAPE_FLAGS);
 			} else
 #endif /* !__NO_PRINTF_ESCAPE */
 			{
@@ -1695,10 +1696,12 @@ __do_special_float:
 		/* Determine the intended precision. */
 		__max_prec = (unsigned int)__precision;
 		__min_prec = (unsigned int)__precision;
-		if (!(__flags & __PRINTF_F_HASPREC))
-			__max_prec = 6, __min_prec = 0;
-		else if (__max_prec > 9)
+		if (!(__flags & __PRINTF_F_HASPREC)) {
+			__max_prec = 6;
+			__min_prec = 0;
+		} else if (__max_prec > 9) {
 			__max_prec = __min_prec = 9;
+		}
 		/* XXX: This cast can overflow */
 #ifdef __UINT64_TYPE__
 		__whole = (__UINT64_TYPE__)__val;
