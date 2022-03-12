@@ -747,7 +747,7 @@ miss:
 @@Copy a NUL-terminated string `str' to `dst', and re-return `dst'.
 @@The exact # of characters copied is `strlen(src) + 1' (+1 because
 @@the trailing NUL-character is also copied)
-[[std, crtbuiltin, leaf]]
+[[std, crtbuiltin, leaf, dos_only_export_alias("_mbscpy")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRCPY))]]
 [[nonnull]] char *strcpy([[nonnull]] char *__restrict dst,
                          [[nonnull]] char const *__restrict src) {
@@ -774,7 +774,7 @@ miss:
 @@Same as `strcpy(3)',  but rather  than copying `src'  ontop of  `dst',
 @@append it at the end of `dst', or more precisely copy to `strend(dst)'
 @@Always re-returns `dst'
-[[std, crtbuiltin, leaf]]
+[[std, crtbuiltin, leaf, dos_only_export_alias("_mbscat")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRCAT))]]
 [[nonnull]] char *strcat([[nonnull]] char *__restrict dst,
                          [[nonnull]] char const *__restrict src) {
@@ -935,6 +935,7 @@ __NAMESPACE_STD_END
 @@Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´)
 [[decl_include("<hybrid/typecore.h>")]]
 [[libc, kernel, wunused, crtbuiltin, pure]]
+[[dos_only_export_alias("__strncnt")]] /* DOS-specific name */
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRNLEN))]]
 $size_t strnlen([[nonnull]] char const *__restrict str, $size_t maxlen) {
 	return (size_t)(strnend(str, maxlen) - str);
@@ -1035,7 +1036,7 @@ strndup([[nonnull]] char const *__restrict str, $size_t max_chars)
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 
 [[crtbuiltin, impl_include("<hybrid/typecore.h>")]]
-[[dos_only_export_alias("_strdup"), export_alias("__strdup")]]
+[[dos_only_export_alias("_strdup", "_mbsdup"), export_alias("__strdup")]]
 [[section(".text.crt{|.dos}.heap.strdup"), requires_function(malloc)]]
 strdup([[nonnull]] char const *__restrict string)
 	-> [[malloc/*((strlen(string) + 1) * sizeof(char))*/]] char *

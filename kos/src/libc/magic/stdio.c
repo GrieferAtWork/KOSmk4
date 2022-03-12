@@ -479,11 +479,11 @@ __LIBC __FILE _IO_2_1_stderr_;
 %[define_crt_name_list(CNL_ftello_unlocked   = ["ftello_unlocked"])]                                           /* off32_t ftello_unlocked(FILE *) */
 %[define_crt_name_list(CNL_ftello64_unlocked = ["ftello64_unlocked", "ftell64_unlocked", "_ftelli64_nolock"])] /* off64_t ftello64_unlocked(FILE *) */
 
-%[define_crt_name_list(CNL_fgetc             = ["fgetc", "getc", "_IO_getc"])]        /* int fgetc(FILE *) */
-%[define_crt_name_list(CNL_fgetc_unlocked    = ["fgetc_unlocked", "getc_unlocked"])]  /* int fgetc_unlocked(FILE *) */
+%[define_crt_name_list(CNL_fgetc             = ["getc", "fgetc", "_IO_getc"])]                                        /* int fgetc(FILE *) */
+%[define_crt_name_list(CNL_fgetc_unlocked    = ["fgetc_unlocked", "getc_unlocked", "_getc_nolock", "_fgetc_nolock"])] /* int fgetc_unlocked(FILE *) */
 
-%[define_crt_name_list(CNL_fputc             = ["fputc", "putc", "_IO_putc"])]        /* int fputc(FILE *) */
-%[define_crt_name_list(CNL_fputc_unlocked    = ["fputc_unlocked", "putc_unlocked"])]  /* int fputc_unlocked(FILE *) */
+%[define_crt_name_list(CNL_fputc             = ["putc", "fputc", "_IO_putc"])]                                        /* int fputc(FILE *) */
+%[define_crt_name_list(CNL_fputc_unlocked    = ["putc_unlocked", "fputc_unlocked", "_putc_nolock", "_fputc_nolock"])] /* int fputc_unlocked(FILE *) */
 
 %[define_crt_name_list(CNL_ungetc            = ["ungetc", "_IO_ungetc"])]              /* int ungetc(int, FILE *) */
 %[define_crt_name_list(CNL_ungetc_unlocked   = ["ungetc_unlocked", "_ungetc_nolock"])] /* int ungetc_unlocked(int, FILE *) */

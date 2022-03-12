@@ -309,9 +309,11 @@ NOTHROW_NCX(LIBCCALL libc_pipe)(fd_t pipedes[2])
 }
 /*[[[end:libc_pipe]]]*/
 
-/*[[[head:libc_sleep,hash:CRC-32=0x56bdadfa]]]*/
+/*[[[head:libc_sleep,hash:CRC-32=0x17df3938]]]*/
 /* >> sleep(3)
- * Sleep for up to `seconds' seconds */
+ * Sleep for up to `seconds' seconds
+ * @return: 0 : Timeout expired
+ * @return: * : You were interrupted, and this many seconds were still left on the timeout */
 INTERN ATTR_SECTION(".text.crt.system.utility") unsigned int
 NOTHROW_RPC(LIBCCALL libc_sleep)(unsigned int seconds)
 /*[[[body:libc_sleep]]]*/

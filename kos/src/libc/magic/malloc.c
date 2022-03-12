@@ -186,6 +186,12 @@ int malloc_trim(size_t pad) {
 %
 [[libc, pure, wunused, decl_include("<hybrid/typecore.h>")]]
 [[dos_only_export_alias("_msize")]]
+/* NOTE: `_msize_debug()' only appears in `msvcrt.dll', but disassembly shows it
+ *       just calls forward to the regular `_msize()'. I'm guessing the idea was
+ *       to set a breakpoint on `_msize_debug()'s entry, and only code that uses
+ *       that function trigger said breakpoint?
+ * However, for safety we still only export this symbol, but don't bind it in headers. */
+[[dos_only_export_as("_msize_debug")]]
 [[section(".text.crt{|.dos}.heap.helpers")]]
 size_t malloc_usable_size(void *__restrict mallptr);
 

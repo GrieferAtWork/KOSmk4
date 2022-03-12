@@ -1160,6 +1160,7 @@ $FILE *open_wmemstream(wchar_t **bufloc, $size_t *sizeloc);
 
 @@>> wcsnlen(3)
 [[guard, wchar, section(".text.crt{|.dos}.wchar.string.memory")]]
+[[dos_export_alias("__wcsncnt")]] /* DOS-specific name */
 [[crt_dos_impl_requires(!defined(LIBC_ARCH_HAVE_C16SNLEN))]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_C32SNLEN))]]
 wcsnlen(*) %{generate(str2wcs("strnlen"))}
@@ -1341,13 +1342,15 @@ $wint_t putwchar_unlocked(wchar_t wc) {
 
 @@>> getwc_unlocked(3), fgetwc_unlocked(3)
 [[decl_include("<hybrid/typecore.h>")]]
-[[cp_stdio, wchar, dos_export_alias("_fgetwc_nolock")]]
+[[cp_stdio, wchar, export_alias("getwc_unlocked")]]
+[[dos_export_alias("_getwc_nolock", "_fgetwc_nolock")]]
 [[section(".text.crt{|.dos}.wchar.FILE.unlocked.read.getc")]]
 $wint_t fgetwc_unlocked([[nonnull]] $FILE *__restrict stream);
 
 @@>> putwc_unlocked(3), fputwc_unlocked(3)
-[[decl_include("<hybrid/typecore.h>"), export_alias("putwc_unlocked")]]
-[[cp_stdio, wchar, dos_export_alias("_fputwc_nolock")]]
+[[decl_include("<hybrid/typecore.h>")]]
+[[cp_stdio, wchar, export_alias("putwc_unlocked")]]
+[[dos_export_alias("_putwc_nolock", "_fputwc_nolock")]]
 [[section(".text.crt{|.dos}.wchar.FILE.unlocked.write.putc")]]
 $wint_t fputwc_unlocked(wchar_t wc, [[nonnull]] $FILE *__restrict stream);
 

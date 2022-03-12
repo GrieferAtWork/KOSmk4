@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x793d8829 */
+/* HASH CRC-32:0xb3611836 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,6 +37,7 @@
 #include "../user/sys.stat.h"
 #include "../user/sys.time.h"
 #include "../user/sys.wait.h"
+#include "../user/time.h"
 #include "../user/unicode.h"
 #include "../user/unistd.h"
 #include "../user/wchar.h"
@@ -4175,6 +4176,32 @@ err_range:
 
 
 }
+#include <bits/os/timespec.h>
+/* >> _sleep(3)
+ * Sleep for `milli' milliseconds (1/1.000 seconds) */
+INTERN ATTR_SECTION(".text.crt.bsd") void
+NOTHROW_RPC(LIBCCALL libc__sleep)(uint32_t milli) {
+	struct timespec ts;
+	ts.tv_sec  = milli / 1000;
+	ts.tv_nsec = (milli % 1000) * 1000;
+
+	{
+		struct timespec rem;
+		for (;;) {
+			rem.tv_sec  = 0;
+			rem.tv_nsec = 0;
+			if (libc_nanosleep(&ts, &rem) == 0)
+				break;
+			if (__libc_geterrno() == EINTR)
+				break;
+			ts.tv_sec  = rem.tv_sec;
+			ts.tv_nsec = rem.tv_nsec;
+		}
+	}
+
+
+
+}
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((2)) char *
 NOTHROW_NCX(LIBCCALL libc_itoa)(int val,
                                 char *buf,
@@ -4604,6 +4631,8 @@ DEFINE_PUBLIC_ALIAS(DOS$_makepath_s, libd__makepath_s);
 DEFINE_PUBLIC_ALIAS(_makepath_s, libc__makepath_s);
 DEFINE_PUBLIC_ALIAS(DOS$_splitpath_s, libd__splitpath_s);
 DEFINE_PUBLIC_ALIAS(_splitpath_s, libc__splitpath_s);
+DEFINE_PUBLIC_ALIAS(__crtSleep, libc__sleep);
+DEFINE_PUBLIC_ALIAS(_sleep, libc__sleep);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_itoa, libc_itoa);
 #endif /* __LIBCCALL_IS_LIBDCALL */

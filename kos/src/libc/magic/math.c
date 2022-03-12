@@ -1110,6 +1110,7 @@ double nan(char const *tagb) {
 	return __LIBM_MATHFUN1I(@nan@, tagb);
 }
 
+[[dos_only_export_alias("_copysignf")]]
 [[std, crtbuiltin, export_alias("__copysignf")]] copysignf(*) %{generate(double2float("copysign"))}
 [[std, crtbuiltin, export_alias("__nanf")]]      nanf(*)      %{generate(double2float("nan"))}
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -2065,7 +2066,7 @@ isnanl(*) %{generate(double2ldouble("isnan"))}
 %/* Bessel functions. */
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN) && __MATH_DECLARING_DOUBLE)
 @@>> j0f(3), j0(3), j0l(3)
-[[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__j0")]]
+[[wunused, ATTR_MCONST, nothrow, crtbuiltin, dos_only_export_alias("_j0"), export_alias("__j0")]]
 [[impl_include("<libm/j0.h>", "<libm/fcomp.h>", "<libm/matherr.h>", "<libm/fabs.h>")]]
 [[requires_include("<ieee754.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
@@ -2079,7 +2080,7 @@ double j0(double x) {
 }
 
 @@>> j1f(3), j1(3), j1l(3)
-[[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__j1")]]
+[[wunused, ATTR_MCONST, nothrow, crtbuiltin, dos_only_export_alias("_j1"), export_alias("__j1")]]
 [[impl_include("<libm/j1.h>", "<libm/fcomp.h>", "<libm/matherr.h>", "<libm/fabs.h>")]]
 [[requires_include("<ieee754.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
@@ -2093,7 +2094,7 @@ double j1(double x) {
 }
 
 @@>> jnf(3), jn(3), jnl(3)
-[[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__jn")]]
+[[wunused, ATTR_MCONST, nothrow, crtbuiltin, dos_only_export_alias("_jn"), export_alias("__jn")]]
 [[impl_include("<libm/jn.h>", "<libm/fcomp.h>", "<libm/matherr.h>", "<libm/fabs.h>")]]
 [[requires_include("<ieee754.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
@@ -2107,7 +2108,7 @@ double jn(int n, double x) {
 }
 
 @@>> y0f(3), y0(3), y0l(3)
-[[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__y0")]]
+[[wunused, ATTR_MCONST, nothrow, crtbuiltin, dos_only_export_alias("_y0"), export_alias("__y0")]]
 [[impl_include("<libm/fcomp.h>", "<bits/math-constants.h>")]]
 [[impl_include("<libm/matherr.h>", "<libm/y0.h>", "<bits/crt/fenv.h>")]]
 [[requires_include("<ieee754.h>")]]
@@ -2132,7 +2133,7 @@ double y0(double x) {
 }
 
 @@>> y1f(3), y1(3), y1l(3)
-[[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__y1")]]
+[[wunused, ATTR_MCONST, nothrow, crtbuiltin, dos_only_export_alias("_y1"), export_alias("__y1")]]
 [[impl_include("<libm/fcomp.h>", "<bits/math-constants.h>")]]
 [[impl_include("<libm/matherr.h>", "<libm/y1.h>", "<bits/crt/fenv.h>")]]
 [[requires_include("<ieee754.h>")]]
@@ -2157,7 +2158,7 @@ double y1(double x) {
 }
 
 @@>> ynf(3), yn(3), ynl(3)
-[[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__yn")]]
+[[wunused, ATTR_MCONST, nothrow, crtbuiltin, dos_only_export_alias("_yn"), export_alias("__yn")]]
 [[impl_include("<libm/fcomp.h>", "<bits/math-constants.h>")]]
 [[impl_include("<libm/matherr.h>", "<libm/yn.h>", "<bits/crt/fenv.h>")]]
 [[requires_include("<ieee754.h>")]]

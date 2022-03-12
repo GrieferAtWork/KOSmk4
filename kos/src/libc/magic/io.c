@@ -147,6 +147,16 @@ errno_t _access_s([[nonnull]] char const *filename, __STDC_INT_AS_UINT_T type) {
 %[insert:function(_open = open)]
 %[insert:function(_umask = umask)]
 %[insert:function(_isatty = isatty)]
+%[insert:function(_mktemp = mktemp)]
+
+[[section(".text.crt.dos.fs.property")]]
+[[decl_include("<bits/types.h>"), requires_function(umask)]]
+errno_t _umask_s($mode_t nmode, [[nonnull]] $mode_t *omode) {
+	*omode = umask(nmode);
+	return $EOK;
+}
+
+
 
 [[requires_include("<asm/os/fcntl.h>"), decl_include("<bits/types.h>")]]
 [[requires($has_function(fcntl) && (defined(__F_SETFL_XCH) || (defined(__F_GETFL) && defined(__F_SETFL))))]]
@@ -327,6 +337,8 @@ $fd_t _open_osfhandle(intptr_t osfd, $oflag_t flags) {
 	COMPILER_IMPURE();
 	return (fd_t)osfd;
 }
+
+
 
 %
 %

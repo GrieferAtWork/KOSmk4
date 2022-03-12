@@ -1200,6 +1200,11 @@ __DECL_END
 /* Include __stub_XXX definitions (checked by configure scripts) */
 #if defined(__CRT_KOS) && !defined(__CRT_KOS_KERNEL)
 #include <gnu/stubs.h>
+/* Even  though  they're implemented,  indicate that  the "invalid_parameter_handler"
+ * system is a stub. -- Some 3rd party programs check for presence of these functions
+ * and think that when they're present, they're to configure themselves for  windows. */
+#define __stub__set_invalid_parameter_handler
+#define __stub__get_invalid_parameter_handler
 #endif /* __CRT_KOS && !__CRT_KOS_KERNEL */
 
 /* Configure SSP *_chk bindings

@@ -593,11 +593,32 @@ int pipe([[nonnull]] $fd_t pipedes[2]) {
 
 @@>> sleep(3)
 @@Sleep for up to `seconds' seconds
+@@@return: 0 : Timeout expired
+@@@return: * : You were interrupted, and this many seconds were still left on the timeout
 [[cp, guard, section(".text.crt{|.dos}.system.utility")]]
-[[userimpl, requires_function(dos_sleep)]]
+[[userimpl, requires($has_function(nanosleep) || $has_function(_sleep))]]
+[[impl_include("<bits/os/timespec.h>")]]
+[[impl_include("<libc/errno.h>")]]
 unsigned int sleep(unsigned int seconds) {
-	dos_sleep((uint32_t)seconds);
+@@pp_if $has_function(nanosleep)@@
+	struct timespec ts, rem;
+	ts.@tv_sec@   = seconds;
+	ts.@tv_nsec@  = 0;
+	rem.@tv_sec@  = 0;
+	rem.@tv_nsec@ = 0;
+	if (nanosleep(&ts, &rem) == 0) {
+		rem.@tv_sec@ = 0;
+	} else {
+@@pp_if defined(__libc_geterrno) && defined(EINTR)@@
+		if (__libc_geterrno() != EINTR)
+			rem.@tv_sec@ = 0;
+@@pp_endif@@
+	}
+	return (unsigned int)rem.@tv_sec@;
+@@pp_else@@
+	_sleep((uint32_t)seconds * 1000);
 	return 0;
+@@pp_endif@@
 }
 
 @@>> fsync(2)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf7dea938 */
+/* HASH CRC-32:0x2063a3a5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1245,6 +1245,61 @@ __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,_isatty,(__fd_t __fd),__isatty,(__f
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isatty)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isatty))(__fd); }
 #endif /* __CRT_HAVE_tcgetattr || __CRT_HAVE___tcgetattr || ((__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TCGETA) */
 #endif /* !... */
+#ifdef __CRT_HAVE_mktemp
+/* >> mktemp(3)
+ * Badly designed version of  `mkstemp' that won't actually  create
+ * the temporary file, meaning that by the time the caller tries to
+ * create the  file themselves,  another process  may have  already
+ * created it.
+ * Also: when no  temporary filename  can be  created, rather  than
+ *       returning something  sensible like  `NULL', this  function
+ *       will instead set `template_' to an empty string, and still
+ *       re-return it like it would if everything had worked! */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,_mktemp,(char *__template_),mktemp,(__template_))
+#elif defined(__CRT_HAVE__mktemp)
+/* >> mktemp(3)
+ * Badly designed version of  `mkstemp' that won't actually  create
+ * the temporary file, meaning that by the time the caller tries to
+ * create the  file themselves,  another process  may have  already
+ * created it.
+ * Also: when no  temporary filename  can be  created, rather  than
+ *       returning something  sensible like  `NULL', this  function
+ *       will instead set `template_' to an empty string, and still
+ *       re-return it like it would if everything had worked! */
+__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,_mktemp,(char *__template_),(__template_))
+#elif defined(__CRT_HAVE___mktemp)
+/* >> mktemp(3)
+ * Badly designed version of  `mkstemp' that won't actually  create
+ * the temporary file, meaning that by the time the caller tries to
+ * create the  file themselves,  another process  may have  already
+ * created it.
+ * Also: when no  temporary filename  can be  created, rather  than
+ *       returning something  sensible like  `NULL', this  function
+ *       will instead set `template_' to an empty string, and still
+ *       re-return it like it would if everything had worked! */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,_mktemp,(char *__template_),__mktemp,(__template_))
+#else /* ... */
+#include <bits/os/stat.h>
+#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))) || (defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))) || (defined(__CRT_HAVE_stat64) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)))
+#include <libc/local/stdlib/mktemp.h>
+/* >> mktemp(3)
+ * Badly designed version of  `mkstemp' that won't actually  create
+ * the temporary file, meaning that by the time the caller tries to
+ * create the  file themselves,  another process  may have  already
+ * created it.
+ * Also: when no  temporary filename  can be  created, rather  than
+ *       returning something  sensible like  `NULL', this  function
+ *       will instead set `template_' to an empty string, and still
+ *       re-return it like it would if everything had worked! */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL _mktemp)(char *__template_) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mktemp))(__template_); }
+#endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) || (__CRT_HAVE_kstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_stat && (!__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) || (__CRT_HAVE_stat64 && (__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) */
+#endif /* !... */
+#ifdef __CRT_HAVE__umask_s
+__CDECLARE(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_umask_s,(__mode_t __nmode, __mode_t *__omode),(__nmode,__omode))
+#elif defined(__CRT_HAVE_umask) || defined(__CRT_HAVE__umask) || defined(__CRT_HAVE___umask) || defined(__CRT_HAVE___libc_umask)
+#include <libc/local/io/_umask_s.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_umask_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) errno_t __NOTHROW_NCX(__LIBCCALL _umask_s)(__mode_t __nmode, __mode_t *__omode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_umask_s))(__nmode, __omode); })
+#endif /* ... */
 #ifdef __CRT_HAVE__setmode
 __CDECLARE(,__oflag_t,__NOTHROW_NCX,_setmode,(__fd_t __fd, __oflag_t __mode),(__fd,__mode))
 #elif (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl) || defined(__CRT_HAVE___libc_fcntl)) && (defined(__F_SETFL_XCH) || (defined(__F_GETFL) && defined(__F_SETFL)))

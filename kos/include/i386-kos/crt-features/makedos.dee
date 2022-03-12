@@ -22,7 +22,10 @@ import * from deemon;
 import ipc;
 import optimizeForIfdef, optimizeForEndif from ....misc.libgen.c.ppexpr;
 
+global _cachedSymbolsByFilename: {string: HashSet with string} = Dict();
 function loadSymbolsFromFile(filename: string | {string...}): {string...} {
+	if (filename is Callable)
+		return HashSet(filename());
 	if (filename !is string) {
 		local result = none;
 		for (local file: filename) {
@@ -38,6 +41,9 @@ function loadSymbolsFromFile(filename: string | {string...}): {string...} {
 			result = HashSet();
 		return result;
 	}
+	local symbols = _cachedSymbolsByFilename.get(filename);
+	if (symbols !is none)
+		return symbols;
 	print File.stderr: "Scanning file:", repr filename;
 	local proc = ipc.Process("cmd", ["/c", "dumpbin /EXPORTS " + filename]);
 	local r, w = ipc.Pipe.new()...;
@@ -71,6 +77,7 @@ function loadSymbolsFromFile(filename: string | {string...}): {string...} {
 		}
 		symbols.insert(name);
 	}
+	_cachedSymbolsByFilename[filename] = symbols;
 	return symbols;
 }
 
@@ -80,7 +87,34 @@ global final MSVCRT_VERSION_FILES: {int: string} = {
 	0x01000000 + 100 : "C:\\Windows\\SysWOW64\\msvcr100.dll",
 	0x81000000 + 100 : "C:\\Windows\\System32\\msvcr100.dll",
 	0x02000000 + 100 : "E:\\c\\msvcr\\x32\\msvcr100d.dll",
-	0x82000000 + 100 : "E:\\c\\msvcr\\x64\\msvcr100d.dll",
+	0x82000000 + 100 : []{
+		/* I'm unable to find "msvcr100d.dll", so we do this: */
+		local x32r = loadSymbolsFromFile("C:\\Windows\\SysWOW64\\msvcr100.dll");
+		local x32d = loadSymbolsFromFile("E:\\c\\msvcr\\x32\\msvcr100d.dll");
+		local x64r = loadSymbolsFromFile("C:\\Windows\\System32\\msvcr100.dll");
+		local allSymbols = copy x32r;
+		for (local x: x32d)
+			allSymbols.insert(x);
+		for (local x: x64r)
+			allSymbols.insert(x);
+		for (local sym: allSymbols) {
+			if (sym in x64r) {
+				if (sym in x32r && sym !in x32d) {
+					/* Symbol in 32/64-bit release version, but not in 32-bit debug version
+					 * -> Assume that it also isn't in the 64-bit debug version. */
+					continue;
+				}
+			} else {
+				if (sym !in x32r && sym in x32d) {
+					/* Symbol only in 32-bit debug version (but not 32-bit release version)
+					 * -> Assume that it also appears in the 64-bit debug version. */
+				} else {
+					continue;
+				}
+			}
+			yield sym;
+		}
+	},
 	0x01000000 + 110 : "E:\\c\\msvcr\\x32\\msvcr110.dll",
 	0x81000000 + 110 : "C:\\Windows\\System32\\msvcr110.dll",
 	0x02000000 + 110 : "E:\\c\\msvcr\\x32\\msvcr110d.dll",
@@ -274,9 +308,7 @@ print("\
  *    140: ucrtbase.dll, vcruntime140.dll     ucrtbased.dll, vcruntime140d.dll
  *
  * TODO: There are some missing versions between 0 and 100
- * XXX: The `_MSC_VER'-based checks have not really been tested/confirmed
- * XXX: I was unable to find the x64 \"msvcr100d.dll\", so below acts like
- *      that file was  exporting the  same symbols as  the x32  variant. */
+ * XXX: The `_MSC_VER'-based checks have not really been tested/confirmed */
 #ifndef __MSVCRT_VERSION__
 #ifdef __TINYC__
 #define __MSVCRT_VERSION__ 0   /* msvcrt.dll */

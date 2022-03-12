@@ -39,6 +39,8 @@
 #include <nt/errhandlingapi.h>
 #include <nt/handleapi.h>
 #include <nt/libloaderapi.h>
+#include <nt/processthreadsapi.h>
+#include <nt/synchapi.h>
 #include <nt/types.h>
 
 #include <elf.h>
@@ -1546,31 +1548,133 @@ libd_requirek32(char const *__restrict symbol_name) {
 	return result;
 }
 
+#define DEFINE_KERNEL32_RESOLVER(name)                         \
+	INTERN ATTR_SECTION(".text.crt.dos.compat.dos")            \
+	typeof(&name) libd_resolve_##name(void) {                  \
+		static typeof(&name) pdynK32##name = NULL;             \
+		if (!pdynK32##name)                                    \
+			*(void **)&pdynK32##name = libd_requirek32(#name); \
+		return pdynK32##name;                                  \
+	}
+/*[[[deemon
+for (local name: {
+	"GetModuleFileNameW",
+	"GetModuleHandleW",
+	"LoadLibraryExW",
+	"InitializeCriticalSectionEx",
+	"GetCurrentThread",
+	"SetUnhandledExceptionFilter",
+	"UnhandledExceptionFilter",
+	"TerminateProcess",
+	"GetCurrentProcess",
+}) {
+	print("#undef ", name);
+	print("DEFINE_KERNEL32_RESOLVER(", name, ")");
+	print("#define ", name, " (*libd_resolve_", name, "())");
+}
+]]]*/
+#undef GetModuleFileNameW
+DEFINE_KERNEL32_RESOLVER(GetModuleFileNameW)
+#define GetModuleFileNameW (*libd_resolve_GetModuleFileNameW())
+#undef GetModuleHandleW
+DEFINE_KERNEL32_RESOLVER(GetModuleHandleW)
+#define GetModuleHandleW (*libd_resolve_GetModuleHandleW())
+#undef LoadLibraryExW
+DEFINE_KERNEL32_RESOLVER(LoadLibraryExW)
+#define LoadLibraryExW (*libd_resolve_LoadLibraryExW())
+#undef InitializeCriticalSectionEx
+DEFINE_KERNEL32_RESOLVER(InitializeCriticalSectionEx)
+#define InitializeCriticalSectionEx (*libd_resolve_InitializeCriticalSectionEx())
+#undef GetCurrentThread
+DEFINE_KERNEL32_RESOLVER(GetCurrentThread)
+#define GetCurrentThread (*libd_resolve_GetCurrentThread())
+#undef SetUnhandledExceptionFilter
+DEFINE_KERNEL32_RESOLVER(SetUnhandledExceptionFilter)
+#define SetUnhandledExceptionFilter (*libd_resolve_SetUnhandledExceptionFilter())
+#undef UnhandledExceptionFilter
+DEFINE_KERNEL32_RESOLVER(UnhandledExceptionFilter)
+#define UnhandledExceptionFilter (*libd_resolve_UnhandledExceptionFilter())
+#undef TerminateProcess
+DEFINE_KERNEL32_RESOLVER(TerminateProcess)
+#define TerminateProcess (*libd_resolve_TerminateProcess())
+#undef GetCurrentProcess
+DEFINE_KERNEL32_RESOLVER(GetCurrentProcess)
+#define GetCurrentProcess (*libd_resolve_GetCurrentProcess())
+/*[[[end]]]*/
+#undef DEFINE_KERNEL32_RESOLVER
+
+DEFINE_PUBLIC_ALIAS(DOS$__crtUnhandledException, libd___crtUnhandledException);
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos")
+LONG LIBDCALL libd___crtUnhandledException(struct _EXCEPTION_POINTERS *pointers) {
+	SetUnhandledExceptionFilter(NULL);
+	return UnhandledExceptionFilter((struct _EXCEPTION_POINTERS *)pointers);
+}
+
+DEFINE_PUBLIC_ALIAS(DOS$__crtTerminateProcess, libd___crtTerminateProcess);
+INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.dos.compat.dos")
+void LIBDCALL libd___crtTerminateProcess(UINT exit_code) {
+	TerminateProcess(GetCurrentProcess(), exit_code);
+	abort();
+}
+
+#ifdef __x86_64__
+#define __LIBDCALL_IS_WINAPI
+#elif defined(__i386__)
+#undef __LIBDCALL_IS_WINAPI
+#endif /* ... */
+
+#ifdef __LIBDCALL_IS_WINAPI
+#define DEFINE_KERNEL32_FORWARDER_FUNCTION(T_RETURN, cc, name, params, k32name, args) \
+	DEFINE_PUBLIC_IFUNC(DOS$##name, libd_resolve_##k32name);
+#else /* __LIBDCALL_IS_WINAPI */
 #define DEFINE_KERNEL32_FORWARDER_FUNCTION(T_RETURN, cc, name, params, k32name, args) \
 	DEFINE_PUBLIC_ALIAS(DOS$##name, libd_##name);                                     \
 	INTERN ATTR_SECTION(".text.crt.dos.compat.dos")                                   \
 	T_RETURN cc libd_##name params {                                                  \
-		typedef T_RETURN (WINAPI *LPK32##name) params;                                \
-		static LPK32##name pdynK32##name = NULL;                                      \
-		if (!pdynK32##name)                                                           \
-			*(void **)&pdynK32##name = libd_requirek32(k32name);                      \
-		return (*pdynK32##name)args;                                                  \
+		return k32name args;                                                          \
 	}
+#endif /* !__LIBDCALL_IS_WINAPI */
 
+/* TODO: __crtCompareStringEx */
+/* TODO: __crtCreateSymbolicLinkW */
+/* TODO: __crtEnumSystemLocalesEx */
+/* TODO: __crtFlsAlloc */
+/* TODO: __crtFlsFree */
+/* TODO: __crtFlsGetValue */
+/* TODO: __crtFlsSetValue */
+/* TODO: __crtGetDateFormatEx */
+/* TODO: __crtGetLocaleInfoEx */
+/* TODO: __crtGetShowWindowMode */
+/* TODO: __crtGetTimeFormatEx */
+/* TODO: __crtGetUserDefaultLocaleName */
+/* TODO: __crtIsPackagedApp */
+/* TODO: __crtIsValidLocaleName */
+/* TODO: __crtLCMapStringEx */
+/* TODO: __crtSetThreadStackGuarantee */
 DEFINE_KERNEL32_FORWARDER_FUNCTION(DWORD, LIBDCALL, __vcrt_GetModuleFileNameW,
                                    (HMODULE hModule, LPWSTR lpFilename, DWORD nSize),
-                                   "GetModuleFileNameW", (hModule, lpFilename, nSize))
+                                   GetModuleFileNameW, (hModule, lpFilename, nSize))
 DEFINE_KERNEL32_FORWARDER_FUNCTION(HMODULE, LIBDCALL, __vcrt_GetModuleHandleW,
                                    (LPCWSTR lpFilename),
-                                   "GetModuleHandleW", (lpFilename))
+                                   GetModuleHandleW, (lpFilename))
 DEFINE_KERNEL32_FORWARDER_FUNCTION(HMODULE, LIBDCALL, __vcrt_LoadLibraryExW,
                                    (LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags),
-                                   "LoadLibraryExW", (lpLibFileName, hFile, dwFlags))
+                                   LoadLibraryExW, (lpLibFileName, hFile, dwFlags))
+#ifdef __LIBDCALL_IS_WINAPI
+DEFINE_PUBLIC_IFUNC(DOS$__crtInitializeCriticalSectionEx, libd_resolve_InitializeCriticalSectionEx);
+#else /* __LIBDCALL_IS_WINAPI */
+DEFINE_PUBLIC_ALIAS(DOS$__crtInitializeCriticalSectionEx, libd___vcrt_InitializeCriticalSectionEx);
+#endif /* !__LIBDCALL_IS_WINAPI */
 DEFINE_KERNEL32_FORWARDER_FUNCTION(WINBOOL, LIBDCALL, __vcrt_InitializeCriticalSectionEx,
-                                   (/*LPCRITICAL_SECTION*/ void *lpCriticalSection, DWORD dwSpinCount, DWORD dwFlags),
-                                   "InitializeCriticalSectionEx", (lpCriticalSection, dwSpinCount, dwFlags))
-DEFINE_KERNEL32_FORWARDER_FUNCTION(uintptr_t, LIBDCALL, __threadhandle, (void), "GetCurrentThread", ())
+                                   (LPCRITICAL_SECTION lpCriticalSection, DWORD dwSpinCount, DWORD dwFlags),
+                                   InitializeCriticalSectionEx, (lpCriticalSection, dwSpinCount, dwFlags))
+DEFINE_KERNEL32_FORWARDER_FUNCTION(LPTOP_LEVEL_EXCEPTION_FILTER, LIBDCALL, __crtSetUnhandledExceptionFilter,
+                                   (LPTOP_LEVEL_EXCEPTION_FILTER lpTopLevelExceptionFilter),
+                                   SetUnhandledExceptionFilter, (lpTopLevelExceptionFilter))
+/*DEFINE_KERNEL32_FORWARDER_FUNCTION(HANDLE, LIBDCALL, __threadhandle, (void), GetCurrentThread, ())*/
+DEFINE_PUBLIC_IFUNC(DOS$__threadhandle, libd_resolve_GetCurrentThread);
 #undef DEFINE_KERNEL32_FORWARDER_FUNCTION
+
 
 
 
@@ -1711,6 +1815,54 @@ libd___dllonexit(_onexit_t func, _onexit_t **p_begin, _onexit_t **p_end) {
 	*p_end     = tab._end;
 	return result;
 }
+
+
+
+/************************************************************************/
+/* <sys/io.h> functions (for DOS compatibility)                         */
+/************************************************************************/
+#if !defined(__x86_64__) && defined(__i386__)
+DECL_END
+#include <sys/io.h>
+DECL_BEGIN
+
+DEFINE_PUBLIC_ALIAS(DOS$_inp, libd__inp);
+DEFINE_PUBLIC_ALIAS(DOS$_inpd, libd__inpd);
+DEFINE_PUBLIC_ALIAS(DOS$_inpw, libd__inpw);
+DEFINE_PUBLIC_ALIAS(DOS$_outp, libd__outp);
+DEFINE_PUBLIC_ALIAS(DOS$_outpd, libd__outpd);
+DEFINE_PUBLIC_ALIAS(DOS$_outpw, libd__outpw);
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") uint8_t LIBDCALL
+libd__inp(uint16_t port) {
+	return inb(port);
+}
+
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") uint16_t LIBDCALL
+libd__inpw(uint16_t port) {
+	return inw(port);
+}
+
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") uint32_t LIBDCALL
+libd__inpd(uint16_t port) {
+	return inl(port);
+}
+
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") void LIBDCALL
+libd__outp(uint16_t port, uint8_t value) {
+	outb(port, value);
+}
+
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") void LIBDCALL
+libd__outpw(uint16_t port, uint16_t value) {
+	outw(port, value);
+}
+
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") void LIBDCALL
+libd__outpd(uint16_t port, uint32_t value) {
+	outl(port, value);
+}
+
+#endif /* !__x86_64__ && __i386__ */
 
 DECL_END
 

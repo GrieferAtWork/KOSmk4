@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1223e24 */
+/* HASH CRC-32:0xc15b9237 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1119,7 +1119,7 @@ INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char **NOTHROW_NCX(LIBCCALL libc___p__
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF _purecall_handler NOTHROW_NCX(LIBDCALL libd__set_purecall_handler)(_purecall_handler __handler);
-INTDEF _invalid_parameter_handler NOTHROW_NCX(LIBDCALL libd__set_invalid_parameter_handler)(_invalid_parameter_handler __handler);
+INTDEF _invalid_parameter_handler NOTHROW_NCX(LIBDCALL libd__set_invalid_parameter_handler)(_invalid_parameter_handler handler);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__get_pgmptr)(char **pvalue);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -1447,6 +1447,16 @@ INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc__splitpath_s)(char const *
 INTDEF void NOTHROW_NCX(LIBDCALL libd__seterrormode)(int mode);
 INTDEF int NOTHROW_NCX(LIBDCALL libd__set_error_mode)(int mode);
 INTDEF void NOTHROW_NCX(LIBDCALL libd__beep)(unsigned int freq, unsigned int duration);
+/* >> _sleep(3)
+ * Sleep for `milli' milliseconds (1/1.000 seconds) */
+INTDEF void NOTHROW_RPC(LIBDCALL libd__sleep)(uint32_t milli);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> _sleep(3)
+ * Sleep for `milli' milliseconds (1/1.000 seconds) */
+INTDEF void NOTHROW_RPC(LIBCCALL libc__sleep)(uint32_t milli);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((2)) char *NOTHROW_NCX(LIBDCALL libd_itoa)(int val, char *buf, int radix);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__

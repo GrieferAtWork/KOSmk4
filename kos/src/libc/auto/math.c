@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbedffa02 */
+/* HASH CRC-32:0x81962528 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4507,6 +4507,9 @@ DEFINE_PUBLIC_ALIAS(_copysign, libc_copysign);
 DEFINE_PUBLIC_ALIAS(copysign, libc_copysign);
 DEFINE_PUBLIC_ALIAS(__nan, libc_nan);
 DEFINE_PUBLIC_ALIAS(nan, libc_nan);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_copysignf, libc_copysignf);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__copysignf, libc_copysignf);
 DEFINE_PUBLIC_ALIAS(copysignf, libc_copysignf);
 DEFINE_PUBLIC_ALIAS(__nanf, libc_nanf);
@@ -4718,16 +4721,34 @@ DEFINE_PUBLIC_ALIAS(__isnanf, libc_isnanf);
 DEFINE_PUBLIC_ALIAS(isnanf, libc_isnanf);
 DEFINE_PUBLIC_ALIAS(__isnanl, libc_isnanl);
 DEFINE_PUBLIC_ALIAS(isnanl, libc_isnanl);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_j0, libc_j0);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__j0, libc_j0);
 DEFINE_PUBLIC_ALIAS(j0, libc_j0);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_j1, libc_j1);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__j1, libc_j1);
 DEFINE_PUBLIC_ALIAS(j1, libc_j1);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_jn, libc_jn);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__jn, libc_jn);
 DEFINE_PUBLIC_ALIAS(jn, libc_jn);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_y0, libc_y0);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__y0, libc_y0);
 DEFINE_PUBLIC_ALIAS(y0, libc_y0);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_y1, libc_y1);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__y1, libc_y1);
 DEFINE_PUBLIC_ALIAS(y1, libc_y1);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_yn, libc_yn);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__yn, libc_yn);
 DEFINE_PUBLIC_ALIAS(yn, libc_yn);
 DEFINE_PUBLIC_ALIAS(__j0f, libc_j0f);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13747628 */
+/* HASH CRC-32:0xd1ea7278 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,7 +67,6 @@
 #define __stub__free_locale
 #define __stub___get_current_locale
 #define __stub__get_current_locale
-#define __stub__get_invalid_parameter_handler
 #define __stub__get_output_format
 #define __stub__get_purecall_handler
 #define __stub__getdiskfree
@@ -80,7 +79,6 @@
 #define __stub__searchenv_s
 #define __stub__set_abort_behavior
 #define __stub__set_error_mode
-#define __stub__set_invalid_parameter_handler
 #define __stub__set_new_handler
 #define __stub__set_new_mode
 #define __stub__set_output_format
@@ -565,6 +563,7 @@
 #define __stub_tmpfile
 #define __stub_tmpnam
 #define __stub_ttyslot
+#define __stub__tzset
 #define __stub_tzset
 #define __stub_ufromfp
 #define __stub_ufromfpx

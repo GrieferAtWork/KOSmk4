@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb398f44f */
+/* HASH CRC-32:0xc2ab31fd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,6 +47,12 @@ NOTHROW_RPC(LIBCCALL libc__access_s)(char const *filename,
 	if (libc_access(filename, type) == 0)
 		return EOK;
 	return __libc_geterrno_or(1);
+}
+INTERN ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((2)) errno_t
+NOTHROW_NCX(LIBCCALL libc__umask_s)(mode_t nmode,
+                                    mode_t *omode) {
+	*omode = libc_umask(nmode);
+	return EOK;
 }
 INTERN ATTR_SECTION(".text.crt.unsorted") oflag_t
 NOTHROW_NCX(LIBCCALL libc__setmode)(fd_t fd,
@@ -254,6 +260,7 @@ DECL_END
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(DOS$_access_s, libd__access_s);
 DEFINE_PUBLIC_ALIAS(_access_s, libc__access_s);
+DEFINE_PUBLIC_ALIAS(_umask_s, libc__umask_s);
 DEFINE_PUBLIC_ALIAS(_setmode, libc__setmode);
 DEFINE_PUBLIC_ALIAS(DOS$_sopen_s_nolock, libd__sopen_s);
 DEFINE_PUBLIC_ALIAS(DOS$_sopen_s, libd__sopen_s);

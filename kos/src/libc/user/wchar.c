@@ -736,7 +736,7 @@ NOTHROW_NCX(LIBDCALL libd_mbsnrtowcs)(char16_t *dst,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xe34d860c]]]*/
+/*[[[start:exports,hash:CRC-32=0xe8d41d68]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$getwc, libd_fgetwc);
 DEFINE_PUBLIC_ALIAS(DOS$fgetwc, libd_fgetwc);
 DEFINE_PUBLIC_ALIAS(getwc, libc_fgetwc);
@@ -755,10 +755,14 @@ DEFINE_PUBLIC_ALIAS(DOS$wcsnrtombs, libd_wcsnrtombs);
 DEFINE_PUBLIC_ALIAS(wcsnrtombs, libc_wcsnrtombs);
 DEFINE_PUBLIC_ALIAS(DOS$open_wmemstream, libd_open_wmemstream);
 DEFINE_PUBLIC_ALIAS(open_wmemstream, libc_open_wmemstream);
+DEFINE_PUBLIC_ALIAS(DOS$getwc_unlocked, libd_fgetwc_unlocked);
+DEFINE_PUBLIC_ALIAS(DOS$_getwc_nolock, libd_fgetwc_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$_fgetwc_nolock, libd_fgetwc_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$fgetwc_unlocked, libd_fgetwc_unlocked);
+DEFINE_PUBLIC_ALIAS(getwc_unlocked, libc_fgetwc_unlocked);
 DEFINE_PUBLIC_ALIAS(fgetwc_unlocked, libc_fgetwc_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$putwc_unlocked, libd_fputwc_unlocked);
+DEFINE_PUBLIC_ALIAS(DOS$_putwc_nolock, libd_fputwc_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$_fputwc_nolock, libd_fputwc_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$fputwc_unlocked, libd_fputwc_unlocked);
 DEFINE_PUBLIC_ALIAS(putwc_unlocked, libc_fputwc_unlocked);

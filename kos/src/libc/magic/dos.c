@@ -77,20 +77,15 @@ __FORCELOCAL void (_enable)(void) { __sti(); }
 %#ifdef __USE_OLD_DOS
 %[default:section(".text.crt.dos.system")]
 
-@@>> delay(3)
-@@Sleep for `mill' milliseconds (1/1.000 seconds)
-[[cp, export_alias("__crtSleep")]]
-[[impl_include("<bits/types.h>"), requires_function(usleep)]]
-void delay(unsigned int mill) {
-	usleep((useconds_t)mill * 1000);
-}
+%[insert:function(delay = _sleep)]
 
 %[insert:function(_dos_getdiskfree = _getdiskfree)]
 
-@@>> sleep(2)
-@@Sleep for up to `duration' seconds
-[[cp, guard, nocrt, alias("_sleep", "sleep"), exposed_name("sleep")]]
-void dos_sleep(unsigned int duration);
+@@>> sleep(3)
+@@Dos-specific prototype for `sleep(3)'
+@@This one simply returns void, thus being unable to handle the EINTR-case.
+[[cp, guard, exposed_name("sleep")]]
+void dos_sleep(unsigned int duration) = sleep;
 
 %[default:section(".text.crt{|.dos}.fs.modify")]
 %[insert:extern(unlink)]

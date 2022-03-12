@@ -480,6 +480,8 @@ void _aligned_free_dbg([[nullable]] void *ptr) {
 }
 
 [[guard, wunused, ATTR_MALLOC]]
+[[dos_only_export_alias("_mbsdup_dbg")]]
+[[dos_only_export_as("mbsdup_dbg")]] /* ??? from msvcrtl.dll */
 [[crt_dos_only, requires_function(strdup)]]
 char *_strdup_dbg(char const *string, int block_type, char const *filename, int line) {
 	(void)block_type;

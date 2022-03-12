@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5329219e */
+/* HASH CRC-32:0xfccd4a5f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6048,12 +6048,18 @@ DEFINE_PUBLIC_ALIAS(strncmp, libc_strncmp);
 DEFINE_PUBLIC_ALIAS(strstr, libc_strstr);
 #endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRSTR */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRCPY)
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_mbscpy, libc_strcpy);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(strcpy, libc_strcpy);
 #endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRCPY */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRNCPY)
 DEFINE_PUBLIC_ALIAS(strncpy, libc_strncpy);
 #endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRNCPY */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRCAT)
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_mbscat, libc_strcat);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(strcat, libc_strcat);
 #endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRCAT */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRNCAT)
@@ -6082,6 +6088,9 @@ DEFINE_PUBLIC_ALIAS(DOS$strerror, libd_strerror);
 DEFINE_PUBLIC_ALIAS(strerror, libc_strerror);
 #endif /* !__KERNEL__ */
 #ifndef LIBC_ARCH_HAVE_STRNLEN
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(__strncnt, libc_strnlen);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(strnlen, libc_strnlen);
 #endif /* !LIBC_ARCH_HAVE_STRNLEN */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STPCPY)
@@ -6110,6 +6119,7 @@ DEFINE_PUBLIC_ALIAS(__strndup, libc_strndup);
 DEFINE_PUBLIC_ALIAS(strndup, libc_strndup);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strdup, libc_strdup);
+DEFINE_PUBLIC_ALIAS(_mbsdup, libc_strdup);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__strdup, libc_strdup);
 DEFINE_PUBLIC_ALIAS(strdup, libc_strdup);

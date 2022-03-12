@@ -3873,7 +3873,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x2f62cca7]]]*/
+/*[[[start:exports,hash:CRC-32=0x86b27b1f]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$__rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$rename, libd_rename);
@@ -3891,11 +3891,11 @@ DEFINE_PUBLIC_ALIAS(fflush, libc_fflush);
 DEFINE_PUBLIC_ALIAS(_IO_fflush, libc_fflush);
 DEFINE_PUBLIC_ALIAS(setvbuf, libc_setvbuf);
 DEFINE_PUBLIC_ALIAS(_IO_setvbuf, libc_setvbuf);
-DEFINE_PUBLIC_ALIAS(fgetc, libc_fgetc);
 DEFINE_PUBLIC_ALIAS(getc, libc_fgetc);
+DEFINE_PUBLIC_ALIAS(fgetc, libc_fgetc);
 DEFINE_PUBLIC_ALIAS(_IO_getc, libc_fgetc);
-DEFINE_PUBLIC_ALIAS(fputc, libc_fputc);
 DEFINE_PUBLIC_ALIAS(putc, libc_fputc);
+DEFINE_PUBLIC_ALIAS(fputc, libc_fputc);
 DEFINE_PUBLIC_ALIAS(_IO_putc, libc_fputc);
 DEFINE_PUBLIC_ALIAS(ungetc, libc_ungetc);
 DEFINE_PUBLIC_ALIAS(_IO_ungetc, libc_ungetc);
@@ -3946,8 +3946,12 @@ DEFINE_PUBLIC_ALIAS(fwrite_unlocked, libc_fwrite_unlocked);
 DEFINE_PUBLIC_ALIAS(_fwrite_nolock, libc_fwrite_unlocked);
 DEFINE_PUBLIC_ALIAS(fgetc_unlocked, libc_fgetc_unlocked);
 DEFINE_PUBLIC_ALIAS(getc_unlocked, libc_fgetc_unlocked);
-DEFINE_PUBLIC_ALIAS(fputc_unlocked, libc_fputc_unlocked);
+DEFINE_PUBLIC_ALIAS(_getc_nolock, libc_fgetc_unlocked);
+DEFINE_PUBLIC_ALIAS(_fgetc_nolock, libc_fgetc_unlocked);
 DEFINE_PUBLIC_ALIAS(putc_unlocked, libc_fputc_unlocked);
+DEFINE_PUBLIC_ALIAS(fputc_unlocked, libc_fputc_unlocked);
+DEFINE_PUBLIC_ALIAS(_putc_nolock, libc_fputc_unlocked);
+DEFINE_PUBLIC_ALIAS(_fputc_nolock, libc_fputc_unlocked);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_tempnam, libc_tempnam);
 #endif /* __LIBCCALL_IS_LIBDCALL */

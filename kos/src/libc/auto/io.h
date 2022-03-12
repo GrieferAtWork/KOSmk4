@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e56f0dc */
+/* HASH CRC-32:0x3e295042 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,12 @@ DECL_BEGIN
 #ifndef __KERNEL__
 INTDEF NONNULL((1)) errno_t NOTHROW_RPC(LIBDCALL libd__access_s)(char const *filename, __STDC_INT_AS_UINT_T type);
 INTDEF NONNULL((1)) errno_t NOTHROW_RPC(LIBCCALL libc__access_s)(char const *filename, __STDC_INT_AS_UINT_T type);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF NONNULL((2)) errno_t NOTHROW_NCX(LIBDCALL libd__umask_s)(mode_t nmode, mode_t *omode);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF NONNULL((2)) errno_t NOTHROW_NCX(LIBCCALL libc__umask_s)(mode_t nmode, mode_t *omode);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF oflag_t NOTHROW_NCX(LIBDCALL libd__setmode)(fd_t fd, oflag_t mode);

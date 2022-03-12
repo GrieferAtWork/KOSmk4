@@ -2601,6 +2601,10 @@ PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char32_t **libc___p___warg
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libd___p___wargv_initialized = ATOMIC_ONCE_INIT;
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libc___p___wargv_initialized = ATOMIC_ONCE_INIT;
 
+#undef __wargv
+DEFINE_PUBLIC_IDATA_G(__wargv, libc___p___wargv, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA_G(DOS$__wargv, libd___p___wargv, __SIZEOF_POINTER__);
+
 /*[[[head:libd___p___wargv,hash:CRC-32=0x61c5fc73]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.wchar.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
 NOTHROW_NCX(LIBDCALL libd___p___wargv)(void)
@@ -2921,28 +2925,6 @@ NOTHROW_NCX(LIBCCALL libc__get_purecall_handler)(void)
 }
 /*[[[end:libc__get_purecall_handler]]]*/
 
-/*[[[head:libc__set_invalid_parameter_handler,hash:CRC-32=0xdb334151]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.errno") _invalid_parameter_handler
-NOTHROW_NCX(LIBCCALL libc__set_invalid_parameter_handler)(_invalid_parameter_handler __handler)
-/*[[[body:libc__set_invalid_parameter_handler]]]*/
-/*AUTO*/{
-	(void)__handler;
-	CRT_UNIMPLEMENTEDF("_set_invalid_parameter_handler(%p)", __handler); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc__set_invalid_parameter_handler]]]*/
-
-/*[[[head:libc__get_invalid_parameter_handler,hash:CRC-32=0x31cb9fb2]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.errno") _invalid_parameter_handler
-NOTHROW_NCX(LIBCCALL libc__get_invalid_parameter_handler)(void)
-/*[[[body:libc__get_invalid_parameter_handler]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("_get_invalid_parameter_handler"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc__get_invalid_parameter_handler]]]*/
 
 #undef _fmode
 INTERN ATTR_SECTION(".bss.crt.dos.FILE.utility") int libd__fmode = 0;
@@ -3170,6 +3152,77 @@ NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format,
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_setproctitle]]]*/
+
+
+/************************************************************************/
+/* Functions from <crtdefs.h>                                           */
+/************************************************************************/
+PRIVATE ATTR_SECTION(".bss.crt.dos.errno") _invalid_parameter_handler
+libd_invalid_parameter_handler = NULL;
+
+DEFINE_PUBLIC_ALIAS(_invalid_parameter, libd__invalid_parameter);
+#ifdef __x86_64__
+DEFINE_PUBLIC_ALIAS("?_invalid_parameter@@YAXPEBG00I_K@Z", libd__invalid_parameter);
+#endif /* __x86_64__ */
+
+INTERN ATTR_SECTION(".text.crt.dos.errno") void
+NOTHROW_NCX(LIBDCALL libd__invalid_parameter)(__WCHAR16_TYPE__ const *expr, __WCHAR16_TYPE__ const *func,
+                                              __WCHAR16_TYPE__ const *file, unsigned int line,
+                                              uintptr_t zero) {
+	_invalid_parameter_handler handler;
+	handler = ATOMIC_READ(libd_invalid_parameter_handler);
+	if (handler) {
+		(*handler)(expr, func, file, line, zero);
+	} else {
+		/* We treat no-handle as a no-op. */
+	}
+}
+
+DEFINE_PUBLIC_ALIAS(_invoke_watson, libd__invoke_watson);
+INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.dos.errno") void
+NOTHROW_NCX(LIBDCALL libd__invoke_watson)(__WCHAR16_TYPE__ const *expr, __WCHAR16_TYPE__ const *func,
+                                          __WCHAR16_TYPE__ const *file, unsigned int line,
+                                          uintptr_t zero) {
+	(void)expr;
+	(void)func;
+	(void)file;
+	(void)line;
+	(void)zero;
+	std::abort();
+}
+
+DEFINE_PUBLIC_ALIAS(_invalid_parameter_noinfo, libd__invalid_parameter_noinfo);
+INTERN ATTR_SECTION(".text.crt.dos.errno") void
+NOTHROW_NCX(LIBDCALL libd__invalid_parameter_noinfo)(void) {
+	libd__invalid_parameter(NULL, NULL, NULL, 0, 0);
+}
+
+DEFINE_PUBLIC_ALIAS(_invalid_parameter_noinfo_noreturn, libd__invalid_parameter_noinfo_noreturn);
+INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.dos.errno") void
+NOTHROW_NCX(LIBDCALL libd__invalid_parameter_noinfo_noreturn)(void) {
+	libd__invalid_parameter(NULL, NULL, NULL, 0, 0);
+	std::abort();
+}
+
+
+/*[[[head:libc__set_invalid_parameter_handler,hash:CRC-32=0xdae2af3b]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.errno") _invalid_parameter_handler
+NOTHROW_NCX(LIBCCALL libc__set_invalid_parameter_handler)(_invalid_parameter_handler handler)
+/*[[[body:libc__set_invalid_parameter_handler]]]*/
+{
+	return ATOMIC_XCH(libd_invalid_parameter_handler, handler);
+}
+/*[[[end:libc__set_invalid_parameter_handler]]]*/
+
+/*[[[head:libc__get_invalid_parameter_handler,hash:CRC-32=0x31cb9fb2]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.errno") _invalid_parameter_handler
+NOTHROW_NCX(LIBCCALL libc__get_invalid_parameter_handler)(void)
+/*[[[body:libc__get_invalid_parameter_handler]]]*/
+{
+	return ATOMIC_READ(libd_invalid_parameter_handler);
+}
+/*[[[end:libc__get_invalid_parameter_handler]]]*/
+
 
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f75658e */
+/* HASH CRC-32:0x7e6f59d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -357,9 +357,6 @@ DFUN(".text.crt.dos.fs.dir", libd_kreaddirf, libc_kreaddirf, TI, 5, TIn(__SIZEOF
 DFUN(".text.crt.dos.fs.dir", libd_kreaddir64, libc_kreaddir64, TI, 4, TIn(__SIZEOF_FD_T__), TP, TI, TD)
 DFUN(".text.crt.dos.fs.dir", libd_kreaddirf64, libc_kreaddirf64, TI, 5, TIn(__SIZEOF_FD_T__), TP, TI, TD, TIn(__SIZEOF_OFLAG_T__))
 
-/* dos */
-DFUN(".text.crt.dos.system", libd_delay, libc_delay, TV, 1, TD)
-
 /* envz */
 DFUN(".text.crt.dos.string.envz", libd_envz_entry, libc_envz_entry, TP, 3, TP, TI, TP)
 DFUN(".text.crt.dos.string.envz", libd_envz_get, libc_envz_get, TP, 3, TP, TI, TP)
@@ -484,6 +481,7 @@ DFUN(".text.crt.dos.unicode.static.convert", libd_strtoi_l, libc_strtoi_l, TIn(_
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtou_l, libc_strtou_l, TIn(__SIZEOF_INTMAX_T__), 7, TP, TP, TD, TIn(__SIZEOF_INTMAX_T__), TIn(__SIZEOF_INTMAX_T__), TP, TP)
 
 /* io */
+DFUN(".text.crt.dos.fs.property", libd__umask_s, libc__umask_s, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_MODE_T__), TP)
 DFUN(".text.crt.dos.unsorted", libd__setmode, libc__setmode, TIn(__SIZEOF_OFLAG_T__), 2, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_OFLAG_T__))
 DFUN(".text.crt.dos.fs.dir", libd__findclose, libc__findclose, TD, 1, TP)
 DFUN(".text.crt.dos.fs.dir", libd__findnext32, libc__findnext32, TD, 2, TP, TP)
@@ -1712,6 +1710,7 @@ DFUN(".text.crt.dos.fs.utility", libd__splitpath, libc__splitpath, TV, 5, TP, TP
 DFUN(".text.crt.dos.errno", libd__seterrormode, libc__seterrormode, TV, 1, TD)
 DFUN(".text.crt.dos.errno", libd__set_error_mode, libc__set_error_mode, TD, 1, TD)
 DFUN(".text.crt.dos.system", libd__beep, libc__beep, TV, 2, TD, TD)
+DFUN(".text.crt.dos.bsd", libd__sleep, libc__sleep, TV, 1, TI32)
 DFUN(".text.crt.dos.unicode.static.convert", libd_itoa, libc_itoa, TP, 3, TD, TP, TD)
 DFUN(".text.crt.dos.unicode.static.convert", libd_ltoa, libc_ltoa, TP, 3, TL, TP, TD)
 DFUN(".text.crt.dos.unicode.static.convert", libd_ultoa, libc_ultoa, TP, 3, TL, TP, TD)

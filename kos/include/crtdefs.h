@@ -435,46 +435,57 @@ typedef __time64_t time_t;
 #ifdef __CC__
 #ifdef _DEBUG
 #ifdef __CRT_HAVE__invalid_parameter
-_CRTIMP void (__ATTR_CDECL _invalid_parameter)(__WCHAR16_TYPE__ const *,
-                                               __WCHAR16_TYPE__ const *,
-                                               __WCHAR16_TYPE__ const *,
-                                               unsigned int, __UINTPTR_TYPE__);
+_CRTIMP void (__LIBDCALL _invalid_parameter)(__WCHAR16_TYPE__ const *__expr,
+                                             __WCHAR16_TYPE__ const *__func,
+                                             __WCHAR16_TYPE__ const *__file,
+                                             unsigned int __line,
+                                             __UINTPTR_TYPE__ __zero);
 #else /* __CRT_HAVE__invalid_parameter */
-__LOCAL void (__ATTR_CDECL _invalid_parameter)(__WCHAR16_TYPE__ const *__UNUSED(__a),
-                                               __WCHAR16_TYPE__ const *__UNUSED(__b),
-                                               __WCHAR16_TYPE__ const *__UNUSED(__c),
-                                               unsigned int __UNUSED(__d),
-                                               __UINTPTR_TYPE__ __UNUSED(__e)) {}
+__LOCAL void (__LIBDCALL _invalid_parameter)(__WCHAR16_TYPE__ const *__UNUSED(__expr),
+                                             __WCHAR16_TYPE__ const *__UNUSED(__func),
+                                             __WCHAR16_TYPE__ const *__UNUSED(__file),
+                                             unsigned int __UNUSED(__line),
+                                             __UINTPTR_TYPE__ __UNUSED(__zero)) {}
 #endif /* !__CRT_HAVE__invalid_parameter */
 #else /* _DEBUG */
 #ifdef __CRT_HAVE__invalid_parameter_noinfo
-_CRTIMP void (__ATTR_CDECL _invalid_parameter_noinfo)(void);
+_CRTIMP void (__LIBDCALL _invalid_parameter_noinfo)(void);
 #else /* __CRT_HAVE__invalid_parameter_noinfo */
-__LOCAL void (__ATTR_CDECL _invalid_parameter_noinfo)(void) {}
+__LOCAL void (__LIBDCALL _invalid_parameter_noinfo)(void) {}
 #endif /* !__CRT_HAVE__invalid_parameter_noinfo */
 #ifdef __CRT_HAVE__invalid_parameter_noinfo_noreturn
-_CRTIMP __ATTR_NORETURN void (__ATTR_CDECL _invalid_parameter_noinfo_noreturn)(void);
-#elif defined(__CRT_HAVE__Exit)
-__CREDIRECT_VOID(__ATTR_NORETURN,,_invalid_parameter_noinfo_noreturn,(void),_Exit,())
+_CRTIMP __ATTR_NORETURN void (__LIBDCALL _invalid_parameter_noinfo_noreturn)(void);
+#elif defined(__CRT_HAVE___chk_fail)
+__COMPILER_REDIRECT_VOID(_CRTIMP,__ATTR_NORETURN,,__LIBDCALL,_invalid_parameter_noinfo_noreturn,(void),__chk_fail,())
+#elif defined(__CRT_HAVE_abort)
+__COMPILER_REDIRECT_VOID(_CRTIMP,__ATTR_NORETURN,,__LIBDCALL,_invalid_parameter_noinfo_noreturn,(void),abort,())
+#elif defined(__CRT_HAVE__ZSt9terminatev)
+__COMPILER_REDIRECT_VOID(_CRTIMP,__ATTR_NORETURN,,__LIBDCALL,_invalid_parameter_noinfo_noreturn,(void),_ZSt9terminatev,())
+#elif defined(__CRT_HAVE_terminate)
+__COMPILER_REDIRECT_VOID(_CRTIMP,__ATTR_NORETURN,,__LIBDCALL,_invalid_parameter_noinfo_noreturn,(void),terminate,())
 #elif defined(__CRT_HAVE__exit)
-__CREDIRECT_VOID(__ATTR_NORETURN,,_invalid_parameter_noinfo_noreturn,(void),_exit,())
-#else
-__LOCAL __ATTR_NORETURN void (__ATTR_CDECL _invalid_parameter_noinfo_noreturn)(void) { for (;;) {} }
-#endif
+__COMPILER_REDIRECT_VOID(_CRTIMP,__ATTR_NORETURN,,__LIBDCALL,_invalid_parameter_noinfo_noreturn,(void),_exit,())
+#else /* ... */
+__LOCAL __ATTR_NORETURN void (__LIBDCALL _invalid_parameter_noinfo_noreturn)(void) {
+	for (;;) {
+	}
+}
+#endif /* !... */
 #endif  /* _DEBUG */
 #ifdef __CRT_HAVE__invoke_watson
 _CRTIMP __ATTR_NORETURN void
-(__ATTR_CDECL _invoke_watson)(__WCHAR16_TYPE__ const *,
-                              __WCHAR16_TYPE__ const *,
-                              __WCHAR16_TYPE__ const *,
-                              unsigned int, __UINTPTR_TYPE__);
+(__LIBDCALL _invoke_watson)(__WCHAR16_TYPE__ const *__expr,
+                            __WCHAR16_TYPE__ const *__func,
+                            __WCHAR16_TYPE__ const *__file,
+                            unsigned int __line,
+                            __UINTPTR_TYPE__ __zero);
 #else /* __CRT_HAVE__invoke_watson */
 __LOCAL __ATTR_NORETURN void
-(__ATTR_CDECL _invoke_watson)(__WCHAR16_TYPE__ const *__UNUSED(__a),
-                              __WCHAR16_TYPE__ const *__UNUSED(__b),
-                              __WCHAR16_TYPE__ const *__UNUSED(__c),
-                              unsigned int __UNUSED(__d),
-                              __UINTPTR_TYPE__ __UNUSED(__e)) {
+(__LIBDCALL _invoke_watson)(__WCHAR16_TYPE__ const *__UNUSED(__expr),
+                            __WCHAR16_TYPE__ const *__UNUSED(__func),
+                            __WCHAR16_TYPE__ const *__UNUSED(__file),
+                            unsigned int __UNUSED(__line),
+                            __UINTPTR_TYPE__ __UNUSED(__zero)) {
 	for (;;) {
 	}
 }

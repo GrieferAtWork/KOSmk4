@@ -4259,22 +4259,30 @@ _purecall_handler _get_purecall_handler();
 %{
 #ifndef ___invalid_parameter_handler_defined
 #define ___invalid_parameter_handler_defined
-typedef void (__LIBDCALL *_invalid_parameter_handler)(wchar_t const *, wchar_t const *, wchar_t const *, unsigned int, __UINTPTR_TYPE__);
+typedef void (__LIBDCALL *_invalid_parameter_handler)(__WCHAR16_TYPE__ const *__expr,
+                                                      __WCHAR16_TYPE__ const *__func,
+                                                      __WCHAR16_TYPE__ const *__file,
+                                                      unsigned int __line,
+                                                      __UINTPTR_TYPE__ __zero);
 #endif /* !___invalid_parameter_handler_defined */
 }
 
 %[define(DEFINE_INVALID_PARAMETER_HANDLER =
-#ifndef ___invalid_parameter_handler_defined
+@@pp_ifndef ___invalid_parameter_handler_defined@@
 #define ___invalid_parameter_handler_defined
-typedef void (__LIBDCALL *_invalid_parameter_handler)(wchar_t const *, wchar_t const *, wchar_t const *, unsigned int, __UINTPTR_TYPE__);
-#endif /* !___invalid_parameter_handler_defined */
+typedef void (__LIBDCALL *_invalid_parameter_handler)(__WCHAR16_TYPE__ const *__expr,
+                                                      __WCHAR16_TYPE__ const *__func,
+                                                      __WCHAR16_TYPE__ const *__file,
+                                                      unsigned int __line,
+                                                      __UINTPTR_TYPE__ __zero);
+@@pp_endif@@
 )]
 %[define_replacement(_invalid_parameter_handler = _invalid_parameter_handler)]
 %[define_type_class(_invalid_parameter_handler = "TP")]
 
 [[section(".text.crt.dos.errno")]]
 [[decl_prefix(DEFINE_INVALID_PARAMETER_HANDLER)]]
-_invalid_parameter_handler _set_invalid_parameter_handler(_invalid_parameter_handler __handler);
+_invalid_parameter_handler _set_invalid_parameter_handler(_invalid_parameter_handler handler);
 
 [[section(".text.crt.dos.errno")]]
 [[decl_prefix(DEFINE_INVALID_PARAMETER_HANDLER)]]
@@ -5551,7 +5559,34 @@ int _set_error_mode(int mode);
 [[section(".text.crt.dos.system")]]
 void _beep(unsigned int freq, unsigned int duration);
 
-[[cp]] void _sleep($u32 duration) = sleep;
+@@>> _sleep(3)
+@@Sleep for `milli' milliseconds (1/1.000 seconds)
+[[cp, requires_function(nanosleep)]]
+[[impl_include("<bits/os/timespec.h>")]]
+[[impl_include("<libc/errno.h>")]]
+[[export_alias("__crtSleep")]]
+void _sleep($uint32_t milli) {
+	struct timespec ts;
+	ts.@tv_sec@  = milli / 1000;
+	ts.@tv_nsec@ = (milli % 1000) * 1000;
+@@pp_if defined(__libc_geterrno) && defined(EINTR)@@
+	{
+		struct timespec rem;
+		for (;;) {
+			rem.@tv_sec@  = 0;
+			rem.@tv_nsec@ = 0;
+			if (nanosleep(&ts, &rem) == 0)
+				break;
+			if (__libc_geterrno() == EINTR)
+				break;
+			ts.@tv_sec@  = rem.@tv_sec@;
+			ts.@tv_nsec@ = rem.@tv_nsec@;
+		}
+	}
+@@pp_else@@
+	nanosleep(&ts, NULL);
+@@pp_endif@@
+}
 
 %
 %{

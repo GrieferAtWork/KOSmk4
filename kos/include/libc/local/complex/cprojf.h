@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95ba4021 */
+/* HASH CRC-32:0x7acca734 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,6 +42,8 @@ __NAMESPACE_LOCAL_BEGIN
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_copysignf,(float __num, float __sign),copysignf,{ return __builtin_copysignf(__num, __sign); })
 #elif defined(__CRT_HAVE_copysignf)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_copysignf,(float __num, float __sign),copysignf,(__num,__sign))
+#elif defined(__CRT_HAVE__copysignf)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_copysignf,(float __num, float __sign),_copysignf,(__num,__sign))
 #elif defined(__CRT_HAVE___copysignf)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_copysignf,(float __num, float __sign),__copysignf,(__num,__sign))
 #else /* ... */

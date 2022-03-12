@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9bffac6 */
+/* HASH CRC-32:0xb650e44f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -447,6 +447,10 @@ DEFINE_PUBLIC_ALIAS(_aligned_offset_malloc_dbg, libc__aligned_offset_malloc_dbg)
 DEFINE_PUBLIC_ALIAS(_aligned_offset_realloc_dbg, libc__aligned_offset_realloc_dbg);
 DEFINE_PUBLIC_ALIAS(_aligned_offset_recalloc_dbg, libc__aligned_offset_recalloc_dbg);
 DEFINE_PUBLIC_ALIAS(_aligned_free_dbg, libc__aligned_free_dbg);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_mbsdup_dbg, libc__strdup_dbg);
+DEFINE_PUBLIC_ALIAS(mbsdup_dbg, libc__strdup_dbg);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(_strdup_dbg, libc__strdup_dbg);
 DEFINE_PUBLIC_ALIAS(_wcsdup_dbg, libc__wcsdup_dbg);
 DEFINE_PUBLIC_ALIAS(_tempnam_dbg, libc__tempnam_dbg);

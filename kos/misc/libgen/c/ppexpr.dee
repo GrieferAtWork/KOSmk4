@@ -1579,7 +1579,7 @@ function optimizeForIfdef(expr: string): string {
 	    result.findmatch("(", ")", 8) == #result - 1) {
 		local definedName = result[8:-1].strip();
 		if (definedName.issymbol())
-			return "#ifdef {}\n".format({  });
+			return "#ifdef {}\n".format({ definedName });
 	}
 	if (expr.startswith("!defined(") && expr.endswith(")") &&
 	    expr.findmatch("(", ")", 9) == #expr - 1) {

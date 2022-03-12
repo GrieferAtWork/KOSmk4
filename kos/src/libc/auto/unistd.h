@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2be35be5 */
+/* HASH CRC-32:0xbaf74b1a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,7 +99,9 @@ INTDEF ATTR_SENTINEL_O(1) NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_execlpe)(c
  * @return: -1: Error (s.a. `errno') */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_pipe)(fd_t pipedes[2]);
 /* >> sleep(3)
- * Sleep for up to `seconds' seconds */
+ * Sleep for up to `seconds' seconds
+ * @return: 0 : Timeout expired
+ * @return: * : You were interrupted, and this many seconds were still left on the timeout */
 INTDEF unsigned int NOTHROW_RPC(LIBDCALL libd_sleep)(unsigned int seconds);
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),

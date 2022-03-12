@@ -630,6 +630,14 @@ INTERN_FUNCTION(F_STRING(nlen))
 	.cfi_endproc
 END(F_STRING(nlen))
 DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(nlen), F_STRING(nlen))
+#ifndef __KERNEL__
+#if N == 1
+DEFINE_PUBLIC_ALIAS(__strncnt, F_STRING(nlen))     /* DOS-specific name */
+#elif N == 2
+DEFINE_PUBLIC_ALIAS(DOS$__wcsncnt, F_STRING(nlen)) /* DOS-specific name */
+#endif /* N == ... */
+#endif /* !__KERNEL__ */
+
 
 /***********************************************************/
 /* char *LIBCCALL strnend(char const *str, size_t maxlen); */

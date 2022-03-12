@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b49b703 */
+/* HASH CRC-32:0x65a3bb48 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,8 @@ __NAMESPACE_LOCAL_BEGIN
 __CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strcat,(char *__restrict __dst, char const *__restrict __src),strcat,{ return __builtin_strcat(__dst, __src); })
 #elif defined(__CRT_HAVE_strcat)
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strcat,(char *__restrict __dst, char const *__restrict __src),strcat,(__dst,__src))
+#elif defined(__CRT_HAVE__mbscat)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strcat,(char *__restrict __dst, char const *__restrict __src),_mbscat,(__dst,__src))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strcat.h>

@@ -267,6 +267,7 @@ cimagf(*) %{generate(double2float("cimag"))}
 cprojf(*) %{generate(double2float("cproj"))}
 
 [[requires_function(hypot, creal, cimag)]]
+[[dos_only_export_alias("_cabs")]] /* DOS-specific name */
 double cabs(double _Complex z) {
 	COMPLEX_IMPL_COPYRIGHT_NOTICE
 	return hypot(creal(z), cimag(z));

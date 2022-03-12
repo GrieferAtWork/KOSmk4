@@ -554,6 +554,9 @@ DEFINE_PUBLIC_ALIAS(F(bzero), F(libc_bzero))
 
 #ifdef F_STRING
 
+/*******************************************/
+/* char *LIBCCALL strend(char const *str); */
+/*******************************************/
 .section STRING_SECTION
 INTERN_FUNCTION(F_STRING(end))
 	.cfi_startproc
@@ -576,6 +579,9 @@ INTERN_FUNCTION(F_STRING(end))
 END(F_STRING(end))
 DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(end), F_STRING(end))
 
+/********************************************/
+/* size_t LIBCCALL strlen(char const *str); */
+/********************************************/
 .section STRING_SECTION
 INTERN_FUNCTION(F_STRING(len))
 	.cfi_startproc
@@ -599,6 +605,9 @@ INTERN_FUNCTION(F_STRING(len))
 END(F_STRING(len))
 DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(len), F_STRING(len))
 
+/************************************************************/
+/* size_t LIBCCALL strnlen(char const *str, size_t maxlen); */
+/************************************************************/
 .section STRING_SECTION
 INTERN_FUNCTION(F_STRING(nlen))
 	.cfi_startproc
@@ -633,7 +642,18 @@ INTERN_FUNCTION(F_STRING(nlen))
 	.cfi_endproc
 END(F_STRING(nlen))
 DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(nlen), F_STRING(nlen))
+#ifndef __KERNEL__
+#if N == 1
+DEFINE_PUBLIC_ALIAS(__strncnt, F_STRING(nlen))     /* DOS-specific name */
+#elif N == 2
+DEFINE_PUBLIC_ALIAS(DOS$__wcsncnt, F_STRING(nlen)) /* DOS-specific name */
+#endif /* N == ... */
+#endif /* !__KERNEL__ */
 
+
+/***********************************************************/
+/* char *LIBCCALL strnend(char const *str, size_t maxlen); */
+/***********************************************************/
 .section STRING_SECTION
 INTERN_FUNCTION(F_STRING(nend))
 	.cfi_startproc

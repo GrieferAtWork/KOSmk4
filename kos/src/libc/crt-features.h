@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb57c2c7d */
+/* HASH CRC-32:0xd6a66de5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -445,6 +445,7 @@
 #define __CRT_HAVE_DOS$_seterrormode
 #define __CRT_HAVE_DOS$_setmaxstdio
 #define __CRT_HAVE_DOS$_setmode
+#define __CRT_HAVE_DOS$_sleep
 #define __CRT_HAVE_DOS$_snprintf
 #define __CRT_HAVE_DOS$_snprintf_c
 #define __CRT_HAVE_DOS$_snprintf_c_l
@@ -514,6 +515,7 @@
 #define __CRT_HAVE_DOS$_ultow_s
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$_umask_s
 #define __CRT_HAVE_DOS$_unloaddll
 #define __CRT_HAVE_DOS$_unlock_fhandle
 #define __CRT_HAVE_DOS$_vfprintf_l
@@ -941,7 +943,6 @@
 #define __CRT_HAVE_DOS$dcgettext
 #define __CRT_HAVE_DOS$dcngettext
 #define __CRT_HAVE_DOS$dehumanize_number
-#define __CRT_HAVE_DOS$delay
 #define __CRT_HAVE_DOS$detach
 #define __CRT_HAVE_DOS$devname
 #define __CRT_HAVE_DOS$devname_r
@@ -4075,6 +4076,7 @@
 #define __CRT_HAVE__seterrormode
 #define __CRT_HAVE__setmaxstdio
 #define __CRT_HAVE__setmode
+#define __CRT_HAVE__sleep
 #define __CRT_HAVE__snprintf
 #define __CRT_HAVE__snprintf_c
 #define __CRT_HAVE__snprintf_c_l
@@ -4137,6 +4139,7 @@
 #define __CRT_HAVE__ultoa_s
 #define __CRT_HAVE__ultow
 #define __CRT_HAVE__ultow_s
+#define __CRT_HAVE__umask_s
 #define __CRT_HAVE__unloaddll
 #define __CRT_HAVE__unlock_fhandle
 #define __CRT_HAVE__unlock_locales
@@ -4543,7 +4546,6 @@
 #define __CRT_HAVE_dcgettext
 #define __CRT_HAVE_dcngettext
 #define __CRT_HAVE_dehumanize_number
-#define __CRT_HAVE_delay
 #define __CRT_HAVE_detach
 #define __CRT_HAVE_devname
 #define __CRT_HAVE_devname_r
