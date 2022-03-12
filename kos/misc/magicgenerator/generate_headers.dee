@@ -45,7 +45,7 @@ final global HASH_FUNCTION = "CRC-32";
 global knownUserspaceCrtFeaturesAlways: {string...} = HashSet();
 
 @@Similar to @knownUserspaceCrtFeaturesAlways, but these
-@@are the conditionally available functions.
+@@are    the    conditionally    available    functions.
 global knownUserspaceCrtFeaturesConditionally: {string...} = HashSet();
 
 @@Set of macro assumptions for KOS user-space.
@@ -1325,7 +1325,7 @@ try {
 	}
 
 	/* Need another barrier here because assumptions
-	 * gathered in `doPrint_src_libc_crtFeatures' */
+	 * gathered  in   `doPrint_src_libc_crtFeatures' */
 	waitTasks();
 	messagePrefix = "3/4";
 

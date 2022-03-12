@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc685185 */
+/* HASH CRC-32:0x2504d37e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -189,7 +189,7 @@ enum __rlimit_resource {
 #define RLIM_NLIMITS      RLIM_NLIMITS      /* Total # of (standard) resource limits */
 #endif /* __RLIMIT_NLIMITS */
 
-	/* Extended resource limits (os-specific) */
+	/* Extended resource limits (OS-specific) */
 #if defined(__USE_KOS) && defined(__RLIMIT_MAXFILE)
 #define RLIMIT_MAXFILE    RLIMIT_MAXFILE    /* greatest usable FD number */
 #endif /* __USE_KOS && __RLIMIT_MAXFILE */
@@ -252,7 +252,7 @@ enum __rlimit_resource {
 #define RLIM_NLIMITS      __RLIMIT_NLIMITS    /* Total # of (standard) resource limits */
 #endif /* __RLIMIT_NLIMITS */
 
-	/* Extended resource limits (os-specific) */
+	/* Extended resource limits (OS-specific) */
 #if defined(__USE_KOS) && defined(__RLIMIT_MAXFILE)
 #define RLIMIT_MAXFILE    __RLIMIT_MAXFILE    /* greatest usable FD number */
 #endif /* __USE_KOS && __RLIMIT_MAXFILE */

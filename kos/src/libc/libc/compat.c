@@ -1000,7 +1000,7 @@ NOTHROW_NCX(LIBCCALL libc_gnu_get_libc_release)(void) {
 }
 
 /* String stolen from the shared `libc.so.5' file I'm using as reference.
- * If there's one version which KOS's emulation of linux libc tries to
+ * If  there's one version  which KOS's emulation of  linux libc tries to
  * follow in terms of ABI specs, it's this one.
  *
  * Oh: and this string is exported as:

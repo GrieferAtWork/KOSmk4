@@ -6049,7 +6049,7 @@ again_lookup_wcsCurrent:
 							 *      and as such don't require a wrapper. */
 							if (!kosProto.argv) {
 								/* Deal with [[dos_only_export_alias()]] annotations, which are normally
-								 * generated to only link the DOS symbol name against the libc variant
+								 * generated to only link the DOS  symbol name against the libc  variant
 								 * when `__LIBCCALL_IS_LIBDCALL' is defined.
 								 *
 								 * Because we're assuming that zero-argments implies `__LIBCCALL_IS_LIBDCALL',

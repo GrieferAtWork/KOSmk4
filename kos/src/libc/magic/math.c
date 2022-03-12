@@ -156,7 +156,7 @@
 
 
 /* NOTE: These assumptions are correct for all currently targeted platforms,
- *       but by making them we can get rid of a significant portion of libc
+ *       but  by making them we can get rid of a significant portion of libc
  *       code. If we ever target a platform where these aren't correct, then
  *       you should simply delete them from here! */
 %[assume_defined_in_kos(__IEEE754_FLOAT_TYPE_IS_FLOAT__)]

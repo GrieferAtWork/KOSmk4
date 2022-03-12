@@ -19,7 +19,7 @@
  */
 
 /* This right here allows headers to assume that stuff like open64() doesn't do
- * anything and can also be resolved by linking against open(). */
+ * anything  and   can   also   be  resolved   by   linking   against   open(). */
 #define __O_LARGEFILE 0
 
 /* KOS */

@@ -46,22 +46,22 @@
 #define rlimitx64 __rlimitx64
 #else /* !__x86_64__ */
 #include <features.h>
-#define __OFFSET_RLIMIT_CUR      __OFFSET_RLIMITX64_CUR
-#define __OFFSET_RLIMIT_MAX      __OFFSET_RLIMITX64_MAX
-#define __SIZEOF_RLIMIT          __SIZEOF_RLIMITX64
-#define __ALIGNOF_RLIMIT         __ALIGNOF_RLIMITX64
-#define __OFFSET_RLIMIT32_CUR    __OFFSET_RLIMITX64_CUR
-#define __OFFSET_RLIMIT32_MAX    __OFFSET_RLIMITX64_MAX
-#define __SIZEOF_RLIMIT32        __SIZEOF_RLIMITX64
-#define __ALIGNOF_RLIMIT32       __ALIGNOF_RLIMITX64
-#define __OFFSET_RLIMIT64_CUR    __OFFSET_RLIMITX64_CUR
-#define __OFFSET_RLIMIT64_MAX    __OFFSET_RLIMITX64_MAX
-#define __SIZEOF_RLIMIT64        __SIZEOF_RLIMITX64
-#define __ALIGNOF_RLIMIT64       __ALIGNOF_RLIMITX64
-#define rlimitx64                rlimit
-#define __rlimitx64              rlimit
-#define __rlimit32               rlimit
-#define __rlimit_alt             rlimit
+#define __OFFSET_RLIMIT_CUR   __OFFSET_RLIMITX64_CUR
+#define __OFFSET_RLIMIT_MAX   __OFFSET_RLIMITX64_MAX
+#define __SIZEOF_RLIMIT       __SIZEOF_RLIMITX64
+#define __ALIGNOF_RLIMIT      __ALIGNOF_RLIMITX64
+#define __OFFSET_RLIMIT32_CUR __OFFSET_RLIMITX64_CUR
+#define __OFFSET_RLIMIT32_MAX __OFFSET_RLIMITX64_MAX
+#define __SIZEOF_RLIMIT32     __SIZEOF_RLIMITX64
+#define __ALIGNOF_RLIMIT32    __ALIGNOF_RLIMITX64
+#define __OFFSET_RLIMIT64_CUR __OFFSET_RLIMITX64_CUR
+#define __OFFSET_RLIMIT64_MAX __OFFSET_RLIMITX64_MAX
+#define __SIZEOF_RLIMIT64     __SIZEOF_RLIMITX64
+#define __ALIGNOF_RLIMIT64    __ALIGNOF_RLIMITX64
+#define rlimitx64             rlimit
+#define __rlimitx64           rlimit
+#define __rlimit32            rlimit
+#define __rlimit_alt          rlimit
 #define _RLIMIT_MATCHES_RLIMIT64 1
 #ifdef __USE_KOS
 #define rlimit32 rlimit

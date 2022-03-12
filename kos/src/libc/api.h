@@ -87,11 +87,11 @@ __asm__("__stack_chk_fail = libc_stack_chk_fail");
 __asm__("__stack_chk_fail_local = libc_stack_chk_fail");
 #endif /* !GUARD_LIBC_LIBC_SSP_C */
 
-/* NOTE: Even though some of the following functions can (and are) overwritten
- *       by libstdc++, even in the event of that happening, we (libc) can still
+/* NOTE: Even though some of the  following functions can (and are)  overwritten
+ *       by libstdc++, even in the event of that happening, we (libc) can  still
  *       continue to use our own, original variants, since while ours are unable
- *       to properly catch non-KOS exceptions (like `throw std::exception'),
- *       they're fully still capable of re-throwing them (in case they were
+ *       to  properly  catch non-KOS  exceptions  (like `throw std::exception'),
+ *       they're fully  still capable  of re-throwing  them (in  case they  were
  *       thrown by user-provided callbacks to functions like `qsort(3)', as well
  *       as being able to handle KOS exceptions (s.a. `<kos/except.h>') */
 #ifndef GUARD_LIBC_HYBRID_EXCEPT_C
