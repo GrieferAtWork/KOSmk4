@@ -194,3 +194,36 @@ If libc contains relocations not rationalized by this document, their presence m
 
 	- This way of accessing global symbols is simplified via the macros in `/kos/src/libc/libc/globals.h`, which you are encouraged to use, knowing that they will do their best to give you the most performance in terms of safely (and without relocations) accessing global data objects.
 	- The same work-around also needs to be used to determine the final address of functions which programs may reasonably be expected to (or required to) override (such as `matherr(3)`).
+
+
+
+### Special file: `/kos/src/libc/crt-features.h`
+
+This file is the crt-features descriptor used while building libc. Because the act of building libc itself is considered to be a special case, and because libc's `INTERN` symbols mustn't share the same namespace as its public symbols (intern: `libc_strlen`; public: `strlen`), the `__CRT_HAVE_*` macros in here don't indicate a one-on-one mapping. Instead, the following mapping is implied:
+
+- `__CRT_HAVE_foo` means that libc has a symbol `INTERN libc_foo` (*usually* exported as `foo`)
+- `__CRT_HAVE_DOS$foo` means that libc has a symbol `INTERN libd_foo` (*usually* exported as `DOS$foo`)
+- `__CRT_HAVE_KOS$foo` means a bug. -- Such a macro shouldn't be get defined in here
+
+In conjunction with this, `<__crt.h>` has special handling for when `__BUILDING_LIBC` is defined, such that it understands that `__CRT_HAVE_*` symbols in this configuration exist in a special namespace. As such, -- assuming that `defined(__CRT_HAVE_strlen)` -- a declaration like:
+
+```c
+__CDECLARE(ATTR_PURE WUNUSED NONNULL((1)),size_t,NOTHROW_NCX,strlen,(char const *__restrict str),(str))
+```
+
+... normally expands to:
+
+```c
+__LIBC ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL strlen)(char const *__restrict str);
+```
+
+But when `__BUILDING_LIBC` was defined, it will instead expand to:
+
+```c
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL strlen)(char const *__restrict str) ASMNAME("libc_strlen");
+```
+
+Because of the fact that export aliases exist, and not every symbol publicly exported from libc has an `INTERN` alias with `libc_` prefixed (e.g.: libc doesn't have a symbol `INTERN libc__ZSt9terminatev`, even though it does have a symbol `PUBLIC _ZSt9terminatev`), we can't make use of the public CRT feature listing (e.g.: as defined in `<i386-kos/crt-features/crt-kos32.h>`), but have to use our own, custom one that defines macros for exactly those symbols which **do** exist in the `libc_*` namespace.
+
+Note however that in practise, you shouldn't need to worry about this file. -- It's one of the files that get created/updated automatically by `/kos/misc/magicgenerator/generate_headers.dee`, which is automatically run whenever one of the `/kos/src/libc/magic/*.c` files changes.
+
