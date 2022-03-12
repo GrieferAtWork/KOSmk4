@@ -81,25 +81,29 @@ global final MSVCRT_VERSION_FILES: {int: string} = {
 	0x81000000 + 100 : "C:\\Windows\\System32\\msvcr100.dll",
 	0x02000000 + 100 : "E:\\c\\msvcr\\x32\\msvcr100d.dll",
 	0x82000000 + 100 : "E:\\c\\msvcr\\x64\\msvcr100d.dll",
+	0x01000000 + 110 : "E:\\c\\msvcr\\x32\\msvcr110.dll",
+	0x81000000 + 110 : "C:\\Windows\\System32\\msvcr110.dll",
+	0x02000000 + 110 : "E:\\c\\msvcr\\x32\\msvcr110d.dll",
+	0x82000000 + 110 : "E:\\c\\msvcr\\x64\\msvcr110d.dll",
 	0x01000000 + 120 : "C:\\Windows\\SysWOW64\\msvcr120.dll",
 	0x81000000 + 120 : "C:\\Windows\\System32\\msvcr120.dll",
 	0x02000000 + 120 : "E:\\c\\msvcr\\x32\\msvcr120d.dll",
 	0x82000000 + 120 : "E:\\c\\msvcr\\x64\\msvcr120d.dll",
 	0x01000000 + 140 : {
-		"C:\\Windows\\System32\\ucrtbase.dll",
-		"C:\\Windows\\System32\\vcruntime140.dll",
-	},
-	0x81000000 + 140 : {
 		"C:\\Windows\\SysWOW64\\ucrtbase.dll",
 		"C:\\Windows\\SysWOW64\\vcruntime140.dll",
 	},
-	0x02000000 + 140 : {
-		"C:\\Windows\\System32\\ucrtbased.dll",
-		"C:\\Windows\\System32\\vcruntime140d.dll",
+	0x81000000 + 140 : {
+		"C:\\Windows\\System32\\ucrtbase.dll",
+		"C:\\Windows\\System32\\vcruntime140.dll",
 	},
-	0x82000000 + 140 : {
+	0x02000000 + 140 : {
 		"C:\\Windows\\SysWOW64\\ucrtbased.dll",
 		"C:\\Windows\\SysWOW64\\vcruntime140d.dll",
+	},
+	0x82000000 + 140 : {
+		"C:\\Windows\\System32\\ucrtbased.dll",
+		"C:\\Windows\\System32\\vcruntime140d.dll",
 	},
 };
 global final KNOWN_VERSION = (for (local v: MSVCRT_VERSION_FILES.keys) v & 0xffff).sorted();
@@ -265,6 +269,7 @@ print("\
  *         _DEBUG                             _RELEASE
  *    0:   msvcrt.dll                         -
  *    100: msvcr100.dll                       msvcr100d.dll
+ *    110: msvcr110.dll                       msvcr110d.dll
  *    120: msvcr120.dll                       msvcr120d.dll
  *    140: ucrtbase.dll, vcruntime140.dll     ucrtbased.dll, vcruntime140d.dll
  *
@@ -281,6 +286,8 @@ print("\
 #define __MSVCRT_VERSION__ 140 /* ucrtbase.dll, vcruntime140.dll  (VS 2015) */
 #elif _MSC_VER >= 1800
 #define __MSVCRT_VERSION__ 120 /* msvcr120.dll  (VS 2013) */
+#elif _MSC_VER >= 1700
+#define __MSVCRT_VERSION__ 110 /* msvcr130.dll  (VS 2012) */
 #elif _MSC_VER >= 1600
 #define __MSVCRT_VERSION__ 100 /* msvcr100.dll  (VS 2010) */
 #else /* ... */

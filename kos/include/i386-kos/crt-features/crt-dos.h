@@ -27,6 +27,7 @@
  *         _DEBUG                             _RELEASE
  *    0:   msvcrt.dll                         -
  *    100: msvcr100.dll                       msvcr100d.dll
+ *    110: msvcr110.dll                       msvcr110d.dll
  *    120: msvcr120.dll                       msvcr120d.dll
  *    140: ucrtbase.dll, vcruntime140.dll     ucrtbased.dll, vcruntime140d.dll
  *
@@ -43,6 +44,8 @@
 #define __MSVCRT_VERSION__ 140 /* ucrtbase.dll, vcruntime140.dll  (VS 2015) */
 #elif _MSC_VER >= 1800
 #define __MSVCRT_VERSION__ 120 /* msvcr120.dll  (VS 2013) */
+#elif _MSC_VER >= 1700
+#define __MSVCRT_VERSION__ 110 /* msvcr130.dll  (VS 2012) */
 #elif _MSC_VER >= 1600
 #define __MSVCRT_VERSION__ 100 /* msvcr100.dll  (VS 2010) */
 #else /* ... */
@@ -942,9 +945,19 @@
 #define __CRT_HAVE__realloc_crt
 #define __CRT_HAVE__recalloc_crt
 #endif /* !_DEBUG && __MSVCRT_VERSION__ >= 100 && __MSVCRT_VERSION__ <= 120 */
-#if !defined(__x86_64__) && !defined(_DEBUG) && __MSVCRT_VERSION__ >= 140
-#define __CRT_HAVE___CxxFrameHandler4
-#endif /* !__x86_64__ && !_DEBUG && __MSVCRT_VERSION__ >= 140 */
+#if !defined(__x86_64__) && (!__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 110 || __MSVCRT_VERSION__ == 120 || __MSVCRT_VERSION__ >= 140)
+#define __CRT_HAVE__libm_sse2_acos_precise
+#define __CRT_HAVE__libm_sse2_asin_precise
+#define __CRT_HAVE__libm_sse2_atan_precise
+#define __CRT_HAVE__libm_sse2_cos_precise
+#define __CRT_HAVE__libm_sse2_exp_precise
+#define __CRT_HAVE__libm_sse2_log10_precise
+#define __CRT_HAVE__libm_sse2_log_precise
+#define __CRT_HAVE__libm_sse2_pow_precise
+#define __CRT_HAVE__libm_sse2_sin_precise
+#define __CRT_HAVE__libm_sse2_sqrt_precise
+#define __CRT_HAVE__libm_sse2_tan_precise
+#endif /* !__x86_64__ && (!__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 110 || __MSVCRT_VERSION__ == 120 || __MSVCRT_VERSION__ >= 140) */
 #if !defined(__x86_64__) && !__MSVCRT_VERSION__
 #define __CRT_HAVE__CallMemberFunction0
 #define __CRT_HAVE__CallMemberFunction1
@@ -1012,7 +1025,27 @@
 #define __CRT_HAVE_$Qwhat$Aexception$A$AUBEPBDXZ
 #endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
 #endif /* !__x86_64__ && !__MSVCRT_VERSION__ */
+#if !defined(__x86_64__) && __MSVCRT_VERSION__ == 110
+#ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
+#define __CRT_HAVE_$Q$Q0_CancellationTokenState$Adetails$AConcurrency$A$AAAE$AXZ
+#define __CRT_HAVE_$Q$Q1_CancellationTokenState$Adetails$AConcurrency$A$AUAE$AXZ
+#define __CRT_HAVE_$Q_Cancel$A_CancellationTokenState$Adetails$AConcurrency$A$AQAEXXZ
+#define __CRT_HAVE_$Q_DeregisterCallback$A_CancellationTokenState$Adetails$AConcurrency$A$AQAEXPAV_CancellationTokenRegistration$A23$A$AZ
+#define __CRT_HAVE_$Q_Destroy$A_CancellationTokenState$Adetails$AConcurrency$A$AEAEXXZ
+#define __CRT_HAVE_$Q_Invoke$A_CancellationTokenRegistration$Adetails$AConcurrency$A$AAAEXXZ
+#define __CRT_HAVE_$Q_NewTokenState$A_CancellationTokenState$Adetails$AConcurrency$A$ASAPAV123$AXZ
+#define __CRT_HAVE_$Q_RegisterCallback$A_CancellationTokenState$Adetails$AConcurrency$A$AQAEPAV_CancellationTokenRegistration$A23$AP6AXPAX$AZ0H$AZ
+#define __CRT_HAVE_$Q_RegisterCallback$A_CancellationTokenState$Adetails$AConcurrency$A$AQAEXPAV_CancellationTokenRegistration$A23$A$AZ
+#define __CRT_HAVE____crtCreateSemaphoreExW$A24
+#endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
+#endif /* !__x86_64__ && __MSVCRT_VERSION__ == 110 */
 #if !defined(__x86_64__) && __MSVCRT_VERSION__ == 120
+#ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
+#define __CRT_HAVE_$Q$Q1_StructuredTaskCollection$Adetails$AConcurrency$A$AQAE$AXZ
+#define __CRT_HAVE_$QCaptureCallstack$Aplatform$Adetails$AConcurrency$A$AYAIPAPAXII$AZ
+#endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
+#endif /* !__x86_64__ && __MSVCRT_VERSION__ == 120 */
+#if !defined(__x86_64__) && __MSVCRT_VERSION__ >= 110 && __MSVCRT_VERSION__ <= 120
 #ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __CRT_HAVE_$Q$Q0_Cancellation_beacon$Adetails$AConcurrency$A$AQAE$AXZ
 #define __CRT_HAVE_$Q$Q0_Condition_variable$Adetails$AConcurrency$A$AQAE$AXZ
@@ -1028,13 +1061,11 @@
 #define __CRT_HAVE_$Q$Q0task_canceled$AConcurrency$A$AQAE$AXZ
 #define __CRT_HAVE_$Q$Q1_Cancellation_beacon$Adetails$AConcurrency$A$AQAE$AXZ
 #define __CRT_HAVE_$Q$Q1_Condition_variable$Adetails$AConcurrency$A$AQAE$AXZ
-#define __CRT_HAVE_$Q$Q1_StructuredTaskCollection$Adetails$AConcurrency$A$AQAE$AXZ
 #define __CRT_HAVE_$Q$Q1_Timer$Adetails$AConcurrency$A$AMAE$AXZ
 #define __CRT_HAVE_$Q$Q3$AYAXPAXHPBDH$AZ
 #define __CRT_HAVE_$Q$Q_F_Context$Adetails$AConcurrency$A$AQAEXXZ
 #define __CRT_HAVE_$Q$Q_F_Scheduler$Adetails$AConcurrency$A$AQAEXXZ
 #define __CRT_HAVE_$Q$Q_V$AYAXPAXHPBDH$AZ
-#define __CRT_HAVE_$QCaptureCallstack$Aplatform$Adetails$AConcurrency$A$AYAIPAPAXII$AZ
 #define __CRT_HAVE_$QCreateScheduleGroup$ACurrentScheduler$AConcurrency$A$ASAPAVScheduleGroup$A2$AAAVlocation$A2$A$AZ
 #define __CRT_HAVE_$QIsAvailableLocation$ACurrentScheduler$AConcurrency$A$ASA_NABVlocation$A2$A$AZ
 #define __CRT_HAVE_$QScheduleTask$ACurrentScheduler$AConcurrency$A$ASAXP6AXPAX$AZ0AAVlocation$A2$A$AZ
@@ -1062,87 +1093,11 @@
 #define __CRT_HAVE_$Qwait$A_Condition_variable$Adetails$AConcurrency$A$AQAEXAAVcritical_section$A3$A$AZ
 #define __CRT_HAVE_$Qwait_for$A_Condition_variable$Adetails$AConcurrency$A$AQAE_NAAVcritical_section$A3$AI$AZ
 #endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
-#endif /* !__x86_64__ && __MSVCRT_VERSION__ == 120 */
+#endif /* !__x86_64__ && __MSVCRT_VERSION__ >= 110 && __MSVCRT_VERSION__ <= 120 */
 #if !defined(__x86_64__) && __MSVCRT_VERSION__ >= 140
-#define __CRT_HAVE___C_specific_handler_noexcept
-#define __CRT_HAVE___intrinsic_setjmpex
-#define __CRT_HAVE__get_FMA3_enable
+#define __CRT_HAVE___intrinsic_abnormal_termination
 #endif /* !__x86_64__ && __MSVCRT_VERSION__ >= 140 */
-#if !defined(__x86_64__) || __MSVCRT_VERSION__ >= 100
-#define __CRT_HAVE___CxxDetectRethrow
-#define __CRT_HAVE___CxxExceptionFilter
-#define __CRT_HAVE___CxxQueryExceptionSize
-#define __CRT_HAVE___CxxRegisterExceptionObject
-#define __CRT_HAVE___CxxUnregisterExceptionObject
-#define __CRT_HAVE___p___argc
-#define __CRT_HAVE___p___argv
-#define __CRT_HAVE___p___wargv
-#define __CRT_HAVE___p__acmdln
-#define __CRT_HAVE___p__commode
-#define __CRT_HAVE___p__environ
-#define __CRT_HAVE___p__fmode
-#define __CRT_HAVE___p__mbcasemap
-#define __CRT_HAVE___p__mbctype
-#define __CRT_HAVE___p__pgmptr
-#define __CRT_HAVE___p__wcmdln
-#define __CRT_HAVE___p__wenviron
-#define __CRT_HAVE___p__wpgmptr
-#define __CRT_HAVE__fpieee_flt
-#define __CRT_HAVE__getdllprocaddr
-#define __CRT_HAVE__loaddll
-#define __CRT_HAVE__unloaddll
-#endif /* !__x86_64__ || __MSVCRT_VERSION__ >= 100 */
-#if defined(_DEBUG) ? (__MSVCRT_VERSION__ >= 0 && __MSVCRT_VERSION__ <= 120) : !__MSVCRT_VERSION__
-#define __CRT_HAVE__CrtDbgBreak
-#define __CRT_HAVE__crtAssertBusy
-#define __CRT_HAVE__crtBreakAlloc
-#define __CRT_HAVE__crtDbgFlag
-#endif /* _DEBUG ? (__MSVCRT_VERSION__ >= 0 && __MSVCRT_VERSION__ <= 120) : !__MSVCRT_VERSION__ */
-#if defined(_DEBUG) ? __MSVCRT_VERSION__ >= 100 : __MSVCRT_VERSION__ >= 140
-#define __CRT_HAVE__free_base
-#define __CRT_HAVE__malloc_base
-#endif /* _DEBUG ? __MSVCRT_VERSION__ >= 100 : __MSVCRT_VERSION__ >= 140 */
-#if defined(_DEBUG) ? __MSVCRT_VERSION__ >= 140 : __MSVCRT_VERSION__ >= 100
-#define __CRT_HAVE__invalid_parameter_noinfo
-#define __CRT_HAVE__invalid_parameter_noinfo_noreturn
-#endif /* _DEBUG ? __MSVCRT_VERSION__ >= 140 : __MSVCRT_VERSION__ >= 100 */
-#if defined(__x86_64__) ? (!defined(_DEBUG) || !__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 120 || __MSVCRT_VERSION__ >= 140) : __MSVCRT_VERSION__ >= 120
-#define __CRT_HAVE__chgsignf
-#define __CRT_HAVE__copysignf
-#endif /* __x86_64__ ? (!_DEBUG || !__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 120 || __MSVCRT_VERSION__ >= 140) : __MSVCRT_VERSION__ >= 120 */
-#if defined(__x86_64__) ? (!defined(_DEBUG) || !__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 120 || __MSVCRT_VERSION__ >= 140) : __MSVCRT_VERSION__ >= 140
-#define __CRT_HAVE_powf
-#endif /* __x86_64__ ? (!_DEBUG || !__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 120 || __MSVCRT_VERSION__ >= 140) : __MSVCRT_VERSION__ >= 140 */
-#if defined(__x86_64__) ? defined(_DEBUG) ? (!__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 120) : (__MSVCRT_VERSION__ >= 0 && __MSVCRT_VERSION__ <= 120) : __MSVCRT_VERSION__ >= 140
-#define __CRT_HAVE___C_specific_handler
-#define __CRT_HAVE__finitef
-#define __CRT_HAVE__fpclassf
-#define __CRT_HAVE__isnanf
-#define __CRT_HAVE__local_unwind
-#define __CRT_HAVE__logbf
-#define __CRT_HAVE__nextafterf
-#define __CRT_HAVE__scalbf
-#define __CRT_HAVE_acosf
-#define __CRT_HAVE_asinf
-#define __CRT_HAVE_atan2f
-#define __CRT_HAVE_atanf
-#define __CRT_HAVE_ceilf
-#define __CRT_HAVE_cosf
-#define __CRT_HAVE_coshf
-#define __CRT_HAVE_expf
-#define __CRT_HAVE_floorf
-#define __CRT_HAVE_fmodf
-#define __CRT_HAVE_log10f
-#define __CRT_HAVE_logf
-#define __CRT_HAVE_modff
-#define __CRT_HAVE_setjmp
-#define __CRT_HAVE_sinf
-#define __CRT_HAVE_sinhf
-#define __CRT_HAVE_sqrtf
-#define __CRT_HAVE_tanf
-#define __CRT_HAVE_tanhf
-#endif /* __x86_64__ ? _DEBUG ? (!__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 120) : (__MSVCRT_VERSION__ >= 0 && __MSVCRT_VERSION__ <= 120) : __MSVCRT_VERSION__ >= 140 */
-#if defined(__x86_64__) ? defined(_DEBUG) ? (__MSVCRT_VERSION__ == 100 || __MSVCRT_VERSION__ >= 140) : __MSVCRT_VERSION__ >= 140 : (__MSVCRT_VERSION__ >= 0 && __MSVCRT_VERSION__ <= 120)
+#if !defined(__x86_64__) || (defined(_DEBUG) && __MSVCRT_VERSION__ == 100)
 #define __CRT_HAVE__CIacos
 #define __CRT_HAVE__CIasin
 #define __CRT_HAVE__CIatan
@@ -1195,23 +1150,52 @@
 #define __CRT_HAVE__seh_longjmp_unwind4
 #define __CRT_HAVE__set_SSE2_enable
 #define __CRT_HAVE__setjmp3
-#endif /* __x86_64__ ? _DEBUG ? (__MSVCRT_VERSION__ == 100 || __MSVCRT_VERSION__ >= 140) : __MSVCRT_VERSION__ >= 140 : (__MSVCRT_VERSION__ >= 0 && __MSVCRT_VERSION__ <= 120) */
-#if defined(__x86_64__) ? defined(_DEBUG) ? (__MSVCRT_VERSION__ == 100 || __MSVCRT_VERSION__ >= 140) : __MSVCRT_VERSION__ >= 140 : (__MSVCRT_VERSION__ >= 100 && __MSVCRT_VERSION__ <= 120)
-#define __CRT_HAVE__NLG_Dispatch2
-#define __CRT_HAVE__NLG_Return
-#define __CRT_HAVE__NLG_Return2
-#define __CRT_HAVE___control87_2
-#define __CRT_HAVE__crt_debugger_hook
-#define __CRT_HAVE__statusfp2
-#endif /* __x86_64__ ? _DEBUG ? (__MSVCRT_VERSION__ == 100 || __MSVCRT_VERSION__ >= 140) : __MSVCRT_VERSION__ >= 140 : (__MSVCRT_VERSION__ >= 100 && __MSVCRT_VERSION__ <= 120) */
-#if defined(__x86_64__) ? defined(_DEBUG) ? __MSVCRT_VERSION__ == 120 : (__MSVCRT_VERSION__ >= 100 && __MSVCRT_VERSION__ <= 120) : __MSVCRT_VERSION__ >= 140
-#define __CRT_HAVE__GetImageBase
-#define __CRT_HAVE__GetThrowImageBase
-#define __CRT_HAVE__SetImageBase
-#define __CRT_HAVE__SetThrowImageBase
-#define __CRT_HAVE___NLG_Dispatch2
-#define __CRT_HAVE___NLG_Return2
-#endif /* __x86_64__ ? _DEBUG ? __MSVCRT_VERSION__ == 120 : (__MSVCRT_VERSION__ >= 100 && __MSVCRT_VERSION__ <= 120) : __MSVCRT_VERSION__ >= 140 */
+#endif /* !__x86_64__ || (_DEBUG && __MSVCRT_VERSION__ == 100) */
+#if !defined(__x86_64__) || __MSVCRT_VERSION__ >= 100
+#define __CRT_HAVE___CxxDetectRethrow
+#define __CRT_HAVE___CxxExceptionFilter
+#define __CRT_HAVE___CxxQueryExceptionSize
+#define __CRT_HAVE___CxxRegisterExceptionObject
+#define __CRT_HAVE___CxxUnregisterExceptionObject
+#define __CRT_HAVE___p___argc
+#define __CRT_HAVE___p___argv
+#define __CRT_HAVE___p___wargv
+#define __CRT_HAVE___p__acmdln
+#define __CRT_HAVE___p__commode
+#define __CRT_HAVE___p__environ
+#define __CRT_HAVE___p__fmode
+#define __CRT_HAVE___p__mbcasemap
+#define __CRT_HAVE___p__mbctype
+#define __CRT_HAVE___p__pgmptr
+#define __CRT_HAVE___p__wcmdln
+#define __CRT_HAVE___p__wenviron
+#define __CRT_HAVE___p__wpgmptr
+#define __CRT_HAVE__fpieee_flt
+#define __CRT_HAVE__getdllprocaddr
+#define __CRT_HAVE__loaddll
+#define __CRT_HAVE__unloaddll
+#endif /* !__x86_64__ || __MSVCRT_VERSION__ >= 100 */
+#if defined(_DEBUG) ? (__MSVCRT_VERSION__ >= 0 && __MSVCRT_VERSION__ <= 120) : !__MSVCRT_VERSION__
+#define __CRT_HAVE__CrtDbgBreak
+#define __CRT_HAVE__crtAssertBusy
+#define __CRT_HAVE__crtBreakAlloc
+#define __CRT_HAVE__crtDbgFlag
+#endif /* _DEBUG ? (__MSVCRT_VERSION__ >= 0 && __MSVCRT_VERSION__ <= 120) : !__MSVCRT_VERSION__ */
+#if defined(_DEBUG) ? __MSVCRT_VERSION__ >= 100 : __MSVCRT_VERSION__ >= 140
+#define __CRT_HAVE__free_base
+#define __CRT_HAVE__malloc_base
+#endif /* _DEBUG ? __MSVCRT_VERSION__ >= 100 : __MSVCRT_VERSION__ >= 140 */
+#if defined(_DEBUG) ? __MSVCRT_VERSION__ >= 140 : __MSVCRT_VERSION__ >= 100
+#define __CRT_HAVE__invalid_parameter_noinfo
+#define __CRT_HAVE__invalid_parameter_noinfo_noreturn
+#endif /* _DEBUG ? __MSVCRT_VERSION__ >= 140 : __MSVCRT_VERSION__ >= 100 */
+#if defined(__x86_64__) ? (!defined(_DEBUG) || !__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 110 || __MSVCRT_VERSION__ == 120 || __MSVCRT_VERSION__ >= 140) : __MSVCRT_VERSION__ >= 120
+#define __CRT_HAVE__chgsignf
+#define __CRT_HAVE__copysignf
+#endif /* __x86_64__ ? (!_DEBUG || !__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 110 || __MSVCRT_VERSION__ == 120 || __MSVCRT_VERSION__ >= 140) : __MSVCRT_VERSION__ >= 120 */
+#if defined(__x86_64__) ? (!defined(_DEBUG) || !__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 110 || __MSVCRT_VERSION__ == 120 || __MSVCRT_VERSION__ >= 140) : __MSVCRT_VERSION__ >= 140
+#define __CRT_HAVE_powf
+#endif /* __x86_64__ ? (!_DEBUG || !__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 110 || __MSVCRT_VERSION__ == 120 || __MSVCRT_VERSION__ >= 140) : __MSVCRT_VERSION__ >= 140 */
 #if defined(__x86_64__) ? (defined(_DEBUG) && __MSVCRT_VERSION__ == 100) : (defined(_DEBUG) && __MSVCRT_VERSION__ >= 100 && __MSVCRT_VERSION__ <= 120)
 #ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __CRT_HAVE_$Q_CrtDbgReportW$A$AYAHHPBGH00ZZ
@@ -1474,6 +1458,14 @@
 #define __CRT_HAVE_$Qwhat$Aexception$Astd$A$AUBEPBDXZ
 #endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
 #endif /* __x86_64__ ? (_DEBUG && __MSVCRT_VERSION__ == 100) : (__MSVCRT_VERSION__ >= 100 && __MSVCRT_VERSION__ <= 120) */
+#if defined(__x86_64__) ? (defined(_DEBUG) && __MSVCRT_VERSION__ == 100) : __MSVCRT_VERSION__ >= 100
+#define __CRT_HAVE__NLG_Dispatch2
+#define __CRT_HAVE__NLG_Return
+#define __CRT_HAVE__NLG_Return2
+#define __CRT_HAVE___control87_2
+#define __CRT_HAVE__crt_debugger_hook
+#define __CRT_HAVE__statusfp2
+#endif /* __x86_64__ ? (_DEBUG && __MSVCRT_VERSION__ == 100) : __MSVCRT_VERSION__ >= 100 */
 #if defined(__x86_64__) ? (defined(_DEBUG) || !__MSVCRT_VERSION__) : (defined(_DEBUG) && __MSVCRT_VERSION__ >= 100)
 #define __CRT_HAVE__msize_dbg
 #endif /* __x86_64__ ? (_DEBUG || !__MSVCRT_VERSION__) : (_DEBUG && __MSVCRT_VERSION__ >= 100) */
@@ -1482,9 +1474,6 @@
 #define __CRT_HAVE___CxxCallUnwindDtor
 #define __CRT_HAVE___CxxCallUnwindVecDtor
 #endif /* __x86_64__ ? __MSVCRT_VERSION__ == 100 : (__MSVCRT_VERSION__ >= 0 && __MSVCRT_VERSION__ <= 100) */
-#if defined(__x86_64__) ? __MSVCRT_VERSION__ == 120 : __MSVCRT_VERSION__ >= 140
-#define __CRT_HAVE__set_FMA3_enable
-#endif /* __x86_64__ ? __MSVCRT_VERSION__ == 120 : __MSVCRT_VERSION__ >= 140 */
 #if defined(__x86_64__) ? (__MSVCRT_VERSION__ >= 100 && __MSVCRT_VERSION__ <= 120) : (__MSVCRT_VERSION__ >= 0 && __MSVCRT_VERSION__ <= 120)
 #define __CRT_HAVE___p___initenv
 #define __CRT_HAVE___p___mb_cur_max
@@ -1502,19 +1491,9 @@
 #define __CRT_HAVE_$I10_OUTPUT
 #endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
 #endif /* __x86_64__ ? (__MSVCRT_VERSION__ >= 100 && __MSVCRT_VERSION__ <= 120) : (__MSVCRT_VERSION__ >= 0 && __MSVCRT_VERSION__ <= 120) */
-#if defined(__x86_64__) ? __MSVCRT_VERSION__ >= 140 : (!__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 120)
-#define __CRT_HAVE__libm_sse2_acos_precise
-#define __CRT_HAVE__libm_sse2_asin_precise
-#define __CRT_HAVE__libm_sse2_atan_precise
-#define __CRT_HAVE__libm_sse2_cos_precise
-#define __CRT_HAVE__libm_sse2_exp_precise
-#define __CRT_HAVE__libm_sse2_log10_precise
-#define __CRT_HAVE__libm_sse2_log_precise
-#define __CRT_HAVE__libm_sse2_pow_precise
-#define __CRT_HAVE__libm_sse2_sin_precise
-#define __CRT_HAVE__libm_sse2_sqrt_precise
-#define __CRT_HAVE__libm_sse2_tan_precise
-#endif /* __x86_64__ ? __MSVCRT_VERSION__ >= 140 : (!__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 120) */
+#if defined(__x86_64__) ? (__MSVCRT_VERSION__ >= 110 && __MSVCRT_VERSION__ <= 120) : __MSVCRT_VERSION__ == 120
+#define __CRT_HAVE___crtCreateSemaphoreExW
+#endif /* __x86_64__ ? (__MSVCRT_VERSION__ >= 110 && __MSVCRT_VERSION__ <= 120) : __MSVCRT_VERSION__ == 120 */
 #if defined(__x86_64__) ? __MSVCRT_VERSION__ >= 140 : __MSVCRT_VERSION__ >= 120
 #define __CRT_HAVE__except1
 #endif /* __x86_64__ ? __MSVCRT_VERSION__ >= 140 : __MSVCRT_VERSION__ >= 120 */
@@ -1604,7 +1583,39 @@
 #define __CRT_HAVE_$Q_ConcRT_DumpMessage$Adetails$AConcurrency$A$AYAXPEB_WZZ
 #endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
 #endif /* __x86_64__ && !_DEBUG && __MSVCRT_VERSION__ == 100 */
-#if defined(__x86_64__) && (defined(_DEBUG) ? (!__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 120) : (__MSVCRT_VERSION__ >= 0 && __MSVCRT_VERSION__ <= 120))
+#if defined(__x86_64__) && !defined(_DEBUG) && __MSVCRT_VERSION__ >= 140
+#define __CRT_HAVE___CxxFrameHandler4
+#endif /* __x86_64__ && !_DEBUG && __MSVCRT_VERSION__ >= 140 */
+#if defined(__x86_64__) && (!defined(_DEBUG) || !__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 110 || __MSVCRT_VERSION__ == 120 || __MSVCRT_VERSION__ >= 140)
+#define __CRT_HAVE___C_specific_handler
+#define __CRT_HAVE__finitef
+#define __CRT_HAVE__fpclassf
+#define __CRT_HAVE__isnanf
+#define __CRT_HAVE__local_unwind
+#define __CRT_HAVE__logbf
+#define __CRT_HAVE__nextafterf
+#define __CRT_HAVE__scalbf
+#define __CRT_HAVE_acosf
+#define __CRT_HAVE_asinf
+#define __CRT_HAVE_atan2f
+#define __CRT_HAVE_atanf
+#define __CRT_HAVE_ceilf
+#define __CRT_HAVE_cosf
+#define __CRT_HAVE_coshf
+#define __CRT_HAVE_expf
+#define __CRT_HAVE_floorf
+#define __CRT_HAVE_fmodf
+#define __CRT_HAVE_log10f
+#define __CRT_HAVE_logf
+#define __CRT_HAVE_modff
+#define __CRT_HAVE_setjmp
+#define __CRT_HAVE_sinf
+#define __CRT_HAVE_sinhf
+#define __CRT_HAVE_sqrtf
+#define __CRT_HAVE_tanf
+#define __CRT_HAVE_tanhf
+#endif /* __x86_64__ && (!_DEBUG || !__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 110 || __MSVCRT_VERSION__ == 120 || __MSVCRT_VERSION__ >= 140) */
+#if defined(__x86_64__) && (defined(_DEBUG) ? (!__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 110 || __MSVCRT_VERSION__ == 120) : (__MSVCRT_VERSION__ >= 0 && __MSVCRT_VERSION__ <= 120))
 #define __CRT_HAVE__setjmpex
 #ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __CRT_HAVE_$Q$Q1type_info$A$AUEAA$AXZ
@@ -1619,13 +1630,13 @@
 #define __CRT_HAVE_$Q_set_se_translator$A$AYAP6AXIPEAU_EXCEPTION_POINTERS$A$A$AZP6AXI0$AZ$AZ
 #define __CRT_HAVE_$Qraw_name$Atype_info$A$AQEBAPEBDXZ
 #endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
-#endif /* __x86_64__ && (_DEBUG ? (!__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 120) : (__MSVCRT_VERSION__ >= 0 && __MSVCRT_VERSION__ <= 120)) */
+#endif /* __x86_64__ && (_DEBUG ? (!__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 110 || __MSVCRT_VERSION__ == 120) : (__MSVCRT_VERSION__ >= 0 && __MSVCRT_VERSION__ <= 120)) */
 #if defined(__x86_64__) && (defined(_DEBUG) ? !__MSVCRT_VERSION__ : (__MSVCRT_VERSION__ >= 0 && __MSVCRT_VERSION__ <= 100))
 #ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __CRT_HAVE_$Qbefore$Atype_info$A$AQEBAHAEBV1$A$AZ
 #endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
 #endif /* __x86_64__ && (_DEBUG ? !__MSVCRT_VERSION__ : (__MSVCRT_VERSION__ >= 0 && __MSVCRT_VERSION__ <= 100)) */
-#if defined(__x86_64__) && (defined(_DEBUG) ? __MSVCRT_VERSION__ == 120 : (__MSVCRT_VERSION__ >= 100 && __MSVCRT_VERSION__ <= 120))
+#if defined(__x86_64__) && (defined(_DEBUG) ? (__MSVCRT_VERSION__ >= 110 && __MSVCRT_VERSION__ <= 120) : (__MSVCRT_VERSION__ >= 100 && __MSVCRT_VERSION__ <= 120))
 #define __CRT_HAVE___crt_debugger_hook
 #ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __CRT_HAVE_$Q$Q0$Q$_SpinWait$A$00$Adetails$AConcurrency$A$AQEAA$AP6AXXZ$AZ
@@ -1840,12 +1851,20 @@
 #define __CRT_HAVE_$Qwait_for_multiple$Aevent$AConcurrency$A$ASA_KPEAPEAV12$A_K_NI$AZ
 #define __CRT_HAVE_$Qwhat$Aexception$Astd$A$AUEBAPEBDXZ
 #endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
-#endif /* __x86_64__ && (_DEBUG ? __MSVCRT_VERSION__ == 120 : (__MSVCRT_VERSION__ >= 100 && __MSVCRT_VERSION__ <= 120)) */
-#if defined(__x86_64__) && defined(_DEBUG) && __MSVCRT_VERSION__ == 120
+#endif /* __x86_64__ && (_DEBUG ? (__MSVCRT_VERSION__ >= 110 && __MSVCRT_VERSION__ <= 120) : (__MSVCRT_VERSION__ >= 100 && __MSVCRT_VERSION__ <= 120)) */
+#if defined(__x86_64__) && (defined(_DEBUG) ? __MSVCRT_VERSION__ >= 110 : __MSVCRT_VERSION__ >= 100)
+#define __CRT_HAVE__GetImageBase
+#define __CRT_HAVE__GetThrowImageBase
+#define __CRT_HAVE__SetImageBase
+#define __CRT_HAVE__SetThrowImageBase
+#define __CRT_HAVE___NLG_Dispatch2
+#define __CRT_HAVE___NLG_Return2
+#endif /* __x86_64__ && (_DEBUG ? __MSVCRT_VERSION__ >= 110 : __MSVCRT_VERSION__ >= 100) */
+#if defined(__x86_64__) && defined(_DEBUG) && __MSVCRT_VERSION__ >= 110 && __MSVCRT_VERSION__ <= 120
 #ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __CRT_HAVE_$Q_CrtDbgReportW$A$AYAHHPEBGH00ZZ
 #endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
-#endif /* __x86_64__ && _DEBUG && __MSVCRT_VERSION__ == 120 */
+#endif /* __x86_64__ && _DEBUG && __MSVCRT_VERSION__ >= 110 && __MSVCRT_VERSION__ <= 120 */
 #if defined(__x86_64__) && !__MSVCRT_VERSION__
 #ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __CRT_HAVE_$Q$Q0__non_rtti_object$A$AQEAA$AAEBV0$A$AZ
@@ -1876,7 +1895,26 @@
 #define __CRT_HAVE_$Qwhat$Aexception$A$AUEBAPEBDXZ
 #endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
 #endif /* __x86_64__ && !__MSVCRT_VERSION__ */
+#if defined(__x86_64__) && __MSVCRT_VERSION__ == 110
+#ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
+#define __CRT_HAVE_$Q$Q0_CancellationTokenState$Adetails$AConcurrency$A$AAEAA$AXZ
+#define __CRT_HAVE_$Q$Q1_CancellationTokenState$Adetails$AConcurrency$A$AUEAA$AXZ
+#define __CRT_HAVE_$Q_Cancel$A_CancellationTokenState$Adetails$AConcurrency$A$AQEAAXXZ
+#define __CRT_HAVE_$Q_DeregisterCallback$A_CancellationTokenState$Adetails$AConcurrency$A$AQEAAXPEAV_CancellationTokenRegistration$A23$A$AZ
+#define __CRT_HAVE_$Q_Destroy$A_CancellationTokenState$Adetails$AConcurrency$A$AEEAAXXZ
+#define __CRT_HAVE_$Q_Invoke$A_CancellationTokenRegistration$Adetails$AConcurrency$A$AAEAAXXZ
+#define __CRT_HAVE_$Q_NewTokenState$A_CancellationTokenState$Adetails$AConcurrency$A$ASAPEAV123$AXZ
+#define __CRT_HAVE_$Q_RegisterCallback$A_CancellationTokenState$Adetails$AConcurrency$A$AQEAAPEAV_CancellationTokenRegistration$A23$AP6AXPEAX$AZ0H$AZ
+#define __CRT_HAVE_$Q_RegisterCallback$A_CancellationTokenState$Adetails$AConcurrency$A$AQEAAXPEAV_CancellationTokenRegistration$A23$A$AZ
+#endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
+#endif /* __x86_64__ && __MSVCRT_VERSION__ == 110 */
 #if defined(__x86_64__) && __MSVCRT_VERSION__ == 120
+#ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
+#define __CRT_HAVE_$Q$Q1_StructuredTaskCollection$Adetails$AConcurrency$A$AQEAA$AXZ
+#define __CRT_HAVE_$QCaptureCallstack$Aplatform$Adetails$AConcurrency$A$AYA_KPEAPEAX_K1$AZ
+#endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
+#endif /* __x86_64__ && __MSVCRT_VERSION__ == 120 */
+#if defined(__x86_64__) && __MSVCRT_VERSION__ >= 110 && __MSVCRT_VERSION__ <= 120
 #define __CRT_HAVE___crtCaptureCurrentContext
 #define __CRT_HAVE___crtCapturePreviousContext
 #ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
@@ -1894,13 +1932,11 @@
 #define __CRT_HAVE_$Q$Q0task_canceled$AConcurrency$A$AQEAA$AXZ
 #define __CRT_HAVE_$Q$Q1_Cancellation_beacon$Adetails$AConcurrency$A$AQEAA$AXZ
 #define __CRT_HAVE_$Q$Q1_Condition_variable$Adetails$AConcurrency$A$AQEAA$AXZ
-#define __CRT_HAVE_$Q$Q1_StructuredTaskCollection$Adetails$AConcurrency$A$AQEAA$AXZ
 #define __CRT_HAVE_$Q$Q1_Timer$Adetails$AConcurrency$A$AMEAA$AXZ
 #define __CRT_HAVE_$Q$Q3$AYAXPEAXHPEBDH$AZ
 #define __CRT_HAVE_$Q$Q_F_Context$Adetails$AConcurrency$A$AQEAAXXZ
 #define __CRT_HAVE_$Q$Q_F_Scheduler$Adetails$AConcurrency$A$AQEAAXXZ
 #define __CRT_HAVE_$Q$Q_V$AYAXPEAXHPEBDH$AZ
-#define __CRT_HAVE_$QCaptureCallstack$Aplatform$Adetails$AConcurrency$A$AYA_KPEAPEAX_K1$AZ
 #define __CRT_HAVE_$QCreateScheduleGroup$ACurrentScheduler$AConcurrency$A$ASAPEAVScheduleGroup$A2$AAEAVlocation$A2$A$AZ
 #define __CRT_HAVE_$QIsAvailableLocation$ACurrentScheduler$AConcurrency$A$ASA_NAEBVlocation$A2$A$AZ
 #define __CRT_HAVE_$QScheduleTask$ACurrentScheduler$AConcurrency$A$ASAXP6AXPEAX$AZ0AEAVlocation$A2$A$AZ
@@ -1928,9 +1964,14 @@
 #define __CRT_HAVE_$Qwait$A_Condition_variable$Adetails$AConcurrency$A$AQEAAXAEAVcritical_section$A3$A$AZ
 #define __CRT_HAVE_$Qwait_for$A_Condition_variable$Adetails$AConcurrency$A$AQEAA_NAEAVcritical_section$A3$AI$AZ
 #endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
-#endif /* __x86_64__ && __MSVCRT_VERSION__ == 120 */
+#endif /* __x86_64__ && __MSVCRT_VERSION__ >= 110 && __MSVCRT_VERSION__ <= 120 */
+#if defined(__x86_64__) && __MSVCRT_VERSION__ >= 120
+#define __CRT_HAVE__set_FMA3_enable
+#endif /* __x86_64__ && __MSVCRT_VERSION__ >= 120 */
 #if defined(__x86_64__) && __MSVCRT_VERSION__ >= 140
-#define __CRT_HAVE___intrinsic_abnormal_termination
+#define __CRT_HAVE___C_specific_handler_noexcept
+#define __CRT_HAVE___intrinsic_setjmpex
+#define __CRT_HAVE__get_FMA3_enable
 #endif /* __x86_64__ && __MSVCRT_VERSION__ >= 140 */
 #if defined(__x86_64__) || __MSVCRT_VERSION__ >= 100
 #define __CRT_HAVE__hypotf
@@ -2016,12 +2057,12 @@
 #define __CRT_HAVE_$Q$Q_7bad_typeid$A$A6B$A
 #endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
 #endif /* !__MSVCRT_VERSION__ */
-#if !__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 120 || __MSVCRT_VERSION__ >= 140
+#if !__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 110 || __MSVCRT_VERSION__ == 120 || __MSVCRT_VERSION__ >= 140
 #define __CRT_HAVE__W_Getdays
 #define __CRT_HAVE__W_Getmonths
 #define __CRT_HAVE__W_Gettnames
 #define __CRT_HAVE__Wcsftime
-#endif /* !__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 120 || __MSVCRT_VERSION__ >= 140 */
+#endif /* !__MSVCRT_VERSION__ || __MSVCRT_VERSION__ == 110 || __MSVCRT_VERSION__ == 120 || __MSVCRT_VERSION__ >= 140 */
 #if !__MSVCRT_VERSION__ || __MSVCRT_VERSION__ >= 140
 #define __CRT_HAVE__mbsdup
 #endif /* !__MSVCRT_VERSION__ || __MSVCRT_VERSION__ >= 140 */
@@ -2032,33 +2073,16 @@
 #define __CRT_HAVE__getdcwd_nolock
 #define __CRT_HAVE__wgetdcwd_nolock
 #endif /* __MSVCRT_VERSION__ == 100 */
+#if __MSVCRT_VERSION__ == 110
+#define __CRT_HAVE__Lock_shared_ptr_spin_lock
+#define __CRT_HAVE__Unlock_shared_ptr_spin_lock
+#endif /* __MSVCRT_VERSION__ == 110 */
 #if __MSVCRT_VERSION__ == 120
-#define __CRT_HAVE___crtCompareStringEx
 #define __CRT_HAVE___crtCreateEventExW
-#define __CRT_HAVE___crtCreateSemaphoreExW
-#define __CRT_HAVE___crtCreateSymbolicLinkW
-#define __CRT_HAVE___crtEnumSystemLocalesEx
-#define __CRT_HAVE___crtFlsAlloc
-#define __CRT_HAVE___crtFlsFree
-#define __CRT_HAVE___crtFlsGetValue
-#define __CRT_HAVE___crtFlsSetValue
-#define __CRT_HAVE___crtGetDateFormatEx
 #define __CRT_HAVE___crtGetFileInformationByHandleEx
-#define __CRT_HAVE___crtGetLocaleInfoEx
-#define __CRT_HAVE___crtGetShowWindowMode
 #define __CRT_HAVE___crtGetTickCount64
-#define __CRT_HAVE___crtGetTimeFormatEx
-#define __CRT_HAVE___crtGetUserDefaultLocaleName
-#define __CRT_HAVE___crtInitializeCriticalSectionEx
-#define __CRT_HAVE___crtIsPackagedApp
-#define __CRT_HAVE___crtIsValidLocaleName
-#define __CRT_HAVE___crtLCMapStringEx
 #define __CRT_HAVE___crtSetFileInformationByHandle
-#define __CRT_HAVE___crtSetThreadStackGuarantee
-#define __CRT_HAVE___crtSetUnhandledExceptionFilter
 #define __CRT_HAVE___crtSleep
-#define __CRT_HAVE___crtTerminateProcess
-#define __CRT_HAVE___crtUnhandledException
 #define __CRT_HAVE__vacopy
 #define __CRT_HAVE_feraiseexcept
 #define __CRT_HAVE_feupdateenv
@@ -2076,19 +2100,6 @@
 #define __CRT_HAVE_vwscanf_s
 #ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ
-#define __CRT_HAVE_$Q_CurrentContext$A_Context$Adetails$AConcurrency$A$ASA$QAV123$AXZ
-#define __CRT_HAVE_$Q_Current_node$Alocation$AConcurrency$A$ASA$QAV12$AXZ
-#define __CRT_HAVE_$Q_Get$A_CurrentScheduler$Adetails$AConcurrency$A$ASA$QAV_Scheduler$A23$AXZ
-#define __CRT_HAVE_$Q_GetConcurrency$Adetails$AConcurrency$A$AYAIXZ
-#define __CRT_HAVE_$Q_GetNumberOfVirtualProcessors$A_CurrentScheduler$Adetails$AConcurrency$A$ASAIXZ
-#define __CRT_HAVE_$Q_Id$A_CurrentScheduler$Adetails$AConcurrency$A$ASAIXZ
-#define __CRT_HAVE_$Q_Oversubscribe$A_Context$Adetails$AConcurrency$A$ASAX_N$AZ
-#define __CRT_HAVE_$Q_ReportUnobservedException$Adetails$AConcurrency$A$AYAXXZ
-#define __CRT_HAVE_$Q_SetUnobservedExceptionHandler$Adetails$AConcurrency$A$AYAXP6AXXZ$AZ
-#define __CRT_HAVE_$Q_Trace_agents$AConcurrency$A$AYAXW4Agents_EventType$A1$A_JZZ
-#define __CRT_HAVE_$Q_Yield$A_Context$Adetails$AConcurrency$A$ASAXXZ
-#define __CRT_HAVE_$Qcurrent$Alocation$AConcurrency$A$ASA$QAV12$AXZ
-#define __CRT_HAVE_$Qfrom_numa_node$Alocation$AConcurrency$A$ASA$QAV12$AG$AZ
 #endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
 #endif /* __MSVCRT_VERSION__ == 120 */
 #if __MSVCRT_VERSION__ >= 0 && __MSVCRT_VERSION__ <= 100
@@ -2492,13 +2503,53 @@
 #define __CRT_HAVE_$Qwait$AConcurrency$A$AYAXI$AZ
 #endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
 #endif /* __MSVCRT_VERSION__ >= 100 && __MSVCRT_VERSION__ <= 120 */
+#if __MSVCRT_VERSION__ >= 110
+#define __CRT_HAVE____lc_locale_name_func
+#define __CRT_HAVE__wcreate_locale
+#endif /* __MSVCRT_VERSION__ >= 110 */
+#if __MSVCRT_VERSION__ >= 110 && __MSVCRT_VERSION__ <= 120
+#define __CRT_HAVE___crtCompareStringEx
+#define __CRT_HAVE___crtCreateSymbolicLinkW
+#define __CRT_HAVE___crtEnumSystemLocalesEx
+#define __CRT_HAVE___crtFlsAlloc
+#define __CRT_HAVE___crtFlsFree
+#define __CRT_HAVE___crtFlsGetValue
+#define __CRT_HAVE___crtFlsSetValue
+#define __CRT_HAVE___crtGetDateFormatEx
+#define __CRT_HAVE___crtGetLocaleInfoEx
+#define __CRT_HAVE___crtGetShowWindowMode
+#define __CRT_HAVE___crtGetTimeFormatEx
+#define __CRT_HAVE___crtGetUserDefaultLocaleName
+#define __CRT_HAVE___crtInitializeCriticalSectionEx
+#define __CRT_HAVE___crtIsPackagedApp
+#define __CRT_HAVE___crtIsValidLocaleName
+#define __CRT_HAVE___crtLCMapStringEx
+#define __CRT_HAVE___crtSetThreadStackGuarantee
+#define __CRT_HAVE___crtSetUnhandledExceptionFilter
+#define __CRT_HAVE___crtTerminateProcess
+#define __CRT_HAVE___crtUnhandledException
+#ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
+#define __CRT_HAVE_$Q_CurrentContext$A_Context$Adetails$AConcurrency$A$ASA$QAV123$AXZ
+#define __CRT_HAVE_$Q_Current_node$Alocation$AConcurrency$A$ASA$QAV12$AXZ
+#define __CRT_HAVE_$Q_Get$A_CurrentScheduler$Adetails$AConcurrency$A$ASA$QAV_Scheduler$A23$AXZ
+#define __CRT_HAVE_$Q_GetConcurrency$Adetails$AConcurrency$A$AYAIXZ
+#define __CRT_HAVE_$Q_GetNumberOfVirtualProcessors$A_CurrentScheduler$Adetails$AConcurrency$A$ASAIXZ
+#define __CRT_HAVE_$Q_Id$A_CurrentScheduler$Adetails$AConcurrency$A$ASAIXZ
+#define __CRT_HAVE_$Q_Oversubscribe$A_Context$Adetails$AConcurrency$A$ASAX_N$AZ
+#define __CRT_HAVE_$Q_ReportUnobservedException$Adetails$AConcurrency$A$AYAXXZ
+#define __CRT_HAVE_$Q_SetUnobservedExceptionHandler$Adetails$AConcurrency$A$AYAXP6AXXZ$AZ
+#define __CRT_HAVE_$Q_Trace_agents$AConcurrency$A$AYAXW4Agents_EventType$A1$A_JZZ
+#define __CRT_HAVE_$Q_Yield$A_Context$Adetails$AConcurrency$A$ASAXXZ
+#define __CRT_HAVE_$Qcurrent$Alocation$AConcurrency$A$ASA$QAV12$AXZ
+#define __CRT_HAVE_$Qfrom_numa_node$Alocation$AConcurrency$A$ASA$QAV12$AG$AZ
+#endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
+#endif /* __MSVCRT_VERSION__ >= 110 && __MSVCRT_VERSION__ <= 120 */
 #if __MSVCRT_VERSION__ >= 120
 #define __CRT_HAVE__Cbuild
 #define __CRT_HAVE__FCbuild
 #define __CRT_HAVE__LCbuild
 #define __CRT_HAVE__SetWinRTOutOfMemoryExceptionCallback
 #define __CRT_HAVE___GetPlatformExceptionInfo
-#define __CRT_HAVE____lc_locale_name_func
 #define __CRT_HAVE__atoll_l
 #define __CRT_HAVE__dclass
 #define __CRT_HAVE__dpcomp
@@ -2524,7 +2575,6 @@
 #define __CRT_HAVE__strtoll_l
 #define __CRT_HAVE__strtoull_l
 #define __CRT_HAVE__strtoumax_l
-#define __CRT_HAVE__wcreate_locale
 #define __CRT_HAVE__wcstof_l
 #define __CRT_HAVE__wcstoimax_l
 #define __CRT_HAVE__wcstold_l
