@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf349e9a */
+/* HASH CRC-32:0x82966fad */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3113,16 +3113,6 @@ DEFINE_PUBLIC_ALIAS(DOS$__unicode_descriptor_digitld, libd___unicode_descriptor_
 DEFINE_PUBLIC_ALIAS(DOS$unicode_fold, libd_unicode_fold);
 
 /* unistd */
-DEFINE_PUBLIC_ALIAS(DOS$_execv, libd_execv);
-DEFINE_PUBLIC_ALIAS(DOS$execv, libd_execv);
-DEFINE_PUBLIC_ALIAS(DOS$_execve, libd_execve);
-DEFINE_PUBLIC_ALIAS(DOS$__execve, libd_execve);
-DEFINE_PUBLIC_ALIAS(DOS$__libc_execve, libd_execve);
-DEFINE_PUBLIC_ALIAS(DOS$execve, libd_execve);
-DEFINE_PUBLIC_ALIAS(DOS$_execvp, libd_execvp);
-DEFINE_PUBLIC_ALIAS(DOS$execvp, libd_execvp);
-DEFINE_PUBLIC_ALIAS(DOS$_execvpe, libd_execvpe);
-DEFINE_PUBLIC_ALIAS(DOS$execvpe, libd_execvpe);
 DEFINE_PUBLIC_ALIAS(DOS$__pipe, libd_pipe);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_pipe, libd_pipe);
 DEFINE_PUBLIC_ALIAS(DOS$pipe, libd_pipe);
@@ -3292,6 +3282,7 @@ DEFINE_PUBLIC_ALIAS(DOS$opendev, libd_opendev);
 DEFINE_PUBLIC_ALIAS(DOS$fparseln, libd_fparseln);
 
 /* utime */
+DEFINE_PUBLIC_ALIAS(DOS$_futime, libd_futime);
 DEFINE_PUBLIC_ALIAS(DOS$_futime32, libd_futime);
 DEFINE_PUBLIC_ALIAS(DOS$futime, libd_futime);
 DEFINE_PUBLIC_ALIAS(DOS$_futime64, libd_futime64);

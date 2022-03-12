@@ -1384,7 +1384,7 @@ NOTHROW_NCX(LIBDCALL libd__wstat32)(char16_t const *filename,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x68844a86]]]*/
+/*[[[start:exports,hash:CRC-32=0x7ec128b8]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$__mkdir, libd_mkdir);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_mkdir, libd_mkdir);
 DEFINE_PUBLIC_ALIAS(DOS$mkdir, libd_mkdir);
@@ -1437,11 +1437,15 @@ DEFINE_PUBLIC_ALIAS(DOS$utimensat64, libd_utimensat64);
 DEFINE_PUBLIC_ALIAS(utimensat64, libc_utimensat64);
 DEFINE_PUBLIC_ALIAS(futimens, libc_futimens);
 DEFINE_PUBLIC_ALIAS(futimens64, libc_futimens64);
+DEFINE_PUBLIC_ALIAS(DOS$_wstat, libd__wstat32);
 DEFINE_PUBLIC_ALIAS(DOS$_wstat32, libd__wstat32);
+DEFINE_PUBLIC_ALIAS(_wstat, libc__wstat32);
 DEFINE_PUBLIC_ALIAS(_wstat32, libc__wstat32);
 DEFINE_PUBLIC_ALIAS(DOS$_wstat64, libd__wstat64);
 DEFINE_PUBLIC_ALIAS(_wstat64, libc__wstat64);
+DEFINE_PUBLIC_ALIAS(DOS$_wstati64, libd__wstat32i64);
 DEFINE_PUBLIC_ALIAS(DOS$_wstat32i64, libd__wstat32i64);
+DEFINE_PUBLIC_ALIAS(_wstati64, libc__wstat32i64);
 DEFINE_PUBLIC_ALIAS(_wstat32i64, libc__wstat32i64);
 DEFINE_PUBLIC_ALIAS(DOS$_wstat64i32, libd__wstat64i32);
 DEFINE_PUBLIC_ALIAS(_wstat64i32, libc__wstat64i32);

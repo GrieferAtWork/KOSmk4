@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f4fd036 */
+/* HASH CRC-32:0x6f75658e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2442,10 +2442,6 @@ DFUN(".text.crt.dos.unicode.UTF", libd___unicode_descriptor_digitld, libc___unic
 DFUN(".text.crt.dos.unicode.UTF", libd_unicode_fold, libc_unicode_fold, TP, 2, TI32, TP)
 
 /* unistd */
-DFUN(".text.crt.dos.fs.exec.exec", libd_execv, libc_execv, TD, 2, TP, TP)
-DFUN(".text.crt.dos.fs.exec.exec", libd_execve, libc_execve, TD, 3, TP, TP, TP)
-DFUN(".text.crt.dos.fs.exec.exec", libd_execvp, libc_execvp, TD, 2, TP, TP)
-DFUN(".text.crt.dos.fs.exec.exec", libd_execvpe, libc_execvpe, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.io.access", libd_pipe, libc_pipe, TD, 1, TP)
 DFUN(".text.crt.dos.system.utility", libd_sleep, libc_sleep, TD, 1, TD)
 DFUN(".text.crt.dos.io.sync", libd_fsync, libc_fsync, TD, 1, TIn(__SIZEOF_FD_T__))

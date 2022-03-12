@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33e19042 */
+/* HASH CRC-32:0xc0ba6423 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,15 @@
 #ifndef __local_futime64_defined
 #define __local_futime64_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_futime) || defined(__CRT_HAVE__futime32)
+#if defined(__CRT_HAVE_futime) || defined(__CRT_HAVE__futime) || defined(__CRT_HAVE__futime32)
 #include <bits/os/utimbuf.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_futime32_defined
 #define __local___localdep_crt_futime32_defined
 #ifdef __CRT_HAVE_futime
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_futime32,(__fd_t __fd, struct __utimbuf32 const *__file_times),futime,(__fd,__file_times))
+#elif defined(__CRT_HAVE__futime)
+__CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_futime32,(__fd_t __fd, struct __utimbuf32 const *__file_times),_futime,(__fd,__file_times))
 #elif defined(__CRT_HAVE__futime32)
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_futime32,(__fd_t __fd, struct __utimbuf32 const *__file_times),_futime32,(__fd,__file_times))
 #else /* ... */
@@ -58,7 +60,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_futime64_defined
 #define __localdep_futime64 __LIBC_LOCAL_NAME(futime64)
 #endif /* !__local___localdep_futime64_defined */
-#else /* __CRT_HAVE_futime || __CRT_HAVE__futime32 */
+#else /* __CRT_HAVE_futime || __CRT_HAVE__futime || __CRT_HAVE__futime32 */
 #undef __local_futime64_defined
-#endif /* !__CRT_HAVE_futime && !__CRT_HAVE__futime32 */
+#endif /* !__CRT_HAVE_futime && !__CRT_HAVE__futime && !__CRT_HAVE__futime32 */
 #endif /* !__local_futime64_defined */

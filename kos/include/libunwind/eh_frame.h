@@ -56,7 +56,7 @@
  * │     uint32_t             eh_cie_offset;      # Offset to CIE metadata-descriptor block. The absolute CIE start address
  * │                                              # is calculated as `(CIE *)((byte_t *)&eh_cie_offset - eh_cie_offset)'.
  * │                                              # iow: the CIE always comes before an FDE
- * │                                              # When equal to `0' what follows is a chunk of out-of-band data (which
+ * │                                              # When equal to `0', what follows is a chunk of out-of-band data (which
  * │                                              # usually contains CIE descriptors), and is simply skipped and ignored
  * │                                              # during unwind parsing.
  * │ #elif <SECTION_IS_DEBUG_FRAME>
@@ -65,8 +65,8 @@
  * │                                              #    Instead of: `(CIE *)((byte_t *)&eh_cie_offset - eh_cie_offset)'
  * │                                              #    use:        `(CIE *)((byte_t *)debug_frame_start + eh_cie_offset)'
  * │                                              #  - For FDE vs. skip-chunk determination:
- * │                                              #    Instead of: `0xffffffff'
- * │                                              #    use:        `0'
+ * │                                              #    Instead of: `0'
+ * │                                              #    use:        `0xffffffff'
  * │ #endif
  * └────────────────────────────────────────────────────────────────────────────────────────
  *

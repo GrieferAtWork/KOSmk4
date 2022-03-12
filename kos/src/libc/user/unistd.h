@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77d0749b */
+/* HASH CRC-32:0x5cbe626a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,6 +34,10 @@ DECL_BEGIN
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char ***NOTHROW(LIBCCALL libc_p_environ)(void);
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> execve(2)
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
+INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBDCALL libd_execve)(char const *__restrict path, __TARGV, __TENVP);
 /* >> execve(2)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */

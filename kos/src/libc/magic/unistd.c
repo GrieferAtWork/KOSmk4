@@ -352,11 +352,11 @@ INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char ***NOTHROW(LIBCCALL libc_p_enviro
 @@>> execv(3)
 @@Replace the calling  process with  the application  image referred  to by  `path' /  `file'
 @@and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
-[[cp, guard, dos_only_export_alias("_execv"), argument_names(path, ___argv)]]
+[[cp, guard, dos_export_alias("_execv"), argument_names(path, ___argv)]]
 [[if(__has_builtin(__builtin_execv) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline(execv, { return __builtin_execv(path, (char *const *)___argv); })]]
 [[requires_include("<libc/template/environ.h>"), requires($has_function(execve) && defined(__LOCAL_environ))]]
-[[impl_include("<libc/template/environ.h>")]]
+[[impl_include("<libc/template/environ.h>"), crt_dos_variant]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 int execv([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV) {
 	return execve(path, ___argv, __LOCAL_environ);
@@ -365,8 +365,8 @@ int execv([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV) {
 @@>> execve(2)
 @@Replace the calling  process with  the application  image referred  to by  `path' /  `file'
 @@and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
-[[cp, guard, dos_only_export_alias("_execve"), export_alias("__execve", "__libc_execve"), argument_names(path, ___argv, ___envp)]]
-[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
+[[cp, guard, dos_export_alias("_execve"), export_alias("__execve", "__libc_execve"), argument_names(path, ___argv, ___envp)]]
+[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV), crt_dos_variant]]
 [[if(__has_builtin(__builtin_execve) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline(execve, { return __builtin_execve(path, (char *const *)___argv, (char *const *)___envp); })]]
 int execve([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
@@ -374,8 +374,8 @@ int execve([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV, [[nonnu
 @@>> execvp(3)
 @@Replace the calling  process with  the application  image referred  to by  `path' /  `file'
 @@and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
-[[cp, guard, dos_only_export_alias("_execvp"), argument_names(file, ___argv)]]
-[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
+[[cp, guard, dos_export_alias("_execvp"), argument_names(file, ___argv)]]
+[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV), crt_dos_variant]]
 [[if(__has_builtin(__builtin_execvp) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline(execvp, { return __builtin_execvp(file, (char *const *)___argv); })]]
 [[requires_include("<libc/template/environ.h>"), requires($has_function(execvpe) && defined(__LOCAL_environ))]]
@@ -388,8 +388,8 @@ int execvp([[nonnull]] char const *__restrict file, [[nonnull]] __TARGV) {
 @@>> execl(3)
 @@Replace the calling process with the application image referred to by `path' / `file'
 @@and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list
-[[cp, guard, ATTR_SENTINEL, dos_only_export_alias("_execl"), impl_include("<parts/redirect-exec.h>")]]
-[[requires_dependent_function(execv), crtbuiltin]]
+[[cp, guard, ATTR_SENTINEL, dos_export_alias("_execl"), impl_include("<parts/redirect-exec.h>")]]
+[[requires_dependent_function(execv), crtbuiltin, crt_dos_variant]]
 int execl([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL*/) {
 	__REDIRECT_EXECL(char, execv, path, args)
 }
@@ -398,8 +398,8 @@ int execl([[nonnull]] char const *__restrict path, char const *args, ... /*, (ch
 @@Replace the calling process with the application image referred to by `path' / `file'
 @@and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
 @@and setting `environ' to a `char **' passed after the NULL sentinel
-[[cp, guard, impl_include("<parts/redirect-exec.h>"), dos_only_export_alias("_execle"), crtbuiltin]]
-[[requires_dependent_function(execve), ATTR_SENTINEL_O(1)]]
+[[cp, guard, impl_include("<parts/redirect-exec.h>"), dos_export_alias("_execle"), crtbuiltin]]
+[[requires_dependent_function(execve), ATTR_SENTINEL_O(1), crt_dos_variant]]
 int execle([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
 	__REDIRECT_EXECLE(char, execve, path, args)
 }
@@ -407,8 +407,8 @@ int execle([[nonnull]] char const *__restrict path, char const *args, ... /*, (c
 @@>> execlp(3)
 @@Replace the calling process with the application image referred to by `path' / `file'
 @@and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list
-[[cp, guard, impl_include("<parts/redirect-exec.h>"), dos_only_export_alias("_execlp")]]
-[[requires_dependent_function(execvp), ATTR_SENTINEL, crtbuiltin]]
+[[cp, guard, impl_include("<parts/redirect-exec.h>"), dos_export_alias("_execlp")]]
+[[requires_dependent_function(execvp), ATTR_SENTINEL, crtbuiltin, crt_dos_variant]]
 int execlp([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL*/) {
 	__REDIRECT_EXECL(char, execvp, file, args)
 }
@@ -418,10 +418,61 @@ int execlp([[nonnull]] char const *__restrict file, char const *args, ... /*, (c
 @@>> execvpe(3)
 @@Replace the  calling process  with the  application  image referred  to by  `file'  and
 @@execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
-[[cp, guard, dos_only_export_alias("_execvpe"), argument_names(file, ___argv, ___envp)]]
+[[cp, guard, dos_export_alias("_execvpe"), argument_names(file, ___argv, ___envp)]]
 [[requires_include("<hybrid/__alloca.h>"), dependency(mempcpyc)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[requires($has_function(getenv) && $has_function(execve) && defined(__hybrid_alloca))]]
+[[crt_dos_variant({
+prefix: {
+@@push_namespace(local)@@
+__LOCAL_LIBC(__dos_execvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 3, 5, 6)) int
+(__LIBCCALL __dos_execvpe_impl)(char const *__restrict path, $size_t path_len,
+                                char const *__restrict file, $size_t file_len,
+                                __TARGV, __TENVP) {
+	char *fullpath, *dst;
+	while (path_len && (path[path_len - 1] == '/' ||
+	                    path[path_len - 1] == '\\'))
+		--path_len;
+	fullpath = (char *)__hybrid_alloca((path_len + 1 + file_len + 1) *
+	                                   sizeof(char));
+	dst = (char *)mempcpyc(fullpath, path, path_len, sizeof(char));
+	*dst++ = '/';
+	dst = (char *)mempcpyc(dst, file, file_len, sizeof(char));
+	*dst = '\0';
+	return libd_execve(fullpath, ___argv, ___envp);
+}
+@@pop_namespace@@
+},
+impl: {
+	char *env_path;
+	/* [...]
+	 * If the specified filename includes a slash character,
+	 * then $PATH is ignored, and the file at the  specified
+	 * pathname is executed.
+	 * [...] */
+	if (strchr(file, '/') || strchr(file, '\\'))
+		return execve(file, ___argv, ___envp);
+	env_path = getenv("PATH");
+	if (env_path && *env_path) {
+		size_t filelen;
+		filelen = strlen(file);
+		for (;;) {
+			char *path_end;
+			path_end = strchrnul(env_path, ';');
+			(__NAMESPACE_LOCAL_SYM __dos_execvpe_impl)(env_path, (size_t)(path_end - env_path),
+			                                           file, filelen, ___argv, ___envp);
+			if (!*path_end)
+				break;
+			env_path = path_end + 1;
+		}
+	} else {
+@@pp_ifdef ENOENT@@
+		(void)libc_seterrno(ENOENT);
+@@pp_endif@@
+	}
+	return -1;
+}
+})]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[impl_include("<libc/errno.h>")]]
 [[impl_prefix(
@@ -497,8 +548,8 @@ int execvpe([[nonnull]] char const *__restrict file,
 @@Replace the calling process with the application image referred to by `path' / `file'
 @@and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
 @@and setting `environ' to a `char **' passed after the NULL sentinel
-[[cp, guard, impl_include("<parts/redirect-exec.h>"), dos_only_export_alias("_execlpe")]]
-[[requires_dependent_function(execvpe), ATTR_SENTINEL_O(1)]]
+[[cp, guard, impl_include("<parts/redirect-exec.h>"), dos_export_alias("_execlpe")]]
+[[requires_dependent_function(execvpe), ATTR_SENTINEL_O(1), crt_dos_variant]]
 int execlpe([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
 	__REDIRECT_EXECLE(char, execvpe, file, args)
 }
@@ -984,13 +1035,13 @@ int access([[nonnull]] char const *file, __STDC_INT_AS_UINT_T type) {
 
 @@>> chdir(2)
 @@Change the current working directory to `path'
-[[cp, guard, dos_only_export_alias("_chdir"), export_alias("__chdir", "__libc_chdir")]]
+[[cp, guard, dos_export_alias("_chdir"), export_alias("__chdir", "__libc_chdir")]]
 [[crt_dos_variant, section(".text.crt{|.dos}.fs.basic_property")]]
 int chdir([[nonnull]] char const *path);
 
 @@>> getcwd(2)
 @@Return the path of the current working directory, relative to the filesystem root set by `chdir(2)'
-[[cp, guard, dos_only_export_alias("_getcwd")]]
+[[cp, guard, dos_export_alias("_getcwd")]]
 [[section(".text.crt{|.dos}.fs.basic_property")]]
 [[crt_dos_variant, decl_include("<hybrid/typecore.h>")]]
 char *getcwd([[outp_opt(bufsize)]] char *buf, size_t bufsize);
@@ -999,7 +1050,7 @@ char *getcwd([[outp_opt(bufsize)]] char *buf, size_t bufsize);
 
 @@>> unlink(2)
 @@Remove a file, symbolic link, device or FIFO referred to by `file'
-[[cp, guard, dos_only_export_alias("_unlink"), export_alias("__unlink", "__libc_unlink")]]
+[[cp, guard, dos_export_alias("_unlink"), export_alias("__unlink", "__libc_unlink")]]
 [[crt_dos_variant, userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(unlinkat))]]
 int unlink([[nonnull]] char const *file) {
@@ -1008,7 +1059,7 @@ int unlink([[nonnull]] char const *file) {
 
 @@>> rmdir(2)
 @@Remove a directory referred to by `path'
-[[cp, guard, dos_only_export_alias("_rmdir"), export_alias("__rmdir", "__libc_rmdir")]]
+[[cp, guard, dos_export_alias("_rmdir"), export_alias("__rmdir", "__libc_rmdir")]]
 [[crt_dos_variant, userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && defined(__AT_REMOVEDIR) && $has_function(unlinkat))]]
 int rmdir([[nonnull]] char const *path) {

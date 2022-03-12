@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a179564 */
+/* HASH CRC-32:0xfd27065 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -853,10 +853,26 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,_fstat64,(__fd_t __fd, struct _
 #elif defined(__CRT_HAVE__fstat64i32)
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,_fstat64,(__fd_t __fd, struct __dos_stat64 *__restrict __buf),_fstat64i32,(__fd,__buf))
 #endif /* ... */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wstat32,(__WCHAR_TYPE__ const *__filename, struct __dos_stat32 *__buf),(__filename,__buf))
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wstat64,(__WCHAR_TYPE__ const *__filename, struct __dos_stat64 *__buf),(__filename,__buf))
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wstat32i64,(__WCHAR_TYPE__ const *__filename, struct __dos_stat32i64 *__buf),(__filename,__buf))
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wstat64i32,(__WCHAR_TYPE__ const *__filename, struct __dos_stat64i32 *__buf),(__filename,__buf))
+#ifdef __CRT_HAVE__wstat32
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wstat32,(__WCHAR_TYPE__ const *__filename, struct __dos_stat32 *__buf),(__filename,__buf))
+#elif defined(__CRT_HAVE__wstat)
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wstat32,(__WCHAR_TYPE__ const *__filename, struct __dos_stat32 *__buf),_wstat,(__filename,__buf))
+#endif /* ... */
+#ifdef __CRT_HAVE__wstat64
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wstat64,(__WCHAR_TYPE__ const *__filename, struct __dos_stat64 *__buf),(__filename,__buf))
+#elif defined(__CRT_HAVE__wstat64i32)
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wstat64,(__WCHAR_TYPE__ const *__filename, struct __dos_stat64 *__buf),_wstat64i32,(__filename,__buf))
+#endif /* ... */
+#ifdef __CRT_HAVE__wstat32i64
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wstat32i64,(__WCHAR_TYPE__ const *__filename, struct __dos_stat32i64 *__buf),(__filename,__buf))
+#elif defined(__CRT_HAVE__wstati64)
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wstat32i64,(__WCHAR_TYPE__ const *__filename, struct __dos_stat32i64 *__buf),_wstati64,(__filename,__buf))
+#endif /* ... */
+#ifdef __CRT_HAVE__wstat64i32
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wstat64i32,(__WCHAR_TYPE__ const *__filename, struct __dos_stat64i32 *__buf),(__filename,__buf))
+#elif defined(__CRT_HAVE__wstat64)
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wstat64i32,(__WCHAR_TYPE__ const *__filename, struct __dos_stat64i32 *__buf),_wstat64,(__filename,__buf))
+#endif /* ... */
 #endif /* __USE_DOS */
 
 __SYSDECL_END

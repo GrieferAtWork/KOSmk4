@@ -894,6 +894,7 @@ NOTHROW_NCX(LIBCCALL libc___setfpucw)(fpu_control_t ctrl) {
  * >> extern double __huge_val;
  * (Assuming `double' is `__IEEE754_DOUBLE_TYPE__') */
 DEFINE_PUBLIC_ALIAS(__huge_val, libc___huge_val);
+DEFINE_PUBLIC_ALIAS(_HUGE, libc___huge_val); /* DOS alias for the same constant */
 INTERN_CONST ATTR_SECTION(".rodata.crt.math.float")
 uint32_t const libc___huge_val[2] = {
 	UINT32_C(0x7FF00000),
@@ -1657,7 +1658,6 @@ typedef struct _onexit_table_t {
 DEFINE_PUBLIC_ALIAS(DOS$_initialize_onexit_table, libd__initialize_onexit_table);
 DEFINE_PUBLIC_ALIAS(DOS$_register_onexit_function, libd__register_onexit_function);
 DEFINE_PUBLIC_ALIAS(DOS$_execute_onexit_table, libd__execute_onexit_table);
-
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos") int LIBDCALL
 libd__initialize_onexit_table(_onexit_table_t *self) {
 	if unlikely(!self)
@@ -1694,6 +1694,21 @@ libd__execute_onexit_table(_onexit_table_t *self) {
 	libd__initialize_onexit_table(self);
 	result = libd__initterm_e(_first, _last);
 	free(_first);
+	return result;
+}
+
+
+DEFINE_PUBLIC_ALIAS(DOS$__dllonexit, libd___dllonexit);
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") NONNULL((2, 3)) int LIBDCALL
+libd___dllonexit(_onexit_t func, _onexit_t **p_begin, _onexit_t **p_end) {
+	int result;
+	_onexit_table_t tab;
+	tab._first = *p_begin;
+	tab._end   = *p_end;
+	tab._last  = tab._end;
+	result     = libd__register_onexit_function(&tab, func);
+	*p_begin   = tab._first;
+	*p_end     = tab._end;
 	return result;
 }
 

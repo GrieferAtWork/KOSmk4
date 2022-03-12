@@ -183,14 +183,16 @@ NOTHROW_RPC(LIBCCALL libc_futime64)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xe089f820]]]*/
+/*[[[start:exports,hash:CRC-32=0x8ae2ddbd]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$__utime, libd_utime);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_utime, libd_utime);
+DEFINE_PUBLIC_ALIAS(DOS$_utime, libd_utime);
 DEFINE_PUBLIC_ALIAS(DOS$_utime32, libd_utime);
 DEFINE_PUBLIC_ALIAS(DOS$utime, libd_utime);
 DEFINE_PUBLIC_ALIAS(__utime, libc_utime);
 DEFINE_PUBLIC_ALIAS(__libc_utime, libc_utime);
 #ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_utime, libc_utime);
 DEFINE_PUBLIC_ALIAS(_utime32, libc_utime);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(utime, libc_utime);
@@ -201,6 +203,7 @@ DEFINE_PUBLIC_ALIAS(_utime64, libc_utime64);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(utime64, libc_utime64);
 #ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_futime, libc_futime);
 DEFINE_PUBLIC_ALIAS(_futime32, libc_futime);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(futime, libc_futime);

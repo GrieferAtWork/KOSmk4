@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcad4ab5b */
+/* HASH CRC-32:0xe814c0cd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,15 @@
 #ifndef __local_futime_defined
 #define __local_futime_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_futime) || defined(__CRT_HAVE__futime32) || defined(__CRT_HAVE_futime64) || defined(__CRT_HAVE__futime64)
+#if defined(__CRT_HAVE_futime) || defined(__CRT_HAVE__futime) || defined(__CRT_HAVE__futime32) || defined(__CRT_HAVE_futime64) || defined(__CRT_HAVE__futime64)
 #include <bits/os/utimbuf.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_futime32_defined
 #define __local___localdep_crt_futime32_defined
 #ifdef __CRT_HAVE_futime
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_futime32,(__fd_t __fd, struct __utimbuf32 const *__file_times),futime,(__fd,__file_times))
+#elif defined(__CRT_HAVE__futime)
+__CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_futime32,(__fd_t __fd, struct __utimbuf32 const *__file_times),_futime,(__fd,__file_times))
 #elif defined(__CRT_HAVE__futime32)
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_futime32,(__fd_t __fd, struct __utimbuf32 const *__file_times),_futime32,(__fd,__file_times))
 #else /* ... */
@@ -52,21 +54,21 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futime))(__fd_t __fd, struct utimbuf 
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #undef actime
 #undef modtime
-#if defined(__CRT_HAVE_futime) || defined(__CRT_HAVE__futime32)
+#if defined(__CRT_HAVE_futime) || defined(__CRT_HAVE__futime) || defined(__CRT_HAVE__futime32)
 	struct __utimbuf32 __buf32;
 	if (!__file_times)
 		return (__NAMESPACE_LOCAL_SYM __localdep_crt_futime32)(__fd, __NULLPTR);
 	__buf32.actime  = (__time32_t)__file_times->actime;
 	__buf32.modtime = (__time32_t)__file_times->modtime;
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_futime32)(__fd, &__buf32);
-#else /* __CRT_HAVE_futime || __CRT_HAVE__futime32 */
+#else /* __CRT_HAVE_futime || __CRT_HAVE__futime || __CRT_HAVE__futime32 */
 	struct __utimbuf64 __buf64;
 	if (!__file_times)
 		return (__NAMESPACE_LOCAL_SYM __localdep_crt_futime64)(__fd, __NULLPTR);
 	__buf64.actime  = (__time64_t)__file_times->actime;
 	__buf64.modtime = (__time64_t)__file_times->modtime;
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_futime64)(__fd, &__buf64);
-#endif /* !__CRT_HAVE_futime && !__CRT_HAVE__futime32 */
+#endif /* !__CRT_HAVE_futime && !__CRT_HAVE__futime && !__CRT_HAVE__futime32 */
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("modtime")
 #pragma pop_macro("actime")
@@ -77,7 +79,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_futime_defined
 #define __localdep_futime __LIBC_LOCAL_NAME(futime)
 #endif /* !__local___localdep_futime_defined */
-#else /* __CRT_HAVE_futime || __CRT_HAVE__futime32 || __CRT_HAVE_futime64 || __CRT_HAVE__futime64 */
+#else /* __CRT_HAVE_futime || __CRT_HAVE__futime || __CRT_HAVE__futime32 || __CRT_HAVE_futime64 || __CRT_HAVE__futime64 */
 #undef __local_futime_defined
-#endif /* !__CRT_HAVE_futime && !__CRT_HAVE__futime32 && !__CRT_HAVE_futime64 && !__CRT_HAVE__futime64 */
+#endif /* !__CRT_HAVE_futime && !__CRT_HAVE__futime && !__CRT_HAVE__futime32 && !__CRT_HAVE_futime64 && !__CRT_HAVE__futime64 */
 #endif /* !__local_futime_defined */

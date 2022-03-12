@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63d352b8 */
+/* HASH CRC-32:0x49c1d12a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,10 +47,28 @@ DECL_BEGIN
 /* >> execv(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
+INTERN ATTR_SECTION(".text.crt.dos.fs.exec.exec") NONNULL((1, 2)) int
+NOTHROW_RPC(LIBDCALL libd_execv)(char const *__restrict path,
+                                 __TARGV) {
+	return libd_execve(path, ___argv, __LOCAL_environ);
+}
+#include <libc/template/environ.h>
+/* >> execv(3)
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTERN ATTR_SECTION(".text.crt.fs.exec.exec") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_execv)(char const *__restrict path,
                                  __TARGV) {
 	return libc_execve(path, ___argv, __LOCAL_environ);
+}
+#include <libc/template/environ.h>
+/* >> execvp(3)
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
+INTERN ATTR_SECTION(".text.crt.dos.fs.exec.exec") NONNULL((1, 2)) int
+NOTHROW_RPC(LIBDCALL libd_execvp)(char const *__restrict file,
+                                  __TARGV) {
+	return libd_execvpe(file, ___argv, __LOCAL_environ);
 }
 #include <libc/template/environ.h>
 /* >> execvp(3)
@@ -61,8 +79,6 @@ NOTHROW_RPC(LIBCCALL libc_execvp)(char const *__restrict file,
                                   __TARGV) {
 	return libc_execvpe(file, ___argv, __LOCAL_environ);
 }
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #include <parts/redirect-exec.h>
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
@@ -71,10 +87,8 @@ INTERN ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_SENTINEL NONNULL((1)) int
 NOTHROW_RPC(VLIBDCALL libd_execl)(char const *__restrict path,
                                   char const *args,
                                   ...) {
-	__REDIRECT_EXECL(char, libc_execv, path, args)
+	__REDIRECT_EXECL(char, libd_execv, path, args)
 }
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 #include <parts/redirect-exec.h>
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
@@ -85,8 +99,6 @@ NOTHROW_RPC(VLIBCCALL libc_execl)(char const *__restrict path,
                                   ...) {
 	__REDIRECT_EXECL(char, libc_execv, path, args)
 }
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #include <parts/redirect-exec.h>
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
@@ -96,10 +108,8 @@ INTERN ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_SENTINEL_O(1) NONNULL((1)
 NOTHROW_RPC(VLIBDCALL libd_execle)(char const *__restrict path,
                                    char const *args,
                                    ...) {
-	__REDIRECT_EXECLE(char, libc_execve, path, args)
+	__REDIRECT_EXECLE(char, libd_execve, path, args)
 }
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 #include <parts/redirect-exec.h>
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
@@ -111,8 +121,6 @@ NOTHROW_RPC(VLIBCCALL libc_execle)(char const *__restrict path,
                                    ...) {
 	__REDIRECT_EXECLE(char, libc_execve, path, args)
 }
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #include <parts/redirect-exec.h>
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
@@ -121,10 +129,8 @@ INTERN ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_SENTINEL NONNULL((1)) int
 NOTHROW_RPC(VLIBDCALL libd_execlp)(char const *__restrict file,
                                    char const *args,
                                    ...) {
-	__REDIRECT_EXECL(char, libc_execvp, file, args)
+	__REDIRECT_EXECL(char, libd_execvp, file, args)
 }
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 #include <parts/redirect-exec.h>
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
@@ -134,6 +140,59 @@ NOTHROW_RPC(VLIBCCALL libc_execlp)(char const *__restrict file,
                                    char const *args,
                                    ...) {
 	__REDIRECT_EXECL(char, libc_execvp, file, args)
+}
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(__dos_execvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 3, 5, 6)) int
+(__LIBCCALL __dos_execvpe_impl)(char const *__restrict path, size_t path_len,
+                                char const *__restrict file, size_t file_len,
+                                __TARGV, __TENVP) {
+	char *fullpath, *dst;
+	while (path_len && (path[path_len - 1] == '/' ||
+	                    path[path_len - 1] == '\\'))
+		--path_len;
+	fullpath = (char *)__hybrid_alloca((path_len + 1 + file_len + 1) *
+	                                   sizeof(char));
+	dst = (char *)libc_mempcpyc(fullpath, path, path_len, sizeof(char));
+	*dst++ = '/';
+	dst = (char *)libc_mempcpyc(dst, file, file_len, sizeof(char));
+	*dst = '\0';
+	return libd_execve(fullpath, ___argv, ___envp);
+}
+__NAMESPACE_LOCAL_END
+/* >> execvpe(3)
+ * Replace the  calling process  with the  application  image referred  to by  `file'  and
+ * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
+INTERN ATTR_SECTION(".text.crt.dos.fs.exec.exec") NONNULL((1, 2, 3)) int
+NOTHROW_RPC(LIBDCALL libd_execvpe)(char const *__restrict file,
+                                   __TARGV,
+                                   __TENVP) {
+	char *env_path;
+	/* [...]
+	 * If the specified filename includes a slash character,
+	 * then $PATH is ignored, and the file at the  specified
+	 * pathname is executed.
+	 * [...] */
+	if (libc_strchr(file, '/') || libc_strchr(file, '\\'))
+		return libc_execve(file, ___argv, ___envp);
+	env_path = libc_getenv("PATH");
+	if (env_path && *env_path) {
+		size_t filelen;
+		filelen = libc_strlen(file);
+		for (;;) {
+			char *path_end;
+			path_end = libc_strchrnul(env_path, ';');
+			(__NAMESPACE_LOCAL_SYM __dos_execvpe_impl)(env_path, (size_t)(path_end - env_path),
+			                                           file, filelen, ___argv, ___envp);
+			if (!*path_end)
+				break;
+			env_path = path_end + 1;
+		}
+	} else {
+
+		(void)libc_seterrno(ENOENT);
+
+	}
+	return -1;
 }
 #include <hybrid/typecore.h>
 #include <libc/errno.h>
@@ -204,8 +263,6 @@ NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__restrict file,
 	}
 	return -1;
 }
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #include <parts/redirect-exec.h>
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `path' / `file'
@@ -215,10 +272,8 @@ INTERN ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_SENTINEL_O(1) NONNULL((1)
 NOTHROW_RPC(VLIBDCALL libd_execlpe)(char const *__restrict file,
                                     char const *args,
                                     ...) {
-	__REDIRECT_EXECLE(char, libc_execvpe, file, args)
+	__REDIRECT_EXECLE(char, libd_execvpe, file, args)
 }
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 #include <parts/redirect-exec.h>
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `path' / `file'
@@ -1296,57 +1351,26 @@ NOTHROW_NCX(LIBCCALL libc_tell64)(fd_t fd) {
 DECL_END
 
 #ifndef __KERNEL__
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_execv, libc_execv);
-#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(DOS$_execv, libd_execv);
+DEFINE_PUBLIC_ALIAS(DOS$execv, libd_execv);
 DEFINE_PUBLIC_ALIAS(execv, libc_execv);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_execvp, libc_execvp);
-#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(DOS$_execvp, libd_execvp);
+DEFINE_PUBLIC_ALIAS(DOS$execvp, libd_execvp);
 DEFINE_PUBLIC_ALIAS(execvp, libc_execvp);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 DEFINE_PUBLIC_ALIAS(DOS$_execl, libd_execl);
 DEFINE_PUBLIC_ALIAS(DOS$execl, libd_execl);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_execl, libc_execl);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(execl, libc_execl);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 DEFINE_PUBLIC_ALIAS(DOS$_execle, libd_execle);
 DEFINE_PUBLIC_ALIAS(DOS$execle, libd_execle);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_execle, libc_execle);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(execle, libc_execle);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 DEFINE_PUBLIC_ALIAS(DOS$_execlp, libd_execlp);
 DEFINE_PUBLIC_ALIAS(DOS$execlp, libd_execlp);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_execlp, libc_execlp);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(execlp, libc_execlp);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_execvpe, libc_execvpe);
-#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(DOS$_execvpe, libd_execvpe);
+DEFINE_PUBLIC_ALIAS(DOS$execvpe, libd_execvpe);
 DEFINE_PUBLIC_ALIAS(execvpe, libc_execvpe);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 DEFINE_PUBLIC_ALIAS(DOS$_execlpe, libd_execlpe);
 DEFINE_PUBLIC_ALIAS(DOS$execlpe, libd_execlpe);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_execlpe, libc_execlpe);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(execlpe, libc_execlpe);
 DEFINE_PUBLIC_ALIAS(__ttyname, libc_ttyname);
 DEFINE_PUBLIC_ALIAS(ttyname, libc_ttyname);

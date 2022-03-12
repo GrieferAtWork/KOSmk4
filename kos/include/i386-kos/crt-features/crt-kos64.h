@@ -223,6 +223,7 @@
 #define __CRT_HAVE__Getdays
 #define __CRT_HAVE__Getmonths
 #define __CRT_HAVE__Gettnames
+#define __CRT_HAVE__HUGE
 #define __CRT_HAVE__IO_2_1_stderr_
 #define __CRT_HAVE__IO_2_1_stdin_
 #define __CRT_HAVE__IO_2_1_stdout_
@@ -1759,10 +1760,12 @@
 #define __CRT_HAVE__wsopen_s
 #define __CRT_HAVE__wsplitpath
 #define __CRT_HAVE__wsplitpath_s
+#define __CRT_HAVE__wstat
 #define __CRT_HAVE__wstat32
 #define __CRT_HAVE__wstat32i64
 #define __CRT_HAVE__wstat64
 #define __CRT_HAVE__wstat64i32
+#define __CRT_HAVE__wstati64
 #define __CRT_HAVE__wtempnam
 #define __CRT_HAVE__wtempnam_dbg
 #define __CRT_HAVE__wtmpnam
@@ -1774,7 +1777,6 @@
 #define __CRT_HAVE__wtoi_l
 #define __CRT_HAVE__wtol_l
 #define __CRT_HAVE__wtoll_l
-#define __CRT_HAVE__wutime32
 #define __CRT_HAVE__xmknod
 #define __CRT_HAVE__xmknodat
 #define __CRT_HAVE__xstat
@@ -5538,6 +5540,7 @@
 #define __CRT_HAVE__XcptFilter
 #define __CRT_HAVE___C_specific_handler
 #define __CRT_HAVE___acrt_iob_func
+#define __CRT_HAVE___dllonexit
 #define __CRT_HAVE___getmainargs
 #define __CRT_HAVE___isascii
 #define __CRT_HAVE___lconv_init
@@ -5607,6 +5610,7 @@
 #define __CRT_HAVE__fputwc_nolock
 #define __CRT_HAVE__fputwchar
 #define __CRT_HAVE__fputws_nolock
+#define __CRT_HAVE__futime
 #define __CRT_HAVE__futime32
 #define __CRT_HAVE__futime64
 #define __CRT_HAVE__gcvt
@@ -5745,6 +5749,7 @@
 #define __CRT_HAVE__unlink
 #define __CRT_HAVE__unlock
 #define __CRT_HAVE__unlock_file
+#define __CRT_HAVE__utime
 #define __CRT_HAVE__utime32
 #define __CRT_HAVE__utime64
 #define __CRT_HAVE__waccess
@@ -5816,6 +5821,8 @@
 #define __CRT_HAVE__wtol
 #define __CRT_HAVE__wtoll
 #define __CRT_HAVE__wunlink
+#define __CRT_HAVE__wutime
+#define __CRT_HAVE__wutime32
 #define __CRT_HAVE__wutime64
 #define __CRT_HAVE_wcstok_s
 #ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
@@ -7053,10 +7060,12 @@
 #define __CRT_HAVE_KOS$_wsopen_s
 #define __CRT_HAVE_KOS$_wsplitpath
 #define __CRT_HAVE_KOS$_wsplitpath_s
+#define __CRT_HAVE_KOS$_wstat
 #define __CRT_HAVE_KOS$_wstat32
 #define __CRT_HAVE_KOS$_wstat32i64
 #define __CRT_HAVE_KOS$_wstat64
 #define __CRT_HAVE_KOS$_wstat64i32
+#define __CRT_HAVE_KOS$_wstati64
 #define __CRT_HAVE_KOS$_wtempnam
 #define __CRT_HAVE_KOS$_wtmpnam
 #define __CRT_HAVE_KOS$_wtmpnam_s
@@ -7067,7 +7076,6 @@
 #define __CRT_HAVE_KOS$_wtoi_l
 #define __CRT_HAVE_KOS$_wtol_l
 #define __CRT_HAVE_KOS$_wtoll_l
-#define __CRT_HAVE_KOS$_wutime32
 #define __CRT_HAVE_KOS$a64l
 #define __CRT_HAVE_KOS$abs
 #define __CRT_HAVE_KOS$accept
@@ -9760,6 +9768,7 @@
 #define __CRT_HAVE_DOS$__dcgettext
 #define __CRT_HAVE_DOS$__dgettext
 #define __CRT_HAVE_DOS$__difftime64
+#define __CRT_HAVE_DOS$__dllonexit
 #define __CRT_HAVE_DOS$__dn_comp
 #define __CRT_HAVE_DOS$__dn_count_labels
 #define __CRT_HAVE_DOS$__dn_expand
@@ -10641,6 +10650,7 @@
 #define __CRT_HAVE_DOS$_ftime64
 #define __CRT_HAVE_DOS$_ftime64_s
 #define __CRT_HAVE_DOS$_fullpath
+#define __CRT_HAVE_DOS$_futime
 #define __CRT_HAVE_DOS$_futime32
 #define __CRT_HAVE_DOS$_futime64
 #define __CRT_HAVE_DOS$_fwprintf_l
@@ -10943,6 +10953,7 @@
 #define __CRT_HAVE_DOS$_unlock
 #define __CRT_HAVE_DOS$_unlock_fhandle
 #define __CRT_HAVE_DOS$_unlock_file
+#define __CRT_HAVE_DOS$_utime
 #define __CRT_HAVE_DOS$_utime32
 #define __CRT_HAVE_DOS$_utime64
 #define __CRT_HAVE_DOS$_vfprintf_l
@@ -11134,10 +11145,12 @@
 #define __CRT_HAVE_DOS$_wspawnvpe
 #define __CRT_HAVE_DOS$_wsplitpath
 #define __CRT_HAVE_DOS$_wsplitpath_s
+#define __CRT_HAVE_DOS$_wstat
 #define __CRT_HAVE_DOS$_wstat32
 #define __CRT_HAVE_DOS$_wstat32i64
 #define __CRT_HAVE_DOS$_wstat64
 #define __CRT_HAVE_DOS$_wstat64i32
+#define __CRT_HAVE_DOS$_wstati64
 #define __CRT_HAVE_DOS$_wsystem
 #define __CRT_HAVE_DOS$_wtempnam
 #define __CRT_HAVE_DOS$_wtmpnam
@@ -11153,6 +11166,7 @@
 #define __CRT_HAVE_DOS$_wtoll
 #define __CRT_HAVE_DOS$_wtoll_l
 #define __CRT_HAVE_DOS$_wunlink
+#define __CRT_HAVE_DOS$_wutime
 #define __CRT_HAVE_DOS$_wutime32
 #define __CRT_HAVE_DOS$_wutime64
 #define __CRT_HAVE_DOS$a64l

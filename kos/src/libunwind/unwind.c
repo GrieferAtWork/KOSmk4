@@ -160,7 +160,9 @@ INTERN void libuw_fini(void) {
 typedef struct __ATTR_PACKED __ATTR_ALIGNED(__SIZEOF_POINTER__) {
 	/* This structure exists  as a (not  100% correct, as  length=0xffffffff
 	 * is indicative of an additional 64-bit length field immediately after)
-	 * struct representation of what is found in .eh_frame */
+	 * struct representation of what is found in .eh_frame
+	 *
+	 * The actual layout is documented in <libunwind/eh_frame.h> */
 	uint32_t length;
 	int32_t  CIE_delta;
 	COMPILER_FLEXIBLE_ARRAY(byte_t, pc_begin);

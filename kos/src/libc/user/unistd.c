@@ -244,6 +244,25 @@
 DECL_BEGIN
 
 
+/*[[[head:libd_execve,hash:CRC-32=0x7339bb4e]]]*/
+/* >> execve(2)
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
+ * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
+INTERN ATTR_SECTION(".text.crt.dos.fs.exec.exec") NONNULL((1, 2, 3)) int
+NOTHROW_RPC(LIBDCALL libd_execve)(char const *__restrict path,
+                                  __TARGV,
+                                  __TENVP)
+/*[[[body:libd_execve]]]*/
+{
+	errno_t result;
+	result = sys_execveat(AT_FDCWD, path,
+	                      (char *const *)___argv,
+	                      (char *const *)___envp,
+	                      libd_AT_DOSPATH);
+	return libc_seterrno_neg(result);
+}
+/*[[[end:libd_execve]]]*/
+
 /*[[[head:libc_execve,hash:CRC-32=0x8b7788fe]]]*/
 /* >> execve(2)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
@@ -3989,10 +4008,11 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x71534a56]]]*/
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_execve, libc_execve);
-#endif /* __LIBCCALL_IS_LIBDCALL */
+/*[[[start:exports,hash:CRC-32=0xc19718c]]]*/
+DEFINE_PUBLIC_ALIAS(DOS$_execve, libd_execve);
+DEFINE_PUBLIC_ALIAS(DOS$__execve, libd_execve);
+DEFINE_PUBLIC_ALIAS(DOS$__libc_execve, libd_execve);
+DEFINE_PUBLIC_ALIAS(DOS$execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(__execve, libc_execve);
 DEFINE_PUBLIC_ALIAS(__libc_execve, libc_execve);
 DEFINE_PUBLIC_ALIAS(execve, libc_execve);
@@ -4137,25 +4157,16 @@ DEFINE_PUBLIC_ALIAS(DOS$_chdir, libd_chdir);
 DEFINE_PUBLIC_ALIAS(DOS$__chdir, libd_chdir);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_chdir, libd_chdir);
 DEFINE_PUBLIC_ALIAS(DOS$chdir, libd_chdir);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_chdir, libc_chdir);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__chdir, libc_chdir);
 DEFINE_PUBLIC_ALIAS(__libc_chdir, libc_chdir);
 DEFINE_PUBLIC_ALIAS(chdir, libc_chdir);
 DEFINE_PUBLIC_ALIAS(DOS$_getcwd, libd_getcwd);
 DEFINE_PUBLIC_ALIAS(DOS$getcwd, libd_getcwd);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_getcwd, libc_getcwd);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(getcwd, libc_getcwd);
 DEFINE_PUBLIC_ALIAS(DOS$_unlink, libd_unlink);
 DEFINE_PUBLIC_ALIAS(DOS$__unlink, libd_unlink);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_unlink, libd_unlink);
 DEFINE_PUBLIC_ALIAS(DOS$unlink, libd_unlink);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_unlink, libc_unlink);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__unlink, libc_unlink);
 DEFINE_PUBLIC_ALIAS(__libc_unlink, libc_unlink);
 DEFINE_PUBLIC_ALIAS(unlink, libc_unlink);
@@ -4163,9 +4174,6 @@ DEFINE_PUBLIC_ALIAS(DOS$_rmdir, libd_rmdir);
 DEFINE_PUBLIC_ALIAS(DOS$__rmdir, libd_rmdir);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_rmdir, libd_rmdir);
 DEFINE_PUBLIC_ALIAS(DOS$rmdir, libd_rmdir);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_rmdir, libc_rmdir);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__rmdir, libc_rmdir);
 DEFINE_PUBLIC_ALIAS(__libc_rmdir, libc_rmdir);
 DEFINE_PUBLIC_ALIAS(rmdir, libc_rmdir);

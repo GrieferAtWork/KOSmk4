@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x300b4406 */
+/* HASH CRC-32:0xb0877b51 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ NOTHROW_RPC(LIBDCALL libd_wexecv)(char16_t const *__restrict path,
 	utf8_argv = libd_convert_wcstombsv(___argv);
 	if unlikely(!utf8_argv)
 		goto done_file;
-	result = libc_execv(utf8_path, utf8_argv);
+	result = libd_execv(utf8_path, utf8_argv);
 
 	libc_convert_freev(utf8_argv);
 
@@ -92,7 +92,7 @@ NOTHROW_RPC(LIBDCALL libd_wexecve)(char16_t const *__restrict path,
 	utf8_envp = NULL;
 	if unlikely(___envp && (utf8_envp = libd_convert_wcstombsv(___envp)) == NULL)
 		goto done_argv;
-	result = libc_execve(utf8_path, utf8_argv, utf8_envp);
+	result = libd_execve(utf8_path, utf8_argv, utf8_envp);
 
 	libc_convert_freev(utf8_envp);
 
@@ -148,7 +148,7 @@ NOTHROW_RPC(LIBDCALL libd_wexecvp)(char16_t const *__restrict file,
 	utf8_argv = libd_convert_wcstombsv(___argv);
 	if unlikely(!utf8_argv)
 		goto done_file;
-	result = libc_execvp(utf8_file, utf8_argv);
+	result = libd_execvp(utf8_file, utf8_argv);
 
 	libc_convert_freev(utf8_argv);
 
@@ -196,7 +196,7 @@ NOTHROW_RPC(LIBDCALL libd_wexecvpe)(char16_t const *__restrict file,
 	utf8_envp = NULL;
 	if unlikely(___envp && (utf8_envp = libd_convert_wcstombsv(___envp)) == NULL)
 		goto done_argv;
-	result = libc_execvpe(utf8_file, utf8_argv, utf8_envp);
+	result = libd_execvpe(utf8_file, utf8_argv, utf8_envp);
 
 	libc_convert_freev(utf8_envp);
 

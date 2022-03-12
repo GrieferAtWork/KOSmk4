@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e4a211b */
+/* HASH CRC-32:0x43b04537 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -188,12 +188,19 @@ NOTHROW_RPC(LIBKCALL libc_wutime64)(char32_t const *file,
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(DOS$_wutime, libd_wutime);
 DEFINE_PUBLIC_ALIAS(DOS$_wutime32, libd_wutime);
 DEFINE_PUBLIC_ALIAS(DOS$wutime, libd_wutime);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_wutime, libc_wutime);
 DEFINE_PUBLIC_ALIAS(_wutime32, libc_wutime);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(wutime, libc_wutime);
 DEFINE_PUBLIC_ALIAS(DOS$_wutime64, libd_wutime64);
 DEFINE_PUBLIC_ALIAS(DOS$wutime64, libd_wutime64);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_wutime64, libc_wutime64);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(wutime64, libc_wutime64);
 #endif /* !__KERNEL__ */
 

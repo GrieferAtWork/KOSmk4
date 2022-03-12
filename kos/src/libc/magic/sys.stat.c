@@ -1001,19 +1001,19 @@ int _fstat64i32($fd_t fd, [[nonnull]] struct __dos_stat64i32 *__restrict buf);
 [[decl_prefix(struct __dos_stat64;), decl_include("<bits/types.h>")]]
 int _fstat64($fd_t fd, [[nonnull]] struct __dos_stat64 *__restrict buf);
 
-[[wchar, decl_prefix(struct __dos_stat32;)]]
+[[wchar, decl_prefix(struct __dos_stat32;), export_alias("_wstat")]]
 int _wstat32([[nonnull]] $wchar_t const *filename,
              [[nonnull]] struct __dos_stat32 *buf);
 
-[[wchar, decl_prefix(struct __dos_stat64;)]]
+[[wchar, decl_prefix(struct __dos_stat64;), alias("_wstat64i32")]]
 int _wstat64([[nonnull]] $wchar_t const *filename,
              [[nonnull]] struct __dos_stat64 *buf);
 
-[[wchar, decl_prefix(struct __dos_stat32i64;)]]
+[[wchar, decl_prefix(struct __dos_stat32i64;), export_alias("_wstati64")]]
 int _wstat32i64([[nonnull]] $wchar_t const *filename,
                 [[nonnull]] struct __dos_stat32i64 *buf);
 
-[[wchar, decl_prefix(struct __dos_stat64i32;)]]
+[[wchar, decl_prefix(struct __dos_stat64i32;), alias("_wstat64")]]
 int _wstat64i32([[nonnull]] $wchar_t const *filename,
                 [[nonnull]] struct __dos_stat64i32 *buf);
 %#endif /* __USE_DOS */
