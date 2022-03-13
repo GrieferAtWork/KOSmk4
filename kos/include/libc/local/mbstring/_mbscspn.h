@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ae169c2 */
+/* HASH CRC-32:0xf3930dab */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,21 @@
 #ifndef __local__mbscspn_defined
 #define __local__mbscspn_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__mbscspn_l
+#if defined(__CRT_HAVE__mbscspn_l) || defined(__CRT_HAVE__ismbblead_l)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbscspn_l_defined
 #define __local___localdep__mbscspn_l_defined
+#ifdef __CRT_HAVE__mbscspn_l
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbscspn_l,(unsigned char const *__haystack, unsigned char const *__reject, __locale_t __locale),_mbscspn_l,(__haystack,__reject,__locale))
+#elif defined(__CRT_HAVE__ismbblead_l)
+__NAMESPACE_LOCAL_END
+#include <libc/local/mbstring/_mbscspn_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__mbscspn_l __LIBC_LOCAL_NAME(_mbscspn_l)
+#else /* ... */
+#undef __local___localdep__mbscspn_l_defined
+#endif /* !... */
 #endif /* !__local___localdep__mbscspn_l_defined */
 __LOCAL_LIBC(_mbscspn) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbscspn))(unsigned char const *__haystack, unsigned char const *__reject) {
@@ -37,7 +46,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__mbscspn_defined
 #define __localdep__mbscspn __LIBC_LOCAL_NAME(_mbscspn)
 #endif /* !__local___localdep__mbscspn_defined */
-#else /* __CRT_HAVE__mbscspn_l */
+#else /* __CRT_HAVE__mbscspn_l || __CRT_HAVE__ismbblead_l */
 #undef __local__mbscspn_defined
-#endif /* !__CRT_HAVE__mbscspn_l */
+#endif /* !__CRT_HAVE__mbscspn_l && !__CRT_HAVE__ismbblead_l */
 #endif /* !__local__mbscspn_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98c49a4b */
+/* HASH CRC-32:0xebc2908 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,22 @@
 #ifndef __local__mbslwr_defined
 #define __local__mbslwr_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__mbslwr_l
+#if defined(__CRT_HAVE__mbslwr_l) || (defined(__CRT_HAVE__ismbblead_l) && defined(__CRT_HAVE__mbctolower_l))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbslwr_l_defined
 #define __local___localdep__mbslwr_l_defined
-__CREDIRECT(__ATTR_NONNULL((1)),unsigned char *,__NOTHROW_NCX,__localdep__mbslwr_l,(unsigned char *__buf, __locale_t __locale),_mbslwr_l,(__buf,__locale))
+#ifdef __CRT_HAVE__mbslwr_l
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),unsigned char *,__NOTHROW_NCX,__localdep__mbslwr_l,(unsigned char *__buf, __locale_t __locale),_mbslwr_l,(__buf,__locale))
+#elif defined(__CRT_HAVE__ismbblead_l) && defined(__CRT_HAVE__mbctolower_l)
+__NAMESPACE_LOCAL_END
+#include <libc/local/mbstring/_mbslwr_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__mbslwr_l __LIBC_LOCAL_NAME(_mbslwr_l)
+#else /* ... */
+#undef __local___localdep__mbslwr_l_defined
+#endif /* !... */
 #endif /* !__local___localdep__mbslwr_l_defined */
-__LOCAL_LIBC(_mbslwr) __ATTR_NONNULL((1)) unsigned char *
+__LOCAL_LIBC(_mbslwr) __ATTR_RETNONNULL __ATTR_NONNULL((1)) unsigned char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbslwr))(unsigned char *__buf) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__mbslwr_l)(__buf, __NULLPTR);
 }
@@ -36,7 +45,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__mbslwr_defined
 #define __localdep__mbslwr __LIBC_LOCAL_NAME(_mbslwr)
 #endif /* !__local___localdep__mbslwr_defined */
-#else /* __CRT_HAVE__mbslwr_l */
+#else /* __CRT_HAVE__mbslwr_l || (__CRT_HAVE__ismbblead_l && __CRT_HAVE__mbctolower_l) */
 #undef __local__mbslwr_defined
-#endif /* !__CRT_HAVE__mbslwr_l */
+#endif /* !__CRT_HAVE__mbslwr_l && (!__CRT_HAVE__ismbblead_l || !__CRT_HAVE__mbctolower_l) */
 #endif /* !__local__mbslwr_defined */

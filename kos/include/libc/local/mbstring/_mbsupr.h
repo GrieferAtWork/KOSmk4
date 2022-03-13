@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7e7120d */
+/* HASH CRC-32:0x7eeb35aa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,11 +21,20 @@
 #ifndef __local__mbsupr_defined
 #define __local__mbsupr_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__mbsupr_l
+#if defined(__CRT_HAVE__mbsupr_l) || (defined(__CRT_HAVE__ismbblead_l) && defined(__CRT_HAVE__mbctoupper_l))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbsupr_l_defined
 #define __local___localdep__mbsupr_l_defined
+#ifdef __CRT_HAVE__mbsupr_l
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),unsigned char *,__NOTHROW_NCX,__localdep__mbsupr_l,(unsigned char *__buf, __locale_t __locale),_mbsupr_l,(__buf,__locale))
+#elif defined(__CRT_HAVE__ismbblead_l) && defined(__CRT_HAVE__mbctoupper_l)
+__NAMESPACE_LOCAL_END
+#include <libc/local/mbstring/_mbsupr_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__mbsupr_l __LIBC_LOCAL_NAME(_mbsupr_l)
+#else /* ... */
+#undef __local___localdep__mbsupr_l_defined
+#endif /* !... */
 #endif /* !__local___localdep__mbsupr_l_defined */
 __LOCAL_LIBC(_mbsupr) __ATTR_RETNONNULL __ATTR_NONNULL((1)) unsigned char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsupr))(unsigned char *__buf) {
@@ -36,7 +45,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__mbsupr_defined
 #define __localdep__mbsupr __LIBC_LOCAL_NAME(_mbsupr)
 #endif /* !__local___localdep__mbsupr_defined */
-#else /* __CRT_HAVE__mbsupr_l */
+#else /* __CRT_HAVE__mbsupr_l || (__CRT_HAVE__ismbblead_l && __CRT_HAVE__mbctoupper_l) */
 #undef __local__mbsupr_defined
-#endif /* !__CRT_HAVE__mbsupr_l */
+#endif /* !__CRT_HAVE__mbsupr_l && (!__CRT_HAVE__ismbblead_l || !__CRT_HAVE__mbctoupper_l) */
 #endif /* !__local__mbsupr_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcaac1bbe */
+/* HASH CRC-32:0x1dd0da57 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,24 +21,27 @@
 #ifndef __local__mbscat_s_defined
 #define __local__mbscat_s_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__mbscat_s_l
 #include <hybrid/typecore.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbscat_s_l_defined
 #define __local___localdep__mbscat_s_l_defined
-__CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep__mbscat_s_l,(unsigned char *__buf, __SIZE_TYPE__ __bufsize, unsigned char const *__src, __locale_t __locale),_mbscat_s_l,(__buf,__bufsize,__src,__locale))
+#ifdef __CRT_HAVE__mbscat_s_l
+__CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep__mbscat_s_l,(unsigned char *__buf, __SIZE_TYPE__ __true_bufsize, unsigned char const *__src, __locale_t __locale),_mbscat_s_l,(__buf,__true_bufsize,__src,__locale))
+#else /* __CRT_HAVE__mbscat_s_l */
+__NAMESPACE_LOCAL_END
+#include <libc/local/mbstring/_mbscat_s_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__mbscat_s_l __LIBC_LOCAL_NAME(_mbscat_s_l)
+#endif /* !__CRT_HAVE__mbscat_s_l */
 #endif /* !__local___localdep__mbscat_s_l_defined */
 __LOCAL_LIBC(_mbscat_s) __ATTR_NONNULL((1, 3)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbscat_s))(unsigned char *__buf, __SIZE_TYPE__ __bufsize, unsigned char const *__src) {
-	return (__NAMESPACE_LOCAL_SYM __localdep__mbscat_s_l)(__buf, __bufsize, __src, __NULLPTR);
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbscat_s))(unsigned char *__buf, __SIZE_TYPE__ __true_bufsize, unsigned char const *__src) {
+	return (__NAMESPACE_LOCAL_SYM __localdep__mbscat_s_l)(__buf, __true_bufsize, __src, __NULLPTR);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__mbscat_s_defined
 #define __local___localdep__mbscat_s_defined
 #define __localdep__mbscat_s __LIBC_LOCAL_NAME(_mbscat_s)
 #endif /* !__local___localdep__mbscat_s_defined */
-#else /* __CRT_HAVE__mbscat_s_l */
-#undef __local__mbscat_s_defined
-#endif /* !__CRT_HAVE__mbscat_s_l */
 #endif /* !__local__mbscat_s_defined */

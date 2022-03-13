@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd15edc3c */
+/* HASH CRC-32:0xeb786686 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,23 +21,32 @@
 #ifndef __local__mbsnbcpy_defined
 #define __local__mbsnbcpy_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__mbsnbcpy_l
+#if defined(__CRT_HAVE__mbsnbcpy_l) || defined(__CRT_HAVE__ismbblead_l)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbsnbcpy_l_defined
 #define __local___localdep__mbsnbcpy_l_defined
-__CREDIRECT(__ATTR_NONNULL((1, 2)),unsigned char *,__NOTHROW_NCX,__localdep__mbsnbcpy_l,(unsigned char *__buf, unsigned char const *__src, __SIZE_TYPE__ __srclen, __locale_t __locale),_mbsnbcpy_l,(__buf,__src,__srclen,__locale))
+#ifdef __CRT_HAVE__mbsnbcpy_l
+__CREDIRECT(__ATTR_NONNULL((1, 2)),unsigned char *,__NOTHROW_NCX,__localdep__mbsnbcpy_l,(unsigned char *__buf, unsigned char const *__src, __SIZE_TYPE__ __bufsize, __locale_t __locale),_mbsnbcpy_l,(__buf,__src,__bufsize,__locale))
+#elif defined(__CRT_HAVE__ismbblead_l)
+__NAMESPACE_LOCAL_END
+#include <libc/local/mbstring/_mbsnbcpy_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__mbsnbcpy_l __LIBC_LOCAL_NAME(_mbsnbcpy_l)
+#else /* ... */
+#undef __local___localdep__mbsnbcpy_l_defined
+#endif /* !... */
 #endif /* !__local___localdep__mbsnbcpy_l_defined */
 __LOCAL_LIBC(_mbsnbcpy) __ATTR_NONNULL((1, 2)) unsigned char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsnbcpy))(unsigned char *__buf, unsigned char const *__src, __SIZE_TYPE__ __srclen) {
-	return (__NAMESPACE_LOCAL_SYM __localdep__mbsnbcpy_l)(__buf, __src, __srclen, __NULLPTR);
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsnbcpy))(unsigned char *__buf, unsigned char const *__src, __SIZE_TYPE__ __bufsize) {
+	return (__NAMESPACE_LOCAL_SYM __localdep__mbsnbcpy_l)(__buf, __src, __bufsize, __NULLPTR);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__mbsnbcpy_defined
 #define __local___localdep__mbsnbcpy_defined
 #define __localdep__mbsnbcpy __LIBC_LOCAL_NAME(_mbsnbcpy)
 #endif /* !__local___localdep__mbsnbcpy_defined */
-#else /* __CRT_HAVE__mbsnbcpy_l */
+#else /* __CRT_HAVE__mbsnbcpy_l || __CRT_HAVE__ismbblead_l */
 #undef __local__mbsnbcpy_defined
-#endif /* !__CRT_HAVE__mbsnbcpy_l */
+#endif /* !__CRT_HAVE__mbsnbcpy_l && !__CRT_HAVE__ismbblead_l */
 #endif /* !__local__mbsnbcpy_defined */

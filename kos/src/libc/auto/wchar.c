@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9642df71 */
+/* HASH CRC-32:0xd88fad64 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -623,12 +623,14 @@ NOTHROW_NCX(LIBKCALL libc_wcsncmp)(char32_t const *s1,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcscoll)(char16_t const *s1,
                                    char16_t const *s2) {
+	/* XXX: Implement properly? */
 	return libd_wcscmp(s1, s2);
 }
 /* >> wcscoll(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wcscoll)(char32_t const *s1,
                                    char32_t const *s2) {
+	/* XXX: Implement properly? */
 	return libc_wcscmp(s1, s2);
 }
 /* >> wcsxfrm(3) */
@@ -636,7 +638,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") NONNULL((2)) si
 NOTHROW_NCX(LIBDCALL libd_wcsxfrm)(char16_t *dst,
                                    char16_t const *__restrict src,
                                    size_t maxlen) {
-	/* XXX: Implement me */
+	/* XXX: Implement properly? */
 	size_t n = libd_wcsnlen(src, maxlen);
 	libc_memcpy(dst, src, n * sizeof(char16_t));
 	return n;
@@ -646,7 +648,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") NONNULL((2)) size_t
 NOTHROW_NCX(LIBKCALL libc_wcsxfrm)(char32_t *dst,
                                    char32_t const *__restrict src,
                                    size_t maxlen) {
-	/* XXX: Implement me */
+	/* XXX: Implement properly? */
 	size_t n = libc_wcsnlen(src, maxlen);
 	libc_memcpy(dst, src, n * sizeof(char32_t));
 	return n;
@@ -1969,6 +1971,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUS
 NOTHROW_NCX(LIBDCALL libd_wcscoll_l)(char16_t const *s1,
                                      char16_t const *s2,
                                      locale_t locale) {
+	/* XXX: Implement properly? */
 	(void)locale;
 	return libd_wcscoll(s1, s2);
 }
@@ -1977,6 +1980,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_PURE WUNUSED N
 NOTHROW_NCX(LIBKCALL libc_wcscoll_l)(char32_t const *s1,
                                      char32_t const *s2,
                                      locale_t locale) {
+	/* XXX: Implement properly? */
 	(void)locale;
 	return libc_wcscoll(s1, s2);
 }
@@ -3923,6 +3927,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUS
 NOTHROW_NCX(LIBDCALL libd_wcsncoll)(char16_t const *s1,
                                     char16_t const *s2,
                                     size_t maxlen) {
+	/* XXX: Implement properly? */
 	return libd_wcsncmp(s1, s2, maxlen);
 }
 /* >> wcsncoll(3) */
@@ -3930,18 +3935,21 @@ INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_PURE WUNUSED N
 NOTHROW_NCX(LIBKCALL libc_wcsncoll)(char32_t const *s1,
                                     char32_t const *s2,
                                     size_t maxlen) {
+	/* XXX: Implement properly? */
 	return libc_wcsncmp(s1, s2, maxlen);
 }
 /* >> wcscasecoll(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcscasecoll)(char16_t const *s1,
                                        char16_t const *s2) {
+	/* XXX: Implement properly? */
 	return libd_wcscasecmp(s1, s2);
 }
 /* >> wcscasecoll(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wcscasecoll)(char32_t const *s1,
                                        char32_t const *s2) {
+	/* XXX: Implement properly? */
 	return libc_wcscasecmp(s1, s2);
 }
 /* >> wcsncasecoll(3) */
@@ -3949,6 +3957,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUS
 NOTHROW_NCX(LIBDCALL libd_wcsncasecoll)(char16_t const *s1,
                                         char16_t const *s2,
                                         size_t maxlen) {
+	/* XXX: Implement properly? */
 	return libd_wcsncasecmp(s1, s2, maxlen);
 }
 /* >> wcsncasecoll(3) */
@@ -3956,6 +3965,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_PURE WUNUSED N
 NOTHROW_NCX(LIBKCALL libc_wcsncasecoll)(char32_t const *s1,
                                         char32_t const *s2,
                                         size_t maxlen) {
+	/* XXX: Implement properly? */
 	return libc_wcsncasecmp(s1, s2, maxlen);
 }
 /* >> wcsnrev(3) */
@@ -4816,6 +4826,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsncoll_l)(char16_t const *s1,
                                       char16_t const *s2,
                                       size_t maxlen,
                                       locale_t locale) {
+	/* XXX: Implement properly? */
 	(void)locale;
 	return libd_wcsncoll(s1, s2, maxlen);
 }
@@ -4825,6 +4836,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncoll_l)(char32_t const *s1,
                                       char32_t const *s2,
                                       size_t maxlen,
                                       locale_t locale) {
+	/* XXX: Implement properly? */
 	(void)locale;
 	return libc_wcsncoll(s1, s2, maxlen);
 }
@@ -4833,6 +4845,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUS
 NOTHROW_NCX(LIBDCALL libd_wcscasecoll_l)(char16_t const *s1,
                                          char16_t const *s2,
                                          locale_t locale) {
+	/* XXX: Implement properly? */
 	return libd_wcscasecmp_l(s1, s2, locale);
 }
 /* >> wcscasecoll_l(3) */
@@ -4840,6 +4853,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_PURE WUNUSED N
 NOTHROW_NCX(LIBKCALL libc_wcscasecoll_l)(char32_t const *s1,
                                          char32_t const *s2,
                                          locale_t locale) {
+	/* XXX: Implement properly? */
 	return libc_wcscasecmp_l(s1, s2, locale);
 }
 /* >> wcsncasecoll_l(3) */
@@ -4848,6 +4862,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsncasecoll_l)(char16_t const *s1,
                                           char16_t const *s2,
                                           size_t maxlen,
                                           locale_t locale) {
+	/* XXX: Implement properly? */
 	(void)locale;
 	return libd_wcsncasecoll(s1, s2, maxlen);
 }
@@ -4857,6 +4872,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncasecoll_l)(char32_t const *s1,
                                           char32_t const *s2,
                                           size_t maxlen,
                                           locale_t locale) {
+	/* XXX: Implement properly? */
 	(void)locale;
 	return libc_wcsncasecoll(s1, s2, maxlen);
 }

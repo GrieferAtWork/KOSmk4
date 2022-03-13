@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2fbfc402 */
+/* HASH CRC-32:0x2332ff6c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,11 +21,20 @@
 #ifndef __local__ismbslead_defined
 #define __local__ismbslead_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__ismbslead_l
+#if defined(__CRT_HAVE__ismbslead_l) || defined(__CRT_HAVE__ismbblead_l)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__ismbslead_l_defined
 #define __local___localdep__ismbslead_l_defined
+#ifdef __CRT_HAVE__ismbslead_l
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep__ismbslead_l,(unsigned char const *__str, unsigned char const *__pos, __locale_t __locale),_ismbslead_l,(__str,__pos,__locale))
+#elif defined(__CRT_HAVE__ismbblead_l)
+__NAMESPACE_LOCAL_END
+#include <libc/local/mbstring/_ismbslead_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__ismbslead_l __LIBC_LOCAL_NAME(_ismbslead_l)
+#else /* ... */
+#undef __local___localdep__ismbslead_l_defined
+#endif /* !... */
 #endif /* !__local___localdep__ismbslead_l_defined */
 __LOCAL_LIBC(_ismbslead) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ismbslead))(unsigned char const *__str, unsigned char const *__pos) {
@@ -36,7 +45,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__ismbslead_defined
 #define __localdep__ismbslead __LIBC_LOCAL_NAME(_ismbslead)
 #endif /* !__local___localdep__ismbslead_defined */
-#else /* __CRT_HAVE__ismbslead_l */
+#else /* __CRT_HAVE__ismbslead_l || __CRT_HAVE__ismbblead_l */
 #undef __local__ismbslead_defined
-#endif /* !__CRT_HAVE__ismbslead_l */
+#endif /* !__CRT_HAVE__ismbslead_l && !__CRT_HAVE__ismbblead_l */
 #endif /* !__local__ismbslead_defined */

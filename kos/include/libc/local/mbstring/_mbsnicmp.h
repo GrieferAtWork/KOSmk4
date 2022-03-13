@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7bc8c616 */
+/* HASH CRC-32:0xea78fc14 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,23 +21,32 @@
 #ifndef __local__mbsnicmp_defined
 #define __local__mbsnicmp_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__mbsnicmp_l
+#if defined(__CRT_HAVE__mbsnicmp_l) || (defined(__CRT_HAVE__ismbblead_l) && defined(__CRT_HAVE__mbctolower_l))
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbsnicmp_l_defined
 #define __local___localdep__mbsnicmp_l_defined
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep__mbsnicmp_l,(unsigned char const *__lhs, unsigned char const *__rhs, __SIZE_TYPE__ __maxlen, __locale_t __locale),_mbsnicmp_l,(__lhs,__rhs,__maxlen,__locale))
+#ifdef __CRT_HAVE__mbsnicmp_l
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep__mbsnicmp_l,(unsigned char const *__lhs, unsigned char const *__rhs, __SIZE_TYPE__ __max_chars, __locale_t __locale),_mbsnicmp_l,(__lhs,__rhs,__max_chars,__locale))
+#elif defined(__CRT_HAVE__ismbblead_l) && defined(__CRT_HAVE__mbctolower_l)
+__NAMESPACE_LOCAL_END
+#include <libc/local/mbstring/_mbsnicmp_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__mbsnicmp_l __LIBC_LOCAL_NAME(_mbsnicmp_l)
+#else /* ... */
+#undef __local___localdep__mbsnicmp_l_defined
+#endif /* !... */
 #endif /* !__local___localdep__mbsnicmp_l_defined */
 __LOCAL_LIBC(_mbsnicmp) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsnicmp))(unsigned char const *__lhs, unsigned char const *__rhs, __SIZE_TYPE__ __maxlen) {
-	return (__NAMESPACE_LOCAL_SYM __localdep__mbsnicmp_l)(__lhs, __rhs, __maxlen, __NULLPTR);
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsnicmp))(unsigned char const *__lhs, unsigned char const *__rhs, __SIZE_TYPE__ __max_chars) {
+	return (__NAMESPACE_LOCAL_SYM __localdep__mbsnicmp_l)(__lhs, __rhs, __max_chars, __NULLPTR);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__mbsnicmp_defined
 #define __local___localdep__mbsnicmp_defined
 #define __localdep__mbsnicmp __LIBC_LOCAL_NAME(_mbsnicmp)
 #endif /* !__local___localdep__mbsnicmp_defined */
-#else /* __CRT_HAVE__mbsnicmp_l */
+#else /* __CRT_HAVE__mbsnicmp_l || (__CRT_HAVE__ismbblead_l && __CRT_HAVE__mbctolower_l) */
 #undef __local__mbsnicmp_defined
-#endif /* !__CRT_HAVE__mbsnicmp_l */
+#endif /* !__CRT_HAVE__mbsnicmp_l && (!__CRT_HAVE__ismbblead_l || !__CRT_HAVE__mbctolower_l) */
 #endif /* !__local__mbsnicmp_defined */

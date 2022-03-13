@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfccd4a5f */
+/* HASH CRC-32:0x63ec03f1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -333,6 +333,7 @@ NOTHROW_NCX(LIBCCALL libc_strtok)(char *str,
 INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_strcoll)(char const *s1,
                                    char const *s2) {
+	/* XXX: Implement properly? */
 	return libc_strcmp(s1, s2);
 }
 #endif /* !LIBC_ARCH_HAVE_STRCOLL */
@@ -341,7 +342,7 @@ INTERN ATTR_SECTION(".text.crt.unicode.static.memory") NONNULL((2)) size_t
 NOTHROW_NCX(LIBCCALL libc_strxfrm)(char *dst,
                                    char const *__restrict src,
                                    size_t maxlen) {
-	/* XXX: Implement me */
+	/* XXX: Implement properly? */
 	size_t n = libc_strnlen(src, maxlen);
 	libc_memcpy(dst, src, n * sizeof(char));
 	return n;
@@ -453,6 +454,7 @@ INTERN ATTR_SECTION(".text.crt.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL
 NOTHROW_NCX(LIBCCALL libc_strcoll_l)(char const *s1,
                                      char const *s2,
                                      locale_t locale) {
+	/* XXX: Implement properly? */
 	(void)locale;
 	return libc_strcoll(s1, s2);
 }
@@ -5094,17 +5096,20 @@ INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_PURE WUNUSED NONNULL
 NOTHROW_NCX(LIBCCALL libc_strncoll)(char const *s1,
                                     char const *s2,
                                     size_t maxlen) {
+	/* XXX: Implement properly? */
 	return libc_strncmp(s1, s2, maxlen);
 }
 INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_strcasecoll)(char const *s1,
                                        char const *s2) {
+	/* XXX: Implement properly? */
 	return libc_strcasecmp(s1, s2);
 }
 INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_strncasecoll)(char const *s1,
                                         char const *s2,
                                         size_t maxlen) {
+	/* XXX: Implement properly? */
 	return libc_strncasecmp(s1, s2, maxlen);
 }
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char *
@@ -5133,6 +5138,7 @@ NOTHROW_NCX(LIBCCALL libc_strncoll_l)(char const *s1,
                                       char const *s2,
                                       size_t maxlen,
                                       locale_t locale) {
+	/* XXX: Implement properly? */
 	(void)locale;
 	return libc_strncoll(s1, s2, maxlen);
 }
@@ -5140,6 +5146,7 @@ INTERN ATTR_SECTION(".text.crt.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL
 NOTHROW_NCX(LIBCCALL libc_strcasecoll_l)(char const *s1,
                                          char const *s2,
                                          locale_t locale) {
+	/* XXX: Implement properly? */
 	return libc_strcasecmp_l(s1, s2, locale);
 }
 INTERN ATTR_SECTION(".text.crt.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
@@ -5147,6 +5154,7 @@ NOTHROW_NCX(LIBCCALL libc_strncasecoll_l)(char const *s1,
                                           char const *s2,
                                           size_t maxlen,
                                           locale_t locale) {
+	/* XXX: Implement properly? */
 	(void)locale;
 	return libc_strncasecoll(s1, s2, maxlen);
 }
@@ -6088,9 +6096,9 @@ DEFINE_PUBLIC_ALIAS(DOS$strerror, libd_strerror);
 DEFINE_PUBLIC_ALIAS(strerror, libc_strerror);
 #endif /* !__KERNEL__ */
 #ifndef LIBC_ARCH_HAVE_STRNLEN
-#ifdef __LIBCCALL_IS_LIBDCALL
+#if defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 DEFINE_PUBLIC_ALIAS(__strncnt, libc_strnlen);
-#endif /* __LIBCCALL_IS_LIBDCALL */
+#endif /* __LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strnlen, libc_strnlen);
 #endif /* !LIBC_ARCH_HAVE_STRNLEN */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STPCPY)

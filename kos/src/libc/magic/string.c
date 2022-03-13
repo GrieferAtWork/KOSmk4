@@ -861,6 +861,7 @@ char *strtok(char *str, [[nonnull]] char const *delim) {
 [[section(".text.crt{|.dos}.unicode.static.memory")]]
 int strcoll([[nonnull]] char const *s1,
             [[nonnull]] char const *s2) {
+	/* XXX: Implement properly? */
 	return strcmp(s1, s2);
 }
 
@@ -868,7 +869,7 @@ int strcoll([[nonnull]] char const *s1,
 [[std, section(".text.crt{|.dos}.unicode.static.memory")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRXFRM))]]
 size_t strxfrm(char *dst, [[nonnull]] char const *__restrict src, size_t maxlen) {
-	/* XXX: Implement me */
+	/* XXX: Implement properly? */
 	size_t n = strnlen(src, maxlen);
 	memcpy(dst, src, n * sizeof(char));
 	return n;
@@ -934,8 +935,8 @@ __NAMESPACE_STD_END
 @@>> strnlen(3)
 @@Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´)
 [[decl_include("<hybrid/typecore.h>")]]
-[[libc, kernel, wunused, crtbuiltin, pure]]
-[[dos_only_export_alias("__strncnt")]] /* DOS-specific name */
+[[libc, kernel, wunused, crtbuiltin, pure, alias("__strncnt")]]
+[[if(!defined(__KERNEL__)), dos_only_export_as("__strncnt")]] /* DOS-specific name */
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRNLEN))]]
 $size_t strnlen([[nonnull]] char const *__restrict str, $size_t maxlen) {
 	return (size_t)(strnend(str, maxlen) - str);
@@ -978,6 +979,7 @@ stpncpy:([[nonnull]] char *__restrict buf,
 int strcoll_l([[nonnull]] char const *s1,
               [[nonnull]] char const *s2,
               $locale_t locale) {
+	/* XXX: Implement properly? */
 	(void)locale;
 	return strcoll(s1, s2);
 }
@@ -7029,6 +7031,7 @@ $size_t fuzzy_memcmpq([[nonnull]] void const *s1, $size_t s1_qwords,
 [[pure, wunused, dos_only_export_alias("_strncoll")]]
 [[section(".text.crt{|.dos}.unicode.static.memory")]]
 int strncoll([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t maxlen) {
+	/* XXX: Implement properly? */
 	return strncmp(s1, s2, maxlen);
 }
 
@@ -7036,6 +7039,7 @@ int strncoll([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t max
 [[alias("strcasecmp", "_stricmp", "stricmp", "_strcmpi", "strcmpi")]]
 [[pure, wunused, section(".text.crt{|.dos}.unicode.static.memory")]]
 int strcasecoll([[nonnull]] char const *s1, [[nonnull]] char const *s2) {
+	/* XXX: Implement properly? */
 	return strcasecmp(s1, s2);
 }
 
@@ -7045,6 +7049,7 @@ int strcasecoll([[nonnull]] char const *s1, [[nonnull]] char const *s2) {
 int strncasecoll([[nonnull]] char const *s1,
                  [[nonnull]] char const *s2,
                  $size_t maxlen) {
+	/* XXX: Implement properly? */
 	return strncasecmp(s1, s2, maxlen);
 }
 
@@ -7079,6 +7084,7 @@ strnupr:([[nonnull]] char *__restrict str, $size_t maxlen) -> [[== str]] char * 
 int strncoll_l([[nonnull]] char const *s1,
                [[nonnull]] char const *s2,
                $size_t maxlen, $locale_t locale) {
+	/* XXX: Implement properly? */
 	(void)locale;
 	return strncoll(s1, s2, maxlen);
 }
@@ -7086,6 +7092,7 @@ int strncoll_l([[nonnull]] char const *s1,
 [[pure, wunused, dos_only_export_alias("_stricoll_l")]]
 [[section(".text.crt{|.dos}.unicode.locale.memory")]]
 int strcasecoll_l([[nonnull]] char const *s1, [[nonnull]] char const *s2, $locale_t locale) {
+	/* XXX: Implement properly? */
 	return strcasecmp_l(s1, s2, locale);
 }
 
@@ -7096,6 +7103,7 @@ int strcasecoll_l([[nonnull]] char const *s1, [[nonnull]] char const *s2, $local
 int strncasecoll_l([[nonnull]] char const *s1,
                    [[nonnull]] char const *s2,
                    $size_t maxlen, $locale_t locale) {
+	/* XXX: Implement properly? */
 	(void)locale;
 	return strncasecoll(s1, s2, maxlen);
 }

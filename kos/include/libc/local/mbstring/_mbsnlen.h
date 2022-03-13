@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3df6e323 */
+/* HASH CRC-32:0x19e9d867 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,23 +21,32 @@
 #ifndef __local__mbsnlen_defined
 #define __local__mbsnlen_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__mbsnlen_l
+#if defined(__CRT_HAVE__mbsnlen_l) || defined(__CRT_HAVE__ismbblead_l)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbsnlen_l_defined
 #define __local___localdep__mbsnlen_l_defined
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbsnlen_l,(unsigned char const *__str, __SIZE_TYPE__ __maxlen, __locale_t __locale),_mbsnlen_l,(__str,__maxlen,__locale))
+#ifdef __CRT_HAVE__mbsnlen_l
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbsnlen_l,(unsigned char const *__str, __SIZE_TYPE__ __max_bytes, __locale_t __locale),_mbsnlen_l,(__str,__max_bytes,__locale))
+#elif defined(__CRT_HAVE__ismbblead_l)
+__NAMESPACE_LOCAL_END
+#include <libc/local/mbstring/_mbsnlen_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__mbsnlen_l __LIBC_LOCAL_NAME(_mbsnlen_l)
+#else /* ... */
+#undef __local___localdep__mbsnlen_l_defined
+#endif /* !... */
 #endif /* !__local___localdep__mbsnlen_l_defined */
 __LOCAL_LIBC(_mbsnlen) __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsnlen))(unsigned char const *__str, __SIZE_TYPE__ __maxlen) {
-	return (__NAMESPACE_LOCAL_SYM __localdep__mbsnlen_l)(__str, __maxlen, __NULLPTR);
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsnlen))(unsigned char const *__str, __SIZE_TYPE__ __max_bytes) {
+	return (__NAMESPACE_LOCAL_SYM __localdep__mbsnlen_l)(__str, __max_bytes, __NULLPTR);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__mbsnlen_defined
 #define __local___localdep__mbsnlen_defined
 #define __localdep__mbsnlen __LIBC_LOCAL_NAME(_mbsnlen)
 #endif /* !__local___localdep__mbsnlen_defined */
-#else /* __CRT_HAVE__mbsnlen_l */
+#else /* __CRT_HAVE__mbsnlen_l || __CRT_HAVE__ismbblead_l */
 #undef __local__mbsnlen_defined
-#endif /* !__CRT_HAVE__mbsnlen_l */
+#endif /* !__CRT_HAVE__mbsnlen_l && !__CRT_HAVE__ismbblead_l */
 #endif /* !__local__mbsnlen_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e4f2ac1 */
+/* HASH CRC-32:0x2eedab95 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,23 +21,32 @@
 #ifndef __local__mbsnccnt_defined
 #define __local__mbsnccnt_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__mbsnccnt_l
+#if defined(__CRT_HAVE__mbsnccnt_l) || defined(__CRT_HAVE__ismbblead_l)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbsnccnt_l_defined
 #define __local___localdep__mbsnccnt_l_defined
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbsnccnt_l,(unsigned char const *__str, __SIZE_TYPE__ __maxlen, __locale_t __locale),_mbsnccnt_l,(__str,__maxlen,__locale))
+#ifdef __CRT_HAVE__mbsnccnt_l
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbsnccnt_l,(unsigned char const *__str, __SIZE_TYPE__ __max_bytes, __locale_t __locale),_mbsnccnt_l,(__str,__max_bytes,__locale))
+#elif defined(__CRT_HAVE__ismbblead_l)
+__NAMESPACE_LOCAL_END
+#include <libc/local/mbstring/_mbsnccnt_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__mbsnccnt_l __LIBC_LOCAL_NAME(_mbsnccnt_l)
+#else /* ... */
+#undef __local___localdep__mbsnccnt_l_defined
+#endif /* !... */
 #endif /* !__local___localdep__mbsnccnt_l_defined */
 __LOCAL_LIBC(_mbsnccnt) __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsnccnt))(unsigned char const *__str, __SIZE_TYPE__ __maxlen) {
-	return (__NAMESPACE_LOCAL_SYM __localdep__mbsnccnt_l)(__str, __maxlen, __NULLPTR);
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsnccnt))(unsigned char const *__str, __SIZE_TYPE__ __max_bytes) {
+	return (__NAMESPACE_LOCAL_SYM __localdep__mbsnccnt_l)(__str, __max_bytes, __NULLPTR);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__mbsnccnt_defined
 #define __local___localdep__mbsnccnt_defined
 #define __localdep__mbsnccnt __LIBC_LOCAL_NAME(_mbsnccnt)
 #endif /* !__local___localdep__mbsnccnt_defined */
-#else /* __CRT_HAVE__mbsnccnt_l */
+#else /* __CRT_HAVE__mbsnccnt_l || __CRT_HAVE__ismbblead_l */
 #undef __local__mbsnccnt_defined
-#endif /* !__CRT_HAVE__mbsnccnt_l */
+#endif /* !__CRT_HAVE__mbsnccnt_l && !__CRT_HAVE__ismbblead_l */
 #endif /* !__local__mbsnccnt_defined */
