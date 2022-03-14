@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a40d164 */
+/* HASH CRC-32:0xd4cc23df */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,8 +48,6 @@
 #define __stub___p__crtAssertBusy
 #define __stub___p__crtBreakAlloc
 #define __stub___p__crtDbgFlag
-#define __stub___p__mbcasemap
-#define __stub___p__mbctype
 #define __stub___pthread_register_cancel
 #define __stub___pthread_register_cancel_defer
 #define __stub___pthread_unregister_cancel
@@ -72,11 +70,9 @@
 #define __stub__get_output_format
 #define __stub__get_purecall_handler
 #define __stub__getdiskfree
-#define __stub__getmbcp
 #define __stub__lock_locales
 #define __stub__mbbtombc_l
 #define __stub__mbctombb_l
-#define __stub__mbctouni_l
 #define __stub__mktemp_s
 #define __stub__query_new_handler
 #define __stub__query_new_mode
@@ -90,10 +86,8 @@
 #define __stub__set_output_format
 #define __stub__set_purecall_handler
 #define __stub__seterrormode
-#define __stub__setmbcp
 #define __stub__statusfp
 #define __stub__statusfp2
-#define __stub__unitombc_l
 #define __stub__unlock_locales
 #define __stub__wcreate_locale
 #define __stub__wcserror

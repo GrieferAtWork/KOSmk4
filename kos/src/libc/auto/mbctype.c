@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0c1f4da */
+/* HASH CRC-32:0x1c3ed8c1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,70 +29,71 @@
 
 DECL_BEGIN
 
+#include "../libc/globals.h"
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__getmbcp_l)(locale_t locale) {
 	if (locale == NULL)
 		return libc__getmbcp();
 	return 65001; /* ??? */
 }
 /* @param: ch: Should actually be `unsigned char ch' */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbbkalnum)(unsigned int ch) {
 	return libc__ismbbkalnum_l(ch, NULL);
 }
 /* @param: ch: Should actually be `unsigned char ch' */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbbkana)(unsigned int ch) {
 	return libc__ismbbkana_l(ch, NULL);
 }
 /* @param: ch: Should actually be `unsigned char ch' */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbbkpunct)(unsigned int ch) {
 	return libc__ismbbkpunct_l(ch, NULL);
 }
 /* @param: ch: Should actually be `unsigned char ch' */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbbalpha)(unsigned int ch) {
 	return libc__ismbbalpha_l(ch, NULL);
 }
 /* @param: ch: Should actually be `unsigned char ch' */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbbpunct)(unsigned int ch) {
 	return libc__ismbbpunct_l(ch, NULL);
 }
 /* @param: ch: Should actually be `unsigned char ch' */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbbblank)(unsigned int ch) {
 	return libc__ismbbblank_l(ch, NULL);
 }
 /* @param: ch: Should actually be `unsigned char ch' */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbbalnum)(unsigned int ch) {
 	return libc__ismbbalnum_l(ch, NULL);
 }
 /* @param: ch: Should actually be `unsigned char ch' */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbbprint)(unsigned int ch) {
 	return libc__ismbbprint_l(ch, NULL);
 }
 /* @param: ch: Should actually be `unsigned char ch' */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbbgraph)(unsigned int ch) {
 	return libc__ismbbgraph_l(ch, NULL);
 }
 /* @param: ch: Should actually be `unsigned char ch' */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbblead)(unsigned int ch) {
 	return libc__ismbblead_l(ch, NULL);
 }
 /* @param: ch: Should actually be `unsigned char ch' */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbbtrail)(unsigned int ch) {
 	return libc__ismbbtrail_l(ch, NULL);
 }
 #include <libc/template/mbctype.h>
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED unsigned char
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED unsigned char
 NOTHROW_NCX(LIBCCALL libc__get_mbbtype_l)(unsigned char ch,
                                           locale_t locale) {
 	if (locale == NULL)
@@ -100,67 +101,67 @@ NOTHROW_NCX(LIBCCALL libc__get_mbbtype_l)(unsigned char ch,
 	return 0; /* XXX: locale support */
 }
 /* @param: ch: Should actually be `unsigned char ch' */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbblead_l)(unsigned int ch,
                                         locale_t locale) {
 	return libc__get_mbbtype_l((unsigned char)ch, locale) & 0x04;
 }
 /* @param: ch: Should actually be `unsigned char ch' */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbbtrail_l)(unsigned int ch,
                                          locale_t locale) {
 	return libc__get_mbbtype_l((unsigned char)ch, locale) & 0x08;
 }
 /* @param: ch: Should actually be `unsigned char ch' */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbbkalnum_l)(unsigned int ch,
                                           locale_t locale) {
 	return libc__get_mbbtype_l((unsigned char)ch, locale) & 0x01;
 }
 /* @param: ch: Should actually be `unsigned char ch' */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbbkana_l)(unsigned int ch,
                                         locale_t locale) {
 	return libc__get_mbbtype_l((unsigned char)ch, locale) & (0x01 | 0x02);
 }
 /* @param: ch: Should actually be `unsigned char ch' */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbbkpunct_l)(unsigned int ch,
                                           locale_t locale) {
 	return libc__get_mbbtype_l((unsigned char)ch, locale) & 0x02;
 }
 /* @param: ch: Should actually be `unsigned char ch' */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbbalpha_l)(unsigned int ch,
                                          locale_t locale) {
 	return libc_isalpha_l(ch, locale) || libc__ismbbkalnum_l(ch, locale);
 }
 /* @param: ch: Should actually be `unsigned char ch' */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbbpunct_l)(unsigned int ch,
                                          locale_t locale) {
 	return libc_ispunct_l(ch, locale) || libc__ismbbkpunct_l(ch, locale);
 }
 /* @param: ch: Should actually be `unsigned char ch' */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbbblank_l)(unsigned int ch,
                                          locale_t locale) {
 	return libc_isblank_l(ch, locale) || ch == '\t';
 }
 /* @param: ch: Should actually be `unsigned char ch' */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbbalnum_l)(unsigned int ch,
                                          locale_t locale) {
 	return libc_isalnum_l(ch, locale) || libc__ismbbkalnum_l(ch, locale);
 }
 /* @param: ch: Should actually be `unsigned char ch' */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbbprint_l)(unsigned int ch,
                                          locale_t locale) {
 	return libc_isprint_l(ch, locale) || libc__ismbbkana_l(ch, locale);
 }
 /* @param: ch: Should actually be `unsigned char ch' */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbbgraph_l)(unsigned int ch,
                                          locale_t locale) {
 	return libc_isgraph_l(ch, locale) || libc__ismbbkana_l(ch, locale);

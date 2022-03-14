@@ -1572,6 +1572,7 @@
 #define __CRT_HAVE__mbbtombc_l
 #define __CRT_HAVE__mbbtype
 #define __CRT_HAVE__mbbtype_l
+#define __CRT_HAVE__mbcasemap
 #define __CRT_HAVE__mbccpy
 #define __CRT_HAVE__mbccpy_l
 #define __CRT_HAVE__mbccpy_s
@@ -1593,6 +1594,7 @@
 #define __CRT_HAVE__mbctouni_l
 #define __CRT_HAVE__mbctoupper
 #define __CRT_HAVE__mbctoupper_l
+#define __CRT_HAVE__mbctype
 #define __CRT_HAVE__mblen_l
 #define __CRT_HAVE__mbsbtype
 #define __CRT_HAVE__mbsbtype_l

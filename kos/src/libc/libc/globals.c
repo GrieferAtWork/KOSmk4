@@ -129,6 +129,13 @@ DEFINE_NOREL_GLOBAL_META(int, signgam, ".crt.math.math");
 #undef _sigintr
 DEFINE_NOREL_GLOBAL_META(sigset_t, _sigintr, ".crt.sched.signal");
 
+
+/* <mbctype.h> */
+#undef _mbctype
+#undef _mbcasemap
+DEFINE_NOREL_GLOBAL_META(unsigned char, _mbctype, ".crt.dos.mbstring");
+DEFINE_NOREL_GLOBAL_META(unsigned char, _mbcasemap, ".crt.dos.mbstring");
+
 /* Misc... */
 #undef __libc_enable_secure
 DEFINE_NOREL_GLOBAL_META(int, __libc_enable_secure, ".crt.compat.glibc");

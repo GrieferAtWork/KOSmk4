@@ -27,8 +27,8 @@
 
 DECL_BEGIN
 
-/*[[[head:libc__mbbtombc_l,hash:CRC-32=0x23f16084]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED unsigned int
+/*[[[head:libc__mbbtombc_l,hash:CRC-32=0x49887d16]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED unsigned int
 NOTHROW_NCX(LIBCCALL libc__mbbtombc_l)(unsigned int ch,
                                        locale_t locale)
 /*[[[body:libc__mbbtombc_l]]]*/
@@ -42,8 +42,8 @@ NOTHROW_NCX(LIBCCALL libc__mbbtombc_l)(unsigned int ch,
 /*[[[end:libc__mbbtombc_l]]]*/
 
 
-/*[[[head:libc__mbctombb_l,hash:CRC-32=0xd82da25f]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED unsigned int
+/*[[[head:libc__mbctombb_l,hash:CRC-32=0xb254bfcd]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED unsigned int
 NOTHROW_NCX(LIBCCALL libc__mbctombb_l)(unsigned int ch,
                                        locale_t locale)
 /*[[[body:libc__mbctombb_l]]]*/
@@ -55,88 +55,6 @@ NOTHROW_NCX(LIBCCALL libc__mbctombb_l)(unsigned int ch,
 	return 0;
 }
 /*[[[end:libc__mbctombb_l]]]*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /*[[[start:exports,hash:CRC-32=0xa191700b]]]*/
 DEFINE_PUBLIC_ALIAS(_mbbtombc_l, libc__mbbtombc_l);

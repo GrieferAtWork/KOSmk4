@@ -227,6 +227,19 @@ DECLARE_NOREL_GLOBAL_META(sigset_t, _sigintr);
 #define _sigintr GET_NOREL_GLOBAL(_sigintr)
 
 
+/* <mbctype.h> */
+#undef _mbctype
+#undef _mbcasemap
+#undef __LOCAL__mbctype
+#undef __LOCAL__mbcasemap
+DECLARE_NOREL_GLOBAL_META(unsigned char, _mbctype);
+DECLARE_NOREL_GLOBAL_META(unsigned char, _mbcasemap);
+#define _mbctype           (&GET_NOREL_GLOBAL(_mbctype))
+#define _mbcasemap         (&GET_NOREL_GLOBAL(_mbcasemap))
+#define __LOCAL__mbctype   (&GET_NOREL_GLOBAL(_mbctype))
+#define __LOCAL__mbcasemap (&GET_NOREL_GLOBAL(_mbcasemap))
+
+
 /* Misc... */
 #undef __libc_enable_secure
 DECLARE_NOREL_GLOBAL_META(int, __libc_enable_secure);

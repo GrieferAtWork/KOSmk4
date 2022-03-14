@@ -22,7 +22,11 @@
 /* (#) Portability: Windows Kits (/ucrt/mbstring.h) */
 }
 
-%[default:section(".text.crt.dos.string.memory")]
+%[default:section(".text.crt.dos.mbstring")]
+
+%(auto_source){
+#include "../libc/globals.h"
+}
 
 %[insert:prefix(
 #include <features.h>

@@ -22,7 +22,11 @@
 /* (#) Portability: Windows Kits (/ucrt/mbctype.h) */
 }
 
-%[default:section(".text.crt.dos.string.memory")]
+%[default:section(".text.crt.dos.mbstring")]
+
+%(auto_source){
+#include "../libc/globals.h"
+}
 
 %[insert:prefix(
 #include <features.h>
@@ -115,7 +119,8 @@ extern unsigned char _mbctype[];
 #define _mbctype _mbctype
 #else /* ... */
 }
-[[guard]] unsigned char *__p__mbctype(void);
+[[guard, const, nonnull, wunused]]
+unsigned char *__p__mbctype(void);
 %[insert:pp_if($has_function(__p__mbctype))]
 %#define _mbctype __p__mbctype()
 %[insert:pp_endif]
@@ -133,6 +138,7 @@ extern unsigned char _mbcasemap[];
 #define _mbcasemap _mbcasemap
 #else /* ... */
 }
+[[guard, const, nonnull, wunused]]
 unsigned char *__p__mbcasemap(void);
 %[insert:pp_if($has_function(__p__mbcasemap))]
 %#define _mbcasemap __p__mbcasemap()

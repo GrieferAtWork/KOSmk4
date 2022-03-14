@@ -1049,7 +1049,7 @@ NOTHROW_NCX(LIBCCALL libc_get_libiconv)(void) {
 	}
 	return result;
 }
-PRIVATE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.glibc") NONNULL((1)) void *
+INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.glibc") NONNULL((1)) void *
 NOTHROW_NCX(FCALL libc_get_libiconv_symbol)(char const *__restrict name) {
 	void *lib, *res;
 	lib = libc_get_libiconv();
