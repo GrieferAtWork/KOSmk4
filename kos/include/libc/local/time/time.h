@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa14e1307 */
+/* HASH CRC-32:0xaac59583 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,20 +24,20 @@
 #include <bits/types.h>
 #if defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_time32_defined
-#define __local___localdep_time32_defined
+#ifndef __local___localdep_crt_time32_defined
+#define __local___localdep_crt_time32_defined
 #ifdef __CRT_HAVE_time
-__CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_time32,(__time32_t *__timer),time,(__timer))
+__CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_crt_time32,(__time32_t *__timer),time,(__timer))
 #elif defined(__CRT_HAVE___time)
-__CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_time32,(__time32_t *__timer),__time,(__timer))
+__CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_crt_time32,(__time32_t *__timer),__time,(__timer))
 #elif defined(__CRT_HAVE___libc_time)
-__CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_time32,(__time32_t *__timer),__libc_time,(__timer))
+__CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_crt_time32,(__time32_t *__timer),__libc_time,(__timer))
 #elif defined(__CRT_HAVE__time32)
-__CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_time32,(__time32_t *__timer),_time32,(__timer))
+__CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_crt_time32,(__time32_t *__timer),_time32,(__timer))
 #else /* ... */
-#undef __local___localdep_time32_defined
+#undef __local___localdep_crt_time32_defined
 #endif /* !... */
-#endif /* !__local___localdep_time32_defined */
+#endif /* !__local___localdep_crt_time32_defined */
 #ifndef __local___localdep_time64_defined
 #define __local___localdep_time64_defined
 #if defined(__CRT_HAVE_time) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -62,7 +62,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(time) __TM_TYPE(time)
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(time))(__TM_TYPE(time) *__timer) {
 #if defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
-	__time32_t __tm32 = (__NAMESPACE_LOCAL_SYM __localdep_time32)(__NULLPTR);
+	__time32_t __tm32 = (__NAMESPACE_LOCAL_SYM __localdep_crt_time32)(__NULLPTR);
 	if (__timer)
 		*__timer = (__TM_TYPE(time))__tm32;
 	return (__TM_TYPE(time))__tm32;

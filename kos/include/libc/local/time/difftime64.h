@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf208d3 */
+/* HASH CRC-32:0xd954348 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,20 +23,20 @@
 #include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_difftime32_defined
-#define __local___localdep_difftime32_defined
+#ifndef __local___localdep_crt_difftime32_defined
+#define __local___localdep_crt_difftime32_defined
 #ifdef __CRT_HAVE_difftime
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_difftime32,(__time32_t __time1, __time32_t __time0),difftime,(__time1,__time0))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_crt_difftime32,(__time32_t __time1, __time32_t __time0),difftime,(__time1,__time0))
 #elif defined(__CRT_HAVE__difftime32)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_difftime32,(__time32_t __time1, __time32_t __time0),_difftime32,(__time1,__time0))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_crt_difftime32,(__time32_t __time1, __time32_t __time0),_difftime32,(__time1,__time0))
 #else /* ... */
-#undef __local___localdep_difftime32_defined
+#undef __local___localdep_crt_difftime32_defined
 #endif /* !... */
-#endif /* !__local___localdep_difftime32_defined */
+#endif /* !__local___localdep_crt_difftime32_defined */
 __LOCAL_LIBC(difftime64) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(difftime64))(__time64_t __time1, __time64_t __time0) {
 #if defined(__CRT_HAVE_difftime) || defined(__CRT_HAVE__difftime32)
-	return (__NAMESPACE_LOCAL_SYM __localdep_difftime32)((__time32_t)__time1, (__time32_t)__time0);
+	return (__NAMESPACE_LOCAL_SYM __localdep_crt_difftime32)((__time32_t)__time1, (__time32_t)__time0);
 #else /* __CRT_HAVE_difftime || __CRT_HAVE__difftime32 */
 	return __time1 > __time0 ? __time1 - __time0 : __time0 - __time1;
 #endif /* !__CRT_HAVE_difftime && !__CRT_HAVE__difftime32 */

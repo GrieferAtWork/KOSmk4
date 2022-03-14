@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76330947 */
+/* HASH CRC-32:0x35d5b652 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4251,42 +4251,58 @@ __CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_set_doserrno,(__UINT32_TYPE__ __err),(__e
 #define _doserrno (*__doserrno())
 #endif /* ____doserrno_defined */
 
-#ifndef ___environ_defined
-#define ___environ_defined
-#undef _environ
-#if defined(__CRT_HAVE_environ) && !defined(__NO_ASMNAME)
-__LIBC char **_environ __ASMNAME("environ");
-#define _environ _environ
-#elif defined(__CRT_HAVE_environ)
-#ifndef __environ_defined
-#define __environ_defined
-#undef environ
-__LIBC char **environ;
-#endif /* !__environ_defined */
+#ifndef _environ
+#if defined(environ)
 #define _environ environ
+#elif defined(__environ)
+#define _environ __environ
+#elif defined(__LOCAL_environ)
+#define _environ __LOCAL_environ
+#elif defined(__CRT_HAVE_environ)
+#ifdef __NO_ASMNAME
+__LIBC char **environ;
+#define environ  environ
+#define _environ environ
+#else /* __NO_ASMNAME */
+__LIBC char **_environ __CASMNAME("environ");
+#define _environ _environ
+#endif /* !__NO_ASMNAME */
 #elif defined(__CRT_HAVE__environ)
 __LIBC char **_environ;
 #define _environ _environ
-#elif defined(__CRT_HAVE___environ) && !defined(__NO_ASMNAME)
-__LIBC char **_environ __ASMNAME("__environ");
-#define _environ _environ
 #elif defined(__CRT_HAVE___environ)
-#ifndef ____environ_defined
-#define ____environ_defined
-#undef __environ
+#ifdef __NO_ASMNAME
 __LIBC char **__environ;
-#endif /* !____environ_defined */
-#define _environ __environ
+#define __environ __environ
+#define _environ  __environ
+#else /* __NO_ASMNAME */
+__LIBC char **_environ __CASMNAME("__environ");
+#define _environ _environ
+#endif /* !__NO_ASMNAME */
+#elif defined(____p__environ_defined)
+#define _environ (*__p__environ())
 #elif defined(__CRT_HAVE___p__environ)
-#ifndef ____p__environ_defined
 #define ____p__environ_defined
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p__environ,(void),())
-#endif /* !____p__environ_defined */
 #define _environ (*__p__environ())
-#else /* ... */
-#undef ___environ_defined
+#elif defined(__CRT_HAVE__get_environ)
+#ifndef ___get_environ_defined
+#define ___get_environ_defined
+__CDECLARE(,int,__NOTHROW,_get_environ,(char ***__p_environ),())
+#endif /* !___get_environ_defined */
+#ifndef _____get_environ_wrapper_defined
+#define _____get_environ_wrapper_defined
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST char **
+__NOTHROW(__LIBCCALL ___get_environ_wrapper)(void) {
+	char **__result;
+	if __unlikely(_get_environ(&__result) != 0)
+		__result = __NULLPTR;
+	return __result;
+}
+#endif /* !_____get_environ_wrapper_defined */
+#define _environ ___get_environ_wrapper()
 #endif /* !... */
-#endif /* !___environ_defined */
+#endif /* !_environ */
 
 #ifndef __argc
 #ifdef __CRT_HAVE___argc
@@ -5770,42 +5786,58 @@ __CREDIRECT_VOID(,__NOTHROW_RPC,_sleep,(__UINT32_TYPE__ __milli),__crtSleep,(__m
 __NAMESPACE_LOCAL_USING_OR_IMPL(_sleep, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_RPC(__LIBCCALL _sleep)(__UINT32_TYPE__ __milli) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_sleep))(__milli); })
 #endif /* ... */
 
-#ifndef __environ_defined
-#define __environ_defined
-#undef environ
-#if defined(__CRT_HAVE_environ)
+#ifndef environ
+#ifdef __CRT_HAVE_environ
 __LIBC char **environ;
 #define environ environ
-#elif defined(__CRT_HAVE__environ) && !defined(__NO_ASMNAME)
-__LIBC char **environ __ASMNAME("_environ");
-#define environ environ
-#elif defined(__CRT_HAVE__environ)
-#ifndef ___environ_defined
-#define ___environ_defined
-#undef _environ
-__LIBC char **_environ;
-#endif /* !___environ_defined */
+#elif defined(_environ)
 #define environ _environ
-#elif defined(__CRT_HAVE___environ) && !defined(__NO_ASMNAME)
-__LIBC char **environ __ASMNAME("__environ");
-#define environ environ
-#elif defined(__CRT_HAVE___environ)
-#ifndef ____environ_defined
-#define ____environ_defined
-#undef __environ
-__LIBC char **__environ;
-#endif /* !____environ_defined */
+#elif defined(__environ)
 #define environ __environ
+#elif defined(__LOCAL_environ)
+#define environ __LOCAL_environ
+#elif defined(__CRT_HAVE__environ)
+#ifdef __NO_ASMNAME
+__LIBC char **_environ;
+#define _environ _environ
+#define environ  _environ
+#else /* __NO_ASMNAME */
+__LIBC char **environ __CASMNAME("_environ");
+#define environ environ
+#endif /* !__NO_ASMNAME */
+#elif defined(__CRT_HAVE___environ)
+#ifdef __NO_ASMNAME
+__LIBC char **__environ;
+#define __environ _environ
+#define environ   __environ
+#else /* __NO_ASMNAME */
+__LIBC char **environ __CASMNAME("__environ");
+#define environ environ
+#endif /* !__NO_ASMNAME */
+#elif defined(____p__environ_defined)
+#define environ (*__p__environ())
 #elif defined(__CRT_HAVE___p__environ)
-#ifndef ____p__environ_defined
 #define ____p__environ_defined
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p__environ,(void),())
-#endif /* !____p__environ_defined */
 #define environ (*__p__environ())
-#else /* ... */
-#undef __environ_defined
+#elif defined(__CRT_HAVE__get_environ)
+#ifndef ___get_environ_defined
+#define ___get_environ_defined
+__CDECLARE(,int,__NOTHROW,_get_environ,(char ***__p_environ),())
+#endif /* !___get_environ_defined */
+#ifndef _____get_environ_wrapper_defined
+#define _____get_environ_wrapper_defined
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST char **
+__NOTHROW(__LIBCCALL ___get_environ_wrapper)(void) {
+	char const **__result;
+	if __unlikely(_get_environ(&__result) != 0)
+		__result = __NULLPTR;
+	return __result;
+}
+#endif /* !_____get_environ_wrapper_defined */
+#define environ ___get_environ_wrapper()
 #endif /* !... */
-#endif /* !__environ_defined */
+#endif /* !environ */
 
 #ifndef __swab_defined
 #define __swab_defined

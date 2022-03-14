@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40a4070f */
+/* HASH CRC-32:0x643309a3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -120,6 +120,15 @@ INTDEF longptr_t libc_timezone;
 INTDEF int NOTHROW_NCX(LIBCCALL libc_clock_adjtime)(clockid_t clock_id, struct timex *utx);
 /* >> clock_adjtime(2), clock_adjtime64(2) */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_clock_adjtime64)(clockid_t clock_id, struct timex64 *utx);
+INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBCCALL libc__get_tzname)(size_t *result, char *buf, size_t bufsize, int index);
+INTDEF WUNUSED NONNULL((1)) time32_t NOTHROW_NCX(LIBCCALL libc__mkgmtime32)(struct tm *tms);
+INTDEF WUNUSED NONNULL((1)) time64_t NOTHROW_NCX(LIBCCALL libc__mkgmtime64)(struct tm *tms);
+INTDEF NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc__strdate)(char *buf);
+INTDEF NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc__strtime)(char *buf);
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc__strdate_s)(char *buf, size_t bufsize);
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc__strtime_s)(char *buf, size_t bufsize);
+INTDEF NONNULL((1)) unsigned int NOTHROW_NCX(LIBCCALL libc__getsystime)(struct tm *tms);
+INTDEF NONNULL((1)) unsigned int NOTHROW_NCX(LIBCCALL libc__setsystime)(struct tm __KOS_FIXED_CONST *tms, unsigned int milliseconds);
 #endif /* !__KERNEL__ */
 
 DECL_END

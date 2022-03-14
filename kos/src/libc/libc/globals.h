@@ -174,15 +174,26 @@ DECLARE_NOREL_GLOBAL_META(reg_syntax_t, re_syntax_options);
 #undef tzname
 #undef timezone
 #undef daylight
+#undef _dstbias
+#undef __LOCAL_tzname
+#undef __LOCAL_timezone
+#undef __LOCAL_daylight
+#undef __LOCAL_dstbias
 DECLARE_NOREL_GLOBAL_META(char *, tzname);
 DECLARE_NOREL_GLOBAL_META(longptr_t, timezone);
 DECLARE_NOREL_GLOBAL_META(int, daylight);
-#define __tzname   GET_NOREL_GLOBAL(tzname)
-#define __timezone GET_NOREL_GLOBAL(timezone)
-#define __daylight GET_NOREL_GLOBAL(daylight)
-#define tzname     GET_NOREL_GLOBAL(tzname)
-#define timezone   GET_NOREL_GLOBAL(timezone)
-#define daylight   GET_NOREL_GLOBAL(daylight)
+DECLARE_NOREL_GLOBAL_META(__LONG32_TYPE__, _dstbias);
+#define __tzname         GET_NOREL_GLOBAL(tzname)
+#define __timezone       GET_NOREL_GLOBAL(timezone)
+#define __daylight       GET_NOREL_GLOBAL(daylight)
+#define tzname           GET_NOREL_GLOBAL(tzname)
+#define timezone         GET_NOREL_GLOBAL(timezone)
+#define daylight         GET_NOREL_GLOBAL(daylight)
+#define _dstbias         GET_NOREL_GLOBAL(_dstbias)
+#define __LOCAL_tzname   (&GET_NOREL_GLOBAL(tzname))
+#define __LOCAL_timezone GET_NOREL_GLOBAL(timezone)
+#define __LOCAL_daylight GET_NOREL_GLOBAL(daylight)
+#define __LOCAL_dstbias  GET_NOREL_GLOBAL(_dstbias)
 
 
 /* <getopt.h> */

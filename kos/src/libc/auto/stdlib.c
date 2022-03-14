@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3611836 */
+/* HASH CRC-32:0x75bd7e76 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4321,6 +4321,22 @@ NOTHROW_NCX(LIBKCALL libc__wdupenv_s)(char32_t **__restrict pbuf,
 	*pbuflen = (libc_wcslen(name) + 1) * sizeof(char32_t);
 	return EOK;
 }
+#include <libc/template/environ.h>
+INTERN ATTR_SECTION(".text.crt.dos.fs.environ") NONNULL((1)) errno_t
+NOTHROW_RPC(LIBCCALL libc__get_environ)(char ***p_environ) {
+	*p_environ = __LOCAL_environ;
+	return 0;
+}
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1)) errno_t
+NOTHROW_RPC(LIBDCALL libd__get_wenviron)(char16_t ***p_wenviron) {
+	*p_wenviron = *libd___p__wenviron();
+	return 0;
+}
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1)) errno_t
+NOTHROW_RPC(LIBKCALL libc__get_wenviron)(char32_t ***p_wenviron) {
+	*p_wenviron = *libc___p__wenviron();
+	return 0;
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -4649,6 +4665,9 @@ DEFINE_PUBLIC_ALIAS(DOS$_wgetenv_s, libd__wgetenv_s);
 DEFINE_PUBLIC_ALIAS(_wgetenv_s, libc__wgetenv_s);
 DEFINE_PUBLIC_ALIAS(DOS$_wdupenv_s, libd__wdupenv_s);
 DEFINE_PUBLIC_ALIAS(_wdupenv_s, libc__wdupenv_s);
+DEFINE_PUBLIC_ALIAS(_get_environ, libc__get_environ);
+DEFINE_PUBLIC_ALIAS(DOS$_get_wenviron, libd__get_wenviron);
+DEFINE_PUBLIC_ALIAS(_get_wenviron, libc__get_wenviron);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_STDLIB_C */

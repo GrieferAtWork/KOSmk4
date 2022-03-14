@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8658fde */
+/* HASH CRC-32:0xaafab3e7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1913,6 +1913,7 @@ DFUN(".text.crt.dos.unicode.static.convert", libd_itoa, libc_itoa, TP, 3, TD, TP
 DFUN(".text.crt.dos.unicode.static.convert", libd_ltoa, libc_ltoa, TP, 3, TL, TP, TD)
 DFUN(".text.crt.dos.unicode.static.convert", libd_ultoa, libc_ultoa, TP, 3, TL, TP, TD)
 DFUN(".text.crt.dos.sched.process", libd_onexit, libc_onexit, TP, 1, TP)
+DFUN(".text.crt.dos.fs.environ", libd__get_environ, libc__get_environ, TIn(__SIZEOF_ERRNO_T__), 1, TP)
 
 /* string */
 DFUN(".text.crt.dos.string.memory", libd_memcpy, libc_memcpy, TP, 3, TP, TP, TI)
@@ -2594,6 +2595,24 @@ DFUN(".text.crt.dos.time", libd_gmtime64_r, libc_gmtime64_r, TP, 2, TP, TP)
 DFUN(".text.crt.dos.time", libd_localtime64_r, libc_localtime64_r, TP, 2, TP, TP)
 DFUN(".text.crt.dos.time", libd_ctime64_r, libc_ctime64_r, TP, 2, TP, TP)
 DFUN(".text.crt.dos.time", libd_asctime_r, libc_asctime_r, TP, 2, TP, TP)
+DFUN(".text.crt.dos.time.timezone", libd__get_daylight, libc__get_daylight, TIn(__SIZEOF_ERRNO_T__), 1, TP)
+DFUN(".text.crt.dos.time.timezone", libd__get_timezone, libc__get_timezone, TIn(__SIZEOF_ERRNO_T__), 1, TP)
+DFUN(".text.crt.dos.time.timezone", libd__get_dstbias, libc__get_dstbias, TIn(__SIZEOF_ERRNO_T__), 1, TP)
+DFUN(".text.crt.dos.time", libd__get_tzname, libc__get_tzname, TIn(__SIZEOF_ERRNO_T__), 4, TP, TP, TI, TD)
+DFUN(".text.crt.dos.time", libd__gmtime32_s, libc__gmtime32_s, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.time", libd__gmtime64_s, libc__gmtime64_s, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.time", libd__localtime32_s, libc__localtime32_s, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.time", libd__localtime64_s, libc__localtime64_s, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.time", libd__ctime32_s, libc__ctime32_s, TIn(__SIZEOF_ERRNO_T__), 3, TP, TI, TP)
+DFUN(".text.crt.dos.time", libd__ctime64_s, libc__ctime64_s, TIn(__SIZEOF_ERRNO_T__), 3, TP, TI, TP)
+DFUN(".text.crt.dos.time", libd__mkgmtime32, libc__mkgmtime32, TIn(__SIZEOF_TIME32_T__), 1, TP)
+DFUN(".text.crt.dos.time", libd__mkgmtime64, libc__mkgmtime64, TIn(__SIZEOF_TIME64_T__), 1, TP)
+DFUN(".text.crt.dos.time", libd__strdate, libc__strdate, TP, 1, TP)
+DFUN(".text.crt.dos.time", libd__strtime, libc__strtime, TP, 1, TP)
+DFUN(".text.crt.dos.time", libd__strdate_s, libc__strdate_s, TIn(__SIZEOF_ERRNO_T__), 2, TP, TI)
+DFUN(".text.crt.dos.time", libd__strtime_s, libc__strtime_s, TIn(__SIZEOF_ERRNO_T__), 2, TP, TI)
+DFUN(".text.crt.dos.time", libd__getsystime, libc__getsystime, TD, 1, TP)
+DFUN(".text.crt.dos.time", libd__setsystime, libc__setsystime, TD, 2, TP, TD)
 
 /* ttyent */
 DFUN(".text.crt.dos.database.utmpx", libd_getttynam, libc_getttynam, TP, 1, TP)

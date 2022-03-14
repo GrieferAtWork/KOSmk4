@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1ca4386 */
+/* HASH CRC-32:0x70c8b6e9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,24 +24,18 @@
 #include <bits/types.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_dos_gmtime_s_defined
-#define __local___localdep_dos_gmtime_s_defined
-__NAMESPACE_LOCAL_END
-#include <features.h>
-__NAMESPACE_LOCAL_BEGIN
-#if defined(__CRT_HAVE__gmtime32_s) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_dos_gmtime_s,(struct __NAMESPACE_STD_SYM tm *__restrict __tp, __TM_TYPE(time) const *__restrict __timer),_gmtime32_s,(__tp,__timer))
-#elif defined(__CRT_HAVE__gmtime64_s) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_dos_gmtime_s,(struct __NAMESPACE_STD_SYM tm *__restrict __tp, __TM_TYPE(time) const *__restrict __timer),_gmtime64_s,(__tp,__timer))
-#elif defined(__CRT_HAVE__gmtime64_s) || defined(__CRT_HAVE__gmtime32_s)
-__NAMESPACE_LOCAL_END
-#include <libc/local/time/dos_gmtime_s.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_dos_gmtime_s __LIBC_LOCAL_NAME(dos_gmtime_s)
-#else /* ... */
-#undef __local___localdep_dos_gmtime_s_defined
-#endif /* !... */
-#endif /* !__local___localdep_dos_gmtime_s_defined */
+#if !defined(__local___localdep_crt_gmtime32_r_defined) && defined(__CRT_HAVE_gmtime_r)
+#define __local___localdep_crt_gmtime32_r_defined
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_crt_gmtime32_r,(__time32_t const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),gmtime_r,(__timer,__tp))
+#endif /* !__local___localdep_crt_gmtime32_r_defined && __CRT_HAVE_gmtime_r */
+#if !defined(__local___localdep_crt_gmtime32_s_defined) && defined(__CRT_HAVE__gmtime32_s)
+#define __local___localdep_crt_gmtime32_s_defined
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_crt_gmtime32_s,(struct __NAMESPACE_STD_SYM tm *__restrict __tp, __time32_t const *__restrict __timer),_gmtime32_s,(__tp,__timer))
+#endif /* !__local___localdep_crt_gmtime32_s_defined && __CRT_HAVE__gmtime32_s */
+#if !defined(__local___localdep_crt_gmtime64_s_defined) && defined(__CRT_HAVE__gmtime64_s)
+#define __local___localdep_crt_gmtime64_s_defined
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_crt_gmtime64_s,(struct __NAMESPACE_STD_SYM tm *__restrict __tp, __time64_t const *__restrict __timer),_gmtime64_s,(__tp,__timer))
+#endif /* !__local___localdep_crt_gmtime64_s_defined && __CRT_HAVE__gmtime64_s */
 #ifndef __local___localdep_gmtime64_r_defined
 #define __local___localdep_gmtime64_r_defined
 #if defined(__CRT_HAVE_gmtime_r) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -56,16 +50,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_gmtime64_r_defined */
 __NAMESPACE_LOCAL_END
-#ifdef __BUILDING_LIBC
-#ifndef __isleap
-#define __isleap(__year) ((__year) % 4 == 0 && ((__year) % 100 != 0 || (__year) % 400 == 0))
-#endif /* !__isleap */
-#ifndef __daystoyears
-#define __daystoyears(__n_days) ((400 * ((__n_days) + 1)) / 146097)
-#endif /* !__daystoyears */
-#ifndef __yearstodays
-#define __yearstodays(__n_years) (((146097 * (__n_years)) / 400) /*-1*/) /* rounding error? */
-#endif /* !__yearstodays */
+#if defined(__BUILDING_LIBC) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 #ifndef ____TIME_MONTHSTART_YDAY_DEFINED
 #define ____TIME_MONTHSTART_YDAY_DEFINED 1
 __NAMESPACE_LOCAL_BEGIN
@@ -77,10 +62,26 @@ __UINT16_TYPE__ const __time_monthstart_yday[2][13] = {
 __NAMESPACE_LOCAL_END
 #endif /* !____TIME_MONTHSTART_YDAY_DEFINED */
 
-#endif /* __BUILDING_LIBC */
+#ifndef __isleap
+#define __isleap(__year) ((__year) % 4 == 0 && ((__year) % 100 != 0 || (__year) % 400 == 0))
+#endif /* !__isleap */
+#ifndef __daystoyears
+#define __daystoyears(__n_days) ((400 * ((__n_days) + 1)) / 146097)
+#endif /* !__daystoyears */
+#ifndef __yearstodays
+#define __yearstodays(__n_years) (((146097 * (__n_years)) / 400) /*-1*/) /* rounding error? */
+#endif /* !__yearstodays */
+#endif /* __BUILDING_LIBC && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(gmtime_r) __ATTR_NONNULL((1, 2)) struct __NAMESPACE_STD_SYM tm *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime_r))(__TM_TYPE(time) const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp) {
+#if defined(__CRT_HAVE__gmtime32_s) && !defined(__USE_TIME_BITS64)
+	return (__NAMESPACE_LOCAL_SYM __localdep_crt_gmtime32_s)(__tp, __timer) ? __NULLPTR : __tp;
+#elif defined(__CRT_HAVE__gmtime64_s) && defined(__USE_TIME_BITS64)
+	return (__NAMESPACE_LOCAL_SYM __localdep_crt_gmtime64_s)(__tp, __timer) ? __NULLPTR : __tp;
+#elif defined(__CRT_HAVE_gmtime_r)
+	__time32_t __timer2 = (__time32_t)*__timer;
+	return (__NAMESPACE_LOCAL_SYM __localdep_crt_gmtime32_r)(&__timer2, __tp);
 
 
 
@@ -122,13 +123,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime_r))(__TM_TYPE(time) const *__r
 
 
 
-#if defined(__CRT_HAVE__gmtime64_s) || defined(__CRT_HAVE__gmtime32_s)
-	return (__NAMESPACE_LOCAL_SYM __localdep_dos_gmtime_s)(__tp, __timer) ? __NULLPTR : __tp;
-#elif defined(__USE_TIME_BITS64)
-	return (__NAMESPACE_LOCAL_SYM __localdep_gmtime64_r)(__timer, __tp);
 #else /* ... */
-	__time64_t __tm64 = (__time64_t)*__timer;
-	return (__NAMESPACE_LOCAL_SYM __localdep_gmtime64_r)(&__tm64, __tp);
+	__time64_t __timer2 = (__time64_t)*__timer;
+	return (__NAMESPACE_LOCAL_SYM __localdep_gmtime64_r)(&__timer2, __tp);
 #endif /* !... */
 }
 __NAMESPACE_LOCAL_END

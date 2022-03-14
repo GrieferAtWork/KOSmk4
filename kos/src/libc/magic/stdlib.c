@@ -4040,42 +4040,58 @@ errno_t _set_doserrno($u32 err);
 
 %
 %{
-#ifndef ___environ_defined
-#define ___environ_defined
-#undef _environ
-#if defined(__CRT_HAVE_environ) && !defined(__NO_ASMNAME)
-__LIBC char **_environ __ASMNAME("environ");
-#define _environ _environ
-#elif defined(__CRT_HAVE_environ)
-#ifndef __environ_defined
-#define __environ_defined
-#undef environ
-__LIBC char **environ;
-#endif /* !__environ_defined */
+#ifndef _environ
+#if defined(environ)
 #define _environ environ
+#elif defined(__environ)
+#define _environ __environ
+#elif defined(__LOCAL_environ)
+#define _environ __LOCAL_environ
+#elif defined(__CRT_HAVE_environ)
+#ifdef __NO_ASMNAME
+__LIBC char **environ;
+#define environ  environ
+#define _environ environ
+#else /* __NO_ASMNAME */
+__LIBC char **_environ __CASMNAME("environ");
+#define _environ _environ
+#endif /* !__NO_ASMNAME */
 #elif defined(__CRT_HAVE__environ)
 __LIBC char **_environ;
 #define _environ _environ
-#elif defined(__CRT_HAVE___environ) && !defined(__NO_ASMNAME)
-__LIBC char **_environ __ASMNAME("__environ");
-#define _environ _environ
 #elif defined(__CRT_HAVE___environ)
-#ifndef ____environ_defined
-#define ____environ_defined
-#undef __environ
+#ifdef __NO_ASMNAME
 __LIBC char **__environ;
-#endif /* !____environ_defined */
-#define _environ __environ
+#define __environ __environ
+#define _environ  __environ
+#else /* __NO_ASMNAME */
+__LIBC char **_environ __CASMNAME("__environ");
+#define _environ _environ
+#endif /* !__NO_ASMNAME */
+#elif defined(____p__environ_defined)
+#define _environ (*__p__environ())
 #elif defined(__CRT_HAVE___p__environ)
-#ifndef ____p__environ_defined
 #define ____p__environ_defined
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p__environ,(void),())
-#endif /* !____p__environ_defined */
 #define _environ (*__p__environ())
-#else /* ... */
-#undef ___environ_defined
+#elif defined(__CRT_HAVE__get_environ)
+#ifndef ___get_environ_defined
+#define ___get_environ_defined
+__CDECLARE(,int,__NOTHROW,_get_environ,(char ***__p_environ),())
+#endif /* !___get_environ_defined */
+#ifndef _____get_environ_wrapper_defined
+#define _____get_environ_wrapper_defined
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST char **
+__NOTHROW(__LIBCCALL ___get_environ_wrapper)(void) {
+	char **__result;
+	if __unlikely(_get_environ(&__result) != 0)
+		__result = __NULLPTR;
+	return __result;
+}
+#endif /* !_____get_environ_wrapper_defined */
+#define _environ ___get_environ_wrapper()
 #endif /* !... */
-#endif /* !___environ_defined */
+#endif /* !_environ */
 
 }
 
@@ -5613,42 +5629,58 @@ void _sleep($uint32_t milli) {
 
 %
 %{
-#ifndef __environ_defined
-#define __environ_defined
-#undef environ
-#if defined(__CRT_HAVE_environ)
+#ifndef environ
+#ifdef __CRT_HAVE_environ
 __LIBC char **environ;
 #define environ environ
-#elif defined(__CRT_HAVE__environ) && !defined(__NO_ASMNAME)
-__LIBC char **environ __ASMNAME("_environ");
-#define environ environ
-#elif defined(__CRT_HAVE__environ)
-#ifndef ___environ_defined
-#define ___environ_defined
-#undef _environ
-__LIBC char **_environ;
-#endif /* !___environ_defined */
+#elif defined(_environ)
 #define environ _environ
-#elif defined(__CRT_HAVE___environ) && !defined(__NO_ASMNAME)
-__LIBC char **environ __ASMNAME("__environ");
-#define environ environ
-#elif defined(__CRT_HAVE___environ)
-#ifndef ____environ_defined
-#define ____environ_defined
-#undef __environ
-__LIBC char **__environ;
-#endif /* !____environ_defined */
+#elif defined(__environ)
 #define environ __environ
+#elif defined(__LOCAL_environ)
+#define environ __LOCAL_environ
+#elif defined(__CRT_HAVE__environ)
+#ifdef __NO_ASMNAME
+__LIBC char **_environ;
+#define _environ _environ
+#define environ  _environ
+#else /* __NO_ASMNAME */
+__LIBC char **environ __CASMNAME("_environ");
+#define environ environ
+#endif /* !__NO_ASMNAME */
+#elif defined(__CRT_HAVE___environ)
+#ifdef __NO_ASMNAME
+__LIBC char **__environ;
+#define __environ _environ
+#define environ   __environ
+#else /* __NO_ASMNAME */
+__LIBC char **environ __CASMNAME("__environ");
+#define environ environ
+#endif /* !__NO_ASMNAME */
+#elif defined(____p__environ_defined)
+#define environ (*__p__environ())
 #elif defined(__CRT_HAVE___p__environ)
-#ifndef ____p__environ_defined
 #define ____p__environ_defined
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p__environ,(void),())
-#endif /* !____p__environ_defined */
 #define environ (*__p__environ())
-#else /* ... */
-#undef __environ_defined
+#elif defined(__CRT_HAVE__get_environ)
+#ifndef ___get_environ_defined
+#define ___get_environ_defined
+__CDECLARE(,int,__NOTHROW,_get_environ,(char ***__p_environ),())
+#endif /* !___get_environ_defined */
+#ifndef _____get_environ_wrapper_defined
+#define _____get_environ_wrapper_defined
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST char **
+__NOTHROW(__LIBCCALL ___get_environ_wrapper)(void) {
+	char const **__result;
+	if __unlikely(_get_environ(&__result) != 0)
+		__result = __NULLPTR;
+	return __result;
+}
+#endif /* !_____get_environ_wrapper_defined */
+#define environ ___get_environ_wrapper()
 #endif /* !... */
-#endif /* !__environ_defined */
+#endif /* !environ */
 }
 
 %
@@ -5720,32 +5752,52 @@ onexit_t onexit(onexit_t func);
 %[define_str2wcs_replacement(_putenv_s    = _wputenv_s)]
 %[define_str2wcs_replacement(_searchenv_s = _wsearchenv_s)]
 
-[[guard, wchar, wunused]]
+[[wchar, wunused]]
 [[section(".text.crt.dos.wchar.fs.environ")]]
 wchar_t *_wgetenv([[nonnull]] wchar_t const *varname);
 
-//[[guard, wchar, section(".text.crt.dos.wchar.fs.environ")]]
+//[[wchar, section(".text.crt.dos.wchar.fs.environ")]]
 //_wgetenv(*) %{generate(str2wcs("getenv"))}
 
-[[guard, wchar, section(".text.crt.dos.wchar.fs.environ")]]
+[[wchar, section(".text.crt.dos.wchar.fs.environ")]]
 _wgetenv_s(*) %{generate(str2wcs("getenv_s"))}
 
-[[guard, wchar, section(".text.crt.dos.wchar.fs.environ")]]
+[[wchar, section(".text.crt.dos.wchar.fs.environ")]]
 _wdupenv_s(*) %{generate(str2wcs("_dupenv_s"))}
 
-[[guard, wchar, section(".text.crt.dos.wchar.fs.environ")]]
+[[wchar, section(".text.crt.dos.wchar.fs.environ")]]
 int _wputenv([[nonnull]] wchar_t *string);
 
-[[guard, wchar, decl_include("<bits/types.h>")]]
+[[wchar, decl_include("<bits/types.h>")]]
 [[section(".text.crt.dos.wchar.fs.environ")]]
 errno_t _wputenv_s(wchar_t const *varname, wchar_t const *val);
 
-[[cp, guard, wchar, decl_include("<bits/types.h>")]]
+[[cp, wchar, decl_include("<bits/types.h>")]]
 [[section(".text.crt.dos.wchar.fs.environ")]]
 errno_t _wsearchenv_s([[nonnull]] wchar_t const *file,
                       [[nonnull]] wchar_t const *envvar,
                       [[nonnull]] wchar_t *__restrict resultpath,
                       $size_t buflen);
+
+
+[[cp, decl_include("<bits/types.h>")]]
+[[section(".text.crt.dos.fs.environ")]]
+[[impl_include("<libc/template/environ.h>")]]
+[[requires_include("<libc/template/environ.h>")]]
+[[requires(defined(__LOCAL_environ))]]
+errno_t _get_environ([[nonnull]] char ***p_environ) {
+	*p_environ = __LOCAL_environ;
+	return 0;
+}
+
+[[cp, wchar, decl_include("<bits/types.h>")]]
+[[section(".text.crt.dos.wchar.fs.environ")]]
+[[requires_function(__p__wenviron)]]
+errno_t _get_wenviron([[nonnull]] wchar_t ***p_wenviron) {
+	*p_wenviron = *__p__wenviron();
+	return 0;
+}
+
 
 %[pop_default]
 /************************************************************************/

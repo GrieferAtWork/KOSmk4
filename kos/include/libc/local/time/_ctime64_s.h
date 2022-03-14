@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89ed63fe */
+/* HASH CRC-32:0x143ba350 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,21 +18,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_ctime64_defined
-#define __local_ctime64_defined
+#ifndef __local__ctime64_s_defined
+#define __local__ctime64_s_defined
 #include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_crt_ctime32_defined
-#define __local___localdep_crt_ctime32_defined
-#ifdef __CRT_HAVE_ctime
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_crt_ctime32,(__time32_t const *__timer),ctime,(__timer))
-#elif defined(__CRT_HAVE__ctime32)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_crt_ctime32,(__time32_t const *__timer),_ctime32,(__timer))
-#else /* ... */
-#undef __local___localdep_crt_ctime32_defined
-#endif /* !... */
-#endif /* !__local___localdep_crt_ctime32_defined */
 #ifndef __local___localdep_ctime64_r_defined
 #define __local___localdep_ctime64_r_defined
 #if defined(__CRT_HAVE_ctime_r) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -52,29 +42,16 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_ctime64_r __LIBC_LOCAL_NAME(ctime64_r)
 #endif /* !... */
 #endif /* !__local___localdep_ctime64_r_defined */
-__NAMESPACE_LOCAL_END
-#if defined(__BUILDING_LIBC) || (!defined(__CRT_HAVE_ctime) && !defined(__CRT_HAVE__ctime32))
-#ifndef __LIBC_CTIME_BUFFER_DEFINED
-#define __LIBC_CTIME_BUFFER_DEFINED 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
-__NAMESPACE_LOCAL_END
-#endif /* !__LIBC_CTIME_BUFFER_DEFINED */
-
-#endif /* __BUILDING_LIBC || (!__CRT_HAVE_ctime && !__CRT_HAVE__ctime32) */
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(ctime64) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ctime64))(__time64_t const *__timer) {
-#if defined(__CRT_HAVE_ctime) || defined(__CRT_HAVE__ctime32)
-	__time32_t __tm32 = (__time32_t)*__timer;
-	return (__NAMESPACE_LOCAL_SYM __localdep_crt_ctime32)(&__tm32);
-#else /* __CRT_HAVE_ctime || __CRT_HAVE__ctime32 */
-	return (__NAMESPACE_LOCAL_SYM __localdep_ctime64_r)(__timer, __NAMESPACE_LOCAL_SYM __ctime_buf);
-#endif /* !__CRT_HAVE_ctime && !__CRT_HAVE__ctime32 */
+__LOCAL_LIBC(_ctime64_s) __ATTR_NONNULL((1, 3)) __errno_t
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ctime64_s))(char __buf[26], __SIZE_TYPE__ __bufsize, __time64_t const *__restrict __timer) {
+	if (__bufsize < 26)
+		return 34;
+	(__NAMESPACE_LOCAL_SYM __localdep_ctime64_r)(__timer, __buf);
+	return 0;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_ctime64_defined
-#define __local___localdep_ctime64_defined
-#define __localdep_ctime64 __LIBC_LOCAL_NAME(ctime64)
-#endif /* !__local___localdep_ctime64_defined */
-#endif /* !__local_ctime64_defined */
+#ifndef __local___localdep__ctime64_s_defined
+#define __local___localdep__ctime64_s_defined
+#define __localdep__ctime64_s __LIBC_LOCAL_NAME(_ctime64_s)
+#endif /* !__local___localdep__ctime64_s_defined */
+#endif /* !__local__ctime64_s_defined */

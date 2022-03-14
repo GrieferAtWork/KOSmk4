@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xd17cace4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,27 +17,50 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_dos_ctime64_s_defined
-#define __local_dos_ctime64_s_defined
+#ifndef __LOCAL_tzname
 #include <__crt.h>
-#ifdef __CRT_HAVE__ctime32_s
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_dos_ctime32_s_defined
-#define __local___localdep_dos_ctime32_s_defined
-__CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime32_s,(char __buf[26], __SIZE_TYPE__ __bufsize, __time32_t const *__restrict __timer),_ctime32_s,(__buf,__bufsize,__timer))
-#endif /* !__local___localdep_dos_ctime32_s_defined */
-__LOCAL_LIBC(dos_ctime64_s) __ATTR_NONNULL((1, 3)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dos_ctime64_s))(char __buf[26], __SIZE_TYPE__ __bufsize, __time64_t const *__restrict __timer) {
-	__time32_t __tm32 = *__timer;
-	return (__NAMESPACE_LOCAL_SYM __localdep_dos_ctime32_s)(__buf, __bufsize, &__tm64);
-}
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep_dos_ctime64_s_defined
-#define __local___localdep_dos_ctime64_s_defined
-#define __localdep_dos_ctime64_s __LIBC_LOCAL_NAME(dos_ctime64_s)
-#endif /* !__local___localdep_dos_ctime64_s_defined */
-#else /* __CRT_HAVE__ctime32_s */
-#undef __local_dos_ctime64_s_defined
-#endif /* !__CRT_HAVE__ctime32_s */
-#endif /* !__local_dos_ctime64_s_defined */
+#ifndef __LOCAL_tzname
+__DECL_BEGIN
+#ifdef tzname
+#define __LOCAL_tzname tzname
+#elif defined(_tzname)
+#define __LOCAL_tzname _tzname
+#elif defined(__tzname)
+#define __LOCAL_tzname __tzname
+#elif defined(__CRT_HAVE_tzname)
+#ifdef __NO_ASMNAME
+__LIBC char *tzname[2];
+#define tzname         tzname
+#define __LOCAL_tzname tzname
+#else /* __NO_ASMNAME */
+__LIBC char *__LOCAL_tzname[2] __CASMNAME("tzname");
+#define __LOCAL_tzname __LOCAL_tzname
+#endif /* !__NO_ASMNAME */
+#elif defined(__CRT_HAVE__tzname)
+#ifdef __NO_ASMNAME
+__LIBC char *_tzname[2];
+#define _tzname        _tzname
+#define __LOCAL_tzname _tzname
+#else /* __NO_ASMNAME */
+__LIBC char *__LOCAL_tzname[2] __CASMNAME("_tzname");
+#define __LOCAL_tzname __LOCAL_tzname
+#endif /* !__NO_ASMNAME */
+#elif defined(__CRT_HAVE___tzname)
+#ifdef __NO_ASMNAME
+__LIBC char *__tzname[2];
+#define __tzname       __tzname
+#define __LOCAL_tzname __tzname
+#else /* __NO_ASMNAME */
+__LIBC char *__LOCAL_tzname[2] __CASMNAME("__tzname");
+#define __LOCAL_tzname __LOCAL_tzname
+#endif /* !__NO_ASMNAME */
+#elif defined(____p__tzname_defined)
+#define __LOCAL_tzname __p__tzname()
+#elif defined(__CRT_HAVE___p__tzname)
+#define ____p__tzname_defined
+__CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char **,__NOTHROW,__p__tzname,(void),())
+#define __LOCAL_tzname __p__tzname()
+#endif /* ... */
+__DECL_END
+#endif /* !__LOCAL_tzname */
+#endif /* !__LOCAL_tzname */

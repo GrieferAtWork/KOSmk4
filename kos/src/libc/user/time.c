@@ -34,26 +34,6 @@
 
 DECL_BEGIN
 
-
-DEFINE_PUBLIC_ALIAS(DOS$__tzname, libd___tzname);
-INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.time.timezone") char **
-NOTHROW_NCX(libd___tzname)(void) {
-	return &tzname;
-}
-
-DEFINE_PUBLIC_ALIAS(DOS$__daylight, libd___daylight);
-INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.time.timezone") int *
-NOTHROW_NCX(libd___daylight)(void) {
-	return &daylight;
-}
-
-DEFINE_PUBLIC_ALIAS(DOS$__timezone, libd___timezone);
-INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.time.timezone") longptr_t *
-NOTHROW_NCX(libd___timezone)(void) {
-	return &timezone;
-}
-
-
 /*[[[head:libc_tzset,hash:CRC-32=0x58b1d4b5]]]*/
 /* >> tzset(3)
  * Set time conversion information from the `$TZ' environment variable.
@@ -66,9 +46,6 @@ NOTHROW_NCX(LIBCCALL libc_tzset)(void)
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_tzset]]]*/
-
-
-
 
 /*[[[head:libc_clock,hash:CRC-32=0x4139ade9]]]*/
 /* >> clock(3)
@@ -134,6 +111,123 @@ NOTHROW_NCX(LIBCCALL libc_clock_adjtime64)(clockid_t clock_id,
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_clock_adjtime64]]]*/
+
+/*[[[head:libc__get_tzname,hash:CRC-32=0xf6bfde6d]]]*/
+INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) errno_t
+NOTHROW_NCX(LIBCCALL libc__get_tzname)(size_t *result,
+                                       char *buf,
+                                       size_t bufsize,
+                                       int index)
+/*[[[body:libc__get_tzname]]]*/
+/*AUTO*/{
+	(void)result;
+	(void)buf;
+	(void)bufsize;
+	(void)index;
+	CRT_UNIMPLEMENTEDF("_get_tzname(%p, %q, %Ix, %x)", result, buf, bufsize, index); /* TODO */
+	return ENOSYS;
+}
+/*[[[end:libc__get_tzname]]]*/
+
+/*[[[head:libc__mkgmtime32,hash:CRC-32=0xf021332e]]]*/
+INTERN ATTR_SECTION(".text.crt.time") WUNUSED NONNULL((1)) time32_t
+NOTHROW_NCX(LIBCCALL libc__mkgmtime32)(struct tm *tms)
+/*[[[body:libc__mkgmtime32]]]*/
+/*AUTO*/{
+	(void)tms;
+	CRT_UNIMPLEMENTEDF("_mkgmtime32(%p)", tms); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:libc__mkgmtime32]]]*/
+
+/*[[[head:libc__mkgmtime64,hash:CRC-32=0xbdd14a74]]]*/
+INTERN ATTR_SECTION(".text.crt.time") WUNUSED NONNULL((1)) time64_t
+NOTHROW_NCX(LIBCCALL libc__mkgmtime64)(struct tm *tms)
+/*[[[body:libc__mkgmtime64]]]*/
+/*AUTO*/{
+	(void)tms;
+	CRT_UNIMPLEMENTEDF("_mkgmtime64(%p)", tms); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:libc__mkgmtime64]]]*/
+
+/*[[[head:libc__strdate,hash:CRC-32=0x9603a45b]]]*/
+INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) char *
+NOTHROW_NCX(LIBCCALL libc__strdate)(char *buf)
+/*[[[body:libc__strdate]]]*/
+/*AUTO*/{
+	(void)buf;
+	CRT_UNIMPLEMENTEDF("_strdate(%q)", buf); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:libc__strdate]]]*/
+
+/*[[[head:libc__strtime,hash:CRC-32=0xc0512a49]]]*/
+INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) char *
+NOTHROW_NCX(LIBCCALL libc__strtime)(char *buf)
+/*[[[body:libc__strtime]]]*/
+/*AUTO*/{
+	(void)buf;
+	CRT_UNIMPLEMENTEDF("_strtime(%q)", buf); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:libc__strtime]]]*/
+
+/*[[[head:libc__strdate_s,hash:CRC-32=0x62129f5f]]]*/
+INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) errno_t
+NOTHROW_NCX(LIBCCALL libc__strdate_s)(char *buf,
+                                      size_t bufsize)
+/*[[[body:libc__strdate_s]]]*/
+/*AUTO*/{
+	(void)buf;
+	(void)bufsize;
+	CRT_UNIMPLEMENTEDF("_strdate_s(%q, %Ix)", buf, bufsize); /* TODO */
+	return ENOSYS;
+}
+/*[[[end:libc__strdate_s]]]*/
+
+/*[[[head:libc__strtime_s,hash:CRC-32=0x1d960276]]]*/
+INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) errno_t
+NOTHROW_NCX(LIBCCALL libc__strtime_s)(char *buf,
+                                      size_t bufsize)
+/*[[[body:libc__strtime_s]]]*/
+/*AUTO*/{
+	(void)buf;
+	(void)bufsize;
+	CRT_UNIMPLEMENTEDF("_strtime_s(%q, %Ix)", buf, bufsize); /* TODO */
+	return ENOSYS;
+}
+/*[[[end:libc__strtime_s]]]*/
+
+/*[[[head:libc__getsystime,hash:CRC-32=0x65ac72ef]]]*/
+INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) unsigned int
+NOTHROW_NCX(LIBCCALL libc__getsystime)(struct tm *tms)
+/*[[[body:libc__getsystime]]]*/
+/*AUTO*/{
+	(void)tms;
+	CRT_UNIMPLEMENTEDF("_getsystime(%p)", tms); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:libc__getsystime]]]*/
+
+/*[[[head:libc__setsystime,hash:CRC-32=0xeb143a15]]]*/
+INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) unsigned int
+NOTHROW_NCX(LIBCCALL libc__setsystime)(struct tm __KOS_FIXED_CONST *tms,
+                                       unsigned int milliseconds)
+/*[[[body:libc__setsystime]]]*/
+/*AUTO*/{
+	(void)tms;
+	(void)milliseconds;
+	CRT_UNIMPLEMENTEDF("_setsystime(%p, %x)", tms, milliseconds); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:libc__setsystime]]]*/
 
 
 
@@ -549,7 +643,7 @@ NOTHROW_NCX(LIBCCALL libc_timer_settime64)(timer_t timerid,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x9a4136f4]]]*/
+/*[[[start:exports,hash:CRC-32=0x6ff1764d]]]*/
 DEFINE_PUBLIC_ALIAS(clock, libc_clock);
 DEFINE_PUBLIC_ALIAS(__time, libc_time);
 DEFINE_PUBLIC_ALIAS(__libc_time, libc_time);
@@ -595,6 +689,15 @@ DEFINE_PUBLIC_ALIAS(clock_nanosleep64, libc_clock_nanosleep64);
 DEFINE_PUBLIC_ALIAS(getdate, libc_getdate);
 DEFINE_PUBLIC_ALIAS(clock_adjtime, libc_clock_adjtime);
 DEFINE_PUBLIC_ALIAS(clock_adjtime64, libc_clock_adjtime64);
+DEFINE_PUBLIC_ALIAS(_get_tzname, libc__get_tzname);
+DEFINE_PUBLIC_ALIAS(_mkgmtime32, libc__mkgmtime32);
+DEFINE_PUBLIC_ALIAS(_mkgmtime64, libc__mkgmtime64);
+DEFINE_PUBLIC_ALIAS(_strdate, libc__strdate);
+DEFINE_PUBLIC_ALIAS(_strtime, libc__strtime);
+DEFINE_PUBLIC_ALIAS(_strdate_s, libc__strdate_s);
+DEFINE_PUBLIC_ALIAS(_strtime_s, libc__strtime_s);
+DEFINE_PUBLIC_ALIAS(_getsystime, libc__getsystime);
+DEFINE_PUBLIC_ALIAS(_setsystime, libc__setsystime);
 /*[[[end:exports]]]*/
 
 DECL_END

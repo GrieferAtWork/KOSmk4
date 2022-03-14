@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d373c97 */
+/* HASH CRC-32:0xad8fb697 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,35 +18,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_asctime_s_defined
-#define __local_asctime_s_defined
+#ifndef __local__get_timezone_defined
+#define __local__get_timezone_defined
 #include <__crt.h>
-#include <bits/crt/tm.h>
+#include <libc/template/timezone.h>
+#ifdef __LOCAL_timezone
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_asctime_r_defined
-#define __local___localdep_asctime_r_defined
-#ifdef __CRT_HAVE_asctime_r
-__CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_asctime_r,(struct __NAMESPACE_STD_SYM tm const *__restrict __tp, char __buf[26]),asctime_r,(__tp,__buf))
-#else /* __CRT_HAVE_asctime_r */
-__NAMESPACE_LOCAL_END
-#include <libc/local/time/asctime_r.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_asctime_r __LIBC_LOCAL_NAME(asctime_r)
-#endif /* !__CRT_HAVE_asctime_r */
-#endif /* !__local___localdep_asctime_r_defined */
-__NAMESPACE_LOCAL_END
-#include <libc/errno.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(asctime_s) __ATTR_NONNULL((1, 3)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime_s))(char *__restrict __buf, __SIZE_TYPE__ __buflen, struct __NAMESPACE_STD_SYM tm const *__restrict __tp) {
-	if (__buflen < 26)
-		return __ERANGE;
-	(__NAMESPACE_LOCAL_SYM __localdep_asctime_r)(__tp, __buf);
+__LOCAL_LIBC(_get_timezone) __errno_t
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_get_timezone))(long *__p_seconds) {
+	*__p_seconds = __LOCAL_timezone;
 	return 0;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_asctime_s_defined
-#define __local___localdep_asctime_s_defined
-#define __localdep_asctime_s __LIBC_LOCAL_NAME(asctime_s)
-#endif /* !__local___localdep_asctime_s_defined */
-#endif /* !__local_asctime_s_defined */
+#ifndef __local___localdep__get_timezone_defined
+#define __local___localdep__get_timezone_defined
+#define __localdep__get_timezone __LIBC_LOCAL_NAME(_get_timezone)
+#endif /* !__local___localdep__get_timezone_defined */
+#else /* __LOCAL_timezone */
+#undef __local__get_timezone_defined
+#endif /* !__LOCAL_timezone */
+#endif /* !__local__get_timezone_defined */

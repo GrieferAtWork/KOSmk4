@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d373c97 */
+/* HASH CRC-32:0x7bbc5441 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,35 +18,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_asctime_s_defined
-#define __local_asctime_s_defined
+#ifndef __local___dstbias_defined
+#define __local___dstbias_defined
 #include <__crt.h>
-#include <bits/crt/tm.h>
+#include <libc/template/dstbias.h>
+#ifdef __LOCAL_dstbias
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_asctime_r_defined
-#define __local___localdep_asctime_r_defined
-#ifdef __CRT_HAVE_asctime_r
-__CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_asctime_r,(struct __NAMESPACE_STD_SYM tm const *__restrict __tp, char __buf[26]),asctime_r,(__tp,__buf))
-#else /* __CRT_HAVE_asctime_r */
-__NAMESPACE_LOCAL_END
-#include <libc/local/time/asctime_r.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_asctime_r __LIBC_LOCAL_NAME(asctime_r)
-#endif /* !__CRT_HAVE_asctime_r */
-#endif /* !__local___localdep_asctime_r_defined */
-__NAMESPACE_LOCAL_END
-#include <libc/errno.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(asctime_s) __ATTR_NONNULL((1, 3)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime_s))(char *__restrict __buf, __SIZE_TYPE__ __buflen, struct __NAMESPACE_STD_SYM tm const *__restrict __tp) {
-	if (__buflen < 26)
-		return __ERANGE;
-	(__NAMESPACE_LOCAL_SYM __localdep_asctime_r)(__tp, __buf);
-	return 0;
+__LOCAL_LIBC(__dstbias) __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED __LONG32_TYPE__ *
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(__dstbias))(void) {
+	return &__LOCAL_dstbias;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_asctime_s_defined
-#define __local___localdep_asctime_s_defined
-#define __localdep_asctime_s __LIBC_LOCAL_NAME(asctime_s)
-#endif /* !__local___localdep_asctime_s_defined */
-#endif /* !__local_asctime_s_defined */
+#ifndef __local___localdep___dstbias_defined
+#define __local___localdep___dstbias_defined
+#define __localdep___dstbias __LIBC_LOCAL_NAME(__dstbias)
+#endif /* !__local___localdep___dstbias_defined */
+#else /* __LOCAL_dstbias */
+#undef __local___dstbias_defined
+#endif /* !__LOCAL_dstbias */
+#endif /* !__local___dstbias_defined */

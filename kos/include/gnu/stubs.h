@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4cc23df */
+/* HASH CRC-32:0xfccb8686 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,10 +69,14 @@
 #define __stub__get_current_locale
 #define __stub__get_output_format
 #define __stub__get_purecall_handler
+#define __stub__get_tzname
 #define __stub__getdiskfree
+#define __stub__getsystime
 #define __stub__lock_locales
 #define __stub__mbbtombc_l
 #define __stub__mbctombb_l
+#define __stub__mkgmtime32
+#define __stub__mkgmtime64
 #define __stub__mktemp_s
 #define __stub__query_new_handler
 #define __stub__query_new_mode
@@ -86,8 +90,13 @@
 #define __stub__set_output_format
 #define __stub__set_purecall_handler
 #define __stub__seterrormode
+#define __stub__setsystime
 #define __stub__statusfp
 #define __stub__statusfp2
+#define __stub__strdate
+#define __stub__strdate_s
+#define __stub__strtime
+#define __stub__strtime_s
 #define __stub__unlock_locales
 #define __stub__wcreate_locale
 #define __stub__wcserror

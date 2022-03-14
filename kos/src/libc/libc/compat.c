@@ -1231,24 +1231,6 @@ libd__except_handler4(struct _EXCEPTION_RECORD *ExceptionRecord,
 	return EXCEPTION_CONTINUE_SEARCH;
 }
 
-DEFINE_PUBLIC_ALIAS(__p__tzname, libd___p__tzname);
-INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.dos.compat.dos")
-char **NOTHROW(LIBDCALL libd___p__tzname)(void) {
-	return &tzname;
-}
-
-DEFINE_PUBLIC_ALIAS(__p__timezone, libd___p__timezone);
-INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.dos.compat.dos")
-longptr_t *NOTHROW(LIBDCALL libd___p__timezone)(void) {
-	return &timezone;
-}
-
-DEFINE_PUBLIC_ALIAS(__p__daylight, libd___p__daylight);
-INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.dos.compat.dos")
-int *NOTHROW(LIBDCALL libd___p__daylight)(void) {
-	return &daylight;
-}
-
 DEFINE_PUBLIC_ALIAS(DOS$_vacopy, libd__vacopy);
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos") NONNULL((1)) void
 NOTHROW(LIBDCALL libd__vacopy)(void **p_dstap, void *srcap) {

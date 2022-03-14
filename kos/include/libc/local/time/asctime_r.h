@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd2a0cd0 */
+/* HASH CRC-32:0x2affca18 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,22 +52,24 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_sprintf_defined */
 __NAMESPACE_LOCAL_END
-#if defined(__BUILDING_LIBC) || !defined(__CRT_HAVE_asctime_s)
+#ifdef __BUILDING_LIBC
 #ifndef __LIBC_TIME_ABBR_WDAY_NAMES_DEFINED
-#define __LIBC_TIME_ABBR_WDAY_NAMES_DEFINED 1
+#define __LIBC_TIME_ABBR_WDAY_NAMES_DEFINED
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_CONST_DATA(__abbr_wday_names) char const __abbr_wday_names[7][4] =
 	{ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 __NAMESPACE_LOCAL_END
 #endif /* !__LIBC_TIME_ABBR_WDAY_NAMES_DEFINED */
+
 #ifndef __LIBC_TIME_ABBR_MONTH_NAMES_DEFINED
-#define __LIBC_TIME_ABBR_MONTH_NAMES_DEFINED 1
+#define __LIBC_TIME_ABBR_MONTH_NAMES_DEFINED
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_CONST_DATA(__abbr_month_names) char const __abbr_month_names[12][4] =
 	{ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 __NAMESPACE_LOCAL_END
 #endif /* !__LIBC_TIME_ABBR_MONTH_NAMES_DEFINED */
-#endif /* __BUILDING_LIBC || !__CRT_HAVE_asctime_s */
+
+#endif /* __BUILDING_LIBC */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(asctime_r) __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime_r))(struct __NAMESPACE_STD_SYM tm const *__restrict __tp, char __buf[26]) {

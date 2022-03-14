@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5f56f5b */
+/* HASH CRC-32:0xf681da12 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -418,7 +418,100 @@ INTDEF NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_asctime_r)(struct tm cons
  * Return in `buf' a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that   is   the   representation   of   `tp'   in   this   format */
 INTDEF NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_asctime_r)(struct tm const *__restrict tp, char buf[26]);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED int *NOTHROW_NCX(LIBDCALL libc___daylight)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED long *NOTHROW_NCX(LIBDCALL libc___timezone)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char **NOTHROW_NCX(LIBDCALL libc___tzname)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED __LONG32_TYPE__ *NOTHROW_NCX(LIBDCALL libc___dstbias)(void);
 #endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__get_daylight)(int *p_result);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__get_daylight)(int *p_result);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__get_timezone)(long *p_seconds);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__get_timezone)(long *p_seconds);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__get_dstbias)(__LONG32_TYPE__ *p_result);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__get_dstbias)(__LONG32_TYPE__ *p_result);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBDCALL libd__get_tzname)(size_t *result, char *buf, size_t bufsize, int index);
+/* >> gmtime_r(3), gmtime64_r(3)
+ * Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
+INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBDCALL libd__gmtime32_s)(struct tm *__restrict tp, time32_t const *__restrict timer);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> gmtime_r(3), gmtime64_r(3)
+ * Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
+INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBCCALL libc__gmtime32_s)(struct tm *__restrict tp, time32_t const *__restrict timer);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> gmtime_r(3), gmtime64_r(3)
+ * Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
+INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBDCALL libd__gmtime64_s)(struct tm *__restrict tp, time64_t const *__restrict timer);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> gmtime_r(3), gmtime64_r(3)
+ * Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
+INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBCCALL libc__gmtime64_s)(struct tm *__restrict tp, time64_t const *__restrict timer);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> localtime_r(3), localtime64_r(3)
+ * Return the `struct tm' representation of `*timer' in local time, using `*tp' to store the result */
+INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBDCALL libd__localtime32_s)(struct tm *__restrict tp, time32_t const *__restrict timer);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> localtime_r(3), localtime64_r(3)
+ * Return the `struct tm' representation of `*timer' in local time, using `*tp' to store the result */
+INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBCCALL libc__localtime32_s)(struct tm *__restrict tp, time32_t const *__restrict timer);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> localtime_r(3), localtime64_r(3)
+ * Return the `struct tm' representation of `*timer' in local time, using `*tp' to store the result */
+INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBDCALL libd__localtime64_s)(struct tm *__restrict tp, time64_t const *__restrict timer);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> localtime_r(3), localtime64_r(3)
+ * Return the `struct tm' representation of `*timer' in local time, using `*tp' to store the result */
+INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBCCALL libc__localtime64_s)(struct tm *__restrict tp, time64_t const *__restrict timer);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> ctime_r(3), ctime64_r(3)
+ * Equivalent to `asctime_r(localtime_r(timer, <tmp>), buf)' */
+INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBDCALL libd__ctime32_s)(char buf[26], size_t bufsize, time32_t const *__restrict timer);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> ctime_r(3), ctime64_r(3)
+ * Equivalent to `asctime_r(localtime_r(timer, <tmp>), buf)' */
+INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBCCALL libc__ctime32_s)(char buf[26], size_t bufsize, time32_t const *__restrict timer);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> ctime_r(3), ctime64_r(3)
+ * Equivalent to `asctime_r(localtime_r(timer, <tmp>), buf)' */
+INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBDCALL libd__ctime64_s)(char buf[26], size_t bufsize, time64_t const *__restrict timer);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> ctime_r(3), ctime64_r(3)
+ * Equivalent to `asctime_r(localtime_r(timer, <tmp>), buf)' */
+INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBCCALL libc__ctime64_s)(char buf[26], size_t bufsize, time64_t const *__restrict timer);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF WUNUSED NONNULL((1)) time32_t NOTHROW_NCX(LIBDCALL libd__mkgmtime32)(struct tm *tms);
+INTDEF WUNUSED NONNULL((1)) time64_t NOTHROW_NCX(LIBDCALL libd__mkgmtime64)(struct tm *tms);
+INTDEF NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd__strdate)(char *buf);
+INTDEF NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd__strtime)(char *buf);
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd__strdate_s)(char *buf, size_t bufsize);
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd__strtime_s)(char *buf, size_t bufsize);
+INTDEF NONNULL((1)) unsigned int NOTHROW_NCX(LIBDCALL libd__getsystime)(struct tm *tms);
+INTDEF NONNULL((1)) unsigned int NOTHROW_NCX(LIBDCALL libd__setsystime)(struct tm __KOS_FIXED_CONST *tms, unsigned int milliseconds);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END
 

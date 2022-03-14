@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc15b9237 */
+/* HASH CRC-32:0xf025e47e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1482,6 +1482,14 @@ INTDEF NONNULL((1, 2, 4)) errno_t NOTHROW_NCX(LIBDCALL libd__wgetenv_s)(size_t *
 INTDEF NONNULL((1, 2, 4)) errno_t NOTHROW_NCX(LIBKCALL libc__wgetenv_s)(size_t *preqsize, char32_t *buf, rsize_t bufsize, char32_t const *varname);
 INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBDCALL libd__wdupenv_s)(char16_t **__restrict pbuf, size_t *pbuflen, char16_t const *varname);
 INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBKCALL libc__wdupenv_s)(char32_t **__restrict pbuf, size_t *pbuflen, char32_t const *varname);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF NONNULL((1)) errno_t NOTHROW_RPC(LIBDCALL libd__get_environ)(char ***p_environ);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF NONNULL((1)) errno_t NOTHROW_RPC(LIBCCALL libc__get_environ)(char ***p_environ);
+INTDEF NONNULL((1)) errno_t NOTHROW_RPC(LIBDCALL libd__get_wenviron)(char16_t ***p_wenviron);
+INTDEF NONNULL((1)) errno_t NOTHROW_RPC(LIBKCALL libc__get_wenviron)(char32_t ***p_wenviron);
 #endif /* !__KERNEL__ */
 
 DECL_END

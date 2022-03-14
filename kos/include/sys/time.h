@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9e30dd3 */
+/* HASH CRC-32:0xd5d26cb8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -118,10 +118,15 @@ typedef __suseconds_t suseconds_t;
 #ifdef __USE_MISC
 #ifndef __struct_timezone_defined
 #define __struct_timezone_defined
+#if !defined(timezone) || defined(__CRT_HAVE_timezone) || defined(__CRT_HAVE___timezone)
 struct timezone {
 	__INT32_TYPE__ tz_minuteswest; /* Minutes west of GMT. */
 	__INT32_TYPE__ tz_dsttime;     /* Nonzero if daylight-savings-time can ever be effect. */
 };
+#else /* ... */
+#undef __struct_timezone_defined
+#warning "With the linked libc, `struct timezone' from <sys/time.h> cannot be used after <time.h> was included"
+#endif /* !... */
 #endif /* !__struct_timezone_defined */
 #endif /* __USE_MISC */
 

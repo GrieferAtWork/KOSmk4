@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22e9a339 */
+/* HASH CRC-32:0xe097b4d5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,28 +18,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_dos_localtime64_s_defined
-#define __local_dos_localtime64_s_defined
+#ifndef __local__get_daylight_defined
+#define __local__get_daylight_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__localtime32_s
-#include <bits/types.h>
-#include <bits/crt/tm.h>
+#include <libc/template/daylight.h>
+#ifdef __LOCAL_daylight
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_dos_localtime32_s_defined
-#define __local___localdep_dos_localtime32_s_defined
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_dos_localtime32_s,(struct __NAMESPACE_STD_SYM tm *__restrict __tp, __time32_t const *__restrict __timer),_localtime32_s,(__tp,__timer))
-#endif /* !__local___localdep_dos_localtime32_s_defined */
-__LOCAL_LIBC(dos_localtime64_s) __ATTR_NONNULL((1, 2)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dos_localtime64_s))(struct __NAMESPACE_STD_SYM tm *__restrict __tp, __time64_t const *__restrict __timer) {
-	__time32_t __tm32 = *__timer;
-	return (__NAMESPACE_LOCAL_SYM __localdep_dos_localtime32_s)(__tp, &__tm32);
+__LOCAL_LIBC(_get_daylight) __errno_t
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_get_daylight))(int *__p_result) {
+	*__p_result = __LOCAL_daylight;
+	return 0;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_dos_localtime64_s_defined
-#define __local___localdep_dos_localtime64_s_defined
-#define __localdep_dos_localtime64_s __LIBC_LOCAL_NAME(dos_localtime64_s)
-#endif /* !__local___localdep_dos_localtime64_s_defined */
-#else /* __CRT_HAVE__localtime32_s */
-#undef __local_dos_localtime64_s_defined
-#endif /* !__CRT_HAVE__localtime32_s */
-#endif /* !__local_dos_localtime64_s_defined */
+#ifndef __local___localdep__get_daylight_defined
+#define __local___localdep__get_daylight_defined
+#define __localdep__get_daylight __LIBC_LOCAL_NAME(_get_daylight)
+#endif /* !__local___localdep__get_daylight_defined */
+#else /* __LOCAL_daylight */
+#undef __local__get_daylight_defined
+#endif /* !__LOCAL_daylight */
+#endif /* !__local__get_daylight_defined */

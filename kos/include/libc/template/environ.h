@@ -21,42 +21,61 @@
 #include <__crt.h>
 #ifndef __LOCAL_environ
 __DECL_BEGIN
-#if defined(__environ_defined) || defined(environ)
+#ifdef environ
 #define __LOCAL_environ environ
-#elif defined(___environ_defined) || defined(_environ)
+#elif defined(_environ)
 #define __LOCAL_environ _environ
-#elif defined(____environ_defined) || defined(__environ)
+#elif defined(__environ)
 #define __LOCAL_environ __environ
-#elif defined(__CRT_HAVE_environ) && !defined(__NO_ASMNAME)
-__LIBC char **__LOCAL_environ __ASMNAME("environ");
-#define __LOCAL_environ __LOCAL_environ
 #elif defined(__CRT_HAVE_environ)
+#ifdef __NO_ASMNAME
 __LIBC char **environ;
-#define __environ_defined
 #define environ         environ
 #define __LOCAL_environ environ
-#elif defined(__CRT_HAVE__environ) && !defined(__NO_ASMNAME)
-__LIBC char **__LOCAL_environ __ASMNAME("_environ");
+#else /* __NO_ASMNAME */
+__LIBC char **__LOCAL_environ __CASMNAME("environ");
 #define __LOCAL_environ __LOCAL_environ
+#endif /* !__NO_ASMNAME */
 #elif defined(__CRT_HAVE__environ)
+#ifdef __NO_ASMNAME
 __LIBC char **_environ;
-#define ___environ_defined
 #define _environ        _environ
 #define __LOCAL_environ _environ
-#elif defined(__CRT_HAVE___environ) && !defined(__NO_ASMNAME)
-__LIBC char **__LOCAL_environ __ASMNAME("__environ");
+#else /* __NO_ASMNAME */
+__LIBC char **__LOCAL_environ __CASMNAME("_environ");
 #define __LOCAL_environ __LOCAL_environ
+#endif /* !__NO_ASMNAME */
 #elif defined(__CRT_HAVE___environ)
+#ifdef __NO_ASMNAME
 __LIBC char **__environ;
-#define ____environ_defined
 #define __environ       __environ
 #define __LOCAL_environ __environ
+#else /* __NO_ASMNAME */
+__LIBC char **__LOCAL_environ __CASMNAME("__environ");
+#define __LOCAL_environ __LOCAL_environ
+#endif /* !__NO_ASMNAME */
+#elif defined(____p__environ_defined)
+#define __LOCAL_environ (*__p__environ())
 #elif defined(__CRT_HAVE___p__environ)
-#ifndef ____p__environ_defined
 #define ____p__environ_defined
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p__environ,(void),())
-#endif /* !____p__environ_defined */
 #define __LOCAL_environ (*__p__environ())
+#elif defined(__CRT_HAVE__get_environ)
+#ifndef ___get_environ_defined
+#define ___get_environ_defined
+__CDECLARE(,int,__NOTHROW,_get_environ,(char ***__p_environ),())
+#endif /* !___get_environ_defined */
+#ifndef _____get_environ_wrapper_defined
+#define _____get_environ_wrapper_defined
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST char **
+__NOTHROW(__LIBCCALL ___get_environ_wrapper)(void) {
+	char **__result;
+	if __unlikely(_get_environ(&__result) != 0)
+		__result = __NULLPTR;
+	return __result;
+}
+#endif /* !_____get_environ_wrapper_defined */
+#define __LOCAL_environ ___get_environ_wrapper()
 #endif /* ... */
 __DECL_END
 #endif /* !__LOCAL_environ */

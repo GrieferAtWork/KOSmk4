@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3fca2dfb */
+/* HASH CRC-32:0xaaca848a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,18 +25,18 @@
 #include <features.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_mktime32_defined
-#define __local___localdep_mktime32_defined
+#ifndef __local___localdep_crt_mktime32_defined
+#define __local___localdep_crt_mktime32_defined
 #ifdef __CRT_HAVE_mktime
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),mktime,(__tp))
-#elif defined(__CRT_HAVE__mktime32)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),_mktime32,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_crt_mktime32,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),mktime,(__tp))
 #elif defined(__CRT_HAVE_timelocal)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),timelocal,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_crt_mktime32,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),timelocal,(__tp))
+#elif defined(__CRT_HAVE__mktime32)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_crt_mktime32,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),_mktime32,(__tp))
 #else /* ... */
-#undef __local___localdep_mktime32_defined
+#undef __local___localdep_crt_mktime32_defined
 #endif /* !... */
-#endif /* !__local___localdep_mktime32_defined */
+#endif /* !__local___localdep_crt_mktime32_defined */
 __NAMESPACE_LOCAL_END
 #ifndef __yearstodays
 #define __yearstodays(__n_years) (((146097*(__n_years))/400)/*-1*/) /* rounding error? */
@@ -44,9 +44,9 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(mktime64) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __time64_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktime64))(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp) {
-#if defined(__CRT_HAVE_mktime) || defined(__CRT_HAVE__mktime32) || defined(__CRT_HAVE_timelocal)
-	return (__time64_t)(__NAMESPACE_LOCAL_SYM __localdep_mktime32)(__tp);
-#else /* __CRT_HAVE_mktime || __CRT_HAVE__mktime32 || __CRT_HAVE_timelocal */
+#if defined(__CRT_HAVE_mktime) || defined(__CRT_HAVE_timelocal) || defined(__CRT_HAVE__mktime32)
+	return (__time64_t)(__NAMESPACE_LOCAL_SYM __localdep_crt_mktime32)(__tp);
+#else /* __CRT_HAVE_mktime || __CRT_HAVE_timelocal || __CRT_HAVE__mktime32 */
 	__time64_t __result;
 	__result = __yearstodays(__tp->tm_year) - __yearstodays(1970); /* UNIX_TIME_START_YEAR */
 	__result += __tp->tm_yday;
@@ -55,7 +55,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktime64))(struct __NAMESPACE_STD_SYM
 	__result += __tp->tm_min * 60;
 	__result += __tp->tm_sec;
 	return __result;
-#endif /* !__CRT_HAVE_mktime && !__CRT_HAVE__mktime32 && !__CRT_HAVE_timelocal */
+#endif /* !__CRT_HAVE_mktime && !__CRT_HAVE_timelocal && !__CRT_HAVE__mktime32 */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mktime64_defined

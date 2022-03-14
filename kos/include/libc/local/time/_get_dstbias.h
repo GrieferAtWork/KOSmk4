@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbae2b6a */
+/* HASH CRC-32:0xc432bb5b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,28 +18,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_dos_gmtime64_s_defined
-#define __local_dos_gmtime64_s_defined
+#ifndef __local__get_dstbias_defined
+#define __local__get_dstbias_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__gmtime32_s
-#include <bits/types.h>
-#include <bits/crt/tm.h>
+#include <libc/template/dstbias.h>
+#ifdef __LOCAL_dstbias
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_dos_gmtime32_s_defined
-#define __local___localdep_dos_gmtime32_s_defined
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_dos_gmtime32_s,(struct __NAMESPACE_STD_SYM tm *__restrict __tp, __time32_t const *__restrict __timer),_gmtime32_s,(__tp,__timer))
-#endif /* !__local___localdep_dos_gmtime32_s_defined */
-__LOCAL_LIBC(dos_gmtime64_s) __ATTR_NONNULL((1, 2)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dos_gmtime64_s))(struct __NAMESPACE_STD_SYM tm *__restrict __tp, __time64_t const *__restrict __timer) {
-	__time32_t __tm32 = *__timer;
-	return (__NAMESPACE_LOCAL_SYM __localdep_dos_gmtime32_s)(__tp, &__tm32);
+__LOCAL_LIBC(_get_dstbias) __errno_t
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_get_dstbias))(__LONG32_TYPE__ *__p_result) {
+	*__p_result = __LOCAL_dstbias;
+	return 0;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_dos_gmtime64_s_defined
-#define __local___localdep_dos_gmtime64_s_defined
-#define __localdep_dos_gmtime64_s __LIBC_LOCAL_NAME(dos_gmtime64_s)
-#endif /* !__local___localdep_dos_gmtime64_s_defined */
-#else /* __CRT_HAVE__gmtime32_s */
-#undef __local_dos_gmtime64_s_defined
-#endif /* !__CRT_HAVE__gmtime32_s */
-#endif /* !__local_dos_gmtime64_s_defined */
+#ifndef __local___localdep__get_dstbias_defined
+#define __local___localdep__get_dstbias_defined
+#define __localdep__get_dstbias __LIBC_LOCAL_NAME(_get_dstbias)
+#endif /* !__local___localdep__get_dstbias_defined */
+#else /* __LOCAL_dstbias */
+#undef __local__get_dstbias_defined
+#endif /* !__LOCAL_dstbias */
+#endif /* !__local__get_dstbias_defined */

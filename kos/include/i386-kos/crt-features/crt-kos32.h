@@ -946,6 +946,7 @@
 #define __CRT_HAVE___p__crtBreakAlloc
 #define __CRT_HAVE___p__crtDbgFlag
 #define __CRT_HAVE___p__daylight
+#define __CRT_HAVE___p__dstbias
 #define __CRT_HAVE___p__environ
 #define __CRT_HAVE___p__fmode
 #define __CRT_HAVE___p__iob
@@ -1372,7 +1373,9 @@
 #define __CRT_HAVE__crt_at_quick_exit
 #define __CRT_HAVE__crt_atexit
 #define __CRT_HAVE__ctime32
+#define __CRT_HAVE__ctime32_s
 #define __CRT_HAVE__ctime64
+#define __CRT_HAVE__ctime64_s
 #define __CRT_HAVE__cwait
 #define __CRT_HAVE__daylight
 #define __CRT_HAVE__dclass
@@ -1381,6 +1384,7 @@
 #define __CRT_HAVE__dosmaperr
 #define __CRT_HAVE__dpcomp
 #define __CRT_HAVE__dsign
+#define __CRT_HAVE__dstbias
 #define __CRT_HAVE__dtest
 #define __CRT_HAVE__dup
 #define __CRT_HAVE__dup2
@@ -1484,7 +1488,10 @@
 #define __CRT_HAVE__gcvt
 #define __CRT_HAVE__gcvt_s
 #define __CRT_HAVE__get_current_locale
+#define __CRT_HAVE__get_daylight
 #define __CRT_HAVE__get_doserrno
+#define __CRT_HAVE__get_dstbias
+#define __CRT_HAVE__get_environ
 #define __CRT_HAVE__get_errno
 #define __CRT_HAVE__get_fmode
 #define __CRT_HAVE__get_invalid_parameter_handler
@@ -1493,6 +1500,9 @@
 #define __CRT_HAVE__get_pgmptr
 #define __CRT_HAVE__get_printf_count_output
 #define __CRT_HAVE__get_purecall_handler
+#define __CRT_HAVE__get_timezone
+#define __CRT_HAVE__get_tzname
+#define __CRT_HAVE__get_wenviron
 #define __CRT_HAVE__get_wpgmptr
 #define __CRT_HAVE__getc_nolock
 #define __CRT_HAVE__getcwd_dbg
@@ -1508,9 +1518,12 @@
 #define __CRT_HAVE__getpwent
 #define __CRT_HAVE__getpwnam
 #define __CRT_HAVE__getpwuid
+#define __CRT_HAVE__getsystime
 #define __CRT_HAVE__getw
 #define __CRT_HAVE__getws_s
+#define __CRT_HAVE__gmtime32_s
 #define __CRT_HAVE__gmtime64
+#define __CRT_HAVE__gmtime64_s
 #define __CRT_HAVE__hypot
 #define __CRT_HAVE__hypotf
 #define __CRT_HAVE__i64toa
@@ -1622,7 +1635,9 @@
 #define __CRT_HAVE__lfind_s
 #define __CRT_HAVE__loaddll
 #define __CRT_HAVE__localtime32
+#define __CRT_HAVE__localtime32_s
 #define __CRT_HAVE__localtime64
+#define __CRT_HAVE__localtime64_s
 #define __CRT_HAVE__lock_file
 #define __CRT_HAVE__lock_locales
 #define __CRT_HAVE__locking
@@ -1791,6 +1806,8 @@
 #define __CRT_HAVE__memicmp
 #define __CRT_HAVE__memicmp_l
 #define __CRT_HAVE__mkdir
+#define __CRT_HAVE__mkgmtime32
+#define __CRT_HAVE__mkgmtime64
 #define __CRT_HAVE__mktemp
 #define __CRT_HAVE__mktemp_s
 #define __CRT_HAVE__mktime32
@@ -1863,6 +1880,7 @@
 #define __CRT_HAVE__setmbcp
 #define __CRT_HAVE__setmode
 #define __CRT_HAVE__setpwent
+#define __CRT_HAVE__setsystime
 #define __CRT_HAVE__sgetpwent
 #define __CRT_HAVE__sigintr
 #define __CRT_HAVE__sleep
@@ -1905,6 +1923,8 @@
 #define __CRT_HAVE__statusfp2
 #define __CRT_HAVE__strcmpi
 #define __CRT_HAVE__strcoll_l
+#define __CRT_HAVE__strdate
+#define __CRT_HAVE__strdate_s
 #define __CRT_HAVE__strdup
 #define __CRT_HAVE__strdup_dbg
 #define __CRT_HAVE__strerror
@@ -1931,6 +1951,8 @@
 #define __CRT_HAVE__strrev
 #define __CRT_HAVE__strset
 #define __CRT_HAVE__strset_s
+#define __CRT_HAVE__strtime
+#define __CRT_HAVE__strtime_s
 #define __CRT_HAVE__strtod_l
 #define __CRT_HAVE__strtof_l
 #define __CRT_HAVE__strtoi64
@@ -6097,6 +6119,7 @@
 #define __CRT_HAVE___crtTerminateProcess
 #define __CRT_HAVE___crtUnhandledException
 #define __CRT_HAVE___dllonexit
+#define __CRT_HAVE___dstbias
 #define __CRT_HAVE___getmainargs
 #define __CRT_HAVE___initialize_lconv_for_unsigned_char
 #define __CRT_HAVE___lconv_init
@@ -6422,6 +6445,7 @@
 #define __CRT_HAVE_KOS$_gcvt_s
 #define __CRT_HAVE_KOS$_get_doserrno
 #define __CRT_HAVE_KOS$_get_errno
+#define __CRT_HAVE_KOS$_get_wenviron
 #define __CRT_HAVE_KOS$_get_wpgmptr
 #define __CRT_HAVE_KOS$_getdcwd
 #define __CRT_HAVE_KOS$_getws_s
@@ -7101,6 +7125,7 @@
 #define __CRT_HAVE_DOS$__crtUnhandledException
 #define __CRT_HAVE_DOS$__daylight
 #define __CRT_HAVE_DOS$__dllonexit
+#define __CRT_HAVE_DOS$__dstbias
 #define __CRT_HAVE_DOS$__dup2
 #define __CRT_HAVE_DOS$__environ
 #define __CRT_HAVE_DOS$__errno
@@ -7287,6 +7312,7 @@
 #define __CRT_HAVE_DOS$_get_initial_narrow_environment
 #define __CRT_HAVE_DOS$_get_initial_wide_environment
 #define __CRT_HAVE_DOS$_get_narrow_winmain_command_line
+#define __CRT_HAVE_DOS$_get_wenviron
 #define __CRT_HAVE_DOS$_get_wide_winmain_command_line
 #define __CRT_HAVE_DOS$_get_wpgmptr
 #define __CRT_HAVE_DOS$_getcwd
