@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x110b7f0c */
+/* HASH CRC-32:0x408635aa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local__mbsupr_s_l_defined
 #define __local__mbsupr_s_l_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE__mbsupr_l) || (defined(__CRT_HAVE__ismbblead_l) && defined(__CRT_HAVE__mbctoupper_l))
+#if defined(__CRT_HAVE__mbsupr_l) || ((defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__mbctoupper_l) || (defined(__CRT_HAVE__mbctouni_l) && defined(__CRT_HAVE__unitombc_l) && defined(__CRT_HAVE___unicode_descriptor)) || ((defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__mbcasemap) || defined(__CRT_HAVE___p__mbcasemap)))))
 #include <hybrid/typecore.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep__mbsupr_l_defined
 #ifdef __CRT_HAVE__mbsupr_l
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),unsigned char *,__NOTHROW_NCX,__localdep__mbsupr_l,(unsigned char *__buf, __locale_t __locale),_mbsupr_l,(__buf,__locale))
-#elif defined(__CRT_HAVE__ismbblead_l) && defined(__CRT_HAVE__mbctoupper_l)
+#elif (defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__mbctoupper_l) || (defined(__CRT_HAVE__mbctouni_l) && defined(__CRT_HAVE__unitombc_l) && defined(__CRT_HAVE___unicode_descriptor)) || ((defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__mbcasemap) || defined(__CRT_HAVE___p__mbcasemap))))
 __NAMESPACE_LOCAL_END
 #include <libc/local/mbstring/_mbsupr_l.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -61,7 +61,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__mbsupr_s_l_defined
 #define __localdep__mbsupr_s_l __LIBC_LOCAL_NAME(_mbsupr_s_l)
 #endif /* !__local___localdep__mbsupr_s_l_defined */
-#else /* __CRT_HAVE__mbsupr_l || (__CRT_HAVE__ismbblead_l && __CRT_HAVE__mbctoupper_l) */
+#else /* __CRT_HAVE__mbsupr_l || ((__CRT_HAVE__ismbblead_l || __CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype) && (__CRT_HAVE__mbctoupper_l || (__CRT_HAVE__mbctouni_l && __CRT_HAVE__unitombc_l && __CRT_HAVE___unicode_descriptor) || ((__CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype) && (__CRT_HAVE__mbcasemap || __CRT_HAVE___p__mbcasemap)))) */
 #undef __local__mbsupr_s_l_defined
-#endif /* !__CRT_HAVE__mbsupr_l && (!__CRT_HAVE__ismbblead_l || !__CRT_HAVE__mbctoupper_l) */
+#endif /* !__CRT_HAVE__mbsupr_l && ((!__CRT_HAVE__ismbblead_l && !__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype) || (!__CRT_HAVE__mbctoupper_l && (!__CRT_HAVE__mbctouni_l || !__CRT_HAVE__unitombc_l || !__CRT_HAVE___unicode_descriptor) && ((!__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype) || (!__CRT_HAVE__mbcasemap && !__CRT_HAVE___p__mbcasemap)))) */
 #endif /* !__local__mbsupr_s_l_defined */

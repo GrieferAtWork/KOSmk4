@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53921fe5 */
+/* HASH CRC-32:0x8b372793 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,13 @@
 #ifndef __local__mbccpy_defined
 #define __local__mbccpy_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE__mbccpy_l) || defined(__CRT_HAVE__ismbblead_l)
+#if defined(__CRT_HAVE__mbccpy_l) || defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbccpy_l_defined
 #define __local___localdep__mbccpy_l_defined
 #ifdef __CRT_HAVE__mbccpy_l
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,__localdep__mbccpy_l,(unsigned char *__dst, unsigned char const *__src, __locale_t __locale),_mbccpy_l,(__dst,__src,__locale))
-#elif defined(__CRT_HAVE__ismbblead_l)
+#elif defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_END
 #include <libc/local/mbstring/_mbccpy_l.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__mbccpy_defined
 #define __localdep__mbccpy __LIBC_LOCAL_NAME(_mbccpy)
 #endif /* !__local___localdep__mbccpy_defined */
-#else /* __CRT_HAVE__mbccpy_l || __CRT_HAVE__ismbblead_l */
+#else /* __CRT_HAVE__mbccpy_l || __CRT_HAVE__ismbblead_l || __CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype */
 #undef __local__mbccpy_defined
-#endif /* !__CRT_HAVE__mbccpy_l && !__CRT_HAVE__ismbblead_l */
+#endif /* !__CRT_HAVE__mbccpy_l && !__CRT_HAVE__ismbblead_l && !__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype */
 #endif /* !__local__mbccpy_defined */

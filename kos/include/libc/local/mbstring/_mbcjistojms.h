@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9633c4db */
+/* HASH CRC-32:0xdb0b5ef0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,22 @@
 #ifndef __local__mbcjistojms_defined
 #define __local__mbcjistojms_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__mbcjistojms_l
+#if defined(__CRT_HAVE__mbcjistojms_l) || defined(__CRT_HAVE__getmbcp)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbcjistojms_l_defined
 #define __local___localdep__mbcjistojms_l_defined
-__CREDIRECT(__ATTR_WUNUSED,unsigned int,__NOTHROW_NCX,__localdep__mbcjistojms_l,(unsigned int __ch, __locale_t __locale),_mbcjistojms_l,(__ch,__locale))
+#ifdef __CRT_HAVE__mbcjistojms_l
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,unsigned int,__NOTHROW_NCX,__localdep__mbcjistojms_l,(unsigned int __ch, __locale_t __locale),_mbcjistojms_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__getmbcp)
+__NAMESPACE_LOCAL_END
+#include <libc/local/mbstring/_mbcjistojms_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__mbcjistojms_l __LIBC_LOCAL_NAME(_mbcjistojms_l)
+#else /* ... */
+#undef __local___localdep__mbcjistojms_l_defined
+#endif /* !... */
 #endif /* !__local___localdep__mbcjistojms_l_defined */
-__LOCAL_LIBC(_mbcjistojms) __ATTR_WUNUSED unsigned int
+__LOCAL_LIBC(_mbcjistojms) __ATTR_PURE __ATTR_WUNUSED unsigned int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbcjistojms))(unsigned int __ch) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__mbcjistojms_l)(__ch, __NULLPTR);
 }
@@ -36,7 +45,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__mbcjistojms_defined
 #define __localdep__mbcjistojms __LIBC_LOCAL_NAME(_mbcjistojms)
 #endif /* !__local___localdep__mbcjistojms_defined */
-#else /* __CRT_HAVE__mbcjistojms_l */
+#else /* __CRT_HAVE__mbcjistojms_l || __CRT_HAVE__getmbcp */
 #undef __local__mbcjistojms_defined
-#endif /* !__CRT_HAVE__mbcjistojms_l */
+#endif /* !__CRT_HAVE__mbcjistojms_l && !__CRT_HAVE__getmbcp */
 #endif /* !__local__mbcjistojms_defined */

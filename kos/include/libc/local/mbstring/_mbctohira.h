@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89ff91fc */
+/* HASH CRC-32:0xd8bfc455 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,22 @@
 #ifndef __local__mbctohira_defined
 #define __local__mbctohira_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__mbctohira_l
+#if defined(__CRT_HAVE__mbctohira_l) || defined(__CRT_HAVE__ismbckata_l) || defined(__CRT_HAVE__getmbcp)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbctohira_l_defined
 #define __local___localdep__mbctohira_l_defined
-__CREDIRECT(__ATTR_WUNUSED,unsigned int,__NOTHROW_NCX,__localdep__mbctohira_l,(unsigned int __ch, __locale_t __locale),_mbctohira_l,(__ch,__locale))
+#ifdef __CRT_HAVE__mbctohira_l
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,unsigned int,__NOTHROW_NCX,__localdep__mbctohira_l,(unsigned int __ch, __locale_t __locale),_mbctohira_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__ismbckata_l) || defined(__CRT_HAVE__getmbcp)
+__NAMESPACE_LOCAL_END
+#include <libc/local/mbstring/_mbctohira_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__mbctohira_l __LIBC_LOCAL_NAME(_mbctohira_l)
+#else /* ... */
+#undef __local___localdep__mbctohira_l_defined
+#endif /* !... */
 #endif /* !__local___localdep__mbctohira_l_defined */
-__LOCAL_LIBC(_mbctohira) __ATTR_WUNUSED unsigned int
+__LOCAL_LIBC(_mbctohira) __ATTR_PURE __ATTR_WUNUSED unsigned int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbctohira))(unsigned int __ch) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__mbctohira_l)(__ch, __NULLPTR);
 }
@@ -36,7 +45,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__mbctohira_defined
 #define __localdep__mbctohira __LIBC_LOCAL_NAME(_mbctohira)
 #endif /* !__local___localdep__mbctohira_defined */
-#else /* __CRT_HAVE__mbctohira_l */
+#else /* __CRT_HAVE__mbctohira_l || __CRT_HAVE__ismbckata_l || __CRT_HAVE__getmbcp */
 #undef __local__mbctohira_defined
-#endif /* !__CRT_HAVE__mbctohira_l */
+#endif /* !__CRT_HAVE__mbctohira_l && !__CRT_HAVE__ismbckata_l && !__CRT_HAVE__getmbcp */
 #endif /* !__local__mbctohira_defined */

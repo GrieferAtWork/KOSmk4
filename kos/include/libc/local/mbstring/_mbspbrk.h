@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x110ba */
+/* HASH CRC-32:0x4099ddbe */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,13 @@
 #ifndef __local__mbspbrk_defined
 #define __local__mbspbrk_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE__mbspbrk_l) || defined(__CRT_HAVE__ismbblead_l)
+#if defined(__CRT_HAVE__mbspbrk_l) || defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbspbrk_l_defined
 #define __local___localdep__mbspbrk_l_defined
 #ifdef __CRT_HAVE__mbspbrk_l
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),unsigned char *,__NOTHROW_NCX,__localdep__mbspbrk_l,(unsigned char const *__haystack, unsigned char const *__accept, __locale_t __locale),_mbspbrk_l,(__haystack,__accept,__locale))
-#elif defined(__CRT_HAVE__ismbblead_l)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),unsigned char *,__NOTHROW_NCX,__localdep__mbspbrk_l,(unsigned char const *__haystack, unsigned char const *__accept, __locale_t __locale),_mbspbrk_l,(__haystack,__accept,__locale))
+#elif defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_END
 #include <libc/local/mbstring/_mbspbrk_l.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__mbspbrk_l_defined
 #endif /* !... */
 #endif /* !__local___localdep__mbspbrk_l_defined */
-__LOCAL_LIBC(_mbspbrk) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) unsigned char *
+__LOCAL_LIBC(_mbspbrk) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) unsigned char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbspbrk))(unsigned char const *__haystack, unsigned char const *__accept) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__mbspbrk_l)(__haystack, __accept, __NULLPTR);
 }
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__mbspbrk_defined
 #define __localdep__mbspbrk __LIBC_LOCAL_NAME(_mbspbrk)
 #endif /* !__local___localdep__mbspbrk_defined */
-#else /* __CRT_HAVE__mbspbrk_l || __CRT_HAVE__ismbblead_l */
+#else /* __CRT_HAVE__mbspbrk_l || __CRT_HAVE__ismbblead_l || __CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype */
 #undef __local__mbspbrk_defined
-#endif /* !__CRT_HAVE__mbspbrk_l && !__CRT_HAVE__ismbblead_l */
+#endif /* !__CRT_HAVE__mbspbrk_l && !__CRT_HAVE__ismbblead_l && !__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype */
 #endif /* !__local__mbspbrk_defined */

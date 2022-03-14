@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd908407d */
+/* HASH CRC-32:0x243aeb5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,13 @@
 #ifndef __local__mbsrchr_defined
 #define __local__mbsrchr_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE__mbsrchr_l) || defined(__CRT_HAVE__ismbblead_l)
+#if defined(__CRT_HAVE__mbsrchr_l) || defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbsrchr_l_defined
 #define __local___localdep__mbsrchr_l_defined
 #ifdef __CRT_HAVE__mbsrchr_l
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),unsigned char *,__NOTHROW_NCX,__localdep__mbsrchr_l,(unsigned char const *__haystack, unsigned int __needle, __locale_t __locale),_mbsrchr_l,(__haystack,__needle,__locale))
-#elif defined(__CRT_HAVE__ismbblead_l)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),unsigned char *,__NOTHROW_NCX,__localdep__mbsrchr_l,(unsigned char const *__haystack, unsigned int __needle, __locale_t __locale),_mbsrchr_l,(__haystack,__needle,__locale))
+#elif defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_END
 #include <libc/local/mbstring/_mbsrchr_l.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__mbsrchr_l_defined
 #endif /* !... */
 #endif /* !__local___localdep__mbsrchr_l_defined */
-__LOCAL_LIBC(_mbsrchr) __ATTR_WUNUSED __ATTR_NONNULL((1)) unsigned char *
+__LOCAL_LIBC(_mbsrchr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) unsigned char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsrchr))(unsigned char const *__haystack, unsigned int __needle) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__mbsrchr_l)(__haystack, __needle, __NULLPTR);
 }
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__mbsrchr_defined
 #define __localdep__mbsrchr __LIBC_LOCAL_NAME(_mbsrchr)
 #endif /* !__local___localdep__mbsrchr_defined */
-#else /* __CRT_HAVE__mbsrchr_l || __CRT_HAVE__ismbblead_l */
+#else /* __CRT_HAVE__mbsrchr_l || __CRT_HAVE__ismbblead_l || __CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype */
 #undef __local__mbsrchr_defined
-#endif /* !__CRT_HAVE__mbsrchr_l && !__CRT_HAVE__ismbblead_l */
+#endif /* !__CRT_HAVE__mbsrchr_l && !__CRT_HAVE__ismbblead_l && !__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype */
 #endif /* !__local__mbsrchr_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb266f412 */
+/* HASH CRC-32:0x25562812 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,13 @@
 #ifndef __local__mbstok_defined
 #define __local__mbstok_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE__mbstok_l) || defined(__CRT_HAVE__mbstok_s_l) || ((defined(__CRT_HAVE__mbsspn_l) || defined(__CRT_HAVE__ismbblead_l)) && (defined(__CRT_HAVE__mbscspn_l) || defined(__CRT_HAVE__ismbblead_l)))
+#if defined(__CRT_HAVE__mbstok_l) || defined(__CRT_HAVE__mbstok_s_l) || ((defined(__CRT_HAVE__mbsspn_l) || defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__mbscspn_l) || ((defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__mbschr_l) || defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)))))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbstok_l_defined
 #define __local___localdep__mbstok_l_defined
 #ifdef __CRT_HAVE__mbstok_l
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),unsigned char *,__NOTHROW_NCX,__localdep__mbstok_l,(unsigned char *__str, unsigned char const *__delim, __locale_t __locale),_mbstok_l,(__str,__delim,__locale))
-#elif defined(__CRT_HAVE__mbstok_s_l) || ((defined(__CRT_HAVE__mbsspn_l) || defined(__CRT_HAVE__ismbblead_l)) && (defined(__CRT_HAVE__mbscspn_l) || defined(__CRT_HAVE__ismbblead_l)))
+#elif defined(__CRT_HAVE__mbstok_s_l) || ((defined(__CRT_HAVE__mbsspn_l) || defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__mbscspn_l) || ((defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__mbschr_l) || defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)))))
 __NAMESPACE_LOCAL_END
 #include <libc/local/mbstring/_mbstok_l.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__mbstok_defined
 #define __localdep__mbstok __LIBC_LOCAL_NAME(_mbstok)
 #endif /* !__local___localdep__mbstok_defined */
-#else /* __CRT_HAVE__mbstok_l || __CRT_HAVE__mbstok_s_l || ((__CRT_HAVE__mbsspn_l || __CRT_HAVE__ismbblead_l) && (__CRT_HAVE__mbscspn_l || __CRT_HAVE__ismbblead_l)) */
+#else /* __CRT_HAVE__mbstok_l || __CRT_HAVE__mbstok_s_l || ((__CRT_HAVE__mbsspn_l || __CRT_HAVE__ismbblead_l || __CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype) && (__CRT_HAVE__mbscspn_l || ((__CRT_HAVE__ismbblead_l || __CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype) && (__CRT_HAVE__mbschr_l || __CRT_HAVE__ismbblead_l || __CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype)))) */
 #undef __local__mbstok_defined
-#endif /* !__CRT_HAVE__mbstok_l && !__CRT_HAVE__mbstok_s_l && ((!__CRT_HAVE__mbsspn_l && !__CRT_HAVE__ismbblead_l) || (!__CRT_HAVE__mbscspn_l && !__CRT_HAVE__ismbblead_l)) */
+#endif /* !__CRT_HAVE__mbstok_l && !__CRT_HAVE__mbstok_s_l && ((!__CRT_HAVE__mbsspn_l && !__CRT_HAVE__ismbblead_l && !__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype) || (!__CRT_HAVE__mbscspn_l && !__CRT_HAVE__ismbblead_l && !__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype)) */
 #endif /* !__local__mbstok_defined */

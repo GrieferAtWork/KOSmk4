@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9527db46 */
+/* HASH CRC-32:0x4b97c0b1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,18 +21,36 @@
 #ifndef __local__mbsnicmp_l_defined
 #define __local__mbsnicmp_l_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE__ismbblead_l) && defined(__CRT_HAVE__mbctolower_l)
+#if (defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__mbctolower_l) || (defined(__CRT_HAVE__mbctouni_l) && defined(__CRT_HAVE__unitombc_l) && defined(__CRT_HAVE___unicode_descriptor)) || ((defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__mbcasemap) || defined(__CRT_HAVE___p__mbcasemap))))
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__ismbblead_l_defined
 #define __local___localdep__ismbblead_l_defined
-__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__ismbblead_l,(unsigned int __ch, __locale_t __locale),_ismbblead_l,(__ch,__locale))
+#ifdef __CRT_HAVE__ismbblead_l
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__ismbblead_l,(unsigned int __ch, __locale_t __locale),_ismbblead_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
+__NAMESPACE_LOCAL_END
+#include <libc/local/mbctype/_ismbblead_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__ismbblead_l __LIBC_LOCAL_NAME(_ismbblead_l)
+#else /* ... */
+#undef __local___localdep__ismbblead_l_defined
+#endif /* !... */
 #endif /* !__local___localdep__ismbblead_l_defined */
 #ifndef __local___localdep__mbctolower_l_defined
 #define __local___localdep__mbctolower_l_defined
-__CREDIRECT(__ATTR_WUNUSED,unsigned int,__NOTHROW_NCX,__localdep__mbctolower_l,(unsigned int __ch, __locale_t __locale),_mbctolower_l,(__ch,__locale))
+#ifdef __CRT_HAVE__mbctolower_l
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,unsigned int,__NOTHROW_NCX,__localdep__mbctolower_l,(unsigned int __ch, __locale_t __locale),_mbctolower_l,(__ch,__locale))
+#elif (defined(__CRT_HAVE__mbctouni_l) && defined(__CRT_HAVE__unitombc_l) && defined(__CRT_HAVE___unicode_descriptor)) || ((defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__mbcasemap) || defined(__CRT_HAVE___p__mbcasemap)))
+__NAMESPACE_LOCAL_END
+#include <libc/local/mbstring/_mbctolower_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__mbctolower_l __LIBC_LOCAL_NAME(_mbctolower_l)
+#else /* ... */
+#undef __local___localdep__mbctolower_l_defined
+#endif /* !... */
 #endif /* !__local___localdep__mbctolower_l_defined */
-__LOCAL_LIBC(_mbsnicmp_l) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(_mbsnicmp_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsnicmp_l))(unsigned char const *__lhs, unsigned char const *__rhs, __SIZE_TYPE__ __max_chars, __locale_t __locale) {
 	for (; __max_chars; --__max_chars) {
 		__UINT16_TYPE__ __lc = 0, __rc = 0;
@@ -58,7 +76,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__mbsnicmp_l_defined
 #define __localdep__mbsnicmp_l __LIBC_LOCAL_NAME(_mbsnicmp_l)
 #endif /* !__local___localdep__mbsnicmp_l_defined */
-#else /* __CRT_HAVE__ismbblead_l && __CRT_HAVE__mbctolower_l */
+#else /* (__CRT_HAVE__ismbblead_l || __CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype) && (__CRT_HAVE__mbctolower_l || (__CRT_HAVE__mbctouni_l && __CRT_HAVE__unitombc_l && __CRT_HAVE___unicode_descriptor) || ((__CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype) && (__CRT_HAVE__mbcasemap || __CRT_HAVE___p__mbcasemap))) */
 #undef __local__mbsnicmp_l_defined
-#endif /* !__CRT_HAVE__ismbblead_l || !__CRT_HAVE__mbctolower_l */
+#endif /* (!__CRT_HAVE__ismbblead_l && !__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype) || (!__CRT_HAVE__mbctolower_l && (!__CRT_HAVE__mbctouni_l || !__CRT_HAVE__unitombc_l || !__CRT_HAVE___unicode_descriptor) && ((!__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype) || (!__CRT_HAVE__mbcasemap && !__CRT_HAVE___p__mbcasemap))) */
 #endif /* !__local__mbsnicmp_l_defined */

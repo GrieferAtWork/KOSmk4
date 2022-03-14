@@ -1014,6 +1014,7 @@ incdir("");
 #include <malloc.h>
 #include <malloca.h>
 #include <math.h>
+#include <mbctype.h>
 #include <mbstring.h>
 #include <mem.h>
 #include <memory.h>

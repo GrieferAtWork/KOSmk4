@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7cd393f6 */
+/* HASH CRC-32:0x98b05bb7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,9 +25,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbbtombc_l_defined
 #define __local___localdep__mbbtombc_l_defined
-__CREDIRECT(__ATTR_WUNUSED,unsigned int,__NOTHROW_NCX,__localdep__mbbtombc_l,(unsigned int __ch, __locale_t __locale),_mbbtombc_l,(__ch,__locale))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,unsigned int,__NOTHROW_NCX,__localdep__mbbtombc_l,(unsigned int __ch, __locale_t __locale),_mbbtombc_l,(__ch,__locale))
 #endif /* !__local___localdep__mbbtombc_l_defined */
-__LOCAL_LIBC(_mbbtombc) __ATTR_WUNUSED unsigned int
+__LOCAL_LIBC(_mbbtombc) __ATTR_PURE __ATTR_WUNUSED unsigned int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbbtombc))(unsigned int __ch) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__mbbtombc_l)(__ch, __NULLPTR);
 }

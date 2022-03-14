@@ -56,8 +56,8 @@ typedef __errno_t errno_t;
 }
 
 [[nocrt, alias("strdup", "_strdup", "_mbsdup", "__strdup")]]
-[if(__has_builtin(__builtin_strdup) && defined(__LIBC_BIND_CRTBUILTINS)),
-  preferred_extern_inline("strdup", { return (unsigned char *)__builtin_strdup((char const *)string); })]
+[[if(__has_builtin(__builtin_strdup) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline("strdup", { return (unsigned char *)__builtin_strdup((char const *)string); })]]
 [[if($has_function(malloc)), bind_local_function("strdup")]]
 _mbsdup([[nonnull]] unsigned char const *__restrict string)
 	-> [[malloc/*((strlen(string) + 1) * sizeof(unsigned char))*/]] unsigned char *;
@@ -66,25 +66,25 @@ _mbsdup([[nonnull]] unsigned char const *__restrict string)
 /* Current-local functions                                              */
 /************************************************************************/
 
-[[wunused, requires_function(_mbbtombc_l), doc_alias("_mbbtombc_l")]]
+[[wunused, pure, requires_function(_mbbtombc_l), doc_alias("_mbbtombc_l")]]
 unsigned int _mbbtombc(unsigned int ch) {
 	return _mbbtombc_l(ch, NULL);
 }
 
-[[wunused, requires_function(_mbbtype_l), doc_alias("_mbbtype_l")]]
+[[wunused, pure, requires_function(_mbbtype_l), doc_alias("_mbbtype_l")]]
 int _mbbtype(unsigned char ch, int ctype) {
 	return _mbbtype_l(ch, ctype, NULL);
 }
 
-[[wunused, requires_function(_mbctombb_l), doc_alias("_mbctombb_l")]]
+[[wunused, pure, requires_function(_mbctombb_l), doc_alias("_mbctombb_l")]]
 unsigned int _mbctombb(unsigned int ch) {
 	return _mbctombb_l(ch, NULL);
 }
 
 [[requires_function(_mbsbtype_l), doc_alias("_mbsbtype_l")]]
-[[wunused, decl_include("<hybrid/typecore.h>")]]
-int _mbsbtype([[nonnull]] unsigned char const *str, size_t pos) {
-	return _mbsbtype_l(str, pos, NULL);
+[[wunused, pure, decl_include("<hybrid/typecore.h>")]]
+int _mbsbtype([[nonnull]] unsigned char const *str, size_t byte_index) {
+	return _mbsbtype_l(str, byte_index, NULL);
 }
 
 [[requires_function(_mbscat_s_l), doc_alias("_mbscat_s_l")]]
@@ -95,14 +95,14 @@ int _mbsbtype([[nonnull]] unsigned char const *str, size_t pos) {
 }
 
 [[nonnull, nocrt, leaf, alias("strcat", "_mbscat")]]
-[if(__has_builtin(__builtin_strcat) && defined(__LIBC_BIND_CRTBUILTINS)),
-  preferred_extern_inline("strcat", { return (unsigned char *)__builtin_strcat((char *)dst, (char const *)src); })]
+[[if(__has_builtin(__builtin_strcat) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline("strcat", { return (unsigned char *)__builtin_strcat((char *)dst, (char const *)src); })]]
 [[bind_local_function("strcat")]]
 unsigned char *_mbscat([[nonnull]] unsigned char *__restrict dst,
                        [[nonnull]] unsigned char const *__restrict src);
 
 
-[[wunused, requires_function(_mbschr_l), doc_alias("_mbschr_l")]]
+[[wunused, pure, requires_function(_mbschr_l), doc_alias("_mbschr_l")]]
 unsigned char *_mbschr([[nonnull]] unsigned char const *__restrict haystack, unsigned int needle)
 	[([[nonnull]] unsigned char *__restrict haystack, int needle): unsigned char *]
 	[([[nonnull]] unsigned char const *__restrict haystack, int needle): unsigned char const *]
@@ -110,13 +110,13 @@ unsigned char *_mbschr([[nonnull]] unsigned char const *__restrict haystack, uns
 	return _mbschr_l(haystack, needle, NULL);
 }
 
-[[wunused, requires_function(_mbscmp_l), doc_alias("_mbscmp_l")]]
+[[wunused, pure, requires_function(_mbscmp_l), doc_alias("_mbscmp_l")]]
 int _mbscmp([[nonnull]] unsigned char const *lhs,
             [[nonnull]] unsigned char const *rhs) {
 	return _mbscmp_l(lhs, rhs, NULL);
 }
 
-[[wunused, requires_function(_mbscoll_l), doc_alias("_mbscoll_l")]]
+[[wunused, pure, requires_function(_mbscoll_l), doc_alias("_mbscoll_l")]]
 int _mbscoll([[nonnull]] unsigned char const *lhs,
              [[nonnull]] unsigned char const *rhs) {
 	return _mbscoll_l(lhs, rhs, NULL);
@@ -130,49 +130,49 @@ int _mbscoll([[nonnull]] unsigned char const *lhs,
 }
 
 [[nonnull, nocrt, leaf, alias("strcpy", "_mbscpy")]]
-[if(__has_builtin(__builtin_strcpy) && defined(__LIBC_BIND_CRTBUILTINS)),
-  preferred_extern_inline("strcpy", { return (unsigned char *)__builtin_strcpy((char *)dst, (char const *)src); })]
+[[if(__has_builtin(__builtin_strcpy) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline("strcpy", { return (unsigned char *)__builtin_strcpy((char *)dst, (char const *)src); })]]
 [[bind_local_function("strcpy")]]
 unsigned char *_mbscpy([[nonnull]] unsigned char *__restrict dst,
                        [[nonnull]] unsigned char const *__restrict src);
 
-[[wunused, requires_function(_mbscspn_l), doc_alias("_mbscspn_l")]]
+[[wunused, pure, requires_function(_mbscspn_l), doc_alias("_mbscspn_l")]]
 [[decl_include("<hybrid/typecore.h>")]]
 size_t _mbscspn([[nonnull]] unsigned char const *haystack,
                 [[nonnull]] unsigned char const *reject) {
 	return _mbscspn_l(haystack, reject, NULL);
 }
 
-[[wunused, requires_function(_mbsdec_l), doc_alias("_mbsdec_l")]]
+[[wunused, pure, requires_function(_mbsdec_l), doc_alias("_mbsdec_l")]]
 unsigned char *_mbsdec([[nonnull]] unsigned char const *start,
                        [[nonnull]] unsigned char const *pos) {
 	return _mbsdec_l(start, pos, NULL);
 }
 
-[[wunused, requires_function(_mbsicmp_l), doc_alias("_mbsicmp_l")]]
+[[wunused, pure, requires_function(_mbsicmp_l), doc_alias("_mbsicmp_l")]]
 int _mbsicmp([[nonnull]] unsigned char const *lhs,
              [[nonnull]] unsigned char const *rhs) {
 	return _mbsicmp_l(lhs, rhs, NULL);
 }
 
-[[wunused, requires_function(_mbsicoll_l), doc_alias("_mbsicoll_l")]]
+[[wunused, pure, requires_function(_mbsicoll_l), doc_alias("_mbsicoll_l")]]
 int _mbsicoll([[nonnull]] unsigned char const *lhs,
               [[nonnull]] unsigned char const *rhs) {
 	return _mbsicoll_l(lhs, rhs, NULL);
 }
 
-[[wunused, requires_function(_mbsinc_l), doc_alias("_mbsinc_l")]]
+[[wunused, pure, requires_function(_mbsinc_l), doc_alias("_mbsinc_l")]]
 unsigned char *_mbsinc([[nonnull]] unsigned char const *ptr) {
 	return _mbsinc_l(ptr, NULL);
 }
 
-[[wunused, requires_function(_mbslen_l), doc_alias("_mbslen_l")]]
+[[wunused, pure, requires_function(_mbslen_l), doc_alias("_mbslen_l")]]
 [[decl_include("<hybrid/typecore.h>")]]
 size_t _mbslen([[nonnull]] unsigned char const *str) {
 	return _mbslen_l(str, NULL);
 }
 
-[[wunused, requires_function(_mbsnlen_l), doc_alias("_mbsnlen_l")]]
+[[wunused, pure, requires_function(_mbsnlen_l), doc_alias("_mbsnlen_l")]]
 [[decl_include("<hybrid/typecore.h>")]]
 size_t _mbsnlen([[nonnull]] unsigned char const *str, size_t max_bytes) {
 	return _mbsnlen_l(str, max_bytes, NULL);
@@ -208,7 +208,7 @@ unsigned char *_mbsnbcat([[nonnull]] unsigned char *buf,
 	return _mbsnbcat_l(buf, src, max_bytes, NULL);
 }
 
-[[wunused, requires_function(_mbsnbcmp_l), doc_alias("_mbsnbcmp_l")]]
+[[wunused, pure, requires_function(_mbsnbcmp_l), doc_alias("_mbsnbcmp_l")]]
 [[decl_include("<hybrid/typecore.h>")]]
 int _mbsnbcmp([[nonnull]] unsigned char const *lhs,
               [[nonnull]] unsigned char const *rhs,
@@ -216,7 +216,7 @@ int _mbsnbcmp([[nonnull]] unsigned char const *lhs,
 	return _mbsnbcmp_l(lhs, rhs, max_bytes, NULL);
 }
 
-[[wunused, requires_function(_mbsnbcoll_l), doc_alias("_mbsnbcoll_l")]]
+[[wunused, pure, requires_function(_mbsnbcoll_l), doc_alias("_mbsnbcoll_l")]]
 [[decl_include("<hybrid/typecore.h>")]]
 int _mbsnbcoll([[nonnull]] unsigned char const *lhs,
                [[nonnull]] unsigned char const *rhs,
@@ -224,7 +224,7 @@ int _mbsnbcoll([[nonnull]] unsigned char const *lhs,
 	return _mbsnbcoll_l(lhs, rhs, max_bytes, NULL);
 }
 
-[[wunused, requires_function(_mbsnbcnt_l), doc_alias("_mbsnbcnt_l")]]
+[[wunused, pure, requires_function(_mbsnbcnt_l), doc_alias("_mbsnbcnt_l")]]
 [[decl_include("<hybrid/typecore.h>")]]
 size_t _mbsnbcnt([[nonnull]] unsigned char const *str, size_t max_chars) {
 	return _mbsnbcnt_l(str, max_chars, NULL);
@@ -245,7 +245,7 @@ unsigned char *_mbsnbcpy([[outp(bufsize)]] unsigned char *buf,
 	return _mbsnbcpy_l(buf, src, bufsize, NULL);
 }
 
-[[wunused, requires_function(_mbsnbicmp_l), doc_alias("_mbsnbicmp_l")]]
+[[wunused, pure, requires_function(_mbsnbicmp_l), doc_alias("_mbsnbicmp_l")]]
 [[decl_include("<hybrid/typecore.h>")]]
 int _mbsnbicmp([[nonnull]] unsigned char const *lhs,
                [[nonnull]] unsigned char const *rhs,
@@ -253,7 +253,7 @@ int _mbsnbicmp([[nonnull]] unsigned char const *lhs,
 	return _mbsnbicmp_l(lhs, rhs, max_bytes, NULL);
 }
 
-[[wunused, requires_function(_mbsnbicoll_l), doc_alias("_mbsnbicoll_l")]]
+[[wunused, pure, requires_function(_mbsnbicoll_l), doc_alias("_mbsnbicoll_l")]]
 [[decl_include("<hybrid/typecore.h>")]]
 int _mbsnbicoll([[nonnull]] unsigned char const *lhs,
                 [[nonnull]] unsigned char const *rhs,
@@ -289,13 +289,13 @@ unsigned char *_mbsncat([[nonnull]] unsigned char *buf,
 	return _mbsncat_l(buf, src, max_chars, NULL);
 }
 
-[[wunused, requires_function(_mbsnccnt_l), doc_alias("_mbsnccnt_l")]]
+[[wunused, pure, requires_function(_mbsnccnt_l), doc_alias("_mbsnccnt_l")]]
 [[decl_include("<hybrid/typecore.h>")]]
 size_t _mbsnccnt([[nonnull]] unsigned char const *str, size_t max_bytes) {
 	return _mbsnccnt_l(str, max_bytes, NULL);
 }
 
-[[wunused, requires_function(_mbsncmp_l), doc_alias("_mbsncmp_l")]]
+[[wunused, pure, requires_function(_mbsncmp_l), doc_alias("_mbsncmp_l")]]
 [[decl_include("<hybrid/typecore.h>")]]
 int _mbsncmp([[nonnull]] unsigned char const *lhs,
              [[nonnull]] unsigned char const *rhs,
@@ -307,7 +307,7 @@ int _mbsncmp([[nonnull]] unsigned char const *lhs,
 %#define _mbccmp(lhs, rhs) _mbsncmp(lhs, rhs, 1)
 %[insert:pp_endif]
 
-[[wunused, requires_function(_mbsncoll_l), doc_alias("_mbsncoll_l")]]
+[[wunused, pure, requires_function(_mbsncoll_l), doc_alias("_mbsncoll_l")]]
 [[decl_include("<hybrid/typecore.h>")]]
 int _mbsncoll([[nonnull]] unsigned char const *lhs,
               [[nonnull]] unsigned char const *rhs,
@@ -329,12 +329,12 @@ unsigned char *_mbsncpy([[nonnull]] unsigned char *buf,
 	return _mbsncpy_l(buf, src, max_chars, NULL);
 }
 
-[[wunused, requires_function(_mbsnextc_l), doc_alias("_mbsnextc_l")]]
+[[wunused, pure, requires_function(_mbsnextc_l), doc_alias("_mbsnextc_l")]]
 unsigned int _mbsnextc([[nonnull]] unsigned char const *str) {
 	return _mbsnextc_l(str, NULL);
 }
 
-[[wunused, requires_function(_mbsnicmp_l), doc_alias("_mbsnicmp_l")]]
+[[wunused, pure, requires_function(_mbsnicmp_l), doc_alias("_mbsnicmp_l")]]
 [[decl_include("<hybrid/typecore.h>")]]
 int _mbsnicmp([[nonnull]] unsigned char const *lhs,
               [[nonnull]] unsigned char const *rhs,
@@ -342,7 +342,7 @@ int _mbsnicmp([[nonnull]] unsigned char const *lhs,
 	return _mbsnicmp_l(lhs, rhs, max_chars, NULL);
 }
 
-[[wunused, requires_function(_mbsnicoll_l), doc_alias("_mbsnicoll_l")]]
+[[wunused, pure, requires_function(_mbsnicoll_l), doc_alias("_mbsnicoll_l")]]
 [[decl_include("<hybrid/typecore.h>")]]
 int _mbsnicoll([[nonnull]] unsigned char const *lhs,
                [[nonnull]] unsigned char const *rhs,
@@ -350,7 +350,7 @@ int _mbsnicoll([[nonnull]] unsigned char const *lhs,
 	return _mbsnicoll_l(lhs, rhs, max_chars, NULL);
 }
 
-[[wunused, requires_function(_mbsninc_l), doc_alias("_mbsninc_l")]]
+[[wunused, pure, requires_function(_mbsninc_l), doc_alias("_mbsninc_l")]]
 [[decl_include("<hybrid/typecore.h>")]]
 unsigned char *_mbsninc([[nonnull]] unsigned char const *str, size_t max_chars) {
 	return _mbsninc_l(str, max_chars, NULL);
@@ -370,7 +370,7 @@ unsigned char *_mbsnset([[nonnull]] unsigned char *buf,
 	return _mbsnset_l(buf, ch, max_chars, NULL);
 }
 
-[[wunused, requires_function(_mbspbrk_l), doc_alias("_mbspbrk_l")]]
+[[wunused, pure, requires_function(_mbspbrk_l), doc_alias("_mbspbrk_l")]]
 unsigned char *_mbspbrk([[nonnull]] unsigned char const *haystack, [[nonnull]] unsigned char const *accept)
 	[([[nonnull]] unsigned char *haystack, [[nonnull]] unsigned char const *accept): unsigned char *]
 	[([[nonnull]] unsigned char const *haystack, [[nonnull]] unsigned char const *accept): unsigned char const *]
@@ -378,7 +378,7 @@ unsigned char *_mbspbrk([[nonnull]] unsigned char const *haystack, [[nonnull]] u
 	return _mbspbrk_l(haystack, accept, NULL);
 }
 
-[[wunused, requires_function(_mbsrchr_l), doc_alias("_mbsrchr_l")]]
+[[wunused, pure, requires_function(_mbsrchr_l), doc_alias("_mbsrchr_l")]]
 unsigned char *_mbsrchr([[nonnull]] unsigned char const *haystack, unsigned int needle)
 	[([[nonnull]] unsigned char *__restrict haystack, unsigned int needle): unsigned char *]
 	[([[nonnull]] unsigned char const *__restrict haystack, unsigned int needle): unsigned char const *]
@@ -403,20 +403,20 @@ unsigned char *_mbsset([[nonnull]] unsigned char *buf, unsigned int ch) {
 	return _mbsset_l(buf, ch, NULL);
 }
 
-[[wunused, requires_function(_mbsspn_l), doc_alias("_mbsspn_l")]]
+[[wunused, pure, requires_function(_mbsspn_l), doc_alias("_mbsspn_l")]]
 [[decl_include("<hybrid/typecore.h>")]]
 size_t _mbsspn([[nonnull]] unsigned char const *haystack,
                [[nonnull]] unsigned char const *accept) {
 	return _mbsspn_l(haystack, accept, NULL);
 }
 
-[[wunused, requires_function(_mbsspnp_l), doc_alias("_mbsspnp_l")]]
+[[wunused, pure, requires_function(_mbsspnp_l), doc_alias("_mbsspnp_l")]]
 unsigned char *_mbsspnp([[nonnull]] unsigned char const *haystack,
                         [[nonnull]] unsigned char const *accept) {
 	return _mbsspnp_l(haystack, accept, NULL);
 }
 
-[[wunused, requires_function(_mbsstr_l), doc_alias("_mbsstr_l")]]
+[[wunused, pure, requires_function(_mbsstr_l), doc_alias("_mbsstr_l")]]
 unsigned char *_mbsstr([[nonnull]] unsigned char const *haystack, [[nonnull]] unsigned char const *needle)
 	[([[nonnull]] unsigned char *haystack, [[nonnull]] unsigned char const *needle): [[nullable]] unsigned char *]
 	[([[nonnull]] unsigned char const *haystack, [[nonnull]] unsigned char const *needle): [[nullable]] unsigned char const *]
@@ -443,7 +443,7 @@ unsigned char *_mbstok_s([[nullable]] unsigned char *str,
 	return _mbsupr_s_l(buf, true_bufsize, NULL);
 }
 
-[[wunused, requires_function(_mbclen_l), doc_alias("_mbclen_l")]]
+[[wunused, pure, requires_function(_mbclen_l), doc_alias("_mbclen_l")]]
 [[decl_include("<hybrid/typecore.h>")]]
 size_t _mbclen([[nonnull]] unsigned char const *str) {
 	return _mbclen_l(str, NULL);
@@ -467,138 +467,133 @@ void _mbccpy([[nonnull]] unsigned char *dst,
 /* Character-traits functions                                           */
 /************************************************************************/
 
-[[wunused, requires_function(_ismbcalnum_l), doc_alias("_ismbcalnum_l")]]
+[[wunused, pure, requires_function(_ismbcalnum_l), doc_alias("_ismbcalnum_l")]]
 int _ismbcalnum(unsigned int ch) {
 	return _ismbcalnum_l(ch, NULL);
 }
 
-[[wunused, requires_function(_ismbcalpha_l), doc_alias("_ismbcalpha_l")]]
+[[wunused, pure, requires_function(_ismbcalpha_l), doc_alias("_ismbcalpha_l")]]
 int _ismbcalpha(unsigned int ch) {
 	return _ismbcalpha_l(ch, NULL);
 }
 
-[[wunused, requires_function(_ismbcdigit_l), doc_alias("_ismbcdigit_l")]]
+[[wunused, pure, requires_function(_ismbcdigit_l), doc_alias("_ismbcdigit_l")]]
 int _ismbcdigit(unsigned int ch) {
 	return _ismbcdigit_l(ch, NULL);
 }
 
-[[wunused, requires_function(_ismbcgraph_l), doc_alias("_ismbcgraph_l")]]
+[[wunused, pure, requires_function(_ismbcgraph_l), doc_alias("_ismbcgraph_l")]]
 int _ismbcgraph(unsigned int ch) {
 	return _ismbcgraph_l(ch, NULL);
 }
 
-[[wunused, requires_function(_ismbclegal_l), doc_alias("_ismbclegal_l")]]
+[[wunused, pure, requires_function(_ismbclegal_l), doc_alias("_ismbclegal_l")]]
 int _ismbclegal(unsigned int ch) {
 	return _ismbclegal_l(ch, NULL);
 }
 
-[[wunused, requires_function(_ismbclower_l), doc_alias("_ismbclower_l")]]
+[[wunused, pure, requires_function(_ismbclower_l), doc_alias("_ismbclower_l")]]
 int _ismbclower(unsigned int ch) {
 	return _ismbclower_l(ch, NULL);
 }
 
-[[wunused, requires_function(_ismbcprint_l), doc_alias("_ismbcprint_l")]]
+[[wunused, pure, requires_function(_ismbcprint_l), doc_alias("_ismbcprint_l")]]
 int _ismbcprint(unsigned int ch) {
 	return _ismbcprint_l(ch, NULL);
 }
 
-[[wunused, requires_function(_ismbcpunct_l), doc_alias("_ismbcpunct_l")]]
+[[wunused, pure, requires_function(_ismbcpunct_l), doc_alias("_ismbcpunct_l")]]
 int _ismbcpunct(unsigned int ch) {
 	return _ismbcpunct_l(ch, NULL);
 }
 
-[[wunused, requires_function(_ismbcblank_l), doc_alias("_ismbcblank_l")]]
+[[wunused, pure, requires_function(_ismbcblank_l), doc_alias("_ismbcblank_l")]]
 int _ismbcblank(unsigned int ch) {
 	return _ismbcblank_l(ch, NULL);
 }
 
-[[wunused, requires_function(_ismbcspace_l), doc_alias("_ismbcspace_l")]]
+[[wunused, pure, requires_function(_ismbcspace_l), doc_alias("_ismbcspace_l")]]
 int _ismbcspace(unsigned int ch) {
 	return _ismbcspace_l(ch, NULL);
 }
 
-[[wunused, requires_function(_ismbcupper_l), doc_alias("_ismbcupper_l")]]
+[[wunused, pure, requires_function(_ismbcupper_l), doc_alias("_ismbcupper_l")]]
 int _ismbcupper(unsigned int ch) {
 	return _ismbcupper_l(ch, NULL);
 }
 
-[[wunused, requires_function(_mbctolower_l), doc_alias("_mbctolower_l")]]
+[[wunused, pure, requires_function(_mbctolower_l), doc_alias("_mbctolower_l")]]
 unsigned int _mbctolower(unsigned int ch) {
 	return _mbctolower_l(ch, NULL);
 }
 
-[[wunused, requires_function(_mbctoupper_l), doc_alias("_mbctoupper_l")]]
+[[wunused, pure, requires_function(_mbctoupper_l), doc_alias("_mbctoupper_l")]]
 unsigned int _mbctoupper(unsigned int ch) {
 	return _mbctoupper_l(ch, NULL);
 }
 
-[[wunused, requires_function(_ismbchira_l), doc_alias("_ismbchira_l")]]
+[[wunused, pure, requires_function(_ismbchira_l), doc_alias("_ismbchira_l")]]
 int _ismbchira(unsigned int ch) {
 	return _ismbchira_l(ch, NULL);
 }
 
-[[wunused, requires_function(_ismbckata_l), doc_alias("_ismbckata_l")]]
+[[wunused, pure, requires_function(_ismbckata_l), doc_alias("_ismbckata_l")]]
 int _ismbckata(unsigned int ch) {
 	return _ismbckata_l(ch, NULL);
 }
 
-[[wunused, requires_function(_ismbcsymbol_l), doc_alias("_ismbcsymbol_l")]]
+[[wunused, pure, requires_function(_ismbcsymbol_l), doc_alias("_ismbcsymbol_l")]]
 int _ismbcsymbol(unsigned int ch) {
 	return _ismbcsymbol_l(ch, NULL);
 }
 
-[[wunused, requires_function(_ismbcl0_l), doc_alias("_ismbcl0_l")]]
+[[wunused, pure, requires_function(_ismbcl0_l), doc_alias("_ismbcl0_l")]]
 int _ismbcl0(unsigned int ch) {
 	return _ismbcl0_l(ch, NULL);
 }
 
-[[wunused, requires_function(_ismbcl1_l), doc_alias("_ismbcl1_l")]]
+[[wunused, pure, requires_function(_ismbcl1_l), doc_alias("_ismbcl1_l")]]
 int _ismbcl1(unsigned int ch) {
 	return _ismbcl1_l(ch, NULL);
 }
 
-[[wunused, requires_function(_ismbcl2_l), doc_alias("_ismbcl2_l")]]
+[[wunused, pure, requires_function(_ismbcl2_l), doc_alias("_ismbcl2_l")]]
 int _ismbcl2(unsigned int ch) {
 	return _ismbcl2_l(ch, NULL);
 }
 
-[[wunused, requires_function(_mbcjistojms_l), doc_alias("_mbcjistojms_l")]]
+[[wunused, pure, requires_function(_mbcjistojms_l), doc_alias("_mbcjistojms_l")]]
 unsigned int _mbcjistojms(unsigned int ch) {
 	return _mbcjistojms_l(ch, NULL);
 }
 
-[[wunused, requires_function(_mbcjmstojis_l), doc_alias("_mbcjmstojis_l")]]
+[[wunused, pure, requires_function(_mbcjmstojis_l), doc_alias("_mbcjmstojis_l")]]
 unsigned int _mbcjmstojis(unsigned int ch) {
 	return _mbcjmstojis_l(ch, NULL);
 }
 
-[[wunused, requires_function(_mbctohira_l), doc_alias("_mbctohira_l")]]
+[[wunused, pure, requires_function(_mbctohira_l), doc_alias("_mbctohira_l")]]
 unsigned int _mbctohira(unsigned int ch) {
 	return _mbctohira_l(ch, NULL);
 }
 
-[[wunused, requires_function(_mbctokata_l), doc_alias("_mbctokata_l")]]
+[[wunused, pure, requires_function(_mbctokata_l), doc_alias("_mbctokata_l")]]
 unsigned int _mbctokata(unsigned int ch) {
 	return _mbctokata_l(ch, NULL);
 }
 
-[[wunused, requires_function(_ismbblead_l), doc_alias("_ismbblead_l")]]
-int _ismbblead(unsigned int ch) {
-	return _ismbblead_l(ch, NULL);
-}
+%[insert:extern(_ismbblead)]  /* From <mbctype.h> */
+%[insert:extern(_ismbbtrail)] /* From <mbctype.h> */
 
-[[wunused, requires_function(_ismbbtrail_l), doc_alias("_ismbbtrail_l")]]
-int _ismbbtrail(unsigned int ch) {
-	return _ismbbtrail_l(ch, NULL);
-}
-
-[[wunused, requires_function(_ismbslead_l), doc_alias("_ismbslead_l")]]
+[[guard]] /* Also declared in <mbctype.h> */
+[[wunused, pure, requires_function(_ismbslead_l), doc_alias("_ismbslead_l")]]
 int _ismbslead([[nonnull]] unsigned char const *str,
                [[nonnull]] unsigned char const *pos) {
 	return _ismbslead_l(str, pos, NULL);
 }
 
-[[wunused, requires_function(_ismbstrail_l), doc_alias("_ismbstrail_l")]]
+[[guard]] /* Also declared in <mbctype.h> */
+[[wunused, pure, requires_function(_ismbstrail_l), doc_alias("_ismbstrail_l")]]
 int _ismbstrail([[nonnull]] unsigned char const *str,
                 [[nonnull]] unsigned char const *pos) {
 	return _ismbstrail_l(str, pos, NULL);
@@ -693,7 +688,7 @@ unsigned char *_mbsnbcpy_l([[outp(bufsize)]] unsigned char *buf,
 	return buf;
 }
 
-[[wunused, impl_include("<hybrid/typecore.h>")]]
+[[wunused, pure, impl_include("<hybrid/typecore.h>")]]
 [[requires_function(_ismbblead_l)]]
 unsigned char *_mbschr_l([[nonnull]] unsigned char const *__restrict haystack, unsigned int needle, $locale_t locale)
 	[([[nonnull]] unsigned char *__restrict haystack, int needle, $locale_t locale): unsigned char *]
@@ -714,7 +709,7 @@ unsigned char *_mbschr_l([[nonnull]] unsigned char const *__restrict haystack, u
 	return NULL;
 }
 
-[[wunused, requires_function(_mbscmp_l)]]
+[[wunused, pure, requires_function(_mbscmp_l)]]
 int _mbscoll_l([[nonnull]] unsigned char const *lhs,
                [[nonnull]] unsigned char const *rhs,
                $locale_t locale) {
@@ -722,7 +717,7 @@ int _mbscoll_l([[nonnull]] unsigned char const *lhs,
 	return _mbscmp_l(lhs, rhs, locale);
 }
 
-[[wunused, requires_function(_mbsicmp_l)]]
+[[wunused, pure, requires_function(_mbsicmp_l)]]
 int _mbsicoll_l([[nonnull]] unsigned char const *lhs,
                 [[nonnull]] unsigned char const *rhs,
                 $locale_t locale) {
@@ -730,7 +725,7 @@ int _mbsicoll_l([[nonnull]] unsigned char const *lhs,
 	return _mbscmp_l(lhs, rhs, locale);
 }
 
-[[wunused, requires_function(_mbsncmp_l)]]
+[[wunused, pure, requires_function(_mbsncmp_l)]]
 [[decl_include("<hybrid/typecore.h>")]]
 int _mbsncoll_l([[nonnull]] unsigned char const *lhs,
                 [[nonnull]] unsigned char const *rhs,
@@ -739,7 +734,7 @@ int _mbsncoll_l([[nonnull]] unsigned char const *lhs,
 	return _mbsncmp_l(lhs, rhs, max_chars, locale);
 }
 
-[[wunused, requires_function(_mbsnicmp_l)]]
+[[wunused, pure, requires_function(_mbsnicmp_l)]]
 [[decl_include("<hybrid/typecore.h>")]]
 int _mbsnicoll_l([[nonnull]] unsigned char const *lhs,
                  [[nonnull]] unsigned char const *rhs,
@@ -748,7 +743,7 @@ int _mbsnicoll_l([[nonnull]] unsigned char const *lhs,
 	return _mbsnicmp_l(lhs, rhs, max_chars, locale);
 }
 
-[[wunused, requires_function(_mbsnbcmp_l)]]
+[[wunused, pure, requires_function(_mbsnbcmp_l)]]
 [[decl_include("<hybrid/typecore.h>")]]
 int _mbsnbcoll_l([[nonnull]] unsigned char const *lhs,
                  [[nonnull]] unsigned char const *rhs,
@@ -757,7 +752,7 @@ int _mbsnbcoll_l([[nonnull]] unsigned char const *lhs,
 	return _mbsnbcmp_l(lhs, rhs, max_bytes, locale);
 }
 
-[[wunused, requires_function(_mbsnbicmp_l)]]
+[[wunused, pure, requires_function(_mbsnbicmp_l)]]
 [[decl_include("<hybrid/typecore.h>")]]
 int _mbsnbicoll_l([[nonnull]] unsigned char const *lhs,
                   [[nonnull]] unsigned char const *rhs,
@@ -818,7 +813,7 @@ do_1byte_lower:
 	return buf;
 }
 
-[[wunused, nonnull, requires_function(_ismbblead_l)]]
+[[wunused, pure, nonnull, requires_function(_ismbblead_l)]]
 unsigned char *_mbsinc_l([[nonnull]] unsigned char const *ptr, $locale_t locale) {
 	if (_ismbblead_l(*ptr++, locale)) {
 		if (*ptr)
@@ -828,7 +823,7 @@ unsigned char *_mbsinc_l([[nonnull]] unsigned char const *ptr, $locale_t locale)
 }
 
 @@Returns pointer to `max_chars'th character of `str' (or strend() when `max_chars > _mbslen_l(str)')
-[[wunused, decl_include("<hybrid/typecore.h>")]]
+[[wunused, pure, decl_include("<hybrid/typecore.h>")]]
 [[requires_function(_mbsnbcnt_l)]]
 unsigned char *_mbsninc_l([[nullable]] unsigned char const *str,
                           size_t max_chars, $locale_t locale) {
@@ -837,7 +832,7 @@ unsigned char *_mbsninc_l([[nullable]] unsigned char const *str,
 	return (unsigned char *)str;
 }
 
-[[wunused, nullable, requires_function(_mbsinc_l)]]
+[[wunused, pure, nullable, requires_function(_mbsinc_l)]]
 unsigned char *_mbsdec_l([[nonnull]] unsigned char const *start,
                          [[nonnull]] unsigned char const *pos,
                          $locale_t locale) {
@@ -855,7 +850,7 @@ unsigned char *_mbsdec_l([[nonnull]] unsigned char const *start,
 	return (unsigned char *)iter;
 }
 
-[[wunused, decl_include("<hybrid/typecore.h>")]]
+[[wunused, pure, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[requires_function(_ismbblead_l, _mbschr_l)]]
 size_t _mbscspn_l([[nonnull]] unsigned char const *haystack,
@@ -874,7 +869,7 @@ size_t _mbscspn_l([[nonnull]] unsigned char const *haystack,
 	return (size_t)(iter - haystack);
 }
 
-[[wunused, decl_include("<hybrid/typecore.h>")]]
+[[wunused, pure, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[requires_function(_ismbblead_l)]]
 size_t _mbslen_l([[nonnull]] unsigned char const *str, $locale_t locale) {
@@ -889,7 +884,7 @@ size_t _mbslen_l([[nonnull]] unsigned char const *str, $locale_t locale) {
 	return result;
 }
 
-[[wunused, decl_include("<hybrid/typecore.h>")]]
+[[wunused, pure, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[requires_function(_ismbblead_l)]]
 size_t _mbsnlen_l([[nonnull]] unsigned char const *str,
@@ -969,7 +964,7 @@ unsigned char *_mbsnbcat_l([[nonnull]] unsigned char *buf,
 }
 
 @@Returns # of characters in (up to) first `max_bytes' of `str'.
-[[wunused, decl_include("<hybrid/typecore.h>")]]
+[[wunused, pure, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[requires_function(_ismbblead_l)]]
 size_t _mbsnccnt_l([[nonnull]] unsigned char const *str,
@@ -997,7 +992,7 @@ size_t _mbsnccnt_l([[nonnull]] unsigned char const *str,
 }
 
 @@Returns byte-offset from `str' after skipping `max_chars' characters.
-[[wunused, decl_include("<hybrid/typecore.h>")]]
+[[wunused, pure, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[requires_function(_ismbblead_l)]]
 size_t _mbsnbcnt_l([[nonnull]] unsigned char const *str,
@@ -1017,7 +1012,7 @@ size_t _mbsnbcnt_l([[nonnull]] unsigned char const *str,
 	return (size_t)(iter - str);
 }
 
-[[wunused, impl_include("<hybrid/typecore.h>")]]
+[[wunused, pure, impl_include("<hybrid/typecore.h>")]]
 [[requires_function(_ismbblead_l)]]
 int _mbscmp_l([[nonnull]] unsigned char const *lhs,
               [[nonnull]] unsigned char const *rhs, $locale_t locale) {
@@ -1037,7 +1032,7 @@ int _mbscmp_l([[nonnull]] unsigned char const *lhs,
 	return 0;
 }
 
-[[wunused, impl_include("<hybrid/typecore.h>")]]
+[[wunused, pure, impl_include("<hybrid/typecore.h>")]]
 [[requires_function(_ismbblead_l, _mbctolower_l)]]
 int _mbsicmp_l([[nonnull]] unsigned char const *lhs,
                [[nonnull]] unsigned char const *rhs, $locale_t locale) {
@@ -1061,7 +1056,7 @@ int _mbsicmp_l([[nonnull]] unsigned char const *lhs,
 	return 0;
 }
 
-[[wunused, decl_include("<hybrid/typecore.h>")]]
+[[wunused, pure, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[requires_function(_ismbblead_l)]]
 int _mbsncmp_l([[nonnull]] unsigned char const *lhs,
@@ -1083,7 +1078,7 @@ int _mbsncmp_l([[nonnull]] unsigned char const *lhs,
 	return 0;
 }
 
-[[wunused, decl_include("<hybrid/typecore.h>")]]
+[[wunused, pure, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[requires_function(_ismbblead_l, _mbctolower_l)]]
 int _mbsnicmp_l([[nonnull]] unsigned char const *lhs,
@@ -1109,7 +1104,7 @@ int _mbsnicmp_l([[nonnull]] unsigned char const *lhs,
 	return 0;
 }
 
-[[wunused, decl_include("<hybrid/typecore.h>")]]
+[[wunused, pure, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[requires_function(_ismbblead_l)]]
 int _mbsnbcmp_l([[nonnull]] unsigned char const *lhs,
@@ -1137,7 +1132,7 @@ int _mbsnbcmp_l([[nonnull]] unsigned char const *lhs,
 	return 0;
 }
 
-[[wunused, decl_include("<hybrid/typecore.h>")]]
+[[wunused, pure, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[requires_function(_ismbblead_l, _mbctolower_l)]]
 int _mbsnbicmp_l([[nonnull]] unsigned char const *lhs,
@@ -1169,7 +1164,7 @@ int _mbsnbicmp_l([[nonnull]] unsigned char const *lhs,
 	return 0;
 }
 
-[[wunused, decl_include("<hybrid/typecore.h>")]]
+[[wunused, pure, decl_include("<hybrid/typecore.h>")]]
 [[requires_function(_ismbblead_l)]]
 unsigned int _mbsnextc_l([[nonnull]] unsigned char const *str,
                          $locale_t locale) {
@@ -1179,7 +1174,7 @@ unsigned int _mbsnextc_l([[nonnull]] unsigned char const *str,
 	return result;
 }
 
-[[wunused, impl_include("<hybrid/typecore.h>")]]
+[[wunused, pure, impl_include("<hybrid/typecore.h>")]]
 [[requires_function(_ismbblead_l)]]
 unsigned char *_mbspbrk_l([[nonnull]] unsigned char const *haystack, [[nonnull]] unsigned char const *accept, $locale_t locale)
 	[([[nonnull]] unsigned char *haystack, [[nonnull]] unsigned char const *accept, $locale_t locale): unsigned char *]
@@ -1208,7 +1203,7 @@ unsigned char *_mbspbrk_l([[nonnull]] unsigned char const *haystack, [[nonnull]]
 	return NULL;
 }
 
-[[wunused, impl_include("<hybrid/typecore.h>")]]
+[[wunused, pure, impl_include("<hybrid/typecore.h>")]]
 [[requires_function(_ismbblead_l)]]
 unsigned char *_mbsrchr_l([[nonnull]] unsigned char const *haystack, unsigned int needle, $locale_t locale)
 	[([[nonnull]] unsigned char *__restrict haystack, unsigned int needle, $locale_t locale): unsigned char *]
@@ -1316,7 +1311,7 @@ unsigned char *_mbsnbset_l([[inoutp(max_bytes)]] unsigned char *buf, unsigned in
 }
 
 @@Returs a byte-offset
-[[wunused, decl_include("<hybrid/typecore.h>")]]
+[[wunused, pure, decl_include("<hybrid/typecore.h>")]]
 [[requires_function(_ismbblead_l, _mbschr_l)]]
 size_t _mbsspn_l([[nonnull]] unsigned char const *haystack,
                  [[nonnull]] unsigned char const *accept,
@@ -1338,7 +1333,7 @@ size_t _mbsspn_l([[nonnull]] unsigned char const *haystack,
 	return (size_t)(iter - haystack);
 }
 
-[[wunused, nullable, requires_function(_mbsspn_l)]]
+[[wunused, pure, nullable, requires_function(_mbsspn_l)]]
 unsigned char *_mbsspnp_l([[nonnull]] unsigned char const *haystack,
                           [[nonnull]] unsigned char const *accept,
                           $locale_t locale) {
@@ -1348,7 +1343,7 @@ unsigned char *_mbsspnp_l([[nonnull]] unsigned char const *haystack,
 	return (unsigned char *)haystack;
 }
 
-[[wunused, requires_function(_ismbblead_l, _mbschr_l, _mbscmp_l, strlen, strcmpz)]]
+[[wunused, pure, requires_function(_ismbblead_l, _mbschr_l, _mbscmp_l, strlen, strcmpz)]]
 unsigned char *_mbsstr_l([[nonnull]] unsigned char const *haystack, [[nonnull]] unsigned char const *needle, $locale_t locale)
 	[([[nonnull]] unsigned char *haystack, [[nonnull]] unsigned char const *needle, $locale_t locale): [[nullable]] unsigned char *]
 	[([[nonnull]] unsigned char const *haystack, [[nonnull]] unsigned char const *needle, $locale_t locale): [[nullable]] unsigned char const *]
@@ -1414,7 +1409,7 @@ unsigned char *_mbstok_s_l([[nullable]] unsigned char *str,
 	return str;
 }
 
-[[wunused, decl_include("<hybrid/typecore.h>")]]
+[[wunused, pure, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[requires_function(_ismbblead_l)]]
 size_t _mbclen_l([[nonnull]] unsigned char const *str, $locale_t locale) {
@@ -1599,7 +1594,8 @@ size_t _mbclen_l([[nonnull]] unsigned char const *str, $locale_t locale) {
 /************************************************************************/
 
 
-[[wunused, requires_function(_ismbblead_l)]]
+[[guard]] /* Also declared in <mbctype.h> */
+[[wunused, pure, requires_function(_ismbblead_l)]]
 int _ismbslead_l([[nonnull]] unsigned char const *str,
                  [[nonnull]] unsigned char const *pos,
                  $locale_t locale) {
@@ -1618,7 +1614,8 @@ int _ismbslead_l([[nonnull]] unsigned char const *str,
 	return 0;
 }
 
-[[wunused, requires_function(_ismbblead_l)]]
+[[guard]] /* Also declared in <mbctype.h> */
+[[wunused, pure, requires_function(_ismbblead_l)]]
 int _ismbstrail_l([[nonnull]] unsigned char const *str,
                   [[nonnull]] unsigned char const *pos,
                   $locale_t locale) {
@@ -1637,118 +1634,399 @@ int _ismbstrail_l([[nonnull]] unsigned char const *str,
 	return 0;
 }
 
-[[wunused, decl_include("<hybrid/typecore.h>")]]
-int _mbsbtype_l([[nonnull]] unsigned char const *str,
-                size_t pos, $locale_t locale); /* TODO */
+@@>> _mbbtype(3), _mbbtype_l(3)
+@@Used for iterating through string bytes to determine byte types. (s.a. `_mbsbtype_l(3)')
+@@@param: ch: Should actually be a `unsigned char'
+@@@param: ctype: One of:
+@@  - `_MBC_LEAD' -> returns:
+@@    - if `_ismbbtrail_l(ch, locale)' -> `_MBC_TRAIL'
+@@    - else -> `_MBC_ILLEGAL'
+@@  - all other values -> returns:
+@@    - if `_ismbblead_l(ch, locale)' -> `_MBC_LEAD'
+@@    - if `_ismbbprint_l(ch, locale)' -> `_MBC_SINGLE'
+@@    - else -> `_MBC_ILLEGAL'
+[[wunused, pure]]
+[[requires_function(_ismbbtrail_l, _ismbblead_l, _ismbbprint_l)]]
+int _mbbtype_l(unsigned char ch, int ctype, $locale_t locale) {
+	if (ctype == _MBC_LEAD)
+		return _ismbbtrail_l(ch, locale) ? _MBC_TRAIL : _MBC_ILLEGAL;
+	if (_ismbblead_l(ch, locale))
+		return _MBC_LEAD;
+	if (_ismbbprint_l(ch, locale))
+		return _MBC_SINGLE;
+	return _MBC_ILLEGAL;
+}
 
-[[wunused]]
+@@>> _mbsbtype(3), _mbsbtype_l(3)
+@@Returns the type (one of `_MBC_*' from `<mbctype.h>')
+@@of the byte at `str[byte_index]'. If that byte is out
+@@of bounds, return `_MBC_ILLEGAL'
+[[wunused, pure, decl_include("<hybrid/typecore.h>")]]
+[[requires_function(_mbbtype_l)]]
+int _mbsbtype_l([[nonnull]] unsigned char const *str,
+                size_t byte_index, $locale_t locale) {
+	int result = _MBC_ILLEGAL;
+	for (;;) {
+		unsigned char ch = *str;
+		if unlikely(ch == 0)
+			return _MBC_ILLEGAL;
+		result = _mbbtype_l(ch, result, locale);
+		if (!byte_index)
+			break;
+		--byte_index;
+		++str;
+	}
+	return result;
+}
+
+[[pure, wunused, requires_function(_ismbblead_l, _ismbbtrail_l)]]
+int _ismbclegal_l(unsigned int ch, $locale_t locale) {
+	if (!_ismbblead_l((ch >> 8) & 0xff, locale))
+		return 0;
+	if (!_ismbbtrail_l(ch & 0xff, locale))
+		return 0;
+	return 1;
+}
+
+[[pure, wunused]]
+[[requires(($has_function(_mbctouni_l, _unitombc_l, __unicode_descriptor)) ||
+           ($has_function(_get_mbbtype_l) && (defined(__CRT_HAVE__mbcasemap) || defined(__CRT_HAVE___p__mbcasemap))))]]
+[[impl_include("<libc/template/mbcasemap.h>", "<libc/unicode.h>")]]
+unsigned int _mbctolower_l(unsigned int ch, $locale_t locale) {
+@@pp_if $has_function(_mbctouni_l, _unitombc_l, __unicode_descriptor)@@
+	char32_t uni;
+	uni = _mbctouni_l(ch, locale);
+	uni = __libc_unicode_tolower(uni);
+	return _unitombc_l(ch, locale);
+@@pp_else@@
+	if (ch <= 0xff) {
+		if (_get_mbbtype_l(ch, locale) & _SBUP)
+			ch = __LOCAL__mbcasemap[(unsigned char)ch];
+	}
+	return ch;
+@@pp_endif@@
+}
+
+[[pure, wunused, impl_include("<libc/template/mbcasemap.h>", "<libc/unicode.h>")]]
+[[requires(($has_function(_mbctouni_l, _unitombc_l, __unicode_descriptor)) ||
+           ($has_function(_get_mbbtype_l) && (defined(__CRT_HAVE__mbcasemap) || defined(__CRT_HAVE___p__mbcasemap))))]]
+unsigned int _mbctoupper_l(unsigned int ch, $locale_t locale) {
+@@pp_if $has_function(_mbctouni_l, _unitombc_l, __unicode_descriptor)@@
+	char32_t uni;
+	uni = _mbctouni_l(ch, locale);
+	uni = __libc_unicode_toupper(uni);
+	return _unitombc_l(ch, locale);
+@@pp_else@@
+	if (ch <= 0xff) {
+		if (_get_mbbtype_l(ch, locale) & _SBLOW)
+			ch = __LOCAL__mbcasemap[(unsigned char)ch];
+	}
+	return ch;
+@@pp_endif@@
+}
+
+
+[[pure, wunused, impl_include("<libc/unicode.h>")]]
+[[requires($has_function(_mbctouni_l, __unicode_descriptor) || $has_function(_ismbbalnum_l))]]
+int _ismbcalnum_l(unsigned int ch, $locale_t locale) {
+@@pp_if $has_function(_mbctouni_l, __unicode_descriptor)@@
+	char32_t uni = _mbctouni_l(ch, locale);
+	return __libc_unicode_isalnum(uni);
+@@pp_else@@
+	if (ch <= 0xff)
+		return _ismbbalnum_l(ch, locale);
+	return 0;
+@@pp_endif@@
+}
+
+[[pure, wunused, impl_include("<libc/unicode.h>")]]
+[[requires($has_function(_mbctouni_l, __unicode_descriptor) || $has_function(_ismbbalpha_l))]]
+int _ismbcalpha_l(unsigned int ch, $locale_t locale) {
+@@pp_if $has_function(_mbctouni_l, __unicode_descriptor)@@
+	char32_t uni = _mbctouni_l(ch, locale);
+	return __libc_unicode_isalpha(uni);
+@@pp_else@@
+	if (ch <= 0xff)
+		return _ismbbalpha_l(ch, locale);
+	return 0;
+@@pp_endif@@
+}
+
+[[pure, wunused, impl_include("<libc/unicode.h>")]]
+[[requires($has_function(_mbctouni_l, __unicode_descriptor) || $has_function(isdigit_l))]]
+int _ismbcdigit_l(unsigned int ch, $locale_t locale) {
+@@pp_if $has_function(_mbctouni_l, __unicode_descriptor)@@
+	char32_t uni = _mbctouni_l(ch, locale);
+	return __libc_unicode_isdigit(uni);
+@@pp_else@@
+	if (ch <= 0xff)
+		return isdigit_l(ch, locale);
+	return 0;
+@@pp_endif@@
+}
+
+[[pure, wunused, impl_include("<libc/unicode.h>")]]
+[[requires($has_function(_mbctouni_l, __unicode_descriptor) || $has_function(_ismbbgraph_l))]]
+int _ismbcgraph_l(unsigned int ch, $locale_t locale) {
+@@pp_if $has_function(_mbctouni_l, __unicode_descriptor)@@
+	char32_t uni = _mbctouni_l(ch, locale);
+	return __libc_unicode_isgraph(uni);
+@@pp_else@@
+	if (ch <= 0xff)
+		return _ismbbgraph_l(ch, locale);
+	return 0;
+@@pp_endif@@
+}
+
+[[pure, wunused, impl_include("<libc/unicode.h>")]]
+[[requires($has_function(_mbctouni_l, __unicode_descriptor) || $has_function(_get_mbbtype_l))]]
+int _ismbclower_l(unsigned int ch, $locale_t locale) {
+@@pp_if $has_function(_mbctouni_l, __unicode_descriptor)@@
+	char32_t uni = _mbctouni_l(ch, locale);
+	return __libc_unicode_islower(uni);
+@@pp_else@@
+	if (ch <= 0xff)
+		return _get_mbbtype_l(ch, locale) & _SBLOW;
+	return 0;
+@@pp_endif@@
+}
+
+[[pure, wunused, impl_include("<libc/unicode.h>")]]
+[[requires($has_function(_mbctouni_l, __unicode_descriptor) || $has_function(_get_mbbtype_l))]]
+int _ismbcupper_l(unsigned int ch, $locale_t locale) {
+@@pp_if $has_function(_mbctouni_l, __unicode_descriptor)@@
+	char32_t uni = _mbctouni_l(ch, locale);
+	return __libc_unicode_isupper(uni);
+@@pp_else@@
+	if (ch <= 0xff)
+		return _get_mbbtype_l(ch, locale) & _SBUP;
+	return 0;
+@@pp_endif@@
+}
+
+[[pure, wunused, impl_include("<libc/unicode.h>")]]
+[[requires($has_function(_mbctouni_l, __unicode_descriptor) || $has_function(_ismbbprint_l))]]
+int _ismbcprint_l(unsigned int ch, $locale_t locale) {
+@@pp_if $has_function(_mbctouni_l, __unicode_descriptor)@@
+	char32_t uni = _mbctouni_l(ch, locale);
+	return __libc_unicode_isprint(uni);
+@@pp_else@@
+	if (ch <= 0xff)
+		return _ismbbprint_l(ch, locale);
+	return 0;
+@@pp_endif@@
+}
+
+[[pure, wunused, impl_include("<libc/unicode.h>")]]
+[[requires($has_function(_mbctouni_l, __unicode_descriptor) || $has_function(_ismbbpunct_l))]]
+int _ismbcpunct_l(unsigned int ch, $locale_t locale) {
+@@pp_if $has_function(_mbctouni_l, __unicode_descriptor)@@
+	char32_t uni = _mbctouni_l(ch, locale);
+	return __libc_unicode_ispunct(uni);
+@@pp_else@@
+	if (ch <= 0xff)
+		return _ismbbpunct_l(ch, locale);
+	return 0;
+@@pp_endif@@
+}
+
+[[pure, wunused, impl_include("<libc/unicode.h>")]]
+[[requires($has_function(_mbctouni_l, __unicode_descriptor) || $has_function(_ismbbblank_l))]]
+int _ismbcblank_l(unsigned int ch, $locale_t locale) {
+@@pp_if $has_function(_mbctouni_l, __unicode_descriptor)@@
+	char32_t uni = _mbctouni_l(ch, locale);
+	return __libc_unicode_isblank(uni);
+@@pp_else@@
+	if (ch <= 0xff)
+		return _ismbbblank_l(ch, locale);
+	return 0;
+@@pp_endif@@
+}
+
+[[pure, wunused, impl_include("<libc/unicode.h>")]]
+[[requires($has_function(_mbctouni_l, __unicode_descriptor) || $has_function(isspace_l))]]
+int _ismbcspace_l(unsigned int ch, $locale_t locale) {
+@@pp_if $has_function(_mbctouni_l, __unicode_descriptor)@@
+	char32_t uni = _mbctouni_l(ch, locale);
+	return __libc_unicode_isspace(uni);
+@@pp_else@@
+	if (ch <= 0xff)
+		return isspace_l(ch, locale);
+	return 0;
+@@pp_endif@@
+}
+
+[[pure, wunused, requires_function(_getmbcp_l)]]
+int _ismbchira_l(unsigned int ch, $locale_t locale) {
+	/* Extrapolated from reverse engineering. */
+	if (_getmbcp_l(locale) != _KANJI_CP)
+		return 0;
+	if (ch > 0x829e && ch < 0x82f2)
+		return 1;
+	return 0;
+}
+
+[[pure, wunused, requires_function(_getmbcp_l)]]
+int _ismbckata_l(unsigned int ch, $locale_t locale) {
+	/* Extrapolated from reverse engineering. */
+	if (_getmbcp_l(locale) != _KANJI_CP)
+		return 0;
+	if (ch > 0x833f && ch < 0x8397 && ch != 0x837f)
+		return 1;
+	return 0;
+}
+
+[[pure, wunused, requires_function(_getmbcp_l)]]
+int _ismbcsymbol_l(unsigned int ch, $locale_t locale) {
+	/* Extrapolated from reverse engineering. */
+	if (_getmbcp_l(locale) != _KANJI_CP)
+		return 0;
+	if (ch > 0x8140 && ch < 0x81ad && ch != 0x817f)
+		return 1;
+	return 0;
+}
+
+[[pure, wunused, requires_function(_getmbcp_l, _ismbblead_l, _ismbbtrail_l)]]
+int _ismbcl0_l(unsigned int ch, $locale_t locale) {
+	/* Extrapolated from reverse engineering. */
+	if (_getmbcp_l(locale) != _KANJI_CP)
+		return 0;
+	if (!_ismbblead_l((ch >> 8) & 0xff, locale))
+		return 0;
+	if (!_ismbbtrail_l(ch & 0xff, locale))
+		return 0;
+	if (ch < 0x889f)
+		return 1;
+	return 0;
+}
+
+[[pure, wunused, requires_function(_getmbcp_l, _ismbblead_l, _ismbbtrail_l)]]
+int _ismbcl1_l(unsigned int ch, $locale_t locale) {
+	/* Extrapolated from reverse engineering. */
+	if (_getmbcp_l(locale) != _KANJI_CP)
+		return 0;
+	if (!_ismbblead_l((ch >> 8) & 0xff, locale))
+		return 0;
+	if (!_ismbbtrail_l(ch & 0xff, locale))
+		return 0;
+	if (ch > 0x889e && ch < 0x9873)
+		return 1;
+	return 0;
+}
+
+[[pure, wunused, requires_function(_getmbcp_l, _ismbblead_l, _ismbbtrail_l)]]
+int _ismbcl2_l(unsigned int ch, $locale_t locale) {
+	/* Extrapolated from reverse engineering. */
+	if (_getmbcp_l(locale) != _KANJI_CP)
+		return 0;
+	if (!_ismbblead_l((ch >> 8) & 0xff, locale))
+		return 0;
+	if (!_ismbbtrail_l(ch & 0xff, locale))
+		return 0;
+	if (ch > 0x989e && ch < 0xeaa5)
+		return 1;
+	return 0;
+}
+
+[[pure, wunused, requires_function(_getmbcp_l)]]
+[[impl_include("<libc/errno.h>", "<hybrid/typecore.h>")]]
+unsigned int _mbcjistojms_l(unsigned int ch, $locale_t locale) {
+	unsigned char c1, c2, temp;
+	/* Extrapolated from reverse engineering. */
+	if (_getmbcp_l(locale) != _KANJI_CP)
+		return ch;
+	c1 = ch & 0xff;
+	c2 = ch >> 8 & 0xff;
+	if ((c1 > 0x7e) || (c1 < 0x21) || 
+	    (c2 > 0x7e) || (c2 < 0x21)) {
+@@pp_ifdef EILSEQ@@
+		__libc_seterrno(EILSEQ);
+@@pp_endif@@
+		return 0;
+	}
+	if (((ch >> 8) & 1) == 0) {
+		c1 += 0x7e;
+	} else {
+		c1 += c1 < 0x60 ? 0x1f: 0x20;
+	}
+	temp = (c2 - 0x21) >> 1;
+	c2   = temp + 0x81;
+	if (c2 > 0x9f)
+		c2 = temp + 0xc1;
+	return (uint16_t)c2 << 8 | c1;
+}
+
+[[pure, wunused, impl_include("<libc/errno.h>")]]
+[[requires_function(_getmbcp_l, _ismbblead_l, _ismbbtrail_l)]]
+unsigned int _mbcjmstojis_l(unsigned int ch, $locale_t locale) {
+	unsigned char c1, c2;
+	/* Extrapolated from reverse engineering. */
+	if (_getmbcp_l(locale) != _KANJI_CP)
+		return ch;
+	c1 = ch & 0xff;
+	c2 = (ch >> 8) & 0xff;
+	if (_ismbblead_l(c1, locale) && _ismbbtrail_l(c2, locale)) {
+		c2 -= c2 < 0xa0 ? 0x81 : 0xc1;
+		if (c1 < 0x9f) {
+			ch = (c2 * 0x200) + 0x2100;
+			ch |= c1 - (c1 < 0x7f ? 0x1f : 0x20);
+		} else {
+			ch = (c2 * 0x200) + 0x2200;
+			ch |= c1 - 0x7e;
+		}
+		if ((ch > 0x2120 && ch < 0x7e7f) &&
+		    ((ch & 0xff) > 0x20) &&
+		    ((ch & 0xff) < 0x7f))
+			return ch;
+	}
+@@pp_ifdef EILSEQ@@
+	__libc_seterrno(EILSEQ);
+@@pp_endif@@
+	return 0;
+}
+
+[[pure, wunused, requires_function(_ismbckata_l)]]
+unsigned int _mbctohira_l(unsigned int ch,
+                          $locale_t locale) {
+	/* Extrapolated from reverse engineering. */
+	if (_ismbckata_l(ch, locale) && ch < 0x8394) {
+		if (ch < 0x837f) {
+			ch -= 0xa1;
+		} else {
+			ch -= 0xa2;
+		}
+	}
+	return ch;
+}
+
+[[pure, wunused, requires_function(_ismbchira_l)]]
+unsigned int _mbctokata_l(unsigned int ch,
+                          $locale_t locale) {
+	/* Extrapolated from reverse engineering. */
+	unsigned int result = ch;
+	if (_ismbchira_l(ch, locale)) {
+		result = ch + 0xa1;
+		if (result > 0x837e)
+			++result;
+	}
+	return result;
+}
+
+/* TODO: These two are kind-of complicated. Disassembly shows that they're using
+ *       some kind of large lookup table, but I have yet to understand the format
+ *       or meaning of that table.
+ * If possible, I'd like to implement these through libiconv */
+[[pure, wunused]]
 unsigned int _mbbtombc_l(unsigned int ch, $locale_t locale); /* TODO */
 
-[[wunused]]
+[[pure, wunused]]
 unsigned int _mbctombb_l(unsigned int ch, $locale_t locale); /* TODO */
 
-[[wunused]]
-int _mbbtype_l(unsigned char ch, int ctype, $locale_t locale); /* TODO */
 
-[[wunused]]
-int _ismbcalnum_l(unsigned int ch,
-                  $locale_t locale); /* TODO */
 
-[[wunused]]
-int _ismbcalpha_l(unsigned int ch,
-                  $locale_t locale); /* TODO */
+%[insert:extern(_ismbblead_l)]  /* From <mbctype.h> */
+%[insert:extern(_ismbbtrail_l)] /* From <mbctype.h> */
 
-[[wunused]]
-int _ismbcdigit_l(unsigned int ch,
-                  $locale_t locale); /* TODO */
-
-[[wunused]]
-int _ismbcgraph_l(unsigned int ch,
-                  $locale_t locale); /* TODO */
-
-[[wunused]]
-int _ismbclegal_l(unsigned int ch,
-                  $locale_t locale); /* TODO */
-
-[[wunused]]
-int _ismbclower_l(unsigned int ch,
-                  $locale_t locale); /* TODO */
-
-[[wunused]]
-int _ismbcprint_l(unsigned int ch,
-                  $locale_t locale); /* TODO */
-
-[[wunused]]
-int _ismbcpunct_l(unsigned int ch,
-                  $locale_t locale); /* TODO */
-
-[[wunused]]
-int _ismbcblank_l(unsigned int ch,
-                  $locale_t locale); /* TODO */
-
-[[wunused]]
-int _ismbcspace_l(unsigned int ch,
-                  $locale_t locale); /* TODO */
-
-[[wunused]]
-int _ismbcupper_l(unsigned int ch,
-                  $locale_t locale); /* TODO */
-
-[[wunused]]
-unsigned int _mbctolower_l(unsigned int ch,
-                           $locale_t locale); /* TODO */
-
-[[wunused]]
-unsigned int _mbctoupper_l(unsigned int ch,
-                           $locale_t locale); /* TODO */
-
-[[wunused]]
-int _ismbchira_l(unsigned int ch,
-                 $locale_t locale); /* TODO */
-
-[[wunused]]
-int _ismbckata_l(unsigned int ch,
-                 $locale_t locale); /* TODO */
-
-[[wunused]]
-int _ismbcsymbol_l(unsigned int ch,
-                   $locale_t locale); /* TODO */
-
-[[wunused]]
-int _ismbcl0_l(unsigned int ch,
-                $locale_t locale); /* TODO */
-
-[[wunused]]
-int _ismbcl1_l(unsigned int ch,
-                $locale_t locale); /* TODO */
-
-[[wunused]]
-int _ismbcl2_l(unsigned int ch,
-                $locale_t locale); /* TODO */
-
-[[wunused]]
-unsigned int _mbcjistojms_l(unsigned int ch,
-                            $locale_t locale); /* TODO */
-
-[[wunused]]
-unsigned int _mbcjmstojis_l(unsigned int ch,
-                            $locale_t locale); /* TODO */
-
-[[wunused]]
-unsigned int _mbctohira_l(unsigned int ch,
-                          $locale_t locale); /* TODO */
-
-[[wunused]]
-unsigned int _mbctokata_l(unsigned int ch,
-                          $locale_t locale); /* TODO */
-
-[[wunused]]
-int _ismbblead_l(unsigned int ch,
-                 $locale_t locale); /* TODO */
-
-[[wunused]]
-int _ismbbtrail_l(unsigned int ch,
-                  $locale_t locale); /* TODO */
 
 %{
 

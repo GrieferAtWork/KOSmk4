@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65b51e69 */
+/* HASH CRC-32:0x190bf5bb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,22 @@
 #ifndef __local__ismbcl1_defined
 #define __local__ismbcl1_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__ismbcl1_l
+#if defined(__CRT_HAVE__ismbcl1_l) || (defined(__CRT_HAVE__getmbcp) && (defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__ismbbtrail_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__ismbcl1_l_defined
 #define __local___localdep__ismbcl1_l_defined
-__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__ismbcl1_l,(unsigned int __ch, __locale_t __locale),_ismbcl1_l,(__ch,__locale))
+#ifdef __CRT_HAVE__ismbcl1_l
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__ismbcl1_l,(unsigned int __ch, __locale_t __locale),_ismbcl1_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__getmbcp) && (defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__ismbbtrail_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype))
+__NAMESPACE_LOCAL_END
+#include <libc/local/mbstring/_ismbcl1_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__ismbcl1_l __LIBC_LOCAL_NAME(_ismbcl1_l)
+#else /* ... */
+#undef __local___localdep__ismbcl1_l_defined
+#endif /* !... */
 #endif /* !__local___localdep__ismbcl1_l_defined */
-__LOCAL_LIBC(_ismbcl1) __ATTR_WUNUSED int
+__LOCAL_LIBC(_ismbcl1) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ismbcl1))(unsigned int __ch) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__ismbcl1_l)(__ch, __NULLPTR);
 }
@@ -36,7 +45,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__ismbcl1_defined
 #define __localdep__ismbcl1 __LIBC_LOCAL_NAME(_ismbcl1)
 #endif /* !__local___localdep__ismbcl1_defined */
-#else /* __CRT_HAVE__ismbcl1_l */
+#else /* __CRT_HAVE__ismbcl1_l || (__CRT_HAVE__getmbcp && (__CRT_HAVE__ismbblead_l || __CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype) && (__CRT_HAVE__ismbbtrail_l || __CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype)) */
 #undef __local__ismbcl1_defined
-#endif /* !__CRT_HAVE__ismbcl1_l */
+#endif /* !__CRT_HAVE__ismbcl1_l && (!__CRT_HAVE__getmbcp || (!__CRT_HAVE__ismbblead_l && !__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype) || (!__CRT_HAVE__ismbbtrail_l && !__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype)) */
 #endif /* !__local__ismbcl1_defined */

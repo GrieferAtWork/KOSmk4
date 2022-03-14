@@ -727,7 +727,7 @@ struct __lc_time_data;
 typedef struct localeinfo_struct {
 	pthreadlocinfo locinfo;
 	pthreadmbcinfo mbcinfo;
-} _locale_tstruct,*_locale_t;
+} _locale_tstruct, *_locale_t;
 
 #ifndef _THREADLOCALEINFO
 #define _THREADLOCALEINFO 1

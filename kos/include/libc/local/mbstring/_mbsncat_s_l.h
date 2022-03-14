@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5725b26 */
+/* HASH CRC-32:0x138a0ef1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,15 +21,15 @@
 #ifndef __local__mbsncat_s_l_defined
 #define __local__mbsncat_s_l_defined
 #include <__crt.h>
-#if (defined(__CRT_HAVE__mbsncat_l) || defined(__CRT_HAVE__ismbblead_l)) && (defined(__CRT_HAVE__mbsnbcnt_l) || defined(__CRT_HAVE__ismbblead_l))
+#if (defined(__CRT_HAVE__mbsncat_l) || defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__mbsnbcnt_l) || defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype))
 #include <hybrid/typecore.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbsnbcnt_l_defined
 #define __local___localdep__mbsnbcnt_l_defined
 #ifdef __CRT_HAVE__mbsnbcnt_l
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbsnbcnt_l,(unsigned char const *__str, __SIZE_TYPE__ __max_chars, __locale_t __locale),_mbsnbcnt_l,(__str,__max_chars,__locale))
-#elif defined(__CRT_HAVE__ismbblead_l)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbsnbcnt_l,(unsigned char const *__str, __SIZE_TYPE__ __max_chars, __locale_t __locale),_mbsnbcnt_l,(__str,__max_chars,__locale))
+#elif defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_END
 #include <libc/local/mbstring/_mbsnbcnt_l.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep__mbsncat_l_defined
 #ifdef __CRT_HAVE__mbsncat_l
 __CREDIRECT(__ATTR_NONNULL((1, 2)),unsigned char *,__NOTHROW_NCX,__localdep__mbsncat_l,(unsigned char *__buf, unsigned char const *__src, __SIZE_TYPE__ __max_chars, __locale_t __locale),_mbsncat_l,(__buf,__src,__max_chars,__locale))
-#elif defined(__CRT_HAVE__ismbblead_l)
+#elif defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_END
 #include <libc/local/mbstring/_mbsncat_l.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -76,7 +76,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__mbsncat_s_l_defined
 #define __localdep__mbsncat_s_l __LIBC_LOCAL_NAME(_mbsncat_s_l)
 #endif /* !__local___localdep__mbsncat_s_l_defined */
-#else /* (__CRT_HAVE__mbsncat_l || __CRT_HAVE__ismbblead_l) && (__CRT_HAVE__mbsnbcnt_l || __CRT_HAVE__ismbblead_l) */
+#else /* (__CRT_HAVE__mbsncat_l || __CRT_HAVE__ismbblead_l || __CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype) && (__CRT_HAVE__mbsnbcnt_l || __CRT_HAVE__ismbblead_l || __CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype) */
 #undef __local__mbsncat_s_l_defined
-#endif /* (!__CRT_HAVE__mbsncat_l && !__CRT_HAVE__ismbblead_l) || (!__CRT_HAVE__mbsnbcnt_l && !__CRT_HAVE__ismbblead_l) */
+#endif /* (!__CRT_HAVE__mbsncat_l && !__CRT_HAVE__ismbblead_l && !__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype) || (!__CRT_HAVE__mbsnbcnt_l && !__CRT_HAVE__ismbblead_l && !__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype) */
 #endif /* !__local__mbsncat_s_l_defined */

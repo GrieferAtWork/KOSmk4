@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf7107d4f */
+/* HASH CRC-32:0x1c700964 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,25 +18,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__ismbblead_defined
-#define __local__ismbblead_defined
+#ifndef __local__ismbbtrail_l_defined
+#define __local__ismbbtrail_l_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__ismbblead_l
+#if defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep__ismbblead_l_defined
-#define __local___localdep__ismbblead_l_defined
-__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__ismbblead_l,(unsigned int __ch, __locale_t __locale),_ismbblead_l,(__ch,__locale))
-#endif /* !__local___localdep__ismbblead_l_defined */
-__LOCAL_LIBC(_ismbblead) __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ismbblead))(unsigned int __ch) {
-	return (__NAMESPACE_LOCAL_SYM __localdep__ismbblead_l)(__ch, __NULLPTR);
+#ifndef __local___localdep__get_mbbtype_l_defined
+#define __local___localdep__get_mbbtype_l_defined
+__NAMESPACE_LOCAL_END
+#include <libc/local/mbctype/_get_mbbtype_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__get_mbbtype_l __LIBC_LOCAL_NAME(_get_mbbtype_l)
+#endif /* !__local___localdep__get_mbbtype_l_defined */
+__LOCAL_LIBC(_ismbbtrail_l) __ATTR_PURE __ATTR_WUNUSED int
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ismbbtrail_l))(unsigned int __ch, __locale_t __locale) {
+	return (__NAMESPACE_LOCAL_SYM __localdep__get_mbbtype_l)((unsigned char)__ch, __locale) & 0x08;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep__ismbblead_defined
-#define __local___localdep__ismbblead_defined
-#define __localdep__ismbblead __LIBC_LOCAL_NAME(_ismbblead)
-#endif /* !__local___localdep__ismbblead_defined */
-#else /* __CRT_HAVE__ismbblead_l */
-#undef __local__ismbblead_defined
-#endif /* !__CRT_HAVE__ismbblead_l */
-#endif /* !__local__ismbblead_defined */
+#ifndef __local___localdep__ismbbtrail_l_defined
+#define __local___localdep__ismbbtrail_l_defined
+#define __localdep__ismbbtrail_l __LIBC_LOCAL_NAME(_ismbbtrail_l)
+#endif /* !__local___localdep__ismbbtrail_l_defined */
+#else /* __CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype */
+#undef __local__ismbbtrail_l_defined
+#endif /* !__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype */
+#endif /* !__local__ismbbtrail_l_defined */

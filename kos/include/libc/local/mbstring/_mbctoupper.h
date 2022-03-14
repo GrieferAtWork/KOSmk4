@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c7458df */
+/* HASH CRC-32:0x4b5e235f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,22 @@
 #ifndef __local__mbctoupper_defined
 #define __local__mbctoupper_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__mbctoupper_l
+#if defined(__CRT_HAVE__mbctoupper_l) || (defined(__CRT_HAVE__mbctouni_l) && defined(__CRT_HAVE__unitombc_l) && defined(__CRT_HAVE___unicode_descriptor)) || ((defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__mbcasemap) || defined(__CRT_HAVE___p__mbcasemap)))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbctoupper_l_defined
 #define __local___localdep__mbctoupper_l_defined
-__CREDIRECT(__ATTR_WUNUSED,unsigned int,__NOTHROW_NCX,__localdep__mbctoupper_l,(unsigned int __ch, __locale_t __locale),_mbctoupper_l,(__ch,__locale))
+#ifdef __CRT_HAVE__mbctoupper_l
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,unsigned int,__NOTHROW_NCX,__localdep__mbctoupper_l,(unsigned int __ch, __locale_t __locale),_mbctoupper_l,(__ch,__locale))
+#elif (defined(__CRT_HAVE__mbctouni_l) && defined(__CRT_HAVE__unitombc_l) && defined(__CRT_HAVE___unicode_descriptor)) || ((defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__mbcasemap) || defined(__CRT_HAVE___p__mbcasemap)))
+__NAMESPACE_LOCAL_END
+#include <libc/local/mbstring/_mbctoupper_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__mbctoupper_l __LIBC_LOCAL_NAME(_mbctoupper_l)
+#else /* ... */
+#undef __local___localdep__mbctoupper_l_defined
+#endif /* !... */
 #endif /* !__local___localdep__mbctoupper_l_defined */
-__LOCAL_LIBC(_mbctoupper) __ATTR_WUNUSED unsigned int
+__LOCAL_LIBC(_mbctoupper) __ATTR_PURE __ATTR_WUNUSED unsigned int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbctoupper))(unsigned int __ch) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__mbctoupper_l)(__ch, __NULLPTR);
 }
@@ -36,7 +45,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__mbctoupper_defined
 #define __localdep__mbctoupper __LIBC_LOCAL_NAME(_mbctoupper)
 #endif /* !__local___localdep__mbctoupper_defined */
-#else /* __CRT_HAVE__mbctoupper_l */
+#else /* __CRT_HAVE__mbctoupper_l || (__CRT_HAVE__mbctouni_l && __CRT_HAVE__unitombc_l && __CRT_HAVE___unicode_descriptor) || ((__CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype) && (__CRT_HAVE__mbcasemap || __CRT_HAVE___p__mbcasemap)) */
 #undef __local__mbctoupper_defined
-#endif /* !__CRT_HAVE__mbctoupper_l */
+#endif /* !__CRT_HAVE__mbctoupper_l && (!__CRT_HAVE__mbctouni_l || !__CRT_HAVE__unitombc_l || !__CRT_HAVE___unicode_descriptor) && ((!__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype) || (!__CRT_HAVE__mbcasemap && !__CRT_HAVE___p__mbcasemap)) */
 #endif /* !__local__mbctoupper_defined */

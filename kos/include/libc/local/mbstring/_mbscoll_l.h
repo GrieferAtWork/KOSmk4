@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16d73957 */
+/* HASH CRC-32:0xaf347ae8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,13 @@
 #ifndef __local__mbscoll_l_defined
 #define __local__mbscoll_l_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE__mbscmp_l) || defined(__CRT_HAVE__ismbblead_l)
+#if defined(__CRT_HAVE__mbscmp_l) || defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbscmp_l_defined
 #define __local___localdep__mbscmp_l_defined
 #ifdef __CRT_HAVE__mbscmp_l
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep__mbscmp_l,(unsigned char const *__lhs, unsigned char const *__rhs, __locale_t __locale),_mbscmp_l,(__lhs,__rhs,__locale))
-#elif defined(__CRT_HAVE__ismbblead_l)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep__mbscmp_l,(unsigned char const *__lhs, unsigned char const *__rhs, __locale_t __locale),_mbscmp_l,(__lhs,__rhs,__locale))
+#elif defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_END
 #include <libc/local/mbstring/_mbscmp_l.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__mbscmp_l_defined
 #endif /* !... */
 #endif /* !__local___localdep__mbscmp_l_defined */
-__LOCAL_LIBC(_mbscoll_l) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(_mbscoll_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbscoll_l))(unsigned char const *__lhs, unsigned char const *__rhs, __locale_t __locale) {
 	/* XXX: Implement properly? */
 	return (__NAMESPACE_LOCAL_SYM __localdep__mbscmp_l)(__lhs, __rhs, __locale);
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__mbscoll_l_defined
 #define __localdep__mbscoll_l __LIBC_LOCAL_NAME(_mbscoll_l)
 #endif /* !__local___localdep__mbscoll_l_defined */
-#else /* __CRT_HAVE__mbscmp_l || __CRT_HAVE__ismbblead_l */
+#else /* __CRT_HAVE__mbscmp_l || __CRT_HAVE__ismbblead_l || __CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype */
 #undef __local__mbscoll_l_defined
-#endif /* !__CRT_HAVE__mbscmp_l && !__CRT_HAVE__ismbblead_l */
+#endif /* !__CRT_HAVE__mbscmp_l && !__CRT_HAVE__ismbblead_l && !__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype */
 #endif /* !__local__mbscoll_l_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ffca739 */
+/* HASH CRC-32:0x8af7ba92 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,22 @@
 #ifndef __local__ismbckata_defined
 #define __local__ismbckata_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__ismbckata_l
+#if defined(__CRT_HAVE__ismbckata_l) || defined(__CRT_HAVE__getmbcp)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__ismbckata_l_defined
 #define __local___localdep__ismbckata_l_defined
-__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__ismbckata_l,(unsigned int __ch, __locale_t __locale),_ismbckata_l,(__ch,__locale))
+#ifdef __CRT_HAVE__ismbckata_l
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__ismbckata_l,(unsigned int __ch, __locale_t __locale),_ismbckata_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__getmbcp)
+__NAMESPACE_LOCAL_END
+#include <libc/local/mbstring/_ismbckata_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__ismbckata_l __LIBC_LOCAL_NAME(_ismbckata_l)
+#else /* ... */
+#undef __local___localdep__ismbckata_l_defined
+#endif /* !... */
 #endif /* !__local___localdep__ismbckata_l_defined */
-__LOCAL_LIBC(_ismbckata) __ATTR_WUNUSED int
+__LOCAL_LIBC(_ismbckata) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ismbckata))(unsigned int __ch) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__ismbckata_l)(__ch, __NULLPTR);
 }
@@ -36,7 +45,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__ismbckata_defined
 #define __localdep__ismbckata __LIBC_LOCAL_NAME(_ismbckata)
 #endif /* !__local___localdep__ismbckata_defined */
-#else /* __CRT_HAVE__ismbckata_l */
+#else /* __CRT_HAVE__ismbckata_l || __CRT_HAVE__getmbcp */
 #undef __local__ismbckata_defined
-#endif /* !__CRT_HAVE__ismbckata_l */
+#endif /* !__CRT_HAVE__ismbckata_l && !__CRT_HAVE__getmbcp */
 #endif /* !__local__ismbckata_defined */

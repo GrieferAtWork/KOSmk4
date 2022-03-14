@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2584ae0a */
+/* HASH CRC-32:0x9a40d164 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,6 +48,8 @@
 #define __stub___p__crtAssertBusy
 #define __stub___p__crtBreakAlloc
 #define __stub___p__crtDbgFlag
+#define __stub___p__mbcasemap
+#define __stub___p__mbctype
 #define __stub___pthread_register_cancel
 #define __stub___pthread_register_cancel_defer
 #define __stub___pthread_unregister_cancel
@@ -70,36 +72,11 @@
 #define __stub__get_output_format
 #define __stub__get_purecall_handler
 #define __stub__getdiskfree
-#define __stub__ismbblead_l
-#define __stub__ismbbtrail_l
-#define __stub__ismbcalnum_l
-#define __stub__ismbcalpha_l
-#define __stub__ismbcblank_l
-#define __stub__ismbcdigit_l
-#define __stub__ismbcgraph_l
-#define __stub__ismbchira_l
-#define __stub__ismbckata_l
-#define __stub__ismbcl0_l
-#define __stub__ismbcl1_l
-#define __stub__ismbcl2_l
-#define __stub__ismbclegal_l
-#define __stub__ismbclower_l
-#define __stub__ismbcprint_l
-#define __stub__ismbcpunct_l
-#define __stub__ismbcspace_l
-#define __stub__ismbcsymbol_l
-#define __stub__ismbcupper_l
+#define __stub__getmbcp
 #define __stub__lock_locales
 #define __stub__mbbtombc_l
-#define __stub__mbbtype_l
-#define __stub__mbcjistojms_l
-#define __stub__mbcjmstojis_l
-#define __stub__mbctohira_l
-#define __stub__mbctokata_l
-#define __stub__mbctolower_l
 #define __stub__mbctombb_l
-#define __stub__mbctoupper_l
-#define __stub__mbsbtype_l
+#define __stub__mbctouni_l
 #define __stub__mktemp_s
 #define __stub__query_new_handler
 #define __stub__query_new_mode
@@ -113,8 +90,10 @@
 #define __stub__set_output_format
 #define __stub__set_purecall_handler
 #define __stub__seterrormode
+#define __stub__setmbcp
 #define __stub__statusfp
 #define __stub__statusfp2
+#define __stub__unitombc_l
 #define __stub__unlock_locales
 #define __stub__wcreate_locale
 #define __stub__wcserror

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8672ced0 */
+/* HASH CRC-32:0xa188c423 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -341,8 +341,26 @@
 #define __CRT_HAVE_DOS$_isctype
 #define __CRT_HAVE_DOS$_isctype_l
 #define __CRT_HAVE_DOS$_isleadbyte_l
+#define __CRT_HAVE_DOS$_ismbbalnum
+#define __CRT_HAVE_DOS$_ismbbalnum_l
+#define __CRT_HAVE_DOS$_ismbbalpha
+#define __CRT_HAVE_DOS$_ismbbalpha_l
+#define __CRT_HAVE_DOS$_ismbbblank
+#define __CRT_HAVE_DOS$_ismbbblank_l
+#define __CRT_HAVE_DOS$_ismbbgraph
+#define __CRT_HAVE_DOS$_ismbbgraph_l
+#define __CRT_HAVE_DOS$_ismbbkalnum
+#define __CRT_HAVE_DOS$_ismbbkalnum_l
+#define __CRT_HAVE_DOS$_ismbbkana
+#define __CRT_HAVE_DOS$_ismbbkana_l
+#define __CRT_HAVE_DOS$_ismbbkpunct
+#define __CRT_HAVE_DOS$_ismbbkpunct_l
 #define __CRT_HAVE_DOS$_ismbblead
 #define __CRT_HAVE_DOS$_ismbblead_l
+#define __CRT_HAVE_DOS$_ismbbprint
+#define __CRT_HAVE_DOS$_ismbbprint_l
+#define __CRT_HAVE_DOS$_ismbbpunct
+#define __CRT_HAVE_DOS$_ismbbpunct_l
 #define __CRT_HAVE_DOS$_ismbbtrail
 #define __CRT_HAVE_DOS$_ismbbtrail_l
 #define __CRT_HAVE_DOS$_ismbcalnum
@@ -442,6 +460,7 @@
 #define __CRT_HAVE_DOS$_mbctolower_l
 #define __CRT_HAVE_DOS$_mbctombb
 #define __CRT_HAVE_DOS$_mbctombb_l
+#define __CRT_HAVE_DOS$_mbctouni_l
 #define __CRT_HAVE_DOS$_mbctoupper
 #define __CRT_HAVE_DOS$_mbctoupper_l
 #define __CRT_HAVE_DOS$_mblen_l
@@ -615,6 +634,7 @@
 #define __CRT_HAVE_DOS$_set_purecall_handler
 #define __CRT_HAVE_DOS$_seterrormode
 #define __CRT_HAVE_DOS$_setmaxstdio
+#define __CRT_HAVE_DOS$_setmbcp
 #define __CRT_HAVE_DOS$_setmode
 #define __CRT_HAVE_DOS$_sleep
 #define __CRT_HAVE_DOS$_snprintf
@@ -687,6 +707,7 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_umask_s
+#define __CRT_HAVE_DOS$_unitombc_l
 #define __CRT_HAVE_DOS$_unloaddll
 #define __CRT_HAVE_DOS$_unlock_fhandle
 #define __CRT_HAVE_DOS$_vfprintf_l
@@ -3960,6 +3981,8 @@
 #define __CRT_HAVE___p__crtBreakAlloc
 #define __CRT_HAVE___p__crtDbgFlag
 #define __CRT_HAVE___p__fmode
+#define __CRT_HAVE___p__mbcasemap
+#define __CRT_HAVE___p__mbctype
 #define __CRT_HAVE___p__pgmptr
 #define __CRT_HAVE___p__wenviron
 #define __CRT_HAVE___p__wpgmptr
@@ -4141,6 +4164,7 @@
 #define __CRT_HAVE__get_errno
 #define __CRT_HAVE__get_fmode
 #define __CRT_HAVE__get_invalid_parameter_handler
+#define __CRT_HAVE__get_mbbtype_l
 #define __CRT_HAVE__get_osfhandle
 #define __CRT_HAVE__get_output_format
 #define __CRT_HAVE__get_pgmptr
@@ -4155,6 +4179,8 @@
 #define __CRT_HAVE__getdrive
 #define __CRT_HAVE__getdrives
 #define __CRT_HAVE__getmaxstdio
+#define __CRT_HAVE__getmbcp
+#define __CRT_HAVE__getmbcp_l
 #define __CRT_HAVE__getws_s
 #define __CRT_HAVE__i64toa
 #define __CRT_HAVE__i64toa_s
@@ -4163,8 +4189,26 @@
 #define __CRT_HAVE__isctype
 #define __CRT_HAVE__isctype_l
 #define __CRT_HAVE__isleadbyte_l
+#define __CRT_HAVE__ismbbalnum
+#define __CRT_HAVE__ismbbalnum_l
+#define __CRT_HAVE__ismbbalpha
+#define __CRT_HAVE__ismbbalpha_l
+#define __CRT_HAVE__ismbbblank
+#define __CRT_HAVE__ismbbblank_l
+#define __CRT_HAVE__ismbbgraph
+#define __CRT_HAVE__ismbbgraph_l
+#define __CRT_HAVE__ismbbkalnum
+#define __CRT_HAVE__ismbbkalnum_l
+#define __CRT_HAVE__ismbbkana
+#define __CRT_HAVE__ismbbkana_l
+#define __CRT_HAVE__ismbbkpunct
+#define __CRT_HAVE__ismbbkpunct_l
 #define __CRT_HAVE__ismbblead
 #define __CRT_HAVE__ismbblead_l
+#define __CRT_HAVE__ismbbprint
+#define __CRT_HAVE__ismbbprint_l
+#define __CRT_HAVE__ismbbpunct
+#define __CRT_HAVE__ismbbpunct_l
 #define __CRT_HAVE__ismbbtrail
 #define __CRT_HAVE__ismbbtrail_l
 #define __CRT_HAVE__ismbcalnum
@@ -4251,6 +4295,7 @@
 #define __CRT_HAVE__mbctolower_l
 #define __CRT_HAVE__mbctombb
 #define __CRT_HAVE__mbctombb_l
+#define __CRT_HAVE__mbctouni_l
 #define __CRT_HAVE__mbctoupper
 #define __CRT_HAVE__mbctoupper_l
 #define __CRT_HAVE__mblen_l
@@ -4417,6 +4462,7 @@
 #define __CRT_HAVE__set_purecall_handler
 #define __CRT_HAVE__seterrormode
 #define __CRT_HAVE__setmaxstdio
+#define __CRT_HAVE__setmbcp
 #define __CRT_HAVE__setmode
 #define __CRT_HAVE__sleep
 #define __CRT_HAVE__snprintf
@@ -4482,6 +4528,7 @@
 #define __CRT_HAVE__ultow
 #define __CRT_HAVE__ultow_s
 #define __CRT_HAVE__umask_s
+#define __CRT_HAVE__unitombc_l
 #define __CRT_HAVE__unloaddll
 #define __CRT_HAVE__unlock_fhandle
 #define __CRT_HAVE__unlock_locales

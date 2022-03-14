@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43d5653b */
+/* HASH CRC-32:0xbcdd7dd7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,22 @@
 #ifndef __local__ismbclower_defined
 #define __local__ismbclower_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__ismbclower_l
+#if defined(__CRT_HAVE__ismbclower_l) || (defined(__CRT_HAVE__mbctouni_l) && defined(__CRT_HAVE___unicode_descriptor)) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__ismbclower_l_defined
 #define __local___localdep__ismbclower_l_defined
-__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__ismbclower_l,(unsigned int __ch, __locale_t __locale),_ismbclower_l,(__ch,__locale))
+#ifdef __CRT_HAVE__ismbclower_l
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__ismbclower_l,(unsigned int __ch, __locale_t __locale),_ismbclower_l,(__ch,__locale))
+#elif (defined(__CRT_HAVE__mbctouni_l) && defined(__CRT_HAVE___unicode_descriptor)) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
+__NAMESPACE_LOCAL_END
+#include <libc/local/mbstring/_ismbclower_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__ismbclower_l __LIBC_LOCAL_NAME(_ismbclower_l)
+#else /* ... */
+#undef __local___localdep__ismbclower_l_defined
+#endif /* !... */
 #endif /* !__local___localdep__ismbclower_l_defined */
-__LOCAL_LIBC(_ismbclower) __ATTR_WUNUSED int
+__LOCAL_LIBC(_ismbclower) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ismbclower))(unsigned int __ch) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__ismbclower_l)(__ch, __NULLPTR);
 }
@@ -36,7 +45,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__ismbclower_defined
 #define __localdep__ismbclower __LIBC_LOCAL_NAME(_ismbclower)
 #endif /* !__local___localdep__ismbclower_defined */
-#else /* __CRT_HAVE__ismbclower_l */
+#else /* __CRT_HAVE__ismbclower_l || (__CRT_HAVE__mbctouni_l && __CRT_HAVE___unicode_descriptor) || __CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype */
 #undef __local__ismbclower_defined
-#endif /* !__CRT_HAVE__ismbclower_l */
+#endif /* !__CRT_HAVE__ismbclower_l && (!__CRT_HAVE__mbctouni_l || !__CRT_HAVE___unicode_descriptor) && !__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype */
 #endif /* !__local__ismbclower_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15acf41 */
+/* HASH CRC-32:0x68c13aaa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,16 +21,25 @@
 #ifndef __local__mbscmp_l_defined
 #define __local__mbscmp_l_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__ismbblead_l
+#if defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__ismbblead_l_defined
 #define __local___localdep__ismbblead_l_defined
-__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__ismbblead_l,(unsigned int __ch, __locale_t __locale),_ismbblead_l,(__ch,__locale))
+#ifdef __CRT_HAVE__ismbblead_l
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__ismbblead_l,(unsigned int __ch, __locale_t __locale),_ismbblead_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
+__NAMESPACE_LOCAL_END
+#include <libc/local/mbctype/_ismbblead_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__ismbblead_l __LIBC_LOCAL_NAME(_ismbblead_l)
+#else /* ... */
+#undef __local___localdep__ismbblead_l_defined
+#endif /* !... */
 #endif /* !__local___localdep__ismbblead_l_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_mbscmp_l) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(_mbscmp_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbscmp_l))(unsigned char const *__lhs, unsigned char const *__rhs, __locale_t __locale) {
 	for (;;) {
 		__UINT16_TYPE__ __lc, __rc;
@@ -52,7 +61,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__mbscmp_l_defined
 #define __localdep__mbscmp_l __LIBC_LOCAL_NAME(_mbscmp_l)
 #endif /* !__local___localdep__mbscmp_l_defined */
-#else /* __CRT_HAVE__ismbblead_l */
+#else /* __CRT_HAVE__ismbblead_l || __CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype */
 #undef __local__mbscmp_l_defined
-#endif /* !__CRT_HAVE__ismbblead_l */
+#endif /* !__CRT_HAVE__ismbblead_l && !__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype */
 #endif /* !__local__mbscmp_l_defined */

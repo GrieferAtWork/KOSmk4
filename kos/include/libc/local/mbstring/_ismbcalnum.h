@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7fe2b049 */
+/* HASH CRC-32:0x9ab490ca */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,22 @@
 #ifndef __local__ismbcalnum_defined
 #define __local__ismbcalnum_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__ismbcalnum_l
+#if defined(__CRT_HAVE__ismbcalnum_l) || (defined(__CRT_HAVE__mbctouni_l) && defined(__CRT_HAVE___unicode_descriptor)) || defined(__CRT_HAVE__ismbbalnum_l) || defined(__CRT_HAVE__ismbbkalnum_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__ismbcalnum_l_defined
 #define __local___localdep__ismbcalnum_l_defined
-__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__ismbcalnum_l,(unsigned int __ch, __locale_t __locale),_ismbcalnum_l,(__ch,__locale))
+#ifdef __CRT_HAVE__ismbcalnum_l
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__ismbcalnum_l,(unsigned int __ch, __locale_t __locale),_ismbcalnum_l,(__ch,__locale))
+#elif (defined(__CRT_HAVE__mbctouni_l) && defined(__CRT_HAVE___unicode_descriptor)) || defined(__CRT_HAVE__ismbbalnum_l) || defined(__CRT_HAVE__ismbbkalnum_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
+__NAMESPACE_LOCAL_END
+#include <libc/local/mbstring/_ismbcalnum_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__ismbcalnum_l __LIBC_LOCAL_NAME(_ismbcalnum_l)
+#else /* ... */
+#undef __local___localdep__ismbcalnum_l_defined
+#endif /* !... */
 #endif /* !__local___localdep__ismbcalnum_l_defined */
-__LOCAL_LIBC(_ismbcalnum) __ATTR_WUNUSED int
+__LOCAL_LIBC(_ismbcalnum) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ismbcalnum))(unsigned int __ch) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__ismbcalnum_l)(__ch, __NULLPTR);
 }
@@ -36,7 +45,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__ismbcalnum_defined
 #define __localdep__ismbcalnum __LIBC_LOCAL_NAME(_ismbcalnum)
 #endif /* !__local___localdep__ismbcalnum_defined */
-#else /* __CRT_HAVE__ismbcalnum_l */
+#else /* __CRT_HAVE__ismbcalnum_l || (__CRT_HAVE__mbctouni_l && __CRT_HAVE___unicode_descriptor) || __CRT_HAVE__ismbbalnum_l || __CRT_HAVE__ismbbkalnum_l || __CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype */
 #undef __local__ismbcalnum_defined
-#endif /* !__CRT_HAVE__ismbcalnum_l */
+#endif /* !__CRT_HAVE__ismbcalnum_l && (!__CRT_HAVE__mbctouni_l || !__CRT_HAVE___unicode_descriptor) && !__CRT_HAVE__ismbbalnum_l && !__CRT_HAVE__ismbbkalnum_l && !__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype */
 #endif /* !__local__ismbcalnum_defined */

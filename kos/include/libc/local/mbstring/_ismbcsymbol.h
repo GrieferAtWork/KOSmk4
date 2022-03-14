@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5df4740 */
+/* HASH CRC-32:0x3a575ab0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,22 @@
 #ifndef __local__ismbcsymbol_defined
 #define __local__ismbcsymbol_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__ismbcsymbol_l
+#if defined(__CRT_HAVE__ismbcsymbol_l) || defined(__CRT_HAVE__getmbcp)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__ismbcsymbol_l_defined
 #define __local___localdep__ismbcsymbol_l_defined
-__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__ismbcsymbol_l,(unsigned int __ch, __locale_t __locale),_ismbcsymbol_l,(__ch,__locale))
+#ifdef __CRT_HAVE__ismbcsymbol_l
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__ismbcsymbol_l,(unsigned int __ch, __locale_t __locale),_ismbcsymbol_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__getmbcp)
+__NAMESPACE_LOCAL_END
+#include <libc/local/mbstring/_ismbcsymbol_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__ismbcsymbol_l __LIBC_LOCAL_NAME(_ismbcsymbol_l)
+#else /* ... */
+#undef __local___localdep__ismbcsymbol_l_defined
+#endif /* !... */
 #endif /* !__local___localdep__ismbcsymbol_l_defined */
-__LOCAL_LIBC(_ismbcsymbol) __ATTR_WUNUSED int
+__LOCAL_LIBC(_ismbcsymbol) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ismbcsymbol))(unsigned int __ch) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__ismbcsymbol_l)(__ch, __NULLPTR);
 }
@@ -36,7 +45,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__ismbcsymbol_defined
 #define __localdep__ismbcsymbol __LIBC_LOCAL_NAME(_ismbcsymbol)
 #endif /* !__local___localdep__ismbcsymbol_defined */
-#else /* __CRT_HAVE__ismbcsymbol_l */
+#else /* __CRT_HAVE__ismbcsymbol_l || __CRT_HAVE__getmbcp */
 #undef __local__ismbcsymbol_defined
-#endif /* !__CRT_HAVE__ismbcsymbol_l */
+#endif /* !__CRT_HAVE__ismbcsymbol_l && !__CRT_HAVE__getmbcp */
 #endif /* !__local__ismbcsymbol_defined */

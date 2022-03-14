@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ff3d913 */
+/* HASH CRC-32:0x9a02febb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1061,6 +1061,35 @@ DEFINE_PUBLIC_ALIAS(DOS$_ldpcomp, libd__ldpcomp);
 DEFINE_PUBLIC_ALIAS(DOS$_chgsignf, libd__chgsignf);
 DEFINE_PUBLIC_ALIAS(DOS$_chgsign, libd__chgsign);
 
+/* mbctype */
+DEFINE_PUBLIC_ALIAS(DOS$_setmbcp, libd__setmbcp);
+DEFINE_PUBLIC_ALIAS(DOS$_mbctouni_l, libd__mbctouni_l);
+DEFINE_PUBLIC_ALIAS(DOS$_unitombc_l, libd__unitombc_l);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbbkalnum, libd__ismbbkalnum);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbbkprint, libd__ismbbkana);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbbkana, libd__ismbbkana);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbbkpunct, libd__ismbbkpunct);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbbalpha, libd__ismbbalpha);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbbpunct, libd__ismbbpunct);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbbblank, libd__ismbbblank);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbbalnum, libd__ismbbalnum);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbbprint, libd__ismbbprint);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbbgraph, libd__ismbbgraph);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbblead, libd__ismbblead);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbbtrail, libd__ismbbtrail);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbblead_l, libd__ismbblead_l);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbbtrail_l, libd__ismbbtrail_l);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbbkalnum_l, libd__ismbbkalnum_l);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbbkprint_l, libd__ismbbkana_l);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbbkana_l, libd__ismbbkana_l);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbbkpunct_l, libd__ismbbkpunct_l);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbbalpha_l, libd__ismbbalpha_l);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbbpunct_l, libd__ismbbpunct_l);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbbblank_l, libd__ismbbblank_l);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbbalnum_l, libd__ismbbalnum_l);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbbprint_l, libd__ismbbprint_l);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbbgraph_l, libd__ismbbgraph_l);
+
 /* mbstring */
 DEFINE_PUBLIC_ALIAS(DOS$_mbbtombc, libd__mbbtombc);
 DEFINE_PUBLIC_ALIAS(DOS$_mbbtype, libd__mbbtype);
@@ -1142,8 +1171,6 @@ DEFINE_PUBLIC_ALIAS(DOS$_mbcjistojms, libd__mbcjistojms);
 DEFINE_PUBLIC_ALIAS(DOS$_mbcjmstojis, libd__mbcjmstojis);
 DEFINE_PUBLIC_ALIAS(DOS$_mbctohira, libd__mbctohira);
 DEFINE_PUBLIC_ALIAS(DOS$_mbctokata, libd__mbctokata);
-DEFINE_PUBLIC_ALIAS(DOS$_ismbblead, libd__ismbblead);
-DEFINE_PUBLIC_ALIAS(DOS$_ismbbtrail, libd__ismbbtrail);
 DEFINE_PUBLIC_ALIAS(DOS$_ismbslead, libd__ismbslead);
 DEFINE_PUBLIC_ALIAS(DOS$_ismbstrail, libd__ismbstrail);
 DEFINE_PUBLIC_ALIAS(DOS$_mbscat_l, libd__mbscat_l);
@@ -1203,23 +1230,21 @@ DEFINE_PUBLIC_ALIAS(DOS$_mbsset_s_l, libd__mbsset_s_l);
 DEFINE_PUBLIC_ALIAS(DOS$_mbccpy_s_l, libd__mbccpy_s_l);
 DEFINE_PUBLIC_ALIAS(DOS$_ismbslead_l, libd__ismbslead_l);
 DEFINE_PUBLIC_ALIAS(DOS$_ismbstrail_l, libd__ismbstrail_l);
-DEFINE_PUBLIC_ALIAS(DOS$_mbsbtype_l, libd__mbsbtype_l);
-DEFINE_PUBLIC_ALIAS(DOS$_mbbtombc_l, libd__mbbtombc_l);
-DEFINE_PUBLIC_ALIAS(DOS$_mbctombb_l, libd__mbctombb_l);
 DEFINE_PUBLIC_ALIAS(DOS$_mbbtype_l, libd__mbbtype_l);
+DEFINE_PUBLIC_ALIAS(DOS$_mbsbtype_l, libd__mbsbtype_l);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbclegal_l, libd__ismbclegal_l);
+DEFINE_PUBLIC_ALIAS(DOS$_mbctolower_l, libd__mbctolower_l);
+DEFINE_PUBLIC_ALIAS(DOS$_mbctoupper_l, libd__mbctoupper_l);
 DEFINE_PUBLIC_ALIAS(DOS$_ismbcalnum_l, libd__ismbcalnum_l);
 DEFINE_PUBLIC_ALIAS(DOS$_ismbcalpha_l, libd__ismbcalpha_l);
 DEFINE_PUBLIC_ALIAS(DOS$_ismbcdigit_l, libd__ismbcdigit_l);
 DEFINE_PUBLIC_ALIAS(DOS$_ismbcgraph_l, libd__ismbcgraph_l);
-DEFINE_PUBLIC_ALIAS(DOS$_ismbclegal_l, libd__ismbclegal_l);
 DEFINE_PUBLIC_ALIAS(DOS$_ismbclower_l, libd__ismbclower_l);
+DEFINE_PUBLIC_ALIAS(DOS$_ismbcupper_l, libd__ismbcupper_l);
 DEFINE_PUBLIC_ALIAS(DOS$_ismbcprint_l, libd__ismbcprint_l);
 DEFINE_PUBLIC_ALIAS(DOS$_ismbcpunct_l, libd__ismbcpunct_l);
 DEFINE_PUBLIC_ALIAS(DOS$_ismbcblank_l, libd__ismbcblank_l);
 DEFINE_PUBLIC_ALIAS(DOS$_ismbcspace_l, libd__ismbcspace_l);
-DEFINE_PUBLIC_ALIAS(DOS$_ismbcupper_l, libd__ismbcupper_l);
-DEFINE_PUBLIC_ALIAS(DOS$_mbctolower_l, libd__mbctolower_l);
-DEFINE_PUBLIC_ALIAS(DOS$_mbctoupper_l, libd__mbctoupper_l);
 DEFINE_PUBLIC_ALIAS(DOS$_ismbchira_l, libd__ismbchira_l);
 DEFINE_PUBLIC_ALIAS(DOS$_ismbckata_l, libd__ismbckata_l);
 DEFINE_PUBLIC_ALIAS(DOS$_ismbcsymbol_l, libd__ismbcsymbol_l);
@@ -1230,8 +1255,8 @@ DEFINE_PUBLIC_ALIAS(DOS$_mbcjistojms_l, libd__mbcjistojms_l);
 DEFINE_PUBLIC_ALIAS(DOS$_mbcjmstojis_l, libd__mbcjmstojis_l);
 DEFINE_PUBLIC_ALIAS(DOS$_mbctohira_l, libd__mbctohira_l);
 DEFINE_PUBLIC_ALIAS(DOS$_mbctokata_l, libd__mbctokata_l);
-DEFINE_PUBLIC_ALIAS(DOS$_ismbblead_l, libd__ismbblead_l);
-DEFINE_PUBLIC_ALIAS(DOS$_ismbbtrail_l, libd__ismbbtrail_l);
+DEFINE_PUBLIC_ALIAS(DOS$_mbbtombc_l, libd__mbbtombc_l);
+DEFINE_PUBLIC_ALIAS(DOS$_mbctombb_l, libd__mbctombb_l);
 
 /* mntent */
 DEFINE_PUBLIC_ALIAS(DOS$__endmntent, libd_endmntent);

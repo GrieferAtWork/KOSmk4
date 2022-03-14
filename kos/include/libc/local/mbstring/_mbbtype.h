@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e25571c */
+/* HASH CRC-32:0xbb248ffc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,22 @@
 #ifndef __local__mbbtype_defined
 #define __local__mbbtype_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE__mbbtype_l
+#if defined(__CRT_HAVE__mbbtype_l) || ((defined(__CRT_HAVE__ismbbtrail_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__ismbbprint_l) || defined(__CRT_HAVE__ismbbkana_l) || defined(__CRT_HAVE__ismbbkprint_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbbtype_l_defined
 #define __local___localdep__mbbtype_l_defined
-__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__mbbtype_l,(unsigned char __ch, int __ctype, __locale_t __locale),_mbbtype_l,(__ch,__ctype,__locale))
+#ifdef __CRT_HAVE__mbbtype_l
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__mbbtype_l,(unsigned char __ch, int __ctype, __locale_t __locale),_mbbtype_l,(__ch,__ctype,__locale))
+#elif (defined(__CRT_HAVE__ismbbtrail_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__ismbbprint_l) || defined(__CRT_HAVE__ismbbkana_l) || defined(__CRT_HAVE__ismbbkprint_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype))
+__NAMESPACE_LOCAL_END
+#include <libc/local/mbstring/_mbbtype_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__mbbtype_l __LIBC_LOCAL_NAME(_mbbtype_l)
+#else /* ... */
+#undef __local___localdep__mbbtype_l_defined
+#endif /* !... */
 #endif /* !__local___localdep__mbbtype_l_defined */
-__LOCAL_LIBC(_mbbtype) __ATTR_WUNUSED int
+__LOCAL_LIBC(_mbbtype) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbbtype))(unsigned char __ch, int __ctype) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__mbbtype_l)(__ch, __ctype, __NULLPTR);
 }
@@ -36,7 +45,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__mbbtype_defined
 #define __localdep__mbbtype __LIBC_LOCAL_NAME(_mbbtype)
 #endif /* !__local___localdep__mbbtype_defined */
-#else /* __CRT_HAVE__mbbtype_l */
+#else /* __CRT_HAVE__mbbtype_l || ((__CRT_HAVE__ismbbtrail_l || __CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype) && (__CRT_HAVE__ismbblead_l || __CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype) && (__CRT_HAVE__ismbbprint_l || __CRT_HAVE__ismbbkana_l || __CRT_HAVE__ismbbkprint_l || __CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype)) */
 #undef __local__mbbtype_defined
-#endif /* !__CRT_HAVE__mbbtype_l */
+#endif /* !__CRT_HAVE__mbbtype_l && ((!__CRT_HAVE__ismbbtrail_l && !__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype) || (!__CRT_HAVE__ismbblead_l && !__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype) || (!__CRT_HAVE__ismbbprint_l && !__CRT_HAVE__ismbbkana_l && !__CRT_HAVE__ismbbkprint_l && !__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype)) */
 #endif /* !__local__mbbtype_defined */

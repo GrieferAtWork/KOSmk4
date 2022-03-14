@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf214273b */
+/* HASH CRC-32:0xd7ece82f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,28 +25,45 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/mbstring.h"
+#include "../user/ctype.h"
+#include "../user/mbctype.h"
 #include "../user/string.h"
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED unsigned int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED unsigned int
 NOTHROW_NCX(LIBCCALL libc__mbbtombc)(unsigned int ch) {
 	return libc__mbbtombc_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED int
+/* >> _mbbtype(3), _mbbtype_l(3)
+ * Used for iterating through string bytes to determine byte types. (s.a. `_mbsbtype_l(3)')
+ * @param: ch: Should actually be a `unsigned char'
+ * @param: ctype: One of:
+ *   - `_MBC_LEAD' -> returns:
+ *     - if `_ismbbtrail_l(ch, locale)' -> `_MBC_TRAIL'
+ *     - else -> `_MBC_ILLEGAL'
+ *   - all other values -> returns:
+ *     - if `_ismbblead_l(ch, locale)' -> `_MBC_LEAD'
+ *     - if `_ismbbprint_l(ch, locale)' -> `_MBC_SINGLE'
+ *     - else -> `_MBC_ILLEGAL' */
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__mbbtype)(unsigned char ch,
                                     int ctype) {
 	return libc__mbbtype_l(ch, ctype, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED unsigned int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED unsigned int
 NOTHROW_NCX(LIBCCALL libc__mbctombb)(unsigned int ch) {
 	return libc__mbctombb_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1)) int
+/* >> _mbsbtype(3), _mbsbtype_l(3)
+ * Returns the type (one of `_MBC_*' from `<mbctype.h>')
+ * of the byte at `str[byte_index]'. If that byte is out
+ * of bounds, return `_MBC_ILLEGAL' */
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc__mbsbtype)(unsigned char const *str,
-                                     size_t pos) {
-	return libc__mbsbtype_l(str, pos, NULL);
+                                     size_t byte_index) {
+	return libc__mbsbtype_l(str, byte_index, NULL);
 }
 INTERN ATTR_SECTION(".text.crt.dos.string.memory") NONNULL((1, 3)) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbscat_s)(unsigned char *buf,
@@ -54,17 +71,17 @@ NOTHROW_NCX(LIBCCALL libc__mbscat_s)(unsigned char *buf,
                                      unsigned char const *src) {
 	return libc__mbscat_s_l(buf, true_bufsize, src, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1)) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1)) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbschr)(unsigned char const *__restrict haystack,
                                    unsigned int needle) {
 	return libc__mbschr_l(haystack, needle, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbscmp)(unsigned char const *lhs,
                                    unsigned char const *rhs) {
 	return libc__mbscmp_l(lhs, rhs, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbscoll)(unsigned char const *lhs,
                                     unsigned char const *rhs) {
 	return libc__mbscoll_l(lhs, rhs, NULL);
@@ -75,35 +92,35 @@ NOTHROW_NCX(LIBCCALL libc__mbscpy_s)(unsigned char *buf,
                                      unsigned char const *src) {
 	return libc__mbscpy_s_l(buf, true_bufsize, src, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) size_t
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBCCALL libc__mbscspn)(unsigned char const *haystack,
                                     unsigned char const *reject) {
 	return libc__mbscspn_l(haystack, reject, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsdec)(unsigned char const *start,
                                    unsigned char const *pos) {
 	return libc__mbsdec_l(start, pos, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsicmp)(unsigned char const *lhs,
                                     unsigned char const *rhs) {
 	return libc__mbsicmp_l(lhs, rhs, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsicoll)(unsigned char const *lhs,
                                      unsigned char const *rhs) {
 	return libc__mbsicoll_l(lhs, rhs, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1)) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1)) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsinc)(unsigned char const *ptr) {
 	return libc__mbsinc_l(ptr, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1)) size_t
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc__mbslen)(unsigned char const *str) {
 	return libc__mbslen_l(str, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1)) size_t
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc__mbsnlen)(unsigned char const *str,
                                     size_t max_bytes) {
 	return libc__mbsnlen_l(str, max_bytes, NULL);
@@ -134,20 +151,20 @@ NOTHROW_NCX(LIBCCALL libc__mbsnbcat)(unsigned char *buf,
                                      size_t max_bytes) {
 	return libc__mbsnbcat_l(buf, src, max_bytes, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsnbcmp)(unsigned char const *lhs,
                                      unsigned char const *rhs,
                                      size_t max_bytes) {
 	return libc__mbsnbcmp_l(lhs, rhs, max_bytes, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsnbcoll)(unsigned char const *lhs,
                                       unsigned char const *rhs,
                                       size_t max_bytes) {
 	return libc__mbsnbcoll_l(lhs, rhs, max_bytes, NULL);
 }
 /* Returns byte-offset from `str' after skipping `max_chars' characters. */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1)) size_t
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc__mbsnbcnt)(unsigned char const *str,
                                      size_t max_chars) {
 	return libc__mbsnbcnt_l(str, max_chars, NULL);
@@ -165,13 +182,13 @@ NOTHROW_NCX(LIBCCALL libc__mbsnbcpy)(unsigned char *buf,
                                      size_t bufsize) {
 	return libc__mbsnbcpy_l(buf, src, bufsize, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsnbicmp)(unsigned char const *lhs,
                                       unsigned char const *rhs,
                                       size_t max_bytes) {
 	return libc__mbsnbicmp_l(lhs, rhs, max_bytes, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsnbicoll)(unsigned char const *lhs,
                                        unsigned char const *rhs,
                                        size_t max_bytes) {
@@ -204,18 +221,18 @@ NOTHROW_NCX(LIBCCALL libc__mbsncat)(unsigned char *buf,
 	return libc__mbsncat_l(buf, src, max_chars, NULL);
 }
 /* Returns # of characters in (up to) first `max_bytes' of `str'. */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1)) size_t
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc__mbsnccnt)(unsigned char const *str,
                                      size_t max_bytes) {
 	return libc__mbsnccnt_l(str, max_bytes, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsncmp)(unsigned char const *lhs,
                                     unsigned char const *rhs,
                                     size_t max_chars) {
 	return libc__mbsncmp_l(lhs, rhs, max_chars, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsncoll)(unsigned char const *lhs,
                                      unsigned char const *rhs,
                                      size_t max_chars) {
@@ -236,24 +253,24 @@ NOTHROW_NCX(LIBCCALL libc__mbsncpy)(unsigned char *buf,
                                     size_t max_chars) {
 	return libc__mbsncpy_l(buf, src, max_chars, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1)) unsigned int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1)) unsigned int
 NOTHROW_NCX(LIBCCALL libc__mbsnextc)(unsigned char const *str) {
 	return libc__mbsnextc_l(str, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsnicmp)(unsigned char const *lhs,
                                      unsigned char const *rhs,
                                      size_t max_chars) {
 	return libc__mbsnicmp_l(lhs, rhs, max_chars, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsnicoll)(unsigned char const *lhs,
                                       unsigned char const *rhs,
                                       size_t max_chars) {
 	return libc__mbsnicoll_l(lhs, rhs, max_chars, NULL);
 }
 /* Returns pointer to `max_chars'th character of `str' (or strend() when `max_chars > _mbslen_l(str)') */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1)) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1)) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsninc)(unsigned char const *str,
                                     size_t max_chars) {
 	return libc__mbsninc_l(str, max_chars, NULL);
@@ -271,12 +288,12 @@ NOTHROW_NCX(LIBCCALL libc__mbsnset)(unsigned char *buf,
                                     size_t max_chars) {
 	return libc__mbsnset_l(buf, ch, max_chars, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbspbrk)(unsigned char const *haystack,
                                     unsigned char const *accept) {
 	return libc__mbspbrk_l(haystack, accept, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1)) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1)) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsrchr)(unsigned char const *haystack,
                                     unsigned int needle) {
 	return libc__mbsrchr_l(haystack, needle, NULL);
@@ -297,17 +314,17 @@ NOTHROW_NCX(LIBCCALL libc__mbsset)(unsigned char *buf,
 	return libc__mbsset_l(buf, ch, NULL);
 }
 /* Returs a byte-offset */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) size_t
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBCCALL libc__mbsspn)(unsigned char const *haystack,
                                    unsigned char const *accept) {
 	return libc__mbsspn_l(haystack, accept, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsspnp)(unsigned char const *haystack,
                                     unsigned char const *accept) {
 	return libc__mbsspnp_l(haystack, accept, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsstr)(unsigned char const *haystack,
                                    unsigned char const *needle) {
 	return libc__mbsstr_l(haystack, needle, NULL);
@@ -328,7 +345,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsupr_s)(unsigned char *buf,
                                      size_t true_bufsize) {
 	return libc__mbsupr_s_l(buf, true_bufsize, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1)) size_t
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc__mbclen)(unsigned char const *str) {
 	return libc__mbclen_l(str, NULL);
 }
@@ -344,112 +361,104 @@ NOTHROW_NCX(LIBCCALL libc__mbccpy_s)(unsigned char *dst,
                                      unsigned char const *src) {
 	return libc__mbccpy_s_l(dst, true_dstsize, p_copied, src, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbcalnum)(unsigned int ch) {
 	return libc__ismbcalnum_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbcalpha)(unsigned int ch) {
 	return libc__ismbcalpha_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbcdigit)(unsigned int ch) {
 	return libc__ismbcdigit_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbcgraph)(unsigned int ch) {
 	return libc__ismbcgraph_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbclegal)(unsigned int ch) {
 	return libc__ismbclegal_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbclower)(unsigned int ch) {
 	return libc__ismbclower_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbcprint)(unsigned int ch) {
 	return libc__ismbcprint_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbcpunct)(unsigned int ch) {
 	return libc__ismbcpunct_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbcblank)(unsigned int ch) {
 	return libc__ismbcblank_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbcspace)(unsigned int ch) {
 	return libc__ismbcspace_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbcupper)(unsigned int ch) {
 	return libc__ismbcupper_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED unsigned int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED unsigned int
 NOTHROW_NCX(LIBCCALL libc__mbctolower)(unsigned int ch) {
 	return libc__mbctolower_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED unsigned int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED unsigned int
 NOTHROW_NCX(LIBCCALL libc__mbctoupper)(unsigned int ch) {
 	return libc__mbctoupper_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbchira)(unsigned int ch) {
 	return libc__ismbchira_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbckata)(unsigned int ch) {
 	return libc__ismbckata_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbcsymbol)(unsigned int ch) {
 	return libc__ismbcsymbol_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbcl0)(unsigned int ch) {
 	return libc__ismbcl0_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbcl1)(unsigned int ch) {
 	return libc__ismbcl1_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__ismbcl2)(unsigned int ch) {
 	return libc__ismbcl2_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED unsigned int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED unsigned int
 NOTHROW_NCX(LIBCCALL libc__mbcjistojms)(unsigned int ch) {
 	return libc__mbcjistojms_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED unsigned int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED unsigned int
 NOTHROW_NCX(LIBCCALL libc__mbcjmstojis)(unsigned int ch) {
 	return libc__mbcjmstojis_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED unsigned int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED unsigned int
 NOTHROW_NCX(LIBCCALL libc__mbctohira)(unsigned int ch) {
 	return libc__mbctohira_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED unsigned int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED unsigned int
 NOTHROW_NCX(LIBCCALL libc__mbctokata)(unsigned int ch) {
 	return libc__mbctokata_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED int
-NOTHROW_NCX(LIBCCALL libc__ismbblead)(unsigned int ch) {
-	return libc__ismbblead_l(ch, NULL);
-}
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED int
-NOTHROW_NCX(LIBCCALL libc__ismbbtrail)(unsigned int ch) {
-	return libc__ismbbtrail_l(ch, NULL);
-}
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__ismbslead)(unsigned char const *str,
                                       unsigned char const *pos) {
 	return libc__ismbslead_l(str, pos, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__ismbstrail)(unsigned char const *str,
                                        unsigned char const *pos) {
 	return libc__ismbstrail_l(str, pos, NULL);
@@ -533,7 +542,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnbcpy_l)(unsigned char *buf,
 	return buf;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1)) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1)) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbschr_l)(unsigned char const *__restrict haystack,
                                      unsigned int needle,
                                      locale_t locale) {
@@ -551,21 +560,21 @@ NOTHROW_NCX(LIBCCALL libc__mbschr_l)(unsigned char const *__restrict haystack,
 	}
 	return NULL;
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbscoll_l)(unsigned char const *lhs,
                                       unsigned char const *rhs,
                                       locale_t locale) {
 	/* XXX: Implement properly? */
 	return libc__mbscmp_l(lhs, rhs, locale);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsicoll_l)(unsigned char const *lhs,
                                        unsigned char const *rhs,
                                        locale_t locale) {
 	/* XXX: Implement properly? */
 	return libc__mbscmp_l(lhs, rhs, locale);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsncoll_l)(unsigned char const *lhs,
                                        unsigned char const *rhs,
                                        size_t max_chars,
@@ -573,7 +582,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsncoll_l)(unsigned char const *lhs,
 	/* XXX: Implement properly? */
 	return libc__mbsncmp_l(lhs, rhs, max_chars, locale);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsnicoll_l)(unsigned char const *lhs,
                                         unsigned char const *rhs,
                                         size_t max_chars,
@@ -581,7 +590,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnicoll_l)(unsigned char const *lhs,
 	/* XXX: Implement properly? */
 	return libc__mbsnicmp_l(lhs, rhs, max_chars, locale);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsnbcoll_l)(unsigned char const *lhs,
                                         unsigned char const *rhs,
                                         size_t max_bytes,
@@ -589,7 +598,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnbcoll_l)(unsigned char const *lhs,
 	/* XXX: Implement properly? */
 	return libc__mbsnbcmp_l(lhs, rhs, max_bytes, locale);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsnbicoll_l)(unsigned char const *lhs,
                                          unsigned char const *rhs,
                                          size_t max_bytes,
@@ -649,7 +658,7 @@ do_1byte_lower:
 	}
 	return buf;
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_RETNONNULL WUNUSED NONNULL((1)) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsinc_l)(unsigned char const *ptr,
                                      locale_t locale) {
 	if (libc__ismbblead_l(*ptr++, locale)) {
@@ -659,7 +668,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsinc_l)(unsigned char const *ptr,
 	return (unsigned char *)ptr;
 }
 /* Returns pointer to `max_chars'th character of `str' (or strend() when `max_chars > _mbslen_l(str)') */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsninc_l)(unsigned char const *str,
                                       size_t max_chars,
                                       locale_t locale) {
@@ -667,7 +676,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsninc_l)(unsigned char const *str,
 		str += libc__mbsnbcnt_l(str, max_chars, locale);
 	return (unsigned char *)str;
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsdec_l)(unsigned char const *start,
                                      unsigned char const *pos,
                                      locale_t locale) {
@@ -685,7 +694,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsdec_l)(unsigned char const *start,
 	return (unsigned char *)iter;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) size_t
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBCCALL libc__mbscspn_l)(unsigned char const *haystack,
                                       unsigned char const *reject,
                                       locale_t locale) {
@@ -703,7 +712,7 @@ NOTHROW_NCX(LIBCCALL libc__mbscspn_l)(unsigned char const *haystack,
 	return (size_t)(iter - haystack);
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1)) size_t
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc__mbslen_l)(unsigned char const *str,
                                      locale_t locale) {
 	size_t result;
@@ -717,7 +726,7 @@ NOTHROW_NCX(LIBCCALL libc__mbslen_l)(unsigned char const *str,
 	return result;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1)) size_t
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc__mbsnlen_l)(unsigned char const *str,
                                       size_t max_bytes,
                                       locale_t locale) {
@@ -794,7 +803,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnbcat_l)(unsigned char *buf,
 }
 #include <hybrid/typecore.h>
 /* Returns # of characters in (up to) first `max_bytes' of `str'. */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1)) size_t
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc__mbsnccnt_l)(unsigned char const *str,
                                        size_t max_bytes,
                                        locale_t locale) {
@@ -821,7 +830,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnccnt_l)(unsigned char const *str,
 }
 #include <hybrid/typecore.h>
 /* Returns byte-offset from `str' after skipping `max_chars' characters. */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1)) size_t
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc__mbsnbcnt_l)(unsigned char const *str,
                                        size_t max_chars,
                                        locale_t locale) {
@@ -840,7 +849,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnbcnt_l)(unsigned char const *str,
 	return (size_t)(iter - str);
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbscmp_l)(unsigned char const *lhs,
                                      unsigned char const *rhs,
                                      locale_t locale) {
@@ -860,7 +869,7 @@ NOTHROW_NCX(LIBCCALL libc__mbscmp_l)(unsigned char const *lhs,
 	return 0;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsicmp_l)(unsigned char const *lhs,
                                       unsigned char const *rhs,
                                       locale_t locale) {
@@ -884,7 +893,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsicmp_l)(unsigned char const *lhs,
 	return 0;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsncmp_l)(unsigned char const *lhs,
                                       unsigned char const *rhs,
                                       size_t max_chars,
@@ -905,7 +914,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsncmp_l)(unsigned char const *lhs,
 	return 0;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsnicmp_l)(unsigned char const *lhs,
                                        unsigned char const *rhs,
                                        size_t max_chars,
@@ -930,7 +939,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnicmp_l)(unsigned char const *lhs,
 	return 0;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsnbcmp_l)(unsigned char const *lhs,
                                        unsigned char const *rhs,
                                        size_t max_bytes,
@@ -957,7 +966,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnbcmp_l)(unsigned char const *lhs,
 	return 0;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsnbicmp_l)(unsigned char const *lhs,
                                         unsigned char const *rhs,
                                         size_t max_bytes,
@@ -987,7 +996,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnbicmp_l)(unsigned char const *lhs,
 	}
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1)) unsigned int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1)) unsigned int
 NOTHROW_NCX(LIBCCALL libc__mbsnextc_l)(unsigned char const *str,
                                        locale_t locale) {
 	uint16_t result = str[0];
@@ -996,7 +1005,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnextc_l)(unsigned char const *str,
 	return result;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbspbrk_l)(unsigned char const *haystack,
                                       unsigned char const *accept,
                                       locale_t locale) {
@@ -1023,7 +1032,7 @@ NOTHROW_NCX(LIBCCALL libc__mbspbrk_l)(unsigned char const *haystack,
 	return NULL;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1)) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1)) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsrchr_l)(unsigned char const *haystack,
                                       unsigned int needle,
                                       locale_t locale) {
@@ -1128,7 +1137,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnbset_l)(unsigned char *buf,
 	return buf;
 }
 /* Returs a byte-offset */
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) size_t
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBCCALL libc__mbsspn_l)(unsigned char const *haystack,
                                      unsigned char const *accept,
                                      locale_t locale) {
@@ -1148,7 +1157,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsspn_l)(unsigned char const *haystack,
 	}
 	return (size_t)(iter - haystack);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsspnp_l)(unsigned char const *haystack,
                                       unsigned char const *accept,
                                       locale_t locale) {
@@ -1157,7 +1166,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsspnp_l)(unsigned char const *haystack,
 		haystack = NULL;
 	return (unsigned char *)haystack;
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsstr_l)(unsigned char const *haystack,
                                      unsigned char const *needle,
                                      locale_t locale) {
@@ -1220,7 +1229,7 @@ NOTHROW_NCX(LIBCCALL libc__mbstok_s_l)(unsigned char *str,
 	return str;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1)) size_t
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc__mbclen_l)(unsigned char const *str,
                                      locale_t locale) {
 	size_t result = 1;
@@ -1392,7 +1401,7 @@ NOTHROW_NCX(LIBCCALL libc__mbccpy_s_l)(unsigned char *dst,
 	}
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__ismbslead_l)(unsigned char const *str,
                                         unsigned char const *pos,
                                         locale_t locale) {
@@ -1410,7 +1419,7 @@ NOTHROW_NCX(LIBCCALL libc__ismbslead_l)(unsigned char const *str,
 	}
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__ismbstrail_l)(unsigned char const *str,
                                          unsigned char const *pos,
                                          locale_t locale) {
@@ -1427,6 +1436,380 @@ NOTHROW_NCX(LIBCCALL libc__ismbstrail_l)(unsigned char const *str,
 		}
 	}
 	return 0;
+}
+/* >> _mbbtype(3), _mbbtype_l(3)
+ * Used for iterating through string bytes to determine byte types. (s.a. `_mbsbtype_l(3)')
+ * @param: ch: Should actually be a `unsigned char'
+ * @param: ctype: One of:
+ *   - `_MBC_LEAD' -> returns:
+ *     - if `_ismbbtrail_l(ch, locale)' -> `_MBC_TRAIL'
+ *     - else -> `_MBC_ILLEGAL'
+ *   - all other values -> returns:
+ *     - if `_ismbblead_l(ch, locale)' -> `_MBC_LEAD'
+ *     - if `_ismbbprint_l(ch, locale)' -> `_MBC_SINGLE'
+ *     - else -> `_MBC_ILLEGAL' */
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__mbbtype_l)(unsigned char ch,
+                                      int ctype,
+                                      locale_t locale) {
+	if (ctype == 1)
+		return libc__ismbbtrail_l(ch, locale) ? 2 : (-1);
+	if (libc__ismbblead_l(ch, locale))
+		return 1;
+	if (libc__ismbbprint_l(ch, locale))
+		return 0;
+	return (-1);
+}
+/* >> _mbsbtype(3), _mbsbtype_l(3)
+ * Returns the type (one of `_MBC_*' from `<mbctype.h>')
+ * of the byte at `str[byte_index]'. If that byte is out
+ * of bounds, return `_MBC_ILLEGAL' */
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc__mbsbtype_l)(unsigned char const *str,
+                                       size_t byte_index,
+                                       locale_t locale) {
+	int result = (-1);
+	for (;;) {
+		unsigned char ch = *str;
+		if unlikely(ch == 0)
+			return (-1);
+		result = libc__mbbtype_l(ch, result, locale);
+		if (!byte_index)
+			break;
+		--byte_index;
+		++str;
+	}
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__ismbclegal_l)(unsigned int ch,
+                                         locale_t locale) {
+	if (!libc__ismbblead_l((ch >> 8) & 0xff, locale))
+		return 0;
+	if (!libc__ismbbtrail_l(ch & 0xff, locale))
+		return 0;
+	return 1;
+}
+#include <libc/template/mbcasemap.h>
+#include <libc/unicode.h>
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED unsigned int
+NOTHROW_NCX(LIBCCALL libc__mbctolower_l)(unsigned int ch,
+                                         locale_t locale) {
+
+	char32_t uni;
+	uni = libc__mbctouni_l(ch, locale);
+	uni = __libc_unicode_tolower(uni);
+	return libc__unitombc_l(ch, locale);
+
+
+
+
+
+
+
+}
+#include <libc/template/mbcasemap.h>
+#include <libc/unicode.h>
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED unsigned int
+NOTHROW_NCX(LIBCCALL libc__mbctoupper_l)(unsigned int ch,
+                                         locale_t locale) {
+
+	char32_t uni;
+	uni = libc__mbctouni_l(ch, locale);
+	uni = __libc_unicode_toupper(uni);
+	return libc__unitombc_l(ch, locale);
+
+
+
+
+
+
+
+}
+#include <libc/unicode.h>
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__ismbcalnum_l)(unsigned int ch,
+                                         locale_t locale) {
+
+	char32_t uni = libc__mbctouni_l(ch, locale);
+	return __libc_unicode_isalnum(uni);
+
+
+
+
+
+}
+#include <libc/unicode.h>
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__ismbcalpha_l)(unsigned int ch,
+                                         locale_t locale) {
+
+	char32_t uni = libc__mbctouni_l(ch, locale);
+	return __libc_unicode_isalpha(uni);
+
+
+
+
+
+}
+#include <libc/unicode.h>
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__ismbcdigit_l)(unsigned int ch,
+                                         locale_t locale) {
+
+	char32_t uni = libc__mbctouni_l(ch, locale);
+	return __libc_unicode_isdigit(uni);
+
+
+
+
+
+}
+#include <libc/unicode.h>
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__ismbcgraph_l)(unsigned int ch,
+                                         locale_t locale) {
+
+	char32_t uni = libc__mbctouni_l(ch, locale);
+	return __libc_unicode_isgraph(uni);
+
+
+
+
+
+}
+#include <libc/unicode.h>
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__ismbclower_l)(unsigned int ch,
+                                         locale_t locale) {
+
+	char32_t uni = libc__mbctouni_l(ch, locale);
+	return __libc_unicode_islower(uni);
+
+
+
+
+
+}
+#include <libc/unicode.h>
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__ismbcupper_l)(unsigned int ch,
+                                         locale_t locale) {
+
+	char32_t uni = libc__mbctouni_l(ch, locale);
+	return __libc_unicode_isupper(uni);
+
+
+
+
+
+}
+#include <libc/unicode.h>
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__ismbcprint_l)(unsigned int ch,
+                                         locale_t locale) {
+
+	char32_t uni = libc__mbctouni_l(ch, locale);
+	return __libc_unicode_isprint(uni);
+
+
+
+
+
+}
+#include <libc/unicode.h>
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__ismbcpunct_l)(unsigned int ch,
+                                         locale_t locale) {
+
+	char32_t uni = libc__mbctouni_l(ch, locale);
+	return __libc_unicode_ispunct(uni);
+
+
+
+
+
+}
+#include <libc/unicode.h>
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__ismbcblank_l)(unsigned int ch,
+                                         locale_t locale) {
+
+	char32_t uni = libc__mbctouni_l(ch, locale);
+	return __libc_unicode_isblank(uni);
+
+
+
+
+
+}
+#include <libc/unicode.h>
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__ismbcspace_l)(unsigned int ch,
+                                         locale_t locale) {
+
+	char32_t uni = libc__mbctouni_l(ch, locale);
+	return __libc_unicode_isspace(uni);
+
+
+
+
+
+}
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__ismbchira_l)(unsigned int ch,
+                                        locale_t locale) {
+	/* Extrapolated from reverse engineering. */
+	if (libc__getmbcp_l(locale) != 932)
+		return 0;
+	if (ch > 0x829e && ch < 0x82f2)
+		return 1;
+	return 0;
+}
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__ismbckata_l)(unsigned int ch,
+                                        locale_t locale) {
+	/* Extrapolated from reverse engineering. */
+	if (libc__getmbcp_l(locale) != 932)
+		return 0;
+	if (ch > 0x833f && ch < 0x8397 && ch != 0x837f)
+		return 1;
+	return 0;
+}
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__ismbcsymbol_l)(unsigned int ch,
+                                          locale_t locale) {
+	/* Extrapolated from reverse engineering. */
+	if (libc__getmbcp_l(locale) != 932)
+		return 0;
+	if (ch > 0x8140 && ch < 0x81ad && ch != 0x817f)
+		return 1;
+	return 0;
+}
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__ismbcl0_l)(unsigned int ch,
+                                      locale_t locale) {
+	/* Extrapolated from reverse engineering. */
+	if (libc__getmbcp_l(locale) != 932)
+		return 0;
+	if (!libc__ismbblead_l((ch >> 8) & 0xff, locale))
+		return 0;
+	if (!libc__ismbbtrail_l(ch & 0xff, locale))
+		return 0;
+	if (ch < 0x889f)
+		return 1;
+	return 0;
+}
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__ismbcl1_l)(unsigned int ch,
+                                      locale_t locale) {
+	/* Extrapolated from reverse engineering. */
+	if (libc__getmbcp_l(locale) != 932)
+		return 0;
+	if (!libc__ismbblead_l((ch >> 8) & 0xff, locale))
+		return 0;
+	if (!libc__ismbbtrail_l(ch & 0xff, locale))
+		return 0;
+	if (ch > 0x889e && ch < 0x9873)
+		return 1;
+	return 0;
+}
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__ismbcl2_l)(unsigned int ch,
+                                      locale_t locale) {
+	/* Extrapolated from reverse engineering. */
+	if (libc__getmbcp_l(locale) != 932)
+		return 0;
+	if (!libc__ismbblead_l((ch >> 8) & 0xff, locale))
+		return 0;
+	if (!libc__ismbbtrail_l(ch & 0xff, locale))
+		return 0;
+	if (ch > 0x989e && ch < 0xeaa5)
+		return 1;
+	return 0;
+}
+#include <libc/errno.h>
+#include <hybrid/typecore.h>
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED unsigned int
+NOTHROW_NCX(LIBCCALL libc__mbcjistojms_l)(unsigned int ch,
+                                          locale_t locale) {
+	unsigned char c1, c2, temp;
+	/* Extrapolated from reverse engineering. */
+	if (libc__getmbcp_l(locale) != 932)
+		return ch;
+	c1 = ch & 0xff;
+	c2 = ch >> 8 & 0xff;
+	if ((c1 > 0x7e) || (c1 < 0x21) || 
+	    (c2 > 0x7e) || (c2 < 0x21)) {
+
+		__libc_seterrno(EILSEQ);
+
+		return 0;
+	}
+	if (((ch >> 8) & 1) == 0) {
+		c1 += 0x7e;
+	} else {
+		c1 += c1 < 0x60 ? 0x1f: 0x20;
+	}
+	temp = (c2 - 0x21) >> 1;
+	c2   = temp + 0x81;
+	if (c2 > 0x9f)
+		c2 = temp + 0xc1;
+	return (uint16_t)c2 << 8 | c1;
+}
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED unsigned int
+NOTHROW_NCX(LIBCCALL libc__mbcjmstojis_l)(unsigned int ch,
+                                          locale_t locale) {
+	unsigned char c1, c2;
+	/* Extrapolated from reverse engineering. */
+	if (libc__getmbcp_l(locale) != 932)
+		return ch;
+	c1 = ch & 0xff;
+	c2 = (ch >> 8) & 0xff;
+	if (libc__ismbblead_l(c1, locale) && libc__ismbbtrail_l(c2, locale)) {
+		c2 -= c2 < 0xa0 ? 0x81 : 0xc1;
+		if (c1 < 0x9f) {
+			ch = (c2 * 0x200) + 0x2100;
+			ch |= c1 - (c1 < 0x7f ? 0x1f : 0x20);
+		} else {
+			ch = (c2 * 0x200) + 0x2200;
+			ch |= c1 - 0x7e;
+		}
+		if ((ch > 0x2120 && ch < 0x7e7f) &&
+		    ((ch & 0xff) > 0x20) &&
+		    ((ch & 0xff) < 0x7f))
+			return ch;
+	}
+
+	__libc_seterrno(EILSEQ);
+
+	return 0;
+}
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED unsigned int
+NOTHROW_NCX(LIBCCALL libc__mbctohira_l)(unsigned int ch,
+                                        locale_t locale) {
+	/* Extrapolated from reverse engineering. */
+	if (libc__ismbckata_l(ch, locale) && ch < 0x8394) {
+		if (ch < 0x837f) {
+			ch -= 0xa1;
+		} else {
+			ch -= 0xa2;
+		}
+	}
+	return ch;
+}
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_PURE WUNUSED unsigned int
+NOTHROW_NCX(LIBCCALL libc__mbctokata_l)(unsigned int ch,
+                                        locale_t locale) {
+	/* Extrapolated from reverse engineering. */
+	unsigned int result = ch;
+	if (libc__ismbchira_l(ch, locale)) {
+		result = ch + 0xa1;
+		if (result > 0x837e)
+			++result;
+	}
+	return result;
 }
 #endif /* !__KERNEL__ */
 
@@ -1513,8 +1896,6 @@ DEFINE_PUBLIC_ALIAS(_mbcjistojms, libc__mbcjistojms);
 DEFINE_PUBLIC_ALIAS(_mbcjmstojis, libc__mbcjmstojis);
 DEFINE_PUBLIC_ALIAS(_mbctohira, libc__mbctohira);
 DEFINE_PUBLIC_ALIAS(_mbctokata, libc__mbctokata);
-DEFINE_PUBLIC_ALIAS(_ismbblead, libc__ismbblead);
-DEFINE_PUBLIC_ALIAS(_ismbbtrail, libc__ismbbtrail);
 DEFINE_PUBLIC_ALIAS(_ismbslead, libc__ismbslead);
 DEFINE_PUBLIC_ALIAS(_ismbstrail, libc__ismbstrail);
 DEFINE_PUBLIC_ALIAS(_mbscat_l, libc__mbscat_l);
@@ -1574,6 +1955,31 @@ DEFINE_PUBLIC_ALIAS(_mbsset_s_l, libc__mbsset_s_l);
 DEFINE_PUBLIC_ALIAS(_mbccpy_s_l, libc__mbccpy_s_l);
 DEFINE_PUBLIC_ALIAS(_ismbslead_l, libc__ismbslead_l);
 DEFINE_PUBLIC_ALIAS(_ismbstrail_l, libc__ismbstrail_l);
+DEFINE_PUBLIC_ALIAS(_mbbtype_l, libc__mbbtype_l);
+DEFINE_PUBLIC_ALIAS(_mbsbtype_l, libc__mbsbtype_l);
+DEFINE_PUBLIC_ALIAS(_ismbclegal_l, libc__ismbclegal_l);
+DEFINE_PUBLIC_ALIAS(_mbctolower_l, libc__mbctolower_l);
+DEFINE_PUBLIC_ALIAS(_mbctoupper_l, libc__mbctoupper_l);
+DEFINE_PUBLIC_ALIAS(_ismbcalnum_l, libc__ismbcalnum_l);
+DEFINE_PUBLIC_ALIAS(_ismbcalpha_l, libc__ismbcalpha_l);
+DEFINE_PUBLIC_ALIAS(_ismbcdigit_l, libc__ismbcdigit_l);
+DEFINE_PUBLIC_ALIAS(_ismbcgraph_l, libc__ismbcgraph_l);
+DEFINE_PUBLIC_ALIAS(_ismbclower_l, libc__ismbclower_l);
+DEFINE_PUBLIC_ALIAS(_ismbcupper_l, libc__ismbcupper_l);
+DEFINE_PUBLIC_ALIAS(_ismbcprint_l, libc__ismbcprint_l);
+DEFINE_PUBLIC_ALIAS(_ismbcpunct_l, libc__ismbcpunct_l);
+DEFINE_PUBLIC_ALIAS(_ismbcblank_l, libc__ismbcblank_l);
+DEFINE_PUBLIC_ALIAS(_ismbcspace_l, libc__ismbcspace_l);
+DEFINE_PUBLIC_ALIAS(_ismbchira_l, libc__ismbchira_l);
+DEFINE_PUBLIC_ALIAS(_ismbckata_l, libc__ismbckata_l);
+DEFINE_PUBLIC_ALIAS(_ismbcsymbol_l, libc__ismbcsymbol_l);
+DEFINE_PUBLIC_ALIAS(_ismbcl0_l, libc__ismbcl0_l);
+DEFINE_PUBLIC_ALIAS(_ismbcl1_l, libc__ismbcl1_l);
+DEFINE_PUBLIC_ALIAS(_ismbcl2_l, libc__ismbcl2_l);
+DEFINE_PUBLIC_ALIAS(_mbcjistojms_l, libc__mbcjistojms_l);
+DEFINE_PUBLIC_ALIAS(_mbcjmstojis_l, libc__mbcjmstojis_l);
+DEFINE_PUBLIC_ALIAS(_mbctohira_l, libc__mbctohira_l);
+DEFINE_PUBLIC_ALIAS(_mbctokata_l, libc__mbctokata_l);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_MBSTRING_C */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x551fcf60 */
+/* HASH CRC-32:0xf0e0428d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local__mbccpy_s_defined
 #define __local__mbccpy_s_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE__mbccpy_s_l) || defined(__CRT_HAVE__ismbblead_l)
+#if defined(__CRT_HAVE__mbccpy_s_l) || defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 #include <hybrid/typecore.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep__mbccpy_s_l_defined
 #ifdef __CRT_HAVE__mbccpy_s_l
 __CREDIRECT(__ATTR_NONNULL((1, 4)),__errno_t,__NOTHROW_NCX,__localdep__mbccpy_s_l,(unsigned char *__dst, __SIZE_TYPE__ __true_dstsize, int *__p_copied, unsigned char const *__src, __locale_t __locale),_mbccpy_s_l,(__dst,__true_dstsize,__p_copied,__src,__locale))
-#elif defined(__CRT_HAVE__ismbblead_l)
+#elif defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_END
 #include <libc/local/mbstring/_mbccpy_s_l.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__mbccpy_s_defined
 #define __localdep__mbccpy_s __LIBC_LOCAL_NAME(_mbccpy_s)
 #endif /* !__local___localdep__mbccpy_s_defined */
-#else /* __CRT_HAVE__mbccpy_s_l || __CRT_HAVE__ismbblead_l */
+#else /* __CRT_HAVE__mbccpy_s_l || __CRT_HAVE__ismbblead_l || __CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype */
 #undef __local__mbccpy_s_defined
-#endif /* !__CRT_HAVE__mbccpy_s_l && !__CRT_HAVE__ismbblead_l */
+#endif /* !__CRT_HAVE__mbccpy_s_l && !__CRT_HAVE__ismbblead_l && !__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype */
 #endif /* !__local__mbccpy_s_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x983303c */
+/* HASH CRC-32:0xb707613a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local__mbsnbset_s_defined
 #define __local__mbsnbset_s_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE__mbsnbset_s_l) || defined(__CRT_HAVE__mbsnbset_l) || defined(__CRT_HAVE__ismbblead_l)
+#if defined(__CRT_HAVE__mbsnbset_s_l) || defined(__CRT_HAVE__mbsnbset_l) || defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 #include <hybrid/typecore.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep__mbsnbset_s_l_defined
 #ifdef __CRT_HAVE__mbsnbset_s_l
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep__mbsnbset_s_l,(unsigned char *__buf, __SIZE_TYPE__ __true_bufsize, unsigned int __ch, __SIZE_TYPE__ __max_bytes, __locale_t __locale),_mbsnbset_s_l,(__buf,__true_bufsize,__ch,__max_bytes,__locale))
-#elif defined(__CRT_HAVE__mbsnbset_l) || defined(__CRT_HAVE__ismbblead_l)
+#elif defined(__CRT_HAVE__mbsnbset_l) || defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_END
 #include <libc/local/mbstring/_mbsnbset_s_l.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__mbsnbset_s_defined
 #define __localdep__mbsnbset_s __LIBC_LOCAL_NAME(_mbsnbset_s)
 #endif /* !__local___localdep__mbsnbset_s_defined */
-#else /* __CRT_HAVE__mbsnbset_s_l || __CRT_HAVE__mbsnbset_l || __CRT_HAVE__ismbblead_l */
+#else /* __CRT_HAVE__mbsnbset_s_l || __CRT_HAVE__mbsnbset_l || __CRT_HAVE__ismbblead_l || __CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype */
 #undef __local__mbsnbset_s_defined
-#endif /* !__CRT_HAVE__mbsnbset_s_l && !__CRT_HAVE__mbsnbset_l && !__CRT_HAVE__ismbblead_l */
+#endif /* !__CRT_HAVE__mbsnbset_s_l && !__CRT_HAVE__mbsnbset_l && !__CRT_HAVE__ismbblead_l && !__CRT_HAVE__mbctype && !__CRT_HAVE___p__mbctype */
 #endif /* !__local__mbsnbset_s_defined */
