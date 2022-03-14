@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xddee33d8 */
+/* HASH CRC-32:0x9d0e70f9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -325,6 +325,19 @@ INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd__toupper)(int ch);
 /* >> _toupper(3)
  * Same as `toupper(3)', but the caller must ensure that `islower(ch)' */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc__toupper)(int ch);
+INTDEF ATTR_CONST WUNUSED size_t NOTHROW_NCX(LIBCCALL libc___ctype_get_mb_cur_max)(void);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF int NOTHROW_NCX(LIBDCALL libd____mb_cur_max_l_func)(locale_t locale);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF int NOTHROW_NCX(LIBCCALL libc____mb_cur_max_l_func)(locale_t locale);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd__chvalidator_l)(locale_t locale, int ch, int mask);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc__chvalidator_l)(locale_t locale, int ch, int mask);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd__isctype)(int ch, int mask);

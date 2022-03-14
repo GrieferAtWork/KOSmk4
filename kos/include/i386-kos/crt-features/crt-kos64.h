@@ -301,7 +301,6 @@
 #define __CRT_HAVE____lc_collate_cp_func
 #define __CRT_HAVE____lc_locale_name_func
 #define __CRT_HAVE____mb_cur_max_func
-#define __CRT_HAVE____mb_cur_max_l_func
 #define __CRT_HAVE___access
 #define __CRT_HAVE___acct
 #define __CRT_HAVE___acos
@@ -403,6 +402,7 @@
 #define __CRT_HAVE___ctype_C_toupper
 #define __CRT_HAVE___ctype_b
 #define __CRT_HAVE___ctype_b_loc
+#define __CRT_HAVE___ctype_get_mb_cur_max
 #define __CRT_HAVE___ctype_tolower
 #define __CRT_HAVE___ctype_tolower_loc
 #define __CRT_HAVE___ctype_toupper
@@ -1347,6 +1347,8 @@
 #define __CRT_HAVE__chdrive
 #define __CRT_HAVE__chgsign
 #define __CRT_HAVE__chgsignf
+#define __CRT_HAVE__chvalidator
+#define __CRT_HAVE__chvalidator_l
 #define __CRT_HAVE__clearfp
 #define __CRT_HAVE__configthreadlocale
 #define __CRT_HAVE__control87
@@ -5787,6 +5789,7 @@
 #define __CRT_HAVE___wgetmainargs
 #define __CRT_HAVE__access
 #define __CRT_HAVE__acmdln
+#define __CRT_HAVE__aexit_rtn
 #define __CRT_HAVE__amsg_exit
 #define __CRT_HAVE__cabs
 #define __CRT_HAVE__chdir
@@ -6972,6 +6975,8 @@
 #define __CRT_HAVE_KOS$_chdrive
 #define __CRT_HAVE_KOS$_chgsign
 #define __CRT_HAVE_KOS$_chgsignf
+#define __CRT_HAVE_KOS$_chvalidator
+#define __CRT_HAVE_KOS$_chvalidator_l
 #define __CRT_HAVE_KOS$_configthreadlocale
 #define __CRT_HAVE_KOS$_control87
 #define __CRT_HAVE_KOS$_controlfp
@@ -10977,6 +10982,7 @@
 #define __CRT_HAVE_DOS$_access
 #define __CRT_HAVE_DOS$_access_s
 #define __CRT_HAVE_DOS$_acmdln
+#define __CRT_HAVE_DOS$_aexit_rtn
 #define __CRT_HAVE_DOS$_aligned_free
 #define __CRT_HAVE_DOS$_aligned_malloc
 #define __CRT_HAVE_DOS$_aligned_msize
@@ -11013,6 +11019,8 @@
 #define __CRT_HAVE_DOS$_chmod
 #define __CRT_HAVE_DOS$_chsize
 #define __CRT_HAVE_DOS$_chsize_s
+#define __CRT_HAVE_DOS$_chvalidator
+#define __CRT_HAVE_DOS$_chvalidator_l
 #define __CRT_HAVE_DOS$_close
 #define __CRT_HAVE_DOS$_commit
 #define __CRT_HAVE_DOS$_commode

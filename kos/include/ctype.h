@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9a563 */
+/* HASH CRC-32:0xf2a9b1ed */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,6 +76,11 @@ __NAMESPACE_STD_USING(isblank)
 #ifdef __USE_GLIBC
 #include <endian.h>
 #endif /* __USE_GLIBC */
+
+#ifdef __USE_DOS
+#include <corecrt.h>
+#include <corecrt_wctype.h>
+#endif /* __USE_DOS */
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -992,14 +997,104 @@ __LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _toupper)(int __ch)
 #endif /* __USE_MISC || __USE_XOPEN || __USE_DOS */
 
 #ifdef __USE_DOS
+/* Possible values for `mask' argument of `_isctype(3)' */
+#ifndef _UPPER
+#define _UPPER    0x0001 /* isupper() */
+#define _LOWER    0x0002 /* islower() */
+#define _DIGIT    0x0004 /* isdigit() */
+#define _SPACE    0x0008 /* isspace() */
+#define _PUNCT    0x0010 /* ispunct() */
+#define _CONTROL  0x0020 /* iscntrl() */
+#define _BLANK    0x0040 /* isblank() */
+#define _HEX      0x0080 /* isxdigit() - isdigit() */
+#define _LEADBYTE 0x8000 /* Leading byte of multi-byte sequence */
+#define _ALPHA    0x0103 /* isalpha() -- (0x0100 | _UPPER | _LOWER) */
+#endif /* !_UPPER */
+
+
+#ifndef MB_CUR_MAX
+#ifdef __LOCAL_MB_CUR_MAX
+#define MB_CUR_MAX __LOCAL_MB_CUR_MAX
+#elif defined(__mb_cur_max)
+#define MB_CUR_MAX ((__SIZE_TYPE__)__mb_cur_max)
+#elif defined(__ctype_get_mb_cur_max) || defined(____ctype_get_mb_cur_max_defined)
+#define MB_CUR_MAX __ctype_get_mb_cur_max()
+#elif defined(___mb_cur_max_func) || defined(_____mb_cur_max_func_defined)
+#define MB_CUR_MAX ((__SIZE_TYPE__)___mb_cur_max_func())
+#elif defined(__p___mb_cur_max) || defined(____p___mb_cur_max_defined)
+#define MB_CUR_MAX ((__SIZE_TYPE__)*__p___mb_cur_max())
+#elif defined(__CRT_HAVE___ctype_get_mb_cur_max)
+#define ____ctype_get_mb_cur_max_defined
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW,__ctype_get_mb_cur_max,(void),())
+#define MB_CUR_MAX __ctype_get_mb_cur_max()
+#elif defined(__CRT_HAVE____mb_cur_max_func)
+#define _____mb_cur_max_func_defined
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,___mb_cur_max_func,(void),())
+#define MB_CUR_MAX ((__SIZE_TYPE__)___mb_cur_max_func())
+#elif defined(__CRT_HAVE___p___mb_cur_max)
+#define ____p___mb_cur_max_defined
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW,__p___mb_cur_max,(void),())
+#define MB_CUR_MAX ((__SIZE_TYPE__)*__p___mb_cur_max())
+#elif defined(__CRT_HAVE___mb_cur_max)
+__LIBC int __mb_cur_max __CASMNAME_SAME("__mb_cur_max");
+#define __mb_cur_max __mb_cur_max
+#define MB_CUR_MAX   ((__SIZE_TYPE__)__mb_cur_max)
+#else /* __CRT_HAVE___ctype_get_mb_cur_max */
+#define MB_CUR_MAX 7 /* == UNICODE_UTF8_CURLEN */
+#endif /* !__CRT_HAVE___ctype_get_mb_cur_max */
+#endif /* !MB_CUR_MAX */
+#ifndef _____mb_cur_max_func_defined
+#define _____mb_cur_max_func_defined
+#ifdef __CRT_HAVE___ctype_get_mb_cur_max
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,___mb_cur_max_func,(void),__ctype_get_mb_cur_max,())
+#elif defined(__CRT_HAVE____mb_cur_max_func)
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,___mb_cur_max_func,(void),())
+#else /* ... */
+#include <libc/local/ctype/__ctype_get_mb_cur_max.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL ___mb_cur_max_func)(void) { return (int)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__ctype_get_mb_cur_max))(); }
+#endif /* !... */
+#endif /* !_____mb_cur_max_func_defined */
+#ifdef __CRT_HAVE____mb_cur_max_l_func
+__CDECLARE(,int,__NOTHROW_NCX,___mb_cur_max_l_func,(__locale_t __locale),(__locale))
+#else /* __CRT_HAVE____mb_cur_max_l_func */
+#include <libc/local/ctype/___mb_cur_max_l_func.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(___mb_cur_max_l_func, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL ___mb_cur_max_l_func)(__locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(___mb_cur_max_l_func))(__locale); })
+#endif /* !__CRT_HAVE____mb_cur_max_l_func */
+#ifdef __CRT_HAVE__chvalidator
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_chvalidator,(int __ch, int __mask),(__ch,__mask))
+#elif defined(__CRT_HAVE__isctype)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_chvalidator,(int __ch, int __mask),_isctype,(__ch,__mask))
+#endif /* ... */
+#ifdef __CRT_HAVE__chvalidator_l
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_chvalidator_l,(__locale_t __locale, int __ch, int __mask),(__locale,__ch,__mask))
+#else /* __CRT_HAVE__chvalidator_l */
+#include <libc/local/ctype/_chvalidator_l.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_chvalidator_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _chvalidator_l)(__locale_t __locale, int __ch, int __mask) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_chvalidator_l))(__locale, __ch, __mask); })
+#endif /* !__CRT_HAVE__chvalidator_l */
+#if !defined(NDEBUG) && (defined(__CRT_HAVE__chvalidator) || defined(__CRT_HAVE__isctype))
+#define __chvalidchk(ch, mask) _chvalidator(ch, mask)
+#else /* !NDEBUG && (__CRT_HAVE__chvalidator || __CRT_HAVE__isctype) */
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int
+__NOTHROW_NCX(__LIBCCALL __acrt_locale_get_ctype_array_value)(__UINT16_TYPE__ const *__ct_array,
+                                                              int __ch, int __mask) {
+	if __likely(__ch >= -1 && __ch <= 255)
+		return __ct_array[__ch] & __mask;
+	return 0;
+}
+#define __chvalidchk(ch, mask) __acrt_locale_get_ctype_array_value(__PCTYPE_FUNC, ch, mask)
+#endif /* NDEBUG || (!__CRT_HAVE__chvalidator && !__CRT_HAVE__isctype) */
+#define _chvalidchk_l(ch, mask, locale) _isctype_l(ch, mask, locale)
+#define _ischartype_l(ch, mask, locale) _isctype_l(ch, mask, locale)
 #ifndef ___isctype_defined
 #define ___isctype_defined
 #ifdef __CRT_HAVE__isctype
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isctype,(int __ch, int __mask),(__ch,__mask))
-#else /* __CRT_HAVE__isctype */
+#elif defined(__CRT_HAVE__chvalidator)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isctype,(int __ch, int __mask),_chvalidator,(__ch,__mask))
+#else /* ... */
 #include <libc/local/ctype/_isctype.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_isctype, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _isctype)(int __ch, int __mask) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_isctype))(__ch, __mask); })
-#endif /* !__CRT_HAVE__isctype */
+#endif /* !... */
 #endif /* !___isctype_defined */
 #ifndef ___isctype_l_defined
 #define ___isctype_l_defined

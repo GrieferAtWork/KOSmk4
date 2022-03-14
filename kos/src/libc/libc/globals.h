@@ -240,6 +240,14 @@ DECLARE_NOREL_GLOBAL_META(unsigned char, _mbcasemap);
 #define __LOCAL__mbcasemap (&GET_NOREL_GLOBAL(_mbcasemap))
 
 
+/* <stdlib.h> */
+#undef MB_CUR_MAX
+#undef __LOCAL_MB_CUR_MAX
+INTDEF unsigned int libd___mb_cur_max;
+#define MB_CUR_MAX         ((size_t)libd___mb_cur_max)
+#define __LOCAL_MB_CUR_MAX ((size_t)libd___mb_cur_max)
+
+
 /* Misc... */
 #undef __libc_enable_secure
 DECLARE_NOREL_GLOBAL_META(int, __libc_enable_secure);

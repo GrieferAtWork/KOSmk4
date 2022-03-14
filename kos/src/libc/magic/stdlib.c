@@ -2459,9 +2459,32 @@ aligned_alloc(*) = memalign;
 %
 %{
 #ifndef MB_CUR_MAX
-#ifdef __CRT_HAVE___ctype_get_mb_cur_max
-__CDECLARE(__ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW,__ctype_get_mb_cur_max,(void),())
-#define MB_CUR_MAX (__ctype_get_mb_cur_max())
+#ifdef __LOCAL_MB_CUR_MAX
+#define MB_CUR_MAX __LOCAL_MB_CUR_MAX
+#elif defined(__mb_cur_max)
+#define MB_CUR_MAX ((__SIZE_TYPE__)__mb_cur_max)
+#elif defined(__ctype_get_mb_cur_max) || defined(____ctype_get_mb_cur_max_defined)
+#define MB_CUR_MAX __ctype_get_mb_cur_max()
+#elif defined(___mb_cur_max_func) || defined(_____mb_cur_max_func_defined)
+#define MB_CUR_MAX ((__SIZE_TYPE__)___mb_cur_max_func())
+#elif defined(__p___mb_cur_max) || defined(____p___mb_cur_max_defined)
+#define MB_CUR_MAX ((__SIZE_TYPE__)*__p___mb_cur_max())
+#elif defined(__CRT_HAVE___ctype_get_mb_cur_max)
+#define ____ctype_get_mb_cur_max_defined
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW,__ctype_get_mb_cur_max,(void),())
+#define MB_CUR_MAX __ctype_get_mb_cur_max()
+#elif defined(__CRT_HAVE____mb_cur_max_func)
+#define _____mb_cur_max_func_defined
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,___mb_cur_max_func,(void),())
+#define MB_CUR_MAX ((__SIZE_TYPE__)___mb_cur_max_func())
+#elif defined(__CRT_HAVE___p___mb_cur_max)
+#define ____p___mb_cur_max_defined
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW,__p___mb_cur_max,(void),())
+#define MB_CUR_MAX ((__SIZE_TYPE__)*__p___mb_cur_max())
+#elif defined(__CRT_HAVE___mb_cur_max)
+__LIBC int __mb_cur_max __CASMNAME_SAME("__mb_cur_max");
+#define __mb_cur_max __mb_cur_max
+#define MB_CUR_MAX   ((__SIZE_TYPE__)__mb_cur_max)
 #else /* __CRT_HAVE___ctype_get_mb_cur_max */
 #define MB_CUR_MAX 7 /* == UNICODE_UTF8_CURLEN */
 #endif /* !__CRT_HAVE___ctype_get_mb_cur_max */

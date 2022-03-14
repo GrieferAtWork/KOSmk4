@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa188c423 */
+/* HASH CRC-32:0x5a7202f0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,6 +47,7 @@
 #define __CRT_HAVE_DOS$___lc_locale_name_func
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$___mb_cur_max_l_func
 #define __CRT_HAVE_DOS$__cmsg_nxthdr
 #define __CRT_HAVE_DOS$__control87_2
 #define __CRT_HAVE_DOS$__fbufsize
@@ -242,6 +243,7 @@
 #define __CRT_HAVE_DOS$_chdrive
 #define __CRT_HAVE_DOS$_chgsign
 #define __CRT_HAVE_DOS$_chgsignf
+#define __CRT_HAVE_DOS$_chvalidator_l
 #define __CRT_HAVE_DOS$_configthreadlocale
 #define __CRT_HAVE_DOS$_control87
 #define __CRT_HAVE_DOS$_controlfp
@@ -3856,6 +3858,7 @@
 #define __CRT_HAVE____lc_codepage_func
 #define __CRT_HAVE____lc_collate_cp_func
 #define __CRT_HAVE____lc_locale_name_func
+#define __CRT_HAVE____mb_cur_max_l_func
 #endif /* !__KERNEL__ */
 #ifdef __KERNEL__
 #define __CRT_HAVE___acheck
@@ -3879,6 +3882,7 @@
 #define __CRT_HAVE___ctype_C_toupper
 #ifndef __KERNEL__
 #define __CRT_HAVE___ctype_b_loc
+#define __CRT_HAVE___ctype_get_mb_cur_max
 #define __CRT_HAVE___ctype_tolower_loc
 #define __CRT_HAVE___ctype_toupper_loc
 #endif /* !__KERNEL__ */
@@ -4091,6 +4095,7 @@
 #define __CRT_HAVE__chdrive
 #define __CRT_HAVE__chgsign
 #define __CRT_HAVE__chgsignf
+#define __CRT_HAVE__chvalidator_l
 #define __CRT_HAVE__clearfp
 #define __CRT_HAVE__configthreadlocale
 #define __CRT_HAVE__control87

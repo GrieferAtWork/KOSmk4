@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a02febb */
+/* HASH CRC-32:0x7553a064 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -277,6 +277,9 @@ DEFINE_PUBLIC_ALIAS(DOS$__toascii, libd_toascii);
 DEFINE_PUBLIC_ALIAS(DOS$toascii, libd_toascii);
 DEFINE_PUBLIC_ALIAS(DOS$_tolower, libd__tolower);
 DEFINE_PUBLIC_ALIAS(DOS$_toupper, libd__toupper);
+DEFINE_PUBLIC_ALIAS(DOS$___mb_cur_max_l_func, libd____mb_cur_max_l_func);
+DEFINE_PUBLIC_ALIAS(DOS$_chvalidator_l, libd__chvalidator_l);
+DEFINE_PUBLIC_ALIAS(DOS$_chvalidator, libd__isctype);
 DEFINE_PUBLIC_ALIAS(DOS$_isctype, libd__isctype);
 DEFINE_PUBLIC_ALIAS(DOS$_isctype_l, libd__isctype_l);
 

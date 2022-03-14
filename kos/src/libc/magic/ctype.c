@@ -90,6 +90,10 @@
 %[assume_defined_in_kos_userspace(__crt_tolower)]
 %[assume_defined_in_kos_userspace(__crt_toupper)]
 
+%(auto_source){
+#include "../libc/globals.h"
+}
+
 
 /* Because KOS uses UTF-8 through, functions from <ctype.h> must
  * operate on only those characters which can be represented  in
@@ -255,6 +259,11 @@ INTERN_CONST ATTR_SECTION(".rodata.crt.unicode.static.ctype") __INT8_TYPE__ cons
 #include <endian.h>
 #endif /* __USE_GLIBC */
 )]%{
+
+#ifdef __USE_DOS
+#include <corecrt.h>
+#include <corecrt_wctype.h>
+#endif /* __USE_DOS */
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -969,15 +978,146 @@ int _toupper(int ch) {
 %#ifdef __USE_DOS
 %[default:section(".text.crt.dos.unicode.static.ctype")];
 
-[[guard, const, wunused, nothrow]]
-int _isctype(int ch, int mask) {
-	/* TODO */
-	(void)ch;
-	(void)mask;
-	return 0;
+%[define(_UPPER    = 0x0001)]
+%[define(_LOWER    = 0x0002)]
+%[define(_DIGIT    = 0x0004)]
+%[define(_SPACE    = 0x0008)]
+%[define(_PUNCT    = 0x0010)]
+%[define(_CONTROL  = 0x0020)]
+%[define(_BLANK    = 0x0040)]
+%[define(_HEX      = 0x0080)]
+%[define(_LEADBYTE = 0x8000)]
+%[define(_ALPHA    = 0x0103)]
+
+
+%{
+/* Possible values for `mask' argument of `_isctype(3)' */
+#ifndef _UPPER
+#define _UPPER    0x0001 /* isupper() */
+#define _LOWER    0x0002 /* islower() */
+#define _DIGIT    0x0004 /* isdigit() */
+#define _SPACE    0x0008 /* isspace() */
+#define _PUNCT    0x0010 /* ispunct() */
+#define _CONTROL  0x0020 /* iscntrl() */
+#define _BLANK    0x0040 /* isblank() */
+#define _HEX      0x0080 /* isxdigit() - isdigit() */
+#define _LEADBYTE 0x8000 /* Leading byte of multi-byte sequence */
+#define _ALPHA    0x0103 /* isalpha() -- (0x0100 | _UPPER | _LOWER) */
+#endif /* !_UPPER */
+
+
+#ifndef MB_CUR_MAX
+#ifdef __LOCAL_MB_CUR_MAX
+#define MB_CUR_MAX __LOCAL_MB_CUR_MAX
+#elif defined(__mb_cur_max)
+#define MB_CUR_MAX ((__SIZE_TYPE__)__mb_cur_max)
+#elif defined(__ctype_get_mb_cur_max) || defined(____ctype_get_mb_cur_max_defined)
+#define MB_CUR_MAX __ctype_get_mb_cur_max()
+#elif defined(___mb_cur_max_func) || defined(_____mb_cur_max_func_defined)
+#define MB_CUR_MAX ((__SIZE_TYPE__)___mb_cur_max_func())
+#elif defined(__p___mb_cur_max) || defined(____p___mb_cur_max_defined)
+#define MB_CUR_MAX ((__SIZE_TYPE__)*__p___mb_cur_max())
+#elif defined(__CRT_HAVE___ctype_get_mb_cur_max)
+#define ____ctype_get_mb_cur_max_defined
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW,__ctype_get_mb_cur_max,(void),())
+#define MB_CUR_MAX __ctype_get_mb_cur_max()
+#elif defined(__CRT_HAVE____mb_cur_max_func)
+#define _____mb_cur_max_func_defined
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,___mb_cur_max_func,(void),())
+#define MB_CUR_MAX ((__SIZE_TYPE__)___mb_cur_max_func())
+#elif defined(__CRT_HAVE___p___mb_cur_max)
+#define ____p___mb_cur_max_defined
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW,__p___mb_cur_max,(void),())
+#define MB_CUR_MAX ((__SIZE_TYPE__)*__p___mb_cur_max())
+#elif defined(__CRT_HAVE___mb_cur_max)
+__LIBC int __mb_cur_max __CASMNAME_SAME("__mb_cur_max");
+#define __mb_cur_max __mb_cur_max
+#define MB_CUR_MAX   ((__SIZE_TYPE__)__mb_cur_max)
+#else /* __CRT_HAVE___ctype_get_mb_cur_max */
+#define MB_CUR_MAX 7 /* == UNICODE_UTF8_CURLEN */
+#endif /* !__CRT_HAVE___ctype_get_mb_cur_max */
+#endif /* !MB_CUR_MAX */
 }
 
-[[guard, pure, wunused]]
+[[hidden, const, wunused]]
+[[impl_include("<libc/template/MB_CUR_MAX.h>")]]
+[[export_alias("___mb_cur_max_func")]]
+[[section(".text.crt{|.dos}.unicode.static.ctype")]]
+$size_t __ctype_get_mb_cur_max(void) {
+	return __LOCAL_MB_CUR_MAX;
+}
+
+[[guard, const, wunused]]
+int ___mb_cur_max_func(void) = __ctype_get_mb_cur_max;
+
+[[impl_include("<libc/template/MB_CUR_MAX.h>")]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc____mb_cur_max_func")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd____mb_cur_max_func")]]
+int ___mb_cur_max_l_func($locale_t locale) {
+	(void)locale;
+	return __LOCAL_MB_CUR_MAX;
+}
+
+[[nocrt, const, wunused, nothrow]]
+[[alias("_chvalidator", "_isctype")]]
+int _chvalidator(int ch, int mask);
+
+[[wunused, pure, requires_function(_isctype_l)]]
+int _chvalidator_l($locale_t locale, int ch, int mask) {
+	return _isctype_l(ch, mask, locale);
+}
+
+%[insert:pp_if(!defined(NDEBUG) && $has_function(_chvalidator))]
+%#define __chvalidchk(ch, mask) _chvalidator(ch, mask)
+%[insert:pp_else]
+%{
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int
+__NOTHROW_NCX(__LIBCCALL __acrt_locale_get_ctype_array_value)(__UINT16_TYPE__ const *__ct_array,
+                                                              int __ch, int __mask) {
+	if __likely(__ch >= -1 && __ch <= 255)
+		return __ct_array[__ch] & __mask;
+	return 0;
+}
+}
+%#define __chvalidchk(ch, mask) __acrt_locale_get_ctype_array_value(__PCTYPE_FUNC, ch, mask)
+%[insert:pp_endif]
+%[insert:pp_if($has_function(_isctype_l))]
+%#define _chvalidchk_l(ch, mask, locale) _isctype_l(ch, mask, locale)
+%#define _ischartype_l(ch, mask, locale) _isctype_l(ch, mask, locale)
+%[insert:pp_elif($has_function(_chvalidator_l))]
+%#define _chvalidchk_l(ch, mask, locale) _chvalidator_l(locale, ch, mask)
+%#define _ischartype_l(ch, mask, locale) _chvalidator_l(locale, ch, mask)
+%[insert:pp_endif]
+
+
+[[guard, const, wunused, nothrow]]
+[[export_alias("_chvalidator")]]
+int _isctype(int ch, int mask) {
+	int result = 0;
+	if ((mask & _UPPER) && isupper(ch))
+		result |= _UPPER;
+	if ((mask & _LOWER) && islower(ch))
+		result |= _LOWER;
+	if ((mask & _DIGIT) && isdigit(ch))
+		result |= _DIGIT;
+	if ((mask & _SPACE) && isspace(ch))
+		result |= _SPACE;
+	if ((mask & _PUNCT) && ispunct(ch))
+		result |= _PUNCT;
+	if ((mask & _CONTROL) && iscntrl(ch))
+		result |= _CONTROL;
+	if ((mask & _BLANK) && isblank(ch))
+		result |= _BLANK;
+	if ((mask & _HEX) && isxdigit(ch) && !isdigit(ch))
+		result |= _HEX;
+	if ((mask & _LEADBYTE) && ch >= 0xc0) /* NOTE: UTF-8 lead byte */
+		result |= _LEADBYTE;
+	/*if ((mask & 0x0100) && isalpha(ch) && islower(ch) && isupper(ch))
+		result |= 0x0100;*/
+	return result;
+}
+
+[[guard, pure, wunused, requires_function(_isctype)]]
 [[section(".text.crt{|.dos}.unicode.locale.ctype")]]
 [[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc__isctype")]]
 [[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd__isctype")]]

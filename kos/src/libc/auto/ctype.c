@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf42c8b5d */
+/* HASH CRC-32:0x2f9d8e55 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@
 
 DECL_BEGIN
 
+#include "../libc/globals.h"
 DEFINE_PUBLIC_ALIAS(__ctype_C_flags, libc___ctype_C_flags);
 DEFINE_PUBLIC_ALIAS(__ctype_C_tolower, libc___ctype_C_tolower);
 DEFINE_PUBLIC_ALIAS(__ctype_C_toupper, libc___ctype_C_toupper);
@@ -431,13 +432,52 @@ INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc__toupper)(int ch) {
 	return ch - 0x20;
 }
+#include <libc/template/MB_CUR_MAX.h>
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED size_t
+NOTHROW_NCX(LIBCCALL libc___ctype_get_mb_cur_max)(void) {
+	return __LOCAL_MB_CUR_MAX;
+}
+#ifdef __LIBKCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libc____mb_cur_max_l_func, libc____mb_cur_max_func);
+#else /* __LIBKCALL_CALLER_CLEANUP */
+#include <libc/template/MB_CUR_MAX.h>
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.ctype") int
+NOTHROW_NCX(LIBCCALL libc____mb_cur_max_l_func)(locale_t locale) {
+	(void)locale;
+	return __LOCAL_MB_CUR_MAX;
+}
+#endif /* !__LIBKCALL_CALLER_CLEANUP */
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__chvalidator_l)(locale_t locale,
+                                          int ch,
+                                          int mask) {
+	return libc__isctype_l(ch, mask, locale);
+}
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc__isctype)(int ch,
                                 int mask) {
-	/* TODO */
-	(void)ch;
-	(void)mask;
-	return 0;
+	int result = 0;
+	if ((mask & 0x0001) && libc_isupper(ch))
+		result |= 0x0001;
+	if ((mask & 0x0002) && libc_islower(ch))
+		result |= 0x0002;
+	if ((mask & 0x0004) && libc_isdigit(ch))
+		result |= 0x0004;
+	if ((mask & 0x0008) && libc_isspace(ch))
+		result |= 0x0008;
+	if ((mask & 0x0010) && libc_ispunct(ch))
+		result |= 0x0010;
+	if ((mask & 0x0020) && libc_iscntrl(ch))
+		result |= 0x0020;
+	if ((mask & 0x0040) && libc_isblank(ch))
+		result |= 0x0040;
+	if ((mask & 0x0080) && libc_isxdigit(ch) && !libc_isdigit(ch))
+		result |= 0x0080;
+	if ((mask & 0x8000) && ch >= 0xc0) /* NOTE: UTF-8 lead byte */
+		result |= 0x8000;
+	/*if ((mask & 0x0100) && isalpha(ch) && islower(ch) && isupper(ch))
+		result |= 0x0100;*/
+	return result;
 }
 #ifdef __LIBKCALL_CALLER_CLEANUP
 DEFINE_INTERN_ALIAS(libc__isctype_l, libc__isctype);
@@ -552,6 +592,11 @@ DEFINE_PUBLIC_ALIAS(__toascii, libc_toascii);
 DEFINE_PUBLIC_ALIAS(toascii, libc_toascii);
 DEFINE_PUBLIC_ALIAS(_tolower, libc__tolower);
 DEFINE_PUBLIC_ALIAS(_toupper, libc__toupper);
+DEFINE_PUBLIC_ALIAS(___mb_cur_max_func, libc___ctype_get_mb_cur_max);
+DEFINE_PUBLIC_ALIAS(__ctype_get_mb_cur_max, libc___ctype_get_mb_cur_max);
+DEFINE_PUBLIC_ALIAS(___mb_cur_max_l_func, libc____mb_cur_max_l_func);
+DEFINE_PUBLIC_ALIAS(_chvalidator_l, libc__chvalidator_l);
+DEFINE_PUBLIC_ALIAS(_chvalidator, libc__isctype);
 DEFINE_PUBLIC_ALIAS(_isctype, libc__isctype);
 DEFINE_PUBLIC_ALIAS(_isctype_l, libc__isctype_l);
 #endif /* !__KERNEL__ */

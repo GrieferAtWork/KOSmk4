@@ -1295,6 +1295,20 @@ NOTHROW(LIBDCALL libd___initialize_lconv_for_unsigned_char)(void) {
 /*	lc->int_n_sign_posn    = (char)(unsigned char)0xff; */
 }
 
+#ifdef __LIBCCALL_IS_LIBDCALL
+#define libd_exit libc_exit
+#endif /* __LIBCCALL_IS_LIBDCALL */
+
+PRIVATE ATTR_SECTION(".bss.crt.dos.compat.dos") void (*LIBDCALL libd__aexit_rtn)(int) = NULL;
+DEFINE_PUBLIC_IDATA_G(DOS$_aexit_rtn, libd___p__aexit_rtn, __SIZEOF_POINTER__);
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") void *
+NOTHROW(LIBDCALL libd___p__aexit_rtn)(void) {
+	if (libd__aexit_rtn == NULL)
+		libd__aexit_rtn = &libd_exit;
+	return &libd__aexit_rtn;
+}
+
+
 
 
 
@@ -1385,23 +1399,11 @@ libd___p__commode(void) {
 /************************************************************************/
 DEFINE_PUBLIC_ALIAS(__mb_cur_max, libd___mb_cur_max);
 DEFINE_PUBLIC_ALIAS(__p___mb_cur_max, libd___p___mb_cur_max);
-DEFINE_PUBLIC_ALIAS(___mb_cur_max_func, libd____mb_cur_max_func);
-DEFINE_PUBLIC_ALIAS(___mb_cur_max_l_func, libd____mb_cur_max_l_func);
-INTERN ATTR_SECTION(".data.crt.dos.application.init") int libd___mb_cur_max = 7;
-INTERN ATTR_SECTION(".text.crt.dos.application.init") int *LIBDCALL
-libd___p___mb_cur_max(void) {
+INTERN ATTR_SECTION(".data.crt.dos.application.init") unsigned int libd___mb_cur_max = 7;
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.dos.application.init")
+int *LIBDCALL libd___p___mb_cur_max(void) {
 	COMPILER_IMPURE();
-	return &libd___mb_cur_max;
-}
-INTERN ATTR_SECTION(".text.crt.dos.application.init") int LIBDCALL
-libd____mb_cur_max_func(void) {
-	COMPILER_IMPURE();
-	return libd___mb_cur_max;
-}
-INTERN ATTR_SECTION(".text.crt.dos.application.init") int LIBDCALL
-libd____mb_cur_max_l_func(locale_t locale) {
-	(void)locale;
-	return libd____mb_cur_max_func();
+	return (int *)&libd___mb_cur_max;
 }
 
 

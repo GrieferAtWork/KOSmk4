@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x710da60f */
+/* HASH CRC-32:0xb927d9d9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,32 +18,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__isctype_l_defined
-#define __local__isctype_l_defined
+#ifndef __local___ctype_get_mb_cur_max_defined
+#define __local___ctype_get_mb_cur_max_defined
 #include <__crt.h>
+#include <libc/template/MB_CUR_MAX.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep__isctype_defined
-#define __local___localdep__isctype_defined
-#ifdef __CRT_HAVE__isctype
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep__isctype,(int __ch, int __mask),_isctype,(__ch,__mask))
-#elif defined(__CRT_HAVE__chvalidator)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep__isctype,(int __ch, int __mask),_chvalidator,(__ch,__mask))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/ctype/_isctype.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep__isctype __LIBC_LOCAL_NAME(_isctype)
-#endif /* !... */
-#endif /* !__local___localdep__isctype_defined */
-__LOCAL_LIBC(_isctype_l) __ATTR_PURE __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_isctype_l))(int __ch, int __mask, __locale_t __locale) {
-	__COMPILER_IMPURE();
-	(void)__locale;
-	return (__NAMESPACE_LOCAL_SYM __localdep__isctype)(__ch, __mask);
+__LOCAL_LIBC(__ctype_get_mb_cur_max) __ATTR_CONST __ATTR_WUNUSED __SIZE_TYPE__
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__ctype_get_mb_cur_max))(void) {
+	return __LOCAL_MB_CUR_MAX;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep__isctype_l_defined
-#define __local___localdep__isctype_l_defined
-#define __localdep__isctype_l __LIBC_LOCAL_NAME(_isctype_l)
-#endif /* !__local___localdep__isctype_l_defined */
-#endif /* !__local__isctype_l_defined */
+#ifndef __local___localdep___ctype_get_mb_cur_max_defined
+#define __local___localdep___ctype_get_mb_cur_max_defined
+#define __localdep___ctype_get_mb_cur_max __LIBC_LOCAL_NAME(__ctype_get_mb_cur_max)
+#endif /* !__local___localdep___ctype_get_mb_cur_max_defined */
+#endif /* !__local___ctype_get_mb_cur_max_defined */
