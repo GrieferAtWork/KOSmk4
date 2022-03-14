@@ -58,6 +58,7 @@
 
 %(auto_source){
 #include "../libc/globals.h"
+#include <stdlib.h>
 }
 
 
@@ -412,6 +413,15 @@ struct sigevent;
 %[define(NSEC_PER_SEC  = __UINT32_C(1000000000))]
 %[define(FSEC_PER_SEC  = __UINT64_C(1000000000000000))]
 
+%[define(SECONDS_PER_MINUTE   = 60)]
+%[define(SECONDS_PER_HOUR     = 360)]
+%[define(SECONDS_PER_DAY      = 86400)]
+%[define(MINUTES_PER_HOUR     = 60)]
+%[define(HOURS_PER_DAY        = 24)]
+%[define(UNIX_TIME_START_YEAR = 1970)]
+%[define(DAYS_PER_WEEK        = 7)]
+
+
 
 
 %[define_c_language_keyword(__KOS_FIXED_CONST)];
@@ -440,13 +450,15 @@ struct sigevent;
 [[ignore, nocrt, doc_alias("difftime64"),     alias("difftime64",  "_difftime64"),    decl_include("<bits/types.h>"), const, wunused, nothrow]] double crt_difftime64($time64_t time1, $time64_t time0);
 [[ignore, nocrt, doc_alias("time"),           alias("time", "__time", "__libc_time", "_time32"), decl_include("<bits/types.h>")]] $time32_t crt_time32([[nullable]] $time32_t *timer);
 [[ignore, nocrt, doc_alias("time64"),         alias("time64",      "_time64"),        decl_include("<bits/types.h>")]] $time64_t crt_time64([[nullable]] $time64_t *timer);
-[[ignore, nocrt, doc_alias("mktime"),         alias("mktime", "timelocal", "_mktime32"), decl_include("<features.h>", "<bits/crt/tm.h>"), pure, wunused]] $time32_t crt_mktime32([[nonnull]] struct $tm __KOS_FIXED_CONST *tp);
-[[ignore, nocrt, doc_alias("mktime64"),       alias("mktime64", "timelocal64", "_mktime64"), decl_include("<features.h>", "<bits/crt/tm.h>"), pure, wunused]] $time64_t crt_mktime64([[nonnull]] struct $tm __KOS_FIXED_CONST *tp);
-[[ignore, nocrt, doc_alias("timespec_get"),   alias("timespec_get", "_timespec32_get"), pure, wunused]] int crt_timespec32_get([[nonnull]] struct __timespec32 *ts, __STDC_INT_AS_UINT_T base);
-[[ignore, nocrt, doc_alias("timespec_get64"), alias("timespec_get64", "_timespec64_get"), pure, wunused]] int crt_timespec64_get([[nonnull]] struct __timespec64 *ts, __STDC_INT_AS_UINT_T base);
+[[ignore, nocrt, doc_alias("mktime"),         alias("mktime", "timelocal", "_mktime32"), decl_include("<bits/types.h>", "<features.h>", "<bits/crt/tm.h>"), pure, wunused]] $time32_t crt_mktime32([[nonnull]] struct $tm __KOS_FIXED_CONST *tp);
+[[ignore, nocrt, doc_alias("mktime64"),       alias("mktime64", "timelocal64", "_mktime64"), decl_include("<bits/types.h>", "<features.h>", "<bits/crt/tm.h>"), pure, wunused]] $time64_t crt_mktime64([[nonnull]] struct $tm __KOS_FIXED_CONST *tp);
+[[ignore, nocrt, doc_alias("mktime"),         alias("_mkgmtime", "_mkgmtime32"),      decl_include("<bits/types.h>", "<features.h>", "<bits/crt/tm.h>"), pure, wunused]] $time32_t crt_mkgmtime32([[nonnull]] struct $tm __KOS_FIXED_CONST *tp);
+[[ignore, nocrt, doc_alias("mktime64"),       alias("_mkgmtime64"),                   decl_include("<bits/types.h>", "<features.h>", "<bits/crt/tm.h>"), pure, wunused]] $time64_t crt_mkgmtime64([[nonnull]] struct $tm __KOS_FIXED_CONST *tp);
+[[ignore, nocrt, doc_alias("timespec_get"),   alias("timespec_get", "_timespec32_get"), pure, wunused, decl_include("<features.h>", "<bits/os/timespec.h>")]] int crt_timespec32_get([[nonnull]] struct __timespec32 *ts, __STDC_INT_AS_UINT_T base);
+[[ignore, nocrt, doc_alias("timespec_get64"), alias("timespec_get64", "_timespec64_get"), pure, wunused, decl_include("<features.h>", "<bits/os/timespec.h>")]] int crt_timespec64_get([[nonnull]] struct __timespec64 *ts, __STDC_INT_AS_UINT_T base);
 
 [[ignore, nocrt, doc_alias("asctime_s"), alias("asctime_s")]]
-[[decl_include("<bits/crt/tm.h>")]]
+[[decl_include("<bits/types.h>", "<bits/crt/tm.h>")]]
 $errno_t crt_asctime_s([[outp(buflen)]] char *__restrict buf, size_t buflen,
                        [[nonnull]] struct tm const *__restrict tp);
 
@@ -509,17 +521,16 @@ double difftime(time_t time1, time_t time0) {
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("mktime", "_mktime32", "timelocal")]]
 [[impl_prefix(DEFINE_YEARSTODAYS), export_as("timelocal")]]
 time_t mktime([[nonnull]] struct tm __KOS_FIXED_CONST *tp) {
-@@pp_if $has_function(mktime64) && !defined(__BUILDING_LIBC)@@
+@@pp_if !defined(__BUILDING_LIBC) || __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__@@
 	return (time_t)mktime64(tp);
-@@pp_elif $has_function(crt_mktime32) && !defined(__BUILDING_LIBC)@@
-	return (time_t)crt_mktime32(tp);
 @@pp_else@@
-	time_t result;
-	result = __yearstodays(tp->@tm_year@) - __yearstodays(1970); /* UNIX_TIME_START_YEAR */
+	/* TODO: Support for localtime? */
+	time64_t result;
+	result = __yearstodays(tp->@tm_year@) - __yearstodays(UNIX_TIME_START_YEAR);
 	result += tp->@tm_yday@;
-	result *= 86400; /* SECONDS_PER_DAY */
-	result += tp->@tm_hour@ * 60 * 60;
-	result += tp->@tm_min@ * 60;
+	result *= SECONDS_PER_DAY;
+	result += tp->@tm_hour@ * SECONDS_PER_HOUR;
+	result += tp->@tm_min@ * SECONDS_PER_MINUTE;
 	result += tp->@tm_sec@;
 	return result;
 @@pp_endif@@
@@ -529,7 +540,7 @@ time_t mktime([[nonnull]] struct tm __KOS_FIXED_CONST *tp) {
 
 @@>> ctime(3), ctime64(3)
 @@Equivalent to `asctime(localtime(timer))'
-[[std, wunused, decl_include("<bits/types.h>"), no_crt_self_import, dos_only_export_alias("_ctime32")]]
+[[std, wunused, decl_include("<bits/types.h>"), no_crt_self_import, dos_only_export_as("_ctime32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("ctime", "_ctime32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("ctime64", "_ctime64")]]
 [[impl_prefix(
@@ -563,7 +574,7 @@ __LOCAL_LIBC_DATA(__gmtime_buf) struct tm __gmtime_buf = { 0 };
 @@>> gmtime(3), gmtime64(3)
 @@Return  the  `struct tm'  representation  of   `*timer'
 @@in Universal Coordinated Time (aka Greenwich Mean Time)
-[[std, wunused, decl_include("<bits/types.h>", "<bits/crt/tm.h>"), no_crt_self_import]]
+[[std, wunused, decl_include("<bits/types.h>", "<bits/crt/tm.h>"), no_crt_self_import, dos_only_export_as("_gmtime32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("gmtime", "_gmtime32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("gmtime64", "_gmtime64")]]
 [[impl_prefix(
@@ -586,7 +597,7 @@ DEFINE_GMTIME_BUFFER
 
 @@>> localtime(3), localtime64(3)
 @@Return the `struct tm' representation of `*timer' in the local timezone
-[[std, wunused, decl_include("<bits/types.h>", "<bits/crt/tm.h>"), no_crt_self_import, dos_only_export_alias("_localtime32")]]
+[[std, wunused, decl_include("<bits/types.h>", "<bits/crt/tm.h>"), no_crt_self_import, dos_only_export_as("_localtime32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("localtime", "_localtime32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("localtime64", "_localtime64")]]
 [[impl_prefix(
@@ -699,22 +710,20 @@ double difftime64($time64_t time1, $time64_t time0) {
 
 [[decl_include("<bits/types.h>", "<features.h>")]]
 [[preferred_time64_variant_of(mktime), doc_alias("mktime")]]
-[[decl_include("<bits/crt/tm.h>"), impl_prefix(
-#ifndef __yearstodays
-#define __yearstodays(n_years) (((146097*(n_years))/400)/*-1*/) /* rounding error? */
-#endif /* !__yearstodays */
-), dos_only_export_alias("_mktime64"), export_alias("timelocal64")]]
-[[pure, wunused]]
+[[decl_include("<bits/crt/tm.h>")]]
+[[pure, wunused, impl_prefix(DEFINE_YEARSTODAYS)]]
+[[dos_only_export_alias("_mktime64"), export_alias("timelocal64")]]
 $time64_t mktime64([[nonnull]] struct $tm __KOS_FIXED_CONST *tp) {
-@@pp_if $has_function(crt_mktime32) && !defined(__BUILDING_LIBC)@@
+@@pp_if !defined(__BUILDING_LIBC) && $has_function(crt_mktime32)@@
 	return (time64_t)crt_mktime32(tp);
 @@pp_else@@
 	time64_t result;
-	result = __yearstodays(tp->@tm_year@) - __yearstodays(1970); /* UNIX_TIME_START_YEAR */
+	/* TODO: Support for localtime? */
+	result = __yearstodays(tp->@tm_year@) - __yearstodays(UNIX_TIME_START_YEAR);
 	result += tp->@tm_yday@;
-	result *= 86400; /* SECONDS_PER_DAY */
-	result += tp->@tm_hour@ * 60 * 60;
-	result += tp->@tm_min@ * 60;
+	result *= SECONDS_PER_DAY;
+	result += tp->@tm_hour@ * SECONDS_PER_HOUR;
+	result += tp->@tm_min@ * SECONDS_PER_MINUTE;
 	result += tp->@tm_sec@;
 	return result;
 @@pp_endif@@
@@ -1489,7 +1498,7 @@ int clock_nanosleep64(clockid_t clock_id, __STDC_INT_AS_UINT_T flags,
 %(c,std)#ifdef __USE_ISOCXX17
 @@>> timespec_get(3), timespec_get64(3)
 @@Set `ts' to calendar time based in time base `base'
-[[std, guard, decl_include("<features.h>", "<bits/os/timespec.h>"), no_crt_self_import, dos_only_export_alias("_timespec32_get")]]
+[[std, guard, decl_include("<features.h>", "<bits/os/timespec.h>"), no_crt_self_import, dos_only_export_as("_timespec32_get")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timespec_get", "_timespec32_get")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timespec_get64", "_timespec64_get")]]
 [[requires_include("<asm/os/clock.h>", "<asm/crt/time.h>")]]
@@ -1684,11 +1693,6 @@ __UINT16_TYPE__ const __time_monthstart_yday[2][13] = {
 
 
 
-%[define(SECONDS_PER_DAY      = 86400)]
-%[define(UNIX_TIME_START_YEAR = 1970)]
-%[define(DAYS_PER_WEEK        = 7)]
-
-
 %
 %#ifdef __USE_POSIX
 
@@ -1718,9 +1722,9 @@ struct $tm *gmtime_r([[nonnull]] $time_t const *__restrict timer,
 	time_t t = *timer;
 	u16 const *monthvec;
 	int i;
-	tp->@tm_sec@  = (int)(t % 60);
-	tp->@tm_min@  = (int)((t / 60) % 60);
-	tp->@tm_hour@ = (int)((t / (60 * 60)) % 24);
+	tp->@tm_sec@  = (int)(t % SECONDS_PER_MINUTE);
+	tp->@tm_min@  = (int)((t / SECONDS_PER_MINUTE) % MINUTES_PER_HOUR);
+	tp->@tm_hour@ = (int)((t / SECONDS_PER_HOUR) % HOURS_PER_DAY);
 	t /= SECONDS_PER_DAY;
 	t += __yearstodays(UNIX_TIME_START_YEAR);
 	tp->@tm_wday@ = (int)(t % DAYS_PER_WEEK);
@@ -1953,6 +1957,11 @@ char *asctime_r([[nonnull]] struct $tm const *__restrict tp,
 %#ifdef __USE_DOS
 
 %{
+#ifndef __ernno_t_defined
+#define __ernno_t_defined
+typedef __errno_t errno_t;
+#endif /* !__ernno_t_defined */
+
 #if !defined(_daylight) && defined(__daylight)
 #define _daylight __daylight
 #endif /* !_daylight && __daylight */
@@ -2021,7 +2030,7 @@ char *asctime_r([[nonnull]] struct $tm const *__restrict tp,
 [[requires_include("<libc/template/daylight.h>")]]
 [[requires(defined(__LOCAL_daylight))]]
 [[impl_include("<libc/template/daylight.h>")]]
-$errno_t _get_daylight(int *p_result) {
+errno_t _get_daylight(int *p_result) {
 	*p_result = __LOCAL_daylight;
 	return 0;
 }
@@ -2030,7 +2039,7 @@ $errno_t _get_daylight(int *p_result) {
 [[requires_include("<libc/template/timezone.h>")]]
 [[requires(defined(__LOCAL_timezone))]]
 [[impl_include("<libc/template/timezone.h>")]]
-$errno_t _get_timezone(long *p_seconds) {
+errno_t _get_timezone(long *p_seconds) {
 	*p_seconds = __LOCAL_timezone;
 	return 0;
 }
@@ -2063,8 +2072,8 @@ errno_t _get_tzname([[nonnull]] size_t *result,
 
 
 [[doc_alias("gmtime_r"), decl_include("<bits/types.h>", "<bits/crt/tm.h>")]]
-$errno_t _gmtime32_s([[nonnull]] struct $tm *__restrict tp,
-                     [[nonnull]] $time32_t const *__restrict timer) {
+errno_t _gmtime32_s([[nonnull]] struct $tm *__restrict tp,
+                    [[nonnull]] $time32_t const *__restrict timer) {
 @@pp_if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__@@
 	gmtime_r(timer, tp);
 @@pp_else@@
@@ -2075,15 +2084,15 @@ $errno_t _gmtime32_s([[nonnull]] struct $tm *__restrict tp,
 }
 
 [[doc_alias("gmtime64_r"), decl_include("<bits/types.h>", "<bits/crt/tm.h>")]]
-$errno_t _gmtime64_s([[nonnull]] struct $tm *__restrict tp,
-                     [[nonnull]] $time64_t const *__restrict timer) {
+errno_t _gmtime64_s([[nonnull]] struct $tm *__restrict tp,
+                    [[nonnull]] $time64_t const *__restrict timer) {
 	gmtime64_r(timer, tp);
 	return 0;
 }
 
 [[doc_alias("localtime_r"), decl_include("<bits/types.h>", "<bits/crt/tm.h>")]]
-$errno_t _localtime32_s([[nonnull]] struct $tm *__restrict tp,
-                        [[nonnull]] $time32_t const *__restrict timer) {
+errno_t _localtime32_s([[nonnull]] struct $tm *__restrict tp,
+                       [[nonnull]] $time32_t const *__restrict timer) {
 @@pp_if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__@@
 	localtime_r(timer, tp);
 @@pp_else@@
@@ -2094,15 +2103,15 @@ $errno_t _localtime32_s([[nonnull]] struct $tm *__restrict tp,
 }
 
 [[doc_alias("localtime64_r"), decl_include("<bits/types.h>", "<bits/crt/tm.h>")]]
-$errno_t _localtime64_s([[nonnull]] struct $tm *__restrict tp,
-                        [[nonnull]] $time64_t const *__restrict timer) {
+errno_t _localtime64_s([[nonnull]] struct $tm *__restrict tp,
+                       [[nonnull]] $time64_t const *__restrict timer) {
 	localtime64_r(timer, tp);
 	return 0;
 }
 
 [[doc_alias("ctime_r"), decl_include("<bits/types.h>")]]
-$errno_t _ctime32_s([[nonnull]] char buf[26], $size_t bufsize,
-                    [[nonnull]] $time32_t const *__restrict timer) {
+errno_t _ctime32_s([[nonnull]] char buf[26], $size_t bufsize,
+                   [[nonnull]] $time32_t const *__restrict timer) {
 	if (bufsize < 26)
 		return DOS_ERANGE;
 @@pp_if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__@@
@@ -2117,8 +2126,8 @@ $errno_t _ctime32_s([[nonnull]] char buf[26], $size_t bufsize,
 }
 
 [[doc_alias("ctime64_r"), decl_include("<bits/types.h>")]]
-$errno_t _ctime64_s([[nonnull]] char buf[26], $size_t bufsize,
-                    [[nonnull]] $time64_t const *__restrict timer) {
+errno_t _ctime64_s([[nonnull]] char buf[26], $size_t bufsize,
+                   [[nonnull]] $time64_t const *__restrict timer) {
 	if (bufsize < 26)
 		return DOS_ERANGE;
 	ctime64_r(timer, buf);
@@ -2153,16 +2162,97 @@ $time32_t _mktime32([[nonnull]] struct $tm __KOS_FIXED_CONST *tp);
 %[insert:function(_mktime64 = mktime64)]
 
 
-[[wunused]] $time32_t _mkgmtime32([[nonnull]] struct tm *tms);
-[[wunused]] $time64_t _mkgmtime64([[nonnull]] struct tm *tms);
+[[pure, wunused, export_alias("_mkgmtime")]]
+[[decl_include("<bits/types.h>", "<features.h>", "<bits/crt/tm.h>")]]
+$time32_t _mkgmtime32([[nonnull]] struct tm __KOS_FIXED_CONST *tp) {
+@@pp_if !defined(__BUILDING_LIBC) || __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__@@
+	return (time32_t)_mkgmtime64(tp);
+@@pp_else@@
+	time32_t result;
+	result = __yearstodays(tp->@tm_year@) - __yearstodays(UNIX_TIME_START_YEAR);
+	result += tp->@tm_yday@;
+	result *= SECONDS_PER_DAY;
+	result += tp->@tm_hour@ * SECONDS_PER_HOUR;
+	result += tp->@tm_min@ * SECONDS_PER_MINUTE;
+	result += tp->@tm_sec@;
+	return result;
+@@pp_endif@@
+}
+
+[[pure, wunused, doc_alias("_mkgmtime32")]]
+[[decl_include("<bits/types.h>", "<features.h>", "<bits/crt/tm.h>")]]
+[[preferred_time64_variant_of(_mkgmtime32)]]
+$time64_t _mkgmtime64([[nonnull]] struct tm __KOS_FIXED_CONST *tp) {
+@@pp_if !defined(__BUILDING_LIBC) && $has_function(crt_mkgmtime32)@@
+	return (time64_t)crt_mkgmtime32(tp);
+@@pp_else@@
+	time64_t result;
+	result = __yearstodays(tp->@tm_year@) - __yearstodays(UNIX_TIME_START_YEAR);
+	result += tp->@tm_yday@;
+	result *= SECONDS_PER_DAY;
+	result += tp->@tm_hour@ * SECONDS_PER_HOUR;
+	result += tp->@tm_min@ * SECONDS_PER_MINUTE;
+	result += tp->@tm_sec@;
+	return result;
+@@pp_endif@@
+}
+
 
 %[insert:function(_strftime_l = strftime_l)]
 
-char *_strdate([[nonnull]] char *buf);
-char *_strtime([[nonnull]] char *buf);
-errno_t _strdate_s([[outp(bufsize)]] char *buf, size_t bufsize);
-errno_t _strtime_s([[outp(bufsize)]] char *buf, size_t bufsize);
+[[requires_function(time64, localtime64_r)]]
+[[nonnull, impl_include("<bits/crt/tm.h>")]]
+[[impl_include("<libc/template/itoa_digits.h>")]]
+char *_strtime([[nonnull]] char buf[9]) {
+	time64_t now = time64(NULL);
+	struct tm now_tms, *pn;
+	pn = localtime64_r(&now, &now_tms);
+	buf[0] = itoa_decimal(pn->@tm_hour@ / 10);
+	buf[1] = itoa_decimal(pn->@tm_hour@ % 10);
+	buf[2] = ':';
+	buf[3] = itoa_decimal(pn->@tm_min@ / 10);
+	buf[4] = itoa_decimal(pn->@tm_min@ % 10);
+	buf[5] = ':';
+	buf[6] = itoa_decimal(pn->@tm_sec@ / 10);
+	buf[7] = itoa_decimal(pn->@tm_sec@ % 10);
+	buf[8] = '\0';
+	return 0;
+}
 
+[[requires_function(time64, localtime64_r)]]
+[[nonnull, impl_include("<bits/crt/tm.h>")]]
+[[impl_include("<libc/template/itoa_digits.h>")]]
+char *_strdate([[nonnull]] char buf[9]) {
+	time64_t now = time64(NULL);
+	struct tm now_tms, *pn;
+	pn = localtime64_r(&now, &now_tms);
+	buf[0] = itoa_decimal(pn->@tm_mon@ / 10);
+	buf[1] = itoa_decimal(pn->@tm_mon@ % 10);
+	buf[2] = '/';
+	buf[3] = itoa_decimal(pn->@tm_mday@ / 10);
+	buf[4] = itoa_decimal(pn->@tm_mday@ % 10);
+	buf[5] = '/';
+	buf[6] = itoa_decimal((pn->@tm_year@ / 10) % 10);
+	buf[7] = itoa_decimal(pn->@tm_year@ % 10);
+	buf[8] = '\0';
+	return buf;
+}
+
+[[decl_include("<bits/types.h>"), requires_function(_strtime)]]
+/*dos*/ errno_t _strtime_s([[outp(bufsize)]] char *buf, size_t bufsize) {
+	if unlikely(bufsize < 9)
+		return DOS_ERANGE;
+	_strtime(buf);
+	return 0;
+}
+
+[[decl_include("<bits/types.h>"), requires_function(_strdate)]]
+/*dos*/ errno_t _strdate_s([[outp(bufsize)]] char *buf, size_t bufsize) {
+	if unlikely(bufsize < 9)
+		return DOS_ERANGE;
+	_strdate(buf);
+	return 0;
+}
 
 [[nocrt, pure, wunused, alias("timespec_get", "_timespec32_get")]]
 [[doc_alias("timespec_get")]]
@@ -2179,6 +2269,32 @@ unsigned int _getsystime([[nonnull]] struct tm *tms);
 [[decl_include("<features.h>", "<bits/crt/tm.h>")]]
 unsigned int _setsystime([[nonnull]] struct tm __KOS_FIXED_CONST *tms,
                          unsigned int milliseconds);
+
+%
+%
+%{
+#ifdef __USE_TIME_BITS64
+#define _mkgmtime _mkgmtime32
+#ifdef __USE_DOS_SLIB
+#define ctime_s     _ctime32_s
+#define gmtime_s    _gmtime32_s
+#define localtime_s _localtime32_s
+#endif /* __USE_DOS_SLIB */
+#else /* __USE_TIME_BITS64 */
+#define _mkgmtime _mkgmtime64
+#ifdef __USE_DOS_SLIB
+#define ctime_s     _ctime64_s
+#define gmtime_s    _gmtime64_s
+#define localtime_s _localtime64_s
+#endif /* __USE_DOS_SLIB */
+#endif /* !__USE_TIME_BITS64 */
+}
+%(auto_source){
+#undef _mkgmtime
+#undef ctime_s
+#undef gmtime_s
+#undef localtime_s
+}
 
 %#endif /* __USE_DOS */
 

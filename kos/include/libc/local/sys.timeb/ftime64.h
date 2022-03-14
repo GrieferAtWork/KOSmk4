@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1b87ba */
+/* HASH CRC-32:0xf3e48d3a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,19 @@
 #ifndef __local_ftime64_defined
 #define __local_ftime64_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE__ftime64) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE__ftime32)
+#if defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE__ftime64) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime)
 #include <bits/os/timeb.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep_crt_dos_ftime32_defined) && defined(__CRT_HAVE__ftime32)
+#ifndef __local___localdep_crt_dos_ftime32_defined
 #define __local___localdep_crt_dos_ftime32_defined
+#ifdef __CRT_HAVE__ftime32
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_crt_dos_ftime32,(struct __timeb32 *__timebuf),_ftime32,(__timebuf))
-#endif /* !__local___localdep_crt_dos_ftime32_defined && __CRT_HAVE__ftime32 */
+#elif defined(__CRT_HAVE__ftime)
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_crt_dos_ftime32,(struct __timeb32 *__timebuf),_ftime,(__timebuf))
+#else /* ... */
+#undef __local___localdep_crt_dos_ftime32_defined
+#endif /* !... */
+#endif /* !__local___localdep_crt_dos_ftime32_defined */
 #if !defined(__local___localdep_crt_dos_ftime64_defined) && defined(__CRT_HAVE__ftime64)
 #define __local___localdep_crt_dos_ftime64_defined
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_crt_dos_ftime64,(struct __timeb64 *__timebuf),_ftime64,(__timebuf))
@@ -101,7 +107,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_ftime64_defined
 #define __localdep_ftime64 __LIBC_LOCAL_NAME(ftime64)
 #endif /* !__local___localdep_ftime64_defined */
-#else /* __CRT_HAVE__ftime64_s || __CRT_HAVE__ftime64 || __CRT_HAVE_ftime || __CRT_HAVE__ftime32_s || __CRT_HAVE__ftime32 */
+#else /* __CRT_HAVE__ftime64_s || __CRT_HAVE__ftime64 || __CRT_HAVE_ftime || __CRT_HAVE__ftime32_s || __CRT_HAVE__ftime32 || __CRT_HAVE__ftime */
 #undef __local_ftime64_defined
-#endif /* !__CRT_HAVE__ftime64_s && !__CRT_HAVE__ftime64 && !__CRT_HAVE_ftime && !__CRT_HAVE__ftime32_s && !__CRT_HAVE__ftime32 */
+#endif /* !__CRT_HAVE__ftime64_s && !__CRT_HAVE__ftime64 && !__CRT_HAVE_ftime && !__CRT_HAVE__ftime32_s && !__CRT_HAVE__ftime32 && !__CRT_HAVE__ftime */
 #endif /* !__local_ftime64_defined */

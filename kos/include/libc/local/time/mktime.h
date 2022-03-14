@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xffe1f5b5 */
+/* HASH CRC-32:0xc7a85dc5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,18 +25,6 @@
 #include <bits/types.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_crt_mktime32_defined
-#define __local___localdep_crt_mktime32_defined
-#ifdef __CRT_HAVE_mktime
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_crt_mktime32,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),mktime,(__tp))
-#elif defined(__CRT_HAVE_timelocal)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_crt_mktime32,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),timelocal,(__tp))
-#elif defined(__CRT_HAVE__mktime32)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_crt_mktime32,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),_mktime32,(__tp))
-#else /* ... */
-#undef __local___localdep_crt_mktime32_defined
-#endif /* !... */
-#endif /* !__local___localdep_crt_mktime32_defined */
 #ifndef __local___localdep_mktime64_defined
 #define __local___localdep_mktime64_defined
 #if defined(__CRT_HAVE_mktime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -63,7 +51,6 @@ __LOCAL_LIBC(mktime) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __TM_TYPE(ti
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktime))(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp) {
 
 	return (__TM_TYPE(time))(__NAMESPACE_LOCAL_SYM __localdep_mktime64)(__tp);
-
 
 
 

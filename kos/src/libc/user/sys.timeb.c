@@ -156,7 +156,8 @@ NOTHROW_NCX(LIBCCALL libc_ftime64)(struct timeb64 *timebuf)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x63cca196]]]*/
+/*[[[start:exports,hash:CRC-32=0xc93952b6]]]*/
+DEFINE_PUBLIC_ALIAS(_ftime, libc__ftime32);
 DEFINE_PUBLIC_ALIAS(_ftime32, libc__ftime32);
 DEFINE_PUBLIC_ALIAS(_ftime64, libc__ftime64);
 DEFINE_PUBLIC_ALIAS(_ftime32_s, libc__ftime32_s);

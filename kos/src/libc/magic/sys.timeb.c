@@ -77,7 +77,7 @@ typedef __errno_t errno_t;
 #endif /* !__errno_t_defined */
 }
 
-[[doc_alias("ftime"), ignore, nocrt, alias("_ftime32")]]
+[[doc_alias("ftime"), ignore, nocrt, alias("_ftime32", "_ftime")]]
 [[decl_include("<bits/os/timeb.h>")]]
 void crt_dos_ftime32([[nonnull]] struct $timeb32 *timebuf);
 
@@ -96,7 +96,7 @@ $errno_t crt_ftime64_s([[nonnull]] struct $timeb64 *timebuf);
 
 
 [[decl_include("<bits/os/timeb.h>")]]
-[[userimpl, doc_alias("ftime")]]
+[[userimpl, doc_alias("ftime"), export_alias("_ftime")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("_ftime64")]]
 [[requires($has_function(crt_ftime32_s) || $has_function(crt_ftime32) ||
            $has_function(crt_dos_ftime64) || $has_function(crt_ftime64_s) ||

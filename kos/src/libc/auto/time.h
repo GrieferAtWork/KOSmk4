@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf681da12 */
+/* HASH CRC-32:0xca8ec0c8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -503,12 +503,42 @@ INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBDCALL libd__ctime64_s)(char buf[26
 INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBCCALL libc__ctime64_s)(char buf[26], size_t bufsize, time64_t const *__restrict timer);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED NONNULL((1)) time32_t NOTHROW_NCX(LIBDCALL libd__mkgmtime32)(struct tm *tms);
-INTDEF WUNUSED NONNULL((1)) time64_t NOTHROW_NCX(LIBDCALL libd__mkgmtime64)(struct tm *tms);
-INTDEF NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd__strdate)(char *buf);
-INTDEF NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd__strtime)(char *buf);
-INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd__strdate_s)(char *buf, size_t bufsize);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) time32_t NOTHROW_NCX(LIBDCALL libd__mkgmtime32)(struct tm __KOS_FIXED_CONST *tp);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) time32_t NOTHROW_NCX(LIBCCALL libc__mkgmtime32)(struct tm __KOS_FIXED_CONST *tp);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) time64_t NOTHROW_NCX(LIBDCALL libd__mkgmtime64)(struct tm __KOS_FIXED_CONST *tp);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) time64_t NOTHROW_NCX(LIBCCALL libc__mkgmtime64)(struct tm __KOS_FIXED_CONST *tp);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd__strtime)(char buf[9]);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc__strtime)(char buf[9]);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd__strdate)(char buf[9]);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc__strdate)(char buf[9]);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd__strtime_s)(char *buf, size_t bufsize);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc__strtime_s)(char *buf, size_t bufsize);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd__strdate_s)(char *buf, size_t bufsize);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc__strdate_s)(char *buf, size_t bufsize);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((1)) unsigned int NOTHROW_NCX(LIBDCALL libd__getsystime)(struct tm *tms);
 INTDEF NONNULL((1)) unsigned int NOTHROW_NCX(LIBDCALL libd__setsystime)(struct tm __KOS_FIXED_CONST *tms, unsigned int milliseconds);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

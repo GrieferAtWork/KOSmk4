@@ -1467,6 +1467,7 @@
 #define __CRT_HAVE__ftell_nolock
 #define __CRT_HAVE__ftelli64
 #define __CRT_HAVE__ftelli64_nolock
+#define __CRT_HAVE__ftime
 #define __CRT_HAVE__ftime32
 #define __CRT_HAVE__ftime32_s
 #define __CRT_HAVE__ftime64
@@ -1521,6 +1522,7 @@
 #define __CRT_HAVE__getsystime
 #define __CRT_HAVE__getw
 #define __CRT_HAVE__getws_s
+#define __CRT_HAVE__gmtime32
 #define __CRT_HAVE__gmtime32_s
 #define __CRT_HAVE__gmtime64
 #define __CRT_HAVE__gmtime64_s
@@ -1806,6 +1808,7 @@
 #define __CRT_HAVE__memicmp
 #define __CRT_HAVE__memicmp_l
 #define __CRT_HAVE__mkdir
+#define __CRT_HAVE__mkgmtime
 #define __CRT_HAVE__mkgmtime32
 #define __CRT_HAVE__mkgmtime64
 #define __CRT_HAVE__mktemp

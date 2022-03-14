@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x826a01ed */
+/* HASH CRC-32:0x77421199 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,19 @@
 #ifndef __local_ftime_defined
 #define __local_ftime_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime64) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE_ftime64)
+#if defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime) || defined(__CRT_HAVE__ftime64) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE_ftime64)
 #include <bits/os/timeb.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep_crt_dos_ftime32_defined) && defined(__CRT_HAVE__ftime32)
+#ifndef __local___localdep_crt_dos_ftime32_defined
 #define __local___localdep_crt_dos_ftime32_defined
+#ifdef __CRT_HAVE__ftime32
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_crt_dos_ftime32,(struct __timeb32 *__timebuf),_ftime32,(__timebuf))
-#endif /* !__local___localdep_crt_dos_ftime32_defined && __CRT_HAVE__ftime32 */
+#elif defined(__CRT_HAVE__ftime)
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_crt_dos_ftime32,(struct __timeb32 *__timebuf),_ftime,(__timebuf))
+#else /* ... */
+#undef __local___localdep_crt_dos_ftime32_defined
+#endif /* !... */
+#endif /* !__local___localdep_crt_dos_ftime32_defined */
 #if !defined(__local___localdep_crt_dos_ftime64_defined) && defined(__CRT_HAVE__ftime64)
 #define __local___localdep_crt_dos_ftime64_defined
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_crt_dos_ftime64,(struct __timeb64 *__timebuf),_ftime64,(__timebuf))
@@ -70,7 +76,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ftime))(struct timeb *__timebuf) {
 	if __unlikely(__error)
 		__error = __libc_seterrno(__error);
 	return (int)__error;
-#elif defined(__CRT_HAVE__ftime32) && !defined(__USE_TIME_BITS64)
+#elif (defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime)) && !defined(__USE_TIME_BITS64)
 	(__NAMESPACE_LOCAL_SYM __localdep_crt_dos_ftime32)(&__temp);
 	return 0;
 #elif defined(__CRT_HAVE__ftime64) && defined(__USE_TIME_BITS64)
@@ -120,7 +126,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ftime))(struct timeb *__timebuf) {
 		__timebuf->dstflag  = __temp.dstflag;
 	}
 	return (int)__error;
-#elif defined(__CRT_HAVE__ftime32)
+#elif defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime)
 	struct __timeb32 __temp;
 	(__NAMESPACE_LOCAL_SYM __localdep_crt_dos_ftime32)(&__temp);
 	__timebuf->time     = (__time64_t)__temp.time;
@@ -143,7 +149,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_ftime_defined
 #define __localdep_ftime __LIBC_LOCAL_NAME(ftime)
 #endif /* !__local___localdep_ftime_defined */
-#else /* __CRT_HAVE__ftime32_s || __CRT_HAVE__ftime64_s || __CRT_HAVE__ftime32 || __CRT_HAVE__ftime64 || __CRT_HAVE_ftime || __CRT_HAVE_ftime64 */
+#else /* __CRT_HAVE__ftime32_s || __CRT_HAVE__ftime64_s || __CRT_HAVE__ftime32 || __CRT_HAVE__ftime || __CRT_HAVE__ftime64 || __CRT_HAVE_ftime || __CRT_HAVE_ftime64 */
 #undef __local_ftime_defined
-#endif /* !__CRT_HAVE__ftime32_s && !__CRT_HAVE__ftime64_s && !__CRT_HAVE__ftime32 && !__CRT_HAVE__ftime64 && !__CRT_HAVE_ftime && !__CRT_HAVE_ftime64 */
+#endif /* !__CRT_HAVE__ftime32_s && !__CRT_HAVE__ftime64_s && !__CRT_HAVE__ftime32 && !__CRT_HAVE__ftime && !__CRT_HAVE__ftime64 && !__CRT_HAVE_ftime && !__CRT_HAVE_ftime64 */
 #endif /* !__local_ftime_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44c6e7b0 */
+/* HASH CRC-32:0xdc372684 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3060,6 +3060,7 @@ DEFINE_PUBLIC_ALIAS(DOS$futimes64, libd_futimes64);
 DEFINE_PUBLIC_ALIAS(DOS$futimesat64, libd_futimesat64);
 
 /* sys.timeb */
+DEFINE_PUBLIC_ALIAS(DOS$_ftime, libd__ftime32);
 DEFINE_PUBLIC_ALIAS(DOS$_ftime32, libd__ftime32);
 DEFINE_PUBLIC_ALIAS(DOS$_ftime64, libd__ftime64);
 DEFINE_PUBLIC_ALIAS(DOS$_ftime32_s, libd__ftime32_s);
@@ -3213,6 +3214,7 @@ DEFINE_PUBLIC_ALIAS(DOS$timelocal, libd_mktime);
 DEFINE_PUBLIC_ALIAS(DOS$mktime, libd_mktime);
 DEFINE_PUBLIC_ALIAS(DOS$_ctime32, libd_ctime);
 DEFINE_PUBLIC_ALIAS(DOS$ctime, libd_ctime);
+DEFINE_PUBLIC_ALIAS(DOS$_gmtime32, libd_gmtime);
 DEFINE_PUBLIC_ALIAS(DOS$gmtime, libd_gmtime);
 DEFINE_PUBLIC_ALIAS(DOS$_localtime32, libd_localtime);
 DEFINE_PUBLIC_ALIAS(DOS$localtime, libd_localtime);
@@ -3296,12 +3298,13 @@ DEFINE_PUBLIC_ALIAS(DOS$_localtime32_s, libd__localtime32_s);
 DEFINE_PUBLIC_ALIAS(DOS$_localtime64_s, libd__localtime64_s);
 DEFINE_PUBLIC_ALIAS(DOS$_ctime32_s, libd__ctime32_s);
 DEFINE_PUBLIC_ALIAS(DOS$_ctime64_s, libd__ctime64_s);
+DEFINE_PUBLIC_ALIAS(DOS$_mkgmtime, libd__mkgmtime32);
 DEFINE_PUBLIC_ALIAS(DOS$_mkgmtime32, libd__mkgmtime32);
 DEFINE_PUBLIC_ALIAS(DOS$_mkgmtime64, libd__mkgmtime64);
-DEFINE_PUBLIC_ALIAS(DOS$_strdate, libd__strdate);
 DEFINE_PUBLIC_ALIAS(DOS$_strtime, libd__strtime);
-DEFINE_PUBLIC_ALIAS(DOS$_strdate_s, libd__strdate_s);
+DEFINE_PUBLIC_ALIAS(DOS$_strdate, libd__strdate);
 DEFINE_PUBLIC_ALIAS(DOS$_strtime_s, libd__strtime_s);
+DEFINE_PUBLIC_ALIAS(DOS$_strdate_s, libd__strdate_s);
 DEFINE_PUBLIC_ALIAS(DOS$_getsystime, libd__getsystime);
 DEFINE_PUBLIC_ALIAS(DOS$_setsystime, libd__setsystime);
 

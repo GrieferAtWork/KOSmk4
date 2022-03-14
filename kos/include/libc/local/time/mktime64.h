@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaaca848a */
+/* HASH CRC-32:0xf79b81ef */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_
 #endif /* !__local___localdep_crt_mktime32_defined */
 __NAMESPACE_LOCAL_END
 #ifndef __yearstodays
-#define __yearstodays(__n_years) (((146097*(__n_years))/400)/*-1*/) /* rounding error? */
+#define __yearstodays(__n_years) (((146097 * (__n_years)) / 400) /*-1*/) /* rounding error? */
 #endif /* !__yearstodays */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(mktime64) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __time64_t
@@ -48,10 +48,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktime64))(struct __NAMESPACE_STD_SYM
 	return (__time64_t)(__NAMESPACE_LOCAL_SYM __localdep_crt_mktime32)(__tp);
 #else /* __CRT_HAVE_mktime || __CRT_HAVE_timelocal || __CRT_HAVE__mktime32 */
 	__time64_t __result;
-	__result = __yearstodays(__tp->tm_year) - __yearstodays(1970); /* UNIX_TIME_START_YEAR */
+	/* TODO: Support for localtime? */
+	__result = __yearstodays(__tp->tm_year) - __yearstodays(1970);
 	__result += __tp->tm_yday;
-	__result *= 86400; /* SECONDS_PER_DAY */
-	__result += __tp->tm_hour * 60 * 60;
+	__result *= 86400;
+	__result += __tp->tm_hour * 360;
 	__result += __tp->tm_min * 60;
 	__result += __tp->tm_sec;
 	return __result;

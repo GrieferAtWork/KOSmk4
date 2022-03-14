@@ -1433,6 +1433,7 @@
 #define __CRT_HAVE__ftell_nolock
 #define __CRT_HAVE__ftelli64
 #define __CRT_HAVE__ftelli64_nolock
+#define __CRT_HAVE__ftime
 #define __CRT_HAVE__ftime32
 #define __CRT_HAVE__ftime32_s
 #define __CRT_HAVE__ftime64
@@ -1726,6 +1727,7 @@
 #define __CRT_HAVE__mbsupr_s_l
 #define __CRT_HAVE__mbtowc_l
 #define __CRT_HAVE__mkdir
+#define __CRT_HAVE__mkgmtime
 #define __CRT_HAVE__mkgmtime32
 #define __CRT_HAVE__mkgmtime64
 #define __CRT_HAVE__mktemp_s
@@ -5883,6 +5885,7 @@
 #define __CRT_HAVE__getcwd
 #define __CRT_HAVE__getw
 #define __CRT_HAVE__getwc_nolock
+#define __CRT_HAVE__gmtime32
 #define __CRT_HAVE__gmtime64
 #define __CRT_HAVE__hypot
 #define __CRT_HAVE__hypotf
@@ -7057,6 +7060,7 @@
 #define __CRT_HAVE_KOS$_ftell_nolock
 #define __CRT_HAVE_KOS$_ftelli64
 #define __CRT_HAVE_KOS$_ftelli64_nolock
+#define __CRT_HAVE_KOS$_ftime
 #define __CRT_HAVE_KOS$_ftime32
 #define __CRT_HAVE_KOS$_ftime32_s
 #define __CRT_HAVE_KOS$_ftime64
@@ -7318,6 +7322,7 @@
 #define __CRT_HAVE_KOS$_mbsupr_s_l
 #define __CRT_HAVE_KOS$_mbtowc_l
 #define __CRT_HAVE_KOS$_mkdir
+#define __CRT_HAVE_KOS$_mkgmtime
 #define __CRT_HAVE_KOS$_mkgmtime32
 #define __CRT_HAVE_KOS$_mkgmtime64
 #define __CRT_HAVE_KOS$_mktemp_s
@@ -11175,6 +11180,7 @@
 #define __CRT_HAVE_DOS$_ftell_nolock
 #define __CRT_HAVE_DOS$_ftelli64
 #define __CRT_HAVE_DOS$_ftelli64_nolock
+#define __CRT_HAVE_DOS$_ftime
 #define __CRT_HAVE_DOS$_ftime32
 #define __CRT_HAVE_DOS$_ftime32_s
 #define __CRT_HAVE_DOS$_ftime64
@@ -11219,6 +11225,7 @@
 #define __CRT_HAVE_DOS$_getw
 #define __CRT_HAVE_DOS$_getwc_nolock
 #define __CRT_HAVE_DOS$_getws_s
+#define __CRT_HAVE_DOS$_gmtime32
 #define __CRT_HAVE_DOS$_gmtime32_s
 #define __CRT_HAVE_DOS$_gmtime64
 #define __CRT_HAVE_DOS$_gmtime64_s
@@ -11505,6 +11512,7 @@
 #define __CRT_HAVE_DOS$_memicmp
 #define __CRT_HAVE_DOS$_memicmp_l
 #define __CRT_HAVE_DOS$_mkdir
+#define __CRT_HAVE_DOS$_mkgmtime
 #define __CRT_HAVE_DOS$_mkgmtime32
 #define __CRT_HAVE_DOS$_mkgmtime64
 #define __CRT_HAVE_DOS$_mktemp

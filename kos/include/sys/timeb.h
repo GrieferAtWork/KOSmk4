@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22472d9e */
+/* HASH CRC-32:0xcdcaa888 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,6 +66,12 @@ typedef __errno_t errno_t;
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_ftime32,(struct __timeb32 *__timebuf),(__timebuf))
+#elif defined(__CRT_HAVE__ftime)
+/* >> ftime(3), ftime64(3)
+ * Write information about the current time to `*timebuf'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_ftime32,(struct __timeb32 *__timebuf),_ftime,(__timebuf))
 #elif defined(__CRT_HAVE__ftime64) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> ftime(3), ftime64(3)
  * Write information about the current time to `*timebuf'
@@ -92,7 +98,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_ftime64,(struct __timeb64 *_
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_ftime64,(struct __timeb64 *__timebuf),(__timebuf))
-#elif defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE_ftime64) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE_ftime)
+#elif defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE_ftime64) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime) || defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE_ftime)
 #include <libc/local/sys.timeb/_ftime64.h>
 /* >> ftime(3), ftime64(3)
  * Write information about the current time to `*timebuf'
@@ -112,7 +118,7 @@ __CDECLARE(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_ftime32_s,(struct __timeb3
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
 __CREDIRECT(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_ftime32_s,(struct __timeb32 *__timebuf),_ftime64_s,(__timebuf))
-#elif defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE_ftime64) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime64)
+#elif defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE_ftime64) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime) || defined(__CRT_HAVE__ftime64)
 #include <libc/local/sys.timeb/_ftime32_s.h>
 /* >> ftime(3), ftime64(3)
  * Write information about the current time to `*timebuf'
@@ -132,7 +138,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_ftime64_s,(struct __timeb
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
 __CDECLARE(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_ftime64_s,(struct __timeb64 *__timebuf),(__timebuf))
-#elif defined(__CRT_HAVE_ftime64) || defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE__ftime64) || defined(__CRT_HAVE__ftime32)
+#elif defined(__CRT_HAVE_ftime64) || defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE__ftime64) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime)
 #include <libc/local/sys.timeb/_ftime64_s.h>
 /* >> ftime(3), ftime64(3)
  * Write information about the current time to `*timebuf'
@@ -155,7 +161,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ftime,(struct timeb *__timebuf)
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ftime,(struct timeb *__timebuf),ftime64,(__timebuf))
-#elif defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime64) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE_ftime64)
+#elif defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime) || defined(__CRT_HAVE__ftime64) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE_ftime64)
 #include <libc/local/sys.timeb/ftime.h>
 /* >> ftime(3), ftime64(3)
  * Write information about the current time to `*timebuf'
@@ -177,7 +183,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ftime64,(struct timeb64 *__tim
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ftime64,(struct timeb64 *__timebuf),(__timebuf))
-#elif defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE__ftime64) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE__ftime32)
+#elif defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE__ftime64) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime)
 #include <libc/local/sys.timeb/ftime64.h>
 /* >> ftime(3), ftime64(3)
  * Write information about the current time to `*timebuf'
