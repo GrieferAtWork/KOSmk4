@@ -55,9 +55,12 @@ typedef __errno_t errno_t;
 
 }
 
+[[nocrt, alias("strdup", "_strdup", "_mbsdup", "__strdup")]]
+[if(__has_builtin(__builtin_strdup) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline("strdup", { return (unsigned char *)__builtin_strdup((char const *)string); })]
+[[if($has_function(malloc)), bind_local_function("strdup")]]
 _mbsdup([[nonnull]] unsigned char const *__restrict string)
-	-> [[malloc/*((_mbslen(string) + 1) * sizeof(char))*/]] unsigned char *
-	= strdup;
+	-> [[malloc/*((strlen(string) + 1) * sizeof(unsigned char))*/]] unsigned char *;
 
 /************************************************************************/
 /* Current-local functions                                              */
@@ -91,9 +94,13 @@ int _mbsbtype([[nonnull]] unsigned char const *str, size_t pos) {
 	return _mbscat_s_l(buf, true_bufsize, src, NULL);
 }
 
-[[nonnull]]
+[[nonnull, nocrt, leaf, alias("strcat", "_mbscat")]]
+[if(__has_builtin(__builtin_strcat) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline("strcat", { return (unsigned char *)__builtin_strcat((char *)dst, (char const *)src); })]
+[[bind_local_function("strcat")]]
 unsigned char *_mbscat([[nonnull]] unsigned char *__restrict dst,
-                       [[nonnull]] unsigned char const *__restrict src) = strcat;
+                       [[nonnull]] unsigned char const *__restrict src);
+
 
 [[wunused, requires_function(_mbschr_l), doc_alias("_mbschr_l")]]
 unsigned char *_mbschr([[nonnull]] unsigned char const *__restrict haystack, unsigned int needle)
@@ -122,9 +129,12 @@ int _mbscoll([[nonnull]] unsigned char const *lhs,
 	return _mbscpy_s_l(buf, true_bufsize, src, NULL);
 }
 
-[[nonnull]]
+[[nonnull, nocrt, leaf, alias("strcpy", "_mbscpy")]]
+[if(__has_builtin(__builtin_strcpy) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline("strcpy", { return (unsigned char *)__builtin_strcpy((char *)dst, (char const *)src); })]
+[[bind_local_function("strcpy")]]
 unsigned char *_mbscpy([[nonnull]] unsigned char *__restrict dst,
-                       [[nonnull]] unsigned char const *__restrict src) = strcpy;
+                       [[nonnull]] unsigned char const *__restrict src);
 
 [[wunused, requires_function(_mbscspn_l), doc_alias("_mbscspn_l")]]
 [[decl_include("<hybrid/typecore.h>")]]

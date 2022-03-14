@@ -639,6 +639,7 @@
 #define __CRT_HAVE___jnl
 #define __CRT_HAVE___kill
 #define __CRT_HAVE___lckpwdf
+#define __CRT_HAVE___lconv
 #define __CRT_HAVE___ldexp
 #define __CRT_HAVE___ldexpf
 #define __CRT_HAVE___ldexpl
@@ -940,10 +941,13 @@
 #define __CRT_HAVE___p__crtAssertBusy
 #define __CRT_HAVE___p__crtBreakAlloc
 #define __CRT_HAVE___p__crtDbgFlag
+#define __CRT_HAVE___p__daylight
 #define __CRT_HAVE___p__environ
 #define __CRT_HAVE___p__fmode
 #define __CRT_HAVE___p__iob
 #define __CRT_HAVE___p__pgmptr
+#define __CRT_HAVE___p__timezone
+#define __CRT_HAVE___p__tzname
 #define __CRT_HAVE___p__wenviron
 #define __CRT_HAVE___p__wpgmptr
 #define __CRT_HAVE___p_cdname
@@ -1340,6 +1344,7 @@
 #define __CRT_HAVE__cexit
 #define __CRT_HAVE__chdrive
 #define __CRT_HAVE__chgsign
+#define __CRT_HAVE__chgsignf
 #define __CRT_HAVE__clearfp
 #define __CRT_HAVE__configthreadlocale
 #define __CRT_HAVE__control87
@@ -1347,6 +1352,7 @@
 #define __CRT_HAVE__controlfp_s
 #define __CRT_HAVE__copysign
 #define __CRT_HAVE__create_locale
+#define __CRT_HAVE__daylight
 #define __CRT_HAVE__dosmaperr
 #define __CRT_HAVE__dpcomp
 #define __CRT_HAVE__dtest
@@ -1798,8 +1804,10 @@
 #define __CRT_HAVE__sys_nerr
 #define __CRT_HAVE__sys_siglist
 #define __CRT_HAVE__tempnam_dbg
+#define __CRT_HAVE__timezone
 #define __CRT_HAVE__tolower
 #define __CRT_HAVE__toupper
+#define __CRT_HAVE__tzname
 #define __CRT_HAVE__tzset
 #define __CRT_HAVE__ui64toa
 #define __CRT_HAVE__ui64toa_s
@@ -5718,18 +5726,23 @@
 #define __CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ
 #define __CRT_HAVE_$Q_CrtDbgReportW$A$AYAHHPBGH00ZZ
 #define __CRT_HAVE_$Q_invalid_parameter$A$AYAXPEBG00I_K$AZ
+#define __CRT_HAVE_$Q_open$A$AYAHPBDHH$AZ
+#define __CRT_HAVE_$Q_wopen$A$AYAHPB_WHH$AZ
+#define __CRT_HAVE_$Q_wsopen$A$AYAHPB_WHHH$AZ
 #define __CRT_HAVE_$Qterminate$A$AYAXXZ
 #endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
 #ifdef __PE__
 #define __CRT_HAVE__XcptFilter
 #define __CRT_HAVE___C_specific_handler
 #define __CRT_HAVE___acrt_iob_func
+#define __CRT_HAVE___crtGetTickCount64
 #define __CRT_HAVE___crtInitializeCriticalSectionEx
 #define __CRT_HAVE___crtSetUnhandledExceptionFilter
 #define __CRT_HAVE___crtTerminateProcess
 #define __CRT_HAVE___crtUnhandledException
 #define __CRT_HAVE___dllonexit
 #define __CRT_HAVE___getmainargs
+#define __CRT_HAVE___initialize_lconv_for_unsigned_char
 #define __CRT_HAVE___isascii
 #define __CRT_HAVE___lconv_init
 #define __CRT_HAVE___p__acmdln
@@ -5803,6 +5816,8 @@
 #define __CRT_HAVE__fputwc_nolock
 #define __CRT_HAVE__fputwchar
 #define __CRT_HAVE__fputws_nolock
+#define __CRT_HAVE__freea
+#define __CRT_HAVE__freea_s
 #define __CRT_HAVE__futime
 #define __CRT_HAVE__futime32
 #define __CRT_HAVE__futime64
@@ -5815,6 +5830,8 @@
 #define __CRT_HAVE__getw
 #define __CRT_HAVE__getwc_nolock
 #define __CRT_HAVE__gmtime64
+#define __CRT_HAVE__hypot
+#define __CRT_HAVE__hypotf
 #define __CRT_HAVE__initialize_narrow_environment
 #define __CRT_HAVE__initialize_onexit_table
 #define __CRT_HAVE__initialize_wide_environment
@@ -5854,6 +5871,7 @@
 #define __CRT_HAVE__ldclass
 #define __CRT_HAVE__ldsign
 #define __CRT_HAVE__lfind
+#define __CRT_HAVE__localtime32
 #define __CRT_HAVE__localtime64
 #define __CRT_HAVE__lock
 #define __CRT_HAVE__lock_file
@@ -5958,6 +5976,7 @@
 #define __CRT_HAVE__utime
 #define __CRT_HAVE__utime32
 #define __CRT_HAVE__utime64
+#define __CRT_HAVE__vacopy
 #define __CRT_HAVE__waccess
 #define __CRT_HAVE__wchdir
 #define __CRT_HAVE__wchmod
@@ -6924,6 +6943,7 @@
 #define __CRT_HAVE_KOS$_byteswap_ushort
 #define __CRT_HAVE_KOS$_chdrive
 #define __CRT_HAVE_KOS$_chgsign
+#define __CRT_HAVE_KOS$_chgsignf
 #define __CRT_HAVE_KOS$_configthreadlocale
 #define __CRT_HAVE_KOS$_control87
 #define __CRT_HAVE_KOS$_controlfp
@@ -10150,6 +10170,7 @@
 #define __CRT_HAVE_DOS$__cosl
 #define __CRT_HAVE_DOS$__creat
 #define __CRT_HAVE_DOS$__create_locale
+#define __CRT_HAVE_DOS$__crtGetTickCount64
 #define __CRT_HAVE_DOS$__crtInitializeCriticalSectionEx
 #define __CRT_HAVE_DOS$__crtSetUnhandledExceptionFilter
 #define __CRT_HAVE_DOS$__crtSleep
@@ -10282,6 +10303,7 @@
 #define __CRT_HAVE_DOS$__ilogbf
 #define __CRT_HAVE_DOS$__ilogbl
 #define __CRT_HAVE_DOS$__initenv
+#define __CRT_HAVE_DOS$__initialize_lconv_for_unsigned_char
 #define __CRT_HAVE_DOS$__initstate
 #define __CRT_HAVE_DOS$__ioctl
 #define __CRT_HAVE_DOS$__ioperm
@@ -10936,6 +10958,7 @@
 #define __CRT_HAVE_DOS$_chdir
 #define __CRT_HAVE_DOS$_chdrive
 #define __CRT_HAVE_DOS$_chgsign
+#define __CRT_HAVE_DOS$_chgsignf
 #define __CRT_HAVE_DOS$_chmod
 #define __CRT_HAVE_DOS$_chsize
 #define __CRT_HAVE_DOS$_chsize_s
@@ -11036,6 +11059,8 @@
 #define __CRT_HAVE_DOS$_fread_nolock
 #define __CRT_HAVE_DOS$_fread_nolock_s
 #define __CRT_HAVE_DOS$_free_locale
+#define __CRT_HAVE_DOS$_freea
+#define __CRT_HAVE_DOS$_freea_s
 #define __CRT_HAVE_DOS$_fscanf_l
 #define __CRT_HAVE_DOS$_fscanf_s_l
 #define __CRT_HAVE_DOS$_fseek_nolock
@@ -11083,6 +11108,8 @@
 #define __CRT_HAVE_DOS$_getwc_nolock
 #define __CRT_HAVE_DOS$_getws_s
 #define __CRT_HAVE_DOS$_gmtime64
+#define __CRT_HAVE_DOS$_hypot
+#define __CRT_HAVE_DOS$_hypotf
 #define __CRT_HAVE_DOS$_i64toa
 #define __CRT_HAVE_DOS$_i64toa_s
 #define __CRT_HAVE_DOS$_i64tow
@@ -11180,6 +11207,7 @@
 #define __CRT_HAVE_DOS$_lfind
 #define __CRT_HAVE_DOS$_lfind_s
 #define __CRT_HAVE_DOS$_loaddll
+#define __CRT_HAVE_DOS$_localtime32
 #define __CRT_HAVE_DOS$_localtime64
 #define __CRT_HAVE_DOS$_lock
 #define __CRT_HAVE_DOS$_lock_file
@@ -11543,6 +11571,7 @@
 #define __CRT_HAVE_DOS$_utime
 #define __CRT_HAVE_DOS$_utime32
 #define __CRT_HAVE_DOS$_utime64
+#define __CRT_HAVE_DOS$_vacopy
 #define __CRT_HAVE_DOS$_vfprintf_l
 #define __CRT_HAVE_DOS$_vfprintf_p
 #define __CRT_HAVE_DOS$_vfprintf_p_l

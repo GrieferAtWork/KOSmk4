@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14dd58c6 */
+/* HASH CRC-32:0x159d90d6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -416,15 +416,9 @@ DECL_END
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(DOS$_wremove, libd_wremove);
 DEFINE_PUBLIC_ALIAS(DOS$wremove, libd_wremove);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_wremove, libc_wremove);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(wremove, libc_wremove);
 DEFINE_PUBLIC_ALIAS(DOS$_wrename, libd_wrename);
 DEFINE_PUBLIC_ALIAS(DOS$wrename, libd_wrename);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_wrename, libc_wrename);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(wrename, libc_wrename);
 DEFINE_PUBLIC_ALIAS(DOS$wrenameat, libd_wrenameat);
 DEFINE_PUBLIC_ALIAS(wrenameat, libc_wrenameat);
@@ -434,21 +428,12 @@ DEFINE_PUBLIC_ALIAS(DOS$wrenameat2, libd_wrenameat2);
 DEFINE_PUBLIC_ALIAS(wrenameat2, libc_wrenameat2);
 DEFINE_PUBLIC_ALIAS(DOS$_wfopen, libd_wfopen);
 DEFINE_PUBLIC_ALIAS(DOS$wfopen, libd_wfopen);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_wfopen, libc_wfopen);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(wfopen, libc_wfopen);
 DEFINE_PUBLIC_ALIAS(DOS$_wfreopen, libd_wfreopen);
 DEFINE_PUBLIC_ALIAS(DOS$wfreopen, libd_wfreopen);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_wfreopen, libc_wfreopen);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(wfreopen, libc_wfreopen);
 DEFINE_PUBLIC_ALIAS(DOS$_wpopen, libd_wpopen);
 DEFINE_PUBLIC_ALIAS(DOS$wpopen, libd_wpopen);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_wpopen, libc_wpopen);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(wpopen, libc_wpopen);
 #endif /* !__KERNEL__ */
 

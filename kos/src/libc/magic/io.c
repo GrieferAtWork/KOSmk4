@@ -355,7 +355,7 @@ $fd_t _open_osfhandle(intptr_t osfd, $oflag_t flags) {
 %[default:section(".text.crt.dos.fs.io")]
 
 [[crt_dos_variant, decl_include("<bits/types.h>")]]
-[[cp, vartypes($mode_t), wunused, dos_only_export_alias("_sopen")]]
+[[cp, vartypes($mode_t), wunused, dos_export_alias("_sopen")]]
 [[requires_function(open), section(".text.crt.dos.fs.io")]]
 $fd_t sopen([[nonnull]] char const *filename, $oflag_t oflags, int sflags, ...) {
 	fd_t result;

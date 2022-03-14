@@ -3228,7 +3228,7 @@ NOTHROW_NCX(LIBCCALL libc__get_invalid_parameter_handler)(void)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x27e23229]]]*/
+/*[[[start:exports,hash:CRC-32=0x30bbf189]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$getenv, libd_getenv);
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
@@ -3283,9 +3283,6 @@ DEFINE_PUBLIC_ALIAS(seed48, libc_seed48);
 DEFINE_PUBLIC_ALIAS(lcong48, libc_lcong48);
 DEFINE_PUBLIC_ALIAS(DOS$_putenv, libd_putenv);
 DEFINE_PUBLIC_ALIAS(DOS$putenv, libd_putenv);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_putenv, libc_putenv);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(putenv, libc_putenv);
 DEFINE_PUBLIC_ALIAS(__random, libc_random);
 DEFINE_PUBLIC_ALIAS(random, libc_random);

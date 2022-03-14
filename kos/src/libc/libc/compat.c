@@ -41,10 +41,12 @@
 #include <nt/libloaderapi.h>
 #include <nt/processthreadsapi.h>
 #include <nt/synchapi.h>
+#include <nt/sysinfoapi.h>
 #include <nt/types.h>
 
 #include <elf.h>
 #include <format-printer.h>
+#include <locale.h>
 #include <math.h>
 #include <signal.h>
 #include <stdlib.h> /* exit() */
@@ -1229,6 +1231,72 @@ libd__except_handler4(struct _EXCEPTION_RECORD *ExceptionRecord,
 	return EXCEPTION_CONTINUE_SEARCH;
 }
 
+DEFINE_PUBLIC_ALIAS(__p__tzname, libd___p__tzname);
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.dos.compat.dos")
+char **NOTHROW(LIBDCALL libd___p__tzname)(void) {
+	return &tzname;
+}
+
+DEFINE_PUBLIC_ALIAS(__p__timezone, libd___p__timezone);
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.dos.compat.dos")
+longptr_t *NOTHROW(LIBDCALL libd___p__timezone)(void) {
+	return &timezone;
+}
+
+DEFINE_PUBLIC_ALIAS(__p__daylight, libd___p__daylight);
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.dos.compat.dos")
+int *NOTHROW(LIBDCALL libd___p__daylight)(void) {
+	return &daylight;
+}
+
+DEFINE_PUBLIC_ALIAS(DOS$_vacopy, libd__vacopy);
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") NONNULL((1)) void
+NOTHROW(LIBDCALL libd__vacopy)(void **p_dstap, void *srcap) {
+	*p_dstap = srcap;
+}
+
+DEFINE_PUBLIC_ALIAS(DOS$_freea, libd__freea);
+DEFINE_PUBLIC_ALIAS(DOS$_freea_s, libd__freea);
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") void
+NOTHROW(LIBDCALL libd__freea)(void *ptr) {
+	if (ptr) {
+		ptr = (byte_t *)ptr - (2 * sizeof(void *));
+		if (*(uint32_t const *)ptr == 0xDDDD)
+			free(ptr);
+	}
+}
+
+PRIVATE ATTR_SECTION(".bss.crt.dos.compat.dos") struct lconv *libd___lconv = NULL;
+DEFINE_PUBLIC_IDATA_G(__lconv, libd___p___lconv, __SIZEOF_POINTER__);
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") struct lconv **
+NOTHROW(LIBDCALL libd___p___lconv)(void) {
+	if (libd___lconv == NULL)
+		libd___lconv = localeconv();
+	return &libd___lconv;
+}
+
+DEFINE_PUBLIC_ALIAS(DOS$__initialize_lconv_for_unsigned_char, libd___initialize_lconv_for_unsigned_char);
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") void
+NOTHROW(LIBDCALL libd___initialize_lconv_for_unsigned_char)(void) {
+	struct lconv *lc       = localeconv();
+	lc->int_frac_digits    = (char)(unsigned char)0xff;
+	lc->frac_digits        = (char)(unsigned char)0xff;
+	lc->p_cs_precedes      = (char)(unsigned char)0xff;
+	lc->p_sep_by_space     = (char)(unsigned char)0xff;
+	lc->n_cs_precedes      = (char)(unsigned char)0xff;
+	lc->n_sep_by_space     = (char)(unsigned char)0xff;
+	lc->p_sign_posn        = (char)(unsigned char)0xff;
+	lc->n_sign_posn        = (char)(unsigned char)0xff;
+/*	lc->int_p_cs_precedes  = (char)(unsigned char)0xff; */
+/*	lc->int_p_sep_by_space = (char)(unsigned char)0xff; */
+/*	lc->int_n_cs_precedes  = (char)(unsigned char)0xff; */
+/*	lc->int_n_sep_by_space = (char)(unsigned char)0xff; */
+/*	lc->int_p_sign_posn    = (char)(unsigned char)0xff; */
+/*	lc->int_n_sign_posn    = (char)(unsigned char)0xff; */
+}
+
+
+
 
 
 /************************************************************************/
@@ -1567,6 +1635,7 @@ for (local name: {
 	"UnhandledExceptionFilter",
 	"TerminateProcess",
 	"GetCurrentProcess",
+	"GetTickCount64",
 }) {
 	print("#undef ", name);
 	print("DEFINE_KERNEL32_RESOLVER(", name, ")");
@@ -1600,6 +1669,9 @@ DEFINE_KERNEL32_RESOLVER(TerminateProcess)
 #undef GetCurrentProcess
 DEFINE_KERNEL32_RESOLVER(GetCurrentProcess)
 #define GetCurrentProcess (*libd_resolve_GetCurrentProcess())
+#undef GetTickCount64
+DEFINE_KERNEL32_RESOLVER(GetTickCount64)
+#define GetTickCount64 (*libd_resolve_GetTickCount64())
 /*[[[end]]]*/
 #undef DEFINE_KERNEL32_RESOLVER
 
@@ -1634,6 +1706,25 @@ void LIBDCALL libd___crtTerminateProcess(UINT exit_code) {
 		return k32name args;                                                          \
 	}
 #endif /* !__LIBDCALL_IS_WINAPI */
+
+/* TODO: __crtCreateEventExW */
+/* TODO: __crtGetFileInformationByHandleEx */
+/* TODO: __crtSetFileInformationByHandle */
+
+/* TODO: __crtCompareStringA */
+/* TODO: __crtCompareStringW */
+/* TODO: __crtLCMapStringA */
+/* TODO: __crtLCMapStringW */
+
+/* TODO: __crtCreateSemaphoreExW */
+
+/* TODO: ___crtCreateSemaphoreExW$A24 */
+
+/* TODO: __crtGetLocaleInfoW */
+/* TODO: __crtGetStringTypeW */
+
+/* TODO: __crtCaptureCurrentContext */
+/* TODO: __crtCapturePreviousContext */
 
 /* TODO: __crtCompareStringEx */
 /* TODO: __crtCreateSymbolicLinkW */
@@ -1673,6 +1764,8 @@ DEFINE_KERNEL32_FORWARDER_FUNCTION(LPTOP_LEVEL_EXCEPTION_FILTER, LIBDCALL, __crt
                                    SetUnhandledExceptionFilter, (lpTopLevelExceptionFilter))
 /*DEFINE_KERNEL32_FORWARDER_FUNCTION(HANDLE, LIBDCALL, __threadhandle, (void), GetCurrentThread, ())*/
 DEFINE_PUBLIC_IFUNC(DOS$__threadhandle, libd_resolve_GetCurrentThread);
+/*DEFINE_KERNEL32_FORWARDER_FUNCTION(ULONGLONG, LIBDCALL, __crtGetTickCount64, (void), GetTickCount64, ())*/
+DEFINE_PUBLIC_IFUNC(DOS$__crtGetTickCount64, libd_resolve_GetTickCount64);
 #undef DEFINE_KERNEL32_FORWARDER_FUNCTION
 
 

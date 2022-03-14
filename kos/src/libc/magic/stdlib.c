@@ -2506,7 +2506,7 @@ void lcong48([[nonnull]] unsigned short param[7]);
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN) || defined(__USE_DOS)
 [[section(".text.crt{|.dos}.fs.environ")]]
-[[crt_dos_variant, dos_only_export_alias("_putenv")]]
+[[crt_dos_variant, dos_export_alias("_putenv")]]
 int putenv([[nonnull]] char *string);
 %#endif /* __USE_MISC || __USE_XOPEN || __USE_DOS */
 

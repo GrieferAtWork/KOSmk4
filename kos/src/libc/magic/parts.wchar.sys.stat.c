@@ -71,8 +71,7 @@ int wmkdir([[nonnull]] wchar_t const *pathname, $mode_t mode) {
 }
 
 
-[[wchar, cp, decl_include("<bits/types.h>")]]
-[[dos_only_export_alias("_wchmod")]]
+[[wchar, cp, decl_include("<bits/types.h>"), dos_export_alias("_wchmod")]]
 [[requires_include("<asm/os/fcntl.h>"), impl_include("<asm/os/fcntl.h>")]]
 [[requires((defined(__AT_FDCWD) && $has_function(wfchmodat)) ||
            $has_function(chmod, convert_wcstombs))]]

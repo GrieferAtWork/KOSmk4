@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x266eef39 */
+/* HASH CRC-32:0x1ff3d913 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -383,7 +383,6 @@ DEFINE_PUBLIC_ALIAS(DOS$_controlfp_s, libd__controlfp_s);
 DEFINE_PUBLIC_ALIAS(DOS$_statusfp2, libd__statusfp2);
 DEFINE_PUBLIC_ALIAS(DOS$_control87, libd__control87);
 DEFINE_PUBLIC_ALIAS(DOS$__control87_2, libd___control87_2);
-DEFINE_PUBLIC_ALIAS(DOS$_chgsign, libd__chgsign);
 DEFINE_PUBLIC_ALIAS(DOS$_fpclass, libd__fpclass);
 
 /* fnmatch */
@@ -704,8 +703,10 @@ DEFINE_PUBLIC_ALIAS(DOS$__powl, libd_powl);
 DEFINE_PUBLIC_ALIAS(DOS$powl, libd_powl);
 DEFINE_PUBLIC_ALIAS(DOS$__sqrtl, libd_sqrtl);
 DEFINE_PUBLIC_ALIAS(DOS$sqrtl, libd_sqrtl);
+DEFINE_PUBLIC_ALIAS(DOS$_hypot, libd_hypot);
 DEFINE_PUBLIC_ALIAS(DOS$__hypot, libd_hypot);
 DEFINE_PUBLIC_ALIAS(DOS$hypot, libd_hypot);
+DEFINE_PUBLIC_ALIAS(DOS$_hypotf, libd_hypotf);
 DEFINE_PUBLIC_ALIAS(DOS$__hypotf, libd_hypotf);
 DEFINE_PUBLIC_ALIAS(DOS$hypotf, libd_hypotf);
 DEFINE_PUBLIC_ALIAS(DOS$__hypotl, libd_hypotl);
@@ -1057,6 +1058,8 @@ DEFINE_PUBLIC_ALIAS(DOS$canonicalizel, libd_canonicalizel);
 DEFINE_PUBLIC_ALIAS(DOS$_dpcomp, libd__dpcomp);
 DEFINE_PUBLIC_ALIAS(DOS$_fdpcomp, libd__fdpcomp);
 DEFINE_PUBLIC_ALIAS(DOS$_ldpcomp, libd__ldpcomp);
+DEFINE_PUBLIC_ALIAS(DOS$_chgsignf, libd__chgsignf);
+DEFINE_PUBLIC_ALIAS(DOS$_chgsign, libd__chgsign);
 
 /* mbstring */
 DEFINE_PUBLIC_ALIAS(DOS$_mbbtombc, libd__mbbtombc);
@@ -1371,15 +1374,6 @@ DEFINE_PUBLIC_ALIAS(DOS$_unloaddll, libd__unloaddll);
 DEFINE_PUBLIC_ALIAS(DOS$_getdllprocaddr, libd__getdllprocaddr);
 DEFINE_PUBLIC_ALIAS(DOS$_cwait, libd_cwait);
 DEFINE_PUBLIC_ALIAS(DOS$cwait, libd_cwait);
-DEFINE_PUBLIC_ALIAS(DOS$_spawnv, libd_spawnv);
-DEFINE_PUBLIC_ALIAS(DOS$spawnv, libd_spawnv);
-DEFINE_PUBLIC_ALIAS(DOS$_spawnvp, libd_spawnvp);
-DEFINE_PUBLIC_ALIAS(DOS$spawnvp, libd_spawnvp);
-DEFINE_PUBLIC_ALIAS(DOS$_spawnve, libd_spawnve);
-DEFINE_PUBLIC_ALIAS(DOS$spawnve, libd_spawnve);
-DEFINE_PUBLIC_ALIAS(DOS$_spawnvpe, libd_spawnvpe);
-DEFINE_PUBLIC_ALIAS(DOS$spawnvpe, libd_spawnvpe);
-DEFINE_PUBLIC_ALIAS(DOS$_spawnve, libd_fspawnve);
 DEFINE_PUBLIC_ALIAS(DOS$fspawnve, libd_fspawnve);
 
 /* pthread */
@@ -3191,6 +3185,7 @@ DEFINE_PUBLIC_ALIAS(DOS$mktime, libd_mktime);
 DEFINE_PUBLIC_ALIAS(DOS$_ctime32, libd_ctime);
 DEFINE_PUBLIC_ALIAS(DOS$ctime, libd_ctime);
 DEFINE_PUBLIC_ALIAS(DOS$gmtime, libd_gmtime);
+DEFINE_PUBLIC_ALIAS(DOS$_localtime32, libd_localtime);
 DEFINE_PUBLIC_ALIAS(DOS$localtime, libd_localtime);
 DEFINE_PUBLIC_ALIAS(DOS$strftime, libd_strftime);
 DEFINE_PUBLIC_ALIAS(DOS$asctime, libd_asctime);

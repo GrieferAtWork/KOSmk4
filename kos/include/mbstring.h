@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9d0dc3f */
+/* HASH CRC-32:0xa9aa45dc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@ typedef __errno_t errno_t;
 #endif /* __CORRECT_ISO_CPP_STRING_H_PROTO */
 
 #if __has_builtin(__builtin_strdup) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strdup)
-__CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),unsigned char *,__NOTHROW_NCX,_mbsdup,(unsigned char const *__restrict __string),strdup,{ return __builtin_strdup(__string); })
+__CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),unsigned char *,__NOTHROW_NCX,_mbsdup,(unsigned char const *__restrict __string),strdup,{ return (unsigned char *)__builtin_strdup((char const *)__string); })
 #elif defined(__CRT_HAVE_strdup)
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),unsigned char *,__NOTHROW_NCX,_mbsdup,(unsigned char const *__restrict __string),strdup,(__string))
 #elif defined(__CRT_HAVE__strdup)
@@ -100,30 +100,14 @@ __CDECLARE(__ATTR_NONNULL((1, 3)),errno_t,__NOTHROW_NCX,_mbscat_s,(unsigned char
 __NAMESPACE_LOCAL_USING_OR_IMPL(_mbscat_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) errno_t __NOTHROW_NCX(__LIBCCALL _mbscat_s)(unsigned char *__buf, size_t __true_bufsize, unsigned char const *__src) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbscat_s))(__buf, __true_bufsize, __src); })
 #endif /* !__CRT_HAVE__mbscat_s */
 #if __has_builtin(__builtin_strcat) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcat)
-/* >> strcat(3)
- * Same as `strcpy(3)',  but rather  than copying `src'  ontop of  `dst',
- * append it at the end of `dst', or more precisely copy to `strend(dst)'
- * Always re-returns `dst' */
-__CEIREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),unsigned char *,__NOTHROW_NCX,_mbscat,(unsigned char *__restrict __dst, unsigned char const *__restrict __src),strcat,{ return __builtin_strcat(__dst, __src); })
+__CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),unsigned char *,__NOTHROW_NCX,_mbscat,(unsigned char *__restrict __dst, unsigned char const *__restrict __src),strcat,{ return (unsigned char *)__builtin_strcat((char *)__dst, (char const *)__src); })
 #elif defined(__CRT_HAVE_strcat)
-/* >> strcat(3)
- * Same as `strcpy(3)',  but rather  than copying `src'  ontop of  `dst',
- * append it at the end of `dst', or more precisely copy to `strend(dst)'
- * Always re-returns `dst' */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),unsigned char *,__NOTHROW_NCX,_mbscat,(unsigned char *__restrict __dst, unsigned char const *__restrict __src),strcat,(__dst,__src))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),unsigned char *,__NOTHROW_NCX,_mbscat,(unsigned char *__restrict __dst, unsigned char const *__restrict __src),strcat,(__dst,__src))
 #elif defined(__CRT_HAVE__mbscat)
-/* >> strcat(3)
- * Same as `strcpy(3)',  but rather  than copying `src'  ontop of  `dst',
- * append it at the end of `dst', or more precisely copy to `strend(dst)'
- * Always re-returns `dst' */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),unsigned char *,__NOTHROW_NCX,_mbscat,(unsigned char *__restrict __dst, unsigned char const *__restrict __src),(__dst,__src))
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),unsigned char *,__NOTHROW_NCX,_mbscat,(unsigned char *__restrict __dst, unsigned char const *__restrict __src),(__dst,__src))
 #else /* ... */
 #include <libc/local/string/strcat.h>
-/* >> strcat(3)
- * Same as `strcpy(3)',  but rather  than copying `src'  ontop of  `dst',
- * append it at the end of `dst', or more precisely copy to `strend(dst)'
- * Always re-returns `dst' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) unsigned char *__NOTHROW_NCX(__LIBCCALL _mbscat)(unsigned char *__restrict __dst, unsigned char const *__restrict __src) { return (unsigned char *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcat))((char *)__dst, (char const *)__src); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) unsigned char *__NOTHROW_NCX(__LIBCCALL _mbscat)(unsigned char *__restrict __dst, unsigned char const *__restrict __src) { return (unsigned char *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcat))((char *)__dst, (char const *)__src); }
 #endif /* !... */
 #ifdef __CRT_HAVE__mbschr
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_MBSTRING_H_PROTO)
@@ -164,30 +148,14 @@ __CDECLARE(__ATTR_NONNULL((1, 3)),errno_t,__NOTHROW_NCX,_mbscpy_s,(unsigned char
 __NAMESPACE_LOCAL_USING_OR_IMPL(_mbscpy_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) errno_t __NOTHROW_NCX(__LIBCCALL _mbscpy_s)(unsigned char *__buf, size_t __true_bufsize, unsigned char const *__src) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbscpy_s))(__buf, __true_bufsize, __src); })
 #endif /* !__CRT_HAVE__mbscpy_s */
 #if __has_builtin(__builtin_strcpy) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcpy)
-/* >> strcpy(3)
- * Copy a NUL-terminated string `str' to `dst', and re-return `dst'.
- * The exact # of characters copied is `strlen(src) + 1' (+1 because
- * the trailing NUL-character is also copied) */
-__CEIREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),unsigned char *,__NOTHROW_NCX,_mbscpy,(unsigned char *__restrict __dst, unsigned char const *__restrict __src),strcpy,{ return __builtin_strcpy(__dst, __src); })
+__CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),unsigned char *,__NOTHROW_NCX,_mbscpy,(unsigned char *__restrict __dst, unsigned char const *__restrict __src),strcpy,{ return (unsigned char *)__builtin_strcpy((char *)__dst, (char const *)__src); })
 #elif defined(__CRT_HAVE_strcpy)
-/* >> strcpy(3)
- * Copy a NUL-terminated string `str' to `dst', and re-return `dst'.
- * The exact # of characters copied is `strlen(src) + 1' (+1 because
- * the trailing NUL-character is also copied) */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),unsigned char *,__NOTHROW_NCX,_mbscpy,(unsigned char *__restrict __dst, unsigned char const *__restrict __src),strcpy,(__dst,__src))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),unsigned char *,__NOTHROW_NCX,_mbscpy,(unsigned char *__restrict __dst, unsigned char const *__restrict __src),strcpy,(__dst,__src))
 #elif defined(__CRT_HAVE__mbscpy)
-/* >> strcpy(3)
- * Copy a NUL-terminated string `str' to `dst', and re-return `dst'.
- * The exact # of characters copied is `strlen(src) + 1' (+1 because
- * the trailing NUL-character is also copied) */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),unsigned char *,__NOTHROW_NCX,_mbscpy,(unsigned char *__restrict __dst, unsigned char const *__restrict __src),(__dst,__src))
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),unsigned char *,__NOTHROW_NCX,_mbscpy,(unsigned char *__restrict __dst, unsigned char const *__restrict __src),(__dst,__src))
 #else /* ... */
 #include <libc/local/string/strcpy.h>
-/* >> strcpy(3)
- * Copy a NUL-terminated string `str' to `dst', and re-return `dst'.
- * The exact # of characters copied is `strlen(src) + 1' (+1 because
- * the trailing NUL-character is also copied) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) unsigned char *__NOTHROW_NCX(__LIBCCALL _mbscpy)(unsigned char *__restrict __dst, unsigned char const *__restrict __src) { return (unsigned char *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcpy))((char *)__dst, (char const *)__src); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) unsigned char *__NOTHROW_NCX(__LIBCCALL _mbscpy)(unsigned char *__restrict __dst, unsigned char const *__restrict __src) { return (unsigned char *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcpy))((char *)__dst, (char const *)__src); }
 #endif /* !... */
 #ifdef __CRT_HAVE__mbscspn
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,_mbscspn,(unsigned char const *__haystack, unsigned char const *__reject),(__haystack,__reject))

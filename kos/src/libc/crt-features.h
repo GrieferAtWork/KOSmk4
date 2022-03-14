@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6cd23de */
+/* HASH CRC-32:0x8672ced0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -241,6 +241,7 @@
 #define __CRT_HAVE_DOS$_byteswap_ushort
 #define __CRT_HAVE_DOS$_chdrive
 #define __CRT_HAVE_DOS$_chgsign
+#define __CRT_HAVE_DOS$_chgsignf
 #define __CRT_HAVE_DOS$_configthreadlocale
 #define __CRT_HAVE_DOS$_control87
 #define __CRT_HAVE_DOS$_controlfp
@@ -2911,8 +2912,6 @@
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$sopen
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$spawnl
 #define __CRT_HAVE_DOS$spawnle
 #define __CRT_HAVE_DOS$spawnlp
@@ -2921,6 +2920,8 @@
 #define __CRT_HAVE_DOS$spawnve
 #define __CRT_HAVE_DOS$spawnvp
 #define __CRT_HAVE_DOS$spawnvpe
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$splice
 #define __CRT_HAVE_DOS$sprintf
 #define __CRT_HAVE_DOS$sprintf_s
@@ -4066,6 +4067,7 @@
 #define __CRT_HAVE__cexit
 #define __CRT_HAVE__chdrive
 #define __CRT_HAVE__chgsign
+#define __CRT_HAVE__chgsignf
 #define __CRT_HAVE__clearfp
 #define __CRT_HAVE__configthreadlocale
 #define __CRT_HAVE__control87

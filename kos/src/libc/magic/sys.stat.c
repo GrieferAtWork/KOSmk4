@@ -673,7 +673,7 @@ int mkdir([[nonnull]] char const *pathname, $mode_t mode) {
 
 @@>> chmod(2)
 [[crt_dos_variant, cp, guard, decl_include("<bits/types.h>")]]
-[[dos_only_export_alias("_chmod"), export_alias("__chmod", "__libc_chmod")]]
+[[dos_export_alias("_chmod"), export_alias("__chmod", "__libc_chmod")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>"), impl_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(fchmodat))]]
 int chmod([[nonnull]] char const *filename, $mode_t mode) {

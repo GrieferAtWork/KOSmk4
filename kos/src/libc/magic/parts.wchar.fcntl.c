@@ -50,7 +50,7 @@ $fd_t wopen32([[nonnull]] wchar_t const *filename, $oflag_t oflags, ...);
 [[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("wopen", "_wopen")]]
 [[                                                                                                                                                     alias("wopen64")]]
 [[decl_include("<bits/types.h>")]]
-[[dos_only_export_as("_wopen"), requires_include("<asm/os/fcntl.h>")]]
+[[dos_export_as("DOS$_wopen", /*"DOS$"*/ "?_wopen@@YAHPB_WHH@Z"), requires_include("<asm/os/fcntl.h>")]]
 [[requires($has_function(wopen64) || (defined(__AT_FDCWD) && $has_function(wopenat)) ||
            $has_function(open, convert_wcstombs))]]
 $fd_t wopen([[nonnull]] wchar_t const *filename, $oflag_t oflags, ...) {
@@ -82,8 +82,7 @@ $fd_t wopen([[nonnull]] wchar_t const *filename, $oflag_t oflags, ...) {
 [[wchar, cp, wunused, no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("wcreat", "_wcreat")]]
 [[                                                                                                                                                     alias("wcreat64")]]
-[[dos_only_export_as("_wcreat")]]
-[[requires_include("<asm/os/fcntl.h>")]]
+[[dos_export_as("DOS$_wcreat"), requires_include("<asm/os/fcntl.h>")]]
 [[requires((defined(__O_CREAT) && defined(__O_WRONLY) && defined(__O_TRUNC) && $has_function(wopen)) ||
            $has_function(creat, convert_wcstombs))]]
 [[impl_include("<asm/os/fcntl.h>"), decl_include("<bits/types.h>")]]

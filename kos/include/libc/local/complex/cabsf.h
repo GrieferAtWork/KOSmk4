@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef03ed1f */
+/* HASH CRC-32:0xb7e4cac2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_cabsf_defined
 #include <__crt.h>
 #include <ieee754.h>
-#if defined(__CRT_HAVE_cabs) || defined(__CRT_HAVE__cabs) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#if defined(__CRT_HAVE_cabs) || defined(__CRT_HAVE__cabs) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_cabs_defined
 #define __local___localdep_cabs_defined
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,double,__NOTHROW_NCX,__localdep_cabs,(double _Complex __z),cabs,(__z))
 #elif defined(__CRT_HAVE__cabs)
 __CREDIRECT(,double,__NOTHROW_NCX,__localdep_cabs,(double _Complex __z),_cabs,(__z))
-#elif defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#elif defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/complex/cabs.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -67,9 +67,11 @@ __NAMESPACE_LOCAL_BEGIN
 __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__localdep_hypotf,(float __x, float __y),hypotf,{ return __builtin_hypotf(__x, __y); })
 #elif defined(__CRT_HAVE_hypotf)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__localdep_hypotf,(float __x, float __y),hypotf,(__x,__y))
+#elif defined(__CRT_HAVE__hypotf)
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__localdep_hypotf,(float __x, float __y),_hypotf,(__x,__y))
 #elif defined(__CRT_HAVE___hypotf)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__localdep_hypotf,(float __x, float __y),__hypotf,(__x,__y))
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/hypotf.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -80,7 +82,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_hypotf_defined */
 __LOCAL_LIBC(cabsf) float
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cabsf))(float _Complex __z) {
-#if defined(__CRT_HAVE_hypotf) || defined(__CRT_HAVE___hypotf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#if defined(__CRT_HAVE_hypotf) || defined(__CRT_HAVE__hypotf) || defined(__CRT_HAVE___hypotf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 	/* Implementation derived from NetBSD. -- See the following copyright notice. */
 	/*-
 	 * Copyright (c) 2007 The NetBSD Foundation, Inc.
@@ -111,16 +113,16 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cabsf))(float _Complex __z) {
 	 * POSSIBILITY OF SUCH DAMAGE.
 	 */
 	return (__NAMESPACE_LOCAL_SYM __localdep_hypotf)((__NAMESPACE_LOCAL_SYM __localdep_crealf)(__z), (__NAMESPACE_LOCAL_SYM __localdep_cimagf)(__z));
-#else /* __CRT_HAVE_hypotf || __CRT_HAVE___hypotf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_hypot || __CRT_HAVE___hypot || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#else /* __CRT_HAVE_hypotf || __CRT_HAVE__hypotf || __CRT_HAVE___hypotf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_hypot || __CRT_HAVE__hypot || __CRT_HAVE___hypot || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 	return (float)(__NAMESPACE_LOCAL_SYM __localdep_cabs)((double _Complex)__z);
-#endif /* !__CRT_HAVE_hypotf && !__CRT_HAVE___hypotf && !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ && !__CRT_HAVE_hypot && !__CRT_HAVE___hypot && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#endif /* !__CRT_HAVE_hypotf && !__CRT_HAVE__hypotf && !__CRT_HAVE___hypotf && !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ && !__CRT_HAVE_hypot && !__CRT_HAVE__hypot && !__CRT_HAVE___hypot && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_cabsf_defined
 #define __local___localdep_cabsf_defined
 #define __localdep_cabsf __LIBC_LOCAL_NAME(cabsf)
 #endif /* !__local___localdep_cabsf_defined */
-#else /* __CRT_HAVE_cabs || __CRT_HAVE__cabs || __CRT_HAVE_hypot || __CRT_HAVE___hypot || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#else /* __CRT_HAVE_cabs || __CRT_HAVE__cabs || __CRT_HAVE_hypot || __CRT_HAVE__hypot || __CRT_HAVE___hypot || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #undef __local_cabsf_defined
-#endif /* !__CRT_HAVE_cabs && !__CRT_HAVE__cabs && !__CRT_HAVE_hypot && !__CRT_HAVE___hypot && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#endif /* !__CRT_HAVE_cabs && !__CRT_HAVE__cabs && !__CRT_HAVE_hypot && !__CRT_HAVE__hypot && !__CRT_HAVE___hypot && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_cabsf_defined */

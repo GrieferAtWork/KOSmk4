@@ -25,6 +25,8 @@
 
 #include <nt/winnls.h>
 
+#include <langinfo.h>
+
 #include "locale.h"
 
 DECL_BEGIN
@@ -97,17 +99,18 @@ NOTHROW_NCX(LIBCCALL libc_localeconv)(void)
 {
 	if (!current_lconv.negative_sign) {
 		/* Initialize as mandated by the standard for the "C" locale. */
-		current_lconv.decimal_point      = (char *)".";
-		current_lconv.thousands_sep      = (char *)"";
-		current_lconv.grouping           = (char *)"";
-		current_lconv.int_curr_symbol    = (char *)"";
-		current_lconv.currency_symbol    = (char *)"";
-		current_lconv.mon_decimal_point  = (char *)"";
-		current_lconv.mon_thousands_sep  = (char *)"";
-		current_lconv.mon_grouping       = (char *)"";
-		current_lconv.positive_sign      = (char *)"";
+		current_lconv.decimal_point      = (char *)nl_langinfo(DECIMAL_POINT);
+		current_lconv.thousands_sep      = (char *)nl_langinfo(THOUSANDS_SEP);
+		current_lconv.grouping           = (char *)nl_langinfo(GROUPING);
+		current_lconv.int_curr_symbol    = (char *)nl_langinfo(INT_CURR_SYMBOL);
+		current_lconv.currency_symbol    = (char *)nl_langinfo(CURRENCY_SYMBOL);
+		current_lconv.mon_decimal_point  = (char *)nl_langinfo(MON_DECIMAL_POINT);
+		current_lconv.mon_thousands_sep  = (char *)nl_langinfo(MON_THOUSANDS_SEP);
+		current_lconv.mon_grouping       = (char *)nl_langinfo(MON_GROUPING);
+		current_lconv.positive_sign      = (char *)nl_langinfo(POSITIVE_SIGN);
+		/* XXX: Use nl_langinfo() to initialize the other fields? */
 		COMPILER_WRITE_BARRIER();
-		current_lconv.negative_sign = (char *)"";
+		current_lconv.negative_sign = (char *)nl_langinfo(NEGATIVE_SIGN);
 	}
 	return &current_lconv;
 }

@@ -1748,7 +1748,7 @@ $fd_t open32([[nonnull]] char const *filename, $oflag_t oflags, ...);
 [[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("open", "_open", "__open", "__libc_open")]]
 [[                                                                                                                                                     alias("open64", "__open64")]]
 [[decl_include("<bits/types.h>"), export_as("__open", "__libc_open")]]
-[[crt_dos_variant, dos_only_export_as("_open"), requires_include("<asm/os/fcntl.h>")]]
+[[crt_dos_variant, dos_export_as("DOS$_open", /*"DOS$"*/ "?_open@@YAHPBDHH@Z"), requires_include("<asm/os/fcntl.h>")]]
 [[userimpl, requires($has_function(open64) || (defined(__AT_FDCWD) && $has_function(openat)))]]
 $fd_t open([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 	$fd_t result;
@@ -1768,7 +1768,7 @@ $fd_t open([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 [[cp, guard, wunused, no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("creat", "_creat", "__creat", "__libc_creat")]]
 [[                                                                                                                                                     alias("creat64")]]
-[[crt_dos_variant, dos_only_export_as("_creat"), export_as("__creat", "__libc_creat")]]
+[[crt_dos_variant, dos_export_as("DOS$_creat"), export_as("__creat", "__libc_creat")]]
 [[userimpl, requires_include("<asm/os/oflags.h>")]]
 [[requires(defined(__O_CREAT) && defined(__O_WRONLY) && defined(__O_TRUNC) && $has_function(open))]]
 [[impl_include("<asm/os/oflags.h>"), decl_include("<bits/types.h>")]]

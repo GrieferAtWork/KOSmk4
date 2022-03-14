@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc035711c */
+/* HASH CRC-32:0x7517c52a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,53 +69,21 @@ INTDEF pid_t NOTHROW_RPC(LIBDCALL libd_cwait)(int *tstat, pid_t pid, __STDC_INT_
  * @return: pid: Child process exited.
  * @return: -1:  Error (s.a. `errno') */
 INTDEF pid_t NOTHROW_RPC(LIBCCALL libc_cwait)(int *tstat, pid_t pid, __STDC_INT_AS_UINT_T action);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((2, 3)) pid_t NOTHROW_RPC(LIBDCALL libd_spawnv)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, __TARGV);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF NONNULL((2, 3)) pid_t NOTHROW_RPC(LIBCCALL libc_spawnv)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, __TARGV);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((2, 3)) pid_t NOTHROW_RPC(LIBDCALL libd_spawnvp)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, __TARGV);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF NONNULL((2, 3)) pid_t NOTHROW_RPC(LIBCCALL libc_spawnvp)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, __TARGV);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((2, 3, 4)) pid_t NOTHROW_RPC(LIBDCALL libd_spawnve)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, __TARGV, __TENVP);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF NONNULL((2, 3, 4)) pid_t NOTHROW_RPC(LIBCCALL libc_spawnve)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, __TARGV, __TENVP);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((2, 3, 4)) pid_t NOTHROW_RPC(LIBDCALL libd_spawnvpe)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, __TARGV, __TENVP);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF NONNULL((2, 3, 4)) pid_t NOTHROW_RPC(LIBCCALL libc_spawnvpe)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, __TARGV, __TENVP);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBDCALL libd_spawnl)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, char const *args, ...);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnl)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, char const *args, ...);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBDCALL libd_spawnlp)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, char const *args, ...);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnlp)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, char const *args, ...);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBDCALL libd_spawnle)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, char const *args, ...);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnle)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, char const *args, ...);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBDCALL libd_spawnlpe)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, char const *args, ...);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnlpe)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, char const *args, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

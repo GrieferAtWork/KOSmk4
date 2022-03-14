@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad1b9963 */
+/* HASH CRC-32:0xffb3d1dd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -146,6 +146,7 @@ DEFINE_PUBLIC_ALIAS(DOS$_wsopen_s, libd__wsopen_s);
 DEFINE_PUBLIC_ALIAS(_wsopen_s, libc__wsopen_s);
 DEFINE_PUBLIC_ALIAS(DOS$_wsopen_dispatch, libd__wsopen_dispatch);
 DEFINE_PUBLIC_ALIAS(_wsopen_dispatch, libc__wsopen_dispatch);
+DEFINE_PUBLIC_ALIAS("?_wsopen@@YAHPB_WHHH@Z", libd__wsopen);
 DEFINE_PUBLIC_ALIAS(DOS$_wsopen, libd__wsopen);
 DEFINE_PUBLIC_ALIAS(_wsopen, libc__wsopen);
 #endif /* !__KERNEL__ */

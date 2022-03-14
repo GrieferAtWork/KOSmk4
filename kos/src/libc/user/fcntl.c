@@ -523,7 +523,7 @@ NOTHROW_RPC(LIBCCALL libc_lockf64)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x4c26bd35]]]*/
+/*[[[start:exports,hash:CRC-32=0x8fdb371b]]]*/
 DEFINE_PUBLIC_ALIAS(readahead, libc_readahead);
 DEFINE_PUBLIC_ALIAS(sync_file_range, libc_sync_file_range);
 DEFINE_PUBLIC_ALIAS(vmsplice, libc_vmsplice);
@@ -539,20 +539,15 @@ DEFINE_PUBLIC_ALIAS(fcntl, libc_fcntl);
 DEFINE_PUBLIC_ALIAS(DOS$__open, libd_open);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_open, libd_open);
 DEFINE_PUBLIC_ALIAS(DOS$_open, libd_open);
+DEFINE_PUBLIC_ALIAS("?_open@@YAHPBDHH@Z", libd_open);
 DEFINE_PUBLIC_ALIAS(DOS$open, libd_open);
 DEFINE_PUBLIC_ALIAS(__open, libc_open);
 DEFINE_PUBLIC_ALIAS(__libc_open, libc_open);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_open, libc_open);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(open, libc_open);
 DEFINE_PUBLIC_ALIAS(DOS$_creat, libd_creat);
 DEFINE_PUBLIC_ALIAS(DOS$__creat, libd_creat);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_creat, libd_creat);
 DEFINE_PUBLIC_ALIAS(DOS$creat, libd_creat);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_creat, libc_creat);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__creat, libc_creat);
 DEFINE_PUBLIC_ALIAS(__libc_creat, libc_creat);
 DEFINE_PUBLIC_ALIAS(creat, libc_creat);

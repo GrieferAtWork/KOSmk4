@@ -42,7 +42,7 @@ __SYSDECL_BEGIN
 
 %[default:section(".text.crt{|.dos}.wchar.fs.modify")]
 
-[[wchar, cp, dos_only_export_alias("_wremove")]]
+[[wchar, cp, dos_export_alias("_wremove")]]
 [[requires_include("<asm/os/fcntl.h>")]]
 [[requires((defined(__AT_FDCWD) && $has_function(wremoveat)) ||
            $has_function(remove, convert_wcstombs))]]
@@ -63,7 +63,7 @@ int wremove([[nonnull]] wchar_t const *filename) {
 @@pp_endif@@
 }
 
-[[wchar, cp, dos_only_export_alias("_wrename")]]
+[[wchar, cp, dos_export_alias("_wrename")]]
 [[requires_include("<asm/os/fcntl.h>")]]
 [[requires((defined(__AT_FDCWD) && $has_function(wrenameat)) ||
            $has_function(renameat, convert_wcstombs))]]
@@ -179,7 +179,7 @@ int wrenameat2($fd_t oldfd, [[nonnull]] wchar_t const *oldname,
 
 
 
-[[wchar, wunused, dos_only_export_alias("_wfopen")]]
+[[wchar, wunused, dos_export_alias("_wfopen")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.access")]]
 [[requires_function(fopen, convert_wcstombs)]]
 $FILE *wfopen([[nonnull]] wchar_t const *filename,
@@ -205,7 +205,7 @@ done:
 	return result;
 }
 
-[[wchar, wunused, dos_only_export_alias("_wfreopen")]]
+[[wchar, wunused, dos_export_alias("_wfreopen")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.access")]]
 [[requires_function(freopen, convert_wcstombs)]]
 $FILE *wfreopen([[nonnull]] wchar_t const *filename,
@@ -232,7 +232,7 @@ done:
 	return result;
 }
 
-[[guard, wchar, wunused, dos_only_export_alias("_wpopen")]]
+[[guard, wchar, wunused, dos_export_alias("_wpopen")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.access")]]
 [[requires_function(popen, convert_wcstombs)]]
 $FILE *wpopen([[nonnull]] wchar_t const *command,

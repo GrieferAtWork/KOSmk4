@@ -674,7 +674,7 @@ DEFINE_GMTIME_BUFFER
 
 @@>> localtime(3), localtime64(3)
 @@Return the `struct tm' representation of `*timer' in the local timezone
-[[std, wunused, decl_include("<bits/types.h>", "<bits/crt/tm.h>"), no_crt_self_import]]
+[[std, wunused, decl_include("<bits/types.h>", "<bits/crt/tm.h>"), no_crt_self_import, dos_only_export_alias("_localtime32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("localtime", "_localtime32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("localtime64", "_localtime64")]]
 [[impl_prefix(

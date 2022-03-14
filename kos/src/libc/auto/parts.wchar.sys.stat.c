@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaae28c40 */
+/* HASH CRC-32:0x4029b4b6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -680,9 +680,6 @@ DEFINE_PUBLIC_ALIAS(DOS$wmkdir, libd_wmkdir);
 DEFINE_PUBLIC_ALIAS(wmkdir, libc_wmkdir);
 DEFINE_PUBLIC_ALIAS(DOS$_wchmod, libd_wchmod);
 DEFINE_PUBLIC_ALIAS(DOS$wchmod, libd_wchmod);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_wchmod, libc_wchmod);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(wchmod, libc_wchmod);
 DEFINE_PUBLIC_ALIAS(DOS$wlchmod, libd_wlchmod);
 DEFINE_PUBLIC_ALIAS(wlchmod, libc_wlchmod);

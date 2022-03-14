@@ -964,7 +964,8 @@ double sqrt(double x) {
 
 @@>> hypotf(3), hypot(3), hypotl(3)
 @@Return `sqrt(x*x + y*y)'
-[[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__hypot")]]
+[[std, wunused, ATTR_MCONST, nothrow, crtbuiltin]]
+[[dos_only_export_alias("_hypot"), export_alias("__hypot")]]
 [[impl_include("<libm/finite.h>", "<libm/matherr.h>")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/hypot.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
@@ -979,7 +980,8 @@ double hypot(double x, double y) {
 }
 
 
-[[std, crtbuiltin, export_alias("__hypotf")]] hypotf(*) %{generate(double2float("hypot"))}
+[[std, crtbuiltin, dos_only_export_alias("_hypotf"), export_alias("__hypotf")]]
+hypotf(*) %{generate(double2float("hypot"))}
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[std, crtbuiltin, export_alias("__hypotl")]] hypotl(*) %{generate(double2ldouble("hypot"))}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -3604,6 +3606,16 @@ short _dtest([[nonnull]] double __KOS_FIXED_CONST *px) {
 
 [[crt_dos_variant]] _fdtest(*) %{generate(double2float("_dtest"))}
 [[crt_dos_variant]] _ldtest(*) %{generate(double2ldouble("_dtest"))}
+
+[[const, wunused, nothrow]]
+float _chgsignf(float x) {
+	return -x;
+}
+
+[[guard, const, wunused, nothrow]]
+double _chgsign(double x) {
+	return -x;
+}
 
 
 %{

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b4ce274 */
+/* HASH CRC-32:0x3e4a12b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -421,7 +421,6 @@ DFUN(".text.crt.dos.math.float", libd__controlfp_s, libc__controlfp_s, TIn(__SIZ
 DFUN(".text.crt.dos.math.float", libd__statusfp2, libc__statusfp2, TV, 2, TP, TP)
 DFUN(".text.crt.dos.math.float", libd__control87, libc__control87, TI32, 2, TI32, TI32)
 DFUN(".text.crt.dos.math.float", libd___control87_2, libc___control87_2, TD, 4, TI32, TI32, TP, TP)
-DFUN(".text.crt.dos.math.float", libd__chgsign, libc__chgsign, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.float", libd__fpclass, libc__fpclass, TD, 1, TFD)
 
 /* fnmatch */
@@ -811,6 +810,8 @@ DFUN(".text.crt.dos.math.math", libd_canonicalizel, libc_canonicalizel, TD, 2, T
 DFUN(".text.crt.dos.math.math", libd__dpcomp, libc__dpcomp, TD, 2, TFD, TFD)
 DFUN(".text.crt.dos.math.math", libd__fdpcomp, libc__fdpcomp, TD, 2, TF, TF)
 DFUN(".text.crt.dos.math.math", libd__ldpcomp, libc__ldpcomp, TD, 2, TFL, TFL)
+DFUN(".text.crt.dos.math.math", libd__chgsignf, libc__chgsignf, TF, 1, TF)
+DFUN(".text.crt.dos.math.math", libd__chgsign, libc__chgsign, TFD, 1, TFD)
 
 /* mbstring */
 DFUN(".text.crt.dos.string.memory", libd__mbbtombc, libc__mbbtombc, TD, 1, TD)
@@ -1118,10 +1119,6 @@ DFUN(".text.crt.dos.sched.thread", libd__endthreadex, libc__endthreadex, TV, 1, 
 DFUN(".text.crt.dos.fs.dlfcn", libd__unloaddll, libc__unloaddll, TD, 1, TP)
 DFUN(".text.crt.dos.fs.dlfcn", libd__getdllprocaddr, libc__getdllprocaddr, TP, 3, TP, TP, TP)
 DFUN(".text.crt.dos.fs.exec.spawn", libd_cwait, libc_cwait, TIn(__SIZEOF_PID_T__), 3, TP, TIn(__SIZEOF_PID_T__), TD)
-DFUN(".text.crt.dos.fs.exec.spawn", libd_spawnv, libc_spawnv, TIn(__SIZEOF_PID_T__), 3, TD, TP, TP)
-DFUN(".text.crt.dos.fs.exec.spawn", libd_spawnvp, libc_spawnvp, TIn(__SIZEOF_PID_T__), 3, TD, TP, TP)
-DFUN(".text.crt.dos.fs.exec.spawn", libd_spawnve, libc_spawnve, TIn(__SIZEOF_PID_T__), 4, TD, TP, TP, TP)
-DFUN(".text.crt.dos.fs.exec.spawn", libd_spawnvpe, libc_spawnvpe, TIn(__SIZEOF_PID_T__), 4, TD, TP, TP, TP)
 DFUN(".text.crt.dos.fs.exec.spawn", libd_fspawnve, libc_fspawnve, TIn(__SIZEOF_PID_T__), 4, TD, TIn(__SIZEOF_FD_T__), TP, TP)
 
 /* pthread */

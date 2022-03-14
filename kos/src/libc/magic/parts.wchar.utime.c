@@ -57,7 +57,7 @@ int crt_wutime64([[nonnull]] $wchar_t const *file,
 [[ignore]] crt_c32utime64(*) %{uchar32("crt_wutime64")}
 
 
-[[cp, wchar, no_crt_self_import, dos_only_export_as("_wutime", "_wutime32")]]
+[[cp, wchar, no_crt_self_import, dos_export_alias("_wutime", "_wutime32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("wutime", "_wutime", "_wutime32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("wutime64", "_wutime64")]]
 [[requires($has_function(crt_wutime32) ||
@@ -108,7 +108,7 @@ int wutime([[nonnull]] wchar_t const *file,
 %#ifdef __USE_TIME64
 
 [[preferred_time64_variant_of(wutime), doc_alias("wutime")]]
-[[cp, wchar, dos_only_export_alias("_wutime64")]]
+[[cp, wchar, dos_export_alias("_wutime64")]]
 [[requires($has_function(utime64, convert_wcstombs) ||
            $has_function(crt_wutime32))]]
 int wutime64([[nonnull]] $wchar_t const *file,

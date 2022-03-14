@@ -112,7 +112,7 @@ done:
 
 [[wchar, cp, wunused, decl_include("<features.h>")]]
 [[section(".text.crt{|.dos}.wchar.fs.property")]]
-[[requires_include("<asm/os/fcntl.h>"), dos_only_export_alias("_waccess")]]
+[[requires_include("<asm/os/fcntl.h>"), dos_export_alias("_waccess")]]
 [[requires((defined(__AT_FDCWD) && $has_function(wfaccessat)) ||
            $has_function(access, convert_wcstombs))]]
 int waccess([[nonnull]] wchar_t const *file, __STDC_INT_AS_UINT_T type) {
@@ -133,7 +133,7 @@ int waccess([[nonnull]] wchar_t const *file, __STDC_INT_AS_UINT_T type) {
 }
 
 [[section(".text.crt{|.dos}.wchar.fs.basic_property")]]
-[[wchar, cp, dos_only_export_alias("_wchdir")]]
+[[wchar, cp, dos_export_alias("_wchdir")]]
 [[requires($has_function(chdir, convert_wcstombs))]]
 int wchdir([[nonnull]] wchar_t const *path) {
 	longptr_t result;
@@ -149,7 +149,7 @@ int wchdir([[nonnull]] wchar_t const *path) {
 }
 
 
-[[wchar, cp, guard, dos_only_export_alias("_wgetcwd")]]
+[[wchar, cp, guard, dos_export_alias("_wgetcwd")]]
 [[section(".text.crt{|.dos}.wchar.fs.basic_property")]]
 [[requires($has_function(getcwd, convert_mbstowcs))]]
 [[impl_include("<hybrid/typecore.h>", "<libc/errno.h>")]]
@@ -209,7 +209,7 @@ done:
 
 
 [[section(".text.crt{|.dos}.wchar.fs.modify")]]
-[[wchar, cp, dos_only_export_alias("_wunlink")]]
+[[wchar, cp, dos_export_alias("_wunlink")]]
 [[requires((defined(__AT_FDCWD) && $has_function(wunlinkat)) ||
            $has_function(unlink, convert_wcstombs))]]
 int wunlink([[nonnull]] wchar_t const *file) {
@@ -230,7 +230,7 @@ int wunlink([[nonnull]] wchar_t const *file) {
 }
 
 [[section(".text.crt{|.dos}.wchar.fs.modify")]]
-[[wchar, cp, dos_only_export_alias("_wrmdir")]]
+[[wchar, cp, dos_export_alias("_wrmdir")]]
 [[requires((defined(__AT_FDCWD) && defined(__AT_REMOVEDIR) && $has_function(wunlinkat)) ||
            $has_function(rmdir, convert_wcstombs))]]
 int wrmdir([[nonnull]] wchar_t const *path) {

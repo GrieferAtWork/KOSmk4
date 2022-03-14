@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb58f0f80 */
+/* HASH CRC-32:0x58f36485 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1220,33 +1220,18 @@ DEFINE_PUBLIC_ALIAS(DOS$wlink, libd_wlink);
 DEFINE_PUBLIC_ALIAS(wlink, libc_wlink);
 DEFINE_PUBLIC_ALIAS(DOS$_waccess, libd_waccess);
 DEFINE_PUBLIC_ALIAS(DOS$waccess, libd_waccess);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_waccess, libc_waccess);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(waccess, libc_waccess);
 DEFINE_PUBLIC_ALIAS(DOS$_wchdir, libd_wchdir);
 DEFINE_PUBLIC_ALIAS(DOS$wchdir, libd_wchdir);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_wchdir, libc_wchdir);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(wchdir, libc_wchdir);
 DEFINE_PUBLIC_ALIAS(DOS$_wgetcwd, libd_wgetcwd);
 DEFINE_PUBLIC_ALIAS(DOS$wgetcwd, libd_wgetcwd);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_wgetcwd, libc_wgetcwd);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(wgetcwd, libc_wgetcwd);
 DEFINE_PUBLIC_ALIAS(DOS$_wunlink, libd_wunlink);
 DEFINE_PUBLIC_ALIAS(DOS$wunlink, libd_wunlink);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_wunlink, libc_wunlink);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(wunlink, libc_wunlink);
 DEFINE_PUBLIC_ALIAS(DOS$_wrmdir, libd_wrmdir);
 DEFINE_PUBLIC_ALIAS(DOS$wrmdir, libd_wrmdir);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_wrmdir, libc_wrmdir);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(wrmdir, libc_wrmdir);
 DEFINE_PUBLIC_ALIAS(DOS$weuidaccess, libd_weuidaccess);
 DEFINE_PUBLIC_ALIAS(weuidaccess, libc_weuidaccess);

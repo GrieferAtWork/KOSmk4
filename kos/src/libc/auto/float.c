@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e534aee */
+/* HASH CRC-32:0x9de5f076 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,10 +70,6 @@ NOTHROW_NCX(LIBCCALL libc__control87)(uint32_t newval,
                                       uint32_t mask) {
 	return libc__controlfp(newval, mask);
 }
-INTERN ATTR_SECTION(".text.crt.math.float") ATTR_CONST WUNUSED double
-NOTHROW(LIBCCALL libc__chgsign)(double x) {
-	return -x;
-}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -84,7 +80,6 @@ DEFINE_PUBLIC_ALIAS(_controlfp, libc__controlfp);
 DEFINE_PUBLIC_ALIAS(_set_controlfp, libc__set_controlfp);
 DEFINE_PUBLIC_ALIAS(_controlfp_s, libc__controlfp_s);
 DEFINE_PUBLIC_ALIAS(_control87, libc__control87);
-DEFINE_PUBLIC_ALIAS(_chgsign, libc__chgsign);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_FLOAT_C */

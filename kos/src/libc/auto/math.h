@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd140b180 */
+/* HASH CRC-32:0x78d4f7bd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2347,6 +2347,18 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) short NOTHROW_NCX(LIBCCALL libc__fdtest)(f
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) short NOTHROW_NCX(LIBDCALL libd__ldtest)(__LONGDOUBLE __KOS_FIXED_CONST *px);
 /* >> _fdtest(3), _dtest(3), _ldtest(3) */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) short NOTHROW_NCX(LIBCCALL libc__ldtest)(__LONGDOUBLE __KOS_FIXED_CONST *px);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBDCALL libd__chgsignf)(float x);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc__chgsignf)(float x);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBDCALL libd__chgsign)(double x);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc__chgsign)(double x);
 #endif /* !__KERNEL__ */
 
 DECL_END

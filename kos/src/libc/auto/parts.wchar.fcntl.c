@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3a5c69c */
+/* HASH CRC-32:0xc8cd3c0b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -369,16 +369,11 @@ DECL_END
 
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(DOS$_wopen, libd_wopen);
+DEFINE_PUBLIC_ALIAS("?_wopen@@YAHPB_WHH@Z", libd_wopen);
 DEFINE_PUBLIC_ALIAS(DOS$wopen, libd_wopen);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_wopen, libc_wopen);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(wopen, libc_wopen);
 DEFINE_PUBLIC_ALIAS(DOS$_wcreat, libd_wcreat);
 DEFINE_PUBLIC_ALIAS(DOS$wcreat, libd_wcreat);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_wcreat, libc_wcreat);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(wcreat, libc_wcreat);
 DEFINE_PUBLIC_ALIAS(DOS$wopen64, libd_wopen64);
 DEFINE_PUBLIC_ALIAS(wopen64, libc_wopen64);

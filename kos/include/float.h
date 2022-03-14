@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9c59383 */
+/* HASH CRC-32:0xab50d7ec */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -500,12 +500,15 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_copysign,(double __num,
  * Return `x' with its signed changed to `y's */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL _copysign)(double __num, double __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysign))(__num, __sign); }
 #endif /* !... */
+#ifndef ___chgsign_defined
+#define ___chgsign_defined
 #ifdef __CRT_HAVE__chgsign
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_chgsign,(double __x),(__x))
 #else /* __CRT_HAVE__chgsign */
-#include <libc/local/float/_chgsign.h>
+#include <libc/local/math/_chgsign.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_chgsign, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL _chgsign)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_chgsign))(__x); })
 #endif /* !__CRT_HAVE__chgsign */
+#endif /* !___chgsign_defined */
 #if __has_builtin(__builtin_scalb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalb)
 /* >> scalbf(3), scalb(3), scalbl(3)
  * Return `x' times (2 to the Nth power) */

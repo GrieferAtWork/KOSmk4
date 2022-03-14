@@ -495,11 +495,7 @@ int __control87_2($uint32_t newval, $uint32_t mask,
 
 %[insert:function(_copysign = copysign)]
 
-[[const, wunused, nothrow]]
-double _chgsign(double x) {
-	return -x;
-}
-
+%[insert:extern(_chgsign)]
 %[insert:function(_scalb = scalb)]
 %[insert:function(_logb = logb)]
 %[insert:function(_nextafter = nextafter)]

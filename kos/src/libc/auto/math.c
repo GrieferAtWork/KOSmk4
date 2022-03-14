@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81962528 */
+/* HASH CRC-32:0xfb7af17 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4302,6 +4302,14 @@ INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_PURE WUNUSED NONNULL((1)) sh
 NOTHROW_NCX(LIBCCALL libc__ldtest)(__LONGDOUBLE __KOS_FIXED_CONST *px) {
 	return libc___fpclassifyl(*px);
 }
+INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED float
+NOTHROW(LIBCCALL libc__chgsignf)(float x) {
+	return -x;
+}
+INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED double
+NOTHROW(LIBCCALL libc__chgsign)(double x) {
+	return -x;
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -4466,8 +4474,14 @@ DEFINE_PUBLIC_ALIAS(__powl, libc_powl);
 DEFINE_PUBLIC_ALIAS(powl, libc_powl);
 DEFINE_PUBLIC_ALIAS(__sqrtl, libc_sqrtl);
 DEFINE_PUBLIC_ALIAS(sqrtl, libc_sqrtl);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_hypot, libc_hypot);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__hypot, libc_hypot);
 DEFINE_PUBLIC_ALIAS(hypot, libc_hypot);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_hypotf, libc_hypotf);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__hypotf, libc_hypotf);
 DEFINE_PUBLIC_ALIAS(hypotf, libc_hypotf);
 DEFINE_PUBLIC_ALIAS(__hypotl, libc_hypotl);
@@ -4866,6 +4880,8 @@ DEFINE_PUBLIC_ALIAS(DOS$_fdtest, libd__fdtest);
 DEFINE_PUBLIC_ALIAS(_fdtest, libc__fdtest);
 DEFINE_PUBLIC_ALIAS(DOS$_ldtest, libd__ldtest);
 DEFINE_PUBLIC_ALIAS(_ldtest, libc__ldtest);
+DEFINE_PUBLIC_ALIAS(_chgsignf, libc__chgsignf);
+DEFINE_PUBLIC_ALIAS(_chgsign, libc__chgsign);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_MATH_C */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b391db8 */
+/* HASH CRC-32:0xb873f39c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -994,113 +994,71 @@ DEFINE_PUBLIC_ALIAS(iswascii, libc_iswascii);
 DEFINE_PUBLIC_ALIAS(DOS$_iswcntrl_l, libd_iswcntrl_l);
 DEFINE_PUBLIC_ALIAS(DOS$__iswcntrl_l, libd_iswcntrl_l);
 DEFINE_PUBLIC_ALIAS(DOS$iswcntrl_l, libd_iswcntrl_l);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_iswcntrl_l, libc_iswcntrl_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswcntrl_l, libc_iswcntrl_l);
 DEFINE_PUBLIC_ALIAS(iswcntrl_l, libc_iswcntrl_l);
 DEFINE_PUBLIC_ALIAS(DOS$_iswspace_l, libd_iswspace_l);
 DEFINE_PUBLIC_ALIAS(DOS$__iswspace_l, libd_iswspace_l);
 DEFINE_PUBLIC_ALIAS(DOS$iswspace_l, libd_iswspace_l);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_iswspace_l, libc_iswspace_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswspace_l, libc_iswspace_l);
 DEFINE_PUBLIC_ALIAS(iswspace_l, libc_iswspace_l);
 DEFINE_PUBLIC_ALIAS(DOS$_iswupper_l, libd_iswupper_l);
 DEFINE_PUBLIC_ALIAS(DOS$__iswupper_l, libd_iswupper_l);
 DEFINE_PUBLIC_ALIAS(DOS$iswupper_l, libd_iswupper_l);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_iswupper_l, libc_iswupper_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswupper_l, libc_iswupper_l);
 DEFINE_PUBLIC_ALIAS(iswupper_l, libc_iswupper_l);
 DEFINE_PUBLIC_ALIAS(DOS$_iswlower_l, libd_iswlower_l);
 DEFINE_PUBLIC_ALIAS(DOS$__iswlower_l, libd_iswlower_l);
 DEFINE_PUBLIC_ALIAS(DOS$iswlower_l, libd_iswlower_l);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_iswlower_l, libc_iswlower_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswlower_l, libc_iswlower_l);
 DEFINE_PUBLIC_ALIAS(iswlower_l, libc_iswlower_l);
 DEFINE_PUBLIC_ALIAS(DOS$_iswalpha_l, libd_iswalpha_l);
 DEFINE_PUBLIC_ALIAS(DOS$__iswalpha_l, libd_iswalpha_l);
 DEFINE_PUBLIC_ALIAS(DOS$iswalpha_l, libd_iswalpha_l);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_iswalpha_l, libc_iswalpha_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswalpha_l, libc_iswalpha_l);
 DEFINE_PUBLIC_ALIAS(iswalpha_l, libc_iswalpha_l);
 DEFINE_PUBLIC_ALIAS(DOS$_iswdigit_l, libd_iswdigit_l);
 DEFINE_PUBLIC_ALIAS(DOS$__iswdigit_l, libd_iswdigit_l);
 DEFINE_PUBLIC_ALIAS(DOS$iswdigit_l, libd_iswdigit_l);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_iswdigit_l, libc_iswdigit_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswdigit_l, libc_iswdigit_l);
 DEFINE_PUBLIC_ALIAS(iswdigit_l, libc_iswdigit_l);
 DEFINE_PUBLIC_ALIAS(DOS$_iswxdigit_l, libd_iswxdigit_l);
 DEFINE_PUBLIC_ALIAS(DOS$__iswxdigit_l, libd_iswxdigit_l);
 DEFINE_PUBLIC_ALIAS(DOS$iswxdigit_l, libd_iswxdigit_l);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_iswxdigit_l, libc_iswxdigit_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswxdigit_l, libc_iswxdigit_l);
 DEFINE_PUBLIC_ALIAS(iswxdigit_l, libc_iswxdigit_l);
 DEFINE_PUBLIC_ALIAS(DOS$_iswalnum_l, libd_iswalnum_l);
 DEFINE_PUBLIC_ALIAS(DOS$__iswalnum_l, libd_iswalnum_l);
 DEFINE_PUBLIC_ALIAS(DOS$iswalnum_l, libd_iswalnum_l);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_iswalnum_l, libc_iswalnum_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswalnum_l, libc_iswalnum_l);
 DEFINE_PUBLIC_ALIAS(iswalnum_l, libc_iswalnum_l);
 DEFINE_PUBLIC_ALIAS(DOS$_iswpunct_l, libd_iswpunct_l);
 DEFINE_PUBLIC_ALIAS(DOS$__iswpunct_l, libd_iswpunct_l);
 DEFINE_PUBLIC_ALIAS(DOS$iswpunct_l, libd_iswpunct_l);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_iswpunct_l, libc_iswpunct_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswpunct_l, libc_iswpunct_l);
 DEFINE_PUBLIC_ALIAS(iswpunct_l, libc_iswpunct_l);
 DEFINE_PUBLIC_ALIAS(DOS$_iswgraph_l, libd_iswgraph_l);
 DEFINE_PUBLIC_ALIAS(DOS$__iswgraph_l, libd_iswgraph_l);
 DEFINE_PUBLIC_ALIAS(DOS$iswgraph_l, libd_iswgraph_l);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_iswgraph_l, libc_iswgraph_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswgraph_l, libc_iswgraph_l);
 DEFINE_PUBLIC_ALIAS(iswgraph_l, libc_iswgraph_l);
 DEFINE_PUBLIC_ALIAS(DOS$_iswprint_l, libd_iswprint_l);
 DEFINE_PUBLIC_ALIAS(DOS$__iswprint_l, libd_iswprint_l);
 DEFINE_PUBLIC_ALIAS(DOS$iswprint_l, libd_iswprint_l);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_iswprint_l, libc_iswprint_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswprint_l, libc_iswprint_l);
 DEFINE_PUBLIC_ALIAS(iswprint_l, libc_iswprint_l);
 DEFINE_PUBLIC_ALIAS(DOS$_iswblank_l, libd_iswblank_l);
 DEFINE_PUBLIC_ALIAS(DOS$__iswblank_l, libd_iswblank_l);
 DEFINE_PUBLIC_ALIAS(DOS$iswblank_l, libd_iswblank_l);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_iswblank_l, libc_iswblank_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswblank_l, libc_iswblank_l);
 DEFINE_PUBLIC_ALIAS(iswblank_l, libc_iswblank_l);
 DEFINE_PUBLIC_ALIAS(DOS$_towlower_l, libd_towlower_l);
 DEFINE_PUBLIC_ALIAS(DOS$__towlower_l, libd_towlower_l);
 DEFINE_PUBLIC_ALIAS(DOS$towlower_l, libd_towlower_l);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_towlower_l, libc_towlower_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__towlower_l, libc_towlower_l);
 DEFINE_PUBLIC_ALIAS(towlower_l, libc_towlower_l);
 DEFINE_PUBLIC_ALIAS(DOS$_towupper_l, libd_towupper_l);
 DEFINE_PUBLIC_ALIAS(DOS$__towupper_l, libd_towupper_l);
 DEFINE_PUBLIC_ALIAS(DOS$towupper_l, libd_towupper_l);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_towupper_l, libc_towupper_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__towupper_l, libc_towupper_l);
 DEFINE_PUBLIC_ALIAS(towupper_l, libc_towupper_l);
 DEFINE_PUBLIC_ALIAS(DOS$_iswctype_l, libd_iswctype_l);

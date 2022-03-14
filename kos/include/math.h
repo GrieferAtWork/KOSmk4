@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec440279 */
+/* HASH CRC-32:0xf9ce8389 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -300,16 +300,16 @@ __NAMESPACE_STD_USING(sqrtl)
 #endif /* __CRT_HAVE_sqrtl || __CRT_HAVE___sqrtl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_sqrt || __CRT_HAVE___sqrt || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #if defined(__USE_XOPEN) || defined(__USE_ISOC99)
-#if defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#if defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(hypot)
-#endif /* __CRT_HAVE_hypot || __CRT_HAVE___hypot || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_hypotf) || defined(__CRT_HAVE___hypotf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#endif /* __CRT_HAVE_hypot || __CRT_HAVE__hypot || __CRT_HAVE___hypot || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#if defined(__CRT_HAVE_hypotf) || defined(__CRT_HAVE__hypotf) || defined(__CRT_HAVE___hypotf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(hypotf)
-#endif /* __CRT_HAVE_hypotf || __CRT_HAVE___hypotf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_hypot || __CRT_HAVE___hypot || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#endif /* __CRT_HAVE_hypotf || __CRT_HAVE__hypotf || __CRT_HAVE___hypotf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_hypot || __CRT_HAVE__hypot || __CRT_HAVE___hypot || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-#if defined(__CRT_HAVE_hypotl) || defined(__CRT_HAVE___hypotl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#if defined(__CRT_HAVE_hypotl) || defined(__CRT_HAVE___hypotl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(hypotl)
-#endif /* __CRT_HAVE_hypotl || __CRT_HAVE___hypotl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_hypot || __CRT_HAVE___hypot || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#endif /* __CRT_HAVE_hypotl || __CRT_HAVE___hypotl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_hypot || __CRT_HAVE__hypot || __CRT_HAVE___hypot || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_XOPEN || __USE_ISOC99 */
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
@@ -2325,6 +2325,10 @@ __CEIDECLARE(__ATTR_WUNUSED,double,__NOTHROW,hypot,(double __x, double __y),{ re
 /* >> hypotf(3), hypot(3), hypotl(3)
  * Return `sqrt(x*x + y*y)' */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,hypot,(double __x, double __y),(__x,__y))
+#elif defined(__CRT_HAVE__hypot)
+/* >> hypotf(3), hypot(3), hypotl(3)
+ * Return `sqrt(x*x + y*y)' */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,hypot,(double __x, double __y),_hypot,(__x,__y))
 #elif defined(__CRT_HAVE___hypot)
 /* >> hypotf(3), hypot(3), hypotl(3)
  * Return `sqrt(x*x + y*y)' */
@@ -2345,11 +2349,15 @@ __CEIDECLARE(__ATTR_WUNUSED,float,__NOTHROW,hypotf,(float __x, float __y),{ retu
 /* >> hypotf(3), hypot(3), hypotl(3)
  * Return `sqrt(x*x + y*y)' */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,hypotf,(float __x, float __y),(__x,__y))
+#elif defined(__CRT_HAVE__hypotf)
+/* >> hypotf(3), hypot(3), hypotl(3)
+ * Return `sqrt(x*x + y*y)' */
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,hypotf,(float __x, float __y),_hypotf,(__x,__y))
 #elif defined(__CRT_HAVE___hypotf)
 /* >> hypotf(3), hypot(3), hypotl(3)
  * Return `sqrt(x*x + y*y)' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,hypotf,(float __x, float __y),__hypotf,(__x,__y))
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/hypotf.h>
 __NAMESPACE_STD_BEGIN
@@ -2370,7 +2378,7 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,hypotl,(__LONGDOUBLE __x, __LON
 /* >> hypotf(3), hypot(3), hypotl(3)
  * Return `sqrt(x*x + y*y)' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,hypotl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__hypotl,(__x,__y))
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/hypotl.h>
 __NAMESPACE_STD_BEGIN
@@ -7113,11 +7121,15 @@ __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,hypot,(float __x, float __y),hypotf
 /* >> hypotf(3), hypot(3), hypotl(3)
  * Return `sqrt(x*x + y*y)' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,hypot,(float __x, float __y),hypotf,(__x,__y))
+#elif defined(__CRT_HAVE__hypotf)
+/* >> hypotf(3), hypot(3), hypotl(3)
+ * Return `sqrt(x*x + y*y)' */
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,hypot,(float __x, float __y),_hypotf,(__x,__y))
 #elif defined(__CRT_HAVE___hypotf)
 /* >> hypotf(3), hypot(3), hypotl(3)
  * Return `sqrt(x*x + y*y)' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,hypot,(float __x, float __y),__hypotf,(__x,__y))
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/hypotf.h>
@@ -7212,7 +7224,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,hypot,(__LONGDOUBLE __x, __LON
 /* >> hypotf(3), hypot(3), hypotl(3)
  * Return `sqrt(x*x + y*y)' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,hypot,(__LONGDOUBLE __x, __LONGDOUBLE __y),__hypotl,(__x,__y))
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/hypotl.h>
@@ -7591,18 +7603,18 @@ __NAMESPACE_STD_USING(sqrtl)
 
 #if defined(__USE_XOPEN) || defined(__USE_ISOC99)
 #ifndef __CXX_SYSTEM_HEADER
-#if defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#if defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(hypot)
-#endif /* __CRT_HAVE_hypot || __CRT_HAVE___hypot || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_hypotf) || defined(__CRT_HAVE___hypotf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#endif /* __CRT_HAVE_hypot || __CRT_HAVE__hypot || __CRT_HAVE___hypot || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#if defined(__CRT_HAVE_hypotf) || defined(__CRT_HAVE__hypotf) || defined(__CRT_HAVE___hypotf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(hypotf)
-#endif /* __CRT_HAVE_hypotf || __CRT_HAVE___hypotf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_hypot || __CRT_HAVE___hypot || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#endif /* __CRT_HAVE_hypotf || __CRT_HAVE__hypotf || __CRT_HAVE___hypotf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_hypot || __CRT_HAVE__hypot || __CRT_HAVE___hypot || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifndef __CXX_SYSTEM_HEADER
-#if defined(__CRT_HAVE_hypotl) || defined(__CRT_HAVE___hypotl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#if defined(__CRT_HAVE_hypotl) || defined(__CRT_HAVE___hypotl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(hypotl)
-#endif /* __CRT_HAVE_hypotl || __CRT_HAVE___hypotl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_hypot || __CRT_HAVE___hypot || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#endif /* __CRT_HAVE_hypotl || __CRT_HAVE___hypotl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_hypot || __CRT_HAVE__hypot || __CRT_HAVE___hypot || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__CXX_SYSTEM_HEADER */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_XOPEN || __USE_ISOC99 */
@@ -10472,6 +10484,10 @@ __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__hypot,(double __x, double __y),h
 /* >> hypotf(3), hypot(3), hypotl(3)
  * Return `sqrt(x*x + y*y)' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__hypot,(double __x, double __y),hypot,(__x,__y))
+#elif defined(__CRT_HAVE__hypot)
+/* >> hypotf(3), hypot(3), hypotl(3)
+ * Return `sqrt(x*x + y*y)' */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__hypot,(double __x, double __y),_hypot,(__x,__y))
 #elif defined(__CRT_HAVE___hypot)
 /* >> hypotf(3), hypot(3), hypotl(3)
  * Return `sqrt(x*x + y*y)' */
@@ -10490,11 +10506,15 @@ __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__hypotf,(float __x, float __y),hyp
 /* >> hypotf(3), hypot(3), hypotl(3)
  * Return `sqrt(x*x + y*y)' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__hypotf,(float __x, float __y),hypotf,(__x,__y))
+#elif defined(__CRT_HAVE__hypotf)
+/* >> hypotf(3), hypot(3), hypotl(3)
+ * Return `sqrt(x*x + y*y)' */
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__hypotf,(float __x, float __y),_hypotf,(__x,__y))
 #elif defined(__CRT_HAVE___hypotf)
 /* >> hypotf(3), hypot(3), hypotl(3)
  * Return `sqrt(x*x + y*y)' */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__hypotf,(float __x, float __y),(__x,__y))
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/hypotf.h>
 /* >> hypotf(3), hypot(3), hypotl(3)
  * Return `sqrt(x*x + y*y)' */
@@ -10513,7 +10533,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__hypotl,(__LONGDOUBLE __x, __
 /* >> hypotf(3), hypot(3), hypotl(3)
  * Return `sqrt(x*x + y*y)' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__hypotl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/hypotl.h>
 /* >> hypotf(3), hypot(3), hypotl(3)
  * Return `sqrt(x*x + y*y)' */
@@ -14353,6 +14373,21 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),short,__NOTHROW_NCX,_l
 /* >> _fdtest(3), _dtest(3), _ldtest(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(_ldtest, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) short __NOTHROW_NCX(__LIBCCALL _ldtest)(__LONGDOUBLE __KOS_FIXED_CONST *__px) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ldtest))(__px); })
 #endif /* !__CRT_HAVE__ldtest */
+#ifdef __CRT_HAVE__chgsignf
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,_chgsignf,(float __x),(__x))
+#else /* __CRT_HAVE__chgsignf */
+#include <libc/local/math/_chgsignf.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_chgsignf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL _chgsignf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_chgsignf))(__x); })
+#endif /* !__CRT_HAVE__chgsignf */
+#ifndef ___chgsign_defined
+#define ___chgsign_defined
+#ifdef __CRT_HAVE__chgsign
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_chgsign,(double __x),(__x))
+#else /* __CRT_HAVE__chgsign */
+#include <libc/local/math/_chgsign.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_chgsign, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL _chgsign)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_chgsign))(__x); })
+#endif /* !__CRT_HAVE__chgsign */
+#endif /* !___chgsign_defined */
 __SYSDECL_END
 #endif /* __CC__ */
 #endif /* __USE_DOS */

@@ -138,6 +138,7 @@ errno_t _wsopen_dispatch([[nonnull]] wchar_t const *filename,
 
 [[wchar, cp, vartypes($mode_t), wunused, decl_include("<bits/types.h>")]]
 [[requires_function(wopen), section(".text.crt.dos.wchar.fs.io")]]
+[[dos_export_as(/*"DOS$"*/ "?_wsopen@@YAHPB_WHHH@Z")]]
 $fd_t _wsopen([[nonnull]] wchar_t const *filename, $oflag_t oflags, int sflags, ...) {
 	fd_t result;
 	va_list args;

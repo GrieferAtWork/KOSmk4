@@ -469,18 +469,17 @@ $pid_t cwait(int *tstat, $pid_t pid, __STDC_INT_AS_UINT_T action) {
 
 %[default:section(".text.crt{|.dos}.fs.exec.spawn")]
 
-[[cp, guard, argument_names(mode, path, ___argv), dos_only_export_alias("_spawnv")]]
+[[cp, guard, argument_names(mode, path, ___argv), dos_export_alias("_spawnv")]]
 [[decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_TARGV)]]
 [[requires_include("<libc/template/environ.h>"), requires($has_function(spawnve) && defined(__LOCAL_environ))]]
-[[impl_include("<libc/template/environ.h>")]]
+[[impl_include("<libc/template/environ.h>"), crt_dos_variant]]
 $pid_t spawnv(__STDC_INT_AS_UINT_T mode, [[nonnull]] char const *__restrict path, [[nonnull]] __TARGV) {
 	return spawnve(mode, path, ___argv, __LOCAL_environ);
 }
 
-[[cp, guard, argument_names(mode, file, ___argv)]]
-[[dos_only_export_alias("_spawnvp")]]
+[[cp, guard, argument_names(mode, file, ___argv), dos_export_alias("_spawnvp")]]
 [[decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_TARGV)]]
-[[requires_include("<libc/template/environ.h>")]]
+[[requires_include("<libc/template/environ.h>"), crt_dos_variant]]
 [[requires($has_function(spawnvpe) && defined(__LOCAL_environ))]]
 [[impl_include("<libc/template/environ.h>")]]
 $pid_t spawnvp(__STDC_INT_AS_UINT_T mode, [[nonnull]] char const *__restrict file, [[nonnull]] __TARGV) {
@@ -488,9 +487,9 @@ $pid_t spawnvp(__STDC_INT_AS_UINT_T mode, [[nonnull]] char const *__restrict fil
 }
 
 [[cp, guard, argument_names(mode, path, ___argv, ___envp)]]
-[[dos_only_export_alias("_spawnve"), requires_function(open, fspawnve)]]
+[[dos_export_alias("_spawnve"), requires_function(open, fspawnve)]]
 [[decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_TARGV)]]
-[[impl_include("<asm/os/oflags.h>")]]
+[[impl_include("<asm/os/oflags.h>"), crt_dos_variant]]
 $pid_t spawnve(__STDC_INT_AS_UINT_T mode,
                [[nonnull]] char const *__restrict path,
                [[nonnull]] __TARGV, [[nonnull]] __TENVP) {
@@ -512,14 +511,68 @@ $pid_t spawnve(__STDC_INT_AS_UINT_T mode,
 	return result;
 }
 
-[[cp, guard, argument_names(mode, file, ___argv, ___envp)]]
-[[dos_only_export_alias("_spawnvpe")]]
+[[cp, guard, argument_names(mode, file, ___argv, ___envp), dos_export_alias("_spawnvpe")]]
 [[decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_TARGV)]]
 [[requires_include("<hybrid/__alloca.h>")]]
 [[requires($has_function(getenv) && $has_function(spawnve) && defined(__hybrid_alloca))]]
 [[dependency(mempcpyc, spawnve)]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[impl_include("<libc/errno.h>")]]
+[[crt_dos_variant({
+prefix: {
+@@push_namespace(local)@@
+__LOCAL_LIBC(__dos_spawnvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((2, 4, 6, 7)) $pid_t
+(__LIBCCALL __dos_spawnvpe_impl)(__STDC_INT_AS_UINT_T mode,
+                                 char const *__restrict path, $size_t path_len,
+                                 char const *__restrict file, $size_t file_len,
+                                 __TARGV, __TENVP) {
+	char *fullpath, *dst;
+	while (path_len && (path[path_len - 1] == '/' ||
+	                    path[path_len - 1] == '\\'))
+		--path_len;
+	fullpath = (char *)__hybrid_alloca((path_len + 1 + file_len + 1) *
+	                                   sizeof(char));
+	dst = (char *)mempcpyc(fullpath, path, path_len, sizeof(char));
+	*dst++ = '/';
+	dst = (char *)mempcpyc(dst, file, file_len, sizeof(char));
+	*dst = '\0';
+	return libd_spawnve(mode, fullpath, ___argv, ___envp);
+}
+@@pop_namespace@@
+},
+impl: {
+	char *env_path;
+	/* [...]
+	 * If the specified filename includes a slash character,
+	 * then $PATH is ignored, and the file at the  specified
+	 * pathname is executed.
+	 * [...] */
+	if (strchr(file, '/') || strchr(file, '\\'))
+		return spawnve(mode, file, ___argv, ___envp);
+	env_path = getenv("PATH");
+	if (env_path && *env_path) {
+		size_t filelen;
+		filelen  = strlen(file);
+		for (;;) {
+			$pid_t result;
+			char *path_end;
+			path_end = strchrnul(env_path, ';');
+			result = (__NAMESPACE_LOCAL_SYM __dos_spawnvpe_impl)(mode, env_path, (size_t)(path_end - env_path),
+			                                                     file, filelen, ___argv, ___envp);
+			if (result >= 0)
+				return result;
+			if (!*path_end)
+				break;
+			env_path = path_end + 1;
+		}
+	} else {
+@@pp_ifdef ENOENT@@
+		(void)libc_seterrno(ENOENT);
+@@pp_endif@@
+	}
+	return -1;
+}
+})]]
 [[impl_prefix(
 @@push_namespace(local)@@
 __LOCAL_LIBC(__spawnvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((2, 4, 6, 7)) $pid_t
@@ -591,32 +644,32 @@ $pid_t spawnvpe(__STDC_INT_AS_UINT_T mode,
 }
 
 [[cp, guard, ATTR_SENTINEL, impl_include("<parts/redirect-exec.h>")]]
-[[requires_dependent_function("spawnv"), dos_only_export_alias("_spawnl")]]
-[[decl_include("<features.h>", "<bits/types.h>")]]
+[[requires_dependent_function("spawnv"), dos_export_alias("_spawnl")]]
+[[decl_include("<features.h>", "<bits/types.h>"), crt_dos_variant]]
 $pid_t spawnl(__STDC_INT_AS_UINT_T mode, [[nonnull]] char const *__restrict path,
               char const *args, ... /*, (char *)NULL*/) {
 	__REDIRECT_SPAWNL(char, spawnv, mode, path, args)
 }
 
 [[cp, guard, ATTR_SENTINEL, impl_include("<parts/redirect-exec.h>")]]
-[[requires_dependent_function("spawnvp"), dos_only_export_alias("_spawnlp")]]
-[[decl_include("<features.h>", "<bits/types.h>")]]
+[[requires_dependent_function("spawnvp"), dos_export_alias("_spawnlp")]]
+[[decl_include("<features.h>", "<bits/types.h>"), crt_dos_variant]]
 $pid_t spawnlp(__STDC_INT_AS_UINT_T mode, [[nonnull]] char const *__restrict file,
                char const *args, ... /*, (char *)NULL*/) {
 	__REDIRECT_SPAWNL(char, spawnvp, mode, file, args)
 }
 
 [[cp, guard, ATTR_SENTINEL_O(1), impl_include("<parts/redirect-exec.h>")]]
-[[requires_dependent_function("spawnve"), dos_only_export_alias("_spawnle")]]
-[[decl_include("<features.h>", "<bits/types.h>")]]
+[[requires_dependent_function("spawnve"), dos_export_alias("_spawnle")]]
+[[decl_include("<features.h>", "<bits/types.h>"), crt_dos_variant]]
 $pid_t spawnle(__STDC_INT_AS_UINT_T mode, [[nonnull]] char const *__restrict path,
                char const *args, ... /*, (char *)NULL, char **environ*/) {
 	__REDIRECT_SPAWNLE(char, spawnve, mode, path, args)
 }
 
 [[cp, guard, ATTR_SENTINEL_O(1), impl_include("<parts/redirect-exec.h>")]]
-[[requires_dependent_function("spawnvpe"), dos_only_export_alias("_spawnlpe")]]
-[[decl_include("<features.h>", "<bits/types.h>")]]
+[[requires_dependent_function("spawnvpe"), dos_export_alias("_spawnlpe")]]
+[[decl_include("<features.h>", "<bits/types.h>"), crt_dos_variant]]
 $pid_t spawnlpe(__STDC_INT_AS_UINT_T mode, [[nonnull]] char const *__restrict file,
                 char const *args, ... /*, (char *)NULL, char **environ*/) {
 	__REDIRECT_SPAWNLE(char, spawnvpe, mode, file, args)
@@ -624,7 +677,6 @@ $pid_t spawnlpe(__STDC_INT_AS_UINT_T mode, [[nonnull]] char const *__restrict fi
 
 %#ifdef __USE_KOS
 [[cp, guard, argument_names(mode, path, ___argv, ___envp)]]
-[[dos_only_export_alias("_spawnve")]]
 [[decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_TARGV)]]
 [[impl_include("<asm/crt/process.h>", "<libc/errno.h>", "<asm/os/vfork.h>")]]
 [[requires_include("<asm/os/oflags.h>", "<asm/os/vfork.h>")]]

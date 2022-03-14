@@ -300,7 +300,7 @@ print("\
  * Select VCRT version.
  *
  * VCRT version:
- *         _DEBUG                             _RELEASE
+ *         _RELEASE                           _DEBUG
  *    0:   msvcrt.dll                         -
  *    100: msvcr100.dll                       msvcr100d.dll
  *    110: msvcr110.dll                       msvcr110d.dll
