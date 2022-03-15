@@ -507,6 +507,10 @@ int __control87_2($uint32_t newval, $uint32_t mask,
 [[const, wunused, nothrow]]
 int _fpclass(double x);
 
+[[hidden, const, wunused, nothrow]]
+int _fpclassf(float x);
+
+
 
 
 

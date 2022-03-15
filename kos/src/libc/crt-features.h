@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1313c1a */
+/* HASH CRC-32:0x1d67be74 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -288,6 +288,7 @@
 #define __CRT_HAVE_DOS$_findnext64
 #define __CRT_HAVE_DOS$_flsbuf
 #define __CRT_HAVE_DOS$_fpclass
+#define __CRT_HAVE_DOS$_fpclassf
 #define __CRT_HAVE_DOS$_fprintf_l
 #define __CRT_HAVE_DOS$_fprintf_p
 #define __CRT_HAVE_DOS$_fprintf_p_l
@@ -4168,6 +4169,7 @@
 #define __CRT_HAVE__flushall
 #define __CRT_HAVE__flushlbf
 #define __CRT_HAVE__fpclass
+#define __CRT_HAVE__fpclassf
 #define __CRT_HAVE__fprintf_l
 #define __CRT_HAVE__fprintf_p
 #define __CRT_HAVE__fprintf_p_l

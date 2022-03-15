@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39226bc8 */
+/* HASH CRC-32:0x80972c14 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,13 +29,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mktime64_defined
 #define __local___localdep_mktime64_defined
 #if defined(__CRT_HAVE_mktime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),mktime,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct __NAMESPACE_STD_SYM tm *__tp),mktime,(__tp))
 #elif defined(__CRT_HAVE_mktime64)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),mktime64,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct __NAMESPACE_STD_SYM tm *__tp),mktime64,(__tp))
 #elif defined(__CRT_HAVE__mktime64)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),_mktime64,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct __NAMESPACE_STD_SYM tm *__tp),_mktime64,(__tp))
 #elif defined(__CRT_HAVE_timelocal64)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),timelocal64,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct __NAMESPACE_STD_SYM tm *__tp),timelocal64,(__tp))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/mktime64.h>
@@ -82,9 +82,9 @@ __NAMESPACE_LOCAL_END
 #include <bits/os/timeval.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_setsystime) __ATTR_NONNULL((1)) unsigned int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_setsystime))(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tms, unsigned int __milliseconds) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_setsystime))(struct __NAMESPACE_STD_SYM tm *__tp, unsigned int __milliseconds) {
 	struct __timeval64 __tv;
-	__tv.tv_sec  = (__NAMESPACE_LOCAL_SYM __localdep_mktime64)(__tms);
+	__tv.tv_sec  = (__NAMESPACE_LOCAL_SYM __localdep_mktime64)(__tp);
 	__tv.tv_usec = __milliseconds * 1000;
 	return (unsigned int)(__NAMESPACE_LOCAL_SYM __localdep_settimeofday64)(&__tv, __NULLPTR);
 }

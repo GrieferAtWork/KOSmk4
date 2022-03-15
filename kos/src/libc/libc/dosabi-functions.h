@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x382c1cec */
+/* HASH CRC-32:0x914c8264 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -428,6 +428,7 @@ DFUN(".text.crt.dos.math.float", libd__statusfp2, libc__statusfp2, TV, 2, TP, TP
 DFUN(".text.crt.dos.math.float", libd__control87, libc__control87, TI32, 2, TI32, TI32)
 DFUN(".text.crt.dos.math.float", libd___control87_2, libc___control87_2, TD, 4, TI32, TI32, TP, TP)
 DFUN(".text.crt.dos.math.float", libd__fpclass, libc__fpclass, TD, 1, TFD)
+DFUN(".text.crt.dos.math.float", libd__fpclassf, libc__fpclassf, TD, 1, TF)
 
 /* fnmatch */
 DFUN(".text.crt.dos.string.match", libd_fnmatch, libc_fnmatch, TD, 3, TP, TP, TD)

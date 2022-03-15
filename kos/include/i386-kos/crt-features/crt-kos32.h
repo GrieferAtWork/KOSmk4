@@ -1441,6 +1441,7 @@
 #define __CRT_HAVE__flushlbf
 #define __CRT_HAVE__fmode
 #define __CRT_HAVE__fpclass
+#define __CRT_HAVE__fpclassf
 #define __CRT_HAVE__fpreset
 #define __CRT_HAVE__fprintf_l
 #define __CRT_HAVE__fprintf_p

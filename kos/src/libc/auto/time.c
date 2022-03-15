@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39da43e9 */
+/* HASH CRC-32:0x2b30e5d2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,11 +52,12 @@ NOTHROW_NCX(LIBCCALL libc_difftime)(time_t time1,
 /* >> mktime(3), mktime64(3)
  * Return the `time_t' representation of `tp' and normalize `tp' */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time_t
-NOTHROW_NCX(LIBCCALL libc_mktime)(struct tm __KOS_FIXED_CONST *tp) {
+NOTHROW_NCX(LIBCCALL libc_mktime)(struct tm *tp) {
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 	return (time_t)libc_mktime64(tp);
 #else /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 	/* TODO: Support for localtime? */
+	/* TODO: Normalize `tp' */
 	time64_t result;
 	result = __yearstodays(tp->tm_year) - __yearstodays(1970);
 	result += tp->tm_yday;
@@ -206,12 +207,13 @@ DEFINE_INTERN_ALIAS(libc_mktime64, libc_mktime);
 /* >> mktime(3), mktime64(3)
  * Return the `time_t' representation of `tp' and normalize `tp' */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time64_t
-NOTHROW_NCX(LIBCCALL libc_mktime64)(struct tm __KOS_FIXED_CONST *tp) {
+NOTHROW_NCX(LIBCCALL libc_mktime64)(struct tm *tp) {
 
 
 
 	time64_t result;
 	/* TODO: Support for localtime? */
+	/* TODO: Normalize `tp' */
 	result = __yearstodays(tp->tm_year) - __yearstodays(1970);
 	result += tp->tm_yday;
 	result *= 86400;
@@ -302,11 +304,12 @@ NOTHROW_NCX(LIBCCALL libc_localtime64)(time64_t const *timer) {
 /* >> timegm(3), timegm64(3)
  * Like `mktime', but `tp' represents Universal Time (UTC), not local time */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time_t
-NOTHROW_NCX(LIBCCALL libc_timegm)(struct tm __KOS_FIXED_CONST *tp) {
+NOTHROW_NCX(LIBCCALL libc_timegm)(struct tm *tp) {
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 	return (time_t)libc_timegm64(tp);
 #else /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 	time_t result;
+	/* TODO: Normalize `tp' */
 	result = __yearstodays(tp->tm_year) - __yearstodays(1970);
 	result += tp->tm_yday;
 	result *= 86400;
@@ -335,11 +338,12 @@ DEFINE_INTERN_ALIAS(libc_timegm64, libc_timegm);
 /* >> timegm(3), timegm64(3)
  * Like `mktime', but `tp' represents Universal Time (UTC), not local time */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time64_t
-NOTHROW_NCX(LIBCCALL libc_timegm64)(struct tm __KOS_FIXED_CONST *tp) {
+NOTHROW_NCX(LIBCCALL libc_timegm64)(struct tm *tp) {
 
 
 
 	time64_t result;
+	/* TODO: Normalize `tp' */
 	result = __yearstodays(tp->tm_year) - __yearstodays(1970);
 	result += tp->tm_yday;
 	result *= 86400;
@@ -827,16 +831,16 @@ NOTHROW_NCX(LIBCCALL libc__ctime64_s)(char buf[26],
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc__strtime)(char buf[9]) {
 	time64_t now = libc_time64(NULL);
-	struct tm now_tms, *pn;
-	pn = libc_localtime64_r(&now, &now_tms);
-	buf[0] = itoa_decimal(pn->tm_hour / 10);
-	buf[1] = itoa_decimal(pn->tm_hour % 10);
+	struct tm now_tm, *tp;
+	tp = libc_localtime64_r(&now, &now_tm);
+	buf[0] = itoa_decimal(tp->tm_hour / 10);
+	buf[1] = itoa_decimal(tp->tm_hour % 10);
 	buf[2] = ':';
-	buf[3] = itoa_decimal(pn->tm_min / 10);
-	buf[4] = itoa_decimal(pn->tm_min % 10);
+	buf[3] = itoa_decimal(tp->tm_min / 10);
+	buf[4] = itoa_decimal(tp->tm_min % 10);
 	buf[5] = ':';
-	buf[6] = itoa_decimal(pn->tm_sec / 10);
-	buf[7] = itoa_decimal(pn->tm_sec % 10);
+	buf[6] = itoa_decimal(tp->tm_sec / 10);
+	buf[7] = itoa_decimal(tp->tm_sec % 10);
 	buf[8] = '\0';
 	return 0;
 }
@@ -845,16 +849,16 @@ NOTHROW_NCX(LIBCCALL libc__strtime)(char buf[9]) {
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc__strdate)(char buf[9]) {
 	time64_t now = libc_time64(NULL);
-	struct tm now_tms, *pn;
-	pn = libc_localtime64_r(&now, &now_tms);
-	buf[0] = itoa_decimal(pn->tm_mon / 10);
-	buf[1] = itoa_decimal(pn->tm_mon % 10);
+	struct tm now_tm, *tp;
+	tp = libc_localtime64_r(&now, &now_tm);
+	buf[0] = itoa_decimal(tp->tm_mon / 10);
+	buf[1] = itoa_decimal(tp->tm_mon % 10);
 	buf[2] = '/';
-	buf[3] = itoa_decimal(pn->tm_mday / 10);
-	buf[4] = itoa_decimal(pn->tm_mday % 10);
+	buf[3] = itoa_decimal(tp->tm_mday / 10);
+	buf[4] = itoa_decimal(tp->tm_mday % 10);
 	buf[5] = '/';
-	buf[6] = itoa_decimal((pn->tm_year / 10) % 10);
-	buf[7] = itoa_decimal(pn->tm_year % 10);
+	buf[6] = itoa_decimal((tp->tm_year / 10) % 10);
+	buf[7] = itoa_decimal(tp->tm_year % 10);
 	buf[8] = '\0';
 	return buf;
 }
@@ -876,21 +880,21 @@ NOTHROW_NCX(LIBCCALL libc__strdate_s)(char *buf,
 }
 #include <bits/os/timeval.h>
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) unsigned int
-NOTHROW_NCX(LIBCCALL libc__getsystime)(struct tm *tms) {
+NOTHROW_NCX(LIBCCALL libc__getsystime)(struct tm *tp) {
 	struct timeval64 tv;
 	if (libc_gettimeofday64(&tv, NULL) != 0) {
 		tv.tv_sec  = 0;
 		tv.tv_usec = 0;
 	}
-	libc_localtime64_r(&tv.tv_sec, tms);
+	libc_localtime64_r(&tv.tv_sec, tp);
 	return tv.tv_usec / 1000;
 }
 #include <bits/os/timeval.h>
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) unsigned int
-NOTHROW_NCX(LIBCCALL libc__setsystime)(struct tm __KOS_FIXED_CONST *tms,
+NOTHROW_NCX(LIBCCALL libc__setsystime)(struct tm *tp,
                                        unsigned int milliseconds) {
 	struct timeval64 tv;
-	tv.tv_sec  = libc_mktime64(tms);
+	tv.tv_sec  = libc_mktime64(tp);
 	tv.tv_usec = milliseconds * 1000;
 	return (unsigned int)libc_settimeofday64(&tv, NULL);
 }

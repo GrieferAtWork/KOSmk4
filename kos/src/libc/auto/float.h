@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9010d9a7 */
+/* HASH CRC-32:0xd89e8795 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,6 +62,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd___control87_2)(uint32_t newval, uint32_t ma
 /* >> _fpclass(3)
  * @return: * : Set of `_FPCLASS_*' */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd__fpclass)(double x);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd__fpclassf)(float x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

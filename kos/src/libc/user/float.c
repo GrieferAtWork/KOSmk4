@@ -112,6 +112,18 @@ NOTHROW(LIBCCALL libc__fpclass)(double x)
 }
 /*[[[end:libc__fpclass]]]*/
 
+/*[[[head:libc__fpclassf,hash:CRC-32=0xe8d33159]]]*/
+INTERN ATTR_SECTION(".text.crt.math.float") ATTR_CONST WUNUSED int
+NOTHROW(LIBCCALL libc__fpclassf)(float x)
+/*[[[body:libc__fpclassf]]]*/
+/*AUTO*/{
+	(void)x;
+	CRT_UNIMPLEMENTEDF("_fpclassf(%f)", x); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:libc__fpclassf]]]*/
+
 
 /*[[[head:libc_fpreset,hash:CRC-32=0xa8470258]]]*/
 INTERN ATTR_SECTION(".text.crt.math.float") void
@@ -127,13 +139,14 @@ NOTHROW_NCX(LIBCCALL libc_fpreset)(void)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x65c287a2]]]*/
+/*[[[start:exports,hash:CRC-32=0xe77a9e72]]]*/
 DEFINE_PUBLIC_ALIAS(_clearfp, libc__clearfp);
 DEFINE_PUBLIC_ALIAS(_statusfp, libc__statusfp);
 DEFINE_PUBLIC_ALIAS(_statusfp2, libc__statusfp2);
 DEFINE_PUBLIC_ALIAS(__control87_2, libc___control87_2);
 DEFINE_PUBLIC_ALIAS(__fpecode, libc___fpecode);
 DEFINE_PUBLIC_ALIAS(_fpclass, libc__fpclass);
+DEFINE_PUBLIC_ALIAS(_fpclassf, libc__fpclassf);
 DEFINE_PUBLIC_ALIAS(_fpreset, libc_fpreset);
 DEFINE_PUBLIC_ALIAS(fpreset, libc_fpreset);
 /*[[[end:exports]]]*/

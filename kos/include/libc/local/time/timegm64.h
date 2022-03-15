@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62b51631 */
+/* HASH CRC-32:0x9e307ac1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,17 +30,17 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_crt_timegm32,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),timegm,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_crt_timegm32,(struct __NAMESPACE_STD_SYM tm *__tp),timegm,(__tp))
 #elif defined(__CRT_HAVE__mkgmtime)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_crt_timegm32,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),_mkgmtime,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_crt_timegm32,(struct __NAMESPACE_STD_SYM tm *__tp),_mkgmtime,(__tp))
 #elif defined(__CRT_HAVE__mkgmtime32)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_crt_timegm32,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),_mkgmtime32,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_crt_timegm32,(struct __NAMESPACE_STD_SYM tm *__tp),_mkgmtime32,(__tp))
 #else /* ... */
 #undef __local___localdep_crt_timegm32_defined
 #endif /* !... */
@@ -51,11 +51,12 @@ __NAMESPACE_LOCAL_END
 #endif /* !__yearstodays */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(timegm64) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __time64_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timegm64))(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timegm64))(struct __NAMESPACE_STD_SYM tm *__tp) {
 #if defined(__CRT_HAVE_timegm) || defined(__CRT_HAVE__mkgmtime) || defined(__CRT_HAVE__mkgmtime32)
 	return (__time64_t)(__NAMESPACE_LOCAL_SYM __localdep_crt_timegm32)(__tp);
 #else /* __CRT_HAVE_timegm || __CRT_HAVE__mkgmtime || __CRT_HAVE__mkgmtime32 */
 	__time64_t __result;
+	/* TODO: Normalize `tp' */
 	__result = __yearstodays(__tp->tm_year) - __yearstodays(1970);
 	__result += __tp->tm_yday;
 	__result *= 86400;

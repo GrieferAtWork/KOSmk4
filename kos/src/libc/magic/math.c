@@ -806,7 +806,10 @@ double logb(double x) {
 
 [[std, crtbuiltin, export_alias("__expm1f")]] expm1f(*) %{generate(double2float("expm1"))}
 [[std, crtbuiltin, export_alias("__log1pf")]] log1pf(*) %{generate(double2float("log1p"))}
-[[std, crtbuiltin, export_alias("__logbf")]]  logbf(*)  %{generate(double2float("logb"))}
+[[std, crtbuiltin, export_alias("__logbf"), alias("_logbf")]] 
+/* For some reason, only exported on x86_64 (s.a. <crt-features/crt-dos.h>) */
+[[if(defined(__x86_64__)), dos_only_export_as("_logbf")]]
+logbf(*) %{generate(double2float("logb"))}
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[std, crtbuiltin, export_alias("__expm1l")]] expm1l(*) %{generate(double2ldouble("expm1"))}
 [[std, crtbuiltin, export_alias("__log1pl")]] log1pl(*) %{generate(double2ldouble("log1p"))}
@@ -1291,9 +1294,12 @@ int ilogb(double x) {
   preferred_extern_inline("nearbyintf", { return __builtin_nearbyintf(x); })]]
 float rintf(float x) %{generate(double2float("rint"))}
 
-[[std, const, wunused, nothrow, crtbuiltin, export_alias("nexttowardf", "__nextafterf", "__nexttowardf")]]
+[[std, const, wunused, nothrow, crtbuiltin]]
+[[export_alias("nexttowardf", "__nextafterf", "__nexttowardf"), alias("_nextafterf")]]
 [[if(__has_builtin(__builtin_nexttowardf) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline("nexttowardf", { return __builtin_nexttowardf(x); })]]
+/* For some reason, only exported on x86_64 (s.a. <crt-features/crt-dos.h>) */
+[[if(defined(__x86_64__)), dos_only_export_as("_nextafterf")]]
 float nextafterf(float x, float y) %{generate(double2float("nextafter"))}
 
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("dremf", "__remainderf", "__dremf")]]
@@ -2019,7 +2025,9 @@ double significand(double x) {
 	return __LIBM_MATHFUN(@significand@, x);
 }
 
-[[crtbuiltin, export_alias("__finitef")]]
+[[crtbuiltin, export_alias("__finitef"), alias("_finitef")]]
+/* For some reason, only exported on x86_64 (s.a. <crt-features/crt-dos.h>) */
+[[if(defined(__x86_64__)), dos_only_export_as("_finitef")]]
 finitef(*) %{generate(double2float("finite"))}
 
 dremf(*) = remainderf;
@@ -2054,7 +2062,9 @@ int isnan(double x) {
 }
 %#endif /* !cplusplus || !__CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
 
-[[crtbuiltin, export_alias("__isnanf")]]
+[[crtbuiltin, export_alias("__isnanf"), alias("_isnanf")]]
+/* For some reason, only exported on x86_64 (s.a. <crt-features/crt-dos.h>) */
+[[if(defined(__x86_64__)), dos_only_export_as("_isnanf")]]
 isnanf(*) %{generate(double2float("isnan"))}
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE

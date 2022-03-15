@@ -1408,6 +1408,7 @@
 #define __CRT_HAVE__flushlbf
 #define __CRT_HAVE__fmode
 #define __CRT_HAVE__fpclass
+#define __CRT_HAVE__fpclassf
 #define __CRT_HAVE__fpreset
 #define __CRT_HAVE__fprintf_l
 #define __CRT_HAVE__fprintf_p
@@ -5865,6 +5866,7 @@
 #define __CRT_HAVE__fgetwchar
 #define __CRT_HAVE__fgetws_nolock
 #define __CRT_HAVE__fileno
+#define __CRT_HAVE__finitef
 #define __CRT_HAVE__fputchar
 #define __CRT_HAVE__fputwc_nolock
 #define __CRT_HAVE__fputwchar
@@ -5900,6 +5902,7 @@
 #define __CRT_HAVE__isgraph_l
 #define __CRT_HAVE__islower_l
 #define __CRT_HAVE__isnan
+#define __CRT_HAVE__isnanf
 #define __CRT_HAVE__isprint_l
 #define __CRT_HAVE__ispunct_l
 #define __CRT_HAVE__isspace_l
@@ -5931,6 +5934,7 @@
 #define __CRT_HAVE__lock_file
 #define __CRT_HAVE__locking
 #define __CRT_HAVE__logb
+#define __CRT_HAVE__logbf
 #define __CRT_HAVE__lsearch
 #define __CRT_HAVE__lseek
 #define __CRT_HAVE__lseeki64
@@ -5949,6 +5953,7 @@
 #define __CRT_HAVE__mktime64
 #define __CRT_HAVE__msize_debug
 #define __CRT_HAVE__nextafter
+#define __CRT_HAVE__nextafterf
 #define __CRT_HAVE__onexit
 #define __CRT_HAVE__open
 #define __CRT_HAVE__pclose
@@ -7043,6 +7048,7 @@
 #define __CRT_HAVE_KOS$_finite
 #define __CRT_HAVE_KOS$_flsbuf
 #define __CRT_HAVE_KOS$_fpclass
+#define __CRT_HAVE_KOS$_fpclassf
 #define __CRT_HAVE_KOS$_fprintf_l
 #define __CRT_HAVE_KOS$_fprintf_p
 #define __CRT_HAVE_KOS$_fprintf_p_l
@@ -11152,8 +11158,10 @@
 #define __CRT_HAVE_DOS$_findnext64i32
 #define __CRT_HAVE_DOS$_findnexti64
 #define __CRT_HAVE_DOS$_finite
+#define __CRT_HAVE_DOS$_finitef
 #define __CRT_HAVE_DOS$_flsbuf
 #define __CRT_HAVE_DOS$_fpclass
+#define __CRT_HAVE_DOS$_fpclassf
 #define __CRT_HAVE_DOS$_fprintf_l
 #define __CRT_HAVE_DOS$_fprintf_p
 #define __CRT_HAVE_DOS$_fprintf_p_l
@@ -11311,6 +11319,7 @@
 #define __CRT_HAVE_DOS$_ismbstrail
 #define __CRT_HAVE_DOS$_ismbstrail_l
 #define __CRT_HAVE_DOS$_isnan
+#define __CRT_HAVE_DOS$_isnanf
 #define __CRT_HAVE_DOS$_isprint_l
 #define __CRT_HAVE_DOS$_ispunct_l
 #define __CRT_HAVE_DOS$_isspace_l
@@ -11353,6 +11362,7 @@
 #define __CRT_HAVE_DOS$_lock_file
 #define __CRT_HAVE_DOS$_locking
 #define __CRT_HAVE_DOS$_logb
+#define __CRT_HAVE_DOS$_logbf
 #define __CRT_HAVE_DOS$_lrotl
 #define __CRT_HAVE_DOS$_lrotr
 #define __CRT_HAVE_DOS$_lsearch
@@ -11519,6 +11529,7 @@
 #define __CRT_HAVE_DOS$_msize
 #define __CRT_HAVE_DOS$_msize_debug
 #define __CRT_HAVE_DOS$_nextafter
+#define __CRT_HAVE_DOS$_nextafterf
 #define __CRT_HAVE_DOS$_onexit
 #define __CRT_HAVE_DOS$_open
 #define __CRT_HAVE_DOS$_open_osfhandle

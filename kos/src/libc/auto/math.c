@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb7af17 */
+/* HASH CRC-32:0x3c22adc6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4443,6 +4443,9 @@ DEFINE_PUBLIC_ALIAS(expm1f, libc_expm1f);
 DEFINE_PUBLIC_ALIAS(__log1pf, libc_log1pf);
 DEFINE_PUBLIC_ALIAS(log1pf, libc_log1pf);
 DEFINE_PUBLIC_ALIAS(__logbf, libc_logbf);
+#if defined(__LIBCCALL_IS_LIBDCALL) && defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(_logbf, libc_logbf);
+#endif /* __LIBCCALL_IS_LIBDCALL && __x86_64__ */
 DEFINE_PUBLIC_ALIAS(logbf, libc_logbf);
 DEFINE_PUBLIC_ALIAS(__expm1l, libc_expm1l);
 DEFINE_PUBLIC_ALIAS(expm1l, libc_expm1l);
@@ -4586,6 +4589,9 @@ DEFINE_PUBLIC_ALIAS(rintf, libc_rintf);
 DEFINE_PUBLIC_ALIAS(nexttowardf, libc_nextafterf);
 DEFINE_PUBLIC_ALIAS(__nextafterf, libc_nextafterf);
 DEFINE_PUBLIC_ALIAS(__nexttowardf, libc_nextafterf);
+#if defined(__LIBCCALL_IS_LIBDCALL) && defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(_nextafterf, libc_nextafterf);
+#endif /* __LIBCCALL_IS_LIBDCALL && __x86_64__ */
 DEFINE_PUBLIC_ALIAS(nextafterf, libc_nextafterf);
 DEFINE_PUBLIC_ALIAS(dremf, libc_remainderf);
 DEFINE_PUBLIC_ALIAS(__remainderf, libc_remainderf);
@@ -4719,6 +4725,9 @@ DEFINE_PUBLIC_ALIAS(finite, libc_finite);
 DEFINE_PUBLIC_ALIAS(__significand, libc_significand);
 DEFINE_PUBLIC_ALIAS(significand, libc_significand);
 DEFINE_PUBLIC_ALIAS(__finitef, libc_finitef);
+#if defined(__LIBCCALL_IS_LIBDCALL) && defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(_finitef, libc_finitef);
+#endif /* __LIBCCALL_IS_LIBDCALL && __x86_64__ */
 DEFINE_PUBLIC_ALIAS(finitef, libc_finitef);
 DEFINE_PUBLIC_ALIAS(__significandf, libc_significandf);
 DEFINE_PUBLIC_ALIAS(significandf, libc_significandf);
@@ -4732,6 +4741,9 @@ DEFINE_PUBLIC_ALIAS(_isnan, libc_isnan);
 DEFINE_PUBLIC_ALIAS(__isnan, libc_isnan);
 DEFINE_PUBLIC_ALIAS(isnan, libc_isnan);
 DEFINE_PUBLIC_ALIAS(__isnanf, libc_isnanf);
+#if defined(__LIBCCALL_IS_LIBDCALL) && defined(__x86_64__)
+DEFINE_PUBLIC_ALIAS(_isnanf, libc_isnanf);
+#endif /* __LIBCCALL_IS_LIBDCALL && __x86_64__ */
 DEFINE_PUBLIC_ALIAS(isnanf, libc_isnanf);
 DEFINE_PUBLIC_ALIAS(__isnanl, libc_isnanl);
 DEFINE_PUBLIC_ALIAS(isnanl, libc_isnanl);

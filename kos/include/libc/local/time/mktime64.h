@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf79b81ef */
+/* HASH CRC-32:0xe9efd142 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,11 +28,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_mktime32_defined
 #define __local___localdep_crt_mktime32_defined
 #ifdef __CRT_HAVE_mktime
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_crt_mktime32,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),mktime,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_crt_mktime32,(struct __NAMESPACE_STD_SYM tm *__tp),mktime,(__tp))
 #elif defined(__CRT_HAVE_timelocal)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_crt_mktime32,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),timelocal,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_crt_mktime32,(struct __NAMESPACE_STD_SYM tm *__tp),timelocal,(__tp))
 #elif defined(__CRT_HAVE__mktime32)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_crt_mktime32,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),_mktime32,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_crt_mktime32,(struct __NAMESPACE_STD_SYM tm *__tp),_mktime32,(__tp))
 #else /* ... */
 #undef __local___localdep_crt_mktime32_defined
 #endif /* !... */
@@ -43,12 +43,13 @@ __NAMESPACE_LOCAL_END
 #endif /* !__yearstodays */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(mktime64) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __time64_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktime64))(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktime64))(struct __NAMESPACE_STD_SYM tm *__tp) {
 #if defined(__CRT_HAVE_mktime) || defined(__CRT_HAVE_timelocal) || defined(__CRT_HAVE__mktime32)
 	return (__time64_t)(__NAMESPACE_LOCAL_SYM __localdep_crt_mktime32)(__tp);
 #else /* __CRT_HAVE_mktime || __CRT_HAVE_timelocal || __CRT_HAVE__mktime32 */
 	__time64_t __result;
 	/* TODO: Support for localtime? */
+	/* TODO: Normalize `tp' */
 	__result = __yearstodays(__tp->tm_year) - __yearstodays(1970);
 	__result += __tp->tm_yday;
 	__result *= 86400;

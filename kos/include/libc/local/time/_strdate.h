@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7dca56d2 */
+/* HASH CRC-32:0xf282956c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,16 +71,16 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_strdate) __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_strdate))(char __buf[9]) {
 	__time64_t __now = (__NAMESPACE_LOCAL_SYM __localdep_time64)(__NULLPTR);
-	struct __NAMESPACE_STD_SYM tm __now_tms, *__pn;
-	__pn = (__NAMESPACE_LOCAL_SYM __localdep_localtime64_r)(&__now, &__now_tms);
-	__buf[0] = __LOCAL_itoa_decimal(__pn->tm_mon / 10);
-	__buf[1] = __LOCAL_itoa_decimal(__pn->tm_mon % 10);
+	struct __NAMESPACE_STD_SYM tm __now_tm, *__tp;
+	__tp = (__NAMESPACE_LOCAL_SYM __localdep_localtime64_r)(&__now, &__now_tm);
+	__buf[0] = __LOCAL_itoa_decimal(__tp->tm_mon / 10);
+	__buf[1] = __LOCAL_itoa_decimal(__tp->tm_mon % 10);
 	__buf[2] = '/';
-	__buf[3] = __LOCAL_itoa_decimal(__pn->tm_mday / 10);
-	__buf[4] = __LOCAL_itoa_decimal(__pn->tm_mday % 10);
+	__buf[3] = __LOCAL_itoa_decimal(__tp->tm_mday / 10);
+	__buf[4] = __LOCAL_itoa_decimal(__tp->tm_mday % 10);
 	__buf[5] = '/';
-	__buf[6] = __LOCAL_itoa_decimal((__pn->tm_year / 10) % 10);
-	__buf[7] = __LOCAL_itoa_decimal(__pn->tm_year % 10);
+	__buf[6] = __LOCAL_itoa_decimal((__tp->tm_year / 10) % 10);
+	__buf[7] = __LOCAL_itoa_decimal(__tp->tm_year % 10);
 	__buf[8] = '\0';
 	return __buf;
 }

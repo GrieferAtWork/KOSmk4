@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2a011db */
+/* HASH CRC-32:0x8fc3ff1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -387,6 +387,7 @@ DEFINE_PUBLIC_ALIAS(DOS$_statusfp2, libd__statusfp2);
 DEFINE_PUBLIC_ALIAS(DOS$_control87, libd__control87);
 DEFINE_PUBLIC_ALIAS(DOS$__control87_2, libd___control87_2);
 DEFINE_PUBLIC_ALIAS(DOS$_fpclass, libd__fpclass);
+DEFINE_PUBLIC_ALIAS(DOS$_fpclassf, libd__fpclassf);
 
 /* fnmatch */
 DEFINE_PUBLIC_ALIAS(DOS$fnmatch, libd_fnmatch);
@@ -675,6 +676,9 @@ DEFINE_PUBLIC_ALIAS(DOS$expm1f, libd_expm1f);
 DEFINE_PUBLIC_ALIAS(DOS$__log1pf, libd_log1pf);
 DEFINE_PUBLIC_ALIAS(DOS$log1pf, libd_log1pf);
 DEFINE_PUBLIC_ALIAS(DOS$__logbf, libd_logbf);
+#ifdef __x86_64__
+DEFINE_PUBLIC_ALIAS(DOS$_logbf, libd_logbf);
+#endif /* __x86_64__ */
 DEFINE_PUBLIC_ALIAS(DOS$logbf, libd_logbf);
 DEFINE_PUBLIC_ALIAS(DOS$__expm1l, libd_expm1l);
 DEFINE_PUBLIC_ALIAS(DOS$expm1l, libd_expm1l);
@@ -810,6 +814,9 @@ DEFINE_PUBLIC_ALIAS(DOS$rintf, libd_rintf);
 DEFINE_PUBLIC_ALIAS(DOS$nexttowardf, libd_nextafterf);
 DEFINE_PUBLIC_ALIAS(DOS$__nextafterf, libd_nextafterf);
 DEFINE_PUBLIC_ALIAS(DOS$__nexttowardf, libd_nextafterf);
+#ifdef __x86_64__
+DEFINE_PUBLIC_ALIAS(DOS$_nextafterf, libd_nextafterf);
+#endif /* __x86_64__ */
 DEFINE_PUBLIC_ALIAS(DOS$nextafterf, libd_nextafterf);
 DEFINE_PUBLIC_ALIAS(DOS$dremf, libd_remainderf);
 DEFINE_PUBLIC_ALIAS(DOS$__remainderf, libd_remainderf);
@@ -943,6 +950,9 @@ DEFINE_PUBLIC_ALIAS(DOS$finite, libd_finite);
 DEFINE_PUBLIC_ALIAS(DOS$__significand, libd_significand);
 DEFINE_PUBLIC_ALIAS(DOS$significand, libd_significand);
 DEFINE_PUBLIC_ALIAS(DOS$__finitef, libd_finitef);
+#ifdef __x86_64__
+DEFINE_PUBLIC_ALIAS(DOS$_finitef, libd_finitef);
+#endif /* __x86_64__ */
 DEFINE_PUBLIC_ALIAS(DOS$finitef, libd_finitef);
 DEFINE_PUBLIC_ALIAS(DOS$__significandf, libd_significandf);
 DEFINE_PUBLIC_ALIAS(DOS$significandf, libd_significandf);
@@ -954,6 +964,9 @@ DEFINE_PUBLIC_ALIAS(DOS$_isnan, libd_isnan);
 DEFINE_PUBLIC_ALIAS(DOS$__isnan, libd_isnan);
 DEFINE_PUBLIC_ALIAS(DOS$isnan, libd_isnan);
 DEFINE_PUBLIC_ALIAS(DOS$__isnanf, libd_isnanf);
+#ifdef __x86_64__
+DEFINE_PUBLIC_ALIAS(DOS$_isnanf, libd_isnanf);
+#endif /* __x86_64__ */
 DEFINE_PUBLIC_ALIAS(DOS$isnanf, libd_isnanf);
 DEFINE_PUBLIC_ALIAS(DOS$__isnanl, libd_isnanl);
 DEFINE_PUBLIC_ALIAS(DOS$isnanl, libd_isnanl);

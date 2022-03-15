@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf4427f9 */
+/* HASH CRC-32:0x78a0f942 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,6 +63,7 @@
 #define __stub___create_locale
 #define __stub__create_locale
 #define __stub__fpclass
+#define __stub__fpclassf
 #define __stub___free_locale
 #define __stub__free_locale
 #define __stub___get_current_locale

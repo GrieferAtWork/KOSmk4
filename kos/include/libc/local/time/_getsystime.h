@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25b46554 */
+/* HASH CRC-32:0xe6bd8d24 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,13 +73,13 @@ __NAMESPACE_LOCAL_END
 #include <bits/os/timeval.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_getsystime) __ATTR_NONNULL((1)) unsigned int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_getsystime))(struct __NAMESPACE_STD_SYM tm *__tms) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_getsystime))(struct __NAMESPACE_STD_SYM tm *__tp) {
 	struct __timeval64 __tv;
 	if ((__NAMESPACE_LOCAL_SYM __localdep_gettimeofday64)(&__tv, __NULLPTR) != 0) {
 		__tv.tv_sec  = 0;
 		__tv.tv_usec = 0;
 	}
-	(__NAMESPACE_LOCAL_SYM __localdep_localtime64_r)(&__tv.tv_sec, __tms);
+	(__NAMESPACE_LOCAL_SYM __localdep_localtime64_r)(&__tv.tv_sec, __tp);
 	return __tv.tv_usec / 1000;
 }
 __NAMESPACE_LOCAL_END

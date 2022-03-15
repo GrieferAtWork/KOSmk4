@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7fec7108 */
+/* HASH CRC-32:0x4b50ec30 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,6 +39,7 @@ INTDEF int *NOTHROW_NCX(LIBCCALL libc___fpecode)(void);
 /* >> _fpclass(3)
  * @return: * : Set of `_FPCLASS_*' */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc__fpclass)(double x);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc__fpclassf)(float x);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_fpreset)(void);
 #endif /* !__KERNEL__ */
 
