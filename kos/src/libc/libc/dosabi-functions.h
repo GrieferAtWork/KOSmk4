@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x914c8264 */
+/* HASH CRC-32:0xa45a232a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -222,6 +222,29 @@ DFUN(".text.crt.dos.math.complex", libd_conjl, libc_conjl, TCFL, 1, TCFL)
 DFUN(".text.crt.dos.math.complex", libd_creall, libc_creall, TFL, 1, TCFL)
 DFUN(".text.crt.dos.math.complex", libd_cimagl, libc_cimagl, TFL, 1, TCFL)
 DFUN(".text.crt.dos.math.complex", libd_cprojl, libc_cprojl, TCFL, 1, TCFL)
+
+/* conio */
+DFUN(".text.crt.dos.conio", libd__putch, libc__putch, TD, 1, TD)
+DFUN(".text.crt.dos.conio", libd__putch_nolock, libc__putch_nolock, TD, 1, TD)
+DFUN(".text.crt.dos.conio", libd__ungetch, libc__ungetch, TD, 1, TD)
+DFUN(".text.crt.dos.conio", libd__ungetch_nolock, libc__ungetch_nolock, TD, 1, TD)
+DFUN(".text.crt.dos.conio", libd__cgets, libc__cgets, TP, 1, TP)
+DFUN(".text.crt.dos.conio", libd__cgets_s, libc__cgets_s, TIn(__SIZEOF_ERRNO_T__), 3, TP, TI, TP)
+DFUN(".text.crt.dos.conio", libd__cputs, libc__cputs, TD, 1, TP)
+DFUN(".text.crt.dos.conio", libd___conio_common_vcprintf, libc___conio_common_vcprintf, TD, 4, TI64, TP, TP, TP)
+DFUN(".text.crt.dos.conio", libd___conio_common_vcprintf_s, libc___conio_common_vcprintf_s, TD, 4, TI64, TP, TP, TP)
+DEFINE_INTERN_ALIAS(libd___conio_common_vcprintf_p, libd___conio_common_vcprintf);
+DFUN(".text.crt.dos.conio", libd___conio_common_vcscanf, libc___conio_common_vcscanf, TD, 4, TI64, TP, TP, TP)
+DFUN(".text.crt.dos.conio", libd__vcprintf_l, libc__vcprintf_l, TD, 3, TP, TP, TP)
+DFUN(".text.crt.dos.conio", libd__vcprintf_s_l, libc__vcprintf_s_l, TD, 3, TP, TP, TP)
+DEFINE_INTERN_ALIAS(libd__vcprintf_p_l, libd__vcprintf_l);
+DFUN(".text.crt.dos.conio", libd__vcscanf_l, libc__vcscanf_l, TD, 3, TP, TP, TP)
+DFUN(".text.crt.dos.conio", libd__vcscanf_s_l, libc__vcscanf_s_l, TD, 3, TP, TP, TP)
+DFUN(".text.crt.dos.conio", libd__vcprintf, libc__vcprintf, TD, 2, TP, TP)
+DFUN(".text.crt.dos.conio", libd__vcprintf_s, libc__vcprintf_s, TD, 2, TP, TP)
+DEFINE_INTERN_ALIAS(libd__vcprintf_p, libd__vcprintf);
+DFUN(".text.crt.dos.conio", libd__vcscanf, libc__vcscanf, TD, 2, TP, TP)
+DFUN(".text.crt.dos.conio", libd__vcscanf_s, libc__vcscanf_s, TD, 2, TP, TP)
 
 /* crypt */
 DFUN(".text.crt.dos.string.encrypt", libd_setkey, libc_setkey, TV, 1, TP)

@@ -566,5 +566,6 @@
 	CB(PREFIX.crt.dos.wchar.fs.modify_time) \
 	CB(PREFIX.crt.dos.wchar.errno.utility PREFIX.crt.dos.wchar.errno) \
 	CB(PREFIX.crt.dos.wchar.fs.exec.spawn PREFIX.crt.dos.wchar.fs.exec.system PREFIX.crt.dos.wchar.fs.io) \
-	CB(PREFIX.crt.dos.wchar.system.configuration)
+	CB(PREFIX.crt.dos.wchar.system.configuration) \
+	CB(PREFIX.crt.dos.wchar.conio)
 /*[[[end]]]*/

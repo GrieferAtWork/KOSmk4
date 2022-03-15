@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8fc3ff1 */
+/* HASH CRC-32:0x97d5ed49 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -202,6 +202,29 @@ DEFINE_PUBLIC_ALIAS(DOS$conjl, libd_conjl);
 DEFINE_PUBLIC_ALIAS(DOS$creall, libd_creall);
 DEFINE_PUBLIC_ALIAS(DOS$cimagl, libd_cimagl);
 DEFINE_PUBLIC_ALIAS(DOS$cprojl, libd_cprojl);
+
+/* conio */
+DEFINE_PUBLIC_ALIAS(DOS$_putch, libd__putch);
+DEFINE_PUBLIC_ALIAS(DOS$_putch_nolock, libd__putch_nolock);
+DEFINE_PUBLIC_ALIAS(DOS$_ungetch, libd__ungetch);
+DEFINE_PUBLIC_ALIAS(DOS$_ungetch_nolock, libd__ungetch_nolock);
+DEFINE_PUBLIC_ALIAS(DOS$_cgets, libd__cgets);
+DEFINE_PUBLIC_ALIAS(DOS$_cgets_s, libd__cgets_s);
+DEFINE_PUBLIC_ALIAS(DOS$_cputs, libd__cputs);
+DEFINE_PUBLIC_ALIAS(DOS$__conio_common_vcprintf, libd___conio_common_vcprintf);
+DEFINE_PUBLIC_ALIAS(DOS$__conio_common_vcprintf_s, libd___conio_common_vcprintf_s);
+DEFINE_PUBLIC_ALIAS(DOS$__conio_common_vcprintf_p, libd___conio_common_vcprintf_p);
+DEFINE_PUBLIC_ALIAS(DOS$__conio_common_vcscanf, libd___conio_common_vcscanf);
+DEFINE_PUBLIC_ALIAS(DOS$_vcprintf_l, libd__vcprintf_l);
+DEFINE_PUBLIC_ALIAS(DOS$_vcprintf_s_l, libd__vcprintf_s_l);
+DEFINE_PUBLIC_ALIAS(DOS$_vcprintf_p_l, libd__vcprintf_p_l);
+DEFINE_PUBLIC_ALIAS(DOS$_vcscanf_l, libd__vcscanf_l);
+DEFINE_PUBLIC_ALIAS(DOS$_vcscanf_s_l, libd__vcscanf_s_l);
+DEFINE_PUBLIC_ALIAS(DOS$_vcprintf, libd__vcprintf);
+DEFINE_PUBLIC_ALIAS(DOS$_vcprintf_s, libd__vcprintf_s);
+DEFINE_PUBLIC_ALIAS(DOS$_vcprintf_p, libd__vcprintf_p);
+DEFINE_PUBLIC_ALIAS(DOS$_vcscanf, libd__vcscanf);
+DEFINE_PUBLIC_ALIAS(DOS$_vcscanf_s, libd__vcscanf_s);
 
 /* crypt */
 DEFINE_PUBLIC_ALIAS(DOS$setkey, libd_setkey);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78a0f942 */
+/* HASH CRC-32:0xc9afd17f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,6 +40,7 @@
 #define __stub__W_Gettnames
 #define __stub__Wcsftime
 #define __stub____lc_locale_name_func
+#define __stub___conio_common_vcwscanf
 #define __stub___control87_2
 #define __stub___fpecode
 #define __stub___h_errno_location
@@ -71,7 +72,16 @@
 #define __stub__get_output_format
 #define __stub__get_purecall_handler
 #define __stub__get_tzname
+#define __stub__getch
+#define __stub__getch_nolock
+#define __stub__getche
+#define __stub__getche_nolock
 #define __stub__getdiskfree
+#define __stub__getwch
+#define __stub__getwch_nolock
+#define __stub__getwche
+#define __stub__getwche_nolock
+#define __stub__kbhit
 #define __stub__lock_locales
 #define __stub__mbbtombc_l
 #define __stub__mbctombb_l
@@ -591,8 +601,13 @@
 #define __stub_DOS$_W_Gettnames
 #define __stub_DOS$_Wcsftime
 #define __stub_DOS$___lc_locale_name_func
+#define __stub_DOS$__conio_common_vcwscanf
 #define __stub_DOS$__wcserror
 #define __stub_DOS$__wcserror_s
+#define __stub_DOS$_getwch
+#define __stub_DOS$_getwch_nolock
+#define __stub_DOS$_getwche
+#define __stub_DOS$_getwche_nolock
 #define __stub_DOS$_wcreate_locale
 #define __stub_DOS$_wcserror
 #define __stub_DOS$_wcserror_s

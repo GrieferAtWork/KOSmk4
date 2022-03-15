@@ -1863,20 +1863,6 @@ NOTHROW_NCX(LIBCCALL libc_ftrylockfile)(FILE *__restrict stream)
 }
 /*[[[end:libc_ftrylockfile]]]*/
 
-/*[[[head:libc_funlockfile,hash:CRC-32=0x10594f1d]]]*/
-/* >> funlockfile(3)
- * Release a previously acquired lock from `stream' */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") NONNULL((1)) void
-NOTHROW_NCX(LIBCCALL libc_funlockfile)(FILE *__restrict stream)
-/*[[[body:libc_funlockfile]]]*/
-{
-	if likely(stream) {
-		stream = file_fromuser(stream);
-		file_lock_endwrite(stream);
-	}
-}
-/*[[[end:libc_funlockfile]]]*/
-
 /*[[[head:libc_flockfile,hash:CRC-32=0x2ffba992]]]*/
 /* >> flockfile(3)
  * Acquire a lock to `stream' and block until doing so succeeds */
@@ -1886,11 +1872,26 @@ NOTHROW_RPC(LIBCCALL libc_flockfile)(FILE *__restrict stream)
 {
 	if likely(stream) {
 		stream = file_fromuser(stream);
-		file_lock_write(stream);
+		if (FMUSTLOCK(stream))
+			file_lock_write(stream);
 	}
 }
 /*[[[end:libc_flockfile]]]*/
 
+/*[[[head:libc_funlockfile,hash:CRC-32=0x10594f1d]]]*/
+/* >> funlockfile(3)
+ * Release a previously acquired lock from `stream' */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") NONNULL((1)) void
+NOTHROW_NCX(LIBCCALL libc_funlockfile)(FILE *__restrict stream)
+/*[[[body:libc_funlockfile]]]*/
+{
+	if likely(stream) {
+		stream = file_fromuser(stream);
+		if (FMUSTLOCK(stream))
+			file_lock_endwrite(stream);
+	}
+}
+/*[[[end:libc_funlockfile]]]*/
 
 /*[[[head:libc_fflush,hash:CRC-32=0x5aeba993]]]*/
 /* >> fflush(3)

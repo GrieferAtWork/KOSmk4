@@ -211,10 +211,10 @@ struct IO_FILE_84 {
 	 *     compatibility!
 	 *   - For the standard streams, we simply link custom instances of `struct IO_FILE_84'
 	 * - For `io84_IO_read_ptr >= io84_IO_read_end':
-	 *   - `__if_pad0 = 0xffffffff;' in std-stream  replacements, causing the  high
-	 *     32 bits of `io84_IO_read_ptr' to be all 1es and following the assumption
-	 *     that libc is loaded somewhere other than the last 4GiB of memory  (which
-	 *     we  can always assume when hosted by  a high-memory kernel, which KOS is
+	 *   - `__if_pad0 = 0xffffffff;'  in std-stream replacements, causing the high
+	 *     32 bits of `io84_IO_read_ptr' to be all 1s and following the assumption
+	 *     that libc is loaded somewhere other than the last 4GiB of memory (which
+	 *     we can always assume when hosted by a high-memory kernel, which KOS  is
 	 *     on all supported architectures).
 	 *     This way, a compare becomes `0xffffffff???????? >= if_base', which should
 	 *     always equate `true'.
@@ -225,7 +225,7 @@ struct IO_FILE_84 {
 	 *   requiring  `if_cnt >= (uint32_t)if_base', which is  impossible to comply with.
 	 * - Instead, define a non-zero `file_uoffset' and have the KOS-style FILE object
 	 *   be padded with leading 0-bytes such that all of the important FILE-bytes are
-	 *   set to ZEROes (which is one of the way to comply with I/O requirements).
+	 *   set to ZEROes (which is one of the ways to comply with I/O requirements).
 	 */
 
 	/*32|64-bit * .................................... *     32-bit | 64-bit */

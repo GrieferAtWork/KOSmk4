@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x583e0e1b */
+/* HASH CRC-32:0x66919f5a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,6 +49,18 @@
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$___mb_cur_max_l_func
 #define __CRT_HAVE_DOS$__cmsg_nxthdr
+#define __CRT_HAVE_DOS$__conio_common_vcprintf
+#define __CRT_HAVE_DOS$__conio_common_vcprintf_p
+#define __CRT_HAVE_DOS$__conio_common_vcprintf_s
+#define __CRT_HAVE_DOS$__conio_common_vcscanf
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#define __CRT_HAVE_DOS$__conio_common_vcwprintf
+#define __CRT_HAVE_DOS$__conio_common_vcwprintf_p
+#define __CRT_HAVE_DOS$__conio_common_vcwprintf_s
+#define __CRT_HAVE_DOS$__conio_common_vcwscanf
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$__control87_2
 #define __CRT_HAVE_DOS$__fbufsize
 #define __CRT_HAVE_DOS$__fdelt_chk
@@ -240,6 +252,14 @@
 #define __CRT_HAVE_DOS$_byteswap_uint64
 #define __CRT_HAVE_DOS$_byteswap_ulong
 #define __CRT_HAVE_DOS$_byteswap_ushort
+#define __CRT_HAVE_DOS$_cgets
+#define __CRT_HAVE_DOS$_cgets_s
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#define __CRT_HAVE_DOS$_cgetws
+#define __CRT_HAVE_DOS$_cgetws_s
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_chdrive
 #define __CRT_HAVE_DOS$_chgsign
 #define __CRT_HAVE_DOS$_chgsignf
@@ -248,9 +268,39 @@
 #define __CRT_HAVE_DOS$_control87
 #define __CRT_HAVE_DOS$_controlfp
 #define __CRT_HAVE_DOS$_controlfp_s
+#define __CRT_HAVE_DOS$_cprintf
+#define __CRT_HAVE_DOS$_cprintf_l
+#define __CRT_HAVE_DOS$_cprintf_p
+#define __CRT_HAVE_DOS$_cprintf_p_l
+#define __CRT_HAVE_DOS$_cprintf_s
+#define __CRT_HAVE_DOS$_cprintf_s_l
+#define __CRT_HAVE_DOS$_cputs
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#define __CRT_HAVE_DOS$_cputws
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_create_locale
+#define __CRT_HAVE_DOS$_cscanf
+#define __CRT_HAVE_DOS$_cscanf_l
+#define __CRT_HAVE_DOS$_cscanf_s
+#define __CRT_HAVE_DOS$_cscanf_s_l
 #define __CRT_HAVE_DOS$_ctime32_s
 #define __CRT_HAVE_DOS$_ctime64_s
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#define __CRT_HAVE_DOS$_cwprintf
+#define __CRT_HAVE_DOS$_cwprintf_l
+#define __CRT_HAVE_DOS$_cwprintf_p
+#define __CRT_HAVE_DOS$_cwprintf_p_l
+#define __CRT_HAVE_DOS$_cwprintf_s
+#define __CRT_HAVE_DOS$_cwprintf_s_l
+#define __CRT_HAVE_DOS$_cwscanf
+#define __CRT_HAVE_DOS$_cwscanf_l
+#define __CRT_HAVE_DOS$_cwscanf_s
+#define __CRT_HAVE_DOS$_cwscanf_s_l
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_dpcomp
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -347,6 +397,10 @@
 #define __CRT_HAVE_DOS$_getsystime
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+#define __CRT_HAVE_DOS$_getwch
+#define __CRT_HAVE_DOS$_getwch_nolock
+#define __CRT_HAVE_DOS$_getwche
+#define __CRT_HAVE_DOS$_getwche_nolock
 #define __CRT_HAVE_DOS$_getws_s
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -616,9 +670,13 @@
 #define __CRT_HAVE_DOS$_printf_p
 #define __CRT_HAVE_DOS$_printf_p_l
 #define __CRT_HAVE_DOS$_printf_s_l
+#define __CRT_HAVE_DOS$_putch
+#define __CRT_HAVE_DOS$_putch_nolock
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$_putenv_s
+#define __CRT_HAVE_DOS$_putwch
+#define __CRT_HAVE_DOS$_putwch_nolock
 #define __CRT_HAVE_DOS$_putws
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -736,9 +794,41 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_umask_s
+#define __CRT_HAVE_DOS$_ungetch
+#define __CRT_HAVE_DOS$_ungetch_nolock
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#define __CRT_HAVE_DOS$_ungetwch
+#define __CRT_HAVE_DOS$_ungetwch_nolock
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_unitombc_l
 #define __CRT_HAVE_DOS$_unloaddll
 #define __CRT_HAVE_DOS$_unlock_fhandle
+#define __CRT_HAVE_DOS$_vcprintf
+#define __CRT_HAVE_DOS$_vcprintf_l
+#define __CRT_HAVE_DOS$_vcprintf_p
+#define __CRT_HAVE_DOS$_vcprintf_p_l
+#define __CRT_HAVE_DOS$_vcprintf_s
+#define __CRT_HAVE_DOS$_vcprintf_s_l
+#define __CRT_HAVE_DOS$_vcscanf
+#define __CRT_HAVE_DOS$_vcscanf_l
+#define __CRT_HAVE_DOS$_vcscanf_s
+#define __CRT_HAVE_DOS$_vcscanf_s_l
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#define __CRT_HAVE_DOS$_vcwprintf
+#define __CRT_HAVE_DOS$_vcwprintf_l
+#define __CRT_HAVE_DOS$_vcwprintf_p
+#define __CRT_HAVE_DOS$_vcwprintf_p_l
+#define __CRT_HAVE_DOS$_vcwprintf_s
+#define __CRT_HAVE_DOS$_vcwprintf_s_l
+#define __CRT_HAVE_DOS$_vcwscanf
+#define __CRT_HAVE_DOS$_vcwscanf_l
+#define __CRT_HAVE_DOS$_vcwscanf_s
+#define __CRT_HAVE_DOS$_vcwscanf_s_l
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_vfprintf_l
 #define __CRT_HAVE_DOS$_vfprintf_p
 #define __CRT_HAVE_DOS$_vfprintf_p_l
@@ -3911,6 +4001,14 @@
 #define __CRT_HAVE___assert_func
 #define __CRT_HAVE___assertfail
 #define __CRT_HAVE___cmsg_nxthdr
+#define __CRT_HAVE___conio_common_vcprintf
+#define __CRT_HAVE___conio_common_vcprintf_p
+#define __CRT_HAVE___conio_common_vcprintf_s
+#define __CRT_HAVE___conio_common_vcscanf
+#define __CRT_HAVE___conio_common_vcwprintf
+#define __CRT_HAVE___conio_common_vcwprintf_p
+#define __CRT_HAVE___conio_common_vcwprintf_s
+#define __CRT_HAVE___conio_common_vcwscanf
 #define __CRT_HAVE___control87_2
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE___crt_unreachable
@@ -4133,6 +4231,10 @@
 #define __CRT_HAVE__cchshf
 #define __CRT_HAVE__cchshl
 #define __CRT_HAVE__cexit
+#define __CRT_HAVE__cgets
+#define __CRT_HAVE__cgets_s
+#define __CRT_HAVE__cgetws
+#define __CRT_HAVE__cgetws_s
 #define __CRT_HAVE__chdrive
 #define __CRT_HAVE__chgsign
 #define __CRT_HAVE__chgsignf
@@ -4142,12 +4244,34 @@
 #define __CRT_HAVE__control87
 #define __CRT_HAVE__controlfp
 #define __CRT_HAVE__controlfp_s
+#define __CRT_HAVE__cprintf
+#define __CRT_HAVE__cprintf_l
+#define __CRT_HAVE__cprintf_p
+#define __CRT_HAVE__cprintf_p_l
+#define __CRT_HAVE__cprintf_s
+#define __CRT_HAVE__cprintf_s_l
+#define __CRT_HAVE__cputs
+#define __CRT_HAVE__cputws
 #define __CRT_HAVE__create_locale
+#define __CRT_HAVE__cscanf
+#define __CRT_HAVE__cscanf_l
+#define __CRT_HAVE__cscanf_s
+#define __CRT_HAVE__cscanf_s_l
 #define __CRT_HAVE__ctans
 #define __CRT_HAVE__ctansf
 #define __CRT_HAVE__ctansl
 #define __CRT_HAVE__ctime32_s
 #define __CRT_HAVE__ctime64_s
+#define __CRT_HAVE__cwprintf
+#define __CRT_HAVE__cwprintf_l
+#define __CRT_HAVE__cwprintf_p
+#define __CRT_HAVE__cwprintf_p_l
+#define __CRT_HAVE__cwprintf_s
+#define __CRT_HAVE__cwprintf_s_l
+#define __CRT_HAVE__cwscanf
+#define __CRT_HAVE__cwscanf_l
+#define __CRT_HAVE__cwscanf_s
+#define __CRT_HAVE__cwscanf_s_l
 #define __CRT_HAVE__dpcomp
 #define __CRT_HAVE__dtest
 #define __CRT_HAVE__dupenv_s
@@ -4226,6 +4350,10 @@
 #define __CRT_HAVE__get_tzname
 #define __CRT_HAVE__get_wenviron
 #define __CRT_HAVE__get_wpgmptr
+#define __CRT_HAVE__getch
+#define __CRT_HAVE__getch_nolock
+#define __CRT_HAVE__getche
+#define __CRT_HAVE__getche_nolock
 #define __CRT_HAVE__getcwd_dbg
 #define __CRT_HAVE__getdcwd
 #define __CRT_HAVE__getdcwd_dbg
@@ -4237,6 +4365,10 @@
 #define __CRT_HAVE__getmbcp
 #define __CRT_HAVE__getmbcp_l
 #define __CRT_HAVE__getsystime
+#define __CRT_HAVE__getwch
+#define __CRT_HAVE__getwch_nolock
+#define __CRT_HAVE__getwche
+#define __CRT_HAVE__getwche_nolock
 #define __CRT_HAVE__getws_s
 #define __CRT_HAVE__gmtime32_s
 #define __CRT_HAVE__gmtime64_s
@@ -4317,6 +4449,7 @@
 #define __CRT_HAVE__itoa_upper_digits
 #define __CRT_HAVE__itow
 #define __CRT_HAVE__itow_s
+#define __CRT_HAVE__kbhit
 #define __CRT_HAVE__ldpcomp
 #define __CRT_HAVE__ldtest
 #define __CRT_HAVE__lfind_s
@@ -4481,7 +4614,11 @@
 #define __CRT_HAVE__printf_p
 #define __CRT_HAVE__printf_p_l
 #define __CRT_HAVE__printf_s_l
+#define __CRT_HAVE__putch
+#define __CRT_HAVE__putch_nolock
 #define __CRT_HAVE__putenv_s
+#define __CRT_HAVE__putwch
+#define __CRT_HAVE__putwch_nolock
 #define __CRT_HAVE__putws
 #define __CRT_HAVE__query_new_handler
 #define __CRT_HAVE__query_new_mode
@@ -4593,10 +4730,34 @@
 #define __CRT_HAVE__ultow
 #define __CRT_HAVE__ultow_s
 #define __CRT_HAVE__umask_s
+#define __CRT_HAVE__ungetch
+#define __CRT_HAVE__ungetch_nolock
+#define __CRT_HAVE__ungetwch
+#define __CRT_HAVE__ungetwch_nolock
 #define __CRT_HAVE__unitombc_l
 #define __CRT_HAVE__unloaddll
 #define __CRT_HAVE__unlock_fhandle
 #define __CRT_HAVE__unlock_locales
+#define __CRT_HAVE__vcprintf
+#define __CRT_HAVE__vcprintf_l
+#define __CRT_HAVE__vcprintf_p
+#define __CRT_HAVE__vcprintf_p_l
+#define __CRT_HAVE__vcprintf_s
+#define __CRT_HAVE__vcprintf_s_l
+#define __CRT_HAVE__vcscanf
+#define __CRT_HAVE__vcscanf_l
+#define __CRT_HAVE__vcscanf_s
+#define __CRT_HAVE__vcscanf_s_l
+#define __CRT_HAVE__vcwprintf
+#define __CRT_HAVE__vcwprintf_l
+#define __CRT_HAVE__vcwprintf_p
+#define __CRT_HAVE__vcwprintf_p_l
+#define __CRT_HAVE__vcwprintf_s
+#define __CRT_HAVE__vcwprintf_s_l
+#define __CRT_HAVE__vcwscanf
+#define __CRT_HAVE__vcwscanf_l
+#define __CRT_HAVE__vcwscanf_s
+#define __CRT_HAVE__vcwscanf_s_l
 #define __CRT_HAVE__vfprintf_l
 #define __CRT_HAVE__vfprintf_p
 #define __CRT_HAVE__vfprintf_p_l
