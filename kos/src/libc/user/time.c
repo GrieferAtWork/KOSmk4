@@ -135,31 +135,7 @@ NOTHROW_NCX(LIBCCALL libc__get_tzname)(size_t *result,
 
 
 
-/*[[[head:libc__getsystime,hash:CRC-32=0x65ac72ef]]]*/
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) unsigned int
-NOTHROW_NCX(LIBCCALL libc__getsystime)(struct tm *tms)
-/*[[[body:libc__getsystime]]]*/
-/*AUTO*/{
-	(void)tms;
-	CRT_UNIMPLEMENTEDF("_getsystime(%p)", tms); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc__getsystime]]]*/
 
-/*[[[head:libc__setsystime,hash:CRC-32=0xeb143a15]]]*/
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) unsigned int
-NOTHROW_NCX(LIBCCALL libc__setsystime)(struct tm __KOS_FIXED_CONST *tms,
-                                       unsigned int milliseconds)
-/*[[[body:libc__setsystime]]]*/
-/*AUTO*/{
-	(void)tms;
-	(void)milliseconds;
-	CRT_UNIMPLEMENTEDF("_setsystime(%p, %x)", tms, milliseconds); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc__setsystime]]]*/
 
 
 
@@ -575,7 +551,7 @@ NOTHROW_NCX(LIBCCALL libc_timer_settime64)(timer_t timerid,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x46ec273a]]]*/
+/*[[[start:exports,hash:CRC-32=0x1c734a4f]]]*/
 DEFINE_PUBLIC_ALIAS(clock, libc_clock);
 DEFINE_PUBLIC_ALIAS(__time, libc_time);
 DEFINE_PUBLIC_ALIAS(__libc_time, libc_time);
@@ -622,8 +598,6 @@ DEFINE_PUBLIC_ALIAS(getdate, libc_getdate);
 DEFINE_PUBLIC_ALIAS(clock_adjtime, libc_clock_adjtime);
 DEFINE_PUBLIC_ALIAS(clock_adjtime64, libc_clock_adjtime64);
 DEFINE_PUBLIC_ALIAS(_get_tzname, libc__get_tzname);
-DEFINE_PUBLIC_ALIAS(_getsystime, libc__getsystime);
-DEFINE_PUBLIC_ALIAS(_setsystime, libc__setsystime);
 /*[[[end:exports]]]*/
 
 DECL_END

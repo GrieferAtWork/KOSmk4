@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64a9b4eb */
+/* HASH CRC-32:0x8d417d0c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -508,7 +508,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsncpy_l)(unsigned char *buf,
 			}
 		}
 	}
-	/* Really weird quirk: until this point, `max_chars' were countered
+	/* Really weird  quirk: until  this point,  `max_chars' were  counted
 	 * in chars, but this zero-padding (which is also done by DOS), would
 	 * mean that it's suddenly counted in characters... */
 	libc_bzero(dst, max_chars);
@@ -1349,7 +1349,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsncpy_s_l)(unsigned char *buf,
 	}
 	if (true_bufsize < max_chars)
 		return 22;
-	/* Really weird quirk: until this point, `max_chars' were countered
+	/* Really weird  quirk: until  this point,  `max_chars' were  counted
 	 * in chars, but this zero-padding (which is also done by DOS), would
 	 * mean that it's suddenly counted in characters... */
 	libc_bzero(buf, max_chars);
@@ -1740,7 +1740,7 @@ NOTHROW_NCX(LIBCCALL libc__mbcjistojms_l)(unsigned int ch,
 		return ch;
 	c1 = ch & 0xff;
 	c2 = ch >> 8 & 0xff;
-	if ((c1 > 0x7e) || (c1 < 0x21) || 
+	if ((c1 > 0x7e) || (c1 < 0x21) ||
 	    (c2 > 0x7e) || (c2 < 0x21)) {
 
 		__libc_seterrno(EILSEQ);

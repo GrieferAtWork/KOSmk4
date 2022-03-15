@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad8fb697 */
+/* HASH CRC-32:0xbe0b5591 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <libc/template/timezone.h>
 #ifdef __LOCAL_timezone
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_get_timezone) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_get_timezone))(long *__p_seconds) {

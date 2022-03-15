@@ -443,8 +443,8 @@ NOTHROW(FCALL mfile_delete_withfilelock_ex)(REF struct mfile *__restrict file,
 		sig_completion_init(&file->_mf_compl, &mfile_zerotrunc_completion_cb);
 		sig_connect_completion_for_poll(&file->mf_initdone, &file->_mf_compl);
 
-		/* Make sure that the completion-callback  is always invoked in  case
-		 * the `mf_trunclock' countered dropped to zero before our completion
+		/* Make sure that the completion-callback is always invoked in case
+		 * the `mf_trunclock' counter dropped to zero before our completion
 		 * callback was connected. */
 		if unlikely(ATOMIC_READ(file->mf_trunclock) == 0)
 			sig_broadcast(&file->mf_initdone);

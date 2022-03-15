@@ -656,7 +656,7 @@ unsigned char *_mbsncpy_l([[nonnull]] unsigned char *buf,
 			}
 		}
 	}
-	/* Really weird quirk: until this point, `max_chars' were countered
+	/* Really weird  quirk: until  this point,  `max_chars' were  counted
 	 * in chars, but this zero-padding (which is also done by DOS), would
 	 * mean that it's suddenly counted in characters... */
 	bzero(dst, max_chars);
@@ -1538,7 +1538,7 @@ size_t _mbclen_l([[nonnull]] unsigned char const *str, $locale_t locale) {
 	}
 	if (true_bufsize < max_chars)
 		return DOS_EINVAL;
-	/* Really weird quirk: until this point, `max_chars' were countered
+	/* Really weird  quirk: until  this point,  `max_chars' were  counted
 	 * in chars, but this zero-padding (which is also done by DOS), would
 	 * mean that it's suddenly counted in characters... */
 	bzero(buf, max_chars);
@@ -1941,7 +1941,7 @@ unsigned int _mbcjistojms_l(unsigned int ch, $locale_t locale) {
 		return ch;
 	c1 = ch & 0xff;
 	c2 = ch >> 8 & 0xff;
-	if ((c1 > 0x7e) || (c1 < 0x21) || 
+	if ((c1 > 0x7e) || (c1 < 0x21) ||
 	    (c2 > 0x7e) || (c2 < 0x21)) {
 @@pp_ifdef EILSEQ@@
 		__libc_seterrno(EILSEQ);
@@ -2016,7 +2016,7 @@ unsigned int _mbctokata_l(unsigned int ch,
 	return result;
 }
 
-/* TODO: These two are kind-of complicated. Disassembly shows that they're using
+/* TODO: These two are kind-of complicated. Disassembly shows that they're  using
  *       some kind of large lookup table, but I have yet to understand the format
  *       or meaning of that table.
  * If possible, I'd like to implement these through libiconv */

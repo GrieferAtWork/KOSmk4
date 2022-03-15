@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe097b4d5 */
+/* HASH CRC-32:0x9b3616f4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <libc/template/daylight.h>
 #ifdef __LOCAL_daylight
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_get_daylight) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_get_daylight))(int *__p_result) {

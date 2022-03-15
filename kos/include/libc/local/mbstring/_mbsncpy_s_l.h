@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f6c01f5 */
+/* HASH CRC-32:0xe563e384 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,7 +78,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsncpy_s_l))(unsigned char *__buf, 
 	}
 	if (__true_bufsize < __max_chars)
 		return 22;
-	/* Really weird quirk: until this point, `max_chars' were countered
+	/* Really weird  quirk: until  this point,  `max_chars' were  counted
 	 * in chars, but this zero-padding (which is also done by DOS), would
 	 * mean that it's suddenly counted in characters... */
 	(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__buf, __max_chars);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca8ec0c8 */
+/* HASH CRC-32:0x6c8cb1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -179,12 +179,12 @@ INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct tm *NOTHROW_NCX(LIBCCALL libc
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_stime)(time_t const *when);
 /* >> timegm(3), timegm64(3)
  * Like `mktime', but `tp' represents Universal Time (UTC), not local time */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) time_t NOTHROW_NCX(LIBDCALL libd_timegm)(struct tm *tp);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) time_t NOTHROW_NCX(LIBDCALL libd_timegm)(struct tm __KOS_FIXED_CONST *tp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> timegm(3), timegm64(3)
  * Like `mktime', but `tp' represents Universal Time (UTC), not local time */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) time_t NOTHROW_NCX(LIBCCALL libc_timegm)(struct tm *tp);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) time_t NOTHROW_NCX(LIBCCALL libc_timegm)(struct tm __KOS_FIXED_CONST *tp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> dysize(3)
@@ -202,12 +202,12 @@ INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_dysize)(__STDC_INT_AS_UI
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_stime64)(time64_t const *when);
 /* >> timegm(3), timegm64(3)
  * Like `mktime', but `tp' represents Universal Time (UTC), not local time */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) time64_t NOTHROW_NCX(LIBDCALL libd_timegm64)(struct tm *tp);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) time64_t NOTHROW_NCX(LIBDCALL libd_timegm64)(struct tm __KOS_FIXED_CONST *tp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> timegm(3), timegm64(3)
  * Like `mktime', but `tp' represents Universal Time (UTC), not local time */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) time64_t NOTHROW_NCX(LIBCCALL libc_timegm64)(struct tm *tp);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) time64_t NOTHROW_NCX(LIBCCALL libc_timegm64)(struct tm __KOS_FIXED_CONST *tp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> nanosleep(2), nanosleep64(2)
@@ -503,18 +503,6 @@ INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBDCALL libd__ctime64_s)(char buf[26
 INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBCCALL libc__ctime64_s)(char buf[26], size_t bufsize, time64_t const *__restrict timer);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) time32_t NOTHROW_NCX(LIBDCALL libd__mkgmtime32)(struct tm __KOS_FIXED_CONST *tp);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) time32_t NOTHROW_NCX(LIBCCALL libc__mkgmtime32)(struct tm __KOS_FIXED_CONST *tp);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) time64_t NOTHROW_NCX(LIBDCALL libd__mkgmtime64)(struct tm __KOS_FIXED_CONST *tp);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) time64_t NOTHROW_NCX(LIBCCALL libc__mkgmtime64)(struct tm __KOS_FIXED_CONST *tp);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd__strtime)(char buf[9]);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -540,8 +528,16 @@ INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc__strdate_s)(char *buf, siz
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((1)) unsigned int NOTHROW_NCX(LIBDCALL libd__getsystime)(struct tm *tms);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF NONNULL((1)) unsigned int NOTHROW_NCX(LIBCCALL libc__getsystime)(struct tm *tms);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((1)) unsigned int NOTHROW_NCX(LIBDCALL libd__setsystime)(struct tm __KOS_FIXED_CONST *tms, unsigned int milliseconds);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF NONNULL((1)) unsigned int NOTHROW_NCX(LIBCCALL libc__setsystime)(struct tm __KOS_FIXED_CONST *tms, unsigned int milliseconds);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

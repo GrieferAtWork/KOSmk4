@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1befe9 */
+/* HASH CRC-32:0x97f88c48 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -121,8 +121,6 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_clock_adjtime)(clockid_t clock_id, struct t
 /* >> clock_adjtime(2), clock_adjtime64(2) */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_clock_adjtime64)(clockid_t clock_id, struct timex64 *utx);
 INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBCCALL libc__get_tzname)(size_t *result, char *buf, size_t bufsize, int index);
-INTDEF NONNULL((1)) unsigned int NOTHROW_NCX(LIBCCALL libc__getsystime)(struct tm *tms);
-INTDEF NONNULL((1)) unsigned int NOTHROW_NCX(LIBCCALL libc__setsystime)(struct tm __KOS_FIXED_CONST *tms, unsigned int milliseconds);
 #endif /* !__KERNEL__ */
 
 DECL_END

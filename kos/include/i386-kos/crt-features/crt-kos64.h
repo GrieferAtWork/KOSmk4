@@ -1727,9 +1727,6 @@
 #define __CRT_HAVE__mbsupr_s_l
 #define __CRT_HAVE__mbtowc_l
 #define __CRT_HAVE__mkdir
-#define __CRT_HAVE__mkgmtime
-#define __CRT_HAVE__mkgmtime32
-#define __CRT_HAVE__mkgmtime64
 #define __CRT_HAVE__mktemp_s
 #define __CRT_HAVE__msize
 #define __CRT_HAVE__msize_dbg
@@ -5944,6 +5941,9 @@
 #define __CRT_HAVE__memccpy
 #define __CRT_HAVE__memicmp
 #define __CRT_HAVE__memicmp_l
+#define __CRT_HAVE__mkgmtime
+#define __CRT_HAVE__mkgmtime32
+#define __CRT_HAVE__mkgmtime64
 #define __CRT_HAVE__mktemp
 #define __CRT_HAVE__mktime32
 #define __CRT_HAVE__mktime64
@@ -7322,9 +7322,6 @@
 #define __CRT_HAVE_KOS$_mbsupr_s_l
 #define __CRT_HAVE_KOS$_mbtowc_l
 #define __CRT_HAVE_KOS$_mkdir
-#define __CRT_HAVE_KOS$_mkgmtime
-#define __CRT_HAVE_KOS$_mkgmtime32
-#define __CRT_HAVE_KOS$_mkgmtime64
 #define __CRT_HAVE_KOS$_mktemp_s
 #define __CRT_HAVE_KOS$_msize
 #define __CRT_HAVE_KOS$_open_osfhandle

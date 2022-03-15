@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc432bb5b */
+/* HASH CRC-32:0x43cd0f70 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <libc/template/dstbias.h>
 #ifdef __LOCAL_dstbias
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_get_dstbias) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_get_dstbias))(__LONG32_TYPE__ *__p_result) {

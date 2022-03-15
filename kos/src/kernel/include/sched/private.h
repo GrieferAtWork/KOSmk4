@@ -54,7 +54,7 @@ typedef NOBLOCK NONNULL((2)) void
  * @param: func:      The function used to access `thread's private variables.
  * @param: stack_buf: A buffer of `bufsize'  bytes that is allocated  in the caller's kernel  stack.
  *                    This buffer is passed to `func()' when `thread' is hosted by the caller's CPU.
- *                    When `thread' is  hosted by  a different  CPU, a  reference countered  control
+ *                    When  `thread'  is hosted  by  a different  CPU,  a reference  counted control
  *                    structure containing  sufficient space  for `bufsize'  is allocated  and  pre-
  *                    initialized with the contents of `stack_buf'.  Following this, an IPI is  used
  *                    to invoke `func' in the context  of `thread->t_cpu', whilst passing a  pointer

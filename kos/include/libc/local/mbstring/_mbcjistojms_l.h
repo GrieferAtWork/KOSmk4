@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8541473 */
+/* HASH CRC-32:0x5389291 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbcjistojms_l))(unsigned int __ch, _
 		return __ch;
 	__c1 = __ch & 0xff;
 	__c2 = __ch >> 8 & 0xff;
-	if ((__c1 > 0x7e) || (__c1 < 0x21) || 
+	if ((__c1 > 0x7e) || (__c1 < 0x21) ||
 	    (__c2 > 0x7e) || (__c2 < 0x21)) {
 #ifdef __EILSEQ
 		__libc_seterrno(__EILSEQ);

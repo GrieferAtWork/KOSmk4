@@ -534,7 +534,7 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 			}
 			result.append(l);
 		} else if ("```" in l) {
-			/* Disable reflow when ``` is countered. */
+			/* Disable reflow when ``` is encountered. */
 			local start = l.index("```");
 			local end   = l.find("```", start + 3);
 			if (end >= 0)
