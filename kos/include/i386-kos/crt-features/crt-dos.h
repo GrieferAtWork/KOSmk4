@@ -943,7 +943,7 @@
 #define __CRT_HAVE__realloc_crt
 #define __CRT_HAVE__recalloc_crt
 #endif /* !_DEBUG && __MSVCRT_VERSION__ >= 100 && __MSVCRT_VERSION__ <= 120 */
-#if !defined(__x86_64__)
+#ifndef __x86_64__
 #define __CRT_HAVE__CIacos
 #define __CRT_HAVE__CIasin
 #define __CRT_HAVE__CIatan

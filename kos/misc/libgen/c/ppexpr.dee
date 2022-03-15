@@ -1581,8 +1581,8 @@ function optimizeForIfdef(expr: string): string {
 		if (definedName.issymbol())
 			return "#ifdef {}\n".format({ definedName });
 	}
-	if (expr.startswith("!defined(") && expr.endswith(")") &&
-	    expr.findmatch("(", ")", 9) == #expr - 1) {
+	if (result.startswith("!defined(") && result.endswith(")") &&
+	    result.findmatch("(", ")", 9) == #result - 1) {
 		local definedName = result[9:-1].strip();
 		if (definedName.issymbol())
 			return "#ifndef {}\n".format({ definedName });
@@ -1602,6 +1602,13 @@ function optimizeForEndif(expr: string): string {
 
 
 #ifdef __MAIN__
+
+assert optimizeForIfdef("FOO") == "#if FOO\n";
+assert optimizeForIfdef("defined(FOO)") == "#ifdef FOO\n";
+assert optimizeForIfdef("!defined(FOO)") == "#ifndef FOO\n";
+assert optimizeForEndif("FOO") == "#endif /* FOO */\n";
+assert optimizeForEndif("defined(FOO)") == "#endif /* FOO */\n";
+assert optimizeForEndif("!defined(FOO)") == "#endif /* !FOO */\n";
 
 assert optimize("0 && 0") == "0";
 assert optimize("1 && 0") == "0";
