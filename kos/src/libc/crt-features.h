@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d67be74 */
+/* HASH CRC-32:0xb664330f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6168,6 +6168,7 @@
 #define __CRT_HAVE_nice
 #define __CRT_HAVE_nl_langinfo
 #define __CRT_HAVE_nl_langinfo_l
+#define __CRT_HAVE_normalize_struct_tm
 #define __CRT_HAVE_nrand48
 #define __CRT_HAVE_nrand48_r
 #define __CRT_HAVE_ns_datetosecs

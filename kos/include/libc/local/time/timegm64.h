@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e307ac1 */
+/* HASH CRC-32:0x3b3931ba */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,6 +45,13 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_
 #undef __local___localdep_crt_timegm32_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_timegm32_defined */
+#ifndef __local___localdep_normalize_struct_tm_defined
+#define __local___localdep_normalize_struct_tm_defined
+__NAMESPACE_LOCAL_END
+#include <libc/local/time/normalize_struct_tm.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_normalize_struct_tm __LIBC_LOCAL_NAME(normalize_struct_tm)
+#endif /* !__local___localdep_normalize_struct_tm_defined */
 __NAMESPACE_LOCAL_END
 #ifndef __yearstodays
 #define __yearstodays(__n_years) (((146097 * (__n_years)) / 400) /*-1*/) /* rounding error? */
@@ -56,7 +63,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timegm64))(struct __NAMESPACE_STD_SYM
 	return (__time64_t)(__NAMESPACE_LOCAL_SYM __localdep_crt_timegm32)(__tp);
 #else /* __CRT_HAVE_timegm || __CRT_HAVE__mkgmtime || __CRT_HAVE__mkgmtime32 */
 	__time64_t __result;
-	/* TODO: Normalize `tp' */
+	/* Normalize `tp' */
+	__tp = (__NAMESPACE_LOCAL_SYM __localdep_normalize_struct_tm)(__tp);
+	/* Calculate current time. */
 	__result = __yearstodays(__tp->tm_year) - __yearstodays(1970);
 	__result += __tp->tm_yday;
 	__result *= 86400;

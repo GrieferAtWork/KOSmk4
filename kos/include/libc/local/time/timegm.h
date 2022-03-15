@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x487c2f07 */
+/* HASH CRC-32:0x175e311b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,13 @@
 #include <bits/types.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_normalize_struct_tm_defined
+#define __local___localdep_normalize_struct_tm_defined
+__NAMESPACE_LOCAL_END
+#include <libc/local/time/normalize_struct_tm.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_normalize_struct_tm __LIBC_LOCAL_NAME(normalize_struct_tm)
+#endif /* !__local___localdep_normalize_struct_tm_defined */
 #ifndef __local___localdep_timegm64_defined
 #define __local___localdep_timegm64_defined
 #if defined(__CRT_HAVE_timegm) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -43,14 +50,13 @@ __NAMESPACE_LOCAL_END
 #ifndef __yearstodays
 #define __yearstodays(__n_years) (((146097 * (__n_years)) / 400) /*-1*/) /* rounding error? */
 #endif /* !__yearstodays */
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(timegm) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __TM_TYPE(time)
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timegm))(struct __NAMESPACE_STD_SYM tm *__tp) {
+	__time64_t __result;
 
-	return (__TM_TYPE(time))(__NAMESPACE_LOCAL_SYM __localdep_timegm64)(__tp);
-
-
-
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_timegm64)(__tp);
 
 
 
@@ -59,6 +65,22 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timegm))(struct __NAMESPACE_STD_SYM t
 
 
 
+
+
+
+
+	/* EOVERFLOW if result gets truncated */
+#if __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__
+	if ((__time64_t)(__TM_TYPE(time))__result != __result) {
+#ifdef __EOVERFLOW
+		return (__TM_TYPE(time))__libc_seterrno(__EOVERFLOW);
+#else /* __EOVERFLOW */
+		return (__TM_TYPE(time))__libc_seterrno(1);
+#endif /* !__EOVERFLOW */
+	}
+#endif /* __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__ */
+
+	return (__TM_TYPE(time))__result;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_timegm_defined

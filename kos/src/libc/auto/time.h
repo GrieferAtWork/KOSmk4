@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51ac01df */
+/* HASH CRC-32:0x91552a41 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,9 @@
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
+INTDEF ATTR_RETNONNULL NONNULL((1)) struct tm *NOTHROW_NCX(LIBCCALL libc_normalize_struct_tm)(struct tm *__restrict tp);
+#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> time(2), time64(2)
  * Return the current time and put it in `*timer' if `timer' is not `NULL' */

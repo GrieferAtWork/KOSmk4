@@ -1319,7 +1319,7 @@ do_return_const:
 		local escapeStart = self.tokStart;
 		local escapeEnd = self.tokEnd;
 		tok = self.next();
-		while (tok in "([{<") {
+		while (tok in "([{") {
 			self.skipPair();
 			escapeEnd = self.tokEnd;
 			tok = self.next();

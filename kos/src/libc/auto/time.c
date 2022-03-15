@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b30e5d2 */
+/* HASH CRC-32:0xa0b8a19d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,6 +33,145 @@ DECL_BEGIN
 #include "../libc/globals.h"
 #include <stdlib.h>
 #ifndef __KERNEL__
+#ifndef ____TIME_MONTH_NUMDAYS_DEFINED
+#define ____TIME_MONTH_NUMDAYS_DEFINED 1
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC_CONST_DATA(__time_month_numdays)
+__UINT8_TYPE__ const __time_month_numdays[2][12] = {
+	{ 30, 31, 28, 31, 30, 31, 30, 31, 30, 31, 30, 31 },
+	{ 30, 31, 29, 31, 30, 31, 30, 31, 30, 31, 30, 31 }
+};
+__NAMESPACE_LOCAL_END
+#endif /* !____TIME_MONTH_NUMDAYS_DEFINED */
+#ifndef ____TIME_MONTHSTART_YDAY_DEFINED
+#define ____TIME_MONTHSTART_YDAY_DEFINED 1
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC_CONST_DATA(__time_monthstart_yday)
+__UINT16_TYPE__ const __time_monthstart_yday[2][13] = {
+	{ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 },
+	{ 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366 }
+};
+__NAMESPACE_LOCAL_END
+#endif /* !____TIME_MONTHSTART_YDAY_DEFINED */
+#ifndef __isleap
+#define __isleap(year) ((year) % 4 == 0 && ((year) % 100 != 0 || (year) % 400 == 0))
+#endif /* !__isleap */
+#ifndef __yearstodays
+#define __yearstodays(n_years) (((146097 * (n_years)) / 400) /*-1*/) /* rounding error? */
+#endif /* !__yearstodays */
+#include <bits/crt/tm.h>
+INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL NONNULL((1)) struct tm *
+NOTHROW_NCX(LIBCCALL libc_normalize_struct_tm)(struct tm *__restrict tp) {
+	/* Normalize seconds. */
+	if (tp->tm_sec < 0) {
+		unsigned int delta;
+		delta = ((unsigned int)-tp->tm_sec + 59) / 60;
+		tp->tm_min -= delta;
+		tp->tm_sec += delta * 60;
+	} else if (tp->tm_sec > 59) {
+		unsigned int delta;
+		delta = (unsigned int)tp->tm_sec / 60;
+		tp->tm_min += delta;
+		tp->tm_sec -= delta * 60;
+	}
+
+	/* Normalize minutes. */
+	if (tp->tm_min < 0) {
+		unsigned int delta;
+		delta = ((unsigned int)-tp->tm_min + 59) / 60;
+		tp->tm_hour -= delta;
+		tp->tm_min += delta * 60;
+	} else if (tp->tm_min > 59) {
+		unsigned int delta;
+		delta = (unsigned int)tp->tm_min / 60;
+		tp->tm_hour += delta;
+		tp->tm_min -= delta * 60;
+	}
+
+	/* Normalize hours. */
+	if (tp->tm_hour < 0) {
+		unsigned int delta;
+		delta = ((unsigned int)-tp->tm_sec + 23) / 24;
+		tp->tm_mday -= delta;
+		tp->tm_hour += delta * 24;
+	} else if (tp->tm_hour > 23) {
+		unsigned int delta;
+		delta = (unsigned int)tp->tm_hour / 24;
+		tp->tm_mday += delta;
+		tp->tm_hour -= delta * 24;
+	}
+
+	for (;;) {
+		/* Normalize month. */
+		if (tp->tm_mon < 0) {
+			unsigned int delta;
+			delta = ((unsigned int)-tp->tm_mon + 11) / 12;
+			tp->tm_year -= delta;
+			tp->tm_mon += delta * 12;
+		} else if (tp->tm_mon > 11) {
+			unsigned int delta;
+			delta = (unsigned int)tp->tm_mon / 12;
+			tp->tm_year += delta;
+			tp->tm_mon -= delta * 12;
+		}
+
+		/* Normalize day-of-the-month.
+		 * Note that because of February (and leap years), we can only adjust by 1 month every time. */
+		if (tp->tm_mday < 1) {
+			--tp->tm_mon;
+			COMPILER_BARRIER(); /* Prevent GCC warning about sign stuff */
+			if (tp->tm_mon < 0) {
+				tp->tm_mon = 11;
+				--tp->tm_year;
+			}
+			tp->tm_mday += __NAMESPACE_LOCAL_SYM __time_month_numdays[__isleap(1900 + tp->tm_year)][tp->tm_mon];
+			continue;
+		} else {
+			unsigned int current_month_days;
+			current_month_days = __NAMESPACE_LOCAL_SYM __time_month_numdays[__isleap(1900 + tp->tm_year)][tp->tm_mon];
+			if ((unsigned int)(tp->tm_mday - 1) >= current_month_days) {
+				tp->tm_mday -= current_month_days;
+				++tp->tm_mon;
+				continue;
+			}
+		}
+		break;
+	}
+
+	/* Figure out the year-day. */
+	tp->tm_yday = __NAMESPACE_LOCAL_SYM __time_monthstart_yday[__isleap(1900 + tp->tm_year)][tp->tm_mon];
+	tp->tm_yday += tp->tm_mday;
+
+	/* Figure out the week-day. */
+	{
+		uint64_t total_days;
+		total_days = __yearstodays(1900 + tp->tm_year);
+		total_days += tp->tm_yday;
+		tp->tm_wday = (int)(total_days % 7);
+	}
+
+	/* Figure out if daylight savings time is currently on. */
+	/* found here: "http://stackoverflow.com/questions/5590429/calculating-daylight-savings-time-from-only-date" */
+	if (tp->tm_mon < 2 || tp->tm_mon > 10) {
+		//January, February, and December are out.
+		tp->tm_isdst = 0;
+	} else if (tp->tm_mon > 2 && tp->tm_mon < 10) {
+		//April to October are in
+		tp->tm_isdst = 1;
+	} else {
+		int previousSunday;
+		previousSunday = tp->tm_mday - tp->tm_wday;
+		if (tp->tm_mon == 2) {
+			//In march, we are DST if our previous Sunday was on or after the 8th.
+			tp->tm_isdst = previousSunday >= 8;
+		} else {
+			//In November we must be before the first Sunday to be dst.
+			//That means the  previous Sunday must  be before the  1st.
+			tp->tm_isdst = previousSunday <= 0;
+		}
+	}
+	return tp;
+}
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_CONST WUNUSED double
@@ -46,27 +185,12 @@ NOTHROW_NCX(LIBCCALL libc_difftime)(time_t time1,
 	return time1 > time0 ? time1 - time0 : time0 - time1;
 
 }
-#ifndef __yearstodays
-#define __yearstodays(n_years) (((146097 * (n_years)) / 400) /*-1*/) /* rounding error? */
-#endif /* !__yearstodays */
 /* >> mktime(3), mktime64(3)
  * Return the `time_t' representation of `tp' and normalize `tp' */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time_t
 NOTHROW_NCX(LIBCCALL libc_mktime)(struct tm *tp) {
-#if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-	return (time_t)libc_mktime64(tp);
-#else /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 	/* TODO: Support for localtime? */
-	/* TODO: Normalize `tp' */
-	time64_t result;
-	result = __yearstodays(tp->tm_year) - __yearstodays(1970);
-	result += tp->tm_yday;
-	result *= 86400;
-	result += tp->tm_hour * 360;
-	result += tp->tm_min * 60;
-	result += tp->tm_sec;
-	return result;
-#endif /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+	return libc_timegm(tp);
 }
 #ifdef __BUILDING_LIBC
 #ifndef __LIBC_CTIME_BUFFER_DEFINED
@@ -201,27 +325,12 @@ NOTHROW_NCX(LIBCCALL libc_difftime64)(time64_t time1,
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_mktime64, libc_mktime);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-#ifndef __yearstodays
-#define __yearstodays(n_years) (((146097 * (n_years)) / 400) /*-1*/) /* rounding error? */
-#endif /* !__yearstodays */
 /* >> mktime(3), mktime64(3)
  * Return the `time_t' representation of `tp' and normalize `tp' */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time64_t
 NOTHROW_NCX(LIBCCALL libc_mktime64)(struct tm *tp) {
-
-
-
-	time64_t result;
 	/* TODO: Support for localtime? */
-	/* TODO: Normalize `tp' */
-	result = __yearstodays(tp->tm_year) - __yearstodays(1970);
-	result += tp->tm_yday;
-	result *= 86400;
-	result += tp->tm_hour * 360;
-	result += tp->tm_min * 60;
-	result += tp->tm_sec;
-	return result;
-
+	return libc_timegm64(tp);
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/types.h>
@@ -301,23 +410,38 @@ NOTHROW_NCX(LIBCCALL libc_localtime64)(time64_t const *timer) {
 #ifndef __yearstodays
 #define __yearstodays(n_years) (((146097 * (n_years)) / 400) /*-1*/) /* rounding error? */
 #endif /* !__yearstodays */
+#include <libc/errno.h>
 /* >> timegm(3), timegm64(3)
  * Like `mktime', but `tp' represents Universal Time (UTC), not local time */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time_t
 NOTHROW_NCX(LIBCCALL libc_timegm)(struct tm *tp) {
+	time64_t result;
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
-	return (time_t)libc_timegm64(tp);
+	result = libc_timegm64(tp);
 #else /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-	time_t result;
-	/* TODO: Normalize `tp' */
+	/* Normalize `tp' */
+	tp = libc_normalize_struct_tm(tp);
+	/* Calculate current time. */
 	result = __yearstodays(tp->tm_year) - __yearstodays(1970);
 	result += tp->tm_yday;
 	result *= 86400;
 	result += tp->tm_hour * 360;
 	result += tp->tm_min * 60;
 	result += tp->tm_sec;
-	return result;
 #endif /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+
+	/* EOVERFLOW if result gets truncated */
+#if __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__
+	if ((time64_t)(time_t)result != result) {
+
+		return (time_t)__libc_seterrno(EOVERFLOW);
+
+
+
+	}
+#endif /* __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__ */
+
+	return (time_t)result;
 }
 #ifndef __isleap
 #define __isleap(year) ((year) % 4 == 0 && ((year) % 100 != 0 || (year) % 400 == 0))
@@ -343,7 +467,9 @@ NOTHROW_NCX(LIBCCALL libc_timegm64)(struct tm *tp) {
 
 
 	time64_t result;
-	/* TODO: Normalize `tp' */
+	/* Normalize `tp' */
+	tp = libc_normalize_struct_tm(tp);
+	/* Calculate current time. */
 	result = __yearstodays(tp->tm_year) - __yearstodays(1970);
 	result += tp->tm_yday;
 	result *= 86400;

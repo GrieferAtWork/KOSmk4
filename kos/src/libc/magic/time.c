@@ -456,6 +456,9 @@ struct sigevent;
 [[ignore, nocrt, doc_alias("mktime64"),       alias("timegm64",    "_mkgmtime64"),    decl_include("<bits/types.h>", "<features.h>", "<bits/crt/tm.h>"), pure, wunused]] $time64_t crt_timegm64([[nonnull]] struct $tm *tp);
 [[ignore, nocrt, doc_alias("timespec_get"),   alias("timespec_get", "_timespec32_get"), pure, wunused, decl_include("<features.h>", "<bits/os/timespec.h>")]] int crt_timespec32_get([[nonnull]] struct __timespec32 *ts, __STDC_INT_AS_UINT_T base);
 [[ignore, nocrt, doc_alias("timespec_get64"), alias("timespec_get64", "_timespec64_get"), pure, wunused, decl_include("<features.h>", "<bits/os/timespec.h>")]] int crt_timespec64_get([[nonnull]] struct __timespec64 *ts, __STDC_INT_AS_UINT_T base);
+[[ignore, nocrt, doc_alias("stime"),          alias("stime", "__stime", "__libc_stime"), decl_include("<bits/types.h>")]] int crt_stime32([[nonnull]] $time32_t const *when);
+[[ignore, nocrt, doc_alias("stime64"),        alias("stime64"),                       decl_include("<bits/types.h>")]] int crt_stime64([[nonnull]] $time64_t const *when);
+
 
 
 
@@ -464,6 +467,158 @@ struct sigevent;
 [[decl_include("<bits/types.h>", "<bits/crt/tm.h>")]]
 $errno_t crt_asctime_s([[outp(buflen)]] char *__restrict buf, size_t buflen,
                        [[nonnull]] struct tm const *__restrict tp);
+
+
+%[define(DEFINE_TIME_MONTH_NUMDAYS =
+@@pp_ifndef ____TIME_MONTH_NUMDAYS_DEFINED@@
+#define ____TIME_MONTH_NUMDAYS_DEFINED 1
+@@push_namespace(local)@@
+__LOCAL_LIBC_CONST_DATA(__time_month_numdays)
+__UINT8_TYPE__ const __time_month_numdays[2][12] = {
+	{ 30, 31, 28, 31, 30, 31, 30, 31, 30, 31, 30, 31 },
+	{ 30, 31, 29, 31, 30, 31, 30, 31, 30, 31, 30, 31 }
+};
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+
+%[define(DEFINE_TIME_MONTHSTART_YDAY =
+@@pp_ifndef ____TIME_MONTHSTART_YDAY_DEFINED@@
+#define ____TIME_MONTHSTART_YDAY_DEFINED 1
+@@push_namespace(local)@@
+__LOCAL_LIBC_CONST_DATA(__time_monthstart_yday)
+__UINT16_TYPE__ const __time_monthstart_yday[2][13] = {
+	{ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 },
+	{ 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366 }
+};
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+
+
+
+[[static]]
+[[impl_prefix(DEFINE_TIME_MONTH_NUMDAYS)]]
+[[impl_prefix(DEFINE_TIME_MONTHSTART_YDAY)]]
+[[impl_prefix(DEFINE_ISLEAP)]]
+//[[impl_prefix(DEFINE_DAYSTOYEARS)]]
+[[impl_prefix(DEFINE_YEARSTODAYS)]]
+[[decl_include("<bits/crt/tm.h>")]]
+[[impl_include("<bits/crt/tm.h>")]]
+[[nonnull]]
+struct $tm *normalize_struct_tm([[nonnull]] struct $tm *__restrict tp) {
+	/* Normalize seconds. */
+	if (tp->@tm_sec@ < 0) {
+		unsigned int delta;
+		delta = ((unsigned int)-tp->@tm_sec@ + 59) / 60;
+		tp->@tm_min@ -= delta;
+		tp->@tm_sec@ += delta * 60;
+	} else if (tp->@tm_sec@ > 59) {
+		unsigned int delta;
+		delta = (unsigned int)tp->@tm_sec@ / 60;
+		tp->@tm_min@ += delta;
+		tp->@tm_sec@ -= delta * 60;
+	}
+
+	/* Normalize minutes. */
+	if (tp->@tm_min@ < 0) {
+		unsigned int delta;
+		delta = ((unsigned int)-tp->@tm_min@ + 59) / 60;
+		tp->@tm_hour@ -= delta;
+		tp->@tm_min@ += delta * 60;
+	} else if (tp->@tm_min@ > 59) {
+		unsigned int delta;
+		delta = (unsigned int)tp->@tm_min@ / 60;
+		tp->@tm_hour@ += delta;
+		tp->@tm_min@ -= delta * 60;
+	}
+
+	/* Normalize hours. */
+	if (tp->@tm_hour@ < 0) {
+		unsigned int delta;
+		delta = ((unsigned int)-tp->@tm_sec@ + 23) / 24;
+		tp->@tm_mday@ -= delta;
+		tp->@tm_hour@ += delta * 24;
+	} else if (tp->@tm_hour@ > 23) {
+		unsigned int delta;
+		delta = (unsigned int)tp->@tm_hour@ / 24;
+		tp->@tm_mday@ += delta;
+		tp->@tm_hour@ -= delta * 24;
+	}
+
+	for (;;) {
+		/* Normalize month. */
+		if (tp->@tm_mon@ < 0) {
+			unsigned int delta;
+			delta = ((unsigned int)-tp->@tm_mon@ + 11) / 12;
+			tp->@tm_year@ -= delta;
+			tp->@tm_mon@ += delta * 12;
+		} else if (tp->@tm_mon@ > 11) {
+			unsigned int delta;
+			delta = (unsigned int)tp->@tm_mon@ / 12;
+			tp->@tm_year@ += delta;
+			tp->@tm_mon@ -= delta * 12;
+		}
+
+		/* Normalize day-of-the-month.
+		 * Note that because of February (and leap years), we can only adjust by 1 month every time. */
+		if (tp->@tm_mday@ < 1) {
+			--tp->@tm_mon@;
+			COMPILER_BARRIER(); /* Prevent GCC warning about sign stuff */
+			if (tp->@tm_mon@ < 0) {
+				tp->@tm_mon@ = 11;
+				--tp->@tm_year@;
+			}
+			tp->@tm_mday@ += __NAMESPACE_LOCAL_SYM __time_month_numdays[__isleap(1900 + tp->@tm_year@)][tp->@tm_mon@];
+			continue;
+		} else {
+			unsigned int current_month_days;
+			current_month_days = __NAMESPACE_LOCAL_SYM __time_month_numdays[__isleap(1900 + tp->@tm_year@)][tp->@tm_mon@];
+			if ((unsigned int)(tp->@tm_mday@ - 1) >= current_month_days) {
+				tp->@tm_mday@ -= current_month_days;
+				++tp->@tm_mon@;
+				continue;
+			}
+		}
+		break;
+	}
+
+	/* Figure out the year-day. */
+	tp->@tm_yday@ = __NAMESPACE_LOCAL_SYM __time_monthstart_yday[__isleap(1900 + tp->@tm_year@)][tp->@tm_mon@];
+	tp->@tm_yday@ += tp->@tm_mday@;
+
+	/* Figure out the week-day. */
+	{
+		uint64_t total_days;
+		total_days = __yearstodays(1900 + tp->@tm_year@);
+		total_days += tp->@tm_yday@;
+		tp->@tm_wday@ = (int)(total_days % DAYS_PER_WEEK);
+	}
+
+	/* Figure out if daylight savings time is currently on. */
+	/* found here: "http://stackoverflow.com/questions/5590429/calculating-daylight-savings-time-from-only-date" */
+	if (tp->@tm_mon@ < 2 || tp->@tm_mon@ > 10) {
+		//January, February, and December are out.
+		tp->@tm_isdst@ = 0;
+	} else if (tp->@tm_mon@ > 2 && tp->@tm_mon@ < 10) {
+		//April to October are in
+		tp->@tm_isdst@ = 1;
+	} else {
+		int previousSunday;
+		previousSunday = tp->@tm_mday@ - tp->@tm_wday@;
+		if (tp->@tm_mon@ == 2) {
+			//In march, we are DST if our previous Sunday was on or after the 8th.
+			tp->@tm_isdst@ = previousSunday >= 8;
+		} else {
+			//In November we must be before the first Sunday to be dst.
+			//That means the  previous Sunday must  be before the  1st.
+			tp->@tm_isdst@ = previousSunday <= 0;
+		}
+	}
+	return tp;
+}
 
 
 
@@ -519,25 +674,14 @@ double difftime(time_t time1, time_t time0) {
 
 @@>> mktime(3), mktime64(3)
 @@Return the `time_t' representation of `tp' and normalize `tp'
-[[pure, wunused, std, decl_include("<features.h>", "<bits/types.h>", "<bits/crt/tm.h>"), no_crt_self_import, dos_only_export_as("_mktime32")]]
+[[pure, wunused, std, decl_include("<features.h>", "<bits/types.h>", "<bits/crt/tm.h>")]]
+[[no_crt_self_import, dos_only_export_as("_mktime32"), export_as("timelocal")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("mktime64", "_mktime64", "timelocal64")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("mktime", "_mktime32", "timelocal")]]
-[[impl_prefix(DEFINE_YEARSTODAYS), export_as("timelocal")]]
+[[requires_function(timegm)]]
 time_t mktime([[nonnull]] struct tm *tp) {
-@@pp_if !defined(__BUILDING_LIBC) || __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__@@
-	return (time_t)mktime64(tp);
-@@pp_else@@
 	/* TODO: Support for localtime? */
-	/* TODO: Normalize `tp' */
-	time64_t result;
-	result = __yearstodays(tp->@tm_year@) - __yearstodays(UNIX_TIME_START_YEAR);
-	result += tp->@tm_yday@;
-	result *= SECONDS_PER_DAY;
-	result += tp->@tm_hour@ * SECONDS_PER_HOUR;
-	result += tp->@tm_min@ * SECONDS_PER_MINUTE;
-	result += tp->@tm_sec@;
-	return result;
-@@pp_endif@@
+	return timegm(tp);
 }
 
 
@@ -693,8 +837,8 @@ $errno_t asctime_s([[outp(buflen)]] char *__restrict buf, size_t buflen,
 $time64_t time64($time64_t *timer) {
 	time32_t tm32 = crt_time32(NULL);
 	if (timer)
-		*timer = (time_t)tm32;
-	return (time_t)tm32;
+		*timer = (time64_t)tm32;
+	return (time64_t)tm32;
 }
 
 %#ifndef __NO_FPU
@@ -715,23 +859,11 @@ double difftime64($time64_t time1, $time64_t time0) {
 [[decl_include("<bits/types.h>", "<features.h>")]]
 [[preferred_time64_variant_of(mktime), doc_alias("mktime")]]
 [[decl_include("<bits/crt/tm.h>")]]
-[[pure, wunused, impl_prefix(DEFINE_YEARSTODAYS)]]
+[[pure, wunused, requires_function(timegm64)]]
 [[dos_only_export_alias("_mktime64"), export_alias("timelocal64")]]
 $time64_t mktime64([[nonnull]] struct $tm *tp) {
-@@pp_if !defined(__BUILDING_LIBC) && $has_function(crt_mktime32)@@
-	return (time64_t)crt_mktime32(tp);
-@@pp_else@@
-	time64_t result;
 	/* TODO: Support for localtime? */
-	/* TODO: Normalize `tp' */
-	result = __yearstodays(tp->@tm_year@) - __yearstodays(UNIX_TIME_START_YEAR);
-	result += tp->@tm_yday@;
-	result *= SECONDS_PER_DAY;
-	result += tp->@tm_hour@ * SECONDS_PER_HOUR;
-	result += tp->@tm_min@ * SECONDS_PER_MINUTE;
-	result += tp->@tm_sec@;
-	return result;
-@@pp_endif@@
+	return timegm64(tp);
 }
 
 [[decl_include("<bits/types.h>")]]
@@ -980,10 +1112,6 @@ __LIBC long timezone __CASMNAME("__timezone");
 %
 %#ifdef __USE_MISC
 
-[[ignore, nocrt, alias("stime", "__stime", "__libc_stime")]]
-[[decl_include("<bits/types.h>"), doc_alias("stime")]]
-int crt_stime32([[nonnull]] $time32_t const *when);
-
 @@>> stime(2), stime64(2)
 @@Set the system time to `*when'. This call is restricted to the superuser
 [[guard, decl_include("<bits/types.h>"), no_crt_self_import, export_as("__stime", "__libc_stime")]]
@@ -1005,21 +1133,35 @@ int stime([[nonnull]] $time_t const *when) {
 [[decl_include("<bits/types.h>"), no_crt_self_import, dos_only_export_as("_mkgmtime", "_mkgmtime32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timegm", "_mkgmtime", "_mkgmtime32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timegm64", "_mkgmtime64")]]
-[[pure, wunused, decl_include("<bits/crt/tm.h>"), impl_prefix(DEFINE_YEARSTODAYS)]]
+[[pure, wunused, decl_include("<bits/crt/tm.h>"), impl_prefix(DEFINE_YEARSTODAYS), impl_include("<libc/errno.h>")]]
 $time_t timegm([[nonnull]] struct $tm *tp) {
+	time64_t result;
 @@pp_if !defined(__BUILDING_LIBC) || __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__@@
-	return (time_t)timegm64(tp);
+	result = timegm64(tp);
 @@pp_else@@
-	time_t result;
-	/* TODO: Normalize `tp' */
+	/* Normalize `tp' */
+	tp = normalize_struct_tm(tp);
+	/* Calculate current time. */
 	result = __yearstodays(tp->@tm_year@) - __yearstodays(UNIX_TIME_START_YEAR);
 	result += tp->@tm_yday@;
 	result *= SECONDS_PER_DAY;
 	result += tp->@tm_hour@ * SECONDS_PER_HOUR;
 	result += tp->@tm_min@ * SECONDS_PER_MINUTE;
 	result += tp->@tm_sec@;
-	return result;
 @@pp_endif@@
+
+	/* EOVERFLOW if result gets truncated */
+@@pp_if @__TM_SIZEOF(TIME)@ < __SIZEOF_TIME64_T__@@
+	if ((time64_t)(time_t)result != result) {
+@@pp_ifdef EOVERFLOW@@
+		return (time_t)__libc_seterrno(EOVERFLOW);
+@@pp_else@@
+		return (time_t)__libc_seterrno(1);
+@@pp_endif@@
+	}
+@@pp_endif@@
+
+	return (time_t)result;
 }
 
 @@>> timelocal(3), timelocal64(3)
@@ -1075,7 +1217,9 @@ $time64_t timegm64([[nonnull]] struct $tm *tp) {
 	return (time64_t)crt_timegm32(tp);
 @@pp_else@@
 	time64_t result;
-	/* TODO: Normalize `tp' */
+	/* Normalize `tp' */
+	tp = normalize_struct_tm(tp);
+	/* Calculate current time. */
 	result = __yearstodays(tp->@tm_year@) - __yearstodays(UNIX_TIME_START_YEAR);
 	result += tp->@tm_yday@;
 	result *= SECONDS_PER_DAY;
@@ -1690,20 +1834,6 @@ int clock_adjtime64($clockid_t clock_id, struct timex64 *utx);
 
 %#endif /* __USE_GNU */
 
-
-
-%[define(DEFINE_TIME_MONTHSTART_YDAY =
-@@pp_ifndef ____TIME_MONTHSTART_YDAY_DEFINED@@
-#define ____TIME_MONTHSTART_YDAY_DEFINED 1
-@@push_namespace(local)@@
-__LOCAL_LIBC_CONST_DATA(__time_monthstart_yday)
-__UINT16_TYPE__ const __time_monthstart_yday[2][13] = {
-	{ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 },
-	{ 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366 }
-};
-@@pop_namespace@@
-@@pp_endif@@
-)]
 
 
 
