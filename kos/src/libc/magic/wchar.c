@@ -2168,6 +2168,7 @@ __SYSDECL_END
 #include <corecrt_wstdio.h>
 #include <corecrt_wstdlib.h>
 #include <corecrt_wstring.h>
+#include <corecrt_wtime.h>
 #endif /* __USE_DOS */
 
 }

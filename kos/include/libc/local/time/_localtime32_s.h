@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bf85449 */
+/* HASH CRC-32:0x3bbb3bf7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,13 +40,26 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_localtime_r __LIBC_LOCAL_NAME(localtime_r)
 #endif /* !... */
 #endif /* !__local___localdep_localtime_r_defined */
+__NAMESPACE_LOCAL_END
+#include <libc/errno.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_localtime32_s) __ATTR_NONNULL((1, 2)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_localtime32_s))(struct __NAMESPACE_STD_SYM tm *__restrict __tp, __time32_t const *__restrict __timer) {
 #if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-	(__NAMESPACE_LOCAL_SYM __localdep_localtime_r)(__timer, __tp);
+
+
+
+	if __unlikely(!(__NAMESPACE_LOCAL_SYM __localdep_localtime_r)(__timer, __tp))
+		return __libc_geterrno_or(1);
+
 #else /* !__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-	__TM_TYPE(time) __timer2 = (__TM_TYPE(time))*__timer;
-	(__NAMESPACE_LOCAL_SYM __localdep_localtime_r)(&__timer2, __tp);
+	__TM_TYPE(time) __ttimer = (__TM_TYPE(time))*__timer;
+
+
+
+	if __unlikely(!(__NAMESPACE_LOCAL_SYM __localdep_localtime_r)(&__ttimer, __tp))
+		return __libc_geterrno_or(1);
+
 #endif /* __USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 	return 0;
 }

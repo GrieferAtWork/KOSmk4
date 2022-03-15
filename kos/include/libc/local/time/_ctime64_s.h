@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x143ba350 */
+/* HASH CRC-32:0x7b69f68f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,11 +42,19 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_ctime64_r __LIBC_LOCAL_NAME(ctime64_r)
 #endif /* !... */
 #endif /* !__local___localdep_ctime64_r_defined */
+__NAMESPACE_LOCAL_END
+#include <libc/errno.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_ctime64_s) __ATTR_NONNULL((1, 3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ctime64_s))(char __buf[26], __SIZE_TYPE__ __bufsize, __time64_t const *__restrict __timer) {
-	if (__bufsize < 26)
+	if __unlikely(__bufsize < 26)
 		return 34;
-	(__NAMESPACE_LOCAL_SYM __localdep_ctime64_r)(__timer, __buf);
+
+
+
+	if __unlikely(!(__NAMESPACE_LOCAL_SYM __localdep_ctime64_r)(__timer, __buf))
+		return __libc_geterrno_or(1);
+
 	return 0;
 }
 __NAMESPACE_LOCAL_END

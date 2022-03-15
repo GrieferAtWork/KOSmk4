@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe6d7e80 */
+/* HASH CRC-32:0x8a9e6437 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,46 +18,45 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__strdate_s_defined
-#define __local__strdate_s_defined
+#ifndef __local__c16strtime_defined
+#define __local__c16strtime_defined
 #include <__crt.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
+#if defined(__CRT_HAVE__strtime) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep__strdate_defined
-#define __local___localdep__strdate_defined
-#ifdef __CRT_HAVE__strdate
-__CREDIRECT(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep__strdate,(char __buf[9]),_strdate,(__buf))
+#ifndef __local___localdep__strtime_defined
+#define __local___localdep__strtime_defined
+#ifdef __CRT_HAVE__strtime
+__CREDIRECT(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep__strtime,(char __buf[9]),_strtime,(__buf))
 #elif defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 __NAMESPACE_LOCAL_END
-#include <libc/local/time/_strdate.h>
+#include <libc/local/time/_strtime.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep__strdate __LIBC_LOCAL_NAME(_strdate)
+#define __localdep__strtime __LIBC_LOCAL_NAME(_strtime)
 #else /* ... */
-#undef __local___localdep__strdate_defined
+#undef __local___localdep__strtime_defined
 #endif /* !... */
-#endif /* !__local___localdep__strdate_defined */
-__NAMESPACE_LOCAL_END
-#include <libc/errno.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_strdate_s) __ATTR_NONNULL((1)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_strdate_s))(char *__buf, __SIZE_TYPE__ __bufsize) {
-	if __unlikely(__bufsize < 9)
-		return 34;
+#endif /* !__local___localdep__strtime_defined */
+__LOCAL_LIBC(_c16strtime) __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_c16strtime))(__CHAR16_TYPE__ __buf[9]) {
+	unsigned int __i;
+	char __abuf[9], *__ptr;
+	__ptr = (__NAMESPACE_LOCAL_SYM __localdep__strtime)(__abuf);
 
+	if __unlikely(!__ptr)
+		return __NULLPTR;
 
-
-	if __unlikely(!(__NAMESPACE_LOCAL_SYM __localdep__strdate)(__buf))
-		return __libc_geterrno_or(1);
-
-	return 0;
+	for (__i = 0; __i < 9; ++__i)
+		__buf[__i] = (__CHAR16_TYPE__)__ptr[__i]; /* Guarantied no unicode in here! */
+	return __buf;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep__strdate_s_defined
-#define __local___localdep__strdate_s_defined
-#define __localdep__strdate_s __LIBC_LOCAL_NAME(_strdate_s)
-#endif /* !__local___localdep__strdate_s_defined */
-#else /* __CRT_HAVE__strdate || __CRT_HAVE_time64 || __CRT_HAVE__time64 || __CRT_HAVE_time || __CRT_HAVE___time || __CRT_HAVE___libc_time || __CRT_HAVE__time32 */
-#undef __local__strdate_s_defined
-#endif /* !__CRT_HAVE__strdate && !__CRT_HAVE_time64 && !__CRT_HAVE__time64 && !__CRT_HAVE_time && !__CRT_HAVE___time && !__CRT_HAVE___libc_time && !__CRT_HAVE__time32 */
-#endif /* !__local__strdate_s_defined */
+#ifndef __local___localdep__c16strtime_defined
+#define __local___localdep__c16strtime_defined
+#define __localdep__c16strtime __LIBC_LOCAL_NAME(_c16strtime)
+#endif /* !__local___localdep__c16strtime_defined */
+#else /* __CRT_HAVE__strtime || __CRT_HAVE_time64 || __CRT_HAVE__time64 || __CRT_HAVE_time || __CRT_HAVE___time || __CRT_HAVE___libc_time || __CRT_HAVE__time32 */
+#undef __local__c16strtime_defined
+#endif /* !__CRT_HAVE__strtime && !__CRT_HAVE_time64 && !__CRT_HAVE__time64 && !__CRT_HAVE_time && !__CRT_HAVE___time && !__CRT_HAVE___libc_time && !__CRT_HAVE__time32 */
+#endif /* !__local__c16strtime_defined */

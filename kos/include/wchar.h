@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71d03d42 */
+/* HASH CRC-32:0xda5d543e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3961,6 +3961,7 @@ __SYSDECL_END
 #include <corecrt_wstdio.h>
 #include <corecrt_wstdlib.h>
 #include <corecrt_wstring.h>
+#include <corecrt_wtime.h>
 #endif /* __USE_DOS */
 
 #ifdef __CXX_SYSTEM_HEADER

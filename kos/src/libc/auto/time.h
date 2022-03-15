@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91552a41 */
+/* HASH CRC-32:0x950506b9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -506,16 +506,16 @@ INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBDCALL libd__ctime64_s)(char buf[26
 INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBCCALL libc__ctime64_s)(char buf[26], size_t bufsize, time64_t const *__restrict timer);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd__strtime)(char buf[9]);
+INTDEF NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd__strtime)(char buf[9]);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc__strtime)(char buf[9]);
+INTDEF NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc__strtime)(char buf[9]);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd__strdate)(char buf[9]);
+INTDEF NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd__strdate)(char buf[9]);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc__strdate)(char buf[9]);
+INTDEF NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc__strdate)(char buf[9]);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd__strtime_s)(char *buf, size_t bufsize);

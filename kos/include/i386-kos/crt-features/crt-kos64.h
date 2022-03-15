@@ -1939,6 +1939,8 @@
 #define __CRT_HAVE__vwscanf_l
 #define __CRT_HAVE__vwscanf_s_l
 #define __CRT_HAVE__waccess_s
+#define __CRT_HAVE__wasctime
+#define __CRT_HAVE__wasctime_s
 #define __CRT_HAVE__wassert
 #define __CRT_HAVE__wcreate_locale
 #define __CRT_HAVE__wcsdup_dbg
@@ -1952,6 +1954,10 @@
 #define __CRT_HAVE__wcstombs_s_l
 #define __CRT_HAVE__wcsupr_s
 #define __CRT_HAVE__wcsupr_s_l
+#define __CRT_HAVE__wctime32
+#define __CRT_HAVE__wctime32_s
+#define __CRT_HAVE__wctime64
+#define __CRT_HAVE__wctime64_s
 #define __CRT_HAVE__wctomb_l
 #define __CRT_HAVE__wctomb_s_l
 #define __CRT_HAVE__wdupenv_s
@@ -2009,6 +2015,10 @@
 #define __CRT_HAVE__wstat64
 #define __CRT_HAVE__wstat64i32
 #define __CRT_HAVE__wstati64
+#define __CRT_HAVE__wstrdate
+#define __CRT_HAVE__wstrdate_s
+#define __CRT_HAVE__wstrtime
+#define __CRT_HAVE__wstrtime_s
 #define __CRT_HAVE__wtempnam
 #define __CRT_HAVE__wtempnam_dbg
 #define __CRT_HAVE__wtmpnam
@@ -6078,6 +6088,7 @@
 #define __CRT_HAVE__wcsupr
 #define __CRT_HAVE__wcsupr_l
 #define __CRT_HAVE__wcsxfrm_l
+#define __CRT_HAVE__wctime
 #define __CRT_HAVE__wexecl
 #define __CRT_HAVE__wexecle
 #define __CRT_HAVE__wexeclp
@@ -7515,6 +7526,8 @@
 #define __CRT_HAVE_KOS$_vwscanf_l
 #define __CRT_HAVE_KOS$_vwscanf_s_l
 #define __CRT_HAVE_KOS$_waccess_s
+#define __CRT_HAVE_KOS$_wasctime
+#define __CRT_HAVE_KOS$_wasctime_s
 #define __CRT_HAVE_KOS$_wassert
 #define __CRT_HAVE_KOS$_wcreate_locale
 #define __CRT_HAVE_KOS$_wcserror
@@ -7527,6 +7540,10 @@
 #define __CRT_HAVE_KOS$_wcstombs_s_l
 #define __CRT_HAVE_KOS$_wcsupr_s
 #define __CRT_HAVE_KOS$_wcsupr_s_l
+#define __CRT_HAVE_KOS$_wctime32
+#define __CRT_HAVE_KOS$_wctime32_s
+#define __CRT_HAVE_KOS$_wctime64
+#define __CRT_HAVE_KOS$_wctime64_s
 #define __CRT_HAVE_KOS$_wctomb_l
 #define __CRT_HAVE_KOS$_wctomb_s_l
 #define __CRT_HAVE_KOS$_wdupenv_s
@@ -7580,6 +7597,10 @@
 #define __CRT_HAVE_KOS$_wstat64
 #define __CRT_HAVE_KOS$_wstat64i32
 #define __CRT_HAVE_KOS$_wstati64
+#define __CRT_HAVE_KOS$_wstrdate
+#define __CRT_HAVE_KOS$_wstrdate_s
+#define __CRT_HAVE_KOS$_wstrtime
+#define __CRT_HAVE_KOS$_wstrtime_s
 #define __CRT_HAVE_KOS$_wtempnam
 #define __CRT_HAVE_KOS$_wtmpnam
 #define __CRT_HAVE_KOS$_wtmpnam_s
@@ -11801,6 +11822,8 @@
 #define __CRT_HAVE_DOS$_vwscanf_s_l
 #define __CRT_HAVE_DOS$_waccess
 #define __CRT_HAVE_DOS$_waccess_s
+#define __CRT_HAVE_DOS$_wasctime
+#define __CRT_HAVE_DOS$_wasctime_s
 #define __CRT_HAVE_DOS$_wassert
 #define __CRT_HAVE_DOS$_wchdir
 #define __CRT_HAVE_DOS$_wchmod
@@ -11851,6 +11874,11 @@
 #define __CRT_HAVE_DOS$_wcsupr_s
 #define __CRT_HAVE_DOS$_wcsupr_s_l
 #define __CRT_HAVE_DOS$_wcsxfrm_l
+#define __CRT_HAVE_DOS$_wctime
+#define __CRT_HAVE_DOS$_wctime32
+#define __CRT_HAVE_DOS$_wctime32_s
+#define __CRT_HAVE_DOS$_wctime64
+#define __CRT_HAVE_DOS$_wctime64_s
 #define __CRT_HAVE_DOS$_wctomb_l
 #define __CRT_HAVE_DOS$_wctomb_s_l
 #define __CRT_HAVE_DOS$_wdupenv_s
@@ -11929,6 +11957,10 @@
 #define __CRT_HAVE_DOS$_wstat64
 #define __CRT_HAVE_DOS$_wstat64i32
 #define __CRT_HAVE_DOS$_wstati64
+#define __CRT_HAVE_DOS$_wstrdate
+#define __CRT_HAVE_DOS$_wstrdate_s
+#define __CRT_HAVE_DOS$_wstrtime
+#define __CRT_HAVE_DOS$_wstrtime_s
 #define __CRT_HAVE_DOS$_wsystem
 #define __CRT_HAVE_DOS$_wtempnam
 #define __CRT_HAVE_DOS$_wtmpnam

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9cc7859 */
+/* HASH CRC-32:0xee7dbb4b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,41 +18,37 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__gmtime64_s_defined
-#define __local__gmtime64_s_defined
+#ifndef __local__c16ctime32_defined
+#define __local__c16ctime32_defined
 #include <__crt.h>
 #include <bits/types.h>
-#include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_gmtime64_r_defined
-#define __local___localdep_gmtime64_r_defined
-#if defined(__CRT_HAVE_gmtime_r) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_NONNULL((1, 2)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_gmtime64_r,(__time64_t const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),gmtime_r,(__timer,__tp))
-#elif defined(__CRT_HAVE_gmtime64_r)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_gmtime64_r,(__time64_t const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),gmtime64_r,(__timer,__tp))
+#ifndef __local___localdep__c16ctime64_defined
+#define __local___localdep__c16ctime64_defined
+#if defined(__CRT_HAVE__wctime64) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep__c16ctime64,(__time64_t const *__timer),_wctime64,(__timer))
+#elif defined(__CRT_HAVE_DOS$_wctime64)
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep__c16ctime64,(__time64_t const *__timer),_wctime64,(__timer))
+#elif __SIZEOF_WCHAR_T__ == 2
+__NAMESPACE_LOCAL_END
+#include <libc/local/corecrt_wtime/_wctime64.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__c16ctime64 __NAMESPACE_LOCAL_TYPEHAX(__CHAR16_TYPE__ *(__LIBDCALL*)(__time64_t const *),__CHAR16_TYPE__ *(__LIBDCALL&)(__time64_t const *),_wctime64)
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/time/gmtime64_r.h>
+#include <libc/local/parts.uchar.time/_c16ctime64.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_gmtime64_r __LIBC_LOCAL_NAME(gmtime64_r)
+#define __localdep__c16ctime64 __LIBC_LOCAL_NAME(_c16ctime64)
 #endif /* !... */
-#endif /* !__local___localdep_gmtime64_r_defined */
-__NAMESPACE_LOCAL_END
-#include <libc/errno.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_gmtime64_s) __ATTR_NONNULL((1, 2)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_gmtime64_s))(struct __NAMESPACE_STD_SYM tm *__restrict __tp, __time64_t const *__restrict __timer) {
-
-
-
-	if __unlikely(!(__NAMESPACE_LOCAL_SYM __localdep_gmtime64_r)(__timer, __tp))
-		return __libc_geterrno_or(1);
-
-	return 0;
+#endif /* !__local___localdep__c16ctime64_defined */
+__LOCAL_LIBC(_c16ctime32) __ATTR_WUNUSED __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_c16ctime32))(__time32_t const *__timer) {
+	__time64_t __timer64 = (__time64_t)*__timer;
+	return (__NAMESPACE_LOCAL_SYM __localdep__c16ctime64)(&__timer64);
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep__gmtime64_s_defined
-#define __local___localdep__gmtime64_s_defined
-#define __localdep__gmtime64_s __LIBC_LOCAL_NAME(_gmtime64_s)
-#endif /* !__local___localdep__gmtime64_s_defined */
-#endif /* !__local__gmtime64_s_defined */
+#ifndef __local___localdep__c16ctime32_defined
+#define __local___localdep__c16ctime32_defined
+#define __localdep__c16ctime32 __LIBC_LOCAL_NAME(_c16ctime32)
+#endif /* !__local___localdep__c16ctime32_defined */
+#endif /* !__local__c16ctime32_defined */

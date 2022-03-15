@@ -523,6 +523,7 @@
 	CB(PREFIX.crt.dos.compat.dos.errno PREFIX.crt.dos.compat.dos.except PREFIX.crt.dos.compat.dos.fs.stat PREFIX.crt.dos.compat.dos.msabi64 PREFIX.crt.dos.compat.dos) \
 	CB(PREFIX.crt.dos.wchar.application.init) \
 	CB(PREFIX.crt.dos.wchar.fs.exec.exec) \
+	CB(PREFIX.crt.dos.wchar.time) \
 	CB(PREFIX.crt.dos.wchar.heap.strdup) \
 	CB(PREFIX.crt.dos.wchar.FILE.locked.access) \
 	CB(PREFIX.crt.dos.wchar.FILE.locked.read.read) \

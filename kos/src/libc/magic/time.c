@@ -85,6 +85,10 @@
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 */
 
+#ifdef __USE_DOS
+#include <corecrt_wtime.h>
+#endif /* __USE_DOS */
+
 #ifdef __USE_GNU
 #include <asm/os/timex.h>
 #include <bits/os/timex.h>
@@ -2218,32 +2222,60 @@ errno_t _get_tzname([[nonnull]] size_t *result,
 
 
 [[doc_alias("gmtime_r"), decl_include("<bits/types.h>", "<bits/crt/tm.h>")]]
+[[impl_include("<libc/errno.h>")]]
 errno_t _gmtime32_s([[nonnull]] struct $tm *__restrict tp,
                     [[nonnull]] $time32_t const *__restrict timer) {
 @@pp_if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__@@
+@@pp_ifdef __BUILDING_LIBC@@
 	gmtime_r(timer, tp);
 @@pp_else@@
-	time_t timer2 = (time_t)*timer;
-	gmtime_r(&timer2, tp);
+	if unlikely(!gmtime_r(timer, tp))
+		return __libc_geterrno_or(1);
+@@pp_endif@@
+@@pp_else@@
+	time_t ttimer = (time_t)*timer;
+@@pp_ifdef __BUILDING_LIBC@@
+	gmtime_r(&ttimer, tp);
+@@pp_else@@
+	if unlikely(!gmtime_r(&ttimer, tp))
+		return __libc_geterrno_or(1);
+@@pp_endif@@
 @@pp_endif@@
 	return 0;
 }
 
 [[doc_alias("gmtime64_r"), decl_include("<bits/types.h>", "<bits/crt/tm.h>")]]
+[[impl_include("<libc/errno.h>")]]
 errno_t _gmtime64_s([[nonnull]] struct $tm *__restrict tp,
                     [[nonnull]] $time64_t const *__restrict timer) {
+@@pp_ifdef __BUILDING_LIBC@@
 	gmtime64_r(timer, tp);
+@@pp_else@@
+	if unlikely(!gmtime64_r(timer, tp))
+		return __libc_geterrno_or(1);
+@@pp_endif@@
 	return 0;
 }
 
 [[doc_alias("localtime_r"), decl_include("<bits/types.h>", "<bits/crt/tm.h>")]]
+[[impl_include("<libc/errno.h>")]]
 errno_t _localtime32_s([[nonnull]] struct $tm *__restrict tp,
                        [[nonnull]] $time32_t const *__restrict timer) {
 @@pp_if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__@@
+@@pp_ifdef __BUILDING_LIBC@@
 	localtime_r(timer, tp);
 @@pp_else@@
-	time_t timer2 = (time_t)*timer;
-	localtime_r(&timer2, tp);
+	if unlikely(!localtime_r(timer, tp))
+		return __libc_geterrno_or(1);
+@@pp_endif@@
+@@pp_else@@
+	time_t ttimer = (time_t)*timer;
+@@pp_ifdef __BUILDING_LIBC@@
+	localtime_r(&ttimer, tp);
+@@pp_else@@
+	if unlikely(!localtime_r(&ttimer, tp))
+		return __libc_geterrno_or(1);
+@@pp_endif@@
 @@pp_endif@@
 	return 0;
 }
@@ -2256,27 +2288,44 @@ errno_t _localtime64_s([[nonnull]] struct $tm *__restrict tp,
 }
 
 [[doc_alias("ctime_r"), decl_include("<bits/types.h>")]]
+[[impl_include("<libc/errno.h>")]]
 errno_t _ctime32_s([[nonnull]] char buf[26], $size_t bufsize,
                    [[nonnull]] $time32_t const *__restrict timer) {
-	if (bufsize < 26)
+	if unlikely(bufsize < 26)
 		return DOS_ERANGE;
 @@pp_if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__@@
+@@pp_ifdef __BUILDING_LIBC@@
 	ctime_r(timer, buf);
+@@pp_else@@
+	if unlikely(!ctime_r(timer, buf))
+		return __libc_geterrno_or(1);
+@@pp_endif@@
 @@pp_else@@
 	{
 		time_t timer2 = (time_t)*timer;
+@@pp_ifdef __BUILDING_LIBC@@
 		ctime_r(&timer2, buf);
+@@pp_else@@
+		if unlikely(!ctime_r(&timer2, buf))
+			return __libc_geterrno_or(1);
+@@pp_endif@@
 	}
 @@pp_endif@@
 	return 0;
 }
 
 [[doc_alias("ctime64_r"), decl_include("<bits/types.h>")]]
+[[impl_include("<libc/errno.h>")]]
 errno_t _ctime64_s([[nonnull]] char buf[26], $size_t bufsize,
                    [[nonnull]] $time64_t const *__restrict timer) {
-	if (bufsize < 26)
+	if unlikely(bufsize < 26)
 		return DOS_ERANGE;
+@@pp_ifdef __BUILDING_LIBC@@
 	ctime64_r(timer, buf);
+@@pp_else@@
+	if unlikely(!ctime64_r(timer, buf))
+		return __libc_geterrno_or(1);
+@@pp_endif@@
 	return 0;
 }
 
@@ -2331,7 +2380,7 @@ $time32_t _mkgmtime32([[nonnull]] struct $tm *tp);
 %[insert:function(_strftime_l = strftime_l)]
 
 [[requires_function(time64, localtime64_r)]]
-[[nonnull, impl_include("<bits/crt/tm.h>")]]
+[[impl_include("<bits/crt/tm.h>")]]
 [[impl_include("<libc/template/itoa_digits.h>")]]
 char *_strtime([[nonnull]] char buf[9]) {
 	time64_t now = time64(NULL);
@@ -2350,7 +2399,7 @@ char *_strtime([[nonnull]] char buf[9]) {
 }
 
 [[requires_function(time64, localtime64_r)]]
-[[nonnull, impl_include("<bits/crt/tm.h>")]]
+[[impl_include("<bits/crt/tm.h>")]]
 [[impl_include("<libc/template/itoa_digits.h>")]]
 char *_strdate([[nonnull]] char buf[9]) {
 	time64_t now = time64(NULL);
@@ -2369,18 +2418,30 @@ char *_strdate([[nonnull]] char buf[9]) {
 }
 
 [[decl_include("<bits/types.h>"), requires_function(_strtime)]]
+[[impl_include("<libc/errno.h>")]]
 /*dos*/ errno_t _strtime_s([[outp(bufsize)]] char *buf, size_t bufsize) {
 	if unlikely(bufsize < 9)
 		return DOS_ERANGE;
+@@pp_ifdef __BUILDING_LIBC@@
 	_strtime(buf);
+@@pp_else@@
+	if unlikely(!_strtime(buf))
+		return __libc_geterrno_or(1);
+@@pp_endif@@
 	return 0;
 }
 
 [[decl_include("<bits/types.h>"), requires_function(_strdate)]]
+[[impl_include("<libc/errno.h>")]]
 /*dos*/ errno_t _strdate_s([[outp(bufsize)]] char *buf, size_t bufsize) {
 	if unlikely(bufsize < 9)
 		return DOS_ERANGE;
+@@pp_ifdef __BUILDING_LIBC@@
 	_strdate(buf);
+@@pp_else@@
+	if unlikely(!_strdate(buf))
+		return __libc_geterrno_or(1);
+@@pp_endif@@
 	return 0;
 }
 
@@ -2398,7 +2459,7 @@ int _timespec32_get([[nonnull]] struct __timespec32 *ts, __STDC_INT_AS_UINT_T ba
 [[impl_include("<bits/os/timeval.h>")]]
 unsigned int _getsystime([[nonnull]] struct $tm *tp) {
 	struct timeval64 tv;
-	if (gettimeofday64(&tv, NULL) != 0) {
+	if unlikely(gettimeofday64(&tv, NULL) != 0) {
 		tv.@tv_sec@  = 0;
 		tv.@tv_usec@ = 0;
 	}
@@ -2422,18 +2483,18 @@ unsigned int _setsystime([[nonnull]] struct $tm *tp,
 %
 %{
 #ifdef __USE_TIME_BITS64
-#define _mkgmtime _mkgmtime32
-#ifdef __USE_DOS_SLIB
-#define ctime_s     _ctime32_s
-#define gmtime_s    _gmtime32_s
-#define localtime_s _localtime32_s
-#endif /* __USE_DOS_SLIB */
-#else /* __USE_TIME_BITS64 */
 #define _mkgmtime _mkgmtime64
 #ifdef __USE_DOS_SLIB
 #define ctime_s     _ctime64_s
 #define gmtime_s    _gmtime64_s
 #define localtime_s _localtime64_s
+#endif /* __USE_DOS_SLIB */
+#else /* __USE_TIME_BITS64 */
+#define _mkgmtime _mkgmtime32
+#ifdef __USE_DOS_SLIB
+#define ctime_s     _ctime32_s
+#define gmtime_s    _gmtime32_s
+#define localtime_s _localtime32_s
 #endif /* __USE_DOS_SLIB */
 #endif /* !__USE_TIME_BITS64 */
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb664330f */
+/* HASH CRC-32:0x583e0e1b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -815,6 +815,8 @@
 #define __CRT_HAVE_DOS$_vwscanf_l
 #define __CRT_HAVE_DOS$_vwscanf_s_l
 #define __CRT_HAVE_DOS$_waccess_s
+#define __CRT_HAVE_DOS$_wasctime
+#define __CRT_HAVE_DOS$_wasctime_s
 #define __CRT_HAVE_DOS$_wcreate_locale
 #define __CRT_HAVE_DOS$_wcserror
 #define __CRT_HAVE_DOS$_wcserror_s
@@ -826,6 +828,10 @@
 #define __CRT_HAVE_DOS$_wcstombs_s_l
 #define __CRT_HAVE_DOS$_wcsupr_s
 #define __CRT_HAVE_DOS$_wcsupr_s_l
+#define __CRT_HAVE_DOS$_wctime32
+#define __CRT_HAVE_DOS$_wctime32_s
+#define __CRT_HAVE_DOS$_wctime64
+#define __CRT_HAVE_DOS$_wctime64_s
 #define __CRT_HAVE_DOS$_wctomb_l
 #define __CRT_HAVE_DOS$_wctomb_s_l
 #define __CRT_HAVE_DOS$_wdupenv_s
@@ -868,6 +874,10 @@
 #define __CRT_HAVE_DOS$_wstat32i64
 #define __CRT_HAVE_DOS$_wstat64
 #define __CRT_HAVE_DOS$_wstat64i32
+#define __CRT_HAVE_DOS$_wstrdate
+#define __CRT_HAVE_DOS$_wstrdate_s
+#define __CRT_HAVE_DOS$_wstrtime
+#define __CRT_HAVE_DOS$_wstrtime_s
 #define __CRT_HAVE_DOS$_wtempnam
 #define __CRT_HAVE_DOS$_wtmpnam
 #define __CRT_HAVE_DOS$_wtmpnam_s
@@ -4649,6 +4659,8 @@
 #define __CRT_HAVE__vwscanf_l
 #define __CRT_HAVE__vwscanf_s_l
 #define __CRT_HAVE__waccess_s
+#define __CRT_HAVE__wasctime
+#define __CRT_HAVE__wasctime_s
 #define __CRT_HAVE__wcreate_locale
 #define __CRT_HAVE__wcsdup_dbg
 #define __CRT_HAVE__wcserror
@@ -4661,6 +4673,10 @@
 #define __CRT_HAVE__wcstombs_s_l
 #define __CRT_HAVE__wcsupr_s
 #define __CRT_HAVE__wcsupr_s_l
+#define __CRT_HAVE__wctime32
+#define __CRT_HAVE__wctime32_s
+#define __CRT_HAVE__wctime64
+#define __CRT_HAVE__wctime64_s
 #define __CRT_HAVE__wctomb_l
 #define __CRT_HAVE__wctomb_s_l
 #define __CRT_HAVE__wdupenv_s
@@ -4707,6 +4723,10 @@
 #define __CRT_HAVE__wstat32i64
 #define __CRT_HAVE__wstat64
 #define __CRT_HAVE__wstat64i32
+#define __CRT_HAVE__wstrdate
+#define __CRT_HAVE__wstrdate_s
+#define __CRT_HAVE__wstrtime
+#define __CRT_HAVE__wstrtime_s
 #define __CRT_HAVE__wtempnam
 #define __CRT_HAVE__wtempnam_dbg
 #define __CRT_HAVE__wtmpnam

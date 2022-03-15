@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9cc7859 */
+/* HASH CRC-32:0xb6a7083f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,41 +18,40 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__gmtime64_s_defined
-#define __local__gmtime64_s_defined
+#ifndef __local__c16asctime_s_defined
+#define __local__c16asctime_s_defined
 #include <__crt.h>
 #include <bits/types.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_gmtime64_r_defined
-#define __local___localdep_gmtime64_r_defined
-#if defined(__CRT_HAVE_gmtime_r) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_NONNULL((1, 2)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_gmtime64_r,(__time64_t const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),gmtime_r,(__timer,__tp))
-#elif defined(__CRT_HAVE_gmtime64_r)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_gmtime64_r,(__time64_t const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),gmtime64_r,(__timer,__tp))
-#else /* ... */
+#ifndef __local___localdep_asctime_r_defined
+#define __local___localdep_asctime_r_defined
+#ifdef __CRT_HAVE_asctime_r
+__CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_asctime_r,(struct __NAMESPACE_STD_SYM tm const *__restrict __tp, char __buf[26]),asctime_r,(__tp,__buf))
+#else /* __CRT_HAVE_asctime_r */
 __NAMESPACE_LOCAL_END
-#include <libc/local/time/gmtime64_r.h>
+#include <libc/local/time/asctime_r.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_gmtime64_r __LIBC_LOCAL_NAME(gmtime64_r)
-#endif /* !... */
-#endif /* !__local___localdep_gmtime64_r_defined */
-__NAMESPACE_LOCAL_END
-#include <libc/errno.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_gmtime64_s) __ATTR_NONNULL((1, 2)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_gmtime64_s))(struct __NAMESPACE_STD_SYM tm *__restrict __tp, __time64_t const *__restrict __timer) {
-
-
-
-	if __unlikely(!(__NAMESPACE_LOCAL_SYM __localdep_gmtime64_r)(__timer, __tp))
-		return __libc_geterrno_or(1);
-
+#define __localdep_asctime_r __LIBC_LOCAL_NAME(asctime_r)
+#endif /* !__CRT_HAVE_asctime_r */
+#endif /* !__local___localdep_asctime_r_defined */
+__LOCAL_LIBC(_c16asctime_s) __ATTR_NONNULL((1, 3)) __errno_t
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_c16asctime_s))(__CHAR16_TYPE__ *__buf, __SIZE_TYPE__ __buflen, struct __NAMESPACE_STD_SYM tm const *__tp) {
+	char __abuf[26], *__ptr;
+	unsigned int __i;
+	if __unlikely(__buflen < 26)
+		return __ERANGE;
+	/* asctime --> ASCiiTIME --> No unicode here --> directly  copy
+	 * This is also why its  kind of <redacted for profanity>  that
+	 * a function like `_wasctime_s()' even exists, but whatever... */
+	__ptr = (__NAMESPACE_LOCAL_SYM __localdep_asctime_r)(__tp, __abuf);
+	for (__i = 0; __i < 26; ++__i)
+		__buf[__i] = (__CHAR16_TYPE__)__ptr[__i];
 	return 0;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep__gmtime64_s_defined
-#define __local___localdep__gmtime64_s_defined
-#define __localdep__gmtime64_s __LIBC_LOCAL_NAME(_gmtime64_s)
-#endif /* !__local___localdep__gmtime64_s_defined */
-#endif /* !__local__gmtime64_s_defined */
+#ifndef __local___localdep__c16asctime_s_defined
+#define __local___localdep__c16asctime_s_defined
+#define __localdep__c16asctime_s __LIBC_LOCAL_NAME(_c16asctime_s)
+#endif /* !__local___localdep__c16asctime_s_defined */
+#endif /* !__local__c16asctime_s_defined */

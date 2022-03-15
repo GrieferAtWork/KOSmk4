@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf282956c */
+/* HASH CRC-32:0xaca15226 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,7 +68,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/tm.h>
 #include <libc/template/itoa_digits.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_strdate) __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
+__LOCAL_LIBC(_strdate) __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_strdate))(char __buf[9]) {
 	__time64_t __now = (__NAMESPACE_LOCAL_SYM __localdep_time64)(__NULLPTR);
 	struct __NAMESPACE_STD_SYM tm __now_tm, *__tp;

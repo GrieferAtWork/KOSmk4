@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87a30c37 */
+/* HASH CRC-32:0xf308b799 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -111,6 +111,10 @@ __NAMESPACE_STD_USING(timespec_get)
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 */
+
+#ifdef __USE_DOS
+#include <corecrt_wtime.h>
+#endif /* __USE_DOS */
 
 #ifdef __USE_GNU
 #include <asm/os/timex.h>
@@ -2230,16 +2234,16 @@ __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,_strftime_l,(c
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _strftime_l)(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strftime_l))(__buf, __bufsize, __format, __tp, __locale); }
 #endif /* !... */
 #ifdef __CRT_HAVE__strtime
-__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,_strtime,(char __buf[9]),(__buf))
+__CDECLARE(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,_strtime,(char __buf[9]),(__buf))
 #elif defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 #include <libc/local/time/_strtime.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_strtime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL _strtime)(char __buf[9]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_strtime))(__buf); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_strtime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL _strtime)(char __buf[9]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_strtime))(__buf); })
 #endif /* ... */
 #ifdef __CRT_HAVE__strdate
-__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,_strdate,(char __buf[9]),(__buf))
+__CDECLARE(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,_strdate,(char __buf[9]),(__buf))
 #elif defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 #include <libc/local/time/_strdate.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_strdate, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL _strdate)(char __buf[9]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_strdate))(__buf); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_strdate, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL _strdate)(char __buf[9]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_strdate))(__buf); })
 #endif /* ... */
 #ifdef __CRT_HAVE__strtime_s
 __CDECLARE(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_strtime_s,(char *__buf, size_t __bufsize),(__buf,__bufsize))
@@ -2306,18 +2310,18 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_setsystime, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 
 
 #ifdef __USE_TIME_BITS64
-#define _mkgmtime _mkgmtime32
-#ifdef __USE_DOS_SLIB
-#define ctime_s     _ctime32_s
-#define gmtime_s    _gmtime32_s
-#define localtime_s _localtime32_s
-#endif /* __USE_DOS_SLIB */
-#else /* __USE_TIME_BITS64 */
 #define _mkgmtime _mkgmtime64
 #ifdef __USE_DOS_SLIB
 #define ctime_s     _ctime64_s
 #define gmtime_s    _gmtime64_s
 #define localtime_s _localtime64_s
+#endif /* __USE_DOS_SLIB */
+#else /* __USE_TIME_BITS64 */
+#define _mkgmtime _mkgmtime32
+#ifdef __USE_DOS_SLIB
+#define ctime_s     _ctime32_s
+#define gmtime_s    _gmtime32_s
+#define localtime_s _localtime32_s
 #endif /* __USE_DOS_SLIB */
 #endif /* !__USE_TIME_BITS64 */
 #endif /* __USE_DOS */

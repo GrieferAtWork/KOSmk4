@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9cc7859 */
+/* HASH CRC-32:0x4e66f41 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,41 +18,31 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__gmtime64_s_defined
-#define __local__gmtime64_s_defined
+#ifndef __local__wasctime_defined
+#define __local__wasctime_defined
 #include <__crt.h>
 #include <bits/types.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_gmtime64_r_defined
-#define __local___localdep_gmtime64_r_defined
-#if defined(__CRT_HAVE_gmtime_r) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_NONNULL((1, 2)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_gmtime64_r,(__time64_t const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),gmtime_r,(__timer,__tp))
-#elif defined(__CRT_HAVE_gmtime64_r)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_gmtime64_r,(__time64_t const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),gmtime64_r,(__timer,__tp))
-#else /* ... */
+#ifndef __local___localdep__wasctime_s_defined
+#define __local___localdep__wasctime_s_defined
+#ifdef __CRT_HAVE__wasctime_s
+__CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep__wasctime_s,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, struct __NAMESPACE_STD_SYM tm const *__tp),_wasctime_s,(__buf,__buflen,__tp))
+#else /* __CRT_HAVE__wasctime_s */
 __NAMESPACE_LOCAL_END
-#include <libc/local/time/gmtime64_r.h>
+#include <libc/local/corecrt_wtime/_wasctime_s.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_gmtime64_r __LIBC_LOCAL_NAME(gmtime64_r)
-#endif /* !... */
-#endif /* !__local___localdep_gmtime64_r_defined */
-__NAMESPACE_LOCAL_END
-#include <libc/errno.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_gmtime64_s) __ATTR_NONNULL((1, 2)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_gmtime64_s))(struct __NAMESPACE_STD_SYM tm *__restrict __tp, __time64_t const *__restrict __timer) {
-
-
-
-	if __unlikely(!(__NAMESPACE_LOCAL_SYM __localdep_gmtime64_r)(__timer, __tp))
-		return __libc_geterrno_or(1);
-
-	return 0;
+#define __localdep__wasctime_s __LIBC_LOCAL_NAME(_wasctime_s)
+#endif /* !__CRT_HAVE__wasctime_s */
+#endif /* !__local___localdep__wasctime_s_defined */
+__LOCAL_LIBC(_wasctime) __ATTR_WUNUSED __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wasctime))(struct __NAMESPACE_STD_SYM tm const *__tp) {
+	static __WCHAR_TYPE__ __wasctime_retbuf[26] = { 0 };
+	return (__NAMESPACE_LOCAL_SYM __localdep__wasctime_s)(__wasctime_retbuf, 26, __tp) ? __NULLPTR : __wasctime_retbuf;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep__gmtime64_s_defined
-#define __local___localdep__gmtime64_s_defined
-#define __localdep__gmtime64_s __LIBC_LOCAL_NAME(_gmtime64_s)
-#endif /* !__local___localdep__gmtime64_s_defined */
-#endif /* !__local__gmtime64_s_defined */
+#ifndef __local___localdep__wasctime_defined
+#define __local___localdep__wasctime_defined
+#define __localdep__wasctime __LIBC_LOCAL_NAME(_wasctime)
+#endif /* !__local___localdep__wasctime_defined */
+#endif /* !__local__wasctime_defined */
