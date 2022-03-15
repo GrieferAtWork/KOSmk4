@@ -446,6 +446,14 @@ __LIBC __FILE _IO_2_1_stderr_;
 #endif /* !stderr */
 
 
+/* KOS-extension: standard file stream for `/dev/tty' */
+#if defined(__USE_KOS) && !defined(stdtty)
+#ifdef __CRT_HAVE_stdtty
+__LIBC FILE *stdtty;
+#define stdtty stdtty
+#endif /* __CRT_HAVE_stdtty */
+#endif /* __USE_KOS && !stdtty */
+
 }
 
 %[insert:std]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4526dfd7 */
+/* HASH CRC-32:0xe3e504e9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -537,6 +537,14 @@ __LIBC __FILE _IO_2_1_stderr_;
 #endif /* ... */
 #endif /* !stderr */
 
+
+/* KOS-extension: standard file stream for `/dev/tty' */
+#if defined(__USE_KOS) && !defined(stdtty)
+#ifdef __CRT_HAVE_stdtty
+__LIBC FILE *stdtty;
+#define stdtty stdtty
+#endif /* __CRT_HAVE_stdtty */
+#endif /* __USE_KOS && !stdtty */
 
 __NAMESPACE_STD_BEGIN
 #ifndef __std_remove_defined

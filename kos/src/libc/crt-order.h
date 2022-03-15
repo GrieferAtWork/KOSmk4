@@ -218,6 +218,7 @@
 	.bsd.* .bsd                       # Misc BSD functions
 	.solaris.* .solaris               # Misc Solaris functions
 	.mbstring.* .mbstring             # <mbstring.h>, <mbctype.h>
+	.conio.* .conio                   # <conio.h>, `stdtty'
 	.unsorted                         # Everything else...
 
 	# Compatibility stuff
@@ -518,6 +519,7 @@
 	CB(PREFIX.crt.dos.bsd.io.access PREFIX.crt.dos.bsd.strstat PREFIX.crt.dos.bsd) \
 	CB(PREFIX.crt.dos.solaris) \
 	CB(PREFIX.crt.dos.mbstring) \
+	CB(PREFIX.crt.dos.conio) \
 	CB(PREFIX.crt.dos.unsorted) \
 	CB(PREFIX.crt.dos.compat.cyg.errno PREFIX.crt.dos.compat.cyg.fs.stat) \
 	CB(PREFIX.crt.dos.compat.dos.errno PREFIX.crt.dos.compat.dos.except PREFIX.crt.dos.compat.dos.fs.stat PREFIX.crt.dos.compat.dos.msabi64 PREFIX.crt.dos.compat.dos) \

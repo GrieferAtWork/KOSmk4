@@ -4428,6 +4428,7 @@
 #define __CRT_HAVE_stderr
 #define __CRT_HAVE_stdin
 #define __CRT_HAVE_stdout
+#define __CRT_HAVE_stdtty
 #define __CRT_HAVE_stime
 #define __CRT_HAVE_stime64
 #define __CRT_HAVE_stpcpy

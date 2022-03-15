@@ -45,9 +45,12 @@
 #include <nt/types.h>
 
 #include <elf.h>
+#include <fcntl.h>
 #include <format-printer.h>
 #include <locale.h>
 #include <math.h>
+#include <paths.h>
+#include <pthread.h>
 #include <signal.h>
 #include <stdlib.h> /* exit() */
 #include <string.h>
@@ -110,6 +113,63 @@ FILE *NOTHROW(LIBDCALL libd___iob_func)(void) {
 	 * to  worry  about   `dlsym("_iob") != &libc_iob'. */
 	return libc_iob;
 }
+
+
+
+/************************************************************************/
+/* stdtty (for <conio.h>)                                               */
+/************************************************************************/
+PRIVATE ATTR_SECTION(".data.crt.dos.conio")
+struct iofile_data_novtab libc_stdttyfile_data = IOFILE_DATA_NOVTAB_INIT();
+#ifdef AT_FDCTTY
+PRIVATE ATTR_SECTION(".data.crt.dos.conio")
+FILE libc_stdttyfile = __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNBUF | IO_ISATTY, AT_FDCTTY, { 0 }, 0, NULL /*(struct iofile_data *)&libc_stdttyfile_data*/);
+#else /* AT_FDCTTY */
+PRIVATE ATTR_SECTION(".data.crt.dos.conio")
+FILE libc_stdttyfile = __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNBUF | IO_ISATTY, -1, { 0 }, 0, NULL /*(struct iofile_data *)&libc_stdttyfile_data*/);
+#endif /* !AT_FDCTTY */
+PRIVATE ATTR_SECTION(".bss.crt.dos.conio")
+FILE *libc_stdtty = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.dos.conio")
+pthread_once_t libc_stdtty_initialized = PTHREAD_ONCE_INIT;
+
+#ifndef _PATH_TTY
+#define _PATH_TTY "/dev/tty"
+#endif /* !_PATH_TTY */
+
+PRIVATE ATTR_SECTION(".text.crt.dos.conio") void
+NOTHROW(LIBCCALL libc_stdtty_initialize)(void) {
+	/* When KOS's AT_FDCTTY extension is active, every process
+	 * can make use of an  implicit file descriptor with  this
+	 * name in order to refer to its controlling terminal.
+	 *
+	 * Trying to use that file descriptor when one does not have
+	 * a controlling terminal will fail with EBADF at use  time. */
+
+#ifndef AT_FDCTTY
+	/* Lazily open /dev/tty on first access. Note that have
+	 * to set `O_CLOEXEC' to ensure that the file handle is
+	 * not inherited by child processes! */
+	fd_t ttyfd = sys_open(_PATH_TTY, O_RDWR | O_CLOEXEC, 0);
+	if likely(E_ISOK(ttyfd))
+		libc_stdttyfile.if_fd = ttyfd;
+#endif /* !AT_FDCTTY */
+
+	/* Initialize global points so they don't require relocations. */
+	libc_stdttyfile.if_exdata = (struct iofile_data *)&libc_stdttyfile_data;
+	libc_stdtty               = &libc_stdttyfile;
+}
+
+#undef stdtty
+DEFINE_PUBLIC_IDATA_G(stdtty, libc_resolve_stdtty, __SIZEOF_POINTER__);
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.dos.conio")
+FILE **NOTHROW(LIBDCALL libc_resolve_stdtty)(void) {
+	pthread_once(&libc_stdtty_initialized, &libc_stdtty_initialize);
+	return &libc_stdtty;
+}
+
+
+
 
 
 

@@ -38,6 +38,7 @@
 #include <fcntl.h>
 #include <format-printer.h>
 #include <malloc.h>
+#include <paths.h>
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
@@ -75,9 +76,15 @@ DEFINE_PUBLIC_ALIAS(SetConsoleCP, libk32_SetConsoleCP);
 DEFINE_PUBLIC_ALIAS(GetConsoleOutputCP, libk32_GetConsoleOutputCP);
 DEFINE_PUBLIC_ALIAS(SetConsoleOutputCP, libk32_SetConsoleOutputCP);
 
+#ifndef _PATH_TTY
+#define _PATH_TTY "/dev/tty"
+#endif /* !_PATH_TTY */
+
 #ifdef AT_FDCTTY
 #define gettty() AT_FDCTTY
-#else /* AT_FDCTTY */
+#elif defined(stdtty)
+#define gettty() fileno(stdtty)
+#else /* ... */
 static fd_t saved_ttyfd = -1;
 PRIVATE fd_t gettty(void) {
 	fd_t result = saved_ttyfd;
@@ -85,7 +92,7 @@ PRIVATE fd_t gettty(void) {
 		if (isatty(STDIN_FILENO))
 			result = STDIN_FILENO;
 		else {
-			result = open("/dev/tty", O_RDONLY);
+			result = open(_PATH_TTY, O_RDONLY);
 			if (result < 0)
 				result = STDIN_FILENO; /* Shouldn't happen... */
 		}
@@ -93,7 +100,7 @@ PRIVATE fd_t gettty(void) {
 	}
 	return result;
 }
-#endif /* !AT_FDCTTY */
+#endif /* !... */
 
 
 static WINBOOL cursor_visible  = TRUE;

@@ -117,25 +117,28 @@ __NAMESPACE_STD_END
 #define __FILE_defined
 __NAMESPACE_STD_USING(FILE)
 #endif /* !__FILE_defined */
-#undef __local_stdstream_defined
-#undef __stdstreams_defined
+#undef _LIBC_TEMPLATE_STDSTREAMS_H
+#define _LIBC_TEMPLATE_STDSTREAMS_H 1
 #undef __LOCAL_stdin
 #undef __LOCAL_stdout
 #undef __LOCAL_stderr
+#undef __LOCAL_stdtty
 #undef stdin
 #undef stdout
 #undef stderr
+#undef stdtty
 DECLARE_NOREL_GLOBAL_META(FILE *, stdin);
 DECLARE_NOREL_GLOBAL_META(FILE *, stdout);
 DECLARE_NOREL_GLOBAL_META(FILE *, stderr);
-#define __local_stdstream_defined
+DECLARE_NOREL_GLOBAL_META(FILE *, stdtty);
 #define __LOCAL_stdin  GET_NOREL_GLOBAL(stdin)
 #define __LOCAL_stdout GET_NOREL_GLOBAL(stdout)
 #define __LOCAL_stderr GET_NOREL_GLOBAL(stderr)
-#define __stdstreams_defined
-#define stdin  GET_NOREL_GLOBAL(stdin)
-#define stdout GET_NOREL_GLOBAL(stdout)
-#define stderr GET_NOREL_GLOBAL(stderr)
+#define __LOCAL_stdtty GET_NOREL_GLOBAL(stdtty)
+#define stdin          GET_NOREL_GLOBAL(stdin)
+#define stdout         GET_NOREL_GLOBAL(stdout)
+#define stderr         GET_NOREL_GLOBAL(stderr)
+#define stdtty         GET_NOREL_GLOBAL(stdtty)
 
 
 /* <error.h> */

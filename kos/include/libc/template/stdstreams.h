@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_stdstream_defined
-#define __local_stdstream_defined
+#ifndef _LIBC_TEMPLATE_STDSTREAMS_H
+#define _LIBC_TEMPLATE_STDSTREAMS_H 1
 #include <__crt.h>
 #ifdef __CRT_CYG_PRIMARY
 #include <sys/reent.h>
@@ -139,4 +139,4 @@ __LIBC __FILE _IO_2_1_stderr_;
 __SYSDECL_END
 #endif /* __CC__ */
 
-#endif /* !__local_stdstream_defined */
+#endif /* !_LIBC_TEMPLATE_STDSTREAMS_H */
