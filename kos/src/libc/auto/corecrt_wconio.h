@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5064160 */
+/* HASH CRC-32:0x64866d98 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,6 +30,14 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
+INTDEF WUNUSED wint16_t NOTHROW_NCX(LIBDCALL libd__getwch)(void);
+INTDEF WUNUSED wint32_t NOTHROW_NCX(LIBKCALL libc__getwch)(void);
+INTDEF WUNUSED wint16_t NOTHROW_NCX(LIBDCALL libd__getwch_nolock)(void);
+INTDEF WUNUSED wint32_t NOTHROW_NCX(LIBKCALL libc__getwch_nolock)(void);
+INTDEF WUNUSED wint16_t NOTHROW_NCX(LIBDCALL libd__getwche)(void);
+INTDEF WUNUSED wint32_t NOTHROW_NCX(LIBKCALL libc__getwche)(void);
+INTDEF WUNUSED wint16_t NOTHROW_NCX(LIBDCALL libd__getwche_nolock)(void);
+INTDEF WUNUSED wint32_t NOTHROW_NCX(LIBKCALL libc__getwche_nolock)(void);
 INTDEF wint16_t NOTHROW_NCX(LIBDCALL libd__putwch)(char16_t ch);
 INTDEF wint32_t NOTHROW_NCX(LIBKCALL libc__putwch)(char32_t ch);
 INTDEF wint16_t NOTHROW_NCX(LIBDCALL libd__putwch_nolock)(char16_t ch);

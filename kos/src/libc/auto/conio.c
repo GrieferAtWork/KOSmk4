@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d352488 */
+/* HASH CRC-32:0x5642fd74 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,11 +29,92 @@
 #include "format-printer.h"
 #include "../user/stdio.h"
 #include "../user/string.h"
+#include "termios.h"
 
 DECL_BEGIN
 
 #include "../libc/globals.h"
 #ifndef __KERNEL__
+#include <libc/template/stdtty.h>
+/* >> _getch(3), _getch_nolock(3)
+ * Read a character from the console, without echoing it on-screen
+ * @return: * : The character read from the console
+ * @return: -1: End-of-file on console */
+INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__getch)(void) {
+	int result;
+
+	FILE *fp = stdtty;
+	libc_flockfile(fp);
+
+	result = libc__getch_nolock();
+
+	libc_funlockfile(fp);
+
+	return result;
+}
+#include <bits/types.h>
+#include <asm/os/termios.h>
+#include <bits/os/termios.h>
+#include <libc/template/stdtty.h>
+/* >> _getch(3), _getch_nolock(3)
+ * Read a character from the console, without echoing it on-screen
+ * @return: * : The character read from the console
+ * @return: -1: End-of-file on console */
+INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__getch_nolock)(void) {
+	int result;
+	struct termios oios, nios;
+	FILE *fp = stdtty;
+	fd_t fd  = libc_fileno(fp);
+	libc_tcgetattr(fd, &oios);
+	libc_memcpy(&nios, &oios, sizeof(nios));
+	nios.c_lflag &= ~__ECHO;
+	libc_tcsetattr(fd, __TCSANOW, &nios);
+	result = libc_fgetc_unlocked(fp);
+	libc_tcsetattr(fd, __TCSANOW, &oios);
+	return result;
+}
+#include <libc/template/stdtty.h>
+/* >> _getche(3), _getche_nolock(3)
+ * Read a character from the console, whilst also echoing it on-screen
+ * @return: * : The character read from the console
+ * @return: -1: End-of-file on console */
+INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__getche)(void) {
+	int result;
+
+	FILE *fp = stdtty;
+	libc_flockfile(fp);
+
+	result = libc__getche_nolock();
+
+	libc_funlockfile(fp);
+
+	return result;
+}
+#include <bits/types.h>
+#include <asm/os/termios.h>
+#include <bits/os/termios.h>
+#include <libc/template/stdtty.h>
+/* >> _getche(3), _getche_nolock(3)
+ * Read a character from the console, whilst also echoing it on-screen
+ * @return: * : The character read from the console
+ * @return: -1: End-of-file on console */
+INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__getche_nolock)(void) {
+	int result;
+	struct termios oios, nios;
+	FILE *fp = stdtty;
+	fd_t fd  = libc_fileno(fp);
+	libc_tcgetattr(fd, &oios);
+	libc_memcpy(&nios, &oios, sizeof(nios));
+	nios.c_lflag |= __ECHO;
+	libc_tcsetattr(fd, __TCSANOW, &nios);
+	result = libc_fgetc_unlocked(fp);
+	libc_tcsetattr(fd, __TCSANOW, &oios);
+	return result;
+}
 #include <libc/template/stdtty.h>
 INTERN ATTR_SECTION(".text.crt.dos.conio") int
 NOTHROW_NCX(LIBCCALL libc__putch)(int ch) {
@@ -130,7 +211,7 @@ __LOCAL_LIBC(__conio_common_vcscanf_getc) ssize_t
 	return (ssize_t)libc__getwche();
 }
 __LOCAL_LIBC(__conio_common_vcscanf_ungetc) ssize_t
-(__FORMATPRINTER_CC __conio_common_vcscanf_ungetc)(void *arg, char32_t ch) {
+(__FORMATPRINTER_CC __conio_common_vcscanf_ungetc)(void *__UNUSED(arg), char32_t ch) {
 	return libc__ungetwch((int)(unsigned int)ch);
 }
 __NAMESPACE_LOCAL_END
@@ -414,6 +495,10 @@ NOTHROW_NCX(VLIBCCALL libc__cscanf_s_l)(char const *format,
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(_getch, libc__getch);
+DEFINE_PUBLIC_ALIAS(_getch_nolock, libc__getch_nolock);
+DEFINE_PUBLIC_ALIAS(_getche, libc__getche);
+DEFINE_PUBLIC_ALIAS(_getche_nolock, libc__getche_nolock);
 DEFINE_PUBLIC_ALIAS(_putch, libc__putch);
 DEFINE_PUBLIC_ALIAS(_putch_nolock, libc__putch_nolock);
 DEFINE_PUBLIC_ALIAS(_ungetch, libc__ungetch);

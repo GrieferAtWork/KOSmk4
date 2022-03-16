@@ -59,9 +59,28 @@ typedef __errno_t errno_t; /* Errno code (one of `E*' from <errno.h>) */
 
 }
 
+/*
+ * =========== Implementation Notes ========================================
+ *
+ * - _kbhit()  --> readf(IO_NONBLOCK)
+ * - _getch()  --> tcgetattr(SAVED) + tcsetattr(~ECHO) + read() + tcsetattr(SAVED)
+ * - _getche() --> tcgetattr(SAVED) + tcsetattr(ECHO) + read() + tcsetattr(SAVED)
+ *
+ * The race condition where _getch() / _getche() don't affect the echoing of characters
+ * entered while not inside of the read-character loop actually also exists on  windows
+ * (as  far as I can tell). By looking  at the disassembly of those functions, it seems
+ * like they do pretty much the same as we do, except that:
+ *  - `tcgetattr()' becomes `GetConsoleMode()'
+ *  - `tcsetattr()' becomes `SetConsoleMode()'
+ *  - `~ECHO' becomes `0'
+ *  - `ECHO' becomes `ENABLE_ECHO_INPUT' (well... actually it also becomes
+ *    `0', and the read character  is manually echoed via `_putch()',  but
+ *    you should get the idea...)
+ */
+
+
 [[wunused]]
 int _kbhit(void);
-
 
 @@>> _getch(3), _getch_nolock(3)
 @@Read a character from the console, without echoing it on-screen
@@ -69,10 +88,39 @@ int _kbhit(void);
 @@@return: -1: End-of-file on console
 [[wunused]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("_getch_nolock")]]
-int _getch(void);
+[[requires(defined(__CRT_HAVE_stdtty) && $has_function(_getch_nolock))]]
+[[impl_include("<libc/template/stdtty.h>")]]
+int _getch(void) {
+	int result;
+@@pp_if $has_function(flockfile, funlockfile)@@
+	FILE *fp = stdtty;
+	flockfile(fp);
+@@pp_endif@@
+	result = _getch_nolock();
+@@pp_if $has_function(flockfile, funlockfile)@@
+	funlockfile(fp);
+@@pp_endif@@
+	return result;
+}
 
 [[wunused, alias("_getch"), doc_alias("_getch")]]
-int _getch_nolock(void);
+[[requires($extended_include_prefix("<asm/os/termios.h>")
+           defined(__ECHO) && defined(__TCSANOW) && defined(__CRT_HAVE_stdtty) &&
+           $has_function(fileno, fgetc_unlocked, tcgetattr, tcsetattr))]]
+[[impl_include("<bits/types.h>", "<asm/os/termios.h>", "<bits/os/termios.h>", "<libc/template/stdtty.h>")]]
+int _getch_nolock(void) {
+	int result;
+	struct termios oios, nios;
+	FILE *fp = stdtty;
+	fd_t fd  = fileno(fp);
+	tcgetattr(fd, &oios);
+	memcpy(&nios, &oios, sizeof(nios));
+	nios.@c_lflag@ &= ~__ECHO;
+	tcsetattr(fd, __TCSANOW, &nios);
+	result = fgetc_unlocked(fp);
+	tcsetattr(fd, __TCSANOW, &oios);
+	return result;
+}
 
 @@>> _getche(3), _getche_nolock(3)
 @@Read a character from the console, whilst also echoing it on-screen
@@ -80,10 +128,39 @@ int _getch_nolock(void);
 @@@return: -1: End-of-file on console
 [[wunused]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("_getche_nolock")]]
-int _getche(void);
+[[requires(defined(__CRT_HAVE_stdtty) && $has_function(_getche_nolock))]]
+[[impl_include("<libc/template/stdtty.h>")]]
+int _getche(void) {
+	int result;
+@@pp_if $has_function(flockfile, funlockfile)@@
+	FILE *fp = stdtty;
+	flockfile(fp);
+@@pp_endif@@
+	result = _getche_nolock();
+@@pp_if $has_function(flockfile, funlockfile)@@
+	funlockfile(fp);
+@@pp_endif@@
+	return result;
+}
 
 [[wunused, alias("_getche"), doc_alias("_getche")]]
-int _getche_nolock(void);
+[[requires($extended_include_prefix("<asm/os/termios.h>")
+           defined(__ECHO) && defined(__TCSANOW) && defined(__CRT_HAVE_stdtty) &&
+           $has_function(fileno, fgetc_unlocked, tcgetattr, tcsetattr))]]
+[[impl_include("<bits/types.h>", "<asm/os/termios.h>", "<bits/os/termios.h>", "<libc/template/stdtty.h>")]]
+int _getche_nolock(void) {
+	int result;
+	struct termios oios, nios;
+	FILE *fp = stdtty;
+	fd_t fd  = fileno(fp);
+	tcgetattr(fd, &oios);
+	memcpy(&nios, &oios, sizeof(nios));
+	nios.@c_lflag@ |= __ECHO;
+	tcsetattr(fd, __TCSANOW, &nios);
+	result = fgetc_unlocked(fp);
+	tcsetattr(fd, __TCSANOW, &oios);
+	return result;
+}
 
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("_putch_nolock")]]
 [[requires(defined(__CRT_HAVE_stdtty) && $has_function(fputc))]]
@@ -204,7 +281,7 @@ __LOCAL_LIBC(__conio_common_vcscanf_getc) ssize_t
 	return (ssize_t)_getwche();
 }
 __LOCAL_LIBC(__conio_common_vcscanf_ungetc) ssize_t
-(__FORMATPRINTER_CC __conio_common_vcscanf_ungetc)(void *arg, char32_t ch) {
+(__FORMATPRINTER_CC __conio_common_vcscanf_ungetc)(void *__UNUSED(arg), char32_t ch) {
 	return _ungetwch((int)(unsigned int)ch);
 }
 @@pop_namespace@@

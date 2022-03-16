@@ -66,17 +66,75 @@ typedef __errno_t errno_t; /* Errno code (one of `E*' from <errno.h>) */
 
 [[wchar, wunused]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("_getwch_nolock")]]
-wint_t _getwch(void);
+[[requires(defined(__CRT_HAVE_stdtty) && $has_function(_getwch_nolock))]]
+[[impl_include("<libc/template/stdtty.h>")]]
+wint_t _getwch(void) {
+	wint_t result;
+@@pp_if $has_function(flockfile, funlockfile)@@
+	FILE *fp = stdtty;
+	flockfile(fp);
+@@pp_endif@@
+	result = _getwch_nolock();
+@@pp_if $has_function(flockfile, funlockfile)@@
+	funlockfile(fp);
+@@pp_endif@@
+	return result;
+}
 
 [[wchar, wunused, doc_alias("_getwch")]]
-wint_t _getwch_nolock(void);
+[[requires($extended_include_prefix("<asm/os/termios.h>")
+           defined(__ECHO) && defined(__TCSANOW) && defined(__CRT_HAVE_stdtty) &&
+           $has_function(fileno, fgetwc_unlocked, tcgetattr, tcsetattr))]]
+[[impl_include("<bits/types.h>", "<asm/os/termios.h>", "<bits/os/termios.h>", "<libc/template/stdtty.h>")]]
+wint_t _getwch_nolock(void) {
+	wint_t result;
+	struct termios oios, nios;
+	FILE *fp = stdtty;
+	fd_t fd  = fileno(fp);
+	tcgetattr(fd, &oios);
+	memcpy(&nios, &oios, sizeof(nios));
+	nios.@c_lflag@ &= ~__ECHO;
+	tcsetattr(fd, __TCSANOW, &nios);
+	result = fgetwc_unlocked(fp);
+	tcsetattr(fd, __TCSANOW, &oios);
+	return result;
+}
 
 [[wchar, wunused]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("_getwche_nolock")]]
-wint_t _getwche(void);
+[[requires(defined(__CRT_HAVE_stdtty) && $has_function(_getwche_nolock))]]
+[[impl_include("<libc/template/stdtty.h>")]]
+wint_t _getwche(void) {
+	wint_t result;
+@@pp_if $has_function(flockfile, funlockfile)@@
+	FILE *fp = stdtty;
+	flockfile(fp);
+@@pp_endif@@
+	result = _getwche_nolock();
+@@pp_if $has_function(flockfile, funlockfile)@@
+	funlockfile(fp);
+@@pp_endif@@
+	return result;
+}
 
 [[wchar, wunused, doc_alias("_getwche")]]
-wint_t _getwche_nolock(void);
+[[requires($extended_include_prefix("<asm/os/termios.h>")
+           defined(__ECHO) && defined(__TCSANOW) && defined(__CRT_HAVE_stdtty) &&
+           $has_function(fileno, fgetwc_unlocked, tcgetattr, tcsetattr))]]
+[[impl_include("<bits/types.h>", "<asm/os/termios.h>", "<bits/os/termios.h>", "<libc/template/stdtty.h>")]]
+wint_t _getwche_nolock(void) {
+	wint_t result;
+	struct termios oios, nios;
+	FILE *fp = stdtty;
+	fd_t fd  = fileno(fp);
+	tcgetattr(fd, &oios);
+	memcpy(&nios, &oios, sizeof(nios));
+	nios.@c_lflag@ |= __ECHO;
+	tcsetattr(fd, __TCSANOW, &nios);
+	result = fgetwc_unlocked(fp);
+	tcsetattr(fd, __TCSANOW, &oios);
+	return result;
+}
 
 [[requires(defined(__CRT_HAVE_stdtty) && $has_function(fputwc))]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("_putwch_nolock")]]

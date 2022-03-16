@@ -27,94 +27,6 @@
 
 DECL_BEGIN
 
-/*[[[head:libd__getwch,hash:CRC-32=0x7f23aff3]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED wint16_t
-NOTHROW_NCX(LIBDCALL libd__getwch)(void)
-/*[[[body:libd__getwch]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("DOS$_getwch"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libd__getwch]]]*/
-
-/*[[[head:libc__getwch,hash:CRC-32=0xce0319f7]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED wint32_t
-NOTHROW_NCX(LIBKCALL libc__getwch)(void)
-/*[[[body:libc__getwch]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("_getwch"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc__getwch]]]*/
-
-/*[[[head:libd__getwch_nolock,hash:CRC-32=0x56803ef1]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED wint16_t
-NOTHROW_NCX(LIBDCALL libd__getwch_nolock)(void)
-/*[[[body:libd__getwch_nolock]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("DOS$_getwch_nolock"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libd__getwch_nolock]]]*/
-
-/*[[[head:libc__getwch_nolock,hash:CRC-32=0xa53ec71]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED wint32_t
-NOTHROW_NCX(LIBKCALL libc__getwch_nolock)(void)
-/*[[[body:libc__getwch_nolock]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("_getwch_nolock"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc__getwch_nolock]]]*/
-
-/*[[[head:libd__getwche,hash:CRC-32=0xee2f321]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED wint16_t
-NOTHROW_NCX(LIBDCALL libd__getwche)(void)
-/*[[[body:libd__getwche]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("DOS$_getwche"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libd__getwche]]]*/
-
-/*[[[head:libc__getwche,hash:CRC-32=0x93e178e]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED wint32_t
-NOTHROW_NCX(LIBKCALL libc__getwche)(void)
-/*[[[body:libc__getwche]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("_getwche"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc__getwche]]]*/
-
-/*[[[head:libd__getwche_nolock,hash:CRC-32=0x1666e283]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED wint16_t
-NOTHROW_NCX(LIBDCALL libd__getwche_nolock)(void)
-/*[[[body:libd__getwche_nolock]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("DOS$_getwche_nolock"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libd__getwche_nolock]]]*/
-
-/*[[[head:libc__getwche_nolock,hash:CRC-32=0xfb82b271]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED wint32_t
-NOTHROW_NCX(LIBKCALL libc__getwche_nolock)(void)
-/*[[[body:libc__getwche_nolock]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("_getwche_nolock"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc__getwche_nolock]]]*/
-
 /*[[[head:libd___conio_common_vcwscanf,hash:CRC-32=0x2b0a341b]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_LIBC_C16SCANF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd___conio_common_vcwscanf)(uint64_t options,
@@ -151,15 +63,7 @@ NOTHROW_NCX(LIBKCALL libc___conio_common_vcwscanf)(uint64_t options,
 }
 /*[[[end:libc___conio_common_vcwscanf]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xe9ccb205]]]*/
-DEFINE_PUBLIC_ALIAS(DOS$_getwch, libd__getwch);
-DEFINE_PUBLIC_ALIAS(_getwch, libc__getwch);
-DEFINE_PUBLIC_ALIAS(DOS$_getwch_nolock, libd__getwch_nolock);
-DEFINE_PUBLIC_ALIAS(_getwch_nolock, libc__getwch_nolock);
-DEFINE_PUBLIC_ALIAS(DOS$_getwche, libd__getwche);
-DEFINE_PUBLIC_ALIAS(_getwche, libc__getwche);
-DEFINE_PUBLIC_ALIAS(DOS$_getwche_nolock, libd__getwche_nolock);
-DEFINE_PUBLIC_ALIAS(_getwche_nolock, libc__getwche_nolock);
+/*[[[start:exports,hash:CRC-32=0x5bd6b6c0]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$__conio_common_vcwscanf, libd___conio_common_vcwscanf);
 DEFINE_PUBLIC_ALIAS(__conio_common_vcwscanf, libc___conio_common_vcwscanf);
 /*[[[end:exports]]]*/

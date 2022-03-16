@@ -23,103 +23,50 @@
 #include "../api.h"
 /**/
 
+#include <bits/crt/io-file.h>
+#include <kos/io.h>
+#include <kos/syscalls.h>
+
+#include <stdio.h>
+
+#include "../libc/globals.h"
 #include "conio.h"
 
 DECL_BEGIN
-
-/* TODO: _kbhit()  --> readf(IO_NONBLOCK) */
-/* TODO: _getch()  --> tcgetattr(SAVED) + tcsetattr(~ECHO) + read() + tcsetattr(SAVED) */
-/* TODO: _getche() --> tcgetattr(SAVED) + tcsetattr(ECHO) + read() + tcsetattr(SAVED) */
-
-/* NOTE: The race condition where _getch() / _getche() don't affect the echoing of characters
- *       entered while not inside of the read-character loop actually also exists on  windows
- *       (as  far as I can tell). By looking  at the disassembly of those functions, it seems
- *       like they do pretty much the same as we do, except that:
- *        - `tcgetattr()' becomes `GetConsoleMode()'
- *        - `tcsetattr()' becomes `SetConsoleMode()'
- *        - `~ECHO' becomes `0'
- *        - `ECHO' becomes `ENABLE_ECHO_INPUT' (well... actually it also becomes
- *           `0', and the read character is manually echoed via `_putch()', but
- *           you should get the idea...) */
 
 /*[[[head:libc__kbhit,hash:CRC-32=0xbcfa11c8]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__kbhit)(void)
 /*[[[body:libc__kbhit]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("_kbhit"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+{
+	int result = 0;
+	FILE *fp = stdtty;
+	flockfile(fp);
+	if (fp->if_cnt == 0) {
+		/* Ask the OS for pending input. */
+		char kb[1];
+		fd_t fd = fileno_unlocked(fp);
+		ssize_t ok;
+		/* Do a non-blocking read from the underlying file descriptor (KOS-specific system call). */
+		ok = sys_readf(fd, kb, sizeof(kb), IO_NONBLOCK);
+		if (ok > 0) {
+			/* Unread the read byte int the file's buffer. */
+			ungetc_unlocked(kb[0], fp);
+
+			/* Indicate that input is available. */
+			result = 1;
+		}
+	} else {
+		/* Pending input is present. */
+		result = 1;
+	}
+	funlockfile(fp);
+	return result;
 }
 /*[[[end:libc__kbhit]]]*/
 
-/*[[[head:libc__getch,hash:CRC-32=0xf7f370e]]]*/
-/* >> _getch(3), _getch_nolock(3)
- * Read a character from the console, without echoing it on-screen
- * @return: * : The character read from the console
- * @return: -1: End-of-file on console */
-INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED int
-NOTHROW_NCX(LIBCCALL libc__getch)(void)
-/*[[[body:libc__getch]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("_getch"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc__getch]]]*/
-
-/*[[[head:libc__getch_nolock,hash:CRC-32=0x34c07390]]]*/
-/* >> _getch(3), _getch_nolock(3)
- * Read a character from the console, without echoing it on-screen
- * @return: * : The character read from the console
- * @return: -1: End-of-file on console */
-INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED int
-NOTHROW_NCX(LIBCCALL libc__getch_nolock)(void)
-/*[[[body:libc__getch_nolock]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("_getch_nolock"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc__getch_nolock]]]*/
-
-/*[[[head:libc__getche,hash:CRC-32=0x6705b2e5]]]*/
-/* >> _getche(3), _getche_nolock(3)
- * Read a character from the console, whilst also echoing it on-screen
- * @return: * : The character read from the console
- * @return: -1: End-of-file on console */
-INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED int
-NOTHROW_NCX(LIBCCALL libc__getche)(void)
-/*[[[body:libc__getche]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("_getche"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc__getche]]]*/
-
-/*[[[head:libc__getche_nolock,hash:CRC-32=0x36ea2394]]]*/
-/* >> _getche(3), _getche_nolock(3)
- * Read a character from the console, whilst also echoing it on-screen
- * @return: * : The character read from the console
- * @return: -1: End-of-file on console */
-INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED int
-NOTHROW_NCX(LIBCCALL libc__getche_nolock)(void)
-/*[[[body:libc__getche_nolock]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("_getche_nolock"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc__getche_nolock]]]*/
-
-
-/*[[[start:exports,hash:CRC-32=0x4c976570]]]*/
+/*[[[start:exports,hash:CRC-32=0x1bce5823]]]*/
 DEFINE_PUBLIC_ALIAS(_kbhit, libc__kbhit);
-DEFINE_PUBLIC_ALIAS(_getch, libc__getch);
-DEFINE_PUBLIC_ALIAS(_getch_nolock, libc__getch_nolock);
-DEFINE_PUBLIC_ALIAS(_getche, libc__getche);
-DEFINE_PUBLIC_ALIAS(_getche_nolock, libc__getche_nolock);
 /*[[[end:exports]]]*/
 
 DECL_END

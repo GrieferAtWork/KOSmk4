@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8852a964 */
+/* HASH CRC-32:0x2bc5d09a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,14 +31,6 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF WUNUSED wint16_t NOTHROW_NCX(LIBDCALL libd__getwch)(void);
-INTDEF WUNUSED wint32_t NOTHROW_NCX(LIBKCALL libc__getwch)(void);
-INTDEF WUNUSED wint16_t NOTHROW_NCX(LIBDCALL libd__getwch_nolock)(void);
-INTDEF WUNUSED wint32_t NOTHROW_NCX(LIBKCALL libc__getwch_nolock)(void);
-INTDEF WUNUSED wint16_t NOTHROW_NCX(LIBDCALL libd__getwche)(void);
-INTDEF WUNUSED wint32_t NOTHROW_NCX(LIBKCALL libc__getwche)(void);
-INTDEF WUNUSED wint16_t NOTHROW_NCX(LIBDCALL libd__getwche_nolock)(void);
-INTDEF WUNUSED wint32_t NOTHROW_NCX(LIBKCALL libc__getwche_nolock)(void);
 INTDEF WUNUSED ATTR_LIBC_C16SCANF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd___conio_common_vcwscanf)(uint64_t options, char16_t const *format, locale_t locale, va_list args);
 INTDEF WUNUSED ATTR_LIBC_C32SCANF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBKCALL libc___conio_common_vcwscanf)(uint64_t options, char32_t const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */

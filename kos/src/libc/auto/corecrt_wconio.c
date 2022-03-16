@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xadfa21f */
+/* HASH CRC-32:0xc6fd0f21 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,12 +26,143 @@
 #include <kos/types.h>
 #include "../user/corecrt_wconio.h"
 #include "../user/corecrt_wstdio.h"
+#include "../user/stdio.h"
+#include "../user/string.h"
+#include "termios.h"
 #include "../user/wchar.h"
 
 DECL_BEGIN
 
 #include "../libc/globals.h"
 #ifndef __KERNEL__
+#include <libc/template/stdtty.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED wint16_t
+NOTHROW_NCX(LIBDCALL libd__getwch)(void) {
+	wint16_t result;
+
+	FILE *fp = stdtty;
+	libc_flockfile(fp);
+
+	result = libd__getwch_nolock();
+
+	libc_funlockfile(fp);
+
+	return result;
+}
+#include <libc/template/stdtty.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED wint32_t
+NOTHROW_NCX(LIBKCALL libc__getwch)(void) {
+	wint32_t result;
+
+	FILE *fp = stdtty;
+	libc_flockfile(fp);
+
+	result = libc__getwch_nolock();
+
+	libc_funlockfile(fp);
+
+	return result;
+}
+#include <bits/types.h>
+#include <asm/os/termios.h>
+#include <bits/os/termios.h>
+#include <libc/template/stdtty.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED wint16_t
+NOTHROW_NCX(LIBDCALL libd__getwch_nolock)(void) {
+	wint16_t result;
+	struct termios oios, nios;
+	FILE *fp = stdtty;
+	fd_t fd  = libc_fileno(fp);
+	libc_tcgetattr(fd, &oios);
+	libc_memcpy(&nios, &oios, sizeof(nios));
+	nios.c_lflag &= ~__ECHO;
+	libc_tcsetattr(fd, __TCSANOW, &nios);
+	result = libd_fgetwc_unlocked(fp);
+	libc_tcsetattr(fd, __TCSANOW, &oios);
+	return result;
+}
+#include <bits/types.h>
+#include <asm/os/termios.h>
+#include <bits/os/termios.h>
+#include <libc/template/stdtty.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED wint32_t
+NOTHROW_NCX(LIBKCALL libc__getwch_nolock)(void) {
+	wint32_t result;
+	struct termios oios, nios;
+	FILE *fp = stdtty;
+	fd_t fd  = libc_fileno(fp);
+	libc_tcgetattr(fd, &oios);
+	libc_memcpy(&nios, &oios, sizeof(nios));
+	nios.c_lflag &= ~__ECHO;
+	libc_tcsetattr(fd, __TCSANOW, &nios);
+	result = libc_fgetwc_unlocked(fp);
+	libc_tcsetattr(fd, __TCSANOW, &oios);
+	return result;
+}
+#include <libc/template/stdtty.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED wint16_t
+NOTHROW_NCX(LIBDCALL libd__getwche)(void) {
+	wint16_t result;
+
+	FILE *fp = stdtty;
+	libc_flockfile(fp);
+
+	result = libd__getwche_nolock();
+
+	libc_funlockfile(fp);
+
+	return result;
+}
+#include <libc/template/stdtty.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED wint32_t
+NOTHROW_NCX(LIBKCALL libc__getwche)(void) {
+	wint32_t result;
+
+	FILE *fp = stdtty;
+	libc_flockfile(fp);
+
+	result = libc__getwche_nolock();
+
+	libc_funlockfile(fp);
+
+	return result;
+}
+#include <bits/types.h>
+#include <asm/os/termios.h>
+#include <bits/os/termios.h>
+#include <libc/template/stdtty.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED wint16_t
+NOTHROW_NCX(LIBDCALL libd__getwche_nolock)(void) {
+	wint16_t result;
+	struct termios oios, nios;
+	FILE *fp = stdtty;
+	fd_t fd  = libc_fileno(fp);
+	libc_tcgetattr(fd, &oios);
+	libc_memcpy(&nios, &oios, sizeof(nios));
+	nios.c_lflag |= __ECHO;
+	libc_tcsetattr(fd, __TCSANOW, &nios);
+	result = libd_fgetwc_unlocked(fp);
+	libc_tcsetattr(fd, __TCSANOW, &oios);
+	return result;
+}
+#include <bits/types.h>
+#include <asm/os/termios.h>
+#include <bits/os/termios.h>
+#include <libc/template/stdtty.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED wint32_t
+NOTHROW_NCX(LIBKCALL libc__getwche_nolock)(void) {
+	wint32_t result;
+	struct termios oios, nios;
+	FILE *fp = stdtty;
+	fd_t fd  = libc_fileno(fp);
+	libc_tcgetattr(fd, &oios);
+	libc_memcpy(&nios, &oios, sizeof(nios));
+	nios.c_lflag |= __ECHO;
+	libc_tcsetattr(fd, __TCSANOW, &nios);
+	result = libc_fgetwc_unlocked(fp);
+	libc_tcsetattr(fd, __TCSANOW, &oios);
+	return result;
+}
 #include <libc/template/stdtty.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") wint16_t
 NOTHROW_NCX(LIBDCALL libd__putwch)(char16_t ch) {
@@ -495,6 +626,14 @@ NOTHROW_NCX(VLIBKCALL libc__cwscanf_s_l)(char32_t const *format,
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(DOS$_getwch, libd__getwch);
+DEFINE_PUBLIC_ALIAS(_getwch, libc__getwch);
+DEFINE_PUBLIC_ALIAS(DOS$_getwch_nolock, libd__getwch_nolock);
+DEFINE_PUBLIC_ALIAS(_getwch_nolock, libc__getwch_nolock);
+DEFINE_PUBLIC_ALIAS(DOS$_getwche, libd__getwche);
+DEFINE_PUBLIC_ALIAS(_getwche, libc__getwche);
+DEFINE_PUBLIC_ALIAS(DOS$_getwche_nolock, libd__getwche_nolock);
+DEFINE_PUBLIC_ALIAS(_getwche_nolock, libc__getwche_nolock);
 DEFINE_PUBLIC_ALIAS(DOS$_putwch, libd__putwch);
 DEFINE_PUBLIC_ALIAS(_putwch, libc__putwch);
 DEFINE_PUBLIC_ALIAS(DOS$_putwch_nolock, libd__putwch_nolock);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62d6da7 */
+/* HASH CRC-32:0xc81e41e3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,28 @@
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
+/* >> _getch(3), _getch_nolock(3)
+ * Read a character from the console, without echoing it on-screen
+ * @return: * : The character read from the console
+ * @return: -1: End-of-file on console */
+INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc__getch)(void);
+/* >> _getch(3), _getch_nolock(3)
+ * Read a character from the console, without echoing it on-screen
+ * @return: * : The character read from the console
+ * @return: -1: End-of-file on console */
+INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc__getch_nolock)(void);
+/* >> _getche(3), _getche_nolock(3)
+ * Read a character from the console, whilst also echoing it on-screen
+ * @return: * : The character read from the console
+ * @return: -1: End-of-file on console */
+INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc__getche)(void);
+/* >> _getche(3), _getche_nolock(3)
+ * Read a character from the console, whilst also echoing it on-screen
+ * @return: * : The character read from the console
+ * @return: -1: End-of-file on console */
+INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc__getche_nolock)(void);
+#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF int NOTHROW_NCX(LIBDCALL libd__putch)(int ch);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
