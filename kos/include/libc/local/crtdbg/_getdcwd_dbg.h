@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaec01908 */
+/* HASH CRC-32:0xb13ed540 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local__getdcwd_dbg_defined
 #include <__crt.h>
 #include <asm/os/fcntl.h>
-#if defined(__CRT_HAVE__getdcwd) || (defined(__CRT_HAVE_frealpath4) && defined(__AT_FDDRIVE_CWD))
+#if defined(__CRT_HAVE__getdcwd) || defined(__CRT_HAVE__getdcwd_nolock) || (defined(__CRT_HAVE_frealpath4) && defined(__AT_FDDRIVE_CWD))
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__getdcwd_defined
@@ -32,6 +32,11 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,char *,__NOTHROW_RPC,__localdep__getdcwd,(int __drive, char *__buf, __SIZE_TYPE__ __size),_getdcwd,(__drive,__buf,__size))
+#elif defined(__CRT_HAVE__getdcwd_nolock)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,char *,__NOTHROW_RPC,__localdep__getdcwd,(int __drive, char *__buf, __SIZE_TYPE__ __size),_getdcwd_nolock,(__drive,__buf,__size))
 #elif defined(__CRT_HAVE_frealpath4) && defined(__AT_FDDRIVE_CWD)
 __NAMESPACE_LOCAL_END
 #include <libc/local/direct/_getdcwd.h>
@@ -53,7 +58,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__getdcwd_dbg_defined
 #define __localdep__getdcwd_dbg __LIBC_LOCAL_NAME(_getdcwd_dbg)
 #endif /* !__local___localdep__getdcwd_dbg_defined */
-#else /* __CRT_HAVE__getdcwd || (__CRT_HAVE_frealpath4 && __AT_FDDRIVE_CWD) */
+#else /* __CRT_HAVE__getdcwd || __CRT_HAVE__getdcwd_nolock || (__CRT_HAVE_frealpath4 && __AT_FDDRIVE_CWD) */
 #undef __local__getdcwd_dbg_defined
-#endif /* !__CRT_HAVE__getdcwd && (!__CRT_HAVE_frealpath4 || !__AT_FDDRIVE_CWD) */
+#endif /* !__CRT_HAVE__getdcwd && !__CRT_HAVE__getdcwd_nolock && (!__CRT_HAVE_frealpath4 || !__AT_FDDRIVE_CWD) */
 #endif /* !__local__getdcwd_dbg_defined */

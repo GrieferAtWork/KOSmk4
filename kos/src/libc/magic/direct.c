@@ -56,10 +56,12 @@ typedef __SIZE_TYPE__ size_t;
 %[insert:function(_rmdir = rmdir)]
 
 %[default:section(".text.crt.dos.fs.property")]
-%#define _getdcwd_nolock _getdcwd
+%[insert:pp_if($has_function(_getdcwd))]
+%#define _getdcwd_nolock(drive, buf, size) _getdcwd(drive, buf, size)
+%[insert:pp_endif]
 
 [[cp, decl_include("<hybrid/typecore.h>")]]
-[[requires_include("<asm/os/fcntl.h>")]]
+[[requires_include("<asm/os/fcntl.h>"), dos_export_alias("_getdcwd_nolock")]]
 [[requires($has_function(frealpath4) && defined(__AT_FDDRIVE_CWD))]]
 [[crt_dos_variant, impl_include("<libc/errno.h>")]]
 char *_getdcwd(int drive, char *buf, size_t size) {

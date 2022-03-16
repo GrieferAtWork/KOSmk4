@@ -1525,6 +1525,7 @@
 #define __CRT_HAVE__getwch_nolock
 #define __CRT_HAVE__getwche
 #define __CRT_HAVE__getwche_nolock
+#define __CRT_HAVE__getws
 #define __CRT_HAVE__getws_s
 #define __CRT_HAVE__gmtime32_s
 #define __CRT_HAVE__gmtime64_s
@@ -4324,6 +4325,7 @@
 #define __CRT_HAVE_splice
 #define __CRT_HAVE_sprintf
 #define __CRT_HAVE_sprintf_s
+#define __CRT_HAVE_sprofil
 #define __CRT_HAVE_sqrt
 #define __CRT_HAVE_sqrtf
 #define __CRT_HAVE_sqrtl
@@ -5868,6 +5870,10 @@
 #ifdef __PE__
 #define __CRT_HAVE__XcptFilter
 #define __CRT_HAVE___C_specific_handler
+#define __CRT_HAVE___CxxCallUnwindDelDtor
+#define __CRT_HAVE___CxxCallUnwindDtor
+#define __CRT_HAVE___CxxCallUnwindStdDelDtor
+#define __CRT_HAVE___CxxCallUnwindVecDtor
 #define __CRT_HAVE___acrt_iob_func
 #define __CRT_HAVE___crtGetTickCount64
 #define __CRT_HAVE___crtInitializeCriticalSectionEx
@@ -5964,6 +5970,7 @@
 #define __CRT_HAVE__get_narrow_winmain_command_line
 #define __CRT_HAVE__get_wide_winmain_command_line
 #define __CRT_HAVE__getcwd
+#define __CRT_HAVE__getdcwd_nolock
 #define __CRT_HAVE__getw
 #define __CRT_HAVE__getwc_nolock
 #define __CRT_HAVE__gmtime32
@@ -6172,6 +6179,7 @@
 #define __CRT_HAVE__wfopen
 #define __CRT_HAVE__wfreopen
 #define __CRT_HAVE__wgetcwd
+#define __CRT_HAVE__wgetdcwd_nolock
 #define __CRT_HAVE__wopen
 #define __CRT_HAVE__wpopen
 #define __CRT_HAVE__wremove
@@ -7220,6 +7228,7 @@
 #define __CRT_HAVE_KOS$_getwch_nolock
 #define __CRT_HAVE_KOS$_getwche
 #define __CRT_HAVE_KOS$_getwche_nolock
+#define __CRT_HAVE_KOS$_getws
 #define __CRT_HAVE_KOS$_getws_s
 #define __CRT_HAVE_KOS$_gmtime32_s
 #define __CRT_HAVE_KOS$_gmtime64_s
@@ -9655,6 +9664,7 @@
 #define __CRT_HAVE_KOS$splice
 #define __CRT_HAVE_KOS$sprintf
 #define __CRT_HAVE_KOS$sprintf_s
+#define __CRT_HAVE_KOS$sprofil
 #define __CRT_HAVE_KOS$sqrt
 #define __CRT_HAVE_KOS$sqrtf
 #define __CRT_HAVE_KOS$sqrtl
@@ -10355,6 +10365,10 @@
 #define __CRT_HAVE_DOS$_Wcsftime
 #define __CRT_HAVE_DOS$_XcptFilter
 #define __CRT_HAVE_DOS$__C_specific_handler
+#define __CRT_HAVE_DOS$__CxxCallUnwindDelDtor
+#define __CRT_HAVE_DOS$__CxxCallUnwindDtor
+#define __CRT_HAVE_DOS$__CxxCallUnwindStdDelDtor
+#define __CRT_HAVE_DOS$__CxxCallUnwindVecDtor
 #define __CRT_HAVE_DOS$___lc_locale_name_func
 #define __CRT_HAVE_DOS$__access
 #define __CRT_HAVE_DOS$__acct
@@ -11415,6 +11429,7 @@
 #define __CRT_HAVE_DOS$_getc_nolock
 #define __CRT_HAVE_DOS$_getcwd
 #define __CRT_HAVE_DOS$_getdcwd
+#define __CRT_HAVE_DOS$_getdcwd_nolock
 #define __CRT_HAVE_DOS$_getdiskfree
 #define __CRT_HAVE_DOS$_getdllprocaddr
 #define __CRT_HAVE_DOS$_getpwnam
@@ -11426,6 +11441,7 @@
 #define __CRT_HAVE_DOS$_getwch_nolock
 #define __CRT_HAVE_DOS$_getwche
 #define __CRT_HAVE_DOS$_getwche_nolock
+#define __CRT_HAVE_DOS$_getws
 #define __CRT_HAVE_DOS$_getws_s
 #define __CRT_HAVE_DOS$_gmtime32
 #define __CRT_HAVE_DOS$_gmtime32_s
@@ -12116,6 +12132,7 @@
 #define __CRT_HAVE_DOS$_wfullpath
 #define __CRT_HAVE_DOS$_wgetcwd
 #define __CRT_HAVE_DOS$_wgetdcwd
+#define __CRT_HAVE_DOS$_wgetdcwd_nolock
 #define __CRT_HAVE_DOS$_wgetenv
 #define __CRT_HAVE_DOS$_wgetenv_s
 #define __CRT_HAVE_DOS$_wmakepath
@@ -14092,6 +14109,7 @@
 #define __CRT_HAVE_DOS$splice
 #define __CRT_HAVE_DOS$sprintf
 #define __CRT_HAVE_DOS$sprintf_s
+#define __CRT_HAVE_DOS$sprofil
 #define __CRT_HAVE_DOS$sqrt
 #define __CRT_HAVE_DOS$sqrtf
 #define __CRT_HAVE_DOS$sqrtl

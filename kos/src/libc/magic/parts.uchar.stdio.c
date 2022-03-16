@@ -246,6 +246,8 @@ _c16fopen_s(*) %{uchar16("_wfopen_s")}
 _c32fopen_s(*) %{uchar32("_wfopen_s")}
 _c16freopen_s(*) %{uchar16("_wfreopen_s")}
 _c32freopen_s(*) %{uchar32("_wfreopen_s")}
+_getc16s(*) %{uchar16("_getws")}
+_getc32s(*) %{uchar32("_getws")}
 _getc16s_s(*) %{uchar16("_getws_s")}
 _getc32s_s(*) %{uchar32("_getws_s")}
 _putc16s(*) %{uchar16("_putws")}

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66919f5a */
+/* HASH CRC-32:0x4f7e2f5c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -401,6 +401,7 @@
 #define __CRT_HAVE_DOS$_getwch_nolock
 #define __CRT_HAVE_DOS$_getwche
 #define __CRT_HAVE_DOS$_getwche_nolock
+#define __CRT_HAVE_DOS$_getws
 #define __CRT_HAVE_DOS$_getws_s
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -3075,6 +3076,7 @@
 #define __CRT_HAVE_DOS$splice
 #define __CRT_HAVE_DOS$sprintf
 #define __CRT_HAVE_DOS$sprintf_s
+#define __CRT_HAVE_DOS$sprofil
 #define __CRT_HAVE_DOS$sqrt
 #define __CRT_HAVE_DOS$sqrtf
 #define __CRT_HAVE_DOS$sqrtl
@@ -4369,6 +4371,7 @@
 #define __CRT_HAVE__getwch_nolock
 #define __CRT_HAVE__getwche
 #define __CRT_HAVE__getwche_nolock
+#define __CRT_HAVE__getws
 #define __CRT_HAVE__getws_s
 #define __CRT_HAVE__gmtime32_s
 #define __CRT_HAVE__gmtime64_s
@@ -7132,6 +7135,7 @@
 #define __CRT_HAVE_sprintf
 #ifndef __KERNEL__
 #define __CRT_HAVE_sprintf_s
+#define __CRT_HAVE_sprofil
 #define __CRT_HAVE_sqrt
 #define __CRT_HAVE_sqrtf
 #define __CRT_HAVE_sqrtl

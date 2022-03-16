@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11d1060b */
+/* HASH CRC-32:0xc8cba005 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,6 +89,7 @@ NOTHROW_RPC(LIBCCALL libc__mkdir)(char const *path) {
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(DOS$_getdcwd_nolock, libd__getdcwd);
 DEFINE_PUBLIC_ALIAS(DOS$_getdcwd, libd__getdcwd);
 DEFINE_PUBLIC_ALIAS(_getdcwd, libc__getdcwd);
 DEFINE_PUBLIC_ALIAS(_chdrive, libc__chdrive);

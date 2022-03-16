@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87834bae */
+/* HASH CRC-32:0x30a19b9c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -620,6 +620,15 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,_wfreopen_s,(FILE *
 __NAMESPACE_LOCAL_USING_OR_IMPL(_wfreopen_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) __errno_t __NOTHROW_NCX(__LIBCCALL _wfreopen_s)(FILE **__pstream, wchar_t const *__filename, wchar_t const *__mode, FILE *__stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wfreopen_s))(__pstream, __filename, __mode, __stream); })
 #endif /* (__CRT_HAVE_freopen_s || (__CRT_HAVE_freopen && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_freopen64 || (__CRT_HAVE_freopen_unlocked && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_freopen64_unlocked) && (__CRT_HAVE_convert_wcstombs || __CRT_HAVE_convert_wcstombsn || __CRT_HAVE_format_aprintf_printer || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) */
 #endif /* !__CRT_HAVE__wfreopen_s */
+#ifdef __CRT_HAVE__getws
+__CDECLARE(,wchar_t *,__NOTHROW_NCX,_getws,(wchar_t *__buf),(__buf))
+#else /* __CRT_HAVE__getws */
+#include <libc/template/stdstreams.h>
+#if defined(__CRT_HAVE__getws_s) || (defined(__LOCAL_stdin) && (defined(__CRT_HAVE_fgetws) || defined(__CRT_HAVE_fgetws_unlocked) || defined(__CRT_HAVE__fgetws_nolock) || ((defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc)) && (defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE_ungetwc_unlocked)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked)))))
+#include <libc/local/corecrt_wstdio/_getws.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_getws, __FORCELOCAL __ATTR_ARTIFICIAL wchar_t *__NOTHROW_NCX(__LIBCCALL _getws)(wchar_t *__buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getws))(__buf); })
+#endif /* __CRT_HAVE__getws_s || (__LOCAL_stdin && (__CRT_HAVE_fgetws || __CRT_HAVE_fgetws_unlocked || __CRT_HAVE__fgetws_nolock || ((__CRT_HAVE_fgetwc || __CRT_HAVE_getwc) && (__CRT_HAVE_ungetwc || __CRT_HAVE_ungetwc_unlocked) && (__CRT_HAVE_ferror || __CRT_HAVE__IO_ferror || __CRT_HAVE_ferror_unlocked)))) */
+#endif /* !__CRT_HAVE__getws */
 #ifdef __CRT_HAVE__getws_s
 __CDECLARE(,wchar_t *,__NOTHROW_NCX,_getws_s,(wchar_t *__buf, size_t __buflen),(__buf,__buflen))
 #else /* __CRT_HAVE__getws_s */

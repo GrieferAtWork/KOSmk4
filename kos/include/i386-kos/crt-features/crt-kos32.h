@@ -1564,6 +1564,7 @@
 #define __CRT_HAVE__getwch_nolock
 #define __CRT_HAVE__getwche
 #define __CRT_HAVE__getwche_nolock
+#define __CRT_HAVE__getws
 #define __CRT_HAVE__getws_s
 #define __CRT_HAVE__gmtime32
 #define __CRT_HAVE__gmtime32_s
@@ -4478,6 +4479,7 @@
 #define __CRT_HAVE_splice
 #define __CRT_HAVE_sprintf
 #define __CRT_HAVE_sprintf_s
+#define __CRT_HAVE_sprofil
 #define __CRT_HAVE_sqrt
 #define __CRT_HAVE_sqrtf
 #define __CRT_HAVE_sqrtl
@@ -6198,6 +6200,10 @@
 #ifdef __PE__
 #define __CRT_HAVE__XcptFilter
 #define __CRT_HAVE___C_specific_handler
+#define __CRT_HAVE___CxxCallUnwindDelDtor
+#define __CRT_HAVE___CxxCallUnwindDtor
+#define __CRT_HAVE___CxxCallUnwindStdDelDtor
+#define __CRT_HAVE___CxxCallUnwindVecDtor
 #define __CRT_HAVE___acrt_iob_func
 #define __CRT_HAVE___crtGetTickCount64
 #define __CRT_HAVE___crtInitializeCriticalSectionEx
@@ -6258,6 +6264,7 @@
 #define __CRT_HAVE__get_narrow_winmain_command_line
 #define __CRT_HAVE__get_wide_winmain_command_line
 #define __CRT_HAVE__getcwd
+#define __CRT_HAVE__getdcwd_nolock
 #define __CRT_HAVE__getwc_nolock
 #define __CRT_HAVE__initialize_narrow_environment
 #define __CRT_HAVE__initialize_onexit_table
@@ -6359,6 +6366,7 @@
 #define __CRT_HAVE__wfopen
 #define __CRT_HAVE__wfreopen
 #define __CRT_HAVE__wgetcwd
+#define __CRT_HAVE__wgetdcwd_nolock
 #define __CRT_HAVE__wopen
 #define __CRT_HAVE__wpopen
 #define __CRT_HAVE__wremove
@@ -6556,6 +6564,7 @@
 #define __CRT_HAVE_KOS$_getwch_nolock
 #define __CRT_HAVE_KOS$_getwche
 #define __CRT_HAVE_KOS$_getwche_nolock
+#define __CRT_HAVE_KOS$_getws
 #define __CRT_HAVE_KOS$_getws_s
 #define __CRT_HAVE_KOS$_i64toa_s
 #define __CRT_HAVE_KOS$_i64tow
@@ -7241,6 +7250,10 @@
 #define __CRT_HAVE_DOS$_Wcsftime
 #define __CRT_HAVE_DOS$_XcptFilter
 #define __CRT_HAVE_DOS$__C_specific_handler
+#define __CRT_HAVE_DOS$__CxxCallUnwindDelDtor
+#define __CRT_HAVE_DOS$__CxxCallUnwindDtor
+#define __CRT_HAVE_DOS$__CxxCallUnwindStdDelDtor
+#define __CRT_HAVE_DOS$__CxxCallUnwindVecDtor
 #define __CRT_HAVE_DOS$___lc_locale_name_func
 #define __CRT_HAVE_DOS$__access
 #define __CRT_HAVE_DOS$__acrt_iob_func
@@ -7466,11 +7479,13 @@
 #define __CRT_HAVE_DOS$_get_wpgmptr
 #define __CRT_HAVE_DOS$_getcwd
 #define __CRT_HAVE_DOS$_getdcwd
+#define __CRT_HAVE_DOS$_getdcwd_nolock
 #define __CRT_HAVE_DOS$_getwc_nolock
 #define __CRT_HAVE_DOS$_getwch
 #define __CRT_HAVE_DOS$_getwch_nolock
 #define __CRT_HAVE_DOS$_getwche
 #define __CRT_HAVE_DOS$_getwche_nolock
+#define __CRT_HAVE_DOS$_getws
 #define __CRT_HAVE_DOS$_getws_s
 #define __CRT_HAVE_DOS$_i64toa_s
 #define __CRT_HAVE_DOS$_i64tow
@@ -7726,6 +7741,7 @@
 #define __CRT_HAVE_DOS$_wfullpath
 #define __CRT_HAVE_DOS$_wgetcwd
 #define __CRT_HAVE_DOS$_wgetdcwd
+#define __CRT_HAVE_DOS$_wgetdcwd_nolock
 #define __CRT_HAVE_DOS$_wgetenv
 #define __CRT_HAVE_DOS$_wgetenv_s
 #define __CRT_HAVE_DOS$_wmakepath

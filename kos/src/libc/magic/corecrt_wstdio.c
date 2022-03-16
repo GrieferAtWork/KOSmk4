@@ -279,6 +279,13 @@ err_badalloc:
 
 
 [[wchar, decl_include("<hybrid/typecore.h>")]]
+[[requires($has_function(_getws_s))]]
+[[section(".text.crt.dos.wchar.FILE.locked.read.read")]]
+wchar_t *_getws(wchar_t *buf) {
+	return _getws_s(buf, (size_t)-1);
+}
+
+[[wchar, decl_include("<hybrid/typecore.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stdin) && $has_function(fgetws))]]
 [[section(".text.crt.dos.wchar.FILE.locked.read.read")]]

@@ -54,7 +54,7 @@ typedef __WCHAR_TYPE__ wchar_t;
 
 %[insert:function(_wgetcwd = wgetcwd)]
 
-[[wchar, cp, decl_include("<hybrid/typecore.h>")]]
+[[wchar, cp, decl_include("<hybrid/typecore.h>"), dos_export_alias("_wgetdcwd_nolock")]]
 [[requires_include("<asm/os/fcntl.h>"), impl_include("<libc/errno.h>")]]
 [[requires($has_function(wfrealpath4) && defined(__AT_FDDRIVE_CWD))]]
 wchar_t *_wgetdcwd(int drive, wchar_t *buf, size_t size) {
@@ -70,7 +70,7 @@ wchar_t *_wgetdcwd(int drive, wchar_t *buf, size_t size) {
 }
 
 %[insert:pp_if($has_function(_wgetdcwd))]
-%#define _wgetdcwd_nolock _wgetdcwd
+%#define _wgetdcwd_nolock(drive, buf, size) _wgetdcwd(drive, buf, size)
 %[insert:pp_endif]
 
 %[insert:function(_wchdir = wchdir)]

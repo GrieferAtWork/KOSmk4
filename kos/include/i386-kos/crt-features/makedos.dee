@@ -88,7 +88,7 @@ global final MSVCRT_VERSION_FILES: {int: string} = {
 	0x81000000 + 100 : "C:\\Windows\\System32\\msvcr100.dll",
 	0x02000000 + 100 : "E:\\c\\msvcr\\x32\\msvcr100d.dll",
 	0x82000000 + 100 : []{
-		/* I'm unable to find "msvcr100d.dll", so we do this: */
+		/* I'm unable to find the x64 "msvcr100d.dll", so we do this: */
 		local x32r = loadSymbolsFromFile("C:\\Windows\\SysWOW64\\msvcr100.dll");
 		local x32d = loadSymbolsFromFile("E:\\c\\msvcr\\x32\\msvcr100d.dll");
 		local x64r = loadSymbolsFromFile("C:\\Windows\\System32\\msvcr100.dll");

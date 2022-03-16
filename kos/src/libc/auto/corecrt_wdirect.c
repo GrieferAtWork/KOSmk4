@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb757de10 */
+/* HASH CRC-32:0xd4fab1f9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,6 +74,7 @@ NOTHROW_RPC(LIBKCALL libc__wmkdir)(char32_t const *path) {
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(DOS$_wgetdcwd_nolock, libd__wgetdcwd);
 DEFINE_PUBLIC_ALIAS(DOS$_wgetdcwd, libd__wgetdcwd);
 DEFINE_PUBLIC_ALIAS(_wgetdcwd, libc__wgetdcwd);
 DEFINE_PUBLIC_ALIAS(DOS$_wmkdir, libd__wmkdir);

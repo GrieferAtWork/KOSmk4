@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1c31526 */
+/* HASH CRC-32:0x949ef69e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,17 +61,19 @@ __FORCELOCAL __ATTR_ARTIFICIAL wchar_t *__NOTHROW_RPC(__LIBCCALL _wgetcwd)(wchar
 #endif /* ... */
 #ifdef __CRT_HAVE__wgetdcwd
 __CDECLARE(,wchar_t *,__NOTHROW_RPC,_wgetdcwd,(int __drive, wchar_t *__buf, size_t __size),(__drive,__buf,__size))
-#else /* __CRT_HAVE__wgetdcwd */
+#elif defined(__CRT_HAVE__wgetdcwd_nolock)
+__CREDIRECT(,wchar_t *,__NOTHROW_RPC,_wgetdcwd,(int __drive, wchar_t *__buf, size_t __size),_wgetdcwd_nolock,(__drive,__buf,__size))
+#else /* ... */
 #include <asm/os/fcntl.h>
 #if (defined(__CRT_HAVE_wfrealpath4) || (defined(__CRT_HAVE_frealpath4) && (defined(__CRT_HAVE_convert_mbstowcs) || defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))))) && defined(__AT_FDDRIVE_CWD)
 #include <libc/local/corecrt_wdirect/_wgetdcwd.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_wgetdcwd, __FORCELOCAL __ATTR_ARTIFICIAL wchar_t *__NOTHROW_RPC(__LIBCCALL _wgetdcwd)(int __drive, wchar_t *__buf, size_t __size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wgetdcwd))(__drive, __buf, __size); })
 #endif /* (__CRT_HAVE_wfrealpath4 || (__CRT_HAVE_frealpath4 && (__CRT_HAVE_convert_mbstowcs || __CRT_HAVE_convert_mbstowcsn || ((__CRT_HAVE_format_waprintf_printer || __CRT_HAVE_format_waprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) && (__CRT_HAVE_format_waprintf_pack || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc))))) && __AT_FDDRIVE_CWD */
-#endif /* !__CRT_HAVE__wgetdcwd */
+#endif /* !... */
 #include <asm/os/fcntl.h>
-#if defined(__CRT_HAVE__wgetdcwd) || ((defined(__CRT_HAVE_wfrealpath4) || (defined(__CRT_HAVE_frealpath4) && (defined(__CRT_HAVE_convert_mbstowcs) || defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))))) && defined(__AT_FDDRIVE_CWD))
-#define _wgetdcwd_nolock _wgetdcwd
-#endif /* __CRT_HAVE__wgetdcwd || ((__CRT_HAVE_wfrealpath4 || (__CRT_HAVE_frealpath4 && (__CRT_HAVE_convert_mbstowcs || __CRT_HAVE_convert_mbstowcsn || ((__CRT_HAVE_format_waprintf_printer || __CRT_HAVE_format_waprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) && (__CRT_HAVE_format_waprintf_pack || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc))))) && __AT_FDDRIVE_CWD) */
+#if defined(__CRT_HAVE__wgetdcwd) || defined(__CRT_HAVE__wgetdcwd_nolock) || ((defined(__CRT_HAVE_wfrealpath4) || (defined(__CRT_HAVE_frealpath4) && (defined(__CRT_HAVE_convert_mbstowcs) || defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))))) && defined(__AT_FDDRIVE_CWD))
+#define _wgetdcwd_nolock(drive, buf, size) _wgetdcwd(drive, buf, size)
+#endif /* __CRT_HAVE__wgetdcwd || __CRT_HAVE__wgetdcwd_nolock || ((__CRT_HAVE_wfrealpath4 || (__CRT_HAVE_frealpath4 && (__CRT_HAVE_convert_mbstowcs || __CRT_HAVE_convert_mbstowcsn || ((__CRT_HAVE_format_waprintf_printer || __CRT_HAVE_format_waprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) && (__CRT_HAVE_format_waprintf_pack || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc))))) && __AT_FDDRIVE_CWD) */
 #ifdef __CRT_HAVE_wchdir
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_wchdir,(wchar_t const *__path),wchdir,(__path))
 #elif defined(__CRT_HAVE__wchdir)

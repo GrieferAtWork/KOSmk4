@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5014582c */
+/* HASH CRC-32:0x4b499d0d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -296,6 +296,14 @@ err_badalloc:
 
 
 
+}
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.read") char16_t *
+NOTHROW_NCX(LIBDCALL libd__getws)(char16_t *buf) {
+	return libd__getws_s(buf, (size_t)-1);
+}
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.read") char32_t *
+NOTHROW_NCX(LIBKCALL libc__getws)(char32_t *buf) {
+	return libc__getws_s(buf, (size_t)-1);
 }
 #include <libc/template/stdstreams.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.read") char16_t *
@@ -1680,6 +1688,8 @@ DEFINE_PUBLIC_ALIAS(DOS$_wfopen_s, libd__wfopen_s);
 DEFINE_PUBLIC_ALIAS(_wfopen_s, libc__wfopen_s);
 DEFINE_PUBLIC_ALIAS(DOS$_wfreopen_s, libd__wfreopen_s);
 DEFINE_PUBLIC_ALIAS(_wfreopen_s, libc__wfreopen_s);
+DEFINE_PUBLIC_ALIAS(DOS$_getws, libd__getws);
+DEFINE_PUBLIC_ALIAS(_getws, libc__getws);
 DEFINE_PUBLIC_ALIAS(DOS$_getws_s, libd__getws_s);
 DEFINE_PUBLIC_ALIAS(_getws_s, libc__getws_s);
 DEFINE_PUBLIC_ALIAS(DOS$_putws, libd__putws);

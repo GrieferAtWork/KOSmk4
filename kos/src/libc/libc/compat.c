@@ -1350,6 +1350,30 @@ NOTHROW(LIBDCALL libd___p__aexit_rtn)(void) {
 	return &libd__aexit_rtn;
 }
 
+DEFINE_PUBLIC_ALIAS(DOS$__CxxCallUnwindDelDtor, libd___CxxCallUnwindDelDtor);
+DEFINE_PUBLIC_ALIAS(DOS$__CxxCallUnwindStdDelDtor, libd___CxxCallUnwindDelDtor);
+DEFINE_PUBLIC_ALIAS(DOS$__CxxCallUnwindDtor, libd___CxxCallUnwindDtor);
+DEFINE_PUBLIC_ALIAS(DOS$__CxxCallUnwindVecDtor, libd___CxxCallUnwindVecDtor);
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") void *
+NOTHROW(LIBDCALL libd___CxxCallUnwindVecDtor)(void *(LIBDCALL *func)(void *a, void *b, void *c, void *d),
+                                              void *a, void *b, void *c, void *d) {
+	return (*func)(a, b, c, d);
+}
+#ifdef __LIBDCALL_CALLER_CLEANUP
+DEFINE_INTERN_ALIAS(libd___CxxCallUnwindDelDtor, libd___CxxCallUnwindVecDtor);
+DEFINE_INTERN_ALIAS(libd___CxxCallUnwindDtor, libd___CxxCallUnwindVecDtor);
+#else /* __LIBDCALL_CALLER_CLEANUP */
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") void *
+NOTHROW(LIBDCALL libd___CxxCallUnwindDelDtor)(void *(LIBDCALL *func)(void *arg), void *arg) {
+	return (*func)(arg);
+}
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos") void *
+NOTHROW(LIBDCALL libd___CxxCallUnwindDtor)(void *(LIBDCALL *func)(void)) {
+	return (*func)();
+}
+#endif /* !__LIBDCALL_CALLER_CLEANUP */
+
+
 
 
 
