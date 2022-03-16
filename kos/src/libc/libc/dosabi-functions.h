@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2181f0f6 */
+/* HASH CRC-32:0x146c0c3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2821,3 +2821,7 @@ DEFINE_INTERN_ALIAS(libd__isleadbyte_l, libd_isleadbyte);
 #else /* __LIBDCALL_CALLER_CLEANUP */
 DFUN(".text.crt.dos.wchar.unicode.locale.mbs", libd__isleadbyte_l, libc__isleadbyte_l, TD, 2, TD, TP)
 #endif /* !__LIBDCALL_CALLER_CLEANUP */
+
+/* wordexp */
+DFUN(".text.crt.dos.wordexp", libd_wordexp, libc_wordexp, TD, 3, TP, TP, TD)
+DFUN(".text.crt.dos.wordexp", libd_wordfree, libc_wordfree, TV, 1, TP)

@@ -134,7 +134,6 @@
 - `<sys/varargs.h>`         (OpenSolaris)
 - `<timeconv.h>`            (libbsd)
 - `<thread_db.h>`           (GLibc!)
-- `<wordexp.h>`             (GLibc!)
 
 
 ### Referenced, but origin unknown

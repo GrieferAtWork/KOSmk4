@@ -1,0 +1,178 @@
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_LIBC_LIBC_WORDEXP_CTEST
+#define GUARD_LIBC_LIBC_WORDEXP_CTEST 1
+#define _KOS_SOURCE 1
+#undef NDEBUG
+
+#include <hybrid/compiler.h>
+
+#include <system-test/ctest.h>
+
+#include <assert.h>
+#include <inttypes.h>
+#include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
+#include <wordexp.h>
+
+DECL_BEGIN
+
+PRIVATE void
+assert_wordexp(char const *expand_me, size_t num_words, ...) {
+	int error;
+	wordexp_t wx;
+	size_t i, common_count;
+	va_list args;
+	error = wordexp(expand_me, &wx, 0);
+	assertf(error == 0, "wordexp returned: %d", error);
+	EQs(wx.we_offs, 0);
+	common_count = wx.we_wordc;
+	if (common_count > num_words)
+		common_count = num_words;
+	va_start(args, num_words);
+	for (i = 0; i < common_count; ++i) {
+		char const *exp = va_arg(args, char const *);
+		char const *got = wx.we_wordv[i];
+		assertf(strcmp(exp, got) == 0,
+		        "Word #%" PRIuSIZ " of wordexp(%q) is incorrect\n"
+		        "exp: %q\n"
+		        "got: %q\n",
+		        i, expand_me, exp, got);
+	}
+	va_end(args);
+	EQs(wx.we_wordc, num_words);
+	EQp(wx.we_wordv[wx.we_wordc], (char *)NULL);
+	wordfree(&wx);
+}
+
+
+DEFINE_TEST(wordexp) {
+
+	/* Basic tests */
+	assert_wordexp("foobar", 1, "foobar");
+	assert_wordexp("foo bar", 2, "foo", "bar");
+	assert_wordexp("foo    bar", 2, "foo", "bar");
+	assert_wordexp("foo \t\t\t  bar", 2, "foo", "bar");
+
+	/* Bring in environment variables */
+	setenv("TEST", "10 20 30", 1);
+	assert_wordexp("a $TEST b", 5, "a", "10", "20", "30", "b");
+	assert_wordexp("a \"$TEST\" b", 3, "a", "10 20 30", "b");
+	assert_wordexp("a\"$TEST\" b", 2, "a10 20 30", "b");
+	assert_wordexp("a\"$TEST\"b", 1, "a10 20 30b");
+	assert_wordexp("a\"\\$TEST\"b", 1, "a$TESTb");
+	assert_wordexp("a'$TEST'b", 1, "a$TESTb");
+	assert_wordexp("a ${TEST} b", 5, "a", "10", "20", "30", "b");
+	assert_wordexp("a \"${TEST}\" b", 3, "a", "10 20 30", "b");
+	assert_wordexp("a\"${TEST}\" b", 2, "a10 20 30", "b");
+	assert_wordexp("a\"${TEST}\"b", 1, "a10 20 30b");
+	assert_wordexp("a ${TEST=42} b", 5, "a", "10", "20", "30", "b");
+	assert_wordexp("a \"${TEST=42}\" b", 3, "a", "10 20 30", "b");
+	assert_wordexp("a\"${TEST=42}\" b", 2, "a10 20 30", "b");
+	assert_wordexp("a\"${TEST=42}\"b", 1, "a10 20 30b");
+	unsetenv("TEST");
+	assert_wordexp("a $TEST b", 2, "a", "b");
+	assert_wordexp("a \"$TEST\" b", 3, "a", "", "b");
+	assert_wordexp("a\"$TEST\" b", 2, "a", "b");
+	assert_wordexp("a\"$TEST\"b", 1, "ab");
+	assert_wordexp("a\"\\$TEST\"b", 1, "a$TESTb");
+	assert_wordexp("a'$TEST'b", 1, "a$TESTb");
+	assert_wordexp("a ${TEST} b", 2, "a", "b");
+	assert_wordexp("a \"${TEST}\" b", 3, "a", "", "b");
+	assert_wordexp("a\"${TEST}\" b", 2, "a", "b");
+	assert_wordexp("a\"${TEST}\"b", 1, "ab");
+	assert(getenv("TEST") == NULL);
+	assert_wordexp("a ${TEST=42} b", 3, "a", "42", "b");
+	assert(getenv("TEST") != NULL);
+	assertf(strcmp(getenv("TEST"), "42") == 0, "%q", getenv("TEST"));
+	assert_wordexp("a ${TEST} b", 3, "a", "42", "b");
+	assert_wordexp("a \"${TEST}\" b", 3, "a", "42", "b");
+	assert_wordexp("a\"${TEST}\" b", 2, "a42", "b");
+	assert_wordexp("a\"${TEST}\"b", 1, "a42b");
+	unsetenv("TEST");
+
+	/* Test arithmetic */
+	assert_wordexp("$((10 + 20))", 1, "30");
+	assert_wordexp("\"$((10 + 20))\"", 1, "30");
+	assert_wordexp("$((10 * 20))", 1, "200");
+	assert_wordexp("$[10 + 20]", 1, "30");
+	assert_wordexp("\"$[10 + 20]\"", 1, "30");
+	assert_wordexp("$[10 * 20]", 1, "200");
+	assert_wordexp("$[10 + 20 * 30]", 1, "610");
+	assert_wordexp("$[20 * 30 + 10]", 1, "610");
+	assert_wordexp("$[20 * (30 + 10)]", 1, "800");
+
+	/* Test KOS extensions to expression parsing */
+	assert_wordexp("$[1 ? 42 : 10]", 1, "42");
+	assert_wordexp("$[0 ? 42 : 10]", 1, "10");
+	assert_wordexp("$[42 ?: 10]", 1, "42");
+	assert_wordexp("$[0 ?: 10]", 1, "10");
+	assert_wordexp("$[42 ?: (10/0)]", 1, "42"); /* Important: divide-by-zero doesn't trigger in dead branches */
+	assert_wordexp("$[42 ?: (10 / 0)]", 1, "42");
+	assert_wordexp("$[42 ?: 10/0]", 1, "42");
+	assert_wordexp("$[42 ?: 10 / 0]", 1, "42");
+	assert_wordexp("$[0 ?: 10]", 1, "10");
+	assert_wordexp("$[0 ?(10/0): 10]", 1, "10");
+	assert_wordexp("$[0 ? (10/0) : 10]", 1, "10");
+	assert_wordexp("$[0 ? 10/0 : 10]", 1, "10");
+	assert_wordexp("$[0 ? 10 / 0 : 10]", 1, "10");
+	assert_wordexp("$[10 == 20]", 1, "0");
+	assert_wordexp("$[10 != 20]", 1, "1");
+	assert_wordexp("$[10 < 20]", 1, "1");
+	assert_wordexp("$[10 <= 20]", 1, "1");
+	assert_wordexp("$[20 < 20]", 1, "0");
+	assert_wordexp("$[20 <= 20]", 1, "1");
+	assert_wordexp("$[10 > 20]", 1, "0");
+	assert_wordexp("$[10 >= 20]", 1, "0");
+	assert_wordexp("$[20 > 20]", 1, "0");
+	assert_wordexp("$[20 >= 20]", 1, "1");
+	assert_wordexp("$[16 % 6]", 1, "4");
+	assert_wordexp("$[17 % 6]", 1, "5");
+	assert_wordexp("$[18 % 6]", 1, "0");
+
+	/* Also test arithmetic expressions containing environ references. */
+	setenv("FIRST", "10", 1);
+	setenv("SECOND", "42", 1);
+	assert_wordexp("$FIRST", 1, "10");
+	assert_wordexp("$SECOND", 1, "42");
+	assert_wordexp("\"$FIRST\"", 1, "10");
+	assert_wordexp("\"$SECOND\"", 1, "42");
+	assert_wordexp("$[$FIRST + $SECOND]", 1, "52");
+	assert_wordexp("\"$[$FIRST + $SECOND]\"", 1, "52");
+	assert_wordexp("\"$[($FIRST) + ($SECOND)]\"", 1, "52");
+	assert_wordexp("\"$[(($FIRST) + ($SECOND))]\"", 1, "52");
+	assert_wordexp("$(($FIRST + $SECOND))", 1, "52");
+	assert_wordexp("\"$(($FIRST + $SECOND))\"", 1, "52");
+	assert_wordexp("\"$((($FIRST) + ($SECOND)))\"", 1, "52");
+	assert_wordexp("\"$(((($FIRST) + ($SECOND))))\"", 1, "52");
+	unsetenv("FIRST");
+	unsetenv("SECOND");
+
+//TODO:	assert_wordexp("`echo hi`", 1, "hi");
+//TODO:	assert_wordexp("$(echo hi)", 1, "hi");
+//TODO:	assert_wordexp("\"`echo hi`\"", 1, "hi");
+//TODO:	assert_wordexp("\"$(echo hi)\"", 1, "hi");
+}
+
+
+DECL_END
+
+#endif /* !GUARD_LIBC_LIBC_WORDEXP_CTEST */

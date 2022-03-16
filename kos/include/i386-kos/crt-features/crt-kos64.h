@@ -5738,6 +5738,8 @@
 #define __CRT_HAVE_wopen64
 #define __CRT_HAVE_wopenat
 #define __CRT_HAVE_wopenat64
+#define __CRT_HAVE_wordexp
+#define __CRT_HAVE_wordfree
 #define __CRT_HAVE_wpathconf
 #define __CRT_HAVE_wpopen
 #define __CRT_HAVE_wprintf
@@ -10256,6 +10258,8 @@
 #define __CRT_HAVE_KOS$wopen64
 #define __CRT_HAVE_KOS$wopenat
 #define __CRT_HAVE_KOS$wopenat64
+#define __CRT_HAVE_KOS$wordexp
+#define __CRT_HAVE_KOS$wordfree
 #define __CRT_HAVE_KOS$wpathconf
 #define __CRT_HAVE_KOS$wpopen
 #define __CRT_HAVE_KOS$wprintf
@@ -14702,6 +14706,8 @@
 #define __CRT_HAVE_DOS$wopen64
 #define __CRT_HAVE_DOS$wopenat
 #define __CRT_HAVE_DOS$wopenat64
+#define __CRT_HAVE_DOS$wordexp
+#define __CRT_HAVE_DOS$wordfree
 #define __CRT_HAVE_DOS$wpathconf
 #define __CRT_HAVE_DOS$wpopen
 #define __CRT_HAVE_DOS$wprintf
