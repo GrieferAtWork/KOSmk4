@@ -185,6 +185,20 @@ DEFINE_TEST(wordexp) {
 	assertf(strcmp(getenv("FOO"), "44") == 0, "%q", getenv("FOO"));
 	unsetenv("FOO");
 
+	/* Assert that unquoted variable expansion works when using a custom $IFS */
+	setenv("IFS", ", \t\r\n", 1);
+	setenv("VAR", "foo, bar, baz", 1);
+	assert_wordexp("$VAR", 3, "foo", "bar", "baz");
+	setenv("VAR", "foo, bar,, baz", 1);
+	assert_wordexp("$VAR", 4, "foo", "bar", "", "baz");
+	/* Unquoted program output must also be subjegated to $IFS, but in our  impl
+	 * that system has its own processing engine (because program output must be
+	 * processed  chunk-wise, rather than  at once like  we can with variables).
+	 * As such, also test $IFS splitting for that case! */
+	assert_wordexp("`echo \"$VAR\"`", 4, "foo", "bar", "", "baz");
+	unsetenv("VAR");
+	unsetenv("IFS");
+
 
 	/* Finally, test invocation of external programs. */
 	assert_wordexp("`echo hi there`", 2, "hi", "there");

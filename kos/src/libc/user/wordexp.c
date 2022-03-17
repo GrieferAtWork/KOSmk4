@@ -352,6 +352,10 @@ do_STATE_FIELDSTART:
 				continue;
 			ch = *bufptr;
 			if (strchr(self->wxp_ifs, ch) != NULL) {
+consume1_and_newword_and_do_STATE_FIELDSTART:
+				++bufptr;
+				--buflen;
+/*newword_and_do_STATE_FIELDSTART:*/
 				/* If it's a non-whitespace $IFS, force a new word to begin. */
 				result = wxparser_newword(self);
 				if unlikely(result != 0)
@@ -361,8 +365,6 @@ do_STATE_FIELDSTART:
 				if unlikely(result != 0)
 					goto err;
 				keep_characters = 0;
-				++bufptr;
-				--buflen;
 				goto do_STATE_FIELDSTART;
 			}
 			state = STATE_COPYING_FIELD;
@@ -383,9 +385,7 @@ do_STATE_COPYING_FIELD:
 			ch = *bufptr;
 			if (strchr(self->wxp_wifs, ch) == NULL) {
 				state = STATE_FIELDSTART;
-				++bufptr;
-				--buflen;
-				goto do_STATE_FIELDSTART;
+				goto consume1_and_newword_and_do_STATE_FIELDSTART;
 			}
 			if (ch == '\r' || ch == '\n') {
 				++bufptr;
@@ -404,12 +404,12 @@ do_STATE_COPYING_FIELD:
 do_STATE_SEARCH_NONSPACE_IFS:
 			ch = *bufptr;
 			if (strchr(self->wxp_ifs, ch) != NULL) {
-				++bufptr;
-				--buflen;
 				if (strchr(self->wxp_wifs, ch) == NULL) {
 					state = STATE_FIELDSTART;
-					goto do_STATE_FIELDSTART;
+					goto consume1_and_newword_and_do_STATE_FIELDSTART;
 				}
+				++bufptr;
+				--buflen;
 				if (!buflen)
 					continue;
 				goto do_STATE_SEARCH_NONSPACE_IFS;
@@ -427,7 +427,7 @@ do_STATE_SEARCH_NONLF_AFTER_FIELD:
 			if (strchr(self->wxp_ifs, ch) != NULL) {
 				if (strchr(self->wxp_wifs, ch) == NULL) {
 					state = STATE_FIELDSTART;
-					goto do_STATE_FIELDSTART;
+					goto consume1_and_newword_and_do_STATE_FIELDSTART;
 				}
 				if (ch == '\r' || ch == '\n') {
 					++bufptr;
@@ -2124,7 +2124,7 @@ done_action:
 
 			/* Skip whitespace after field. */
 			next_start = field_end;
-			next_start += memcspn(next_start, (size_t)(value_end - next_start), self->wxp_wifs);
+			next_start += memspn(next_start, (size_t)(value_end - next_start), self->wxp_wifs);
 
 			/* Skip up to 1 non-space $IFS after the field. */
 			found_nonspace_ifs = false;
