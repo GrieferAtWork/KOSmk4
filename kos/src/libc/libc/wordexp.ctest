@@ -166,10 +166,11 @@ DEFINE_TEST(wordexp) {
 	unsetenv("FIRST");
 	unsetenv("SECOND");
 
-//TODO:	assert_wordexp("`echo hi`", 1, "hi");
-//TODO:	assert_wordexp("$(echo hi)", 1, "hi");
-//TODO:	assert_wordexp("\"`echo hi`\"", 1, "hi");
-//TODO:	assert_wordexp("\"$(echo hi)\"", 1, "hi");
+	/* Finally, test invocation of external programs. */
+	assert_wordexp("`echo hi there`", 2, "hi", "there");
+	assert_wordexp("$(echo hi there)", 2, "hi", "there");
+	assert_wordexp("\"`echo hi there`\"", 1, "hi there");
+	assert_wordexp("\"$(echo hi there)\"", 1, "hi there");
 }
 
 

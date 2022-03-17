@@ -84,17 +84,42 @@ struct wxparser {
 	char const  *wxp_flush;   /* [1..1] Flush start pointer (points before `wxp_input') */
 	char const  *wxp_input;   /* [1..1] Pointer to next input character */
 	char const  *wxp_ifs;     /* [1..1] InputFieldSeparators (defaults to " \t\n") */
-	union {
-		char     wxp_wifs[4]; /* Whitespace InputFieldSeparators (subset of " \t\n") */
-		uint32_t _wxp_wifsi;  /* ... */
-	};
 	unsigned int wxp_flags;   /* Word expansion flags (set of `WRDE_*' from <wordexp.h>) */
 	size_t       wxp_wordc;   /* # of output words */
 	char       **wxp_wordv;   /* [0..1][owned][0..wxp_wordc][owned] Vector of output words */
 	char        *wxp_word;    /* [0..wxp_wordlen][owned] Word currently being constructed.
 	                           * Set to `NULL' if no word is currently under construction. */
 	size_t       wxp_wordlen; /* Length of the current word. (or `0' when `wxp_word == NULL') */
+	char         wxp_wifs[5]; /* Whitespace InputFieldSeparators (subset of " \t\n\r") */
 };
+
+/* Lazily load `self->wxp_ifs' and `self->wxp_wifs' */
+PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) void
+NOTHROW_NCX(LIBCCALL wxparser_loadifs)(struct wxparser *__restrict self) {
+	/* KOS extension: we also accept \r as IFS (for universal linefeeds) */
+	static char const default_ifs[] = " \t\n\r";
+	if (self->wxp_ifs != NULL)
+		return; /* Already loaded! */
+
+	/* Load IFS string */
+	self->wxp_ifs = getenv("IFS");
+	if (self->wxp_ifs == NULL) {
+		self->wxp_ifs = strcpy(self->wxp_wifs, default_ifs);
+	} else {
+		char *dst = self->wxp_wifs;
+		char const *scanner;
+		/* Only that subset of `default_ifs' that actually
+		 * appears in $IFS may be used as whitespace  IFS. */
+		*dst = '\0';
+		for (scanner = self->wxp_ifs; *scanner; ++scanner) {
+			char ch = *scanner;
+			if (strchr(default_ifs, ch) && !strchr(self->wxp_wifs, ch)) {
+				*dst++ = ch;
+				*dst   = '\0';
+			}
+		}
+	}
+}
 
 /* Finish the current word. */
 PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
@@ -120,6 +145,9 @@ NOTHROW_NCX(LIBCCALL wxparser_finishword)(struct wxparser *__restrict self) {
 PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL wxparser_newword)(struct wxparser *__restrict self) {
 	int result;
+	/* Note that DON'T check for `wxp_wordlen != 0' here! EMPTY WORDS CAN OCCURR!
+	 * We use the word!=NULL check to indicate that a word has been  constructed,
+	 * even if that word ends up staying empty! */
 	if (!self->wxp_word)
 		return 0; /* No word under construction */
 	result = wxparser_finishword(self);
@@ -148,6 +176,50 @@ NOTHROW_NCX(LIBCCALL wxparser_wordappend)(struct wxparser *__restrict self,
 }
 
 
+/* XXX: Make this a proper functions in <string.h> (and implement
+ *      it  without alloca() or having it stop on the first '\0') */
+PRIVATE ATTR_NOINLINE ATTR_PURE WUNUSED ATTR_SECTION(".text.crt.wordexp") int
+NOTHROW_NCX(LIBCCALL wildmemcmp)(void const *lhs, size_t lhs_size,
+                                 void const *rhs, size_t rhs_size) {
+	/* FIXME: we need to use `fnmatch(lhs, rhs, 0)', because this
+	 *        doesn't set `FNM_NOESCAPE', thus causing '\\' to be
+	 *        treated differently!
+	 * Thus, we need a KOS-specific `fnmemmatch(3)' function! */
+	void *lhs_dup = alloca(lhs_size + sizeof(char));
+	void *rhs_dup = alloca(rhs_size + sizeof(char));
+	*(char *)mempcpy(lhs_dup, lhs, lhs_size) = '\0';
+	*(char *)mempcpy(rhs_dup, rhs, rhs_size) = '\0';
+	return wildstrcmp((char *)lhs_dup, (char *)rhs_dup);
+}
+
+
+/* Same as `strspn()', but operates on a fixed-length `haystack'. */
+PRIVATE ATTR_PURE WUNUSED NONNULL((3)) size_t
+NOTHROW_NCX(LIBCCALL memspn)(void const *haystack, size_t haystack_len,
+                             char const *accept) {
+	char const *iter = (char const *)haystack;
+	while (haystack_len && strchr(accept, *iter)) {
+		++iter;
+		--haystack_len;
+	}
+	return (size_t)(iter - (char const *)haystack);
+}
+
+/* Same as `strcspn()', but operates on a fixed-length `haystack'. */
+PRIVATE ATTR_PURE WUNUSED NONNULL((3)) size_t
+NOTHROW_NCX(LIBCCALL memcspn)(void const *haystack, size_t haystack_len,
+                              char const *reject) {
+	char const *iter = (char const *)haystack;
+	while (haystack_len && !strchr(reject, *iter)) {
+		++iter;
+		--haystack_len;
+	}
+	return (size_t)(iter - (char const *)haystack);
+}
+
+
+
+
 /* Forward declarations */
 PRIVATE NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL wxparser_parse_dollar)(struct wxparser *__restrict self, bool quoted);
@@ -171,6 +243,7 @@ NOTHROW_NCX(LIBCCALL wxparser_insert_command)(struct wxparser *__restrict self,
 	int result;
 	pid_t cpid;
 	fd_t pipes[2];
+	size_t keep_characters;
 	unsigned int state = (unsigned int)quoted;
 #define STATE_FIELDSTART               (unsigned int)false /* Searching for first character of a field. */
 #define STATE_QUOTED                   (unsigned int)true
@@ -211,11 +284,14 @@ NOTHROW_NCX(LIBCCALL wxparser_insert_command)(struct wxparser *__restrict self,
 	}
 	/* In parent */
 	close(pipes[1]);
+	keep_characters = self->wxp_wordlen;
 	for (;;) {
 		size_t buflen;
-		char buf[512];
+		char buf[512], *bufptr = buf;
 		buflen = (size_t)read(pipes[0], buf, sizeof(buf));
-		if ((size_t)buflen < 0) {
+		if ((size_t)buflen <= 0) {
+			if (buflen == 0)
+				break;
 			if (libc_geterrno() == EINTR)
 				continue;
 			result = WRDE_NOSPACE;
@@ -227,28 +303,141 @@ NOTHROW_NCX(LIBCCALL wxparser_insert_command)(struct wxparser *__restrict self,
 
 		case STATE_QUOTED:
 			/* Simple case: always append to current word. */
-			result = wxparser_wordappend(self, buf, buflen);
+			result = wxparser_wordappend(self, bufptr, buflen);
 			if unlikely(result != 0)
 				goto err;
 			break;
 
-		case STATE_FIELDSTART:
-		case STATE_COPYING_FIELD:
-		case STATE_SEARCH_NONSPACE_IFS:
+		case STATE_FIELDSTART: {
+			size_t len;
+			char ch;
+			/* Ensure that $IFS has been loaded. */
+			wxparser_loadifs(self);
+
+			/* Skip $IFS whitespace preceding the field */
+do_STATE_FIELDSTART:
+			len = memspn(bufptr, buflen, self->wxp_wifs);
+			bufptr += len;
+			buflen -= len;
+			if (!buflen)
+				continue;
+			ch = *bufptr;
+			if (strchr(self->wxp_ifs, ch) != NULL) {
+				/* If it's a non-whitespace $IFS, force a new word to begin. */
+				result = wxparser_newword(self);
+				if unlikely(result != 0)
+					goto err;
+				/* Append 0 characters to force the next word to be non-NULL. */
+				result = wxparser_wordappend(self, bufptr, 0);
+				if unlikely(result != 0)
+					goto err;
+				keep_characters = 0;
+				++bufptr;
+				--buflen;
+				goto do_STATE_FIELDSTART;
+			}
+			state = STATE_COPYING_FIELD;
+		}	ATTR_FALLTHROUGH
+		case STATE_COPYING_FIELD: {
+			size_t len;
+			char ch;
+do_STATE_COPYING_FIELD:
+			/* Figure out how long this field should be. */
+			len    = memcspn(bufptr, buflen, self->wxp_ifs);
+			result = wxparser_wordappend(self, bufptr, len);
+			if unlikely(result != 0)
+				goto err;
+			bufptr += len;
+			buflen -= len;
+			if unlikely(!buflen)
+				continue;
+			ch = *bufptr;
+			if (strchr(self->wxp_wifs, ch) == NULL) {
+				state = STATE_FIELDSTART;
+				++bufptr;
+				--buflen;
+				goto do_STATE_FIELDSTART;
+			}
+			if (ch == '\r' || ch == '\n') {
+				++bufptr;
+				--buflen;
+				state = STATE_SEARCH_NONLF_AFTER_FIELD;
+				goto do_STATE_SEARCH_NONLF_AFTER_FIELD;
+			}
+			result = wxparser_newword(self);
+			if unlikely(result != 0)
+				goto err;
+			keep_characters = 0;
+			state = STATE_SEARCH_NONSPACE_IFS;
+		}	ATTR_FALLTHROUGH
+		case STATE_SEARCH_NONSPACE_IFS: {
+			char ch;
+do_STATE_SEARCH_NONSPACE_IFS:
+			ch = *bufptr;
+			if (strchr(self->wxp_ifs, ch) != NULL) {
+				++bufptr;
+				--buflen;
+				if (strchr(self->wxp_wifs, ch) == NULL) {
+					state = STATE_FIELDSTART;
+					goto do_STATE_FIELDSTART;
+				}
+				if (!buflen)
+					continue;
+				goto do_STATE_SEARCH_NONSPACE_IFS;
+			}
+			state = STATE_COPYING_FIELD;
+			goto do_STATE_COPYING_FIELD;
+		}	break;
+
 		case STATE_SEARCH_NONLF_AFTER_FIELD: {
-			/* TODO: like the `!quoted' insert-path in `wxparser_parse_dollar_param()' */
-			result = WRDE_NOSYS;
-			goto err;
+			char ch;
+do_STATE_SEARCH_NONLF_AFTER_FIELD:
+			if unlikely(!buflen)
+				continue;
+			ch = *bufptr;
+			if (strchr(self->wxp_ifs, ch) != NULL) {
+				if (strchr(self->wxp_wifs, ch) == NULL) {
+					state = STATE_FIELDSTART;
+					goto do_STATE_FIELDSTART;
+				}
+				if (ch == '\r' || ch == '\n') {
+					++bufptr;
+					--buflen;
+					goto do_STATE_SEARCH_NONLF_AFTER_FIELD;
+				}
+				result = wxparser_newword(self);
+				if unlikely(result != 0)
+					goto err;
+				keep_characters = 0;
+				state = STATE_SEARCH_NONSPACE_IFS;
+				goto do_STATE_SEARCH_NONSPACE_IFS;
+			}
+			result = wxparser_newword(self);
+			if unlikely(result != 0)
+				goto err;
+			keep_characters = 0;
+			state = STATE_COPYING_FIELD;
+			goto do_STATE_COPYING_FIELD;
 		}	break;
 
 		default: __builtin_unreachable();
 		}
-		if (quoted) {
-
-
-		} else {
-		}
 	}
+
+	/* Strip trailing linefeeds (as required by POSIX)
+	 * NOTE: ensure that we don't get rid of line-feeds that
+	 *       stem from before  we started inserting  program
+	 *       output!
+	 * Also note that this happens for both
+	 * quoted and unquoted program  output! */
+	while (self->wxp_wordlen > keep_characters) {
+		char ch = self->wxp_word[self->wxp_wordlen - 1];
+		if (ch != '\r' && ch != '\n')
+			break;
+		--self->wxp_wordlen;
+	}
+
+	/* Close our (reader-)end of the pipe. */
 	close(pipes[0]);
 
 	/* Join (reap) child process */
@@ -745,48 +934,6 @@ done_username:
 	result = wxparser_wordappend(self, homedir, strlen(homedir));
 	self->wxp_input = username_end;
 	return result;
-}
-
-
-/* XXX: Make this a proper functions in <string.h> (and implement
- *      it  without alloca() or having it stop on the first '\0') */
-PRIVATE ATTR_NOINLINE ATTR_PURE WUNUSED ATTR_SECTION(".text.crt.wordexp") int
-NOTHROW_NCX(LIBCCALL wildmemcmp)(void const *lhs, size_t lhs_size,
-                                 void const *rhs, size_t rhs_size) {
-	/* FIXME: we need to use `fnmatch(lhs, rhs, 0)', because this
-	 *        doesn't set `FNM_NOESCAPE', thus causing '\\' to be
-	 *        treated differently!
-	 * Thus, we need a KOS-specific `fnmemmatch(3)' function! */
-	void *lhs_dup = alloca(lhs_size + sizeof(char));
-	void *rhs_dup = alloca(rhs_size + sizeof(char));
-	*(char *)mempcpy(lhs_dup, lhs, lhs_size) = '\0';
-	*(char *)mempcpy(rhs_dup, rhs, rhs_size) = '\0';
-	return wildstrcmp((char *)lhs_dup, (char *)rhs_dup);
-}
-
-
-/* Same as `strspn()', but operates on a fixed-length `haystack'. */
-PRIVATE ATTR_PURE WUNUSED NONNULL((3)) size_t
-NOTHROW_NCX(LIBCCALL memspn)(void const *haystack, size_t haystack_len,
-                             char const *accept) {
-	char const *iter = (char const *)haystack;
-	while (haystack_len && strchr(accept, *iter)) {
-		++iter;
-		--haystack_len;
-	}
-	return (size_t)(iter - (char const *)haystack);
-}
-
-/* Same as `strcspn()', but operates on a fixed-length `haystack'. */
-PRIVATE ATTR_PURE WUNUSED NONNULL((3)) size_t
-NOTHROW_NCX(LIBCCALL memcspn)(void const *haystack, size_t haystack_len,
-                              char const *reject) {
-	char const *iter = (char const *)haystack;
-	while (haystack_len && !strchr(reject, *iter)) {
-		++iter;
-		--haystack_len;
-	}
-	return (size_t)(iter - (char const *)haystack);
 }
 
 
@@ -1320,6 +1467,9 @@ done_action:
 		char const *field_start = value_str;
 		char const *value_end   = value_str + value_len;
 		bool found_nonspace_ifs = false;
+
+		/* Ensure that $IFS has been loaded. */
+		wxparser_loadifs(self);
 		for (;;) {
 			char const *field_end;
 			char const *next_start;
@@ -1831,6 +1981,7 @@ NOTHROW_NCX(LIBCCALL libc_wordexp)(char const *__restrict string,
 	/* Set-up our parser. */
 	parser.wxp_flush   = string;
 	parser.wxp_input   = string;
+	parser.wxp_ifs     = NULL; /* Lazily loaded on first use. */
 	parser.wxp_flags   = flags;
 	parser.wxp_wordc   = self->we_wordc;
 	parser.wxp_wordv   = self->we_wordv;
@@ -1867,26 +2018,6 @@ NOTHROW_NCX(LIBCCALL libc_wordexp)(char const *__restrict string,
 		if (!(flags & WRDE_APPEND))
 			bzeroc(words, self->we_offs, sizeof(char *));
 		parser.wxp_wordv = words;
-	}
-
-	/* Load IFS string
-	 * TODO: Do this lazily upon first use. */
-	parser.wxp_ifs = getenv("IFS");
-	if (parser.wxp_ifs == NULL) {
-		parser._wxp_wifsi = ENCODE_INT32(' ', '\t', '\n', '\0');
-		parser.wxp_ifs    = parser.wxp_wifs;
-	} else {
-		char *dst = parser.wxp_wifs;
-		char const *scanner;
-		/* Only that subset of " \t\n" that actually appears in $IFS may be used. */
-		*dst = '\0';
-		for (scanner = parser.wxp_ifs; *scanner; ++scanner) {
-			char ch = *scanner;
-			if (strchr(" \t\n", ch) && !strchr(parser.wxp_wifs, ch)) {
-				*dst++ = ch;
-				*dst   = '\0';
-			}
-		}
 	}
 
 	/* All of the setup is now done. -- We can now do the actual work! */
