@@ -1141,7 +1141,7 @@ again_switch_curlied_action:
 			break;
 
 		case '+':
-			if (value_str == NULL && (value_len != 0 || got_colon))
+			if (value_str != NULL && (value_len != 0 || got_colon))
 				expand_pattern = true;
 			break;
 
@@ -1392,7 +1392,7 @@ do_use_pattern_as_value:
 			goto done_action;
 
 		case (unsigned char)'+':
-			if (value_str == NULL || (value_len == 0 && !got_colon))
+			if (value_str == NULL || (value_len == 0 && got_colon))
 				goto insert_nothing;
 			/* Re-use the pattern as value. */
 			goto do_use_pattern_as_value;
