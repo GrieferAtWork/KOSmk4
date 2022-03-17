@@ -130,7 +130,10 @@ NOTHROW_NCX(LIBCCALL wxparser_newword)(struct wxparser *__restrict self) {
 	return result;
 }
 
-/* Append the given `text...+=len' to the current word. */
+/* Append the given `text...+=len' to the current word.
+ * NOTE: Even when `len == 0', a previously NULL-word will become non-NULL,
+ *       and  thus will eventually  be added to the  array of result words.
+ *       -> Important detail needed to construct empty words with '""'. */
 PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL wxparser_wordappend)(struct wxparser *__restrict self,
                                           char const *text, size_t len) {
@@ -750,6 +753,10 @@ done_username:
 PRIVATE ATTR_NOINLINE ATTR_PURE WUNUSED ATTR_SECTION(".text.crt.wordexp") int
 NOTHROW_NCX(LIBCCALL wildmemcmp)(void const *lhs, size_t lhs_size,
                                  void const *rhs, size_t rhs_size) {
+	/* FIXME: we need to use `fnmatch(lhs, rhs, 0)', because this
+	 *        doesn't set `FNM_NOESCAPE', thus causing '\\' to be
+	 *        treated differently!
+	 * Thus, we need a KOS-specific `fnmemmatch(3)' function! */
 	void *lhs_dup = alloca(lhs_size + sizeof(char));
 	void *rhs_dup = alloca(rhs_size + sizeof(char));
 	*(char *)mempcpy(lhs_dup, lhs, lhs_size) = '\0';
@@ -1156,7 +1163,7 @@ err_pattern_restore:
 		self->wxp_word    = saved_wxp_word;
 		self->wxp_wordlen = saved_wxp_wordlen;
 
-		/* Consume the trialing '}' (the only path through which we can
+		/* Consume the trailing '}' (the only path through which we can
 		 * get here is the "case '}'" above, and to be safe, we  simply
 		 * assert that the next character still is a '}') */
 		assert(*self->wxp_input == '}');
@@ -1365,7 +1372,7 @@ done:
 
 /* Parse what comes after a '`'
  * - `self->wxp_input' must point _AFTER_ '`'
- * - Returns with `self->wxp_input' pointing _AFTER_ the trialing '`'
+ * - Returns with `self->wxp_input' pointing _AFTER_ the trailing '`'
  * - Returns with `self->wxp_flush' undefined
  * - No leading flushing is done by this function */
 PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int

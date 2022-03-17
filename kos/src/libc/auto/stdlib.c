@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75bd7e76 */
+/* HASH CRC-32:0x3688fbb5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2269,8 +2269,8 @@ do_try_again:
  * This function only returns on failure (similar to exec(2)), and will never
  * return on success (since in that case, the calling program will have  been
  * replaced by the system shell)
- * The shell paths attempted by this function are system-dependent, but before
- * any of them are tested, this function will try to use `getenv("SHELL")', if
+ * The shell paths attempted by this function are system-dependent, but before any
+ * of them are tested, this function will try to use `secure_getenv("SHELL")',  if
  * and only if that variable is defined and starts with a '/'-character. */
 INTERN ATTR_SECTION(".text.crt.fs.exec.system") int
 NOTHROW_RPC(LIBCCALL libc_shexec)(char const *command) {
@@ -2279,7 +2279,7 @@ NOTHROW_RPC(LIBCCALL libc_shexec)(char const *command) {
 
 
 	/* Try to make use of $SHELL, if defined and an absolute path. */
-	char const *environ_shell = libc_getenv("SHELL");
+	char const *environ_shell = libc_secure_getenv("SHELL");
 	if (environ_shell && *environ_shell == '/') {
 		char const *environ_shell_sh;
 		environ_shell_sh = libc_strrchrnul(environ_shell, '/') + 1;

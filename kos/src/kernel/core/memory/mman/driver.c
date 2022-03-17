@@ -5509,13 +5509,16 @@ path_get_last_segment_raw(USER CHECKED char const *path,
 		THROWS(E_SEGFAULT) {
 	char const *seg_start;
 	size_t pathlen = *p_pathlen;
-	/* Skip trialing slashes. */
+
+	/* Skip trailing slashes. */
 	while (pathlen && path[pathlen - 1] == '/')
 		--pathlen;
 	if (!pathlen)
 		return false;
+
 	/* Find the start of the current segment. */
 	seg_start = (char const *)memrend(path, '/', pathlen) + 1;
+
 	/* Write back results. */
 	result->ps_base = seg_start;
 	result->ps_size = (size_t)((path + pathlen) - seg_start);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3b7a9c */
+/* HASH CRC-32:0x6e95cc3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,19 +41,25 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_execl_defined
 #endif /* !... */
 #endif /* !__local___localdep_execl_defined */
-#ifndef __local___localdep_getenv_defined
-#define __local___localdep_getenv_defined
-#ifdef __CRT_HAVE_getenv
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
+#ifndef __local___localdep_secure_getenv_defined
+#define __local___localdep_secure_getenv_defined
+#ifdef __CRT_HAVE_secure_getenv
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_secure_getenv,(char const *__varname),secure_getenv,(__varname))
+#elif defined(__CRT_HAVE___secure_getenv)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_secure_getenv,(char const *__varname),__secure_getenv,(__varname))
+#elif defined(__CRT_HAVE___libc_secure_getenv)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_secure_getenv,(char const *__varname),__libc_secure_getenv,(__varname))
+#elif defined(__CRT_HAVE_getenv)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_secure_getenv,(char const *__varname),getenv,(__varname))
 #elif defined(__LOCAL_environ)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/getenv.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_getenv __LIBC_LOCAL_NAME(getenv)
+#define __localdep_secure_getenv __LIBC_LOCAL_NAME(getenv)
 #else /* ... */
-#undef __local___localdep_getenv_defined
+#undef __local___localdep_secure_getenv_defined
 #endif /* !... */
-#endif /* !__local___localdep_getenv_defined */
+#endif /* !__local___localdep_secure_getenv_defined */
 #ifndef __local___localdep_strrchrnul_defined
 #define __local___localdep_strrchrnul_defined
 #ifdef __CRT_HAVE_strrchrnul
@@ -70,16 +76,16 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(shexec))(char const *__command) {
 	static char const __arg_sh[] = "sh";
 	static char const __arg__c[] = "-c";
 
-#if defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)
+#if defined(__CRT_HAVE_secure_getenv) || defined(__CRT_HAVE___secure_getenv) || defined(__CRT_HAVE___libc_secure_getenv) || defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)
 	/* Try to make use of $SHELL, if defined and an absolute path. */
-	char const *__environ_shell = (__NAMESPACE_LOCAL_SYM __localdep_getenv)("SHELL");
+	char const *__environ_shell = (__NAMESPACE_LOCAL_SYM __localdep_secure_getenv)("SHELL");
 	if (__environ_shell && *__environ_shell == '/') {
 		char const *__environ_shell_sh;
 		__environ_shell_sh = (__NAMESPACE_LOCAL_SYM __localdep_strrchrnul)(__environ_shell, '/') + 1;
 		(__NAMESPACE_LOCAL_SYM __localdep_execl)(__environ_shell, __environ_shell_sh,
 		      __arg__c, __command, (char *)__NULLPTR);
 	}
-#endif /* __CRT_HAVE_getenv || __LOCAL_environ */
+#endif /* __CRT_HAVE_secure_getenv || __CRT_HAVE___secure_getenv || __CRT_HAVE___libc_secure_getenv || __CRT_HAVE_getenv || __LOCAL_environ */
 
 #ifdef __KOS__
 	/* By default, KOS uses busybox, so try to invoke that first. */
