@@ -163,8 +163,28 @@ DEFINE_TEST(wordexp) {
 	assert_wordexp("\"$(($FIRST + $SECOND))\"", 1, "52");
 	assert_wordexp("\"$((($FIRST) + ($SECOND)))\"", 1, "52");
 	assert_wordexp("\"$(((($FIRST) + ($SECOND))))\"", 1, "52");
+	/* KOS extension: Variables should also be expanded if not preceded by a '$' */
+	assert_wordexp("$[FIRST + SECOND]", 1, "52");
+	assert_wordexp("\"$[FIRST + SECOND]\"", 1, "52");
+	assert_wordexp("\"$[(FIRST) + (SECOND)]\"", 1, "52");
+	assert_wordexp("\"$[((FIRST) + (SECOND))]\"", 1, "52");
 	unsetenv("FIRST");
 	unsetenv("SECOND");
+
+	/* KOS extension: Variable assignment in math expressions. */
+	unsetenv("FOO");
+	assert(getenv("FOO") == NULL);
+	assert_wordexp("$[FOO=42]", 1, "42");
+	assert(getenv("FOO") != NULL);
+	assertf(strcmp(getenv("FOO"), "42") == 0, "%q", getenv("FOO"));
+	assert_wordexp("$[FOO++]", 1, "42");
+	assert(getenv("FOO") != NULL);
+	assertf(strcmp(getenv("FOO"), "43") == 0, "%q", getenv("FOO"));
+	assert_wordexp("$[++FOO]", 1, "44");
+	assert(getenv("FOO") != NULL);
+	assertf(strcmp(getenv("FOO"), "44") == 0, "%q", getenv("FOO"));
+	unsetenv("FOO");
+
 
 	/* Finally, test invocation of external programs. */
 	assert_wordexp("`echo hi there`", 2, "hi", "there");

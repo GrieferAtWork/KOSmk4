@@ -65,6 +65,8 @@ DECL_BEGIN
 
 /*
  * NOTE: This implementation (should) be logic-compatible with gLibc.
+ *       Though obviously several  KOS-specific extensions have  been
+ *       added, too.
  *
  * However, this is NOT the implementation from gLibc. The  implementation
  * found in here has  been written from  scratch to best  fit KOS and  its
@@ -173,6 +175,33 @@ NOTHROW_NCX(LIBCCALL wxparser_wordappend)(struct wxparser *__restrict self,
 	memcpy(word + self->wxp_wordlen, text, len, sizeof(char));
 	self->wxp_wordlen += len;
 	return 0;
+}
+
+
+PRIVATE ATTR_NOINLINE ATTR_SECTION(".text.crt.wordexp") char *
+NOTHROW_NCX(FCALL getenv_fixedlength)(char const *varname_str,
+                                      size_t varname_len) {
+	char *dup = (char *)alloca((varname_len + 1) * sizeof(char));
+	*(char *)mempcpy(dup, varname_str, varname_len, sizeof(char)) = '\0';
+	return getenv(dup);
+}
+
+PRIVATE ATTR_NOINLINE ATTR_SECTION(".text.crt.wordexp") int
+NOTHROW_NCX(FCALL setenv_fixedlength)(char const *varname_str,
+                                      size_t varname_len,
+                                      char const *val, int replace) {
+	char *dup = (char *)alloca((varname_len + 1) * sizeof(char));
+	*(char *)mempcpy(dup, varname_str, varname_len, sizeof(char)) = '\0';
+	return setenv(dup, val, replace);
+}
+
+PRIVATE ATTR_NOINLINE ATTR_SECTION(".text.crt.wordexp") int
+NOTHROW_NCX(FCALL setenv_intval)(char const *varname_str,
+                                 size_t varname_len,
+                                 intmax_t val, int replace) {
+	char valbuf[COMPILER_LENOF(PRIMAXdMAX)];
+	sprintf(valbuf, "%" PRIdMAX, val);
+	return setenv_fixedlength(varname_str, varname_len, valbuf, replace);
 }
 
 
@@ -460,12 +489,24 @@ err:
 
 /* WordexpeXPRessionPARSER */
 struct wxpr_parser {
-	intmax_t    wxpr_val;  /* [out] Expression value */
-	char const *wxpr_pos;  /* [1..1] Pointer to (potential) first character of next token. */
-	char const *wxpr_end;  /* [1..1] Pointer to expression end. */
-	char        wxpr_tok;  /* Current token */
-	bool        wxpr_dead; /* True if inside of a dead branch. (disable runtime errors) */
+	struct wxparser *wxpr_wpar;   /* [1..1][const] Underlying word expansion parser. (for flags) */
+	union {
+		intmax_t     wxpr_val;    /* [out][valid_if(wxpr_varlen == 0)] Expression value */
+		char const  *wxpr_varstr; /* [out][valid_if(wxpr_varlen != 0)] Variable name */
+	};
+	size_t           wxpr_varlen; /* [out] Variable name length, or `0' for integral constant */
+	char const      *wxpr_pos;    /* [1..1] Pointer to (potential) first character of next token. */
+	char const      *wxpr_end;    /* [1..1] Pointer to expression end. */
+	char             wxpr_tok;    /* Current token */
+	bool             wxpr_dead;   /* True if inside of a dead branch. (disable runtime errors) */
 };
+
+#define wxpr_parser_isvar(self) \
+	((self)->wxpr_varlen != 0)
+
+/* Forward declaration */
+PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
+NOTHROW_NCX(FCALL wxpr_eval_comma)(struct wxpr_parser *__restrict self);
 
 PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) char
 NOTHROW_NCX(FCALL wxpr_next)(struct wxpr_parser *__restrict self) {
@@ -484,68 +525,266 @@ NOTHROW_NCX(FCALL wxpr_next)(struct wxpr_parser *__restrict self) {
 	return self->wxpr_tok;
 }
 
-/* Forward declaration */
+/* Ensure that `self' is a constant (`self->wxpr_varlen == 0') */
 PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
-NOTHROW_NCX(FCALL wxpr_eval_ifelse)(struct wxpr_parser *__restrict self);
+NOTHROW_NCX(FCALL wxpr_makeconst)(struct wxpr_parser *__restrict self) {
+	int result;
+	char const *saved_wxpr_pos;
+	char const *saved_wxpr_end;
+	char saved_wxpr_tok;
+	char const *varval;
+	unsigned int recursion;
+	if likely(self->wxpr_varlen == 0)
+		return 0;
+	if (self->wxpr_dead) {
+set_zero_value:
+		self->wxpr_val    = 0;
+		self->wxpr_varlen = 0;
+		return 0;
+	}
+	recursion = 0;
+again_expand_varname:
+	/* Lookup the variable value. */
+	varval = getenv_fixedlength(self->wxpr_varstr, self->wxpr_varlen);
+	if (!varval) {
+		WX_DEBUG("wxpr_makeconst(%$q=NULL)\n", self->wxpr_varlen, self->wxpr_varstr);
+		/* Check for flag: should we error out when an undefined variable is used? */
+		if (self->wxpr_wpar->wxp_flags & WRDE_UNDEF)
+			return WRDE_BADVAL;
+		goto set_zero_value;
+	}
+	saved_wxpr_pos = self->wxpr_pos;
+	saved_wxpr_end = self->wxpr_end;
+	saved_wxpr_tok = self->wxpr_tok;
+	/* Recursively parse the variable's expansion as an expression */
+	self->wxpr_pos = varval;
+	self->wxpr_end = strend(varval);
+	wxpr_next(self);
+	WX_DEBUG("wxpr_makeconst(%$q=%q)\n", self->wxpr_varlen, self->wxpr_varstr, varval);
+	result = wxpr_eval_comma(self);
+	if (result == 0 && self->wxpr_pos < self->wxpr_end)
+		result = WX_SYNTAX();
+	self->wxpr_pos = saved_wxpr_pos;
+	self->wxpr_end = saved_wxpr_end;
+	self->wxpr_tok = saved_wxpr_tok;
+	if (result == 0 && self->wxpr_varlen != 0) {
+		if unlikely(recursion > 128)
+			return WX_SYNTAX(); /* Loop error... */
+		++recursion;
+		goto again_expand_varname;
+	}
+	return result;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
+NOTHROW_NCX(FCALL wxpr_eval_unary)(struct wxpr_parser *__restrict self);
 
 /* Unary expression */
 PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
-NOTHROW_NCX(FCALL wxpr_eval_unary)(struct wxpr_parser *__restrict self) {
+NOTHROW_NCX(FCALL wxpr_eval_unarybase)(struct wxpr_parser *__restrict self) {
 	int result;
 again:
 	switch (self->wxpr_tok) {
 
-	case '-': {
-		/* KOS-extension: negative. */
-		wxpr_next(self);
-		result = wxpr_eval_unary(self);
-		self->wxpr_val = -self->wxpr_val;
-	}	break;
-
 	case '+':
+	case '-':
+		if (*self->wxpr_pos == self->wxpr_tok) {
+			/* KOS-extension: Inplace-increment */
+			char const *varname_str;
+			size_t varname_len;
+			char tok = self->wxpr_tok;
+			++self->wxpr_pos;
+			wxpr_next(self);
+			result = wxpr_eval_unary(self);
+			if unlikely(result != 0)
+				goto done;
+			if (self->wxpr_dead)
+				goto again;
+			if (!wxpr_parser_isvar(self))
+				return WX_SYNTAX();
+			varname_str = self->wxpr_varstr;
+			varname_len = self->wxpr_varlen;
+			result      = wxpr_makeconst(self);
+			if unlikely(result != 0)
+				goto done;
+			if (tok == '+') {
+				++self->wxpr_val;
+			} else {
+				--self->wxpr_val;
+			}
+			if unlikely(setenv_intval(varname_str, varname_len, self->wxpr_val, 1) != 0)
+				return WRDE_NOSPACE;
+			goto done;
+		} else if (self->wxpr_tok == '-') {
+			/* KOS-extension: negative. */
+			goto do_unary_op;
+		}
 		/* KOS-extension: positive. */
 		wxpr_next(self);
 		goto again;
 
+	case '!':   /* KOS-extension: logical not. */
+	case '~': { /* KOS-extension: bitwise not. */
+		char tok;
+do_unary_op:
+		tok = self->wxpr_tok;
+		wxpr_next(self);
+		result = wxpr_eval_unary(self);
+		if unlikely(result != 0)
+			goto done;
+		result = wxpr_makeconst(self);
+		switch (tok) {
+		case '!':
+			self->wxpr_val = !self->wxpr_val;
+			break;
+		case '~':
+			self->wxpr_val = ~self->wxpr_val;
+			break;
+		case '-':
+			self->wxpr_val = -self->wxpr_val;
+			break;
+		default: __builtin_unreachable();
+		}
+	}	break;
+
 	case '(':
 		wxpr_next(self);
-		result = wxpr_eval_ifelse(self);
-		if likely(result == 0) {
-			if likely(self->wxpr_tok == ')') {
-				wxpr_next(self);
-			} else {
-				result = WX_SYNTAX();
-			}
+		result = wxpr_eval_comma(self);
+		if likely(self->wxpr_tok == ')') {
+			wxpr_next(self);
+		} else {
+			if unlikely(result != 0)
+				goto done;
+			result = WX_SYNTAX();
 		}
 		break;
 
-	default: {
-		/* Parse an integer.
-		 * NOTE: We pass `0' for `base', thus allowing use of octal and hex numbers.
-		 *       Apparently, supporting them  here is something  mandated by  POSIX.
-		 *
-		 * WARNING: This assumes that input is always (eventually) terminated by
-		 *          '\0'. Our caller  guaranties that this  is always the  case! */
-		char const *newpos;
-		--self->wxpr_pos; /* Rewind to include the leading digit character. */
-		self->wxpr_val = strtoimax_r(self->wxpr_pos, (char **)&newpos, 0, NULL);
-		WX_DEBUG("strtoimax_r: parsed %$q as %" PRIdMAX "\n",
-		         (size_t)(newpos - self->wxpr_pos),
-		         self->wxpr_pos, self->wxpr_val);
+	default:
+		if (isalpha(self->wxpr_tok)) {
+			/* KOS extension: support for unprefixed shell variables:
+			 * >> $((10 + FOO))
+			 * Should be the same as:
+			 * >> $((10 + $FOO))
+			 * Note that in the later case, our caller already did the expansion! */
+	case '_':
+			self->wxpr_varstr = self->wxpr_pos - 1;
+			for (; self->wxpr_pos < self->wxpr_end; ++self->wxpr_pos) {
+				char ch = *self->wxpr_pos;
+				if (isalnum(ch))
+					continue;
+				if (ch == '_')
+					continue;
+				break;
+			}
+			self->wxpr_varlen = (size_t)(self->wxpr_pos -
+			                             self->wxpr_varstr);
+			assert(self->wxpr_varlen != 0);
+			wxpr_next(self);
+			result = 0;
+		} else /*if (isdigit(self->wxpr_tok))*/ {
+			/* Parse an integer.
+			 * NOTE: We pass `0' for `base', thus allowing use of octal and hex numbers.
+			 *       Apparently, supporting them  here is something  mandated by  POSIX.
+			 *
+			 * WARNING: This assumes that input is always (eventually) terminated by
+			 *          '\0'. Our caller  guaranties that this  is always the  case! */
+			char const *newpos;
+			--self->wxpr_pos; /* Rewind to include the leading digit character. */
+			self->wxpr_val = strtoimax_r(self->wxpr_pos, (char **)&newpos, 0, NULL);
+			WX_DEBUG("strtoimax_r: parsed %$q as %" PRIdMAX "\n",
+			         (size_t)(newpos - self->wxpr_pos),
+			         self->wxpr_pos, self->wxpr_val);
+			self->wxpr_varlen = 0; /* Not a variable */
 
-		/* Verify that `newpos' has proper bounds. */
-		if (newpos <= self->wxpr_pos || newpos > self->wxpr_end)
-			return WX_SYNTAX(); /* Nothing was parsed, or number extends beyond buffer? */
+			/* Verify that `newpos' has proper bounds. */
+			if (newpos <= self->wxpr_pos || newpos > self->wxpr_end)
+				return WX_SYNTAX(); /* Nothing was parsed, or number extends beyond buffer? */
 
-		/* Load the next token */
-		self->wxpr_pos = newpos;
-		wxpr_next(self);
+			/* Load the next token */
+			self->wxpr_pos = newpos;
+			wxpr_next(self);
 
-		/* Success! */
-		result = 0;
-	}	break;
+			/* Success! */
+			result = 0;
+		} /*else {
+			result = WX_SYNTAX();
+		}*/
+		break;
 
 	}
+done:
+	return result;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
+NOTHROW_NCX(FCALL wxpr_eval_unary)(struct wxpr_parser *__restrict self) {
+	int result = wxpr_eval_unarybase(self);
+	if unlikely(result != 0)
+		goto done;
+	while ((self->wxpr_tok == '+' || self->wxpr_tok == '-') &&
+	       *self->wxpr_pos == self->wxpr_tok) {
+		char const *varname_str;
+		size_t varname_len;
+		char tok = self->wxpr_tok;
+		intmax_t saved_val;
+		++self->wxpr_pos;
+		wxpr_next(self);
+		if (self->wxpr_dead)
+			continue;
+		if (!wxpr_parser_isvar(self))
+			return WX_SYNTAX();
+		varname_str = self->wxpr_varstr;
+		varname_len = self->wxpr_varlen;
+		result      = wxpr_makeconst(self);
+		if unlikely(result != 0)
+			goto done;
+		saved_val = self->wxpr_val;
+		if (tok == '+') {
+			++saved_val;
+		} else {
+			--saved_val;
+		}
+		if unlikely(setenv_intval(varname_str, varname_len, saved_val, 1) != 0)
+			return WRDE_NOSPACE;
+	}
+done:
+	return result;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.wordexp") intmax_t
+NOTHROW_NCX(FCALL ipowmax)(intmax_t base, intmax_t exp) {
+	intmax_t result = 1;
+	/* XXX: Instead of doing ((2*2)*2)*2 we could do (2*2)*(2*2) */
+	while ((uintmax_t)exp) {
+		result *= base;
+		--exp;
+	}
+	return result;
+}
+
+/* Power expression */
+PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
+NOTHROW_NCX(FCALL wxpr_eval_power)(struct wxpr_parser *__restrict self) {
+	int result = wxpr_eval_unary(self);
+	if unlikely(result != 0)
+		goto done;
+	while (self->wxpr_tok == '*' && *self->wxpr_pos == '*') {
+		intmax_t lhs;
+		result = wxpr_makeconst(self);
+		if unlikely(result != 0)
+			goto done;
+		lhs = self->wxpr_val;
+		++self->wxpr_pos;
+		wxpr_next(self);
+		result = wxpr_eval_unary(self);
+		if unlikely(result != 0)
+			goto done;
+		result = wxpr_makeconst(self);
+		if unlikely(result != 0)
+			goto done;
+		self->wxpr_val = ipowmax(lhs, self->wxpr_val);
+	}
+done:
 	return result;
 }
 
@@ -553,7 +792,7 @@ again:
 PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
 NOTHROW_NCX(FCALL wxpr_eval_prod)(struct wxpr_parser *__restrict self) {
 	char tok;
-	int result = wxpr_eval_unary(self);
+	int result = wxpr_eval_power(self);
 	if unlikely(result != 0)
 		goto done;
 again_switch_tok:
@@ -563,10 +802,18 @@ again_switch_tok:
 	case '%': /* KOS extension! (modulo) */
 	case '*':
 	case '/': {
-		intptr_t lhs;
+		intmax_t lhs;
+		if (*self->wxpr_pos == '=')
+			break; /* "*=", "%=" or "/=" */
+		result = wxpr_makeconst(self);
+		if unlikely(result != 0)
+			goto done;
 		lhs = self->wxpr_val;
 		wxpr_next(self);
-		result = wxpr_eval_unary(self);
+		result = wxpr_eval_power(self);
+		if unlikely(result != 0)
+			goto done;
+		result = wxpr_makeconst(self);
 		if unlikely(result != 0)
 			goto done;
 		if (tok == '*') {
@@ -575,7 +822,7 @@ again_switch_tok:
 			if unlikely(self->wxpr_val == 0) {
 				if unlikely(self->wxpr_dead)
 					goto again_switch_tok; /* Ignore runtime errors */
-				return WX_SYNTAX(); /* gLibc also returns this error for divide-by-zero */
+				return WX_SYNTAX();        /* gLibc also returns this error for divide-by-zero */
 			}
 			if (tok == '/') {
 				self->wxpr_val = lhs / self->wxpr_val;
@@ -606,10 +853,22 @@ again_switch_tok:
 
 	case '+':
 	case '-': {
-		intptr_t lhs;
+		intmax_t lhs;
+		if (*self->wxpr_pos == '=')
+			break; /* "+=" or "-=" */
+#if 0 /* Can't happen (already handled in unarybase/unary) */
+		if (*self->wxpr_pos == tok)
+			break; /* "++" or "--" */
+#endif
+		result = wxpr_makeconst(self);
+		if unlikely(result != 0)
+			goto done;
 		lhs = self->wxpr_val;
 		wxpr_next(self);
 		result = wxpr_eval_prod(self);
+		if unlikely(result != 0)
+			goto done;
+		result = wxpr_makeconst(self);
 		if unlikely(result != 0)
 			goto done;
 		if (tok == '+') {
@@ -627,41 +886,32 @@ done:
 	return result;
 }
 
-/* Compare equal/non-zero expression */
+/* Compare expression */
 PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
-NOTHROW_NCX(FCALL wxpr_eval_cmpeq)(struct wxpr_parser *__restrict self) {
-	/* KOS extension: C-style compare-equal/non-equal (`10 != 20') */
-	char tok;
+NOTHROW_NCX(FCALL wxpr_eval_shift)(struct wxpr_parser *__restrict self) {
+	/* KOS extension: C-style shift */
 	int result = wxpr_eval_sum(self);
 	if unlikely(result != 0)
 		goto done;
-again_switch_tok:
-	tok = self->wxpr_tok;
-	switch (tok) {
-
-	case '!':
-	case '=': {
-		intptr_t lhs;
-		if (self->wxpr_pos >= self->wxpr_end)
-			break;
-		if (*self->wxpr_pos != '=')
-			break;
+	while ((self->wxpr_tok == '>' || self->wxpr_tok == '<') &&
+	       self->wxpr_pos[0] == self->wxpr_tok &&
+	       self->wxpr_pos[1] != '=') {
+		char tok = self->wxpr_tok;
+		intmax_t lhs;
 		++self->wxpr_pos;
-		lhs = self->wxpr_val;
 		wxpr_next(self);
+		result = wxpr_makeconst(self);
+		if unlikely(result != 0)
+			goto done;
+		lhs    = self->wxpr_val;
 		result = wxpr_eval_sum(self);
 		if unlikely(result != 0)
 			goto done;
-		if (tok == '!') {
-			self->wxpr_val = lhs != self->wxpr_val ? 1 : 0;
-		} else {
-			self->wxpr_val = lhs == self->wxpr_val ? 1 : 0;
-		}
-		goto again_switch_tok;
-	}	break;
-
-	default:
-		break;
+		result = wxpr_makeconst(self);
+		if unlikely(result != 0)
+			goto done;
+		self->wxpr_val = tok == '<' ? (lhs << (shift_t)self->wxpr_val)
+		                            : (lhs >> (shift_t)self->wxpr_val);
 	}
 done:
 	return result;
@@ -670,9 +920,9 @@ done:
 /* Compare expression */
 PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
 NOTHROW_NCX(FCALL wxpr_eval_cmp)(struct wxpr_parser *__restrict self) {
-	/* KOS extension: C-style compare (`30 > 20') */
+	/* KOS extension: C-style compare */
 	char tok;
-	int result = wxpr_eval_cmpeq(self);
+	int result = wxpr_eval_shift(self);
 	if unlikely(result != 0)
 		goto done;
 again_switch_tok:
@@ -682,14 +932,23 @@ again_switch_tok:
 	case '>':
 	case '<': {
 		bool cmp;
-		intptr_t lhs;
-		if (self->wxpr_pos < self->wxpr_end && *self->wxpr_pos == '=') {
+		intmax_t lhs;
+		if (*self->wxpr_pos == '=') {
 			tok <<= 1;
 			++self->wxpr_pos;
+		} else if (*self->wxpr_pos == tok) {
+			/* "<<=" or ">>=" */
+			break;
 		}
+		result = wxpr_makeconst(self);
+		if unlikely(result != 0)
+			goto done;
 		lhs = self->wxpr_val;
 		wxpr_next(self);
-		result = wxpr_eval_cmpeq(self);
+		result = wxpr_eval_shift(self);
+		if unlikely(result != 0)
+			goto done;
+		result = wxpr_makeconst(self);
 		if unlikely(result != 0)
 			goto done;
 		switch ((unsigned char)tok) {
@@ -718,27 +977,219 @@ done:
 	return result;
 }
 
-/* Compare expression */
+/* Compare equal/non-zero expression */
+PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
+NOTHROW_NCX(FCALL wxpr_eval_cmpeq)(struct wxpr_parser *__restrict self) {
+	/* KOS extension: C-style compare-equal/non-equal (`10 != 20') */
+	char tok;
+	int result = wxpr_eval_cmp(self);
+	if unlikely(result != 0)
+		goto done;
+again_switch_tok:
+	tok = self->wxpr_tok;
+	switch (tok) {
+
+	case '!':
+	case '=': {
+		intmax_t lhs;
+		if (self->wxpr_pos >= self->wxpr_end)
+			break;
+		if (*self->wxpr_pos != '=')
+			break;
+		++self->wxpr_pos;
+		result = wxpr_makeconst(self);
+		if unlikely(result != 0)
+			goto done;
+		lhs = self->wxpr_val;
+		wxpr_next(self);
+		result = wxpr_eval_cmp(self);
+		if unlikely(result != 0)
+			goto done;
+		result = wxpr_makeconst(self);
+		if unlikely(result != 0)
+			goto done;
+		if (tok == '!') {
+			self->wxpr_val = lhs != self->wxpr_val ? 1 : 0;
+		} else {
+			self->wxpr_val = lhs == self->wxpr_val ? 1 : 0;
+		}
+		goto again_switch_tok;
+	}	break;
+
+	default:
+		break;
+	}
+done:
+	return result;
+}
+
+/* Bitwise and */
+PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
+NOTHROW_NCX(FCALL wxpr_eval_and)(struct wxpr_parser *__restrict self) {
+	/* KOS extension: C-style bitwise and */
+	int result = wxpr_eval_cmpeq(self);
+	if unlikely(result != 0)
+		goto done;
+	while (self->wxpr_tok == '&' && (*self->wxpr_pos != '&' &&
+	                                 *self->wxpr_pos != '=')) {
+		intmax_t oldval;
+		wxpr_next(self);
+		result = wxpr_makeconst(self);
+		if unlikely(result != 0)
+			goto done;
+		oldval = self->wxpr_val;
+		result = wxpr_eval_cmpeq(self);
+		if unlikely(result != 0)
+			goto done;
+		result = wxpr_makeconst(self);
+		if unlikely(result != 0)
+			goto done;
+		self->wxpr_val &= oldval;
+	}
+done:
+	return result;
+}
+
+/* Bitwise xor */
+PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
+NOTHROW_NCX(FCALL wxpr_eval_xor)(struct wxpr_parser *__restrict self) {
+	/* KOS extension: C-style bitwise xor */
+	int result = wxpr_eval_and(self);
+	if unlikely(result != 0)
+		goto done;
+	while (self->wxpr_tok == '^' && (*self->wxpr_pos != '=')) {
+		intmax_t oldval;
+		wxpr_next(self);
+		result = wxpr_makeconst(self);
+		if unlikely(result != 0)
+			goto done;
+		oldval = self->wxpr_val;
+		result = wxpr_eval_and(self);
+		if unlikely(result != 0)
+			goto done;
+		result = wxpr_makeconst(self);
+		if unlikely(result != 0)
+			goto done;
+		self->wxpr_val ^= oldval;
+	}
+done:
+	return result;
+}
+
+/* Bitwise or */
+PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
+NOTHROW_NCX(FCALL wxpr_eval_or)(struct wxpr_parser *__restrict self) {
+	/* KOS extension: C-style bitwise or */
+	int result = wxpr_eval_xor(self);
+	if unlikely(result != 0)
+		goto done;
+	while (self->wxpr_tok == '|' && (*self->wxpr_pos != '|' &&
+	                                 *self->wxpr_pos != '=')) {
+		intmax_t oldval;
+		wxpr_next(self);
+		result = wxpr_makeconst(self);
+		if unlikely(result != 0)
+			goto done;
+		oldval = self->wxpr_val;
+		result = wxpr_eval_xor(self);
+		if unlikely(result != 0)
+			goto done;
+		result = wxpr_makeconst(self);
+		if unlikely(result != 0)
+			goto done;
+		self->wxpr_val |= oldval;
+	}
+done:
+	return result;
+}
+
+/* Logical and */
+PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
+NOTHROW_NCX(FCALL wxpr_eval_land)(struct wxpr_parser *__restrict self) {
+	/* KOS extension: C-style logical and */
+	int result = wxpr_eval_or(self);
+	if unlikely(result != 0)
+		goto done;
+	while (self->wxpr_tok == '&' && *self->wxpr_pos == '&') {
+		bool was_dead, is_false;
+		++self->wxpr_pos;
+		wxpr_next(self);
+		result = wxpr_makeconst(self);
+		if unlikely(result != 0)
+			goto done;
+		was_dead        = self->wxpr_dead;
+		is_false        = self->wxpr_val == 0;
+		self->wxpr_dead = was_dead | is_false;
+		result = wxpr_eval_or(self);
+		if unlikely(result != 0)
+			goto done;
+		result = wxpr_makeconst(self);
+		if unlikely(result != 0)
+			goto done;
+		self->wxpr_dead = was_dead;
+		self->wxpr_val  = !is_false & (self->wxpr_val != 0);
+	}
+done:
+	return result;
+}
+
+/* Logical or */
+PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
+NOTHROW_NCX(FCALL wxpr_eval_lor)(struct wxpr_parser *__restrict self) {
+	/* KOS extension: C-style logical or */
+	int result = wxpr_eval_land(self);
+	if unlikely(result != 0)
+		goto done;
+	while (self->wxpr_tok == '|' && *self->wxpr_pos == '|') {
+		bool was_dead, is_true;
+		++self->wxpr_pos;
+		wxpr_next(self);
+		result = wxpr_makeconst(self);
+		if unlikely(result != 0)
+			goto done;
+		was_dead        = self->wxpr_dead;
+		is_true         = self->wxpr_val != 0;
+		self->wxpr_dead = was_dead | is_true;
+		result = wxpr_eval_land(self);
+		if unlikely(result != 0)
+			goto done;
+		result = wxpr_makeconst(self);
+		if unlikely(result != 0)
+			goto done;
+		self->wxpr_dead = was_dead;
+		self->wxpr_val  = is_true | (self->wxpr_val != 0);
+	}
+done:
+	return result;
+}
+
+/* If-else expression */
 PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
 NOTHROW_NCX(FCALL wxpr_eval_ifelse)(struct wxpr_parser *__restrict self) {
 	/* KOS extension: C-style if/else expression (`foo ? bar : baz') */
-	int result = wxpr_eval_cmp(self);
+	int result = wxpr_eval_lor(self);
 	if unlikely(result != 0)
 		goto done;
 	if (self->wxpr_tok == '?') {
 		bool cond = self->wxpr_val != 0;
 		bool dead = self->wxpr_dead;
 		intmax_t lhs;
+		size_t lhs_len;
+		result = wxpr_makeconst(self);
+		if unlikely(result != 0)
+			goto done;
 		wxpr_next(self);
 		if (self->wxpr_tok == ':') {
 			/* GCC-style `foo ?: bar' expression (same as `foo ? foo : bar') */
-			lhs = self->wxpr_val;
+			lhs     = self->wxpr_val;
+			lhs_len = self->wxpr_varlen;
 		} else {
 			self->wxpr_dead = dead | !cond;
-			result = wxpr_eval_cmp(self);
+			result = wxpr_eval_lor(self);
 			if unlikely(result != 0)
 				goto done;
-			lhs = self->wxpr_val;
+			lhs     = self->wxpr_val;
+			lhs_len = self->wxpr_varlen;
 			if (self->wxpr_tok != ':')
 				return WX_SYNTAX();
 		}
@@ -747,9 +1198,122 @@ NOTHROW_NCX(FCALL wxpr_eval_ifelse)(struct wxpr_parser *__restrict self) {
 		result = wxpr_eval_ifelse(self);
 		if unlikely(result != 0)
 			goto done;
-		if (cond)
-			self->wxpr_val = lhs;
+		if (cond) {
+			self->wxpr_val    = lhs;
+			self->wxpr_varlen = lhs_len;
+		}
 		self->wxpr_dead = dead;
+	}
+done:
+	return result;
+}
+
+/* Assignment expression */
+PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
+NOTHROW_NCX(FCALL wxpr_eval_assign)(struct wxpr_parser *__restrict self) {
+	int result = wxpr_eval_ifelse(self);
+	if unlikely(result != 0)
+		goto done;
+	switch (self->wxpr_tok) {
+
+	case '=': {
+		char const *varname_str;
+		size_t varname_len;
+		wxpr_next(self);
+		varname_str = self->wxpr_varstr;
+		varname_len = self->wxpr_varlen;
+		if unlikely(!self->wxpr_dead && !wxpr_parser_isvar(self))
+			return WX_SYNTAX();
+		result = wxpr_eval_assign(self);
+		if unlikely(result != 0)
+			goto done;
+		if (!self->wxpr_dead) {
+			result = wxpr_makeconst(self);
+			if unlikely(result != 0)
+				goto done;
+			if unlikely(setenv_intval(varname_str, varname_len, self->wxpr_val, 1) != 0)
+				return WRDE_NOSPACE;
+		}
+	}	break;
+
+	case '<':
+	case '>':
+		if (self->wxpr_pos[0] != self->wxpr_tok ||
+		    self->wxpr_pos[1] != '=')
+			break;
+		++self->wxpr_pos;
+		ATTR_FALLTHROUGH
+	case '*':
+	case '/':
+	case '%':
+	case '+':
+	case '-':
+	case '&':
+	case '|':
+	case '^': {
+		char tok;
+		char const *varname_str;
+		size_t varname_len;
+		intmax_t lhs;
+		if (*self->wxpr_pos != '=')
+			break;
+		tok = self->wxpr_tok;
+		++self->wxpr_pos;
+		wxpr_next(self);
+		varname_str = self->wxpr_varstr;
+		varname_len = self->wxpr_varlen;
+		if unlikely(!self->wxpr_dead && !wxpr_parser_isvar(self))
+			return WX_SYNTAX();
+		result = wxpr_makeconst(self);
+		if unlikely(result != 0)
+			goto done;
+		lhs    = self->wxpr_val;
+		result = wxpr_eval_assign(self);
+		if unlikely(result != 0)
+			goto done;
+		if (!self->wxpr_dead) {
+			intmax_t rhs;
+			result = wxpr_makeconst(self);
+			if unlikely(result != 0)
+				goto done;
+			rhs = self->wxpr_val;
+			switch (tok) {
+			case '<': lhs <<= rhs; break;
+			case '>': lhs >>= rhs; break;
+			case '*': lhs *= rhs; break;
+			case '/': lhs /= rhs; break;
+			case '%': lhs %= rhs; break;
+			case '+': lhs += rhs; break;
+			case '-': lhs -= rhs; break;
+			case '&': lhs &= rhs; break;
+			case '|': lhs |= rhs; break;
+			case '^': lhs ^= rhs; break;
+			default: __builtin_unreachable();
+			}
+			self->wxpr_val = lhs;
+			if unlikely(setenv_intval(varname_str, varname_len, lhs, 1) != 0)
+				return WRDE_NOSPACE;
+		}
+	}	break;
+
+	default:
+		break;
+	}
+done:
+	return result;
+}
+
+/* Assignment expression */
+PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
+NOTHROW_NCX(FCALL wxpr_eval_comma)(struct wxpr_parser *__restrict self) {
+	int result;
+again:
+	result = wxpr_eval_assign(self);
+	if unlikely(result != 0)
+		goto done;
+	if (self->wxpr_tok == ',') {
+		wxpr_next(self);
+		goto again;
 	}
 done:
 	return result;
@@ -767,24 +1331,37 @@ NOTHROW_NCX(LIBCCALL wxparser_parse_expr)(struct wxparser *__restrict self,
 	size_t len;
 	WX_DEBUG("wxparser_parse_expr(%$q)\n", expr_len, expr);
 
-	wxpr.wxpr_pos = expr;
-	wxpr.wxpr_end = expr + expr_len;
+	DBG_memset(&wxpr, 0xcc, sizeof(wxpr));
+	wxpr.wxpr_pos  = expr;
+	wxpr.wxpr_end  = expr + expr_len;
+	wxpr.wxpr_dead = false;
+	wxpr.wxpr_wpar = self;
 
 	/* Evaluate the expression */
 	wxpr_next(&wxpr);
-	result = wxpr_eval_ifelse(&wxpr);
+	result = wxpr_eval_comma(&wxpr);
 	if unlikely(result != 0)
-		return result;
+		goto done;
 
 	/* Ensure that all tokens were consumed. */
-	if (wxpr.wxpr_tok != '\0')
-		return WX_SYNTAX();
+	if unlikely(wxpr.wxpr_tok != '\0') {
+		result = WX_SYNTAX();
+		goto done;
+	}
+
+	/* Ensure that variables have been expanded */
+	result = wxpr_makeconst(&wxpr);
+	if unlikely(result != 0)
+		goto done;
+
 
 	/* Convert the expression result into a (decimal) string */
 	len = sprintf(buf, "%" PRIdMAX, wxpr.wxpr_val);
 
 	/* And finally: append the expression's string representation onto the current word. */
-	return wxparser_wordappend(self, buf, len);
+	result = wxparser_wordappend(self, buf, len);
+done:
+	return result;
 }
 
 /* Parse what comes after a '\\' output of quoted context
@@ -978,6 +1555,12 @@ set_value_as_argc_minus_one:
 		++self->wxp_input;
 		break;
 
+//	case '!':
+		/* TODO: "${!prefix*}", "${!prefix@}"
+		 *       Same * vs. @ expansion rules as ${#*} and ${#@},
+		 *       but expands uses the list of environ variables
+		 *       names that start with the given `prefix'. */
+
 	case '*':
 	case '@': {
 		unsigned int argc;
@@ -1053,7 +1636,6 @@ set_value_as_argc_minus_one:
 
 	default:
 		if (isalpha(ch)) {
-			char *envname_temp;
 			char const *envname_start;
 			size_t envname_len;
 	case '_':
@@ -1068,11 +1650,8 @@ set_value_as_argc_minus_one:
 				break;
 			}
 			/* Environment variable name. */
-			envname_len  = (size_t)(self->wxp_input - envname_start);
-			envname_temp = (char *)malloca(envname_len + 1, sizeof(char));
-			*(char *)mempcpy(envname_temp, envname_start, envname_len, sizeof(char)) = '\0';
-			value_str = getenv(envname_temp);
-			freea(envname_temp);
+			envname_len = (size_t)(self->wxp_input - envname_start);
+			value_str   = getenv_fixedlength(envname_start, envname_len);
 			goto set_value_len_with_strlen;
 		} else if (isdigit(ch)) {
 			/* Index into program arguments. */
@@ -1117,11 +1696,65 @@ again_switch_curlied_action:
 		case '}':
 			goto done_action;
 
+//		case '/':
+			/* TODO: Support for bash-style pattern-replace:
+			 *       ${VARNAME/PATTERN/STRING} */
+
+//		case '^':
+//		case ',':
+			/* TODO: Support for bash-style case-modification:
+			 *       ${parameter^pattern}
+			 *       ${parameter^^pattern}
+			 *       ${parameter,pattern}
+			 *       ${parameter,,pattern} */
+
+//		case '@':
+			/* TODO: Support for bash-style "Parameter transformation"
+			 *       ${parameter@operator} */
+
 		case ':':
 			got_colon = true;
 			ch        = *self->wxp_input;
-			if unlikely(!strchr("-=?+", ch))
+			if unlikely(!strchr("-=?+", ch)) {
+				/* TODO: Support for bash-style substring:
+				 *   FOO="TestString"
+				 *   ${FOO:1}    --> "estString"
+				 *   ${FOO:1:}   --> ""
+				 *   ${FOO:1:3}  --> "est"
+				 *   ${FOO::1}   --> "T"
+				 *   ${FOO:3}    --> "tString"
+				 *   ${FOO:3:2}  --> "tS"
+				 * Syntax:
+				 *   ${VARNAME:START_INDEX[:LENGTH]}  -- LENGTH=INT_MAX
+				 *   ${VARNAME::[LENGTH]}             -- START_INDEX="0"
+				 * Impl:
+				 *   startIndex = START_INDEX;
+				 *   if (startIndex < 0) {
+				 *       startIndex = 0;
+				 *       endIndex   = {value_len};
+				 *   } else {
+				 *       endIndex = LENGTH;
+				 *       if (endIndex < 0) {
+				 *           if ((startIndex + (-endIndex)) > {value_len})
+				 *               ERROR;
+				 *           endIndex += {value_len};
+				 *           assert(endIndex >= 0);
+				 *       } else {
+				 *           endIndex += startIndex;
+				 *           if (endIndex > {value_len})
+				 *               endIndex = {value_len};
+				 *       }
+				 *   }
+				 *   if (startIndex > {value_len}) {
+				 *       startIndex = {value_len})
+				 *       endIndex   = {value_len})
+				 *   }
+				 *   // Apply substring transformation
+				 *   value_str += startIndex;
+				 *   value_len = startIndex - endIndex;
+				 */
 				goto err_syntax;
+			}
 			goto again_switch_curlied_action;
 
 		case '#': /* Include "##" */
