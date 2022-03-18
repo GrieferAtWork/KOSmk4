@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc81e41e3 */
+/* HASH CRC-32:0xc1144063 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -236,6 +236,132 @@ INTDEF WUNUSED ATTR_LIBC_SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF WUNUSED ATTR_LIBC_SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__cscanf_s_l)(char const *format, locale_t locale, ...);
+/* >> clreol(3)
+ * Clear all cells from the cursor (inclusive) until the end
+ * of the current line. (s.a. `AC_EL(ANSITTY_EL_AFTER)') */
+INTDEF void NOTHROW_NCX(LIBCCALL libc_clreol)(void);
+/* >> clrscr(3)
+ * Clear the entire screen (s.a. `AC_ED(ANSITTY_CLS_ALL)') */
+INTDEF void NOTHROW_NCX(LIBCCALL libc_clrscr)(void);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> gotoxy(3)
+ * Set the cursor {x,y} position (s.a. `AC_CUP(y, x)') */
+INTDEF void NOTHROW_NCX(LIBDCALL libd_gotoxy)(int x, int y);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> gotoxy(3)
+ * Set the cursor {x,y} position (s.a. `AC_CUP(y, x)') */
+INTDEF void NOTHROW_NCX(LIBCCALL libc_gotoxy)(int x, int y);
+/* >> normvideo(3)
+ * Delete the line at the current cursor position, moving the
+ * screen contents underneath up one line. (s.a. `AC_DL("1")') */
+INTDEF void NOTHROW_NCX(LIBCCALL libc_delline)(void);
+/* >> normvideo(3)
+ * Insert a blank line at the current cursor position, moving the
+ * screen contents underneath down one line. (s.a. `AC_IL("1")') */
+INTDEF void NOTHROW_NCX(LIBCCALL libc_insline)(void);
+/* >> normvideo(3)
+ * Brighten text foreground color (s.a. `AC_FGBRIGHT') */
+INTDEF void NOTHROW_NCX(LIBCCALL libc_highvideo)(void);
+/* >> normvideo(3)
+ * Darken text foreground color (s.a. `AC_FGDARK') */
+INTDEF void NOTHROW_NCX(LIBCCALL libc_lowvideo)(void);
+/* >> normvideo(3)
+ * Reset all graphics attributes to normal (s.a. `AC_DEFATTR') */
+INTDEF void NOTHROW_NCX(LIBCCALL libc_normvideo)(void);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> textcolor(3)
+ * @param: color: Color code (s.a. constants in `<conio.h>') */
+INTDEF void NOTHROW_NCX(LIBDCALL libd_textcolor)(int color);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> textcolor(3)
+ * @param: color: Color code (s.a. constants in `<conio.h>') */
+INTDEF void NOTHROW_NCX(LIBCCALL libc_textcolor)(int color);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> textbackground(3)
+ * @param: color: Color code (s.a. constants in `<conio.h>') */
+INTDEF void NOTHROW_NCX(LIBDCALL libd_textbackground)(int color);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> textbackground(3)
+ * @param: color: Color code (s.a. constants in `<conio.h>') */
+INTDEF void NOTHROW_NCX(LIBCCALL libc_textbackground)(int color);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> textattr(3)
+ * Set text attributes: `textcolor(attr & 0x0f)' and `textbackground((attr & 0xf0) >> 8)' */
+INTDEF void NOTHROW_NCX(LIBDCALL libd_textattr)(int attr);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> textattr(3)
+ * Set text attributes: `textcolor(attr & 0x0f)' and `textbackground((attr & 0xf0) >> 8)' */
+INTDEF void NOTHROW_NCX(LIBCCALL libc_textattr)(int attr);
+/* >> clearkeybuf(3)
+ * Flush all unread input (usually keyboard) data pending on the terminal */
+INTDEF void NOTHROW_NCX(LIBCCALL libc_clearkeybuf)(void);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> _conio_getpass(3)
+ * CONIO version of getpass(3). But note the slightly different variant from `<unistd.h>' */
+INTDEF NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd__conio_getpass)(const char *prompt, char *str);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> _conio_getpass(3)
+ * CONIO version of getpass(3). But note the slightly different variant from `<unistd.h>' */
+INTDEF NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc__conio_getpass)(const char *prompt, char *str);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> cputsxy(3)
+ * Combination of `gotoxy(3)' and `cputs(3)' */
+INTDEF void NOTHROW_NCX(LIBDCALL libd_cputsxy)(int x, int y, char __KOS_FIXED_CONST *str);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> cputsxy(3)
+ * Combination of `gotoxy(3)' and `cputs(3)' */
+INTDEF void NOTHROW_NCX(LIBCCALL libc_cputsxy)(int x, int y, char __KOS_FIXED_CONST *str);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> putchxy(3)
+ * Combination of `gotoxy(3)' and `putch(3)' */
+INTDEF void NOTHROW_NCX(LIBDCALL libd_putchxy)(int x, int y, char ch);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> putchxy(3)
+ * Combination of `gotoxy(3)' and `putch(3)' */
+INTDEF void NOTHROW_NCX(LIBCCALL libc_putchxy)(int x, int y, char ch);
+INTDEF int NOTHROW_NCX(LIBCCALL libc__conio_wherexy)(uint16_t xy[2]);
+/* >> wherex(3)
+ * Return the current cursor 'X' position (1-based) */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_wherex)(void);
+/* >> wherey(3)
+ * Return the current cursor 'Y' position (1-based) */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_wherey)(void);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> window(3)
+ * Set scroll range and margains to the specified rectangle (1-based) */
+INTDEF void NOTHROW_NCX(LIBDCALL libd_window)(int left, int top, int right, int bottom);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> window(3)
+ * Set scroll range and margains to the specified rectangle (1-based) */
+INTDEF void NOTHROW_NCX(LIBCCALL libc_window)(int left, int top, int right, int bottom);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> movetext(3)
+ * Duplicate a given rectangle (1-based) of on-screen text at
+ * another location. Overlapping rectangles are handled correctly. */
+INTDEF int NOTHROW_NCX(LIBDCALL libd_movetext)(int left, int top, int right, int bottom, int destleft, int desttop);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> movetext(3)
+ * Duplicate a given rectangle (1-based) of on-screen text at
+ * another location. Overlapping rectangles are handled correctly. */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_movetext)(int left, int top, int right, int bottom, int destleft, int desttop);
 #endif /* !__KERNEL__ */
 
 DECL_END

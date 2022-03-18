@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x146c0c3 */
+/* HASH CRC-32:0xeb52c601 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -245,6 +245,15 @@ DFUN(".text.crt.dos.conio", libd__vcprintf_s, libc__vcprintf_s, TD, 2, TP, TP)
 DEFINE_INTERN_ALIAS(libd__vcprintf_p, libd__vcprintf);
 DFUN(".text.crt.dos.conio", libd__vcscanf, libc__vcscanf, TD, 2, TP, TP)
 DFUN(".text.crt.dos.conio", libd__vcscanf_s, libc__vcscanf_s, TD, 2, TP, TP)
+DFUN(".text.crt.dos.conio", libd_gotoxy, libc_gotoxy, TV, 2, TD, TD)
+DFUN(".text.crt.dos.conio", libd_textcolor, libc_textcolor, TV, 1, TD)
+DFUN(".text.crt.dos.conio", libd_textbackground, libc_textbackground, TV, 1, TD)
+DFUN(".text.crt.dos.conio", libd_textattr, libc_textattr, TV, 1, TD)
+DFUN(".text.crt.dos.conio", libd__conio_getpass, libc__conio_getpass, TP, 2, TP, TP)
+DFUN(".text.crt.dos.conio", libd_cputsxy, libc_cputsxy, TV, 3, TD, TD, TP)
+DFUN(".text.crt.dos.conio", libd_putchxy, libc_putchxy, TV, 3, TD, TD, THH)
+DFUN(".text.crt.dos.conio", libd_window, libc_window, TV, 4, TD, TD, TD, TD)
+DFUN(".text.crt.dos.conio", libd_movetext, libc_movetext, TD, 6, TD, TD, TD, TD, TD, TD)
 
 /* crypt */
 DFUN(".text.crt.dos.string.encrypt", libd_setkey, libc_setkey, TV, 1, TP)

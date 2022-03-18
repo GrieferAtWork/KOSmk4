@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa66e9001 */
+/* HASH CRC-32:0x8456c311 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -265,6 +265,7 @@
 #define __CRT_HAVE_DOS$_chgsignf
 #define __CRT_HAVE_DOS$_chvalidator_l
 #define __CRT_HAVE_DOS$_configthreadlocale
+#define __CRT_HAVE_DOS$_conio_getpass
 #define __CRT_HAVE_DOS$_control87
 #define __CRT_HAVE_DOS$_controlfp
 #define __CRT_HAVE_DOS$_controlfp_s
@@ -1227,6 +1228,7 @@
 #define __CRT_HAVE_DOS$cproj
 #define __CRT_HAVE_DOS$cprojf
 #define __CRT_HAVE_DOS$cprojl
+#define __CRT_HAVE_DOS$cputsxy
 #define __CRT_HAVE_DOS$creal
 #define __CRT_HAVE_DOS$crealf
 #define __CRT_HAVE_DOS$creall
@@ -1862,6 +1864,7 @@
 #define __CRT_HAVE_DOS$gnu_dev_major
 #define __CRT_HAVE_DOS$gnu_dev_makedev
 #define __CRT_HAVE_DOS$gnu_dev_minor
+#define __CRT_HAVE_DOS$gotoxy
 #define __CRT_HAVE_DOS$grantpt
 #define __CRT_HAVE_DOS$group_member
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -2300,6 +2303,7 @@
 #define __CRT_HAVE_DOS$modff
 #define __CRT_HAVE_DOS$modfl
 #define __CRT_HAVE_DOS$mount
+#define __CRT_HAVE_DOS$movetext
 #define __CRT_HAVE_DOS$mprotect
 #define __CRT_HAVE_DOS$mq_close
 #define __CRT_HAVE_DOS$mq_getattr
@@ -2665,6 +2669,7 @@
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$putchar
 #define __CRT_HAVE_DOS$putchar_unlocked
+#define __CRT_HAVE_DOS$putchxy
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$putenv
@@ -3302,6 +3307,9 @@
 #define __CRT_HAVE_DOS$tell64
 #define __CRT_HAVE_DOS$telldir
 #define __CRT_HAVE_DOS$tempnam
+#define __CRT_HAVE_DOS$textattr
+#define __CRT_HAVE_DOS$textbackground
+#define __CRT_HAVE_DOS$textcolor
 #define __CRT_HAVE_DOS$textdomain
 #define __CRT_HAVE_DOS$tfind
 #define __CRT_HAVE_DOS$tfind_r
@@ -3704,6 +3712,11 @@
 #define __CRT_HAVE_DOS$wildwcscasecmp
 #define __CRT_HAVE_DOS$wildwcscasecmp_l
 #define __CRT_HAVE_DOS$wildwcscmp
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$window
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$wlchmod
 #define __CRT_HAVE_DOS$wlchown
 #define __CRT_HAVE_DOS$wlink
@@ -4249,6 +4262,8 @@
 #define __CRT_HAVE__chvalidator_l
 #define __CRT_HAVE__clearfp
 #define __CRT_HAVE__configthreadlocale
+#define __CRT_HAVE__conio_getpass
+#define __CRT_HAVE__conio_wherexy
 #define __CRT_HAVE__control87
 #define __CRT_HAVE__controlfp
 #define __CRT_HAVE__controlfp_s
@@ -5088,6 +5103,7 @@
 #define __CRT_HAVE_clearenv
 #define __CRT_HAVE_clearerr
 #define __CRT_HAVE_clearerr_s
+#define __CRT_HAVE_clearkeybuf
 #define __CRT_HAVE_clock
 #define __CRT_HAVE_clock_adjtime
 #define __CRT_HAVE_clock_adjtime64
@@ -5109,6 +5125,8 @@
 #define __CRT_HAVE_closedir
 #define __CRT_HAVE_closefrom
 #define __CRT_HAVE_closelog
+#define __CRT_HAVE_clreol
+#define __CRT_HAVE_clrscr
 #define __CRT_HAVE_cnd_broadcast
 #define __CRT_HAVE_cnd_init
 #define __CRT_HAVE_cnd_signal
@@ -5146,6 +5164,7 @@
 #define __CRT_HAVE_cproj
 #define __CRT_HAVE_cprojf
 #define __CRT_HAVE_cprojl
+#define __CRT_HAVE_cputsxy
 #define __CRT_HAVE_creal
 #define __CRT_HAVE_crealf
 #define __CRT_HAVE_creall
@@ -5180,6 +5199,7 @@
 #define __CRT_HAVE_dcgettext
 #define __CRT_HAVE_dcngettext
 #define __CRT_HAVE_dehumanize_number
+#define __CRT_HAVE_delline
 #define __CRT_HAVE_detach
 #define __CRT_HAVE_devname
 #define __CRT_HAVE_devname_r
@@ -5844,6 +5864,7 @@
 #define __CRT_HAVE_gnu_dev_major
 #define __CRT_HAVE_gnu_dev_makedev
 #define __CRT_HAVE_gnu_dev_minor
+#define __CRT_HAVE_gotoxy
 #define __CRT_HAVE_grantpt
 #define __CRT_HAVE_group_member
 #define __CRT_HAVE_gsignal
@@ -5858,6 +5879,7 @@
 #define __CRT_HAVE_hdestroy_r
 #define __CRT_HAVE_heapsort
 #define __CRT_HAVE_herror
+#define __CRT_HAVE_highvideo
 #define __CRT_HAVE_hostalias
 #define __CRT_HAVE_hsearch
 #define __CRT_HAVE_hsearch_r
@@ -5917,6 +5939,7 @@
 #define __CRT_HAVE_initstate
 #define __CRT_HAVE_initstate_r
 #define __CRT_HAVE_innetgr
+#define __CRT_HAVE_insline
 #define __CRT_HAVE_insque
 #define __CRT_HAVE_ioctl
 #define __CRT_HAVE_ioperm
@@ -6090,6 +6113,7 @@
 #define __CRT_HAVE_logl
 #define __CRT_HAVE_logout
 #define __CRT_HAVE_logwtmp
+#define __CRT_HAVE_lowvideo
 #define __CRT_HAVE_lrand48
 #define __CRT_HAVE_lrand48_r
 #define __CRT_HAVE_lremovexattr
@@ -6304,6 +6328,7 @@
 #define __CRT_HAVE_modff
 #define __CRT_HAVE_modfl
 #define __CRT_HAVE_mount
+#define __CRT_HAVE_movetext
 #define __CRT_HAVE_mprotect
 #define __CRT_HAVE_mq_close
 #define __CRT_HAVE_mq_getattr
@@ -6359,6 +6384,7 @@
 #define __CRT_HAVE_nl_langinfo
 #define __CRT_HAVE_nl_langinfo_l
 #define __CRT_HAVE_normalize_struct_tm
+#define __CRT_HAVE_normvideo
 #define __CRT_HAVE_nrand48
 #define __CRT_HAVE_nrand48_r
 #define __CRT_HAVE_ns_datetosecs
@@ -6665,6 +6691,7 @@
 #define __CRT_HAVE_ptsname_r
 #define __CRT_HAVE_putchar
 #define __CRT_HAVE_putchar_unlocked
+#define __CRT_HAVE_putchxy
 #define __CRT_HAVE_putenv
 #define __CRT_HAVE_putgrent
 #define __CRT_HAVE_putmsg
@@ -7371,6 +7398,9 @@
 #define __CRT_HAVE_telldir
 #define __CRT_HAVE_tempnam
 #define __CRT_HAVE_terminate
+#define __CRT_HAVE_textattr
+#define __CRT_HAVE_textbackground
+#define __CRT_HAVE_textcolor
 #define __CRT_HAVE_textdomain
 #define __CRT_HAVE_tfind
 #define __CRT_HAVE_tfind_r
@@ -7728,12 +7758,15 @@
 #define __CRT_HAVE_wgetcwd
 #define __CRT_HAVE_wgetdomainname
 #define __CRT_HAVE_wgethostname
+#define __CRT_HAVE_wherex
+#define __CRT_HAVE_wherey
 #define __CRT_HAVE_wildstrcasecmp
 #define __CRT_HAVE_wildstrcasecmp_l
 #define __CRT_HAVE_wildstrcmp
 #define __CRT_HAVE_wildwcscasecmp
 #define __CRT_HAVE_wildwcscasecmp_l
 #define __CRT_HAVE_wildwcscmp
+#define __CRT_HAVE_window
 #define __CRT_HAVE_wlchmod
 #define __CRT_HAVE_wlchown
 #define __CRT_HAVE_wlink

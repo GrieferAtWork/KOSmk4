@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e40f0f */
+/* HASH CRC-32:0xf1260def */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,6 +73,8 @@ __FORCELOCAL void (_enable)(void) { __sti(); }
 #endif /* __i386__ || __x86_64__ */
 
 #ifdef __USE_OLD_DOS
+#ifndef __delay_defined
+#define __delay_defined
 #ifdef __CRT_HAVE__sleep
 /* >> _sleep(3)
  * Sleep for `milli' milliseconds (1/1.000 seconds) */
@@ -89,8 +91,11 @@ __CREDIRECT_VOID(,__NOTHROW_RPC,delay,(__UINT32_TYPE__ __milli),__crtSleep,(__mi
 /* >> _sleep(3)
  * Sleep for `milli' milliseconds (1/1.000 seconds) */
 __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_RPC(__LIBCCALL delay)(__UINT32_TYPE__ __milli) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_sleep))(__milli); }
-#endif /* __CRT_HAVE_nanosleep64 || __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep || __CRT_HAVE___libc_nanosleep */
+#else /* __CRT_HAVE_nanosleep64 || __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep || __CRT_HAVE___libc_nanosleep */
+#undef __delay_defined
+#endif /* !__CRT_HAVE_nanosleep64 && !__CRT_HAVE_nanosleep && !__CRT_HAVE___nanosleep && !__CRT_HAVE___libc_nanosleep */
 #endif /* !... */
+#endif /* !__delay_defined */
 #ifdef __CRT_HAVE__getdiskfree
 __CREDIRECT(,unsigned int,__NOTHROW_RPC,_dos_getdiskfree,(unsigned int __drive, struct _diskfree_t *__diskfree),_getdiskfree,(__drive,__diskfree))
 #endif /* __CRT_HAVE__getdiskfree */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5642fd74 */
+/* HASH CRC-32:0x17397115 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,8 +28,11 @@
 #include "../user/corecrt_wconio.h"
 #include "format-printer.h"
 #include "../user/stdio.h"
+#include "../user/stdio_ext.h"
 #include "../user/string.h"
+#include "../user/sys.ioctl.h"
 #include "termios.h"
+#include "../user/unistd.h"
 
 DECL_BEGIN
 
@@ -490,6 +493,289 @@ NOTHROW_NCX(VLIBCCALL libc__cscanf_s_l)(char const *format,
 	va_end(args);
 	return result;
 }
+/* >> clreol(3)
+ * Clear all cells from the cursor (inclusive) until the end
+ * of the current line. (s.a. `AC_EL(ANSITTY_EL_AFTER)') */
+INTERN ATTR_SECTION(".text.crt.dos.conio") void
+NOTHROW_NCX(LIBCCALL libc_clreol)(void) {
+	libc__cputs("\033[K"); /* AC_EL(ANSITTY_EL_AFTER) */
+}
+/* >> clrscr(3)
+ * Clear the entire screen (s.a. `AC_ED(ANSITTY_CLS_ALL)') */
+INTERN ATTR_SECTION(".text.crt.dos.conio") void
+NOTHROW_NCX(LIBCCALL libc_clrscr)(void) {
+	libc__cputs("\033[2J"); /* AC_ED(ANSITTY_CLS_ALL) */
+}
+/* >> gotoxy(3)
+ * Set the cursor {x,y} position (s.a. `AC_CUP(y, x)') */
+INTERN ATTR_SECTION(".text.crt.dos.conio") void
+NOTHROW_NCX(LIBCCALL libc_gotoxy)(int x,
+                                  int y) {
+	libc__cprintf("\033[%d;%dH", y, x); /* AC_CUP(y, x) */
+}
+/* >> normvideo(3)
+ * Delete the line at the current cursor position, moving the
+ * screen contents underneath up one line. (s.a. `AC_DL("1")') */
+INTERN ATTR_SECTION(".text.crt.dos.conio") void
+NOTHROW_NCX(LIBCCALL libc_delline)(void) {
+	libc__cputs("\033[M"); /* AC_DL("1") */
+}
+/* >> normvideo(3)
+ * Insert a blank line at the current cursor position, moving the
+ * screen contents underneath down one line. (s.a. `AC_IL("1")') */
+INTERN ATTR_SECTION(".text.crt.dos.conio") void
+NOTHROW_NCX(LIBCCALL libc_insline)(void) {
+	libc__cputs("\033[L"); /* AC_IL("1") */
+}
+/* >> normvideo(3)
+ * Brighten text foreground color (s.a. `AC_FGBRIGHT') */
+INTERN ATTR_SECTION(".text.crt.dos.conio") void
+NOTHROW_NCX(LIBCCALL libc_highvideo)(void) {
+	libc__cputs("\033[1m"); /* AC_FGBRIGHT */
+}
+/* >> normvideo(3)
+ * Darken text foreground color (s.a. `AC_FGDARK') */
+INTERN ATTR_SECTION(".text.crt.dos.conio") void
+NOTHROW_NCX(LIBCCALL libc_lowvideo)(void) {
+	libc__cputs("\033[2m"); /* AC_FGDARK */
+}
+/* >> normvideo(3)
+ * Reset all graphics attributes to normal (s.a. `AC_DEFATTR') */
+INTERN ATTR_SECTION(".text.crt.dos.conio") void
+NOTHROW_NCX(LIBCCALL libc_normvideo)(void) {
+	libc__cputs("\033[m"); /* AC_DEFATTR */
+}
+/* >> textcolor(3)
+ * @param: color: Color code (s.a. constants in `<conio.h>') */
+INTERN ATTR_SECTION(".text.crt.dos.conio") void
+NOTHROW_NCX(LIBCCALL libc_textcolor)(int color) {
+	switch (color) {
+	case 0x0:        color = 30; break; /* AC_FG_BLACK   */
+	case 0x1:         color = 34; break; /* AC_FG_NAVY    */
+	case 0x2:        color = 32; break; /* AC_FG_GREEN   */
+	case 0x3:         color = 36; break; /* AC_FG_TEAL    */
+	case 0x4:          color = 31; break; /* AC_FG_MAROON  */
+	case 0x5:      color = 35; break; /* AC_FG_PURPLE  */
+	case 0x6:        color = 33; break; /* AC_FG_OLIVE   */
+	case 0x7:    color = 37; break; /* AC_FG_SILVER  */
+	case 0x8:     color = 90; break; /* AC_FG_GREY    */
+	case 0x9:    color = 94; break; /* AC_FG_BLUE    */
+	case 0xa:   color = 92; break; /* AC_FG_LIME    */
+	case 0xb:    color = 96; break; /* AC_FG_AQUA    */
+	case 0xc:     color = 91; break; /* AC_FG_RED     */
+	case 0xd: color = 95; break; /* AC_FG_FUCHSIA */
+	case 0xe:       color = 93; break; /* AC_FG_YELLOW  */
+	case 0xf:        color = 97; break; /* AC_FG_WHITE   */
+	default: break;
+	}
+	libc__cprintf("\033[%dm", color);
+}
+/* >> textbackground(3)
+ * @param: color: Color code (s.a. constants in `<conio.h>') */
+INTERN ATTR_SECTION(".text.crt.dos.conio") void
+NOTHROW_NCX(LIBCCALL libc_textbackground)(int color) {
+	switch (color) {
+	case 0x0:        color = 40;  break; /* AC_BG_BLACK   */
+	case 0x1:         color = 44;  break; /* AC_BG_NAVY    */
+	case 0x2:        color = 42;  break; /* AC_BG_GREEN   */
+	case 0x3:         color = 46;  break; /* AC_BG_TEAL    */
+	case 0x4:          color = 41;  break; /* AC_BG_MAROON  */
+	case 0x5:      color = 45;  break; /* AC_BG_PURPLE  */
+	case 0x6:        color = 43;  break; /* AC_BG_OLIVE   */
+	case 0x7:    color = 47;  break; /* AC_BG_SILVER  */
+	case 0x8:     color = 100; break; /* AC_BG_GREY    */
+	case 0x9:    color = 104; break; /* AC_BG_BLUE    */
+	case 0xa:   color = 102; break; /* AC_BG_LIME    */
+	case 0xb:    color = 106; break; /* AC_BG_AQUA    */
+	case 0xc:     color = 101; break; /* AC_BG_RED     */
+	case 0xd: color = 105; break; /* AC_BG_FUCHSIA */
+	case 0xe:       color = 103; break; /* AC_BG_YELLOW  */
+	case 0xf:        color = 107; break; /* AC_BG_WHITE   */
+	default: break;
+	}
+	libc__cprintf("\033[%dm", color);
+}
+/* >> textattr(3)
+ * Set text attributes: `textcolor(attr & 0x0f)' and `textbackground((attr & 0xf0) >> 8)' */
+INTERN ATTR_SECTION(".text.crt.dos.conio") void
+NOTHROW_NCX(LIBCCALL libc_textattr)(int attr) {
+	libc_textcolor(attr & 0x0f);
+	libc_textbackground((attr & 0xf0) >> 8);
+}
+#include <bits/types.h>
+#include <asm/os/termios.h>
+#include <bits/os/termios.h>
+#include <libc/template/stdtty.h>
+/* >> clearkeybuf(3)
+ * Flush all unread input (usually keyboard) data pending on the terminal */
+INTERN ATTR_SECTION(".text.crt.dos.conio") void
+NOTHROW_NCX(LIBCCALL libc_clearkeybuf)(void) {
+	struct termios ios;
+	FILE *fp = stdtty;
+	fd_t fd  = libc_fileno(fp);
+
+	/* Flush (read: "drain") kernel-space buffer. */
+	libc_tcgetattr(fd, &ios);
+	libc_tcsetattr(fd, __TCSADRAIN, &ios);
+
+	/* Flush (read: "purge") user-space buffer. */
+	libc___fpurge(fp);
+}
+/* >> _conio_getpass(3)
+ * CONIO version of getpass(3). But note the slightly different variant from `<unistd.h>' */
+INTERN ATTR_SECTION(".text.crt.dos.conio") NONNULL((1, 2)) char *
+NOTHROW_NCX(LIBCCALL libc__conio_getpass)(const char *prompt,
+                                          char *str) {
+	unsigned char buflen = (unsigned char)str[0];
+	char *result = libc_getpass_r(prompt, &str[2], buflen);
+	if (result != NULL) {
+		str[1] = (unsigned char)libc_strlen(result);
+		result = str;
+	}
+	return result;
+}
+/* >> cputsxy(3)
+ * Combination of `gotoxy(3)' and `cputs(3)' */
+INTERN ATTR_SECTION(".text.crt.dos.conio") void
+NOTHROW_NCX(LIBCCALL libc_cputsxy)(int x,
+                                   int y,
+                                   char __KOS_FIXED_CONST *str) {
+	libc_gotoxy(x, y);
+	libc__cputs(str);
+}
+/* >> putchxy(3)
+ * Combination of `gotoxy(3)' and `putch(3)' */
+INTERN ATTR_SECTION(".text.crt.dos.conio") void
+NOTHROW_NCX(LIBCCALL libc_putchxy)(int x,
+                                   int y,
+                                   char ch) {
+	libc_gotoxy(x, y);
+	libc__putch(ch);
+}
+#include <libc/template/stdtty.h>
+#include <kos/ioctl/video.h>
+#include <bits/crt/inttypes.h>
+INTERN ATTR_SECTION(".text.crt.dos.conio") int
+NOTHROW_NCX(LIBCCALL libc__conio_wherexy)(uint16_t xy[2]) {
+
+
+
+	char putback[64];
+	unsigned int i;
+	int result;
+	libc__cputs("\033[6n"); /* DSR */
+	for (i = 0; i < 64; ++i) {
+		int ch = libc__getch();
+		if (ch == '\033')
+			break;
+		putback[i] = ch;
+	}
+	result = libc__cscanf("[%" __SCA2_PREFIX "u"
+	                 ";%" __SCA2_PREFIX "uR",
+	                 &xy[1], &xy[0]) == 2
+	         ? 0
+	         : -1;
+	while (i) {
+		--i;
+		libc__ungetch(putback[i]);
+	}
+	return result;
+
+}
+/* >> wherex(3)
+ * Return the current cursor 'X' position (1-based) */
+INTERN ATTR_SECTION(".text.crt.dos.conio") int
+NOTHROW_NCX(LIBCCALL libc_wherex)(void) {
+	uint16_t xy[2];
+	if (libc__conio_wherexy(xy))
+		return -1;
+	return xy[0] + 1;
+}
+/* >> wherey(3)
+ * Return the current cursor 'Y' position (1-based) */
+INTERN ATTR_SECTION(".text.crt.dos.conio") int
+NOTHROW_NCX(LIBCCALL libc_wherey)(void) {
+	uint16_t xy[2];
+	if (libc__conio_wherexy(xy))
+		return -1;
+	return xy[1] + 1;
+}
+/* >> window(3)
+ * Set scroll range and margains to the specified rectangle (1-based) */
+INTERN ATTR_SECTION(".text.crt.dos.conio") void
+NOTHROW_NCX(LIBCCALL libc_window)(int left,
+                                  int top,
+                                  int right,
+                                  int bottom) {
+	libc__cprintf("\033[?69h"    /* DECLRMM  (enable scroll margins) */
+	         "\033[%d;%ds"  /* DECSLRM  (set scroll margins) */
+	         "\033[%d;%dr", /* DECSTBM  (set scroll region; iow: top/bottom) */
+	         left, right, top, bottom);
+}
+#include <bits/types.h>
+#include <libc/template/stdtty.h>
+#include <kos/ioctl/video.h>
+#include <parts/malloca.h>
+/* >> movetext(3)
+ * Duplicate a given rectangle (1-based) of on-screen text at
+ * another location. Overlapping rectangles are handled correctly. */
+INTERN ATTR_SECTION(".text.crt.dos.conio") int
+NOTHROW_NCX(LIBCCALL libc_movetext)(int left,
+                                    int top,
+                                    int right,
+                                    int bottom,
+                                    int destleft,
+                                    int desttop) {
+	struct vidttyinfo info;
+	struct vidttycelldata data;
+	fd_t fd = libc_fileno(stdtty);
+	uint16_t args[6], i, error;
+	if (libc_ioctl(fd, VID_IOC_GETTTYINFO, &info) != 0)
+		goto err;
+	args[0] = (uint16_t)(unsigned int)left;
+	args[1] = (uint16_t)(unsigned int)right;
+	args[2] = (uint16_t)(unsigned int)destleft;
+	args[3] = (uint16_t)(unsigned int)top;
+	args[4] = (uint16_t)(unsigned int)bottom;
+	args[5] = (uint16_t)(unsigned int)desttop;
+	for (i = 0; i < 6; ++i) {
+		uint16_t v = args[i] - 1;
+		if (v < 0) {
+			v = 0;
+		} else {
+			uint16_t maxval;
+			maxval = i >= 3 ? info.vti_cellh : info.vti_cellw;
+			if (v > maxval)
+				v = maxval;
+		}
+		args[i] = v;
+	}
+	if (args[0]/*left*/ >= args[1]/*right*/)
+		goto done;
+	if (args[3]/*top*/ >= args[4]/*bottom*/)
+		goto done;
+	libc_bzero(&data, sizeof(data));
+	data.vcd_x = args[0]/*left*/;
+	data.vcd_y = args[3]/*top*/;
+	data.vcd_w = args[1]/*right*/ - args[0]/*left*/;
+	data.vcd_h = args[4]/*bottom*/ - args[3]/*top*/;
+	data.vcd_dat = (byte_t *)__malloca(data.vcd_w * data.vcd_h * info.vti_cellsize);
+	if unlikely(!data.vcd_dat)
+		goto err;
+	error = libc_ioctl(fd, VID_IOC_GETCELLDATA, &data);
+	if likely(error == 0) {
+		data.vcd_x = args[2]/*destleft*/;
+		data.vcd_y = args[5]/*desttop*/;
+		error = libc_ioctl(fd, VID_IOC_SETCELLDATA, &data);
+	}
+	__freea(data.vcd_dat);
+	if unlikely(error != 0)
+		goto err;
+done:
+	return 0;
+err:
+	return 1;
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -580,6 +866,25 @@ DEFINE_PUBLIC_ALIAS(DOS$_cscanf_s_l, libd__cscanf_s_l);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_cscanf_s_l, libc__cscanf_s_l);
+DEFINE_PUBLIC_ALIAS(clreol, libc_clreol);
+DEFINE_PUBLIC_ALIAS(clrscr, libc_clrscr);
+DEFINE_PUBLIC_ALIAS(gotoxy, libc_gotoxy);
+DEFINE_PUBLIC_ALIAS(delline, libc_delline);
+DEFINE_PUBLIC_ALIAS(insline, libc_insline);
+DEFINE_PUBLIC_ALIAS(highvideo, libc_highvideo);
+DEFINE_PUBLIC_ALIAS(lowvideo, libc_lowvideo);
+DEFINE_PUBLIC_ALIAS(normvideo, libc_normvideo);
+DEFINE_PUBLIC_ALIAS(textcolor, libc_textcolor);
+DEFINE_PUBLIC_ALIAS(textbackground, libc_textbackground);
+DEFINE_PUBLIC_ALIAS(textattr, libc_textattr);
+DEFINE_PUBLIC_ALIAS(clearkeybuf, libc_clearkeybuf);
+DEFINE_PUBLIC_ALIAS(_conio_getpass, libc__conio_getpass);
+DEFINE_PUBLIC_ALIAS(cputsxy, libc_cputsxy);
+DEFINE_PUBLIC_ALIAS(putchxy, libc_putchxy);
+DEFINE_PUBLIC_ALIAS(wherex, libc_wherex);
+DEFINE_PUBLIC_ALIAS(wherey, libc_wherey);
+DEFINE_PUBLIC_ALIAS(window, libc_window);
+DEFINE_PUBLIC_ALIAS(movetext, libc_movetext);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_CONIO_C */

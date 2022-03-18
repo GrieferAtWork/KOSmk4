@@ -77,7 +77,7 @@ __FORCELOCAL void (_enable)(void) { __sti(); }
 %#ifdef __USE_OLD_DOS
 %[default:section(".text.crt.dos.system")]
 
-%[insert:function(delay = _sleep)]
+%[insert:guarded_function(delay = _sleep)]
 
 %[insert:function(_dos_getdiskfree = _getdiskfree)]
 

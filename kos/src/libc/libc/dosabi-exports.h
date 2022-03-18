@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x615d7ddc */
+/* HASH CRC-32:0xfa8e899c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -225,6 +225,15 @@ DEFINE_PUBLIC_ALIAS(DOS$_vcprintf_s, libd__vcprintf_s);
 DEFINE_PUBLIC_ALIAS(DOS$_vcprintf_p, libd__vcprintf_p);
 DEFINE_PUBLIC_ALIAS(DOS$_vcscanf, libd__vcscanf);
 DEFINE_PUBLIC_ALIAS(DOS$_vcscanf_s, libd__vcscanf_s);
+DEFINE_PUBLIC_ALIAS(DOS$gotoxy, libd_gotoxy);
+DEFINE_PUBLIC_ALIAS(DOS$textcolor, libd_textcolor);
+DEFINE_PUBLIC_ALIAS(DOS$textbackground, libd_textbackground);
+DEFINE_PUBLIC_ALIAS(DOS$textattr, libd_textattr);
+DEFINE_PUBLIC_ALIAS(DOS$_conio_getpass, libd__conio_getpass);
+DEFINE_PUBLIC_ALIAS(DOS$cputsxy, libd_cputsxy);
+DEFINE_PUBLIC_ALIAS(DOS$putchxy, libd_putchxy);
+DEFINE_PUBLIC_ALIAS(DOS$window, libd_window);
+DEFINE_PUBLIC_ALIAS(DOS$movetext, libd_movetext);
 
 /* crypt */
 DEFINE_PUBLIC_ALIAS(DOS$setkey, libd_setkey);
