@@ -1469,8 +1469,11 @@ do_expand_tilde:
 		char ch = *username_end;
 		switch (ch) {
 
-		case ':': case '/': case ' ':
-		case '\t': case '\0':
+		case ':':
+		case '/':
+		case ' ':
+		case '\t':
+		case '\0':
 			goto done_username;
 
 		case '\\':
@@ -1495,6 +1498,9 @@ done_username:
 		char *namebuf;
 		size_t namelen;
 		namelen = (size_t)(username_end - username_start);
+		/* TODO: '~+' --> '$PWD' or getpwd() */
+		/* TODO: '~-' --> '$OLDPWD' or <re-insert '~-'> */
+
 		namebuf = (char *)malloca(namelen + 1, sizeof(char));
 		if unlikely(!namebuf)
 			return WRDE_NOSPACE;
@@ -2723,6 +2729,23 @@ continue_input:
 		case '~':
 			error = wxparser_parse_tilde(&parser, false);
 			break;
+
+		/* TODO: brace-expansion (only when a KOS-specific flag `WRDE_BRACES' is given to wordexp()):
+		 *       XXX: '{' and '}' are illegal by default, so why don't we enable this unconditionally?
+		 *       wordexp("file{1,2}")      -->  ["file1", "file2"]
+		 *       wordexp("a{b,c,d}e")      -->  ["ade", "ace", "abe"]
+		 *       wordexp("a{10..20}e")     -->  ["a10e", "a11e", "a12e", ..., "a20e"]
+		 *       wordexp("a{10..20..2}e")  -->  ["a10e", "a11e", "a12e", ..., "a20e"]
+		 *       wordexp("a{20..10}e")     -->  ["a20e", "a19e", "a18e", ..., "a10e"]
+		 *       wordexp("a{20..10..-2}e") -->  ["a20e", "a18e", "a16e", ..., "a10e"]
+		 *       wordexp("a{20..10..2}e")  -->  ["a20e", "a18e", "a16e", ..., "a10e"]  // NOTE: The sign given for `step' is simply ignored
+		 *       wordexp("a{a..z}e")       -->  ["aae", "abe", "ace", ..., "aze"]
+		 *       wordexp("a{a..z..2}e")    -->  ["aae", "ace", "aee", ..., "aye"]
+		 * Note that nesting is possible in ',' braces:
+		 *       wordexp("/usr/{src,include/{libc,libdl}}") -->  ["/usr/src", "/usr/include/libc", "/usr/include/libdl"]
+		 * Note that more than one brace can appear in a single word
+		 *       wordexp("pre{1,2}mid{3,4}post") --> ["pre1mid3post", "pre1mid4post", "pre2mid3post", "pre2mid4post"]
+		 */
 
 		case '*':
 		case '[':

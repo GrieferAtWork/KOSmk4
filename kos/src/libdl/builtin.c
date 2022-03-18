@@ -2735,6 +2735,9 @@ libdl_dlauxctrl(USER DlModule *self, unsigned int cmd, ...)
 		DlModule_RunAllTlsFinalizers();
 		goto err;
 
+	case DLAUXCTRL_GET_MAIN_TLSSEG:
+		return libdl_dlmainsegment();
+
 	default:
 		break;
 	}

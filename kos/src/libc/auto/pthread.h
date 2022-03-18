@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3caf9ee2 */
+/* HASH CRC-32:0x8e75d30b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,14 +73,14 @@ INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_detach)(pthread_t pthread);
  * Compare two thread identifiers
  * @return: 0 : Given threads are non-equal
  * @return: * : Given threads are equal */
-INTDEF ATTR_CONST int NOTHROW(LIBDCALL libd_pthread_equal)(pthread_t thr1, pthread_t thr2);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_pthread_equal)(pthread_t thr1, pthread_t thr2);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> pthread_equal(3)
  * Compare two thread identifiers
  * @return: 0 : Given threads are non-equal
  * @return: * : Given threads are equal */
-INTDEF ATTR_CONST int NOTHROW(LIBCCALL libc_pthread_equal)(pthread_t thr1, pthread_t thr2);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_pthread_equal)(pthread_t thr1, pthread_t thr2);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> pthread_attr_init(3)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2eddb25 */
+/* HASH CRC-32:0x31c1beb1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ DECL_BEGIN
  * Compare two thread identifiers
  * @return: 0 : Given threads are non-equal
  * @return: * : Given threads are equal */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_CONST int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_pthread_equal)(pthread_t thr1,
                                      pthread_t thr2) {
 	return thr1 == thr2;
@@ -280,7 +280,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_set_num_processors_np)(int n) {
  * isn't a case that can actually happen under KOS's implementation. */
 INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_CONST int
 NOTHROW(LIBCCALL libc_pthread_main_np)(void) {
-	return libc_gettid() == libc_getpid();
+
+	return libc_pthread_equal(libc_pthread_mainthread_np(), libc_pthread_self());
+
+
+
 }
 #endif /* !__KERNEL__ */
 

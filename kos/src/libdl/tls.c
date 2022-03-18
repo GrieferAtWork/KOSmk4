@@ -150,6 +150,19 @@ PRIVATE struct atomic_rwlock static_tls_lock    = ATOMIC_RWLOCK_INIT;
 #define static_tls_waitread()   atomic_rwlock_waitread(&static_tls_lock)
 #define static_tls_waitwrite()  atomic_rwlock_waitwrite(&static_tls_lock)
 
+/* Return a pointer to the main thread's  TLS segment. The caller must ensure  that
+ * this segment has not, and will not be deleted. Otherwise, behavior is undefined. */
+INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED void *CC
+libdl_dlmainsegment(void) {
+	struct tls_segment *result;
+	static_tls_read();
+	result = LIST_FIRST(&static_tls_list);
+	while (LIST_NEXT(result, ts_threads) != NULL)
+		result = LIST_NEXT(result, ts_threads);
+	static_tls_endread();
+	return result;
+}
+
 
 /* Minimum alignment of the static TLS segment. */
 PRIVATE size_t static_tls_align = COMPILER_ALIGNOF(struct tls_segment);
@@ -173,6 +186,11 @@ again:
 	static_tls_read();
 	LIST_FOREACH (iter, &static_tls_list, ts_threads) {
 		if (!tls_segment_ex_trywrite(iter)) {
+#ifndef __OPTIMIZE_SIZE__
+			/* TODO: Try to get read-lock and check if this TLS segment even uses `self'
+			 *       If not, then we can simply skip it without ever having to acquire a
+			 *       write-lock! */
+#endif /* !__OPTIMIZE_SIZE__ */
 			static_tls_endread();
 			sys_sched_yield();
 			goto again;

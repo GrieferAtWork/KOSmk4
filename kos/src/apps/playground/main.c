@@ -1151,6 +1151,22 @@ int main_dosenv(int argc, char *argv[], char *envp[]) {
 
 
 
+/************************************************************************/
+int main_stackend(int argc, char *argv[], char *envp[]) {
+	void **p_stackend;
+	(void)argc, (void)argv, (void)envp;
+	p_stackend = (void **)dlsym(RTLD_DEFAULT, "__libc_stack_end");
+	if (!p_stackend)
+		err(1, "dlsym failed: %s", dlerror());
+	printf(" __libc_stack_end = %p\n", p_stackend);
+	printf("*__libc_stack_end = %p\n", *p_stackend);
+	assert(*p_stackend != NULL);
+	return 0;
+}
+/************************************************************************/
+
+
+
 typedef int (*FUN)(int argc, char *argv[], char *envp[]);
 typedef struct {
 	char const *n;
@@ -1198,6 +1214,7 @@ PRIVATE DEF defs[] = {
 	{ "fatls", &main_fatls },
 	{ "leakmon", &main_leakmon },
 	{ "dosenv", &main_dosenv },
+	{ "stackend", &main_stackend },
 	/* TODO: On x86_64, add a playground that:
 	 *   - mmap(0x00007ffffffff000, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_ANON|MAP_FIXED);
 	 *   - WRITE(0x00007ffffffffffe, [0x0f, 0x05]); // syscall

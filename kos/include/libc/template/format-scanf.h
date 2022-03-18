@@ -267,6 +267,8 @@ __next_mod_curr:
 #endif /* !__UINT64_TYPE__ */
 		case 'p':
 			__radix = 16;
+			if (__type_size == 0)
+				__type_size = sizeof(void *);
 			goto __do_scanf_integer_unsigned;
 		case 'i':
 			__radix = 0; /* Automatically determine radix */

@@ -787,6 +787,7 @@
 #define __CRT_HAVE___libc_sigpending
 #define __CRT_HAVE___libc_sigprocmask
 #define __CRT_HAVE___libc_socketcall
+#define __CRT_HAVE___libc_stack_end
 #define __CRT_HAVE___libc_start_main
 #define __CRT_HAVE___libc_statfs
 #define __CRT_HAVE___libc_stime
@@ -3963,6 +3964,7 @@
 #define __CRT_HAVE_pthread_key_delete
 #define __CRT_HAVE_pthread_kill
 #define __CRT_HAVE_pthread_main_np
+#define __CRT_HAVE_pthread_mainthread_np
 #define __CRT_HAVE_pthread_mutex_consistent
 #define __CRT_HAVE_pthread_mutex_consistent_np
 #define __CRT_HAVE_pthread_mutex_destroy

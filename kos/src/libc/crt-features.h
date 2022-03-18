@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f9103eb */
+/* HASH CRC-32:0xa66e9001 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6589,6 +6589,7 @@
 #define __CRT_HAVE_pthread_key_delete
 #define __CRT_HAVE_pthread_kill
 #define __CRT_HAVE_pthread_main_np
+#define __CRT_HAVE_pthread_mainthread_np
 #define __CRT_HAVE_pthread_mutex_consistent
 #define __CRT_HAVE_pthread_mutex_destroy
 #define __CRT_HAVE_pthread_mutex_getprioceiling

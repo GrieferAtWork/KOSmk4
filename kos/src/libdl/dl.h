@@ -694,6 +694,11 @@ INTDEF WUNUSED void *__DLFCN_DLTLSADDR2_CC
 libdl_dltlsaddr2_noinit(DlModule *__restrict self,
                         USER struct tls_segment *seg);
 
+/* Return a pointer to the main thread's  TLS segment. The caller must ensure  that
+ * this segment has not, and will not be deleted. Otherwise, behavior is undefined. */
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED void *CC
+libdl_dlmainsegment(void);
+
 /* Similar to `libdl_dltlsaddr()', but do no lazy allocation
  * and return NULL if the module doesn't have a TLS segment. */
 INTDEF WUNUSED NONNULL((1)) void *

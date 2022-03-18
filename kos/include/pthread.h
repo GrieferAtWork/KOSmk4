@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8607ebd2 */
+/* HASH CRC-32:0x34910e14 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -727,36 +727,36 @@ __CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_detach,(pthread_t __pthread),(__
 /* >> pthread_self(3)
  * Obtain the identifier of the current thread
  * @return: * : Handle for the calling thread */
-__CDECLARE(__ATTR_CONST,pthread_t,__NOTHROW,pthread_self,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,pthread_t,__NOTHROW,pthread_self,(void),())
 #elif defined(__CRT_HAVE_thrd_current)
 /* >> pthread_self(3)
  * Obtain the identifier of the current thread
  * @return: * : Handle for the calling thread */
-__CREDIRECT(__ATTR_CONST,pthread_t,__NOTHROW,pthread_self,(void),thrd_current,())
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,pthread_t,__NOTHROW,pthread_self,(void),thrd_current,())
 #elif defined(__CRT_HAVE_thr_self)
 /* >> pthread_self(3)
  * Obtain the identifier of the current thread
  * @return: * : Handle for the calling thread */
-__CREDIRECT(__ATTR_CONST,pthread_t,__NOTHROW,pthread_self,(void),thr_self,())
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,pthread_t,__NOTHROW,pthread_self,(void),thr_self,())
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_equal
 /* >> pthread_equal(3)
  * Compare two thread identifiers
  * @return: 0 : Given threads are non-equal
  * @return: * : Given threads are equal */
-__CEIDECLARE(__ATTR_CONST,int,__NOTHROW,pthread_equal,(pthread_t __thr1, pthread_t __thr2),{ return __thr1 == __thr2; })
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,pthread_equal,(pthread_t __thr1, pthread_t __thr2),{ return __thr1 == __thr2; })
 #elif defined(__CRT_HAVE_thrd_equal)
 /* >> pthread_equal(3)
  * Compare two thread identifiers
  * @return: 0 : Given threads are non-equal
  * @return: * : Given threads are equal */
-__CEIREDIRECT(__ATTR_CONST,int,__NOTHROW,pthread_equal,(pthread_t __thr1, pthread_t __thr2),thrd_equal,{ return __thr1 == __thr2; })
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,pthread_equal,(pthread_t __thr1, pthread_t __thr2),thrd_equal,{ return __thr1 == __thr2; })
 #else /* ... */
 /* >> pthread_equal(3)
  * Compare two thread identifiers
  * @return: 0 : Given threads are non-equal
  * @return: * : Given threads are equal */
-__LOCAL __ATTR_CONST int __NOTHROW(__LIBCCALL pthread_equal)(pthread_t __thr1, pthread_t __thr2) { return __thr1 == __thr2; }
+__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL pthread_equal)(pthread_t __thr1, pthread_t __thr2) { return __thr1 == __thr2; }
 #endif /* !... */
 
 /* Thread attribute handling. */
@@ -1013,6 +1013,10 @@ __CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthr
  * @return: 0 : The given `target_thread' has already terminated */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,pthread_gettid_np,(pthread_t __target_thread),(__target_thread))
 #endif /* !__pthread_gettid_np_defined && __CRT_HAVE_pthread_gettid_np */
+/* >> pthread_mainthread_np(3)
+ * Obtain the identifier of the main thread
+ * @return: * : Handle for the main thread */
+__CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,pthread_t,__NOTHROW,pthread_mainthread_np,(void),())
 struct rpc_context;
 /* >> pthread_rpc_exec(3)
  * Schedule an RPC for `target_thread' to-be executed the next  time
@@ -2567,7 +2571,7 @@ __CDECLARE(__ATTR_CONST,int,__NOTHROW,pthread_main_np,(void),())
  * if the  calling  thread  "hasn't been initialized",  though  this
  * isn't a case that can actually happen under KOS's implementation. */
 __CREDIRECT(__ATTR_CONST,int,__NOTHROW,pthread_main_np,(void),thr_main,())
-#elif (defined(__CRT_HAVE_gettid) || defined(__CRT_HAVE___threadid) || defined(__CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid))
+#elif (defined(__CRT_HAVE_pthread_mainthread_np) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self))) || ((defined(__CRT_HAVE_gettid) || defined(__CRT_HAVE___threadid) || defined(__CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
 #include <libc/local/pthread/pthread_main_np.h>
 /* >> pthread_main_np(3)
  * Returns  1 if the  calling thread is the  main() thread (i.e. the

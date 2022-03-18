@@ -375,7 +375,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 /*	pt->pt_pmask.lpm_pmask.pm_sigmask = NULL; */ /* Already done by the bzero (NULL means not-yet-initialized) */
 #endif /* __LIBC_CONFIG_HAVE_USERPROCMASK */
 	pt->pt_refcnt    = 2;
-	pt->pt_flags     = PTHREAD_FNORMAL;
+	pt->pt_flags     = PTHREAD_FNORMAL | PTHREAD_FTIDSET; /* We use `CLONE_CHILD_SETTID', so the TID is set from the get-go. */
 	pt->pt_stackaddr = attr->pa_stackaddr;
 	pt->pt_stacksize = attr->pa_stacksize;
 	pt->pt_cpuset    = NULL;
@@ -721,23 +721,23 @@ NOTHROW_NCX(LIBCCALL libc_pthread_detach)(pthread_t pthread)
 }
 /*[[[end:libc_pthread_detach]]]*/
 
-/*[[[head:libc_pthread_self,hash:CRC-32=0xf351376d]]]*/
+/*[[[head:libc_pthread_self,hash:CRC-32=0xaad45458]]]*/
 /* >> pthread_self(3)
  * Obtain the identifier of the current thread
  * @return: * : Handle for the calling thread */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_CONST pthread_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_CONST WUNUSED pthread_t
 NOTHROW(LIBCCALL libc_pthread_self)(void)
 /*[[[body:libc_pthread_self]]]*/
 {
-	struct pthread *result;
-	result = &current;
-	if unlikely(!result->pt_tid) {
+	struct pthread *result = &current;
+	if unlikely(!(result->pt_flags & PTHREAD_FTIDSET)) {
 		/* Lazily initialize the thread descriptor's TID field.
 		 *
 		 * We get here if the calling thread was created by some API other
 		 * than pthread that still made proper use of dltlsallocseg(),  or
 		 * if the caller is the program's main() thread. */
 		result->pt_tid = sys_set_tid_address(&result->pt_tid);
+		result->pt_flags |= PTHREAD_FTIDSET;
 	}
 	return result;
 }
@@ -758,6 +758,31 @@ NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t target_thread)
 	return result;
 }
 /*[[[end:libc_pthread_gettid_np]]]*/
+
+/*[[[head:libc_pthread_mainthread_np,hash:CRC-32=0xff77a072]]]*/
+/* >> pthread_mainthread_np(3)
+ * Obtain the identifier of the main thread
+ * @return: * : Handle for the main thread */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_CONST WUNUSED pthread_t
+NOTHROW(LIBCCALL libc_pthread_mainthread_np)(void)
+/*[[[body:libc_pthread_mainthread_np]]]*/
+{
+	void *maintls  = dlauxctrl(NULL, DLAUXCTRL_GET_MAIN_TLSSEG);
+	pthread_t main = current_from_tls(maintls);
+	if (main->pt_tid == 0) {
+		/* Initially, the TID field of the main  thread's `current' will be set to  `0'.
+		 * However, this setting would cause practically all other pthread APIs to think
+		 * that  said thread has already terminated when in fact that has yet to happen.
+		 *
+		 * However, not to worry. -  On KOS, the main thread's  TID is equal to  getpid(),
+		 * so  we can simply fill in that field lazily (no data race here; so-long as this
+		 * function isn't called from a vfork'd child process, the PID given by the kernel
+		 * at this point will always be correct) */
+		main->pt_tid = getpid();
+	}
+	return main;
+}
+/*[[[end:libc_pthread_mainthread_np]]]*/
 
 /*[[[head:libc_pthread_attr_init,hash:CRC-32=0x1494d6d4]]]*/
 /* >> pthread_attr_init(3)
@@ -1288,6 +1313,32 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setattr_default_np)(pthread_attr_t const *attr
 }
 /*[[[end:libc_pthread_setattr_default_np]]]*/
 
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") void PRPC_EXEC_CALLBACK_CC
+get_stack_pointer_rpc(struct rpc_context *__restrict ctx, void *cookie) {
+	*(void **)cookie = ctx;
+}
+
+/* Use /proc/self/maps to figure out the mapping containing `pointer' */
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") int PRPC_EXEC_CALLBACK_CC
+get_mapping_from_pointer(void *pointer, void **p_minaddr, void **p_endaddr) {
+	char *line;
+	FILE *fp = fopen("/proc/self/maps", "r");
+	if unlikely(!fp)
+		goto err;
+	while ((line = fgetln(fp, NULL)) != NULL) {
+		if (sscanf(line, "%p-%p", p_minaddr, p_endaddr) != 2)
+			continue;
+		if (pointer >= *p_minaddr && pointer < *p_endaddr) {
+			/* Found it! */
+			fclose(fp);
+			return 0;
+		}
+	}
+	fclose(fp);
+err:
+	return -1;
+}
+
 /*[[[head:libc_pthread_getattr_np,hash:CRC-32=0x16b045c7]]]*/
 /* >> pthread_getattr_np(3)
  * Initialize thread  attribute `*attr'  with attributes  corresponding to  the
@@ -1300,21 +1351,73 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getattr_np)(pthread_t pthread,
                                               pthread_attr_t *attr)
 /*[[[body:libc_pthread_getattr_np]]]*/
 {
-	errno_t result;
-	result = pthread_getschedparam(pthread, &attr->pa_schedpolicy, &attr->pa_schedparam);
-	if (result != EOK)
-		goto done;
+	errno_t error;
+	attr->pa_flags = 0;
+	if (pthread_getschedparam(pthread,
+	                          &attr->pa_schedpolicy,
+	                          &attr->pa_schedparam) == EOK)
+		attr->pa_flags |= PTHREAD_ATTR_FLAG_SCHED_SET | PTHREAD_ATTR_FLAG_POLICY_SET;
+	attr->pa_guardsize = getpagesize();
+	if (pthread->pt_flags & PTHREAD_FUSERSTACK)
+		attr->pa_flags |= PTHREAD_ATTR_FLAG_STACKADDR;
 	if (pthread->pt_flags & PTHREAD_FNOSTACK) {
+		pthread_t main;
 		attr->pa_stackaddr = NULL;
 		attr->pa_stacksize = 0;
+
+		/* Check for special case: requesting information on the main thread. */
+		main = pthread_mainthread_np();
+		if (pthread_equal(pthread, main)) {
+			void *pointer_to_main_stack;
+			void *stack_min, *stack_end;
+			/* If `pthread' is the main thread:
+			 * #1: Check if caller if main thread. - If so, use address of some stack variable. Else,
+			 *     send  an RPC whose sole purpose is to retrieve the address of some stack variable.
+			 * #2: With a stack pointer on hand, use /proc/self/maps to figure out the memory
+			 *     mapping that pointer is part of.
+			 * #3: Return information on the bounds of the discovered, return those bounds to
+			 *     our caller.
+			 * #4: Also write-back that same information to the given `pthread' structure, such
+			 *     that future requests as to the main thread's stack can be served without the
+			 *     need of going through all of the hoops above. */
+			if (main == &current) {
+				/* Simple case: caller _is_ the main thread. */
+				pointer_to_main_stack = &pointer_to_main_stack;
+			} else {
+				pointer_to_main_stack = (void *)-1;
+				COMPILER_BARRIER();
+				if unlikely(rpc_exec(main->pt_tid,
+				                     RPC_SYNCMODE_ASYNC | RPC_SYSRESTART_RESTART |
+				                     RPC_DOMAIN_THREAD | RPC_JOIN_WAITFOR,
+				                     &get_stack_pointer_rpc, &pointer_to_main_stack) != 0)
+					goto done_stack;
+				COMPILER_BARRIER();
+				while (ATOMIC_READ(pointer_to_main_stack) == (void *)-1)
+					sched_yield();
+			}
+			/* Use /proc/self/maps to figure out the mapping containing `pointer_to_main_stack' */
+			if unlikely(get_mapping_from_pointer(pointer_to_main_stack, &stack_min, &stack_end) != 0)
+				goto done_stack;
+#ifdef __ARCH_STACK_GROWS_DOWNWARDS
+			attr->pa_stackaddr = stack_end;
+#else /* __ARCH_STACK_GROWS_DOWNWARDS */
+			attr->pa_stackaddr = stack_min;
+#endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
+			attr->pa_stacksize = (size_t)((byte_t *)stack_end - (byte_t *)stack_min);
+
+			/* Store results in the main thread's controller. */
+			COMPILER_WRITE_BARRIER();
+			main->pt_stackaddr  = attr->pa_stackaddr;
+			main->pt_cpusetsize = attr->pa_stacksize;
+			COMPILER_WRITE_BARRIER();
+			main->pt_flags &= ~PTHREAD_FNOSTACK;
+			COMPILER_WRITE_BARRIER();
+		}
 	} else {
 		attr->pa_stackaddr = pthread->pt_stackaddr;
 		attr->pa_stacksize = pthread->pt_stacksize;
 	}
-	attr->pa_guardsize = getpagesize();
-	attr->pa_flags = PTHREAD_ATTR_FLAG_SCHED_SET | PTHREAD_ATTR_FLAG_POLICY_SET;
-	if (pthread->pt_flags & PTHREAD_FUSERSTACK)
-		attr->pa_flags |= PTHREAD_ATTR_FLAG_STACKADDR;
+done_stack:
 	/* When the thread is running (pt_tid != 0) and has a reference  counter
 	 * of `1', then  that means it  got detached. Note  the order of  checks
 	 * which ensures that a thread currently exiting isn't detected as being
@@ -1323,45 +1426,52 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getattr_np)(pthread_t pthread,
 	    ATOMIC_READ(pthread->pt_tid) != 0)
 		attr->pa_flags |= PTHREAD_ATTR_FLAG_DETACHSTATE;
 	attr->pa_cpuset = (cpu_set_t *)&attr->pa_cpusetsize;
-	result = pthread_getaffinity_np(pthread,
-	                                sizeof(attr->pa_cpusetsize),
-	                                attr->pa_cpuset);
-	if (result != ESRCH) {
-		/* Buffer too small. */
-		cpu_set_t *buf = NULL, *newbuf;
-		size_t bufsize = sizeof(attr->pa_cpusetsize) * 2;
-		do {
-			newbuf = (cpu_set_t *)realloc(buf, bufsize);
-			if unlikely(!newbuf) {
-				free(buf);
-				return ENOMEM;
-			}
-			buf = newbuf;
-			result = pthread_getaffinity_np(pthread, bufsize, buf);
-			if (result == EOK) {
-				while (bufsize && ((byte_t *)buf)[bufsize - 1])
-					--bufsize;
-				if unlikely(!bufsize) {
+	error = pthread_getaffinity_np(pthread,
+	                               sizeof(attr->pa_cpusetsize),
+	                               attr->pa_cpuset);
+	if (error == EOK) {
+		/* Success */
+	} else {
+		if (error == EINVAL) {
+			/* Buffer too small. */
+			cpu_set_t *buf = NULL, *newbuf;
+			size_t bufsize = sizeof(attr->pa_cpusetsize) * 2;
+			do {
+				newbuf = (cpu_set_t *)realloc(buf, bufsize);
+				if unlikely(!newbuf) {
 					free(buf);
-					attr->pa_cpuset     = NULL;
-					attr->pa_cpusetsize = 0;
-				} else {
-					newbuf = (cpu_set_t *)realloc(buf, bufsize);
-					if likely(newbuf)
-						buf = newbuf;
-					attr->pa_cpuset     = buf;
-					attr->pa_cpusetsize = bufsize;
+					return ENOMEM;
 				}
-				goto done;
-			}
-			if (result != EINVAL)
-				break;
-			bufsize *= 2;
-		} while (bufsize < sizeof(attr->pa_cpusetsize) * 512);
-		free(buf);
+				buf = newbuf;
+				error = pthread_getaffinity_np(pthread, bufsize, buf);
+				if (error == EOK) {
+					while (bufsize && ((byte_t *)buf)[bufsize - 1])
+						--bufsize;
+					if unlikely(!bufsize) {
+						free(buf);
+						attr->pa_cpuset     = NULL;
+						attr->pa_cpusetsize = 0;
+					} else {
+						newbuf = (cpu_set_t *)realloc(buf, bufsize);
+						if likely(newbuf)
+							buf = newbuf;
+						attr->pa_cpuset     = buf;
+						attr->pa_cpusetsize = bufsize;
+					}
+					goto done;
+				}
+				if (error != EINVAL)
+					break;
+				bufsize *= 2;
+			} while (bufsize < sizeof(attr->pa_cpusetsize) * 512);
+			free(buf);
+		}
+		/* Indicate that the thread's affinity is unknown. */
+		attr->pa_cpuset     = NULL;
+		attr->pa_cpusetsize = 0;
 	}
 done:
-	return result;
+	return EOK;
 }
 /*[[[end:libc_pthread_getattr_np]]]*/
 
@@ -4479,7 +4589,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getspecificptr_np)(pthread_key_t key)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xd44aeeb1]]]*/
+/*[[[start:exports,hash:CRC-32=0xdf3ada84]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(DOS$pthread_create, libd_pthread_create);
 #endif /* !__LIBCCALL_IS_LIBDCALL */
@@ -4527,6 +4637,7 @@ DEFINE_PUBLIC_ALIAS(pthread_getname_np, libc_pthread_getname_np);
 DEFINE_PUBLIC_ALIAS(pthread_set_name_np, libc_pthread_setname_np);
 DEFINE_PUBLIC_ALIAS(pthread_setname_np, libc_pthread_setname_np);
 DEFINE_PUBLIC_ALIAS(pthread_gettid_np, libc_pthread_gettid_np);
+DEFINE_PUBLIC_ALIAS(pthread_mainthread_np, libc_pthread_mainthread_np);
 DEFINE_PUBLIC_ALIAS(pthread_rpc_exec, libc_pthread_rpc_exec);
 DEFINE_PUBLIC_ALIAS(thr_getconcurrency, libc_pthread_getconcurrency);
 DEFINE_PUBLIC_ALIAS(pthread_getconcurrency, libc_pthread_getconcurrency);

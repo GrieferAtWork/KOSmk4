@@ -1016,7 +1016,7 @@ maps_printer_cb(void *maps_arg, struct mmapinfo *__restrict info) {
 	           "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"  /* dev:major */
 	           "%.2" PRIxN(__SIZEOF_MINOR_T__) " "  /* dev:minor */
 	           "%-7" PRIuN(__SIZEOF_INO64_T__) " ", /* inode */
-	           info->mmi_min, info->mmi_max,
+	           info->mmi_min, (byte_t *)info->mmi_max + 1,
 	           info->mmi_flags & MNODE_F_PREAD /* */ ? 'r' : '-',
 	           info->mmi_flags & MNODE_F_PWRITE /**/ ? 'w' : '-',
 	           info->mmi_flags & MNODE_F_PEXEC /* */ ? 'x' : '-',

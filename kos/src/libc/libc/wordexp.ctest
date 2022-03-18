@@ -189,11 +189,11 @@ DEFINE_TEST(wordexp) {
 	setenv("IFS", ", \t\r\n", 1);
 	setenv("VAR", "foo, bar, baz", 1);
 	assert_wordexp("$VAR", 3, "foo", "bar", "baz");
-	setenv("VAR", "foo, bar,, baz", 1);
+	setenv("VAR", "foo, bar ,,   baz", 1);
 	assert_wordexp("$VAR", 4, "foo", "bar", "", "baz");
-	/* Unquoted program output must also be subjegated to $IFS, but in our  impl
-	 * that system has its own processing engine (because program output must be
-	 * processed  chunk-wise, rather than  at once like  we can with variables).
+	/* Unquoted  program output must also be subjegated  to $IFS, but in our impl
+	 * that system has its own processing engine (because program output must  be
+	 * processed chunk-wise, rather than all at once like we can with variables).
 	 * As such, also test $IFS splitting for that case! */
 	assert_wordexp("`echo \"$VAR\"`", 4, "foo", "bar", "", "baz");
 	unsetenv("VAR");

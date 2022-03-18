@@ -51,6 +51,7 @@
 #include <math.h>
 #include <paths.h>
 #include <pthread.h>
+#include <pthread_np.h>
 #include <signal.h>
 #include <stdlib.h> /* exit() */
 #include <string.h>
@@ -68,6 +69,7 @@
 #include "compat.h"
 #include "dl.h"
 #include "globals.h"
+#include "tls.h"
 
 #ifndef FCALL
 #define FCALL __FCALL
@@ -1020,6 +1022,33 @@ NOTHROW_NCX(LIBCCALL libc_query_module)(char const *name, int which, void *buf,
 	(void)ret;
 	return libc_seterrno(ENOSYS);
 }
+
+/************************************************************************/
+/* >> extern void *__libc_stack_end;                                    */
+/* Resolves to the main thread's stack end address                      */
+/************************************************************************/
+PRIVATE ATTR_SECTION(".bss.crt.compat.glibc") void *libc___libc_stack_end = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.compat.glibc")
+pthread_once_t libc___libc_stack_end_initialized = PTHREAD_ONCE_INIT;
+PRIVATE ATTR_SECTION(".text.crt.compat.glibc") void
+NOTHROW_NCX(LIBCCALL libc___libc_stack_end_initialize)(void) {
+	stack_t info;
+	void *end_of_stack = NULL;
+	if (pthread_stackseg_np(pthread_mainthread_np(), &info) == 0)
+		end_of_stack = (byte_t *)info.ss_sp + info.ss_size;
+	libc___libc_stack_end = end_of_stack;
+}
+
+DEFINE_PUBLIC_IDATA_G(__libc_stack_end, libc_resolve___libc_stack_end, __SIZEOF_POINTER__);
+INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.glibc")
+void **NOTHROW_NCX(LIBCCALL libc_resolve___libc_stack_end)(void) {
+	pthread_once(&libc___libc_stack_end_initialized,
+	             &libc___libc_stack_end_initialize);
+	return &libc___libc_stack_end;
+}
+
+
+
 
 
 

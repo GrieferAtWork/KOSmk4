@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0977674 */
+/* HASH CRC-32:0x2a51bb8d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,7 +93,7 @@ INTDEF errno_t NOTHROW_NCX(LIBCCALL libc_pthread_detach)(pthread_t pthread);
 /* >> pthread_self(3)
  * Obtain the identifier of the current thread
  * @return: * : Handle for the calling thread */
-INTDEF ATTR_CONST pthread_t NOTHROW(LIBCCALL libc_pthread_self)(void);
+INTDEF ATTR_CONST WUNUSED pthread_t NOTHROW(LIBCCALL libc_pthread_self)(void);
 /* >> pthread_attr_init(3)
  * Initialize thread  attribute `*attr'  with default  attributes (detachstate  is
  * `PTHREAD_JOINABLE', scheduling policy is `SCHED_OTHER', no user-provided stack)
@@ -259,6 +259,10 @@ INTDEF NONNULL((2)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthrea
  * @return: * : The TID of the given thread
  * @return: 0 : The given `target_thread' has already terminated */
 INTDEF ATTR_PURE WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t target_thread);
+/* >> pthread_mainthread_np(3)
+ * Obtain the identifier of the main thread
+ * @return: * : Handle for the main thread */
+INTDEF ATTR_CONST WUNUSED pthread_t NOTHROW(LIBCCALL libc_pthread_mainthread_np)(void);
 /* >> pthread_rpc_exec(3)
  * Schedule an RPC for `target_thread' to-be executed the next  time
  * it makes a call to a cancellation-point system call (or interrupt
