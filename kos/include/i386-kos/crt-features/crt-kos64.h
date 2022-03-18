@@ -806,6 +806,7 @@
 #define __CRT_HAVE___libc_unlink
 #define __CRT_HAVE___libc_utime
 #define __CRT_HAVE___libc_valloc
+#define __CRT_HAVE___libc_vfork
 #define __CRT_HAVE___libc_vhangup
 #define __CRT_HAVE___libc_wait4
 #define __CRT_HAVE___libc_write

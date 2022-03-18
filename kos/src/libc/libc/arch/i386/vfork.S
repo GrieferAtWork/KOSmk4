@@ -76,6 +76,7 @@ END(libc_vfork)
 
 DEFINE_PUBLIC_ALIAS(vfork, libc_vfork)
 DEFINE_PUBLIC_ALIAS(__vfork, libc_vfork)
+DEFINE_PUBLIC_ALIAS(__libc_vfork, libc_vfork)
 
 
 .section .text.crt.except.sched.access
