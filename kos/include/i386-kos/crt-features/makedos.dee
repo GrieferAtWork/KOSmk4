@@ -82,12 +82,12 @@ function loadSymbolsFromFile(filename: string | {string...}): {string...} {
 }
 
 global final MSVCRT_VERSION_FILES: {int: string} = {
-	0x03000000 + 0   : "C:\\Windows\\SysWOW64\\msvcrt.dll",
-	0x83000000 + 0   : "C:\\Windows\\System32\\msvcrt.dll",
-	0x01000000 + 100 : "C:\\Windows\\SysWOW64\\msvcr100.dll",
-	0x81000000 + 100 : "C:\\Windows\\System32\\msvcr100.dll",
-	0x02000000 + 100 : "E:\\c\\msvcr\\x32\\msvcr100d.dll",
-	0x82000000 + 100 : []{
+	0x03000000 + 0x0000 : "C:\\Windows\\SysWOW64\\msvcrt.dll",
+	0x83000000 + 0x0000 : "C:\\Windows\\System32\\msvcrt.dll",
+	0x01000000 + 0x1000 : "C:\\Windows\\SysWOW64\\msvcr100.dll",
+	0x81000000 + 0x1000 : "C:\\Windows\\System32\\msvcr100.dll",
+	0x02000000 + 0x1000 : "E:\\c\\msvcr\\x32\\msvcr100d.dll",
+	0x82000000 + 0x1000 : []{
 		/* I'm unable to find the x64 "msvcr100d.dll", so we do this: */
 		local x32r = loadSymbolsFromFile("C:\\Windows\\SysWOW64\\msvcr100.dll");
 		local x32d = loadSymbolsFromFile("E:\\c\\msvcr\\x32\\msvcr100d.dll");
@@ -115,27 +115,27 @@ global final MSVCRT_VERSION_FILES: {int: string} = {
 			yield sym;
 		}
 	},
-	0x01000000 + 110 : "E:\\c\\msvcr\\x32\\msvcr110.dll",
-	0x81000000 + 110 : "C:\\Windows\\System32\\msvcr110.dll",
-	0x02000000 + 110 : "E:\\c\\msvcr\\x32\\msvcr110d.dll",
-	0x82000000 + 110 : "E:\\c\\msvcr\\x64\\msvcr110d.dll",
-	0x01000000 + 120 : "C:\\Windows\\SysWOW64\\msvcr120.dll",
-	0x81000000 + 120 : "C:\\Windows\\System32\\msvcr120.dll",
-	0x02000000 + 120 : "E:\\c\\msvcr\\x32\\msvcr120d.dll",
-	0x82000000 + 120 : "E:\\c\\msvcr\\x64\\msvcr120d.dll",
-	0x01000000 + 140 : {
+	0x01000000 + 0x1100 : "E:\\c\\msvcr\\x32\\msvcr110.dll",
+	0x81000000 + 0x1100 : "C:\\Windows\\System32\\msvcr110.dll",
+	0x02000000 + 0x1100 : "E:\\c\\msvcr\\x32\\msvcr110d.dll",
+	0x82000000 + 0x1100 : "E:\\c\\msvcr\\x64\\msvcr110d.dll",
+	0x01000000 + 0x1200 : "C:\\Windows\\SysWOW64\\msvcr120.dll",
+	0x81000000 + 0x1200 : "C:\\Windows\\System32\\msvcr120.dll",
+	0x02000000 + 0x1200 : "E:\\c\\msvcr\\x32\\msvcr120d.dll",
+	0x82000000 + 0x1200 : "E:\\c\\msvcr\\x64\\msvcr120d.dll",
+	0x01000000 + 0x1400 : {
 		"C:\\Windows\\SysWOW64\\ucrtbase.dll",
 		"C:\\Windows\\SysWOW64\\vcruntime140.dll",
 	},
-	0x81000000 + 140 : {
+	0x81000000 + 0x1400 : {
 		"C:\\Windows\\System32\\ucrtbase.dll",
 		"C:\\Windows\\System32\\vcruntime140.dll",
 	},
-	0x02000000 + 140 : {
+	0x02000000 + 0x1400 : {
 		"C:\\Windows\\SysWOW64\\ucrtbased.dll",
 		"C:\\Windows\\SysWOW64\\vcruntime140d.dll",
 	},
-	0x82000000 + 140 : {
+	0x82000000 + 0x1400 : {
 		"C:\\Windows\\System32\\ucrtbased.dll",
 		"C:\\Windows\\System32\\vcruntime140d.dll",
 	},
@@ -195,8 +195,7 @@ function getPpCondForArchVersions(vers: {int...}): string {
 		}
 		if (min == max)
 			return "__MSVCRT_VERSION__ == {}".format({ min });
-		return "__MSVCRT_VERSION__ >= {} && __MSVCRT_VERSION__ <= {}"
-			.format({ min, max });
+		return "__MSVCRT_VERSION__ >= {} && __MSVCRT_VERSION__ <= {}".format({ min, max });
 	}
 	return " || ".join(for (local ver: vers)
 		"__MSVCRT_VERSION__ {} {}".format({ ver == KNOWN_VERSION_MAX ? ">=" : "==", ver }));
@@ -300,30 +299,30 @@ print("\
  * Select VCRT version.
  *
  * VCRT version:
- *         _RELEASE                           _DEBUG
- *    0:   msvcrt.dll                         -
- *    100: msvcr100.dll                       msvcr100d.dll
- *    110: msvcr110.dll                       msvcr110d.dll
- *    120: msvcr120.dll                       msvcr120d.dll
- *    140: ucrtbase.dll, vcruntime140.dll     ucrtbased.dll, vcruntime140d.dll
+ *            _RELEASE                           _DEBUG
+ *    0x0000: msvcrt.dll                         -
+ *    0x1000: msvcr100.dll                       msvcr100d.dll
+ *    0x1100: msvcr110.dll                       msvcr110d.dll
+ *    0x1200: msvcr120.dll                       msvcr120d.dll
+ *    0x1400: ucrtbase.dll, vcruntime140.dll     ucrtbased.dll, vcruntime140d.dll
  *
- * TODO: There are some missing versions between 0 and 100
+ * TODO: There are some missing versions between 0x0 and 0x1000
  * XXX: The `_MSC_VER'-based checks have not really been tested/confirmed */
 #ifndef __MSVCRT_VERSION__
 #ifdef __TINYC__
-#define __MSVCRT_VERSION__ 0   /* msvcrt.dll */
+#define __MSVCRT_VERSION__ 0      /* msvcrt.dll */
 #elif !defined(_MSC_VER)
-#define __MSVCRT_VERSION__ 0   /* msvcrt.dll */
+#define __MSVCRT_VERSION__ 0      /* msvcrt.dll */
 #elif _MSC_VER >= 1900
-#define __MSVCRT_VERSION__ 140 /* ucrtbase.dll, vcruntime140.dll  (VS 2015) */
+#define __MSVCRT_VERSION__ 0x1400 /* ucrtbase.dll, vcruntime140.dll  (VS 2015) */
 #elif _MSC_VER >= 1800
-#define __MSVCRT_VERSION__ 120 /* msvcr120.dll  (VS 2013) */
+#define __MSVCRT_VERSION__ 0x1200 /* msvcr120.dll  (VS 2013) */
 #elif _MSC_VER >= 1700
-#define __MSVCRT_VERSION__ 110 /* msvcr130.dll  (VS 2012) */
+#define __MSVCRT_VERSION__ 0x1100 /* msvcr130.dll  (VS 2012) */
 #elif _MSC_VER >= 1600
-#define __MSVCRT_VERSION__ 100 /* msvcr100.dll  (VS 2010) */
+#define __MSVCRT_VERSION__ 0x1000 /* msvcr100.dll  (VS 2010) */
 #else /* ... */
-#define __MSVCRT_VERSION__ 0   /* msvcrt.dll */
+#define __MSVCRT_VERSION__ 0      /* msvcrt.dll */
 #endif /* !... */
 #endif /* !__MSVCRT_VERSION__ */
 
