@@ -230,7 +230,7 @@
  * Reminder: On  `2038-01-19T03:14:07', 32-bit unix time will roll  over, and this is a date
  *           that anyone reading this is likely to still experience, so be prepared and know
  *           that sooner or later _all_ applications will have to support this.
- * NOTE: As  the aforementioned date becomes closer and closer, `__USE_TIME_BITS64' will eventually
+ * NOTE: As the aforementioned date creeps  closer and closer, `__USE_TIME_BITS64' will  eventually
  *       become the default, and if I (or someone else) will still be willing to maintain this file
  *       as  well as the KOS operating system at  that point, 32-bit time support may eventually be
  *       removed entirely, depending on adoption of 64-bit time by both KOS-specific and unix/linux
