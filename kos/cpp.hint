@@ -196,6 +196,8 @@
 #define __DLFCN_CC
 #define DLFCN_VCC
 #define __DLFCN_VCC
+#define __DLFCN_DLTLSADDR_CC
+#define __DLFCN_DLTLSADDR2_CC
 
 #define INT8_C(c) c
 #define __INT8_C(c) c

@@ -316,20 +316,20 @@ again:
 	}
 }
 
-PRIVATE NONNULL((1)) void CC
-fini_tls_extension_tables(struct dtls_extension *__restrict self)
+PRIVATE NONNULL((1, 2)) void CC
+fini_tls_extension_tables(struct dtls_extension *__restrict self,
+                          struct tls_segment *__restrict segment)
 		THROWS(...) {
 	DlModule *mod;
 	struct dtls_extension *minptr, *maxptr;
 again:
 	mod = dtls_extension_getmodule(self);
 	if (mod != NULL) {
-		void (*callback)(void *arg, void *base);
+		void (*callback)(void *arg, void *tls_segment, void *base);
 		callback = mod->dm_tls_fini;
 		if (callback) {
 			TRY {
-				(*callback)(mod->dm_tls_arg,
-				            self->te_data);
+				(*callback)(mod->dm_tls_arg, self->te_data, segment);
 			} EXCEPT {
 				decref_tls_extension_modules(self);
 				RETHROW();
@@ -342,7 +342,7 @@ again:
 	free(self);
 	if (minptr) {
 		if (maxptr)
-			fini_tls_extension_tables(maxptr);
+			fini_tls_extension_tables(maxptr, segment);
 		self = minptr;
 		goto again;
 	}
@@ -365,7 +365,7 @@ INTERN void CC DlModule_RunAllTlsFinalizers(void) THROWS(...) {
 		try_incref_extension_table_modules(ext_free);
 		tls_segment_ex_endwrite(self);
 		/* Free the extension tables, and invoke finalizers. */
-		fini_tls_extension_tables(ext_free);
+		fini_tls_extension_tables(ext_free, self);
 	} else {
 		tls_segment_ex_endwrite(self);
 	}
@@ -400,19 +400,20 @@ err_nomem:
 	return NULL;
 }
 
-PRIVATE NONNULL((1)) void CC
-delete_extension_tables(struct dtls_extension *__restrict self)
+PRIVATE NONNULL((1, 2)) void CC
+delete_extension_tables(struct dtls_extension *__restrict self,
+                        struct tls_segment *__restrict segment)
 		THROWS(...) {
 	DlModule *mod;
 	struct dtls_extension *minptr, *maxptr;
 again:
 	mod = dtls_extension_getmodule(self);
 	if (mod != NULL) {
-		void (*callback)(void *arg, void *base);
+		void (*callback)(void *arg, void *base, void *tls_segment);
 		callback = mod->dm_tls_fini;
 		if (callback) {
 			TRY {
-				(*callback)(mod->dm_tls_arg, self->te_data);
+				(*callback)(mod->dm_tls_arg, self->te_data, segment);
 			} EXCEPT {
 				decref_tls_extension_modules(self);
 				RETHROW();
@@ -425,7 +426,7 @@ again:
 	free(self);
 	if (minptr) {
 		if (maxptr)
-			delete_extension_tables(maxptr);
+			delete_extension_tables(maxptr, segment);
 		self = minptr;
 		goto again;
 	}
@@ -446,7 +447,7 @@ clear_extension_table(struct tls_segment *__restrict self)
 		try_incref_extension_table_modules(ext_free);
 		tls_segment_ex_endwrite(self);
 		/* Free the extension tables, and invoke finalizers. */
-		delete_extension_tables(ext_free);
+		delete_extension_tables(ext_free, self);
 	} else {
 		tls_segment_ex_endwrite(self);
 	}
@@ -527,6 +528,8 @@ err_badptr:
  *                         @param: arg:  The value of `perthread_callback_arg' passed to `dltlsalloc'
  *                         @param: base: The base  address of  the  associated segment  within  the
  *                                       calling thread (same as the return value of `dltlsaddr()')
+ *                         @param: tls_segment: The TLS segment to which `base' belongs (usually  that
+ *                                              of the calling thread, unless `dltlsaddr2()' was used)
  * @param: perthread_fini: An  optional callback that behaves similar to `perthread_init',
  *                         but called by  `pthread_exit()' or any  other thread  finalizer
  *                         (more specifically: by `dltlsfreeseg()') within any thread that
@@ -546,8 +549,8 @@ err_badptr:
 INTERN WUNUSED DlModule *
 NOTHROW(DLFCN_CC libdl_dltlsalloc)(size_t num_bytes, size_t min_alignment,
                                    USER void const *template_data, size_t template_size,
-                                   void (DLFCN_CC USER *perthread_init)(void *arg, void *base),
-                                   void (DLFCN_CC USER *perthread_fini)(void *arg, void *base),
+                                   void (DLFCN_CC USER *perthread_init)(void *arg, void *base, void *tls_segment),
+                                   void (DLFCN_CC USER *perthread_fini)(void *arg, void *base, void *tls_segment),
                                    USER void *perthread_callback_arg) {
 	DlModule *result;
 	if unlikely(template_size > num_bytes) {

@@ -654,6 +654,8 @@ __IMPDEF __ATTR_NONNULL((1)) int
  *                         @param: arg:  The value of `perthread_callback_arg' passed to `dltlsalloc'
  *                         @param: base: The base  address of  the  associated segment  within  the
  *                                       calling thread (same as the return value of `dltlsaddr()')
+ *                         @param: tls_segment: The TLS segment to which `base' belongs (usually  that
+ *                                              of the calling thread, unless `dltlsaddr2()' was used)
  * @param: perthread_fini: An  optional callback that behaves similar to `perthread_init',
  *                         but called by  `pthread_exit()' or any  other thread  finalizer
  *                         (more specifically: by `dltlsfreeseg()') within any thread that
@@ -674,8 +676,8 @@ __IMPDEF __ATTR_NONNULL((1)) int
 __IMPDEF __ATTR_WUNUSED void *
 __NOTHROW(__DLFCN_CC dltlsalloc)(__size_t __num_bytes, __size_t __min_alignment,
                                  void const *__template_data, __size_t __template_size,
-                                 void (__LIBCCALL *__perthread_init)(void *__arg, void *__base),
-                                 void (__LIBCCALL *__perthread_fini)(void *__arg, void *__base),
+                                 void (__DLFCN_CC *__perthread_init)(void *__arg, void *__base, void *__tls_segment),
+                                 void (__DLFCN_CC *__perthread_fini)(void *__arg, void *__base, void *__tls_segment),
                                  void *__perthread_callback_arg);
 #endif /* __CRT_HAVE_dltlsalloc */
 

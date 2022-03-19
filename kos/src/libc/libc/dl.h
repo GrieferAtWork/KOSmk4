@@ -113,8 +113,8 @@ typedef WUNUSED NONNULL((1)) void *(__DLFCN_DLTLSADDR_CC *PDLTLSADDR)(void *tls_
 typedef WUNUSED NONNULL((1, 2)) void *(__DLFCN_DLTLSADDR2_CC *PDLTLSADDR2)(void *tls_handle, void *tls_segment) /*THROWS(...)*/;
 typedef WUNUSED void * /*NOTHROW*/ (__DLFCN_CC *PDLTLSALLOC)(size_t num_bytes, size_t min_alignment,
                                                              void const *template_data, size_t template_size,
-                                                             void (LIBCCALL *perthread_init)(void *arg, void *base),
-                                                             void (LIBCCALL *perthread_fini)(void *arg, void *base),
+                                                             void (LIBCCALL *perthread_init)(void *arg, void *base, void *tls_segment),
+                                                             void (LIBCCALL *perthread_fini)(void *arg, void *base, void *tls_segment),
                                                              void *perthread_callback_arg);
 typedef NONNULL((1)) int (__DLFCN_CC *PDLTLSFREE)(void *tls_handle) /*THROWS(...)*/;
 typedef NONNULL((2)) int /*NOTHROW_NCX*/(__DLFCN_CC *PDLADDR)(void const *address, Dl_info *info);

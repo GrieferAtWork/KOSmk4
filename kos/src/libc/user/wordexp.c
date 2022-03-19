@@ -2741,6 +2741,7 @@ continue_input:
 		 *       wordexp("a{20..10..2}e")  -->  ["a20e", "a18e", "a16e", ..., "a10e"]  // NOTE: The sign given for `step' is simply ignored
 		 *       wordexp("a{a..z}e")       -->  ["aae", "abe", "ace", ..., "aze"]
 		 *       wordexp("a{a..z..2}e")    -->  ["aae", "ace", "aee", ..., "aye"]
+		 *       wordexp("a{b}e")          -->  ["a{b}e"]  // If braces contain no "," or "..", nothing is substituted
 		 * Note that nesting is possible in ',' braces:
 		 *       wordexp("/usr/{src,include/{libc,libdl}}") -->  ["/usr/src", "/usr/include/libc", "/usr/include/libdl"]
 		 * Note that more than one brace can appear in a single word

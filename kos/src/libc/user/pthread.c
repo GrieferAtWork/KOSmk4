@@ -164,6 +164,7 @@ STATIC_ASSERT(offsetof(pthread_barrier_t, b_out) == __OFFSET_PTHREAD_BARRIER_OUT
 /* Destroy a given `pthread' `self' */
 LOCAL ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) void
 NOTHROW(LIBCCALL destroy)(struct pthread *__restrict self) {
+	/* NOTE: This also invokes TLS finalizers! */
 	dltlsfreeseg(self->pt_tls);
 }
 
@@ -1375,8 +1376,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getattr_np)(pthread_t pthread,
 			 *     send  an RPC whose sole purpose is to retrieve the address of some stack variable.
 			 * #2: With a stack pointer on hand, use /proc/self/maps to figure out the memory
 			 *     mapping that pointer is part of.
-			 * #3: Return information on the bounds of the discovered, return those bounds to
-			 *     our caller.
+			 * #3: With information on the bounds of the discovered mapping, return those
+			 *     bounds to our caller.
 			 * #4: Also write-back that same information to the given `pthread' structure, such
 			 *     that future requests as to the main thread's stack can be served without the
 			 *     need of going through all of the hoops above. */
@@ -4240,7 +4241,8 @@ struct pthread_tls_segment {
 };
 
 PRIVATE void __LIBCCALL
-pthread_tls_segment_init(void *UNUSED(arg), void *base) {
+pthread_tls_segment_init(void *UNUSED(arg), void *base,
+                         void *UNUSED(tls_segment)) {
 	struct pthread_tls_segment *me;
 	me = (struct pthread_tls_segment *)base;
 	me->pts_values = me->pts_static;
@@ -4248,7 +4250,8 @@ pthread_tls_segment_init(void *UNUSED(arg), void *base) {
 }
 
 PRIVATE void __LIBCCALL
-pthread_tls_segment_fini(void *UNUSED(arg), void *base) {
+pthread_tls_segment_fini(void *UNUSED(arg), void *base,
+                         void *UNUSED(tls_segment)) {
 	struct pthread_tls_segment *me;
 	size_t i, attempt = 0;
 	bool found_some;
@@ -4365,7 +4368,7 @@ NOTHROW_NCX(LIBCCALL get_pthread_tls_slot)(size_t id) {
 }
 
 /* No-op destructor used to mark TLS-slots without custom destructors as in-use. */
-PRIVATE void __LIBKCALL noop_dtor(void *UNUSED(value)) {
+PRIVATE void LIBKCALL noop_dtor(void *UNUSED(value)) {
 }
 
 /*[[[head:libc_pthread_key_create,hash:CRC-32=0xd76210ef]]]*/

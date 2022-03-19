@@ -277,8 +277,8 @@ struct dlmodule {
 	                                          * NOTE:  Only modules loaded  by the initial application  are part of  the static TLS segment.
 	                                          *    -> All other modules loaded thereafter have their TLS segments lazily loaded on first access. */
 	/* WARNING: TLS Initializers/Finalizers are _NOT_ invoked for modules apart of the static TLS image! */
-	void         (__DLFCN_CC *dm_tls_init)(void *arg, void *base); /* [valid_if(!dm_tlsstoff)][0..1] Optional callback for a TLS initializer. */
-	void         (__DLFCN_CC *dm_tls_fini)(void *arg, void *base); /* [valid_if(!dm_tlsstoff)][0..1] Optional callback for a TLS finalizer. */
+	void         (__DLFCN_CC *dm_tls_init)(void *arg, void *base, void *tls_segment); /* [valid_if(!dm_tlsstoff)][0..1] Optional callback for a TLS initializer. */
+	void         (__DLFCN_CC *dm_tls_fini)(void *arg, void *base, void *tls_segment); /* [valid_if(!dm_tlsstoff)][0..1] Optional callback for a TLS finalizer. */
 	void                     *dm_tls_arg;    /* [?..?][const] Argument passed to `dm_tls_init' / `dm_tls_fini' */
 
 	/* All  of  the  above  was  just  so  that  `dltlsalloc()' doesn't

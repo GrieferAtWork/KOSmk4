@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce9864b3 */
+/* HASH CRC-32:0xc9111039 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -541,7 +541,7 @@ __LIBC __ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_
 
 
 
-/* Functions from DJGPP */
+/* Functions also defined by DJGPP */
 
 #ifdef __CRT_HAVE_clreol
 /* >> clreol(3)
@@ -576,46 +576,46 @@ __CDECLARE_VOID(,__NOTHROW_NCX,gotoxy,(int __x, int __y),(__x,__y))
 __NAMESPACE_LOCAL_USING_OR_IMPL(gotoxy, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL gotoxy)(int __x, int __y) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gotoxy))(__x, __y); })
 #endif /* ... */
 #ifdef __CRT_HAVE_delline
-/* >> normvideo(3)
+/* >> delline(3)
  * Delete the line at the current cursor position, moving the
  * screen contents underneath up one line. (s.a. `AC_DL("1")') */
 __CDECLARE_VOID(,__NOTHROW_NCX,delline,(void),())
 #elif defined(__CRT_HAVE__cputs) || (defined(__CRT_HAVE__putch_nolock) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE__putch) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))
 #include <libc/local/conio/delline.h>
-/* >> normvideo(3)
+/* >> delline(3)
  * Delete the line at the current cursor position, moving the
  * screen contents underneath up one line. (s.a. `AC_DL("1")') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(delline, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL delline)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(delline))(); })
 #endif /* ... */
 #ifdef __CRT_HAVE_insline
-/* >> normvideo(3)
+/* >> insline(3)
  * Insert a blank line at the current cursor position, moving the
  * screen contents underneath down one line. (s.a. `AC_IL("1")') */
 __CDECLARE_VOID(,__NOTHROW_NCX,insline,(void),())
 #elif defined(__CRT_HAVE__cputs) || (defined(__CRT_HAVE__putch_nolock) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE__putch) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))
 #include <libc/local/conio/insline.h>
-/* >> normvideo(3)
+/* >> insline(3)
  * Insert a blank line at the current cursor position, moving the
  * screen contents underneath down one line. (s.a. `AC_IL("1")') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(insline, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL insline)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(insline))(); })
 #endif /* ... */
 #ifdef __CRT_HAVE_highvideo
-/* >> normvideo(3)
+/* >> highvideo(3)
  * Brighten text foreground color (s.a. `AC_FGBRIGHT') */
 __CDECLARE_VOID(,__NOTHROW_NCX,highvideo,(void),())
 #elif defined(__CRT_HAVE__cputs) || (defined(__CRT_HAVE__putch_nolock) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE__putch) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))
 #include <libc/local/conio/highvideo.h>
-/* >> normvideo(3)
+/* >> highvideo(3)
  * Brighten text foreground color (s.a. `AC_FGBRIGHT') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(highvideo, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL highvideo)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(highvideo))(); })
 #endif /* ... */
 #ifdef __CRT_HAVE_lowvideo
-/* >> normvideo(3)
+/* >> lowvideo(3)
  * Darken text foreground color (s.a. `AC_FGDARK') */
 __CDECLARE_VOID(,__NOTHROW_NCX,lowvideo,(void),())
 #elif defined(__CRT_HAVE__cputs) || (defined(__CRT_HAVE__putch_nolock) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE__putch) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))
 #include <libc/local/conio/lowvideo.h>
-/* >> normvideo(3)
+/* >> lowvideo(3)
  * Darken text foreground color (s.a. `AC_FGDARK') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(lowvideo, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL lowvideo)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lowvideo))(); })
 #endif /* ... */

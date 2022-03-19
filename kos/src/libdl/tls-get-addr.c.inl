@@ -107,7 +107,7 @@ libdl_dltlsaddr2(USER DlModule *self, USER struct tls_segment *seg) THROWS(E_SEG
 		/* Invoke TLS initializers. */
 		if (self->dm_tls_init) {
 			TRY {
-				(*self->dm_tls_init)(self->dm_tls_arg, extab->te_data);
+				(*self->dm_tls_init)(self->dm_tls_arg, extab->te_data, seg);
 			} EXCEPT {
 				free(extab);
 				RETHROW();
@@ -134,7 +134,7 @@ libdl_dltlsaddr2(USER DlModule *self, USER struct tls_segment *seg) THROWS(E_SEG
 			/* Invoke TLS finalizers. */
 			RAII_FINALLY { free(extab); };
 			if (self->dm_tls_fini)
-				(*self->dm_tls_fini)(self->dm_tls_arg, extab->te_data);
+				(*self->dm_tls_fini)(self->dm_tls_arg, extab->te_data, seg);
 			return newtab->te_data;
 		}
 	}

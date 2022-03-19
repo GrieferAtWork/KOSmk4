@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1144063 */
+/* HASH CRC-32:0xf29fb2a3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -253,18 +253,18 @@ INTDEF void NOTHROW_NCX(LIBDCALL libd_gotoxy)(int x, int y);
 /* >> gotoxy(3)
  * Set the cursor {x,y} position (s.a. `AC_CUP(y, x)') */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_gotoxy)(int x, int y);
-/* >> normvideo(3)
+/* >> delline(3)
  * Delete the line at the current cursor position, moving the
  * screen contents underneath up one line. (s.a. `AC_DL("1")') */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_delline)(void);
-/* >> normvideo(3)
+/* >> insline(3)
  * Insert a blank line at the current cursor position, moving the
  * screen contents underneath down one line. (s.a. `AC_IL("1")') */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_insline)(void);
-/* >> normvideo(3)
+/* >> highvideo(3)
  * Brighten text foreground color (s.a. `AC_FGBRIGHT') */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_highvideo)(void);
-/* >> normvideo(3)
+/* >> lowvideo(3)
  * Darken text foreground color (s.a. `AC_FGDARK') */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_lowvideo)(void);
 /* >> normvideo(3)

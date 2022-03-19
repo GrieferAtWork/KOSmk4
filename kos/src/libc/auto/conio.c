@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17397115 */
+/* HASH CRC-32:0x950acd4a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -513,27 +513,27 @@ NOTHROW_NCX(LIBCCALL libc_gotoxy)(int x,
                                   int y) {
 	libc__cprintf("\033[%d;%dH", y, x); /* AC_CUP(y, x) */
 }
-/* >> normvideo(3)
+/* >> delline(3)
  * Delete the line at the current cursor position, moving the
  * screen contents underneath up one line. (s.a. `AC_DL("1")') */
 INTERN ATTR_SECTION(".text.crt.dos.conio") void
 NOTHROW_NCX(LIBCCALL libc_delline)(void) {
 	libc__cputs("\033[M"); /* AC_DL("1") */
 }
-/* >> normvideo(3)
+/* >> insline(3)
  * Insert a blank line at the current cursor position, moving the
  * screen contents underneath down one line. (s.a. `AC_IL("1")') */
 INTERN ATTR_SECTION(".text.crt.dos.conio") void
 NOTHROW_NCX(LIBCCALL libc_insline)(void) {
 	libc__cputs("\033[L"); /* AC_IL("1") */
 }
-/* >> normvideo(3)
+/* >> highvideo(3)
  * Brighten text foreground color (s.a. `AC_FGBRIGHT') */
 INTERN ATTR_SECTION(".text.crt.dos.conio") void
 NOTHROW_NCX(LIBCCALL libc_highvideo)(void) {
 	libc__cputs("\033[1m"); /* AC_FGBRIGHT */
 }
-/* >> normvideo(3)
+/* >> lowvideo(3)
  * Darken text foreground color (s.a. `AC_FGDARK') */
 INTERN ATTR_SECTION(".text.crt.dos.conio") void
 NOTHROW_NCX(LIBCCALL libc_lowvideo)(void) {

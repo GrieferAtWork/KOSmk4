@@ -578,12 +578,12 @@ DlModule_PeTlsExec(DlModule *__restrict self, void *base, DWORD reason) {
 }
 
 PRIVATE void DLFCN_CC
-DlModule_PeTlsInit(void *arg, void *base) {
+DlModule_PeTlsInit(void *arg, void *base, void *UNUSED(tls_segment)) {
 	DlModule_PeTlsExec((DlModule *)arg, base, DLL_THREAD_ATTACH);
 }
 
 PRIVATE void DLFCN_CC
-DlModule_PeTlsFini(void *arg, void *base) {
+DlModule_PeTlsFini(void *arg, void *base, void *UNUSED(tls_segment)) {
 	DlModule_PeTlsExec((DlModule *)arg, base, DLL_THREAD_DETACH);
 }
 
@@ -624,7 +624,7 @@ PRIVATE void **CC PeTls_AllocVector(bool forme) {
 			if (forme) {
 				DlModule_PeTlsDoExec(iter, DLL_THREAD_ATTACH);
 			} else {
-				DlModule_PeTlsInit(iter, block);
+				DlModule_PeTlsInit(iter, block, NULL);
 			}
 		}
 	}
@@ -646,7 +646,7 @@ err:
 			if (forme) {
 				DlModule_PeTlsDoExec(iter, DLL_THREAD_DETACH);
 			} else {
-				DlModule_PeTlsFini(iter, block);
+				DlModule_PeTlsFini(iter, block, NULL);
 			}
 		}
 		free(block);

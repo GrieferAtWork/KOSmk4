@@ -405,7 +405,7 @@ __STDC_INT_AS_SSIZE_T _vcscanf_s([[nonnull, format]] char const *format, $va_lis
 %
 %
 %
-%/* Functions from DJGPP */
+%/* Functions also defined by DJGPP */
 %
 
 @@>> clreol(3)
@@ -430,7 +430,7 @@ void gotoxy(int x, int y) {
 	_cprintf("\033[%d;%dH", y, x); /* AC_CUP(y, x) */
 }
 
-@@>> normvideo(3)
+@@>> delline(3)
 @@Delete the line at the current cursor position, moving the
 @@screen contents underneath up one line. (s.a. `AC_DL("1")')
 [[requires_function(_cputs)]]
@@ -438,7 +438,7 @@ void delline(void) {
 	_cputs("\033[M"); /* AC_DL("1") */
 }
 
-@@>> normvideo(3)
+@@>> insline(3)
 @@Insert a blank line at the current cursor position, moving the
 @@screen contents underneath down one line. (s.a. `AC_IL("1")')
 [[requires_function(_cputs)]]
@@ -446,14 +446,14 @@ void insline(void) {
 	_cputs("\033[L"); /* AC_IL("1") */
 }
 
-@@>> normvideo(3)
+@@>> highvideo(3)
 @@Brighten text foreground color (s.a. `AC_FGBRIGHT')
 [[requires_function(_cputs)]]
 void highvideo(void) {
 	_cputs("\033[1m"); /* AC_FGBRIGHT */
 }
 
-@@>> normvideo(3)
+@@>> lowvideo(3)
 @@Darken text foreground color (s.a. `AC_FGDARK')
 [[requires_function(_cputs)]]
 void lowvideo(void) {
@@ -793,7 +793,7 @@ struct char_info {
 // TODO: int _conio_gettext(int left, int top, int right, int bottom, struct char_info *destin);
 // TODO:     Once cell buffer formats have been unified, implement this one via `VID_IOC_GETCELLDATA'
 
-// TODO: #define gettext _conio_gettext  // NOTE: <gettext.h> should override this one when both are #include'ed
+// TODO: #define gettext _conio_gettext  // NOTE: <libintl.h> should override this one when both are #include'ed
 
 // TODO: @@>> puttext(3)
 // TODO: @@Fill on-screen cells with textual contents (s.a. `_conio_gettext')

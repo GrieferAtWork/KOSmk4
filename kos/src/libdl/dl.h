@@ -628,6 +628,8 @@ libdl_dltlsbase(DlModule *__restrict self) THROWS(...);
  *                         @param: arg:  The value of `perthread_callback_arg' passed to `dltlsalloc'
  *                         @param: base: The base  address of  the  associated segment  within  the
  *                                       calling thread (same as the return value of `dltlsaddr()')
+ *                         @param: tls_segment: The TLS segment to which `base' belongs (usually  that
+ *                                              of the calling thread, unless `dltlsaddr2()' was used)
  * @param: perthread_fini: An  optional callback that behaves similar to `perthread_init',
  *                         but called by  `pthread_exit()' or any  other thread  finalizer
  *                         (more specifically: by `dltlsfreeseg()') within any thread that
@@ -647,8 +649,8 @@ libdl_dltlsbase(DlModule *__restrict self) THROWS(...);
 INTDEF WUNUSED DlModule *
 NOTHROW(DLFCN_CC libdl_dltlsalloc)(size_t num_bytes, size_t min_alignment,
                                    USER void const *template_data, size_t template_size,
-                                   void (DLFCN_CC USER *perthread_init)(void *__arg, void *__base),
-                                   void (DLFCN_CC USER *perthread_fini)(void *__arg, void *__base),
+                                   void (DLFCN_CC USER *perthread_init)(void *arg, void *base, void *tls_segment),
+                                   void (DLFCN_CC USER *perthread_fini)(void *arg, void *base, void *tls_segment),
                                    USER void *perthread_callback_arg);
 
 /* Free a TLS segment previously allocated with `dltlsalloc()' */

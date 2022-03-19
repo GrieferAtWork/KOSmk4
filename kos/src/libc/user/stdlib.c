@@ -1864,12 +1864,14 @@ INTERN ATTR_SECTION(".text.crt.application.exit") ATTR_NORETURN void
 /*[[[body:libc_exit]]]*/
 {
 	/* Finalizer TLS objects for the calling thread (c++11-specific) */
-	dlauxctrl(NULL, DLAUXCTRL_RUNTLSFINI, NULL, NULL);
+	dlauxctrl(NULL, DLAUXCTRL_RUNTLSFINI);
+
 	/* Run functions registered with `atexit()' or `on_exit()'. */
 	libc_run_atexit(status);
+
 	/* Run library finalizers (NOTE: This will also call back to invoke
 	 * `libc_fini()' because libc  is compiled with  `-fini=libc_fini') */
-	dlauxctrl(NULL, DLAUXCTRL_RUNFINI, NULL, NULL);
+	dlauxctrl(NULL, DLAUXCTRL_RUNFINI);
 	_Exit(status);
 }
 /*[[[end:libc_exit]]]*/

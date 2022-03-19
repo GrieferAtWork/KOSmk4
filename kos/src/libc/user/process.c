@@ -158,9 +158,9 @@ INTERN ATTR_SECTION(".text.crt.dos.sched.process") void
 /*[[[body:libc__cexit]]]*/
 {
 	/* Same as `exit()', but without actually exiting... */
-	dlauxctrl(NULL, DLAUXCTRL_RUNTLSFINI, NULL, NULL);
+	dlauxctrl(NULL, DLAUXCTRL_RUNTLSFINI);
 	libc_run_atexit(0);
-	dlauxctrl(NULL, DLAUXCTRL_RUNFINI, NULL, NULL);
+	dlauxctrl(NULL, DLAUXCTRL_RUNFINI);
 }
 /*[[[end:libc__cexit]]]*/
 
