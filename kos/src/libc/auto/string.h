@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ecdaae2 */
+/* HASH CRC-32:0xb89eafee */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2591,6 +2591,40 @@ INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_consttime_memequal)
  * @return: == 0: Memory blocks are non-equal.
  * @return: != 0: Memory blocks are equal. */
 INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_consttime_memequal)(void const *s1, void const *s2, size_t n_bytes);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> uucopy(2)
+ * Copy `num_bytes' from `src' to `dst'. The copy is done such that any
+ * faulty memory access is handled by returning `-1' with `errno=EFAULT'
+ * @return: 0 : Success
+ * @return: -1: [errno=EFAULT] Faulty memory access */
+INTDEF int NOTHROW_NCX(LIBDCALL libd_uucopy)(void const *__restrict src, void *__restrict dst, size_t num_bytes);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> uucopy(2)
+ * Copy `num_bytes' from `src' to `dst'. The copy is done such that any
+ * faulty memory access is handled by returning `-1' with `errno=EFAULT'
+ * @return: 0 : Success
+ * @return: -1: [errno=EFAULT] Faulty memory access */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_uucopy)(void const *__restrict src, void *__restrict dst, size_t num_bytes);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> uucopystr(2)
+ * Copy a string `src' into `dst', but copy no more than `maxlen' characters (including trailing NUL).
+ * The copy is done such that any faulty memory access is handled by returning `-1' with `errno=EFAULT'
+ * @return: * : The number of copied characters (including trialing NUL; )
+ * @return: -1: [errno=EFAULT]       Faulty memory access
+ * @return: -1: [errno=ENAMETOOLONG] `strlen(src) >= maxlen' */
+INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_uucopystr)(void const *__restrict src, void *__restrict dst, size_t maxlen);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> uucopystr(2)
+ * Copy a string `src' into `dst', but copy no more than `maxlen' characters (including trailing NUL).
+ * The copy is done such that any faulty memory access is handled by returning `-1' with `errno=EFAULT'
+ * @return: * : The number of copied characters (including trialing NUL; )
+ * @return: -1: [errno=EFAULT]       Faulty memory access
+ * @return: -1: [errno=ENAMETOOLONG] `strlen(src) >= maxlen' */
+INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_uucopystr)(void const *__restrict src, void *__restrict dst, size_t maxlen);
 #endif /* !__KERNEL__ */
 
 DECL_END

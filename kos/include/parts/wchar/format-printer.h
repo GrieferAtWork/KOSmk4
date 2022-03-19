@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab42ee83 */
+/* HASH CRC-32:0x844a93d9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -87,8 +87,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_wrepeat, __FORCELOCAL __ATTR_ARTIFICIAL _
  * Input:
  * >> Hello "World" W
  * >> hat a great day.
- * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
- * Output #2:  >> Hello  \"World\"  W\nhat a  great  day
+ * Output #1: "\"Hello \"World\" W\nhat a great day.\""
+ * Output #2:   "Hello \"World\" W\nhat a great day"
  * NOTE: Output  #2 is generated if `FORMAT_ESCAPE_FPRINTRAW' is set
  * This  function  escapes  all  control  and  non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
@@ -104,8 +104,8 @@ __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_wescape,(pwforma
  * Input:
  * >> Hello "World" W
  * >> hat a great day.
- * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
- * Output #2:  >> Hello  \"World\"  W\nhat a  great  day
+ * Output #1: "\"Hello \"World\" W\nhat a great day.\""
+ * Output #2:   "Hello \"World\" W\nhat a great day"
  * NOTE: Output  #2 is generated if `FORMAT_ESCAPE_FPRINTRAW' is set
  * This  function  escapes  all  control  and  non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding

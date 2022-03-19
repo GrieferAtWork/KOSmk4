@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8456c311 */
+/* HASH CRC-32:0x4ecb555d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3476,6 +3476,8 @@
 #define __CRT_HAVE_DOS$utimes64
 #define __CRT_HAVE_DOS$utmpname
 #define __CRT_HAVE_DOS$utmpxname
+#define __CRT_HAVE_DOS$uucopy
+#define __CRT_HAVE_DOS$uucopystr
 #define __CRT_HAVE_DOS$valloc
 #define __CRT_HAVE_DOS$vasprintf
 #define __CRT_HAVE_DOS$vdprintf
@@ -7544,6 +7546,8 @@
 #define __CRT_HAVE_utimes64
 #define __CRT_HAVE_utmpname
 #define __CRT_HAVE_utmpxname
+#define __CRT_HAVE_uucopy
+#define __CRT_HAVE_uucopystr
 #define __CRT_HAVE_valloc
 #define __CRT_HAVE_vasprintf
 #define __CRT_HAVE_vdprintf

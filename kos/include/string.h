@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe99a4b67 */
+/* HASH CRC-32:0xf979313 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -8574,6 +8574,43 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,consttime_mem
 __NAMESPACE_LOCAL_USING_OR_IMPL(consttime_memequal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL consttime_memequal)(void const *__s1, void const *__s2, size_t __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(consttime_memequal))(__s1, __s2, __n_bytes); })
 #endif /* !__CRT_HAVE_consttime_memequal */
 #endif /* __USE_NETBSD */
+
+#ifdef __USE_SOLARIS
+#ifdef __CRT_HAVE_uucopy
+/* >> uucopy(2)
+ * Copy `num_bytes' from `src' to `dst'. The copy is done such that any
+ * faulty memory access is handled by returning `-1' with `errno=EFAULT'
+ * @return: 0 : Success
+ * @return: -1: [errno=EFAULT] Faulty memory access */
+__CDECLARE(,int,__NOTHROW_NCX,uucopy,(void const *__restrict __src, void *__restrict __dst, size_t __num_bytes),(__src,__dst,__num_bytes))
+#elif defined(__KOS__) && defined(__cplusplus)
+#include <libc/local/string/uucopy.h>
+/* >> uucopy(2)
+ * Copy `num_bytes' from `src' to `dst'. The copy is done such that any
+ * faulty memory access is handled by returning `-1' with `errno=EFAULT'
+ * @return: 0 : Success
+ * @return: -1: [errno=EFAULT] Faulty memory access */
+__NAMESPACE_LOCAL_USING_OR_IMPL(uucopy, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL uucopy)(void const *__restrict __src, void *__restrict __dst, size_t __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(uucopy))(__src, __dst, __num_bytes); })
+#endif /* ... */
+#ifdef __CRT_HAVE_uucopystr
+/* >> uucopystr(2)
+ * Copy a string `src' into `dst', but copy no more than `maxlen' characters (including trailing NUL).
+ * The copy is done such that any faulty memory access is handled by returning `-1' with `errno=EFAULT'
+ * @return: * : The number of copied characters (including trialing NUL; )
+ * @return: -1: [errno=EFAULT]       Faulty memory access
+ * @return: -1: [errno=ENAMETOOLONG] `strlen(src) >= maxlen' */
+__CDECLARE(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,uucopystr,(void const *__restrict __src, void *__restrict __dst, size_t __maxlen),(__src,__dst,__maxlen))
+#elif defined(__KOS__) && defined(__cplusplus)
+#include <libc/local/string/uucopystr.h>
+/* >> uucopystr(2)
+ * Copy a string `src' into `dst', but copy no more than `maxlen' characters (including trailing NUL).
+ * The copy is done such that any faulty memory access is handled by returning `-1' with `errno=EFAULT'
+ * @return: * : The number of copied characters (including trialing NUL; )
+ * @return: -1: [errno=EFAULT]       Faulty memory access
+ * @return: -1: [errno=ENAMETOOLONG] `strlen(src) >= maxlen' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(uucopystr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL uucopystr)(void const *__restrict __src, void *__restrict __dst, size_t __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(uucopystr))(__src, __dst, __maxlen); })
+#endif /* ... */
+#endif /* __USE_SOLARIS */
 
 #endif /* __CC__ */
 

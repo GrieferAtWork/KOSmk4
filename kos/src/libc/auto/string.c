@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63ec03f1 */
+/* HASH CRC-32:0xec52f57f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 #include <kos/types.h>
 #include "../user/string.h"
 #include "../user/ctype.h"
+#include "../user/kos.except.h"
 #include "../user/stdio.h"
 #include "../user/stdlib.h"
 
@@ -6009,6 +6010,75 @@ NOTHROW_NCX(LIBCCALL libc_consttime_memequal)(void const *s1,
                                               size_t n_bytes) {
 	return libc_timingsafe_memcmp(s1, s2, n_bytes) == 0;
 }
+#include <kos/except.h>
+#include <libc/errno.h>
+/* >> uucopy(2)
+ * Copy `num_bytes' from `src' to `dst'. The copy is done such that any
+ * faulty memory access is handled by returning `-1' with `errno=EFAULT'
+ * @return: 0 : Success
+ * @return: -1: [errno=EFAULT] Faulty memory access */
+INTERN ATTR_SECTION(".text.crt.solaris") int
+NOTHROW_NCX(LIBCCALL libc_uucopy)(void const *__restrict src,
+                                  void *__restrict dst,
+                                  size_t num_bytes) {
+	NESTED_TRY {
+		libc_memcpy(dst, src, num_bytes);
+	} EXCEPT {
+
+		return __libc_seterrno(libc_except_as_errno(libc_except_data()));
+
+
+
+
+
+	}
+	return 0;
+}
+#include <kos/except.h>
+#include <libc/errno.h>
+/* >> uucopystr(2)
+ * Copy a string `src' into `dst', but copy no more than `maxlen' characters (including trailing NUL).
+ * The copy is done such that any faulty memory access is handled by returning `-1' with `errno=EFAULT'
+ * @return: * : The number of copied characters (including trialing NUL; )
+ * @return: -1: [errno=EFAULT]       Faulty memory access
+ * @return: -1: [errno=ENAMETOOLONG] `strlen(src) >= maxlen' */
+INTERN ATTR_SECTION(".text.crt.solaris") NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBCCALL libc_uucopystr)(void const *__restrict src,
+                                     void *__restrict dst,
+                                     size_t maxlen) {
+	size_t result = 0;
+	NESTED_TRY {
+		byte_t const *s_ptr = (byte_t const *)src;
+		byte_t *d_ptr = (byte_t *)dst;
+		for (;;) {
+			char ch;
+			if unlikely(maxlen == 0) {
+
+				return __libc_seterrno(ENAMETOOLONG);
+
+
+
+			}
+			--maxlen;
+			COMPILER_BARRIER();
+			ch = *s_ptr++;
+			*d_ptr++ = ch;
+			COMPILER_BARRIER();
+			++result;
+			if (ch == '\0')
+				break;
+		}
+	} EXCEPT {
+
+		return __libc_seterrno(libc_except_as_errno(libc_except_data()));
+
+
+
+
+
+	}
+	return (__STDC_INT_AS_SSIZE_T)result;
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -6836,6 +6906,8 @@ DEFINE_PUBLIC_ALIAS(timingsafe_memcmp, libc_timingsafe_memcmp);
 DEFINE_PUBLIC_ALIAS(strtosigno, libc_strtosigno);
 DEFINE_PUBLIC_ALIAS(stresep, libc_stresep);
 DEFINE_PUBLIC_ALIAS(consttime_memequal, libc_consttime_memequal);
+DEFINE_PUBLIC_ALIAS(uucopy, libc_uucopy);
+DEFINE_PUBLIC_ALIAS(uucopystr, libc_uucopystr);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_STRING_C */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1cd5d95 */
+/* HASH CRC-32:0xe07acb18 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -133,8 +133,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_c32repeat, __FORCELOCAL __ATTR_ARTIFICIAL
  * Input:
  * >> Hello "World" W
  * >> hat a great day.
- * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
- * Output #2:  >> Hello  \"World\"  W\nhat a  great  day
+ * Output #1: "\"Hello \"World\" W\nhat a great day.\""
+ * Output #2:   "Hello \"World\" W\nhat a great day"
  * NOTE: Output  #2 is generated if `FORMAT_ESCAPE_FPRINTRAW' is set
  * This  function  escapes  all  control  and  non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
@@ -149,8 +149,8 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c16escape,(pc16
  * Input:
  * >> Hello "World" W
  * >> hat a great day.
- * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
- * Output #2:  >> Hello  \"World\"  W\nhat a  great  day
+ * Output #1: "\"Hello \"World\" W\nhat a great day.\""
+ * Output #2:   "Hello \"World\" W\nhat a great day"
  * NOTE: Output  #2 is generated if `FORMAT_ESCAPE_FPRINTRAW' is set
  * This  function  escapes  all  control  and  non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
@@ -166,8 +166,8 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c16escape,(
  * Input:
  * >> Hello "World" W
  * >> hat a great day.
- * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
- * Output #2:  >> Hello  \"World\"  W\nhat a  great  day
+ * Output #1: "\"Hello \"World\" W\nhat a great day.\""
+ * Output #2:   "Hello \"World\" W\nhat a great day"
  * NOTE: Output  #2 is generated if `FORMAT_ESCAPE_FPRINTRAW' is set
  * This  function  escapes  all  control  and  non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
@@ -183,8 +183,8 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBDCALL fo
  * Input:
  * >> Hello "World" W
  * >> hat a great day.
- * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
- * Output #2:  >> Hello  \"World\"  W\nhat a  great  day
+ * Output #1: "\"Hello \"World\" W\nhat a great day.\""
+ * Output #2:   "Hello \"World\" W\nhat a great day"
  * NOTE: Output  #2 is generated if `FORMAT_ESCAPE_FPRINTRAW' is set
  * This  function  escapes  all  control  and  non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
@@ -200,8 +200,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_c16escape, __FORCELOCAL __ATTR_ARTIFICIAL
  * Input:
  * >> Hello "World" W
  * >> hat a great day.
- * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
- * Output #2:  >> Hello  \"World\"  W\nhat a  great  day
+ * Output #1: "\"Hello \"World\" W\nhat a great day.\""
+ * Output #2:   "Hello \"World\" W\nhat a great day"
  * NOTE: Output  #2 is generated if `FORMAT_ESCAPE_FPRINTRAW' is set
  * This  function  escapes  all  control  and  non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
@@ -216,8 +216,8 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c32escape,(pc32
  * Input:
  * >> Hello "World" W
  * >> hat a great day.
- * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
- * Output #2:  >> Hello  \"World\"  W\nhat a  great  day
+ * Output #1: "\"Hello \"World\" W\nhat a great day.\""
+ * Output #2:   "Hello \"World\" W\nhat a great day"
  * NOTE: Output  #2 is generated if `FORMAT_ESCAPE_FPRINTRAW' is set
  * This  function  escapes  all  control  and  non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
@@ -233,8 +233,8 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c32escape,(
  * Input:
  * >> Hello "World" W
  * >> hat a great day.
- * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
- * Output #2:  >> Hello  \"World\"  W\nhat a  great  day
+ * Output #1: "\"Hello \"World\" W\nhat a great day.\""
+ * Output #2:   "Hello \"World\" W\nhat a great day"
  * NOTE: Output  #2 is generated if `FORMAT_ESCAPE_FPRINTRAW' is set
  * This  function  escapes  all  control  and  non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
@@ -250,8 +250,8 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBKCALL fo
  * Input:
  * >> Hello "World" W
  * >> hat a great day.
- * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
- * Output #2:  >> Hello  \"World\"  W\nhat a  great  day
+ * Output #1: "\"Hello \"World\" W\nhat a great day.\""
+ * Output #2:   "Hello \"World\" W\nhat a great day"
  * NOTE: Output  #2 is generated if `FORMAT_ESCAPE_FPRINTRAW' is set
  * This  function  escapes  all  control  and  non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding

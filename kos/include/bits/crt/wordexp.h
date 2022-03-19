@@ -24,6 +24,23 @@
 
 #include <bits/types.h>
 
+
+#ifdef __solaris__
+#define __WRDE_APPEND  0x01
+#define __WRDE_DOOFFS  0x02
+#define __WRDE_NOCMD   0x04
+#define __WRDE_REUSE   0x08
+#define __WRDE_SHOWERR 0x10
+#define __WRDE_UNDEF   0x20
+#define __WRDE_ERRNO   2
+#define __WRDE_BADCHAR 3
+#define __WRDE_BADVAL  4
+#define __WRDE_CMDSUB  5
+#define __WRDE_NOSPACE 6
+#define __WRDE_SYNTAX  7
+#define __WRDE_NOSYS   8
+#else /* ... */
+
 /* Flags for `wordexp(3)' */
 #define __WRDE_DOOFFS  0x01 /* [valid_if(!WRDE_APPEND)] Insert `IN:we_offs' leading NULL entries before `we_wordv'.
                              * _NOT_  counted in `we_wordc'. This flag is  ignored if `WRDE_APPEND' is also passed. */
@@ -40,6 +57,7 @@
 #define __WRDE_BADVAL  3    /* `WRDE_UNDEF' was given and an undefined environment variable was used. */
 #define __WRDE_CMDSUB  4    /* Tried to use "$(echo hi)" or "`echo hi`" when `WRDE_NOCMD' was given. */
 #define __WRDE_SYNTAX  5    /* Syntax error (e.g. unmatched '"' or '(') */
+#endif /* !... */
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -52,6 +70,10 @@ struct __wordexp_struct {
 	                     * Vector of words (+ trailing NULL entry) */
 	__size_t  we_offs;  /* [IN:valid_if(WRDE_REUSE || WRDE_APPEND || WRDE_DOOFFS)]
 	                     * # of leading NULL entries in `we_wordv' (s.a. `WRDE_DOOFFS') */
+#ifdef __solaris__
+	char    **we_wordp; /* ... */
+	int       we_wordn; /* ... */
+#endif /* __solaris__ */
 };
 
 __DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfeae1e43 */
+/* HASH CRC-32:0xa4f44f2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -108,8 +108,8 @@ err:
  * Input:
  * >> Hello "World" W
  * >> hat a great day.
- * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
- * Output #2:  >> Hello  \"World\"  W\nhat a  great  day
+ * Output #1: "\"Hello \"World\" W\nhat a great day.\""
+ * Output #2:   "Hello \"World\" W\nhat a great day"
  * NOTE: Output  #2 is generated if `FORMAT_ESCAPE_FPRINTRAW' is set
  * This  function  escapes  all  control  and  non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding

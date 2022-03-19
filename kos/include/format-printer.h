@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a773b64 */
+/* HASH CRC-32:0x385d95db */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -256,8 +256,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_repeat, __FORCELOCAL __ATTR_ARTIFICIAL __
  * Input:
  * >> Hello "World" W
  * >> hat a great day.
- * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
- * Output #2:  >> Hello  \"World\"  W\nhat a  great  day
+ * Output #1: "\"Hello \"World\" W\nhat a great day.\""
+ * Output #2:   "Hello \"World\" W\nhat a great day"
  * NOTE: Output  #2 is generated if `FORMAT_ESCAPE_FPRINTRAW' is set
  * This  function  escapes  all  control  and  non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
@@ -272,8 +272,8 @@ __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_escape,(pformatp
  * Input:
  * >> Hello "World" W
  * >> hat a great day.
- * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
- * Output #2:  >> Hello  \"World\"  W\nhat a  great  day
+ * Output #1: "\"Hello \"World\" W\nhat a great day.\""
+ * Output #2:   "Hello \"World\" W\nhat a great day"
  * NOTE: Output  #2 is generated if `FORMAT_ESCAPE_FPRINTRAW' is set
  * This  function  escapes  all  control  and  non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding
@@ -289,8 +289,8 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_escape,(pformat
  * Input:
  * >> Hello "World" W
  * >> hat a great day.
- * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
- * Output #2:  >> Hello  \"World\"  W\nhat a  great  day
+ * Output #1: "\"Hello \"World\" W\nhat a great day.\""
+ * Output #2:   "Hello \"World\" W\nhat a great day"
  * NOTE: Output  #2 is generated if `FORMAT_ESCAPE_FPRINTRAW' is set
  * This  function  escapes  all  control  and  non-ascii characters,
  * preferring octal encoding for control characters and hex-encoding

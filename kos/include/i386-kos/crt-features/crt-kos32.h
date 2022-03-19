@@ -5855,6 +5855,8 @@
 #define __CRT_HAVE_utimes64
 #define __CRT_HAVE_utmpname
 #define __CRT_HAVE_utmpxname
+#define __CRT_HAVE_uucopy
+#define __CRT_HAVE_uucopystr
 #define __CRT_HAVE_valloc
 #define __CRT_HAVE_vasprintf
 #define __CRT_HAVE_vdprintf

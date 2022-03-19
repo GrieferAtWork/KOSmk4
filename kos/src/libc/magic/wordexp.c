@@ -81,6 +81,13 @@
 #if !defined(WRDE_SYNTAX) && defined(__WRDE_SYNTAX)
 #define WRDE_SYNTAX  __WRDE_SYNTAX  /* Syntax error (e.g. unmatched '"' or '(') */
 #endif /* !WRDE_SYNTAX && __WRDE_SYNTAX */
+#ifndef WRDE_ERRNO
+#ifdef __WRDE_ERRNO
+#define WRDE_ERRNO __WRDE_ERRNO   /* Error can be found in `errno(1)' */
+#elif defined(__WRDE_NOSPACE)
+#define WRDE_ERRNO __WRDE_NOSPACE /* Error can be found in `errno(1)' */
+#endif /* !WRDE_SYNTAX && __WRDE_SYNTAX */
+#endif /* !WRDE_ERRNO */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

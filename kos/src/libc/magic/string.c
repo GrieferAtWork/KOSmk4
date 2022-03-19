@@ -8341,6 +8341,77 @@ int consttime_memequal([[nonnull]] void const *s1,
 
 %#endif /* __USE_NETBSD */
 
+%
+%#ifdef __USE_SOLARIS
+@@>> uucopy(2)
+@@Copy `num_bytes' from `src' to `dst'. The copy is done such that any
+@@faulty memory access is handled by returning `-1' with `errno=EFAULT'
+@@@return: 0 : Success
+@@@return: -1: [errno=EFAULT] Faulty memory access
+[[requires(defined(__KOS__) && defined(__cplusplus))]]
+[[impl_include("<kos/except.h>", "<libc/errno.h>")]]
+[[section(".text.crt{|.dos}.solaris")]]
+int uucopy(void const *__restrict src, void *__restrict dst, size_t num_bytes) {
+	@NESTED_TRY@ {
+		memcpy(dst, src, num_bytes);
+	} @EXCEPT@ {
+@@pp_if $has_function(except_as_errno, except_data)@@
+		return __libc_seterrno(except_as_errno(except_data()));
+@@pp_elif defined(EFAULT)@@
+		return __libc_seterrno(EFAULT);
+@@pp_else@@
+		return __libc_seterrno(1);
+@@pp_endif@@
+	}
+	return 0;
+}
+
+@@>> uucopystr(2)
+@@Copy a string `src' into `dst', but copy no more than `maxlen' characters (including trailing NUL).
+@@The copy is done such that any faulty memory access is handled by returning `-1' with `errno=EFAULT'
+@@@return: * : The number of copied characters (including trialing NUL; )
+@@@return: -1: [errno=EFAULT]       Faulty memory access
+@@@return: -1: [errno=ENAMETOOLONG] `strlen(src) >= maxlen'
+[[requires(defined(__KOS__) && defined(__cplusplus))]]
+[[impl_include("<kos/except.h>", "<libc/errno.h>")]]
+[[section(".text.crt{|.dos}.solaris")]]
+__STDC_INT_AS_SSIZE_T uucopystr([[nonnull]] /*char*/ void const *__restrict src,
+                                [[nonnull]] /*char*/ void *__restrict dst, size_t maxlen) {
+	size_t result = 0;
+	@NESTED_TRY@ {
+		byte_t const *s_ptr = (byte_t const *)src;
+		byte_t *d_ptr = (byte_t *)dst;
+		for (;;) {
+			char ch;
+			if unlikely(maxlen == 0) {
+@@pp_if defined(ENAMETOOLONG)@@
+				return __libc_seterrno(ENAMETOOLONG);
+@@pp_else@@
+				return __libc_seterrno(1);
+@@pp_endif@@
+			}
+			--maxlen;
+			COMPILER_BARRIER();
+			ch = *s_ptr++;
+			*d_ptr++ = ch;
+			COMPILER_BARRIER();
+			++result;
+			if (ch == '\0')
+				break;
+		}
+	} @EXCEPT@ {
+@@pp_if $has_function(except_as_errno, except_data)@@
+		return __libc_seterrno(except_as_errno(except_data()));
+@@pp_elif defined(EFAULT)@@
+		return __libc_seterrno(EFAULT);
+@@pp_else@@
+		return __libc_seterrno(1);
+@@pp_endif@@
+	}
+	return (__STDC_INT_AS_SSIZE_T)result;
+}
+
+%#endif /* __USE_SOLARIS */
 
 %(libc_fast){
 #define __libc_PRIVATE_memset1 __libc_memset

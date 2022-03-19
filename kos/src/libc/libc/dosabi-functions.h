@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb52c601 */
+/* HASH CRC-32:0x9f7de4fc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2216,6 +2216,8 @@ DFUN(".text.crt.dos.bsd", libd_timingsafe_memcmp, libc_timingsafe_memcmp, TD, 3,
 DFUN(".text.crt.dos.string.memory", libd_strtosigno, libc_strtosigno, TIn(__SIZEOF_SIGNO_T__), 1, TP)
 DFUN(".text.crt.dos.string.memory", libd_stresep, libc_stresep, TP, 3, TP, TP, TD)
 DFUN(".text.crt.dos.bsd", libd_consttime_memequal, libc_consttime_memequal, TD, 3, TP, TP, TI)
+DFUN(".text.crt.dos.solaris", libd_uucopy, libc_uucopy, TD, 3, TP, TP, TI)
+DFUN(".text.crt.dos.solaris", libd_uucopystr, libc_uucopystr, TD, 3, TP, TP, TI)
 
 /* stringlist */
 DFUN(".text.crt.dos.bsd.stringlist", libd_sl_add, libc_sl_add, TD, 2, TP, TP)

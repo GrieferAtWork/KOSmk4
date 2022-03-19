@@ -290,13 +290,13 @@ NOTHROW_NCX(LIBCCALL wxparser_insert_command)(struct wxparser *__restrict self,
 	/* Construct pipes for child-process communication */
 	result = pipe2(pipes, O_CLOEXEC);
 	if unlikely(result != 0)
-		return WRDE_NOSPACE;
+		return WRDE_ERRNO;
 
 	cpid = vfork();
 	if unlikely(cpid < 0) {
 		close(pipes[0]);
 		close(pipes[1]);
-		return WRDE_NOSPACE;
+		return WRDE_ERRNO;
 	}
 	if (cpid == 0) {
 		/* In child process. */
@@ -323,7 +323,7 @@ NOTHROW_NCX(LIBCCALL wxparser_insert_command)(struct wxparser *__restrict self,
 				break;
 			if (libc_geterrno() == EINTR)
 				continue;
-			result = WRDE_NOSPACE;
+			result = WRDE_ERRNO;
 			goto err;
 		}
 
@@ -472,7 +472,7 @@ do_STATE_SEARCH_NONLF_AFTER_FIELD:
 	/* Join (reap) child process */
 	while (waitpid(cpid, &result, 0) != cpid) {
 		if (libc_geterrno() != EINTR) {
-			result = WRDE_NOSPACE;
+			result = WRDE_ERRNO;
 			goto err;
 		}
 	}
