@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9093ba9 */
+/* HASH CRC-32:0xa6de9075 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,133 +40,120 @@
 #include <kos/anno.h>
 #include <asm/crt/stdio_ext.h>
 
+/************************************************************************/
+/* Possible values for `__fsetlocking(3)'                               */
+/************************************************************************/
+/* Don't change the locking type. */
+#if !defined(FSETLOCKING_QUERY) && defined(__FSETLOCKING_QUERY)
+#define FSETLOCKING_QUERY __FSETLOCKING_QUERY
+#endif /* !FSETLOCKING_QUERY && __FSETLOCKING_QUERY */
+
+/* Automatically acquire/release locks during file operators. */
+#if !defined(FSETLOCKING_INTERNAL) && defined(__FSETLOCKING_INTERNAL)
+#define FSETLOCKING_INTERNAL __FSETLOCKING_INTERNAL
+#endif /* !FSETLOCKING_INTERNAL && __FSETLOCKING_INTERNAL */
+
+/* Never automatically acquire  locks. The  only way file  locks are  still
+ * acquired is through manual calls to `flockfile(3)' and `funlockfile(3)'.
+ * This is the  equivalent of `__USE_STDIO_UNLOCKED'  on a per-file  basis. */
+#if !defined(FSETLOCKING_BYCALLER) && defined(__FSETLOCKING_BYCALLER)
+#define FSETLOCKING_BYCALLER __FSETLOCKING_BYCALLER
+#endif /* !FSETLOCKING_BYCALLER && __FSETLOCKING_BYCALLER */
+/************************************************************************/
+
+
+#ifdef __CC__
 __SYSDECL_BEGIN
 
-/* Documentation taken from Glibc /usr/include/stdio_ext.h, before (some) being modified/extended. */
-/* Copyright (C) 1991-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
-#if (defined(__FSETLOCKING_QUERY) || defined(__FSETLOCKING_INTERNAL) || \
-     defined(__FSETLOCKING_BYCALLER))
-/*[[[enum]]]*/
-#ifdef __CC__
-enum {
-#ifdef __FSETLOCKING_QUERY
-	FSETLOCKING_QUERY    = __FSETLOCKING_QUERY,    /* Query current state of the locking status. */
-#endif /* __FSETLOCKING_QUERY */
-#ifdef __FSETLOCKING_INTERNAL
-	FSETLOCKING_INTERNAL = __FSETLOCKING_INTERNAL, /* The library protects all uses of the stream functions, except for uses
-	                                                * of the *_unlocked  functions, by calls  equivalent to  `flockfile(3)'. */
-#endif /* __FSETLOCKING_INTERNAL */
-#ifdef __FSETLOCKING_BYCALLER
-	FSETLOCKING_BYCALLER = __FSETLOCKING_BYCALLER  /* The user will take care of locking.
-	                                                * This is the equivalent of `__USE_STDIO_UNLOCKED' on a per-file basis. */
-#endif /* __FSETLOCKING_BYCALLER */
-};
-#endif /* __CC__ */
-/*[[[AUTO]]]*/
-#ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __FSETLOCKING_QUERY
-#define FSETLOCKING_QUERY    FSETLOCKING_QUERY    /* Query current state of the locking status. */
-#endif /* __FSETLOCKING_QUERY */
-#ifdef __FSETLOCKING_INTERNAL
-#define FSETLOCKING_INTERNAL FSETLOCKING_INTERNAL /* The library protects all uses of the stream functions, except for uses
-                                                   * of the *_unlocked  functions, by calls  equivalent to  `flockfile(3)'. */
-#endif /* __FSETLOCKING_INTERNAL */
-#ifdef __FSETLOCKING_BYCALLER
-#define FSETLOCKING_BYCALLER FSETLOCKING_BYCALLER /* The user will take care of locking.
-                                                   * This is the equivalent of `__USE_STDIO_UNLOCKED' on a per-file basis. */
-#endif /* __FSETLOCKING_BYCALLER */
-#else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __FSETLOCKING_QUERY
-#define FSETLOCKING_QUERY    __FSETLOCKING_QUERY    /* Query current state of the locking status. */
-#endif /* __FSETLOCKING_QUERY */
-#ifdef __FSETLOCKING_INTERNAL
-#define FSETLOCKING_INTERNAL __FSETLOCKING_INTERNAL /* The library protects all uses of the stream functions, except for uses
-                                                     * of the *_unlocked  functions, by calls  equivalent to  `flockfile(3)'. */
-#endif /* __FSETLOCKING_INTERNAL */
-#ifdef __FSETLOCKING_BYCALLER
-#define FSETLOCKING_BYCALLER __FSETLOCKING_BYCALLER /* The user will take care of locking.
-                                                     * This is the equivalent of `__USE_STDIO_UNLOCKED' on a per-file basis. */
-#endif /* __FSETLOCKING_BYCALLER */
-#endif /* !__COMPILER_PREFERR_ENUMS */
-/*[[[end]]]*/
-#endif /* ... */
-
-
-#ifdef __CC__
-
 /* >> __fbufsize(3)
- * Return the size of the buffer of `stream' in
- * bytes  currently in use  by the given stream */
+ * Returns the used buffer size of the given `stream' (s.a. `setvbuf(3)')
+ * @return: * : Used buffer size of `stream' */
 __CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__fbufsize,(__FILE __KOS_FIXED_CONST *__stream),(__stream))
 /* >> __freading(3)
- * Return  non-zero value when  `stream' is opened readonly,
- * or if the last operation on `stream' was a read operation */
+ * Returns  non-zero if the `stream' is read-only, or "the last operation
+ * performed on `stream' was a read-operation". On KOS, this last part is
+ * implemented such that we check for unsaved changes to `stream'. */
 __CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__freading,(__FILE __KOS_FIXED_CONST *__stream),(__stream))
 /* >> __fwriting(3)
- * Return non-zero value when  `stream' is opened write-only  or
- * append-only, or if the last operation on `stream' was a write
- * operation */
+ * Returns non-zero if the `stream'  is "write-only", or "the last  operation
+ * performed on `stream' was a write-operation". On KOS, our stdio impl  does
+ * not support write-only files (if reading isn't allowed, this will only  be
+ * enforced on an fd-level by the kernel). Instead, we implement `__fwriting'
+ * to return indicative of `stream' containing any unwritten changes. */
 __CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__fwriting,(__FILE __KOS_FIXED_CONST *__stream),(__stream))
 /* >> __freadable(3)
- * Return non-zero value when `stream' is not opened write-only or append-only */
+ * Returns non-zero if `stream'  allows for reading (s.a.  `fread(3)')
+ * On  KOS, all stdio files can be  read from (except those opened for
+ * file descriptors opened as `O_WRONLY', though in this case write(2)
+ * is still attempted). As such, KOS  considers all stdio files to  be
+ * readable, meaning that on KOS this function always returns `1'. */
 __CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__freadable,(__FILE __KOS_FIXED_CONST *__stream),(__stream))
 /* >> __fwritable(3)
- * Return non-zero value when `stream' is not opened read-only */
+ * Returns non-zero if `stream' is writable, that is: has been opened
+ * with "w",  "r+", or  some similar  flag that  allows for  writing. */
 __CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__fwritable,(__FILE __KOS_FIXED_CONST *__stream),(__stream))
 /* >> __flbf(3)
- * Return non-zero value when `stream' is line-buffered */
+ * Return  non-zero  if `stream'  is line-buffered.  (s.a. `_IOLBF')
+ * Note  that on KOS, the line-buffered attribute of stdio files may
+ * be determined  lazily, based  on  an underlying  file  descriptor
+ * referring to a TTY. If this is the case, this function will  make
+ * the appropriate call to `isatty(3)' and set the internal is-line-
+ * buffered flag accordingly, before returning its state. */
 __CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__flbf,(__FILE *__stream),(__stream))
 #ifdef __CRT_HAVE___fpurge
 /* >> __fpurge(3)
- * Discard all pending buffered I/O on `stream' */
+ * Discard all modified, but unwritten data from `stream', as  well
+ * as  all unread data previously buffered, but not yet read. After
+ * a call to this function, the next `fread(3)' or `fwrite(3)' will
+ * start off from a blank state. */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__fpurge,(__FILE *__stream),(__stream))
 #elif defined(__CRT_HAVE_fpurge)
 /* >> __fpurge(3)
- * Discard all pending buffered I/O on `stream' */
+ * Discard all modified, but unwritten data from `stream', as  well
+ * as  all unread data previously buffered, but not yet read. After
+ * a call to this function, the next `fread(3)' or `fwrite(3)' will
+ * start off from a blank state. */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__fpurge,(__FILE *__stream),fpurge,(__stream))
 #endif /* ... */
 /* >> __fpending(3)
- * Return amount of output in bytes pending on a `stream' */
+ * Returns the number of pending, but not-yet-written bytes of modified
+ * file  data (s.a. `__fwriting(3)'). A call to `fflush(3)' can be used
+ * to write all modified data to the system, and following such a call,
+ * this function will return `0' until new unwritten data appears. */
 __CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,__NOTHROW_NCX,__fpending,(__FILE __KOS_FIXED_CONST *__stream),(__stream))
 #ifdef __CRT_HAVE__flushlbf
 /* >> _flushlbf(3)
- * Flush all line-buffered files */
+ * Perform  a call  `fflush(stream)' for  every open  line-buffered stdio file.
+ * Note that usually call this function isn't necessary, since the same already
+ * happens automatically when  writing a line-feed  to any line-buffered  stdio
+ * file (where line-buffered files are usually those opened on TTYs) */
 __CDECLARE_VOID(,__THROWING,_flushlbf,(void),())
 #elif defined(__CRT_HAVE__IO_flush_all_linebuffered)
 /* >> _flushlbf(3)
- * Flush all line-buffered files */
+ * Perform  a call  `fflush(stream)' for  every open  line-buffered stdio file.
+ * Note that usually call this function isn't necessary, since the same already
+ * happens automatically when  writing a line-feed  to any line-buffered  stdio
+ * file (where line-buffered files are usually those opened on TTYs) */
 __CREDIRECT_VOID(,__THROWING,_flushlbf,(void),_IO_flush_all_linebuffered,())
 #endif /* ... */
 /* >> __fsetlocking(3)
- * Set locking status of `stream' to `type'
- * @param: type: One of `FSETLOCKING_*' */
+ * Set the locking type for `stream' to `type'. This affects all stdio functions
+ * that aren't already lock-less by nature (iow: everything but `*_unlocked(3)')
+ * @param: type: One of `FSETLOCKING_*', as defined in `<stdio_ext.h>'
+ * @return: * : The locking type prior to this call (one of `FSETLOCKING_INTERNAL' or `FSETLOCKING_BYCALLER') */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__fsetlocking,(__FILE *__stream, int __type),(__stream,__type))
 /* >> __fseterr(3)
- * Set the error indicator for the given `stream' (s.a. `ferror()') */
+ * Set the error indicator of `stream', the same an error file error would, such
+ * that `ferror(stream) != 0', and `clearerr(stream)' must be used if one wishes
+ * to clear the error once again. */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__NOTHROW_NCX,__fseterr,(__FILE *__stream),(__stream))
+
+__SYSDECL_END
 #endif /* __CC__ */
 
 /* Never actually needed */
 #ifndef enable_extended_FILE_stdio
 #define enable_extended_FILE_stdio(fd, act) 0
 #endif /* !enable_extended_FILE_stdio */
-
-__SYSDECL_END
 
 #endif /* !_STDIO_EXT_H */

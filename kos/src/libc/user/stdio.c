@@ -1872,8 +1872,10 @@ NOTHROW_RPC(LIBCCALL libc_flockfile)(FILE *__restrict stream)
 {
 	if likely(stream) {
 		stream = file_fromuser(stream);
-		if (FMUSTLOCK(stream))
-			file_lock_write(stream);
+		/* Must always lock the file here, irregardless of `FMUSTLOCK()'.
+		 * This behavior is implemented by the documentation (and naming)
+		 * of `__fsetlocking(3)' and `FSETLOCKING_BYCALLER'. */
+		file_lock_write(stream);
 	}
 }
 /*[[[end:libc_flockfile]]]*/
@@ -1887,8 +1889,10 @@ NOTHROW_NCX(LIBCCALL libc_funlockfile)(FILE *__restrict stream)
 {
 	if likely(stream) {
 		stream = file_fromuser(stream);
-		if (FMUSTLOCK(stream))
-			file_lock_endwrite(stream);
+		/* Must always unlock the file here, irregardless of `FMUSTLOCK()'.
+		 * This behavior is implemented  by the documentation (and  naming)
+		 * of `__fsetlocking(3)' and `FSETLOCKING_BYCALLER'. */
+		file_lock_endwrite(stream);
 	}
 }
 /*[[[end:libc_funlockfile]]]*/

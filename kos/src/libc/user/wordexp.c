@@ -1562,7 +1562,14 @@ set_value_as_argc_minus_one:
 		break;
 
 //	case '!':
-		/* TODO: "${!prefix*}", "${!prefix@}"
+		/* TODO: "${!VARNAME}"
+		 *       Indirection
+		 *       >> FOO="Hello"
+		 *       >> VAR=FOO
+		 *       >> echo ${VAR}   # "FOO"
+		 *       >> echo ${!VAR}  # "Hello"
+		 *
+		 * TODO: "${!prefix*}", "${!prefix@}"
 		 *       Same * vs. @ expansion rules as ${#*} and ${#@},
 		 *       but expands uses the list of environ variables
 		 *       names that start with the given `prefix'. */

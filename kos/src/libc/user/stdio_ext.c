@@ -30,10 +30,10 @@
 
 DECL_BEGIN
 
-/*[[[head:libc___fbufsize,hash:CRC-32=0xbbcaae72]]]*/
+/*[[[head:libc___fbufsize,hash:CRC-32=0x1ed169ee]]]*/
 /* >> __fbufsize(3)
- * Return the size of the buffer of `stream' in
- * bytes  currently in use  by the given stream */
+ * Returns the used buffer size of the given `stream' (s.a. `setvbuf(3)')
+ * @return: * : Used buffer size of `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc___fbufsize)(FILE __KOS_FIXED_CONST *stream)
 /*[[[body:libc___fbufsize]]]*/
@@ -43,25 +43,28 @@ NOTHROW_NCX(LIBCCALL libc___fbufsize)(FILE __KOS_FIXED_CONST *stream)
 }
 /*[[[end:libc___fbufsize]]]*/
 
-/*[[[head:libc___freading,hash:CRC-32=0xb337dbfa]]]*/
+/*[[[head:libc___freading,hash:CRC-32=0x712e4008]]]*/
 /* >> __freading(3)
- * Return  non-zero value when  `stream' is opened readonly,
- * or if the last operation on `stream' was a read operation */
+ * Returns  non-zero if the `stream' is read-only, or "the last operation
+ * performed on `stream' was a read-operation". On KOS, this last part is
+ * implemented such that we check for unsaved changes to `stream'. */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc___freading)(FILE __KOS_FIXED_CONST *stream)
 /*[[[body:libc___freading]]]*/
 {
 	stream = file_fromuser(stream);
-	return (stream->if_flag & __IO_FILE_IORW) ||
+	return !(stream->if_flag & __IO_FILE_IORW) ||
 	       (stream->if_exdata->io_chsz == 0);
 }
 /*[[[end:libc___freading]]]*/
 
-/*[[[head:libc___fwriting,hash:CRC-32=0x79deca70]]]*/
+/*[[[head:libc___fwriting,hash:CRC-32=0x1b4eab60]]]*/
 /* >> __fwriting(3)
- * Return non-zero value when  `stream' is opened write-only  or
- * append-only, or if the last operation on `stream' was a write
- * operation */
+ * Returns non-zero if the `stream'  is "write-only", or "the last  operation
+ * performed on `stream' was a write-operation". On KOS, our stdio impl  does
+ * not support write-only files (if reading isn't allowed, this will only  be
+ * enforced on an fd-level by the kernel). Instead, we implement `__fwriting'
+ * to return indicative of `stream' containing any unwritten changes. */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc___fwriting)(FILE __KOS_FIXED_CONST *stream)
 /*[[[body:libc___fwriting]]]*/
@@ -71,9 +74,13 @@ NOTHROW_NCX(LIBCCALL libc___fwriting)(FILE __KOS_FIXED_CONST *stream)
 }
 /*[[[end:libc___fwriting]]]*/
 
-/*[[[head:libc___freadable,hash:CRC-32=0x6443ce78]]]*/
+/*[[[head:libc___freadable,hash:CRC-32=0xf71af367]]]*/
 /* >> __freadable(3)
- * Return non-zero value when `stream' is not opened write-only or append-only */
+ * Returns non-zero if `stream'  allows for reading (s.a.  `fread(3)')
+ * On  KOS, all stdio files can be  read from (except those opened for
+ * file descriptors opened as `O_WRONLY', though in this case write(2)
+ * is still attempted). As such, KOS  considers all stdio files to  be
+ * readable, meaning that on KOS this function always returns `1'. */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc___freadable)(FILE __KOS_FIXED_CONST *stream)
 /*[[[body:libc___freadable]]]*/
@@ -86,9 +93,10 @@ NOTHROW_NCX(LIBCCALL libc___freadable)(FILE __KOS_FIXED_CONST *stream)
 }
 /*[[[end:libc___freadable]]]*/
 
-/*[[[head:libc___fwritable,hash:CRC-32=0xd7cccf6a]]]*/
+/*[[[head:libc___fwritable,hash:CRC-32=0x2c768586]]]*/
 /* >> __fwritable(3)
- * Return non-zero value when `stream' is not opened read-only */
+ * Returns non-zero if `stream' is writable, that is: has been opened
+ * with "w",  "r+", or  some similar  flag that  allows for  writing. */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc___fwritable)(FILE __KOS_FIXED_CONST *stream)
 /*[[[body:libc___fwritable]]]*/
@@ -98,9 +106,14 @@ NOTHROW_NCX(LIBCCALL libc___fwritable)(FILE __KOS_FIXED_CONST *stream)
 }
 /*[[[end:libc___fwritable]]]*/
 
-/*[[[head:libc___flbf,hash:CRC-32=0x6ee65875]]]*/
+/*[[[head:libc___flbf,hash:CRC-32=0x227db012]]]*/
 /* >> __flbf(3)
- * Return non-zero value when `stream' is line-buffered */
+ * Return  non-zero  if `stream'  is line-buffered.  (s.a. `_IOLBF')
+ * Note  that on KOS, the line-buffered attribute of stdio files may
+ * be determined  lazily, based  on  an underlying  file  descriptor
+ * referring to a TTY. If this is the case, this function will  make
+ * the appropriate call to `isatty(3)' and set the internal is-line-
+ * buffered flag accordingly, before returning its state. */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc___flbf)(FILE *stream)
 /*[[[body:libc___flbf]]]*/
@@ -133,9 +146,12 @@ NOTHROW_NCX(LIBCCALL stdio_purge_file)(FILE *__restrict stream) {
 }
 
 
-/*[[[head:libc___fpurge,hash:CRC-32=0xfa2958a0]]]*/
+/*[[[head:libc___fpurge,hash:CRC-32=0x6b3a294e]]]*/
 /* >> __fpurge(3)
- * Discard all pending buffered I/O on `stream' */
+ * Discard all modified, but unwritten data from `stream', as  well
+ * as  all unread data previously buffered, but not yet read. After
+ * a call to this function, the next `fread(3)' or `fwrite(3)' will
+ * start off from a blank state. */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc___fpurge)(FILE *stream)
 /*[[[body:libc___fpurge]]]*/
@@ -151,9 +167,12 @@ NOTHROW_NCX(LIBCCALL libc___fpurge)(FILE *stream)
 }
 /*[[[end:libc___fpurge]]]*/
 
-/*[[[head:libc___fpending,hash:CRC-32=0xf5470da]]]*/
+/*[[[head:libc___fpending,hash:CRC-32=0xa357a99b]]]*/
 /* >> __fpending(3)
- * Return amount of output in bytes pending on a `stream' */
+ * Returns the number of pending, but not-yet-written bytes of modified
+ * file  data (s.a. `__fwriting(3)'). A call to `fflush(3)' can be used
+ * to write all modified data to the system, and following such a call,
+ * this function will return `0' until new unwritten data appears. */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc___fpending)(FILE __KOS_FIXED_CONST *stream)
 /*[[[body:libc___fpending]]]*/
@@ -167,9 +186,12 @@ NOTHROW_NCX(LIBCCALL libc___fpending)(FILE __KOS_FIXED_CONST *stream)
 }
 /*[[[end:libc___fpending]]]*/
 
-/*[[[head:libc__flushlbf,hash:CRC-32=0x44e31e48]]]*/
+/*[[[head:libc__flushlbf,hash:CRC-32=0x3d029d6f]]]*/
 /* >> _flushlbf(3)
- * Flush all line-buffered files */
+ * Perform  a call  `fflush(stream)' for  every open  line-buffered stdio file.
+ * Note that usually call this function isn't necessary, since the same already
+ * happens automatically when  writing a line-feed  to any line-buffered  stdio
+ * file (where line-buffered files are usually those opened on TTYs) */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") void
 (LIBCCALL libc__flushlbf)(void) THROWS(...)
 /*[[[body:libc__flushlbf]]]*/
@@ -178,10 +200,12 @@ INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") void
 }
 /*[[[end:libc__flushlbf]]]*/
 
-/*[[[head:libc___fsetlocking,hash:CRC-32=0xf9179fdf]]]*/
+/*[[[head:libc___fsetlocking,hash:CRC-32=0x2e37ddc3]]]*/
 /* >> __fsetlocking(3)
- * Set locking status of `stream' to `type'
- * @param: type: One of `FSETLOCKING_*' */
+ * Set the locking type for `stream' to `type'. This affects all stdio functions
+ * that aren't already lock-less by nature (iow: everything but `*_unlocked(3)')
+ * @param: type: One of `FSETLOCKING_*', as defined in `<stdio_ext.h>'
+ * @return: * : The locking type prior to this call (one of `FSETLOCKING_INTERNAL' or `FSETLOCKING_BYCALLER') */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc___fsetlocking)(FILE *stream,
                                          int type)
@@ -206,9 +230,11 @@ NOTHROW_NCX(LIBCCALL libc___fsetlocking)(FILE *stream,
 }
 /*[[[end:libc___fsetlocking]]]*/
 
-/*[[[head:libc___fseterr,hash:CRC-32=0xbf21e9db]]]*/
+/*[[[head:libc___fseterr,hash:CRC-32=0x5d08c6c0]]]*/
 /* >> __fseterr(3)
- * Set the error indicator for the given `stream' (s.a. `ferror()') */
+ * Set the error indicator of `stream', the same an error file error would, such
+ * that `ferror(stream) != 0', and `clearerr(stream)' must be used if one wishes
+ * to clear the error once again. */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc___fseterr)(FILE *stream)
 /*[[[body:libc___fseterr]]]*/

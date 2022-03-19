@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39456c5f */
+/* HASH CRC-32:0x6147cfde */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,11 +73,17 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,fgetln,(__FIL
 #define __fpurge_defined
 #ifdef __CRT_HAVE___fpurge
 /* >> __fpurge(3)
- * Discard all pending buffered I/O on `stream' */
+ * Discard all modified, but unwritten data from `stream', as  well
+ * as  all unread data previously buffered, but not yet read. After
+ * a call to this function, the next `fread(3)' or `fwrite(3)' will
+ * start off from a blank state. */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,fpurge,(__FILE *__stream),__fpurge,(__stream))
 #elif defined(__CRT_HAVE_fpurge)
 /* >> __fpurge(3)
- * Discard all pending buffered I/O on `stream' */
+ * Discard all modified, but unwritten data from `stream', as  well
+ * as  all unread data previously buffered, but not yet read. After
+ * a call to this function, the next `fread(3)' or `fwrite(3)' will
+ * start off from a blank state. */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,fpurge,(__FILE *__stream),(__stream))
 #else /* ... */
 #undef __fpurge_defined
