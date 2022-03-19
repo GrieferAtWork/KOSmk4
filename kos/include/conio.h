@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9111039 */
+/* HASH CRC-32:0x10578e05 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -546,13 +546,13 @@ __LIBC __ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_
 #ifdef __CRT_HAVE_clreol
 /* >> clreol(3)
  * Clear all cells from the cursor (inclusive) until the end
- * of the current line. (s.a. `AC_EL(ANSITTY_EL_AFTER)') */
+ * of the  current  line.  (s.a.  `AC_EL(ANSITTY_EL_AFTER)') */
 __CDECLARE_VOID(,__NOTHROW_NCX,clreol,(void),())
 #elif defined(__CRT_HAVE__cputs) || (defined(__CRT_HAVE__putch_nolock) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE__putch) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))
 #include <libc/local/conio/clreol.h>
 /* >> clreol(3)
  * Clear all cells from the cursor (inclusive) until the end
- * of the current line. (s.a. `AC_EL(ANSITTY_EL_AFTER)') */
+ * of the  current  line.  (s.a.  `AC_EL(ANSITTY_EL_AFTER)') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(clreol, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL clreol)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(clreol))(); })
 #endif /* ... */
 #ifdef __CRT_HAVE_clrscr
@@ -577,26 +577,26 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(gotoxy, __FORCELOCAL __ATTR_ARTIFICIAL void __NO
 #endif /* ... */
 #ifdef __CRT_HAVE_delline
 /* >> delline(3)
- * Delete the line at the current cursor position, moving the
+ * Delete the line at the current cursor position, moving  the
  * screen contents underneath up one line. (s.a. `AC_DL("1")') */
 __CDECLARE_VOID(,__NOTHROW_NCX,delline,(void),())
 #elif defined(__CRT_HAVE__cputs) || (defined(__CRT_HAVE__putch_nolock) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE__putch) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))
 #include <libc/local/conio/delline.h>
 /* >> delline(3)
- * Delete the line at the current cursor position, moving the
+ * Delete the line at the current cursor position, moving  the
  * screen contents underneath up one line. (s.a. `AC_DL("1")') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(delline, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL delline)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(delline))(); })
 #endif /* ... */
 #ifdef __CRT_HAVE_insline
 /* >> insline(3)
  * Insert a blank line at the current cursor position, moving the
- * screen contents underneath down one line. (s.a. `AC_IL("1")') */
+ * screen  contents underneath down one line. (s.a. `AC_IL("1")') */
 __CDECLARE_VOID(,__NOTHROW_NCX,insline,(void),())
 #elif defined(__CRT_HAVE__cputs) || (defined(__CRT_HAVE__putch_nolock) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE__putch) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))
 #include <libc/local/conio/insline.h>
 /* >> insline(3)
  * Insert a blank line at the current cursor position, moving the
- * screen contents underneath down one line. (s.a. `AC_IL("1")') */
+ * screen  contents underneath down one line. (s.a. `AC_IL("1")') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(insline, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL insline)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(insline))(); })
 #endif /* ... */
 #ifdef __CRT_HAVE_highvideo
@@ -845,13 +845,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(window, __FORCELOCAL __ATTR_ARTIFICIAL void __NO
 #endif /* ... */
 #ifdef __CRT_HAVE_movetext
 /* >> movetext(3)
- * Duplicate a given rectangle (1-based) of on-screen text at
+ * Duplicate a  given rectangle  (1-based)  of on-screen  text  at
  * another location. Overlapping rectangles are handled correctly. */
 __CDECLARE(,int,__NOTHROW_NCX,movetext,(int __left, int __top, int __right, int __bottom, int __destleft, int __desttop),(__left,__top,__right,__bottom,__destleft,__desttop))
 #elif defined(__KOS__) && defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_fileno) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno_unlocked)) && (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl))
 #include <libc/local/conio/movetext.h>
 /* >> movetext(3)
- * Duplicate a given rectangle (1-based) of on-screen text at
+ * Duplicate a  given rectangle  (1-based)  of on-screen  text  at
  * another location. Overlapping rectangles are handled correctly. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(movetext, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL movetext)(int __left, int __top, int __right, int __bottom, int __destleft, int __desttop) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(movetext))(__left, __top, __right, __bottom, __destleft, __desttop); })
 #endif /* ... */

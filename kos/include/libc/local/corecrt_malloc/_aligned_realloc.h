@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab0bf5c9 */
+/* HASH CRC-32:0xfb352ded */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep__aligned_free,(void *__aligned_mallptr),_aligned_free,(__aligned_mallptr))
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 __NAMESPACE_LOCAL_END
-#include <libc/local/stdlib/_aligned_free.h>
+#include <libc/local/corecrt_malloc/_aligned_free.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep__aligned_free __LIBC_LOCAL_NAME(_aligned_free)
 #else /* ... */
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep__aligned_malloc,(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment),_aligned_malloc,(__num_bytes,__min_alignment))
 #elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 __NAMESPACE_LOCAL_END
-#include <libc/local/stdlib/_aligned_malloc.h>
+#include <libc/local/corecrt_malloc/_aligned_malloc.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep__aligned_malloc __LIBC_LOCAL_NAME(_aligned_malloc)
 #else /* ... */
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__aligned_msize,(void *__aligned_mallptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),_aligned_msize,(__aligned_mallptr,__min_alignment,__offset))
 #else /* __CRT_HAVE__aligned_msize */
 __NAMESPACE_LOCAL_END
-#include <libc/local/stdlib/_aligned_msize.h>
+#include <libc/local/corecrt_malloc/_aligned_msize.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep__aligned_msize __LIBC_LOCAL_NAME(_aligned_msize)
 #endif /* !__CRT_HAVE__aligned_msize */

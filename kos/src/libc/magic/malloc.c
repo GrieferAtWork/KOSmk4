@@ -365,13 +365,13 @@ void *__NOTHROW_NCX(__LIBCCALL calloc)(size_t __num_bytes) { return (calloc)(1, 
 %#endif /* __USE_KOS */
 
 
-%#ifdef __USE_DOS
-%[insert:function(_msize = malloc_usable_size)]
-%#endif /* __USE_DOS */
-
 %{
 
 __SYSDECL_END
 #endif /* __CC__ */
+
+#ifdef __USE_DOS
+#include <corecrt_malloc.h>
+#endif /* __USE_DOS */
 
 }

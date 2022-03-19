@@ -17,50 +17,26 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%(c_prefix){
-/* (#) Portability: Windows Kits (/ucrt/corecrt_memory.h) */
-}
+/* (#) Portability: Windows Kits (/ucrt/corecrt_math_defines.h) */
+#ifndef _MATH_DEFINES_DEFINED
+#define _MATH_DEFINES_DEFINED 1
 
-%[define_replacement(fd_t = __fd_t)]
-%[define_replacement(oflag_t = __oflag_t)]
+#include "math.h"
 
-%[insert:prefix(
-#include <features.h>
-)]%[insert:prefix(
-#include <hybrid/typecore.h>
-)]%[insert:prefix(
-#include <bits/types.h>
-)]%[insert:prefix(
-#include <vcruntime_string.h>
-)]%[insert:prefix(
-#include <corecrt_memcpy_s.h>
-)]%[insert:prefix(
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-)]%{
+#ifndef M_E
+#define M_E        2.7182818284590452354  /* e */
+#define M_LOG2E    1.4426950408889634074  /* log_2 e */
+#define M_LOG10E   0.43429448190325182765 /* log_10 e */
+#define M_LN2      0.69314718055994530942 /* log_e 2 */
+#define M_LN10     2.30258509299404568402 /* log_e 10 */
+#define M_PI       3.14159265358979323846 /* pi */
+#define M_PI_2     1.57079632679489661923 /* pi/2 */
+#define M_PI_4     0.78539816339744830962 /* pi/4 */
+#define M_1_PI     0.31830988618379067154 /* 1/pi */
+#define M_2_PI     0.63661977236758134308 /* 2/pi */
+#define M_2_SQRTPI 1.12837916709551257390 /* 2/sqrt(pi) */
+#define M_SQRT2    1.41421356237309504880 /* sqrt(2) */
+#define M_SQRT1_2  0.70710678118654752440 /* 1/sqrt(2) */
+#endif /* !M_E */
 
-#ifdef __CC__
-__SYSDECL_BEGIN
-
-#ifndef __size_t_defined
-#define __size_t_defined
-typedef __size_t size_t;
-#endif /* !__size_t_defined */
-
-}
-
-%[insert:extern(memcpy)]
-%[insert:extern(memccpy)]
-%[insert:guarded_function(_memccpy = memccpy)]
-%[insert:guarded_function(_memicmp = memcasecmp)]
-%[insert:guarded_function(_memicmp_l = memcasecmp_l)]
-%[insert:guarded_function(memicmp = memcasecmp)]
-
-
-%{
-
-__SYSDECL_END
-#endif /* __CC__ */
-
-}
+#endif /* !_MATH_DEFINES_DEFINED */

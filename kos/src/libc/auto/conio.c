@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x950acd4a */
+/* HASH CRC-32:0x54852042 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -495,7 +495,7 @@ NOTHROW_NCX(VLIBCCALL libc__cscanf_s_l)(char const *format,
 }
 /* >> clreol(3)
  * Clear all cells from the cursor (inclusive) until the end
- * of the current line. (s.a. `AC_EL(ANSITTY_EL_AFTER)') */
+ * of the  current  line.  (s.a.  `AC_EL(ANSITTY_EL_AFTER)') */
 INTERN ATTR_SECTION(".text.crt.dos.conio") void
 NOTHROW_NCX(LIBCCALL libc_clreol)(void) {
 	libc__cputs("\033[K"); /* AC_EL(ANSITTY_EL_AFTER) */
@@ -514,7 +514,7 @@ NOTHROW_NCX(LIBCCALL libc_gotoxy)(int x,
 	libc__cprintf("\033[%d;%dH", y, x); /* AC_CUP(y, x) */
 }
 /* >> delline(3)
- * Delete the line at the current cursor position, moving the
+ * Delete the line at the current cursor position, moving  the
  * screen contents underneath up one line. (s.a. `AC_DL("1")') */
 INTERN ATTR_SECTION(".text.crt.dos.conio") void
 NOTHROW_NCX(LIBCCALL libc_delline)(void) {
@@ -522,7 +522,7 @@ NOTHROW_NCX(LIBCCALL libc_delline)(void) {
 }
 /* >> insline(3)
  * Insert a blank line at the current cursor position, moving the
- * screen contents underneath down one line. (s.a. `AC_IL("1")') */
+ * screen  contents underneath down one line. (s.a. `AC_IL("1")') */
 INTERN ATTR_SECTION(".text.crt.dos.conio") void
 NOTHROW_NCX(LIBCCALL libc_insline)(void) {
 	libc__cputs("\033[L"); /* AC_IL("1") */
@@ -717,7 +717,7 @@ NOTHROW_NCX(LIBCCALL libc_window)(int left,
 #include <kos/ioctl/video.h>
 #include <parts/malloca.h>
 /* >> movetext(3)
- * Duplicate a given rectangle (1-based) of on-screen text at
+ * Duplicate a  given rectangle  (1-based)  of on-screen  text  at
  * another location. Overlapping rectangles are handled correctly. */
 INTERN ATTR_SECTION(".text.crt.dos.conio") int
 NOTHROW_NCX(LIBCCALL libc_movetext)(int left,

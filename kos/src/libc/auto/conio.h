@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf29fb2a3 */
+/* HASH CRC-32:0xf6eed7f7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -238,7 +238,7 @@ INTDEF WUNUSED ATTR_LIBC_SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_
 INTDEF WUNUSED ATTR_LIBC_SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__cscanf_s_l)(char const *format, locale_t locale, ...);
 /* >> clreol(3)
  * Clear all cells from the cursor (inclusive) until the end
- * of the current line. (s.a. `AC_EL(ANSITTY_EL_AFTER)') */
+ * of the  current  line.  (s.a.  `AC_EL(ANSITTY_EL_AFTER)') */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_clreol)(void);
 /* >> clrscr(3)
  * Clear the entire screen (s.a. `AC_ED(ANSITTY_CLS_ALL)') */
@@ -254,12 +254,12 @@ INTDEF void NOTHROW_NCX(LIBDCALL libd_gotoxy)(int x, int y);
  * Set the cursor {x,y} position (s.a. `AC_CUP(y, x)') */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_gotoxy)(int x, int y);
 /* >> delline(3)
- * Delete the line at the current cursor position, moving the
+ * Delete the line at the current cursor position, moving  the
  * screen contents underneath up one line. (s.a. `AC_DL("1")') */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_delline)(void);
 /* >> insline(3)
  * Insert a blank line at the current cursor position, moving the
- * screen contents underneath down one line. (s.a. `AC_IL("1")') */
+ * screen  contents underneath down one line. (s.a. `AC_IL("1")') */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_insline)(void);
 /* >> highvideo(3)
  * Brighten text foreground color (s.a. `AC_FGBRIGHT') */
@@ -353,13 +353,13 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc_window)(int left, int top, int right, int 
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> movetext(3)
- * Duplicate a given rectangle (1-based) of on-screen text at
+ * Duplicate a  given rectangle  (1-based)  of on-screen  text  at
  * another location. Overlapping rectangles are handled correctly. */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_movetext)(int left, int top, int right, int bottom, int destleft, int desttop);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> movetext(3)
- * Duplicate a given rectangle (1-based) of on-screen text at
+ * Duplicate a  given rectangle  (1-based)  of on-screen  text  at
  * another location. Overlapping rectangles are handled correctly. */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_movetext)(int left, int top, int right, int bottom, int destleft, int desttop);
 #endif /* !__KERNEL__ */

@@ -5089,131 +5089,6 @@ errno_t wcstombs_s([[nonnull]] $size_t *presult,
 
 
 %
-%/* DOS malloc extensions */
-
-%[insert:function(_recalloc = recallocv)]
-
-[[section(".text.crt.dos.heap")]]
-[[requires_function(malloc)]]
-_aligned_malloc:($size_t num_bytes, $size_t min_alignment)
-	-> [[memalign(min_alignment, num_bytes)]] void *
-{
-	void *result = malloc(num_bytes + 2 * sizeof(void *) + min_alignment - 1);
-	if (result) {
-		void *base = (void *)(((uintptr_t)result + (min_alignment - 1)) & ~(min_alignment - 1));
-		((void **)base)[-1] = result;
-		((void **)base)[-2] = (void *)num_bytes;
-		result = base;
-	}
-	return result;
-}
-
-[[section(".text.crt.dos.heap")]]
-[[requires_function(malloc)]]
-_aligned_offset_malloc:($size_t num_bytes, $size_t min_alignment, $size_t offset)
-	-> [[malloc_unaligned(num_bytes)]] void *
-{
-	void *result;
-	offset &= (min_alignment - 1);
-	result = malloc(num_bytes + 2 * sizeof(void *) + min_alignment - 1 + (min_alignment - offset));
-	if (result) {
-		void *base = (void *)((((uintptr_t)result + (min_alignment - 1)) & ~(min_alignment - 1)) + offset);
-		((void **)base)[-1] = result;
-		((void **)base)[-2] = (void *)num_bytes;
-		result = base;
-	}
-	return result;
-}
-
-[[section(".text.crt.dos.heap")]]
-[[requires_function(_aligned_malloc, _aligned_free, _aligned_msize)]]
-_aligned_realloc:(void *aligned_mallptr, $size_t newsize, $size_t min_alignment)
-	-> [[realign(aligned_mallptr, min_alignment, newsize)]] void *
-{
-	void *result;
-	result = _aligned_malloc(newsize, min_alignment);
-	if (result && aligned_mallptr) {
-		$size_t temp = _aligned_msize(aligned_mallptr, min_alignment, 0);
-		if (temp > newsize)
-			temp = newsize;
-		memcpy(result, aligned_mallptr, temp);
-		_aligned_free(aligned_mallptr);
-	}
-	return result;
-}
-
-[[section(".text.crt.dos.heap")]]
-[[requires_function(_aligned_malloc, _aligned_free, _aligned_msize)]]
-_aligned_recalloc:(void *aligned_mallptr, $size_t count, $size_t num_bytes, $size_t min_alignment)
-	-> [[realign(aligned_mallptr, min_alignment, count * num_bytes)]] void *
-{
-	void *result;
-	num_bytes *= count;
-	result = _aligned_malloc(num_bytes, min_alignment);
-	if (result) {
-		$size_t temp = _aligned_msize(aligned_mallptr, min_alignment, 0);
-		if (temp > num_bytes)
-			temp = num_bytes;
-		memcpy(result, aligned_mallptr, temp);
-		bzero((byte_t *)result + temp, num_bytes - temp);
-		_aligned_free(aligned_mallptr);
-	}
-	return result;
-}
-
-[[section(".text.crt.dos.heap")]]
-[[requires_function(_aligned_offset_malloc, _aligned_free, _aligned_msize)]]
-_aligned_offset_realloc:(void *aligned_mallptr, $size_t newsize, $size_t min_alignment, $size_t offset)
-	-> [[realloc_unaligned(aligned_mallptr, newsize)]] void *
-{
-	void *result;
-	result = _aligned_offset_malloc(newsize, min_alignment, offset);
-	if (result) {
-		$size_t temp = _aligned_msize(aligned_mallptr, min_alignment, offset);
-		if (temp > newsize)
-			temp = newsize;
-		memcpy(result, aligned_mallptr, temp);
-		_aligned_free(aligned_mallptr);
-	}
-	return result;
-}
-
-[[section(".text.crt.dos.heap")]]
-[[requires_function(_aligned_offset_malloc, _aligned_free, _aligned_msize)]]
-_aligned_offset_recalloc:(void *aligned_mallptr, $size_t count, $size_t num_bytes, $size_t min_alignment, $size_t offset)
-	-> [[realloc_unaligned(aligned_mallptr, count * num_bytes)]] void *
-{
-	void *result;
-	num_bytes *= count;
-	result = _aligned_offset_malloc(num_bytes, min_alignment, offset);
-	if (result) {
-		$size_t temp = _aligned_msize(aligned_mallptr, min_alignment, offset);
-		if (temp > num_bytes)
-			temp = num_bytes;
-		memcpy(result, aligned_mallptr, temp);
-		bzero((byte_t *)result + temp, num_bytes - temp);
-		_aligned_free(aligned_mallptr);
-	}
-	return result;
-}
-
-[[pure, wunused, section(".text.crt.dos.heap")]]
-$size_t _aligned_msize(void *aligned_mallptr, $size_t min_alignment, $size_t offset) {
-	(void)min_alignment;
-	(void)offset;
-	if (!aligned_mallptr)
-		return 0;
-	return ($size_t)(uintptr_t)((void **)aligned_mallptr)[-2];
-}
-
-[[section(".text.crt.dos.heap")]]
-[[requires_function(free)]]
-void _aligned_free(void *aligned_mallptr) {
-	if (aligned_mallptr)
-		free(((void **)aligned_mallptr)[-1]);
-}
-
-%
 %#define _CVTBUFSIZE   349
 @@>> _fullpath(3)
 @@s.a. `realpath(3)', `frealpathat(3)'
@@ -5812,6 +5687,8 @@ errno_t _get_wenviron([[nonnull]] wchar_t ***p_wenviron) {
 __SYSDECL_END
 
 #ifdef __USE_DOS
+#include <corecrt_malloc.h>
+#include <corecrt_search.h>
 #include <corecrt_wstdlib.h>
 #endif /* __USE_DOS */
 

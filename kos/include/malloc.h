@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31edeaba */
+/* HASH CRC-32:0x8d46f403 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -433,15 +433,12 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR
 #endif /* !__MALLOC_OVERLOADS_DEFINED */
 #endif /* __USE_STRING_OVERLOADS */
 #endif /* __USE_KOS */
-#ifdef __USE_DOS
-#ifdef __CRT_HAVE_malloc_usable_size
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,size_t,__NOTHROW_NCX,_msize,(void *__restrict __mallptr),malloc_usable_size,(__mallptr))
-#elif defined(__CRT_HAVE__msize)
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,size_t,__NOTHROW_NCX,_msize,(void *__restrict __mallptr),(__mallptr))
-#endif /* ... */
-#endif /* __USE_DOS */
 
 __SYSDECL_END
 #endif /* __CC__ */
+
+#ifdef __USE_DOS
+#include <corecrt_malloc.h>
+#endif /* __USE_DOS */
 
 #endif /* !_MALLOC_H */

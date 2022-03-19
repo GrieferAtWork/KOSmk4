@@ -1571,7 +1571,7 @@ set_value_as_argc_minus_one:
 		 *
 		 * TODO: "${!prefix*}", "${!prefix@}"
 		 *       Same * vs. @ expansion rules as ${#*} and ${#@},
-		 *       but expands uses the list of environ variables
+		 *       but  expands uses the  list of environ variables
 		 *       names that start with the given `prefix'. */
 
 	case '*':
@@ -1742,18 +1742,18 @@ again_switch_curlied_action:
 				 *   ${VARNAME::[LENGTH]}             -- START_INDEX="0"
 				 * Impl:
 				 *   startIndex = START_INDEX;
-				 *   if (startIndex < 0) {
+				 *   if  (startIndex  <  0)  {
 				 *       startIndex = 0;
 				 *       endIndex   = {value_len};
 				 *   } else {
-				 *       endIndex = LENGTH;
+				 *       endIndex =  LENGTH;
 				 *       if (endIndex < 0) {
 				 *           if ((startIndex + (-endIndex)) > {value_len})
 				 *               ERROR;
 				 *           endIndex += {value_len};
-				 *           assert(endIndex >= 0);
+				 *           assert(endIndex  >=  0);
 				 *       } else {
-				 *           endIndex += startIndex;
+				 *           endIndex   +=   startIndex;
 				 *           if (endIndex > {value_len})
 				 *               endIndex = {value_len};
 				 *       }

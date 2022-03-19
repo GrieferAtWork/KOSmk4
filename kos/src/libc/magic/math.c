@@ -806,7 +806,7 @@ double logb(double x) {
 
 [[std, crtbuiltin, export_alias("__expm1f")]] expm1f(*) %{generate(double2float("expm1"))}
 [[std, crtbuiltin, export_alias("__log1pf")]] log1pf(*) %{generate(double2float("log1p"))}
-[[std, crtbuiltin, export_alias("__logbf"), alias("_logbf")]] 
+[[std, crtbuiltin, export_alias("__logbf"), alias("_logbf")]]
 /* For some reason, only exported on x86_64 (s.a. <crt-features/crt-dos.h>) */
 [[if(defined(__x86_64__)), dos_only_export_as("_logbf")]]
 logbf(*) %{generate(double2float("logb"))}

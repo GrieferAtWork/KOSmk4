@@ -410,7 +410,7 @@ __STDC_INT_AS_SSIZE_T _vcscanf_s([[nonnull, format]] char const *format, $va_lis
 
 @@>> clreol(3)
 @@Clear all cells from the cursor (inclusive) until the end
-@@of the current line. (s.a. `AC_EL(ANSITTY_EL_AFTER)')
+@@of the  current  line.  (s.a.  `AC_EL(ANSITTY_EL_AFTER)')
 [[requires_function(_cputs)]]
 void clreol(void) {
 	_cputs("\033[K"); /* AC_EL(ANSITTY_EL_AFTER) */
@@ -431,7 +431,7 @@ void gotoxy(int x, int y) {
 }
 
 @@>> delline(3)
-@@Delete the line at the current cursor position, moving the
+@@Delete the line at the current cursor position, moving  the
 @@screen contents underneath up one line. (s.a. `AC_DL("1")')
 [[requires_function(_cputs)]]
 void delline(void) {
@@ -440,7 +440,7 @@ void delline(void) {
 
 @@>> insline(3)
 @@Insert a blank line at the current cursor position, moving the
-@@screen contents underneath down one line. (s.a. `AC_IL("1")')
+@@screen  contents underneath down one line. (s.a. `AC_IL("1")')
 [[requires_function(_cputs)]]
 void insline(void) {
 	_cputs("\033[L"); /* AC_IL("1") */
@@ -685,7 +685,7 @@ void window(int left, int top, int right, int bottom) {
 }
 
 @@>> movetext(3)
-@@Duplicate a given rectangle (1-based) of on-screen text at
+@@Duplicate a  given rectangle  (1-based)  of on-screen  text  at
 @@another location. Overlapping rectangles are handled correctly.
 [[requires(defined(__KOS__) && defined(__CRT_HAVE_stdtty) && $has_function(fileno, ioctl))]]
 [[impl_include("<bits/types.h>", "<libc/template/stdtty.h>", "<kos/ioctl/video.h>", "<parts/malloca.h>")]]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x497383e9 */
+/* HASH CRC-32:0x98eb3df9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep__aligned_free,(void *__aligned_mallptr),_aligned_free,(__aligned_mallptr))
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 __NAMESPACE_LOCAL_END
-#include <libc/local/stdlib/_aligned_free.h>
+#include <libc/local/corecrt_malloc/_aligned_free.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep__aligned_free __LIBC_LOCAL_NAME(_aligned_free)
 #else /* ... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5783f4cf */
+/* HASH CRC-32:0xd1c2272c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,12 +33,18 @@
 #include <hybrid/typecore.h>
 #include <bits/types.h>
 #include <vcruntime_string.h>
+#include <corecrt_memcpy_s.h>
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>
 #endif /* __LIBC_BIND_OPTIMIZATIONS */
 
 #ifdef __CC__
 __SYSDECL_BEGIN
+
+#ifndef __size_t_defined
+#define __size_t_defined
+typedef __size_t size_t;
+#endif /* !__size_t_defined */
 
 #ifndef __memcpy_defined
 #define __memcpy_defined
@@ -70,24 +76,6 @@ __CDECLARE_GCCNCX(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__
 __NAMESPACE_LOCAL_USING_OR_IMPL(memcpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memcpy)(void *__restrict __dst, void const *__restrict __src, size_t __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpy))(__dst, __src, __n_bytes); })
 #endif /* !... */
 #endif /* !__memcpy_defined */
-#ifndef __memcpy_s_defined
-#define __memcpy_s_defined
-#ifdef __CRT_HAVE_memcpy_s
-__CDECLARE(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,memcpy_s,(void *__dst, rsize_t __dstlength, void const *__src, rsize_t __srclength),(__dst,__dstlength,__src,__srclength))
-#else /* __CRT_HAVE_memcpy_s */
-#include <libc/local/string/memcpy_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(memcpy_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) __errno_t __NOTHROW_NCX(__LIBCCALL memcpy_s)(void *__dst, rsize_t __dstlength, void const *__src, rsize_t __srclength) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpy_s))(__dst, __dstlength, __src, __srclength); })
-#endif /* !__CRT_HAVE_memcpy_s */
-#endif /* !__memcpy_s_defined */
-#ifndef __memmove_s_defined
-#define __memmove_s_defined
-#ifdef __CRT_HAVE_memmove_s
-__CDECLARE(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,memmove_s,(void *__dst, rsize_t __dstlength, void const *__src, rsize_t __srclength),(__dst,__dstlength,__src,__srclength))
-#else /* __CRT_HAVE_memmove_s */
-#include <libc/local/string/memmove_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(memmove_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) __errno_t __NOTHROW_NCX(__LIBCCALL memmove_s)(void *__dst, rsize_t __dstlength, void const *__src, rsize_t __srclength) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmove_s))(__dst, __dstlength, __src, __srclength); })
-#endif /* !__CRT_HAVE_memmove_s */
-#endif /* !__memmove_s_defined */
 #ifndef __memccpy_defined
 #define __memccpy_defined
 #ifdef __CRT_HAVE_memccpy

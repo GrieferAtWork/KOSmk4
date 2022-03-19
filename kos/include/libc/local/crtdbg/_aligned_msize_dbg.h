@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0522f91 */
+/* HASH CRC-32:0x4b75c243 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__aligned_msize,(void *__aligned_mallptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),_aligned_msize,(__aligned_mallptr,__min_alignment,__offset))
 #else /* __CRT_HAVE__aligned_msize */
 __NAMESPACE_LOCAL_END
-#include <libc/local/stdlib/_aligned_msize.h>
+#include <libc/local/corecrt_malloc/_aligned_msize.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep__aligned_msize __LIBC_LOCAL_NAME(_aligned_msize)
 #endif /* !__CRT_HAVE__aligned_msize */

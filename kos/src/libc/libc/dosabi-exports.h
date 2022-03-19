@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf0cd1ff */
+/* HASH CRC-32:0x79a9bc5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -234,6 +234,16 @@ DEFINE_PUBLIC_ALIAS(DOS$cputsxy, libd_cputsxy);
 DEFINE_PUBLIC_ALIAS(DOS$putchxy, libd_putchxy);
 DEFINE_PUBLIC_ALIAS(DOS$window, libd_window);
 DEFINE_PUBLIC_ALIAS(DOS$movetext, libd_movetext);
+
+/* corecrt_malloc */
+DEFINE_PUBLIC_ALIAS(DOS$_aligned_malloc, libd__aligned_malloc);
+DEFINE_PUBLIC_ALIAS(DOS$_aligned_offset_malloc, libd__aligned_offset_malloc);
+DEFINE_PUBLIC_ALIAS(DOS$_aligned_realloc, libd__aligned_realloc);
+DEFINE_PUBLIC_ALIAS(DOS$_aligned_recalloc, libd__aligned_recalloc);
+DEFINE_PUBLIC_ALIAS(DOS$_aligned_offset_realloc, libd__aligned_offset_realloc);
+DEFINE_PUBLIC_ALIAS(DOS$_aligned_offset_recalloc, libd__aligned_offset_recalloc);
+DEFINE_PUBLIC_ALIAS(DOS$_aligned_msize, libd__aligned_msize);
+DEFINE_PUBLIC_ALIAS(DOS$_aligned_free, libd__aligned_free);
 
 /* crypt */
 DEFINE_PUBLIC_ALIAS(DOS$setkey, libd_setkey);
@@ -2407,14 +2417,6 @@ DEFINE_PUBLIC_ALIAS(DOS$_mbstrnlen, libd__mbstrnlen);
 DEFINE_PUBLIC_ALIAS(DOS$_mbstrlen_l, libd__mbstrlen_l);
 DEFINE_PUBLIC_ALIAS(DOS$_mbstrnlen_l, libd__mbstrnlen_l);
 DEFINE_PUBLIC_ALIAS(DOS$_mblen_l, libd__mblen_l);
-DEFINE_PUBLIC_ALIAS(DOS$_aligned_malloc, libd__aligned_malloc);
-DEFINE_PUBLIC_ALIAS(DOS$_aligned_offset_malloc, libd__aligned_offset_malloc);
-DEFINE_PUBLIC_ALIAS(DOS$_aligned_realloc, libd__aligned_realloc);
-DEFINE_PUBLIC_ALIAS(DOS$_aligned_recalloc, libd__aligned_recalloc);
-DEFINE_PUBLIC_ALIAS(DOS$_aligned_offset_realloc, libd__aligned_offset_realloc);
-DEFINE_PUBLIC_ALIAS(DOS$_aligned_offset_recalloc, libd__aligned_offset_recalloc);
-DEFINE_PUBLIC_ALIAS(DOS$_aligned_msize, libd__aligned_msize);
-DEFINE_PUBLIC_ALIAS(DOS$_aligned_free, libd__aligned_free);
 DEFINE_PUBLIC_ALIAS(DOS$_atoflt, libd__atoflt);
 DEFINE_PUBLIC_ALIAS(DOS$_atoflt_l, libd__atoflt_l);
 DEFINE_PUBLIC_ALIAS(DOS$_atodbl, libd__atodbl);

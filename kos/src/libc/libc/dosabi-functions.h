@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50245322 */
+/* HASH CRC-32:0x2564e0c1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -254,6 +254,16 @@ DFUN(".text.crt.dos.conio", libd_cputsxy, libc_cputsxy, TV, 3, TD, TD, TP)
 DFUN(".text.crt.dos.conio", libd_putchxy, libc_putchxy, TV, 3, TD, TD, THH)
 DFUN(".text.crt.dos.conio", libd_window, libc_window, TV, 4, TD, TD, TD, TD)
 DFUN(".text.crt.dos.conio", libd_movetext, libc_movetext, TD, 6, TD, TD, TD, TD, TD, TD)
+
+/* corecrt_malloc */
+DFUN(".text.crt.dos.heap", libd__aligned_malloc, libc__aligned_malloc, TP, 2, TI, TI)
+DFUN(".text.crt.dos.heap", libd__aligned_offset_malloc, libc__aligned_offset_malloc, TP, 3, TI, TI, TI)
+DFUN(".text.crt.dos.heap", libd__aligned_realloc, libc__aligned_realloc, TP, 3, TP, TI, TI)
+DFUN(".text.crt.dos.heap", libd__aligned_recalloc, libc__aligned_recalloc, TP, 4, TP, TI, TI, TI)
+DFUN(".text.crt.dos.heap", libd__aligned_offset_realloc, libc__aligned_offset_realloc, TP, 4, TP, TI, TI, TI)
+DFUN(".text.crt.dos.heap", libd__aligned_offset_recalloc, libc__aligned_offset_recalloc, TP, 5, TP, TI, TI, TI, TI)
+DFUN(".text.crt.dos.heap", libd__aligned_msize, libc__aligned_msize, TI, 3, TP, TI, TI)
+DFUN(".text.crt.dos.heap", libd__aligned_free, libc__aligned_free, TV, 1, TP)
 
 /* crypt */
 DFUN(".text.crt.dos.string.encrypt", libd_setkey, libc_setkey, TV, 1, TP)
@@ -1916,14 +1926,6 @@ DFUN(".text.crt.dos.wchar.unicode.static.mbs", libd__mbstrnlen, libc__mbstrnlen,
 DFUN(".text.crt.dos.wchar.unicode.static.mbs", libd__mbstrlen_l, libc__mbstrlen_l, TI, 2, TP, TP)
 DFUN(".text.crt.dos.wchar.unicode.static.mbs", libd__mbstrnlen_l, libc__mbstrnlen_l, TI, 3, TP, TI, TP)
 DFUN(".text.crt.dos.wchar.unicode.static.mbs", libd__mblen_l, libc__mblen_l, TD, 3, TP, TI, TP)
-DFUN(".text.crt.dos.heap", libd__aligned_malloc, libc__aligned_malloc, TP, 2, TI, TI)
-DFUN(".text.crt.dos.heap", libd__aligned_offset_malloc, libc__aligned_offset_malloc, TP, 3, TI, TI, TI)
-DFUN(".text.crt.dos.heap", libd__aligned_realloc, libc__aligned_realloc, TP, 3, TP, TI, TI)
-DFUN(".text.crt.dos.heap", libd__aligned_recalloc, libc__aligned_recalloc, TP, 4, TP, TI, TI, TI)
-DFUN(".text.crt.dos.heap", libd__aligned_offset_realloc, libc__aligned_offset_realloc, TP, 4, TP, TI, TI, TI)
-DFUN(".text.crt.dos.heap", libd__aligned_offset_recalloc, libc__aligned_offset_recalloc, TP, 5, TP, TI, TI, TI, TI)
-DFUN(".text.crt.dos.heap", libd__aligned_msize, libc__aligned_msize, TI, 3, TP, TI, TI)
-DFUN(".text.crt.dos.heap", libd__aligned_free, libc__aligned_free, TV, 1, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd__atoflt, libc__atoflt, TD, 2, TP, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd__atoflt_l, libc__atoflt_l, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd__atodbl, libc__atodbl, TD, 2, TP, TP)

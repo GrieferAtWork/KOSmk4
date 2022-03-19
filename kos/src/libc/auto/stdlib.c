@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3688fbb5 */
+/* HASH CRC-32:0x5757e992 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3686,116 +3686,6 @@ NOTHROW_NCX(LIBKCALL libc_wcstombs_s)(size_t *presult,
 	/* TODO: if (buflen < *presult) return ERANGE; */
 	return EOK;
 }
-INTERN ATTR_SECTION(".text.crt.dos.heap") ATTR_MALLOC WUNUSED ATTR_ALLOC_ALIGN(2) ATTR_ALLOC_SIZE((1)) void *
-NOTHROW_NCX(LIBCCALL libc__aligned_malloc)(size_t num_bytes,
-                                           size_t min_alignment) {
-	void *result = libc_malloc(num_bytes + 2 * sizeof(void *) + min_alignment - 1);
-	if (result) {
-		void *base = (void *)(((uintptr_t)result + (min_alignment - 1)) & ~(min_alignment - 1));
-		((void **)base)[-1] = result;
-		((void **)base)[-2] = (void *)num_bytes;
-		result = base;
-	}
-	return result;
-}
-INTERN ATTR_SECTION(".text.crt.dos.heap") ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1)) void *
-NOTHROW_NCX(LIBCCALL libc__aligned_offset_malloc)(size_t num_bytes,
-                                                  size_t min_alignment,
-                                                  size_t offset) {
-	void *result;
-	offset &= (min_alignment - 1);
-	result = libc_malloc(num_bytes + 2 * sizeof(void *) + min_alignment - 1 + (min_alignment - offset));
-	if (result) {
-		void *base = (void *)((((uintptr_t)result + (min_alignment - 1)) & ~(min_alignment - 1)) + offset);
-		((void **)base)[-1] = result;
-		((void **)base)[-2] = (void *)num_bytes;
-		result = base;
-	}
-	return result;
-}
-INTERN ATTR_SECTION(".text.crt.dos.heap") WUNUSED ATTR_ALLOC_ALIGN(3) ATTR_ALLOC_SIZE((2)) void *
-NOTHROW_NCX(LIBCCALL libc__aligned_realloc)(void *aligned_mallptr,
-                                            size_t newsize,
-                                            size_t min_alignment) {
-	void *result;
-	result = libc__aligned_malloc(newsize, min_alignment);
-	if (result && aligned_mallptr) {
-		size_t temp = libc__aligned_msize(aligned_mallptr, min_alignment, 0);
-		if (temp > newsize)
-			temp = newsize;
-		libc_memcpy(result, aligned_mallptr, temp);
-		libc__aligned_free(aligned_mallptr);
-	}
-	return result;
-}
-INTERN ATTR_SECTION(".text.crt.dos.heap") WUNUSED ATTR_ALLOC_ALIGN(4) ATTR_ALLOC_SIZE((2, 3)) void *
-NOTHROW_NCX(LIBCCALL libc__aligned_recalloc)(void *aligned_mallptr,
-                                             size_t count,
-                                             size_t num_bytes,
-                                             size_t min_alignment) {
-	void *result;
-	num_bytes *= count;
-	result = libc__aligned_malloc(num_bytes, min_alignment);
-	if (result) {
-		size_t temp = libc__aligned_msize(aligned_mallptr, min_alignment, 0);
-		if (temp > num_bytes)
-			temp = num_bytes;
-		libc_memcpy(result, aligned_mallptr, temp);
-		libc_bzero((byte_t *)result + temp, num_bytes - temp);
-		libc__aligned_free(aligned_mallptr);
-	}
-	return result;
-}
-INTERN ATTR_SECTION(".text.crt.dos.heap") WUNUSED ATTR_ALLOC_SIZE((2)) void *
-NOTHROW_NCX(LIBCCALL libc__aligned_offset_realloc)(void *aligned_mallptr,
-                                                   size_t newsize,
-                                                   size_t min_alignment,
-                                                   size_t offset) {
-	void *result;
-	result = libc__aligned_offset_malloc(newsize, min_alignment, offset);
-	if (result) {
-		size_t temp = libc__aligned_msize(aligned_mallptr, min_alignment, offset);
-		if (temp > newsize)
-			temp = newsize;
-		libc_memcpy(result, aligned_mallptr, temp);
-		libc__aligned_free(aligned_mallptr);
-	}
-	return result;
-}
-INTERN ATTR_SECTION(".text.crt.dos.heap") WUNUSED ATTR_ALLOC_SIZE((2, 3)) void *
-NOTHROW_NCX(LIBCCALL libc__aligned_offset_recalloc)(void *aligned_mallptr,
-                                                    size_t count,
-                                                    size_t num_bytes,
-                                                    size_t min_alignment,
-                                                    size_t offset) {
-	void *result;
-	num_bytes *= count;
-	result = libc__aligned_offset_malloc(num_bytes, min_alignment, offset);
-	if (result) {
-		size_t temp = libc__aligned_msize(aligned_mallptr, min_alignment, offset);
-		if (temp > num_bytes)
-			temp = num_bytes;
-		libc_memcpy(result, aligned_mallptr, temp);
-		libc_bzero((byte_t *)result + temp, num_bytes - temp);
-		libc__aligned_free(aligned_mallptr);
-	}
-	return result;
-}
-INTERN ATTR_SECTION(".text.crt.dos.heap") ATTR_PURE WUNUSED size_t
-NOTHROW_NCX(LIBCCALL libc__aligned_msize)(void *aligned_mallptr,
-                                          size_t min_alignment,
-                                          size_t offset) {
-	(void)min_alignment;
-	(void)offset;
-	if (!aligned_mallptr)
-		return 0;
-	return (size_t)(uintptr_t)((void **)aligned_mallptr)[-2];
-}
-INTERN ATTR_SECTION(".text.crt.dos.heap") void
-NOTHROW_NCX(LIBCCALL libc__aligned_free)(void *aligned_mallptr) {
-	if (aligned_mallptr)
-		libc_free(((void **)aligned_mallptr)[-1]);
-}
 #include <asm/os/fcntl.h>
 /* >> _fullpath(3)
  * s.a. `realpath(3)', `frealpathat(3)' */
@@ -4610,14 +4500,6 @@ DEFINE_PUBLIC_ALIAS(DOS$_wcstombs_l, libd__wcstombs_l);
 DEFINE_PUBLIC_ALIAS(_wcstombs_l, libc__wcstombs_l);
 DEFINE_PUBLIC_ALIAS(DOS$wcstombs_s, libd_wcstombs_s);
 DEFINE_PUBLIC_ALIAS(wcstombs_s, libc_wcstombs_s);
-DEFINE_PUBLIC_ALIAS(_aligned_malloc, libc__aligned_malloc);
-DEFINE_PUBLIC_ALIAS(_aligned_offset_malloc, libc__aligned_offset_malloc);
-DEFINE_PUBLIC_ALIAS(_aligned_realloc, libc__aligned_realloc);
-DEFINE_PUBLIC_ALIAS(_aligned_recalloc, libc__aligned_recalloc);
-DEFINE_PUBLIC_ALIAS(_aligned_offset_realloc, libc__aligned_offset_realloc);
-DEFINE_PUBLIC_ALIAS(_aligned_offset_recalloc, libc__aligned_offset_recalloc);
-DEFINE_PUBLIC_ALIAS(_aligned_msize, libc__aligned_msize);
-DEFINE_PUBLIC_ALIAS(_aligned_free, libc__aligned_free);
 DEFINE_PUBLIC_ALIAS(DOS$_fullpath, libd__fullpath);
 DEFINE_PUBLIC_ALIAS(_fullpath, libc__fullpath);
 DEFINE_PUBLIC_ALIAS(DOS$_ecvt_s, libd__ecvt_s);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb650e44f */
+/* HASH CRC-32:0xb152dde9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/crtdbg.h"
+#include "corecrt_malloc.h"
 #include "../user/direct.h"
 #include "../user/malloc.h"
 #include "../user/parts.wchar.unistd.h"
