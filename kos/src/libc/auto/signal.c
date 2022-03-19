@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a4e1f91 */
+/* HASH CRC-32:0x3e1d170c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1001,7 +1001,7 @@ NOTHROW_NCX(LIBCCALL libc_signalnext)(signo_t signo) {
  * Wrapper around  `sigabbrev_np(3)', that  also adds  additional
  * handling for `SIGRTMIN...`SIGRTMAX' signals, which are encoded
  * in a way that is compatible with `str2sig(3)'. */
-INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.solaris") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_sig2str)(signo_t signo,
                                    char buf[32]) {
 	char const *name = libc_sigabbrev_np(signo);
@@ -1025,7 +1025,7 @@ NOTHROW_NCX(LIBCCALL libc_sig2str)(signo_t signo,
  *  - Doesn't automatically remove any "SIG" prefix.
  * @return: 0 : Success; `*p_signo' was filled
  * @return: -1: Unrecognized `name' (`errno(3)' was _NOT_ modified) */
-INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.solaris") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_str2sig)(const char *name,
                                    signo_t *p_signo) {
 	signo_t result;

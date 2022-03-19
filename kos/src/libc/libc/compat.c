@@ -52,6 +52,7 @@
 #include <paths.h>
 #include <pthread.h>
 #include <pthread_np.h>
+#include <siginfo.h>
 #include <signal.h>
 #include <stdlib.h> /* exit() */
 #include <string.h>
@@ -2053,6 +2054,150 @@ libd__outpd(uint16_t port, uint32_t value) {
 }
 
 #endif /* !__x86_64__ && __i386__ */
+
+
+
+/************************************************************************/
+/* OpenSolaris's string arrays from <siginfo.h>                         */
+/************************************************************************/
+#define N_SYS_ILLLIST 8
+STATIC_ASSERT(ILL_ILLOPC < (N_SYS_ILLLIST + 1));
+STATIC_ASSERT(ILL_ILLOPN < (N_SYS_ILLLIST + 1));
+STATIC_ASSERT(ILL_ILLADR < (N_SYS_ILLLIST + 1));
+STATIC_ASSERT(ILL_ILLTRP < (N_SYS_ILLLIST + 1));
+STATIC_ASSERT(ILL_PRVOPC < (N_SYS_ILLLIST + 1));
+STATIC_ASSERT(ILL_PRVREG < (N_SYS_ILLLIST + 1));
+STATIC_ASSERT(ILL_COPROC < (N_SYS_ILLLIST + 1));
+STATIC_ASSERT(ILL_BADSTK < (N_SYS_ILLLIST + 1));
+
+#define N_SYS_FPELIST 8
+STATIC_ASSERT(FPE_INTDIV < (N_SYS_FPELIST + 1));
+STATIC_ASSERT(FPE_INTOVF < (N_SYS_FPELIST + 1));
+STATIC_ASSERT(FPE_FLTDIV < (N_SYS_FPELIST + 1));
+STATIC_ASSERT(FPE_FLTOVF < (N_SYS_FPELIST + 1));
+STATIC_ASSERT(FPE_FLTUND < (N_SYS_FPELIST + 1));
+STATIC_ASSERT(FPE_FLTRES < (N_SYS_FPELIST + 1));
+STATIC_ASSERT(FPE_FLTINV < (N_SYS_FPELIST + 1));
+STATIC_ASSERT(FPE_FLTSUB < (N_SYS_FPELIST + 1));
+
+#define N_SYS_SEGVLIST 2
+STATIC_ASSERT(SEGV_MAPERR < (N_SYS_SEGVLIST + 1));
+STATIC_ASSERT(SEGV_ACCERR < (N_SYS_SEGVLIST + 1));
+
+#define N_SYS_BUSLIST 5
+STATIC_ASSERT(BUS_ADRALN < (N_SYS_BUSLIST + 1));
+STATIC_ASSERT(BUS_ADRERR < (N_SYS_BUSLIST + 1));
+STATIC_ASSERT(BUS_OBJERR < (N_SYS_BUSLIST + 1));
+STATIC_ASSERT(BUS_MCEERR_AR < (N_SYS_BUSLIST + 1));
+STATIC_ASSERT(BUS_MCEERR_AO < (N_SYS_BUSLIST + 1));
+
+#define N_SYS_TRAPLIST 2
+STATIC_ASSERT(TRAP_BRKPT < (N_SYS_TRAPLIST + 1));
+STATIC_ASSERT(TRAP_TRACE < (N_SYS_TRAPLIST + 1));
+
+#define N_SYS_CLDLIST 6
+STATIC_ASSERT(CLD_EXITED < (N_SYS_CLDLIST + 1));
+STATIC_ASSERT(CLD_KILLED < (N_SYS_CLDLIST + 1));
+STATIC_ASSERT(CLD_DUMPED < (N_SYS_CLDLIST + 1));
+STATIC_ASSERT(CLD_TRAPPED < (N_SYS_CLDLIST + 1));
+STATIC_ASSERT(CLD_STOPPED < (N_SYS_CLDLIST + 1));
+STATIC_ASSERT(CLD_CONTINUED < (N_SYS_CLDLIST + 1));
+
+#define N_SYS_POLLLIST 6
+STATIC_ASSERT(POLL_IN < (N_SYS_POLLLIST + 1));
+STATIC_ASSERT(POLL_OUT < (N_SYS_POLLLIST + 1));
+STATIC_ASSERT(POLL_MSG < (N_SYS_POLLLIST + 1));
+STATIC_ASSERT(POLL_ERR < (N_SYS_POLLLIST + 1));
+STATIC_ASSERT(POLL_PRI < (N_SYS_POLLLIST + 1));
+STATIC_ASSERT(POLL_HUP < (N_SYS_POLLLIST + 1));
+
+PRIVATE ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL NONNULL((1)) char const **LIBCCALL
+libc_siginfolist_init(char const **list, unsigned int count, signo_t signo) {
+	if (!list[count - 1]) {
+		unsigned int i;
+		for (i = 0; i < count; ++i) {
+			char const *str = strsigcode_s(signo, i + 1);
+			COMPILER_WRITE_BARRIER();
+			list[i] = str;
+			COMPILER_WRITE_BARRIER();
+		}
+	}
+	return list;
+}
+
+#define DEFINE_LIBC_SIGINFO_LIST(name, N, signo)                                         \
+	PRIVATE ATTR_SECTION(".bss.crt.solaris") char const *libc_##name[N] = {};            \
+	DEFINE_PUBLIC_IDATA_G(name, libc_##name##_init, N * __SIZEOF_POINTER__);             \
+	INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.solaris")           \
+	char const **LIBCCALL libc_##name##_init(void) {                                     \
+		return libc_siginfolist_init(libc_##name, N, signo);                             \
+	}                                                                                    \
+	PRIVATE ATTR_SECTION(".rodata.crt.solaris") char const libc_##name##_name[] = #name; \
+	PRIVATE ATTR_SECTION(".bss.crt.solaris") char const **libc_##name##_addr = NULL;     \
+	PRIVATE ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.solaris")          \
+	char const **LIBCCALL libc_##name##_lookup(void) {                                   \
+		if (!libc_##name##_addr) {                                                       \
+			libc_##name##_addr = (char const **)dlsym(RTLD_DEFAULT, libc_##name##_name); \
+			assert(libc_##name##_addr);                                                  \
+		}                                                                                \
+		return libc_##name##_addr;                                                       \
+	}
+#undef _sys_illlist
+#undef _sys_fpelist
+#undef _sys_segvlist
+#undef _sys_buslist
+#undef _sys_traplist
+#undef _sys_cldlist
+#undef _sys_polllist
+DEFINE_LIBC_SIGINFO_LIST(_sys_illlist, N_SYS_ILLLIST, SIGILL)
+DEFINE_LIBC_SIGINFO_LIST(_sys_fpelist, N_SYS_FPELIST, SIGFPE)
+DEFINE_LIBC_SIGINFO_LIST(_sys_segvlist, N_SYS_SEGVLIST, SIGSEGV)
+DEFINE_LIBC_SIGINFO_LIST(_sys_buslist, N_SYS_BUSLIST, SIGBUS)
+DEFINE_LIBC_SIGINFO_LIST(_sys_traplist, N_SYS_TRAPLIST, SIGTRAP)
+DEFINE_LIBC_SIGINFO_LIST(_sys_cldlist, N_SYS_CLDLIST, SIGCLD)
+DEFINE_LIBC_SIGINFO_LIST(_sys_polllist, N_SYS_POLLLIST, SIGPOLL)
+#define _sys_illlist  libc__sys_illlist_lookup()
+#define _sys_fpelist  libc__sys_fpelist_lookup()
+#define _sys_segvlist libc__sys_segvlist_lookup()
+#define _sys_buslist  libc__sys_buslist_lookup()
+#define _sys_traplist libc__sys_traplist_lookup()
+#define _sys_cldlist  libc__sys_cldlist_lookup()
+#define _sys_polllist libc__sys_polllist_lookup()
+#undef DEFINE_LIBC_SIGINFO_LIST
+
+/* Define the per-signal information lookup table. */
+PRIVATE ATTR_SECTION(".bss.crt.solaris") struct siginfolist libc__sys_siginfolist[NSIG - 1] = {};
+PRIVATE ATTR_SECTION(".bss.crt.solaris") struct siginfolist const *libc__sys_siginfolistp   = NULL;
+DEFINE_PUBLIC_IDATA_G(_sys_siginfolistp, libc__sys_siginfolistp_init, __SIZEOF_POINTER__);
+INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.solaris")
+struct siginfolist const **LIBCCALL libc__sys_siginfolistp_init(void) {
+	if (!libc__sys_siginfolistp) {
+		/* Populate string vectors. */
+		libc__sys_siginfolist[SIGILL - 1].nsiginfo  = N_SYS_ILLLIST;
+		libc__sys_siginfolist[SIGILL - 1].vsiginfo  = (char **)_sys_illlist;
+		libc__sys_siginfolist[SIGFPE - 1].nsiginfo  = N_SYS_FPELIST;
+		libc__sys_siginfolist[SIGFPE - 1].vsiginfo  = (char **)_sys_fpelist;
+		libc__sys_siginfolist[SIGSEGV - 1].nsiginfo = N_SYS_SEGVLIST;
+		libc__sys_siginfolist[SIGSEGV - 1].vsiginfo = (char **)_sys_segvlist;
+		libc__sys_siginfolist[SIGBUS - 1].nsiginfo  = N_SYS_BUSLIST;
+		libc__sys_siginfolist[SIGBUS - 1].vsiginfo  = (char **)_sys_buslist;
+		libc__sys_siginfolist[SIGTRAP - 1].nsiginfo = N_SYS_TRAPLIST;
+		libc__sys_siginfolist[SIGTRAP - 1].vsiginfo = (char **)_sys_traplist;
+		libc__sys_siginfolist[SIGCLD - 1].nsiginfo  = N_SYS_CLDLIST;
+		libc__sys_siginfolist[SIGCLD - 1].vsiginfo  = (char **)_sys_cldlist;
+		libc__sys_siginfolist[SIGPOLL - 1].nsiginfo = N_SYS_POLLLIST;
+		libc__sys_siginfolist[SIGPOLL - 1].vsiginfo = (char **)_sys_polllist;
+		COMPILER_WRITE_BARRIER();
+		/* Initialize the string-list-pointer. */
+		libc__sys_siginfolistp = libc__sys_siginfolist;
+	}
+	return &libc__sys_siginfolistp;
+}
+
+
+
+
+
 
 DECL_END
 

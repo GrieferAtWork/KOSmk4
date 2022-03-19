@@ -1902,9 +1902,17 @@
 #define __CRT_HAVE__swprintf_s_l
 #define __CRT_HAVE__swscanf_l
 #define __CRT_HAVE__swscanf_s_l
+#define __CRT_HAVE__sys_buslist
+#define __CRT_HAVE__sys_cldlist
 #define __CRT_HAVE__sys_errlist
+#define __CRT_HAVE__sys_fpelist
+#define __CRT_HAVE__sys_illlist
 #define __CRT_HAVE__sys_nerr
+#define __CRT_HAVE__sys_polllist
+#define __CRT_HAVE__sys_segvlist
+#define __CRT_HAVE__sys_siginfolistp
 #define __CRT_HAVE__sys_siglist
+#define __CRT_HAVE__sys_traplist
 #define __CRT_HAVE__tempnam_dbg
 #define __CRT_HAVE__timezone
 #define __CRT_HAVE__tolower

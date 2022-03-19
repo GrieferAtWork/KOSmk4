@@ -2120,7 +2120,7 @@ void psignal($signo_t signo, [[nullable]] char const *s) {
 [[impl_include("<asm/os/signal.h>")]]
 [[impl_include("<bits/crt/inttypes.h>")]]
 [[impl_include("<bits/types.h>")]]
-[[requires_include("<libc/template/stdstreams.h>")]]
+[[guard, requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stderr) && $has_function(fprintf))]]
 void psiginfo([[nonnull]] siginfo_t const *pinfo,
               [[nullable]] char const *s) {
@@ -3005,6 +3005,7 @@ $signo_t signalnext($signo_t signo) {
 @@in a way that is compatible with `str2sig(3)'.
 [[requires_function(sigabbrev_np)]]
 [[impl_include("<asm/os/signal.h>")]]
+[[section(".text.crt{|.dos}.solaris")]]
 int sig2str($signo_t signo, [[nonnull]] char buf[SIG2STR_MAX]) {
 	char const *name = sigabbrev_np(signo);
 	if (name) {
@@ -3029,6 +3030,7 @@ int sig2str($signo_t signo, [[nonnull]] char buf[SIG2STR_MAX]) {
 @@@return: 0 : Success; `*p_signo' was filled
 @@@return: -1: Unrecognized `name' (`errno(3)' was _NOT_ modified)
 [[requires_function(signalnumber)]]
+[[section(".text.crt{|.dos}.solaris")]]
 int str2sig([[nonnull]] const char *name, [[nonnull]] $signo_t *p_signo) {
 	$signo_t result;
 	size_t i;

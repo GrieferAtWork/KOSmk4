@@ -1141,6 +1141,7 @@ incdir("");
 #include <sgtty.h>
 #include <shadow.h>
 #include <share.h>
+#include <siginfo.h>
 #include <signal.h>
 #include <spawn.h>
 #include <ssp/chk.h>
