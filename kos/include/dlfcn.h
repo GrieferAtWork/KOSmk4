@@ -829,7 +829,7 @@ __NOTHROW_NCX(__DLFCN_CC dladdr)(void const *__address,
 #define RTLD_DI_LINKMAP     __RTLD_DI_LINKMAP     /* [struct link_map **arg] -- *arg = GET_LINK_MAP_FOR(handle) (on KOS: this is the same as `handle') */
 #endif /* !RTLD_DI_LINKMAP && __RTLD_DI_LINKMAP */
 #if !defined(RTLD_DI_CONFIGADDR) && defined(__RTLD_DI_CONFIGADDR)
-#define RTLD_DI_CONFIGADDR  __RTLD_DI_CONFIGADDR  /* Unsupported on KOS (and neither supported by gLibc) */
+#define RTLD_DI_CONFIGADDR  __RTLD_DI_CONFIGADDR  /* [Dl_info *arg] Fill in `dli_fname' (module filename) and `dli_fbase' (module start address; NOT load address! Unsupported by gLibc!) */
 #endif /* !RTLD_DI_CONFIGADDR && __RTLD_DI_CONFIGADDR */
 #if !defined(RTLD_DI_SERINFO) && defined(__RTLD_DI_SERINFO)
 typedef struct __Dl_serpath Dl_serpath;

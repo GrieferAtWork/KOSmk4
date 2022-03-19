@@ -1211,6 +1211,12 @@ NOTHROW_NCX(DLFCN_CC libdl_dlinfo)(USER DlModule *self, int request,
 		*(void **)arg = DlModule_TryGetTLSAddr(self);
 		break;
 
+	case RTLD_DI_CONFIGADDR: {
+		Dl_info *info = (Dl_info *)arg;
+		info->dli_fname = self->dm_filename;
+		info->dli_fbase = (void *)self->dm_loadstart;
+	}	break;
+
 	case RTLD_DI_ARGSINFO: {
 		static auxv_t const null_auxv = { 0, { 0 } };
 		Dl_argsinfo_t *info = (Dl_argsinfo_t *)arg;

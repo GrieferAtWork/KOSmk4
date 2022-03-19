@@ -107,7 +107,7 @@ __DECL_BEGIN
 #ifdef __CRT_HAVE_dlinfo
 #define __RTLD_DI_LMID        1  /* Unsupported on KOS */
 #define __RTLD_DI_LINKMAP     2  /* [struct link_map **arg] -- *arg = GET_LINK_MAP_FOR(handle) (on KOS: this is the same as `handle') */
-#define __RTLD_DI_CONFIGADDR  3  /* Unsupported on KOS (and neither supported by gLibc) */
+#define __RTLD_DI_CONFIGADDR  3  /* [Dl_info *arg] Fill in `dli_fname' (module filename) and `dli_fbase' (module start address; NOT load address! Unsupported by gLibc!) */
 #define __RTLD_DI_SERINFO     4  /* [Dl_serinfo *arg] Return search path information */
 #define __RTLD_DI_SERINFOSIZE 5  /* [Dl_serinfo *arg] Like `__RTLD_DI_SERINFO', but only fill in `dls_size' and `dls_cnt' */
 #define __RTLD_DI_ORIGIN      6  /* [char *arg] strcpy() the `$ORIGIN' of this module (WARNING: UNBOUNDED BUFFER COPY) */
