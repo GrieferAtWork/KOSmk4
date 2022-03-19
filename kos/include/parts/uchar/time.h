@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf03af8bd */
+/* HASH CRC-32:0x8a9bff0c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -129,48 +129,48 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32ftime_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 
 #ifdef __USE_DOS
 #if defined(__CRT_HAVE__wasctime) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,_c16asctime,(struct tm const *__tp),_wasctime,(__tp))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,_c16asctime,(struct __NAMESPACE_STD_SYM tm const *__tp),_wasctime,(__tp))
 #elif defined(__CRT_HAVE_DOS$_wasctime)
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,_c16asctime,(struct tm const *__tp),_wasctime,(__tp))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,_c16asctime,(struct __NAMESPACE_STD_SYM tm const *__tp),_wasctime,(__tp))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/corecrt_wtime/_wasctime.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char16_t *__NOTHROW_NCX(__LIBDCALL _c16asctime)(struct tm const *__tp) { return (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wasctime))(__tp); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char16_t *__NOTHROW_NCX(__LIBDCALL _c16asctime)(struct __NAMESPACE_STD_SYM tm const *__tp) { return (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wasctime))(__tp); }
 #else /* ... */
 #include <libc/local/parts.uchar.time/_c16asctime.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_c16asctime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char16_t *__NOTHROW_NCX(__LIBDCALL _c16asctime)(struct tm const *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c16asctime))(__tp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_c16asctime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char16_t *__NOTHROW_NCX(__LIBDCALL _c16asctime)(struct __NAMESPACE_STD_SYM tm const *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c16asctime))(__tp); })
 #endif /* !... */
 #if defined(__CRT_HAVE__wasctime) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,_c32asctime,(struct tm const *__tp),_wasctime,(__tp))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,_c32asctime,(struct __NAMESPACE_STD_SYM tm const *__tp),_wasctime,(__tp))
 #elif defined(__CRT_HAVE_KOS$_wasctime)
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,_c32asctime,(struct tm const *__tp),_wasctime,(__tp))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,_c32asctime,(struct __NAMESPACE_STD_SYM tm const *__tp),_wasctime,(__tp))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/corecrt_wtime/_wasctime.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char32_t *__NOTHROW_NCX(__LIBKCALL _c32asctime)(struct tm const *__tp) { return (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wasctime))(__tp); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char32_t *__NOTHROW_NCX(__LIBKCALL _c32asctime)(struct __NAMESPACE_STD_SYM tm const *__tp) { return (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wasctime))(__tp); }
 #else /* ... */
 #include <libc/local/parts.uchar.time/_c32asctime.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_c32asctime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char32_t *__NOTHROW_NCX(__LIBKCALL _c32asctime)(struct tm const *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c32asctime))(__tp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_c32asctime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char32_t *__NOTHROW_NCX(__LIBKCALL _c32asctime)(struct __NAMESPACE_STD_SYM tm const *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c32asctime))(__tp); })
 #endif /* !... */
 #if defined(__CRT_HAVE__wasctime_s) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((1, 3)),errno_t,__NOTHROW_NCX,_c16asctime_s,(char16_t *__buf, size_t __buflen, struct tm const *__tp),_wasctime_s,(__buf,__buflen,__tp))
+__CREDIRECT(__ATTR_NONNULL((1, 3)),errno_t,__NOTHROW_NCX,_c16asctime_s,(char16_t *__buf, size_t __buflen, struct __NAMESPACE_STD_SYM tm const *__tp),_wasctime_s,(__buf,__buflen,__tp))
 #elif defined(__CRT_HAVE_DOS$_wasctime_s)
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 3)),errno_t,__NOTHROW_NCX,_c16asctime_s,(char16_t *__buf, size_t __buflen, struct tm const *__tp),_wasctime_s,(__buf,__buflen,__tp))
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 3)),errno_t,__NOTHROW_NCX,_c16asctime_s,(char16_t *__buf, size_t __buflen, struct __NAMESPACE_STD_SYM tm const *__tp),_wasctime_s,(__buf,__buflen,__tp))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/corecrt_wtime/_wasctime_s.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) errno_t __NOTHROW_NCX(__LIBDCALL _c16asctime_s)(char16_t *__buf, size_t __buflen, struct tm const *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wasctime_s))((__WCHAR_TYPE__ *)__buf, __buflen, __tp); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) errno_t __NOTHROW_NCX(__LIBDCALL _c16asctime_s)(char16_t *__buf, size_t __buflen, struct __NAMESPACE_STD_SYM tm const *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wasctime_s))((__WCHAR_TYPE__ *)__buf, __buflen, __tp); }
 #else /* ... */
 #include <libc/local/parts.uchar.time/_c16asctime_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_c16asctime_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) errno_t __NOTHROW_NCX(__LIBDCALL _c16asctime_s)(char16_t *__buf, size_t __buflen, struct tm const *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c16asctime_s))(__buf, __buflen, __tp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_c16asctime_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) errno_t __NOTHROW_NCX(__LIBDCALL _c16asctime_s)(char16_t *__buf, size_t __buflen, struct __NAMESPACE_STD_SYM tm const *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c16asctime_s))(__buf, __buflen, __tp); })
 #endif /* !... */
 #if defined(__CRT_HAVE__wasctime_s) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((1, 3)),errno_t,__NOTHROW_NCX,_c32asctime_s,(char32_t *__buf, size_t __buflen, struct tm const *__tp),_wasctime_s,(__buf,__buflen,__tp))
+__CREDIRECT(__ATTR_NONNULL((1, 3)),errno_t,__NOTHROW_NCX,_c32asctime_s,(char32_t *__buf, size_t __buflen, struct __NAMESPACE_STD_SYM tm const *__tp),_wasctime_s,(__buf,__buflen,__tp))
 #elif defined(__CRT_HAVE_KOS$_wasctime_s)
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 3)),errno_t,__NOTHROW_NCX,_c32asctime_s,(char32_t *__buf, size_t __buflen, struct tm const *__tp),_wasctime_s,(__buf,__buflen,__tp))
+__CREDIRECT_KOS(__ATTR_NONNULL((1, 3)),errno_t,__NOTHROW_NCX,_c32asctime_s,(char32_t *__buf, size_t __buflen, struct __NAMESPACE_STD_SYM tm const *__tp),_wasctime_s,(__buf,__buflen,__tp))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/corecrt_wtime/_wasctime_s.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) errno_t __NOTHROW_NCX(__LIBKCALL _c32asctime_s)(char32_t *__buf, size_t __buflen, struct tm const *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wasctime_s))((__WCHAR_TYPE__ *)__buf, __buflen, __tp); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) errno_t __NOTHROW_NCX(__LIBKCALL _c32asctime_s)(char32_t *__buf, size_t __buflen, struct __NAMESPACE_STD_SYM tm const *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wasctime_s))((__WCHAR_TYPE__ *)__buf, __buflen, __tp); }
 #else /* ... */
 #include <libc/local/parts.uchar.time/_c32asctime_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_c32asctime_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) errno_t __NOTHROW_NCX(__LIBKCALL _c32asctime_s)(char32_t *__buf, size_t __buflen, struct tm const *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c32asctime_s))(__buf, __buflen, __tp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_c32asctime_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) errno_t __NOTHROW_NCX(__LIBKCALL _c32asctime_s)(char32_t *__buf, size_t __buflen, struct __NAMESPACE_STD_SYM tm const *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c32asctime_s))(__buf, __buflen, __tp); })
 #endif /* !... */
 #if defined(__CRT_HAVE__wctime32) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,_c16ctime32,(__time32_t const *__timer),_wctime32,(__timer))

@@ -2163,6 +2163,7 @@ __SYSDECL_END
 #endif /* __USE_UTF */
 
 #ifdef __USE_DOS
+//TODO:#include <corecrt_wprocess.h>
 #include <corecrt_wconio.h>
 #include <corecrt_wdirect.h>
 #include <corecrt_wio.h>
@@ -2170,6 +2171,10 @@ __SYSDECL_END
 #include <corecrt_wstdlib.h>
 #include <corecrt_wstring.h>
 #include <corecrt_wtime.h>
+#ifndef __USE_DOS_CLEAN
+#include <corecrt_memcpy_s.h> /* Include <string.h> instead */
+#include <corecrt_wctype.h>   /* Include <wctype.h> instead */
+#endif /* !__USE_DOS_CLEAN */
 #endif /* __USE_DOS */
 
 }

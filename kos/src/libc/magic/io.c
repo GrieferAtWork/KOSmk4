@@ -39,8 +39,6 @@
 #include <asm/os/fcntl.h>
 )]%[insert:prefix(
 #include <asm/os/oflags.h>
-)]%[insert:prefix(
-#include <corecrt_wio.h>
 )]%{
 
 
@@ -473,6 +471,10 @@ struct __finddata64_t {
 
 __SYSDECL_END
 #endif /* __CC__ */
+
+#if defined(__USE_DOS) && !defined(__USE_DOS_CLEAN)
+#include <corecrt_wio.h> /* Include <wchar.h> instead */
+#endif /* __USE_DOS && !__USE_DOS_CLEAN */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_IO_H)

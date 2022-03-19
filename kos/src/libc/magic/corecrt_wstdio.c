@@ -43,6 +43,11 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+#ifndef __wint_t_defined
+#define __wint_t_defined
+typedef __WINT_TYPE__ wint_t;
+#endif /* !__wint_t_defined */
+
 #ifndef __size_t_defined
 #define __size_t_defined
 typedef __SIZE_TYPE__ size_t;

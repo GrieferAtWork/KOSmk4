@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a6d152a */
+/* HASH CRC-32:0x10cfe7bb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5861,11 +5861,11 @@ __CREDIRECT(,onexit_t,__NOTHROW_NCX,onexit,(onexit_t __func),_onexit,(__func))
 
 __SYSDECL_END
 
-#ifdef __USE_DOS
-#include <corecrt_malloc.h>
-#include <corecrt_search.h>
-#include <corecrt_wstdlib.h>
-#endif /* __USE_DOS */
+#if defined(__USE_DOS) && !defined(__USE_DOS_CLEAN)
+#include <corecrt_malloc.h>  /* Include <malloc.h> instead */
+#include <corecrt_search.h>  /* Include <search.h> instead */
+#include <corecrt_wstdlib.h> /* Include <wchar.h> instead */
+#endif /* __USE_DOS && !__USE_DOS_CLEAN */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_STDLIB_H)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbedf4a5 */
+/* HASH CRC-32:0x2f11f40 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,16 +52,16 @@ typedef __size_t size_t;
 #endif /* !__size_t_defined */
 
 #ifdef __CRT_HAVE__wasctime
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),wchar_t *,__NOTHROW_NCX,_wasctime,(struct tm const *__tp),(__tp))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),wchar_t *,__NOTHROW_NCX,_wasctime,(struct __NAMESPACE_STD_SYM tm const *__tp),(__tp))
 #else /* __CRT_HAVE__wasctime */
 #include <libc/local/corecrt_wtime/_wasctime.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wasctime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) wchar_t *__NOTHROW_NCX(__LIBCCALL _wasctime)(struct tm const *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wasctime))(__tp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wasctime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) wchar_t *__NOTHROW_NCX(__LIBCCALL _wasctime)(struct __NAMESPACE_STD_SYM tm const *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wasctime))(__tp); })
 #endif /* !__CRT_HAVE__wasctime */
 #ifdef __CRT_HAVE__wasctime_s
-__CDECLARE(__ATTR_NONNULL((1, 3)),errno_t,__NOTHROW_NCX,_wasctime_s,(wchar_t *__buf, size_t __buflen, struct tm const *__tp),(__buf,__buflen,__tp))
+__CDECLARE(__ATTR_NONNULL((1, 3)),errno_t,__NOTHROW_NCX,_wasctime_s,(wchar_t *__buf, size_t __buflen, struct __NAMESPACE_STD_SYM tm const *__tp),(__buf,__buflen,__tp))
 #else /* __CRT_HAVE__wasctime_s */
 #include <libc/local/corecrt_wtime/_wasctime_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wasctime_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) errno_t __NOTHROW_NCX(__LIBCCALL _wasctime_s)(wchar_t *__buf, size_t __buflen, struct tm const *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wasctime_s))(__buf, __buflen, __tp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wasctime_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) errno_t __NOTHROW_NCX(__LIBCCALL _wasctime_s)(wchar_t *__buf, size_t __buflen, struct __NAMESPACE_STD_SYM tm const *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wasctime_s))(__buf, __buflen, __tp); })
 #endif /* !__CRT_HAVE__wasctime_s */
 #ifndef __wcsftime_defined
 #define __wcsftime_defined

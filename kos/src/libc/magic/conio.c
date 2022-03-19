@@ -41,7 +41,9 @@
 
 #ifdef __USE_DOS
 #include <crtdefs.h>
-#include <corecrt_wconio.h>
+#ifndef __USE_DOS_CLEAN
+#include <corecrt_wconio.h> /* Include <wchar.h> instead */
+#endif /* !__USE_DOS_CLEAN */
 #endif /* __USE_DOS */
 
 #ifdef __CC__

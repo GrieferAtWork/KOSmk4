@@ -3190,7 +3190,7 @@ NOTHROW_NCX(LIBDCALL libd__invoke_watson)(__WCHAR16_TYPE__ const *expr, __WCHAR1
 	(void)file;
 	(void)line;
 	(void)zero;
-	std::abort();
+	abort();
 }
 
 DEFINE_PUBLIC_ALIAS(_invalid_parameter_noinfo, libd__invalid_parameter_noinfo);
@@ -3203,7 +3203,7 @@ DEFINE_PUBLIC_ALIAS(_invalid_parameter_noinfo_noreturn, libd__invalid_parameter_
 INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.dos.errno") void
 NOTHROW_NCX(LIBDCALL libd__invalid_parameter_noinfo_noreturn)(void) {
 	libd__invalid_parameter(NULL, NULL, NULL, 0, 0);
-	std::abort();
+	abort();
 }
 
 

@@ -91,10 +91,10 @@
 #endif /* _BROKEN_CCOMPAT_SOURCE || _GLIBCXX_SHARED */
 
 /* When  exposed  in  headers,  the  behavior  of  memmem()  and memrmem()
- * differs from the behavior found in glibc's implementation (of memmem())
+ * differs from the behavior found in gLibc's implementation (of memmem())
  * #define _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE (kos-specific)
  *    -> memmem() or memrmem() called with `needlelen' set to ZERO(0), return `NULL'
- * #undef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE  (glibc-compatible)
+ * #undef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE  (gLibc-compatible)
  *    -> memmem() or memrmem() called with `needlelen' set to ZERO(0), return:
  *       memmem():  `haystack'
  *       memrmem(): `haystack + haystacklen'
@@ -207,7 +207,7 @@
 
 /* 64-bit time_t extensions for KOS
  * (By the time of this writing, but I'm guessing by 2038-01-19T03:14:07 this'll
- * be similar to  what glibc will  have to do  if it doesn't  wan'na roll  over)
+ * be similar to  what gLibc will  have to do  if it doesn't  wan'na roll  over)
  * Also available as extensions in other libcs:
  *  - defined(_TIME64_SOURCE):
  *    - KOS-specific feature macro
@@ -560,18 +560,20 @@
 #endif /* _UTF_SOURCE */
 
 
-/* Enable  closer  emulation  of  glibc  headers  in  cases   where
- * standards    leave    the    implementation    behavior    open.
- * This  mainly  affects  optional include  implications  in system
- * headers. For example, POSIX allows (but doesn't require) <aio.h>
- * to also #include  <sys/types.h>, where glibc  does perform  this
- * inclusion, however doing so isn't actually necessary under  KOS.
+/* Enable closer emulation of gLibc headers in cases  where
+ * standards leave the  implementation behavior open.  This
+ * mainly affects optional  include implications in  system
+ * headers. For example, POSIX allows (but doesn't require)
+ * <aio.h> to also #include <sys/types.h>, where gLibc does
+ * perform  this inclusion, however doing so isn't actually
+ * necessary under KOS.
  *
- * When  `_GLIBC_SOURCE' is defined, non-portable, implicit includes
- * are  emulated more  closely to what  is also done  by glibc, note
- * however that this additional level of compatibility is not backed
- * by  any fixed standard, but depends solely on what glibc actually
- * does in relation to fixed standards (such as POSIX) */
+ * When `_GLIBC_SOURCE' is defined, non-portable, implicit
+ * includes are emulated more closely to what is also done
+ * by gLibc, note  however that this  additional level  of
+ * compatibility is not backed by any fixed standard,  but
+ * depends solely on what gLibc actually does in  relation
+ * to fixed standards (such as POSIX) */
 #ifdef _GLIBC_SOURCE
 #undef __USE_GLIBC
 #define __USE_GLIBC 1
@@ -599,19 +601,19 @@
  * >>     my_print_stat64(&st);
  * >> }
  *
- * Long  story  short.  When   `__USE_STRUCT64_MACRO'  is  enabled  (it   isn't
- * enabled  by  default), the  above code  would not  be guarantied  to compile
- * without errors. In order to fix the code to work with `__USE_STRUCT64_MACRO'
- * enabled, one mustn't  forward-declare struct types  found in system  headers
- * before the respective header has already been included.
+ * Long story short. When `__USE_STRUCT64_MACRO' is enabled (it isn't enabled
+ * by  default), the  above code would  not be guarantied  to compile without
+ * errors.  In  order to  fix the  code  to work  with `__USE_STRUCT64_MACRO'
+ * enabled, one mustn't forward-declare struct types found in system  headers
+ * before the respective headers have already been included.
  *
  * The longer story is this:
  *   - Take `struct timespec' and `struct timespec64' as an example
  *   - When `_TIME_T_BITS=64', then they  are mandated to share  binary
  *     compatibility, such that the offsetof for each field, and sizeof
  *     of the structures as a whole will be identical between the  two.
- *   - Knowing this, it stands to reason to simply have the header define
- *     `struct timespec64'        as        `#define timespec64 timespec'
+ *   - Knowing  this, it stands to reason to simply have the header
+ *     define `struct timespec64' as `#define timespec64 timespec'.
  *   - The only problem with this is  that this would break any  forward
  *     declarations of `struct timespec64' prior to the declaring header
  *     being included.
@@ -873,7 +875,7 @@
 #include "stdc-predef.h"
 #endif /* !_STDC_PREDEF_H */
 
-/* KOS headers are always trying to emulate glibc in some way... */
+/* KOS headers are always trying to emulate gLibc in some way... */
 #undef __GNU_LIBRARY__
 #define __GNU_LIBRARY__ 6
 #define __GLIBC__       2

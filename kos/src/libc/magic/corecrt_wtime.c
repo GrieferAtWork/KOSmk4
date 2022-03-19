@@ -54,7 +54,7 @@ typedef __size_t size_t;
 
 [[wchar, wunused, requires_function(_wasctime_s)]]
 [[decl_include("<bits/types.h>", "<bits/crt/tm.h>")]]
-wchar_t *_wasctime([[nonnull]] struct tm const *tp) {
+wchar_t *_wasctime([[nonnull]] struct $tm const *tp) {
 	static wchar_t wasctime_retbuf[26] = { 0 };
 	return _wasctime_s(wasctime_retbuf, 26, tp) ? NULL : wasctime_retbuf;
 }
@@ -62,7 +62,7 @@ wchar_t *_wasctime([[nonnull]] struct tm const *tp) {
 [[wchar, requires_function(asctime_r)]]
 [[decl_include("<bits/types.h>", "<bits/crt/tm.h>")]]
 errno_t _wasctime_s([[outp(buflen)]] wchar_t *buf, size_t buflen,
-                    [[nonnull]] struct tm const *tp) {
+                    [[nonnull]] struct $tm const *tp) {
 	char abuf[26], *ptr;
 	unsigned int i;
 	if unlikely(buflen < 26)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x686e72a */
+/* HASH CRC-32:0x374a6079 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -8616,9 +8616,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(uucopystr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 
 __SYSDECL_END
 
-#ifdef __USE_DOS
-#include <corecrt_wstring.h>
-#endif /* __USE_DOS */
+#if defined(__USE_DOS) && !defined(__USE_DOS_CLEAN)
+#include <corecrt_wstring.h> /* Include <wchar.h> instead */
+#endif /* __USE_DOS && !__USE_DOS_CLEAN */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_STRING_H)

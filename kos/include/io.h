@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2063a3a5 */
+/* HASH CRC-32:0xe3763e16 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,6 @@
 #include <bits/types.h>
 #include <asm/os/fcntl.h>
 #include <asm/os/oflags.h>
-#include <corecrt_wio.h>
 
 
 #ifndef _A_NORMAL
@@ -1684,6 +1683,10 @@ struct __finddata64_t {
 
 __SYSDECL_END
 #endif /* __CC__ */
+
+#if defined(__USE_DOS) && !defined(__USE_DOS_CLEAN)
+#include <corecrt_wio.h> /* Include <wchar.h> instead */
+#endif /* __USE_DOS && !__USE_DOS_CLEAN */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_IO_H)

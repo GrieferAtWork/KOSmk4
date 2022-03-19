@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf308b799 */
+/* HASH CRC-32:0x6d6cc04d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -111,10 +111,6 @@ __NAMESPACE_STD_USING(timespec_get)
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 */
-
-#ifdef __USE_DOS
-#include <corecrt_wtime.h>
-#endif /* __USE_DOS */
 
 #ifdef __USE_GNU
 #include <asm/os/timex.h>
@@ -2328,6 +2324,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_setsystime, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 
 __SYSDECL_END
 #endif /* __CC__ */
+
+#if defined(__USE_DOS) && !defined(__USE_DOS_CLEAN)
+#include <corecrt_wtime.h> /* Include <wchar.h> instead */
+#endif /* __USE_DOS && !__USE_DOS_CLEAN */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_TIME_H)

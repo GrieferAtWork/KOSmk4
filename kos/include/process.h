@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93b4aba0 */
+/* HASH CRC-32:0x58f84c2b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,6 +79,10 @@ __SYSDECL_BEGIN
 
 /* DOS */
 #ifdef __USE_DOS
+#ifndef __USE_DOS_CLEAN
+//TODO:#include <corecrt_wprocess.h> /* Include <wchar.h> instead */
+#endif /* !__USE_DOS_CLEAN */
+
 #define _P_WAIT          P_WAIT
 #define _P_NOWAIT        P_NOWAIT
 #define _P_OVERLAY       P_OVERLAY
@@ -114,22 +118,11 @@ typedef __UINT32_TYPE__ (__ATTR_STDCALL *__dos_beginthreadex_entry_t)(void *__ar
 #endif /* !__NO_ATTR_STDCALL */
 #endif /* !____dos_beginthreadex_entry_t_defined */
 
-__CDECLARE_OPT(,uintptr_t,__NOTHROW_NCX,_beginthread,(void (__LIBDCALL *__entry)(void *__arg), __UINT32_TYPE__ __stacksz, void *__arg),(__entry,__stacksz,__arg))
-__CDECLARE_OPT(,uintptr_t,__NOTHROW_NCX,_beginthreadex,(void *__sec, __UINT32_TYPE__ __stacksz, __dos_beginthreadex_entry_t __entry, void *__arg, __UINT32_TYPE__ __flags, __UINT32_TYPE__ *__threadaddr),(__sec,__stacksz,__entry,__arg,__flags,__threadaddr))
-#ifdef __CRT_HAVE__endthread
-__CDECLARE_VOID(,__NOTHROW_NCX,_endthread,(void),())
-#elif defined(__CRT_HAVE__endthreadex)
-#include <libc/local/process/_endthread.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_endthread, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL _endthread)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_endthread))(); })
-#endif /* ... */
-__CDECLARE_VOID_OPT(,__NOTHROW_NCX,_endthreadex,(__UINT32_TYPE__ __exitcode),(__exitcode))
-
-#ifndef _CRT_TERMINATE_DEFINED
-#define _CRT_TERMINATE_DEFINED 1
-#ifndef __exit_defined
-#define __exit_defined
-#ifdef __std_exit_defined
-__NAMESPACE_STD_USING(exit)
+__NAMESPACE_STD_BEGIN
+#ifndef __std_exit_defined
+#define __std_exit_defined
+#ifdef __exit_defined
+__NAMESPACE_GLB_USING_OR_IMPL(exit, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL exit)(int __status) __THROWS(...) { :: exit(__status); })
 #elif __has_builtin(__builtin_exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exit)
 __CEIDECLARE_GCCNCX(__ATTR_NORETURN,void,__THROWING,exit,(int __status),{ __builtin_exit(__status); })
 #elif defined(__CRT_HAVE_exit)
@@ -141,13 +134,13 @@ __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,exit,(int __status),_exit,(__
 #elif defined(__CRT_HAVE__Exit)
 __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,exit,(int __status),_Exit,(__status))
 #else /* ... */
-#undef __exit_defined
+#undef __std_exit_defined
 #endif /* !... */
-#endif /* !__exit_defined */
-#ifndef __abort_defined
-#define __abort_defined
-#ifdef __std_abort_defined
-__NAMESPACE_STD_USING(abort)
+#endif /* !__std_exit_defined */
+#ifndef __std_abort_defined
+#define __std_abort_defined
+#ifdef __abort_defined
+__NAMESPACE_GLB_USING_OR_IMPL(abort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL abort)(void) __THROWS(...) { :: abort(); })
 #elif __has_builtin(__builtin_abort) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_abort)
 __CEIDECLARE_GCCNCX(__ATTR_NORETURN,void,__THROWING,abort,(void),{ __builtin_abort(); })
 #elif defined(__CRT_HAVE_abort)
@@ -161,12 +154,25 @@ __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,abort,(void),__chk_fail,())
 #elif defined(__CRT_HAVE_$Qterminate$A$AYAXXZ)
 __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,abort,(void),?terminate@@YAXXZ,())
 #elif defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)
+__NAMESPACE_STD_END
 #include <libc/local/stdlib/abort.h>
+__NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(abort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL abort)(void) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(abort))(); })
 #else /* ... */
-#undef __abort_defined
+#undef __std_abort_defined
 #endif /* !... */
-#endif /* !__abort_defined */
+#endif /* !__std_abort_defined */
+__NAMESPACE_STD_END
+#ifndef __CXX_SYSTEM_HEADER
+#if !defined(__exit_defined) && defined(__std_exit_defined)
+#define __exit_defined
+__NAMESPACE_STD_USING(exit)
+#endif /* !__exit_defined && __std_exit_defined */
+#if !defined(__abort_defined) && defined(__std_abort_defined)
+#define __abort_defined
+__NAMESPACE_STD_USING(abort)
+#endif /* !__abort_defined && __std_abort_defined */
+#endif /* !__CXX_SYSTEM_HEADER */
 #ifndef ___exit_defined
 #define ___exit_defined
 #if __has_builtin(__builtin__Exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE__Exit)
@@ -185,7 +191,15 @@ __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,_exit,(int __status),exit,(__
 #undef ___exit_defined
 #endif /* !... */
 #endif /* !___exit_defined */
-#endif /* !_CRT_TERMINATE_DEFINED */
+__CDECLARE_OPT(,uintptr_t,__NOTHROW_NCX,_beginthread,(void (__LIBDCALL *__entry)(void *__arg), __UINT32_TYPE__ __stacksz, void *__arg),(__entry,__stacksz,__arg))
+__CDECLARE_OPT(,uintptr_t,__NOTHROW_NCX,_beginthreadex,(void *__sec, __UINT32_TYPE__ __stacksz, __dos_beginthreadex_entry_t __entry, void *__arg, __UINT32_TYPE__ __flags, __UINT32_TYPE__ *__threadaddr),(__sec,__stacksz,__entry,__arg,__flags,__threadaddr))
+#ifdef __CRT_HAVE__endthread
+__CDECLARE_VOID(,__NOTHROW_NCX,_endthread,(void),())
+#elif defined(__CRT_HAVE__endthreadex)
+#include <libc/local/process/_endthread.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_endthread, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL _endthread)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_endthread))(); })
+#endif /* ... */
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,_endthreadex,(__UINT32_TYPE__ __exitcode),(__exitcode))
 __CDECLARE_VOID_OPT(,__THROWING,_cexit,(void),())
 #ifdef __CRT_HAVE__c_exit
 __CDECLARE_VOID(,__THROWING,_c_exit,(void),())

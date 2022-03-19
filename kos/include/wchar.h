@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe31ed005 */
+/* HASH CRC-32:0xcac4f2a1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3956,6 +3956,7 @@ __SYSDECL_END
 #endif /* __USE_UTF */
 
 #ifdef __USE_DOS
+//TODO:#include <corecrt_wprocess.h>
 #include <corecrt_wconio.h>
 #include <corecrt_wdirect.h>
 #include <corecrt_wio.h>
@@ -3963,6 +3964,10 @@ __SYSDECL_END
 #include <corecrt_wstdlib.h>
 #include <corecrt_wstring.h>
 #include <corecrt_wtime.h>
+#ifndef __USE_DOS_CLEAN
+#include <corecrt_memcpy_s.h> /* Include <string.h> instead */
+#include <corecrt_wctype.h>   /* Include <wctype.h> instead */
+#endif /* !__USE_DOS_CLEAN */
 #endif /* __USE_DOS */
 
 #ifdef __CXX_SYSTEM_HEADER

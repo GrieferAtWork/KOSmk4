@@ -85,10 +85,6 @@
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 */
 
-#ifdef __USE_DOS
-#include <corecrt_wtime.h>
-#endif /* __USE_DOS */
-
 #ifdef __USE_GNU
 #include <asm/os/timex.h>
 #include <bits/os/timex.h>
@@ -2511,6 +2507,10 @@ unsigned int _setsystime([[nonnull]] struct $tm *tp,
 
 __SYSDECL_END
 #endif /* __CC__ */
+
+#if defined(__USE_DOS) && !defined(__USE_DOS_CLEAN)
+#include <corecrt_wtime.h> /* Include <wchar.h> instead */
+#endif /* __USE_DOS && !__USE_DOS_CLEAN */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_TIME_H)

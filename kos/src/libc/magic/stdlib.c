@@ -5686,11 +5686,11 @@ errno_t _get_wenviron([[nonnull]] wchar_t ***p_wenviron) {
 
 __SYSDECL_END
 
-#ifdef __USE_DOS
-#include <corecrt_malloc.h>
-#include <corecrt_search.h>
-#include <corecrt_wstdlib.h>
-#endif /* __USE_DOS */
+#if defined(__USE_DOS) && !defined(__USE_DOS_CLEAN)
+#include <corecrt_malloc.h>  /* Include <malloc.h> instead */
+#include <corecrt_search.h>  /* Include <search.h> instead */
+#include <corecrt_wstdlib.h> /* Include <wchar.h> instead */
+#endif /* __USE_DOS && !__USE_DOS_CLEAN */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_STDLIB_H)

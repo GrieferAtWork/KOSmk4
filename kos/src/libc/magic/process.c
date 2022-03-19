@@ -88,6 +88,10 @@ __SYSDECL_BEGIN
 }
 %#ifdef __USE_DOS
 %{
+#ifndef __USE_DOS_CLEAN
+//TODO:#include <corecrt_wprocess.h> /* Include <wchar.h> instead */
+#endif /* !__USE_DOS_CLEAN */
+
 #define _P_WAIT          P_WAIT
 #define _P_NOWAIT        P_NOWAIT
 #define _P_OVERLAY       P_OVERLAY
@@ -118,8 +122,6 @@ typedef __WCHAR_TYPE__ wchar_t;
 
 }
 
-
-%[default:section(".text.crt.dos.sched.thread")]
 %{
 #ifndef ____dos_beginthreadex_entry_t_defined
 #define ____dos_beginthreadex_entry_t_defined
@@ -143,39 +145,44 @@ typedef __UINT32_TYPE__ (__ATTR_STDCALL *__dos_beginthreadex_entry_t)(void *__ar
 @@pp_endif@@
 )]
 
-
 %[define_type_class(__dos_beginthreadex_entry_t = "TP")]
 %[define_replacement(__dos_beginthreadex_entry_t = __dos_beginthreadex_entry_t)]
 
+
+
+%[insert:std]
+%[insert:guarded_std_function(exit)]
+%[insert:guarded_std_function(abort)]
+
+%[insert:guarded_function(_exit = _Exit)]
+
+
+
 [[decl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt.dos.sched.thread")]]
 uintptr_t _beginthread(void (LIBDCALL *entry)(void *arg), $u32 stacksz, void *arg);
 
 [[decl_include("<hybrid/typecore.h>")]]
 [[decl_prefix(DEFINE_DOS_BEGINTHREADEX_ENTRY_T)]]
+[[section(".text.crt.dos.sched.thread")]]
 uintptr_t _beginthreadex(void *sec, $u32 stacksz, __dos_beginthreadex_entry_t entry,
                          void *arg, $u32 flags, $u32 *threadaddr);
 
 [[requires($has_function(_endthreadex))]]
+[[section(".text.crt.dos.sched.thread")]]
 void _endthread() {
 	_endthreadex(0);
 }
 
 [[decl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt.dos.sched.thread")]]
 void _endthreadex($u32 exitcode);
 
-%[default:section(".text.crt{|.dos}.sched.process")]
+[[throws, section(".text.crt.dos.sched.process")]]
+void _cexit();
 
-%
-%#ifndef _CRT_TERMINATE_DEFINED
-%#define _CRT_TERMINATE_DEFINED 1
-%[insert:extern(exit)]
-%[insert:extern(abort)]
-%[insert:guarded_function(_exit = _Exit)]
-%#endif /* !_CRT_TERMINATE_DEFINED */
-
-%[default:section(".text.crt.dos.sched.process")]
-[[throws]] void _cexit();
-[[throws]] void _c_exit() {
+[[throws, section(".text.crt.dos.sched.process")]]
+void _c_exit() {
 }
 
 %[define(DEFINE__tls_callback_type =
@@ -192,6 +199,7 @@ typedef void (__ATTR_STDCALL *_tls_callback_type)(void * /*???*/, __ULONG32_TYPE
 
 %[insert:prefix(DEFINE__tls_callback_type)]
 
+[[section(".text.crt.dos.sched.process")]]
 [[crt_dos_only, decl_prefix(DEFINE__tls_callback_type)]]
 void _register_thread_local_exe_atexit_callback([[nonnull]] _tls_callback_type callback);
 
@@ -200,7 +208,6 @@ void _register_thread_local_exe_atexit_callback([[nonnull]] _tls_callback_type c
 
 %[insert:function(_getpid = getpid)]
 
-%[default:section(".text.crt.dos.fs.exec.exec")]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 int _execv([[nonnull]] char const *__restrict path,
            [[nonnull]] char const *const *___argv) = execv;
@@ -224,7 +231,6 @@ int _execvpe([[nonnull]] char const *__restrict file,
 %[insert:function(_execle = execle)]
 %[insert:function(_execlpe = execlpe)]
 
-%[default:section(".text.crt.dos.fs.exec.spawn")]
 %[insert:function(_cwait = cwait)]
 
 [[decl_include("<features.h>")]]
@@ -269,7 +275,6 @@ intptr_t _spawnlpe(__STDC_INT_AS_UINT_T mode,
                    [[nonnull]] char const *__restrict file,
                    char const *args, ... /*, (char *)NULL, (char **)environ*/) = spawnlpe;
 
-%[default:section(".text.crt{|.dos}.fs.exec.system")]
 %[insert:extern(system)]
 
 %
@@ -277,7 +282,7 @@ intptr_t _spawnlpe(__STDC_INT_AS_UINT_T mode,
 %
 %[define_c_language_keyword(__KOS_FIXED_CONST)]
 
-%[default:section(".text.crt.dos.fs.dlfcn")]
+[[section(".text.crt.dos.fs.dlfcn")]]
 [[throws, decl_include("<features.h>", "<bits/types.h>")]]
 [[requires_include("<libdl/asm/dlfcn.h>")]]
 [[requires(defined(__CRT_HAVE_dlopen))]]
@@ -292,6 +297,7 @@ intptr_t _loaddll(char __KOS_FIXED_CONST *file) {
 @@pp_endif@@
 }
 
+[[section(".text.crt.dos.fs.dlfcn")]]
 [[throws, decl_include("<bits/types.h>")]]
 [[impl_include("<dlfcn.h>")]]
 int _unloaddll(intptr_t hnd) {
@@ -319,6 +325,7 @@ typedef int (*__procfun)(void);
 #endif /* !____procfun_defined */
 )]
 
+[[section(".text.crt.dos.fs.dlfcn")]]
 [[throws, decl_include("<features.h>", "<bits/types.h>")]]
 [[decl_prefix(DEFINE_PROCFUN)]]
 [[requires_include("<libdl/asm/dlfcn.h>")]]
@@ -362,7 +369,6 @@ typedef __intptr_t intptr_t;
 %
 %#ifndef _WPROCESS_DEFINED
 %#define _WPROCESS_DEFINED 1
-%[default:section(".text.crt{|.dos}.wchar.fs.exec.exec")]
 [[argument_names(mode, path, ___argv), decl_include("<features.h>")]]
 int _wexecv([[nonnull]] wchar_t const *__restrict path,
             [[nonnull]] wchar_t const *const *__restrict ___argv) = wexecv;
@@ -386,7 +392,6 @@ int _wexecvpe([[nonnull]] wchar_t const *__restrict file,
 %[insert:function(_wexecle = wexecle)]
 %[insert:function(_wexeclpe = wexeclpe)]
 
-%[default:section(".text.crt{|.dos}.wchar.fs.exec.spawn")]
 [[argument_names(mode, path, ___argv), decl_include("<features.h>")]]
 intptr_t _wspawnv(__STDC_INT_AS_UINT_T mode,
                   [[nonnull]] wchar_t const *__restrict path,
@@ -449,13 +454,13 @@ intptr_t _wspawnlpe(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__rest
 %[insert:extern(execle)]
 %[insert:extern(execlpe)]
 
-%[default:section(".text.crt.dos.fs.exec.spawn")]
 
 @@>> cwait(3)
 @@DOS name for `waitpid(2)', except that `action' is ignored. Use
 @@this function together with the `spawn(3)' family of functions.
 @@@return: pid: Child process exited.
 @@@return: -1:  Error (s.a. `errno')
+[[section(".text.crt.dos.fs.exec.spawn")]]
 [[decl_include("<features.h>", "<bits/types.h>")]]
 [[cp, dos_only_export_alias("_cwait"), requires_function(waitpid)]]
 $pid_t cwait(int *tstat, $pid_t pid, __STDC_INT_AS_UINT_T action) {
@@ -467,8 +472,7 @@ $pid_t cwait(int *tstat, $pid_t pid, __STDC_INT_AS_UINT_T action) {
 	return waitpid(pid, tstat, 0);
 }
 
-%[default:section(".text.crt{|.dos}.fs.exec.spawn")]
-
+[[section(".text.crt{|.dos}.fs.exec.spawn")]]
 [[cp, guard, argument_names(mode, path, ___argv), dos_export_alias("_spawnv")]]
 [[decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_TARGV)]]
 [[requires_include("<libc/template/environ.h>"), requires($has_function(spawnve) && defined(__LOCAL_environ))]]
@@ -477,6 +481,7 @@ $pid_t spawnv(__STDC_INT_AS_UINT_T mode, [[nonnull]] char const *__restrict path
 	return spawnve(mode, path, ___argv, __LOCAL_environ);
 }
 
+[[section(".text.crt{|.dos}.fs.exec.spawn")]]
 [[cp, guard, argument_names(mode, file, ___argv), dos_export_alias("_spawnvp")]]
 [[decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_TARGV)]]
 [[requires_include("<libc/template/environ.h>"), crt_dos_variant]]
@@ -486,6 +491,7 @@ $pid_t spawnvp(__STDC_INT_AS_UINT_T mode, [[nonnull]] char const *__restrict fil
 	return spawnvpe(mode, file, ___argv, __LOCAL_environ);
 }
 
+[[section(".text.crt{|.dos}.fs.exec.spawn")]]
 [[cp, guard, argument_names(mode, path, ___argv, ___envp)]]
 [[dos_export_alias("_spawnve"), requires_function(open, fspawnve)]]
 [[decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_TARGV)]]
@@ -511,6 +517,7 @@ $pid_t spawnve(__STDC_INT_AS_UINT_T mode,
 	return result;
 }
 
+[[section(".text.crt{|.dos}.fs.exec.spawn")]]
 [[cp, guard, argument_names(mode, file, ___argv, ___envp), dos_export_alias("_spawnvpe")]]
 [[decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_TARGV)]]
 [[requires_include("<hybrid/__alloca.h>")]]
@@ -643,6 +650,7 @@ $pid_t spawnvpe(__STDC_INT_AS_UINT_T mode,
 	return -1;
 }
 
+[[section(".text.crt{|.dos}.fs.exec.spawn")]]
 [[cp, guard, ATTR_SENTINEL, impl_include("<parts/redirect-exec.h>")]]
 [[requires_dependent_function("spawnv"), dos_export_alias("_spawnl")]]
 [[decl_include("<features.h>", "<bits/types.h>"), crt_dos_variant]]
@@ -651,6 +659,7 @@ $pid_t spawnl(__STDC_INT_AS_UINT_T mode, [[nonnull]] char const *__restrict path
 	__REDIRECT_SPAWNL(char, spawnv, mode, path, args)
 }
 
+[[section(".text.crt{|.dos}.fs.exec.spawn")]]
 [[cp, guard, ATTR_SENTINEL, impl_include("<parts/redirect-exec.h>")]]
 [[requires_dependent_function("spawnvp"), dos_export_alias("_spawnlp")]]
 [[decl_include("<features.h>", "<bits/types.h>"), crt_dos_variant]]
@@ -659,6 +668,7 @@ $pid_t spawnlp(__STDC_INT_AS_UINT_T mode, [[nonnull]] char const *__restrict fil
 	__REDIRECT_SPAWNL(char, spawnvp, mode, file, args)
 }
 
+[[section(".text.crt{|.dos}.fs.exec.spawn")]]
 [[cp, guard, ATTR_SENTINEL_O(1), impl_include("<parts/redirect-exec.h>")]]
 [[requires_dependent_function("spawnve"), dos_export_alias("_spawnle")]]
 [[decl_include("<features.h>", "<bits/types.h>"), crt_dos_variant]]
@@ -667,6 +677,7 @@ $pid_t spawnle(__STDC_INT_AS_UINT_T mode, [[nonnull]] char const *__restrict pat
 	__REDIRECT_SPAWNLE(char, spawnve, mode, path, args)
 }
 
+[[section(".text.crt{|.dos}.fs.exec.spawn")]]
 [[cp, guard, ATTR_SENTINEL_O(1), impl_include("<parts/redirect-exec.h>")]]
 [[requires_dependent_function("spawnvpe"), dos_export_alias("_spawnlpe")]]
 [[decl_include("<features.h>", "<bits/types.h>"), crt_dos_variant]]
@@ -676,6 +687,7 @@ $pid_t spawnlpe(__STDC_INT_AS_UINT_T mode, [[nonnull]] char const *__restrict fi
 }
 
 %#ifdef __USE_KOS
+[[section(".text.crt{|.dos}.fs.exec.spawn")]]
 [[cp, guard, argument_names(mode, path, ___argv, ___envp)]]
 [[decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_TARGV)]]
 [[impl_include("<asm/crt/process.h>", "<libc/errno.h>", "<asm/os/vfork.h>")]]

@@ -146,9 +146,9 @@ int _mkdir([[nonnull]] char const *path) {
 __SYSDECL_END
 #endif /* __CC__ */
 
-#ifdef __USE_DOS
-#include <corecrt_wdirect.h>
-#endif /* __USE_DOS */
+#if defined(__USE_DOS) && !defined(__USE_DOS_CLEAN)
+#include <corecrt_wdirect.h> /* Include <wchar.h> instead */
+#endif /* __USE_DOS && !__USE_DOS_CLEAN */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_DIRECT_H)

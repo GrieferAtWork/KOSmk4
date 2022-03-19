@@ -262,7 +262,9 @@ INTERN_CONST ATTR_SECTION(".rodata.crt.unicode.static.ctype") __INT8_TYPE__ cons
 
 #ifdef __USE_DOS
 #include <corecrt.h>
-#include <corecrt_wctype.h>
+#ifndef __USE_DOS_CLEAN
+#include <corecrt_wctype.h> /* Include <wchar.h> instead */
+#endif /* !__USE_DOS_CLEAN */
 #endif /* __USE_DOS */
 
 #ifdef __CC__

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2a9b1ed */
+/* HASH CRC-32:0x7340c551 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,7 +79,9 @@ __NAMESPACE_STD_USING(isblank)
 
 #ifdef __USE_DOS
 #include <corecrt.h>
-#include <corecrt_wctype.h>
+#ifndef __USE_DOS_CLEAN
+#include <corecrt_wctype.h> /* Include <wchar.h> instead */
+#endif /* !__USE_DOS_CLEAN */
 #endif /* __USE_DOS */
 
 #ifdef __CC__

@@ -5312,9 +5312,9 @@ __STDC_INT_AS_SSIZE_T vsscanf_s([[nonnull]] char const *buf, [[nonnull, format]]
 
 __SYSDECL_END
 
-#ifdef __USE_DOS
-#include <corecrt_wstdio.h>
-#endif /* __USE_DOS */
+#if defined(__USE_DOS) && !defined(__USE_DOS_CLEAN)
+#include <corecrt_wstdio.h> /* Include <wchar.h> instead */
+#endif /* __USE_DOS && !__USE_DOS_CLEAN */
 
 #if ((defined(__USE_XOPEN) && !defined(__USE_XOPEN2K) && !defined(__USE_GNU)) || defined(__USE_SOLARIS))
 #include <getopt.h>

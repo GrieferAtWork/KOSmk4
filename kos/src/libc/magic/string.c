@@ -8429,9 +8429,9 @@ __STDC_INT_AS_SSIZE_T uucopystr([[nonnull]] /*char*/ void const *__restrict src,
 
 __SYSDECL_END
 
-#ifdef __USE_DOS
-#include <corecrt_wstring.h>
-#endif /* __USE_DOS */
+#if defined(__USE_DOS) && !defined(__USE_DOS_CLEAN)
+#include <corecrt_wstring.h> /* Include <wchar.h> instead */
+#endif /* __USE_DOS && !__USE_DOS_CLEAN */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_STRING_H)
