@@ -1211,6 +1211,15 @@ NOTHROW_NCX(DLFCN_CC libdl_dlinfo)(USER DlModule *self, int request,
 		*(void **)arg = DlModule_TryGetTLSAddr(self);
 		break;
 
+	case RTLD_DI_ARGSINFO: {
+		static auxv_t const null_auxv = { 0, { 0 } };
+		Dl_argsinfo_t *info = (Dl_argsinfo_t *)arg;
+		info->dla_argc = (typeof(info->dla_argc))dl_globals.dg_peb->pp_argc;
+		info->dla_argv = dl_globals.dg_peb->pp_argv;
+		info->dla_envp = dl_globals.dg_peb->pp_envp;
+		info->dla_auxv = (auxv_t *)&null_auxv;
+	}	break;
+
 	default:
 		return dl_seterrorf("dlinfo: unknown request: %d", request);
 	}

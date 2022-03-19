@@ -50,6 +50,7 @@ struct __dl_info_struct {
 
 
 #ifdef __CRT_HAVE_dlinfo
+#ifdef __RTLD_DI_SERINFO
 struct __Dl_serpath {
 	char        *dls_name;   /* [1..1] Search path directory */
 	unsigned int dls_flags;  /* ??? */
@@ -65,6 +66,22 @@ struct __Dl_serinfo {
 #endif /* !__USE_KOS_ALTERATIONS */
 	/* The buffer for `dls_name' strings goes here. */
 };
+#endif /* __RTLD_DI_SERINFO */
+#ifdef __RTLD_DI_ARGSINFO
+#if __SIZEOF_POINTER__ >= 8
+typedef struct elf64_auxv_t auxv_t;
+#else /* __SIZEOF_POINTER__ >= 8 */
+typedef struct elf32_auxv_t auxv_t;
+#endif /* __SIZEOF_POINTER__ < 8 */
+struct __Dl_argsinfo {
+	__LONGPTR_TYPE__ dla_argc; /* s.a. `__argc' from <stdlib.h> */
+	char           **dla_argv; /* [1..n] s.a. `__argv' from <stdlib.h> */
+	char           **dla_envp; /* [1..n] s.a. `environ' from <unistd.h> */
+	auxv_t          *dla_auxv; /* [1..1] NOTE: On KOS, this always pointers to a bzero'd `auxv_t' */
+};
+#endif /* __RTLD_DI_ARGSINFO */
+
+
 #endif /* __CRT_HAVE_dlinfo */
 
 

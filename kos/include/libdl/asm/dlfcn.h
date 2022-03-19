@@ -113,9 +113,22 @@ __DECL_BEGIN
 #define __RTLD_DI_ORIGIN      6  /* [char *arg] strcpy() the `$ORIGIN' of this module (WARNING: UNBOUNDED BUFFER COPY) */
 #define __RTLD_DI_PROFILENAME 7  /* Unsupported on KOS (and neither supported by gLibc) */
 #define __RTLD_DI_PROFILEOUT  8  /* Unsupported on KOS (and neither supported by gLibc) */
+#if defined(__KOS__) || defined(__CRT_GLC)
+/* linux / gLibc */
 #define __RTLD_DI_TLS_MODID   9  /* [size_t *arg] Store TLS module id (on KOS: this is the same as `handle') */
 #define __RTLD_DI_TLS_DATA    10 /* [void **arg] Same as `dltlsaddr(3)', but don't allocate TLS if not already done -- Writes NULL if not allocated or no PT_TLS segment */
 #define __RTLD_DI_MAX         10
+#if defined(__KOS__) || defined(__CRT_KOS)
+#define __RTLD_DI_ARGSINFO    64 /* [Dl_argsinfo *arg] Return information from the program PEB. */
+#endif /* defined(__KOS__) || __CRT_KOS */
+#elif defined(__solaris__)
+#define __RTLD_DI_GETSIGNAL   9
+#define __RTLD_DI_SETSIGNAL   10
+#define __RTLD_DI_ARGSINFO    11
+#define __RTLD_DI_MMAPS       12
+#define __RTLD_DI_MMAPCNT     13
+#define __RTLD_DI_MAX         13
+#endif /* ... */
 #endif /* __CRT_HAVE_dlinfo */
 
 #ifdef __CRT_HAVE_dladdr1

@@ -162,7 +162,7 @@
 #endif /* __USE_NETBSD && __RTLD_LAZY */
 
 
-#if defined(__USE_NETBSD) || defined(__USE_GNU)
+#if defined(__USE_NETBSD) || defined(__USE_SOLARIS) || defined(__USE_GNU)
 /* If  the first argument  of `dlsym' or `dlvsym'  is set to RTLD_NEXT
  * the run-time address of the symbol called `name' in the next shared
  * object is returned.  The "next"  relation is defined  by the  order
@@ -189,13 +189,15 @@
 #endif /* __RTLD_SELF */
 
 /* Special namespace ID values. */
+#ifdef __USE_GNU
 #ifdef __LM_ID_BASE
 #define LM_ID_BASE __LM_ID_BASE /* Initial namespace. */
 #endif /* __LM_ID_BASE */
 #ifdef __LM_ID_NEWLM
 #define LM_ID_NEWLM __LM_ID_NEWLM /* For dlmopen: request new namespace. */
 #endif /* __LM_ID_NEWLM */
-#endif /* __USE_NETBSD || __USE_GNU */
+#endif /* __USE_GNU */
+#endif /* __USE_NETBSD || __USE_SOLARIS || __USE_GNU */
 
 
 
@@ -801,7 +803,7 @@ __IMPDEF void *(__DLFCN_VCC dlauxctrl)(void *__handle,
 
 
 
-#if defined(__USE_GNU) || defined(__USE_NETBSD)
+#if defined(__USE_GNU) || defined(__USE_NETBSD) || defined(__USE_SOLARIS)
 #ifdef __CRT_HAVE_dladdr
 #ifndef __Dl_info_defined
 #define __Dl_info_defined
@@ -830,6 +832,8 @@ __NOTHROW_NCX(__DLFCN_CC dladdr)(void const *__address,
 #define RTLD_DI_CONFIGADDR  __RTLD_DI_CONFIGADDR  /* Unsupported on KOS (and neither supported by gLibc) */
 #endif /* !RTLD_DI_CONFIGADDR && __RTLD_DI_CONFIGADDR */
 #if !defined(RTLD_DI_SERINFO) && defined(__RTLD_DI_SERINFO)
+typedef struct __Dl_serpath Dl_serpath;
+typedef struct __Dl_serinfo Dl_serinfo;
 #define RTLD_DI_SERINFO     __RTLD_DI_SERINFO     /* [Dl_serinfo *arg] Return search path information */
 #endif /* !RTLD_DI_SERINFO && __RTLD_DI_SERINFO */
 #if !defined(RTLD_DI_SERINFOSIZE) && defined(__RTLD_DI_SERINFOSIZE)
@@ -853,9 +857,12 @@ __NOTHROW_NCX(__DLFCN_CC dladdr)(void const *__address,
 #if !defined(RTLD_DI_MAX) && defined(__RTLD_DI_MAX)
 #define RTLD_DI_MAX         __RTLD_DI_MAX
 #endif /* !RTLD_DI_MAX && __RTLD_DI_MAX */
+#if !defined(RTLD_DI_ARGSINFO) && defined(__RTLD_DI_ARGSINFO)
+typedef struct __Dl_argsinfo Dl_argsinfo;
+typedef struct __Dl_argsinfo Dl_argsinfo_t;
+#define RTLD_DI_ARGSINFO    __RTLD_DI_ARGSINFO /* [Dl_argsinfo *arg] Return information from the program PEB. */
+#endif /* !RTLD_DI_ARGSINFO && __RTLD_DI_ARGSINFO */
 
-typedef struct __Dl_serpath Dl_serpath;
-typedef struct __Dl_serinfo Dl_serinfo;
 
 /* >> dlinfo(3)
  * Query auxiliary information on `handle', according to `request'
@@ -868,7 +875,7 @@ __NOTHROW_NCX(__DLFCN_CC dlinfo)(void *__restrict __handle,
                                  int __request,
                                  void *__arg);
 #endif /* __CRT_HAVE_dlinfo */
-#endif /* __USE_GNU || __USE_NETBSD */
+#endif /* __USE_GNU || __USE_NETBSD || __USE_SOLARIS */
 
 
 #ifdef __USE_GNU
