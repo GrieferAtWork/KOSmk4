@@ -4264,6 +4264,7 @@
 #define __CRT_HAVE_shmdt
 #define __CRT_HAVE_shmget
 #define __CRT_HAVE_shutdown
+#define __CRT_HAVE_sig2str
 #define __CRT_HAVE_sigabbrev_np
 #define __CRT_HAVE_sigaction
 #define __CRT_HAVE_sigaddset
@@ -4368,6 +4369,7 @@
 #define __CRT_HAVE_stime64
 #define __CRT_HAVE_stpcpy
 #define __CRT_HAVE_stpncpy
+#define __CRT_HAVE_str2sig
 #define __CRT_HAVE_strcasecmp
 #define __CRT_HAVE_strcasecmp_l
 #define __CRT_HAVE_strcasecoll
@@ -9625,6 +9627,7 @@
 #define __CRT_HAVE_KOS$shmdt
 #define __CRT_HAVE_KOS$shmget
 #define __CRT_HAVE_KOS$shutdown
+#define __CRT_HAVE_KOS$sig2str
 #define __CRT_HAVE_KOS$sigabbrev_np
 #define __CRT_HAVE_KOS$sigaction
 #define __CRT_HAVE_KOS$sigaddset
@@ -9718,6 +9721,7 @@
 #define __CRT_HAVE_KOS$stime64
 #define __CRT_HAVE_KOS$stpcpy
 #define __CRT_HAVE_KOS$stpncpy
+#define __CRT_HAVE_KOS$str2sig
 #define __CRT_HAVE_KOS$strcasecmp
 #define __CRT_HAVE_KOS$strcasecmp_l
 #define __CRT_HAVE_KOS$strcasecoll
@@ -14083,6 +14087,7 @@
 #define __CRT_HAVE_DOS$shmdt
 #define __CRT_HAVE_DOS$shmget
 #define __CRT_HAVE_DOS$shutdown
+#define __CRT_HAVE_DOS$sig2str
 #define __CRT_HAVE_DOS$sigabbrev_np
 #define __CRT_HAVE_DOS$sigaction
 #define __CRT_HAVE_DOS$sigaddset
@@ -14176,6 +14181,7 @@
 #define __CRT_HAVE_DOS$stime64
 #define __CRT_HAVE_DOS$stpcpy
 #define __CRT_HAVE_DOS$stpncpy
+#define __CRT_HAVE_DOS$str2sig
 #define __CRT_HAVE_DOS$strcasecmp
 #define __CRT_HAVE_DOS$strcasecmp_l
 #define __CRT_HAVE_DOS$strcasecoll

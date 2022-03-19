@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ad088c4 */
+/* HASH CRC-32:0xf0e5284d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_uucopystr_defined
 #define __local_uucopystr_defined
 #include <__crt.h>
-#if defined(__KOS__) && defined(__cplusplus)
+#if defined(__KOS__) && defined(__cplusplus) && defined(__CRT_HAVE_except_nesting_begin) && defined(__CRT_HAVE_except_nesting_end)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_except_as_errno_defined
 #define __local___localdep_except_as_errno_defined
@@ -103,7 +103,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_uucopystr_defined
 #define __localdep_uucopystr __LIBC_LOCAL_NAME(uucopystr)
 #endif /* !__local___localdep_uucopystr_defined */
-#else /* __KOS__ && __cplusplus */
+#else /* __KOS__ && __cplusplus && __CRT_HAVE_except_nesting_begin && __CRT_HAVE_except_nesting_end */
 #undef __local_uucopystr_defined
-#endif /* !__KOS__ || !__cplusplus */
+#endif /* !__KOS__ || !__cplusplus || !__CRT_HAVE_except_nesting_begin || !__CRT_HAVE_except_nesting_end */
 #endif /* !__local_uucopystr_defined */

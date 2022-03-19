@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1bd9d131 */
+/* HASH CRC-32:0x4d34caa5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,7 +68,7 @@ global CODED_SIGNALS: {(string, string)...} = {
 	("SIGSEGV", "__SEGV_"),
 	("SIGBUS", "__BUS_"),
 	("SIGTRAP", "__TRAP_"),
-	("SIGCLD", "__CLD_"),
+	("SIGCHLD", "__CLD_"),
 	("SIGPOLL", "__POLL_"),
 };
 
@@ -225,7 +225,7 @@ print("@@pp_endif@@");
 		}
 		break;
 
-	case __SIGCLD:
+	case __SIGCHLD:
 		if ((unsigned int)__code <= 0x6) {
 			static char const __repr_cld[] =
 			"\0Child has exited\0Child was killed\0Child terminated abnormally\0T"
@@ -260,7 +260,7 @@ print("@@pp_endif@@");
 			static char const __repr_si[] =
 			"Sent by tkill\0Sent by queued SIGIO\0Sent by AIO completion\0Sent b"
 			"y real time mesq state change\0Sent by timer expiration\0Sent by s"
-			"igqueue_entry";
+			"igqueue";
 			__result = __repr_si;
 			__code -= 0xfa;
 		}
@@ -390,8 +390,8 @@ print("@@pp_endif@@");
 		break;
 #endif /* __SIGTRAP */
 
-#ifdef __SIGCLD
-	case __SIGCLD:
+#ifdef __SIGCHLD
+	case __SIGCHLD:
 		switch (__code) {
 #ifdef __CLD_EXITED
 		case __CLD_EXITED: __result = "Child has exited"; break;
@@ -414,7 +414,7 @@ print("@@pp_endif@@");
 		default: break;
 		}
 		break;
-#endif /* __SIGCLD */
+#endif /* __SIGCHLD */
 
 #ifdef __SIGPOLL
 	case __SIGPOLL:

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb89eafee */
+/* HASH CRC-32:0xadf09f4c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2547,14 +2547,14 @@ INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_timingsafe_memcmp)(
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strtosigno(3)
  * Return the signal number for a given name.
- * e.g.      `strtosigno("SIGINT") == SIGINT'
+ * e.g.: `strtosigno("SIGINT") == SIGINT'
  * When `name' isn't recognized, return `0' instead. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) signo_t NOTHROW_NCX(LIBDCALL libd_strtosigno)(const char *name);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strtosigno(3)
  * Return the signal number for a given name.
- * e.g.      `strtosigno("SIGINT") == SIGINT'
+ * e.g.: `strtosigno("SIGINT") == SIGINT'
  * When `name' isn't recognized, return `0' instead. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) signo_t NOTHROW_NCX(LIBCCALL libc_strtosigno)(const char *name);
 #endif /* !__KERNEL__ */
@@ -2594,7 +2594,7 @@ INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_consttime_memequal)
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> uucopy(2)
- * Copy `num_bytes' from `src' to `dst'. The copy is done such that any
+ * Copy `num_bytes' from `src' to `dst'. The copy is done such that  any
  * faulty memory access is handled by returning `-1' with `errno=EFAULT'
  * @return: 0 : Success
  * @return: -1: [errno=EFAULT] Faulty memory access */
@@ -2602,7 +2602,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_uucopy)(void const *__restrict src, void *_
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> uucopy(2)
- * Copy `num_bytes' from `src' to `dst'. The copy is done such that any
+ * Copy `num_bytes' from `src' to `dst'. The copy is done such that  any
  * faulty memory access is handled by returning `-1' with `errno=EFAULT'
  * @return: 0 : Success
  * @return: -1: [errno=EFAULT] Faulty memory access */
@@ -2610,7 +2610,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_uucopy)(void const *__restrict src, void *_
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> uucopystr(2)
- * Copy a string `src' into `dst', but copy no more than `maxlen' characters (including trailing NUL).
+ * Copy  a string `src' into `dst', but copy no more than `maxlen' characters (including trailing NUL).
  * The copy is done such that any faulty memory access is handled by returning `-1' with `errno=EFAULT'
  * @return: * : The number of copied characters (including trialing NUL; )
  * @return: -1: [errno=EFAULT]       Faulty memory access
@@ -2619,7 +2619,7 @@ INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_uucopystr
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> uucopystr(2)
- * Copy a string `src' into `dst', but copy no more than `maxlen' characters (including trailing NUL).
+ * Copy  a string `src' into `dst', but copy no more than `maxlen' characters (including trailing NUL).
  * The copy is done such that any faulty memory access is handled by returning `-1' with `errno=EFAULT'
  * @return: * : The number of copied characters (including trialing NUL; )
  * @return: -1: [errno=EFAULT]       Faulty memory access

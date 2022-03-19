@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6758a658 */
+/* HASH CRC-32:0x2a4e1f91 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,9 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/signal.h"
+#include "../user/ctype.h"
 #include "../user/stdio.h"
+#include "../user/stdlib.h"
 #include "../user/string.h"
 
 DECL_BEGIN
@@ -412,7 +414,7 @@ global CODED_SIGNALS: {(string, string)...} = {
 	("SIGSEGV", "__SEGV_"),
 	("SIGBUS", "__BUS_"),
 	("SIGTRAP", "__TRAP_"),
-	("SIGCLD", "__CLD_"),
+	("SIGCHLD", "__CLD_"),
 	("SIGPOLL", "__POLL_"),
 };
 
@@ -569,7 +571,7 @@ print("@@pp_endif@@");
 		}
 		break;
 
-	case __SIGCLD:
+	case __SIGCHLD:
 		if ((unsigned int)code <= 0x6) {
 			static char const repr_cld[] =
 			"\0Child has exited\0Child was killed\0Child terminated abnormally\0T"
@@ -604,7 +606,7 @@ print("@@pp_endif@@");
 			static char const repr_si[] =
 			"Sent by tkill\0Sent by queued SIGIO\0Sent by AIO completion\0Sent b"
 			"y real time mesq state change\0Sent by timer expiration\0Sent by s"
-			"igqueue_entry";
+			"igqueue";
 			result = repr_si;
 			code -= 0xfa;
 		}
@@ -928,23 +930,62 @@ err:
 /* >> signalnumber(3)
  * Similar to `strtosigno(3)', however ignore any leading `SIG*'
  * prefix of `name', and  do a case-insensitive compare  between
- * the   given   `name',   and   the   signal's   actual   name.
- * When   `name'   isn't   recognized,   return   `0'   instead. */
+ * the given `name', and the  signal's actual name. When  `name'
+ * isn't recognized, return `0' instead.
+ * This function also handles stuff like "SIGRTMIN+1" or "9" */
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_PURE WUNUSED NONNULL((1)) signo_t
 NOTHROW_NCX(LIBCCALL libc_signalnumber)(const char *name) {
-	signo_t i, result = 0;
+	signo_t result;
+
+	/* Skip "SIG" prefix. */
 	if ((name[0] == 'S' || name[0] == 's') &&
 	    (name[1] == 'I' || name[1] == 'i') &&
 	    (name[2] == 'G' || name[2] == 'g'))
 		name += 3;
-	for (i = 1; i < __NSIG; ++i) {
-		char const *s = libc_sigabbrev_np(i);
-		if (likely(s) && libc_strcasecmp(s, name) == 0) {
-			result = i;
-			break;
-		}
+
+	/* Check for known signal names. */
+	for (result = 1; result < __NSIG; ++result) {
+		char const *s = libc_sigabbrev_np(result);
+		if (likely(s) && libc_strcasecmp(name, s) == 0)
+			return result;
 	}
-	return result;
+
+	/* Signal alias names. */
+
+	if (libc_strcasecmp(name, "CLD") == 0)
+		return __SIGCHLD;
+
+
+	if (libc_strcasecmp(name, "RPC") == 0)
+		return __SIGRPC;
+
+
+	if (libc_strcasecmp(name, "POLL") == 0)
+		return __SIGPOLL;
+
+
+	/* SIGRT* with offset. e.g. "RTMIN+1", "RTMAX-1" */
+
+	if (libc_memcasecmp(name, "RTMIN+", 6 * sizeof(char)) == 0) {
+		name += 6;
+		result = __SIGRTMIN + (signo_t)libc_strtou32(name, (char **)&name, 10);
+return_rt_signal:
+		if (*name != '\0' || (result < __SIGRTMIN || result > __SIGRTMAX))
+			result = 0;
+		return result;
+	}
+	if (libc_memcasecmp(name, "RTMAX-", 6 * sizeof(char)) == 0) {
+		name += 6;
+		result = __SIGRTMAX - (signo_t)libc_strtou32(name, (char **)&name, 10);
+		goto return_rt_signal;
+	}
+
+
+	/* Special case: the signal number itself. */
+	result = libc_strtou32(name, (char **)&name, 10);
+	if (*name != '\0' || (result <= 0 || result >= __NSIG))
+		result = 0;
+	return 0;
 }
 /* >> signalnext(3)
  * Return the next-greater signal number that comes after `signo'
@@ -955,6 +996,52 @@ NOTHROW_NCX(LIBCCALL libc_signalnext)(signo_t signo) {
 	if (signo >= (__NSIG - 1))
 		return 0;
 	return signo + 1;
+}
+/* >> sig2str(3)
+ * Wrapper around  `sigabbrev_np(3)', that  also adds  additional
+ * handling for `SIGRTMIN...`SIGRTMAX' signals, which are encoded
+ * in a way that is compatible with `str2sig(3)'. */
+INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((2)) int
+NOTHROW_NCX(LIBCCALL libc_sig2str)(signo_t signo,
+                                   char buf[32]) {
+	char const *name = libc_sigabbrev_np(signo);
+	if (name) {
+		/* Predefined name. */
+		libc_strcpy(buf, name);
+		return 0;
+	}
+
+	if (signo >= __SIGRTMIN && signo <= __SIGRTMAX) {
+		/* Realtime . */
+		libc_sprintf(buf, "RTMIN+%u", (unsigned int)(signo - __SIGRTMIN));
+		return 0;
+	}
+
+	return -1;
+}
+/* >> str2sig(3)
+ * More restrictive version of `signalnumber(3)':
+ *  - Requires all name-characters to be upper-case
+ *  - Doesn't automatically remove any "SIG" prefix.
+ * @return: 0 : Success; `*p_signo' was filled
+ * @return: -1: Unrecognized `name' (`errno(3)' was _NOT_ modified) */
+INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1, 2)) int
+NOTHROW_NCX(LIBCCALL libc_str2sig)(const char *name,
+                                   signo_t *p_signo) {
+	signo_t result;
+	size_t i;
+	if (name[0] == 'S' && name[1] == 'I' && name[2] == 'G')
+		return -1;
+	for (i = 0; name[i]; ++i) {
+		if (libc_islower(name[i]))
+			return -1;
+	}
+	result = libc_signalnumber(name);
+	if (result != 0) {
+		*p_signo = result;
+		return 0;
+	}
+	return -1;
 }
 #endif /* !__KERNEL__ */
 
@@ -1001,6 +1088,8 @@ DEFINE_PUBLIC_ALIAS(sigignore, libc_sigignore);
 DEFINE_PUBLIC_ALIAS(sigset, libc_sigset);
 DEFINE_PUBLIC_ALIAS(signalnumber, libc_signalnumber);
 DEFINE_PUBLIC_ALIAS(signalnext, libc_signalnext);
+DEFINE_PUBLIC_ALIAS(sig2str, libc_sig2str);
+DEFINE_PUBLIC_ALIAS(str2sig, libc_str2sig);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SIGNAL_C */

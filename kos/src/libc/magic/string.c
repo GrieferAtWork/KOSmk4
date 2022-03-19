@@ -8264,22 +8264,20 @@ int timingsafe_memcmp([[nonnull]] void const *s1,
 %#ifdef __USE_CYGWIN
 @@>> strtosigno(3)
 @@Return the signal number for a given name.
-@@e.g.      `strtosigno("SIGINT") == SIGINT'
+@@e.g.: `strtosigno("SIGINT") == SIGINT'
 @@When `name' isn't recognized, return `0' instead.
 [[pure, wunused, impl_include("<asm/os/signal.h>")]]
+[[requires_function(signalnumber, isupper)]]
 $signo_t strtosigno([[nonnull]] const char *name) {
-	$signo_t i, result = 0;
+	size_t i;
 	if (name[0] != 'S' || name[1] != 'I' || name[2] != 'G')
 		return 0;
 	name += 3;
-	for (i = 1; i < __NSIG; ++i) {
-		char const *s = sigabbrev_np(i);
-		if (likely(s) && strcmp(s, name) == 0) {
-			result = i;
-			break;
-		}
+	for (i = 0; name[i]; ++i) {
+		if (!isupper(name[i]))
+			return 0;
 	}
-	return result;
+	return signalnumber(name);
 }
 %#endif /* __USE_CYGWIN */
 
@@ -8344,11 +8342,11 @@ int consttime_memequal([[nonnull]] void const *s1,
 %
 %#ifdef __USE_SOLARIS
 @@>> uucopy(2)
-@@Copy `num_bytes' from `src' to `dst'. The copy is done such that any
+@@Copy `num_bytes' from `src' to `dst'. The copy is done such that  any
 @@faulty memory access is handled by returning `-1' with `errno=EFAULT'
 @@@return: 0 : Success
 @@@return: -1: [errno=EFAULT] Faulty memory access
-[[requires(defined(__KOS__) && defined(__cplusplus))]]
+[[requires(defined(__KOS__) && defined(__cplusplus) && $has_function(except_nesting_begin, except_nesting_end))]]
 [[impl_include("<kos/except.h>", "<libc/errno.h>")]]
 [[section(".text.crt{|.dos}.solaris")]]
 int uucopy(void const *__restrict src, void *__restrict dst, size_t num_bytes) {
@@ -8367,12 +8365,12 @@ int uucopy(void const *__restrict src, void *__restrict dst, size_t num_bytes) {
 }
 
 @@>> uucopystr(2)
-@@Copy a string `src' into `dst', but copy no more than `maxlen' characters (including trailing NUL).
+@@Copy  a string `src' into `dst', but copy no more than `maxlen' characters (including trailing NUL).
 @@The copy is done such that any faulty memory access is handled by returning `-1' with `errno=EFAULT'
 @@@return: * : The number of copied characters (including trialing NUL; )
 @@@return: -1: [errno=EFAULT]       Faulty memory access
 @@@return: -1: [errno=ENAMETOOLONG] `strlen(src) >= maxlen'
-[[requires(defined(__KOS__) && defined(__cplusplus))]]
+[[requires(defined(__KOS__) && defined(__cplusplus) && $has_function(except_nesting_begin, except_nesting_end))]]
 [[impl_include("<kos/except.h>", "<libc/errno.h>")]]
 [[section(".text.crt{|.dos}.solaris")]]
 __STDC_INT_AS_SSIZE_T uucopystr([[nonnull]] /*char*/ void const *__restrict src,

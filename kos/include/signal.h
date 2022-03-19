@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89d77b09 */
+/* HASH CRC-32:0xd6236a86 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2568,16 +2568,18 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW
 /* >> signalnumber(3)
  * Similar to `strtosigno(3)', however ignore any leading `SIG*'
  * prefix of `name', and  do a case-insensitive compare  between
- * the   given   `name',   and   the   signal's   actual   name.
- * When   `name'   isn't   recognized,   return   `0'   instead. */
+ * the given `name', and the  signal's actual name. When  `name'
+ * isn't recognized, return `0' instead.
+ * This function also handles stuff like "SIGRTMIN+1" or "9" */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__signo_t,__NOTHROW_NCX,signalnumber,(const char *__name),(__name))
 #else /* __CRT_HAVE_signalnumber */
 #include <libc/local/signal/signalnumber.h>
 /* >> signalnumber(3)
  * Similar to `strtosigno(3)', however ignore any leading `SIG*'
  * prefix of `name', and  do a case-insensitive compare  between
- * the   given   `name',   and   the   signal's   actual   name.
- * When   `name'   isn't   recognized,   return   `0'   instead. */
+ * the given `name', and the  signal's actual name. When  `name'
+ * isn't recognized, return `0' instead.
+ * This function also handles stuff like "SIGRTMIN+1" or "9" */
 __NAMESPACE_LOCAL_USING_OR_IMPL(signalnumber, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __signo_t __NOTHROW_NCX(__LIBCCALL signalnumber)(const char *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(signalnumber))(__name); })
 #endif /* !__CRT_HAVE_signalnumber */
 #ifdef __CRT_HAVE_signalnext
@@ -2595,6 +2597,42 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,signalnext,(__sig
 __NAMESPACE_LOCAL_USING_OR_IMPL(signalnext, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __signo_t __NOTHROW_NCX(__LIBCCALL signalnext)(__signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(signalnext))(__signo); })
 #endif /* !__CRT_HAVE_signalnext */
 #endif /* __USE_NETBSD */
+
+#ifdef __USE_SOLARIS
+#define SIG2STR_MAX 32
+#ifdef __CRT_HAVE_sig2str
+/* >> sig2str(3)
+ * Wrapper around  `sigabbrev_np(3)', that  also adds  additional
+ * handling for `SIGRTMIN...`SIGRTMAX' signals, which are encoded
+ * in a way that is compatible with `str2sig(3)'. */
+__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,sig2str,(__signo_t __signo, char __buf[32]),(__signo,__buf))
+#else /* __CRT_HAVE_sig2str */
+#include <libc/local/signal/sig2str.h>
+/* >> sig2str(3)
+ * Wrapper around  `sigabbrev_np(3)', that  also adds  additional
+ * handling for `SIGRTMIN...`SIGRTMAX' signals, which are encoded
+ * in a way that is compatible with `str2sig(3)'. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(sig2str, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL sig2str)(__signo_t __signo, char __buf[32]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sig2str))(__signo, __buf); })
+#endif /* !__CRT_HAVE_sig2str */
+#ifdef __CRT_HAVE_str2sig
+/* >> str2sig(3)
+ * More restrictive version of `signalnumber(3)':
+ *  - Requires all name-characters to be upper-case
+ *  - Doesn't automatically remove any "SIG" prefix.
+ * @return: 0 : Success; `*p_signo' was filled
+ * @return: -1: Unrecognized `name' (`errno(3)' was _NOT_ modified) */
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,str2sig,(const char *__name, __signo_t *__p_signo),(__name,__p_signo))
+#else /* __CRT_HAVE_str2sig */
+#include <libc/local/signal/str2sig.h>
+/* >> str2sig(3)
+ * More restrictive version of `signalnumber(3)':
+ *  - Requires all name-characters to be upper-case
+ *  - Doesn't automatically remove any "SIG" prefix.
+ * @return: 0 : Success; `*p_signo' was filled
+ * @return: -1: Unrecognized `name' (`errno(3)' was _NOT_ modified) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(str2sig, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL str2sig)(const char *__name, __signo_t *__p_signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(str2sig))(__name, __p_signo); })
+#endif /* !__CRT_HAVE_str2sig */
+#endif /* __USE_SOLARIS */
 
 #endif /* __CC__ */
 

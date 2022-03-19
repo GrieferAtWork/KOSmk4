@@ -4418,6 +4418,7 @@
 #define __CRT_HAVE_shmdt
 #define __CRT_HAVE_shmget
 #define __CRT_HAVE_shutdown
+#define __CRT_HAVE_sig2str
 #define __CRT_HAVE_sigabbrev_np
 #define __CRT_HAVE_sigaction
 #define __CRT_HAVE_sigaddset
@@ -4522,6 +4523,7 @@
 #define __CRT_HAVE_stime64
 #define __CRT_HAVE_stpcpy
 #define __CRT_HAVE_stpncpy
+#define __CRT_HAVE_str2sig
 #define __CRT_HAVE_strcasecmp
 #define __CRT_HAVE_strcasecmp_l
 #define __CRT_HAVE_strcasecoll

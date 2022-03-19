@@ -282,6 +282,7 @@ incdir("");
 #include <bits/crt/vtimes.h>
 #include <bits/crt/wctype.h>
 #include <bits/crt/wformat-printer.h>
+#include <bits/crt/wordexp.h>
 #include <bits/elf-types.h>
 #include <bits/elf.h>
 #include <bits/math-constants.h>
@@ -529,6 +530,7 @@ incdir("");
 #include <glob.h>
 #include <gnu/lib-names.h>
 #include <gnu/stubs.h>
+#include <gppconio.h>
 #include <grp.h>
 #include <huge_val.h>
 #include <hw/bus/pci.h>
@@ -1240,6 +1242,7 @@ incdir("");
 #include <sys/poll.h>
 #include <sys/prctl.h>
 #include <sys/procfs.h>
+#include <sys/profil.h>
 #include <sys/ptrace.h>
 #include <sys/queue.h>
 #include <sys/random.h>
@@ -1334,6 +1337,7 @@ incdir("");
 #include <waitstatus.h>
 #include <wchar.h>
 #include <wctype.h>
+#include <wordexp.h>
 #include <xlocale.h>
 //[[[end]]]
 

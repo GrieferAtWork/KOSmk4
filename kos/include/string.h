@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf979313 */
+/* HASH CRC-32:0x686e72a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -8514,14 +8514,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(timingsafe_memcmp, __FORCELOCAL __ATTR_ARTIFICIA
 #ifdef __CRT_HAVE_strtosigno
 /* >> strtosigno(3)
  * Return the signal number for a given name.
- * e.g.      `strtosigno("SIGINT") == SIGINT'
+ * e.g.: `strtosigno("SIGINT") == SIGINT'
  * When `name' isn't recognized, return `0' instead. */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__signo_t,__NOTHROW_NCX,strtosigno,(const char *__name),(__name))
 #else /* __CRT_HAVE_strtosigno */
 #include <libc/local/string/strtosigno.h>
 /* >> strtosigno(3)
  * Return the signal number for a given name.
- * e.g.      `strtosigno("SIGINT") == SIGINT'
+ * e.g.: `strtosigno("SIGINT") == SIGINT'
  * When `name' isn't recognized, return `0' instead. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strtosigno, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __signo_t __NOTHROW_NCX(__LIBCCALL strtosigno)(const char *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtosigno))(__name); })
 #endif /* !__CRT_HAVE_strtosigno */
@@ -8578,15 +8578,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(consttime_memequal, __FORCELOCAL __ATTR_ARTIFICI
 #ifdef __USE_SOLARIS
 #ifdef __CRT_HAVE_uucopy
 /* >> uucopy(2)
- * Copy `num_bytes' from `src' to `dst'. The copy is done such that any
+ * Copy `num_bytes' from `src' to `dst'. The copy is done such that  any
  * faulty memory access is handled by returning `-1' with `errno=EFAULT'
  * @return: 0 : Success
  * @return: -1: [errno=EFAULT] Faulty memory access */
 __CDECLARE(,int,__NOTHROW_NCX,uucopy,(void const *__restrict __src, void *__restrict __dst, size_t __num_bytes),(__src,__dst,__num_bytes))
-#elif defined(__KOS__) && defined(__cplusplus)
+#elif defined(__KOS__) && defined(__cplusplus) && defined(__CRT_HAVE_except_nesting_begin) && defined(__CRT_HAVE_except_nesting_end)
 #include <libc/local/string/uucopy.h>
 /* >> uucopy(2)
- * Copy `num_bytes' from `src' to `dst'. The copy is done such that any
+ * Copy `num_bytes' from `src' to `dst'. The copy is done such that  any
  * faulty memory access is handled by returning `-1' with `errno=EFAULT'
  * @return: 0 : Success
  * @return: -1: [errno=EFAULT] Faulty memory access */
@@ -8594,16 +8594,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(uucopy, __FORCELOCAL __ATTR_ARTIFICIAL int __NOT
 #endif /* ... */
 #ifdef __CRT_HAVE_uucopystr
 /* >> uucopystr(2)
- * Copy a string `src' into `dst', but copy no more than `maxlen' characters (including trailing NUL).
+ * Copy  a string `src' into `dst', but copy no more than `maxlen' characters (including trailing NUL).
  * The copy is done such that any faulty memory access is handled by returning `-1' with `errno=EFAULT'
  * @return: * : The number of copied characters (including trialing NUL; )
  * @return: -1: [errno=EFAULT]       Faulty memory access
  * @return: -1: [errno=ENAMETOOLONG] `strlen(src) >= maxlen' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,uucopystr,(void const *__restrict __src, void *__restrict __dst, size_t __maxlen),(__src,__dst,__maxlen))
-#elif defined(__KOS__) && defined(__cplusplus)
+#elif defined(__KOS__) && defined(__cplusplus) && defined(__CRT_HAVE_except_nesting_begin) && defined(__CRT_HAVE_except_nesting_end)
 #include <libc/local/string/uucopystr.h>
 /* >> uucopystr(2)
- * Copy a string `src' into `dst', but copy no more than `maxlen' characters (including trailing NUL).
+ * Copy  a string `src' into `dst', but copy no more than `maxlen' characters (including trailing NUL).
  * The copy is done such that any faulty memory access is handled by returning `-1' with `errno=EFAULT'
  * @return: * : The number of copied characters (including trialing NUL; )
  * @return: -1: [errno=EFAULT]       Faulty memory access

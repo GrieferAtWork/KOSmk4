@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec52f57f */
+/* HASH CRC-32:0x53fb64d6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,7 @@
 #include "../user/string.h"
 #include "../user/ctype.h"
 #include "../user/kos.except.h"
+#include "../user/signal.h"
 #include "../user/stdio.h"
 #include "../user/stdlib.h"
 
@@ -5951,22 +5952,19 @@ NOTHROW_NCX(LIBCCALL libc_timingsafe_memcmp)(void const *s1,
 #include <asm/os/signal.h>
 /* >> strtosigno(3)
  * Return the signal number for a given name.
- * e.g.      `strtosigno("SIGINT") == SIGINT'
+ * e.g.: `strtosigno("SIGINT") == SIGINT'
  * When `name' isn't recognized, return `0' instead. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) signo_t
 NOTHROW_NCX(LIBCCALL libc_strtosigno)(const char *name) {
-	signo_t i, result = 0;
+	size_t i;
 	if (name[0] != 'S' || name[1] != 'I' || name[2] != 'G')
 		return 0;
 	name += 3;
-	for (i = 1; i < __NSIG; ++i) {
-		char const *s = libc_sigabbrev_np(i);
-		if (likely(s) && libc_strcmp(s, name) == 0) {
-			result = i;
-			break;
-		}
+	for (i = 0; name[i]; ++i) {
+		if (!libc_isupper(name[i]))
+			return 0;
 	}
-	return result;
+	return libc_signalnumber(name);
 }
 /* >> stresep(3)
  * Same as `strsep(3)', but allow the specification of an additional `escape'
@@ -6013,7 +6011,7 @@ NOTHROW_NCX(LIBCCALL libc_consttime_memequal)(void const *s1,
 #include <kos/except.h>
 #include <libc/errno.h>
 /* >> uucopy(2)
- * Copy `num_bytes' from `src' to `dst'. The copy is done such that any
+ * Copy `num_bytes' from `src' to `dst'. The copy is done such that  any
  * faulty memory access is handled by returning `-1' with `errno=EFAULT'
  * @return: 0 : Success
  * @return: -1: [errno=EFAULT] Faulty memory access */
@@ -6037,7 +6035,7 @@ NOTHROW_NCX(LIBCCALL libc_uucopy)(void const *__restrict src,
 #include <kos/except.h>
 #include <libc/errno.h>
 /* >> uucopystr(2)
- * Copy a string `src' into `dst', but copy no more than `maxlen' characters (including trailing NUL).
+ * Copy  a string `src' into `dst', but copy no more than `maxlen' characters (including trailing NUL).
  * The copy is done such that any faulty memory access is handled by returning `-1' with `errno=EFAULT'
  * @return: * : The number of copied characters (including trialing NUL; )
  * @return: -1: [errno=EFAULT]       Faulty memory access

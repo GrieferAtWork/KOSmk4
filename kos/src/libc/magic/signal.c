@@ -2230,7 +2230,7 @@ global CODED_SIGNALS: {(string, string)...} = {
 	("SIGSEGV", "__SEGV_"),
 	("SIGBUS", "__BUS_"),
 	("SIGTRAP", "__TRAP_"),
-	("SIGCLD", "__CLD_"),
+	("SIGCHLD", "__CLD_"),
 	("SIGPOLL", "__POLL_"),
 };
 
@@ -2387,7 +2387,7 @@ print("@@pp_endif@@");
 		}
 		break;
 
-	case __SIGCLD:
+	case __SIGCHLD:
 		if ((unsigned int)code <= 0x6) {
 			static char const repr_cld[] =
 			"\0Child has exited\0Child was killed\0Child terminated abnormally\0T"
@@ -2422,7 +2422,7 @@ print("@@pp_endif@@");
 			static char const repr_si[] =
 			"Sent by tkill\0Sent by queued SIGIO\0Sent by AIO completion\0Sent b"
 			"y real time mesq state change\0Sent by timer expiration\0Sent by s"
-			"igqueue_entry";
+			"igqueue";
 			result = repr_si;
 			code -= 0xfa;
 		}
@@ -2552,8 +2552,8 @@ print("@@pp_endif@@");
 		break;
 @@pp_endif@@
 
-@@pp_ifdef __SIGCLD@@
-	case __SIGCLD:
+@@pp_ifdef __SIGCHLD@@
+	case __SIGCHLD:
 		switch (code) {
 @@pp_ifdef __CLD_EXITED@@
 		case __CLD_EXITED: result = "Child has exited"; break;
@@ -2923,23 +2923,62 @@ DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO
 @@>> signalnumber(3)
 @@Similar to `strtosigno(3)', however ignore any leading `SIG*'
 @@prefix of `name', and  do a case-insensitive compare  between
-@@the   given   `name',   and   the   signal's   actual   name.
-@@When   `name'   isn't   recognized,   return   `0'   instead.
+@@the given `name', and the  signal's actual name. When  `name'
+@@isn't recognized, return `0' instead.
+@@This function also handles stuff like "SIGRTMIN+1" or "9"
 [[pure, wunused, impl_include("<asm/os/signal.h>")]]
 $signo_t signalnumber([[nonnull]] const char *name) {
-	$signo_t i, result = 0;
+	$signo_t result;
+
+	/* Skip "SIG" prefix. */
 	if ((name[0] == 'S' || name[0] == 's') &&
 	    (name[1] == 'I' || name[1] == 'i') &&
 	    (name[2] == 'G' || name[2] == 'g'))
 		name += 3;
-	for (i = 1; i < __NSIG; ++i) {
-		char const *s = sigabbrev_np(i);
-		if (likely(s) && strcasecmp(s, name) == 0) {
-			result = i;
-			break;
-		}
+
+	/* Check for known signal names. */
+	for (result = 1; result < __NSIG; ++result) {
+		char const *s = sigabbrev_np(result);
+		if (likely(s) && strcasecmp(name, s) == 0)
+			return result;
 	}
-	return result;
+
+	/* Signal alias names. */
+@@pp_ifdef __SIGCHLD@@
+	if (strcasecmp(name, "CLD") == 0)
+		return __SIGCHLD;
+@@pp_endif@@
+@@pp_ifdef __SIGRPC@@
+	if (strcasecmp(name, "RPC") == 0)
+		return __SIGRPC;
+@@pp_endif@@
+@@pp_ifdef __SIGPOLL@@
+	if (strcasecmp(name, "POLL") == 0)
+		return __SIGPOLL;
+@@pp_endif@@
+
+	/* SIGRT* with offset. e.g. "RTMIN+1", "RTMAX-1" */
+@@pp_if defined(__SIGRTMIN) && defined(__SIGRTMAX)@@
+	if (memcasecmp(name, "RTMIN+", 6 * sizeof(char)) == 0) {
+		name += 6;
+		result = __SIGRTMIN + (signo_t)strtou32(name, (char **)&name, 10);
+return_rt_signal:
+		if (*name != '\0' || (result < __SIGRTMIN || result > __SIGRTMAX))
+			result = 0;
+		return result;
+	}
+	if (memcasecmp(name, "RTMAX-", 6 * sizeof(char)) == 0) {
+		name += 6;
+		result = __SIGRTMAX - (signo_t)strtou32(name, (char **)&name, 10);
+		goto return_rt_signal;
+	}
+@@pp_endif@@
+
+	/* Special case: the signal number itself. */
+	result = strtou32(name, (char **)&name, 10);
+	if (*name != '\0' || (result <= 0 || result >= __NSIG))
+		result = 0;
+	return 0;
 }
 
 @@>> signalnext(3)
@@ -2953,6 +2992,61 @@ $signo_t signalnext($signo_t signo) {
 	return signo + 1;
 }
 %#endif /* __USE_NETBSD */
+
+
+%
+%#ifdef __USE_SOLARIS
+%#define SIG2STR_MAX 32
+%[define(SIG2STR_MAX = 32)]
+
+@@>> sig2str(3)
+@@Wrapper around  `sigabbrev_np(3)', that  also adds  additional
+@@handling for `SIGRTMIN...`SIGRTMAX' signals, which are encoded
+@@in a way that is compatible with `str2sig(3)'.
+[[requires_function(sigabbrev_np)]]
+[[impl_include("<asm/os/signal.h>")]]
+int sig2str($signo_t signo, [[nonnull]] char buf[SIG2STR_MAX]) {
+	char const *name = sigabbrev_np(signo);
+	if (name) {
+		/* Predefined name. */
+		strcpy(buf, name);
+		return 0;
+	}
+@@pp_if defined(__SIGRTMIN) && defined(__SIGRTMAX)@@
+	if (signo >= __SIGRTMIN && signo <= __SIGRTMAX) {
+		/* Realtime . */
+		sprintf(buf, "RTMIN+%u", (unsigned int)(signo - __SIGRTMIN));
+		return 0;
+	}
+@@pp_endif@@
+	return -1;
+}
+
+@@>> str2sig(3)
+@@More restrictive version of `signalnumber(3)':
+@@ - Requires all name-characters to be upper-case
+@@ - Doesn't automatically remove any "SIG" prefix.
+@@@return: 0 : Success; `*p_signo' was filled
+@@@return: -1: Unrecognized `name' (`errno(3)' was _NOT_ modified)
+[[requires_function(signalnumber)]]
+int str2sig([[nonnull]] const char *name, [[nonnull]] $signo_t *p_signo) {
+	$signo_t result;
+	size_t i;
+	if (name[0] == 'S' && name[1] == 'I' && name[2] == 'G')
+		return -1;
+	for (i = 0; name[i]; ++i) {
+		if (islower(name[i]))
+			return -1;
+	}
+	result = signalnumber(name);
+	if (result != 0) {
+		*p_signo = result;
+		return 0;
+	}
+	return -1;
+}
+
+%#endif /* __USE_SOLARIS */
 
 
 %

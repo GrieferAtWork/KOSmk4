@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72885aca */
+/* HASH CRC-32:0x1cde23e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -530,16 +530,18 @@ INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_sigqueue)(pthread_t pthread, si
 /* >> signalnumber(3)
  * Similar to `strtosigno(3)', however ignore any leading `SIG*'
  * prefix of `name', and  do a case-insensitive compare  between
- * the   given   `name',   and   the   signal's   actual   name.
- * When   `name'   isn't   recognized,   return   `0'   instead. */
+ * the given `name', and the  signal's actual name. When  `name'
+ * isn't recognized, return `0' instead.
+ * This function also handles stuff like "SIGRTMIN+1" or "9" */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) signo_t NOTHROW_NCX(LIBDCALL libd_signalnumber)(const char *name);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> signalnumber(3)
  * Similar to `strtosigno(3)', however ignore any leading `SIG*'
  * prefix of `name', and  do a case-insensitive compare  between
- * the   given   `name',   and   the   signal's   actual   name.
- * When   `name'   isn't   recognized,   return   `0'   instead. */
+ * the given `name', and the  signal's actual name. When  `name'
+ * isn't recognized, return `0' instead.
+ * This function also handles stuff like "SIGRTMIN+1" or "9" */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) signo_t NOTHROW_NCX(LIBCCALL libc_signalnumber)(const char *name);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -555,6 +557,38 @@ INTDEF ATTR_CONST WUNUSED signo_t NOTHROW_NCX(LIBDCALL libd_signalnext)(signo_t 
  * When  no such signal number exists, return `0'. When the given
  * `signo' is `0', return the lowest valid signal number. */
 INTDEF ATTR_CONST WUNUSED signo_t NOTHROW_NCX(LIBCCALL libc_signalnext)(signo_t signo);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> sig2str(3)
+ * Wrapper around  `sigabbrev_np(3)', that  also adds  additional
+ * handling for `SIGRTMIN...`SIGRTMAX' signals, which are encoded
+ * in a way that is compatible with `str2sig(3)'. */
+INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_sig2str)(signo_t signo, char buf[32]);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> sig2str(3)
+ * Wrapper around  `sigabbrev_np(3)', that  also adds  additional
+ * handling for `SIGRTMIN...`SIGRTMAX' signals, which are encoded
+ * in a way that is compatible with `str2sig(3)'. */
+INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_sig2str)(signo_t signo, char buf[32]);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> str2sig(3)
+ * More restrictive version of `signalnumber(3)':
+ *  - Requires all name-characters to be upper-case
+ *  - Doesn't automatically remove any "SIG" prefix.
+ * @return: 0 : Success; `*p_signo' was filled
+ * @return: -1: Unrecognized `name' (`errno(3)' was _NOT_ modified) */
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_str2sig)(const char *name, signo_t *p_signo);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> str2sig(3)
+ * More restrictive version of `signalnumber(3)':
+ *  - Requires all name-characters to be upper-case
+ *  - Doesn't automatically remove any "SIG" prefix.
+ * @return: 0 : Success; `*p_signo' was filled
+ * @return: -1: Unrecognized `name' (`errno(3)' was _NOT_ modified) */
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_str2sig)(const char *name, signo_t *p_signo);
 #endif /* !__KERNEL__ */
 
 DECL_END
