@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ece9e52 */
+/* HASH CRC-32:0xe9421311 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,7 +82,7 @@ INTDEF NONNULL((1, 2, 3)) error_t NOTHROW_NCX(LIBCCALL libc_argz_create)(char *c
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> argz_create_sep(3)
  * Create an argz-string from `string' by splitting that string at each
- * occurance  of `sep'. This function behaves the same as the following
+ * occurrence of `sep'. This function behaves the same as the following
  * pseudo-code:
  *     [*pargz, *pargz_len] = string.replace(sep, "\0").replaceall("\0\0", "\0");
  * As can be seen in the pseudo-code, duplicate, successive instance of
@@ -97,7 +97,7 @@ INTDEF NONNULL((1, 3, 4)) error_t NOTHROW_NCX(LIBDCALL libd_argz_create_sep)(cha
 #ifndef __KERNEL__
 /* >> argz_create_sep(3)
  * Create an argz-string from `string' by splitting that string at each
- * occurance  of `sep'. This function behaves the same as the following
+ * occurrence of `sep'. This function behaves the same as the following
  * pseudo-code:
  *     [*pargz, *pargz_len] = string.replace(sep, "\0").replaceall("\0\0", "\0");
  * As can be seen in the pseudo-code, duplicate, successive instance of

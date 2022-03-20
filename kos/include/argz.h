@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e70a9f7 */
+/* HASH CRC-32:0xe5c88ffc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -211,7 +211,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(_
 #ifdef __CRT_HAVE_argz_create_sep
 /* >> argz_create_sep(3)
  * Create an argz-string from `string' by splitting that string at each
- * occurance  of `sep'. This function behaves the same as the following
+ * occurrence of `sep'. This function behaves the same as the following
  * pseudo-code:
  *     [*pargz, *pargz_len] = string.replace(sep, "\0").replaceall("\0\0", "\0");
  * As can be seen in the pseudo-code, duplicate, successive instance of
@@ -225,7 +225,7 @@ __CDECLARE(__ATTR_NONNULL((1, 3, 4)),error_t,__NOTHROW_NCX,argz_create_sep,(char
 #elif defined(__CRT_HAVE___argz_create_sep)
 /* >> argz_create_sep(3)
  * Create an argz-string from `string' by splitting that string at each
- * occurance  of `sep'. This function behaves the same as the following
+ * occurrence of `sep'. This function behaves the same as the following
  * pseudo-code:
  *     [*pargz, *pargz_len] = string.replace(sep, "\0").replaceall("\0\0", "\0");
  * As can be seen in the pseudo-code, duplicate, successive instance of
@@ -240,7 +240,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),error_t,__NOTHROW_NCX,argz_create_sep,(cha
 #include <libc/local/argz/argz_create_sep.h>
 /* >> argz_create_sep(3)
  * Create an argz-string from `string' by splitting that string at each
- * occurance  of `sep'. This function behaves the same as the following
+ * occurrence of `sep'. This function behaves the same as the following
  * pseudo-code:
  *     [*pargz, *pargz_len] = string.replace(sep, "\0").replaceall("\0\0", "\0");
  * As can be seen in the pseudo-code, duplicate, successive instance of
@@ -255,7 +255,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(argz_create_sep, __FORCELOCAL __ATTR_ARTIFICIAL 
 #ifdef __CRT_HAVE_argz_create_sep
 /* >> argz_create_sep(3)
  * Create an argz-string from `string' by splitting that string at each
- * occurance  of `sep'. This function behaves the same as the following
+ * occurrence of `sep'. This function behaves the same as the following
  * pseudo-code:
  *     [*pargz, *pargz_len] = string.replace(sep, "\0").replaceall("\0\0", "\0");
  * As can be seen in the pseudo-code, duplicate, successive instance of
@@ -269,7 +269,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),error_t,__NOTHROW_NCX,__argz_create_sep,(c
 #elif defined(__CRT_HAVE___argz_create_sep)
 /* >> argz_create_sep(3)
  * Create an argz-string from `string' by splitting that string at each
- * occurance  of `sep'. This function behaves the same as the following
+ * occurrence of `sep'. This function behaves the same as the following
  * pseudo-code:
  *     [*pargz, *pargz_len] = string.replace(sep, "\0").replaceall("\0\0", "\0");
  * As can be seen in the pseudo-code, duplicate, successive instance of
@@ -284,7 +284,7 @@ __CDECLARE(__ATTR_NONNULL((1, 3, 4)),error_t,__NOTHROW_NCX,__argz_create_sep,(ch
 #include <libc/local/argz/argz_create_sep.h>
 /* >> argz_create_sep(3)
  * Create an argz-string from `string' by splitting that string at each
- * occurance  of `sep'. This function behaves the same as the following
+ * occurrence of `sep'. This function behaves the same as the following
  * pseudo-code:
  *     [*pargz, *pargz_len] = string.replace(sep, "\0").replaceall("\0\0", "\0");
  * As can be seen in the pseudo-code, duplicate, successive instance of

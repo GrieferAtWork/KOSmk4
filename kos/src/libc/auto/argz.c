@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e071ad2 */
+/* HASH CRC-32:0x5cf1e93f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,7 +88,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_create)(char *const argv[],
 #include <libc/errno.h>
 /* >> argz_create_sep(3)
  * Create an argz-string from `string' by splitting that string at each
- * occurance  of `sep'. This function behaves the same as the following
+ * occurrence of `sep'. This function behaves the same as the following
  * pseudo-code:
  *     [*pargz, *pargz_len] = string.replace(sep, "\0").replaceall("\0\0", "\0");
  * As can be seen in the pseudo-code, duplicate, successive instance of

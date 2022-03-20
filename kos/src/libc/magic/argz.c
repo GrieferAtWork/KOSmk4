@@ -124,7 +124,7 @@ error_t argz_create([[nonnull]] char *const argv[],
 
 @@>> argz_create_sep(3)
 @@Create an argz-string from `string' by splitting that string at each
-@@occurance  of `sep'. This function behaves the same as the following
+@@occurrence of `sep'. This function behaves the same as the following
 @@pseudo-code:
 @@    [*pargz, *pargz_len] = string.replace(sep, "\0").replaceall("\0\0", "\0");
 @@As can be seen in the pseudo-code, duplicate, successive instance of

@@ -43,7 +43,7 @@ final global TOK_KEYWORD = 5;
 @@for:  @"#define foo 42"
 final global TOK_DIRECTIVE = 6;
 
-@@Replace all occurances of @findStr with @replaceStr in @text
+@@Replace all occurrence of @findStr with @replaceStr in @text
 function replaceAll(text: string, findStr: string, replaceStr: string): string {
 	for (;;) {
 		local newText = text.replace(findStr, replaceStr);
