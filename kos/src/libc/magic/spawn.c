@@ -186,15 +186,15 @@ $errno_t crt_posix_spawn([[nonnull]] pid_t *__restrict pid,
 @@@return: * :          Error (errno-code describing the reason of failure)
 [[argument_names(pid, execfd, file_actions, attrp, ___argv, ___envp)]]
 [[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>"), decl_prefix(DEFINE_TARGV)]]
-[[impl_include("<bits/os/sigaction.h>", "<libc/errno.h>")]]
+[[impl_include("<bits/os/sigaction.h>", "<libc/errno.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<asm/os/vfork.h>", "<asm/os/oflags.h>", "<asm/os/signal.h>")]]
-[[requires_include("<asm/crt/posix_spawn.h>", "<asm/os/vfork.h>")]]
+[[requires_include("<asm/crt/posix_spawn.h>", "<asm/os/vfork.h>", "<asm/os/features.h>")]]
 [[requires((defined(__POSIX_SPAWN_USE_KOS) &&
             ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)) ||
              ($has_function(fork) && ($has_function(pipe2) && defined(O_CLOEXEC)) &&
               $has_function(read) && $has_function(write) && $has_function(close))) &&
-            $has_function(fexecve) && $has_function(waitpid)) ||
-           $has_function(crt_posix_spawn))]]
+            $has_function(crt_fexecve) && $has_function(waitpid)) ||
+           (defined(__OS_HAVE_PROCFS_SELF_FD) && $has_function(crt_posix_spawn)))]]
 $errno_t posix_fspawn_np([[nonnull]] pid_t *__restrict pid, $fd_t execfd,
                          [[nullable]] posix_spawn_file_actions_t const *file_actions,
                          [[nullable]] posix_spawnattr_t const *attrp,
@@ -203,7 +203,7 @@ $errno_t posix_fspawn_np([[nonnull]] pid_t *__restrict pid, $fd_t execfd,
         ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)) ||
          ($has_function(fork) && ($has_function(pipe2) && defined(O_CLOEXEC)) &&
           $has_function(read) && $has_function(write) && $has_function(close))) &&
-        $has_function(fexecve) && $has_function(waitpid)@@
+        $has_function(crt_fexecve) && $has_function(waitpid)@@
 	int status;
 @@pp_if !defined(__ARCH_HAVE_SHARED_VM_VFORK) || !$has_function(vfork)@@
 	fd_t pipes[2];
@@ -545,7 +545,15 @@ child_error:
 	}
 	_Exit(127);
 @@pp_else@@
-	char buf[32];
+@@pp_if __SIZEOF_INT__ == 4@@
+	char buf[COMPILER_LNEOF("/proc/self/fd/-2147483648")];
+@@pp_elif __SIZEOF_INT__ == 8@@
+	char buf[COMPILER_LNEOF("/proc/self/fd/-9223372036854775808")];
+@@pp_elif __SIZEOF_INT__ == 2@@
+	char buf[COMPILER_LNEOF("/proc/self/fd/-32768")];
+@@pp_else@@
+	char buf[COMPILER_LNEOF("/proc/self/fd/-128")];
+@@pp_endif@@
 	sprintf(buf, "/proc/self/fd/%d", execfd);
 	return crt_posix_spawn(pid, buf, file_actions, attrp, ___argv, ___envp);
 @@pp_endif@@

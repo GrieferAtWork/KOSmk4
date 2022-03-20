@@ -209,6 +209,7 @@ struct _wfinddata32i64_t {
 };
 struct _wfinddata64i32_t {
 	__UINT32_TYPE__      attrib;
+	__UINT32_TYPE__     _wfd64i32_pad; /* Padding made visible */
 	__INT64_TYPE__       time_create;
 	__INT64_TYPE__       time_access;
 	__INT64_TYPE__       time_write;
@@ -220,6 +221,7 @@ struct _wfinddata64i32_t {
 };
 struct _wfinddata64_t {
 	__UINT32_TYPE__      attrib;
+	__UINT32_TYPE__     _wfd64_pad; /* Padding made visible */
 	__INT64_TYPE__       time_create;
 	__INT64_TYPE__       time_access;
 	__INT64_TYPE__       time_write;

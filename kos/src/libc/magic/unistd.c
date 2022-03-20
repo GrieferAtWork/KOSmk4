@@ -1865,12 +1865,33 @@ int truncate64([[nonnull]] char const *file, __PIO_OFFSET64 length) {
 %#ifdef __USE_XOPEN2K8
 
 @@>> fexecve(2)
-@@Replace the  calling  process  with the  application  image  referred to  by  `fd'  and
-@@execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
-[[cp, guard, argument_names(fd, ___argv, ___envp)]]
+@@Replace the calling process with the application image referred
+@@to by `execfd'  and execute it's  `main()' method, passing  the
+@@given `argv', and setting `environ' to `envp'.
+[[cp, guard, argument_names(execfd, ___argv, ___envp)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[decl_include("<bits/types.h>"), section(".text.crt{|.dos}.fs.exec.exec")]]
-int fexecve($fd_t fd, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
+[[requires_include("<asm/os/features.h>"), userimpl]]
+[[requires(defined(__OS_HAVE_PROCFS_SELF_FD) && $has_function(execve))]]
+[[impl_include("<hybrid/typecore.h>")]]
+int fexecve($fd_t execfd, [[nonnull]] __TARGV, [[nonnull]] __TENVP) {
+@@pp_if __SIZEOF_INT__ == 4@@
+	char buf[COMPILER_LNEOF("/proc/self/fd/-2147483648")];
+@@pp_elif __SIZEOF_INT__ == 8@@
+	char buf[COMPILER_LNEOF("/proc/self/fd/-9223372036854775808")];
+@@pp_elif __SIZEOF_INT__ == 2@@
+	char buf[COMPILER_LNEOF("/proc/self/fd/-32768")];
+@@pp_else@@
+	char buf[COMPILER_LNEOF("/proc/self/fd/-128")];
+@@pp_endif@@
+	sprintf(buf, "/proc/self/fd/%d", execfd);
+	return execve(buf, ___argv, ___envp);
+}
+
+[[cp, argument_names(fd, ___argv, ___envp)]]
+[[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
+[[decl_include("<bits/types.h>"), hidden, nocrt, alias("fexecve")]]
+int crt_fexecve($fd_t fd, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
 
 %#endif /* __USE_XOPEN2K8 */
 

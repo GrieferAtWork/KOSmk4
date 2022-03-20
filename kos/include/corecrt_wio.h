@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34ce0f72 */
+/* HASH CRC-32:0x2b95f9e1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -227,6 +227,7 @@ struct _wfinddata32i64_t {
 };
 struct _wfinddata64i32_t {
 	__UINT32_TYPE__      attrib;
+	__UINT32_TYPE__     _wfd64i32_pad; /* Padding made visible */
 	__INT64_TYPE__       time_create;
 	__INT64_TYPE__       time_access;
 	__INT64_TYPE__       time_write;
@@ -238,6 +239,7 @@ struct _wfinddata64i32_t {
 };
 struct _wfinddata64_t {
 	__UINT32_TYPE__      attrib;
+	__UINT32_TYPE__     _wfd64_pad; /* Padding made visible */
 	__INT64_TYPE__       time_create;
 	__INT64_TYPE__       time_access;
 	__INT64_TYPE__       time_write;

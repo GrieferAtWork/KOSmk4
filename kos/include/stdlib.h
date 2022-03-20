@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10cfe7bb */
+/* HASH CRC-32:0xa5b5cd02 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3627,14 +3627,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getexecname, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 __CDECLARE(__ATTR_NONNULL((1)),int,__THROWING,fdwalk,(int (__LIBCCALL *__walk)(void *__arg, __fd_t __fd), void *__arg),(__walk,__arg))
 #else /* __CRT_HAVE_fdwalk */
 #include <asm/os/fcntl.h>
-#if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl) || defined(__CRT_HAVE___libc_fcntl)) && defined(__F_NEXT)
+#include <asm/os/features.h>
+#include <bits/os/dirent.h>
+#if ((defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl) || defined(__CRT_HAVE___libc_fcntl)) && defined(__F_NEXT)) || (defined(__OS_HAVE_PROCFS_SELF_FD) && (defined(__CRT_HAVE_opendir) || defined(__CRT_HAVE___libc_opendir) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_opendirat) || defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))) || defined(__USE_DOS_DIRENT)) && ((defined(__CRT_HAVE_readdirk) && defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE_readdirk64) && defined(__CRT_KOS) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE_readdir) && !defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE___libc_readdir) && !defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE_readdir64) && !defined(__CRT_KOS) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || defined(__USE_DOS_DIRENT)))
 #include <libc/local/stdlib/fdwalk.h>
 /* Enumerate all open file descriptors by  invoking `(*walk)(arg, <fd>)' for each of  them
  * If during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
  * and  `fdwalk()' returns with that same value. If `(*walk)(...)' is never called, or all
  * invocations return 0, `fdwalk()' will also return 0. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fdwalk, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int (__LIBCCALL fdwalk)(int (__LIBCCALL *__walk)(void *__arg, __fd_t __fd), void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdwalk))(__walk, __arg); })
-#endif /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl || __CRT_HAVE___libc_fcntl) && __F_NEXT */
+#endif /* ((__CRT_HAVE_fcntl || __CRT_HAVE___fcntl || __CRT_HAVE___libc_fcntl) && __F_NEXT) || (__OS_HAVE_PROCFS_SELF_FD && (__CRT_HAVE_opendir || __CRT_HAVE___libc_opendir || (__AT_FDCWD && (__CRT_HAVE_opendirat || __CRT_HAVE_fopendirat || (__CRT_HAVE_fdopendir && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)))) || (__CRT_HAVE_fdopendir && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)))) || __USE_DOS_DIRENT) && ((__CRT_HAVE_readdirk && __CRT_KOS && (!__USE_FILE_OFFSET64 || _DIRENT_MATCHES_DIRENT64)) || (__CRT_HAVE_readdirk64 && __CRT_KOS && (__USE_FILE_OFFSET64 || _DIRENT_MATCHES_DIRENT64)) || (__CRT_HAVE_readdir && !__CRT_KOS && (!__USE_FILE_OFFSET64 || _DIRENT_MATCHES_DIRENT64)) || (__CRT_HAVE___libc_readdir && !__CRT_KOS && (!__USE_FILE_OFFSET64 || _DIRENT_MATCHES_DIRENT64)) || (__CRT_HAVE_readdir64 && !__CRT_KOS && (__USE_FILE_OFFSET64 || _DIRENT_MATCHES_DIRENT64)) || __USE_DOS_DIRENT)) */
 #endif /* !__CRT_HAVE_fdwalk */
 #ifdef __CRT_HAVE_getpass
 /* >> getpass(3), getpassphrase(3) */

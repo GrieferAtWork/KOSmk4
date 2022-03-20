@@ -1706,18 +1706,19 @@ NOTHROW_NCX(LIBCCALL libc_truncate64)(char const *file,
 #endif /* MAGIC:alias */
 /*[[[end:libc_truncate64]]]*/
 
-/*[[[head:libc_fexecve,hash:CRC-32=0x318f1a9a]]]*/
+/*[[[head:libc_fexecve,hash:CRC-32=0xd0e40df3]]]*/
 /* >> fexecve(2)
- * Replace the  calling  process  with the  application  image  referred to  by  `fd'  and
- * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
+ * Replace the calling process with the application image referred
+ * to by `execfd'  and execute it's  `main()' method, passing  the
+ * given `argv', and setting `environ' to `envp'. */
 INTERN ATTR_SECTION(".text.crt.fs.exec.exec") NONNULL((2, 3)) int
-NOTHROW_RPC(LIBCCALL libc_fexecve)(fd_t fd,
+NOTHROW_RPC(LIBCCALL libc_fexecve)(fd_t execfd,
                                    __TARGV,
                                    __TENVP)
 /*[[[body:libc_fexecve]]]*/
 {
 	errno_t error;
-	error = sys_execveat(fd,
+	error = sys_execveat(execfd,
 	                     "",
 	                     (char const *const *)___argv,
 	                     (char const *const *)___envp,

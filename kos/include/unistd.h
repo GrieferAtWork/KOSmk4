@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84f9da9e */
+/* HASH CRC-32:0xa088dfe6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2431,13 +2431,28 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(truncate64, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 
 #ifdef __USE_XOPEN2K8
-#if !defined(__fexecve_defined) && defined(__CRT_HAVE_fexecve)
+#ifndef __fexecve_defined
 #define __fexecve_defined
+#ifdef __CRT_HAVE_fexecve
 /* >> fexecve(2)
- * Replace the  calling  process  with the  application  image  referred to  by  `fd'  and
- * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-__CDECLARE(__ATTR_NONNULL((2, 3)),int,__NOTHROW_RPC,fexecve,(__fd_t __fd, __TARGV, __TENVP),(__fd,___argv,___envp))
-#endif /* !__fexecve_defined && __CRT_HAVE_fexecve */
+ * Replace the calling process with the application image referred
+ * to by `execfd'  and execute it's  `main()' method, passing  the
+ * given `argv', and setting `environ' to `envp'. */
+__CDECLARE(__ATTR_NONNULL((2, 3)),int,__NOTHROW_RPC,fexecve,(__fd_t __execfd, __TARGV, __TENVP),(__execfd,___argv,___envp))
+#else /* __CRT_HAVE_fexecve */
+#include <asm/os/features.h>
+#if defined(__OS_HAVE_PROCFS_SELF_FD) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve))
+#include <libc/local/unistd/fexecve.h>
+/* >> fexecve(2)
+ * Replace the calling process with the application image referred
+ * to by `execfd'  and execute it's  `main()' method, passing  the
+ * given `argv', and setting `environ' to `envp'. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(fexecve, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3)) int __NOTHROW_RPC(__LIBCCALL fexecve)(__fd_t __execfd, __TARGV, __TENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fexecve))(__execfd, ___argv, ___envp); })
+#else /* __OS_HAVE_PROCFS_SELF_FD && (__CRT_HAVE_execve || __CRT_HAVE__execve || __CRT_HAVE___execve || __CRT_HAVE___libc_execve) */
+#undef __fexecve_defined
+#endif /* !__OS_HAVE_PROCFS_SELF_FD || (!__CRT_HAVE_execve && !__CRT_HAVE__execve && !__CRT_HAVE___execve && !__CRT_HAVE___libc_execve) */
+#endif /* !__CRT_HAVE_fexecve */
+#endif /* !__fexecve_defined */
 #endif /* __USE_XOPEN2K8 */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)

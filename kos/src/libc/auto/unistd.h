@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbaf74b1a */
+/* HASH CRC-32:0x41bbdb6c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -382,9 +382,10 @@ INTDEF WUNUSED pid_t NOTHROW_NCX(LIBDCALL libd_getpgid)(pid_t pid);
  * return  THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID; */
 INTDEF WUNUSED pid_t NOTHROW_NCX(LIBDCALL libd_getsid)(pid_t pid);
 /* >> fexecve(2)
- * Replace the  calling  process  with the  application  image  referred to  by  `fd'  and
- * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-INTDEF NONNULL((2, 3)) int NOTHROW_RPC(LIBDCALL libd_fexecve)(fd_t fd, __TARGV, __TENVP);
+ * Replace the calling process with the application image referred
+ * to by `execfd'  and execute it's  `main()' method, passing  the
+ * given `argv', and setting `environ' to `envp'. */
+INTDEF NONNULL((2, 3)) int NOTHROW_RPC(LIBDCALL libd_fexecve)(fd_t execfd, __TARGV, __TENVP);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_nice)(int inc);
 /* Retrieve a system configuration string specified by `name'
  * @param: name:   One of `_CS_*' from <asm/crt/confname.h>

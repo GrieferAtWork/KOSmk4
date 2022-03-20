@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef6d59ac */
+/* HASH CRC-32:0xed07a146 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -259,9 +259,10 @@
 #define HAVE_BCOPY 1
 
 #undef HAVE_CLOSEDIR
-#if defined(__CRT_HAVE_closedir) || defined(__CRT_HAVE___libc_closedir)
+#include <bits/os/dirent.h>
+#if defined(__CRT_HAVE_closedir) || defined(__CRT_HAVE___libc_closedir) || defined(__USE_DOS_DIRENT)
 #define HAVE_CLOSEDIR 1
-#endif /* __CRT_HAVE_closedir || __CRT_HAVE___libc_closedir */
+#endif /* __CRT_HAVE_closedir || __CRT_HAVE___libc_closedir || __USE_DOS_DIRENT */
 
 #undef HAVE_DUP2
 #if defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2) || defined(__CRT_HAVE___libc_dup2)

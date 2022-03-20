@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5757e992 */
+/* HASH CRC-32:0x80a1260d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 #include <kos/types.h>
 #include "../user/stdlib.h"
 #include "../user/ctype.h"
+#include "../user/dirent.h"
 #include "err.h"
 #include "../user/fcntl.h"
 #include "format-printer.h"
@@ -2341,6 +2342,7 @@ INTERN ATTR_SECTION(".text.crt.dos.solaris") NONNULL((1)) int
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #include <asm/os/fcntl.h>
+#include <bits/os/dirent.h>
 /* Enumerate all open file descriptors by  invoking `(*walk)(arg, <fd>)' for each of  them
  * If during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
  * and  `fdwalk()' returns with that same value. If `(*walk)(...)' is never called, or all
@@ -2348,10 +2350,10 @@ INTERN ATTR_SECTION(".text.crt.dos.solaris") NONNULL((1)) int
 INTERN ATTR_SECTION(".text.crt.solaris") NONNULL((1)) int
 (LIBCCALL libc_fdwalk)(int (LIBCCALL *walk)(void *arg, fd_t fd),
                        void *arg) THROWS(...) {
-	/* TODO: Implementation alternative using `opendir("/proc/self/fd")' */
 	int result = 0;
 
 	errno_t saved_err;
+
 
 	fd_t fd = 0;
 	for (;;) {
@@ -2373,6 +2375,27 @@ INTERN ATTR_SECTION(".text.crt.solaris") NONNULL((1)) int
 		if (__hybrid_overflow_sadd(fd, 1, &fd))
 			break;
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	return result;
 }
 INTERN ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL WUNUSED NONNULL((2)) char *

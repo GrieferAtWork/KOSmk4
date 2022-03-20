@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1bc8786f */
+/* HASH CRC-32:0x9fb82db8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -223,12 +223,12 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),DIR *,__NOTHROW_RPC,opendir,(char
 #else /* ... */
 #include <asm/os/fcntl.h>
 #include <asm/os/oflags.h>
-#if defined(__AT_FDCWD) && (defined(__CRT_HAVE_opendirat) || defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))
+#if (defined(__AT_FDCWD) && (defined(__CRT_HAVE_opendirat) || defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))) || defined(__USE_DOS_DIRENT)
 #include <libc/local/dirent/opendir.h>
 /* >> opendir(3)
  * Open and return a new directory stream for reading, referring to `name' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(opendir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) DIR *__NOTHROW_RPC(__LIBCCALL opendir)(char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(opendir))(__name); })
-#endif /* __AT_FDCWD && (__CRT_HAVE_opendirat || __CRT_HAVE_fopendirat || (__CRT_HAVE_fdopendir && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) */
+#endif /* (__AT_FDCWD && (__CRT_HAVE_opendirat || __CRT_HAVE_fopendirat || (__CRT_HAVE_fdopendir && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)))) || (__CRT_HAVE_fdopendir && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)))) || __USE_DOS_DIRENT */
 #endif /* !... */
 
 #if defined(__USE_KOS) && defined(__USE_ATFILE)
@@ -268,6 +268,11 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,closedir,(DIR *__dirp),(__dirp)
 /* >> closedir(3)
  * Close a directory stream previously returned by `opendir(3)' and friends */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,closedir,(DIR *__dirp),__libc_closedir,(__dirp))
+#elif defined(__USE_DOS_DIRENT)
+#include <libc/local/dirent/closedir.h>
+/* >> closedir(3)
+ * Close a directory stream previously returned by `opendir(3)' and friends */
+__NAMESPACE_LOCAL_USING_OR_IMPL(closedir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL closedir)(DIR *__dirp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(closedir))(__dirp); })
 #endif /* ... */
 
 #ifdef __USE_BSD
@@ -301,6 +306,12 @@ __CREDIRECT(__ATTR_NONNULL((1)),struct dirent *,__NOTHROW_RPC,readdir,(DIR *__re
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
 __CREDIRECT(__ATTR_NONNULL((1)),struct dirent *,__NOTHROW_RPC,readdir,(DIR *__restrict __dirp),readdir64,(__dirp))
+#elif defined(__USE_DOS_DIRENT)
+#include <libc/local/dirent/readdir.h>
+/* >> readdir(3), readdir64(3)
+ * Read and return the next pending directory entry of the given directory stream `dirp'
+ * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
+__NAMESPACE_LOCAL_USING_OR_IMPL(readdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) struct dirent *__NOTHROW_RPC(__LIBCCALL readdir)(DIR *__restrict __dirp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(readdir))(__dirp); })
 #endif /* ... */
 
 #ifdef __CRT_HAVE_rewinddir
@@ -347,6 +358,12 @@ __CREDIRECT(__ATTR_NONNULL((1)),struct dirent64 *,__NOTHROW_RPC,readdir64,(DIR *
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
 __CDECLARE(__ATTR_NONNULL((1)),struct dirent64 *,__NOTHROW_RPC,readdir64,(DIR *__restrict __dirp),(__dirp))
+#elif defined(__USE_DOS_DIRENT) && defined(_DIRENT_MATCHES_DIRENT64)
+#include <libc/local/dirent/readdir.h>
+/* >> readdir(3), readdir64(3)
+ * Read and return the next pending directory entry of the given directory stream `dirp'
+ * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) struct dirent64 *__NOTHROW_RPC(__LIBCCALL readdir64)(DIR *__restrict __dirp) { return (struct dirent64 *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(readdir))(__dirp); }
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 #ifdef __USE_POSIX

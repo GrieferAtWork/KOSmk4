@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2223eb0 */
+/* HASH CRC-32:0xd1994d58 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -464,9 +464,10 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_truncate64)(char const *file, 
  * Truncate the given file `file' to a length of `length' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_truncate64)(char const *file, __PIO_OFFSET64 length);
 /* >> fexecve(2)
- * Replace the  calling  process  with the  application  image  referred to  by  `fd'  and
- * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-INTDEF NONNULL((2, 3)) int NOTHROW_RPC(LIBCCALL libc_fexecve)(fd_t fd, __TARGV, __TENVP);
+ * Replace the calling process with the application image referred
+ * to by `execfd'  and execute it's  `main()' method, passing  the
+ * given `argv', and setting `environ' to `envp'. */
+INTDEF NONNULL((2, 3)) int NOTHROW_RPC(LIBCCALL libc_fexecve)(fd_t execfd, __TARGV, __TENVP);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_nice)(int inc);
 /* Retrieve a system configuration string specified by `name'
  * @param: name:   One of `_CS_*' from <asm/crt/confname.h>

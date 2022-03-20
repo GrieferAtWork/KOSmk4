@@ -175,7 +175,7 @@ $oflag_t _setmode($fd_t fd, $oflag_t mode) {
 %
 %
 %[default:section(".text.crt.dos.fs.dir")]
-[[decl_include("<hybrid/typecore.h>")]]
+[[guard, decl_include("<hybrid/typecore.h>")]]
 int _findclose(intptr_t findfd);
 
 [[crt_dos_variant, cp, wunused, export_alias("_findfirst"), decl_include("<hybrid/typecore.h>")]]
@@ -186,11 +186,12 @@ intptr_t _findfirst32([[nonnull]] char const *__restrict filename,
 intptr_t _findfirst32i64([[nonnull]] char const *__restrict filename,
                          [[nonnull]] struct _finddata32i64_t *__restrict finddata);
 
-[[crt_dos_variant, cp, wunused, export_alias("_findfirst64i32"), decl_include("<hybrid/typecore.h>")]]
+[[guard, cp, wunused, export_alias("_findfirst64i32")]]
+[[crt_dos_variant, decl_include("<hybrid/typecore.h>")]]
 intptr_t _findfirst64([[nonnull]] char const *__restrict filename,
                       [[nonnull]] struct __finddata64_t *__restrict finddata);
 
-[[cp, wunused, decl_include("<hybrid/typecore.h>")]]
+[[guard, cp, wunused, decl_include("<hybrid/typecore.h>")]]
 intptr_t _findfirst64i32([[nonnull]] char const *__restrict filename,
                          [[nonnull]] struct _finddata64i32_t *__restrict finddata)
 	= _findfirst64;
@@ -203,11 +204,11 @@ int _findnext32(intptr_t findfd,
 int _findnext32i64(intptr_t findfd,
                    [[nonnull]] struct _finddata32i64_t *__restrict finddata);
 
-[[cp, export_alias("_findnext64i32"), decl_include("<hybrid/typecore.h>")]]
+[[guard, cp, export_alias("_findnext64i32"), decl_include("<hybrid/typecore.h>")]]
 int _findnext64(intptr_t findfd,
                 [[nonnull]] struct __finddata64_t *__restrict finddata);
 
-[[cp, decl_include("<hybrid/typecore.h>")]]
+[[guard, cp, decl_include("<hybrid/typecore.h>")]]
 int _findnext64i32(intptr_t findfd,
                    [[nonnull]] struct _finddata64i32_t *__restrict finddata)
 	= _findnext64;
@@ -432,6 +433,7 @@ struct _finddata32i64_t {
 };
 struct _finddata64i32_t {
 	__UINT32_TYPE__      attrib;
+	__UINT32_TYPE__     _fd64i32_pad; /* Padding made visible */
 	__INT64_TYPE__       time_create;
 	__INT64_TYPE__       time_access;
 	__INT64_TYPE__       time_write;
@@ -443,6 +445,7 @@ struct _finddata64i32_t {
 };
 struct __finddata64_t {
 	__UINT32_TYPE__      attrib;
+	__UINT32_TYPE__     _fd64_pad; /* Padding made visible */
 	__INT64_TYPE__       time_create;
 	__INT64_TYPE__       time_access;
 	__INT64_TYPE__       time_write;

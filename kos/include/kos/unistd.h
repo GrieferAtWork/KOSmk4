@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xddfa587a */
+/* HASH CRC-32:0xaa416fcf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -609,8 +609,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Truncate64, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #if !defined(__FExecve_defined) && defined(__CRT_HAVE_FExecve)
 #define __FExecve_defined
 /* >> fexecve(2)
- * Replace the  calling  process  with the  application  image  referred to  by  `fd'  and
- * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
+ * Replace the calling process with the application image referred
+ * to by `execfd'  and execute it's  `main()' method, passing  the
+ * given `argv', and setting `environ' to `envp'. */
 __CDECLARE_VOID(__ATTR_NORETURN __ATTR_NONNULL((2, 3)),__THROWING,FExecve,(__fd_t __fd, __TARGV, __TENVP),(__fd,___argv,___envp))
 #endif /* !__FExecve_defined && __CRT_HAVE_FExecve */
 #endif /* __USE_XOPEN2K8 */

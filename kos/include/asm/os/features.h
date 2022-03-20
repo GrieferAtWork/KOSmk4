@@ -17,37 +17,25 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_OS_DIRENT_H
-#define _BITS_OS_DIRENT_H 1
-
-/* File:
- *    <bits/os/dirent.h>
- *
- * Definitions:
- *    struct dirent {
- *        ...
- *    };
- *    #ifdef __USE_LARGEFILE64
- *    struct dirent64 {
- *        ...
- *    };
- *    #endif // __USE_LARGEFILE64
- */
+#ifndef _ASM_OS_FEATURES_H
+#define _ASM_OS_FEATURES_H 1
 
 #include <__stdinc.h>
-#include <__crt.h> /* __CRT_DOS_PRIMARY */
 
-/**/
-#ifdef __CRT_DOS_PRIMARY
-#include <bits/os/dos/dirent.h>
-#else /* __CRT_DOS_PRIMARY */
-#include <bits/os/kos/dirent.h>
-#endif /* !__CRT_DOS_PRIMARY */
+/*
+ * OS-specific features that may be used as implementation aids in libc,
+ * but cannot be detected with __CRT_HAVE_* macros without falling  back
+ * on using os-specific predefined macros for tests.
+ *
+ * To prevent redundancy and make code easier to read, features that are
+ * os-specific, but may be supported by more than one OS, can be  tested
+ * for using these macros.
+ *
+ * - __OS_HAVE_PROCFS_SELF_FD:  exists("/proc/self/fd/...")
+ */
 
-#ifdef _DIRENT_HAVE_D_FILENO
-#ifndef d_fileno
-#define d_fileno d_fileno
-#endif /* !d_fileno */
-#endif /* _DIRENT_HAVE_D_FILENO */
+#if defined(__KOS__) || defined(__linux__)
+#define __OS_HAVE_PROCFS_SELF_FD
+#endif /* ... */
 
-#endif /* !_BITS_OS_DIRENT_H */
+#endif /* !_ASM_OS_FEATURES_H */

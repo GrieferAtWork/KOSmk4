@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3763e16 */
+/* HASH CRC-32:0x72c97c3e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1307,7 +1307,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_setmode, __FORCELOCAL __ATTR_ARTIFICIAL __oflag
 #endif /* ... */
 
 
-__CDECLARE_OPT(,int,__NOTHROW_NCX,_findclose,(intptr_t __findfd),(__findfd))
+#if !defined(___findclose_defined) && defined(__CRT_HAVE__findclose)
+#define ___findclose_defined
+__CDECLARE(,int,__NOTHROW_NCX,_findclose,(intptr_t __findfd),(__findfd))
+#endif /* !___findclose_defined && __CRT_HAVE__findclose */
 #ifdef __CRT_HAVE__findfirst32
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst32,(char const *__restrict __filename, struct _finddata32_t *__restrict __finddata),(__filename,__finddata))
 #elif defined(__CRT_HAVE__findfirst)
@@ -1318,16 +1321,26 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfir
 #elif defined(__CRT_HAVE__findfirsti64)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst32i64,(char const *__restrict __filename, struct _finddata32i64_t *__restrict __finddata),_findfirsti64,(__filename,__finddata))
 #endif /* ... */
+#ifndef ___findfirst64_defined
+#define ___findfirst64_defined
 #ifdef __CRT_HAVE__findfirst64
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst64,(char const *__restrict __filename, struct __finddata64_t *__restrict __finddata),(__filename,__finddata))
 #elif defined(__CRT_HAVE__findfirst64i32)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst64,(char const *__restrict __filename, struct __finddata64_t *__restrict __finddata),_findfirst64i32,(__filename,__finddata))
-#endif /* ... */
+#else /* ... */
+#undef ___findfirst64_defined
+#endif /* !... */
+#endif /* !___findfirst64_defined */
+#ifndef ___findfirst64i32_defined
+#define ___findfirst64i32_defined
 #ifdef __CRT_HAVE__findfirst64
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst64i32,(char const *__restrict __filename, struct _finddata64i32_t *__restrict __finddata),_findfirst64,(__filename,__finddata))
 #elif defined(__CRT_HAVE__findfirst64i32)
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst64i32,(char const *__restrict __filename, struct _finddata64i32_t *__restrict __finddata),(__filename,__finddata))
-#endif /* ... */
+#else /* ... */
+#undef ___findfirst64i32_defined
+#endif /* !... */
+#endif /* !___findfirst64i32_defined */
 #ifdef __CRT_HAVE__findnext32
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext32,(intptr_t __findfd, struct _finddata32_t *__restrict __finddata),(__findfd,__finddata))
 #elif defined(__CRT_HAVE__findnext)
@@ -1338,16 +1351,26 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext32i64,(intptr_t __find
 #elif defined(__CRT_HAVE__findnexti64)
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext32i64,(intptr_t __findfd, struct _finddata32i64_t *__restrict __finddata),_findnexti64,(__findfd,__finddata))
 #endif /* ... */
+#ifndef ___findnext64_defined
+#define ___findnext64_defined
 #ifdef __CRT_HAVE__findnext64
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext64,(intptr_t __findfd, struct __finddata64_t *__restrict __finddata),(__findfd,__finddata))
 #elif defined(__CRT_HAVE__findnext64i32)
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext64,(intptr_t __findfd, struct __finddata64_t *__restrict __finddata),_findnext64i32,(__findfd,__finddata))
-#endif /* ... */
+#else /* ... */
+#undef ___findnext64_defined
+#endif /* !... */
+#endif /* !___findnext64_defined */
+#ifndef ___findnext64i32_defined
+#define ___findnext64i32_defined
 #ifdef __CRT_HAVE__findnext64
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext64i32,(intptr_t __findfd, struct _finddata64i32_t *__restrict __finddata),_findnext64,(__findfd,__finddata))
 #elif defined(__CRT_HAVE__findnext64i32)
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext64i32,(intptr_t __findfd, struct _finddata64i32_t *__restrict __finddata),(__findfd,__finddata))
-#endif /* ... */
+#else /* ... */
+#undef ___findnext64i32_defined
+#endif /* !... */
+#endif /* !___findnext64i32_defined */
 
 #ifdef __CRT_HAVE__sopen_s
 __CDECLARE(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_RPC,_sopen_s,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),(__fd,__filename,__oflags,__sflags,__mode))
@@ -1637,6 +1660,7 @@ struct _finddata32i64_t {
 };
 struct _finddata64i32_t {
 	__UINT32_TYPE__      attrib;
+	__UINT32_TYPE__     _fd64i32_pad; /* Padding made visible */
 	__INT64_TYPE__       time_create;
 	__INT64_TYPE__       time_access;
 	__INT64_TYPE__       time_write;
@@ -1648,6 +1672,7 @@ struct _finddata64i32_t {
 };
 struct __finddata64_t {
 	__UINT32_TYPE__      attrib;
+	__UINT32_TYPE__     _fd64_pad; /* Padding made visible */
 	__INT64_TYPE__       time_create;
 	__INT64_TYPE__       time_access;
 	__INT64_TYPE__       time_write;

@@ -3358,20 +3358,22 @@ char const *getexecname() {
 @@If during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
 @@and  `fdwalk()' returns with that same value. If `(*walk)(...)' is never called, or all
 @@invocations return 0, `fdwalk()' will also return 0.
-[[requires_include("<asm/os/fcntl.h>")]]
-[[requires($has_function(fcntl) && defined(__F_NEXT))]]
+[[requires_include("<asm/os/fcntl.h>", "<asm/os/features.h>")]]
+[[requires(($has_function(fcntl) && defined(__F_NEXT)) ||
+           (defined(__OS_HAVE_PROCFS_SELF_FD) && $has_function(opendir, readdir)))]]
 [[impl_include("<asm/os/fcntl.h>", "<libc/errno.h>", "<hybrid/__overflow.h>")]]
+[[impl_include("<bits/os/dirent.h>")]]
 [[throws, crt_dos_variant(callback(
 	cook: struct { auto walk = walk; auto arg = arg; },
 	wrap: ($cook *c, $fd_t fd): int { return (*c->walk)(c->arg, fd); },
 	impl: fdwalk((int (LIBCCALL *)(void *, $fd_t))&$wrap, &$cook),
 ))]]
 int fdwalk([[nonnull]] int (LIBCCALL *walk)(void *arg, $fd_t fd), void *arg) {
-	/* TODO: Implementation alternative using `opendir("/proc/self/fd")' */
 	int result = 0;
 @@pp_ifdef __libc_geterrno@@
 	errno_t saved_err;
 @@pp_endif@@
+@@pp_if $has_function(fcntl) && defined(__F_NEXT)@@
 	fd_t fd = 0;
 	for (;;) {
 @@pp_ifdef __libc_geterrno@@
@@ -3392,6 +3394,27 @@ int fdwalk([[nonnull]] int (LIBCCALL *walk)(void *arg, $fd_t fd), void *arg) {
 		if (__hybrid_overflow_sadd(fd, 1, &fd))
 			break;
 	}
+@@pp_else@@
+	/* Implementation alternative using `opendir("/proc/self/fd")' */
+	DIR *dir = opendir("/proc/self/fd");
+	if likely(dir) {
+		struct dirent *ent;
+@@pp_ifdef __libc_geterrno@@
+		saved_err = __libc_geterrno();
+@@pp_endif@@
+		ent = readdir(dir);
+		if (!ent) {
+@@pp_ifdef __libc_geterrno@@
+			(void)libc_seterrno(saved_err);
+@@pp_endif@@
+			break;
+		}
+		result = (*walk)(arg, atoi(ent->@d_name@));
+	}
+@@pp_if $has_function(closedir)@@
+	closedir(dir);
+@@pp_endif@@
+@@pp_endif@@
 	return result;
 }
 

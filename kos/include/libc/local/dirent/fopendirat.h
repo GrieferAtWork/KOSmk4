@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d53f38c */
+/* HASH CRC-32:0x4935fb38 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,6 +63,12 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fopendirat) __ATTR_WUNUSED __ATTR_NONNULL((2)) struct __dirstream *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fopendirat))(__fd_t __dirfd, char const *__name, __oflag_t __oflags) {
 	struct __dirstream *__result;
+#ifdef __O_RDONLY
+	__oflags |= __O_RDONLY;
+#endif /* __O_RDONLY */
+#ifdef __O_DIRECTORY
+	__oflags |= __O_DIRECTORY;
+#endif /* __O_DIRECTORY */
 	__fd_t __fd = (__NAMESPACE_LOCAL_SYM __localdep_openat)(__dirfd, __name, __oflags);
 	if __unlikely(__fd < 0)
 		return __NULLPTR;

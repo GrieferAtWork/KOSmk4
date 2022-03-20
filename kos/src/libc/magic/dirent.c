@@ -232,11 +232,43 @@ typedef struct __dirstream DIR;
 @@Open and return a new directory stream for reading, referring to `name'
 [[cp, wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 [[requires_include("<asm/os/fcntl.h>"), export_alias("__libc_opendir")]]
-[[crt_dos_variant, userimpl, requires(defined(__AT_FDCWD) && $has_function(opendirat))]]
+[[crt_dos_variant, userimpl]]
+[[requires_include("<bits/os/dirent.h>")]]
+[[requires((defined(__AT_FDCWD) && $has_function(opendirat)) ||
+           ($has_function(fdopendir, open)) || defined(__USE_DOS_DIRENT))]]
+[[impl_include("<asm/os/oflags.h>")]]
+[[impl_prefix(
+@@pp_ifdef __CRT_DOS_PRIMARY@@
+#include <bits/os/dirent.h>
+@@pp_endif@@
+)]]
 DIR *opendir([[nonnull]] char const *name) {
-	/* TODO: Emulate using DOS's _find* functions */
-	/* TODO: Emulate using fdopendir(open(name, 0)) */
+@@pp_if defined(__AT_FDCWD) && $has_function(opendirat)@@
 	return opendirat(__AT_FDCWD, name);
+@@pp_elif $has_function(fdopendir, open)@@
+	/* Emulate using fdopendir(open(name, O_DIRECTORY | O_RDONLY)) */
+	fd_t fd;
+	DIR *result;
+	oflag_t oflags = 0;
+@@pp_ifdef __O_RDONLY@@
+	oflags |= __O_RDONLY;
+@@pp_endif@@
+@@pp_ifdef __O_DIRECTORY@@
+	oflags |= __O_DIRECTORY;
+@@pp_endif@@
+	fd = open(name, oflags);
+	if unlikely(fd < 0)
+		return NULL;
+	result = fdopendir(fd);
+@@pp_if $has_function(close)@@
+	if unlikely(!result)
+		close(fd);
+@@pp_endif@@
+	return result;
+@@pp_else@@
+	/* Emulate using DOS's _find* functions */
+	return (DIR *)__dos_dirent_opendir(name);
+@@pp_endif@@
 }
 
 
@@ -244,10 +276,17 @@ DIR *opendir([[nonnull]] char const *name) {
 %#if defined(__USE_KOS) && defined(__USE_ATFILE)
 @@>> fopendirat(3)
 @@Directory-handle-relative, and flags-enabled versions of `opendir(3)'
-[[cp, wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM), decl_include("<bits/types.h>")]]
+[[cp, wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 [[crt_dos_variant, userimpl, requires_function(fdopendir, openat)]]
+[[decl_include("<bits/types.h>"), impl_include("<asm/os/oflags.h>")]]
 DIR *fopendirat($fd_t dirfd, [[nonnull]] char const *name, $oflag_t oflags) {
 	DIR *result;
+@@pp_ifdef __O_RDONLY@@
+	oflags |= __O_RDONLY;
+@@pp_endif@@
+@@pp_ifdef __O_DIRECTORY@@
+	oflags |= __O_DIRECTORY;
+@@pp_endif@@
 	fd_t fd = openat(dirfd, name, oflags);
 	if unlikely(fd < 0)
 		return NULL;
@@ -272,7 +311,11 @@ DIR *opendirat($fd_t dirfd, [[nonnull]] char const *name) {
 @@>> closedir(3)
 @@Close a directory stream previously returned by `opendir(3)' and friends
 [[decl_prefix(DEFINE_STRUCT_DIRSTREAM), export_alias("__libc_closedir")]]
-int closedir([[nonnull]] DIR *dirp);
+[[userimpl, requires_include("<bits/os/dirent.h>")]]
+[[requires(defined(__USE_DOS_DIRENT))]]
+int closedir([[nonnull]] DIR *dirp) {
+	return __dos_dirent_closedir(dirp);
+}
 
 
 %
@@ -292,7 +335,10 @@ $fd_t fdclosedir([[nonnull]] DIR *dirp);
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>") defined(__CRT_KOS) && ( defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("readdirk64")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("readdir", "__libc_readdir")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__CRT_KOS) && ( defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("readdir64")]]
-struct dirent *readdir([[nonnull]] DIR *__restrict dirp);
+[[userimpl, requires_include("<bits/os/dirent.h>"), requires(defined(__USE_DOS_DIRENT))]]
+struct dirent *readdir([[nonnull]] DIR *__restrict dirp) {
+	return (struct dirent *)__dos_dirent_readdir(dirp);
+}
 
 %
 @@>> rewinddir(3)
@@ -318,6 +364,7 @@ DIR *fdopendir($fd_t fd);
 [[if($extended_include_prefix("<bits/os/dirent.h>")!defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)), alias("readdir", "__libc_readdir")]]
 [[if(                                              !defined(__CRT_KOS)                                     ), alias("readdir64")]]
 [[if($extended_include_prefix("<bits/os/dirent.h>")defined(_DIRENT_MATCHES_DIRENT64)), crt_intern_kos_alias(libc_readdirk)]]
+[[if($extended_include_prefix("<bits/os/dirent.h>")defined(__USE_DOS_DIRENT) && defined(_DIRENT_MATCHES_DIRENT64)), bind_local_function("readdir")]]
 struct dirent64 *readdir64([[nonnull]] DIR *__restrict dirp);
 %#endif /* __USE_LARGEFILE64 */
 

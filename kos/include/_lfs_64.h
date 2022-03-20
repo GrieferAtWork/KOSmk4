@@ -18,17 +18,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: uClibc (/include/_lfs_64.h) */
-#include <features.h>
-
-#if defined(_FILE_OFFSET_BITS) && (_FILE_OFFSET_BITS + 0) != 64
+#ifndef _FEATURES_H
+#undef _LARGEFILE64_SOURCE
+#define _LARGEFILE64_SOURCE 1 /* For `__USE_LARGEFILE64' */
 #undef _FILE_OFFSET_BITS
-#define _FILE_OFFSET_BITS 64
-#endif /* _FILE_OFFSET_BITS != 64 */
+#define _FILE_OFFSET_BITS 32
 
-#ifndef __USE_LARGEFILE64
-#define __USE_LARGEFILE64 1
-#endif /* !__USE_LARGEFILE64 */
-
-#ifdef __USE_FILE_OFFSET64
-#undef __USE_FILE_OFFSET64
-#endif /* !__USE_FILE_OFFSET64 */
+#include <features.h>
+#endif /* !_FEATURES_H */

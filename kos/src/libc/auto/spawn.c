@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb005dfa */
+/* HASH CRC-32:0xb3fbb924 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,6 +39,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 #include <bits/os/sigaction.h>
 #include <libc/errno.h>
+#include <hybrid/typecore.h>
 #include <asm/os/vfork.h>
 #include <asm/os/oflags.h>
 #include <asm/os/signal.h>
@@ -417,6 +418,14 @@ child_error:
 
 	}
 	libc__Exit(127);
+
+
+
+
+
+
+
+
 
 
 

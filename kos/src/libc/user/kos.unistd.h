@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4b40329 */
+/* HASH CRC-32:0xeb0dd9c2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -271,8 +271,9 @@ INTDEF NONNULL((1)) void (LIBCCALL libc_Truncate)(char const *file, pos_t length
  * Truncate the given file `file' to a length of `length' */
 INTDEF NONNULL((1)) void (LIBCCALL libc_Truncate64)(char const *file, pos64_t length) THROWS(...);
 /* >> fexecve(2)
- * Replace the  calling  process  with the  application  image  referred to  by  `fd'  and
- * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
+ * Replace the calling process with the application image referred
+ * to by `execfd'  and execute it's  `main()' method, passing  the
+ * given `argv', and setting `environ' to `envp'. */
 INTDEF ATTR_NORETURN NONNULL((2, 3)) void (LIBCCALL libc_FExecve)(fd_t fd, __TARGV, __TENVP) THROWS(...);
 /* >> execvpe(3)
  * Replace the  calling process  with the  application  image referred  to by  `file'  and

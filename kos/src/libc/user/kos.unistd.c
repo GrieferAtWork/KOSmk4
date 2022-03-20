@@ -317,10 +317,11 @@ INTERN ATTR_SECTION(".text.crt.except.fs.basic_property") ATTR_MALLOC ATTR_MALL_
 }
 /*[[[end:libc_GetCurrentDirName]]]*/
 
-/*[[[head:libc_FExecve,hash:CRC-32=0x3700e3c]]]*/
+/*[[[head:libc_FExecve,hash:CRC-32=0x1578a52]]]*/
 /* >> fexecve(2)
- * Replace the  calling  process  with the  application  image  referred to  by  `fd'  and
- * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
+ * Replace the calling process with the application image referred
+ * to by `execfd'  and execute it's  `main()' method, passing  the
+ * given `argv', and setting `environ' to `envp'. */
 INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((2, 3)) void
 (LIBCCALL libc_FExecve)(fd_t fd,
                         __TARGV,

@@ -1,3 +1,4 @@
+/* HASH CRC-32:0xb80dd2ef */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,37 +18,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_OS_DIRENT_H
-#define _BITS_OS_DIRENT_H 1
-
-/* File:
- *    <bits/os/dirent.h>
- *
- * Definitions:
- *    struct dirent {
- *        ...
- *    };
- *    #ifdef __USE_LARGEFILE64
- *    struct dirent64 {
- *        ...
- *    };
- *    #endif // __USE_LARGEFILE64
- */
-
-#include <__stdinc.h>
-#include <__crt.h> /* __CRT_DOS_PRIMARY */
-
-/**/
-#ifdef __CRT_DOS_PRIMARY
-#include <bits/os/dos/dirent.h>
-#else /* __CRT_DOS_PRIMARY */
-#include <bits/os/kos/dirent.h>
-#endif /* !__CRT_DOS_PRIMARY */
-
-#ifdef _DIRENT_HAVE_D_FILENO
-#ifndef d_fileno
-#define d_fileno d_fileno
-#endif /* !d_fileno */
-#endif /* _DIRENT_HAVE_D_FILENO */
-
-#endif /* !_BITS_OS_DIRENT_H */
+#ifndef __local_readdir_defined
+#define __local_readdir_defined
+#include <__crt.h>
+#include <bits/os/dirent.h>
+#ifdef __USE_DOS_DIRENT
+struct __dirstream;
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(readdir) __ATTR_NONNULL((1)) struct dirent *
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(readdir))(struct __dirstream *__restrict __dirp) {
+	return (struct dirent *)__dos_dirent_readdir(__dirp);
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep_readdir_defined
+#define __local___localdep_readdir_defined
+#define __localdep_readdir __LIBC_LOCAL_NAME(readdir)
+#endif /* !__local___localdep_readdir_defined */
+#else /* __USE_DOS_DIRENT */
+#undef __local_readdir_defined
+#endif /* !__USE_DOS_DIRENT */
+#endif /* !__local_readdir_defined */
