@@ -42,6 +42,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <inttypes.h>
 #include <malloc.h>
 #include <pthread.h>
 #include <sched.h>
@@ -134,14 +135,14 @@ DEFINE_INTERN_ALIAS(libk32_GetExitCodeThread, libk32_GetExitCodeProcess);
 INTERN HANDLE WINAPI
 libk32_OpenThread(DWORD dwDesiredAccess, WINBOOL bInheritHandle, DWORD dwThreadId) {
 	fd_t result;
-	char filename[64];
+	char filename[COMPILER_LENOF("/proc/" PRIMAXdN(__SIZEOF_PID_T__))];
 	struct fdcast cast;
 	int status;
 	TRACE("OpenThread(%#x, %u, %#x)", dwDesiredAccess, bInheritHandle, dwThreadId);
 	(void)dwDesiredAccess;
 	/* NOTE: For linux compat, `sys_pidfd_open()' can't be used to open thread
 	 *       handles! - Instead, those can be opened via `open("/proc/[tid]")' */
-	sprintf(filename, "/proc/%d", (pid_t)dwThreadId);
+	sprintf(filename, "/proc/%" PRIdN(__SIZEOF_PID_T__), (pid_t)dwThreadId);
 	result = open(filename,
 	              bInheritHandle ? (O_RDWR | O_DIRECTORY)
 	                             : (O_RDWR | O_DIRECTORY | O_CLOEXEC));
@@ -153,7 +154,7 @@ libk32_OpenThread(DWORD dwDesiredAccess, WINBOOL bInheritHandle, DWORD dwThreadI
 	 * a PIDFD handle, we can guaranty that the correct object is returned.
 	 *
 	 * This is also required to ensure that kcmp(2) for multiple invocations
-	 * of this functions  returns indicative of  the same underlying  kernel
+	 * of  this function  returns indicative  of the  same underlying kernel
 	 * object. */
 	bzero(&cast, sizeof(cast));
 	cast.fc_rqtyp          = HANDLE_TYPE_PIDFD;
@@ -196,7 +197,7 @@ libk32_GetThreadId(HANDLE hThread) {
 INTERN WINBOOL WINAPI
 libk32_GetProcessHandleCount(HANDLE hProcess, PDWORD pdwHandleCount) {
 	/* Count the # of files in "/proc/pid/fd" */
-	char pathname[64];
+	char pathname[COMPILER_LENOF("/proc/" PRIMAXd "/fd")];
 	DWORD pid = libk32_GetProcessId(hProcess);
 	DIR *fddir;
 	size_t count;
