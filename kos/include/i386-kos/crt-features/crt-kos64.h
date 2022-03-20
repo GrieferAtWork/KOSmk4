@@ -2208,6 +2208,7 @@
 #define __CRT_HAVE_bcmpq
 #define __CRT_HAVE_bcmpw
 #define __CRT_HAVE_bcopy
+#define __CRT_HAVE_bgets
 #define __CRT_HAVE_bind
 #define __CRT_HAVE_bind_textdomain_codeset
 #define __CRT_HAVE_bindresvport
@@ -2220,6 +2221,7 @@
 #define __CRT_HAVE_bsearch_r
 #define __CRT_HAVE_bsearch_s
 #define __CRT_HAVE_btowc
+#define __CRT_HAVE_bufsplit
 #define __CRT_HAVE_bulk_free
 #define __CRT_HAVE_bzero
 #define __CRT_HAVE_bzeroc
@@ -2344,6 +2346,8 @@
 #define __CRT_HAVE_convert_wcstombsn
 #define __CRT_HAVE_convert_wcstombsv
 #define __CRT_HAVE_convert_wcstombsvn
+#define __CRT_HAVE_copylist
+#define __CRT_HAVE_copylist64
 #define __CRT_HAVE_copysign
 #define __CRT_HAVE_copysignf
 #define __CRT_HAVE_copysignl
@@ -4378,6 +4382,7 @@
 #define __CRT_HAVE_stpcpy
 #define __CRT_HAVE_stpncpy
 #define __CRT_HAVE_str2sig
+#define __CRT_HAVE_strcadd
 #define __CRT_HAVE_strcasecmp
 #define __CRT_HAVE_strcasecmp_l
 #define __CRT_HAVE_strcasecoll
@@ -4386,6 +4391,7 @@
 #define __CRT_HAVE_strcasestr_l
 #define __CRT_HAVE_strcat
 #define __CRT_HAVE_strcat_s
+#define __CRT_HAVE_strccpy
 #define __CRT_HAVE_strchr
 #define __CRT_HAVE_strchrnul
 #define __CRT_HAVE_strcmp
@@ -4398,6 +4404,8 @@
 #define __CRT_HAVE_strcspn
 #define __CRT_HAVE_strdup
 #define __CRT_HAVE_strdupf
+#define __CRT_HAVE_streadd
+#define __CRT_HAVE_strecpy
 #define __CRT_HAVE_strend
 #define __CRT_HAVE_strerror
 #define __CRT_HAVE_strerror_l
@@ -4405,6 +4413,7 @@
 #define __CRT_HAVE_strerrordesc_np
 #define __CRT_HAVE_strerrorname_np
 #define __CRT_HAVE_stresep
+#define __CRT_HAVE_strfind
 #define __CRT_HAVE_strfmon
 #define __CRT_HAVE_strfmon_l
 #define __CRT_HAVE_strfromd
@@ -4457,6 +4466,7 @@
 #define __CRT_HAVE_strrchrnul
 #define __CRT_HAVE_strrev
 #define __CRT_HAVE_strroff
+#define __CRT_HAVE_strrspn
 #define __CRT_HAVE_strsep
 #define __CRT_HAVE_strset
 #define __CRT_HAVE_strsigcode_s
@@ -4508,6 +4518,7 @@
 #define __CRT_HAVE_strtoumax
 #define __CRT_HAVE_strtoumax_l
 #define __CRT_HAVE_strtouq
+#define __CRT_HAVE_strtrns
 #define __CRT_HAVE_strupr
 #define __CRT_HAVE_strupr_l
 #define __CRT_HAVE_strverscmp
@@ -7879,6 +7890,7 @@
 #define __CRT_HAVE_KOS$basename
 #define __CRT_HAVE_KOS$bcmp
 #define __CRT_HAVE_KOS$bcopy
+#define __CRT_HAVE_KOS$bgets
 #define __CRT_HAVE_KOS$bind
 #define __CRT_HAVE_KOS$bind_textdomain_codeset
 #define __CRT_HAVE_KOS$bindresvport
@@ -7891,6 +7903,7 @@
 #define __CRT_HAVE_KOS$bsearch_r
 #define __CRT_HAVE_KOS$bsearch_s
 #define __CRT_HAVE_KOS$btowc
+#define __CRT_HAVE_KOS$bufsplit
 #define __CRT_HAVE_KOS$bzero
 #define __CRT_HAVE_KOS$bzeroc
 #define __CRT_HAVE_KOS$bzerol
@@ -8006,6 +8019,8 @@
 #define __CRT_HAVE_KOS$convert_wcstombsn
 #define __CRT_HAVE_KOS$convert_wcstombsv
 #define __CRT_HAVE_KOS$convert_wcstombsvn
+#define __CRT_HAVE_KOS$copylist
+#define __CRT_HAVE_KOS$copylist64
 #define __CRT_HAVE_KOS$copysign
 #define __CRT_HAVE_KOS$copysignf
 #define __CRT_HAVE_KOS$copysignl
@@ -9730,6 +9745,7 @@
 #define __CRT_HAVE_KOS$stpcpy
 #define __CRT_HAVE_KOS$stpncpy
 #define __CRT_HAVE_KOS$str2sig
+#define __CRT_HAVE_KOS$strcadd
 #define __CRT_HAVE_KOS$strcasecmp
 #define __CRT_HAVE_KOS$strcasecmp_l
 #define __CRT_HAVE_KOS$strcasecoll
@@ -9738,6 +9754,7 @@
 #define __CRT_HAVE_KOS$strcasestr_l
 #define __CRT_HAVE_KOS$strcat
 #define __CRT_HAVE_KOS$strcat_s
+#define __CRT_HAVE_KOS$strccpy
 #define __CRT_HAVE_KOS$strchr
 #define __CRT_HAVE_KOS$strchrnul
 #define __CRT_HAVE_KOS$strcmp
@@ -9750,6 +9767,8 @@
 #define __CRT_HAVE_KOS$strcspn
 #define __CRT_HAVE_KOS$strdup
 #define __CRT_HAVE_KOS$strdupf
+#define __CRT_HAVE_KOS$streadd
+#define __CRT_HAVE_KOS$strecpy
 #define __CRT_HAVE_KOS$strend
 #define __CRT_HAVE_KOS$strerror
 #define __CRT_HAVE_KOS$strerror_l
@@ -9757,6 +9776,7 @@
 #define __CRT_HAVE_KOS$strerrordesc_np
 #define __CRT_HAVE_KOS$strerrorname_np
 #define __CRT_HAVE_KOS$stresep
+#define __CRT_HAVE_KOS$strfind
 #define __CRT_HAVE_KOS$strfmon
 #define __CRT_HAVE_KOS$strfmon_l
 #define __CRT_HAVE_KOS$strfromd
@@ -9809,6 +9829,7 @@
 #define __CRT_HAVE_KOS$strrchrnul
 #define __CRT_HAVE_KOS$strrev
 #define __CRT_HAVE_KOS$strroff
+#define __CRT_HAVE_KOS$strrspn
 #define __CRT_HAVE_KOS$strsep
 #define __CRT_HAVE_KOS$strset
 #define __CRT_HAVE_KOS$strsigcode_s
@@ -9860,6 +9881,7 @@
 #define __CRT_HAVE_KOS$strtoumax
 #define __CRT_HAVE_KOS$strtoumax_l
 #define __CRT_HAVE_KOS$strtouq
+#define __CRT_HAVE_KOS$strtrns
 #define __CRT_HAVE_KOS$strupr
 #define __CRT_HAVE_KOS$strupr_l
 #define __CRT_HAVE_KOS$strverscmp
@@ -12339,6 +12361,7 @@
 #define __CRT_HAVE_DOS$basename
 #define __CRT_HAVE_DOS$bcmp
 #define __CRT_HAVE_DOS$bcopy
+#define __CRT_HAVE_DOS$bgets
 #define __CRT_HAVE_DOS$bind
 #define __CRT_HAVE_DOS$bind_textdomain_codeset
 #define __CRT_HAVE_DOS$bindresvport
@@ -12351,6 +12374,7 @@
 #define __CRT_HAVE_DOS$bsearch_r
 #define __CRT_HAVE_DOS$bsearch_s
 #define __CRT_HAVE_DOS$btowc
+#define __CRT_HAVE_DOS$bufsplit
 #define __CRT_HAVE_DOS$bzero
 #define __CRT_HAVE_DOS$bzeroc
 #define __CRT_HAVE_DOS$bzerol
@@ -12466,6 +12490,8 @@
 #define __CRT_HAVE_DOS$convert_wcstombsn
 #define __CRT_HAVE_DOS$convert_wcstombsv
 #define __CRT_HAVE_DOS$convert_wcstombsvn
+#define __CRT_HAVE_DOS$copylist
+#define __CRT_HAVE_DOS$copylist64
 #define __CRT_HAVE_DOS$copysign
 #define __CRT_HAVE_DOS$copysignf
 #define __CRT_HAVE_DOS$copysignl
@@ -14190,6 +14216,7 @@
 #define __CRT_HAVE_DOS$stpcpy
 #define __CRT_HAVE_DOS$stpncpy
 #define __CRT_HAVE_DOS$str2sig
+#define __CRT_HAVE_DOS$strcadd
 #define __CRT_HAVE_DOS$strcasecmp
 #define __CRT_HAVE_DOS$strcasecmp_l
 #define __CRT_HAVE_DOS$strcasecoll
@@ -14198,6 +14225,7 @@
 #define __CRT_HAVE_DOS$strcasestr_l
 #define __CRT_HAVE_DOS$strcat
 #define __CRT_HAVE_DOS$strcat_s
+#define __CRT_HAVE_DOS$strccpy
 #define __CRT_HAVE_DOS$strchr
 #define __CRT_HAVE_DOS$strchrnul
 #define __CRT_HAVE_DOS$strcmp
@@ -14210,6 +14238,8 @@
 #define __CRT_HAVE_DOS$strcspn
 #define __CRT_HAVE_DOS$strdup
 #define __CRT_HAVE_DOS$strdupf
+#define __CRT_HAVE_DOS$streadd
+#define __CRT_HAVE_DOS$strecpy
 #define __CRT_HAVE_DOS$strend
 #define __CRT_HAVE_DOS$strerror
 #define __CRT_HAVE_DOS$strerror_l
@@ -14217,6 +14247,7 @@
 #define __CRT_HAVE_DOS$strerrordesc_np
 #define __CRT_HAVE_DOS$strerrorname_np
 #define __CRT_HAVE_DOS$stresep
+#define __CRT_HAVE_DOS$strfind
 #define __CRT_HAVE_DOS$strfmon
 #define __CRT_HAVE_DOS$strfmon_l
 #define __CRT_HAVE_DOS$strfromd
@@ -14269,6 +14300,7 @@
 #define __CRT_HAVE_DOS$strrchrnul
 #define __CRT_HAVE_DOS$strrev
 #define __CRT_HAVE_DOS$strroff
+#define __CRT_HAVE_DOS$strrspn
 #define __CRT_HAVE_DOS$strsep
 #define __CRT_HAVE_DOS$strset
 #define __CRT_HAVE_DOS$strsigcode_s
@@ -14320,6 +14352,7 @@
 #define __CRT_HAVE_DOS$strtoumax
 #define __CRT_HAVE_DOS$strtoumax_l
 #define __CRT_HAVE_DOS$strtouq
+#define __CRT_HAVE_DOS$strtrns
 #define __CRT_HAVE_DOS$strupr
 #define __CRT_HAVE_DOS$strupr_l
 #define __CRT_HAVE_DOS$strverscmp

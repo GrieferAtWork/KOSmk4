@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xadf09f4c */
+/* HASH CRC-32:0x21541554 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -528,30 +528,30 @@ INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strcspn(3)
- * Return   the  offset  from  `haystack'  to  the  first
- * character   for   which  `strchr(reject, ch) != NULL'.
- * If no such character exists, return `strlen(haystack)' */
+ * Return the  offset from  `haystack' to  the first  character
+ * for which `strchr(reject, ch) == NULL'. If no such character
+ * exists, return `strlen(haystack)' */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) size_t NOTHROW_NCX(LIBDCALL libd_strcspn)(char const *haystack, char const *reject);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strcspn(3)
- * Return   the  offset  from  `haystack'  to  the  first
- * character   for   which  `strchr(reject, ch) != NULL'.
- * If no such character exists, return `strlen(haystack)' */
+ * Return the  offset from  `haystack' to  the first  character
+ * for which `strchr(reject, ch) == NULL'. If no such character
+ * exists, return `strlen(haystack)' */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) size_t NOTHROW_NCX(LIBCCALL libc_strcspn)(char const *haystack, char const *reject);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strspn(3)
- * Return   the  offset  from  `haystack'  to  the  first
- * character   for   which  `strchr(reject, ch) == NULL'.
- * If no such character exists, return `strlen(haystack)' */
+ * Return the  offset from  `haystack' to  the first  character
+ * for which `strchr(accept, ch) != NULL'. If no such character
+ * exists, return `strlen(haystack)' */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) size_t NOTHROW_NCX(LIBDCALL libd_strspn)(char const *haystack, char const *accept);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strspn(3)
- * Return   the  offset  from  `haystack'  to  the  first
- * character   for   which  `strchr(reject, ch) == NULL'.
- * If no such character exists, return `strlen(haystack)' */
+ * Return the  offset from  `haystack' to  the first  character
+ * for which `strchr(accept, ch) != NULL'. If no such character
+ * exists, return `strlen(haystack)' */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) size_t NOTHROW_NCX(LIBCCALL libc_strspn)(char const *haystack, char const *accept);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

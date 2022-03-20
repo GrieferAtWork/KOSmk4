@@ -1121,6 +1121,7 @@ int euidaccess([[nonnull]] char const *file, __STDC_INT_AS_UINT_T type) {
 @@>> eaccess(2)
 @@@param: type: Set of `X_OK | W_OK | R_OK'
 @@Test for access to the specified file `file', testing for `type', using the effective filesystem ids
+[[guard]]
 eaccess(*) = euidaccess;
 
 %#endif /* __USE_GNU */
@@ -1216,18 +1217,6 @@ $off64_t lseek64($fd_t fd, $off64_t offset, __STDC_INT_AS_UINT_T whence) {
 
 %
 %#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
-%{
-#ifndef __PIO_OFFSET
-#ifdef __USE_KOS_ALTERATIONS
-#define __PIO_OFFSET   __FS_TYPE(pos)
-#define __PIO_OFFSET64 __pos64_t
-#else /* __USE_KOS_ALTERATIONS */
-#define __PIO_OFFSET   __FS_TYPE(off)
-#define __PIO_OFFSET64 __off64_t
-#endif /* !__USE_KOS_ALTERATIONS */
-#endif /* !__PIO_OFFSET */
-}
-
 %[define(DEFINE_PIO_OFFSET =
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
@@ -1240,6 +1229,7 @@ $off64_t lseek64($fd_t fd, $off64_t offset, __STDC_INT_AS_UINT_T whence) {
 #endif /* !__PIO_OFFSET */
 )]
 
+%[insert:prefix(DEFINE_PIO_OFFSET)]
 
 @@>> pread(2), pread64(2)
 @@Read data from a file at a specific `offset', rather than the current R/W position

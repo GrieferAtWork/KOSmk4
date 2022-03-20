@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x374a6079 */
+/* HASH CRC-32:0x37e3b48f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -772,46 +772,46 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strncat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_L
 #endif /* !... */
 #if __has_builtin(__builtin_strcspn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcspn)
 /* >> strcspn(3)
- * Return   the  offset  from  `haystack'  to  the  first
- * character   for   which  `strchr(reject, ch) != NULL'.
- * If no such character exists, return `strlen(haystack)' */
+ * Return the  offset from  `haystack' to  the first  character
+ * for which `strchr(reject, ch) == NULL'. If no such character
+ * exists, return `strlen(haystack)' */
 __CEIDECLARE_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,strcspn,(char const *__haystack, char const *__reject),{ return __builtin_strcspn(__haystack, __reject); })
 #elif defined(__CRT_HAVE_strcspn)
 /* >> strcspn(3)
- * Return   the  offset  from  `haystack'  to  the  first
- * character   for   which  `strchr(reject, ch) != NULL'.
- * If no such character exists, return `strlen(haystack)' */
+ * Return the  offset from  `haystack' to  the first  character
+ * for which `strchr(reject, ch) == NULL'. If no such character
+ * exists, return `strlen(haystack)' */
 __CDECLARE_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,strcspn,(char const *__haystack, char const *__reject),(__haystack,__reject))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/string/strcspn.h>
 __NAMESPACE_STD_BEGIN
 /* >> strcspn(3)
- * Return   the  offset  from  `haystack'  to  the  first
- * character   for   which  `strchr(reject, ch) != NULL'.
- * If no such character exists, return `strlen(haystack)' */
+ * Return the  offset from  `haystack' to  the first  character
+ * for which `strchr(reject, ch) == NULL'. If no such character
+ * exists, return `strlen(haystack)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strcspn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBCCALL strcspn)(char const *__haystack, char const *__reject) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcspn))(__haystack, __reject); })
 #endif /* !... */
 #if __has_builtin(__builtin_strspn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strspn)
 /* >> strspn(3)
- * Return   the  offset  from  `haystack'  to  the  first
- * character   for   which  `strchr(reject, ch) == NULL'.
- * If no such character exists, return `strlen(haystack)' */
+ * Return the  offset from  `haystack' to  the first  character
+ * for which `strchr(accept, ch) != NULL'. If no such character
+ * exists, return `strlen(haystack)' */
 __CEIDECLARE_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,strspn,(char const *__haystack, char const *__accept),{ return __builtin_strspn(__haystack, __accept); })
 #elif defined(__CRT_HAVE_strspn)
 /* >> strspn(3)
- * Return   the  offset  from  `haystack'  to  the  first
- * character   for   which  `strchr(reject, ch) == NULL'.
- * If no such character exists, return `strlen(haystack)' */
+ * Return the  offset from  `haystack' to  the first  character
+ * for which `strchr(accept, ch) != NULL'. If no such character
+ * exists, return `strlen(haystack)' */
 __CDECLARE_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,strspn,(char const *__haystack, char const *__accept),(__haystack,__accept))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/string/strspn.h>
 __NAMESPACE_STD_BEGIN
 /* >> strspn(3)
- * Return   the  offset  from  `haystack'  to  the  first
- * character   for   which  `strchr(reject, ch) == NULL'.
- * If no such character exists, return `strlen(haystack)' */
+ * Return the  offset from  `haystack' to  the first  character
+ * for which `strchr(accept, ch) != NULL'. If no such character
+ * exists, return `strlen(haystack)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strspn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBCCALL strspn)(char const *__haystack, char const *__accept) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strspn))(__haystack, __accept); })
 #endif /* !... */
 #if __has_builtin(__builtin_strpbrk) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strpbrk)

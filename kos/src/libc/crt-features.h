@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb619beb0 */
+/* HASH CRC-32:0xf09f125c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1068,6 +1068,7 @@
 #define __CRT_HAVE_DOS$basename
 #define __CRT_HAVE_DOS$bcmp
 #define __CRT_HAVE_DOS$bcopy
+#define __CRT_HAVE_DOS$bgets
 #define __CRT_HAVE_DOS$bind
 #define __CRT_HAVE_DOS$bind_textdomain_codeset
 #define __CRT_HAVE_DOS$bindresvport
@@ -1088,6 +1089,7 @@
 #define __CRT_HAVE_DOS$btowc
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$bufsplit
 #define __CRT_HAVE_DOS$bzero
 #define __CRT_HAVE_DOS$bzeroc
 #define __CRT_HAVE_DOS$bzerol
@@ -1211,6 +1213,9 @@
 #define __CRT_HAVE_DOS$convert_wcstombsn
 #define __CRT_HAVE_DOS$convert_wcstombsv
 #define __CRT_HAVE_DOS$convert_wcstombsvn
+#define __CRT_HAVE_DOS$copylist
+#define __CRT_HAVE_DOS$copylist64
+#define __CRT_HAVE_DOS$copylist_sz
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$copysign
@@ -3110,6 +3115,7 @@
 #define __CRT_HAVE_DOS$stpcpy
 #define __CRT_HAVE_DOS$stpncpy
 #define __CRT_HAVE_DOS$str2sig
+#define __CRT_HAVE_DOS$strcadd
 #define __CRT_HAVE_DOS$strcasecmp
 #define __CRT_HAVE_DOS$strcasecmp_l
 #define __CRT_HAVE_DOS$strcasecoll
@@ -3118,6 +3124,7 @@
 #define __CRT_HAVE_DOS$strcasestr_l
 #define __CRT_HAVE_DOS$strcat
 #define __CRT_HAVE_DOS$strcat_s
+#define __CRT_HAVE_DOS$strccpy
 #define __CRT_HAVE_DOS$strchr
 #define __CRT_HAVE_DOS$strchrnul
 #define __CRT_HAVE_DOS$strcmp
@@ -3129,6 +3136,8 @@
 #define __CRT_HAVE_DOS$strcspn
 #define __CRT_HAVE_DOS$strdup
 #define __CRT_HAVE_DOS$strdupf
+#define __CRT_HAVE_DOS$streadd
+#define __CRT_HAVE_DOS$strecpy
 #define __CRT_HAVE_DOS$strend
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -3144,6 +3153,7 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$stresep
+#define __CRT_HAVE_DOS$strfind
 #define __CRT_HAVE_DOS$strfmon
 #define __CRT_HAVE_DOS$strfmon_l
 #define __CRT_HAVE_DOS$strfromd
@@ -3193,6 +3203,7 @@
 #define __CRT_HAVE_DOS$strrchrnul
 #define __CRT_HAVE_DOS$strrev
 #define __CRT_HAVE_DOS$strroff
+#define __CRT_HAVE_DOS$strrspn
 #define __CRT_HAVE_DOS$strsep
 #define __CRT_HAVE_DOS$strset
 #define __CRT_HAVE_DOS$strsigcode_s
@@ -3245,6 +3256,7 @@
 #define __CRT_HAVE_DOS$strtoull_l
 #define __CRT_HAVE_DOS$strtoumax
 #define __CRT_HAVE_DOS$strtoumax_l
+#define __CRT_HAVE_DOS$strtrns
 #define __CRT_HAVE_DOS$strupr
 #define __CRT_HAVE_DOS$strupr_l
 #define __CRT_HAVE_DOS$strverscmp
@@ -5014,6 +5026,7 @@
 #define __CRT_HAVE_bcmp
 #ifndef __KERNEL__
 #define __CRT_HAVE_bcopy
+#define __CRT_HAVE_bgets
 #define __CRT_HAVE_bind
 #define __CRT_HAVE_bind_textdomain_codeset
 #define __CRT_HAVE_bindresvport
@@ -5028,6 +5041,7 @@
 #define __CRT_HAVE_bsearch_r
 #define __CRT_HAVE_bsearch_s
 #define __CRT_HAVE_btowc
+#define __CRT_HAVE_bufsplit
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_bzero
 #define __CRT_HAVE_bzeroc
@@ -5153,6 +5167,9 @@
 #define __CRT_HAVE_convert_wcstombsn
 #define __CRT_HAVE_convert_wcstombsv
 #define __CRT_HAVE_convert_wcstombsvn
+#define __CRT_HAVE_copylist
+#define __CRT_HAVE_copylist64
+#define __CRT_HAVE_copylist_sz
 #define __CRT_HAVE_copysign
 #define __CRT_HAVE_copysignf
 #define __CRT_HAVE_copysignl
@@ -5366,6 +5383,7 @@
 #define __CRT_HAVE_fclose
 #define __CRT_HAVE_fcloseall
 #define __CRT_HAVE_fcntl
+#define __CRT_HAVE_fcopylist_sz
 #define __CRT_HAVE_fcvt
 #define __CRT_HAVE_fcvt_r
 #define __CRT_HAVE_fdatasync
@@ -7198,6 +7216,7 @@
 #define __CRT_HAVE_stpcpy
 #define __CRT_HAVE_stpncpy
 #define __CRT_HAVE_str2sig
+#define __CRT_HAVE_strcadd
 #define __CRT_HAVE_strcasecmp
 #define __CRT_HAVE_strcasecmp_l
 #define __CRT_HAVE_strcasecoll
@@ -7206,6 +7225,7 @@
 #define __CRT_HAVE_strcasestr_l
 #define __CRT_HAVE_strcat
 #define __CRT_HAVE_strcat_s
+#define __CRT_HAVE_strccpy
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_strchr
 #define __CRT_HAVE_strchrnul
@@ -7219,6 +7239,8 @@
 #define __CRT_HAVE_strcspn
 #define __CRT_HAVE_strdup
 #define __CRT_HAVE_strdupf
+#define __CRT_HAVE_streadd
+#define __CRT_HAVE_strecpy
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_strend
 #ifndef __KERNEL__
@@ -7230,6 +7252,7 @@
 #define __CRT_HAVE_strerrorname_np
 #ifndef __KERNEL__
 #define __CRT_HAVE_stresep
+#define __CRT_HAVE_strfind
 #define __CRT_HAVE_strfmon
 #define __CRT_HAVE_strfmon_l
 #define __CRT_HAVE_strfromd
@@ -7285,6 +7308,7 @@
 #define __CRT_HAVE_strrchrnul
 #define __CRT_HAVE_strrev
 #define __CRT_HAVE_strroff
+#define __CRT_HAVE_strrspn
 #define __CRT_HAVE_strsep
 #define __CRT_HAVE_strset
 #define __CRT_HAVE_strsigcode_s
@@ -7347,6 +7371,7 @@
 #define __CRT_HAVE_strtoull_l
 #define __CRT_HAVE_strtoumax
 #define __CRT_HAVE_strtoumax_l
+#define __CRT_HAVE_strtrns
 #define __CRT_HAVE_strupr
 #define __CRT_HAVE_strupr_l
 #define __CRT_HAVE_strverscmp

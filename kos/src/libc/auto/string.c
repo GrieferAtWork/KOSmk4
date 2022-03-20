@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53fb64d6 */
+/* HASH CRC-32:0x8a5710d2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -280,9 +280,9 @@ NOTHROW_NCX(LIBCCALL libc_strncat)(char *__restrict buf,
 #ifndef LIBC_ARCH_HAVE_STRCSPN
 #include <hybrid/typecore.h>
 /* >> strcspn(3)
- * Return   the  offset  from  `haystack'  to  the  first
- * character   for   which  `strchr(reject, ch) != NULL'.
- * If no such character exists, return `strlen(haystack)' */
+ * Return the  offset from  `haystack' to  the first  character
+ * for which `strchr(reject, ch) == NULL'. If no such character
+ * exists, return `strlen(haystack)' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBCCALL libc_strcspn)(char const *haystack,
                                    char const *reject) {
@@ -294,9 +294,9 @@ NOTHROW_NCX(LIBCCALL libc_strcspn)(char const *haystack,
 #endif /* !LIBC_ARCH_HAVE_STRCSPN */
 #ifndef LIBC_ARCH_HAVE_STRSPN
 /* >> strspn(3)
- * Return   the  offset  from  `haystack'  to  the  first
- * character   for   which  `strchr(reject, ch) == NULL'.
- * If no such character exists, return `strlen(haystack)' */
+ * Return the  offset from  `haystack' to  the first  character
+ * for which `strchr(accept, ch) != NULL'. If no such character
+ * exists, return `strlen(haystack)' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBCCALL libc_strspn)(char const *haystack,
                                   char const *accept) {

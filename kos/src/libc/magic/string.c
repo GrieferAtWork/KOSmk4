@@ -799,9 +799,9 @@ miss:
 }
 
 @@>> strcspn(3)
-@@Return   the  offset  from  `haystack'  to  the  first
-@@character   for   which  `strchr(reject, ch) != NULL'.
-@@If no such character exists, return `strlen(haystack)'
+@@Return the  offset from  `haystack' to  the first  character
+@@for which `strchr(reject, ch) == NULL'. If no such character
+@@exists, return `strlen(haystack)'
 [[std, wunused, crtbuiltin, pure]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRCSPN))]]
@@ -814,9 +814,9 @@ size_t strcspn([[nonnull]] char const *haystack,
 }
 
 @@>> strspn(3)
-@@Return   the  offset  from  `haystack'  to  the  first
-@@character   for   which  `strchr(reject, ch) == NULL'.
-@@If no such character exists, return `strlen(haystack)'
+@@Return the  offset from  `haystack' to  the first  character
+@@for which `strchr(accept, ch) != NULL'. If no such character
+@@exists, return `strlen(haystack)'
 [[std, wunused, crtbuiltin, pure]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRSPN))]]

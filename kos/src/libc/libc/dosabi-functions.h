@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2564e0c1 */
+/* HASH CRC-32:0x8e5c7fab */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -566,6 +566,15 @@ DFUN(".text.crt.dos.i18n", libd_nl_langinfo_l, libc_nl_langinfo_l, TP, 2, TD, TP
 /* libgen */
 DFUN(".text.crt.dos.unsorted", libd_dirname, libc_dirname, TP, 1, TP)
 DFUN(".text.crt.dos.unsorted", libd___xpg_basename, libc___xpg_basename, TP, 1, TP)
+DFUN(".text.crt.dos.solaris", libd_bgets, libc_bgets, TP, 4, TP, TI, TP, TP)
+DFUN(".text.crt.dos.solaris", libd_bufsplit, libc_bufsplit, TI, 3, TP, TI, TP)
+DFUN(".text.crt.dos.solaris", libd_strcadd, libc_strcadd, TP, 2, TP, TP)
+DFUN(".text.crt.dos.solaris", libd_strccpy, libc_strccpy, TP, 2, TP, TP)
+DFUN(".text.crt.dos.solaris", libd_streadd, libc_streadd, TP, 3, TP, TP, TP)
+DFUN(".text.crt.dos.solaris", libd_strecpy, libc_strecpy, TP, 3, TP, TP, TP)
+DFUN(".text.crt.dos.solaris", libd_strfind, libc_strfind, TD, 2, TP, TP)
+DFUN(".text.crt.dos.solaris", libd_strrspn, libc_strrspn, TP, 2, TP, TP)
+DFUN(".text.crt.dos.solaris", libd_strtrns, libc_strtrns, TP, 4, TP, TP, TP, TP)
 
 /* libintl */
 DFUN(".text.crt.dos.i18n", libd_dcgettext, libc_dcgettext, TP, 3, TP, TP, TD)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4c69ef6 */
+/* HASH CRC-32:0x84f9da9e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1691,6 +1691,8 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,euidaccess,(cha
 __NAMESPACE_LOCAL_USING_OR_IMPL(euidaccess, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL euidaccess)(char const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(euidaccess))(__file, __type); })
 #endif /* __AT_FDCWD && __AT_EACCESS && __CRT_HAVE_faccessat */
 #endif /* !... */
+#ifndef __eaccess_defined
+#define __eaccess_defined
 #ifdef __CRT_HAVE_euidaccess
 /* >> eaccess(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
@@ -1714,8 +1716,11 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,eaccess,(char c
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type', using the effective filesystem ids */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL eaccess)(char const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(euidaccess))(__file, __type); }
-#endif /* __AT_FDCWD && __AT_EACCESS && __CRT_HAVE_faccessat */
+#else /* __AT_FDCWD && __AT_EACCESS && __CRT_HAVE_faccessat */
+#undef __eaccess_defined
+#endif /* !__AT_FDCWD || !__AT_EACCESS || !__CRT_HAVE_faccessat */
 #endif /* !... */
+#endif /* !__eaccess_defined */
 #endif /* __USE_GNU */
 
 #ifdef __USE_ATFILE

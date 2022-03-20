@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79a9bc5 */
+/* HASH CRC-32:0xdcd8cc6c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -535,6 +535,15 @@ DEFINE_PUBLIC_ALIAS(DOS$nl_langinfo_l, libd_nl_langinfo_l);
 DEFINE_PUBLIC_ALIAS(DOS$dirname, libd_dirname);
 DEFINE_PUBLIC_ALIAS(DOS$__gnu_basename, libd___xpg_basename);
 DEFINE_PUBLIC_ALIAS(DOS$__xpg_basename, libd___xpg_basename);
+DEFINE_PUBLIC_ALIAS(DOS$bgets, libd_bgets);
+DEFINE_PUBLIC_ALIAS(DOS$bufsplit, libd_bufsplit);
+DEFINE_PUBLIC_ALIAS(DOS$strcadd, libd_strcadd);
+DEFINE_PUBLIC_ALIAS(DOS$strccpy, libd_strccpy);
+DEFINE_PUBLIC_ALIAS(DOS$streadd, libd_streadd);
+DEFINE_PUBLIC_ALIAS(DOS$strecpy, libd_strecpy);
+DEFINE_PUBLIC_ALIAS(DOS$strfind, libd_strfind);
+DEFINE_PUBLIC_ALIAS(DOS$strrspn, libd_strrspn);
+DEFINE_PUBLIC_ALIAS(DOS$strtrns, libd_strtrns);
 
 /* libintl */
 DEFINE_PUBLIC_ALIAS(DOS$__dcgettext, libd_dcgettext);
