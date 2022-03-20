@@ -1950,7 +1950,7 @@ __begin_positional_for_width_or_precision:
 				++__FORMAT_FORMAT;
 			}
 			if (__ch == '$') {
-				/* Positional argument selector. */
+				/* Positional argument selector --> lazily load on first occurrence. */
 				if (!__p_args) {
 					/* Figure out the greatest positional argument index. */
 					__CHAR_TYPE const *__iter;
@@ -2069,6 +2069,7 @@ __again_posscan2_infmt:
 									++__iter;
 								}
 								if (__pos_ch == '$') {
+									__hybrid_assert(__posidx3 <= __posidx);
 #if (__PRINTF_LENGTH_SIZE & 0xf) != 0
 									if (__pos_ch == '*') {
 										__p_args[__posidx3 - 1].__p_unsigned = 0;
@@ -2205,18 +2206,23 @@ __again_posscan2_infmt:
 #endif /* __NO_PRINTF_PERCENT_N_OPT */
 #endif /* !__NO_PRINTF_PERCENT_N */
 
-						default:
+						default: {
+							__size_t __new_type_idx;
 							if (!(__ch >= '0' && __ch <= '9'))
 								continue;
-							__type_idx = __ch - '0';
+							__new_type_idx = __ch - '0';
 							while ((__ch = *__iter, __ch >= '0' && __ch <= '9')) {
-								__type_idx = __type_idx * 10 + (__size_t)(__ch - '0');
+								__new_type_idx = __new_type_idx * 10 + (__size_t)(__ch - '0');
 								++__iter;
 							}
-							if (__ch != '$')
-								continue;
-							++__iter;
+							if (__ch == '$') {
+								__type_idx = __new_type_idx;
+								++__iter;
+								goto __again_posscan2_infmt;
+							}
 							goto __again_posscan2_infmt;
+						}	break;
+
 						}
 						if __unlikely(!__type_idx) {
 #if 1
@@ -2236,6 +2242,7 @@ __again_posscan2_infmt:
 							goto __broken_format;
 #endif
 						}
+						__hybrid_assert(__type_idx <= __posidx);
 						__p_args[__type_idx - 1].__p_unsigned = __type_code;
 					}
 

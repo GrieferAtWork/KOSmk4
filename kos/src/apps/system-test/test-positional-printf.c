@@ -70,6 +70,10 @@ DEFINE_TEST(positional_printf) {
 	assert_printf_equals("<42      >", "<%2$-*1$d>", 8, 42);
 	assert_printf_equals("<42      >", "<%1$-*2$lld>", 42ll, 8);
 	assert_printf_equals("<42      >", "<%2$-*1$lld>", 8, 42ll);
+
+	/* This used to break due to a (now-fixed) bug with positional argument pre-loading. */
+	assert_printf_equals("PRE\"Foobar\"MID00001234POST",
+	                     "PRE%2$.6qMID%1$0.8xPOST", 0x1234, "Foobar");
 }
 
 
