@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe203cfd2 */
+/* HASH CRC-32:0xf681780a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,7 +82,11 @@
 #define __stub__register_thread_local_exe_atexit_callback
 #define __stub__rmtmp
 #define __stub__searchenv_s
+#define __stub__seh_filter_dll
+#define __stub__seh_filter_exe
 #define __stub__set_abort_behavior
+#define __stub___set_app_type
+#define __stub__set_app_type
 #define __stub__set_error_mode
 #define __stub__set_new_handler
 #define __stub__set_new_mode

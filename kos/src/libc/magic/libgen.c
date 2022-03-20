@@ -224,6 +224,7 @@ typedef __FILE FILE;
 
 // TODO: char *pathfind([[nullable]] char const *path, [[nonnull]] char const *name, [[nullable]] char const *mode);
 
+%[define_c_language_keyword("__KOS_FIXED_CONST")]
 
 @@>> bgets(3)
 @@Read at most `buflen_minus_one' characters from `fp' and into `buf'

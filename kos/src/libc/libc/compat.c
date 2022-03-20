@@ -65,6 +65,7 @@
 #include <libcmdline/encode.h>
 #include <libiconv/api.h>
 
+#include "../user/corecrt_startup.h"
 #include "../user/stdio-api.h"
 #include "../user/stdlib.h"
 #include "compat.h"
@@ -1213,18 +1214,13 @@ void libc_exec_main(void) {
 /************************************************************************/
 
 typedef struct {
-	int newmode;
+	_crt_app_type newmode;
 } _startupinfo;
 
 DEFINE_PUBLIC_ALIAS(DOS$__lconv_init, libd___lconv_init);
-DEFINE_PUBLIC_ALIAS(DOS$_query_app_type, libd__query_app_type);
-DEFINE_PUBLIC_ALIAS(DOS$_set_app_type, libd___set_app_type);
-DEFINE_PUBLIC_ALIAS(DOS$__set_app_type, libd___set_app_type);
 DEFINE_PUBLIC_ALIAS(DOS$__getmainargs, libd___getmainargs);
 DEFINE_PUBLIC_ALIAS(DOS$__wgetmainargs, libd___wgetmainargs);
 DEFINE_PUBLIC_ALIAS(DOS$_XcptFilter, libd__XcptFilter);
-DEFINE_PUBLIC_ALIAS(DOS$_seh_filter_dll, libd__seh_filter_dll);
-DEFINE_PUBLIC_ALIAS(DOS$_seh_filter_exe, libd__seh_filter_exe);
 DEFINE_PUBLIC_ALIAS(DOS$_except_handler2, libd__except_handler4);
 DEFINE_PUBLIC_ALIAS(DOS$_except_handler3, libd__except_handler4);
 DEFINE_PUBLIC_ALIAS(DOS$_except_handler_3, libd__except_handler4);
@@ -1235,18 +1231,6 @@ DEFINE_PUBLIC_ALIAS(DOS$__C_specific_handler, libd__except_handler4);
 INTERN ATTR_SECTION(".text.crt.dos.application.init") void LIBDCALL
 libd___lconv_init(void) {
 	CRT_UNIMPLEMENTED("__lconv_init");
-}
-
-INTERN ATTR_SECTION(".text.crt.dos.application.init") int LIBDCALL
-libd__query_app_type(void) {
-	COMPILER_IMPURE();
-	return 1; /* _crt_console_app */
-}
-
-INTERN ATTR_SECTION(".text.crt.dos.application.init") void LIBDCALL
-libd___set_app_type(int typ) {
-	(void)typ;
-	COMPILER_IMPURE();
 }
 
 INTERN ATTR_SECTION(".text.crt.dos.application.init") int LIBDCALL
@@ -1262,7 +1246,7 @@ libd___getmainargs(int *pargc, char ***pargv,
 	if (penvp != NULL)
 		*penvp = peb->pp_envp;
 	if (pstartinfo != NULL)
-		libd___set_app_type(pstartinfo->newmode);
+		libc__set_app_type(pstartinfo->newmode);
 	return 0;
 }
 
@@ -1278,7 +1262,7 @@ libd___wgetmainargs(int *pargc, char16_t ***pargv,
 	if (penvp != NULL)
 		*penvp = *libd___p___winitenv();
 	if (pstartinfo != NULL)
-		libd___set_app_type(pstartinfo->newmode);
+		libc__set_app_type(pstartinfo->newmode);
 	return 0;
 }
 
@@ -1287,22 +1271,6 @@ libd__XcptFilter(u32 xno, struct _EXCEPTION_POINTERS *infp_ptrs) {
 	(void)xno;
 	(void)infp_ptrs;
 	CRT_UNIMPLEMENTEDF("_XcptFilter(%" PRIu32 ", %p)", xno, infp_ptrs);
-	return 0;
-}
-
-INTERN ATTR_SECTION(".text.crt.dos.compat.dos.except") int LIBDCALL
-libd__seh_filter_dll(u32 xno, struct _EXCEPTION_POINTERS *infp_ptrs) {
-	(void)xno;
-	(void)infp_ptrs;
-	CRT_UNIMPLEMENTEDF("_seh_filter_dll(%" PRIu32 ", %p)", xno, infp_ptrs);
-	return 0;
-}
-
-INTERN ATTR_SECTION(".text.crt.dos.compat.dos.except") int LIBDCALL
-libd__seh_filter_exe(u32 xno, struct _EXCEPTION_POINTERS *infp_ptrs) {
-	(void)xno;
-	(void)infp_ptrs;
-	CRT_UNIMPLEMENTEDF("_seh_filter_exe(%" PRIu32 ", %p)", xno, infp_ptrs);
 	return 0;
 }
 
@@ -1404,79 +1372,6 @@ NOTHROW(LIBDCALL libd___CxxCallUnwindDtor)(void *(LIBDCALL *func)(void)) {
 #endif /* !__LIBDCALL_CALLER_CLEANUP */
 
 
-
-
-
-
-
-/************************************************************************/
-/* _acmdln                                                              */
-/************************************************************************/
-PRIVATE ATTR_SECTION(".text.crt.dos.application.init") char *LIBDCALL
-construct_dos_commandline(void) {
-	struct process_peb *peb = &__peb;
-	char *result            = NULL;
-	void *libcmdline;
-	PCMDLINE_ENCODE cmdline_encode;
-	libcmdline = dlopen(LIBCMDLINE_LIBRARY_NAME, RTLD_LAZY | RTLD_LOCAL);
-	if (!libcmdline)
-		return NULL;
-	*(void **)&cmdline_encode = dlsym(libcmdline, "cmdline_encode");
-	if (cmdline_encode) {
-		ssize_t error;
-		struct format_aprintf_data printer;
-		/* Encode the commandline. */
-		format_aprintf_data_init(&printer);
-		error = (*cmdline_encode)(&format_aprintf_printer, &printer,
-		                          peb->pp_argc, peb->pp_argv);
-		if unlikely(error < 0) {
-			format_aprintf_data_fini(&printer);
-		} else {
-			result = format_aprintf_pack(&printer, NULL);
-		}
-	}
-	dlclose(libcmdline);
-	return result;
-}
-
-PRIVATE ATTR_SECTION(".bss.crt.dos.application.init")
-struct atomic_once libd___p__acmdln_initialized = ATOMIC_ONCE_INIT;
-PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char *libd__acmdln = NULL;
-DEFINE_PUBLIC_IDATA_G(DOS$_acmdln, libd___p__acmdln, __SIZEOF_POINTER__);
-DEFINE_PUBLIC_ALIAS(DOS$__p__acmdln, libd___p__acmdln);
-INTERN ATTR_PURE ATTR_SECTION(".text.crt.dos.application.init") char **LIBDCALL
-libd___p__acmdln(void) {
-	ATOMIC_ONCE_RUN(&libd___p__acmdln_initialized, {
-		libd__acmdln = construct_dos_commandline();
-	});
-	return &libd__acmdln;
-}
-
-
-
-/************************************************************************/
-/* _wcmdln                                                              */
-/************************************************************************/
-PRIVATE ATTR_SECTION(".text.crt.dos.application.init") char16_t *LIBDCALL
-construct_dos_wcommandline(void) {
-	char *acmdln = *libd___p__acmdln();
-	return acmdln ? convert_mbstoc16(acmdln) : NULL;
-}
-
-PRIVATE ATTR_SECTION(".bss.crt.dos.application.init")
-struct atomic_once libd___p__wcmdln_initialized = ATOMIC_ONCE_INIT;
-PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char16_t *libd__wcmdln = NULL;
-DEFINE_PUBLIC_IDATA_G(DOS$_wcmdln, libd___p__wcmdln, __SIZEOF_POINTER__);
-DEFINE_PUBLIC_ALIAS(DOS$__p__wcmdln, libd___p__wcmdln);
-INTERN ATTR_PURE ATTR_SECTION(".text.crt.dos.application.init") char16_t **LIBDCALL
-libd___p__wcmdln(void) {
-	ATOMIC_ONCE_RUN(&libd___p__wcmdln_initialized, {
-		libd__wcmdln = construct_dos_wcommandline();
-	});
-	return &libd__wcmdln;
-}
-
-
 /************************************************************************/
 /* _commode                                                             */
 /************************************************************************/
@@ -1504,102 +1399,6 @@ int *LIBDCALL libd___p___mb_cur_max(void) {
 
 
 /************************************************************************/
-/* _setusermatherr()                                                    */
-/************************************************************************/
-#ifndef __NO_FPU
-#ifdef __cplusplus
-struct __exception;
-#define STRUCT_EXCEPTION struct __exception
-#else /* __cplusplus */
-struct exception;
-#define STRUCT_EXCEPTION struct exception
-#endif /* !__cplusplus */
-
-struct _exception {
-	int type;
-	char *name;
-	double arg1;
-	double arg2;
-	double retval;
-};
-#define _DOMAIN    1
-#define _SING      2
-#define _OVERFLOW  3
-#define _UNDERFLOW 4
-#define _TLOSS     5
-#define _PLOSS     6
-
-/* Assert that DOS's `struct _exception' is ABI-compatible with ours (which it should be) */
-STATIC_ASSERT(offsetof(struct _exception, type) == offsetof(STRUCT_EXCEPTION, type));
-STATIC_ASSERT(offsetafter(struct _exception, type) == offsetafter(STRUCT_EXCEPTION, type));
-STATIC_ASSERT(offsetof(struct _exception, name) == offsetof(STRUCT_EXCEPTION, name));
-STATIC_ASSERT(offsetafter(struct _exception, name) == offsetafter(STRUCT_EXCEPTION, name));
-STATIC_ASSERT(offsetof(struct _exception, arg1) == offsetof(STRUCT_EXCEPTION, arg1));
-STATIC_ASSERT(offsetafter(struct _exception, arg1) == offsetafter(STRUCT_EXCEPTION, arg1));
-STATIC_ASSERT(offsetof(struct _exception, arg2) == offsetof(STRUCT_EXCEPTION, arg2));
-STATIC_ASSERT(offsetafter(struct _exception, arg2) == offsetafter(STRUCT_EXCEPTION, arg2));
-STATIC_ASSERT(offsetof(struct _exception, retval) == offsetof(STRUCT_EXCEPTION, retval));
-STATIC_ASSERT(offsetafter(struct _exception, retval) == offsetafter(STRUCT_EXCEPTION, retval));
-STATIC_ASSERT(_DOMAIN == __MATH_EXCEPT_DOMAIN);
-STATIC_ASSERT(_SING == __MATH_EXCEPT_SING);
-STATIC_ASSERT(_OVERFLOW == __MATH_EXCEPT_OVERFLOW);
-STATIC_ASSERT(_UNDERFLOW == __MATH_EXCEPT_UNDERFLOW);
-STATIC_ASSERT(_TLOSS == __MATH_EXCEPT_TLOSS);
-STATIC_ASSERT(_PLOSS == __MATH_EXCEPT_PLOSS);
-
-/* If non-NULL, the currently used `matherr(3)' handler in  "libc/matherr.c"
- * When `NULL', lazily load the matherr handler via `dlsym()', and fall back
- * to a no-op handler when no override was defined.
- *
- * To facilitate DOS's `__setusermatherr(3)', we simply re-assign this pointer
- * with  another function that  will invoke the  DOS-given math error handler. */
-typedef int (LIBKCALL *LPMATHERR)(STRUCT_EXCEPTION *exc);
-INTDEF LPMATHERR libc_pdyn_matherr;
-
-
-DEFINE_PUBLIC_ALIAS(__setusermatherr, libc___setusermatherr);
-INTERN ATTR_SECTION(".text.crt.dos.application.init") void LIBDCALL
-libc___setusermatherr(int (LIBKCALL *fptr)(struct _exception *)) {
-	/* We've already asserted  that DOS's `struct _exception'  and
-	 * our `STRUCT_EXCEPTION'  are  binary  compatible  (s.a.  the
-	 * static asserts above), so  if the calling conventions  also
-	 * match, then we can simply cast+assign the function pointer. */
-	libc_pdyn_matherr = (LPMATHERR)fptr;
-}
-
-#ifndef __LIBDCALL_IS_LIBKCALL
-/* When calling conventions don't match, then we need to do some extra
- * work  in order to  set-up a wrapper that  calls DOS's error handler
- * using the proper calling convention. */
-INTERN ATTR_SECTION(".bss.crt.dos.application.init")
-int (LIBDCALL *libd_usermatherr_fptr)(struct _exception *) = NULL;
-INTERN ATTR_SECTION(".text.crt.dos.application.init") int LIBKCALL
-libd_usermatherr_wrapper(STRUCT_EXCEPTION *exc) {
-	/* Even when calling conventions don't match, we still know that
-	 * our `STRUCT_EXCEPTION' matches DOS's `struct _exception',  so
-	 * no need to do some extra conversion in here.
-	 *
-	 * If they didn't match, this compat function could still  be
-	 * provided, only that we'd need to do some extra fiddling in
-	 * order to achive ABI compatibility. */
-	return (*libd_usermatherr_fptr)((struct _exception *)exc);
-}
-
-DEFINE_PUBLIC_ALIAS(DOS$__setusermatherr, libd___setusermatherr);
-INTERN ATTR_SECTION(".text.crt.dos.application.init") void LIBDCALL
-libd___setusermatherr(int (LIBDCALL *fptr)(struct _exception *)) {
-	/* Assign the function pointer to-be called by the wrapper. */
-	libd_usermatherr_fptr = fptr;
-
-	/* Assign the wrapper to-be called as `matherr(3)' handler. */
-	libc_pdyn_matherr = &libd_usermatherr_wrapper;
-}
-#endif /* !__LIBDCALL_IS_LIBKCALL */
-#endif /* !__NO_FPU */
-
-
-
-/************************************************************************/
 /* _amsg_exit()                                                         */
 /************************************************************************/
 DEFINE_PUBLIC_ALIAS(DOS$_amsg_exit, libd__amsg_exit);
@@ -1607,46 +1406,6 @@ INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.dos.application.init") void LIBDCAL
 libd__amsg_exit(int errnum) {
 	CRT_UNIMPLEMENTEDF("DOS$_amsg_exit(%p)\n", errnum);
 	_Exit(-1);
-}
-
-
-
-/************************************************************************/
-/* _initterm()                                                          */
-/************************************************************************/
-typedef void (LIBDCALL *_INITTERMFUN)(void);
-typedef int (LIBDCALL *_INITTERM_E_FN)(void);
-
-DEFINE_PUBLIC_ALIAS(DOS$_initterm, libd__initterm);
-INTERN ATTR_SECTION(".text.crt.dos.application.init") void LIBDCALL
-libd__initterm(_INITTERMFUN *start, _INITTERMFUN *end) {
-	_INITTERMFUN *iter = start;
-	for (iter = start; iter < end; ++iter) {
-		if (!*iter)
-			continue;
-		syslog(LOG_DEBUG, "[libc] DOS$_initterm: call %p\n", *iter);
-		(**iter)();
-	}
-	syslog(LOG_DEBUG, "[libc] DOS$_initterm: done\n");
-}
-
-DEFINE_PUBLIC_ALIAS(DOS$_initterm_e, libd__initterm_e);
-INTERN ATTR_SECTION(".text.crt.dos.application.init") int LIBDCALL
-libd__initterm_e(_INITTERM_E_FN *start, _INITTERM_E_FN *end) {
-	_INITTERM_E_FN *iter;
-	int result = 0;
-	for (iter = start; iter < end; ++iter) {
-		if (!*iter)
-			continue;
-		syslog(LOG_DEBUG, "[libc] DOS$_initterm_e: call %p\n", *iter);
-		result = (**iter)();
-		if (result != 0) {
-			syslog(LOG_DEBUG, "[libc] DOS$_initterm_e: call %p failed -> %d\n", *iter, result);
-			break;
-		}
-	}
-	syslog(LOG_DEBUG, "[libc] DOS$_initterm_e: done\n");
-	return result;
 }
 
 
@@ -1887,123 +1646,6 @@ libd__except2(int unknown_flags, int fpu_opcode, double arg1, double arg2, doubl
 	/* This function seems related to DOS math error handling... */
 	CRT_UNIMPLEMENTEDF("DOS$_except2(%d,%d,%f,%f,%f,%p)",
 	                   unknown_flags, fpu_opcode, arg1, arg2, result, fpu_cw);
-	return result;
-}
-
-
-
-/************************************************************************/
-/* New-style DOS CRT initialization                                     */
-/************************************************************************/
-#define _crt_argv_no_arguments         0
-#define _crt_argv_unexpanded_arguments 1
-#define _crt_argv_expanded_arguments   2
-typedef int _crt_argv_mode;
-
-DEFINE_PUBLIC_ALIAS(DOS$_configure_narrow_argv, libd__configure_narrow_argv);
-DEFINE_PUBLIC_ALIAS(DOS$_configure_wide_argv, libd__configure_wide_argv);
-DEFINE_PUBLIC_ALIAS(DOS$_initialize_narrow_environment, libd__initialize_narrow_environment);
-DEFINE_PUBLIC_ALIAS(DOS$_initialize_wide_environment, libd__initialize_wide_environment);
-DEFINE_PUBLIC_ALIAS(DOS$_get_initial_narrow_environment, libd__get_initial_narrow_environment);
-DEFINE_PUBLIC_ALIAS(DOS$_get_initial_wide_environment, libd__get_initial_wide_environment);
-DEFINE_PUBLIC_ALIAS(DOS$_get_narrow_winmain_command_line, libd__get_narrow_winmain_command_line);
-DEFINE_PUBLIC_ALIAS(DOS$_get_wide_winmain_command_line, libd__get_wide_winmain_command_line);
-
-DEFINE_INTERN_ALIAS(libd__configure_wide_argv, libd__configure_narrow_argv);
-INTERN ATTR_SECTION(".text.crt.dos.compat.dos") errno_t LIBDCALL
-libd__configure_narrow_argv(_crt_argv_mode mode) {
-	COMPILER_IMPURE();
-	(void)mode;
-	return 0;
-}
-
-DEFINE_INTERN_ALIAS(libd__initialize_wide_environment, libd__initialize_narrow_environment);
-INTERN ATTR_SECTION(".text.crt.dos.compat.dos") int LIBDCALL
-libd__initialize_narrow_environment(void) {
-	COMPILER_IMPURE();
-	return 0;
-}
-
-INTERN ATTR_PURE ATTR_SECTION(".text.crt.dos.compat.dos") char **LIBDCALL
-libd__get_initial_narrow_environment(void) {
-	return *libc___p___initenv();
-}
-
-INTERN ATTR_PURE ATTR_SECTION(".text.crt.dos.compat.dos") char16_t **LIBDCALL
-libd__get_initial_wide_environment(void) {
-	return *libd___p___winitenv();
-}
-
-INTERN ATTR_PURE ATTR_SECTION(".text.crt.dos.compat.dos") char *LIBDCALL
-libd__get_narrow_winmain_command_line(void) {
-	return *libd___p__acmdln();
-}
-
-INTERN ATTR_PURE ATTR_SECTION(".text.crt.dos.compat.dos") char16_t *LIBDCALL
-libd__get_wide_winmain_command_line(void) {
-	return *libd___p__wcmdln();
-}
-
-typedef struct _onexit_table_t {
-	_onexit_t *_first;
-	_onexit_t *_last;
-	_onexit_t *_end;
-} _onexit_table_t;
-
-DEFINE_PUBLIC_ALIAS(DOS$_initialize_onexit_table, libd__initialize_onexit_table);
-DEFINE_PUBLIC_ALIAS(DOS$_register_onexit_function, libd__register_onexit_function);
-DEFINE_PUBLIC_ALIAS(DOS$_execute_onexit_table, libd__execute_onexit_table);
-INTERN ATTR_SECTION(".text.crt.dos.compat.dos") int LIBDCALL
-libd__initialize_onexit_table(_onexit_table_t *self) {
-	if unlikely(!self)
-		return -1;
-	bzero(self, sizeof(*self));
-	return 0;
-}
-
-INTERN ATTR_SECTION(".text.crt.dos.compat.dos") int LIBDCALL
-libd__register_onexit_function(_onexit_table_t *self, _onexit_t function) {
-	if unlikely(!self)
-		return -1;
-	if (self->_last >= self->_end) {
-		_onexit_t *newtab;
-		size_t newcnt;
-		newcnt = (size_t)(self->_last - self->_first) + 1;
-		newtab = (_onexit_t *)realloc(self->_first, newcnt + 1, sizeof(_onexit_t));
-		if (!newtab)
-			return -1;
-		newcnt       = malloc_usable_size(newtab) / sizeof(_onexit_t);
-		self->_last  = newtab + (self->_last - self->_first);
-		self->_end   = newtab + newcnt;
-		self->_first = newtab;
-	}
-	*self->_last++ = function;
-	return 0;
-}
-
-INTERN ATTR_SECTION(".text.crt.dos.compat.dos") int LIBDCALL
-libd__execute_onexit_table(_onexit_table_t *self) {
-	int result;
-	_onexit_t *_first = self->_first;
-	_onexit_t *_last  = self->_last;
-	libd__initialize_onexit_table(self);
-	result = libd__initterm_e(_first, _last);
-	free(_first);
-	return result;
-}
-
-
-DEFINE_PUBLIC_ALIAS(DOS$__dllonexit, libd___dllonexit);
-INTERN ATTR_SECTION(".text.crt.dos.compat.dos") NONNULL((2, 3)) int LIBDCALL
-libd___dllonexit(_onexit_t func, _onexit_t **p_begin, _onexit_t **p_end) {
-	int result;
-	_onexit_table_t tab;
-	tab._first = *p_begin;
-	tab._end   = *p_end;
-	tab._last  = tab._end;
-	result     = libd__register_onexit_function(&tab, func);
-	*p_begin   = tab._first;
-	*p_end     = tab._end;
 	return result;
 }
 

@@ -4285,6 +4285,9 @@ __LIBC wchar_t **__winitenv;
 }
 %#endif /* __USE_KOS */
 
+[[hidden]] __p___c16initenv(*) %{uchar16("__p___winitenv")}
+[[hidden]] __p___c32initenv(*) %{uchar32("__p___winitenv")}
+
 %
 %#ifndef _countof
 %#define _countof(a) __COMPILER_LENOF(a)

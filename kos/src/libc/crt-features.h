@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf09f125c */
+/* HASH CRC-32:0x167a1bb1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -158,6 +158,11 @@
 #define __CRT_HAVE_DOS$__pthread_unregister_cancel
 #define __CRT_HAVE_DOS$__pthread_unregister_cancel_restore
 #define __CRT_HAVE_DOS$__pthread_unwind_next
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#define __CRT_HAVE_DOS$__setusermatherr
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$__signbit
 #define __CRT_HAVE_DOS$__signbitf
 #define __CRT_HAVE_DOS$__signbitl
@@ -4063,6 +4068,7 @@
 #define __CRT_HAVE___cxa_rethrow
 #ifndef __KERNEL__
 #define __CRT_HAVE___daylight
+#define __CRT_HAVE___dllonexit
 #define __CRT_HAVE___doserrno
 #define __CRT_HAVE___dstbias
 #define __CRT_HAVE___environ
@@ -4155,6 +4161,7 @@
 #define __CRT_HAVE___p___initenv
 #define __CRT_HAVE___p___wargv
 #define __CRT_HAVE___p___winitenv
+#define __CRT_HAVE___p__acmdln
 #define __CRT_HAVE___p__crtAssertBusy
 #define __CRT_HAVE___p__crtBreakAlloc
 #define __CRT_HAVE___p__crtDbgFlag
@@ -4162,6 +4169,7 @@
 #define __CRT_HAVE___p__mbcasemap
 #define __CRT_HAVE___p__mbctype
 #define __CRT_HAVE___p__pgmptr
+#define __CRT_HAVE___p__wcmdln
 #define __CRT_HAVE___p__wenviron
 #define __CRT_HAVE___p__wpgmptr
 #define __CRT_HAVE___p_program_invocation_short_name
@@ -4176,6 +4184,7 @@
 #define __CRT_HAVE___pthread_unregister_cancel_restore
 #define __CRT_HAVE___pthread_unwind_next
 #define __CRT_HAVE___res_state
+#define __CRT_HAVE___setusermatherr
 #define __CRT_HAVE___signbit
 #define __CRT_HAVE___signbitf
 #define __CRT_HAVE___signbitl
@@ -4278,6 +4287,8 @@
 #define __CRT_HAVE__chvalidator_l
 #define __CRT_HAVE__clearfp
 #define __CRT_HAVE__configthreadlocale
+#define __CRT_HAVE__configure_narrow_argv
+#define __CRT_HAVE__configure_wide_argv
 #define __CRT_HAVE__conio_getpass
 #define __CRT_HAVE__conio_wherexy
 #define __CRT_HAVE__control87
@@ -4324,6 +4335,7 @@
 #define __CRT_HAVE__except_badusage_no_nesting
 #define __CRT_HAVE__except_check_no_nesting
 #ifndef __KERNEL__
+#define __CRT_HAVE__execute_onexit_table
 #define __CRT_HAVE__expand_dbg
 #define __CRT_HAVE__fcvt_s
 #define __CRT_HAVE__fdpcomp
@@ -4378,8 +4390,11 @@
 #define __CRT_HAVE__get_environ
 #define __CRT_HAVE__get_errno
 #define __CRT_HAVE__get_fmode
+#define __CRT_HAVE__get_initial_narrow_environment
+#define __CRT_HAVE__get_initial_wide_environment
 #define __CRT_HAVE__get_invalid_parameter_handler
 #define __CRT_HAVE__get_mbbtype_l
+#define __CRT_HAVE__get_narrow_winmain_command_line
 #define __CRT_HAVE__get_osfhandle
 #define __CRT_HAVE__get_output_format
 #define __CRT_HAVE__get_pgmptr
@@ -4388,6 +4403,7 @@
 #define __CRT_HAVE__get_timezone
 #define __CRT_HAVE__get_tzname
 #define __CRT_HAVE__get_wenviron
+#define __CRT_HAVE__get_wide_winmain_command_line
 #define __CRT_HAVE__get_wpgmptr
 #define __CRT_HAVE__getch
 #define __CRT_HAVE__getch_nolock
@@ -4416,6 +4432,11 @@
 #define __CRT_HAVE__i64toa_s
 #define __CRT_HAVE__i64tow
 #define __CRT_HAVE__i64tow_s
+#define __CRT_HAVE__initialize_narrow_environment
+#define __CRT_HAVE__initialize_onexit_table
+#define __CRT_HAVE__initialize_wide_environment
+#define __CRT_HAVE__initterm
+#define __CRT_HAVE__initterm_e
 #define __CRT_HAVE__isctype
 #define __CRT_HAVE__isctype_l
 #define __CRT_HAVE__isleadbyte_l
@@ -4660,6 +4681,7 @@
 #define __CRT_HAVE__putwch
 #define __CRT_HAVE__putwch_nolock
 #define __CRT_HAVE__putws
+#define __CRT_HAVE__query_app_type
 #define __CRT_HAVE__query_new_handler
 #define __CRT_HAVE__query_new_mode
 #define __CRT_HAVE__realloc_dbg
@@ -4667,6 +4689,7 @@
 #define __CRT_HAVE__redupi
 #define __CRT_HAVE__redupif
 #define __CRT_HAVE__redupil
+#define __CRT_HAVE__register_onexit_function
 #define __CRT_HAVE__register_thread_local_exe_atexit_callback
 #define __CRT_HAVE__rmtmp
 #define __CRT_HAVE__rotl
@@ -4685,7 +4708,10 @@
 #define __CRT_HAVE__scwprintf_p_l
 #define __CRT_HAVE__searchenv
 #define __CRT_HAVE__searchenv_s
+#define __CRT_HAVE__seh_filter_dll
+#define __CRT_HAVE__seh_filter_exe
 #define __CRT_HAVE__set_abort_behavior
+#define __CRT_HAVE__set_app_type
 #define __CRT_HAVE__set_controlfp
 #define __CRT_HAVE__set_doserrno
 #define __CRT_HAVE__set_errno

@@ -2305,7 +2305,7 @@ __after_posscan2_infmt:
 
 				if (*__old_format_format == '$') {
 					/* Check if we got here due to something like "%$42..." (same as "%42$..."),
-					 * which must be interpreted as width=42, and precision=varargs:size_t. */
+					 * which  must  be  interpreted as  width=42,  and precision=varargs:size_t. */
 __set_explicit_precision_size_t:
 					__precision = __builtin_va_arg(__FORMAT_ARGS, __size_t);
 					__flags |= __PRINTF_F_HASPREC;
@@ -2327,11 +2327,11 @@ __set_explicit_precision_size_t:
 					/* Check if we got here due to something like:
 					 *  - "%*42..."
 					 *  - "%?42..."
-					 * These cases are kind-of nonsensical, since here we have two
-					 * different components that are both specifying what width to
-					 * use. For the sake of common sense, we always use the most-
-					 * recent instruction (above: the "42", which we already have
-					 * loaded into `__width' at this point). However, we still have
+					 * These cases are kind-of nonsensical,  since here we have  two
+					 * different components that are  both specifying what width  to
+					 * use.  For the sake  of common sense, we  always use the most-
+					 * recent instruction (above:  the "42", which  we already  have
+					 * loaded into `__width' at this point). However, we still  have
 					 * to consume the varargs argument; else all following arguments
 					 * will not be based correctly.
 					 *

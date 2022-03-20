@@ -105,7 +105,6 @@
 - `<bsd/timeconv.h>`        (libbsd)
 - `<bsd/vis.h>`             (libbsd)
 - `<corecrt_share.h>`       (DOS)
-- `<corecrt_startup.h>`     (DOS)
 - `<corecrt_terminate.h>`   (DOS)
 - `<fmtmsg.h>`              (GLibc!)
 - `<fstab.h>`               (GLibc!)

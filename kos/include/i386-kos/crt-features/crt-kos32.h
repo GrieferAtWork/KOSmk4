@@ -431,6 +431,7 @@
 #define __CRT_HAVE___deregister_frame_info_bases
 #define __CRT_HAVE___dgettext
 #define __CRT_HAVE___difftime64
+#define __CRT_HAVE___dllonexit
 #define __CRT_HAVE___dn_comp
 #define __CRT_HAVE___dn_count_labels
 #define __CRT_HAVE___dn_expand
@@ -952,6 +953,7 @@
 #define __CRT_HAVE___p___mb_cur_max
 #define __CRT_HAVE___p___wargv
 #define __CRT_HAVE___p___winitenv
+#define __CRT_HAVE___p__acmdln
 #define __CRT_HAVE___p__crtAssertBusy
 #define __CRT_HAVE___p__crtBreakAlloc
 #define __CRT_HAVE___p__crtDbgFlag
@@ -1086,6 +1088,7 @@
 #define __CRT_HAVE___select
 #define __CRT_HAVE___send
 #define __CRT_HAVE___sendmmsg
+#define __CRT_HAVE___set_app_type
 #define __CRT_HAVE___set_cygerrno
 #define __CRT_HAVE___set_doserrno
 #define __CRT_HAVE___set_errno
@@ -1323,6 +1326,7 @@
 #define __CRT_HAVE__abs64
 #define __CRT_HAVE__access
 #define __CRT_HAVE__access_s
+#define __CRT_HAVE__acmdln
 #define __CRT_HAVE__aligned_free
 #define __CRT_HAVE__aligned_free_dbg
 #define __CRT_HAVE__aligned_malloc
@@ -1378,6 +1382,7 @@
 #define __CRT_HAVE__close
 #define __CRT_HAVE__commit
 #define __CRT_HAVE__configthreadlocale
+#define __CRT_HAVE__configure_narrow_argv
 #define __CRT_HAVE__conio_getpass
 #define __CRT_HAVE__control87
 #define __CRT_HAVE__controlfp
@@ -1440,6 +1445,7 @@
 #define __CRT_HAVE__etext
 #define __CRT_HAVE__except_badusage_no_nesting
 #define __CRT_HAVE__except_check_no_nesting
+#define __CRT_HAVE__execute_onexit_table
 #define __CRT_HAVE__exit
 #define __CRT_HAVE__expand_dbg
 #define __CRT_HAVE__fclose_nolock
@@ -1533,7 +1539,10 @@
 #define __CRT_HAVE__get_environ
 #define __CRT_HAVE__get_errno
 #define __CRT_HAVE__get_fmode
+#define __CRT_HAVE__get_initial_narrow_environment
+#define __CRT_HAVE__get_initial_wide_environment
 #define __CRT_HAVE__get_invalid_parameter_handler
+#define __CRT_HAVE__get_narrow_winmain_command_line
 #define __CRT_HAVE__get_osfhandle
 #define __CRT_HAVE__get_output_format
 #define __CRT_HAVE__get_pgmptr
@@ -1542,6 +1551,7 @@
 #define __CRT_HAVE__get_timezone
 #define __CRT_HAVE__get_tzname
 #define __CRT_HAVE__get_wenviron
+#define __CRT_HAVE__get_wide_winmain_command_line
 #define __CRT_HAVE__get_wpgmptr
 #define __CRT_HAVE__getc_nolock
 #define __CRT_HAVE__getch
@@ -1579,6 +1589,10 @@
 #define __CRT_HAVE__i64toa_s
 #define __CRT_HAVE__i64tow
 #define __CRT_HAVE__i64tow_s
+#define __CRT_HAVE__initialize_narrow_environment
+#define __CRT_HAVE__initialize_onexit_table
+#define __CRT_HAVE__initterm
+#define __CRT_HAVE__initterm_e
 #define __CRT_HAVE__invalid_parameter
 #define __CRT_HAVE__invalid_parameter_noinfo
 #define __CRT_HAVE__invalid_parameter_noinfo_noreturn
@@ -1888,6 +1902,7 @@
 #define __CRT_HAVE__putwch
 #define __CRT_HAVE__putwch_nolock
 #define __CRT_HAVE__putws
+#define __CRT_HAVE__query_app_type
 #define __CRT_HAVE__query_new_handler
 #define __CRT_HAVE__query_new_mode
 #define __CRT_HAVE__quicksort
@@ -1895,6 +1910,7 @@
 #define __CRT_HAVE__realloc_dbg
 #define __CRT_HAVE__recalloc
 #define __CRT_HAVE__recalloc_dbg
+#define __CRT_HAVE__register_onexit_function
 #define __CRT_HAVE__register_thread_local_exe_atexit_callback
 #define __CRT_HAVE__rmtmp
 #define __CRT_HAVE__rotl
@@ -1915,7 +1931,10 @@
 #define __CRT_HAVE__scwprintf_p_l
 #define __CRT_HAVE__searchenv
 #define __CRT_HAVE__searchenv_s
+#define __CRT_HAVE__seh_filter_dll
+#define __CRT_HAVE__seh_filter_exe
 #define __CRT_HAVE__set_abort_behavior
+#define __CRT_HAVE__set_app_type
 #define __CRT_HAVE__set_controlfp
 #define __CRT_HAVE__set_doserrno
 #define __CRT_HAVE__set_errno
@@ -6257,15 +6276,12 @@
 #define __CRT_HAVE___crtSetUnhandledExceptionFilter
 #define __CRT_HAVE___crtTerminateProcess
 #define __CRT_HAVE___crtUnhandledException
-#define __CRT_HAVE___dllonexit
 #define __CRT_HAVE___dstbias
 #define __CRT_HAVE___getmainargs
 #define __CRT_HAVE___initialize_lconv_for_unsigned_char
 #define __CRT_HAVE___lconv_init
-#define __CRT_HAVE___p__acmdln
 #define __CRT_HAVE___p__commode
 #define __CRT_HAVE___p__wcmdln
-#define __CRT_HAVE___set_app_type
 #define __CRT_HAVE___threadhandle
 #define __CRT_HAVE___vcrt_GetModuleFileNameW
 #define __CRT_HAVE___vcrt_GetModuleHandleW
@@ -6273,14 +6289,11 @@
 #define __CRT_HAVE___vcrt_LoadLibraryExW
 #define __CRT_HAVE___wcsncnt
 #define __CRT_HAVE___wgetmainargs
-#define __CRT_HAVE__acmdln
 #define __CRT_HAVE__aexit_rtn
 #define __CRT_HAVE__amsg_exit
 #define __CRT_HAVE__chdir
 #define __CRT_HAVE__chmod
 #define __CRT_HAVE__commode
-#define __CRT_HAVE__configure_narrow_argv
-#define __CRT_HAVE__configure_wide_argv
 #define __CRT_HAVE__creat
 #define __CRT_HAVE__except1
 #define __CRT_HAVE__except2
@@ -6293,7 +6306,6 @@
 #define __CRT_HAVE__execle
 #define __CRT_HAVE__execlp
 #define __CRT_HAVE__execlpe
-#define __CRT_HAVE__execute_onexit_table
 #define __CRT_HAVE__execv
 #define __CRT_HAVE__execve
 #define __CRT_HAVE__execvp
@@ -6306,18 +6318,9 @@
 #define __CRT_HAVE__fputws_nolock
 #define __CRT_HAVE__freea
 #define __CRT_HAVE__freea_s
-#define __CRT_HAVE__get_initial_narrow_environment
-#define __CRT_HAVE__get_initial_wide_environment
-#define __CRT_HAVE__get_narrow_winmain_command_line
-#define __CRT_HAVE__get_wide_winmain_command_line
 #define __CRT_HAVE__getcwd
 #define __CRT_HAVE__getdcwd_nolock
 #define __CRT_HAVE__getwc_nolock
-#define __CRT_HAVE__initialize_narrow_environment
-#define __CRT_HAVE__initialize_onexit_table
-#define __CRT_HAVE__initialize_wide_environment
-#define __CRT_HAVE__initterm
-#define __CRT_HAVE__initterm_e
 #define __CRT_HAVE__inp
 #define __CRT_HAVE__inpd
 #define __CRT_HAVE__inpw
@@ -6340,12 +6343,7 @@
 #define __CRT_HAVE__outpw
 #define __CRT_HAVE__putenv
 #define __CRT_HAVE__putwc_nolock
-#define __CRT_HAVE__query_app_type
-#define __CRT_HAVE__register_onexit_function
 #define __CRT_HAVE__rmdir
-#define __CRT_HAVE__seh_filter_dll
-#define __CRT_HAVE__seh_filter_exe
-#define __CRT_HAVE__set_app_type
 #define __CRT_HAVE__signal
 #define __CRT_HAVE__sopen
 #define __CRT_HAVE__spawnl
@@ -7322,7 +7320,6 @@
 #define __CRT_HAVE_DOS$__crtTerminateProcess
 #define __CRT_HAVE_DOS$__crtUnhandledException
 #define __CRT_HAVE_DOS$__daylight
-#define __CRT_HAVE_DOS$__dllonexit
 #define __CRT_HAVE_DOS$__dstbias
 #define __CRT_HAVE_DOS$__dup2
 #define __CRT_HAVE_DOS$__environ
@@ -7382,7 +7379,6 @@
 #define __CRT_HAVE_DOS$__p___initenv
 #define __CRT_HAVE_DOS$__p___wargv
 #define __CRT_HAVE_DOS$__p___winitenv
-#define __CRT_HAVE_DOS$__p__acmdln
 #define __CRT_HAVE_DOS$__p__commode
 #define __CRT_HAVE_DOS$__p__environ
 #define __CRT_HAVE_DOS$__p__pgmptr
@@ -7395,7 +7391,6 @@
 #define __CRT_HAVE_DOS$__rename
 #define __CRT_HAVE_DOS$__rmdir
 #define __CRT_HAVE_DOS$__secure_getenv
-#define __CRT_HAVE_DOS$__set_app_type
 #define __CRT_HAVE_DOS$__setmntent
 #define __CRT_HAVE_DOS$__stdio_common_vfwprintf
 #define __CRT_HAVE_DOS$__stdio_common_vfwprintf_p
@@ -7447,7 +7442,6 @@
 #define __CRT_HAVE_DOS$__winitenv
 #define __CRT_HAVE_DOS$_access
 #define __CRT_HAVE_DOS$_access_s
-#define __CRT_HAVE_DOS$_acmdln
 #define __CRT_HAVE_DOS$_aexit_rtn
 #define __CRT_HAVE_DOS$_amsg_exit
 #define __CRT_HAVE_DOS$_cgetws
@@ -7455,8 +7449,6 @@
 #define __CRT_HAVE_DOS$_chdir
 #define __CRT_HAVE_DOS$_chmod
 #define __CRT_HAVE_DOS$_commode
-#define __CRT_HAVE_DOS$_configure_narrow_argv
-#define __CRT_HAVE_DOS$_configure_wide_argv
 #define __CRT_HAVE_DOS$_cputws
 #define __CRT_HAVE_DOS$_creat
 #define __CRT_HAVE_DOS$_cwprintf
@@ -7487,7 +7479,6 @@
 #define __CRT_HAVE_DOS$_execle
 #define __CRT_HAVE_DOS$_execlp
 #define __CRT_HAVE_DOS$_execlpe
-#define __CRT_HAVE_DOS$_execute_onexit_table
 #define __CRT_HAVE_DOS$_execv
 #define __CRT_HAVE_DOS$_execve
 #define __CRT_HAVE_DOS$_execvp
@@ -7520,11 +7511,7 @@
 #define __CRT_HAVE_DOS$_gcvt_s
 #define __CRT_HAVE_DOS$_get_doserrno
 #define __CRT_HAVE_DOS$_get_errno
-#define __CRT_HAVE_DOS$_get_initial_narrow_environment
-#define __CRT_HAVE_DOS$_get_initial_wide_environment
-#define __CRT_HAVE_DOS$_get_narrow_winmain_command_line
 #define __CRT_HAVE_DOS$_get_wenviron
-#define __CRT_HAVE_DOS$_get_wide_winmain_command_line
 #define __CRT_HAVE_DOS$_get_wpgmptr
 #define __CRT_HAVE_DOS$_getcwd
 #define __CRT_HAVE_DOS$_getdcwd
@@ -7539,11 +7526,6 @@
 #define __CRT_HAVE_DOS$_i64toa_s
 #define __CRT_HAVE_DOS$_i64tow
 #define __CRT_HAVE_DOS$_i64tow_s
-#define __CRT_HAVE_DOS$_initialize_narrow_environment
-#define __CRT_HAVE_DOS$_initialize_onexit_table
-#define __CRT_HAVE_DOS$_initialize_wide_environment
-#define __CRT_HAVE_DOS$_initterm
-#define __CRT_HAVE_DOS$_initterm_e
 #define __CRT_HAVE_DOS$_inp
 #define __CRT_HAVE_DOS$_inpd
 #define __CRT_HAVE_DOS$_inpw
@@ -7588,16 +7570,11 @@
 #define __CRT_HAVE_DOS$_putwch
 #define __CRT_HAVE_DOS$_putwch_nolock
 #define __CRT_HAVE_DOS$_putws
-#define __CRT_HAVE_DOS$_query_app_type
-#define __CRT_HAVE_DOS$_register_onexit_function
 #define __CRT_HAVE_DOS$_rmdir
 #define __CRT_HAVE_DOS$_scwprintf
 #define __CRT_HAVE_DOS$_scwprintf_l
 #define __CRT_HAVE_DOS$_scwprintf_p
 #define __CRT_HAVE_DOS$_scwprintf_p_l
-#define __CRT_HAVE_DOS$_seh_filter_dll
-#define __CRT_HAVE_DOS$_seh_filter_exe
-#define __CRT_HAVE_DOS$_set_app_type
 #define __CRT_HAVE_DOS$_set_errno
 #define __CRT_HAVE_DOS$_signal
 #define __CRT_HAVE_DOS$_snwprintf
