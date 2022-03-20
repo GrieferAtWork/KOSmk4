@@ -54,6 +54,7 @@ DEFINE_TEST(positional_printf) {
 	assert_printf_equals("42", "%d", 42);
 	assert_printf_equals("-42", "%d", -42);
 	assert_printf_equals("+42", "%+d", 42);
+	assert_printf_equals("-42", "%+d", -42);
 
 	/* The actual meat of this test: positional printf arguments. */
 	assert_printf_equals("<42 42 42 42>", "<%1$d %1$d %1$d %1$d>", 42);
@@ -74,6 +75,53 @@ DEFINE_TEST(positional_printf) {
 	/* This used to break due to a (now-fixed) bug with positional argument pre-loading. */
 	assert_printf_equals("PRE\"Foobar\"MID00001234POST",
 	                     "PRE%2$.6qMID%1$0.8xPOST", 0x1234, "Foobar");
+
+	/* Ensure that something like "%.*16..." is handled the same as "%16.*..."
+	 * The  fact that precision and width can be written in any order is a KOS
+	 * extension,  however  "%.*16..." still  requires special  handling since
+	 * "%.*16$..." would mean something entirely different:
+	 *  - "%.*16..."  -- set:precision=va_arg(uint); set:width=16;
+	 *  - "%.*16$..." -- set:precision=positional[16].uint; */
+	assert_printf_equals("PRE             FooPOST", "PRE%.*16sPOST", 3, "Foobar");
+	assert_printf_equals("PRE             FooPOST", "PRE%16.*sPOST", 3, "Foobar");
+	assert_printf_equals("PREFoo             POST", "PRE%-.*16sPOST", 3, "Foobar");
+	assert_printf_equals("PREFoo             POST", "PRE%-16.*sPOST", 3, "Foobar");
+	assert_printf_equals("PRE          FoobarPOST", "PRE%.*16sPOST", 6, "Foobar");
+	assert_printf_equals("PRE          FoobarPOST", "PRE%16.*sPOST", 6, "Foobar");
+	assert_printf_equals("PREFoobar          POST", "PRE%-.*16sPOST", 6, "Foobar");
+	assert_printf_equals("PREFoobar          POST", "PRE%-16.*sPOST", 6, "Foobar");
+	assert_printf_equals("PRE          FoobarPOST", "PRE%.*16sPOST", 42, "Foobar");
+	assert_printf_equals("PRE          FoobarPOST", "PRE%16.*sPOST", 42, "Foobar");
+	assert_printf_equals("PREFoobar          POST", "PRE%-.*16sPOST", 42, "Foobar");
+	assert_printf_equals("PREFoobar          POST", "PRE%-16.*sPOST", 42, "Foobar");
+
+	/* Also ensure that width vs. precision work correctly when both arguments are taken from varargs
+	 * NOTE: Because KOS also defines '$' as a precision-from-varargs flag, some ambiguity arises in
+	 *       something like "%*16$". This is _always_ handled as `precision=positional[16].uint', as
+	 *       opposed to  width=va_arg(uint),width=16,precision=va_arg(size_t). The  later cannot  be
+	 *       encoded in that order, but using a different order you could write "%*$16", which would
+	 *       get decoded as width=va_arg(uint),precision=va_arg(size_t),width=16 */
+	assert_printf_equals("PRE             FooPOST", "PRE%.**sPOST", 3, 16, "Foobar");
+	assert_printf_equals("PRE             FooPOST", "PRE%*.*sPOST", 16, 3, "Foobar");
+	assert_printf_equals("PREFoo             POST", "PRE%-.**sPOST", 3, 16, "Foobar");
+	assert_printf_equals("PREFoo             POST", "PRE%-*.*sPOST", 16, 3, "Foobar");
+	assert_printf_equals("PRE          FoobarPOST", "PRE%.**sPOST", 6, 16, "Foobar");
+	assert_printf_equals("PRE          FoobarPOST", "PRE%*.*sPOST", 16, 6, "Foobar");
+	assert_printf_equals("PREFoobar          POST", "PRE%-.**sPOST", 6, 16, "Foobar");
+	assert_printf_equals("PREFoobar          POST", "PRE%-*.*sPOST", 16, 6, "Foobar");
+	assert_printf_equals("PRE          FoobarPOST", "PRE%.**sPOST", 42, 16, "Foobar");
+	assert_printf_equals("PRE          FoobarPOST", "PRE%*.*sPOST", 16, 42, "Foobar");
+	assert_printf_equals("PREFoobar          POST", "PRE%-.**sPOST", 42, 16, "Foobar");
+	assert_printf_equals("PREFoobar          POST", "PRE%-*.*sPOST", 16, 42, "Foobar");
+
+	/* NOTE: The "*" in the following is completely pointless; it gets overwritten by the '16'
+	 *       But also note that specifying the same  attribute (here: width) can be done,  but
+	 *       isn't something you should do in practice. This only tests that it ~does~ work as
+	 *       it should! */
+	assert_printf_equals("PRE      \"Foobar\\0\"POST", "PRE%*$16qPOST", 0xdeadbeef, (size_t)7, "Foobar");
+
+	/* NOTE: "%$16q" behaves as expected, but the alias "%16$q" would be a positional argument declaration! */
+	assert_printf_equals("PRE      \"Foobar\\0\"POST", "PRE%$16qPOST", (size_t)7, "Foobar");
 }
 
 

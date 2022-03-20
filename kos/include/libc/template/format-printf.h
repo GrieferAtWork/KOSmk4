@@ -299,6 +299,8 @@ __nextfmt:
 				__CHAR_TYPE __posch;
 				if (!__p_args) {
 					__FORMAT_FORMAT -= 2;
+					if (__ch == '$')
+						++__FORMAT_FORMAT;
 					goto __begin_positional_for_width_or_precision;
 				}
 				__posch = *__FORMAT_FORMAT++;
@@ -329,7 +331,7 @@ __nextfmt:
 				}
 			}
 		} else if __likely(__ch >= '0' && __ch <= '9') {
-			/* decimal-encoded __precision modifier. */
+			/* decimal-encoded precision modifier. */
 			__precision = (__size_t)(__ch - '0');
 			while ((__ch = *__FORMAT_FORMAT, __ch >= '0' && __ch <= '9')) {
 				__precision = __precision * 10 + (__size_t)(__ch - '0');
@@ -1957,7 +1959,6 @@ __begin_positional_for_width_or_precision:
 					__iter = __old_format_format;
 					goto __again_posscan1_infmt;
 					for (;;) {
-						__size_t __posidx2;
 						__ch = *__iter++;
 						if (__ch == '\0')
 							goto __after_posscan1_infmt;
@@ -1984,15 +1985,15 @@ __again_posscan1_infmt:
 #ifdef __PRINTF_HAVE_LBRACKET
 						case '[': {
 							/* Special handling for %[...] extended format codes. */
-							unsigned int __i = 1;
+							unsigned int __bracket_recursion = 1;
 							while ((__ch = *__iter) != 0) {
 								++__iter;
-								if (__ch == '\033' && *__iter == '[')
+								if (__ch == '\033' && *__iter == '[') {
 									++__iter; /* Don't count ANSI escape sequences! */
-								else if (__ch == '[')
-									++__i;
-								else if (__ch == ']') {
-									if (!--__i)
+								} else if (__ch == '[') {
+									++__bracket_recursion;
+								} else if (__ch == ']') {
+									if (!--__bracket_recursion)
 										break;
 								}
 							}
@@ -2000,19 +2001,23 @@ __again_posscan1_infmt:
 						}	break;
 #endif /* __PRINTF_HAVE_LBRACKET */
 
-						default:
-							if (!(__ch >= '0' && __ch <= '9'))
+						default: {
+							__size_t __new_posidx;
+							if (!(__ch >= '1' && __ch <= '9')) /* '0' is a flag and its own case */
 								continue;
-							__posidx2 = __ch - '0';
+							__new_posidx = __ch - '0';
 							while ((__ch = *__iter, __ch >= '0' && __ch <= '9')) {
-								__posidx2 = __posidx2 * 10 + (__size_t)(__ch - '0');
+								__new_posidx = __new_posidx * 10 + (__size_t)(__ch - '0');
 								++__iter;
 							}
-							if (__ch == '$') {
-								if (__posidx < __posidx2)
-									__posidx = __posidx2;
-							}
+							if (__ch != '$')
+								goto __again_posscan1_infmt;
+							if (__posidx < __new_posidx)
+								__posidx = __new_posidx;
+							++__iter;
 							goto __again_posscan1_infmt;
+						}	break;
+
 						}
 					}
 __after_posscan1_infmt:
@@ -2156,15 +2161,15 @@ __again_posscan2_infmt:
 #ifdef __PRINTF_HAVE_LBRACKET
 						case '[': {
 							/* Special handling for %[...] extended format codes. */
-							unsigned int __i = 1;
+							unsigned int __bracket_recursion = 1;
 							while ((__ch = *__iter) != 0) {
 								++__iter;
-								if (__ch == '\033' && *__iter == '[')
+								if (__ch == '\033' && *__iter == '[') {
 									++__iter; /* Don't count ANSI escape sequences! */
-								else if (__ch == '[')
-									++__i;
-								else if (__ch == ']') {
-									if (!--__i)
+								} else if (__ch == '[') {
+									++__bracket_recursion;
+								} else if (__ch == ']') {
+									if (!--__bracket_recursion)
 										break;
 								}
 							}
@@ -2208,18 +2213,17 @@ __again_posscan2_infmt:
 
 						default: {
 							__size_t __new_type_idx;
-							if (!(__ch >= '0' && __ch <= '9'))
+							if (!(__ch >= '1' && __ch <= '9')) /* '0' is a flag and its own case */
 								continue;
 							__new_type_idx = __ch - '0';
 							while ((__ch = *__iter, __ch >= '0' && __ch <= '9')) {
 								__new_type_idx = __new_type_idx * 10 + (__size_t)(__ch - '0');
 								++__iter;
 							}
-							if (__ch == '$') {
-								__type_idx = __new_type_idx;
-								++__iter;
+							if (__ch != '$')
 								goto __again_posscan2_infmt;
-							}
+							__type_idx = __new_type_idx;
+							++__iter;
 							goto __again_posscan2_infmt;
 						}	break;
 
@@ -2298,6 +2302,50 @@ __after_posscan2_infmt:
 			} else {
 				__width = __posidx;
 				__flags |= __PRINTF_F_HASWIDTH;
+
+				if (*__old_format_format == '$') {
+					/* Check if we got here due to something like "%$42..." (same as "%42$..."),
+					 * which must be interpreted as width=42, and precision=varargs:size_t. */
+__set_explicit_precision_size_t:
+					__precision = __builtin_va_arg(__FORMAT_ARGS, __size_t);
+					__flags |= __PRINTF_F_HASPREC;
+				} else if (*__old_format_format == '.') {
+					/* Check if we got here due to something like:
+					 *  - "%.*42..." (same as "%42.*..."),
+					 *  - "%.?42..." (same as "%42.*..."),
+					 * which must be interpreted as width=42, and precision=varargs:uint/size_t. */
+#if __SIZEOF_POINTER__ > __VA_SIZE
+					if (__old_format_format[1] == '*') {
+						__precision = (__size_t)__builtin_va_arg(__FORMAT_ARGS, unsigned);
+						__flags |= __PRINTF_F_HASPREC;
+					} else
+#endif /* __SIZEOF_POINTER__ > __VA_SIZE */
+					{
+						goto __set_explicit_precision_size_t;
+					}
+				} else if (*__old_format_format == '*' || *__old_format_format == '?') {
+					/* Check if we got here due to something like:
+					 *  - "%*42..."
+					 *  - "%?42..."
+					 * These cases are kind-of nonsensical, since here we have two
+					 * different components that are both specifying what width to
+					 * use. For the sake of common sense, we always use the most-
+					 * recent instruction (above: the "42", which we already have
+					 * loaded into `__width' at this point). However, we still have
+					 * to consume the varargs argument; else all following arguments
+					 * will not be based correctly.
+					 *
+					 * But really though: if you use the above, something is probably
+					 * wrong with your code... */
+#if __SIZEOF_POINTER__ > __VA_SIZE
+					if (*__old_format_format == '*') {
+						(void)__builtin_va_arg(__FORMAT_ARGS, unsigned);
+					} else
+#endif /* __SIZEOF_POINTER__ > __VA_SIZE */
+					{
+						(void)__builtin_va_arg(__FORMAT_ARGS, __size_t);
+					}
+				}
 			}
 #endif /* !__NO_PRINTF_POSITIONAL */
 			goto __nextfmt;
