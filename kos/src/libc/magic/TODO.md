@@ -107,7 +107,6 @@
 - `<corecrt_share.h>`       (DOS)
 - `<corecrt_startup.h>`     (DOS)
 - `<corecrt_terminate.h>`   (DOS)
-- `<corecrt_wprocess.h>`    (DOS)
 - `<fmtmsg.h>`              (GLibc!)
 - `<fstab.h>`               (GLibc!)
 - `<gnu-versions.h>`        (GLibc!)

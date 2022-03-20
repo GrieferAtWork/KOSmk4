@@ -1742,8 +1742,8 @@ again_switch_curlied_action:
 				 *   ${VARNAME::[LENGTH]}             -- START_INDEX="0"
 				 * Impl:
 				 *   startIndex = START_INDEX;
-				 *   if  (startIndex  <  0)  {
-				 *       startIndex = 0;
+				 *   if  (startIndex < 0) {
+				 *       startIndex  =   0;
 				 *       endIndex   = {value_len};
 				 *   } else {
 				 *       endIndex =  LENGTH;

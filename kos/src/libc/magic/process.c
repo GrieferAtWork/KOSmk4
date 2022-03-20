@@ -46,8 +46,6 @@
 #include <kos/anno.h>
 )]%{
 
-__SYSDECL_BEGIN
-
 /* `mode' argument values for spawn() functions. */
 #ifdef __P_WAIT
 #define P_WAIT    __P_WAIT    /* Wait for the process to terminate, and return its exit status */
@@ -84,12 +82,14 @@ __SYSDECL_BEGIN
 #endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__TARGV */
 
+__SYSDECL_BEGIN
+
 /* DOS */
 }
 %#ifdef __USE_DOS
 %{
 #ifndef __USE_DOS_CLEAN
-//TODO:#include <corecrt_wprocess.h> /* Include <wchar.h> instead */
+#include <corecrt_wprocess.h> /* Include <wchar.h> instead */
 #endif /* !__USE_DOS_CLEAN */
 
 #define _P_WAIT          P_WAIT
@@ -365,76 +365,6 @@ typedef __intptr_t intptr_t;
 
 %[define_type_class(__TWARGV = "TP")]
 %[define_type_class(__TWENVP = "TP")]
-
-%
-%#ifndef _WPROCESS_DEFINED
-%#define _WPROCESS_DEFINED 1
-[[argument_names(mode, path, ___argv), decl_include("<features.h>")]]
-int _wexecv([[nonnull]] wchar_t const *__restrict path,
-            [[nonnull]] wchar_t const *const *__restrict ___argv) = wexecv;
-
-[[argument_names(mode, file, ___argv), decl_include("<features.h>")]]
-int _wexecvp([[nonnull]] wchar_t const *__restrict file,
-             [[nonnull]] wchar_t const *const *__restrict ___argv) = wexecvp;
-
-[[argument_names(mode, path, ___argv, ___envp), decl_include("<features.h>")]]
-int _wexecve([[nonnull]] wchar_t const *__restrict path,
-             [[nonnull]] wchar_t const *const *__restrict ___argv,
-             [[nonnull]] wchar_t const *const *__restrict ___envp) = wexecve;
-
-[[argument_names(mode, file, ___argv, ___envp), decl_include("<features.h>")]]
-int _wexecvpe([[nonnull]] wchar_t const *__restrict file,
-              [[nonnull]] wchar_t const *const *__restrict ___argv,
-              [[nonnull]] wchar_t const *const *__restrict ___envp) = wexecvpe;
-
-%[insert:function(_wexecl = wexecl)]
-%[insert:function(_wexeclp = wexeclp)]
-%[insert:function(_wexecle = wexecle)]
-%[insert:function(_wexeclpe = wexeclpe)]
-
-[[argument_names(mode, path, ___argv), decl_include("<features.h>")]]
-intptr_t _wspawnv(__STDC_INT_AS_UINT_T mode,
-                  [[nonnull]] wchar_t const *__restrict path,
-                  [[nonnull]] wchar_t const *const *__restrict ___argv) = wspawnv;
-
-[[argument_names(mode, file, ___argv), decl_include("<features.h>")]]
-intptr_t _wspawnvp(__STDC_INT_AS_UINT_T mode,
-                   [[nonnull]] wchar_t const *__restrict file,
-                   [[nonnull]] wchar_t const *const *__restrict ___argv) = wspawnvp;
-
-[[argument_names(mode, path, ___argv, ___envp), decl_include("<features.h>")]]
-intptr_t _wspawnve(__STDC_INT_AS_UINT_T mode,
-                   [[nonnull]] wchar_t const *__restrict path,
-                   [[nonnull]] wchar_t const *const *__restrict ___argv,
-                   [[nonnull]] wchar_t const *const *__restrict ___envp) = wspawnve;
-
-[[argument_names(mode, file, ___argv, ___envp), decl_include("<features.h>")]]
-intptr_t _wspawnvpe(__STDC_INT_AS_UINT_T mode,
-                    [[nonnull]] wchar_t const *__restrict file,
-                    [[nonnull]] wchar_t const *const *__restrict ___argv,
-                    [[nonnull]] wchar_t const *const *__restrict ___envp) = wspawnvpe;
-
-[[ATTR_SENTINEL, decl_include("<features.h>", "<bits/types.h>")]]
-intptr_t _wspawnl(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict path,
-                  wchar_t const *args, ... /*, (wchar_t *)NULL*/) = wspawnl;
-
-[[ATTR_SENTINEL, decl_include("<features.h>", "<bits/types.h>")]]
-intptr_t _wspawnlp(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict file,
-                   wchar_t const *args, ... /*, (wchar_t *)NULL*/) = wspawnlp;
-
-[[ATTR_SENTINEL_O(1), decl_include("<features.h>", "<bits/types.h>")]]
-intptr_t _wspawnle(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict path,
-                   wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) = wspawnle;
-
-[[ATTR_SENTINEL_O(1), decl_include("<features.h>", "<bits/types.h>")]]
-intptr_t _wspawnlpe(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict file,
-                    wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) = wspawnlpe;
-%#endif /* !_WPROCESS_DEFINED */
-
-%
-%[insert:function(_wsystem = wsystem, guardName: "_CRT_WSYSTEM_DEFINED")]
-
-
 
 %
 %#endif /* __CC__ */
@@ -860,31 +790,11 @@ do_exec:
 @@pp_endif@@
 	_Exit(127);
 }
+
+%[insert:extern(fexecve)] /* Also defined in <unistd.h> */
+
 %#endif /* __USE_KOS */
 %#endif /* __USE_DOS || __USE_KOS */
-
-//TODO:#ifdef __USE_KOS
-//TODO:#ifndef _PARTS_KOS2_PROCESS_H
-//TODO:#include <parts/kos2/process.h>
-//TODO:#endif
-//TODO:#ifdef _WCHAR_H
-//TODO:#ifndef _PARTS_KOS2_WPROCESS_H
-//TODO:#include <parts/kos2/wprocess.h>
-//TODO:#endif
-//TODO:#endif
-//TODO:#endif /* __USE_KOS */
-//TODO:
-//TODO:#ifdef __USE_KOS3
-//TODO:#ifndef _PARTS_KOS3_PROCESS_H
-//TODO:#include <parts/kos3/process.h>
-//TODO:#endif
-//TODO:#ifdef _WCHAR_H
-//TODO:#ifndef _PARTS_KOS3_WPROCESS_H
-//TODO:#include <parts/kos3/wprocess.h>
-//TODO:#endif
-//TODO:#endif
-//TODO:#endif /* __USE_KOS3 */
-
 
 %{
 

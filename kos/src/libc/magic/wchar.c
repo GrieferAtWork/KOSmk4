@@ -2163,7 +2163,7 @@ __SYSDECL_END
 #endif /* __USE_UTF */
 
 #ifdef __USE_DOS
-//TODO:#include <corecrt_wprocess.h>
+#include <corecrt_wprocess.h>
 #include <corecrt_wconio.h>
 #include <corecrt_wdirect.h>
 #include <corecrt_wio.h>
