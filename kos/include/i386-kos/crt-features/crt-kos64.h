@@ -5936,6 +5936,7 @@
 #ifdef __PE__
 #define __CRT_HAVE__XcptFilter
 #define __CRT_HAVE___C_specific_handler
+#define __CRT_HAVE___CppXcptFilter
 #define __CRT_HAVE___CxxCallUnwindDelDtor
 #define __CRT_HAVE___CxxCallUnwindDtor
 #define __CRT_HAVE___CxxCallUnwindStdDelDtor
@@ -10436,6 +10437,7 @@
 #define __CRT_HAVE_DOS$_Wcsftime
 #define __CRT_HAVE_DOS$_XcptFilter
 #define __CRT_HAVE_DOS$__C_specific_handler
+#define __CRT_HAVE_DOS$__CppXcptFilter
 #define __CRT_HAVE_DOS$__CxxCallUnwindDelDtor
 #define __CRT_HAVE_DOS$__CxxCallUnwindDtor
 #define __CRT_HAVE_DOS$__CxxCallUnwindStdDelDtor

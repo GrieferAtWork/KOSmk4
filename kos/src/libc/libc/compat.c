@@ -1221,6 +1221,7 @@ DEFINE_PUBLIC_ALIAS(DOS$__lconv_init, libd___lconv_init);
 DEFINE_PUBLIC_ALIAS(DOS$__getmainargs, libd___getmainargs);
 DEFINE_PUBLIC_ALIAS(DOS$__wgetmainargs, libd___wgetmainargs);
 DEFINE_PUBLIC_ALIAS(DOS$_XcptFilter, libd__XcptFilter);
+DEFINE_PUBLIC_ALIAS(DOS$__CppXcptFilter, libd__XcptFilter);
 DEFINE_PUBLIC_ALIAS(DOS$_except_handler2, libd__except_handler4);
 DEFINE_PUBLIC_ALIAS(DOS$_except_handler3, libd__except_handler4);
 DEFINE_PUBLIC_ALIAS(DOS$_except_handler_3, libd__except_handler4);

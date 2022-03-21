@@ -115,6 +115,7 @@
 - `<obstack.h>`             (GLibc!)
 - `<regexp.h>`              (GLibc!)
 - `<resolv.h>`              (GLibc!)
+- `<share.h>`               (DOS)
 - `<stab.h>`                (GLibc!)
 - `<sys/capability.h>`      (linux: found in `/usr/include/sys/capability.h`; aka not in arch-headers!)
 - `<sys/fanotify.h>`        (linux)
@@ -134,6 +135,7 @@
 - `<sys/va_impl.h>`         (OpenSolaris)
 - `<sys/va_list.h>`         (OpenSolaris)
 - `<sys/varargs.h>`         (OpenSolaris)
+- `<tchar.h>`               (DOS)
 - `<timeconv.h>`            (libbsd)
 - `<thread_db.h>`           (GLibc!)
 
