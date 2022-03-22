@@ -70,7 +70,10 @@ struct device_ops {
 };
 
 
+#ifndef __device_awref_defined
+#define __device_awref_defined
 AWREF(device_awref, device);
+#endif /* !__device_awref_defined */
 
 /* Directory entry descriptor for /dev/ device files */
 struct devdirent {

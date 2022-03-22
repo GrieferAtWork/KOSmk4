@@ -128,8 +128,8 @@ BEGIN
 #if 0 /* TODO: These drivers have yet to be ported to the new FS system. */
 		DEFINE_SIMPLE_DRIVER("usb-hid", LIB(":usb")) /* Link against usb driver */
 		DEFINE_SIMPLE_DRIVER("usb-storage", LIB(":usb")) /* Link against usb driver */
-		DEFINE_SIMPLE_DRIVER("usb")
 #endif
+		DEFINE_SIMPLE_DRIVER("usb")
 
 		DEFINE_SIMPLE_DRIVER("procfs")
 		DEFINE_SIMPLE_DRIVER("ext2")

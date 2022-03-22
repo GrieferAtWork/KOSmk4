@@ -254,7 +254,7 @@ _async_worker_v_cancel(struct async *__restrict self) {
 
 
 /* Create (but don't start) a new async worker for the given object. */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct async *KCALL
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct async *KCALL
 async_worker_new(struct async_worker_ops const *__restrict ops,
                  void *__restrict ob_pointer, uintptr_half_t ob_type)
 		THROWS(E_BADALLOC) {

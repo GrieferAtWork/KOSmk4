@@ -29,6 +29,7 @@
 #include <drivers/usb.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/malloc.h>
 #include <kernel/printk.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
@@ -36,6 +37,7 @@
 #include <hw/usb/class.h>
 #include <hw/usb/hub.h>
 #include <hw/usb/usb.h>
+#include <kos/dev.h>
 
 #include <stddef.h>
 #include <stdio.h>
@@ -43,12 +45,23 @@
 DECL_BEGIN
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL usb_hub_fini)(struct chrdev *__restrict self) {
-	struct usb_hub_device *me;
-	me = (struct usb_hub_device *)self;
+NOTHROW(KCALL usbhubdev_v_destroy)(struct mfile *__restrict self) {
+	struct usbhubdev *me = mfile_asusbhub(self);
 	decref(me->uh_intf);
 	decref(me->uh_ctrl);
+	chrdev_v_destroy(self);
 }
+
+
+PRIVATE struct chrdev_ops const usbhubdev_ops = {{{{
+	.no_file = {
+		.mo_destroy = &usbhubdev_v_destroy,
+		.mo_changed = &chrdev_v_changed,
+		.mo_stream  = &chrdev_v_stream_ops,
+	},
+	.no_wrattr = &chrdev_v_wrattr,
+}}}};
+
 
 
 PRIVATE void
@@ -60,8 +73,8 @@ NOTHROW(FCALL sleep_milli)(unsigned int n) {
 
 
 PRIVATE void KCALL
-usb_hub_reset_port_and_probe(struct usb_hub_device *__restrict self,
-                             u8 portno) {
+usbhubdev_reset_port_and_probe(struct usbhubdev *__restrict self,
+                               u8 portno) {
 	struct usb_request req;
 	struct usb_controller *ctrl;
 	u16 st;
@@ -126,10 +139,10 @@ do_probe_port:
 
 
 INTERN bool KCALL
-usb_hub_probe(struct usb_controller *__restrict self,
+usbhubdev_probe(struct usb_controller *__restrict self,
               struct usb_interface *__restrict intf,
               size_t endpc, struct usb_endpoint *const endpv[]) {
-	REF struct usb_hub_device *result;
+	REF struct usbhubdev *result;
 	struct usb_request req;
 	struct usb_hub_descriptor desc;
 	size_t transfer_size;
@@ -160,31 +173,33 @@ usb_hub_probe(struct usb_controller *__restrict self,
 		printk(KERN_ERR "[usb] HUB doesn't have any ports\n");
 		return false;
 	}
+
 	/* XXX: Validate the proper amount/kinds of end-points? */
 	(void)endpc;
 	(void)endpv;
 
-	result = CHRDEV_ALLOC(struct usb_hub_device);
+	result = (REF struct usbhubdev *)kmalloc(sizeof(struct usbhubdev), GFP_NORMAL);
+	_chrdev_init(result, &usbhubdev_ops);
+	result->dv_driver       = incref(&drv_self);
+	result->fn_mode         = S_IFCHR | 0644;
 	result->uh_ctrl         = (REF struct usb_controller *)incref(self);
 	result->uh_intf         = (REF struct usb_interface *)incref(intf);
 	result->uh_num_ports    = desc.uh_num_ports;
 	result->uh_powerondelay = desc.uh_powerondelay;
 	result->uh_attrib       = desc.uh_attrib;
-	result->cd_type.ct_fini = &usb_hub_fini;
 	/* TODO: Implement ioctl() */
 	FINALLY_DECREF_UNLIKELY(result);
 
 	/* Create a device file for the hub. */
+
 	{
 		static int n = 0; /* TODO: better naming */
-		sprintf(result->cd_name, "usbhub%c", 'a' + n++);
+		device_registerf(self, MKDEV(DEV_MAJOR_AUTO, 0), "usbhub%c", 'a' + n++);
 	}
-	chrdev_register_auto(result);
 	TRY {
-		usb_register_chrdev(intf->ui_device,
-		                              result);
+		usb_register_device(intf->ui_device, result);
 	} EXCEPT {
-		chrdev_unregister(result);
+		device_delete(result);
 		RETHROW();
 	}
 
@@ -206,7 +221,7 @@ usb_hub_probe(struct usb_controller *__restrict self,
 		}
 		/* Reset and probe all of the hub's ports. */
 		for (i = 0; i < result->uh_num_ports; ++i)
-			usb_hub_reset_port_and_probe(result, i);
+			usbhubdev_reset_port_and_probe(result, i);
 	}
 	return true;
 }

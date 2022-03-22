@@ -386,7 +386,9 @@ again_pop_job:
 					unsigned int tmo_status;
 					ATOMIC_WRITE(ctx->atd_sleepon, NULL);
 					decref_unlikely(ctx);
+					task_disconnectall(); /* &async_ready_sig */
 do_handle_timeout:
+					assert(!task_wasconnected());
 					/* Timeout expired. */
 					tmo_status = ASYNC_CANCEL;
 					if (job->a_ops->ao_time != NULL) {
@@ -491,7 +493,7 @@ again_rd_stat:
 	if unlikely(st != _ASYNC_ST_TRIGGERED) {
 		struct aio_handle *aio;
 		assert(st == _ASYNC_ST_TRIGGERED_STOP);
-do_handle_triggered_stop:
+/*do_handle_triggered_stop:*/
 		aio = ATOMIC_XCH(job->a_aio, NULL);
 		if (aio) {
 			PREEMPTION_DISABLE();
@@ -555,15 +557,23 @@ again_do_work:
 		       status == ASYNC_CANCEL);
 		if (status != ASYNC_RESUME) {
 			struct aio_handle *aio;
+			bool did_set_stop;
 			/* Complete the async job. */
-			ATOMIC_CMPXCH(job->a_stat, _ASYNC_ST_READY, _ASYNC_ST_TRIGGERED_STOP);
 			aio = ATOMIC_XCH(job->a_aio, NULL);
+
+			/* Set  async stop state.  -- If it was  already set, then that
+			 * means that whoever set the state is doing the cleanup, which
+			 * may or many not involve re-adding the job to the ready list. */
+			did_set_stop = ATOMIC_CMPXCH(job->a_stat, _ASYNC_ST_READY,
+			                             _ASYNC_ST_TRIGGERED_STOP);
 			if (status == ASYNC_CANCEL) {
 				if (aio) {
 					PREEMPTION_DISABLE();
 					aio_handle_complete_nopr(aio, AIO_COMPLETION_CANCEL);
 					PREEMPTION_ENABLE();
 				}
+				if (!did_set_stop)
+					goto decref_job_and_again;
 				goto again_rd_stat;
 			}
 			/* Non-cancel completion. */
@@ -572,6 +582,8 @@ again_do_work:
 				aio_handle_complete_nopr(aio, AIO_COMPLETION_SUCCESS);
 				PREEMPTION_ENABLE();
 			}
+			if (!did_set_stop)
+				goto decref_job_and_again;
 			st = ATOMIC_READ(job->a_stat);
 			if unlikely(st == _ASYNC_ST_TRIGGERED)
 				goto again_handle_triggered;
@@ -607,10 +619,27 @@ again_rd_stat_before_reconnect:
 				goto again;
 			}
 		} else {
-			if (st == _ASYNC_ST_TRIGGERED_STOP)
-				goto do_handle_triggered_stop; /* async_cancel() was called in the mean time... */
-			if (st == _ASYNC_ST_TRIGGERED)
-				goto again_handle_triggered; /* async_cancel()+async_start() was called in the mean time... */
+			/* Don't  directly handle TRIGGERED_STOP. - `async_cancel()' will have
+			 * added the job to the ready-list,  and if we immediately handle  the
+			 * stop request, then the job will eventually be popped from the ready
+			 * list (which may have already happened at this point).
+			 *
+			 * This would lead to corruption because being on the ready-list means that
+			 * your state is either `_ASYNC_ST_TRIGGERED' or `_ASYNC_ST_TRIGGERED_STOP'
+			 *
+			 * The same also goes for `_ASYNC_ST_TRIGGERED'. In both states, we have
+			 * to manually pop the job from the ready queue before we're allowed  to
+			 * do anything! */
+#if 0
+			if (st == _ASYNC_ST_TRIGGERED_STOP) {
+				/* async_cancel() was called in the mean time... */
+				goto do_handle_triggered_stop;
+			}
+			if (st == _ASYNC_ST_TRIGGERED) {
+				/* async_cancel()+async_start() was called in the mean time... */
+				goto again_handle_triggered;
+			}
+#endif
 		}
 	} EXCEPT {
 		/* Async error-completion.
@@ -635,6 +664,7 @@ again_rd_stat_before_reconnect:
 	}
 
 	/* Drop the reference that we've gotten from the ready-list. */
+decref_job_and_again:
 	decref_unlikely(job);
 	goto again;
 }

@@ -145,7 +145,7 @@ done_tmpfs:
 	 *       when  the   ps2  keyboard   files  are   missing  from   /dev
 	 *       As  it stands right now, PS/2 will still create device files,
 	 *       even when the devices stem from USB emulation. */
-	ksysctl_insmod("usb-hid", NULL);
+//	ksysctl_insmod("usb", NULL);
 
 	/* Setup a couple of signals to-be ignored */
 	signal(SIGHUP, SIG_IGN);

@@ -54,6 +54,7 @@
 #include <hw/bus/pci.h>
 #include <hw/usb/uhci.h>
 #include <hw/usb/usb.h>
+#include <kos/dev.h>
 #include <kos/except/reason/io.h>
 
 #include <assert.h>
@@ -67,7 +68,7 @@
 #if !defined(NDEBUG) && 1
 //#define UHCI_DEBUG_LOG_TD_COMPLETE 1
 //#define  UHCI_DEBUG_LOG_INTERRUPT  1
-#define UHCI_DEBUG(...)             printk(__VA_ARGS__)
+#define UHCI_DEBUG(...) printk(__VA_ARGS__)
 #else /* !NDEBUG */
 #define UHCI_DEBUG(...) (void)0
 #endif /* NDEBUG */
@@ -273,6 +274,8 @@ NOTHROW(FCALL uhci_controller_egsm_leave)(struct uhci_controller *__restrict sel
 		self->uc_flags &= ~UHCI_CONTROLLER_FLAG_SUSPENDED;
 		COMPILER_WRITE_BARRIER();
 		sig_broadcast(&self->uc_resdec);
+		/* Start the EGSM daemon. */
+		async_start(self->uc_egsm);
 	}
 }
 
@@ -755,12 +758,12 @@ NOTHROW(KCALL uhci_aio_retsize)(struct aio_handle *__restrict self) {
 
 LOCAL NOBLOCK void
 NOTHROW(FCALL uhci_aio_handle_finidma)(struct uhci_aio_data *__restrict self) {
-	if (self->ud_flags & UHCI_AIO_FONEDMA)
-		mman_dmalock_release(&self->ud_dmalock);
-	else if (self->ud_dmalockvec) {
-		struct mdmalock *iter;
-		for (iter = self->ud_dmalockvec; iter->mdl_part; ++iter)
-			mman_dmalock_release(iter);
+	if (self->ud_flags & UHCI_AIO_FONEDMA) {
+		mdma_lock_release(self->ud_dmalock);
+	} else if (self->ud_dmalockvec) {
+		mdma_lock_t *iter;
+		for (iter = self->ud_dmalockvec; *iter; ++iter)
+			mdma_lock_release(*iter);
 		kfree(self->ud_dmalockvec);
 	}
 }
@@ -900,16 +903,9 @@ NOTHROW(FCALL uhci_int_do_invoke)(struct uhci_interrupt *__restrict ui,
 	if unlikely(intflags & USB_INTERRUPT_FLAG_DELETED) {
 do_stop:
 		result = USB_INTERRUPT_HANDLER_RETURN_STOP;
-	} else if (intflags & USB_INTERRUPT_FLAG_ISABLK) {
-		REF struct blkdev *dev;
-		dev = awref_get(&ui->ui_bind.ui_blk);
-		if unlikely(!dev)
-			goto do_stop;
-		result = (*ui->ui_handler)(dev, status, data, datalen);
-		decref_unlikely(dev);
 	} else {
-		REF struct chrdev *dev;
-		dev = awref_get(&ui->ui_bind.ui_chr);
+		REF struct device *dev;
+		dev = awref_get(&ui->ui_dev);
 		if unlikely(!dev)
 			goto do_stop;
 		result = (*ui->ui_handler)(dev, status, data, datalen);
@@ -1508,14 +1504,13 @@ done_tdint:
 
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL uhci_fini)(struct chrdev *__restrict self) {
-	struct uhci_controller *me;
+NOTHROW(KCALL uhci_v_destroy)(struct mfile *__restrict self) {
+	struct uhci_controller *me = mfile_asuhci(self);
 	REF struct uhci_interrupt *iter, *next;
 	unsigned int i;
-	me = (struct uhci_controller *)self;
 
-	/* Unregister the power control callback. */
-	unregister_async_worker(&uhci_powerctl_cb, me);
+	/* Cancel+destroy the power control daemon. */
+	decref(async_cancel(me->uc_egsm));
 
 	/* Make sure that the controller is stopped. */
 	if (me->uc_base.uc_mmbase != NULL)
@@ -1541,6 +1536,7 @@ NOTHROW(KCALL uhci_fini)(struct chrdev *__restrict self) {
 	}
 	if (me->uc_framelist)
 		mman_unmap_kram(me->uc_framelist, PAGESIZE);
+	usb_controller_v_destroy(self);
 }
 
 /* Schedule the given queue for execution. */
@@ -2418,31 +2414,28 @@ NOTHROW(FCALL uhci_count_isotds_for_interval_and_offset)(struct uhci_controller 
 
 
 /* Create an interrupt descriptor.
- * @param: endp:                          The endpoint from which to poll data.
- * @param: handler:                       The handler to-be invoked.
- * @param: character_or_block_device:     Either  a  `struct chrdev'  or   `struct blkdev',
- *                                        depending on the setting of `USB_INTERRUPT_FLAG_ISABLK'
- * @param: buflen:                        The (max) number of bytes of data to-be pulled from the device.
- *                                        Note that unless `USB_INTERRUPT_FLAG_SHORT' is set, this is the
- *                                        mandatory buffer size,  with it  being an error  if the  device
- *                                        produces  less data that this, meaning that unless said flag is
- *                                        set, your handler is allowed to completely ignore its `datalen'
- *                                        argument and simply assume that  the buffer's size is equal  to
- *                                        the `buflen' value  passed when the  interrupt was  registered.
- * @param: flags:                         Set of `USB_INTERRUPT_FLAG_*'
+ * @param: endp:    The endpoint from which to poll data.
+ * @param: handler: The handler to-be invoked.
+ * @param: dev:     Associated device.
+ * @param: buflen:  The (max) number of bytes of data to-be pulled from the device.
+ *                  Note that unless `USB_INTERRUPT_FLAG_SHORT' is set, this is the
+ *                  mandatory buffer size,  with it  being an error  if the  device
+ *                  produces  less data that this, meaning that unless said flag is
+ *                  set, your handler is allowed to completely ignore its `datalen'
+ *                  argument and simply assume that  the buffer's size is equal  to
+ *                  the `buflen' value  passed when the  interrupt was  registered.
+ * @param: flags:   Set of `USB_INTERRUPT_FLAG_*'
  * @param: poll_interval_in_milliseconds: A   hint  for  how  often  the  USB  device  should  be  polled.
  *                                        When set to `0', the device will be polled as often as possible. */
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4)) REF struct usb_interrupt *KCALL
 uhci_register_interrupt(struct usb_controller *__restrict self, struct usb_endpoint *__restrict endp,
-                        PUSB_INTERRUPT_HANDLER handler, void *__restrict character_or_block_device,
+                        PUSB_INTERRUPT_HANDLER handler, struct device *__restrict dev,
                         size_t buflen, uintptr_t flags, unsigned int poll_interval_in_milliseconds) {
 	struct uhci_controller *me;
 	unsigned int interval = 1;
 	unsigned int frame_hits = 1;
 	REF struct uhci_interrupt *result;
-	assert(!(flags & (USB_INTERRUPT_FLAG_ISACHR |
-	                  USB_INTERRUPT_FLAG_ISABLK |
-	                  USB_INTERRUPT_FLAG_SHORT |
+	assert(!(flags & (USB_INTERRUPT_FLAG_SHORT |
 	                  USB_INTERRUPT_FLAG_EVENPERIOD)));
 	if (flags & UHCI_INTERRUPT_FLAG_ISOCHRONOUS) {
 		/* Figure out how often the poll should happen. */
@@ -2482,7 +2475,7 @@ uhci_register_interrupt(struct usb_controller *__restrict self, struct usb_endpo
 	result->ui_flags   = flags;
 	result->ui_endp    = incref(endp);
 	result->ui_handler = handler;
-	awref_cinit(&result->ui_bind.ui_blk, (struct blkdev *)character_or_block_device);
+	awref_cinit(&result->ui_dev, dev);
 	TRY {
 		u32 tok, orig_tok, cs;
 		u16 maxpck;
@@ -2821,10 +2814,14 @@ do_resdect:
 		sync_endwrite(&uc->uc_lock);
 		goto done;
 	}
+
 	/* Try to enter EGSM mode.
 	 * Note that this function returns `false' if there are
 	 * any  ports  with  changed  connectivity  indicators! */
 	egsm_ok = uhci_controller_egsm_enter(uc);
+
+	/* Stop the EGSM daemon. */
+	async_cancel(uc->uc_egsm);
 	uhci_controller_endwrite(uc);
 
 	/* If we've successfully managed to enter EGSM mode, directly loop back. */
@@ -2994,6 +2991,22 @@ done:
 }
 
 
+
+PRIVATE struct usb_controller_ops const uhci_ops = {
+	.uco_chr = {{{{
+		.no_file = {
+			.mo_destroy = &uhci_v_destroy,
+			.mo_changed = &chrdev_v_changed,
+			.mo_stream  = &chrdev_v_stream_ops,
+		},
+		.no_wrattr = &chrdev_v_wrattr,
+	}}}},
+	.uco_transfer  = &uhci_transfer,
+	.uco_interrupt = &uhci_register_interrupt,
+};
+
+
+
 INTERN ATTR_FREETEXT void KCALL
 usb_probe_uhci(struct pci_device *__restrict dev) {
 	struct uhci_controller *result;
@@ -3010,15 +3023,17 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 		return;
 	}
 
-	result = CHRDEV_ALLOC(struct uhci_controller);
-	FINALLY_DECREF_UNLIKELY(result);
-
-	result->cd_type.ct_fini = &uhci_fini;
+	result = (struct uhci_controller *)kmemalign(alignof(struct uhci_controller),
+	                                             sizeof(struct uhci_controller),
+	                                             GFP_NORMAL | GFP_CALLOC);
+	_usb_controller_cinit(result, &uhci_ops);
+	result->dv_driver = incref(&drv_self);
+	result->fn_mode   = S_IFCHR | 0644;
 	sig_cinit(&result->uc_resdec);
 	atomic_rwlock_cinit(&result->uc_lock);
-	usb_controller_cinit(result);
 	result->uc_pci = dev;
 	assert(IS_ALIGNED((uintptr_t)&result->uc_qhstart, UHCI_FLE_ALIGN));
+	FINALLY_DECREF_UNLIKELY(result);
 
 	if (dev->pd_regions[pci_bar].pmr_is_IO) {
 		result->uc_base.uc_iobase = (port_t)dev->pd_regions[pci_bar].pmr_addr;
@@ -3036,8 +3051,6 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 		result->uc_base.uc_mmbase = (byte_t *)addr;
 		result->uc_flags |= UHCI_CONTROLLER_FLAG_USESMMIO;
 	}
-	result->uc_transfer        = &uhci_transfer;
-	result->uc_interrupt       = &uhci_register_interrupt;
 	result->uc_framelist       = (u32 *)mman_map_kram(NULL, PAGESIZE, GFP_LOCKED | GFP_PREFLT | GFP_MAP_32BIT);
 	result->uc_framelist_phys  = (u32)pagedir_translate(result->uc_framelist);
 	result->uc_qhstart.qh_self = (u32)pagedir_translate(&result->uc_qhstart);
@@ -3111,13 +3124,14 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 	result->uc_suspdelay = 250; /* Milliseconds */
 
 	/* Register the power control callback. */
-	register_async_worker(&uhci_powerctl_cb, result);
+	result->uc_egsm = async_worker_new(&uhci_powerctl_cb, result);
+	async_start(result->uc_egsm);
 
+	/* Register the device. */
 	{
 		static int n = 0; /* TODO: better naming */
-		sprintf(result->cd_name, "uhci%c", 'a' + n++);
+		device_registerf(result, MKDEV(DEV_MAJOR_AUTO, 0), "uhci%c", 'a' + n++);
 	}
-	chrdev_register_auto(result);
 
 	/* Reset & probe for new connections. */
 	for (i = 0; i < result->uc_portnum; ++i)

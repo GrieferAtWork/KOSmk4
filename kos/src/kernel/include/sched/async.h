@@ -407,7 +407,7 @@ FUNDEF WUNUSED NONNULL((1)) unsigned int FCALL _async_worker_v_time(struct async
 FUNDEF NONNULL((1)) void FCALL _async_worker_v_cancel(struct async *__restrict self);
 
 /* Create (but don't start) a new async worker for the given object. */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct async *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct async *KCALL
 async_worker_new(struct async_worker_ops const *__restrict ops,
                  void *__restrict ob_pointer, uintptr_half_t ob_type)
 		THROWS(E_BADALLOC);
@@ -435,6 +435,11 @@ HANDLE_FOREACH_CUSTOMTYPE(_ASYNC_WORKER_CXX_FWD_STRUCT)
 #undef _ASYNC_WORKER_CXX_FWD_STRUCT
 extern "C++" {
 #define _ASYNC_WORKER_CXX_DECLARE(HT, T)                                                  \
+	LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct async *KCALL                 \
+	async_worker_new(struct async_worker_ops const *__restrict ops,                       \
+	                 T *__restrict ob_pointer) THROWS(E_BADALLOC) {                       \
+		return async_worker_new(ops, (void *)ob_pointer, HT);                             \
+	}                                                                                     \
 	LOCAL NONNULL((1, 2)) bool KCALL                                                      \
 	register_async_worker(struct async_worker_ops const *__restrict ops,                  \
 	                      T *__restrict ob_pointer) THROWS(E_BADALLOC) {                  \

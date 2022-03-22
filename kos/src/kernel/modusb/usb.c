@@ -182,7 +182,7 @@ LOCAL bool KCALL
 usb_probe_builtin_interfaces(struct usb_controller *__restrict self,
                              struct usb_interface *__restrict intf,
                              size_t endpc, struct usb_endpoint *const endpv[]) {
-	if (usb_hub_probe(self, intf, endpc, endpv))
+	if (usbhubdev_probe(self, intf, endpc, endpv))
 		goto ok;
 	/* Other builtin interfaces would go here... */
 	return false;
@@ -1347,24 +1347,14 @@ strange_device:
  * single  given USB device,  however it is not  possible to delete such
  * a registration, other than physically removing the associated device.
  */
-PUBLIC void KCALL
-usb_register_blkdev(struct usb_device *__restrict usb_dev,
-                          struct blkdev *__restrict dev)
+PUBLIC NONNULL((1, 2)) void KCALL
+usb_register_device(struct usb_device *__restrict usb_dev,
+                    struct device *__restrict dev)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	/* TODO */
 	(void)usb_dev;
 	(void)dev;
 }
-
-PUBLIC void KCALL
-usb_register_chrdev(struct usb_device *__restrict usb_dev,
-                              struct chrdev *__restrict dev)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	/* TODO */
-	(void)usb_dev;
-	(void)dev;
-}
-
 
 
 /* Destroy the given USB interrupt descriptor. */

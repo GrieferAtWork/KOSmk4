@@ -27,13 +27,13 @@
 
 DECL_BEGIN
 
-struct usb_hub_device
+struct usbhubdev
 #ifdef __cplusplus
-	: chrdev
+    : chrdev
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct chrdev    uh_dev;          /* The underlying character device. */
+	struct chrdev              uh_dev;          /* The underlying character device. */
 #endif /* !__cplusplus */
 	REF struct usb_controller *uh_ctrl;         /* [1..1][const] The associated USB controller. */
 	REF struct usb_interface  *uh_intf;         /* [1..1][const] The interface of the HUB */
@@ -42,12 +42,17 @@ struct usb_hub_device
 	u16                        uh_attrib;       /* [const] Hub attributes (characteristics) (Set of `USB_HUB_ATTRIB_*') */
 };
 
+#define chrdev_asusbhub(self) ((struct usbhubdev *)(self))
+#define device_asusbhub(self) chrdev_asusbhub(device_aschr(self))
+#define fnode_asusbhub(self)  chrdev_asusbhub(fnode_aschrdev(self))
+#define mfile_asusbhub(self)  chrdev_asusbhub(mfile_aschrdev(self))
+
 
 #ifdef CONFIG_BUILDING_MODUSB
 INTDEF bool KCALL
-usb_hub_probe(struct usb_controller *__restrict self,
-              struct usb_interface *__restrict intf,
-              size_t endpc, struct usb_endpoint *const endpv[]);
+usbhubdev_probe(struct usb_controller *__restrict self,
+                struct usb_interface *__restrict intf,
+                size_t endpc, struct usb_endpoint *const endpv[]);
 #endif /* CONFIG_BUILDING_MODUSB */
 
 DECL_END

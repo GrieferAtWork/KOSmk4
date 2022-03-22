@@ -70,8 +70,8 @@ struct uhci_aio_data {
 	REF struct uhci_osqh       *ud_osqh;       /* [1..1][const] The Queue head associated with this request. */
 	REF struct uhci_controller *ud_ctrl;       /* [1..1][const] The associated USB controller. */
 	union {
-		struct mdmalock         ud_dmalock;    /* [valid_if(!UHCI_AIO_FSERVED && UHCI_AIO_FONEDMA)] Single DMA lock */
-		struct mdmalock        *ud_dmalockvec; /* [valid_if(!UHCI_AIO_FSERVED && !UHCI_AIO_FONEDMA)][0..1][owned] Vector of DMA locks
+		mdma_lock_t             ud_dmalock;    /* [valid_if(!UHCI_AIO_FSERVED && UHCI_AIO_FONEDMA)] Single DMA lock */
+		mdma_lock_t            *ud_dmalockvec; /* [valid_if(!UHCI_AIO_FSERVED && !UHCI_AIO_FONEDMA)][0..1][owned] Vector of DMA locks
 		                                        * NOTE: This vector is  terminated by  a sentinel  DMA
 		                                        *       lock with its `mdl_part' pointer set to `NULL' */
 	};
@@ -189,6 +189,7 @@ struct uhci_controller: usb_controller {
 	struct sig                 uc_resdec;         /* Signal broadcast when the `UHCI_CONTROLLER_FLAG_RESDECT' flag
 	                                               * is  set,  or  `UHCI_CONTROLLER_FLAG_SUSPENDED'  is   cleared,
 	                                               * or `uc_qhlast' is set to `NULL'. */
+	struct async              *uc_egsm;           /* [1..1][owned] EGSM daemon. */
 	struct atomic_rwlock       uc_lock;           /* Lock for sending commands to the controller. */
 	REF struct uhci_interrupt *uc_intreg;         /* [lock(uc_lock)][0..1] Chain of interrupts checked every frame (w/o `UHCI_INTERRUPT_FLAG_ISOCHRONOUS').
 	                                               * NOTE: The  HW-next  pointer of  last  TD of  the  last entry  of  this chain  points  to `uc_qhstart'! */
@@ -219,9 +220,12 @@ struct uhci_controller: usb_controller {
 	u8                         uc_portnum;        /* [const] # of available ports. */
 };
 
-
-
-
+/* Cast a given object into a `struct usb_controller' */
+#define usb_controller_asuhci(self) ((struct uhci_controller *)(self))
+#define chrdev_asuhci(self)         usb_controller_asuhci(chrdev_as_usb_controller(self))
+#define device_asuhci(self)         usb_controller_asuhci(device_as_usb_controller(self))
+#define fnode_asuhci(self)          usb_controller_asuhci(fnode_as_usb_controller(self))
+#define mfile_asuhci(self)          usb_controller_asuhci(mfile_as_usb_controller(self))
 
 /* Safely release a read/write lock on `self->uc_lock' */
 FUNDEF NOBLOCK void NOTHROW(FCALL uhci_controller_endread)(struct uhci_controller *__restrict self);
