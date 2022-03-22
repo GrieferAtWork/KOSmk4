@@ -871,6 +871,9 @@ again:
 	/* Insert the cloned range into `dst' */
 	handman_ranges_insert(dst, dstrange);
 
+	/* Consume the preallocated range (which has now been inserted into `dst') */
+	data->hfd_range = NULL;
+
 	/* Keep on cloning additional ranges. */
 	goto again;
 #undef UNLOCKALL
