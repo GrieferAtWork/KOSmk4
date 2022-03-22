@@ -299,7 +299,7 @@ int __dllonexit(_onexit_t func,
 	struct _onexit_table_t tab;
 	tab.@_first@ = (_PVFV *)*p_begin;
 	tab.@_last@  = (_PVFV *)*p_end;
-	tab.@_end@   = tab.@_end@;
+	tab.@_end@   = tab.@_last@;
 	result = _register_onexit_function(&tab, func);
 	*p_begin = (_onexit_t *)tab.@_first@;
 	*p_end   = (_onexit_t *)tab.@_last@;

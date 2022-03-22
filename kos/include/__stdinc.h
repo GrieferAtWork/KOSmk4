@@ -422,10 +422,16 @@
 #endif
 #define __INTERN_INLINE(sectnam, name)         inline __ATTR_UNUSED __ATTR_VISIBILITY("hidden")
 #define __INTERN_INLINE_SECTION(sectnam, name) inline __ATTR_UNUSED __ATTR_VISIBILITY("hidden") __ATTR_SECTION(sectnam "." name)
-#else /* ... */
+#elif defined(__GNUC__) && defined(__OPTIMIZE__) /* `static' only gets guarantied removed in optimized builds... (strange) */
 #define __NO_INTERN_COMDAT /* In this fallback case, we don't actually have proper COMDAT functionality... */
 #define __INTERN_COMDAT(sectnam, name)         static __ATTR_UNUSED
 #define __INTERN_COMDAT_SECTION(sectnam, name) static __ATTR_UNUSED __ATTR_SECTION(sectnam)
+#define __INTERN_INLINE(sectnam, name)         __LOCAL
+#define __INTERN_INLINE_SECTION(sectnam, name) __LOCAL __ATTR_SECTION(sectnam)
+#else /* ... */
+#define __NO_INTERN_COMDAT /* In this fallback case, we don't actually have proper COMDAT functionality... */
+#define __INTERN_COMDAT(sectnam, name)         __LOCAL
+#define __INTERN_COMDAT_SECTION(sectnam, name) __LOCAL __ATTR_SECTION(sectnam)
 #define __INTERN_INLINE(sectnam, name)         __LOCAL
 #define __INTERN_INLINE_SECTION(sectnam, name) __LOCAL __ATTR_SECTION(sectnam)
 #endif /* !... */
