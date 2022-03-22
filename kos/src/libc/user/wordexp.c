@@ -2108,6 +2108,9 @@ done_action:
 	if (quoted) {
 		/* Quoted, so fields won't be split! */
 		result = wxparser_wordappend(self, value_str, value_len);
+	} else if (value_len == 0) {
+		/* Special case: empty value. */
+		result = 0;
 	} else {
 		/* No quotes, so need to need to split fields. */
 		char const *field_start = value_str;
