@@ -45,6 +45,7 @@
 %[typecompat(i386:termios = *:termios)]
 %[typecompat(i386:termios2 = *:termios2)]
 %[typecompat(i386:winsize = *:winsize)]
+%[typecompat(i386:__kos_stat = *:__kos_stat)]
 
 
 @@Restore the specified register state when returning from a signal handler
@@ -107,10 +108,6 @@ signal = signalx32;
 sigaction = sigactionx32;
 rt_sigaction = rt_sigactionx32;
 sigaltstack = sigaltstackx32;
-kfstatat = kfstatatx32;
-kfstat = kfstatx32;
-klstat = klstatx32;
-kstat = kstatx32;
 fstatat = fstatatx32; /* Not exported */
 fstatat64 = fstatatx32_64;
 fstat = fstatx32;

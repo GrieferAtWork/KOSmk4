@@ -121,8 +121,6 @@
 %[typeorg(<bits/os/kos/rlimit32.h>: rlimitx32, __rlimitx32, rlimitx32_64, __rlimitx32_64)]
 %[typeorg(<bits/os/kos/rlimit64.h>: rlimitx64, __rlimitx64)]
 %[typeorg(<bits/os/kos/stat.h>: __kos_stat)]
-%[typeorg(<bits/os/kos/stat32.h>: __kos_statx32)]
-%[typeorg(<bits/os/kos/stat64.h>: __kos_statx64)]
 %[typeorg(<bits/os/statfs.h>: statfs, statfs32, statfs64, __statfs32, __statfs64)]
 %[typeorg(<bits/os/kos/statfs32.h>: statfsx32, __statfsx32, statfsx32_64, __statfsx32_64)]
 %[typeorg(<bits/os/kos/statfs64.h>: statfsx64, __statfsx64)]
@@ -1210,40 +1208,18 @@ fstatfsx64:(fd_t file, [tostr(out:STRUCT_STATFSX64)] struct __statfsx64 *buf) ->
 %[endgroup]
 
 
-%[startgroup]
 @@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
 [cp] kfstatat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename,
                [tostr(out:STRUCT_KOS_STAT)] struct __kos_stat *statbuf,
                [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
-[cp][doc_alias(kfstatat)] kfstatatx32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename,
-                                       [tostr(out:STRUCT_KOS_STATX32)] struct __kos_statx32 *statbuf,
-                                       [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
-[cp][doc_alias(kfstatat)] kfstatatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename,
-                                       [tostr(out:STRUCT_KOS_STATX64)] struct __kos_statx64 *statbuf,
-                                       [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
-%[endgroup]
+[cp] kfstat:(fd_t fd, [tostr(out:STRUCT_KOS_STAT)] struct __kos_stat *statbuf) -> errno_t;
+[cp] klstat:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_KOS_STAT)] struct __kos_stat *statbuf) -> errno_t;
+[cp] kstat:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_KOS_STAT)] struct __kos_stat *statbuf) -> errno_t;
 
 [cp] newfstatat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename,
                  [tostr(out:STRUCT_LINUX64_STAT32)] struct linux64_stat32 *statbuf,
                  [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t; /* UNIMPLEMENTED! */
 
-%[startgroup]
-[cp] kfstat:(fd_t fd, [tostr(out:STRUCT_KOS_STAT)] struct __kos_stat *statbuf) -> errno_t;
-[cp] kfstatx32:(fd_t fd, [tostr(out:STRUCT_KOS_STATX32)] struct __kos_statx32 *statbuf) -> errno_t;
-[cp] kfstatx64:(fd_t fd, [tostr(out:STRUCT_KOS_STATX64)] struct __kos_statx64 *statbuf) -> errno_t;
-%[endgroup]
-
-%[startgroup]
-[cp] klstat:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_KOS_STAT)] struct __kos_stat *statbuf) -> errno_t;
-[cp] klstatx32:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_KOS_STATX32)] struct __kos_statx32 *statbuf) -> errno_t;
-[cp] klstatx64:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_KOS_STATX64)] struct __kos_statx64 *statbuf) -> errno_t;
-%[endgroup]
-
-%[startgroup]
-[cp] kstat:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_KOS_STAT)] struct __kos_stat *statbuf) -> errno_t;
-[cp] kstatx32:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_KOS_STATX32)] struct __kos_statx32 *statbuf) -> errno_t;
-[cp] kstatx64:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_KOS_STATX64)] struct __kos_statx64 *statbuf) -> errno_t;
-%[endgroup]
 
 @@@param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE'
 [cp] setxattr:([tostr(FILENAME)] char const *path,

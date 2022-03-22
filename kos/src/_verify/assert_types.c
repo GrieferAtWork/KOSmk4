@@ -1016,85 +1016,37 @@ static_assert(sizeof(struct __siginfo_struct) == __SIZEOF_SIGINFO);
 
 #include <bits/os/kos/stat.h>
 
+/* struct __stat_timespec32 */
+/* ... */
+
 /* struct __kos_stat */
 static_assert(offsetof(struct __kos_stat, st_atime) == __OFFSET_KOS_STAT_ATIME);
-static_assert(offsetof(struct __kos_stat, st_atime32) == __OFFSET_KOS_STAT_ATIME32);
-static_assert(offsetof(struct __kos_stat, st_atime64) == __OFFSET_KOS_STAT_ATIME64);
 static_assert(offsetof(struct __kos_stat, st_atimensec) == __OFFSET_KOS_STAT_ATIMENSEC);
-static_assert(offsetof(struct __kos_stat, st_atimensec32) == __OFFSET_KOS_STAT_ATIMENSEC32);
-static_assert(offsetof(struct __kos_stat, st_atimensec64) == __OFFSET_KOS_STAT_ATIMENSEC64);
 static_assert(offsetof(struct __kos_stat, st_atimespec) == __OFFSET_KOS_STAT_ATIMESPEC);
-static_assert(offsetof(struct __kos_stat, st_atimespec32) == __OFFSET_KOS_STAT_ATIMESPEC32);
-static_assert(offsetof(struct __kos_stat, st_atimespec64) == __OFFSET_KOS_STAT_ATIMESPEC64);
 static_assert(offsetof(struct __kos_stat, st_blksize) == __OFFSET_KOS_STAT_BLKSIZE);
 static_assert(offsetof(struct __kos_stat, st_blocks) == __OFFSET_KOS_STAT_BLOCKS);
+static_assert(offsetof(struct __kos_stat, st_btime) == __OFFSET_KOS_STAT_BTIME);
+static_assert(offsetof(struct __kos_stat, st_btimensec) == __OFFSET_KOS_STAT_BTIMENSEC);
+static_assert(offsetof(struct __kos_stat, st_btimespec) == __OFFSET_KOS_STAT_BTIMESPEC);
 static_assert(offsetof(struct __kos_stat, st_ctime) == __OFFSET_KOS_STAT_CTIME);
-static_assert(offsetof(struct __kos_stat, st_ctime32) == __OFFSET_KOS_STAT_CTIME32);
-static_assert(offsetof(struct __kos_stat, st_ctime64) == __OFFSET_KOS_STAT_CTIME64);
 static_assert(offsetof(struct __kos_stat, st_ctimensec) == __OFFSET_KOS_STAT_CTIMENSEC);
-static_assert(offsetof(struct __kos_stat, st_ctimensec32) == __OFFSET_KOS_STAT_CTIMENSEC32);
-static_assert(offsetof(struct __kos_stat, st_ctimensec64) == __OFFSET_KOS_STAT_CTIMENSEC64);
 static_assert(offsetof(struct __kos_stat, st_ctimespec) == __OFFSET_KOS_STAT_CTIMESPEC);
-static_assert(offsetof(struct __kos_stat, st_ctimespec32) == __OFFSET_KOS_STAT_CTIMESPEC32);
-static_assert(offsetof(struct __kos_stat, st_ctimespec64) == __OFFSET_KOS_STAT_CTIMESPEC64);
 static_assert(offsetof(struct __kos_stat, st_dev) == __OFFSET_KOS_STAT_DEV);
 static_assert(offsetof(struct __kos_stat, st_gid) == __OFFSET_KOS_STAT_GID);
 static_assert(offsetof(struct __kos_stat, st_ino) == __OFFSET_KOS_STAT_INO);
 static_assert(offsetof(struct __kos_stat, st_mode) == __OFFSET_KOS_STAT_MODE);
 static_assert(offsetof(struct __kos_stat, st_mtime) == __OFFSET_KOS_STAT_MTIME);
-static_assert(offsetof(struct __kos_stat, st_mtime32) == __OFFSET_KOS_STAT_MTIME32);
-static_assert(offsetof(struct __kos_stat, st_mtime64) == __OFFSET_KOS_STAT_MTIME64);
 static_assert(offsetof(struct __kos_stat, st_mtimensec) == __OFFSET_KOS_STAT_MTIMENSEC);
-static_assert(offsetof(struct __kos_stat, st_mtimensec32) == __OFFSET_KOS_STAT_MTIMENSEC32);
-static_assert(offsetof(struct __kos_stat, st_mtimensec64) == __OFFSET_KOS_STAT_MTIMENSEC64);
 static_assert(offsetof(struct __kos_stat, st_mtimespec) == __OFFSET_KOS_STAT_MTIMESPEC);
-static_assert(offsetof(struct __kos_stat, st_mtimespec32) == __OFFSET_KOS_STAT_MTIMESPEC32);
-static_assert(offsetof(struct __kos_stat, st_mtimespec64) == __OFFSET_KOS_STAT_MTIMESPEC64);
 static_assert(offsetof(struct __kos_stat, st_nlink) == __OFFSET_KOS_STAT_NLINK);
 static_assert(offsetof(struct __kos_stat, st_rdev) == __OFFSET_KOS_STAT_RDEV);
 static_assert(offsetof(struct __kos_stat, st_size) == __OFFSET_KOS_STAT_SIZE);
 static_assert(offsetof(struct __kos_stat, st_uid) == __OFFSET_KOS_STAT_UID);
 static_assert(sizeof(struct __kos_stat) == __SIZEOF_KOS_STAT);
+static_assert(alignof(struct __kos_stat) == __ALIGNOF_KOS_STAT);
 
 /* struct __kos_stat_alias64 */
-static_assert(offsetof(struct __kos_stat_alias64, st_atime) == __OFFSET_KOS_STAT_ATIME);
-static_assert(offsetof(struct __kos_stat_alias64, st_atime32) == __OFFSET_KOS_STAT_ATIME32);
-static_assert(offsetof(struct __kos_stat_alias64, st_atime64) == __OFFSET_KOS_STAT_ATIME64);
-static_assert(offsetof(struct __kos_stat_alias64, st_atimensec) == __OFFSET_KOS_STAT_ATIMENSEC);
-static_assert(offsetof(struct __kos_stat_alias64, st_atimensec32) == __OFFSET_KOS_STAT_ATIMENSEC32);
-static_assert(offsetof(struct __kos_stat_alias64, st_atimensec64) == __OFFSET_KOS_STAT_ATIMENSEC64);
-static_assert(offsetof(struct __kos_stat_alias64, st_atimespec) == __OFFSET_KOS_STAT_ATIMESPEC);
-static_assert(offsetof(struct __kos_stat_alias64, st_atimespec32) == __OFFSET_KOS_STAT_ATIMESPEC32);
-static_assert(offsetof(struct __kos_stat_alias64, st_atimespec64) == __OFFSET_KOS_STAT_ATIMESPEC64);
-static_assert(offsetof(struct __kos_stat_alias64, st_blksize) == __OFFSET_KOS_STAT_BLKSIZE);
-static_assert(offsetof(struct __kos_stat_alias64, st_blocks) == __OFFSET_KOS_STAT_BLOCKS);
-static_assert(offsetof(struct __kos_stat_alias64, st_ctime) == __OFFSET_KOS_STAT_CTIME);
-static_assert(offsetof(struct __kos_stat_alias64, st_ctime32) == __OFFSET_KOS_STAT_CTIME32);
-static_assert(offsetof(struct __kos_stat_alias64, st_ctime64) == __OFFSET_KOS_STAT_CTIME64);
-static_assert(offsetof(struct __kos_stat_alias64, st_ctimensec) == __OFFSET_KOS_STAT_CTIMENSEC);
-static_assert(offsetof(struct __kos_stat_alias64, st_ctimensec32) == __OFFSET_KOS_STAT_CTIMENSEC32);
-static_assert(offsetof(struct __kos_stat_alias64, st_ctimensec64) == __OFFSET_KOS_STAT_CTIMENSEC64);
-static_assert(offsetof(struct __kos_stat_alias64, st_ctimespec) == __OFFSET_KOS_STAT_CTIMESPEC);
-static_assert(offsetof(struct __kos_stat_alias64, st_ctimespec32) == __OFFSET_KOS_STAT_CTIMESPEC32);
-static_assert(offsetof(struct __kos_stat_alias64, st_ctimespec64) == __OFFSET_KOS_STAT_CTIMESPEC64);
-static_assert(offsetof(struct __kos_stat_alias64, st_dev) == __OFFSET_KOS_STAT_DEV);
-static_assert(offsetof(struct __kos_stat_alias64, st_gid) == __OFFSET_KOS_STAT_GID);
-static_assert(offsetof(struct __kos_stat_alias64, st_ino) == __OFFSET_KOS_STAT_INO);
-static_assert(offsetof(struct __kos_stat_alias64, st_mode) == __OFFSET_KOS_STAT_MODE);
-static_assert(offsetof(struct __kos_stat_alias64, st_mtime) == __OFFSET_KOS_STAT_MTIME);
-static_assert(offsetof(struct __kos_stat_alias64, st_mtime32) == __OFFSET_KOS_STAT_MTIME32);
-static_assert(offsetof(struct __kos_stat_alias64, st_mtime64) == __OFFSET_KOS_STAT_MTIME64);
-static_assert(offsetof(struct __kos_stat_alias64, st_mtimensec) == __OFFSET_KOS_STAT_MTIMENSEC);
-static_assert(offsetof(struct __kos_stat_alias64, st_mtimensec32) == __OFFSET_KOS_STAT_MTIMENSEC32);
-static_assert(offsetof(struct __kos_stat_alias64, st_mtimensec64) == __OFFSET_KOS_STAT_MTIMENSEC64);
-static_assert(offsetof(struct __kos_stat_alias64, st_mtimespec) == __OFFSET_KOS_STAT_MTIMESPEC);
-static_assert(offsetof(struct __kos_stat_alias64, st_mtimespec32) == __OFFSET_KOS_STAT_MTIMESPEC32);
-static_assert(offsetof(struct __kos_stat_alias64, st_mtimespec64) == __OFFSET_KOS_STAT_MTIMESPEC64);
-static_assert(offsetof(struct __kos_stat_alias64, st_nlink) == __OFFSET_KOS_STAT_NLINK);
-static_assert(offsetof(struct __kos_stat_alias64, st_rdev) == __OFFSET_KOS_STAT_RDEV);
-static_assert(offsetof(struct __kos_stat_alias64, st_size) == __OFFSET_KOS_STAT_SIZE);
-static_assert(offsetof(struct __kos_stat_alias64, st_uid) == __OFFSET_KOS_STAT_UID);
-static_assert(sizeof(struct __kos_stat_alias64) == __SIZEOF_KOS_STAT);
+/* ... */
 
 
 

@@ -86,8 +86,6 @@
 #include <utime.h>
 
 #ifdef __ARCH_HAVE_COMPAT
-#include <compat/bits/os/stat-convert.h>
-#include <compat/bits/os/stat.h>
 #include <compat/bits/os/statfs-convert.h>
 #include <compat/bits/os/statfs.h>
 #include <compat/bits/os/timespec.h>
@@ -1681,133 +1679,41 @@ system_stat(USER UNCHECKED char const *filename,
 /************************************************************************/
 /* kfstatat(), kfstat(), klstat(), kstat()                              */
 /************************************************************************/
-#if (defined(__ARCH_WANT_SYSCALL_KFSTATAT) || \
-     defined(__ARCH_WANT_SYSCALL_KFSTAT) ||   \
-     defined(__ARCH_WANT_SYSCALL_KLSTAT) ||   \
-     defined(__ARCH_WANT_SYSCALL_KSTAT))
-#define WANT_KSTAT_NATIVE 1
-#endif /* kstat... */
-
-#if (defined(__ARCH_WANT_COMPAT_SYSCALL_KFSTATAT) || \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_KFSTAT) ||   \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_KLSTAT) ||   \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_KSTAT))
-#define WANT_KSTAT_COMPAT 1
-#endif /* kstat... (compat) */
-
-#if defined(WANT_KSTAT_NATIVE) || defined(WANT_KSTAT_COMPAT)
-#define WANT_KSTAT 1
-#endif /* kstat... */
-
-#ifdef WANT_KSTAT_NATIVE
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-#define complete_kstat(statbuf) (void)0
-#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-LOCAL void KCALL
-complete_kstat(USER CHECKED struct stat *statbuf) {
-	COMPILER_BARRIER();
-	statbuf->__st_atimespec32.tv_sec  = statbuf->st_atime;
-	statbuf->__st_atimespec32.tv_nsec = statbuf->st_atimensec;
-	statbuf->__st_mtimespec32.tv_sec  = statbuf->st_mtime;
-	statbuf->__st_mtimespec32.tv_nsec = statbuf->st_mtimensec;
-	statbuf->__st_ctimespec32.tv_sec  = statbuf->st_ctime;
-	statbuf->__st_ctimespec32.tv_nsec = statbuf->st_ctimensec;
-	COMPILER_BARRIER();
-}
-#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#endif /* WANT_KSTAT_NATIVE */
-
 #ifdef __ARCH_WANT_SYSCALL_KFSTATAT
 DEFINE_SYSCALL4(errno_t, kfstatat, fd_t, dirfd,
                 USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct stat *, statbuf,
+                USER UNCHECKED struct __kos_stat *, statbuf,
                 atflag_t, atflags) {
 	validate_writable(statbuf, sizeof(*statbuf));
-	system_fstatat(dirfd, filename, statbuf, atflags);
-	complete_kstat(statbuf);
-	return -EOK;
+	return system_fstatat(dirfd, filename, statbuf, atflags);
 }
 #endif /* __ARCH_WANT_SYSCALL_KFSTATAT */
 
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_KFSTATAT
-DEFINE_COMPAT_SYSCALL4(errno_t, kfstatat, fd_t, dirfd,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_stat *, statbuf,
-                       atflag_t, atflags) {
-	struct stat st;
-	compat_validate_writable(statbuf, sizeof(*statbuf));
-	system_fstatat(dirfd, filename, &st, atflags);
-	stat_to_compat_stat(&st, statbuf);
-	return -EOK;
-}
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_KFSTATAT */
-
 #ifdef __ARCH_WANT_SYSCALL_KFSTAT
 DEFINE_SYSCALL2(errno_t, kfstat, fd_t, fd,
-                USER UNCHECKED struct stat *, statbuf) {
+                USER UNCHECKED struct __kos_stat *, statbuf) {
 	validate_writable(statbuf, sizeof(*statbuf));
-	system_fstat(fd, statbuf);
-	complete_kstat(statbuf);
-	return -EOK;
+	return system_fstat(fd, statbuf);
 }
 #endif /* __ARCH_WANT_SYSCALL_KFSTAT */
-
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_KFSTAT
-DEFINE_COMPAT_SYSCALL2(errno_t, kfstat, fd_t, fd,
-                       USER UNCHECKED struct compat_stat *, statbuf) {
-	struct stat st;
-	compat_validate_writable(statbuf, sizeof(*statbuf));
-	system_fstat(fd, &st);
-	stat_to_compat_stat(&st, statbuf);
-	return -EOK;
-}
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_KFSTAT */
 
 #ifdef __ARCH_WANT_SYSCALL_KLSTAT
 DEFINE_SYSCALL2(errno_t, klstat,
                 USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct stat *, statbuf) {
+                USER UNCHECKED struct __kos_stat *, statbuf) {
 	validate_writable(statbuf, sizeof(*statbuf));
-	system_lstat(filename, statbuf);
-	complete_kstat(statbuf);
-	return -EOK;
+	return system_lstat(filename, statbuf);
 }
 #endif /* __ARCH_WANT_SYSCALL_KLSTAT */
-
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_KLSTAT
-DEFINE_COMPAT_SYSCALL2(errno_t, klstat,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_stat *, statbuf) {
-	struct stat st;
-	compat_validate_writable(statbuf, sizeof(*statbuf));
-	system_lstat(filename, &st);
-	stat_to_compat_stat(&st, statbuf);
-	return -EOK;
-}
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_KLSTAT */
 
 #ifdef __ARCH_WANT_SYSCALL_KSTAT
 DEFINE_SYSCALL2(errno_t, kstat,
                 USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct stat *, statbuf) {
+                USER UNCHECKED struct __kos_stat *, statbuf) {
 	validate_writable(statbuf, sizeof(*statbuf));
-	system_stat(filename, statbuf);
-	complete_kstat(statbuf);
-	return -EOK;
+	return system_stat(filename, statbuf);
 }
 #endif /* __ARCH_WANT_SYSCALL_KSTAT */
-
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_KSTAT
-DEFINE_COMPAT_SYSCALL2(errno_t, kstat,
-                       USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_stat *, statbuf) {
-	struct stat st;
-	compat_validate_writable(statbuf, sizeof(*statbuf));
-	system_stat(filename, &st);
-	stat_to_compat_stat(&st, statbuf);
-	return -EOK;
-}
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_KSTAT */
 
 
 

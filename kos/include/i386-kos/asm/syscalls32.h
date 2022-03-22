@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x966d62af */
+/* HASH CRC-32:0x953519c0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1123,7 +1123,7 @@
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define __NR_fsymlinkat                   __UINT32_C(0xfffffed0) /* errno_t fsymlinkat(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-#define __NR_kfstatat                     __UINT32_C(0xfffffed4) /* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx32 *statbuf, atflag_t flags) */
+#define __NR_kfstatat                     __UINT32_C(0xfffffed4) /* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_stat *statbuf, atflag_t flags) */
 #define __NR_futimesat64                  __UINT32_C(0xfffffed5) /* errno_t futimesat64(fd_t dirfd, char const *filename, struct timevalx32_64 const[2] times) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define __NR_fmknodat                     __UINT32_C(0xfffffed7) /* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
@@ -1139,9 +1139,9 @@
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
  *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
 #define __NR_kreaddirf                    __UINT32_C(0xffffff24) /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
-#define __NR_kfstat                       __UINT32_C(0xffffff3b) /* errno_t kfstat(fd_t fd, struct __kos_statx32 *statbuf) */
-#define __NR_klstat                       __UINT32_C(0xffffff3c) /* errno_t klstat(char const *filename, struct __kos_statx32 *statbuf) */
-#define __NR_kstat                        __UINT32_C(0xffffff3d) /* errno_t kstat(char const *filename, struct __kos_statx32 *statbuf) */
+#define __NR_kfstat                       __UINT32_C(0xffffff3b) /* errno_t kfstat(fd_t fd, struct __kos_stat *statbuf) */
+#define __NR_klstat                       __UINT32_C(0xffffff3c) /* errno_t klstat(char const *filename, struct __kos_stat *statbuf) */
+#define __NR_kstat                        __UINT32_C(0xffffff3d) /* errno_t kstat(char const *filename, struct __kos_stat *statbuf) */
 #define __NR_pwrite64f                    __UINT32_C(0xffffff4b) /* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
 #define __NR_pread64f                     __UINT32_C(0xffffff4c) /* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
 /* Restore the specified register state when returning from a signal handler

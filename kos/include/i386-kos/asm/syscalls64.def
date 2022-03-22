@@ -44,6 +44,7 @@
 %[typecompat(x86_64:termios = *:termios)]
 %[typecompat(x86_64:termios2 = *:termios2)]
 %[typecompat(x86_64:winsize = *:winsize)]
+%[typecompat(x86_64:__kos_stat = *:__kos_stat)]
 
 /* Define type compatibilities between x86_64 and i386 */
 %[typecompat(x86_64:[timeb,timebx64,__timebx64] = i386:[timebx32_64,__timebx32_64])]
@@ -91,10 +92,6 @@ execveat = execveatx64;
 fstat = fstatx64;
 lstat = lstatx64;
 stat = statx64;
-kfstatat = kfstatatx64;
-kfstat = kfstatx64;
-klstat = klstatx64;
-kstat = kstatx64;
 maplibrary = maplibraryx64;
 sigaltstack = sigaltstackx64;
 getrusage = getrusagex64;

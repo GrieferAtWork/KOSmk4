@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18311e05 */
+/* HASH CRC-32:0x8bbe6ad8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@
 #include <bits/os/kos/sigaction64.h>
 #include <bits/os/kos/siginfo64.h>
 #include <bits/os/kos/sigstack64.h>
-#include <bits/os/kos/stat64.h>
+#include <bits/os/kos/stat.h>
 #include <bits/os/kos/statfs64.h>
 #include <bits/os/kos/sysinfo64.h>
 #include <bits/os/kos/tms64.h>
@@ -110,7 +110,7 @@ struct __iovecx64;
 struct __itimerspecx64;
 struct __itimervalx64;
 struct __kernel_sigactionx64;
-struct __kos_statx64;
+struct __kos_stat;
 struct __mmsghdrx64;
 struct __msghdrx64;
 struct __rlimitx64;
@@ -964,17 +964,17 @@ __CDECLARE_SC(,__errno_t,kexec_load,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__errno_t,keyctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(keyctl) */
 #if __CRT_HAVE_SC(kfstat)
-__CDECLARE_SC(,__errno_t,kfstat,(__fd_t __fd, struct __kos_statx64 *__statbuf),(__fd,__statbuf))
+__CDECLARE_SC(,__errno_t,kfstat,(__fd_t __fd, struct __kos_stat *__statbuf),(__fd,__statbuf))
 #endif /* __CRT_HAVE_SC(kfstat) */
 #if __CRT_HAVE_SC(kfstatat)
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-__CDECLARE_SC(,__errno_t,kfstatat,(__fd_t __dirfd, char const *__filename, struct __kos_statx64 *__statbuf, __atflag_t __flags),(__dirfd,__filename,__statbuf,__flags))
+__CDECLARE_SC(,__errno_t,kfstatat,(__fd_t __dirfd, char const *__filename, struct __kos_stat *__statbuf, __atflag_t __flags),(__dirfd,__filename,__statbuf,__flags))
 #endif /* __CRT_HAVE_SC(kfstatat) */
 #if __CRT_HAVE_SC(kill)
 __CDECLARE_SC(,__errno_t,kill,(__pid_t __pid, __signo_t __signo),(__pid,__signo))
 #endif /* __CRT_HAVE_SC(kill) */
 #if __CRT_HAVE_SC(klstat)
-__CDECLARE_SC(,__errno_t,klstat,(char const *__filename, struct __kos_statx64 *__statbuf),(__filename,__statbuf))
+__CDECLARE_SC(,__errno_t,klstat,(char const *__filename, struct __kos_stat *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_SC(klstat) */
 #if __CRT_HAVE_SC(kreaddir)
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
@@ -1004,7 +1004,7 @@ __CDECLARE_SC(,__ssize_t,kreaddirf,(__fd_t __fd, struct dirent *__buf, __size_t 
 __CDECLARE_VOID_SC(,ksigreturn,(void),())
 #endif /* __CRT_HAVE_SC(ksigreturn) */
 #if __CRT_HAVE_SC(kstat)
-__CDECLARE_SC(,__errno_t,kstat,(char const *__filename, struct __kos_statx64 *__statbuf),(__filename,__statbuf))
+__CDECLARE_SC(,__errno_t,kstat,(char const *__filename, struct __kos_stat *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_SC(kstat) */
 #if __CRT_HAVE_SC(ksysctl)
 __CDECLARE_SC(,__syscall_slong_t,ksysctl,(__ioctl_t __command, void *__arg),(__command,__arg))
@@ -3114,17 +3114,17 @@ __CDECLARE_XSC(,__errno_t,kexec_load,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__errno_t,keyctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(keyctl) */
 #if __CRT_HAVE_XSC(kfstat)
-__CDECLARE_XSC(,__errno_t,kfstat,(__fd_t __fd, struct __kos_statx64 *__statbuf),(__fd,__statbuf))
+__CDECLARE_XSC(,__errno_t,kfstat,(__fd_t __fd, struct __kos_stat *__statbuf),(__fd,__statbuf))
 #endif /* __CRT_HAVE_XSC(kfstat) */
 #if __CRT_HAVE_XSC(kfstatat)
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-__CDECLARE_XSC(,__errno_t,kfstatat,(__fd_t __dirfd, char const *__filename, struct __kos_statx64 *__statbuf, __atflag_t __flags),(__dirfd,__filename,__statbuf,__flags))
+__CDECLARE_XSC(,__errno_t,kfstatat,(__fd_t __dirfd, char const *__filename, struct __kos_stat *__statbuf, __atflag_t __flags),(__dirfd,__filename,__statbuf,__flags))
 #endif /* __CRT_HAVE_XSC(kfstatat) */
 #if __CRT_HAVE_XSC(kill)
 __CDECLARE_XSC(,__errno_t,kill,(__pid_t __pid, __signo_t __signo),(__pid,__signo))
 #endif /* __CRT_HAVE_XSC(kill) */
 #if __CRT_HAVE_XSC(klstat)
-__CDECLARE_XSC(,__errno_t,klstat,(char const *__filename, struct __kos_statx64 *__statbuf),(__filename,__statbuf))
+__CDECLARE_XSC(,__errno_t,klstat,(char const *__filename, struct __kos_stat *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_XSC(klstat) */
 #if __CRT_HAVE_XSC(kreaddir)
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
@@ -3137,7 +3137,7 @@ __CDECLARE_XSC(,__ssize_t,kreaddir,(__fd_t __fd, struct dirent *__buf, __size_t 
 __CDECLARE_XSC(,__ssize_t,kreaddirf,(__fd_t __fd, struct dirent *__buf, __size_t __bufsize, __syscall_ulong_t __mode, __iomode_t __iomode),(__fd,__buf,__bufsize,__mode,__iomode))
 #endif /* __CRT_HAVE_XSC(kreaddirf) */
 #if __CRT_HAVE_XSC(kstat)
-__CDECLARE_XSC(,__errno_t,kstat,(char const *__filename, struct __kos_statx64 *__statbuf),(__filename,__statbuf))
+__CDECLARE_XSC(,__errno_t,kstat,(char const *__filename, struct __kos_stat *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_XSC(kstat) */
 #if __CRT_HAVE_XSC(ksysctl)
 __CDECLARE_XSC(,__syscall_slong_t,ksysctl,(__ioctl_t __command, void *__arg),(__command,__arg))

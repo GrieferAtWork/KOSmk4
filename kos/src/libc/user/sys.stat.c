@@ -253,12 +253,12 @@ convstat_kos2glc(struct __glc_stat *__restrict dst,
 	dst->st_size         = (typeof(dst->st_size))src->st_size32;
 	dst->st_blksize      = (typeof(dst->st_blksize))src->st_blksize;
 	dst->st_blocks       = (typeof(dst->st_blocks))src->st_blocks32;
-	dst->st_atim.tv_sec  = (typeof(dst->st_atim.tv_sec))src->st_atim32.tv_sec;
-	dst->st_atim.tv_nsec = (typeof(dst->st_atim.tv_nsec))src->st_atim32.tv_nsec;
-	dst->st_mtim.tv_sec  = (typeof(dst->st_mtim.tv_sec))src->st_mtim32.tv_sec;
-	dst->st_mtim.tv_nsec = (typeof(dst->st_mtim.tv_nsec))src->st_mtim32.tv_nsec;
-	dst->st_ctim.tv_sec  = (typeof(dst->st_ctim.tv_sec))src->st_ctim32.tv_sec;
-	dst->st_ctim.tv_nsec = (typeof(dst->st_ctim.tv_nsec))src->st_ctim32.tv_nsec;
+	dst->st_atim.tv_sec  = (typeof(dst->st_atim.tv_sec))src->st_atime;
+	dst->st_atim.tv_nsec = (typeof(dst->st_atim.tv_nsec))src->st_atimensec;
+	dst->st_mtim.tv_sec  = (typeof(dst->st_mtim.tv_sec))src->st_mtime;
+	dst->st_mtim.tv_nsec = (typeof(dst->st_mtim.tv_nsec))src->st_mtimensec;
+	dst->st_ctim.tv_sec  = (typeof(dst->st_ctim.tv_sec))src->st_ctime;
+	dst->st_ctim.tv_nsec = (typeof(dst->st_ctim.tv_nsec))src->st_ctimensec;
 }
 
 LOCAL ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((1, 2)) void LIBCCALL
@@ -274,12 +274,12 @@ convstat_kos2glc64(struct __glc_stat64 *__restrict dst,
 	dst->st_size64       = (typeof(dst->st_size64))src->st_size64;
 	dst->st_blksize      = (typeof(dst->st_blksize))src->st_blksize;
 	dst->st_blocks       = (typeof(dst->st_blocks))src->st_blocks32;
-	dst->st_atim.tv_sec  = (typeof(dst->st_atim.tv_sec))src->st_atim32.tv_sec;
-	dst->st_atim.tv_nsec = (typeof(dst->st_atim.tv_nsec))src->st_atim32.tv_nsec;
-	dst->st_mtim.tv_sec  = (typeof(dst->st_mtim.tv_sec))src->st_mtim32.tv_sec;
-	dst->st_mtim.tv_nsec = (typeof(dst->st_mtim.tv_nsec))src->st_mtim32.tv_nsec;
-	dst->st_ctim.tv_sec  = (typeof(dst->st_ctim.tv_sec))src->st_ctim32.tv_sec;
-	dst->st_ctim.tv_nsec = (typeof(dst->st_ctim.tv_nsec))src->st_ctim32.tv_nsec;
+	dst->st_atim.tv_sec  = (typeof(dst->st_atim.tv_sec))src->st_atime;
+	dst->st_atim.tv_nsec = (typeof(dst->st_atim.tv_nsec))src->st_atimensec;
+	dst->st_mtim.tv_sec  = (typeof(dst->st_mtim.tv_sec))src->st_mtime;
+	dst->st_mtim.tv_nsec = (typeof(dst->st_mtim.tv_nsec))src->st_mtimensec;
+	dst->st_ctim.tv_sec  = (typeof(dst->st_ctim.tv_sec))src->st_ctime;
+	dst->st_ctim.tv_nsec = (typeof(dst->st_ctim.tv_nsec))src->st_ctimensec;
 	dst->st_ino64        = (typeof(dst->st_ino64))src->st_ino64;
 }
 
@@ -720,48 +720,48 @@ DEFINE_INTERN_ALIAS(libc__stat64i32, libc_dos_stat64);
 LOCAL ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((1, 2)) void LIBCCALL
 convstat_kos2dos32(struct __dos_stat32 *__restrict dst,
                    struct __kos_stat const *__restrict src) {
-	dst->st_dev     = (u32)src->st_dev;
-	dst->st_ino     = (u16)src->st_ino32;
-	dst->st_mode    = (u16)src->st_mode;
-	dst->st_nlink   = (s16)src->st_nlink;
-	dst->st_uid     = (s16)src->st_uid;
-	dst->st_gid     = (s16)src->st_gid;
-	dst->st_rdev    = (u32)src->st_rdev;
-	dst->st_size32  = (u32)src->st_size32;
-	dst->st_atime32 = (time32_t)src->st_atim32.tv_sec;
-	dst->st_mtime32 = (time32_t)src->st_mtim32.tv_sec;
-	dst->st_ctime32 = (time32_t)src->st_ctim32.tv_sec;
+	dst->st_dev     = (typeof(dst->st_dev))src->st_dev;
+	dst->st_ino     = (typeof(dst->st_ino))src->st_ino32;
+	dst->st_mode    = (typeof(dst->st_mode))src->st_mode;
+	dst->st_nlink   = (typeof(dst->st_nlink))src->st_nlink;
+	dst->st_uid     = (typeof(dst->st_uid))src->st_uid;
+	dst->st_gid     = (typeof(dst->st_gid))src->st_gid;
+	dst->st_rdev    = (typeof(dst->st_rdev))src->st_rdev;
+	dst->st_size32  = (typeof(dst->st_size32))src->st_size32;
+	dst->st_atime32 = (typeof(dst->st_atime32))src->st_atime32;
+	dst->st_mtime32 = (typeof(dst->st_mtime32))src->st_mtime32;
+	dst->st_ctime32 = (typeof(dst->st_ctime32))src->st_ctime32;
 }
 LOCAL ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((1, 2)) void LIBCCALL
 convstat_kos2dos32i64(struct __dos_stat32i64 *__restrict dst,
                       struct __kos_stat const *__restrict src) {
-	dst->st_dev     = (u32)src->st_dev;
-	dst->st_ino     = (u16)src->st_ino32;
-	dst->st_mode    = (u16)src->st_mode;
-	dst->st_nlink   = (s16)src->st_nlink;
-	dst->st_uid     = (s16)src->st_uid;
-	dst->st_gid     = (s16)src->st_gid;
-	dst->st_rdev    = (u32)src->st_rdev;
-	dst->st_size64  = (u64)src->st_size64;
-	dst->st_atime32 = (time32_t)src->st_atim32.tv_sec;
-	dst->st_mtime32 = (time32_t)src->st_mtim32.tv_sec;
-	dst->st_ctime32 = (time32_t)src->st_ctim32.tv_sec;
+	dst->st_dev     = (typeof(dst->st_dev))src->st_dev;
+	dst->st_ino     = (typeof(dst->st_ino))src->st_ino32;
+	dst->st_mode    = (typeof(dst->st_mode))src->st_mode;
+	dst->st_nlink   = (typeof(dst->st_nlink))src->st_nlink;
+	dst->st_uid     = (typeof(dst->st_uid))src->st_uid;
+	dst->st_gid     = (typeof(dst->st_gid))src->st_gid;
+	dst->st_rdev    = (typeof(dst->st_rdev))src->st_rdev;
+	dst->st_size64  = (typeof(dst->st_size64))src->st_size64;
+	dst->st_atime32 = (typeof(dst->st_atime32))src->st_atime32;
+	dst->st_mtime32 = (typeof(dst->st_mtime32))src->st_mtime32;
+	dst->st_ctime32 = (typeof(dst->st_ctime32))src->st_ctime32;
 }
 
 LOCAL ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((1, 2)) void LIBCCALL
 convstat_kos2dos64(struct __dos_stat64 *__restrict dst,
                    struct __kos_stat const *__restrict src) {
-	dst->st_dev     = (u32)src->st_dev;
-	dst->st_ino     = (u16)src->st_ino32;
-	dst->st_mode    = (u16)src->st_mode;
-	dst->st_nlink   = (s16)src->st_nlink;
-	dst->st_uid     = (s16)src->st_uid;
-	dst->st_gid     = (s16)src->st_gid;
-	dst->st_rdev    = (u32)src->st_rdev;
-	dst->st_size64  = (u64)src->st_size64;
-	dst->st_atime64 = (time64_t)src->st_atim64.tv_sec;
-	dst->st_mtime64 = (time64_t)src->st_mtim64.tv_sec;
-	dst->st_ctime64 = (time64_t)src->st_ctim64.tv_sec;
+	dst->st_dev     = (typeof(dst->st_dev))src->st_dev;
+	dst->st_ino     = (typeof(dst->st_ino))src->st_ino32;
+	dst->st_mode    = (typeof(dst->st_mode))src->st_mode;
+	dst->st_nlink   = (typeof(dst->st_nlink))src->st_nlink;
+	dst->st_uid     = (typeof(dst->st_uid))src->st_uid;
+	dst->st_gid     = (typeof(dst->st_gid))src->st_gid;
+	dst->st_rdev    = (typeof(dst->st_rdev))src->st_rdev;
+	dst->st_size64  = (typeof(dst->st_size64))src->st_size64;
+	dst->st_atime64 = (typeof(dst->st_atime64))src->st_atime64;
+	dst->st_mtime64 = (typeof(dst->st_mtime64))src->st_mtime64;
+	dst->st_ctime64 = (typeof(dst->st_ctime64))src->st_ctime64;
 }
 
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((2)) int

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd70d9575 */
+/* HASH CRC-32:0xafe5d694 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,10 @@
 
 #include <features.h>
 #include <bits/types.h>
+#include <vcruntime_startup.h>
 
 #ifdef __USE_DOS
 #include <corecrt.h>
-#include <vcruntime_startup.h>
 #ifndef __USE_DOS_CLEAN
 #include <math.h>
 #endif /* !__USE_DOS_CLEAN */

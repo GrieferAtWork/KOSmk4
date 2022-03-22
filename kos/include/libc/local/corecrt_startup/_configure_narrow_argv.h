@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a091223 */
+/* HASH CRC-32:0xa2a25707 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local__configure_narrow_argv_defined
 #include <__crt.h>
 #include <bits/types.h>
+#include <vcruntime_startup.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_configure_narrow_argv) __errno_t
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_configure_narrow_argv))(enum _crt_argv_mode __mode) {

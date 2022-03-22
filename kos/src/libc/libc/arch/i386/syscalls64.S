@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50ad5b3a */
+/* HASH CRC-32:0x424b34b2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3545,7 +3545,7 @@ END(libc_sys_fsymlinkat)
 DEFINE_PUBLIC_ALIAS(sys_fsymlinkat, libc_sys_fsymlinkat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx64 *statbuf, atflag_t flags) */
+/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_stat *statbuf, atflag_t flags) */
 INTERN_FUNCTION(libc_sys_kfstatat)
 	movq   $(0xfffffffffffffefa), %rax
 	movq   %rcx, %r10
@@ -4214,7 +4214,7 @@ INTERN_FUNCTION(libc_sys_readf)
 END(libc_sys_readf)
 DEFINE_PUBLIC_ALIAS(sys_readf, libc_sys_readf)
 
-/* errno_t klstat(char const *filename, struct __kos_statx64 *statbuf) */
+/* errno_t klstat(char const *filename, struct __kos_stat *statbuf) */
 INTERN_FUNCTION(libc_sys_klstat)
 	movq   $(0xfffffffffffffffa), %rax
 	syscall
@@ -4222,7 +4222,7 @@ INTERN_FUNCTION(libc_sys_klstat)
 END(libc_sys_klstat)
 DEFINE_PUBLIC_ALIAS(sys_klstat, libc_sys_klstat)
 
-/* errno_t kfstat(fd_t fd, struct __kos_statx64 *statbuf) */
+/* errno_t kfstat(fd_t fd, struct __kos_stat *statbuf) */
 INTERN_FUNCTION(libc_sys_kfstat)
 	movq   $(0xfffffffffffffffb), %rax
 	syscall
@@ -4230,7 +4230,7 @@ INTERN_FUNCTION(libc_sys_kfstat)
 END(libc_sys_kfstat)
 DEFINE_PUBLIC_ALIAS(sys_kfstat, libc_sys_kfstat)
 
-/* errno_t kstat(char const *filename, struct __kos_statx64 *statbuf) */
+/* errno_t kstat(char const *filename, struct __kos_stat *statbuf) */
 INTERN_FUNCTION(libc_sys_kstat)
 	movq   $(0xfffffffffffffffc), %rax
 	syscall
@@ -8471,7 +8471,7 @@ END(libc_sys_Xfsymlinkat)
 DEFINE_PUBLIC_ALIAS(sys_Xfsymlinkat, libc_sys_Xfsymlinkat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx64 *statbuf, atflag_t flags) */
+/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_stat *statbuf, atflag_t flags) */
 INTERN_FUNCTION(libc_sys_Xkfstatat)
 	movq   $(0xfffffffffffffefa), %rax
 	movq   %rcx, %r10
@@ -9190,7 +9190,7 @@ INTERN_FUNCTION(libc_sys_Xreadf)
 END(libc_sys_Xreadf)
 DEFINE_PUBLIC_ALIAS(sys_Xreadf, libc_sys_Xreadf)
 
-/* errno_t klstat(char const *filename, struct __kos_statx64 *statbuf) */
+/* errno_t klstat(char const *filename, struct __kos_stat *statbuf) */
 INTERN_FUNCTION(libc_sys_Xklstat)
 	movq   $(0xfffffffffffffffa), %rax
 	std /* Enable exceptions */
@@ -9200,7 +9200,7 @@ INTERN_FUNCTION(libc_sys_Xklstat)
 END(libc_sys_Xklstat)
 DEFINE_PUBLIC_ALIAS(sys_Xklstat, libc_sys_Xklstat)
 
-/* errno_t kfstat(fd_t fd, struct __kos_statx64 *statbuf) */
+/* errno_t kfstat(fd_t fd, struct __kos_stat *statbuf) */
 INTERN_FUNCTION(libc_sys_Xkfstat)
 	movq   $(0xfffffffffffffffb), %rax
 	std /* Enable exceptions */
@@ -9210,7 +9210,7 @@ INTERN_FUNCTION(libc_sys_Xkfstat)
 END(libc_sys_Xkfstat)
 DEFINE_PUBLIC_ALIAS(sys_Xkfstat, libc_sys_Xkfstat)
 
-/* errno_t kstat(char const *filename, struct __kos_statx64 *statbuf) */
+/* errno_t kstat(char const *filename, struct __kos_stat *statbuf) */
 INTERN_FUNCTION(libc_sys_Xkstat)
 	movq   $(0xfffffffffffffffc), %rax
 	std /* Enable exceptions */

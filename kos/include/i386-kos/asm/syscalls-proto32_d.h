@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5123dcc */
+/* HASH CRC-32:0xbf81d67d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2005,7 +2005,7 @@
 #define __NR32AT3_fsymlinkat                   (atflag_t, __atflag_t)
 #define __NR32AT0_kfstatat                     (fd_t, __fd_t)
 #define __NR32AT1_kfstatat                     (char const *, char const *)
-#define __NR32AT2_kfstatat                     (struct __kos_statx32 *, struct __kos_statx32 *)
+#define __NR32AT2_kfstatat                     (struct __kos_stat *, struct __kos_stat *)
 #define __NR32AT3_kfstatat                     (atflag_t, __atflag_t)
 #define __NR32AT0_futimesat64                  (fd_t, __fd_t)
 #define __NR32AT1_futimesat64                  (char const *, char const *)
@@ -2032,11 +2032,11 @@
 #define __NR32AT3_kreaddirf                    (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT4_kreaddirf                    (iomode_t, __iomode_t)
 #define __NR32AT0_kfstat                       (fd_t, __fd_t)
-#define __NR32AT1_kfstat                       (struct __kos_statx32 *, struct __kos_statx32 *)
+#define __NR32AT1_kfstat                       (struct __kos_stat *, struct __kos_stat *)
 #define __NR32AT0_klstat                       (char const *, char const *)
-#define __NR32AT1_klstat                       (struct __kos_statx32 *, struct __kos_statx32 *)
+#define __NR32AT1_klstat                       (struct __kos_stat *, struct __kos_stat *)
 #define __NR32AT0_kstat                        (char const *, char const *)
-#define __NR32AT1_kstat                        (struct __kos_statx32 *, struct __kos_statx32 *)
+#define __NR32AT1_kstat                        (struct __kos_stat *, struct __kos_stat *)
 #define __NR32AT0_pwrite64f                    (fd_t, __fd_t)
 #define __NR32AT1_pwrite64f                    (void const *, void const *)
 #define __NR32AT2_pwrite64f                    (size_t, __size_t)
@@ -2614,16 +2614,16 @@
 #define __NR32AM_fallocate64(a, b, c, d, e, f)                  (__fd_t)a, (__syscall_ulong_t)b, (__uint64_t)((__uint64_t)c | (__uint64_t)d << 32), (__uint64_t)((__uint64_t)e | (__uint64_t)f << 32)
 #define __NR32AM_freadlinkat(a, b, c, d, e, f)                  (__fd_t)a, (char const *)b, (char *)c, (__size_t)d, (__atflag_t)e
 #define __NR32AM_fsymlinkat(a, b, c, d, e, f)                   (char const *)a, (__fd_t)b, (char const *)c, (__atflag_t)d
-#define __NR32AM_kfstatat(a, b, c, d, e, f)                     (__fd_t)a, (char const *)b, (struct __kos_statx32 *)c, (__atflag_t)d
+#define __NR32AM_kfstatat(a, b, c, d, e, f)                     (__fd_t)a, (char const *)b, (struct __kos_stat *)c, (__atflag_t)d
 #define __NR32AM_futimesat64(a, b, c, d, e, f)                  (__fd_t)a, (char const *)b, (struct __timevalx32_64 const *)c
 #define __NR32AM_fmknodat(a, b, c, d, e, f)                     (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d, (__atflag_t)e
 #define __NR32AM_fmkdirat(a, b, c, d, e, f)                     (__fd_t)a, (char const *)b, (__mode_t)c, (__atflag_t)d
 #define __NR32AM_waitid64(a, b, c, d, e, f)                     (__syscall_ulong_t)a, (__id_t)b, (struct __siginfox32_struct *)c, (__syscall_ulong_t)d, (struct __rusagex32_64 *)e
 #define __NR32AM_utimes64(a, b, c, d, e, f)                     (char const *)a, (struct __timevalx32_64 const *)b
 #define __NR32AM_kreaddirf(a, b, c, d, e, f)                    (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d, (__iomode_t)e
-#define __NR32AM_kfstat(a, b, c, d, e, f)                       (__fd_t)a, (struct __kos_statx32 *)b
-#define __NR32AM_klstat(a, b, c, d, e, f)                       (char const *)a, (struct __kos_statx32 *)b
-#define __NR32AM_kstat(a, b, c, d, e, f)                        (char const *)a, (struct __kos_statx32 *)b
+#define __NR32AM_kfstat(a, b, c, d, e, f)                       (__fd_t)a, (struct __kos_stat *)b
+#define __NR32AM_klstat(a, b, c, d, e, f)                       (char const *)a, (struct __kos_stat *)b
+#define __NR32AM_kstat(a, b, c, d, e, f)                        (char const *)a, (struct __kos_stat *)b
 #define __NR32AM_pwrite64f(a, b, c, d, e, f)                    (__fd_t)a, (void const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32), (__iomode_t)f
 #define __NR32AM_pread64f(a, b, c, d, e, f)                     (__fd_t)a, (void *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32), (__iomode_t)f
 #define __NR32AM_ksigreturn(a, b, c, d, e, f)                   (struct fpustate32 const *)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (struct __sigset_with_sizex32 const *)d, (struct rpc_syscall_info32 const *)e, (struct ucpustate32 const *)f

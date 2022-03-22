@@ -22,6 +22,7 @@
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 #define _UTF_SOURCE 1
+#define _TIME64_SOURCE 1
 #define _LARGEFILE64_SOURCE 1
 
 #include "api.h"
@@ -44,9 +45,9 @@
 
 DECL_BEGIN
 
-INTERN struct timespec CC
+INTERN struct timespec64 CC
 libk32_FileTimeToTimeSpec(CONST FILETIME *ft) {
-	struct timespec result;
+	struct timespec64 result;
 	/* TODO */
 	(void)ft;
 	COMPILER_IMPURE();
@@ -56,7 +57,7 @@ libk32_FileTimeToTimeSpec(CONST FILETIME *ft) {
 }
 
 INTERN FILETIME CC
-libk32_TimeSpecToFileTime(struct timespec const *ts) {
+libk32_TimeSpecToFileTime(struct timespec64 const *ts) {
 	FILETIME result;
 	/* TODO */
 	(void)ts;
@@ -121,9 +122,9 @@ again_readdir:
 	              ent->d_name, &st, AT_SYMLINK_NOFOLLOW) != 0)
 		goto again_readdir;
 	lpFindFileData->dwFileAttributes = libk32_FileAttributesFromStat(&st);
-	lpFindFileData->ftCreationTime   = libk32_TimeSpecToFileTime(&st.st_ctimespec);
-	lpFindFileData->ftLastAccessTime = libk32_TimeSpecToFileTime(&st.st_atimespec);
-	lpFindFileData->ftLastWriteTime  = libk32_TimeSpecToFileTime(&st.st_mtimespec);
+	lpFindFileData->ftCreationTime   = libk32_TimeSpecToFileTime(&st.st_ctimespec64);
+	lpFindFileData->ftLastAccessTime = libk32_TimeSpecToFileTime(&st.st_atimespec64);
+	lpFindFileData->ftLastWriteTime  = libk32_TimeSpecToFileTime(&st.st_mtimespec64);
 	lpFindFileData->nFileSizeHigh    = (DWORD)(st.st_size64 >> 32);
 	lpFindFileData->nFileSizeLow     = (DWORD)(st.st_size64);
 	lpFindFileData->dwReserved0      = 0;
@@ -151,9 +152,9 @@ again_readdir:
 	              ent->d_name, &st, AT_SYMLINK_NOFOLLOW) != 0)
 		goto again_readdir;
 	lpFindFileData->dwFileAttributes = libk32_FileAttributesFromStat(&st);
-	lpFindFileData->ftCreationTime   = libk32_TimeSpecToFileTime(&st.st_ctimespec);
-	lpFindFileData->ftLastAccessTime = libk32_TimeSpecToFileTime(&st.st_atimespec);
-	lpFindFileData->ftLastWriteTime  = libk32_TimeSpecToFileTime(&st.st_mtimespec);
+	lpFindFileData->ftCreationTime   = libk32_TimeSpecToFileTime(&st.st_ctimespec64);
+	lpFindFileData->ftLastAccessTime = libk32_TimeSpecToFileTime(&st.st_atimespec64);
+	lpFindFileData->ftLastWriteTime  = libk32_TimeSpecToFileTime(&st.st_mtimespec64);
 	lpFindFileData->nFileSizeHigh    = (DWORD)(st.st_size64 >> 32);
 	lpFindFileData->nFileSizeLow     = (DWORD)(st.st_size64);
 	lpFindFileData->dwReserved0      = 0;
@@ -732,9 +733,9 @@ libk32_GetFileAttributesExA(LPCSTR lpFileName,
 		if (DOS$klstat64(lpFileName, &st) != 0)
 			return INVALID_FILE_ATTRIBUTES;
 		info->dwFileAttributes     = libk32_FileAttributesFromStat(&st);
-		info->ftCreationTime       = libk32_TimeSpecToFileTime(&st.st_ctimespec);
-		info->ftLastAccessTime     = libk32_TimeSpecToFileTime(&st.st_atimespec);
-		info->ftLastWriteTime      = libk32_TimeSpecToFileTime(&st.st_mtimespec);
+		info->ftCreationTime       = libk32_TimeSpecToFileTime(&st.st_ctimespec64);
+		info->ftLastAccessTime     = libk32_TimeSpecToFileTime(&st.st_atimespec64);
+		info->ftLastWriteTime      = libk32_TimeSpecToFileTime(&st.st_mtimespec64);
 		info->nFileSizeHigh        = (DWORD)(st.st_size64 >> 32);
 		info->nFileSizeLow         = (DWORD)st.st_size64;
 	}	break;
@@ -809,9 +810,9 @@ libk32_GetFileInformationByHandle(HANDLE hFile, LPBY_HANDLE_FILE_INFORMATION lpF
 	if (fstat64(NTHANDLE_ASFD(hFile), &st) != 0)
 		return FALSE;
 	lpFileInformation->dwFileAttributes     = libk32_FileAttributesFromStat(&st);
-	lpFileInformation->ftCreationTime       = libk32_TimeSpecToFileTime(&st.st_ctimespec);
-	lpFileInformation->ftLastAccessTime     = libk32_TimeSpecToFileTime(&st.st_atimespec);
-	lpFileInformation->ftLastWriteTime      = libk32_TimeSpecToFileTime(&st.st_mtimespec);
+	lpFileInformation->ftCreationTime       = libk32_TimeSpecToFileTime(&st.st_ctimespec64);
+	lpFileInformation->ftLastAccessTime     = libk32_TimeSpecToFileTime(&st.st_atimespec64);
+	lpFileInformation->ftLastWriteTime      = libk32_TimeSpecToFileTime(&st.st_mtimespec64);
 	lpFileInformation->dwVolumeSerialNumber = (DWORD)st.st_dev;
 	lpFileInformation->nFileSizeHigh        = (DWORD)(st.st_size64 >> 32);
 	lpFileInformation->nFileSizeLow         = (DWORD)st.st_size64;
@@ -880,11 +881,11 @@ libk32_GetFileTime(HANDLE hFile,
 	if (fstat64(NTHANDLE_ASFD(hFile), &st) != 0)
 		return FALSE;
 	if (lpCreationTime)
-		*lpCreationTime = libk32_TimeSpecToFileTime(&st.st_ctimespec);
+		*lpCreationTime = libk32_TimeSpecToFileTime(&st.st_ctimespec64);
 	if (lpLastAccessTime)
-		*lpLastAccessTime = libk32_TimeSpecToFileTime(&st.st_atimespec);
+		*lpLastAccessTime = libk32_TimeSpecToFileTime(&st.st_atimespec64);
 	if (lpLastWriteTime)
-		*lpLastWriteTime = libk32_TimeSpecToFileTime(&st.st_mtimespec);
+		*lpLastWriteTime = libk32_TimeSpecToFileTime(&st.st_mtimespec64);
 	return TRUE;
 }
 
@@ -893,7 +894,7 @@ libk32_SetFileTime(HANDLE hFile,
                    CONST FILETIME *lpCreationTime,
                    CONST FILETIME *lpLastAccessTime,
                    CONST FILETIME *lpLastWriteTime) {
-	struct timespec ts[3];
+	struct timespec64 ts[3];
 	atflag_t flags = AT_EMPTY_PATH;
 	TRACE("SetFileTime(%p, %p, %p, %p)",
 	      hFile, lpCreationTime,
@@ -912,7 +913,7 @@ libk32_SetFileTime(HANDLE hFile,
 		ts[2] = libk32_FileTimeToTimeSpec(lpCreationTime);
 		flags |= AT_CHANGE_CTIME;
 	}
-	return utimensat(NTHANDLE_ASFD(hFile), "", ts, flags) == 0;
+	return utimensat64(NTHANDLE_ASFD(hFile), "", ts, flags) == 0;
 }
 
 INTERN DWORD WINAPI

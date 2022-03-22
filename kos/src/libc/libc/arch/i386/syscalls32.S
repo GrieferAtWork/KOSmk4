@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8c734af */
+/* HASH CRC-32:0xfeea5713 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3911,7 +3911,7 @@ END(libc_sys_fsymlinkat)
 DEFINE_PUBLIC_ALIAS(sys_fsymlinkat, libc_sys_fsymlinkat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx32 *statbuf, atflag_t flags) */
+/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_stat *statbuf, atflag_t flags) */
 INTERN_FUNCTION(libc_sys_kfstatat)
 	movl   $(0xfffffed4), %eax
 	jmp    libc_x86_exec_syscall4
@@ -3969,21 +3969,21 @@ INTERN_FUNCTION(libc_sys_kreaddirf)
 END(libc_sys_kreaddirf)
 DEFINE_PUBLIC_ALIAS(sys_kreaddirf, libc_sys_kreaddirf)
 
-/* errno_t kfstat(fd_t fd, struct __kos_statx32 *statbuf) */
+/* errno_t kfstat(fd_t fd, struct __kos_stat *statbuf) */
 INTERN_FUNCTION(libc_sys_kfstat)
 	movl   $(0xffffff3b), %eax
 	jmp    libc_x86_exec_syscall2
 END(libc_sys_kfstat)
 DEFINE_PUBLIC_ALIAS(sys_kfstat, libc_sys_kfstat)
 
-/* errno_t klstat(char const *filename, struct __kos_statx32 *statbuf) */
+/* errno_t klstat(char const *filename, struct __kos_stat *statbuf) */
 INTERN_FUNCTION(libc_sys_klstat)
 	movl   $(0xffffff3c), %eax
 	jmp    libc_x86_exec_syscall2
 END(libc_sys_klstat)
 DEFINE_PUBLIC_ALIAS(sys_klstat, libc_sys_klstat)
 
-/* errno_t kstat(char const *filename, struct __kos_statx32 *statbuf) */
+/* errno_t kstat(char const *filename, struct __kos_stat *statbuf) */
 INTERN_FUNCTION(libc_sys_kstat)
 	movl   $(0xffffff3d), %eax
 	jmp    libc_x86_exec_syscall2
@@ -8363,7 +8363,7 @@ END(libc_sys_Xfsymlinkat)
 DEFINE_PUBLIC_ALIAS(sys_Xfsymlinkat, libc_sys_Xfsymlinkat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx32 *statbuf, atflag_t flags) */
+/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_stat *statbuf, atflag_t flags) */
 INTERN_FUNCTION(libc_sys_Xkfstatat)
 	movl   $(0xfffffed4), %eax
 	jmp    libc_x86_exec_Xsyscall4
@@ -8421,21 +8421,21 @@ INTERN_FUNCTION(libc_sys_Xkreaddirf)
 END(libc_sys_Xkreaddirf)
 DEFINE_PUBLIC_ALIAS(sys_Xkreaddirf, libc_sys_Xkreaddirf)
 
-/* errno_t kfstat(fd_t fd, struct __kos_statx32 *statbuf) */
+/* errno_t kfstat(fd_t fd, struct __kos_stat *statbuf) */
 INTERN_FUNCTION(libc_sys_Xkfstat)
 	movl   $(0xffffff3b), %eax
 	jmp    libc_x86_exec_Xsyscall2
 END(libc_sys_Xkfstat)
 DEFINE_PUBLIC_ALIAS(sys_Xkfstat, libc_sys_Xkfstat)
 
-/* errno_t klstat(char const *filename, struct __kos_statx32 *statbuf) */
+/* errno_t klstat(char const *filename, struct __kos_stat *statbuf) */
 INTERN_FUNCTION(libc_sys_Xklstat)
 	movl   $(0xffffff3c), %eax
 	jmp    libc_x86_exec_Xsyscall2
 END(libc_sys_Xklstat)
 DEFINE_PUBLIC_ALIAS(sys_Xklstat, libc_sys_Xklstat)
 
-/* errno_t kstat(char const *filename, struct __kos_statx32 *statbuf) */
+/* errno_t kstat(char const *filename, struct __kos_stat *statbuf) */
 INTERN_FUNCTION(libc_sys_Xkstat)
 	movl   $(0xffffff3d), %eax
 	jmp    libc_x86_exec_Xsyscall2

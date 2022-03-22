@@ -39,8 +39,8 @@ DEFINE_PUBLIC_ALIAS(FileTimeToSystemTime, libk32_FileTimeToSystemTime);
 DEFINE_PUBLIC_ALIAS(SystemTimeToFileTime, libk32_SystemTimeToFileTime);
 DEFINE_PUBLIC_ALIAS(GetTimeZoneInformation, libk32_GetTimeZoneInformation);
 
-INTDEF FILETIME CC libk32_TimeSpecToFileTime(struct timespec const *ts);
-INTDEF struct timespec CC libk32_FileTimeToTimeSpec(CONST FILETIME *ft);
+INTDEF FILETIME CC libk32_TimeSpecToFileTime(struct timespec64 const *ts);
+INTDEF struct timespec64 CC libk32_FileTimeToTimeSpec(CONST FILETIME *ft);
 
 INTERN WINBOOL WINAPI
 libk32_SystemTimeToTzSpecificLocalTime(CONST TIME_ZONE_INFORMATION *lpTimeZoneInformation,
@@ -60,10 +60,10 @@ libk32_TzSpecificLocalTimeToSystemTime(CONST TIME_ZONE_INFORMATION *lpTimeZoneIn
 
 INTERN WINBOOL WINAPI
 libk32_FileTimeToSystemTime(CONST FILETIME *lpFileTime, LPSYSTEMTIME lpSystemTime) {
-	struct timespec ts;
+	struct timespec64 ts;
 	struct tm tms;
 	ts = libk32_FileTimeToTimeSpec(lpFileTime);
-	gmtime_r(&ts.tv_sec, &tms);
+	gmtime64_r(&ts.tv_sec, &tms);
 	lpSystemTime->wYear         = tms.tm_year + 1900;
 	lpSystemTime->wMonth        = tms.tm_mon + 1;
 	lpSystemTime->wDayOfWeek    = tms.tm_wday;
@@ -77,7 +77,7 @@ libk32_FileTimeToSystemTime(CONST FILETIME *lpFileTime, LPSYSTEMTIME lpSystemTim
 
 INTERN WINBOOL WINAPI
 libk32_SystemTimeToFileTime(CONST SYSTEMTIME *lpSystemTime, LPFILETIME lpFileTime) {
-	struct timespec ts;
+	struct timespec64 ts;
 	struct tm tms;
 	tms.tm_year = lpSystemTime->wYear - 1900;
 	tms.tm_mon  = lpSystemTime->wMonth - 1;

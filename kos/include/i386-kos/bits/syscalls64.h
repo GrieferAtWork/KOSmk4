@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5cc9ea4 */
+/* HASH CRC-32:0x5f5f518e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -984,7 +984,7 @@
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define SYS_fsymlinkat               __NR_fsymlinkat               /* errno_t fsymlinkat(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-#define SYS_kfstatat                 __NR_kfstatat                 /* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx64 *statbuf, atflag_t flags) */
+#define SYS_kfstatat                 __NR_kfstatat                 /* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_stat *statbuf, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define SYS_fmknodat                 __NR_fmknodat                 /* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -1374,9 +1374,9 @@
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 #define SYS_readf                    __NR_readf                    /* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
-#define SYS_klstat                   __NR_klstat                   /* errno_t klstat(char const *filename, struct __kos_statx64 *statbuf) */
-#define SYS_kfstat                   __NR_kfstat                   /* errno_t kfstat(fd_t fd, struct __kos_statx64 *statbuf) */
-#define SYS_kstat                    __NR_kstat                    /* errno_t kstat(char const *filename, struct __kos_statx64 *statbuf) */
+#define SYS_klstat                   __NR_klstat                   /* errno_t klstat(char const *filename, struct __kos_stat *statbuf) */
+#define SYS_kfstat                   __NR_kfstat                   /* errno_t kfstat(fd_t fd, struct __kos_stat *statbuf) */
+#define SYS_kstat                    __NR_kstat                    /* errno_t kstat(char const *filename, struct __kos_stat *statbuf) */
 /* Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
  * possible at the time the call was made, and throw `E_WOULDBLOCK' if

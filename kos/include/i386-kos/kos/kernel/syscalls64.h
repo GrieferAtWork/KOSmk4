@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x843afc0d */
+/* HASH CRC-32:0x77419a55 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -465,11 +465,7 @@
 #define __ARCH_WANT_COMPAT_SYSCALL_IDLE
 #define __ARCH_WANT_COMPAT_SYSCALL_IO_PGETEVENTS_TIME64
 #define __ARCH_WANT_COMPAT_SYSCALL_IPC
-#define __ARCH_WANT_COMPAT_SYSCALL_KFSTAT
-#define __ARCH_WANT_COMPAT_SYSCALL_KFSTATAT
-#define __ARCH_WANT_COMPAT_SYSCALL_KLSTAT
 #define __ARCH_WANT_COMPAT_SYSCALL_KSIGRETURN
-#define __ARCH_WANT_COMPAT_SYSCALL_KSTAT
 #define __ARCH_WANT_COMPAT_SYSCALL_LFUTEX
 #define __ARCH_WANT_COMPAT_SYSCALL_LFUTEXEXPR
 #define __ARCH_WANT_COMPAT_SYSCALL_LOCK

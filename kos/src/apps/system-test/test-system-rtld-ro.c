@@ -20,7 +20,8 @@
 #ifndef GUARD_APPS_SYSTEM_TEST_TEST_SYSTEM_RTLD_RO_C
 #define GUARD_APPS_SYSTEM_TEST_TEST_SYSTEM_RTLD_RO_C 1
 #define _KOS_SOURCE 1
-#define _KOS_KERNEL_SOURCE 1
+#define _KOS_ALTERATIONS_SOURCE 1 /* For unsigned `struct stat::st_size' */
+#define _KOS_KERNEL_SOURCE 1      /* For `AT_FDSYSRTLD' */
 #undef NDEBUG
 
 #include <hybrid/compiler.h>

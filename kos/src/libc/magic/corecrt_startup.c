@@ -29,11 +29,12 @@
 #include <features.h>
 )]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
+#include <vcruntime_startup.h>
 )]%{
 
 #ifdef __USE_DOS
 #include <corecrt.h>
-#include <vcruntime_startup.h>
 #ifndef __USE_DOS_CLEAN
 #include <math.h>
 #endif /* !__USE_DOS_CLEAN */
@@ -103,24 +104,26 @@ int _seh_filter_dll(__ULONG32_TYPE__ xno, [[nonnull]] struct _EXCEPTION_POINTERS
 int _seh_filter_exe(__ULONG32_TYPE__ xno, [[nonnull]] struct _EXCEPTION_POINTERS *infp_ptrs);
 
 [[const, wunused, crt_dos_only]]
+[[decl_include("<corecrt_startup.h>")]]
 _crt_app_type _query_app_type(void) {
 	return (_crt_app_type)_crt_console_app;
 }
 
 [[crt_dos_only, export_alias("__set_app_type")]]
+[[decl_include("<corecrt_startup.h>")]]
 void _set_app_type(_crt_app_type type);
 
 [[crt_dos_variant]]
 void __setusermatherr([[nonnull]] int (__LIBCCALL *fptr)(struct _exception *));
 
-[[crt_dos_only, decl_include("<bits/types.h>")]]
+[[crt_dos_only, decl_include("<bits/types.h>", "<vcruntime_startup.h>")]]
 errno_t _configure_narrow_argv(_crt_argv_mode mode) {
 	COMPILER_IMPURE();
 	(void)mode;
 	return 0;
 }
 
-[[crt_dos_only, decl_include("<bits/types.h>")]]
+[[crt_dos_only, decl_include("<bits/types.h>", "<vcruntime_startup.h>")]]
 [[crt_intern_alias("libc__configure_narrow_argv")]]
 errno_t _configure_wide_argv(_crt_argv_mode mode) {
 	COMPILER_IMPURE();

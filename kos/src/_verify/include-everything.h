@@ -442,8 +442,6 @@ incdir("");
 #include <compat/bits/os/sigset_with_size.h>
 #include <compat/bits/os/sigstack.h>
 #include <compat/bits/os/sigval.h>
-#include <compat/bits/os/stat-convert.h>
-#include <compat/bits/os/stat.h>
 #include <compat/bits/os/statfs-convert.h>
 #include <compat/bits/os/statfs.h>
 #include <compat/bits/os/sysinfo.h>
@@ -492,6 +490,7 @@ incdir("");
 #include <corecrt_memcpy_s.h>
 #include <corecrt_memory.h>
 #include <corecrt_search.h>
+#include <corecrt_startup.h>
 #include <corecrt_stdio_config.h>
 #include <corecrt_wconio.h>
 #include <corecrt_wctype.h>
@@ -1338,6 +1337,7 @@ incdir("");
 #include <vadefs.h>
 #include <values.h>
 #include <vcruntime.h>
+#include <vcruntime_startup.h>
 #include <vcruntime_string.h>
 #include <vfork.h>
 #include <wait.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46e7683e */
+/* HASH CRC-32:0x34282c0e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -981,7 +981,7 @@
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define __NR64_fsymlinkat               __UINT64_C(0xfffffffffffffef6) /* errno_t fsymlinkat(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-#define __NR64_kfstatat                 __UINT64_C(0xfffffffffffffefa) /* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx64 *statbuf, atflag_t flags) */
+#define __NR64_kfstatat                 __UINT64_C(0xfffffffffffffefa) /* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_stat *statbuf, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define __NR64_fmknodat                 __UINT64_C(0xfffffffffffffefd) /* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -1371,9 +1371,9 @@
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 #define __NR64_readf                    __UINT64_C(0xfffffffffffffff9) /* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
-#define __NR64_klstat                   __UINT64_C(0xfffffffffffffffa) /* errno_t klstat(char const *filename, struct __kos_statx64 *statbuf) */
-#define __NR64_kfstat                   __UINT64_C(0xfffffffffffffffb) /* errno_t kfstat(fd_t fd, struct __kos_statx64 *statbuf) */
-#define __NR64_kstat                    __UINT64_C(0xfffffffffffffffc) /* errno_t kstat(char const *filename, struct __kos_statx64 *statbuf) */
+#define __NR64_klstat                   __UINT64_C(0xfffffffffffffffa) /* errno_t klstat(char const *filename, struct __kos_stat *statbuf) */
+#define __NR64_kfstat                   __UINT64_C(0xfffffffffffffffb) /* errno_t kfstat(fd_t fd, struct __kos_stat *statbuf) */
+#define __NR64_kstat                    __UINT64_C(0xfffffffffffffffc) /* errno_t kstat(char const *filename, struct __kos_stat *statbuf) */
 /* Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
  * possible at the time the call was made, and throw `E_WOULDBLOCK' if

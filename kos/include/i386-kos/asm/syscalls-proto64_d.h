@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7f8486 */
+/* HASH CRC-32:0xbb29a08a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1657,7 +1657,7 @@
 #define __NR64AT3_fsymlinkat               (atflag_t, __atflag_t)
 #define __NR64AT0_kfstatat                 (fd_t, __fd_t)
 #define __NR64AT1_kfstatat                 (char const *, char const *)
-#define __NR64AT2_kfstatat                 (struct __kos_statx64 *, struct __kos_statx64 *)
+#define __NR64AT2_kfstatat                 (struct __kos_stat *, struct __kos_stat *)
 #define __NR64AT3_kfstatat                 (atflag_t, __atflag_t)
 #define __NR64AT0_fmknodat                 (fd_t, __fd_t)
 #define __NR64AT1_fmknodat                 (char const *, char const *)
@@ -1767,11 +1767,11 @@
 #define __NR64AT2_readf                    (size_t, __size_t)
 #define __NR64AT3_readf                    (iomode_t, __iomode_t)
 #define __NR64AT0_klstat                   (char const *, char const *)
-#define __NR64AT1_klstat                   (struct __kos_statx64 *, struct __kos_statx64 *)
+#define __NR64AT1_klstat                   (struct __kos_stat *, struct __kos_stat *)
 #define __NR64AT0_kfstat                   (fd_t, __fd_t)
-#define __NR64AT1_kfstat                   (struct __kos_statx64 *, struct __kos_statx64 *)
+#define __NR64AT1_kfstat                   (struct __kos_stat *, struct __kos_stat *)
 #define __NR64AT0_kstat                    (char const *, char const *)
-#define __NR64AT1_kstat                    (struct __kos_statx64 *, struct __kos_statx64 *)
+#define __NR64AT1_kstat                    (struct __kos_stat *, struct __kos_stat *)
 #define __NR64AT0_writef                   (fd_t, __fd_t)
 #define __NR64AT1_writef                   (void const *, void const *)
 #define __NR64AT2_writef                   (size_t, __size_t)
@@ -2141,7 +2141,7 @@
 #define __NR64AM_preadvf(a, b, c, d, e, f)                  (__fd_t)a, (struct __iovecx64 const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
 #define __NR64AM_freadlinkat(a, b, c, d, e, f)              (__fd_t)a, (char const *)b, (char *)c, (__size_t)d, (__atflag_t)e
 #define __NR64AM_fsymlinkat(a, b, c, d, e, f)               (char const *)a, (__fd_t)b, (char const *)c, (__atflag_t)d
-#define __NR64AM_kfstatat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (struct __kos_statx64 *)c, (__atflag_t)d
+#define __NR64AM_kfstatat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (struct __kos_stat *)c, (__atflag_t)d
 #define __NR64AM_fmknodat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d, (__atflag_t)e
 #define __NR64AM_fmkdirat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__mode_t)c, (__atflag_t)d
 #define __NR64AM_ksysctl(a, b, c, d, e, f)                  (__ioctl_t)a, (void *)b
@@ -2178,9 +2178,9 @@
 #define __NR64AM_getdrives(a, b, c, d, e, f)                /* nothing */
 #define __NR64AM_detach(a, b, c, d, e, f)                   (__pid_t)a
 #define __NR64AM_readf(a, b, c, d, e, f)                    (__fd_t)a, (void *)b, (__size_t)c, (__iomode_t)d
-#define __NR64AM_klstat(a, b, c, d, e, f)                   (char const *)a, (struct __kos_statx64 *)b
-#define __NR64AM_kfstat(a, b, c, d, e, f)                   (__fd_t)a, (struct __kos_statx64 *)b
-#define __NR64AM_kstat(a, b, c, d, e, f)                    (char const *)a, (struct __kos_statx64 *)b
+#define __NR64AM_klstat(a, b, c, d, e, f)                   (char const *)a, (struct __kos_stat *)b
+#define __NR64AM_kfstat(a, b, c, d, e, f)                   (__fd_t)a, (struct __kos_stat *)b
+#define __NR64AM_kstat(a, b, c, d, e, f)                    (char const *)a, (struct __kos_stat *)b
 #define __NR64AM_writef(a, b, c, d, e, f)                   (__fd_t)a, (void const *)b, (__size_t)c, (__iomode_t)d
 #endif /* !__NR64FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER */
 #endif /* __WANT_SYSCALL_ARGUMENT_LIST_MAKER */
