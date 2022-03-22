@@ -26,6 +26,7 @@
 
 #include <kernel/arch/syslog.h>
 #include <kernel/syslog.h>
+#include <kernel/paging.h>
 #include <kernel/types.h>
 #include <sched/task.h>
 
@@ -106,10 +107,10 @@ PRIVATE NOBLOCK ATTR_NOINLINE NONNULL((1)) size_t FCALL
 syslog_alloca_buffer(/*utf-8*/ char const *__restrict format,
                      va_list args) {
 	size_t avail = get_stack_avail();
-	if (avail >= __SIZEOF_POINTER__ * 512) {
+	if (avail >= __SIZEOF_POINTER__ * 2048) {
 		char *buf;
 		size_t reqlen;
-		avail -= __SIZEOF_POINTER__ * 512;
+		avail -= __SIZEOF_POINTER__ * 2048;
 		buf    = (char *)alloca(avail);
 		reqlen = vsnprintf(buf, avail, format, args);
 		if (reqlen <= avail) {
