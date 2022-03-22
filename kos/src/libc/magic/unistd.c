@@ -84,9 +84,9 @@
 #include <kos/anno.h>
 )]%{
 
-#ifdef __USE_BSD
+#ifdef __USE_GNU
 #include <linux/close_range.h>
-#endif /* __USE_BSD */
+#endif /* __USE_GNU */
 
 #if defined(__CRT_GLC) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL)
 #include <asm/unistd.h>
@@ -3258,7 +3258,7 @@ void closefrom($fd_t lowfd) {
 @@@param: flags: Set of `0 | CLOSE_RANGE_UNSHARE | CLOSE_RANGE_CLOEXEC'
 @@@return: 0 : Success
 @@@return: -1: Error (s.a. `errno')
-[[section(".text.crt{|.dos}.bsd.io.access")]]
+[[guard, section(".text.crt{|.dos}.bsd.io.access")]]
 int close_range(unsigned int minfd, unsigned int maxfd, unsigned int flags);
 
 %{

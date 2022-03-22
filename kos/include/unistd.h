@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa088dfe6 */
+/* HASH CRC-32:0x90640571 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,9 +57,9 @@
 #include <bits/types.h>
 #include <kos/anno.h>
 
-#ifdef __USE_BSD
+#ifdef __USE_GNU
 #include <linux/close_range.h>
-#endif /* __USE_BSD */
+#endif /* __USE_GNU */
 
 #if defined(__CRT_GLC) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL)
 #include <asm/unistd.h>
@@ -3700,12 +3700,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(closefrom, __FORCELOCAL __ATTR_ARTIFICIAL void _
 #endif /* ((!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl && !__CRT_HAVE___libc_fcntl) || !__F_CLOSEM) && !__CRT_HAVE_close_range */
 #endif /* !__CRT_HAVE_closefrom */
 #endif /* !__closefrom_defined */
+#if !defined(__close_range_defined) && defined(__CRT_HAVE_close_range)
+#define __close_range_defined
 /* >> close_range(2)
  * Close all files handles `>= minfd && <= maxfd' (but see `flags')
  * @param: flags: Set of `0 | CLOSE_RANGE_UNSHARE | CLOSE_RANGE_CLOEXEC'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,close_range,(unsigned int __minfd, unsigned int __maxfd, unsigned int __flags),(__minfd,__maxfd,__flags))
+__CDECLARE(,int,__NOTHROW_NCX,close_range,(unsigned int __minfd, unsigned int __maxfd, unsigned int __flags),(__minfd,__maxfd,__flags))
+#endif /* !__close_range_defined && __CRT_HAVE_close_range */
 #endif /* __USE_BSD */
 
 #if defined(__USE_SOLARIS) || defined(__USE_NETBSD)

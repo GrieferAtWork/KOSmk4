@@ -227,6 +227,19 @@ struct __stat_timespec32 /*[PREFIX(tv_)][NAME(stat_timespec32)]*/ {
 	__TM_TYPE(time)   tv_sec;        /* seconds since 01.01.1970 */
 	__byte_t        __tv_pad_sec[__SIZEOF_TIME64_T__ - __TM_SIZEOF(TIME)];
 	__syscall_ulong_t tv_nsec;  /* nanoseconds */
+#ifdef __cplusplus
+	__CXX_CLASSMEMBER operator timespec(void) const __CXX_NOEXCEPT {
+		struct timespec __res;
+		__res.tv_sec  = (__TM_TYPE(time))this->tv_sec;
+		__res.tv_nsec = this->tv_nsec;
+		return __res;
+	}
+	__CXX_CLASSMEMBER __stat_timespec32 &operator = (struct timespec const &__val) __CXX_NOEXCEPT {
+		this->tv_sec  = (__TM_TYPE(time))__val.tv_sec;
+		this->tv_nsec = __val.tv_nsec;
+		return *this;
+	}
+#endif /* __cplusplus */
 };
 #endif /* __TM_SIZEOF(TIME) != __SIZEOF_TIME64_T__ */
 
@@ -336,8 +349,9 @@ function Tfsfield(Tname: string, name: string, comment: string) {
 // >> __syscall_ulong_t   st_atimensec;
 // >> __time32_t          st_atime32;     #ifdef __USE_KOS
 // >> __time64_t          st_atime64;     #ifdef __USE_TIME64
-function TtimespecField(name: string, comment: string) {
-	print("union {");
+function TtimespecField(name: string, comment: string, doUnionHead: bool = true, doUnionTail: bool = true) {
+	if (doUnionHead)
+		print("union {");
 
 	print("#if __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__");
 	print("	", "struct timespec".ljust(TYPE_WIDTH)),;
@@ -382,7 +396,11 @@ function TtimespecField(name: string, comment: string) {
 	print("struct {");
 	_printTypedNameWithCommentAndPad("__TM_TYPE(time)", "st_" + name + "time",     comment + " (seconds since 01.01.1970)", "__TM_SIZEOF(TIME)", "__SIZEOF_TIME64_T__");
 	_printTypedNameWithCommentAndPad("__syscall_ulong_t", "st_" + name + "timensec", comment + " (nanoseconds)", "__SIZEOF_SYSCALL_LONG_T__", "8");
-	print("};};");
+	if (doUnionTail) {
+		print("};};");
+	} else {
+		print("};");
+	}
 }
 
 global actions = [];
@@ -405,7 +423,11 @@ actions.append([] {  print("	", "__byte_t".ljust(TYPE_WIDTH - 2)),; _printNameWi
 actions.append([] -> TtimespecField("a", "Last-accessed time"));
 actions.append([] -> TtimespecField("m", "Last-modified time"));
 actions.append([] -> TtimespecField("c", "Last-changed time"));
-actions.append([] -> TtimespecField("b", "Birth/creation time"));
+actions.append([] -> TtimespecField("b", "Birth/creation time", doUnionTail: false));
+actions.append([] {  print("#ifndef __USE_KOS_PURE"); });
+actions.append([] -> TtimespecField("birth", "Birth/creation time", doUnionHead: false, doUnionTail: false));
+actions.append([] {  print("#endif /" "* !__USE_KOS_PURE *" "/"); });
+actions.append([] {  print("};"); });
 actions.append([] {  print("	", "__byte_t".ljust(TYPE_WIDTH - 2)),; _printNameWithComment("__st_reserved2[64]", "Reserved for future use"); });
 
 
@@ -658,7 +680,47 @@ struct {
 #if __SIZEOF_SYSCALL_LONG_T__ < 8
 	__byte_t               __st_pad_btimensec[8 - __SIZEOF_SYSCALL_LONG_T__];
 #endif /* __SIZEOF_SYSCALL_LONG_T__ < 8 */
-};};
+};
+#ifndef __USE_KOS_PURE
+#if __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__
+	struct timespec          st_birthtimespec; /* Birth/creation time */
+#ifdef __USE_XOPEN2K8
+	struct timespec          st_birthtim;      /* Birth/creation time */
+#endif /* __USE_XOPEN2K8 */
+#else /* __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__ */
+	struct __stat_timespec32 st_birthtimespec; /* Birth/creation time (`struct __timespec64') */
+#ifdef __USE_XOPEN2K8
+	struct __stat_timespec32 st_birthtim;      /* Birth/creation time (`struct __timespec64') */
+#endif /* __USE_XOPEN2K8 */
+#endif /* __TM_SIZEOF(TIME) != __SIZEOF_TIME64_T__ */
+#ifdef __USE_KOS
+	__time32_t               st_birthtime32;   /* Birth/creation time (seconds since 01.01.1970) */
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+	struct __timespec32      st_birthtimespec32; /* Birth/creation time */
+#ifdef __USE_XOPEN2K8
+	struct __timespec32      st_birthtim32;    /* Birth/creation time */
+#endif /* __USE_XOPEN2K8 */
+#endif /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+#endif /* __USE_KOS */
+#ifdef __USE_TIME64
+#ifdef __USE_XOPEN2K8
+	struct __timespec64      st_birthtim64;    /* Birth/creation time */
+#endif /* __USE_XOPEN2K8 */
+	struct __timespec64      st_birthtimespec64; /* Birth/creation time */
+	__time64_t               st_birthtime64;   /* Birth/creation time (seconds since 01.01.1970) */
+#endif /* __USE_TIME64 */
+struct {
+	__TM_TYPE(time)          st_birthtime;     /* Birth/creation time (seconds since 01.01.1970) */
+#if __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__
+	__byte_t               __st_pad_birthtime[__SIZEOF_TIME64_T__ - __TM_SIZEOF(TIME)];
+#endif /* __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__ */
+	__syscall_ulong_t        st_birthtimensec; /* Birth/creation time (nanoseconds) */
+#if __SIZEOF_SYSCALL_LONG_T__ < 8
+	__byte_t               __st_pad_birthtimensec[8 - __SIZEOF_SYSCALL_LONG_T__];
+#endif /* __SIZEOF_SYSCALL_LONG_T__ < 8 */
+};
+#endif /* !__USE_KOS_PURE */
+};
 	__byte_t               __st_reserved2[64]; /* Reserved for future use */
 };
 
@@ -883,7 +945,47 @@ struct {
 #if __SIZEOF_SYSCALL_LONG_T__ < 8
 	__byte_t               __st_pad_btimensec[8 - __SIZEOF_SYSCALL_LONG_T__];
 #endif /* __SIZEOF_SYSCALL_LONG_T__ < 8 */
-};};
+};
+#ifndef __USE_KOS_PURE
+#if __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__
+	struct timespec          st_birthtimespec; /* Birth/creation time */
+#ifdef __USE_XOPEN2K8
+	struct timespec          st_birthtim;      /* Birth/creation time */
+#endif /* __USE_XOPEN2K8 */
+#else /* __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__ */
+	struct __stat_timespec32 st_birthtimespec; /* Birth/creation time (`struct __timespec64') */
+#ifdef __USE_XOPEN2K8
+	struct __stat_timespec32 st_birthtim;      /* Birth/creation time (`struct __timespec64') */
+#endif /* __USE_XOPEN2K8 */
+#endif /* __TM_SIZEOF(TIME) != __SIZEOF_TIME64_T__ */
+#ifdef __USE_KOS
+	__time32_t               st_birthtime32;   /* Birth/creation time (seconds since 01.01.1970) */
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+	struct __timespec32      st_birthtimespec32; /* Birth/creation time */
+#ifdef __USE_XOPEN2K8
+	struct __timespec32      st_birthtim32;    /* Birth/creation time */
+#endif /* __USE_XOPEN2K8 */
+#endif /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+#endif /* __USE_KOS */
+#ifdef __USE_TIME64
+#ifdef __USE_XOPEN2K8
+	struct __timespec64      st_birthtim64;    /* Birth/creation time */
+#endif /* __USE_XOPEN2K8 */
+	struct __timespec64      st_birthtimespec64; /* Birth/creation time */
+	__time64_t               st_birthtime64;   /* Birth/creation time (seconds since 01.01.1970) */
+#endif /* __USE_TIME64 */
+struct {
+	__TM_TYPE(time)          st_birthtime;     /* Birth/creation time (seconds since 01.01.1970) */
+#if __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__
+	__byte_t               __st_pad_birthtime[__SIZEOF_TIME64_T__ - __TM_SIZEOF(TIME)];
+#endif /* __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__ */
+	__syscall_ulong_t        st_birthtimensec; /* Birth/creation time (nanoseconds) */
+#if __SIZEOF_SYSCALL_LONG_T__ < 8
+	__byte_t               __st_pad_birthtimensec[8 - __SIZEOF_SYSCALL_LONG_T__];
+#endif /* __SIZEOF_SYSCALL_LONG_T__ < 8 */
+};
+#endif /* !__USE_KOS_PURE */
+};
 	__byte_t               __st_reserved2[64]; /* Reserved for future use */
 };
 #undef __kos_stat_alias64

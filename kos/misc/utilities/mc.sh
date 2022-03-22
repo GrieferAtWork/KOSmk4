@@ -48,5 +48,10 @@ CONFIGURE=(
 	"--with-subshell=optional"
 )
 
+# Force-enable 64-bit time (needed because program assigns
+# `struct stat::st_*tim' as-is to a `struct timespec'; and
+# also because 32-bit will overflow sooner rather than later)
+PACKAGE_CCFLAGS="-D_TIME_T_BITS=64"
+
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"

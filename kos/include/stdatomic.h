@@ -169,6 +169,8 @@ typedef enum {
 
 #if __has_feature(c_atomic) || __has_extension(c_atomic)
 /* #undef __COMPILER_NO_STDC_ATOMICS */ /* Supported! */
+#elif defined(__GNUC__) /* TODO: Which version? */
+/* #undef __COMPILER_NO_STDC_ATOMICS */ /* Supported! */
 #elif defined(__NO_has_feature) || defined(__NO_has_extension)
 #define __COMPILER_NO_STDC_ATOMICS /* Compiler has feature test macros, but they didn't indicate support */
 #elif !defined(__STDC_VERSION__) || __STDC_VERSION__ < 201112

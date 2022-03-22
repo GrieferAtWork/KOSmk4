@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x9cdd82f0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,17 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%(c_prefix){
 /* (#) Portability: Linux (/include/linux/close_range.h) */
-#ifndef _LINUX_CLOSE_RANGE_H
-#define _LINUX_CLOSE_RANGE_H 1
+}
 
-#include <__stdinc.h>
-#include <__crt.h>
+%[define_replacement(fd_t       = __fd_t)]
 
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
+%{
 
 /* Flags for `close_range(2)' */
 #if defined(__linux__) || defined(__KOS__)
@@ -58,17 +53,13 @@ __SYSDECL_BEGIN
  * need in regards to close_range(2)!
  */
 
-#if !defined(__close_range_defined) && defined(__CRT_HAVE_close_range)
-#define __close_range_defined
-/* >> close_range(2)
- * Close all files handles `>= minfd && <= maxfd' (but see `flags')
- * @param: flags: Set of `0 | CLOSE_RANGE_UNSHARE | CLOSE_RANGE_CLOEXEC'
- * @return: 0 : Success
- * @return: -1: Error (s.a. `errno') */
-__CDECLARE(,int,__NOTHROW_NCX,close_range,(unsigned int __minfd, unsigned int __maxfd, unsigned int __flags),(__minfd,__maxfd,__flags))
-#endif /* !__close_range_defined && __CRT_HAVE_close_range */
+}
+
+%[insert:extern(close_range)]
+
+%{
 
 __SYSDECL_END
 #endif /* __CC__ */
 
-#endif /* !_LINUX_CLOSE_RANGE_H */
+}

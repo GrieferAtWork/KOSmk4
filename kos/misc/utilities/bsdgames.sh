@@ -231,7 +231,8 @@ $text"
 		cmd wait
 
 		cmd cd "$OPTPATH"
-		cmd make -j "$MAKE_PARALLEL_COUNT"
+		# XXX: For some reason, make fails the first time around (running it again seems to fix it?)
+		make -j "$MAKE_PARALLEL_COUNT" || cmd make -j "$MAKE_PARALLEL_COUNT"
 		> "$OPTPATH/_didmake"
 	fi # Make
 	rm -rf "$DESTDIR" > /dev/null 2>&1

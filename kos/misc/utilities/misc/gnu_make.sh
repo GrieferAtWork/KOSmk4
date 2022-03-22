@@ -1650,6 +1650,12 @@ $1=$2"
 				export CFLAGS="-ggdb"
 				export CXX="${CROSS_PREFIX}g++"
 				export CXXFLAGS="-ggdb"
+				if ! test -z "$PACKAGE_CFLAGS"; then export CFLAGS="$CFLAGS $PACKAGE_CFLAGS"; fi
+				if ! test -z "$PACKAGE_CXXFLAGS"; then export CXXFLAGS="$CXXFLAGS $PACKAGE_CXXFLAGS"; fi
+				if ! test -z "$PACKAGE_CCFLAGS"; then
+					export CFLAGS="$CFLAGS $PACKAGE_CCFLAGS";
+					export CXXFLAGS="$CXXFLAGS $PACKAGE_CCFLAGS"; 
+				fi
 				export CPP="${CROSS_PREFIX}cpp"
 				export CXXCPP="${CROSS_PREFIX}cpp"
 				export NM="${CROSS_PREFIX}nm"

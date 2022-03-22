@@ -105,7 +105,7 @@ HOOK_BEFORE_INSTALL_DISK=_hook_before_install_disk
 _hook_before_install_disk() {
 	# We don't want to install the precompiled python files
 	cmd cd "$DESTDIR/lib/python2.7"
-	cmd find \( -name '*.pyc' -or -name '*.pyo' \) -print0 | cmd xargs -0 rm -f
+	find \( -name '*.pyc' -or -name '*.pyo' \) -print0 | xargs -0 rm -f
 
 	# We don't want to install tests
 	cmd rm -rf "$DESTDIR/lib/python2.7/test"

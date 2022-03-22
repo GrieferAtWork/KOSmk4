@@ -49,5 +49,24 @@ CONFIGURE=(
 	"--enable-utf8"
 )
 
+#
+# Force-enable 64-bit time because gnulib laiks 2 suc dix and p00p itself
+#
+# DID ANYONE EVEN TEST ALL OF YOUR NONSENSE, GNULIB!?!?!
+#
+# As an explaination: there is some really strange non-sense going on with
+# its detection of `struct stat::st_birthtime' somehow (incorrectly) being
+# intermangled with the other fields. Essentially, when `stat::st_*_tim'
+# exists, but isn't actually a `struct timespec' (as is the case when using
+# 32-bit time_t on i386), then you'll get compile-time errors. But not for
+# a lack of this not being supported. This is actually something that gnulib
+# tries to support, with dediced code just for this case. - Problem is that
+# said code is broken, and -- to quote the above -- "laiks 2 suc dix"
+#
+# PS: f*ck you gnulib
+#
+PACKAGE_CCFLAGS="-D_TIME_T_BITS=64"
+
+
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"
