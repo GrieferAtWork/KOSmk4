@@ -107,8 +107,7 @@ struct pending_rpc {
 		siginfo_t               pr_psig;   /* [!RPC_CONTEXT_KERN && RPC_CONTEXT_SIGNAL] Posix signal
 		                                    * NOTE: In this case, `pr_flags & RPC_SIGNO_MASK' must encode
 		                                    *       the same signal  number as `pr_psig.si_signo'.  Else,
-		                                    *       the incorrect signal is used during sigmask checks
-		                                    * NOTE: Only thread-specific posix signals appear here! */
+		                                    *       the incorrect signal is used during sigmask checks */
 	};
 };
 
@@ -155,15 +154,15 @@ DATDEF ATTR_PERTASK struct pending_rpc_slist this_rpcs;
  *
  * To send one of these signals to a thread, do:
  * >> assert(signo >= 1 && signo <= 31);
- * >> ATOMIC_OR(FORTASK(thread, this_sig_pend), (uint32_t)1 << signo);
+ * >> ATOMIC_OR(FORTASK(thread, this_rpcs_sigpend), (uint32_t)1 << signo);
  * >> sig_broadcast(&FORTASK(thread, this_rpcs_sig));
  * >> ATOMIC_OR(thread->t_flags, TASK_FRPC);
  * >> userexcept_sysret_inject_and_marksignal_safe(thread, flags); */
-DATDEF ATTR_PERTASK uint32_t this_sig_pend;
+DATDEF ATTR_PERTASK uint32_t this_rpcs_sigpend;
 
 /* [lock(PRIVATE(THIS_TASK))]
  * Used internally: inactive set of pending posix signals. */
-DATDEF ATTR_PERTASK uint32_t this_sig_pend_inactive;
+DATDEF ATTR_PERTASK uint32_t this_rpcs_sigpend_inactive;
 
 /* A  signal that is broadcast whenever something is added to `this_rpcs'
  * This signal is _only_ used  to implement `signalfd(2)', as you're  not
@@ -270,9 +269,9 @@ FUNDEF WUNUSED NONNULL((1)) /*inherit*/ struct pending_rpc *FCALL
 proc_rpc_pending_steal_posix_signal(sigset_t const *__restrict these)
 		THROWS(E_WOULDBLOCK);
 
-/* Same  as `proc_rpc_pending_steal_posix_signal()', but only _try_ to
- * acquire the  necessary lock  to `THIS_PROCESS_RPCS.ppr_lock'.  When
- * doing so fails, `PROC_RPC_PENDING_TRYSTEAL_POSIX_SIGNAL_WOULDBLOCK'
+/* Same as `proc_rpc_pending_steal_posix_signal()',  but only _try_  to
+ * acquire the necessary lock to `task_getprocctl()->pc_sig_more'. When
+ * doing so fails,  `PROC_RPC_PENDING_TRYSTEAL_POSIX_SIGNAL_WOULDBLOCK'
  * is returned. */
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) /*inherit*/ struct pending_rpc *
 NOTHROW(FCALL proc_rpc_pending_trysteal_posix_signal)(sigset_t const *__restrict these);

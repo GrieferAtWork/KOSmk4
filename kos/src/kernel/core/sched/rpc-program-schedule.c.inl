@@ -142,12 +142,11 @@ rpc_schedule_in_this_task(struct pending_rpc *__restrict rpc,
 	 * to do, so if we don't find it in the per-proc list,  that's
 	 * also OK) */
 	if (mode & RPC_DOMAIN_F_PROC) {
-		bool did_remove = true;
-		struct process_pending_rpcs *rpcs;
-		rpcs = &THIS_PROCESS_RPCS;
-		process_pending_rpcs_write(rpcs);
-		SLIST_TRYREMOVE(&rpcs->pc_sig_list, rpc, pr_link, { did_remove = false; });
-		process_pending_rpcs_endwrite(rpcs);
+		struct procctl *proc = task_getprocctl();
+		bool did_remove      = true;
+		procctl_sig_write(proc);
+		SLIST_TRYREMOVE(&proc->pc_sig_list, rpc, pr_link, { did_remove = false; });
+		procctl_sig_endwrite(proc);
 		if unlikely(!did_remove) {
 			/* Failed to remove -> Some other thread already came across it, but because
 			 * we managed to set the RPC state to `PENDING_USER_RPC_STATUS_CANCELED', we

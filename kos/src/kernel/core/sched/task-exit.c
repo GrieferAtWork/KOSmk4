@@ -117,7 +117,7 @@ NOTHROW(FCALL terminate_pending_rpcs)(struct task *__restrict caller) {
 	/* Mark the RPC list as terminated and load remaining RPCs. */
 	remain = ATOMIC_XCH(FORTASK(caller, this_rpcs.slh_first),
 	                    THIS_RPCS_TERMINATED);
-	ATOMIC_OR(FORTASK(caller, this_sig_pend), 1);
+	ATOMIC_OR(FORTASK(caller, this_rpcs_sigpend), 1);
 	assertf(remain != THIS_RPCS_TERMINATED,
 	        "We're the only ones that ever set this, "
 	        "so what; did we get called twice?");

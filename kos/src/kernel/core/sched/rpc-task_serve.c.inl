@@ -267,8 +267,8 @@ handle_pending:
 	{
 		/* Check for pending, active bitset-style RPCs */
 		uint32_t pending_bitset;
-		pending_bitset = PERTASK_GET(this_sig_pend);
-		pending_bitset &= ~PERTASK_GET(this_sig_pend_inactive);
+		pending_bitset = PERTASK_GET(this_rpcs_sigpend);
+		pending_bitset &= ~PERTASK_GET(this_rpcs_sigpend_inactive);
 		if (pending_bitset != 0) {
 			/* Check if any of the signals from `pending_bitset' are unmasked. */
 #ifdef LOCAL_HAVE_SIGMASK
@@ -315,7 +315,7 @@ handle_pending:
 				if (func == SIG_IGN) {
 					/* Yes: discard this signal. */
 					restore_plast = SLIST_PFIRST(&restore);
-					ATOMIC_AND(PERTASK(this_sig_pend), ~signo_mask);
+					ATOMIC_AND(PERTASK(this_rpcs_sigpend), ~signo_mask);
 					continue;
 				}
 				goto yes_have_pending_rpcs;

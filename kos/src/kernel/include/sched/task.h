@@ -49,8 +49,10 @@ DECL_BEGIN
 #define TASK_FNORMAL       __UINT32_C(0x00000000) /* Normal task flags. */
 #define TASK_FRUNNING      __UINT32_C(0x00000001) /* [lock(PRIVATE(THIS_CPU))] The task is currently running (`s_running' is valid). */
 #define TASK_FTIMEOUT      __UINT32_C(0x00000002) /* [lock(CLEAR(THIS_TASK))] Set by the scheduler when waking a task due to a timeout. */
-#define TASK_FRPC          __UINT32_C(0x00000004) /* [lock(CLEAR(THIS_TASK))] Set if there  may be active  RPCs pending  in
-                                                   * `this_rpcs' or `THIS_PROCESS_RPCS', and `task_serve()' must be called. */
+#define TASK_FRPC          __UINT32_C(0x00000004) /* [lock(CLEAR(THIS_TASK))] Set if there may be active RPCs pending in:
+                                                   *  - `PERTASK(this_rpcs)' or `PERTASK(this_rpcs_sigpend)'
+                                                   *  - `task_getprocctl()->pc_sig_list' or `task_getprocctl()->pc_sig_pend'
+                                                   * ... and `task_serve()' must be called. */
 /*      TASK_F             __UINT32_C(0x00000008)  * ... */
 #define TASK_FSTARTING     __UINT32_C(0x00000010) /* [lock(WRITE_ONCE)] The thread is currently starting. */
 #define TASK_FSTARTED      __UINT32_C(0x00000020) /* [lock(WRITE_ONCE)] The thread has been started. */

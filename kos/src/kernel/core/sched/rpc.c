@@ -72,28 +72,28 @@ STATIC_ASSERT(offsetafter(struct pending_rpc, pr_kern.k_func) == offsetafter(str
  * are/were serviced with `RPC_REASONCTX_SHUTDOWN') */
 PUBLIC ATTR_PERTASK ATTR_ALIGN(struct pending_rpc_slist) this_rpcs = SLIST_HEAD_INITIALIZER(this_rpcs);
 
-/* A signal that is broadcast whenever something is added to `this_rpcs'
- * This signal is _only_ used to implement `signalfd(2)', as you're not
+/* A  signal that is broadcast whenever something is added to `this_rpcs'
+ * This signal is _only_ used  to implement `signalfd(2)', as you're  not
  * normally supposed to "wait" for signals to arrive; you just always get
  * a sporadic interrupt once they do arrive. */
 PUBLIC ATTR_PERTASK ATTR_ALIGN(struct sig) this_rpcs_sig = SIG_INIT;
 
 /* [lock(SET(ATOMIC), CLEAR(ATOMIC && THIS_TASK))]
  * Bitset of pending info-less POSIX signals (1-31). Bit#0 becomes set
- * by the thread itself to indicate `THIS_RPCS_TERMINATED'. Once this
+ * by the thread itself to indicate `THIS_RPCS_TERMINATED'. Once  this
  * bit is set, all other bits become meaningless.
  *
  * To send one of these signals to a thread, do:
  * >> assert(signo >= 1 && signo <= 31);
- * >> ATOMIC_OR(FORTASK(thread, this_sig_pend), (uint32_t)1 << signo);
+ * >> ATOMIC_OR(FORTASK(thread, this_rpcs_sigpend), (uint32_t)1 << signo);
  * >> sig_broadcast(&FORTASK(thread, this_rpcs_sig));
  * >> ATOMIC_OR(thread->t_flags, TASK_FRPC);
  * >> userexcept_sysret_inject_safe(thread, flags); */
-PUBLIC ATTR_PERTASK ATTR_ALIGN(uint32_t) this_sig_pend = 0;
+PUBLIC ATTR_PERTASK ATTR_ALIGN(uint32_t) this_rpcs_sigpend = 0;
 
 /* [lock(PRIVATE(THIS_TASK))]
  * Used internally: inactive set of pending posix signals. */
-PUBLIC ATTR_PERTASK ATTR_ALIGN(uint32_t) this_sig_pend_inactive = 0;
+PUBLIC ATTR_PERTASK ATTR_ALIGN(uint32_t) this_rpcs_sigpend_inactive = 0;
 
 
 /* High-level RPC scheduling function.
@@ -102,24 +102,24 @@ PUBLIC ATTR_PERTASK ATTR_ALIGN(uint32_t) this_sig_pend_inactive = 0;
  * @param: flags: Set of RPC flags (MUST contain `RPC_CONTEXT_KERN'):
  *   - RPC_CONTEXT_KERN:           Mandatory flag
  *   - RPC_CONTEXT_NOEXCEPT:       The given `func' never throws and may be served by `task_serve_nx()'
- *   - RPC_SYNCMODE_F_ALLOW_ASYNC: Schedule as an asynchronous RPC (be _very_ careful about these, as
+ *   - RPC_SYNCMODE_F_ALLOW_ASYNC: Schedule  as an asynchronous RPC (be _very_ careful about these, as
  *                                 the given `func' must act like an interrupt handler and be NOBLOCK)
- *   - RPC_SYNCMODE_F_USER:        Only allowed when `!(thread->t_flags & TASK_FKERNTHREAD)': Force
+ *   - RPC_SYNCMODE_F_USER:        Only  allowed  when  `!(thread->t_flags & TASK_FKERNTHREAD)':   Force
  *                                 unwind the current system call the next time `thread' makes a call to
- *                                 `task_serve()' (if the thread is currently sleeping, it will be send
+ *                                 `task_serve()'  (if the thread is currently sleeping, it will be send
  *                                 a sporadic interrupt which should cause it to call that function once
- *                                 again). Once unwinding all to way to userspace has finished, invoke
- *                                 `func' in the context to which the syscall returns. Note that here,
- *                                 `func' is allowed to transition the `ctx->rc_context' it is given
+ *                                 again). Once unwinding all to  way to userspace has finished,  invoke
+ *                                 `func' in the context to which  the syscall returns. Note that  here,
+ *                                 `func'  is allowed  to transition  the `ctx->rc_context'  it is given
  *                                 from `RPC_REASONCTX_SYSCALL' to `RPC_REASONCTX_SYSRET', in which case
  *                                 the system call/interrupt will not be restarted.
  *                                 When `thread == THIS_TASK', this function will not return normally,
  *                                 but will instead `THROW(E_INTERRUPT_USER_RPC)'.
- *   - RPC_SYNCMODE_F_SYSRET:      May only be used when combined with `RPC_SYNCMODE_F_USER', in which
+ *   - RPC_SYNCMODE_F_SYSRET:      May only be used when  combined with `RPC_SYNCMODE_F_USER', in  which
  *                                 case the RPC will only be invoked the next time that `thread' returns
  *                                 to user-space (or immediately if `thread' is currently in user-space)
- *                                 Note though that an in-progress, blocking system call isn't aborted.
- *   - RPC_PRIORITY_F_HIGH:        When `thread' is hosted by the same CPU as the caller, gift the rest
+ *                                 Note though that an in-progress, blocking system call isn't  aborted.
+ *   - RPC_PRIORITY_F_HIGH:        When  `thread' is hosted by the same CPU as the caller, gift the rest
  *                                 of the calling thread's current quantum to `thread' and have it start
  *                                 executing even before this function returns.
  * @return: true:  Success
@@ -142,9 +142,9 @@ task_rpc_exec(struct task *__restrict thread, syscall_ulong_t flags,
 		/* TODO: Async RPCs are scheduled entirely different from regular ones:
 		 *        - Send IPI to correct CPU
 		 *        - Update scpustate of target thread via `task_asyncrpc_push()',
-		 *          unless target is THIS_TASK, where invocation is either done
-		 *          with IPI-icpustate, or via `task_asyncrpc_execnow()' (when
-		 *          no IPI had to be used because the target CPU didn't differ
+		 *          unless target is THIS_TASK,  where invocation is either  done
+		 *          with  IPI-icpustate,  or via  `task_asyncrpc_execnow()' (when
+		 *          no  IPI had to  be used because the  target CPU didn't differ
 		 *          from that of the original sender) */
 		THROW(E_NOT_IMPLEMENTED_TODO);
 	}
@@ -178,16 +178,16 @@ task_rpc_exec(struct task *__restrict thread, syscall_ulong_t flags,
 	/* Set the thread's `TASK_FRPC' flag to indicate that it's got work to do */
 	ATOMIC_OR(thread->t_flags, TASK_FRPC);
 
-	/* Deal with the case where `thread' is currently running in user-space,
+	/* Deal  with the case where `thread' is currently running in user-space,
 	 * which requires us to temporarily move its execution into kernel-space,
-	 * such that it executes `handle_sysret_rpc()' the next time it returns
+	 * such that it executes `handle_sysret_rpc()'  the next time it  returns
 	 * back to user-space.
 	 *
 	 * This is normally done by `userexcept_sysret_inject_nopr()', however that
-	 * function only works correctly when the thread is being hosted by
-	 * the same CPU as the calling thread. But there's also a wrapper for
-	 * that low-level function `userexcept_sysret_inject_safe()', which does
-	 * the same thing, but also works then the thread hosted by another CPU. */
+	 * function only  works  correctly  when  the thread  is  being  hosted  by
+	 * the same  CPU as  the calling  thread. But  there's also  a wrapper  for
+	 * that  low-level  function `userexcept_sysret_inject_safe()',  which does
+	 * the same thing, but  also works then the  thread hosted by another  CPU. */
 	if (thread->t_flags & TASK_FKERNTHREAD) {
 		assertf(!(flags & RPC_SYNCMODE_F_USER), "Can't send user-return RPC to kernel-only thread");
 		STATIC_ASSERT(RPC_PRIORITY_F_HIGH == TASK_WAKE_FHIGHPRIO);
@@ -201,7 +201,7 @@ task_rpc_exec(struct task *__restrict thread, syscall_ulong_t flags,
 
 
 /* Helper wrapper for executing the given RPC `func' after
- * unwind the current system call. This is identical to:
+ * unwind the current system  call. This is identical  to:
  * >> task_rpc_exec(THIS_TASK, RPC_CONTEXT_KERN | RPC_SYNCMODE_F_USER, func, cookie);
  * >> THROW(E_INTERRUPT_USER_RPC); */
 PUBLIC ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void KCALL
@@ -277,28 +277,26 @@ INTDEF NOBLOCK void /* From "misc/except-handler.c" */
 NOTHROW(FCALL restore_pending_rpcs)(struct pending_rpc *restore);
 
 #ifdef CONFIG_HAVE_USERPROCMASK
-/* Same as `are_any_unmasked_process_rpcs_pending()', but keep a pair
- * of internal signal sets to track which signals are known-masked,
+/* Same  as `are_any_unmasked_process_rpcs_pending()', but keep a pair
+ * of internal signal  sets to track  which signals are  known-masked,
  * and known-unmasked (this allows us to work around the locking issue
  * relating to the current thread using the userprocmask mechanism)
  * @param: signo: The first known "faulty" signo that must be blocking-
  *                checked for being masked/unmasked. */
 PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1)) bool FCALL
-are_any_unmasked_process_rpcs_pending_with_faulty(struct process_pending_rpcs *__restrict proc_rpcs,
-                                                  signo_t signo)
+are_any_unmasked_signals_pending_with_faulty(struct procctl *__restrict proc,
+                                             signo_t signo)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK) {
 	sigset_t known_masked, known_unmasked;
 	sigemptyset(&known_masked);
 	sigemptyset(&known_unmasked);
 again_test_signo:
 	/* NOTE: This `sigmask_ismasked()' is the only thing in here that might throw! */
-	sigaddset(sigmask_ismasked(signo) ? &known_masked
-	                                  : &known_unmasked,
-	          signo);
-	process_pending_rpcs_read(proc_rpcs);
-	if likely(ATOMIC_READ(proc_rpcs->pc_sig_list.slh_first) != THIS_RPCS_TERMINATED) {
+	sigaddset(sigmask_ismasked(signo) ? &known_masked : &known_unmasked, signo);
+	procctl_sig_read(proc);
+	if likely(ATOMIC_READ(proc->pc_sig_list.slh_first) != THIS_RPCS_TERMINATED) {
 		struct pending_rpc *rpc;
-		SLIST_FOREACH (rpc, &proc_rpcs->pc_sig_list, pr_link) {
+		SLIST_FOREACH (rpc, &proc->pc_sig_list, pr_link) {
 			int status;
 			signo = _RPC_GETSIGNO(rpc->pr_flags);
 			if (sigismember(&known_masked, signo))
@@ -314,23 +312,23 @@ again_test_signo:
 			}
 			if (status == SIGMASK_ISMASKED_NOPF_FAULT) {
 				/* Must do a "hard" masking-test */
-				process_pending_rpcs_endread(proc_rpcs);
+				procctl_sig_endread(proc);
 				goto again_test_signo;
 			}
 
 maybe_consume_if_ignored_else_return_true:
 			/* TODO: If it's a POSIX signal RPC, check if our thread's sighand
-			 *       disposition indicates that the signal should be ignored.
+			 *       disposition  indicates that the signal should be ignored.
 			 *       If so, consume and discard the associated RPC! */
-			process_pending_rpcs_endread(proc_rpcs);
+			procctl_sig_endread(proc);
 			return true;
 		}
 	}
-	if (proc_rpcs->pc_sig_pend != 0) {
+	if (proc->pc_sig_pend != 0) {
 		for (signo = 1; signo <= 31; ++signo) {
 			int status;
 			uint32_t signo_mask = (uint32_t)1 << signo;
-			if (!(proc_rpcs->pc_sig_pend & signo_mask))
+			if (!(proc->pc_sig_pend & signo_mask))
 				continue;
 			if (sigismember(&known_masked, signo))
 				continue; /* Known-masked signal */
@@ -345,19 +343,19 @@ maybe_consume_if_ignored_else_return_true:
 			}
 			if (status == SIGMASK_ISMASKED_NOPF_FAULT) {
 				/* Must do a "hard" masking-test */
-				process_pending_rpcs_endread(proc_rpcs);
+				procctl_sig_endread(proc);
 				goto again_test_signo;
 			}
 
 bitset_maybe_consume_if_ignored_else_return_true:
 			/* TODO: Check if our thread's sighand disposition indicates
-			 *       that the signal should be ignored. If so, consume
+			 *       that the signal should  be ignored. If so,  consume
 			 *       and discard this signal! */
-			process_pending_rpcs_endread(proc_rpcs);
+			procctl_sig_endread(proc);
 			return true;
 		}
 	}
-	process_pending_rpcs_endread(proc_rpcs);
+	procctl_sig_endread(proc);
 	return false;
 }
 #endif /* CONFIG_HAVE_USERPROCMASK */
@@ -372,11 +370,11 @@ are_any_unmasked_process_rpcs_pending(void)
 		THROWS(E_WOULDBLOCK)
 #endif /* !CONFIG_HAVE_USERPROCMASK */
 {
-	struct process_pending_rpcs *proc_rpcs = &THIS_PROCESS_RPCS;
-	process_pending_rpcs_read(proc_rpcs);
-	if likely(ATOMIC_READ(proc_rpcs->pc_sig_list.slh_first) != THIS_RPCS_TERMINATED) {
+	struct procctl *proc = task_getprocctl();
+	procctl_sig_read(proc);
+	if likely(ATOMIC_READ(proc->pc_sig_list.slh_first) != THIS_RPCS_TERMINATED) {
 		struct pending_rpc *rpc;
-		SLIST_FOREACH (rpc, &proc_rpcs->pc_sig_list, pr_link) {
+		SLIST_FOREACH (rpc, &proc->pc_sig_list, pr_link) {
 			int status;
 			status = sigmask_ismasked_nopf(_RPC_GETSIGNO(rpc->pr_flags));
 			if (status == SIGMASK_ISMASKED_NOPF_YES)
@@ -384,41 +382,41 @@ are_any_unmasked_process_rpcs_pending(void)
 #ifdef CONFIG_HAVE_USERPROCMASK
 			if (status == SIGMASK_ISMASKED_NOPF_FAULT) {
 				signo_t signo = _RPC_GETSIGNO(rpc->pr_flags);
-				process_pending_rpcs_endread(proc_rpcs);
-				return are_any_unmasked_process_rpcs_pending_with_faulty(proc_rpcs, signo);
+				procctl_sig_endread(proc);
+				return are_any_unmasked_signals_pending_with_faulty(proc, signo);
 			}
 #endif /* CONFIG_HAVE_USERPROCMASK */
 			/* TODO: If it's a POSIX signal RPC, check if our thread's sighand
-			 *       disposition indicates that the signal should be ignored.
+			 *       disposition  indicates that the signal should be ignored.
 			 *       If so, consume and discard the associated RPC! */
-			process_pending_rpcs_endread(proc_rpcs);
+			procctl_sig_endread(proc);
 			return true;
 		}
 	}
-	if (proc_rpcs->pc_sig_pend != 0) {
+	if (proc->pc_sig_pend != 0) {
 		signo_t signo;
 		for (signo = 1; signo <= 31; ++signo) {
 			int status;
 			uint32_t signo_mask = (uint32_t)1 << signo;
-			if (!(proc_rpcs->pc_sig_pend & signo_mask))
+			if (!(proc->pc_sig_pend & signo_mask))
 				continue;
 			status = sigmask_ismasked_nopf(signo);
 			if (status == SIGMASK_ISMASKED_NOPF_YES)
 				continue;
 #ifdef CONFIG_HAVE_USERPROCMASK
 			if (status == SIGMASK_ISMASKED_NOPF_FAULT) {
-				process_pending_rpcs_endread(proc_rpcs);
-				return are_any_unmasked_process_rpcs_pending_with_faulty(proc_rpcs, signo);
+				procctl_sig_endread(proc);
+				return are_any_unmasked_signals_pending_with_faulty(proc, signo);
 			}
 #endif /* CONFIG_HAVE_USERPROCMASK */
 			/* TODO: Check if our thread's sighand disposition indicates that
 			 *       the signal should be ignored. If so, consume and discard
 			 *       the signal! */
-			process_pending_rpcs_endread(proc_rpcs);
+			procctl_sig_endread(proc);
 			return true;
 		}
 	}
-	process_pending_rpcs_endread(proc_rpcs);
+	procctl_sig_endread(proc);
 	return false;
 }
 
@@ -426,36 +424,36 @@ are_any_unmasked_process_rpcs_pending(void)
 PRIVATE WUNUSED NONNULL((1)) bool FCALL
 are_any_unmasked_process_rpcs_pending_with_sigmask(sigset_t const *__restrict sigmask)
 		THROWS(E_WOULDBLOCK) {
-	struct process_pending_rpcs *proc_rpcs = &THIS_PROCESS_RPCS;
-	process_pending_rpcs_read(proc_rpcs);
-	if (ATOMIC_READ(proc_rpcs->pc_sig_list.slh_first) != THIS_RPCS_TERMINATED) {
+	struct procctl *proc = task_getprocctl();
+	procctl_sig_read(proc);
+	if (ATOMIC_READ(proc->pc_sig_list.slh_first) != THIS_RPCS_TERMINATED) {
 		struct pending_rpc *rpc;
-		SLIST_FOREACH (rpc, &proc_rpcs->pc_sig_list, pr_link) {
+		SLIST_FOREACH (rpc, &proc->pc_sig_list, pr_link) {
 			if (sigismember(sigmask, _RPC_GETSIGNO(rpc->pr_flags)))
 				continue;
 			/* TODO: If it's a POSIX signal RPC, check if our thread's sighand
-			 *       disposition indicates that the signal should be ignored.
+			 *       disposition  indicates that the signal should be ignored.
 			 *       If so, consume and discard the associated RPC! */
-			process_pending_rpcs_endread(proc_rpcs);
+			procctl_sig_endread(proc);
 			return true;
 		}
 	}
-	if (proc_rpcs->pc_sig_pend != 0) {
+	if (proc->pc_sig_pend != 0) {
 		signo_t signo;
 		for (signo = 1; signo <= 31; ++signo) {
 			uint32_t signo_mask = (uint32_t)1 << signo;
-			if (!(proc_rpcs->pc_sig_pend & signo_mask))
+			if (!(proc->pc_sig_pend & signo_mask))
 				continue;
 			if (sigismember(sigmask, signo))
 				continue;
 			/* TODO: Check if our thread's sighand disposition indicates that
 			 *       the signal should be ignored. If so, consume and discard
 			 *       the signal! */
-			process_pending_rpcs_endread(proc_rpcs);
+			procctl_sig_endread(proc);
 			return true;
 		}
 	}
-	process_pending_rpcs_endread(proc_rpcs);
+	procctl_sig_endread(proc);
 	return false;
 }
 
@@ -463,16 +461,16 @@ are_any_unmasked_process_rpcs_pending_with_sigmask(sigset_t const *__restrict si
  * access, and if that fails, assume that pending RPCs are always unmasked. */
 PRIVATE WUNUSED bool
 NOTHROW(FCALL are_any_unmasked_process_rpcs_maybe_pending_nx)(void) {
-	struct process_pending_rpcs *proc_rpcs = &THIS_PROCESS_RPCS;
-	if (!process_pending_rpcs_tryread(proc_rpcs)) {
-		if (ATOMIC_READ(proc_rpcs->pc_sig_list.slh_first) == NULL &&
-		    ATOMIC_READ(proc_rpcs->pc_sig_pend) == 0)
+	struct procctl *proc = task_getprocctl();
+	if (!procctl_sig_tryread(proc)) {
+		if (ATOMIC_READ(proc->pc_sig_list.slh_first) == NULL &&
+		    ATOMIC_READ(proc->pc_sig_pend) == 0)
 			return false;
 		return true; /* Must assume that at least one of them would be unmasked in our thread. */
 	}
-	if likely(ATOMIC_READ(proc_rpcs->pc_sig_list.slh_first) != THIS_RPCS_TERMINATED) {
+	if likely(ATOMIC_READ(proc->pc_sig_list.slh_first) != THIS_RPCS_TERMINATED) {
 		struct pending_rpc *rpc;
-		SLIST_FOREACH (rpc, &proc_rpcs->pc_sig_list, pr_link) {
+		SLIST_FOREACH (rpc, &proc->pc_sig_list, pr_link) {
 			int status;
 			status = sigmask_ismasked_nopf(_RPC_GETSIGNO(rpc->pr_flags));
 			if (status == SIGMASK_ISMASKED_NOPF_YES)
@@ -480,16 +478,16 @@ NOTHROW(FCALL are_any_unmasked_process_rpcs_maybe_pending_nx)(void) {
 			/* Either the signal number isn't masked, or the status can't be determined.
 			 * In any case, we're supposed to act like it isn't masked, since our caller
 			 * asked weather there **may** be unmasked process RPCs. */
-			process_pending_rpcs_endread(proc_rpcs);
+			procctl_sig_endread(proc);
 			return true;
 		}
 	}
-	if (proc_rpcs->pc_sig_pend != 0) {
+	if (proc->pc_sig_pend != 0) {
 		signo_t signo;
 		for (signo = 1; signo <= 31; ++signo) {
 			int status;
 			uint32_t signo_mask = (uint32_t)1 << signo;
-			if (!(proc_rpcs->pc_sig_pend & signo_mask))
+			if (!(proc->pc_sig_pend & signo_mask))
 				continue;
 			status = sigmask_ismasked_nopf(signo);
 			if (status == SIGMASK_ISMASKED_NOPF_YES)
@@ -497,11 +495,11 @@ NOTHROW(FCALL are_any_unmasked_process_rpcs_maybe_pending_nx)(void) {
 			/* Either the signal number isn't masked, or the status can't be determined.
 			 * In any case, we're supposed to act like it isn't masked, since our caller
 			 * asked weather there **may** be unmasked process RPCs. */
-			process_pending_rpcs_endread(proc_rpcs);
+			procctl_sig_endread(proc);
 			return true;
 		}
 	}
-	process_pending_rpcs_endread(proc_rpcs);
+	procctl_sig_endread(proc);
 	return false;
 }
 
@@ -521,14 +519,14 @@ DECL_BEGIN
 
 
 /* Schedule the given `rpc' for execution on `thread'.
- * NOTE: Be mindful of the scenario where `thread == THIS_TASK', in which case
+ * NOTE: Be mindful of the scenario  where `thread == THIS_TASK', in which  case
  *       this function will return like normal, and the RPC will only be noticed
  *       the next time you make a call to `task_serve()'!
  * NOTE: The caller must initialize:
  *       - `rpc->pr_flags'
  *       - `rpc->pr_kern' or `rpc->pr_user'
  * @return: true:  Success. (Even if the thread terminates before the RPC can be served
- *                 normally, it will still be served as `RPC_REASONCTX_SHUTDOWN' when
+ *                 normally, it will still  be served as `RPC_REASONCTX_SHUTDOWN'  when
  *                 true has been returned here)
  * @return: false: The target thread has already terminated. */
 PUBLIC NOBLOCK WUNUSED NONNULL((1, 2)) bool
@@ -560,16 +558,16 @@ NOTHROW(FCALL task_rpc_schedule)(struct task *__restrict thread,
 		/* Set the thread's `TASK_FRPC' flag to indicate that it's got work to do */
 		ATOMIC_OR(thread->t_flags, TASK_FRPC);
 
-		/* Deal with the case where `thread' is currently running in user-space,
+		/* Deal  with the case where `thread' is currently running in user-space,
 		 * which requires us to temporarily move its execution into kernel-space,
-		 * such that it executes `handle_sysret_rpc()' the next time it returns
+		 * such that it executes `handle_sysret_rpc()'  the next time it  returns
 		 * back to user-space.
 		 *
-		 * This is normally done by `userexcept_sysret_inject_nopr()', however
+		 * This is normally  done by `userexcept_sysret_inject_nopr()',  however
 		 * that function only works correctly when the thread is being hosted by
-		 * the same CPU as the calling thread. But there's also a wrapper for
+		 * the same CPU as  the calling thread. But  there's also a wrapper  for
 		 * that low-level function `userexcept_sysret_inject_safe()', which does
-		 * the same thing, but also works then the thread is hosted by another
+		 * the  same thing, but also works then  the thread is hosted by another
 		 * CPU. */
 		userexcept_sysret_inject_safe(thread, rpc_flags);
 	} else {
@@ -578,9 +576,9 @@ NOTHROW(FCALL task_rpc_schedule)(struct task *__restrict thread,
 		        "for execution within a TASK_FKERNTHREAD thread");
 
 		/* Because it's a user-level RPC, we only want to interrupt the thread if
-		 * it isn't masking the signal vector `_RPC_GETSIGNO(rpc_flags)'. If it
-		 * is currently masked, then we also want to mark it as pending within
-		 * the thread's userprocmask (if it's using one). Finally, we only want
+		 * it isn't masking the  signal vector `_RPC_GETSIGNO(rpc_flags)'. If  it
+		 * is currently masked, then  we also want to  mark it as pending  within
+		 * the thread's userprocmask (if it's  using one). Finally, we only  want
 		 * to wake the thread if the signal isn't masked, all of which is done by
 		 * the following call.
 		 *
@@ -599,7 +597,7 @@ NOTHROW(FCALL task_sig_schedule)(struct task *__restrict thread, signo_t signo) 
 	        "Cannot schedule a non-RPC_CONTEXT_KERN RPC "
 	        "for execution within a TASK_FKERNTHREAD thread");
 	assertf(signo >= 1 && signo <= 31, "Invalid signo %d", signo);
-	word = ATOMIC_FETCHOR(FORTASK(thread, this_sig_pend), (uint32_t)1 << signo);
+	word = ATOMIC_FETCHOR(FORTASK(thread, this_rpcs_sigpend), (uint32_t)1 << signo);
 	if unlikely(word & 1)
 		return false; /* Already terminated */
 	sig_broadcast(&FORTASK(thread, this_rpcs_sig));
@@ -611,14 +609,14 @@ NOTHROW(FCALL task_sig_schedule)(struct task *__restrict thread, signo_t signo) 
 
 
 /* Same as `task_rpc_schedule()', but schedule the RPC for execution
- * by some arbitrary thread apart of the process `proc->tp_pctl'.
+ * by some arbitrary  thread apart of  the process  `proc->tp_pctl'.
  * NOTE: Process-directed user-RPCs must not make use of `RPC_SYNCMODE_F_REQUIRE_SC'
  *       or `RPC_SYNCMODE_F_REQUIRE_CP'. Attempting to do so causes this function to
  *       trigger an internal assertion check.
  *       All other RPC functionality works as expected, though obviously  RPCs
  * NOTE: The caller must be holding a read-lock to `proc->tp_pctl->pc_chlds_lock'
  * @return: true:  Success. (Even if the process terminates before the RPC can be served
- *                 normally, it will still be served as `RPC_REASONCTX_SHUTDOWN' when
+ *                 normally, it will  still be served  as `RPC_REASONCTX_SHUTDOWN'  when
  *                 true has been returned here)
  * @return: false: The target process was marked as having terminated. */
 PUBLIC NOBLOCK WUNUSED NONNULL((1, 2)) bool
@@ -683,11 +681,11 @@ NOTHROW(FCALL pending_signals_from_rpc_list)(/*in|out*/ sigset_t *__restrict res
 
 
 /* Gather the set of posix signal numbers used by pending RPCs
- * of calling thread or process. These functions are used to
+ * of calling thread or process.  These functions are used  to
  * implement the `sigpending(2)' system call.
  *
  * NOTE: These functions don't `sigemptyset(result)' beforehand,
- *       but will blindly `sigaddset()' all pending signals to
+ *       but  will blindly `sigaddset()'  all pending signals to
  *       it. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL task_rpc_pending_sigset)(/*in|out*/ sigset_t *__restrict result) {
@@ -695,24 +693,23 @@ NOTHROW(FCALL task_rpc_pending_sigset)(/*in|out*/ sigset_t *__restrict result) {
 	list = PERTASK_GET(this_rpcs.slh_first);
 	assert(list != THIS_RPCS_TERMINATED);
 	pending_signals_from_rpc_list(result, list);
-	result->__val[0] |= PERTASK_GET(this_sig_pend) >> 1;
+	result->__val[0] |= PERTASK_GET(this_rpcs_sigpend) >> 1;
 }
 
 PUBLIC NONNULL((1)) void FCALL
 proc_rpc_pending_sigset(/*in|out*/ sigset_t *__restrict result)
 		THROWS(E_WOULDBLOCK) {
-	struct process_pending_rpcs *proc_rpcs;
+	struct procctl *proc = task_getprocctl();
 	struct pending_rpc *first;
 	uint32_t pending_bitset;
-	proc_rpcs = &THIS_PROCESS_RPCS;
-	process_pending_rpcs_read(proc_rpcs);
-	first = ATOMIC_READ(proc_rpcs->pc_sig_list.slh_first);
+	procctl_sig_read(proc);
+	first = ATOMIC_READ(proc->pc_sig_list.slh_first);
 	if (first != THIS_RPCS_TERMINATED)
 		pending_signals_from_rpc_list(result, first);
-	pending_bitset = ATOMIC_READ(proc_rpcs->pc_sig_pend);
+	pending_bitset = ATOMIC_READ(proc->pc_sig_pend);
 	if (!(pending_bitset & 1))
 		result->__val[0] |= pending_bitset >> 1;
-	process_pending_rpcs_endread(proc_rpcs);
+	procctl_sig_endread(proc);
 }
 
 
@@ -738,7 +735,7 @@ NOTHROW(FCALL task_rpc_pending_oneof)(sigset_t const *__restrict these) {
 	assert(list != THIS_RPCS_TERMINATED);
 	if (is_one_of_these_pending(these, list))
 		return true;
-	pending_bitset = PERTASK_GET(this_sig_pend);
+	pending_bitset = PERTASK_GET(this_rpcs_sigpend);
 	if (((pending_bitset >> 1) & (uint32_t)these->__val[0]) != 0)
 		return true;
 	return false;
@@ -747,33 +744,31 @@ NOTHROW(FCALL task_rpc_pending_oneof)(sigset_t const *__restrict these) {
 PUBLIC ATTR_PURE WUNUSED NONNULL((1)) bool FCALL
 proc_rpc_pending_oneof(sigset_t const *__restrict these)
 		THROWS(E_WOULDBLOCK) {
-	bool result = false;
-	struct process_pending_rpcs *proc_rpcs;
+	struct procctl *proc = task_getprocctl();
 	struct pending_rpc *first;
-	proc_rpcs = &THIS_PROCESS_RPCS;
-	process_pending_rpcs_read(proc_rpcs);
-	first = ATOMIC_READ(proc_rpcs->pc_sig_list.slh_first);
+	bool result = false;
+	procctl_sig_read(proc);
+	first = ATOMIC_READ(proc->pc_sig_list.slh_first);
 	if (first != THIS_RPCS_TERMINATED)
 		result = is_one_of_these_pending(these, first);
 	if (!result) {
-		uint32_t pending_bitset = ATOMIC_READ(proc_rpcs->pc_sig_pend);
+		uint32_t pending_bitset = ATOMIC_READ(proc->pc_sig_pend);
 		if (!(pending_bitset & 1))
 			result = ((pending_bitset >> 1) & (uint32_t)these->__val[0]) != 0;
 	}
-	process_pending_rpcs_endread(proc_rpcs);
+	procctl_sig_endread(proc);
 	return result;
 }
 
 /* @return: * : One of `PROC_RPC_TRYPENDING_ONEOF_*' */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW(FCALL proc_rpc_trypending_oneof)(sigset_t const *__restrict these) {
-	int result = PROC_RPC_TRYPENDING_ONEOF_NO;
-	struct process_pending_rpcs *proc_rpcs;
+	struct procctl *proc = task_getprocctl();
 	struct pending_rpc *first;
-	proc_rpcs = &THIS_PROCESS_RPCS;
-	if (!process_pending_rpcs_tryread(proc_rpcs))
+	int result = PROC_RPC_TRYPENDING_ONEOF_NO;
+	if (!procctl_sig_tryread(proc))
 		return PROC_RPC_TRYPENDING_ONEOF_WOULDBLOCK;
-	first = ATOMIC_READ(proc_rpcs->pc_sig_list.slh_first);
+	first = ATOMIC_READ(proc->pc_sig_list.slh_first);
 	if (first != THIS_RPCS_TERMINATED) {
 		STATIC_ASSERT(PROC_RPC_TRYPENDING_ONEOF_NO == (int)false);
 		STATIC_ASSERT(PROC_RPC_TRYPENDING_ONEOF_YES == (int)true);
@@ -782,11 +777,11 @@ NOTHROW(FCALL proc_rpc_trypending_oneof)(sigset_t const *__restrict these) {
 	if (result == PROC_RPC_TRYPENDING_ONEOF_NO) {
 		STATIC_ASSERT(PROC_RPC_TRYPENDING_ONEOF_NO == (int)false);
 		STATIC_ASSERT(PROC_RPC_TRYPENDING_ONEOF_YES == (int)true);
-		uint32_t pending_bitset = ATOMIC_READ(proc_rpcs->pc_sig_pend);
+		uint32_t pending_bitset = ATOMIC_READ(proc->pc_sig_pend);
 		if (!(pending_bitset & 1))
 			result = (int)(((pending_bitset >> 1) & (uint32_t)these->__val[0]) != 0);
 	}
-	process_pending_rpcs_endread(proc_rpcs);
+	procctl_sig_endread(proc);
 	return result;
 }
 
@@ -794,7 +789,7 @@ NOTHROW(FCALL proc_rpc_trypending_oneof)(sigset_t const *__restrict these) {
 
 
 /* Try to steal a posix signal RPC from `list' who's signal bit is `1' in `these'
- * If no such pending RPC exists, return `NULL'; else return the stolen entry. */
+ * If no such pending  RPC exists, return `NULL';  else return the stolen  entry. */
 PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) struct pending_rpc *
 NOTHROW(FCALL steal_posix_signal)(struct pending_rpc_slist *__restrict list,
                                   sigset_t const *__restrict these) {
@@ -832,7 +827,7 @@ again:
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) /*inherit*/ struct pending_rpc *
 NOTHROW(FCALL task_rpc_pending_steal_posix_signal)(sigset_t const *__restrict these) {
 	struct pending_rpc_slist *mylist = &PERTASK(this_rpcs);
-	/* TODO: Support for `this_sig_pend' (don't forget to also update `this_sig_pend_inactive') */
+	/* TODO: Support for `this_rpcs_sigpend' (don't forget to also update `this_rpcs_sigpend_inactive') */
 	return steal_posix_signal(mylist, these);
 }
 
@@ -840,37 +835,35 @@ PUBLIC WUNUSED NONNULL((1)) /*inherit*/ struct pending_rpc *FCALL
 proc_rpc_pending_steal_posix_signal(sigset_t const *__restrict these)
 		THROWS(E_WOULDBLOCK) {
 	struct pending_rpc *result;
-	struct process_pending_rpcs *proc_rpcs;
-	proc_rpcs = &THIS_PROCESS_RPCS;
-	result = ATOMIC_READ(proc_rpcs->pc_sig_list.slh_first);
+	struct procctl *proc = task_getprocctl();
+	result = ATOMIC_READ(proc->pc_sig_list.slh_first);
 	if (result == NULL || result == THIS_RPCS_TERMINATED)
 		return NULL;
 	/* XXX: Implement via read-lock + upgrade */
-	process_pending_rpcs_write(proc_rpcs);
-	result = steal_posix_signal(&proc_rpcs->pc_sig_list, these);
+	procctl_sig_write(proc);
+	result = steal_posix_signal(&proc->pc_sig_list, these);
 	/* TODO: Support for `proc_rpcs->pc_sig_pend' */
-	process_pending_rpcs_endwrite(proc_rpcs);
+	procctl_sig_endwrite(proc);
 	return result;
 }
 
-/* Same as `proc_rpc_pending_steal_posix_signal()', but only _try_ to
- * acquire the necessary lock to `THIS_PROCESS_RPCS.ppr_lock'. When
- * doing so fails, `PROC_RPC_PENDING_TRYSTEAL_POSIX_SIGNAL_WOULDBLOCK'
+/* Same as `proc_rpc_pending_steal_posix_signal()',  but only _try_  to
+ * acquire the necessary lock to `task_getprocctl()->pc_sig_more'. When
+ * doing so fails,  `PROC_RPC_PENDING_TRYSTEAL_POSIX_SIGNAL_WOULDBLOCK'
  * is returned. */
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) /*inherit*/ struct pending_rpc *
 NOTHROW(FCALL proc_rpc_pending_trysteal_posix_signal)(sigset_t const *__restrict these) {
 	struct pending_rpc *result;
-	struct process_pending_rpcs *proc_rpcs;
-	proc_rpcs = &THIS_PROCESS_RPCS;
-	result = ATOMIC_READ(proc_rpcs->pc_sig_list.slh_first);
+	struct procctl *proc = task_getprocctl();
+	result = ATOMIC_READ(proc->pc_sig_list.slh_first);
 	if (result == NULL || result == THIS_RPCS_TERMINATED)
 		return NULL;
 	/* XXX: Implement via read-lock + update */
-	if (!process_pending_rpcs_trywrite(proc_rpcs))
+	if (!procctl_sig_trywrite(proc))
 		return PROC_RPC_PENDING_TRYSTEAL_POSIX_SIGNAL_WOULDBLOCK;
-	result = steal_posix_signal(&proc_rpcs->pc_sig_list, these);
+	result = steal_posix_signal(&proc->pc_sig_list, these);
 	/* TODO: Support for `proc_rpcs->pc_sig_pend' */
-	process_pending_rpcs_endwrite(proc_rpcs);
+	procctl_sig_endwrite(proc);
 	return result;
 }
 

@@ -630,11 +630,11 @@ signal_waitfor(sigset_t const *__restrict these,
 		if (rpc == NULL) {
 			rpc = proc_rpc_pending_trysteal_posix_signal(these);
 			if (rpc == PROC_RPC_PENDING_TRYSTEAL_POSIX_SIGNAL_WOULDBLOCK) {
-				struct process_pending_rpcs *proc_rpcs;
+				struct procctl *proc;
 				PREEMPTION_ENABLE();
 				/* Yield until the lock becomes available. */
-				proc_rpcs = &THIS_PROCESS_RPCS;
-				process_pending_rpcs_waitwrite(proc_rpcs);
+				proc = task_getprocctl();
+				procctl_sig_waitwrite(proc);
 				continue;
 			}
 		}

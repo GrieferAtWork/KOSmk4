@@ -101,7 +101,7 @@ handle_signalfd_read(struct signalfd *__restrict self,
 			assert(!task_wasconnected());
 			task_connect(&PERTASK(this_rpcs_sig));
 			TRY {
-				task_connect(&THIS_PROCESS_RPCS.ppr_more);
+				task_connect(&task_getprocctl()->pc_sig_more);
 				rpc = task_rpc_pending_steal_posix_signal(&self->sf_mask);
 				if (!rpc)
 					rpc = proc_rpc_pending_steal_posix_signal(&self->sf_mask);
@@ -169,7 +169,7 @@ handle_signalfd_pollconnect(struct signalfd *__restrict UNUSED(self),
                             poll_mode_t what) {
 	if (what & POLLINMASK) {
 		task_connect_for_poll(&PERTASK(this_rpcs_sig));
-		task_connect_for_poll(&THIS_PROCESS_RPCS.ppr_more);
+		task_connect_for_poll(&task_getprocctl()->pc_sig_more);
 	}
 }
 
@@ -232,7 +232,7 @@ update_signalfd(fd_t fd,
 	 * mask  not  actually causing  the  other to  get  the message.
 	 * Oh well... Just mirror what linux does... */
 	sig_broadcast(&PERTASK(this_rpcs_sig));
-	sig_broadcast(&THIS_PROCESS_RPCS.ppr_more);
+	sig_broadcast(&task_getprocctl()->pc_sig_more);
 }
 
 DEFINE_SYSCALL4(fd_t, signalfd4, fd_t, fd,

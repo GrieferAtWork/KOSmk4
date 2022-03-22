@@ -172,7 +172,7 @@ NOTHROW(FCALL userexcept_sysret)(struct icpustate *__restrict state)
 	/* Load RPC functions. This must happen _AFTER_ we clear
 	 * the  pending-RPC  flag to  prevent a  race condition. */
 	pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
-	pending_bitset    = ATOMIC_READ(PERTASK(this_sig_pend));
+	pending_bitset    = ATOMIC_READ(PERTASK(this_rpcs_sigpend));
 
 handle_pending:
 	for (;;) {
@@ -285,12 +285,12 @@ make_inactive:
 
 	if (pending_bitset) {
 #ifndef LOCAL_IS_SYSRET
-		uint32_t inactive = PERTASK_GET(this_sig_pend_inactive);
+		uint32_t inactive = PERTASK_GET(this_rpcs_sigpend_inactive);
 #endif /* LOCAL_IS_SYSRET */
 		signo_t signo;
-		pending_bitset = ATOMIC_XCH(PERTASK(this_sig_pend), 0);
+		pending_bitset = ATOMIC_XCH(PERTASK(this_rpcs_sigpend), 0);
 #ifdef LOCAL_IS_SYSRET
-		PERTASK_SET(this_sig_pend_inactive, 0);
+		PERTASK_SET(this_rpcs_sigpend_inactive, 0);
 #endif /* LOCAL_IS_SYSRET */
 		for (signo = 1; signo <= 31; ++signo) {
 			uint32_t signo_mask = (uint32_t)1 << signo;
@@ -333,7 +333,7 @@ make_inactive:
 					restore_bitset |= signo_mask;
 #ifndef LOCAL_IS_SYSRET
 					inactive |= signo_mask;
-					PERTASK_SET(this_sig_pend_inactive, inactive);
+					PERTASK_SET(this_rpcs_sigpend_inactive, inactive);
 #endif /* !LOCAL_IS_SYSRET */
 					continue;
 				}
@@ -357,12 +357,11 @@ make_inactive:
 	 * NOTE: Additionally, this part is only done so-long as no exception
 	 *       has been set (iow:  `error.ei_code == EXCEPT_CODEOF(E_OK)'). */
 	if (error.ei_code == EXCEPT_CODEOF(E_OK)) {
+		struct procctl *proc = task_getprocctl();
 		struct pending_rpc *rpc;
-		struct process_pending_rpcs *proc_rpcs;
 		uint32_t pending_bitset;
-		proc_rpcs      = &THIS_PROCESS_RPCS;
-		rpc            = ATOMIC_READ(proc_rpcs->pc_sig_list.slh_first);
-		pending_bitset = ATOMIC_READ(proc_rpcs->pc_sig_pend);
+		rpc            = ATOMIC_READ(proc->pc_sig_list.slh_first);
+		pending_bitset = ATOMIC_READ(proc->pc_sig_pend);
 		if ((rpc != NULL && rpc != THIS_RPCS_TERMINATED) || pending_bitset) {
 			struct pending_rpc **p_rpc;
 			bool has_write_lock;
@@ -374,9 +373,9 @@ make_inactive:
 #endif /* CONFIG_HAVE_USERPROCMASK */
 again_lock_proc_rpcs:
 			has_write_lock = false;
-			process_pending_rpcs_read(proc_rpcs);
+			procctl_sig_read(proc);
 again_scan_proc_rpcs:
-			p_rpc = SLIST_PFIRST(&proc_rpcs->pc_sig_list);
+			p_rpc = SLIST_PFIRST(&proc->pc_sig_list);
 			rpc   = *p_rpc;
 			if likely(rpc != NULL && rpc != THIS_RPCS_TERMINATED) {
 				for (;;) {
@@ -411,9 +410,9 @@ again_scan_proc_rpcs:
 							if (status == SIGMASK_ISMASKED_NOPF_FAULT) {
 								/* Must do this the hard way... */
 								if (has_write_lock) {
-									process_pending_rpcs_endwrite(proc_rpcs);
+									procctl_sig_endwrite(proc);
 								} else {
-									process_pending_rpcs_endread(proc_rpcs);
+									procctl_sig_endread(proc);
 								}
 								TRY {
 									status = sigmask_ismasked(signo);
@@ -447,9 +446,9 @@ again_scan_proc_rpcs:
 
 					/* If necessary, upgrade to a write-lock. */
 					if (!has_write_lock) {
-						if (!process_pending_rpcs_tryupgrade(proc_rpcs)) {
-							process_pending_rpcs_endread(proc_rpcs);
-							process_pending_rpcs_write(proc_rpcs);
+						if (!procctl_sig_tryupgrade(proc)) {
+							procctl_sig_endread(proc);
+							procctl_sig_write(proc);
 							has_write_lock = true;
 							goto again_scan_proc_rpcs;
 						}
@@ -457,7 +456,7 @@ again_scan_proc_rpcs:
 					}
 
 					/* Remove `rpc' from the list */
-					if (p_rpc == &proc_rpcs->pc_sig_list.slh_first) {
+					if (p_rpc == &proc->pc_sig_list.slh_first) {
 						/* Check for race condition: new RPCs were added in the mean time. */
 						if (!ATOMIC_CMPXCH(*p_rpc, rpc, rpc->pr_link.sle_next))
 							goto again_scan_proc_rpcs;
@@ -467,7 +466,7 @@ again_scan_proc_rpcs:
 					}
 
 					COMPILER_BARRIER();
-					process_pending_rpcs_endwrite(proc_rpcs);
+					procctl_sig_endwrite(proc);
 					/* At this point, we've taken ownership of `rpc', and won't ever give it back! */
 					if (rpc->pr_flags & RPC_CONTEXT_KERN) {
 						/* Handle this RPC later. */
@@ -490,7 +489,7 @@ check_next_proc_rpc:
 						break;
 				}
 			}
-			pending_bitset = ATOMIC_READ(proc_rpcs->pc_sig_pend);
+			pending_bitset = ATOMIC_READ(proc->pc_sig_pend);
 			if (pending_bitset) {
 				signo_t signo;
 				for (signo = 1; signo <= 31; ++signo) {
@@ -511,9 +510,9 @@ check_next_proc_rpc:
 						if (status == SIGMASK_ISMASKED_NOPF_FAULT) {
 							/* Must do this the hard way... */
 							if (has_write_lock) {
-								process_pending_rpcs_endwrite(proc_rpcs);
+								procctl_sig_endwrite(proc);
 							} else {
-								process_pending_rpcs_endread(proc_rpcs);
+								procctl_sig_endread(proc);
 							}
 							TRY {
 								status = sigmask_ismasked(signo);
@@ -546,18 +545,18 @@ check_next_proc_rpc:
 
 					/* If necessary, upgrade to a write-lock. */
 					if (!has_write_lock) {
-						if (!process_pending_rpcs_tryupgrade(proc_rpcs)) {
-							process_pending_rpcs_endread(proc_rpcs);
-							process_pending_rpcs_write(proc_rpcs);
+						if (!procctl_sig_tryupgrade(proc)) {
+							procctl_sig_endread(proc);
+							procctl_sig_write(proc);
 							has_write_lock = true;
 							goto again_scan_proc_rpcs;
 						}
 						has_write_lock = true;
 					}
 					/* Remove `signo' from the list */
-					if (!(ATOMIC_FETCHAND(proc_rpcs->pc_sig_pend, ~signo_mask) & signo_mask))
+					if (!(ATOMIC_FETCHAND(proc->pc_sig_pend, ~signo_mask) & signo_mask))
 						goto again_scan_proc_rpcs;
-					process_pending_rpcs_endwrite(proc_rpcs);
+					procctl_sig_endwrite(proc);
 					/* At this point, we've taken ownership of `rpc', and won't ever give it back! */
 					/* User-space RPC */
 					if (!userexcept_exec_user_signo_rpc(&ctx, &error, signo))
@@ -573,9 +572,9 @@ check_next_proc_rpc:
 
 			/* Release our lock. */
 			if (has_write_lock) {
-				process_pending_rpcs_endwrite(proc_rpcs);
+				procctl_sig_endwrite(proc);
 			} else {
-				process_pending_rpcs_endread(proc_rpcs);
+				procctl_sig_endread(proc);
 			}
 		}
 	}
@@ -631,7 +630,7 @@ check_next_proc_rpc:
 					 *          call doesn't want that, it  has to clear the INACTIVE  flags
 					 *          itself. -- This has to be done in the case of  sigsuspend()! */
 					restore_pending_rpcs(SLIST_FIRST(&restore));
-					ATOMIC_OR(PERTASK(this_sig_pend), repeat_bitset);
+					ATOMIC_OR(PERTASK(this_rpcs_sigpend), repeat_bitset);
 					ATOMIC_OR(PERTASK(this_task.t_flags), TASK_FRPC);
 					assert(PREEMPTION_ENABLED());
 					PREEMPTION_DISABLE();
@@ -728,7 +727,7 @@ check_next_proc_rpc:
 			plast_pending  = &repeat_rpc->pr_link.sle_next;
 		}
 		*plast_pending = NULL;
-		pending_bitset = ATOMIC_READ(PERTASK(this_sig_pend)) | repeat_bitset;
+		pending_bitset = ATOMIC_READ(PERTASK(this_rpcs_sigpend)) | repeat_bitset;
 		repeat_bitset  = 0;
 		goto handle_pending;
 	}
@@ -816,9 +815,9 @@ check_next_proc_rpc:
 			ATOMIC_OR(PERTASK(this_task.t_flags), TASK_FRPC);
 		}
 		if (restore_bitset) {
-			ATOMIC_OR(PERTASK(this_sig_pend), restore_bitset);
+			ATOMIC_OR(PERTASK(this_rpcs_sigpend), restore_bitset);
 			/* Clear INACTIVE bits for all restored signals. */
-			PERTASK_SET(this_sig_pend_inactive, PERTASK_GET(this_sig_pend_inactive) & ~restore_bitset);
+			PERTASK_SET(this_rpcs_sigpend_inactive, PERTASK_GET(this_rpcs_sigpend_inactive) & ~restore_bitset);
 		}
 	}
 
