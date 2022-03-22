@@ -247,6 +247,8 @@ NOTHROW(FCALL taskpid_destroy)(struct taskpid *__restrict self) {
 		assertf(LIST_EMPTY(&ctl->pc_chlds_list), "Child processes should have kept us alive");
 		assertf(ATOMIC_READ(ctl->pc_sig_list.slh_first) == THIS_RPCS_TERMINATED,
 		        "This should have happened in `task_exit()'");
+		assertf(ATOMIC_READ(ctl->pc_sig_pend) & 1,
+		        "This should have happened in `task_exit()'");
 		sig_broadcast_for_fini(&ctl->pc_chld_changed);
 
 		/* We know that we're no longer part of the parent's list of child

@@ -503,7 +503,7 @@ svgatty_settty_with_winch(struct svgatty *__restrict self,
 		return; /* No foreground process. */
 	{
 		FINALLY_DECREF_UNLIKELY(fggrp);
-		task_raisesignalprocessgroup(fggrp, SIGWINCH);
+		_task_raisesignoprocessgroup(fggrp, SIGWINCH);
 	}
 
 	/* In case the calling process is part of the same group,

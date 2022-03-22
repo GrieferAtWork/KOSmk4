@@ -392,7 +392,10 @@ select_from_avail_range:
 
 		/* Figure out the max address which we're allowed to return. */
 		alloc_maxaddr = ((byte_t *)avail_maxaddr + 1) - num_bytes;
-		assert(alloc_maxaddr >= avail_minaddr);
+		assertf(avail_minaddr <= alloc_maxaddr,
+		        "avail_minaddr: %p\n"
+		        "alloc_maxaddr: %p\n",
+		        avail_minaddr, alloc_maxaddr);
 		if (addr < avail_minaddr)
 			addr = avail_minaddr;
 		if (addr > alloc_maxaddr)

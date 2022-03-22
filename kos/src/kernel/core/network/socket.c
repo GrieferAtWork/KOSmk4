@@ -479,9 +479,9 @@ PRIVATE void KCALL raise_sigpipe(void) {
 	NESTED_EXCEPTION;
 	/* Actually send the signal. */
 #if 1
-	task_raisesignalthread(THIS_TASK, SIGPIPE);
+	_task_raisesignothread(THIS_TASK, SIGPIPE);
 #else
-	task_raisesignalprocess(THIS_TASK, SIGPIPE);
+	_task_raisesignoprocess(task_gettaskpid(), SIGPIPE);
 #endif
 	task_serve();
 }

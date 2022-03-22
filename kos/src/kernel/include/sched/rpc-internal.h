@@ -148,6 +148,23 @@ SLIST_HEAD(pending_rpc_slist, pending_rpc);
 DATDEF ATTR_PERTASK struct pending_rpc_slist this_rpcs;
 #define THIS_RPCS_TERMINATED ((struct pending_rpc *)-1)
 
+/* [lock(SET(ATOMIC), CLEAR(ATOMIC && THIS_TASK))]
+ * Bitset of pending info-less POSIX signals (1-31). Bit#0 becomes set
+ * by the thread itself to indicate `THIS_RPCS_TERMINATED'. Once this
+ * bit is set, all other bits become meaningless.
+ *
+ * To send one of these signals to a thread, do:
+ * >> assert(signo >= 1 && signo <= 31);
+ * >> ATOMIC_OR(FORTASK(thread, this_sig_pend), (uint32_t)1 << signo);
+ * >> sig_broadcast(&FORTASK(thread, this_rpcs_sig));
+ * >> ATOMIC_OR(thread->t_flags, TASK_FRPC);
+ * >> userexcept_sysret_inject_and_marksignal_safe(thread, flags); */
+DATDEF ATTR_PERTASK uint32_t this_sig_pend;
+
+/* [lock(PRIVATE(THIS_TASK))]
+ * Used internally: inactive set of pending posix signals. */
+DATDEF ATTR_PERTASK uint32_t this_sig_pend_inactive;
+
 /* A  signal that is broadcast whenever something is added to `this_rpcs'
  * This signal is _only_ used  to implement `signalfd(2)', as you're  not
  * normally supposed to "wait" for signals to arrive; you just always get
@@ -178,6 +195,13 @@ NOTHROW(FCALL task_rpc_schedule)(struct task *__restrict thread,
 } /* extern "C++" */
 #endif /* __cplusplus */
 
+/* Schedule a given signal (which must be `>= 1 && <= 31') for `thread'
+ * @return: true:  Success.
+ * @return: false: The target thread has already terminated. */
+FUNDEF NOBLOCK NONNULL((1)) __BOOL
+NOTHROW(FCALL task_sig_schedule)(struct task *__restrict thread, signo_t signo);
+
+
 /* Same as `task_rpc_schedule()', but schedule the RPC for execution
  * by some arbitrary  thread apart of  the process  `proc->tp_pctl'.
  * NOTE: Process-directed user-RPCs must not make use of `RPC_SYNCMODE_F_REQUIRE_SC'
@@ -200,6 +224,13 @@ NOTHROW(FCALL proc_rpc_schedule)(struct taskpid *__restrict proc,
 		ASMNAME("proc_rpc_schedule");
 } /* extern "C++" */
 #endif /* __cplusplus */
+
+/* Schedule a given signal (which must be `>= 1 && <= 31') for `proc'
+ * @return: true:  Success.
+ * @return: false: The target process was marked as having terminated. */
+FUNDEF NOBLOCK NONNULL((1)) __BOOL
+NOTHROW(FCALL proc_sig_schedule)(struct taskpid *__restrict proc, signo_t signo);
+
 
 /* Gather the set of posix signal numbers used by pending RPCs
  * of calling thread or process.  These functions are used  to

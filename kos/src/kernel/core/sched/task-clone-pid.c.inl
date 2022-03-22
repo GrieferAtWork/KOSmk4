@@ -139,6 +139,7 @@ again_determine_parent:
 	sig_init(&result_ctl->pc_chld_changed);
 	atomic_rwlock_init(&result_ctl->pc_sig_lock);
 	SLIST_INIT(&result_ctl->pc_sig_list);
+	result_ctl->pc_sig_pend = 0;
 	sig_init(&result_ctl->pc_sig_more);
 
 	/* Select who should be the process's parent. */
@@ -413,9 +414,12 @@ release_locks_and_do_task_serve:
 #endif /* !LOCAL_IS_THRD */
 			struct pending_rpc *rpc;
 			struct pending_rpc_slist pending;
+			uint32_t pending_bitset;
 			pending.slh_first = ATOMIC_READ(caller_ctl->pc_sig_list.slh_first);
-			if (pending.slh_first != NULL) {
-				if unlikely(pending.slh_first == THIS_RPCS_TERMINATED) {
+			pending_bitset    = ATOMIC_READ(caller_ctl->pc_sig_pend);
+			if (pending.slh_first != NULL || pending_bitset != 0) {
+				if unlikely((pending.slh_first == THIS_RPCS_TERMINATED) ||
+				            (pending_bitset & 1)) {
 release_locks_and_force_do_task_serve:
 					ATOMIC_OR(caller->t_flags, TASK_FRPC);
 					goto release_locks_and_do_task_serve;
@@ -432,7 +436,9 @@ release_locks_and_force_do_task_serve:
 					goto again_lock_ns;
 				}
 				pending.slh_first = ATOMIC_READ(caller_ctl->pc_sig_list.slh_first);
-				if unlikely(pending.slh_first == THIS_RPCS_TERMINATED) {
+				pending_bitset    = ATOMIC_READ(caller_ctl->pc_sig_pend);
+				if unlikely((pending.slh_first == THIS_RPCS_TERMINATED) ||
+				            (pending_bitset & 1)) {
 sig_endread_and_release_locks_and_force_do_task_serve:
 					procctl_sig_endread(caller_ctl);
 					goto release_locks_and_force_do_task_serve;
@@ -450,6 +456,7 @@ sig_endread_and_release_locks_and_force_do_task_serve:
 						USER CHECKED struct userprocmask *um;
 						USER UNCHECKED sigset_t *umask;
 						size_t umasksize;
+unlock_everything_and_do_load_userprocmask:
 						_procctl_sig_endread(caller_ctl);
 						LOCAL_RELEASE_ALL_LOCKS();
 #ifdef LOCAL_IS_PROC
@@ -475,8 +482,28 @@ sig_endread_and_release_locks_and_force_do_task_serve:
 						goto sig_endread_and_release_locks_and_force_do_task_serve; /* Unmasked, pending RPC! */
 #endif /* CONFIG_HAVE_USERPROCMASK */
 				}
+				if (pending_bitset != 0) {
+					signo_t signo;
+					for (signo = 1; signo <= 31; ++signo) {
+						int status;
+						if (!(pending_bitset & ((uint32_t)1 << signo)))
+							continue;
+						status = sigmask_ismasked_nopf(signo);
+						if (status == SIGMASK_ISMASKED_NOPF_NO)
+							goto sig_endread_and_release_locks_and_force_do_task_serve; /* Unmasked, pending RPC! */
+#ifdef CONFIG_HAVE_USERPROCMASK
+						if (status != SIGMASK_ISMASKED_NOPF_FAULT)
+							continue;
+						if (!have_caller_sigmask)
+							goto unlock_everything_and_do_load_userprocmask;
+						if (!sigismember(&caller_sigmask, signo))
+							goto sig_endread_and_release_locks_and_force_do_task_serve; /* Unmasked, pending RPC! */
+#endif /* CONFIG_HAVE_USERPROCMASK */
+					}
+				}
 				procctl_sig_endread(caller_ctl);
 			} /* if (pending.slh_first != NULL) */
+
 		}     /* Scope */
 
 		/* ========== Point of no return: From here on, we'll be making the thread visible! */

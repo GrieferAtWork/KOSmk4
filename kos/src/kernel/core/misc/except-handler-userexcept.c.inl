@@ -87,6 +87,9 @@ NOTHROW(FCALL userexcept_sysret)(struct icpustate *__restrict state)
 	struct pending_rpc **restore_plast;
 	struct pending_rpc_slist kernel_rpcs;
 	struct exception_info error;
+	uint32_t pending_bitset;
+	uint32_t restore_bitset;
+	uint32_t repeat_bitset;
 #ifndef LOCAL_IS_SYSRET
 	struct rpc_context ctx;
 #else /* !LOCAL_IS_SYSRET */
@@ -144,8 +147,10 @@ NOTHROW(FCALL userexcept_sysret)(struct icpustate *__restrict state)
 
 	ctx.rc_state = state;
 	restore_plast = SLIST_PFIRST(&restore);
+	restore_bitset = 0;
 	SLIST_INIT(&kernel_rpcs);
 	SLIST_INIT(&repeat);
+	repeat_bitset = 0;
 
 #ifdef LOCAL_IS_SYSRET
 	/* Also  clear the `TASK_FWAKEONMSKRPC'  during sysret, thus making
@@ -167,6 +172,7 @@ NOTHROW(FCALL userexcept_sysret)(struct icpustate *__restrict state)
 	/* Load RPC functions. This must happen _AFTER_ we clear
 	 * the  pending-RPC  flag to  prevent a  race condition. */
 	pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
+	pending_bitset    = ATOMIC_READ(PERTASK(this_sig_pend));
 
 handle_pending:
 	for (;;) {
@@ -277,6 +283,73 @@ make_inactive:
 		}
 	}
 
+	if (pending_bitset) {
+#ifndef LOCAL_IS_SYSRET
+		uint32_t inactive = PERTASK_GET(this_sig_pend_inactive);
+#endif /* LOCAL_IS_SYSRET */
+		signo_t signo;
+		pending_bitset = ATOMIC_XCH(PERTASK(this_sig_pend), 0);
+#ifdef LOCAL_IS_SYSRET
+		PERTASK_SET(this_sig_pend_inactive, 0);
+#endif /* LOCAL_IS_SYSRET */
+		for (signo = 1; signo <= 31; ++signo) {
+			uint32_t signo_mask = (uint32_t)1 << signo;
+			if (!(pending_bitset & signo_mask))
+				continue;
+#ifndef LOCAL_IS_SYSRET
+			if (inactive & signo_mask) {
+				/* RPC was disabled in an earlier pass. */
+				restore_bitset |= signo_mask;
+			} else
+#endif /* !LOCAL_IS_SYSRET */
+			{
+				/* User-space RPC
+				 * NOTE: These are executed in reverse  order, since each one  executed
+				 *       will return to the context loaded by the one that was executed
+				 *       before, meaning that the last one executed (iow: the first one
+				 *       originally scheduled) will have the last word when it comes to
+				 *       where execution should continue. */
+#if !defined(LOCAL_HAVE_SIGMASK) && defined(CONFIG_HAVE_USERPROCMASK)
+				bool is_masked;
+				TRY {
+					is_masked = sigmask_ismasked(signo);
+				} EXCEPT {
+					/* Prioritize errors. */
+					struct exception_info *tls = except_info();
+					if (except_priority(error.ei_code) < except_priority(tls->ei_code)) {
+						memcpy(&error, tls, sizeof(error));
+						ctx.rc_context = RPC_REASONCTX_SYSRET; /* Will need to return to user-space to handle this exception */
+					}
+					continue;
+				}
+				if (is_masked)
+#elif !defined(LOCAL_HAVE_SIGMASK)
+				if (sigmask_ismasked(signo))
+#else /* !... */
+				if (sigismember(sigmask, signo))
+#endif /* ... */
+				{
+					/* User-space RPCs are currently masked. */
+					restore_bitset |= signo_mask;
+#ifndef LOCAL_IS_SYSRET
+					inactive |= signo_mask;
+					PERTASK_SET(this_sig_pend_inactive, inactive);
+#endif /* !LOCAL_IS_SYSRET */
+					continue;
+				}
+	
+				/* Do everything necessary to handle the USER-rpc. */
+				if (!userexcept_exec_user_signo_rpc(&ctx, &error, signo))
+					repeat_bitset |= signo_mask;
+#ifdef LCAL_IS_SYSRET
+				else {
+					assert(ctx.rc_context == RPC_REASONCTX_SYSRET);
+				}
+#endif /* !LOCAL_IS_SYSRET */
+			}
+		}
+	}
+
 	/* Service process-directed RPCs.
 	 * NOTE: Handling of these special process-directed RPCs functions the
 	 *       same like thread-directed ones (the handling of which can  be
@@ -286,9 +359,11 @@ make_inactive:
 	if (error.ei_code == EXCEPT_CODEOF(E_OK)) {
 		struct pending_rpc *rpc;
 		struct process_pending_rpcs *proc_rpcs;
-		proc_rpcs = &THIS_PROCESS_RPCS;
-		rpc       = ATOMIC_READ(proc_rpcs->ppr_list.slh_first);
-		if (rpc != NULL && rpc != THIS_RPCS_TERMINATED) {
+		uint32_t pending_bitset;
+		proc_rpcs      = &THIS_PROCESS_RPCS;
+		rpc            = ATOMIC_READ(proc_rpcs->pc_sig_list.slh_first);
+		pending_bitset = ATOMIC_READ(proc_rpcs->pc_sig_pend);
+		if ((rpc != NULL && rpc != THIS_RPCS_TERMINATED) || pending_bitset) {
 			struct pending_rpc **p_rpc;
 			bool has_write_lock;
 #ifdef CONFIG_HAVE_USERPROCMASK
@@ -301,7 +376,7 @@ again_lock_proc_rpcs:
 			has_write_lock = false;
 			process_pending_rpcs_read(proc_rpcs);
 again_scan_proc_rpcs:
-			p_rpc = SLIST_PFIRST(&proc_rpcs->ppr_list);
+			p_rpc = SLIST_PFIRST(&proc_rpcs->pc_sig_list);
 			rpc   = *p_rpc;
 			if likely(rpc != NULL && rpc != THIS_RPCS_TERMINATED) {
 				for (;;) {
@@ -380,8 +455,9 @@ again_scan_proc_rpcs:
 						}
 						has_write_lock = true;
 					}
+
 					/* Remove `rpc' from the list */
-					if (p_rpc == &proc_rpcs->ppr_list.slh_first) {
+					if (p_rpc == &proc_rpcs->pc_sig_list.slh_first) {
 						/* Check for race condition: new RPCs were added in the mean time. */
 						if (!ATOMIC_CMPXCH(*p_rpc, rpc, rpc->pr_link.sle_next))
 							goto again_scan_proc_rpcs;
@@ -414,6 +490,87 @@ check_next_proc_rpc:
 						break;
 				}
 			}
+			pending_bitset = ATOMIC_READ(proc_rpcs->pc_sig_pend);
+			if (pending_bitset) {
+				signo_t signo;
+				for (signo = 1; signo <= 31; ++signo) {
+					uint32_t signo_mask = (uint32_t)1 << signo;
+					if (!(pending_bitset & signo_mask))
+						continue;
+					/* Figure out if we should handle this RPC. */
+#if !defined(LOCAL_HAVE_SIGMASK) && defined(CONFIG_HAVE_USERPROCMASK)
+					if (sigismember(&known_masked_signals, signo))
+						continue; /* Known-masked signal */
+					if (!sigismember(&known_unmasked_signals, signo)) {
+						/* Signal isn't known to be unmasked. */
+						int status = sigmask_ismasked_nopf(signo);
+						if (status == SIGMASK_ISMASKED_NOPF_YES) {
+							sigaddset(&known_masked_signals, signo);
+							continue; /* Known-masked signal */
+						}
+						if (status == SIGMASK_ISMASKED_NOPF_FAULT) {
+							/* Must do this the hard way... */
+							if (has_write_lock) {
+								process_pending_rpcs_endwrite(proc_rpcs);
+							} else {
+								process_pending_rpcs_endread(proc_rpcs);
+							}
+							TRY {
+								status = sigmask_ismasked(signo);
+							} EXCEPT {
+								/* Prioritize errors. */
+								struct exception_info *tls = except_info();
+								if (except_priority(error.ei_code) < except_priority(tls->ei_code))
+									memcpy(&error, tls, sizeof(error));
+								status = 1; /* Assume masked, so we don't consume RPCs for this signal! */
+							}
+							/* Remember what we learned about this signal number. */
+							if (status) {
+								sigaddset(&known_masked_signals, signo);
+							} else {
+								sigaddset(&known_unmasked_signals, signo);
+							}
+							goto again_lock_proc_rpcs;
+						}
+						/* Unmasked signal */
+						sigaddset(&known_unmasked_signals, signo);
+					}
+#elif !defined(LOCAL_HAVE_SIGMASK)
+					if (sigmask_ismasked(signo))
+						continue; /* Masked signal */
+#else /* ... */
+					if (sigismember(sigmask, signo))
+						continue; /* Masked signal */
+#endif /* !... */
+					/* Yes: we _are_ allowed to handle this RPC! */
+
+					/* If necessary, upgrade to a write-lock. */
+					if (!has_write_lock) {
+						if (!process_pending_rpcs_tryupgrade(proc_rpcs)) {
+							process_pending_rpcs_endread(proc_rpcs);
+							process_pending_rpcs_write(proc_rpcs);
+							has_write_lock = true;
+							goto again_scan_proc_rpcs;
+						}
+						has_write_lock = true;
+					}
+					/* Remove `signo' from the list */
+					if (!(ATOMIC_FETCHAND(proc_rpcs->pc_sig_pend, ~signo_mask) & signo_mask))
+						goto again_scan_proc_rpcs;
+					process_pending_rpcs_endwrite(proc_rpcs);
+					/* At this point, we've taken ownership of `rpc', and won't ever give it back! */
+					/* User-space RPC */
+					if (!userexcept_exec_user_signo_rpc(&ctx, &error, signo))
+						repeat_bitset |= signo_mask;
+#ifdef LOCAL_IS_SYSRET
+					else {
+						assert(ctx.rc_context == RPC_REASONCTX_SYSRET);
+					}
+#endif /* LOCAL_IS_SYSRET */
+					goto again_lock_proc_rpcs;
+				}
+			}
+
 			/* Release our lock. */
 			if (has_write_lock) {
 				process_pending_rpcs_endwrite(proc_rpcs);
@@ -468,12 +625,13 @@ check_next_proc_rpc:
 					SLIST_REMOVE_HEAD(&repeat, pr_link);
 					SLIST_INSERT_HEAD(&restore, repeat_rpc, pr_link);
 				}
-				if (!SLIST_EMPTY(&restore)) {
+				if (!SLIST_EMPTY(&restore) || repeat_bitset) {
 					/* WARNING: User-space RPCs in `restore' may still be marked as INACTIVE
 					 *          at this point. This is normally  OK, but in case the  system
 					 *          call doesn't want that, it  has to clear the INACTIVE  flags
 					 *          itself. -- This has to be done in the case of  sigsuspend()! */
 					restore_pending_rpcs(SLIST_FIRST(&restore));
+					ATOMIC_OR(PERTASK(this_sig_pend), repeat_bitset);
 					ATOMIC_OR(PERTASK(this_task.t_flags), TASK_FRPC);
 					assert(PREEMPTION_ENABLED());
 					PREEMPTION_DISABLE();
@@ -556,20 +714,22 @@ check_next_proc_rpc:
 	}
 
 	/* Check if there are RPCs that need to be repeated. */
-	if unlikely(!SLIST_EMPTY(&repeat)) {
+	if unlikely(!SLIST_EMPTY(&repeat) || repeat_bitset != 0) {
 		struct pending_rpc **plast_pending, *repeat_rpc;
 		ATOMIC_AND(PERTASK(this_task.t_flags), ~TASK_FRPC);
 		pending.slh_first = SLIST_ATOMIC_CLEAR(&PERTASK(this_rpcs));
-		plast_pending = SLIST_PFIRST(&pending);
+		plast_pending     = SLIST_PFIRST(&pending);
 		while ((repeat_rpc = *plast_pending) != NULL)
 			plast_pending = SLIST_PNEXT(repeat_rpc, pr_link);
-		do {
+		while (!SLIST_EMPTY(&repeat)) {
 			repeat_rpc = SLIST_FIRST(&repeat);
 			SLIST_REMOVE_HEAD(&repeat, pr_link);
 			*plast_pending = repeat_rpc;
 			plast_pending  = &repeat_rpc->pr_link.sle_next;
-		} while (!SLIST_EMPTY(&repeat));
+		}
 		*plast_pending = NULL;
+		pending_bitset = ATOMIC_READ(PERTASK(this_sig_pend)) | repeat_bitset;
+		repeat_bitset  = 0;
 		goto handle_pending;
 	}
 
@@ -581,7 +741,7 @@ check_next_proc_rpc:
 	 * before  returning to user-space,  which is what's about
 	 * to happen)
 	 * #endif */
-	if (restore_plast != SLIST_PFIRST(&restore)) {
+	if (restore_plast != SLIST_PFIRST(&restore) || restore_bitset != 0) {
 		*restore_plast = NULL; /* NULL-terminate list */
 
 #ifndef LOCAL_IS_SYSRET
@@ -655,6 +815,11 @@ check_next_proc_rpc:
 			restore_pending_rpcs(SLIST_FIRST(&restore));
 			ATOMIC_OR(PERTASK(this_task.t_flags), TASK_FRPC);
 		}
+		if (restore_bitset) {
+			ATOMIC_OR(PERTASK(this_sig_pend), restore_bitset);
+			/* Clear INACTIVE bits for all restored signals. */
+			PERTASK_SET(this_sig_pend_inactive, PERTASK_GET(this_sig_pend_inactive) & ~restore_bitset);
+		}
 	}
 
 	/* Check if we must throw a new exception. */
@@ -686,7 +851,7 @@ check_next_proc_rpc:
 	 *
 	 * Once the interrupt/syscall completes as normal, all of them will
 	 * be re-enabled once again. */
-	if (!SLIST_EMPTY(&restore)) {
+	if (!SLIST_EMPTY(&restore) || restore_bitset != 0) {
 		/* The following call causes `handle_sysret_rpc()' to be
 		 * invoked before we'll eventually return to user-space. */
 		assert(PREEMPTION_ENABLED());

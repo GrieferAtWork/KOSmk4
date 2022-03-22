@@ -76,6 +76,23 @@ task_raisesignalprocessgroup(struct procgrp *__restrict group,
                              struct taskpid *__restrict sender)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE);
 
+/* Same as `task_raisesignalprocessgroup()', but `signo' must be in range `1..31',
+ * allowing this function to use "non-queuing" signals, thus preventing the chance
+ * of running out of memory while trying to send a signal.
+ * NOTE: This function is unable to encode a sender PID/UID, and instead uses
+ *       defaults (s.a. `userexcept_exec_user_signo_rpc()') for this purpose. */
+FUNDEF NONNULL((1)) size_t FCALL
+_task_raisesignoprocessgroup(struct procgrp *__restrict group, signo_t signo)
+		THROWS(E_WOULDBLOCK);
+/* Like `_task_raisesignoprocessgroup()' is to `task_raisesignalprocessgroup()',
+ * but for a single process. This is in fact the same as  `proc_sig_schedule()'. */
+FUNDEF NOBLOCK NONNULL((1)) __BOOL
+NOTHROW(FCALL _task_raisesignoprocess)(struct taskpid *__restrict proc, signo_t signo)
+		ASMNAME("proc_sig_schedule");
+FUNDEF NOBLOCK NONNULL((1)) __BOOL
+NOTHROW(FCALL _task_raisesignothread)(struct task *__restrict thread, signo_t signo)
+		ASMNAME("task_sig_schedule");
+
 
 #ifdef __cplusplus
 extern "C++" {

@@ -60,36 +60,18 @@ typedef __ATTR_NONNULL((1, 2)) __ssize_t
 /* Raise a given signal `signo' (one of `SIG*')
  * within the foreground process  group associated with the  terminal.
  * A negative return value of this function is propagated immediately.
- * s.a. `task_raisesignalprocess()'
+ * s.a. `_task_raisesignoprocessgroup()'
  * @return: < 0:  An error status that should be propagated immediately. */
 typedef __ATTR_NONNULL((1)) __ssize_t
 (LIBTERM_CC *pterminal_raise_t)(struct terminal *__restrict self,
                                 __signo_t signo);
 
-/* Check  if  the  calling  process's  group  leader  is  apart  of  the  foreground   process
- * group associated  with  the  given terminal  `self'.  -  If it  is,  return  0.  Otherwise,
- * the POSIX behavior  is to raise  a signal `SIGTTOU'  within every process  in the  caller's
- * process  group,  however  the  implementation  of  this  function  may  also  choose  to do
- * something completely different.  (or just  be a  no-op; >I'm just  a sign,  not a  cop...<)
- * For  a  POSIX-compliant terminal,  a kernel-side  implementation of  this would  look like:
- * >> PRIVATE ssize_t LIBTERM_CC my_terminal_check_sigttou(struct terminal *__restrict self) {
- * >>	MY_TERMINAL *term = container_of(self, MY_TERMINAL, t_term);
- * >>	REF struct task *my_leader = task_getprocessgroupleader();
- * >>	if (!my_leader)
- * >>		...;
- * >>	FINALLY_DECREF_UNLIKELY(my_leader);
- * >>	if unlikely(FORTASK(my_leader, this_taskpid) != ATOMIC_READ(term->t_fproc)) {
- * >>		task_raisesignalprocessgroup(my_leader, SIGTTOU);
- * >>		task_serve();
- * >>		// We might get here if the calling process changed its process group
- * >>		// in the mean time. - In this case, just re-raise `SIGTTOU' within the
- * >>		// calling process only.
- * >>		task_raisesignalprocess(task_getprocess(), SIGTTOU);
- * >>		task_serve();
- * >>		// We really shouldn't get here
- * >>	}
- * >>	return 0;
- * >> }
+/* Check if the  calling process's  group leader  is apart  of the  foreground
+ * process  group  associated with  the  given terminal  `self'.  - If  it is,
+ * return 0. Otherwise,  the POSIX  behavior is  to raise  a signal  `SIGTTOU'
+ * within  every  process   in  the  caller's   process  group,  however   the
+ * implementation  of  this   function  may  also   choose  to  do   something
+ * completely different. (or just be a no-op; >I'm just a sign, not a cop...<)
  * @return: < 0:  An error status that should be propagated immediately. */
 typedef __ATTR_NONNULL((1)) __ssize_t
 (LIBTERM_CC *pterminal_check_sigttou_t)(struct terminal *__restrict self);

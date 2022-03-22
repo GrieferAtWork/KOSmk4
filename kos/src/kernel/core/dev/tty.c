@@ -99,6 +99,7 @@ kernel_terminal_check_sigtty(struct ttydev *__restrict self,
 	struct taskpid *mypid = task_gettaskpid();
 	struct procgrp *fggrp;
 	REF struct procgrp *mygrp;
+	assert(signo == SIGTTOU || signo == SIGTTIN);
 	assert(chrdev_istty(self));
 again:
 	fggrp = awref_ptr(&self->t_fproc);
@@ -164,7 +165,7 @@ do_throw_E_IOERROR_REASON_TTY_ORPHAN_SIGTTIN:
 		 *      special handling  for orphaned  process groups  must happen  interlocked
 		 *      with the sending of a signal to a non-orphaned one. */
 		procgrp_memb_endread(mygrp);
-		task_raisesignalprocessgroup(mygrp, signo);
+		_task_raisesignoprocessgroup(mygrp, signo);
 		task_serve();
 		/* FIXME: We might get here if the calling process changed groups.
 		 *        This race condition  must be fixed  by keeping the  lock
@@ -175,7 +176,7 @@ do_throw_E_IOERROR_REASON_TTY_ORPHAN_SIGTTIN:
 		 * caller uses a userprocmask that changed `signo' to masked before
 		 * we  were able to send it the  signal. When that happens, we want
 		 * to fall through to the throwing the exception below. */
-		task_raisesignalprocess(mypid, signo);
+		_task_raisesignoprocess(mypid, signo);
 		task_serve();
 	} else {
 		procgrp_memb_endread(mygrp);
@@ -208,7 +209,7 @@ ttydev_v_raise(struct terminal *__restrict self,
 	fg = ttydev_getfproc(term);
 	if (fg) {
 		FINALLY_DECREF_UNLIKELY(fg);
-		task_raisesignalprocessgroup(fg, signo);
+		_task_raisesignoprocessgroup(fg, signo);
 		task_serve();
 	}
 	return 0;

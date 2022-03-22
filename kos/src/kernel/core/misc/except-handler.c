@@ -37,6 +37,7 @@
 #include <kernel/types.h>
 #include <sched/arch/task.h>
 #include <sched/cpu.h>
+#include <sched/cred.h>
 #include <sched/enum.h>
 #include <sched/group.h>
 #include <sched/rpc-internal.h>
@@ -645,6 +646,118 @@ again_switch_action_handler:
 		if (!new_state)
 			return true;
 		ctx->rc_state = new_state;
+	}
+
+	/* User-space RPCs are _always_ required (or at least expected)
+	 * to restart system calls, meaning  that once the first  one's
+	 * been executed, any that come after have to be told that they
+	 * will return to an async user-space location (rather than  to
+	 * another system call)
+	 *
+	 * NOTE: In actuality, `_RPC_REASONCTX_SYNC' is passed as reason
+	 *       for any additional RPCs */
+	ctx->rc_context = RPC_REASONCTX_SYSRET;
+	return true;
+}
+
+/* Helper function for `userexcept_handler()' and `userexcept_sysret()'
+ * @return: true:  RPC was handled.
+ * @return: false: RPC cannot be handled right now; Load other RPCs and try again */
+PRIVATE WUNUSED NONNULL((1, 2)) bool
+NOTHROW(FCALL userexcept_exec_user_signo_rpc)(/*in|out*/ struct rpc_context *__restrict ctx,
+                                              /*in|out*/ struct exception_info *__restrict error,
+                                              signo_t signo) {
+	/* Because signals handled here must properly integrate with  other
+	 * RPCs, as well as the current `error', we can't just make use  of
+	 * `userexcept_raisesignal_from_exception()', but have to implement
+	 * signal action handling ourselves.
+	 *
+	 * This is required for signal actions such as SIG_CORE, or
+	 * SIG_STOP, which introduce  custom control routing  which
+	 * could otherwise interfere with normal RPC handling. */
+	struct kernel_sigaction action;
+	assert(signo != 0);
+	assert(signo < NSIG);
+again_load_threadsig_action:
+	sighand_getaction(signo, &action);
+
+	/* Custom handlers. */
+again_switch_action_handler:
+	switch ((uintptr_t)action.sa_handler) {
+
+	case __SIG_DFL:
+		action.sa_handler = sighand_default_action(signo);
+		goto again_switch_action_handler;
+
+	case __SIG_IGN:
+		/* Ignored */
+		break;
+
+	case __SIG_CONT:
+		/* Undo the effects of `SIG_STOP' */
+		if (error->ei_code == EXCEPT_CODEOF(_E_STOP_PROCESS))
+			error->ei_code = EXCEPT_CODEOF(E_OK);
+		break;
+
+	case __SIG_TERM: {
+		except_code_t code;
+		code = EXCEPT_CODEOF(E_EXIT_PROCESS);
+		__IF0 { case __SIG_EXIT: code = EXCEPT_CODEOF(E_EXIT_THREAD); }
+		__IF0 { case __SIG_STOP: code = EXCEPT_CODEOF(_E_STOP_PROCESS); }
+		__IF0 { case __SIG_CORE: code = EXCEPT_CODEOF(_E_CORE_PROCESS); }
+
+		/* If applicable, override the active return-exception. */
+		if (except_priority(error->ei_code) < except_priority(code)) {
+			union wait reason;
+			reason.w_status = W_EXITCODE(1, signo);
+			bzero(error, sizeof(struct exception_info));
+			error->ei_code = code;
+			if (action.sa_handler == SIG_CORE) {
+				error->ei_data.e_args.e_pointers[1] = signo;
+				error->ei_data.e_args.e_pointers[2] = SI_KERNEL; /* ??? */
+				reason.w_status |= WCOREFLAG;
+			} else if (action.sa_handler == SIG_STOP) {
+				reason.w_status = W_STOPCODE(signo);
+			}
+			error->ei_data.e_args.e_pointers[0] = reason.w_status;
+		}
+	}	break;
+
+	default: {
+		siginfo_t info;
+		bzero(&info, sizeof(info));
+		info.si_signo = signo;
+		info.si_code  = SI_KERNEL; /* ??? */
+		info.si_pid   = 1;         /* (init?) */
+//		info.si_uid   = 0;         /* (root?) */
+		TRY {
+			struct icpustate *newstate;
+
+			/* "Normal" invoke-userspace-function signal action */
+			newstate = userexcept_callsignal_and_maybe_restart_syscall(ctx->rc_state, &action, &info,
+			                                                           ctx->rc_context == RPC_REASONCTX_SYSCALL
+			                                                           ? &ctx->rc_scinfo
+			                                                           : NULL);
+
+			/* When  `userexcept_callsignal_and_maybe_restart_syscall()'  returns `NULL',
+			 * a race condition is indicated where the user-defined signal action changed
+			 * before the handler function could be invoked.
+			 * This is important to ensure that `SA_RESETHAND' works atomically. */
+			if (newstate == NULL)
+				goto again_load_threadsig_action;
+			ctx->rc_state = newstate;
+		} EXCEPT {
+			/* Prioritize errors. */
+			struct exception_info *tls = except_info();
+			if (tls->ei_code == EXCEPT_CODEOF(E_INTERRUPT_USER_RPC))
+				return false; /* Load other RPCs and try again. */
+			if (except_priority(error->ei_code) < except_priority(tls->ei_code)) {
+				memcpy(error, tls, sizeof(struct exception_info));
+				ctx->rc_context = RPC_REASONCTX_SYSRET; /* Will need to return to user-space to handle this exception */
+			}
+		}
+	}	break;
+
 	}
 
 	/* User-space RPCs are _always_ required (or at least expected)

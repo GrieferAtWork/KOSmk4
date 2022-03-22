@@ -117,6 +117,7 @@ NOTHROW(FCALL terminate_pending_rpcs)(struct task *__restrict caller) {
 	/* Mark the RPC list as terminated and load remaining RPCs. */
 	remain = ATOMIC_XCH(FORTASK(caller, this_rpcs.slh_first),
 	                    THIS_RPCS_TERMINATED);
+	ATOMIC_OR(FORTASK(caller, this_sig_pend), 1);
 	assertf(remain != THIS_RPCS_TERMINATED,
 	        "We're the only ones that ever set this, "
 	        "so what; did we get called twice?");
@@ -332,6 +333,7 @@ NOTHROW(FCALL task_exit)(uint16_t w_status) {
 			assert(PREEMPTION_ENABLED());
 			procctl_sig_write(ctl); /* Never throws because preemption is enabled */
 			rpcs = ATOMIC_XCH(ctl->pc_sig_list.slh_first, THIS_RPCS_TERMINATED);
+			ATOMIC_OR(ctl->pc_sig_pend, 1); /* Indicate that further pending signals won't be served. */
 			procctl_sig_endwrite(ctl);
 			task_asyncrpc_destroy_list_for_shutdown(rpcs);
 		}

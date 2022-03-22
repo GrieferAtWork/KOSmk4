@@ -146,7 +146,7 @@ rpc_schedule_in_this_task(struct pending_rpc *__restrict rpc,
 		struct process_pending_rpcs *rpcs;
 		rpcs = &THIS_PROCESS_RPCS;
 		process_pending_rpcs_write(rpcs);
-		SLIST_TRYREMOVE(&rpcs->ppr_list, rpc, pr_link, { did_remove = false; });
+		SLIST_TRYREMOVE(&rpcs->pc_sig_list, rpc, pr_link, { did_remove = false; });
 		process_pending_rpcs_endwrite(rpcs);
 		if unlikely(!did_remove) {
 			/* Failed to remove -> Some other thread already came across it, but because
@@ -157,7 +157,7 @@ rpc_schedule_in_this_task(struct pending_rpc *__restrict rpc,
 				 * we can't re-use the same RPC descriptor, since this one must have  it's
 				 * status kept as `PENDING_USER_RPC_STATUS_CANCELED'. If we were to change
 				 * that, then the other thread currently executing it might end up missing
-				 * the momo on its cancellation.
+				 * the memo on its cancellation.
 				 *
 				 * As such, our only option is to create a duplicate of the descriptor
 				 * and let the original be lazily cleaned up. */
@@ -180,7 +180,7 @@ rpc_schedule_in_this_task(struct pending_rpc *__restrict rpc,
 				incref(&rpc->pr_user);
 			}
 		} else {
-			/* Reference was inherited from `&rpcs->ppr_list' */
+			/* Reference was inherited from `&rpcs->pc_sig_list' */
 		}
 	} else {
 		/* The per-task RPC list is thread-private, so no-one should

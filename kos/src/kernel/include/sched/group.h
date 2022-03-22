@@ -417,7 +417,6 @@ struct procctl {
 	                                           * NOTE: User-RPCs must not have the `RPC_SYNCMODE_F_REQUIRE_SC'
 	                                           *       or `RPC_SYNCMODE_F_REQUIRE_CP'  flag set.  If they  do,
 	                                           *       an internal assertion check will trigger. */
-#if 0 /* TODO */
 	/* Posix says:
 	 * """
 	 * [...] it is implementation-defined  as to whether  the signal is  delivered or accepted  more
@@ -435,11 +434,15 @@ struct procctl {
 	                                           * that should  be delivered  to some  thread within  this
 	                                           * process. Bit `1 << N' in this set behaves identical  to
 	                                           * a `struct pending_rpc' in `pc_sig_list' that  indicates
-	                                           * a signal `RPC_SIGNO(N)'. */
+	                                           * a signal `RPC_SIGNO(N)'.
+	                                           *
+	                                           * NOTE: In order to atomically detect terminated processes,
+	                                           *       we make use of bit#0, which (if set) indicates that
+	                                           *       the process has exited (and further changes to  the
+	                                           *       other fields are meaningless) */
 #if __SIZEOF_POINTER__ > 4
 	byte_t                  _pc_pad[__SIZEOF_POINTER__ - 4]; /* ... */
 #endif /* __SIZEOF_POINTER__ > 4 */
-#endif
 	struct sig               pc_sig_more;     /* A signal that is broadcast whenever something is added to `pc_sig_list'
 	                                           * This  signal is _only_  used to implement  `signalfd(2)', as you're not
 	                                           * normally supposed to "wait" for signals to arrive; you just always  get

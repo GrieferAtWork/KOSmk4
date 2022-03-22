@@ -19,9 +19,9 @@
  */
 #ifdef __INTELLISENSE__
 #include "rpc.c"
-//#define    DEFINE_task_serve_with_icpustate
+#define    DEFINE_task_serve_with_icpustate
 //#define DEFINE_task_serve_with_icpustate_nx
-#define DEFINE_task_serve_with_icpustate_and_sigmask
+//#define DEFINE_task_serve_with_icpustate_and_sigmask
 #endif /* __INTELLISENSE__ */
 
 #include <sched/sigaction.h>
@@ -248,37 +248,117 @@ handle_pending:
 		assert(ctx.rc_context == RPC_REASONCTX_SYNC);
 	}
 
-#ifdef LOCAL_NOEXCEPT
-	/* Unmasked process RPCs also require that we unwind the system call. */
-	if (!(result & TASK_SERVE_NX_EXCEPT)) {
-		if (are_any_unmasked_process_rpcs_maybe_pending_nx())
-			result |= TASK_SERVE_NX_EXCEPT;
-	}
-	icpustate_setreturn(ctx.rc_state, result);
-	return ctx.rc_state;
-#else /* LOCAL_NOEXCEPT */
+#ifndef LOCAL_NOEXCEPT
 	/* Check if we must throw a new exception. */
 	if (error.ei_code != EXCEPT_CODEOF(E_OK)) {
 		memcpy(except_info(), &error, sizeof(error));
 		unwind_current_exception_at_icpustate(ctx.rc_state);
 	}
+#endif /* !LOCAL_NOEXCEPT */
+
+
 
 	/* Unmasked process RPCs also require that we unwind the system call. */
-	if (!must_unwind) {
+#ifdef LOCAL_NOEXCEPT
+	if (!(result & TASK_SERVE_NX_EXCEPT))
+#else /* LOCAL_NOEXCEPT */
+	if (!must_unwind)
+#endif /* !LOCAL_NOEXCEPT */
+	{
+		/* Check for pending, active bitset-style RPCs */
+		uint32_t pending_bitset;
+		pending_bitset = PERTASK_GET(this_sig_pend);
+		pending_bitset &= ~PERTASK_GET(this_sig_pend_inactive);
+		if (pending_bitset != 0) {
+			/* Check if any of the signals from `pending_bitset' are unmasked. */
+#ifdef LOCAL_HAVE_SIGMASK
+			if (((pending_bitset >> 1) & ~(uint32_t)sigmask->__val[0]) != 0)
+				goto yes_have_pending_rpcs;
+#else /* LOCAL_HAVE_SIGMASK */
+			signo_t signo;
+			for (signo = 1; signo <= 31; ++signo) {
+				uint32_t signo_mask = (uint32_t)1 << signo;
+				sighandler_t func;
+				struct sighand_ptr *handptr;
+				if (!(pending_bitset & signo_mask))
+					continue;
+				/* NOTE: `sigmask_ismasked_chk_nopf()' returns one of:
+				 *  - SIGMASK_ISMASKED_NOPF_YES:   Signal is masked
+				 *  - SIGMASK_ISMASKED_NOPF_NO:    Signal isn't masked
+				 *  - SIGMASK_ISMASKED_NOPF_FAULT: Unable to access userprocmask */
+				int status = sigmask_ismasked_nopf(signo);
+				if (status == SIGMASK_ISMASKED_NOPF_YES)
+					continue; /* Signal is known to be masked! (so skip) */
+				func    = SIG_DFL;
+				handptr = THIS_SIGHAND_PTR;
+				if (handptr != NULL) {
+					struct sighand *hand;
+					if (!atomic_rwlock_read_nx(&handptr->sp_lock)) {
+						assert(!PREEMPTION_ENABLED());
+						PREEMPTION_ENABLE();
+						icpustate_setpreemption(ctx.rc_state, 1);
+#ifdef LOCAL_NOEXCEPT
+						result |= TASK_SERVE_NX_DIDRUN;
+#else /* LOCAL_NOEXCEPT */
+						did_serve_rpcs = true;
+#endif /* !LOCAL_NOEXCEPT */
+						/* This can't throw  because it only  could when  preemption
+						 * were disabled, which it isn't because we just enabled it! */
+						atomic_rwlock_read(&handptr->sp_lock);
+					}
+					if ((hand = handptr->sp_hand) != NULL)
+						func = hand->sh_actions[signo - 1].sa_handler;
+					atomic_rwlock_endread(&handptr->sp_lock);
+				}
+				if (func == SIG_DFL)
+					func = sighand_default_action(signo);
+				if (func == SIG_IGN) {
+					/* Yes: discard this signal. */
+					restore_plast = SLIST_PFIRST(&restore);
+					ATOMIC_AND(PERTASK(this_sig_pend), ~signo_mask);
+					continue;
+				}
+				goto yes_have_pending_rpcs;
+			}
+#endif /* !LOCAL_HAVE_SIGMASK */
+		}
+
+#ifdef LOCAL_NOEXCEPT
+#ifdef LOCAL_HAVE_SIGMASK
+		if (are_any_unmasked_process_rpcs_maybe_pending_with_sigmask_nx(sigmask))
+#else /* LOCAL_HAVE_SIGMASK */
+		if (are_any_unmasked_process_rpcs_maybe_pending_nx())
+#endif /* !LOCAL_HAVE_SIGMASK */
+#else /* LOCAL_NOEXCEPT */
 #ifdef LOCAL_HAVE_SIGMASK
 		if (are_any_unmasked_process_rpcs_pending_with_sigmask(sigmask))
 #else /* LOCAL_HAVE_SIGMASK */
 		if (are_any_unmasked_process_rpcs_pending())
 #endif /* !LOCAL_HAVE_SIGMASK */
+#endif /* !LOCAL_NOEXCEPT */
 		{
+yes_have_pending_rpcs:
+#ifdef LOCAL_NOEXCEPT
+			result |= TASK_SERVE_NX_EXCEPT;
+#else /* LOCAL_NOEXCEPT */
 			/* Enabling interrupts before throwing an exception is part of the ABI! */
 			PREEMPTION_ENABLE();
 			icpustate_setpreemption(ctx.rc_state, 1);
 			must_unwind = true;
+#endif /* !LOCAL_NOEXCEPT */
 		}
 	}
+
+	/* Throw an exception if we have to unwind. */
+#ifndef LOCAL_NOEXCEPT
 	if (must_unwind)
 		THROW(E_INTERRUPT_USER_RPC);
+#endif /* !LOCAL_NOEXCEPT */
+
+	/* Write-back the result. */
+#ifdef LOCAL_NOEXCEPT
+	icpustate_setreturn(ctx.rc_state, result);
+#else /* LOCAL_NOEXCEPT */
 	icpustate_setreturnbool(ctx.rc_state, did_serve_rpcs);
 #endif /* !LOCAL_NOEXCEPT */
 	return ctx.rc_state;

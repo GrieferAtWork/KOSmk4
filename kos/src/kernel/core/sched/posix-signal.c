@@ -268,6 +268,29 @@ done:
 }
 
 
+/* Same as `task_raisesignalprocessgroup()', but `signo' must be in range `1..31',
+ * allowing this function to use "non-queuing" signals, thus preventing the chance
+ * of running out of memory while trying to send a signal.
+ * NOTE: This function is unable to encode a sender PID/UID, and instead uses
+ *       defaults (s.a. `userexcept_exec_user_signo_rpc()') for this purpose. */
+PUBLIC NONNULL((1)) size_t FCALL
+_task_raisesignoprocessgroup(struct procgrp *__restrict group, signo_t signo)
+		THROWS(E_WOULDBLOCK) {
+	struct taskpid *member;
+	size_t proc_count = 0;
+	assert(signo >= 1 && signo <= 31);
+	/* Send a signal to every process within the group. */
+	procgrp_memb_read(group);
+	FOREACH_procgrp_memb(member, group) {
+		if (proc_sig_schedule(member, signo))
+			++proc_count;
+	}
+	procgrp_memb_endread(group);
+	return proc_count;
+}
+
+
+
 
 
 
