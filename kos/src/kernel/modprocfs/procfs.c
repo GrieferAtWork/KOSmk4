@@ -645,6 +645,7 @@ NOTHROW(FCALL initialize_timestamps)(struct fdirent *const *__restrict files, si
 		node->mf_atime = *tms;
 		node->mf_mtime = *tms;
 		node->mf_ctime = *tms;
+		node->mf_btime = *tms;
 
 		/* Assign Inode number */
 		node->fn_ino = (ino_t)skew_kernel_pointer(node);
@@ -671,6 +672,7 @@ PRIVATE DRIVER_INIT void KCALL procfs_init(void) {
 	procfs_super.fs_root.mf_atime = now;
 	procfs_super.fs_root.mf_mtime = now;
 	procfs_super.fs_root.mf_ctime = now;
+	procfs_super.fs_root.mf_btime = now;
 
 	/* Register the filesystem type. */
 	ffilesys_register(&procfs_filesys);

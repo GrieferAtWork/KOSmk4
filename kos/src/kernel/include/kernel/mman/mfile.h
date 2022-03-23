@@ -258,6 +258,7 @@ struct mfile_stream_ops {
 	 *   - st_atim    = mf_atime;
 	 *   - st_mtim    = mf_mtime;
 	 *   - st_ctim    = mf_ctime;
+	 *   - st_btim    = mf_btime;
 	 *   - All other fields have been pre-initialized to zero
 	 * As such, only the following fields always have fixed values:
 	 *   - st_dev
@@ -829,21 +830,14 @@ struct mfile {
 #define MFILE_INIT_mf_atime(mf_atime__tv_sec, mf_atime__tv_nsec) {{ { .tv_sec = mf_atime__tv_sec, .tv_nsec = mf_atime__tv_nsec }
 #define MFILE_INIT_mf_mtime(mf_mtime__tv_sec, mf_mtime__tv_nsec)    { .tv_sec = mf_mtime__tv_sec, .tv_nsec = mf_mtime__tv_nsec }
 #define MFILE_INIT_mf_ctime(mf_ctime__tv_sec, mf_ctime__tv_nsec)    { .tv_sec = mf_ctime__tv_sec, .tv_nsec = mf_ctime__tv_nsec } }}
+#define MFILE_INIT_mf_btime(mf_btime__tv_sec, mf_btime__tv_nsec)    { .tv_sec = mf_btime__tv_sec, .tv_nsec = mf_btime__tv_nsec } }}
 #endif /* __WANT_FS_INIT */
 	union {
 		struct {
-			struct timespec       mf_atime;      /* [lock(_MFILE_F_SMP_TSLOCK)][const_if(MFILE_F_NOATIME)][valid_if(!MFILE_F_DELETED)]
-			                                      * Last-accessed timestamp. NOTE!!!  Becomes invalid when  `MFILE_F_DELETED' is  set!
-			                                      * iow: After reading this field, you must first check if `MFILE_F_DELETED' is set
-			                                      *      before proceeding to use the data you've just read! */
-			struct timespec       mf_mtime;      /* [lock(_MFILE_F_SMP_TSLOCK)][const_if(MFILE_F_NOMTIME)][valid_if(!MFILE_F_DELETED)]
-			                                      * Last-modified timestamp. NOTE!!!  Becomes invalid when  `MFILE_F_DELETED' is  set!
-			                                      * iow: After reading this field, you must first check if `MFILE_F_DELETED' is set
-			                                      *      before proceeding to use the data you've just read! */
-			struct timespec       mf_ctime;      /* [const][valid_if(!MFILE_F_DELETED)]
-			                                      * Creation timestamp. NOTE!!! Becomes invalid when `MFILE_F_DELETED' is set!
-			                                      * iow: After reading this field, you must first check if `MFILE_F_DELETED' is set
-			                                      *      before proceeding to use the data you've just read! */
+			struct timespec       mf_atime;      /* ... */
+			struct timespec       mf_mtime;      /* ... */
+			struct timespec       mf_ctime;      /* ... */
+			struct timespec       mf_btime;      /* ... */
 		};
 
 #ifdef __WANT_MFILE__mf_lop
@@ -928,6 +922,7 @@ struct mfile {
 #define MFILE_INIT_mf_atime(mf_atime__tv_sec, mf_atime__tv_nsec) { .tv_sec = mf_atime__tv_sec, .tv_nsec = mf_atime__tv_nsec }
 #define MFILE_INIT_mf_mtime(mf_mtime__tv_sec, mf_mtime__tv_nsec) { .tv_sec = mf_mtime__tv_sec, .tv_nsec = mf_mtime__tv_nsec }
 #define MFILE_INIT_mf_ctime(mf_ctime__tv_sec, mf_ctime__tv_nsec) { .tv_sec = mf_ctime__tv_sec, .tv_nsec = mf_ctime__tv_nsec }
+#define MFILE_INIT_mf_btime(mf_btime__tv_sec, mf_btime__tv_nsec) { .tv_sec = mf_btime__tv_sec, .tv_nsec = mf_btime__tv_nsec }
 #endif /* __WANT_FS_INIT */
 	struct timespec               mf_atime;      /* [lock(_MFILE_F_SMP_TSLOCK)][const_if(MFILE_F_NOATIME)][valid_if(!MFILE_F_DELETED)]
 	                                              * Last-accessed timestamp. NOTE!!!  Becomes invalid when  `MFILE_F_DELETED' is  set!
@@ -938,7 +933,11 @@ struct mfile {
 	                                              * iow: After reading this field, you must first check if `MFILE_F_DELETED' is set
 	                                              *      before proceeding to use the data you've just read! */
 	struct timespec               mf_ctime;      /* [const][valid_if(!MFILE_F_DELETED)]
-	                                              * Creation timestamp. NOTE!!! Becomes invalid when `MFILE_F_DELETED' is set!
+	                                              * Last-changed timestamp. Same as `mf_mtime',  but whereas `mf_mtime' only  changes
+	                                              * when file data is altered, this one also changes when file attributes (other than
+	                                              * timestamps) are altered. (e.g. `chmod(2)', `chown(2)') */
+	struct timespec               mf_btime;      /* [const][valid_if(!MFILE_F_DELETED)]
+	                                              * Birth timestamp. NOTE!!! Becomes invalid when `MFILE_F_DELETED' is set!
 	                                              * iow: After reading this field, you must first check if `MFILE_F_DELETED' is set
 	                                              *      before proceeding to use the data you've just read! */
 #endif /* !__WANT_MFILE__mf_... */
@@ -1034,8 +1033,9 @@ EIDECLARE(NOBLOCK NONNULL((1)), void, NOTHROW, FCALL,
 
 
 /* Initialize common fields. The caller must still initialize:
- *  - mf_ops,  mf_parts,   mf_changed,  mf_part_amask,   mf_blockshift,
- *    mf_iobashift, mf_flags, mf_filesize, mf_atime, mf_mtime, mf_ctime */
+ *  - mf_ops, mf_parts, mf_changed, mf_part_amask, mf_blockshift,
+ *    mf_iobashift, mf_flags,  mf_filesize,  mf_atime,  mf_mtime,
+ *    mf_ctime, mf_btime */
 #define _mfile_init_common(self)           \
 	((self)->mf_refcnt = 1,                \
 	 atomic_rwlock_init(&(self)->mf_lock), \
@@ -1050,7 +1050,7 @@ EIDECLARE(NOBLOCK NONNULL((1)), void, NOTHROW, FCALL,
 	 __hybrid_assert((self)->mf_trunclock == 0))
 
 /* Initialize common+basic fields. The caller must still initialize:
- *  - mf_parts, mf_changed, mf_flags, mf_filesize, mf_atime, mf_mtime, mf_ctime */
+ *  - mf_parts, mf_changed, mf_flags, mf_filesize, mf_atime, mf_mtime, mf_ctime, mf_btime */
 #define _mfile_init(self, ops, block_shift, iobashift) \
 	(_mfile_init_common(self),                         \
 	 (self)->mf_ops = (ops),                           \

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfeea5713 */
+/* HASH CRC-32:0x46180ea6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2799,7 +2799,7 @@ INTERN_FUNCTION(libc_sys_epoll_pwait)
 END(libc_sys_epoll_pwait)
 DEFINE_PUBLIC_ALIAS(sys_epoll_pwait, libc_sys_epoll_pwait)
 
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
 /* errno_t utimensat(fd_t dirfd, char const *filename, struct timespecx32 const[2] times, atflag_t flags) */
 INTERN_FUNCTION(libc_sys_utimensat)
 	movl   $(0x140), %eax
@@ -3633,7 +3633,7 @@ INTERN_FUNCTION(libc_sys_timerfd_settime64)
 END(libc_sys_timerfd_settime64)
 DEFINE_PUBLIC_ALIAS(sys_timerfd_settime64, libc_sys_timerfd_settime64)
 
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
 /* errno_t utimensat_time64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
 INTERN_FUNCTION(libc_sys_utimensat_time64)
 	movl   $(0x19c), %eax
@@ -7251,7 +7251,7 @@ INTERN_FUNCTION(libc_sys_Xepoll_pwait)
 END(libc_sys_Xepoll_pwait)
 DEFINE_PUBLIC_ALIAS(sys_Xepoll_pwait, libc_sys_Xepoll_pwait)
 
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
 /* errno_t utimensat(fd_t dirfd, char const *filename, struct timespecx32 const[2] times, atflag_t flags) */
 INTERN_FUNCTION(libc_sys_Xutimensat)
 	movl   $(0x140), %eax
@@ -8085,7 +8085,7 @@ INTERN_FUNCTION(libc_sys_Xtimerfd_settime64)
 END(libc_sys_Xtimerfd_settime64)
 DEFINE_PUBLIC_ALIAS(sys_Xtimerfd_settime64, libc_sys_Xtimerfd_settime64)
 
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
 /* errno_t utimensat_time64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
 INTERN_FUNCTION(libc_sys_Xutimensat_time64)
 	movl   $(0x19c), %eax

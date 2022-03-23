@@ -1031,6 +1031,7 @@ got_active:
 	result->mf_atime = realtime();
 	result->mf_mtime = result->mf_atime;
 	result->mf_ctime = result->mf_atime;
+	result->mf_btime = result->mf_atime;
 	incref(self);       /* For `result->vlc_dev' */
 	incref(active_tty); /* For `result->vlc_oldtty' */
 	result->vlc_dev    = self;

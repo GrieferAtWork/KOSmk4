@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35dba521 */
+/* HASH CRC-32:0x19340a11 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1533,7 +1533,7 @@ __CDECLARE_SC(,__errno_t,ustat,(__dev_t __dev, struct ustat *__ubuf),(__dev,__ub
 __CDECLARE_SC(,__errno_t,utime,(char const *__filename, struct utimbuf const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_SC(utime) */
 #if __CRT_HAVE_SC(utimensat)
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
 __CDECLARE_SC(,__errno_t,utimensat,(__fd_t __dirfd, char const *__filename, struct timespec const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
 #endif /* __CRT_HAVE_SC(utimensat) */
 #if __CRT_HAVE_SC(utimes)
@@ -3007,7 +3007,7 @@ __CDECLARE_XSC(,__errno_t,ustat,(__dev_t __dev, struct ustat *__ubuf),(__dev,__u
 __CDECLARE_XSC(,__errno_t,utime,(char const *__filename, struct utimbuf const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_XSC(utime) */
 #if __CRT_HAVE_XSC(utimensat)
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
 __CDECLARE_XSC(,__errno_t,utimensat,(__fd_t __dirfd, char const *__filename, struct timespec const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
 #endif /* __CRT_HAVE_XSC(utimensat) */
 #if __CRT_HAVE_XSC(utimes)

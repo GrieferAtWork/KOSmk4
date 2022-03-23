@@ -135,6 +135,7 @@ NOTHROW(KCALL clnknode_v_linkstr)(struct flnknode *__restrict self) {
  *  - return->_clnknode_lnode_ _flnknode_node_ _fnode_file_ mf_atime
  *  - return->_clnknode_lnode_ _flnknode_node_ _fnode_file_ mf_mtime
  *  - return->_clnknode_lnode_ _flnknode_node_ _fnode_file_ mf_ctime
+ *  - return->_clnknode_lnode_ _flnknode_node_ _fnode_file_ mf_btime
  *  - return->_clnknode_lnode_ _flnknode_node_ fn_uid
  *  - return->_clnknode_lnode_ _flnknode_node_ fn_gid
  *  - return->_clnknode_lnode_ _flnknode_node_ fn_allnodes

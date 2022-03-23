@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32a2a8a4 */
+/* HASH CRC-32:0xdb205297 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,10 +58,10 @@ INTDEF NONNULL((1)) void (LIBCCALL libc_Mknod)(char const *nodename, mode_t mode
 /* >> mknodat(2) */
 INTDEF NONNULL((2)) void (LIBCCALL libc_MknodAt)(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev) THROWS(...);
 /* >> utimensat(2), utimensat64(2)
- * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
 INTDEF NONNULL((2)) void (LIBCCALL libc_UTimensAt)(fd_t dirfd, char const *filename, struct timespec const times[2 /*or:3*/], atflag_t flags) THROWS(...);
 /* >> utimensat(2), utimensat64(2)
- * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
 INTDEF NONNULL((2)) void (LIBCCALL libc_UTimensAt64)(fd_t dirfd, char const *filename, struct timespec64 const times[2 /*or:3*/], atflag_t flags) THROWS(...);
 /* >> futimens(2), futimens64(2) */
 INTDEF void (LIBCCALL libc_FUtimens)(fd_t fd, struct timespec const times[2 /*or:3*/]) THROWS(...);

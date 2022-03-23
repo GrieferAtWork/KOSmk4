@@ -504,6 +504,7 @@ err_cannot_open_file:
 		result->fs_root.mf_atime = realtime();
 		result->fs_root.mf_mtime = result->fs_root.mf_atime;
 		result->fs_root.mf_ctime = result->fs_root.mf_atime;
+		result->fs_root.mf_btime = result->fs_root.mf_atime;
 		result->fs_root.fn_nlink = 1;
 		assert(S_ISDIR(result->fs_root.fn_mode)); /* Only . */
 		result->fs_root.fn_uid   = 0;

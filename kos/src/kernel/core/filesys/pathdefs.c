@@ -121,10 +121,11 @@ PUBLIC struct ramfs_super fsuper_unmounted = {
 					                    MFILE_F_READONLY | MFILE_F_ROFLAGS),
 					MFILE_INIT_mf_trunclock,
 					MFILE_INIT_mf_filesize((uint64_t)-1),
-					/* TODO: Have an initializer that copies `boottime' into these 3! */
+					/* TODO: Have an initializer that copies `boottime' into these 4! */
 					MFILE_INIT_mf_atime(0, 0),
 					MFILE_INIT_mf_mtime(0, 0),
 					MFILE_INIT_mf_ctime(0, 0),
+					MFILE_INIT_mf_btime(0, 0),
 				},
 				FNODE_INIT_fn_nlink(1),
 				FNODE_INIT_fn_mode(S_IFDIR | 0755),

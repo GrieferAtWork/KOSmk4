@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x833f12fd */
+/* HASH CRC-32:0xaf9eda97 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -220,7 +220,7 @@
 #define SYS_timerfd_settime        __NR_timerfd_settime        /* errno_t timerfd_settime(fd_t timerfd, syscall_ulong_t flags, struct itimerspec const *utmr, struct itimerspec *otmr) */
 /* Return the next expiration time of UFD */
 #define SYS_timerfd_gettime        __NR_timerfd_gettime        /* errno_t timerfd_gettime(fd_t timerfd, struct itimerspec *otmr) */
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
 #define SYS_utimensat              __NR_utimensat              /* errno_t utimensat(fd_t dirfd, char const *filename, struct timespec const[2] times, atflag_t flags) */
 #define SYS_acct                   __NR_acct                   /* errno_t acct(char const *filename) */
 #define SYS_capget                 __NR_capget                 /* errno_t capget(int TODO_PROTOTYPE) */

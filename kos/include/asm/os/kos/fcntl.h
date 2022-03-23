@@ -106,14 +106,14 @@
 #define __AT_EMPTY_PATH        0x1000 /* Allow empty relative pathname. */
 #ifdef __KOS__
 #if __KOS_VERSION__ >= 300
-#define __AT_CHANGE_CTIME      0x0200 /* For use with `utimensat' and friends: Take `struct timespec[3]', where the 3rd entry
-                                       * (when not equal to  `UTIME_OMIT') is used to  override the file creation  timestamp.
+#define __AT_CHANGE_BTIME      0x0200 /* For use with `utimensat' and friends: Take `struct timespec[3]', where the 3rd entry
+                                       * (when not  equal to  `UTIME_OMIT') is  used to  override the  file brith  timestamp.
                                        * NOTE: Passing this flag when the 3rd  timespec isn't set to `UTIME_OMIT'  requires
                                        *       that the calling thread be holding the `CAP_SYS_TIME' permission and be  the
                                        *       owner of the file in question, or to be holding the `CAP_FOWNER' permission.
-                                       *       Less permissions are required when `UTIME_NOW' is passed, in which case
-                                       *      `CAP_SYS_TIME' is not required (similarly how having `CAP_FOWNER', or being
-                                       *       the owner would allow you to copy the file (updating the timestamp), then
+                                       *       Less permissions  are required  when `UTIME_NOW'  is passed,  in which  case
+                                       *       `CAP_SYS_TIME' is not required (similarly how having `CAP_FOWNER', or  being
+                                       *       the owner would allow  you to copy the  file (updating the timestamp),  then
                                        *       replacing the original)
                                        * NOTE: This flag is used to implement full compatibility with NT's SetFileTime function. */
 #define __AT_READLINK_REQSIZE  0x0200 /* For use with `freadlinkat' and friends.

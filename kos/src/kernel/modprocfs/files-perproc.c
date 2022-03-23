@@ -235,25 +235,28 @@ procfs_perproc_v_stat_common(struct mfile *__restrict self,
 
 		/* Creation-time: store the time when the thread was started. */
 		ts = task_getstarttime(thread);
-		result->st_ctimespec.tv_sec  = (typeof(result->st_ctimespec.tv_sec))ts.tv_sec;
-		result->st_ctimespec.tv_nsec = (typeof(result->st_ctimespec.tv_nsec))ts.tv_nsec;
+		result->st_btime     = ts.tv_sec;
+		result->st_btimensec = ts.tv_nsec;
 
-		/* Last-accessed + last-modified: store the last point in time when the thread got executed. */
+		/* a/m/c: store the last point in time when the thread got executed. */
 		ts = thread == THIS_TASK ? realtime() : ktime_to_timespec(FORTASK(thread, this_stoptime));
-		result->st_atimespec.tv_sec  = (typeof(result->st_atimespec.tv_sec))ts.tv_sec;
-		result->st_atimespec.tv_nsec = (typeof(result->st_atimespec.tv_nsec))ts.tv_nsec;
-		result->st_mtimespec.tv_sec  = (typeof(result->st_mtimespec.tv_sec))ts.tv_sec;
-		result->st_mtimespec.tv_nsec = (typeof(result->st_mtimespec.tv_nsec))ts.tv_nsec;
-
+		result->st_atime     = ts.tv_sec;
+		result->st_atimensec = ts.tv_nsec;
+		result->st_mtime     = ts.tv_sec;
+		result->st_mtimensec = ts.tv_nsec;
+		result->st_ctime     = ts.tv_sec;
+		result->st_ctimensec = ts.tv_nsec;
 	} else {
 		/* Fallback: just write the current time... */
-		struct timespec now          = realtime();
-		result->st_atimespec.tv_sec  = (typeof(result->st_atimespec.tv_sec))now.tv_sec;
-		result->st_atimespec.tv_nsec = (typeof(result->st_atimespec.tv_nsec))now.tv_nsec;
-		result->st_mtimespec.tv_sec  = (typeof(result->st_mtimespec.tv_sec))now.tv_sec;
-		result->st_mtimespec.tv_nsec = (typeof(result->st_mtimespec.tv_nsec))now.tv_nsec;
-		result->st_ctimespec.tv_sec  = (typeof(result->st_ctimespec.tv_sec))now.tv_sec;
-		result->st_ctimespec.tv_nsec = (typeof(result->st_ctimespec.tv_nsec))now.tv_nsec;
+		struct timespec now  = realtime();
+		result->st_atime     = now.tv_sec;
+		result->st_atimensec = now.tv_nsec;
+		result->st_mtime     = now.tv_sec;
+		result->st_mtimensec = now.tv_nsec;
+		result->st_ctime     = now.tv_sec;
+		result->st_ctimensec = now.tv_nsec;
+		result->st_btime     = now.tv_sec;
+		result->st_btimensec = now.tv_nsec;
 	}
 }
 

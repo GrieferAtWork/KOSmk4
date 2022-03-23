@@ -204,6 +204,7 @@ NOTHROW(KCALL ffifonode_v_destroy)(struct mfile *__restrict self);
  *  - self->_ffifonode_node_ _fnode_file_ mf_atime
  *  - self->_ffifonode_node_ _fnode_file_ mf_mtime
  *  - self->_ffifonode_node_ _fnode_file_ mf_ctime
+ *  - self->_ffifonode_node_ _fnode_file_ mf_btime
  *  - self->_ffifonode_node_ fn_uid
  *  - self->_ffifonode_node_ fn_gid
  *  - self->_ffifonode_node_ fn_allnodes

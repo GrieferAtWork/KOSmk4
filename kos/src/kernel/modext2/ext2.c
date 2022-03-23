@@ -364,6 +364,7 @@ ext2_blockindex(struct ext2idat *__restrict self,
  *  - node->mf_atime
  *  - node->mf_mtime
  *  - node->mf_ctime
+ *  - node->mf_btime
  *  - node->fn_nlink
  *  - node->fn_uid
  *  - node->fn_gid
@@ -388,8 +389,10 @@ NOTHROW(FCALL ext2_diskinode_decode)(Ext2DiskINode const *__restrict self,
 	node->mf_atime.tv_nsec = 0;
 	node->mf_mtime.tv_sec  = LETOH32(self->i_mtime);
 	node->mf_mtime.tv_nsec = 0;
-	node->mf_ctime.tv_sec  = LETOH32(self->i_ctime);
-	node->mf_ctime.tv_nsec = 0;
+	node->mf_ctime.tv_sec  = node->mf_mtime.tv_sec;
+	node->mf_ctime.tv_nsec = node->mf_mtime.tv_nsec;
+	node->mf_btime.tv_sec  = LETOH32(self->i_btime);
+	node->mf_btime.tv_nsec = 0;
 	node->fn_nlink         = LETOH16(self->i_nlink);
 	node->fn_uid           = (uid_t)LETOH16(self->i_uid);
 	node->fn_gid           = (gid_t)LETOH16(self->i_gid);
@@ -515,7 +518,7 @@ ext2_v_wrattr(struct fnode *__restrict self)
 	}
 	disk_inode.i_atime = HTOLE32((u32)self->mf_atime.tv_sec);
 	disk_inode.i_mtime = HTOLE32((u32)self->mf_mtime.tv_sec);
-	disk_inode.i_ctime = HTOLE32((u32)self->mf_ctime.tv_sec);
+	disk_inode.i_btime = HTOLE32((u32)self->mf_btime.tv_sec);
 	if (!mfile_issuper(self))
 		disk_inode.i_nlink = HTOLE16((u16)self->fn_nlink);
 	disk_inode.i_uid  = HTOLE16((u16)self->fn_uid);
@@ -967,6 +970,7 @@ PRIVATE struct flatsuper_ops const ext2_super_ops = {
 //TODO:	.so_truncate_atime = &ext2_super_v_truncate_atime,
 //TODO:	.so_truncate_mtime = &ext2_super_v_truncate_mtime,
 //TODO:	.so_truncate_ctime = &ext2_super_v_truncate_ctime,
+//TODO:	.so_truncate_btime = &ext2_super_v_truncate_btime,
 		.so_fdir = {
 			.dno_node = {
 				.no_file = {

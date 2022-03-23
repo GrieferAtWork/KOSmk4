@@ -122,7 +122,7 @@ again_readdir:
 	              ent->d_name, &st, AT_SYMLINK_NOFOLLOW) != 0)
 		goto again_readdir;
 	lpFindFileData->dwFileAttributes = libk32_FileAttributesFromStat(&st);
-	lpFindFileData->ftCreationTime   = libk32_TimeSpecToFileTime(&st.st_ctimespec64);
+	lpFindFileData->ftCreationTime   = libk32_TimeSpecToFileTime(&st.st_btimespec64);
 	lpFindFileData->ftLastAccessTime = libk32_TimeSpecToFileTime(&st.st_atimespec64);
 	lpFindFileData->ftLastWriteTime  = libk32_TimeSpecToFileTime(&st.st_mtimespec64);
 	lpFindFileData->nFileSizeHigh    = (DWORD)(st.st_size64 >> 32);
@@ -152,7 +152,7 @@ again_readdir:
 	              ent->d_name, &st, AT_SYMLINK_NOFOLLOW) != 0)
 		goto again_readdir;
 	lpFindFileData->dwFileAttributes = libk32_FileAttributesFromStat(&st);
-	lpFindFileData->ftCreationTime   = libk32_TimeSpecToFileTime(&st.st_ctimespec64);
+	lpFindFileData->ftCreationTime   = libk32_TimeSpecToFileTime(&st.st_btimespec64);
 	lpFindFileData->ftLastAccessTime = libk32_TimeSpecToFileTime(&st.st_atimespec64);
 	lpFindFileData->ftLastWriteTime  = libk32_TimeSpecToFileTime(&st.st_mtimespec64);
 	lpFindFileData->nFileSizeHigh    = (DWORD)(st.st_size64 >> 32);
@@ -733,7 +733,7 @@ libk32_GetFileAttributesExA(LPCSTR lpFileName,
 		if (DOS$klstat64(lpFileName, &st) != 0)
 			return INVALID_FILE_ATTRIBUTES;
 		info->dwFileAttributes     = libk32_FileAttributesFromStat(&st);
-		info->ftCreationTime       = libk32_TimeSpecToFileTime(&st.st_ctimespec64);
+		info->ftCreationTime       = libk32_TimeSpecToFileTime(&st.st_btimespec64);
 		info->ftLastAccessTime     = libk32_TimeSpecToFileTime(&st.st_atimespec64);
 		info->ftLastWriteTime      = libk32_TimeSpecToFileTime(&st.st_mtimespec64);
 		info->nFileSizeHigh        = (DWORD)(st.st_size64 >> 32);
@@ -810,7 +810,7 @@ libk32_GetFileInformationByHandle(HANDLE hFile, LPBY_HANDLE_FILE_INFORMATION lpF
 	if (fstat64(NTHANDLE_ASFD(hFile), &st) != 0)
 		return FALSE;
 	lpFileInformation->dwFileAttributes     = libk32_FileAttributesFromStat(&st);
-	lpFileInformation->ftCreationTime       = libk32_TimeSpecToFileTime(&st.st_ctimespec64);
+	lpFileInformation->ftCreationTime       = libk32_TimeSpecToFileTime(&st.st_btimespec64);
 	lpFileInformation->ftLastAccessTime     = libk32_TimeSpecToFileTime(&st.st_atimespec64);
 	lpFileInformation->ftLastWriteTime      = libk32_TimeSpecToFileTime(&st.st_mtimespec64);
 	lpFileInformation->dwVolumeSerialNumber = (DWORD)st.st_dev;
@@ -881,7 +881,7 @@ libk32_GetFileTime(HANDLE hFile,
 	if (fstat64(NTHANDLE_ASFD(hFile), &st) != 0)
 		return FALSE;
 	if (lpCreationTime)
-		*lpCreationTime = libk32_TimeSpecToFileTime(&st.st_ctimespec64);
+		*lpCreationTime = libk32_TimeSpecToFileTime(&st.st_btimespec64);
 	if (lpLastAccessTime)
 		*lpLastAccessTime = libk32_TimeSpecToFileTime(&st.st_atimespec64);
 	if (lpLastWriteTime)
@@ -911,7 +911,7 @@ libk32_SetFileTime(HANDLE hFile,
 		ts[1] = libk32_FileTimeToTimeSpec(lpLastWriteTime);
 	if (lpCreationTime) {
 		ts[2] = libk32_FileTimeToTimeSpec(lpCreationTime);
-		flags |= AT_CHANGE_CTIME;
+		flags |= AT_CHANGE_BTIME;
 	}
 	return utimensat64(NTHANDLE_ASFD(hFile), "", ts, flags) == 0;
 }

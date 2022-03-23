@@ -82,6 +82,7 @@ NOTHROW(KCALL fsocknode_v_destroy)(struct mfile *__restrict self);
  *  - self->_fsocknode_node_ _fnode_file_ mf_atime
  *  - self->_fsocknode_node_ _fnode_file_ mf_mtime
  *  - self->_fsocknode_node_ _fnode_file_ mf_ctime
+ *  - self->_fsocknode_node_ _fnode_file_ mf_btime
  *  - self->_fsocknode_node_ fn_uid
  *  - self->_fsocknode_node_ fn_gid
  *  - self->_fsocknode_node_ fn_allnodes

@@ -154,6 +154,7 @@ memfd_new(USER CHECKED char const *name)
 	result->mf_atime = realtime();
 	result->mf_mtime = result->mf_atime;
 	result->mf_ctime = result->mf_atime;
+	result->mf_btime = result->mf_atime;
 	result->mfd_name = memfd_name;
 	DBG_memset(&memfd_name->fd_ino, 0xcc, sizeof(memfd_name->fd_ino));
 	memfd_name->fd_refcnt  = 1; /* +1: result->mfd_name */

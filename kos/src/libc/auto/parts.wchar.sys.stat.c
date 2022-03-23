@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4029b4b6 */
+/* HASH CRC-32:0x25e17093 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -485,7 +485,7 @@ NOTHROW_RPC(LIBDCALL libd_wutimensat)(fd_t dirfd,
 	tms[0].tv_nsec = times[0].tv_nsec;
 	tms[1].tv_sec  = (time64_t)times[1].tv_sec;
 	tms[1].tv_nsec = times[1].tv_nsec;
-	if (flags & __AT_CHANGE_CTIME) {
+	if (flags & __AT_CHANGE_BTIME) {
 		tms[2].tv_sec  = (time64_t)times[2].tv_sec;
 		tms[2].tv_nsec = times[2].tv_nsec;
 	}
@@ -552,7 +552,7 @@ NOTHROW_RPC(LIBKCALL libc_wutimensat)(fd_t dirfd,
 	tms[0].tv_nsec = times[0].tv_nsec;
 	tms[1].tv_sec  = (time64_t)times[1].tv_sec;
 	tms[1].tv_nsec = times[1].tv_nsec;
-	if (flags & __AT_CHANGE_CTIME) {
+	if (flags & __AT_CHANGE_BTIME) {
 		tms[2].tv_sec  = (time64_t)times[2].tv_sec;
 		tms[2].tv_nsec = times[2].tv_nsec;
 	}

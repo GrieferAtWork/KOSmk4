@@ -166,19 +166,19 @@ NOTHROW(KCALL FatFileTime_Encode)(struct fat_filetime *__restrict self,
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL FatFileCTime_Encode)(struct fat_filectime *__restrict self,
+NOTHROW(FCALL FatFileBTime_Encode)(struct fat_filebtime *__restrict self,
                                    struct timespec const *__restrict value) {
-	FatFileDate_Encode(&self->fc_date, value->tv_sec);
-	FatFileTime_Encode(&self->fc_time, value->tv_sec);
-	self->fc_sectenth = (u8)(value->tv_nsec / (1000000000ul / 200ul));
+	FatFileDate_Encode(&self->fb_date, value->tv_sec);
+	FatFileTime_Encode(&self->fb_time, value->tv_sec);
+	self->fb_sectenth = (u8)(value->tv_nsec / (1000000000ul / 200ul));
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL FatFileCTime_Decode)(struct fat_filectime const *__restrict self,
+NOTHROW(FCALL FatFileBTime_Decode)(struct fat_filebtime const *__restrict self,
                                    struct timespec *__restrict result) {
-	result->tv_sec  = FatFileDate_Decode(&self->fc_date);
-	result->tv_sec += FatFileTime_Decode(&self->fc_time);
-	result->tv_nsec = (syscall_ulong_t)self->fc_sectenth * (1000000000ul / 200ul);
+	result->tv_sec  = FatFileDate_Decode(&self->fb_date);
+	result->tv_sec += FatFileTime_Decode(&self->fb_time);
+	result->tv_nsec = (syscall_ulong_t)self->fb_sectenth * (1000000000ul / 200ul);
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
@@ -743,7 +743,7 @@ again:
 	if likely(!flatdirent_wasdeleted(&ent->fad_ent)) {
 		FatClusterIndex first_cluster;
 		mode_t fmode;
-		struct timespec atm, mtm, ctm;
+		struct timespec atm, mtm, btm;
 		gid_t gid;
 		uid_t uid;
 
@@ -752,7 +752,7 @@ again:
 		fmode = self->fn_mode;
 		atm   = self->mf_atime;
 		mtm   = self->mf_mtime;
-		ctm   = self->mf_ctime;
+		btm   = self->mf_btime;
 		gid   = self->fn_gid;
 		uid   = self->fn_uid;
 		mfile_tslock_release(self);
@@ -819,7 +819,7 @@ again:
 
 		/* Convert timestamps. */
 		FatFileMTime_Encode(&ent->fad_dos.f_mtime, &mtm);
-		FatFileCTime_Encode(&ent->fad_dos.f_ctime, &ctm);
+		FatFileBTime_Encode(&ent->fad_dos.f_btime, &btm);
 
 		/* Set the ARCHIVE flag to indicate a file that has been modified. */
 		ent->fad_dos.f_attr |= FATATTR_ARCH;
@@ -1335,7 +1335,7 @@ Fat_GenerateFileEntries(struct fat_dirent files[FAT_DIRENT_PER_FILE_MAXCOUNT],
 		FatFileATime_Encode(&ent->fad_dos.f_atime, &file->mf_atime);
 	}
 	FatFileMTime_Encode(&ent->fad_dos.f_mtime, &file->mf_mtime);
-	FatFileCTime_Encode(&ent->fad_dos.f_ctime, &file->mf_ctime);
+	FatFileBTime_Encode(&ent->fad_dos.f_btime, &file->mf_btime);
 	fmode = file->fn_mode;
 	mfile_tslock_release(file);
 
@@ -1852,14 +1852,14 @@ fatdir_v_allocfile(struct flatdirnode *__restrict self,
 			FatFileATime_Encode(&hdr[0].f_atime, &fdir->mf_atime);
 		}
 		FatFileMTime_Encode(&hdr[0].f_mtime, &fdir->mf_mtime);
-		FatFileCTime_Encode(&hdr[0].f_ctime, &fdir->mf_ctime);
+		FatFileBTime_Encode(&hdr[0].f_btime, &fdir->mf_btime);
 		mfile_tslock_release(fdir);
 		hdr[1].f_atime             = hdr[0].f_atime;
 		hdr[1].f_mtime.fc_date     = hdr[0].f_mtime.fc_date;
 		hdr[1].f_mtime.fc_time     = hdr[0].f_mtime.fc_time;
-		hdr[1].f_ctime.fc_date     = hdr[0].f_ctime.fc_date;
-		hdr[1].f_ctime.fc_time     = hdr[0].f_ctime.fc_time;
-		hdr[1].f_ctime.fc_sectenth = hdr[0].f_ctime.fc_sectenth;
+		hdr[1].f_btime.fb_date     = hdr[0].f_btime.fb_date;
+		hdr[1].f_btime.fb_time     = hdr[0].f_btime.fb_time;
+		hdr[1].f_btime.fb_sectenth = hdr[0].f_btime.fb_sectenth;
 
 		/* Write the directory header into the directory stream file. */
 		mfile_writeall(fdir, hdr, sizeof(hdr), 0);
@@ -2819,7 +2819,7 @@ fatsuper_v_makenode(struct flatsuper *__restrict self,
 
 	/* Convert timestamps. */
 	FatFileMTime_Decode(&ent->fad_dos.f_mtime, &result->mf_mtime);
-	FatFileCTime_Decode(&ent->fad_dos.f_ctime, &result->mf_ctime);
+	FatFileBTime_Decode(&ent->fad_dos.f_btime, &result->mf_btime);
 	if (super->ft_features & FAT_FEATURE_UGID) {
 		/* In-built user/group ID support */
 		result->fn_uid = (uid_t)ent->fad_dos.f_uid;
@@ -2883,9 +2883,18 @@ NOTHROW(KCALL fatsuper_v_truncate_mtime)(struct fsuper *__restrict UNUSED(self),
 PRIVATE NONNULL((1, 2)) void
 NOTHROW(KCALL fatsuper_v_truncate_ctime)(struct fsuper *__restrict UNUSED(self),
                                          /*in|out*/ struct timespec *__restrict tms) {
-	struct fat_filectime ts;
-	FatFileCTime_Encode(&ts, tms);
-	FatFileCTime_Decode(&ts, tms);
+	COMPILER_IMPURE();
+	(void)tms;
+	/* TODO: Truncation must set `ctime = mtime'
+	 *       For this purpose, the timestamp-truncate interface must be redesigned! */
+}
+
+PRIVATE NONNULL((1, 2)) void
+NOTHROW(KCALL fatsuper_v_truncate_btime)(struct fsuper *__restrict UNUSED(self),
+                                         /*in|out*/ struct timespec *__restrict tms) {
+	struct fat_filebtime ts;
+	FatFileBTime_Encode(&ts, tms);
+	FatFileBTime_Decode(&ts, tms);
 }
 
 PRIVATE NONNULL((1)) void KCALL
@@ -2972,6 +2981,7 @@ PRIVATE struct flatsuper_ops const Fat16_SuperOps = {
 		.so_truncate_atime = &fatsuper_v_truncate_atime,
 		.so_truncate_mtime = &fatsuper_v_truncate_mtime,
 		.so_truncate_ctime = &fatsuper_v_truncate_ctime,
+		.so_truncate_btime = &fatsuper_v_truncate_btime,
 		.so_sync           = &fatsuper_v_sync,
 		.so_fdir = {
 			.dno_node = {
@@ -3013,6 +3023,7 @@ PRIVATE struct flatsuper_ops const Fat32_SuperOps = {
 		.so_truncate_atime = &fatsuper_v_truncate_atime,
 		.so_truncate_mtime = &fatsuper_v_truncate_mtime,
 		.so_truncate_ctime = &fatsuper_v_truncate_ctime,
+		.so_truncate_btime = &fatsuper_v_truncate_btime,
 		.so_sync           = &fatsuper_v_sync,
 		.so_fdir = {
 			.dno_node = {
@@ -3335,6 +3346,7 @@ fatfs_open(struct ffilesys *__restrict UNUSED(filesys),
 					DBG_memset(&fatfile->mf_atime, 0xcc, sizeof(fatfile->mf_atime));
 					DBG_memset(&fatfile->mf_mtime, 0xcc, sizeof(fatfile->mf_mtime));
 					DBG_memset(&fatfile->mf_ctime, 0xcc, sizeof(fatfile->mf_ctime));
+					DBG_memset(&fatfile->mf_btime, 0xcc, sizeof(fatfile->mf_btime));
 
 					/* Initialize custom fields. */
 					fatfile->mfsf_dev              = incref(dev);
@@ -3396,6 +3408,7 @@ fatfs_open(struct ffilesys *__restrict UNUSED(filesys),
 	result->ft_super.ffs_super.fs_root.mf_atime              = realtime();
 	result->ft_super.ffs_super.fs_root.mf_mtime              = result->ft_super.ffs_super.fs_root.mf_atime;
 	result->ft_super.ffs_super.fs_root.mf_ctime              = result->ft_super.ffs_super.fs_root.mf_atime;
+	result->ft_super.ffs_super.fs_root.mf_btime              = result->ft_super.ffs_super.fs_root.mf_atime;
 	result->ft_super.ffs_super.fs_root.fn_nlink              = 1;
 	result->ft_super.ffs_super.fs_root.fn_uid                = 0;
 	result->ft_super.ffs_super.fs_root.fn_gid                = 0;

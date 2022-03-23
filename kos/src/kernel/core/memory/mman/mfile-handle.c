@@ -1013,9 +1013,10 @@ handle_mfile_stat(struct mfile *__restrict self,
 	dev_t st_rdev;
 	pos_t st_size;
 	blksize_t st_blksize;
-	struct timespec st_atimespec;
-	struct timespec st_mtimespec;
-	struct timespec st_ctimespec;
+	struct timespec st_atim;
+	struct timespec st_mtim;
+	struct timespec st_ctim;
+	struct timespec st_btim;
 
 	mfile_tslock_acquire(self);
 	st_size = mfile_getsize(self);
@@ -1023,9 +1024,10 @@ handle_mfile_stat(struct mfile *__restrict self,
 		st_size = 0;
 	st_blksize = (blksize_t)self->mf_part_amask + 1;
 
-	memcpy(&st_atimespec, &self->mf_atime, sizeof(struct timespec));
-	memcpy(&st_mtimespec, &self->mf_mtime, sizeof(struct timespec));
-	memcpy(&st_ctimespec, &self->mf_ctime, sizeof(struct timespec));
+	memcpy(&st_atim, &self->mf_atime, sizeof(struct timespec));
+	memcpy(&st_mtim, &self->mf_mtime, sizeof(struct timespec));
+	memcpy(&st_ctim, &self->mf_ctime, sizeof(struct timespec));
+	memcpy(&st_btim, &self->mf_btime, sizeof(struct timespec));
 
 	st_dev = st_rdev = 0;
 	if (mfile_isnode(self)) {
@@ -1061,28 +1063,31 @@ handle_mfile_stat(struct mfile *__restrict self,
 
 	/* Check if the file has been deleted. If it has, timestamps are invalid. */
 	if (ATOMIC_READ(self->mf_flags) & MFILE_F_DELETED) {
-		bzero(&st_atimespec, sizeof(struct timespec));
-		bzero(&st_mtimespec, sizeof(struct timespec));
-		bzero(&st_ctimespec, sizeof(struct timespec));
+		bzero(&st_atim, sizeof(struct timespec));
+		bzero(&st_mtim, sizeof(struct timespec));
+		bzero(&st_ctim, sizeof(struct timespec));
+		bzero(&st_btim, sizeof(struct timespec));
 	}
 
 	/* Fill in generic default information */
-	result->st_dev               = (typeof(result->st_dev))st_dev;
-	result->st_ino               = (typeof(result->st_ino))st_ino;
-	result->st_mode              = (typeof(result->st_mode))st_mode;
-	result->st_nlink             = (typeof(result->st_nlink))st_nlink;
-	result->st_uid               = (typeof(result->st_uid))st_uid;
-	result->st_gid               = (typeof(result->st_gid))st_gid;
-	result->st_rdev              = (typeof(result->st_rdev))st_rdev;
-	result->st_size              = (typeof(result->st_size))st_size;
-	result->st_blksize           = (typeof(result->st_blksize))st_blksize;
-	result->st_blocks            = (typeof(result->st_blocks))CEILDIV(st_size, st_blksize);
-	result->st_atimespec.tv_sec  = (typeof(result->st_atimespec.tv_sec))st_atimespec.tv_sec;
-	result->st_atimespec.tv_nsec = (typeof(result->st_atimespec.tv_nsec))st_atimespec.tv_nsec;
-	result->st_mtimespec.tv_sec  = (typeof(result->st_mtimespec.tv_sec))st_mtimespec.tv_sec;
-	result->st_mtimespec.tv_nsec = (typeof(result->st_mtimespec.tv_nsec))st_mtimespec.tv_nsec;
-	result->st_ctimespec.tv_sec  = (typeof(result->st_ctimespec.tv_sec))st_ctimespec.tv_sec;
-	result->st_ctimespec.tv_nsec = (typeof(result->st_ctimespec.tv_nsec))st_ctimespec.tv_nsec;
+	result->st_dev       = (typeof(result->st_dev))st_dev;
+	result->st_ino       = (typeof(result->st_ino))st_ino;
+	result->st_mode      = (typeof(result->st_mode))st_mode;
+	result->st_nlink     = (typeof(result->st_nlink))st_nlink;
+	result->st_uid       = (typeof(result->st_uid))st_uid;
+	result->st_gid       = (typeof(result->st_gid))st_gid;
+	result->st_rdev      = (typeof(result->st_rdev))st_rdev;
+	result->st_size      = (typeof(result->st_size))st_size;
+	result->st_blksize   = (typeof(result->st_blksize))st_blksize;
+	result->st_blocks    = (typeof(result->st_blocks))CEILDIV(st_size, st_blksize);
+	result->st_atime     = st_atim.tv_sec;
+	result->st_atimensec = st_atim.tv_nsec;
+	result->st_mtime     = st_mtim.tv_sec;
+	result->st_mtimensec = st_mtim.tv_nsec;
+	result->st_ctime     = st_ctim.tv_sec;
+	result->st_ctimensec = st_ctim.tv_nsec;
+	result->st_btime     = st_btim.tv_sec;
+	result->st_btimensec = st_btim.tv_nsec;
 
 	/* If defined, invoke a stat information override callback. */
 	{

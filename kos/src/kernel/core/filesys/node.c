@@ -574,6 +574,7 @@ fnode_chmod(struct fnode *__restrict self, mode_t perm_mask,
             mode_t perm_flag, bool check_permissions)
 		THROWS(E_FSERROR_READONLY, E_INSUFFICIENT_RIGHTS) {
 	mode_t old_mode, new_mode;
+	struct timespec now = realtime();
 
 	/* Check if file attributes may be modified. */
 	if unlikely(self->mf_flags & MFILE_FN_ATTRREADONLY)
@@ -653,6 +654,8 @@ again_check_permissions:
 	new_mode = (old_mode & perm_mask) | perm_flag;
 	/* Set the new file mode. */
 	ATOMIC_WRITE(self->fn_mode, new_mode);
+	if (old_mode != new_mode)
+		self->mf_ctime = now; /* Attributes-changed */
 	mfile_tslock_release(self);
 
 	/* Broadcast that mode bits have changed. */
@@ -675,6 +678,7 @@ fnode_chown(struct fnode *__restrict self, uid_t owner, gid_t group,
             bool check_permissions)
 		THROWS(E_SEGFAULT, E_FSERROR_READONLY,
 		       E_INSUFFICIENT_RIGHTS, E_INVALID_ARGUMENT_BAD_VALUE) {
+	struct timespec now = realtime();
 	bool changed = false;
 	uid_t old_owner, new_owner;
 	gid_t old_group, new_group;
@@ -783,9 +787,10 @@ again_read_old_values:
 		}
 
 		/* Actually write the new owner/group */
-		self->fn_uid = new_owner;
-		self->fn_gid = new_group;
-		changed = true;
+		self->fn_uid   = new_owner;
+		self->fn_gid   = new_group;
+		self->mf_ctime = now; /* Attributes-changed */
+		changed        = true;
 	}
 	mfile_tslock_release(self);
 
@@ -796,15 +801,32 @@ again_read_old_values:
 
 
 
+PRIVATE NOBLOCK NONNULL((1)) bool
+NOTHROW(FCALL maybe_set_timestamp)(struct timespec *__restrict dst,
+                                   struct timespec const *src) {
+	if (src != NULL && (dst->tv_sec != src->tv_sec ||
+	                    dst->tv_nsec != src->tv_nsec)) {
+		dst->tv_sec  = src->tv_sec;
+		dst->tv_nsec = src->tv_nsec;
+		return true;
+	}
+	return false;
+}
+
+
 /* Change all non-NULL the timestamp that are given.
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: The `MFILE_F_DELETED' is set.
- * @throw: E_FSERROR_READONLY: The `MFILE_FN_ATTRREADONLY' flag is (or was) set. */
-PUBLIC NONNULL((1)) void KCALL
+ * @throw: E_FSERROR_READONLY: The `MFILE_FN_ATTRREADONLY' flag is (or was) set.
+ * @return: true:  File attributes were changed.
+ * @return: false: File attributes remain unchanged (ctime wasn't updated). */
+PUBLIC NONNULL((1)) bool KCALL
 mfile_chtime(struct mfile *__restrict self,
              struct timespec const *new_atime,
              struct timespec const *new_mtime,
-             struct timespec const *new_ctime)
+             struct timespec const *new_btime)
 		THROWS(E_FSERROR_READONLY) {
+	struct timespec now = realtime();
+	bool changed;
 	if unlikely(self->mf_flags & MFILE_FN_ATTRREADONLY)
 		THROW(E_FSERROR_READONLY);
 	mfile_tslock_acquire(self);
@@ -817,22 +839,16 @@ mfile_chtime(struct mfile *__restrict self,
 		THROW(E_FSERROR_DELETED, E_FILESYSTEM_DELETED_FILE);
 	}
 	/* Fill in new timestamps. */
-	if (new_atime) {
-		self->mf_atime.tv_sec  = new_atime->tv_sec;
-		self->mf_atime.tv_nsec = new_atime->tv_nsec;
-	}
-	if (new_mtime) {
-		self->mf_mtime.tv_sec  = new_mtime->tv_sec;
-		self->mf_mtime.tv_nsec = new_mtime->tv_nsec;
-	}
-	if (new_ctime) {
-		self->mf_ctime.tv_sec  = new_ctime->tv_sec;
-		self->mf_ctime.tv_nsec = new_ctime->tv_nsec;
-	}
+	changed = maybe_set_timestamp(&self->mf_atime, new_atime);
+	changed |= maybe_set_timestamp(&self->mf_mtime, new_mtime);
+	changed |= maybe_set_timestamp(&self->mf_btime, new_btime);
+	if (changed)
+		self->mf_ctime = now; /* Attributes-changed */
 	mfile_tslock_release(self);
 
 	/* Mark attributes of this file as having changed. */
 	mfile_changed(self, MFILE_F_ATTRCHANGED);
+	return changed;
 }
 
 

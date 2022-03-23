@@ -937,6 +937,7 @@ handle_existing:
 		node->mf_atime      = info->mkf_creat.c_atime;
 		node->mf_mtime      = info->mkf_creat.c_mtime;
 		node->mf_ctime      = info->mkf_creat.c_ctime;
+		node->mf_btime      = info->mkf_creat.c_btime;
 		node->fn_nlink      = 1;
 		node->fn_mode       = info->mkf_fmode;
 		node->fn_uid        = info->mkf_creat.c_owner;

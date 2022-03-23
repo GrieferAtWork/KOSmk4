@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb86b134c */
+/* HASH CRC-32:0x22ac6c9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -121,7 +121,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c32utimensat) __ATTR_NONNULL((2)) int
 __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32utimensat))(__fd_t __dirfd, __CHAR32_TYPE__ const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags) {
 #if (defined(__CRT_HAVE_wutimensat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wutimensat)
-#ifdef __AT_CHANGE_CTIME
+#ifdef __AT_CHANGE_BTIME
 	struct __timespec32 __tms[3];
 	if (!__times)
 		return (__NAMESPACE_LOCAL_SYM __localdep_crt_c32utimensat32)(__dirfd, __filename, __NULLPTR, __flags);
@@ -129,12 +129,12 @@ __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32utimensat))(__fd_t __dirfd, __CHAR
 	__tms[0].tv_nsec = __times[0].tv_nsec;
 	__tms[1].tv_sec  = (__time32_t)__times[1].tv_sec;
 	__tms[1].tv_nsec = __times[1].tv_nsec;
-	if (__flags & __AT_CHANGE_CTIME) {
+	if (__flags & __AT_CHANGE_BTIME) {
 		__tms[2].tv_sec  = (__time32_t)__times[2].tv_sec;
 		__tms[2].tv_nsec = __times[2].tv_nsec;
 	}
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_c32utimensat32)(__dirfd, __filename, __tms, __flags);
-#else /* __AT_CHANGE_CTIME */
+#else /* __AT_CHANGE_BTIME */
 	struct __timespec32 __tms[2];
 	if (!__times)
 		return (__NAMESPACE_LOCAL_SYM __localdep_crt_c32utimensat32)(__dirfd, __filename, __NULLPTR, __flags);
@@ -143,9 +143,9 @@ __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32utimensat))(__fd_t __dirfd, __CHAR
 	__tms[1].tv_sec  = (__time32_t)__times[1].tv_sec;
 	__tms[1].tv_nsec = __times[1].tv_nsec;
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_c32utimensat32)(__dirfd, __filename, __tms, __flags);
-#endif /* !__AT_CHANGE_CTIME */
+#endif /* !__AT_CHANGE_BTIME */
 #elif (defined(__CRT_HAVE_wutimensat64) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wutimensat64)
-#ifdef __AT_CHANGE_CTIME
+#ifdef __AT_CHANGE_BTIME
 	struct __timespec64 __tms[3];
 	if (!__times)
 		return (__NAMESPACE_LOCAL_SYM __localdep_c32utimensat64)(__dirfd, __filename, __NULLPTR, __flags);
@@ -153,12 +153,12 @@ __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32utimensat))(__fd_t __dirfd, __CHAR
 	__tms[0].tv_nsec = __times[0].tv_nsec;
 	__tms[1].tv_sec  = (__time64_t)__times[1].tv_sec;
 	__tms[1].tv_nsec = __times[1].tv_nsec;
-	if (__flags & __AT_CHANGE_CTIME) {
+	if (__flags & __AT_CHANGE_BTIME) {
 		__tms[2].tv_sec  = (__time64_t)__times[2].tv_sec;
 		__tms[2].tv_nsec = __times[2].tv_nsec;
 	}
 	return (__NAMESPACE_LOCAL_SYM __localdep_c32utimensat64)(__dirfd, __filename, __tms, __flags);
-#else /* __AT_CHANGE_CTIME */
+#else /* __AT_CHANGE_BTIME */
 	struct __timespec64 __tms[2];
 	if (!__times)
 		return (__NAMESPACE_LOCAL_SYM __localdep_c32utimensat64)(__dirfd, __filename, __NULLPTR, __flags);
@@ -167,7 +167,7 @@ __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32utimensat))(__fd_t __dirfd, __CHAR
 	__tms[1].tv_sec  = (__time64_t)__times[1].tv_sec;
 	__tms[1].tv_nsec = __times[1].tv_nsec;
 	return (__NAMESPACE_LOCAL_SYM __localdep_c32utimensat64)(__dirfd, __filename, __tms, __flags);
-#endif /* !__AT_CHANGE_CTIME */
+#endif /* !__AT_CHANGE_BTIME */
 #else /* ... */
 	int __result;
 	char *__utf8_filename;

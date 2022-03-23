@@ -452,6 +452,7 @@ NOTHROW(FCALL mfile_add_changed_part)(struct mfile *__restrict self,
 				COMPILER_READ_BARRIER();
 				if (!(self->mf_flags & (MFILE_F_NOMTIME | MFILE_F_DELETED))) {
 					self->mf_mtime = now;
+					self->mf_ctime = now;
 					changes |= MFILE_F_ATTRCHANGED;
 				}
 				mfile_tslock_release(self);

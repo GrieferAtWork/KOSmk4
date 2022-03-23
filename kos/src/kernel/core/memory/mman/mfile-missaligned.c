@@ -222,10 +222,12 @@ mfile_create_missaligned_wrapper(struct mfile *__restrict inner,
 		result->mf_atime = inner->mf_atime;
 		result->mf_mtime = inner->mf_mtime;
 		result->mf_ctime = inner->mf_ctime;
+		result->mf_btime = inner->mf_btime;
 	} else {
 		result->mf_atime = realtime();
 		result->mf_mtime = result->mf_atime;
 		result->mf_ctime = result->mf_atime;
+		result->mf_btime = result->mf_atime;
 	}
 	mfile_tslock_release(inner);
 

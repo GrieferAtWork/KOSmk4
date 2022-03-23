@@ -48,7 +48,7 @@
                                                                   *              `KSYSCTL_OPEN_ROOT_PIDNS', `KSYSCTL_OPEN_BOOT_TASK' */
 #define CAP_DATABLOCK_DEANONYMIZE            CAP_SYS_RESOURCE    /* Allow use of `HOP_DATABLOCK_DEANONYMIZE' */
 #define CAP_DATABLOCK_OPEN_PART              CAP_SYS_RESOURCE    /* Allow use of `HOP_DATABLOCK_OPEN_PART' and `HOP_DATABLOCK_OPEN_PART_EXACT' */
-#define CAP_AT_CHANGE_CTIME                  CAP_SYS_TIME        /* Allow use of `AT_CHANGE_CTIME' */
+#define CAP_AT_CHANGE_BTIME                  CAP_SYS_TIME        /* Allow use of `AT_CHANGE_BTIME' */
 
 
 /*[[[enum]]]*/

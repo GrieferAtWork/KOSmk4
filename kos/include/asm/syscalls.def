@@ -1115,13 +1115,13 @@ ftruncate64:(fd_t fd, [reg64] uint64_t length) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-@@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH'
-[cp] utimensat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMESPEC_VEC2_OR_3:flags)] struct timespec const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH)] atflag_t flags) -> errno_t;
-[cp][doc_alias(utimensat)] utimensat32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMESPEC32_VEC2_OR_3:flags)] struct timespec32 const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH)] atflag_t flags) -> errno_t;
-[cp][doc_alias(utimensat)] utimensat64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMESPEC64_VEC2_OR_3:flags)] struct timespec64 const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH)] atflag_t flags) -> errno_t;
-[cp][doc_alias(utimensat)] utimensatx32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMESPECX32_VEC2_OR_3:flags)] struct timespecx32 const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH)] atflag_t flags) -> errno_t;
-[cp][doc_alias(utimensat)] utimensatx32_64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMESPECX32_64_VEC2_OR_3:flags)] struct timespecx32_64 const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH)] atflag_t flags) -> errno_t;
-[cp][doc_alias(utimensat)] utimensatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMESPECX64_VEC2_OR_3:flags)] struct timespecx64 const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH)] atflag_t flags) -> errno_t;
+@@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH'
+[cp] utimensat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMESPEC_VEC2_OR_3:flags)] struct timespec const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_BTIME__DOSPATH)] atflag_t flags) -> errno_t;
+[cp][doc_alias(utimensat)] utimensat32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMESPEC32_VEC2_OR_3:flags)] struct timespec32 const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_BTIME__DOSPATH)] atflag_t flags) -> errno_t;
+[cp][doc_alias(utimensat)] utimensat64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMESPEC64_VEC2_OR_3:flags)] struct timespec64 const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_BTIME__DOSPATH)] atflag_t flags) -> errno_t;
+[cp][doc_alias(utimensat)] utimensatx32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMESPECX32_VEC2_OR_3:flags)] struct timespecx32 const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_BTIME__DOSPATH)] atflag_t flags) -> errno_t;
+[cp][doc_alias(utimensat)] utimensatx32_64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMESPECX32_64_VEC2_OR_3:flags)] struct timespecx32_64 const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_BTIME__DOSPATH)] atflag_t flags) -> errno_t;
+[cp][doc_alias(utimensat)] utimensatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(STRUCT_TIMESPECX64_VEC2_OR_3:flags)] struct timespecx64 const times[2], [tostr(ATFLAG__SYMLINK_NOFOLLOW__CHANGE_BTIME__DOSPATH)] atflag_t flags) -> errno_t;
 %[endgroup]
 
 [cp] mount:([tostr(FILENAME)] char const *special_file,

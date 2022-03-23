@@ -606,6 +606,7 @@ UnixSocket_Bind(struct socket *__restrict self,
 		mki.mkf_creat.c_atime = realtime();
 		mki.mkf_creat.c_mtime = mki.mkf_creat.c_atime;
 		mki.mkf_creat.c_ctime = mki.mkf_creat.c_atime;
+		mki.mkf_creat.c_btime = mki.mkf_creat.c_atime;
 
 		/* Create the new file */
 		if (fdirnode_mkfile(bind_path->p_dir, &mki) == FDIRNODE_MKFILE_EXISTS)

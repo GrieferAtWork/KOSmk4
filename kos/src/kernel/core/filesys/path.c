@@ -1889,6 +1889,7 @@ path_open_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 			info.mkf_creat.c_atime = realtime();
 			info.mkf_creat.c_mtime = info.mkf_creat.c_atime;
 			info.mkf_creat.c_ctime = info.mkf_creat.c_atime;
+			info.mkf_creat.c_btime = info.mkf_creat.c_atime;
 
 #if 0 /* This can't be asserted here and instead happens while holding fs-specific
        * locks, after having learned that  the file to-be created doesn't  already

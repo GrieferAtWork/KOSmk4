@@ -954,6 +954,7 @@ devdiskrule_vallocf(size_t sizeof_devdiskruledir,
 	dir->mf_atime = realtime();
 	dir->mf_mtime = dir->mf_atime;
 	dir->mf_ctime = dir->mf_atime;
+	dir->mf_btime = dir->mf_atime;
 
 	/* Return the newly constructed rule. */
 	return pdat.ddp_base;

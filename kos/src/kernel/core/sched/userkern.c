@@ -227,6 +227,7 @@ PUBLIC struct mfile userkern_segment_file = {
 	.mf_atime      = { .tv_sec = 0, .tv_nsec = 0 },
 	.mf_mtime      = { .tv_sec = 0, .tv_nsec = 0 },
 	.mf_ctime      = { .tv_sec = 0, .tv_nsec = 0 },
+	.mf_btime      = { .tv_sec = 0, .tv_nsec = 0 },
 };
 
 
@@ -353,6 +354,7 @@ PUBLIC struct mfile userkern_segment_file_compat = {
 	.mf_atime      = { .tv_sec = 0, .tv_nsec = 0 },
 	.mf_mtime      = { .tv_sec = 0, .tv_nsec = 0 },
 	.mf_ctime      = { .tv_sec = 0, .tv_nsec = 0 },
+	.mf_btime      = { .tv_sec = 0, .tv_nsec = 0 },
 };
 #endif /* __ARCH_HAVE_COMPAT */
 

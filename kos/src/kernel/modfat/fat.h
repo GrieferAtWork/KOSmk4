@@ -99,10 +99,10 @@ struct ATTR_PACKED fat_filedate {
 	};
 };
 
-struct ATTR_PACKED fat_filectime {
-	u8 fc_sectenth;      /* Creation time in 10ms resolution (0-199). */
-	struct fat_filetime fc_time; /* Creation time. */
-	struct fat_filedate fc_date; /* Creation date. */
+struct ATTR_PACKED fat_filebtime {
+	u8                  fb_sectenth; /* Birth time in 10ms resolution (0-199). */
+	struct fat_filetime fb_time;     /* Birth time. */
+	struct fat_filedate fb_date;     /* Birth date. */
 };
 
 struct ATTR_PACKED fat_filemtime {
@@ -139,7 +139,7 @@ struct ATTR_PACKED ATTR_ALIGNED(4) fat_dirent {
 			u8                    f_ntflags;     /* NT Flags (Set of `NTFLAG_*'). */
 			union ATTR_PACKED {
 				u8                   f_delchr;   /* First character of deleted file. */
-				struct fat_filectime f_ctime;    /* Creation time. */
+				struct fat_filebtime f_btime;    /* Birth time. */
 			};
 			union ATTR_PACKED {
 				struct ATTR_PACKED {

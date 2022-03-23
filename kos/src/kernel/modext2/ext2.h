@@ -163,7 +163,7 @@ typedef struct ATTR_PACKED {
 	le16                 i_uid;        /* INode UID (Identical to our `uid_t') */
 	le32                 i_size_low;   /* Lower 32 bits of INode size in bytes. */
 	le32                 i_atime;      /* Last accessed time (`time32_t' format) */
-	le32                 i_ctime;      /* File creation time (`time32_t' format) */
+	le32                 i_btime;      /* File birth time (`time32_t' format) */
 	le32                 i_mtime;      /* File modification time (`time32_t' format) */
 	le32                 i_dtime;      /* File deletion time (`time32_t' format) */
 	le16                 i_gid;        /* INode GID (Identical to our gid_t') */

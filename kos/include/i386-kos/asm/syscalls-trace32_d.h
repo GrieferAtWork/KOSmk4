@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3fbd1f7 */
+/* HASH CRC-32:0xe5e7bb34 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2189,7 +2189,7 @@
 #define __NR32ATL1_utimensat                    0                                                                    /* filename -> dirfd */ 
 #define __NR32ATR2_utimensat                    SC_REPR_STRUCT_TIMESPECX32_VEC2_OR_3                                 /* times */ 
 #define __NR32ATL2_utimensat                    3                                                                    /* times -> flags */ 
-#define __NR32ATR3_utimensat                    SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH              /* flags */ 
+#define __NR32ATR3_utimensat                    SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_BTIME__DOSPATH              /* flags */ 
 #define __NR32RTR_utimensat                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_signalfd                     SC_REPR_FD_T                                                         /* fd */ 
 #define __NR32ATR1_signalfd                     SC_REPR_STRUCT_SIGSET                                                /* sigmask */ 
@@ -2526,7 +2526,7 @@
 #define __NR32ATL1_utimensat_time64             0                                                                    /* filename -> dirfd */ 
 #define __NR32ATR2_utimensat_time64             SC_REPR_STRUCT_TIMESPECX32_64_VEC2_OR_3                              /* times */ 
 #define __NR32ATL2_utimensat_time64             3                                                                    /* times -> flags */ 
-#define __NR32ATR3_utimensat_time64             SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH              /* flags */ 
+#define __NR32ATR3_utimensat_time64             SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_BTIME__DOSPATH              /* flags */ 
 #define __NR32RTR_utimensat_time64              SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_pselect6_time64              SC_REPR_SIZE_T                                                       /* nfds */ 
 #define __NR32ATR1_pselect6_time64              SC_REPR_STRUCT_FDSET                                                 /* readfds */ 

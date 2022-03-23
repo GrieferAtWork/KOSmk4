@@ -681,6 +681,7 @@ ramfs_dirnode_mknode_frominfo(struct fdirnode *__restrict self,
 	result->mf_atime = info->mkf_creat.c_atime;
 	result->mf_mtime = info->mkf_creat.c_mtime;
 	result->mf_ctime = info->mkf_creat.c_ctime;
+	result->mf_btime = info->mkf_creat.c_btime;
 	result->fn_uid   = info->mkf_creat.c_owner;
 	result->fn_gid   = info->mkf_creat.c_group;
 	result->fn_nlink = 1;
@@ -1343,6 +1344,7 @@ ramfs_open(struct ffilesys *__restrict UNUSED(filesys),
 	result->fs_root.mf_atime             = realtime();
 	result->fs_root.mf_mtime             = result->fs_root.mf_atime;
 	result->fs_root.mf_ctime             = result->fs_root.mf_atime;
+	result->fs_root.mf_btime             = result->fs_root.mf_atime;
 	result->fs_root.fn_mode              = S_IFDIR | 0777;
 	result->fs_root.fn_nlink             = 1;
 	result->fs_root.fn_uid               = 0;

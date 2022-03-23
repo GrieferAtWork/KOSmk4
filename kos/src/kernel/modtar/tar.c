@@ -191,6 +191,8 @@ again:
 	result->mf_mtime.tv_nsec = 0;
 	result->mf_ctime.tv_sec  = tfile->tf_mtim;
 	result->mf_ctime.tv_nsec = 0;
+	result->mf_btime.tv_sec  = tfile->tf_mtim; /* XXX: Birthtime of mounted tar file? */
+	result->mf_btime.tv_nsec = 0;
 
 	/* Fill in file-node fields. */
 	result->fn_nlink = 1;
@@ -229,10 +231,11 @@ again:
 			result->fn_uid  = 0;
 			result->fn_gid  = 0;
 			mfile_tslock_acquire(&super->ts_super.fs_root);
-			result->mf_atime = super->ts_super.fs_root.mf_ctime;
-			result->mf_mtime = super->ts_super.fs_root.mf_ctime;
-			result->mf_ctime = super->ts_super.fs_root.mf_ctime;
+			result->mf_atime = super->ts_super.fs_root.mf_btime;
 			mfile_tslock_release(&super->ts_super.fs_root);
+			result->mf_mtime = result->mf_atime;
+			result->mf_ctime = result->mf_atime;
+			result->mf_btime = result->mf_atime;
 		}
 		atomic64_init(&result->mf_filesize, (uint64_t)-1);
 		result->mf_flags |= MFILE_FN_NODIRATIME;
@@ -1850,6 +1853,7 @@ tarfs_open(struct ffilesys *__restrict UNUSED(filesys),
 	result->ts_super.fs_root.mf_atime = realtime();
 	result->ts_super.fs_root.mf_mtime = result->ts_super.fs_root.mf_atime;
 	result->ts_super.fs_root.mf_ctime = result->ts_super.fs_root.mf_atime;
+	result->ts_super.fs_root.mf_btime = result->ts_super.fs_root.mf_atime;
 
 	/* Set-up appropriate flags. */
 	result->ts_super.fs_root.mf_flags = MFILE_F_READONLY | MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO | MFILE_F_FIXEDFILESIZE |

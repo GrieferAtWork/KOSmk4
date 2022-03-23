@@ -331,6 +331,7 @@ sys_fmknodat_impl(fd_t dirfd, USER UNCHECKED char const *nodename,
 		mkinfo.mkf_creat.c_atime = realtime();
 		mkinfo.mkf_creat.c_mtime = mkinfo.mkf_creat.c_atime;
 		mkinfo.mkf_creat.c_ctime = mkinfo.mkf_creat.c_atime;
+		mkinfo.mkf_creat.c_btime = mkinfo.mkf_creat.c_atime;
 		mkinfo.mkf_creat.c_rdev  = dev;
 		/* Create the new file. */
 		status = fdirnode_mkfile(nodename_path->p_dir, &mkinfo);
@@ -403,6 +404,7 @@ sys_fmkdirat_impl(fd_t dirfd, USER UNCHECKED char const *pathname,
 		mkinfo.mkf_creat.c_atime = realtime();
 		mkinfo.mkf_creat.c_mtime = mkinfo.mkf_creat.c_atime;
 		mkinfo.mkf_creat.c_ctime = mkinfo.mkf_creat.c_atime;
+		mkinfo.mkf_creat.c_btime = mkinfo.mkf_creat.c_atime;
 		/* Create the new file. */
 		status = fdirnode_mkfile(pathname_path->p_dir, &mkinfo);
 	}
@@ -523,6 +525,7 @@ sys_fsymlinkat_impl(USER UNCHECKED char const *link_text, fd_t target_dirfd,
 		mkinfo.mkf_creat.c_atime = realtime();
 		mkinfo.mkf_creat.c_mtime = mkinfo.mkf_creat.c_atime;
 		mkinfo.mkf_creat.c_ctime = mkinfo.mkf_creat.c_atime;
+		mkinfo.mkf_creat.c_btime = mkinfo.mkf_creat.c_atime;
 		mkinfo.mkf_creat.c_symlink.s_text = link_text;
 		mkinfo.mkf_creat.c_symlink.s_size = strlen(link_text);
 		/* Create the new file. */
@@ -3298,13 +3301,13 @@ lookup_inode_for_utimensat(fd_t dirfd, USER UNCHECKED char const *filename,
 	REF struct fnode *result;
 	if (filename) {
 		VALIDATE_FLAGSET(atflags,
-		                 AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH,
+		                 AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH,
 		                 E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS);
 		validate_readable(filename, 1);
 		atflags = fs_atflags(atflags);
 		result  = path_traversefull(dirfd, filename, atflags);
 	} else {
-		VALIDATE_FLAGSET(atflags, AT_CHANGE_CTIME,
+		VALIDATE_FLAGSET(atflags, AT_CHANGE_BTIME,
 		                 E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS_NOFILENAME);
 		result = handles_lookupfnode(dirfd);
 	}
@@ -3317,9 +3320,9 @@ DEFINE_SYSCALL4(errno_t, utimensat, fd_t, dirfd,
                 USER UNCHECKED char const *, filename,
                 USER UNCHECKED struct timespec32 const *, times,
                 atflag_t, atflags) {
-	struct timespec atm, mtm, ctm;
+	struct timespec atm, mtm, btm;
 	struct timespec *patm, *pmtm;
-	struct timespec *pctm = NULL;
+	struct timespec *pbtm = NULL;
 	REF struct fnode *node;
 	node = lookup_inode_for_utimensat(dirfd, filename, atflags);
 	FINALLY_DECREF_UNLIKELY(node);
@@ -3329,13 +3332,13 @@ DEFINE_SYSCALL4(errno_t, utimensat, fd_t, dirfd,
 		atm.tv_nsec = (syscall_ulong_t)times[0].tv_nsec;
 		mtm.tv_sec  = (time_t)times[1].tv_sec;
 		mtm.tv_nsec = (syscall_ulong_t)times[1].tv_nsec;
-		if unlikely(atflags & AT_CHANGE_CTIME) {
-			ctm.tv_sec  = (time_t)times[2].tv_sec;
-			ctm.tv_nsec = (syscall_ulong_t)times[2].tv_nsec;
-			/* Specify CTIME as OMIT is the same as not passing `AT_CHANGE_CTIME'! */
-			if (ctm.tv_nsec != UTIME_OMIT) {
-				require(CAP_AT_CHANGE_CTIME);
-				pctm = &ctm;
+		if unlikely(atflags & AT_CHANGE_BTIME) {
+			btm.tv_sec  = (time_t)times[2].tv_sec;
+			btm.tv_nsec = (syscall_ulong_t)times[2].tv_nsec;
+			/* Specify BTIME as OMIT is the same as not passing `AT_CHANGE_BTIME'! */
+			if (btm.tv_nsec != UTIME_OMIT) {
+				require(CAP_AT_CHANGE_BTIME);
+				pbtm = &btm;
 			}
 		}
 		COMPILER_READ_BARRIER();
@@ -3346,19 +3349,19 @@ DEFINE_SYSCALL4(errno_t, utimensat, fd_t, dirfd,
 		/* Deal with the case where at least one of the
 		 * timestamp should be set to the current time. */
 		if (atm.tv_nsec == UTIME_NOW || mtm.tv_nsec == UTIME_NOW ||
-		    (pctm && pctm->tv_nsec == UTIME_NOW)) {
+		    (pbtm && pbtm->tv_nsec == UTIME_NOW)) {
 			struct timespec now;
 			/* Special case: Less permissions are needed to do a touch! */
 			if (atm.tv_nsec == UTIME_NOW &&
-			    mtm.tv_nsec == UTIME_NOW && !pctm)
+			    mtm.tv_nsec == UTIME_NOW && !pbtm)
 				goto do_touch;
 			now = realtime();
 			if (atm.tv_nsec == UTIME_NOW)
 				atm = now;
 			if (mtm.tv_nsec == UTIME_NOW)
 				mtm = now;
-			if (pctm && pctm->tv_nsec == UTIME_NOW)
-				*pctm = now;
+			if (pbtm && pbtm->tv_nsec == UTIME_NOW)
+				*pbtm = now;
 		}
 		fnode_request_arbitrary_timestamps(node);
 	} else {
@@ -3369,7 +3372,7 @@ do_touch:
 		patm = &atm;
 		pmtm = &mtm;
 	}
-	mfile_chtime(node, patm, pmtm, pctm);
+	mfile_chtime(node, patm, pmtm, pbtm);
 	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_UTIMENSAT */
@@ -3379,9 +3382,9 @@ DEFINE_COMPAT_SYSCALL4(errno_t, utimensat, fd_t, dirfd,
                        USER UNCHECKED char const *, filename,
                        USER UNCHECKED struct compat_timespec32 const *, times,
                        atflag_t, atflags) {
-	struct timespec atm, mtm, ctm;
+	struct timespec atm, mtm, btm;
 	struct timespec *patm, *pmtm;
-	struct timespec *pctm = NULL;
+	struct timespec *pbtm = NULL;
 	REF struct fnode *node;
 	node = lookup_inode_for_utimensat(dirfd, filename, atflags);
 	FINALLY_DECREF_UNLIKELY(node);
@@ -3391,13 +3394,13 @@ DEFINE_COMPAT_SYSCALL4(errno_t, utimensat, fd_t, dirfd,
 		atm.tv_nsec = (syscall_ulong_t)times[0].tv_nsec;
 		mtm.tv_sec  = (time_t)times[1].tv_sec;
 		mtm.tv_nsec = (syscall_ulong_t)times[1].tv_nsec;
-		if unlikely(atflags & AT_CHANGE_CTIME) {
-			ctm.tv_sec  = (time_t)times[2].tv_sec;
-			ctm.tv_nsec = (syscall_ulong_t)times[2].tv_nsec;
-			/* Specify CTIME as OMIT is the same as not passing `AT_CHANGE_CTIME'! */
-			if (ctm.tv_nsec != UTIME_OMIT) {
-				require(CAP_AT_CHANGE_CTIME);
-				pctm = &ctm;
+		if unlikely(atflags & AT_CHANGE_BTIME) {
+			btm.tv_sec  = (time_t)times[2].tv_sec;
+			btm.tv_nsec = (syscall_ulong_t)times[2].tv_nsec;
+			/* Specify BTIME as OMIT is the same as not passing `AT_CHANGE_BTIME'! */
+			if (btm.tv_nsec != UTIME_OMIT) {
+				require(CAP_AT_CHANGE_BTIME);
+				pbtm = &btm;
 			}
 		}
 		COMPILER_READ_BARRIER();
@@ -3408,19 +3411,19 @@ DEFINE_COMPAT_SYSCALL4(errno_t, utimensat, fd_t, dirfd,
 		/* Deal with the case where at least one of the
 		 * timestamp should be set to the current time. */
 		if (atm.tv_nsec == UTIME_NOW || mtm.tv_nsec == UTIME_NOW ||
-		    (pctm && pctm->tv_nsec == UTIME_NOW)) {
+		    (pbtm && pbtm->tv_nsec == UTIME_NOW)) {
 			struct timespec now;
 			/* Special case: Less permissions are needed to do a touch! */
 			if (atm.tv_nsec == UTIME_NOW &&
-			    mtm.tv_nsec == UTIME_NOW && !pctm)
+			    mtm.tv_nsec == UTIME_NOW && !pbtm)
 				goto do_touch;
 			now = realtime();
 			if (atm.tv_nsec == UTIME_NOW)
 				atm = now;
 			if (mtm.tv_nsec == UTIME_NOW)
 				mtm = now;
-			if (pctm && pctm->tv_nsec == UTIME_NOW)
-				*pctm = now;
+			if (pbtm && pbtm->tv_nsec == UTIME_NOW)
+				*pbtm = now;
 		}
 		fnode_request_arbitrary_timestamps(node);
 	} else {
@@ -3431,7 +3434,7 @@ do_touch:
 		patm = &atm;
 		pmtm = &mtm;
 	}
-	mfile_chtime(node, patm, pmtm, pctm);
+	mfile_chtime(node, patm, pmtm, pbtm);
 	return -EOK;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_UTIMENSAT */
@@ -3450,9 +3453,9 @@ DEFINE_SYSCALL4(errno_t, utimensat_time64, fd_t, dirfd,
                 atflag_t, atflags)
 #endif /* !__ARCH_WANT_SYSCALL_UTIMENSAT64 */
 {
-	struct timespec atm, mtm, ctm;
+	struct timespec atm, mtm, btm;
 	struct timespec *patm, *pmtm;
-	struct timespec *pctm = NULL;
+	struct timespec *pbtm = NULL;
 	REF struct fnode *node;
 	node = lookup_inode_for_utimensat(dirfd, filename, atflags);
 	FINALLY_DECREF_UNLIKELY(node);
@@ -3462,13 +3465,13 @@ DEFINE_SYSCALL4(errno_t, utimensat_time64, fd_t, dirfd,
 		atm.tv_nsec = (syscall_ulong_t)times[0].tv_nsec;
 		mtm.tv_sec  = (time_t)times[1].tv_sec;
 		mtm.tv_nsec = (syscall_ulong_t)times[1].tv_nsec;
-		if unlikely(atflags & AT_CHANGE_CTIME) {
-			ctm.tv_sec  = (time_t)times[2].tv_sec;
-			ctm.tv_nsec = (syscall_ulong_t)times[2].tv_nsec;
-			/* Specify CTIME as OMIT is the same as not passing `AT_CHANGE_CTIME'! */
-			if (ctm.tv_nsec != UTIME_OMIT) {
-				require(CAP_AT_CHANGE_CTIME);
-				pctm = &ctm;
+		if unlikely(atflags & AT_CHANGE_BTIME) {
+			btm.tv_sec  = (time_t)times[2].tv_sec;
+			btm.tv_nsec = (syscall_ulong_t)times[2].tv_nsec;
+			/* Specify BTIME as OMIT is the same as not passing `AT_CHANGE_BTIME'! */
+			if (btm.tv_nsec != UTIME_OMIT) {
+				require(CAP_AT_CHANGE_BTIME);
+				pbtm = &btm;
 			}
 		}
 		COMPILER_READ_BARRIER();
@@ -3479,19 +3482,19 @@ DEFINE_SYSCALL4(errno_t, utimensat_time64, fd_t, dirfd,
 		/* Deal with the case where at least one of the
 		 * timestamp should be set to the current time. */
 		if (atm.tv_nsec == UTIME_NOW || mtm.tv_nsec == UTIME_NOW ||
-		    (pctm && pctm->tv_nsec == UTIME_NOW)) {
+		    (pbtm && pbtm->tv_nsec == UTIME_NOW)) {
 			struct timespec now;
 			/* Special case: Less permissions are needed to do a touch! */
 			if (atm.tv_nsec == UTIME_NOW &&
-			    mtm.tv_nsec == UTIME_NOW && !pctm)
+			    mtm.tv_nsec == UTIME_NOW && !pbtm)
 				goto do_touch;
 			now = realtime();
 			if (atm.tv_nsec == UTIME_NOW)
 				atm = now;
 			if (mtm.tv_nsec == UTIME_NOW)
 				mtm = now;
-			if (pctm && pctm->tv_nsec == UTIME_NOW)
-				*pctm = now;
+			if (pbtm && pbtm->tv_nsec == UTIME_NOW)
+				*pbtm = now;
 		}
 		fnode_request_arbitrary_timestamps(node);
 	} else {
@@ -3502,7 +3505,7 @@ do_touch:
 		patm = &atm;
 		pmtm = &mtm;
 	}
-	mfile_chtime(node, patm, pmtm, pctm);
+	mfile_chtime(node, patm, pmtm, pbtm);
 	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_UTIMENSAT64 || __ARCH_WANT_SYSCALL_UTIMENSAT_TIME64 */
@@ -3521,9 +3524,9 @@ DEFINE_COMPAT_SYSCALL4(errno_t, utimensat_time64, fd_t, dirfd,
                        atflag_t, atflags)
 #endif /* !__ARCH_WANT_COMPAT_SYSCALL_UTIMENSAT64 */
 {
-	struct timespec atm, mtm, ctm;
+	struct timespec atm, mtm, btm;
 	struct timespec *patm, *pmtm;
-	struct timespec *pctm = NULL;
+	struct timespec *pbtm = NULL;
 	REF struct fnode *node;
 	node = lookup_inode_for_utimensat(dirfd, filename, atflags);
 	FINALLY_DECREF_UNLIKELY(node);
@@ -3533,13 +3536,13 @@ DEFINE_COMPAT_SYSCALL4(errno_t, utimensat_time64, fd_t, dirfd,
 		atm.tv_nsec = (syscall_ulong_t)times[0].tv_nsec;
 		mtm.tv_sec  = (time_t)times[1].tv_sec;
 		mtm.tv_nsec = (syscall_ulong_t)times[1].tv_nsec;
-		if unlikely(atflags & AT_CHANGE_CTIME) {
-			ctm.tv_sec  = (time_t)times[2].tv_sec;
-			ctm.tv_nsec = (syscall_ulong_t)times[2].tv_nsec;
-			/* Specify CTIME as OMIT is the same as not passing `AT_CHANGE_CTIME'! */
-			if (ctm.tv_nsec != UTIME_OMIT) {
-				require(CAP_AT_CHANGE_CTIME);
-				pctm = &ctm;
+		if unlikely(atflags & AT_CHANGE_BTIME) {
+			btm.tv_sec  = (time_t)times[2].tv_sec;
+			btm.tv_nsec = (syscall_ulong_t)times[2].tv_nsec;
+			/* Specify BTIME as OMIT is the same as not passing `AT_CHANGE_BTIME'! */
+			if (btm.tv_nsec != UTIME_OMIT) {
+				require(CAP_AT_CHANGE_BTIME);
+				pbtm = &btm;
 			}
 		}
 		COMPILER_READ_BARRIER();
@@ -3550,19 +3553,19 @@ DEFINE_COMPAT_SYSCALL4(errno_t, utimensat_time64, fd_t, dirfd,
 		/* Deal with the case where at least one of the
 		 * timestamp should be set to the current time. */
 		if (atm.tv_nsec == UTIME_NOW || mtm.tv_nsec == UTIME_NOW ||
-		    (pctm && pctm->tv_nsec == UTIME_NOW)) {
+		    (pbtm && pbtm->tv_nsec == UTIME_NOW)) {
 			struct timespec now;
 			/* Special case: Less permissions are needed to do a touch! */
 			if (atm.tv_nsec == UTIME_NOW &&
-			    mtm.tv_nsec == UTIME_NOW && !pctm)
+			    mtm.tv_nsec == UTIME_NOW && !pbtm)
 				goto do_touch;
 			now = realtime();
 			if (atm.tv_nsec == UTIME_NOW)
 				atm = now;
 			if (mtm.tv_nsec == UTIME_NOW)
 				mtm = now;
-			if (pctm && pctm->tv_nsec == UTIME_NOW)
-				*pctm = now;
+			if (pbtm && pbtm->tv_nsec == UTIME_NOW)
+				*pbtm = now;
 		}
 		fnode_request_arbitrary_timestamps(node);
 	} else {
@@ -3573,7 +3576,7 @@ do_touch:
 		patm = &atm;
 		pmtm = &mtm;
 	}
-	mfile_chtime(node, patm, pmtm, pctm);
+	mfile_chtime(node, patm, pmtm, pbtm);
 	return -EOK;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_UTIMENSAT64 || __ARCH_WANT_COMPAT_SYSCALL_UTIMENSAT_TIME64 */

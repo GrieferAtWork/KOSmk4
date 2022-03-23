@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ca3149e */
+/* HASH CRC-32:0x3ef46316 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1927,7 +1927,7 @@
 #define __NR64ATL1_utimensat                0                                                                    /* filename -> dirfd */ 
 #define __NR64ATR2_utimensat                SC_REPR_STRUCT_TIMESPECX64_VEC2_OR_3                                 /* times */ 
 #define __NR64ATL2_utimensat                3                                                                    /* times -> flags */ 
-#define __NR64ATR3_utimensat                SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH              /* flags */ 
+#define __NR64ATR3_utimensat                SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_BTIME__DOSPATH              /* flags */ 
 #define __NR64RTR_utimensat                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_epoll_pwait              SC_REPR_FD_T                                                         /* epfd */ 
 #define __NR64ATR1_epoll_pwait              SC_REPR_POINTER                                                      /* events */ 

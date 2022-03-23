@@ -175,7 +175,8 @@ struct fcreatfile_info {
 	gid_t                      c_group;     /* [in] File group */
 	struct timespec            c_atime;     /* [in] File access timestamp */
 	struct timespec            c_mtime;     /* [in] File modified timestamp */
-	struct timespec            c_ctime;     /* [in] File created timestamp */
+	struct timespec            c_ctime;     /* [in] File changed timestamp */
+	struct timespec            c_btime;     /* [in] File birth timestamp */
 	union {
 		dev_t                  c_rdev;      /* [valid_if(S_ISDEV(mkf_fmode))][in] Referenced device. */
 		struct {
@@ -460,6 +461,7 @@ struct fdirnode
  *  - self->_fdirnode_node_ _fnode_file_ mf_atime
  *  - self->_fdirnode_node_ _fnode_file_ mf_mtime
  *  - self->_fdirnode_node_ _fnode_file_ mf_ctime
+ *  - self->_fdirnode_node_ _fnode_file_ mf_btime
  *  - self->_fdirnode_node_ fn_uid
  *  - self->_fdirnode_node_ fn_gid
  *  - self->_fdirnode_node_ fn_allnodes

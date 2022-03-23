@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaab212a6 */
+/* HASH CRC-32:0xbbcd3484 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -12160,7 +12160,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_pwait)
 	.cfi_endproc
 END(__x86_asm32_int80_epoll_pwait)
 
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
 /* errno_t utimensat(fd_t dirfd, char const *filename, struct timespecx32 const[2] times, atflag_t flags) */
 .section .text.x86.asm32_syscall_int80.utimensat
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimensat)
@@ -15656,7 +15656,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_settime64)
 	.cfi_endproc
 END(__x86_asm32_int80_timerfd_settime64)
 
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
 /* errno_t utimensat_time64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
 .section .text.x86.asm32_syscall_int80.utimensat_time64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimensat_time64)
@@ -31669,7 +31669,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_epoll_pwait)
 	.cfi_endproc
 END(__x86_asm32_sysenter_epoll_pwait)
 
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
 /* errno_t utimensat(fd_t dirfd, char const *filename, struct timespecx32 const[2] times, atflag_t flags) */
 .section .text.x86.asm32_syscall_sysenter.utimensat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_utimensat)
@@ -35191,7 +35191,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_timerfd_settime64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_timerfd_settime64)
 
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
 /* errno_t utimensat_time64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
 .section .text.x86.asm32_syscall_sysenter.utimensat_time64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_utimensat_time64)

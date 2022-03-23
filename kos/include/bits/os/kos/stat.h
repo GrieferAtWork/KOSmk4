@@ -224,9 +224,9 @@ __DECL_BEGIN
 
 #if __TM_SIZEOF(TIME) != __SIZEOF_TIME64_T__
 struct __stat_timespec32 /*[PREFIX(tv_)][NAME(stat_timespec32)]*/ {
-	__TM_TYPE(time)   tv_sec;        /* seconds since 01.01.1970 */
+	__TM_TYPE(time)   tv_sec;  /* seconds since 01.01.1970 */
 	__byte_t        __tv_pad_sec[__SIZEOF_TIME64_T__ - __TM_SIZEOF(TIME)];
-	__syscall_ulong_t tv_nsec;  /* nanoseconds */
+	__syscall_ulong_t tv_nsec; /* nanoseconds */
 #ifdef __cplusplus
 	__CXX_CLASSMEMBER operator timespec(void) const __CXX_NOEXCEPT {
 		struct timespec __res;

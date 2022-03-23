@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd66bf74c */
+/* HASH CRC-32:0x136a4a2c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2189,7 +2189,7 @@
 #define __NRATL1_utimensat                    0                                                                    /* filename -> dirfd */ 
 #define __NRATR2_utimensat                    SC_REPR_STRUCT_TIMESPECX32_VEC2_OR_3                                 /* times */ 
 #define __NRATL2_utimensat                    3                                                                    /* times -> flags */ 
-#define __NRATR3_utimensat                    SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH              /* flags */ 
+#define __NRATR3_utimensat                    SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_BTIME__DOSPATH              /* flags */ 
 #define __NRRTR_utimensat                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_signalfd                     SC_REPR_FD_T                                                         /* fd */ 
 #define __NRATR1_signalfd                     SC_REPR_STRUCT_SIGSET                                                /* sigmask */ 
@@ -2526,7 +2526,7 @@
 #define __NRATL1_utimensat_time64             0                                                                    /* filename -> dirfd */ 
 #define __NRATR2_utimensat_time64             SC_REPR_STRUCT_TIMESPECX32_64_VEC2_OR_3                              /* times */ 
 #define __NRATL2_utimensat_time64             3                                                                    /* times -> flags */ 
-#define __NRATR3_utimensat_time64             SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH              /* flags */ 
+#define __NRATR3_utimensat_time64             SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_BTIME__DOSPATH              /* flags */ 
 #define __NRRTR_utimensat_time64              SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_pselect6_time64              SC_REPR_SIZE_T                                                       /* nfds */ 
 #define __NRATR1_pselect6_time64              SC_REPR_STRUCT_FDSET                                                 /* readfds */ 

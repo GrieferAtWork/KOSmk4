@@ -145,7 +145,7 @@
 %[assume_defined_in_kos(AT_SYMLINK_FOLLOW, __AT_SYMLINK_FOLLOW)]
 %[assume_defined_in_kos(AT_NO_AUTOMOUNT, __AT_NO_AUTOMOUNT)]
 %[assume_defined_in_kos(AT_EMPTY_PATH, __AT_EMPTY_PATH)]
-%[assume_defined_in_kos(AT_CHANGE_CTIME, __AT_CHANGE_CTIME)]
+%[assume_defined_in_kos(AT_CHANGE_BTIME, __AT_CHANGE_BTIME)]
 %[assume_defined_in_kos(AT_READLINK_REQSIZE, __AT_READLINK_REQSIZE)]
 %[assume_defined_in_kos(AT_REMOVEREG, __AT_REMOVEREG)]
 %[assume_defined_in_kos(AT_ALTPATH, __AT_ALTPATH)]
@@ -1081,18 +1081,18 @@ enum __pid_type {
 
 #if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
 /* For use with `utimensat' and friends: Take `struct timespec[3]', where the 3rd entry
- * (when not equal to  `UTIME_OMIT') is used to  override the file creation  timestamp.
+ * (when not  equal to  `UTIME_OMIT') is  used to  override the  file brith  timestamp.
  * NOTE: Passing this flag when the 3rd  timespec isn't set to `UTIME_OMIT'  requires
  *       that the calling thread be holding the `CAP_SYS_TIME' permission and be  the
  *       owner of the file in question, or to be holding the `CAP_FOWNER' permission.
- *       Less permissions are required when `UTIME_NOW' is passed, in which case
- *      `CAP_SYS_TIME' is not required (similarly how having `CAP_FOWNER', or being
- *       the owner would allow you to copy the file (updating the timestamp), then
+ *       Less permissions  are required  when `UTIME_NOW'  is passed,  in which  case
+ *       `CAP_SYS_TIME' is not required (similarly how having `CAP_FOWNER', or  being
+ *       the owner would allow  you to copy the  file (updating the timestamp),  then
  *       replacing the original)
  * NOTE: This flag is used to implement full compatibility with NT's SetFileTime function. */
-#if !defined(AT_CHANGE_CTIME) && defined(__AT_CHANGE_CTIME)
-#define AT_CHANGE_CTIME __AT_CHANGE_CTIME
-#endif /* !AT_CHANGE_CTIME && __AT_CHANGE_CTIME */
+#if !defined(AT_CHANGE_BTIME) && defined(__AT_CHANGE_BTIME)
+#define AT_CHANGE_BTIME __AT_CHANGE_BTIME
+#endif /* !AT_CHANGE_BTIME && __AT_CHANGE_BTIME */
 
 /* For use with `freadlinkat' and friends.
  * Rather  than following  unix semantics  and returning  the amount of

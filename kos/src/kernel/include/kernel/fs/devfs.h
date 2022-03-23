@@ -212,7 +212,8 @@ FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void);
 	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops = &(ops)->do_node.dvno_node.no_file, \
 	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_atime =                                  \
 	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_mtime =                                  \
-	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ctime = realtime(),                      \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ctime =                                  \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_btime = realtime(),                      \
 	 (self)->_device_devnode_ _fdevnode_node_ fn_super              = incref(&_devfs_super),           \
 	 (self)->_device_devnode_ fn_nlink                              = 1,                               \
 	 (self)->_device_devnode_ fn_uid                                = 0,                               \
@@ -222,7 +223,8 @@ FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void);
 	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops = &(ops)->do_node.dvno_node.no_file, \
 	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_atime =                                  \
 	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_mtime =                                  \
-	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ctime = realtime(),                      \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_ctime =                                  \
+	 (self)->_device_devnode_ _fdevnode_node_ _fnode_file_ mf_btime = realtime(),                      \
 	 (self)->_device_devnode_ _fdevnode_node_ fn_super              = incref(&_devfs_super),           \
 	 (self)->_device_devnode_ fn_nlink                              = 1,                               \
 	 __hybrid_assert((self)->_device_devnode_ fn_uid == 0),                                            \

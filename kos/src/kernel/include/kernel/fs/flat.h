@@ -236,6 +236,7 @@ struct flatdirnode_xops {
 	 *  - return->_fnode_file_ mf_atime      = info->mkf_creat.c_atime;
 	 *  - return->_fnode_file_ mf_mtime      = info->mkf_creat.c_mtime;
 	 *  - return->_fnode_file_ mf_ctime      = info->mkf_creat.c_ctime;
+	 *  - return->_fnode_file_ mf_btime      = info->mkf_creat.c_btime;
 	 *  - return->fn_nlink                   = 1;
 	 *  - return->fn_mode                    = info->mkf_fmode;
 	 *  - return->fn_uid                     = info->mkf_creat.c_owner;
@@ -646,6 +647,7 @@ struct flatdirnode
  *  - self->_flatdirnode_dir_ _fdirnode_node_ _fnode_file_ mf_atime
  *  - self->_flatdirnode_dir_ _fdirnode_node_ _fnode_file_ mf_mtime
  *  - self->_flatdirnode_dir_ _fdirnode_node_ _fnode_file_ mf_ctime
+ *  - self->_flatdirnode_dir_ _fdirnode_node_ _fnode_file_ mf_btime
  *  - self->_flatdirnode_dir_ _fdirnode_node_ fn_uid
  *  - self->_flatdirnode_dir_ _fdirnode_node_ fn_gid
  *  - self->_flatdirnode_dir_ _fdirnode_node_ fn_allnodes
@@ -694,6 +696,7 @@ struct flatsuper_ops {
 	 *  - return->_fnode_file_ mf_atime      = ...;                # As read from disk
 	 *  - return->_fnode_file_ mf_mtime      = ...;                # As read from disk
 	 *  - return->_fnode_file_ mf_ctime      = ...;                # As read from disk
+	 *  - return->_fnode_file_ mf_btime      = ...;                # As read from disk
 	 *  - return->fn_nlink                   = ...;                # As read from disk
 	 *  - return->fn_mode                    = ...;                # As read from disk  (S_IFMT must match `DTTOIF(ent->fde_ent.fd_type)')
 	 *  - return->fn_uid                     = ...;                # As read from disk

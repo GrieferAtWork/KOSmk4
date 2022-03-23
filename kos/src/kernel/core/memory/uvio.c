@@ -947,6 +947,7 @@ PUBLIC REF struct uvio *KCALL uvio_create(void) THROWS(E_BADALLOC) {
 	result->mf_atime = realtime();
 	result->mf_mtime = result->mf_atime;
 	result->mf_ctime = result->mf_atime;
+	result->mf_btime = result->mf_atime;
 	sig_init(&result->uv_reqmore);
 	sig_init(&result->uv_reqdlvr);
 	sig_init(&result->uv_reqdone);

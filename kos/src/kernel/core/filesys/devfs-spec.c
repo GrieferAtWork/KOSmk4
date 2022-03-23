@@ -78,12 +78,14 @@ PRIVATE BLOCKING NONNULL((1)) void KCALL
 devfs_spec_v_stat_with_boottime(struct mfile *__restrict self,
                                 USER CHECKED struct stat *result)
 		THROWS(...) {
-	result->st_atim.tv_sec  = (typeof(result->st_atim.tv_sec))boottime.tv_sec;
-	result->st_atim.tv_nsec = (typeof(result->st_atim.tv_nsec))boottime.tv_nsec;
-	result->st_mtim.tv_sec  = (typeof(result->st_mtim.tv_sec))boottime.tv_sec;
-	result->st_mtim.tv_nsec = (typeof(result->st_mtim.tv_nsec))boottime.tv_nsec;
-	result->st_ctim.tv_sec  = (typeof(result->st_ctim.tv_sec))boottime.tv_sec;
-	result->st_ctim.tv_nsec = (typeof(result->st_ctim.tv_nsec))boottime.tv_nsec;
+	result->st_atime     = boottime.tv_sec;
+	result->st_atimensec = boottime.tv_nsec;
+	result->st_mtime     = boottime.tv_sec;
+	result->st_mtimensec = boottime.tv_nsec;
+	result->st_ctime     = boottime.tv_sec;
+	result->st_ctimensec = boottime.tv_nsec;
+	result->st_btime     = boottime.tv_sec;
+	result->st_btimensec = boottime.tv_nsec;
 	fdirnode_v_stat(self, result);
 }
 
@@ -203,6 +205,7 @@ devicelink_new(char const *__restrict prefix, struct device *__restrict dev) {
 		result->mf_atime = dev->mf_atime;
 		result->mf_mtime = dev->mf_mtime;
 		result->mf_ctime = dev->mf_ctime;
+		result->mf_btime = dev->mf_btime;
 	}
 	result->dl_devname = incref(dev->dv_dirent);
 	mfile_tslock_release(dev);

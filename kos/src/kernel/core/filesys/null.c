@@ -78,12 +78,14 @@ DECL_BEGIN
 INTERN NONNULL((1)) void KCALL /* `INTERN' because also re-used for pre-defined mounts */
 nullfile_v_stat(struct mfile *__restrict UNUSED(self),
                 USER CHECKED struct stat *result) {
-	result->st_atimespec.tv_sec  = (typeof(result->st_atimespec.tv_sec))boottime.tv_sec;
-	result->st_mtimespec.tv_sec  = (typeof(result->st_mtimespec.tv_sec))boottime.tv_sec;
-	result->st_ctimespec.tv_sec  = (typeof(result->st_ctimespec.tv_sec))boottime.tv_sec;
-	result->st_atimespec.tv_nsec = (typeof(result->st_atimespec.tv_nsec))boottime.tv_nsec;
-	result->st_mtimespec.tv_nsec = (typeof(result->st_mtimespec.tv_nsec))boottime.tv_nsec;
-	result->st_ctimespec.tv_nsec = (typeof(result->st_ctimespec.tv_nsec))boottime.tv_nsec;
+	result->st_atime     = boottime.tv_sec;
+	result->st_atimensec = boottime.tv_nsec;
+	result->st_mtime     = boottime.tv_sec;
+	result->st_mtimensec = boottime.tv_nsec;
+	result->st_ctime     = boottime.tv_sec;
+	result->st_ctimensec = boottime.tv_nsec;
+	result->st_btime     = boottime.tv_sec;
+	result->st_btimensec = boottime.tv_nsec;
 }
 
 
@@ -1063,15 +1065,17 @@ devtty_v_stat(struct mfile *__restrict UNUSED(self),
 	/* Only include certain information within stat. If we'd included
 	 * everything, then it would be impossible to tell the difference
 	 * between /dev/tty and /dev/<actual-tty> */
-	result->st_size              = ctty_stat.st_size;
-	result->st_blocks            = ctty_stat.st_blocks;
-	result->st_blksize           = ctty_stat.st_blksize;
-	result->st_atimespec.tv_sec  = ctty_stat.st_atimespec.tv_sec;
-	result->st_atimespec.tv_nsec = ctty_stat.st_atimespec.tv_nsec;
-	result->st_mtimespec.tv_sec  = ctty_stat.st_mtimespec.tv_sec;
-	result->st_mtimespec.tv_nsec = ctty_stat.st_mtimespec.tv_nsec;
-	result->st_ctimespec.tv_sec  = ctty_stat.st_ctimespec.tv_sec;
-	result->st_ctimespec.tv_nsec = ctty_stat.st_ctimespec.tv_nsec;
+	result->st_size      = ctty_stat.st_size;
+	result->st_blocks    = ctty_stat.st_blocks;
+	result->st_blksize   = ctty_stat.st_blksize;
+	result->st_atime     = ctty_stat.st_atime;
+	result->st_atimensec = ctty_stat.st_atimensec;
+	result->st_mtime     = ctty_stat.st_mtime;
+	result->st_mtimensec = ctty_stat.st_mtimensec;
+	result->st_ctime     = ctty_stat.st_ctime;
+	result->st_ctimensec = ctty_stat.st_ctimensec;
+	result->st_btime     = ctty_stat.st_btime;
+	result->st_btimensec = ctty_stat.st_btimensec;
 }
 
 PRIVATE NONNULL((1)) void KCALL

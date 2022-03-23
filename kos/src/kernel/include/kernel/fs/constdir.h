@@ -140,6 +140,7 @@ struct constdir
  *  - self->_constdir_dir_ _fdirnode_node_ _fnode_file_ mf_atime
  *  - self->_constdir_dir_ _fdirnode_node_ _fnode_file_ mf_mtime
  *  - self->_constdir_dir_ _fdirnode_node_ _fnode_file_ mf_ctime
+ *  - self->_constdir_dir_ _fdirnode_node_ _fnode_file_ mf_btime
  *  - self->_constdir_dir_ _fdirnode_node_ fn_uid
  *  - self->_constdir_dir_ _fdirnode_node_ fn_gid
  *  - self->_constdir_dir_ _fdirnode_node_ fn_allnodes

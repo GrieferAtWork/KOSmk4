@@ -99,6 +99,7 @@ PUBLIC struct mfile mfile_dbgheap = {
 	MFILE_INIT_mf_atime(0, 0),
 	MFILE_INIT_mf_mtime(0, 0),
 	MFILE_INIT_mf_ctime(0, 0),
+	MFILE_INIT_mf_btime(0, 0),
 };
 #endif /* CONFIG_DEBUG_HEAP */
 

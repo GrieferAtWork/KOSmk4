@@ -680,6 +680,7 @@ again_read_old_filesize:
 			COMPILER_READ_BARRIER();
 			if (!(self->mf_flags & (MFILE_F_NOMTIME | MFILE_F_DELETED))) {
 				self->mf_mtime = now;
+				self->mf_ctime = now;
 				changes |= MFILE_F_ATTRCHANGED;
 			}
 			mfile_tslock_release(self);
@@ -1857,6 +1858,7 @@ handle_part_insert_failure:
 			COMPILER_READ_BARRIER();
 			if (!(self->mf_flags & (MFILE_F_NOMTIME | MFILE_F_DELETED))) {
 				self->mf_mtime = now;
+				self->mf_ctime = now;
 				changes |= MFILE_F_ATTRCHANGED;
 			}
 			mfile_tslock_release(self);

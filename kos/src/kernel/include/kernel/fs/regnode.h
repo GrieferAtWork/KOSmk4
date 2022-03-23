@@ -62,6 +62,7 @@ struct fregnode
  *  - self->_fregnode_node_ _fnode_file_ mf_atime
  *  - self->_fregnode_node_ _fnode_file_ mf_mtime
  *  - self->_fregnode_node_ _fnode_file_ mf_ctime
+ *  - self->_fregnode_node_ _fnode_file_ mf_btime
  *  - self->_fregnode_node_ fn_uid
  *  - self->_fregnode_node_ fn_gid
  *  - self->_fregnode_node_ fn_allnodes

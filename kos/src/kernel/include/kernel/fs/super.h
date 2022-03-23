@@ -146,6 +146,7 @@ struct fsuper_ops {
 	BLOCKING NONNULL((1, 2)) void (KCALL *so_truncate_atime)(struct fsuper *__restrict self, /*in|out*/ struct timespec *__restrict tms) THROWS(...);
 	BLOCKING NONNULL((1, 2)) void (KCALL *so_truncate_mtime)(struct fsuper *__restrict self, /*in|out*/ struct timespec *__restrict tms) THROWS(...);
 	BLOCKING NONNULL((1, 2)) void (KCALL *so_truncate_ctime)(struct fsuper *__restrict self, /*in|out*/ struct timespec *__restrict tms) THROWS(...);
+	BLOCKING NONNULL((1, 2)) void (KCALL *so_truncate_btime)(struct fsuper *__restrict self, /*in|out*/ struct timespec *__restrict tms) THROWS(...);
 
 	/* [0..1] Flush unwritten changes from fs-specific
 	 *        superblock buffers to disk and/or disk buffers */
@@ -344,6 +345,8 @@ DATDEF __BOOL fsuper_allow_fs_oob;
 	(void)(!fsuper_getops(self)->so_truncate_mtime || ((*fsuper_getops(self)->so_truncate_mtime)(self, tms), 0))
 #define fsuper_truncate_ctime(self, tms) \
 	(void)(!fsuper_getops(self)->so_truncate_ctime || ((*fsuper_getops(self)->so_truncate_ctime)(self, tms), 0))
+#define fsuper_truncate_btime(self, tms) \
+	(void)(!fsuper_getops(self)->so_truncate_btime || ((*fsuper_getops(self)->so_truncate_btime)(self, tms), 0))
 
 
 
@@ -371,6 +374,7 @@ DATDEF __BOOL fsuper_allow_fs_oob;
  *  - self->fs_root._fdirnode_node_ _fnode_file_ mf_atime
  *  - self->fs_root._fdirnode_node_ _fnode_file_ mf_mtime
  *  - self->fs_root._fdirnode_node_ _fnode_file_ mf_ctime
+ *  - self->fs_root._fdirnode_node_ _fnode_file_ mf_btime
  *  - self->fs_root._fdirnode_node_ fn_uid
  *  - self->fs_root._fdirnode_node_ fn_gid
  *  - self->fs_root._fdirnode_node_ fn_mode (with something or'd with S_IFDIR)

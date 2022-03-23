@@ -200,9 +200,9 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_atflag_t
 #endif /* HAVE_SC_REPR_ATFLAG__REMOVEDIR__REMOVEREG__DOSPATH */
 
-#ifdef HAVE_SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH
+#ifdef HAVE_SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_BTIME__DOSPATH
 #define NEED_print_atflag_t
-#endif /* HAVE_SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH */
+#endif /* HAVE_SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_BTIME__DOSPATH */
 
 #ifdef HAVE_SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__DOSPATH
 #define NEED_print_atflag_t
@@ -1219,7 +1219,7 @@ PRIVATE ssize_t CC
 print_atflag_t_impl(pformatprinter printer, void *arg,
                     atflag_t atflags,
                     char const *nameof_AT_READLINK_REQSIZE) {
-	STATIC_ASSERT(AT_READLINK_REQSIZE == AT_CHANGE_CTIME);
+	STATIC_ASSERT(AT_READLINK_REQSIZE == AT_CHANGE_BTIME);
 	STATIC_ASSERT(AT_READLINK_REQSIZE == AT_EACCESS);
 	ssize_t temp, result = 0;
 	bool is_first = true;
@@ -5443,7 +5443,7 @@ do_struct_timevalx64:
 		utms = (USER UNCHECKED struct_timespec_typecode *)(uintptr_t)value.sv_u64; \
 		if unlikely(!utms)                                                         \
 			goto do_null_pointer;                                                  \
-		if (link && ((syscall_ulong_t)link->sa_value.sv_u64 & AT_CHANGE_CTIME))    \
+		if (link && ((syscall_ulong_t)link->sa_value.sv_u64 & AT_CHANGE_BTIME))    \
 			count = 3;                                                             \
 		validate_readablem(utms, count, sizeof(struct_timespec_typecode));         \
 		COMPILER_READ_BARRIER();                                                   \
@@ -5777,13 +5777,13 @@ do_struct_timespecx64:
 		break;
 #endif /* HAVE_SC_REPR_ATFLAG__REMOVEDIR__REMOVEREG__DOSPATH */
 
-#ifdef HAVE_SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH
-	case SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH:
+#ifdef HAVE_SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_BTIME__DOSPATH
+	case SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_BTIME__DOSPATH:
 		result = print_atflag_t(printer, arg, (oflag_t)value.sv_u64,
-		                        AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH,
-		                        "AT_CHANGE_CTIME");
+		                        AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH,
+		                        "AT_CHANGE_BTIME");
 		break;
-#endif /* HAVE_SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_CTIME__DOSPATH */
+#endif /* HAVE_SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__CHANGE_BTIME__DOSPATH */
 
 #ifdef HAVE_SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__DOSPATH
 	case SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__DOSPATH:

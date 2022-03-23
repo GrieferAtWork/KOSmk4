@@ -519,6 +519,7 @@ int dos_fstat64i64($fd_t fd, [[nonnull]] struct __dos_stat64 *__restrict buf);
 //[[ignore, nocrt, alias("fstat64")]] int glibc_fstat64($fd_t fd, [[nonnull]] struct __glc_stat64 *__restrict buf);
 
 
+/* TODO: Don't assume that kstat() and kstat64() are the same. -- Only do so when `defined(__STAT32_MATCHES_STAT64)'! */
 
 @@>> stat(2), stat64(2)
 [[no_crt_impl, decl_include("<bits/os/stat.h>"), no_crt_self_import]]
@@ -813,7 +814,7 @@ int utimensat32($fd_t dirfd, [[nonnull]] char const *filename,
 %
 %#ifdef __USE_ATFILE
 @@>> utimensat(2), utimensat64(2)
-@@@param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH'
+@@@param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH'
 [[cp, decl_include("<bits/os/timespec.h>", "<bits/types.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("utimensat")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("utimensat64")]]
@@ -823,7 +824,7 @@ int utimensat($fd_t dirfd, [[nonnull]] char const *filename,
               [[nullable]] struct timespec const times[2 /*or:3*/],
               $atflag_t flags) {
 @@pp_if $has_function(utimensat64)@@
-@@pp_ifdef       __AT_CHANGE_CTIME@@
+@@pp_ifdef       __AT_CHANGE_BTIME@@
 	struct timespec64 tms[3];
 	if (!times)
 		return utimensat64(dirfd, filename, NULL, flags);
@@ -831,7 +832,7 @@ int utimensat($fd_t dirfd, [[nonnull]] char const *filename,
 	tms[0].tv_nsec = times[0].tv_nsec;
 	tms[1].tv_sec  = (time64_t)times[1].tv_sec;
 	tms[1].tv_nsec = times[1].tv_nsec;
-	if (flags & __AT_CHANGE_CTIME) {
+	if (flags & __AT_CHANGE_BTIME) {
 		tms[2].tv_sec  = (time64_t)times[2].tv_sec;
 		tms[2].tv_nsec = times[2].tv_nsec;
 	}
@@ -847,7 +848,7 @@ int utimensat($fd_t dirfd, [[nonnull]] char const *filename,
 	return utimensat64(dirfd, filename, tms, flags);
 @@pp_endif@@
 @@pp_else@@
-@@pp_ifdef __AT_CHANGE_CTIME@@
+@@pp_ifdef __AT_CHANGE_BTIME@@
 	struct timespec32 tms[3];
 	if (!times)
 		return utimensat32(dirfd, filename, NULL, flags);
@@ -855,7 +856,7 @@ int utimensat($fd_t dirfd, [[nonnull]] char const *filename,
 	tms[0].tv_nsec = times[0].tv_nsec;
 	tms[1].tv_sec  = (time32_t)times[1].tv_sec;
 	tms[1].tv_nsec = times[1].tv_nsec;
-	if (flags & __AT_CHANGE_CTIME) {
+	if (flags & __AT_CHANGE_BTIME) {
 		tms[2].tv_sec  = (time32_t)times[2].tv_sec;
 		tms[2].tv_nsec = times[2].tv_nsec;
 	}
@@ -880,7 +881,7 @@ int utimensat($fd_t dirfd, [[nonnull]] char const *filename,
 int utimensat64($fd_t dirfd, [[nonnull]] char const *filename,
                 [[nullable]] struct timespec64 const times[2 /*or:3*/],
                 $atflag_t flags) {
-@@pp_ifdef __AT_CHANGE_CTIME@@
+@@pp_ifdef __AT_CHANGE_BTIME@@
 	struct timespec32 tms[3];
 	if (!times)
 		return utimensat32(dirfd, filename, NULL, flags);
@@ -888,7 +889,7 @@ int utimensat64($fd_t dirfd, [[nonnull]] char const *filename,
 	tms[0].tv_nsec = times[0].tv_nsec;
 	tms[1].tv_sec  = (time32_t)times[1].tv_sec;
 	tms[1].tv_nsec = times[1].tv_nsec;
-	if (flags & __AT_CHANGE_CTIME) {
+	if (flags & __AT_CHANGE_BTIME) {
 		tms[2].tv_sec  = (time32_t)times[2].tv_sec;
 		tms[2].tv_nsec = times[2].tv_nsec;
 	}

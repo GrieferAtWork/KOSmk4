@@ -125,10 +125,10 @@ libc_dfind_read32(struct dfind *__restrict self,
 	if (fstatat(dirfd(self->df_dir), ent->d_name, &st, AT_SYMLINK_NOFOLLOW))
 		goto err;
 	finddata->attrib      = libc_dfind_attrib(ent, &st);
-	finddata->time_create = (s32)st.st_ctime32;
-	finddata->time_access = (s32)st.st_atime32;
-	finddata->time_write  = (s32)st.st_mtime32;
-	finddata->size        = (_fsize_t)st.st_size;
+	finddata->time_create = (typeof(finddata->time_create))st.st_btime32;
+	finddata->time_access = (typeof(finddata->time_access))st.st_atime32;
+	finddata->time_write  = (typeof(finddata->time_write))st.st_mtime32;
+	finddata->size        = (typeof(finddata->size))st.st_size;
 	memcpy(finddata->name, ent->d_name,
 	       MIN(ent->d_namlen, COMPILER_LENOF(finddata->name)),
 	       sizeof(char));
@@ -150,10 +150,10 @@ libc_dfind_read32i64(struct dfind *__restrict self,
 	            AT_SYMLINK_NOFOLLOW))
 		goto err;
 	finddata->attrib      = libc_dfind_attrib(ent, &st);
-	finddata->time_create = (s32)st.st_ctime32;
-	finddata->time_access = (s32)st.st_atime32;
-	finddata->time_write  = (s32)st.st_mtime32;
-	finddata->size        = (s64)st.st_size64;
+	finddata->time_create = (typeof(finddata->time_create))st.st_btime32;
+	finddata->time_access = (typeof(finddata->time_access))st.st_atime32;
+	finddata->time_write  = (typeof(finddata->time_write))st.st_mtime32;
+	finddata->size        = (typeof(finddata->size))st.st_size64;
 	memcpy(finddata->name, ent->d_name,
 	       MIN(ent->d_namlen, COMPILER_LENOF(finddata->name)),
 	       sizeof(char));
@@ -175,10 +175,10 @@ libc_dfind_read64(struct dfind *__restrict self,
 	            AT_SYMLINK_NOFOLLOW))
 		goto err;
 	finddata->attrib      = libc_dfind_attrib(ent, &st);
-	finddata->time_create = (s64)st.st_ctime64;
-	finddata->time_access = (s64)st.st_atime64;
-	finddata->time_write  = (s64)st.st_mtime64;
-	finddata->size        = (s64)st.st_size64;
+	finddata->time_create = (typeof(finddata->time_create))st.st_btime64;
+	finddata->time_access = (typeof(finddata->time_access))st.st_atime64;
+	finddata->time_write  = (typeof(finddata->time_write))st.st_mtime64;
+	finddata->size        = (typeof(finddata->size))st.st_size64;
 	memcpy(finddata->name, ent->d_name,
 	       MIN(ent->d_namlen, COMPILER_LENOF(finddata->name)),
 	       sizeof(char));

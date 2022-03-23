@@ -216,7 +216,8 @@ struct fnode_ops {
 	 *  - self->_fnode_file_ mf_filesize    # Guarantied to be `<= fn_super->fs_feat.sf_filesize_max'
 	 *  - self->_fnode_file_ mf_atime       # Write to disk as would be truncated by `fsuper_truncate_atime()'
 	 *  - self->_fnode_file_ mf_mtime       # Write to disk as would be truncated by `fsuper_truncate_mtime()'
-	 *  - self->_fnode_file_ mf_ctime       # Write to disk as would be truncated by `fsuper_truncate_ctime()' */
+	 *  - self->_fnode_file_ mf_ctime       # Write to disk as would be truncated by `fsuper_truncate_ctime()'
+	 *  - self->_fnode_file_ mf_btime       # Write to disk as would be truncated by `fsuper_truncate_btime()' */
 	BLOCKING NONNULL((1)) void
 	(KCALL *no_wrattr)(struct fnode *__restrict self)
 			THROWS(E_IOERROR, ...);
@@ -428,6 +429,7 @@ NOTHROW(FCALL fnode_init_addtosuper_and_all)(struct fnode *__restrict self);
  *  - self->_fnode_file_ mf_atime
  *  - self->_fnode_file_ mf_mtime
  *  - self->_fnode_file_ mf_ctime
+ *  - self->_fnode_file_ mf_btime
  *  - self->fn_uid
  *  - self->fn_gid
  *  - self->fn_nlink
@@ -507,12 +509,14 @@ fnode_chown(struct fnode *__restrict self, uid_t owner, gid_t group,
 
 /* Change all non-NULL the timestamp that are given.
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: The `MFILE_F_DELETED' is set.
- * @throw: E_FSERROR_READONLY: The `MFILE_FN_ATTRREADONLY' flag is (or was) set. */
-PUBLIC NONNULL((1)) void KCALL
+ * @throw: E_FSERROR_READONLY: The `MFILE_FN_ATTRREADONLY' flag is (or was) set.
+ * @return: true:  File attributes were changed.
+ * @return: false: File attributes remain unchanged (ctime wasn't updated). */
+PUBLIC NONNULL((1)) __BOOL KCALL
 mfile_chtime(struct mfile *__restrict self,
              struct timespec const *new_atime,
              struct timespec const *new_mtime,
-             struct timespec const *new_ctime)
+             struct timespec const *new_btime)
 		THROWS(E_FSERROR_READONLY);
 
 

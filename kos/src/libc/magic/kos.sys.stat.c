@@ -197,7 +197,7 @@ void UTimensAt32($fd_t dirfd, [[nonnull]] char const *filename,
 void UTimensAt($fd_t dirfd, [[nonnull]] char const *filename,
                [[nullable]] struct timespec const times[2 /*or:3*/], $atflag_t flags) {
 @@pp_if $has_function(UTimensAt64)@@
-@@pp_ifdef       __AT_CHANGE_CTIME@@
+@@pp_ifdef       __AT_CHANGE_BTIME@@
 	struct timespec64 tms[3];
 	if (!times) {
 		UTimensAt64(dirfd, filename, NULL, flags);
@@ -206,7 +206,7 @@ void UTimensAt($fd_t dirfd, [[nonnull]] char const *filename,
 		tms[0].tv_nsec = times[0].tv_nsec;
 		tms[1].tv_sec  = (time64_t)times[1].tv_sec;
 		tms[1].tv_nsec = times[1].tv_nsec;
-		if (flags & __AT_CHANGE_CTIME) {
+		if (flags & __AT_CHANGE_BTIME) {
 			tms[2].tv_sec  = (time64_t)times[2].tv_sec;
 			tms[2].tv_nsec = times[2].tv_nsec;
 		}
@@ -225,7 +225,7 @@ void UTimensAt($fd_t dirfd, [[nonnull]] char const *filename,
 	}
 @@pp_endif@@
 @@pp_else@@
-@@pp_ifdef __AT_CHANGE_CTIME@@
+@@pp_ifdef __AT_CHANGE_BTIME@@
 	struct timespec32 tms[3];
 	if (!times) {
 		UTimensAt32(dirfd, filename, NULL, flags);
@@ -234,7 +234,7 @@ void UTimensAt($fd_t dirfd, [[nonnull]] char const *filename,
 		tms[0].tv_nsec = times[0].tv_nsec;
 		tms[1].tv_sec  = (time32_t)times[1].tv_sec;
 		tms[1].tv_nsec = times[1].tv_nsec;
-		if (flags & __AT_CHANGE_CTIME) {
+		if (flags & __AT_CHANGE_BTIME) {
 			tms[2].tv_sec  = (time32_t)times[2].tv_sec;
 			tms[2].tv_nsec = times[2].tv_nsec;
 		}
@@ -262,7 +262,7 @@ void UTimensAt($fd_t dirfd, [[nonnull]] char const *filename,
 [[impl_include("<asm/os/fcntl.h>")]]
 void UTimensAt64($fd_t dirfd, [[nonnull]] char const *filename,
                  [[nullable]] struct timespec64 const times[2 /*or:3*/], $atflag_t flags) {
-@@pp_ifdef __AT_CHANGE_CTIME@@
+@@pp_ifdef __AT_CHANGE_BTIME@@
 	struct timespec32 tms[3];
 	if (!times) {
 		UTimensAt32(dirfd, filename, NULL, flags);
@@ -271,7 +271,7 @@ void UTimensAt64($fd_t dirfd, [[nonnull]] char const *filename,
 		tms[0].tv_nsec = times[0].tv_nsec;
 		tms[1].tv_sec  = (time32_t)times[1].tv_sec;
 		tms[1].tv_nsec = times[1].tv_nsec;
-		if (flags & __AT_CHANGE_CTIME) {
+		if (flags & __AT_CHANGE_BTIME) {
 			tms[2].tv_sec  = (time32_t)times[2].tv_sec;
 			tms[2].tv_nsec = times[2].tv_nsec;
 		}

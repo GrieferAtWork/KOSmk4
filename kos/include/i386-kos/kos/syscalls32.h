@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x177013ac */
+/* HASH CRC-32:0xdabf471a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2550,11 +2550,11 @@ __CDECLARE_SC(,__errno_t,utime,(char const *__filename, struct __utimbufx32 cons
 __CDECLARE_SC(,__errno_t,utime64,(char const *__filename, struct __utimbufx32_64 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_SC(utime64) */
 #if __CRT_HAVE_SC(utimensat)
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
 __CDECLARE_SC(,__errno_t,utimensat,(__fd_t __dirfd, char const *__filename, struct __timespecx32 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
 #endif /* __CRT_HAVE_SC(utimensat) */
 #if __CRT_HAVE_SC(utimensat_time64)
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
 __CDECLARE_SC(,__errno_t,utimensat_time64,(__fd_t __dirfd, char const *__filename, struct __timespecx32_64 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
 #endif /* __CRT_HAVE_SC(utimensat_time64) */
 #if __CRT_HAVE_SC(utimes)
@@ -5036,11 +5036,11 @@ __CDECLARE_XSC(,__errno_t,utime,(char const *__filename, struct __utimbufx32 con
 __CDECLARE_XSC(,__errno_t,utime64,(char const *__filename, struct __utimbufx32_64 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_XSC(utime64) */
 #if __CRT_HAVE_XSC(utimensat)
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
 __CDECLARE_XSC(,__errno_t,utimensat,(__fd_t __dirfd, char const *__filename, struct __timespecx32 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
 #endif /* __CRT_HAVE_XSC(utimensat) */
 #if __CRT_HAVE_XSC(utimensat_time64)
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
 __CDECLARE_XSC(,__errno_t,utimensat_time64,(__fd_t __dirfd, char const *__filename, struct __timespecx32_64 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
 #endif /* __CRT_HAVE_XSC(utimensat_time64) */
 #if __CRT_HAVE_XSC(utimes)

@@ -91,8 +91,8 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID,           /* E_INVALID_ARGUMENT_BAD_VALUE: The `uid' given to `chown(2)' cannot be encoded by the underlying filesystem. */
 	E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID,           /* E_INVALID_ARGUMENT_BAD_VALUE: The `gid' given to `chown(2)' cannot be encoded by the underlying filesystem. */
 	E_INVALID_ARGUMENT_CONTEXT_FCHOWNAT_FLAGS,             /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fchownat' isn't a set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
-	E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS,            /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' isn't a set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
-	E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS_NOFILENAME, /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' (with `filename' set to `NULL') isn't a set of `0 | AT_CHANGE_CTIME' */
+	E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS,            /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' isn't a set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
+	E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS_NOFILENAME, /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' (with `filename' set to `NULL') isn't a set of `0 | AT_CHANGE_BTIME' */
 	E_INVALID_ARGUMENT_CONTEXT_RENAMEAT2_FLAGS,            /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `renameat2()' isn't a set of `0|AT_DOSPATH|RENAME_NOREPLACE|RENAME_EXCHANGE|RENAME_MOVETODIR|RENAME_WHITEOUT'
 	                                                        * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: both `AT_RENAME_NOREPLACE' and `AT_RENAME_EXCHANGE' were given to `renameat2()' */
 
@@ -378,8 +378,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID                 E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID                 /* E_INVALID_ARGUMENT_BAD_VALUE: The `uid' given to `chown(2)' cannot be encoded by the underlying filesystem. */
 #define E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID                 E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID                 /* E_INVALID_ARGUMENT_BAD_VALUE: The `gid' given to `chown(2)' cannot be encoded by the underlying filesystem. */
 #define E_INVALID_ARGUMENT_CONTEXT_FCHOWNAT_FLAGS                   E_INVALID_ARGUMENT_CONTEXT_FCHOWNAT_FLAGS                   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fchownat' isn't a set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
-#define E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS                  E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS                  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' isn't a set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
-#define E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS_NOFILENAME       E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS_NOFILENAME       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' (with `filename' set to `NULL') isn't a set of `0 | AT_CHANGE_CTIME' */
+#define E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS                  E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS                  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' isn't a set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
+#define E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS_NOFILENAME       E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS_NOFILENAME       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' (with `filename' set to `NULL') isn't a set of `0 | AT_CHANGE_BTIME' */
 #define E_INVALID_ARGUMENT_CONTEXT_RENAMEAT2_FLAGS                  E_INVALID_ARGUMENT_CONTEXT_RENAMEAT2_FLAGS                  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `renameat2()' isn't a set of `0|AT_DOSPATH|RENAME_NOREPLACE|RENAME_EXCHANGE|RENAME_MOVETODIR|RENAME_WHITEOUT'
                                                                                                                                  * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: both `AT_RENAME_NOREPLACE' and `AT_RENAME_EXCHANGE' were given to `renameat2()' */
 /* System calls: fs syscalls for file testing/query. */
@@ -633,8 +633,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID                 386  /* E_INVALID_ARGUMENT_BAD_VALUE: The `uid' given to `chown(2)' cannot be encoded by the underlying filesystem. */
 #define E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID                 387  /* E_INVALID_ARGUMENT_BAD_VALUE: The `gid' given to `chown(2)' cannot be encoded by the underlying filesystem. */
 #define E_INVALID_ARGUMENT_CONTEXT_FCHOWNAT_FLAGS                   388  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fchownat' isn't a set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
-#define E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS                  389  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' isn't a set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
-#define E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS_NOFILENAME       390  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' (with `filename' set to `NULL') isn't a set of `0 | AT_CHANGE_CTIME' */
+#define E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS                  389  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' isn't a set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
+#define E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS_NOFILENAME       390  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' (with `filename' set to `NULL') isn't a set of `0 | AT_CHANGE_BTIME' */
 #define E_INVALID_ARGUMENT_CONTEXT_RENAMEAT2_FLAGS                  391  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `renameat2()' isn't a set of `0|AT_DOSPATH|RENAME_NOREPLACE|RENAME_EXCHANGE|RENAME_MOVETODIR|RENAME_WHITEOUT'
                                                                           * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: both `AT_RENAME_NOREPLACE' and `AT_RENAME_EXCHANGE' were given to `renameat2()' */
 /* System calls: fs syscalls for file testing/query. */

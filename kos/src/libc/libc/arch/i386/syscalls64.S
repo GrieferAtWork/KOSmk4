@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x424b34b2 */
+/* HASH CRC-32:0xc9216d9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2774,7 +2774,7 @@ INTERN_FUNCTION(libc_sys_move_pages)
 END(libc_sys_move_pages)
 DEFINE_PUBLIC_ALIAS(sys_move_pages, libc_sys_move_pages)
 
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
 /* errno_t utimensat(fd_t dirfd, char const *filename, struct timespecx64 const[2] times, atflag_t flags) */
 INTERN_FUNCTION(libc_sys_utimensat)
 	movq   $(0x118), %rax
@@ -7550,7 +7550,7 @@ INTERN_FUNCTION(libc_sys_Xmove_pages)
 END(libc_sys_Xmove_pages)
 DEFINE_PUBLIC_ALIAS(sys_Xmove_pages, libc_sys_Xmove_pages)
 
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
 /* errno_t utimensat(fd_t dirfd, char const *filename, struct timespecx64 const[2] times, atflag_t flags) */
 INTERN_FUNCTION(libc_sys_Xutimensat)
 	movq   $(0x118), %rax

@@ -409,7 +409,8 @@ struct vidlck
 	 (self)->mf_flags = (MFILE_F_READONLY | MFILE_F_ATTRCHANGED | MFILE_F_CHANGED | \
 	                     MFILE_F_NOATIME | MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |    \
 	                     MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE),                  \
-	 (self)->mf_ctime = (self)->mf_mtime = (self)->mf_atime = realtime())
+	 (self)->mf_btime = (self)->mf_ctime =                                          \
+	 (self)->mf_mtime = (self)->mf_atime = realtime())
 #define _vidlck_cinit(self, ops)                                                    \
 	(_mfile_cinit(self, &(ops)->vlo_file, PAGESHIFT, PAGESHIFT),                    \
 	 (self)->mf_parts             = MFILE_PARTS_ANONYMOUS,                          \
@@ -418,7 +419,8 @@ struct vidlck
 	 (self)->mf_flags = (MFILE_F_READONLY | MFILE_F_ATTRCHANGED | MFILE_F_CHANGED | \
 	                     MFILE_F_NOATIME | MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |    \
 	                     MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE),                  \
-	 (self)->mf_ctime = (self)->mf_mtime = (self)->mf_atime = realtime())
+	 (self)->mf_btime = (self)->mf_ctime =                                          \
+	 (self)->mf_mtime = (self)->mf_atime = realtime())
 
 /* Finalize a partially initialized `struct vidlck' (as initialized by `_vidlck_init()') */
 #define _vidlck_fini(self) (void)0

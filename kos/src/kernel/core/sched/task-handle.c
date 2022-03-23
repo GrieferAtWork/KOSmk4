@@ -68,9 +68,10 @@ INTERN void KCALL
 handle_pidfd_stat(struct taskpid *__restrict self,
                   USER CHECKED struct stat *result) {
 	bzero(result, sizeof(*result));
-	/* TODO: st_ctim: Thread creation time? */
 	/* TODO: st_atim: End of the latest quantum */
 	/* TODO: st_mtim: Start of the latest quantum */
+	/* TODO: st_ctim: Start of the latest quantum */
+	/* TODO: st_btim: Thread creation time */
 	(void)self;
 }
 

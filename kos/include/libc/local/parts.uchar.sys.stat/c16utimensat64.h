@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd24879d */
+/* HASH CRC-32:0x6c4a68b0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -107,7 +107,7 @@ __NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(c16utimensat64))(__fd_t __dirfd, __CH
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 	return __result;
 #else /* (__CRT_HAVE_utimensat64 || __CRT_HAVE_utimensat) && ((__CRT_HAVE_convert_wcstombs && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$convert_wcstombs || (__CRT_HAVE_convert_wcstombsn && __SIZEOF_WCHAR_T__ == 2) || __CRT_HAVE_DOS$convert_wcstombsn || __CRT_HAVE_format_aprintf_printer || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) */
-#ifdef __AT_CHANGE_CTIME
+#ifdef __AT_CHANGE_BTIME
 	struct __timespec32 __tms[3];
 	if (!__times)
 		return (__NAMESPACE_LOCAL_SYM __localdep_crt_c16utimensat32)(__dirfd, __filename, __NULLPTR, __flags);
@@ -115,12 +115,12 @@ __NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(c16utimensat64))(__fd_t __dirfd, __CH
 	__tms[0].tv_nsec = __times[0].tv_nsec;
 	__tms[1].tv_sec  = (__time32_t)__times[1].tv_sec;
 	__tms[1].tv_nsec = __times[1].tv_nsec;
-	if (__flags & __AT_CHANGE_CTIME) {
+	if (__flags & __AT_CHANGE_BTIME) {
 		__tms[2].tv_sec  = (__time32_t)__times[2].tv_sec;
 		__tms[2].tv_nsec = __times[2].tv_nsec;
 	}
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_c16utimensat32)(__dirfd, __filename, __tms, __flags);
-#else /* __AT_CHANGE_CTIME */
+#else /* __AT_CHANGE_BTIME */
 	struct __timespec32 __tms[2];
 	if (!__times)
 		return (__NAMESPACE_LOCAL_SYM __localdep_crt_c16utimensat32)(__dirfd, __filename, __NULLPTR, __flags);
@@ -129,7 +129,7 @@ __NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(c16utimensat64))(__fd_t __dirfd, __CH
 	__tms[1].tv_sec  = (__time32_t)__times[1].tv_sec;
 	__tms[1].tv_nsec = __times[1].tv_nsec;
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_c16utimensat32)(__dirfd, __filename, __tms, __flags);
-#endif /* !__AT_CHANGE_CTIME */
+#endif /* !__AT_CHANGE_BTIME */
 #endif /* (!__CRT_HAVE_utimensat64 && !__CRT_HAVE_utimensat) || ((!__CRT_HAVE_convert_wcstombs || __SIZEOF_WCHAR_T__ != 2 || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$convert_wcstombs && (!__CRT_HAVE_convert_wcstombsn || __SIZEOF_WCHAR_T__ != 2) && !__CRT_HAVE_DOS$convert_wcstombsn && !__CRT_HAVE_format_aprintf_printer && !__CRT_HAVE_format_aprintf_alloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc) */
 }
 __NAMESPACE_LOCAL_END

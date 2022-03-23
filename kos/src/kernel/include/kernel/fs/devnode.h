@@ -83,6 +83,7 @@ fdevnode_v_open(struct mfile *__restrict self,
  *  - self->_fdevnode_node_ _fnode_file_ mf_atime
  *  - self->_fdevnode_node_ _fnode_file_ mf_mtime
  *  - self->_fdevnode_node_ _fnode_file_ mf_ctime
+ *  - self->_fdevnode_node_ _fnode_file_ mf_btime
  *  - self->_fdevnode_node_ fn_uid
  *  - self->_fdevnode_node_ fn_gid
  *  - self->_fdevnode_node_ fn_allnodes

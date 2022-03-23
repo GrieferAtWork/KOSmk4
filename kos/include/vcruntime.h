@@ -141,18 +141,21 @@ typedef __BOOL __vcrt_bool;
 typedef __WCHAR_TYPE__ wchar_t;
 #endif  /* __wchar_t_defined */
 
+/* Static functions */
+#ifdef _MSC_VER
 #ifndef _M_CEE
-void __ATTR_CDECL __security_init_cookie(void);
+extern void __ATTR_CDECL __security_init_cookie(void);
 #if defined(__i386__) || defined(__x86_64__)
-void __ATTR_FASTCALL __security_check_cookie(uintptr_t __stackcookie);
-__ATTR_NORETURN void __ATTR_CDECL __report_gsfailure(void);
+extern void __ATTR_FASTCALL __security_check_cookie(uintptr_t __stackcookie);
+extern __ATTR_NORETURN void __ATTR_CDECL __report_gsfailure(void);
 #else /* _M_IX86 */
-void __ATTR_CDECL __security_check_cookie(uintptr_t __stackcookie);
-__ATTR_NORETURN void __ATTR_CDECL __report_gsfailure(uintptr_t __stackcookie);
+extern void __ATTR_CDECL __security_check_cookie(uintptr_t __stackcookie);
+extern __ATTR_NORETURN void __ATTR_CDECL __report_gsfailure(uintptr_t __stackcookie);
 #endif
 #endif /* !_M_CEE */
 
 extern uintptr_t __security_cookie;
+#endif /* _MSC_VER */
 
 __DECL_END
 #endif /* __CC__ */

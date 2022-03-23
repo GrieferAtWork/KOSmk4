@@ -261,6 +261,7 @@ PUBLIC struct mfile mfile_ndef = {
 	MFILE_INIT_mf_atime(0, 0),
 	MFILE_INIT_mf_mtime(0, 0),
 	MFILE_INIT_mf_ctime(0, 0),
+	MFILE_INIT_mf_btime(0, 0),
 };
 
 
@@ -289,6 +290,7 @@ PUBLIC struct mfile mfile_anon[BITSOF(void *)] = {
 		MFILE_INIT_mf_atime(0, 0),                                  \
 		MFILE_INIT_mf_mtime(0, 0),                                  \
 		MFILE_INIT_mf_ctime(0, 0),                                  \
+		MFILE_INIT_mf_btime(0, 0),                                  \
 	}
 	INIT_ANON_FILE(0),  INIT_ANON_FILE(1),  INIT_ANON_FILE(2),  INIT_ANON_FILE(3),
 	INIT_ANON_FILE(4),  INIT_ANON_FILE(5),  INIT_ANON_FILE(6),  INIT_ANON_FILE(7),

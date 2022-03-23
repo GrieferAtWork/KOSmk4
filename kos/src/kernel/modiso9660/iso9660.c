@@ -280,6 +280,7 @@ iso9660_v_makenode(struct flatsuper *__restrict UNUSED(self),
 	RecordDateTime_Decode(&ent->id_rec, &result->mf_atime);
 	result->mf_mtime = result->mf_atime;
 	result->mf_ctime = result->mf_atime;
+	result->mf_btime = result->mf_atime;
 	return result;
 }
 
@@ -420,6 +421,7 @@ iso9660_openfs(struct ffilesys *__restrict UNUSED(filesys),
 	result->ffs_super.fs_root.mf_atime = realtime();
 	result->ffs_super.fs_root.mf_mtime = result->ffs_super.fs_root.mf_atime;
 	result->ffs_super.fs_root.mf_ctime = result->ffs_super.fs_root.mf_atime;
+	result->ffs_super.fs_root.mf_btime = result->ffs_super.fs_root.mf_atime;
 	result->ffs_super.fs_root.fn_nlink = 1;
 	result->ffs_super.fs_root.fn_uid   = 0;
 	result->ffs_super.fs_root.fn_gid   = 0;

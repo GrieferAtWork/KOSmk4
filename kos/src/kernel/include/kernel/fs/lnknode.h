@@ -196,6 +196,7 @@ struct flnknode
  *  - self->_flnknode_node_ _fnode_file_ mf_atime
  *  - self->_flnknode_node_ _fnode_file_ mf_mtime
  *  - self->_flnknode_node_ _fnode_file_ mf_ctime
+ *  - self->_flnknode_node_ _fnode_file_ mf_btime
  *  - self->_flnknode_node_ fn_uid
  *  - self->_flnknode_node_ fn_gid
  *  - self->_flnknode_node_ fn_allnodes

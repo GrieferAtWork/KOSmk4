@@ -230,7 +230,8 @@ for (local name, st_mode, st_rdev: DEVICES) {
 	print("				MFILE_INIT_mf_filesize(", DEVICE_SIZES.get(name, "0"), "),");
 	print("				MFILE_INIT_mf_atime(0, 0),");
 	print("				MFILE_INIT_mf_mtime(0, 0),");
-	print("				MFILE_INIT_mf_ctime(0, 0)");
+	print("				MFILE_INIT_mf_ctime(0, 0),");
+	print("				MFILE_INIT_mf_btime(0, 0)");
 	print("			},");
 	print("			.fn_nlink = 1,");
 	print("			.fn_mode  = ", (st_mode & 07777).oct(), " | ", STMODE_MAP[st_mode & ~07777], ",");
@@ -433,7 +434,8 @@ PUBLIC struct device dev_mem = {
 				MFILE_INIT_mf_filesize((uint64_t)(physaddr_t)-1),
 				MFILE_INIT_mf_atime(0, 0),
 				MFILE_INIT_mf_mtime(0, 0),
-				MFILE_INIT_mf_ctime(0, 0)
+				MFILE_INIT_mf_ctime(0, 0),
+				MFILE_INIT_mf_btime(0, 0)
 			},
 			.fn_nlink = 1,
 			.fn_mode  = 0640 | S_IFCHR,
@@ -481,7 +483,8 @@ PUBLIC struct device dev_kmem = {
 				MFILE_INIT_mf_filesize((uint64_t)(size_t)-1),
 				MFILE_INIT_mf_atime(0, 0),
 				MFILE_INIT_mf_mtime(0, 0),
-				MFILE_INIT_mf_ctime(0, 0)
+				MFILE_INIT_mf_ctime(0, 0),
+				MFILE_INIT_mf_btime(0, 0)
 			},
 			.fn_nlink = 1,
 			.fn_mode  = 0640 | S_IFCHR,
@@ -529,7 +532,8 @@ PUBLIC struct device dev_null = {
 				MFILE_INIT_mf_filesize(0),
 				MFILE_INIT_mf_atime(0, 0),
 				MFILE_INIT_mf_mtime(0, 0),
-				MFILE_INIT_mf_ctime(0, 0)
+				MFILE_INIT_mf_ctime(0, 0),
+				MFILE_INIT_mf_btime(0, 0)
 			},
 			.fn_nlink = 1,
 			.fn_mode  = 0666 | S_IFCHR,
@@ -577,7 +581,8 @@ PUBLIC struct device dev_port = {
 				MFILE_INIT_mf_filesize((uint64_t)(port_t)-1),
 				MFILE_INIT_mf_atime(0, 0),
 				MFILE_INIT_mf_mtime(0, 0),
-				MFILE_INIT_mf_ctime(0, 0)
+				MFILE_INIT_mf_ctime(0, 0),
+				MFILE_INIT_mf_btime(0, 0)
 			},
 			.fn_nlink = 1,
 			.fn_mode  = 0640 | S_IFCHR,
@@ -624,7 +629,8 @@ PUBLIC struct device dev_zero = {
 				MFILE_INIT_mf_filesize(0),
 				MFILE_INIT_mf_atime(0, 0),
 				MFILE_INIT_mf_mtime(0, 0),
-				MFILE_INIT_mf_ctime(0, 0)
+				MFILE_INIT_mf_ctime(0, 0),
+				MFILE_INIT_mf_btime(0, 0)
 			},
 			.fn_nlink = 1,
 			.fn_mode  = 0666 | S_IFCHR,
@@ -673,7 +679,8 @@ PUBLIC struct device dev_full = {
 				MFILE_INIT_mf_filesize(0),
 				MFILE_INIT_mf_atime(0, 0),
 				MFILE_INIT_mf_mtime(0, 0),
-				MFILE_INIT_mf_ctime(0, 0)
+				MFILE_INIT_mf_ctime(0, 0),
+				MFILE_INIT_mf_btime(0, 0)
 			},
 			.fn_nlink = 1,
 			.fn_mode  = 0666 | S_IFCHR,
@@ -721,7 +728,8 @@ PUBLIC struct device dev_random = {
 				MFILE_INIT_mf_filesize(0),
 				MFILE_INIT_mf_atime(0, 0),
 				MFILE_INIT_mf_mtime(0, 0),
-				MFILE_INIT_mf_ctime(0, 0)
+				MFILE_INIT_mf_ctime(0, 0),
+				MFILE_INIT_mf_btime(0, 0)
 			},
 			.fn_nlink = 1,
 			.fn_mode  = 0666 | S_IFCHR,
@@ -770,7 +778,8 @@ PUBLIC struct device dev_urandom = {
 				MFILE_INIT_mf_filesize((uint64_t)-1),
 				MFILE_INIT_mf_atime(0, 0),
 				MFILE_INIT_mf_mtime(0, 0),
-				MFILE_INIT_mf_ctime(0, 0)
+				MFILE_INIT_mf_ctime(0, 0),
+				MFILE_INIT_mf_btime(0, 0)
 			},
 			.fn_nlink = 1,
 			.fn_mode  = 0666 | S_IFCHR,
@@ -819,7 +828,8 @@ PUBLIC struct device dev_kmsg = {
 				MFILE_INIT_mf_filesize(0),
 				MFILE_INIT_mf_atime(0, 0),
 				MFILE_INIT_mf_mtime(0, 0),
-				MFILE_INIT_mf_ctime(0, 0)
+				MFILE_INIT_mf_ctime(0, 0),
+				MFILE_INIT_mf_btime(0, 0)
 			},
 			.fn_nlink = 1,
 			.fn_mode  = 0644 | S_IFCHR,
@@ -868,7 +878,8 @@ PUBLIC struct device dev_tty = {
 				MFILE_INIT_mf_filesize(0),
 				MFILE_INIT_mf_atime(0, 0),
 				MFILE_INIT_mf_mtime(0, 0),
-				MFILE_INIT_mf_ctime(0, 0)
+				MFILE_INIT_mf_ctime(0, 0),
+				MFILE_INIT_mf_btime(0, 0)
 			},
 			.fn_nlink = 1,
 			.fn_mode  = 0666 | S_IFCHR,

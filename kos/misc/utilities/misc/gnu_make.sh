@@ -809,8 +809,8 @@ $1=$2"
 						_config_site_option "gl_cv_func_ceill_works" "yes"; ;;
 					*gl_cv_func_chown_slash_works*) # symlink(\"file\", \"link\"); assert(chown(\"link/\") != 0)
 						_config_site_option "gl_cv_func_chown_slash_works" "yes"; ;;
-					*gl_cv_func_chown_ctime_works*) # symlink(3) updates st_ctime (doesn't on KOS, where st_ctime is file-creation time)
-						_config_site_option "gl_cv_func_chown_ctime_works" "no"; ;;
+					*gl_cv_func_chown_ctime_works*) # chown(3) updates st_ctime (yes it does, but the timestamp may not be persistent...)
+						_config_site_option "gl_cv_func_chown_ctime_works" "yes"; ;;
 					*gl_cv_func_chown_follows_symlink*)
 						_config_site_option "gl_cv_func_chown_follows_symlink" "yes"; ;;
 					*gl_cv_struct_dirent_d_ino*)
