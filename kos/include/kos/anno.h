@@ -93,7 +93,8 @@
  * function is called from another function annotated as NOTHROW()
  * s.a. `bugprone-exception-escape' */
 #undef __THROWS
-#define __THROWS(...) throw(int)
+#define __THROWS(...)         throw(int)
+#define __TYPEDEF_THROWS(...) /* Doesn't work :( */
 #undef __THROWING
 #define __THROWING(...) (__VA_ARGS__) __PRIVATE_THROWING
 #define __PRIVATE_THROWING(...) (__VA_ARGS__) throw(int)
@@ -105,6 +106,9 @@
 #define __THROWING(...) (__VA_ARGS__) __PRIVATE_THROWING
 #define __PRIVATE_THROWING(...) (__VA_ARGS__) noexcept(false)
 #endif /* __clang_tidy__ && __cplusplus */
+#ifndef __TYPEDEF_THROWS
+#define __TYPEDEF_THROWS __THROWS
+#endif /* !__TYPEDEF_THROWS */
 
 
 #endif /* !_KOS_ANNO_H */

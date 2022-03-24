@@ -112,7 +112,7 @@ NOTHROW(FCALL entropy_take_nopr)(void *buf, size_t num_bits);
  *          not predictable. (e.g.: if the source of randomness  is
  *          timing, only feed the least  significant few bits of  a
  *          nano-second counter!)
- * Also: Don't feed security-critical data (such as which buffers a
+ * Also: Don't feed security-critical data (such as which buttons a
  *       user is pressing)  to this function,  as this  information
  *       may otherwise be reverse-engineered by a malicious entity! */
 FUNDEF NOBLOCK NONNULL((1)) void

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa416fcf */
+/* HASH CRC-32:0xa71af19f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,11 +71,11 @@ __LIBC __ATTR_NORETURN __ATTR_SENTINEL __ATTR_NONNULL((1)) void (__VLIBCCALL Exe
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
  * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
-#ifdef __cplusplus
+#if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_USING_OR_IMPL(Execl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_SENTINEL __ATTR_NONNULL((1)) void (__VLIBCCALL Execl)(char const *__restrict __path, char const *__args, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execl))(__path, __args, __builtin_va_arg_pack()); })
-#else /* __cplusplus */
-#define Execl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execl))
-#endif /* !__cplusplus */
+#else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
+#define Execl(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execl))(__VA_ARGS__)
+#endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
 #endif /* ... */
 #ifdef __CRT_HAVE_Execle
 /* >> execle(3)
@@ -89,11 +89,11 @@ __LIBC __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void (__VLIBCCAL
  * Replace the calling process with the application image referred to by `path' / `file'
  * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
-#ifdef __cplusplus
+#if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_USING_OR_IMPL(Execle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void (__VLIBCCALL Execle)(char const *__restrict __path, char const *__args, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execle))(__path, __args, __builtin_va_arg_pack()); })
-#else /* __cplusplus */
-#define Execle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execle))
-#endif /* !__cplusplus */
+#else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
+#define Execle(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execle))(__VA_ARGS__)
+#endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
 #endif /* ... */
 #ifdef __CRT_HAVE_Execpl
 /* >> execlp(3)
@@ -105,11 +105,11 @@ __LIBC __ATTR_NORETURN __ATTR_SENTINEL __ATTR_NONNULL((1)) void (__VLIBCCALL Exe
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
  * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
-#ifdef __cplusplus
+#if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_USING_OR_IMPL(Execpl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_SENTINEL __ATTR_NONNULL((1)) void (__VLIBCCALL Execpl)(char const *__restrict __file, char const *__args, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execpl))(__file, __args, __builtin_va_arg_pack()); })
-#else /* __cplusplus */
-#define Execpl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execpl))
-#endif /* !__cplusplus */
+#else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
+#define Execpl(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execpl))(__VA_ARGS__)
+#endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
 #endif /* ... */
 #ifdef __CRT_HAVE_Execlpe
 /* >> execle(3)
@@ -123,11 +123,11 @@ __LIBC __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void (__VLIBCCAL
  * Replace the calling process with the application image referred to by `path' / `file'
  * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
-#ifdef __cplusplus
+#if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_USING_OR_IMPL(Execlpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void (__VLIBCCALL Execlpe)(char const *__restrict __file, char const *__args, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execlpe))(__file, __args, __builtin_va_arg_pack()); })
-#else /* __cplusplus */
-#define Execlpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execlpe))
-#endif /* !__cplusplus */
+#else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
+#define Execlpe(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execlpe))(__VA_ARGS__)
+#endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
 #endif /* ... */
 /* >> pipe(2)
  * Create a new pair of connected pipes ([0] = reader, [1] = writer)

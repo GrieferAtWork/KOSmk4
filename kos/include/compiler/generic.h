@@ -244,7 +244,7 @@
 #elif defined(__TINYC__) || 1
 #define __FUNCTION__ __func__
 #define __builtin_FUNCTION() __func__
-#define __builtin_FUNCTION_IS_func__
+#define __builtin_FUNCTION_IS___func__
 #else /* ... */
 #define __NO_builtin_FUNCTION
 #define __builtin_FUNCTION() (char *)0

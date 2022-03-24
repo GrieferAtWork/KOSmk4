@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37e3b48f */
+/* HASH CRC-32:0xf6953e2c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,10 +49,6 @@
 #define __size_t_defined
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
-#if defined(__std___forward_size_defined) && !defined(____forward_size_defined)
-#define ____forward_size_defined
-__NAMESPACE_STD_USING(__forward_size)
-#endif /* __std___forward_size_defined && !____forward_size_defined */
 #if !defined(__memcpy_defined) && defined(__std_memcpy_defined)
 #define __memcpy_defined
 __NAMESPACE_STD_USING(memcpy)
@@ -125,10 +121,6 @@ __NAMESPACE_STD_END
 #define __size_t_defined
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
-#if defined(__std___forward_size_defined) && !defined(____forward_size_defined)
-#define ____forward_size_defined
-__NAMESPACE_STD_USING(__forward_size)
-#endif /* __std___forward_size_defined && !____forward_size_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
 #ifndef NULL
@@ -7099,11 +7091,11 @@ __LIBC __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_LIBC_PRIN
 #include <libc/local/string/strdupf.h>
 /* >> strdupf(3), vstrdupf(3)
  * Print the given `format' into a newly allocated, heap-allocated string */
-#ifdef __cplusplus
+#if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_USING_OR_IMPL(strdupf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_LIBC_PRINTF(1, 2) __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__VLIBCCALL strdupf)(char const *__restrict __format, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strdupf))(__format, __builtin_va_arg_pack()); })
-#else /* __cplusplus */
-#define strdupf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strdupf))
-#endif /* !__cplusplus */
+#else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
+#define strdupf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strdupf))(__VA_ARGS__)
+#endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
 #endif /* ... */
 /* mstrdupa() & friends. */
 #ifdef __INTELLISENSE__
@@ -8107,23 +8099,8 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2))
 #ifndef __INTELLISENSE__
 #if __has_builtin(__builtin_strlen)
 #ifdef __cplusplus
-#ifndef __std___forward_size_defined
-#define __std___forward_size_defined
-__NAMESPACE_STD_BEGIN
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_CONST size_t __NOTHROW(__forward_size)(size_t __x) { return __x; }
-__NAMESPACE_STD_END
-#endif /* !__std___forward_size_defined */
-#ifndef __CXX_SYSTEM_HEADER
-__NAMESPACE_GLB_USING_OR_IMPL(__forward_size, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_CONST size_t __NOTHROW(__forward_size)(size_t __x) { return __x; })
-#endif /* !__CXX_SYSTEM_HEADER */
-/* Must  also put a  symbol in `__local_impl'  so that the `#define __libc_core_strlen',
- * (and its consumer `__libc_strlen()') from <libc/string.h> continue to work correctly. */
-__NAMESPACE_LOCAL_BEGIN
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_CONST size_t __NOTHROW(__forward_size)(size_t __x) { return __x; }
-__NAMESPACE_LOCAL_END
-
 /* Special handling, so this macro also works as `std::strlen(...)' */
-#define strlen(x) __forward_size(__builtin_constant_p(x) ? __builtin_strlen(x) : (__NAMESPACE_STD_SYM strlen)(x))
+#define strlen(x) size_t(__builtin_constant_p(x) ? __builtin_strlen(x) : (__NAMESPACE_STD_SYM strlen)(x))
 #else /* __cplusplus */
 #define strlen(x) (__builtin_constant_p(x) ? __builtin_strlen(x) : (strlen)(x))
 #endif /* !__cplusplus */

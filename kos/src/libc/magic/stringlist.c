@@ -137,8 +137,7 @@ void sl_free([[nullable]] struct _stringlist *sl, int freeit) {
 	return NULL;
 }
 
-%#ifdef __USE_BSD
-@@>> sl_delete(3)
+@@>> sl_delete(3) [NetBSD]
 @@Remove an entry `name' from `sl'
 @@When `freeit' is non-zero, a removed string is deallocated using `free(3)'
 @@@return: 0:  Successfully removed a string equal to `name'
@@ -167,8 +166,6 @@ int sl_delete([[nonnull]] struct _stringlist *sl,
 	}
 	return -1; /* Not found */
 }
-
-%#endif /* __USE_BSD */
 
 %{
 

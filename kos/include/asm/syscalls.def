@@ -2110,7 +2110,7 @@ timerfd_create:(clockid_t clock_id, [tostr(TIMERFD_FLAGS)] syscall_ulong_t flags
 %[startgroup]
 @@Set next expiration time of interval timer source `timerfd' to `utmr'.
 @@If `flags'  has the  `TFD_TIMER_ABSTIME' flag  set the  timeout  value
-@@is absolute. Optionally return the old expiration time in `otmr''
+@@is absolute. Optionally return the old expiration time in `otmr'
 @@@param: flags: Set of `0 | TFD_TIMER_ABSTIME'
 timerfd_settime:(fd_t timerfd, [tostr(TIMERFD_TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_ITIMERSPEC)] struct itimerspec const *utmr, [tostr(out:STRUCT_ITIMERSPEC)] struct itimerspec *otmr) -> errno_t;                                                            /* UNIMPLEMENTED! */
 [doc_alias(timerfd_settime)] timerfd_settime32:(fd_t timerfd, [tostr(TIMERFD_TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_ITIMERSPEC32)] struct itimerspec32 const *utmr, [tostr(out:STRUCT_ITIMERSPEC32)] struct itimerspec32 *otmr) -> errno_t;                     /* UNIMPLEMENTED! */

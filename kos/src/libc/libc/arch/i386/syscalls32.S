@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46180ea6 */
+/* HASH CRC-32:0x2bfc6cd0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2842,7 +2842,7 @@ DEFINE_PUBLIC_ALIAS(sys_fallocate, libc_sys_fallocate)
 
 /* Set next expiration time of interval timer source `timerfd' to `utmr'.
  * If `flags'  has the  `TFD_TIMER_ABSTIME' flag  set the  timeout  value
- * is absolute. Optionally return the old expiration time in `otmr''
+ * is absolute. Optionally return the old expiration time in `otmr'
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
 /* errno_t timerfd_settime(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32 const *utmr, struct itimerspecx32 *otmr) */
 INTERN_FUNCTION(libc_sys_timerfd_settime)
@@ -3624,7 +3624,7 @@ DEFINE_PUBLIC_ALIAS(sys_timerfd_gettime64, libc_sys_timerfd_gettime64)
 
 /* Set next expiration time of interval timer source `timerfd' to `utmr'.
  * If `flags'  has the  `TFD_TIMER_ABSTIME' flag  set the  timeout  value
- * is absolute. Optionally return the old expiration time in `otmr''
+ * is absolute. Optionally return the old expiration time in `otmr'
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
 /* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
 INTERN_FUNCTION(libc_sys_timerfd_settime64)
@@ -7294,7 +7294,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xfallocate, libc_sys_Xfallocate)
 
 /* Set next expiration time of interval timer source `timerfd' to `utmr'.
  * If `flags'  has the  `TFD_TIMER_ABSTIME' flag  set the  timeout  value
- * is absolute. Optionally return the old expiration time in `otmr''
+ * is absolute. Optionally return the old expiration time in `otmr'
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
 /* errno_t timerfd_settime(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32 const *utmr, struct itimerspecx32 *otmr) */
 INTERN_FUNCTION(libc_sys_Xtimerfd_settime)
@@ -8076,7 +8076,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xtimerfd_gettime64, libc_sys_Xtimerfd_gettime64)
 
 /* Set next expiration time of interval timer source `timerfd' to `utmr'.
  * If `flags'  has the  `TFD_TIMER_ABSTIME' flag  set the  timeout  value
- * is absolute. Optionally return the old expiration time in `otmr''
+ * is absolute. Optionally return the old expiration time in `otmr'
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
 /* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
 INTERN_FUNCTION(libc_sys_Xtimerfd_settime64)

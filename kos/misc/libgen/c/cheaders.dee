@@ -1748,10 +1748,10 @@ class LocalFunction {
 					callToLocalName, usedPrototype,
 					LOCAL_NAMESPACE);
 			} else {
-				fp << "#define " << exposedName << " ";
+				fp << "#define " << exposedName << "(...) (";
 				if (oldNs !== LOCAL_NAMESPACE && LOCAL_NAMESPACE.prefix)
 					fp << LOCAL_NAMESPACE.prefix << " ";
-				fp << callToLocalName;
+				fp << callToLocalName << ")(__VA_ARGS__)";
 			}
 			return;
 		}
@@ -1762,19 +1762,47 @@ class LocalFunction {
 			if (doc)
 				fp.printComment(doc);
 			if (exposedName == name) {
-				fp.ppIfdef("__cplusplus");
+				fp.ppIf(usedPrototype.hasEllipsis
+					? "defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)"
+					: "defined(__cplusplus)");
 				LOCAL_NAMESPACE.keyUsingOrImpl(fp, exposedName, []{
 					prototypes.first.cprintCallToFunction(
 						fp, escapeMode, NAMESPACE_IMPORT_DECL,
 						exposedName, callToLocalName, usedPrototype,
 						callToEscapeMode: callToEscapeMode);
 				});
-				fp.ppElse();
-				fp << "#define " << exposedName << " " << callToLocalName << "\n";
-				fp.ppEndif();
-			} else {
-				fp << "#define " << exposedName << " " << callToLocalName << "\n";
 			}
+			if (fp.namespace != GLOBAL_NAMESPACE) {
+				if (exposedName == name) {
+					fp.ppElif("defined(__cplusplus)");
+				} else {
+					fp.ppIf("defined(__cplusplus)");
+				}
+				fp << "#define " << exposedName << "(...) ";
+				/* Use the cast-to-return-type-for-namespace-prefix trick.
+				 * TODO: Must use namespace-specific symbol names in case the
+				 *       return type is something like "int", or "void *". In
+				 *       these cases, we have to use a local typedef in order
+				 *       to declare a symbol we can use for the cast.
+				 * TODO: If someone later in the current file does a `using'
+				 *       for our namespace'd symbol, they have to check for
+				 *       the case where we did the cast-trick, in which case
+				 *       they either have to do nothing, or namespace-using-
+				 *       import the custom type symbol we created as alias
+				 *       for the function's return type. */
+				usedPrototype.returnType.cprint(fp, escapeMode);
+				fp << "(" << callToLocalName << "(__VA_ARGS__))\n";
+				fp.ppElse();
+				fp << "#define " << exposedName << "(...) " << callToLocalName << "(__VA_ARGS__)\n";
+				if (exposedName != name)
+					fp.ppEndif();
+			} else {
+				if (exposedName == name)
+					fp.ppElse();
+				fp << "#define " << exposedName << "(...) " << callToLocalName << "(__VA_ARGS__)\n";
+			}
+			if (exposedName == name)
+				fp.ppEndif();
 			return;
 		}
 		for (local ptype: prototypes) {
@@ -2060,8 +2088,18 @@ class NamespaceBinding {
 			if (nsPrefix)
 				cSymbolName = "{} {}".format({ nsPrefix, cSymbolName });
 			if (#conditionalPrototypes == 1 && conditionalPrototypes.first[0] == "1") {
+				local prototypes = conditionalPrototypes.first[1];
+				local doUsingPpCond = "1";
+				local usedCallToPrototype = none;
+				if (#prototypes == 1) {
+					usedCallToPrototype = prototypes.first;
+					if (prototype is bound)
+						usedCallToPrototype = functionPrototype;
+					if (usedCallToPrototype.hasEllipsis)
+						doUsingPpCond = "__has_builtin(__builtin_va_arg_pack)";
+				}
+				fp.ppIf(doUsingPpCond);
 				namespace.keyUsingOrImpl(fp, exposedName, []{
-					local prototypes = conditionalPrototypes.first[1];
 					if (#prototypes == 1) {
 						local callToPrototype = prototypes.first;
 						if (prototype is bound)
@@ -2087,6 +2125,15 @@ class NamespaceBinding {
 						fp.externLinkage = oldExternLinkage;
 					}
 				});
+				if (doUsingPpCond != "1") {
+					fp.ppElse();
+					if (fp.namespace === GLOBAL_NAMESPACE) {
+						fp << "#define " << exposedName << "(...) " << cSymbolName << "(__VA_ARGS__)\n";
+					} else {
+						namespace.keyUsing(fp, exposedName);
+					}
+				}
+				fp.ppEndif();
 			} else {
 				local cond = "!defined(__COMPILER_HAVE_BUG_BLOATY_CXX_USING)";
 				if (namespace === GLOBAL_NAMESPACE || namespace === STD_NAMESPACE)
@@ -2155,15 +2202,29 @@ class NamespaceBinding {
 			}
 			if (#prototypes == 1) {
 				/* The complicated case: Must use `keyUsingOrImpl' */
+				local usedPrototype = prototypes.first;
+				local usedCallToPrototype = usedPrototype;
+				if (prototype is bound)
+					usedCallToPrototype = functionPrototype;
+				local doUsingPpCond = "1";
+				if (usedPrototype.hasEllipsis)
+					doUsingPpCond = "__has_builtin(__builtin_va_arg_pack)";
+				fp.ppIf(doUsingPpCond);
 				namespace.keyUsingOrImpl(fp, exposedName, []{
-					local callToPrototype = prototypes.first;
-					if (prototype is bound)
-						callToPrototype = functionPrototype;
-					prototypes.first.cprintCallToFunction(
+					usedPrototype.cprintCallToFunction(
 						fp, escapeMode, NAMESPACE_IMPORT_DECL,
-						exposedName, cSymbolName, callToPrototype,
+						exposedName, cSymbolName, usedCallToPrototype,
 						callToEscapeMode: callToEscapeMode);
 				});
+				if (doUsingPpCond != "1") {
+					fp.ppElse();
+					if (fp.namespace === GLOBAL_NAMESPACE) {
+						fp << "#define " << exposedName << "(...) " << cSymbolName << "(__VA_ARGS__)\n";
+					} else {
+						namespace.keyUsing(fp, exposedName);
+					}
+				}
+				fp.ppEndif();
 			} else {
 				/* TODO: preferBindingMacros */
 				/* The even more complicated case:

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x385d95db */
+/* HASH CRC-32:0x44f78f67 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -401,11 +401,11 @@ __LIBC __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__VLIBCCA
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-#ifdef __cplusplus
+#if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_printf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__VLIBCCALL format_printf)(pformatprinter __printer, void *__arg, char const *__restrict __format, ...) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_printf))(__printer, __arg, __format, __builtin_va_arg_pack()); })
-#else /* __cplusplus */
-#define format_printf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_printf))
-#endif /* !__cplusplus */
+#else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
+#define format_printf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_printf))(__VA_ARGS__)
+#endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
 #endif /* !__CRT_HAVE_format_printf */
 
 
@@ -517,11 +517,11 @@ __LIBC __ATTR_LIBC_SCANF(4, 5) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__VLIBC
  * @return: 0 :  No data could be scanned.
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-#ifdef __cplusplus
+#if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_scanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_SCANF(4, 5) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__VLIBCCALL format_scanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, char const *__restrict __format, ...) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_scanf))(__pgetc, __pungetc, __arg, __format, __builtin_va_arg_pack()); })
-#else /* __cplusplus */
-#define format_scanf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_scanf))
-#endif /* !__cplusplus */
+#else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
+#define format_scanf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_scanf))(__VA_ARGS__)
+#endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
 #endif /* !__CRT_HAVE_format_scanf */
 
 

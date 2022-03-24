@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe07acb18 */
+/* HASH CRC-32:0xbfba8a3e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -526,7 +526,7 @@ __LIBC __ATTR_LIBC_C16PRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBD
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-#define format_c16printf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wprintf))
+#define format_c16printf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wprintf))(__VA_ARGS__)
 #else /* ... */
 #include <libc/local/parts.uchar.format-printer/format_c16printf.h>
 /* >> format_printf(3), format_vprintf(3)
@@ -541,11 +541,11 @@ __LIBC __ATTR_LIBC_C16PRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBD
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-#ifdef __cplusplus
+#if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_c16printf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_C16PRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBDCALL format_c16printf)(pc16formatprinter __printer, void *__arg, char16_t const *__restrict __format, ...) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c16printf))(__printer, __arg, __format, __builtin_va_arg_pack()); })
-#else /* __cplusplus */
-#define format_c16printf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c16printf))
-#endif /* !__cplusplus */
+#else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
+#define format_c16printf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c16printf))(__VA_ARGS__)
+#endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
 #endif /* !... */
 #if defined(__CRT_HAVE_format_wprintf) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> format_printf(3), format_vprintf(3)
@@ -589,7 +589,7 @@ __LIBC __ATTR_LIBC_C32PRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBK
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-#define format_c32printf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wprintf))
+#define format_c32printf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wprintf))(__VA_ARGS__)
 #else /* ... */
 #include <libc/local/parts.uchar.format-printer/format_c32printf.h>
 /* >> format_printf(3), format_vprintf(3)
@@ -604,11 +604,11 @@ __LIBC __ATTR_LIBC_C32PRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBK
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-#ifdef __cplusplus
+#if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_c32printf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_C32PRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBKCALL format_c32printf)(pc32formatprinter __printer, void *__arg, char32_t const *__restrict __format, ...) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c32printf))(__printer, __arg, __format, __builtin_va_arg_pack()); })
-#else /* __cplusplus */
-#define format_c32printf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c32printf))
-#endif /* !__cplusplus */
+#else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
+#define format_c32printf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c32printf))(__VA_ARGS__)
+#endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
 #endif /* !... */
 
 

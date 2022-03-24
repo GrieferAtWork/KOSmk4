@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf9eda97 */
+/* HASH CRC-32:0x8de4e5b8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -215,7 +215,7 @@
 #define SYS_timerfd_create         __NR_timerfd_create         /* fd_t timerfd_create(clockid_t clock_id, syscall_ulong_t flags) */
 /* Set next expiration time of interval timer source `timerfd' to `utmr'.
  * If `flags'  has the  `TFD_TIMER_ABSTIME' flag  set the  timeout  value
- * is absolute. Optionally return the old expiration time in `otmr''
+ * is absolute. Optionally return the old expiration time in `otmr'
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
 #define SYS_timerfd_settime        __NR_timerfd_settime        /* errno_t timerfd_settime(fd_t timerfd, syscall_ulong_t flags, struct itimerspec const *utmr, struct itimerspec *otmr) */
 /* Return the next expiration time of UFD */

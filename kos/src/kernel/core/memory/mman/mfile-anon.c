@@ -534,9 +534,9 @@ NOTHROW(FCALL mfile_delete)(struct mfile *__restrict self) {
 	 * or another async-delete operation is already in progress!
 	 *
 	 * NOTE: We also set the NOATIME+NOMTIME flags to prevent anyone from changing
-	 *       the `mf_atime' and `mf_mtime' fields after this point. - This must be
-	 *       done since we intend on  (ab-)using those fields for storing  lock-op
-	 *       descriptors needed do delete the file asynchronously.
+	 *       the `mf_atime', `mf_mtime' and `mf_btime' fields after this point.  -
+	 *       This must be  done since  we intend  on (ab-)using  those fields  for
+	 *       storing lock-op descriptors needed to delete the file asynchronously.
 	 *
 	 * For simplicity, we set all of these flags at the same time, thus allowing
 	 * someone who wishes to write to the atime or mtime fields to be able to do

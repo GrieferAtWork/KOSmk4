@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb36ea18 */
+/* HASH CRC-32:0xbf524b01 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -103,7 +103,7 @@ NOTHROW_NCX(LIBCCALL libc_sl_find)(struct _stringlist __KOS_FIXED_CONST *sl,
 	}
 	return NULL;
 }
-/* >> sl_delete(3)
+/* >> sl_delete(3) [NetBSD]
  * Remove an entry `name' from `sl'
  * When `freeit' is non-zero, a removed string is deallocated using `free(3)'
  * @return: 0:  Successfully removed a string equal to `name'

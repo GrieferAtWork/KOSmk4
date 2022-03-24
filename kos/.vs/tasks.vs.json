@@ -79,7 +79,7 @@
 				"magic.dee",
 				"--target=${env.TARGET}",
 				"--config=${env.CONFIG}",
-				"--clang-tidy=D:\\LLVM10\\bin\\clang-tidy.exe",
+				"--clang-tidy=D:\\LLVM\\bin\\clang-tidy.exe",
 				"--vsgengroup-of=${file}"
 			]
 		},

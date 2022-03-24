@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x539775dd */
+/* HASH CRC-32:0x30eaab33 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -98,11 +98,10 @@ __CDECLARE(__ATTR_PURE __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,sl_find,(stru
  * If `sl' doesn't contain an equivalent string, return `NULL' instead. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sl_find, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL sl_find)(struct _stringlist __KOS_FIXED_CONST *__sl, char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sl_find))(__sl, __name); })
 #endif /* !__CRT_HAVE_sl_find */
-#ifdef __USE_BSD
 #ifndef __sl_delete_defined
 #define __sl_delete_defined
 #ifdef __CRT_HAVE_sl_delete
-/* >> sl_delete(3)
+/* >> sl_delete(3) [NetBSD]
  * Remove an entry `name' from `sl'
  * When `freeit' is non-zero, a removed string is deallocated using `free(3)'
  * @return: 0:  Successfully removed a string equal to `name'
@@ -110,7 +109,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sl_find, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,sl_delete,(struct _stringlist *__sl, char const *__name, int __freeit),(__sl,__name,__freeit))
 #else /* __CRT_HAVE_sl_delete */
 #include <libc/local/stringlist/sl_delete.h>
-/* >> sl_delete(3)
+/* >> sl_delete(3) [NetBSD]
  * Remove an entry `name' from `sl'
  * When `freeit' is non-zero, a removed string is deallocated using `free(3)'
  * @return: 0:  Successfully removed a string equal to `name'
@@ -118,7 +117,6 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,sl_delete,(st
 __NAMESPACE_LOCAL_USING_OR_IMPL(sl_delete, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL sl_delete)(struct _stringlist *__sl, char const *__name, int __freeit) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sl_delete))(__sl, __name, __freeit); })
 #endif /* !__CRT_HAVE_sl_delete */
 #endif /* !__sl_delete_defined */
-#endif /* __USE_BSD */
 
 __SYSDECL_END
 #endif /* __CC__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80a1260d */
+/* HASH CRC-32:0x4b2d2524 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1742,6 +1742,7 @@ NOTHROW_NCX(LIBCCALL libc_l64a)(long n) {
 	libc_l64a_r(n, buf, sizeof(buf));
 	return buf;
 }
+#include <hybrid/typecore.h>
 /* >> l64a(3), a64l(3)
  * Convert between `long' and base-64 encoded integer strings. */
 INTERN ATTR_SECTION(".text.crt.bsd") ATTR_PURE WUNUSED NONNULL((1)) long
@@ -1750,16 +1751,16 @@ NOTHROW_NCX(LIBCCALL libc_a64l)(char const *s) {
 	shift_t shift = 0;
 	for (;; ++s) {
 		char ch = *s;
-		if (ch <= 0) {
+		if ((unsigned char)ch <= '\0') {
 			break;
-		} else if (ch <= '/') {
-			digit = (ch - '.') + 0;
-		} else if (ch <= '9') {
-			digit = (ch - '0') + 2;
-		} else if (ch <= 'Z') {
-			digit = (ch - 'A') + 12;
+		} else if ((unsigned char)ch <= '/') {
+			digit = (unsigned long)(ch - '.' + 0);
+		} else if ((unsigned char)ch <= '9') {
+			digit = (unsigned long)(ch - '0' + 2);
+		} else if ((unsigned char)ch <= 'Z') {
+			digit = (unsigned long)(ch - 'A' + 12);
 		} else {
-			digit = (ch - 'a') + 38;
+			digit = (unsigned long)(ch - 'a' + 38);
 		}
 		digit <<= shift;
 		result |= digit;

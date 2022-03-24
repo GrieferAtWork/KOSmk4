@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x549cdd46 */
+/* HASH CRC-32:0x4885c3ff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __SYSDECL_BEGIN
 #ifndef __sl_delete_defined
 #define __sl_delete_defined
 #ifdef __CRT_HAVE_sl_delete
-/* >> sl_delete(3)
+/* >> sl_delete(3) [NetBSD]
  * Remove an entry `name' from `sl'
  * When `freeit' is non-zero, a removed string is deallocated using `free(3)'
  * @return: 0:  Successfully removed a string equal to `name'
@@ -45,7 +45,7 @@ __SYSDECL_BEGIN
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,sl_delete,(struct _stringlist *__sl, char const *__name, int __freeit),(__sl,__name,__freeit))
 #else /* __CRT_HAVE_sl_delete */
 #include <libc/local/stringlist/sl_delete.h>
-/* >> sl_delete(3)
+/* >> sl_delete(3) [NetBSD]
  * Remove an entry `name' from `sl'
  * When `freeit' is non-zero, a removed string is deallocated using `free(3)'
  * @return: 0:  Successfully removed a string equal to `name'

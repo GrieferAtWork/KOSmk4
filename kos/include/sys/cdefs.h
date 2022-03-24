@@ -469,9 +469,9 @@
 #elif (!defined(__NO_builtin_choose_expr) && !defined(__NO_builtin_types_compatible_p) && defined(__COMPILER_HAVE_TYPEOF))
 #define __generic(expr, t, yes, no) __builtin_choose_expr(__builtin_types_compatible_p(__typeof(expr), t), yes, no)
 #endif /* ... */
-#if !defined(__func__) && !defined(__builtin_FUNCTION_IS_func__)
+#if !defined(__func__) && !defined(__builtin_FUNCTION_IS___func__)
 #define __func__                    __builtin_FUNCTION()
-#endif /* !__func__ && !__builtin_FUNCTION_IS_func__ */
+#endif /* !__func__ && !__builtin_FUNCTION_IS___func__ */
 #undef __CONCAT
 #define __CONCAT1                   __PP_PRIVATE_CAT2
 #define __CONCAT                    __PP_CAT2

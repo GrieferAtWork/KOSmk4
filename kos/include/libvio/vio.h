@@ -298,17 +298,17 @@ struct vio_operators {
                               or_callbacks,     \
                               xor_callbacks,    \
                               call_callback)    \
-	{                                        \
-		/* .vo_read   = */ read_callbacks,   \
-		/* .vo_write  = */ write_callbacks,  \
-		/* .vo_cmpxch = */ cmpxch_callbacks, \
-		/* .vo_xch    = */ xch_callbacks,    \
-		/* .vo_add    = */ add_callbacks,    \
-		/* .vo_sub    = */ sub_callbacks,    \
-		/* .vo_and    = */ and_callbacks,    \
-		/* .vo_or     = */ or_callbacks,     \
-		/* .vo_xor    = */ xor_callbacks,    \
-		/* .vo_call   = */ call_callback     \
+	{                                           \
+		/* .vo_read   = */ read_callbacks,      \
+		/* .vo_write  = */ write_callbacks,     \
+		/* .vo_cmpxch = */ cmpxch_callbacks,    \
+		/* .vo_xch    = */ xch_callbacks,       \
+		/* .vo_add    = */ add_callbacks,       \
+		/* .vo_sub    = */ sub_callbacks,       \
+		/* .vo_and    = */ and_callbacks,       \
+		/* .vo_or     = */ or_callbacks,        \
+		/* .vo_xor    = */ xor_callbacks,       \
+		/* .vo_call   = */ call_callback        \
 	}
 
 

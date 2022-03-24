@@ -39,7 +39,7 @@ __DECL_BEGIN
 
 struct coredump_assert64 {
 	__HYBRID_PTR64(char const) ca_expr; /* [0..1] Faulting expression    (`#expr') */
-	__HYBRID_PTR64(char const) ca_file; /* [0..1] Faulting file name     (`__FUNC__') */
+	__HYBRID_PTR64(char const) ca_file; /* [0..1] Faulting file name     (`__FILE__') */
 	__ULONG64_TYPE__           ca_line; /* Faulting line number (or `0') (`__LINE__') */
 	__HYBRID_PTR64(char const) ca_func; /* [0..1] Faulting function name (`__func__') */
 	__HYBRID_PTR64(char const) ca_mesg; /* [0..1] Assert message         (`sprintf(...)'; for `assertf(expr, ...)') */

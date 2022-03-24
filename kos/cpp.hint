@@ -92,6 +92,8 @@
 #define PAGEDIR_PAGEALIGNED
 #define THROWS(...)
 #define __THROWS(...)
+#define TYPEDEF_THROWS(...)
+#define __TYPEDEF_THROWS(...)
 #define THROWS_INDIRECT(...)
 #define __THROWS_INDIRECT(...)
 #define KCALL

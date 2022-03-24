@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4365e570 */
+/* HASH CRC-32:0xe0533478 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -732,7 +732,7 @@
 #define __NR32_fallocate                    0x144                  /* errno_t fallocate(fd_t fd, syscall_ulong_t mode, syscall_ulong_t offset, syscall_ulong_t length) */
 /* Set next expiration time of interval timer source `timerfd' to `utmr'.
  * If `flags'  has the  `TFD_TIMER_ABSTIME' flag  set the  timeout  value
- * is absolute. Optionally return the old expiration time in `otmr''
+ * is absolute. Optionally return the old expiration time in `otmr'
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
 #define __NR32_timerfd_settime              0x145                  /* errno_t timerfd_settime(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32 const *utmr, struct itimerspecx32 *otmr) */
 /* Return the next expiration time of UFD */
@@ -1034,7 +1034,7 @@
 #define __NR32_timerfd_gettime64            0x19a                  /* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
 /* Set next expiration time of interval timer source `timerfd' to `utmr'.
  * If `flags'  has the  `TFD_TIMER_ABSTIME' flag  set the  timeout  value
- * is absolute. Optionally return the old expiration time in `otmr''
+ * is absolute. Optionally return the old expiration time in `otmr'
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
 #define __NR32_timerfd_settime64            0x19b                  /* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */

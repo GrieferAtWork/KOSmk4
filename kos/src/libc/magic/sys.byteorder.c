@@ -69,8 +69,8 @@
 #define LE_64(x) BMASK_64(x)
 #define BE_64(x) BSWAP_64(x)
 #endif /* __BYTE_ORDER__ == ... */
-#define BE_IN8(ptr)      (*(__UINT8_TYPE__ *)(ptr))
-#define LE_IN8(ptr)      (*(__UINT8_TYPE__ *)(ptr))
+#define BE_IN8(ptr)      (*(__UINT8_TYPE__ const *)(ptr))
+#define LE_IN8(ptr)      (*(__UINT8_TYPE__ const *)(ptr))
 #define BE_OUT8(ptr, v)  *(__UINT8_TYPE__ *)(ptr) = (v);
 #define LE_OUT8(ptr, v)  *(__UINT8_TYPE__ *)(ptr) = (v);
 #define BE_IN16(ptr)     __hybrid_unaligned_getbe16(ptr)

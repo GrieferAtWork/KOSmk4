@@ -125,7 +125,7 @@ __LIBC int error_one_per_line;
 [[impl_include("<libc/template/program_invocation_name.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires_include("<libc/template/program_invocation_name.h>")]]
-[[requires(defined(__LOCAL_stdout) && defined(__LOCAL_stderr) && $has_function(exit) &&
+[[requires(defined(__LOCAL_stdout) && $has_function(exit) &&
            $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc) &&
            defined(__LOCAL_program_invocation_short_name) &&
            $has_function(strerror))]]
@@ -136,7 +136,9 @@ void error(int status, $errno_t errnum, [[nullable, format("printf")]] const cha
 	} else
 @@pp_endif@@
 	{
+@@pp_ifdef stdout@@
 		fflush(stdout);
+@@pp_endif@@
 		fprintf(stderr, "%s: ", program_invocation_short_name);
 	}
 	if (format) {
@@ -167,7 +169,7 @@ void error(int status, $errno_t errnum, [[nullable, format("printf")]] const cha
 [[impl_include("<libc/template/program_invocation_name.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires_include("<libc/template/program_invocation_name.h>")]]
-[[requires(defined(__LOCAL_stderr) && defined(__LOCAL_stdout) && $has_function(exit) &&
+[[requires(defined(__LOCAL_stderr) && $has_function(exit) &&
            $has_function(fprintf) && $has_function(vfprintf) &&
            $has_function(fputc) && defined(__LOCAL_program_invocation_short_name) &&
            $has_function(strerror))]]
@@ -196,7 +198,9 @@ void error_at_line(int status, $errno_t errnum, char const *filename,
 		} else
 @@pp_endif@@
 		{
+@@pp_ifdef stdout@@
 			fflush(stdout);
+@@pp_endif@@
 			fprintf(stderr, "%s:", program_invocation_short_name);
 		}
 		fprintf(stderr, "%s:%u: ", filename, line);
@@ -227,7 +231,7 @@ void error_at_line(int status, $errno_t errnum, char const *filename,
 /* Override for printing the program name.
  * When non-NULL,  this  function  should:
  *  - fflush(stdout);
- *  - fprintf(stderr, "%s: ", basename(argv[0])); */
+ *  - fprintf(stderr, "%s:", basename(argv[0])); */
 __LIBC void (__LIBKCALL *error_print_progname)(void);
 #define error_print_progname error_print_progname
 #endif /* __CRT_HAVE_error_print_progname */

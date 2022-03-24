@@ -95,6 +95,12 @@
 %[define_replacement(BUFSIZ = __BUFSIZ)]
 %[define_replacement(EOF = __EOF)]
 
+%[assume_defined_in_kos_userspace(stdin, __LOCAL_stdin)]
+%[assume_defined_in_kos_userspace(stdout, __LOCAL_stdout)]
+%[assume_defined_in_kos_userspace(stderr, __LOCAL_stderr)]
+%[assume_defined_in_kos_userspace(stdtty, __LOCAL_stdtty)]
+
+
 %(auto_source){
 #include "../libc/globals.h"
 }

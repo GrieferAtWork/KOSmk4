@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19340a11 */
+/* HASH CRC-32:0xe1edd65 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1483,7 +1483,7 @@ __CDECLARE_SC(,__errno_t,timerfd_gettime,(__fd_t __timerfd, struct itimerspec *_
 #if __CRT_HAVE_SC(timerfd_settime)
 /* Set next expiration time of interval timer source `timerfd' to `utmr'.
  * If `flags'  has the  `TFD_TIMER_ABSTIME' flag  set the  timeout  value
- * is absolute. Optionally return the old expiration time in `otmr''
+ * is absolute. Optionally return the old expiration time in `otmr'
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
 __CDECLARE_SC(,__errno_t,timerfd_settime,(__fd_t __timerfd, __syscall_ulong_t __flags, struct itimerspec const *__utmr, struct itimerspec *__otmr),(__timerfd,__flags,__utmr,__otmr))
 #endif /* __CRT_HAVE_SC(timerfd_settime) */
@@ -2957,7 +2957,7 @@ __CDECLARE_XSC(,__errno_t,timerfd_gettime,(__fd_t __timerfd, struct itimerspec *
 #if __CRT_HAVE_XSC(timerfd_settime)
 /* Set next expiration time of interval timer source `timerfd' to `utmr'.
  * If `flags'  has the  `TFD_TIMER_ABSTIME' flag  set the  timeout  value
- * is absolute. Optionally return the old expiration time in `otmr''
+ * is absolute. Optionally return the old expiration time in `otmr'
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
 __CDECLARE_XSC(,__errno_t,timerfd_settime,(__fd_t __timerfd, __syscall_ulong_t __flags, struct itimerspec const *__utmr, struct itimerspec *__otmr),(__timerfd,__flags,__utmr,__otmr))
 #endif /* __CRT_HAVE_XSC(timerfd_settime) */

@@ -2574,21 +2574,22 @@ char *l64a(long n) {
 
 [[pure, wunused, doc_alias("l64a")]]
 [[section(".text.crt{|.dos}.bsd")]]
+[[impl_include("<hybrid/typecore.h>")]]
 long a64l([[nonnull]] char const *s) {
 	unsigned long digit, result = 0;
 	shift_t shift = 0;
 	for (;; ++s) {
 		char ch = *s;
-		if (ch <= 0) {
+		if ((unsigned char)ch <= '\0') {
 			break;
-		} else if (ch <= '/') {
-			digit = (ch - '.') + 0;
-		} else if (ch <= '9') {
-			digit = (ch - '0') + 2;
-		} else if (ch <= 'Z') {
-			digit = (ch - 'A') + 12;
+		} else if ((unsigned char)ch <= '/') {
+			digit = (unsigned long)(ch - '.' + 0);
+		} else if ((unsigned char)ch <= '9') {
+			digit = (unsigned long)(ch - '0' + 2);
+		} else if ((unsigned char)ch <= 'Z') {
+			digit = (unsigned long)(ch - 'A' + 12);
 		} else {
-			digit = (ch - 'a') + 38;
+			digit = (unsigned long)(ch - 'a' + 38);
 		}
 		digit <<= shift;
 		result |= digit;

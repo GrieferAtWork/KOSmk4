@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfecd5fd3 */
+/* HASH CRC-32:0xd8efc10c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -740,20 +740,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__mempmovedownq_chk, __FORCELOCAL __ATTR_ARTIFIC
 
 #if defined(__cplusplus) || !defined(__USE_STRING_OVERLOADS)
 #ifdef __cplusplus
-#ifndef __std___forward_voidp_defined
-#define __std___forward_voidp_defined
 __NAMESPACE_STD_BEGIN
-#ifdef __forward_voidp_defined
-__NAMESPACE_GLB_USING_OR_IMPL(__forward_voidp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST void *__NOTHROW(__forward_voidp)(void *__x) { return __x; })
-#else /* __forward_voidp_defined */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST void *__NOTHROW(__forward_voidp)(void *__x) { return __x; }
-#endif /* !__forward_voidp_defined */
+typedef void *__forward_voidp;
 __NAMESPACE_STD_END
-#ifndef __forward_voidp_defined
-#define __forward_voidp_defined
 __NAMESPACE_STD_USING(__forward_voidp)
-#endif /* !__forward_voidp_defined */
-#endif /* !__std___forward_voidp_defined */
 #endif /* __cplusplus */
 #undef memset
 #undef memcpy

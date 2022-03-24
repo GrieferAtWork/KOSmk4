@@ -423,10 +423,6 @@ __NAMESPACE_STD_END
 #define __size_t_defined
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
-#if defined(__std___forward_size_defined) && !defined(____forward_size_defined)
-#define ____forward_size_defined
-__NAMESPACE_STD_USING(__forward_size)
-#endif /* __std___forward_size_defined && !____forward_size_defined */
 }%{
 #endif /* !__CXX_SYSTEM_HEADER */
 
@@ -628,7 +624,8 @@ void *memchr([[nonnull]] void const *__restrict haystack, int needle, size_t n_b
 
 
 %(libc_fast)#if defined(__LIBC_BIND_OPTIMIZATIONS) && !defined(__NO_builtin_constant_p) && (__has_builtin(__builtin_strlen) && defined(__CRT_HAVE_strlen))
-/* Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
+/* >> strlen(3)
+ * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 %(libc_fast)#define __libc_strlen(str) (__builtin_constant_p(str) ? __builtin_strlen(str) : __libc_core_strlen(str))
 %(libc_fast)#else /* __LIBC_BIND_OPTIMIZATIONS && !__NO_builtin_constant_p && __builtin_strlen && __CRT_HAVE_strlen */
 
@@ -7730,23 +7727,8 @@ char *_strerror(char const *message) {
 #ifndef __INTELLISENSE__
 #if __has_builtin(__builtin_strlen)
 #ifdef __cplusplus
-#ifndef __std___forward_size_defined
-#define __std___forward_size_defined
-__NAMESPACE_STD_BEGIN
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_CONST size_t __NOTHROW(__forward_size)(size_t __x) { return __x; }
-__NAMESPACE_STD_END
-#endif /* !__std___forward_size_defined */
-#ifndef __CXX_SYSTEM_HEADER
-__NAMESPACE_GLB_USING_OR_IMPL(__forward_size, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_CONST size_t __NOTHROW(__forward_size)(size_t __x) { return __x; })
-#endif /* !__CXX_SYSTEM_HEADER */
-/* Must  also put a  symbol in `__local_impl'  so that the `#define __libc_core_strlen',
- * (and its consumer `__libc_strlen()') from <libc/string.h> continue to work correctly. */
-__NAMESPACE_LOCAL_BEGIN
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_CONST size_t __NOTHROW(__forward_size)(size_t __x) { return __x; }
-__NAMESPACE_LOCAL_END
-
 /* Special handling, so this macro also works as `std::strlen(...)' */
-#define strlen(x) __forward_size(__builtin_constant_p(x) ? __builtin_strlen(x) : (__NAMESPACE_STD_SYM strlen)(x))
+#define strlen(x) size_t(__builtin_constant_p(x) ? __builtin_strlen(x) : (__NAMESPACE_STD_SYM strlen)(x))
 #else /* __cplusplus */
 #define strlen(x) (__builtin_constant_p(x) ? __builtin_strlen(x) : (strlen)(x))
 #endif /* !__cplusplus */

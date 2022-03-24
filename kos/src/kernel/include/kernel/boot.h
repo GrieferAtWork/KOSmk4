@@ -47,7 +47,7 @@ INTDEF FREE void NOTHROW(KCALL kernel_initialize_commandline_options_late)(void)
  * which shouldn't contain mappings for anything user-space related. */
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_user_mman)(void);
 
-/* Initialize (link, relocation  & initialize) all  drivers
+/* Initialize  (link,  relocate &  initialize)  all drivers
  * loaded via the kernel commandline as bootloader modules.
  * This  is done as a separate step from the actual loading
  * of  drivers so-as to allow for inter-driver dependencies

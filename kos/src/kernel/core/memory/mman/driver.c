@@ -222,6 +222,7 @@ again:
 			new_dll = incref(&default_loaded_drivers);
 		} else {
 			size_t dst;
+
 			/* Try to allocate a new driver load-list.
 			 * If this fails, drop all of our references, change the
 			 * `loaded_drivers_contains_dead' flag back to true, and
@@ -325,6 +326,7 @@ NOTHROW(FCALL driver_section_destroy)(struct driver_section *__restrict self) {
 		uint16_t myindex;
 		myindex = (uint16_t)(size_t)(self->ds_shdr - drv->d_shdr);
 		assert(myindex < drv->d_shnum);
+
 		/* Replace a pointer to `self' with `NULL'.
 		 * There is the (very) unlikely case that someone reloaded
 		 * the section before we were able to delete out  pointer,
@@ -454,6 +456,7 @@ driver_section_getaddr_inflate(struct driver_section *__restrict self,
 			ssize_t error;
 			struct zlib_reader reader;
 			zlib_reader_init(&reader, chdr + 1, src_size);
+
 			/* Decompress data. */
 #ifdef CONFIG_HAVE_DEBUGGER
 			if (dbg_active) {
@@ -493,6 +496,7 @@ driver_section_getaddr_inflate(struct driver_section *__restrict self,
 			zlib_reader_fini(&reader);
 			if unlikely(error < 0)
 				THROW(E_INVALID_ARGUMENT);
+
 			/* clear trailing data that could not be read. */
 			if (dst_size > (size_t)error) {
 				bzero((byte_t *)dst_data + (size_t)error,
@@ -793,6 +797,7 @@ NOTHROW(FCALL driver_fromaddr)(void const *addr) {
 	REF struct driver_loadlist *ll;
 	REF struct driver *result;
 	size_t i;
+
 	/* If possible, try to make use of the mnode->module  self-pointers!
 	 * Note  however that this  requires acquiring a  lock to the kernel
 	 * mman, which can't be done consistently without blocking. As such,
@@ -804,6 +809,7 @@ NOTHROW(FCALL driver_fromaddr)(void const *addr) {
 		node   = mman_mappings_locate(&mman_kernel, addr);
 		if (node) {
 			result = (struct driver *)node->mn_module;
+
 			/* NOTE: Any module we  find here should  _always_ be a  driver
 			 *       module, but better be save than sorry, and check  that
 			 *       this is the case, only constructing the to-be returned
@@ -829,6 +835,7 @@ NOTHROW(FCALL driver_fromaddr)(void const *addr) {
 		uint16_t phdr;
 		uintptr_t driver_reladdr;
 		result = ll->dll_drivers[i];
+
 		/* Check  if the driver-relative address is being
 		 * mapped by one of the driver's program headers!
 		 * Note  that we can access the phdr-vector, even
@@ -842,6 +849,7 @@ NOTHROW(FCALL driver_fromaddr)(void const *addr) {
 			if (driver_reladdr >= (result->d_phdr[phdr].p_vaddr +
 			                       result->d_phdr[phdr].p_memsz))
 				continue; /* Not this one! */
+
 			/* Found it! */
 			if unlikely(!tryincref(result))
 				goto nope;
@@ -1067,6 +1075,7 @@ argcash_eval(struct driver *__restrict self,
 		bzero(buf, bufsize);
 		return bufsize;
 	}
+
 	switch (type) {
 
 	case DRIVER_ARGCASH_ENTRY_TYPE_HEX: {
@@ -1120,6 +1129,7 @@ argcash_eval(struct driver *__restrict self,
 					}
 					break;
 				}
+
 				/* Write-back the next hex-byte. */
 				if (dst < result)
 					buf[dst] = (high_nibble << 4) | low_nibble;
@@ -1156,6 +1166,7 @@ argcash_eval(struct driver *__restrict self,
 					error = ERANGE;
 			}
 		}
+
 		/* Check for errors. */
 		if (error != 0) {
 			assert(error == ECANCELED || error == ERANGE || error == EINVAL);
@@ -1167,6 +1178,7 @@ argcash_eval(struct driver *__restrict self,
 				reason = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_ARGCASH_D_EINVAL;
 			THROW_FAULTY_ELF_ERROR(reason);
 		}
+
 		/* Write-back the fully parsed integer argument. */
 		bzero(buf, bufsize);
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
@@ -1185,6 +1197,7 @@ argcash_eval(struct driver *__restrict self,
 		/* String argument. */
 		size_t len = strlen(value);
 		size_t res = (len + 1) * sizeof(char);
+
 		/* Write-back the NUL-terminated string. */
 		if (bufsize >= res)
 			*(char *)mempcpy(buf, value, len, sizeof(char)) = '\0';
@@ -1223,6 +1236,7 @@ NOTHROW(FCALL driver_getargval)(struct driver const *__restrict self,
 			continue;
 		if (name[namelen] != '=' && name[namelen] != ':')
 			continue;
+
 		/* Found it! */
 		return arg + namelen + 1;
 	}
@@ -1290,6 +1304,7 @@ driver_argcash_alloc(struct driver *__restrict self, size_t req_ent_size) {
 	byte_t *hint;
 	minsize = offsetof(struct driver_argcash, dac_ent) + req_ent_size;
 	minsize = CEIL_ALIGN(minsize, PAGESIZE);
+
 	/* Allocate kernel ram and use the middle of the driver's
 	 * load-range as the  mapping base-address hint,  meaning
 	 * that the resulting mapped address will be close-by  to
@@ -1338,6 +1353,7 @@ NOTHROW(FCALL driver_argcash_find_locked)(struct driver const *__restrict self,
 			if (DRIVER_ARGCASH_ENTRY_TYPE_HASSIZE(type) &&
 			    ent->dace_size != size)
 				continue;
+
 			/* Found it! */
 			return ent;
 		}
@@ -1362,9 +1378,11 @@ NOTHROW(FCALL driver_argcash_alloc_locked)(struct driver *__restrict self,
 		avail = tab->dac_size - tab->dac_used;
 		if (entsize >= avail) {
 			struct driver_argcash_entry *result;
+
 			/* Can allocate the new entry within this table! */
 			result = (struct driver_argcash_entry *)((byte_t *)tab + tab->dac_used);
 			tab->dac_used += entsize;
+
 			/* Set the `dace_next'-pointer to point at the new table end. */
 			result->dace_next = tab->dac_used;
 			return result;
@@ -1449,6 +1467,7 @@ driver_argcash_lookup(struct driver *__restrict self,
 	if (!ent) {
 		struct driver_argcash *newtab;
 		driver_argcash_endwrite(self);
+
 		/* Allocate a new arg$ page able to hold at
 		 * least  1 entry with a size of `entsize'. */
 		newtab = driver_argcash_alloc(self, entsize);
@@ -1460,6 +1479,7 @@ driver_argcash_lookup(struct driver *__restrict self,
 			driver_argcash_free(newtab);
 			return ent;
 		}
+
 		/* Insert the new arg$ table into the list of tables of this driver. */
 		SLIST_INSERT_HEAD(&self->d_argcash, newtab, dac_link);
 		ent              = &newtab->dac_ent[0];
@@ -1516,6 +1536,7 @@ driver_argcash_resolve(struct driver *__restrict self,
 	arg_size = sizeof(bool);
 	if (utype) {
 		USER CHECKED char const *iter;
+
 		/* Parse the user-type string. */
 		iter     = utype;
 		arg_size = sizeof(int);
@@ -1642,6 +1663,7 @@ badtype:
 		}
 		entry = driver_argcash_lookup(self, arg_type, arg_size, kname, kdefl);
 	}
+
 	/* Write-back information from the argcash entry. */
 	info->dsi_addr = entry->dace_data;
 	info->dsi_size = entry->dace_size;
@@ -1708,6 +1730,7 @@ driver_dlsym_drv(struct driver *__restrict self,
 			info->dsi_size = self->d_argc * sizeof(char *);
 			goto ok;
 		}
+
 		/* Special case: `drv_arg$...' symbols! */
 		if (arg_name[0] == '$') {
 			driver_argcash_resolve(self, info);
@@ -1722,7 +1745,7 @@ ok:
 	return true;
 }
 
-LOCAL ATTR_PURE WUNUSED NONNULL((1)) u32 FCALL
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) u32 FCALL
 gnu_symhash(USER CHECKED char const *name) THROWS(E_SEGFAULT) {
 	u32 h = 5381;
 	for (; *name; ++name) {
@@ -1731,7 +1754,7 @@ gnu_symhash(USER CHECKED char const *name) THROWS(E_SEGFAULT) {
 	return h;
 }
 
-LOCAL ATTR_PURE WUNUSED NONNULL((1)) u32 FCALL
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) u32 FCALL
 elf_symhash(USER CHECKED char const *name) THROWS(E_SEGFAULT) {
 	u32 h = 0;
 	while (*name) {
@@ -1769,6 +1792,7 @@ kernel_dlsym(struct driver_syminfo *__restrict info)
 	if (hash == (uint32_t)-1)
 		hash = info->dsi_elfhash = elf_symhash(info->dsi_name);
 	perturb = i = hash & kernel_symbol_table.ds_mask;
+
 	/* NOTE: Changes to this algorithm must be mirrored in /src/kernel/core/.sources */
 	for (;; i = ((i << 2) + i + perturb + 1), perturb >>= 5) {
 		uint32_t index;
@@ -1779,6 +1803,7 @@ kernel_dlsym(struct driver_syminfo *__restrict info)
 			continue; /* Different hash */
 		if (strcmp(kernel_symbol_table.ds_list[index].ks_name, info->dsi_name) != 0)
 			continue; /* Different name */
+
 		/* Found it! */
 		info->dsi_addr = kernel_symbol_table.ds_list[index].ks_addr;
 		info->dsi_size = kernel_symbol_table.ds_list[index].ks_size;
@@ -1843,6 +1868,7 @@ driver_dlsym_elf(struct driver *__restrict self,
 		symid = gh_buckets[hash % gnu_ht->gh_nbuckets];
 		if unlikely(symid < gh_symoffset)
 			goto nosym;
+
 		/* Search for the symbol. */
 		for (;; ++symid) {
 			ElfW(Word) enthash;
@@ -1884,6 +1910,7 @@ search_elf_table:
 			result = self->d_dynsym_tab + chain;
 			if likely(strcmp(info->dsi_name, self->d_dynstr + result->st_name) == 0)
 				return result; /* Found it! */
+
 			/* Load the next chain entry. */
 			chain = ht_chains[chain];
 		} while likely(--max_attempts);
@@ -1986,6 +2013,7 @@ resolve_elf_symbol(struct driver *__restrict self,
 	    ELFW(ST_TYPE)(st_info) == STT_KOS_IDATA) {
 		ElfW(Addr) newaddr;
 		unsigned char newinfo;
+
 		/* Special case: Indirect symbol! */
 		driver_isym_acquire();
 		st_info = symbol->st_info;
@@ -2022,6 +2050,7 @@ resolve_elf_symbol(struct driver *__restrict self,
 			driver_isym_break();
 			goto normal_symbol;
 		}
+
 		/* _VERY_ important! must write `st_info' second, since knowing
 		 * that it indicates an  indirect symbol, `st_value' is  _only_
 		 * guarded against reads/writes  from other cpus/threads  while
@@ -2061,12 +2090,14 @@ driver_dlsym_local(struct driver *__restrict self,
                    struct driver_syminfo *__restrict info)
 		THROWS(E_SEGFAULT, ...) {
 	ElfW(Sym) const *symbol;
+
 	/* Check for special symbols from the `drv_*' namespace. */
 	if (info->dsi_name[0] == 'd' && info->dsi_name[1] == 'r' &&
 	    info->dsi_name[2] == 'v' && info->dsi_name[3] == '_') {
 		if (driver_dlsym_drv(self, info))
 			return true;
 	}
+
 	/* Check for the special case with the kernel core. */
 	if (self == &kernel_driver)
 		return kernel_dlsym(info);
@@ -2146,6 +2177,7 @@ driver_dlsym(struct driver *__restrict self,
 	unsigned int status, depth, max_depth;
 	struct driver *resdrv = self;
 	bool result = driver_dlsym_local(self, info);
+
 	/* All drivers have an implicit dependency on the kernel core! */
 	if (!result) {
 		resdrv = &kernel_driver;
@@ -2246,11 +2278,13 @@ driver_dlsym_global(struct driver_syminfo *__restrict info)
 					decref_unlikely(d);
 					RETHROW();
 				}
+
 				/* Only accept non-weak symbols at this point! */
 				if (!ok || info2.dsi_bind == STB_WEAK) {
 					decref_unlikely(d2);
 					continue;
 				}
+
 				/* Found a non-weak symbol! */
 				info->dsi_addr = info2.dsi_addr;
 				info->dsi_size = info2.dsi_size;
@@ -2415,6 +2449,7 @@ NOTHROW(FCALL driver_dladdr_local)(struct driver *__restrict self,
                                    uintptr_t driver_reladdr,
                                    struct driver_symaddr *__restrict info) {
 	ElfW(Sym) const *symbol;
+
 	/* Special case for the kernel core. */
 	if (self == &kernel_driver)
 		return kernel_dladdr(info, (void *)driver_reladdr);
@@ -2475,7 +2510,7 @@ DECL_END
 #define RBTREE_NOTHROW         NOTHROW
 #define RBTREE_NODEFIELD       dfc_node
 #define RBTREE_REDFIELD        dfc_heapsz
-#define RBTREE_REDBIT          1
+#define RBTREE_REDBIT          0x1
 #define RBTREE_GETNODE(self)   (self)->dfc_node
 #define RBTREE_GETMINKEY(node) (node)->dfc_fde.f_pcstart
 #define RBTREE_GETMAXKEY(node) ((byte_t *)(node)->dfc_fde.f_pcend - 1)
@@ -2554,6 +2589,7 @@ NOTHROW(FCALL driver_findfde)(struct driver *__restrict self, void const *absolu
 			cache->dfc_heapsz = heapptr_getsiz(cp);
 			if likely(driver_eh_frame_cache_trywrite(self)) {
 				bool ok;
+
 				/* Try to insert the entry into the cache. */
 				ok = dfc_tryinsert(&self->d_eh_frame_cache, cache);
 				driver_eh_frame_cache_endwrite(self);
@@ -2588,10 +2624,12 @@ NOTHROW_NCX(KCALL libuw_unwind_fde_find)(void const *absolute_pc,
                                          unwind_fde_t *__restrict result) {
 	unsigned int error;
 	REF struct driver *d;
+
 	/* Figure out which driver is mapped at the given `absolute_pc' */
 	d = driver_fromaddr(absolute_pc);
 	if unlikely(!d)
 		return UNWIND_NO_FRAME;
+
 	/* Lookup the FDE descriptor within the driver */
 	error = driver_findfde(d, absolute_pc, result);
 	decref_unlikely(d);
@@ -2617,6 +2655,7 @@ PUBLIC struct sig driver_state_changed = SIG_INIT;
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL driver_runstate_fini_deps)(struct driver *__restrict self) {
 	size_t i;
+
 	/* Go over all dependencies and clear them. */
 	for (i = 0; i < self->d_depcnt; ++i)
 		axref_clear(&self->d_depvec[i]);
@@ -2654,6 +2693,7 @@ driver_runstate_init_deps(struct driver *__restrict self)
 			dependency = driver_fromname(filename);
 			if unlikely(!dependency) {
 				char const *name;
+
 				/* We  get here if  a driver loaded  as a bootloader module
 				 * required another driver as a dependency, with that other
 				 * driver not having been provided in the same manner.
@@ -2674,6 +2714,7 @@ driver_runstate_init_deps(struct driver *__restrict self)
 					             name, self->d_name);
 				}
 			}
+
 			/* Make sure that the dependency has been initialized.
 			 * This way, bootloader drivers are always initialized
 			 * boot-up, no matter the order.
@@ -2685,6 +2726,7 @@ driver_runstate_init_deps(struct driver *__restrict self)
 			/* Recursively load the dependent driver. */
 			dependency = driver_insmod(filename);
 		}
+
 		/* Write the dependency back into the vector of dependencies. */
 		axref_set_inherit(&self->d_depvec[dst], dependency);
 		++dst;
@@ -3007,19 +3049,10 @@ done_dynamic:
 
 
 typedef void (*driver_initfini_t)(int argc, char *argv[]);
-struct driver_initfini_savestate {
-	pflag_t difss_preemption; /* Saved preemption state. */
-	inline driver_initfini_savestate() noexcept
-	    : difss_preemption(PREEMPTION_PUSH()) { }
-	inline ~driver_initfini_savestate() noexcept {
-		PREEMPTION_POP(difss_preemption);
-	}
-};
-
 
 struct driver_initfini_vector {
-	driver_initfini_t *difv_vec; /* [1..1][difv_siz] Callbacks. */
 	size_t             difv_siz; /* # of callbacks. */
+	driver_initfini_t *difv_vec; /* [1..1][difv_siz] Callbacks. */
 };
 
 /* Check if the given address range is mapped by the given driver. */
@@ -3063,6 +3096,7 @@ again_scan_phdrs:
 			phdr_maxaddr = phdr_minaddr + self->d_phdr[i].p_memsz;
 			if (!(minaddr >= phdr_minaddr && minaddr <= phdr_maxaddr))
 				continue;
+
 			/* This header contains at least 1 byte of the requested range! */
 			if (maxaddr <= phdr_maxaddr)
 				return true;
@@ -3285,10 +3319,12 @@ again:
 			goto again;
 		ATOMIC_WRITE(self->_d_initthread, THIS_TASK);
 		sig_broadcast(driver_changesignal(self));
+
 		/* At this point, we have exclusive authority to initialize
 		 * the given driver however we  want, as well as the  right
 		 * to finalize it if something happens that we don't  like! */
 		TRY {
+
 			/* Step #1: Like already indicate by `DRIVER_STATE_INIT_DEPS',
 			 *          we  have to load+initialize  other drivers that we
 			 *          have dependencies upon.
@@ -3332,14 +3368,14 @@ again:
 		}
 
 		TRY {
-			/* Step #3: Run driver DT_PREINIT_ARRAY constructions. */
+			/* Step #3: Run driver DT_PREINIT_ARRAY constructors. */
 			ATOMIC_WRITE(self->d_state, DRIVER_STATE_INIT_CT_PREINITARR);
 			sig_broadcast(driver_changesignal(self));
 			driver_runinit_DT_PREINITARR(self);
 			if (ATOMIC_READ(self->d_state) != DRIVER_STATE_INIT_CT_PREINITARR)
 				goto abort_init_DT_FINIARR;
 
-			/* Step #4: Run driver DT_INIT_ARRAY constructions. */
+			/* Step #4: Run driver DT_INIT_ARRAY constructors. */
 			ATOMIC_WRITE(self->d_state, DRIVER_STATE_INIT_CT_INITARR);
 			sig_broadcast(driver_changesignal(self));
 			driver_runinit_DT_INITARR(self);
@@ -3463,6 +3499,7 @@ abort_init_deps:
 			goto again;
 		if unlikely(init_thread == THIS_TASK)
 			return; /* Don't cause a deadlock by waiting for ourselves to finish init! */
+
 		/* Wait for the driver's state to change. */
 		task_connect(driver_changesignal(self));
 		if unlikely(ATOMIC_READ(self->d_state) != state) {
@@ -3506,6 +3543,7 @@ again:
 		                        DRIVER_STATE_KILL))
 			goto again;
 		sig_broadcast(driver_changesignal(self));
+
 		/* Drop the self-reference that was held by the
 		 * driver's state being `!= DRIVER_STATE_KILL'. */
 		decref_nokill(self);
@@ -3519,7 +3557,7 @@ again:
 		/* The driver  is being  initialized _right_  _now_
 		 * In  this case, we must differentiate between the
 		 * case where it's the calling thread that does the
-		 * init, and some other thread.
+		 * init, or some other thread.
 		 *
 		 * In the former case, we  must mark the driver  for
 		 * finalization, and return to our caller, such that
@@ -3542,6 +3580,7 @@ again:
 			} else if (state == DRIVER_STATE_INIT_CT_INIT) {
 				state = DRIVER_STATE_FINI_DT_FINI;
 			}
+
 			/* Mark the driver for lazy finalization once
 			 * we return back up the stack to our caller! */
 			if (!ATOMIC_CMPXCH_WEAK(self->d_state, state, new_state))
@@ -3549,6 +3588,7 @@ again:
 			sig_broadcast(driver_changesignal(self));
 			return;
 		}
+
 		/* Wait for another thread to finish initialization. */
 		task_connect(driver_changesignal(self));
 		if unlikely(state != ATOMIC_READ(self->d_state)) {
@@ -3641,6 +3681,7 @@ do_handle_fini_unbindglob:
 			goto again;
 		if (fini_thread == THIS_TASK)
 			return; /* Ignore recursive calls. */
+		ATTR_FALLTHROUGH
 	case DRIVER_STATE_FINI_DEPS:
 		/* Wait for the state to change. */
 		task_connect(driver_changesignal(self));
@@ -3682,7 +3723,8 @@ NOTHROW(FCALL remove_dead_drivers_from_loadlist)(void) {
 
 again:
 	old_ll = arref_get(&drivers);
-	/* Could the # of non-destroyed drivers.
+
+	/* Count the # of non-destroyed drivers.
 	 * Note that this # may decrease over time, but is
 	 * guarantied  not to increase (meaning we can use
 	 * it as an upper limit  to the # of drivers  that
@@ -3718,7 +3760,8 @@ again:
 			decref_unlikely(old_ll);
 			return false;
 		}
-		/* Construct new weak referneces for all (still) non-destroyed drivers. */
+
+		/* Construct new weak references for all (still) non-destroyed drivers. */
 		for (i = 0, dst = 0; i < old_ll->dll_count; ++i) {
 			if (wasdestroyed(old_ll->dll_drivers[i]))
 				continue;
@@ -3811,6 +3854,7 @@ again_find_nodes:
 				assert(self->d_module.md_nodecount != 0);
 				--self->d_module.md_nodecount;
 #endif /* !NDEBUG */
+
 				/* Driver  nodes  _must_ have  the PREPARED  flag set.
 				 * Otherwise, we'd be unable to unmap them as NOTHROW! */
 				assert(node->mn_flags & MNODE_F_MPREPARED);
@@ -3844,9 +3888,9 @@ again_find_nodes:
 		}
 	}
 #ifdef NDEBUG
-	assert(self->d_module.md_nodecount == 0);
-#else /* NDEBUG */
 	self->d_module.md_nodecount = 0;
+#else /* NDEBUG */
+	assert(self->d_module.md_nodecount == 0);
 #endif /* !NDEBUG */
 }
 
@@ -3903,7 +3947,7 @@ NOTHROW(FCALL driver_clear_mnode_pointers_and_destroy)(struct driver *__restrict
 			} else {
 				mman_remove_driver_nodes(self, &self->_d_deadnodes);
 				_mman_lock_release(&mman_kernel);
-				/* Destroy all of the dead mem-noeds. */
+				/* Destroy all of the dead mem-nodes. */
 				assert(!SLIST_EMPTY(&self->_d_deadnodes));
 				driver_deadnodes_freelist(&self->_d_deadnodes);
 				DBG_memset(&self->_d_deadnodes, 0xcc, sizeof(self->_d_deadnodes));
@@ -3947,7 +3991,7 @@ NOTHROW(FCALL driver_unbind_sections_and_destroy_lop)(struct lockop *__restrict 
 	me = container_of(self, struct driver, _d_lop);
 	SLIST_INIT(&me->_d_deadsect);
 
-	/* Remove all sections from the . */
+	/* Remove all sections from the driver. */
 	while (me->d_shnum) {
 		REF struct driver_section *sect;
 		--me->d_shnum;
@@ -3978,7 +4022,6 @@ NOTHROW(FCALL driver_unbind_sections_and_destroy_lop)(struct lockop *__restrict 
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL driver_destroy)(struct driver *__restrict self) {
-
 	/* Log a system message informing the user that  this
 	 * driver is now officially dead, and will no  longer
 	 * appear in load-lists (or at the very least: should
@@ -4107,6 +4150,7 @@ NOTHROW(FCALL driver_nonodes)(struct driver *__restrict self) {
 	 * Once  all mem-nodes have  gone away, we must  simply drop that reference. */
 	assert(self->d_module.md_weakrefcnt >= 1);
 	if (ATOMIC_DECFETCH(self->d_module.md_weakrefcnt) == 0) {
+
 		/* Enqueue a lock operation for the kernel mman to-be performed
 		 * once the kernel mman lock has been released in order to free
 		 * the driver control structure.
@@ -4117,6 +4161,7 @@ NOTHROW(FCALL driver_nonodes)(struct driver *__restrict self) {
 		self->_d_mm_lop.olo_func = &driver_nonodes_cleanup_lop;
 		SLIST_ATOMIC_INSERT(&mman_kernel_lockops,
 		                    &self->_d_mm_lop, olo_link);
+
 		/* DONT REAP LOCKOPS HERE!
 		 *
 		 * It won't work since our caller still holds a lock to
@@ -4182,6 +4227,7 @@ again:
 			}
 		}
 	}
+
 	/* Acquire a lock to the module section cache. */
 	TRY {
 		module_section_cache_acquire();
@@ -4245,6 +4291,7 @@ again:
 			if (module_relative_addr > self->d_shdr[i].sh_addr + self->d_shdr[i].sh_size)
 				continue;
 		}
+
 		/* Found it! (fill in section information for our caller) */
 		info->msi_name    = (char *)&kernel_shstrtab_data + self->d_shdr[i].sh_name;
 		info->msi_addr    = self->d_shdr[i].sh_addr;
@@ -4376,10 +4423,12 @@ driver_init_cmdline(struct driver *__restrict self,
 	                               GFP_LOCKED | GFP_PREFLT);
 	TRY {
 		memcpy(cmdline_copy, cmdline, cmdline_size, sizeof(char));
+
 		/* Add a double-NUL terminator to allow the commandline
 		 * to  always be interpreted into a NUL-NUL string-list */
 		cmdline_copy[cmdline_size + 0] = '\0';
 		cmdline_copy[cmdline_size + 1] = '\0';
+
 		/* Split the commandline through use of libcmdline */
 		self->d_argv = cmdline_decode_argv(cmdline_copy, &self->d_argc,
 		                                   GFP_LOCKED | GFP_PREFLT);
@@ -4538,6 +4587,7 @@ done_dynhdr:
 				goto got_dynstr_size;
 			}
 		}
+
 		/* Check which program header contains the .dynstr segment. */
 		for (i = 0; i < self->d_phnum; ++i) {
 			byte_t const *phdr_start, *phdr_end;
@@ -4553,6 +4603,7 @@ done_dynhdr:
 				goto got_dynstr_size;
 			}
 		}
+
 		/* Error: Nothing appears to be mapping the .dynstr segment... */
 		reasons[0] = (uintptr_t)self->d_dynstr - self->d_module.md_loadaddr;
 		reasons[1] = 1;
@@ -4566,6 +4617,7 @@ got_dynstr_size:
 	}
 	if unlikely(soname_offset >= dynstr_size)
 		return E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SONAME;
+
 	/* Try to include as many trailing NUL characters with .dynstr as possible. */
 	while ((byte_t const *)(self->d_dynstr + dynstr_size) <= self->d_module.md_loadmax &&
 	       memcpy_nopf(&lastch, &self->d_dynstr[dynstr_size], sizeof(lastch)) == 0 &&
@@ -4604,6 +4656,7 @@ bad_elf_symhash:
 				reasons[0] = (uintptr_t)self->d_hashtab - self->d_module.md_loadaddr;
 				return E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMHASH;
 			}
+
 			/* Verify that the ELF `.hash' section is in-bounds of the driver image. */
 			if (OVERFLOW_UMUL(hashtab_hdr.ht_nbuckts, sizeof(ElfW(Word)), &temp))
 				goto bad_elf_symhash;
@@ -4632,12 +4685,14 @@ bad_gnu_symhash:
 				reasons[0] = (uintptr_t)self->d_hashtab - self->d_module.md_loadaddr;
 				return E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_GNUSYMHASH;
 			}
+
 			/* GNU hash tables are a bit more complicated, since we need  to
 			 * find the symbol with the greatest index, then add +1 to that. */
 			buckets = (ElfW(Word) const *)(self->d_gnuhashtab->gh_bloom + hashtab_hdr.gh_bloom_size);
 			chains  = (ElfW(Word) const *)(buckets + hashtab_hdr.gh_nbuckets);
 			if unlikely(!image_validate(self, self->d_gnuhashtab,
-			                            (size_t)((byte_t const *)chains - (byte_t const *)self->d_gnuhashtab)))
+			                            (size_t)((byte_t const *)chains -
+			                                     (byte_t const *)self->d_gnuhashtab)))
 				goto bad_gnu_symhash;
 			if (memcpy_nopf(&count, &chains[-1], sizeof(count)) != 0)
 				goto bad_gnu_symhash;
@@ -4670,6 +4725,7 @@ bad_gnu_symhash:
 					goto got_dynsym_size;
 				}
 			}
+
 			/* Calculate # of symbols based on program headers. */
 			for (i = 0; i < self->d_phnum; ++i) {
 				byte_t const *phdr_start, *phdr_end;
@@ -4689,6 +4745,7 @@ err_bad_dynsym:
 			reasons[0] = (uintptr_t)self->d_dynsym_tab - self->d_module.md_loadaddr;
 			return E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSYM;
 		}
+
 		/* Verify that the .dynsym section is in-bounds. */
 		{
 			size_t dynsym_size;
@@ -4749,6 +4806,7 @@ create_mnode_for_phdr(ElfW(Phdr) const *__restrict phdr,
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT) {
 	struct mnode *node;
 	struct mpart *part;
+
 	/* Allocate a new node/part pair. */
 	node = (struct mnode *)kmalloc(sizeof(struct mnode), GFP_LOCKED | GFP_PREFLT);
 	TRY {
@@ -5139,6 +5197,7 @@ done_dynhdr_for_soname:
 			TRY {
 				REF struct driver_loadlist *old_ll;
 				REF struct driver_loadlist *new_ll;
+
 				/* Allocate a new `struct driver_loadlist' descriptor
 				 * which can then be used to replace the current one. */
 again_get_driver_loadlist:
@@ -5407,6 +5466,7 @@ driver_loadmod_file(struct mfile *__restrict driver_file,
                     bool *pnew_driver_loaded)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR, ...) {
 	REF struct driver *result;
+
 	/* Check if we've already got a driver loaded under `driver_file' */
 	result = driver_fromfile(driver_file);
 	if (result) {
@@ -5416,12 +5476,15 @@ driver_loadmod_file(struct mfile *__restrict driver_file,
 		/* Fallback: Try to create a new driver. */
 		void *unmap_cookie, *tempmap;
 		pos_t tempmap_size = mfile_getsize(driver_file);
+
 		/* Impose a limit on how large driver files may be. */
 		if (tempmap_size >= (pos_t)UINT32_C(0x10000000))
 			THROW(E_NOT_EXECUTABLE_TOOLARGE);
+
 		/* Allocate  a cookie which we can use to NOBLOCK-unmap the temporary
 		 * mapping of the given `driver_file' once we're done, or upon error. */
 		unmap_cookie = mman_unmap_kram_cookie_alloc();
+
 		/* Create a temporary memory mapping of the given file. */
 		TRY {
 			tempmap = mman_map(/* self:          */ &mman_kernel,
@@ -5459,6 +5522,7 @@ driver_loadmod_blob(USER CHECKED void const *base, size_t num_bytes,
                     bool *pnew_driver_loaded)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR, ...) {
 	REF struct driver *result;
+
 	/* Try to create a driver from the given blob. */
 	result = driver_create((USER CHECKED byte_t const *)base,
 	                       num_bytes, NULL, NULL, NULL,
@@ -5670,6 +5734,7 @@ driver_loadmod_file_in_path(char const *__restrict path, size_t pathlen,
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_NOT_EXECUTABLE, E_FSERROR, E_IOERROR, ...) {
 	REF struct driver *result;
 	char *buf, *p;
+
 	/* Strip leading/trailing slashes from strings. */
 	while (pathlen && path[pathlen - 1] == '/')
 		--pathlen;
@@ -5737,6 +5802,7 @@ driver_loadmod(USER CHECKED char const *driver_name,
                bool *pnew_driver_loaded)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_NOT_EXECUTABLE, E_FSERROR, E_IOERROR, ...) {
 	REF struct driver *result;
+
 	/* Check if the given `driver_name' is actually a file-path.
 	 * We can identify paths  by them containing slashes  (`/'),
 	 * and if  this is  the case,  rather than  searching for  a
@@ -5758,10 +5824,12 @@ driver_loadmod(USER CHECKED char const *driver_name,
 			*pnew_driver_loaded = true;
 	} else {
 		REF struct driver_libpath_struct *lp;
+
 		/* Search for a  file matching `driver_name'  in the  driver
 		 * library path list (which usually contains `/os/drivers'). */
 		lp = arref_get(&driver_libpath);
 		FINALLY_DECREF_UNLIKELY(lp);
+
 		/* Don't create new drivers during the first pass. */
 		result = driver_loadmod_file_with_path(lp, driver_name,
 		                                       driver_cmdline,
@@ -6056,7 +6124,7 @@ PUBLIC struct driver_libpath_arref driver_libpath = ARREF_INIT(&default_library_
 /************************************************************************/
 
 #ifndef CONFIG_NO_BOOTLOADER_DRIVERS
-/* Initialize (link, relocation  & initialize) all  drivers
+/* Initialize  (link,  relocate &  initialize)  all drivers
  * loaded via the kernel commandline as bootloader modules.
  * This  is done as a separate step from the actual loading
  * of  drivers so-as to allow for inter-driver dependencies

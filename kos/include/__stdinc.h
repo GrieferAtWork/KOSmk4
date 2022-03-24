@@ -143,7 +143,8 @@
  * signal handler to throw an  exception upon `SIGSEGV', or the  like.
  * Or alternatively, has KOS kernel exceptions enabled (s.a. <kos/except-handler.h>) */
 #if (!defined(__NO_NON_CALL_EXCEPTIONS) || \
-     (defined(__NON_CALL_EXCEPTIONS) && (__NON_CALL_EXCEPTIONS + 0) != 0))
+     (defined(__NON_CALL_EXCEPTIONS) && (__NON_CALL_EXCEPTIONS + 0) != 0) || \
+     (defined(__KOS__) && defined(__KERNEL__)))
 #undef __NO_NON_CALL_EXCEPTIONS
 #undef __NON_CALL_EXCEPTIONS
 #define __NON_CALL_EXCEPTIONS

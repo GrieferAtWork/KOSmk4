@@ -1040,6 +1040,8 @@ static_assert(offsetof(struct __kos_stat, st_mtimensec) == __OFFSET_KOS_STAT_MTI
 static_assert(offsetof(struct __kos_stat, st_mtimespec) == __OFFSET_KOS_STAT_MTIMESPEC);
 static_assert(offsetof(struct __kos_stat, st_nlink) == __OFFSET_KOS_STAT_NLINK);
 static_assert(offsetof(struct __kos_stat, st_rdev) == __OFFSET_KOS_STAT_RDEV);
+static_assert(offsetof(struct __kos_stat, __st_reserved1) == __OFFSET_KOS_STAT_RESERVED1);
+static_assert(offsetof(struct __kos_stat, __st_reserved2) == __OFFSET_KOS_STAT_RESERVED2);
 static_assert(offsetof(struct __kos_stat, st_size) == __OFFSET_KOS_STAT_SIZE);
 static_assert(offsetof(struct __kos_stat, st_uid) == __OFFSET_KOS_STAT_UID);
 static_assert(sizeof(struct __kos_stat) == __SIZEOF_KOS_STAT);

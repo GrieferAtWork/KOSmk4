@@ -46,10 +46,10 @@
 #define __IO_FILE_IOCOMMIT  __UINT32_C(0x00004000) /* Invoke fsync() during fflush() */
 #define __IO_FILE_IOLOCKED  __UINT32_C(0x00008000) /* ??? */
 #define __IO_FILE_IONOLOCK  __UINT32_C(0x08000000) /* NOT ORIGINALLY DEFINED IN DOS: The buffer does not perform any locking (s.a. `__fsetlocking()') */
-#define __IO_FILE_IOLNIFTYY __UINT32_C(0x80000000) /* NOT ORIGINALLY DEFINED IN DOS: Determine `isatty()' on first access and set `__IO_FILE_IOLNBUF' accordingly. */
-#define __IO_FILE_IOREADING __UINT32_C(0x40000000) /* NOT ORIGINALLY DEFINED IN DOS: The buffer is currently being read into and must not be changed or resized. */
-#define __IO_FILE_IOISATTY  __UINT32_C(0x20000000) /* NOT ORIGINALLY DEFINED IN DOS: The buffer refers to a TTY */
 #define __IO_FILE_IONOTATTY __UINT32_C(0x10000000) /* NOT ORIGINALLY DEFINED IN DOS: The buffer doesn't refer to a TTY */
+#define __IO_FILE_IOISATTY  __UINT32_C(0x20000000) /* NOT ORIGINALLY DEFINED IN DOS: The buffer refers to a TTY */
+#define __IO_FILE_IOREADING __UINT32_C(0x40000000) /* NOT ORIGINALLY DEFINED IN DOS: The buffer is currently being read into and must not be changed or resized. */
+#define __IO_FILE_IOLNIFTYY __UINT32_C(0x80000000) /* NOT ORIGINALLY DEFINED IN DOS: Determine `isatty()' on first access and set `__IO_FILE_IOLNBUF' accordingly. */
 
 
 #ifdef __CRT_KOS_PRIMARY

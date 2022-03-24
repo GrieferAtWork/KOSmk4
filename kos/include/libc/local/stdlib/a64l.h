@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f43e747 */
+/* HASH CRC-32:0xeb03dc8a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_a64l_defined
 #define __local_a64l_defined
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(a64l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(a64l))(char const *__s) {
@@ -28,16 +29,16 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(a64l))(char const *__s) {
 	__SHIFT_TYPE__ __shift = 0;
 	for (;; ++__s) {
 		char __ch = *__s;
-		if (__ch <= 0) {
+		if ((unsigned char)__ch <= '\0') {
 			break;
-		} else if (__ch <= '/') {
-			__digit = (__ch - '.') + 0;
-		} else if (__ch <= '9') {
-			__digit = (__ch - '0') + 2;
-		} else if (__ch <= 'Z') {
-			__digit = (__ch - 'A') + 12;
+		} else if ((unsigned char)__ch <= '/') {
+			__digit = (unsigned long)(__ch - '.' + 0);
+		} else if ((unsigned char)__ch <= '9') {
+			__digit = (unsigned long)(__ch - '0' + 2);
+		} else if ((unsigned char)__ch <= 'Z') {
+			__digit = (unsigned long)(__ch - 'A' + 12);
 		} else {
-			__digit = (__ch - 'a') + 38;
+			__digit = (unsigned long)(__ch - 'a' + 38);
 		}
 		__digit <<= __shift;
 		__result |= __digit;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbe9fb55 */
+/* HASH CRC-32:0x67b15940 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,7 +82,9 @@ INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(3, 4) void
 	} else
 
 	{
+
 		libc_fflush(stdout);
+
 		libc_fprintf(stderr, "%s: ", program_invocation_short_name);
 	}
 	if (format) {
@@ -146,7 +148,9 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(3, 4) void
 	} else
 
 	{
+
 		libc_fflush(stdout);
+
 		libc_fprintf(stderr, "%s: ", program_invocation_short_name);
 	}
 	if (format) {
@@ -239,7 +243,9 @@ INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(5, 6) void
 		} else
 
 		{
+
 			libc_fflush(stdout);
+
 			libc_fprintf(stderr, "%s:", program_invocation_short_name);
 		}
 		libc_fprintf(stderr, "%s:%u: ", filename, line);
@@ -336,7 +342,9 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(5, 6) void
 		} else
 
 		{
+
 			libc_fflush(stdout);
+
 			libc_fprintf(stderr, "%s:", program_invocation_short_name);
 		}
 		libc_fprintf(stderr, "%s:%u: ", filename, line);
