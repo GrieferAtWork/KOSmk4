@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfeb78fa */
+/* HASH CRC-32:0x90475fd5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,12 +29,16 @@
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
+INTDEF ATTR_LIBC_PRINTF(3, 0) void (LIBCCALL libc_verror)(int status, errno_t errnum, const char *format, va_list args) THROWS(...);
+INTDEF ATTR_LIBC_PRINTF(5, 0) void (LIBCCALL libc_verror_at_line)(int status, errno_t errnum, char const *filename, unsigned int line, char const *format, va_list args) THROWS(...);
+#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> error(3)
  * Helper  function  for printing  an error  message to  `stderr' and  possibly exiting  the program
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
  * Also note that `stdout' is flushed before the message is printed.
- * If `STATUS' is non-zero, follow up with a call to `exit(status)' */
+ * If `status' is non-zero, follow up with a call to `exit(status)' */
 INTDEF ATTR_LIBC_PRINTF(3, 4) void (VLIBDCALL libd_error)(int status, errno_t errnum, const char *format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -42,23 +46,23 @@ INTDEF ATTR_LIBC_PRINTF(3, 4) void (VLIBDCALL libd_error)(int status, errno_t er
  * Helper  function  for printing  an error  message to  `stderr' and  possibly exiting  the program
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
  * Also note that `stdout' is flushed before the message is printed.
- * If `STATUS' is non-zero, follow up with a call to `exit(status)' */
+ * If `status' is non-zero, follow up with a call to `exit(status)' */
 INTDEF ATTR_LIBC_PRINTF(3, 4) void (VLIBCCALL libc_error)(int status, errno_t errnum, const char *format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> error_at_line(3)
  * Same as `error()', but also include the given filename in the error message.
  * The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
- * Additionally,    when   `error_one_per_line'   is    non-zero,   consecutive   calls    to   this   function   that
- * pass the same values for `filename' and `line' will not produce the error message. */
+ * Additionally,  when `error_one_per_line' is non-zero, consecutive calls to  this function that pass the same values
+ * for `filename' and `line' will not produce the error message. */
 INTDEF ATTR_LIBC_PRINTF(5, 6) void (VLIBDCALL libd_error_at_line)(int status, errno_t errnum, char const *filename, unsigned int line, char const *format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> error_at_line(3)
  * Same as `error()', but also include the given filename in the error message.
  * The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
- * Additionally,    when   `error_one_per_line'   is    non-zero,   consecutive   calls    to   this   function   that
- * pass the same values for `filename' and `line' will not produce the error message. */
+ * Additionally,  when `error_one_per_line' is non-zero, consecutive calls to  this function that pass the same values
+ * for `filename' and `line' will not produce the error message. */
 INTDEF ATTR_LIBC_PRINTF(5, 6) void (VLIBCCALL libc_error_at_line)(int status, errno_t errnum, char const *filename, unsigned int line, char const *format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 

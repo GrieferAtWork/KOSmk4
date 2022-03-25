@@ -32,8 +32,8 @@
 /* Use the KOS-special `libc_strerrordesc_np()' functions, rather than strerror()
  * below (thus making  these functions  a bit  more light-weight  by having  just
  * a bit less dependencies) */
-#define strerror        libc_strerrordesc_np
-#define libc_strerror   libc_strerrordesc_np
+#define strerror      libc_strerrordesc_np
+#define libc_strerror libc_strerrordesc_np
 #include "../libc/globals.h" /* For norel access to global variables */
 }
 
@@ -111,14 +111,11 @@ __LIBC int error_one_per_line;
 %[define_replacement(program_invocation_name       = __LOCAL_program_invocation_name)]
 %[define_replacement(program_invocation_short_name = __LOCAL_program_invocation_short_name)]
 
+/* Declare error functions as static varargs. -- Because varargs functions always
+ * need a dedicated DOS variant, we want to keep their body as small as possible,
+ * so that the C library doesn't get bloated more than it needs to be. */
 
-@@>> error(3)
-@@Helper  function  for printing  an error  message to  `stderr' and  possibly exiting  the program
-@@The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
-@@Also note that `stdout' is flushed before the message is printed.
-@@If `STATUS' is non-zero, follow up with a call to `exit(status)'
-[[fast, libc, throws]]
-[[decl_include("<bits/types.h>")]]
+[[static, throws, decl_include("<bits/types.h>")]]
 [[impl_prefix(DEFINE_LOCAL_error_print_progname)]]
 [[impl_prefix(DEFINE_LOCAL_error_message_count)]]
 [[impl_include("<libc/template/stdstreams.h>")]]
@@ -129,7 +126,8 @@ __LIBC int error_one_per_line;
            $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc) &&
            defined(__LOCAL_program_invocation_short_name) &&
            $has_function(strerror))]]
-void error(int status, $errno_t errnum, [[nullable, format("printf")]] const char *format, ...) {
+void verror(int status, $errno_t errnum,
+            [[nullable, format("printf")]] const char *format, va_list args) {
 @@pp_ifdef __LOCAL_error_print_progname@@
 	if (__LOCAL_error_print_progname) {
 		(*__LOCAL_error_print_progname)();
@@ -141,12 +139,8 @@ void error(int status, $errno_t errnum, [[nullable, format("printf")]] const cha
 @@pp_endif@@
 		fprintf(stderr, "%s: ", program_invocation_short_name);
 	}
-	if (format) {
-		va_list args;
-		va_start(args, format);
+	if (format)
 		vfprintf(stderr, format, args);
-		va_end(args);
-	}
 @@pp_ifdef __LOCAL_error_message_count@@
 	++__LOCAL_error_message_count;
 @@pp_endif@@
@@ -158,13 +152,7 @@ void error(int status, $errno_t errnum, [[nullable, format("printf")]] const cha
 }
 
 
-@@>> error_at_line(3)
-@@Same as `error()', but also include the given filename in the error message.
-@@The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
-@@Additionally,    when   `error_one_per_line'   is    non-zero,   consecutive   calls    to   this   function   that
-@@pass the same values for `filename' and `line' will not produce the error message.
-[[fast, libc, throws]]
-[[decl_include("<bits/types.h>")]]
+[[static, throws, decl_include("<bits/types.h>")]]
 [[impl_include("<libc/template/stdstreams.h>")]]
 [[impl_include("<libc/template/program_invocation_name.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
@@ -176,8 +164,8 @@ void error(int status, $errno_t errnum, [[nullable, format("printf")]] const cha
 [[impl_prefix(DEFINE_LOCAL_error_print_progname)]]
 [[impl_prefix(DEFINE_LOCAL_error_one_per_line)]]
 [[impl_prefix(DEFINE_LOCAL_error_message_count)]]
-void error_at_line(int status, $errno_t errnum, char const *filename,
-                   unsigned int line, [[nullable, format("printf")]] char const *format, ...) {
+void verror_at_line(int status, $errno_t errnum, char const *filename,
+                    unsigned int line, [[nullable, format("printf")]] char const *format, va_list args) {
 @@pp_ifdef __LOCAL_error_one_per_line@@
 	static char const *last_filename = NULL;
 	static unsigned int last_line = 0;
@@ -204,12 +192,8 @@ void error_at_line(int status, $errno_t errnum, char const *filename,
 			fprintf(stderr, "%s:", program_invocation_short_name);
 		}
 		fprintf(stderr, "%s:%u: ", filename, line);
-		if (format) {
-			va_list args;
-			va_start(args, format);
+		if (format)
 			vfprintf(stderr, format, args);
-			va_end(args);
-		}
 @@pp_ifdef __LOCAL_error_message_count@@
 		++__LOCAL_error_message_count;
 @@pp_endif@@
@@ -224,36 +208,72 @@ void error_at_line(int status, $errno_t errnum, char const *filename,
 }
 
 
+
+@@>> error(3)
+@@Helper  function  for printing  an error  message to  `stderr' and  possibly exiting  the program
+@@The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
+@@Also note that `stdout' is flushed before the message is printed.
+@@If `status' is non-zero, follow up with a call to `exit(status)'
+[[fast, libc, throws, decl_include("<bits/types.h>"), requires_function(verror)]]
+void error(int status, $errno_t errnum, [[nullable, format("printf")]] const char *format, ...) {
+	va_list args;
+	va_start(args, format);
+	verror(status, errnum, format, args);
+	va_end(args);
+}
+
+
+@@>> error_at_line(3)
+@@Same as `error()', but also include the given filename in the error message.
+@@The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
+@@Additionally,  when `error_one_per_line' is non-zero, consecutive calls to  this function that pass the same values
+@@for `filename' and `line' will not produce the error message.
+[[fast, libc, throws, decl_include("<bits/types.h>"), requires_function(verror_at_line)]]
+void error_at_line(int status, $errno_t errnum, char const *filename,
+                   unsigned int line, [[nullable, format("printf")]] char const *format, ...) {
+	va_list args;
+	va_start(args, format);
+	verror_at_line(status, errnum, filename, line, format, args);
+	va_end(args);
+}
+
+
 %{
 
 #ifndef error_print_progname
-#ifdef __CRT_HAVE_error_print_progname
+#ifdef __LOCAL_error_print_progname
+#define error_print_progname __LOCAL_error_print_progname
+#elif defined(__CRT_HAVE_error_print_progname)
 /* Override for printing the program name.
  * When non-NULL,  this  function  should:
  *  - fflush(stdout);
  *  - fprintf(stderr, "%s:", basename(argv[0])); */
 __LIBC void (__LIBKCALL *error_print_progname)(void);
 #define error_print_progname error_print_progname
-#endif /* __CRT_HAVE_error_print_progname */
+#endif /* ... */
 #endif /* !error_print_progname */
 
 #ifndef error_message_count
-#ifdef __CRT_HAVE_error_print_progname
+#ifdef __LOCAL_error_message_count
+#define error_message_count __LOCAL_error_message_count
+#elif defined(__CRT_HAVE_error_message_count)
 /* Incremented by one each time `error()' or `error_at_line()' is called. */
 __LIBC unsigned int error_message_count;
 #define error_message_count error_message_count
-#endif /* __CRT_HAVE_error_print_progname */
+#endif /* ... */
 #endif /* !error_message_count */
 
 #ifndef error_one_per_line
-#ifdef __CRT_HAVE_error_one_per_line
+#ifdef __LOCAL_error_one_per_line
+#define error_one_per_line __LOCAL_error_one_per_line
+#elif defined(__CRT_HAVE_error_one_per_line)
 /* Mode configuration for `error_at_line()'.
  * When non-zero, consecutive calls to `error_at_line()' that pass the same
  * values for `filename'  and `line'  will not produce  the error  message.
  * The default value is ZERO(0) */
 __LIBC int error_one_per_line;
 #define error_one_per_line error_one_per_line
-#endif /* __CRT_HAVE_error_one_per_line */
+#endif /* ... */
 #endif /* !error_one_per_line */
 
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x167a1bb1 */
+/* HASH CRC-32:0x78772fc8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7608,6 +7608,8 @@
 #define __CRT_HAVE_vdprintf
 #define __CRT_HAVE_verr
 #define __CRT_HAVE_verrc
+#define __CRT_HAVE_verror
+#define __CRT_HAVE_verror_at_line
 #define __CRT_HAVE_verrx
 #define __CRT_HAVE_versionsortk
 #define __CRT_HAVE_versionsortk64
