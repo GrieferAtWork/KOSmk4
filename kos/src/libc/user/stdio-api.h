@@ -25,13 +25,13 @@
 
 #include <hybrid/atomic.h>
 #include <hybrid/sequence/list.h>
-#include <hybrid/sync/atomic-owner-rwlock.h>
 
 #include <asm/crt/stdio.h>
 #include <asm/os/stdio.h>
 #include <bits/crt/io-file.h>
 #include <bits/crt/mbstate.h>
 #include <kos/refcnt.h>
+#include <kos/sched/shared-recursive-rwlock.h>
 #include <kos/types.h>
 
 #include <assert.h>
@@ -117,30 +117,30 @@ typedef struct __mbstate mbstate_t;
  */
 
 struct iofile_data_novtab {
-	uintptr_t                  io_zero;   /* Always ZERO(0). - Required for binary compatibility with DOS. */
-	__WEAK refcnt_t            io_refcnt; /* Reference counter. */
-	char                      *io_getln;  /* [0..1] malloc'd buffer for `fgetln(3)' (no lock, because
-	                                       * only  used by `fgetln()' which already is thread-unsafe) */
-	struct atomic_owner_rwlock io_lock;   /* Lock for the file. */
-	byte_t                    *io_chng;   /* [>= :if_base][+io_chsz <= :if_base + :if_bufsiz]
-	                                       * [valid_if(io_chsz != 0)][lock(fb_lock)]
-	                                       * Pointer to the  first character that  was
-	                                       * changed since the buffer had been loaded. */
-	size_t                     io_chsz;   /* [lock(fb_lock)] Amount of bytes that were changed. */
-	LIST_ENTRY(FILE)           io_lnch;   /* [lock(changed_linebuffered_files_lock)][0..1] Chain of line-buffered file that
-	                                       * have  changed and must  be flushed before another  line-buffered file is read. */
-	LIST_ENTRY(FILE)           io_link;   /* [lock(all_files_lock)][0..1] Entry  in  the  global chain  of  open  files.
-	                                       * (Used by `fcloseall()', as well as flushing all open files during `exit()') */
-	uintptr_t                  io_fver;   /* [lock(flushall_lock)] Last time that this file was flushed because of a global flush. */
-	pos64_t                    io_fblk;   /* The starting address of the data block currently stored in `if_base'. */
-	pos64_t                    io_fpos;   /* The current (assumed) position within the underlying file stream. */
-	mbstate_t                  io_mbs;    /* MB State used for translating unicode data. */
+	uintptr_t                      io_zero;   /* Always ZERO(0). - Required for binary compatibility with DOS. */
+	__WEAK refcnt_t                io_refcnt; /* Reference counter. */
+	char                          *io_getln;  /* [0..1] malloc'd buffer for `fgetln(3)' (no lock, because
+	                                           * only  used by `fgetln()' which already is thread-unsafe) */
+	struct shared_recursive_rwlock io_lock;   /* Lock for the file. */
+	byte_t                        *io_chng;   /* [>= :if_base][+io_chsz <= :if_base + :if_bufsiz]
+	                                           * [valid_if(io_chsz != 0)][lock(fb_lock)]
+	                                           * Pointer to the  first character that  was
+	                                           * changed since the buffer had been loaded. */
+	size_t                         io_chsz;   /* [lock(fb_lock)] Amount of bytes that were changed. */
+	LIST_ENTRY(FILE)               io_lnch;   /* [lock(changed_linebuffered_files_lock)][0..1] Chain of line-buffered file that
+	                                           * have  changed and must  be flushed before another  line-buffered file is read. */
+	LIST_ENTRY(FILE)               io_link;   /* [lock(all_files_lock)][0..1] Entry  in  the  global chain  of  open  files.
+	                                           * (Used by `fcloseall()', as well as flushing all open files during `exit()') */
+	uintptr_t                      io_fver;   /* [lock(flushall_lock)] Last time that this file was flushed because of a global flush. */
+	pos64_t                        io_fblk;   /* The starting address of the data block currently stored in `if_base'. */
+	pos64_t                        io_fpos;   /* The current (assumed) position within the underlying file stream. */
+	mbstate_t                      io_mbs;    /* MB State used for translating unicode data. */
 };
 #define IOFILE_DATA_NOVTAB_INIT()                    \
 	{                                                \
 		.io_zero   = 0,                              \
 		.io_refcnt = 2,                              \
-		.io_lock   = ATOMIC_OWNER_RWLOCK_INIT,       \
+		.io_lock   = SHARED_RECURSIVE_RWLOCK_INIT,   \
 		.io_chng   = NULL,                           \
 		.io_chsz   = 0,                              \
 		.io_lnch   = LIST_ENTRY_UNBOUND_INITIALIZER, \
@@ -184,17 +184,17 @@ struct iofile_data: iofile_data_novtab {
 #define IOBUF_RELOCATE_THRESHOLD 2048 /* When >= this amount of bytes are unused in the buffer, free them. */
 
 /* File locking helpers. */
-#define file_lock_reading(x)     atomic_owner_rwlock_reading(&(x)->if_exdata->io_lock)
-#define file_lock_writing(x)     atomic_owner_rwlock_writing(&(x)->if_exdata->io_lock)
-#define file_lock_tryread(x)     atomic_owner_rwlock_tryread(&(x)->if_exdata->io_lock)
-#define file_lock_trywrite(x)    atomic_owner_rwlock_trywrite(&(x)->if_exdata->io_lock)
-#define file_lock_tryupgrade(x)  atomic_owner_rwlock_tryupgrade(&(x)->if_exdata->io_lock)
-#define file_lock_read(x)        atomic_owner_rwlock_read(&(x)->if_exdata->io_lock)
-#define file_lock_write(x)       atomic_owner_rwlock_write(&(x)->if_exdata->io_lock)
-#define file_lock_upgrade(x)     atomic_owner_rwlock_upgrade(&(x)->if_exdata->io_lock)
-#define file_lock_downgrade(x)   atomic_owner_rwlock_downgrade(&(x)->if_exdata->io_lock)
-#define file_lock_endread(x)     atomic_owner_rwlock_endread(&(x)->if_exdata->io_lock)
-#define file_lock_endwrite(x)    atomic_owner_rwlock_endwrite(&(x)->if_exdata->io_lock)
+#define file_lock_reading(x)     shared_recursive_rwlock_reading(&(x)->if_exdata->io_lock)
+#define file_lock_writing(x)     shared_recursive_rwlock_writing(&(x)->if_exdata->io_lock)
+#define file_lock_tryread(x)     shared_recursive_rwlock_tryread(&(x)->if_exdata->io_lock)
+#define file_lock_trywrite(x)    shared_recursive_rwlock_trywrite(&(x)->if_exdata->io_lock)
+#define file_lock_tryupgrade(x)  shared_recursive_rwlock_tryupgrade(&(x)->if_exdata->io_lock)
+#define file_lock_read(x)        shared_recursive_rwlock_read(&(x)->if_exdata->io_lock)
+#define file_lock_write(x)       shared_recursive_rwlock_write(&(x)->if_exdata->io_lock)
+#define file_lock_upgrade(x)     shared_recursive_rwlock_upgrade(&(x)->if_exdata->io_lock)
+#define file_lock_downgrade(x)   shared_recursive_rwlock_downgrade(&(x)->if_exdata->io_lock)
+#define file_lock_endread(x)     shared_recursive_rwlock_endread(&(x)->if_exdata->io_lock)
+#define file_lock_endwrite(x)    shared_recursive_rwlock_endwrite(&(x)->if_exdata->io_lock)
 
 /* Destroy the given file */
 INTDEF NONNULL((1)) void LIBCCALL file_destroy(FILE *__restrict self);

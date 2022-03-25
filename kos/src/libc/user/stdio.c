@@ -508,29 +508,29 @@ file_destroy(FILE *__restrict self) {
 	ex = self->if_exdata;
 
 	/* Last reference -> This file has to go away! */
-	assert(!atomic_owner_rwlock_reading(&ex->io_lock));
+	assert(!shared_recursive_rwlock_reading(&ex->io_lock));
 	assert(!(self->if_flag & IO_READING));
 	if (ex->io_chsz != 0) {
 		/* The file still contains some changed data.
 		 * -> Try to flush data data. */
-		atomic_owner_rwlock_init_read(&ex->io_lock);
+		shared_recursive_rwlock_init_read(&ex->io_lock);
 		ATOMIC_WRITE(ex->io_refcnt, 1);
 
 		/* NOTE: Errors during this sync are ignored! */
 		file_sync(self);
-		atomic_owner_rwlock_endread(&ex->io_lock);
+		shared_recursive_rwlock_endread(&ex->io_lock);
 		refcnt = ATOMIC_FETCHDEC(ex->io_refcnt);
 		assert(refcnt != 0);
 		if (refcnt != 1)
 			return; /* The file was revived. */
 	}
-	assert(!atomic_owner_rwlock_reading(&ex->io_lock));
+	assert(!shared_recursive_rwlock_reading(&ex->io_lock));
 	assert(!(self->if_flag & IO_READING));
 
 	/* Close the underlying file. */
 	if (self->if_flag & IO_HASVTAB) {
 		/* In this case, we have to be careful in case the file gets revived. */
-		atomic_owner_rwlock_init_read(&ex->io_lock);
+		shared_recursive_rwlock_init_read(&ex->io_lock);
 		ATOMIC_WRITE(ex->io_refcnt, 1);
 		/* NOTE: Errors during this close are ignored! */
 		if (ex->io_closefn != NULL) {
@@ -539,7 +539,7 @@ file_destroy(FILE *__restrict self) {
 			(*ex->io_closefn)(ex->io_cookie);
 			(void)libc_seterrno(saved_errno);
 		}
-		atomic_owner_rwlock_endread(&ex->io_lock);
+		shared_recursive_rwlock_endread(&ex->io_lock);
 		refcnt = ATOMIC_FETCHDEC(ex->io_refcnt);
 		assert(refcnt != 0);
 		if (refcnt != 1)
@@ -548,7 +548,7 @@ file_destroy(FILE *__restrict self) {
 		if likely(self->if_fd >= 0)
 			sys_close(self->if_fd);
 	}
-	assert(!atomic_owner_rwlock_reading(&ex->io_lock));
+	assert(!shared_recursive_rwlock_reading(&ex->io_lock));
 	assert(!(self->if_flag & IO_READING));
 
 	/* Make sure that the file is no longer accessible through the global file lists. */
@@ -675,40 +675,41 @@ do_flush_fp:
 }
 
 
-PRIVATE ATTR_SECTION(".bss.crt.application.exit") struct atomic_owner_rwlock flushall_lock = ATOMIC_OWNER_RWLOCK_INIT;
+PRIVATE ATTR_SECTION(".bss.crt.application.exit")
+struct shared_recursive_rwlock flushall_lock = SHARED_RECURSIVE_RWLOCK_INIT;
 PRIVATE ATTR_SECTION(".bss.crt.application.exit") uintptr_t flushall_version = 0;
 PRIVATE ATTR_SECTION(".bss.crt.application.exit") bool flushall_must_restart = false;
 
 PRIVATE ATTR_SECTION(".text.crt.application.exit") void LIBCCALL
 file_syncall_locked(void) {
 	/* Check for recursion (as is possible due to file cookies) */
-	if (atomic_owner_rwlock_writing(&flushall_lock)) {
+	if (shared_recursive_rwlock_writing(&flushall_lock)) {
 		/* Don't allow recursion, but solve the problem by re-starting the flush operation. */
 		flushall_must_restart = true;
 		return;
 	}
-	atomic_owner_rwlock_write(&flushall_lock);
+	shared_recursive_rwlock_write(&flushall_lock);
 	do {
 		flushall_must_restart = false;
 		file_do_syncall_locked(flushall_version++);
 	} while (flushall_must_restart);
-	atomic_owner_rwlock_endwrite(&flushall_lock);
+	shared_recursive_rwlock_endwrite(&flushall_lock);
 }
 
 PRIVATE ATTR_SECTION(".text.crt.FILE.unlocked.write.utility") void LIBCCALL
 file_syncall_unlocked(void) {
 	/* Check for recursion (as is possible due to file cookies) */
-	if (atomic_owner_rwlock_writing(&flushall_lock)) {
+	if (shared_recursive_rwlock_writing(&flushall_lock)) {
 		/* Don't allow recursion, but solve the problem by re-starting the flush operation. */
 		flushall_must_restart = true;
 		return;
 	}
-	atomic_owner_rwlock_write(&flushall_lock);
+	shared_recursive_rwlock_write(&flushall_lock);
 	do {
 		flushall_must_restart = false;
 		file_do_syncall_unlocked(flushall_version++);
 	} while (flushall_must_restart);
-	atomic_owner_rwlock_endwrite(&flushall_lock);
+	shared_recursive_rwlock_endwrite(&flushall_lock);
 }
 
 
@@ -1664,7 +1665,7 @@ file_openfd(/*inherit(on_success)*/ fd_t fd, uint32_t flags) {
 	result->if_exdata = ex;
 	result->if_fd     = fd; /* Inherit reference */
 	assert(ex->io_getln == NULL);
-	atomic_owner_rwlock_cinit(&ex->io_lock);
+	shared_recursive_rwlock_cinit(&ex->io_lock);
 	assert(ex->io_zero == 0);
 	ex->io_refcnt   = 1;
 	result->if_flag = flags;
@@ -3177,7 +3178,7 @@ fp_funopen(void const *cookie,
 	ex = (struct iofile_data *)(result + 1);
 	result->if_exdata = ex;
 	assert(ex->io_getln == NULL);
-	atomic_owner_rwlock_cinit(&ex->io_lock);
+	shared_recursive_rwlock_cinit(&ex->io_lock);
 	assert(ex->io_zero == 0);
 	ex->io_refcnt = 1;
 
@@ -3379,7 +3380,7 @@ NOTHROW_RPC(LIBCCALL libc_popen_impl)(char const *modes, unsigned int how, void 
 	ex = (struct iofile_data_popen *)(result + 1);
 	result->if_exdata = (struct iofile_data *)ex;
 	assert(ex->io_getln == NULL);
-	atomic_owner_rwlock_cinit(&ex->io_lock);
+	shared_recursive_rwlock_cinit(&ex->io_lock);
 	assert(ex->io_zero == 0);
 	ex->io_refcnt   = 1;
 	result->if_flag = flags;
