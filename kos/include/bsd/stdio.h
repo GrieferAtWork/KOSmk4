@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6147cfde */
+/* HASH CRC-32:0xb90c3cdb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,8 +36,9 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-#if !defined(__fmtcheck_defined) && defined(__CRT_HAVE_fmtcheck)
+#ifndef __fmtcheck_defined
 #define __fmtcheck_defined
+#ifdef __CRT_HAVE_fmtcheck
 /* >> fmtcheck(3)
  * Check if `user_format' may be used as a drop-in replacement for `good_format'
  * in the context of a call to `printf(3)' (or `format_printf()'), such that all
@@ -49,7 +50,21 @@ __SYSDECL_BEGIN
  * format strings before actually using them, after they've been read from  lang
  * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) __ATTR_FORMAT_ARG(2),char const *,__NOTHROW_NCX,fmtcheck,(char const *__user_format, char const *__good_format),(__user_format,__good_format))
-#endif /* !__fmtcheck_defined && __CRT_HAVE_fmtcheck */
+#else /* __CRT_HAVE_fmtcheck */
+#include <libc/local/stdio/fmtcheck.h>
+/* >> fmtcheck(3)
+ * Check if `user_format' may be used as a drop-in replacement for `good_format'
+ * in the context of a call to `printf(3)' (or `format_printf()'), such that all
+ * contained format qualifiers reference the  same (or compatible) underlying  C
+ * types, and in the same order.
+ * If all of this is the  case, simply re-return `user_format'. Otherwise  (i.e.
+ * when `user_format' isn't compatible with `good_format'), return `good_format'
+ * instead. This function is meant to  be used to validate user-provided  printf
+ * format strings before actually using them, after they've been read from  lang
+ * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(fmtcheck, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) __ATTR_FORMAT_ARG(2) char const *__NOTHROW_NCX(__LIBCCALL fmtcheck)(char const *__user_format, char const *__good_format) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmtcheck))(__user_format, __good_format); })
+#endif /* !__CRT_HAVE_fmtcheck */
+#endif /* !__fmtcheck_defined */
 #if !defined(__fgetln_defined) && defined(__CRT_HAVE_fgetln)
 #define __fgetln_defined
 /* >> fgetln(3)

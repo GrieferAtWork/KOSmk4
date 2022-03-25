@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd73dbdf */
+/* HASH CRC-32:0x3a5f4ac6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,10 +71,10 @@ INTDEF WUNUSED NONNULL((1, 4)) size_t (LIBCCALL libc_fread)(void *__restrict buf
  * Write up to `elemsize * elemcount' bytes of data from `buf' into `stream' */
 INTDEF NONNULL((1, 4)) size_t (LIBCCALL libc_fwrite)(void const *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
 /* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Change the current in-file position of `stream' as a byte-offset from the start of the file */
 INTDEF NONNULL((1)) int (LIBCCALL libc_fseek)(FILE *__restrict stream, long int off, int whence) THROWS(...);
 /* >> ftell(3)
- * Return the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Return the current in-file position of `stream' as a byte-offset from the start of the file */
 INTDEF WUNUSED NONNULL((1)) long int (LIBCCALL libc_ftell)(FILE *__restrict stream) THROWS(...);
 /* >> rewind(3)
  * Rewind the current in-file position of `stream' to its starting position */
@@ -284,17 +284,6 @@ INTDEF NONNULL((1)) int (LIBCCALL libc_fftruncate64_unlocked)(FILE *__restrict s
  *                be invalidated during any  other I/O operation relating  to
  *                `stream', tough this isn't the case under KOS. */
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_fgetln)(FILE *__restrict stream, size_t *__restrict lenp);
-/* >> fmtcheck(3)
- * Check if `user_format' may be used as a drop-in replacement for `good_format'
- * in the context of a call to `printf(3)' (or `format_printf()'), such that all
- * contained format qualifiers reference the  same (or compatible) underlying  C
- * types, and in the same order.
- * If all of this is the  case, simply re-return `user_format'. Otherwise  (i.e.
- * when `user_format' isn't compatible with `good_format'), return `good_format'
- * instead. This function is meant to  be used to validate user-provided  printf
- * format strings before actually using them, after they've been read from  lang
- * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) __ATTR_FORMAT_ARG(2) char const *NOTHROW_NCX(LIBCCALL libc_fmtcheck)(char const *user_format, char const *good_format);
 /* >> funopen2(3), funopen2_64(3) */
 INTDEF WUNUSED FILE *NOTHROW_NCX(LIBCCALL libc_funopen2)(void const *cookie, ssize_t (LIBKCALL *readfn)(void *cookie, void *buf, size_t num_bytes), ssize_t (LIBKCALL *writefn)(void *cookie, void const *buf, size_t num_bytes), off_t (LIBKCALL *seekfn)(void *cookie, off_t off, int whence), int (LIBKCALL *flushfn)(void *cookie), int (LIBKCALL *closefn)(void *cookie));
 /* >> funopen2(3), funopen2_64(3) */

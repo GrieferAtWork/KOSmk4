@@ -109,8 +109,8 @@ check_ot_wow64:
 	}
 	/* STD Handles are found at:
 	 * PEB->ProcessParameters->StdHandles
-	 * Note that the StdHandles field is re not officially documented,
-	 * and its offet has been reverse engineered by me from looking at
+	 * Note that the StdHandles field is re not officially  documented,
+	 * and its offset has been reverse engineered by me from looking at
 	 * the disassembly of `KernelBase.dll'. */
 	local final OFFSET_PEB_ProcessParameters = { 4 : 0x10, 8 : 0x20 };
 	local final OFFSET_RTL_USER_PROCESS_PARAMETERS_StdHandles = { 4 : 0x18, 8 : 0x20 };

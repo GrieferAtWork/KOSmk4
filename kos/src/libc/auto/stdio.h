@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2dde0454 */
+/* HASH CRC-32:0x98fdd6bf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -135,10 +135,10 @@ INTDEF WUNUSED NONNULL((1, 4)) size_t (LIBDCALL libd_fread)(void *__restrict buf
  * Write up to `elemsize * elemcount' bytes of data from `buf' into `stream' */
 INTDEF NONNULL((1, 4)) size_t (LIBDCALL libd_fwrite)(void const *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
 /* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Change the current in-file position of `stream' as a byte-offset from the start of the file */
 INTDEF NONNULL((1)) int (LIBDCALL libd_fseek)(FILE *__restrict stream, long int off, int whence) THROWS(...);
 /* >> ftell(3)
- * Return the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Return the current in-file position of `stream' as a byte-offset from the start of the file */
 INTDEF WUNUSED NONNULL((1)) long int (LIBDCALL libd_ftell)(FILE *__restrict stream) THROWS(...);
 /* >> rewind(3)
  * Rewind the current in-file position of `stream' to its starting position */
@@ -752,6 +752,21 @@ INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_fgetln)(FILE *__rest
  * format strings before actually using them, after they've been read from  lang
  * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) __ATTR_FORMAT_ARG(2) char const *NOTHROW_NCX(LIBDCALL libd_fmtcheck)(char const *user_format, char const *good_format);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> fmtcheck(3)
+ * Check if `user_format' may be used as a drop-in replacement for `good_format'
+ * in the context of a call to `printf(3)' (or `format_printf()'), such that all
+ * contained format qualifiers reference the  same (or compatible) underlying  C
+ * types, and in the same order.
+ * If all of this is the  case, simply re-return `user_format'. Otherwise  (i.e.
+ * when `user_format' isn't compatible with `good_format'), return `good_format'
+ * instead. This function is meant to  be used to validate user-provided  printf
+ * format strings before actually using them, after they've been read from  lang
+ * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) __ATTR_FORMAT_ARG(2) char const *NOTHROW_NCX(LIBCCALL libc_fmtcheck)(char const *user_format, char const *good_format);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> funopen(3), funopen64(3) */
 INTDEF WUNUSED FILE *NOTHROW_NCX(LIBDCALL libd_funopen)(void const *cookie, int (LIBKCALL *readfn)(void *cookie, char *buf, int num_bytes), int (LIBKCALL *writefn)(void *cookie, char const *buf, int num_bytes), off_t (LIBKCALL *seekfn)(void *cookie, off_t off, int whence), int (LIBKCALL *closefn)(void *cookie));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

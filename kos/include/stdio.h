@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x165260f5 */
+/* HASH CRC-32:0xaa25a5c8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1236,158 +1236,158 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fwrite, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #endif /* ... */
 #if defined(__CRT_HAVE_fseek_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Change the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,fseek,(FILE *__restrict __stream, long int __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseek_nolock) && defined(__USE_STDIO_UNLOCKED)
 /* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Change the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,fseek,(FILE *__restrict __stream, long int __off, int __whence),_fseek_nolock,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF32_T__
 /* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Change the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,fseek,(FILE *__restrict __stream, long int __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
 /* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Change the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,fseek,(FILE *__restrict __stream, long int __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
 /* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Change the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,fseek,(FILE *__restrict __stream, long int __off, int __whence),fseek64_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseeki64_nolock) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
 /* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Change the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,fseek,(FILE *__restrict __stream, long int __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek)
 /* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Change the current in-file position of `stream' as a byte-offset from the start of the file */
 __CDECLARE(__ATTR_NONNULL((1)),int,__THROWING,fseek,(FILE *__restrict __stream, long int __off, int __whence),(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko) && __SIZEOF_LONG__ == __SIZEOF_OFF32_T__
 /* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Change the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,fseek,(FILE *__restrict __stream, long int __off, int __whence),fseeko,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko64) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
 /* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Change the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,fseek,(FILE *__restrict __stream, long int __off, int __whence),fseeko64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek64) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
 /* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Change the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,fseek,(FILE *__restrict __stream, long int __off, int __whence),fseek64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseeki64) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
 /* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Change the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,fseek,(FILE *__restrict __stream, long int __off, int __whence),_fseeki64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek_unlocked)
 /* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Change the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,fseek,(FILE *__restrict __stream, long int __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseek_nolock)
 /* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Change the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,fseek,(FILE *__restrict __stream, long int __off, int __whence),_fseek_nolock,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko_unlocked) && __SIZEOF_LONG__ == __SIZEOF_OFF32_T__
 /* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Change the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,fseek,(FILE *__restrict __stream, long int __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko64_unlocked) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
 /* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Change the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,fseek,(FILE *__restrict __stream, long int __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek64_unlocked) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
 /* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Change the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,fseek,(FILE *__restrict __stream, long int __off, int __whence),fseek64_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseeki64_nolock) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
 /* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Change the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,fseek,(FILE *__restrict __stream, long int __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock)
 __NAMESPACE_STD_END
 #include <libc/local/stdio/fseek.h>
 __NAMESPACE_STD_BEGIN
 /* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Change the current in-file position of `stream' as a byte-offset from the start of the file */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fseek, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int (__LIBCCALL fseek)(FILE *__restrict __stream, long int __off, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fseek))(__stream, __off, __whence); })
 #endif /* ... */
 #if defined(__CRT_HAVE_ftell_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* >> ftell(3)
- * Return the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Return the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__THROWING,ftell,(FILE *__restrict __stream),ftell_unlocked,(__stream))
 #elif defined(__CRT_HAVE__ftell_nolock) && defined(__USE_STDIO_UNLOCKED)
 /* >> ftell(3)
- * Return the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Return the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__THROWING,ftell,(FILE *__restrict __stream),_ftell_nolock,(__stream))
 #elif defined(__CRT_HAVE_ftello_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF32_T__
 /* >> ftell(3)
- * Return the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Return the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__THROWING,ftell,(FILE *__restrict __stream),ftello_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ftello64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
 /* >> ftell(3)
- * Return the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Return the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__THROWING,ftell,(FILE *__restrict __stream),ftello64_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ftell64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
 /* >> ftell(3)
- * Return the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Return the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__THROWING,ftell,(FILE *__restrict __stream),ftell64_unlocked,(__stream))
 #elif defined(__CRT_HAVE__ftelli64_nolock) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
 /* >> ftell(3)
- * Return the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Return the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__THROWING,ftell,(FILE *__restrict __stream),_ftelli64_nolock,(__stream))
 #elif defined(__CRT_HAVE_ftell)
 /* >> ftell(3)
- * Return the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Return the current in-file position of `stream' as a byte-offset from the start of the file */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__THROWING,ftell,(FILE *__restrict __stream),(__stream))
 #elif defined(__CRT_HAVE__IO_ftell)
 /* >> ftell(3)
- * Return the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Return the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__THROWING,ftell,(FILE *__restrict __stream),_IO_ftell,(__stream))
 #elif defined(__CRT_HAVE_ftello) && __SIZEOF_LONG__ == __SIZEOF_OFF32_T__
 /* >> ftell(3)
- * Return the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Return the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__THROWING,ftell,(FILE *__restrict __stream),ftello,(__stream))
 #elif defined(__CRT_HAVE_ftello64) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
 /* >> ftell(3)
- * Return the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Return the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__THROWING,ftell,(FILE *__restrict __stream),ftello64,(__stream))
 #elif defined(__CRT_HAVE_ftell64) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
 /* >> ftell(3)
- * Return the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Return the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__THROWING,ftell,(FILE *__restrict __stream),ftell64,(__stream))
 #elif defined(__CRT_HAVE__ftelli64) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
 /* >> ftell(3)
- * Return the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Return the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__THROWING,ftell,(FILE *__restrict __stream),_ftelli64,(__stream))
 #elif defined(__CRT_HAVE_ftell_unlocked)
 /* >> ftell(3)
- * Return the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Return the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__THROWING,ftell,(FILE *__restrict __stream),ftell_unlocked,(__stream))
 #elif defined(__CRT_HAVE__ftell_nolock)
 /* >> ftell(3)
- * Return the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Return the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__THROWING,ftell,(FILE *__restrict __stream),_ftell_nolock,(__stream))
 #elif defined(__CRT_HAVE_ftello_unlocked) && __SIZEOF_LONG__ == __SIZEOF_OFF32_T__
 /* >> ftell(3)
- * Return the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Return the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__THROWING,ftell,(FILE *__restrict __stream),ftello_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ftello64_unlocked) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
 /* >> ftell(3)
- * Return the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Return the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__THROWING,ftell,(FILE *__restrict __stream),ftello64_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ftell64_unlocked) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
 /* >> ftell(3)
- * Return the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Return the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__THROWING,ftell,(FILE *__restrict __stream),ftell64_unlocked,(__stream))
 #elif defined(__CRT_HAVE__ftelli64_nolock) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
 /* >> ftell(3)
- * Return the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Return the current in-file position of `stream' as a byte-offset from the start of the file */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,__THROWING,ftell,(FILE *__restrict __stream),_ftelli64_nolock,(__stream))
 #elif defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE_ftell64) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE_ftell64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked)
 __NAMESPACE_STD_END
 #include <libc/local/stdio/ftell.h>
 __NAMESPACE_STD_BEGIN
 /* >> ftell(3)
- * Return the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Return the current in-file position of `stream' as a byte-offset from the start of the file */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ftell, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) long int (__LIBCCALL ftell)(FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftell))(__stream); })
 #endif /* ... */
 #if defined(__CRT_HAVE_rewind_unlocked) && defined(__USE_STDIO_UNLOCKED)
@@ -4654,8 +4654,9 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,fpurge,(__FILE *__stream),(__s
  *                `stream', tough this isn't the case under KOS. */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,fgetln,(__FILE *__restrict __stream, __SIZE_TYPE__ *__restrict __lenp),(__stream,__lenp))
 #endif /* !__fgetln_defined && __CRT_HAVE_fgetln */
-#if !defined(__fmtcheck_defined) && defined(__CRT_HAVE_fmtcheck)
+#ifndef __fmtcheck_defined
 #define __fmtcheck_defined
+#ifdef __CRT_HAVE_fmtcheck
 /* >> fmtcheck(3)
  * Check if `user_format' may be used as a drop-in replacement for `good_format'
  * in the context of a call to `printf(3)' (or `format_printf()'), such that all
@@ -4667,7 +4668,21 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,fgetln,(__FIL
  * format strings before actually using them, after they've been read from  lang
  * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) __ATTR_FORMAT_ARG(2),char const *,__NOTHROW_NCX,fmtcheck,(char const *__user_format, char const *__good_format),(__user_format,__good_format))
-#endif /* !__fmtcheck_defined && __CRT_HAVE_fmtcheck */
+#else /* __CRT_HAVE_fmtcheck */
+#include <libc/local/stdio/fmtcheck.h>
+/* >> fmtcheck(3)
+ * Check if `user_format' may be used as a drop-in replacement for `good_format'
+ * in the context of a call to `printf(3)' (or `format_printf()'), such that all
+ * contained format qualifiers reference the  same (or compatible) underlying  C
+ * types, and in the same order.
+ * If all of this is the  case, simply re-return `user_format'. Otherwise  (i.e.
+ * when `user_format' isn't compatible with `good_format'), return `good_format'
+ * instead. This function is meant to  be used to validate user-provided  printf
+ * format strings before actually using them, after they've been read from  lang
+ * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(fmtcheck, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) __ATTR_FORMAT_ARG(2) char const *__NOTHROW_NCX(__LIBCCALL fmtcheck)(char const *__user_format, char const *__good_format) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmtcheck))(__user_format, __good_format); })
+#endif /* !__CRT_HAVE_fmtcheck */
+#endif /* !__fmtcheck_defined */
 #endif /* __USE_NETBSD */
 
 #if defined(__USE_NETBSD) || defined(__USE_KOS)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x339441cc */
+/* HASH CRC-32:0x9f9c5786 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1673,8 +1673,18 @@ DFUN(".text.crt.dos.FILE.locked.access", libd_fopencookie, libc_fopencookie, TP,
 DFUN(".text.crt.dos.FILE.unlocked.read.read", libd_fgets_unlocked, libc_fgets_unlocked, TP, 3, TP, TD, TP)
 DFUN(".text.crt.dos.FILE.unlocked.write.write", libd_fputs_unlocked, libc_fputs_unlocked, TD, 2, TP, TP)
 DFUN(".text.crt.dos.obstack", libd_obstack_vprintf, libc_obstack_vprintf, TD, 3, TP, TP, TP)
+#include <features.h>
+#include <bits/types.h>
+#if __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+DEFINE_INTERN_ALIAS(libd_fseeko, libd_fseek);
+#else /* __FS_SIZEOF(OFF) == __SIZEOF_LONG__ */
 DFUN(".text.crt.dos.FILE.locked.seek.seek", libd_fseeko, libc_fseeko, TD, 3, TP, TIn(__SIZEOF_OFF32_T__), TD)
+#endif /* __FS_SIZEOF(OFF) != __SIZEOF_LONG__ */
+#if __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+DEFINE_INTERN_ALIAS(libd_ftello, libd_ftell);
+#else /* __FS_SIZEOF(OFF) == __SIZEOF_LONG__ */
 DFUN(".text.crt.dos.FILE.locked.seek.seek", libd_ftello, libc_ftello, TIn(__SIZEOF_OFF32_T__), 1, TP)
+#endif /* __FS_SIZEOF(OFF) != __SIZEOF_LONG__ */
 DFUN(".text.crt.dos.FILE.locked.seek.seek", libd_fseeko64, libc_fseeko64, TD, 3, TP, TIn(__SIZEOF_OFF64_T__), TD)
 DFUN(".text.crt.dos.FILE.locked.seek.seek", libd_ftello64, libc_ftello64, TIn(__SIZEOF_OFF64_T__), 1, TP)
 DFUN(".text.crt.dos.FILE.locked.seek.pos", libd_fgetpos64, libc_fgetpos64, TD, 2, TP, TP)
@@ -1684,8 +1694,6 @@ DFUN(".text.crt.dos.FILE.locked.access", libd_fdreopen, libc_fdreopen, TP, 3, TI
 DFUN(".text.crt.dos.FILE.unlocked.access", libd_fdreopen_unlocked, libc_fdreopen_unlocked, TP, 3, TIn(__SIZEOF_FD_T__), TP, TP)
 DFUN(".text.crt.dos.FILE.unlocked.seek.seek", libd_fseek_unlocked, libc_fseek_unlocked, TD, 3, TP, TL, TD)
 DFUN(".text.crt.dos.FILE.unlocked.seek.seek", libd_ftell_unlocked, libc_ftell_unlocked, TL, 1, TP)
-#include <features.h>
-#include <bits/types.h>
 #if __FS_SIZEOF(OFF) == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libd_fseeko_unlocked, libd_fseek_unlocked);
 #else /* __FS_SIZEOF(OFF) == __SIZEOF_LONG__ */

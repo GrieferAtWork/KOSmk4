@@ -56,6 +56,14 @@
 #include "stdlib.h"
 #include "string.h"
 
+#ifndef OFF_MAX
+#define OFF_MAX __PRIVATE_MAX_S(__SIZEOF_OFF_T__)
+#endif /* !OFF_MAX */
+#ifndef OFF64_MAX
+#define OFF64_MAX __PRIVATE_MAX_S(__SIZEOF_OFF64_T__)
+#endif /* !OFF64_MAX */
+
+
 DECL_BEGIN
 
 #undef libc_ferror_unlocked
@@ -2115,9 +2123,19 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") NONNULL((1, 2)) ssize
 /*[[[end:libc_file_printer_unlocked]]]*/
 
 
-/*[[[head:libc_ftell,hash:CRC-32=0x5cceab65]]]*/
+
+
+
+
+
+
+/************************************************************************/
+/* ftell[_unlocked](3), ftello[_unlocked](3), ftello64[_unlocked](3)    */
+/************************************************************************/
+
+/*[[[head:libc_ftell,hash:CRC-32=0xc7bc9cb4]]]*/
 /* >> ftell(3)
- * Return the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Return the current in-file position of `stream' as a byte-offset from the start of the file */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") WUNUSED NONNULL((1)) long int
 (LIBCCALL libc_ftell)(FILE *__restrict stream) THROWS(...)
 /*[[[body:libc_ftell]]]*/
@@ -2126,18 +2144,141 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") WUNUSED NONNULL((1)) long
 	if unlikely(!stream)
 		return (long int)libc_seterrno(EINVAL);
 	stream = file_fromuser(stream);
-	file_lock_read(stream);
-	result = file_seek(stream, 0, SEEK_CUR);
-	file_lock_endread(stream);
+	if (FMUSTLOCK(stream)) {
+		file_lock_read(stream);
+		result = file_seek(stream, 0, SEEK_CUR);
+		file_lock_endread(stream);
+	} else {
+		result = file_seek(stream, 0, SEEK_CUR);
+	}
 	if unlikely(result > LONG_MAX)
 		return (long int)libc_seterrno(EOVERFLOW);
 	return (long int)(off64_t)result;
 }
 /*[[[end:libc_ftell]]]*/
 
-/*[[[head:libc_fseek,hash:CRC-32=0xa1e74e72]]]*/
+/*[[[head:libc_ftell_unlocked,hash:CRC-32=0xd871cfda]]]*/
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") WUNUSED NONNULL((1)) long int
+(LIBCCALL libc_ftell_unlocked)(FILE *__restrict stream) THROWS(...)
+/*[[[body:libc_ftell_unlocked]]]*/
+{
+	pos64_t result;
+	if unlikely(!stream)
+		return (long int)libc_seterrno(EINVAL);
+	stream = file_fromuser(stream);
+	result = file_seek(stream, 0, SEEK_CUR);
+	if unlikely(result > LONG_MAX)
+		return (long int)libc_seterrno(EOVERFLOW);
+	return (long int)(off64_t)result;
+}
+/*[[[end:libc_ftell_unlocked]]]*/
+
+/*[[[head:libc_ftello,hash:CRC-32=0xb7cb9fc9]]]*/
+#if __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+DEFINE_INTERN_ALIAS(libc_ftello, libc_ftell);
+#else /* MAGIC:alias */
+/* >> ftello(3), ftello64(3)
+ * Return the current in-file position of `stream' */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") WUNUSED NONNULL((1)) off_t
+(LIBCCALL libc_ftello)(FILE *__restrict stream) THROWS(...)
+/*[[[body:libc_ftello]]]*/
+{
+	pos64_t result;
+	if unlikely(!stream)
+		return (off_t)libc_seterrno(EINVAL);
+	stream = file_fromuser(stream);
+	if (FMUSTLOCK(stream)) {
+		file_lock_read(stream);
+		result = file_seek(stream, 0, SEEK_CUR);
+		file_lock_endread(stream);
+	} else {
+		result = file_seek(stream, 0, SEEK_CUR);
+	}
+	if unlikely(result > OFF_MAX)
+		return (off_t)libc_seterrno(EOVERFLOW);
+	return (off_t)(pos_t)result;
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_ftello]]]*/
+
+/*[[[head:libc_ftello_unlocked,hash:CRC-32=0xea5e6a31]]]*/
+#if __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+DEFINE_INTERN_ALIAS(libc_ftello_unlocked, libc_ftell_unlocked);
+#else /* MAGIC:alias */
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") WUNUSED NONNULL((1)) off_t
+(LIBCCALL libc_ftello_unlocked)(FILE *__restrict stream) THROWS(...)
+/*[[[body:libc_ftello_unlocked]]]*/
+{
+	pos64_t result;
+	if unlikely(!stream)
+		return (off_t)libc_seterrno(EINVAL);
+	stream = file_fromuser(stream);
+	result = file_seek(stream, 0, SEEK_CUR);
+	if unlikely(result > OFF_MAX)
+		return (off_t)libc_seterrno(EOVERFLOW);
+	return (off_t)(pos_t)result;
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_ftello_unlocked]]]*/
+
+/*[[[head:libc_ftello64,hash:CRC-32=0xbf5392fd]]]*/
+#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+DEFINE_INTERN_ALIAS(libc_ftello64, libc_ftello);
+#else /* MAGIC:alias */
+/* >> ftello(3), ftello64(3)
+ * Return the current in-file position of `stream' */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") WUNUSED NONNULL((1)) off64_t
+(LIBCCALL libc_ftello64)(FILE *__restrict stream) THROWS(...)
+/*[[[body:libc_ftello64]]]*/
+{
+	pos64_t result;
+	if unlikely(!stream)
+		return (off64_t)libc_seterrno(EINVAL);
+	stream = file_fromuser(stream);
+	file_lock_read(stream);
+	result = file_seek(stream, 0, SEEK_CUR);
+	file_lock_endread(stream);
+	if unlikely(result > OFF64_MAX)
+		return (off64_t)libc_seterrno(EOVERFLOW);
+	return (off64_t)result;
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_ftello64]]]*/
+
+/*[[[head:libc_ftello64_unlocked,hash:CRC-32=0xced139e4]]]*/
+#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+DEFINE_INTERN_ALIAS(libc_ftello64_unlocked, libc_ftello_unlocked);
+#else /* MAGIC:alias */
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") WUNUSED NONNULL((1)) off64_t
+(LIBCCALL libc_ftello64_unlocked)(FILE *__restrict stream) THROWS(...)
+/*[[[body:libc_ftello64_unlocked]]]*/
+{
+	pos64_t result;
+	if unlikely(!stream)
+		return (off64_t)libc_seterrno(EINVAL);
+	stream = file_fromuser(stream);
+	result = file_seek(stream, 0, SEEK_CUR);
+	if unlikely(result > OFF64_MAX)
+		return (off64_t)libc_seterrno(EOVERFLOW);
+	return (off64_t)result;
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_ftello64_unlocked]]]*/
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* fseek[_unlocked](3), fseeko[_unlocked](3), fseeko64[_unlocked](3)    */
+/************************************************************************/
+
+/*[[[head:libc_fseek,hash:CRC-32=0xef9ab8a6]]]*/
 /* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
+ * Change the current in-file position of `stream' as a byte-offset from the start of the file */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") NONNULL((1)) int
 (LIBCCALL libc_fseek)(FILE *__restrict stream,
                       long int off,
@@ -2161,52 +2302,27 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") NONNULL((1)) int
 }
 /*[[[end:libc_fseek]]]*/
 
-/*[[[head:libc_ftello,hash:CRC-32=0x5e33bad]]]*/
-/* >> ftello(3), ftello64(3)
- * Return the current in-file position of `stream' */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") WUNUSED NONNULL((1)) off_t
-(LIBCCALL libc_ftello)(FILE *__restrict stream) THROWS(...)
-/*[[[body:libc_ftello]]]*/
+/*[[[head:libc_fseek_unlocked,hash:CRC-32=0x32bb46c7]]]*/
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") NONNULL((1)) int
+(LIBCCALL libc_fseek_unlocked)(FILE *__restrict stream,
+                               long int off,
+                               int whence) THROWS(...)
+/*[[[body:libc_fseek_unlocked]]]*/
 {
-	pos64_t result;
+	int result;
 	if unlikely(!stream)
-		return (off_t)libc_seterrno(EINVAL);
+		return (int)libc_seterrno(EINVAL);
 	stream = file_fromuser(stream);
-	file_lock_read(stream);
-	result = file_seek(stream, 0, SEEK_CUR);
-	file_lock_endread(stream);
-	if unlikely(result > INT32_MAX)
-		return (off_t)libc_seterrno(EOVERFLOW);
-	return (off_t)(pos_t)result;
+	file_seek(stream, (off64_t)off, whence);
+	result = unlikely(FERROR(stream)) ? -1 : 0;
+	return result;
 }
-/*[[[end:libc_ftello]]]*/
+/*[[[end:libc_fseek_unlocked]]]*/
 
-/*[[[head:libc_ftello64,hash:CRC-32=0xbf5392fd]]]*/
-#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_ftello64, libc_ftello);
+/*[[[head:libc_fseeko,hash:CRC-32=0x6b41469a]]]*/
+#if __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+DEFINE_INTERN_ALIAS(libc_fseeko, libc_fseek);
 #else /* MAGIC:alias */
-/* >> ftello(3), ftello64(3)
- * Return the current in-file position of `stream' */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") WUNUSED NONNULL((1)) off64_t
-(LIBCCALL libc_ftello64)(FILE *__restrict stream) THROWS(...)
-/*[[[body:libc_ftello64]]]*/
-{
-	pos64_t result;
-	if unlikely(!stream)
-		return (off64_t)libc_seterrno(EINVAL);
-	stream = file_fromuser(stream);
-	file_lock_read(stream);
-	result = file_seek(stream, 0, SEEK_CUR);
-	file_lock_endread(stream);
-	if unlikely(result > INT64_MAX)
-		return (off64_t)libc_seterrno(EOVERFLOW);
-	return (off64_t)result;
-}
-#endif /* MAGIC:alias */
-/*[[[end:libc_ftello64]]]*/
-
-
-/*[[[head:libc_fseeko,hash:CRC-32=0x46202317]]]*/
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") NONNULL((1)) int
@@ -2230,7 +2346,29 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") NONNULL((1)) int
 	}
 	return result;
 }
+#endif /* MAGIC:alias */
 /*[[[end:libc_fseeko]]]*/
+
+/*[[[head:libc_fseeko_unlocked,hash:CRC-32=0xf033dbfb]]]*/
+#if __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+DEFINE_INTERN_ALIAS(libc_fseeko_unlocked, libc_fseek_unlocked);
+#else /* MAGIC:alias */
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") NONNULL((1)) int
+(LIBCCALL libc_fseeko_unlocked)(FILE *__restrict stream,
+                                off_t off,
+                                int whence) THROWS(...)
+/*[[[body:libc_fseeko_unlocked]]]*/
+{
+	int result;
+	if unlikely(!stream)
+		return (int)libc_seterrno(EINVAL);
+	stream = file_fromuser(stream);
+	file_seek(stream, (off64_t)off, whence);
+	result = unlikely(FERROR(stream)) ? -1 : 0;
+	return result;
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_fseeko_unlocked]]]*/
 
 /*[[[head:libc_fseeko64,hash:CRC-32=0x8ab8b0cf]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
@@ -2262,6 +2400,38 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") NONNULL((1)) int
 #endif /* MAGIC:alias */
 /*[[[end:libc_fseeko64]]]*/
 
+/*[[[head:libc_fseeko64_unlocked,hash:CRC-32=0x8fc0ea17]]]*/
+#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+DEFINE_INTERN_ALIAS(libc_fseeko64_unlocked, libc_fseeko_unlocked);
+#else /* MAGIC:alias */
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") NONNULL((1)) int
+(LIBCCALL libc_fseeko64_unlocked)(FILE *__restrict stream,
+                                  off64_t off,
+                                  int whence) THROWS(...)
+/*[[[body:libc_fseeko64_unlocked]]]*/
+{
+	int result;
+	if unlikely(!stream)
+		return (int)libc_seterrno(EINVAL);
+	stream = file_fromuser(stream);
+	file_seek(stream, (off64_t)off, whence);
+	result = unlikely(FERROR(stream)) ? -1 : 0;
+	return result;
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_fseeko64_unlocked]]]*/
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* fgetpos[_unlocked](3), fsetpos[_unlocked](3)                         */
+/* fgetpos64[_unlocked](3), fsetpos64[_unlocked](3)                     */
+/************************************************************************/
 
 /*[[[head:libc_fgetpos,hash:CRC-32=0xa2b2dacb]]]*/
 /* >> fgetpos(3), fgetpos64(3)
@@ -2280,6 +2450,20 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.pos") NONNULL((1, 2)) int
 }
 /*[[[end:libc_fgetpos]]]*/
 
+/*[[[head:libc_fgetpos_unlocked,hash:CRC-32=0x2b6389b4]]]*/
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.pos") NONNULL((1, 2)) int
+(LIBCCALL libc_fgetpos_unlocked)(FILE *__restrict stream,
+                                 fpos_t *__restrict pos) THROWS(...)
+/*[[[body:libc_fgetpos_unlocked]]]*/
+{
+	off_t result = ftello_unlocked(stream);
+	if unlikely(result == -1 && libc_geterrno() != EOK)
+		return -1;
+	*pos = (fpos_t)result;
+	return 0;
+}
+/*[[[end:libc_fgetpos_unlocked]]]*/
+
 /*[[[head:libc_fsetpos,hash:CRC-32=0xe015939d]]]*/
 /* >> fsetpos(3), fsetpos64(3)
  * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
@@ -2291,6 +2475,16 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.pos") NONNULL((1, 2)) int
 	return fseeko(stream, (off_t)(pos_t)*pos, SEEK_SET);
 }
 /*[[[end:libc_fsetpos]]]*/
+
+/*[[[head:libc_fsetpos_unlocked,hash:CRC-32=0xbff9986b]]]*/
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.pos") NONNULL((1, 2)) int
+(LIBCCALL libc_fsetpos_unlocked)(FILE *__restrict stream,
+                                 fpos_t const *__restrict pos) THROWS(...)
+/*[[[body:libc_fsetpos_unlocked]]]*/
+{
+	return fseeko_unlocked(stream, (off_t)(pos_t)*pos, SEEK_SET);
+}
+/*[[[end:libc_fsetpos_unlocked]]]*/
 
 /*[[[head:libc_fgetpos64,hash:CRC-32=0x19dbc7c9]]]*/
 #if __SIZEOF_FPOS32_T__ == __SIZEOF_FPOS64_T__
@@ -2313,164 +2507,6 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.pos") NONNULL((1, 2)) int
 #endif /* MAGIC:alias */
 /*[[[end:libc_fgetpos64]]]*/
 
-/*[[[head:libc_fsetpos64,hash:CRC-32=0xabf1ad77]]]*/
-#if __SIZEOF_FPOS32_T__ == __SIZEOF_FPOS64_T__
-DEFINE_INTERN_ALIAS(libc_fsetpos64, libc_fsetpos);
-#else /* MAGIC:alias */
-/* >> fsetpos(3), fsetpos64(3)
- * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.pos") NONNULL((1, 2)) int
-(LIBCCALL libc_fsetpos64)(FILE *__restrict stream,
-                          fpos64_t const *__restrict pos) THROWS(...)
-/*[[[body:libc_fsetpos64]]]*/
-{
-	return fseeko64(stream, (off64_t)(pos64_t)*pos, SEEK_SET);
-}
-#endif /* MAGIC:alias */
-/*[[[end:libc_fsetpos64]]]*/
-
-
-
-
-/*[[[head:libc_ftell_unlocked,hash:CRC-32=0xd871cfda]]]*/
-INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") WUNUSED NONNULL((1)) long int
-(LIBCCALL libc_ftell_unlocked)(FILE *__restrict stream) THROWS(...)
-/*[[[body:libc_ftell_unlocked]]]*/
-{
-	pos64_t result;
-	if unlikely(!stream)
-		return (long int)libc_seterrno(EINVAL);
-	stream = file_fromuser(stream);
-	result = file_seek(stream, 0, SEEK_CUR);
-	if unlikely(result > LONG_MAX)
-		return (long int)libc_seterrno(EOVERFLOW);
-	return (long int)(off64_t)result;
-}
-/*[[[end:libc_ftell_unlocked]]]*/
-
-/*[[[head:libc_ftello_unlocked,hash:CRC-32=0xea5e6a31]]]*/
-#if __FS_SIZEOF(OFF) == __SIZEOF_LONG__
-DEFINE_INTERN_ALIAS(libc_ftello_unlocked, libc_ftell_unlocked);
-#else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") WUNUSED NONNULL((1)) off_t
-(LIBCCALL libc_ftello_unlocked)(FILE *__restrict stream) THROWS(...)
-/*[[[body:libc_ftello_unlocked]]]*/
-{
-	pos64_t result;
-	if unlikely(!stream)
-		return (off_t)libc_seterrno(EINVAL);
-	stream = file_fromuser(stream);
-	result = file_seek(stream, 0, SEEK_CUR);
-	if unlikely(result > INT32_MAX)
-		return (off_t)libc_seterrno(EOVERFLOW);
-	return (off_t)(pos_t)result;
-}
-#endif /* MAGIC:alias */
-/*[[[end:libc_ftello_unlocked]]]*/
-
-/*[[[head:libc_ftello64_unlocked,hash:CRC-32=0xced139e4]]]*/
-#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_ftello64_unlocked, libc_ftello_unlocked);
-#else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") WUNUSED NONNULL((1)) off64_t
-(LIBCCALL libc_ftello64_unlocked)(FILE *__restrict stream) THROWS(...)
-/*[[[body:libc_ftello64_unlocked]]]*/
-{
-	pos64_t result;
-	if unlikely(!stream)
-		return (off64_t)libc_seterrno(EINVAL);
-	stream = file_fromuser(stream);
-	result = file_seek(stream, 0, SEEK_CUR);
-	if unlikely(result > INT64_MAX)
-		return (off64_t)libc_seterrno(EOVERFLOW);
-	return (off64_t)result;
-}
-#endif /* MAGIC:alias */
-/*[[[end:libc_ftello64_unlocked]]]*/
-
-/*[[[head:libc_fseek_unlocked,hash:CRC-32=0x32bb46c7]]]*/
-INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") NONNULL((1)) int
-(LIBCCALL libc_fseek_unlocked)(FILE *__restrict stream,
-                               long int off,
-                               int whence) THROWS(...)
-/*[[[body:libc_fseek_unlocked]]]*/
-{
-	int result;
-	if unlikely(!stream)
-		return (int)libc_seterrno(EINVAL);
-	stream = file_fromuser(stream);
-	file_seek(stream, (off64_t)off, whence);
-	result = unlikely(FERROR(stream)) ? -1 : 0;
-	return result;
-}
-/*[[[end:libc_fseek_unlocked]]]*/
-
-/*[[[head:libc_fseeko_unlocked,hash:CRC-32=0xf033dbfb]]]*/
-#if __FS_SIZEOF(OFF) == __SIZEOF_LONG__
-DEFINE_INTERN_ALIAS(libc_fseeko_unlocked, libc_fseek_unlocked);
-#else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") NONNULL((1)) int
-(LIBCCALL libc_fseeko_unlocked)(FILE *__restrict stream,
-                                off_t off,
-                                int whence) THROWS(...)
-/*[[[body:libc_fseeko_unlocked]]]*/
-{
-	int result;
-	if unlikely(!stream)
-		return (int)libc_seterrno(EINVAL);
-	stream = file_fromuser(stream);
-	file_seek(stream, (off64_t)off, whence);
-	result = unlikely(FERROR(stream)) ? -1 : 0;
-	return result;
-}
-#endif /* MAGIC:alias */
-/*[[[end:libc_fseeko_unlocked]]]*/
-
-/*[[[head:libc_fseeko64_unlocked,hash:CRC-32=0x8fc0ea17]]]*/
-#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_fseeko64_unlocked, libc_fseeko_unlocked);
-#else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") NONNULL((1)) int
-(LIBCCALL libc_fseeko64_unlocked)(FILE *__restrict stream,
-                                  off64_t off,
-                                  int whence) THROWS(...)
-/*[[[body:libc_fseeko64_unlocked]]]*/
-{
-	int result;
-	if unlikely(!stream)
-		return (int)libc_seterrno(EINVAL);
-	stream = file_fromuser(stream);
-	file_seek(stream, (off64_t)off, whence);
-	result = unlikely(FERROR(stream)) ? -1 : 0;
-	return result;
-}
-#endif /* MAGIC:alias */
-/*[[[end:libc_fseeko64_unlocked]]]*/
-
-/*[[[head:libc_fgetpos_unlocked,hash:CRC-32=0x2b6389b4]]]*/
-INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.pos") NONNULL((1, 2)) int
-(LIBCCALL libc_fgetpos_unlocked)(FILE *__restrict stream,
-                                 fpos_t *__restrict pos) THROWS(...)
-/*[[[body:libc_fgetpos_unlocked]]]*/
-{
-	off_t result = ftello_unlocked(stream);
-	if unlikely(result == -1 && libc_geterrno() != EOK)
-		return -1;
-	*pos = (fpos_t)result;
-	return 0;
-}
-/*[[[end:libc_fgetpos_unlocked]]]*/
-
-/*[[[head:libc_fsetpos_unlocked,hash:CRC-32=0xbff9986b]]]*/
-INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.pos") NONNULL((1, 2)) int
-(LIBCCALL libc_fsetpos_unlocked)(FILE *__restrict stream,
-                                 fpos_t const *__restrict pos) THROWS(...)
-/*[[[body:libc_fsetpos_unlocked]]]*/
-{
-	return fseeko_unlocked(stream, (off_t)(pos_t)*pos, SEEK_SET);
-}
-/*[[[end:libc_fsetpos_unlocked]]]*/
-
 /*[[[head:libc_fgetpos64_unlocked,hash:CRC-32=0x211fbe47]]]*/
 #if __SIZEOF_FPOS32_T__ == __SIZEOF_FPOS64_T__
 DEFINE_INTERN_ALIAS(libc_fgetpos64_unlocked, libc_fgetpos_unlocked);
@@ -2489,6 +2525,22 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.pos") NONNULL((1, 2)) int
 #endif /* MAGIC:alias */
 /*[[[end:libc_fgetpos64_unlocked]]]*/
 
+/*[[[head:libc_fsetpos64,hash:CRC-32=0xabf1ad77]]]*/
+#if __SIZEOF_FPOS32_T__ == __SIZEOF_FPOS64_T__
+DEFINE_INTERN_ALIAS(libc_fsetpos64, libc_fsetpos);
+#else /* MAGIC:alias */
+/* >> fsetpos(3), fsetpos64(3)
+ * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.pos") NONNULL((1, 2)) int
+(LIBCCALL libc_fsetpos64)(FILE *__restrict stream,
+                          fpos64_t const *__restrict pos) THROWS(...)
+/*[[[body:libc_fsetpos64]]]*/
+{
+	return fseeko64(stream, (off64_t)(pos64_t)*pos, SEEK_SET);
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_fsetpos64]]]*/
+
 /*[[[head:libc_fsetpos64_unlocked,hash:CRC-32=0x522733b2]]]*/
 #if __SIZEOF_FPOS32_T__ == __SIZEOF_FPOS64_T__
 DEFINE_INTERN_ALIAS(libc_fsetpos64_unlocked, libc_fsetpos_unlocked);
@@ -2502,6 +2554,17 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.pos") NONNULL((1, 2)) int
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_fsetpos64_unlocked]]]*/
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* ungetc[_unlocked](3)                                                 */
+/************************************************************************/
 
 /*[[[head:libc_ungetc,hash:CRC-32=0xa350829a]]]*/
 /* >> ungetc(3)
@@ -2541,6 +2604,17 @@ NOTHROW_NCX(LIBCCALL libc_ungetc_unlocked)(int ch,
 }
 /*[[[end:libc_ungetc_unlocked]]]*/
 
+
+
+
+
+
+
+
+/************************************************************************/
+/* rewind[_unlocked](3)                                                 */
+/************************************************************************/
+
 /*[[[head:libc_rewind,hash:CRC-32=0x906e3147]]]*/
 /* >> rewind(3)
  * Rewind the current in-file position of `stream' to its starting position */
@@ -2576,6 +2650,17 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.utility") NONNULL((1)) void
 }
 /*[[[end:libc_rewind_unlocked]]]*/
 
+
+
+
+
+
+
+
+/************************************************************************/
+/* fisatty(3)                                                           */
+/************************************************************************/
+
 /*[[[head:libc_fisatty,hash:CRC-32=0x109783b2]]]*/
 INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_fisatty)(FILE *__restrict stream)
@@ -2588,6 +2673,17 @@ NOTHROW_NCX(LIBCCALL libc_fisatty)(FILE *__restrict stream)
 	return (stream->if_flag & IO_ISATTY) != 0;
 }
 /*[[[end:libc_fisatty]]]*/
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* fftruncate[_unlocked](3), fftruncate64[_unlocked](3)                 */
+/************************************************************************/
 
 /*[[[head:libc_fftruncate,hash:CRC-32=0x68fd1cf]]]*/
 /* >> fftruncate(3)
@@ -2676,6 +2772,297 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.utility") NONNULL((1)) int
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_fftruncate64_unlocked]]]*/
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* setvbuf[_unlocked](3)                                                */
+/************************************************************************/
+
+/*[[[head:libc_setvbuf,hash:CRC-32=0xca168189]]]*/
+/* >> setvbuf(3)
+ * Set the buffer and buffer-mode to-be used by the given `stream'
+ * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.read.utility") NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc_setvbuf)(FILE *__restrict stream,
+                                   char *__restrict buf,
+                                   __STDC_INT_AS_UINT_T modes,
+                                   size_t bufsize)
+/*[[[body:libc_setvbuf]]]*/
+{
+	int result;
+	if unlikely(!stream)
+		return (int)libc_seterrno(EINVAL);
+	stream = file_fromuser(stream);
+	if (FMUSTLOCK(stream)) {
+		file_lock_write(stream);
+		result = file_sync(stream);
+		if likely(result == 0) {
+			result = file_setmode(stream,
+			                      buf,
+			                      modes,
+			                      bufsize);
+		}
+		file_lock_endwrite(stream);
+	} else {
+		result = file_sync(stream);
+		if likely(result == 0) {
+			result = file_setmode(stream,
+			                      buf,
+			                      modes,
+			                      bufsize);
+		}
+	}
+	return result;
+}
+/*[[[end:libc_setvbuf]]]*/
+
+/*[[[head:libc_setvbuf_unlocked,hash:CRC-32=0x524d657]]]*/
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.utility") NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc_setvbuf_unlocked)(FILE *__restrict stream,
+                                            char *__restrict buf,
+                                            __STDC_INT_AS_UINT_T modes,
+                                            size_t bufsize)
+/*[[[body:libc_setvbuf_unlocked]]]*/
+{
+	int result;
+	if unlikely(!stream)
+		return (int)libc_seterrno(EINVAL);
+	stream = file_fromuser(stream);
+	result = file_sync(stream);
+	if likely(result == 0) {
+		result = file_setmode(stream,
+		                      buf,
+		                      modes,
+		                      bufsize);
+	}
+	return result;
+}
+/*[[[end:libc_setvbuf_unlocked]]]*/
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* feof(3), ferror(3), clearerr(3)                                      */
+/************************************************************************/
+
+/*[[[head:libc_feof,hash:CRC-32=0xbe068e02]]]*/
+/* >> feof(3)
+ * Check if end-of-file has been reached in `stream' */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.read.utility") ATTR_PURE WUNUSED NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc_feof)(FILE __KOS_FIXED_CONST *__restrict stream)
+/*[[[body:libc_feof]]]*/
+{
+	if unlikely(!stream)
+		return (int)libc_seterrno(EINVAL);
+	stream = file_fromuser(stream);
+	return FEOF(stream);
+}
+/*[[[end:libc_feof]]]*/
+
+/*[[[head:libc_ferror,hash:CRC-32=0xefb1aad3]]]*/
+/* >> ferror(3)
+ * Check if an I/O error occurred in `stream' */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") ATTR_PURE WUNUSED NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc_ferror)(FILE __KOS_FIXED_CONST *__restrict stream)
+/*[[[body:libc_ferror]]]*/
+{
+	if unlikely(!stream)
+		return (int)libc_seterrno(EINVAL);
+	stream = file_fromuser(stream);
+	return FERROR(stream);
+}
+/*[[[end:libc_ferror]]]*/
+
+/*[[[head:libc_clearerr,hash:CRC-32=0x48094766]]]*/
+/* >> clearerr(3)
+ * Clear the error state of `stream', returning the stream to normal operations mode */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.access") NONNULL((1)) void
+NOTHROW_NCX(LIBCCALL libc_clearerr)(FILE *__restrict stream)
+/*[[[body:libc_clearerr]]]*/
+{
+	if likely(stream) {
+		stream = file_fromuser(stream);
+		FCLEARERR(stream);
+	}
+}
+/*[[[end:libc_clearerr]]]*/
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* fileno(3)                                                            */
+/************************************************************************/
+
+/*[[[head:libc_fileno,hash:CRC-32=0x1fa780d8]]]*/
+/* >> fileno(3)
+ * Return the underlying file descriptor number used by `stream' */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") WUNUSED NONNULL((1)) fd_t
+NOTHROW_NCX(LIBCCALL libc_fileno)(FILE *__restrict stream)
+/*[[[body:libc_fileno]]]*/
+{
+	if unlikely(!stream)
+		goto err_inval;
+	stream = file_fromuser(stream);
+	if unlikely(stream->if_flag & IO_HASVTAB)
+		goto err_nostream;
+	return ATOMIC_READ(stream->if_fd);
+err_nostream:
+	/* """
+	 * EBADF The stream is not associated with a file.
+	 * """ */
+	return (fd_t)libc_seterrno(EBADF);
+err_inval:
+	return (fd_t)libc_seterrno(EINVAL);
+}
+/*[[[end:libc_fileno]]]*/
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* fopen(3), fopen64(3)                                                 */
+/************************************************************************/
+
+/*[[[head:libd_fopen,hash:CRC-32=0x1ec4b920]]]*/
+/* >> fopen(3), fopen64(3)
+ * Create and return a new file-stream for accessing `filename' */
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
+NOTHROW_RPC(LIBDCALL libd_fopen)(char const *__restrict filename,
+                                 char const *__restrict modes)
+/*[[[body:libd_fopen]]]*/
+{
+	fd_t fd;
+	FILE *result;
+	uint32_t flags;
+	oflag_t oflags;
+	flags = file_evalmodes(modes, &oflags);
+	fd    = open(filename, oflags | libd_O_DOSPATH, 0644);
+	if unlikely(fd < 0)
+		return NULL;
+	result = file_openfd(fd, flags);
+	if likely(result) {
+		result = file_touser(result);
+	} else {
+		sys_close(fd);
+	}
+	return result;
+}
+/*[[[end:libd_fopen]]]*/
+
+/*[[[head:libc_fopen,hash:CRC-32=0x8e368ed0]]]*/
+/* >> fopen(3), fopen64(3)
+ * Create and return a new file-stream for accessing `filename' */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
+NOTHROW_RPC(LIBCCALL libc_fopen)(char const *__restrict filename,
+                                 char const *__restrict modes)
+/*[[[body:libc_fopen]]]*/
+{
+	/* TODO: (re-)add extension functions `fopenat()' and `fopenat64()'
+	 *       that allow for  the specification of  `dfd' and  `atflags' */
+	fd_t fd;
+	FILE *result;
+	uint32_t flags;
+	oflag_t oflags;
+	flags = file_evalmodes(modes, &oflags);
+	fd    = open(filename, oflags, 0644);
+	if unlikely(fd < 0)
+		return NULL;
+	result = file_openfd(fd, flags);
+	if likely(result) {
+		result = file_touser(result);
+	} else {
+		sys_close(fd);
+	}
+	return result;
+}
+/*[[[end:libc_fopen]]]*/
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* fdopen(3)                                                            */
+/************************************************************************/
+
+/*[[[head:libc_fdopen,hash:CRC-32=0xd9878f49]]]*/
+/* >> fdopen(3)
+ * Open a new file stream by inheriting a given file descriptor `fd'
+ * Note   that  upon  success  (`return != NULL'),  the  given  `fd'
+ * will be `close()'d once `fclose(return)' is called */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") WUNUSED NONNULL((2)) FILE *
+NOTHROW_NCX(LIBCCALL libc_fdopen)(fd_t fd,
+                                  char const *__restrict modes)
+/*[[[body:libc_fdopen]]]*/
+{
+	FILE *result;
+	uint32_t flags;
+	flags  = file_evalmodes(modes, NULL);
+	result = file_openfd(fd, flags);
+	result = file_touser_opt(result);
+	return result;
+}
+/*[[[end:libc_fdopen]]]*/
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* fclose(3)                                                            */
+/************************************************************************/
+
+/*[[[head:libc_fclose,hash:CRC-32=0xfd36aa48]]]*/
+/* >> fclose(3)
+ * Close and destroy a given file `stream' */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.access") NONNULL((1)) int
+(LIBCCALL libc_fclose)(FILE *__restrict stream) THROWS(...)
+/*[[[body:libc_fclose]]]*/
+{
+	if unlikely(!stream)
+		return (int)libc_seterrno(EINVAL);
+	stream = file_fromuser(stream);
+	decref(stream);
+	return 0;
+}
+/*[[[end:libc_fclose]]]*/
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* fgetln(3)                                                            */
+/************************************************************************/
 
 /*[[[head:libc_fgetln,hash:CRC-32=0xc64629dd]]]*/
 /* >> fgetln(3)
@@ -2774,29 +3161,6 @@ NOTHROW_NCX(LIBCCALL libc_fgetln)(FILE *__restrict stream,
 }
 /*[[[end:libc_fgetln]]]*/
 
-/*[[[head:libc_fmtcheck,hash:CRC-32=0xef198050]]]*/
-/* >> fmtcheck(3)
- * Check if `user_format' may be used as a drop-in replacement for `good_format'
- * in the context of a call to `printf(3)' (or `format_printf()'), such that all
- * contained format qualifiers reference the  same (or compatible) underlying  C
- * types, and in the same order.
- * If all of this is the  case, simply re-return `user_format'. Otherwise  (i.e.
- * when `user_format' isn't compatible with `good_format'), return `good_format'
- * instead. This function is meant to  be used to validate user-provided  printf
- * format strings before actually using them, after they've been read from  lang
- * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
-INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") ATTR_RETNONNULL WUNUSED NONNULL((2)) __ATTR_FORMAT_ARG(2) char const *
-NOTHROW_NCX(LIBCCALL libc_fmtcheck)(char const *user_format,
-                                    char const *good_format)
-/*[[[body:libc_fmtcheck]]]*/
-/*AUTO*/{
-	(void)user_format;
-	(void)good_format;
-	CRT_UNIMPLEMENTEDF("fmtcheck(%q, %q)", user_format, good_format); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_fmtcheck]]]*/
 
 
 
@@ -2955,219 +3319,7 @@ NOTHROW_NCX(LIBCCALL libc_funopen2_64)(void const *cookie,
 #endif /* MAGIC:alias */
 /*[[[end:libc_funopen2_64]]]*/
 
-/*[[[head:libc_setvbuf,hash:CRC-32=0xca168189]]]*/
-/* >> setvbuf(3)
- * Set the buffer and buffer-mode to-be used by the given `stream'
- * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.read.utility") NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_setvbuf)(FILE *__restrict stream,
-                                   char *__restrict buf,
-                                   __STDC_INT_AS_UINT_T modes,
-                                   size_t bufsize)
-/*[[[body:libc_setvbuf]]]*/
-{
-	int result;
-	if unlikely(!stream)
-		return (int)libc_seterrno(EINVAL);
-	stream = file_fromuser(stream);
-	if (FMUSTLOCK(stream)) {
-		file_lock_write(stream);
-		result = file_sync(stream);
-		if likely(result == 0) {
-			result = file_setmode(stream,
-			                      buf,
-			                      modes,
-			                      bufsize);
-		}
-		file_lock_endwrite(stream);
-	} else {
-		result = file_sync(stream);
-		if likely(result == 0) {
-			result = file_setmode(stream,
-			                      buf,
-			                      modes,
-			                      bufsize);
-		}
-	}
-	return result;
-}
-/*[[[end:libc_setvbuf]]]*/
 
-/*[[[head:libc_setvbuf_unlocked,hash:CRC-32=0x524d657]]]*/
-INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.utility") NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_setvbuf_unlocked)(FILE *__restrict stream,
-                                            char *__restrict buf,
-                                            __STDC_INT_AS_UINT_T modes,
-                                            size_t bufsize)
-/*[[[body:libc_setvbuf_unlocked]]]*/
-{
-	int result;
-	if unlikely(!stream)
-		return (int)libc_seterrno(EINVAL);
-	stream = file_fromuser(stream);
-	result = file_sync(stream);
-	if likely(result == 0) {
-		result = file_setmode(stream,
-		                      buf,
-		                      modes,
-		                      bufsize);
-	}
-	return result;
-}
-/*[[[end:libc_setvbuf_unlocked]]]*/
-
-/*[[[head:libc_feof,hash:CRC-32=0xbe068e02]]]*/
-/* >> feof(3)
- * Check if end-of-file has been reached in `stream' */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.read.utility") ATTR_PURE WUNUSED NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_feof)(FILE __KOS_FIXED_CONST *__restrict stream)
-/*[[[body:libc_feof]]]*/
-{
-	if unlikely(!stream)
-		return (int)libc_seterrno(EINVAL);
-	stream = file_fromuser(stream);
-	return FEOF(stream);
-}
-/*[[[end:libc_feof]]]*/
-
-/*[[[head:libc_ferror,hash:CRC-32=0xefb1aad3]]]*/
-/* >> ferror(3)
- * Check if an I/O error occurred in `stream' */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") ATTR_PURE WUNUSED NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_ferror)(FILE __KOS_FIXED_CONST *__restrict stream)
-/*[[[body:libc_ferror]]]*/
-{
-	if unlikely(!stream)
-		return (int)libc_seterrno(EINVAL);
-	stream = file_fromuser(stream);
-	return FERROR(stream);
-}
-/*[[[end:libc_ferror]]]*/
-
-/*[[[head:libc_clearerr,hash:CRC-32=0x48094766]]]*/
-/* >> clearerr(3)
- * Clear the error state of `stream', returning the stream to normal operations mode */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.access") NONNULL((1)) void
-NOTHROW_NCX(LIBCCALL libc_clearerr)(FILE *__restrict stream)
-/*[[[body:libc_clearerr]]]*/
-{
-	if likely(stream) {
-		stream = file_fromuser(stream);
-		FCLEARERR(stream);
-	}
-}
-/*[[[end:libc_clearerr]]]*/
-
-/*[[[head:libc_fileno,hash:CRC-32=0x1fa780d8]]]*/
-/* >> fileno(3)
- * Return the underlying file descriptor number used by `stream' */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") WUNUSED NONNULL((1)) fd_t
-NOTHROW_NCX(LIBCCALL libc_fileno)(FILE *__restrict stream)
-/*[[[body:libc_fileno]]]*/
-{
-	if unlikely(!stream)
-		goto err_inval;
-	stream = file_fromuser(stream);
-	if unlikely(stream->if_flag & IO_HASVTAB)
-		goto err_nostream;
-	return ATOMIC_READ(stream->if_fd);
-err_nostream:
-	/* """
-	 * EBADF The stream is not associated with a file.
-	 * """ */
-	return (fd_t)libc_seterrno(EBADF);
-err_inval:
-	return (fd_t)libc_seterrno(EINVAL);
-}
-/*[[[end:libc_fileno]]]*/
-
-/*[[[head:libd_fopen,hash:CRC-32=0x1ec4b920]]]*/
-/* >> fopen(3), fopen64(3)
- * Create and return a new file-stream for accessing `filename' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
-NOTHROW_RPC(LIBDCALL libd_fopen)(char const *__restrict filename,
-                                 char const *__restrict modes)
-/*[[[body:libd_fopen]]]*/
-{
-	fd_t fd;
-	FILE *result;
-	uint32_t flags;
-	oflag_t oflags;
-	flags = file_evalmodes(modes, &oflags);
-	fd    = open(filename, oflags | libd_O_DOSPATH, 0644);
-	if unlikely(fd < 0)
-		return NULL;
-	result = file_openfd(fd, flags);
-	if likely(result) {
-		result = file_touser(result);
-	} else {
-		sys_close(fd);
-	}
-	return result;
-}
-/*[[[end:libd_fopen]]]*/
-
-/*[[[head:libc_fopen,hash:CRC-32=0x8e368ed0]]]*/
-/* >> fopen(3), fopen64(3)
- * Create and return a new file-stream for accessing `filename' */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
-NOTHROW_RPC(LIBCCALL libc_fopen)(char const *__restrict filename,
-                                 char const *__restrict modes)
-/*[[[body:libc_fopen]]]*/
-{
-	/* TODO: (re-)add extension functions `fopenat()' and `fopenat64()'
-	 *       that allow for  the specification of  `dfd' and  `atflags' */
-	fd_t fd;
-	FILE *result;
-	uint32_t flags;
-	oflag_t oflags;
-	flags = file_evalmodes(modes, &oflags);
-	fd    = open(filename, oflags, 0644);
-	if unlikely(fd < 0)
-		return NULL;
-	result = file_openfd(fd, flags);
-	if likely(result) {
-		result = file_touser(result);
-	} else {
-		sys_close(fd);
-	}
-	return result;
-}
-/*[[[end:libc_fopen]]]*/
-
-/*[[[head:libc_fdopen,hash:CRC-32=0xd9878f49]]]*/
-/* >> fdopen(3)
- * Open a new file stream by inheriting a given file descriptor `fd'
- * Note   that  upon  success  (`return != NULL'),  the  given  `fd'
- * will be `close()'d once `fclose(return)' is called */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") WUNUSED NONNULL((2)) FILE *
-NOTHROW_NCX(LIBCCALL libc_fdopen)(fd_t fd,
-                                  char const *__restrict modes)
-/*[[[body:libc_fdopen]]]*/
-{
-	FILE *result;
-	uint32_t flags;
-	flags  = file_evalmodes(modes, NULL);
-	result = file_openfd(fd, flags);
-	result = file_touser_opt(result);
-	return result;
-}
-/*[[[end:libc_fdopen]]]*/
-
-/*[[[head:libc_fclose,hash:CRC-32=0xfd36aa48]]]*/
-/* >> fclose(3)
- * Close and destroy a given file `stream' */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.access") NONNULL((1)) int
-(LIBCCALL libc_fclose)(FILE *__restrict stream) THROWS(...)
-/*[[[body:libc_fclose]]]*/
-{
-	if unlikely(!stream)
-		return (int)libc_seterrno(EINVAL);
-	stream = file_fromuser(stream);
-	decref(stream);
-	return 0;
-}
-/*[[[end:libc_fclose]]]*/
 
 
 
@@ -3638,9 +3790,9 @@ NOTHROW_NCX(LIBCCALL libc__set_output_format)(uint32_t format)
 
 /* When set to `true', '%n' cannot be used in format strings.
  *
- * NOTE: DOS specs state that  '%n' be disabled by  default.
- *       However, since KOS is primarly a unix OS, we enable
- *       is by default. But note that the PE loader will set
+ * NOTE: DOS specs state  that '%n' be  disabled by  default.
+ *       However, since KOS is primarily a unix OS, we enable
+ *       is  by default. But note that the PE loader will set
  *       it to disabled for the sake of compatibility! */
 INTERN ATTR_SECTION(".bss.crt.dos.FILE.utility")
 bool libc_printf_percent_n_disabled = false;
@@ -3689,7 +3841,8 @@ NOTHROW_RPC(LIBCCALL libc_fdreopen)(fd_t fd,
 		file_lock_write(stream);
 	oldfd = stream->if_fd;
 	if unlikely(fd == oldfd) {
-		file_lock_endwrite(stream);
+		if (FMUSTLOCK(stream))
+			file_lock_endwrite(stream);
 		libc_seterrno(EBADF);
 		stream = NULL;
 		goto done;
@@ -3886,7 +4039,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x86b27b1f]]]*/
+/*[[[start:exports,hash:CRC-32=0x9858264a]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$__rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$rename, libd_rename);
@@ -4056,7 +4209,6 @@ DEFINE_PUBLIC_ALIAS(fsetpos64_unlocked, libc_fsetpos64_unlocked);
 DEFINE_PUBLIC_ALIAS(fftruncate64, libc_fftruncate64);
 DEFINE_PUBLIC_ALIAS(fftruncate64_unlocked, libc_fftruncate64_unlocked);
 DEFINE_PUBLIC_ALIAS(fgetln, libc_fgetln);
-DEFINE_PUBLIC_ALIAS(fmtcheck, libc_fmtcheck);
 DEFINE_PUBLIC_ALIAS(funopen2, libc_funopen2);
 DEFINE_PUBLIC_ALIAS(funopen2_64, libc_funopen2_64);
 DEFINE_PUBLIC_ALIAS(_flushall, libc__flushall);

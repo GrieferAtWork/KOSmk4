@@ -1094,7 +1094,7 @@ done:
 %[default:section(".text.crt{|.dos}.FILE.locked.seek.seek")]
 
 @@>> fseek(3)
-@@Change the current in-file position of `stream' as a byte-offet from the start of the file
+@@Change the current in-file position of `stream' as a byte-offset from the start of the file
 [[stdio_throws, std, no_crt_self_import, no_crt_self_export, export_as(CNL_fseek...)]]
 [[if($extended_include_prefix("<features.h>")                  defined(__USE_STDIO_UNLOCKED)                                         ), alias(CNL_fseek_unlocked...)]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko_unlocked...)]]
@@ -1117,7 +1117,7 @@ int fseek([[nonnull]] FILE *__restrict stream, long int off, int whence) {
 }
 
 @@>> ftell(3)
-@@Return the current in-file position of `stream' as a byte-offet from the start of the file
+@@Return the current in-file position of `stream' as a byte-offset from the start of the file
 [[stdio_throws, std, wunused, no_crt_self_import, no_crt_self_export, export_as(CNL_ftell...)]]
 [[if($extended_include_prefix("<features.h>")                  defined(__USE_STDIO_UNLOCKED)                                         ), alias(CNL_ftell_unlocked...)]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF32_T__), alias(CNL_ftello_unlocked...)]]
@@ -2826,6 +2826,7 @@ int obstack_printf([[nonnull]] struct obstack *__restrict obstack_,
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __FS_SIZEOF(@OFF@) == __SIZEOF_LONG__   ), alias(CNL_fseek_unlocked...)]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias(CNL_fseeko_unlocked...)]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias(CNL_fseeko64_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_LONG__), crt_intern_alias("fseek")]]
 [[userimpl, requires($has_function(crt_fseeko64) || $has_function(crt_fseeko) || $has_function(crt_fseek))]]
 int fseeko([[nonnull]] $FILE *__restrict stream, $off_t off, int whence) {
 @@pp_if $has_function(crt_fseeko64)@@
@@ -2849,6 +2850,7 @@ int fseeko([[nonnull]] $FILE *__restrict stream, $off_t off, int whence) {
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __FS_SIZEOF(@OFF@) == __SIZEOF_LONG__   ), alias(CNL_ftell_unlocked...)]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias(CNL_ftello_unlocked...)]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias(CNL_ftello64_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_LONG__), crt_intern_alias("ftell")]]
 [[userimpl, requires($has_function(crt_fgetpos64) || $has_function(crt_fgetpos) ||
                      $has_function(crt_ftello64) || $has_function(crt_ftello) ||
                      $has_function(crt_ftell))]]
@@ -3701,7 +3703,12 @@ fgetln([[nonnull]] $FILE *__restrict stream, $size_t *__restrict lenp);
 @@config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");'
 [[guard, wunused, nonnull, attribute("__ATTR_FORMAT_ARG(2)")]]
 char const *fmtcheck([[nullable]] char const *user_format,
-                     [[nonnull]] char const *good_format); /* TODO: Implement inline */
+                     [[nonnull]] char const *good_format) {
+	/* TODO: Implement properly */
+	COMPILER_IMPURE();
+	(void)good_format;
+	return user_format;
+}
 %#endif /* __USE_NETBSD */
 
 
@@ -3709,7 +3716,7 @@ char const *fmtcheck([[nullable]] char const *user_format,
 
 /************************************************************************/
 /************************************************************************/
-/* funopen and funopen2                                                 */
+/* funopen(3) and funopen2(3)                                           */
 /************************************************************************/
 /************************************************************************/
 %
@@ -3724,19 +3731,19 @@ typedef __FS_TYPE(off) off_t;
 
 
 [[ignore, guard, wunused, doc_alias("funopen"), nocrt, alias("funopen")]]
-$FILE *funopen32(void const *cookie,
-                 int (LIBKCALL *readfn)(void *cookie, char *buf, int num_bytes),
-                 int (LIBKCALL *writefn)(void *cookie, char const *buf, int num_bytes),
-                 off32_t (LIBKCALL *seekfn)(void *cookie, off32_t off, int whence),
-                 int (LIBKCALL *closefn)(void *cookie));
+$FILE *crt_funopen32(void const *cookie,
+                     int (LIBKCALL *readfn)(void *cookie, char *buf, int num_bytes),
+                     int (LIBKCALL *writefn)(void *cookie, char const *buf, int num_bytes),
+                     off32_t (LIBKCALL *seekfn)(void *cookie, off32_t off, int whence),
+                     int (LIBKCALL *closefn)(void *cookie));
 
 [[ignore, guard, wunused, doc_alias("funopen2"), nocrt, alias("funopen2")]]
-$FILE *funopen2_32(void const *cookie,
-                   ssize_t (LIBKCALL *readfn)(void *cookie, void *buf, size_t num_bytes),
-                   ssize_t (LIBKCALL *writefn)(void *cookie, void const *buf, size_t num_bytes),
-                   off32_t (LIBKCALL *seekfn)(void *cookie, off32_t off, int whence),
-                   int (LIBKCALL *flushfn)(void *cookie),
-                   int (LIBKCALL *closefn)(void *cookie));
+$FILE *crt_funopen2_32(void const *cookie,
+                       ssize_t (LIBKCALL *readfn)(void *cookie, void *buf, size_t num_bytes),
+                       ssize_t (LIBKCALL *writefn)(void *cookie, void const *buf, size_t num_bytes),
+                       off32_t (LIBKCALL *seekfn)(void *cookie, off32_t off, int whence),
+                       int (LIBKCALL *flushfn)(void *cookie),
+                       int (LIBKCALL *closefn)(void *cookie));
 
 
 
@@ -4241,7 +4248,7 @@ __LOCAL_LIBC(funopen64_to_funopen_seekfn) off_t
 [[requires((__SIZEOF_INT__ == __SIZEOF_SIZE_T__ && $has_function(funopen2_64)) ||
            ($has_function(malloc) && ($has_function(funopen2_64) ||
                                       $has_function(crt_fopencookie) ||
-                                      $has_function(funopen32))))]]
+                                      $has_function(crt_funopen32))))]]
 [[impl_prefix(
 @@pp_if __SIZEOF_INT__ != __SIZEOF_SIZE_T__ || !$has_function(funopen2_64)@@
 DEFINE_FUNOPEN_HOLDER
@@ -4294,9 +4301,9 @@ $FILE *funopen64(void const *cookie,
 	FILE *result;
 	struct __NAMESPACE_LOCAL_SYM __funopen64_holder *holder;
 @@pp_ifndef      __BUILDING_LIBC@@
-@@pp_if $has_function(funopen32)@@
+@@pp_if $has_function(crt_funopen32)@@
 	if (!seekfn)
-		return funopen32(cookie, readfn, writefn, NULL, closefn);
+		return crt_funopen32(cookie, readfn, writefn, NULL, closefn);
 @@pp_endif@@
 @@pp_endif@@
 	holder = (struct __NAMESPACE_LOCAL_SYM __funopen64_holder *)malloc(sizeof(struct __NAMESPACE_LOCAL_SYM __funopen64_holder));
@@ -4339,31 +4346,31 @@ $FILE *funopen64(void const *cookie,
 @@pp_else@@
 @@pp_if   __SIZEOF_INT__   ==  __SIZEOF_SIZE_T__@@
 @@pp_if __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__@@
-	result = funopen32(/* cookie:  */ holder,
-	                   /* readfn:  */ readfn  ? (int (LIBKCALL *)(void *, char *, int))&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_readfn  : NULL,
-	                   /* writefn: */ writefn ? (int (LIBKCALL *)(void *, char const *, int))&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_writefn : NULL,
-	                   /* seekfn:  */ seekfn  ? (off_t (LIBKCALL *)(void *, off_t, int))&__NAMESPACE_LOCAL_SYM funopen_to_funopen64_seekfn  : NULL,
-	                   /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
+	result = crt_funopen32(/* cookie:  */ holder,
+	                       /* readfn:  */ readfn  ? (int (LIBKCALL *)(void *, char *, int))&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_readfn  : NULL,
+	                       /* writefn: */ writefn ? (int (LIBKCALL *)(void *, char const *, int))&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_writefn : NULL,
+	                       /* seekfn:  */ seekfn  ? (off_t (LIBKCALL *)(void *, off_t, int))&__NAMESPACE_LOCAL_SYM funopen_to_funopen64_seekfn  : NULL,
+	                       /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
 @@pp_else@@
-	result = funopen32(/* cookie:  */ holder,
-	                   /* readfn:  */ readfn  ? (int (LIBKCALL *)(void *, char *, int))&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_readfn  : NULL,
-	                   /* writefn: */ writefn ? (int (LIBKCALL *)(void *, char const *, int))&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_writefn : NULL,
-	                   /* seekfn:  */ seekfn  ? &__NAMESPACE_LOCAL_SYM funopen64_to_funopen_seekfn  : NULL,
-	                   /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
+	result = crt_funopen32(/* cookie:  */ holder,
+	                       /* readfn:  */ readfn  ? (int (LIBKCALL *)(void *, char *, int))&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_readfn  : NULL,
+	                       /* writefn: */ writefn ? (int (LIBKCALL *)(void *, char const *, int))&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_writefn : NULL,
+	                       /* seekfn:  */ seekfn  ? &__NAMESPACE_LOCAL_SYM funopen64_to_funopen_seekfn  : NULL,
+	                       /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
 @@pp_endif@@
 @@pp_else@@
 @@pp_if __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__@@
-	result = funopen32(/* cookie:  */ holder,
-	                   /* readfn:  */ readfn  ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen64_readfn  : NULL,
-	                   /* writefn: */ writefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen64_writefn : NULL,
-	                   /* seekfn:  */ seekfn  ? (off_t (LIBKCALL *)(void *, off_t, int))&__NAMESPACE_LOCAL_SYM funopen_to_funopen64_seekfn  : NULL,
-	                   /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
+	result = crt_funopen32(/* cookie:  */ holder,
+	                       /* readfn:  */ readfn  ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen64_readfn  : NULL,
+	                       /* writefn: */ writefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen64_writefn : NULL,
+	                       /* seekfn:  */ seekfn  ? (off_t (LIBKCALL *)(void *, off_t, int))&__NAMESPACE_LOCAL_SYM funopen_to_funopen64_seekfn  : NULL,
+	                       /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
 @@pp_else@@
-	result = funopen32(/* cookie:  */ holder,
-	                   /* readfn:  */ readfn  ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen64_readfn  : NULL,
-	                   /* writefn: */ writefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen64_writefn : NULL,
-	                   /* seekfn:  */ seekfn  ? &__NAMESPACE_LOCAL_SYM funopen64_to_funopen_seekfn  : NULL,
-	                   /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
+	result = crt_funopen32(/* cookie:  */ holder,
+	                       /* readfn:  */ readfn  ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen64_readfn  : NULL,
+	                       /* writefn: */ writefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen64_writefn : NULL,
+	                       /* seekfn:  */ seekfn  ? &__NAMESPACE_LOCAL_SYM funopen64_to_funopen_seekfn  : NULL,
+	                       /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
 @@pp_endif@@
 @@pp_endif@@
 @@pp_endif@@
@@ -4425,7 +4432,7 @@ __LOCAL_LIBC(funopen2_64_to_funopen2_seekfn) __off32_t
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), crt_intern_kos_alias("libc_funopen2")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), preferred_alias("funopen2")]]
 [[section(".text.crt{|.dos}.FILE.locked.utility")]]
-[[userimpl, requires_function(malloc, funopen2_32)]]
+[[userimpl, requires_function(malloc, crt_funopen2_32)]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(DEFINE_FUNOPEN_HOLDER)]]
 [[impl_prefix(DEFINE_FUNOPEN2_HOLDER)]]
@@ -4451,7 +4458,7 @@ $FILE *funopen2_64(void const *cookie,
 	FILE *result;
 	struct __NAMESPACE_LOCAL_SYM __funopen2_64_holder *holder;
 	if (!seekfn)
-		return funopen2_32(cookie, readfn, writefn, NULL, flushfn, closefn);
+		return crt_funopen2_32(cookie, readfn, writefn, NULL, flushfn, closefn);
 	holder = (struct __NAMESPACE_LOCAL_SYM __funopen2_64_holder *)malloc(sizeof(struct __NAMESPACE_LOCAL_SYM __funopen2_64_holder));
 	if unlikely(!holder)
 		return NULL;
@@ -4462,19 +4469,19 @@ $FILE *funopen2_64(void const *cookie,
 	holder->f2h64_closefn = closefn;
 	holder->f2h64_flushfn = flushfn;
 @@pp_if __SIZEOF_INT__ == __SIZEOF_SIZE_T__@@
-	result = funopen2_32(/* cookie:  */ holder,
-	                     /* readfn:  */ readfn  ? (ssize_t (LIBKCALL *)(void *, void *, size_t))&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_readfn  : NULL,
-	                     /* writefn: */ writefn ? (ssize_t (LIBKCALL *)(void *, void const *, size_t))&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_writefn : NULL,
-	                     /* seekfn:  */ seekfn  ? &__NAMESPACE_LOCAL_SYM funopen2_64_to_funopen2_seekfn  : NULL,
-	                     /* flushfn: */ flushfn ? &__NAMESPACE_LOCAL_SYM funopen2_to_funopen2_64_flushfn : NULL,
-	                     /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
+	result = crt_funopen2_32(/* cookie:  */ holder,
+	                         /* readfn:  */ readfn  ? (ssize_t (LIBKCALL *)(void *, void *, size_t))&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_readfn  : NULL,
+	                         /* writefn: */ writefn ? (ssize_t (LIBKCALL *)(void *, void const *, size_t))&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_writefn : NULL,
+	                         /* seekfn:  */ seekfn  ? &__NAMESPACE_LOCAL_SYM funopen2_64_to_funopen2_seekfn  : NULL,
+	                         /* flushfn: */ flushfn ? &__NAMESPACE_LOCAL_SYM funopen2_to_funopen2_64_flushfn : NULL,
+	                         /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
 @@pp_else@@
-	result = funopen2_32(/* cookie:  */ holder,
-	                     /* readfn:  */ readfn  ? &__NAMESPACE_LOCAL_SYM funopen2_to_funopen2_64_readfn  : NULL,
-	                     /* writefn: */ writefn ? &__NAMESPACE_LOCAL_SYM funopen2_to_funopen2_64_writefn : NULL,
-	                     /* seekfn:  */ seekfn  ? &__NAMESPACE_LOCAL_SYM funopen2_64_to_funopen2_seekfn  : NULL,
-	                     /* flushfn: */ flushfn ? &__NAMESPACE_LOCAL_SYM funopen2_to_funopen2_64_flushfn : NULL,
-	                     /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
+	result = crt_funopen2_32(/* cookie:  */ holder,
+	                         /* readfn:  */ readfn  ? &__NAMESPACE_LOCAL_SYM funopen2_to_funopen2_64_readfn  : NULL,
+	                         /* writefn: */ writefn ? &__NAMESPACE_LOCAL_SYM funopen2_to_funopen2_64_writefn : NULL,
+	                         /* seekfn:  */ seekfn  ? &__NAMESPACE_LOCAL_SYM funopen2_64_to_funopen2_seekfn  : NULL,
+	                         /* flushfn: */ flushfn ? &__NAMESPACE_LOCAL_SYM funopen2_to_funopen2_64_flushfn : NULL,
+	                         /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
 @@pp_endif@@
 @@pp_if $has_function(free)@@
 	if unlikely(!result)
@@ -4753,13 +4760,8 @@ errno_t tmpnam_s([[outp(bufsize)]] char *__restrict buf,
 		return 1;
 @@pp_endif@@
 	}
-	if unlikely(!tmpnam(buf)) {
-@@pp_ifdef __libc_geterrno@@
-		return __libc_geterrno();
-@@pp_else@@
-		return 1;
-@@pp_endif@@
-	}
+	if unlikely(!tmpnam(buf))
+		return __libc_geterrno_or(1);
 	return EOK;
 }
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8e5e196 */
+/* HASH CRC-32:0xb7b0326b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,45 +18,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_tmpnam_s_defined
-#define __local_tmpnam_s_defined
+#ifndef __local_fmtcheck_defined
+#define __local_fmtcheck_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE_tmpnam
-#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_tmpnam_defined
-#define __local___localdep_tmpnam_defined
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_tmpnam,(char *__buf),tmpnam,(__buf))
-#endif /* !__local___localdep_tmpnam_defined */
-__NAMESPACE_LOCAL_END
-#include <libc/errno.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(tmpnam_s) __ATTR_NONNULL((1)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tmpnam_s))(char *__restrict __buf, __SIZE_TYPE__ __bufsize) {
-	if __unlikely(!__buf) {
-#ifdef __EINVAL
-		return __EINVAL;
-#else /* __EINVAL */
-		return 1;
-#endif /* !__EINVAL */
-	}
-	if __unlikely(__bufsize < __L_tmpnam) {
-#ifdef __ERANGE
-		return __ERANGE; /* XXX: Is this what dos does? */
-#else /* __ERANGE */
-		return 1;
-#endif /* !__ERANGE */
-	}
-	if __unlikely(!(__NAMESPACE_LOCAL_SYM __localdep_tmpnam)(__buf))
-		return __libc_geterrno_or(1);
-	return __EOK;
+__LOCAL_LIBC(fmtcheck) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) __ATTR_FORMAT_ARG(2) char const *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmtcheck))(char const *__user_format, char const *__good_format) {
+	/* TODO: Implement properly */
+	__COMPILER_IMPURE();
+	(void)__good_format;
+	return __user_format;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_tmpnam_s_defined
-#define __local___localdep_tmpnam_s_defined
-#define __localdep_tmpnam_s __LIBC_LOCAL_NAME(tmpnam_s)
-#endif /* !__local___localdep_tmpnam_s_defined */
-#else /* __CRT_HAVE_tmpnam */
-#undef __local_tmpnam_s_defined
-#endif /* !__CRT_HAVE_tmpnam */
-#endif /* !__local_tmpnam_s_defined */
+#ifndef __local___localdep_fmtcheck_defined
+#define __local___localdep_fmtcheck_defined
+#define __localdep_fmtcheck __LIBC_LOCAL_NAME(fmtcheck)
+#endif /* !__local___localdep_fmtcheck_defined */
+#endif /* !__local_fmtcheck_defined */

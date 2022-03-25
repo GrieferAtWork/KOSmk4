@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd59d6d0 */
+/* HASH CRC-32:0x71567d6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1912,6 +1912,24 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCAN
 	va_end(args);
 	return result;
 }
+/* >> fmtcheck(3)
+ * Check if `user_format' may be used as a drop-in replacement for `good_format'
+ * in the context of a call to `printf(3)' (or `format_printf()'), such that all
+ * contained format qualifiers reference the  same (or compatible) underlying  C
+ * types, and in the same order.
+ * If all of this is the  case, simply re-return `user_format'. Otherwise  (i.e.
+ * when `user_format' isn't compatible with `good_format'), return `good_format'
+ * instead. This function is meant to  be used to validate user-provided  printf
+ * format strings before actually using them, after they've been read from  lang
+ * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") ATTR_RETNONNULL WUNUSED NONNULL((2)) __ATTR_FORMAT_ARG(2) char const *
+NOTHROW_NCX(LIBCCALL libc_fmtcheck)(char const *user_format,
+                                    char const *good_format) {
+	/* TODO: Implement properly */
+	COMPILER_IMPURE();
+	(void)good_format;
+	return user_format;
+}
 #if __SIZEOF_INT__ != __SIZEOF_SIZE_T__ || ((!defined(__CRT_HAVE_funopen2) || __FS_SIZEOF(OFF) != __SIZEOF_OFF32_T__) && (!defined(__CRT_HAVE_funopen2_64) || __FS_SIZEOF(OFF) != __SIZEOF_OFF64_T__) && ((!defined(__CRT_HAVE_malloc) && !defined(__CRT_HAVE___libc_malloc) && !defined(__CRT_HAVE_calloc) && !defined(__CRT_HAVE___libc_calloc) && !defined(__CRT_HAVE_realloc) && !defined(__CRT_HAVE___libc_realloc) && !defined(__CRT_HAVE_memalign) && !defined(__CRT_HAVE_aligned_alloc) && !defined(__CRT_HAVE___libc_memalign) && !defined(__CRT_HAVE_posix_memalign)) || (!defined(__CRT_HAVE_funopen2_64) && !defined(__CRT_HAVE_funopen2))))
 #ifndef ____funopen_holder_defined
 __NAMESPACE_LOCAL_BEGIN
@@ -2690,13 +2708,8 @@ NOTHROW_NCX(LIBCCALL libc_tmpnam_s)(char *__restrict buf,
 
 
 	}
-	if unlikely(!libc_tmpnam(buf)) {
-
-		return __libc_geterrno();
-
-
-
-	}
+	if unlikely(!libc_tmpnam(buf))
+		return __libc_geterrno_or(1);
 	return EOK;
 }
 #include <libc/errno.h>
@@ -4166,6 +4179,7 @@ DEFINE_PUBLIC_ALIAS(DOS$scanf_unlocked, libd_scanf_unlocked);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(scanf_unlocked, libc_scanf_unlocked);
+DEFINE_PUBLIC_ALIAS(fmtcheck, libc_fmtcheck);
 DEFINE_PUBLIC_ALIAS(funopen, libc_funopen);
 DEFINE_PUBLIC_ALIAS(funopen64, libc_funopen64);
 DEFINE_PUBLIC_ALIAS(DOS$_fsopen, libd__fsopen);

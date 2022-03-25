@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf681780a */
+/* HASH CRC-32:0x25a40e2d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -170,7 +170,6 @@
 #define __stub_fgetwln
 #define __stub_fmaxmag
 #define __stub_fminmag
-#define __stub_fmtcheck
 #define __stub___fp_nquery
 #define __stub_fp_nquery
 #define __stub___fp_query
