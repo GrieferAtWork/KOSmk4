@@ -64,7 +64,7 @@ NOTHROW(LIBCCALL libc_get_nprocs)(void)
 /*[[[body:libc_get_nprocs]]]*/
 {
 	/* TODO: Active processor count (aka: The kernel's `cpu_online_count' global) */
-	CRT_UNIMPLEMENTED("get_nprocs_conf"); /* TODO */
+	CRT_UNIMPLEMENTED("get_nprocs"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }

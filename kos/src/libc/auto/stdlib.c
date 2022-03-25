@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd15bc843 */
+/* HASH CRC-32:0x7e03b828 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3800,18 +3800,28 @@ NOTHROW_NCX(LIBCCALL libc__atoldbl_l)(__LONGDOUBLE *__restrict result,
 	*result = libc_strtold_l(nptr, NULL, locale);
 	return 0;
 }
+#include <hybrid/typecore.h>
+#if __SIZEOF_INT__ == 8
+DEFINE_INTERN_ALIAS(libc__rotl, libc__rotl64);
+#else /* __SIZEOF_INT__ == 8 */
 #include <hybrid/__rotate.h>
 INTERN ATTR_SECTION(".text.crt.dos.math.utility") ATTR_CONST unsigned int
 NOTHROW(LIBCCALL libc__rotl)(unsigned int val,
                              int shift) {
 	return __hybrid_rol(val, (shift_t)(unsigned int)shift);
 }
+#endif /* __SIZEOF_INT__ != 8 */
+#include <hybrid/typecore.h>
+#if __SIZEOF_INT__ == 8
+DEFINE_INTERN_ALIAS(libc__rotr, libc__rotr64);
+#else /* __SIZEOF_INT__ == 8 */
 #include <hybrid/__rotate.h>
 INTERN ATTR_SECTION(".text.crt.dos.math.utility") ATTR_CONST unsigned int
 NOTHROW(LIBCCALL libc__rotr)(unsigned int val,
                              int shift) {
 	return __hybrid_ror(val, (shift_t)(unsigned int)shift);
 }
+#endif /* __SIZEOF_INT__ != 8 */
 #include <hybrid/__rotate.h>
 INTERN ATTR_SECTION(".text.crt.dos.math.utility") ATTR_CONST u64
 NOTHROW(LIBCCALL libc__rotl64)(u64 val,
@@ -3824,18 +3834,32 @@ NOTHROW(LIBCCALL libc__rotr64)(u64 val,
                                int shift) {
 	return __hybrid_ror64(val, (shift_t)(unsigned int)shift);
 }
+#include <hybrid/typecore.h>
+#if __SIZEOF_LONG__ == __SIZEOF_INT__
+DEFINE_INTERN_ALIAS(libc__lrotl, libc__rotl);
+#elif __SIZEOF_LONG__ == 8
+DEFINE_INTERN_ALIAS(libc__lrotl, libc__rotl64);
+#else /* ... */
 #include <hybrid/__rotate.h>
 INTERN ATTR_SECTION(".text.crt.dos.math.utility") ATTR_CONST unsigned long
 NOTHROW(LIBCCALL libc__lrotl)(unsigned long val,
                               int shift) {
 	return __hybrid_rol(val, (shift_t)(unsigned int)shift);
 }
+#endif /* !... */
+#include <hybrid/typecore.h>
+#if __SIZEOF_LONG__ == __SIZEOF_INT__
+DEFINE_INTERN_ALIAS(libc__lrotr, libc__rotr);
+#elif __SIZEOF_LONG__ == 8
+DEFINE_INTERN_ALIAS(libc__lrotr, libc__rotr64);
+#else /* ... */
 #include <hybrid/__rotate.h>
 INTERN ATTR_SECTION(".text.crt.dos.math.utility") ATTR_CONST unsigned long
 NOTHROW(LIBCCALL libc__lrotr)(unsigned long val,
                               int shift) {
 	return __hybrid_ror(val, (shift_t)(unsigned int)shift);
 }
+#endif /* !... */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.environ") errno_t
 NOTHROW_NCX(LIBDCALL libd__putenv_s)(char const *varname,
                                      char const *val) {

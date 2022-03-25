@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd8fdb2d */
+/* HASH CRC-32:0x545ac4e0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -441,6 +441,10 @@ NOTHROW_RPC(LIBDCALL libd_copylist)(char const *filename,
 	return result;
 #endif /* !... */
 }
+#include <bits/types.h>
+#if __SIZEOF_OFF32_T__ == __SIZEOF_SIZE_T__
+DEFINE_INTERN_ALIAS(libc_copylist, libc_copylist_sz);
+#else /* __SIZEOF_OFF32_T__ == __SIZEOF_SIZE_T__ */
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
 #define __PIO_OFFSET   __FS_TYPE(pos)
@@ -450,7 +454,6 @@ NOTHROW_RPC(LIBDCALL libd_copylist)(char const *filename,
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
-#include <bits/types.h>
 /* >> copylist(3), copylist64(3)
  * Load a given file `filename' into memory (via `malloc(3)'), and return
  * a  pointer to this newly malloc'd data-blob (the caller is responsible
@@ -505,7 +508,11 @@ NOTHROW_RPC(LIBCCALL libc_copylist)(char const *filename,
 	return result;
 #endif /* !... */
 }
+#endif /* __SIZEOF_OFF32_T__ != __SIZEOF_SIZE_T__ */
 #include <bits/types.h>
+#if __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__
+DEFINE_INTERN_ALIAS(libd_copylist64, libd_copylist);
+#else /* __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__ */
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
 #define __PIO_OFFSET   __FS_TYPE(pos)
@@ -564,10 +571,15 @@ NOTHROW_RPC(LIBDCALL libd_copylist64)(char const *filename,
 	return result;
 #endif /* __SIZEOF_OFF64_T__ != __SIZEOF_SIZE_T__ */
 }
+#endif /* __SIZEOF_OFF64_T__ != __SIZEOF_OFF32_T__ */
 #include <bits/types.h>
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_copylist64, libc_copylist);
-#else /* __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
+#elif __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__
+DEFINE_INTERN_ALIAS(libc_copylist64, libc_copylist);
+#elif __SIZEOF_OFF64_T__ == __SIZEOF_SIZE_T__
+DEFINE_INTERN_ALIAS(libc_copylist64, libc_copylist_sz);
+#else /* ... */
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
 #define __PIO_OFFSET   __FS_TYPE(pos)
@@ -616,17 +628,17 @@ DEFINE_INTERN_ALIAS(libc_copylist64, libc_copylist);
 INTERN ATTR_SECTION(".text.crt.solaris") WUNUSED NONNULL((1, 2)) char *
 NOTHROW_RPC(LIBCCALL libc_copylist64)(char const *filename,
                                       __PIO_OFFSET64 *p_filesize) {
-#if __SIZEOF_OFF64_T__ == __SIZEOF_SIZE_T__
-	return libc_copylist_sz(filename, (size_t *)p_filesize);
-#else /* __SIZEOF_OFF64_T__ == __SIZEOF_SIZE_T__ */
+
+
+
 	char *result;
 	size_t size;
 	result = libc_copylist_sz(filename, &size);
 	*p_filesize = (__PIO_OFFSET64)size;
 	return result;
-#endif /* __SIZEOF_OFF64_T__ != __SIZEOF_SIZE_T__ */
+
 }
-#endif /* __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__ */
+#endif /* !... */
 /* >> strcadd(3)
  * Decode C-style escape sequences from `string' and write the result to `dstbuf'
  * To prevent a buffer overflow, `dstbuf' should be at least `strlen(string) + 1'

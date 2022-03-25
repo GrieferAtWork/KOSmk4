@@ -3189,6 +3189,7 @@ long int ftell_unlocked([[nonnull]] $FILE *__restrict stream) {
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_LONG__   ), alias(CNL_fseek...)]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias(CNL_fseeko...)]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias(CNL_fseeko64...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_LONG__   ), crt_intern_alias("fseek_unlocked")]]
 [[userimpl, requires_function(fseeko)]]
 int fseeko_unlocked([[nonnull]] $FILE *__restrict stream, $off_t off, int whence) {
 	return fseeko(stream, off, whence);
@@ -3202,6 +3203,7 @@ int fseeko_unlocked([[nonnull]] $FILE *__restrict stream, $off_t off, int whence
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_LONG__   ), alias(CNL_ftell...)]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias(CNL_ftello...)]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias(CNL_ftello64...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_LONG__   ), crt_intern_alias("ftell_unlocked")]]
 [[userimpl, requires_function(ftello)]]
 $off_t ftello_unlocked([[nonnull]] $FILE *__restrict stream) {
 	return ftello(stream);

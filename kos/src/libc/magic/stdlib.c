@@ -5225,6 +5225,7 @@ int _atoldbl_l([[nonnull]] __LONGDOUBLE *__restrict result,
 [[impl_include("<hybrid/__rotate.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("_lrotl")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_rotl64")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), crt_intern_alias("_rotl64")]]
 unsigned int _rotl(unsigned int val, int shift) {
 	return __hybrid_rol(val, (shift_t)(unsigned int)shift);
 }
@@ -5233,6 +5234,7 @@ unsigned int _rotl(unsigned int val, int shift) {
 [[impl_include("<hybrid/__rotate.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("_lrotr")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_rotr64")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), crt_intern_alias("_rotr64")]]
 unsigned int _rotr(unsigned int val, int shift) {
 	return __hybrid_ror(val, (shift_t)(unsigned int)shift);
 }
@@ -5259,6 +5261,8 @@ $u64 _rotr64($u64 val, int shift) {
 [[impl_include("<hybrid/__rotate.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), alias("_rotl")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_rotl64")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), crt_intern_alias("_rotl")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), crt_intern_alias("_rotl64")]]
 unsigned long _lrotl(unsigned long val, int shift) {
 	return __hybrid_rol(val, (shift_t)(unsigned int)shift);
 }
@@ -5267,6 +5271,8 @@ unsigned long _lrotl(unsigned long val, int shift) {
 [[impl_include("<hybrid/__rotate.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), alias("_rotr")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_rotr64")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), crt_intern_alias("_rotr")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), crt_intern_alias("_rotr64")]]
 unsigned long _lrotr(unsigned long val, int shift) {
 	return __hybrid_ror(val, (shift_t)(unsigned int)shift);
 }

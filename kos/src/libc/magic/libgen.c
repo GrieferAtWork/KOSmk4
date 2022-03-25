@@ -486,6 +486,7 @@ char *copylist_sz([[nonnull]] char const *filename,
 [[crt_dos_variant, impl_prefix(DEFINE_PIO_OFFSET)]]
 [[requires_include("<bits/types.h>"), impl_include("<bits/types.h>")]]
 [[requires(($has_function(copylist64) && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__) || $has_function(copylist_sz))]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_SIZE_T__), crt_intern_kos_alias("libc_copylist_sz")]]
 char *copylist([[nonnull]] char const *filename, [[nonnull]] __PIO_OFFSET *p_filesize) {
 @@pp_if $has_function(copylist64) && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__@@
 	__PIO_OFFSET64 filesize64;
@@ -509,6 +510,8 @@ char *copylist([[nonnull]] char const *filename, [[nonnull]] __PIO_OFFSET *p_fil
 [[preferred_off64_variant_of(copylist), doc_alias("copylist")]]
 [[crt_dos_variant, impl_include("<bits/types.h>"), impl_prefix(DEFINE_PIO_OFFSET)]]
 [[requires_function(copylist_sz)]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), crt_intern_alias("copylist")]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF64_T__ == __SIZEOF_SIZE_T__), crt_intern_kos_alias("libc_copylist_sz")]]
 char *copylist64([[nonnull]] char const *filename, [[nonnull]] __PIO_OFFSET64 *p_filesize) {
 @@pp_if __SIZEOF_OFF64_T__ == __SIZEOF_SIZE_T__@@
 	return copylist_sz(filename, (size_t *)p_filesize);

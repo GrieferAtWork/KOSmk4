@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e5c7fab */
+/* HASH CRC-32:0x339441cc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1684,8 +1684,18 @@ DFUN(".text.crt.dos.FILE.locked.access", libd_fdreopen, libc_fdreopen, TP, 3, TI
 DFUN(".text.crt.dos.FILE.unlocked.access", libd_fdreopen_unlocked, libc_fdreopen_unlocked, TP, 3, TIn(__SIZEOF_FD_T__), TP, TP)
 DFUN(".text.crt.dos.FILE.unlocked.seek.seek", libd_fseek_unlocked, libc_fseek_unlocked, TD, 3, TP, TL, TD)
 DFUN(".text.crt.dos.FILE.unlocked.seek.seek", libd_ftell_unlocked, libc_ftell_unlocked, TL, 1, TP)
+#include <features.h>
+#include <bits/types.h>
+#if __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+DEFINE_INTERN_ALIAS(libd_fseeko_unlocked, libd_fseek_unlocked);
+#else /* __FS_SIZEOF(OFF) == __SIZEOF_LONG__ */
 DFUN(".text.crt.dos.FILE.unlocked.seek.seek", libd_fseeko_unlocked, libc_fseeko_unlocked, TD, 3, TP, TIn(__SIZEOF_OFF32_T__), TD)
+#endif /* __FS_SIZEOF(OFF) != __SIZEOF_LONG__ */
+#if __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+DEFINE_INTERN_ALIAS(libd_ftello_unlocked, libd_ftell_unlocked);
+#else /* __FS_SIZEOF(OFF) == __SIZEOF_LONG__ */
 DFUN(".text.crt.dos.FILE.unlocked.seek.seek", libd_ftello_unlocked, libc_ftello_unlocked, TIn(__SIZEOF_OFF32_T__), 1, TP)
+#endif /* __FS_SIZEOF(OFF) != __SIZEOF_LONG__ */
 DFUN(".text.crt.dos.FILE.unlocked.seek.pos", libd_fgetpos_unlocked, libc_fgetpos_unlocked, TD, 2, TP, TP)
 DFUN(".text.crt.dos.FILE.unlocked.seek.pos", libd_fsetpos_unlocked, libc_fsetpos_unlocked, TD, 2, TP, TP)
 DFUN(".text.crt.dos.FILE.unlocked.read.getc", libd_getw_unlocked, libc_getw_unlocked, TD, 1, TP)
@@ -1941,12 +1951,33 @@ DFUN(".text.crt.dos.unicode.static.convert", libd__atodbl, libc__atodbl, TD, 2, 
 DFUN(".text.crt.dos.unicode.static.convert", libd__atodbl_l, libc__atodbl_l, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd__atoldbl, libc__atoldbl, TD, 2, TP, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd__atoldbl_l, libc__atoldbl_l, TD, 3, TP, TP, TP)
+#include <hybrid/typecore.h>
+#if __SIZEOF_INT__ == 8
+DEFINE_INTERN_ALIAS(libd__rotl, libd__rotl64);
+#else /* __SIZEOF_INT__ == 8 */
 DFUN(".text.crt.dos.math.utility", libd__rotl, libc__rotl, TD, 2, TD, TD)
+#endif /* __SIZEOF_INT__ != 8 */
+#if __SIZEOF_INT__ == 8
+DEFINE_INTERN_ALIAS(libd__rotr, libd__rotr64);
+#else /* __SIZEOF_INT__ == 8 */
 DFUN(".text.crt.dos.math.utility", libd__rotr, libc__rotr, TD, 2, TD, TD)
+#endif /* __SIZEOF_INT__ != 8 */
 DFUN(".text.crt.dos.math.utility", libd__rotl64, libc__rotl64, TI64, 2, TI64, TD)
 DFUN(".text.crt.dos.math.utility", libd__rotr64, libc__rotr64, TI64, 2, TI64, TD)
+#if __SIZEOF_LONG__ == __SIZEOF_INT__
+DEFINE_INTERN_ALIAS(libd__lrotl, libd__rotl);
+#elif __SIZEOF_LONG__ == 8
+DEFINE_INTERN_ALIAS(libd__lrotl, libd__rotl64);
+#else /* ... */
 DFUN(".text.crt.dos.math.utility", libd__lrotl, libc__lrotl, TL, 2, TL, TD)
+#endif /* !... */
+#if __SIZEOF_LONG__ == __SIZEOF_INT__
+DEFINE_INTERN_ALIAS(libd__lrotr, libd__rotr);
+#elif __SIZEOF_LONG__ == 8
+DEFINE_INTERN_ALIAS(libd__lrotr, libd__rotr64);
+#else /* ... */
 DFUN(".text.crt.dos.math.utility", libd__lrotr, libc__lrotr, TL, 2, TL, TD)
+#endif /* !... */
 DFUN(".text.crt.dos.fs.utility", libd__searchenv, libc__searchenv, TV, 3, TP, TP, TP)
 DFUN(".text.crt.dos.fs.utility", libd__searchenv_s, libc__searchenv_s, TIn(__SIZEOF_ERRNO_T__), 4, TP, TP, TP, TI)
 DFUN(".text.crt.dos.fs.utility", libd__makepath, libc__makepath, TV, 5, TP, TP, TP, TP, TP)

@@ -260,7 +260,29 @@ INTERN ATTR_SECTION(".text.crt.except.io.read") NONNULL((2)) size_t
                          pos_t offset) THROWS(...)
 /*[[[body:libc_PReadAll]]]*/
 {
+#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+	size_t result, temp;
+	result = PRead(fd, buf, bufsize, offset);
+	if (result != 0 && (size_t)result < bufsize) {
+		/* Keep on reading */
+		for (;;) {
+			temp = PRead(fd,
+			             (byte_t *)buf + result,
+			             bufsize - result,
+			             offset + result);
+			if (!temp) {
+				result = 0;
+				break;
+			}
+			result += temp;
+			if (result >= bufsize)
+				break;
+		}
+	}
+	return result;
+#else /* __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
 	return PReadAll64(fd, buf, bufsize, offset);
+#endif /* __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__ */
 }
 /*[[[end:libc_PReadAll]]]*/
 

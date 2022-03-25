@@ -2348,7 +2348,10 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") WUNUSED NONNULL((1)) lo
 }
 /*[[[end:libc_ftell_unlocked]]]*/
 
-/*[[[head:libc_ftello_unlocked,hash:CRC-32=0xc003b4e9]]]*/
+/*[[[head:libc_ftello_unlocked,hash:CRC-32=0xea5e6a31]]]*/
+#if __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+DEFINE_INTERN_ALIAS(libc_ftello_unlocked, libc_ftell_unlocked);
+#else /* MAGIC:alias */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") WUNUSED NONNULL((1)) off_t
 (LIBCCALL libc_ftello_unlocked)(FILE *__restrict stream) THROWS(...)
 /*[[[body:libc_ftello_unlocked]]]*/
@@ -2362,6 +2365,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") WUNUSED NONNULL((1)) of
 		return (off_t)libc_seterrno(EOVERFLOW);
 	return (off_t)(pos_t)result;
 }
+#endif /* MAGIC:alias */
 /*[[[end:libc_ftello_unlocked]]]*/
 
 /*[[[head:libc_ftello64_unlocked,hash:CRC-32=0xced139e4]]]*/
@@ -2401,7 +2405,10 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") NONNULL((1)) int
 }
 /*[[[end:libc_fseek_unlocked]]]*/
 
-/*[[[head:libc_fseeko_unlocked,hash:CRC-32=0x79314bd]]]*/
+/*[[[head:libc_fseeko_unlocked,hash:CRC-32=0xf033dbfb]]]*/
+#if __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+DEFINE_INTERN_ALIAS(libc_fseeko_unlocked, libc_fseek_unlocked);
+#else /* MAGIC:alias */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") NONNULL((1)) int
 (LIBCCALL libc_fseeko_unlocked)(FILE *__restrict stream,
                                 off_t off,
@@ -2416,6 +2423,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") NONNULL((1)) int
 	result = unlikely(FERROR(stream)) ? -1 : 0;
 	return result;
 }
+#endif /* MAGIC:alias */
 /*[[[end:libc_fseeko_unlocked]]]*/
 
 /*[[[head:libc_fseeko64_unlocked,hash:CRC-32=0x8fc0ea17]]]*/
