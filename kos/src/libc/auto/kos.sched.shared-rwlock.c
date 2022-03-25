@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa54a3876 */
+/* HASH CRC-32:0x34b974de */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,7 @@ NOTHROW(__FCALL libc_shared_rwlock_trywrite)(struct shared_rwlock *__restrict se
 #include <hybrid/__assert.h>
 #include <kos/asm/futex.h>
 /* >> shared_rwlock_endwrite(3)
- * Release a a write-lock from `self' */
+ * Release a write-lock from `self' */
 INTERN ATTR_SECTION(".text.crt.sched.futex") __NOBLOCK NONNULL((1)) void
 NOTHROW(__FCALL libc_shared_rwlock_endwrite)(struct shared_rwlock *__restrict self) {
 	__COMPILER_BARRIER();

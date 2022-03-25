@@ -79,12 +79,12 @@ __SYSDECL_BEGIN
 #define SHARED_RWLOCK_INIT              { 0, 0, 0 }
 #define SHARED_RWLOCK_INIT_READ         { 1, 0, 0 }
 #define SHARED_RWLOCK_INIT_WRITE        { (__uintptr_t)-1, 0, 0 }
-#define shared_rwlock_init(self)        ((self)->sl_lock = 0, (self)->sl_rdwait = 0, (self)->sl_wrwait = 0)
+#define shared_rwlock_init(self)        (void)((self)->sl_lock = 0, (self)->sl_rdwait = 0, (self)->sl_wrwait = 0)
 #define shared_rwlock_init_read(self)   (void)((self)->sl_lock = 1, (self)->sl_rdwait = 0, (self)->sl_wrwait = 0)
 #define shared_rwlock_init_write(self)  (void)((self)->sl_lock = (__uintptr_t)-1, (self)->sl_rdwait = 0, (self)->sl_wrwait = 0)
 #define shared_rwlock_cinit(self)       (__hybrid_assert((self)->sl_lock == 0), __hybrid_assert((self)->sl_rdwait == 0), __hybrid_assert((self)->sl_wrwait == 0))
-#define shared_rwlock_cinit_read(self)  (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = 1, __hybrid_assert((self)->sl_rdwait == 0), __hybrid_assert((self)->sl_wrwait == 0))
-#define shared_rwlock_cinit_write(self) (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = (__uintptr_t)-1, __hybrid_assert((self)->sl_rdwait == 0), __hybrid_assert((self)->sl_wrwait == 0))
+#define shared_rwlock_cinit_read(self)  (__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = 1, __hybrid_assert((self)->sl_rdwait == 0), __hybrid_assert((self)->sl_wrwait == 0))
+#define shared_rwlock_cinit_write(self) (__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = (__uintptr_t)-1, __hybrid_assert((self)->sl_rdwait == 0), __hybrid_assert((self)->sl_wrwait == 0))
 /* NOTE: we use `sys_Xlfutex()', because the only possible exception is E_SEGFAULT */
 #define shared_rwlock_broadcast_for_fini(self)                                                                        \
 	((self)->sl_rdwait ? (void)sys_Xlfutex(&(self)->sl_rdwait, LFUTEX_WAKE, (__uintptr_t)-1, __NULLPTR, 0) : (void)0, \
@@ -138,7 +138,7 @@ $bool shared_rwlock_trywrite([[nonnull]] struct shared_rwlock *__restrict self) 
 
 
 @@>> shared_rwlock_endwrite(3)
-@@Release a a write-lock from `self'
+@@Release a write-lock from `self'
 [[extern_inline, nothrow, kernel, cc(__FCALL), attribute(__NOBLOCK)]]
 [[decl_include("<kos/bits/shared-rwlock.h>", "<kos/anno.h>")]]
 [[impl_include("<hybrid/__atomic.h>", "<hybrid/__assert.h>", "<kos/asm/futex.h>")]]
@@ -953,12 +953,12 @@ success:
 %[insert:function(shared_rwlock_write     = shared_rwlock_write_with_timeout, externLinkageOverride: "C++")]
 %[insert:function(shared_rwlock_waitread  = shared_rwlock_waitread_with_timeout, externLinkageOverride: "C++")]
 %[insert:function(shared_rwlock_waitwrite = shared_rwlock_waitwrite_with_timeout, externLinkageOverride: "C++")]
-%#if !defined(__KERNEL__) && defined(__USE_TIME64)
+%#if !defined(__KERNEL__) && defined(__USE_TIME64) && (!defined(__USE_STRUCT64_MACRO) || !defined(_TIMESPEC_MATCHES_TIMESPEC64))
 %[insert:function(shared_rwlock_read      = shared_rwlock_read_with_timeout64, externLinkageOverride: "C++")]
 %[insert:function(shared_rwlock_write     = shared_rwlock_write_with_timeout64, externLinkageOverride: "C++")]
 %[insert:function(shared_rwlock_waitread  = shared_rwlock_waitread_with_timeout64, externLinkageOverride: "C++")]
 %[insert:function(shared_rwlock_waitwrite = shared_rwlock_waitwrite_with_timeout64, externLinkageOverride: "C++")]
-%#endif /* !__KERNEL__ && __USE_TIME64 */
+%#endif /* !__KERNEL__ && __USE_TIME64 && (!__USE_STRUCT64_MACRO || !_TIMESPEC_MATCHES_TIMESPEC64) */
 %#if defined(__KERNEL__) && defined(__KOS_VERSION__) && __KOS_VERSION__ >= 400
 %[insert:function(shared_rwlock_read_nx      = shared_rwlock_read_with_timeout_nx, externLinkageOverride: "C++")]
 %[insert:function(shared_rwlock_write_nx     = shared_rwlock_write_with_timeout_nx, externLinkageOverride: "C++")]

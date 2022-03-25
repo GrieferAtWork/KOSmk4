@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e3e7303 */
+/* HASH CRC-32:0xc9866551 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ INTDEF WUNUSED __NOBLOCK NONNULL((1)) bool NOTHROW(__FCALL libc_shared_rwlock_tr
  * Try to acquire a write-lock to `self' */
 INTDEF WUNUSED __NOBLOCK NONNULL((1)) bool NOTHROW(__FCALL libc_shared_rwlock_trywrite)(struct shared_rwlock *__restrict self);
 /* >> shared_rwlock_endwrite(3)
- * Release a a write-lock from `self' */
+ * Release a write-lock from `self' */
 INTDEF __NOBLOCK NONNULL((1)) void NOTHROW(__FCALL libc_shared_rwlock_endwrite)(struct shared_rwlock *__restrict self);
 /* >> shared_rwlock_endread(3)
  * Release a read-lock from `self'

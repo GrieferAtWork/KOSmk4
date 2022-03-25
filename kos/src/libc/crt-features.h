@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28ebfdf0 */
+/* HASH CRC-32:0x6b63bc2b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7065,6 +7065,26 @@
 #ifdef __KERNEL__
 #define __CRT_HAVE_shared_lock_waitfor_with_timeout_nx
 #endif /* __KERNEL__ */
+#ifndef __KERNEL__
+#define __CRT_HAVE_shared_recursive_rwlock_downgrade
+#define __CRT_HAVE_shared_recursive_rwlock_endread
+#define __CRT_HAVE_shared_recursive_rwlock_endwrite
+#define __CRT_HAVE_shared_recursive_rwlock_read
+#define __CRT_HAVE_shared_recursive_rwlock_read_with_timeout
+#define __CRT_HAVE_shared_recursive_rwlock_read_with_timeout64
+#define __CRT_HAVE_shared_recursive_rwlock_tryread
+#define __CRT_HAVE_shared_recursive_rwlock_trywrite
+#define __CRT_HAVE_shared_recursive_rwlock_upgrade
+#define __CRT_HAVE_shared_recursive_rwlock_waitread
+#define __CRT_HAVE_shared_recursive_rwlock_waitread_with_timeout
+#define __CRT_HAVE_shared_recursive_rwlock_waitread_with_timeout64
+#define __CRT_HAVE_shared_recursive_rwlock_waitwrite
+#define __CRT_HAVE_shared_recursive_rwlock_waitwrite_with_timeout
+#define __CRT_HAVE_shared_recursive_rwlock_waitwrite_with_timeout64
+#define __CRT_HAVE_shared_recursive_rwlock_write
+#define __CRT_HAVE_shared_recursive_rwlock_write_with_timeout
+#define __CRT_HAVE_shared_recursive_rwlock_write_with_timeout64
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_shared_rwlock_downgrade
 #define __CRT_HAVE_shared_rwlock_end
 #define __CRT_HAVE_shared_rwlock_endread

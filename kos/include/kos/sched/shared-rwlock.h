@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31ca66f2 */
+/* HASH CRC-32:0x8481145 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,12 +72,12 @@ __SYSDECL_BEGIN
 #define SHARED_RWLOCK_INIT              { 0, 0, 0 }
 #define SHARED_RWLOCK_INIT_READ         { 1, 0, 0 }
 #define SHARED_RWLOCK_INIT_WRITE        { (__uintptr_t)-1, 0, 0 }
-#define shared_rwlock_init(self)        ((self)->sl_lock = 0, (self)->sl_rdwait = 0, (self)->sl_wrwait = 0)
+#define shared_rwlock_init(self)        (void)((self)->sl_lock = 0, (self)->sl_rdwait = 0, (self)->sl_wrwait = 0)
 #define shared_rwlock_init_read(self)   (void)((self)->sl_lock = 1, (self)->sl_rdwait = 0, (self)->sl_wrwait = 0)
 #define shared_rwlock_init_write(self)  (void)((self)->sl_lock = (__uintptr_t)-1, (self)->sl_rdwait = 0, (self)->sl_wrwait = 0)
 #define shared_rwlock_cinit(self)       (__hybrid_assert((self)->sl_lock == 0), __hybrid_assert((self)->sl_rdwait == 0), __hybrid_assert((self)->sl_wrwait == 0))
-#define shared_rwlock_cinit_read(self)  (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = 1, __hybrid_assert((self)->sl_rdwait == 0), __hybrid_assert((self)->sl_wrwait == 0))
-#define shared_rwlock_cinit_write(self) (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = (__uintptr_t)-1, __hybrid_assert((self)->sl_rdwait == 0), __hybrid_assert((self)->sl_wrwait == 0))
+#define shared_rwlock_cinit_read(self)  (__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = 1, __hybrid_assert((self)->sl_rdwait == 0), __hybrid_assert((self)->sl_wrwait == 0))
+#define shared_rwlock_cinit_write(self) (__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = (__uintptr_t)-1, __hybrid_assert((self)->sl_rdwait == 0), __hybrid_assert((self)->sl_wrwait == 0))
 /* NOTE: we use `sys_Xlfutex()', because the only possible exception is E_SEGFAULT */
 #define shared_rwlock_broadcast_for_fini(self)                                                                        \
 	((self)->sl_rdwait ? (void)sys_Xlfutex(&(self)->sl_rdwait, LFUTEX_WAKE, (__uintptr_t)-1, __NULLPTR, 0) : (void)0, \
@@ -149,7 +149,7 @@ __LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL sh
 #endif /* !__CRT_HAVE_shared_rwlock_trywrite */
 #if defined(__CRT_HAVE_shared_rwlock_endwrite) && defined(__shared_rwlock_wrwait_send)
 /* >> shared_rwlock_endwrite(3)
- * Release a a write-lock from `self' */
+ * Release a write-lock from `self' */
 __COMPILER_EIDECLARE(__NOBLOCK __ATTR_NONNULL((1)),void,__NOTHROW,__FCALL,shared_rwlock_endwrite,(struct shared_rwlock *__restrict __self),{
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->sl_lock == (__UINTPTR_TYPE__)-1, "Lock isn't in write-mode (%x)", __self->sl_lock);
@@ -159,11 +159,11 @@ __COMPILER_EIDECLARE(__NOBLOCK __ATTR_NONNULL((1)),void,__NOTHROW,__FCALL,shared
 })
 #elif defined(__CRT_HAVE_shared_rwlock_endwrite)
 /* >> shared_rwlock_endwrite(3)
- * Release a a write-lock from `self' */
+ * Release a write-lock from `self' */
 __LIBC __NOBLOCK __ATTR_NONNULL((1)) void __NOTHROW(__FCALL shared_rwlock_endwrite)(struct shared_rwlock *__restrict __self) __CASMNAME_SAME("shared_rwlock_endwrite");
 #elif defined(__shared_rwlock_wrwait_send)
 /* >> shared_rwlock_endwrite(3)
- * Release a a write-lock from `self' */
+ * Release a write-lock from `self' */
 __LOCAL __NOBLOCK __ATTR_NONNULL((1)) void __NOTHROW(__FCALL shared_rwlock_endwrite)(struct shared_rwlock *__restrict __self) {
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->sl_lock == (__UINTPTR_TYPE__)-1, "Lock isn't in write-mode (%x)", __self->sl_lock);
@@ -880,7 +880,7 @@ extern "C++" {
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitwrite)(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_waitwrite_with_timeout))(__self, __abs_timeout); }
 #endif /* ... */
 } /* extern "C++" */
-#if !defined(__KERNEL__) && defined(__USE_TIME64)
+#if !defined(__KERNEL__) && defined(__USE_TIME64) && (!defined(__USE_STRUCT64_MACRO) || !defined(_TIMESPEC_MATCHES_TIMESPEC64))
 extern "C++" {
 #if defined(__CRT_HAVE_shared_rwlock_read_with_timeout) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> shared_rwlock_read_with_timeout(3), shared_rwlock_read_with_timeout64(3)
@@ -971,7 +971,7 @@ extern "C++" {
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __BLOCKING __ATTR_NONNULL((1)) __BOOL (__FCALL shared_rwlock_waitwrite)(struct shared_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shared_rwlock_waitwrite_with_timeout64))(__self, __abs_timeout); }
 #endif /* ... */
 } /* extern "C++" */
-#endif /* !__KERNEL__ && __USE_TIME64 */
+#endif /* !__KERNEL__ && __USE_TIME64 && (!__USE_STRUCT64_MACRO || !_TIMESPEC_MATCHES_TIMESPEC64) */
 #if defined(__KERNEL__) && defined(__KOS_VERSION__) && __KOS_VERSION__ >= 400
 extern "C++" {
 #ifdef __CRT_HAVE_shared_rwlock_read_with_timeout_nx
