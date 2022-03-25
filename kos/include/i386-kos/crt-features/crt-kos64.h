@@ -1777,7 +1777,6 @@
 #define __CRT_HAVE__mbstok_s
 #define __CRT_HAVE__mbstok_s_l
 #define __CRT_HAVE__mbstowcs_l
-#define __CRT_HAVE__mbstowcs_s
 #define __CRT_HAVE__mbstowcs_s_l
 #define __CRT_HAVE__mbstrlen
 #define __CRT_HAVE__mbstrlen_l
@@ -7493,7 +7492,6 @@
 #define __CRT_HAVE_KOS$_mbstok_s
 #define __CRT_HAVE_KOS$_mbstok_s_l
 #define __CRT_HAVE_KOS$_mbstowcs_l
-#define __CRT_HAVE_KOS$_mbstowcs_s
 #define __CRT_HAVE_KOS$_mbstowcs_s_l
 #define __CRT_HAVE_KOS$_mbstrlen
 #define __CRT_HAVE_KOS$_mbstrlen_l
@@ -11775,7 +11773,6 @@
 #define __CRT_HAVE_DOS$_mbstok_s
 #define __CRT_HAVE_DOS$_mbstok_s_l
 #define __CRT_HAVE_DOS$_mbstowcs_l
-#define __CRT_HAVE_DOS$_mbstowcs_s
 #define __CRT_HAVE_DOS$_mbstowcs_s_l
 #define __CRT_HAVE_DOS$_mbstrlen
 #define __CRT_HAVE_DOS$_mbstrlen_l

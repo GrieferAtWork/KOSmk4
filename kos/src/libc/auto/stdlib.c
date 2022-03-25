@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d382ee6 */
+/* HASH CRC-32:0xd15bc843 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3417,48 +3417,6 @@ NOTHROW_NCX(LIBKCALL libc__mbstowcs_l)(char32_t *dst,
 	return libc_mbstowcs(dst, src, dstlen);
 }
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") errno_t
-NOTHROW_NCX(LIBDCALL libd__mbstowcs_s)(size_t *presult,
-                                       char16_t *dst,
-                                       size_t dstsize,
-                                       char const *src,
-                                       size_t dstlen) {
-	size_t error;
-	if (dstlen >= dstsize) {
-		if (!dstsize)
-			return 0;
-		dstlen = dstsize - 1;
-	}
-	error = libd_mbstowcs(dst, src, dstlen);
-	if (presult)
-		*presult = error;
-
-	if (error == (size_t)-1)
-		return 42;
-
-	return 0;
-}
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") errno_t
-NOTHROW_NCX(LIBKCALL libc__mbstowcs_s)(size_t *presult,
-                                       char32_t *dst,
-                                       size_t dstsize,
-                                       char const *src,
-                                       size_t dstlen) {
-	size_t error;
-	if (dstlen >= dstsize) {
-		if (!dstsize)
-			return 0;
-		dstlen = dstsize - 1;
-	}
-	error = libc_mbstowcs(dst, src, dstlen);
-	if (presult)
-		*presult = error;
-
-	if (error == (size_t)-1)
-		return EILSEQ;
-
-	return EOK;
-}
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") errno_t
 NOTHROW_NCX(LIBDCALL libd_mbstowcs_s)(size_t *presult,
                                       char16_t *dst,
                                       size_t dstsize,
@@ -4504,8 +4462,6 @@ DEFINE_PUBLIC_ALIAS(DOS$_mbtowc_l, libd__mbtowc_l);
 DEFINE_PUBLIC_ALIAS(_mbtowc_l, libc__mbtowc_l);
 DEFINE_PUBLIC_ALIAS(DOS$_mbstowcs_l, libd__mbstowcs_l);
 DEFINE_PUBLIC_ALIAS(_mbstowcs_l, libc__mbstowcs_l);
-DEFINE_PUBLIC_ALIAS(DOS$_mbstowcs_s, libd__mbstowcs_s);
-DEFINE_PUBLIC_ALIAS(_mbstowcs_s, libc__mbstowcs_s);
 DEFINE_PUBLIC_ALIAS(DOS$mbstowcs_s, libd_mbstowcs_s);
 DEFINE_PUBLIC_ALIAS(mbstowcs_s, libc_mbstowcs_s);
 DEFINE_PUBLIC_ALIAS(DOS$_mbstowcs_s_l, libd__mbstowcs_s_l);

@@ -4933,28 +4933,6 @@ $size_t _mbstowcs_l(wchar_t *dst, char const *src,
 [[decl_include("<bits/types.h>")]]
 [[wchar, impl_include("<libc/errno.h>")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
-errno_t _mbstowcs_s($size_t *presult,
-                    wchar_t *dst, $size_t dstsize,
-                    char const *src, $size_t dstlen) {
-	size_t error;
-	if (dstlen >= dstsize) {
-		if (!dstsize)
-			return 0;
-		dstlen = dstsize - 1;
-	}
-	error = mbstowcs(dst, src, dstlen);
-	if (presult)
-		*presult = error;
-@@pp_ifdef EILSEQ@@
-	if (error == (size_t)-1)
-		return $EILSEQ;
-@@pp_endif@@
-	return $EOK;
-}
-
-[[decl_include("<bits/types.h>")]]
-[[wchar, impl_include("<libc/errno.h>")]]
-[[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 errno_t mbstowcs_s($size_t *presult,
                    wchar_t *dst, $size_t dstsize,
                    char const *src, $size_t dstlen) {

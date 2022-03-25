@@ -1855,7 +1855,6 @@
 #define __CRT_HAVE__mbstok_s
 #define __CRT_HAVE__mbstok_s_l
 #define __CRT_HAVE__mbstowcs_l
-#define __CRT_HAVE__mbstowcs_s
 #define __CRT_HAVE__mbstowcs_s_l
 #define __CRT_HAVE__mbstrlen
 #define __CRT_HAVE__mbstrlen_l
@@ -6628,7 +6627,6 @@
 #define __CRT_HAVE_KOS$_ltow_s
 #define __CRT_HAVE_KOS$_makepath_s
 #define __CRT_HAVE_KOS$_mbstowcs_l
-#define __CRT_HAVE_KOS$_mbstowcs_s
 #define __CRT_HAVE_KOS$_mbstowcs_s_l
 #define __CRT_HAVE_KOS$_mbtowc_l
 #define __CRT_HAVE_KOS$_mkdir
@@ -7557,7 +7555,6 @@
 #define __CRT_HAVE_DOS$_ltow_s
 #define __CRT_HAVE_DOS$_makepath_s
 #define __CRT_HAVE_DOS$_mbstowcs_l
-#define __CRT_HAVE_DOS$_mbstowcs_s
 #define __CRT_HAVE_DOS$_mbstowcs_s_l
 #define __CRT_HAVE_DOS$_mbtowc_l
 #define __CRT_HAVE_DOS$_mkdir
