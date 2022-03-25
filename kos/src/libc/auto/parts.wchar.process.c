@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda6ba122 */
+/* HASH CRC-32:0x2e63cf3b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec") NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBDCALL libd_wexecv)(char16_t const *__restrict path,
                                   __T16ARGV) {
 	int result = -1;
@@ -77,7 +77,7 @@ done_file:
 done:
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec") NONNULL((1, 2, 3)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec") NONNULL((1, 2, 3)) int
 NOTHROW_RPC(LIBDCALL libd_wexecve)(char16_t const *__restrict path,
                                    __T16ARGV,
                                    __T16ENVP) {
@@ -137,7 +137,7 @@ done_file:
 done:
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec") NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBDCALL libd_wexecvp)(char16_t const *__restrict file,
                                    __T16ARGV) {
 	int result = -1;
@@ -181,7 +181,7 @@ done_file:
 done:
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec") NONNULL((1, 2, 3)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec") NONNULL((1, 2, 3)) int
 NOTHROW_RPC(LIBDCALL libd_wexecvpe)(char16_t const *__restrict file,
                                     __T16ARGV,
                                     __T16ENVP) {
@@ -242,7 +242,7 @@ done:
 	return result;
 }
 #include <parts/redirect-exec.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec") ATTR_SENTINEL NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec") ATTR_SENTINEL NONNULL((1)) int
 NOTHROW_RPC(VLIBDCALL libd_wexecl)(char16_t const *__restrict path,
                                    char16_t const *args,
                                    ...) {
@@ -256,7 +256,7 @@ NOTHROW_RPC(VLIBKCALL libc_wexecl)(char32_t const *__restrict path,
 	__REDIRECT_EXECL(char32_t, libc_wexecv, path, args)
 }
 #include <parts/redirect-exec.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec") ATTR_SENTINEL_O(1) NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec") ATTR_SENTINEL_O(1) NONNULL((1)) int
 NOTHROW_RPC(VLIBDCALL libd_wexecle)(char16_t const *__restrict path,
                                     char16_t const *args,
                                     ...) {
@@ -270,7 +270,7 @@ NOTHROW_RPC(VLIBKCALL libc_wexecle)(char32_t const *__restrict path,
 	__REDIRECT_EXECLE(char32_t, libc_wexecve, path, args)
 }
 #include <parts/redirect-exec.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec") ATTR_SENTINEL NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec") ATTR_SENTINEL NONNULL((1)) int
 NOTHROW_RPC(VLIBDCALL libd_wexeclp)(char16_t const *__restrict file,
                                     char16_t const *args,
                                     ...) {
@@ -284,7 +284,7 @@ NOTHROW_RPC(VLIBKCALL libc_wexeclp)(char32_t const *__restrict file,
 	__REDIRECT_EXECL(char32_t, libc_wexecvp, file, args)
 }
 #include <parts/redirect-exec.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec") ATTR_SENTINEL_O(1) NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec") ATTR_SENTINEL_O(1) NONNULL((1)) int
 NOTHROW_RPC(VLIBDCALL libd_wexeclpe)(char16_t const *__restrict file,
                                      char16_t const *args,
                                      ...) {
@@ -297,7 +297,7 @@ NOTHROW_RPC(VLIBKCALL libc_wexeclpe)(char32_t const *__restrict file,
                                      ...) {
 	__REDIRECT_EXECLE(char32_t, libc_wexecvpe, file, args)
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn") NONNULL((2, 3)) pid_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn") NONNULL((2, 3)) pid_t
 NOTHROW_RPC(LIBDCALL libd_wspawnv)(__STDC_INT_AS_UINT_T mode,
                                    char16_t const *__restrict path,
                                    __T16ARGV) {
@@ -343,7 +343,7 @@ done_file:
 done:
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn") NONNULL((2, 3, 4)) pid_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn") NONNULL((2, 3, 4)) pid_t
 NOTHROW_RPC(LIBDCALL libd_wspawnve)(__STDC_INT_AS_UINT_T mode,
                                     char16_t const *__restrict path,
                                     __T16ARGV,
@@ -405,7 +405,7 @@ done_file:
 done:
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn") NONNULL((2, 3)) pid_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn") NONNULL((2, 3)) pid_t
 NOTHROW_RPC(LIBDCALL libd_wspawnvp)(__STDC_INT_AS_UINT_T mode,
                                     char16_t const *__restrict file,
                                     __T16ARGV) {
@@ -451,7 +451,7 @@ done_file:
 done:
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn") NONNULL((2, 3, 4)) pid_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn") NONNULL((2, 3, 4)) pid_t
 NOTHROW_RPC(LIBDCALL libd_wspawnvpe)(__STDC_INT_AS_UINT_T mode,
                                      char16_t const *__restrict file,
                                      __T16ARGV,
@@ -514,7 +514,7 @@ done:
 	return result;
 }
 #include <parts/redirect-exec.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn") ATTR_SENTINEL NONNULL((2)) pid_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn") ATTR_SENTINEL NONNULL((2)) pid_t
 NOTHROW_RPC(VLIBDCALL libd_wspawnl)(__STDC_INT_AS_UINT_T mode,
                                     char16_t const *__restrict path,
                                     char16_t const *args,
@@ -530,7 +530,7 @@ NOTHROW_RPC(VLIBKCALL libc_wspawnl)(__STDC_INT_AS_UINT_T mode,
 	__REDIRECT_SPAWNL(char32_t, libc_wspawnv, mode, path, args)
 }
 #include <parts/redirect-exec.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn") ATTR_SENTINEL_O(1) NONNULL((2)) pid_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn") ATTR_SENTINEL_O(1) NONNULL((2)) pid_t
 NOTHROW_RPC(VLIBDCALL libd_wspawnle)(__STDC_INT_AS_UINT_T mode,
                                      char16_t const *__restrict path,
                                      char16_t const *args,
@@ -546,7 +546,7 @@ NOTHROW_RPC(VLIBKCALL libc_wspawnle)(__STDC_INT_AS_UINT_T mode,
 	__REDIRECT_SPAWNLE(char32_t, libc_wspawnve, mode, path, args)
 }
 #include <parts/redirect-exec.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn") ATTR_SENTINEL NONNULL((2)) pid_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn") ATTR_SENTINEL NONNULL((2)) pid_t
 NOTHROW_RPC(VLIBDCALL libd_wspawnlp)(__STDC_INT_AS_UINT_T mode,
                                      char16_t const *__restrict file,
                                      char16_t const *args,
@@ -562,7 +562,7 @@ NOTHROW_RPC(VLIBKCALL libc_wspawnlp)(__STDC_INT_AS_UINT_T mode,
 	__REDIRECT_SPAWNL(char32_t, libc_wspawnvp, mode, file, args)
 }
 #include <parts/redirect-exec.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn") ATTR_SENTINEL_O(1) NONNULL((2)) pid_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn") ATTR_SENTINEL_O(1) NONNULL((2)) pid_t
 NOTHROW_RPC(VLIBDCALL libd_wspawnlpe)(__STDC_INT_AS_UINT_T mode,
                                       char16_t const *__restrict file,
                                       char16_t const *args,

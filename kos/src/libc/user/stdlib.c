@@ -1010,8 +1010,8 @@ NOTHROW(LIBDCALL libd_p_environ)(void) {
 	return &libd_environ;
 }
 
-/*[[[head:libd_getenv,hash:CRC-32=0x6479cc27]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.environ") WUNUSED NONNULL((1)) char *
+/*[[[head:libd_getenv,hash:CRC-32=0x9ccb4c39]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.environ") WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBDCALL libd_getenv)(char const *varname)
 /*[[[body:libd_getenv]]]*/
 {
@@ -1239,8 +1239,8 @@ err:
 }
 
 
-/*[[[head:libd_setenv,hash:CRC-32=0xb2e0dbfc]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.environ") NONNULL((1, 2)) int
+/*[[[head:libd_setenv,hash:CRC-32=0xe34b5b1f]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.environ") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_setenv)(char const *varname,
                                   char const *val,
                                   int replace)
@@ -1328,8 +1328,8 @@ did_update_dos_environ:
 
 
 
-/*[[[head:libd_unsetenv,hash:CRC-32=0x656808f6]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.environ") NONNULL((1)) int
+/*[[[head:libd_unsetenv,hash:CRC-32=0x5d3ac3ab]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.environ") NONNULL((1)) int
 NOTHROW_NCX(LIBDCALL libd_unsetenv)(char const *varname)
 /*[[[body:libd_unsetenv]]]*/
 {
@@ -1414,8 +1414,8 @@ NOTHROW_NCX(LIBKCALL libc_update_wenviron)(void) {
 	return 0;
 }
 
-/*[[[head:libd___p__wenviron,hash:CRC-32=0xf111074f]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
+/*[[[head:libd___p__wenviron,hash:CRC-32=0xd104e9d2]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
 NOTHROW_NCX(LIBDCALL libd___p__wenviron)(void)
 /*[[[body:libd___p__wenviron]]]*/
 {
@@ -1474,8 +1474,8 @@ NOTHROW_NCX(LIBKCALL libc__wgetenv)(char32_t const *varname)
 }
 /*[[[end:libc__wgetenv]]]*/
 
-/*[[[head:libd__wgetenv,hash:CRC-32=0xa7845fca]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") WUNUSED NONNULL((1)) char16_t *
+/*[[[head:libd__wgetenv,hash:CRC-32=0xa6f08241]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd__wgetenv)(char16_t const *varname)
 /*[[[body:libd__wgetenv]]]*/
 {
@@ -1511,8 +1511,8 @@ NOTHROW_NCX(LIBDCALL libd__wgetenv)(char16_t const *varname)
 }
 /*[[[end:libd__wgetenv]]]*/
 
-/*[[[head:libd_putenv,hash:CRC-32=0x2ddbec6f]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.environ") NONNULL((1)) int
+/*[[[head:libd_putenv,hash:CRC-32=0x501d62dd]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.environ") NONNULL((1)) int
 NOTHROW_NCX(LIBDCALL libd_putenv)(char *string)
 /*[[[body:libd_putenv]]]*/
 {
@@ -1531,8 +1531,8 @@ NOTHROW_NCX(LIBDCALL libd_putenv)(char *string)
 }
 /*[[[end:libd_putenv]]]*/
 
-/*[[[head:libd_secure_getenv,hash:CRC-32=0xf2ecbf88]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.environ") WUNUSED NONNULL((1)) char *
+/*[[[head:libd_secure_getenv,hash:CRC-32=0xf26829ff]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.environ") WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBDCALL libd_secure_getenv)(char const *varname)
 /*[[[body:libd_secure_getenv]]]*/
 {
@@ -1542,8 +1542,8 @@ NOTHROW_NCX(LIBDCALL libd_secure_getenv)(char const *varname)
 }
 /*[[[end:libd_secure_getenv]]]*/
 
-/*[[[head:libd__wputenv,hash:CRC-32=0x2ede1d24]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1)) int
+/*[[[head:libd__wputenv,hash:CRC-32=0xe7d19ea2]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1)) int
 NOTHROW_NCX(LIBDCALL libd__wputenv)(char16_t *string)
 /*[[[body:libd__wputenv]]]*/
 {
@@ -1587,8 +1587,8 @@ NOTHROW_NCX(LIBKCALL libc__wputenv)(char32_t *string)
 }
 /*[[[end:libc__wputenv]]]*/
 
-/*[[[head:libd__wputenv_s,hash:CRC-32=0x985727da]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") errno_t
+/*[[[head:libd__wputenv_s,hash:CRC-32=0x49f754ec]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") errno_t
 NOTHROW_NCX(LIBDCALL libd__wputenv_s)(char16_t const *varname,
                                       char16_t const *val)
 /*[[[body:libd__wputenv_s]]]*/
@@ -1757,9 +1757,9 @@ libd_on_exit_wrapper(int status, void *arg) {
 }
 #endif /* __LIBCCALL_IS_LIBDCALL */
 
-/*[[[head:libd_on_exit,hash:CRC-32=0xc3379334]]]*/
+/*[[[head:libd_on_exit,hash:CRC-32=0xf5c79fa8]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
-INTERN ATTR_SECTION(".text.crt.dos.sched.process") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.sched.process") NONNULL((1)) int
 NOTHROW_NCX(LIBDCALL libd_on_exit)(void (LIBDCALL *func)(int status, void *arg),
                                    void *arg)
 /*[[[body:libd_on_exit]]]*/
@@ -2260,7 +2260,7 @@ NOTHROW_NCX(LIBCCALL libc_setstate)(char *statebuf)
 }
 /*[[[end:libc_setstate]]]*/
 
-/*[[[head:libd_frealpath4,hash:CRC-32=0x8aa202ec]]]*/
+/*[[[head:libd_frealpath4,hash:CRC-32=0x78fb4c2b]]]*/
 /* >> frealpath4(2)
  * Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
@@ -2272,7 +2272,7 @@ NOTHROW_NCX(LIBCCALL libc_setstate)(char *statebuf)
  * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
  *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED char *
 NOTHROW_RPC(LIBDCALL libd_frealpath4)(fd_t fd,
                                       char *resolved,
                                       size_t buflen,
@@ -2365,7 +2365,7 @@ done:
 }
 /*[[[end:libc_frealpath4]]]*/
 
-/*[[[head:libd_frealpathat,hash:CRC-32=0x8785929e]]]*/
+/*[[[head:libd_frealpathat,hash:CRC-32=0xae20a84f]]]*/
 /* >> frealpathat(2)
  * Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
@@ -2380,7 +2380,7 @@ done:
  *       pass `0' for `buflen' to automatically determine the required buffer size.
  * @param flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
  * @return: NULL: [errno=ERANGE]: `buflen' is too small to fit the entire path */
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED NONNULL((2)) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED NONNULL((2)) char *
 NOTHROW_RPC(LIBDCALL libd_frealpathat)(fd_t dirfd,
                                        char const *filename,
                                        char *resolved,
@@ -2506,10 +2506,10 @@ NOTHROW_RPC(LIBCCALL libc_posix_openpt)(oflag_t oflags)
 }
 /*[[[end:libc_posix_openpt]]]*/
 
-/*[[[head:libd_ptsname_r,hash:CRC-32=0xdd2f3f26]]]*/
+/*[[[head:libd_ptsname_r,hash:CRC-32=0x135cd6a8]]]*/
 /* Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
-INTERN ATTR_SECTION(".text.crt.dos.io.tty") NONNULL((2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.io.tty") NONNULL((2)) int
 NOTHROW_NCX(LIBDCALL libd_ptsname_r)(fd_t fd,
                                      char *buf,
                                      size_t buflen)
@@ -2553,10 +2553,10 @@ NOTHROW_RPC(LIBCCALL libc_getpt)(void)
 }
 /*[[[end:libc_getpt]]]*/
 
-/*[[[head:libd_canonicalize_file_name,hash:CRC-32=0x640e6ae]]]*/
+/*[[[head:libd_canonicalize_file_name,hash:CRC-32=0x90a8e285]]]*/
 /* Return the result of `realpath(filename)' as a `malloc()'-allocated buffer
  * Upon error, `NULL' is returned instead */
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") ATTR_MALLOC WUNUSED NONNULL((1)) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") ATTR_MALLOC WUNUSED NONNULL((1)) char *
 NOTHROW_RPC(LIBDCALL libd_canonicalize_file_name)(char const *filename)
 /*[[[body:libd_canonicalize_file_name]]]*/
 {
@@ -2607,8 +2607,8 @@ PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libc___
 DEFINE_PUBLIC_IDATA_G(__wargv, libc___p___wargv, __SIZEOF_POINTER__);
 DEFINE_PUBLIC_IDATA_G(DOS$__wargv, libd___p___wargv, __SIZEOF_POINTER__);
 
-/*[[[head:libd___p___wargv,hash:CRC-32=0x61c5fc73]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
+/*[[[head:libd___p___wargv,hash:CRC-32=0x8148fe7c]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
 NOTHROW_NCX(LIBDCALL libd___p___wargv)(void)
 /*[[[body:libd___p___wargv]]]*/
 {
@@ -2672,9 +2672,9 @@ NOTHROW_NCX(LIBDCALL libd_alloc_initenv)(void) {
 	return libd_alloc_environ(libc_get_initenv());
 }
 
-/*[[[head:libd___p___initenv,hash:CRC-32=0xe1169326]]]*/
+/*[[[head:libd___p___initenv,hash:CRC-32=0xa714881c]]]*/
 /* Access to the initial environment block */
-INTERN ATTR_SECTION(".text.crt.dos.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char ***
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char ***
 NOTHROW_NCX(LIBDCALL libd___p___initenv)(void)
 /*[[[body:libd___p___initenv]]]*/
 {
@@ -2694,9 +2694,9 @@ PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libc___
 DEFINE_PUBLIC_IDATA_G(__winitenv, libc___p___winitenv, __SIZEOF_POINTER__);
 DEFINE_PUBLIC_IDATA_G(DOS$__winitenv, libd___p___winitenv, __SIZEOF_POINTER__);
 
-/*[[[head:libd___p___winitenv,hash:CRC-32=0xbaabf17d]]]*/
+/*[[[head:libd___p___winitenv,hash:CRC-32=0x6e247b16]]]*/
 /* Access to the initial environment block */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
 NOTHROW_NCX(LIBDCALL libd___p___winitenv)(void)
 /*[[[body:libd___p___winitenv]]]*/
 {
@@ -2759,8 +2759,8 @@ PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libc___
 DEFINE_PUBLIC_IDATA_G(_wpgmptr, libc___p__wpgmptr, __SIZEOF_POINTER__);
 DEFINE_PUBLIC_IDATA_G(DOS$_wpgmptr, libd___p__wpgmptr, __SIZEOF_POINTER__);
 
-/*[[[head:libd___p__wpgmptr,hash:CRC-32=0xdf5a3664]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t **
+/*[[[head:libd___p__wpgmptr,hash:CRC-32=0x3fd7346b]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t **
 NOTHROW_NCX(LIBDCALL libd___p__wpgmptr)(void)
 /*[[[body:libd___p__wpgmptr]]]*/
 {
@@ -2786,8 +2786,8 @@ NOTHROW_NCX(LIBKCALL libc___p__wpgmptr)(void)
 /* This one is implemented in libc/libc/errno.c */
 /*[[[skip:libc___doserrno]]]*/
 
-/*[[[head:libd__get_errno,hash:CRC-32=0x89478bd0]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.errno_access") errno_t
+/*[[[head:libd__get_errno,hash:CRC-32=0xf859afee]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.errno_access") errno_t
 NOTHROW_NCX(LIBDCALL libd__get_errno)(errno_t *perr)
 /*[[[body:libd__get_errno]]]*/
 {
@@ -2810,8 +2810,8 @@ NOTHROW_NCX(LIBCCALL libc__get_errno)(errno_t *perr)
 }
 /*[[[end:libc__get_errno]]]*/
 
-/*[[[head:libd__set_errno,hash:CRC-32=0xd9d75bda]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.errno_access") errno_t
+/*[[[head:libd__set_errno,hash:CRC-32=0x727b5373]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.errno_access") errno_t
 NOTHROW_NCX(LIBDCALL libd__set_errno)(errno_t err)
 /*[[[body:libd__set_errno]]]*/
 {
@@ -2830,8 +2830,8 @@ NOTHROW_NCX(LIBCCALL libc__set_errno)(errno_t err)
 }
 /*[[[end:libc__set_errno]]]*/
 
-/*[[[head:libd__get_doserrno,hash:CRC-32=0xbb969dc6]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.errno") errno_t
+/*[[[head:libd__get_doserrno,hash:CRC-32=0xfeffb474]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.errno") errno_t
 NOTHROW_NCX(LIBDCALL libd__get_doserrno)(u32 *perr)
 /*[[[body:libd__get_doserrno]]]*/
 {
@@ -2978,8 +2978,8 @@ NOTHROW_NCX(LIBCCALL libc__set_abort_behavior)(unsigned int flags,
 
 
 
-/*[[[head:libd__wsearchenv_s,hash:CRC-32=0x39e33fd3]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 2, 3)) errno_t
+/*[[[head:libd__wsearchenv_s,hash:CRC-32=0xac90f019]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 2, 3)) errno_t
 NOTHROW_RPC(LIBDCALL libd__wsearchenv_s)(char16_t const *file,
                                          char16_t const *envvar,
                                          char16_t *__restrict resultpath,
@@ -3127,10 +3127,10 @@ NOTHROW_NCX(LIBCCALL libc_dehumanize_number)(char const *str,
 }
 /*[[[end:libc_dehumanize_number]]]*/
 
-/*[[[head:libd_setproctitle,hash:CRC-32=0x92733881]]]*/
+/*[[[head:libd_setproctitle,hash:CRC-32=0xf7549bc0]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 /* >> setproctitle(3) */
-INTERN ATTR_SECTION(".text.crt.dos.bsd") ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.bsd") ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) void
 NOTHROW_NCX(VLIBDCALL libd_setproctitle)(char const *format,
                                          ...)
 /*[[[body:libd_setproctitle]]]*/

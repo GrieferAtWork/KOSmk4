@@ -83,7 +83,7 @@ INTDEF void /*ASMCALL*/ libc_sig_restore(void);
 
 
 
-/*[[[head:libd_raise,hash:CRC-32=0xeb3b73a9]]]*/
+/*[[[head:libd_raise,hash:CRC-32=0xac7f2574]]]*/
 /* >> raise(3)
  * Raise a signal within the current thread.
  * In  a *-threaded process this is same as:
@@ -91,7 +91,7 @@ INTDEF void /*ASMCALL*/ libc_sig_restore(void);
  *   *=single: `kill(getpid(), signo)'
  * @return: 0:  Success
  * @return: -1: [errno=EINVAL] The given `signo' is invalid */
-INTERN ATTR_SECTION(".text.crt.dos.sched.signal") int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.sched.signal") int
 NOTHROW_NCX(LIBDCALL libd_raise)(signo_t signo)
 /*[[[body:libd_raise]]]*/
 {
@@ -117,7 +117,7 @@ NOTHROW_NCX(LIBCCALL libc_raise)(signo_t signo)
 }
 /*[[[end:libc_raise]]]*/
 
-/*[[[head:libd_sysv_signal,hash:CRC-32=0xa472bfcf]]]*/
+/*[[[head:libd_sysv_signal,hash:CRC-32=0xa4f3e276]]]*/
 /* >> sysv_signal(3)
  * Wrapper for `sigaction(2)' to establish a signal handler as:
  *     >> struct sigaction act, oact
@@ -129,7 +129,7 @@ NOTHROW_NCX(LIBCCALL libc_raise)(signo_t signo)
  *     >> return oact.sa_handler;
  * @return: * :      The previous signal handler function.
  * @return: SIG_ERR: Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.dos.sched.signal") sighandler_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.sched.signal") sighandler_t
 NOTHROW_NCX(LIBDCALL libd_sysv_signal)(signo_t signo,
                                        sighandler_t handler)
 /*[[[body:libd_sysv_signal]]]*/
@@ -320,7 +320,7 @@ NOTHROW_NCX(LIBCCALL libc_bsd_signal)(signo_t signo,
 }
 /*[[[end:libc_bsd_signal]]]*/
 
-/*[[[head:libd_bsd_signal,hash:CRC-32=0x1a7cc9f2]]]*/
+/*[[[head:libd_bsd_signal,hash:CRC-32=0xefea7f20]]]*/
 /* >> bsd_signal(3)
  * Wrapper for `sigaction(2)' to establish a signal handler as:
  *     >> struct sigaction act, oact
@@ -337,7 +337,7 @@ NOTHROW_NCX(LIBCCALL libc_bsd_signal)(signo_t signo,
  *     argument
  * @return: * :      The previous signal handler function.
  * @return: SIG_ERR: Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.dos.sched.signal") sighandler_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.sched.signal") sighandler_t
 NOTHROW_NCX(LIBDCALL libd_bsd_signal)(signo_t signo,
                                       sighandler_t handler)
 /*[[[body:libd_bsd_signal]]]*/

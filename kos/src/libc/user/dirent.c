@@ -82,10 +82,10 @@ PRIVATE ATTR_SECTION(".bss.crt.fs.dir") size_t dirbuf_compat_offset = 0;
 
 
 
-/*[[[head:libd_opendir,hash:CRC-32=0x338c7c26]]]*/
+/*[[[head:libd_opendir,hash:CRC-32=0x50ddf814]]]*/
 /* >> opendir(3)
  * Open and return a new directory stream for reading, referring to `name' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((1)) DIR *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((1)) DIR *
 NOTHROW_RPC(LIBDCALL libd_opendir)(char const *name)
 /*[[[body:libd_opendir]]]*/
 {
@@ -113,10 +113,10 @@ err:
 }
 /*[[[end:libc_opendir]]]*/
 
-/*[[[head:libd_fopendirat,hash:CRC-32=0xd310085e]]]*/
+/*[[[head:libd_fopendirat,hash:CRC-32=0xba8b7129]]]*/
 /* >> fopendirat(3)
  * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((2)) DIR *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((2)) DIR *
 NOTHROW_RPC(LIBDCALL libd_fopendirat)(fd_t dirfd,
                                       char const *name,
                                       oflag_t oflags)
@@ -150,10 +150,10 @@ err:
 }
 /*[[[end:libc_fopendirat]]]*/
 
-/*[[[head:libd_opendirat,hash:CRC-32=0x18217be4]]]*/
+/*[[[head:libd_opendirat,hash:CRC-32=0xa408c21d]]]*/
 /* >> opendirat(3)
  * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((2)) DIR *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((2)) DIR *
 NOTHROW_RPC(LIBDCALL libd_opendirat)(fd_t dirfd,
                                      char const *name)
 /*[[[body:libd_opendirat]]]*/

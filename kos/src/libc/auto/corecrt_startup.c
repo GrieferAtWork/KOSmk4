@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4dc7ab85 */
+/* HASH CRC-32:0x38fbda2b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,41 +33,41 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST WUNUSED _crt_app_type
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST WUNUSED _crt_app_type
 NOTHROW_NCX(LIBDCALL libc__query_app_type)(void) {
 	return (_crt_app_type)1;
 }
-INTERN ATTR_SECTION(".text.crt.dos.application.init") errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") errno_t
 NOTHROW_NCX(LIBDCALL libc__configure_narrow_argv)(_crt_argv_mode mode) {
 	COMPILER_IMPURE();
 	(void)mode;
 	return 0;
 }
 DEFINE_INTERN_ALIAS(libc__configure_wide_argv, libc_libc__configure_narrow_argv);
-INTERN ATTR_SECTION(".text.crt.dos.application.init") int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") int
 NOTHROW_NCX(LIBDCALL libc__initialize_narrow_environment)(void) {
 	COMPILER_IMPURE();
 	return 0;
 }
 DEFINE_INTERN_ALIAS(libc__initialize_wide_environment, libc_libc__initialize_narrow_environment);
-INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_PURE WUNUSED char **
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") ATTR_PURE WUNUSED char **
 NOTHROW_NCX(LIBDCALL libc__get_initial_narrow_environment)(void) {
 	return *libc___p___initenv();
 }
-INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_PURE WUNUSED __WCHAR16_TYPE__ **
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") ATTR_PURE WUNUSED __WCHAR16_TYPE__ **
 NOTHROW_NCX(LIBDCALL libc__get_initial_wide_environment)(void) {
 	return (__WCHAR16_TYPE__ **)*libd___p___winitenv();
 }
-INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_PURE WUNUSED char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") ATTR_PURE WUNUSED char *
 NOTHROW_NCX(LIBDCALL libc__get_narrow_winmain_command_line)(void) {
 	return *libc___p__acmdln();
 }
-INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_PURE WUNUSED __WCHAR16_TYPE__ *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") ATTR_PURE WUNUSED __WCHAR16_TYPE__ *
 NOTHROW_NCX(LIBDCALL libc__get_wide_winmain_command_line)(void) {
 	return (__WCHAR16_TYPE__ *)*libc___p__wcmdln();
 }
 #include <asm/os/syslog.h>
-INTERN ATTR_SECTION(".text.crt.dos.application.init") void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") void
 NOTHROW_NCX(LIBDCALL libc__initterm)(_PVFV *start,
                                      _PVFV *end) {
 	for (; start < end; ++start) {
@@ -83,7 +83,7 @@ NOTHROW_NCX(LIBDCALL libc__initterm)(_PVFV *start,
 
 }
 #include <asm/os/syslog.h>
-INTERN ATTR_SECTION(".text.crt.dos.application.init") int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") int
 NOTHROW_NCX(LIBDCALL libc__initterm_e)(_onexit_t *start,
                                        _onexit_t *end) {
 	int result = 0;
@@ -106,7 +106,7 @@ NOTHROW_NCX(LIBDCALL libc__initterm_e)(_onexit_t *start,
 
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.application.init") int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") int
 NOTHROW_NCX(LIBDCALL libc__initialize_onexit_table)(struct _onexit_table_t *self) {
 	if unlikely(!self)
 		return -1;
@@ -114,7 +114,7 @@ NOTHROW_NCX(LIBDCALL libc__initialize_onexit_table)(struct _onexit_table_t *self
 	return 0;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.application.init") int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") int
 NOTHROW_NCX(LIBDCALL libc__register_onexit_function)(struct _onexit_table_t *self,
                                                      _onexit_t function) {
 	if unlikely(!self)
@@ -134,7 +134,7 @@ NOTHROW_NCX(LIBDCALL libc__register_onexit_function)(struct _onexit_table_t *sel
 	*self->_last++ = (_PVFV)function;
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.application.init") int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") int
 NOTHROW_NCX(LIBDCALL libc__execute_onexit_table)(struct _onexit_table_t *self) {
 	int result;
 	_onexit_t *first = (_onexit_t *)self->_first;
@@ -147,7 +147,7 @@ NOTHROW_NCX(LIBDCALL libc__execute_onexit_table)(struct _onexit_table_t *self) {
 	return result;
 }
 #include <corecrt_startup.h>
-INTERN ATTR_SECTION(".text.crt.dos.application.init") NONNULL((2, 3)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") NONNULL((2, 3)) int
 NOTHROW_NCX(LIBDCALL libc___dllonexit)(_onexit_t func,
                                        _onexit_t **p_begin,
                                        _onexit_t **p_end) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x159d90d6 */
+/* HASH CRC-32:0x3613927a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_wremove)(char16_t const *filename) {
 
 	return libd_wremoveat(__AT_FDCWD, filename);
@@ -67,7 +67,7 @@ NOTHROW_RPC(LIBKCALL libc_wremove)(char32_t const *filename) {
 
 
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBDCALL libd_wrename)(char16_t const *oldname,
                                    char16_t const *newname_or_path) {
 
@@ -121,7 +121,7 @@ NOTHROW_RPC(LIBKCALL libc_wrename)(char32_t const *oldname,
 
 
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((2, 4)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((2, 4)) int
 NOTHROW_RPC(LIBDCALL libd_wrenameat)(fd_t oldfd,
                                      char16_t const *oldname,
                                      fd_t newfd,
@@ -180,7 +180,7 @@ NOTHROW_RPC(LIBKCALL libc_wrenameat)(fd_t oldfd,
 
 }
 #include <asm/os/fcntl.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((2)) int
 NOTHROW_RPC(LIBDCALL libd_wremoveat)(fd_t dirfd,
                                      char16_t const *filename) {
 
@@ -217,7 +217,7 @@ NOTHROW_RPC(LIBKCALL libc_wremoveat)(fd_t dirfd,
 
 
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((2, 4)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((2, 4)) int
 NOTHROW_RPC(LIBDCALL libd_wrenameat2)(fd_t oldfd,
                                       char16_t const *oldname,
                                       fd_t newfd,
@@ -269,7 +269,7 @@ NOTHROW_RPC(LIBKCALL libc_wrenameat2)(fd_t oldfd,
 
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
 NOTHROW_NCX(LIBDCALL libd_wfopen)(char16_t const *filename,
                                   char16_t const *mode) {
 	FILE *result = NULL;
@@ -315,7 +315,7 @@ done_utf8_filename:
 done:
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
 NOTHROW_NCX(LIBDCALL libd_wfreopen)(char16_t const *filename,
                                     char16_t const *mode,
                                     FILE *stream) {
@@ -363,7 +363,7 @@ done_utf8_filename:
 done:
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
 NOTHROW_NCX(LIBDCALL libd_wpopen)(char16_t const *command,
                                   char16_t const *mode) {
 	FILE *result = NULL;

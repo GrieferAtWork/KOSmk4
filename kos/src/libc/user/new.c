@@ -27,8 +27,8 @@
 
 DECL_BEGIN
 
-/*[[[head:libc__query_new_handler,hash:CRC-32=0xcae95eef]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.malloc") _PNH
+/*[[[head:libc__query_new_handler,hash:CRC-32=0x7c1b32c3]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.malloc") _PNH
 NOTHROW_NCX(LIBDCALL libc__query_new_handler)(void)
 /*[[[body:libc__query_new_handler]]]*/
 /*AUTO*/{
@@ -38,8 +38,8 @@ NOTHROW_NCX(LIBDCALL libc__query_new_handler)(void)
 }
 /*[[[end:libc__query_new_handler]]]*/
 
-/*[[[head:libc__set_new_handler,hash:CRC-32=0x507e9bf3]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.malloc") _PNH
+/*[[[head:libc__set_new_handler,hash:CRC-32=0x8c8d8428]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.malloc") _PNH
 NOTHROW_NCX(LIBDCALL libc__set_new_handler)(_PNH newhandler)
 /*[[[body:libc__set_new_handler]]]*/
 /*AUTO*/{
@@ -50,8 +50,8 @@ NOTHROW_NCX(LIBDCALL libc__set_new_handler)(_PNH newhandler)
 }
 /*[[[end:libc__set_new_handler]]]*/
 
-/*[[[head:libc__query_new_mode,hash:CRC-32=0x609448a]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.malloc") int
+/*[[[head:libc__query_new_mode,hash:CRC-32=0xb07c83a7]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.malloc") int
 NOTHROW_NCX(LIBDCALL libc__query_new_mode)(void)
 /*[[[body:libc__query_new_mode]]]*/
 /*AUTO*/{
@@ -61,8 +61,8 @@ NOTHROW_NCX(LIBDCALL libc__query_new_mode)(void)
 }
 /*[[[end:libc__query_new_mode]]]*/
 
-/*[[[head:libc__set_new_mode,hash:CRC-32=0x3582281d]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.malloc") int
+/*[[[head:libc__set_new_mode,hash:CRC-32=0x7ecb692]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.malloc") int
 NOTHROW_NCX(LIBDCALL libc__set_new_mode)(int newmode)
 /*[[[body:libc__set_new_mode]]]*/
 /*AUTO*/{

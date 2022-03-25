@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8cba005 */
+/* HASH CRC-32:0x9a083a1a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") char *
 NOTHROW_RPC(LIBDCALL libd__getdcwd)(int drive,
                                     char *buf,
                                     size_t size) {
@@ -76,7 +76,7 @@ NOTHROW_RPC(LIBCCALL libc__chdrive)(int drive) {
 	}
 	return libc_fchdir(__AT_FDDRIVE_ROOT(drive));
 }
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd__mkdir)(char const *path) {
 	return libd_mkdir(path, 0755);
 }

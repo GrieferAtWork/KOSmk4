@@ -27,8 +27,8 @@
 
 DECL_BEGIN
 
-/*[[[head:libd___conio_common_vcwscanf,hash:CRC-32=0x2b0a341b]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_LIBC_C16SCANF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T
+/*[[[head:libd___conio_common_vcwscanf,hash:CRC-32=0xf8bcf677]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_LIBC_C16SCANF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd___conio_common_vcwscanf)(uint64_t options,
                                                    char16_t const *format,
                                                    locale_t locale,

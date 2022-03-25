@@ -3130,6 +3130,9 @@ class LibraryFunctionBinding {
 	@@NOTE: Ignored when binding isn't a @FunctionImplementation
 	public member implSection: string | UserString | none = none;
 
+	@@Some extra attributes to inject into the in-library implementation
+	public member extraAttributes: {string | UserString...} | none = none;
+
 	@@Returns @binding, but unwind @Callable wrappers
 	public property functionBinding: FunctionImplementation | string | UserString = {
 		get(): FunctionImplementation | string | UserString {
@@ -3324,13 +3327,18 @@ class LibraryFunction {
 					}
 					if (doc)
 						fp.printComment(doc);
+					local extraAttributes = bind.extraAttributes;
+					if (bind.implSection !is none) {
+						if (extraAttributes is none)
+							extraAttributes = ();
+						extraAttributes = List(extraAttributes);
+						extraAttributes.append("ATTR_SECTION({!r})".format({ bind.implSection }));
+					}
 					proto.cprintDeclarationWithoutTerminator(
 						fp, escapeMode,
 						decl:                 decl,
 						exposedName:          this.name,
-						injectedAttributes:   bind.implSection !is none
-							? { "ATTR_SECTION({!r})".format({ bind.implSection }) }
-							: none,
+						injectedAttributes:   extraAttributes,
 						breakAfterReturnType: true,
 						oneArgumentPerLine:   true);
 					fp << " ";
@@ -3702,7 +3710,7 @@ class SystemHeader {
 			"\n";
 		for (local part: order_libcAutoSource) {
 			if (part is LibraryFunction) {
-				part.cprintInLibraryAutoImplementation(fp, ESCAPE_MODE_NONE, "INTERN");
+				part.cprintInLibraryAutoImplementation(fp, ESCAPE_MODE_NONE, decl: "INTERN");
 			} else {
 				fp << part;
 			}

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7ce81e3 */
+/* HASH CRC-32:0x25352ed0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 #include <asm/os/stat.h>
 /* >> mkfifo(2) */
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_mkfifo)(char const *fifoname,
                                   mode_t mode) {
 	return libd_mknod(fifoname, mode | __S_IFIFO, 0);
@@ -45,7 +45,7 @@ NOTHROW_RPC(LIBCCALL libc_mkfifo)(char const *fifoname,
 }
 #include <asm/os/stat.h>
 /* >> mkfifoat(2) */
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2)) int
 NOTHROW_RPC(LIBDCALL libd_mkfifoat)(fd_t dirfd,
                                     char const *fifoname,
                                     mode_t mode) {

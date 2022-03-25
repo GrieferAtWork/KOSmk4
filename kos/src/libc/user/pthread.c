@@ -459,7 +459,7 @@ libd_pthread_create_wrapper(struct libd_pthread_create_wrapper_struct *arg) {
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL */
 
-/*[[[head:libd_pthread_create,hash:CRC-32=0x59f6dcfd]]]*/
+/*[[[head:libd_pthread_create,hash:CRC-32=0x993187b7]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 /* >> pthread_create(3)
  * Create a  new thread,  starting with  execution of  `start_routine'
@@ -469,7 +469,7 @@ libd_pthread_create_wrapper(struct libd_pthread_create_wrapper_struct *arg) {
  * @return: EAGAIN: Insufficient resources, or operation-not-permitted
  *                  (read: `ENOMEM', but posix didn't want to use that
  *                  errno for whatever reason...) */
-INTERN ATTR_SECTION(".text.crt.dos.sched.pthread") NONNULL((1, 3)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.sched.pthread") NONNULL((1, 3)) errno_t
 NOTHROW_NCX(LIBDCALL libd_pthread_create)(pthread_t *__restrict newthread,
                                           pthread_attr_t const *__restrict attr,
                                           void *(LIBDCALL *start_routine)(void *arg),

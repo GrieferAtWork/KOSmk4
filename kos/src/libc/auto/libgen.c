@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97a9487c */
+/* HASH CRC-32:0xcd8fdb2d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -351,7 +351,7 @@ err_r:
 err:
 	return NULL;
 }
-INTERN ATTR_SECTION(".text.crt.dos.solaris") NONNULL((1, 2)) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") NONNULL((1, 2)) char *
 NOTHROW_NCX(LIBDCALL libd_copylist_sz)(char const *filename,
                                        size_t *p_filesize) {
 	char *result;
@@ -423,7 +423,7 @@ NOTHROW_NCX(LIBCCALL libc_copylist_sz)(char const *filename,
  *      -> copylist64() is identical to copylist() because pos_t is  always
  *         64-bit, meaning that its existence isn't explicitly warranted on
  *         this architecture. */
-INTERN ATTR_SECTION(".text.crt.dos.solaris") WUNUSED NONNULL((1, 2)) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") WUNUSED NONNULL((1, 2)) char *
 NOTHROW_RPC(LIBDCALL libd_copylist)(char const *filename,
                                     __PIO_OFFSET *p_filesize) {
 #if __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__
@@ -551,7 +551,7 @@ NOTHROW_RPC(LIBCCALL libc_copylist)(char const *filename,
  *      -> copylist64() is identical to copylist() because pos_t is  always
  *         64-bit, meaning that its existence isn't explicitly warranted on
  *         this architecture. */
-INTERN ATTR_SECTION(".text.crt.dos.solaris") WUNUSED NONNULL((1, 2)) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") WUNUSED NONNULL((1, 2)) char *
 NOTHROW_RPC(LIBDCALL libd_copylist64)(char const *filename,
                                       __PIO_OFFSET64 *p_filesize) {
 #if __SIZEOF_OFF64_T__ == __SIZEOF_SIZE_T__

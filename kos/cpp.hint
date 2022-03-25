@@ -743,6 +743,8 @@
 #define ATTR_LIBC_C32SCANF(a,b)
 #define __ATTR_LIBC_C32FTIME(a,b)
 #define ATTR_LIBC_C32FTIME(a,b)
+#define __ATTR_OPTIMIZE_SIZE
+#define ATTR_OPTIMIZE_SIZE
 
 #define __DECL_SIMD_cos
 #define __DECL_SIMD_cosf

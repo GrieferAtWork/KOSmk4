@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54852042 */
+/* HASH CRC-32:0x3c22961d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -283,7 +283,7 @@ NOTHROW_NCX(LIBCCALL libc__vcscanf_s)(char const *format,
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTERN ATTR_SECTION(".text.crt.dos.conio") ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.conio") ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__cprintf)(char const *format,
                                      ...) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -307,7 +307,7 @@ NOTHROW_NCX(VLIBCCALL libc__cprintf)(char const *format,
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTERN ATTR_SECTION(".text.crt.dos.conio") ATTR_LIBC_PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.conio") ATTR_LIBC_PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__cprintf_l)(char const *format,
                                        locale_t locale,
                                        ...) {
@@ -333,7 +333,7 @@ NOTHROW_NCX(VLIBCCALL libc__cprintf_l)(char const *format,
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTERN ATTR_SECTION(".text.crt.dos.conio") ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.conio") ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__cprintf_s)(char const *format,
                                        ...) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -357,7 +357,7 @@ NOTHROW_NCX(VLIBCCALL libc__cprintf_s)(char const *format,
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTERN ATTR_SECTION(".text.crt.dos.conio") ATTR_LIBC_PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.conio") ATTR_LIBC_PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__cprintf_s_l)(char const *format,
                                          locale_t locale,
                                          ...) {
@@ -395,7 +395,7 @@ DEFINE_INTERN_ALIAS(libd__cprintf_p_l, libd__cprintf_l);
 DEFINE_INTERN_ALIAS(libc__cprintf_p_l, libc__cprintf_l);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__cscanf)(char const *format,
                                     ...) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -419,7 +419,7 @@ NOTHROW_NCX(VLIBCCALL libc__cscanf)(char const *format,
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_LIBC_SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_LIBC_SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__cscanf_l)(char const *format,
                                       locale_t locale,
                                       ...) {
@@ -445,7 +445,7 @@ NOTHROW_NCX(VLIBCCALL libc__cscanf_l)(char const *format,
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__cscanf_s)(char const *format,
                                       ...) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -469,7 +469,7 @@ NOTHROW_NCX(VLIBCCALL libc__cscanf_s)(char const *format,
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_LIBC_SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_LIBC_SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__cscanf_s_l)(char const *format,
                                         locale_t locale,
                                         ...) {

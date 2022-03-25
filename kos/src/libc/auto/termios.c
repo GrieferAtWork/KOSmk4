@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c2df7a4 */
+/* HASH CRC-32:0xf6e8c638 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,23 +76,23 @@ NOTHROW_NCX(LIBCCALL libc_tcsetattr)(fd_t fd,
 	int cmd;
 	switch (optional_actions) {
 
-#if defined(__TCSANOW) && defined(__TCSETA)
+
 	case __TCSANOW:
 		cmd = __TCSETA;
 		break;
-#endif /* __TCSANOW && __TCSETA */
 
-#if defined(__TCSADRAIN) && defined(__TCSETAW)
+
+
 	case __TCSADRAIN:
 		cmd = __TCSETAW;
 		break;
-#endif /* __TCSADRAIN && __TCSETAW */
 
-#if defined(__TCSAFLUSH) && defined(__TCSETAF)
+
+
 	case __TCSAFLUSH:
 		cmd = __TCSETAF;
 		break;
-#endif /* __TCSAFLUSH && __TCSETAF */
+
 
 	default:
 

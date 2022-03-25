@@ -25,9 +25,9 @@
 
 DECL_BEGIN
 
-/*[[[head:libd_strfmon,hash:CRC-32=0x7435bd4d]]]*/
+/*[[[head:libd_strfmon,hash:CRC-32=0xfc9bf649]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
-INTERN ATTR_SECTION(".text.crt.dos.utility.monetary") ATTR_LIBC_STRFMON(3, 4) NONNULL((1, 3)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.monetary") ATTR_LIBC_STRFMON(3, 4) NONNULL((1, 3)) ssize_t
 NOTHROW_NCX(VLIBDCALL libd_strfmon)(char *__restrict s,
                                     size_t maxsize,
                                     char const *__restrict format,
@@ -61,9 +61,9 @@ NOTHROW_NCX(VLIBCCALL libc_strfmon)(char *__restrict s,
 }
 /*[[[end:libc_strfmon]]]*/
 
-/*[[[head:libd_strfmon_l,hash:CRC-32=0xe458adb]]]*/
+/*[[[head:libd_strfmon_l,hash:CRC-32=0xc7fee8ed]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
-INTERN ATTR_SECTION(".text.crt.dos.utility.monetary") ATTR_LIBC_STRFMON(4, 5) NONNULL((1, 4)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.monetary") ATTR_LIBC_STRFMON(4, 5) NONNULL((1, 4)) ssize_t
 NOTHROW_NCX(VLIBDCALL libd_strfmon_l)(char *__restrict s,
                                       size_t maxsize,
                                       locale_t loc,

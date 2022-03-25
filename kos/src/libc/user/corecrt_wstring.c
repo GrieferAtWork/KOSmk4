@@ -27,8 +27,8 @@
 
 DECL_BEGIN
 
-/*[[[head:libd__wcserror,hash:CRC-32=0x93a8bba0]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") char16_t *
+/*[[[head:libd__wcserror,hash:CRC-32=0xfb9acc95]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.errno") char16_t *
 NOTHROW_NCX(LIBDCALL libd__wcserror)(errno_t errno_value)
 /*[[[body:libd__wcserror]]]*/
 /*AUTO*/{
@@ -51,8 +51,8 @@ NOTHROW_NCX(LIBKCALL libc__wcserror)(errno_t errno_value)
 }
 /*[[[end:libc__wcserror]]]*/
 
-/*[[[head:libd__wcserror_s,hash:CRC-32=0x24583f55]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") errno_t
+/*[[[head:libd__wcserror_s,hash:CRC-32=0xd0f8eaf5]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.errno") errno_t
 NOTHROW_NCX(LIBDCALL libd__wcserror_s)(char16_t *buf,
                                        size_t bufsize,
                                        errno_t errno_value)
@@ -81,8 +81,8 @@ NOTHROW_NCX(LIBKCALL libc__wcserror_s)(char32_t *buf,
 }
 /*[[[end:libc__wcserror_s]]]*/
 
-/*[[[head:libd___wcserror,hash:CRC-32=0x94426558]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") char16_t *
+/*[[[head:libd___wcserror,hash:CRC-32=0x81a01ada]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.errno") char16_t *
 NOTHROW_NCX(LIBDCALL libd___wcserror)(char16_t const *message)
 /*[[[body:libd___wcserror]]]*/
 /*AUTO*/{
@@ -105,8 +105,8 @@ NOTHROW_NCX(LIBKCALL libc___wcserror)(char32_t const *message)
 }
 /*[[[end:libc___wcserror]]]*/
 
-/*[[[head:libd___wcserror_s,hash:CRC-32=0x1c1899a8]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") errno_t
+/*[[[head:libd___wcserror_s,hash:CRC-32=0x6063d93c]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.errno") errno_t
 NOTHROW_NCX(LIBDCALL libd___wcserror_s)(char16_t *buf,
                                         size_t bufsize,
                                         char16_t const *message)

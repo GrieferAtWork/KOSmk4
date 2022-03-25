@@ -216,6 +216,20 @@ __asm__("_Unwind_Resume = libc_Unwind_Resume");
 #define ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALL_DEFAULT_ALIGNED
 #define ATTR_MALL_PAGEALIGNED     __ATTR_MALL_PAGEALIGNED
 
+
+/* Extra  attribute for CRT functions that should be optimized for size
+ * rather than speed when it comes to optimizing builds of the library.
+ *
+ * By  default,  magic sets  this attribute  for the  DOS variants  of all
+ * functions, but this can be turned off with [[no_crt_dos_optimize_size]] */
+#ifndef ATTR_OPTIMIZE_SIZE
+#ifdef __OPTIMIZE__
+#define ATTR_OPTIMIZE_SIZE __ATTR_OPTIMIZE("-Os")
+#else /* __OPTIMIZE__ */
+#define ATTR_OPTIMIZE_SIZE /* nothing */
+#endif /* !__OPTIMIZE__ */
+#endif /* !ATTR_OPTIMIZE_SIZE */
+
 /* Attribute for global data that is mostly read from */
 #ifndef ATTR_READMOSTLY
 #define ATTR_READMOSTLY ATTR_SECTION(".data.read_mostly")

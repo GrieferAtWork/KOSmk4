@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f4899c0 */
+/* HASH CRC-32:0xccd320e0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,7 +65,7 @@ NOTHROW_NCX(LIBCCALL libc__Getdays)(void) {
 	return result;
 }
 #include <asm/crt/langinfo.h>
-INTERN ATTR_SECTION(".text.crt.dos.i18n") WUNUSED char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.i18n") WUNUSED char16_t *
 NOTHROW_NCX(LIBDCALL libd__W_Getdays)(void) {
 	/* Essentially, we do:
 	 * >> wcsdup(L":Sun:Sunday:Mon:Monday:Tue:Tuesday:Wed:Wednesday:Thu:Thursday:Fri:Friday:Sat:Saturday") */
@@ -167,7 +167,7 @@ NOTHROW_NCX(LIBCCALL libc__Getmonths)(void) {
 	return result;
 }
 #include <asm/crt/langinfo.h>
-INTERN ATTR_SECTION(".text.crt.dos.i18n") WUNUSED char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.i18n") WUNUSED char16_t *
 NOTHROW_NCX(LIBDCALL libd__W_Getmonths)(void) {
 	/* Essentially, we do:
 	 * >> wcsdup(L":Jan:January:Feb:February:Mar:March:Apr:April:May:May:Jun:June:Jul:July:Aug:August:Sep:September:Oct:October:Nov:November:Dec:December") */

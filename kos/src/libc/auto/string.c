@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a5710d2 */
+/* HASH CRC-32:0x7fb40c67 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -351,7 +351,7 @@ NOTHROW_NCX(LIBCCALL libc_strxfrm)(char *dst,
 }
 #endif /* !LIBC_ARCH_HAVE_STRXFRM */
 #include <libc/template/itoa_digits.h>
-INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.errno") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
 NOTHROW_NCX(LIBDCALL libd_strerror)(errno_t errnum) {
 	static char strerror_buf[64];
 	char *result;
@@ -474,7 +474,7 @@ NOTHROW_NCX(LIBCCALL libc_strerror_l)(int errnum,
 	(void)locale;
 	return libc_strerror(errnum);
 }
-INTERN ATTR_SECTION(".text.crt.dos.string.memory.strsignal") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.string.memory.strsignal") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
 NOTHROW_NCX(LIBDCALL libd_strsignal)(signo_t signo) {
 	static char strsignal_buf[64];
 	char *result = strsignal_buf;
@@ -801,7 +801,7 @@ NOTHROW_NCX(LIBCCALL libc_strncasecmp_l)(char const *s1,
 	(void)locale;
 	return libc_strncasecmp(s1, s2, maxlen);
 }
-INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST WUNUSED char const *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST WUNUSED char const *
 NOTHROW(LIBDCALL libd_strerrordesc_np)(errno_t errnum) {
 	char const *result;
 	result = libd_strerrorname_np(errnum);
@@ -1280,7 +1280,7 @@ NOTHROW(LIBCCALL libc_strerrordesc_np)(errno_t errnum) {
 
 }
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST WUNUSED char const *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST WUNUSED char const *
 NOTHROW(LIBDCALL libd_strerrorname_np)(errno_t errnum) {
 	/* Special handling for a hand full of errno
 	 * values that don't  have KOS  equivalents. */
@@ -2062,7 +2062,7 @@ print("	};");
 }
 #ifndef __KERNEL__
 #include <hybrid/__assert.h>
-INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_COLD ATTR_RETNONNULL NONNULL((2)) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.errno") ATTR_COLD ATTR_RETNONNULL NONNULL((2)) char *
 NOTHROW_NCX(LIBDCALL libd_strerror_r)(errno_t errnum,
                                       char *buf,
                                       size_t buflen) {
@@ -4527,7 +4527,7 @@ NOTHROW_NCX(LIBCCALL libc_vstrdupf)(char const *__restrict format,
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strdupf(3), vstrdupf(3)
  * Print the given `format' into a newly allocated, heap-allocated string */
-INTERN ATTR_SECTION(".text.crt.dos.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) char *
 NOTHROW_NCX(VLIBDCALL libd_strdupf)(char const *__restrict format,
                                     ...) {
 	char * result;

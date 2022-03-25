@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46c09bf9 */
+/* HASH CRC-32:0x5803646e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ DECL_BEGIN
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> warn(3), vwarn(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
-INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(1, 2) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(1, 2) void
 (VLIBDCALL libd_warn)(char const *format,
                       ...) THROWS(...) {
 	va_list args;
@@ -67,7 +67,7 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 0) void
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> warnc(3), vwarnc(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
-INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(2, 3) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(2, 3) void
 (VLIBDCALL libd_warnc)(errno_t used_errno,
                        char const *format,
                        ...) THROWS(...) {
@@ -115,7 +115,7 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(2, 0) void
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> warnx(3), vwarnx(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>\n' */
-INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(1, 2) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(1, 2) void
 (VLIBDCALL libd_warnx)(char const *format,
                        ...) THROWS(...) {
 	va_list args;
@@ -157,7 +157,7 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 0) void
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> err(3), verr(3)
  * Same as `warn()', but follow up by calling `exit(status)' */
-INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void
 (VLIBDCALL libd_err)(int status,
                      char const *format,
                      ...) THROWS(...) {
@@ -190,7 +190,7 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 0) void
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> errc(3), verrc(3)
  * Same as `warnc()', but follow up by calling `exit(status)' */
-INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR_LIBC_PRINTF(3, 4) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR_LIBC_PRINTF(3, 4) void
 (VLIBDCALL libd_errc)(int status,
                       errno_t used_errno,
                       char const *format,
@@ -226,7 +226,7 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(3, 0) void
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> errx(3), verrx(3)
  * Same as `warnx()', but follow up by calling `exit(status)' */
-INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void
 (VLIBDCALL libd_errx)(int status,
                       char const *format,
                       ...) THROWS(...) {

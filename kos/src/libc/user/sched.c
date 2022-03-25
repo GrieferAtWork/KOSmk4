@@ -34,9 +34,9 @@ DECL_BEGIN
 /* Clone must be implemented in assembly! */
 /*[[[skip:libc_clone]]]*/
 
-/*[[[head:libd_clone,hash:CRC-32=0x61d7a9e7]]]*/
+/*[[[head:libd_clone,hash:CRC-32=0xcc621642]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
-INTERN ATTR_SECTION(".text.crt.dos.sched.access") NONNULL((1)) pid_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.sched.access") NONNULL((1)) pid_t
 NOTHROW_NCX(VLIBDCALL libd_clone)(int (LIBDCALL *fn)(void *arg),
                                   void *child_stack,
                                   int flags,

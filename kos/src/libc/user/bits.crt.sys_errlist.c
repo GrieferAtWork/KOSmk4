@@ -60,8 +60,8 @@ DEFINE_PUBLIC_IDATA_G(DOS$sys_errlist, libd___sys_errlist, DOS_ECOUNT * __SIZEOF
 DEFINE_PUBLIC_IDATA_G(DOS$_sys_errlist, libd___sys_errlist, DOS_ECOUNT * __SIZEOF_POINTER__);
 
 
-/*[[[head:libd___sys_errlist,hash:CRC-32=0x64e50929]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST ATTR_RETNONNULL WUNUSED char const *const *
+/*[[[head:libd___sys_errlist,hash:CRC-32=0xf8951d59]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST ATTR_RETNONNULL WUNUSED char const *const *
 NOTHROW(LIBDCALL libd___sys_errlist)(void)
 /*[[[body:libd___sys_errlist]]]*/
 {
@@ -102,8 +102,8 @@ NOTHROW(LIBCCALL libc___sys_errlist)(void)
 }
 /*[[[end:libc___sys_errlist]]]*/
 
-/*[[[head:libd___sys_nerr,hash:CRC-32=0x3fc139ba]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST ATTR_RETNONNULL WUNUSED int *
+/*[[[head:libd___sys_nerr,hash:CRC-32=0x3c6239c9]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST ATTR_RETNONNULL WUNUSED int *
 NOTHROW(LIBDCALL libd___sys_nerr)(void)
 /*[[[body:libd___sys_nerr]]]*/
 {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c22adc6 */
+/* HASH CRC-32:0xeb3821b0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3929,7 +3929,7 @@ NOTHROW(LIBCCALL libc_scalbl)(__LONGDOUBLE x,
 
 }
 /* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
-INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd___fpclassify)(double x) { return fptype_kos2dos(libc___fpclassify(x)); }
 #include <libm/fpclassify.h>
 /* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
@@ -3958,7 +3958,7 @@ NOTHROW(LIBCCALL libc___signbit)(double x) {
 
 }
 /* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
-INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd___fpclassifyf)(float x) { return fptype_kos2dos(libc___fpclassifyf(x)); }
 #include <libm/fpclassify.h>
 /* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
@@ -3993,7 +3993,7 @@ NOTHROW(LIBCCALL libc___signbitf)(float x) {
 
 }
 /* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
-INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd___fpclassifyl)(__LONGDOUBLE x) { return fptype_kos2dos(libc___fpclassifyl(x)); }
 #include <libm/fpclassify.h>
 /* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
@@ -4273,7 +4273,7 @@ NOTHROW(LIBCCALL libc___signgam)(void) {
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> _fdtest(3), _dtest(3), _ldtest(3) */
-INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_PURE WUNUSED NONNULL((1)) short
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.math.math") ATTR_PURE WUNUSED NONNULL((1)) short
 NOTHROW_NCX(LIBDCALL libd__dtest)(double __KOS_FIXED_CONST *px) {
 	return libd___fpclassify(*px);
 }
@@ -4283,7 +4283,7 @@ NOTHROW_NCX(LIBCCALL libc__dtest)(double __KOS_FIXED_CONST *px) {
 	return libc___fpclassify(*px);
 }
 /* >> _fdtest(3), _dtest(3), _ldtest(3) */
-INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_PURE WUNUSED NONNULL((1)) short
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.math.math") ATTR_PURE WUNUSED NONNULL((1)) short
 NOTHROW_NCX(LIBDCALL libd__fdtest)(float __KOS_FIXED_CONST *px) {
 	return libd___fpclassifyf(*px);
 }
@@ -4293,7 +4293,7 @@ NOTHROW_NCX(LIBCCALL libc__fdtest)(float __KOS_FIXED_CONST *px) {
 	return libc___fpclassifyf(*px);
 }
 /* >> _fdtest(3), _dtest(3), _ldtest(3) */
-INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_PURE WUNUSED NONNULL((1)) short
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.math.math") ATTR_PURE WUNUSED NONNULL((1)) short
 NOTHROW_NCX(LIBDCALL libd__ldtest)(__LONGDOUBLE __KOS_FIXED_CONST *px) {
 	return libd___fpclassifyl(*px);
 }

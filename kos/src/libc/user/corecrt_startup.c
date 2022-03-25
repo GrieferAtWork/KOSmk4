@@ -39,8 +39,8 @@
 
 DECL_BEGIN
 
-/*[[[head:libc__seh_filter_dll,hash:CRC-32=0xfa2f2623]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.application.init") NONNULL((2)) int
+/*[[[head:libc__seh_filter_dll,hash:CRC-32=0x55c5dda7]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") NONNULL((2)) int
 NOTHROW_NCX(LIBDCALL libc__seh_filter_dll)(__ULONG32_TYPE__ xno,
                                            struct _EXCEPTION_POINTERS *infp_ptrs)
 /*[[[body:libc__seh_filter_dll]]]*/
@@ -53,8 +53,8 @@ NOTHROW_NCX(LIBDCALL libc__seh_filter_dll)(__ULONG32_TYPE__ xno,
 }
 /*[[[end:libc__seh_filter_dll]]]*/
 
-/*[[[head:libc__seh_filter_exe,hash:CRC-32=0x596f3b5d]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.application.init") NONNULL((2)) int
+/*[[[head:libc__seh_filter_exe,hash:CRC-32=0xf685c0d9]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") NONNULL((2)) int
 NOTHROW_NCX(LIBDCALL libc__seh_filter_exe)(__ULONG32_TYPE__ xno,
                                            struct _EXCEPTION_POINTERS *infp_ptrs)
 /*[[[body:libc__seh_filter_exe]]]*/
@@ -67,8 +67,8 @@ NOTHROW_NCX(LIBDCALL libc__seh_filter_exe)(__ULONG32_TYPE__ xno,
 }
 /*[[[end:libc__seh_filter_exe]]]*/
 
-/*[[[head:libc__set_app_type,hash:CRC-32=0xce1d5c19]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.application.init") void
+/*[[[head:libc__set_app_type,hash:CRC-32=0xa24d1202]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") void
 NOTHROW_NCX(LIBDCALL libc__set_app_type)(_crt_app_type type)
 /*[[[body:libc__set_app_type]]]*/
 /*AUTO*/{
@@ -223,8 +223,8 @@ void LIBCCALL libc___p__acmdln_initialize(void) {
 	libc__acmdln = libc_construct_dos_commandline();
 }
 
-/*[[[head:libc___p__acmdln,hash:CRC-32=0xee025830]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.application.init") char **
+/*[[[head:libc___p__acmdln,hash:CRC-32=0xdc6cc6bf]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") char **
 NOTHROW_NCX(LIBDCALL libc___p__acmdln)(void)
 /*[[[body:libc___p__acmdln]]]*/
 {
@@ -256,8 +256,8 @@ void LIBCCALL libd___p__wcmdln_initialize(void) {
 	libd__wcmdln = libd_construct_dos_wcommandline();
 }
 
-/*[[[head:libc___p__wcmdln,hash:CRC-32=0x5dd0007e]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.application.init") __WCHAR16_TYPE__ **
+/*[[[head:libc___p__wcmdln,hash:CRC-32=0xb0bf62a]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") __WCHAR16_TYPE__ **
 NOTHROW_NCX(LIBDCALL libc___p__wcmdln)(void)
 /*[[[body:libc___p__wcmdln]]]*/
 {

@@ -57,10 +57,10 @@ NOTHROW_RPC(LIBKCALL libc_wttyname_r)(fd_t fd,
 }
 /*[[[end:libc_wttyname_r]]]*/
 
-/*[[[head:libd_wttyname_r,hash:CRC-32=0x9e01164a]]]*/
+/*[[[head:libd_wttyname_r,hash:CRC-32=0xee755add]]]*/
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-INTERN ATTR_SECTION(".text.crt.dos.unsorted") NONNULL((2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unsorted") NONNULL((2)) int
 NOTHROW_RPC(LIBDCALL libd_wttyname_r)(fd_t fd,
                                       char16_t *buf,
                                       size_t buflen)
@@ -87,8 +87,8 @@ NOTHROW_RPC(LIBKCALL libc_wreadlinkat)(fd_t dfd,
 }
 /*[[[end:libc_wreadlinkat]]]*/
 
-/*[[[head:libd_wreadlinkat,hash:CRC-32=0x1c63c70d]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.property") NONNULL((2, 3)) ssize_t
+/*[[[head:libd_wreadlinkat,hash:CRC-32=0x23d82705]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") NONNULL((2, 3)) ssize_t
 NOTHROW_RPC(LIBDCALL libd_wreadlinkat)(fd_t dfd,
                                        char16_t const *path,
                                        char16_t *buf,
@@ -119,8 +119,8 @@ NOTHROW_RPC(LIBKCALL libc_wfreadlinkat)(fd_t dfd,
 }
 /*[[[end:libc_wfreadlinkat]]]*/
 
-/*[[[head:libd_wfreadlinkat,hash:CRC-32=0xfb483361]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.property") NONNULL((2, 3)) ssize_t
+/*[[[head:libd_wfreadlinkat,hash:CRC-32=0x13af2b52]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") NONNULL((2, 3)) ssize_t
 NOTHROW_RPC(LIBDCALL libd_wfreadlinkat)(fd_t dfd,
                                         char16_t const *path,
                                         char16_t *buf,
@@ -150,8 +150,8 @@ NOTHROW_RPC(LIBKCALL libc_wreadlink)(char32_t const *path,
 }
 /*[[[end:libc_wreadlink]]]*/
 
-/*[[[head:libd_wreadlink,hash:CRC-32=0x3cb2a1c5]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.property") NONNULL((1, 2)) ssize_t
+/*[[[head:libd_wreadlink,hash:CRC-32=0x10d93971]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") NONNULL((1, 2)) ssize_t
 NOTHROW_RPC(LIBDCALL libd_wreadlink)(char16_t const *path,
                                      char16_t *buf,
                                      size_t buflen)

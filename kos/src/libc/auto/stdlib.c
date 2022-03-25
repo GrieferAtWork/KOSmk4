@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b2d2524 */
+/* HASH CRC-32:0x4d382ee6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,14 +54,14 @@ struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 {
 	int (LIBDCALL *compar)(void const *a, void const *b, void *arg);
 	void *arg;
 };
-PRIVATE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
+PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
 (LIBCCALL _dwrap_sTPTP_TDTPTPTP_c0A0A1c1)(void const *a,
                                           void const *b,
                                           struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 *c) THROWS(...) {
 	return (*c->compar)(a, b, c->arg);
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined */
-INTERN ATTR_SECTION(".text.crt.dos.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void *
 (LIBDCALL libd_bsearch_r)(void const *pkey,
                           void const *pbase,
                           size_t item_count,
@@ -121,14 +121,14 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #ifndef __dwrap_cTP_TDTPTPTP_CA0A1_defined
 #define __dwrap_cTP_TDTPTPTP_CA0A1_defined
-PRIVATE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
+PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
 (LIBCCALL _dwrap_cTP_TDTPTPTP_CA0A1)(void const *a,
                                      void const *b,
                                      int (LIBDCALL *c)(void const *a, void const *b)) THROWS(...) {
 	return (*c)(a, b);
 }
 #endif /* !__dwrap_cTP_TDTPTPTP_CA0A1_defined */
-INTERN ATTR_SECTION(".text.crt.dos.utility.stdlib") NONNULL((1, 4)) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") NONNULL((1, 4)) void
 (LIBDCALL libd_qsort)(void *pbase,
                       size_t item_count,
                       size_t item_size,
@@ -165,14 +165,14 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #ifndef __dwrap_cTP_TDTPTPTP_CA0A1_defined
 #define __dwrap_cTP_TDTPTPTP_CA0A1_defined
-PRIVATE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
+PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
 (LIBCCALL _dwrap_cTP_TDTPTPTP_CA0A1)(void const *a,
                                      void const *b,
                                      int (LIBDCALL *c)(void const *a, void const *b)) THROWS(...) {
 	return (*c)(a, b);
 }
 #endif /* !__dwrap_cTP_TDTPTPTP_CA0A1_defined */
-INTERN ATTR_SECTION(".text.crt.dos.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void *
 (LIBDCALL libd_bsearch)(void const *pkey,
                         void const *pbase,
                         size_t item_count,
@@ -259,7 +259,7 @@ NOTHROW_NCX(LIBCCALL libc_mblen)(char const *str,
                                  size_t maxlen) {
 	return libc_mbrlen(str, maxlen, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") int
 NOTHROW_NCX(LIBDCALL libd_mbtowc)(char16_t *__restrict pwc,
                                   char const *__restrict str,
                                   size_t maxlen) {
@@ -271,7 +271,7 @@ NOTHROW_NCX(LIBKCALL libc_mbtowc)(char32_t *__restrict pwc,
                                   size_t maxlen) {
 	return libc_mbrtowc(pwc, str, maxlen, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") int
 NOTHROW_NCX(LIBDCALL libd_wctomb)(char *str,
                                   char16_t wc) {
 	return libd_wcrtomb(str, wc, NULL);
@@ -281,7 +281,7 @@ NOTHROW_NCX(LIBKCALL libc_wctomb)(char *str,
                                   char32_t wc) {
 	return libc_wcrtomb(str, wc, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd_mbstowcs)(char16_t *__restrict dst,
                                     char const *__restrict src,
                                     size_t dstlen) {
@@ -293,7 +293,7 @@ NOTHROW_NCX(LIBKCALL libc_mbstowcs)(char32_t *__restrict dst,
                                     size_t dstlen) {
 	return libc_mbsrtowcs(dst, (char const **)&src, dstlen, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcstombs)(char *__restrict dst,
                                     char16_t const *__restrict src,
                                     size_t dstlen) {
@@ -1777,7 +1777,7 @@ NOTHROW_NCX(LIBCCALL libc_a64l)(char const *s) {
  * @param: resolved: A buffer of `PATH_MAX' bytes to-be filled with the resulting
  *                   path, or NULL  to automatically `malloc()'ate  and return  a
  *                   buffer of sufficient size. */
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED NONNULL((1)) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED NONNULL((1)) char *
 NOTHROW_RPC(LIBDCALL libd_realpath)(char const *filename,
                                     char *resolved) {
 
@@ -1810,7 +1810,7 @@ NOTHROW_RPC(LIBCCALL libc_realpath)(char const *filename,
  * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
  *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED char *
 NOTHROW_RPC(LIBDCALL libd_frealpath)(fd_t fd,
                                      char *resolved,
                                      size_t buflen) {
@@ -1953,7 +1953,7 @@ NOTHROW_NCX(LIBCCALL libc_unlockpt)(fd_t fd) {
 /* >> ptsname(3)
  * Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
-INTERN ATTR_SECTION(".text.crt.dos.io.tty") WUNUSED char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.io.tty") WUNUSED char *
 NOTHROW_NCX(LIBDCALL libd_ptsname)(fd_t fd) {
 	static char buf[64];
 	if unlikely(libd_ptsname_r(fd, buf, sizeof(buf)))
@@ -2304,7 +2304,7 @@ NOTHROW_RPC(LIBCCALL libc_shexec)(char const *command) {
 }
 #include <libc/template/program_invocation_name.h>
 /* Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
-INTERN ATTR_SECTION(".text.crt.dos.solaris") ATTR_CONST WUNUSED char const *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") ATTR_CONST WUNUSED char const *
 NOTHROW_NCX(LIBDCALL libd_getexecname)(void) {
 	return __LOCAL_program_invocation_name;
 }
@@ -2322,7 +2322,7 @@ struct _dwrap_cookie_struct_sTPTP_TDTPTIn__SIZEOF_FD_T___c0c1A1 {
 	int (LIBDCALL *walk)(void *arg, fd_t fd);
 	void *arg;
 };
-PRIVATE ATTR_SECTION(".text.crt.dos.solaris") int
+PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") int
 (LIBCCALL _dwrap_sTPTP_TDTPTIn__SIZEOF_FD_T___c0c1A1)(struct _dwrap_cookie_struct_sTPTP_TDTPTIn__SIZEOF_FD_T___c0c1A1 *c,
                                                       fd_t fd) THROWS(...) {
 	return (*c->walk)(c->arg, fd);
@@ -2332,7 +2332,7 @@ PRIVATE ATTR_SECTION(".text.crt.dos.solaris") int
  * If during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
  * and  `fdwalk()' returns with that same value. If `(*walk)(...)' is never called, or all
  * invocations return 0, `fdwalk()' will also return 0. */
-INTERN ATTR_SECTION(".text.crt.dos.solaris") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") NONNULL((1)) int
 (LIBDCALL libd_fdwalk)(int (LIBDCALL *walk)(void *arg, fd_t fd),
                        void *arg) THROWS(...) {
 	struct _dwrap_cookie_struct_sTPTP_TDTPTIn__SIZEOF_FD_T___c0c1A1 libd_fdwalk_cookie;
@@ -2605,7 +2605,7 @@ struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 {
 	int (LIBDCALL *compar)(void const *a, void const *b, void *arg);
 	void *arg;
 };
-PRIVATE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
+PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
 (LIBCCALL _dwrap_sTPTP_TDTPTPTP_c0A0A1c1)(void const *a,
                                           void const *b,
                                           struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 *c) THROWS(...) {
@@ -2613,7 +2613,7 @@ PRIVATE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined */
 /* >> qsort_r(3) */
-INTERN ATTR_SECTION(".text.crt.dos.utility.stdlib") NONNULL((1, 4)) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") NONNULL((1, 4)) void
 (LIBDCALL libd_qsort_r)(void *pbase,
                         size_t item_count,
                         size_t item_size,
@@ -2797,7 +2797,7 @@ NOTHROW_NCX(LIBCCALL libc__get_pgmptr)(char **pvalue) {
 	*pvalue = __LOCAL_program_invocation_name;
 	return EOK;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.application.init") errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.application.init") errno_t
 NOTHROW_NCX(LIBDCALL libd__get_wpgmptr)(char16_t **pvalue) {
 	*pvalue = *libd___p__wpgmptr();
 	return EOK;
@@ -2871,14 +2871,14 @@ struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A0A1 {
 	int (LIBDCALL *compar)(void *arg, void const *a, void const *b);
 	void *arg;
 };
-PRIVATE ATTR_SECTION(".text.crt.dos.utility") int
+PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility") int
 (LIBCCALL _dwrap_sTPTP_TDTPTPTP_c0c1A0A1)(void const *a,
                                           void const *b,
                                           struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A0A1 *c) THROWS(...) {
 	return (*c->compar)(c->arg, a, b);
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0c1A0A1_defined */
-INTERN ATTR_SECTION(".text.crt.dos.utility") WUNUSED NONNULL((1, 2, 5)) void *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility") WUNUSED NONNULL((1, 2, 5)) void *
 (LIBDCALL libd_bsearch_s)(void const *key,
                           void const *base,
                           size_t elem_count,
@@ -2928,14 +2928,14 @@ struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A0A1 {
 	int (LIBDCALL *compar)(void *arg, void const *a, void const *b);
 	void *arg;
 };
-PRIVATE ATTR_SECTION(".text.crt.dos.utility") int
+PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility") int
 (LIBCCALL _dwrap_sTPTP_TDTPTPTP_c0c1A0A1)(void const *a,
                                           void const *b,
                                           struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A0A1 *c) THROWS(...) {
 	return (*c->compar)(c->arg, a, b);
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0c1A0A1_defined */
-INTERN ATTR_SECTION(".text.crt.dos.utility") NONNULL((1, 4)) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility") NONNULL((1, 4)) void
 (LIBDCALL libd_qsort_s)(void *base,
                         size_t elem_count,
                         size_t elem_size,
@@ -2975,7 +2975,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility") NONNULL((1, 4)) void
 	               &__NAMESPACE_LOCAL_SYM __invoke_compare_helper_s,
 	               &data);
 }
-INTERN ATTR_SECTION(".text.crt.dos.utility") NONNULL((1, 2, 4)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility") NONNULL((1, 2, 4)) errno_t
 NOTHROW_NCX(LIBDCALL libd_getenv_s)(size_t *preqsize,
                                     char *buf,
                                     rsize_t bufsize,
@@ -3025,7 +3025,7 @@ NOTHROW_NCX(LIBCCALL libc_getenv_s)(size_t *preqsize,
 	libc_memcpy(buf, name, reqsize);
 	return EOK;
 }
-INTERN ATTR_SECTION(".text.crt.dos.utility") NONNULL((1, 2, 3)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility") NONNULL((1, 2, 3)) errno_t
 NOTHROW_NCX(LIBDCALL libd__dupenv_s)(char **__restrict pbuf,
                                      size_t *pbuflen,
                                      char const *varname) {
@@ -3069,7 +3069,7 @@ NOTHROW_NCX(LIBCCALL libc__dupenv_s)(char **__restrict pbuf,
 	*pbuflen = (libc_strlen(name) + 1) * sizeof(char);
 	return EOK;
 }
-INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBDCALL libd__itoa_s)(int val,
                                    char *buf,
                                    size_t buflen,
@@ -3164,7 +3164,7 @@ NOTHROW_NCX(LIBCCALL libc__ltoa_s)(long val,
 	return EOK;
 }
 #endif /* __SIZEOF_LONG__ != __SIZEOF_INT__ */
-INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBDCALL libd__ultoa_s)(unsigned long val,
                                     char *buf,
                                     size_t buflen,
@@ -3226,7 +3226,7 @@ NOTHROW_NCX(LIBCCALL libc__ui64toa)(u64 val,
 	return buf;
 }
 #endif /* __SIZEOF_LONG__ != 8 */
-INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBDCALL libd__i64toa_s)(s64 val,
                                      char *buf,
                                      size_t buflen,
@@ -3281,7 +3281,7 @@ NOTHROW_NCX(LIBCCALL libc__i64toa_s)(s64 val,
 	return EOK;
 }
 #endif /* !... */
-INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBDCALL libd__ui64toa_s)(u64 val,
                                       char *buf,
                                       size_t buflen,
@@ -3384,7 +3384,7 @@ NOTHROW_NCX(LIBCCALL libc__mblen_l)(char const *str,
 	(void)locale;
 	return libc_mblen(str, maxlen);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") int
 NOTHROW_NCX(LIBDCALL libd__mbtowc_l)(char16_t *dst,
                                      char const *src,
                                      size_t srclen,
@@ -3400,7 +3400,7 @@ NOTHROW_NCX(LIBKCALL libc__mbtowc_l)(char32_t *dst,
 	(void)locale;
 	return libc_mbtowc(dst, src, srclen);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") size_t
 NOTHROW_NCX(LIBDCALL libd__mbstowcs_l)(char16_t *dst,
                                        char const *src,
                                        size_t dstlen,
@@ -3416,7 +3416,7 @@ NOTHROW_NCX(LIBKCALL libc__mbstowcs_l)(char32_t *dst,
 	(void)locale;
 	return libc_mbstowcs(dst, src, dstlen);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") errno_t
 NOTHROW_NCX(LIBDCALL libd__mbstowcs_s)(size_t *presult,
                                        char16_t *dst,
                                        size_t dstsize,
@@ -3458,7 +3458,7 @@ NOTHROW_NCX(LIBKCALL libc__mbstowcs_s)(size_t *presult,
 
 	return EOK;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") errno_t
 NOTHROW_NCX(LIBDCALL libd_mbstowcs_s)(size_t *presult,
                                       char16_t *dst,
                                       size_t dstsize,
@@ -3500,7 +3500,7 @@ NOTHROW_NCX(LIBKCALL libc_mbstowcs_s)(size_t *presult,
 
 	return EOK;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") errno_t
 NOTHROW_NCX(LIBDCALL libd__mbstowcs_s_l)(size_t *presult,
                                          char16_t *dst,
                                          size_t dstsize,
@@ -3544,7 +3544,7 @@ NOTHROW_NCX(LIBKCALL libc__mbstowcs_s_l)(size_t *presult,
 
 	return EOK;
 }
-INTERN ATTR_SECTION(".text.crt.dos.random") NONNULL((1)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.random") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBDCALL libd_rand_s)(unsigned int *__restrict randval) {
 	return libd_errno_kos2dos(libc_rand_s(randval));
 }
@@ -3560,7 +3560,7 @@ NOTHROW_NCX(LIBCCALL libc_rand_s)(unsigned int *__restrict randval) {
 	*randval = libc_rand();
 	return EOK;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") int
 NOTHROW_NCX(LIBDCALL libd__wctomb_l)(char *buf,
                                      char16_t wc,
                                      locale_t locale) {
@@ -3574,7 +3574,7 @@ NOTHROW_NCX(LIBKCALL libc__wctomb_l)(char *buf,
 	(void)locale;
 	return libc_wctomb(buf, wc);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2)) errno_t
 NOTHROW_NCX(LIBDCALL libd_wctomb_s)(int *presult,
                                     char *buf,
                                     rsize_t buflen,
@@ -3618,7 +3618,7 @@ NOTHROW_NCX(LIBKCALL libc_wctomb_s)(int *presult,
 	*presult = libc_wctomb(buf, wc);
 	return EOK;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2)) errno_t
 NOTHROW_NCX(LIBDCALL libd__wctomb_s_l)(int *presult,
                                        char *buf,
                                        size_t buflen,
@@ -3636,7 +3636,7 @@ NOTHROW_NCX(LIBKCALL libc__wctomb_s_l)(int *presult,
 	(void)locale;
 	return libc_wctomb_s(presult, buf, buflen, wc);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2, 4)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2, 4)) errno_t
 NOTHROW_NCX(LIBDCALL libd__wcstombs_s_l)(size_t *presult,
                                          char *buf,
                                          size_t buflen,
@@ -3656,7 +3656,7 @@ NOTHROW_NCX(LIBKCALL libc__wcstombs_s_l)(size_t *presult,
 	(void)locale;
 	return libc_wcstombs_s(presult, buf, buflen, src, maxlen);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd__wcstombs_l)(char *dst,
                                        char16_t const *src,
                                        size_t maxlen,
@@ -3672,7 +3672,7 @@ NOTHROW_NCX(LIBKCALL libc__wcstombs_l)(char *dst,
 	(void)locale;
 	return libc_wcstombs(dst, src, maxlen);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2, 4)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2, 4)) errno_t
 NOTHROW_NCX(LIBDCALL libd_wcstombs_s)(size_t *presult,
                                       char *buf,
                                       size_t buflen,
@@ -3713,7 +3713,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstombs_s)(size_t *presult,
 #include <asm/os/fcntl.h>
 /* >> _fullpath(3)
  * s.a. `realpath(3)', `frealpathat(3)' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED NONNULL((2)) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED NONNULL((2)) char *
 NOTHROW_RPC(LIBDCALL libd__fullpath)(char *buf,
                                      char const *path,
                                      size_t buflen) {
@@ -3728,7 +3728,7 @@ NOTHROW_RPC(LIBCCALL libc__fullpath)(char *buf,
                                      size_t buflen) {
 	return libc_frealpathat(__AT_FDCWD, path, buf, buflen, 0);
 }
-INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((1, 5, 6)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((1, 5, 6)) errno_t
 NOTHROW_NCX(LIBDCALL libd__ecvt_s)(char *buf,
                                    size_t buflen,
                                    double val,
@@ -3754,7 +3754,7 @@ NOTHROW_NCX(LIBCCALL libc__ecvt_s)(char *buf,
 	libc_ecvt_r(val, ndigit, decptr, sign, buf, buflen);
 	return EOK;
 }
-INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((1, 5, 6)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((1, 5, 6)) errno_t
 NOTHROW_NCX(LIBDCALL libd__fcvt_s)(char *buf,
                                    size_t buflen,
                                    double val,
@@ -3780,7 +3780,7 @@ NOTHROW_NCX(LIBCCALL libc__fcvt_s)(char *buf,
 	libc_fcvt_r(val, ndigit, decptr, sign, buf, buflen);
 	return EOK;
 }
-INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((1)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBDCALL libd__gcvt_s)(char *buf,
                                    size_t buflen,
                                    double val,
@@ -3878,7 +3878,7 @@ NOTHROW(LIBCCALL libc__lrotr)(unsigned long val,
                               int shift) {
 	return __hybrid_ror(val, (shift_t)(unsigned int)shift);
 }
-INTERN ATTR_SECTION(".text.crt.dos.fs.environ") errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.environ") errno_t
 NOTHROW_NCX(LIBDCALL libd__putenv_s)(char const *varname,
                                      char const *val) {
 	return libd_setenv(varname, val, 1)
@@ -3926,7 +3926,7 @@ NOTHROW_NCX(LIBCCALL libc__splitpath)(char const *__restrict abspath,
 	             file, file ? 256 : 0,
 	             ext, ext ? 256 : 0);
 }
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") NONNULL((1)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.utility") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBDCALL libd__makepath_s)(char *buf,
                                        size_t buflen,
                                        char const *drive,
@@ -3985,7 +3985,7 @@ err_buflen:
 #undef path_putn
 #undef path_putc
 }
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") NONNULL((1)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.utility") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBDCALL libd__splitpath_s)(char const *__restrict abspath,
                                         char *drive,
                                         size_t drivelen,
@@ -4141,7 +4141,7 @@ NOTHROW_NCX(LIBCCALL libc_ultoa)(unsigned long val,
 	libc__ultoa_s(val, buf, (size_t)-1, radix);
 	return buf;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 2, 4)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 2, 4)) errno_t
 NOTHROW_NCX(LIBDCALL libd__wgetenv_s)(size_t *preqsize,
                                       char16_t *buf,
                                       rsize_t bufsize,
@@ -4191,7 +4191,7 @@ NOTHROW_NCX(LIBKCALL libc__wgetenv_s)(size_t *preqsize,
 	libc_memcpy(buf, name, reqsize);
 	return EOK;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 2, 3)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 2, 3)) errno_t
 NOTHROW_NCX(LIBDCALL libd__wdupenv_s)(char16_t **__restrict pbuf,
                                       size_t *pbuflen,
                                       char16_t const *varname) {
@@ -4241,7 +4241,7 @@ NOTHROW_RPC(LIBCCALL libc__get_environ)(char ***p_environ) {
 	*p_environ = __LOCAL_environ;
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1)) errno_t
 NOTHROW_RPC(LIBDCALL libd__get_wenviron)(char16_t ***p_wenviron) {
 	*p_wenviron = *libd___p__wenviron();
 	return 0;

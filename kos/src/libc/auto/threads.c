@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa78ddc82 */
+/* HASH CRC-32:0x26035fea */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ STATIC_ASSERT(sizeof(int) <= sizeof(void *));
  * Create and start a new thread (s.a. `pthread_create(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
-INTERN ATTR_SECTION(".text.crt.dos.sched.threads") int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.sched.threads") int
 NOTHROW_NCX(LIBDCALL libd_thrd_create)(thrd_t *thr,
                                        int (LIBDCALL *func)(void *arg),
                                        void *arg) {

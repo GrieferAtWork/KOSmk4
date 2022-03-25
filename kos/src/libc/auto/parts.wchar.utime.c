@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5bc2663 */
+/* HASH CRC-32:0x437b63fd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.modify_time") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify_time") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_wutime)(char16_t const *file,
                                   struct utimbuf const *file_times) {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
@@ -112,7 +112,7 @@ NOTHROW_RPC(LIBKCALL libc_wutime)(char32_t const *file,
 #pragma pop_macro("actime")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.modify_time") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify_time") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_wutime64)(char16_t const *file,
                                     struct utimbuf64 const *file_times) {
 

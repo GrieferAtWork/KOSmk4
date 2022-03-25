@@ -39,8 +39,8 @@
 
 DECL_BEGIN
 
-/*[[[head:libc___p__crtAssertBusy,hash:CRC-32=0x6476d96d]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") __LONG32_TYPE__ *
+/*[[[head:libc___p__crtAssertBusy,hash:CRC-32=0xad795aeb]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") __LONG32_TYPE__ *
 NOTHROW_NCX(LIBDCALL libc___p__crtAssertBusy)(void)
 /*[[[body:libc___p__crtAssertBusy]]]*/
 /*AUTO*/{
@@ -50,8 +50,8 @@ NOTHROW_NCX(LIBDCALL libc___p__crtAssertBusy)(void)
 }
 /*[[[end:libc___p__crtAssertBusy]]]*/
 
-/*[[[head:libc___p__crtBreakAlloc,hash:CRC-32=0xc4e93b64]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") __LONG32_TYPE__ *
+/*[[[head:libc___p__crtBreakAlloc,hash:CRC-32=0xde6b8e2]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") __LONG32_TYPE__ *
 NOTHROW_NCX(LIBDCALL libc___p__crtBreakAlloc)(void)
 /*[[[body:libc___p__crtBreakAlloc]]]*/
 /*AUTO*/{
@@ -61,8 +61,8 @@ NOTHROW_NCX(LIBDCALL libc___p__crtBreakAlloc)(void)
 }
 /*[[[end:libc___p__crtBreakAlloc]]]*/
 
-/*[[[head:libc___p__crtDbgFlag,hash:CRC-32=0x6a8e593b]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") int *
+/*[[[head:libc___p__crtDbgFlag,hash:CRC-32=0xc52fee7f]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") int *
 NOTHROW_NCX(LIBDCALL libc___p__crtDbgFlag)(void)
 /*[[[body:libc___p__crtDbgFlag]]]*/
 /*AUTO*/{
@@ -72,8 +72,8 @@ NOTHROW_NCX(LIBDCALL libc___p__crtDbgFlag)(void)
 }
 /*[[[end:libc___p__crtDbgFlag]]]*/
 
-/*[[[head:libc__CrtGetReportHook,hash:CRC-32=0xf27e3ac]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") _CRT_REPORT_HOOK
+/*[[[head:libc__CrtGetReportHook,hash:CRC-32=0x1ac59c2e]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") _CRT_REPORT_HOOK
 NOTHROW_NCX(LIBDCALL libc__CrtGetReportHook)(void)
 /*[[[body:libc__CrtGetReportHook]]]*/
 /*AUTO*/{
@@ -83,8 +83,8 @@ NOTHROW_NCX(LIBDCALL libc__CrtGetReportHook)(void)
 }
 /*[[[end:libc__CrtGetReportHook]]]*/
 
-/*[[[head:libc__CrtSetReportHook,hash:CRC-32=0x458da49d]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") _CRT_REPORT_HOOK
+/*[[[head:libc__CrtSetReportHook,hash:CRC-32=0x3fe68ae8]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") _CRT_REPORT_HOOK
 NOTHROW_NCX(LIBDCALL libc__CrtSetReportHook)(_CRT_REPORT_HOOK pfn_new_hook)
 /*[[[body:libc__CrtSetReportHook]]]*/
 /*AUTO*/{
@@ -95,8 +95,8 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetReportHook)(_CRT_REPORT_HOOK pfn_new_hook)
 }
 /*[[[end:libc__CrtSetReportHook]]]*/
 
-/*[[[head:libc__CrtSetReportHook2,hash:CRC-32=0x19f6974a]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") int
+/*[[[head:libc__CrtSetReportHook2,hash:CRC-32=0x2a5d4001]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") int
 NOTHROW_NCX(LIBDCALL libc__CrtSetReportHook2)(int mode,
                                               _CRT_REPORT_HOOK pfn_new_hook)
 /*[[[body:libc__CrtSetReportHook2]]]*/
@@ -109,8 +109,8 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetReportHook2)(int mode,
 }
 /*[[[end:libc__CrtSetReportHook2]]]*/
 
-/*[[[head:libc__CrtSetReportHookW2,hash:CRC-32=0x880fc32a]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") int
+/*[[[head:libc__CrtSetReportHookW2,hash:CRC-32=0x7bbd8880]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") int
 NOTHROW_NCX(LIBDCALL libc__CrtSetReportHookW2)(int mode,
                                                _CRT_REPORT_HOOKW pfn_new_hook)
 /*[[[body:libc__CrtSetReportHookW2]]]*/
@@ -123,8 +123,8 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetReportHookW2)(int mode,
 }
 /*[[[end:libc__CrtSetReportHookW2]]]*/
 
-/*[[[head:libc__CrtGetAllocHook,hash:CRC-32=0xed82ccda]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") _CRT_ALLOC_HOOK
+/*[[[head:libc__CrtGetAllocHook,hash:CRC-32=0x678b5578]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") _CRT_ALLOC_HOOK
 NOTHROW_NCX(LIBDCALL libc__CrtGetAllocHook)(void)
 /*[[[body:libc__CrtGetAllocHook]]]*/
 /*AUTO*/{
@@ -134,8 +134,8 @@ NOTHROW_NCX(LIBDCALL libc__CrtGetAllocHook)(void)
 }
 /*[[[end:libc__CrtGetAllocHook]]]*/
 
-/*[[[head:libc__CrtSetAllocHook,hash:CRC-32=0x444e1954]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") _CRT_ALLOC_HOOK
+/*[[[head:libc__CrtSetAllocHook,hash:CRC-32=0xe2d814fd]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") _CRT_ALLOC_HOOK
 NOTHROW_NCX(LIBDCALL libc__CrtSetAllocHook)(_CRT_ALLOC_HOOK pfn_new_hook)
 /*[[[body:libc__CrtSetAllocHook]]]*/
 /*AUTO*/{
@@ -146,8 +146,8 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetAllocHook)(_CRT_ALLOC_HOOK pfn_new_hook)
 }
 /*[[[end:libc__CrtSetAllocHook]]]*/
 
-/*[[[head:libc__CrtGetDumpClient,hash:CRC-32=0xa8c08c1]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") _CRT_DUMP_CLIENT
+/*[[[head:libc__CrtGetDumpClient,hash:CRC-32=0x1f6e7743]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") _CRT_DUMP_CLIENT
 NOTHROW_NCX(LIBDCALL libc__CrtGetDumpClient)(void)
 /*[[[body:libc__CrtGetDumpClient]]]*/
 /*AUTO*/{
@@ -157,8 +157,8 @@ NOTHROW_NCX(LIBDCALL libc__CrtGetDumpClient)(void)
 }
 /*[[[end:libc__CrtGetDumpClient]]]*/
 
-/*[[[head:libc__CrtSetDumpClient,hash:CRC-32=0xba59149b]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") _CRT_DUMP_CLIENT
+/*[[[head:libc__CrtSetDumpClient,hash:CRC-32=0xc0323aee]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") _CRT_DUMP_CLIENT
 NOTHROW_NCX(LIBDCALL libc__CrtSetDumpClient)(_CRT_DUMP_CLIENT pfn_new_dump)
 /*[[[body:libc__CrtSetDumpClient]]]*/
 /*AUTO*/{
@@ -169,8 +169,8 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetDumpClient)(_CRT_DUMP_CLIENT pfn_new_dump)
 }
 /*[[[end:libc__CrtSetDumpClient]]]*/
 
-/*[[[head:libc__CrtSetReportMode,hash:CRC-32=0xe2d9f783]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") int
+/*[[[head:libc__CrtSetReportMode,hash:CRC-32=0xf9cd3027]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") int
 NOTHROW_NCX(LIBDCALL libc__CrtSetReportMode)(int report_type,
                                              int report_mode)
 /*[[[body:libc__CrtSetReportMode]]]*/
@@ -183,8 +183,8 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetReportMode)(int report_type,
 }
 /*[[[end:libc__CrtSetReportMode]]]*/
 
-/*[[[head:libc__CrtSetReportFile,hash:CRC-32=0x20feabcd]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") _HFILE
+/*[[[head:libc__CrtSetReportFile,hash:CRC-32=0x364e40a7]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") _HFILE
 NOTHROW_NCX(LIBDCALL libc__CrtSetReportFile)(int report_type,
                                              _HFILE report_file)
 /*[[[body:libc__CrtSetReportFile]]]*/
@@ -197,8 +197,8 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetReportFile)(int report_type,
 }
 /*[[[end:libc__CrtSetReportFile]]]*/
 
-/*[[[head:libc__CrtDbgReport,hash:CRC-32=0xd42ec690]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") int
+/*[[[head:libc__CrtDbgReport,hash:CRC-32=0xa2fa3cc0]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") int
 NOTHROW_NCX(VLIBDCALL libc__CrtDbgReport)(int report_type,
                                           char const *filename,
                                           int line,
@@ -219,8 +219,8 @@ NOTHROW_NCX(VLIBDCALL libc__CrtDbgReport)(int report_type,
 /*[[[end:libc__CrtDbgReport]]]*/
 
 
-/*[[[head:libc__CrtSetDebugFillThreshold,hash:CRC-32=0x3a4eecaf]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") size_t
+/*[[[head:libc__CrtSetDebugFillThreshold,hash:CRC-32=0x4025c2da]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") size_t
 NOTHROW_NCX(LIBDCALL libc__CrtSetDebugFillThreshold)(size_t new_debug_fill_threshold)
 /*[[[body:libc__CrtSetDebugFillThreshold]]]*/
 /*AUTO*/{
@@ -232,8 +232,8 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetDebugFillThreshold)(size_t new_debug_fill_thres
 /*[[[end:libc__CrtSetDebugFillThreshold]]]*/
 
 
-/*[[[head:libc__CrtDbgReportW,hash:CRC-32=0xfd19dbd4]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") int
+/*[[[head:libc__CrtDbgReportW,hash:CRC-32=0xcceff7d]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") int
 NOTHROW_NCX(VLIBDCALL libc__CrtDbgReportW)(int report_type,
                                            __WCHAR16_TYPE__ const *filename,
                                            int line,
@@ -253,9 +253,9 @@ NOTHROW_NCX(VLIBDCALL libc__CrtDbgReportW)(int report_type,
 }
 /*[[[end:libc__CrtDbgReportW]]]*/
 
-/*[[[head:libc__CrtDbgBreak,hash:CRC-32=0xd43487a0]]]*/
+/*[[[head:libc__CrtDbgBreak,hash:CRC-32=0xb86394b7]]]*/
 #ifndef LIBC_ARCH_HAVE_CRTDBGBREAK
-INTERN ATTR_SECTION(".text.crt.dos.utility") void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility") void
 NOTHROW_NCX(LIBDCALL libc__CrtDbgBreak)(void)
 /*[[[body:libc__CrtDbgBreak]]]*/
 {
@@ -266,8 +266,8 @@ NOTHROW_NCX(LIBDCALL libc__CrtDbgBreak)(void)
 #endif /* MAGIC:impl_if */
 /*[[[end:libc__CrtDbgBreak]]]*/
 
-/*[[[head:libc__CrtSetBreakAlloc,hash:CRC-32=0xe82fa55e]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") __LONG32_TYPE__
+/*[[[head:libc__CrtSetBreakAlloc,hash:CRC-32=0x4eb9a8f7]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") __LONG32_TYPE__
 NOTHROW_NCX(LIBDCALL libc__CrtSetBreakAlloc)(__LONG32_TYPE__ break_alloc)
 /*[[[body:libc__CrtSetBreakAlloc]]]*/
 /*AUTO*/{

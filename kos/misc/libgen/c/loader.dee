@@ -1001,6 +1001,26 @@ class FunctionFeatures {
 	public member crt_dosSection: UserString | string | none = none; /* [dos_section(...)]           Section name for the DOS implementation (if @wchar) */
 	public member crt_kosImplRequires: UserString | string = "1";    /* [crt_kos_impl_requires(...)] Condition to meet for auto implementation (does not affect declaration; e.g. `!defined(LIBC_ARCH_HAVE_MEMCHR)') */
 	public member crt_dosImplRequires: UserString | string = "1";    /* [crt_dos_impl_requires(...)] Same as `crt_kosImplRequires', but for the DOS implementation */
+	public member crt_kosExtraAttr: {UserString | string...} | none = none; /* [crt_kos_attr(...)]   Extra (implementation-only) in-crt attributes for KOS variant. */
+	public member crt_dosExtraAttr: {UserString | string...} | none = none; /* [crt_dos_attr(...)]   Extra (implementation-only) in-crt attributes for DOS variant. */
+	public member crt_dosNoOptimizeSize: bool = false;               /* [[no_]crt_dos_optimize_size] When `false', add `ATTR_OPTIMIZE_SIZE' to `crt_dosExtraAttr'. */
+
+	@@Return extra attributes for the KOS crt implementation
+	public function getCrtKosExtraAttr(): {UserString | string...} | none {
+		return crt_kosExtraAttr;
+	}
+
+	@@Return extra attributes for the DOS crt implementation
+	public function getCrtDosExtraAttr(): {UserString | string...} | none {
+		if (crt_dosNoOptimizeSize)
+			return crt_dosExtraAttr;
+		local result = crt_dosExtraAttr;
+		if (result is none)
+			result = ();
+		result = List(result);
+		result.append("ATTR_OPTIMIZE_SIZE");
+		return result;
+	}
 
 	@@Enable a given namespace binding (via `using`)
 	public function addNamespaceUsingBinding(name: string) {
@@ -1050,55 +1070,59 @@ class FunctionFeatures {
 		@@Simple annotations that only entail setting the value of some field.
 		@@This  is  a mapping  of: @(tagName:  (fieldName, toBeAssignedValue))
 		final local SIMPLE_SETFIELD_ANNOTATIONS: {string: (string, Object)} = {
-			"nodecl"                      : ("decl", "__LIBC" /*DEFAULT_DECL*/),
-			"no_decl"                     : ("decl", "__LIBC" /*DEFAULT_DECL*/),
-			"ignore"                      : ("namespaces", ()),
-			"no_ignore"                   : ("namespaces", ("",)),
-			"libc"                        : ("libc", true),
-			"nolibc"                      : ("libc", false),
-			"no_libc"                     : ("libc", false),
-			"inline"                      : ("inline", "LOCAL"),
-			"forceinline"                 : ("inline", "FORCELOCAL"),
-			"noinline"                    : ("inline", none),
-			"no_inline"                   : ("inline", none),
-			"inline_truncate"             : ("noInlineTruncate", false),
-			"no_inline_truncate"          : ("noInlineTruncate", true),
-			"extern_inline"               : ("noExternInline", false),
-			"no_extern_inline"            : ("noExternInline", true),
-			"local"                       : ("noLocal", false),
-			"noLocal"                     : ("noLocal", true),
-			"no_local"                    : ("noLocal", true),
-			"norequires"                  : ("requires", "1"),
-			"no_requires"                 : ("requires", "1"),
-			"no_requires_prefix"          : ("requiresPrefix", ""),
-			"no_impl_prefix"              : ("implPrefix", ""),
-			"macro_bindings"              : ("macroBinding", true),
-			"no_macro_bindings"           : ("macroBinding", false),
-			"noguard"                     : ("guard", false),
-			"no_guard"                    : ("guard", false),
-			"default_guard_names"         : ("guardNames", none),
-			"default_exposed_name"        : ("exposedName", none),
-			"wchar"                       : ("wchar", true),
-			"no_wchar"                    : ("wchar", false),
-			"crt_dos_variant"             : ("crt_dosVariant", true),
-			"no_crt_dos_variant"          : ("crt_dosVariant", false),
-			"crt_dos_wrapper"             : ("crt_noDosWrapper", false),
-			"no_crt_dos_wrapper"          : ("crt_noDosWrapper", true),
-			"default_crt_name"            : ("crt_name", none),
-			"crt_impl"                    : ("crt_noImpl", false),
-			"no_crt_impl"                 : ("crt_noImpl", true),
-			"crt_self_import"             : ("crt_noSelfImport", false),
-			"no_crt_self_import"          : ("crt_noSelfImport", true),
-			"crt_self_export"             : ("crt_noSelfExport", false),
-			"no_crt_self_export"          : ("crt_noSelfExport", true),
-			"no_crt_kos_impl_requires"    : ("crt_kosImplRequires", "1"),
-			"no_crt_dos_impl_requires"    : ("crt_dosImplRequires", "1"),
-			"userimpl"                    : ("crt_userimpl", true),
-			"no_userimpl"                 : ("crt_userimpl", false),
-			"default_kos_section"         : ("crt_kosSection", none),
-			"default_dos_section"         : ("crt_dosSection", none),
-			"auto_dependency_scanning"    : ("noAutoDependencyScanning", false),
-			"no_auto_dependency_scanning" : ("noAutoDependencyScanning", true),
+			"nodecl"                       : ("decl", "__LIBC" /*DEFAULT_DECL*/),
+			"no_decl"                      : ("decl", "__LIBC" /*DEFAULT_DECL*/),
+			"ignore"                       : ("namespaces", ()),
+			"no_ignore"                    : ("namespaces", ("",)),
+			"libc"                         : ("libc", true),
+			"nolibc"                       : ("libc", false),
+			"no_libc"                      : ("libc", false),
+			"inline"                       : ("inline", "LOCAL"),
+			"forceinline"                  : ("inline", "FORCELOCAL"),
+			"noinline"                     : ("inline", none),
+			"no_inline"                    : ("inline", none),
+			"inline_truncate"              : ("noInlineTruncate", false),
+			"no_inline_truncate"           : ("noInlineTruncate", true),
+			"extern_inline"                : ("noExternInline", false),
+			"no_extern_inline"             : ("noExternInline", true),
+			"local"                        : ("noLocal", false),
+			"noLocal"                      : ("noLocal", true),
+			"no_local"                     : ("noLocal", true),
+			"norequires"                   : ("requires", "1"),
+			"no_requires"                  : ("requires", "1"),
+			"no_requires_prefix"           : ("requiresPrefix", ""),
+			"no_impl_prefix"               : ("implPrefix", ""),
+			"macro_bindings"               : ("macroBinding", true),
+			"no_macro_bindings"            : ("macroBinding", false),
+			"noguard"                      : ("guard", false),
+			"no_guard"                     : ("guard", false),
+			"default_guard_names"          : ("guardNames", none),
+			"default_exposed_name"         : ("exposedName", none),
+			"wchar"                        : ("wchar", true),
+			"no_wchar"                     : ("wchar", false),
+			"crt_dos_variant"              : ("crt_dosVariant", true),
+			"no_crt_dos_variant"           : ("crt_dosVariant", false),
+			"crt_dos_wrapper"              : ("crt_noDosWrapper", false),
+			"no_crt_dos_wrapper"           : ("crt_noDosWrapper", true),
+			"default_crt_name"             : ("crt_name", none),
+			"crt_impl"                     : ("crt_noImpl", false),
+			"no_crt_impl"                  : ("crt_noImpl", true),
+			"crt_self_import"              : ("crt_noSelfImport", false),
+			"no_crt_self_import"           : ("crt_noSelfImport", true),
+			"crt_self_export"              : ("crt_noSelfExport", false),
+			"no_crt_self_export"           : ("crt_noSelfExport", true),
+			"no_crt_kos_impl_requires"     : ("crt_kosImplRequires", "1"),
+			"no_crt_dos_impl_requires"     : ("crt_dosImplRequires", "1"),
+			"userimpl"                     : ("crt_userimpl", true),
+			"no_userimpl"                  : ("crt_userimpl", false),
+			"default_kos_section"          : ("crt_kosSection", none),
+			"default_dos_section"          : ("crt_dosSection", none),
+			"auto_dependency_scanning"     : ("noAutoDependencyScanning", false),
+			"no_auto_dependency_scanning"  : ("noAutoDependencyScanning", true),
+			"no_crt_kos_attr"              : ("crt_kosExtraAttr", none),
+			"no_crt_dos_attr"              : ("crt_dosExtraAttr", none),
+			"crt_dos_optimize_size"    : ("crt_dosNoOptimizeSize", false),
+			"no_crt_dos_optimize_size" : ("crt_dosNoOptimizeSize", true),
 		};
 
 		switch (tok) {
@@ -1167,6 +1191,29 @@ class FunctionFeatures {
 		case "nofast": /* TODO: REMOVE_ME */
 			delNamespaceUsingBinding("fast");
 			goto oneword_nocond;
+
+		case "crt_attr":
+		case "crt_kos_attr":
+		case "crt_dos_attr": {
+			self.next();
+			self.skip("(");
+			local appendTargets = [];
+			if (tok != "crt_dos_attr") {
+				if (crt_kosExtraAttr is none)
+					crt_kosExtraAttr = [];
+				appendTargets.append(crt_kosExtraAttr);
+			}
+			if (tok != "crt_kos_attr") {
+				if (crt_dosExtraAttr is none)
+					crt_dosExtraAttr = [];
+				appendTargets.append(crt_dosExtraAttr);
+			}
+			for (local extra: self.parseCStringOrFunctionLikeExpressionList()) {
+				for (local item: appendTargets)
+					item.append(extra);
+			}
+			self.skip(")");
+		}	break;
 
 		case "requires": {
 			if (ppCond !is none)
@@ -1496,6 +1543,12 @@ err_unexpected_if:
 			return "[no_]dos_section";
 		if (crt_kosSection !== defaultFeatures.crt_kosSection)
 			return "[no_]kos_section";
+		if (crt_kosExtraAttr !== defaultFeatures.crt_kosExtraAttr)
+			return "[no_]crt_kos_attr";
+		if (crt_dosExtraAttr !== defaultFeatures.crt_dosExtraAttr)
+			return "[no_]crt_dos_attr";
+		if (crt_dosNoOptimizeSize !== defaultFeatures.crt_dosNoOptimizeSize)
+			return "[no_]crt_dos_optimize_size";
 		if (crt_dosImplRequires !== defaultFeatures.crt_dosImplRequires)
 			return "[no_]crt_kos_impl_requires";
 		if (crt_kosImplRequires !== defaultFeatures.crt_kosImplRequires)
@@ -3030,6 +3083,7 @@ class CrtDosVariantCallbackMetadata: CrtDosVariantMetadata {
 		applyDosProtoOverrides(dosProto, this.dosProto);
 
 		/* Figure out the section to put the wrapper function into */
+		local crt_dosExtraAttr = currentFeatures.getCrtDosExtraAttr();
 		local crt_dosSection = currentFeatures.crt_dosSection !is none
 			? currentFeatures.crt_dosSection
 			: DEFAULT_DOS_SECTION;
@@ -3078,11 +3132,16 @@ class CrtDosVariantCallbackMetadata: CrtDosVariantMetadata {
 				usedWrapperBody = usedWrapperBody.replace("$cook", cookie.cookieTypeName);
 
 			/* Generate the wrapper implementation body. */
+			local usedExtraAttributes = crt_dosExtraAttr;
+			if (usedExtraAttributes is none)
+				usedExtraAttributes = ();
+			usedExtraAttributes = List(usedExtraAttributes);
+			usedExtraAttributes.append("ATTR_SECTION({!r})".format({ crt_dosSection }));
 			wrapperPrototype.cprintDeclarationWithoutTerminator(
 				fp:                   dosPrefix,
 				escapeMode:           ESCAPE_MODE_NONE,
 				decl:                 "PRIVATE",
-				injectedAttributes:   { "ATTR_SECTION({!r})".format({ crt_dosSection }) },
+				injectedAttributes:   usedExtraAttributes,
 				exposedName:          wrapperFunctionName,
 				breakAfterReturnType: true,
 				oneArgumentPerLine:   true);
@@ -4462,6 +4521,12 @@ do_handle_alt_variant_of:
 					currentPrototype.cc = DEFAULT_DOS_CC;
 					currentFeatures.crt_noDosWrapper = true;
 					currentFeatures.crt_dosVariant   = false;
+					/* Add `ATTR_OPTIMIZE_SIZE' to the KOS variant (since it's obviously there for compat) */
+					if (!currentFeatures.crt_dosNoOptimizeSize) {
+						if (currentFeatures.crt_kosExtraAttr is none)
+							currentFeatures.crt_kosExtraAttr = [];
+						currentFeatures.crt_kosExtraAttr.append("ATTR_OPTIMIZE_SIZE");
+					}
 					self.next();
 					break;
 
@@ -4574,6 +4639,12 @@ again_skip_annotation_rbracket:
 			    currentFeatures.crt_dosSection !== context.defaultFeatures.crt_dosSection) {
 				self.errAt(currentNameTokStart,
 					"[section({!r})] used with [nocrt] or [crt_no_impl]"
+					.format({ currentFeatures.crt_kosSection }));
+			}
+			if (currentFeatures.crt_kosExtraAttr !== context.defaultFeatures.crt_kosExtraAttr ||
+			    currentFeatures.crt_dosExtraAttr !== context.defaultFeatures.crt_dosExtraAttr) {
+				self.errAt(currentNameTokStart,
+					"[crt_(kos|dos)_attr({!r})] used with [nocrt] or [crt_no_impl]"
 					.format({ currentFeatures.crt_kosSection }));
 			}
 			if (currentKosLibraryFunction.exportSymbolNames ||
@@ -5896,6 +5967,7 @@ again_lookup_wcsCurrent:
 				local crt_kosSection = currentFeatures.crt_kosSection !is none
 					? currentFeatures.crt_kosSection
 					: DEFAULT_KOS_SECTION;
+				local crt_kosExtraAttr = currentFeatures.getCrtKosExtraAttr();
 				if (currentFeatures.wchar || currentFeatures.crt_dosVariant !== false) {
 					/* Create 2 new functions that are then exported from libc. */
 					if (currentDosLibraryFunction is none)
@@ -5921,6 +5993,7 @@ again_lookup_wcsCurrent:
 					local crt_dosSection = currentFeatures.crt_dosSection !is none
 						? currentFeatures.crt_dosSection
 						: DEFAULT_DOS_SECTION;
+					local crt_dosExtraAttr = currentFeatures.getCrtDosExtraAttr();
 					if (currentFeatures.wchar) {
 						if (currentFeatures.crt_dosVariant !is bool)
 							self.errAt(currentNameTokStart, "Custom dos implementation cannot be used with [wchar]");
@@ -5939,7 +6012,8 @@ again_lookup_wcsCurrent:
 								functionName: string | UserString,
 								ppCond: string | UserString,
 								crtName: string | UserString, mode: int,
-								implSection: UserString | string | none): Callable {
+								implSection: UserString | string | none,
+								extraAttrib: {UserString | string...} | none): Callable {
 							return []{
 								local xc: XcharImplementation = wcsCurrent
 									.getXCharImplementation(functionName, mode, true);
@@ -5952,7 +6026,8 @@ again_lookup_wcsCurrent:
 										? getDefaultLibraryImplementationForPrototype(
 											wcsCurrent.wc_prototype, crtName)
 										: xcLoaderImpl.impl,
-									implSection: implSection);
+									implSection: implSection,
+									extraAttributes: extraAttrib);
 							};
 						}
 						/* Link the Xchar-implementations.
@@ -5960,10 +6035,10 @@ again_lookup_wcsCurrent:
 						 *       available  once  the  implementation  gets  generated. */
 						currentDosLibraryFunction.bindings.append(createXCharBinding(
 							libc_dosName, currentFeatures.crt_dosImplRequires,
-							"DOS$" + crtName, WCHAR_REPLACEMENT_CHAR16, crt_dosSection));
+							"DOS$" + crtName, WCHAR_REPLACEMENT_CHAR16, crt_dosSection, crt_dosExtraAttr));
 						currentKosLibraryFunction.bindings.append(createXCharBinding(
 							libc_kosName, currentFeatures.crt_kosImplRequires,
-							crtName, WCHAR_REPLACEMENT_CHAR32, crt_kosSection));
+							crtName, WCHAR_REPLACEMENT_CHAR32, crt_kosSection, crt_kosExtraAttr));
 					} else {
 						if (currentDosLibraryFunction.prototype !is bound) {
 							/* Generate the default prototype used by the dos-variant */
@@ -6007,13 +6082,15 @@ again_lookup_wcsCurrent:
 								: DELAY_cb getDefaultLibraryImplementationForPrototype(dosProto, crtName);
 						}
 						currentDosLibraryFunction.bindings.append(LibraryFunctionBinding(
-							ppCond:      currentFeatures.crt_dosImplRequires,
-							binding:     dosLibImpl,
-							implSection: crt_dosSection));
+							ppCond:          currentFeatures.crt_dosImplRequires,
+							binding:         dosLibImpl,
+							implSection:     crt_dosSection,
+							extraAttributes: crt_dosExtraAttr));
 						currentKosLibraryFunction.bindings.append(LibraryFunctionBinding(
-							ppCond:      currentFeatures.crt_kosImplRequires,
-							binding:     kosLibImpl,
-							implSection: crt_kosSection));
+							ppCond:          currentFeatures.crt_kosImplRequires,
+							binding:         kosLibImpl,
+							implSection:     crt_kosSection,
+							extraAttributes: crt_kosExtraAttr));
 					}
 					/* Insert the library implementations into the system header order */
 					if (currentFeatures.crt_userimpl || loaderImpl is none) {
@@ -6039,9 +6116,10 @@ again_lookup_wcsCurrent:
 							: DELAY_cb getDefaultLibraryImplementationForPrototype(kosProto, crtName);
 					}
 					currentKosLibraryFunction.bindings.append(LibraryFunctionBinding(
-						ppCond:      currentFeatures.crt_kosImplRequires,
-						binding:     libImpl,
-						implSection: crt_kosSection));
+						ppCond:          currentFeatures.crt_kosImplRequires,
+						binding:         libImpl,
+						implSection:     crt_kosSection,
+						extraAttributes: crt_kosExtraAttr));
 					if (!currentFeatures.crt_noDosWrapper) {
 						if (kosProto !is Callable) {
 							/* XXX: This assumes that LIBDCALL functions that take no
@@ -6093,13 +6171,15 @@ again_lookup_wcsCurrent:
 						local crt_dosSection = currentFeatures.crt_dosSection !is none
 							? currentFeatures.crt_dosSection
 							: DEFAULT_DOS_SECTION;
+						local crt_dosExtraAttr = currentFeatures.getCrtDosExtraAttr();
 						local dosProto: FunctionPrototype | Callable = currentDosLibraryFunction.prototype;
 						if (dosProto is Callable || !dosProto.hasEllipsis || dosProto.ellipsisArgumentTypes !is none) {
 							currentDosLibraryFunction.bindings.append(LibraryFunctionBinding(
-								ppCond:      currentFeatures.crt_dosImplRequires,
+								ppCond:          currentFeatures.crt_dosImplRequires,
 								/* Special trigger to cause a DFUN() wrapper to be generated. */
-								binding:     FunctionImplementation(name: libc_kosName),
-								implSection: crt_dosSection));
+								binding:         FunctionImplementation(name: libc_kosName),
+								implSection:     crt_dosSection,
+								extraAttributes: crt_dosExtraAttr));
 							result.order_libcAutoHeader.append(currentDosLibraryFunction);
 							result.order_libcDosabiSource.append(currentDosLibraryFunction);
 						} else {
@@ -6125,9 +6205,10 @@ again_lookup_wcsCurrent:
 								dosLibImpl = libImpl;
 							}
 							currentDosLibraryFunction.bindings.append(LibraryFunctionBinding(
-								ppCond:      currentFeatures.crt_dosImplRequires,
-								binding:     dosLibImpl,
-								implSection: crt_dosSection));
+								ppCond:          currentFeatures.crt_dosImplRequires,
+								binding:         dosLibImpl,
+								implSection:     crt_dosSection,
+								extraAttributes: crt_dosExtraAttr));
 							if ((currentFeatures.crt_userimpl || loaderImpl is none) &&
 							    (dosProto !is Callable && dosProto.hasEllipsis && dosProto.ellipsisArgumentTypes is none)) {
 								result.order_libcUserHeader.append(currentDosLibraryFunction);

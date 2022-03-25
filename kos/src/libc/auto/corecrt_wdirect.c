@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4fab1f9 */
+/* HASH CRC-32:0xbfcfb042 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.dos.unsorted") char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unsorted") char16_t *
 NOTHROW_RPC(LIBDCALL libd__wgetdcwd)(int drive,
                                      char16_t *buf,
                                      size_t size) {
@@ -61,7 +61,7 @@ NOTHROW_RPC(LIBKCALL libc__wgetdcwd)(int drive,
 	}
 	return libc_wfrealpath4(__AT_FDDRIVE_CWD(drive), buf, size, 0);
 }
-INTERN ATTR_SECTION(".text.crt.dos.unsorted") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unsorted") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd__wmkdir)(char16_t const *path) {
 	return libd_wmkdir(path, 0755);
 }

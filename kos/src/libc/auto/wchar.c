@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd88fad64 */
+/* HASH CRC-32:0xe87cc112 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ DECL_BEGIN
  * Convert a single-byte into a wide character. If the given
  * character `ch' isn't valid, or  is `EOF', then `WEOF'  is
  * returned instead. */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED wint16_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED wint16_t
 NOTHROW_NCX(LIBDCALL libd_btowc)(int ch) {
 	if (ch >= 0 && ch <= 0x7f)
 		return (wint16_t)ch;
@@ -67,7 +67,7 @@ NOTHROW_NCX(LIBKCALL libc_btowc)(int ch) {
 /* >> wctob(3)
  * Convert a wide-character into a single-byte character. If
  * doing so isn't possible, then `EOF' is returned  instead. */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_wctob)(wint16_t ch) {
 	if (ch >= 0 && ch <= 0x7f)
 		return (int)ch;
@@ -142,7 +142,7 @@ NOTHROW_NCX(LIBKCALL libc_c16rtomb)(char *__restrict str,
 #ifndef __KERNEL__
 #include <libc/errno.h>
 /* >> mbrtowc(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") size_t
 NOTHROW_NCX(LIBDCALL libd_mbrtowc)(char16_t *pwc,
                                    char const *__restrict str,
                                    size_t maxlen,
@@ -208,7 +208,7 @@ NOTHROW_NCX(LIBKCALL libc_mbrtowc)(char32_t *pwc,
 }
 #include <libc/errno.h>
 /* >> wcrtomb(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") size_t
 NOTHROW_NCX(LIBDCALL libd_wcrtomb)(char *__restrict str,
                                    char16_t wc,
                                    mbstate_t *mbs) {
@@ -307,7 +307,7 @@ NOTHROW_NCX(LIBKCALL libc_wcrtomb)(char *__restrict str,
 	return result;
 }
 /* >> mbrlen(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") WUNUSED size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") WUNUSED size_t
 NOTHROW_NCX(LIBDCALL libd_mbrlen)(char const *__restrict str,
                                   size_t maxlen,
                                   mbstate_t *mbs) {
@@ -323,7 +323,7 @@ NOTHROW_NCX(LIBKCALL libc_mbrlen)(char const *__restrict str,
 	return libc_mbrtowc(&wc, str, maxlen, mbs);
 }
 /* >> mbsrtowcs(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd_mbsrtowcs)(char16_t *__restrict dst,
                                      char const **__restrict psrc,
                                      size_t dstlen,
@@ -371,7 +371,7 @@ NOTHROW_NCX(LIBKCALL libc_mbsrtowcs)(char32_t *__restrict dst,
 	return result;
 }
 /* >> wcsrtombs(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcsrtombs)(char *dst,
                                      char16_t const **__restrict psrc,
                                      size_t dstlen,
@@ -422,8 +422,14 @@ NOTHROW_NCX(LIBKCALL libc_wcsrtombs)(char *dst,
 	*psrc = src;
 	return result;
 }
+#include <hybrid/typecore.h>
+#if __SIZEOF_LONG__ == 4
+DEFINE_INTERN_ALIAS(libd_wcstol, libd_wcsto32);
+#elif __SIZEOF_LONG__ == 8
+DEFINE_INTERN_ALIAS(libd_wcstol, libd_wcsto64);
+#else /* ... */
 /* >> wcstol(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) long
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) long
 NOTHROW_NCX(LIBDCALL libd_wcstol)(char16_t const *__restrict nptr,
                                   char16_t **endptr,
                                   __STDC_INT_AS_UINT_T base) {
@@ -433,6 +439,13 @@ NOTHROW_NCX(LIBDCALL libd_wcstol)(char16_t const *__restrict nptr,
 	return (long)libd_wcsto64(nptr, endptr, base);
 #endif /* __SIZEOF_LONG__ > 4 */
 }
+#endif /* !... */
+#include <hybrid/typecore.h>
+#if __SIZEOF_LONG__ == 4
+DEFINE_INTERN_ALIAS(libc_wcstol, libc_wcsto32);
+#elif __SIZEOF_LONG__ == 8
+DEFINE_INTERN_ALIAS(libc_wcstol, libc_wcsto64);
+#else /* ... */
 /* >> wcstol(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) long
 NOTHROW_NCX(LIBKCALL libc_wcstol)(char32_t const *__restrict nptr,
@@ -444,8 +457,15 @@ NOTHROW_NCX(LIBKCALL libc_wcstol)(char32_t const *__restrict nptr,
 	return (long)libc_wcsto64(nptr, endptr, base);
 #endif /* __SIZEOF_LONG__ > 4 */
 }
+#endif /* !... */
+#include <hybrid/typecore.h>
+#if __SIZEOF_LONG__ == 4
+DEFINE_INTERN_ALIAS(libd_wcstoul, libd_wcstou32);
+#elif __SIZEOF_LONG__ == 8
+DEFINE_INTERN_ALIAS(libd_wcstoul, libd_wcstou64);
+#else /* ... */
 /* >> wcstoul(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) unsigned long
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) unsigned long
 NOTHROW_NCX(LIBDCALL libd_wcstoul)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
                                    __STDC_INT_AS_UINT_T base) {
@@ -455,6 +475,13 @@ NOTHROW_NCX(LIBDCALL libd_wcstoul)(char16_t const *__restrict nptr,
 	return (unsigned long)libd_wcstou64(nptr, endptr, base);
 #endif /* __SIZEOF_LONG__ > 4 */
 }
+#endif /* !... */
+#include <hybrid/typecore.h>
+#if __SIZEOF_LONG__ == 4
+DEFINE_INTERN_ALIAS(libc_wcstoul, libc_wcstou32);
+#elif __SIZEOF_LONG__ == 8
+DEFINE_INTERN_ALIAS(libc_wcstoul, libc_wcstou64);
+#else /* ... */
 /* >> wcstoul(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) unsigned long
 NOTHROW_NCX(LIBKCALL libc_wcstoul)(char32_t const *__restrict nptr,
@@ -466,6 +493,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstoul)(char32_t const *__restrict nptr,
 	return (unsigned long)libc_wcstou64(nptr, endptr, base);
 #endif /* __SIZEOF_LONG__ > 4 */
 }
+#endif /* !... */
 /* >> mbsinit(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_mbsinit)(mbstate_t const *mbs) {
@@ -473,7 +501,7 @@ NOTHROW_NCX(LIBCCALL libc_mbsinit)(mbstate_t const *mbs) {
 }
 #if !defined(LIBC_ARCH_HAVE_C16MEMCMP) && __SIZEOF_INT__ > 2
 /* >> wmemcmp(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wmemcmp)(char16_t const *s1,
                                    char16_t const *s2,
                                    size_t num_chars) {
@@ -502,7 +530,7 @@ NOTHROW_NCX(LIBKCALL libc_wmemcmp)(char32_t const *s1,
 }
 #endif /* !LIBC_ARCH_HAVE_C32MEMCMP && __SIZEOF_INT__ > 4 */
 /* >> wcscpy(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcscpy)(char16_t *__restrict buf,
                                   char16_t const *__restrict src) {
 	return (char16_t *)libc_memcpyw(buf, src, libd_wcslen(src) + 1);
@@ -514,7 +542,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscpy)(char32_t *__restrict buf,
 	return (char32_t *)libc_memcpyl(buf, src, libc_wcslen(src) + 1);
 }
 /* >> wcscat(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcscat)(char16_t *__restrict buf,
                                   char16_t const *__restrict src) {
 	(char16_t *)libc_memcpyw(libd_wcsend(buf), src, libd_wcslen(src) + 1);
@@ -528,7 +556,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscat)(char32_t *__restrict buf,
 	return buf;
 }
 /* >> wcsncat(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsncat)(char16_t *__restrict buf,
                                    char16_t const *__restrict src,
                                    size_t buflen) {
@@ -550,7 +578,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncat)(char32_t *__restrict buf,
 	return buf;
 }
 /* >> wcsncpy(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsncpy)(char16_t *__restrict buf,
                                    char16_t const *__restrict src,
                                    size_t buflen) {
@@ -570,7 +598,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncpy)(char32_t *__restrict buf,
 	return buf;
 }
 /* >> wcscmp(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcscmp)(char16_t const *s1,
                                   char16_t const *s2) {
 	char16_t c1, c2;
@@ -592,7 +620,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscmp)(char32_t const *s1,
 	return 0;
 }
 /* >> wcsncmp(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcsncmp)(char16_t const *s1,
                                    char16_t const *s2,
                                    size_t maxlen) {
@@ -620,7 +648,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncmp)(char32_t const *s1,
 	return 0;
 }
 /* >> wcscoll(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcscoll)(char16_t const *s1,
                                    char16_t const *s2) {
 	/* XXX: Implement properly? */
@@ -634,7 +662,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscoll)(char32_t const *s1,
 	return libc_wcscmp(s1, s2);
 }
 /* >> wcsxfrm(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") NONNULL((2)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") NONNULL((2)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcsxfrm)(char16_t *dst,
                                    char16_t const *__restrict src,
                                    size_t maxlen) {
@@ -655,7 +683,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsxfrm)(char32_t *dst,
 }
 #include <libc/template/stdstreams.h>
 /* >> getwchar(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.getc") wint16_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.getc") wint16_t
 (LIBDCALL libd_getwchar)(void) THROWS(...) {
 	return libd_fgetwc(stdin);
 }
@@ -667,7 +695,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.getc") wint32_t
 }
 #include <libc/template/stdstreams.h>
 /* >> putwchar(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.putc") wint16_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.putc") wint16_t
 (LIBDCALL libd_putwchar)(char16_t wc) THROWS(...) {
 	return libd_fputwc(wc, stdout);
 }
@@ -680,7 +708,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.putc") wint32_t
 #include <libc/errno.h>
 #include <asm/crt/stdio.h>
 /* >> fgetws(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.read") WUNUSED NONNULL((1, 3)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.read") WUNUSED NONNULL((1, 3)) char16_t *
 (LIBDCALL libd_fgetws)(char16_t *__restrict buf,
                        __STDC_INT_AS_SIZE_T bufsize,
                        FILE *__restrict stream) THROWS(...) {
@@ -764,7 +792,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.read") WUNUSED NONNULL((1,
 	return buf;
 }
 /* >> fputws(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.write") NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.write") NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (LIBDCALL libd_fputws)(char16_t const *__restrict str,
                        FILE *__restrict stream) THROWS(...) {
 	__STDC_INT_AS_SIZE_T result;
@@ -780,7 +808,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.write") NONNULL((1, 2)) _
 	return result;
 }
 /* >> wcsftime(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.strftime") ATTR_LIBC_C16FTIME(3, 0) NONNULL((1, 3, 4)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.strftime") ATTR_LIBC_C16FTIME(3, 0) NONNULL((1, 3, 4)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcsftime)(char16_t *__restrict buf,
                                     size_t buflen,
                                     char16_t const *__restrict format,
@@ -806,7 +834,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsftime)(char32_t *__restrict buf,
 	return 0;
 }
 /* >> wcstok(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") NONNULL((2, 3)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") NONNULL((2, 3)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcstok)(char16_t *str,
                                   char16_t const *__restrict delim,
                                   char16_t **__restrict save_ptr) {
@@ -859,7 +887,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstok)(char32_t *str,
 }
 #ifndef LIBC_ARCH_HAVE_C16SLEN
 /* >> wcslen(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcslen)(char16_t const *__restrict str) {
 	return (size_t)(libd_wcsend(str) - str);
 }
@@ -872,7 +900,7 @@ NOTHROW_NCX(LIBKCALL libc_wcslen)(char32_t const *__restrict str) {
 }
 #endif /* !LIBC_ARCH_HAVE_C32SLEN */
 /* >> wcsspn(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcsspn)(char16_t const *haystack,
                                   char16_t const *accept) {
 	char16_t const *iter = haystack;
@@ -891,7 +919,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsspn)(char32_t const *haystack,
 }
 #include <hybrid/typecore.h>
 /* >> wcscspn(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcscspn)(char16_t const *haystack,
                                    char16_t const *reject) {
 	char16_t const *iter = haystack;
@@ -910,7 +938,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscspn)(char32_t const *haystack,
 	return (size_t)(iter - haystack);
 }
 /* >> wcschr(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcschr)(char16_t const *__restrict haystack,
                                   char16_t needle) {
 	for (;; ++haystack) {
@@ -936,7 +964,7 @@ NOTHROW_NCX(LIBKCALL libc_wcschr)(char32_t const *__restrict haystack,
 	return NULL;
 }
 /* >> wcsrchr(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsrchr)(char16_t const *__restrict haystack,
                                    char16_t needle) {
 	char16_t const *result = NULL;
@@ -964,7 +992,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsrchr)(char32_t const *__restrict haystack,
 	return (char32_t *)result;
 }
 /* >> wcspbrk(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcspbrk)(char16_t const *haystack,
                                    char16_t const *accept) {
 	char16_t haych, ch;
@@ -994,7 +1022,7 @@ NOTHROW_NCX(LIBKCALL libc_wcspbrk)(char32_t const *haystack,
 	return NULL;
 }
 /* >> wcsstr(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsstr)(char16_t const *haystack,
                                   char16_t const *needle) {
 	char16_t ch, needle_start = *needle++;
@@ -1045,7 +1073,7 @@ NOTHROW_NCX(LIBCCALL libc_fwide)(FILE *fp,
 	return 0;
 }
 /* >> fwprintf(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf") ATTR_LIBC_C16PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf") ATTR_LIBC_C16PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (VLIBDCALL libd_fwprintf)(FILE *__restrict stream,
                           char16_t const *__restrict format,
                           ...) THROWS(...) {
@@ -1069,7 +1097,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.printf") ATTR_LIBC_C32PRI
 	return result;
 }
 /* >> vfwprintf(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf") ATTR_LIBC_C16PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf") ATTR_LIBC_C16PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (LIBDCALL libd_vfwprintf)(FILE *__restrict stream,
                           char16_t const *__restrict format,
                           va_list args) THROWS(...) {
@@ -1083,7 +1111,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.printf") ATTR_LIBC_C32PRI
 	return (__STDC_INT_AS_SSIZE_T)libc_format_vwprintf(&libc_file_wprinter, stream, format, args);
 }
 /* >> wprintf(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf") ATTR_LIBC_C16PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf") ATTR_LIBC_C16PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (VLIBDCALL libd_wprintf)(char16_t const *__restrict format,
                          ...) THROWS(...) {
 	__STDC_INT_AS_SIZE_T result;
@@ -1106,7 +1134,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.printf") ATTR_LIBC_C32PRI
 }
 #include <libc/template/stdstreams.h>
 /* >> vwprintf(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf") ATTR_LIBC_C16PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf") ATTR_LIBC_C16PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBDCALL libd_vwprintf)(char16_t const *__restrict format,
                          va_list args) THROWS(...) {
 	return libd_vfwprintf(stdout, format, args);
@@ -1119,7 +1147,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.printf") ATTR_LIBC_C32PRI
 	return libc_vfwprintf(stdout, format, args);
 }
 /* >> fwscanf(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") ATTR_LIBC_C16SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") ATTR_LIBC_C16SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (VLIBDCALL libd_fwscanf)(FILE *__restrict stream,
                          char16_t const *__restrict format,
                          ...) THROWS(...) {
@@ -1143,7 +1171,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.scanf") ATTR_LIBC_C32SCANF
 	return result;
 }
 /* >> wscanf(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") ATTR_LIBC_C16SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") ATTR_LIBC_C16SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (VLIBDCALL libd_wscanf)(char16_t const *__restrict format,
                         ...) THROWS(...) {
 	__STDC_INT_AS_SIZE_T result;
@@ -1165,7 +1193,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.scanf") ATTR_LIBC_C32SCANF
 	return result;
 }
 /* >> swscanf(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.scanf") ATTR_LIBC_C16SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.scanf") ATTR_LIBC_C16SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBDCALL libd_swscanf)(char16_t const *__restrict src,
                                     char16_t const *__restrict format,
                                     ...) {
@@ -1196,7 +1224,7 @@ struct __format_c16snprintf_data {
 };
 #endif /* !____format_c16snprintf_data_defined */
 /* >> vswprintf(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C16PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C16PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBDCALL libd_vswprintf)(char16_t *__restrict buf,
                                      size_t buflen,
                                      char16_t const *__restrict format,
@@ -1247,7 +1275,7 @@ NOTHROW_NCX(LIBKCALL libc_vswprintf)(char32_t *__restrict buf,
 	return result;
 }
 /* >> swprintf(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C16PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_C16PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBDCALL libd_swprintf)(char16_t *__restrict buf,
                                      size_t buflen,
                                      char16_t const *__restrict format,
@@ -1331,7 +1359,7 @@ __NAMESPACE_LOCAL_BEGIN
 
 __NAMESPACE_LOCAL_END
 /* >> wcstod(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) double
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) double
 NOTHROW_NCX(LIBDCALL libd_wcstod)(char16_t const *__restrict nptr,
                                   char16_t **endptr) {
 	double result;
@@ -1499,7 +1527,7 @@ __NAMESPACE_LOCAL_BEGIN
 
 __NAMESPACE_LOCAL_END
 /* >> wcstof(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) float
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) float
 NOTHROW_NCX(LIBDCALL libd_wcstof)(char16_t const *__restrict nptr,
                                   char16_t **endptr) {
 	float result;
@@ -1667,7 +1695,7 @@ __NAMESPACE_LOCAL_BEGIN
 
 __NAMESPACE_LOCAL_END
 /* >> wcstold(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) __LONGDOUBLE
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) __LONGDOUBLE
 NOTHROW_NCX(LIBDCALL libd_wcstold)(char16_t const *__restrict nptr,
                                    char16_t **endptr) {
 	__LONGDOUBLE result;
@@ -1776,8 +1804,14 @@ NOTHROW_NCX(LIBKCALL libc_wcstold)(char32_t const *__restrict nptr,
 		*endptr = (char32_t *)text_pointer;
 	return result;
 }
+#include <hybrid/typecore.h>
+#if __SIZEOF_LONG_LONG__ == 8
+DEFINE_INTERN_ALIAS(libd_wcstoll, libd_wcsto64);
+#elif __SIZEOF_LONG_LONG__ == 4
+DEFINE_INTERN_ALIAS(libd_wcstoll, libd_wcsto32);
+#else /* ... */
 /* >> wcstoll(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) __LONGLONG
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) __LONGLONG
 NOTHROW_NCX(LIBDCALL libd_wcstoll)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
                                    __STDC_INT_AS_UINT_T base) {
@@ -1787,6 +1821,13 @@ NOTHROW_NCX(LIBDCALL libd_wcstoll)(char16_t const *__restrict nptr,
 	return (__LONGLONG)libd_wcsto64(nptr, endptr, base);
 #endif /* __SIZEOF_LONG_LONG__ > 4 */
 }
+#endif /* !... */
+#include <hybrid/typecore.h>
+#if __SIZEOF_LONG_LONG__ == 8
+DEFINE_INTERN_ALIAS(libc_wcstoll, libc_wcsto64);
+#elif __SIZEOF_LONG_LONG__ == 4
+DEFINE_INTERN_ALIAS(libc_wcstoll, libc_wcsto32);
+#else /* ... */
 /* >> wcstoll(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) __LONGLONG
 NOTHROW_NCX(LIBKCALL libc_wcstoll)(char32_t const *__restrict nptr,
@@ -1798,8 +1839,15 @@ NOTHROW_NCX(LIBKCALL libc_wcstoll)(char32_t const *__restrict nptr,
 	return (__LONGLONG)libc_wcsto64(nptr, endptr, base);
 #endif /* __SIZEOF_LONG_LONG__ > 4 */
 }
+#endif /* !... */
+#include <hybrid/typecore.h>
+#if __SIZEOF_LONG_LONG__ == 8
+DEFINE_INTERN_ALIAS(libd_wcstoull, libd_wcstou64);
+#elif __SIZEOF_LONG_LONG__ == 4
+DEFINE_INTERN_ALIAS(libd_wcstoull, libd_wcstou32);
+#else /* ... */
 /* >> wcstoull(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) __ULONGLONG
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) __ULONGLONG
 NOTHROW_NCX(LIBDCALL libd_wcstoull)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
                                     __STDC_INT_AS_UINT_T base) {
@@ -1809,6 +1857,13 @@ NOTHROW_NCX(LIBDCALL libd_wcstoull)(char16_t const *__restrict nptr,
 	return (__ULONGLONG)libd_wcstou64(nptr, endptr, base);
 #endif /* __SIZEOF_LONG_LONG__ > 4 */
 }
+#endif /* !... */
+#include <hybrid/typecore.h>
+#if __SIZEOF_LONG_LONG__ == 8
+DEFINE_INTERN_ALIAS(libc_wcstoull, libc_wcstou64);
+#elif __SIZEOF_LONG_LONG__ == 4
+DEFINE_INTERN_ALIAS(libc_wcstoull, libc_wcstou32);
+#else /* ... */
 /* >> wcstoull(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) __ULONGLONG
 NOTHROW_NCX(LIBKCALL libc_wcstoull)(char32_t const *__restrict nptr,
@@ -1820,9 +1875,10 @@ NOTHROW_NCX(LIBKCALL libc_wcstoull)(char32_t const *__restrict nptr,
 	return (__ULONGLONG)libc_wcstou64(nptr, endptr, base);
 #endif /* __SIZEOF_LONG_LONG__ > 4 */
 }
+#endif /* !... */
 #include <libc/template/stdstreams.h>
 /* >> vwscanf(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_C16SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_C16SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBDCALL libd_vwscanf)(char16_t const *__restrict format,
                         va_list args) THROWS(...) {
 	return libd_vfwscanf(stdin, format, args);
@@ -1835,7 +1891,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_
 	return libc_vfwscanf(stdin, format, args);
 }
 /* >> vswscanf(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.scanf") WUNUSED ATTR_LIBC_C16SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.scanf") WUNUSED ATTR_LIBC_C16SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBDCALL libd_vswscanf)(char16_t const *__restrict src,
                                     char16_t const *__restrict format,
                                     va_list args) {
@@ -1859,7 +1915,7 @@ NOTHROW_NCX(LIBKCALL libc_vswscanf)(char32_t const *__restrict src,
 	return 0;
 }
 /* >> wcscasecmp(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcscasecmp)(char16_t const *s1,
                                       char16_t const *s2) {
 	char16_t c1, c2;
@@ -1893,7 +1949,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscasecmp)(char32_t const *s1,
 	return 0;
 }
 /* >> wcsncasecmp(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcsncasecmp)(char16_t const *s1,
                                        char16_t const *s2,
                                        size_t maxlen) {
@@ -1933,7 +1989,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncasecmp)(char32_t const *s1,
 	return 0;
 }
 /* >> wcscasecmp_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcscasecmp_l)(char16_t const *s1,
                                         char16_t const *s2,
                                         locale_t locale) {
@@ -1949,7 +2005,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscasecmp_l)(char32_t const *s1,
 	return libc_wcscasecmp(s1, s2);
 }
 /* >> wcsncasecmp_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcsncasecmp_l)(char16_t const *s1,
                                          char16_t const *s2,
                                          size_t maxlen,
@@ -1967,7 +2023,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncasecmp_l)(char32_t const *s1,
 	return libc_wcsncasecmp(s1, s2, maxlen);
 }
 /* >> wcscoll_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcscoll_l)(char16_t const *s1,
                                      char16_t const *s2,
                                      locale_t locale) {
@@ -1985,7 +2041,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscoll_l)(char32_t const *s1,
 	return libc_wcscoll(s1, s2);
 }
 /* >> wcsxfrm_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") NONNULL((2)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") NONNULL((2)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcsxfrm_l)(char16_t *dst,
                                      char16_t const *__restrict src,
                                      size_t maxlen,
@@ -2003,7 +2059,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsxfrm_l)(char32_t *dst,
 	return libc_wcsxfrm(dst, src, maxlen);
 }
 /* >> wcpcpy(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcpcpy)(char16_t *__restrict dst,
                                   char16_t const *__restrict src) {
 	return (char16_t *)libc_mempcpyw(dst, src, libd_wcslen(src) + 1);
@@ -2015,7 +2071,7 @@ NOTHROW_NCX(LIBKCALL libc_wcpcpy)(char32_t *__restrict dst,
 	return (char32_t *)libc_mempcpyl(dst, src, libc_wcslen(src) + 1);
 }
 /* >> wcpncpy(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcpncpy)(char16_t *__restrict buf,
                                    char16_t const *__restrict src,
                                    size_t buflen) {
@@ -2036,7 +2092,7 @@ NOTHROW_NCX(LIBKCALL libc_wcpncpy)(char32_t *__restrict buf,
 }
 #ifndef LIBC_ARCH_HAVE_C16SNLEN
 /* >> wcsnlen(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcsnlen)(char16_t const *__restrict str,
                                    size_t maxlen) {
 	return (size_t)(libd_wcsnend(str, maxlen) - str);
@@ -2052,7 +2108,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnlen)(char32_t const *__restrict str,
 #endif /* !LIBC_ARCH_HAVE_C32SNLEN */
 #include <hybrid/typecore.h>
 /* >> wcsdup(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsdup)(char16_t const *__restrict string) {
 	size_t resultsize = (libd_wcslen(string) + 1) * sizeof(char16_t);
 	char16_t *result = (char16_t *)libc_malloc(resultsize);
@@ -2075,7 +2131,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsdup)(char32_t const *__restrict string) {
  * Returns the number of columns needed to display `ch' in a system terminal
  * When `ch' cannot be  displayed at all, `-1'  is returned (but `errno'  is
  * never modified by this function). Zero-width characters return `0'. */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_wcwidth)(char16_t ch) {
 	if (__libc_unicode_isprint(ch))
 		return 1;
@@ -2100,7 +2156,7 @@ NOTHROW_NCX(LIBKCALL libc_wcwidth)(char32_t ch) {
  * Returns the number of columns needed to display `str...+=wcslen(str, num_chars)'
  * in a system terminal. If any of the contained characters cannot be printed, then
  * `-1' is returned. (s.a. `wcwidth(3)') */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) __STDC_INT32_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) __STDC_INT32_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd_wcswidth)(char16_t const *__restrict str,
                                     size_t num_chars) {
 	int temp;
@@ -2138,7 +2194,7 @@ NOTHROW_NCX(LIBKCALL libc_wcswidth)(char32_t const *__restrict str,
 }
 /* >> wcschrnul(3)
  * Same as `wcschr', but return `wcsend(str)', rather than `NULL' if `needle' wasn't found. */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcschrnul)(char16_t const *haystack,
                                      char16_t needle) {
 	for (; *haystack; ++haystack) {
@@ -2159,7 +2215,7 @@ NOTHROW_NCX(LIBKCALL libc_wcschrnul)(char32_t const *haystack,
 	return (char32_t *)haystack;
 }
 /* >> wcstol_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) long
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) long
 NOTHROW_NCX(LIBDCALL libd_wcstol_l)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
                                     __STDC_INT_AS_UINT_T base,
@@ -2177,7 +2233,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstol_l)(char32_t const *__restrict nptr,
 	return libc_wcstol(nptr, endptr, base);
 }
 /* >> wcstoul_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) unsigned long
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) unsigned long
 NOTHROW_NCX(LIBDCALL libd_wcstoul_l)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
                                      __STDC_INT_AS_UINT_T base,
@@ -2195,7 +2251,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstoul_l)(char32_t const *__restrict nptr,
 	return libc_wcstoul(nptr, endptr, base);
 }
 /* >> wcstoll_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) __LONGLONG
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) __LONGLONG
 NOTHROW_NCX(LIBDCALL libd_wcstoll_l)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
                                      __STDC_INT_AS_UINT_T base,
@@ -2213,7 +2269,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstoll_l)(char32_t const *__restrict nptr,
 	return libc_wcstoll(nptr, endptr, base);
 }
 /* >> wcstoull_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) __ULONGLONG
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) __ULONGLONG
 NOTHROW_NCX(LIBDCALL libd_wcstoull_l)(char16_t const *__restrict nptr,
                                       char16_t **endptr,
                                       __STDC_INT_AS_UINT_T base,
@@ -2231,7 +2287,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstoull_l)(char32_t const *__restrict nptr,
 	return libc_wcstoull(nptr, endptr, base);
 }
 /* >> wcstof_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) float
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) float
 NOTHROW_NCX(LIBDCALL libd_wcstof_l)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
                                     locale_t locale) {
@@ -2247,7 +2303,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstof_l)(char32_t const *__restrict nptr,
 	return libc_wcstof(nptr, endptr);
 }
 /* >> wcstod_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) double
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) double
 NOTHROW_NCX(LIBDCALL libd_wcstod_l)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
                                     locale_t locale) {
@@ -2263,7 +2319,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstod_l)(char32_t const *__restrict nptr,
 	return libc_wcstod(nptr, endptr);
 }
 /* >> wcstold_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) __LONGDOUBLE
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) __LONGDOUBLE
 NOTHROW_NCX(LIBDCALL libd_wcstold_l)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
                                      locale_t locale) {
@@ -2280,7 +2336,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstold_l)(char32_t const *__restrict nptr,
 }
 #include <libc/template/stdstreams.h>
 /* >> getwchar_unlocked(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.getc") wint16_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.getc") wint16_t
 (LIBDCALL libd_getwchar_unlocked)(void) THROWS(...) {
 	return libd_fgetwc_unlocked(stdin);
 }
@@ -2292,7 +2348,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.getc") wint32_t
 }
 #include <libc/template/stdstreams.h>
 /* >> putwchar_unlocked(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.putc") wint16_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.putc") wint16_t
 (LIBDCALL libd_putwchar_unlocked)(char16_t wc) THROWS(...) {
 	return libd_fputwc_unlocked(wc, stdout);
 }
@@ -2305,7 +2361,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.putc") wint32_t
 #include <asm/crt/stdio.h>
 #include <libc/errno.h>
 /* >> fgetws_unlocked(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.read") NONNULL((1, 3)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.read") NONNULL((1, 3)) char16_t *
 (LIBDCALL libd_fgetws_unlocked)(char16_t *__restrict buf,
                                 __STDC_INT_AS_SIZE_T bufsize,
                                 FILE *__restrict stream) THROWS(...) {
@@ -2389,7 +2445,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.read") NONNULL((1, 3)) c
 	return buf;
 }
 /* >> fputws_unlocked(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.write") NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.write") NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (LIBDCALL libd_fputws_unlocked)(char16_t const *__restrict str,
                                 FILE *__restrict stream) THROWS(...) {
 	__STDC_INT_AS_SIZE_T result;
@@ -2405,7 +2461,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.write") NONNULL((1, 2))
 	return result;
 }
 /* >> wcsftime_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.strftime") ATTR_LIBC_C16FTIME(3, 0) NONNULL((1, 3, 4)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.strftime") ATTR_LIBC_C16FTIME(3, 0) NONNULL((1, 3, 4)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcsftime_l)(char16_t *__restrict buf,
                                       size_t maxsize,
                                       char16_t const *__restrict format,
@@ -2425,7 +2481,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsftime_l)(char32_t *__restrict buf,
 	return libc_wcsftime(buf, maxsize, format, tp);
 }
 /* >> vfwprintf_unlocked(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.printf") ATTR_LIBC_C16PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.printf") ATTR_LIBC_C16PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (LIBDCALL libd_vfwprintf_unlocked)(FILE *__restrict stream,
                                    char16_t const *__restrict format,
                                    va_list args) THROWS(...) {
@@ -2441,7 +2497,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.printf") ATTR_LIBC_C32P
 	                                              stream, format, args);
 }
 /* >> fwprintf_unlocked(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.printf") ATTR_LIBC_C16PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.printf") ATTR_LIBC_C16PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (VLIBDCALL libd_fwprintf_unlocked)(FILE *__restrict stream,
                                    char16_t const *__restrict format,
                                    ...) THROWS(...) {
@@ -2465,7 +2521,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.printf") ATTR_LIBC_C32P
 	return result;
 }
 /* >> wprintf_unlocked(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.printf") ATTR_LIBC_C16PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.printf") ATTR_LIBC_C16PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (VLIBDCALL libd_wprintf_unlocked)(char16_t const *__restrict format,
                                   ...) THROWS(...) {
 	__STDC_INT_AS_SIZE_T result;
@@ -2488,7 +2544,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.printf") ATTR_LIBC_C32P
 }
 #include <libc/template/stdstreams.h>
 /* >> vwprintf_unlocked(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.printf") ATTR_LIBC_C16PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.printf") ATTR_LIBC_C16PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBDCALL libd_vwprintf_unlocked)(char16_t const *__restrict format,
                                   va_list args) THROWS(...) {
 	return libd_vfwprintf_unlocked(stdout, format, args);
@@ -2502,7 +2558,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.printf") ATTR_LIBC_C32P
 }
 #include <libc/template/stdstreams.h>
 /* >> vwscanf_unlocked(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_C16SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_C16SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBDCALL libd_vwscanf_unlocked)(char16_t const *__restrict format,
                                  va_list args) THROWS(...) {
 	return libd_vfwscanf_unlocked(stdin, format, args);
@@ -2515,7 +2571,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIB
 	return libc_vfwscanf_unlocked(stdin, format, args);
 }
 /* >> fwscanf_unlocked(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_C16SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_C16SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (VLIBDCALL libd_fwscanf_unlocked)(FILE *__restrict stream,
                                   char16_t const *__restrict format,
                                   ...) THROWS(...) {
@@ -2539,7 +2595,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIB
 	return result;
 }
 /* >> wscanf_unlocked(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_C16SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_C16SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (VLIBDCALL libd_wscanf_unlocked)(char16_t const *__restrict format,
                                  ...) THROWS(...) {
 	__STDC_INT_AS_SIZE_T result;
@@ -2563,7 +2619,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIB
 #ifndef LIBC_ARCH_HAVE_C16SEND
 /* >> wcsend(3)
  * Same as `str + wcslen(str)' */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsend)(char16_t const *__restrict str) {
 	while (*str)
 		++str;
@@ -2583,7 +2639,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsend)(char32_t const *__restrict str) {
 #ifndef LIBC_ARCH_HAVE_C16SNEND
 /* >> wcsnend(3)
  * Same as `str + wcsnlen(str, max_chars)' */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsnend)(char16_t const *__restrict str,
                                    size_t maxlen) {
 	for (; maxlen && *str; ++str, --maxlen)
@@ -2606,7 +2662,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnend)(char32_t const *__restrict str,
 #include <hybrid/__overflow.h>
 #include <hybrid/limitcore.h>
 /* >> wcsto32_r(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int32_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int32_t
 NOTHROW_NCX(LIBDCALL libd_wcsto32_r)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
                                      __STDC_INT_AS_UINT_T base,
@@ -2897,7 +2953,7 @@ handle_overflow:
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
 /* >> wcstou32_r(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint32_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint32_t
 NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
                                       char16_t **endptr,
                                       __STDC_INT_AS_UINT_T base,
@@ -3160,7 +3216,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
 }
 #include <libc/errno.h>
 /* >> wcsto32(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int32_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int32_t
 NOTHROW_NCX(LIBDCALL libd_wcsto32)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
                                    __STDC_INT_AS_UINT_T base) {
@@ -3194,7 +3250,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsto32)(char32_t const *__restrict nptr,
 }
 #include <libc/errno.h>
 /* >> wcstou32(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint32_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint32_t
 NOTHROW_NCX(LIBDCALL libd_wcstou32)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
                                     __STDC_INT_AS_UINT_T base) {
@@ -3230,7 +3286,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32)(char32_t const *__restrict nptr,
 #include <hybrid/__overflow.h>
 #include <hybrid/limitcore.h>
 /* >> wcsto64_r(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int64_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int64_t
 NOTHROW_NCX(LIBDCALL libd_wcsto64_r)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
                                      __STDC_INT_AS_UINT_T base,
@@ -3521,7 +3577,7 @@ handle_overflow:
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
 /* >> wcstou64_r(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint64_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint64_t
 NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
                                       char16_t **endptr,
                                       __STDC_INT_AS_UINT_T base,
@@ -3784,7 +3840,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
 }
 #include <libc/errno.h>
 /* >> wcstou64(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint64_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint64_t
 NOTHROW_NCX(LIBDCALL libd_wcstou64)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
                                     __STDC_INT_AS_UINT_T base) {
@@ -3818,7 +3874,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64)(char32_t const *__restrict nptr,
 }
 #include <libc/errno.h>
 /* >> wcsto64(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int64_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int64_t
 NOTHROW_NCX(LIBDCALL libd_wcsto64)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
                                    __STDC_INT_AS_UINT_T base) {
@@ -3851,7 +3907,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsto64)(char32_t const *__restrict nptr,
 
 }
 /* >> wcsto32_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) int32_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) int32_t
 NOTHROW_NCX(LIBDCALL libd_wcsto32_l)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
                                      __STDC_INT_AS_UINT_T base,
@@ -3869,7 +3925,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsto32_l)(char32_t const *__restrict nptr,
 	return libc_wcsto32(nptr, endptr, base);
 }
 /* >> wcstou32_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) uint32_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) uint32_t
 NOTHROW_NCX(LIBDCALL libd_wcstou32_l)(char16_t const *__restrict nptr,
                                       char16_t **endptr,
                                       __STDC_INT_AS_UINT_T base,
@@ -3887,7 +3943,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32_l)(char32_t const *__restrict nptr,
 	return libc_wcstou32(nptr, endptr, base);
 }
 /* >> wcsto64_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) int64_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) int64_t
 NOTHROW_NCX(LIBDCALL libd_wcsto64_l)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
                                      __STDC_INT_AS_UINT_T base,
@@ -3905,7 +3961,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsto64_l)(char32_t const *__restrict nptr,
 	return libc_wcsto64(nptr, endptr, base);
 }
 /* >> wcstou64_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) uint64_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) uint64_t
 NOTHROW_NCX(LIBDCALL libd_wcstou64_l)(char16_t const *__restrict nptr,
                                       char16_t **endptr,
                                       __STDC_INT_AS_UINT_T base,
@@ -3923,7 +3979,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64_l)(char32_t const *__restrict nptr,
 	return libc_wcstou64(nptr, endptr, base);
 }
 /* >> wcsncoll(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcsncoll)(char16_t const *s1,
                                     char16_t const *s2,
                                     size_t maxlen) {
@@ -3939,7 +3995,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncoll)(char32_t const *s1,
 	return libc_wcsncmp(s1, s2, maxlen);
 }
 /* >> wcscasecoll(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcscasecoll)(char16_t const *s1,
                                        char16_t const *s2) {
 	/* XXX: Implement properly? */
@@ -3953,7 +4009,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscasecoll)(char32_t const *s1,
 	return libc_wcscasecmp(s1, s2);
 }
 /* >> wcsncasecoll(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcsncasecoll)(char16_t const *s1,
                                         char16_t const *s2,
                                         size_t maxlen) {
@@ -3969,7 +4025,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncasecoll)(char32_t const *s1,
 	return libc_wcsncasecmp(s1, s2, maxlen);
 }
 /* >> wcsnrev(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsnrev)(char16_t *__restrict str,
                                    size_t maxlen) {
 
@@ -3993,7 +4049,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnrev)(char32_t *__restrict str,
 
 }
 /* >> wcsnlwr(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsnlwr)(char16_t *__restrict str,
                                    size_t maxlen) {
 	char16_t *iter, ch;
@@ -4011,7 +4067,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnlwr)(char32_t *__restrict str,
 	return str;
 }
 /* >> wcsnupr(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsnupr)(char16_t *__restrict str,
                                    size_t maxlen) {
 	char16_t *iter, ch;
@@ -4029,7 +4085,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnupr)(char32_t *__restrict str,
 	return str;
 }
 /* >> wcscasestr(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcscasestr)(char16_t const *haystack,
                                       char16_t const *needle) {
 	for (; *haystack; ++haystack) {
@@ -4050,7 +4106,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscasestr)(char32_t const *haystack,
 }
 /* >> wcspcpy(3)
  * Same as wcscpy, but return a pointer after the last written character */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcspcpy)(char16_t *__restrict buf,
                                    char16_t const *__restrict src) {
 	return (char16_t *)libc_mempcpyw(buf, src, libd_wcslen(src) + 1);
@@ -4064,7 +4120,7 @@ NOTHROW_NCX(LIBKCALL libc_wcspcpy)(char32_t *__restrict buf,
 }
 /* >> wcspncpy(3)
  * Same as wcsncpy, but return a pointer after the last written character */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcspncpy)(char16_t *__restrict buf,
                                     char16_t const *__restrict src,
                                     size_t buflen) {
@@ -4084,7 +4140,7 @@ NOTHROW_NCX(LIBKCALL libc_wcspncpy)(char32_t *__restrict buf,
 }
 /* >> wcsnchr(3)
  * Same as `wcschr', but don't exceed `max_chars' characters. */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsnchr)(char16_t const *__restrict haystack,
                                    char16_t needle,
                                    size_t maxlen) {
@@ -4108,7 +4164,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnchr)(char32_t const *__restrict haystack,
 }
 /* >> wcsnrchr(3)
  * Same as `wcsrchr', but don't exceed `max_chars' characters. */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsnrchr)(char16_t const *__restrict haystack,
                                     char16_t needle,
                                     size_t maxlen) {
@@ -4133,7 +4189,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnrchr)(char32_t const *__restrict haystack,
 	return (char32_t *)result;
 }
 /* >> wcssep(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF NONNULL((1, 2)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcssep)(char16_t **__restrict stringp,
                                   char16_t const *__restrict delim) {
 	char16_t *result, *iter;
@@ -4162,7 +4218,7 @@ NOTHROW_NCX(LIBKCALL libc_wcssep)(char32_t **__restrict stringp,
 }
 #include <hybrid/typecore.h>
 /* >> wcsfry(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsfry)(char16_t *__restrict str) {
 	size_t i, count = libd_wcslen(str);
 	for (i = 0; i < count; ++i) {
@@ -4193,7 +4249,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsfry)(char32_t *__restrict str) {
 	return str;
 }
 /* >> wcsndup(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsndup)(char16_t const *__restrict str,
                                    size_t max_chars) {
 	size_t resultsize = libd_wcsnlen(str, max_chars) * sizeof(char16_t);
@@ -4216,7 +4272,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsndup)(char32_t const *__restrict str,
 }
 /* >> wcsrchrnul(3)
  * Same as `wcsrchr', but return `str-1', rather than `NULL' if `needle' wasn't found. */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsrchrnul)(char16_t const *__restrict haystack,
                                       char16_t needle) {
 	char16_t const *result = haystack - 1;
@@ -4240,7 +4296,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsrchrnul)(char32_t const *__restrict haystack,
 }
 /* >> wcsnchrnul(3)
  * Same as `wcsnchr', but return `wcsnend(str, max_chars)', rather than `NULL' if `needle' wasn't found. */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsnchrnul)(char16_t const *__restrict haystack,
                                       char16_t needle,
                                       size_t maxlen) {
@@ -4260,7 +4316,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnchrnul)(char32_t const *__restrict haystack,
 }
 /* >> wcsnrchrnul(3)
  * Same as `wcsnrchr', but return `str-1', rather than `NULL' if `needle' wasn't found. */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsnrchrnul)(char16_t const *__restrict haystack,
                                        char16_t needle,
                                        size_t maxlen) {
@@ -4286,7 +4342,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnrchrnul)(char32_t const *__restrict haystack,
 }
 /* >> wcsoff(3)
  * Same as `wcschrnul', but return the offset from `str', rather than the actual address */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcsoff)(char16_t const *__restrict haystack,
                                   char16_t needle) {
 	return (size_t)(libd_wcschrnul(haystack, needle) - haystack);
@@ -4300,7 +4356,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsoff)(char32_t const *__restrict haystack,
 }
 /* >> wcsroff(3)
  * Same as `wcsrchrnul', but return the offset from `str', rather than the actual address */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcsroff)(char16_t const *__restrict haystack,
                                    char16_t needle) {
 	return (size_t)(libd_wcsrchrnul(haystack, needle) - haystack);
@@ -4314,7 +4370,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsroff)(char32_t const *__restrict haystack,
 }
 /* >> wcsnoff(3)
  * Same as `wcsnchrnul', but return the offset from `str', rather than the actual address */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcsnoff)(char16_t const *__restrict haystack,
                                    char16_t needle,
                                    size_t maxlen) {
@@ -4330,7 +4386,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnoff)(char32_t const *__restrict haystack,
 }
 /* >> wcsnroff(3)
  * Same as `wcsnrchrnul', but return the offset from `str', rather than the actual address */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcsnroff)(char16_t const *__restrict haystack,
                                     char16_t needle,
                                     size_t maxlen) {
@@ -4345,7 +4401,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnroff)(char32_t const *__restrict haystack,
 	return (size_t)(libc_wcsnrchrnul(haystack, needle, maxlen) - haystack);
 }
 /* >> fuzzy_wcscmp(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd_fuzzy_wcscmp)(char16_t const *s1,
                                         char16_t const *s2) {
 	return libc_fuzzy_memcmpw(s1, libd_wcslen(s1), s2, libd_wcslen(s2));
@@ -4357,7 +4413,7 @@ NOTHROW_NCX(LIBKCALL libc_fuzzy_wcscmp)(char32_t const *s1,
 	return libc_fuzzy_memcmpl(s1, libc_wcslen(s1), s2, libc_wcslen(s2));
 }
 /* >> fuzzy_wcsncmp(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
 NOTHROW_NCX(LIBDCALL libd_fuzzy_wcsncmp)(char16_t const *s1,
                                          size_t s1_maxlen,
                                          char16_t const *s2,
@@ -4374,7 +4430,7 @@ NOTHROW_NCX(LIBKCALL libc_fuzzy_wcsncmp)(char32_t const *s1,
 }
 #include <parts/malloca.h>
 /* >> fuzzy_wmemcasecmp(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
 NOTHROW_NCX(LIBDCALL libd_fuzzy_wmemcasecmp)(char16_t const *s1,
                                              size_t s1_bytes,
                                              char16_t const *s2,
@@ -4499,7 +4555,7 @@ NOTHROW_NCX(LIBKCALL libc_fuzzy_wmemcasecmp)(char32_t const *s1,
 	return temp;
 }
 /* >> fuzzy_wcscasecmp(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd_fuzzy_wcscasecmp)(char16_t const *s1,
                                             char16_t const *s2) {
 	return libd_fuzzy_wmemcasecmp(s1, libd_wcslen(s1), s2, libd_wcslen(s2));
@@ -4511,7 +4567,7 @@ NOTHROW_NCX(LIBKCALL libc_fuzzy_wcscasecmp)(char32_t const *s1,
 	return libc_fuzzy_wmemcasecmp(s1, libc_wcslen(s1), s2, libc_wcslen(s2));
 }
 /* >> fuzzy_wcsncasecmp(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
 NOTHROW_NCX(LIBDCALL libd_fuzzy_wcsncasecmp)(char16_t const *s1,
                                              size_t s1_maxlen,
                                              char16_t const *s2,
@@ -4527,7 +4583,7 @@ NOTHROW_NCX(LIBKCALL libc_fuzzy_wcsncasecmp)(char32_t const *s1,
 	return libc_fuzzy_wmemcasecmp(s1, libc_wcsnlen(s1, s1_maxlen), s2, libc_wcsnlen(s2, s2_maxlen));
 }
 /* >> wildwcscmp(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wildwcscmp)(char16_t const *pattern,
                                       char16_t const *string) {
 	char16_t card_post;
@@ -4615,7 +4671,7 @@ next:
 	return (int)((char32_t)*string - (char32_t)*pattern);
 }
 /* >> wildwcscasecmp(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wildwcscasecmp)(char16_t const *pattern,
                                           char16_t const *string) {
 	char16_t card_post, pattern_ch, wcsing_ch;
@@ -4713,7 +4769,7 @@ next:
 	return (int)((char32_t)wcsing_ch - (char32_t)pattern_ch);
 }
 /* >> wcsverscmp(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcsverscmp)(char16_t const *s1,
                                       char16_t const *s2) {
 	char16_t const *s1_start = s1;
@@ -4821,7 +4877,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsverscmp)(char32_t const *s1,
 	return 0;
 }
 /* >> wcsncoll_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcsncoll_l)(char16_t const *s1,
                                       char16_t const *s2,
                                       size_t maxlen,
@@ -4841,7 +4897,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncoll_l)(char32_t const *s1,
 	return libc_wcsncoll(s1, s2, maxlen);
 }
 /* >> wcscasecoll_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcscasecoll_l)(char16_t const *s1,
                                          char16_t const *s2,
                                          locale_t locale) {
@@ -4857,7 +4913,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscasecoll_l)(char32_t const *s1,
 	return libc_wcscasecmp_l(s1, s2, locale);
 }
 /* >> wcsncasecoll_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcsncasecoll_l)(char16_t const *s1,
                                           char16_t const *s2,
                                           size_t maxlen,
@@ -4877,7 +4933,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncasecoll_l)(char32_t const *s1,
 	return libc_wcsncasecoll(s1, s2, maxlen);
 }
 /* >> wcslwr_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcslwr_l)(char16_t *__restrict str,
                                     locale_t locale) {
 	char16_t *iter, ch;
@@ -4895,7 +4951,7 @@ NOTHROW_NCX(LIBKCALL libc_wcslwr_l)(char32_t *__restrict str,
 	return str;
 }
 /* >> wcsupr_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsupr_l)(char16_t *__restrict str,
                                     locale_t locale) {
 	char16_t *iter, ch;
@@ -4913,7 +4969,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsupr_l)(char32_t *__restrict str,
 	return str;
 }
 /* >> wcsnlwr_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsnlwr_l)(char16_t *__restrict str,
                                      size_t maxlen,
                                      locale_t locale) {
@@ -4933,7 +4989,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnlwr_l)(char32_t *__restrict str,
 	return str;
 }
 /* >> wcsnupr_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsnupr_l)(char16_t *__restrict str,
                                      size_t maxlen,
                                      locale_t locale) {
@@ -4953,7 +5009,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnupr_l)(char32_t *__restrict str,
 	return str;
 }
 /* >> wcscasestr_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcscasestr_l)(char16_t const *haystack,
                                         char16_t const *needle,
                                         locale_t locale) {
@@ -4975,7 +5031,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscasestr_l)(char32_t const *haystack,
 	return NULL;
 }
 /* >> fuzzy_wmemcasecmp_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
 NOTHROW_NCX(LIBDCALL libd_fuzzy_wmemcasecmp_l)(char16_t const *s1,
                                                size_t s1_bytes,
                                                char16_t const *s2,
@@ -5101,7 +5157,7 @@ NOTHROW_NCX(LIBKCALL libc_fuzzy_wmemcasecmp_l)(char32_t const *s1,
 	return temp;
 }
 /* >> fuzzy_wcscasecmp_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd_fuzzy_wcscasecmp_l)(char16_t const *s1,
                                               char16_t const *s2,
                                               locale_t locale) {
@@ -5115,7 +5171,7 @@ NOTHROW_NCX(LIBKCALL libc_fuzzy_wcscasecmp_l)(char32_t const *s1,
 	return libc_fuzzy_wmemcasecmp_l(s1, libc_wcslen(s1), s2, libc_wcslen(s2), locale);
 }
 /* >> fuzzy_wcsncasecmp_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
 NOTHROW_NCX(LIBDCALL libd_fuzzy_wcsncasecmp_l)(char16_t const *s1,
                                                size_t s1_maxlen,
                                                char16_t const *s2,
@@ -5133,7 +5189,7 @@ NOTHROW_NCX(LIBKCALL libc_fuzzy_wcsncasecmp_l)(char32_t const *s1,
 	return libc_fuzzy_wmemcasecmp_l(s1, libc_wcsnlen(s1, s1_maxlen), s2, libc_wcsnlen(s2, s2_maxlen), locale);
 }
 /* >> wildwcscasecmp_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wildwcscasecmp_l)(char16_t const *pattern,
                                             char16_t const *string,
                                             locale_t locale) {
@@ -5233,7 +5289,7 @@ next:
 	return (int)((char32_t)wcsing_ch - (char32_t)pattern_ch);
 }
 /* >> wcslcat(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_LEAF NONNULL((1, 2)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_LEAF NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcslcat)(char16_t *__restrict dst,
                                    char16_t const *__restrict src,
                                    size_t bufsize) {
@@ -5261,7 +5317,7 @@ NOTHROW_NCX(LIBKCALL libc_wcslcat)(char32_t *__restrict dst,
 	return result + (new_dst - dst);
 }
 /* >> wcslcpy(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_LEAF NONNULL((1, 2)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_LEAF NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcslcpy)(char16_t *__restrict dst,
                                    char16_t const *__restrict src,
                                    size_t bufsize) {
@@ -5283,7 +5339,7 @@ NOTHROW_NCX(LIBKCALL libc_wcslcpy)(char32_t *__restrict dst,
 	return result;
 }
 /* >> wcsnset(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsnset)(char16_t *__restrict str,
                                    char16_t ch,
                                    size_t maxlen) {
@@ -5303,7 +5359,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnset)(char32_t *__restrict str,
 	return str;
 }
 /* >> wcsrev(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsrev)(char16_t *__restrict str) {
 
 	return (char16_t *)libc_memrevw(str, libd_wcslen(str));
@@ -5325,7 +5381,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsrev)(char32_t *__restrict str) {
 
 }
 /* >> wcsset(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsset)(char16_t *__restrict str,
                                   int ch) {
 	char16_t *iter;
@@ -5343,7 +5399,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsset)(char32_t *__restrict str,
 	return str;
 }
 /* >> wcslwr(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_RETNONNULL NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcslwr)(char16_t *__restrict str) {
 	char16_t *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
@@ -5359,7 +5415,7 @@ NOTHROW_NCX(LIBKCALL libc_wcslwr)(char32_t *__restrict str) {
 	return str;
 }
 /* >> wcsupr(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_RETNONNULL NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsupr)(char16_t *__restrict str) {
 	char16_t *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)

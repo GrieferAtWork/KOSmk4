@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb873f39c */
+/* HASH CRC-32:0x158bc479 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 #include <bits/crt/wctype.h>
 /* >> iswcntrl(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswcntrl)(wint16_t wc) {
 
 	return __crt_iswcntrl(wc);
@@ -55,7 +55,7 @@ NOTHROW(LIBKCALL libc_iswcntrl)(wint32_t wc) {
 }
 #include <bits/crt/wctype.h>
 /* >> iswspace(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswspace)(wint16_t wc) {
 
 	return __crt_iswspace(wc);
@@ -75,7 +75,7 @@ NOTHROW(LIBKCALL libc_iswspace)(wint32_t wc) {
 }
 #include <bits/crt/wctype.h>
 /* >> iswupper(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswupper)(wint16_t wc) {
 
 	return __crt_iswupper(wc);
@@ -95,7 +95,7 @@ NOTHROW(LIBKCALL libc_iswupper)(wint32_t wc) {
 }
 #include <bits/crt/wctype.h>
 /* >> iswlower(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswlower)(wint16_t wc) {
 
 	return __crt_iswlower(wc);
@@ -115,7 +115,7 @@ NOTHROW(LIBKCALL libc_iswlower)(wint32_t wc) {
 }
 #include <bits/crt/wctype.h>
 /* >> iswalpha(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswalpha)(wint16_t wc) {
 
 	return __crt_iswalpha(wc);
@@ -135,7 +135,7 @@ NOTHROW(LIBKCALL libc_iswalpha)(wint32_t wc) {
 }
 #include <bits/crt/wctype.h>
 /* >> iswdigit(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswdigit)(wint16_t wc) {
 
 	return __crt_iswdigit(wc);
@@ -155,7 +155,7 @@ NOTHROW(LIBKCALL libc_iswdigit)(wint32_t wc) {
 }
 #include <bits/crt/wctype.h>
 /* >> iswxdigit(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswxdigit)(wint16_t wc) {
 
 	return __crt_iswxdigit(wc);
@@ -175,7 +175,7 @@ NOTHROW(LIBKCALL libc_iswxdigit)(wint32_t wc) {
 }
 #include <bits/crt/wctype.h>
 /* >> iswalnum(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswalnum)(wint16_t wc) {
 
 	return __crt_iswalnum(wc);
@@ -195,7 +195,7 @@ NOTHROW(LIBKCALL libc_iswalnum)(wint32_t wc) {
 }
 #include <bits/crt/wctype.h>
 /* >> iswpunct(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswpunct)(wint16_t wc) {
 
 	return __crt_iswpunct(wc);
@@ -215,7 +215,7 @@ NOTHROW(LIBKCALL libc_iswpunct)(wint32_t wc) {
 }
 #include <bits/crt/wctype.h>
 /* >> iswgraph(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswgraph)(wint16_t wc) {
 
 	return __crt_iswgraph(wc);
@@ -235,7 +235,7 @@ NOTHROW(LIBKCALL libc_iswgraph)(wint32_t wc) {
 }
 #include <bits/crt/wctype.h>
 /* >> iswprint(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswprint)(wint16_t wc) {
 
 	return __crt_iswprint(wc);
@@ -255,7 +255,7 @@ NOTHROW(LIBKCALL libc_iswprint)(wint32_t wc) {
 }
 #include <bits/crt/wctype.h>
 /* >> towlower(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED wint16_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED wint16_t
 NOTHROW(LIBDCALL libd_towlower)(wint16_t wc) {
 
 	return __crt_towlower(wc);
@@ -275,7 +275,7 @@ NOTHROW(LIBKCALL libc_towlower)(wint32_t wc) {
 }
 #include <bits/crt/wctype.h>
 /* >> towupper(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED wint16_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED wint16_t
 NOTHROW(LIBDCALL libd_towupper)(wint16_t wc) {
 
 	return __crt_towupper(wc);
@@ -295,7 +295,7 @@ NOTHROW(LIBKCALL libc_towupper)(wint32_t wc) {
 }
 #include <bits/crt/wctype.h>
 /* >> iswblank(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswblank)(wint16_t wc) {
 
 	return __crt_iswblank(wc);
@@ -333,7 +333,7 @@ NOTHROW_NCX(LIBCCALL libc_wctrans)(char const *prop) {
 	return (wctrans_t)0;
 }
 #include <bits/crt/unicode.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED wint16_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED wint16_t
 NOTHROW_NCX(LIBDCALL libd_towctrans)(wint16_t wc,
                                      wctrans_t desc) {
 	struct __unitraits const *traits = libc___unicode_descriptor(wc);
@@ -385,7 +385,7 @@ NOTHROW_NCX(LIBCCALL libc_wctype)(char const *prop) {
 	return 0;
 }
 #include <bits/crt/unicode.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswctype)(wint16_t wc,
                                     wctype_t desc) {
 	struct __unitraits const *traits = libc___unicode_descriptor(wc);
@@ -398,7 +398,7 @@ NOTHROW_NCX(LIBKCALL libc_iswctype)(wint32_t wc,
 	struct __unitraits const *traits = libc___unicode_descriptor(wc);
 	return (int)(traits->__ut_flags & (uint16_t)desc);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd_iswascii)(wint16_t wc) {
 	return wc >= 0 && wc <= 0x7f;
 }
@@ -410,7 +410,7 @@ NOTHROW(LIBKCALL libc_iswascii)(wint32_t wc) {
 DEFINE_INTERN_ALIAS(libd_iswcntrl_l, libd_iswcntrl);
 #else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswcntrl_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswcntrl_l)(wint16_t ch,
                                       locale_t locale) {
 	COMPILER_IMPURE();
@@ -434,7 +434,7 @@ NOTHROW_NCX(LIBKCALL libc_iswcntrl_l)(wint32_t ch,
 DEFINE_INTERN_ALIAS(libd_iswspace_l, libd_iswspace);
 #else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswspace_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswspace_l)(wint16_t ch,
                                       locale_t locale) {
 	COMPILER_IMPURE();
@@ -458,7 +458,7 @@ NOTHROW_NCX(LIBKCALL libc_iswspace_l)(wint32_t ch,
 DEFINE_INTERN_ALIAS(libd_iswupper_l, libd_iswupper);
 #else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswupper_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswupper_l)(wint16_t ch,
                                       locale_t locale) {
 	COMPILER_IMPURE();
@@ -482,7 +482,7 @@ NOTHROW_NCX(LIBKCALL libc_iswupper_l)(wint32_t ch,
 DEFINE_INTERN_ALIAS(libd_iswlower_l, libd_iswlower);
 #else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswlower_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswlower_l)(wint16_t ch,
                                       locale_t locale) {
 	COMPILER_IMPURE();
@@ -506,7 +506,7 @@ NOTHROW_NCX(LIBKCALL libc_iswlower_l)(wint32_t ch,
 DEFINE_INTERN_ALIAS(libd_iswalpha_l, libd_iswalpha);
 #else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswalpha_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswalpha_l)(wint16_t ch,
                                       locale_t locale) {
 	COMPILER_IMPURE();
@@ -530,7 +530,7 @@ NOTHROW_NCX(LIBKCALL libc_iswalpha_l)(wint32_t ch,
 DEFINE_INTERN_ALIAS(libd_iswdigit_l, libd_iswdigit);
 #else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswdigit_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswdigit_l)(wint16_t ch,
                                       locale_t locale) {
 	COMPILER_IMPURE();
@@ -554,7 +554,7 @@ NOTHROW_NCX(LIBKCALL libc_iswdigit_l)(wint32_t ch,
 DEFINE_INTERN_ALIAS(libd_iswxdigit_l, libd_iswxdigit);
 #else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswxdigit_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswxdigit_l)(wint16_t ch,
                                        locale_t locale) {
 	COMPILER_IMPURE();
@@ -578,7 +578,7 @@ NOTHROW_NCX(LIBKCALL libc_iswxdigit_l)(wint32_t ch,
 DEFINE_INTERN_ALIAS(libd_iswalnum_l, libd_iswalnum);
 #else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswalnum_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswalnum_l)(wint16_t ch,
                                       locale_t locale) {
 	COMPILER_IMPURE();
@@ -602,7 +602,7 @@ NOTHROW_NCX(LIBKCALL libc_iswalnum_l)(wint32_t ch,
 DEFINE_INTERN_ALIAS(libd_iswpunct_l, libd_iswpunct);
 #else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswpunct_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswpunct_l)(wint16_t ch,
                                       locale_t locale) {
 	COMPILER_IMPURE();
@@ -626,7 +626,7 @@ NOTHROW_NCX(LIBKCALL libc_iswpunct_l)(wint32_t ch,
 DEFINE_INTERN_ALIAS(libd_iswgraph_l, libd_iswgraph);
 #else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswgraph_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswgraph_l)(wint16_t ch,
                                       locale_t locale) {
 	COMPILER_IMPURE();
@@ -650,7 +650,7 @@ NOTHROW_NCX(LIBKCALL libc_iswgraph_l)(wint32_t ch,
 DEFINE_INTERN_ALIAS(libd_iswprint_l, libd_iswprint);
 #else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswprint_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswprint_l)(wint16_t ch,
                                       locale_t locale) {
 	COMPILER_IMPURE();
@@ -674,7 +674,7 @@ NOTHROW_NCX(LIBKCALL libc_iswprint_l)(wint32_t ch,
 DEFINE_INTERN_ALIAS(libd_iswblank_l, libd_iswblank);
 #else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswblank_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswblank_l)(wint16_t ch,
                                       locale_t locale) {
 	COMPILER_IMPURE();
@@ -698,7 +698,7 @@ NOTHROW_NCX(LIBKCALL libc_iswblank_l)(wint32_t ch,
 DEFINE_INTERN_ALIAS(libd_towlower_l, libd_towlower);
 #else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> towlower_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED wint16_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED wint16_t
 NOTHROW_NCX(LIBDCALL libd_towlower_l)(wint16_t ch,
                                       locale_t locale) {
 	COMPILER_IMPURE();
@@ -722,7 +722,7 @@ NOTHROW_NCX(LIBKCALL libc_towlower_l)(wint32_t ch,
 DEFINE_INTERN_ALIAS(libd_towupper_l, libd_towupper);
 #else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> towupper_l(3) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED wint16_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED wint16_t
 NOTHROW_NCX(LIBDCALL libd_towupper_l)(wint16_t ch,
                                       locale_t locale) {
 	COMPILER_IMPURE();
@@ -745,7 +745,7 @@ NOTHROW_NCX(LIBKCALL libc_towupper_l)(wint32_t ch,
 #ifdef __LIBDCALL_CALLER_CLEANUP
 DEFINE_INTERN_ALIAS(libd_iswctype_l, libd_iswctype);
 #else /* __LIBDCALL_CALLER_CLEANUP */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_iswctype_l)(wint16_t wc,
                                       wctype_t type,
                                       locale_t locale) {
@@ -780,7 +780,7 @@ NOTHROW_NCX(LIBCCALL libc_wctype_l)(char const *prop,
 #ifdef __LIBDCALL_CALLER_CLEANUP
 DEFINE_INTERN_ALIAS(libd_towctrans_l, libd_towctrans);
 #else /* __LIBDCALL_CALLER_CLEANUP */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") WUNUSED wint16_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") WUNUSED wint16_t
 NOTHROW_NCX(LIBDCALL libd_towctrans_l)(wint16_t wc,
                                        wctrans_t desc,
                                        locale_t locale) {
@@ -815,7 +815,7 @@ NOTHROW_NCX(LIBCCALL libc_wctrans_l)(char const *prop,
 #include <bits/crt/unicode.h>
 /* >> iswsymstrt(3), iswsymstrt_l(3)
  * Check if `wc' may appear at the start of a symbol/keyword/identifier */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBDCALL libd___iswcsymf)(wint16_t wc) {
 
 	struct __unitraits const *traits = libc___unicode_descriptor(wc);
@@ -839,7 +839,7 @@ NOTHROW_NCX(LIBKCALL libc___iswcsymf)(wint32_t wc) {
 #include <bits/crt/unicode.h>
 /* >> iswsymcont(3), iswsymcont_l(3)
  * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBDCALL libd___iswcsym)(wint16_t wc) {
 
 	struct __unitraits const *traits = libc___unicode_descriptor(wc);
@@ -865,7 +865,7 @@ DEFINE_INTERN_ALIAS(libd__iswcsymf_l, libd___iswcsymf);
 #else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswsymstrt(3), iswsymstrt_l(3)
  * Check if `wc' may appear at the start of a symbol/keyword/identifier */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.mbs") ATTR_PURE WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.mbs") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd__iswcsymf_l)(wint16_t wc,
                                        locale_t locale) {
 
@@ -899,7 +899,7 @@ DEFINE_INTERN_ALIAS(libd__iswcsym_l, libd___iswcsym);
 #else /* __LIBDCALL_CALLER_CLEANUP */
 /* >> iswsymcont(3), iswsymcont_l(3)
  * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.mbs") ATTR_PURE WUNUSED int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.mbs") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd__iswcsym_l)(wint16_t wc,
                                       locale_t locale) {
 

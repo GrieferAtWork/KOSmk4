@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4f44f2 */
+/* HASH CRC-32:0x8a36d9e6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -638,7 +638,7 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_PRINTF(3, 0) NONNULL((1
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTERN ATTR_SECTION(".text.crt.dos.string.format") ATTR_LIBC_PRINTF(3, 4) NONNULL((1, 3)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.string.format") ATTR_LIBC_PRINTF(3, 4) NONNULL((1, 3)) ssize_t
 (VLIBDCALL libd_format_printf)(pformatprinter printer,
                                void *arg,
                                char const *__restrict format,
@@ -743,7 +743,7 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_SCANF(4, 0) NONNULL((1,
  * @return: 0 :  No data could be scanned.
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-INTERN ATTR_SECTION(".text.crt.dos.string.format") ATTR_LIBC_SCANF(4, 5) NONNULL((1, 2, 4)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.string.format") ATTR_LIBC_SCANF(4, 5) NONNULL((1, 2, 4)) ssize_t
 (VLIBDCALL libd_format_scanf)(pformatgetc pgetc,
                               pformatungetc pungetc,
                               void *arg,

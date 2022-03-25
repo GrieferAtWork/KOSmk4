@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72523124 */
+/* HASH CRC-32:0x961b5ea7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,7 +78,7 @@ NOTHROW_RPC(LIBCCALL libc_cwait)(int *tstat,
 	return libc_waitpid(pid, tstat, 0);
 }
 #include <libc/template/environ.h>
-INTERN ATTR_SECTION(".text.crt.dos.fs.exec.spawn") NONNULL((2, 3)) pid_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.spawn") NONNULL((2, 3)) pid_t
 NOTHROW_RPC(LIBDCALL libd_spawnv)(__STDC_INT_AS_UINT_T mode,
                                   char const *__restrict path,
                                   __TARGV) {
@@ -92,7 +92,7 @@ NOTHROW_RPC(LIBCCALL libc_spawnv)(__STDC_INT_AS_UINT_T mode,
 	return libc_spawnve(mode, path, ___argv, __LOCAL_environ);
 }
 #include <libc/template/environ.h>
-INTERN ATTR_SECTION(".text.crt.dos.fs.exec.spawn") NONNULL((2, 3)) pid_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.spawn") NONNULL((2, 3)) pid_t
 NOTHROW_RPC(LIBDCALL libd_spawnvp)(__STDC_INT_AS_UINT_T mode,
                                    char const *__restrict file,
                                    __TARGV) {
@@ -106,7 +106,7 @@ NOTHROW_RPC(LIBCCALL libc_spawnvp)(__STDC_INT_AS_UINT_T mode,
 	return libc_spawnvpe(mode, file, ___argv, __LOCAL_environ);
 }
 #include <asm/os/oflags.h>
-INTERN ATTR_SECTION(".text.crt.dos.fs.exec.spawn") NONNULL((2, 3, 4)) pid_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.spawn") NONNULL((2, 3, 4)) pid_t
 NOTHROW_RPC(LIBDCALL libd_spawnve)(__STDC_INT_AS_UINT_T mode,
                                    char const *__restrict path,
                                    __TARGV,
@@ -170,7 +170,7 @@ __LOCAL_LIBC(__dos_spawnvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((2, 4, 6, 7)) p
 	return libd_spawnve(mode, fullpath, ___argv, ___envp);
 }
 __NAMESPACE_LOCAL_END
-INTERN ATTR_SECTION(".text.crt.dos.fs.exec.spawn") NONNULL((2, 3, 4)) pid_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.spawn") NONNULL((2, 3, 4)) pid_t
 NOTHROW_RPC(LIBDCALL libd_spawnvpe)(__STDC_INT_AS_UINT_T mode,
                                     char const *__restrict file,
                                     __TARGV,
@@ -278,7 +278,7 @@ NOTHROW_RPC(LIBCCALL libc_spawnvpe)(__STDC_INT_AS_UINT_T mode,
 	return -1;
 }
 #include <parts/redirect-exec.h>
-INTERN ATTR_SECTION(".text.crt.dos.fs.exec.spawn") ATTR_SENTINEL NONNULL((2)) pid_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.spawn") ATTR_SENTINEL NONNULL((2)) pid_t
 NOTHROW_RPC(VLIBDCALL libd_spawnl)(__STDC_INT_AS_UINT_T mode,
                                    char const *__restrict path,
                                    char const *args,
@@ -294,7 +294,7 @@ NOTHROW_RPC(VLIBCCALL libc_spawnl)(__STDC_INT_AS_UINT_T mode,
 	__REDIRECT_SPAWNL(char, libc_spawnv, mode, path, args)
 }
 #include <parts/redirect-exec.h>
-INTERN ATTR_SECTION(".text.crt.dos.fs.exec.spawn") ATTR_SENTINEL NONNULL((2)) pid_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.spawn") ATTR_SENTINEL NONNULL((2)) pid_t
 NOTHROW_RPC(VLIBDCALL libd_spawnlp)(__STDC_INT_AS_UINT_T mode,
                                     char const *__restrict file,
                                     char const *args,
@@ -310,7 +310,7 @@ NOTHROW_RPC(VLIBCCALL libc_spawnlp)(__STDC_INT_AS_UINT_T mode,
 	__REDIRECT_SPAWNL(char, libc_spawnvp, mode, file, args)
 }
 #include <parts/redirect-exec.h>
-INTERN ATTR_SECTION(".text.crt.dos.fs.exec.spawn") ATTR_SENTINEL_O(1) NONNULL((2)) pid_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.spawn") ATTR_SENTINEL_O(1) NONNULL((2)) pid_t
 NOTHROW_RPC(VLIBDCALL libd_spawnle)(__STDC_INT_AS_UINT_T mode,
                                     char const *__restrict path,
                                     char const *args,
@@ -326,7 +326,7 @@ NOTHROW_RPC(VLIBCCALL libc_spawnle)(__STDC_INT_AS_UINT_T mode,
 	__REDIRECT_SPAWNLE(char, libc_spawnve, mode, path, args)
 }
 #include <parts/redirect-exec.h>
-INTERN ATTR_SECTION(".text.crt.dos.fs.exec.spawn") ATTR_SENTINEL_O(1) NONNULL((2)) pid_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.spawn") ATTR_SENTINEL_O(1) NONNULL((2)) pid_t
 NOTHROW_RPC(VLIBDCALL libd_spawnlpe)(__STDC_INT_AS_UINT_T mode,
                                      char const *__restrict file,
                                      char const *args,

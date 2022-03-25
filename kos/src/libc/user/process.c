@@ -164,8 +164,8 @@ INTERN ATTR_SECTION(".text.crt.dos.sched.process") void
 }
 /*[[[end:libc__cexit]]]*/
 
-/*[[[head:libc__register_thread_local_exe_atexit_callback,hash:CRC-32=0x7664ff4e]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.sched.process") NONNULL((1)) void
+/*[[[head:libc__register_thread_local_exe_atexit_callback,hash:CRC-32=0x6c51beff]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.sched.process") NONNULL((1)) void
 NOTHROW_NCX(LIBDCALL libc__register_thread_local_exe_atexit_callback)(_tls_callback_type callback)
 /*[[[body:libc__register_thread_local_exe_atexit_callback]]]*/
 /*AUTO*/{
@@ -175,8 +175,8 @@ NOTHROW_NCX(LIBDCALL libc__register_thread_local_exe_atexit_callback)(_tls_callb
 }
 /*[[[end:libc__register_thread_local_exe_atexit_callback]]]*/
 
-/*[[[head:libd__loaddll,hash:CRC-32=0xfd03c949]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.dlfcn") intptr_t
+/*[[[head:libd__loaddll,hash:CRC-32=0xc5510214]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.dlfcn") intptr_t
 (LIBDCALL libd__loaddll)(char __KOS_FIXED_CONST *file) THROWS(...)
 /*[[[body:libd__loaddll]]]*/
 {

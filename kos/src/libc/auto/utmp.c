@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87c5d3a2 */
+/* HASH CRC-32:0x8391f8e6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_login_tty)(fd_t fd) {
 		goto err;
 	if unlikely(libc_ioctl(fd, __TIOCSCTTY, 1) < 0)
 		goto err;
-#if STDIN_FILENO <= 2 && STDOUT_FILENO <= 2 && STDERR_FILENO <= 2
+
 	{
 		fd_t i;
 		for (i = 0; i <= 2; ++i) {
@@ -56,16 +56,16 @@ NOTHROW_RPC_KOS(LIBCCALL libc_login_tty)(fd_t fd) {
 	}
 	if likely(fd >= 3)
 		libc_close(fd);
-#else /* STDIN_FILENO <= 2 && STDOUT_FILENO <= 2 && STDERR_FILENO <= 2 */
-	if (likely(fd != STDIN_FILENO) && unlikely(libc_dup2(fd, STDIN_FILENO)))
-		goto err;
-	if (likely(fd != STDOUT_FILENO) && unlikely(libc_dup2(fd, STDOUT_FILENO)))
-		goto err;
-	if (likely(fd != STDERR_FILENO) && unlikely(libc_dup2(fd, STDERR_FILENO)))
-		goto err;
-	if likely(fd != STDIN_FILENO && fd != STDOUT_FILENO && fd != STDERR_FILENO)
-		libc_close(fd);
-#endif /* STDIN_FILENO > 2 || STDOUT_FILENO > 2 || STDERR_FILENO > 2 */
+
+
+
+
+
+
+
+
+
+
 	return 0;
 err:
 	return -1;

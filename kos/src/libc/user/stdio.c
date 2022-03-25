@@ -1751,11 +1751,11 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.utility") int
 }
 /*[[[end:libc_flushall_unlocked]]]*/
 
-/*[[[head:libd_rename,hash:CRC-32=0xd00ba396]]]*/
+/*[[[head:libd_rename,hash:CRC-32=0xf4bcdf36]]]*/
 /* >> rename(2)
  * Rename  a given file `oldname' to `newname_or_path', or in the event
  * that `newname_or_path' refers to a directory, place the file within. */
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBDCALL libd_rename)(char const *oldname,
                                   char const *newname_or_path)
 /*[[[body:libd_rename]]]*/
@@ -1779,9 +1779,9 @@ NOTHROW_RPC(LIBCCALL libc_rename)(char const *oldname,
 }
 /*[[[end:libc_rename]]]*/
 
-/*[[[head:libd_renameat,hash:CRC-32=0x526adc86]]]*/
+/*[[[head:libd_renameat,hash:CRC-32=0xf4d8963d]]]*/
 /* >> renameat(2) */
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2, 4)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2, 4)) int
 NOTHROW_RPC(LIBDCALL libd_renameat)(fd_t oldfd,
                                     char const *oldname,
                                     fd_t newfd,
@@ -1807,7 +1807,7 @@ NOTHROW_RPC(LIBCCALL libc_renameat)(fd_t oldfd,
 }
 /*[[[end:libc_renameat]]]*/
 
-/*[[[head:libd_renameat2,hash:CRC-32=0xfcf51a3e]]]*/
+/*[[[head:libd_renameat2,hash:CRC-32=0x117a191]]]*/
 /* >> renameat2(2)
  * @param flags: Set of `0 | AT_RENAME_NOREPLACE | AT_RENAME_EXCHANGE |
  *                       AT_RENAME_WHITEOUT | AT_RENAME_MOVETODIR | AT_DOSPATH'
@@ -1815,7 +1815,7 @@ NOTHROW_RPC(LIBCCALL libc_renameat)(fd_t oldfd,
  *   - `AT_RENAME_NOREPLACE' --> `RENAME_NOREPLACE'
  *   - `AT_RENAME_EXCHANGE'  --> `RENAME_EXCHANGE'
  *   - `AT_RENAME_WHITEOUT'  --> `RENAME_WHITEOUT' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2, 4)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2, 4)) int
 NOTHROW_RPC(LIBDCALL libd_renameat2)(fd_t oldfd,
                                      char const *oldname,
                                      fd_t newfd,
@@ -3073,10 +3073,10 @@ err_inval:
 }
 /*[[[end:libc_fileno]]]*/
 
-/*[[[head:libd_fopen,hash:CRC-32=0x7d0a2ee4]]]*/
+/*[[[head:libd_fopen,hash:CRC-32=0x1ec4b920]]]*/
 /* >> fopen(3), fopen64(3)
  * Create and return a new file-stream for accessing `filename' */
-INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
 NOTHROW_RPC(LIBDCALL libd_fopen)(char const *__restrict filename,
                                  char const *__restrict modes)
 /*[[[body:libd_fopen]]]*/
@@ -3528,9 +3528,9 @@ NOTHROW_NCX(LIBCCALL libc_tmpnam)(char *buf)
 }
 /*[[[end:libc_tmpnam]]]*/
 
-/*[[[head:libd_tmpnam,hash:CRC-32=0x9ddb7cb7]]]*/
+/*[[[head:libd_tmpnam,hash:CRC-32=0xdb9ac794]]]*/
 /* >> tmpnam(3), tmpnam_r(3) */
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED NONNULL((1)) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBDCALL libd_tmpnam)(char *buf)
 /*[[[body:libd_tmpnam]]]*/
 /*AUTO*/{
@@ -3728,10 +3728,10 @@ done:
 }
 /*[[[end:libc_fdreopen_unlocked]]]*/
 
-/*[[[head:libd_freopen,hash:CRC-32=0x4f03bc5]]]*/
+/*[[[head:libd_freopen,hash:CRC-32=0x6540b923]]]*/
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
  * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
-INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.access") NONNULL((1, 2, 3)) FILE *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.locked.access") NONNULL((1, 2, 3)) FILE *
 NOTHROW_RPC(LIBDCALL libd_freopen)(char const *__restrict filename,
                                    char const *__restrict modes,
                                    FILE *__restrict stream)
@@ -3796,10 +3796,10 @@ NOTHROW_RPC(LIBCCALL libc_freopen)(char const *__restrict filename,
 }
 /*[[[end:libc_freopen]]]*/
 
-/*[[[head:libd_freopen_unlocked,hash:CRC-32=0x95feab24]]]*/
+/*[[[head:libd_freopen_unlocked,hash:CRC-32=0x40808ca4]]]*/
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
  * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
-INTERN ATTR_SECTION(".text.crt.dos.FILE.unlocked.access") NONNULL((1, 2, 3)) FILE *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.unlocked.access") NONNULL((1, 2, 3)) FILE *
 NOTHROW_RPC(LIBDCALL libd_freopen_unlocked)(char const *__restrict filename,
                                             char const *__restrict modes,
                                             FILE *__restrict stream)

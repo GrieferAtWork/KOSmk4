@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2bebf79 */
+/* HASH CRC-32:0x3869faa8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -189,16 +189,16 @@ again:
 			term.c_cc[__VSTATUS] = __VDISABLE;
 #endif /* __VSTATUS */
 		if (libc_memcmp(&old_ios, &new_ios, sizeof(struct termios)) != 0) {
-#if defined(__TCSAFLUSH) && defined(__TCSASOFT)
+#ifdef __TCSASOFT
 			if (libc_tcsetattr(infd, __TCSAFLUSH | __TCSASOFT, &new_ios) != 0)
 				goto err_infd;
-#elif defined(__TCSAFLUSH)
+#else /* __TCSASOFT */
 			if (libc_tcsetattr(infd, __TCSAFLUSH, &new_ios) != 0)
 				goto err_infd;
-#else /* ... */
-			if (libc_tcsetattr(infd, 0, &new_ios) != 0)
-				goto err_infd;
-#endif /* !... */
+
+
+
+#endif /* !__TCSASOFT */
 #define __PRIVATE_WANT_err_infd
 		}
 	} else {
@@ -298,13 +298,13 @@ again:
 done_infd_oldsact_oldios:
 
 	if (libc_memcmp(&old_ios, &new_ios, sizeof(struct termios)) != 0) {
-#if defined(__TCSAFLUSH) && defined(__TCSASOFT)
+#ifdef __TCSASOFT
 		(void)libc_tcsetattr(infd, __TCSAFLUSH | __TCSASOFT, &old_ios);
-#elif defined(__TCSAFLUSH)
+#else /* __TCSASOFT */
 		(void)libc_tcsetattr(infd, __TCSAFLUSH, &old_ios);
-#else /* ... */
-		(void)libc_tcsetattr(infd, 0, &old_ios);
-#endif /* !... */
+
+
+#endif /* !__TCSASOFT */
 	}
 
 
@@ -378,13 +378,13 @@ err_infd_oldios:
 	/* Restore terminal IOS configuration */
 
 	if (libc_memcmp(&old_ios, &new_ios, sizeof(struct termios)) != 0) {
-#if defined(__TCSAFLUSH) && defined(__TCSASOFT)
+#ifdef __TCSASOFT
 		(void)libc_tcsetattr(infd, __TCSAFLUSH | __TCSASOFT, &old_ios);
-#elif defined(__TCSAFLUSH)
+#else /* __TCSASOFT */
 		(void)libc_tcsetattr(infd, __TCSAFLUSH, &old_ios);
-#else /* ... */
-		(void)libc_tcsetattr(infd, 0, &old_ios);
-#endif /* !... */
+
+
+#endif /* !__TCSASOFT */
 	}
 
 	buf = NULL;

@@ -666,6 +666,11 @@ int cfsetispeed([[nonnull]] struct termios *__restrict termios_p, speed_t speed)
 	return 0;
 }
 
+%[assume_defined_in_kos(TCGETA, __TCGETA)]
+%[assume_defined_in_kos(TCSETA, __TCSETA, TCSANOW, __TCSANOW)]
+%[assume_defined_in_kos(TCSETAW, __TCSETAW, TCSADRAIN, __TCSADRAIN)]
+%[assume_defined_in_kos(TCSETAF, __TCSETAF, TCSAFLUSH, __TCSAFLUSH)]
+
 @@>> tcgetattr(3)
 @@Get terminal attributes
 [[decl_include("<bits/os/termios.h>"), export_alias("__tcgetattr")]]
@@ -729,6 +734,9 @@ int tcdrain($fd_t fd) {
 	return (int)ioctl(fd, __TCSBRK, 1);
 }
 
+%[assume_defined_in_kos(TCFLSH, __TCFLSH)]
+%[assume_defined_in_kos(TCIFLUSH, TCOFLUSH, TCIOFLUSH)]
+%[assume_defined_in_kos(__TCIFLUSH, __TCOFLUSH, __TCIOFLUSH)]
 
 @@>> tcflush(3)
 @@@param: queue_selector: One of `TCIFLUSH', `TCOFLUSH' or `TCIOFLUSH'
@@ -748,6 +756,8 @@ int tcflow($fd_t fd, __STDC_INT_AS_UINT_T action) {
 	return (int)ioctl(fd, __TCXONC, action);
 }
 
+%[assume_defined_in_kos(TIOCGSID, __TIOCGSID)]
+
 %
 %#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
 @@>> tcgetsid(3)
@@ -760,6 +770,8 @@ $pid_t tcgetsid($fd_t fd) {
 	return result;
 }
 %#endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
+
+%[assume_defined_in_kos(TIOCSCTTY, __TIOCSCTTY)]
 
 %
 %#if defined(__USE_BSD)

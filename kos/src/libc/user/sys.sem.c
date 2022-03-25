@@ -25,10 +25,10 @@
 
 DECL_BEGIN
 
-/*[[[head:libd_semctl,hash:CRC-32=0xc28f7352]]]*/
+/*[[[head:libd_semctl,hash:CRC-32=0x4212b989]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 /* Semaphore control operation. */
-INTERN ATTR_SECTION(".text.crt.dos.io.poll") int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.io.poll") int
 NOTHROW_NCX(VLIBDCALL libd_semctl)(int semid,
                                    __STDC_INT_AS_UINT_T semnum,
                                    __STDC_INT_AS_UINT_T cmd,

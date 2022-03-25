@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52ecf017 */
+/* HASH CRC-32:0x9b95be7c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@ DECL_BEGIN
  * Repeat  `ch'  a   number  of  `num_repetitions'   times
  * The usual format-printer rules apply, and this function
  * is  allowed to  call `printer'  as often  as it chooses */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 (LIBDCALL libd_format_wrepeat)(pc16formatprinter printer,
                                void *arg,
                                char16_t ch,
@@ -169,7 +169,7 @@ err:
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 (LIBDCALL libd_format_wescape)(pc16formatprinter printer,
                                void *arg,
                                char16_t const *__restrict text,
@@ -712,7 +712,7 @@ err:
  * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 (LIBDCALL libd_format_whexdump)(pc16formatprinter printer,
                                 void *arg,
                                 void const *__restrict data,
@@ -1122,7 +1122,7 @@ err:
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1, 3)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1, 3)) ssize_t
 (LIBDCALL libd_format_vwprintf)(pc16formatprinter printer,
                                 void *arg,
                                 char16_t const *__restrict format,
@@ -1236,7 +1236,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_LIBC_C32PRINTF(3, 0) N
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1, 3)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1, 3)) ssize_t
 (LIBDCALL libd_format_wprintf)(pc16formatprinter printer,
                                void *arg,
                                char16_t const *__restrict format,
@@ -1274,7 +1274,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_LIBC_C32PRINTF(3, 0) N
 }
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1, 2)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1, 2)) ssize_t
 NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wsprintf_printer)(void *arg,
                                                                 char16_t const *__restrict data,
                                                                 size_t datalen) {
@@ -1295,7 +1295,7 @@ NOTHROW_NCX(__C32FORMATPRINTER_CC libc_format_wsprintf_printer)(void *arg,
  * NOTE: The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
  * NOTE: The   number   of   required   characters   is   `arg->sd_buffer - <orig_buf>',   or
  *       alternatively the sum of return values of all calls to `format_wsnprintf_printer(3)' */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1, 2)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1, 2)) ssize_t
 NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wsnprintf_printer)(void *arg,
                                                                  char16_t const *__restrict data,
                                                                  size_t datalen) {
@@ -1339,7 +1339,7 @@ NOTHROW_NCX(__C32FORMATPRINTER_CC libc_format_wsnprintf_printer)(void *arg,
 /* >> format_width(3)
  * Returns the width (number of characters; not bytes) of the given unicode string
  * The  `arg'   argument   is   ignored,   and  you   may   safely   pass   `NULL' */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_PURE NONNULL((2)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_PURE NONNULL((2)) ssize_t
 NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wwidth)(void *arg,
                                                       char16_t const *__restrict data,
                                                       size_t datalen) {
@@ -1393,7 +1393,7 @@ NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wwidth)(void *arg,
  *                  but may differ from `wcslen(return)' when NUL characters  were
  *                  printed to the waprintf-printer at one point.
  *                  (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)') */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_format_waprintf_pack)(struct format_c16aprintf_data *__restrict self,
                                                 size_t *pstrlen) {
 	/* Free unused buffer memory. */
@@ -1506,7 +1506,7 @@ NOTHROW_NCX(LIBKCALL libc_format_waprintf_pack)(struct format_c32aprintf_data *_
  * the format_aprintf buffer `self' is finalized,  or some other function is  used
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory (errno is set of `ENOMEM') */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_format_waprintf_alloc)(struct format_c16aprintf_data *__restrict self,
                                                  size_t num_wchars) {
 	char16_t *result;
@@ -1578,7 +1578,7 @@ err:
  * This function is intended to be used as a pwformatprinter-compatible printer sink
  * @return: datalen: Success.
  * @return: -1: [errno=ENOMEM] Insufficient memory. */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") WUNUSED NONNULL((1, 2)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") WUNUSED NONNULL((1, 2)) ssize_t
 NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_waprintf_printer)(void *arg,
                                                                 char16_t const *__restrict data,
                                                                 size_t datalen) {

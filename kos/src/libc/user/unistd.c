@@ -244,11 +244,11 @@
 DECL_BEGIN
 
 
-/*[[[head:libd_execve,hash:CRC-32=0x7339bb4e]]]*/
+/*[[[head:libd_execve,hash:CRC-32=0x7aa354ef]]]*/
 /* >> execve(2)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.exec.exec") NONNULL((1, 2, 3)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.exec") NONNULL((1, 2, 3)) int
 NOTHROW_RPC(LIBDCALL libd_execve)(char const *__restrict path,
                                   __TARGV,
                                   __TENVP)
@@ -660,10 +660,10 @@ NOTHROW_NCX(LIBCCALL libc_tcsetpgrp)(fd_t fd,
 }
 /*[[[end:libc_tcsetpgrp]]]*/
 
-/*[[[head:libd_chown,hash:CRC-32=0x37ee8d0d]]]*/
+/*[[[head:libd_chown,hash:CRC-32=0xff461cf1]]]*/
 /* >> chown(2)
  * Change the ownership of a given `file' to `group:owner' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_chown)(char const *file,
                                  uid_t owner,
                                  gid_t group)
@@ -701,10 +701,10 @@ NOTHROW_NCX(LIBCCALL libc_setlogin)(char const *name)
 }
 /*[[[end:libc_setlogin]]]*/
 
-/*[[[head:libd_link,hash:CRC-32=0xc7a97374]]]*/
+/*[[[head:libd_link,hash:CRC-32=0x80e9d05f]]]*/
 /* >> link(2)
  * Create a hard link from `from', leading to `to' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBDCALL libd_link)(char const *from,
                                 char const *to)
 /*[[[body:libd_link]]]*/
@@ -811,11 +811,11 @@ NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd,
 INTDEF ATTR_SECTION(".text.crt.dos.fs.environ") void
 NOTHROW(CC libd_dos_fsroot_changed)(void);
 
-/*[[[head:libd_dup2,hash:CRC-32=0xf8dbcbef]]]*/
+/*[[[head:libd_dup2,hash:CRC-32=0x4fa5ebbd]]]*/
 /* >> dup2(2)
  * @return: newfd: Returns the new handle upon success.
  * Duplicate a file referred to by `oldfd' into `newfd' */
-INTERN ATTR_SECTION(".text.crt.dos.io.access") fd_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.io.access") fd_t
 NOTHROW_NCX(LIBDCALL libd_dup2)(fd_t oldfd,
                                 fd_t newfd)
 /*[[[body:libd_dup2]]]*/
@@ -828,8 +828,8 @@ NOTHROW_NCX(LIBDCALL libd_dup2)(fd_t oldfd,
 }
 /*[[[end:libd_dup2]]]*/
 
-/*[[[head:libd_dup3,hash:CRC-32=0xd6e23971]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.io.access") fd_t
+/*[[[head:libd_dup3,hash:CRC-32=0x24c0295f]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.io.access") fd_t
 NOTHROW_NCX(LIBDCALL libd_dup3)(fd_t oldfd,
                                 fd_t newfd,
                                 oflag_t flags)
@@ -872,11 +872,11 @@ NOTHROW_NCX(LIBCCALL libc_close_range)(unsigned int minfd,
 }
 /*[[[end:libc_close_range]]]*/
 
-/*[[[head:libd_access,hash:CRC-32=0x3d46423d]]]*/
+/*[[[head:libd_access,hash:CRC-32=0x45f8ea80]]]*/
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_access)(char const *file,
                                   __STDC_INT_AS_UINT_T type)
 /*[[[body:libd_access]]]*/
@@ -899,10 +899,10 @@ NOTHROW_RPC(LIBCCALL libc_access)(char const *file,
 }
 /*[[[end:libc_access]]]*/
 
-/*[[[head:libd_chdir,hash:CRC-32=0x31b57673]]]*/
+/*[[[head:libd_chdir,hash:CRC-32=0x19817f5]]]*/
 /* >> chdir(2)
  * Change the current working directory to `path' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.basic_property") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.basic_property") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_chdir)(char const *path)
 /*[[[body:libd_chdir]]]*/
 {
@@ -923,10 +923,10 @@ NOTHROW_RPC(LIBCCALL libc_chdir)(char const *path)
 }
 /*[[[end:libc_chdir]]]*/
 
-/*[[[head:libd_getcwd,hash:CRC-32=0x656d37bb]]]*/
+/*[[[head:libd_getcwd,hash:CRC-32=0xa5dc1f15]]]*/
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.basic_property") char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.basic_property") char *
 NOTHROW_RPC(LIBDCALL libd_getcwd)(char *buf,
                                   size_t bufsize)
 /*[[[body:libd_getcwd]]]*/
@@ -1000,10 +1000,10 @@ done:
 }
 /*[[[end:libc_getcwd]]]*/
 
-/*[[[head:libd_unlink,hash:CRC-32=0xdd8fe10b]]]*/
+/*[[[head:libd_unlink,hash:CRC-32=0x25c05ab3]]]*/
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_unlink)(char const *file)
 /*[[[body:libd_unlink]]]*/
 {
@@ -1023,10 +1023,10 @@ NOTHROW_RPC(LIBCCALL libc_unlink)(char const *file)
 }
 /*[[[end:libc_unlink]]]*/
 
-/*[[[head:libd_rmdir,hash:CRC-32=0x18705577]]]*/
+/*[[[head:libd_rmdir,hash:CRC-32=0x1be88e03]]]*/
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_rmdir)(char const *path)
 /*[[[body:libd_rmdir]]]*/
 {
@@ -1046,11 +1046,11 @@ NOTHROW_RPC(LIBCCALL libc_rmdir)(char const *path)
 }
 /*[[[end:libc_rmdir]]]*/
 
-/*[[[head:libd_euidaccess,hash:CRC-32=0x8d32dfa3]]]*/
+/*[[[head:libd_euidaccess,hash:CRC-32=0xdb06971a]]]*/
 /* >> euidaccess(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type', using the effective filesystem ids */
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_euidaccess)(char const *file,
                                       __STDC_INT_AS_UINT_T type)
 /*[[[body:libd_euidaccess]]]*/
@@ -1076,11 +1076,11 @@ NOTHROW_RPC(LIBCCALL libc_euidaccess)(char const *file,
 }
 /*[[[end:libc_euidaccess]]]*/
 
-/*[[[head:libd_faccessat,hash:CRC-32=0x934426f8]]]*/
+/*[[[head:libd_faccessat,hash:CRC-32=0xd3ddf3e5]]]*/
 /* >> faccessat(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `dfd:file', testing for `type' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((2)) int
 NOTHROW_RPC(LIBDCALL libd_faccessat)(fd_t dfd,
                                      char const *file,
                                      __STDC_INT_AS_UINT_T type,
@@ -1108,10 +1108,10 @@ NOTHROW_RPC(LIBCCALL libc_faccessat)(fd_t dfd,
 }
 /*[[[end:libc_faccessat]]]*/
 
-/*[[[head:libd_fchownat,hash:CRC-32=0xec527e13]]]*/
+/*[[[head:libd_fchownat,hash:CRC-32=0x75158422]]]*/
 /* >> fchownat(2)
  * Change the ownership of a given `dfd:file' to `group:owner' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2)) int
 NOTHROW_RPC(LIBDCALL libd_fchownat)(fd_t dfd,
                                     char const *file,
                                     uid_t owner,
@@ -1140,10 +1140,10 @@ NOTHROW_RPC(LIBCCALL libc_fchownat)(fd_t dfd,
 }
 /*[[[end:libc_fchownat]]]*/
 
-/*[[[head:libd_linkat,hash:CRC-32=0x55d66431]]]*/
+/*[[[head:libd_linkat,hash:CRC-32=0x3d2acca4]]]*/
 /* >> linkat(2)
  * Create a hard link from `fromfd:from', leading to `tofd:to' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2, 4)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2, 4)) int
 NOTHROW_RPC(LIBDCALL libd_linkat)(fd_t fromfd,
                                   char const *from,
                                   fd_t tofd,
@@ -1171,11 +1171,11 @@ NOTHROW_RPC(LIBCCALL libc_linkat)(fd_t fromfd,
 }
 /*[[[end:libc_linkat]]]*/
 
-/*[[[head:libd_symlinkat,hash:CRC-32=0x8ad0ccd1]]]*/
+/*[[[head:libd_symlinkat,hash:CRC-32=0x80c5f674]]]*/
 /* >> symlinkat(3)
  * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1, 3)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1, 3)) int
 NOTHROW_RPC(LIBDCALL libd_symlinkat)(char const *link_text,
                                      fd_t tofd,
                                      char const *target_path)
@@ -1204,7 +1204,7 @@ NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link_text,
 }
 /*[[[end:libc_symlinkat]]]*/
 
-/*[[[head:libd_readlinkat,hash:CRC-32=0x3eb260e]]]*/
+/*[[[head:libd_readlinkat,hash:CRC-32=0xd61e8354]]]*/
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * WARNING: This  function is badly designed and will neither append a trailing
@@ -1213,7 +1213,7 @@ NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link_text,
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((2, 3)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((2, 3)) ssize_t
 NOTHROW_RPC(LIBDCALL libd_readlinkat)(fd_t dfd,
                                       char const *path,
                                       char *buf,
@@ -1249,12 +1249,12 @@ NOTHROW_RPC(LIBCCALL libc_readlinkat)(fd_t dfd,
 }
 /*[[[end:libc_readlinkat]]]*/
 
-/*[[[head:libd_fsymlinkat,hash:CRC-32=0x39d3bf9a]]]*/
+/*[[[head:libd_fsymlinkat,hash:CRC-32=0xfbd3e021]]]*/
 /* >> fsymlinkat(3)
  * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path'
  * @param flags: Set of `0 | AT_DOSPATH' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((1, 3)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((1, 3)) int
 NOTHROW_RPC(LIBDCALL libd_fsymlinkat)(char const *link_text,
                                       fd_t tofd,
                                       char const *target_path,
@@ -1282,11 +1282,11 @@ NOTHROW_RPC(LIBCCALL libc_fsymlinkat)(char const *link_text,
 }
 /*[[[end:libc_fsymlinkat]]]*/
 
-/*[[[head:libd_freadlinkat,hash:CRC-32=0xd5ba18ee]]]*/
+/*[[[head:libd_freadlinkat,hash:CRC-32=0xfd8f02f]]]*/
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH | AT_READLINK_REQSIZE' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((2, 3)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((2, 3)) ssize_t
 NOTHROW_RPC(LIBDCALL libd_freadlinkat)(fd_t dfd,
                                        char const *path,
                                        char *buf,
@@ -1315,10 +1315,10 @@ NOTHROW_RPC(LIBCCALL libc_freadlinkat)(fd_t dfd,
 }
 /*[[[end:libc_freadlinkat]]]*/
 
-/*[[[head:libd_unlinkat,hash:CRC-32=0xc8de8c49]]]*/
+/*[[[head:libd_unlinkat,hash:CRC-32=0x4722dc71]]]*/
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2)) int
 NOTHROW_RPC(LIBDCALL libd_unlinkat)(fd_t dfd,
                                     char const *name,
                                     atflag_t flags)
@@ -1602,11 +1602,11 @@ NOTHROW_NCX(LIBCCALL libc_getsid)(pid_t pid)
 }
 /*[[[end:libc_getsid]]]*/
 
-/*[[[head:libd_lchown,hash:CRC-32=0x7141e46e]]]*/
+/*[[[head:libd_lchown,hash:CRC-32=0x133bc058]]]*/
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
  * but don't reference it if  that file is a symbolic  link */
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_lchown)(char const *file,
                                   uid_t owner,
                                   gid_t group)
@@ -1636,10 +1636,10 @@ NOTHROW_RPC(LIBCCALL libc_lchown)(char const *file,
 }
 /*[[[end:libc_lchown]]]*/
 
-/*[[[head:libd_truncate,hash:CRC-32=0xe7d7cab2]]]*/
+/*[[[head:libd_truncate,hash:CRC-32=0xedb43047]]]*/
 /* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
 NOTHROW_NCX(LIBDCALL libd_truncate)(char const *file,
                                     __PIO_OFFSET length)
 /*[[[body:libd_truncate]]]*/
@@ -1667,13 +1667,13 @@ NOTHROW_NCX(LIBCCALL libc_truncate)(char const *file,
 }
 /*[[[end:libc_truncate]]]*/
 
-/*[[[head:libd_truncate64,hash:CRC-32=0x545c45f3]]]*/
+/*[[[head:libd_truncate64,hash:CRC-32=0xd1f222f2]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libd_truncate64, libd_truncate);
 #else /* MAGIC:alias */
 /* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
 NOTHROW_NCX(LIBDCALL libd_truncate64)(char const *file,
                                       __PIO_OFFSET64 length)
 /*[[[body:libd_truncate64]]]*/
@@ -1886,12 +1886,12 @@ NOTHROW_NCX(LIBCCALL libc_ttyslot)(void)
 }
 /*[[[end:libc_ttyslot]]]*/
 
-/*[[[head:libd_symlink,hash:CRC-32=0xf6e7aa23]]]*/
+/*[[[head:libd_symlink,hash:CRC-32=0x43c96b10]]]*/
 /* >> symlink(3)
  * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBDCALL libd_symlink)(char const *link_text,
                                    char const *target_path)
 /*[[[body:libd_symlink]]]*/
@@ -1919,7 +1919,7 @@ NOTHROW_RPC(LIBCCALL libc_symlink)(char const *link_text,
 }
 /*[[[end:libc_symlink]]]*/
 
-/*[[[head:libd_readlink,hash:CRC-32=0xf81cd6e8]]]*/
+/*[[[head:libd_readlink,hash:CRC-32=0x92c8996f]]]*/
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
@@ -1929,7 +1929,7 @@ NOTHROW_RPC(LIBCCALL libc_symlink)(char const *link_text,
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((1, 2)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((1, 2)) ssize_t
 NOTHROW_RPC(LIBDCALL libd_readlink)(char const *path,
                                     char *buf,
                                     size_t buflen)
@@ -2161,11 +2161,11 @@ NOTHROW_RPC(LIBCCALL libc_revoke)(char const *file)
 }
 /*[[[end:libc_revoke]]]*/
 
-/*[[[head:libd_chroot,hash:CRC-32=0xda34e1ba]]]*/
+/*[[[head:libd_chroot,hash:CRC-32=0x568ab51d]]]*/
 /* >> chroot(2)
  * Change  the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `path' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.utility") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_chroot)(char const *__restrict path)
 /*[[[body:libd_chroot]]]*/
 {
@@ -2514,14 +2514,14 @@ NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
 }
 /*[[[end:libc_fpathconf]]]*/
 
-/*[[[head:libd_pathconf,hash:CRC-32=0xcb3c3e01]]]*/
+/*[[[head:libd_pathconf,hash:CRC-32=0x6e2afd22]]]*/
 /* >> pathconf(2)
  * @param: name: One of `_PC_*' from <asm/crt/confname.h>
  * Return a path configuration value associated with `name' for `path'
  * return: * : The configuration limit associated with `name' for `path'
  * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `path'
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((1)) longptr_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((1)) longptr_t
 NOTHROW_RPC(LIBDCALL libd_pathconf)(char const *path,
                                     __STDC_INT_AS_UINT_T name)
 /*[[[body:libd_pathconf]]]*/

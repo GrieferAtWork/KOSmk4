@@ -451,13 +451,18 @@ again_find_nextPresentFunction:
 				local doc = func.documentationString;
 				if (doc)
 					headWriter.printComment(doc);
+				local extraAttributes = implBinding.extraAttributes;
+				if (implBinding.implSection !is none) {
+					if (extraAttributes is none)
+						extraAttributes = ();
+					extraAttributes = List(extraAttributes);
+					extraAttributes.append("ATTR_SECTION({!r})".format({ implBinding.implSection }));
+				}
 				func.functionPrototype.cprintDeclarationWithoutTerminator(
 					headWriter, ESCAPE_MODE_NONE,
 					decl:                 "INTERN",
 					exposedName:          func.name,
-					injectedAttributes:   implBinding.implSection !is none
-						? { "ATTR_SECTION({!r})".format({ implBinding.implSection }) }
-						: none,
+					injectedAttributes:   extraAttributes,
 					breakAfterReturnType: true,
 					oneArgumentPerLine:   true);
 				headWriter.flush();

@@ -27,9 +27,9 @@
 
 DECL_BEGIN
 
-/*[[[head:libd_utime,hash:CRC-32=0xc6321830]]]*/
+/*[[[head:libd_utime,hash:CRC-32=0xd97c5c49]]]*/
 /* >> utime(2), utime64(2) */
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify_time") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify_time") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_utime)(char const *filename,
                                  struct utimbuf const *file_times)
 /*[[[body:libd_utime]]]*/
@@ -75,12 +75,12 @@ NOTHROW_RPC(LIBCCALL libc_utime)(char const *filename,
 }
 /*[[[end:libc_utime]]]*/
 
-/*[[[head:libd_utime64,hash:CRC-32=0x298e73a0]]]*/
+/*[[[head:libd_utime64,hash:CRC-32=0xbff61a1f]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libd_utime64, libd_utime);
 #else /* MAGIC:alias */
 /* >> utime(2), utime64(2) */
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify_time") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify_time") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_utime64)(char const *filename,
                                    struct utimbuf64 const *file_times)
 /*[[[body:libd_utime64]]]*/

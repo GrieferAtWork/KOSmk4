@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80980080 */
+/* HASH CRC-32:0x2b29e7d9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1044,7 +1044,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_c16toc8)(char pc8[3],
 /* >> format_8tow(3)
  * Format printer  (compatible  with  `__pformatprinter')  for
  * converting UTF-8 unicode input data into a UTF-16/32 output */
-INTERN ATTR_SECTION(".text.crt.dos.unicode.UTF") ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.UTF") ssize_t
 NOTHROW_NCX(__FORMATPRINTER_CC libd_format_8tow)(void *arg,
                                                  char const *data,
                                                  size_t datalen) {
@@ -1139,7 +1139,7 @@ err:
 /* >> format_wto8(3)
  * Format   printer   (compatible  with   `pc16formatprinter')  for
  * converting wide-character unicode input data into a UTF-8 output */
-INTERN ATTR_SECTION(".text.crt.dos.unicode.UTF") ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.UTF") ssize_t
 NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wto8)(void *arg,
                                                     char16_t const *data,
                                                     size_t datalen) {
@@ -1305,7 +1305,7 @@ err:
 /* >> format_wto32(3)
  * Format  printer   (compatible   with   `pc16formatprinter')   for
  * converting wide-character unicode input data into a UTF-32 output */
-INTERN ATTR_SECTION(".text.crt.dos.unicode.UTF") ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.UTF") ssize_t
 NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wto32)(void *arg,
                                                      char16_t const *data,
                                                      size_t datalen) {
@@ -1442,7 +1442,7 @@ NOTHROW_NCX(__C32FORMATPRINTER_CC libc_format_wto32)(void *arg,
 /* >> format_wto16(3)
  * Format   printer   (compatible   with   `pwformatprinter')    for
  * converting wide-character unicode input data into a UTF-16 output */
-INTERN ATTR_SECTION(".text.crt.dos.unicode.UTF") ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.UTF") ssize_t
 NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wto16)(void *arg,
                                                      char16_t const *data,
                                                      size_t datalen) {

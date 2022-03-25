@@ -54,6 +54,13 @@
 %[define_replacement(syscall_slong_t = __syscall_slong_t)]
 %[define_replacement(syscall_ulong_t = __syscall_ulong_t)]
 
+%[assume_defined_in_kos(STDIN_FILENO = "0")]
+%[assume_defined_in_kos(STDOUT_FILENO = "1")]
+%[assume_defined_in_kos(STDERR_FILENO = "2")]
+%[assume_defined_in_kos(__STDIN_FILENO = "0")]
+%[assume_defined_in_kos(__STDOUT_FILENO = "1")]
+%[assume_defined_in_kos(__STDERR_FILENO = "2")]
+
 %(auto_source){
 #include "../libc/globals.h"
 }
