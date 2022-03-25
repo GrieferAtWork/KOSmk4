@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb191391 */
+/* HASH CRC-32:0x6ccda2d3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,11 +29,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__crt_iswupper) && defined(__CRT_HAVE_iswupper) && __SIZEOF_WCHAR_T__ == 2
-__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBDCALL,__localdep_isupper16,(__WINT16_TYPE__ __wc),iswupper,{ return __crt_iswupper(__wc); })
+__COMPILER_CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBDCALL,__localdep_isupper16,(__WINT16_TYPE__ __wc),iswupper,{ return __crt_iswupper(__wc); })
 #elif defined(__crt_iswupper) && __SIZEOF_WCHAR_T__ == 2
 __LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBDCALL __localdep_isupper16)(__WINT16_TYPE__ __wc) { return __crt_iswupper(__wc); }
 #elif __has_builtin(__builtin_iswupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswupper) && __SIZEOF_WCHAR_T__ == 2
-__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBDCALL,__localdep_isupper16,(__WINT16_TYPE__ __wc),iswupper,{ return __builtin_iswupper(__wc); })
+__COMPILER_CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBDCALL,__localdep_isupper16,(__WINT16_TYPE__ __wc),iswupper,{ return __builtin_iswupper(__wc); })
 #elif defined(__CRT_HAVE_iswupper) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isupper16,(__WINT16_TYPE__ __wc),iswupper,(__wc))
 #elif defined(__CRT_HAVE_DOS$iswupper)

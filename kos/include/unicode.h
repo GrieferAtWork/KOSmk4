@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88bd5d56 */
+/* HASH CRC-32:0xc4fefd32 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1016,7 +1016,7 @@ struct format_8to16_data {
 /* >> format_8to16(3)
  * Format printer (compatible with `__pformatprinter')  for
  * converting UTF-8 unicode input data into a UTF-16 output */
-__COMPILER_REDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,format_8to16,(void *__arg, char const *__data, __SIZE_TYPE__ __datalen),format_8tow,(__arg,__data,__datalen))
+__COMPILER_CREDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,format_8to16,(void *__arg, char const *__data, __SIZE_TYPE__ __datalen),format_8tow,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$format_8tow) && defined(__LIBDCALL_IS_FORMATPRINTER_CC)
 /* >> format_8to16(3)
  * Format printer (compatible with `__pformatprinter')  for
@@ -1045,7 +1045,7 @@ struct format_8to32_data {
 /* >> format_8to32(3)
  * Format printer (compatible with `__pformatprinter')  for
  * converting UTF-8 unicode input data into a UTF-32 output */
-__COMPILER_REDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,format_8to32,(void *__arg, char const *__data, __SIZE_TYPE__ __datalen),format_8tow,(__arg,__data,__datalen))
+__COMPILER_CREDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,format_8to32,(void *__arg, char const *__data, __SIZE_TYPE__ __datalen),format_8tow,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_KOS$format_8tow) && defined(__LIBKCALL_IS_FORMATPRINTER_CC)
 /* >> format_8to32(3)
  * Format printer (compatible with `__pformatprinter')  for
@@ -1074,12 +1074,12 @@ struct format_16to8_data {
 /* >> format_16to8(3)
  * Format printer (compatible with `pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-8 output */
-__COMPILER_REDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C16FORMATPRINTER_CC,format_16to8,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
+__COMPILER_CREDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C16FORMATPRINTER_CC,format_16to8,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$format_wto8)
 /* >> format_16to8(3)
  * Format printer (compatible with `pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-8 output */
-__COMPILER_REDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C16FORMATPRINTER_CC,format_16to8,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),DOS$format_wto8,(__arg,__data,__datalen))
+__COMPILER_CREDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C16FORMATPRINTER_CC,format_16to8,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),DOS$format_wto8,(__arg,__data,__datalen))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/unicode/format_wto8.h>
 /* >> format_16to8(3)
@@ -1102,12 +1102,12 @@ struct format_32to8_data {
 /* >> format_32to8(3)
  * Format printer (compatible with `pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-8 output */
-__COMPILER_REDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C32FORMATPRINTER_CC,format_32to8,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
+__COMPILER_CREDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C32FORMATPRINTER_CC,format_32to8,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_KOS$format_wto8)
 /* >> format_32to8(3)
  * Format printer (compatible with `pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-8 output */
-__COMPILER_REDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C32FORMATPRINTER_CC,format_32to8,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),KOS$format_wto8,(__arg,__data,__datalen))
+__COMPILER_CREDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C32FORMATPRINTER_CC,format_32to8,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),KOS$format_wto8,(__arg,__data,__datalen))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/unicode/format_wto8.h>
 /* >> format_32to8(3)
@@ -1131,12 +1131,12 @@ struct format_16to32_data {
 /* >> format_16to32(3)
  * Format printer (compatible with `pc16formatprinter')  for
  * converting UTF-16 unicode input data into a UTF-32 output */
-__COMPILER_REDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C16FORMATPRINTER_CC,format_16to32,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto32,(__arg,__data,__datalen))
+__COMPILER_CREDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C16FORMATPRINTER_CC,format_16to32,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto32,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$format_wto32)
 /* >> format_16to32(3)
  * Format printer (compatible with `pc16formatprinter')  for
  * converting UTF-16 unicode input data into a UTF-32 output */
-__COMPILER_REDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C16FORMATPRINTER_CC,format_16to32,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),DOS$format_wto32,(__arg,__data,__datalen))
+__COMPILER_CREDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C16FORMATPRINTER_CC,format_16to32,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),DOS$format_wto32,(__arg,__data,__datalen))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/unicode/format_wto32.h>
 /* >> format_16to32(3)
@@ -1159,12 +1159,12 @@ struct format_32to16_data {
 /* >> format_32to16(3)
  * Format printer (compatible with `__pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-16  output */
-__COMPILER_REDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C32FORMATPRINTER_CC,format_32to16,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto16,(__arg,__data,__datalen))
+__COMPILER_CREDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C32FORMATPRINTER_CC,format_32to16,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto16,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_KOS$format_wto16)
 /* >> format_32to16(3)
  * Format printer (compatible with `__pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-16  output */
-__COMPILER_REDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C32FORMATPRINTER_CC,format_32to16,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),KOS$format_wto16,(__arg,__data,__datalen))
+__COMPILER_CREDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C32FORMATPRINTER_CC,format_32to16,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),KOS$format_wto16,(__arg,__data,__datalen))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/unicode/format_wto16.h>
 /* >> format_32to16(3)

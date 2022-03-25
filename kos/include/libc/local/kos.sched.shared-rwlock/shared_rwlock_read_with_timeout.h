@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb761bb5 */
+/* HASH CRC-32:0x9c178cae */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/__atomic.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_EIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__localdep_shared_rwlock_tryread,(struct shared_rwlock *__restrict __self),shared_rwlock_tryread,{
+__COMPILER_CEIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__localdep_shared_rwlock_tryread,(struct shared_rwlock *__restrict __self),shared_rwlock_tryread,{
 	__UINTPTR_TYPE__ __temp;
 	do {
 		__temp = __hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE);

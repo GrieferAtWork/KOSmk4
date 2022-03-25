@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb94a1bb0 */
+/* HASH CRC-32:0x1148d038 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -137,7 +137,7 @@ __CREDIRECT(,size_t,__NOTHROW_NCX,mbrtoc16,(char16_t *__pc16, char const *__rest
 __CREDIRECT(,size_t,__NOTHROW_NCX,mbrtoc16,(char16_t *__pc16, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs),__mbrtowc,(__pc16,__str,__maxlen,__mbs))
 #elif defined(__CRT_HAVE_DOS$mbrtowc) && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> mbrtoc16(3) */
-__COMPILER_REDIRECT(__LIBC,,size_t,__NOTHROW_NCX,__LIBCCALL,mbrtoc16,(char16_t *__pc16, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs),DOS$mbrtowc,(__pc16,__str,__maxlen,__mbs))
+__COMPILER_CREDIRECT(__LIBC,,size_t,__NOTHROW_NCX,__LIBCCALL,mbrtoc16,(char16_t *__pc16, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs),DOS$mbrtowc,(__pc16,__str,__maxlen,__mbs))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_STD_END
 #include <libc/local/wchar/mbrtowc.h>
@@ -162,7 +162,7 @@ __CREDIRECT(,size_t,__NOTHROW_NCX,mbrtoc32,(char32_t *__pc32, char const *__rest
 __CREDIRECT(,size_t,__NOTHROW_NCX,mbrtoc32,(char32_t *__pc32, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs),__mbrtowc,(__pc32,__str,__maxlen,__mbs))
 #elif defined(__CRT_HAVE_KOS$mbrtowc) && defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> mbrtoc32(3) */
-__COMPILER_REDIRECT(__LIBC,,size_t,__NOTHROW_NCX,__LIBCCALL,mbrtoc32,(char32_t *__pc32, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs),KOS$mbrtowc,(__pc32,__str,__maxlen,__mbs))
+__COMPILER_CREDIRECT(__LIBC,,size_t,__NOTHROW_NCX,__LIBCCALL,mbrtoc32,(char32_t *__pc32, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs),KOS$mbrtowc,(__pc32,__str,__maxlen,__mbs))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_STD_END
 #include <libc/local/wchar/mbrtowc.h>
@@ -184,7 +184,7 @@ __CDECLARE(,size_t,__NOTHROW_NCX,c16rtomb,(char *__restrict __str, char16_t __c1
 __CREDIRECT(,size_t,__NOTHROW_NCX,c16rtomb,(char *__restrict __str, char16_t __c16, mbstate_t *__mbs),wcrtomb,(__str,__c16,__mbs))
 #elif defined(__CRT_HAVE_DOS$wcrtomb) && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> c16rtomb(3) */
-__COMPILER_REDIRECT(__LIBC,,size_t,__NOTHROW_NCX,__LIBCCALL,c16rtomb,(char *__restrict __str, char16_t __c16, mbstate_t *__mbs),DOS$wcrtomb,(__str,__c16,__mbs))
+__COMPILER_CREDIRECT(__LIBC,,size_t,__NOTHROW_NCX,__LIBCCALL,c16rtomb,(char *__restrict __str, char16_t __c16, mbstate_t *__mbs),DOS$wcrtomb,(__str,__c16,__mbs))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_STD_END
 #include <libc/local/wchar/wcrtomb.h>
@@ -206,7 +206,7 @@ __CDECLARE(,size_t,__NOTHROW_NCX,c32rtomb,(char *__restrict __str, char32_t __c3
 __CREDIRECT(,size_t,__NOTHROW_NCX,c32rtomb,(char *__restrict __str, char32_t __c32, mbstate_t *__mbs),wcrtomb,(__str,__c32,__mbs))
 #elif defined(__CRT_HAVE_KOS$wcrtomb) && defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> c32rtomb(3) */
-__COMPILER_REDIRECT(__LIBC,,size_t,__NOTHROW_NCX,__LIBCCALL,c32rtomb,(char *__restrict __str, char32_t __c32, mbstate_t *__mbs),KOS$wcrtomb,(__str,__c32,__mbs))
+__COMPILER_CREDIRECT(__LIBC,,size_t,__NOTHROW_NCX,__LIBCCALL,c32rtomb,(char *__restrict __str, char32_t __c32, mbstate_t *__mbs),KOS$wcrtomb,(__str,__c32,__mbs))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_STD_END
 #include <libc/local/wchar/wcrtomb.h>

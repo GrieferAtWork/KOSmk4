@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9136efc */
+/* HASH CRC-32:0x31fa6c2f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,15 +31,15 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_wopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE) && __SIZEOF_WCHAR_T__ == 4 && defined(__VLIBCCALL_IS_VLIBKCALL)
-__COMPILER_VREDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__VLIBKCALL,__localdep_c32open,(__CHAR32_TYPE__ const *__filename, __oflag_t __oflags),wopen,(__filename,__oflags),__oflags,1,(__mode_t))
+__COMPILER_CVREDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__VLIBKCALL,__localdep_c32open,(__CHAR32_TYPE__ const *__filename, __oflag_t __oflags),wopen,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_KOS$wopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __CVREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_c32open,(__CHAR32_TYPE__ const *__filename, __oflag_t __oflags),wopen,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__wopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE) && __SIZEOF_WCHAR_T__ == 4 && defined(__VLIBCCALL_IS_VLIBKCALL)
-__COMPILER_VREDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__VLIBKCALL,__localdep_c32open,(__CHAR32_TYPE__ const *__filename, __oflag_t __oflags),_wopen,(__filename,__oflags),__oflags,1,(__mode_t))
+__COMPILER_CVREDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__VLIBKCALL,__localdep_c32open,(__CHAR32_TYPE__ const *__filename, __oflag_t __oflags),_wopen,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_KOS$_wopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __CVREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_c32open,(__CHAR32_TYPE__ const *__filename, __oflag_t __oflags),_wopen,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_wopen64) && __SIZEOF_WCHAR_T__ == 4 && defined(__VLIBCCALL_IS_VLIBKCALL)
-__COMPILER_VREDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__VLIBKCALL,__localdep_c32open,(__CHAR32_TYPE__ const *__filename, __oflag_t __oflags),wopen64,(__filename,__oflags),__oflags,1,(__mode_t))
+__COMPILER_CVREDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__VLIBKCALL,__localdep_c32open,(__CHAR32_TYPE__ const *__filename, __oflag_t __oflags),wopen64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_KOS$wopen64)
 __CVREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_c32open,(__CHAR32_TYPE__ const *__filename, __oflag_t __oflags),wopen64,(__filename,__oflags),__oflags,1,(__mode_t))
 #else /* ... */
@@ -64,11 +64,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32open32_defined
 #define __local___localdep_c32open32_defined
 #if defined(__CRT_HAVE_wopen) && __SIZEOF_WCHAR_T__ == 4 && defined(__VLIBCCALL_IS_VLIBKCALL)
-__COMPILER_VREDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__VLIBKCALL,__localdep_c32open32,(__CHAR32_TYPE__ const *__filename, __oflag_t __oflags),wopen,(__filename,__oflags),__oflags,1,(__mode_t))
+__COMPILER_CVREDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__VLIBKCALL,__localdep_c32open32,(__CHAR32_TYPE__ const *__filename, __oflag_t __oflags),wopen,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_KOS$wopen)
 __CVREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_c32open32,(__CHAR32_TYPE__ const *__filename, __oflag_t __oflags),wopen,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__wopen) && __SIZEOF_WCHAR_T__ == 4 && defined(__VLIBCCALL_IS_VLIBKCALL)
-__COMPILER_VREDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__VLIBKCALL,__localdep_c32open32,(__CHAR32_TYPE__ const *__filename, __oflag_t __oflags),_wopen,(__filename,__oflags),__oflags,1,(__mode_t))
+__COMPILER_CVREDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__VLIBKCALL,__localdep_c32open32,(__CHAR32_TYPE__ const *__filename, __oflag_t __oflags),_wopen,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_KOS$_wopen)
 __CVREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_c32open32,(__CHAR32_TYPE__ const *__filename, __oflag_t __oflags),_wopen,(__filename,__oflags),__oflags,1,(__mode_t))
 #else /* ... */

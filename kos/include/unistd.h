@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7bf0d6e5 */
+/* HASH CRC-32:0x89afeb4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1365,7 +1365,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(writeall, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
  * A pformatprinter-compatible consumer that dumps all input data into `fd' by use
  * of `writeall(3)'. The given `fd' should be encoded by  `WRITE_PRINTER_ARG(fd)'.
  * @return: * : Same as `writeall(3)' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,__FORMATPRINTER_CC,write_printer,(void *__fd, char const *__restrict __buf, size_t __bufsize),writeall,(__fd,__buf,__bufsize))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,__FORMATPRINTER_CC,write_printer,(void *__fd, char const *__restrict __buf, size_t __bufsize),writeall,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE_write_printer)
 /* >> write_printer(3)
  * A pformatprinter-compatible consumer that dumps all input data into `fd' by use

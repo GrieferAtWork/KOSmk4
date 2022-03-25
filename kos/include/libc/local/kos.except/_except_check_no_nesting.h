@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6cec3695 */
+/* HASH CRC-32:0x7cde87c0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_except_active_defined
 #define __local___localdep_except_active_defined
 #ifdef __CRT_HAVE_except_active
-__COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED,__BOOL,__NOTHROW,__LIBKCALL,__localdep_except_active,(void),except_active,())
+__COMPILER_CREDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED,__BOOL,__NOTHROW,__LIBKCALL,__localdep_except_active,(void),except_active,())
 #elif (defined(__CRT_HAVE_except_code) || defined(__arch_except_code) || defined(__CRT_HAVE_except_data) || defined(__arch_except_data)) && (defined(__arch_except_active) || defined(__CRT_HAVE_except_code) || defined(__arch_except_code) || defined(__CRT_HAVE_except_data) || defined(__arch_except_data))
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.except/except_active.h>

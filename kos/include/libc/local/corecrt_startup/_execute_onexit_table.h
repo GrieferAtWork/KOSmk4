@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6f7f5ef */
+/* HASH CRC-32:0xd6fdc87c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__initialize_onexit_table_defined
 #define __local___localdep__initialize_onexit_table_defined
 #ifdef __CRT_HAVE__initialize_onexit_table
-__COMPILER_REDIRECT(__LIBC,,int,__NOTHROW_NCX,__LIBDCALL,__localdep__initialize_onexit_table,(struct _onexit_table_t *__self),_initialize_onexit_table,(__self))
+__COMPILER_CREDIRECT(__LIBC,,int,__NOTHROW_NCX,__LIBDCALL,__localdep__initialize_onexit_table,(struct _onexit_table_t *__self),_initialize_onexit_table,(__self))
 #else /* __CRT_HAVE__initialize_onexit_table */
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_startup/_initialize_onexit_table.h>
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__initterm_e_defined
 #define __local___localdep__initterm_e_defined
 #ifdef __CRT_HAVE__initterm_e
-__COMPILER_REDIRECT(__LIBC,,int,__NOTHROW_NCX,__LIBDCALL,__localdep__initterm_e,(_onexit_t *__start, _onexit_t *__end),_initterm_e,(__start,__end))
+__COMPILER_CREDIRECT(__LIBC,,int,__NOTHROW_NCX,__LIBDCALL,__localdep__initterm_e,(_onexit_t *__start, _onexit_t *__end),_initterm_e,(__start,__end))
 #else /* __CRT_HAVE__initterm_e */
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_startup/_initterm_e.h>

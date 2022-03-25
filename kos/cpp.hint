@@ -646,26 +646,36 @@
 
 #define __KOS_FIXED_CONST const
 
-#define __COMPILER_REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       Treturn name param;
-#define __COMPILER_REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                             void name param;
-#define __COMPILER_VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)    Treturn name param;
-#define __COMPILER_VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)          void name param;
-#define __COMPILER_VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) Treturn name paramf;
-#define __COMPILER_VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)       void name paramf;
-#define __COMPILER_XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      Treturn name param;
-#define __COMPILER_XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                            void name param;
-#define __COMPILER_EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)                                                    Treturn name param;
-#define __COMPILER_EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...)                                           Treturn name param;
-#define REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                                  Treturn name param;
-#define REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                                        void name param;
-#define VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)               Treturn name param;
-#define VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)                     void name param;
-#define VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)            Treturn name paramf;
-#define VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)                  void name paramf;
-#define XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                                 Treturn name param;
-#define XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                                       void name param;
-#define EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)                                                               Treturn name param;
-#define EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...)                                                      Treturn name param;
+#define __COMPILER_REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                        Treturn name param;
+#define __COMPILER_REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                              void name param;
+#define __COMPILER_VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)     Treturn name param;
+#define __COMPILER_VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)           void name param;
+#define __COMPILER_VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)  Treturn name paramf;
+#define __COMPILER_VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)        void name paramf;
+#define __COMPILER_XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                       Treturn name param;
+#define __COMPILER_XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                             void name param;
+#define __COMPILER_EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)                                                     Treturn name param;
+#define __COMPILER_EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...)                                            Treturn name param;
+#define __COMPILER_CREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       Treturn name param;
+#define __COMPILER_CREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                             void name param;
+#define __COMPILER_CVREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)    Treturn name param;
+#define __COMPILER_CVREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)          void name param;
+#define __COMPILER_CVFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) Treturn name paramf;
+#define __COMPILER_CVFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)       void name paramf;
+#define __COMPILER_CXREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      Treturn name param;
+#define __COMPILER_CXREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                            void name param;
+#define __COMPILER_CEIDECLARE(attr,Treturn,nothrow,cc,name,param,...)                                                    Treturn name param;
+#define __COMPILER_CEIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...)                                           Treturn name param;
+#define REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                                   Treturn name param;
+#define REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                                         void name param;
+#define VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)                Treturn name param;
+#define VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)                      void name param;
+#define VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)             Treturn name paramf;
+#define VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)                   void name paramf;
+#define XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                                  Treturn name param;
+#define XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                                        void name param;
+#define EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)                                                                Treturn name param;
+#define EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...)                                                       Treturn name param;
 
 #define __NAMESPACE_GLB_SYM                 ::
 #define __NAMESPACE_STD_BEGIN               namespace std {

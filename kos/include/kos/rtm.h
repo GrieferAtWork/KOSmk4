@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28c5ad73 */
+/* HASH CRC-32:0x9e2692ad */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -181,7 +181,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(rtm_end, __FORCELOCAL __ATTR_ARTIFICIAL void __N
  * `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
  * If no  transaction  was  in  progress, behave  as  a  no-op.  Otherwise,  this
  * function does not return normally, but returns from the original `rtm_begin()' */
-__COMPILER_EIDECLARE(,void,__NOTHROW,__FCALL,rtm_abort,(unsigned int __code),{ __arch_rtm_abort(__code); })
+__COMPILER_CEIDECLARE(,void,__NOTHROW,__FCALL,rtm_abort,(unsigned int __code),{ __arch_rtm_abort(__code); })
 #elif defined(__CRT_HAVE_rtm_abort)
 /* >> rtm_abort(2)
  * Abort  the   current  transaction   by   having  `rtm_begin()'   return   with

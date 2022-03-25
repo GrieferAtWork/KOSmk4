@@ -1075,14 +1075,14 @@ class FunctionPrototype {
 	}
 
 	@@Print a declaration akin to:
-	@@> __COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,__NOTHROW_NCX,
-	@@>                     __LIBCCALL,strlen,(char const *__str),strlen_alias,(__str))
+	@@> __COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,__NOTHROW_NCX,
+	@@>                      __LIBCCALL,strlen,(char const *__str),strlen_alias,(__str))
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintREDIRECT(
 			fp: CWriter, escapeMode: int, decl: string,
 			exposedName: string, assemblyName: string,
 			isLcl: bool) {
-		fp << (isLcl ? "__CREDIRECT" : "__COMPILER_REDIRECT");
+		fp << (isLcl ? "__CREDIRECT" : "__COMPILER_CREDIRECT");
 		local isVoidReturn = returnType.isVoid;
 		if (isVoidReturn)
 			fp << "_VOID";
@@ -1140,7 +1140,7 @@ class FunctionPrototype {
 			fp: CWriter, escapeMode: int, decl: string,
 			exposedName: string, assemblyName: string,
 			isLcl: bool) {
-		fp << (isLcl ? "__CVREDIRECT" : "__COMPILER_VREDIRECT");
+		fp << (isLcl ? "__CVREDIRECT" : "__COMPILER_CVREDIRECT");
 		local isVoidReturn = returnType.isVoid;
 		if (isVoidReturn)
 			fp << "_VOID";
@@ -1282,7 +1282,7 @@ class FunctionPrototype {
 		local isSameAsname = exposedName == assemblyName && fp.externLinkage in ["", "C"];
 		fp << (isLcl
 		       ? isSameAsname ? "__CEIDECLARE" : "__CEIREDIRECT"
-		       : isSameAsname ? "__COMPILER_EIDECLARE" : "__COMPILER_EIREDIRECT");
+		       : isSameAsname ? "__COMPILER_CEIDECLARE" : "__COMPILER_CEIREDIRECT");
 		if (isLcl) {
 			if (assemblyName.startswith("DOS$")) {
 				fp << "_DOS";

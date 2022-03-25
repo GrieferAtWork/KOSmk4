@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x132848ad */
+/* HASH CRC-32:0x8d17d748 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_except_rethrow_defined) && defined(__CRT_HAVE_except_rethrow)
 #define __local___localdep_except_rethrow_defined
-__COMPILER_REDIRECT_VOID(__LIBC,__ATTR_COLD __ATTR_NORETURN,__THROWING,__LIBKCALL,__localdep_except_rethrow,(void),except_rethrow,())
+__COMPILER_CREDIRECT_VOID(__LIBC,__ATTR_COLD __ATTR_NORETURN,__THROWING,__LIBKCALL,__localdep_except_rethrow,(void),except_rethrow,())
 #endif /* !__local___localdep_except_rethrow_defined && __CRT_HAVE_except_rethrow */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/pthreadvalues.h>

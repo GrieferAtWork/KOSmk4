@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb96f9a1f */
+/* HASH CRC-32:0x640c51dc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,7 +88,7 @@ typedef __except_subclass_t except_subclass_t;
 #if defined(__arch_except_data) && defined(__CRT_HAVE_except_data)
 /* >> except_data(3)
  * Return a pointer to the thread-local descriptor of the current exception */
-__COMPILER_EIDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,struct exception_data *,__NOTHROW,__LIBKCALL,except_data,(void),{ return __arch_except_data(); })
+__COMPILER_CEIDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,struct exception_data *,__NOTHROW,__LIBKCALL,except_data,(void),{ return __arch_except_data(); })
 #elif defined(__CRT_HAVE_except_data)
 /* >> except_data(3)
  * Return a pointer to the thread-local descriptor of the current exception */
@@ -102,7 +102,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(except_data, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__arch_except_code) && defined(__CRT_HAVE_except_code)
 /* >> except_code(3)
  * Return the current exception code, or `EXCEPT_CODEOF(E_OK)' when none is active */
-__COMPILER_EIDECLARE(__ATTR_PURE __ATTR_WUNUSED,except_code_t,__NOTHROW,__LIBKCALL,except_code,(void),{ return __arch_except_code(); })
+__COMPILER_CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,except_code_t,__NOTHROW,__LIBKCALL,except_code,(void),{ return __arch_except_code(); })
 #elif defined(__CRT_HAVE_except_code)
 /* >> except_code(3)
  * Return the current exception code, or `EXCEPT_CODEOF(E_OK)' when none is active */
@@ -116,7 +116,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(except_code, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__arch_except_active) && defined(__CRT_HAVE_except_active)
 /* >> except_active(3)
  * Check if an exception is active; same as `except_code() != EXCEPT_CODEOF(E_OK)' */
-__COMPILER_EIDECLARE(__ATTR_PURE __ATTR_WUNUSED,__BOOL,__NOTHROW,__LIBKCALL,except_active,(void),{ return __arch_except_active(); })
+__COMPILER_CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,__BOOL,__NOTHROW,__LIBKCALL,except_active,(void),{ return __arch_except_active(); })
 #elif defined(__CRT_HAVE_except_active)
 /* >> except_active(3)
  * Check if an exception is active; same as `except_code() != EXCEPT_CODEOF(E_OK)' */
@@ -130,7 +130,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(except_active, __FORCELOCAL __ATTR_ARTIFICIAL __
 #if defined(__arch_except_class) && defined(__CRT_HAVE_except_class)
 /* >> except_class(3)
  * Return the current exception class; same as `EXCEPT_CLASS(except_code())' */
-__COMPILER_EIDECLARE(__ATTR_PURE __ATTR_WUNUSED,except_class_t,__NOTHROW,__LIBKCALL,except_class,(void),{ return __arch_except_class(); })
+__COMPILER_CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,except_class_t,__NOTHROW,__LIBKCALL,except_class,(void),{ return __arch_except_class(); })
 #elif defined(__CRT_HAVE_except_class)
 /* >> except_class(3)
  * Return the current exception class; same as `EXCEPT_CLASS(except_code())' */
@@ -144,7 +144,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(except_class, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #if defined(__arch_except_subclass) && defined(__CRT_HAVE_except_subclass)
 /* >> except_subclass(3)
  * Return the current exception sub-class; same as `EXCEPT_SUBCLASS(except_code())' */
-__COMPILER_EIDECLARE(__ATTR_PURE __ATTR_WUNUSED,except_subclass_t,__NOTHROW,__LIBKCALL,except_subclass,(void),{ return __arch_except_subclass(); })
+__COMPILER_CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,except_subclass_t,__NOTHROW,__LIBKCALL,except_subclass,(void),{ return __arch_except_subclass(); })
 #elif defined(__CRT_HAVE_except_subclass)
 /* >> except_subclass(3)
  * Return the current exception sub-class; same as `EXCEPT_SUBCLASS(except_code())' */
@@ -159,7 +159,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(except_subclass, __FORCELOCAL __ATTR_ARTIFICIAL 
 /* >> except_register_state(3)
  * Return  the register state  at the time the  current exception was thrown.
  * The returned block of memory is only valid when `except_active() == true'. */
-__COMPILER_EIDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,except_register_state_t *,__NOTHROW,__LIBKCALL,except_register_state,(void),{ return __arch_except_register_state(); })
+__COMPILER_CEIDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,except_register_state_t *,__NOTHROW,__LIBKCALL,except_register_state,(void),{ return __arch_except_register_state(); })
 #elif defined(__CRT_HAVE_except_register_state)
 /* >> except_register_state(3)
  * Return  the register state  at the time the  current exception was thrown.
@@ -260,7 +260,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(except_print_short_description, __FORCELOCAL __A
  * libc/the kernel was configured. For the sake of compatibility,
  * try to  use `except_data()'  and `except_register_state()'  in
  * favor of this function. */
-__COMPILER_EIDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,struct exception_info *,__NOTHROW,__LIBKCALL,except_info,(void),{ return __arch_except_info(); })
+__COMPILER_CEIDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,struct exception_info *,__NOTHROW,__LIBKCALL,except_info,(void),{ return __arch_except_info(); })
 #elif defined(__CRT_HAVE_except_info)
 /* >> except_info(3)
  * Return a pointer to the thread-local exception info structure.

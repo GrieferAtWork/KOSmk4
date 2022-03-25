@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d775c8d */
+/* HASH CRC-32:0xd71243f9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,9 +43,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_write_printer_defined
 #define __local___localdep_write_printer_defined
 #if defined(__CRT_HAVE_writeall) && defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__FORMATPRINTER_CC,__localdep_write_printer,(void *__fd, char const *__restrict __buf, __SIZE_TYPE__ __bufsize),writeall,(__fd,__buf,__bufsize))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__FORMATPRINTER_CC,__localdep_write_printer,(void *__fd, char const *__restrict __buf, __SIZE_TYPE__ __bufsize),writeall,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE_write_printer)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__FORMATPRINTER_CC,__localdep_write_printer,(void *__fd, char const *__restrict __buf, __SIZE_TYPE__ __bufsize),write_printer,(__fd,__buf,__bufsize))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__FORMATPRINTER_CC,__localdep_write_printer,(void *__fd, char const *__restrict __buf, __SIZE_TYPE__ __bufsize),write_printer,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE_writeall) || defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/write_printer.h>

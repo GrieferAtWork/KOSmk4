@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xafe5d694 */
+/* HASH CRC-32:0xa93a1680 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -96,7 +96,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_query_app_type, __FORCELOCAL __ATTR_ARTIFICIAL 
 #ifdef __CRT_HAVE__set_app_type
 __LIBC void __NOTHROW_NCX(__LIBDCALL _set_app_type)(_crt_app_type __type) __CASMNAME_SAME("_set_app_type");
 #elif defined(__CRT_HAVE___set_app_type)
-__COMPILER_REDIRECT_VOID(__LIBC,,__NOTHROW_NCX,__LIBDCALL,_set_app_type,(_crt_app_type __type),__set_app_type,(__type))
+__COMPILER_CREDIRECT_VOID(__LIBC,,__NOTHROW_NCX,__LIBDCALL,_set_app_type,(_crt_app_type __type),__set_app_type,(__type))
 #endif /* ... */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__NOTHROW_NCX,__setusermatherr,(int (__LIBCCALL *__fptr)(struct _exception *)),(__fptr))
 #ifdef __CRT_HAVE__configure_narrow_argv

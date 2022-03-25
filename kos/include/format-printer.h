@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44f78f67 */
+/* HASH CRC-32:0x357c48a8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -590,7 +590,7 @@ __LIBC __ATTR_CONST __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC format_lengt
 /* >> format_length(3)
  * Always re-return `datalen' and ignore all other arguments
  * Both the `arg'  and `data' arguments  are simply  ignored */
-__COMPILER_REDIRECT(__LIBC,__ATTR_CONST,__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,format_length,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_CONST,__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,format_length,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
 #else /* ... */
 #include <libc/local/format-printer/format_length.h>
 /* >> format_length(3)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d6cc04d */
+/* HASH CRC-32:0x25f1fb9d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1836,7 +1836,7 @@ __LIBC __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED __LONG32_TYPE__ *__NOTHROW_
 #elif defined(__CRT_HAVE_DOS$__dstbias)
 __CREDIRECT_DOS(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__LONG32_TYPE__ *,__NOTHROW_NCX,__dstbias,(void),__dstbias,())
 #elif defined(__CRT_HAVE___p__dstbias)
-__COMPILER_REDIRECT(__LIBC,__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__LONG32_TYPE__ *,__NOTHROW_NCX,__LIBDCALL,__dstbias,(void),__p__dstbias,())
+__COMPILER_CREDIRECT(__LIBC,__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__LONG32_TYPE__ *,__NOTHROW_NCX,__LIBDCALL,__dstbias,(void),__p__dstbias,())
 #else /* ... */
 #include <libc/template/dstbias.h>
 #ifdef __LOCAL_dstbias

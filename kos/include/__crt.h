@@ -618,76 +618,38 @@ struct __locale_struct;
 #define __CXREDIRECT_VOID_KOS(attr,nothrow,name,param,asmname,code)                                     __INTDEF attr void nothrow(__LIBKCALL name) param __ASMNAME("libc_" #asmname);
 #ifdef __NO_EXTERN_INLINE
 #ifdef __NO_INLINE__
-#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __CEIDECLARE(attr,Treturn,nothrow,name,param,...)              __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #name);
 #define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,...)          __INTDEF attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("libd_" #name);
 #define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,...)          __INTDEF attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("libc_" #name);
 #define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,...)     __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname);
 #define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...) __INTDEF attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("libd_" #asmname);
 #define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,...) __INTDEF attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("libc_" #asmname);
-#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
-#define __CEIDECLARE(attr,Treturn,nothrow,name,param,inline_impl...)              __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #name);
-#define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,inline_impl...)          __INTDEF attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("libd_" #name);
-#define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,inline_impl...)          __INTDEF attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("libc_" #name);
-#define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,inline_impl...)     __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname);
-#define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,inline_impl...) __INTDEF attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("libd_" #asmname);
-#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,inline_impl...) __INTDEF attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("libc_" #asmname);
-#else /* ... */
-#define __CEIDECLARE(attr,Treturn,nothrow,name,param,inline_impl)              __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #name);
-#define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,inline_impl)          __INTDEF attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("libd_" #name);
-#define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,inline_impl)          __INTDEF attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("libc_" #name);
-#define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,inline_impl)     __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname);
-#define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,inline_impl) __INTDEF attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("libd_" #asmname);
-#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,inline_impl) __INTDEF attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("libc_" #asmname);
-#endif /* !... */
 #else /* __NO_INLINE__ */
-#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __CEIDECLARE(attr,Treturn,nothrow,name,param,...)              __LOCAL __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
 #define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,...)          __LOCAL __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
 #define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,...)          __LOCAL __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBKCALL name) param __VA_ARGS__
 #define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,...)     __LOCAL __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
 #define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...) __LOCAL __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
 #define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,...) __LOCAL __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBKCALL name) param __VA_ARGS__
-#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
-#define __CEIDECLARE(attr,Treturn,nothrow,name,param,inline_impl...)              __LOCAL __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBCCALL name) param inline_impl
-#define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,inline_impl...)          __LOCAL __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBDCALL name) param inline_impl
-#define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,inline_impl...)          __LOCAL __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBKCALL name) param inline_impl
-#define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,inline_impl...)     __LOCAL __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBCCALL name) param inline_impl
-#define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,inline_impl...) __LOCAL __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBDCALL name) param inline_impl
-#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,inline_impl...) __LOCAL __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBKCALL name) param inline_impl
-#else /* ... */
-#define __CEIDECLARE(attr,Treturn,nothrow,name,param,inline_impl)              __LOCAL __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBCCALL name) param inline_impl
-#define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,inline_impl)          __LOCAL __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBDCALL name) param inline_impl
-#define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,inline_impl)          __LOCAL __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBKCALL name) param inline_impl
-#define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,inline_impl)     __LOCAL __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBCCALL name) param inline_impl
-#define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,inline_impl) __LOCAL __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBDCALL name) param inline_impl
-#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,inline_impl) __LOCAL __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBKCALL name) param inline_impl
-#endif /* !... */
 #endif /* !__NO_INLINE__ */
 #else /* __NO_EXTERN_INLINE */
-#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __CEIDECLARE(attr,Treturn,nothrow,name,param,...)              __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #name); __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
 #define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,...)          __INTDEF attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("libd_" #name); __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
 #define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,...)          __INTDEF attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("libc_" #name); __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBKCALL name) param __VA_ARGS__
 #define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,...)     __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname); __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBCCALL name) param __VA_ARGS__
 #define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,...) __INTDEF attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("libd_" #asmname); __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBDCALL name) param __VA_ARGS__
 #define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,...) __INTDEF attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("libc_" #asmname); __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBKCALL name) param __VA_ARGS__
-#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
-#define __CEIDECLARE(attr,Treturn,nothrow,name,param,inline_impl...)              __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #name); __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBCCALL name) param inline_impl
-#define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,inline_impl...)          __INTDEF attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("libd_" #name); __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBDCALL name) param inline_impl
-#define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,inline_impl...)          __INTDEF attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("libc_" #name); __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBKCALL name) param inline_impl
-#define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,inline_impl...)     __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname); __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBCCALL name) param inline_impl
-#define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,inline_impl...) __INTDEF attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("libd_" #asmname); __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBDCALL name) param inline_impl
-#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,inline_impl...) __INTDEF attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("libc_" #asmname); __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBKCALL name) param inline_impl
-#else /* ... */
-#define __CEIDECLARE(attr,Treturn,nothrow,name,param,inline_impl)              __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #name); __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBCCALL name) param inline_impl
-#define __CEIDECLARE_DOS(attr,Treturn,nothrow,name,param,inline_impl)          __INTDEF attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("libd_" #name); __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBDCALL name) param inline_impl
-#define __CEIDECLARE_KOS(attr,Treturn,nothrow,name,param,inline_impl)          __INTDEF attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("libc_" #name); __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBKCALL name) param inline_impl
-#define __CEIREDIRECT(attr,Treturn,nothrow,name,param,asmname,inline_impl)     __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname); __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBCCALL name) param inline_impl
-#define __CEIREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,inline_impl) __INTDEF attr Treturn nothrow(__LIBDCALL name) param __ASMNAME("libd_" #asmname); __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBDCALL name) param inline_impl
-#define __CEIREDIRECT_KOS(attr,Treturn,nothrow,name,param,asmname,inline_impl) __INTDEF attr Treturn nothrow(__LIBKCALL name) param __ASMNAME("libc_" #asmname); __EXTERN_INLINE __ATTR_ARTIFICIAL attr Treturn nothrow(__LIBKCALL name) param inline_impl
-#endif /* !... */
 #endif /* !__NO_EXTERN_INLINE */
+#define __COMPILER_CREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       decl attr Treturn nothrow(cc name) param __ASMNAME("libc_" #asmname);
+#define __COMPILER_CREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                          decl attr void nothrow(cc name) param __ASMNAME("libc_" #asmname);
+#define __COMPILER_CVREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)    decl attr Treturn nothrow(cc name)(____PRIVATE_VREDIRECT_UNPACK param, ...) __ASMNAME("libc_" #asmname);
+#define __COMPILER_CVREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)       decl attr void nothrow(cc name)(____PRIVATE_VREDIRECT_UNPACK param, ...) __ASMNAME("libc_" #asmname);
+#define __COMPILER_CVFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) decl attr Treturn nothrow(cc name) paramf __ASMNAME("libc_" #asmnamef);
+#define __COMPILER_CVFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    decl attr void nothrow(cc name) paramf __ASMNAME("libc_" #asmnamef);
+#define __COMPILER_CXREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      decl attr Treturn nothrow(cc name) param __ASMNAME("libc_" #asmname);
+#define __COMPILER_CXREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         decl attr void nothrow(cc name) param __ASMNAME("libc_" #asmname);
+#define __COMPILER_CEIDECLARE(attr,Treturn,nothrow,cc,name,param,...)                                                    __COMPILER_EIREDIRECT(attr,Treturn,nothrow,cc,name,param,libc_##name,__VA_ARGS__)
+#define __COMPILER_CEIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...)                                           __COMPILER_EIREDIRECT(attr,Treturn,nothrow,cc,name,param,libc_##asmname,__VA_ARGS__)
 #else /* __BUILDING_LIBC... */
 #define __CASMNAME                                                                                      __ASMNAME
 #define __CASMNAME_SAME(x)                                                                              /* nothing */
@@ -995,6 +957,27 @@ struct __locale_struct;
 
 #endif /* !__NO_EXTERN_INLINE */
 #endif /* !__BUILDING_LIBC... */
+
+#ifndef __COMPILER_CREDIRECT
+#define __COMPILER_CREDIRECT        __COMPILER_REDIRECT
+#define __COMPILER_CREDIRECT_VOID   __COMPILER_REDIRECT_VOID
+#define __COMPILER_CVREDIRECT       __COMPILER_VREDIRECT
+#define __COMPILER_CVREDIRECT_VOID  __COMPILER_VREDIRECT_VOID
+#define __COMPILER_CVFREDIRECT      __COMPILER_VFREDIRECT
+#define __COMPILER_CVFREDIRECT_VOID __COMPILER_VFREDIRECT_VOID
+#define __COMPILER_CXREDIRECT       __COMPILER_XREDIRECT
+#define __COMPILER_CXREDIRECT_VOID  __COMPILER_XREDIRECT_VOID
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define __COMPILER_CEIDECLARE  __COMPILER_EIDECLARE
+#define __COMPILER_CEIREDIRECT __COMPILER_EIREDIRECT
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __COMPILER_CEIDECLARE  __COMPILER_EIDECLARE
+#define __COMPILER_CEIREDIRECT __COMPILER_EIREDIRECT
+#else /* ... */
+#define __COMPILER_CEIDECLARE  __COMPILER_EIDECLARE
+#define __COMPILER_CEIREDIRECT __COMPILER_EIREDIRECT
+#endif /* !... */
+#endif /* !__COMPILER_CREDIRECT */
 
 
 /* Special c-declare functions that are needed to work around a GCC bug that

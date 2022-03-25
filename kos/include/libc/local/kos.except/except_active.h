@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x722c9621 */
+/* HASH CRC-32:0x7fa48663 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <kos/bits/exception_data.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED,__except_code_t,__NOTHROW,__LIBKCALL,__localdep_except_code,(void),except_code,())
+__COMPILER_CREDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED,__except_code_t,__NOTHROW,__LIBKCALL,__localdep_except_code,(void),except_code,())
 #elif defined(__arch_except_code) || defined(__CRT_HAVE_except_data) || defined(__arch_except_data)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.except/except_code.h>

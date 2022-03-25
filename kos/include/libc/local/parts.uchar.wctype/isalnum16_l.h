@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7430b7ac */
+/* HASH CRC-32:0xdef2b779 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,11 +29,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__crt_iswalnum) && defined(__CRT_HAVE_iswalnum) && __SIZEOF_WCHAR_T__ == 2
-__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBDCALL,__localdep_isalnum16,(__WINT16_TYPE__ __wc),iswalnum,{ return __crt_iswalnum(__wc); })
+__COMPILER_CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBDCALL,__localdep_isalnum16,(__WINT16_TYPE__ __wc),iswalnum,{ return __crt_iswalnum(__wc); })
 #elif defined(__crt_iswalnum) && __SIZEOF_WCHAR_T__ == 2
 __LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBDCALL __localdep_isalnum16)(__WINT16_TYPE__ __wc) { return __crt_iswalnum(__wc); }
 #elif __has_builtin(__builtin_iswalnum) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswalnum) && __SIZEOF_WCHAR_T__ == 2
-__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBDCALL,__localdep_isalnum16,(__WINT16_TYPE__ __wc),iswalnum,{ return __builtin_iswalnum(__wc); })
+__COMPILER_CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBDCALL,__localdep_isalnum16,(__WINT16_TYPE__ __wc),iswalnum,{ return __builtin_iswalnum(__wc); })
 #elif defined(__CRT_HAVE_iswalnum) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isalnum16,(__WINT16_TYPE__ __wc),iswalnum,(__wc))
 #elif defined(__CRT_HAVE_DOS$iswalnum)

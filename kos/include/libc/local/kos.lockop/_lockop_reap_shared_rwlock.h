@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd7e98b3 */
+/* HASH CRC-32:0x6e48ccd4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/__assert.h>
 #include <kos/asm/futex.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_EIREDIRECT(__NOBLOCK __ATTR_NONNULL((1)),void,__NOTHROW,__FCALL,__localdep_shared_rwlock_endwrite,(struct shared_rwlock *__restrict __self),shared_rwlock_endwrite,{
+__COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_NONNULL((1)),void,__NOTHROW,__FCALL,__localdep_shared_rwlock_endwrite,(struct shared_rwlock *__restrict __self),shared_rwlock_endwrite,{
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->sl_lock == (__UINTPTR_TYPE__)-1, "Lock isn't in write-mode (%x)", __self->sl_lock);
 	__hybrid_atomic_store(__self->sl_lock, 0, __ATOMIC_RELEASE);
@@ -46,7 +46,7 @@ __COMPILER_EIREDIRECT(__NOBLOCK __ATTR_NONNULL((1)),void,__NOTHROW,__FCALL,__loc
 		__shared_rwlock_rdwait_broadcast(__self);
 })
 #elif defined(__CRT_HAVE_shared_rwlock_endwrite)
-__COMPILER_REDIRECT_VOID(__LIBC,__NOBLOCK __ATTR_NONNULL((1)),__NOTHROW,__FCALL,__localdep_shared_rwlock_endwrite,(struct shared_rwlock *__restrict __self),shared_rwlock_endwrite,(__self))
+__COMPILER_CREDIRECT_VOID(__LIBC,__NOBLOCK __ATTR_NONNULL((1)),__NOTHROW,__FCALL,__localdep_shared_rwlock_endwrite,(struct shared_rwlock *__restrict __self),shared_rwlock_endwrite,(__self))
 #elif defined(__shared_rwlock_wrwait_send)
 __NAMESPACE_LOCAL_END
 #include <hybrid/__atomic.h>
@@ -70,7 +70,7 @@ __LOCAL __NOBLOCK __ATTR_NONNULL((1)) void __NOTHROW(__FCALL __localdep_shared_r
 __NAMESPACE_LOCAL_END
 #include <hybrid/__atomic.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_EIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__localdep_shared_rwlock_trywrite,(struct shared_rwlock *__restrict __self),shared_rwlock_trywrite,{
+__COMPILER_CEIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__localdep_shared_rwlock_trywrite,(struct shared_rwlock *__restrict __self),shared_rwlock_trywrite,{
 	if (!__hybrid_atomic_cmpxch(__self->sl_lock, 0, (__UINTPTR_TYPE__)-1,
 	                            __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
 		return 0;

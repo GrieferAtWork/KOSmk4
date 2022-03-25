@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a476d01 */
+/* HASH CRC-32:0x71f60588 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,11 +36,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__crt_iswalpha) && defined(__CRT_HAVE_iswalpha) && __SIZEOF_WCHAR_T__ == 4
-__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBKCALL,__localdep_isalpha32,(__WINT32_TYPE__ __wc),iswalpha,{ return __crt_iswalpha(__wc); })
+__COMPILER_CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBKCALL,__localdep_isalpha32,(__WINT32_TYPE__ __wc),iswalpha,{ return __crt_iswalpha(__wc); })
 #elif defined(__crt_iswalpha) && __SIZEOF_WCHAR_T__ == 4
 __LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBKCALL __localdep_isalpha32)(__WINT32_TYPE__ __wc) { return __crt_iswalpha(__wc); }
 #elif __has_builtin(__builtin_iswalpha) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswalpha) && __SIZEOF_WCHAR_T__ == 4
-__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBKCALL,__localdep_isalpha32,(__WINT32_TYPE__ __wc),iswalpha,{ return __builtin_iswalpha(__wc); })
+__COMPILER_CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBKCALL,__localdep_isalpha32,(__WINT32_TYPE__ __wc),iswalpha,{ return __builtin_iswalpha(__wc); })
 #elif defined(__CRT_HAVE_iswalpha) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isalpha32,(__WINT32_TYPE__ __wc),iswalpha,(__wc))
 #elif defined(__CRT_HAVE_KOS$iswalpha)

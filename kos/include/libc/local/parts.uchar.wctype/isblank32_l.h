@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28e3192d */
+/* HASH CRC-32:0x560efaa4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,11 +29,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__crt_iswblank) && defined(__CRT_HAVE_iswblank) && __SIZEOF_WCHAR_T__ == 4
-__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBKCALL,__localdep_isblank32,(__WINT32_TYPE__ __wc),iswblank,{ return __crt_iswblank(__wc); })
+__COMPILER_CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBKCALL,__localdep_isblank32,(__WINT32_TYPE__ __wc),iswblank,{ return __crt_iswblank(__wc); })
 #elif defined(__crt_iswblank) && __SIZEOF_WCHAR_T__ == 4
 __LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBKCALL __localdep_isblank32)(__WINT32_TYPE__ __wc) { return __crt_iswblank(__wc); }
 #elif __has_builtin(__builtin_iswblank) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswblank) && __SIZEOF_WCHAR_T__ == 4
-__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBKCALL,__localdep_isblank32,(__WINT32_TYPE__ __wc),iswblank,{ return __builtin_iswblank(__wc); })
+__COMPILER_CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBKCALL,__localdep_isblank32,(__WINT32_TYPE__ __wc),iswblank,{ return __builtin_iswblank(__wc); })
 #elif defined(__CRT_HAVE_iswblank) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isblank32,(__WINT32_TYPE__ __wc),iswblank,(__wc))
 #elif defined(__CRT_HAVE_KOS$iswblank)

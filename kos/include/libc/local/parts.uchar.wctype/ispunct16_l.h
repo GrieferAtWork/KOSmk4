@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb1d9603 */
+/* HASH CRC-32:0xe249e59c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,11 +29,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__crt_iswpunct) && defined(__CRT_HAVE_iswpunct) && __SIZEOF_WCHAR_T__ == 2
-__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBDCALL,__localdep_ispunct16,(__WINT16_TYPE__ __wc),iswpunct,{ return __crt_iswpunct(__wc); })
+__COMPILER_CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBDCALL,__localdep_ispunct16,(__WINT16_TYPE__ __wc),iswpunct,{ return __crt_iswpunct(__wc); })
 #elif defined(__crt_iswpunct) && __SIZEOF_WCHAR_T__ == 2
 __LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBDCALL __localdep_ispunct16)(__WINT16_TYPE__ __wc) { return __crt_iswpunct(__wc); }
 #elif __has_builtin(__builtin_iswpunct) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswpunct) && __SIZEOF_WCHAR_T__ == 2
-__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBDCALL,__localdep_ispunct16,(__WINT16_TYPE__ __wc),iswpunct,{ return __builtin_iswpunct(__wc); })
+__COMPILER_CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBDCALL,__localdep_ispunct16,(__WINT16_TYPE__ __wc),iswpunct,{ return __builtin_iswpunct(__wc); })
 #elif defined(__CRT_HAVE_iswpunct) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_ispunct16,(__WINT16_TYPE__ __wc),iswpunct,(__wc))
 #elif defined(__CRT_HAVE_DOS$iswpunct)
