@@ -199,7 +199,7 @@ struct uhci_controller: usb_controller {
 	                                               * NOTE: Interrupts chained more  than once  also count more  than once  here. */
 	struct uhci_osqh          *uc_qhlast;         /* [lock(uc_lock)][0..1] The last queue head in the `uc_qhstart.qh_next' chain. */
 #ifndef CONFIG_NO_SMP
-	struct atomic_rwlock       uc_lastint_lock;   /* SMP-lock for accessing `uc_lastint'. */
+	struct atomic_lock         uc_lastint_lock;   /* SMP-lock for accessing `uc_lastint'. */
 #endif /* !CONFIG_NO_SMP */
 	ktime_t                    uc_lastint;        /* Timestamp for the time when the last interrupt happened. */
 	unsigned int               uc_suspdelay;      /* Delay (in milliseconds) before the controller is suspended. */
@@ -227,9 +227,37 @@ struct uhci_controller: usb_controller {
 #define fnode_asuhci(self)          usb_controller_asuhci(fnode_as_usb_controller(self))
 #define mfile_asuhci(self)          usb_controller_asuhci(mfile_as_usb_controller(self))
 
+/* Helper macros for working with `struct uhci_controller::uc_lock' */
+#define _uhci_controller_reap(self)        (void)0
+#define uhci_controller_reap(self)         (void)0
+#define uhci_controller_mustreap(self)     0
+#define uhci_controller_write(self)        atomic_rwlock_write(&(self)->uc_lock)
+#define uhci_controller_write_nx(self)     atomic_rwlock_write_nx(&(self)->uc_lock)
+#define uhci_controller_trywrite(self)     atomic_rwlock_trywrite(&(self)->uc_lock)
+#define _uhci_controller_endwrite(self)    atomic_rwlock_endwrite(&(self)->uc_lock)
+#define uhci_controller_read(self)         atomic_rwlock_read(&(self)->uc_lock)
+#define uhci_controller_read_nx(self)      atomic_rwlock_read_nx(&(self)->uc_lock)
+#define uhci_controller_tryread(self)      atomic_rwlock_tryread(&(self)->uc_lock)
+#define _uhci_controller_endread(self)     atomic_rwlock_endread(&(self)->uc_lock)
+#define _uhci_controller_end(self)         atomic_rwlock_end(&(self)->uc_lock)
+#define uhci_controller_end(self)          (void)(atomic_rwlock_end(&(self)->uc_lock) && (uhci_controller_reap(self), 0))
+#define uhci_controller_upgrade(self)      atomic_rwlock_upgrade(&(self)->uc_lock)
+#define uhci_controller_upgrade_nx(self)   atomic_rwlock_upgrade_nx(&(self)->uc_lock)
+#define uhci_controller_tryupgrade(self)   atomic_rwlock_tryupgrade(&(self)->uc_lock)
+#define uhci_controller_downgrade(self)    atomic_rwlock_downgrade(&(self)->uc_lock)
+#define uhci_controller_reading(self)      atomic_rwlock_reading(&(self)->uc_lock)
+#define uhci_controller_writing(self)      atomic_rwlock_writing(&(self)->uc_lock)
+#define uhci_controller_canread(self)      atomic_rwlock_canread(&(self)->uc_lock)
+#define uhci_controller_canwrite(self)     atomic_rwlock_canwrite(&(self)->uc_lock)
+#define uhci_controller_waitread(self)     atomic_rwlock_waitread(&(self)->uc_lock)
+#define uhci_controller_waitwrite(self)    atomic_rwlock_waitwrite(&(self)->uc_lock)
+#define uhci_controller_waitread_nx(self)  atomic_rwlock_waitread_nx(&(self)->uc_lock)
+#define uhci_controller_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->uc_lock)
+
 /* Safely release a read/write lock on `self->uc_lock' */
 FUNDEF NOBLOCK void NOTHROW(FCALL uhci_controller_endread)(struct uhci_controller *__restrict self);
 FUNDEF NOBLOCK void NOTHROW(FCALL uhci_controller_endwrite)(struct uhci_controller *__restrict self);
+
 
 /* Schedule the given queue for execution.
  * This function initialized:

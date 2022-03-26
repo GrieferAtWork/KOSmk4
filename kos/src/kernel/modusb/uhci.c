@@ -297,7 +297,7 @@ NOTHROW(FCALL uhci_osqh_unlink)(struct uhci_controller *__restrict self,
                                 struct uhci_osqh **__restrict pentry) {
 	struct uhci_osqh *prev, *next;
 	u32 hw_pointer;
-	assert(sync_writing(&self->uc_lock));
+	assert(uhci_controller_writing(self));
 	prev = container_of(pentry, struct uhci_osqh, qh_next);
 	next = entry->qh_next;
 	prev->qh_next = next;
@@ -337,7 +337,7 @@ LOCAL NOBLOCK void
 NOTHROW(FCALL uhci_osqh_append)(struct uhci_controller *__restrict self,
                                 /*in_ref*/ REF struct uhci_osqh *__restrict osqh) {
 	struct uhci_osqh *last;
-	assert(sync_writing(&self->uc_lock));
+	assert(uhci_controller_writing(self));
 	osqh->qh_next = NULL;
 	last = self->uc_qhlast;
 	self->uc_qhlast = osqh;
@@ -370,7 +370,7 @@ NOTHROW(FCALL uhci_intreg_insert)(struct uhci_controller *__restrict self,
 	 * that  get  hit  more  often  than  others  get  triggered  more often. */
 	struct uhci_interrupt **pself, *next;
 	size_t my_hitcount = ui->ui_hits;
-	assert(sync_writing(&self->uc_lock));
+	assert(uhci_controller_writing(self));
 	pself = &self->uc_intreg;
 	while ((next = *pself) != NULL) {
 		if (next->ui_hits <= my_hitcount)
@@ -434,7 +434,7 @@ NOTHROW(FCALL uhci_intreg_unlink)(struct uhci_controller *__restrict self,
 	/* Remove the given interrupt. */
 	struct uhci_interrupt *next;
 	u32 hw_next_pointer;
-	assert(sync_writing(&self->uc_lock));
+	assert(uhci_controller_writing(self));
 	assert(*pui == ui);
 	/* Remove the interrupt from the software list. */
 	next = ui->ui_reg.ife_next;
@@ -495,7 +495,7 @@ NOTHROW(FCALL uhci_intiso_insert)(struct uhci_controller *__restrict self,
 	u32 hw_next_pointer;
 	struct uhci_interrupt_frameentry *ent;
 	struct uhci_interrupt **pself, *next, *prev;
-	assert(sync_writing(&self->uc_lock));
+	assert(uhci_controller_writing(self));
 	ent = ui->ui_iso[frameno];
 	assert(ent);
 	/* Insert the new interrupt into the ISO vector. */
@@ -550,7 +550,7 @@ NOTHROW(FCALL uhci_intiso_unlink)(struct uhci_controller *__restrict self,
 	u32 hw_next_pointer, *phw_next_pointer, phw_next_pointer_addr;
 	struct uhci_interrupt **pself, *next;
 	struct uhci_interrupt_frameentry *ent;
-	assert(sync_writing(&self->uc_lock));
+	assert(uhci_controller_writing(self));
 	assert(self->uc_iisocount);
 	assert(self->uc_intiso[frameno]);
 	pself = &self->uc_intiso[frameno];
@@ -658,7 +658,7 @@ again:
 
 	/* Acquire a lock to the controller to prevent it from completing
 	 * our   AIO,  and  setting  `UHCI_AIO_FSERVED'  before  we  can. */
-	if unlikely(!sync_trywrite(&ctrl->uc_lock)) {
+	if unlikely(!uhci_controller_trywrite(ctrl)) {
 		task_tryyield_or_pause();
 		goto again;
 	}
@@ -1250,7 +1250,7 @@ NOTHROW(FCALL uhci_finish_completed_iso)(struct uhci_controller *__restrict self
 PRIVATE NOBLOCK void
 NOTHROW(FCALL uhci_finish_completed)(struct uhci_controller *__restrict self) {
 	struct uhci_osqh **piter, *iter;
-	assert(sync_writing(&self->uc_lock));
+	assert(uhci_controller_writing(self));
 
 	/* When isochronous interrupts are being used, check if any of them have gotten data. */
 	if (self->uc_iisocount != 0) {
@@ -1380,36 +1380,36 @@ NOTHROW(FCALL uhci_finish_completed)(struct uhci_controller *__restrict self) {
 PUBLIC NOBLOCK void
 NOTHROW(FCALL uhci_controller_endwrite)(struct uhci_controller *__restrict self) {
 again:
-	assert(sync_writing(&self->uc_lock));
+	assert(uhci_controller_writing(self));
 	if (ATOMIC_READ(self->uc_flags) & UHCI_CONTROLLER_FLAG_INTERRUPTED) {
 		if (ATOMIC_FETCHAND(self->uc_flags, ~UHCI_CONTROLLER_FLAG_INTERRUPTED) &
 		    UHCI_CONTROLLER_FLAG_INTERRUPTED)
 			uhci_finish_completed(self);
 	}
-	sync_endwrite(&self->uc_lock);
+	_uhci_controller_endwrite(self);
 	/* Do the interlocked check. */
 	if (ATOMIC_READ(self->uc_flags) & UHCI_CONTROLLER_FLAG_INTERRUPTED) {
-		if (sync_trywrite(&self->uc_lock))
+		if (uhci_controller_trywrite(self))
 			goto again;
 	}
 }
 
 PUBLIC NOBLOCK void
 NOTHROW(FCALL uhci_controller_endread)(struct uhci_controller *__restrict self) {
-	assert(sync_reading(&self->uc_lock));
+	assert(uhci_controller_reading(self));
 	if (ATOMIC_READ(self->uc_flags) & UHCI_CONTROLLER_FLAG_INTERRUPTED) {
-		if (sync_tryupgrade(&self->uc_lock)) {
+		if (uhci_controller_tryupgrade(self)) {
 do_end_write:
 			uhci_controller_endwrite(self);
 			return;
 		}
-		sync_endread(&self->uc_lock);
+		_uhci_controller_endread(self);
 		goto do_try_write;
 	} else {
-		sync_endread(&self->uc_lock);
+		_uhci_controller_endread(self);
 		if (ATOMIC_READ(self->uc_flags) & UHCI_CONTROLLER_FLAG_INTERRUPTED) {
 do_try_write:
-			if (sync_trywrite(&self->uc_lock))
+			if (uhci_controller_trywrite(self))
 				goto do_end_write;
 		}
 	}
@@ -1431,14 +1431,13 @@ NOTHROW(FCALL uhci_interrupt_handler)(void *arg) {
 		/* Remember that we've just gotten an interrupt. */
 		now = ktime();
 #ifndef CONFIG_NO_SMP
-		while (!sync_trywrite(&self->uc_lastint_lock))
-			task_pause();
+		atomic_lock_acquire_nopr(&self->uc_lastint_lock);
 #endif /* !CONFIG_NO_SMP */
 		COMPILER_WRITE_BARRIER();
 		self->uc_lastint = now;
 		COMPILER_WRITE_BARRIER();
 #ifndef CONFIG_NO_SMP
-		sync_endwrite(&self->uc_lastint_lock);
+		atomic_lock_release_nopr(&self->uc_lastint_lock);
 #endif /* !CONFIG_NO_SMP */
 	}
 	if unlikely(status & UHCI_USBSTS_HSE) {
@@ -1467,21 +1466,21 @@ NOTHROW(FCALL uhci_interrupt_handler)(void *arg) {
 		/* One of two things happened:
 		 *  - A TD with the IOC bit was finished
 		 *  - Some TD got one of its error bits set. */
-		if (!sync_trywrite(&self->uc_lock)) {
+		if (!uhci_controller_trywrite(self)) {
 			/* Whoever is holding the lock must handle this interrupt, then... */
 			ATOMIC_OR(self->uc_flags, UHCI_CONTROLLER_FLAG_INTERRUPTED);
 			/* Try to acquire the lock again, so the `UHCI_CONTROLLER_FLAG_INTERRUPTED'
 			 * flag becomes interlocked on our end. */
-			if (!sync_trywrite(&self->uc_lock))
+			if (!uhci_controller_trywrite(self))
 				goto done_tdint;
 			ATOMIC_AND(self->uc_flags, ~UHCI_CONTROLLER_FLAG_INTERRUPTED);
 		}
 		uhci_finish_completed(self);
-		/* No need to use `uhci_controller_unlock()' here. - We're the only place
-		 * that could ever set the `UHCI_CONTROLLER_FLAG_INTERRUPTED' bit, so  we
-		 * know that no additional interrupt  could happen after we release  this
+		/* No need to use `uhci_controller_endwrite()' here. - We're the only place
+		 * that could ever  set the `UHCI_CONTROLLER_FLAG_INTERRUPTED'  bit, so  we
+		 * know that no  additional interrupt  could happen after  we release  this
 		 * lock! */
-		sync_endwrite(&self->uc_lock);
+		_uhci_controller_endwrite(self);
 	}
 done_tdint:
 	if (status & UHCI_USBSTS_RD) {
@@ -1544,7 +1543,7 @@ PUBLIC void FCALL
 uhci_controller_addqueue(struct uhci_controller *__restrict self,
                          REF struct uhci_osqh *__restrict osqh)
 		THROWS(E_WOULDBLOCK) {
-	sync_write(&self->uc_lock);
+	uhci_controller_write(self);
 	uhci_osqh_append(self, osqh);
 	uhci_controller_endwrite(self);
 }
@@ -2577,7 +2576,7 @@ uhci_register_interrupt(struct usb_controller *__restrict self, struct usb_endpo
 		/* At this point, everything that we could possibly already know about the
 		 * new interrupt handler has  already been filled in.  - Now it's time  to
 		 * actually register the thing! */
-		sync_write(&me->uc_lock);
+		uhci_controller_write(me);
 		if (flags & UHCI_INTERRUPT_FLAG_ISOCHRONOUS) {
 			unsigned int n, i, winner_offset = 0;
 			size_t winner_score = (size_t)-1;
@@ -2749,7 +2748,7 @@ uhci_handle_resume_detect(struct uhci_controller *__restrict self) {
 	/* Resume detected.
 	 * -> Check for changes in port attachments. */
 	ATOMIC_AND(self->uc_flags, ~UHCI_CONTROLLER_FLAG_RESDECT);
-	sync_write(&self->uc_lock);
+	uhci_controller_write(self);
 	{
 		RAII_FINALLY { uhci_controller_endwrite(self); };
 
@@ -2795,7 +2794,7 @@ do_resdect:
 		goto done;
 	/* Lock the controller since we're about to access its registers. */
 	TRY {
-		sync_write(&uc->uc_lock);
+		uhci_controller_write(uc);
 	} EXCEPT {
 		decref_unlikely(uc);
 		RETHROW();
@@ -2803,15 +2802,15 @@ do_resdect:
 	/* Check the controller state again (now that we've got the necessary lock) */
 	flags = ATOMIC_READ(uc->uc_flags);
 	if (flags & UHCI_CONTROLLER_FLAG_RESDECT) {
-		sync_endwrite(&uc->uc_lock);
+		_uhci_controller_endwrite(uc);
 		goto do_resdect;
 	}
 	if (ATOMIC_READ(uc->uc_qhlast) != NULL) {
-		sync_endwrite(&uc->uc_lock);
+		_uhci_controller_endwrite(uc);
 		goto done;
 	}
 	if (flags & UHCI_CONTROLLER_FLAG_SUSPENDED) {
-		sync_endwrite(&uc->uc_lock);
+		_uhci_controller_endwrite(uc);
 		goto done;
 	}
 
@@ -2866,7 +2865,7 @@ uhci_powerctl_connect(void *__restrict arg) {
 	assert(PREEMPTION_ENABLED());
 #ifndef CONFIG_NO_SMP
 	PREEMPTION_DISABLE();
-	while (!sync_tryread(&uc->uc_lastint_lock)) {
+	while (!atomic_lock_tryacquire(&uc->uc_lastint_lock)) {
 		PREEMPTION_ENABLE();
 		task_yield();
 		PREEMPTION_DISABLE();
@@ -2878,7 +2877,7 @@ uhci_powerctl_connect(void *__restrict arg) {
 	timeout = uc->uc_lastint;
 	COMPILER_READ_BARRIER();
 #ifndef CONFIG_NO_SMP
-	sync_endread(&uc->uc_lastint_lock);
+	atomic_lock_release(&uc->uc_lastint_lock);
 #endif /* !CONFIG_NO_SMP */
 	PREEMPTION_ENABLE();
 	timeout += relktime_from_milliseconds(uc->uc_suspdelay);
@@ -3118,7 +3117,7 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 
 	/* Configure the suspend timeout */
 #ifndef CONFIG_NO_SMP
-	atomic_rwlock_cinit(&result->uc_lastint_lock);
+	atomic_lock_cinit(&result->uc_lastint_lock);
 #endif /* !CONFIG_NO_SMP */
 	result->uc_lastint   = ktime();
 	result->uc_suspdelay = 250; /* Milliseconds */
