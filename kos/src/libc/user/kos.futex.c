@@ -313,43 +313,43 @@ NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_below)(lfutex_t *uaddr,
 }
 /*[[[end:libc_futex_waitwhile_below]]]*/
 
-/*[[[head:libc_futex_waitwhile_aboveequal,hash:CRC-32=0xf87e09a2]]]*/
-/* Wait if `*uaddr >= above_equal_value'
+/*[[[head:libc_futex_waitwhile_aboveequal,hash:CRC-32=0xfd9e1e4e]]]*/
+/* Wait if `*uaddr >= above_or_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
 INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_aboveequal)(lfutex_t *uaddr,
-                                                      lfutex_t above_equal_value)
+                                                      lfutex_t above_or_equal_value)
 /*[[[body:libc_futex_waitwhile_aboveequal]]]*/
 {
 	errno_t result;
-	assert(above_equal_value != 0);
-	SPIN_WHILE(ATOMIC_READ(*uaddr) >= above_equal_value);
+	assert(above_or_equal_value != 0);
+	SPIN_WHILE(ATOMIC_READ(*uaddr) >= above_or_equal_value);
 	result = (errno_t)sys_lfutex(uaddr, LFUTEX_WAIT_WHILE_ABOVE,
-	                             (uintptr_t)above_equal_value - 1,
+	                             (uintptr_t)above_or_equal_value - 1,
 	                             NULL, 0);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_futex_waitwhile_aboveequal]]]*/
 
-/*[[[head:libc_futex_waitwhile_belowequal,hash:CRC-32=0xcad12894]]]*/
-/* Wait if `*uaddr <= below_equal_value'
+/*[[[head:libc_futex_waitwhile_belowequal,hash:CRC-32=0x2ea78422]]]*/
+/* Wait if `*uaddr <= below_or_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
 INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_belowequal)(lfutex_t *uaddr,
-                                                      lfutex_t below_equal_value)
+                                                      lfutex_t below_or_equal_value)
 /*[[[body:libc_futex_waitwhile_belowequal]]]*/
 {
 	errno_t result;
-	assert(below_equal_value != (lfutex_t)-1);
-	SPIN_WHILE(ATOMIC_READ(*uaddr) <= below_equal_value);
+	assert(below_or_equal_value != (lfutex_t)-1);
+	SPIN_WHILE(ATOMIC_READ(*uaddr) <= below_or_equal_value);
 	result = (errno_t)sys_lfutex(uaddr, LFUTEX_WAIT_WHILE_BELOW,
-	                             (uintptr_t)below_equal_value + 1,
+	                             (uintptr_t)below_or_equal_value + 1,
 	                             NULL, 0);
 	return libc_seterrno_syserr(result);
 }
@@ -533,8 +533,8 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_below)(lfutex_t *uaddr,
 }
 /*[[[end:libc_futex_timedwaitwhile_below]]]*/
 
-/*[[[head:libc_futex_timedwaitwhile_aboveequal,hash:CRC-32=0xc4809155]]]*/
-/* Wait if `*uaddr >= above_equal_value'
+/*[[[head:libc_futex_timedwaitwhile_aboveequal,hash:CRC-32=0xd45a9755]]]*/
+/* Wait if `*uaddr >= above_or_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
@@ -542,21 +542,21 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_below)(lfutex_t *uaddr,
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_aboveequal)(lfutex_t *uaddr,
-                                                           lfutex_t above_equal_value,
+                                                           lfutex_t above_or_equal_value,
                                                            struct timespec const *rel_timeout)
 /*[[[body:libc_futex_timedwaitwhile_aboveequal]]]*/
 {
 	struct timespec64 tms64;
 	if (!rel_timeout)
-		return futex_timedwaitwhile_aboveequal64(uaddr, above_equal_value, NULL);
+		return futex_timedwaitwhile_aboveequal64(uaddr, above_or_equal_value, NULL);
 	tms64.tv_sec  = (time64_t)rel_timeout->tv_sec;
 	tms64.tv_nsec = rel_timeout->tv_nsec;
-	return futex_timedwaitwhile_aboveequal64(uaddr, above_equal_value, &tms64);
+	return futex_timedwaitwhile_aboveequal64(uaddr, above_or_equal_value, &tms64);
 }
 /*[[[end:libc_futex_timedwaitwhile_aboveequal]]]*/
 
-/*[[[head:libc_futex_timedwaitwhile_belowequal,hash:CRC-32=0x322c6907]]]*/
-/* Wait if `*uaddr <= below_equal_value'
+/*[[[head:libc_futex_timedwaitwhile_belowequal,hash:CRC-32=0x5dc3644]]]*/
+/* Wait if `*uaddr <= below_or_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
@@ -564,16 +564,16 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_aboveequal)(lfutex_t *uaddr,
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_belowequal)(lfutex_t *uaddr,
-                                                           lfutex_t below_equal_value,
+                                                           lfutex_t below_or_equal_value,
                                                            struct timespec const *rel_timeout)
 /*[[[body:libc_futex_timedwaitwhile_belowequal]]]*/
 {
 	struct timespec64 tms64;
 	if (!rel_timeout)
-		return futex_timedwaitwhile_belowequal64(uaddr, below_equal_value, NULL);
+		return futex_timedwaitwhile_belowequal64(uaddr, below_or_equal_value, NULL);
 	tms64.tv_sec  = (time64_t)rel_timeout->tv_sec;
 	tms64.tv_nsec = rel_timeout->tv_nsec;
-	return futex_timedwaitwhile_belowequal64(uaddr, below_equal_value, &tms64);
+	return futex_timedwaitwhile_belowequal64(uaddr, below_or_equal_value, &tms64);
 }
 /*[[[end:libc_futex_timedwaitwhile_belowequal]]]*/
 
@@ -779,11 +779,11 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_below64)(lfutex_t *uaddr,
 #endif /* MAGIC:alias */
 /*[[[end:libc_futex_timedwaitwhile_below64]]]*/
 
-/*[[[head:libc_futex_timedwaitwhile_aboveequal64,hash:CRC-32=0xec688560]]]*/
+/*[[[head:libc_futex_timedwaitwhile_aboveequal64,hash:CRC-32=0x624b52bb]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_futex_timedwaitwhile_aboveequal64, libc_futex_timedwaitwhile_aboveequal);
 #else /* MAGIC:alias */
-/* Wait if `*uaddr >= above_equal_value'
+/* Wait if `*uaddr >= above_or_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
@@ -791,27 +791,27 @@ DEFINE_INTERN_ALIAS(libc_futex_timedwaitwhile_aboveequal64, libc_futex_timedwait
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_aboveequal64)(lfutex_t *uaddr,
-                                                             lfutex_t above_equal_value,
+                                                             lfutex_t above_or_equal_value,
                                                              struct timespec64 const *rel_timeout)
 /*[[[body:libc_futex_timedwaitwhile_aboveequal64]]]*/
 {
 	errno_t result;
-	assert(above_equal_value != 0);
-	SPIN_WHILE(ATOMIC_READ(*uaddr) >= above_equal_value);
+	assert(above_or_equal_value != 0);
+	SPIN_WHILE(ATOMIC_READ(*uaddr) >= above_or_equal_value);
 	result = (errno_t)sys_lfutex(uaddr,
 	                             LFUTEX_WAIT_WHILE_ABOVE | LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE,
-	                             (uintptr_t)above_equal_value - 1,
+	                             (uintptr_t)above_or_equal_value - 1,
 	                             rel_timeout, (uintptr_t)0);
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_futex_timedwaitwhile_aboveequal64]]]*/
 
-/*[[[head:libc_futex_timedwaitwhile_belowequal64,hash:CRC-32=0x448a5668]]]*/
+/*[[[head:libc_futex_timedwaitwhile_belowequal64,hash:CRC-32=0x3bd35615]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_futex_timedwaitwhile_belowequal64, libc_futex_timedwaitwhile_belowequal);
 #else /* MAGIC:alias */
-/* Wait if `*uaddr <= below_equal_value'
+/* Wait if `*uaddr <= below_or_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
@@ -819,16 +819,16 @@ DEFINE_INTERN_ALIAS(libc_futex_timedwaitwhile_belowequal64, libc_futex_timedwait
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_belowequal64)(lfutex_t *uaddr,
-                                                             lfutex_t below_equal_value,
+                                                             lfutex_t below_or_equal_value,
                                                              struct timespec64 const *rel_timeout)
 /*[[[body:libc_futex_timedwaitwhile_belowequal64]]]*/
 {
 	errno_t result;
-	assert(below_equal_value != (lfutex_t)-1);
-	SPIN_WHILE(ATOMIC_READ(*uaddr) <= below_equal_value);
+	assert(below_or_equal_value != (lfutex_t)-1);
+	SPIN_WHILE(ATOMIC_READ(*uaddr) <= below_or_equal_value);
 	result = (errno_t)sys_lfutex(uaddr,
 	                             LFUTEX_WAIT_WHILE_BELOW | LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE,
-	                             (uintptr_t)below_equal_value + 1,
+	                             (uintptr_t)below_or_equal_value + 1,
 	                             rel_timeout, (uintptr_t)0);
 	return libc_seterrno_syserr(result);
 }

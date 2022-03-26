@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87666a66 */
+/* HASH CRC-32:0x7cb97459 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5675,6 +5675,18 @@
 #define __CRT_HAVE_futex_timedwaitwhile_belowequal64
 #define __CRT_HAVE_futex_timedwaitwhile_exactbits
 #define __CRT_HAVE_futex_timedwaitwhile_exactbits64
+#define __CRT_HAVE_futex_trywaituntil
+#define __CRT_HAVE_futex_trywaituntil_exactbits
+#define __CRT_HAVE_futex_trywaitwhile
+#define __CRT_HAVE_futex_trywaitwhile_above
+#define __CRT_HAVE_futex_trywaitwhile_aboveequal
+#define __CRT_HAVE_futex_trywaitwhile_allbits
+#define __CRT_HAVE_futex_trywaitwhile_anybit
+#define __CRT_HAVE_futex_trywaitwhile_below
+#define __CRT_HAVE_futex_trywaitwhile_belowequal
+#define __CRT_HAVE_futex_trywaitwhile_equal
+#define __CRT_HAVE_futex_trywaitwhile_exactbits
+#define __CRT_HAVE_futex_trywaitwhile_notequal
 #define __CRT_HAVE_futex_waituntil
 #define __CRT_HAVE_futex_waituntil_exactbits
 #define __CRT_HAVE_futex_waitwhile

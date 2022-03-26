@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45dc7973 */
+/* HASH CRC-32:0x121a3d2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,9 +45,9 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(futex_timedwaitwhile_belowequal64) __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futex_timedwaitwhile_belowequal64))(__uintptr_t *__uaddr, __uintptr_t __below_equal_value, struct __timespec64 const *__rel_timeout) {
-	__hybrid_assert(__above_equal_value != (__uintptr_t)-1);
-	return (__NAMESPACE_LOCAL_SYM __localdep_lfutex64)(__uaddr, LFUTEX_WAIT_WHILE_BELOW, __below_equal_value + 1, __rel_timeout);
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futex_timedwaitwhile_belowequal64))(__uintptr_t *__uaddr, __uintptr_t __below_or_equal_value, struct __timespec64 const *__rel_timeout) {
+	__hybrid_assert(__above_or_equal_value != (__uintptr_t)-1);
+	return (__NAMESPACE_LOCAL_SYM __localdep_lfutex64)(__uaddr, LFUTEX_WAIT_WHILE_BELOW, __below_or_equal_value + 1, __rel_timeout);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_futex_timedwaitwhile_belowequal64_defined
