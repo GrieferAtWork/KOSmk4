@@ -159,17 +159,17 @@ DECL_BEGIN
  * >>     if (VM_NODE_AT(min: addr, max: addr + #data - 1)->mn_part != part)
  * >>         goto RETRY;
  * >>     if (changed) {
- * >>         sync_write(part);
+ * >>         mpart_lock_acquire(part);
  * >>         if (part->mp_meta->mpm_rtm_vers != version)
  * >>             goto RETRY;
  * >>     } else {
  * >>         // Have to acquire a read-lock to ensure that parts
  * >>         // that were only read aren't being modified right
  * >>         // now by another RTM context.
- * >>         sync_read(part);
+ * >>         mpart_lock_acquire(part);
  * >>         if (part->mp_meta->mpm_rtm_vers != version)
  * >>             goto RETRY;
- * >>         sync_endread(part);
+ * >>         mpart_lock_release(part);
  * >>     }
  * >> }
  * >>
@@ -196,7 +196,7 @@ DECL_BEGIN
  * >>         error = memcpy_nopf(addr, data.bytes(), #data);
  * >>         assert(error == 0); // We asserted this above!
  * >>         ++part->mp_meta->mpm_rtm_vers;
- * >>         sync_endwrite(part);
+ * >>         mpart_lock_release(part);
  * >>     }
  * >> }
  */
