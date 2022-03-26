@@ -594,7 +594,7 @@ done:
 	return result;
 err:
 	if (!GDBThread_IsAllStopModeActive)
-		sync_endread(&hman->hm_lock);
+		handman_endread(hman);
 	decref_unlikely(hman);
 	return temp;
 }
