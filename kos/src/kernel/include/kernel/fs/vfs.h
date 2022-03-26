@@ -118,7 +118,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct vfs, vf_refcnt, vfs_destroy)
 #define vfs_rootlock_waitread_nx(self)  atomic_rwlock_waitread_nx(&(self)->vf_rootlock)
 #define vfs_rootlock_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->vf_rootlock)
 
-/* Helper macros for `struct fsuper::vf_mountslock' */
+/* Helper macros for working with `struct vfs::vf_mountslock' */
 #define _vfs_mountslock_reap(self)      (void)0
 #define vfs_mountslock_reap(self)       (void)0
 #define vfs_mountslock_mustreap(self)   0
@@ -132,7 +132,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct vfs, vf_refcnt, vfs_destroy)
 #define vfs_mountslock_waitfor(self)    atomic_lock_waitfor(&(self)->vf_mountslock)
 #define vfs_mountslock_waitfor_nx(self) atomic_lock_waitfor_nx(&(self)->vf_mountslock)
 
-/* Helper macros for `struct fsuper::vf_recentlock' */
+/* Helper macros for working with `struct vfs::vf_recentlock' */
 #define _vfs_recentlock_reap(self)      _oblockop_reap_atomic_lock(&(self)->vf_recentlops, &(self)->vf_recentlock, self)
 #define vfs_recentlock_reap(self)       oblockop_reap_atomic_lock(&(self)->vf_recentlops, &(self)->vf_recentlock, self)
 #define vfs_recentlock_mustreap(self)   oblockop_mustreap(&(self)->vf_recentlops)

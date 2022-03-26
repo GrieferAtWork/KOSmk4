@@ -92,6 +92,20 @@ struct network_ip_datagrams {
 	                                * [SORTED][lock(nid_lock)][owned] Vector of incomplete datagrams */
 };
 
+/* Helper macros for `struct network_ip_datagrams::nid_lock' */
+#define _network_ip_datagrams_reap(self)      (void)0
+#define network_ip_datagrams_reap(self)       (void)0
+#define network_ip_datagrams_mustreap(self)   0
+#define network_ip_datagrams_tryacquire(self) atomic_lock_tryacquire(&(self)->nid_lock)
+#define network_ip_datagrams_acquire(self)    atomic_lock_acquire(&(self)->nid_lock)
+#define network_ip_datagrams_acquire_nx(self) atomic_lock_acquire_nx(&(self)->nid_lock)
+#define _network_ip_datagrams_release(self)   atomic_lock_release(&(self)->nid_lock)
+#define network_ip_datagrams_release(self)    (atomic_lock_release(&(self)->nid_lock), network_ip_datagrams_reap(self))
+#define network_ip_datagrams_acquired(self)   atomic_lock_acquired(&(self)->nid_lock)
+#define network_ip_datagrams_available(self)  atomic_lock_available(&(self)->nid_lock)
+#define network_ip_datagrams_waitfor(self)    atomic_lock_waitfor(&(self)->nid_lock)
+#define network_ip_datagrams_waitfor_nx(self) atomic_lock_waitfor_nx(&(self)->nid_lock)
+
 #define network_ip_datagrams_init(self)   \
 	(atomic_lock_init(&(self)->nid_lock), \
 	 (self)->nid_size  = 0,               \

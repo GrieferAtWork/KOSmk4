@@ -324,7 +324,7 @@ ip_routepacket(struct nicdev *__restrict dev,
 		/* Complicated case: Fragmented packet.
 		 * -> Search for an existing datagram. */
 again_lock_datagrams:
-		sync_write(&dev->nd_net.n_ipgrams.nid_lock);
+		network_ip_datagrams_acquire(&dev->nd_net.n_ipgrams);
 		dg = network_ip_datagrams_findentry(&dev->nd_net.n_ipgrams, uid, &i);
 		if (dg) {
 			/* Fragment already exists.
@@ -342,7 +342,7 @@ again_lock_datagrams:
 				/* Delete the datagram. */
 				assert(dg == &dev->nd_net.n_ipgrams.nid_list[i]);
 				network_ip_datagrams_delete(&dev->nd_net.n_ipgrams, i);
-				sync_endwrite(&dev->nd_net.n_ipgrams.nid_lock);
+				network_ip_datagrams_release(&dev->nd_net.n_ipgrams);
 				kfree(datagram);
 				return;
 			}
@@ -366,7 +366,7 @@ again_lock_datagrams:
 						/* Delete the datagram. */
 						assert(dg == &dev->nd_net.n_ipgrams.nid_list[i]);
 						network_ip_datagrams_delete(&dev->nd_net.n_ipgrams, i);
-						sync_endwrite(&dev->nd_net.n_ipgrams.nid_lock);
+						network_ip_datagrams_release(&dev->nd_net.n_ipgrams);
 						kfree(datagram);
 						return;
 					}
@@ -375,7 +375,7 @@ again_lock_datagrams:
 do_write_fragment_nogotlast:
 				if (ip_datagram_write(dg, fragment_start, fragment_end, fragment_payload, fragment_size))
 					goto datagram_complete_and_unlock;
-				sync_endwrite(&dev->nd_net.n_ipgrams.nid_lock);
+				network_ip_datagrams_release(&dev->nd_net.n_ipgrams);
 				return;
 			}
 
@@ -396,7 +396,7 @@ do_write_fragment_nogotlast:
 				/* Delete the datagram. */
 				assert(dg == &dev->nd_net.n_ipgrams.nid_list[i]);
 				network_ip_datagrams_delete(&dev->nd_net.n_ipgrams, i);
-				sync_endwrite(&dev->nd_net.n_ipgrams.nid_lock);
+				network_ip_datagrams_release(&dev->nd_net.n_ipgrams);
 				kfree(datagram);
 				return;
 			}
@@ -407,14 +407,14 @@ do_write_fragment_nogotlast:
 				new_buffer = (struct iphdr *)krealloc_nx(dg->dg_buf, fragment_end, GFP_ATOMIC);
 				if unlikely(!new_buffer) {
 					/* Must extend while blocking... */
-					sync_endwrite(&dev->nd_net.n_ipgrams.nid_lock);
+					network_ip_datagrams_release(&dev->nd_net.n_ipgrams);
 					new_buffer = (struct iphdr *)kmalloc(fragment_end, GFP_NORMAL);
-					sync_write(&dev->nd_net.n_ipgrams.nid_lock);
+					network_ip_datagrams_acquire(&dev->nd_net.n_ipgrams);
 					/* Check to see if anything's changed... */
 					dg = network_ip_datagrams_findentry(&dev->nd_net.n_ipgrams, uid, &i);
 					if unlikely(!dg || fragment_end <= dg->dg_len ||
 					            (dg->dg_flg & IP_DATAGRAM_FLAG_GOTLAST)) {
-						sync_endwrite(&dev->nd_net.n_ipgrams.nid_lock);
+						network_ip_datagrams_release(&dev->nd_net.n_ipgrams);
 						kfree(new_buffer);
 						goto again_lock_datagrams;
 					}
@@ -469,7 +469,7 @@ do_write_fragment_nogotlast:
 					dg->dg_hol    = old_length;
 					goto do_write_fragment_nogotlast;
 				}
-				sync_endwrite(&dev->nd_net.n_ipgrams.nid_lock);
+				network_ip_datagrams_release(&dev->nd_net.n_ipgrams);
 				return;
 			}
 		}
@@ -480,12 +480,12 @@ do_write_fragment_nogotlast:
 			datagram = (struct iphdr *)kmalloc_nx(fragment_end, GFP_ATOMIC);
 			if unlikely(!datagram) {
 				/* Must allocate while blocking... */
-				sync_endwrite(&dev->nd_net.n_ipgrams.nid_lock);
+				network_ip_datagrams_release(&dev->nd_net.n_ipgrams);
 				datagram = (struct iphdr *)kmalloc(fragment_end, GFP_NORMAL);
-				sync_write(&dev->nd_net.n_ipgrams.nid_lock);
+				network_ip_datagrams_acquire(&dev->nd_net.n_ipgrams);
 				dg = network_ip_datagrams_findentry(&dev->nd_net.n_ipgrams, uid, &i);
 				if unlikely(dg != NULL) {
-					sync_endwrite(&dev->nd_net.n_ipgrams.nid_lock);
+					network_ip_datagrams_release(&dev->nd_net.n_ipgrams);
 					kfree(datagram);
 					goto again_lock_datagrams;
 				}
@@ -507,7 +507,7 @@ do_write_fragment_nogotlast:
 					                                               GFP_ATOMIC);
 					if unlikely(!new_vector) {
 						/* Must allocate while blocking. */
-						sync_endwrite(&dev->nd_net.n_ipgrams.nid_lock);
+						network_ip_datagrams_release(&dev->nd_net.n_ipgrams);
 						new_alloc  = dev->nd_net.n_ipgrams.nid_size + 64;
 						new_vector = (struct ip_datagram *)krealloc_nx(dev->nd_net.n_ipgrams.nid_list,
 						                                               new_alloc * sizeof(struct ip_datagram),
@@ -523,10 +523,10 @@ do_write_fragment_nogotlast:
 								RETHROW();
 							}
 						}
-						sync_write(&dev->nd_net.n_ipgrams.nid_lock);
+						network_ip_datagrams_acquire(&dev->nd_net.n_ipgrams);
 						dg = network_ip_datagrams_findentry(&dev->nd_net.n_ipgrams, uid, &i);
 						if unlikely(dg != NULL || new_alloc < dev->nd_net.n_ipgrams.nid_alloc) {
-							sync_endwrite(&dev->nd_net.n_ipgrams.nid_lock);
+							network_ip_datagrams_release(&dev->nd_net.n_ipgrams);
 							kfree(new_vector);
 							kfree(datagram);
 							goto again_lock_datagrams;
@@ -563,7 +563,7 @@ do_write_fragment_nogotlast:
 				hole->dh_end  = fragment_start;
 				dg->dg_hol    = 0; /* Fragment hole at offset=0 */
 			}
-			sync_endwrite(&dev->nd_net.n_ipgrams.nid_lock);
+			network_ip_datagrams_release(&dev->nd_net.n_ipgrams);
 			return;
 		}
 datagram_complete_and_unlock:
@@ -575,7 +575,7 @@ datagram_complete_and_unlock:
 			/* Delete the datagram. */
 			assert(dg == &dev->nd_net.n_ipgrams.nid_list[i]);
 			network_ip_datagrams_delete(&dev->nd_net.n_ipgrams, i);
-			sync_endwrite(&dev->nd_net.n_ipgrams.nid_lock);
+			network_ip_datagrams_release(&dev->nd_net.n_ipgrams);
 			RAII_FINALLY { kfree(datagram); };
 			ip_routedatagram(dev, datagram, datagram_len);
 			return;
