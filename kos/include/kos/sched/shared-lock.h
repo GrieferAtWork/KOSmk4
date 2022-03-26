@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5a9eb5f */
+/* HASH CRC-32:0x28ce8f32 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,22 +52,32 @@
 __SYSDECL_BEGIN
 
 #ifdef __KERNEL__
-#define SHARED_LOCK_INIT               { SIG_INIT, 0 }
-#define SHARED_LOCK_INIT_LOCKED        { SIG_INIT, 1 }
+#if __SIZEOF_INT__ < __SIZEOF_POINTER__
+#define SHARED_LOCK_INIT               { 0, {}, SIG_INIT }
+#define SHARED_LOCK_INIT_LOCKED        { 1, {}, SIG_INIT }
+#else /* __SIZEOF_INT__ < __SIZEOF_POINTER__ */
+#define SHARED_LOCK_INIT               { 0, SIG_INIT }
+#define SHARED_LOCK_INIT_LOCKED        { 1, SIG_INIT }
+#endif /* __SIZEOF_INT__ >= __SIZEOF_POINTER__ */
 #define shared_lock_init(self)         (void)(sig_init(&(self)->sl_sig), (self)->sl_lock = 0)
 #define shared_lock_init_locked(self)  (void)(sig_init(&(self)->sl_sig), (self)->sl_lock = 1)
 #define shared_lock_cinit(self)        (void)(sig_cinit(&(self)->sl_sig), __hybrid_assert((self)->sl_lock == 0))
 #define shared_lock_cinit_locked(self) (void)(sig_cinit(&(self)->sl_sig), (self)->sl_lock = 1)
 #else /* __KERNEL__ */
+#if __SIZEOF_INT__ < __SIZEOF_POINTER__
+#define SHARED_LOCK_INIT               { 0, {}, 0 }
+#define SHARED_LOCK_INIT_LOCKED        { 1, {}, 0 }
+#else /* __SIZEOF_INT__ < __SIZEOF_POINTER__ */
 #define SHARED_LOCK_INIT               { 0, 0 }
-#define SHARED_LOCK_INIT_LOCKED        { 0, 1 }
+#define SHARED_LOCK_INIT_LOCKED        { 1, 0 }
+#endif /* __SIZEOF_INT__ >= __SIZEOF_POINTER__ */
 #define shared_lock_init(self)         (void)((self)->sl_sig = 0, (self)->sl_lock = 0)
 #define shared_lock_init_locked(self)  (void)((self)->sl_sig = 0, (self)->sl_lock = 1)
 #define shared_lock_cinit(self)        (void)(__hybrid_assert((self)->sl_sig == 0), __hybrid_assert((self)->sl_lock == 0))
 #define shared_lock_cinit_locked(self) (void)(__hybrid_assert((self)->sl_sig == 0), (self)->sl_lock = 1)
 #endif /* !__KERNEL__ */
-#define shared_lock_acquired(self)     (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) != 0)
-#define shared_lock_available(self)    (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) == 0)
+#define shared_lock_acquired(self)  (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) != 0)
+#define shared_lock_available(self) (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) == 0)
 #ifdef __KERNEL__
 #define shared_lock_broadcast_for_fini(self) \
 	sig_broadcast_for_fini(&(self)->sl_sig)

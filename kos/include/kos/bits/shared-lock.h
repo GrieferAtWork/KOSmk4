@@ -41,12 +41,15 @@ __DECL_BEGIN
 
 
 struct shared_lock {
+	unsigned int sl_lock; /* Lock word. (non-zero if held) */
+#if __SIZEOF_INT__ < __SIZEOF_POINTER__
+	__byte_t   __sl_pad[__SIZEOF_POINTER__ - __SIZEOF_INT__];
+#endif /* __SIZEOF_INT__ < __SIZEOF_POINTER__ */
 #ifdef __KERNEL__
 	struct sig   sl_sig;  /* Signal send when the shared_lock is unlocked. */
 #else /* __KERNEL__ */
 	__uintptr_t  sl_sig;  /* Futex (`1' if there are threads waiting for this futex) */
 #endif /* !__KERNEL__ */
-	unsigned int sl_lock; /* Lock word. (non-zero if held) */
 };
 
 __DECL_END
