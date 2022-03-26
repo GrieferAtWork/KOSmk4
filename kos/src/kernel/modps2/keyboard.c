@@ -419,8 +419,8 @@ ps2_keyboard_setleds(struct kbddev *__restrict self,
 		new_ps2_leds |= PS2_KEYBOARD_CMD_SETLED_NUMLOCK;
 	if (new_leds & KEYBOARD_LED_CAPSLOCK)
 		new_ps2_leds |= PS2_KEYBOARD_CMD_SETLED_CAPSLOCK;
-	sync_write(&me->pk_cmdlock);
-	RAII_FINALLY { sync_endwrite(&me->pk_cmdlock); };
+	shared_lock_acquire(&me->pk_cmdlock);
+	RAII_FINALLY { shared_lock_release(&me->pk_cmdlock); };
 	ps2_keyboard_send_command_byte_and_wait_for_ack(me, PS2_KEYBOARD_CMD_SETLED);
 	ps2_keyboard_send_command_byte_and_wait_for_ack(me, new_ps2_leds);
 }
@@ -472,7 +472,7 @@ ps2_keyboard_create(struct ps2_probe_data *__restrict probe_data,
 	kbd->fn_mode   = S_IFCHR | 0644;
 	kbd->dv_driver = incref(&drv_self);
 	TRY {
-		mutex_cinit(&kbd->pk_cmdlock);
+		shared_lock_cinit(&kbd->pk_cmdlock);
 		kbd->pk_portno = portno;
 		switch (used_scanset) {
 		case 1:

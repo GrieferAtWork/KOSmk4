@@ -24,9 +24,10 @@
 
 #include <dev/keyboard.h>
 #include <kernel/types.h>
-#include <sched/mutex.h>
 
 #include <hybrid/sync/atomic-rwlock.h>
+
+#include <kos/sched/shared-lock.h>
 
 #include "ps2.h"
 
@@ -81,7 +82,7 @@ struct ps2_keyboard
 #endif /* !__cplusplus */
 	ps2_portid_t           pk_portno;     /* [const] PS/2 port number. */
 	u8                     pk_state;      /* ISR-only: PS/2 keyboard state (one of `PS2_KEYBOARD_STATE_*'). */
-	struct mutex           pk_cmdlock;    /* Lock held when issuing commands to the keyboard. */
+	struct shared_lock     pk_cmdlock;    /* Lock held when issuing commands to the keyboard. */
 	u8                     pk_errors;     /* ISR-only: PS/2 error state (set of `PS2_KEYBOARD_ERROR_*'). */
 	struct sig             pk_errors_sig; /* Signal broadcast when `pk_errors' changes. */
 };
