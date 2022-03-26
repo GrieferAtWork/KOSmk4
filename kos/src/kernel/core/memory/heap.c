@@ -298,7 +298,7 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 	 *    screwed  badly enough to  actually cause our  caller's operation to break... */
 	if (kernel_poisoned())
 		return;
-	if (!sync_tryread(&self->h_lock))
+	if (!atomic_lock_tryacquire(&self->h_lock))
 		return;
 
 	/* Exception nesting is needed because of the `TRY' (`UNNESTED_TRY') in `quick_verify_mfree()'
@@ -396,7 +396,7 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 			}
 		}
 	}
-	sync_endread(&self->h_lock);
+	atomic_lock_release(&self->h_lock);
 }
 #else /* CONFIG_DEBUG_HEAP */
 #define mfree_set_checksum(self) (void)0
@@ -527,7 +527,7 @@ NOTHROW(KCALL heap_serve_pending)(struct heap *__restrict self,
 		still_locked = heap_free_raw_and_unlock_impl(self, pend, pend_size, pend_flags);
 		if (!still_locked) {
 			/* Try to re-acquire the lock. */
-			if (!sync_trywrite(&self->h_lock)) {
+			if (!atomic_lock_tryacquire(&self->h_lock)) {
 				/* In ATOMIC mode, we mustn't block, but must instead re-add the chain of
 				 * pending free operations that we took away from the heap, back onto it. */
 				if (flags & GFP_ATOMIC) {
@@ -545,7 +545,7 @@ NOTHROW(KCALL heap_serve_pending)(struct heap *__restrict self,
 					return false;
 				}
 				/* Just block until we've acquired the lock again! */
-				sync_write(&self->h_lock);
+				atomic_lock_acquire(&self->h_lock);
 			}
 		}
 		/* Continue with the next part. */
@@ -553,7 +553,7 @@ NOTHROW(KCALL heap_serve_pending)(struct heap *__restrict self,
 			break;
 		pend = next;
 	}
-	assert(sync_writing(&self->h_lock));
+	assert(atomic_lock_acquired(&self->h_lock));
 	return true; /* Lock is still being held. */
 }
 
@@ -564,43 +564,43 @@ NOTHROW(KCALL heap_serve_pending)(struct heap *__restrict self,
 LOCAL WUNUSED NONNULL((1)) bool KCALL
 heap_acquirelock(struct heap *__restrict self, gfp_t flags) {
 	struct heap_pending_free *pend;
-	if (!sync_trywrite(&self->h_lock)) {
+	if (!atomic_lock_tryacquire(&self->h_lock)) {
 		if (flags & GFP_ATOMIC)
 			return false;
-		sync_write(&self->h_lock);
+		atomic_lock_acquire(&self->h_lock);
 	}
 	pend = ATOMIC_XCH(self->h_pfree, NULL);
 	if unlikely(pend)
 		return heap_serve_pending(self, pend, flags);
-	assert(sync_writing(&self->h_lock));
+	assert(atomic_lock_acquired(&self->h_lock));
 	return true;
 }
 
 LOCAL WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL heap_acquirelock_nx)(struct heap *__restrict self, gfp_t flags) {
 	struct heap_pending_free *pend;
-	if (!sync_trywrite(&self->h_lock)) {
+	if (!atomic_lock_tryacquire(&self->h_lock)) {
 		if (flags & GFP_ATOMIC)
 			return false;
-		if (!sync_write_nx(&self->h_lock))
+		if (!atomic_lock_acquire_nx(&self->h_lock))
 			return false;
 	}
 	pend = ATOMIC_XCH(self->h_pfree, NULL);
 	if unlikely(pend)
 		return heap_serve_pending(self, pend, flags);
-	assert(sync_writing(&self->h_lock));
+	assert(atomic_lock_acquired(&self->h_lock));
 	return true;
 }
 
 LOCAL NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL heap_acquirelock_atomic)(struct heap *__restrict self) {
 	struct heap_pending_free *pend;
-	if (!sync_trywrite(&self->h_lock))
+	if (!atomic_lock_tryacquire(&self->h_lock))
 		return false;
 	pend = ATOMIC_XCH(self->h_pfree, NULL);
 	if unlikely(pend)
 		return heap_serve_pending(self, pend, GFP_ATOMIC);
-	assert(sync_writing(&self->h_lock));
+	assert(atomic_lock_acquired(&self->h_lock));
 	return true;
 }
 
@@ -642,8 +642,8 @@ NOTHROW(KCALL heap_free_raw)(struct heap *__restrict self,
 	bool still_locked;
 	still_locked = heap_free_raw_lock_and_maybe_unlock_impl(self, ptr, num_bytes, flags);
 	if (still_locked) {
-		assert(sync_writing(&self->h_lock));
-		sync_endwrite(&self->h_lock);
+		assert(atomic_lock_acquired(&self->h_lock));
+		atomic_lock_release(&self->h_lock);
 	}
 }
 
@@ -756,7 +756,7 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 			HEAP_ADD_DANGLE(self, slot->mf_size);
 			dandle_size += slot->mf_size;
 #endif /* CONFIG_HEAP_TRACE_DANGLE */
-			sync_endwrite(&self->h_lock);
+			atomic_lock_release(&self->h_lock);
 			if (flags & GFP_CALLOC) {
 				heap_validate_all_paranoid();
 				reset_heap_data((byte_t *)ptr, DEBUGHEAP_NO_MANS_LAND, num_bytes);
@@ -803,7 +803,7 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 				HEAP_ADD_DANGLE(self, high_slot->mf_size);
 				dandle_size += high_slot->mf_size;
 #endif /* CONFIG_HEAP_TRACE_DANGLE */
-				sync_endwrite(&self->h_lock);
+				atomic_lock_release(&self->h_lock);
 				if (slot->mf_flags & GFP_CALLOC) {
 					heap_validate_all_paranoid();
 					reset_heap_data((byte_t *)((uintptr_t)slot + SIZEOF_MFREE),
@@ -869,7 +869,7 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 			HEAP_ADD_DANGLE(self, slot_size);
 			dandle_size += slot_size;
 #endif /* CONFIG_HEAP_TRACE_DANGLE */
-			sync_endwrite(&self->h_lock);
+			atomic_lock_release(&self->h_lock);
 			if (flags & GFP_CALLOC)
 				reset_heap_data((byte_t *)ptr, DEBUGHEAP_NO_MANS_LAND, num_bytes);
 			if (slot_flags & GFP_CALLOC)
@@ -942,7 +942,7 @@ load_new_slot:
 			}
 			if unlikely(free_minaddr >= free_endaddr)
 				goto do_load_new_slot;
-			sync_endwrite(&self->h_lock);
+			atomic_lock_release(&self->h_lock);
 
 			/* Release this slot to the VM. */
 			if (hkeep_size) {
@@ -1180,7 +1180,7 @@ again:
 		/* Remove this chain entry. */
 		mfree_tree_removenode(&self->h_addr, chain);
 		LIST_REMOVE(chain, mf_lsize);
-		sync_endwrite(&self->h_lock);
+		atomic_lock_release(&self->h_lock);
 
 		tail_pointer = (void *)((uintptr_t)MFREE_END(chain) - tail_keep);
 		free_flags   = chain->mf_flags;
@@ -1210,7 +1210,7 @@ again:
 		result += (size_t)((byte_t *)free_endaddr - (byte_t *)free_minaddr);
 		goto again;
 	}
-	sync_endwrite(&self->h_lock);
+	atomic_lock_release(&self->h_lock);
 	return result;
 }
 

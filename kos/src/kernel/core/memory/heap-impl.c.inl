@@ -147,7 +147,7 @@ search_heap:
 		dangle_size = MFREE_SIZE(chain) - result_siz;
 		HEAP_ADD_DANGLE(self, dangle_size);
 #endif /* CONFIG_HEAP_TRACE_DANGLE */
-		sync_endwrite(&self->h_lock);
+		atomic_lock_release(&self->h_lock);
 		HEAP_ASSERT(IS_ALIGNED(dangle_size, HEAP_ALIGNMENT));
 		/* We've got the memory! */
 		result_ptr  = (void *)chain;
@@ -231,7 +231,7 @@ search_heap:
 #ifdef CONFIG_HEAP_TRACE_DANGLE
 	/* Check for dangling data and don't allocate new memory if enough exists. */
 	if (ATOMIC_READ(self->h_dangle) >= result_siz) {
-		sync_endwrite(&self->h_lock);
+		atomic_lock_release(&self->h_lock);
 		/* Let some other thread about to release dangling
 		 * data   do  so,  then  search  the  heap  again. */
 		if (flags & GFP_ATOMIC)
@@ -264,7 +264,7 @@ search_heap:
 	 *         could  (and  does) only  allocate with  GFP_ATOMIC while
 	 *         holding  a lock to  `mman_kernel.mm_lock', in which case
 	 *         the yield never happens. */
-	sync_endwrite(&self->h_lock);
+	atomic_lock_release(&self->h_lock);
 
 	/* No pre-allocated memory found. -> Allocate new memory. */
 	{
@@ -389,7 +389,7 @@ again:
 	slot = mfree_tree_locate(self->h_addr, (uintptr_t)ptr);
 	if (!slot) {
 		PAGEDIR_PAGEALIGNED void *pageaddr;
-		sync_endwrite(&self->h_lock);
+		atomic_lock_release(&self->h_lock);
 		/* Not in cache. Try to allocate associated core memory. */
 		pageaddr = (void *)((uintptr_t)ptr & ~PAGEMASK);
 		pageaddr = FUNC(core_page_alloc)(self, pageaddr, PAGESIZE, PAGESIZE, flags);
@@ -411,7 +411,7 @@ again:
 		/* Allocate this entire slot, then remove unused memory from the end. */
 		mfree_tree_removenode(&self->h_addr, slot);
 		LIST_REMOVE(slot, mf_lsize);
-		sync_endwrite(&self->h_lock);
+		atomic_lock_release(&self->h_lock);
 		result     = slot->mf_size;
 		slot_flags = (flags & (__GFP_HEAPMASK | GFP_INHERIT)) | slot->mf_flags;
 #ifndef CONFIG_DEBUG_HEAP
@@ -437,7 +437,7 @@ again:
 			 *       we already know  that the requested  part has  already
 			 *       been allocated (meaning this allocation is impossible) */
 			PAGEDIR_PAGEALIGNED void *slot_pageaddr;
-			sync_endwrite(&self->h_lock);
+			atomic_lock_release(&self->h_lock);
 			if (MFREE_BEGIN(slot) & PAGEMASK)
 				return 0; /* Not page-aligned. */
 			slot_pageaddr = (void *)MFREE_BEGIN(slot);
@@ -462,7 +462,7 @@ again:
 		if unlikely(result < HEAP_MINSIZE) {
 			/* Too close to the back. - Try to allocate the next page. */
 			void *slot_end = (void *)MFREE_END(slot);
-			sync_endwrite(&self->h_lock);
+			atomic_lock_release(&self->h_lock);
 			if ((uintptr_t)slot_end & PAGEMASK)
 				return 0; /* Not page-aligned. */
 			if (FUNC(core_page_alloc)(self, slot_end, PAGESIZE, PAGESIZE, flags) == CORE_PAGE_MALLOC_ERROR)
@@ -481,7 +481,7 @@ again:
 		/* Trace leading free data as dangling. */
 		HEAP_ADD_DANGLE(self, free_offset);
 #endif /* CONFIG_HEAP_TRACE_DANGLE */
-		sync_endwrite(&self->h_lock);
+		atomic_lock_release(&self->h_lock);
 		slot_flags = (flags & (__GFP_HEAPMASK | GFP_INHERIT)) | slot->mf_flags;
 		if (slot_flags & GFP_CALLOC)
 			bzero(slot, MIN(free_offset, SIZEOF_MFREE));
@@ -649,7 +649,7 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 			dangle_size = chain->mf_size - alloc_bytes;
 			HEAP_ADD_DANGLE(self, dangle_size);
 #endif /* CONFIG_HEAP_TRACE_DANGLE */
-			sync_endwrite(&self->h_lock);
+			atomic_lock_release(&self->h_lock);
 			HEAP_ASSERT(IS_ALIGNED((uintptr_t)(alignment_base + offset), min_alignment));
 
 			/* All right! we can actually use this one! */
@@ -743,7 +743,7 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 			heap_validate_all_paranoid();
 			return heapptr_make(result_ptr, result_siz);
 		}
-		sync_endwrite(&self->h_lock);
+		atomic_lock_release(&self->h_lock);
 	}
 #endif
 	/* Fallback: Use overallocation to assert alignment. */
