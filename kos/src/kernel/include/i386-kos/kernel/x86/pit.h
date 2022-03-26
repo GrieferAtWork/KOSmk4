@@ -39,10 +39,11 @@ DECL_BEGIN
  * WARNING: When acquiring this lock, you must first disable preemption!
  * In  single-core mode,  it is  sufficient to  only disable preemption. */
 DATDEF struct atomic_lock x86_pit_lock;
-#define x86_pit_lock_acquire_nopr() atomic_lock_acquire_nopr(&x86_pit_lock);
-#define x86_pit_lock_release_nopr() atomic_lock_release(&x86_pit_lock)
-
+#define x86_pit_lock_tryacquire()   atomic_lock_tryacquire(&x86_pit_lock)
+#define x86_pit_lock_acquire_nopr() atomic_lock_acquire_nopr(&x86_pit_lock)
+#define x86_pit_lock_release_nopr() atomic_lock_release_nopr(&x86_pit_lock)
 #else /* !CONFIG_NO_SMP */
+#define x86_pit_lock_tryacquire()   1
 #define x86_pit_lock_acquire_nopr() (void)0
 #define x86_pit_lock_release_nopr() (void)0
 #endif /* CONFIG_NO_SMP */

@@ -25,13 +25,13 @@
 #include <kernel/compiler.h>
 
 #include <kernel/arch/syslog.h>
-#include <kernel/syslog.h>
 #include <kernel/paging.h>
+#include <kernel/syslog.h>
 #include <kernel/types.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sync/atomic-lock.h>
 
 #include <sys/io.h>
 
@@ -42,8 +42,6 @@
 #include <stdio.h> /* sprintf() */
 #include <string.h>
 #include <time.h> /* localtime_r() */
-
-
 
 #undef DBG_MONITOR_MEMORY
 #if 0 /* For debugging: Monitor a physical memory location */
@@ -169,7 +167,7 @@ PRIVATE ATTR_ALIGNED(1) char const level_prefix[][10] = {
 
 
 #ifdef DBG_MONITOR_MEMORY
-static struct atomic_rwlock monitor_memory_lock = ATOMIC_RWLOCK_INIT;
+static struct atomic_lock monitor_memory_lock = ATOMIC_LOCK_INIT;
 #endif /* DBG_MONITOR_MEMORY */
 
 
@@ -191,7 +189,7 @@ NOTHROW(FCALL x86_syslog_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
 		size_t len;
 		localtime_r(&packet->sp_time, &t);
 #ifdef DBG_MONITOR_MEMORY
-		if (sync_trywrite(&monitor_memory_lock)) {
+		if (atomic_lock_tryacquire(&monitor_memory_lock)) {
 			pagedir_pushval_t pv;
 			byte_t *addr = (byte_t *)0xc0000000 + (DBG_MONITOR_MEMORY & ~PAGEMASK);
 			DBG_MONITOR_TYPE value;
@@ -199,7 +197,7 @@ NOTHROW(FCALL x86_syslog_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
 			pagedir_syncone(addr);
 			value = *(DBG_MONITOR_TYPE volatile *)(0xc0000000 + DBG_MONITOR_MEMORY);
 			pagedir_pop_mapone((void *)addr, pv);
-			sync_endwrite(&monitor_memory_lock);
+			atomic_lock_release(&monitor_memory_lock);
 			len = sprintf(buf, "[" PP_STR(DBG_MONITOR_TYPE) "@%" PRIxPTR "=%#" DBG_MONITOR_FMT "]",
 			              (uintptr_t)DBG_MONITOR_MEMORY, value);
 			x86_syslog_write(buf, len);

@@ -105,8 +105,7 @@ NOTHROW(KCALL send_init_ipi)(struct cpu *__restrict target) {
 
 	/* Wait for 10 milliseconds. */
 	was = PREEMPTION_PUSHOFF();
-	while (!sync_trywrite(&x86_pit_lock))
-		task_pause();
+	x86_pit_lock_acquire_nopr();
 	outb(PIT_PCSPEAKER,
 	     (inb(PIT_PCSPEAKER) &
 	      ~(PIT_PCSPEAKER_FSYNCPIT | PIT_PCSPEAKER_FINOUT)) |
@@ -125,7 +124,7 @@ NOTHROW(KCALL send_init_ipi)(struct cpu *__restrict target) {
 	}
 	while (inb(PIT_PCSPEAKER) & PIT_PCSPEAKER_FPIT2OUT)
 		task_pause();
-	sync_endwrite(&x86_pit_lock);
+	x86_pit_lock_release_nopr();
 	PREEMPTION_POP(was);
 
 	/* Send the startup IPI */
@@ -144,7 +143,7 @@ NOTHROW(KCALL send_init_ipi)(struct cpu *__restrict target) {
 
 	/* Explicitly wait for 1 millisecond. */
 	was = PREEMPTION_PUSHOFF();
-	while (!sync_trywrite(&x86_pit_lock)) {
+	while (!x86_pit_lock_tryacquire()) {
 		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop;
 		task_pause();
@@ -170,7 +169,7 @@ NOTHROW(KCALL send_init_ipi)(struct cpu *__restrict target) {
 	while (inb(PIT_PCSPEAKER) & PIT_PCSPEAKER_FPIT2OUT) {
 		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP) {
 done_ppop_endwrite:
-			sync_endwrite(&x86_pit_lock);
+			x86_pit_lock_release_nopr();
 done_ppop:
 			PREEMPTION_POP(was);
 			return;
@@ -179,7 +178,7 @@ done_ppop:
 		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop_endwrite;
 	}
-	sync_endwrite(&x86_pit_lock);
+	x86_pit_lock_release_nopr();
 	PREEMPTION_POP(was);
 	if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 		return;
@@ -189,7 +188,7 @@ done_ppop:
 
 	/* Wait for up to 1 second. */
 	was = PREEMPTION_PUSHOFF();
-	while (!sync_trywrite(&x86_pit_lock)) {
+	while (!x86_pit_lock_tryacquire()) {
 		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop;
 		task_pause();
@@ -220,7 +219,7 @@ done_ppop:
 		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop_endwrite;
 	}
-	sync_endwrite(&x86_pit_lock);
+	x86_pit_lock_release_nopr();
 	PREEMPTION_POP(was);
 	if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 		return;
