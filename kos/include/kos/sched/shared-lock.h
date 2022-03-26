@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa543cafa */
+/* HASH CRC-32:0x4c224408 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,24 +81,17 @@ __SYSDECL_BEGIN
 #ifdef __KERNEL__
 #define shared_lock_broadcast_for_fini(self) \
 	sig_broadcast_for_fini(&(self)->sl_sig)
-#else /* __KERNEL__ */
+#elif defined(__CRT_HAVE_XSC)
+#if __CRT_HAVE_XSC(lfutex)
 /* NOTE: we use `sys_Xlfutex()', because the only possible exception is E_SEGFAULT */
 #define shared_lock_broadcast_for_fini(self) \
 	((self)->sl_sig ? (void)sys_Xlfutex(&(self)->sl_sig, LFUTEX_WAKE, (__uintptr_t)-1, __NULLPTR, 0) : (void)0)
+#endif /* __CRT_HAVE_XSC(lfutex) */
 #endif /* !__KERNEL__ */
 
 /* Try to acquire a lock to a given `struct shared_lock *self' */
 #define shared_lock_tryacquire(self) \
 	(__hybrid_atomic_xch((self)->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
-
-#ifdef __KERNEL__
-#define __shared_lock_send(self) \
-	sig_send(&(self)->sl_sig)
-#elif __CRT_HAVE_XSC(lfutex)
-/* NOTE: we use `sys_Xlfutex()', because the only possible exception is E_SEGFAULT */
-#define __shared_lock_send(self) \
-	((self)->sl_sig ? (sys_Xlfutex(&(self)->sl_sig, LFUTEX_WAKEMASK, 1, __NULLPTR, 0) != 0) : 0)
-#endif /* ... */
 
 /* Release a lock from a given shared_lock.
  * @return: true:  A waiting thread was signaled.

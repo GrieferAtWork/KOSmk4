@@ -33,12 +33,12 @@
 #define __shared_lock_timespec ktime_t
 #else /* __KERNEL__ */
 #include <bits/os/timespec.h>
+#include <kos/syscalls.h>
 #define __shared_lock_timespec struct timespec const *
 #endif /* !__KERNEL__ */
 
 #ifdef __CC__
 __DECL_BEGIN
-
 
 struct shared_lock {
 	unsigned int sl_lock; /* Lock word. (non-zero if held) */
@@ -51,6 +51,16 @@ struct shared_lock {
 	__uintptr_t  sl_sig;  /* Futex (`1' if there are threads waiting for this futex) */
 #endif /* !__KERNEL__ */
 };
+
+#ifdef __KERNEL__
+#define __shared_lock_send(self) sig_send(&(self)->sl_sig)
+#elif defined(__CRT_HAVE_XSC)
+#if __CRT_HAVE_XSC(lfutex)
+/* NOTE: we use `sys_Xlfutex()', because the only possible exception is E_SEGFAULT */
+#define __shared_lock_send(self) \
+	((self)->sl_sig ? (sys_Xlfutex(&(self)->sl_sig, LFUTEX_WAKEMASK, 1, __NULLPTR, 0) != 0) : 0)
+#endif /* __CRT_HAVE_XSC(lfutex) */
+#endif /* ... */
 
 __DECL_END
 #endif /* __CC__ */

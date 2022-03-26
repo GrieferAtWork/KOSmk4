@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7cb97459 */
+/* HASH CRC-32:0x4083848a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7075,6 +7075,14 @@
 #define __CRT_HAVE_shared_lock_waitfor_with_timeout_nx
 #endif /* __KERNEL__ */
 #ifndef __KERNEL__
+#define __CRT_HAVE_shared_recursive_lock_acquire
+#define __CRT_HAVE_shared_recursive_lock_acquire_with_timeout
+#define __CRT_HAVE_shared_recursive_lock_acquire_with_timeout64
+#define __CRT_HAVE_shared_recursive_lock_release
+#define __CRT_HAVE_shared_recursive_lock_tryacquire
+#define __CRT_HAVE_shared_recursive_lock_waitfor
+#define __CRT_HAVE_shared_recursive_lock_waitfor_with_timeout
+#define __CRT_HAVE_shared_recursive_lock_waitfor_with_timeout64
 #define __CRT_HAVE_shared_recursive_rwlock_downgrade
 #define __CRT_HAVE_shared_recursive_rwlock_endread
 #define __CRT_HAVE_shared_recursive_rwlock_endwrite

@@ -95,10 +95,11 @@ __SYSDECL_BEGIN
 	shared_rwlock_broadcast_for_fini(&(self)->srr_lock)
 
 /* Check if reading/writing is possible, or a read/write lock is being held. */
-#define shared_recursive_rwlock_reading(self)  shared_rwlock_reading(&(self)->srr_lock)
-#define shared_recursive_rwlock_writing(self)  (shared_rwlock_writing(&(self)->srr_lock) && __shared_recursive_rwlock_isown(self))
 #define shared_recursive_rwlock_canread(self)  (shared_rwlock_canread(&(self)->srr_lock) || __shared_recursive_rwlock_isown(self))
 #define shared_recursive_rwlock_canwrite(self) (shared_rwlock_canwrite(&(self)->srr_lock) || __shared_recursive_rwlock_isown(self))
+#define shared_recursive_rwlock_reading(self)  shared_rwlock_reading(&(self)->srr_lock)
+#define shared_recursive_rwlock_writing(self)  __shared_recursive_rwlock_isown(self)
+/* #define shared_recursive_rwlock_writing(self) (shared_rwlock_writing(&(self)->srr_lock) && __shared_recursive_rwlock_isown(self)) */
 
 /* >> shared_recursive_rwlock_tryupgrade(3)
  * Try to upgrade a read-lock to a recursive write-lock. Return `false' upon failure. */

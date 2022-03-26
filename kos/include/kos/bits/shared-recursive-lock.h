@@ -17,53 +17,46 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_BITS_SHARED_RWLOCK_H
-#define _KOS_BITS_SHARED_RWLOCK_H 1
+#ifndef _KOS_BITS_SHARED_RECURSIVE_LOCK_H
+#define _KOS_BITS_SHARED_RECURSIVE_LOCK_H 1
 
 #include <__stdinc.h>
 
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
+#include <hybrid/sched/__gettid.h>
 
 #include <bits/types.h>
-
-#ifdef __KERNEL__
-#include <kernel/types.h> /* ktime_t */
-#include <sched/sig.h>
-#define __shared_rwlock_timespec ktime_t
-#else /* __KERNEL__ */
-#include <bits/os/timespec.h>
-#include <kos/syscalls.h>
-#define __shared_rwlock_timespec struct timespec const *
-#endif /* !__KERNEL__ */
+#include <kos/bits/shared-lock.h>
 
 #ifdef __CC__
 __DECL_BEGIN
 
-struct shared_rwlock {
-	__uintptr_t sl_lock;   /* # of read-locks, or (uintptr_t)-1 if a write-lock is active. */
-#ifdef __KERNEL__
-	struct sig  sl_rdwait; /* Signal broadcast to wake-up readers. */
-	struct sig  sl_wrwait; /* Signal broadcast to wake-up writers. */
-#else /* __KERNEL__ */
-	__uintptr_t sl_rdwait; /* Futex for read-lock waiters (non-zero if threads may be waiting) */
-	__uintptr_t sl_wrwait; /* Futex for write-lock waiters (non-zero if threads may be waiting) */
-#endif /* !__KERNEL__ */
+#define __shared_recursive_lock_tid_t       __hybrid_tid_t
+#define __shared_recursive_lock_gettid()    __hybrid_gettid()
+#define __shared_recursive_lock_eqtid(a, b) __hybrid_gettid_equal(a, b)
+#define __shared_recursive_lock_mytid(tid)  __hybrid_gettid_iscaller(tid)
+#define __SHARED_RECURSIVE_LOCK_BADTID      __HYBRID_GETTID_INVALID
+#ifdef __HYBRID_GETTID_INVALID_IS_ZERO
+#define __SHARED_RECURSIVE_LOCK_BADTID_ISZERO
+#endif /* __HYBRID_GETTID_INVALID_IS_ZERO */
+
+struct shared_recursive_lock {
+	struct shared_lock            sr_lock;  /* Underlying lock */
+	__shared_recursive_lock_tid_t sr_owner; /* [0..1|NULL(__HYBRID_GETTID_INVALID)] Thread holding the lock */
+	__uintptr_t                   sr_rcnt;  /* [lock(WRITING)] Number of recursive locks (0 means only one lock remains) */
 };
 
-#ifdef __KERNEL__
-#define __shared_rwlock_wrwait_send(self)      sig_send(&(self)->sl_wrwait)
-#define __shared_rwlock_rdwait_broadcast(self) sig_broadcast(&(self)->sl_rdwait)
-#elif defined(__CRT_HAVE_XSC)
-#if __CRT_HAVE_XSC(lfutex)
-#define __shared_rwlock_wrwait_send(self) \
-	((self)->sl_wrwait ? (sys_Xlfutex(&(self)->sl_wrwait, LFUTEX_WAKEMASK, 1, __NULLPTR, 0) != 0) : 0)
-#define __shared_rwlock_rdwait_broadcast(self) \
-	((self)->sl_rdwait ? sys_Xlfutex(&(self)->sl_rdwait, LFUTEX_WAKEMASK, (__uintptr_t)-1, __NULLPTR, 0) : 0)
-#endif /* __CRT_HAVE_XSC(lfutex) */
-#endif /* ... */
+/* Check if the caller is is the owner of `self' */
+#define __shared_recursive_lock_isown(self) \
+	__shared_recursive_lock_mytid((self)->sr_owner)
+
+/* Set the caller as the owner of `self' */
+#define __shared_recursive_lock_setown(self)              \
+	((self)->sr_owner = __shared_recursive_lock_gettid(), \
+	 __hybrid_assert((self)->sr_rcnt == 0))
 
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_KOS_BITS_SHARED_RWLOCK_H */
+#endif /* !_KOS_BITS_SHARED_RECURSIVE_LOCK_H */
