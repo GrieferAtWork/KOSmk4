@@ -128,11 +128,11 @@ NOTHROW(FCALL sighand_ptr_destroy)(struct sighand_ptr *__restrict self) {
  * >> struct sighand *h;
  * >> h = sighand_ptr_lockread(THIS_SIGHAND_PTR);
  * >> ...
- * >> sync_endread(h);
+ * >> sighand_endread(h);
  * For writing:
  * >> h = sighand_ptr_lockwrite();
  * >> ...
- * >> sync_endwrite(h);
+ * >> sighand_endwrite(h);
  * With that in mind, these function will perform the necessary unsharing  of
  * copy-on-write signal handler  tables, while still  keeping association  of
  * handlers in check when it comes to shared handler tables, as usually found
@@ -147,7 +147,7 @@ again:
 	COMPILER_READ_BARRIER();
 	result = ptr->sp_hand;
 	COMPILER_READ_BARRIER();
-	lock_ok = !result ? true : sync_tryread(result);
+	lock_ok = !result ? true : sighand_tryread(result);
 	sync_endread(&ptr->sp_lock);
 	if (!lock_ok) {
 		task_yield();
@@ -217,7 +217,7 @@ again_lock_ptr:
 	}
 
 	/* Got the handler table! - Now to lock it. */
-	lock_ok = sync_trywrite(result);
+	lock_ok = sighand_trywrite(result);
 	sync_endread(ptr);
 	if (!lock_ok) {
 		task_yield();
@@ -230,7 +230,7 @@ again_lock_ptr:
 	 * with a copy. */
 	if (ATOMIC_READ(result->sh_share) > 1) {
 		struct sighand *copy;
-		sync_endwrite(result);
+		sighand_endwrite(result);
 		copy = (struct sighand *)kmalloc(sizeof(struct sighand), GFP_NORMAL);
 		TRY {
 again_lock_ptr_for_copy:
@@ -238,7 +238,7 @@ again_lock_ptr_for_copy:
 			COMPILER_READ_BARRIER();
 			result = ptr->sp_hand;
 			COMPILER_READ_BARRIER();
-			if (!sync_tryread(result)) {
+			if (!sighand_tryread(result)) {
 				sync_endwrite(ptr);
 				task_yield();
 				goto again_lock_ptr_for_copy;
@@ -247,8 +247,8 @@ again_lock_ptr_for_copy:
 				/* The handler table already got unshared in the mean time...
 				 * No need to initialize + save our copy! */
 				sync_endwrite(ptr);
-				if (!sync_tryupgrade(result)) {
-					sync_endread(result);
+				if (!sighand_tryupgrade(result)) {
+					sighand_endread(result);
 					kfree(copy);
 					task_yield();
 					goto again_lock_ptr;
@@ -258,7 +258,7 @@ again_lock_ptr_for_copy:
 			}
 			/* Initialize the new copy as a duplicate of the old handler table. */
 			memcpy(copy->sh_actions, result->sh_actions, sizeof(result->sh_actions));
-			sync_endread(result);
+			sighand_endread(result);
 			copy->sh_share = 1; /* Only 1 sighand_ptr will use this copy (for now) */
 			atomic_rwlock_init_write(&copy->sh_lock);
 			/* Store the copy in the thread-local sighand_ptr */
@@ -368,7 +368,7 @@ default_sighand:
 			goto default_sighand;
 		memcpy(action, &hand->sh_actions[signo - 1],
 		       sizeof(struct kernel_sigaction));
-		sync_endread(hand);
+		sighand_endread(hand);
 	}
 }
 
@@ -386,7 +386,7 @@ sighand_gethandler(signo_t signo)
 	if (hand == NULL)
 		goto done;
 	result = hand->sh_actions[signo - 1].sa_handler;
-	sync_endread(hand);
+	sighand_endread(hand);
 done:
 	return result;
 }
@@ -413,13 +413,13 @@ sighand_reset_handler(signo_t signo,
 	if (memcmp(current_action,
 	           &hand->sh_actions[signo - 1],
 	           sizeof(struct kernel_sigaction)) != 0) {
-		sync_endwrite(hand);
+		sighand_endwrite(hand);
 		return false;
 	}
 
 	/* Reset the action. */
 	bzero(&hand->sh_actions[signo - 1], sizeof(struct kernel_sigaction));
-	sync_endwrite(hand);
+	sighand_endwrite(hand);
 	return true;
 }
 
@@ -460,7 +460,7 @@ INTERN void KCALL onexec_posix_signals_reset_action(void) {
 		/* Check if there are any signals set to SIG_IGN, for which
 		 * `sighand_default_action()'   returns   something   else. */
 		if (!sighand_has_nondefault_sig_ign(hand)) {
-			sync_endread(hand);
+			sighand_endread(hand);
 			goto done_handptr;
 		}
 		/* We have to create a new, custom set of signal handlers... */
@@ -469,7 +469,7 @@ INTERN void KCALL onexec_posix_signals_reset_action(void) {
 		newhand = (REF struct sighand *)kmalloc_nx(sizeof(struct sighand),
 		                                           GFP_CALLOC | GFP_ATOMIC);
 		if (!newhand) {
-			sync_endread(hand);
+			sighand_endread(hand);
 			newhand = (REF struct sighand *)kmalloc(sizeof(struct sighand), GFP_CALLOC);
 			TRY {
 				hand = sighand_ptr_lockread(handptr);
@@ -484,7 +484,7 @@ INTERN void KCALL onexec_posix_signals_reset_action(void) {
 				goto done_handptr;
 			}
 			if (sighand_has_nondefault_sig_ign(hand)) {
-				sync_endread(hand);
+				sighand_endread(hand);
 				kfree(newhand);
 				goto done_handptr;
 			}
@@ -500,7 +500,7 @@ INTERN void KCALL onexec_posix_signals_reset_action(void) {
 		}
 		atomic_rwlock_cinit(&newhand->sh_lock);
 		newhand->sh_share = 1;
-		sync_endread(hand);
+		sighand_endread(hand);
 		if (!isshared(handptr)) {
 			/* We can re-use `handptr' to point to `newhand' */
 			TRY {
@@ -590,7 +590,7 @@ sys_sigaction_impl(signo_t signo,
 					goto no_old_handler;
 				memcpy(&ohandler, &hand->sh_actions[signo - 1],
 				       sizeof(struct kernel_sigaction));
-				sync_endread(hand);
+				sighand_endread(hand);
 copy_old_handler:
 				COMPILER_WRITE_BARRIER();
 				memset(mempcpy(oact, &ohandler,
@@ -628,7 +628,7 @@ no_old_handler:
 		hand = sighand_ptr_lockwrite();
 		memcpy(&ohandler, &hand->sh_actions[signo - 1], sizeof(struct kernel_sigaction));
 		memcpy(&hand->sh_actions[signo - 1], &nhandler, sizeof(struct kernel_sigaction));
-		sync_endwrite(hand);
+		sighand_endwrite(hand);
 
 		/* Check if user-space also wants to get the old action. */
 		if (oact != NULL)

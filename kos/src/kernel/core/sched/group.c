@@ -899,7 +899,7 @@ is_ignoring_SIGCLD(void) THROWS(E_WOULDBLOCK) {
 		return false;
 	result = (hand->sh_actions[SIGCLD - 1].sa_flags & SA_NOCLDWAIT) || /* This also triggers `SIG_IGN' behavior! */
 	         (hand->sh_actions[SIGCLD - 1].sa_handler == SIG_IGN);     /* SIGCLD is explicitly set to SIG_IGN */
-	sync_endread(hand);
+	sighand_endread(hand);
 	return result;
 }
 

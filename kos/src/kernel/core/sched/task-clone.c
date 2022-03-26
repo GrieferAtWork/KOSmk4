@@ -332,14 +332,14 @@ again_lock_myptr:
 					kfree(newptr);
 					newptr = NULL;
 				} else {
-					if (!sync_trywrite(myhand)) {
+					if (!sighand_trywrite(myhand)) {
 						sync_endread(myptr);
 						task_yield();
 						goto again_lock_myptr;
 					}
 					sync_endread(myptr);
 					sighand_incshare(myhand);
-					sync_endwrite(myhand);
+					sighand_endwrite(myhand);
 
 					/* Still share the handler table as copy-on-write. */
 					atomic_rwlock_init(&newptr->sp_lock);

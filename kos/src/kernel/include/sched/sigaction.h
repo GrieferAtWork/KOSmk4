@@ -58,7 +58,36 @@ struct sighand {
 	                                               * Amount of unrelated processes sharing this sighand. */
 	struct kernel_sigaction sh_actions[NSIG - 1]; /* Signal handlers. */
 };
-__DEFINE_SYNC_PROXY(struct sighand, sh_lock)
+
+/* Helper macros for working with `struct sighand::sh_lock' */
+#define _sighand_reap(self)        (void)0
+#define sighand_reap(self)         (void)0
+#define sighand_mustreap(self)     0
+#define sighand_write(self)        atomic_rwlock_write(&(self)->sh_lock)
+#define sighand_write_nx(self)     atomic_rwlock_write_nx(&(self)->sh_lock)
+#define sighand_trywrite(self)     atomic_rwlock_trywrite(&(self)->sh_lock)
+#define sighand_endwrite(self)     (atomic_rwlock_endwrite(&(self)->sh_lock), sighand_reap(self))
+#define _sighand_endwrite(self)    atomic_rwlock_endwrite(&(self)->sh_lock)
+#define sighand_read(self)         atomic_rwlock_read(&(self)->sh_lock)
+#define sighand_read_nx(self)      atomic_rwlock_read_nx(&(self)->sh_lock)
+#define sighand_tryread(self)      atomic_rwlock_tryread(&(self)->sh_lock)
+#define _sighand_endread(self)     atomic_rwlock_endread(&(self)->sh_lock)
+#define sighand_endread(self)      (void)(atomic_rwlock_endread(&(self)->sh_lock) && (sighand_reap(self), 0))
+#define _sighand_end(self)         atomic_rwlock_end(&(self)->sh_lock)
+#define sighand_end(self)          (void)(atomic_rwlock_end(&(self)->sh_lock) && (sighand_reap(self), 0))
+#define sighand_upgrade(self)      atomic_rwlock_upgrade(&(self)->sh_lock)
+#define sighand_upgrade_nx(self)   atomic_rwlock_upgrade_nx(&(self)->sh_lock)
+#define sighand_tryupgrade(self)   atomic_rwlock_tryupgrade(&(self)->sh_lock)
+#define sighand_downgrade(self)    atomic_rwlock_downgrade(&(self)->sh_lock)
+#define sighand_reading(self)      atomic_rwlock_reading(&(self)->sh_lock)
+#define sighand_writing(self)      atomic_rwlock_writing(&(self)->sh_lock)
+#define sighand_canread(self)      atomic_rwlock_canread(&(self)->sh_lock)
+#define sighand_canwrite(self)     atomic_rwlock_canwrite(&(self)->sh_lock)
+#define sighand_waitread(self)     atomic_rwlock_waitread(&(self)->sh_lock)
+#define sighand_waitwrite(self)    atomic_rwlock_waitwrite(&(self)->sh_lock)
+#define sighand_waitread_nx(self)  atomic_rwlock_waitread_nx(&(self)->sh_lock)
+#define sighand_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->sh_lock)
+
 #ifndef ____os_free_defined
 #define ____os_free_defined
 FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
@@ -116,14 +145,14 @@ NOTHROW(FCALL task_setsighand_ptr)(struct sighand_ptr *newsighand_ptr);
  * >> h = sighand_ptr_lockread(THIS_SIGHAND_PTR);
  * >> if (h) {
  * >>     ...
- * >>     sync_endread(h);
+ * >>     sighand_endread(h);
  * >> } else {
  * >>     ...  // Use default behavior (s.a. `sighand_default_action()')
  * >> }
  * For writing:
  * >> h = sighand_ptr_lockwrite();
  * >> ...
- * >> sync_endwrite(h);
+ * >> sighand_endwrite(h);
  * With that in mind, these function will perform the necessary unsharing  of
  * copy-on-write signal handler  tables, while still  keeping association  of
  * handlers in check when it comes to shared handler tables, as usually found
