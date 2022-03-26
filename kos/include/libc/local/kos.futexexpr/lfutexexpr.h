@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x894f02be */
+/* HASH CRC-32:0xc76df0ab */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,46 +21,35 @@
 #ifndef __local_lfutexexpr_defined
 #define __local_lfutexexpr_defined
 #include <__crt.h>
+#if defined(__CRT_HAVE_lfutexexpr) || defined(__CRT_HAVE_lfutexexpr64)
 #include <bits/types.h>
-#if defined(__CRT_HAVE_lfutexexpr64) || defined(__CRT_HAVE_lfutexexpr)
 #include <bits/os/timespec.h>
 #include <kos/bits/futex-expr.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep_lfutexexpr32_defined) && defined(__CRT_HAVE_lfutexexpr)
-#define __local___localdep_lfutexexpr32_defined
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_lfutexexpr32,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexexpr,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
-#endif /* !__local___localdep_lfutexexpr32_defined && __CRT_HAVE_lfutexexpr */
-#ifndef __local___localdep_lfutexexpr64_defined
-#define __local___localdep_lfutexexpr64_defined
-#if defined(__CRT_HAVE_lfutexexpr) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_lfutexexpr64,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexexpr,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
-#elif defined(__CRT_HAVE_lfutexexpr64)
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_lfutexexpr64,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexexpr64,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
-#elif defined(__CRT_HAVE_lfutexexpr)
-__NAMESPACE_LOCAL_END
-#include <libc/local/kos.futexexpr/lfutexexpr64.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_lfutexexpr64 __LIBC_LOCAL_NAME(lfutexexpr64)
-#else /* ... */
-#undef __local___localdep_lfutexexpr64_defined
-#endif /* !... */
-#endif /* !__local___localdep_lfutexexpr64_defined */
+#if !defined(__local___localdep_crt_lfutexexpr32_defined) && defined(__CRT_HAVE_lfutexexpr)
+#define __local___localdep_crt_lfutexexpr32_defined
+__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_crt_lfutexexpr32,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec32 const *__timeout, unsigned int __timeout_flags),lfutexexpr,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
+#endif /* !__local___localdep_crt_lfutexexpr32_defined && __CRT_HAVE_lfutexexpr */
+#if !defined(__local___localdep_crt_lfutexexpr64_defined) && defined(__CRT_HAVE_lfutexexpr64)
+#define __local___localdep_crt_lfutexexpr64_defined
+__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_crt_lfutexexpr64,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexexpr64,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
+#endif /* !__local___localdep_crt_lfutexexpr64_defined && __CRT_HAVE_lfutexexpr64 */
 __LOCAL_LIBC(lfutexexpr) __ATTR_NONNULL((1, 3)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lfutexexpr))(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags) {
 #ifdef __CRT_HAVE_lfutexexpr
 	struct __timespec32 __tms32;
 	if (!__timeout)
-		return (__NAMESPACE_LOCAL_SYM __localdep_lfutexexpr32)(__ulockaddr, __base, __expr, __NULLPTR, 0);
+		return (__NAMESPACE_LOCAL_SYM __localdep_crt_lfutexexpr32)(__ulockaddr, __base, __expr, __NULLPTR, 0);
 	__tms32.tv_sec  = (__time32_t)__timeout->tv_sec;
 	__tms32.tv_nsec = __timeout->tv_nsec;
-	return (__NAMESPACE_LOCAL_SYM __localdep_lfutexexpr32)(__ulockaddr, __base, __expr, &__tms32, __timeout_flags);
+	return (__NAMESPACE_LOCAL_SYM __localdep_crt_lfutexexpr32)(__ulockaddr, __base, __expr, &__tms32, __timeout_flags);
 #else /* __CRT_HAVE_lfutexexpr */
 	struct __timespec64 __tms64;
 	if (!__timeout)
-		return (__NAMESPACE_LOCAL_SYM __localdep_lfutexexpr64)(__ulockaddr, __base, __expr, __NULLPTR, 0);
+		return (__NAMESPACE_LOCAL_SYM __localdep_crt_lfutexexpr64)(__ulockaddr, __base, __expr, __NULLPTR, 0);
 	__tms64.tv_sec  = (__time64_t)__timeout->tv_sec;
 	__tms64.tv_nsec = __timeout->tv_nsec;
-	return (__NAMESPACE_LOCAL_SYM __localdep_lfutexexpr64)(__ulockaddr, __base, __expr, &__tms64, __timeout_flags);
+	return (__NAMESPACE_LOCAL_SYM __localdep_crt_lfutexexpr64)(__ulockaddr, __base, __expr, &__tms64, __timeout_flags);
 #endif /* !__CRT_HAVE_lfutexexpr */
 }
 __NAMESPACE_LOCAL_END
@@ -68,7 +57,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_lfutexexpr_defined
 #define __localdep_lfutexexpr __LIBC_LOCAL_NAME(lfutexexpr)
 #endif /* !__local___localdep_lfutexexpr_defined */
-#else /* __CRT_HAVE_lfutexexpr64 || __CRT_HAVE_lfutexexpr */
+#else /* __CRT_HAVE_lfutexexpr || __CRT_HAVE_lfutexexpr64 */
 #undef __local_lfutexexpr_defined
-#endif /* !__CRT_HAVE_lfutexexpr64 && !__CRT_HAVE_lfutexexpr */
+#endif /* !__CRT_HAVE_lfutexexpr && !__CRT_HAVE_lfutexexpr64 */
 #endif /* !__local_lfutexexpr_defined */

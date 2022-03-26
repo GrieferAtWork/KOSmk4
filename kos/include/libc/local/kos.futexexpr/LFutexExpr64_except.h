@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a53676e */
+/* HASH CRC-32:0x6b5ba686 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,18 +27,18 @@
 #include <bits/os/timespec.h>
 #include <kos/bits/futex-expr.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_LFutexExpr32_except_defined
-#define __local___localdep_LFutexExpr32_except_defined
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_LFutexExpr32_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExpr,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
-#endif /* !__local___localdep_LFutexExpr32_except_defined */
+#ifndef __local___localdep_crt_LFutexExpr32_except_defined
+#define __local___localdep_crt_LFutexExpr32_except_defined
+__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_crt_LFutexExpr32_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec32 const *__timeout, unsigned int __timeout_flags),LFutexExpr,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
+#endif /* !__local___localdep_crt_LFutexExpr32_except_defined */
 __LOCAL_LIBC(LFutexExpr64_except) __ATTR_NONNULL((1, 3)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(LFutexExpr64_except))(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags) __THROWS(...) {
 	struct __timespec32 __tms32;
 	if (!__timeout)
-		return (__NAMESPACE_LOCAL_SYM __localdep_LFutexExpr32_except)(__ulockaddr, __base, __expr, __NULLPTR, 0);
+		return (__NAMESPACE_LOCAL_SYM __localdep_crt_LFutexExpr32_except)(__ulockaddr, __base, __expr, __NULLPTR, __timeout_flags);
 	__tms32.tv_sec  = (__time32_t)__timeout->tv_sec;
 	__tms32.tv_nsec = __timeout->tv_nsec;
-	return (__NAMESPACE_LOCAL_SYM __localdep_LFutexExpr32_except)(__ulockaddr, __base, __expr, &__tms32, __timeout_flags);
+	return (__NAMESPACE_LOCAL_SYM __localdep_crt_LFutexExpr32_except)(__ulockaddr, __base, __expr, &__tms32, __timeout_flags);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_LFutexExpr64_except_defined

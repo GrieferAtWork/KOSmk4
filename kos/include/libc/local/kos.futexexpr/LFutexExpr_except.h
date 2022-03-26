@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x670d656 */
+/* HASH CRC-32:0xbdfe6c3d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,47 +21,36 @@
 #ifndef __local_LFutexExpr_except_defined
 #define __local_LFutexExpr_except_defined
 #include <__crt.h>
-#include <bits/types.h>
-#if defined(__CRT_HAVE_lfutexexpr64) || defined(__CRT_HAVE_lfutexexpr)
+#if defined(__CRT_HAVE_LFutexExpr) || defined(__CRT_HAVE_LFutexExpr64)
 #include <kos/anno.h>
+#include <bits/types.h>
 #include <bits/os/timespec.h>
 #include <kos/bits/futex-expr.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep_LFutexExpr32_except_defined) && defined(__CRT_HAVE_LFutexExpr)
-#define __local___localdep_LFutexExpr32_except_defined
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_LFutexExpr32_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExpr,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
-#endif /* !__local___localdep_LFutexExpr32_except_defined && __CRT_HAVE_LFutexExpr */
-#ifndef __local___localdep_LFutexExpr64_except_defined
-#define __local___localdep_LFutexExpr64_except_defined
-#if defined(__CRT_HAVE_LFutexExpr) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__THROWING,__localdep_LFutexExpr64_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExpr,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
-#elif defined(__CRT_HAVE_LFutexExpr64)
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__THROWING,__localdep_LFutexExpr64_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExpr64,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
-#elif defined(__CRT_HAVE_LFutexExpr)
-__NAMESPACE_LOCAL_END
-#include <libc/local/kos.futexexpr/LFutexExpr64_except.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_LFutexExpr64_except __LIBC_LOCAL_NAME(LFutexExpr64_except)
-#else /* ... */
-#undef __local___localdep_LFutexExpr64_except_defined
-#endif /* !... */
-#endif /* !__local___localdep_LFutexExpr64_except_defined */
+#if !defined(__local___localdep_crt_LFutexExpr32_except_defined) && defined(__CRT_HAVE_LFutexExpr)
+#define __local___localdep_crt_LFutexExpr32_except_defined
+__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_crt_LFutexExpr32_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec32 const *__timeout, unsigned int __timeout_flags),LFutexExpr,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
+#endif /* !__local___localdep_crt_LFutexExpr32_except_defined && __CRT_HAVE_LFutexExpr */
+#if !defined(__local___localdep_crt_LFutexExpr64_except_defined) && defined(__CRT_HAVE_LFutexExpr64)
+#define __local___localdep_crt_LFutexExpr64_except_defined
+__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_crt_LFutexExpr64_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExpr64,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
+#endif /* !__local___localdep_crt_LFutexExpr64_except_defined && __CRT_HAVE_LFutexExpr64 */
 __LOCAL_LIBC(LFutexExpr_except) __ATTR_NONNULL((1, 3)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(LFutexExpr_except))(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags) __THROWS(...) {
 #ifdef __CRT_HAVE_LFutexExpr
 	struct __timespec32 __tms32;
 	if (!__timeout)
-		return (__NAMESPACE_LOCAL_SYM __localdep_LFutexExpr32_except)(__ulockaddr, __base, __expr, __NULLPTR, 0);
+		return (__NAMESPACE_LOCAL_SYM __localdep_crt_LFutexExpr32_except)(__ulockaddr, __base, __expr, __NULLPTR, __timeout_flags);
 	__tms32.tv_sec  = (__time32_t)__timeout->tv_sec;
 	__tms32.tv_nsec = __timeout->tv_nsec;
-	return (__NAMESPACE_LOCAL_SYM __localdep_LFutexExpr32_except)(__ulockaddr, __base, __expr, &__tms32, __timeout_flags);
+	return (__NAMESPACE_LOCAL_SYM __localdep_crt_LFutexExpr32_except)(__ulockaddr, __base, __expr, &__tms32, __timeout_flags);
 #else /* __CRT_HAVE_LFutexExpr */
 	struct __timespec64 __tms64;
 	if (!__timeout)
-		return (__NAMESPACE_LOCAL_SYM __localdep_LFutexExpr64_except)(__ulockaddr, __base, __expr, __NULLPTR, 0);
+		return (__NAMESPACE_LOCAL_SYM __localdep_crt_LFutexExpr64_except)(__ulockaddr, __base, __expr, __NULLPTR, __timeout_flags);
 	__tms64.tv_sec  = (__time64_t)__timeout->tv_sec;
 	__tms64.tv_nsec = __timeout->tv_nsec;
-	return (__NAMESPACE_LOCAL_SYM __localdep_LFutexExpr64_except)(__ulockaddr, __base, __expr, &__tms64, __timeout_flags);
+	return (__NAMESPACE_LOCAL_SYM __localdep_crt_LFutexExpr64_except)(__ulockaddr, __base, __expr, &__tms64, __timeout_flags);
 #endif /* !__CRT_HAVE_LFutexExpr */
 }
 __NAMESPACE_LOCAL_END
@@ -69,7 +58,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_LFutexExpr_except_defined
 #define __localdep_LFutexExpr_except __LIBC_LOCAL_NAME(LFutexExpr_except)
 #endif /* !__local___localdep_LFutexExpr_except_defined */
-#else /* __CRT_HAVE_lfutexexpr64 || __CRT_HAVE_lfutexexpr */
+#else /* __CRT_HAVE_LFutexExpr || __CRT_HAVE_LFutexExpr64 */
 #undef __local_LFutexExpr_except_defined
-#endif /* !__CRT_HAVE_lfutexexpr64 && !__CRT_HAVE_lfutexexpr */
+#endif /* !__CRT_HAVE_LFutexExpr && !__CRT_HAVE_LFutexExpr64 */
 #endif /* !__local_LFutexExpr_except_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31c6020e */
+/* HASH CRC-32:0xc7d87564 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,18 +26,18 @@
 #include <bits/os/timespec.h>
 #include <kos/bits/futex-expr.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_lfutexexpr32_defined
-#define __local___localdep_lfutexexpr32_defined
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_lfutexexpr32,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexexpr,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
-#endif /* !__local___localdep_lfutexexpr32_defined */
+#ifndef __local___localdep_crt_lfutexexpr32_defined
+#define __local___localdep_crt_lfutexexpr32_defined
+__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_crt_lfutexexpr32,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec32 const *__timeout, unsigned int __timeout_flags),lfutexexpr,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
+#endif /* !__local___localdep_crt_lfutexexpr32_defined */
 __LOCAL_LIBC(lfutexexpr64) __ATTR_NONNULL((1, 3)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lfutexexpr64))(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags) {
 	struct __timespec32 __tms32;
 	if (!__timeout)
-		return (__NAMESPACE_LOCAL_SYM __localdep_lfutexexpr32)(__ulockaddr, __base, __expr, __NULLPTR, 0);
+		return (__NAMESPACE_LOCAL_SYM __localdep_crt_lfutexexpr32)(__ulockaddr, __base, __expr, __NULLPTR, 0);
 	__tms32.tv_sec  = (__time32_t)__timeout->tv_sec;
 	__tms32.tv_nsec = __timeout->tv_nsec;
-	return (__NAMESPACE_LOCAL_SYM __localdep_lfutexexpr32)(__ulockaddr, __base, __expr, &__tms32, __timeout_flags);
+	return (__NAMESPACE_LOCAL_SYM __localdep_crt_lfutexexpr32)(__ulockaddr, __base, __expr, &__tms32, __timeout_flags);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_lfutexexpr64_defined

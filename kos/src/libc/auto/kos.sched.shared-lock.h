@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59ce05e3 */
+/* HASH CRC-32:0x9c06336 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,10 +38,10 @@ INTDEF __BLOCKING NONNULL((1)) void (__FCALL libc_shared_lock_acquire)(struct sh
  * @return: false: The given `abs_timeout' has expired. */
 INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_lock_acquire_with_timeout)(struct shared_lock *__restrict self, __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...);
 /* >> shared_lock_waitfor(3)
- * Wait that `self' becomes available. */
+ * Wait for `self' to become available. */
 INTDEF __BLOCKING NONNULL((1)) void (__FCALL libc_shared_lock_waitfor)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, ...);
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
- * Wait that `self' becomes available, blocking until `abs_timeout' or indefinitely.
+ * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
 INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_lock_waitfor_with_timeout)(struct shared_lock *__restrict self, __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...);
@@ -52,7 +52,7 @@ INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_lock_waitfor_wi
  * @return: false: The given `abs_timeout' has expired. */
 INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_lock_acquire_with_timeout64)(struct shared_lock *__restrict self, struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...);
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
- * Wait that `self' becomes available, blocking until `abs_timeout' or indefinitely.
+ * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
 INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_lock_waitfor_with_timeout64)(struct shared_lock *__restrict self, struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...);

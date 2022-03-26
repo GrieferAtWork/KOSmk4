@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb28d7c54 */
+/* HASH CRC-32:0x6ca803fe */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_KOS_FUTEXEXPR_H 1
 
 #include "../api.h"
+#include "../auto/kos.futexexpr.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>
@@ -30,7 +31,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* >> lfutexexpr(2)
+/* >> lfutexexpr(2), lfutexexpr64(2)
  * The lfutexexpr(2) system call can be used to specify arbitrarily complex
  * expressions that must atomically (in relation to other futex operations)
  * hold true before the scheduler will suspend the calling thread.
@@ -50,7 +51,7 @@ DECL_BEGIN
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_lfutexexpr)(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec const *timeout, unsigned int timeout_flags);
-/* >> lfutexexpr(2)
+/* >> lfutexexpr(2), lfutexexpr64(2)
  * The lfutexexpr(2) system call can be used to specify arbitrarily complex
  * expressions that must atomically (in relation to other futex operations)
  * hold true before the scheduler will suspend the calling thread.
@@ -70,7 +71,7 @@ INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_lfutexexpr)(lfutex_t *ulock
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_lfutexexpr64)(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec64 const *timeout, unsigned int timeout_flags);
-/* >> LFutexExpr(2)
+/* >> LFutexExpr(2), LFutexExpr64(2)
  * Excetion-enabled version of `lfutexexpr(2)'
  * @return: * :  The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *               in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
@@ -78,9 +79,12 @@ INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_lfutexexpr64)(lfutex_t *ulo
  *               perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *               thread had to perform a wait operation, at which point this function returning
  *               that value means that you've once again been re-awoken.
- * @return: < 0: Timeout expired */
+ * @return: < 0: Timeout expired
+ * @throws: E_SEGFAULT:         A faulty pointer was given
+ * @throws: E_INVALID_ARGUMENT: One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
+ * @throws: E_INTERRUPT:        A blocking futex-wait operation was interrupted */
 INTDEF NONNULL((1, 3)) int (LIBCCALL libc_LFutexExpr)(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec const *timeout, unsigned int timeout_flags) THROWS(...);
-/* >> LFutexExpr(2)
+/* >> LFutexExpr(2), LFutexExpr64(2)
  * Excetion-enabled version of `lfutexexpr(2)'
  * @return: * :  The first  non-zero  return value  from  executing  all of  the  given  `expr'
  *               in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
@@ -88,7 +92,10 @@ INTDEF NONNULL((1, 3)) int (LIBCCALL libc_LFutexExpr)(lfutex_t *ulockaddr, void 
  *               perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *               thread had to perform a wait operation, at which point this function returning
  *               that value means that you've once again been re-awoken.
- * @return: < 0: Timeout expired */
+ * @return: < 0: Timeout expired
+ * @throws: E_SEGFAULT:         A faulty pointer was given
+ * @throws: E_INVALID_ARGUMENT: One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
+ * @throws: E_INTERRUPT:        A blocking futex-wait operation was interrupted */
 INTDEF NONNULL((1, 3)) int (LIBCCALL libc_LFutexExpr64)(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec64 const *timeout, unsigned int timeout_flags) THROWS(...);
 #endif /* !__KERNEL__ */
 

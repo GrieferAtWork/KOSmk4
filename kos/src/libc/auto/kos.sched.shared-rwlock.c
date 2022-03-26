@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34b974de */
+/* HASH CRC-32:0xcbd5f3cc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -169,7 +169,9 @@ success:
 #else /* __KERNEL__ */
 	while (!libc_shared_rwlock_tryread(self)) {
 		__hybrid_atomic_store(self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
-		libc_LFutexExpr64(&self->sl_rdwait, self, __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr, NULL, 0);
+		libc_LFutexExprI64(&self->sl_rdwait, self,
+		                     __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
+		                     NULL, 0);
 	}
 #endif /* !__KERNEL__ */
 	COMPILER_READ_BARRIER();
@@ -215,7 +217,9 @@ success:
 #else /* __KERNEL__ */
 	while (!libc_shared_rwlock_trywrite(self)) {
 		__hybrid_atomic_store(self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
-		libc_LFutexExpr64(&self->sl_wrwait, self, __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr, NULL, 0);
+		libc_LFutexExprI64(&self->sl_wrwait, self,
+		                     __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
+		                     NULL, 0);
 	}
 #endif /* !__KERNEL__ */
 	COMPILER_BARRIER();
@@ -246,9 +250,9 @@ success:
 #else /* __KERNEL__ */
 	while (!libc_shared_rwlock_tryread(self)) {
 		__hybrid_atomic_store(self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
-		if (libc_LFutexExpr(&self->sl_rdwait, self,
-		                      __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
-		                      abs_timeout, 0) < 0)
+		if (libc_LFutexExprI(&self->sl_rdwait, self,
+		                       __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
+		                       abs_timeout, 0) < 0)
 			return false;
 	}
 #endif /* !__KERNEL__ */
@@ -281,9 +285,9 @@ success:
 #else /* __KERNEL__ */
 	while (!libc_shared_rwlock_trywrite(self)) {
 		__hybrid_atomic_store(self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
-		if (libc_LFutexExpr(&self->sl_wrwait, self,
-		                      __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
-		                      abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
+		if (libc_LFutexExprI(&self->sl_wrwait, self,
+		                       __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
+		                       abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
 			return false;
 	}
 #endif /* !__KERNEL__ */
@@ -312,8 +316,8 @@ success:
 #else /* __KERNEL__ */
 	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
 		__hybrid_atomic_store(self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
-		libc_LFutexExpr64(&self->sl_rdwait, self, __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
-		                    NULL, LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL);
+		libc_LFutexExprI64(&self->sl_rdwait, self, __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
+		                     NULL, LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL);
 	}
 #endif /* !__KERNEL__ */
 	COMPILER_READ_BARRIER();
@@ -340,8 +344,8 @@ success:
 #else /* __KERNEL__ */
 	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
-		libc_LFutexExpr64(&self->sl_wrwait, self, __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
-		                    NULL, LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL);
+		libc_LFutexExprI64(&self->sl_wrwait, self, __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
+		                     NULL, LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL);
 	}
 #endif /* !__KERNEL__ */
 	COMPILER_BARRIER();
@@ -372,11 +376,11 @@ success:
 #else /* __KERNEL__ */
 	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
 		__hybrid_atomic_store(self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
-		if (libc_LFutexExpr(&self->sl_rdwait, self,
-		                      __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
-		                      abs_timeout,
-		                      LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE |
-		                      LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL) < 0)
+		if (libc_LFutexExprI(&self->sl_rdwait, self,
+		                       __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
+		                       abs_timeout,
+		                       LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE |
+		                       LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL) < 0)
 			return false;
 	}
 #endif /* !__KERNEL__ */
@@ -409,11 +413,11 @@ success:
 #else /* __KERNEL__ */
 	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
-		if (libc_LFutexExpr(&self->sl_wrwait, self,
-		                      __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
-		                      abs_timeout,
-		                      LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE |
-		                      LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL) < 0)
+		if (libc_LFutexExprI(&self->sl_wrwait, self,
+		                       __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
+		                       abs_timeout,
+		                       LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE |
+		                       LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL) < 0)
 			return false;
 	}
 #endif /* !__KERNEL__ */
@@ -447,9 +451,9 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING NONNULL((1)) boo
                                                  struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 	while (!libc_shared_rwlock_tryread(self)) {
 		__hybrid_atomic_store(self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
-		if (libc_LFutexExpr64(&self->sl_rdwait, self,
-		                        __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
-		                        abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
+		if (libc_LFutexExprI64(&self->sl_rdwait, self,
+		                         __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
+		                         abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
 			return false;
 	}
 	COMPILER_READ_BARRIER();
@@ -482,9 +486,9 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING NONNULL((1)) boo
                                                   struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 	while (!libc_shared_rwlock_trywrite(self)) {
 		__hybrid_atomic_store(self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
-		if (libc_LFutexExpr64(&self->sl_wrwait, self,
-		                        __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
-		                        abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
+		if (libc_LFutexExprI64(&self->sl_wrwait, self,
+		                         __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
+		                         abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
 			return false;
 	}
 	COMPILER_BARRIER();
@@ -517,11 +521,11 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING NONNULL((1)) boo
                                                      struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) == (uintptr_t)-1) {
 		__hybrid_atomic_store(self->sl_rdwait, 1, __ATOMIC_SEQ_CST);
-		if (libc_LFutexExpr64(&self->sl_rdwait, self,
-		                        __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
-		                        abs_timeout,
-		                        LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE |
-		                        LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL) < 0)
+		if (libc_LFutexExprI64(&self->sl_rdwait, self,
+		                         __NAMESPACE_LOCAL_SYM __shared_rwlock_waitreadexpr,
+		                         abs_timeout,
+		                         LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE |
+		                         LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL) < 0)
 			return false;
 	}
 	COMPILER_READ_BARRIER();
@@ -554,11 +558,11 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING NONNULL((1)) boo
                                                       struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->sl_wrwait, 1, __ATOMIC_SEQ_CST);
-		if (libc_LFutexExpr64(&self->sl_wrwait, self,
-		                        __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
-		                        abs_timeout,
-		                        LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE |
-		                        LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL) < 0)
+		if (libc_LFutexExprI64(&self->sl_wrwait, self,
+		                         __NAMESPACE_LOCAL_SYM __shared_rwlock_waitwriteexpr,
+		                         abs_timeout,
+		                         LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE |
+		                         LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL) < 0)
 			return false;
 	}
 	COMPILER_BARRIER();

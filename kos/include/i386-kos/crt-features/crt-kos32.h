@@ -89,6 +89,8 @@
 #define __CRT_HAVE_LChown
 #define __CRT_HAVE_LFutexExpr
 #define __CRT_HAVE_LFutexExpr64
+#define __CRT_HAVE_LFutexExprI
+#define __CRT_HAVE_LFutexExprI64
 #define __CRT_HAVE_LSeek
 #define __CRT_HAVE_LSeek64
 #define __CRT_HAVE_Link

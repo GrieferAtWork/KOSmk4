@@ -300,7 +300,7 @@ DEFINE_SHARED_RWLOCK_WRITE_USER_PREFIX
 @@Acquire a read-lock to the given shared_rwlock.
 [[kernel, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[requires(defined(__KERNEL__) || $has_function(LFutexExpr64_except))]]
+[[requires(defined(__KERNEL__) || $has_function(LFutexExprI64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_READ_PREFIX)]]
 void shared_rwlock_read([[nonnull]] struct shared_rwlock *__restrict self) {
 @@pp_ifdef __KERNEL__@@
@@ -321,7 +321,9 @@ success:
 @@pp_else@@
 	while (!shared_rwlock_tryread(self)) {
 		__hybrid_atomic_store(self->@sl_rdwait@, 1, __ATOMIC_SEQ_CST);
-		LFutexExpr64_except(&self->@sl_rdwait@, self, __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@, NULL, 0);
+		LFutexExprI64_except(&self->@sl_rdwait@, self,
+		                     __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@,
+		                     NULL, 0);
 	}
 @@pp_endif@@
 	COMPILER_READ_BARRIER();
@@ -332,7 +334,7 @@ success:
 @@Acquire a write-lock to the given shared_rwlock.
 [[kernel, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[requires(defined(__KERNEL__) || $has_function(LFutexExpr64_except))]]
+[[requires(defined(__KERNEL__) || $has_function(LFutexExprI64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_PREFIX)]]
 void shared_rwlock_write([[nonnull]] struct shared_rwlock *__restrict self) {
 @@pp_ifdef __KERNEL__@@
@@ -353,7 +355,9 @@ success:
 @@pp_else@@
 	while (!shared_rwlock_trywrite(self)) {
 		__hybrid_atomic_store(self->@sl_wrwait@, 1, __ATOMIC_SEQ_CST);
-		LFutexExpr64_except(&self->@sl_wrwait@, self, __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@, NULL, 0);
+		LFutexExprI64_except(&self->@sl_wrwait@, self,
+		                     __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@,
+		                     NULL, 0);
 	}
 @@pp_endif@@
 	COMPILER_BARRIER();
@@ -368,7 +372,7 @@ success:
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_rwlock_read_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_rwlock_read_with_timeout64")]]
-[[requires(defined(__KERNEL__) || $has_function(LFutexExpr_except))]]
+[[requires(defined(__KERNEL__) || $has_function(LFutexExprI_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_READ_PREFIX)]]
 $bool shared_rwlock_read_with_timeout([[nonnull]] struct shared_rwlock *__restrict self,
                                       __shared_rwlock_timespec abs_timeout) {
@@ -391,9 +395,9 @@ success:
 @@pp_else@@
 	while (!shared_rwlock_tryread(self)) {
 		__hybrid_atomic_store(self->@sl_rdwait@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExpr_except(&self->@sl_rdwait@, self,
-		                      __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@,
-		                      abs_timeout, 0) < 0)
+		if (LFutexExprI_except(&self->@sl_rdwait@, self,
+		                       __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@,
+		                       abs_timeout, 0) < 0)
 			return false;
 	}
 @@pp_endif@@
@@ -410,7 +414,7 @@ success:
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_rwlock_write_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_rwlock_write_with_timeout64")]]
-[[requires(defined(__KERNEL__) || $has_function(LFutexExpr_except))]]
+[[requires(defined(__KERNEL__) || $has_function(LFutexExprI_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_PREFIX)]]
 $bool shared_rwlock_write_with_timeout([[nonnull]] struct shared_rwlock *__restrict self,
                                        __shared_rwlock_timespec abs_timeout) {
@@ -433,9 +437,9 @@ success:
 @@pp_else@@
 	while (!shared_rwlock_trywrite(self)) {
 		__hybrid_atomic_store(self->@sl_wrwait@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExpr_except(&self->@sl_wrwait@, self,
-		                      __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@,
-		                      abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
+		if (LFutexExprI_except(&self->@sl_wrwait@, self,
+		                       __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@,
+		                       abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
 			return false;
 	}
 @@pp_endif@@
@@ -456,7 +460,7 @@ success:
 @@Wait until acquiring a read-lock to `self' no longer blocks
 [[kernel, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[requires(defined(__KERNEL__) || $has_function(LFutexExpr64_except))]]
+[[requires(defined(__KERNEL__) || $has_function(LFutexExprI64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_READ_PREFIX)]]
 void shared_rwlock_waitread([[nonnull]] struct shared_rwlock *__restrict self) {
 @@pp_ifdef __KERNEL__@@
@@ -477,8 +481,8 @@ success:
 @@pp_else@@
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == ($uintptr_t)-1) {
 		__hybrid_atomic_store(self->@sl_rdwait@, 1, __ATOMIC_SEQ_CST);
-		LFutexExpr64_except(&self->@sl_rdwait@, self, __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@,
-		                    NULL, @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@);
+		LFutexExprI64_except(&self->@sl_rdwait@, self, __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@,
+		                     NULL, @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@);
 	}
 @@pp_endif@@
 	COMPILER_READ_BARRIER();
@@ -489,7 +493,7 @@ success:
 @@Wait until acquiring a write-lock to `self' no longer blocks
 [[kernel, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[requires(defined(__KERNEL__) || $has_function(LFutexExpr64_except))]]
+[[requires(defined(__KERNEL__) || $has_function(LFutexExprI64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_PREFIX)]]
 void shared_rwlock_waitwrite([[nonnull]] struct shared_rwlock *__restrict self) {
 @@pp_ifdef __KERNEL__@@
@@ -510,8 +514,8 @@ success:
 @@pp_else@@
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->@sl_wrwait@, 1, __ATOMIC_SEQ_CST);
-		LFutexExpr64_except(&self->@sl_wrwait@, self, __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@,
-		                    NULL, @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@);
+		LFutexExprI64_except(&self->@sl_wrwait@, self, __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@,
+		                     NULL, @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@);
 	}
 @@pp_endif@@
 	COMPILER_BARRIER();
@@ -526,7 +530,7 @@ success:
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_rwlock_waitread_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_rwlock_waitread_with_timeout64")]]
-[[requires(defined(__KERNEL__) || $has_function(LFutexExpr_except))]]
+[[requires(defined(__KERNEL__) || $has_function(LFutexExprI_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_READ_PREFIX)]]
 $bool shared_rwlock_waitread_with_timeout([[nonnull]] struct shared_rwlock *__restrict self,
                                       __shared_rwlock_timespec abs_timeout) {
@@ -549,11 +553,11 @@ success:
 @@pp_else@@
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == ($uintptr_t)-1) {
 		__hybrid_atomic_store(self->@sl_rdwait@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExpr_except(&self->@sl_rdwait@, self,
-		                      __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@,
-		                      abs_timeout,
-		                      @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@ |
-		                      @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@) < 0)
+		if (LFutexExprI_except(&self->@sl_rdwait@, self,
+		                       __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@,
+		                       abs_timeout,
+		                       @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@ |
+		                       @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@) < 0)
 			return false;
 	}
 @@pp_endif@@
@@ -570,7 +574,7 @@ success:
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_rwlock_waitwrite_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_rwlock_waitwrite_with_timeout64")]]
-[[requires(defined(__KERNEL__) || $has_function(LFutexExpr_except))]]
+[[requires(defined(__KERNEL__) || $has_function(LFutexExprI_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_PREFIX)]]
 $bool shared_rwlock_waitwrite_with_timeout([[nonnull]] struct shared_rwlock *__restrict self,
                                        __shared_rwlock_timespec abs_timeout) {
@@ -593,11 +597,11 @@ success:
 @@pp_else@@
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->@sl_wrwait@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExpr_except(&self->@sl_wrwait@, self,
-		                      __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@,
-		                      abs_timeout,
-		                      @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@ |
-		                      @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@) < 0)
+		if (LFutexExprI_except(&self->@sl_wrwait@, self,
+		                       __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@,
+		                       abs_timeout,
+		                       @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@ |
+		                       @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@) < 0)
 			return false;
 	}
 @@pp_endif@@
@@ -614,15 +618,15 @@ success:
 [[preferred_time64_variant_of(shared_rwlock_read_with_timeout), doc_alias("shared_rwlock_read_with_timeout")]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>", "<bits/os/timespec.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[requires($has_function(LFutexExpr64_except))]]
+[[requires($has_function(LFutexExprI64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_READ_USER_PREFIX)]]
 $bool shared_rwlock_read_with_timeout64([[nonnull]] struct shared_rwlock *__restrict self,
                                         struct timespec64 const *abs_timeout) {
 	while (!shared_rwlock_tryread(self)) {
 		__hybrid_atomic_store(self->@sl_rdwait@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExpr64_except(&self->@sl_rdwait@, self,
-		                        __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@,
-		                        abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
+		if (LFutexExprI64_except(&self->@sl_rdwait@, self,
+		                         __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@,
+		                         abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
 			return false;
 	}
 	COMPILER_READ_BARRIER();
@@ -632,15 +636,15 @@ $bool shared_rwlock_read_with_timeout64([[nonnull]] struct shared_rwlock *__rest
 [[preferred_time64_variant_of(shared_rwlock_write_with_timeout), doc_alias("shared_rwlock_write_with_timeout")]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>", "<bits/os/timespec.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[requires($has_function(LFutexExpr64_except))]]
+[[requires($has_function(LFutexExprI64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_USER_PREFIX)]]
 $bool shared_rwlock_write_with_timeout64([[nonnull]] struct shared_rwlock *__restrict self,
                                          struct timespec64 const *abs_timeout) {
 	while (!shared_rwlock_trywrite(self)) {
 		__hybrid_atomic_store(self->@sl_wrwait@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExpr64_except(&self->@sl_wrwait@, self,
-		                        __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@,
-		                        abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
+		if (LFutexExprI64_except(&self->@sl_wrwait@, self,
+		                         __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@,
+		                         abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
 			return false;
 	}
 	COMPILER_BARRIER();
@@ -650,17 +654,17 @@ $bool shared_rwlock_write_with_timeout64([[nonnull]] struct shared_rwlock *__res
 [[preferred_time64_variant_of(shared_rwlock_waitread_with_timeout), doc_alias("shared_rwlock_waitread_with_timeout")]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>", "<bits/os/timespec.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[requires($has_function(LFutexExpr64_except))]]
+[[requires($has_function(LFutexExprI64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_READ_USER_PREFIX)]]
 $bool shared_rwlock_waitread_with_timeout64([[nonnull]] struct shared_rwlock *__restrict self,
                                         struct timespec64 const *abs_timeout) {
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == ($uintptr_t)-1) {
 		__hybrid_atomic_store(self->@sl_rdwait@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExpr64_except(&self->@sl_rdwait@, self,
-		                        __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@,
-		                        abs_timeout,
-		                        @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@ |
-		                        @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@) < 0)
+		if (LFutexExprI64_except(&self->@sl_rdwait@, self,
+		                         __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitreadexpr@,
+		                         abs_timeout,
+		                         @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@ |
+		                         @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@) < 0)
 			return false;
 	}
 	COMPILER_READ_BARRIER();
@@ -670,17 +674,17 @@ $bool shared_rwlock_waitread_with_timeout64([[nonnull]] struct shared_rwlock *__
 [[preferred_time64_variant_of(shared_rwlock_waitwrite_with_timeout), doc_alias("shared_rwlock_waitwrite_with_timeout")]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>", "<bits/os/timespec.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[requires($has_function(LFutexExpr64_except))]]
+[[requires($has_function(LFutexExprI64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_USER_PREFIX)]]
 $bool shared_rwlock_waitwrite_with_timeout64([[nonnull]] struct shared_rwlock *__restrict self,
                                          struct timespec64 const *abs_timeout) {
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->@sl_wrwait@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExpr64_except(&self->@sl_wrwait@, self,
-		                        __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@,
-		                        abs_timeout,
-		                        @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@ |
-		                        @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@) < 0)
+		if (LFutexExprI64_except(&self->@sl_wrwait@, self,
+		                         __NAMESPACE_LOCAL_SYM @__shared_rwlock_waitwriteexpr@,
+		                         abs_timeout,
+		                         @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@ |
+		                         @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@) < 0)
 			return false;
 	}
 	COMPILER_BARRIER();

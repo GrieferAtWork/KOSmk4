@@ -224,7 +224,7 @@ userexcept_callsignal_and_maybe_restart_syscall(struct icpustate *__restrict sta
 
 		if (!should_restart) {
 			struct exception_data error;
-			/* Made modifications to `state' that will make it look like the
+			/* Make modifications to `state' that will make it look like the
 			 * interrupted  system call returned  with `-EINTR', or returned
 			 * to  user-space by calling the user-defined exception handler. */
 			bzero(&error, sizeof(error));

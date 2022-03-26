@@ -30,8 +30,8 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_lfutexexpr,hash:CRC-32=0xaedd29a0]]]*/
-/* >> lfutexexpr(2)
+/*[[[head:libc_lfutexexpr,hash:CRC-32=0xef2e1f31]]]*/
+/* >> lfutexexpr(2), lfutexexpr64(2)
  * The lfutexexpr(2) system call can be used to specify arbitrarily complex
  * expressions that must atomically (in relation to other futex operations)
  * hold true before the scheduler will suspend the calling thread.
@@ -76,11 +76,11 @@ NOTHROW_RPC(LIBCCALL libc_lfutexexpr)(lfutex_t *ulockaddr,
 }
 /*[[[end:libc_lfutexexpr]]]*/
 
-/*[[[head:libc_lfutexexpr64,hash:CRC-32=0x18e63f97]]]*/
+/*[[[head:libc_lfutexexpr64,hash:CRC-32=0x1dcff623]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_lfutexexpr64, libc_lfutexexpr);
 #else /* MAGIC:alias */
-/* >> lfutexexpr(2)
+/* >> lfutexexpr(2), lfutexexpr64(2)
  * The lfutexexpr(2) system call can be used to specify arbitrarily complex
  * expressions that must atomically (in relation to other futex operations)
  * hold true before the scheduler will suspend the calling thread.
