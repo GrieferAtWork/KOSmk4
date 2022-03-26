@@ -26,6 +26,7 @@
 #include <hybrid/atomic.h>
 
 #include <kos/futex.h>
+#include <kos/futexexpr.h>
 #include <kos/syscalls.h>
 #include <sys/mman.h>
 #include <sys/time.h>
@@ -52,35 +53,37 @@ DECL_BEGIN
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
-#if SEM_VALUE_MAX == INT8_MAX
-#define SEM_COUNT_MASK   UINT8_C(0x7f)
-#define SEM_WAITERS_FLAG UINT8_C(0x80)
-#elif SEM_VALUE_MAX == INT16_MAX
-#define SEM_COUNT_MASK   UINT16_C(0x7fff)
-#define SEM_WAITERS_FLAG UINT16_C(0x8000)
-#elif SEM_VALUE_MAX == INT32_MAX
-#define SEM_COUNT_MASK   UINT32_C(0x7fffffff)
-#define SEM_WAITERS_FLAG UINT32_C(0x80000000)
-#elif SEM_VALUE_MAX == INT64_MAX
-#define SEM_COUNT_MASK   UINT64_C(0x7fffffffffffffff)
-#define SEM_WAITERS_FLAG UINT64_C(0x8000000000000000)
+#if SEM_VALUE_MAX <= INT8_MAX
+#define SEM_COUNT_SIZE 1
+#define SEM_COUNT_MASK UINT8_C(0xff)
+#elif SEM_VALUE_MAX <= INT16_MAX
+#define SEM_COUNT_SIZE 2
+#define SEM_COUNT_MASK UINT16_C(0xffff)
+#elif SEM_VALUE_MAX <= INT32_MAX
+#define SEM_COUNT_SIZE 4
+#define SEM_COUNT_MASK UINT32_C(0xffffffff)
+#elif SEM_VALUE_MAX <= INT64_MAX
+#define SEM_COUNT_SIZE 8
+#define SEM_COUNT_MASK UINT64_C(0xffffffffffffffff)
 #else /* SEM_VALUE_MAX == ... */
 #error "Unsupported `SEM_VALUE_MAX'"
 #endif /* SEM_VALUE_MAX != ... */
 
-/* <=, because `__SIZEOF_SEM_T' is the public ABI buffer size, while,
- * us being libc,  sizeof(sem_t) is the  actually used/needed  buffer
- * size, meaning that libc users  are allowed to provide more  buffer
- * space than we actually need. */
-STATIC_ASSERT(sizeof(sem_t) <= __SIZEOF_SEM_T);
+typedef typeof(((sem_t *)0)->s_count) sem_count_t;
+
+/* Ensure that `sem_t' has the correct size. */
+STATIC_ASSERT(sizeof(sem_t) == __SIZEOF_SEM_T);
+
+/* Ensure that `sem_t's counter value has the correct width. */
+STATIC_ASSERT(sizeof(sem_count_t) == SEM_COUNT_SIZE);
 
 
 
-/*[[[head:libc_sem_init,hash:CRC-32=0x9df0c86f]]]*/
+/*[[[head:libc_sem_init,hash:CRC-32=0x26b9528f]]]*/
 /* >> sem_init(3)
- * Initialize the given semaphore `sem' to start out with `value' tickets
- * @param: sem:     The semaphore to initialize
- * @param: pshared: When  non-zero, `sem'  may point  to a  memory region shared
+ * Initialize the given semaphore `self' to start out with `value' tickets
+ * @param: self:     The semaphore to initialize
+ * @param: pshared: When non-zero, `self'  may point to  a memory region  shared
  *                  with another process, such that both caller, and any process
  *                  the pointed-to memory is shared  with can safely operate  on
  *                  the same semaphore.
@@ -91,7 +94,7 @@ STATIC_ASSERT(sizeof(sem_t) <= __SIZEOF_SEM_T);
  * @return: -1:     [errno=ENOSYS] `pshared != 0', but inter-process semaphores aren't supported
  *                  HINT: Never returned `#ifdef __ARCH_HAVE_INTERPROCESS_SEMAPHORES' */
 INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_sem_init)(sem_t *sem,
+NOTHROW_NCX(LIBCCALL libc_sem_init)(sem_t *self,
                                     int pshared,
                                     unsigned int value)
 /*[[[body:libc_sem_init]]]*/
@@ -101,24 +104,34 @@ NOTHROW_NCX(LIBCCALL libc_sem_init)(sem_t *sem,
 	if unlikely(value > SEM_COUNT_MASK)
 		return libc_seterrno(EINVAL);
 #endif /* UINT_MAX > SEM_COUNT_MASK */
-	DBG_memset(sem, 0xcc, __SIZEOF_SEM_T);
-	sem->s_count = value;
+	bzero(self, sizeof(sem_t));
+	self->s_count = value;
 	return 0;
 }
 /*[[[end:libc_sem_init]]]*/
 
-/*[[[head:libc_sem_destroy,hash:CRC-32=0x42732111]]]*/
+/*[[[head:libc_sem_destroy,hash:CRC-32=0x25f68fb9]]]*/
 /* >> sem_destroy(3)
  * Destroy a semaphore previously initialized by `sem_init(3)'
  * @return: 0: Success */
 INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_sem_destroy)(sem_t *sem)
+NOTHROW_NCX(LIBCCALL libc_sem_destroy)(sem_t *self)
 /*[[[body:libc_sem_destroy]]]*/
 {
+	/* From `man 3 sem_destroy'
+	 *    """
+	 *    Destroying a semaphore that other processes or threads are
+	 *    currently blocked on  (in sem_wait(3)) produces  undefined
+	 *    behavior.
+	 *    """
+	 * In  other words: we don't have to  do a broadcast to wake up
+	 * all of the remaining threads. -- It's good enough if we just
+	 * leave everything as-is. */
+
 	COMPILER_IMPURE();
-	(void)sem;
+	(void)self;
 	/* Nothing to do here... */
-	DBG_memset(sem, 0xcc, __SIZEOF_SEM_T);
+	DBG_memset(self, 0xcc, sizeof(sem_t));
 	return 0;
 }
 /*[[[end:libc_sem_destroy]]]*/
@@ -165,12 +178,12 @@ NOTHROW_RPC_KOS(VLIBCCALL libc_sem_open)(char const *name,
 	va_list args;
 	mode_t mode;
 	sem_t *result;
-	unsigned int value;
+	sem_count_t value;
 	while (*name == '/')
 		++name;
 	va_start(args, oflags);
 	mode  = va_arg(args, mode_t);
-	value = va_arg(args, unsigned int);
+	value = (sem_count_t)va_arg(args, unsigned int);
 	va_end(args);
 	name_length = strlen(name);
 	if unlikely(!name_length || (oflags & (O_CREAT | O_EXCL)) != 0) {
@@ -300,17 +313,17 @@ err:
 }
 /*[[[end:libc_sem_open]]]*/
 
-/*[[[head:libc_sem_close,hash:CRC-32=0x41ee39f3]]]*/
+/*[[[head:libc_sem_close,hash:CRC-32=0x6bf191f5]]]*/
 /* >> sem_close(3)
  * Close a semaphore previously returned by `sem_open(3)'. But note the case
  * of opening the same semaphore more than once within the same process,  as
  * described by in `sem_open(3)' and by `__ARCH_HAVE_NON_UNIQUE_SEM_OPEN'->
  * @return: 0: Success */
 INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_sem_close)(sem_t *sem)
+NOTHROW_NCX(LIBCCALL libc_sem_close)(sem_t *self)
 /*[[[body:libc_sem_close]]]*/
 {
-	return munmap(sem, sizeof(sem_t));
+	return munmap(self, sizeof(sem_t));
 }
 /*[[[end:libc_sem_close]]]*/
 
@@ -351,37 +364,49 @@ err:
 }
 /*[[[end:libc_sem_unlink]]]*/
 
-/*[[[head:libc_sem_wait,hash:CRC-32=0x725db4a0]]]*/
+
+/* Futex wait expression: wait while `self->s_count == 0' */
+PRIVATE ATTR_SECTION(".rodata.crt.sched.semaphore")
+struct lfutexexpr const sem_waitexpr[] = {
+#if SEM_COUNT_SIZE >= __SIZEOF_POINTER__
+	LFUTEXEXPR_INIT(offsetof(sem_t, s_count), LFUTEX_WAIT_WHILE, 0, 0),
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	LFUTEXEXPR_INIT(offsetof(sem_t, s_count), LFUTEX_WAIT_WHILE_BITMASK, SEM_COUNT_MASK, 0),
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	LFUTEXEXPR_INIT(offsetof(sem_t, s_count) + __SIZEOF_POINTER__ - SEM_COUNT_SIZE,
+	                LFUTEX_WAIT_WHILE_BITMASK, SEM_COUNT_MASK, 0),
+#else /* ... */
+#error "Unsupported configuration"
+#endif /* !... */
+	LFUTEXEXPR_INIT(0, LFUTEX_EXPREND, 0, 0)
+};
+
+/*[[[head:libc_sem_wait,hash:CRC-32=0xfd20df8b]]]*/
 /* >> sem_wait(3)
- * Wait  for a ticket  to become available to  the given semaphore `sem'
+ * Wait for a ticket to become  available to the given semaphore  `self'
  * Once a ticket has become available, consume it and return. Until that
  * point in time, keep on blocking.
  * @return: 0:  Success
  * @return: -1: [errno=EINTR] Interrupted. */
 INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1)) int
-NOTHROW_RPC(LIBCCALL libc_sem_wait)(sem_t *sem)
+NOTHROW_RPC(LIBCCALL libc_sem_wait)(sem_t *self)
 /*[[[body:libc_sem_wait]]]*/
 {
 	for (;;) {
 		int error;
-		lfutex_t oldval;
-		oldval = ATOMIC_READ(sem->s_count);
-		if (oldval & SEM_COUNT_MASK) {
-			if (!ATOMIC_CMPXCH_WEAK(sem->s_count, oldval, oldval - 1))
-				continue;
-			return 0; /* Success! */
+		sem_count_t count;
+		count = ATOMIC_READ(self->s_count);
+		if (count != 0) {
+			if (ATOMIC_CMPXCH_WEAK(self->s_count, count, count - 1))
+				return 0; /* Success! */
+			continue;
 		}
+
 		/* Set the is-waiting bit the first time around. */
-		if (!(oldval & SEM_WAITERS_FLAG)) {
-			if (!ATOMIC_CMPXCH_WEAK(sem->s_count,
-			                        oldval,
-			                        oldval | SEM_WAITERS_FLAG))
-				continue;
-		}
-		/* Wait until `SEM_COUNT_MASK' becomes non-zero. */
-		error = futex_waitwhile_exactbits(&sem->s_count,
-		                                  SEM_COUNT_MASK,
-		                                  0);
+		ATOMIC_STORE(self->s_wait, 1);
+
+		/* Wait until `self->s_count' becomes non-zero. */
+		error = lfutexexpr(&self->s_wait, self, sem_waitexpr, NULL, 0);
 		if (error < 0)
 			return error;
 	}
@@ -389,41 +414,35 @@ NOTHROW_RPC(LIBCCALL libc_sem_wait)(sem_t *sem)
 }
 /*[[[end:libc_sem_wait]]]*/
 
-/*[[[head:libc_sem_timedwait,hash:CRC-32=0xc28b06c9]]]*/
+/*[[[head:libc_sem_timedwait,hash:CRC-32=0xdc859447]]]*/
 /* >> sem_timedwait(3), sem_timedwait64(3)
- * Wait for a  ticket to  become available  to the  given semaphore  `sem'
+ * Wait  for a  ticket to become  available to the  given semaphore `self'
  * Once a ticket has become available, consume it and return. If no ticket
  * becomes  available until `abstime' has passed, return `errno=ETIMEDOUT'
  * @return: 0:  Success
  * @return: -1: [errno=EINTR]     Interrupted.
  * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
 INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1, 2)) int
-NOTHROW_RPC(LIBCCALL libc_sem_timedwait)(sem_t *__restrict sem,
+NOTHROW_RPC(LIBCCALL libc_sem_timedwait)(sem_t *__restrict self,
                                          struct timespec const *__restrict abstime)
 /*[[[body:libc_sem_timedwait]]]*/
 {
 	for (;;) {
 		int error;
-		lfutex_t oldval;
-		oldval = ATOMIC_READ(sem->s_count);
-		if (oldval & SEM_COUNT_MASK) {
-			if (!ATOMIC_CMPXCH_WEAK(sem->s_count, oldval, oldval - 1))
-				continue;
-			return 0; /* Success! */
+		sem_count_t count;
+		count = ATOMIC_READ(self->s_count);
+		if (count != 0) {
+			if (ATOMIC_CMPXCH_WEAK(self->s_count, count, count - 1))
+				return 0; /* Success! */
+			continue;
 		}
+
 		/* Set the is-waiting bit the first time around. */
-		if (!(oldval & SEM_WAITERS_FLAG)) {
-			if (!ATOMIC_CMPXCH_WEAK(sem->s_count,
-			                        oldval,
-			                        oldval | SEM_WAITERS_FLAG))
-				continue;
-		}
-		/* Wait until `SEM_COUNT_MASK' becomes non-zero. */
-		error = lfutex(&sem->s_count,
-		               LFUTEX_WAIT_WHILE_BITMASK |
-		               LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME,
-		               (lfutex_t)SEM_COUNT_MASK,
-		               abstime, (lfutex_t)0);
+		ATOMIC_STORE(self->s_wait, 1);
+
+		/* Wait until `self->s_count' becomes non-zero. */
+		error = lfutexexpr(&self->s_wait, self, sem_waitexpr, abstime,
+		                   LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE);
 		if (error < 0)
 			return error;
 	}
@@ -431,44 +450,38 @@ NOTHROW_RPC(LIBCCALL libc_sem_timedwait)(sem_t *__restrict sem,
 }
 /*[[[end:libc_sem_timedwait]]]*/
 
-/*[[[head:libc_sem_timedwait64,hash:CRC-32=0xfc8ce2f]]]*/
+/*[[[head:libc_sem_timedwait64,hash:CRC-32=0xd3a7fde0]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_sem_timedwait64, libc_sem_timedwait);
 #else /* MAGIC:alias */
 /* >> sem_timedwait(3), sem_timedwait64(3)
- * Wait for a  ticket to  become available  to the  given semaphore  `sem'
+ * Wait  for a  ticket to become  available to the  given semaphore `self'
  * Once a ticket has become available, consume it and return. If no ticket
  * becomes  available until `abstime' has passed, return `errno=ETIMEDOUT'
  * @return: 0:  Success
  * @return: -1: [errno=EINTR]     Interrupted.
  * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
 INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1, 2)) int
-NOTHROW_RPC(LIBCCALL libc_sem_timedwait64)(sem_t *__restrict sem,
+NOTHROW_RPC(LIBCCALL libc_sem_timedwait64)(sem_t *__restrict self,
                                            struct timespec64 const *__restrict abstime)
 /*[[[body:libc_sem_timedwait64]]]*/
 {
 	for (;;) {
 		int error;
-		lfutex_t oldval;
-		oldval = ATOMIC_READ(sem->s_count);
-		if (oldval & SEM_COUNT_MASK) {
-			if (!ATOMIC_CMPXCH_WEAK(sem->s_count, oldval, oldval - 1))
-				continue;
-			return 0; /* Success! */
+		sem_count_t count;
+		count = ATOMIC_READ(self->s_count);
+		if (count != 0) {
+			if (ATOMIC_CMPXCH_WEAK(self->s_count, count, count - 1))
+				return 0; /* Success! */
+			continue;
 		}
+
 		/* Set the is-waiting bit the first time around. */
-		if (!(oldval & SEM_WAITERS_FLAG)) {
-			if (!ATOMIC_CMPXCH_WEAK(sem->s_count,
-			                        oldval,
-			                        oldval | SEM_WAITERS_FLAG))
-				continue;
-		}
-		/* Wait until `SEM_COUNT_MASK' becomes non-zero. */
-		error = lfutex64(&sem->s_count,
-		                 LFUTEX_WAIT_WHILE_BITMASK |
-		                 LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME,
-		                 (lfutex_t)SEM_COUNT_MASK,
-		                 abstime, (lfutex_t)0);
+		ATOMIC_STORE(self->s_wait, 1);
+
+		/* Wait until `self->s_count' becomes non-zero. */
+		error = lfutexexpr64(&self->s_wait, self, sem_waitexpr, abstime,
+		                     LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE);
 		if (error < 0)
 			return error;
 	}
@@ -477,73 +490,64 @@ NOTHROW_RPC(LIBCCALL libc_sem_timedwait64)(sem_t *__restrict sem,
 #endif /* MAGIC:alias */
 /*[[[end:libc_sem_timedwait64]]]*/
 
-/*[[[head:libc_sem_trywait,hash:CRC-32=0x3007d222]]]*/
+/*[[[head:libc_sem_trywait,hash:CRC-32=0xc153f2ba]]]*/
 /* >> sem_trywait(3)
- * Atomically check if at least 1 ticket is available for `sem', and consume
- * one if this is the case, or return with `errno=EAGAIN' if no tickets were
+ * Atomically check if at least 1 ticket is available for `self', and consume
+ * one  if this is the case, or return with `errno=EAGAIN' if no tickets were
  * available at the time of the call.
  * @return: 0:  Success
  * @return: -1: [errno=EAGAIN] A ticket could not be acquired without blocking. */
 INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_sem_trywait)(sem_t *sem)
+NOTHROW_NCX(LIBCCALL libc_sem_trywait)(sem_t *self)
 /*[[[body:libc_sem_trywait]]]*/
 {
-	lfutex_t oldval;
-again:
-	oldval = ATOMIC_READ(sem->s_count);
-	if (oldval & SEM_COUNT_MASK) {
-		if (!ATOMIC_CMPXCH_WEAK(sem->s_count, oldval, oldval - 1))
-			goto again;
-		return 0; /* Success! */
+	for (;;) {
+		sem_count_t count;
+		count = ATOMIC_READ(self->s_count);
+		if (count == 0)
+			break;
+		if (ATOMIC_CMPXCH_WEAK(self->s_count, count, count - 1))
+			return 0; /* Success! */
 	}
+
 	/* No tickets available... */
-	libc_seterrno(EAGAIN);
-	return -1;
+	return libc_seterrno(EAGAIN);
 }
 /*[[[end:libc_sem_trywait]]]*/
 
-/*[[[head:libc_sem_post,hash:CRC-32=0x6fdea9c3]]]*/
+/*[[[head:libc_sem_post,hash:CRC-32=0xfe5d22dc]]]*/
 /* >> sem_post(3)
- * Post a ticket to the given semaphore `sem', waking up to 1 other thread
- * that may be waiting for  tickets to become available before  returning.
+ * Post a ticket to the given semaphore `self', waking up to 1 other thread
+ * that  may be waiting  for tickets to  become available before returning.
  * @return: 0:  Success
  * @return: -1: [errno=EOVERFLOW] The maximum number of tickets have already been posted. */
 INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_sem_post)(sem_t *sem)
+NOTHROW_NCX(LIBCCALL libc_sem_post)(sem_t *self)
 /*[[[body:libc_sem_post]]]*/
 {
-	lfutex_t oldval;
+	sem_count_t count;
 	do {
-		oldval = ATOMIC_READ(sem->s_count);
-		if unlikely((oldval & SEM_COUNT_MASK) == SEM_VALUE_MAX)
+		count = ATOMIC_READ(self->s_count);
+		if unlikely(count >= SEM_VALUE_MAX)
 			return libc_seterrno(EOVERFLOW);
-	} while (!ATOMIC_CMPXCH_WEAK(sem->s_count,
-	                             oldval,
-	                             oldval + 1));
+	} while (!ATOMIC_CMPXCH_WEAK(self->s_count, count, count + 1));
 	/* If there are waiting threads, wake one of them. */
-	if (oldval & SEM_WAITERS_FLAG) {
-		/* NOTE: Make use of `LFUTEX_WAKEMASK' to do the equivalent of:
-		 * >> if (!sys_lfutex(&self->s_count, LFUTEX_WAKE, 1, NULL, 0)) {
-		 * >>     ATOMIC_AND(&self->s_count, ~SEM_WAITERS_FLAG);
-		 * >>     sys_lfutex(&self->s_count, LFUTEX_WAKE, (size_t)-1, NULL, 0);
-		 * >> } */
-		sys_lfutex(&sem->s_count, LFUTEX_WAKEMASK, 1,
-		           (struct timespec64 const *)(uintptr_t)~SEM_WAITERS_FLAG, 0);
-	}
+	if (ATOMIC_READ(self->s_wait) != 0)
+		sys_lfutex(&self->s_wait, LFUTEX_WAKEMASK, 1, NULL, 0);
 	return 0;
 }
 /*[[[end:libc_sem_post]]]*/
 
-/*[[[head:libc_sem_getvalue,hash:CRC-32=0xe7b0d8bf]]]*/
+/*[[[head:libc_sem_getvalue,hash:CRC-32=0x57f742af]]]*/
 /* >> sem_getvalue(3)
  * Capture a snapshot of how may tickets are available storing that number in `*sval'
  * @return: 0: Success */
 INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1, 2)) int
-NOTHROW_NCX(LIBCCALL libc_sem_getvalue)(sem_t *__restrict sem,
+NOTHROW_NCX(LIBCCALL libc_sem_getvalue)(sem_t *__restrict self,
                                         __STDC_INT_AS_UINT_T *__restrict sval)
 /*[[[body:libc_sem_getvalue]]]*/
 {
-	*sval = (int)(unsigned int)(ATOMIC_READ(sem->s_count) & SEM_COUNT_MASK);
+	*sval = (__STDC_INT_AS_UINT_T)(unsigned int)ATOMIC_READ(self->s_count);
 	return 0;
 }
 /*[[[end:libc_sem_getvalue]]]*/

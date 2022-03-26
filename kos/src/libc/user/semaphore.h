@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8999aa2 */
+/* HASH CRC-32:0x21104de */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,9 +32,9 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 /* >> sem_init(3)
- * Initialize the given semaphore `sem' to start out with `value' tickets
- * @param: sem:     The semaphore to initialize
- * @param: pshared: When  non-zero, `sem'  may point  to a  memory region shared
+ * Initialize the given semaphore `self' to start out with `value' tickets
+ * @param: self:     The semaphore to initialize
+ * @param: pshared: When non-zero, `self'  may point to  a memory region  shared
  *                  with another process, such that both caller, and any process
  *                  the pointed-to memory is shared  with can safely operate  on
  *                  the same semaphore.
@@ -44,11 +44,11 @@ DECL_BEGIN
  *                  HINT: Never returned `#if SEM_VALUE_MAX >= UINT_MAX'
  * @return: -1:     [errno=ENOSYS] `pshared != 0', but inter-process semaphores aren't supported
  *                  HINT: Never returned `#ifdef __ARCH_HAVE_INTERPROCESS_SEMAPHORES' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_init)(sem_t *sem, int pshared, unsigned int value);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_init)(sem_t *self, int pshared, unsigned int value);
 /* >> sem_destroy(3)
  * Destroy a semaphore previously initialized by `sem_init(3)'
  * @return: 0: Success */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_destroy)(sem_t *sem);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_destroy)(sem_t *self);
 /* >> sem_open(3)
  * Open a named semaphore `name', which must be string that starts with `/'
  * NOTE: When called multiple times with identical strings for  `name',
@@ -74,7 +74,7 @@ INTDEF NONNULL((1)) sem_t *NOTHROW_RPC_KOS(VLIBCCALL libc_sem_open)(char const *
  * of opening the same semaphore more than once within the same process,  as
  * described by in `sem_open(3)' and by `__ARCH_HAVE_NON_UNIQUE_SEM_OPEN'->
  * @return: 0: Success */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_close)(sem_t *sem);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_close)(sem_t *self);
 /* >> sem_unlink(3)
  * Unlink (delete) a named semaphore `name' that was
  * previously  created  by `sem_open(name, O_CREAT)'
@@ -83,45 +83,45 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_close)(sem_t *sem);
  * @return: -1: Error (s.a. `errno') */
 INTDEF NONNULL((1)) int NOTHROW_RPC_KOS(LIBCCALL libc_sem_unlink)(const char *name);
 /* >> sem_wait(3)
- * Wait  for a ticket  to become available to  the given semaphore `sem'
+ * Wait for a ticket to become  available to the given semaphore  `self'
  * Once a ticket has become available, consume it and return. Until that
  * point in time, keep on blocking.
  * @return: 0:  Success
  * @return: -1: [errno=EINTR] Interrupted. */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_sem_wait)(sem_t *sem);
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_sem_wait)(sem_t *self);
 /* >> sem_timedwait(3), sem_timedwait64(3)
- * Wait for a  ticket to  become available  to the  given semaphore  `sem'
+ * Wait  for a  ticket to become  available to the  given semaphore `self'
  * Once a ticket has become available, consume it and return. If no ticket
  * becomes  available until `abstime' has passed, return `errno=ETIMEDOUT'
  * @return: 0:  Success
  * @return: -1: [errno=EINTR]     Interrupted.
  * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_sem_timedwait)(sem_t *__restrict sem, struct timespec const *__restrict abstime);
+INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_sem_timedwait)(sem_t *__restrict self, struct timespec const *__restrict abstime);
 /* >> sem_timedwait(3), sem_timedwait64(3)
- * Wait for a  ticket to  become available  to the  given semaphore  `sem'
+ * Wait  for a  ticket to become  available to the  given semaphore `self'
  * Once a ticket has become available, consume it and return. If no ticket
  * becomes  available until `abstime' has passed, return `errno=ETIMEDOUT'
  * @return: 0:  Success
  * @return: -1: [errno=EINTR]     Interrupted.
  * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_sem_timedwait64)(sem_t *__restrict sem, struct timespec64 const *__restrict abstime);
+INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_sem_timedwait64)(sem_t *__restrict self, struct timespec64 const *__restrict abstime);
 /* >> sem_trywait(3)
- * Atomically check if at least 1 ticket is available for `sem', and consume
- * one if this is the case, or return with `errno=EAGAIN' if no tickets were
+ * Atomically check if at least 1 ticket is available for `self', and consume
+ * one  if this is the case, or return with `errno=EAGAIN' if no tickets were
  * available at the time of the call.
  * @return: 0:  Success
  * @return: -1: [errno=EAGAIN] A ticket could not be acquired without blocking. */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_trywait)(sem_t *sem);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_trywait)(sem_t *self);
 /* >> sem_post(3)
- * Post a ticket to the given semaphore `sem', waking up to 1 other thread
- * that may be waiting for  tickets to become available before  returning.
+ * Post a ticket to the given semaphore `self', waking up to 1 other thread
+ * that  may be waiting  for tickets to  become available before returning.
  * @return: 0:  Success
  * @return: -1: [errno=EOVERFLOW] The maximum number of tickets have already been posted. */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_post)(sem_t *sem);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_post)(sem_t *self);
 /* >> sem_getvalue(3)
  * Capture a snapshot of how may tickets are available storing that number in `*sval'
  * @return: 0: Success */
-INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_sem_getvalue)(sem_t *__restrict sem, __STDC_INT_AS_UINT_T *__restrict sval);
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_sem_getvalue)(sem_t *__restrict self, __STDC_INT_AS_UINT_T *__restrict sval);
 #endif /* !__KERNEL__ */
 
 DECL_END

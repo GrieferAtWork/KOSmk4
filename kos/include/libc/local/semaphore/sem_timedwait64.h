@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66c4adac */
+/* HASH CRC-32:0x845ecb33 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,14 +27,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sem_timedwait32_defined
 #define __local___localdep_sem_timedwait32_defined
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_sem_timedwait32,(__sem_t *__restrict __sem, struct __timespec32 const *__restrict __abstime),sem_timedwait,(__sem,__abstime))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_sem_timedwait32,(__sem_t *__restrict __self, struct __timespec32 const *__restrict __abstime),sem_timedwait,(__self,__abstime))
 #endif /* !__local___localdep_sem_timedwait32_defined */
 __LOCAL_LIBC(sem_timedwait64) __ATTR_NONNULL((1, 2)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sem_timedwait64))(__sem_t *__restrict __sem, struct __timespec64 const *__restrict __abstime) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sem_timedwait64))(__sem_t *__restrict __self, struct __timespec64 const *__restrict __abstime) {
 	struct __timespec32 __ts32;
 	__ts32.tv_sec  = (__time32_t)__abstime->tv_sec;
 	__ts32.tv_nsec = __abstime->tv_nsec;
-	return (__NAMESPACE_LOCAL_SYM __localdep_sem_timedwait32)(__sem, &__ts32);
+	return (__NAMESPACE_LOCAL_SYM __localdep_sem_timedwait32)(__self, &__ts32);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sem_timedwait64_defined

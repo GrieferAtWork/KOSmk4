@@ -68,9 +68,9 @@ typedef __sem_t sem_t;
 }
 
 @@>> sem_init(3)
-@@Initialize the given semaphore `sem' to start out with `value' tickets
-@@@param: sem:     The semaphore to initialize
-@@@param: pshared: When  non-zero, `sem'  may point  to a  memory region shared
+@@Initialize the given semaphore `self' to start out with `value' tickets
+@@@param: self:     The semaphore to initialize
+@@@param: pshared: When non-zero, `self'  may point to  a memory region  shared
 @@                 with another process, such that both caller, and any process
 @@                 the pointed-to memory is shared  with can safely operate  on
 @@                 the same semaphore.
@@ -81,13 +81,13 @@ typedef __sem_t sem_t;
 @@@return: -1:     [errno=ENOSYS] `pshared != 0', but inter-process semaphores aren't supported
 @@                 HINT: Never returned `#ifdef __ARCH_HAVE_INTERPROCESS_SEMAPHORES'
 [[decl_include("<bits/crt/semaphore.h>")]]
-int sem_init([[nonnull]] sem_t *sem, int pshared, unsigned int value);
+int sem_init([[nonnull]] sem_t *self, int pshared, unsigned int value);
 
 @@>> sem_destroy(3)
 @@Destroy a semaphore previously initialized by `sem_init(3)'
 @@@return: 0: Success
 [[decl_include("<bits/crt/semaphore.h>")]]
-int sem_destroy([[nonnull]] sem_t *sem);
+int sem_destroy([[nonnull]] sem_t *self);
 
 @@>> sem_open(3)
 @@Open a named semaphore `name', which must be string that starts with `/'
@@ -119,7 +119,7 @@ sem_t *sem_open([[nonnull]] char const *name, $oflag_t oflags,
 @@described by in `sem_open(3)' and by `__ARCH_HAVE_NON_UNIQUE_SEM_OPEN'->
 @@@return: 0: Success
 [[decl_include("<bits/crt/semaphore.h>")]]
-int sem_close([[nonnull]] sem_t *sem);
+int sem_close([[nonnull]] sem_t *self);
 
 @@>> sem_unlink(3)
 @@Unlink (delete) a named semaphore `name' that was
@@ -132,24 +132,24 @@ int sem_unlink([[nonnull]] const char *name);
 
 
 @@>> sem_wait(3)
-@@Wait  for a ticket  to become available to  the given semaphore `sem'
+@@Wait for a ticket to become  available to the given semaphore  `self'
 @@Once a ticket has become available, consume it and return. Until that
 @@point in time, keep on blocking.
 @@@return: 0:  Success
 @@@return: -1: [errno=EINTR] Interrupted.
 [[cp, decl_include("<bits/crt/semaphore.h>")]]
-int sem_wait([[nonnull]] sem_t *sem);
+int sem_wait([[nonnull]] sem_t *self);
 
 [[cp, doc_alias("sem_timedwait"), ignore, nocrt, alias("sem_timedwait")]]
 [[decl_include("<bits/crt/semaphore.h>", "<bits/os/timespec.h>")]]
-int sem_timedwait32([[nonnull]] sem_t *__restrict sem,
+int sem_timedwait32([[nonnull]] sem_t *__restrict self,
                     [[nonnull]] struct $timespec32 const *__restrict abstime);
 
 
 %
 %#ifdef __USE_XOPEN2K
 @@>> sem_timedwait(3), sem_timedwait64(3)
-@@Wait for a  ticket to  become available  to the  given semaphore  `sem'
+@@Wait  for a  ticket to become  available to the  given semaphore `self'
 @@Once a ticket has become available, consume it and return. If no ticket
 @@becomes  available until `abstime' has passed, return `errno=ETIMEDOUT'
 @@@return: 0:  Success
@@ -159,18 +159,18 @@ int sem_timedwait32([[nonnull]] sem_t *__restrict sem,
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sem_timedwait")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sem_timedwait64")]]
 [[userimpl, requires($has_function(sem_timedwait32) || $has_function(sem_timedwait64))]]
-int sem_timedwait([[nonnull]] sem_t *__restrict sem,
+int sem_timedwait([[nonnull]] sem_t *__restrict self,
                   [[nonnull]] struct timespec const *__restrict abstime) {
 @@pp_if $has_function(sem_timedwait32)@@
 	struct timespec32 ts32;
 	ts32.tv_sec = (time32_t)abstime->tv_sec;
 	ts32.tv_nsec = abstime->tv_nsec;
-	return sem_timedwait32(sem, &ts32);
+	return sem_timedwait32(self, &ts32);
 @@pp_else@@
 	struct timespec64 ts64;
 	ts64.tv_sec = (time64_t)abstime->tv_sec;
 	ts64.tv_nsec = abstime->tv_nsec;
-	return sem_timedwait64(sem, &ts64);
+	return sem_timedwait64(self, &ts64);
 @@pp_endif@@
 }
 
@@ -179,38 +179,38 @@ int sem_timedwait([[nonnull]] sem_t *__restrict sem,
 [[cp, decl_include("<bits/crt/semaphore.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(sem_timedwait), doc_alias("sem_timedwait")]]
 [[userimpl, requires_function(sem_timedwait32)]]
-int sem_timedwait64([[nonnull]] sem_t *__restrict sem,
+int sem_timedwait64([[nonnull]] sem_t *__restrict self,
                     [[nonnull]] struct timespec64 const *__restrict abstime) {
 	struct timespec32 ts32;
 	ts32.tv_sec  = (time32_t)abstime->tv_sec;
 	ts32.tv_nsec = abstime->tv_nsec;
-	return sem_timedwait32(sem, &ts32);
+	return sem_timedwait32(self, &ts32);
 }
 %#endif /* __USE_TIME64 */
 %#endif /* __USE_XOPEN2K */
 
 @@>> sem_trywait(3)
-@@Atomically check if at least 1 ticket is available for `sem', and consume
-@@one if this is the case, or return with `errno=EAGAIN' if no tickets were
+@@Atomically check if at least 1 ticket is available for `self', and consume
+@@one  if this is the case, or return with `errno=EAGAIN' if no tickets were
 @@available at the time of the call.
 @@@return: 0:  Success
 @@@return: -1: [errno=EAGAIN] A ticket could not be acquired without blocking.
 [[decl_include("<bits/crt/semaphore.h>")]]
-int sem_trywait([[nonnull]] sem_t *sem);
+int sem_trywait([[nonnull]] sem_t *self);
 
 @@>> sem_post(3)
-@@Post a ticket to the given semaphore `sem', waking up to 1 other thread
-@@that may be waiting for  tickets to become available before  returning.
+@@Post a ticket to the given semaphore `self', waking up to 1 other thread
+@@that  may be waiting  for tickets to  become available before returning.
 @@@return: 0:  Success
 @@@return: -1: [errno=EOVERFLOW] The maximum number of tickets have already been posted.
 [[decl_include("<bits/crt/semaphore.h>")]]
-int sem_post([[nonnull]] sem_t *sem);
+int sem_post([[nonnull]] sem_t *self);
 
 @@>> sem_getvalue(3)
 @@Capture a snapshot of how may tickets are available storing that number in `*sval'
 @@@return: 0: Success
 [[decl_include("<features.h>", "<bits/crt/semaphore.h>")]]
-int sem_getvalue([[nonnull]] sem_t *__restrict sem,
+int sem_getvalue([[nonnull]] sem_t *__restrict self,
                  [[nonnull]] __STDC_INT_AS_UINT_T *__restrict sval);
 
 

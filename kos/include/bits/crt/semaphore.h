@@ -35,23 +35,47 @@
 
 #define __SEM_FAILED 0 /* Returned by `sem_open(3)' upon failure. */
 
-#ifdef __CC__
-__DECL_BEGIN
-
 #undef __USE_PTHREAD_INTERNALS
 #if defined(__KOS__) && (defined(__BUILDING_LIBC) || defined(_LIBC_SOURCE))
 #define __USE_PTHREAD_INTERNALS 1
+#include <hybrid/byteorder.h>
 #endif /* __KOS__ && (__BUILDING_LIBC || _LIBC_SOURCE) */
 
-typedef union {
+#ifdef __CC__
+__DECL_BEGIN
+
 #ifdef __USE_PTHREAD_INTERNALS
 #undef s_count
-	lfutex_t s_count;
+typedef struct {
+
+	/* Semaphore count (read: # of available tickets) */
+#if __SIZEOF_INT__ < 8 && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	__byte_t   __s_cpad[8 - __SIZEOF_INT__];
+#endif /* __SIZEOF_INT__ < 8 && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	unsigned int s_count;
+#if __SIZEOF_INT__ < 8 && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	__byte_t   __s_cpad[8 - __SIZEOF_INT__];
+#endif /* __SIZEOF_INT__ < 8 && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+
+	/* Futex for waiting threads (non-zero if threads are waiting) */
+#if __SIZEOF_POINTER__ < 8 && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	__byte_t   __s_wpad[8 - __SIZEOF_POINTER__];
+#endif /* __SIZEOF_POINTER__ < 8 && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	__uintptr_t  s_wait;
+#if __SIZEOF_POINTER__ < 8 && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	__byte_t   __s_wpad[8 - __SIZEOF_POINTER__];
+#endif /* __SIZEOF_POINTER__ < 8 && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+
+#if __SIZEOF_SEM_T > 16
+	__byte_t   __s_tpad[__SIZEOF_SEM_T - 16];
+#endif /* __SIZEOF_SEM_T > 16 */
+} __sem_t;
 #else /* __USE_PTHREAD_INTERNALS */
+typedef union {
 	__BYTE_TYPE__ __data[__SIZEOF_SEM_T];
 	void         *__align;
-#endif /* !__USE_PTHREAD_INTERNALS */
 } __sem_t;
+#endif /* !__USE_PTHREAD_INTERNALS */
 
 __DECL_END
 #endif /* __CC__ */
