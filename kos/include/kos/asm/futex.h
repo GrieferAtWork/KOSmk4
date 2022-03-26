@@ -23,7 +23,7 @@
 #include <__stdinc.h>
 #include <hybrid/typecore.h>
 
-/* KOS futex  operations (for  use with  the lfutex()  system
+/* KOS futex operations (for use with the `lfutex(2)'  system
  * call, though can't be used with the futex() system call!). */
 #define LFUTEX_WAKE               __UINT32_C(0x00000000) /* >> result = 0; while (val && sig_send(uaddr)) ++result; return result; */
 #define LFUTEX_EXPREND            __UINT32_C(0x00000000) /* Expression terminator for `lfutexexpr(2)' */
@@ -75,15 +75,15 @@
  *   specified expression.
  * - When used with `lfutex(2)', only a singular expression can be specified.
  * - A futexfd object remembers:
- *   - `WEAK REF struct mman *': A weak reference to the of the creating thread
+ *   - `WEAK REF struct mman *': A weak reference to the creating thread's mman
  *   - `REF struct mfutex *':    Then futex object on which to wait
  *   - `exprv':                  Everything relating to the expression being checked.
  *                               Note that a full copy of the caller-given `exprv' is
- *                               taken, meaning  that you  can immediatly  deallocate
+ *                               taken, meaning that  you can immediately  deallocate
  *                               the storage for the exprv of the initial system call
  *                               after it returns!
  *                               s.a. `LFUTEXFD_DEFAULT_MAXEXPR'
- * - Whenever the fd is polled, the mnode->mpart mapped at that address is taken.
+ * - Whenever the fd is polled, the mnode->mpart mapped at that address is tested.
  * - Poll will indicate:
  *   - POLLRDHUP | POLLHUP | POLLPRI:
  *     - The mman has been destroyed

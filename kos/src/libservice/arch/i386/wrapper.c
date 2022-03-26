@@ -4426,8 +4426,8 @@ NOTHROW(FCALL comgen_eh_frame_finish)(struct com_generator *__restrict self) {
 	UNALIGNED_SET((uintptr_t *)&eh_hdr->cef_cie_persoptr, (uintptr_t)(void *)&__gcc_personality_v0);
 	UNALIGNED_SET(&eh_hdr->cef_fde_size, (uint32_t)(size_t)(self->cg_ehptr - (byte_t *)&eh_hdr->cef_fde_size));
 
-	/* After the following write has been done, other threads may _immediatly_
-	 * start to parse our newly generated unwind data, _as_ _well_ _as_ access
+	/* After the following write has been done, other threads may _immediately_
+	 * start to parse our newly generated unwind data, _as_ _well_ _as_  access
 	 * the generated wrapper function.
 	 * In a sense, making this write is a point-of-no-return */
 	COMPILER_BARRIER();

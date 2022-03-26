@@ -386,7 +386,7 @@ INTERN errno_t NOTHROW(CC libpci_system_init)(void)
 {
 #ifndef __KERNEL__
 	errno_t error;
-	/* Return immediatly when already initialized. */
+	/* Return immediately when already initialized. */
 	if (libpci_devices_tree != NULL)
 		return EOK;
 

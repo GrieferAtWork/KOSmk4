@@ -143,18 +143,18 @@ struct exception_info {
 #endif /* __SIZEOF_POINTER__ != ... */
 };
 #if !defined(__COMPILER_HAVE_TRANSPARENT_UNION) && !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT)
-#define ei_data      _ei_code_data.ei_data
-#define ei_code      _ei_code_data.ei_code
-#define ei_class     _ei_code_data._ei_class_subclass.ei_class
-#define ei_subclass  _ei_code_data._ei_class_subclass.ei_subclass
+#define ei_data     _ei_code_data.ei_data
+#define ei_code     _ei_code_data.ei_code
+#define ei_class    _ei_code_data._ei_class_subclass.ei_class
+#define ei_subclass _ei_code_data._ei_class_subclass.ei_subclass
 #elif !defined(__COMPILER_HAVE_TRANSPARENT_UNION)
-#define ei_data      _ei_code_data.ei_data
-#define ei_code      _ei_code_data.ei_code
-#define ei_class     _ei_code_data.ei_class
-#define ei_subclass  _ei_code_data.ei_subclass
+#define ei_data     _ei_code_data.ei_data
+#define ei_code     _ei_code_data.ei_code
+#define ei_class    _ei_code_data.ei_class
+#define ei_subclass _ei_code_data.ei_subclass
 #elif !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT)
-#define ei_class     _ei_class_subclass.ei_class
-#define ei_subclass  _ei_class_subclass.ei_subclass
+#define ei_class    _ei_class_subclass.ei_class
+#define ei_subclass _ei_class_subclass.ei_subclass
 #endif /* ... */
 #endif /* __USE_KOS_KERNEL */
 

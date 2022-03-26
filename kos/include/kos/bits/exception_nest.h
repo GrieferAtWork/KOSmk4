@@ -49,11 +49,11 @@ __DECL_BEGIN
 
 #define _EXCEPTION_NESTING_DATA_SIZE (sizeof(struct _exception_nesting_data) - sizeof(__size_t))
 struct _exception_nesting_data {
-	__size_t                    en_size;  /* == _EXCEPTION_NESTING_DATA_SIZE */
+	__size_t                     en_size;  /* == _EXCEPTION_NESTING_DATA_SIZE */
 	__EXCEPT_REGISTER_STATE_TYPE en_state; /* Saved exception state. */
-	struct exception_data       en_data;  /* Saved exception data. */
+	struct exception_data        en_data;  /* Saved exception data. */
 #if __EXCEPT_BACKTRACE_SIZE != 0
-	void                       *en_trace[__EXCEPT_BACKTRACE_SIZE]; /* Saved traceback. */
+	void                        *en_trace[__EXCEPT_BACKTRACE_SIZE]; /* Saved traceback. */
 #endif /* __EXCEPT_BACKTRACE_SIZE != 0 */
 };
 

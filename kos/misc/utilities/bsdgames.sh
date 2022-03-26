@@ -49,7 +49,7 @@ require_utility openssl    "$PKG_CONFIG_PATH/openssl.pc"
 #    monop(1):        Works
 #    morse(1):        Works
 #    number(1):       Works
-#    phantasia(1):    Coredumps immediatly
+#    phantasia(1):    Coredumps immediately
 #    pig(1):          Works
 #    pom(1):          Unimplemented function called: `sin()'
 #    ppt(1):          Works

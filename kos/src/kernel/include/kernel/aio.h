@@ -210,9 +210,9 @@ struct aio_handle_type {
 	/*NOTHROW*/ (KCALL *ht_fini)(struct aio_handle *__restrict self);
 
 	/* [1..1] Cancel execution of the given AIO operation.
-	 * NOTE: This function is required to _immediatly_ cancel the operation associated
-	 *       with  the given handle,  so long as that  operation hasn't yet completed.
-	 *       If the first holds true, the  associated handle function must be  invoked
+	 * NOTE: This function is required to _immediately_ cancel the operation associated
+	 *       with  the given  handle, so long  as that operation  hasn't yet completed.
+	 *       If  the first holds  true, the associated handle  function must be invoked
 	 *       with `AIO_COMPLETION_CANCEL' before this operator may return.
 	 * WARNING: This callback may only be invoked _once_! */
 	NOBLOCK NONNULL((1)) void

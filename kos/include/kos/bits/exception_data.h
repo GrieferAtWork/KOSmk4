@@ -624,16 +624,16 @@ struct __ATTR_PACKED exception_data /*[PREFIX(e_)]*/ {
 };
 
 #if !defined(__COMPILER_HAVE_TRANSPARENT_UNION) && !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT)
-#define e_code      _ed_code.e_code
-#define e_class     _ed_code._ed_class_subclass.e_class
-#define e_subclass  _ed_code._ed_class_subclass.e_subclass
+#define e_code     _ed_code.e_code
+#define e_class    _ed_code._ed_class_subclass.e_class
+#define e_subclass _ed_code._ed_class_subclass.e_subclass
 #elif !defined(__COMPILER_HAVE_TRANSPARENT_UNION)
-#define e_code      _ed_code.e_code
-#define e_class     _ed_code.e_class
-#define e_subclass  _ed_code.e_subclass
+#define e_code     _ed_code.e_code
+#define e_class    _ed_code.e_class
+#define e_subclass _ed_code.e_subclass
 #elif !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT)
-#define e_class     _ed_class_subclass.e_class
-#define e_subclass  _ed_class_subclass.e_subclass
+#define e_class    _ed_class_subclass.e_class
+#define e_subclass _ed_class_subclass.e_subclass
 #endif /* ... */
 
 
