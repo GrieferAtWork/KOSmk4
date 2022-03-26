@@ -197,6 +197,7 @@ enum {
 	                                                        * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was true, but unused flag bits were set. */
 	E_INVALID_ARGUMENT_CONTEXT_FUTEX_OP,                   /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: [syscall_ulong_t futex_op] The `futex_op' given to one of `futex()' is invalid. */
 	E_INVALID_ARGUMENT_CONTEXT_LFUTEXEXPR_FD_WITH_TIMEOUT, /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `timeout' argument of `lfutexexpr(2)' was non-NULL when `LFUTEX_FDBIT' was given. */
+	E_INVALID_ARGUMENT_CONTEXT_LFUTEX_FD_WITH_TIMEOUT,     /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `timeout' argument of `lfutex(2)' was non-NULL when `LFUTEX_FDBIT' was given. */
 
 	/* system call: `rpc_schedule(2)' */
 	E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE = 0x1140,    /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `rpc_schedule(2)' or `EPOLL_CTL_RPC_PROG'. */
@@ -471,6 +472,7 @@ enum {
                                                                                                                                  * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was true, but unused flag bits were set. */
 #define E_INVALID_ARGUMENT_CONTEXT_FUTEX_OP                         E_INVALID_ARGUMENT_CONTEXT_FUTEX_OP                         /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: [syscall_ulong_t futex_op] The `futex_op' given to one of `futex()' is invalid. */
 #define E_INVALID_ARGUMENT_CONTEXT_LFUTEXEXPR_FD_WITH_TIMEOUT       E_INVALID_ARGUMENT_CONTEXT_LFUTEXEXPR_FD_WITH_TIMEOUT       /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `timeout' argument of `lfutexexpr(2)' was non-NULL when `LFUTEX_FDBIT' was given. */
+#define E_INVALID_ARGUMENT_CONTEXT_LFUTEX_FD_WITH_TIMEOUT           E_INVALID_ARGUMENT_CONTEXT_LFUTEX_FD_WITH_TIMEOUT           /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `timeout' argument of `lfutex(2)' was non-NULL when `LFUTEX_FDBIT' was given. */
 /* system call: `rpc_schedule(2)' */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE                E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE                /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `rpc_schedule(2)' or `EPOLL_CTL_RPC_PROG'. */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_ILLSIGNO            E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_ILLSIGNO            /* E_INVALID_ARGUMENT_BAD_VALUE: Tried to send the RPC via `RPC_SIGNO(SIGKILL)' or `RPC_SIGNO(SIGSTOP)' */
@@ -726,6 +728,7 @@ enum {
                                                                           * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was true, but unused flag bits were set. */
 #define E_INVALID_ARGUMENT_CONTEXT_FUTEX_OP                         4385 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: [syscall_ulong_t futex_op] The `futex_op' given to one of `futex()' is invalid. */
 #define E_INVALID_ARGUMENT_CONTEXT_LFUTEXEXPR_FD_WITH_TIMEOUT       4386 /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `timeout' argument of `lfutexexpr(2)' was non-NULL when `LFUTEX_FDBIT' was given. */
+#define E_INVALID_ARGUMENT_CONTEXT_LFUTEX_FD_WITH_TIMEOUT           4387 /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `timeout' argument of `lfutex(2)' was non-NULL when `LFUTEX_FDBIT' was given. */
 /* system call: `rpc_schedule(2)' */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE                4416 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `rpc_schedule(2)' or `EPOLL_CTL_RPC_PROG'. */
 #define E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_ILLSIGNO            4417 /* E_INVALID_ARGUMENT_BAD_VALUE: Tried to send the RPC via `RPC_SIGNO(SIGKILL)' or `RPC_SIGNO(SIGSTOP)' */
