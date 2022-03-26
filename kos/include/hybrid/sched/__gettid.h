@@ -37,11 +37,11 @@
 #else /* __KOS_VERSION__ >= ... */
 #include <sched/percpu.h> /* THIS_TASK */
 #endif /* __KOS_VERSION__ < ... */
-#define __HYBRID_SIZEOF_TID__           __SIZEOF_POINTER__
-#define __HYBRID_GETTID_INVALID_IS_ZERO 1
-#define __HYBRID_GETTID_INVALID         __NULLPTR
-#define __HYBRID_GETTID_PRINTF_FMT      "%p"
-#define __HYBRID_GETTID_PRINTF_ARG(x)   x
+#define __HYBRID_SIZEOF_TID__ __SIZEOF_POINTER__
+#define __HYBRID_GETTID_INVALID_IS_ZERO
+#define __HYBRID_GETTID_INVALID       __NULLPTR
+#define __HYBRID_GETTID_PRINTF_FMT    "%p"
+#define __HYBRID_GETTID_PRINTF_ARG(x) x
 #ifdef __CC__
 #define __hybrid_gettid() THIS_TASK
 #define __hybrid_tid_t    struct task *
@@ -62,8 +62,8 @@
 #define __HYBRID_SIZEOF_TID__           __SIZEOF_POINTER__
 #define __HYBRID_GETTID_PRINTF_FMT      "%p"
 #define __HYBRID_GETTID_PRINTF_ARG(x)   (void *)(x)
-#define __HYBRID_GETTID_INVALID_IS_ZERO 1
-#define __HYBRID_GETTID_INVALID         0
+#define __HYBRID_GETTID_INVALID_IS_ZERO
+#define __HYBRID_GETTID_INVALID 0
 
 #else /* Mk4 + X86 */
 #include <__crt.h>
@@ -71,9 +71,9 @@
 #include <bits/types.h>
 
 #define __HYBRID_SIZEOF_TID__ __SIZEOF_PID_T__
-#if 1
-#define __HYBRID_GETTID_INVALID_IS_ZERO 1 /* Not always, but good enough? */
-#define __HYBRID_GETTID_INVALID         0
+#if 1 /* PID=0 should never be valid */
+#define __HYBRID_GETTID_INVALID_IS_ZERO
+#define __HYBRID_GETTID_INVALID 0
 #else
 #define __HYBRID_GETTID_INVALID (-1)
 #endif
@@ -87,9 +87,9 @@ __DECL_END
 #endif /* ... */
 #endif /* !__KERNEL__ */
 #elif defined(__WINNT__)
-#define __HYBRID_SIZEOF_TID__           4
-#define __HYBRID_GETTID_INVALID_IS_ZERO 1
-#define __HYBRID_GETTID_INVALID         0
+#define __HYBRID_SIZEOF_TID__ 4
+#define __HYBRID_GETTID_INVALID_IS_ZERO
+#define __HYBRID_GETTID_INVALID 0
 #ifdef __CC__
 #include <hybrid/typecore.h>
 #ifdef _MSC_VER
@@ -125,8 +125,8 @@ __STATIC_ASSERT_MSG(sizeof(pid_t) == __HYBRID_SIZEOF_TID__, "Please adjust");
 #else /* __NR_gettid */
 #define __hybrid_gettid() syscall(SYS_gettid)
 #endif /* !__NR_gettid */
-#define __HYBRID_GETTID_INVALID_IS_ZERO 1
-#define __HYBRID_GETTID_INVALID         0
+#define __HYBRID_GETTID_INVALID_IS_ZERO
+#define __HYBRID_GETTID_INVALID 0
 #endif /* SYS_gettid || __NR_gettid */
 #endif /* ... */
 
@@ -148,8 +148,8 @@ __STATIC_ASSERT_MSG(sizeof(pid_t) == __HYBRID_SIZEOF_TID__, "Please adjust");
 #else /* gettid || __gettid_defined */
 #define __hybrid_gettid __gettid
 #endif /* !gettid && !__gettid_defined */
-#define __HYBRID_GETTID_INVALID_IS_ZERO 1
-#define __HYBRID_GETTID_INVALID         0
+#define __HYBRID_GETTID_INVALID_IS_ZERO
+#define __HYBRID_GETTID_INVALID 0
 #elif (__has_include(<pthread.h>) || \
        (defined(__NO_has_include) && \
         (defined(__unix__) || defined(__unix) || defined(unix))))
@@ -164,11 +164,11 @@ __STATIC_ASSERT_MSG(sizeof(pid_t) == __HYBRID_SIZEOF_TID__, "Please adjust");
 #define __HYBRID_SIZEOF_TID__ __SIZEOF_POINTER__
 __STATIC_ASSERT_MSG(sizeof(pthread_t) == __HYBRID_SIZEOF_TID__, "Please adjust");
 #endif /* !... */
-#define __hybrid_tid_t                  pthread_t
-#define __hybrid_gettid                 pthread_self
-#define __HYBRID_GETTID_INVALID_IS_ZERO 1 /* Not always, but good enough? */
-#define __HYBRID_GETTID_INVALID         (__CCAST(pthread_t)0)
-#define __hybrid_gettid_equal           pthread_equal
+#define __hybrid_tid_t  pthread_t
+#define __hybrid_gettid pthread_self
+#define __HYBRID_GETTID_INVALID_IS_ZERO /* Not always, but good enough? */
+#define __HYBRID_GETTID_INVALID (__CCAST(pthread_t) 0)
+#define __hybrid_gettid_equal   pthread_equal
 #elif (__has_include(<threads.h>) ||                                  \
        (defined(__NO_has_include) && !defined(__STDC_NO_THREADS__) && \
         defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L))
@@ -187,22 +187,22 @@ __STATIC_ASSERT_MSG(sizeof(pthread_t) == __HYBRID_SIZEOF_TID__, "Please adjust")
 #define __HYBRID_SIZEOF_TID__ __SIZEOF_POINTER__
 __STATIC_ASSERT_MSG(sizeof(thrd_t) == __HYBRID_SIZEOF_TID__, "Please adjust");
 #endif /* !... */
-#define __hybrid_tid_t                  thrd_t
-#define __hybrid_gettid                 thrd_current
-#define __HYBRID_GETTID_INVALID_IS_ZERO 1 /* Not always, but good enough? */
-#define __HYBRID_GETTID_INVALID         (__CCAST(thrd_t)0)
-#define __hybrid_gettid_equal           thrd_equal
+#define __hybrid_tid_t  thrd_t
+#define __hybrid_gettid thrd_current
+#define __HYBRID_GETTID_INVALID_IS_ZERO /* Not always, but good enough? */
+#define __HYBRID_GETTID_INVALID (__CCAST(thrd_t)0)
+#define __hybrid_gettid_equal   thrd_equal
 #else /* ... */
 /* Fallback: Assume single-threaded and assign  TID=0
  * for <invalid-tid> and TID=1 for the main() thread. */
 #include <hybrid/typecore.h>
-#define __HYBRID_SIZEOF_TID__           __SIZEOF_INT__
-#define __HYBRID_GETTID_INVALID_IS_ZERO 1 /* Not always, but good enough? */
-#define __HYBRID_GETTID_INVALID         0
-#define __HYBRID_GETTID_PRINTF_FMT      "%u"
-#define __HYBRID_GETTID_PRINTF_ARG(x)   (unsigned int)(x)
-#define __hybrid_tid_t                  int
-#define __hybrid_gettid()               1 /* ??? */
+#define __HYBRID_SIZEOF_TID__ __SIZEOF_INT__
+#define __HYBRID_GETTID_INVALID_IS_ZERO
+#define __HYBRID_GETTID_INVALID       0
+#define __HYBRID_GETTID_PRINTF_FMT    "%u"
+#define __HYBRID_GETTID_PRINTF_ARG(x) (unsigned int)(x)
+#define __hybrid_tid_t                int
+#define __hybrid_gettid()             1
 #endif /* !... */
 #endif /* !__hybrid_gettid */
 

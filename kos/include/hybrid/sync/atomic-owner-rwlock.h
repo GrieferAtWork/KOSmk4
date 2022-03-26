@@ -30,8 +30,6 @@
 #include "../sched/__yield.h"
 #include "../sched/__gettid.h"
 
-__DECL_BEGIN
-
 #if __SIZEOF_POINTER__ == 4
 #define __ATOMIC_OWNER_RWLOCK_NMASK __UINT32_C(0x7fffffff)
 #define __ATOMIC_OWNER_RWLOCK_WFLAG __UINT32_C(0x80000000)
@@ -52,6 +50,8 @@ __DECL_BEGIN
 #endif /* __HYBRID_SIZEOF_TID__ < __SIZEOF_POINTER__ */
 
 #ifdef __CC__
+__DECL_BEGIN
+
 struct __ATTR_PACKED atomic_owner_rwlock {
 	/* Similar to a regular rwlock, but allow for owner write-recursion: */
 	union __ATTR_PACKED {
@@ -428,30 +428,7 @@ __NOTHROW(atomic_owner_rwlock_canwrite)(struct atomic_owner_rwlock const *__rest
 }
 #endif /* !__INTELLISENSE__ */
 
-#endif /* __CC__ */
-
-
-#ifdef __DEFINE_SYNC_RWLOCK
-__DEFINE_SYNC_RWLOCK(struct atomic_owner_rwlock,
-                     atomic_owner_rwlock_tryread,
-                     atomic_owner_rwlock_read,
-                     atomic_owner_rwlock_read_nx,
-                     atomic_owner_rwlock_endread,
-                     atomic_owner_rwlock_reading,
-                     atomic_owner_rwlock_canread,
-                     atomic_owner_rwlock_trywrite,
-                     atomic_owner_rwlock_write,
-                     atomic_owner_rwlock_write_nx,
-                     atomic_owner_rwlock_endwrite,
-                     atomic_owner_rwlock_writing,
-                     atomic_owner_rwlock_canwrite,
-                     atomic_owner_rwlock_end,
-                     atomic_owner_rwlock_tryupgrade,
-                     atomic_owner_rwlock_upgrade,
-                     atomic_owner_rwlock_upgrade_nx,
-                     atomic_owner_rwlock_downgrade)
-#endif /* __DEFINE_SYNC_RWLOCK */
-
 __DECL_END
+#endif /* __CC__ */
 
 #endif /* !__GUARD_HYBRID_SYNC_ATOMIC_OWNER_RWLOCK_H */

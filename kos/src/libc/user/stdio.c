@@ -29,7 +29,6 @@
 #include <hybrid/overflow.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-lock.h>
-#include <hybrid/sync/atomic-owner-rwlock.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <bits/crt/io-file.h>

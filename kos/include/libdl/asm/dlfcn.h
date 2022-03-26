@@ -54,7 +54,8 @@ __DECL_BEGIN
                                   * rather than  running  initializers  of all  affected  libraries  first.
                                   * HINT: You may  run initializers  (and finalizers  during exit())  at  a
                                   *       later time by calling `dlopen()' again without passing this flag.
-                                  * WARNING: Initializers of newly loaded dependencies will not be executed either! */
+                                  * WARNING: Initializers of newly loaded dependencies will not be executed
+                                  *          either! */
 
 #define __CRT_HAVE_dlfopen
 #define __CRT_HAVE_dlexceptaware

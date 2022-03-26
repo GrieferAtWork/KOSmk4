@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc350cfc4 */
+/* HASH CRC-32:0xeb4fde1a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -289,7 +289,7 @@ __COMPILER_CEIDECLARE(__NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,sha
 	                 __self->srr_lock.sl_lock);
 	__hybrid_assertf(__shared_recursive_rwlock_isown(__self),
 	                 "You're not the owner of this lock");
-	if (--__self->srr_wrcnt == 0) {
+	if (__self->srr_wrcnt == 0) {
 		__self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
 		__COMPILER_BARRIER();
 		__hybrid_atomic_store(__self->srr_lock.sl_lock, 0, __ATOMIC_RELEASE);
@@ -297,6 +297,7 @@ __COMPILER_CEIDECLARE(__NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,sha
 			__shared_rwlock_rdwait_broadcast(&__self->srr_lock);
 		return 1;
 	}
+	--__self->srr_wrcnt;
 	return 0;
 })
 #elif defined(__CRT_HAVE_shared_recursive_rwlock_endwrite)
@@ -317,7 +318,7 @@ __LOCAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL shared_recursive_
 	                 __self->srr_lock.sl_lock);
 	__hybrid_assertf(__shared_recursive_rwlock_isown(__self),
 	                 "You're not the owner of this lock");
-	if (--__self->srr_wrcnt == 0) {
+	if (__self->srr_wrcnt == 0) {
 		__self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
 		__COMPILER_BARRIER();
 		__hybrid_atomic_store(__self->srr_lock.sl_lock, 0, __ATOMIC_RELEASE);
@@ -325,6 +326,7 @@ __LOCAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL shared_recursive_
 			__shared_rwlock_rdwait_broadcast(&__self->srr_lock);
 		return 1;
 	}
+	--__self->srr_wrcnt;
 	return 0;
 }
 #endif /* ... */
@@ -344,7 +346,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__
 	                 __self->srr_lock.sl_lock);
 	__hybrid_assertf(__shared_recursive_rwlock_isown(__self),
 	                 "You're not the owner of this lock");
-	if (--__self->srr_wrcnt == 0) {
+	if (__self->srr_wrcnt == 0) {
 		__self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
 		__COMPILER_BARRIER();
 		__hybrid_atomic_store(__self->srr_lock.sl_lock, 0, __ATOMIC_RELEASE);
@@ -352,6 +354,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__
 			__shared_rwlock_rdwait_broadcast(&__self->srr_lock);
 		return 1;
 	}
+	--__self->srr_wrcnt;
 	return 0;
 })
 #else /* __CRT_HAVE_shared_recursive_rwlock_endwrite */
@@ -366,7 +369,7 @@ __LOCAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __localdep_shared
 	                 __self->srr_lock.sl_lock);
 	__hybrid_assertf(__shared_recursive_rwlock_isown(__self),
 	                 "You're not the owner of this lock");
-	if (--__self->srr_wrcnt == 0) {
+	if (__self->srr_wrcnt == 0) {
 		__self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
 		__COMPILER_BARRIER();
 		__hybrid_atomic_store(__self->srr_lock.sl_lock, 0, __ATOMIC_RELEASE);
@@ -374,6 +377,7 @@ __LOCAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __localdep_shared
 			__shared_rwlock_rdwait_broadcast(&__self->srr_lock);
 		return 1;
 	}
+	--__self->srr_wrcnt;
 	return 0;
 }
 #endif /* !__CRT_HAVE_shared_recursive_rwlock_endwrite */
@@ -416,7 +420,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__
 	                 __self->srr_lock.sl_lock);
 	__hybrid_assertf(__shared_recursive_rwlock_isown(__self),
 	                 "You're not the owner of this lock");
-	if (--__self->srr_wrcnt == 0) {
+	if (__self->srr_wrcnt == 0) {
 		__self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
 		__COMPILER_BARRIER();
 		__hybrid_atomic_store(__self->srr_lock.sl_lock, 0, __ATOMIC_RELEASE);
@@ -424,6 +428,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__
 			__shared_rwlock_rdwait_broadcast(&__self->srr_lock);
 		return 1;
 	}
+	--__self->srr_wrcnt;
 	return 0;
 })
 #else /* __CRT_HAVE_shared_recursive_rwlock_endwrite */
@@ -438,7 +443,7 @@ __LOCAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __localdep_shared
 	                 __self->srr_lock.sl_lock);
 	__hybrid_assertf(__shared_recursive_rwlock_isown(__self),
 	                 "You're not the owner of this lock");
-	if (--__self->srr_wrcnt == 0) {
+	if (__self->srr_wrcnt == 0) {
 		__self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
 		__COMPILER_BARRIER();
 		__hybrid_atomic_store(__self->srr_lock.sl_lock, 0, __ATOMIC_RELEASE);
@@ -446,6 +451,7 @@ __LOCAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __localdep_shared
 			__shared_rwlock_rdwait_broadcast(&__self->srr_lock);
 		return 1;
 	}
+	--__self->srr_wrcnt;
 	return 0;
 }
 #endif /* !__CRT_HAVE_shared_recursive_rwlock_endwrite */
@@ -483,7 +489,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__
 	                 __self->srr_lock.sl_lock);
 	__hybrid_assertf(__shared_recursive_rwlock_isown(__self),
 	                 "You're not the owner of this lock");
-	if (--__self->srr_wrcnt == 0) {
+	if (__self->srr_wrcnt == 0) {
 		__self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
 		__COMPILER_BARRIER();
 		__hybrid_atomic_store(__self->srr_lock.sl_lock, 0, __ATOMIC_RELEASE);
@@ -491,6 +497,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__
 			__shared_rwlock_rdwait_broadcast(&__self->srr_lock);
 		return 1;
 	}
+	--__self->srr_wrcnt;
 	return 0;
 })
 #else /* __CRT_HAVE_shared_recursive_rwlock_endwrite */
@@ -505,7 +512,7 @@ __LOCAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __localdep_shared
 	                 __self->srr_lock.sl_lock);
 	__hybrid_assertf(__shared_recursive_rwlock_isown(__self),
 	                 "You're not the owner of this lock");
-	if (--__self->srr_wrcnt == 0) {
+	if (__self->srr_wrcnt == 0) {
 		__self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
 		__COMPILER_BARRIER();
 		__hybrid_atomic_store(__self->srr_lock.sl_lock, 0, __ATOMIC_RELEASE);
@@ -513,6 +520,7 @@ __LOCAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __localdep_shared
 			__shared_rwlock_rdwait_broadcast(&__self->srr_lock);
 		return 1;
 	}
+	--__self->srr_wrcnt;
 	return 0;
 }
 #endif /* !__CRT_HAVE_shared_recursive_rwlock_endwrite */
@@ -555,7 +563,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__
 	                 __self->srr_lock.sl_lock);
 	__hybrid_assertf(__shared_recursive_rwlock_isown(__self),
 	                 "You're not the owner of this lock");
-	if (--__self->srr_wrcnt == 0) {
+	if (__self->srr_wrcnt == 0) {
 		__self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
 		__COMPILER_BARRIER();
 		__hybrid_atomic_store(__self->srr_lock.sl_lock, 0, __ATOMIC_RELEASE);
@@ -563,6 +571,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__
 			__shared_rwlock_rdwait_broadcast(&__self->srr_lock);
 		return 1;
 	}
+	--__self->srr_wrcnt;
 	return 0;
 })
 #else /* __CRT_HAVE_shared_recursive_rwlock_endwrite */
@@ -577,7 +586,7 @@ __LOCAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __localdep_shared
 	                 __self->srr_lock.sl_lock);
 	__hybrid_assertf(__shared_recursive_rwlock_isown(__self),
 	                 "You're not the owner of this lock");
-	if (--__self->srr_wrcnt == 0) {
+	if (__self->srr_wrcnt == 0) {
 		__self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
 		__COMPILER_BARRIER();
 		__hybrid_atomic_store(__self->srr_lock.sl_lock, 0, __ATOMIC_RELEASE);
@@ -585,6 +594,7 @@ __LOCAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __localdep_shared
 			__shared_rwlock_rdwait_broadcast(&__self->srr_lock);
 		return 1;
 	}
+	--__self->srr_wrcnt;
 	return 0;
 }
 #endif /* !__CRT_HAVE_shared_recursive_rwlock_endwrite */
@@ -642,8 +652,8 @@ __NAMESPACE_LOCAL_END
  * to ensure  that  you're only  holding  a  single write-lock  at  the  moment). */
 __COMPILER_CEIDECLARE(__NOBLOCK __ATTR_NONNULL((1)),void,__NOTHROW,__FCALL,shared_recursive_rwlock_downgrade,(struct shared_recursive_rwlock *__restrict __self),{
 	__hybrid_assertf(__shared_recursive_rwlock_isown(__self), "You're not holding this lock");
-	__hybrid_assertf(__self->srr_wrcnt == 1, "You're holding more than 1 write-lock");
-	__self->srr_wrcnt = 0;
+	__hybrid_assertf(__self->srr_wrcnt > 0, "You're holding more than 1 write-lock");
+	__self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
 	__COMPILER_WRITE_BARRIER();
 	(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_downgrade)(&__self->srr_lock);
 })
@@ -688,8 +698,8 @@ __NAMESPACE_LOCAL_END
  * to ensure  that  you're only  holding  a  single write-lock  at  the  moment). */
 __LOCAL __NOBLOCK __ATTR_NONNULL((1)) void __NOTHROW(__FCALL shared_recursive_rwlock_downgrade)(struct shared_recursive_rwlock *__restrict __self) {
 	__hybrid_assertf(__shared_recursive_rwlock_isown(__self), "You're not holding this lock");
-	__hybrid_assertf(__self->srr_wrcnt == 1, "You're holding more than 1 write-lock");
-	__self->srr_wrcnt = 0;
+	__hybrid_assertf(__self->srr_wrcnt > 0, "You're holding more than 1 write-lock");
+	__self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
 	__COMPILER_WRITE_BARRIER();
 	(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_downgrade)(&__self->srr_lock);
 }
@@ -713,7 +723,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__
 	                 __self->srr_lock.sl_lock);
 	__hybrid_assertf(__shared_recursive_rwlock_isown(__self),
 	                 "You're not the owner of this lock");
-	if (--__self->srr_wrcnt == 0) {
+	if (__self->srr_wrcnt == 0) {
 		__self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
 		__COMPILER_BARRIER();
 		__hybrid_atomic_store(__self->srr_lock.sl_lock, 0, __ATOMIC_RELEASE);
@@ -721,6 +731,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__
 			__shared_rwlock_rdwait_broadcast(&__self->srr_lock);
 		return 1;
 	}
+	--__self->srr_wrcnt;
 	return 0;
 })
 #else /* __CRT_HAVE_shared_recursive_rwlock_endwrite */
@@ -735,7 +746,7 @@ __LOCAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __localdep_shared
 	                 __self->srr_lock.sl_lock);
 	__hybrid_assertf(__shared_recursive_rwlock_isown(__self),
 	                 "You're not the owner of this lock");
-	if (--__self->srr_wrcnt == 0) {
+	if (__self->srr_wrcnt == 0) {
 		__self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
 		__COMPILER_BARRIER();
 		__hybrid_atomic_store(__self->srr_lock.sl_lock, 0, __ATOMIC_RELEASE);
@@ -743,6 +754,7 @@ __LOCAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __localdep_shared
 			__shared_rwlock_rdwait_broadcast(&__self->srr_lock);
 		return 1;
 	}
+	--__self->srr_wrcnt;
 	return 0;
 }
 #endif /* !__CRT_HAVE_shared_recursive_rwlock_endwrite */
@@ -783,7 +795,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__
 	                 __self->srr_lock.sl_lock);
 	__hybrid_assertf(__shared_recursive_rwlock_isown(__self),
 	                 "You're not the owner of this lock");
-	if (--__self->srr_wrcnt == 0) {
+	if (__self->srr_wrcnt == 0) {
 		__self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
 		__COMPILER_BARRIER();
 		__hybrid_atomic_store(__self->srr_lock.sl_lock, 0, __ATOMIC_RELEASE);
@@ -791,6 +803,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__
 			__shared_rwlock_rdwait_broadcast(&__self->srr_lock);
 		return 1;
 	}
+	--__self->srr_wrcnt;
 	return 0;
 })
 #else /* __CRT_HAVE_shared_recursive_rwlock_endwrite */
@@ -805,7 +818,7 @@ __LOCAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __localdep_shared
 	                 __self->srr_lock.sl_lock);
 	__hybrid_assertf(__shared_recursive_rwlock_isown(__self),
 	                 "You're not the owner of this lock");
-	if (--__self->srr_wrcnt == 0) {
+	if (__self->srr_wrcnt == 0) {
 		__self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
 		__COMPILER_BARRIER();
 		__hybrid_atomic_store(__self->srr_lock.sl_lock, 0, __ATOMIC_RELEASE);
@@ -813,6 +826,7 @@ __LOCAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __localdep_shared
 			__shared_rwlock_rdwait_broadcast(&__self->srr_lock);
 		return 1;
 	}
+	--__self->srr_wrcnt;
 	return 0;
 }
 #endif /* !__CRT_HAVE_shared_recursive_rwlock_endwrite */
@@ -947,7 +961,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__
 	                 __self->srr_lock.sl_lock);
 	__hybrid_assertf(__shared_recursive_rwlock_isown(__self),
 	                 "You're not the owner of this lock");
-	if (--__self->srr_wrcnt == 0) {
+	if (__self->srr_wrcnt == 0) {
 		__self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
 		__COMPILER_BARRIER();
 		__hybrid_atomic_store(__self->srr_lock.sl_lock, 0, __ATOMIC_RELEASE);
@@ -955,6 +969,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__
 			__shared_rwlock_rdwait_broadcast(&__self->srr_lock);
 		return 1;
 	}
+	--__self->srr_wrcnt;
 	return 0;
 })
 #else /* __CRT_HAVE_shared_recursive_rwlock_endwrite */
@@ -969,7 +984,7 @@ __LOCAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __localdep_shared
 	                 __self->srr_lock.sl_lock);
 	__hybrid_assertf(__shared_recursive_rwlock_isown(__self),
 	                 "You're not the owner of this lock");
-	if (--__self->srr_wrcnt == 0) {
+	if (__self->srr_wrcnt == 0) {
 		__self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
 		__COMPILER_BARRIER();
 		__hybrid_atomic_store(__self->srr_lock.sl_lock, 0, __ATOMIC_RELEASE);
@@ -977,6 +992,7 @@ __LOCAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __localdep_shared
 			__shared_rwlock_rdwait_broadcast(&__self->srr_lock);
 		return 1;
 	}
+	--__self->srr_wrcnt;
 	return 0;
 }
 #endif /* !__CRT_HAVE_shared_recursive_rwlock_endwrite */
@@ -1017,7 +1033,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__
 	                 __self->srr_lock.sl_lock);
 	__hybrid_assertf(__shared_recursive_rwlock_isown(__self),
 	                 "You're not the owner of this lock");
-	if (--__self->srr_wrcnt == 0) {
+	if (__self->srr_wrcnt == 0) {
 		__self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
 		__COMPILER_BARRIER();
 		__hybrid_atomic_store(__self->srr_lock.sl_lock, 0, __ATOMIC_RELEASE);
@@ -1025,6 +1041,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__
 			__shared_rwlock_rdwait_broadcast(&__self->srr_lock);
 		return 1;
 	}
+	--__self->srr_wrcnt;
 	return 0;
 })
 #else /* __CRT_HAVE_shared_recursive_rwlock_endwrite */
@@ -1039,7 +1056,7 @@ __LOCAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __localdep_shared
 	                 __self->srr_lock.sl_lock);
 	__hybrid_assertf(__shared_recursive_rwlock_isown(__self),
 	                 "You're not the owner of this lock");
-	if (--__self->srr_wrcnt == 0) {
+	if (__self->srr_wrcnt == 0) {
 		__self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
 		__COMPILER_BARRIER();
 		__hybrid_atomic_store(__self->srr_lock.sl_lock, 0, __ATOMIC_RELEASE);
@@ -1047,6 +1064,7 @@ __LOCAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __localdep_shared
 			__shared_rwlock_rdwait_broadcast(&__self->srr_lock);
 		return 1;
 	}
+	--__self->srr_wrcnt;
 	return 0;
 }
 #endif /* !__CRT_HAVE_shared_recursive_rwlock_endwrite */

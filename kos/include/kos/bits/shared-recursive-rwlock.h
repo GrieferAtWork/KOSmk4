@@ -32,7 +32,7 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-typedef __hybrid_tid_t __shared_recursive_rwlock_tid_t;
+#define __shared_recursive_rwlock_tid_t       __hybrid_tid_t
 #define __shared_recursive_rwlock_gettid()    __hybrid_gettid()
 #define __shared_recursive_rwlock_eqtid(a, b) __hybrid_gettid_equal(a, b)
 #define __shared_recursive_rwlock_mytid(tid)  __hybrid_gettid_iscaller(tid)
@@ -44,16 +44,17 @@ typedef __hybrid_tid_t __shared_recursive_rwlock_tid_t;
 struct shared_recursive_rwlock {
 	struct shared_rwlock            srr_lock;   /* Underlying R/W-lock */
 	__shared_recursive_rwlock_tid_t srr_writer; /* [0..1|NULL(__HYBRID_GETTID_INVALID)] Thread holding a write-lock */
-	__uintptr_t                     srr_wrcnt;  /* [lock(WRITING)] Number of write-locks (or 0 if not writing) */
+	__uintptr_t                     srr_wrcnt;  /* [lock(WRITING)] Number of additional write-locks (0 means only one write-lock remains) */
 };
 
-/* Check if the caller is holding the recursive write-lock */
+/* Check if the caller is is the write-lock owner of `self' */
 #define __shared_recursive_rwlock_isown(self) \
 	__shared_recursive_rwlock_mytid((self)->srr_writer)
+
+/* Set the caller as the write-lock owner of `self' */
 #define __shared_recursive_rwlock_setown(self)                \
 	((self)->srr_writer = __shared_recursive_rwlock_gettid(), \
-	 (self)->srr_wrcnt  = 1)
-
+	 __hybrid_assert((self)->srr_wrcnt == 0))
 
 __DECL_END
 #endif /* __CC__ */

@@ -154,7 +154,8 @@
                                    * rather than  running  initializers  of all  affected  libraries  first.
                                    * HINT: You may  run initializers  (and finalizers  during exit())  at  a
                                    *       later time by calling `dlopen()' again without passing this flag.
-                                   * WARNING: Initializers of newly loaded dependencies will not be executed either! */
+                                   * WARNING: Initializers of newly loaded dependencies will not be executed7
+                                   *          either! */
 #endif /* __USE_KOS && __RTLD_NOINIT */
 
 #if defined(__USE_NETBSD) && defined(__RTLD_LAZY)

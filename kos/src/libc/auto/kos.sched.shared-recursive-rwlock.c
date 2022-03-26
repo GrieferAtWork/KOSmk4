@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc6ca2c4 */
+/* HASH CRC-32:0xf8dddda5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,7 +73,7 @@ NOTHROW(__FCALL libc_shared_recursive_rwlock_endwrite)(struct shared_recursive_r
 	                 self->srr_lock.sl_lock);
 	__hybrid_assertf(__shared_recursive_rwlock_isown(self),
 	                 "You're not the owner of this lock");
-	if (--self->srr_wrcnt == 0) {
+	if (self->srr_wrcnt == 0) {
 		self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
 		__COMPILER_BARRIER();
 		__hybrid_atomic_store(self->srr_lock.sl_lock, 0, __ATOMIC_RELEASE);
@@ -81,6 +81,7 @@ NOTHROW(__FCALL libc_shared_recursive_rwlock_endwrite)(struct shared_recursive_r
 			__shared_rwlock_rdwait_broadcast(&self->srr_lock);
 		return true;
 	}
+	--self->srr_wrcnt;
 	return false;
 }
 #include <hybrid/__atomic.h>
@@ -110,8 +111,8 @@ NOTHROW(__FCALL libc_shared_recursive_rwlock_endread)(struct shared_recursive_rw
 INTERN ATTR_SECTION(".text.crt.sched.futex") __NOBLOCK NONNULL((1)) void
 NOTHROW(__FCALL libc_shared_recursive_rwlock_downgrade)(struct shared_recursive_rwlock *__restrict self) {
 	__hybrid_assertf(__shared_recursive_rwlock_isown(self), "You're not holding this lock");
-	__hybrid_assertf(self->srr_wrcnt == 1, "You're holding more than 1 write-lock");
-	self->srr_wrcnt = 0;
+	__hybrid_assertf(self->srr_wrcnt > 0, "You're holding more than 1 write-lock");
+	self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
 	COMPILER_WRITE_BARRIER();
 	libc_shared_rwlock_downgrade(&self->srr_lock);
 }
