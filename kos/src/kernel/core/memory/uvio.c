@@ -85,6 +85,7 @@ uvio_request_impl(struct uvio *__restrict self,
                   vio_addr_t addr, u16 command,
                   /*in|out*/ union kernel_uvio_argument argv_result[2]) THROWS(...) {
 	u8 status;
+
 	/* Fill in request information */
 	slot->kur_args   = args;
 	slot->kur_orig   = THIS_TASK;
@@ -95,7 +96,7 @@ uvio_request_impl(struct uvio *__restrict self,
 	memcpy(slot->kur_argv, argv_result, 2,
 	       sizeof(union kernel_uvio_argument));
 	/* Unlock the slot. */
-	sync_endwrite(&slot->kur_lock);
+	kernel_uvio_request_endwrite(slot);
 
 	/* Signal that a new request has become available. */
 	sig_send(&self->uv_reqmore);
@@ -113,6 +114,7 @@ uvio_request_impl(struct uvio *__restrict self,
 			task_disconnectall();
 			break; /* Request has completed (either successfully, or with an exception) */
 		}
+
 		/* Wait for the request to complete. */
 		task_waitfor();
 	}
@@ -154,17 +156,17 @@ NOTHROW(KCALL uvio_freerequest)(struct uvio *__restrict self,
 	 *       request handling server is running in user-space we need
 	 *       to have preemption enabled in order to be able to switch
 	 *       execute to the server thread), we can safely make use of
-	 *       `task_tryyield_or_pause()'  here to wait for the lock to
-	 *       become available. */
+	 *       `task_yield()' here  to  wait  for the  lock  to  become
+	 *       available. */
 	assert(PREEMPTION_ENABLED());
-	while unlikely(!sync_trywrite(&slot->kur_lock))
-		task_tryyield_or_pause();
+	kernel_uvio_request_write(slot);
+
 	/* Mark as free */
 	ATOMIC_WRITE(slot->kur_args, NULL);
 	DBG_memset(&slot->kur_orig, 0xcc,
 	           sizeof(struct kernel_uvio_request) -
 	           offsetof(struct kernel_uvio_request, kur_orig));
-	sync_endwrite(&slot->kur_lock);
+	kernel_uvio_request_endwrite(slot);
 
 	/* Signal that a free slot became available */
 	sig_send(&self->uv_reqfree);
@@ -199,14 +201,16 @@ uvio_request(/*in|out*/ struct vioargs *__restrict args, vio_addr_t addr, u16 co
 	if unlikely(!PREEMPTION_ENABLED())
 		THROW(E_WOULDBLOCK_PREEMPTED);
 again:
+
 	/* Find a free request slot and try to allocate it. */
 	for (reqid = 0; reqid < CONFIG_UVIO_MAX_PARALLEL_REQUESTS; ++reqid) {
 		slot = &self->uv_req[reqid];
-		sync_write(&slot->kur_lock);
+		kernel_uvio_request_write(slot);
 		if (self->uv_req[reqid].kur_args) {
-			sync_endwrite(&slot->kur_lock);
+			kernel_uvio_request_endwrite(slot);
 			continue; /* Already in use. */
 		}
+
 got_free_slot:
 		/* Found (and allocated) a free slot.
 		 * Now use this slot for the request. */
@@ -219,16 +223,18 @@ got_free_slot:
 		                  argv_result);
 		return;
 	}
+
 	/* Wait for more slots to become available. */
 	task_connect(&self->uv_reqfree);
 	TRY {
 		for (reqid = 0; reqid < CONFIG_UVIO_MAX_PARALLEL_REQUESTS; ++reqid) {
 			slot = &self->uv_req[reqid];
-			sync_write(&slot->kur_lock);
+			kernel_uvio_request_write(slot);
 			if (self->uv_req[reqid].kur_args) {
-				sync_endwrite(&slot->kur_lock);
+				kernel_uvio_request_endwrite(slot);
 				continue; /* Already in use. */
 			}
+
 			/* Unlikely case: A free slot was discovered during interlocked re-check */
 			task_disconnectall();
 			goto got_free_slot;
@@ -237,6 +243,7 @@ got_free_slot:
 		task_disconnectall();
 		RETHROW();
 	}
+
 	/* Wait for the a slot to become free. */
 	task_waitfor();
 	goto again;
@@ -465,6 +472,7 @@ NOTHROW(KCALL uvio_server_has_request_with_status)(struct uvio const *__restrict
 		slot = &self->uv_req[i];
 		if (!ATOMIC_READ(slot->kur_args))
 			continue; /* Unused slot */
+
 		/* NOTE: The status this following line reads may already be garbage!
 		 *       Between the previous line and this one, the request may have
 		 *       gotten freed, at which point its `kur_status' field would no
@@ -493,6 +501,7 @@ uvio_server_readone_nonblock(struct uvio *__restrict self,
 			continue; /* Unused slot. */
 		if (ATOMIC_READ(slot->kur_status) != KERNEL_UVIO_REQUEST_STATUS_PENDING)
 			continue; /* Slot isn't pending. */
+
 		/* This is likely going to be our slot. - Fill in `*req' */
 		COMPILER_BARRIER();
 		req->uq_addr  = (u64)slot->kur_addr;
@@ -523,32 +532,34 @@ uvio_server_readone_nonblock(struct uvio *__restrict self,
 			struct vioargs *args;
 			pid_t sender_pid;
 			COMPILER_READ_BARRIER();
-			sync_read(&slot->kur_lock);
+			kernel_uvio_request_read(slot);
 			args = ATOMIC_READ(slot->kur_args);
 			if unlikely(!args)
 				goto badslot;
 			acmap_page   = args->va_acmap_page;
 			acmap_offset = args->va_acmap_offset;
 			sender_pid   = task_getpid_of_s(slot->kur_orig);
-			sync_endread(&slot->kur_lock);
+			kernel_uvio_request_endread(slot);
 			COMPILER_READ_BARRIER();
 			req->uq_mapaddr = (u64)(uintptr_t)acmap_page;
 			req->uq_mapoffs = (u64)acmap_offset;
 			req->uq_pid     = (u32)sender_pid;
 		}
 		COMPILER_BARRIER();
+
 		/* (Try to) change the status of the slot. */
-		sync_read(&slot->kur_lock);
+		kernel_uvio_request_read(slot);
 		if unlikely(!ATOMIC_READ(slot->kur_args))
 			goto badslot;
 		if unlikely(!ATOMIC_CMPXCH(slot->kur_status,
 		                           KERNEL_UVIO_REQUEST_STATUS_PENDING,
 		                           KERNEL_UVIO_REQUEST_STATUS_DELIVERED)) {
 badslot:
-			sync_endread(&slot->kur_lock);
+			kernel_uvio_request_endread(slot);
 			continue;
 		}
-		sync_endread(&slot->kur_lock);
+		kernel_uvio_request_endread(slot);
+
 		/* Status got changed to DELIVERED.
 		 * -> This condition must be broadcast via `uv_reqdlvr' */
 		sig_broadcast(&self->uv_reqdlvr);
@@ -561,10 +572,10 @@ PRIVATE WUNUSED NONNULL((1)) size_t KCALL
 uvio_server_read(struct mfile *__restrict self,
                  USER CHECKED void *dst,
                  size_t num_bytes, iomode_t mode) THROWS(...) {
-	struct uvio *me;
+	struct uvio *me = mfile_asuvio(self);
 	USER CHECKED struct uvio_request *req;
 	assert(!task_wasconnected());
-	me = (struct uvio *)self;
+
 	/* Have the caller check for (IO_NONBLOCK), or wait (!IO_NONBLOCK)  until
 	 * a UVIO request has become available, at which point the request should
 	 * be copied into `dst', and be marked as delivered-but-not-completed  in
@@ -580,6 +591,7 @@ uvio_server_read(struct mfile *__restrict self,
 try_readone:
 	if (uvio_server_readone_nonblock(me, req))
 		return sizeof(struct uvio_request);
+
 	/* TODO: Check for `UVIO_OPCODE_GETUCMD' */
 
 	/* No requests available right now (behavior here depends on IO_NONBLOCK) */
@@ -588,12 +600,14 @@ try_readone:
 			return 0;
 		THROW(E_WOULDBLOCK_WAITFORSIGNAL);
 	}
+
 	/* Wait for data to become available. */
 	task_connect(&me->uv_reqmore);
 	if (uvio_server_has_request_with_status(me, KERNEL_UVIO_REQUEST_STATUS_PENDING)) {
 		task_disconnectall();
 		goto try_readone;
 	}
+
 	/* Wait for the request. */
 	task_waitfor();
 	goto try_readone;
@@ -604,11 +618,11 @@ uvio_server_write(struct mfile *__restrict self,
                   USER CHECKED void const *src,
                   size_t num_bytes,
                   iomode_t UNUSED(mode)) THROWS(...) {
-	size_t result;
-	struct uvio *me;
+	struct uvio *me = mfile_asuvio(self);
 	struct uvio_response response_header;
 	struct kernel_uvio_request *slot;
-	me = (struct uvio *)self;
+	size_t result;
+
 	/* Parse a UVIO response to a previous performed request.
 	 * s.a. `struct uvio_response' */
 	if unlikely(num_bytes < sizeof(response_header)) {
@@ -617,9 +631,11 @@ uvio_server_write(struct mfile *__restrict self,
 		      sizeof(response_header),
 		      num_bytes);
 	}
+
 	/* Copy the header into kernel-space */
 	memcpy(&response_header, src, sizeof(response_header));
 	COMPILER_READ_BARRIER();
+
 	/* No opcode currently makes use of the flags field.
 	 * As such, we can simply assert that field to be ZERO for all opcodes! */
 	if (response_header.ur_respflags != UVIO_RESPONSE_FLAG_NORMAL) {
@@ -662,17 +678,21 @@ err_buffer_too_small:
 #ifdef __ARCH_HAVE_COMPAT
 complete_slot_with_except:
 #endif /* __ARCH_HAVE_COMPAT */
+
 		/* Verify the response ID */
 		slot = &me->uv_req[response_header.ur_respid & 0xff];
-		sync_read(&slot->kur_lock);
+		kernel_uvio_request_read(slot);
+
 		/* Ignore responses to requests that may have been aborted. */
 		if unlikely(!VERIFY_SLOT(slot, response_header))
 			goto unlock_slot_and_ignore;
+
 		/* Fill in the exception to-be re-thrown. */
 		memcpy(&slot->kur_except, &except,
 		       sizeof(struct kernel_uvio_except));
 		ATOMIC_WRITE(slot->kur_status, KERNEL_UVIO_REQUEST_STATUS_EXCEPT);
 		goto complete_slot_nostatus;
+
 #ifdef __ARCH_HAVE_COMPAT
 	case UVIO_OPCODE_EXCEPT_COMPAT: {
 		unsigned int i;
@@ -706,20 +726,23 @@ err_bad_respid_lowbyte:
 			      response_header.ur_respid & 0xff, 0,
 			      CONFIG_UVIO_MAX_PARALLEL_REQUESTS - 1);
 		}
+
 		/* Verify the response ID */
 		slot = &me->uv_req[response_header.ur_respid & 0xff];
-		sync_read(&slot->kur_lock);
+		kernel_uvio_request_read(slot);
+
 		/* Ignore responses to requests that may have been aborted. */
 		if unlikely(!VERIFY_SLOT(slot, response_header)) {
 unlock_slot_and_ignore:
 			printk(KERN_WARNING "[uvio] Ignore bad/aborted response\n");
-			sync_endread(&slot->kur_lock);
+			kernel_uvio_request_endread(slot);
 			goto done;
 		}
 complete_slot:
 		ATOMIC_WRITE(slot->kur_status, KERNEL_UVIO_REQUEST_STATUS_COMPLETE);
 complete_slot_nostatus:
-		sync_endread(&slot->kur_lock);
+		kernel_uvio_request_endread(slot);
+
 		/* Signal that a request has been completed. */
 		sig_broadcast(&me->uv_reqdone);
 		break;
@@ -740,17 +763,21 @@ complete_slot_nostatus:
 			goto err_buffer_too_small;
 		if unlikely((response_header.ur_respid & 0xff) >= CONFIG_UVIO_MAX_PARALLEL_REQUESTS)
 			goto err_bad_respid_lowbyte;
+
 		/* Read in the return value. */
 		COMPILER_READ_BARRIER();
 		full_response = (USER CHECKED struct uvio_response_readb *)src;
 		retval        = full_response->ur_result;
 		COMPILER_READ_BARRIER();
+
 		/* Verify the response ID */
 		slot = &me->uv_req[response_header.ur_respid & 0xff];
-		sync_read(&slot->kur_lock);
+		kernel_uvio_request_read(slot);
+
 		/* Ignore responses to requests that may have been aborted. */
 		if unlikely(!VERIFY_SLOT(slot, response_header))
 			goto unlock_slot_and_ignore;
+
 		/* Fill in the return value. */
 		slot->kur_res.kua_b = retval;
 		goto complete_slot;
@@ -772,17 +799,21 @@ complete_slot_nostatus:
 			goto err_buffer_too_small;
 		if unlikely((response_header.ur_respid & 0xff) >= CONFIG_UVIO_MAX_PARALLEL_REQUESTS)
 			goto err_bad_respid_lowbyte;
+
 		/* Read in the return value. */
 		COMPILER_READ_BARRIER();
 		full_response = (USER CHECKED struct uvio_response_readw *)src;
 		retval        = full_response->ur_result;
 		COMPILER_READ_BARRIER();
+
 		/* Verify the response ID */
 		slot = &me->uv_req[response_header.ur_respid & 0xff];
-		sync_read(&slot->kur_lock);
+		kernel_uvio_request_read(slot);
+
 		/* Ignore responses to requests that may have been aborted. */
 		if unlikely(!VERIFY_SLOT(slot, response_header))
 			goto unlock_slot_and_ignore;
+
 		/* Fill in the return value. */
 		slot->kur_res.kua_w = retval;
 		goto complete_slot;
@@ -804,17 +835,21 @@ complete_slot_nostatus:
 			goto err_buffer_too_small;
 		if unlikely((response_header.ur_respid & 0xff) >= CONFIG_UVIO_MAX_PARALLEL_REQUESTS)
 			goto err_bad_respid_lowbyte;
+
 		/* Read in the return value. */
 		COMPILER_READ_BARRIER();
 		full_response = (USER CHECKED struct uvio_response_readl *)src;
 		retval        = full_response->ur_result;
 		COMPILER_READ_BARRIER();
+
 		/* Verify the response ID */
 		slot = &me->uv_req[response_header.ur_respid & 0xff];
-		sync_read(&slot->kur_lock);
+		kernel_uvio_request_read(slot);
+
 		/* Ignore responses to requests that may have been aborted. */
 		if unlikely(!VERIFY_SLOT(slot, response_header))
 			goto unlock_slot_and_ignore;
+
 		/* Fill in the return value. */
 		slot->kur_res.kua_l = retval;
 		goto complete_slot;
@@ -842,17 +877,21 @@ complete_slot_nostatus:
 			goto err_buffer_too_small;
 		if unlikely((response_header.ur_respid & 0xff) >= CONFIG_UVIO_MAX_PARALLEL_REQUESTS)
 			goto err_bad_respid_lowbyte;
+
 		/* Read in the return value. */
 		COMPILER_READ_BARRIER();
 		full_response = (USER CHECKED struct uvio_response_readq *)src;
 		retval        = full_response->ur_result;
 		COMPILER_READ_BARRIER();
+
 		/* Verify the response ID */
 		slot = &me->uv_req[response_header.ur_respid & 0xff];
-		sync_read(&slot->kur_lock);
+		kernel_uvio_request_read(slot);
+
 		/* Ignore responses to requests that may have been aborted. */
 		if unlikely(!VERIFY_SLOT(slot, response_header))
 			goto unlock_slot_and_ignore;
+
 		/* Fill in the return value. */
 		slot->kur_res.kua_q = retval;
 		goto complete_slot;
@@ -869,17 +908,21 @@ complete_slot_nostatus:
 			goto err_buffer_too_small;
 		if unlikely((response_header.ur_respid & 0xff) >= CONFIG_UVIO_MAX_PARALLEL_REQUESTS)
 			goto err_bad_respid_lowbyte;
+
 		/* Read in the return value. */
 		COMPILER_READ_BARRIER();
 		full_response = (USER CHECKED struct uvio_response_readx *)src;
 		retval        = full_response->ur_result;
 		COMPILER_READ_BARRIER();
+
 		/* Verify the response ID */
 		slot = &me->uv_req[response_header.ur_respid & 0xff];
-		sync_read(&slot->kur_lock);
+		kernel_uvio_request_read(slot);
+
 		/* Ignore responses to requests that may have been aborted. */
 		if unlikely(!VERIFY_SLOT(slot, response_header))
 			goto unlock_slot_and_ignore;
+
 		/* Fill in the return value. */
 		slot->kur_res.kua_x = retval;
 		goto complete_slot;
@@ -901,7 +944,8 @@ done:
 PRIVATE NONNULL((1)) void KCALL
 uvio_server_pollconnect(struct mfile *__restrict self,
                         poll_mode_t what) THROWS(...) {
-	struct uvio *me = (struct uvio *)self;
+	struct uvio *me = mfile_asuvio(self);
+
 	/* Poll for pending UVIO requests (read) and delivered-but-not-completed requests (write) */
 	if (what & (POLLINMASK | POLLOUTMASK))
 		task_connect_for_poll(&me->uv_reqmore);
@@ -910,8 +954,9 @@ uvio_server_pollconnect(struct mfile *__restrict self,
 PRIVATE WUNUSED NONNULL((1)) poll_mode_t
 NOTHROW(KCALL uvio_server_polltest)(struct mfile *__restrict self,
                                     poll_mode_t what) THROWS(...) {
+	struct uvio *me = mfile_asuvio(self);
 	poll_mode_t result = 0;
-	struct uvio *me = (struct uvio *)self;
+
 	/* Poll for pending UVIO requests (read) and delivered-but-not-completed requests (write) */
 	if ((what & POLLINMASK) && uvio_server_has_request_with_status(me, KERNEL_UVIO_REQUEST_STATUS_PENDING))
 		result |= POLLINMASK;

@@ -290,6 +290,35 @@ struct kernel_uvio_request {
 	};
 };
 
+/* Helper macros for working with `struct kernel_uvio_request::kur_lock' */
+#define _kernel_uvio_request_reap(self)        (void)0
+#define kernel_uvio_request_reap(self)         (void)0
+#define kernel_uvio_request_mustreap(self)     0
+#define kernel_uvio_request_write(self)        atomic_rwlock_write(&(self)->kur_lock)
+#define kernel_uvio_request_write_nx(self)     atomic_rwlock_write_nx(&(self)->kur_lock)
+#define kernel_uvio_request_trywrite(self)     atomic_rwlock_trywrite(&(self)->kur_lock)
+#define kernel_uvio_request_endwrite(self)     (atomic_rwlock_endwrite(&(self)->kur_lock), kernel_uvio_request_reap(self))
+#define _kernel_uvio_request_endwrite(self)    atomic_rwlock_endwrite(&(self)->kur_lock)
+#define kernel_uvio_request_read(self)         atomic_rwlock_read(&(self)->kur_lock)
+#define kernel_uvio_request_read_nx(self)      atomic_rwlock_read_nx(&(self)->kur_lock)
+#define kernel_uvio_request_tryread(self)      atomic_rwlock_tryread(&(self)->kur_lock)
+#define _kernel_uvio_request_endread(self)     atomic_rwlock_endread(&(self)->kur_lock)
+#define kernel_uvio_request_endread(self)      (void)(atomic_rwlock_endread(&(self)->kur_lock) && (kernel_uvio_request_reap(self), 0))
+#define _kernel_uvio_request_end(self)         atomic_rwlock_end(&(self)->kur_lock)
+#define kernel_uvio_request_end(self)          (void)(atomic_rwlock_end(&(self)->kur_lock) && (kernel_uvio_request_reap(self), 0))
+#define kernel_uvio_request_upgrade(self)      atomic_rwlock_upgrade(&(self)->kur_lock)
+#define kernel_uvio_request_upgrade_nx(self)   atomic_rwlock_upgrade_nx(&(self)->kur_lock)
+#define kernel_uvio_request_tryupgrade(self)   atomic_rwlock_tryupgrade(&(self)->kur_lock)
+#define kernel_uvio_request_downgrade(self)    atomic_rwlock_downgrade(&(self)->kur_lock)
+#define kernel_uvio_request_reading(self)      atomic_rwlock_reading(&(self)->kur_lock)
+#define kernel_uvio_request_writing(self)      atomic_rwlock_writing(&(self)->kur_lock)
+#define kernel_uvio_request_canread(self)      atomic_rwlock_canread(&(self)->kur_lock)
+#define kernel_uvio_request_canwrite(self)     atomic_rwlock_canwrite(&(self)->kur_lock)
+#define kernel_uvio_request_waitread(self)     atomic_rwlock_waitread(&(self)->kur_lock)
+#define kernel_uvio_request_waitwrite(self)    atomic_rwlock_waitwrite(&(self)->kur_lock)
+#define kernel_uvio_request_waitread_nx(self)  atomic_rwlock_waitread_nx(&(self)->kur_lock)
+#define kernel_uvio_request_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->kur_lock)
+
 
 struct uvio
 #ifdef __cplusplus
@@ -305,6 +334,9 @@ struct uvio
 	struct sig                 uv_reqfree; /* Signal send when a request slot is freed. */
 	struct kernel_uvio_request uv_req[CONFIG_UVIO_MAX_PARALLEL_REQUESTS]; /* Vector of UVIO requests. */
 };
+
+#define mfile_asuvio(self) ((struct uvio *)(self))
+
 
 /* The datablock type used by UVIO objects. */
 DATDEF struct mfile_ops const uvio_mfile_ops;
