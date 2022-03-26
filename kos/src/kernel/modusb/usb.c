@@ -684,22 +684,25 @@ PRIVATE void KCALL
 usb_controller_assign_device_address(struct usb_controller *__restrict self,
                                      struct usb_device *__restrict dev) {
 	u16 addr;
-	sync_write(&self->uc_devslock);
+	usb_controller_devs_write(self);
+
 	/* Find an unused (and non-zero) address. */
 	for (addr = 1; usb_controller_isused(self, addr); ++addr)
 		;
+
 	/* Make sure that the device can understand the address. */
 	if unlikely(addr > 127) {
-		sync_endwrite(&self->uc_devslock);
+		usb_controller_devs_endwrite(self);
 		THROW(E_IOERROR_NODATA,
 		      E_IOERROR_SUBSYSTEM_USB,
 		      E_IOERROR_REASON_USB_TOOMANY);
 	}
+
 	/* Remember the address, and link up the device in our chain. */
 	dev->ud_dev   = addr;
 	dev->ud_next  = self->uc_devs;
 	self->uc_devs = (REF struct usb_device *)incref(dev);
-	sync_endwrite(&self->uc_devslock);
+	usb_controller_devs_endwrite(self);
 }
 
 

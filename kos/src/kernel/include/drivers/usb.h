@@ -104,6 +104,7 @@ struct usb_device
 #ifndef __cplusplus
 	struct usb_interface      ud_intf;         /* The associated interface. */
 #endif /* !__cplusplus */
+	/* TODO: Use SLIST_ENTRY() for `ud_next' */
 	REF struct usb_device    *ud_next;         /* [0..1][lock(:uc_endpt_lock)] Next device within the associated controller. */
 	char                     *ud_str_vendor;   /* [0..1][const][owned] Device vendor name (NUL-terminated utf-8 string) */
 	char                     *ud_str_product;  /* [0..1][const][owned] Device product name (NUL-terminated utf-8 string) */
@@ -315,13 +316,43 @@ struct usb_controller
 #define _usb_controller_chr_ /* nothing */
 #endif /* __cplusplus */
 	struct atomic_rwlock    uc_devslock; /* Lock for `uc_devs' */
-	REF struct usb_device  *uc_devs;     /* [0..1][lock(uc_devslock)] Chain of known USB devices. */
+	/* TODO: Use SLIST_HEAD() for `uc_devs' */
+	REF struct usb_device  *uc_devs;     /* [0..1][lock(uc_devslock)] List of known USB devices. */
 	struct shared_lock      uc_disclock; /* Lock  that must be held when resetting ports for the purpose
 	                                      * of discovering new devices. This lock is required to prevent
 	                                      * multiple threads from resetting the ports of different hubs,
 	                                      * which could lead to multiple devices bound to ADDR=0, making
 	                                      * it impossible to safely configure them individually. */
 };
+
+/* Helper macros for working with `struct usb_controller::uc_devslock' */
+#define _usb_controller_devs_reap(self)        (void)0
+#define usb_controller_devs_reap(self)         (void)0
+#define usb_controller_devs_mustreap(self)     0
+#define usb_controller_devs_write(self)        atomic_rwlock_write(&(self)->uc_devslock)
+#define usb_controller_devs_write_nx(self)     atomic_rwlock_write_nx(&(self)->uc_devslock)
+#define usb_controller_devs_trywrite(self)     atomic_rwlock_trywrite(&(self)->uc_devslock)
+#define usb_controller_devs_endwrite(self)     (atomic_rwlock_endwrite(&(self)->uc_devslock), usb_controller_devs_reap(self))
+#define _usb_controller_devs_endwrite(self)    atomic_rwlock_endwrite(&(self)->uc_devslock)
+#define usb_controller_devs_read(self)         atomic_rwlock_read(&(self)->uc_devslock)
+#define usb_controller_devs_read_nx(self)      atomic_rwlock_read_nx(&(self)->uc_devslock)
+#define usb_controller_devs_tryread(self)      atomic_rwlock_tryread(&(self)->uc_devslock)
+#define _usb_controller_devs_endread(self)     atomic_rwlock_endread(&(self)->uc_devslock)
+#define usb_controller_devs_endread(self)      (void)(atomic_rwlock_endread(&(self)->uc_devslock) && (usb_controller_devs_reap(self), 0))
+#define _usb_controller_devs_end(self)         atomic_rwlock_end(&(self)->uc_devslock)
+#define usb_controller_devs_end(self)          (void)(atomic_rwlock_end(&(self)->uc_devslock) && (usb_controller_devs_reap(self), 0))
+#define usb_controller_devs_upgrade(self)      atomic_rwlock_upgrade(&(self)->uc_devslock)
+#define usb_controller_devs_upgrade_nx(self)   atomic_rwlock_upgrade_nx(&(self)->uc_devslock)
+#define usb_controller_devs_tryupgrade(self)   atomic_rwlock_tryupgrade(&(self)->uc_devslock)
+#define usb_controller_devs_downgrade(self)    atomic_rwlock_downgrade(&(self)->uc_devslock)
+#define usb_controller_devs_reading(self)      atomic_rwlock_reading(&(self)->uc_devslock)
+#define usb_controller_devs_writing(self)      atomic_rwlock_writing(&(self)->uc_devslock)
+#define usb_controller_devs_canread(self)      atomic_rwlock_canread(&(self)->uc_devslock)
+#define usb_controller_devs_canwrite(self)     atomic_rwlock_canwrite(&(self)->uc_devslock)
+#define usb_controller_devs_waitread(self)     atomic_rwlock_waitread(&(self)->uc_devslock)
+#define usb_controller_devs_waitwrite(self)    atomic_rwlock_waitwrite(&(self)->uc_devslock)
+#define usb_controller_devs_waitread_nx(self)  atomic_rwlock_waitread_nx(&(self)->uc_devslock)
+#define usb_controller_devs_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->uc_devslock)
 
 /* Helper macros for `struct usb_controller::uc_disclock' */
 #define _usb_controller_disclock_reap(self)      (void)0
