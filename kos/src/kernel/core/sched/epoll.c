@@ -430,7 +430,7 @@ NOTHROW(FCALL epoll_controller_destroy)(struct epoll_controller *__restrict self
 	kfree(self->ec_list);
 
 	/* Broadcast private signals for finalization */
-	assert(!sig_iswaiting(&self->ec_lock.m_unlock));
+	assert(!sig_iswaiting(&self->ec_lock.sl_sig));
 	sig_broadcast_for_fini(&self->ec_avail);
 	weakdecref_likely(self);
 }
@@ -453,7 +453,7 @@ epoll_controller_create(void) THROWS(E_BADALLOC) {
 #ifdef CONFIG_HAVE_EPOLL_RPC
 	SLIST_INIT(&result->ec_lops);
 #endif /* CONFIG_HAVE_EPOLL_RPC */
-	mutex_init(&result->ec_lock);
+	shared_lock_init(&result->ec_lock);
 	result->ec_raised  = NULL;
 	result->ec_pending = NULL;
 	sig_init(&result->ec_avail);
@@ -584,7 +584,7 @@ epoll_loop:
 				task_disconnectall();
 				decref_unlikely(error);
 			};
-			while (!mutex_poll_unlikely(&error->ec_lock))
+			while (!shared_lock_poll_unlikely(&error->ec_lock))
 				task_waitfor();
 			goto again;
 		}

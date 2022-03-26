@@ -25,10 +25,10 @@
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/types.h>
-#include <sched/mutex.h>
 #include <sched/sig-completion.h>
 #include <sched/sig.h>
 
+#include <kos/sched/shared-lock.h>
 #include <sys/epoll.h>
 
 
@@ -148,8 +148,8 @@ struct epoll_controller {
 	 *       the send-queue) */
 	WEAK refcnt_t                     ec_refcnt;     /* Reference counter. */
 	WEAK refcnt_t                     ec_weakrefcnt; /* Weak reference counter. */
-	/* TODO: Don't use a mutex here; change this to use `atomic_lock' instead! */
-	struct mutex                      ec_lock;       /* Lock  for this epoll  controller. This one has  to be held whenever
+	/* TODO: Don't use a shared_lock here; change this to use `atomic_lock' instead! */
+	struct shared_lock                ec_lock;       /* Lock  for this epoll  controller. This one has  to be held whenever
 	                                                  * making modifications  to, or  scanning the  set of  monitored  file
 	                                                  * descriptors. Additionally, `epoll_wait(2)' will temporarily acquire
 	                                                  * a this lock while searching for handle monitors that may have  been
@@ -178,15 +178,15 @@ struct epoll_controller {
 #ifdef CONFIG_HAVE_EPOLL_RPC
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _epoll_controller_lock_reap)(struct epoll_controller *__restrict self);
 #define epoll_controller_lock_reap(self)    (void)(!oblockop_mustreap(&(self)->ec_lops) || (_epoll_controller_lock_reap(self), 0))
-#define epoll_controller_lock_release(self) (mutex_release(&(self)->ec_lock), epoll_controller_lock_reap(self))
+#define epoll_controller_lock_release(self) (shared_lock_release(&(self)->ec_lock), epoll_controller_lock_reap(self))
 #else /* CONFIG_HAVE_EPOLL_RPC */
-#define epoll_controller_lock_release(self) mutex_release(&(self)->ec_lock)
+#define epoll_controller_lock_release(self) shared_lock_release(&(self)->ec_lock)
 #endif /* !CONFIG_HAVE_EPOLL_RPC */
-#define _epoll_controller_lock_release(self)   mutex_release(&(self)->ec_lock)
-#define epoll_controller_lock_tryacquire(self) mutex_tryacquire(&(self)->ec_lock)
-#define epoll_controller_lock_acquire(self)    mutex_acquire(&(self)->ec_lock)
-#define epoll_controller_lock_acquire_nx(self) mutex_acquire_nx(&(self)->ec_lock)
-#define epoll_controller_lock_acquired(self)   mutex_acquired(&(self)->ec_lock)
+#define _epoll_controller_lock_release(self)   shared_lock_release(&(self)->ec_lock)
+#define epoll_controller_lock_tryacquire(self) shared_lock_tryacquire(&(self)->ec_lock)
+#define epoll_controller_lock_acquire(self)    shared_lock_acquire(&(self)->ec_lock)
+#define epoll_controller_lock_acquire_nx(self) shared_lock_acquire_nx(&(self)->ec_lock)
+#define epoll_controller_lock_acquired(self)   shared_lock_acquired(&(self)->ec_lock)
 
 
 /* Hash-vector iteration helper macros */
