@@ -931,7 +931,7 @@ usb_device_discovered(struct usb_controller *__restrict self,
 	{
 		/* Always  release  the  device-discover-lock  as
 		 * soon as we've assigned the device its address. */
-		FINALLY_ENDWRITE(&self->uc_disclock);
+		RAII_FINALLY { usb_controller_disclock_release(self); };
 
 		/* Create a descriptor for the device. */
 		dev = (REF struct usb_device *)kmalloc(sizeof(struct usb_device),
@@ -978,7 +978,7 @@ usb_device_discovered(struct usb_controller *__restrict self,
 			RETHROW();
 		}
 	} /* FINALLY {
-		sync_endwrite(&self->uc_disclock);
+		usb_controller_disclock_release(self);
 	} */
 
 	/* Cleanup our initial reference to the device once this function returns. */

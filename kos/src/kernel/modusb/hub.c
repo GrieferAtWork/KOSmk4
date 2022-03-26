@@ -82,8 +82,10 @@ usbhubdev_reset_port_and_probe(struct usbhubdev *__restrict self,
 	printk(FREESTR(KERN_INFO "[usb][addr:%#I8x] Checking for device attached to hub port #%I8u\n"),
 	       self->uh_intf->ue_dev, portno);
 	ctrl = self->uh_ctrl;
-	sync_write(&ctrl->uc_disclock);
-	TRY {
+	usb_controller_disclock_acquire(ctrl);
+	{
+		RAII_FINALLY { usb_controller_disclock_release(ctrl); };
+
 		/* Reset the port. */
 		req.ur_reqtype = USB_REQUEST_RETYPE_DEST_OTH |
 		                 USB_REQUEST_RETYPE_TYPE_CLS |
@@ -115,11 +117,7 @@ usbhubdev_reset_port_and_probe(struct usbhubdev *__restrict self,
 			if (st & 2)
 				goto do_probe_port;
 		}
-	} EXCEPT {
-		sync_endwrite(&ctrl->uc_disclock);
-		RETHROW();
 	}
-	sync_endwrite(&ctrl->uc_disclock);
 	return;
 do_probe_port:
 	{

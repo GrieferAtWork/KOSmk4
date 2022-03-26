@@ -2709,7 +2709,7 @@ uhci_chk_port_changes(struct uhci_controller *__restrict self) {
 	                 "Check for uhci root-hub connectivity changes\n",
 	       self->uc_pci->pd_addr, self->uc_base.uc_mmbase);
 again:
-	sync_write(&self->uc_disclock);
+	usb_controller_disclock_acquire(self);
 	for (i = 0; i < self->uc_portnum; ++i) {
 		u16 portsc;
 		portsc = uhci_rdw(self, UHCI_PORTSC(i));
@@ -2735,11 +2735,11 @@ again:
 		portsc |= UHCI_PORTSC_PEDC;
 		uhci_wrw(self, UHCI_PORTSC(i), portsc);
 		/* Inform the USB sub-system that a device has been detached. */
-		sync_endwrite(&self->uc_disclock);
+		usb_controller_disclock_release(self);
 		uhci_controller_device_detached(self, i);
 		goto again;
 	}
-	sync_endwrite(&self->uc_disclock);
+	usb_controller_disclock_release(self);
 }
 
 PRIVATE void KCALL
@@ -2906,17 +2906,17 @@ uhci_controller_reset_port_and_probe(struct uhci_controller *__restrict self,
 	UHCI_DEBUG(FREESTR(KERN_INFO "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] "
 	                             "Checking for device on uhci port #%" PRIu16 "\n"),
 	           self->uc_pci->pd_addr, self->uc_base.uc_mmbase, portno);
-	sync_write(&self->uc_disclock);
+	usb_controller_disclock_acquire(self);
 	TRY {
 		status = uhci_controller_reset_port(self, portno);
 	} EXCEPT {
-		sync_endwrite(&self->uc_disclock);
+		usb_controller_disclock_release(self);
 		RETHROW();
 	}
 	if (status & UHCI_PORTSC_PED) {
 		uhci_controller_device_attached(self, portno, status);
 	} else {
-		sync_endwrite(&self->uc_disclock);
+		usb_controller_disclock_release(self);
 	}
 }
 

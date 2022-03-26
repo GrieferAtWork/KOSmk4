@@ -25,7 +25,6 @@
 #include <kernel/fs/chrdev.h>
 #include <kernel/fs/devfs.h>
 #include <kernel/types.h>
-#include <sched/mutex.h>
 
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
@@ -34,6 +33,7 @@
 #include <bits/crt/format-printer.h>
 #include <kos/aref.h>
 #include <kos/kernel/memory.h>
+#include <kos/sched/shared-lock.h>
 
 #include <stdbool.h>
 
@@ -316,12 +316,24 @@ struct usb_controller
 #endif /* __cplusplus */
 	struct atomic_rwlock    uc_devslock; /* Lock for `uc_devs' */
 	REF struct usb_device  *uc_devs;     /* [0..1][lock(uc_devslock)] Chain of known USB devices. */
-	struct mutex            uc_disclock; /* Lock  that must be held when resetting ports for the purpose
+	struct shared_lock      uc_disclock; /* Lock  that must be held when resetting ports for the purpose
 	                                      * of discovering new devices. This lock is required to prevent
 	                                      * multiple threads from resetting the ports of different hubs,
 	                                      * which could lead to multiple devices bound to ADDR=0, making
 	                                      * it impossible to safely configure them individually. */
 };
+
+/* Helper macros for `struct usb_controller::uc_disclock' */
+#define _usb_controller_disclock_reap(self)      (void)0
+#define usb_controller_disclock_reap(self)       (void)0
+#define usb_controller_disclock_mustreap(self)   0
+#define usb_controller_disclock_tryacquire(self) shared_lock_tryacquire(&(self)->uc_disclock)
+#define usb_controller_disclock_acquire(self)    shared_lock_acquire(&(self)->uc_disclock)
+#define usb_controller_disclock_acquire_nx(self) shared_lock_acquire_nx(&(self)->uc_disclock)
+#define _usb_controller_disclock_release(self)   shared_lock_release(&(self)->uc_disclock)
+#define usb_controller_disclock_release(self)    (shared_lock_release(&(self)->uc_disclock), usb_controller_disclock_reap(self))
+#define usb_controller_disclock_acquired(self)   shared_lock_acquired(&(self)->uc_disclock)
+#define usb_controller_disclock_available(self)  shared_lock_available(&(self)->uc_disclock)
 
 
 /* Return a pointer to character-device operators of `self' */
@@ -360,12 +372,12 @@ struct usb_controller
 	(_chrdev_init(self, &(ops)->uco_chr),      \
 	 atomic_rwlock_init(&(self)->uc_devslock), \
 	 (self)->uc_devs = __NULLPTR,              \
-	 mutex_init(&(self)->uc_disclock))
+	 shared_lock_init(&(self)->uc_disclock))
 #define _usb_controller_cinit(self, ops)            \
 	(_chrdev_cinit(self, &(ops)->uco_chr),          \
 	 atomic_rwlock_cinit(&(self)->uc_devslock),     \
 	 __hybrid_assert((self)->uc_devs == __NULLPTR), \
-	 mutex_cinit(&(self)->uc_disclock))
+	 shared_lock_cinit(&(self)->uc_disclock))
 #define _usb_controller_fini(self) _chrdev_fini(self)
 
 
