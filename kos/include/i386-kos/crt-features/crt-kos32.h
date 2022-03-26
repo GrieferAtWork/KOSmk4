@@ -2989,8 +2989,6 @@
 #define __CRT_HAVE_funopen64
 #define __CRT_HAVE_futex_getspin
 #define __CRT_HAVE_futex_setspin
-#define __CRT_HAVE_futex_timedwaitlock
-#define __CRT_HAVE_futex_timedwaitlock64
 #define __CRT_HAVE_futex_timedwaituntil
 #define __CRT_HAVE_futex_timedwaituntil64
 #define __CRT_HAVE_futex_timedwaituntil_exactbits
@@ -3011,7 +3009,6 @@
 #define __CRT_HAVE_futex_timedwaitwhile_belowequal64
 #define __CRT_HAVE_futex_timedwaitwhile_exactbits
 #define __CRT_HAVE_futex_timedwaitwhile_exactbits64
-#define __CRT_HAVE_futex_waitlock
 #define __CRT_HAVE_futex_waituntil
 #define __CRT_HAVE_futex_waituntil_exactbits
 #define __CRT_HAVE_futex_waitwhile
@@ -3025,8 +3022,6 @@
 #define __CRT_HAVE_futex_wake
 #define __CRT_HAVE_futex_wakeall
 #define __CRT_HAVE_futex_wakemask
-#define __CRT_HAVE_futexlock_wake
-#define __CRT_HAVE_futexlock_wakeall
 #define __CRT_HAVE_futime
 #define __CRT_HAVE_futime64
 #define __CRT_HAVE_futimens

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe25dc7a9 */
+/* HASH CRC-32:0x516f60ab */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,7 +80,6 @@ typedef __uintptr_t lfutex_t;
  * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t val = count)
  *    - LFUTEX_WAKEMASK:           (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKEMASK, size_t val = count, lfutex_t mask_and, lfutex_t mask_or)
- *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t val = lock_value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE_ABOVE:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_ABOVE, lfutex_t val = value, struct timespec const *timeout)
@@ -100,7 +99,6 @@ __LIBC __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_RPC(__VLIBCCALL lfutex)(lfut
  * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t val = count)
  *    - LFUTEX_WAKEMASK:           (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKEMASK, size_t val = count, lfutex_t mask_and, lfutex_t mask_or)
- *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t val = lock_value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE_ABOVE:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_ABOVE, lfutex_t val = value, struct timespec const *timeout)
@@ -121,7 +119,6 @@ __CVREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,lfutex,(lfutex_t *
  * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t val = count)
  *    - LFUTEX_WAKEMASK:           (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKEMASK, size_t val = count, lfutex_t mask_and, lfutex_t mask_or)
- *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t val = lock_value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE_ABOVE:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_ABOVE, lfutex_t val = value, struct timespec const *timeout)
@@ -148,7 +145,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lfutex, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
  * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t val = count)
  *    - LFUTEX_WAKEMASK:           (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKEMASK, size_t val = count, lfutex_t mask_and, lfutex_t mask_or)
- *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t val = lock_value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE_ABOVE:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_ABOVE, lfutex_t val = value, struct timespec const *timeout)
@@ -168,7 +164,6 @@ __CVREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,lfutex64,(lfutex_t
  * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t val = count)
  *    - LFUTEX_WAKEMASK:           (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKEMASK, size_t val = count, lfutex_t mask_and, lfutex_t mask_or)
- *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t val = lock_value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE_ABOVE:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_ABOVE, lfutex_t val = value, struct timespec const *timeout)
@@ -189,7 +184,6 @@ __LIBC __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_RPC(__VLIBCCALL lfutex64)(lf
  * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t val = count)
  *    - LFUTEX_WAKEMASK:           (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKEMASK, size_t val = count, lfutex_t mask_and, lfutex_t mask_or)
- *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t val = lock_value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE_ABOVE:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_ABOVE, lfutex_t val = value, struct timespec const *timeout)
@@ -246,38 +240,6 @@ __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,futex_wakemask,(lfut
  * @return: * : The number of woken threads
  * @return: -1:EFAULT: A faulty pointer was given */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_wakemask, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL futex_wakemask)(lfutex_t *__uaddr, __SIZE_TYPE__ __max_wake, lfutex_t __mask_and, lfutex_t __mask_or) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_wakemask))(__uaddr, __max_wake, __mask_and, __mask_or); })
-#endif /* ... */
-#ifdef __CRT_HAVE_futexlock_wake
-/* >> futexlock_wake(3), futexlock_wakeall(3)
- * A more efficient variant of `futex_wake()' that does  nothing
- * if `!(*ulockaddr & LFUTEX_WAIT_LOCK_WAITERS)', and will clear
- * the `LFUTEX_WAIT_LOCK_WAITERS' flag  (in a race-safe  manner)
- * when there are no more waiting threads. */
-__CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,futexlock_wake,(lfutex_t *__ulockaddr, __SIZE_TYPE__ __max_wake),(__ulockaddr,__max_wake))
-#elif defined(__CRT_HAVE_futex_wakemask) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
-#include <libc/local/kos.futex/futexlock_wake.h>
-/* >> futexlock_wake(3), futexlock_wakeall(3)
- * A more efficient variant of `futex_wake()' that does  nothing
- * if `!(*ulockaddr & LFUTEX_WAIT_LOCK_WAITERS)', and will clear
- * the `LFUTEX_WAIT_LOCK_WAITERS' flag  (in a race-safe  manner)
- * when there are no more waiting threads. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(futexlock_wake, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL futexlock_wake)(lfutex_t *__ulockaddr, __SIZE_TYPE__ __max_wake) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futexlock_wake))(__ulockaddr, __max_wake); })
-#endif /* ... */
-#ifdef __CRT_HAVE_futexlock_wakeall
-/* >> futexlock_wake(3), futexlock_wakeall(3)
- * A more efficient variant of `futex_wake()' that does  nothing
- * if `!(*ulockaddr & LFUTEX_WAIT_LOCK_WAITERS)', and will clear
- * the `LFUTEX_WAIT_LOCK_WAITERS' flag  (in a race-safe  manner)
- * when there are no more waiting threads. */
-__CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,futexlock_wakeall,(lfutex_t *__ulockaddr),(__ulockaddr))
-#elif defined(__CRT_HAVE_futex_wakeall) || defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
-#include <libc/local/kos.futex/futexlock_wakeall.h>
-/* >> futexlock_wake(3), futexlock_wakeall(3)
- * A more efficient variant of `futex_wake()' that does  nothing
- * if `!(*ulockaddr & LFUTEX_WAIT_LOCK_WAITERS)', and will clear
- * the `LFUTEX_WAIT_LOCK_WAITERS' flag  (in a race-safe  manner)
- * when there are no more waiting threads. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(futexlock_wakeall, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL futexlock_wakeall)(lfutex_t *__ulockaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futexlock_wakeall))(__ulockaddr); })
 #endif /* ... */
 #ifdef __CRT_HAVE_futex_waitwhile
 /* Wait if `*uaddr == equal_to_value'
@@ -406,22 +368,6 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_belowequal,(lfu
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_waitwhile_belowequal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile_belowequal)(lfutex_t *__uaddr, lfutex_t __below_equal_value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_waitwhile_belowequal))(__uaddr, __below_equal_value); })
-#endif /* ... */
-#ifdef __CRT_HAVE_futex_waitlock
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT: A faulty pointer was given
- * @return: -1:EINTR:  Operation was interrupted (*uaddr was still set to new_value) */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitlock,(lfutex_t *__uaddr),(__uaddr))
-#elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
-#include <libc/local/kos.futex/futex_waitlock.h>
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT: A faulty pointer was given
- * @return: -1:EINTR:  Operation was interrupted (*uaddr was still set to new_value) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(futex_waitlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitlock)(lfutex_t *__uaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_waitlock))(__uaddr); })
 #endif /* ... */
 #ifdef __CRT_HAVE_futex_waitwhile_exactbits
 /* Wait if `(*uaddr & bitmask) == setmask'
@@ -694,32 +640,6 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_belowequa
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile_belowequal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile_belowequal)(lfutex_t *__uaddr, lfutex_t __below_equal_value, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_belowequal))(__uaddr, __below_equal_value, __rel_timeout); })
-#endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitlock) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitlock,(lfutex_t *__uaddr, struct timespec const *__rel_timeout),(__uaddr,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitlock64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitlock,(lfutex_t *__uaddr, struct timespec const *__rel_timeout),futex_timedwaitlock64,(__uaddr,__rel_timeout))
-#elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
-#include <libc/local/kos.futex/futex_timedwaitlock.h>
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitlock)(lfutex_t *__uaddr, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitlock))(__uaddr, __rel_timeout); })
 #endif /* ... */
 #if defined(__CRT_HAVE_futex_timedwaitwhile_exactbits) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `(*uaddr & bitmask) == setmask'
@@ -1023,32 +943,6 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_belowequal
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile_belowequal64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile_belowequal64)(lfutex_t *__uaddr, lfutex_t __below_equal_value, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_belowequal64))(__uaddr, __below_equal_value, __rel_timeout); })
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitlock64,(lfutex_t *__uaddr, struct timespec64 const *__rel_timeout),futex_timedwaitlock,(__uaddr,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitlock64)
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitlock64,(lfutex_t *__uaddr, struct timespec64 const *__rel_timeout),(__uaddr,__rel_timeout))
-#elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
-#include <libc/local/kos.futex/futex_timedwaitlock64.h>
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitlock64)(lfutex_t *__uaddr, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitlock64))(__uaddr, __rel_timeout); })
-#endif /* ... */
 #if defined(__CRT_HAVE_futex_timedwaitwhile_exactbits) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `(*uaddr & bitmask) == setmask'
  * @return: 0: Did wait
@@ -1142,27 +1036,6 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_allbits64,
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile_allbits64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile_allbits64)(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_allbits64))(__uaddr, __bitmask, __rel_timeout); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
-#ifndef ____os_gettid_defined
-#define ____os_gettid_defined
-#ifdef __CRT_HAVE_gettid
-/* >> gettid(2)
- * Return the TID of the calling thread
- * THIS_THREAD->PID */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__os_gettid,(void),gettid,())
-#elif defined(__CRT_HAVE___threadid)
-/* >> gettid(2)
- * Return the TID of the calling thread
- * THIS_THREAD->PID */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__os_gettid,(void),__threadid,())
-#elif defined(__CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ)
-/* >> gettid(2)
- * Return the TID of the calling thread
- * THIS_THREAD->PID */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__os_gettid,(void),?GetCurrentThreadId@platform@details@Concurrency@@YAJXZ,())
-#else /* ... */
-#undef ____os_gettid_defined
-#endif /* !... */
-#endif /* !____os_gettid_defined */
 
 
 
@@ -1230,25 +1103,6 @@ __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_belowequal)(lfutex_t *__uaddr, lfute
 	return __hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) <= __below_equal_value ? 0 : 1;
 }
 
-#ifdef ____os_gettid_defined
-/* Same as `futex_waitlock()' with a 0-length timeout
- * @return: 0: Successfully acquired the lock
- * @return: 1: Failed to acquire acquired the lock without blocking */
-__FORCELOCAL __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL futex_trywaitlock)(lfutex_t *__uaddr) {
-	for (;;) {
-		lfutex_t __oldval;
-		__oldval = __hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE);
-		if ((__oldval & LFUTEX_WAIT_LOCK_TIDMASK) != 0)
-			break;
-		if (__hybrid_atomic_cmpxch_weak(*__uaddr, __oldval, (__oldval & ~LFUTEX_WAIT_LOCK_TIDMASK) | __os_gettid(),
-		                                __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))
-			return 0;
-	}
-	return 1;
-}
-#endif /* ____os_gettid_defined */
-
 /* Check if `futex_waitwhile_exactbits()' would block
  * @return: 0: `futex_waitwhile_exactbits()' would block
  * @return: 1: `futex_waitwhile_exactbits()' wouldn't block */
@@ -1289,10 +1143,10 @@ __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_allbits)(lfutex_t *__uaddr, lfutex_t
  *   - LFUTEX_WAIT_WHILE: SPIN({ if (*uaddr != val) DONE(); });
  *   - LFUTEX_WAIT_UNTIL: SPIN({ if (*uaddr == val) DONE(); });
  *   - ...
- * Futex  spinning  improves  performance  by  bypassing  expensive  blocking   operations
- * when  associated  locks  are  often only  held  for  a  couple of  moments  at  a time.
- * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'), which
- * is wrapped like this:
+ * Futex spinning improves  performance by bypassing  expensive blocking  operations
+ * when associated locks  are often only  held for a  couple of moments  at a  time.
+ * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'),
+ * which is wrapped like this:
  * >> unsigned int spins;
  * >> spins = futex_getspin();
  * >> while (spins--) {
@@ -1310,10 +1164,10 @@ __CDECLARE_OPT(__ATTR_WUNUSED,unsigned int,__NOTHROW,futex_getspin,(void),())
  *   - LFUTEX_WAIT_WHILE: SPIN({ if (*uaddr != val) DONE(); });
  *   - LFUTEX_WAIT_UNTIL: SPIN({ if (*uaddr == val) DONE(); });
  *   - ...
- * Futex  spinning  improves  performance  by  bypassing  expensive  blocking   operations
- * when  associated  locks  are  often only  held  for  a  couple of  moments  at  a time.
- * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'), which
- * is wrapped like this:
+ * Futex spinning improves  performance by bypassing  expensive blocking  operations
+ * when associated locks  are often only  held for a  couple of moments  at a  time.
+ * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'),
+ * which is wrapped like this:
  * >> unsigned int spins;
  * >> spins = futex_getspin();
  * >> while (spins--) {
@@ -1572,34 +1426,6 @@ extern "C++" {
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile_belowequal)(lfutex_t *__uaddr, lfutex_t __below_equal_value, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_belowequal))(__uaddr, __below_equal_value, __rel_timeout); }
-#endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitlock) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitlock,(lfutex_t *__uaddr, struct timespec const *__rel_timeout),futex_timedwaitlock,(__uaddr,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitlock64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitlock,(lfutex_t *__uaddr, struct timespec const *__rel_timeout),futex_timedwaitlock64,(__uaddr,__rel_timeout))
-#elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
-} /* extern "C++" */
-#include <libc/local/kos.futex/futex_timedwaitlock.h>
-extern "C++" {
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitlock)(lfutex_t *__uaddr, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitlock))(__uaddr, __rel_timeout); }
 #endif /* ... */
 #if defined(__CRT_HAVE_futex_timedwaitwhile_exactbits) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `(*uaddr & bitmask) == setmask'
@@ -1928,34 +1754,6 @@ extern "C++" {
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile_belowequal)(lfutex_t *__uaddr, lfutex_t __below_equal_value, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_belowequal64))(__uaddr, __below_equal_value, __rel_timeout); }
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitlock,(lfutex_t *__uaddr, struct timespec64 const *__rel_timeout),futex_timedwaitlock,(__uaddr,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitlock64)
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitlock,(lfutex_t *__uaddr, struct timespec64 const *__rel_timeout),futex_timedwaitlock64,(__uaddr,__rel_timeout))
-#elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
-} /* extern "C++" */
-#include <libc/local/kos.futex/futex_timedwaitlock64.h>
-extern "C++" {
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitlock)(lfutex_t *__uaddr, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitlock64))(__uaddr, __rel_timeout); }
-#endif /* ... */
 #if defined(__CRT_HAVE_futex_timedwaitwhile_exactbits) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `(*uaddr & bitmask) == setmask'
  * @return: 0: Did wait
@@ -2077,8 +1875,6 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL 
 #define __PRIVATE_futex_waitwhile_aboveequal_3(uaddr, above_equal_value, rel_timeout) futex_timedwaitwhile_aboveequal(uaddr, above_equal_value, rel_timeout)
 #define __PRIVATE_futex_waitwhile_belowequal_2(uaddr, below_equal_value)              futex_waitwhile_belowequal(uaddr, below_equal_value)
 #define __PRIVATE_futex_waitwhile_belowequal_3(uaddr, below_equal_value, rel_timeout) futex_timedwaitwhile_belowequal(uaddr, below_equal_value, rel_timeout)
-#define __PRIVATE_futex_waitlock_1(uaddr)                                             futex_waitlock(uaddr)
-#define __PRIVATE_futex_waitlock_2(uaddr, rel_timeout)                                futex_timedwaitlock(uaddr, rel_timeout)
 #define __PRIVATE_futex_waitwhile_exactbits_3(uaddr, bitmask, setmask)                futex_waitwhile_exactbits(uaddr, bitmask, setmask)
 #define __PRIVATE_futex_waitwhile_exactbits_4(uaddr, bitmask, setmask, rel_timeout)   futex_timedwaitwhile_exactbits(uaddr, bitmask, setmask, rel_timeout)
 #define __PRIVATE_futex_waituntil_exactbits_3(uaddr, bitmask, setmask)                futex_waituntil_exactbits(uaddr, bitmask, setmask)
@@ -2096,7 +1892,6 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL 
 #define futex_waitwhile_below(...)                __HYBRID_PP_VA_OVERLOAD(__PRIVATE_futex_waitwhile_below_, (__VA_ARGS__))(__VA_ARGS__)
 #define futex_waitwhile_aboveequal(...)           __HYBRID_PP_VA_OVERLOAD(__PRIVATE_futex_waitwhile_aboveequal_, (__VA_ARGS__))(__VA_ARGS__)
 #define futex_waitwhile_belowequal(...)           __HYBRID_PP_VA_OVERLOAD(__PRIVATE_futex_waitwhile_belowequal_, (__VA_ARGS__))(__VA_ARGS__)
-#define futex_waitlock(...)                       __HYBRID_PP_VA_OVERLOAD(__PRIVATE_futex_waitlock_, (__VA_ARGS__))(__VA_ARGS__)
 #define futex_waitwhile_exactbits(...)            __HYBRID_PP_VA_OVERLOAD(__PRIVATE_futex_waitwhile_exactbits_, (__VA_ARGS__))(__VA_ARGS__)
 #define futex_waituntil_exactbits(...)            __HYBRID_PP_VA_OVERLOAD(__PRIVATE_futex_waituntil_exactbits_, (__VA_ARGS__))(__VA_ARGS__)
 #define futex_waitwhile_anybit(...)               __HYBRID_PP_VA_OVERLOAD(__PRIVATE_futex_waitwhile_anybit_, (__VA_ARGS__))(__VA_ARGS__)

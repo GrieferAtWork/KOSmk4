@@ -32,10 +32,10 @@
                                                           * more threads to wake up, before broadcasting all remaining threads to
                                                           * ensure that futex bits are in a consistent state.
                                                           * Mainly intended to be used like this (allowing something like `sem_post()'
-                                                          * to be  implemented  without the  need  of  a system  call  whenever  there
-                                                          * aren't any waiting threads):
-                                                          * >> if (BIT_SET(LFUTEX_WAIT_LOCK_WAITERS))
-                                                          * >>     wakemask(timeout: ~LFUTEX_WAIT_LOCK_WAITERS, val2: 0);
+                                                          * to be implemented without the need of a system call whenever there  aren't
+                                                          * any waiting threads):
+                                                          * >> if (BIT_SET(0x80000000))
+                                                          * >>     wakemask(timeout: ~0x80000000, val2: 0);
                                                           * Behavior:
                                                           * >> result = 0;
                                                           * >> while (val && sig_send(uaddr))
@@ -53,13 +53,6 @@
 #define LFUTEX_WAIT_WHILE_BELOW   __UINT32_C(0x00000013) /* >> if ((unsigned)*uaddr < val) return waitfor(uaddr); return 1; */
 #define LFUTEX_WAIT_WHILE_BITMASK __UINT32_C(0x00000014) /* >> if ((*uaddr & val) == val2) return waitfor(uaddr); return 1; */
 #define LFUTEX_WAIT_UNTIL_BITMASK __UINT32_C(0x00000015) /* >> if ((*uaddr & val) != val2) return waitfor(uaddr); return 1; */
-#define LFUTEX_WAIT_LOCK          __UINT32_C(0x00000018) /* >> if ((*uaddr & LFUTEX_WAIT_LOCK_TIDMASK) == 0) {
-                                                          * >>     *uaddr = (*uaddr & ~LFUTEX_WAIT_LOCK_TIDMASK) | (val ? val : gettid());
-                                                          * >>     return 1;
-                                                          * >> } else {
-                                                          * >>     *uaddr |= LFUTEX_WAIT_LOCK_WAITERS;
-                                                          * >>     return waitfor(uaddr); // 0, E_INTERRUPT or -ETIMEDOUT
-                                                          * >> } */
 
 
 
@@ -102,17 +95,6 @@
  * - A thread with `CAP_SYS_RESOURCE' is always allowed to exceed this limit. */
 #define LFUTEXFD_DEFAULT_MAXEXPR 32
 
-
-
-#if __SIZEOF_POINTER__ >= 8
-#define LFUTEX_WAIT_LOCK_TIDMASK __UINT64_C(0x3fffffffffffffff) /* Mask for the TID. */
-#define LFUTEX_WAIT_LOCK_WAITERS __UINT64_C(0x4000000000000000) /* Flag: Set by the kernel before waiting for the futex. */
-#define LFUTEX_WAIT_LOCK_OWNDIED __UINT64_C(0x8000000000000000) /* Flag: Set by the kernel if a robust futex died. */
-#else /* __SIZEOF_POINTER__ >= 8 */
-#define LFUTEX_WAIT_LOCK_TIDMASK __UINT32_C(0x3fffffff) /* Mask for the TID. */
-#define LFUTEX_WAIT_LOCK_WAITERS __UINT32_C(0x40000000) /* Flag: Set by the kernel before waiting for the futex. */
-#define LFUTEX_WAIT_LOCK_OWNDIED __UINT32_C(0x80000000) /* Flag: Set by the kernel if a robust futex died. */
-#endif /* __SIZEOF_POINTER__ < 8 */
 
 /* Check if the given futex command `x' uses the timeout argument. */
 #define LFUTEX_USES_TIMEOUT(x) ((x) & 0x10)

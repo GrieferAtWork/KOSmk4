@@ -227,46 +227,6 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 #undef APPLY_MASK
 	}	break;
 
-	case LFUTEX_WAIT_LOCK: {
-		FUNC(lfutex_t) oldval, newval;
-		validate_writable(uaddr, sizeof(*uaddr));
-		for (;;) {
-			oldval = ATOMIC_READ(*uaddr);
-			if ((oldval & FUNC2(LFUTEX_WAIT_LOCK_TIDMASK)) == 0) {
-				if (!val)
-					val = task_gettid();
-				/* Lock is available. */
-				newval = (oldval & ~FUNC2(LFUTEX_WAIT_LOCK_TIDMASK)) | val;
-				if (!ATOMIC_CMPXCH_WEAK(*uaddr, oldval, newval))
-					continue;
-				return 1;
-			}
-			/* Lock isn't available  (connect to it,  then set  the
-			 * is-waiting bit and sleep until it becomes available) */
-			newval = oldval | FUNC2(LFUTEX_WAIT_LOCK_WAITERS);
-			f = mman_createfutex(THIS_MMAN, uaddr);
-			FINALLY_DECREF(f);
-			if (futex_op & LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL) {
-				mfutex_connect_for_poll(f);
-			} else {
-				mfutex_connect(f);
-			}
-			TRY {
-				if (!ATOMIC_CMPXCH_WEAK(*uaddr, oldval, newval)) {
-					/* Failed to set the locked bit (try again) */
-					task_disconnectall();
-					continue;
-				}
-				/* Wait for the futex and return the resulting status code. */
-				result = FUNC(task_waitfor_futex)(futex_op, timeout);
-			} EXCEPT {
-				task_disconnectall();
-				RETHROW();
-			}
-			break;
-		}
-	}	break;
-
 #define DEFINE_WAIT_WHILE_OPERATOR(id, validate, should_wait)         \
 	case id: {                                                        \
 		validate(uaddr, sizeof(*uaddr));                              \

@@ -252,7 +252,6 @@ $ssize_t lfutex32([[nonnull]] lfutex_t *uaddr, $syscall_ulong_t futex_op,
 @@@param: futex_op: One of:
 @@   - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t val = count)
 @@   - LFUTEX_WAKEMASK:           (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKEMASK, size_t val = count, lfutex_t mask_and, lfutex_t mask_or)
-@@   - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t val = lock_value, struct timespec const *timeout)
 @@   - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t val = value, struct timespec const *timeout)
 @@   - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t val = value, struct timespec const *timeout)
 @@   - LFUTEX_WAIT_WHILE_ABOVE:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_ABOVE, lfutex_t val = value, struct timespec const *timeout)
@@ -357,33 +356,6 @@ $ssize_t futex_wakemask([[nonnull]] lfutex_t *uaddr, $size_t max_wake,
 }
 
 
-@@>> futexlock_wake(3), futexlock_wakeall(3)
-@@A more efficient variant of `futex_wake()' that does  nothing
-@@if `!(*ulockaddr & LFUTEX_WAIT_LOCK_WAITERS)', and will clear
-@@the `LFUTEX_WAIT_LOCK_WAITERS' flag  (in a race-safe  manner)
-@@when there are no more waiting threads.
-[[decl_include("<bits/types.h>")]]
-[[impl_include("<hybrid/__atomic.h>", "<kos/asm/futex.h>")]]
-[[requires_function(futex_wakemask)]]
-$ssize_t futexlock_wake([[nonnull]] lfutex_t *ulockaddr, $size_t max_wake) {
-	if (!(__hybrid_atomic_load(*ulockaddr, __ATOMIC_ACQUIRE) & LFUTEX_WAIT_LOCK_WAITERS))
-		return 0; /* No waiting threads. */
-	return futex_wakemask(ulockaddr, max_wake, ~(lfutex_t)LFUTEX_WAIT_LOCK_WAITERS, 0);
-}
-
-[[doc_alias("futexlock_wake"), decl_include("<bits/types.h>")]]
-[[impl_include("<hybrid/__atomic.h>", "<kos/asm/futex.h>")]]
-[[requires_function(futex_wakeall)]]
-$ssize_t futexlock_wakeall([[nonnull]] lfutex_t *ulockaddr) {
-@@pp_ifndef __OPTIMIZE_SIZE__@@
-	if (!(__hybrid_atomic_load(*ulockaddr, __ATOMIC_ACQUIRE) & LFUTEX_WAIT_LOCK_WAITERS))
-		return 0; /* No waiting threads. */
-@@pp_endif@@
-	if (!(__hybrid_atomic_fetchand(*ulockaddr, ~(lfutex_t)LFUTEX_WAIT_LOCK_WAITERS, __ATOMIC_SEQ_CST) & LFUTEX_WAIT_LOCK_WAITERS))
-		return 0; /* No waiting threads. */
-	return futex_wakeall(ulockaddr);
-}
-
 @@Wait if `*uaddr == equal_to_value'
 @@@return: 0: Did wait
 @@@return: 1: Didn't wait
@@ -458,19 +430,6 @@ int futex_waitwhile_belowequal([[nonnull]] lfutex_t *uaddr, lfutex_t below_equal
 	__hybrid_assert(above_equal_value != (lfutex_t)-1);
 	return lfutex64(uaddr, @LFUTEX_WAIT_WHILE_BELOW@, below_equal_value + 1, (struct timespec64 const *)NULL);
 }
-
-@@Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
-@@@return: 0: Did wait
-@@@return: 1: Didn't wait
-@@@return: -1:EFAULT: A faulty pointer was given
-@@@return: -1:EINTR:  Operation was interrupted (*uaddr was still set to new_value)
-[[cp, userimpl, requires_function(lfutex64)]]
-[[decl_include("<bits/types.h>")]]
-[[impl_include("<bits/os/timespec.h>", "<kos/asm/futex.h>")]]
-int futex_waitlock([[nonnull]] lfutex_t *uaddr) {
-	return lfutex64(uaddr, @LFUTEX_WAIT_LOCK@, 0, (struct timespec64 const *)NULL);
-}
-
 
 @@Wait if `(*uaddr & bitmask) == setmask'
 @@@return: 0: Did wait
@@ -621,21 +580,6 @@ int futex_timedwaitwhile_belowequal([[nonnull]] lfutex_t *uaddr, lfutex_t below_
 	return lfutex(uaddr, @LFUTEX_WAIT_WHILE_BELOW@, below_equal_value + 1, rel_timeout);
 }
 
-@@Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
-@@@return: 0: Did wait
-@@@return: 1: Didn't wait
-@@@return: -1:EFAULT:    A faulty pointer was given
-@@@return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
-@@@return: -1:ETIMEDOUT: The given `rel_timeout' has expired
-[[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaitlock")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futex_timedwaitlock64")]]
-[[impl_include("<kos/asm/futex.h>"), userimpl, requires_function(lfutex)]]
-int futex_timedwaitlock([[nonnull]] lfutex_t *uaddr, struct timespec const *rel_timeout) {
-	return lfutex(uaddr, @LFUTEX_WAIT_LOCK@, 0, rel_timeout);
-}
-
-
 @@Wait if `(*uaddr & bitmask) == setmask'
 @@@return: 0: Did wait
 @@@return: 1: Didn't wait
@@ -741,13 +685,6 @@ int futex_timedwaitwhile_belowequal64([[nonnull]] lfutex_t *uaddr, lfutex_t belo
 }
 
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>")]]
-[[preferred_time64_variant_of(futex_timedwaitlock), doc_alias("futex_timedwaitlock")]]
-[[userimpl, requires_function(lfutex64), impl_include("<kos/asm/futex.h>")]]
-int futex_timedwaitlock64([[nonnull]] lfutex_t *uaddr, struct timespec64 const *rel_timeout) {
-	return lfutex64(uaddr, @LFUTEX_WAIT_LOCK@, 0, rel_timeout);
-}
-
-[[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(futex_timedwaitwhile_exactbits), doc_alias("futex_timedwaitwhile_exactbits")]]
 [[userimpl, requires_function(lfutex64), impl_include("<kos/asm/futex.h>")]]
 int futex_timedwaitwhile_exactbits64([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask, struct timespec64 const *rel_timeout) {
@@ -776,8 +713,6 @@ int futex_timedwaitwhile_allbits64([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask
 }
 
 %#endif /* __USE_TIME64 */
-
-%[insert:guarded_function(__os_gettid = gettid)]
 
 %
 %
@@ -847,25 +782,6 @@ __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_belowequal)(lfutex_t *__uaddr, lfute
 	return __hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE) <= __below_equal_value ? 0 : 1;
 }
 
-#ifdef ____os_gettid_defined
-/* Same as `futex_waitlock()' with a 0-length timeout
- * @return: 0: Successfully acquired the lock
- * @return: 1: Failed to acquire acquired the lock without blocking */
-__FORCELOCAL __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL futex_trywaitlock)(lfutex_t *__uaddr) {
-	for (;;) {
-		lfutex_t __oldval;
-		__oldval = __hybrid_atomic_load(*__uaddr, __ATOMIC_ACQUIRE);
-		if ((__oldval & LFUTEX_WAIT_LOCK_TIDMASK) != 0)
-			break;
-		if (__hybrid_atomic_cmpxch_weak(*__uaddr, __oldval, (__oldval & ~LFUTEX_WAIT_LOCK_TIDMASK) | __os_gettid(),
-		                                __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))
-			return 0;
-	}
-	return 1;
-}
-#endif /* ____os_gettid_defined */
-
 /* Check if `futex_waitwhile_exactbits()' would block
  * @return: 0: `futex_waitwhile_exactbits()' would block
  * @return: 1: `futex_waitwhile_exactbits()' wouldn't block */
@@ -910,10 +826,10 @@ __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_allbits)(lfutex_t *__uaddr, lfutex_t
 @@  - LFUTEX_WAIT_WHILE: SPIN({ if (*uaddr != val) DONE(); });
 @@  - LFUTEX_WAIT_UNTIL: SPIN({ if (*uaddr == val) DONE(); });
 @@  - ...
-@@Futex  spinning  improves  performance  by  bypassing  expensive  blocking   operations
-@@when  associated  locks  are  often only  held  for  a  couple of  moments  at  a time.
-@@Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'), which
-@@is wrapped like this:
+@@Futex spinning improves  performance by bypassing  expensive blocking  operations
+@@when associated locks  are often only  held for a  couple of moments  at a  time.
+@@Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'),
+@@which is wrapped like this:
 @@>> unsigned int spins;
 @@>> spins = futex_getspin();
 @@>> while (spins--) {
@@ -950,7 +866,6 @@ unsigned int futex_setspin(unsigned int new_spin);
 %[insert:function(futex_waitwhile_below = futex_timedwaitwhile_below, externLinkageOverride: "C++")]
 %[insert:function(futex_waitwhile_aboveequal = futex_timedwaitwhile_aboveequal, externLinkageOverride: "C++")]
 %[insert:function(futex_waitwhile_belowequal = futex_timedwaitwhile_belowequal, externLinkageOverride: "C++")]
-%[insert:function(futex_waitlock = futex_timedwaitlock, externLinkageOverride: "C++")]
 %[insert:function(futex_waitwhile_exactbits = futex_timedwaitwhile_exactbits, externLinkageOverride: "C++")]
 %[insert:function(futex_waituntil_exactbits = futex_timedwaituntil_exactbits, externLinkageOverride: "C++")]
 %[insert:function(futex_waitwhile_anybit = futex_timedwaitwhile_anybit, externLinkageOverride: "C++")]
@@ -964,7 +879,6 @@ unsigned int futex_setspin(unsigned int new_spin);
 %[insert:function(futex_waitwhile_below = futex_timedwaitwhile_below64, externLinkageOverride: "C++")]
 %[insert:function(futex_waitwhile_aboveequal = futex_timedwaitwhile_aboveequal64, externLinkageOverride: "C++")]
 %[insert:function(futex_waitwhile_belowequal = futex_timedwaitwhile_belowequal64, externLinkageOverride: "C++")]
-%[insert:function(futex_waitlock = futex_timedwaitlock64, externLinkageOverride: "C++")]
 %[insert:function(futex_waitwhile_exactbits = futex_timedwaitwhile_exactbits64, externLinkageOverride: "C++")]
 %[insert:function(futex_waituntil_exactbits = futex_timedwaituntil_exactbits64, externLinkageOverride: "C++")]
 %[insert:function(futex_waitwhile_anybit = futex_timedwaitwhile_anybit64, externLinkageOverride: "C++")]
@@ -991,8 +905,6 @@ unsigned int futex_setspin(unsigned int new_spin);
 #define __PRIVATE_futex_waitwhile_aboveequal_3(uaddr, above_equal_value, rel_timeout) futex_timedwaitwhile_aboveequal(uaddr, above_equal_value, rel_timeout)
 #define __PRIVATE_futex_waitwhile_belowequal_2(uaddr, below_equal_value)              futex_waitwhile_belowequal(uaddr, below_equal_value)
 #define __PRIVATE_futex_waitwhile_belowequal_3(uaddr, below_equal_value, rel_timeout) futex_timedwaitwhile_belowequal(uaddr, below_equal_value, rel_timeout)
-#define __PRIVATE_futex_waitlock_1(uaddr)                                             futex_waitlock(uaddr)
-#define __PRIVATE_futex_waitlock_2(uaddr, rel_timeout)                                futex_timedwaitlock(uaddr, rel_timeout)
 #define __PRIVATE_futex_waitwhile_exactbits_3(uaddr, bitmask, setmask)                futex_waitwhile_exactbits(uaddr, bitmask, setmask)
 #define __PRIVATE_futex_waitwhile_exactbits_4(uaddr, bitmask, setmask, rel_timeout)   futex_timedwaitwhile_exactbits(uaddr, bitmask, setmask, rel_timeout)
 #define __PRIVATE_futex_waituntil_exactbits_3(uaddr, bitmask, setmask)                futex_waituntil_exactbits(uaddr, bitmask, setmask)
@@ -1010,7 +922,6 @@ unsigned int futex_setspin(unsigned int new_spin);
 #define futex_waitwhile_below(...)                __HYBRID_PP_VA_OVERLOAD(__PRIVATE_futex_waitwhile_below_, (__VA_ARGS__))(__VA_ARGS__)
 #define futex_waitwhile_aboveequal(...)           __HYBRID_PP_VA_OVERLOAD(__PRIVATE_futex_waitwhile_aboveequal_, (__VA_ARGS__))(__VA_ARGS__)
 #define futex_waitwhile_belowequal(...)           __HYBRID_PP_VA_OVERLOAD(__PRIVATE_futex_waitwhile_belowequal_, (__VA_ARGS__))(__VA_ARGS__)
-#define futex_waitlock(...)                       __HYBRID_PP_VA_OVERLOAD(__PRIVATE_futex_waitlock_, (__VA_ARGS__))(__VA_ARGS__)
 #define futex_waitwhile_exactbits(...)            __HYBRID_PP_VA_OVERLOAD(__PRIVATE_futex_waitwhile_exactbits_, (__VA_ARGS__))(__VA_ARGS__)
 #define futex_waituntil_exactbits(...)            __HYBRID_PP_VA_OVERLOAD(__PRIVATE_futex_waituntil_exactbits_, (__VA_ARGS__))(__VA_ARGS__)
 #define futex_waitwhile_anybit(...)               __HYBRID_PP_VA_OVERLOAD(__PRIVATE_futex_waitwhile_anybit_, (__VA_ARGS__))(__VA_ARGS__)

@@ -67,13 +67,12 @@ INTERN ATTR_READMOSTLY unsigned int futex_spin_counter = 4;
 
 
 
-/*[[[head:libc_lfutex,hash:CRC-32=0x636d04f]]]*/
+/*[[[head:libc_lfutex,hash:CRC-32=0x8ad1f45d]]]*/
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t val = count)
  *    - LFUTEX_WAKEMASK:           (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKEMASK, size_t val = count, lfutex_t mask_and, lfutex_t mask_or)
- *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t val = lock_value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE_ABOVE:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_ABOVE, lfutex_t val = value, struct timespec const *timeout)
@@ -124,7 +123,7 @@ NOTHROW_RPC(VLIBCCALL libc_lfutex)(lfutex_t *uaddr,
 /*[[[end:libc_lfutex]]]*/
 
 
-/*[[[head:libc_lfutex64,hash:CRC-32=0x3739c957]]]*/
+/*[[[head:libc_lfutex64,hash:CRC-32=0xba3621ab]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_lfutex64, libc_lfutex);
 #else /* MAGIC:alias */
@@ -133,7 +132,6 @@ DEFINE_INTERN_ALIAS(libc_lfutex64, libc_lfutex);
  * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t val = count)
  *    - LFUTEX_WAKEMASK:           (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKEMASK, size_t val = count, lfutex_t mask_and, lfutex_t mask_or)
- *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t val = lock_value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE_ABOVE:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_ABOVE, lfutex_t val = value, struct timespec const *timeout)
@@ -357,27 +355,6 @@ NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_belowequal)(lfutex_t *uaddr,
 }
 /*[[[end:libc_futex_waitwhile_belowequal]]]*/
 
-/*[[[head:libc_futex_waitlock,hash:CRC-32=0xb3e7735f]]]*/
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT: A faulty pointer was given
- * @return: -1:EINTR:  Operation was interrupted (*uaddr was still set to new_value) */
-INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
-NOTHROW_RPC(LIBCCALL libc_futex_waitlock)(lfutex_t *uaddr)
-/*[[[body:libc_futex_waitlock]]]*/
-{
-	errno_t result;
-	SPIN_WHILE(futex_trywaitlock(uaddr) == 0);
-	result = (errno_t)sys_lfutex(uaddr,
-	                             LFUTEX_WAIT_LOCK,
-	                             0,
-	                             NULL,
-	                             0);
-	return libc_seterrno_syserr(result);
-}
-/*[[[end:libc_futex_waitlock]]]*/
-
 /*[[[head:libc_futex_waitwhile_exactbits,hash:CRC-32=0x3db826fd]]]*/
 /* Wait if `(*uaddr & bitmask) == setmask'
  * @return: 0: Did wait
@@ -599,27 +576,6 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_belowequal)(lfutex_t *uaddr,
 	return futex_timedwaitwhile_belowequal64(uaddr, below_equal_value, &tms64);
 }
 /*[[[end:libc_futex_timedwaitwhile_belowequal]]]*/
-
-/*[[[head:libc_futex_timedwaitlock,hash:CRC-32=0x95e65ba7]]]*/
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
-NOTHROW_RPC(LIBCCALL libc_futex_timedwaitlock)(lfutex_t *uaddr,
-                                               struct timespec const *rel_timeout)
-/*[[[body:libc_futex_timedwaitlock]]]*/
-{
-	struct timespec64 tms64;
-	if (!rel_timeout)
-		return futex_timedwaitlock64(uaddr, NULL);
-	tms64.tv_sec  = (time64_t)rel_timeout->tv_sec;
-	tms64.tv_nsec = rel_timeout->tv_nsec;
-	return futex_timedwaitlock64(uaddr, &tms64);
-}
-/*[[[end:libc_futex_timedwaitlock]]]*/
 
 /*[[[head:libc_futex_timedwaitwhile_exactbits,hash:CRC-32=0x47a87624]]]*/
 /* Wait if `(*uaddr & bitmask) == setmask'
@@ -879,34 +835,6 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_belowequal64)(lfutex_t *uaddr,
 #endif /* MAGIC:alias */
 /*[[[end:libc_futex_timedwaitwhile_belowequal64]]]*/
 
-/*[[[head:libc_futex_timedwaitlock64,hash:CRC-32=0xcf98f4e9]]]*/
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_futex_timedwaitlock64, libc_futex_timedwaitlock);
-#else /* MAGIC:alias */
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
-NOTHROW_RPC(LIBCCALL libc_futex_timedwaitlock64)(lfutex_t *uaddr,
-                                                 struct timespec64 const *rel_timeout)
-/*[[[body:libc_futex_timedwaitlock64]]]*/
-{
-	errno_t result;
-	SPIN_WHILE(futex_trywaitlock(uaddr) == 0);
-	result = (errno_t)sys_lfutex(uaddr,
-	                             LFUTEX_WAIT_LOCK |
-	                             LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE,
-	                             (uintptr_t)0,
-	                             rel_timeout,
-	                             (uintptr_t)0);
-	return libc_seterrno_syserr(result);
-}
-#endif /* MAGIC:alias */
-/*[[[end:libc_futex_timedwaitlock64]]]*/
-
 /*[[[head:libc_futex_timedwaitwhile_exactbits64,hash:CRC-32=0x9d4d878]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_futex_timedwaitwhile_exactbits64, libc_futex_timedwaitwhile_exactbits);
@@ -1021,16 +949,16 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_allbits64)(lfutex_t *uaddr,
 #endif /* MAGIC:alias */
 /*[[[end:libc_futex_timedwaitwhile_allbits64]]]*/
 
-/*[[[head:libc_futex_getspin,hash:CRC-32=0x22192ca8]]]*/
+/*[[[head:libc_futex_getspin,hash:CRC-32=0x4183c524]]]*/
 /* Get/Set the number of times to spin the following futex operations without
  * entering  kernel-space,  setting  waiter-bits,  and  entering  sleep mode:
  *   - LFUTEX_WAIT_WHILE: SPIN({ if (*uaddr != val) DONE(); });
  *   - LFUTEX_WAIT_UNTIL: SPIN({ if (*uaddr == val) DONE(); });
  *   - ...
- * Futex  spinning  improves  performance  by  bypassing  expensive  blocking   operations
- * when  associated  locks  are  often only  held  for  a  couple of  moments  at  a time.
- * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'), which
- * is wrapped like this:
+ * Futex spinning improves  performance by bypassing  expensive blocking  operations
+ * when associated locks  are often only  held for a  couple of moments  at a  time.
+ * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'),
+ * which is wrapped like this:
  * >> unsigned int spins;
  * >> spins = futex_getspin();
  * >> while (spins--) {
@@ -1048,22 +976,22 @@ NOTHROW(LIBCCALL libc_futex_getspin)(void)
 {
 #ifdef NO_FUTEX_SPIN
 	return 0;
-#else
+#else /* NO_FUTEX_SPIN */
 	return ATOMIC_READ(futex_spin_counter);
-#endif
+#endif /* !NO_FUTEX_SPIN */
 }
 /*[[[end:libc_futex_getspin]]]*/
 
-/*[[[head:libc_futex_setspin,hash:CRC-32=0x7a05bf3]]]*/
+/*[[[head:libc_futex_setspin,hash:CRC-32=0xde86c264]]]*/
 /* Get/Set the number of times to spin the following futex operations without
  * entering  kernel-space,  setting  waiter-bits,  and  entering  sleep mode:
  *   - LFUTEX_WAIT_WHILE: SPIN({ if (*uaddr != val) DONE(); });
  *   - LFUTEX_WAIT_UNTIL: SPIN({ if (*uaddr == val) DONE(); });
  *   - ...
- * Futex  spinning  improves  performance  by  bypassing  expensive  blocking   operations
- * when  associated  locks  are  often only  held  for  a  couple of  moments  at  a time.
- * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'), which
- * is wrapped like this:
+ * Futex spinning improves  performance by bypassing  expensive blocking  operations
+ * when associated locks  are often only  held for a  couple of moments  at a  time.
+ * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'),
+ * which is wrapped like this:
  * >> unsigned int spins;
  * >> spins = futex_getspin();
  * >> while (spins--) {
@@ -1082,9 +1010,9 @@ NOTHROW(LIBCCALL libc_futex_setspin)(unsigned int new_spin)
 #ifdef NO_FUTEX_SPIN
 	(void)new_spin;
 	return 0;
-#else
+#else /* NO_FUTEX_SPIN */
 	return ATOMIC_XCH(futex_spin_counter, new_spin);
-#endif
+#endif /* !NO_FUTEX_SPIN */
 }
 /*[[[end:libc_futex_setspin]]]*/
 
@@ -1092,7 +1020,7 @@ NOTHROW(LIBCCALL libc_futex_setspin)(unsigned int new_spin)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x1a8101c5]]]*/
+/*[[[start:exports,hash:CRC-32=0x579a238]]]*/
 DEFINE_PUBLIC_ALIAS(lfutex, libc_lfutex);
 DEFINE_PUBLIC_ALIAS(lfutex64, libc_lfutex64);
 DEFINE_PUBLIC_ALIAS(futex_wake, libc_futex_wake);
@@ -1104,7 +1032,6 @@ DEFINE_PUBLIC_ALIAS(futex_waitwhile_above, libc_futex_waitwhile_above);
 DEFINE_PUBLIC_ALIAS(futex_waitwhile_below, libc_futex_waitwhile_below);
 DEFINE_PUBLIC_ALIAS(futex_waitwhile_aboveequal, libc_futex_waitwhile_aboveequal);
 DEFINE_PUBLIC_ALIAS(futex_waitwhile_belowequal, libc_futex_waitwhile_belowequal);
-DEFINE_PUBLIC_ALIAS(futex_waitlock, libc_futex_waitlock);
 DEFINE_PUBLIC_ALIAS(futex_waitwhile_exactbits, libc_futex_waitwhile_exactbits);
 DEFINE_PUBLIC_ALIAS(futex_waituntil_exactbits, libc_futex_waituntil_exactbits);
 DEFINE_PUBLIC_ALIAS(futex_waitwhile_anybit, libc_futex_waitwhile_anybit);
@@ -1115,7 +1042,6 @@ DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_above, libc_futex_timedwaitwhile_above)
 DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_below, libc_futex_timedwaitwhile_below);
 DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_aboveequal, libc_futex_timedwaitwhile_aboveequal);
 DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_belowequal, libc_futex_timedwaitwhile_belowequal);
-DEFINE_PUBLIC_ALIAS(futex_timedwaitlock, libc_futex_timedwaitlock);
 DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_exactbits, libc_futex_timedwaitwhile_exactbits);
 DEFINE_PUBLIC_ALIAS(futex_timedwaituntil_exactbits, libc_futex_timedwaituntil_exactbits);
 DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_anybit, libc_futex_timedwaitwhile_anybit);
@@ -1126,7 +1052,6 @@ DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_above64, libc_futex_timedwaitwhile_abov
 DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_below64, libc_futex_timedwaitwhile_below64);
 DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_aboveequal64, libc_futex_timedwaitwhile_aboveequal64);
 DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_belowequal64, libc_futex_timedwaitwhile_belowequal64);
-DEFINE_PUBLIC_ALIAS(futex_timedwaitlock64, libc_futex_timedwaitlock64);
 DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_exactbits64, libc_futex_timedwaitwhile_exactbits64);
 DEFINE_PUBLIC_ALIAS(futex_timedwaituntil_exactbits64, libc_futex_timedwaituntil_exactbits64);
 DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_anybit64, libc_futex_timedwaitwhile_anybit64);

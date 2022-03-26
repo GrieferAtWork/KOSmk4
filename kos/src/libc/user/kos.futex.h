@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x526b113f */
+/* HASH CRC-32:0x6828bfe8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define GUARD_LIBC_USER_KOS_FUTEX_H 1
 
 #include "../api.h"
-#include "../auto/kos.futex.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>
@@ -36,7 +35,6 @@ DECL_BEGIN
  * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t val = count)
  *    - LFUTEX_WAKEMASK:           (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKEMASK, size_t val = count, lfutex_t mask_and, lfutex_t mask_or)
- *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t val = lock_value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE_ABOVE:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_ABOVE, lfutex_t val = value, struct timespec const *timeout)
@@ -55,7 +53,6 @@ INTDEF NONNULL((1)) ssize_t NOTHROW_RPC(VLIBCCALL libc_lfutex)(lfutex_t *uaddr, 
  * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t val = count)
  *    - LFUTEX_WAKEMASK:           (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKEMASK, size_t val = count, lfutex_t mask_and, lfutex_t mask_or)
- *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t val = lock_value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t val = value, struct timespec const *timeout)
  *    - LFUTEX_WAIT_WHILE_ABOVE:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_ABOVE, lfutex_t val = value, struct timespec const *timeout)
@@ -118,12 +115,6 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_aboveequal)(lf
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_belowequal)(lfutex_t *uaddr, lfutex_t below_equal_value);
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT: A faulty pointer was given
- * @return: -1:EINTR:  Operation was interrupted (*uaddr was still set to new_value) */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_waitlock)(lfutex_t *uaddr);
 /* Wait if `(*uaddr & bitmask) == setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -190,13 +181,6 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_aboveequa
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_belowequal)(lfutex_t *uaddr, lfutex_t below_equal_value, struct timespec const *rel_timeout);
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitlock)(lfutex_t *uaddr, struct timespec const *rel_timeout);
 /* Wait if `(*uaddr & bitmask) == setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -263,13 +247,6 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_aboveequa
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_belowequal64)(lfutex_t *uaddr, lfutex_t below_equal_value, struct timespec64 const *rel_timeout);
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitlock64)(lfutex_t *uaddr, struct timespec64 const *rel_timeout);
 /* Wait if `(*uaddr & bitmask) == setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -299,10 +276,10 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_allbits64
  *   - LFUTEX_WAIT_WHILE: SPIN({ if (*uaddr != val) DONE(); });
  *   - LFUTEX_WAIT_UNTIL: SPIN({ if (*uaddr == val) DONE(); });
  *   - ...
- * Futex  spinning  improves  performance  by  bypassing  expensive  blocking   operations
- * when  associated  locks  are  often only  held  for  a  couple of  moments  at  a time.
- * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'), which
- * is wrapped like this:
+ * Futex spinning improves  performance by bypassing  expensive blocking  operations
+ * when associated locks  are often only  held for a  couple of moments  at a  time.
+ * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'),
+ * which is wrapped like this:
  * >> unsigned int spins;
  * >> spins = futex_getspin();
  * >> while (spins--) {
@@ -320,10 +297,10 @@ INTDEF WUNUSED unsigned int NOTHROW(LIBCCALL libc_futex_getspin)(void);
  *   - LFUTEX_WAIT_WHILE: SPIN({ if (*uaddr != val) DONE(); });
  *   - LFUTEX_WAIT_UNTIL: SPIN({ if (*uaddr == val) DONE(); });
  *   - ...
- * Futex  spinning  improves  performance  by  bypassing  expensive  blocking   operations
- * when  associated  locks  are  often only  held  for  a  couple of  moments  at  a time.
- * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'), which
- * is wrapped like this:
+ * Futex spinning improves  performance by bypassing  expensive blocking  operations
+ * when associated locks  are often only  held for a  couple of moments  at a  time.
+ * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'),
+ * which is wrapped like this:
  * >> unsigned int spins;
  * >> spins = futex_getspin();
  * >> while (spins--) {
