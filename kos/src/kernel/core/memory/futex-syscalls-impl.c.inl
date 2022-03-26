@@ -385,7 +385,7 @@ DEFINE_SYSCALL5(errno_t, lfutexexpr,
 
 	/* Evaluate expressions. */
 	TRY {
-		typeof(expr) iter = expr;
+		LOCAL_struct_lfutexexpr const *iter = expr;
 		for (;; ++iter) {
 			errno_t expr_result;
 			syscall_ulong_t cond;

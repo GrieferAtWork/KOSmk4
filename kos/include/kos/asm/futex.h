@@ -26,7 +26,7 @@
 /* KOS futex operations (for use with the `lfutex(2)'  system
  * call, though can't be used with the futex() system call!). */
 #define LFUTEX_WAKE               __UINT32_C(0x00000000) /* >> result = 0; while (val && sig_send(uaddr)) ++result; return result; */
-#define LFUTEX_EXPREND            __UINT32_C(0x00000000) /* Expression terminator for `lfutexexpr(2)' */
+#define LFUTEX_EXPREND            __UINT32_C(0x00000000) /* Expression list terminator for `lfutexexpr(2)' */
 #define LFUTEX_NOP                __UINT32_C(0x00000001) /* >> return 0; // Only valid in `lfutexexpr(2)' */
 #define LFUTEX_WAKEMASK           __UINT32_C(0x00000001) /* Same as `LFUTEX_WAKE', but clear/set  certain bits once there are  no
                                                           * more threads to wake up, before broadcasting all remaining threads to
@@ -65,7 +65,7 @@
  * - The returned handle is of type `HANDLE_TYPE_FUTEXFD'
  * - This flag may also appear in `lfutexexpr(2)::flags', in which case that
  *   system call returns a futexfd object that  can be used to poll for  the
- *   specified expression.
+ *   specified expression(s).
  * - When used with `lfutex(2)', only a singular expression can be specified.
  * - A futexfd object remembers:
  *   - `WEAK REF struct mman *': A weak reference to the creating thread's mman

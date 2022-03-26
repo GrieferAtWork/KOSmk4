@@ -160,8 +160,9 @@ done_expr:
 	}
 
 	/* Fill in remaining fields */
-	result->mfd_futex = incref(futex);
-	result->mfd_mman  = weakincref(THIS_MMAN);
+	result->mfd_refcnt = 1;
+	result->mfd_futex  = incref(futex);
+	result->mfd_mman   = weakincref(THIS_MMAN);
 	return result;
 }
 
