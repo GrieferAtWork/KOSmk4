@@ -197,7 +197,8 @@ ms_scsi_doio(struct ms_scsi_device *__restrict self,
 	{
 		/* With all of the data  structures set up, acquire  a
 		 * lock to the SCSI device and initiate the operation. */
-		SCOPED_WRITELOCK(&self->msd_lock);
+		ms_scsi_device_acquire(self);
+		RAII_FINALLY { ms_scsi_device_release(self); };
 		cbw.cbw_tag = self->msd_tag++;
 
 		/* TODO: Actually make this part  have ASYNC support by  creating
@@ -374,7 +375,7 @@ usb_scsi_create_lun(struct usb_controller *__restrict self,
 	result->msd_endp_in  = incref(in);
 	result->msd_endp_out = incref(out);
 	result->msd_lun      = lun;
-	mutex_cinit(&result->msd_lock);
+	shared_lock_cinit(&result->msd_lock);
 	assert(result->msd_tag == 0);
 
 	/* Fill in missing capacity information. */

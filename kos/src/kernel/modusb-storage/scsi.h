@@ -25,7 +25,8 @@
 #include <drivers/usb.h>
 #include <kernel/fs/blkdev.h>
 #include <kernel/types.h>
-#include <sched/mutex.h>
+
+#include <kos/sched/shared-lock.h>
 
 DECL_BEGIN
 
@@ -42,10 +43,23 @@ struct ms_scsi_device
 	REF struct usb_controller *msd_ctrl;     /* [1..1][const] The associated USB controller. */
 	REF struct usb_endpoint   *msd_endp_in;  /* [1..1][const] Input endpoint (for reading from the device) */
 	REF struct usb_endpoint   *msd_endp_out; /* [1..1][const] Output endpoint (for writing to the device) */
-	struct mutex               msd_lock;     /* Lock for reading/writing data */
+	struct shared_lock         msd_lock;     /* Lock for reading/writing data */
 	u32                        msd_tag;      /* [lock(msd_lock)] Next tag to-be used for I/O */
 	u8                         msd_lun;      /* [const] Logical unit number (think of it as a drive selector). */
 };
+
+
+/* Helper macros for `struct ms_scsi_device::msd_lock' */
+#define _ms_scsi_device_reap(self)      (void)0
+#define ms_scsi_device_reap(self)       (void)0
+#define ms_scsi_device_mustreap(self)   0
+#define ms_scsi_device_tryacquire(self) shared_lock_tryacquire(&(self)->msd_lock)
+#define ms_scsi_device_acquire(self)    shared_lock_acquire(&(self)->msd_lock)
+#define ms_scsi_device_acquire_nx(self) shared_lock_acquire_nx(&(self)->msd_lock)
+#define _ms_scsi_device_release(self)   shared_lock_release(&(self)->msd_lock)
+#define ms_scsi_device_release(self)    (shared_lock_release(&(self)->msd_lock), ms_scsi_device_reap(self))
+#define ms_scsi_device_acquired(self)   shared_lock_acquired(&(self)->msd_lock)
+#define ms_scsi_device_available(self)  shared_lock_available(&(self)->msd_lock)
 
 /* Probe for an SCSI device, and create the /dev file(s) if found. */
 INTDEF bool KCALL
