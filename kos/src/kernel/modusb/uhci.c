@@ -95,22 +95,52 @@ PRIVATE struct async_worker_ops const uhci_powerctl_cb {
 #define HW_WRITE(dst, value) ATOMIC_WRITE(dst, value)
 
 PRIVATE struct atomic_lock ostd_free_lock = ATOMIC_LOCK_INIT;
+PRIVATE struct uhci_ostd *ostd_free       = NULL;
+
+/* Helper macros for working with `ostd_free' */
+#define _ostd_free_reap()      (void)0
+#define ostd_free_reap()       (void)0
+#define ostd_free_mustreap()   0
+#define ostd_free_tryacquire() atomic_lock_tryacquire(&ostd_free_lock)
+#define ostd_free_acquire()    atomic_lock_acquire(&ostd_free_lock)
+#define ostd_free_acquire_nx() atomic_lock_acquire_nx(&ostd_free_lock)
+#define _ostd_free_release()   atomic_lock_release(&ostd_free_lock)
+#define ostd_free_release()    (atomic_lock_release(&ostd_free_lock), ostd_free_reap())
+#define ostd_free_acquired()   atomic_lock_acquired(&ostd_free_lock)
+#define ostd_free_available()  atomic_lock_available(&ostd_free_lock)
+#define ostd_free_waitfor()    atomic_lock_waitfor(&ostd_free_lock)
+#define ostd_free_waitfor_nx() atomic_lock_waitfor_nx(&ostd_free_lock)
+
 PRIVATE struct atomic_lock osqh_free_lock = ATOMIC_LOCK_INIT;
-PRIVATE struct uhci_ostd *ostd_free = NULL;
-PRIVATE struct uhci_osqh *osqh_free = NULL;
+PRIVATE struct uhci_osqh *osqh_free       = NULL;
+
+/* Helper macros for working with `osqh_free_lock' */
+#define _osqh_free_reap()      (void)0
+#define osqh_free_reap()       (void)0
+#define osqh_free_mustreap()   0
+#define osqh_free_tryacquire() atomic_lock_tryacquire(&osqh_free_lock)
+#define osqh_free_acquire()    atomic_lock_acquire(&osqh_free_lock)
+#define osqh_free_acquire_nx() atomic_lock_acquire_nx(&osqh_free_lock)
+#define _osqh_free_release()   atomic_lock_release(&osqh_free_lock)
+#define osqh_free_release()    (atomic_lock_release(&osqh_free_lock), osqh_free_reap())
+#define osqh_free_acquired()   atomic_lock_acquired(&osqh_free_lock)
+#define osqh_free_available()  atomic_lock_available(&osqh_free_lock)
+#define osqh_free_waitfor()    atomic_lock_waitfor(&osqh_free_lock)
+#define osqh_free_waitfor_nx() atomic_lock_waitfor_nx(&osqh_free_lock)
+
 
 PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED struct uhci_ostd *FCALL
 uhci_ostd_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	struct uhci_ostd *result;
-	sync_write(&ostd_free_lock);
+	ostd_free_acquire();
 again_read:
 	result = ATOMIC_READ(ostd_free);
 	if (result) {
 		if (!ATOMIC_CMPXCH_WEAK(ostd_free, result, result->td_next))
 			goto again_read;
-		sync_endwrite(&ostd_free_lock);
+		ostd_free_release();
 	} else {
-		sync_endwrite(&ostd_free_lock);
+		ostd_free_release();
 		result = (struct uhci_ostd *)kmemalign(UHCI_FLE_ALIGN,
 		                                       sizeof(struct uhci_ostd),
 		                                       GFP_LOCKED | GFP_PREFLT);
@@ -124,15 +154,15 @@ again_read:
 PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED struct uhci_osqh *FCALL
 uhci_osqh_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	struct uhci_osqh *result;
-	sync_write(&osqh_free_lock);
+	osqh_free_acquire();
 again_read:
 	result = ATOMIC_READ(osqh_free);
 	if (result) {
 		if (!ATOMIC_CMPXCH_WEAK(osqh_free, result, result->qh_next))
 			goto again_read;
-		sync_endwrite(&osqh_free_lock);
+		osqh_free_release();
 	} else {
-		sync_endwrite(&osqh_free_lock);
+		osqh_free_release();
 		result = (struct uhci_osqh *)kmemalign(UHCI_FLE_ALIGN,
 		                                       sizeof(struct uhci_osqh),
 		                                       GFP_LOCKED | GFP_PREFLT);
