@@ -248,27 +248,6 @@ __NOTHROW(atomic_rwlock_upgrade_nx)(struct atomic_rwlock *__restrict __self) {
 #define atomic_rwlock_upgrade(self)  __builtin_expect(atomic_rwlock_upgrade(self), 1)
 #endif /* !__INTELLISENSE__ && !__NO_builtin_expect */
 
-#ifdef __DEFINE_SYNC_RWLOCK
-__DEFINE_SYNC_RWLOCK(struct atomic_rwlock,
-                     atomic_rwlock_tryread,
-                     atomic_rwlock_read,
-                     atomic_rwlock_read_nx,
-                     atomic_rwlock_endread,
-                     atomic_rwlock_reading,
-                     atomic_rwlock_canread,
-                     atomic_rwlock_trywrite,
-                     atomic_rwlock_write,
-                     atomic_rwlock_write_nx,
-                     atomic_rwlock_endwrite,
-                     atomic_rwlock_writing,
-                     atomic_rwlock_canwrite,
-                     atomic_rwlock_end,
-                     atomic_rwlock_tryupgrade,
-                     atomic_rwlock_upgrade,
-                     atomic_rwlock_upgrade_nx,
-                     atomic_rwlock_downgrade)
-#endif /* __DEFINE_SYNC_RWLOCK */
-
 __DECL_END
 #endif /* __CC__ */
 

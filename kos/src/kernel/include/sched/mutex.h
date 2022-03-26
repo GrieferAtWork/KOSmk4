@@ -149,16 +149,6 @@ NOTHROW(KCALL mutex_available)(struct mutex const *__restrict self) {
 #define mutex_poll(self)          mutex_poll_ex(self, task_connect_for_poll)
 #define mutex_poll_unlikely(self) mutex_poll_unlikely_ex(self, task_connect_for_poll)
 
-
-/* Integration into the sync_* API-system. */
-__DEFINE_SYNC_MUTEX(struct mutex,
-                    mutex_tryacquire,
-                    mutex_acquire,
-                    mutex_acquire_nx,
-                    mutex_release,
-                    mutex_acquired,
-                    mutex_available)
-
 DECL_END
 #endif /* __CC__ */
 

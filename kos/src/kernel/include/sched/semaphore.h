@@ -29,10 +29,8 @@
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
 
-DECL_BEGIN
-
 #ifdef __CC__
-struct task;
+DECL_BEGIN
 
 struct semaphore {
 	struct sig s_avail; /* Signal send for every ticket made available. */
@@ -120,18 +118,7 @@ NOTHROW(FCALL semaphore_postmany)(struct semaphore *__restrict self, size_t coun
 #define semaphore_pollconnect(self) semaphore_pollconnect_ex(self, task_connect_for_poll)
 #define semaphore_poll(self)        semaphore_poll_ex(self, task_connect_for_poll)
 
-
-/* Integration into the sync_* API-system. */
-__DEFINE_SYNC_SEMAPHORE(struct semaphore,
-                        semaphore_trywait,
-                        semaphore_wait,
-                        semaphore_wait_nx,
-                        semaphore_post,
-                        semaphore_available)
-
-
-#endif /* __CC__ */
-
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_SEMAPHORE_H */

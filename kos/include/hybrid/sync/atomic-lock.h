@@ -129,17 +129,6 @@ __NOTHROW(atomic_lock_waitfor_nopr)(struct atomic_lock *__restrict __self) {
 #endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 #endif /* !__INTELLISENSE__ */
 
-
-#ifdef __DEFINE_SYNC_MUTEX
-__DEFINE_SYNC_MUTEX(struct atomic_lock,
-                    atomic_lock_tryacquire,
-                    atomic_lock_acquire,
-                    atomic_lock_acquire_nx,
-                    atomic_lock_release,
-                    atomic_lock_acquired,
-                    atomic_lock_available)
-#endif /* __DEFINE_SYNC_MUTEX */
-
 __DECL_END
 #endif /* __CC__ */
 
