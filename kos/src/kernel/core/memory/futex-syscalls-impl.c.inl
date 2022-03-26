@@ -407,32 +407,32 @@ DEFINE_SYSCALL5(errno_t, lfutexexpr,
 
 			case LFUTEX_WAIT_WHILE:
 				/* >> if (*uaddr == val) return waitfor(uaddr); return 1; */
-				expr_result = ATOMIC_READ(*uaddr) == iter->fe_val;
+				expr_result = !(ATOMIC_READ(*uaddr) == iter->fe_val);
 				break;
 
 			case LFUTEX_WAIT_UNTIL:
 				/* >> if (*uaddr != val) return waitfor(uaddr); return 1; */
-				expr_result = ATOMIC_READ(*uaddr) != iter->fe_val;
+				expr_result = !(ATOMIC_READ(*uaddr) != iter->fe_val);
 				break;
 
 			case LFUTEX_WAIT_WHILE_ABOVE:
 				/* >> if ((unsigned)*uaddr > val) return waitfor(uaddr); return 1; */
-				expr_result = ATOMIC_READ(*uaddr) > iter->fe_val;
+				expr_result = !(ATOMIC_READ(*uaddr) > iter->fe_val);
 				break;
 
 			case LFUTEX_WAIT_WHILE_BELOW:
 				/* >> if ((unsigned)*uaddr < val) return waitfor(uaddr); return 1; */
-				expr_result = ATOMIC_READ(*uaddr) < iter->fe_val;
+				expr_result = !(ATOMIC_READ(*uaddr) < iter->fe_val);
 				break;
 
 			case LFUTEX_WAIT_WHILE_BITMASK:
 				/* >> if ((*uaddr & val) == val2) return waitfor(uaddr); return 1; */
-				expr_result = (ATOMIC_READ(*uaddr) & iter->fe_val) == iter->fe_val2;
+				expr_result = !((ATOMIC_READ(*uaddr) & iter->fe_val) == iter->fe_val2);
 				break;
 
 			case LFUTEX_WAIT_UNTIL_BITMASK:
 				/* >> if ((*uaddr & val) != val2) return waitfor(uaddr); return 1; */
-				expr_result = (ATOMIC_READ(*uaddr) & iter->fe_val) != iter->fe_val2;
+				expr_result = !((ATOMIC_READ(*uaddr) & iter->fe_val) != iter->fe_val2);
 				break;
 
 			default:

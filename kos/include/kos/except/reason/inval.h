@@ -189,7 +189,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_F_SETPIPE_SZ_TOO_SMALL, /* E_INVALID_ARGUMENT_BAD_VALUE: [size_t bufsize] Attempted to pass a too low value to `F_SETPIPE_SZ' */
 
 	/* system call: `futex(2)' / `lfutex(2)' / `lfutexexpr(2)' */
-	E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP = 0x1120,         /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: [syscall_ulong_t futex_op] The `futex_op' given to one of `lfutex()' or `lfutexexpr()' is invalid.
+	E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP = 0x1120,         /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: [syscall_ulong_t futex_op] The `futex_op' given to `lfutex(2)' or `lfutexexpr(2)' is invalid.
 	                                                        * E_INVALID_ARGUMENT_UNKNOWN_FLAG:  When masked with `LFUTEX_FLAGMASK', `futex_op' contains bits not defined by `LFUTEX_WAIT_FLAG_*'
 	                                                        * E_INVALID_ARGUMENT_UNKNOWN_FLAG:  `LFUTEX_FDBIT' was given to `lfutexexpr(2)', but other flags were also given.
 	                                                        * E_INVALID_ARGUMENT_RESERVED_FLAG: The `timeout' argument was non-NULL, but `futex_op & LFUTEX_FLAGMASK' contained non-zero `LFUTEX_WAIT_FLAG_TIMEOUT_*' flags.
@@ -464,7 +464,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_F_SETFL_OFLAGS                   E_INVALID_ARGUMENT_CONTEXT_F_SETFL_OFLAGS                   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `F_SETFL' */
 #define E_INVALID_ARGUMENT_CONTEXT_F_SETPIPE_SZ_TOO_SMALL           E_INVALID_ARGUMENT_CONTEXT_F_SETPIPE_SZ_TOO_SMALL           /* E_INVALID_ARGUMENT_BAD_VALUE: [size_t bufsize] Attempted to pass a too low value to `F_SETPIPE_SZ' */
 /* system call: `futex(2)' / `lfutex(2)' / `lfutexexpr(2)' */
-#define E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                        E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                        /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: [syscall_ulong_t futex_op] The `futex_op' given to one of `lfutex()' or `lfutexexpr()' is invalid.
+#define E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                        E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                        /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: [syscall_ulong_t futex_op] The `futex_op' given to `lfutex(2)' or `lfutexexpr(2)' is invalid.
                                                                                                                                  * E_INVALID_ARGUMENT_UNKNOWN_FLAG:  When masked with `LFUTEX_FLAGMASK', `futex_op' contains bits not defined by `LFUTEX_WAIT_FLAG_*'
                                                                                                                                  * E_INVALID_ARGUMENT_UNKNOWN_FLAG:  `LFUTEX_FDBIT' was given to `lfutexexpr(2)', but other flags were also given.
                                                                                                                                  * E_INVALID_ARGUMENT_RESERVED_FLAG: The `timeout' argument was non-NULL, but `futex_op & LFUTEX_FLAGMASK' contained non-zero `LFUTEX_WAIT_FLAG_TIMEOUT_*' flags.
@@ -720,7 +720,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_F_SETFL_OFLAGS                   4098 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `F_SETFL' */
 #define E_INVALID_ARGUMENT_CONTEXT_F_SETPIPE_SZ_TOO_SMALL           4099 /* E_INVALID_ARGUMENT_BAD_VALUE: [size_t bufsize] Attempted to pass a too low value to `F_SETPIPE_SZ' */
 /* system call: `futex(2)' / `lfutex(2)' / `lfutexexpr(2)' */
-#define E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                        4384 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: [syscall_ulong_t futex_op] The `futex_op' given to one of `lfutex()' or `lfutexexpr()' is invalid.
+#define E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                        4384 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: [syscall_ulong_t futex_op] The `futex_op' given to `lfutex(2)' or `lfutexexpr(2)' is invalid.
                                                                           * E_INVALID_ARGUMENT_UNKNOWN_FLAG:  When masked with `LFUTEX_FLAGMASK', `futex_op' contains bits not defined by `LFUTEX_WAIT_FLAG_*'
                                                                           * E_INVALID_ARGUMENT_UNKNOWN_FLAG:  `LFUTEX_FDBIT' was given to `lfutexexpr(2)', but other flags were also given.
                                                                           * E_INVALID_ARGUMENT_RESERVED_FLAG: The `timeout' argument was non-NULL, but `futex_op & LFUTEX_FLAGMASK' contained non-zero `LFUTEX_WAIT_FLAG_TIMEOUT_*' flags.
