@@ -116,7 +116,36 @@ struct sighand_ptr {
 	REF struct sighand  *sp_hand;   /* [0..1][ref(sh_share)][lock(sp_lock,WRITE_ONCE[ALLOW_EXCHANGE])]
 	                                 * Pointer to the shared signal handler table. */
 };
-__DEFINE_SYNC_PROXY(struct sighand_ptr, sp_lock)
+
+/* Helper macros for working with `struct sighand_ptr::sp_lock' */
+#define _sighand_ptr_reap(self)        (void)0
+#define sighand_ptr_reap(self)         (void)0
+#define sighand_ptr_mustreap(self)     0
+#define sighand_ptr_write(self)        atomic_rwlock_write(&(self)->sp_lock)
+#define sighand_ptr_write_nx(self)     atomic_rwlock_write_nx(&(self)->sp_lock)
+#define sighand_ptr_trywrite(self)     atomic_rwlock_trywrite(&(self)->sp_lock)
+#define sighand_ptr_endwrite(self)     (atomic_rwlock_endwrite(&(self)->sp_lock), sighand_ptr_reap(self))
+#define _sighand_ptr_endwrite(self)    atomic_rwlock_endwrite(&(self)->sp_lock)
+#define sighand_ptr_read(self)         atomic_rwlock_read(&(self)->sp_lock)
+#define sighand_ptr_read_nx(self)      atomic_rwlock_read_nx(&(self)->sp_lock)
+#define sighand_ptr_tryread(self)      atomic_rwlock_tryread(&(self)->sp_lock)
+#define _sighand_ptr_endread(self)     atomic_rwlock_endread(&(self)->sp_lock)
+#define sighand_ptr_endread(self)      (void)(atomic_rwlock_endread(&(self)->sp_lock) && (sighand_ptr_reap(self), 0))
+#define _sighand_ptr_end(self)         atomic_rwlock_end(&(self)->sp_lock)
+#define sighand_ptr_end(self)          (void)(atomic_rwlock_end(&(self)->sp_lock) && (sighand_ptr_reap(self), 0))
+#define sighand_ptr_upgrade(self)      atomic_rwlock_upgrade(&(self)->sp_lock)
+#define sighand_ptr_upgrade_nx(self)   atomic_rwlock_upgrade_nx(&(self)->sp_lock)
+#define sighand_ptr_tryupgrade(self)   atomic_rwlock_tryupgrade(&(self)->sp_lock)
+#define sighand_ptr_downgrade(self)    atomic_rwlock_downgrade(&(self)->sp_lock)
+#define sighand_ptr_reading(self)      atomic_rwlock_reading(&(self)->sp_lock)
+#define sighand_ptr_writing(self)      atomic_rwlock_writing(&(self)->sp_lock)
+#define sighand_ptr_canread(self)      atomic_rwlock_canread(&(self)->sp_lock)
+#define sighand_ptr_canwrite(self)     atomic_rwlock_canwrite(&(self)->sp_lock)
+#define sighand_ptr_waitread(self)     atomic_rwlock_waitread(&(self)->sp_lock)
+#define sighand_ptr_waitwrite(self)    atomic_rwlock_waitwrite(&(self)->sp_lock)
+#define sighand_ptr_waitread_nx(self)  atomic_rwlock_waitread_nx(&(self)->sp_lock)
+#define sighand_ptr_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->sp_lock)
+
 
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL sighand_ptr_destroy)(struct sighand_ptr *__restrict self);

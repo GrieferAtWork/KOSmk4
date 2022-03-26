@@ -141,14 +141,15 @@ PUBLIC WUNUSED NONNULL((1)) struct sighand *FCALL
 sighand_ptr_lockread(struct sighand_ptr *__restrict ptr)
 		THROWS(E_WOULDBLOCK) {
 	struct sighand *result;
-	bool lock_ok;
+	bool lock_ok = true;
 again:
-	sync_read(&ptr->sp_lock);
+	sighand_ptr_read(ptr);
 	COMPILER_READ_BARRIER();
 	result = ptr->sp_hand;
 	COMPILER_READ_BARRIER();
-	lock_ok = !result ? true : sighand_tryread(result);
-	sync_endread(&ptr->sp_lock);
+	if (result != NULL)
+		lock_ok = sighand_tryread(result);
+	sighand_ptr_endread(ptr);
 	if (!lock_ok) {
 		task_yield();
 		goto again;
@@ -188,18 +189,18 @@ again_read_thread_ptr:
 		return result;
 	}
 again_lock_ptr:
-	sync_read(ptr);
+	sighand_ptr_read(ptr);
 	COMPILER_READ_BARRIER();
 	result = ptr->sp_hand;
 	COMPILER_READ_BARRIER();
 	if (!result) {
-		sync_endread(ptr);
+		sighand_ptr_endread(ptr);
 		/* Lazily allocate the signal handler table. */
 		result = (struct sighand *)kmalloc(sizeof(struct sighand), GFP_CALLOC);
 		atomic_rwlock_cinit_write(&result->sh_lock); /* Init in write-mode */
 		result->sh_share = 1;
 		TRY {
-			sync_write(ptr);
+			sighand_ptr_write(ptr);
 		} EXCEPT {
 			kfree(result);
 			RETHROW();
@@ -207,18 +208,18 @@ again_lock_ptr:
 		COMPILER_BARRIER();
 		if likely(!ptr->sp_hand) {
 			ptr->sp_hand = result;
-			sync_endwrite(ptr);
+			sighand_ptr_endwrite(ptr);
 			return result;
 		}
 		/* Race condition: another thread also allocated the handler table in the mean time! */
-		sync_endwrite(ptr);
+		sighand_ptr_endwrite(ptr);
 		kfree(result);
 		goto again_lock_ptr;
 	}
 
 	/* Got the handler table! - Now to lock it. */
 	lock_ok = sighand_trywrite(result);
-	sync_endread(ptr);
+	sighand_ptr_endread(ptr);
 	if (!lock_ok) {
 		task_yield();
 		goto again_lock_ptr;
@@ -234,19 +235,19 @@ again_lock_ptr:
 		copy = (struct sighand *)kmalloc(sizeof(struct sighand), GFP_NORMAL);
 		TRY {
 again_lock_ptr_for_copy:
-			sync_write(ptr);
+			sighand_ptr_write(ptr);
 			COMPILER_READ_BARRIER();
 			result = ptr->sp_hand;
 			COMPILER_READ_BARRIER();
 			if (!sighand_tryread(result)) {
-				sync_endwrite(ptr);
+				sighand_ptr_endwrite(ptr);
 				task_yield();
 				goto again_lock_ptr_for_copy;
 			}
 			if unlikely(ATOMIC_READ(result->sh_share) <= 1) {
 				/* The handler table already got unshared in the mean time...
 				 * No need to initialize + save our copy! */
-				sync_endwrite(ptr);
+				sighand_ptr_endwrite(ptr);
 				if (!sighand_tryupgrade(result)) {
 					sighand_endread(result);
 					kfree(copy);
@@ -265,7 +266,7 @@ again_lock_ptr_for_copy:
 			COMPILER_WRITE_BARRIER();
 			ptr->sp_hand = copy;
 			COMPILER_WRITE_BARRIER();
-			sync_endwrite(ptr);
+			sighand_ptr_endwrite(ptr);
 		} EXCEPT {
 			kfree(copy);
 			RETHROW();
@@ -506,7 +507,7 @@ INTERN void KCALL onexec_posix_signals_reset_action(void) {
 			TRY {
 				/* This really shouldn't block since handptr isn't shared.
 				 * ... But better to be safe than sorry. */
-				sync_write(&handptr->sp_lock);
+				sighand_ptr_write(handptr);
 			} EXCEPT {
 				kfree(newhand);
 				decref(handptr);
@@ -517,7 +518,7 @@ INTERN void KCALL onexec_posix_signals_reset_action(void) {
 			assert(!isshared(handptr));
 			hand = handptr->sp_hand;    /* Inherit reference */
 			handptr->sp_hand = newhand; /* Inherit reference */
-			sync_endwrite(&handptr->sp_lock);
+			sighand_ptr_endwrite(handptr);
 			/* Restore the old hand-pointer for the calling thread. */
 			assert(!PERTASK_TEST(this_sighand_ptr));
 			PERTASK_SET(this_sighand_ptr, handptr);

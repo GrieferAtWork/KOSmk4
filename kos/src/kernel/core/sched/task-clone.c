@@ -322,22 +322,22 @@ task_clone_sighand(struct task *__restrict result,
 			                                           GFP_NORMAL);
 again_lock_myptr:
 			TRY {
-				sync_read(myptr);
+				sighand_ptr_read(myptr);
 				COMPILER_READ_BARRIER();
 				myhand = myptr->sp_hand;
 				COMPILER_READ_BARRIER();
 				if (!myhand) {
 					/* No handlers -> Nothing to copy (the new thread will also use default handlers!) */
-					sync_endread(myptr);
+					sighand_ptr_endread(myptr);
 					kfree(newptr);
 					newptr = NULL;
 				} else {
 					if (!sighand_trywrite(myhand)) {
-						sync_endread(myptr);
+						sighand_ptr_endread(myptr);
 						task_yield();
 						goto again_lock_myptr;
 					}
-					sync_endread(myptr);
+					sighand_ptr_endread(myptr);
 					sighand_incshare(myhand);
 					sighand_endwrite(myhand);
 
