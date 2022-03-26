@@ -22,10 +22,6 @@
 #define SEGMENT_SIZE 4
 #endif /* __INTELLISENSE__ */
 
-#define FUNC3(x, y) x##y
-#define FUNC2(x, y) FUNC3(x, y)
-#define FUNC(x)     FUNC2(x, SEGMENT_SIZE)
-
 DECL_BEGIN
 
 #ifndef DBG_memset
@@ -41,18 +37,18 @@ DECL_BEGIN
 #define SIZEOF_BITSET   SLAB_SIZEOF_BITSET(SEGMENT_SIZE)
 #define LENGTHOF_BITSET SLAB_LENGTHOF_BITSET(SEGMENT_SIZE)
 
-#define LOCAL_segment   FUNC(segment)
-#define LOCAL_desc      FUNC(slab_desc)
+#define LOCAL_segment   PP_CAT2(segment, SEGMENT_SIZE)
+#define LOCAL_desc      PP_CAT2(slab_desc, SEGMENT_SIZE)
 #define INUSE_BITSET(s) ((uintptr_t *)((struct slab *)(s) + 1))
 #define SEGMENTS(s)     ((struct LOCAL_segment *)((byte_t *)(s) + SEGMENT_OFFSET))
 
 /* Local symbols. */
-#define LOCAL_slab_dofreeptr                  FUNC(slab_dofreeptr)
-#define LOCAL_slab_freeptr                    FUNC(slab_freeptr)
-#define LOCAL_slab_descriptor_service_pending FUNC(slab_service_pending)
-#define LOCAL_slab_malloc                     FUNC(slab_malloc)
-#define LOCAL_slab_kmalloc                    FUNC(slab_kmalloc)
-#define LOCAL_slab_kmalloc_nx                 FUNC(slab_kmalloc_nx)
+#define LOCAL_slab_dofreeptr                  PP_CAT2(slab_dofreeptr, SEGMENT_SIZE)
+#define LOCAL_slab_freeptr                    PP_CAT2(slab_freeptr, SEGMENT_SIZE)
+#define LOCAL_slab_descriptor_service_pending PP_CAT2(slab_service_pending, SEGMENT_SIZE)
+#define LOCAL_slab_malloc                     PP_CAT2(slab_malloc, SEGMENT_SIZE)
+#define LOCAL_slab_kmalloc                    PP_CAT2(slab_kmalloc, SEGMENT_SIZE)
+#define LOCAL_slab_kmalloc_nx                 PP_CAT2(slab_kmalloc_nx, SEGMENT_SIZE)
 
 INTERN struct slab_descriptor LOCAL_desc = {
 	.sd_lock = ATOMIC_LOCK_INIT,
@@ -361,6 +357,3 @@ DECL_END
 #undef SEGMENT_SIZE
 
 #undef NEXT_SEGMENT_SIZE
-#undef FUNC3
-#undef FUNC2
-#undef FUNC

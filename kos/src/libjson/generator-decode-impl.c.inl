@@ -29,19 +29,23 @@
 
 
 #ifdef MODE_DECODE
-#define IF_DECODE(...) __VA_ARGS__
-#define IF_ZERO(...)   /* nothing */
+#define LOCAL_IF_DECODE(...)            __VA_ARGS__
+#define LOCAL_IF_ZERO(...)              /* nothing */
+#define LOCAL_IF_DECODE_ELSE(ifd, ifz)  ifd
+#define LOCAL_libjson_decode_INTO       libjson_decode_INTO
+#define LOCAL_libjson_decode_OBJECT     libjson_decode_OBJECT
+#define LOCAL_libjson_decode_ARRAY      libjson_decode_ARRAY
+#define LOCAL_libjson_decode_designator libjson_decode_designator
 #else /* MODE_DECODE */
-#define IF_DECODE(...) /* nothing */
-#define IF_ZERO(...) __VA_ARGS__
+#define LOCAL_IF_DECODE(...)            /* nothing */
+#define LOCAL_IF_ZERO(...)              __VA_ARGS__
+#define LOCAL_IF_DECODE_ELSE(ifd, ifz)  ifz
+#define LOCAL_libjson_decode_INTO       libjson_decode_INTO_zero
+#define LOCAL_libjson_decode_OBJECT     libjson_decode_OBJECT_zero
+#define LOCAL_libjson_decode_ARRAY      libjson_decode_ARRAY_zero
+#define LOCAL_libjson_decode_designator libjson_decode_designator_zero
 #endif /* !MODE_DECODE */
 
-
-#ifdef MODE_ZERO
-#define FUNC(x) x##_zero
-#elif defined(MODE_DECODE)
-#define FUNC(x) x
-#endif
 
 DECL_BEGIN
 
@@ -50,23 +54,20 @@ DECL_BEGIN
 INTDEF char const libjson_empty_string[1];
 #endif /* !LIBJSON_EMPTY_STRING_DEFINED */
 
-INTERN
-	IF_DECODE(NONNULL((1, 2, 3, 4)))
-	IF_ZERO  (NONNULL((1, 2, 3)))
-	int
-NOTHROW_NCX(CC FUNC(libjson_decode_INTO))(IF_DECODE(struct json_parser *__restrict parser, )
+INTERN LOCAL_IF_DECODE_ELSE(NONNULL((1, 2, 3, 4)), NONNULL((1, 2, 3))) int
+NOTHROW_NCX(CC LOCAL_libjson_decode_INTO)(LOCAL_IF_DECODE(struct json_parser *__restrict parser,)
                                           byte_t const **__restrict preader,
                                           void *__restrict dst_base,
                                           void *__restrict dst,
                                           uint8_t type
-                                          IF_DECODE(, unsigned int gen_flags)) {
-	IF_DECODE(int result;)
-	IF_DECODE((void)gen_flags;)
+                                          LOCAL_IF_DECODE(, unsigned int gen_flags)) {
+	LOCAL_IF_DECODE(int result;)
+	LOCAL_IF_DECODE((void)gen_flags;)
 	switch (type) {
 
 	case JSON_TYPE_BOOLBIT(0) ... JSON_TYPE_BOOLBIT(7): {
 		uint8_t mask;
-		IF_DECODE(bool value;)
+		LOCAL_IF_DECODE(bool value;)
 		mask = (uint8_t)1 << (type - JSON_TYPE_BOOLBIT(0));
 #ifdef MODE_DECODE
 		result = libjson_parser_getbool(parser, &value);
@@ -316,22 +317,16 @@ done:
 
 
 /* Process until _after_ the correct `JGEN_END' opcode is reached. */
-INTDEF
-	IF_DECODE(NONNULL((1, 2)))
-	IF_ZERO  (NONNULL((1)))
-	int
-NOTHROW_NCX(CC FUNC(libjson_decode_OBJECT))(IF_DECODE(struct json_parser *__restrict parser, )
+INTDEF LOCAL_IF_DECODE_ELSE(NONNULL((1, 2)), NONNULL((1))) int
+NOTHROW_NCX(CC LOCAL_libjson_decode_OBJECT)(LOCAL_IF_DECODE(struct json_parser *__restrict parser,)
                                             byte_t const **__restrict preader,
                                             void *__restrict dst,
                                             unsigned int gen_flags,
                                             void const *const *ext);
 
 /* Process until _after_ the correct `JGEN_END' opcode is reached. */
-INTDEF
-	IF_DECODE(NONNULL((1, 2, 3)))
-	IF_ZERO  (NONNULL((1, 2)))
-	int
-NOTHROW_NCX(CC FUNC(libjson_decode_ARRAY))(IF_DECODE(struct json_parser *__restrict parser, )
+INTDEF LOCAL_IF_DECODE_ELSE(NONNULL((1, 2, 3)), NONNULL((1, 2))) int
+NOTHROW_NCX(CC LOCAL_libjson_decode_ARRAY)(LOCAL_IF_DECODE(struct json_parser *__restrict parser,)
                                            byte_t const **__restrict preader,
                                            void *__restrict dst,
                                            unsigned int gen_flags,
@@ -371,11 +366,8 @@ NOTHROW_NCX(CC libjson_decode_ARRAY_zero)(byte_t const **__restrict preader,
  *   - JGEN_BEGINARRAY
  *   - JGEN_INTO
  */
-INTERN
-	IF_DECODE(NONNULL((1, 2, 3)))
-	IF_ZERO  (NONNULL((1, 2)))
-	int
-NOTHROW_NCX(CC FUNC(libjson_decode_designator))(IF_DECODE(struct json_parser *__restrict parser, )
+INTERN LOCAL_IF_DECODE_ELSE(NONNULL((1, 2, 3)), NONNULL((1, 2))) int
+NOTHROW_NCX(CC LOCAL_libjson_decode_designator)(LOCAL_IF_DECODE(struct json_parser *__restrict parser,)
                                                 byte_t const **__restrict preader,
                                                 void *__restrict dst,
                                                 unsigned int gen_flags,
@@ -388,11 +380,11 @@ NOTHROW_NCX(CC FUNC(libjson_decode_designator))(IF_DECODE(struct json_parser *__
 	switch (op) {
 
 	case JGEN_BEGINOBJECT:
-		result = FUNC(libjson_decode_OBJECT)(IF_DECODE(parser, )&reader, dst, gen_flags, ext);
+		result = LOCAL_libjson_decode_OBJECT(LOCAL_IF_DECODE(parser,) &reader, dst, gen_flags, ext);
 		break;
 
 	case JGEN_BEGINARRAY:
-		result = FUNC(libjson_decode_ARRAY)(IF_DECODE(parser, )&reader, dst, gen_flags, ext);
+		result = LOCAL_libjson_decode_ARRAY(LOCAL_IF_DECODE(parser,) &reader, dst, gen_flags, ext);
 		break;
 
 	case JGEN_EXTERN_OP: {
@@ -407,15 +399,9 @@ NOTHROW_NCX(CC FUNC(libjson_decode_designator))(IF_DECODE(struct json_parser *__
 			/* Allowed, but highly unlikely: An empty codec */
 			result = JSON_ERROR_OK;
 		} else {
-#ifdef MODE_DECODE
-			result = libjson_decode_designator(parser, &codec,
-			                                   (byte_t *)dst + offset,
-			                                   gen_flags, ext);
-#else /* MODE_DECODE */
-			result = libjson_decode_designator_zero(&codec,
-			                                        (byte_t *)dst + offset,
-			                                        gen_flags, ext);
-#endif /* !MODE_DECODE */
+			result = LOCAL_libjson_decode_designator(LOCAL_IF_DECODE(parser,) &codec,
+			                                         (byte_t *)dst + offset,
+			                                         gen_flags, ext);
 			if likely(result == JSON_ERROR_OK) {
 				op = *codec++;
 				if unlikely(op != JGEN_TERM)
@@ -431,9 +417,9 @@ NOTHROW_NCX(CC FUNC(libjson_decode_designator))(IF_DECODE(struct json_parser *__
 		reader += 2;
 		type = *(uint8_t const *)reader;
 		reader += 1;
-		result = FUNC(libjson_decode_INTO)(IF_DECODE(parser, )&reader,
+		result = LOCAL_libjson_decode_INTO(LOCAL_IF_DECODE(parser,) &reader,
 		                                   dst, (byte_t *)dst + offset,
-		                                   type IF_DECODE(, gen_flags));
+		                                   type LOCAL_IF_DECODE(, gen_flags));
 	}	break;
 
 	default:
@@ -447,11 +433,8 @@ err_bad_usage:
 
 
 /* Process until _after_ the correct `JGEN_END' opcode is reached. */
-INTERN
-	IF_DECODE(NONNULL((1, 2, 3)))
-	IF_ZERO  (NONNULL((1, 2)))
-	int
-NOTHROW_NCX(CC FUNC(libjson_decode_OBJECT))(IF_DECODE(struct json_parser *__restrict parser, )
+INTERN LOCAL_IF_DECODE_ELSE(NONNULL((1, 2, 3)), NONNULL((1, 2))) int
+NOTHROW_NCX(CC LOCAL_libjson_decode_OBJECT)(LOCAL_IF_DECODE(struct json_parser *__restrict parser,)
                                             byte_t const **__restrict preader,
                                             void *__restrict dst,
                                             unsigned int gen_flags,
@@ -480,7 +463,7 @@ again_inner:
 			goto done_object;
 
 		case JGEN_FIELD: {
-			IF_DECODE(size_t namelen;)
+			LOCAL_IF_DECODE(size_t namelen;)
 #ifndef MODE_DECODE
 			reader = (byte_t const *)(strend((char const *)reader) + 1);
 #else /* !MODE_DECODE */
@@ -500,7 +483,7 @@ again_inner:
 			} else
 #endif /* MODE_DECODE */
 			{
-				result = FUNC(libjson_decode_designator)(IF_DECODE(parser, )&reader, dst,
+				result = LOCAL_libjson_decode_designator(LOCAL_IF_DECODE(parser,) &reader, dst,
 				                                         inner_flags | (gen_flags & ~GENFLAG_OPTIONAL),
 				                                         ext);
 			}
@@ -535,11 +518,8 @@ done:
 
 
 /* Process until _after_ the correct `JGEN_END' opcode is reached. */
-INTERN
-	IF_DECODE(NONNULL((1, 2, 3)))
-	IF_ZERO  (NONNULL((1, 2)))
-	int
-NOTHROW_NCX(CC FUNC(libjson_decode_ARRAY))(IF_DECODE(struct json_parser *__restrict parser, )
+INTERN LOCAL_IF_DECODE_ELSE(NONNULL((1, 2, 3)), NONNULL((1, 2))) int
+NOTHROW_NCX(CC LOCAL_libjson_decode_ARRAY)(LOCAL_IF_DECODE(struct json_parser *__restrict parser,)
                                            byte_t const **__restrict preader,
                                            void *__restrict dst,
                                            unsigned int gen_flags,
@@ -547,7 +527,7 @@ NOTHROW_NCX(CC FUNC(libjson_decode_ARRAY))(IF_DECODE(struct json_parser *__restr
 	int result;
 	byte_t op;
 	byte_t const *reader;
-	IF_DECODE(bool is_first = true;)
+	LOCAL_IF_DECODE(bool is_first = true;)
 #ifdef MODE_DECODE
 	result = libjson_parser_enterarray(parser);
 	if (result != JSON_ERROR_OK) {
@@ -601,7 +581,7 @@ again_inner:
 			} else
 #endif /* MODE_DECODE */
 			{
-				result = FUNC(libjson_decode_designator)(IF_DECODE(parser, )&reader, dst,
+				result = LOCAL_libjson_decode_designator(LOCAL_IF_DECODE(parser,) &reader, dst,
 				                                         inner_flags | (gen_flags & ~GENFLAG_OPTIONAL),
 				                                         ext);
 			}
@@ -634,7 +614,7 @@ again_inner:
 #endif /* MODE_DECODE */
 				/* parse the array element designator. */
 				reader = orig_reader;
-				result = FUNC(libjson_decode_designator)(IF_DECODE(parser, )&reader,
+				result = LOCAL_libjson_decode_designator(LOCAL_IF_DECODE(parser,) &reader,
 				                                         (byte_t *)dst + offset,
 				                                         inner_flags | (gen_flags & ~GENFLAG_OPTIONAL),
 				                                         ext);
@@ -669,9 +649,13 @@ done:
 
 DECL_END
 
-#undef IF_DECODE
-#undef IF_ZERO
-#undef FUNC
+#undef LOCAL_IF_DECODE
+#undef LOCAL_IF_ZERO
+#undef LOCAL_IF_DECODE_ELSE
+#undef LOCAL_libjson_decode_INTO
+#undef LOCAL_libjson_decode_OBJECT
+#undef LOCAL_libjson_decode_ARRAY
+#undef LOCAL_libjson_decode_designator
 
 #undef MODE_DECODE
 #undef MODE_ZERO

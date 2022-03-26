@@ -1394,7 +1394,7 @@ NOTHROW(KCALL heap_free_underallocation)(struct heap *__restrict self,
 DECL_END
 
 #ifndef __INTELLISENSE__
-#define HEAP_NX 1
+#define DEFINE_HEAP_NX
 #include "heap-impl.c.inl"
 /**/
 #include "heap-impl.c.inl"
@@ -1403,7 +1403,7 @@ DECL_END
 DECL_BEGIN
 
 /* Weakly alias the TRACED-versions of heap functions.
- * When DEBUG_MALLOC is enabled, `debug-malloc.c' will override these. */
+ * When `trace-malloc.c' is enabled, it will override these. */
 DEFINE_PUBLIC_WEAK_ALIAS(heap_alloc, heap_alloc_untraced);
 DEFINE_PUBLIC_WEAK_ALIAS(heap_align, heap_align_untraced);
 DEFINE_PUBLIC_WEAK_ALIAS(heap_allat, heap_allat_untraced);

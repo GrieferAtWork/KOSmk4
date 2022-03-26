@@ -237,7 +237,7 @@ DEFINE_INTERN_ALIAS(untraced_kmalloc_noslab_nx, untraced_kmalloc_nx);
 DECL_END
 
 #ifndef __INTELLISENSE__
-#define MALLOC_NX 1
+#define DEFINE_MALLOC_NX
 #include "malloc-impl.c.inl"
 /**/
 #include "malloc-impl.c.inl"

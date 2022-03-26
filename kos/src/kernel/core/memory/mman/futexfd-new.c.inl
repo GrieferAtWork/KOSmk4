@@ -40,27 +40,22 @@
 DECL_BEGIN
 
 #ifdef DEFINE_compat_mfutexfd_new
-#define LOCAL_sizeof_pointer __ARCH_COMPAT_SIZEOF_POINTER
+#define LOCAL_sizeof_pointer    __ARCH_COMPAT_SIZEOF_POINTER
+#define LOCAL_mfutexfd_new      compat_mfutexfd_new
+#define LOCAL_struct_lfutexexpr struct compat_lfutexexpr
 #else /* DEFINE_compat_mfutexfd_new */
-#define LOCAL_sizeof_pointer __SIZEOF_POINTER__
+#define LOCAL_sizeof_pointer    __SIZEOF_POINTER__
+#define LOCAL_mfutexfd_new      mfutexfd_new
+#define LOCAL_struct_lfutexexpr struct lfutexexpr
 #endif /* !DEFINE_compat_mfutexfd_new */
 
 /* Create a new futexfd object.
  * @throw: E_INSUFFICIENT_RIGHTS: Tried to exceed `mfutexfd_maxexpr' w/o `CAP_SYS_RESOURCE' */
-#ifdef DEFINE_mfutexfd_new
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mfutexfd *FCALL
-mfutexfd_new(REF struct mfutex *__restrict futex,
-             USER UNCHECKED void *base,
-             USER CHECKED struct lfutexexpr const *expr)
-		THROWS(E_BADALLOC, E_SEGFAULT, E_INSUFFICIENT_RIGHTS)
-#else /* DEFINE_mfutexfd_new */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mfutexfd *FCALL
-compat_mfutexfd_new(REF struct mfutex *__restrict futex,
-                    USER UNCHECKED void *base,
-                    USER CHECKED struct compat_lfutexexpr const *expr)
-		THROWS(E_BADALLOC, E_SEGFAULT, E_INSUFFICIENT_RIGHTS)
-#endif /* !DEFINE_mfutexfd_new */
-{
+LOCAL_mfutexfd_new(REF struct mfutex *__restrict futex,
+                   USER UNCHECKED void *base,
+                   USER CHECKED LOCAL_struct_lfutexexpr const *expr)
+		THROWS(E_BADALLOC, E_SEGFAULT, E_INSUFFICIENT_RIGHTS) {
 	REF struct mfutexfd *result;
 	size_t count = 0;
 	while (expr[count].fe_condition != LFUTEX_EXPREND) {
@@ -167,6 +162,8 @@ done_expr:
 }
 
 #undef LOCAL_sizeof_pointer
+#undef LOCAL_mfutexfd_new
+#undef LOCAL_struct_lfutexexpr
 
 DECL_END
 

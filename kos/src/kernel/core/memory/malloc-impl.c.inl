@@ -19,52 +19,74 @@
  */
 #ifdef __INTELLISENSE__
 #include "malloc.c"
-#define MALLOC_NX
+#define DEFINE_MALLOC_NX
 #endif /* __INTELLISENSE__ */
 
-#ifdef MALLOC_NX
-#define IFELSE_NX(if_nx, if_x) if_nx
-#define FUNC(x)                x##_nx
-#define NOTHROW_NX             NOTHROW
-#else /* MALLOC_NX */
-#define IFELSE_NX(if_nx, if_x) if_x
-#define FUNC(x)                x
-#define NOTHROW_NX             /* nothing */
-#endif /* !MALLOC_NX */
+#ifdef DEFINE_MALLOC_NX
+#define LOCAL_IF_NX_ELSE(if_nx, if_x)    if_nx
+#define LOCAL_NOTHROW                    NOTHROW
+#define LOCAL_get_realloc_size           get_realloc_size_nx
+#define LOCAL_untraced_kmalloc_noslab    untraced_kmalloc_noslab_nx
+#define LOCAL_untraced_kmalloc           untraced_kmalloc_nx
+#define LOCAL_untraced_kmemalign         untraced_kmemalign_nx
+#define LOCAL_untraced_kmemalign_offset  untraced_kmemalign_offset_nx
+#define LOCAL_untraced_krealloc_in_place untraced_krealloc_in_place_nx
+#define LOCAL_untraced_krealloc          untraced_krealloc_nx
+#define LOCAL_untraced_krealign          untraced_krealign_nx
+#define LOCAL_heap_alloc_untraced        heap_alloc_untraced_nx
+#define LOCAL_heap_align_untraced        heap_align_untraced_nx
+#define LOCAL_heap_allat_untraced        heap_allat_untraced_nx
+#define LOCAL_untraced_krealign_offset   untraced_krealign_offset_nx
+#else /* DEFINE_MALLOC_NX */
+#define LOCAL_IF_NX_ELSE(if_nx, if_x)    if_x
+#define LOCAL_NOTHROW                    /* nothing */
+#define LOCAL_get_realloc_size           get_realloc_size
+#define LOCAL_untraced_kmalloc_noslab    untraced_kmalloc_noslab
+#define LOCAL_untraced_kmalloc           untraced_kmalloc
+#define LOCAL_untraced_kmemalign         untraced_kmemalign
+#define LOCAL_untraced_kmemalign_offset  untraced_kmemalign_offset
+#define LOCAL_untraced_krealloc_in_place untraced_krealloc_in_place
+#define LOCAL_untraced_krealloc          untraced_krealloc
+#define LOCAL_untraced_krealign          untraced_krealign
+#define LOCAL_heap_alloc_untraced        heap_alloc_untraced
+#define LOCAL_heap_align_untraced        heap_align_untraced
+#define LOCAL_heap_allat_untraced        heap_allat_untraced
+#define LOCAL_untraced_krealign_offset   untraced_krealign_offset
+#endif /* !DEFINE_MALLOC_NX */
 
 DECL_BEGIN
 
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 INTERN ATTR_MALLOC WUNUSED VIRT void *
-NOTHROW_NX(KCALL FUNC(untraced_kmalloc_noslab))(size_t n_bytes, gfp_t flags) {
+LOCAL_NOTHROW(KCALL LOCAL_untraced_kmalloc_noslab)(size_t n_bytes, gfp_t flags) {
 	heapptr_t hptr;
 	struct mptr *result;
 	size_t alloc_size;
 	if unlikely(OVERFLOW_UADD(sizeof(struct mptr), n_bytes, &alloc_size))
-		goto IFELSE_NX(err, err_overflow);
-	hptr = FUNC(heap_alloc_untraced)(&kernel_heaps[flags & __GFP_HEAPMASK],
+		goto LOCAL_IF_NX_ELSE(err, err_overflow);
+	hptr = LOCAL_heap_alloc_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
 	                                 alloc_size, flags);
-	IFELSE_NX(if unlikely(!heapptr_getsiz(hptr)) goto err;, )
+	LOCAL_IF_NX_ELSE(if unlikely(!heapptr_getsiz(hptr)) goto err;, )
 	assert(heapptr_getsiz(hptr) >= alloc_size);
 	result = (struct mptr *)heapptr_getptr(hptr);
 	mptr_init(result, heapptr_getsiz(hptr), flags & __GFP_HEAPMASK);
 	return mptr_user(result);
-IFELSE_NX(err:, err_overflow:)
-	IFELSE_NX(return NULL, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
+LOCAL_IF_NX_ELSE(err:, err_overflow:)
+	LOCAL_IF_NX_ELSE(return NULL, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
 }
-#elif defined(MALLOC_NX)
+#elif defined(DEFINE_MALLOC_NX)
 #define untraced_kmalloc_no_slab_nx untraced_kmalloc_nx
 #else /* ... */
 #define untraced_kmalloc_noslab     untraced_kmalloc
 #endif /* !... */
 
 INTERN ATTR_MALLOC WUNUSED VIRT void *
-NOTHROW_NX(KCALL FUNC(untraced_kmalloc))(size_t n_bytes, gfp_t flags) {
+LOCAL_NOTHROW(KCALL LOCAL_untraced_kmalloc)(size_t n_bytes, gfp_t flags) {
 	heapptr_t hptr;
 	struct mptr *result;
 	size_t alloc_size;
 	if unlikely(OVERFLOW_UADD(sizeof(struct mptr), n_bytes, &alloc_size))
-		goto IFELSE_NX(err, err_overflow);
+		goto LOCAL_IF_NX_ELSE(err, err_overflow);
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 	if (n_bytes <= SLAB_MAXSIZE) {
 		void *slab_ptr;
@@ -73,63 +95,63 @@ NOTHROW_NX(KCALL FUNC(untraced_kmalloc))(size_t n_bytes, gfp_t flags) {
 			return slab_ptr;
 	}
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
-	hptr = FUNC(heap_alloc_untraced)(&kernel_heaps[flags & __GFP_HEAPMASK],
+	hptr = LOCAL_heap_alloc_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
 	                                 alloc_size, flags);
-	IFELSE_NX(if unlikely(!heapptr_getsiz(hptr)) goto err;, )
+	LOCAL_IF_NX_ELSE(if unlikely(!heapptr_getsiz(hptr)) goto err;, )
 	assert(heapptr_getsiz(hptr) >= alloc_size);
 	result = (struct mptr *)heapptr_getptr(hptr);
 	mptr_init(result, heapptr_getsiz(hptr), flags & __GFP_HEAPMASK);
 	mptr_assert_paranoid(result);
 	return mptr_user(result);
-IFELSE_NX(err:, err_overflow:)
-	IFELSE_NX(return NULL, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
+LOCAL_IF_NX_ELSE(err:, err_overflow:)
+	LOCAL_IF_NX_ELSE(return NULL, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
 }
 
 INTERN ATTR_MALLOC WUNUSED VIRT void *
-NOTHROW_NX(KCALL FUNC(untraced_kmemalign))(size_t min_alignment,
-                                           size_t n_bytes,
-                                           gfp_t flags) {
+LOCAL_NOTHROW(KCALL LOCAL_untraced_kmemalign)(size_t min_alignment,
+                                              size_t n_bytes,
+                                              gfp_t flags) {
 	heapptr_t hptr;
 	struct mptr *result;
 	size_t alloc_size;
 	if unlikely(OVERFLOW_UADD(sizeof(struct mptr), n_bytes, &alloc_size))
-		goto IFELSE_NX(err, err_overflow);
-	hptr = FUNC(heap_align_untraced)(&kernel_heaps[flags & __GFP_HEAPMASK],
+		goto LOCAL_IF_NX_ELSE(err, err_overflow);
+	hptr = LOCAL_heap_align_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
 	                                 min_alignment, sizeof(struct mptr),
 	                                 alloc_size, flags);
-	IFELSE_NX(if unlikely(!heapptr_getsiz(hptr)) goto err;, )
+	LOCAL_IF_NX_ELSE(if unlikely(!heapptr_getsiz(hptr)) goto err;, )
 	result = (struct mptr *)heapptr_getptr(hptr);
 	mptr_init(result, heapptr_getsiz(hptr), flags & __GFP_HEAPMASK);
 	mptr_assert_paranoid(result);
 	assert(IS_ALIGNED((uintptr_t)mptr_user(result), min_alignment));
 	return mptr_user(result);
-IFELSE_NX(err:, err_overflow:)
-	IFELSE_NX(return NULL, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
+LOCAL_IF_NX_ELSE(err:, err_overflow:)
+	LOCAL_IF_NX_ELSE(return NULL, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
 }
 
 INTERN ATTR_MALLOC WUNUSED VIRT void *
-NOTHROW_NX(KCALL FUNC(untraced_kmemalign_offset))(size_t min_alignment, ptrdiff_t offset,
-                                                  size_t n_bytes, gfp_t flags) {
+LOCAL_NOTHROW(KCALL LOCAL_untraced_kmemalign_offset)(size_t min_alignment, ptrdiff_t offset,
+                                                     size_t n_bytes, gfp_t flags) {
 	heapptr_t hptr;
 	struct mptr *result;
 	size_t alloc_size;
 	if unlikely(OVERFLOW_UADD(sizeof(struct mptr), n_bytes, &alloc_size))
-		goto IFELSE_NX(err, err_overflow);
-	hptr = FUNC(heap_align_untraced)(&kernel_heaps[flags & __GFP_HEAPMASK],
+		goto LOCAL_IF_NX_ELSE(err, err_overflow);
+	hptr = LOCAL_heap_align_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
 	                                 min_alignment, sizeof(struct mptr) + offset,
 	                                 alloc_size, flags);
-	IFELSE_NX(if unlikely(!heapptr_getsiz(hptr)) goto err;, )
+	LOCAL_IF_NX_ELSE(if unlikely(!heapptr_getsiz(hptr)) goto err;, )
 	result = (struct mptr *)heapptr_getptr(hptr);
 	mptr_init(result, heapptr_getsiz(hptr), flags & __GFP_HEAPMASK);
 	mptr_assert_paranoid(result);
 	assert(IS_ALIGNED((uintptr_t)mptr_user(result) + offset, min_alignment));
 	return mptr_user(result);
-IFELSE_NX(err:, err_overflow:)
-	IFELSE_NX(return NULL, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
+LOCAL_IF_NX_ELSE(err:, err_overflow:)
+	LOCAL_IF_NX_ELSE(return NULL, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
 }
 
-PRIVATE IFELSE_NX(ATTR_CONST, ) WUNUSED size_t
-NOTHROW_NX(KCALL FUNC(get_realloc_size))(size_t n_bytes) {
+PRIVATE LOCAL_IF_NX_ELSE(ATTR_CONST, ) WUNUSED size_t
+LOCAL_NOTHROW(KCALL LOCAL_get_realloc_size)(size_t n_bytes) {
 	size_t result;
 	if unlikely(OVERFLOW_UADD(n_bytes, (size_t)(HEAP_ALIGNMENT - 1), &result))
 		goto err_overflow;
@@ -140,14 +162,14 @@ NOTHROW_NX(KCALL FUNC(get_realloc_size))(size_t n_bytes) {
 		result = HEAP_MINSIZE;
 	return result;
 err_overflow:
-	IFELSE_NX(return (size_t)-1,
+	LOCAL_IF_NX_ELSE(return (size_t)-1,
 	          THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
 }
 
 INTERN VIRT void *
-NOTHROW_NX(KCALL FUNC(untraced_krealloc_in_place))(VIRT void *ptr,
-                                                   size_t n_bytes,
-                                                   gfp_t flags) {
+LOCAL_NOTHROW(KCALL LOCAL_untraced_krealloc_in_place)(VIRT void *ptr,
+                                                      size_t n_bytes,
+                                                      gfp_t flags) {
 	struct mptr *result;
 	size_t more_size;
 	assert(!(flags & GFP_NOMOVE));
@@ -160,8 +182,8 @@ NOTHROW_NX(KCALL FUNC(untraced_krealloc_in_place))(VIRT void *ptr,
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 
 	/* Align the given n_bytes and add the overhead caused by the mptr. */
-	n_bytes = FUNC(get_realloc_size)(n_bytes);
-	IFELSE_NX(if unlikely(n_bytes == (size_t)-1) goto err;, )
+	n_bytes = LOCAL_get_realloc_size(n_bytes);
+	LOCAL_IF_NX_ELSE(if unlikely(n_bytes == (size_t)-1) goto err;, )
 	result = mptr_get(ptr);
 	mptr_assert(result);
 	if (n_bytes <= mptr_size(result)) {
@@ -184,7 +206,7 @@ NOTHROW_NX(KCALL FUNC(untraced_krealloc_in_place))(VIRT void *ptr,
 	/* Increase the pointer (try to do so in-place at first) */
 	flags &= ~__GFP_HEAPMASK;
 	flags |= mptr_heap_gfp(result);
-	more_size = FUNC(heap_allat_untraced)(mptr_heap(result),
+	more_size = LOCAL_heap_allat_untraced(mptr_heap(result),
 	                                      (void *)((uintptr_t)result + mptr_size(result)),
 	                                      (size_t)(n_bytes - mptr_size(result)), flags);
 	if (more_size != 0) {
@@ -199,9 +221,9 @@ err:
 }
 
 INTERN VIRT void *
-NOTHROW_NX(KCALL FUNC(untraced_krealloc))(VIRT void *ptr,
-                                          size_t n_bytes,
-                                          gfp_t flags) {
+LOCAL_NOTHROW(KCALL LOCAL_untraced_krealloc)(VIRT void *ptr,
+                                             size_t n_bytes,
+                                             gfp_t flags) {
 	heapptr_t hptr;
 	struct mptr *result;
 	struct heap *used_heap;
@@ -209,9 +231,9 @@ NOTHROW_NX(KCALL FUNC(untraced_krealloc))(VIRT void *ptr,
 	assert(!(flags & GFP_NOMOVE));
 	if (!ptr) {
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
-		return FUNC(untraced_kmalloc_noslab)(n_bytes, flags);
+		return LOCAL_untraced_kmalloc_noslab(n_bytes, flags);
 #else /* CONFIG_USE_SLAB_ALLOCATORS */
-		return FUNC(untraced_kmalloc)(n_bytes, flags);
+		return LOCAL_untraced_kmalloc(n_bytes, flags);
 #endif /* !CONFIG_USE_SLAB_ALLOCATORS */
 	}
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
@@ -220,11 +242,11 @@ NOTHROW_NX(KCALL FUNC(untraced_krealloc))(VIRT void *ptr,
 		u8 old_size = SLAB_GET(ptr)->s_size;
 		if (n_bytes <= old_size)
 			return ptr;
-		resptr = FUNC(untraced_kmalloc_noslab)(n_bytes, flags);
-#ifdef MALLOC_NX
+		resptr = LOCAL_untraced_kmalloc_noslab(n_bytes, flags);
+#ifdef DEFINE_MALLOC_NX
 		if unlikely(!resptr)
 			return NULL;
-#endif /* MALLOC_NX */
+#endif /* DEFINE_MALLOC_NX */
 		memcpy(resptr, ptr, old_size);
 		slab_free(ptr);
 		return resptr;
@@ -233,8 +255,8 @@ NOTHROW_NX(KCALL FUNC(untraced_krealloc))(VIRT void *ptr,
 	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
 
 	/* Align the given n_bytes and add the overhead caused by the mptr. */
-	n_bytes = FUNC(get_realloc_size)(n_bytes);
-	IFELSE_NX(if unlikely(n_bytes == (size_t)-1) goto err;, )
+	n_bytes = LOCAL_get_realloc_size(n_bytes);
+	LOCAL_IF_NX_ELSE(if unlikely(n_bytes == (size_t)-1) goto err;, )
 	result = mptr_get(ptr);
 	mptr_assert(result);
 	if (n_bytes <= mptr_size(result)) {
@@ -257,7 +279,7 @@ NOTHROW_NX(KCALL FUNC(untraced_krealloc))(VIRT void *ptr,
 	flags &= ~__GFP_HEAPMASK;
 	flags |= mptr_heap_gfp(result);
 	used_heap = mptr_heap(result);
-	more_size = FUNC(heap_allat_untraced)(used_heap,
+	more_size = LOCAL_heap_allat_untraced(used_heap,
 	                                      (void *)((uintptr_t)result + mptr_size(result)),
 	                                      (size_t)(n_bytes - mptr_size(result)), flags);
 	if (more_size != 0) {
@@ -268,8 +290,8 @@ NOTHROW_NX(KCALL FUNC(untraced_krealloc))(VIRT void *ptr,
 	}
 
 	/* Overlap with another pointer. - Allocate a new block. */
-	hptr = FUNC(heap_alloc_untraced)(used_heap, sizeof(struct mptr) + n_bytes, flags);
-	IFELSE_NX(if unlikely(!heapptr_getsiz(hptr)) goto err;, )
+	hptr = LOCAL_heap_alloc_untraced(used_heap, sizeof(struct mptr) + n_bytes, flags);
+	LOCAL_IF_NX_ELSE(if unlikely(!heapptr_getsiz(hptr)) goto err;, )
 	memcpy(heapptr_getptr(hptr), result, mptr_size(result));
 
 	/* Free the old pointer. */
@@ -282,22 +304,22 @@ NOTHROW_NX(KCALL FUNC(untraced_krealloc))(VIRT void *ptr,
 	mptr_init(result, heapptr_getsiz(hptr), flags & __GFP_HEAPMASK);
 	mptr_assert_paranoid(result);
 	return mptr_user(result);
-#ifdef MALLOC_NX
+#ifdef DEFINE_MALLOC_NX
 err:
 	return NULL;
-#endif /* MALLOC_NX */
+#endif /* DEFINE_MALLOC_NX */
 }
 
 INTERN VIRT void *
-NOTHROW_NX(KCALL FUNC(untraced_krealign))(VIRT void *ptr, size_t min_alignment,
-                                          size_t n_bytes, gfp_t flags) {
+LOCAL_NOTHROW(KCALL LOCAL_untraced_krealign)(VIRT void *ptr, size_t min_alignment,
+                                             size_t n_bytes, gfp_t flags) {
 	heapptr_t hptr;
 	struct mptr *result;
 	struct heap *used_heap;
 	size_t more_size;
 	assert(!(flags & GFP_NOMOVE));
 	if (!ptr)
-		return FUNC(untraced_kmemalign)(min_alignment, n_bytes, flags);
+		return LOCAL_untraced_kmemalign(min_alignment, n_bytes, flags);
 	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr)) {
@@ -305,11 +327,11 @@ NOTHROW_NX(KCALL FUNC(untraced_krealign))(VIRT void *ptr, size_t min_alignment,
 		u8 old_size = SLAB_GET(ptr)->s_size;
 		if (n_bytes <= old_size)
 			return ptr;
-		resptr = FUNC(untraced_kmemalign)(min_alignment, n_bytes, flags);
-#ifdef MALLOC_NX
+		resptr = LOCAL_untraced_kmemalign(min_alignment, n_bytes, flags);
+#ifdef DEFINE_MALLOC_NX
 		if unlikely(!resptr)
 			return NULL;
-#endif /* MALLOC_NX */
+#endif /* DEFINE_MALLOC_NX */
 		memcpy(resptr, ptr, old_size);
 		slab_free(ptr);
 		return resptr;
@@ -317,8 +339,8 @@ NOTHROW_NX(KCALL FUNC(untraced_krealign))(VIRT void *ptr, size_t min_alignment,
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 
 	/* Align the given n_bytes and add the overhead caused by the mptr. */
-	n_bytes = FUNC(get_realloc_size)(n_bytes);
-	IFELSE_NX(if unlikely(n_bytes == (size_t)-1) goto err;, )
+	n_bytes = LOCAL_get_realloc_size(n_bytes);
+	LOCAL_IF_NX_ELSE(if unlikely(n_bytes == (size_t)-1) goto err;, )
 	result = mptr_get(ptr);
 	mptr_assert(result);
 	if (n_bytes <= mptr_size(result)) {
@@ -342,7 +364,7 @@ NOTHROW_NX(KCALL FUNC(untraced_krealign))(VIRT void *ptr, size_t min_alignment,
 	flags &= ~__GFP_HEAPMASK;
 	flags |= mptr_heap_gfp(result);
 	used_heap = mptr_heap(result);
-	more_size = FUNC(heap_allat_untraced)(used_heap,
+	more_size = LOCAL_heap_allat_untraced(used_heap,
 	                                      (void *)((uintptr_t)result + mptr_size(result)),
 	                                      (size_t)(n_bytes - mptr_size(result)), flags);
 	if (more_size != 0) {
@@ -353,11 +375,11 @@ NOTHROW_NX(KCALL FUNC(untraced_krealign))(VIRT void *ptr, size_t min_alignment,
 		return ptr;
 	}
 	/* Overlap with another pointer. - Allocate a new block. */
-	hptr = FUNC(heap_align_untraced)(used_heap, min_alignment,
+	hptr = LOCAL_heap_align_untraced(used_heap, min_alignment,
 	                                 sizeof(struct mptr),
 	                                 sizeof(struct mptr) + n_bytes,
 	                                 flags);
-	IFELSE_NX(if unlikely(!heapptr_getsiz(hptr)) goto err;, )
+	LOCAL_IF_NX_ELSE(if unlikely(!heapptr_getsiz(hptr)) goto err;, )
 	memcpy(heapptr_getptr(hptr), result, mptr_size(result));
 
 	/* Free the old pointer. */
@@ -370,23 +392,23 @@ NOTHROW_NX(KCALL FUNC(untraced_krealign))(VIRT void *ptr, size_t min_alignment,
 	mptr_init(result, heapptr_getsiz(hptr), flags & __GFP_HEAPMASK);
 	mptr_assert_paranoid(result);
 	return mptr_user(result);
-#ifdef MALLOC_NX
+#ifdef DEFINE_MALLOC_NX
 err:
 	return NULL;
-#endif /* MALLOC_NX */
+#endif /* DEFINE_MALLOC_NX */
 }
 
 INTERN VIRT void *
-NOTHROW_NX(KCALL FUNC(untraced_krealign_offset))(VIRT void *ptr, size_t min_alignment,
-                                                 ptrdiff_t offset, size_t n_bytes,
-                                                 gfp_t flags) {
+LOCAL_NOTHROW(KCALL LOCAL_untraced_krealign_offset)(VIRT void *ptr, size_t min_alignment,
+                                                    ptrdiff_t offset, size_t n_bytes,
+                                                    gfp_t flags) {
 	heapptr_t hptr;
 	struct mptr *result;
 	struct heap *used_heap;
 	size_t more_size;
 	assert(!(flags & GFP_NOMOVE));
 	if (!ptr)
-		return FUNC(untraced_kmemalign_offset)(min_alignment, offset, n_bytes, flags);
+		return LOCAL_untraced_kmemalign_offset(min_alignment, offset, n_bytes, flags);
 	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr)) {
@@ -394,11 +416,11 @@ NOTHROW_NX(KCALL FUNC(untraced_krealign_offset))(VIRT void *ptr, size_t min_alig
 		u8 old_size = SLAB_GET(ptr)->s_size;
 		if (n_bytes <= old_size)
 			return ptr;
-		resptr = FUNC(untraced_kmemalign_offset)(min_alignment, offset, n_bytes, flags);
-#ifdef MALLOC_NX
+		resptr = LOCAL_untraced_kmemalign_offset(min_alignment, offset, n_bytes, flags);
+#ifdef DEFINE_MALLOC_NX
 		if unlikely(!resptr)
 			return NULL;
-#endif /* MALLOC_NX */
+#endif /* DEFINE_MALLOC_NX */
 		memcpy(resptr, ptr, old_size);
 		slab_free(ptr);
 		return resptr;
@@ -406,8 +428,8 @@ NOTHROW_NX(KCALL FUNC(untraced_krealign_offset))(VIRT void *ptr, size_t min_alig
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 
 	/* Align the given n_bytes and add the overhead caused by the mptr. */
-	n_bytes = FUNC(get_realloc_size)(n_bytes);
-	IFELSE_NX(if unlikely(n_bytes == (size_t)-1) goto err;, )
+	n_bytes = LOCAL_get_realloc_size(n_bytes);
+	LOCAL_IF_NX_ELSE(if unlikely(n_bytes == (size_t)-1) goto err;, )
 	result = mptr_get(ptr);
 	mptr_assert(result);
 	if (n_bytes <= mptr_size(result)) {
@@ -431,7 +453,7 @@ NOTHROW_NX(KCALL FUNC(untraced_krealign_offset))(VIRT void *ptr, size_t min_alig
 	flags &= ~__GFP_HEAPMASK;
 	flags |= mptr_heap_gfp(result);
 	used_heap = mptr_heap(result);
-	more_size = FUNC(heap_allat_untraced)(used_heap,
+	more_size = LOCAL_heap_allat_untraced(used_heap,
 	                                      (void *)((uintptr_t)result + mptr_size(result)),
 	                                      (size_t)(n_bytes - mptr_size(result)), flags);
 	if (more_size != 0) {
@@ -443,11 +465,11 @@ NOTHROW_NX(KCALL FUNC(untraced_krealign_offset))(VIRT void *ptr, size_t min_alig
 	}
 
 	/* Overlap with another pointer. - Allocate a new block. */
-	hptr = FUNC(heap_align_untraced)(used_heap, min_alignment,
+	hptr = LOCAL_heap_align_untraced(used_heap, min_alignment,
 	                                 sizeof(struct mptr) + offset,
 	                                 sizeof(struct mptr) + n_bytes,
 	                                 flags);
-	IFELSE_NX(if unlikely(!heapptr_getsiz(hptr)) goto err;, )
+	LOCAL_IF_NX_ELSE(if unlikely(!heapptr_getsiz(hptr)) goto err;, )
 	memcpy(heapptr_getptr(hptr), result, mptr_size(result));
 
 	/* Free the old pointer. */
@@ -460,15 +482,27 @@ NOTHROW_NX(KCALL FUNC(untraced_krealign_offset))(VIRT void *ptr, size_t min_alig
 	mptr_init(result, heapptr_getsiz(hptr), flags & __GFP_HEAPMASK);
 	mptr_assert_paranoid(result);
 	return mptr_user(result);
-#ifdef MALLOC_NX
+#ifdef DEFINE_MALLOC_NX
 err:
 	return NULL;
-#endif /* MALLOC_NX */
+#endif /* DEFINE_MALLOC_NX */
 }
 
 DECL_END
 
-#undef NOTHROW_NX
-#undef FUNC
-#undef IFELSE_NX
-#undef MALLOC_NX
+#undef LOCAL_NOTHROW
+#undef LOCAL_IF_NX_ELSE
+#undef LOCAL_get_realloc_size
+#undef LOCAL_untraced_kmalloc_noslab
+#undef LOCAL_untraced_kmalloc
+#undef LOCAL_untraced_kmemalign
+#undef LOCAL_untraced_kmemalign_offset
+#undef LOCAL_untraced_krealloc_in_place
+#undef LOCAL_untraced_krealloc
+#undef LOCAL_untraced_krealign
+#undef LOCAL_heap_alloc_untraced
+#undef LOCAL_heap_align_untraced
+#undef LOCAL_heap_allat_untraced
+#undef LOCAL_untraced_krealign_offset
+
+#undef DEFINE_MALLOC_NX

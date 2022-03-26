@@ -19,7 +19,7 @@
  */
 #ifdef __INTELLISENSE__
 #include "heap.c"
-#define HEAP_NX 1
+#define DEFINE_HEAP_NX
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/driver.h>
@@ -27,27 +27,43 @@
 
 #include <inttypes.h>
 
-#ifdef HEAP_NX
-#define IFELSE_NX(if_nx, if_x) if_nx
-#define FUNC(x)                x##_nx
-#define NOTHROW_NX             NOTHROW
-#else /* HEAP_NX */
-#define IFELSE_NX(if_nx, if_x) if_x
-#define FUNC(x)                x
-#define NOTHROW_NX(x)          x
-#endif /* HEAP_NX */
+#ifdef DEFINE_HEAP_NX
+#define LOCAL_IF_NX_ELSE(if_nx, if_x) if_nx
+#define LOCAL_NOTHROW                 NOTHROW
+#define LOCAL_core_page_alloc         core_page_alloc_nx
+#define LOCAL_mman_map_kram           mman_map_kram_nx
+#define LOCAL_heap_alloc_untraced     heap_alloc_untraced_nx
+#define LOCAL_heap_acquirelock        heap_acquirelock_nx
+#define LOCAL_heap_allat_partial      heap_allat_partial_nx
+#define LOCAL_heap_allat_untraced     heap_allat_untraced_nx
+#define LOCAL_heap_align_untraced     heap_align_untraced_nx
+#define LOCAL_heap_realloc_untraced   heap_realloc_untraced_nx
+#define LOCAL_heap_realign_untraced   heap_realign_untraced_nx
+#else /* DEFINE_HEAP_NX */
+#define LOCAL_IF_NX_ELSE(if_nx, if_x) if_x
+#define LOCAL_NOTHROW(x)              x
+#define LOCAL_core_page_alloc         core_page_alloc
+#define LOCAL_mman_map_kram           mman_map_kram
+#define LOCAL_heap_alloc_untraced     heap_alloc_untraced
+#define LOCAL_heap_acquirelock        heap_acquirelock
+#define LOCAL_heap_allat_partial      heap_allat_partial
+#define LOCAL_heap_allat_untraced     heap_allat_untraced
+#define LOCAL_heap_align_untraced     heap_align_untraced
+#define LOCAL_heap_realloc_untraced   heap_realloc_untraced
+#define LOCAL_heap_realign_untraced   heap_realign_untraced
+#endif /* DEFINE_HEAP_NX */
 
 
 DECL_BEGIN
 
-#define CORE_PAGE_MALLOC_ERROR MAP_FAILED
-#define CORE_PAGE_MALLOC_AUTO  MAP_FAILED
+#define LOCAL_CORE_PAGE_MALLOC_ERROR MAP_FAILED
+#define LOCAL_CORE_PAGE_MALLOC_AUTO  MAP_FAILED
 
-/* @param: mapping_target: The target page number where memory should be mapped.
- *                         When  `CORE_PAGE_MALLOC_AUTO',  automatically  search
- *                         for a suitable location, otherwise _always_ return
- *                        `CORE_PAGE_MALLOC_AUTO' (regardless of `HEAP_NX'), if
- *                         another kernel VM mapping already exists at that location.
+/* @param: mapping_target: The  target  page  number  where  memory  should  be  mapped. When
+ *                         `LOCAL_CORE_PAGE_MALLOC_AUTO', automatically search for a suitable
+ *                         location, otherwise _always_ return  `LOCAL_CORE_PAGE_MALLOC_AUTO'
+ *                         (regardless  of  `DEFINE_HEAP_NX'), if  another kernel  VM mapping
+ *                         already exists at that location.
  *                   NOTE: When this is  used to  specify a fixed  target, the  caller
  *                         should do an additional check for pre-existing nodes within
  *                         range  `mapping_target ... mapping_target + num_bytes - 1',
@@ -58,25 +74,25 @@ DECL_BEGIN
  * @param: min_alignment:  The minimum alignment required from automatic mapping_target
  *                         detection. */
 PRIVATE NONNULL((1)) VIRT void *
-NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
-                                        PAGEDIR_PAGEALIGNED void *mapping_target,
-                                        PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                        PAGEDIR_PAGEALIGNED size_t min_alignment,
-                                        gfp_t flags) {
+LOCAL_NOTHROW(KCALL LOCAL_core_page_alloc)(struct heap *__restrict self,
+                                           PAGEDIR_PAGEALIGNED void *mapping_target,
+                                           PAGEDIR_PAGEALIGNED size_t num_bytes,
+                                           PAGEDIR_PAGEALIGNED size_t min_alignment,
+                                           gfp_t flags) {
 	void *result;
 	assert(!(flags & GFP_MAP_FLAGS));
-	if (mapping_target == CORE_PAGE_MALLOC_AUTO) {
+	if (mapping_target == LOCAL_CORE_PAGE_MALLOC_AUTO) {
 		void *mapping_hint;
 		unsigned int mapping_mode;
 		mapping_hint = ATOMIC_READ(self->h_hintaddr);
 		mapping_mode = ATOMIC_READ(self->h_hintmode);
-		result = FUNC(mman_map_kram)(mapping_hint,
+		result = LOCAL_mman_map_kram(mapping_hint,
 		                             num_bytes,
 		                             flags | gfp_from_mapflags(mapping_mode),
 		                             min_alignment);
-#ifdef HEAP_NX
+#ifdef DEFINE_HEAP_NX
 		if (result != MAP_FAILED)
-#endif /* HEAP_NX */
+#endif /* DEFINE_HEAP_NX */
 		{
 			/* Update the hint for the next allocation to be adjacent to this one. */
 			ATOMIC_CMPXCH(self->h_hintaddr, mapping_hint,
@@ -86,7 +102,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 		}
 	} else {
 		/* Try to map memory at the specified address. */
-		result = FUNC(mman_map_kram)(mapping_target,
+		result = LOCAL_mman_map_kram(mapping_target,
 		                             num_bytes,
 		                             flags | GFP_MAP_FIXED,
 		                             min_alignment);
@@ -99,15 +115,15 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 
 
 PUBLIC WUNUSED NONNULL((1)) heapptr_t
-NOTHROW_NX(KCALL FUNC(heap_alloc_untraced))(struct heap *__restrict self,
-                                            size_t num_bytes, gfp_t flags) {
+LOCAL_NOTHROW(KCALL LOCAL_heap_alloc_untraced)(struct heap *__restrict self,
+                                               size_t num_bytes, gfp_t flags) {
 	void *result_ptr;
 	size_t result_siz;
 	struct mfree_list *iter, *end;
 	heap_validate_all_paranoid();
-	TRACE(PP_STR(FUNC(heap_alloc_untraced)) "(%p, %" PRIuSIZ ", %#x)\n", self, num_bytes, flags);
+	TRACE(PP_STR(LOCAL_heap_alloc_untraced) "(%p, %" PRIuSIZ ", %#x)\n", self, num_bytes, flags);
 	if unlikely(OVERFLOW_UADD(num_bytes, (size_t)(HEAP_ALIGNMENT - 1), &result_siz))
-		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes));
+		LOCAL_IF_NX_ELSE(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes));
 	result_siz &= ~(HEAP_ALIGNMENT - 1);
 	if unlikely(result_siz < HEAP_MINSIZE)
 		result_siz = HEAP_MINSIZE;
@@ -119,8 +135,8 @@ NOTHROW_NX(KCALL FUNC(heap_alloc_untraced))(struct heap *__restrict self,
 	             result_siz, HEAP_BUCKET_OF(result_siz),
 	             COMPILER_LENOF(self->h_size));
 search_heap:
-	if (!FUNC(heap_acquirelock)(self, flags))
-		IFELSE_NX(goto err, THROW(E_WOULDBLOCK_PREEMPTED));
+	if (!LOCAL_heap_acquirelock(self, flags))
+		LOCAL_IF_NX_ELSE(goto err, THROW(E_WOULDBLOCK_PREEMPTED));
 	for (; iter != end; ++iter) {
 #ifdef CONFIG_HEAP_TRACE_DANGLE
 		size_t dangle_size;
@@ -235,7 +251,7 @@ search_heap:
 		/* Let some other thread about to release dangling
 		 * data   do  so,  then  search  the  heap  again. */
 		if (flags & GFP_ATOMIC)
-			IFELSE_NX(goto err, THROW(E_WOULDBLOCK_PREEMPTED));
+			LOCAL_IF_NX_ELSE(goto err, THROW(E_WOULDBLOCK_PREEMPTED));
 		task_yield();
 		goto search_heap;
 	}
@@ -271,7 +287,7 @@ search_heap:
 		void *pageaddr;
 		size_t page_bytes, unused_size;
 		if unlikely(OVERFLOW_UADD(result_siz, (size_t)(PAGESIZE - 1), &page_bytes))
-			IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, result_siz));
+			LOCAL_IF_NX_ELSE(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, result_siz));
 		if (!(flags & GFP_NOOVER)) {
 			/* Add overhead for overallocation. */
 			if unlikely(OVERFLOW_UADD(page_bytes, self->h_overalloc, &page_bytes))
@@ -279,33 +295,33 @@ search_heap:
 		}
 		page_bytes &= ~PAGEMASK;
 		pageaddr = core_page_alloc_nx(self,
-		                              CORE_PAGE_MALLOC_AUTO,
+		                              LOCAL_CORE_PAGE_MALLOC_AUTO,
 		                              page_bytes,
 		                              PAGESIZE,
 		                              flags);
-		if unlikely(pageaddr == CORE_PAGE_MALLOC_ERROR) {
+		if unlikely(pageaddr == LOCAL_CORE_PAGE_MALLOC_ERROR) {
 allocate_without_overalloc:
 			/* Try again without overallocation. */
 			page_bytes = CEIL_ALIGN(result_siz, PAGESIZE);
-			pageaddr = FUNC(core_page_alloc)(self,
-			                                 CORE_PAGE_MALLOC_AUTO,
+			pageaddr = LOCAL_core_page_alloc(self,
+			                                 LOCAL_CORE_PAGE_MALLOC_AUTO,
 			                                 page_bytes,
 			                                 PAGESIZE,
 			                                 flags);
-#ifdef HEAP_NX
-			if unlikely(pageaddr == CORE_PAGE_MALLOC_ERROR)
+#ifdef DEFINE_HEAP_NX
+			if unlikely(pageaddr == LOCAL_CORE_PAGE_MALLOC_ERROR)
 				goto err;
-#endif /* HEAP_NX */
+#endif /* DEFINE_HEAP_NX */
 		}
 		PRINTK_SYSTEM_ALLOCATION("[heap] Acquire kernel heap: %p...%p\n",
 		                         pageaddr,
 		                         (byte_t *)pageaddr + page_bytes - 1);
 		/* Got it! */
-		result_ptr = pageaddr;
-		unused_size   = page_bytes - result_siz;
-		if unlikely(unused_size < HEAP_MINSIZE)
+		result_ptr  = pageaddr;
+		unused_size = page_bytes - result_siz;
+		if unlikely(unused_size < HEAP_MINSIZE) {
 			result_siz = page_bytes;
-		else {
+		} else {
 			void *unused_begin = (void *)((uintptr_t)result_ptr + result_siz);
 			/* Free unused size. */
 			HEAP_ASSERT(IS_ALIGNED(unused_size, HEAP_ALIGNMENT));
@@ -363,27 +379,26 @@ allocate_without_overalloc:
 	HEAP_ASSERT(result_siz >= HEAP_MINSIZE);
 	heap_validate_all_paranoid();
 	return heapptr_make(result_ptr, result_siz);
-#ifdef HEAP_NX
+#ifdef DEFINE_HEAP_NX
 err:
 	return heapptr_make(NULL, 0);
-#endif /* HEAP_NX */
+#endif /* DEFINE_HEAP_NX */
 }
 
 
 
 PRIVATE WUNUSED NONNULL((1)) size_t
-NOTHROW_NX(KCALL FUNC(heap_allat_partial))(struct heap *__restrict self,
-                                           VIRT void *__restrict ptr,
-                                           gfp_t flags) {
+LOCAL_NOTHROW(KCALL LOCAL_heap_allat_partial)(struct heap *__restrict self,
+                                              VIRT void *__restrict ptr,
+                                              gfp_t flags) {
 	gfp_t slot_flags;
 	size_t result;
 	struct mfree *slot;
 	HEAP_ASSERT(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
-	TRACE(PP_STR(FUNC(heap_allat_partial)) "(%p, %p, %#x)\n", self, ptr, flags);
+	TRACE(PP_STR(LOCAL_heap_allat_partial) "(%p, %p, %#x)\n", self, ptr, flags);
 again:
-
-	if (!FUNC(heap_acquirelock)(self, flags))
-		IFELSE_NX(return 0, THROW(E_WOULDBLOCK_PREEMPTED));
+	if (!LOCAL_heap_acquirelock(self, flags))
+		LOCAL_IF_NX_ELSE(return 0, THROW(E_WOULDBLOCK_PREEMPTED));
 
 	/* Check if the requested address is in cache. */
 	slot = mfree_tree_locate(self->h_addr, (uintptr_t)ptr);
@@ -392,8 +407,8 @@ again:
 		atomic_lock_release(&self->h_lock);
 		/* Not in cache. Try to allocate associated core memory. */
 		pageaddr = (void *)((uintptr_t)ptr & ~PAGEMASK);
-		pageaddr = FUNC(core_page_alloc)(self, pageaddr, PAGESIZE, PAGESIZE, flags);
-		if (pageaddr == CORE_PAGE_MALLOC_ERROR)
+		pageaddr = LOCAL_core_page_alloc(self, pageaddr, PAGESIZE, PAGESIZE, flags);
+		if (pageaddr == LOCAL_CORE_PAGE_MALLOC_ERROR)
 			return 0;
 #ifdef CONFIG_DEBUG_HEAP
 		/* Fill the page as no-mans-land if it's not supposed to be zero-initialized */
@@ -443,8 +458,8 @@ again:
 			slot_pageaddr = (void *)MFREE_BEGIN(slot);
 			if unlikely(slot_pageaddr == 0)
 				return 0; /* Shouldn't happen: can't allocate previous page that doesn't exist. */
-			slot_pageaddr = FUNC(core_page_alloc)(self, (byte_t *)slot_pageaddr - PAGESIZE, PAGESIZE, PAGESIZE, flags);
-			if (slot_pageaddr == CORE_PAGE_MALLOC_ERROR)
+			slot_pageaddr = LOCAL_core_page_alloc(self, (byte_t *)slot_pageaddr - PAGESIZE, PAGESIZE, PAGESIZE, flags);
+			if (slot_pageaddr == LOCAL_CORE_PAGE_MALLOC_ERROR)
 				return 0; /* Failed to allocate the associated core-page. */
 			/* Free the page, so-as to try and merge it with the slot from before.
 			 * NOTE: Set the `GFP_NOTRIM' to prevent the memory
@@ -465,7 +480,7 @@ again:
 			atomic_lock_release(&self->h_lock);
 			if ((uintptr_t)slot_end & PAGEMASK)
 				return 0; /* Not page-aligned. */
-			if (FUNC(core_page_alloc)(self, slot_end, PAGESIZE, PAGESIZE, flags) == CORE_PAGE_MALLOC_ERROR)
+			if (LOCAL_core_page_alloc(self, slot_end, PAGESIZE, PAGESIZE, flags) == LOCAL_CORE_PAGE_MALLOC_ERROR)
 				return 0; /* Failed to allocate the associated core-page. */
 #ifdef CONFIG_DEBUG_HEAP
 			memsetl(slot_end, DEBUGHEAP_NO_MANS_LAND, PAGESIZE / 4);
@@ -512,16 +527,16 @@ again:
 
 
 PUBLIC WUNUSED NONNULL((1)) size_t
-NOTHROW_NX(KCALL FUNC(heap_allat_untraced))(struct heap *__restrict self,
-                                            VIRT void *__restrict ptr,
-                                            size_t num_bytes, gfp_t flags) {
+LOCAL_NOTHROW(KCALL LOCAL_heap_allat_untraced)(struct heap *__restrict self,
+                                               VIRT void *__restrict ptr,
+                                               size_t num_bytes, gfp_t flags) {
 	size_t unused_size, alloc_size;
 	size_t result = 0;
-	TRACE(PP_STR(FUNC(heap_allat_untraced)) "(%p, %p, %" PRIuSIZ ", %#x)\n", self, ptr, num_bytes, flags);
+	TRACE(PP_STR(LOCAL_heap_allat_untraced) "(%p, %p, %" PRIuSIZ ", %#x)\n", self, ptr, num_bytes, flags);
 	if unlikely(!IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT))
 		goto err; /* Badly aligned pointer (can't allocate anything here...) */
 	if unlikely(OVERFLOW_UADD(num_bytes, (size_t)(HEAP_ALIGNMENT - 1), &alloc_size))
-		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes));
+		LOCAL_IF_NX_ELSE(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes));
 	alloc_size &= ~(HEAP_ALIGNMENT - 1);
 	if unlikely(alloc_size < HEAP_MINSIZE)
 		alloc_size = HEAP_MINSIZE;
@@ -529,16 +544,16 @@ NOTHROW_NX(KCALL FUNC(heap_allat_untraced))(struct heap *__restrict self,
 	while (result < alloc_size) {
 		size_t part;
 		/* Allocate the new missing part. */
-		IFELSE_NX(, TRY) {
-			part = FUNC(heap_allat_partial)(self,
+		LOCAL_IF_NX_ELSE(, TRY) {
+			part = LOCAL_heap_allat_partial(self,
 			                                (byte_t *)ptr + result,
 			                                flags);
-		} IFELSE_NX(if (!part), EXCEPT) {
+		} LOCAL_IF_NX_ELSE(if (!part), EXCEPT) {
 			if (result)
 				heap_free_untraced(self, ptr, result, flags);
-			IFELSE_NX(goto err, RETHROW());
+			LOCAL_IF_NX_ELSE(goto err, RETHROW());
 		}
-#ifndef HEAP_NX
+#ifndef DEFINE_HEAP_NX
 		if unlikely(!part) {
 			/* Failed to allocate the entirety of the requested range.
 			 * Free what was already allocated. */
@@ -546,7 +561,7 @@ NOTHROW_NX(KCALL FUNC(heap_allat_untraced))(struct heap *__restrict self,
 				heap_free_untraced(self, ptr, result, flags);
 			goto err;
 		}
-#endif /* !HEAP_NX */
+#endif /* !DEFINE_HEAP_NX */
 		result += part;
 	}
 	/* With everything now allocated, free what the caller didn't ask for. */
@@ -565,9 +580,9 @@ err:
 
 
 PUBLIC WUNUSED NONNULL((1)) heapptr_t
-NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
-                                            size_t min_alignment, ptrdiff_t offset,
-                                            size_t num_bytes, gfp_t flags) {
+LOCAL_NOTHROW(KCALL LOCAL_heap_align_untraced)(struct heap *__restrict self,
+                                               size_t min_alignment, ptrdiff_t offset,
+                                               size_t num_bytes, gfp_t flags) {
 	heapptr_t result_base;
 	void *result_ptr;
 	size_t result_siz;
@@ -577,14 +592,16 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 	assertf(!(min_alignment & (min_alignment - 1)),
 	        "Invalid min_alignment: %#" PRIxSIZ,
 	        min_alignment);
+
 	/* Truncate the offset, if it was a multiple of `min_alignment'
-	 * HINT: This   also   ensures  that   `offset'   is  positive. */
+	 * HINT: This also ensures that `offset' is positive. */
 	offset &= (min_alignment - 1);
+
 	/* Forward to the regular allocator when the constraints allow it. */
 	if (min_alignment <= HEAP_ALIGNMENT && !offset)
-		return FUNC(heap_alloc_untraced)(self, num_bytes, flags);
+		return LOCAL_heap_alloc_untraced(self, num_bytes, flags);
 	if unlikely(OVERFLOW_UADD(num_bytes, (size_t)(HEAP_ALIGNMENT - 1), &alloc_bytes))
-		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes));
+		LOCAL_IF_NX_ELSE(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes));
 	alloc_bytes &= ~(HEAP_ALIGNMENT - 1);
 	if unlikely(alloc_bytes < HEAP_MINSIZE)
 		alloc_bytes = HEAP_MINSIZE;
@@ -598,8 +615,8 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 		             "HEAP_BUCKET_OF(%" PRIuSIZ ") = %" PRIuSIZ "/%" PRIuSIZ,
 		             alloc_bytes, HEAP_BUCKET_OF(alloc_bytes),
 		             COMPILER_LENOF(self->h_size));
-		if (!FUNC(heap_acquirelock)(self, flags))
-			IFELSE_NX(goto err, THROW(E_WOULDBLOCK_PREEMPTED));
+		if (!LOCAL_heap_acquirelock(self, flags))
+			LOCAL_IF_NX_ELSE(goto err, THROW(E_WOULDBLOCK_PREEMPTED));
 		/* Search for  existing  free  data  that
 		 * fit the required alignment and offset. */
 		for (; iter != end; ++iter) {
@@ -751,10 +768,10 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 	/* Must overallocate by at least `HEAP_MINSIZE',
 	 * so  we can _always_ free unused lower memory. */
 	if unlikely(OVERFLOW_UADD(alloc_bytes, min_alignment, &heap_alloc_bytes))
-		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, MAX(alloc_bytes, min_alignment)));
+		LOCAL_IF_NX_ELSE(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, MAX(alloc_bytes, min_alignment)));
 	if unlikely(OVERFLOW_UADD(heap_alloc_bytes, HEAP_MINSIZE, &heap_alloc_bytes))
-		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, heap_alloc_bytes));
-	result_base = FUNC(heap_alloc_untraced)(self, heap_alloc_bytes, flags);
+		LOCAL_IF_NX_ELSE(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, heap_alloc_bytes));
+	result_base = LOCAL_heap_alloc_untraced(self, heap_alloc_bytes, flags);
 	HEAP_ASSERT(heapptr_getsiz(result_base) >= heap_alloc_bytes);
 	result_ptr = (void *)(CEIL_ALIGN((uintptr_t)heapptr_getptr(result_base) +
 	                                 HEAP_MINSIZE + offset,
@@ -788,18 +805,18 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 	HEAP_ASSERT(IS_ALIGNED((uintptr_t)result_siz, HEAP_ALIGNMENT));
 	heap_validate_all_paranoid();
 	return heapptr_make(result_ptr, result_siz);
-#ifdef HEAP_NX
+#ifdef DEFINE_HEAP_NX
 err:
 	return heapptr_make(NULL, 0);
-#endif /* HEAP_NX */
+#endif /* DEFINE_HEAP_NX */
 }
 
 
 PUBLIC WUNUSED NONNULL((1)) heapptr_t
-NOTHROW_NX(KCALL FUNC(heap_realloc_untraced))(struct heap *__restrict self,
-                                              VIRT void *old_ptr, size_t old_bytes,
-                                              size_t new_bytes, gfp_t alloc_flags,
-                                              gfp_t free_flags) {
+LOCAL_NOTHROW(KCALL LOCAL_heap_realloc_untraced)(struct heap *__restrict self,
+                                                 VIRT void *old_ptr, size_t old_bytes,
+                                                 size_t new_bytes, gfp_t alloc_flags,
+                                                 gfp_t free_flags) {
 	size_t missing_bytes;
 	assert(IS_ALIGNED(old_bytes, HEAP_ALIGNMENT));
 	assert(!old_bytes || IS_ALIGNED((uintptr_t)old_ptr, HEAP_ALIGNMENT));
@@ -808,10 +825,10 @@ NOTHROW_NX(KCALL FUNC(heap_realloc_untraced))(struct heap *__restrict self,
 		if (alloc_flags & GFP_NOMOVE)
 			goto err;
 		/* Special case: initial allocation */
-		return FUNC(heap_alloc_untraced)(self, new_bytes, alloc_flags);
+		return LOCAL_heap_alloc_untraced(self, new_bytes, alloc_flags);
 	}
 	if unlikely(OVERFLOW_UADD(new_bytes, (size_t)(HEAP_ALIGNMENT - 1), &new_bytes))
-		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, new_bytes - (HEAP_ALIGNMENT - 1)));
+		LOCAL_IF_NX_ELSE(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, new_bytes - (HEAP_ALIGNMENT - 1)));
 	new_bytes &= ~(HEAP_ALIGNMENT - 1);
 	if unlikely(new_bytes < HEAP_MINSIZE)
 		new_bytes = HEAP_MINSIZE;
@@ -827,7 +844,7 @@ NOTHROW_NX(KCALL FUNC(heap_realloc_untraced))(struct heap *__restrict self,
 		return heapptr_make(old_ptr, old_bytes);
 	}
 	missing_bytes = new_bytes - old_bytes;
-	missing_bytes = FUNC(heap_allat_untraced)(self, (void *)((uintptr_t)old_ptr + old_bytes),
+	missing_bytes = LOCAL_heap_allat_untraced(self, (void *)((uintptr_t)old_ptr + old_bytes),
 	                                          missing_bytes, alloc_flags);
 	if (missing_bytes) {
 		/* Managed to extend the data block. */
@@ -838,8 +855,8 @@ NOTHROW_NX(KCALL FUNC(heap_realloc_untraced))(struct heap *__restrict self,
 	{
 		heapptr_t result;
 		/* Must allocate an entirely new data block and copy memory to it. */
-		result = FUNC(heap_alloc_untraced)(self, new_bytes, alloc_flags);
-		IFELSE_NX(if (heapptr_getsiz(result) == 0) goto err;, )
+		result = LOCAL_heap_alloc_untraced(self, new_bytes, alloc_flags);
+		LOCAL_IF_NX_ELSE(if (heapptr_getsiz(result) == 0) goto err;, )
 		memcpy(heapptr_getptr(result), old_ptr, old_bytes);
 		/* Free the old data block. */
 		heap_free_untraced(self, old_ptr, old_bytes,
@@ -851,11 +868,11 @@ err:
 }
 
 PUBLIC WUNUSED NONNULL((1)) heapptr_t
-NOTHROW_NX(KCALL FUNC(heap_realign_untraced))(struct heap *__restrict self,
-                                              VIRT void *old_ptr, size_t old_bytes,
-                                              size_t min_alignment, ptrdiff_t offset,
-                                              size_t new_bytes, gfp_t alloc_flags,
-                                              gfp_t free_flags) {
+LOCAL_NOTHROW(KCALL LOCAL_heap_realign_untraced)(struct heap *__restrict self,
+                                                 VIRT void *old_ptr, size_t old_bytes,
+                                                 size_t min_alignment, ptrdiff_t offset,
+                                                 size_t new_bytes, gfp_t alloc_flags,
+                                                 gfp_t free_flags) {
 	size_t missing_bytes;
 	assert(IS_ALIGNED(old_bytes, HEAP_ALIGNMENT));
 	assert(!old_bytes || IS_ALIGNED((uintptr_t)old_ptr, HEAP_ALIGNMENT));
@@ -864,10 +881,10 @@ NOTHROW_NX(KCALL FUNC(heap_realign_untraced))(struct heap *__restrict self,
 		if (alloc_flags & GFP_NOMOVE)
 			goto err;
 		/* Special case: initial allocation */
-		return FUNC(heap_align_untraced)(self, min_alignment, offset, new_bytes, alloc_flags);
+		return LOCAL_heap_align_untraced(self, min_alignment, offset, new_bytes, alloc_flags);
 	}
 	if unlikely(OVERFLOW_UADD(new_bytes, (size_t)(HEAP_ALIGNMENT - 1), &new_bytes))
-		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, new_bytes - (HEAP_ALIGNMENT - 1)));
+		LOCAL_IF_NX_ELSE(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, new_bytes - (HEAP_ALIGNMENT - 1)));
 	new_bytes &= ~(HEAP_ALIGNMENT - 1);
 	if (new_bytes <= old_bytes) {
 		size_t free_bytes;
@@ -883,7 +900,7 @@ NOTHROW_NX(KCALL FUNC(heap_realign_untraced))(struct heap *__restrict self,
 		return heapptr_make(old_ptr, old_bytes);
 	}
 	missing_bytes = new_bytes - old_bytes;
-	missing_bytes = FUNC(heap_allat_untraced)(self, (void *)((uintptr_t)old_ptr + old_bytes),
+	missing_bytes = LOCAL_heap_allat_untraced(self, (void *)((uintptr_t)old_ptr + old_bytes),
 	                                          missing_bytes, alloc_flags);
 	if (missing_bytes) {
 		/* Managed to extend the data block. */
@@ -895,9 +912,9 @@ NOTHROW_NX(KCALL FUNC(heap_realign_untraced))(struct heap *__restrict self,
 		heapptr_t result;
 
 		/* Must allocate an entirely new data block and copy memory to it. */
-		result = FUNC(heap_align_untraced)(self, min_alignment, offset,
+		result = LOCAL_heap_align_untraced(self, min_alignment, offset,
 		                                   new_bytes, alloc_flags);
-		IFELSE_NX(if (heapptr_getsiz(result) == 0) goto err;, )
+		LOCAL_IF_NX_ELSE(if (heapptr_getsiz(result) == 0) goto err;, )
 		memcpy(heapptr_getptr(result), old_ptr, old_bytes);
 
 		/* Free the old data block. */
@@ -909,10 +926,21 @@ err:
 	return heapptr_make(NULL, 0);
 }
 
+#undef LOCAL_CORE_PAGE_MALLOC_ERROR
+#undef LOCAL_CORE_PAGE_MALLOC_AUTO
+
 DECL_END
 
-#undef NOTHROW_NX
-#undef FUNC
-#undef IFELSE_NX
-#undef CORE_PAGE_MALLOC_ERROR
-#undef HEAP_NX
+#undef LOCAL_NOTHROW
+#undef LOCAL_IF_NX_ELSE
+#undef LOCAL_core_page_alloc
+#undef LOCAL_mman_map_kram
+#undef LOCAL_heap_alloc_untraced
+#undef LOCAL_heap_acquirelock
+#undef LOCAL_heap_allat_partial
+#undef LOCAL_heap_allat_untraced
+#undef LOCAL_heap_align_untraced
+#undef LOCAL_heap_realloc_untraced
+#undef LOCAL_heap_realign_untraced
+
+#undef DEFINE_HEAP_NX

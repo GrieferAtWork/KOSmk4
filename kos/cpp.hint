@@ -1386,11 +1386,12 @@
 #define Tobpostlockop_callback_t(T) obpostlockop_callback_t
 #define Toblockop_callback_t(T)     oblockop_callback_t
 
-#define IF_DECODE(x) x
-#define IF_ZERO(x)
-#define IFELSE_NX(if_nx,if_x) if_nx
-#define NOTHROW_NX(x) x
+#define LOCAL_IF_DECODE(x) x
+#define LOCAL_IF_ZERO(x)
+#define LOCAL_IF_DECODE_ELSE(a,b) a
+#define LOCAL_IF_NX_ELSE(a,b) a
 #define LOCAL_NOTHROW(x) x
+
 #define __NRFEAT_SYSCALL_TABLE_FOREACH(cb) cb(0) cb(1)
 #define DEFINE_LIBRARY_OPEN(open_libname, ...) void *open_libname(void);
 #define BUILTIN_GLOBALS_ENUMERATE(cb) cb(__gxx_personality_v0) cb(__cxa_begin_catch) cb(__cxa_end_catch) cb(__cxa_rethrow) cb(_Unwind_Resume)
