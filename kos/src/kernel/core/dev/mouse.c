@@ -503,31 +503,30 @@ mousebuf_getpacket(struct mousebuf *__restrict self) THROWS(E_WOULDBLOCK) {
 }
 
 #ifndef CONFIG_NO_SMP
-#define MD_LOCK_WRITE(self, was)                     \
-	do {                                             \
-		for (;;) {                                   \
-			was = PREEMPTION_PUSHOFF();              \
-			if likely(sync_trywrite(&self->md_lock)) \
-				break;                               \
-			PREEMPTION_POP(was);                     \
-			task_yield();                            \
-		}                                            \
+#define MD_LOCK_WRITE(self, was)                         \
+	do {                                                 \
+		for (;;) {                                       \
+			was = PREEMPTION_PUSHOFF();                  \
+			if likely(mousedev_smplock_tryacquire(self)) \
+				break;                                   \
+			PREEMPTION_POP(was);                         \
+			task_yield();                                \
+		}                                                \
 	}	__WHILE0
-#define MD_LOCK_WRITE_NOPR(self)                       \
-	do {                                               \
-		assert(!PREEMPTION_ENABLED());                 \
-		while unlikely(!sync_trywrite(&self->md_lock)) \
-			task_tryyield_or_pause();                  \
+#define MD_LOCK_WRITE_NOPR(self)             \
+	do {                                     \
+		assert(!PREEMPTION_ENABLED());       \
+		mousedev_smplock_acquire_nopr(self); \
 	}	__WHILE0
-#define MD_LOCK_ENDWRITE(self, was)    \
-	do {                               \
-		sync_endwrite(&self->md_lock); \
-		PREEMPTION_POP(was);           \
+#define MD_LOCK_ENDWRITE(self, was)          \
+	do {                                     \
+		mousedev_smplock_release_nopr(self); \
+		PREEMPTION_POP(was);                 \
 	}	__WHILE0
-#define MD_LOCK_ENDWRITE_NOPR(self)    \
-	do {                               \
-		assert(!PREEMPTION_ENABLED()); \
-		sync_endwrite(&self->md_lock); \
+#define MD_LOCK_ENDWRITE_NOPR(self)          \
+	do {                                     \
+		assert(!PREEMPTION_ENABLED());       \
+		mousedev_smplock_release_nopr(self); \
 	}	__WHILE0
 #else /* !CONFIG_NO_SMP */
 #define MD_LOCK_WRITE(self, was)    ((was) = PREEMPTION_PUSHOFF())
@@ -875,7 +874,7 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 		}
 		for (;;) {
 			was = PREEMPTION_PUSHOFF();
-			if (sync_trywrite(&me->md_lock))
+			if (mousedev_smplock_tryacquire(me))
 				break;
 			PREEMPTION_POP(was);
 			task_yield();
@@ -901,7 +900,7 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 		 * clamped, absolute mouse position. */
 		if (was_clamped && (ATOMIC_READ(me->md_flags) & MOUSE_DEVICE_FLAG_GENABS))
 			mouse_device_do_motion_nopr_locked(me, 0, 0);
-		sync_endwrite(&me->md_lock);
+		mousedev_smplock_release_nopr(me);
 		PREEMPTION_POP(was);
 	}	break;
 

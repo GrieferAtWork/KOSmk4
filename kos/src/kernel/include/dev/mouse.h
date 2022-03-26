@@ -89,13 +89,13 @@ struct mousedev
 #define _mousedev_aschr(x) x
 #define _mousedev_chr_     /* nothing */
 #endif /* !__WANT_FS_INLINE_STRUCTURES */
-	struct mousebuf      md_buf;   /* [lock(md_lock)] Mouse input buffer. */
-	struct mouse_state   md_state; /* [lock(md_lock)] Current mouse state at the head of the buffer of pending inputs. */
-	struct mouse_rect    md_rect;  /* [lock(md_lock)] Clip rectangle for absolute mouse positions. */
+	struct mousebuf    md_buf;   /* [lock(md_lock)] Mouse input buffer. */
+	struct mouse_state md_state; /* [lock(md_lock)] Current mouse state at the head of the buffer of pending inputs. */
+	struct mouse_rect  md_rect;  /* [lock(md_lock)] Clip rectangle for absolute mouse positions. */
 #ifndef CONFIG_NO_SMP
-	struct atomic_rwlock md_lock;  /* Preemption-lock for writing to `md_buf', `md_state' and `md_rect' */
+	struct atomic_lock md_lock;  /* Preemption-lock for writing to `md_buf', `md_state' and `md_rect' */
 #endif /* !CONFIG_NO_SMP */
-	WEAK uintptr_t       md_flags; /* Mouse device flags (Set of `MOUSE_DEVICE_FLAG_*') */
+	WEAK uintptr_t     md_flags; /* Mouse device flags (Set of `MOUSE_DEVICE_FLAG_*') */
 };
 
 /* Operator access */
@@ -144,11 +144,17 @@ mousedev_v_polltest(struct mfile *__restrict self,
                     poll_mode_t what) THROWS(...);
 
 #ifndef CONFIG_NO_SMP
-#define __mousedev_init_md_lock_(self)  atomic_rwlock_init(&(self)->md_lock),
-#define __mousedev_cinit_md_lock_(self) atomic_rwlock_cinit(&(self)->md_lock),
+#define mousedev_smplock_tryacquire(self)   atomic_lock_tryacquire(&(self)->md_lock)
+#define mousedev_smplock_acquire_nopr(self) atomic_lock_acquire_nopr(&(self)->md_lock)
+#define mousedev_smplock_release_nopr(self) atomic_lock_release_nopr(&(self)->md_lock)
+#define __mousedev_init_md_lock_(self)      atomic_lock_init(&(self)->md_lock),
+#define __mousedev_cinit_md_lock_(self)     atomic_lock_cinit(&(self)->md_lock),
 #else /* !CONFIG_NO_SMP */
-#define __mousedev_init_md_lock_(self)  /* nothing */
-#define __mousedev_cinit_md_lock_(self) /* nothing */
+#define mousedev_smplock_tryacquire(self)   1
+#define mousedev_smplock_acquire_nopr(self) (void)0
+#define mousedev_smplock_release_nopr(self) (void)0
+#define __mousedev_init_md_lock_(self)      /* nothing */
+#define __mousedev_cinit_md_lock_(self)     /* nothing */
 #endif /* CONFIG_NO_SMP */
 
 /* Initialize common+basic fields. The caller must still initialize:
