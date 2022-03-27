@@ -248,8 +248,8 @@ again:
 				goto done;
 			}
 
-			/* Fill in the new driver load-list with all of the non-
-			 * destroyed   drivers   from    the   original    list. */
+			/* Fill in the new driver load-list with all of the
+			 * non-destroyed  drivers  from the  original list. */
 			new_dll->dll_refcnt = 2; /* +1:return, +1:arref_cmpxch_inherit_new() */
 			new_dll->dll_count  = newcount;
 			for (i = 0, dst = 0; i < result->dll_count; ++i) {

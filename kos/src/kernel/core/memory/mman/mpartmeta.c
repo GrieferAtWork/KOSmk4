@@ -411,7 +411,7 @@ done:
 
 
 /* Same as `mpart_createfutex()', but don't allocate a new futex object if none already
- * exists for the given `file_position'
+ * exists for the given `file_position'.
  * @param: file_position:    The absolute in-file address of the futex (will be floor-aligned
  *                           by `MFUTEX_ADDR_ALIGNMENT' internally)
  * @return: * :              A reference to the futex bound to the given `partrel_offset'

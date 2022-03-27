@@ -84,7 +84,7 @@ libk32_VirtualProtect(LPVOID lpAddress, SIZE_T dwSize,
 	TRACE("VirtualProtect(%p, %#Ix, %#x, %p)",
 	      lpAddress, dwSize, flNewProtect, lpflOldProtect);
 	prot = libk32_MmanProtFromNtProt(flNewProtect);
-	*lpflOldProtect = PROT_READ | PROT_WRITE | PROT_EXEC; /* TODO */
+	*lpflOldProtect = PAGE_EXECUTE_READWRITE; /* TODO */
 	return mprotect(lpAddress, dwSize, prot) == 0;
 }
 

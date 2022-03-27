@@ -48,7 +48,7 @@ DECL_BEGIN
 struct mfile;     /* Memory file. */
 struct mpart;     /* Memory file part. */
 struct mpartmeta; /* Memory file part meta-data. */
-struct mfutex;    /* Memory-Fast-Userspace-mUTEX */
+struct mfutex;    /* Memory-Fast-Userspace-muTEX */
 
 #ifndef __mfutex_slist_defined
 #define __mfutex_slist_defined
@@ -68,7 +68,7 @@ AWREF(mpart_awref, mpart);
 #endif /* !__mpart_awref_defined */
 
 struct mfutex {
-	/* Memory-Fast-Userspace-mUTEX */
+	/* Memory-Fast-Userspace-muTEX */
 	WEAK refcnt_t             mfu_refcnt;     /* Reference counter. */
 	WEAK refcnt_t             mfu_weakrefcnt; /* Weak reference counter. */
 	struct mpart_awref        mfu_part;       /* [1..1] The (currently) associated mem-part.
@@ -76,7 +76,6 @@ struct mfutex {
 	                                           * `mpart_split()'.  To prevent this,  read out this  field, acquire a lock
 	                                           * to the mem-part, or the futex-tree-lock, then read out this field  again
 	                                           * until the mem-part no longer changes. At this point, the mem-part you'll
-	                                           * end up with will be consistent.
 	                                           * end up with will be consistent. */
 	mpart_reladdr_t           mfu_addr;       /* [lock(mfu_part->mp_meta->mpm_ftx)] Address of this mem-futex
 	                                           * (relative to mfu_part; within the R/B-tree)
@@ -163,9 +162,9 @@ struct mpartmeta {
 	                                              * # of DMA locks referencing the associated part. */
 	struct sig                     mpm_dma_done; /* Broadcast when `mpm_dmalocks' drops to `0' */
 #ifdef ARCH_HAVE_RTM
-	/* We  keep the RTM version and field  in the futex controller, such that
-	 * they don't take up space in the base `mpart' structure, but only exist
-	 * conditionally, and upon first access. */
+	/* We keep the RTM version and field in the futex controller, such that
+	 * they don't take up space in the base `mpart' structure, but are only
+	 * allocated conditionally, and upon first access. */
 	uintptr_t                      mpm_rtm_vers; /* [lock(:MPART_F_LOCKBIT)]
 	                                              * RTM version (incremented for every RTM-driven
 	                                              * modifications made to memory). */
@@ -307,7 +306,7 @@ mpart_createfutex(struct mpart *__restrict self, pos_t file_position)
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 
 /* Same as `mpart_createfutex()', but don't allocate a new futex object if none already
- * exists for the given `file_position'
+ * exists for the given `file_position'.
  * @param: file_position:    The absolute in-file address of the futex (will be floor-aligned
  *                           by `MFUTEX_ADDR_ALIGNMENT' internally)
  * @return: * :              A reference to the futex bound to the given `partrel_offset'

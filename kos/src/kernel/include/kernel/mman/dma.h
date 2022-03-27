@@ -135,8 +135,8 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL refcountable_dmalock_destroy)(struct refcountable *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct refcountable_dmalock, rca_refcnt, refcountable_dmalock_destroy)
 
-/* A function that may be called as-is from `mdma_range_callback_t' in order to
- * convert  a   DMA-lock  to   `lock'   into  a   refcnt-controlled   DMA-lock. */
+/* A function that may be called as-is from `mdma_range_callback_t' in order
+ * to convert  a  DMA-lock  to `lock'  into  a  refcnt-controlled  DMA-lock. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct refcountable_dmalock *FCALL
 refcountable_dmalock_new(/*inherit(always)*/ mdma_lock_t lock, struct refcountable *misc)
 		THROWS(E_BADALLOC);

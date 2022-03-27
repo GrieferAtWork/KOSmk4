@@ -1152,10 +1152,10 @@ libvio_cmpxchb(struct vioargs *__restrict args,
 		qword oldval, oldval2, newval;
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
 		oldval.q = libvio_readq(args, addr & ~7);
-#else
+#else /* LIBVIO_CONFIG_HAVE_QWORD */
 		oldval.l[0] = libvio_readl(args, (addr & ~7));
 		oldval.l[1] = libvio_readl(args, (addr & ~7) + 4);
-#endif
+#endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 		oldval.b[(uintptr_t)addr & 7] = oldvalue;
 		newval                        = oldval;
 		newval.b[(uintptr_t)addr & 7] = newvalue;

@@ -540,7 +540,7 @@ INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_NORETURN void
 	me->pt_retval = retval;
 	/* TODO: Unwind the stack (using `_Unwind_ForcedUnwind') and
 	 *       invoke c++ finally+catch-all  handlers, as well  as
-	 *       manually  registered ones (via  a custom `stop cb),
+	 *       manually  registered ones (via a custom `stop' cb),
 	 *       as per `__pthread_register_cancel()' */
 
 	/* Perform cleanup & terminate the current thread. */
