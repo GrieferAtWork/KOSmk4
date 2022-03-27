@@ -104,23 +104,22 @@ WINBASEAPI DWORD WINAPI SetCriticalSectionSpinCount(LPCRITICAL_SECTION lpCritica
 
 
 
-
 /************************************************************************/
 /* SRWLOCK                                                              */
 /************************************************************************/
-//TODO:typedef struct _RTL_SRWLOCK {
-//TODO:	PVOID Ptr;
-//TODO:} RTL_SRWLOCK, *PRTL_SRWLOCK;
-//TODO:typedef RTL_SRWLOCK SRWLOCK, *PSRWLOCK;
-//TODO:#define RTL_SRWLOCK_INIT { 0 }
-//TODO:#define SRWLOCK_INIT RTL_SRWLOCK_INIT
-//TODO:WINBASEAPI VOID WINAPI InitializeSRWLock(PSRWLOCK SRWLock);
-//TODO:WINBASEAPI VOID WINAPI ReleaseSRWLockExclusive(PSRWLOCK SRWLock);
-//TODO:WINBASEAPI VOID WINAPI ReleaseSRWLockShared(PSRWLOCK SRWLock);
-//TODO:WINBASEAPI VOID WINAPI AcquireSRWLockExclusive(PSRWLOCK SRWLock);
-//TODO:WINBASEAPI VOID WINAPI AcquireSRWLockShared(PSRWLOCK SRWLock);
-//TODO:WINBASEAPI BOOLEAN WINAPI TryAcquireSRWLockExclusive(PSRWLOCK SRWLock);
-//TODO:WINBASEAPI BOOLEAN WINAPI TryAcquireSRWLockShared(PSRWLOCK SRWLock);
+typedef struct _RTL_SRWLOCK {
+	PVOID Ptr;
+} RTL_SRWLOCK, *PRTL_SRWLOCK;
+typedef RTL_SRWLOCK SRWLOCK, *PSRWLOCK;
+#define RTL_SRWLOCK_INIT { 0 }
+#define SRWLOCK_INIT RTL_SRWLOCK_INIT
+WINBASEAPI VOID WINAPI InitializeSRWLock(PSRWLOCK SRWLock);
+WINBASEAPI VOID WINAPI ReleaseSRWLockExclusive(PSRWLOCK SRWLock);
+WINBASEAPI VOID WINAPI ReleaseSRWLockShared(PSRWLOCK SRWLock);
+WINBASEAPI VOID WINAPI AcquireSRWLockExclusive(PSRWLOCK SRWLock);
+WINBASEAPI VOID WINAPI AcquireSRWLockShared(PSRWLOCK SRWLock);
+WINBASEAPI BOOLEAN WINAPI TryAcquireSRWLockExclusive(PSRWLOCK SRWLock);
+WINBASEAPI BOOLEAN WINAPI TryAcquireSRWLockShared(PSRWLOCK SRWLock);
 
 
 

@@ -27,6 +27,7 @@
 #include "api.h"
 
 #include <hybrid/atomic.h>
+#include <hybrid/sync/atomic-rwlock.h>
 
 #include <kos/futex.h>
 #include <kos/ioctl/fd.h>
@@ -152,6 +153,67 @@ libk32_InitializeCriticalSection(LPCRITICAL_SECTION lpCriticalSection) {
 /************************************************************************/
 
 
+
+
+
+
+/************************************************************************/
+/* SRWLOCK                                                              */
+/************************************************************************/
+DEFINE_PUBLIC_ALIAS(InitializeSRWLock, libk32_InitializeSRWLock);
+DEFINE_PUBLIC_ALIAS(ReleaseSRWLockExclusive, libk32_ReleaseSRWLockExclusive);
+DEFINE_PUBLIC_ALIAS(ReleaseSRWLockShared, libk32_ReleaseSRWLockShared);
+DEFINE_PUBLIC_ALIAS(AcquireSRWLockExclusive, libk32_AcquireSRWLockExclusive);
+DEFINE_PUBLIC_ALIAS(AcquireSRWLockShared, libk32_AcquireSRWLockShared);
+DEFINE_PUBLIC_ALIAS(TryAcquireSRWLockExclusive, libk32_TryAcquireSRWLockExclusive);
+DEFINE_PUBLIC_ALIAS(TryAcquireSRWLockShared, libk32_TryAcquireSRWLockShared);
+INTERN VOID WINAPI
+libk32_InitializeSRWLock(PSRWLOCK SRWLock) {
+	SRWLock->Ptr = NULL;
+}
+INTERN VOID WINAPI
+libk32_ReleaseSRWLockExclusive(PSRWLOCK SRWLock) {
+	struct atomic_rwlock *me = (struct atomic_rwlock *)SRWLock;
+	atomic_rwlock_endwrite(me);
+	/* Wake all waiting threads
+	 * -- Note the inefficiency: this _always_ makes a system call */
+	futex_wakeall(&me->arw_lock);
+}
+INTERN VOID WINAPI
+libk32_ReleaseSRWLockShared(PSRWLOCK SRWLock) {
+	struct atomic_rwlock *me = (struct atomic_rwlock *)SRWLock;
+	/* If last read-lock went away, wake threads
+	 * -- Note the inefficiency: this _always_ makes a system call
+	 * -- Note the inefficiency: no  differentiation  between reads/writers:
+	 *                           all  waiting  threads  are  woken,  whereas
+	 *                           it would be enough to wake a single writer,
+	 *                           and  only wake all  readers if there aren't
+	 *                           any writers. */
+	if (atomic_rwlock_endread(me))
+		futex_wakeall(&me->arw_lock);
+}
+INTERN VOID WINAPI
+libk32_AcquireSRWLockExclusive(PSRWLOCK SRWLock) {
+	struct atomic_rwlock *me = (struct atomic_rwlock *)SRWLock;
+	while (!atomic_rwlock_trywrite(me))
+		futex_waituntil(&me->arw_lock, 0); /* ... While in locks are present */
+}
+INTERN VOID WINAPI
+libk32_AcquireSRWLockShared(PSRWLOCK SRWLock) {
+	struct atomic_rwlock *me = (struct atomic_rwlock *)SRWLock;
+	while (!atomic_rwlock_tryread(me))
+		futex_waitwhile(&me->arw_lock, (uintptr_t)-1); /* ... While in write-mode */
+}
+INTERN BOOLEAN WINAPI
+libk32_TryAcquireSRWLockExclusive(PSRWLOCK SRWLock) {
+	struct atomic_rwlock *me = (struct atomic_rwlock *)SRWLock;
+	return atomic_rwlock_trywrite(me);
+}
+INTERN BOOLEAN WINAPI
+libk32_TryAcquireSRWLockShared(PSRWLOCK SRWLock) {
+	struct atomic_rwlock *me = (struct atomic_rwlock *)SRWLock;
+	return atomic_rwlock_tryread(me);
+}
 
 
 
