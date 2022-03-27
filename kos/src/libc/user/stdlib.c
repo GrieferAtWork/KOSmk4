@@ -1863,7 +1863,7 @@ INTERN ATTR_SECTION(".text.crt.application.exit") ATTR_NORETURN void
 (LIBCCALL libc_exit)(int status) THROWS(...)
 /*[[[body:libc_exit]]]*/
 {
-	/* Finalizer TLS objects for the calling thread (c++11-specific) */
+	/* Finalize TLS objects for the calling thread (c++11-specific) */
 	dlauxctrl(NULL, DLAUXCTRL_RUNTLSFINI);
 
 	/* Run functions registered with `atexit()' or `on_exit()'. */

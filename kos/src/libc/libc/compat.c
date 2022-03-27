@@ -1031,6 +1031,13 @@ NOTHROW_NCX(LIBCCALL libc_query_module)(char const *name, int which, void *buf,
 	return libc_seterrno(ENOSYS);
 }
 
+DEFINE_PUBLIC_ALIAS(__call_tls_dtors, libc___call_tls_dtors);
+INTERN ATTR_SECTION(".text.crt.compat.glibc")
+void LIBCCALL libc___call_tls_dtors(void) {
+	/* Finalize TLS objects for the calling thread (c++11-specific) */
+	dlauxctrl(NULL, DLAUXCTRL_RUNTLSFINI);
+}
+
 /************************************************************************/
 /* >> extern void *__libc_stack_end;                                    */
 /* Resolves to the main thread's stack end address                      */

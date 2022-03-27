@@ -365,6 +365,7 @@
 #define __CRT_HAVE___builtin_vec_delete
 #define __CRT_HAVE___builtin_vec_new
 #define __CRT_HAVE___bzero
+#define __CRT_HAVE___call_tls_dtors
 #define __CRT_HAVE___cbrt
 #define __CRT_HAVE___cbrtf
 #define __CRT_HAVE___cbrtl

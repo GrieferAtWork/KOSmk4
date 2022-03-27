@@ -151,6 +151,7 @@ NOTHROW_NCX(LIBCCALL libc__endthreadex)(u32 exitcode)
 /*[[[end:libc__endthreadex]]]*/
 
 INTDEF void LIBCCALL libc_run_atexit(int status);
+INTDEF void LIBCCALL libc___call_tls_dtors(void);
 
 /*[[[head:libc__cexit,hash:CRC-32=0xb122eb11]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.sched.process") void
@@ -158,7 +159,7 @@ INTERN ATTR_SECTION(".text.crt.dos.sched.process") void
 /*[[[body:libc__cexit]]]*/
 {
 	/* Same as `exit()', but without actually exiting... */
-	dlauxctrl(NULL, DLAUXCTRL_RUNTLSFINI);
+	libc___call_tls_dtors();
 	libc_run_atexit(0);
 	dlauxctrl(NULL, DLAUXCTRL_RUNFINI);
 }
