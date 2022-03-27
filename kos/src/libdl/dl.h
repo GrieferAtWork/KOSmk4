@@ -127,13 +127,12 @@ DlModule_OpenFilename(USER char const *filename, unsigned int mode)
 INTDEF WUNUSED NONNULL((1, 3)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
 DlModule_OpenFilenameInPath(char const *__restrict path, size_t pathlen,
                             USER char const *filename, size_t filenamelen,
-                            unsigned int mode)
+                            unsigned int mode, char const *origin_filename)
 		THROWS(E_SEGFAULT, ...);
 
 INTDEF WUNUSED NONNULL((1, 2)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
-DlModule_OpenFilenameInPathList(char const *__restrict path,
-                                USER char const *filename,
-                                unsigned int mode)
+DlModule_OpenFilenameInPathList(char const *__restrict path, USER char const *filename,
+                                unsigned int mode, char const *origin_filename)
 		THROWS(E_SEGFAULT, ...);
 
 INTDEF WUNUSED NONNULL((1)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC

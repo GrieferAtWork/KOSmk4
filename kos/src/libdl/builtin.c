@@ -375,7 +375,7 @@ again:
 			/* Load a module using the LD-library path List */
 			ATOMIC_WRITE(dl_globals.dg_errmsg, NULL);
 			result = DlModule_OpenFilenameInPathList(dl_globals.dg_libpath,
-			                                         filename, mode);
+			                                         filename, mode, NULL);
 		}
 	}
 	if unlikely(!result) {
@@ -1659,7 +1659,7 @@ unknown_section:
 			result->ds_data = (void *)self->dm_elf.de_hashtab;
 create_section_from_addr:
 			result->ds_size = sizeof_addr_mapping(self,
-			                                      (uintptr_t)self->dm_elf.de_gnuhashtab -
+			                                      (uintptr_t)result->ds_data -
 			                                      self->dm_loadaddr);
 			return result;
 

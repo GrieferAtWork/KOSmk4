@@ -266,8 +266,8 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags)
 			ATOMIC_WRITE(dl_globals.dg_errmsg, NULL);
 			if (self->dm_elf.de_runpath) {
 				dependency = DlModule_OpenFilenameInPathList(self->dm_elf.de_runpath,
-				                                             filename,
-				                                             dep_flags);
+				                                             filename, dep_flags,
+				                                             self->dm_filename);
 				if (!dependency && ATOMIC_READ(dl_globals.dg_errmsg) == NULL) {
 					/* Before  doing more open() system calls, check to see if we've
 					 * already   loaded  a  matching   candidate  of  this  library!
@@ -277,7 +277,8 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags)
 						try_add2global(dependency);
 					} else if (ATOMIC_READ(dl_globals.dg_errmsg) == NULL) {
 						dependency = DlModule_OpenFilenameInPathList(dl_globals.dg_libpath,
-						                                             filename, dep_flags);
+						                                             filename, dep_flags,
+						                                             self->dm_filename);
 					}
 				}
 			} else {
@@ -289,7 +290,8 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags)
 					try_add2global(dependency);
 				} else if (ATOMIC_READ(dl_globals.dg_errmsg) == NULL) {
 					dependency = DlModule_OpenFilenameInPathList(dl_globals.dg_libpath,
-					                                             filename, dep_flags);
+					                                             filename, dep_flags,
+					                                             self->dm_filename);
 				}
 			}
 			if (!dependency) {

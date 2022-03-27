@@ -29,6 +29,7 @@
 #include <hybrid/minmax.h>
 
 #include <kos/exec/elf.h>
+#include <kos/exec/rtld.h>
 #include <kos/io.h>
 #include <kos/ioctl/fd.h>
 #include <kos/syscalls.h>
@@ -456,20 +457,150 @@ err:
 	return NULL;
 }
 
+struct dynstring {
+	char  *ds_str; /* [0..ds_len+1][owned] String */
+	size_t ds_len; /* Used string length. */
+};
+
+PRIVATE NONNULL((1, 2)) int CC
+dynstring_append(struct dynstring *__restrict self,
+                 char const *__restrict str, size_t len) {
+	char *newstr;
+	newstr = (char *)realloc(self->ds_str,
+	                         (self->ds_len + len + 1) *
+	                         sizeof(char));
+	if unlikely(!newstr)
+		return -1;
+	self->ds_str = newstr;
+	newstr += self->ds_len;
+	memcpy(newstr, str, len, sizeof(char));
+	self->ds_len += len;
+	return 0;
+}
+
+
+PRIVATE WUNUSED ATTR_NOINLINE NONNULL((1, 3)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
+DlModule_OpenFilenameInPathWithDollar(char const *__restrict path, size_t pathlen,
+                                      USER char const *filename, size_t filenamelen,
+                                      unsigned int mode, char const *origin_filename)
+		THROWS(E_SEGFAULT, ...) {
+	DlModule *result = NULL;
+	struct dynstring ds;
+	char const *dollar;
+	char const *path_end = path + pathlen;
+	ds.ds_str = NULL;
+	ds.ds_len = 0;
+
+	/* Scan the pathname for '$' tokens and expand them. */
+	while ((dollar = (char *)memchr(path, '$', (size_t)(path_end - path) * sizeof(char))) != NULL) {
+		char const *symname_start, *symname_end;
+		char const *replstr_start, *replstr_end;
+		size_t symname_len, replstr_len;
+		if unlikely(dynstring_append(&ds, path, (size_t)(dollar - path)))
+			goto done;
+		replstr_start = dollar;
+		++dollar;
+		symname_start = dollar;
+		symname_end   = dollar;
+		if (symname_end < path_end) {
+			if (*symname_end == '{') {
+				++symname_start;
+				symname_end = (char *)memend(symname_start, '}',
+				                             (size_t)(path_end -
+				                                      symname_start) *
+				                             sizeof(char));
+				replstr_end = symname_end;
+				if (replstr_end < path_end)
+					++replstr_end; /* Skip trailing '}' */
+			} else {
+				/* Identifiers reach until the first non-alnum char. */
+				while (symname_end < path_end && isalnum(*symname_end))
+					++symname_end;
+				replstr_end = symname_end;
+			}
+		} else {
+			replstr_end = path_end;
+		}
+		replstr_len = (size_t)(replstr_end - replstr_start);
+		symname_len = (size_t)(symname_end - symname_start);
+#define SYMNAME_EQUALS(str)                     \
+		(symname_len == COMPILER_STRLEN(str) && \
+		 memcmp(symname_start, str,             \
+		        COMPILER_STRLEN(str) *          \
+		        sizeof(char)) == 0)
+		if (SYMNAME_EQUALS("ORIGIN")) {
+			size_t origin_len;
+			/* Default to the origin filename of the primary application
+			 * >> dlmodulename(dlopen(NULL, 0)) */
+			if (origin_filename == NULL) {
+				DlModule *mainapp = dlglobals_mainapp(&dl_globals);
+				if (mainapp != NULL)
+					origin_filename = mainapp->dm_filename;
+				if (origin_filename == NULL)
+					goto done_replace;
+			}
+			/* Use the basename of the origin module's filename as replacement string */
+			origin_len = strroff(origin_filename, '/');
+			if (origin_len == (size_t)-1)
+				origin_len = strlen(origin_filename);
+			replstr_start = origin_filename;
+			replstr_len   = origin_len;
+		} else if (SYMNAME_EQUALS("LIB")) {
+			replstr_start = RTLD_LIB;
+			replstr_len   = COMPILER_STRLEN(RTLD_LIB);
+		} else if (SYMNAME_EQUALS("PLATFORM")) {
+			replstr_start = RTLD_PLATFORM;
+			replstr_len   = COMPILER_STRLEN(RTLD_PLATFORM);
+		}
+#undef SYMNAME_EQUALS
+
+		/* Insert the replacement string (note how we default to $FOO) */
+done_replace:
+		if unlikely(dynstring_append(&ds, replstr_start, replstr_len))
+			goto done;
+
+		/* Keep on searching for more dollars after the replaced text.
+		 * This also  sets the  flush-base  pointer to  start  pasting
+		 * additional content after this point. */
+		path = replstr_end;
+	}
+
+	/* Flush the remainder of the path. */
+	if unlikely(dynstring_append(&ds, path, (size_t)(path_end - path)))
+		goto done;
+
+	/* Append filename portion. */
+	if unlikely(dynstring_append(&ds, "/", 1))
+		goto done;
+	if unlikely(dynstring_append(&ds, filename, filenamelen))
+		goto done;
+	ds.ds_str[ds.ds_len] = '\0'; /* Force NUL-termination */
+
+	/* Try to open the fully constructed filename. */
+	result = DlModule_OpenFilename(ds.ds_str, mode);
+done:
+	free(ds.ds_str);
+	return result;
+}
+
 INTERN WUNUSED ATTR_NOINLINE NONNULL((1, 3)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
 DlModule_OpenFilenameInPath(char const *__restrict path, size_t pathlen,
                             USER char const *filename, size_t filenamelen,
-                            unsigned int mode)
+                            unsigned int mode, char const *origin_filename)
 		THROWS(E_SEGFAULT, ...) {
 	char *buf;
 	REF DlModule *result;
 	while (pathlen && path[pathlen - 1] == '/')
 		--pathlen;
-	/* TODO: The specs state that we must expand special tokens within library paths:
-	 *        - $ORIGIN / ${ORIGIN}:     DIRECTORY_WITHOUT_TRAILING_SLASH_OF(CALLING_MODULE)
-	 *        - $LIB / ${LIB}:           Expand to `RTLD_LIB'
-	 *        - $PLATFORM / ${PLATFORM}: Expand to `RTLD_PLATFORM'
-	 */
+	/* The specs state that we must expand special tokens within library paths:
+	 *  - $ORIGIN / ${ORIGIN}:     DIRECTORY_WITHOUT_TRAILING_SLASH_OF(CALLING_MODULE)
+	 *  - $LIB / ${LIB}:           Expand to `RTLD_LIB'
+	 *  - $PLATFORM / ${PLATFORM}: Expand to `RTLD_PLATFORM' */
+	if (memchr(path, '$', pathlen * sizeof(char)) != NULL) {
+		return DlModule_OpenFilenameInPathWithDollar(path, pathlen,
+		                                             filename, filenamelen,
+		                                             mode, origin_filename);
+	}
 	buf = (char *)malloca(pathlen + 1 + filenamelen + 1, sizeof(char));
 	if unlikely(!buf) {
 		dl_seterror_nomem();
@@ -534,9 +665,8 @@ NOTHROW_NCX(CC DlModule_FindFilenameInPathListFromAll)(USER char const *filename
 #endif
 
 INTERN WUNUSED NONNULL((1, 2)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
-DlModule_OpenFilenameInPathList(char const *__restrict path,
-                                USER char const *filename,
-                                unsigned int mode)
+DlModule_OpenFilenameInPathList(char const *__restrict path, USER char const *filename,
+                                unsigned int mode, char const *origin_filename)
 		THROWS(E_SEGFAULT, ...) {
 	REF DlModule *result;
 	char const *sep;
@@ -558,11 +688,9 @@ again:
 			if (!ch || ch == ':' || ch == ';')
 				break;
 		}
-		result = DlModule_OpenFilenameInPath(path,
-		                                     (size_t)(sep - path),
-		                                     filename,
-		                                     filenamelen,
-		                                     mode);
+		result = DlModule_OpenFilenameInPath(path, (size_t)(sep - path),
+		                                     filename, filenamelen,
+		                                     mode, origin_filename);
 		if (result || dl_globals.dg_errmsg != NULL)
 			goto done;
 		if (!ch)
