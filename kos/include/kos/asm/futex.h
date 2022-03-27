@@ -25,34 +25,43 @@
 
 /* KOS futex operations (for use with the `lfutex(2)'  system
  * call, though can't be used with the futex() system call!). */
-#define LFUTEX_WAKE               __UINT32_C(0x00000000) /* >> result = 0; while (val && sig_send(uaddr)) ++result; return result; */
-#define LFUTEX_EXPREND            __UINT32_C(0x00000000) /* Expression list terminator for `lfutexexpr(2)' */
-#define LFUTEX_NOP                __UINT32_C(0x00000001) /* >> return 0; // Only valid in `lfutexexpr(2)' */
-#define LFUTEX_WAKEMASK           __UINT32_C(0x00000001) /* Same as `LFUTEX_WAKE', but clear/set  certain bits once there are  no
-                                                          * more threads to wake up, before broadcasting all remaining threads to
-                                                          * ensure that futex bits are in a consistent state.
-                                                          * Mainly intended to be used like this (allowing something like `sem_post()'
-                                                          * to be implemented without the need of a system call whenever there  aren't
-                                                          * any waiting threads):
-                                                          * >> if (BIT_SET(0x80000000))
-                                                          * >>     wakemask(timeout: ~0x80000000, val2: 0);
-                                                          * Behavior:
-                                                          * >> result = 0;
-                                                          * >> while (val && sig_send(uaddr))
-                                                          * >>     ++result, --val;
-                                                          * >> if (result < val && val != 0) {
-                                                          * >>     *uaddr = (*uaddr & (lfutex_t)timeout) | val2;
-                                                          * >>     result += sig_broadcast(uaddr);
-                                                          * >>     if (result > val)
-                                                          * >>         result = val;
-                                                          * >> }
-                                                          * >> return result; */
-#define LFUTEX_WAIT_WHILE         __UINT32_C(0x00000010) /* >> if (*uaddr == val) return waitfor(uaddr); return 1; */
-#define LFUTEX_WAIT_UNTIL         __UINT32_C(0x00000011) /* >> if (*uaddr != val) return waitfor(uaddr); return 1; */
-#define LFUTEX_WAIT_WHILE_ABOVE   __UINT32_C(0x00000012) /* >> if ((unsigned)*uaddr > val) return waitfor(uaddr); return 1; */
-#define LFUTEX_WAIT_WHILE_BELOW   __UINT32_C(0x00000013) /* >> if ((unsigned)*uaddr < val) return waitfor(uaddr); return 1; */
-#define LFUTEX_WAIT_WHILE_BITMASK __UINT32_C(0x00000014) /* >> if ((*uaddr & val) == val2) return waitfor(uaddr); return 1; */
-#define LFUTEX_WAIT_UNTIL_BITMASK __UINT32_C(0x00000015) /* >> if ((*uaddr & val) != val2) return waitfor(uaddr); return 1; */
+#define LFUTEX_WAKE                __UINT32_C(0x00000000) /* >> result = 0; while (val && sig_send(uaddr)) ++result; return result; */
+#define LFUTEX_EXPREND             __UINT32_C(0x00000000) /* Expression list terminator for `lfutexexpr(2)' */
+#define LFUTEX_NOP                 __UINT32_C(0x00000001) /* >> return 0; // Only valid in `lfutexexpr(2)' */
+#define LFUTEX_WAKEMASK            __UINT32_C(0x00000001) /* Same as `LFUTEX_WAKE', but clear/set  certain bits once there are  no
+                                                           * more threads to wake up, before broadcasting all remaining threads to
+                                                           * ensure that futex bits are in a consistent state.
+                                                           * Mainly intended to be used like this (allowing something like `sem_post()'
+                                                           * to be implemented without the need of a system call whenever there  aren't
+                                                           * any waiting threads):
+                                                           * >> if (BIT_SET(0x80000000))
+                                                           * >>     wakemask(timeout: ~0x80000000, val2: 0);
+                                                           * Behavior:
+                                                           * >> result = 0;
+                                                           * >> while (val && sig_send(uaddr))
+                                                           * >>     ++result, --val;
+                                                           * >> if (result < val && val != 0) {
+                                                           * >>     *uaddr = (*uaddr & (lfutex_t)timeout) | val2;
+                                                           * >>     result += sig_broadcast(uaddr);
+                                                           * >>     if (result > val)
+                                                           * >>         result = val;
+                                                           * >> }
+                                                           * >> return result; */
+#define LFUTEX_WAIT_WHILE          __UINT32_C(0x00000010) /* >> if (*uaddr == val) return waitfor(uaddr); return 1; */
+#define LFUTEX_WAIT_UNTIL          __UINT32_C(0x00000011) /* >> if (*uaddr != val) return waitfor(uaddr); return 1; */
+#define LFUTEX_WAIT_WHILE_ABOVE    __UINT32_C(0x00000012) /* >> if ((unsigned)*uaddr > val) return waitfor(uaddr); return 1; */
+#define LFUTEX_WAIT_WHILE_BELOW    __UINT32_C(0x00000013) /* >> if ((unsigned)*uaddr < val) return waitfor(uaddr); return 1; */
+#define LFUTEX_WAIT_WHILE_BITMASK  __UINT32_C(0x00000014) /* >> if ((*uaddr & val) == val2) return waitfor(uaddr); return 1; */
+#define LFUTEX_WAIT_UNTIL_BITMASK  __UINT32_C(0x00000015) /* >> if ((*uaddr & val) != val2) return waitfor(uaddr); return 1; */
+
+/* Wait for a variable-length buffer to change value.
+ * NOTE: In  the case of lfutexexpr(), `val' is interpreted
+ *       as an offset to the object base, rather than as an
+ *       absolute address! */
+#define LFUTEX_WAIT_WHILE_EX       __UINT32_C(0x00000018) /* >> if (memcmp(uaddr, val, val2) == 0) return waitfor(uaddr); return 1; */
+#define LFUTEX_WAIT_UNTIL_EX       __UINT32_C(0x00000019) /* >> if (memcmp(uaddr, val, val2) != 0) return waitfor(uaddr); return 1; */
+#define LFUTEX_WAIT_WHILE_ABOVE_EX __UINT32_C(0x0000001a) /* >> if (memcmp(uaddr, val, val2) >  0) return waitfor(uaddr); return 1; */
+#define LFUTEX_WAIT_WHILE_BELOW_EX __UINT32_C(0x0000001b) /* >> if (memcmp(uaddr, val, val2) <  0) return waitfor(uaddr); return 1; */
 
 
 

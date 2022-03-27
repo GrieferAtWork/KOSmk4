@@ -74,6 +74,7 @@ LOCAL_mfutexfd_new(REF struct mfutex *__restrict futex,
 		/* Initialize expressions. */
 		for (i = dst = 0; i < count; ++i) {
 			result->mfd_expr[dst].fe_offset = (uintptr_t)base + expr[i].fe_offset;
+			/* !!! Never use compat_validate_readable here -- (base+fe_offset might produce large pointers) */
 			validate_readable((void *)result->mfd_expr[dst].fe_offset, LOCAL_sizeof_pointer);
 
 			/* To ensure that the expression address is always contained within a singular
@@ -106,6 +107,8 @@ LOCAL_mfutexfd_new(REF struct mfutex *__restrict futex,
 			case LFUTEX_WAIT_WHILE_BITMASK:
 			case LFUTEX_WAIT_UNTIL_BITMASK:
 				break;
+
+			/* TODO: Support for memcmp-based futex codes */
 
 			default:
 				THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,

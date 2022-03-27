@@ -28,6 +28,8 @@
 #include <sched/rpc.h>
 #include <sched/tsc.h>
 
+#include <string.h>
+
 #ifdef DEFINE_COMPAT_FUTEX
 #define LOCAL_uintptr_t              compat_uintptr_t
 #define LOCAL_lfutex_t               compat_lfutex_t
@@ -36,6 +38,9 @@
 #define LOCAL_mfutexfd_new           compat_mfutexfd_new
 #define LOCAL_task_waitfor_futex     compat_task_waitfor_futex
 #define LOCAL_sys_lfutex_makefd_impl compat_sys_lfutex_makefd_impl
+#define LOCAL_validate_readable      compat_validate_readable
+#define LOCAL_validate_readwrite     compat_validate_readwrite
+#define LOCAL_validate_user          compat_validate_user
 #else /* DEFINE_COMPAT_FUTEX */
 #define LOCAL_uintptr_t              uintptr_t
 #define LOCAL_lfutex_t               lfutex_t
@@ -44,6 +49,9 @@
 #define LOCAL_mfutexfd_new           mfutexfd_new
 #define LOCAL_task_waitfor_futex     task_waitfor_futex
 #define LOCAL_sys_lfutex_makefd_impl sys_lfutex_makefd_impl
+#define LOCAL_validate_readable      validate_readable
+#define LOCAL_validate_readwrite     validate_readwrite
+#define LOCAL_validate_user          validate_user
 #endif /* !DEFINE_COMPAT_FUTEX */
 
 DECL_BEGIN
@@ -82,7 +90,7 @@ LOCAL_task_waitfor_futex(syscall_ulong_t flags,
 		task_waitfor();
 		return 0;
 	}
-	validate_readable(timeout, sizeof(*timeout));
+	LOCAL_validate_readable(timeout, sizeof(*timeout));
 	COMPILER_READ_BARRIER();
 	if (flags & LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME) {
 		/* XXX: How should we implement this? */
@@ -114,7 +122,7 @@ LOCAL_sys_lfutex_makefd_impl(USER UNCHECKED LOCAL_lfutex_t *uaddr,
 	}
 
 	/* Construct a futex at the given address. */
-	validate_user(uaddr, sizeof(*uaddr));
+	LOCAL_validate_user(uaddr, sizeof(*uaddr));
 	ftx = mman_createfutex(THIS_MMAN, uaddr);
 	FINALLY_DECREF(ftx);
 
@@ -177,7 +185,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 			      LFUTEX_FLAGMASK,
 			      futex_op & LFUTEX_FLAGMASK);
 		}
-		validate_user(uaddr, 1);
+		LOCAL_validate_user(uaddr, 1);
 		f = mman_lookupfutex(THIS_MMAN, uaddr);
 		result = 0;
 		if (f) {
@@ -232,7 +240,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 			      LFUTEX_FLAGMASK,
 			      futex_op & LFUTEX_FLAGMASK);
 		}
-		validate_user(uaddr, 1);
+		LOCAL_validate_readwrite(uaddr, 1);
 		f = mman_lookupfutex(THIS_MMAN, uaddr);
 		result = 0;
 		if (!f) {
@@ -274,9 +282,10 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 #undef APPLY_MASK
 	}	break;
 
-#define DEFINE_WAIT_WHILE_OPERATOR(id, should_wait)                   \
+#define DEFINE_WAIT_WHILE_OPERATOR(id, should_wait, ...)              \
 	case id: {                                                        \
-		validate_readable(uaddr, sizeof(*uaddr));                     \
+		LOCAL_validate_readable(uaddr, sizeof(*uaddr));               \
+		__VA_ARGS__;                                                  \
 		/* Connect  to  the  futex first,  thus  performing the       \
 		 * should-wait checked in a manner that is interlocked. */    \
 		f = mman_createfutex(THIS_MMAN, uaddr);                       \
@@ -307,6 +316,10 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_BELOW, ATOMIC_READ(*uaddr) < val);
 	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_BITMASK, (ATOMIC_READ(*uaddr) & val) == val2);
 	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_UNTIL_BITMASK, (ATOMIC_READ(*uaddr) & val) != val2);
+	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_EX, memcmp(uaddr, (USER CHECKED void const *)(uintptr_t)val, val2) == 0, LOCAL_validate_readable((USER UNCHECKED void const *)(uintptr_t)val, val2));
+	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_UNTIL_EX, memcmp(uaddr, (USER CHECKED void const *)(uintptr_t)val, val2) != 0, LOCAL_validate_readable((USER UNCHECKED void const *)(uintptr_t)val, val2));
+	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_ABOVE_EX, memcmp(uaddr, (USER CHECKED void const *)(uintptr_t)val, val2) > 0, LOCAL_validate_readable((USER UNCHECKED void const *)(uintptr_t)val, val2));
+	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_BELOW_EX, memcmp(uaddr, (USER CHECKED void const *)(uintptr_t)val, val2) < 0, LOCAL_validate_readable((USER UNCHECKED void const *)(uintptr_t)val, val2));
 #undef DEFINE_WAIT_WHILE_OPERATOR
 
 	default:
@@ -393,6 +406,7 @@ DEFINE_SYSCALL5(errno_t, lfutexexpr,
 			cond  = ATOMIC_READ(iter->fe_condition);
 			uaddr = (USER UNCHECKED LOCAL_uintptr_t *)((USER UNCHECKED byte_t *)base +
 			                                           ATOMIC_READ(iter->fe_offset));
+			/* !!! Don't use LOCAL_validate_readable here -- (base+fe_offset might produce large pointers) */
 			validate_readable(uaddr, sizeof(*uaddr));
 			switch (cond) {
 
@@ -405,35 +419,45 @@ DEFINE_SYSCALL5(errno_t, lfutexexpr,
 				expr_result = 0; /* no-op */
 				break;
 
-			case LFUTEX_WAIT_WHILE:
-				/* >> if (*uaddr == val) return waitfor(uaddr); return 1; */
-				expr_result = !(ATOMIC_READ(*uaddr) == iter->fe_val);
-				break;
+#define DEFINE_CASE(id, should_wait)          \
+			case id:                          \
+				expr_result = !(should_wait); \
+				break
+			DEFINE_CASE(LFUTEX_WAIT_WHILE, /* >> if (*uaddr == val) return waitfor(uaddr); return 1; */
+			            ATOMIC_READ(*uaddr) == iter->fe_val);
+			DEFINE_CASE(LFUTEX_WAIT_UNTIL, /* >> if (*uaddr != val) return waitfor(uaddr); return 1; */
+			            ATOMIC_READ(*uaddr) != iter->fe_val);
+			DEFINE_CASE(LFUTEX_WAIT_WHILE_ABOVE, /* >> if ((unsigned)*uaddr > val) return waitfor(uaddr); return 1; */
+			            ATOMIC_READ(*uaddr) > iter->fe_val);
+			DEFINE_CASE(LFUTEX_WAIT_WHILE_BELOW, /* >> if ((unsigned)*uaddr < val) return waitfor(uaddr); return 1; */
+			            ATOMIC_READ(*uaddr) < iter->fe_val);
+			DEFINE_CASE(LFUTEX_WAIT_WHILE_BITMASK, /* >> if ((*uaddr & val) == val2) return waitfor(uaddr); return 1; */
+			            (ATOMIC_READ(*uaddr) & iter->fe_val) == iter->fe_val2);
+			DEFINE_CASE(LFUTEX_WAIT_UNTIL_BITMASK, /* >> if ((*uaddr & val) != val2) return waitfor(uaddr); return 1; */
+			            (ATOMIC_READ(*uaddr) & iter->fe_val) != iter->fe_val2);
+#undef DEFINE_CASE
 
-			case LFUTEX_WAIT_UNTIL:
-				/* >> if (*uaddr != val) return waitfor(uaddr); return 1; */
-				expr_result = !(ATOMIC_READ(*uaddr) != iter->fe_val);
-				break;
-
-			case LFUTEX_WAIT_WHILE_ABOVE:
-				/* >> if ((unsigned)*uaddr > val) return waitfor(uaddr); return 1; */
-				expr_result = !(ATOMIC_READ(*uaddr) > iter->fe_val);
-				break;
-
-			case LFUTEX_WAIT_WHILE_BELOW:
-				/* >> if ((unsigned)*uaddr < val) return waitfor(uaddr); return 1; */
-				expr_result = !(ATOMIC_READ(*uaddr) < iter->fe_val);
-				break;
-
-			case LFUTEX_WAIT_WHILE_BITMASK:
-				/* >> if ((*uaddr & val) == val2) return waitfor(uaddr); return 1; */
-				expr_result = !((ATOMIC_READ(*uaddr) & iter->fe_val) == iter->fe_val2);
-				break;
-
-			case LFUTEX_WAIT_UNTIL_BITMASK:
-				/* >> if ((*uaddr & val) != val2) return waitfor(uaddr); return 1; */
-				expr_result = !((ATOMIC_READ(*uaddr) & iter->fe_val) != iter->fe_val2);
-				break;
+			case LFUTEX_WAIT_WHILE_EX:
+			case LFUTEX_WAIT_UNTIL_EX:
+			case LFUTEX_WAIT_WHILE_ABOVE_EX:
+			case LFUTEX_WAIT_WHILE_BELOW_EX: {
+				/* Compare variable-sized memory blobs. */
+				size_t num_bytes = iter->fe_val2;
+				USER CHECKED void const *rhs;
+				int cmp;
+				rhs = (USER UNCHECKED byte_t *)base + iter->fe_val;
+				COMPILER_READ_BARRIER();
+				/* !!! Don't use LOCAL_validate_readable here -- (base+fe_val might produce large pointers) */
+				rhs = validate_readable(rhs, num_bytes);
+				cmp = memcmp(uaddr, rhs, num_bytes);
+				switch (cond) {
+				case LFUTEX_WAIT_WHILE_EX:       expr_result = !(cmp == 0); break;
+				case LFUTEX_WAIT_UNTIL_EX:       expr_result = !(cmp != 0); break;
+				case LFUTEX_WAIT_WHILE_ABOVE_EX: expr_result = !(cmp >  0); break;
+				case LFUTEX_WAIT_WHILE_BELOW_EX: expr_result = !(cmp <  0); break;
+				default: __builtin_unreachable();
+				}
+			}	break;
 
 			default:
 bad_opcode:
@@ -474,4 +498,7 @@ DECL_END
 #undef LOCAL_mfutexfd_new
 #undef LOCAL_task_waitfor_futex
 #undef LOCAL_sys_lfutex_makefd_impl
+#undef LOCAL_validate_readable
+#undef LOCAL_validate_readwrite
+#undef LOCAL_validate_user
 #undef DEFINE_COMPAT_FUTEX
