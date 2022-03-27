@@ -187,9 +187,15 @@ again:
 	LIST_FOREACH (iter, &static_tls_list, ts_threads) {
 		if (!tls_segment_ex_trywrite(iter)) {
 #ifndef __OPTIMIZE_SIZE__
-			/* TODO: Try to get read-lock and check if this TLS segment even uses `self'
-			 *       If not, then we can simply skip it without ever having to acquire a
-			 *       write-lock! */
+			/* Try to get read-lock and check if this TLS segment even uses `self'
+			 * If not, then we can simply skip it without ever having to acquire a
+			 * write-lock! */
+			if (!tls_segment_ex_tryread(iter)) {
+				next = dtls_extension_tree_locate(iter->ts_extree, self);
+				tls_segment_ex_endread(iter);
+				if (!next)
+					continue; /* Unused */
+			}
 #endif /* !__OPTIMIZE_SIZE__ */
 			static_tls_endread();
 			sys_sched_yield();
@@ -203,6 +209,7 @@ again:
 		}
 	}
 	static_tls_endread();
+
 	/* Free all instances of extension data for this module. */
 	while (chain) {
 		next = chain->te_tree.rb_lhs;
