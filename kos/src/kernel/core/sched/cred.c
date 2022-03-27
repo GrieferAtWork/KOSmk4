@@ -347,6 +347,9 @@ inode_get_file_creds(struct mfile *__restrict program_file,
 	(void)result;
 	COMPILER_IMPURE();
 	/* TODO */
+	/* TODO: Once this function gets implemented, `libc_saved_AT_SECURE_init()'
+	 *       also  has to be updated to perform the same checks as done here in
+	 *       order to determine if additional capabilities should be added. */
 	return false;
 }
 

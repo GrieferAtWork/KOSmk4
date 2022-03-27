@@ -71,6 +71,18 @@
 #endif /* SYS_getresuid */
 #endif /* __SIZEOF_UID_T__ != 4 */
 
+#if __SIZEOF_GID_T__ != 4
+#ifdef SYS_getgid
+#undef SYS_getgid32
+#endif /* SYS_getgid */
+#ifdef SYS_getegid
+#undef SYS_getegid32
+#endif /* SYS_getegid */
+#ifdef SYS_getresgid
+#undef SYS_getresgid32
+#endif /* SYS_getresgid */
+#endif /* __SIZEOF_GID_T__ != 4 */
+
 #ifdef SYS_getuid32
 #define _sys_getuid() (uid_t)sys_getuid32()
 #else /* SYS_getuid32 */
@@ -90,6 +102,26 @@
 	              (SYSCALL_ARG_TYPE_OF(getresuid, 1))(euid), \
 	              (SYSCALL_ARG_TYPE_OF(getresuid, 2))(suid))
 #endif /* !SYS_getresuid32 */
+
+#ifdef SYS_getgid32
+#define _sys_getgid() (gid_t)sys_getgid32()
+#else /* SYS_getgid32 */
+#define _sys_getgid() (gid_t)sys_getgid()
+#endif /* SYS_getgid32 */
+#ifdef SYS_getegid32
+#define _sys_getegid() (gid_t)sys_getegid32()
+#else /* SYS_getegid32 */
+#define _sys_getegid() (gid_t)sys_getegid()
+#endif /* !SYS_getegid32 */
+#ifdef SYS_getresgid32
+#define _sys_getresgid(rgid, egid, sgid) \
+	sys_getresgid32((uint32_t *)(rgid), (uint32_t *)(egid), (uint32_t *)(sgid))
+#else /* SYS_getresgid32 */
+#define _sys_getresgid(rgid, egid, sgid)                     \
+	sys_getresgid((SYSCALL_ARG_TYPE_OF(getresgid, 0))(rgid), \
+	              (SYSCALL_ARG_TYPE_OF(getresgid, 1))(egid), \
+	              (SYSCALL_ARG_TYPE_OF(getresgid, 2))(sgid))
+#endif /* !SYS_getresgid32 */
 
 DECL_BEGIN
 
@@ -151,20 +183,46 @@ fallback:
 PRIVATE ATTR_SECTION(".bss.crt.compat.glibc") int libc_saved_AT_SECURE = 0;
 PRIVATE ATTR_SECTION(".bss.crt.compat.glibc")
 pthread_once_t libc_saved_AT_SECURE_didinit = PTHREAD_ONCE_INIT;
-PRIVATE ATTR_SECTION(".text.crt.compat.glibc") void
-NOTHROW(LIBCCALL libc_saved_AT_SECURE_init)(void) {
+
+PRIVATE ATTR_SECTION(".text.crt.compat.glibc") bool
+NOTHROW(LIBCCALL real_and_effective_uid_equal)(void) {
 #ifdef SYS_getresuid
 	uid_t ruid, euid;
 	errno_t error;
 	/* Try to use `sys_getresuid(2)', so we only need 1 system call! */
 	error = _sys_getresuid(&ruid, &euid, NULL);
-	if likely(E_ISOK(error)) { /* Should never fail... */
-		libc_saved_AT_SECURE = (ruid != euid);
-	} else
+	if likely(E_ISOK(error)) /* Should never fail... */
+		return ruid == euid;
 #endif /* SYS_getresuid */
-	{
-		libc_saved_AT_SECURE = (_sys_geteuid() != _sys_getuid());
-	}
+	return _sys_geteuid() == _sys_getuid();
+}
+
+PRIVATE ATTR_SECTION(".text.crt.compat.glibc") bool
+NOTHROW(LIBCCALL real_and_effective_gid_equal)(void) {
+#ifdef SYS_getresgid
+	gid_t rgid, egid;
+	errno_t error;
+	/* Try to use `sys_getresgid(2)', so we only need 1 system call! */
+	error = _sys_getresgid(&rgid, &egid, NULL);
+	if likely(E_ISOK(error)) /* Should never fail... */
+		return rgid == egid;
+#endif /* SYS_getresgid */
+	return _sys_getegid() == _sys_getgid();
+}
+
+
+PRIVATE ATTR_SECTION(".text.crt.compat.glibc") void
+NOTHROW(LIBCCALL libc_saved_AT_SECURE_init)(void) {
+	/* Determine AT_SECURE as documented here:
+	 * https://man7.org/linux/man-pages/man8/ld.so.8.html */
+	libc_saved_AT_SECURE = real_and_effective_uid_equal() ||
+	                       real_and_effective_gid_equal();
+	/* XXX: must also set  AT_SECURE if dlmodulename(dlopen(NULL,  0))
+	 *      had extended attributes set that were added to our process
+	 *      during execution (s.a. kernel:`inode_get_file_creds()')
+	 * Currently, this never happens on KOS since `inode_get_file_creds'
+	 * is  implemented as a  no-op (for now),  but once it's implemented
+	 * properly, we must check here if it may have done something. */
 }
 
 PRIVATE ATTR_SECTION(".text.crt.compat.glibc") void
