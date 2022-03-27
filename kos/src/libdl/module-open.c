@@ -590,6 +590,12 @@ DlModule_OpenFilenameInPath(char const *__restrict path, size_t pathlen,
 		THROWS(E_SEGFAULT, ...) {
 	char *buf;
 	REF DlModule *result;
+	if unlikely(pathlen == 0) {
+		/* From `man 8 ld.so':
+		 * """A zero-length directory name indicates the current working directory""" */
+		path    = ".";
+		pathlen = 1;
+	}
 	while (pathlen && path[pathlen - 1] == '/')
 		--pathlen;
 	/* The specs state that we must expand special tokens within library paths:
