@@ -22,6 +22,7 @@
 #define _KOS_ALTERATIONS_SOURCE 1
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
+#define _TIME64_SOURCE 1
 
 #include "api.h"
 
@@ -37,6 +38,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <malloca.h>
 #include <pthread.h>
 #include <stddef.h>
@@ -150,6 +152,41 @@ libk32_InitializeCriticalSection(LPCRITICAL_SECTION lpCriticalSection) {
 /************************************************************************/
 
 
+
+
+
+
+/************************************************************************/
+/* FUTEX                                                                */
+/************************************************************************/
+DEFINE_PUBLIC_ALIAS(WaitOnAddress, libk32_WaitOnAddress);
+DEFINE_PUBLIC_ALIAS(WakeByAddressSingle, libk32_WakeByAddressSingle);
+DEFINE_PUBLIC_ALIAS(WakeByAddressAll, libk32_WakeByAddressAll);
+INTERN WINBOOL WINAPI
+libk32_WaitOnAddress(volatile VOID *Address, PVOID CompareAddress,
+                     SIZE_T AddressSize, DWORD dwMilliseconds) {
+	struct timespec64 ts;
+	TRACE("WaitOnAddress(%p, %p, %" PRIuSIZ ", %#x)",
+	      Address, CompareAddress, AddressSize, dwMilliseconds);
+	if (dwMilliseconds == INFINITE) {
+		return lfutex64((lfutex_t *)Address, LFUTEX_WAIT_WHILE_EX,
+		                (lfutex_t)CompareAddress,
+		                (struct timespec64 *)NULL, AddressSize) == 0;
+	}
+	ts.tv_sec  = 0;
+	ts.tv_nsec = 0;
+	ts.add_milliseconds(dwMilliseconds);
+	return lfutex64((lfutex_t *)Address, LFUTEX_WAIT_WHILE_EX,
+	                (lfutex_t)CompareAddress, &ts, AddressSize) == 0;
+}
+INTERN VOID WINAPI libk32_WakeByAddressSingle(PVOID Address) {
+	TRACE("WakeByAddressSingle(%p)", Address);
+	futex_wake((lfutex_t *)Address, 1);
+}
+INTERN VOID WINAPI libk32_WakeByAddressAll(PVOID Address) {
+	TRACE("WakeByAddressAll(%p)", Address);
+	futex_wakeall((lfutex_t *)Address);
+}
 
 
 

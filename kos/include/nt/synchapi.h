@@ -246,9 +246,9 @@ WINBASEAPI DWORD WINAPI SetCriticalSectionSpinCount(LPCRITICAL_SECTION lpCritica
 /************************************************************************/
 /* FUTEX                                                                */
 /************************************************************************/
-//TODO:WINBASEAPI WINBOOL WINAPI WaitOnAddress(volatile VOID *Address, PVOID CompareAddress, SIZE_T AddressSize, DWORD dwMilliseconds);
-//TODO:WINBASEAPI VOID WINAPI WakeByAddressSingle(PVOID Address);
-//TODO:WINBASEAPI VOID WINAPI WakeByAddressAll(PVOID Address);
+WINBASEAPI WINBOOL WINAPI WaitOnAddress(volatile VOID *Address, PVOID CompareAddress, SIZE_T AddressSize, DWORD dwMilliseconds);
+WINBASEAPI VOID WINAPI WakeByAddressSingle(PVOID Address);
+WINBASEAPI VOID WINAPI WakeByAddressAll(PVOID Address);
 
 
 
