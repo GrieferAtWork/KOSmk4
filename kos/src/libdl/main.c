@@ -34,6 +34,7 @@
 #include <kos/exec/peb.h>
 #include <kos/exec/rtld.h>
 #include <kos/syscalls.h>
+#include <linux/prctl.h>
 #include <sys/ioctl.h>
 
 #include <malloc.h>
@@ -162,8 +163,13 @@ linker_main(struct elfexec_info *__restrict info,
 
 	/* Check for LD-specific environment variables. */
 	dl_globals.dg_libpath = process_peb_getenv(peb, "LD_LIBRARY_PATH");
-	if (dl_globals.dg_libpath == NULL)
+	if (dl_globals.dg_libpath == NULL) {
 		dl_globals.dg_libpath = (char *)RTLD_LIBRARY_PATH;
+	} else {
+		/* Specs state that `LD_LIBRARY_PATH' should be ignored under AT_SECURE-mode */
+		if (sys_Xprctl(PR_KOS_GET_AT_SECURE, 0, 0, 0, 0))
+			dl_globals.dg_libpath = (char *)RTLD_LIBRARY_PATH;
+	}
 
 	/* Support for executable formats other than ELF */
 	if (elfexec_info_usesinterpreter(info)) {
