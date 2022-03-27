@@ -29,6 +29,7 @@
 #include <kos/exec/idata.h>
 #include <kos/exec/rtld.h> /* RTLD_PLATFORM */
 #include <kos/syscalls.h>
+#include <linux/prctl.h> /* PR_KOS_GET_AT_SECURE */
 
 #include <fcntl.h>
 #include <pthread.h>
@@ -184,45 +185,12 @@ PRIVATE ATTR_SECTION(".bss.crt.compat.glibc") int libc_saved_AT_SECURE = 0;
 PRIVATE ATTR_SECTION(".bss.crt.compat.glibc")
 pthread_once_t libc_saved_AT_SECURE_didinit = PTHREAD_ONCE_INIT;
 
-PRIVATE ATTR_SECTION(".text.crt.compat.glibc") bool
-NOTHROW(LIBCCALL real_and_effective_uid_equal)(void) {
-#ifdef SYS_getresuid
-	uid_t ruid, euid;
-	errno_t error;
-	/* Try to use `sys_getresuid(2)', so we only need 1 system call! */
-	error = _sys_getresuid(&ruid, &euid, NULL);
-	if likely(E_ISOK(error)) /* Should never fail... */
-		return ruid == euid;
-#endif /* SYS_getresuid */
-	return _sys_geteuid() == _sys_getuid();
-}
-
-PRIVATE ATTR_SECTION(".text.crt.compat.glibc") bool
-NOTHROW(LIBCCALL real_and_effective_gid_equal)(void) {
-#ifdef SYS_getresgid
-	gid_t rgid, egid;
-	errno_t error;
-	/* Try to use `sys_getresgid(2)', so we only need 1 system call! */
-	error = _sys_getresgid(&rgid, &egid, NULL);
-	if likely(E_ISOK(error)) /* Should never fail... */
-		return rgid == egid;
-#endif /* SYS_getresgid */
-	return _sys_getegid() == _sys_getgid();
-}
-
-
 PRIVATE ATTR_SECTION(".text.crt.compat.glibc") void
 NOTHROW(LIBCCALL libc_saved_AT_SECURE_init)(void) {
-	/* Determine AT_SECURE as documented here:
-	 * https://man7.org/linux/man-pages/man8/ld.so.8.html */
-	libc_saved_AT_SECURE = real_and_effective_uid_equal() ||
-	                       real_and_effective_gid_equal();
-	/* XXX: must also set  AT_SECURE if dlmodulename(dlopen(NULL,  0))
-	 *      had extended attributes set that were added to our process
-	 *      during execution (s.a. kernel:`inode_get_file_creds()')
-	 * Currently, this never happens on KOS since `inode_get_file_creds'
-	 * is  implemented as a  no-op (for now),  but once it's implemented
-	 * properly, we must check here if it may have done something. */
+	/* Use the KOS-specific prctl command to test for AT_SECURE.
+	 * NOTE: The dedicated prctl exists because libdl sometimes
+	 *       also  needs to make  decisions based on AT_SECURE. */
+	libc_saved_AT_SECURE = sys_Xprctl(PR_KOS_GET_AT_SECURE, 0, 0, 0, 0);
 }
 
 PRIVATE ATTR_SECTION(".text.crt.compat.glibc") void

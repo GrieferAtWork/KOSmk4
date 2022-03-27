@@ -381,6 +381,25 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 
 	/* TODO: PR_SET_PTRACER */
 
+
+	case PR_KOS_GET_AT_SECURE: {
+		/* Determine AT_SECURE as documented here:
+		 * https://man7.org/linux/man-pages/man8/ld.so.8.html */
+		syscall_slong_t result;
+		struct cred *mycred = FORTASK(me, this_cred);
+		cred_read(mycred);
+		/* XXX: must also set  AT_SECURE if dlmodulename(dlopen(NULL,  0))
+		 *      had extended attributes set that were added to our process
+		 *      during execution (s.a. kernel:`inode_get_file_creds()')
+		 * Currently, this never happens on KOS since `inode_get_file_creds'
+		 * is  implemented as a  no-op (for now),  but once it's implemented
+		 * properly, we must check here if it may have done something. */
+		result = (mycred->c_ruid != mycred->c_euid) ||
+		         (mycred->c_rgid != mycred->c_egid);
+		cred_endread(mycred);
+		return result;
+	}	break;
+
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_PRCTL_COMMAND,

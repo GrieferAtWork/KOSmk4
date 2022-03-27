@@ -30,9 +30,8 @@
 )]%[insert:prefix(
 #include <bits/types.h>
 )]%[insert:prefix(
-#include <linux/prctl.h> /* fd_t */
+#include <linux/prctl.h>
 )]%{
-
 
 #ifdef __CC__
 __SYSDECL_BEGIN

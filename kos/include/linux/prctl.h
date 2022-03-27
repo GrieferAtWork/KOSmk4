@@ -316,10 +316,12 @@ __DECL_END
 #define PR_SET_PTRACER         0x59616d61 /* Set PID of who can trace this process (0: no-one; PR_SET_PTRACER_ANY: everyone) */
 #   define PR_SET_PTRACER_ANY  (__CCAST(__syscall_ulong_t)(-1)) /* Anyone can trace this process */
 
+/* KOS-specific prctl codes */
+#ifdef __KOS__
+#define PR_KOS_GET_AT_SECURE 0x8050fff1 /* [int return] Returns 0/1 indicative of `getauxval(AT_SECURE)' */
+#endif /* __KOS__ */
 
 /* clang-format on */
 
-
-/* TODO: KOS-specific PR_* codes to explicitly map the kernel's version of libdl into memory. */
 
 #endif /* !_LINUX_PRCTL_H */

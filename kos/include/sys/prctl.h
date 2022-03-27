@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71f1f6cb */
+/* HASH CRC-32:0x6a33db39 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,8 +33,7 @@
 
 #include <features.h>
 #include <bits/types.h>
-#include <linux/prctl.h> /* fd_t */
-
+#include <linux/prctl.h>
 
 #ifdef __CC__
 __SYSDECL_BEGIN
