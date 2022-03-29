@@ -17,6 +17,11 @@
 		- `svcudp_create()`
 		- `xdr_u_int()`
 		- `xdrstdio_create()`
+	- `<ssp/fcntl.h>`:
+		- `__open64_2()`
+		- `__open_2()`
+		- `__openat64_2()`
+		- `__openat_2()`
 	- `<ssp/unistd.h>`:
 		- `__getcwd_chk()`
 		- `__getgroups_chk()`
@@ -28,17 +33,34 @@
 		- `__readlink_chk()`
 		- `__realpath_chk()`
 		- `__ttyname_r_chk()`
+		- `__confstr_chk()`
+		- `__getdomainname_chk()`
+		- `__getwd_chk()`
+		- `__readlinkat_chk()`
+	- `<ssp/setjmp.h>`:
+		- `__longjmp_chk()`
 	- `<ssp/stdio.h>`:
 		- `__fgets_chk()`
 		- `__fgets_unlocked_chk()`
 		- `__fprintf_chk()`
-		- `__printf_chk()`
-		- `__snprintf_chk()`
-		- `__sprintf_chk()`
 		- `__vfprintf_chk()`
+		- `__printf_chk()`
 		- `__vprintf_chk()`
+		- `__snprintf_chk()`
 		- `__vsnprintf_chk()`
+		- `__sprintf_chk()`
 		- `__vsprintf_chk()`
+		- `__asprintf_chk()`
+		- `__vasprintf_chk()`
+		- `__dprintf_chk()`
+		- `__vdprintf_chk()`
+		- `__fread_chk()`
+		- `__fread_unlocked_chk()`
+		- `__gets_chk()`
+		- `__obstack_printf_chk()`
+		- `__obstack_vprintf_chk()`
+	- `<ssp/stdlib.h>`:
+		- `__ptsname_r_chk()`
 	- `<ssp/wchar.h>`:
 		- `__fgetws_chk()`
 		- `__fgetws_unlocked_chk()`
@@ -71,6 +93,9 @@
 		- `__wmempcpy_chk()`
 		- `__wmemset_chk()`
 		- `__wprintf_chk()`
+	- `<ssp/sys/poll.h>`:
+		- `__poll_chk()`
+		- `__ppoll_chk()`
 	- `<ssp/sys/socket.h>`:
 		- `__recv_chk()`
 		- `__recvfrom_chk()`
