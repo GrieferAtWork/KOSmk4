@@ -41,7 +41,7 @@ Usage (all of these are the same):
 | ------------------------------------------------ | ------------------------------------------------------------ |
 | `%[push_macro (a, b, c)]`                        | Emit portable code for `#pragma push_macro()`                |
 | `%[push_macro (a b c)]`                          | You can also separate macros by whitespace                   |
-| `%[push_macro(NAMESPACES) (a b c)]`              | This is how you specify which namespaces to putput text to   |
+| `%[push_macro(NAMESPACES) (a b c)]`              | This is how you specify which namespaces to output text to   |
 | `%[push_macro(NAMESPACES) (a, b, c)]`            | ...                                                          |
 | `%[push_macro @undef (a b c)]`                   | And this way you automatically `#undef` macros after pushing |
 | `%[push_macro @undef (a, b, c)]`                 | ...                                                          |
@@ -62,7 +62,7 @@ Usage (all of these are the same):
 |                                                  |                                                              |
 | `%[default:...]`                                 | Set default function annotations (`...` are annotations as in `Annotations (defaultable)`; s.a. below) |
 |                                                  |                                                              |
-| `%[include(FILENAME)]`                           | Include contents of another file here |
+| `%[include(FILENAME)]`                           | Include contents of another file here                        |
 |                                                  |                                                              |
 | `%[insert:prefix(TEXT)]`                         | Insert `TEXT` into the `c` namespace, and don't duplicate that text in function prefixes |
 |                                                  |                                                              |
@@ -78,7 +78,7 @@ Usage (all of these are the same):
 | `%[insert:function(EXPOSED_NAME = NAME, ATTRIB)]`| ... |
 | `%[insert:std_function(<Same as above...>)]`                 | Insert into the `std::` namespace and add `using` to also load it into the global namespace |
 | `%[insert:std_function_nousing(<Same as above...>)]`         | Same, but don't import into the global namespace |
-| `%[insert:guarded_function(<Same as above...>)]`             | Like above, but include `guardName = true` in `ATTRIB` |
+| `%[insert:guarded_function(<Same as above...>)]`             | Like above, but include `guardName: true` in `ATTRIB` |
 | `%[insert:guarded_std_function(<Same as above...>)]`         | ... |
 | `%[insert:guarded_std_function_nousing(<Same as above...>)]` | ... |
 |                                                  |                                                              |
@@ -98,9 +98,9 @@ Usage (all of these are the same):
 |                                                  |                                                              |
 | `%[define_type_class(TYPENAME = CLASS)]`         | Specify the classification for `TYPENAME` (usually you'll use `"TP"` for `CLASS` to indicate pointer types) (s.a. `knownTypeClasses` from `typeclass.dee`) |
 |                                                  |                                                              |
-| `%[str2wcs_replacement(STR = WCHAR)]`            | Specify replacement for automatic string to wchar generators (s.a. `str2wcsReplacementEscapes` from `generator.dee`) |
+| `%[define_str2wcs_replacement(STR = WCHAR)]`     | Specify replacement for automatic string to wchar generators (s.a. `str2wcsReplacementEscapes` from `generator.dee`) |
 |                                                  |                                                              |
-| `%[str2wcs_header_replacement(STR_HEADER = WCHAR_HEADER)]` | Specify replacement headers for automatic string to wchar generators (s.a. `str2wcsHeaderReplacementEscapes` from `generator.dee`) |
+| `%[define_str2wcs_header_replacement(STR_HEADER = WCHAR_HEADER)]` | Specify replacement headers for automatic string to wchar generators (s.a. `str2wcsHeaderReplacementEscapes` from `generator.dee`) |
 |                                                  |                                                              |
 | `%[define_double_replacement(DOUBLE = FLOAT,LONG_DOUBLE)]` | Specify replacements for auto-generated math functions |
 |                                                  |                                                              |
@@ -120,7 +120,7 @@ TODO: Incomplete
 
 | Annotation               | Description                                               |
 | ------------------------ | --------------------------------------------------------- |
-| `[format_arg]`           | Add attribute `__ATTR_FORMAT_ARG(<argumentIndex>)`      |
+| `[format_arg]`           | Add attribute `__ATTR_FORMAT_ARG(<argumentIndex>)`        |
 | `[nullable]`             | no-op                                                     |
 | `[null]`                 | no-op                                                     |
 | `[nonnull]`              | Add arg index to `ATTR_NONNULL((...))`                    |
@@ -202,9 +202,9 @@ TODO: Incomplete
 | `[no_decl]`              | Set declaration: `__LIBC`                                 |
 | `[ignore]`               | Set namespaces: `[]`                                      |
 | `[no_ignore]`            | Set namespaces: `[""]`  (Global namespace) (__default__)  |
-| `[libc]`                 | Export in `<libc/HEADER.h>`: `true`                     |
-| `[nolibc]`               | Export in `<libc/HEADER.h>`: `false` (__default__)      |
-| `[no_libc]`              | Export in `<libc/HEADER.h>`: `false` (__default__)      |
+| `[libc]`                 | Export in `<libc/HEADER.h>`: `true`                       |
+| `[nolibc]`               | Export in `<libc/HEADER.h>`: `false` (__default__)        |
+| `[no_libc]`              | Export in `<libc/HEADER.h>`: `false` (__default__)        |
 | `[inline]`               | Set inline mode: `LOCAL`                                  |
 | `[forceinline]`          | Set inline mode: `FORCELOCAL`                             |
 | `[noinline]`             | Disable inline (__default__)                              |
