@@ -253,7 +253,7 @@ again_prefault:
 
 		if likely(rl.mrl_nodes.mm_min) {
 			do {
-				u16 perm;
+				pagedir_prot_t prot;
 				byte_t const *fault_minaddr, *fault_maxaddr;
 				fault_minaddr = (byte_t const *)mnode_getminaddr(rl.mrl_nodes.mm_min);
 				fault_maxaddr = (byte_t const *)mnode_getmaxaddr(rl.mrl_nodes.mm_min);
@@ -294,7 +294,7 @@ again_prefault:
 
 					/* Re-map the freshly faulted memory. */
 					if unlikely(mf.mfl_node->mn_flags & MNODE_F_MPREPARED) {
-						perm = mpart_mmap_node_p(mf.mfl_part, self->mm_pagedir_p,
+						prot = mpart_mmap_node_p(mf.mfl_part, self->mm_pagedir_p,
 						                         mf.mfl_addr, mf.mfl_size,
 						                         mf.mfl_offs, mf.mfl_node);
 					} else {
@@ -303,7 +303,7 @@ again_prefault:
 							mman_lock_release(self);
 							THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 						}
-						perm = mpart_mmap_node_p(mf.mfl_part, self->mm_pagedir_p,
+						prot = mpart_mmap_node_p(mf.mfl_part, self->mm_pagedir_p,
 						                         mf.mfl_addr, mf.mfl_size,
 						                         mf.mfl_offs, mf.mfl_node);
 						pagedir_unprepare_p(self->mm_pagedir_p, mf.mfl_addr, mf.mfl_size);
@@ -321,7 +321,7 @@ again_prefault:
 					mpart_lock_release(mf.mfl_part);
 
 					/* If write-access was granted, add the node to the list of writable nodes. */
-					if ((perm & PAGEDIR_PROT_WRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
+					if ((prot & PAGEDIR_PROT_WRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
 					    LIST_INSERT_HEAD(&self->mm_writable, mf.mfl_node, mn_writable);
 				}
 

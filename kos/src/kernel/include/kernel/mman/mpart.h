@@ -143,6 +143,11 @@ struct mnode;     /* Memory range descriptor. */
 struct iov_buffer;
 struct iov_physbuffer;
 
+#ifndef __pagedir_prot_t_defined
+#define __pagedir_prot_t_defined
+typedef u16 pagedir_prot_t;
+#endif /* !__pagedir_prot_t_defined */
+
 #ifndef __mnode_list_defined
 #define __mnode_list_defined
 LIST_HEAD(mnode_list, mnode);
@@ -1209,37 +1214,37 @@ mpart_lock_acquire_and_setcore_denywrite_sync(struct mpart *__restrict self)
  *
  * NOTES:
  *   - When  mapping  blocks not  marked  as `MPART_BLOCK_ST_CHNG',
- *     the `PAGEDIR_PROT_WRITE' perm-flag is automatically cleared.
+ *     the `PAGEDIR_PROT_WRITE' prot-flag is automatically cleared.
  *   - When mapping blocks marked as `MPART_BLOCK_ST_NDEF' or `MPART_BLOCK_ST_INIT',
- *     the `PAGEDIR_PROT_EXEC', `PAGEDIR_PROT_READ'  and `PAGEDIR_PROT_WRITE'  perm-
+ *     the `PAGEDIR_PROT_EXEC', `PAGEDIR_PROT_READ'  and `PAGEDIR_PROT_WRITE'  prot-
  *     flags are automatically cleared.
  *
  * @return: * : The union of permissions actually applied to all  pages.
  *              This may be used to figure out if write permissions were
  *              actually given to any of the requested pages. */
-FUNDEF NOBLOCK NONNULL((1)) u16
+FUNDEF NOBLOCK NONNULL((1)) pagedir_prot_t
 NOTHROW(FCALL mpart_mmap_p)(struct mpart const *__restrict self, pagedir_phys_t pdir,
                             PAGEDIR_PAGEALIGNED void *addr,
                             PAGEDIR_PAGEALIGNED size_t size,
                             PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
-                            u16 perm);
+                            pagedir_prot_t prot);
 
 /* Same as `mpart_mmap_p()', but always map into the current page directory. */
-FUNDEF NOBLOCK NONNULL((1)) u16
+FUNDEF NOBLOCK NONNULL((1)) pagedir_prot_t
 NOTHROW(FCALL mpart_mmap)(struct mpart const *__restrict self,
                           PAGEDIR_PAGEALIGNED void *addr,
                           PAGEDIR_PAGEALIGNED size_t size,
                           PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
-                          u16 perm);
+                          pagedir_prot_t prot);
 
-/* Similar to `mpart_mmap_p()', but force the given `perm' for all pages, no
+/* Similar to `mpart_mmap_p()', but force the given `prot' for all pages, no
  * matter  what the block-status  bitset of `self' might  say of the matter. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_mmap_force_p)(struct mpart const *__restrict self, pagedir_phys_t pdir,
                                   PAGEDIR_PAGEALIGNED void *addr,
                                   PAGEDIR_PAGEALIGNED size_t size,
                                   PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
-                                  u16 perm);
+                                  pagedir_prot_t prot);
 
 /* Same as `mpart_mmap_force_p()', but always map into the current page directory. */
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -1247,21 +1252,21 @@ NOTHROW(FCALL mpart_mmap_force)(struct mpart const *__restrict self,
                                 PAGEDIR_PAGEALIGNED void *addr,
                                 PAGEDIR_PAGEALIGNED size_t size,
                                 PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
-                                u16 perm);
+                                pagedir_prot_t prot);
 
 /* For use with `MNODE_F_MHINT':
  *  - Ensure that the pages (== block) at the given `offset'
  *    has been marked as `MPART_BLOCK_ST_CHNG', invoking the
  *    block loader from the associated file if necessary.
  *  - Afterwards, map the associated page to `addr' within
- *    the   current   page   directory,   using    `perm'.
+ *    the   current   page   directory,   using    `prot'.
  * This function is used to implement handling of hinted
  * mem-nodes   when  encountered  by  the  #PF  handler. */
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL mpart_hinted_mmap)(struct mpart *__restrict self,
                                  PAGEDIR_PAGEALIGNED void *addr,
                                  PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
-                                 u16 perm);
+                                 pagedir_prot_t prot);
 
 /* Convenience wrapper for `mpart_hinted_mmap()' */
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void
@@ -1415,17 +1420,17 @@ NOTHROW(FCALL _mpart_issharewritable)(struct mpart const *__restrict self,
 
 
 /* A slightly smarter equivalent of:
- * >> u16 prot;
- * >> prot = mnode_getprot(node);
- * >> prot = mpart_mmap(self, addr, size, offset);
- * >> return prot;
+ * >> pagedir_prot_t perm;
+ * >> perm = mnode_getprot(node);
+ * >> perm = mpart_mmap(self, addr, size, offset);
+ * >> return perm;
  * However, unlike that piece of code, this one determines if write
  * access can be granted on a per-page basis (see the documentation
  * of `mpart_iscopywritable()'  and  `mpart_issharewritable()'  for
  * when write-access can be given)
  * @return: * : The union (or aka. |-ed together) set of `PAGEDIR_PROT_*'
  *              flags  used to  map pages  from the  given address range. */
-FUNDEF NOBLOCK NONNULL((1, 5)) u16
+FUNDEF NOBLOCK NONNULL((1, 5)) pagedir_prot_t
 NOTHROW(FCALL mpart_mmap_node)(struct mpart const *__restrict self,
                                PAGEDIR_PAGEALIGNED void *addr,
                                PAGEDIR_PAGEALIGNED size_t size,
@@ -1433,7 +1438,7 @@ NOTHROW(FCALL mpart_mmap_node)(struct mpart const *__restrict self,
                                struct mnode const *__restrict node);
 
 /* Same as `mpart_mmap_node()', but map into the given page directory. */
-FUNDEF NOBLOCK NONNULL((1, 6)) u16
+FUNDEF NOBLOCK NONNULL((1, 6)) pagedir_prot_t
 NOTHROW(FCALL mpart_mmap_node_p)(struct mpart const *__restrict self,
                                  pagedir_phys_t pdir,
                                  PAGEDIR_PAGEALIGNED void *addr,

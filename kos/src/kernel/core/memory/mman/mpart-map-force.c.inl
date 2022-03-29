@@ -38,16 +38,16 @@
 DECL_BEGIN
 
 #ifdef DEFINE_mpart_mmap_force_p
-/* Similar to `mpart_mmap_p()', but force the given `perm' for all pages, no
+/* Similar to `mpart_mmap_p()', but force the given `prot' for all pages, no
  * matter  what the block-status  bitset of `self' might  say of the matter. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_mmap_force_p)(struct mpart const *__restrict self, pagedir_phys_t pdir,
                                   PAGEDIR_PAGEALIGNED void *addr,
                                   PAGEDIR_PAGEALIGNED size_t size,
                                   PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
-                                  u16 perm)
+                                  pagedir_prot_t prot)
 #define LOCAL_pagedir_map(addr, num_bytes, phys) \
-	pagedir_map_p(pdir, addr, num_bytes, phys, perm)
+	pagedir_map_p(pdir, addr, num_bytes, phys, prot)
 #define LOCAL_pagedir_unmap(addr, num_bytes) \
 	pagedir_unmap_p(pdir, addr, num_bytes)
 #elif defined(DEFINE_mpart_mmap_force)
@@ -57,9 +57,9 @@ NOTHROW(FCALL mpart_mmap_force)(struct mpart const *__restrict self,
                                 PAGEDIR_PAGEALIGNED void *addr,
                                 PAGEDIR_PAGEALIGNED size_t size,
                                 PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
-                                u16 perm)
+                                pagedir_prot_t prot)
 #define LOCAL_pagedir_map(addr, num_bytes, phys) \
-	pagedir_map(addr, num_bytes, phys, perm)
+	pagedir_map(addr, num_bytes, phys, prot)
 #define LOCAL_pagedir_unmap pagedir_unmap
 #else /* ... */
 #error "Bad configuration"

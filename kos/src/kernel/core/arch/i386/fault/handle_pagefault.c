@@ -1030,9 +1030,9 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 
 	/* Re-map the freshly faulted memory. */
 	{
-		u16 perm;
+		pagedir_prot_t prot;
 		if unlikely(mf.mfl_node->mn_flags & MNODE_F_MPREPARED) {
-			perm = mpart_mmap_node(mf.mfl_part, mf.mfl_addr,
+			prot = mpart_mmap_node(mf.mfl_part, mf.mfl_addr,
 			                       mf.mfl_size, mf.mfl_offs,
 			                       mf.mfl_node);
 		} else {
@@ -1041,7 +1041,7 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 				mman_lock_release(mf.mfl_mman);
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 			}
-			perm = mpart_mmap_node(mf.mfl_part, mf.mfl_addr,
+			prot = mpart_mmap_node(mf.mfl_part, mf.mfl_addr,
 			                       mf.mfl_size, mf.mfl_offs,
 			                       mf.mfl_node);
 			pagedir_unprepare(mf.mfl_addr, mf.mfl_size);
@@ -1049,7 +1049,7 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 		mpart_lock_release(mf.mfl_part);
 
 		/* If write-access was granted, add the node to the list of writable nodes. */
-		if ((perm & PAGEDIR_PROT_WRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
+		if ((prot & PAGEDIR_PROT_WRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
 			LIST_INSERT_HEAD(&mf.mfl_mman->mm_writable, mf.mfl_node, mn_writable);
 
 		/* Sync the newly mapped address range if the mapping was created  with
@@ -1070,13 +1070,13 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 		 * FIXME: The original `mf.mfl_part' must only be decref'd _AFTER_  we
 		 *        did this. - Otherwise, other CPUs might have TLBs for memory
 		 *        that was already freed! */
-		if (perm & PAGEDIR_PROT_WRITE)
+		if (prot & PAGEDIR_PROT_WRITE)
 			mman_sync(mf.mfl_addr, mf.mfl_size);
 
 #if 0
-		printk(KERN_DEBUG "Page fault at %p (page %p) [pc=%p,sp=%p] [ecode=%#" PRIxPTR "] resolve:[part=%p,perm=%#x]\n",
+		printk(KERN_DEBUG "Page fault at %p (page %p) [pc=%p,sp=%p] [ecode=%#" PRIxPTR "] resolve:[part=%p,prot=%#x]\n",
 		       (uintptr_t)addr, mf.mfl_addr, pc, icpustate_getsp(state), ecode,
-		       mf.mfl_part, perm);
+		       mf.mfl_part, prot);
 #endif
 	}
 	mman_lock_release(mf.mfl_mman);

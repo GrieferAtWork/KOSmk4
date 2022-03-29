@@ -1826,7 +1826,7 @@ NOTHROW(FCALL p64_pagedir_xch_e1_word_nochk)(unsigned int vec4,
 #endif /* !NDEBUG */
 
 
-INTERN u64 p64_pageperm_matrix[0x40] = {
+INTERN u64 p64_pageprot_table[0x40] = {
 #define COMMON_PRESENT (P64_PAGE_FPREPARED | P64_PAGE_FACCESSED | P64_PAGE_FDIRTY | P64_PAGE_FPRESENT)
 	[(0)]                                                                                                                               = P64_PAGE_FNOEXEC,
 	[(PAGEDIR_PROT_EXEC)]                                                                                                               = COMMON_PRESENT,
@@ -1898,20 +1898,20 @@ INTERN u64 p64_pageperm_matrix[0x40] = {
 LOCAL NOBLOCK WUNUSED u64
 NOTHROW(FCALL p64_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                        PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
-                                       u16 perm) {
+                                       pagedir_prot_t prot) {
 	u64 result;
 	PG_ASSERT_ALIGNED_ADDRESS(addr);
 	assertf(IS_ALIGNED(phys, 4096), "phys = %" PRIpN(__SIZEOF_PHYSADDR_T__), phys);
-	assertf(!(perm & ~PAGEDIR_PROT_MASK),
-	        "Invalid page permissions: %#.4" PRIx16, perm);
+	assertf(!(prot & ~PAGEDIR_PROT_MASK),
+	        "Invalid page protection: %#.4" PRIx16, prot);
 	assertf(phys <= (physaddr_t)UINT64_C(0x000ffffffffff000),
 	        "Address cannot be mapped under p64: %" PRIpN(__SIZEOF_PHYSADDR_T__),
 	        phys);
 	result  = (u64)phys;
 #if PAGEDIR_PROT_MASK == 0x3f
-	result |= p64_pageperm_matrix[perm];
+	result |= p64_pageprot_table[prot];
 #else /* PAGEDIR_PROT_MASK == 0x3f */
-	result |= p64_pageperm_matrix[perm & 0x3f];
+	result |= p64_pageprot_table[prot & 0x3f];
 #endif /* PAGEDIR_PROT_MASK != 0x3f */
 
 	/* All kernel pages have the GLOBAL bit set, and all user pages the USER bit. */
@@ -1999,15 +1999,15 @@ NOTHROW(FCALL p64_pagedir_gethint)(VIRT void *addr) {
 
 
 /* Create/delete a page-directory mapping.
- * @param: perm: A set of `PAGEDIR_PROT_*' detailing how memory should be mapped. */
+ * @param: prot: A set of `PAGEDIR_PROT_*' detailing how memory should be mapped. */
 INTERN NOBLOCK void
 NOTHROW(FCALL p64_pagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                   PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
-                                  u16 perm) {
+                                  pagedir_prot_t prot) {
 	u64 e1_word;
 	unsigned int vec4, vec3, vec2, vec1;
-	PG_TRACE_MAP(addr, PAGESIZE, phys, perm);
-	e1_word = p64_pagedir_encode_4kib(addr, phys, perm);
+	PG_TRACE_MAP(addr, PAGESIZE, phys, prot);
+	e1_word = p64_pagedir_encode_4kib(addr, phys, prot);
 	vec4 = P64_PDIR_VEC4INDEX(addr);
 	vec3 = P64_PDIR_VEC3INDEX(addr);
 	vec2 = P64_PDIR_VEC2INDEX(addr);
@@ -2019,12 +2019,12 @@ INTERN NOBLOCK void
 NOTHROW(FCALL p64_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                PAGEDIR_PAGEALIGNED size_t num_bytes,
                                PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
-                               u16 perm) {
+                               pagedir_prot_t prot) {
 	size_t i;
 	u64 e1_word;
 	PG_ASSERT_ALIGNED_ADDRESS_RANGE(addr, num_bytes);
-	PG_TRACE_MAP(addr, num_bytes, phys, perm);
-	e1_word = p64_pagedir_encode_4kib(addr, phys, perm);
+	PG_TRACE_MAP(addr, num_bytes, phys, prot);
+	e1_word = p64_pagedir_encode_4kib(addr, phys, prot);
 	for (i = 0; i < num_bytes; i += 4096) {
 		unsigned int vec4, vec3, vec2, vec1;
 		byte_t *effective_addr = (byte_t *)addr + i;
@@ -2047,11 +2047,11 @@ NOTHROW(FCALL p64_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 INTERN NOBLOCK WUNUSED pagedir_pushval_t
 NOTHROW(FCALL p64_pagedir_push_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                        PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
-                                       u16 perm) {
+                                       pagedir_prot_t prot) {
 	u64 e1_word, result;
 	unsigned int vec4, vec3, vec2, vec1;
-	PG_TRACE_MAP(addr, PAGESIZE, phys, perm);
-	e1_word = p64_pagedir_encode_4kib(addr, phys, perm);
+	PG_TRACE_MAP(addr, PAGESIZE, phys, prot);
+	e1_word = p64_pagedir_encode_4kib(addr, phys, prot);
 	vec4 = P64_PDIR_VEC4INDEX(addr);
 	vec3 = P64_PDIR_VEC3INDEX(addr);
 	vec2 = P64_PDIR_VEC2INDEX(addr);
@@ -2479,14 +2479,14 @@ NOTHROW(KCALL x86_initialize_paging)(void) {
 		used_pxx_page_fglobal = 0;
 	if (!HAVE_EXECUTE_DISABLE) {
 		unsigned int i;
-		for (i = 0; i < COMPILER_LENOF(p64_pageperm_matrix); ++i)
-			p64_pageperm_matrix[i] &= ~P64_PAGE_FNOEXEC;
+		for (i = 0; i < COMPILER_LENOF(p64_pageprot_table); ++i)
+			p64_pageprot_table[i] &= ~P64_PAGE_FNOEXEC;
 	}
 	if (!HAVE_PAGE_ATTRIBUTE_TABLE) {
 		/* Disable PAT bits. */
 		unsigned int i;
-		for (i = 0; i < COMPILER_LENOF(p64_pageperm_matrix); ++i)
-			p64_pageperm_matrix[i] &= ~(P64_PAGE_FPWT | P64_PAGE_FPCD | P64_PAGE_FPAT_4KIB);
+		for (i = 0; i < COMPILER_LENOF(p64_pageprot_table); ++i)
+			p64_pageprot_table[i] &= ~(P64_PAGE_FPWT | P64_PAGE_FPCD | P64_PAGE_FPAT_4KIB);
 	}
 
 	/* Check if we must re-write our implementation of `pagedir_syncall()'.

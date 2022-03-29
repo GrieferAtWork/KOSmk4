@@ -151,14 +151,14 @@ again:
 
 		/* (re-)map the faulted address range. */
 		{
-			u16 perm;
-			perm = mpart_mmap_node(mf.mfl_part, mf.mfl_addr,
+			pagedir_prot_t prot;
+			prot = mpart_mmap_node(mf.mfl_part, mf.mfl_addr,
 			                       mf.mfl_size, mf.mfl_offs,
 			                       mf.mfl_node);
 			pagedir_unprepare(mf.mfl_addr, mf.mfl_size);
 			pagedir_sync(mf.mfl_addr, mf.mfl_size);
 			mpart_lock_release(mf.mfl_part);
-			if ((perm & PAGEDIR_PROT_WRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
+			if ((prot & PAGEDIR_PROT_WRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
 				LIST_INSERT_HEAD(&mf.mfl_mman->mm_writable, mf.mfl_node, mn_writable);
 		}
 		mman_lock_release(mf.mfl_mman);
@@ -320,14 +320,14 @@ again:
 
 		/* (re-)map the faulted address range. */
 		{
-			u16 perm;
-			perm = mpart_mmap_node(mf.mfl_part, mf.mfl_addr,
+			pagedir_prot_t prot;
+			prot = mpart_mmap_node(mf.mfl_part, mf.mfl_addr,
 			                       mf.mfl_size, mf.mfl_offs,
 			                       mf.mfl_node);
 			pagedir_unprepare(mf.mfl_addr, mf.mfl_size);
 			pagedir_sync(mf.mfl_addr, mf.mfl_size);
 			mpart_lock_release(mf.mfl_part);
-			if ((perm & PAGEDIR_PROT_WRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
+			if ((prot & PAGEDIR_PROT_WRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
 				LIST_INSERT_HEAD(&mf.mfl_mman->mm_writable, mf.mfl_node, mn_writable);
 		}
 		mman_lock_release(mf.mfl_mman);

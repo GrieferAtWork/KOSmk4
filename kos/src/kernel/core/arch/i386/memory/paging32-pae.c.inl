@@ -1031,7 +1031,7 @@ NOTHROW(FCALL pae_pagedir_xch_e1_word_nochk)(unsigned int vec3,
 
 
 
-INTERN ATTR_PAGING_READMOSTLY u64 pae_pageperm_matrix[0x40] = {
+INTERN ATTR_PAGING_READMOSTLY u64 pae_pageprot_table[0x40] = {
 #define COMMON_PRESENT (PAE_PAGE_FPREPARED | PAE_PAGE_FACCESSED | PAE_PAGE_FDIRTY | PAE_PAGE_FPRESENT)
 	[(0)]                                                                                                                               = PAE_PAGE_FNOEXEC,
 	[(PAGEDIR_PROT_EXEC)]                                                                                                               = COMMON_PRESENT,
@@ -1104,20 +1104,20 @@ INTERN ATTR_PAGING_READMOSTLY u64 pae_pageperm_matrix[0x40] = {
 LOCAL NOBLOCK WUNUSED u64
 NOTHROW(FCALL pae_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                        PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
-                                       u16 perm) {
+                                       pagedir_prot_t prot) {
 	u64 result;
 	PG_ASSERT_ALIGNED_ADDRESS(addr);
 	assertf(IS_ALIGNED(phys, 4096), "phys = %" PRIpN(__SIZEOF_PHYSADDR_T__), phys);
-	assertf(!(perm & ~PAGEDIR_PROT_MASK),
-	        "Invalid page permissions: %#.4" PRIx16, perm);
+	assertf(!(prot & ~PAGEDIR_PROT_MASK),
+	        "Invalid page protection: %#.4" PRIx16, prot);
 	assertf(phys <= (physaddr_t)UINT64_C(0x000ffffffffff000),
 	        "Address cannot be mapped under pae: %" PRIpN(__SIZEOF_PHYSADDR_T__),
 	        phys);
 	result  = (u64)phys;
 #if PAGEDIR_PROT_MASK == 0x3f
-	result |= pae_pageperm_matrix[perm];
+	result |= pae_pageprot_table[prot];
 #else /* PAGEDIR_PROT_MASK == 0x3f */
-	result |= pae_pageperm_matrix[perm & 0x3f];
+	result |= pae_pageprot_table[prot & 0x3f];
 #endif /* PAGEDIR_PROT_MASK != 0x3f */
 
 	/* All kernel pages have the GLOBAL bit set, and all user pages the USER bit. */
@@ -1197,15 +1197,15 @@ NOTHROW(FCALL pae_pagedir_gethint)(VIRT void *addr) {
 
 
 /* Create/delete a page-directory mapping.
- * @param: perm: A set of `PAGEDIR_PROT_*' detailing how memory should be mapped. */
+ * @param: prot: A set of `PAGEDIR_PROT_*' detailing how memory should be mapped. */
 INTERN NOBLOCK void
 NOTHROW(FCALL pae_pagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                   PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
-                                  u16 perm) {
+                                  pagedir_prot_t prot) {
 	u64 e1_word;
 	unsigned int vec3, vec2, vec1;
-	PG_TRACE_MAP(addr, PAGESIZE, phys, perm);
-	e1_word = pae_pagedir_encode_4kib(addr, phys, perm);
+	PG_TRACE_MAP(addr, PAGESIZE, phys, prot);
+	e1_word = pae_pagedir_encode_4kib(addr, phys, prot);
 	vec3 = PAE_PDIR_VEC3INDEX(addr);
 	vec2 = PAE_PDIR_VEC2INDEX(addr);
 	vec1 = PAE_PDIR_VEC1INDEX(addr);
@@ -1216,12 +1216,12 @@ INTERN NOBLOCK void
 NOTHROW(FCALL pae_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                PAGEDIR_PAGEALIGNED size_t num_bytes,
                                PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
-                               u16 perm) {
+                               pagedir_prot_t prot) {
 	size_t i;
 	u64 e1_word;
 	PG_ASSERT_ALIGNED_ADDRESS_RANGE(addr, num_bytes);
-	PG_TRACE_MAP(addr, num_bytes, phys, perm);
-	e1_word = pae_pagedir_encode_4kib(addr, phys, perm);
+	PG_TRACE_MAP(addr, num_bytes, phys, prot);
+	e1_word = pae_pagedir_encode_4kib(addr, phys, prot);
 	for (i = 0; i < num_bytes; i += 4096) {
 		unsigned int vec3, vec2, vec1;
 		byte_t *effective_addr = (byte_t *)addr + i;
@@ -1243,11 +1243,11 @@ NOTHROW(FCALL pae_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 INTERN NOBLOCK WUNUSED pae_pagedir_pushval_t
 NOTHROW(FCALL pae_pagedir_push_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                        PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
-                                       u16 perm) {
+                                       pagedir_prot_t prot) {
 	u64 e1_word, result;
 	unsigned int vec3, vec2, vec1;
-	PG_TRACE_MAP(addr, PAGESIZE, phys, perm);
-	e1_word = pae_pagedir_encode_4kib(addr, phys, perm);
+	PG_TRACE_MAP(addr, PAGESIZE, phys, prot);
+	e1_word = pae_pagedir_encode_4kib(addr, phys, prot);
 	vec3 = PAE_PDIR_VEC3INDEX(addr);
 	vec2 = PAE_PDIR_VEC2INDEX(addr);
 	vec1 = PAE_PDIR_VEC1INDEX(addr);

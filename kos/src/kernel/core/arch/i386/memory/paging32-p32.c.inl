@@ -695,7 +695,7 @@ NOTHROW(FCALL p32_pagedir_xch_e1_word_nochk)(unsigned int vec2,
 #endif /* !NDEBUG */
 
 
-INTERN_CONST ATTR_PAGING_READMOSTLY u32 const p32_pageperm_matrix[0x40] = {
+INTERN_CONST ATTR_PAGING_READMOSTLY u32 const p32_pageprot_table[0x40] = {
 #define COMMON_PRESENT (P32_PAGE_FPREPARED | P32_PAGE_FACCESSED | P32_PAGE_FDIRTY | P32_PAGE_FPRESENT)
 	[(0)]                                                                                                                               = 0,
 	[(PAGEDIR_PROT_EXEC)]                                                                                                               = COMMON_PRESENT,
@@ -767,12 +767,12 @@ INTERN_CONST ATTR_PAGING_READMOSTLY u32 const p32_pageperm_matrix[0x40] = {
 LOCAL NOBLOCK WUNUSED u32
 NOTHROW(FCALL p32_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                        PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
-                                       u16 perm) {
+                                       pagedir_prot_t prot) {
 	u32 result;
 	PG_ASSERT_ALIGNED_ADDRESS(addr);
 	assertf(IS_ALIGNED(phys, 4096), "phys = %" PRIpN(__SIZEOF_PHYSADDR_T__), phys);
-	assertf(!(perm & ~PAGEDIR_PROT_MASK),
-	        "Invalid page permissions: %#.4" PRIx16, perm);
+	assertf(!(prot & ~PAGEDIR_PROT_MASK),
+	        "Invalid page protection: %#.4" PRIx16, prot);
 #if __SIZEOF_PHYSADDR_T__ > 4
 	assertf(phys <= (physaddr_t)0xfffff000,
 	        "Address cannot be mapped under p32: %" PRIpN(__SIZEOF_PHYSADDR_T__),
@@ -780,15 +780,15 @@ NOTHROW(FCALL p32_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 #endif /* __SIZEOF_PHYSADDR_T__ > 4 */
 	result  = (u32)phys;
 #if PAGEDIR_PROT_MASK == 0x3f
-	result |= p32_pageperm_matrix[perm];
+	result |= p32_pageprot_table[prot];
 #else /* PAGEDIR_PROT_MASK == 0x3f */
-	result |= p32_pageperm_matrix[perm & 0x3f];
+	result |= p32_pageprot_table[prot & 0x3f];
 #endif /* PAGEDIR_PROT_MASK != 0x3f */
 
 	/* All kernel pages have the GLOBAL bit set, and all user pages the USER bit. */
-	if ((byte_t *)addr >= (byte_t *)KERNELSPACE_BASE)
+	if ((byte_t *)addr >= (byte_t *)KERNELSPACE_BASE) {
 		result |= USED_P32_PAGE_FGLOBAL;
-	else {
+	} else {
 		result |= P32_PAGE_FUSER;
 	}
 	return result;
@@ -851,15 +851,15 @@ NOTHROW(FCALL p32_pagedir_gethint)(VIRT void *addr) {
 }
 
 /* Create/delete a page-directory mapping.
- * @param: perm: A set of `PAGEDIR_PROT_*' detailing how memory should be mapped. */
+ * @param: prot: A set of `PAGEDIR_PROT_*' detailing how memory should be mapped. */
 INTERN NOBLOCK void
 NOTHROW(FCALL p32_pagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                   PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
-                                  u16 perm) {
+                                  pagedir_prot_t prot) {
 	u32 e1_word;
 	unsigned int vec2, vec1;
-	PG_TRACE_MAP(addr, PAGESIZE, phys, perm);
-	e1_word = p32_pagedir_encode_4kib(addr, phys, perm);
+	PG_TRACE_MAP(addr, PAGESIZE, phys, prot);
+	e1_word = p32_pagedir_encode_4kib(addr, phys, prot);
 	vec2 = P32_PDIR_VEC2INDEX(addr);
 	vec1 = P32_PDIR_VEC1INDEX(addr);
 	p32_pagedir_set_e1_word(vec2, vec1, e1_word);
@@ -869,12 +869,12 @@ INTERN NOBLOCK void
 NOTHROW(FCALL p32_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                PAGEDIR_PAGEALIGNED size_t num_bytes,
                                PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
-                                u16 perm) {
+                               pagedir_prot_t prot) {
 	size_t i;
 	u32 e1_word;
 	PG_ASSERT_ALIGNED_ADDRESS_RANGE(addr, num_bytes);
-	PG_TRACE_MAP(addr, num_bytes, phys, perm);
-	e1_word = p32_pagedir_encode_4kib(addr, phys, perm);
+	PG_TRACE_MAP(addr, num_bytes, phys, prot);
+	e1_word = p32_pagedir_encode_4kib(addr, phys, prot);
 	for (i = 0; i < num_bytes; i += 4096) {
 		unsigned int vec2, vec1;
 		byte_t *effective_addr = (byte_t *)addr + i;
@@ -895,11 +895,11 @@ NOTHROW(FCALL p32_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 INTERN NOBLOCK WUNUSED p32_pagedir_pushval_t
 NOTHROW(FCALL p32_pagedir_push_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                        PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
-                                       u16 perm) {
+                                       pagedir_prot_t prot) {
 	u32 e1_word, result;
 	unsigned int vec2, vec1;
-	PG_TRACE_MAP(addr, PAGESIZE, phys, perm);
-	e1_word = p32_pagedir_encode_4kib(addr, phys, perm);
+	PG_TRACE_MAP(addr, PAGESIZE, phys, prot);
+	e1_word = p32_pagedir_encode_4kib(addr, phys, prot);
 	vec2 = P32_PDIR_VEC2INDEX(addr);
 	vec1 = P32_PDIR_VEC1INDEX(addr);
 	result = p32_pagedir_xch_e1_word(vec2, vec1, e1_word);

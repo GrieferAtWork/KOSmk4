@@ -328,7 +328,7 @@ again:
 		    mnode_pagedir_prepare_p(self->mm_pagedir_p, node))
 			was_prepared |= MMAN_MAP_MBUILDER_F_PREPARED;
 		if (was_prepared & MMAN_MAP_MBUILDER_F_PREPARED) {
-			u16 map_prot;
+			pagedir_prot_t map_prot;
 			/* Try to map the associated part into the target mman's page directory. */
 			map_prot = mpart_mmap_node_p(node->mn_part,
 			                             self->mm_pagedir_p,
@@ -340,6 +340,7 @@ again:
 			/* Set `MBNODE_F_WRITABLE' if the node ends up as writable. */
 			if (map_prot & PAGEDIR_PROT_WRITE)
 				tree->mbn_flags |= MBNODE_F_WRITABLE;
+
 			/* If we've only temporarily prepared the pagedir, then unprepare again. */
 			if (was_prepared != flags)
 				mnode_pagedir_unprepare_p(self->mm_pagedir_p, node);

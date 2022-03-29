@@ -183,7 +183,7 @@ FOREACH_PAGING_FUNCTION(DEFINE_PUBLIC_ALIAS_PAGING_P32)
 
 
 #ifndef CONFIG_NO_PAGING_P32
-INTDEF u32 p32_pageperm_matrix_[0x40] ASMNAME("p32_pageperm_matrix");
+INTDEF u32 p32_pageperm_matrix_[0x40] ASMNAME("p32_pageprot_table");
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_paging_p32)(void) {
@@ -206,7 +206,7 @@ NOTHROW(KCALL kernel_initialize_paging_p32)(void) {
 #endif /* !CONFIG_NO_PAGING_P32 */
 
 #ifndef CONFIG_NO_PAGING_PAE
-INTDEF u64 pae_pageperm_matrix_[0x40] ASMNAME("pae_pageperm_matrix");
+INTDEF u64 pae_pageprot_table_[0x40] ASMNAME("pae_pageprot_table");
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_paging_pae)(void) {
@@ -217,8 +217,8 @@ NOTHROW(KCALL kernel_initialize_paging_pae)(void) {
 	if __untraced(!HAVE_EXECUTE_DISABLE) {
 		unsigned int i;
 		/* Disable support for execute-disable. */
-		for (i = 0; i < COMPILER_LENOF(pae_pageperm_matrix_); ++i)
-			pae_pageperm_matrix_[i] &= ~PAE_PAGE_FNOEXEC;
+		for (i = 0; i < COMPILER_LENOF(pae_pageprot_table_); ++i)
+			pae_pageprot_table_[i] &= ~PAE_PAGE_FNOEXEC;
 	} else {
 		u64 msr;
 		/* Set the NXE msr bit to enable support for execute-disable */
@@ -229,8 +229,8 @@ NOTHROW(KCALL kernel_initialize_paging_pae)(void) {
 	if (!HAVE_PAGE_ATTRIBUTE_TABLE) {
 		/* Disable PAT bits. */
 		unsigned int i;
-		for (i = 0; i < COMPILER_LENOF(pae_pageperm_matrix_); ++i)
-			pae_pageperm_matrix_[i] &= ~(PAE_PAGE_FPWT | PAE_PAGE_FPCD | PAE_PAGE_FPAT_4KIB);
+		for (i = 0; i < COMPILER_LENOF(pae_pageprot_table_); ++i)
+			pae_pageprot_table_[i] &= ~(PAE_PAGE_FPWT | PAE_PAGE_FPCD | PAE_PAGE_FPAT_4KIB);
 	}
 }
 #endif /* !CONFIG_NO_PAGING_PAE */

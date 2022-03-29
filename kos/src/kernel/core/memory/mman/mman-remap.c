@@ -243,7 +243,7 @@ something_changed:
 	while (!SLIST_EMPTY(&map.mmwu_map.mfm_nodes)) {
 		struct mnode *node;
 		struct mpart *part;
-		u16 map_prot;
+		pagedir_prot_t map_prot;
 		node = SLIST_FIRST(&map.mmwu_map.mfm_nodes);
 		SLIST_REMOVE_HEAD(&map.mmwu_map.mfm_nodes, _mn_alloc);
 		part           = node->mn_part;
@@ -470,7 +470,7 @@ NOTHROW(KCALL insert_and_maybe_map_nodes)(struct mman *__restrict self,
 				ATOMIC_OR(part->mp_flags, MPART_F_MLOCK);
 
 			if (did_prepare) {
-				u16 map_prot;
+				pagedir_prot_t map_prot;
 				/* Map the backing part (as far as that is possible) */
 				map_prot = mpart_mmap_node_p(part, self->mm_pagedir_p,
 				                             mnode_getaddr(node),
@@ -664,7 +664,7 @@ err_cannot_prepare:
 				SLIST_REMOVE_HEAD(&movenodes, _mn_dead);
 				mman_mappings_insert(self, node);
 				if (node->mn_part != NULL && mpart_lock_tryacquire(node->mn_part)) {
-					u16 map_prot;
+					pagedir_prot_t map_prot;
 
 					/* Map the backing part (as far as that is possible) */
 					map_prot = mpart_mmap_node_p(node->mn_part,
@@ -855,7 +855,7 @@ again_lock_mman_phase2:
 						mman_mappings_insert(self, node);
 						if (node->mn_part != NULL && did_prepare &&
 						    mpart_lock_tryacquire(node->mn_part)) {
-							u16 map_prot;
+							pagedir_prot_t map_prot;
 
 							/* Map the backing part (as far as that is possible) */
 							map_prot = mpart_mmap_node_p(node->mn_part,

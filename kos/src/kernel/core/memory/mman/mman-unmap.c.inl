@@ -309,7 +309,7 @@ again_acquire_lock:
 			if (mnodeflags_prot_more_restrictive(old_flags, new_flags)) {
 				struct mpart *part = node->mn_part;
 				if likely(part != NULL) {
-					u16 newperm;
+					pagedir_prot_t newperm;
 					void *node_addr;
 					size_t node_size;
 					node_addr = mnode_getaddr(node);

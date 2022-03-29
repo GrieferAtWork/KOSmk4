@@ -309,6 +309,10 @@ typedef u64 pae_pagedir_pushval_t;
 #define PAGEDIR_PAGEALIGNED /* Annotation for variables that need to be aligned on page boundaries. */
 #endif /* !PAGEDIR_PAGEALIGNED */
 
+#ifndef __pagedir_prot_t_defined
+#define __pagedir_prot_t_defined
+typedef u16 pagedir_prot_t;
+#endif /* !__pagedir_prot_t_defined */
 
 /* Initialize the given page directory.
  * The caller is required to allocate the page directory
@@ -362,16 +366,16 @@ INTDEF NOBLOCK WUNUSED void *
 NOTHROW(FCALL pae_pagedir_gethint)(PAGEDIR_PAGEALIGNED VIRT void *addr);
 
 /* Create/delete a page-directory mapping.
- * @param: perm: A set of `PAGEDIR_PROT_*' detailing how memory should be mapped. */
+ * @param: prot: A set of `PAGEDIR_PROT_*' detailing how memory should be mapped. */
 INTDEF NOBLOCK void
 NOTHROW(FCALL pae_pagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                   PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
-                                  u16 perm);
+                                  pagedir_prot_t prot);
 INTDEF NOBLOCK void
 NOTHROW(FCALL pae_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                PAGEDIR_PAGEALIGNED size_t num_bytes,
                                PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
-                               u16 perm);
+                               pagedir_prot_t prot);
 
 /* Special variants of `pagedir_mapone()' that should be used to
  * temporary override the  mapping of a  single, prepared  page.
@@ -383,7 +387,7 @@ NOTHROW(FCALL pae_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 INTDEF NOBLOCK WUNUSED pae_pagedir_pushval_t
 NOTHROW(FCALL pae_pagedir_push_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                        PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
-                                       u16 perm);
+                                       pagedir_prot_t prot);
 INTDEF NOBLOCK void
 NOTHROW(FCALL pae_pagedir_pop_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                       pae_pagedir_pushval_t backup);

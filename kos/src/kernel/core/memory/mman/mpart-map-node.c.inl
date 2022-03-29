@@ -39,7 +39,7 @@
 DECL_BEGIN
 
 /* A slightly smarter equivalent of:
- * >> u16 prot;
+ * >> pagedir_prot_t prot;
  * >> prot = mnode_getprot(node);
  * >> prot = mpart_mmap(self, addr, size, offset);
  * >> return prot;
@@ -50,41 +50,41 @@ DECL_BEGIN
  * @return: * : The union (or aka. |-ed together) set of `PAGEDIR_PROT_*'
  *              flags  used to  map pages  from the  given address range. */
 #ifdef DEFINE_mpart_mmap_node
-PUBLIC NOBLOCK NONNULL((1, 5)) u16
+PUBLIC NOBLOCK NONNULL((1, 5)) pagedir_prot_t
 NOTHROW(FCALL mpart_mmap_node)(struct mpart const *__restrict self,
                                PAGEDIR_PAGEALIGNED void *addr,
                                PAGEDIR_PAGEALIGNED size_t size,
                                PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
                                struct mnode const *__restrict node)
-#define LOCAL_mpart_mmap(addr, size, offset, perm) \
-	mpart_mmap(self, addr, size, offset, perm)
+#define LOCAL_mpart_mmap(addr, size, offset, prot) \
+	mpart_mmap(self, addr, size, offset, prot)
 #elif defined(DEFINE_mpart_mmap_node_p)
 /* Same as `mpart_mmap_node()', but map into the given page directory. */
-PUBLIC NOBLOCK NONNULL((1, 6)) u16
+PUBLIC NOBLOCK NONNULL((1, 6)) pagedir_prot_t
 NOTHROW(FCALL mpart_mmap_node_p)(struct mpart const *__restrict self,
                                  pagedir_phys_t pdir,
                                  PAGEDIR_PAGEALIGNED void *addr,
                                  PAGEDIR_PAGEALIGNED size_t size,
                                  PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
                                  struct mnode const *__restrict node)
-#define LOCAL_mpart_mmap(addr, size, offset, perm) \
-	mpart_mmap_p(self, pdir, addr, size, offset, perm)
+#define LOCAL_mpart_mmap(addr, size, offset, prot) \
+	mpart_mmap_p(self, pdir, addr, size, offset, prot)
 #else /* ... */
 #error "Invalid configuration"
 #endif /* !... */
 {
-	u16 perm, result;
-	perm = mnode_getperm_force(node);
+	pagedir_prot_t prot, result;
+	prot = mnode_getperm_force(node);
 
 	/* Check for simple case: No write access needed. */
-	if (!(perm & PAGEDIR_PROT_WRITE))
-		return LOCAL_mpart_mmap(addr, size, offset, perm);
+	if (!(prot & PAGEDIR_PROT_WRITE))
+		return LOCAL_mpart_mmap(addr, size, offset, prot);
 
 	/* Deal with write permissions on a per-page basis! */
 	result = 0;
 	while (size) {
 		size_t part;
-		u16 used_perm = perm;
+		pagedir_prot_t used_perm = prot;
 		bool is_writable;
 
 		/* Select permissions on a per-page basis! */

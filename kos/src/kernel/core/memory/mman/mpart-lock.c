@@ -1706,7 +1706,7 @@ free_unused_block_status:
 	 * valid state, time to have the hardware match us by updating  the
 	 * underlying page directories. */
 	{
-		u16 prot_mask = PAGEDIR_PROT_EXEC | PAGEDIR_PROT_WRITE | PAGEDIR_PROT_READ;
+		pagedir_prot_t prot_mask = PAGEDIR_PROT_EXEC | PAGEDIR_PROT_WRITE | PAGEDIR_PROT_READ;
 		assert(!LIST_EMPTY(&copy->mp_copy));
 		/* We can map as writable if only a single copy-on-write node exists! */
 		if (LIST_NEXT(LIST_FIRST(&copy->mp_copy), mn_link) != NULL)
@@ -1715,7 +1715,7 @@ free_unused_block_status:
 			struct mman *mm;
 			void *addr;
 			size_t size;
-			u16 prot;
+			pagedir_prot_t prot;
 			STATIC_ASSERT(PAGEDIR_PROT_EXEC == MNODE_F_PEXEC);
 			STATIC_ASSERT(PAGEDIR_PROT_WRITE == MNODE_F_PWRITE);
 			STATIC_ASSERT(PAGEDIR_PROT_READ == MNODE_F_PREAD);

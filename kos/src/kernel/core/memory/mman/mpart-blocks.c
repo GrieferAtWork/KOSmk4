@@ -907,14 +907,14 @@ NOTHROW(FCALL mpart_atomic_cmpxch_blockstate)(struct mpart *__restrict self,
  *    has been marked as `MPART_BLOCK_ST_CHNG', invoking the
  *    block loader from the associated file if necessary.
  *  - Afterwards, map the associated page to `addr' within
- *    the   current   page   directory,   using    `perm'.
+ *    the   current   page   directory,   using    `prot'.
  * This function is used to implement handling of hinted
  * mem-nodes   when  encountered  by  the  #PF  handler. */
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL mpart_hinted_mmap)(struct mpart *__restrict self,
                                  PAGEDIR_PAGEALIGNED void *addr,
                                  PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
-                                 u16 perm) {
+                                 pagedir_prot_t prot) {
 	unsigned int st;
 	struct mpart_physloc pl;
 	size_t block_index;
@@ -1002,7 +1002,7 @@ again_read_st:
 	 *       Hinted nodes require that the `MNODE_F_MPREPARED' flag be  set,
 	 *       meaning that we're  allowed to assume  that the page  directory
 	 *       is, and always has been, prepared. */
-	pagedir_mapone(addr, pl.mppl_addr, perm);
+	pagedir_mapone(addr, pl.mppl_addr, prot);
 
 	/* Because  we got here as the result of a #PF, we don't even have to
 	 * sync anything since all that our mapone() call did, was expand the

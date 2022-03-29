@@ -472,7 +472,7 @@ again_lock_mfile_map:
 			struct mnode_list *list;
 			struct mnode *node;
 			struct mpart *part;
-			u16 map_prot;
+			pagedir_prot_t map_prot;
 			node = SLIST_FIRST(&map.mmwu_map.mfm_nodes);
 			SLIST_REMOVE_HEAD(&map.mmwu_map.mfm_nodes, _mn_alloc);
 			part           = node->mn_part;
@@ -537,7 +537,7 @@ again_lock_mfile_map:
 		RETHROW();
 	}
 	while (!SLIST_EMPTY(&ext_nodes)) {
-		u16 map_prot;
+		pagedir_prot_t map_prot;
 		struct mnode *node;
 		struct mpart *part;
 		node = SLIST_FIRST(&ext_nodes);
