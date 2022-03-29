@@ -88,7 +88,7 @@ PUBLIC uint8_t __kernel_poisoned = false;
 DBG_COMMAND(unpoison,
             "unpoison\n"
             "\tClears the PANIC bit after kernel panic\n"
-            "\tThe NO_WARRANTY bit is not altered") {
+            "\tThe NO_WARRANTY bit is not altered\n") {
 	ATOMIC_AND(__kernel_poisoned, ~_KERNEL_POISON_PANIC);
 	return 0;
 }
