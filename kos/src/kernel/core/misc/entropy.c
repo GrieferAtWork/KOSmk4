@@ -393,7 +393,7 @@ DEFINE_SYSCALL3(ssize_t, getrandom,
 
 DBG_COMMAND(entropy,
             "entropy\n"
-            "\tDisplay information on entropy collected by the kernel") {
+            "\tDisplay information on entropy collected by the kernel\n") {
 	size_t i, j;
 	uint8_t bytevalues[256];
 	size_t onebits;
